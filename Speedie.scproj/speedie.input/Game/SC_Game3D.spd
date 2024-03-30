@@ -38,7 +38,7 @@ module SCGame3D
 
 extend SCClass
 	function NewDeclInClassModule (|string| S, |SCClass| T)
-		|| Dcl = SCDecl(T, .ismodel)
+		|| Dcl = SCDecl(T)
 		dcl.Name = S
 		.Modul.TryAdd( .IsModel, Dcl, S )
 	

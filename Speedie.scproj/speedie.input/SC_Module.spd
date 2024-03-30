@@ -22,8 +22,7 @@ linkage
 |bool|						IsRequiredInterface
 
 
-constructor (|message| src)
-	super.constructor(src)
+constructor
 	.defaultrefs = cpprefs.new
 	if compiler.modulelist != nil
 		compiler.modulelist <~ self
@@ -182,7 +181,7 @@ module
 	
 	
 	function NeuModule (CollectFunc)
-		|| m = SCModule.new(node)
+		|| m = SCModule.new
 		m.Project = scimport.curr
 		m.parent = name_space.ProjectFix
 		if node
@@ -192,7 +191,7 @@ module
 
 	function NewContainer (|string| s, |scmodule|)
 		// for storing arbitrary stuff in.
-		rz = SCModule.new(@arg.msg)
+		rz = SCModule.new
 		rz.name = s
 		Compiler.program.TryAdd( nil, rz, s )
 

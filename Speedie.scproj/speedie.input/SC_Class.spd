@@ -43,8 +43,6 @@ linkage
 |Byte|						MinOpt
 |Byte|						IsBehaviour
 |byte|						IsWrapper
-|byte|						IsRole
-|SCNodetype| 				BaseType
 
 // these could all just be an int?
 |bool|						ContainsParentClass
@@ -59,13 +57,14 @@ linkage
 |bool| 						Banned
 |bool|						HasNilChecker
 |bool|						DefaultsToReal
+|byte|						IsRole
 |bool|						IsBuiltin // SCNodeType
+|SCNodetype| 				BaseType
 |bool|						IsASM
 |bool|						IsNotNumeric
 
 
 constructor (|Message| node, |SCNode| parent, |bool| HasPtrs, |scmodule| m)
-	super.constructor(node)
 	Compiler.stClasses++
 	
 	node.obj = self			// for autocomplete :)
@@ -78,7 +77,7 @@ constructor (|Message| node, |SCNode| parent, |bool| HasPtrs, |scmodule| m)
 	.TypeInfo = DataTypeCode.UnusedType
 	.Banned = .TestBanned
 	
-	|| T = SCDecl(self, node)
+	|| T = SCDecl(self)
 	t.nildeclared = (nilstate.real >> HasPtrs)
 	.TypeNormal = T
 	.TypeOptional = T.NilConstructor(NilState.optional * HasPtrs)
@@ -854,8 +853,7 @@ module
 			require parent.ExpectModule(errplace)
 		
 		|| arg = node.GiveArg
-		|| Module = arg.find( @tmp, "module" )
-		|| cls = SCClass.new( node, parent, base.hasptrs, SCModule.new(module) )
+		|| cls = SCClass.new( node, parent, base.hasptrs, SCModule.new )
 		cls.BaseType = base
 		cls.IsRole = (node ~= "role")
 
@@ -863,6 +861,7 @@ module
 		cls.loadlinkage
 		Compiler.ClassList <~ cls
 
+		|| Module = arg.find( @tmp, "module" )
 		cls.loadModuleForCls( Module, parent )
 
 		if (ForInterface and parent isa scmodule)

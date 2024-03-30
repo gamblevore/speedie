@@ -4,7 +4,7 @@
 */
 
 
-class SCObject 
+class SCObject
 	|array? of SCNode|			LinkFrom
 	|Message?|					Source
 	|byte|						NoAutoComplete
@@ -12,8 +12,7 @@ class SCObject
 	|uint| 						LinkedFrom
 	|SCNodeInfo|				NodeInfo
 	
-	constructor (|message?| where)
-		.source = where
+	constructor
 		.linkfrom = nil
 	
 	function SyntaxExpect ( |string| Error )
@@ -60,9 +59,6 @@ class SCNamed (SCObject)	// move back into scobject? we can't remove it from sca
 	|string|					Name
 	|String|					ExportName
 
-	constructor (|message| where)
-		super.constructor(Where)
-	
 	function Name (|string|)
 		nil safe
 		if self

@@ -12,7 +12,6 @@ class SCBehaviour (SCNode)
 	
 	
 	constructor (|SCClass| parent)
-		super.constructor(parent.source)
 		.project = parent.project
 		.parent = parent
 		.Interfaces = dictionary.new
@@ -182,7 +181,7 @@ class SCBehaviour (SCNode)
 	
 	
 	function SCModule.AddInterfaceToTable (|SCClass| TableCls)
-		|| d = SCDecl(.cls!, .source)
+		|| d = SCDecl(.cls!)
 		d.NilDeclared = NilState.real
 		d.Name = .name.InterfaceToBehaviour
 		TableCls.properties <~ d

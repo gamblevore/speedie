@@ -21,7 +21,6 @@ class SCIterator (SCNamed)
 	|bool| 				OK
 	
 	constructor (|scclass?| parent, |Message!| msg)
-		super.constructor(msg)
 		.parent = parent
 		
 		|| thg = msg.first
