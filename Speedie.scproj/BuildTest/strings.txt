@@ -771,7 +771,7 @@
 "Comment did not close."
 "Compilation"
 "Compile Speedie"
-"Compiler did not generate correct code for function."
+"Compiler did not fully type this function."
 "Compiler did not initialise"
 "Compiler error. No decl found."
 "Compiles and installs new Speedie, after self-test."

@@ -461,8 +461,6 @@ struct JB_Error;
 
 struct Message;
 
-struct LessThan2;
-
 struct Message;
 
 struct SCArg;
@@ -478,10 +476,6 @@ struct SCModule;
 struct Message;
 
 struct JB_Task;
-
-struct JB_Task;
-
-struct LessThan;
 
 struct LessThan3;
 
@@ -1379,13 +1373,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBetter (32)
-#define kJB__ErrorColors_bold (JB_LUB[95])
+#define kJB__ErrorColors_bold (JB_LUB[94])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[92])
-#define kJB__ErrorColors_good (JB_LUB[93])
-#define kJB__ErrorColors_normal (JB_LUB[96])
-#define kJB__ErrorColors_underline (JB_LUB[93])
-#define kJB__ErrorColors_warn (JB_LUB[94])
+#define kJB__ErrorColors_error (JB_LUB[91])
+#define kJB__ErrorColors_good (JB_LUB[92])
+#define kJB__ErrorColors_normal (JB_LUB[95])
+#define kJB__ErrorColors_underline (JB_LUB[92])
+#define kJB__ErrorColors_warn (JB_LUB[93])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1562,7 +1556,7 @@ extern Dictionary* JB__SyxDict_;
 extern CharSet* JB_C_Letters;
 extern Dictionary* JB_ClassLinkageTable;
 extern Dictionary* JB_ClsCollectTable;
-#define kJB_codesign_native (JB_LUB[1555])
+#define kJB_codesign_native (JB_LUB[1554])
 extern Dictionary* JB_CppRefTable;
 extern CharSet* JB_CSHex;
 extern CharSet* JB_CSNum;
@@ -1576,7 +1570,7 @@ extern Dictionary* JB_FuncPreReader;
 #define kJB_kActualTypecasts ((~(128 | 32)))
 #define kJB_kAddressOfMatch (3 << 22)
 #define kJB_kASM (63)
-#define kJB_kBitOr (JB_LUB[278])
+#define kJB_kBitOr (JB_LUB[277])
 #define kJB_kCastedMatch (6 << 22)
 #define kJB_kDontSaveProperty (0)
 #define kJB_kLossyCastedMatch (7 << 22)
@@ -1591,7 +1585,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_kSaveProperty (1)
 #define kJB_kSavePropertyAndGoIn (2)
 #define kJB_kSaverEnd (JB_LUB[0])
-#define kJB_kSaverStart1 (JB_LUB[603])
+#define kJB_kSaverStart1 (JB_LUB[602])
 #define kJB_kSelfDebug (2)
 #define kJB_kSelfReplace (1)
 #define kJB_kSimpleMatch (1 << 22)
@@ -2380,7 +2374,7 @@ SCDecl* SC_Comp__FindClassType(Message* n);
 
 SCFunction* SC_Comp__FindFunction(JB_String* Name);
 
-SCModule* SC_Comp__FindModulemsg(Message* where, SCNodeFindMode Mode);
+SCModule* SC_Comp__FindModuleMsg(Message* where, SCNodeFindMode Mode);
 
 SCNode* SC_Comp__FindModuleOrClass(Message* mod, bool retry);
 
@@ -3000,9 +2994,6 @@ SCNode* SC_SCTasks__NewTask(Message* node, SCNode* name_space, Message* ErrPlace
 
 SCNode* SC_SCTasks__NewTaskActual(Message* node, SCNode* name_space);
 
-
-
-// SCTasks2
 
 
 // SCThe
@@ -4351,6 +4342,8 @@ bool SC_SCNodeFindMode_SyntaxIs(SCNodeFindMode self, SCNodeFindMode m);
 // SCNodeType
 bool SC_SCNodeType_HasPtrs(SCNodeType self);
 
+bool SC_SCNodeType_SyntaxIs(SCNodeType self, SCNodeType d);
+
 
 
 // SizeInt
@@ -4703,9 +4696,6 @@ void SC_fn_asm__InitTable();
 
 
 // fpMsgRenderCpp
-
-
-// prototype
 
 
 // prototype
@@ -8304,9 +8294,6 @@ void JB_Err__SourceRemove();
 // JB_FileArchive
 
 
-// JB_LessThan2
-
-
 // JB_MessageRoot
 
 
@@ -9043,14 +9030,8 @@ bool JB_config_Save(Message* self);
 
 
 // JB_interface
-
-
-// JB_interface
 bool SC_Task_LessThan3_interface_SyntaxCall(JB_Task* self, int i);
 
-
-
-// JB_LessThan
 
 
 // JB_LessThan3
@@ -9206,7 +9187,7 @@ inline JB_String* SC_Named_Name(SCNamed* self) {
 	if (self) {
 		return self->Name;
 	}
-	return JB_LUB[276];
+	return JB_LUB[275];
 }
 
 inline bool SC_PA_SyntaxCast(SCParamArray* self) {
@@ -9313,7 +9294,7 @@ inline void SC_Msg_AddValue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1370])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1369])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}
