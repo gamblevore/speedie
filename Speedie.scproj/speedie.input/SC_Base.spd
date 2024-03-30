@@ -809,9 +809,9 @@ function Message.ConstantExpandSub (|Message|)
 
 
 function ConstantExpand (|Message| ch)
-	|| L = ch.first
-	|| op = L.Next
-	|| R = op.Next
+	|| L = ch.first!
+	|| op = L.Next!
+	|| R = op.Next!
 	
 	expect ((op == "=") and (L ==@thg))  ( op, "Expected 'd=(a,b,c...)' ." )
 	

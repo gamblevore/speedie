@@ -305,7 +305,7 @@ function message.AddValue (|scfunction| f)
 	opt norefcounts
 	pragma inline
 	if !.HasChildCount(2)
-		using f.source
+		using f.source!
 			self <~ «thg "Value"»
 
 

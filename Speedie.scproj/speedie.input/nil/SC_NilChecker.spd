@@ -568,8 +568,8 @@ function Declaration (niltrackerfn) // function decl
 	|| rel = msg.last
 	if rel != @thg
 		|| d = rel.first!.FastDecl
+		|| J = .Jump(rel.last!)
 		if d.IsReg
-			|| J = .Jump(rel.last!)
 			return T.Declare(D, J)
 
 

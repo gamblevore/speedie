@@ -20,7 +20,7 @@ dispatch fn_asm_table (fn_asm)
 	@rel:
 		opt norefcounts
 		|| OV = .openvars
-		rz = .DoRels(exp.first, reg)
+		rz = .DoRels(exp.first!, reg)
 		.closevars(OV)
 
 

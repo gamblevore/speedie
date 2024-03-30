@@ -113,7 +113,7 @@ function SCNode.CollectConstantsSub (|Message| ch)
 
 
 function SCNode.Tran_Const (|SCDecl| D, |SCNode| base)
-	|| root = D.default
+	|| root = D.default!
 	|| Using = root.SyntaxUsing
 
 	for curr.flat in root

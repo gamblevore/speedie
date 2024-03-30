@@ -111,24 +111,14 @@ module SC_Saver {
 		}
 
 		// put it in the code.
-		|| Using = .source.syntaxusing
+		|| Using = .source!.syntaxusing
 		|| SrcStr = fs.getresult
 		|| Msg = SrcStr.parse
-		|| dest = .sourcearg
+		|| dest = .sourcearg!
 		for (line in Msg)
 			dest <~ line
 	}
 	
-	
-//	function SCDecl.CanSaveDespiteBeingBorrowed (|bool|)
-//		require (.type.isobject)
-//		require !.IsCArray
-//		return (.type.isa(compiler..linkedlist))
-
-
-// shouldn't be an issue with borrowed properties?
-// why? either it was collected, or not.
-// i think we don't even generate collectors?
 
 	function SCDecl.IsSaveable (|string|)
 		require !.PointerCount
@@ -211,7 +201,7 @@ module SC_Saver {
 		|| IsStruct = (.saveas == "struct")
 		|| IsSave	= (name contains "Save")
 
-		|| Using = .source.syntaxusing
+		|| Using = .source!.syntaxusing
 		if (IsStruct)
 			dest <~ "function "
 		  else

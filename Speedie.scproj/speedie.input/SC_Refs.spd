@@ -669,7 +669,7 @@ function RC_HandleDisappearing (|SCFunction| fn, |Message| msg, |int| Basis)
 
 function scfunction.CallSuperMem (|SCFunction| fn)
 	opt norefcounts
-	|| root = .sourcearg 
+	|| root = .sourcearg $
 	using root
 	|| PCon = NewFnc(fn.exportName)
 	|| lst = PCon.last!
@@ -689,15 +689,16 @@ function scfunction.CallSuperMem (|SCFunction| fn)
 	
 function scfunction.FillInDestructor
 	opt norefcounts
-	|| first = .SourceArg.FindDestructor
-	Using .sourcearg
+	|| s = .sourcearg!
+	|| first = s.FindDestructor
+	Using s
 	for d in .cls!.Properties
 		if d.IsReffable(true)
-			.SourceArg.AddBefore( first, d.RefDestructor )
+			s.AddBefore( first, d.RefDestructor )
 		  else
 			|| Destr = d.HasStructDestructor
 				|| Addr = d.DeclToAddr(.self)
-				.SourceArg.AddBefore( first, SCRefs.RefDestructorMsg( Addr, destr ) )
+				s.AddBefore( first, SCRefs.RefDestructorMsg( Addr, destr ) )
 
 
 function scfunction.FindCallParents (|message|)

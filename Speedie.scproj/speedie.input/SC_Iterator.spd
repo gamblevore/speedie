@@ -89,7 +89,7 @@ class SCIterator (SCNamed)
 
 
 	function Check (|SCClass| cls)
-		using .source
+		using .source!
 		|| dot = ("." + .name, "")(.name)
 		|| msg = "iterator iter_test () {for yield_test$dot in self {(yield_test)}}".parseclean
 		|| fnc = SCFunction.NewFunc( msg, cls, .source )|SCFunction|

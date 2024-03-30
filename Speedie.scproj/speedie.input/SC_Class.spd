@@ -367,8 +367,8 @@ function CreateEmptyConstructors (|scfunction|)
 
 function scfunction.AddConstructorReturn2
 	require !.IsWrapper and self is newnew
-	|| args = .source[@arg,2]
-	using .source
+	|| args = .source![@arg,2]
+	using .source!
 	|| type = message(@thg, .cls!.name)
 	if .cls.IsTask
 		args.first = macros.ConstructorNewTask.run(type)
@@ -397,7 +397,7 @@ function CreateConstructors
 			.DestructorFunc = s.DestructorFunc
 			require con
 		
-		using .Source
+		using .Source!
 		if !con and !.IsWrapper		// some wrapper classes cant be newed.
 			con = .CreateEmptyConstructors
 		.ConstructorFunc = con

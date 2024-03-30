@@ -1438,11 +1438,14 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| n = .name
 		if !n
 			fs <~ "JB_LUB[0]"
-		  else
+		  elseif n isa messageid
 			|int| ID = n|messageid|.ID
 			fs <~ "JB_LUB["
+			if id < 1 or id > 10000
 			fs <~ (ID+1)
 			fs <~ "]"
+		  else
+			debugger
 
 
 	function C_RenderStr (fpMsgRenderCpp)

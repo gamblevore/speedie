@@ -87,7 +87,7 @@ class SCBehaviour (SCNode)
 		require .isobject and !.isrole
 		
 		.Behaviour := SCBehaviour.new(self)
-		.Behaviour!.CreateFuncTable( .sourcearg )
+		.Behaviour!.CreateFuncTable( .sourcearg! )
 	
 	
 	function SCClass.BestBehaviourFor (|string| name, |SCFunction|)
@@ -127,7 +127,7 @@ class SCBehaviour (SCNode)
 		WriteTo.func = @prm
 		prms.Remove
 
-		|| Using = fn.source.syntaxusing
+		|| Using = fn.source!.syntaxusing
 		|| CopyFrom = fn.source.Second
 		WriteTo <~ (@thg, "self")
 
@@ -280,6 +280,7 @@ function $InterName (,$InterName)
 		
 
 		function NewVirtual (CollectFunc)
+			require errplace
 			using (errplace)
 			|| cls = name_space.ShouldBeClass(errplace)
 				|| arg = node.find(@arg)
