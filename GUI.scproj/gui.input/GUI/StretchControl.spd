@@ -163,6 +163,7 @@ class StretchDivider (GuiControl)
 			if s < 10
 				s = mix(pr[.d], pr[.d+2], 0.333)|int|
 			.ActiveEnd = (s)~up
+//			.slideheight(0.5s)
 
 
 	function High (|guicontrol|)

@@ -213,14 +213,14 @@ class GUIControl (list)
 			._ScrollDrawTimer = value
 			sdlapp.touch(self)
 
-	function SizeFraction (|int|which=2, assigns:|float|)
-		value = value.clamp * 4K
-		which++
-		if which&1
-			._Sizefraction[0] = value
-		if which&2
-			._Sizefraction[1] = value
-		sdlapp.resized(self)
+	function SizeFraction (|movecode| D=movecode.all, assigns:|float|)
+		if d is Horizontal or Vertical
+			value = value.clamp * 4K
+			if D is Horizontal
+				._Sizefraction[0] = value
+			if D is Vertical
+				._Sizefraction[1] = value
+			sdlapp.resized(self)
 		
 	setter Visible (|bool|)
 		(self is visible) = value
@@ -471,7 +471,7 @@ class GUIControl (list)
 	
 
 	task_run SlideHeight (TaskGUI)
-		.upon.SizeFraction = progress
+		.upon.SizeFraction(movecode.vertical) = progress
 
 
 	helper AddTask (|TaskGUI| t)
@@ -480,7 +480,7 @@ class GUIControl (list)
 			w.tasks <~ t
 
 
-	task TaskGUI ( |...!| Upon,  |date| duration=0,  |date| StartTime=date.now )
+	task TaskGUI ( |...!| Upon,  |date| duration,  |date| StartTime=date.now )
 		contains –parentclass			// super cool feature
 		constructor						// upon,  StartTime,  duration are automatically set
 			upon.addtask(self)

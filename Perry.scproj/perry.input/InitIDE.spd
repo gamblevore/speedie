@@ -50,7 +50,7 @@ extend PerryIDE
 		.filesep			= StretchControl.horz(self, 175~right, 110, 110)
 		.ProductSep			= StretchControl.vert(self, 0~right,     0,   100)
 		.PopupDisplay		= textview(self)
-		.DebugArgsList		= textview(self	)
+		.DebugArgsList		= textview(self)
 		.AttachedProgram	= ""
 		
 		.init
@@ -76,7 +76,7 @@ extend PerryIDE
 		with .DebugArgsList
 			isnt visible
 			is editable
-			.size =  the~left+4 for 360  by  18~down back 150
+			.size =  the~left+4 for 360  by  15~down back 150
 			.id = "debugargs"
 			.ClickOutsideCloses = true
 			.OnFocus = DebugArgsGotFocus
@@ -84,6 +84,7 @@ extend PerryIDE
 			.gnormal.edge = (0.0, 0.0, 0.0, 0.125)
 			.OnKeyDown = DebugArgsKeyDown
 //			.ontextchanged = ArgValidation 
+			.AttachedToParent = true
 			.expectsparse = textview.AlwaysJeebox			
 
 
@@ -340,8 +341,9 @@ extend PerryIDE
 		.SpeedieText.SetupOut("speedie")
 		.ProductOut.SetupOut("product", TextView.AllowJeebox)
 		.ProductErrors.SetupOut("errors")
-				
-		.runbutton.SubControl = self.DebugArgsList
+		
+		.runbutton.SubControl = .DebugArgsList
+		.runbutton <~ .DebugArgsList
 
 		.AddIDEButton(.RunButton,	"\02", "Debug Project", "debug")
 		.AddIDEButton(.buildbutton, "\1C", "Build Project", "compile")

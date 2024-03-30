@@ -554,7 +554,7 @@ function TextView.DrawOneStartLine (|string| txt, |int|)
 	|| s = .lastrect
 	|| b = font.width
 	|| x = s.x1 + b
-	if .Alignment is CenterH
+	if .Alignment is Horizontal
 		|| W = (txt.length) * font.width
 		x += (s.width - W)/2
 	return x

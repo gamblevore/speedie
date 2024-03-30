@@ -39,11 +39,11 @@ class ProgressBar (GUIControl)
 	
 	setter Progress	(|float|)
 		if .Progress != value
-			sdlapp.touch
 			.Progress = value
+			sdlapp.touch
 	
 	behaviour Mouseup
-		if .lastrect contains p
+		if .LastRect contains p
 			(.onclicked)(self)?
 	
 	module

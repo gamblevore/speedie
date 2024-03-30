@@ -892,10 +892,10 @@ datatype MoveCode (byte)
 		Bottom = Down
 		Front = Forward
 		Back = Backward
-		CenterV = Up + Down
-		CenterH = Right + Left
-		MiddleLeft = Left + CenterV
-		MiddleRight = Right + CenterV
+		Vertical = Up + Down
+		Horizontal = Right + Left
+		MiddleLeft = Left + Vertical
+		MiddleRight = Right + Vertical
 		All = 63
 		Center = 63
 

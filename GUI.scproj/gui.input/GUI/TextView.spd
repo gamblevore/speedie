@@ -188,10 +188,8 @@ class TextView (GUIControl)
 		if p.y < .abstop
 			return (.text.length, 0)
 
-
 	
 	helper LastLineFix (|textviewline| d, |int| x, |ivec2|)
-
 		x += 2
 		|| t = d.ByteOfX(x)
 		|| PreferFirst = (d.after == t) and (d isnt last)
@@ -245,7 +243,6 @@ class TextView (GUIControl)
 	
 	behaviour RightClick
 		.SendSpecialClick(p, true)
-					
 
 
 	function SelRange (|intrange|)
