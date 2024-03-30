@@ -184,7 +184,7 @@ function Function (NilTrackerFn)
 		if (recv.nildeclared is optional) and (fn.IsNilChecker != 3)
 			test |= nilcheckmode.Soft
 			
-		expect (p) (msg, "Compiler did not generate correct code for function.") 
+		expect (p) (msg, "Compiler did not fully type this function.") 
 		|| v = .Jump(p!, test)
 		if rz and !(v is FnBecomesNilCh) and p!.isfirst
 			rz = 0 // can't work
