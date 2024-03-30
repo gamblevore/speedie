@@ -61,9 +61,7 @@ struct ControlSize
 	function Calculate (|ivec4| Parent, |ivec4| Prev, |ivec4| Window, |guicontrol| upon, |ivec4|)
 		|| dbg = upon.clipmode is debug
 			"---------------"
-		|| vis = upon is visible
-		if keys.shift and upon ~= "debugargs"
-			
+		|| vis = upon is visible			
 		|| pc = parent.size >> 1
 		for i in 4
 			|| m = .mode(i)
