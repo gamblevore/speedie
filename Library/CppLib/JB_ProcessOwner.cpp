@@ -22,7 +22,7 @@ static void AddLostChild_(int PID, int C) {
 			if (WIFEXITED(C))   Ex = WEXITSTATUS(C);
 			if (WIFSIGNALED(C)) Sig = WTERMSIG(C);
 			if (Sig and !Ex) // in case unix is being dumb. Which happens a lot.
-				Ex = -1;
+				Ex = 1;
 			F->_Exit = Ex;
 			F->_Status = Sig;
 			return;
