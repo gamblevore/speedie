@@ -281,9 +281,11 @@ function Message.AddBefore (|Message| before, |Message| NewItem)
 		self <~ NewItem
 
 
-function Message.InsertBefore (|Message| j, |Message| ch)
-	if ch
-		ch.Prev = j
+function Message.InsertBefore (|Message| j, |Message?| ch)
+	opt norefcounts
+	real self
+	if ch.parent == self
+		ch!.Prev = j
 	  else
 		.Last = j
 

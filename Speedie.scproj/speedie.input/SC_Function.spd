@@ -379,7 +379,8 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 	|| fi = 0
 	if  (self is constructor)  and  !Incoming.AllowSelfToConstructor
 		fi = 1
-			
+	
+	debugat 0
 	while fi < fin
 		|| FuncArg = .Args[fi]!
 		|| PArg_Ch = Incoming[Pos]
@@ -409,7 +410,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 			
 		  elseif (ThisAlter)	// we need to put something in exp
 			|| def = FuncArg.Default!.Copy
-			Incoming.exp.last.InsertBefore( def, PArg_Ch )
+			Incoming.exp.last!.InsertBefore( def, PArg_Ch )
 			TypeOfExpr( def, Name_Space )
 
 		  else
