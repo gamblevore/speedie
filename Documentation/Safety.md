@@ -1,0 +1,198 @@
+## Safety In Speedie
+
+Making your code safe, as in not crashing unexpectly is a hugely important thing.
+
+Speedie has a lot of safety features built in, including:
+
+* Nil-Safety
+* Type-Safety
+* Numeric-Safety
+* Exceptionless Error Handling
+* Loop safety
+* Safe Library
+* Managed Memory
+
+Speedie's memory-manager is a form of safety... its what you expect from most OOP systems, but its worth mentioning as C/C++ doesn't have it.
+
+
+### Safe Library
+
+Speedie's library is safe too. It won't crash. _(If it crashes, then thats a bug that the speedie devs should fix. But I haven't seen that for a long time.)_ This isn't like C++ where `strlen(nil)` can crash your app.
+
+All the basic speedie functions, and classes like arrays, lists, strings, dictionaries, messages, etc, are safe to use, even if you use them improperly.
+
+For example this:
+
+    || myarray = ["hello", "bye"]
+    || a = myarray.pop
+    || b = myarray.pop
+    || c = myarray.pop // returns nil!
+
+That won't crash. It just returns `nil`. Which is totally valid. Same with accessing `myarray[-1]` just returns `nil`.
+    
+
+### Loop Safety
+
+Speedie recognises a basic infinite loop. Not all but a basic one. It also recognises a recursion bug.
+
+    function A
+        while
+            "hello" // speedie does not allow this
+    
+    function B
+        B() // speedie doesn't allow this either
+
+Not a common bug, but nice that speedie saves you from it!
+
+
+### Error Handling
+
+Speedie has a great error-handling system that is exceptionless. It is really nice. Read about [it in it's own article](Errors.md). Its actually perfect.
+
+
+### Numeric Safety
+
+Speedie has a little numeric safety. Mostly on constants, so you can't define a constant that won't fit its type. Like defining a byte-constant of 1000, which is more than 255.
+
+Also it won't allow silent numeric conversions (like C allows) that alter the bit-patterns of the values.
+
+Also it won't allow you to pass objects or numbers to a boolean parameter... because this is very dangerous, almost everything is convertible to boolean which means you can easily pass the wrong param!
+
+
+
+### Type safety
+
+Speedie is type-safe... this works like you'd expect in most languages. We have the `isa` operator:
+
+    function abc (|object| o)
+        if o isa message // o is type-casted to `message` within this branch
+            printline m.name
+        if o isa file   // same
+            printline m.readall
+        if o isa string
+            printline o
+
+The `as` operator:
+
+    function def (|object| o)
+        || m = o as message #require // creates an error if o is not a message, and then returns nil.
+        printline m.name
+
+And the `mustbe` operator.
+
+    function ghi (|object| f, |message| where)
+        if f mustbe (file, where)
+            printline f.path
+        // if `mustbe` returns false, then it creates an error, using "where" to signify where the error came from
+
+
+Lets finish with the biggest safety feature...
+
+### Nil-safety
+
+In fact, Speedie's nil-checker is mostly invisible. So you won't need to be writing very different code in order to use it. It is mostly silent... except when things go wrong. It is like a silent genius that thoroughly checks your code but rarely says anything... unless it finds a mistake.
+
+The main thing to know, is that you need to specify if your objects or pointers, are "optional"... within object properties.
+
+"Optional" in speedie doesn't mean the same thing as in other languages, it just means "it could be nil". There is zero overhead. And because numbers can't be nil, numbers are never optional! :)
+
+So, to define a class with one optional and one real property, do this:
+
+    class MyClass
+        |string?|  Optional
+        |string|   Real
+        
+        function Test
+            || v = .optional
+            if v != nil
+                "v is real"
+              else
+                "v is nil"
+
+Global properties are a bit different, they are assumed optional unless you create them on the same line. And strings/arrays have default "real" values anyhow, (empty string, empty array), so they are still real.
+
+    module abc
+        |myclass| optional
+        |myclass| real = myclass()
+        |string|  real_string   // same as real_string = ""
+        
+You can also set a global variable to a real value, but still declare it as optional.
+
+    |myclass?| optional2 = myclass()
+
+Local variables are all figured out for you! Speedie has a full "nil-inferencer". That means it does extensive logic on the nils. So it knows whether something can be nil or not at any point in the code. This is like having a helpful programming companion check your code for you. So its not like the language `Rust` which imposes a dreadful model on you.
+
+Local variables include function parameters, params can be declared as optional or real... However! That only specifies what the caller may send. You can still alter parameters within a function.
+
+
+    function abc (|message!| m)
+        if m.position == 1
+            "position 1"
+        if random[] > 0.5
+            m = nil // we altered the parameter 'm'
+        if m == nil
+            "m became nil"
+          else 
+            m.position = 7
+
+You can also specify parameters as "real", or "optional" by putting ! or ? before or after the type.
+
+    function def (|message!| real, |message?| optional)
+        "real is not nil"
+        if optional
+            "optional is not nil"
+          else
+            "optional is nil"
+
+Param realness can be inferred also:
+
+    function def (|message| A, |message| B)
+        if (A)
+            "A is not nil"
+          else
+            "A is nil"
+        B.position = 1  // OK. B was inferred to be real.
+        A.position = 1  // fails to compile! A was inferred to be optional.
+        
+
+Local var inference is super-smart... it won't let bugs go unnoticed. Heres a simple example:
+
+    function bad_loop
+        || msg = message()
+        for i in 10
+            msg.Position++ // <-- compile error!
+            if (random())
+                msg = msg.next // could leave msg as nil
+
+The nil-checker will complain when we set `msg.position`, because `msg` could be `nil`, at that point... due to something that happens later in the code!
+
+    function fixed_loop
+        || msg = message()
+        for i in 10
+            msg.position++ // OK!
+            if (random())
+                msg = msg.next #require
+
+This works fine now! Because the nil-checker understands how loops work.
+
+You can override the nil-checker using the `!` symbol.
+
+    // parsing this particular string, should never return nil, but speedie doesnt know this.
+    || msg = "abc, def".parse
+    msg!.position = 30
+
+Obviously, if you get this wrong, your program crashes. The "!" symbol is better avoided, but you will have to decide for yourself. Its not such a problem to do this instead:
+
+    || msg = "abc, def".parse
+        msg.position = 30 // now is nil safe
+    
+That example used the implicit "`if`" syntax in speedie:
+
+    || x = 4
+        "x is not 0"
+
+    // same as below
+    || y = 4
+    if y
+        "y is not 0"
+
