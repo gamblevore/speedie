@@ -82,6 +82,7 @@ helper @OutputFile.MainArg   (|int| Pos, |string| name, |faststring|)
 
 
 // these roles really should be submodules on the file-module.
+// maybe we can do this now? we do have some kinda name spaces now...
 // like these:
 //			module file.Jeebox: helper MainArg (...)
 // 			module file.Output: helper MainArg (...)
@@ -93,7 +94,6 @@ role JeeboxFile   (file)
 role OutputFile   (faststring)
 
 
-// i can't help but like the idea
 helper @string.MainArgSub (|int| Pos,  |string| name, |string| type,   |stringthatwasreadsafely|)
 	// could remove "pos", and use array.mark?
 	opt norefcounts
