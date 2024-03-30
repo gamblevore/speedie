@@ -107,8 +107,11 @@ function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 	
 	|| MaybeNil = Type isarel "?"
 		Type = Type.first
+
 	require type.expect(@thg)
-	
+	|| cls = Compiler[type] #require
+	if !maybenil
+		maybenil = cls.IsDataTypeOnly	
 	
 	|| prms = [name, type, i.msg]
 	require (prms == 3)
