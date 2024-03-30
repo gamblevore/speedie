@@ -147,8 +147,9 @@ function scclass.ReachBehaviours
 
 function compiler.DeadStrip
 	opt norefcounts
-	Compiler.VisibleFuncs = SCNode("Visible",	false)
-	Compiler.Interpreter = SCNode("Interpreter", false)
+	|| dummy = @arg.msg
+	Compiler.VisibleFuncs = SCNode("Visible",	dummy)
+	Compiler.Interpreter = SCNode("Interpreter", dummy)
 
 	compiler.MainFunc.StripTest?
 	

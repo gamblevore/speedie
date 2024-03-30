@@ -18,6 +18,26 @@ linkage
 |SCImport--?|						Project
 
 
+/*constructor (|message| where)
+	cpp_part Constructor0
+	.Project = scimport.curr
+	.IsVisible = CurrVisibility	// don't do anything?
+*/
+
+constructor (|string| Name, |message| where)
+	cpp_part ConstructorStr
+	super.constructor(where)
+	.name = name
+
+
+constructor (|Message| node)
+	cpp_part ConstructorMsg
+	super.constructor(node)
+	.source = node
+	.IsVisible = CurrVisibility
+	.Project = scimport.curr // why not?
+
+
 function IsSTDLib (|bool|) // .islib, .isprojlib, .isproject, .isntproject, .isntlib
 	opt norefcounts
 	return .Project.IsSTDLib?
@@ -201,23 +221,6 @@ function scfunction.IsConstructorOnModule (|scfunction| old, |bool|)
 		|| p = old.parent
 		return p == .cls!.modul
 
-
-constructor
-	cpp_part Constructor0
-	.Project = scimport.curr
-	.IsVisible = CurrVisibility	// don't do anything?
-
-
-constructor (|string| Name, |bool| Dummy)
-	cpp_part ConstructorStr
-	.name = name
-
-
-constructor (|Message?| node)
-	cpp_part ConstructorMsg
-	.source = node
-	.IsVisible = CurrVisibility
-	.Project = scimport.curr // why not?
 
 
 function Use

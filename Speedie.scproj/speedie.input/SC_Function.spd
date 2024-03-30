@@ -76,7 +76,7 @@ linkage
 
 
 
-constructor (|Message?| msg = nil)
+constructor (|Message| msg)
 	Super.Constructor( msg )
 	.linkto = nil
 	if (msg)

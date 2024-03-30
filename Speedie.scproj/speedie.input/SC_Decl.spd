@@ -108,7 +108,8 @@ class SCDecl (SCNamed) {
 	|byte| 				NilAllocDepth
 
 	
-	constructor (|scclass| type)
+	constructor (|scclass| type, |message?| where=nil)
+		super.constructor(where)
 		.type = type
 		.NilDeclared = NilState.Either
 		.info = scdeclinfo.altered

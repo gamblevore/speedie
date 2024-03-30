@@ -12,7 +12,7 @@ module TextAssembler
 		
 	
 	function TextFunc (|message| msg, |bool|) // assemble a function from text
-		|| fn = SCFunction.new
+		|| fn = SCFunction.new(msg)
 		fn.source = msg
 		TreeAssembler.StdState.Initstate(fn)
 		|| arg = TreeAssembler.StdState.TextFuncSub(msg)

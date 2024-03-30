@@ -274,7 +274,7 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 	|| src = cmd.last
 	if src != @dot
 		return .getfunc2(cmd, myfile, ff, n)
-	|| fn   = .anonfn init scfunction()
+	|| fn   = .anonfn init scfunction(@tmp.msg("function"))
 	|| prm  = src.second
 	|| mpos = prm.first
 	|| str  = prm.second

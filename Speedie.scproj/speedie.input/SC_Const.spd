@@ -54,7 +54,7 @@ function SCNode.CollectConstantsSub (|Message| ch)
 			
 		if (line == @Thg) // default numeric constant
 			using (line)
-			NewItem = SCDecl(typeint!)
+			NewItem = SCDecl(typeint!, line)
 			|| NewNum = NewDeclNum( NewItem, NextNum, line.name )
 			newitem.source = line
 			if (ch == "flags")
@@ -75,7 +75,7 @@ function SCNode.CollectConstantsSub (|Message| ch)
 			|| NewType = CurrType
 			if !(NewType?)
 				newtype = OMGType
-			NewItem = SCDecl(newtype.type)
+			NewItem = SCDecl(newtype.type, line)
 
 			if (ValueNode == @Str)
 				SCFunction.ObjectifyString(ValueNode)
@@ -98,7 +98,7 @@ function SCNode.CollectConstantsSub (|Message| ch)
 	
 	
 	if (ch == "flags")
-		|| NewItem = SCDecl(TypeInt!)
+		|| NewItem = SCDecl(TypeInt!, ch)
 		Compiler.newconst(NewItem)
 		|| s = (FuncName.Name, "Flag")(FuncName)
 		NewDeclNum( NewItem, lastflag|int|.bits, "Largest" + s )

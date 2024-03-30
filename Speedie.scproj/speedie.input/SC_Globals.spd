@@ -537,7 +537,7 @@ function SCDecl.LoadContained (|Message| Contained, |Message| wrap, |SCNode| Nam
 
 function SCDecl.MakeDataObject (|SCNode| Name_Space, |declmode| Purpose, |scdecl|)
 	|| wrapp = «thg "dataobject"»
-	rz = SCDecl(.type)
+	rz = SCDecl(.type, wrapp)
 	rz.LoadContainedSub(self, wrapp, name_space, purpose)
 
 	
@@ -846,7 +846,7 @@ function ArrayInOrderCheck (|int| InOrder, |message| msg, |int|)
 function TypeOfArr (ExprResolver)
 	|int| IsDispatch = (exp ~= "dispatch")|int|
 	|| InOrder = 0
-	|| result = SCDecl(TypeVoid_!)
+	|| result = SCDecl(TypeVoid_!, exp)
 	result.nildeclared = nilstate.real
 	exp.obj = result
 		
@@ -1702,7 +1702,7 @@ function TypeOfArgArr (ExprResolver)
 				|| oof = contained.HighestArrayContainMatch( result.type.TypeNormal, itm )
 				result.type = oof.type
 			  else
-				result = SCDecl(contained.type)
+				result = SCDecl(contained.type, itm)
 			Count++
 	
 	exp.obj = result						#expect (exp, "Can't get the type of this.")
