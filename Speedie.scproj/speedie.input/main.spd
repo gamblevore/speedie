@@ -1,8 +1,6 @@
 
 
 main // speedie main {
-	target debug2
-		using "abc"
 	compiler.SetupEnv
 	compiler.MiniTests
 	compiler.Main

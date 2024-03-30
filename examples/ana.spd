@@ -34,13 +34,16 @@ class Anagrams
 			s = s.Remove(jeebox.CSLettersOnly.invert)
 			if !.d
 				|| data = ""
-				data = file.words.ReadAll
-				data = data.LowerCase
-				.d = data.dict
+				using "read":  data = file.words.ReadAll
+				using "lower": data = data.LowerCase
+				using "dict":    .d = data.dict
 			rz = Dictionary()
-			Anagrams(rz, s).find("", "", 0)
+			using "anagram"
+				Anagrams(rz, s).find("", "", 0)
 
-main
-	|| d = Anagrams.find(app.args[0] ?? "hedgehog")
-	for (v in d) (k)
-		printline v + " <-- " + k
+
+main (|string| word="hedgehog")
+	using "total"
+		|| d = Anagrams.find(word)
+		for v in d
+			printline v
