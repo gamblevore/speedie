@@ -78,9 +78,9 @@ class Menu (ListView)
 		opt norefcounts
 		|| mw = owner.width min 140
 		|| W = owner.BestXForMenu(x, .TextWidth+14 max mw)
-		|| H = ControlPoint.low back .DesiredHeight
+		|| CP = ((Y)~up, ControlPoint.low)(Y)
+		|| H = CP back .DesiredHeight
 		.size = w by h
-		.FindAttachedEdge
 		.ShowMenu(owner)
 	
 	

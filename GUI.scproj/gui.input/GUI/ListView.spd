@@ -140,11 +140,13 @@ class ListView (GUIControl) {
 			rz--
 
 
-	function OpenMenu (|ListViewRow| r, |int| y, |ListViewrow| sels)
+	function OpenMenu (|ListViewRow| r, |int| y)
 		opt norefcounts
 		|| m = .cmm	
 			m.EditingRow = r
-			m.ShowCmm(self, (y-1) - .lastbottom)
+			y = (y+2) - .lastbottom
+			y:=1
+			m.ShowCmm(self, y)
 
 
 	function DesiredHeight (|int|)
@@ -214,7 +216,7 @@ class ListView (GUIControl) {
 				.Select(r)
 			|| c = .onrightclick 
 			if c and (c)(self, r)
-				.openmenu(r, y - .lastbottom, r)
+				.openmenu(r, y - .lastbottom)
 	
 
 	function MenuForSelRow
@@ -223,7 +225,7 @@ class ListView (GUIControl) {
 		|| y = .DrawYRow(sels)
 		|| fp = .onrightclick
 		if fp and (fp)(self, sels)
-			.openmenu(sels, y - .lastbottom, sels)
+			.openmenu(sels, y - .lastbottom)
 		
 	
 	function DoReturn (|bool|)

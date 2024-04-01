@@ -414,11 +414,11 @@ class GUIControl (list)
 		|| a = .AttachedFrom
 			return a
 		if .Sizer[0] is high
-			return MoveCode.left
+			return MoveCode.right
 		if .sizer[1] is high
 			return MoveCode.bottom
 		if .sizer[2] is low
-			return MoveCode.right
+			return MoveCode.left
 		if .sizer[3] is low
 			return MoveCode.top
 		
