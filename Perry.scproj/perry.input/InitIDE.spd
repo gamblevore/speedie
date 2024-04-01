@@ -85,6 +85,7 @@ extend PerryIDE
 			.OnKeyDown = DebugArgsKeyDown
 //			.ontextchanged = ArgValidation 
 			.expectsparse = textview.AlwaysJeebox
+			.attachedfrom = movecode.top
 			.ClickOutsideCloses = true		
 
 

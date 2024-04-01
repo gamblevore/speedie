@@ -411,16 +411,15 @@ class GUIControl (list)
 	
 	helper FindAttachedEdge (|MoveCode|) // .EdgeAllow
 		opt norefcounts
-		|| p = .parent$
 		|| a = .AttachedFrom
 			return a
-		if .Sizer[0] is after
+		if .Sizer[0] is high
 			return MoveCode.left
-		if .sizer[1] is After
+		if .sizer[1] is high
 			return MoveCode.bottom
-		if .sizer[2] is before
+		if .sizer[2] is low
 			return MoveCode.right
-		if .sizer[3] is before
+		if .sizer[3] is low
 			return MoveCode.top
 		
 	

@@ -81,18 +81,14 @@ struct ControlSize
 				if dbg
 					.PrintExplain(i, 0, rz)
 		
+		|| E = upon.findattachededge.flip
 		for i in 4
 			if .mode(i) == ControlPoint.Length
 				|| o = i xor 2
-				|| mo = .mode(o)
-				|int| Do = (mo&2) + (o&1)
-
 				|| ro = rz[o]
 				|| Sz = .size(i)
-
-				// rightwards of the right: i == 0
 				
-				sz = upon.transition(sz, i, 0)
+				sz = upon.transition(sz, i, e)
 				rz[i] = ro + ((i>=2) sign sz)
 				if dbg
 					.PrintExplain(i, ro, rz)

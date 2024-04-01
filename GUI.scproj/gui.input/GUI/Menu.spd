@@ -74,12 +74,13 @@ class Menu (ListView)
 		return moved or .SelJustChanged 
 		
 	
-	function ShowCmm (|guicontrol| Owner, |int| Y, |int| X = -1)
+	function ShowCmm (|GUIControl| Owner, |int| Y, |int| X = -1)
 		opt norefcounts
 		|| mw = owner.width min 140
 		|| W = owner.BestXForMenu(x, .TextWidth+14 max mw)
-		|| H = (Y)~up back .DesiredHeight
+		|| H = ControlPoint.low back .DesiredHeight
 		.size = w by h
+		.FindAttachedEdge
 		.ShowMenu(owner)
 	
 	
