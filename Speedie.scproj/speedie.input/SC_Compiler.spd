@@ -840,7 +840,7 @@ function CheckIsGoodLibrary
 		expect compiler.api_place ("No 'main' or 'export_api' found. Create 'export_api' to make this a library, create 'main' to make this an app.")
 
 
-function InputFile (|File| Default, |String| s, |message| where, |File|)
+function InputFile (|File| Default, |String| s, |message| where,  |File|)
 	opt norefcounts
 	expect !(s contains "../") (where, "Insecure path")
 	// find the "highest" file...

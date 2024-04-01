@@ -57,7 +57,7 @@ function NewRender (CollectFunc)
 	|| cls = name_space.isnormalobject 
 	if Tran_Render( node, cls )
 		rz = SCBehaviour.NewActual( node, name_space, ErrPlace )
-	else
+	  else
 		rz = SCFunction.NewFunc( node, name_space, ErrPlace )
 	if rz
 		(rz|scfunction| is render) // use this later to reliably turn:   fs <~ obj.somefunc   <--   obj.Somefunc(fs)
@@ -71,15 +71,23 @@ function ObjectifyString (|Message| msg)
 function GetFileString (|Message| msg, |string| name, |message|)
 	expect (msg ~= "file" or "img") (msg)
 	
+	|| OK = name.Last == '?'
+		name = name.Trim(1)
+	
+	|| data = ""
 	|| f = compiler.InputFile(nil, name, msg)
-		|| data = f.readall
+		data = f.readall
 		if msg ~= "img"
 			data = image.ConvertPNGToVOI(data)
+		OK = data
+
+	if OK
 		msg.become(@str, data)
 		(SCImport.Recent max= f.modified) 
 		msg.clear
 		.ObjectifyString(msg)
 		return msg
+
 	error (msg, "File does not exist")
 
 
