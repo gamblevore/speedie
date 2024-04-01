@@ -32,7 +32,10 @@ function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
 		fields = @bra.msg
 		name.next = fields
 	
-	|| arg = fields.next(@arg)		#require
+	|| arg = fields.next
+	if  !arg.expect(@arg)
+		arg = node.msg(@arg)
+	
 	|| Supper = fields.first
 	tmp.TakeAllFrom(fields)
 	
@@ -44,8 +47,12 @@ function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
 		level = 3
 	  else
 		fields <~ (@sdot, "interface")
-	arg.BuildTask(fields, node)
+	arg.BuildTask(fields, node, level)
 	arg.TakeAllFrom(tmp)
+
+//	printline node
+//	debugger
+
 	node.name = "role"
 	
 	|| task = SCClass.NeuRole(node, name_space, node)|SCModule|
@@ -103,14 +110,15 @@ function Message.MakeTaskVar  (|message!| con, |message| before, |bool| First)
 		prm <~ .copy // :)
 
 
-function Message.BuildRunTask (|message| fields, |bool|)
+function Message.BuildRunTask (|message| fields, |int| level, |bool|)
 	opt norefcounts
 	|| prms = .first
-	if !prms or prms == @arg
+	|| NoPrms = !prms or prms == @arg
 		prms = @list.msg
 		.first = prms
-		|| ss = fields.first
-			prms <~ ss.copy
+		if level == 3
+			|| ss = fields.first
+				prms <~ ss.copy
 	  else
 		|| pf = prms.func
 		expect (pf == @bra or @list) (prms)
@@ -128,7 +136,7 @@ function Message.BuildRunTask (|message| fields, |bool|)
 		ff.func = @thg
 			
 	|| f = p1.func
-	ifn f == @thg or @dot
+	if !(f == @thg or @dot)
 		|| brah = @bra.msg
 		brah <~ (@thg, "interface")
 		.first = brah
@@ -145,19 +153,20 @@ function Message.BuildRunTask (|message| fields, |bool|)
 	return true
 
 
-
-function Message.BuildTask (|message| fields, |message!| root)
+function Message.BuildTask (|message| fields, |message!| root, |int| level)
 	|| Runs = .FindAll("run")
 	|| run = runs[0]
-		root.Expect(@tmp, "task")
-		check (runs == 1) (run, "Multiple run statements")
-	  else
-		root.Expect(@tmp, "task_run")
+	check (runs <= 1) (run, "Multiple run statements")
+
+	if root == "task_run"
+		if run: error run
 		run = @tmp + "run"
 		run.msg(@arg).TakeAllFrom(self)
 		self <~ run
-		
-	if run.BuildRunTask(fields) and !.findall("constructor")
+	  else
+		expect (run) (self, "Missing 'run' statement")
+
+	if run.BuildRunTask(fields, level) and !.findall("constructor")
 		run.prev = "constructor () {}"~parse
 
 
