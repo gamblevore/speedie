@@ -226,7 +226,7 @@ class TextViewLine (list)
 		|| Finish = .SquaresAtByte(R.x2 min M.x2)
 		require Finish > Start
 		
-		|| Y = parent.abstop - (vline+1) * parent.lineheight
+		|| Y = parent.lasttop - (vline+1) * parent.lineheight
 		|| X = parent.TextLeft
 		|| n = font.Width
 		x += n - 2

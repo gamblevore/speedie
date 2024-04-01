@@ -3,7 +3,7 @@
 function DebugArgsKeyDown (GUIKeyEvent)
 	opt norefcounts
 	if key.IsCancel
-		.window!.ClearFocus
+		.window!.setfocus(nil)
 		return true
 	
 
@@ -17,13 +17,13 @@ function FoundListKeys (GuiKeyEvent)
 
 
 function DebugArgsGotFocus (guiaction)
+	opt norefcounts
 	|| v = state == 1
 	if (self is visible) != v
-		(self is visible) = v
 		if self isa textview
 			.UpdateDebugArgs(v)
-		if v
-			.SlideHeight(0.125s)
+	.SlideOpen(0.125s, (movecode.open)(v) )
+
 
 
 function textview.UpdateDebugArgs (|bool| Visible=false)

@@ -233,6 +233,9 @@ class String
 			return self
 		Return self[0,1].Uppercase + self[1...]
 	
+	function Trim (|int| n, |string|)
+		cpp_part Shorten
+		return self[0, .length-n]
 
 	function Trim (|charset| cs = nil, |string|)
 		nil self

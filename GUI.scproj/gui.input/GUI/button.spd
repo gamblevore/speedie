@@ -35,8 +35,14 @@ class ButtonView (GUIControl)
 	helper InitMenu (|GUIListEvent| ret,  |menu|)
 		require ret
 		rz = menu(self, nil, ret)
-		rz.AttachedToParent = true
 
+
+	function Attach (|guicontrol| p)
+		.SubControl = p
+		self <~ p
+		p.ClickOutsideCloses = true
+	
+	
 	function SubMenu (|menu|)
 		opt norefcounts
 		|| s = .SubControl

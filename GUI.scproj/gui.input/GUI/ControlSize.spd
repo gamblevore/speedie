@@ -83,12 +83,20 @@ struct ControlSize
 		
 		for i in 4
 			if .mode(i) == ControlPoint.Length
-				|| d = rz[i xor 2]
-				|| Sz = (.size(i) * upon._sizefraction[i&1]) >> 12
-				rz[i] = d + ((i>=2) sign sz)
+				|| o = i xor 2
+				|| mo = .mode(o)
+				|int| Do = (mo&2) + (o&1)
+
+				|| ro = rz[o]
+				|| Sz = .size(i)
+
+				// rightwards of the right: i == 0
+				
+				sz = upon.transition(sz, i, 0)
+				rz[i] = ro + ((i>=2) sign sz)
 				if dbg
-					.PrintExplain(i, d, rz)
-		
+					.PrintExplain(i, ro, rz)
+
 		if upon.ClipMode is SlideBackInParent
 			|| rz2 = rz.Bound(parent)
 			if dbg

@@ -116,7 +116,7 @@ function PerryIDE.ShowAuto (|bool|)
 	|| a = .autocomplete
 	if a.listsource.hasany
 		a.ListSource.obj = .editme.Path
-		a.ShowCmm(self, .AutoPoint.y - .absbottom, .AutoPoint.x)
+		a.ShowCmm(self, .AutoPoint.y - .lastbottom, .AutoPoint.x)
 		(a is typethrough)
 		return true
 	a.ListSource.obj = nil

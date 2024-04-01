@@ -47,6 +47,19 @@ module Perry
 		if ide isa PerryIDE
 			ide.editme.ViewLineAndSel(line.x)
 			return ide
+
+	function OpenProj (|[PerryIDE]|)
+		opt norefcounts
+		for w in window.all
+			if w isa PerryIDE
+				rz <~ w
+
+
+	function IDE (|PerryIDE|) // frontide, frontperry, firstperry
+		opt norefcounts
+		for w in window.all
+			if w isa PerryIDE
+				return w
 	
 	
 	function Save
@@ -54,7 +67,7 @@ module Perry
 		app.pref("colors") = ¥.savecolors.parse
 
 		
-	function LoadWindowsSub (|bool|)
+	helper LoadWindowsSub (|bool|)
 		|| Found = false
 		for proj_item in .projects
 			if proj_item.name.fileExists
@@ -104,20 +117,6 @@ module Perry
 			return 0
 		|| oof = (.FindProj(old),  .Projects.First)(old)
 			oof.ide.showide
-
-
-	function OpenProj (|[PerryIDE]|)
-		opt norefcounts
-		for w in window.all
-			if w isa PerryIDE
-				rz <~ w
-
-
-	function IDE (|PerryIDE|)
-		opt norefcounts
-		for w in window.all
-			if w isa PerryIDE
-				return w
 
 
 	function FindProj (|string| path, |message|)

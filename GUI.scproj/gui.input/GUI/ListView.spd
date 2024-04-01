@@ -144,7 +144,7 @@ class ListView (GUIControl) {
 		opt norefcounts
 		|| m = .cmm	
 			m.EditingRow = r
-			m.ShowCmm(self, (y-1) - .absbottom)
+			m.ShowCmm(self, (y-1) - .lastbottom)
 
 
 	function DesiredHeight (|int|)
@@ -214,7 +214,7 @@ class ListView (GUIControl) {
 				.Select(r)
 			|| c = .onrightclick 
 			if c and (c)(self, r)
-				.openmenu(r, y - .absbottom, r)
+				.openmenu(r, y - .lastbottom, r)
 	
 
 	function MenuForSelRow
@@ -223,7 +223,7 @@ class ListView (GUIControl) {
 		|| y = .DrawYRow(sels)
 		|| fp = .onrightclick
 		if fp and (fp)(self, sels)
-			.openmenu(sels, y - .absbottom, sels)
+			.openmenu(sels, y - .lastbottom, sels)
 		
 	
 	function DoReturn (|bool|)
@@ -745,13 +745,13 @@ class ListView (GUIControl) {
 				WantsTo = i
 			  else
 				WantsTo = .listsource
-				|| top = .abstop
-				if (p.y+p2.y > .abstop)
+				|| top = .lasttop
+				if (p.y+p2.y > .lasttop)
 					|| s = ._Scroll
 						WantsTo = .bmove(s, -1)
 					.ScrollByRows(-1)
 					
-				  elseif (p.y-p2.y < .absbottom)
+				  elseif (p.y-p2.y < .LastBottom)
 					.ScrollByRows(1)
 			
 			if .draggingrowFrom and (.CanDrawDrag(Wantsto))
@@ -1128,9 +1128,9 @@ class ListView (GUIControl) {
 	
 	helper FindClickedMenu (|int| y, |ListViewRow|)
 		opt norefcounts
-		if y <= .AbsBottom
+		if y <= .lastBottom
 			return .bmove(.LastVisible$, 1)
-		if y > .AbsTop
+		if y > .lastTop
 			return .bmove(._scroll$, -1)
 		|| c = .FindClickedCell((0,y))
 			return c.row
@@ -1261,7 +1261,7 @@ class ListView (GUIControl) {
 		|| B = .RowBounds(._scroll, sc, .rowheight)			#require
 		B.horz = .col(cell.column, B, sc)
 		B.x += sc.depth(self) * font.width*2
-		return (B down .absbottom) left .absleft 
+		return (B down .lastbottom) left .lastleft 
 
 
 	helper DrawBordersSub (|image| Where,  |ivec4| Rect)
@@ -1319,7 +1319,7 @@ class ListView (GUIControl) {
 
 
 	helper ScrollSlide (|int|)
-		|| y	= .abstop
+		|| y	= .lasttop
 		|| shl	= .scrollshift
 		if !shl or .ScrollPixelsSub(0)
 			return 0
@@ -1413,7 +1413,7 @@ class ListView (GUIControl) {
 		
 		.SetInlineSize
 		
-		where.RectOutlineOnly(.lastrect, .gnormal.edge, .gnormal.bg, .EdgeAllow)
+		where.RectOutlineOnly(.lastrect, .gnormal.edge, .gnormal.bg, ~.FindAttachedEdge)
 
 		if .CanSeeAllLines
 			.ScrollDrawTimer = 0
@@ -1421,20 +1421,8 @@ class ListView (GUIControl) {
 			if self isa menu
 				.ScrollDrawTimer = 1							// oooop
 			.DrawScroll(.slh, where)
-	
-	
-	helper guicontrol.EdgeAllow	(|MoveCode|)
-		opt norefcounts
-		|| Hide = 0
-		|| p = .parent
-		if p and .AttachedToParent
-			Hide   |=  movecode.bottom * (.abstop > p.abstop)
-			Hide   |=  MoveCode.top * (.absbottom < p.absbottom)
-			
-		return ~Hide
-		
-		
-	
+
+
 	helper textview.MoveListLine (|int| i, |bool|)
 		opt norefcounts
 		|| inl = .isinline$

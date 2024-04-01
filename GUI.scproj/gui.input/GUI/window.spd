@@ -17,6 +17,7 @@ class Window (GUIControl)
 	|guicontrol?|						DroppingInto
 	|guicontrol?|						MouseIsOver
 	|guicontrol?|						FocusAttempt
+	|guicontrol?|						InnerLostFocus
 	|InlineEditor|						InlineEditorPlace
 	|GUIPasteEvent?|					OnPaste
 	|GUICopyEvent?|						OnCopy
@@ -132,6 +133,7 @@ class Window (GUIControl)
 		.finishfocus(focus)
 		focus.__GotFocus__?
 		old.__LostFocus__?
+		.InnerLostFocus = old
 
 
 	helper FinishFocus (|guicontrol| focus)
@@ -306,20 +308,27 @@ class Window (GUIControl)
 		|| f = .Focus
 			|| str = (0.70, 1.0)(i)
 			f.drawfocus(where, str)
+			
+		|| old = .InnerLostFocus
+		if old and !old.drawmenu(where)
+			.InnerLostFocus = nil
+		menu.DrawMenu(where)
 		
-		if menu.IsViewable
-			where.ControlClip = menu
-			menu.__Draw__(Where)
-			menu.DrawChildren(where, menu.lastrect)
 		
 		where.ControlClip = self
-
 		i.DrawFocus(where)?
 
 		where.ResetBoundsToSize
 		if .AlphaFader and .FlashSelf
-			.DrawFocusRect(Where, .lastrect, .FaintingEdgeSub)
+			.DrawFocusRect(Where, .LastRect, .FaintingEdgeSub)
 
+
+	helper guicontrol.DrawMenu (|image| where, |bool|)
+		if .IsViewable
+			where.ControlClip = self
+			.__Draw__(Where)
+			.DrawChildren(where, .lastrect)
+			return true
 
 	helper FixFocus
 		opt norefcounts
@@ -328,7 +337,7 @@ class Window (GUIControl)
 		if f == .innerfocus
 			.SetInnerFocus(nil)
 		  else
-			.ClearFocus
+			.setfocus( nil)
 
 
 	function guicontrol.CanPasteInto (|guicontrol|dest, |guicontrol|)
@@ -463,7 +472,7 @@ class Window (GUIControl)
 	function RunAllTasks (|date| now)
 		opt norefcounts
 		for p in .tasks
-			if !p.runone(now)
+			if !p.SmartRun(now)
 				p.Remove
 			 
 	

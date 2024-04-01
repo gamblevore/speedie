@@ -168,18 +168,6 @@ function PerryIDE.ClickedTodo
 	fl.SelectNoShow(todo)
 
 
-//function HeldReleaseButton (GUIaction)
-//	if self isa buttonview
-//		if !.OpenMenu
-//			.ide.notify("No build-tasks exist.")
-
-
-//function ClickedRelease (GUIaction)
-//	return false
-//	|| name = .tag as string
-//		.ide.compile("compile", name)
-
-
 function fnBuildIsDead (fnConfirmCanceller)
 	if self mustbe perryide
 		if !.IsBuilding

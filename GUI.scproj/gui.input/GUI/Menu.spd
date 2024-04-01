@@ -87,15 +87,18 @@ class Menu (ListView)
 		|| win = .window					#require
 		win.inline.clear
 		win.openedmenu = self
-		is visible // shouln't really be visible? seems no?
+		is visible
 		._Scroll = nil
+		.slideopen(0.125s)
 		.SelectFirst(listviewselectmode.initialselection)
+	
 	
 	function IsCmm (|bool|)
 		|| p = .parent
 		if p isa listview
 			return p.cmm == self // idk really
-		
+	
+	
 	function IsOpenedMenu (|bool|)
 		opt norefcounts
 		|| w = .window

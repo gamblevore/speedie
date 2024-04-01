@@ -461,7 +461,7 @@ class PerryIDE (Window)
 		require .LastMemory[i] != c
 		.LastMemory[i] = c
 		return true
-			
+		
 		
 	function UpdateMem (|bool|)
 		require perryide.StatsMode == 3

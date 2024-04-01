@@ -76,16 +76,16 @@ extend PerryIDE
 		with .DebugArgsList
 			isnt visible
 			is editable
+//			is TrapVisibleChange
 			.size =  the~left+4 for 360  by  15~down back 150
 			.id = "debugargs"
-			.ClickOutsideCloses = true
 			.OnFocus = DebugArgsGotFocus
 			.gnormal.solid  = (0.05, 0.05, 0.05, 0.95)
 			.gnormal.edge = (0.0, 0.0, 0.0, 0.125)
 			.OnKeyDown = DebugArgsKeyDown
 //			.ontextchanged = ArgValidation 
-			.AttachedToParent = true
-			.expectsparse = textview.AlwaysJeebox			
+			.expectsparse = textview.AlwaysJeebox
+			.ClickOutsideCloses = true		
 
 
 		with .ViewButtons 
@@ -342,8 +342,6 @@ extend PerryIDE
 		.ProductOut.SetupOut("product", TextView.AllowJeebox)
 		.ProductErrors.SetupOut("errors")
 		
-		.runbutton.SubControl = .DebugArgsList
-		.runbutton <~ .DebugArgsList
 
 		.AddIDEButton(.RunButton,	"\02", "Debug Project", "debug")
 		.AddIDEButton(.buildbutton, "\1C", "Build Project", "compile")

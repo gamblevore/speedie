@@ -20,12 +20,12 @@ class GUIControl (list)
 	|ControlClipMode|			ClipMode
 	|GuiControlFlags|			State
 	|TakesFocusFlag|			TakesFocus
-	|uint16[2]| 				_SizeFraction
+	|uint16| 					_TransitionFraction
+	|movecode| 					AttachedFrom
 	|byte|						TextAlteredForDraw
 	|byte|						ExpandOnMouseOver
 	|bool|						PostLoaded
 	|bool|						ClickOutsideCloses
-	|bool| 						AttachedToParent
 	|CopyPasteFlags|			CopyPaste
 
 
@@ -36,8 +36,7 @@ class GUIControl (list)
 			.tabindex = parent.loadtabindex
 		.gnormal = drawstyle()
 
-		._SizeFraction[0] = 4K
-		._SizeFraction[1] = 4K
+		._TransitionFraction = 4K
 		is visible
 		is Enabled
 		is Drawsfocus
@@ -79,8 +78,8 @@ class GUIControl (list)
 	virtual Copy
 	virtual GotFocus
 		(.OnFocus)(self, 1)?
-	virtual LostFocus
-		(.OnFocus)(self, 0)?
+	virtual LostFocus (|bool|)
+		return (.OnFocus)(self, 0)?
 	virtual AppForegroundChanged (|bool| IsForeGround)
 		0
 	
@@ -190,6 +189,7 @@ class GUIControl (list)
 		  else
 			.state &= ~F
 		if f & guicontrolflags.visible
+			if self is TrapVisibleChange
 			#!VisibleChange
 			sdlapp.resized(self)
 
@@ -213,14 +213,19 @@ class GUIControl (list)
 			._ScrollDrawTimer = value
 			sdlapp.touch(self)
 
-	function SizeFraction (|movecode| D=movecode.all, assigns:|float|)
-		if d is Horizontal or Vertical
-			value = value.clamp * 4K
-			if D is Horizontal
-				._Sizefraction[0] = value
-			if D is Vertical
-				._Sizefraction[1] = value
+	function SizeFraction (assigns:|float|)
+		|| t = (value.clamp * 4K)|int|
+		if ._TransitionFraction != t
+			._TransitionFraction = t
 			sdlapp.resized(self)
+	
+	
+	function Transition (|int| Value, |int| field, |movecode| matching, |int|)
+		if matching.field == field
+			value *= ._TransitionFraction
+			return value >> 12
+		return value
+	
 		
 	setter Visible (|bool|)
 		(self is visible) = value
@@ -238,16 +243,17 @@ class GUIControl (list)
 			return self contains w!.MouseIsOver
 	
 	
-	helper DrawChildren (|image| where,  |ivec4| Lim,  |guicontrol| avoid=nil)
+	helper DrawChildren (|image| where,  |ivec4| Lim,  |guicontrol| avoid=nil) // drawcontrols
 		opt norefcounts
 		for R in self							// .last gets drawn last, so .last is actually the "front".
-			if (r!=avoid) and R.isviewable
-				|| SubLim = Lim.clip(r.LastRect)
+			if (r!=avoid) and R.IsViewable
+				|| SubLim = Lim.clip(r.lastrect)
 				where.ControlClip = SubLim
 				r.__Draw__(Where)
-				if r.hasany
+				if r.HasAny
 					r.drawchildren(where, Sublim, avoid)
 
+	
 	
 	helper DoPaste (|Object| Data, |copypasteflags| Type = CopyPasteFlags.PasteText, |bool|)
 		|| w = .window
@@ -351,11 +357,13 @@ class GUIControl (list)
 	setter Top (|ControlPoint|)
 		.size(3) = value
 		
-	function AbsBottom (|int|)
+	function LastBottom (|int|)
 		return .lastrect.y
-	function AbsLeft (|int|)
+	function LastLeft (|int|)
 		return .lastrect.x
-	function AbsTop (|int|)
+	function LastRight (|int|)
+		return .lastrect.x2
+	function LastTop (|int|)
 		return .lastrect.y2
 
 	function Left (|controlpoint|)
@@ -397,9 +405,24 @@ class GUIControl (list)
 		require strength > 0
 		|| oldclip = where._ControlClip // maybe outside
 		where.controlclip = (0, 0, 31K, 31K)
-		where.EdgeAlpha(R, .FocusBorderStyle, Strength, .EdgeAllow)
+		where.EdgeAlpha(R, .FocusBorderStyle, Strength, ~.FindAttachedEdge)
 		where.controlclip = oldclip
+
 	
+	helper FindAttachedEdge (|MoveCode|) // .EdgeAllow
+		opt norefcounts
+		|| p = .parent$
+		|| a = .AttachedFrom
+			return a
+		if .Sizer[0] is after
+			return MoveCode.left
+		if .sizer[1] is After
+			return MoveCode.bottom
+		if .sizer[2] is before
+			return MoveCode.right
+		if .sizer[3] is before
+			return MoveCode.top
+		
 	
 	helper FaintingEdge (|float|)
 		opt norefcounts
@@ -435,7 +458,7 @@ class GUIControl (list)
 	function ClearFocus
 		opt norefcounts
 		if .hasfocus
-			.window!.clearfocus
+			.window!.setfocus(nil)
 
 
 	helper MouseIsDown (|bool|)
@@ -470,8 +493,16 @@ class GUIControl (list)
 			r2.refsanity
 	
 
-	task_run SlideHeight (TaskGUI)
-		.upon.SizeFraction(movecode.vertical) = progress
+	task_run SlideOpen (TaskGUI)
+		|| hide = (progress >= 1 and .dir is close)
+		(.upon is visible) = !hide
+		if .dir is close
+			progress = 1.0 - progress
+			
+		// Cant slide menus closed cos of how menus work
+		// Sadly. we need to change the menu-system to not be stupid.
+		
+		.upon.SizeFraction() = progress
 
 
 	helper AddTask (|TaskGUI| t)
@@ -480,7 +511,7 @@ class GUIControl (list)
 			w.tasks <~ t
 
 
-	task TaskGUI ( |...!| Upon,  |date| duration,  |date| StartTime=date.now )
+	task TaskGUI ( |...!| Upon,  |date| duration,  |date| StartTime=date.now,  |movecode| Dir = MoveCode.Open )
 		contains –parentclass			// super cool feature
 		constructor						// upon,  StartTime,  duration are automatically set
 			upon.addtask(self)
@@ -489,7 +520,7 @@ class GUIControl (list)
 			|| Over = now - .StartTime
 			return (Over)|float| / .duration|float|
 		
-		function RunOne (|date| now, |bool|)
+		function SmartRun (|date| now, |bool|)
 			opt NoRefCounts
 			require .upon.parent
 				
@@ -518,3 +549,5 @@ function image.Window (assigns:|window| W)
 	|| s = w.LastRect
 	.windowbase = s.xy
 	.ControlClip = s.Soothe
+
+

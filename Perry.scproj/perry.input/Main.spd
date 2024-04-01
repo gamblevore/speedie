@@ -9,6 +9,7 @@ main // main {
 		app.crash
 	SDLApp.init
 	Perry.Startup
+	notifications.ShowTip
 	return SDLApp.Run
 
 

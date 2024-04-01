@@ -58,6 +58,7 @@ datatype GuiControlFlags (uint)
 		NeverDrawModified
 		OpensMenu
 		NewlyShown
+		TrapVisibleChange
 		DrawsFocus // showborder, showsborder, hasborder, drawborder
 
 

@@ -339,7 +339,7 @@ class list (Saveable)
 					rz--
 	
 	function Rand (||)
-		return self[.slowcount()]
+		return self[.slowcount()()]
 
 	render
 		cpp_name JB_List_Render
