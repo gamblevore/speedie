@@ -1906,14 +1906,18 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__MoveCode_Backward (32)
 #define kJB__MoveCode_Bottom (kJB__MoveCode_Down)
 #define kJB__MoveCode_Center (63)
+#define kJB__MoveCode_Close (128)
 #define kJB__MoveCode_Down (8)
 #define kJB__MoveCode_Forward (16)
 #define kJB__MoveCode_Front (kJB__MoveCode_Forward)
 #define kJB__MoveCode_Horizontal (1 + 2)
-#define kJB__MoveCode_LargestFlag (63)
+#define kJB__MoveCode_LargestFlag (255)
 #define kJB__MoveCode_Left (2)
 #define kJB__MoveCode_MiddleLeft (2 + (4 + 8))
 #define kJB__MoveCode_MiddleRight (1 + (4 + 8))
+#define kJB__MoveCode_Negative ((2 + (8 + (32 + 128))))
+#define kJB__MoveCode_Open (64)
+#define kJB__MoveCode_Positive ((1 + (4 + (16 + 64))))
 #define kJB__MoveCode_Right (1)
 #define kJB__MoveCode_Top (kJB__MoveCode_Up)
 #define kJB__MoveCode_Up (4)
@@ -5809,6 +5813,8 @@ void JB_FS_AppendInt32(FastString* self, int data);
 
 void JB_FS_AppendFloatAsText(FastString* self, float F);
 
+void JB_FS_AppendBool(FastString* self, bool B);
+
 void JB_FS_SyntaxAppend(FastString* self, Message* msg);
 
 FastString* JB_FS__Use(JB_Object* other);
@@ -6597,6 +6603,8 @@ void JB_Array_SaveWrite(Array* self, ObjectSaver* Saver);
 
 void JB_Array_SyntaxAppend(Array* self, JB_Object* item);
 
+int JB_Array_SyntaxCompare(Array* self, int n, bool Aware);
+
 bool JB_Array_SyntaxEquals(Array* self, int n, bool Aware);
 
 
@@ -6957,9 +6965,9 @@ SCDecl* SC_Msg_BraDeclfind(Message* self);
 
 void JB_Msg_BRel__(Message* self, FastString* fs);
 
-bool SC_Msg_BuildRunTask(Message* self, Message* fields);
+bool SC_Msg_BuildRunTask(Message* self, Message* fields, int level);
 
-void SC_Msg_BuildTask(Message* self, Message* fields, Message* root);
+void SC_Msg_BuildTask(Message* self, Message* fields, Message* root, int level);
 
 void SC_Msg_BunchFix(Message* self);
 
