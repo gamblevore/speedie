@@ -26,7 +26,7 @@ class TextViewLine (list)
 	|TextLineFlags|			State
 
 
-	constructor (|int| pos)
+	constructor (|int| pos=0)
 		.position = pos
 
 
@@ -390,8 +390,8 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 			.drawerror(where, y+GoUp, d)
 		  else
 			d.drawerror = nil // sigh. crappy bug fix
-	if d is found
-		.drawfound(where, y+GoUp, d)
+//	if d is found
+//		.drawfound(where, y+GoUp, d)
 	if .CanDrawLight(d)				// linelight
 		lc.addint(80)				// need to use ._PreferPrevLine
 		.DrawLighter(where, y+goup)
@@ -594,12 +594,6 @@ function Textviewline.ReclaimEnd (|int| T, |int| dp, |textviewline|)
 		.vline = ++v
 	return self
 
-
-//function message.RangeTrim (|ivec2|)
-//	if self == @sstr
-//		return (3,-3)
-//	if .isstring
-//		return (1,-1)
 
 function message.FlatRange (|intrange|)
 	opt norefcounts

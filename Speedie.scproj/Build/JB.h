@@ -2045,12 +2045,13 @@ extern Array* SC__NilReason_values;
 #define kSC__SCNodeType_Struct (4)
 extern int JB__Syx_CurrFuncID;
 extern int JB__Syx_MaxFuncID;
-#define kJB__TaskState_Finished (32)
+#define kJB__TaskState_Animation (16)
+#define kJB__TaskState_Finished (64)
 #define kJB__TaskState_HadErrors (8)
-#define kJB__TaskState_LargestFlag (63)
+#define kJB__TaskState_LargestFlag (127)
 #define kJB__TaskState_Paused (2)
 #define kJB__TaskState_Started (1)
-#define kJB__TaskState_Successful (16)
+#define kJB__TaskState_Successful (32)
 #define kJB__TaskState_WaitsTillStart (4)
 #define kSC__TM_BaseShrinkSpeed (0.0005f)
 #define kSC__TM_Halfmap (6148914691236517205)

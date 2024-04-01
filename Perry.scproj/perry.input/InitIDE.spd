@@ -233,8 +233,8 @@ extend PerryIDE
 			isnt DrawsFocus
 			.IsMainListView = true
 			.RowHeight		= .rowheight + 3
-			.IsTree	= true
-			.NoSeps	= true
+			.IsTree			= true
+			.NoSeps			= true
 			.tooltip		= self.SearchArea.Tooltip			
 			.OneAlwaysSelected = true
 			.UseColorScheme	= true
@@ -245,14 +245,8 @@ extend PerryIDE
 			.takesfocus		= takesfocusflag.On
 			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.Solid = LeftBG
-
 			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
 
-
-//		with .tester
-//			.gnormal.solid	= ((0.0, 0.0, 0.1, 1.0))
-//			.size = 10~wide by 10~high
-//			.left = 0~right
 			
 		with .progress
 			isnt visible

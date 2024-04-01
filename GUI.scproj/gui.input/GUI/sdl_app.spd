@@ -526,9 +526,9 @@ module SDLApp
 		|| P	= .mousexy
 		|| sigh	= P.grow((6,6))
 		|| img = .DrawSpace
-		img.drawcircle(sigh, ¥.DragAndDrop, 0.0)
+		img.DrawCircleStyled(sigh, ¥.DragAndDrop, 0.0)
 		sigh	= P.grow((10,10))
-		img.drawcircle(sigh, ¥.DragAndDrop, 7.0)
+		img.DrawCircleStyled(sigh, ¥.DragAndDrop, 7.0)
 		
 		img.controlclip = sigh
 		|| t	= $s.length
@@ -618,7 +618,7 @@ module SDLApp
 
 		|| Now = date()
 		for w  in  window.all
-			w.RunAllTasks(now)
+			w.RunAllTasks(now, w.tasks)
 		
 		.StartResize
 		|| Dlg = .DialogIsOpen

@@ -325,14 +325,35 @@ class PerryIDE (Window)
 		|| F = .realfocus
 		if F == E
 			return M
-		  elseif F == M
+		if F == M
 			return E
 	
+	
+	task SoftExplode (taskgui, |int| Particles, |vec2| V, |ivec2| Start)
+		constructor
+			is Animation // should subclass off taskanim instead!
+		
+		run
+			for p in .particles
+				|| V2 = (.starttime + p).randomvec2 - 0.5
+				|| A = (.starttime - p).randomvec2 - 0.5
+				A.y *= 4
+				V2 = (V2 * 25.0) + .V * 250.0
+				.drawparticle(V2, A, progress, p|float|)
+
+		function DrawParticle (|vec2| V, |vec2| A, |float| T, |float| p)
+			|| T2 = T - p * 0.0125
+			|| s = .start + (V*T2 + A).ivec2
+			|| z = (2, 2)
+			|| r = (s - z, s + z)
+			|| Alpha = (1.0-(T2*1.5)) * (1.0-T)
+			sdlapp.drawspace.drawcircle(r, colors.white(alpha), 0)
+			
 	
 	function UpdateSearchText
 		opt norefcounts
 		|| other = .UpdateSearchSwap #require 
-		|| rf = .realfocus // what if they just used the same document??
+		|| rf = .RealFocus // what if they just used the same document??
 			|| t = rf.text // sigh
 			sdlapp.LastSearch = t
 			if other.text != t

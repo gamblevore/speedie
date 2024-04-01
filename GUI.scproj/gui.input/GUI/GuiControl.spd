@@ -492,16 +492,13 @@ class GUIControl (list)
 			r2.refsanity
 	
 
-	task_run SlideOpen (TaskGUI)
-		|| hide = (progress >= 1 and .dir is close)
-		(.upon is visible) = !hide
-		if .dir is close
-			progress = 1.0 - progress
-			
-		// Cant slide menus closed cos of how menus work
-		// Sadly. we need to change the menu-system to not be stupid.
-		
-		.upon.SizeFraction() = progress
+	task SlideOpen (TaskGUI, |movecode| Dir = MoveCode.Open)
+		run 
+			|| hide = (progress >= 1 and .dir is close)
+			(.upon is visible) = !hide
+			if .dir is close
+				progress = 1.0 - progress			
+			.upon.SizeFraction() = progress
 
 
 	helper AddTask (|TaskGUI| t)
@@ -510,7 +507,7 @@ class GUIControl (list)
 			w.tasks <~ t
 
 
-	task TaskGUI ( |...!| Upon,  |date| duration,  |date| StartTime=date.now,  |movecode| Dir = MoveCode.Open )
+	task TaskGUI ( |...!| Upon,  |date| duration,  |date| StartTime=date.now )
 		contains –parentclass			// super cool feature
 		constructor						// upon,  StartTime,  duration are automatically set
 			upon.addtask(self)
@@ -519,7 +516,7 @@ class GUIControl (list)
 			|| Over = now - .StartTime
 			return (Over)|float| / .duration|float|
 		
-		function SmartRun (|date| now, |bool|)
+		function SmartRun (|date| now,  |bool|)
 			opt NoRefCounts
 			require .upon.parent
 				
@@ -532,12 +529,22 @@ class GUIControl (list)
 				is started
 			  elseif self isnt waitstillstart
 				return true
-			|| ok = (self)(now, .progress(now))
+			|| ok = (self)(.progress(now))
+			if self is Animation
+				sdlapp.touch
 			if self isnt Finished
 				return ok
 		
-		run (|date| now, |float| progress, |ErrorInt|)
+		run (|float| progress, |ErrorInt|)
 			return -1
+
+	
+	task TaskAnim ( TaskGUI )
+		constructor
+			is Animation
+			|| w = upon.window
+				w.animations <~ self
+		run (TaskGUI)
 
 
 helper image.ControlClip (assigns:|GuiControl| G)

@@ -50,7 +50,7 @@ module Notifications
 				return true
 
 
-	function Draw // drawnotifications, drawnote
+	function Draw  // drawnotifications, drawnote
 		opt norefcounts
 		for w in .Alerts
 			w.drawwindow(sdlapp.DrawSpace)

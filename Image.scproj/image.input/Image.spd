@@ -531,9 +531,9 @@ class Image (memory)
 			p+=4
 	
 
-	function DrawCircle (|ivec4| R, |drawstyle| G, |float| fade=0.0)
+	function DrawCircleStyled (|ivec4| R, |drawstyle| G, |float| fade=0.0)
 		cpp_part DrawCircleG // sigh. remove this
-		.DrawCircle(r,g.bg.color, fade)
+		.DrawCircle(r, g.bg.color, fade)
 		
 	function DrawCircle (|ivec4| R, |vec4| C, |float| fade=0.0)
 		|| Back		= .Clip(R)$

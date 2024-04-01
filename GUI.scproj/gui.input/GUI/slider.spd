@@ -124,6 +124,6 @@ class Slider (GuiControl)
 			|| px = colors.white(0.15)
 			Where.RectBasic(s2, px)
 		
-		where.DrawCircle(s, .gnormal)
+		where.DrawCircleStyled(s, .gnormal)
 
 

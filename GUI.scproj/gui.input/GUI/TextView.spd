@@ -43,8 +43,8 @@ class TextView (GUIControl)
 	constructor (|guicontrol| p, |guiaction| Clicked=nil, |GUIKeyEvent| keys=nil)
 		super.Constructor(p)
 		._reclaim = (0, 1GB, 0)
-		._Lines = TextViewLine(0)
-		._Start = TextViewLine(0) // make nilchecker happy
+		._Lines = TextViewLine()
+		._Start = TextViewLine() // make nilchecker happy
 		.TakesFocus = TakesFocusFlag.On
 		.OnClicked	= Clicked
 		.OnKeyDown	= keys
@@ -256,7 +256,7 @@ class TextView (GUIControl)
 	function SelRange (assigns:|intrange|)
 		.TypingPlaceTry(value, false, nil)
 
-	helper SelDirect (|intrange| value, |textviewline| d)
+	helper SelDirect (|IntRange| value, |TextViewLine| d)
 		.TypingPlaceTry(value, false, d)
 
 	function Sel (assigns: |int| r)
@@ -276,7 +276,7 @@ class TextView (GUIControl)
 		._UncorrectedSel = result
 		return true
 
-	helper TypingPlaceTry (|intrange| result, |bool|insert, |textviewline| d)
+	helper TypingPlaceTry (|IntRange| result, |bool| insert, |textviewline| d)
 		opt norefcounts
 		if .TypingPlaceDirect(result)
 			.TypingPlaceChanged(insert, d)
@@ -1611,6 +1611,7 @@ class TextView (GUIControl)
 		if !dse or dse.err != err
 			.CancelDelayedError
 			._ErrorDelayer = DelayedShowError(self, 0.33s, date.now, err, P2)
+				
 	
 	
 	helper ShowExtraInfoAtPos (|int| B, |string| reason, |error| err)

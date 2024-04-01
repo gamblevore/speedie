@@ -45,6 +45,7 @@ datatype TaskState (byte)
 		Paused
 		WaitsTillStart
 		HadErrors
+		Animation
 		Successful
 		Finished
 	

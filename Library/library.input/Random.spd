@@ -139,3 +139,10 @@ function uint64.Now (|uint64|)
 function int.Now (|uint64|)
 	return self|uint64|.now
 
+	
+function int64.randomvec2 (|vec2|)
+	|| M = 0xFFFFffff
+	|| S = 1.0 / M|float|
+	|| H = .hash
+	return ( (H >> 32)|float|,   (H & M)|float| ) * S
+

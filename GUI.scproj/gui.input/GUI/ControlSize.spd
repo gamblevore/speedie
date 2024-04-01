@@ -59,8 +59,8 @@ struct ControlSize
 
 
 	function Calculate (|ivec4| Parent, |ivec4| Prev, |ivec4| Window, |guicontrol| upon, |ivec4|)
-		|| dbg = upon.clipmode is debug
-			"---------------"
+//		|| dbg = upon.clipmode is debug
+//			"---------------"
 		|| vis = upon is visible			
 		|| pc = parent.size >> 1
 		for i in 4
@@ -74,12 +74,12 @@ struct ControlSize
 				  elseif m == controlpoint.Centered
 					d = pc[i&1]
 				rz[i] = d + .Size(i)
-				if upon.clipmode is debug
-					.PrintExplain(i, d, rz)
+//				if upon.clipmode is debug
+//					.PrintExplain(i, d, rz)
 			  elseif m == controlpoint.Percent
 				rz[i] = pc[i&1]|float| * (1.0/64K) * .size(i)
-				if dbg
-					.PrintExplain(i, 0, rz)
+//				if dbg
+//					.PrintExplain(i, 0, rz)
 		
 		|| E = upon.findattachededge.flip
 		for i in 4
@@ -90,23 +90,23 @@ struct ControlSize
 				
 				sz = upon.transition(sz, i, e)
 				rz[i] = ro + ((i>=2) sign sz)
-				if dbg
-					.PrintExplain(i, ro, rz)
+//				if dbg
+//					.PrintExplain(i, ro, rz)
 
 		if upon.ClipMode is SlideBackInParent
 			|| rz2 = rz.Bound(parent)
-			if dbg
-				.ExplainBound(rz, rz2)
+//			if dbg
+//				.ExplainBound(rz, rz2)
 			rz = rz2
 		
 		if upon.ClipMode is SlideBackInWindow
 			|| rz2 = rz.Bound(window)
 			rz2 = rz2.boundclip(window) // in case parent goes outside window
-			if dbg
-				.ExplainBound(rz, rz2)
+//			if dbg
+//				.ExplainBound(rz, rz2)
 			rz = rz2
 	
-	
+/*	
 	function PrintExplain (|int| i, |int| New, |ivec4| rz)
 		|| fs = faststring()
 		.explain(i, new, rz, fs)
@@ -131,7 +131,6 @@ struct ControlSize
 			d = d xor 2
 		
 		fs <~ "${ivec4.edgename(d)} ($new) + ${.Size(i)}"
-		
 
 	function ExplainBound (|ivec4| rz, |ivec4| rz2)
 		if rz != rz2
@@ -139,6 +138,7 @@ struct ControlSize
 			print " bounded to "
 			printline $rz2
 
+*/
 
 function @ivec4.EdgeName (|int| i, |string|)
 	if i == 0

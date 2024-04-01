@@ -430,8 +430,11 @@ function file.IsNicelyViewable (|bool|)
 function PerryIDE.ClickedFind (|error| row)
 	|| p = row.path
 	.GotoIncludedFile(p)
-	if row.position
+	if row.position						// XYOfChar
 		.editme.ShowAndSel(row.position, .MassSearchField.text.length)
+		|| X = .editme.Right
+		|| Y = .editme.XYOfChar(row.position).y + (.editme.lineheight / 2) + 2
+		.animations <~ .SoftExplode(5s, date.now, 24, (-2.0, 0), (x,y))
 	  else
 		row = row.first
 	|| curr = .MoveError(row, p, -1)
