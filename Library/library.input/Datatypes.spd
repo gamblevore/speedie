@@ -29,6 +29,15 @@ datatype int
 	operator FTD (|uint| belf, |bool|)
 		return self and ((self&belf) == self)
 
+
+	function IsKnown (|bool|)
+		pragma inline
+		return (self & (self - 1)) == 0
+
+	function IsPo2 (|bool|)
+		pragma inline
+		return (self & (self - 1)) == 0
+
 	function Bits (|int|)
 		return (1<<self)-1
 
@@ -126,14 +135,6 @@ datatype int
 		if d > 0 // can fail otherwise
 			return (self|uint| < d|uint|)
 
-
-	function IsKnown (|bool|)
-		pragma inline
-		return (self & (self - 1)) == 0
-
-	function IsPo2 (|bool|)
-		pragma inline
-		return (self & (self - 1)) == 0
 
 	function IsPow2 (|bool|)
 		disabled ".IsPo2"
@@ -882,23 +883,42 @@ datatype bool
 
 datatype MoveCode (byte)
 	Flags
+		|movecode| 
 		Right
 		Left
 		Up
 		Down
 		Forward
 		Backward
-		Top = Up
+		Open
+		Close
+		Positive = (Right + Up   + Forward  + Open)
+		Negative = (Left  + Down + Backward + Close)
+		Top    = Up
 		Bottom = Down
-		Front = Forward
-		Back = Backward
-		Vertical = Up + Down
-		Horizontal = Right + Left
-		MiddleLeft = Left + Vertical
+		Front  = Forward
+		Back   = Backward
+		Vertical    = Up + Down
+		Horizontal  = Right + Left
+		MiddleLeft  = Left + Vertical
 		MiddleRight = Right + Vertical
 		All = 63
 		Center = 63
 
 	syntax is (|movecode| m, |bool|)
 		return (self & m) == m
+	
+	syntax call (|bool| same, |movecode|)
+		if same: return self
+		return .flip
 
+	function field (|int|)
+		if self & Vertical
+			rz = 1
+		if self & Positive
+			rz |= 2
+	
+	function flip (|movecode|)
+		|| m = 0b01010101
+		|| m2 = m << 1
+		return ((self & m) << 1) ||| ((self & m2) >> 1)

@@ -265,6 +265,10 @@ class FastString {
 		cpp_name JB_FS_AppendFloatAsText
 		self <~ F|f64|
 
+	syntax Append (|bool| B)
+		cpp_name JB_FS_AppendBool
+		self <~ ("true", "false")(b)
+
 	
 	function Mark (|int|)
 		cpp_wrapper
