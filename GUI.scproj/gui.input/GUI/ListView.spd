@@ -296,7 +296,6 @@ class ListView (GUIControl) {
 		|| f = .nextsearch(.lastselected)$
 		
 		.Show(f)
-		.scrolljump
 		if !.DraggingRowFrom
 			.Select(f)
 		return true
@@ -639,8 +638,7 @@ class ListView (GUIControl) {
 			  elseif before
 				before.prev = p
 		
-		.scrolldrawtimer = ScrollInfo.timer
-		.touch
+		.bumpscroll
 		return true
 	
 	
@@ -1031,8 +1029,6 @@ class ListView (GUIControl) {
 			.SelChangeEvent(s, mode)
 		if mode isnt noshow
 			.show(s)
-			if mode is fast
-				.scrolljump
 
 	
 	function FocusOn (|ListViewrow| r)
@@ -1056,24 +1052,16 @@ class ListView (GUIControl) {
 	function ScrollByRows (|int| Rows)
 		|| s = ._Scroll
 			.scrollset( .bmove(s, rows) )
-			.ScrollDrawTimer = ScrollInfo.timer // where should this go?
-		// in scrollset or the caller of this func?
+			.bumpscroll
 
 	
 	function ScrollMoveTo (|int| v)
 		|| s = .start
 			.scrollset(.bmove(s, v))
-			.ScrollJump
-	
-
-	function ScrollJump						// sigh...
-		// not needed anyomre
-		//.Scrollset( ._desiredscroll )
 	
 	
 	function ShowFast (|ListViewrow| i)
 		.show(i)
-		.scrolljump
 
 	
 	function Owns (|ListViewrow| i, |bool|)
@@ -1115,7 +1103,7 @@ class ListView (GUIControl) {
 			.SelectFirst
 		  else
 			.SelectNone
-		.ScrollDrawTimer = ScrollInfo.timer
+		.bumpscroll
 		._BlockedDuringUse = false
 
 	
@@ -1341,7 +1329,7 @@ class ListView (GUIControl) {
 	function ScrollPixels (|int| rem)
 		if rem
 			.ScrollPixelsSub(rem)
-			.scrolldrawtimer = ScrollInfo.timer
+			.bumpscroll
 			.ScrollRealigner = (48, 0)(.scrollshift)
 			sdlapp.touch(self)
 

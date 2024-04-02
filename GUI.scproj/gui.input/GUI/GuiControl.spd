@@ -213,6 +213,9 @@ class GUIControl (list)
 			._ScrollDrawTimer = value
 			sdlapp.touch(self)
 
+	function BumpScroll (|int| extra = 0)
+		.ScrollDrawTimer = ScrollInfo.timer-extra
+
 	function SizeFraction (assigns:|float|)
 		|| t = (value.clamp * 4K)|int|
 		if ._TransitionFraction != t

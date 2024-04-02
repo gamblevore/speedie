@@ -415,8 +415,6 @@ struct xC2xB5Form;
 
 struct ASMFunc;
 
-struct JB_String;
-
 struct FastStringCpp;
 
 struct FastString;
@@ -6610,9 +6608,6 @@ int JB_Array_SyntaxCompare(Array* self, int n, bool Aware);
 
 bool JB_Array_SyntaxEquals(Array* self, int n, bool Aware);
 
-
-
-// JB_BigNum
 
 
 // JB_Dictionary

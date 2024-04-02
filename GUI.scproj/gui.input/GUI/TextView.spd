@@ -107,7 +107,7 @@ class TextView (GUIControl)
 	behaviour LostFocus
 		.isinline.clear(False)?
 		
-		ifn .KeepUndosOnLoseFocus
+		if !.KeepUndosOnLoseFocus
 			.document = nil
 		super.lostfocus
 
@@ -115,7 +115,6 @@ class TextView (GUIControl)
 	behaviour GotFocus
 		if .isinline or .singleline
 			.sel = .text.length
-		.clearfound
 		sdlapp.SelChanged
 		super.gotfocus
 
@@ -351,8 +350,6 @@ class TextView (GUIControl)
 					exit
 				pos++
 				
- 
-			
 		while x != pos // move pos
 			|| ng = s.group(pos+shift)
 			if ng!=G
@@ -460,8 +457,9 @@ class TextView (GUIControl)
 				return r
 		return ._lines.last
 	
+	
 	function ViewLineAndSel (|int| L)
-		|| d	= .DrawInfoAtLine(L)
+		|| d = .DrawInfoAtLine(L)
 			.ShowAndSel(d.position)
 
 	
@@ -469,10 +467,27 @@ class TextView (GUIControl)
 		return .ViewPos(x, (.MaxVisibleLines/3))
 	
 	
-	function ShowAndSel (|int| x, |int| length=0, |textviewline|)
+	function MarkAsFound (|message| Where)
+		opt norefcounts
+		|| D = .FindDrawInfo(Where.Position)
+		where.obj = D
+		.DoExplode(D, 4)
+
+
+	function DoExplode (|textviewline| D, |float| strength)
 		opt NoRefCounts
-		rz = .show(x)
-		.SelDirect((x, x + length), rz)
+		|| w = .window
+			for i in 3
+				w.animations <~ .SoftExplode(5s, date.now + 0.25s*i, (-2.0, 0), D, strength)
+
+
+	function ShowAndSel (|int| P, |int| length=0, |bool| Explode=false, |textviewline|)
+		opt NoRefCounts
+		rz = .show(P)
+		.SelDirect((P, P + length), rz)
+
+		if explode
+			.Doexplode(rz, 2)
 
 
 	function ViewPos (|int| x,  |int|before=0, |int| back=0, |bool| Exact=false, |TextViewLine|)
@@ -497,7 +512,7 @@ class TextView (GUIControl)
 				d2 = d2.MoveCapped(2) // looks lil nicer
 			if ._Start != d2
 				.StartLine = d2
-				.ScrollDrawTimer = ScrollInfo.timer 
+				.bumpscroll
 		
 		
 	function Jump (|int| x, |int| Before=0, |bool|)
@@ -758,6 +773,7 @@ class TextView (GUIControl)
 		.insertsub(s, r, true)
 		return true
 
+
 	helper string.IsSlashComment (|bool|)
 		for s.lines in self
 			|| i = s.OutWhite
@@ -891,12 +907,14 @@ class TextView (GUIControl)
 		for e in err
 			.ErrorAt(e)
 	
-	function ErrorJump (|error| err)
-		.jump(err.position, .MaxVisibleLines/2)
-		
+	
+	helper ErrorJump (|int| pos)
+		.jump(pos, .MaxVisibleLines/2)
+	
+	
 	function ErrorAt (|error| err)
 		if err
-			.ErrorJump(err)
+			.ErrorJump(err.position)
 			.LineErrorAdd( err, true )
 	///// end of non-internal calls
 	// they will call finddrawinfo... which can parse and resplit the entire textview...
@@ -910,16 +928,6 @@ class TextView (GUIControl)
 			d.drawerror = nil
 
 
-	function ClearFound (|bool|)
-		opt norefcounts
-		for d in ._lines
-			if d is found
-				(d isnt found)
-				(d isnt currfound)
-				rz = true
-				sdlapp.touch(Self)
-
-
 	helper LineErrorAdd (|error| e, |bool| ForceParse=true)
 		opt norefcounts
 		require ForceParse or !.NeedsPrepare
@@ -931,16 +939,36 @@ class TextView (GUIControl)
 			sdlapp.touch(Self)
 
 
-	function MarkAsFound (|error| Where, |bool| IsCurr)
-		opt norefcounts
-		
-		|| r = .FindDrawInfo(Where.Position)
-		require (r isnt found) or ((r is currfound) != iscurr)
+// how can we make this stronger if the current line is selected
+// Lets see. So... we need to pass a current textviewline object?
 
-		where.obj = r
-		(r is found)
-		(r is CurrFound) = iscurr
-		sdlapp.touch(Self)
+	task SoftExplode (taskgui, |vec2| V, |TextViewLine| D, |float| Strength)
+		constructor
+			is Animation // should SubClass off TaskAnim instead!
+		
+		run
+			|| start = .upon.XY(.d)
+			|| Particles = 24 
+			for p in particles
+				|| V2 = (.starttime + p).RandomVec2 - 0.5
+				|| A  = (.starttime - p).RandomVec2 - 0.5
+				A.y *= 4
+				V2 = (V2 * 25.0) + .V * 250.0
+				.DrawParticle(V2, A, progress, p|float|, start)
+
+
+		function DrawParticle (|vec2| V, |vec2| A, |float| T, |float| p, |ivec2| start)
+			|| str = 1.0
+			if .upon.SelectedLine != .D
+				str = 0.5
+			|| T2 = T - p * 0.0125
+			|| s = start.vec2 + (V*T2 + A)
+			|| z = vec2(2.5)
+			|| r = (s - z, s + z)
+			|| Alpha = (1.0-(T2*1.5)) * (1.0-T)
+			Alpha *= str * .strength
+			|| C1 = (1.0, 1.0, 2.0, alpha)
+			sdlapp.DrawSpace.DrawCircle2(r, C1)
 
 
 	helper message.LastAfter (|int| IgnoreAfter, |ind|)
@@ -1441,20 +1469,40 @@ class TextView (GUIControl)
 			if !n or .FoundInfo(d.DrawRange, char, sec)
 				if vline
 					*vline = c
+//				_LastVLine = c
 				return d
 			d = n
 			c++
 	
 	
-	function XYOfChar (|ind| pos, |ivec2|)
+	helper Y (|textviewline| D, |movecode| M,  |int|)
+		rz = .lasttop - (D.vline - (._Start.vline-1)) * .lineheight|int|
+		rz += 2
+		ifn m & MoveCode.Vertical
+			rz += .lineheight / 2
+	
+	helper XY (|textviewline| D, |movecode| M=movecode.right,  |ivec2|)
+		rz.y = .y(d,m)
+		rz.x = .x(m)
+	
+	helper X (|movecode| M, |int|)
+		if m is right
+			return .Right
+		if m is left
+			return .left
+
+	helper XYOfChar (|ind| pos, |ivec2|)
 		opt norefcounts
 		|| VLine = 0
 		|| d = .FindDrawInfo(pos, VLine)
-		require  vline >= 0  and  vline <= .maxvisiblelines
-		
-		|| y = (.lasttop - (vline+1) * .lineheight|int|) - 2
+		if  vline >= 0  and  vline <= .maxvisiblelines
+			return .XYOfCharSub(d, vline, pos)
+
+
+	helper XYOfCharSub (|textviewline| D, |ind| vline, |ind| pos, |ivec2|)
+		|| y = .lasttop - (vline+1) * .lineheight|int|
 		|| x = d.XOfChar(pos) + font.width + .textleft // sigh
-		return (x-2, y)
+		return (x, y) - 2
 	
 
 	helper FindDrawLineEdge (|intrange| t, |int| i, |bool| CanAvoid=true, |int|)
@@ -1508,16 +1556,18 @@ class TextView (GUIControl)
 		|| Sel = self is editable or alwaysscrollable
 			.DrawSel(where)
 		where.ControlClip = c			/// restore!
-		if  !.CanSeeAllLines and .CanDrawScroll
-			if .myerror
-				.DrawScrollErrors(where)
-			if sel
-				.DrawScroll(.slh, where)
+
+		require  !.CanSeeAllLines and .CanDrawScroll
+		if .MyError
+			.DrawScrollErrors(where)
+		if sel
+			.DrawScroll(.slh, where)
 	
 	
 	helper DrawScrollErrors (|image| where)
 		opt norefcounts
-		|| strength = .DrawScroll(.slh)				#require
+		|| strength = .DrawScroll(.slh)
+		require strength > 0
 		|float| N = ._lines.last!.vline
 		for s in ._lines
 			|| E = s.drawerror
@@ -1630,7 +1680,7 @@ class TextView (GUIControl)
 	helper StartLine (assigns:|TextViewLine| d)
 		cpp_part StartAtLine
 		.StartWithoutScrollDraw = d
-		.ScrollDrawTimer = ScrollInfo.timer
+		.bumpscroll
 	
 	
 	function StartLine (assigns:|int| v)
@@ -1991,6 +2041,7 @@ class TextView (GUIControl)
 		|| csAntiWords		= makeanti()
 		|| CounterParts		= <(`{[(`'"|`)>
 		|| CounterParts2	= <(`}])`'"|`)>
+//		|| _LastVLine		= 0
 
 		function MakeAnti (|charset|)
 			return jeebox.CSWordMiddle.Invert

@@ -8,9 +8,6 @@ role StretchControl (GuiControl)
 	helper Add (|string| name)
 		|| rz = guicontrol(self)
 		rz.ID = name
-
-	function Open
-		.isCollapsed = false
 		
 	setter IsCollapsed (|bool|)
 		opt norefcounts
@@ -27,10 +24,7 @@ role StretchControl (GuiControl)
 	function Reset
 		opt norefcounts
 		.div.ActiveEnd = .div.start
-	
-//	function Flip
-//		.div.flip
-	
+
 	function Collapse (|bool| soft = false)
 		opt norefcounts
 		.div.Collapse(soft)

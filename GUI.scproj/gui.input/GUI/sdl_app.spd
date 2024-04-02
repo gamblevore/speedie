@@ -967,8 +967,6 @@ module SDLApp
 
 	helper MouseMoveEvent (|window| w, |ivec2| XY, |int|)
 		|| mxy = .MouseXY
-//		if .AppResizingXY
-//			return .DoAppResize(mxy)
 		require .CurrMouseXY != mxy
 		|| MB = .MouseButtons
 		require MB or !.IsBackground

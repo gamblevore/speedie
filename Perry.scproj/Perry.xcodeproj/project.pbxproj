@@ -44,7 +44,6 @@
 		AC310BF22A5188FE00837DCB /* libSDL2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC528F142961FA8C005EFB9D /* libSDL2.dylib */; };
 		AC310BF32A5188FE00837DCB /* libSpeedie.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC61010E2798768C00278BEF /* libSpeedie.dylib */; };
 		AC310BF52A5188FE00837DCB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC259FAD2660E1AC0026C303 /* Assets.xcassets */; };
-		AC310C072A518A1300837DCB /* bird.input in Resources */ = {isa = PBXBuildFile; fileRef = AC310C062A518A1300837DCB /* bird.input */; };
 		AC33F7BE2B4FA499009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */; };
 		AC33F7BF2B4FA499009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */; };
 		AC33F7C02B4FA499009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */; };
@@ -242,7 +241,6 @@
 		AC259FBF2660EF610026C303 /* image.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = image.input; path = ../Image.scproj/image.input; sourceTree = "<group>"; };
 		AC28D04B2638AAE700635A66 /* perry.input */ = {isa = PBXFileReference; lastKnownFileType = folder; path = perry.input; sourceTree = SOURCE_ROOT; };
 		AC310BFA2A5188FE00837DCB /* BirdDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BirdDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		AC310C062A518A1300837DCB /* bird.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = bird.input; path = ../Utils/birds.scproj/bird.input; sourceTree = "<group>"; };
 		AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Pico.cpp; path = ../Library/CppLib/JB_Pico.cpp; sourceTree = "<group>"; };
 		AC3A6A8D296082E700CE1E91 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		AC4A650125011C1600EF6E9A /* gui.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = gui.input; path = ../GUI.scproj/gui.input; sourceTree = "<group>"; };
@@ -452,7 +450,6 @@
 			children = (
 				AC3A6A8D296082E700CE1E91 /* README.md */,
 				AC5289792961F3FB005EFB9D /* JB_Umbrella.hpp */,
-				AC310C062A518A1300837DCB /* bird.input */,
 				AC28D04B2638AAE700635A66 /* perry.input */,
 				AC528A5F2961F8D3005EFB9D /* Compiled Src Perry */,
 				AC610133279877CC00278BEF /* Compiled Src Speedie */,
@@ -693,7 +690,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				AC310BF52A5188FE00837DCB /* Assets.xcassets in Resources */,
-				AC310C072A518A1300837DCB /* bird.input in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

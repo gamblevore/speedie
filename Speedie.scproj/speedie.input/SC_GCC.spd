@@ -481,7 +481,7 @@ function BackupCompiler (|bool|)
 function InstallOne (|file| test)
 	test.parent.MakeDir
 	|| f0 = test.Path.ReplacePathComponent(-2, "Build").file
-	ifn Test.CompareFile( f0)
+	if !Test.CompareFile( f0)
 		Test.Copyto(f0)
 
 

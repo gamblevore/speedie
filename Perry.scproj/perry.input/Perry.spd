@@ -54,6 +54,7 @@ module Perry
 			if w isa PerryIDE
 				rz <~ w
 
+	function Unused // test
 
 	function IDE (|PerryIDE|) // frontide, frontperry, firstperry
 		opt norefcounts

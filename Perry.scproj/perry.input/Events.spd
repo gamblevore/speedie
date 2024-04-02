@@ -162,7 +162,6 @@ function PerryIDE.ClickedTodo
 	|| Jumpback = (todo is selected) and .nottodo and (fl.listsource contains .nottodo) 
 		todo = .NotTodo
 		fl.show(todo)
-		fl.scrolljump
 	  else
 		.nottodo = .CurrFileRow
 	fl.SelectNoShow(todo)
@@ -207,7 +206,7 @@ function ReturnProjectPath (GUIListEvent)
 
 function ReturnAllFuncs (GUIListEvent)
 	|| e = .ide!.EditMe
-	e.ShowAndSel(row!.position)
+	e.ShowAndSel(row!.position, true)
 	e.SetFocus
 	return true
 
@@ -415,7 +414,7 @@ function PerryIDE.ClickedError (|error| row)
 		|| f = row.path.file
 		if (row.path != .editme.path) and f.IsNicelyViewable
 			.GoToAnyFile(f)
-		.editme.ShowAndSel(row.position)
+		.editme.ShowAndSel(row.position, true)
 		.editme.MyError = row
 
 
@@ -428,21 +427,21 @@ function file.IsNicelyViewable (|bool|)
 
 
 function PerryIDE.ClickedFind (|error| row)
-	|| p = row.path
-	.GotoIncludedFile(p)
-	if row.position						// XYOfChar
-		.editme.ShowAndSel(row.position, .MassSearchField.text.length)
-		|| X = .editme.Right
-		|| Y = .editme.XYOfChar(row.position).y + (.editme.lineheight / 2) + 2
-		.animations <~ .SoftExplode(5s, date.now, 24, (-2.0, 0), (x,y))
-	  else
-		row = row.first
-	|| curr = .MoveError(row, p, -1)
-	|| last = .MoveError(row, p,  1)
-	.editme.ClearFound
+	opt norefcounts
+	.GotoIncludedFile(row.path)
+	|| L0 = .MassSearchField.text.length
+	|| f1 = row.first
+	if row.position
+		|| L = row.rangelength
+		L := L0
+		.editme.ShowAndSel(row.position, L, true)
+		return
+
+	|| curr = .MoveError(f1, row.path, -1)
+	|| last = .MoveError(f1, row.path,  1)
 
 	while curr
-		.editme.MarkAsFound(curr, row == curr)
+		.editme.MarkAsFound(curr)
 		if curr == last
 			exit
 		curr++
@@ -552,7 +551,7 @@ function PerryFileViewRightClick (GuiListEvent)
 
 function FileViewerCountCode (GuiMenuEvent)
 	|| row = clicked!.row as filerow			#require
-	|| CLOC = (0,0)
+	|| CLOC = (0, 0)
 	|| FileCount = 0
 	|| Size = 0
 	for c.flat in row

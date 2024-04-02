@@ -72,9 +72,8 @@ function PerryAutoCompleteSelected (GUIListEvent)
 	if !row
 		p = .ListSource.obj as string
 	if p and i.EditPath(p)
-		e.ClearFound
 		|| rl = row[2]
-			e.ShowAndSel(rl.int) is found
+			e.ShowAndSel(rl.int, true)
 
 	i.DuringTempView--
 	
@@ -82,9 +81,8 @@ function PerryAutoCompleteSelected (GUIListEvent)
 function PerryFuncMenuSelected (GUIListEvent)
 	opt norefcounts
 	|| e = .ide.EditMe
-	e.ClearFound
 	if row
-		e.ShowAndSel(row.position) is found
+		e.ShowAndSel(row.position)
 		return false
 	|| obj = .ListSource.obj as TextViewLine
 		e._Start = obj

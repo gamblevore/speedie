@@ -101,13 +101,11 @@ module Notifications
 		rz.GNormal.BG <~ B
 	
 	
-	function ShowTip (|string| prefix = "Tip of the day:\n\n",  |string| data = file://tips.box? )
+	function ShowTip (|string| prefix = "Tip:  ",  |string| data = file://tips.box? )
 		|| p = data.parse[]
 			Notifications <~ prefix + p.name
-	
-	
 
-		
+
 
 function error.Useable (|date| ago=8s, |error|)
 	require self and .name

@@ -2010,7 +2010,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* s) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[1228], (112197591642063)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[1228], (112201324315659)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -3356,7 +3356,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1955]);
-	JB_FS_AppendInt32(_fsf0, (2024040120));
+	JB_FS_AppendInt32(_fsf0, (2024040212));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7503,7 +7503,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[926]);
-	JB_FS_AppendInt32(_fsf0, (2024040120));
+	JB_FS_AppendInt32(_fsf0, (2024040212));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -26450,7 +26450,6 @@ int JB_Array_SyntaxCompare(Array* self, int n, bool Aware) {
 bool JB_Array_SyntaxEquals(Array* self, int n, bool Aware) {
 	return JB_Array_Size(self) == n;
 }
-
 
 
 JB_Object* JB_Dict_Expect(Dictionary* self, Message* m) {
@@ -47825,4 +47824,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 1095574249276518835 -8121787482552757695
+// -7655953190382567605 -8121787482552757695

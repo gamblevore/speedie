@@ -15,7 +15,7 @@ conf
 	helpurl	"http://docs.gamblevore.org/Perry.md"
 	prefs	"Perry.prefs"
 	registration
-		prefix	PER1
+		prefix	PERI
 		salt	"Perry"
 		type	Donate
 		buyurl	"http://jeebox.org/donate/perry"

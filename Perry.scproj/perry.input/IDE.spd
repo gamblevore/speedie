@@ -299,6 +299,7 @@ class PerryIDE (Window)
 	function Show (|bool| FromClick=false)
 		disabled "use .ShowIDE"
 	
+	function UnusedTest
 	
 	function ShowIDE (|bool| FromClick=false)
 		debug_require self // what?
@@ -327,27 +328,6 @@ class PerryIDE (Window)
 			return M
 		if F == M
 			return E
-	
-	
-	task SoftExplode (taskgui, |int| Particles, |vec2| V, |ivec2| Start)
-		constructor
-			is Animation // should subclass off taskanim instead!
-		
-		run
-			for p in .particles
-				|| V2 = (.starttime + p).randomvec2 - 0.5
-				|| A = (.starttime - p).randomvec2 - 0.5
-				A.y *= 4
-				V2 = (V2 * 25.0) + .V * 250.0
-				.drawparticle(V2, A, progress, p|float|)
-
-		function DrawParticle (|vec2| V, |vec2| A, |float| T, |float| p)
-			|| T2 = T - p * 0.0125
-			|| s = .start + (V*T2 + A).ivec2
-			|| z = (2, 2)
-			|| r = (s - z, s + z)
-			|| Alpha = (1.0-(T2*1.5)) * (1.0-T)
-			sdlapp.drawspace.drawcircle(r, colors.white(alpha), 0)
 			
 	
 	function UpdateSearchText
@@ -746,7 +726,7 @@ class PerryIDE (Window)
 				.filelist.ErrorAt(err)
 				
 		if jumpto
-			txt.ErrorJump(jumpto)
+			txt.ErrorJump(jumpto.position)
 		  elseif jump and actual_compile
 			if .DuringMsgFB
 				.DuringMsgFB = false
@@ -764,13 +744,11 @@ So anything not 0 means "its OK"`
 
 		if r isa filerow
 			rz = .EditFile(r)
-			.filelist.ScrollJump
 
 
 	function CurrFileRow (|FileRow|)
 		opt norefcounts
 		return .FileList.FirstSelected as filerow
-	
 	
 
 	function Path (|string|)
@@ -826,17 +804,23 @@ So anything not 0 means "its OK"`
 			return 1
 		
 
+	task_run CheckScrollErrors (taskgui)
+		|| e = .upon.editme 
+		if e.myerror
+			e.BumpScroll(60)
+	
+	
 	function EditText (|FileRow| r, |int|) // edittextfile, loadfile, fileload, fileedit, openfile, fileopen
 		|| E	= .editme
 		|| doc	= r.document
 		if e.Document == doc
 			return -1
 		
-		|| Loaded =  E.LoadDocument(doc)
+		|| Loaded =  E.LoadDocument(doc) #require
 		|| spd = .IsSpeedieCode
 		doc.CompareTreesOnSave = spd
 		.ListAllFuncs
-		require Loaded
+		.CheckScrollErrors(0, date.now + 0.25s)		
 		|| it = .ProjMsg
 			if !.DuringLoad
 				it["edit"] = r.location

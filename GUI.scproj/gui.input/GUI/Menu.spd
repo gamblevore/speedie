@@ -90,7 +90,7 @@ class Menu (ListView)
 		win.openedmenu = self
 		is visible
 		._Scroll = nil
-		.slideopen(0.125s)
+//		.slideopen(0.125s)
 		.SelectFirst(listviewselectmode.initialselection)
 	
 	

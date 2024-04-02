@@ -625,9 +625,7 @@ extend PerryIDE
 				.EditRow(file)
 				.EditMe.showandsel(pos)
 			return true
-		if .EditRow(.filelist.start)
-			return true
-		.close
+		return .EditRow(.filelist.start)
 
 
 	function PerryFile (|file!|)

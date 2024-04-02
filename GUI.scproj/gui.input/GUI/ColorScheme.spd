@@ -173,7 +173,7 @@ function textview.LineNumColor (|imagepixel|)
 
 
 function textview.CanDrawLight (|TextViewLine| D, |bool|)
-	if .hasfocus and (self is editable) and !.SingleLine
+	if (self is editable) and !.SingleLine
 		|| sr	= .selrange
 		ifn .seltext contains jeebox.csline
 			return  (d contains sr.x and sr.x2)

@@ -36,9 +36,29 @@ datatype vec4
 	function Lum (|float|)
 		return .xyz.lum
 
+	
+	function Width (|float|)
+		return .x2 - .x1			// not quite true but SubliminalApp uses it this way :(
+
+	function Height (|float|)
+		return .y2 - .y1			// not quite true but SubliminalApp uses it this way :(
+
+	function Area (|float|)
+		return .width*.Height
+
+	function Aspect (|float|)
+		return .width / .height
+	
 	function Sum (|float|)
 		return .x + .y + .z + .w
-
+		
+	function Clip (|vec4| R, |vec4|)
+		r.x  = r.x  max .x
+		r.y  = r.y  max .y
+		r.x2 = r.x2 min .x2
+		r.y2 = r.y2 min .y2
+		return R
+	
 	render
 		fs <~ "${.x}, ${.y}, ${.z}, ${.w}"
 	
@@ -634,9 +654,15 @@ datatype vec2
 			return 1
 		if (L < other)
 			return -1
-		
+	
 	module
-		function New (|float| a=0.0, |float| b=0.0,  |vec2|)
+		function New (|vec2|)
+			cpp_part New0
+		function New (|float| a, |vec2|)
+			cpp_part New1
+			return (a, a)
+		function New (|float| a, |float| b,  |vec2|)
+			cpp_part New2
 			return (a, b)
 
 
@@ -712,5 +738,8 @@ function ivec4.Min (|int| L, |ivec4|)
 	return (.x min L, .y min L, .z min L, .w min L )
 
 function ivec4.Center (|vec2|)
-	return ((.x+.x2)|float|/2.0, (.y+.y2)|float|/2.0)
+	return .vec4.center
+
+function vec4.Center (|vec2|)
+	return (.x+.x2, .y+.y2)*0.5
 

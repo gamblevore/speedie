@@ -140,7 +140,7 @@ function int.Now (|uint64|)
 	return self|uint64|.now
 
 	
-function int64.randomvec2 (|vec2|)
+function int64.RandomVec2 (|vec2|)
 	|| M = 0xFFFFffff
 	|| S = 1.0 / M|float|
 	|| H = .hash

@@ -107,6 +107,12 @@ class Image (memory)
 			r = r.clip(.ControlClip)
 		return R
 
+	function Clip (|vec4| R, |vec4|)
+		cpp_part ClipVec
+		if (self)
+			r = r.clip(.ControlClip.vec4)
+		return R
+
 	syntax cast (|ivec4|)
 		return ._controlclip
 
@@ -328,12 +334,6 @@ class Image (memory)
 				yield (self[curr]) (curr)
 				curr.x++
 			curr = (xstart, curr.y+1)
-
-	
-	function TestCanWrite
-		|| a = .ptr|&byte|
-		for i in .bytecapacity
-			a[i] = 0
 	
 	
 	module
@@ -534,8 +534,10 @@ class Image (memory)
 	function DrawCircleStyled (|ivec4| R, |drawstyle| G, |float| fade=0.0)
 		cpp_part DrawCircleG // sigh. remove this
 		.DrawCircle(r, g.bg.color, fade)
-		
+	
+	
 	function DrawCircle (|ivec4| R, |vec4| C, |float| fade=0.0)
+		// remove this and use drawcircle2...
 		|| Back		= .Clip(R)$
 		
 		R -= (0,0,1,1)
@@ -561,9 +563,27 @@ class Image (memory)
 			  elseif v <= maxdist
 				self[Pix].Overlay(cm)
 
+		
+	function DrawCircle2 (|vec4| R, |vec4| Col, |float| str=1.0)
+		|| Back		= .Clip(R)$
+
+		|| mid		= r.Center
+		|| maxdist	= ((0.5 * r.width) + 0.5) * 0.15
+		|| scale	= (1.0, r.aspect)
+		|| Dim		= r.area.RangeConvertClamped(2000.0, 0.15, 8000.0, 0.26)
+		|| c1		= col * str * col.a
+		|| MD		= (maxdist / dim).pow2
+
+		for Pix.rect in Back.ivec4
+			|| V = (mid - pix.vec2)*scale
+			|| vv = v • v
+			if MD > vv
+				|| D = maxdist / vv.sqrt
+				self[Pix].add((D-dim)*c1)
+
 	
-	function Fill (|DrawStyle| G)
-		.RectStyled(._controlclip, G)
+//	function Fill (|DrawStyle| G)
+//		.RectStyled(._controlclip, G)
 
 
 	

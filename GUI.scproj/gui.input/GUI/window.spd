@@ -423,6 +423,7 @@ class Window (GUIControl)
 
 
 	helper sdlapp.AskQuit (|bool|) // !sdlapp.askquit
+		debugger
 		|| q = "Quit " + app.AppName + "?"
 		return q.confirm
 	

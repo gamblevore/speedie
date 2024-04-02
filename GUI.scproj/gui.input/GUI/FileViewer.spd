@@ -453,7 +453,7 @@ class FileViewer (ListView)
 		if LineByte.x1
 			.editme.ViewLineAndSel(LineByte.x1)
 		if LineByte.x2
-			.editme.ShowAndSel(LineByte.x2)
+			.editme.ShowAndSel(LineByte.x2, true)
 
 
 	function AddExtra (|string| path, |filerow|)
