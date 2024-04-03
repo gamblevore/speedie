@@ -468,13 +468,13 @@ class Window (GUIControl)
 				return Found
 
 
-	function RunAllTasks (|bool| Mark)
+	function RunAllTasks (|bool| Animated)
 		opt norefcounts
 		if !.HaveRunTasks
 			for p in .Tasks
-				if !p.SmartRun
+				if !p.SmartRun(Animated)
 					p.Remove
-		.HaveRunTasks = Mark
+		.HaveRunTasks = Animated
 			 
 	
 	iterator

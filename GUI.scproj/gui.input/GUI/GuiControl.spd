@@ -519,9 +519,11 @@ class GUIControl (list)
 			|| Over = now - .StartTime
 			return (Over)|float| / .duration|float|
 		
-		function SmartRun (|bool|)
+		function SmartRun (|bool| Animated, |bool|)
 			opt NoRefCounts
 			require .upon.parent
+			if !animated and self is animation
+				return true
 				
 			|| s = .starttime
 			|| e = s + .duration

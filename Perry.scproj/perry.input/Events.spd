@@ -297,15 +297,6 @@ function perryIDE.UpdateJeeboxField (|bool|)
 	return true
 
 
-//function PerryIDE.ClickedFile (|bool|)
-//	|| t = .editme.seltext.trim
-//	if t[0] == '/'
-//		|| it = t.inwhite
-//			t = t[0, it]
-//		if t.reveal
-//			return true
-
-
 function PerryIDE.BatchPhind (|string| text, |uint| ID, |bool|)
 	|| found = .filelist.BatchFind(text, ID)
 	.foundlist.use(found)
@@ -437,9 +428,10 @@ function PerryIDE.ClickedFind (|error| row)
 		.editme.ShowAndSel(row.position, L, true)
 		return
 
-	|| curr = .MoveError(f1, row.path, -1)
+	|| curr = .MoveError(f1, row.path, -1)$
 	|| last = .MoveError(f1, row.path,  1)
 
+	.editme.show(curr.position)
 	while curr
 		.editme.MarkAsFound(curr)
 		if curr == last
