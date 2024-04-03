@@ -306,5 +306,5 @@ module ErrorColors
 		
 	
 	function DisableIfNoTerminal
-		.enabled = pipe.StdOutIsTerminal
+		.enabled = filedes.StdOut.IsTerminal
 

@@ -110,7 +110,7 @@ module Perry
 		if app.CWD == "/"
 			app.args.remove("YES")
 
-		if pipe.StdOutIsTerminal
+		if filedes.StdOut.IsTerminal
 			app.AllowInteruptCrash = true // fails with 0 params... sigh whatever
 
 		if !.LoadWindowsFromArgs and !.LoadWindowsSub()

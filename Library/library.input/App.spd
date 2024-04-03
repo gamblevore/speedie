@@ -268,12 +268,12 @@ function FileName (|string|)
 
 function StdIn (|File!|)
 	opt norefcounts
-	return ._Stdin init File.newpipe(pipe.stdin_)
+	return ._Stdin init File.newpipe(filedes.stdin)
 
 	
 function StdOut (|File!|)
 	opt norefcounts
-	return ._StdOut init File.NewPipe(pipe.stdout_)
+	return ._StdOut init File.NewPipe(filedes.stdout)
 
 
 function CWD (|string|)

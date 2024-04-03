@@ -4,20 +4,15 @@
 */
 
 
-module Pipe
+datatype FileDes (int)
 	constants
-		StdIn_  = 0
-		StdOut_ = 1
-		StdErr_ = 2
+		|FileDes|
+		StdIn  = 0
+		StdOut = 1
+		StdErr = 2
 
-	function StdOutIsTerminal (|bool|)
-		return .IsTerminal(.StdOut_)
-	
-	function IsTerminal (|int| FD, |bool|)
+	function IsTerminal (|bool|)
 		cpp_wrapper JB_IsTerminal
-	
-	function ErrorIsTerminal (|bool|)
-		.IsTerminal(.StdErr_)
 		
 
 

@@ -22,6 +22,10 @@ function Compiler.PrintResults
 	.PrintCompileErrors
 	if SpdProcess.parent != nil
 		printline "Exiting Speedie " + app.id.render
+
+	if options.selfreplacement and filedes.stdout.isterminal
+		if .variantsuffix ~= "Test"
+			app.say("Speedie Success", false)
 	if Options.Beep
 		"\07"
 

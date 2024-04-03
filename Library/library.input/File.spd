@@ -10,7 +10,7 @@ class File (String)
 		wrapper
 	default			nil
 	false			nil
-	|int|		Descriptor
+	|filedes|		Descriptor
 
 	constants
 		IgnoreErrors = true
@@ -312,7 +312,7 @@ class File (String)
 		cpp_wrapper JB_File_IsLink
 
 	function IsTerminal (|bool|)
-		return pipe.IsTerminal(.descriptor)
+		return .descriptor.IsTerminal
 		
 	function Offset (|int64|)
 		cpp_wrapper JB_File_Offset
