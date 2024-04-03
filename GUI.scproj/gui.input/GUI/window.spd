@@ -9,6 +9,7 @@ class Window (GUIControl)
 	|bool|								FlashSelf
 	|bool|								BlockRecurseKeyDown
 	|bool| 								IsLiveAction
+	|bool| 								HaveRunTasks
 	|GUIControl?|						Focus
 	|Guicontrol?|						InnerFocus
 	|GUIControl?|						CurrMouseDown
@@ -23,7 +24,6 @@ class Window (GUIControl)
 	|GUICopyEvent?|						OnCopy
 	|GUIMouseMoveEvent?|				OnMouseMove
 	|list of TaskGUI|					Tasks
-	|list of TaskGUI|					Animations
 	|object?|							ReturnValue
 	|date|								AlphaFader
 	|date|								CreatedDate
@@ -32,7 +32,6 @@ class Window (GUIControl)
 	constructor
 		super.constructor(window.all)
 		.Tasks = list()
-		.Animations = list()
 		.subconstructor(the~area)
 		
 
@@ -40,7 +39,6 @@ class Window (GUIControl)
 		cpp_part ConstructorSize
 		super.constructor(window.all)
 		.Tasks = list()
-		.Animations = list()
 		.subconstructor(size)
 	
 	
@@ -294,7 +292,7 @@ class Window (GUIControl)
 		.__draw__(where)
 		|| gd = .GNormal.Drawer
 			(gd)(where, .LastRect, .GNormal, true)
-		.RunAllTasks(sdlapp.lastframedate, .animations)
+		.RunAllTasks(true)
 
 
 	behaviour Draw
@@ -470,11 +468,13 @@ class Window (GUIControl)
 				return Found
 
 
-	function RunAllTasks (|date| now, |list of taskgui| L)
+	function RunAllTasks (|bool| Mark)
 		opt norefcounts
-		for p in L
-			if !p.SmartRun(now)
-				p.Remove
+		if !.HaveRunTasks
+			for p in .Tasks
+				if !p.SmartRun
+					p.Remove
+		.HaveRunTasks = Mark
 			 
 	
 	iterator
@@ -510,6 +510,12 @@ class Window (GUIControl)
 			for w in .all
 				if (w is visible) and !w.isdialog
 					rz++
+
+		function RunAllTasks
+			opt norefcounts
+			for w  in  .all
+				w.RunAllTasks(false)
+		
 
 
 struct SDL_Window

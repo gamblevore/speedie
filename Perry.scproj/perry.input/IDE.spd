@@ -5,8 +5,8 @@ class PerryIDE (Window)
 
 	|SpdProcess?|				Feedback
 	|Process?|					compilr
-	|string|					CompileOKString
 	|Process?|					RunCompiledApp
+	|string|					CompileOKString
 	|[error]|					StartupErrors
 	|FileViewer|				FileList
 	|Guicontrol|				Debugger
@@ -99,13 +99,6 @@ class PerryIDE (Window)
 
 		rz = path.path_expand(perry.PathDict) #expect ("Unrecognised @ in: " + path)
 		rz = rz.resolve(fileResolveMode.allowmissing)
-
-
-//	function GetBuildFile (|file|) 
-//		|| inside = .filelist.listsource.first
-//		|| found = inside.findnested(@nil, "build.spd") as filerow
-//			return found.location.file
-
 	
 	function PerryError (|error?|) 
 		opt norefcounts

@@ -201,6 +201,7 @@ module SDLApp
 		app.ClearCaches
 		|uint| n 
 		while .SingleFrame
+			window.RunAllTasks
 			if n++ isa 512
 				app.ClearCaches //  :)
 		.Quit
@@ -573,9 +574,9 @@ module SDLApp
 		|| D = sdlapp.DrawSpace
 		|| BigRect = d.rect
 		|| rect = (0,0,0,0)
-		if UsePrev
-			|| b = .prev
-				rect = b.lastrect
+		|| b = .prev
+		if b and UsePrev
+			rect = b.lastrect
 		return .reflowdoc(bigrect, rect, bigrect)
 
 	
@@ -599,14 +600,15 @@ module SDLApp
 			w1 = w1.next as window // :O
 		
 		notifications.Draw
-
 		.DoDrawDrag(window.front!)
 		.EndFrame(.Raw!)
+
 
 	function BGBlurAmount (|float|)
 		.BlurBackgroundStart := date.now
 		|| Scale = 7
-		rz = .BlurBackgroundStart.ago.seconds*Scale*4.0
+		|| ago = .BlurBackgroundStart.ago.seconds
+		rz = ago*Scale*4.0
 		if rz > Scale
 			return scale
 		sdlapp.Touch
@@ -614,12 +616,7 @@ module SDLApp
 
 	function FrameUpdatesAndResize
 		opt norefcounts
-		notifications.CheckForDisappear
-
-		|| Now = date()
-		for w  in  window.all
-			w.RunAllTasks(now, w.tasks)
-		
+		notifications.CheckForDisappear		
 		.StartResize
 		|| Dlg = .DialogIsOpen
 		for w  in  window.all
@@ -646,6 +643,7 @@ module SDLApp
 
 	
 	helper SingleFrame (|bool|)
+		opt norefcounts
 		require .SingleFrameNest <= 2
 		.SingleFrameNest++
 
@@ -663,7 +661,7 @@ module SDLApp
 			if occured is activity
 				.DrawFrame
 			if !sdl_event.HasAny
-				app.sleep(.naptime)
+				app.sleep(.NapTime)
 			
 			.SingleFrameNest--
 			rz = true

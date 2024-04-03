@@ -43,6 +43,12 @@ class Image (memory)
 			memory.Copy(rz.ptr, .ptr, rz.ByteCapacity)
 	
 	
+	function Window (assigns:|window| W)
+		|| s = w.LastRect
+		.windowbase = s.xy
+		.ControlClip = s.Soothe
+
+
 	function ControlClip (assigns:|ivec4| R)
 		cpp_part ControlClipSet4
 		|| sigh = (0, 0, .size)
@@ -51,18 +57,18 @@ class Image (memory)
 		._ControlClip = r - b
 	
 	
-	function imagepixel.operatorin (|image| src, |bool|)
-		|| p = src._ptr
-		|| pi1 = p|&imagepixel|
-		|| pi2 = (p+src.ByteCapacity)|&imagepixel| 
-		return self >= pi1 and self < pi2
+//	function imagepixel.operatorin (|image| src, |bool|)
+//		|| p = src._ptr
+//		|| pi1 = p|&imagepixel|
+//		|| pi2 = (p+src.ByteCapacity)|&imagepixel| 
+//		return self >= pi1 and self < pi2
 		
 	
 	function ControlClip (|ivec4|)
 		return ._ControlClip
 	
-	function Tile (|int| t, |imagetiler|)
-		return .tile((t,t))
+//	function Tile (|int| t, |imagetiler|)
+//		return .tile((t,t))
 	
 	function Tile (|ivec2| t, |imagetiler|)
 		cpp_Part Tile2
@@ -95,11 +101,11 @@ class Image (memory)
 		._controlclip.x = r.x
 		._controlclip.x2 = r.x2
 	
-	function Horz (|intrange|)
-		return ._Controlclip.x1x2
-	
-	function Vert (|intrange|)
-		return ._Controlclip.y1y2
+//	function Horz (|intrange|)
+//		return ._Controlclip.x1x2
+//	
+//	function Vert (|intrange|)
+//		return ._Controlclip.y1y2
 	
 		
 	function Clip (|ivec4| R, |ivec4|)
@@ -117,11 +123,11 @@ class Image (memory)
 		return ._controlclip
 
 
-	operator contains (|&imagepixel| r, |bool|)
-		cpp_part ContainsPtr
-		require r >= .ptr|&imagepixel|
-		require r <  .ptr|&imagepixel| + .length
-		return true
+//	operator contains (|&imagepixel| r, |bool|)
+//		cpp_part ContainsPtr
+//		require r >= .ptr|&imagepixel|
+//		require r <  .ptr|&imagepixel| + .length
+//		return true
 
 		
 	setter Size (|ivec2|)
@@ -222,7 +228,8 @@ class Image (memory)
 	syntax access (|ivec2| P, assigns:|ImagePixel|)
 		if self contains p
 			*self[p] = value
-		
+	
+	
 	syntax access (|ivec2| P, |&ImagePixel|)
 		cpp_part AtXY
 		P += .windowbase

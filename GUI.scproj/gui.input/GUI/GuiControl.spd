@@ -519,12 +519,13 @@ class GUIControl (list)
 			|| Over = now - .StartTime
 			return (Over)|float| / .duration|float|
 		
-		function SmartRun (|date| now,  |bool|)
+		function SmartRun (|bool|)
 			opt NoRefCounts
 			require .upon.parent
 				
 			|| s = .starttime
 			|| e = s + .duration
+			|| now = sdlapp.LastFrameDate
 			if now >= s
 				if now > e
 					require self isnt finished
@@ -540,23 +541,3 @@ class GUIControl (list)
 		
 		run (|float| progress, |ErrorInt|)
 			return -1
-
-	
-	task TaskAnim ( TaskGUI )
-		constructor
-			is Animation
-			|| w = upon.window
-				w.animations <~ self
-		run (TaskGUI)
-
-
-helper image.ControlClip (assigns:|GuiControl| G)
-	.controlclip = g.lastrect
-
-
-function image.Window (assigns:|window| W)
-	|| s = w.LastRect
-	.windowbase = s.xy
-	.ControlClip = s.Soothe
-
-

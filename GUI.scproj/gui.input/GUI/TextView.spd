@@ -478,7 +478,7 @@ class TextView (GUIControl)
 		opt NoRefCounts
 		|| w = .window
 			for i in 3
-				w.animations <~ .SoftExplode(5s, date.now + 0.25s*i, (-2.0, 0), D, strength)
+				.SoftExplode(5s, date.now + 0.25s*i, (-2.0, 0), D, strength)
 
 
 	function ShowAndSel (|int| P, |int| length=0, |bool| Explode=false, |textviewline|)
@@ -939,12 +939,9 @@ class TextView (GUIControl)
 			sdlapp.touch(Self)
 
 
-// how can we make this stronger if the current line is selected
-// Lets see. So... we need to pass a current textviewline object?
-
 	task SoftExplode (taskgui, |vec2| V, |TextViewLine| D, |float| Strength)
 		constructor
-			is Animation // should SubClass off TaskAnim instead!
+			is Animation
 		
 		run
 			|| start = .upon.XY(.d)
