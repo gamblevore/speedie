@@ -876,19 +876,7 @@ function CallFrom (|message| msg,  |string| purpose,  |object| found=nil,  |mess
 	require fn
 	
 	rz = .CallFromDefine(msg, fn, found)
-	|| arg = rz.first
-	if fn isnt constructor
-		.CallFromSub(arg, fn)
-		return rz
-
-	while fn
-		|| arr = fn.counterpart|array|
-		if arr isa array
-			for fn2 in arr
-				.callfromsub(arg, fn2|scfunction|)
-		if msg != @name
-			exit
-		fn = fn.nextfunc
+	.CallFromSub(rz.first, fn)
 
 
 function CallFromSub (|message| arg, |scfunction| fn)

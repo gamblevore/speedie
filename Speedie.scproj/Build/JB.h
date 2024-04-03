@@ -8745,8 +8745,6 @@ JB_String* SC_Func_MakeProtoClassName(SCFunction* self, JB_String* start);
 
 void SC_Func_MarkRecursive(SCFunction* self, SCFunction* EndAt);
 
-JB_String* SC_Func_NameOfClassAllocator(SCFunction* self, JB_String* s, JB_String* CppPart);
-
 bool SC_Func_NeedsExport(SCFunction* self);
 
 Message* SC_Func_NewDefaultRel(SCFunction* self, Message* place, SCDecl* d);
@@ -8808,8 +8806,6 @@ bool SC_Func_Update_Source(SCFunction* self, int start, JB_String* text, SCFile*
 bool SC_Func_UpdateSourceSub(SCFunction* self, Message* src);
 
 bool SC_Func_UseCppName(SCFunction* self, JB_String* CppName);
-
-bool SC_Func_UseExportNameConstructor(SCFunction* self, JB_String* CppPart, JB_String* CppWrapper);
 
 bool SC_Func_UseExportWrapper(SCFunction* self, JB_String* CppWrapper);
 

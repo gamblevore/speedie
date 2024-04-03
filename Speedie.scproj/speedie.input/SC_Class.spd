@@ -436,44 +436,6 @@ function FindFunc (|string| keyword, |bool| CheckParents, |bool| DoError, |SCFun
 		loop CheckParents
 
 
-
-function NewClassNew (|SCFunction| con, |Message| src)
-	|| IsOK = stderr.mark
-	.NewClassNewSub(con, src)
-	if !IsOK
-		con.badness |= 1
-
-
-function NewClassNewSub (|SCFunction| con, |Message| src)
-	src.Position = con.Source!.Position
-	
-	|| result			= .Modul.NewModuleFunc( src )$
-	result.counterpart	= con
-	|| c = con.CounterPart|array|
-	if !c
-		c = []
-		con.CounterPart = c
-	c <~ result
-	(result is constructor)
-	(con.alloccode = functionType.Constructor)
-	
-	|| NewParams		= src[ @prm, 1 ]
-	|| A				= con.Source!.Second
-	|| rsrc				= result.source!
-	|| TypeNode			= rsrc.FindNested(@thg, "type", true)
-	if TypeNode and NewParams
-		if A == @prm or @list
-			|| CallParams = rsrc.FindNested(@dot).last
-			for dcl in A
-				|| dcpy = dcl.Copy(Src)
-				NewParams  <~ dcpy
-				|| dn = dcpy.GetDclName(true)
-					CallParams <~ dn.Copy
-		
-		TypeNode.ReplaceWith(.TypeNormal.writetype)
-		NewParams <~ .TypeNormal.WriteDeclFull
-
-
 function NeedsDefaultValue (|message| def, |&message| place, |string| name)
 	require !*place
 	if .IsObject and !.IsRole

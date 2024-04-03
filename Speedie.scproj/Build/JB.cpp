@@ -2010,7 +2010,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* s) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[1228], (112206899344595)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[1228], (112207047600850)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -3356,7 +3356,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1955]);
-	JB_FS_AppendInt32(_fsf0, (2024040311));
+	JB_FS_AppendInt32(_fsf0, (2024040312));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -3977,31 +3977,7 @@ Message* SC_AC__CallFrom(Message* msg, JB_String* purpose, JB_Object* found) {
 		return nil;
 	}
 	rz = SC_AC__CallFromDefine(msg, fn, found);
-	Message* arg = ((Message*)JB_Ring_First(rz));
-	if (!(SC_Func_SyntaxIs(fn, kSC__FunctionType_Constructor))) {
-		SC_AC__CallFromSub(arg, fn);
-		return rz;
-	}
-	while (fn) {
-		Array* arr = ((Array*)fn->CounterPart);
-		if (JB_Object_Isa(arr, &ArrayData)) {
-			{
-				int _if0 = 0;
-				while (true) {
-					JB_Object* fn2 = JB_Array_Value(((Array*)arr), _if0);
-					if (fn2 == nil) {
-						break;
-					}
-					SC_AC__CallFromSub(arg, ((SCFunction*)fn2));
-					_if0++;
-				};
-			};
-		}
-		if ((!JB_Msg_EqualsSyx(msg, JB_SyxName, false))) {
-			break;
-		}
-		fn = fn->NextFunc;
-	};
+	SC_AC__CallFromSub(((Message*)JB_Ring_First(rz)), fn);
 	return rz;
 }
 
@@ -7506,7 +7482,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[926]);
-	JB_FS_AppendInt32(_fsf0, (2024040311));
+	JB_FS_AppendInt32(_fsf0, (2024040312));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -37603,7 +37579,7 @@ void SC_Base_LoadExportName(SCNode* self) {
 		if (JB_Str_Exists(CppWrapper)) {
 			SC_Func_MakeParamsReal(((SCFunction*)self));
 		}
-		if ((!((!SC_Func_UseExportNameConstructor(((SCFunction*)self), CppPart, CppWrapper)) and ((!SC_Func_UseExportWrapper(((SCFunction*)self), CppWrapper)) and ((!SC_Func_UseCppName(((SCFunction*)self), CppName)) and (!((SCFunction*)self)->IsDisabled)))))) {
+		if ((!((!SC_Func_UseExportWrapper(((SCFunction*)self), CppWrapper)) and ((!SC_Func_UseCppName(((SCFunction*)self), CppName)) and (!((SCFunction*)self)->IsDisabled))))) {
 			JB_Decr(CppWrapper);
 			JB_Decr(CppPart);
 			JB_Decr(CppName);
@@ -44178,25 +44154,6 @@ void SC_Func_MarkRecursive(SCFunction* self, SCFunction* EndAt) {
 	};
 }
 
-JB_String* SC_Func_NameOfClassAllocator(SCFunction* self, JB_String* s, JB_String* CppPart) {
-	JB_String* rz = JB_Incr(JB_LUB[0]);
-	JB_SetRef(rz, CppPart);
-	if (JB_Str_Exists(rz)) {
-		JB_SetRef(rz, JB_Str_OperatorPlus(JB_LUB[1426], rz));
-	}
-	 else {
-		JB_SetRef(rz, JB_LUB[1438]);
-	}
-	if (JB_Str_ContainsString(s, JB_LUB[785])) {
-		JB_SetRef(rz, JB_Str_ReplaceAll(s, JB_LUB[785], rz, true, nil));
-	}
-	 else {
-		JB_SetRef(rz, JB_Str_OperatorPlus(s, rz));
-	}
-	JB_SafeDecr(rz);
-	return rz;
-}
-
 bool SC_Func_NeedsExport(SCFunction* self) {
 	return ((bool)(self->MyReacher)) or self->IsAPI;
 }
@@ -44715,25 +44672,6 @@ bool SC_Func_UseCppName(SCFunction* self, JB_String* CppName) {
 	}
 	SC_Base_SetExportName(self, CppName, true);
 	return true;
-}
-
-bool SC_Func_UseExportNameConstructor(SCFunction* self, JB_String* CppPart, JB_String* CppWrapper) {
-	if ((!((!JB_Str_Exists(CppWrapper)) and (SC_Func_SyntaxIs(self, kSC__FunctionType_Constructor))))) {
-		return nil;
-	}
-	JB_Object* fn = JB_Incr(self->CounterPart);
-	if (JB_Object_FastIsa(fn, &SCFunctionData)) {
-		if ((!JB_Str_Exists(((SCFunction*)fn)->ExportName))) {
-			SC_Base_LoadExportName(((SCFunction*)fn));
-		}
-		JB_String* s = JB_Incr(SC_Func_NameOfClassAllocator(self, ((SCFunction*)fn)->ExportName, CppPart));
-		SC_Base_SetExportName(self, s, SC_SCObject_SyntaxIs(((SCNode*)((SCFunction*)fn)), kSC__SCNodeInfo_ExplicitExport));
-		JB_Decr(s);
-		JB_Decr(fn);
-		return true;
-	}
-	JB_Decr(fn);
-	return false;
 }
 
 bool SC_Func_UseExportWrapper(SCFunction* self, JB_String* CppWrapper) {
@@ -47829,4 +47767,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -1416279718977173146 -8121787482552757695
+// 569008991173745758 -8121787482552757695

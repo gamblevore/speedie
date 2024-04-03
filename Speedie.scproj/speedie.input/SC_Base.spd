@@ -244,20 +244,6 @@ function SCFunction.NameOfClassAllocator (|string| s, |string| CppPart, |string|
 		rz = s + Rz
 
 
-function SCFunction.UseExportNameConstructor (|string| CppPart, |string| CppWrapper, |bool|)
-	// REMOVE THIS
-	// return true
-	require !CppWrapper and (self is constructor)  
-	|| fn = .CounterPart
-	if fn isa scfunction
-		if !fn.ExportName
-			fn.LoadExportName
-
-		|| s = .NameOfClassAllocator(fn.ExportName, CppPart)
-		.SetExportName( s, fn|SCNode| is ExplicitExport )
-		Return true
-
-
 function SCFunction.UseExportWrapper (|string| CppWrapper, |bool|)
 	if CppWrapper
 		.IsWrapper = 1
@@ -393,7 +379,7 @@ function LoadExportName
 		.IsCppInBuilt := (cw == @bra)|int|
 		|| CppWrapper = cw.cpp_Wrapper
 			.MakeParamsReal
-		require !.UseExportNameConstructor(CppPart, CppWrapper) and !.UseExportWrapper(CppWrapper) and !.UseCppName(CppName) and !.isdisabled
+		require !.UseExportWrapper(CppWrapper) and !.UseCppName(CppName) and !.isdisabled
 
 ///  ///  ///  ///  ///	 ///  ///  ///	 ///  ///  ///	 ///  ///  ///
 		cppname = .exportnamebuilder(cpppart)
