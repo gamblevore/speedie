@@ -2995,7 +2995,7 @@ int SC_SCTasks__InitCode_();
 
 SCNode* SC_SCTasks__NewTask(Message* node, SCNode* name_space, Message* ErrPlace);
 
-SCNode* SC_SCTasks__NewTaskActual(Message* node, SCNode* name_space);
+void SC_SCTasks__NewTaskActual(Message* node, SCNode* name_space);
 
 
 

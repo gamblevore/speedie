@@ -15,17 +15,14 @@ function CollectAll
 			P = T.Modul
 		  elseif p isa SCClass
 			p = p.modul|SCClass|
-		|| found = NewTaskActual(ch, P)
-			found.parent = p
-			P.TryAdd(ch, found, found.name)
+		NewTaskActual(ch, P)
 
 
-function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
+function NewTaskActual (|Message| node, |SCNode| name_space)
 	opt norefcounts
 	// OK so... now what?
-	|| name = node[@thg]
-	|| fields = name.Next(@nil)
-	require name and fields
+	|| name = node[@thg, @dot]$
+	|| fields = name.Next
 	if fields == @bra or @list
 		fields.func = @bra
 	  else
@@ -33,7 +30,7 @@ function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
 		name.next = fields
 	
 	|| arg = fields.next
-	if  !arg.expect(@arg)
+	if !arg.expect(@arg)
 		arg = node.msg(@arg)
 	
 	|| Supper = fields.first
@@ -51,10 +48,16 @@ function NewTaskActual (|Message| node, |SCNode| name_space, |SCNode?|)
 	arg.TakeAllFrom(tmp)
 	node.name = "role"
 	
+	
+	if name == @dot
+		|| P = name_space.FindModuleMsg(name.first!)
+			name_Space = p // hmmm
+		
 	|| task = SCClass.NeuRole(node, name_space, node)|SCModule|
 		compiler.taskslist <~ task.cls
 		task.cls!.IsRole = level
-	return task
+		task.parent = name_space
+		name_space.TryAdd(node, task, task.name)
 
 
 function NewTask (CollectFunc)
@@ -76,9 +79,9 @@ function scclass.FillTaskConstructor (|scfunction| con)
 function message.TaskConBefore (|message!|)
 	opt norefcounts
 	|| marker = .find(@dot, "constructor")
-	if !marker
+		marker++
+	  else
 		marker = .first
-	marker++
 	if marker
 		return marker
 	

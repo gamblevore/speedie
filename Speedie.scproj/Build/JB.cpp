@@ -2010,7 +2010,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* s) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[1228], (112201324315659)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[1228], (112206899344595)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -3356,7 +3356,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1955]);
-	JB_FS_AppendInt32(_fsf0, (2024040212));
+	JB_FS_AppendInt32(_fsf0, (2024040311));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -6351,11 +6351,7 @@ void SC_SCTasks__CollectAll() {
 			 else if (JB_Object_FastIsa(P, &SCClassData)) {
 				P = ((SCClass*)((SCClass*)P)->Modul);
 			}
-			SCNode* found = SC_SCTasks__NewTaskActual(ch, P);
-			if (found) {
-				found->Parent = P;
-				SC_Base_TryAdd(P, ch, found, found->Name);
-			}
+			SC_SCTasks__NewTaskActual(ch, P);
 			_if0++;
 		};
 	};
@@ -6380,12 +6376,12 @@ SCNode* SC_SCTasks__NewTask(Message* node, SCNode* name_space, Message* ErrPlace
 	return SC__Comp_program;
 }
 
-SCNode* SC_SCTasks__NewTaskActual(Message* node, SCNode* name_space) {
-	Message* name = JB_Msg_NeedSyx(node, JB_SyxThg);
-	Message* fields = JB_Msg_NextOf(name, JB_SyxNil);
-	if ((!(((bool)name) and ((bool)fields)))) {
-		return nil;
+void SC_SCTasks__NewTaskActual(Message* node, SCNode* name_space) {
+	Message* name = JB_Msg_NeedSyxOK(node, JB_SyxThg, JB_SyxDot);
+	if ((!name)) {
+		return;
 	}
+	Message* fields = ((Message*)JB_Ring_NextSib(name));
 	if ((JB_Msg_EqualsSyx(fields, JB_SyxBra, false)) or (JB_Msg_EqualsSyx(fields, JB_SyxList, false))) {
 		fields->Func = JB_SyxBra;
 	}
@@ -6412,14 +6408,21 @@ SCNode* SC_SCTasks__NewTaskActual(Message* node, SCNode* name_space) {
 	SC_Msg_BuildTask(arg, fields, node, level);
 	JB_Tree_TakeAllFrom(arg, SC__SCTasks_tmp);
 	JB_SetRef(node->Name, JB_LUB[1903]);
+	if (JB_Msg_EqualsSyx(name, JB_SyxDot, false)) {
+		SCModule* P = SC_Base_FindModuleMsg(name_space, ((Message*)JB_Ring_First(name)), 0);
+		if (P) {
+			name_space = P;
+		}
+	}
 	SCModule* task = ((SCModule*)SC_Class__NeuRole(node, name_space, node));
 	if (task) {
 		JB_Array_SyntaxAppend(SC__Comp_TasksList, task->Cls);
 		task->Cls->IsRole = level;
+		task->Parent = name_space;
+		SC_Base_TryAdd(name_space, node, task, task->Name);
 	}
 	JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 	JB_MsgPos_Destructor((&_usingf0));
-	return task;
 }
 
 
@@ -7503,7 +7506,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[926]);
-	JB_FS_AppendInt32(_fsf0, (2024040212));
+	JB_FS_AppendInt32(_fsf0, (2024040311));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -33431,10 +33434,12 @@ bool SC_Msg_TargetTest(Message* self) {
 
 Message* SC_Msg_TaskConBefore(Message* self) {
 	Message* marker = JB_Msg_FindSyxName(self, JB_SyxDot, JB_LUB[1564], false);
-	if ((!marker)) {
+	if (marker) {
+		marker = ((Message*)JB_Ring_NextSib(marker));
+	}
+	 else {
 		marker = ((Message*)JB_Ring_First(self));
 	}
-	marker = ((Message*)JB_Ring_NextSib(marker));
 	if (marker) {
 		return marker;
 	}
@@ -47824,4 +47829,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -7655953190382567605 -8121787482552757695
+// -1416279718977173146 -8121787482552757695
