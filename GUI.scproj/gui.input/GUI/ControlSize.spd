@@ -77,7 +77,7 @@ struct ControlSize
 //				if upon.clipmode is debug
 //					.PrintExplain(i, d, rz)
 			  elseif m == controlpoint.Percent
-				rz[i] = pc[i&1]|float| * (1.0/64K) * .size(i)
+				rz[i] = (pc[i&1]|float| * (1.0/(64K|float|)) * .size(i)|float|)|int|
 //				if dbg
 //					.PrintExplain(i, 0, rz)
 		

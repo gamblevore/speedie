@@ -27,7 +27,7 @@ struct JeeboxEffects
 
 	helper MakeSubBoxes (|image| img, |int| Size, |float| opacity=1.0)
 		opt norefcounts
-		|int| a = opacity * 255.0
+		|| a = (opacity * 255.0)|int|
 		for r in img.tile((size, size))
 			|| c = .cols[.rnd.int&7]
 			c.a = a
@@ -124,7 +124,7 @@ struct JeeboxEffects
 	
 		.xhash = hash
 		.MakeBoxes(d, seed)
-		d.Blur(20, t)
+		d.Blur(20.0, t)
 		
 		.RunOutline(d, t, LineStr, v)
 		.Duration += date.now - start
@@ -200,5 +200,5 @@ struct ImageBlurrer
 		
 		for i in nn
 			W[i] *= norm
-			.weights[i] = w[i]*64K
+			.weights[i] = (w[i]*64K|float|)|int|
 		

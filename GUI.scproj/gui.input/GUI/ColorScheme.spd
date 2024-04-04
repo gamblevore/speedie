@@ -168,7 +168,7 @@ function colorscheme.GetColor (|message| msg, |int| HasColor, |int| pos, |imagep
 function textview.LineNumColor (|imagepixel|)
 	|| c = .gnormal.bg.color
 	c = mix(c, colors.white, 0.35)
-	c.a = 1
+	c.a = 1.0
 	return c.px
 
 

@@ -155,7 +155,7 @@ class StretchDivider (GuiControl)
 		if .ActiveEnd.length < 10
 			|| s = .start.length
 			if s < 10
-				s = mix(pr[.d], pr[.d+2], 0.333)|int|
+				s = mix(pr[.d]|float|, pr[.d+2]|float|, 0.333)|int|
 			.ActiveEnd = (s)~up
 //			.slideheight(0.5s)
 
@@ -214,7 +214,7 @@ class StretchDivider (GuiControl)
 		|| diff = now - .entered
 		|float| f = (diff.seconds - 0.6)*2.0
 		rz = f.clamp
-		if rz >= 0 and rz < 1
+		if rz >= 0 and rz < 1.0
 			sdlapp.touch(Self)
 
 
@@ -231,7 +231,7 @@ class StretchDivider (GuiControl)
 		|| w	= scale[.d]
 		scale = 2.25/(w, h)
 		w = (3.0,2.0)(.collapsed) 
-		xy[.d]  += 4.0-w
+		xy[.d]  += (4.0-w)|int|
 		|| add  = (.d, 1-.d)
 		||stride= (where.width, 1)(.d)
 		|| col  = .gnormal.edge.Color

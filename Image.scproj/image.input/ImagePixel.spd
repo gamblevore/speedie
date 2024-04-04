@@ -66,10 +66,10 @@ struct ImagePixel
 		
 	function Alpha (assigns:|float| a)
 		a = (a * 255.0) + 0.25
-		.a = a.clamp(255)
+		.a = a.clamp(255.0)|int|
 		
 	function Alpha (|float|)
-		return .a * 255th
+		return .a|float| * 255th
 	
 	function AddAlpha (|float| v)
 		.Alpha = .Alpha + v

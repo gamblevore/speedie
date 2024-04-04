@@ -159,7 +159,7 @@ role ListViewRow (message)
 
 		if self is active
 			where.horz	= z2.h
-			where.DrawCircleStyled( z2 + (4,0,-4,0), ¥.WhiteStyle, 1)
+			where.DrawCircleStyled( z2 + (4,0,-4,0), ¥.WhiteStyle, 1.0)
 		
 		if self is Grayed
 			|| gr = colors.gray(0.4*str)

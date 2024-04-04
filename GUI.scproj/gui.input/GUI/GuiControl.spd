@@ -217,7 +217,7 @@ class GUIControl (list)
 		.ScrollDrawTimer = ScrollInfo.timer-extra
 
 	function SizeFraction (assigns:|float|)
-		|| t = (value.clamp * 4K)|int|
+		|| t = (value.clamp * 4.0K)|int|
 		if ._TransitionFraction != t
 			._TransitionFraction = t
 			sdlapp.resized(self)
@@ -429,7 +429,7 @@ class GUIControl (list)
 	helper FaintingEdge (|float|)
 		opt norefcounts
 		if self is drawsfocus
-			return 1
+			return 1.0
 		if .HasFocus
 			return .FaintingEdgeSub
 	
@@ -497,7 +497,7 @@ class GUIControl (list)
 
 	task SlideOpen (TaskGUI, |movecode| Dir = MoveCode.Open)
 		run 
-			|| hide = (progress >= 1 and .dir is close)
+			|| hide = (progress >= 1.0 and .dir is close)
 			(.upon is visible) = !hide
 			if .dir is close
 				progress = 1.0 - progress			

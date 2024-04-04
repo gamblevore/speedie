@@ -166,10 +166,10 @@ module SDLApp
 				.JB_SDL_FullScreen(n) // SDL2 had a bug in it... probably still exists
 			return true
 		|| Old = .SizeOrig
-		|| aligned = .scale * (1+.IsHighDPI)
+		|| aligned = .scale * (1.0+.IsHighDPI)
 		|| wh = result.size-1
-		if aligned > 1
-			 wh = wh align aligned
+		if aligned > 1.0
+			 wh = wh align aligned|int|
 		.SDL_SetWindowSize(.screenwindow!, wh.x, wh.y)
 		if .SizeOrig != wh
 			.TryResizeLater = wh
@@ -606,7 +606,7 @@ module SDLApp
 
 	function BGBlurAmount (|float|)
 		.BlurBackgroundStart := date.now
-		|| Scale = 7
+		|| Scale = 7.0
 		|| ago = .BlurBackgroundStart.ago.seconds
 		rz = ago*Scale*4.0
 		if rz > Scale
@@ -633,7 +633,7 @@ module SDLApp
 
 	function Cycle (|date| amount, |float|)
 		opt min 3
-		return (.mod((amount*60).WholeSeconds).sin + 1) * 0.5
+		return (.mod((amount*60).WholeSeconds).sin + 1.0) * 0.5
 	
 
 	helper NapTime (|date|)
@@ -674,7 +674,7 @@ module SDLApp
 
 	helper Rescale (|float| NewScale, |bool|)
 		.init
-		if (NewScale >= 1 and NewScale <= 8)
+		if (NewScale >= 1.0 and NewScale <= 8.0)
 			.scale = NewScale
 			.NewSize = .SizeOrig
 		  else

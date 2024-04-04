@@ -47,9 +47,11 @@ class ShaderToy (window)
 	
 	
 	function Moved (|vec3|)
-		rz.y = keys.SPACE[] - keys.LSHIFT[]
-		rz.z = keys.W[]     - keys.S[]
-		rz.x = keys.D[]     - keys.A[]
+		|ivec3| k
+		k.y = keys.SPACE[] - keys.LSHIFT[]
+		k.z = keys.W[]     - keys.S[]
+		k.x = keys.D[]     - keys.A[]
+		return k.vec3
 
 	
 	behaviour FrameUpdate

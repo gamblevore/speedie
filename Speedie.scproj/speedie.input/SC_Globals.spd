@@ -305,10 +305,10 @@ function TypeOfUnit (ExprResolver)
 		using (exp)
 		exp.become(@type)
 		exp <~ (@thg, "l")
-		return typeint64!.TypeNormal
+		return TypeInt64!.TypeNormal
 
 	|f64| Mul = 0.0
-	|| Type = TypeInt!.typenormal
+	|| Type = TypeInt!
 	|| unit = exp.name
 	if unit == "KB" or "K"
 		Mul = (1<<10)|f64|
@@ -321,56 +321,63 @@ function TypeOfUnit (ExprResolver)
 	  elseif unit == "th"
 		Mul = 0
 	  else
-		type = typedate!.typenormal
+		type = typedate!
 		if unit == "s"
-			mul = (64KB)|f64|
+			mul = 64.0KB
 		  elseif unit == "ms"
 			mul = 64.0
 		  elseif unit == "π"
 			mul = π
-			type = typef64!.typenormal
+			type = typef64!
 		  elseif unit == "τ"
 			mul = τ
-			type = typef64!.typenormal
-		  elseif exp.unitmatch("days", "day")
-			mul = 86400.0 * (64KB)|f64|
-		  elseif exp.unitmatch("weeks", "week")
-			mul = 604800.0 * (64KB)|f64|
-		  elseif exp.unitmatch("years", "year")
-			mul = 31536000.0 * (64KB)|f64|
-		  elseif exp.unitmatch("mins", "min")
-			mul = 60.0 * (64KB)|f64|
-		  elseif exp.unitmatch("hours", "hour")
-			mul = 3600.0 * (64KB)|f64|
+			type = typef64!
+		  elseif exp.UnitMatch("days", "day")
+			mul = 86400.0 * 64.0KB
+		  elseif exp.UnitMatch("weeks", "week")
+			mul = 604800.0 * 64.0KB
+		  elseif exp.UnitMatch("years", "year")
+			mul = 31536000.0 * 64.0KB
+		  elseif exp.UnitMatch("mins", "min")
+			mul = 60.0 * 64.0KB
+		  elseif exp.UnitMatch("hours", "hour")
+			mul = 3600.0 * 64.0KB
 		  else
 			error (exp, "Unknown unit")
 	
-	|| it = exp.first
-		|| str = ""
-		|| val = it.float
-		if !mul
-			str = (1.0 / val).render
-			Type = Typefloat!.typenormal
-		  else
-			val *= mul
-			if type.typeinfo.isint
-				str = val|int64|.render
-				|f64| big = (1|int64| << 31|int64|)|f64|
-				if val >= big  or val < -big
-					type = TypeInt64!.TypeNormal
+	|| it = exp.first$
+	|| str = ""
+	|| val = it.float
+	if !mul
+		str = (1.0 / val).render
+		Type = TypeFloat!
+	  else
+		val *= mul
+		if type != TypeInt
+			str = val.render
+		  elseif it.name contains '.'
+			str = it.name
+			|f64| big = 16.0*1024.0*1024.0
+			if val >= big  or val < -big
+				type = TypeF64!
 			  else
-				str = val.render
-		exp.become(@num, str)
-		it.remove
-	return type
+				type = TypeFloat!
+			// So... then what should I do?
+		  else
+			str = val|int64|.render
+			|f64| big = (1|int64| << 31|int64|)|f64|
+			if val >= big  or val < -big
+				type = TypeInt64!
 
+	if it == str
+		str = it.name
+	// OK... so now what? now what do we do?
+	// how do we know we have 0.1KB? check for a "."? or a fractional part?
+	// where do we check for it, though?
+	exp.become(@num, str)
+	it.remove
+	return type.TypeNormal
 
-//function String.IsHexConstant (|bool|)
-//	return  (*self=='0')  and  (self[1] == 'x')
-//
-//
-//function String.IsBinaryConstant (|bool|)
-//	return  (*self=='0')  and  (self[1] == 'b')
 
 
 function TypeOfNum (ExprResolver)

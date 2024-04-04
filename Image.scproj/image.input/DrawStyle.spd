@@ -85,10 +85,10 @@ class DrawStyle
 		.bg = ._BG
 
 	function Strengthen (|float| s)
-		require s!=1
+		require s!=1.0
 		.edge.alpha *= s
 		.bg.alpha *= s
-		if s > 1
+		if s > 1.0
 			|| a = .bg.a
 			.bg <~ (.bg.Color * s)
 			.bg.a = a

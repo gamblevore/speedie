@@ -220,7 +220,7 @@ function PerryIDE.PopupDisplayFadeInSub (|bool|)
 	require alpha
 
 	|| g = .PopupDisplay.GNormal
-	|int| New = alpha * 255
+	|| New = (alpha * 255.0)|int|
 	if g.BG.a != New
 		sdlapp.touch
 	g.BG.a = New

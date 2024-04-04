@@ -73,7 +73,7 @@ function DrawScroll (|vec3| slh, |image?| where=nil, |float|)
 
 
 function ScrollRectFind (|vec3| slh, |int| shift, |int|)
-	return .scrollrect(slh, shift).x
+	return .ScrollRect(slh, shift).x|int|
 
 
 function ScrollRect (|vec3|slh, |ivec4|)
@@ -131,21 +131,21 @@ function ScrollRect (|vec3| slh, |int| shift, |vec4|)
 	|| f  = 1.0 - (s / l)
 	|| d  = 10
 	if l > 0
-		|float| h = .height
+		|| h = .height|float|
 		|| div = l * rh
 		div = div max h
-		|| porp = (h * h) / (div*4)
-		d = (20 + porp) min (h * 0.375)
+		|| porp = (h * h) / (div*4.0)
+		d = ((20.0 + porp) min (h * 0.375))|int|
 
 	|| si = .lastrect + (0,d,0,-1-d)
 	|| w = 10
-	|int| p = mix(si.y1, si.y2, f)
+	|| p = mix(si.y1|float|, si.y2|float|, f)|int|
 	|| y = p - d
 	
 	if shift
 		y += shift
 		p = y + d
-		f = unmix(si.y1, si.y2, p)
+		f = unmix(si.y1|float|, si.y2|float|, p|float|)
 		s = (1.0-f) * l
 		return (s, s, s, s)
 	

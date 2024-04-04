@@ -463,7 +463,7 @@ extend PerryIDE
 		g.id = "log"
 		require !app.pref("nolog")
 		g.gnormal.seps = g.gnormal.bg
-		g.gnormal.seps.a *= 0.8
+		g.gnormal.seps.alpha *= 0.8
 		
 		g.OnKeyDown = LogAreaKeys
 		.logcomms = .AddBaseLog("-- speedie comms --")

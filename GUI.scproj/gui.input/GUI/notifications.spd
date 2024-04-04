@@ -11,15 +11,18 @@ module Notifications
 	
 	
 	function ShouldDraw (|window| w, |bool|)
-		opt norefcounts		
-		|| ago = w.CreatedDate.ago.seconds
+		opt norefcounts
+		|| ago = 1.0|f64|
+		ago = w.CreatedDate.ago.seconds
 		|controlrect| sz
+		|| wd = width|float|
 		if !w.tag									// fall
-			sz = ((0.5-ago)*width*2.0)~left  by  (height)~up back height
+			sz = ((0.5-ago)*wd*2.0)|int|~left  by  (height)~up back height
 			if ago >= 0.5
 				return false
 		  elseif ago < 1.0							// raise
-			sz = (width)~left  by  (ago*height)~up back height
+			|| h = (ago*height|float|)|int|
+			sz = (width)~left  by  (h)~up back height
 		  elseif ago < 5.0							// stay
 			sz = (width)~left  by  (height)~up back height
 		  elseif !(w contains sdlapp.mousexy)		// swap-direction

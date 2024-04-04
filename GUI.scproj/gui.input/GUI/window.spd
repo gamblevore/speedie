@@ -65,7 +65,7 @@ class Window (GUIControl)
 
 	virtual DrawBackground (|image| where)
 		|| a = .GNormal.bg.Alpha()
-		if .IsFullScreen and a < 1
+		if .IsFullScreen and a < 1.0
 			¥.DrawBackground(where)
 		
 		if a > 0

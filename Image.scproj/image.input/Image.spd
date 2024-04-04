@@ -154,7 +154,7 @@ class Image (memory)
 			return .RectBasic(r, b)
 		|| hz = r.horz
 		|| vt = r.vert
-		|| Step = 1.0 / (vt[1] - vt[0])
+		|| Step = 1.0 / (vt[1] - vt[0])|float|
 		|| curr = 0.0
 		for y in vt
 			|| value = mix(b,t,curr).PreMul
@@ -177,9 +177,9 @@ class Image (memory)
 	function @Vec4.Colorise (|byte| D, |float| a=1.0,  |vec4|)
 		|| DB = (d>>2)&3				// too brown otherwise
 		|| DX = (d>>5)&3
-		rz.r = ((d>>0)&7)*7th
-		rz.g = ((d>>3)&7)*7th
-		rz.b = (DB xor DX)*3th
+		rz.r = ((d>>0)&7)|float|*7th
+		rz.g = ((d>>3)&7)|float|*7th
+		rz.b = (DB xor DX)|float|*3th
 		rz.a = a
 	
 	
@@ -549,10 +549,10 @@ class Image (memory)
 		
 		R -= (0,0,1,1)
 		|| mid		= r.Center
-		|| maxdist	= (0.5 * r.width) + 0.5
+		|| maxdist	= (0.5 * r.width|float|) + 0.5
 		|| scale	= (1.0, r.aspect)
 		|| area_over= r.area|float|
-		|| Dim		= area_over.RangeConvertClamped(2000, 0.15, 8000, 0.26)
+		|| Dim		= area_over.RangeConvertClamped(2000.0, 0.15, 8000.0, 0.26)
 		
 		// OK so... jsut fade? 
 		|| cm = c.PreMul // why tho? the a is just 1? Do we clear c.a later?

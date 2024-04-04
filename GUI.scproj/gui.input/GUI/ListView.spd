@@ -1082,8 +1082,8 @@ class ListView (GUIControl) {
 		
 		.ExpandParents(i)
 		require !.VisFullyContains(i)
-		|| n = .visiblerows*0.34
-		.scrollset(.bmove(i, -n))
+		|| n = .visiblerows|float|*0.34
+		.scrollset(.bmove(i, -n|int|))
 	
 		
 //	function Contains (|int| Y,  |ivec2| Search,  |bool|)

@@ -6,19 +6,19 @@ function image.RoundRectDrawer (GUIDrawEvent)
 
 
     || center = rect.Center
-    center.y-=0.5
-    || CS = G.CornerSize * 0.25 + 1.0
+    center.y -= 0.5
+    || CS = G.CornerSize|float| * 0.25 + 1.0
     || Lim1 = (CS-0.5).pow2
-    || Lim2 = (CS+g.LineWidth-0.5).pow2
+    || Lim2 = (CS+g.LineWidth|float|-0.5).pow2
     || Conv = math.RangeConvert(lim2, lim1)
-    || SubX = center.x - (rect.x + CS)
-    || SubY = center.y - (rect.y + CS)
+    || SubX = center.x - (rect.x|float| + CS)
+    || SubY = center.y - (rect.y|float| + CS)
     
     for Y in rect.Vert
-        || Y2 = (Y - center.Y).abs.minus0(suby).Pow2
+        || Y2 = (Y|float| - center.Y).abs.minus0(suby).Pow2
         || W = self[rect.x, Y]
         for X in rect.Horz
-            || X2 = (X - center.X).abs.minus0(subx).pow2
+            || X2 = (X|float| - center.X).abs.minus0(subx).pow2
             || D2 = X2 + Y2
             
             if D2 <= lim1
@@ -35,7 +35,7 @@ function image.ClippedRectDrawer (GUIDrawEvent)
 	rect.y2-- // seems to draw too high? not sure why.
 	|| Col = g.bg.PreMul
 	|| Edge = g.edge.Color.PreMul
-	|int| Lim = G.CornerSize * 0.5 + 1.0
+	|| Lim = (G.CornerSize|float| * 0.5 + 1.0)|int|
 	|| center = rect.Center.iVec2
 	|| Active = g.CornersCut
 	

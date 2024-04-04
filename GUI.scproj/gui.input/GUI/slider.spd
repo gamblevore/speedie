@@ -17,8 +17,8 @@ class Slider (GuiControl)
 		super.constructor(p)
 		.ValueStep		= 1.0 / 16.0
 		.InitialValue	= true
-		.Value			= 1
-		.Valuecap		= 1
+		.Value			= 1.0
+		.Valuecap		= 1.0
 		.Onslide		= changed
 		.LastMouseY		= -int.max
 		.Init
@@ -77,10 +77,10 @@ class Slider (GuiControl)
 		|| s = .MiniSize
 		|| D = s.width > s.height
 		|| V = s.vert(d).vec2
-		|| Y = p[1-d]|float|
-		|| f = (y - v.x) / (v.x2 - v.x)
+		|| Y = p[1-d]
 		if .lastmousey != y
 			.LastMouseY = y
+			|| f = (y|float| - v.x) / (v.x2 - v.x)
 			.setvalue(f)
 		return MouseDragging.Beyond
 	
@@ -100,7 +100,7 @@ class Slider (GuiControl)
 	function DrawPos (|float|v, |int|)
 		|| s  = .MiniSize
 		|| D  = s.width > s.height
-		return mix(s.vert(d).vec2, v)
+		return mix(s.vert(d).vec2, v)|int|
 
 
 	behaviour Draw
@@ -116,9 +116,9 @@ class Slider (GuiControl)
 		s[x]  = y - w
 		s[x2] = y + w
 
-		if .ValueCap < 1
+		if .ValueCap < 1.0
 			|| s2 = .MiniSize
-			y = mix(s2.vert(d).vec2, .valuecap)
+			y = mix(s2.vert(d).vec2, .valuecap)|int|
 			s2[x] = y
 			s2[x2] = y
 			|| px = colors.white(0.15)
