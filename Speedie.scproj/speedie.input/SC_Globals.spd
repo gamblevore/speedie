@@ -1348,7 +1348,6 @@ function TypeOfRel (ExprResolver) {
 		return Or_And_Expansion( LC, RC, exp, name_Space ) // expects both sides to be booleans, right?
 
 
-//	if SCFunction.CurrFunc ~= "TestNumeric"
 	|| Custom = 0
 	if (RC != TypeNil)
 		|| IPM = IsPointerMath(LC, RC, comp, exp)
@@ -1754,36 +1753,4 @@ function Tran_ArgArray (|Message| Exp, |SCNode| name_space, |scdecl| decl)
 		|| c = counter.max+1
 		check (c < 16K) (exp, "Too many items in C-array.")
 		decl.C_Array = c
-		
-		
 
-
-function TestNumeric2 (|float| f, |int|)
-function TestNumeric
-	visible
-
-	|int64| i64
-	|int|   i32
-	|date|  d = 0
-
-	|| f = 30.0
-//	if f == i32				// shouldn't allow
-//	|| s = "abc"[f,f]		// shouldn't allow
-//	TestNumeric2(i32)		// also
-	
-//	f = i32					// nope
-//	f = TestNumeric2(0.0)	// noope
-	d = 1					// bad
-	
-
-
-	|| v = vec2(i32, i32)	// OK!
-	TestNumeric2(0)			// allow
-	f = d					// using a cast... i guess it's ok
-	
-	
-//	
-//	target debug2	
-//		d = f // bad
-//		if i64 <= range // this shouldn't involve cast to date.
-	

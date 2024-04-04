@@ -438,9 +438,8 @@ datatype float
 		cpp_part AsBool
 		return self|bool|
 
-	syntax cast (|date|)
-		disabled "Call .date instead"
-
+//	syntax cast (|date|)
+//		disabled "Call .date instead"
 	
 	function Floor (|float|)
 		cpp_wrapper (floorf)
@@ -452,7 +451,7 @@ datatype float
 		cpp_wrapper (roundf)
 
 	function Date (|date|)
-		return (self * date.kOneSecond|float|)|date|
+		return (self * 64.0K)|date|
 	
 	function DecimalPlaces (|int| to=2, |float|)
 		cpp_Part RoundTo

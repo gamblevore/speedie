@@ -59,3 +59,4 @@ function errorseverity.color (|vec4|)
 		return colors.White
 	return colors.red
 	
+	
