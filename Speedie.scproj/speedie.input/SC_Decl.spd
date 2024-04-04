@@ -548,7 +548,7 @@ class SCDecl (SCNamed) {
 
 		
 	function ExpectMatch (|SCDecl| O, |int| TypeCast, |Message?| exp, |Message?| ErrNode = nil, |Message|)
-		if exp.iszero
+		if exp and exp.IsSmallInt(O)
 			typecast |= kTypeCastFromZero
 		|| Matched = .TypeMatch(O, TypeCast, exp)
 		if (Matched == kCastedMatch or kLossyCastedMatch)

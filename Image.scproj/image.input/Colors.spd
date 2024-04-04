@@ -48,7 +48,7 @@ function vec4.PreMul (|PreMultipliedColor|)
 	|| M = .Clamp
 	|| A = m.a
 	m = (m * (A * 255.0)) + 0.25
-	m.a = (1.0-A) * (64.0*1024.0)
+	m.a = (1.0-A) * 64.0K
 	return m.ivec4|PreMultipliedColor|
 
 

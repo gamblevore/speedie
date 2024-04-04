@@ -68,9 +68,11 @@ class RayScene (window)
 	
 	
 	function Moved (|vec3|)
-		rz.y = keys.SPACE[] - keys.LSHIFT[]
-		rz.z = keys.W[]     - keys.S[]
-		rz.x = keys.D[]     - keys.A[]
+		|| k = ivec3()
+		k.y = keys.SPACE[] - keys.LSHIFT[]
+		k.z = keys.W[]     - keys.S[]
+		k.x = keys.D[]     - keys.A[]
+		return k.Vec3
 
 	
 	behaviour FrameUpdate

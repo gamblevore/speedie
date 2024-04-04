@@ -553,8 +553,8 @@ datatype f64
 		cpp_class double
 		cpp_part dbl
 	
-
 	default 0.0
+
 	syntax cast (|bool|)
 		return self|bool|
 	
@@ -597,7 +597,7 @@ datatype f64
 
 datatype hfloat
 	processas float
-	default 0
+	default 0.0
 	
 	linkage
 		cpp_class __fp16

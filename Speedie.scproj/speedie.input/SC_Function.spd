@@ -391,7 +391,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 
 		|| LArg_ch = (PArg_Ch, nil)(ThisAlter)
 		|| Cast = TypeCast ||| SelfCast
-		if Parg_ch.iszero
+		if Parg_ch!.IsSmallInt(parg_type)
 			Cast |= kTypeCastFromZero
 		|| Matched = FuncArg.TypeMatch( PArg_Type, Cast, LArg_ch )
 		SelfCast = 0
@@ -429,6 +429,17 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		error (self.source,  "Function here:")
 
 
+function scdecl.IsInt (|bool|)
+	return  .isnormal  and  .type.typeinfo.isint
+	
+function message.IsSmallInt (|scdecl| T, |bool|)
+	if T and (.func == @num)// and T.isint
+		if .name contains "."
+			return false
+		|| i = .int
+		return i <= 16M and i >= -16M
+		
+		
 function HiderMatch (|bool| IsAssigns, |bool|)
 	if self
 		if .IsAssigns

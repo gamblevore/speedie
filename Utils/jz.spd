@@ -215,9 +215,9 @@ module Conv
 		conv.speed <~ (' ', 4)
 		if !compress
 			if .data
-				size = .data.Length 
+				size = .data.Length|float|
 			|| s = .Start.ago.seconds
-			conv.speed.RenderSpeed(s, size, 0, name)
+			conv.speed.RenderSpeed(s, size|int|, 0, name)
 		  else
 			CompressionStats.all.Render(conv.speed)
 			CompressionStats.all.Clear
@@ -231,12 +231,12 @@ module Conv
 		require src!=nil and d != nil
 		.start = date() 
 		if Decomp
-			.size = d.File.size
+			.size = d.File.size|float|
 			src.DecompressInto(d)
 			.time("Decompress(streamed )", true)
 		  else 
 			|| typ = ("µz", "ro")(.defaultstrength < mzlab.strong)
-			.size = .in!.size
+			.size = .in!.size|float|
 			src.CompressInto(d, DefaultStrength) 
 			.time("Compress(streamed $typ)", true)
 		if dest is selfreplace
