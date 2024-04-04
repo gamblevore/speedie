@@ -60,7 +60,7 @@ The `isnt` operator is automatically defined as being the opposite of `is`. So a
 So these two versions are equivalent:
 
     require row isnt Disabled                    // version one
-    if row.syntaxis(listviewstate.disabled)      // version two
+    if !row.syntaxis(listviewstate.disabled)      // version two
         return nil
     
 
