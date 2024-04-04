@@ -588,6 +588,9 @@ datatype f64
 	render (|int|dp=6)
 		fs.appenddouble(self, dp, true)
 
+	render RenderFloat
+		fs.appenddouble(self, 6, false, true)
+
 	function Date (|date|)
 		return (self * date.kOneSecond|f64|)|date|
 

@@ -355,9 +355,9 @@ function TypeOfUnit (ExprResolver)
 	  else
 		val *= mul
 		if type != TypeInt
-			str = val.render
+			str = val.renderfloat
 		  elseif it.name contains '.'
-			str = it.name
+			str = val.renderfloat
 			|f64| big = 16.0*1024.0*1024.0
 			if val >= big  or val < -big
 				type = TypeF64!

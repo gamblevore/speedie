@@ -543,7 +543,7 @@
 		};
 		ACBA49F027AAB490009C2631 /* SpeedieBuilder */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--SelfDebug --nocolor --x";
+			buildArgumentsString = "--Self --nocolor --x --nocompile";
 			buildConfigurationList = ACBA49F127AAB490009C2631 /* Build configuration list for PBXLegacyTarget "SpeedieBuilder" */;
 			buildPhases = (
 			);

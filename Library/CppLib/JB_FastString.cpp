@@ -353,12 +353,12 @@ void JB_FS_AppendIntegerAsText(FastString* self, int64 LeftOver, int RoundTo) {
 
 
 void JB_FS_AppendDurr(FastString* self, Date D) {
-    JB_FS_AppendDoubleAsText(self, ((double)D) / ((double)0x10000), 3, false);
+    JB_FS_AppendDoubleAsText(self, ((double)D) / ((double)0x10000), 3, false, false);
 }
 
 
 void JB_FS_AppendDoubleAsText0(FastString* self, double D) {
-    JB_FS_AppendDoubleAsText(self, D, 9, true);
+    JB_FS_AppendDoubleAsText(self, D, 9, true, false);
 }
 
 
@@ -372,7 +372,7 @@ bool HasDot (uint8* self, int Used) {
 
 
 
-void JB_FS_AppendDoubleAsText(FastString* self, double D, int dp, bool CanExp) {
+void JB_FS_AppendDoubleAsText(FastString* self, double D, int dp, bool CanExp, bool Dot) {
 // need a "mode" really... what about if we want no exp but DO want the full length?
     dp = Max(dp, 0);
     dp = Min(dp, 16);
@@ -393,14 +393,15 @@ void JB_FS_AppendDoubleAsText(FastString* self, double D, int dp, bool CanExp) {
 	double F = floor(D);
 	double Frac = D-F;
 	JB_FS_AppendIntegerAsText(self, F, 1);
-	if (Frac and dp > 0) {
+	if (Dot or (Frac and dp > 0)) {
 		JB_FS_AppendByte(self, '.');
-		while (Frac and dp > 0) {
-			dp--;
+		while (dp-- > 0) {
 			Frac *= 10;
 			double Num = floor(Frac);
 			Frac -= Num;
 			JB_FS_AppendByte(self, '0'+Num);
+			if (!Frac)
+				break;
 		}
 	}
 	if (ActualExp) {

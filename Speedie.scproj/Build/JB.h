@@ -1375,13 +1375,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBetter (32)
-#define kJB__ErrorColors_bold (JB_LUB[94])
+#define kJB__ErrorColors_bold (JB_LUB[95])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[91])
-#define kJB__ErrorColors_good (JB_LUB[92])
-#define kJB__ErrorColors_normal (JB_LUB[95])
-#define kJB__ErrorColors_underline (JB_LUB[92])
-#define kJB__ErrorColors_warn (JB_LUB[93])
+#define kJB__ErrorColors_error (JB_LUB[92])
+#define kJB__ErrorColors_good (JB_LUB[93])
+#define kJB__ErrorColors_normal (JB_LUB[96])
+#define kJB__ErrorColors_underline (JB_LUB[93])
+#define kJB__ErrorColors_warn (JB_LUB[94])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1555,7 +1555,7 @@ extern Dictionary* JB__SyxDict_;
 extern CharSet* JB_C_Letters;
 extern Dictionary* JB_ClassLinkageTable;
 extern Dictionary* JB_ClsCollectTable;
-#define kJB_codesign_native (JB_LUB[1554])
+#define kJB_codesign_native (JB_LUB[1555])
 extern Dictionary* JB_CppRefTable;
 extern CharSet* JB_CSHex;
 extern CharSet* JB_CSNum;
@@ -1569,7 +1569,7 @@ extern Dictionary* JB_FuncPreReader;
 #define kJB_kActualTypecasts ((~(128 | 32)))
 #define kJB_kAddressOfMatch (3 << 22)
 #define kJB_kASM (63)
-#define kJB_kBitOr (JB_LUB[277])
+#define kJB_kBitOr (JB_LUB[278])
 #define kJB_kCastedMatch (6 << 22)
 #define kJB_kDontSaveProperty (0)
 #define kJB_kLossyCastedMatch (7 << 22)
@@ -1584,7 +1584,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_kSaveProperty (1)
 #define kJB_kSavePropertyAndGoIn (2)
 #define kJB_kSaverEnd (JB_LUB[0])
-#define kJB_kSaverStart1 (JB_LUB[602])
+#define kJB_kSaverStart1 (JB_LUB[603])
 #define kJB_kSimpleMatch (1 << 22)
 #define kJB_kSuperClassMatch (4 << 22)
 #define kJB_kTypeCastAssigns (64)
@@ -2278,6 +2278,8 @@ int JB_App__InitCode_();
 
 bool JB_App__IsMainThread();
 
+bool JB_App__No(JB_String* name);
+
 JB_String* JB_App__OrigPath();
 
 JB_String* JB_App__GetPref(JB_String* s);
@@ -2299,6 +2301,8 @@ JB_String* JB_App__StackTrace(int skip, FastString* fs_in);
 int64 JB_App__StringMemory();
 
 JB_String* JB_App__ArgValue(JB_String* name);
+
+bool JB_App__Yes(JB_String* name);
 
 
 
@@ -3958,6 +3962,8 @@ FakeJBString JB_cstring_temp(_cstring self);
 int64 JB_dbl_AsInt(double self);
 
 JB_String* JB_dbl_Render(double self, int dp, FastString* fs_in);
+
+JB_String* JB_dbl_RenderFloat(double self, FastString* fs_in);
 
 
 
@@ -9212,7 +9218,7 @@ inline JB_String* SC_Named_Name(SCNamed* self) {
 	if (self) {
 		return self->Name;
 	}
-	return JB_LUB[275];
+	return JB_LUB[276];
 }
 
 inline bool SC_PA_SyntaxCast(SCParamArray* self) {
@@ -9319,7 +9325,7 @@ inline void SC_Msg_AddValue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1369])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1370])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}
