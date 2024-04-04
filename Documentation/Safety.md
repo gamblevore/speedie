@@ -55,9 +55,9 @@ Speedie has a great error-handling system that is exceptionless. It is really ni
 
 Speedie has a little numeric safety. Mostly on constants, so you can't define a constant that won't fit its type. Like defining a byte-constant of 1000, which is more than 255.
 
-Also it won't allow silent numeric conversions (like C allows) that alter the bit-patterns of the values.
+Also Speedie won't allow int / float conversions, to happen silently. You need to explicitly convert them. We allow a small leeway when it comes to integer constants, for example adding `2` to a float variable, is OK, as `2` is exactly representable as a float anyhow. We don't allow this for ints that are too big and would lose precision as a float!
 
-Also it won't allow you to pass objects or numbers to a boolean parameter... because this is very dangerous, almost everything is convertible to boolean which means you can easily pass the wrong param!
+Also Speedie won't allow passing objects or numbers to a boolean parameter... because this is very dangerous, almost everything is convertible to boolean which means you can easily pass the wrong param!
 
 
 
