@@ -280,21 +280,21 @@ function faststring.RenderSpeed (|float| seconds, |int64| BytesIn, |int64| Bytes
 	self <~ " in "
 
 	if seconds < 0.01
-		.appenddouble(seconds*1000, 2)
+		.appenddouble(seconds*1000.0, 2)
 		self <~ 'm'
 	  else
 		.appenddouble(seconds, 2)
 	self <~ 's'
 		
 	require seconds
-	|float| scale = 1MB
+	|float| scale = (1MB)|float|
 	|| unit = 'M'
 	|| rate = BytesIn|float| / (scale*seconds)
-	if rate >= 1K
-		rate /= 1K
+	if rate >= (1K)|float|
+		rate /= (1K)|float|
 		unit = 'G'
-	  elseif rate <= 1
-		rate *= 1K
+	  elseif rate <= 1.0
+		rate *= (1K)|float|
 		unit = 'K'
 	|| dp = (5,2)(rate <= 0.01)
 	self <~ "  ("

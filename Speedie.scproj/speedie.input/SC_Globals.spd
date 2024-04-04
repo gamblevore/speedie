@@ -311,21 +311,21 @@ function TypeOfUnit (ExprResolver)
 	|| Type = TypeInt!.typenormal
 	|| unit = exp.name
 	if unit == "KB" or "K"
-		Mul = 1<<10
+		Mul = (1<<10)|f64|
 	  elseif unit == "MB" or "M"
-		Mul = 1<<20
+		Mul = (1<<20)|f64|
 	  elseif unit == "GB" or "G"
-		Mul = 1<<30
+		Mul = (1<<30)|f64|
 	  elseif unit == "TB" or "T"
-		Mul = 1|int64|<<40|int64| // goddamn c++ complaining
+		Mul = (1|int64|<<40|int64|)|f64| // goddamn c++ complaining
 	  elseif unit == "th"
 		Mul = 0
 	  else
 		type = typedate!.typenormal
 		if unit == "s"
-			mul = 64KB
+			mul = (64KB)|f64|
 		  elseif unit == "ms"
-			mul = 64
+			mul = 64.0
 		  elseif unit == "π"
 			mul = π
 			type = typef64!.typenormal
@@ -333,15 +333,15 @@ function TypeOfUnit (ExprResolver)
 			mul = τ
 			type = typef64!.typenormal
 		  elseif exp.unitmatch("days", "day")
-			mul = 86400.0 * 64KB
+			mul = 86400.0 * (64KB)|f64|
 		  elseif exp.unitmatch("weeks", "week")
-			mul = 604800.0 * 64KB
+			mul = 604800.0 * (64KB)|f64|
 		  elseif exp.unitmatch("years", "year")
-			mul = 31536000.0 * 64KB
+			mul = 31536000.0 * (64KB)|f64|
 		  elseif exp.unitmatch("mins", "min")
-			mul = 60 * 64KB
+			mul = 60.0 * (64KB)|f64|
 		  elseif exp.unitmatch("hours", "hour")
-			mul = 3600 * 64KB
+			mul = 3600.0 * (64KB)|f64|
 		  else
 			error (exp, "Unknown unit")
 	
@@ -355,7 +355,7 @@ function TypeOfUnit (ExprResolver)
 			val *= mul
 			if type.typeinfo.isint
 				str = val|int64|.render
-				|f64| big = 1|int64| << 31|int64|
+				|f64| big = (1|int64| << 31|int64|)|f64|
 				if val >= big  or val < -big
 					type = TypeInt64!.TypeNormal
 			  else
@@ -1041,7 +1041,7 @@ function TypeOfSwiz (|message| exp, |SCNode| name_space, |message| side, |scdecl
 function TypeOfDot (ExprResolver)
 	require !(exp.Last!.obj) // it's a func that returns nothing. we already got it, don't get again.
 
-	debugat 0
+//	debugat 0
 	|| DotVar = exp.first!.DotSpace(name_space)|SCNode| #expect (exp, "This expression can’t be used here.") // DotVar is the type of the thing that the dot is on.
 
 
@@ -1342,6 +1342,7 @@ function TypeOfRel (ExprResolver) {
 		return Or_And_Expansion( LC, RC, exp, name_Space ) // expects both sides to be booleans, right?
 
 
+//	if SCFunction.CurrFunc ~= "TestNumeric"
 	|| Custom = 0
 	if (RC != TypeNil)
 		|| IPM = IsPointerMath(LC, RC, comp, exp)
@@ -1750,3 +1751,33 @@ function Tran_ArgArray (|Message| Exp, |SCNode| name_space, |scdecl| decl)
 		
 		
 
+
+function TestNumeric2 (|float| f, |int|)
+function TestNumeric
+	visible
+
+	|int64| i64
+	|int|   i32
+	|date|  d = 0
+
+	|| f = 30.0
+//	if f == i32				// shouldn't allow
+//	|| s = "abc"[f,f]		// shouldn't allow
+//	TestNumeric2(i32)		// also
+	
+//	f = i32					// nope
+//	f = TestNumeric2(0.0)	// noope
+	d = 1					// bad
+	
+
+
+	|| v = vec2(i32, i32)	// OK!
+	TestNumeric2(0)			// allow
+	f = d					// using a cast... i guess it's ok
+	
+	
+//	
+//	target debug2	
+//		d = f // bad
+//		if i64 <= range // this shouldn't involve cast to date.
+	

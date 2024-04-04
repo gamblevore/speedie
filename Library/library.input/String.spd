@@ -368,7 +368,7 @@ class String
 		cpp_Wrapper JB_Str_BadUTF8
 
 	function IsBinary (|float|f=24.0, |bool|)
-		return .badness*f >= .length
+		return  .badness|float|*f  >=  .length|float|
 	
 	function IsText (|float|f=24.0, |bool|)
 		return !.IsBinary(f)

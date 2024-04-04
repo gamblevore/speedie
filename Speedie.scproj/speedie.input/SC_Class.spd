@@ -61,7 +61,7 @@ linkage
 |bool|						IsBuiltin // SCNodeType
 |SCNodetype| 				BaseType
 |bool|						IsASM
-|bool|						IsNotNumeric
+|byte|						NumericReduction
 
 
 constructor (|Message| node, |SCNode| parent, |bool| HasPtrs, |scmodule| m)
@@ -450,7 +450,7 @@ function ContainedTypeLoad
 		.Contained = sup.Contained
 		.SelfDecl.Contains = sup.SelfDecl.Contains
 		
-		if .IsNotNumeric == sup.IsNotNumeric
+		if .NumericReduction == sup.NumericReduction
 			.NeedsDefaultValue(sup.Defawlt, .defawlt, "default")
 			.NeedsDefaultValue(sup.false,   .false,   "false")
 		.IgnoreContainedSelf |= sup.IgnoreContainedSelf // bad assumption. we shouldn't swap objects and datatypes
@@ -883,7 +883,7 @@ module
 		|| node = .Source
 		|| sup = .super
 			.Size = sup.Size
-			if !.IsNotNumeric
+			if !.NumericReduction
 				.TypeInfo = sup.TypeInfo
 				.defawlt := sup.defawlt
 

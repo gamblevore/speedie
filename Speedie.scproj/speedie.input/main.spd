@@ -25,7 +25,10 @@ function Compiler.PrintResults
 
 	if options.selfreplacement and filedes.stdout.isterminal
 		if .variantsuffix ~= "Test"
-			app.say("Speedie Success", false)
+			if stderr.ok
+				app.say("Speedie Success", false)
+//			  else
+//				app.say("Speedie Failed", false)
 	if Options.Beep
 		"\07"
 

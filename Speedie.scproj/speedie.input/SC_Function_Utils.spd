@@ -34,10 +34,17 @@ dispatch FuncPreReader (fnPreReader)
 	+"pragma"
 		opt norefcounts
 		|| f = msg[@thg]
-		if f ~= "inline"
-			.IsInline = true
-		  else
+			f.expectlast
+			if f ~= "inline"
+				.IsInline = true
+			  else
+				error f
+				
+	+"numeric"
+		opt norefcounts
+		|| f = msg.first
 			error f
+		(self is numbercreator)
 	
 	
 	+"opt"

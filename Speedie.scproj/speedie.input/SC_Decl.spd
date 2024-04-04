@@ -38,6 +38,7 @@ constants
 	kTypeCastAssigns = 64
 	kTypeCastWantSuperDistance = 128
 	kTypeCastDescribeErrors = 256
+	kTypeCastFromZero = 512
 	kActualTypecasts = ~(kTypeCastWantSuperDistance ||| kNoBoolTypeCast)  
 	kTypeCastFalse = 0
 
@@ -535,45 +536,29 @@ class SCDecl (SCNamed) {
 		return slf.expectmatch(cls.typenormal, 0, self, self) 
 	
 
-	function ExpectFail (|SCDecl| O, |string|)
+	function SCDecl.ExpectFail  (|scdecl| o, |message?| errnode, |message?| backup)
 		|| fs = faststring()
 		fs <~ "Type mismatch, expected '"
 		.RenderTypeName(fs)
 		fs <~ "' but found '"
 		o.RenderTypeNameNicer(fs)
 		fs <~ "'."
-		return fs
+		ErrNode := backup
+		error ( ErrNode, fs )
 
 		
 	function ExpectMatch (|SCDecl| O, |int| TypeCast, |Message?| exp, |Message?| ErrNode = nil, |Message|)
+		if exp.iszero
+			typecast |= kTypeCastFromZero
 		|| Matched = .TypeMatch(O, TypeCast, exp)
 		if (Matched == kCastedMatch or kLossyCastedMatch)
 			return exp!.CastedParent
 
 		if (Matched == kNoMatch)
-			ErrNode := exp
-			error ( ErrNode, .ExpectFail(o) )
+			.ExpectFail(o, ErrNode, exp)
 			.TypeMatch(O, TypeCast, exp)
 
 		return exp
-
-
-//	function SCClass.MatchType (|SCDecl|Other, |message| exp, |bool|)
-//		return .typenormal.ExpectMatch(other, ktypecastfalse, exp, exp)
-//
-//
-//	operator isobj (|SCClass| type, |bool|)
-//		return self and (.type == type) and (.isnormalobject)
-//
-//
-//	function IsPtr (|scclass|type, |bool|)
-//		return self and (.type == type) and (.pointercount == 1)
-//
-//		
-//	operator isa_not_stupid (|SCClass| O, |bool|)
-//		if o and self
-//			return O.TypeNormal.matchC(self)
-		// same as operator isa but not backwards :(
 
 	
 	operator matches (|SCDecl!| O, |bool|)
@@ -584,13 +569,6 @@ class SCDecl (SCNamed) {
 
 	operator exact_isa (|scclass| v, |bool|)
 		Return .IsNormal and (.type == v)
-
-
-//	operator isa (|string| s, |bool|)
-//		cpp_Part IsaStr
-//		if self
-//			return .isnormal and .type.name ~= s
-	
 
 	operator matches (|SCClass| O, |bool|)
 		if o and self
@@ -1047,7 +1025,7 @@ class SCDecl (SCNamed) {
 
 
 function IsPointerMath (|SCDecl|L, |SCDecl|R, |SCOperator| opp, |Message|exp, |SCDecl|)
-	require (opp.name == "+" or "-")
+	require (opp is Addition)
 	if (L.PointerCount) and (R.IsNumeric == 1)
 		return L
 	if (R.PointerCount) and (L.IsNumeric == 1)

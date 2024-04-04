@@ -1077,14 +1077,14 @@ class Message (list)
 				return F.name.ParseHex(i, F)
 			|| mul = f.name.ParseFloat
 			if self == "K"
-				mul *= 1K
+				mul *= 1K|float|
 			  elseif self == "M"
-				mul *= 1M
+				mul *= 1M|float|
 			  elseif self == "G"
-				mul *= 1G
+				mul *= 1G|float|
 			  else
 				error (self, "Invalid unit")
-				return 0
+				mul = 0.0
 			return mul|int64|
 			
 

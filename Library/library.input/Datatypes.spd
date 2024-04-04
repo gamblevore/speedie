@@ -217,7 +217,7 @@ struct RetroFloat
 			rem--
 			A++
 		.remain = rem
-		return A
+		return A|int|
 
 
 struct IntDownRange   /// :3
@@ -409,7 +409,7 @@ function int.SyntaxCast (|uint24|)
 datatype float
 	linkage 
 		cpp_part f
-	default 0
+	default 0.0
 		
 	module
 		function Max (|float|)
@@ -426,7 +426,7 @@ datatype float
 		if !self
 			fs <~ "0"
 		  else
-			self = (self * 1000).floor/10
+			self = (self * 1000.0).floor*0.1
 			if !self
 				fs <~ "<0.1"
 			  else
@@ -452,11 +452,11 @@ datatype float
 		cpp_wrapper (roundf)
 
 	function Date (|date|)
-		return (self * date.kOneSecond)|date|
+		return (self * date.kOneSecond|float|)|date|
 	
-	function DecimalPlaces (|float| to=2, |float|)
+	function DecimalPlaces (|int| to=2, |float|)
 		cpp_Part RoundTo
-		|| v = 10 pow to
+		|| v = (10 pow to)|float|
 		return (self * v).Round / v
 //		std::ceil(value * 100.0) / 100.0
 
@@ -511,7 +511,7 @@ datatype float
 
 	function SmoothStep (|float|)
 		|| x = .clamp-0.5
-		return x * x * (3 - 2 * x)
+		return x * x * (3.0 - 2.0 * x)
 
 	operator max (|float| other, |float|)
 		cpp_wrapper (fmaxf)
@@ -538,7 +538,7 @@ datatype float
 	operator to (|float| To, |floatrange|)
 		rz.from = self
 		rz.to = to
-		rz.step = 1
+		rz.step = 1.0
 
 	iterator
 		|| i = 0.0
@@ -554,7 +554,7 @@ datatype f64
 		cpp_part dbl
 	
 
-	default 0
+	default 0.0
 	syntax cast (|bool|)
 		return self|bool|
 	
@@ -589,7 +589,7 @@ datatype f64
 		fs.appenddouble(self, dp, true)
 
 	function Date (|date|)
-		return (self * date.kOneSecond)|date|
+		return (self * date.kOneSecond|f64|)|date|
 
 
 datatype hfloat
@@ -671,11 +671,11 @@ datatype int64
 	render Hex
 		fs.appendhex(self)
 
-	helper RenderSizePart (|faststring| fs, |float| Size, |string| Suff)
-		|| f = (self|float|/size).DecimalPlaces(1)
+	helper RenderSizePart (|faststring| fs, |int| Size, |string| Suff)
+		|| f = (self|float|/size|float|).DecimalPlaces(1)
 		fs <~ f|int|
-		if f < 120
-			|| frac = (f.fract*10)|int|
+		if f < 120.0
+			|| frac = (f.fract*10.0)|int|
 			fs <~ "."
 			fs <~ frac
 		fs <~ suff

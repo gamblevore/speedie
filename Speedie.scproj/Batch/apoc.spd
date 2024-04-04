@@ -5,8 +5,8 @@ class Country
 	|string|	name
 	constructor (|string| Name)
 		.name = name
-		.population = random[40, 100]
-		.ATP = random[4, 12]
+		.population = random[40.0, 100.0]|int|
+		.ATP = random[4.0, 12.0]|int|
 		"$name was founded with $.population population and $.ATP power"
 		
 	function Attack (|Country| other)

@@ -125,28 +125,37 @@ dispatch ClassLinkageTable (TranFunc)
 	// these items with {} are processed elsewhere...
 	// it would have been better to process them all here. but I wrote this after
 	// So the older code still needs removing and using this instead.
-	cpp_wrapper			{}
-	cpp_part			{SCNode.LoadCppPart(node, name_space, node)}
-	cpp_refs			scfunction.tran_cpprefs
-	cpp_class			{}
-	visible				{} // (SCFunction.Tran_Visible)
-	ignore				{}
-	noearlyfree			{}
+	+"cpp_wrapper"			{}
+	+"cpp_part"				{SCNode.LoadCppPart(node, name_space, node)}
+	+"cpp_refs"				scfunction.tran_cpprefs
+	+"cpp_class"			{}
+	+"visible"				{} // (SCFunction.Tran_Visible)
+	+"ignore"				{}
+	+"noearlyfree"			{}
 //	dontdestructlocally {}
-	wrapper				{} //if name_space.mustbe(scclass) : name_space.IsWrapper = true}
-	datatype
+	+"wrapper"				{} //if name_space.mustbe(scclass) : name_space.IsWrapper = true}
+	+"datatype"
 		if name_space.mustbe(SCClass, node)
 			expect (name_space.isstruct) (node, "Expected this for a struct")
 			|| value = node[@thg]
 				value.expectlast
 
-	numeric
+	+"numeric"
 		if name_space.mustbe(SCClass, node)
 			expect (name_space.isdatatypeOnly) (node, "Expected this for a datatype")
-			if node[@thg] == "false"
-				name_space.typeinfo = datatypecode.unusedtype
-				name_space.IsNotNumeric = true
+			|| type = node[@thg]$
+			name_space.typeinfo = datatypecode.unusedtype
+			if type == "false" or "symbol"
+				name_space.NumericReduction = NumericLoss.symbol
+			  elseif type == "fixed"
+				name_space.NumericReduction = NumericLoss.fixed
+			  elseif type == "flags"
+				name_space.NumericReduction = NumericLoss.flag
+			  else
+				error type
 
+// now we have a numeric reduction... how to disable it nicely?
+// we need a test function
 
 function SCNode.ProcessLinkage (|message| node, |dictionary of tranfunc| Table, |SCNode|)
 	opt norefcounts
@@ -158,3 +167,10 @@ function SCNode.ProcessLinkage (|message| node, |dictionary of tranfunc| Table, 
 
 	return compiler.program
 
+
+datatype NumericLoss (byte)
+	flags
+		Normal = 0
+		Symbol
+		Fixed
+		Flag

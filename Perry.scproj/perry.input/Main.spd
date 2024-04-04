@@ -1,17 +1,13 @@
 
 
 main // main { 
-//	|int64| d
-//	|| range = 30.0
-//	if d <= range // this shouldn't involve cast to date.
-
 	if app["crash"]
 		app.crash
 	SDLApp.init
 	Perry.Startup
 	notifications.ShowTip
 	return SDLApp.Run
-
+	
 
 function app.InitColors
 	¥.border.edge			<~ vec4(1) 

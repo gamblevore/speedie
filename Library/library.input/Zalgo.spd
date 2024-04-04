@@ -6,7 +6,8 @@ module zalgo
 	|string| down = #(CC96CC97CC98CC99CC9CCC9DCC9ECC9FCCA0CCA4CCA5CCA6CCA9CCAACCABCCACCCADCCAECCAFCCB0CCB1CCB2CCB3CCB9CCBACCBBCCBCCD85CD87CD88CD89CD8DCD8ECD93CD94CD95CD96CD99CD9ACCA3)#
 
 	function Rand (|faststring| fs, |string| z)	
-		|| i = (zalgo.R[0, z.length/2]|int|)*2
+		|| n = z.length|float| * 0.5
+		|| i = (zalgo.R[0, n]|int|)*2
 		fs <~ z[i]
 		fs <~ z[i+1]
 	
@@ -18,7 +19,7 @@ module zalgo
 			fs <~ s
 			if s < 128
 				|| scale = (s<=32) + (txt[i+1]<=32) + (txt[i-1]<=32)
-				fs.zalgo(s, wierdness, scale)
+				fs.zalgo(s, wierdness, scale|float|)
 
 
 function string.Zalgo (|float| Wierdness=8, |string|)
@@ -27,12 +28,12 @@ function string.Zalgo (|float| Wierdness=8, |string|)
 
 function faststring.Zalgo (|byte| s, |float| Wierdness, |float| whites)
 	|| mul  = 1.0/(whites+1.0)
-	|| up   = zalgo.R[3, 3+Wierdness]*mul
+	|| up   = zalgo.R[3.0, 3.0+Wierdness]*mul
 	for (up)
 		zalgo.rand(self, zalgo.up)
 	|| mid  = zalgo.R[1.0,3.0]*mul
 	for (mid)
 		zalgo.rand(self, zalgo.mid)
-	|| down = zalgo.R[3,3+Wierdness]*mul
+	|| down = zalgo.R[3.0,3.0+Wierdness]*mul
 	for (down)
 		zalgo.rand(self, zalgo.down)

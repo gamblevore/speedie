@@ -68,15 +68,19 @@ datatype vec4
 			return (0.0,0.0,0.0,0.0)
 		function New (|vec3| a, |float| b, |vec4|)
 			cpp_part New31
+			numeric
 			return (a, b)
 		function New (|float| f, |vec4|)
 			cpp_part New1
+			numeric
 			return (f,f,f,f)
 		function New (|float| g, |float| a, |vec4|)
 			cpp_part Gray
+			numeric
 			return (g,g,g,a)
 		function New (|float| a, |float| b, |float| c, |float| d, |vec4|)
 			cpp_part New4
+			numeric
 			return (a,b,c,d)
 		function Load (|&byte| b, |vec4|)
 			cpp_inbuilt JB_vec4_Load
@@ -217,7 +221,7 @@ datatype ivec4
 		
 	syntax cast (|bool|)
 		cpp_part Bool
-		return self!=ivec4.zero	
+		return self!=ivec4()	
 
 	function Soothe (|ivec4|)
 		return (0, 0, .x2 - .x1, .y2 - .y1)	
@@ -232,16 +236,16 @@ datatype ivec4
 		function Load (|&byte| b, |ivec4|)
 			cpp_inbuilt JB_ivec4_Load
 
-		function Zero (|ivec4|)
-			return (0, 0, 0, 0)
 		function New (|ivec4|)
 			cpp_part New0
 			return (0, 0, 0, 0)
 		function New (|int| x, |ivec4|)
 			cpp_part New1
+			numeric
 			return (x,x,x,x)
 		function New (|int| x, |int| y, |int| z, |int| w, |ivec4|)
 			cpp_part New4
+			numeric
 			return (x,y,w,z)
 	
 	iterator Rect
@@ -356,14 +360,17 @@ datatype vec3
 	module
 		function New (|vec3|)
 			cpp_part zero
-			return (0.0,  0.0, 0.0)
+			return (0.0, 0.0, 0.0)
 		function New (|float| x, |float| y, |float| z, |vec3|)
+			numeric
 			return (x,y,z)
 		function New (|vec2| xy, |float| z, |vec3|)
 			cpp_part New21
+			numeric
 			return (xy,z)
 		function New (|float| x, |vec3|)
 			cpp_part New1
+			numeric
 			return (x,x,x)
 		function Up   (|vec3|)
 			return (0.0,  1.0, 0.0)
@@ -387,7 +394,7 @@ datatype ivec3
 		return (.x == v.x) and (.y == v.y) and (.z == v.z) 
 	
 	module
-		function Zero (|ivec3|)
+		function New (|ivec3|)
 			return (0, 0, 0)
 
 
@@ -426,8 +433,8 @@ datatype IntRange (ivec2)
 		return .x1 min .x2
 	function Mid (|int|)
 		return (.x1 + .x2)/2
-	function Mix (|float|f,|float|)
-		return mix(.x1,.x2,f)
+//	function Mix (|float|f, |float|)
+//		return mix(.x1, .x2, f)
 	function LimitTo (|int| i, |ivec2|)
 		if (.X  < 0):		.X  = 0
 		if (.X2 < 0):		.X2 = 0
@@ -468,10 +475,10 @@ datatype ivec2
 			return 1
 		if (Lsq < osq)
 			return -1
-	function Rnd (|ivec2|)
-		|int| cw = random[0, .x, 1]
-		|int| ch = random[0, .y, 1]
-		return (cw, ch)
+//	function Rnd (|ivec2|)
+//		|int| cw = random[0.0, .x, 1.0]
+//		|int| ch = random[0.0, .y, 1.0]
+//		return (cw, ch)
 
 	syntax cast (|intrange|)
 		return self|intrange|
@@ -568,9 +575,11 @@ datatype ivec2
 	module
 		function New (|int| x, |ivec2|)
 			cpp_Part New1
+			numeric
 			return (x, x)
 		function New (|int| x, |int| y, |ivec2|)
 			cpp_Part New2
+			numeric
 			return (x, y)
 
 
@@ -660,9 +669,11 @@ datatype vec2
 			cpp_part New0
 		function New (|float| a, |vec2|)
 			cpp_part New1
+			numeric
 			return (a, a)
 		function New (|float| a, |float| b,  |vec2|)
 			cpp_part New2
+			numeric
 			return (a, b)
 
 
@@ -671,9 +682,11 @@ datatype mat2 (vec4)
 		return (m.xy • self, m.zw • self)
 	module
 		function New (|vec4| x, |mat2|)
+			numeric
 			return x|mat2|
 		function New (|float| a, |float| b, |float| c, |float| d,  |mat2|)
 			cpp_part New4
+			numeric
 			return (a,b,c,d)|mat2|
 		function New (|mat2|)
 			cpp_part Identity

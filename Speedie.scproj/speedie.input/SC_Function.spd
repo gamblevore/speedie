@@ -20,6 +20,7 @@ datatype FunctionType (uint)
 		Comparison
 		Reffer
 		NewStruct
+		NumberCreator
 		TypeTest
 		InitFunc
 		Recursive
@@ -31,7 +32,7 @@ datatype FunctionType (uint)
 		AlreadyExported
 		Render
 		ConOrDes = Constructor + Destructor
-	syntax is (|functiontype| t, |bool|)
+	syntax is (|FunctionType| t, |bool|)
 		return self & t
 
 
@@ -81,12 +82,10 @@ constructor (|Message?| msg = nil)
 	.linkto = nil
 	if (msg)
 		Compiler.stFuncs++
-			
 
 
 syntax equals (|string| name, |bool| Aware, |bool|)
-	require (self)
-	
+	require (self)	
 	if .ExportName.syntaxequals( name, true )
 		return true
 	return .Name.syntaxequals( name, true )		// never needs !aware.
@@ -96,11 +95,13 @@ syntax is (|FunctionType| k, |bool|) // assumes ANY match. Asking "x is a+b", th
 	if self
 		return .alloccode & k
 
+
 syntax is (|FunctionType| k, assigns:|bool|)
 	if value
 		.alloccode |= k
 	  else
 		.alloccode &= ~k
+
 
 function IsReal (|bool|)
 	return (self != nil) and !.isMacro 
@@ -135,7 +136,6 @@ render RenderParams (|bool| ForErrors=true)
 	if !ForErrors and .ReturnType
 		fs <~ sep
 		.returntype.render(fs)
-	
 	fs <~ ')'
 
 
@@ -278,7 +278,7 @@ function Transform ()
 	if !StillOK
 		.Badness |= 1
 	  else
-		.CallParents //hehe 🥰
+		.CallParents // hehe 🥰
 
 	CurrFunc = nil
 	scmodule.curr = nil
@@ -299,7 +299,6 @@ function MacroFix (|SCDecl?| contains, |SCNode| name_space, |SCParamArray| Incom
 	orig.MacroFixSub(contains) 
 	rz = TypeOfExpr(orig, name_space) 
 	rz := typevoid!
-
 
 
 function message.FailOrCopy (|message| p, |message|)
@@ -374,7 +373,9 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 	|| Result = kSimpleMatch
 	|| SelfCast = Incoming.ignoreselfContain()
 	TypeCast |= kNoBoolTypeCast ||| kTypeCastWantSuperDistance
-		
+	if self is numbercreator
+		typecast |= ktypecastfromzero
+	
 	|| fin = .args.length
 	|| fi = 0
 	if  (self is constructor)  and  !Incoming.AllowSelfToConstructor
@@ -389,7 +390,10 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 			FuncArg = FuncArg.ContainedReplace(base, false)
 
 		|| LArg_ch = (PArg_Ch, nil)(ThisAlter)
-		|| Matched = FuncArg.TypeMatch( PArg_Type, TypeCast ||| SelfCast, LArg_ch )
+		|| Cast = TypeCast ||| SelfCast
+		if Parg_ch.iszero
+			Cast |= kTypeCastFromZero
+		|| Matched = FuncArg.TypeMatch( PArg_Type, Cast, LArg_ch )
 		SelfCast = 0
 		
 		if (Matched != kNoMatch) and !((matched == kUseDefaultParams) and ThisAlter)

@@ -176,7 +176,7 @@ module Feedback
 		  elseif value.isjbin // ignore it
 			0 // probably a restart compile option
 		  elseif (options.OperationCount == 1)
-			error ("Too many input projects: " + value)
+			error ("Can't compile multiple projects: " + value)
 		  else
 			.TryUseProject(Value)
 			options.OperationCount++

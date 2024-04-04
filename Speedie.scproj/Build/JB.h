@@ -69,6 +69,8 @@ typedef uint ErrorMarker;
 
 typedef byte ErrorSeverity;
 
+typedef int FileDes;
+
 typedef int FileMode;
 
 typedef bool FileResolveMode;
@@ -102,6 +104,8 @@ typedef byte NilReason;
 typedef uint64 NilRecord;
 
 typedef byte NilState;
+
+typedef byte NumericLoss;
 
 typedef u16 OpMode;
 
@@ -1219,7 +1223,7 @@ JBClass ( SCClass , SCNode ,
 	bool IsBuiltin;
 	SCNodeType BaseType;
 	bool IsASM;
-	bool IsNotNumeric;
+	byte NumericReduction;
 );
 
 struct SCFunction_Behaviour: SCNode_Behaviour {
@@ -1371,13 +1375,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBetter (32)
-#define kJB__ErrorColors_bold (JB_LUB[95])
+#define kJB__ErrorColors_bold (JB_LUB[94])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[92])
-#define kJB__ErrorColors_good (JB_LUB[93])
-#define kJB__ErrorColors_normal (JB_LUB[96])
-#define kJB__ErrorColors_underline (JB_LUB[93])
-#define kJB__ErrorColors_warn (JB_LUB[94])
+#define kJB__ErrorColors_error (JB_LUB[91])
+#define kJB__ErrorColors_good (JB_LUB[92])
+#define kJB__ErrorColors_normal (JB_LUB[95])
+#define kJB__ErrorColors_underline (JB_LUB[92])
+#define kJB__ErrorColors_warn (JB_LUB[93])
 extern Array* SC__ExecTable_Funcs;
 extern Array* SC__ExecTable_Globs;
 extern SCFunction* SC__FastStringOpts__ByteFunc;
@@ -1485,9 +1489,6 @@ extern bool SC__Options_UseFuncCallCount;
 extern byte SC__Options_UseScriptLoc;
 extern JB_String* SC__Options_Variant;
 extern bool SC__Options_Warnings;
-#define kJB__Pipe_StdErr_ (2)
-#define kJB__Pipe_StdIn_ (0)
-#define kJB__Pipe_StdOut_ (1)
 extern JB_File* JB__Platform_Logger;
 extern Dictionary* SC__SCGame3D_Types;
 extern int SC__SC_UniqueNum;
@@ -1554,7 +1555,7 @@ extern Dictionary* JB__SyxDict_;
 extern CharSet* JB_C_Letters;
 extern Dictionary* JB_ClassLinkageTable;
 extern Dictionary* JB_ClsCollectTable;
-#define kJB_codesign_native (JB_LUB[1555])
+#define kJB_codesign_native (JB_LUB[1554])
 extern Dictionary* JB_CppRefTable;
 extern CharSet* JB_CSHex;
 extern CharSet* JB_CSNum;
@@ -1568,7 +1569,7 @@ extern Dictionary* JB_FuncPreReader;
 #define kJB_kActualTypecasts ((~(128 | 32)))
 #define kJB_kAddressOfMatch (3 << 22)
 #define kJB_kASM (63)
-#define kJB_kBitOr (JB_LUB[278])
+#define kJB_kBitOr (JB_LUB[277])
 #define kJB_kCastedMatch (6 << 22)
 #define kJB_kDontSaveProperty (0)
 #define kJB_kLossyCastedMatch (7 << 22)
@@ -1583,7 +1584,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_kSaveProperty (1)
 #define kJB_kSavePropertyAndGoIn (2)
 #define kJB_kSaverEnd (JB_LUB[0])
-#define kJB_kSaverStart1 (JB_LUB[603])
+#define kJB_kSaverStart1 (JB_LUB[602])
 #define kJB_kSelfDebug (2)
 #define kJB_kSelfReplace (1)
 #define kJB_kSimpleMatch (1 << 22)
@@ -1592,6 +1593,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_kTypeCastBothWays (16)
 #define kJB_kTypeCastDescribeErrors (256)
 #define kJB_kTypeCastFalse (0)
+#define kJB_kTypeCastFromZero (512)
 #define kJB_kTypeCastIgnoreAddressOf (8)
 #define kJB_kTypeCastIgnoreContained (4)
 #define kJB_kTypeCastMost (1)
@@ -1875,6 +1877,9 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__ErrorSeverity_OK (0)
 #define kJB__ErrorSeverity_Problem (3)
 #define kJB__ErrorSeverity_Warning (2)
+#define kJB__FileDes_StdErr (2)
+#define kJB__FileDes_StdIn (0)
+#define kJB__FileDes_StdOut (1)
 #define kJB__FileMode_CanExec (1 << ((6 + 1) << ((3 + 1) << 0)))
 #define kJB__FileMode_Data (6 << ((6 + 4) << ((2 + 4) << 2)))
 #define kJB__FileMode_Group (7 << 3)
@@ -1882,23 +1887,24 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__FileMode_Owner (7 << 6)
 #define kJB__FileMode_Process (((7 << 6) + 5) << ((3 + 5) << 0))
 #define kJB__FileResolveMode_AllowMissing (true)
-#define kSC__FunctionType_AlreadyExported (8192)
-#define kSC__FunctionType_Behaviour (1024)
+#define kSC__FunctionType_AlreadyExported (16384)
+#define kSC__FunctionType_Behaviour (2048)
 #define kSC__FunctionType_Comparison (4)
 #define kSC__FunctionType_ConOrDes (1 + 2)
 #define kSC__FunctionType_Constructor (1)
 #define kSC__FunctionType_Destructor (2)
-#define kSC__FunctionType_EmptyConstructor (256)
-#define kSC__FunctionType_ExpectsRealVars (4096)
-#define kSC__FunctionType_InitFunc (64)
-#define kSC__FunctionType_LargestFlag (32767)
-#define kSC__FunctionType_NewNew (2048)
+#define kSC__FunctionType_EmptyConstructor (512)
+#define kSC__FunctionType_ExpectsRealVars (8192)
+#define kSC__FunctionType_InitFunc (128)
+#define kSC__FunctionType_LargestFlag (65535)
+#define kSC__FunctionType_NewNew (4096)
 #define kSC__FunctionType_NewStruct (16)
-#define kSC__FunctionType_Recursive (128)
+#define kSC__FunctionType_NumberCreator (32)
+#define kSC__FunctionType_Recursive (256)
 #define kSC__FunctionType_Reffer (8)
-#define kSC__FunctionType_Render (16384)
-#define kSC__FunctionType_TypeTest (32)
-#define kSC__FunctionType_VirtualCaller (512)
+#define kSC__FunctionType_Render (32768)
+#define kSC__FunctionType_TypeTest (64)
+#define kSC__FunctionType_VirtualCaller (1024)
 #define kJB__MoveCode_All (63)
 #define kJB__MoveCode_Back (kJB__MoveCode_Backward)
 #define kJB__MoveCode_Backward (32)
@@ -1963,29 +1969,35 @@ extern Array* SC__NilReason_values;
 #define kSC__NilState_Solved (64)
 #define kSC__NilState_Stated (4)
 #define kSC__NilState_TrueValue (32)
-#define kSC__OpMode_AND (4096)
-#define kSC__OpMode_AndOr (2048 | 4096)
+#define kSC__NumericLoss_Fixed (2)
+#define kSC__NumericLoss_Flag (4)
+#define kSC__NumericLoss_LargestFlag (7)
+#define kSC__NumericLoss_Normal (0)
+#define kSC__NumericLoss_Symbol (1)
+#define kSC__OpMode_Addition (16)
+#define kSC__OpMode_AND (8192)
+#define kSC__OpMode_AndOr (4096 | 8192)
 #define kSC__OpMode_Assigns (2)
 #define kSC__OpMode_Bit (4)
-#define kSC__OpMode_CaseAware (16384)
+#define kSC__OpMode_CaseAware (32768)
 #define kSC__OpMode_Compare (1)
 #define kSC__OpMode_CompSet (1 | 2)
-#define kSC__OpMode_Custom (8192)
-#define kSC__OpMode_EqualOrNot (128)
-#define kSC__OpMode_ExactEquals (256 + (64 + (128 + 1)))
-#define kSC__OpMode_ExactlyEquals (64)
-#define kSC__OpMode_ExactNotEquals (256 + (128 + 1))
-#define kSC__OpMode_LargestFlag (32767)
-#define kSC__OpMode_Left (16 + 512)
-#define kSC__OpMode_LeftOnly (16)
-#define kSC__OpMode_LoseBits (1024)
-#define kSC__OpMode_MakesSigned (32)
+#define kSC__OpMode_Custom (16384)
+#define kSC__OpMode_EqualOrNot (256)
+#define kSC__OpMode_ExactEquals (512 + (128 + (256 + 1)))
+#define kSC__OpMode_ExactlyEquals (128)
+#define kSC__OpMode_ExactNotEquals (512 + (256 + 1))
+#define kSC__OpMode_LargestFlag (65535)
+#define kSC__OpMode_Left (32 + 1024)
+#define kSC__OpMode_LeftOnly (32)
+#define kSC__OpMode_LoseBits (2048)
+#define kSC__OpMode_MakesSigned (64)
 #define kSC__OpMode_Math (8)
 #define kSC__OpMode_MathLike (4 | 8)
-#define kSC__OpMode_NilTest (256)
-#define kSC__OpMode_NoExtraBits (512)
-#define kSC__OpMode_OR (2048)
-#define kSC__OpMode_SameOrLessBits (512 | 1024)
+#define kSC__OpMode_NilTest (512)
+#define kSC__OpMode_NoExtraBits (1024)
+#define kSC__OpMode_OR (4096)
+#define kSC__OpMode_SameOrLessBits (1024 | 2048)
 #define kJB__ProcessMode_AutoPrintErrors (4)
 #define kJB__ProcessMode_CaptureAll (1 | 4)
 #define kJB__ProcessMode_CaptureErrors (2)
@@ -2853,11 +2865,6 @@ int SC_Options__InitCode_();
 
 
 
-// Pipe
-bool JB_Pipe__StdOutIsTerminal();
-
-
-
 // Platform
 bool JB_Platform__CPU_ARM();
 
@@ -3433,6 +3440,8 @@ bool SC_FuncPreReader_disabled(SCFunction* self, Message* msg);
 
 bool SC_FuncPreReader_nil(SCFunction* self, Message* msg);
 
+bool SC_FuncPreReader_numeric(SCFunction* self, Message* msg);
+
 bool SC_FuncPreReader_opt(SCFunction* self, Message* msg);
 
 bool SC_FuncPreReader_pragma(SCFunction* self, Message* msg);
@@ -3522,6 +3531,10 @@ void SC_TemporalStatements_crash(SCFunction* fn, Message* node, SCNode* name_spa
 void SC_TemporalStatements_do(SCFunction* fn, Message* node, SCNode* name_space);
 
 void SC_TemporalStatements_ignore(SCFunction* fn, Message* node, SCNode* name_space);
+
+void SC_TestNumeric();
+
+int SC_TestNumeric2(float f);
 
 bool SC_TooManyErrors();
 
@@ -3953,7 +3966,7 @@ JB_String* JB_dbl_Render(double self, int dp, FastString* fs_in);
 
 
 // float
-float JB_f_RoundTo(float self, float to);
+float JB_f_RoundTo(float self, int to);
 
 float JB_f_Fract(float self);
 
@@ -4023,7 +4036,7 @@ int64 JB_int64_OperatorRotl(int64 self, int Amount);
 
 JB_String* JB_int64_Render(int64 self, FastString* fs_in);
 
-void JB_int64_RenderSizePart(int64 self, FastString* fs, float Size, JB_String* Suff);
+void JB_int64_RenderSizePart(int64 self, FastString* fs, int Size, JB_String* Suff);
 
 JB_String* JB_int64_StrSize(int64 self, FastString* fs_in);
 
@@ -4060,6 +4073,8 @@ uint64 JB_uint64_LowestBit(uint64 self);
 
 
 // vec2
+vec2 JB_vec2__New2(float a, float b);
+
 
 
 // vec3
@@ -4212,6 +4227,9 @@ Array* JB_ErrorSeverity__InitNames();
 
 
 
+// FileDes
+
+
 // FileMode
 
 
@@ -4307,6 +4325,9 @@ NilState SC_NilState_StatedReal(NilState self);
 
 bool SC_NilState_SyntaxIs(NilState self, NilState type);
 
+
+
+// NumericLoss
 
 
 // OpMode
@@ -7791,7 +7812,7 @@ void JB_Decl_Destructor(SCDecl* self);
 
 SCDecl* SC_Decl_DownGrade(SCDecl* self);
 
-JB_String* SC_Decl_ExpectFail(SCDecl* self, SCDecl* O);
+void SC_Decl_ExpectFail(SCDecl* self, SCDecl* o, Message* errnode, Message* backup);
 
 Message* SC_Decl_ExpectMatch(SCDecl* self, SCDecl* O, int TypeCast, Message* exp, Message* ErrNode);
 
@@ -9039,6 +9060,8 @@ bool SC_Task_LessThan3_interface_SyntaxCall(JB_Task* self, int i);
 // JB_LessThan3
 bool SC_Task_LessThan3_run(LessThan3* self, int i);
 
+inline float JB_Date_CastFloat(Date self);
+
 inline bool JB_ErrorInt_SyntaxCast(ErrorInt self);
 
 inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker self);
@@ -9121,6 +9144,10 @@ inline SCDecl* SC_TypeOfSwiz(Message* exp, SCNode* name_space, Message* side, SC
 
 
 //// HEADER Inlines.h
+inline float JB_Date_CastFloat(Date self) {
+	return (((float)self) * kJB__Date_kOneStep);
+}
+
 inline bool JB_ErrorInt_SyntaxCast(ErrorInt self) {
 	return self == 0;
 }
@@ -9189,7 +9216,7 @@ inline JB_String* SC_Named_Name(SCNamed* self) {
 	if (self) {
 		return self->Name;
 	}
-	return JB_LUB[276];
+	return JB_LUB[275];
 }
 
 inline bool SC_PA_SyntaxCast(SCParamArray* self) {
@@ -9296,7 +9323,7 @@ inline void SC_Msg_AddValue(Message* self, SCFunction* f) {
 	if ((!JB_Ring_HasChildCount(self, 2))) {
 		if (true) {
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(f->Source);
-			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1370])));
+			JB_Tree_SyntaxAppend(self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1369])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
 			JB_MsgPos_Destructor((&_usingf0));
 		}

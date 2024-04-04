@@ -9,5 +9,5 @@ main (|file| f)
 	|| count = 0
 	for ch in f.parse
 		count += ch == "song"
-	"$count songs in ${size.strsize} (${size2.strsize}) at ${size|float|/count} / song"
+	"$count songs in ${size.strsize} (${size2.strsize}) at ${size|float|/count|float|} / song"
 

@@ -944,6 +944,7 @@ class TextView (GUIControl)
 			is Animation
 		
 		run
+			require .d.parent == .upon._Lines
 			|| start = .upon.XY(.d)
 			|| Particles = 24 
 			for p in particles

@@ -77,7 +77,7 @@ module Math
 		cpp_wrapper (abs)
 	
 	function int.Sqrt (|int|)
-		return self|f64|.sqrt
+		return (self|f64|.sqrt)|int|
 	
 	function f64.Sqrt (|f64|)
 		cpp_wrapper (sqrt)
@@ -181,8 +181,8 @@ function Mix (|vec3| A, |vec3| B, |float| F, |vec3|)
 	cpp_Part Vec3Mix
 	return (((A,0.0)*(1.0-F)) + ((B,0.0) * F)).xyz
 
-function Mix (|ivec2| A, |float| F, |float|)
-	cpp_Part ivec2Mix
+function Mix (|vec2| A, |float| F, |float|)
+	cpp_Part Vec2Mix
 	return (A.x1*(1.0-F)) + (a.x2*F)
 
 

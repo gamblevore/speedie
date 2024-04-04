@@ -108,13 +108,16 @@ helper @string.MainArgSub (|int| Pos,  |string| name, |string| type,   |stringth
 
 helper @FileSizeInt.MainArg (|int| Pos, |string| name,  |FileSizeInt|)
 	|| size = string.MainArgSub(Pos, name, "file-size")$
-	|| Mul = 1
+	|f64| Mul = 1.0
+	|| T = size.length-2
 	if size endswith "kb"
-		mul = 1KB
+		mul = (1KB)|f64|
 	  elseif size endswith "mb"
-		mul = 1MB
+		mul = (1MB)|f64|
 	  elseif size endswith "gb"
-		mul = 1GB
+		mul = (1GB)|f64|
 	  else
-		return size.float
-	return size[0, size.length - 2].float*mul
+		T+=2
+	
+	|| f = size[0, T].float
+	return (f*mul)|FileSizeInt|

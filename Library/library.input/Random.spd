@@ -30,7 +30,7 @@ struct Random
 		if a.isascii and b.isascii
 			fs.size = n
 		for i in n
-			fs.AppendUTF8(self[a,b])
+			fs.AppendUTF8(self[a|float|, b|float|]|codepoint|)
 		return fs
 	
 	
@@ -48,10 +48,10 @@ struct Random
 			return s[0,n]
 	
 	function Int (|f64| n, |int64|) 
-		return .Double * n
+		return (.Double * n)|int64|
 
 	function Double (|f64|)
-		rz = .int|uint64|
+		rz = (.int|uint64|)|f64|
 		rz /= 18446744073709551616.0 
 
 	function Float (|float|) 
@@ -72,12 +72,12 @@ struct Random
 		rz = self[from, to+step]
 		rz -= rz modf step
 		
-	function Float (|float| From, |float| To, |float|step, |float| Pow, |float|) 
+	function Float (|float| From, |float| To, |float|step, |float| Power, |float|) 
 		cpp_part FloatPow
 		rz = self[from, to, step]
-		rz = rz.rangeconvert(from, to, 1, 0)
-		rz = rz pow pow
-		rz = rz.rangeconvert(1, 0, from, to)
+		rz = rz.rangeconvert(from, to, 1.0, 0)
+		rz = rz pow power
+		rz = rz.rangeconvert(1.0, 0, from, to)
 	
 	syntax access (|float| To, |float|) 
 		cpp_part AccessScale
@@ -127,7 +127,7 @@ function float.syntaxcall (|float|)
 	return random.shared.double * self
 
 function int.syntaxcall (|int|)
-	return random.shared.double * self
+	return (random.shared.double * self|f64|)|int|
 
 function int.Rand (|int|)
 	disabled "use 'num()'"

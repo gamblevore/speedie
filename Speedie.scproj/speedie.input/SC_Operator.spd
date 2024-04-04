@@ -11,6 +11,7 @@ datatype OpMode (uint16)
 		|OpMode|
 		CompSet = (Compare, Assigns)
 		MathLike = (Bit, Math)
+		Addition
 		LeftOnly
 		MakesSigned
 		ExactlyEquals
@@ -152,8 +153,8 @@ module {
 		.AddAssign( "=" )
 
 		.AddMath( "mod",	"mod",		&asmops.Mod)
-		.AddMath( "+",		"Plus",		&asmops.Plus)
-		.AddMath( "-",		"Minus",	&asmops.Minus, opmode.makessigned)
+		.AddMath( "+",		"Plus",		&asmops.Plus, opmode.Addition)
+		.AddMath( "-",		"Minus",	&asmops.Minus, opmode.makessigned + opmode.Addition)
 		.AddMath( "*",		"Mul",		&asmops.Mul)
 		.AddMath( "/",		"Divide",	&asmops.Div)
 

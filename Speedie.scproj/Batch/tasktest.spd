@@ -35,5 +35,5 @@ module SCTasks
 
 task LessThan2 (|float| f)
 	run 	(SCTasks.lessthan)
-		return lessthan*2.1 < .f
+		return lessthan|float|*2.1 < .f
 

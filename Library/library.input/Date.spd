@@ -39,17 +39,17 @@ datatype Date (int64)
 	
 	function Rate (|f64|)
 		return 1.0 / .Seconds
+	
 	function Seconds (|f64|)
-		return self|f64| / kOneSecond
+		return self|f64| / kOneSecond|f64|
 	
 	function ReportAgo (|string|)
 		|| s = .seconds
 		|| unit = "s"
 		if s < 0.01
-			s*=1000
+			s*=1000.0
 			unit = "ms"
 		return s.Render + unit
-		
 		
 	function Ago (|date|)
 		if self
