@@ -1,10 +1,5 @@
 
 
-constants
-	kSelfReplace 	= 1
-	kSelfDebug   	= 2
-
-
 module Options
 	flags: native,pack
 	
@@ -47,7 +42,7 @@ module Options
 	||		Products				= native
 	||		Compile32Bit			= maybebool(false)
 	|byte|	Optimise				= 1
-	|byte|	SelfReplacement			= 0
+	|bool|	SelfReplacement			= 0
 	|byte|	OperationCount			= 0
 	|byte|	PerryOutput				= 0
 	|byte|	UseScriptLoc			= 0
@@ -69,7 +64,7 @@ module Feedback
 	function CheckSelfModifying
 		|| t2 = .CheckSelfModifying2
 		if t2 == 1
-			Options.SelfReplacement = kSelfReplace // isselfaltering, isselfmodifying, alteringself, modifyingself
+			Options.SelfReplacement = true // isselfaltering, isselfmodifying, alteringself, modifyingself
 			Options.ExternalCompile = true
 			options.ForceRecompile = true
 			Options.GenFlowControlCode = app.pref("self_flow").yes
@@ -396,17 +391,7 @@ module Feedback
 		+"nocolor"
 			Explain(Purpose, "Don't print text coloring symbols for terminals.")$
 			Options.Color = false
-		
-		+"selfdebug"
-			Explain(Purpose, "Self-test only.")$
-			Options.SelfReplacement = kSelfDebug
-			options.targetdebug = true
-			Options.Compile = false // remove this later
-			options.products &= (~options.pack+options.native) 
-			Options.ExternalCompile = true
-			feedback.TryUseProject( Compiler.SpeedieProj )
-			return true // does something, counts towards operationCount
-		
+				
 		+"optimise"
 			Explain(Purpose, "Optimisation level. (0 to 3... EG: '--Optimise=1')")$
 			Options.Optimise = Value.parseint

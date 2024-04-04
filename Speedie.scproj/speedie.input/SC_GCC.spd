@@ -290,7 +290,7 @@ function ClearThis
 
 
 function IsCompilerAndNeedsInstall (|bool|)
-	require (Options.SelfReplacement == kSelfReplace)
+	require (Options.SelfReplacement)
 	require (StdErr.OK and !Compiler.IsTest)
 	flowcontrol.disabled++
 	rz = (.TestNewCompiler and .BackupCompiler)

@@ -322,8 +322,9 @@ function TypeOfUnit (ExprResolver)
 		Mul = 0
 	  else
 		type = typedate!
+		|| s4 = 64.0*1024.0
 		if unit == "s"
-			mul = 64.0KB
+			mul = s4
 		  elseif unit == "ms"
 			mul = 64.0
 		  elseif unit == "π"
@@ -333,15 +334,15 @@ function TypeOfUnit (ExprResolver)
 			mul = τ
 			type = typef64!
 		  elseif exp.UnitMatch("days", "day")
-			mul = 86400.0 * 64.0KB
+			mul = 86400.0 * s4
 		  elseif exp.UnitMatch("weeks", "week")
-			mul = 604800.0 * 64.0KB
+			mul = 604800.0 * s4
 		  elseif exp.UnitMatch("years", "year")
-			mul = 31536000.0 * 64.0KB
+			mul = 31536000.0 * s4
 		  elseif exp.UnitMatch("mins", "min")
-			mul = 60.0 * 64.0KB
+			mul = 60.0 * s4
 		  elseif exp.UnitMatch("hours", "hour")
-			mul = 3600.0 * 64.0KB
+			mul = 3600.0 * s4
 		  else
 			error (exp, "Unknown unit")
 	
@@ -371,9 +372,7 @@ function TypeOfUnit (ExprResolver)
 
 	if it == str
 		str = it.name
-	// OK... so now what? now what do we do?
-	// how do we know we have 0.1KB? check for a "."? or a fractional part?
-	// where do we check for it, though?
+
 	exp.become(@num, str)
 	it.remove
 	return type.TypeNormal

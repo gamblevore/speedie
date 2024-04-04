@@ -965,7 +965,7 @@ function IsTest (|bool|)
 
 
 function VariantSuffix (|string|)
-	if (Options.SelfReplacement == kSelfReplace) and Options.Compile
+	if (Options.SelfReplacement) and Options.Compile
 		return "Test" + Options.Variant
 	return Options.Variant
 
