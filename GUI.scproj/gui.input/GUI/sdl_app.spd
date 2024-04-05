@@ -8,7 +8,7 @@ module SDLApp
 	|GUIPasteEvent|				AppDocumentOpen
 	|[string]|					PendingAlerts
 	|array?|					DrawDrag = nil
-	|image|						DrawSpace = image("read")
+	|image|						Screen = image("read")
 	|&SDL_Window|				ScreenWindow
 	|&SDL_Renderer|				Renderer
 	|&SDL_Texture|				Raw
@@ -93,7 +93,7 @@ module SDLApp
 		cpp_Wrapper JB_App__InitStuff
 
 
-	function Screen (|ivec4|)
+	function ScreenSize (|ivec4|)
 		cpp_Part GetScreen
 		return (.ScreenOrig.vec4 / .scale).ivec4 	
 
@@ -325,7 +325,7 @@ module SDLApp
 	
 	function Scaling (assigns:|float| scale)
 		|| bigPx = (.SizeOrig.vec2/scale).ivec2
-		.DrawSpace.sizeinfo = bigPx
+		.Screen.sizeinfo = bigPx
 		|| r = .Renderer
 			.Raw = SDL_CreateTexture(r, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, bigPx.x, bigPx.y)
 			.scale = Scale
@@ -526,7 +526,7 @@ module SDLApp
 		require s and d and d != w.currmousedown
 		|| P	= .mousexy
 		|| sigh	= P.grow((6,6))
-		|| img = .DrawSpace
+		|| img = .Screen
 		img.DrawCircleStyled(sigh, ¥.DragAndDrop, 0.0)
 		sigh	= P.grow((10,10))
 		img.DrawCircleStyled(sigh, ¥.DragAndDrop, 7.0)
@@ -571,7 +571,7 @@ module SDLApp
 	helper Window.Reflow (|bool| UsePrev = true, |ivec4|)
 		opt norefcounts
 		|| p = .parent ?? window.all
-		|| D = sdlapp.DrawSpace
+		|| D = sdlapp.Screen
 		|| BigRect = d.rect
 		|| rect = (0,0,0,0)
 		|| b = .prev
@@ -594,9 +594,9 @@ module SDLApp
 		while w1
 			if w1.IsViewable
 				if w1.IsDialog
-					if CanBlur: .DrawSpace.Blur(.BGBlurAmount)
+					if CanBlur: .Screen.Blur(.BGBlurAmount)
 					CanBlur = false
-				w1.DrawWindow(.DrawSpace)
+				w1.DrawWindow(.Screen)
 			w1 = w1.next as window // :O
 		
 		notifications.Draw
@@ -693,7 +693,7 @@ module SDLApp
 			r.dispose
 		|| v = (.NewSize.vec2/.Scale).ivec2
 		.newsize = nil										// phew
-		.DrawSpace.size = v
+		.Screen.size = v
 		.Raw = SDL_CreateTexture(.renderer!, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, v.x, v.y)
 
 		window.all.FullScreen = v
@@ -703,7 +703,7 @@ module SDLApp
 	function StartFrame (|&SDL_Texture| T)
 		opt norefcounts
 		|| stride = 0
-		|| bytes = (&(.DrawSpace._ptr))|&&nil|
+		|| bytes = (&(.Screen._ptr))|&&nil|
 		t.lockThatZerosEventhoughItShouldnt(nil, bytes, &stride)
 		
 

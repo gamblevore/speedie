@@ -2022,7 +2022,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* s) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[1228], (112213506389637)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[1228], (112213696905216)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -2469,16 +2469,16 @@ void SC_Comp__TestDate() {
 	int64 hour = 235929600;
 	int64 min = 3932160;
 	int64 sec = 64 * 1024;
-	if (sec != 65536) {
+	if (sec != 65536.0) {
 		debugger;
 	}
-	if (min != 3932160) {
+	if (min != 3932160.0) {
 		debugger;
 	}
-	if (hour != 235929600) {
+	if (hour != 235929600.0) {
 		debugger;
 	}
-	if (day != 5662310400) {
+	if (day != 5662310400.0) {
 		debugger;
 	}
 }
@@ -3364,7 +3364,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1955]);
-	JB_FS_AppendInt32(_fsf0, (2024040415));
+	JB_FS_AppendInt32(_fsf0, (2024040416));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -4314,7 +4314,7 @@ bool SC_AC__EnterAutoComplete() {
 	if (SC__Options_PrintLibraries) {
 		PicoCommsConf(perry->Pico)->Noise = -1;
 	}
-	PicoGlobalConf()->TimeOut = 1966080;
+	PicoGlobalConf()->TimeOut = 1966080.0;
 	SC__Comp_InPerry = true;
 	SC_AC__PerryTalk(perry);
 	JB_Decr(perry);
@@ -7482,7 +7482,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[926]);
-	JB_FS_AppendInt32(_fsf0, (2024040415));
+	JB_FS_AppendInt32(_fsf0, (2024040416));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7976,7 +7976,7 @@ bool SC_Ext__TransCompile(Array* Files, JB_String* Dest, JB_String* Type) {
 		JB_PrintLine(_tmPf2);
 		JB_Decr(_tmPf2);
 	}
-	JB_Date__Sleep(8192);
+	JB_Date__Sleep(8192.0);
 	bool _tmPf3 = SC_Ext__ExecuteGCC(CompileString);
 	JB_Decr(CompileString);
 	return _tmPf3;
@@ -10904,22 +10904,6 @@ void SC_TemporalStatements_do(SCFunction* fn, Message* node, SCNode* name_space)
 
 void SC_TemporalStatements_ignore(SCFunction* fn, Message* node, SCNode* name_space) {
 	(JB_Tree_Remove(node));
-}
-
-void SC_TestNumeric() {
-	//visible;
-	int64 i64 = 0;
-	int i32 = 0;
-	Date d = 0;
-	float f = 30.0f;
-	d = 1;
-	vec2 v = JB_vec2__New2(i32, i32);
-	SC_TestNumeric2(0);
-	f = JB_Date_CastFloat(d);
-}
-
-int SC_TestNumeric2(float f) {
-	return 0;
 }
 
 bool SC_TooManyErrors() {
@@ -15304,10 +15288,6 @@ uint64 JB_uint64_LowestBit(uint64 self) {
 	return self & (-self);
 }
 
-
-vec2 JB_vec2__New2(float a, float b) {
-	return vec2{a, b};
-}
 
 
 
@@ -22014,15 +21994,15 @@ void JB_FS_RenderSpeed(FastString* self, float seconds, int64 BytesIn, int64 Byt
 	if ((!seconds)) {
 		return;
 	}
-	float scale = 1.0f;
+	float scale = 1048576.0f;
 	byte unit = 'M';
 	float rate = ((float)BytesIn) / (scale * seconds);
-	if (rate >= 1.0f) {
-		rate = (rate / 1.0f);
+	if (rate >= 1024.0f) {
+		rate = (rate / 1024.0f);
 		unit = 'G';
 	}
 	 else if (rate <= 1.0f) {
-		rate = (rate * 1.0f);
+		rate = (rate * 1024.0f);
 		unit = 'K';
 	}
 	int dp = JB_Ternary(rate <= 0.01f, 5, 2);
@@ -31190,6 +31170,17 @@ bool SC_Msg_IsSettablePlace(Message* self) {
 	return SC_Msg_IsFirstOfSetRel(self);
 }
 
+bool SC_Msg_IsSmallInt(Message* self, SCDecl* T) {
+	if (((bool)T) and (self->Func == JB_SyxNum)) {
+		if (JB_Str_ContainsString(self->Name, JB_LUB[354])) {
+			return false;
+		}
+		int64 i = JB_Msg_Int(self, 0);
+		return (i <= 16777216) and (i >= -16777216);
+	}
+	return false;
+}
+
 bool SC_Msg_IsStatementExpr(Message* self) {
 	return SC_Msg_TmpType(self) == kSC__ASMtmp_kStatementExpression;
 }
@@ -35065,7 +35056,7 @@ void SC_Decl_ExpectFail(SCDecl* self, SCDecl* o, Message* errnode, Message* back
 }
 
 Message* SC_Decl_ExpectMatch(SCDecl* self, SCDecl* O, int TypeCast, Message* exp, Message* ErrNode) {
-	if (SC_Msg_IsZero(exp)) {
+	if (((bool)exp) and SC_Msg_IsSmallInt(exp, O)) {
 		TypeCast = (TypeCast | kJB_kTypeCastFromZero);
 	}
 	uint Matched = SC_Decl_TypeMatch(self, O, TypeCast, exp);
@@ -42375,7 +42366,7 @@ int SC_Func_ArgsMatch3(SCFunction* self, int TypeCast, SCDecl* base, bool ThisAl
 		}
 		Message* LArg_ch = JB_Incr(((Message*)JB_Ternary(ThisAlter, PArg_Ch, nil)));
 		int Cast = TypeCast | SelfCast;
-		if (SC_Msg_IsZero(PArg_Ch)) {
+		if (SC_Msg_IsSmallInt(PArg_Ch, PArg_Type)) {
 			Cast = (Cast | kJB_kTypeCastFromZero);
 		}
 		uint Matched = SC_Decl_TypeMatch(FuncArg, PArg_Type, Cast, LArg_ch);
@@ -47855,4 +47846,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 1303267002582374055 4060414611560067244
+// 8216136885283149910 4060414611560067244

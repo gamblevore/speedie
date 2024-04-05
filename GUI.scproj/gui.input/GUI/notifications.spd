@@ -56,7 +56,7 @@ module Notifications
 	function Draw  // drawnotifications, drawnote
 		opt norefcounts
 		for w in .Alerts
-			w.drawwindow(sdlapp.DrawSpace)
+			w.drawwindow(sdlapp.Screen)
 
 
 	function CheckForDisappear

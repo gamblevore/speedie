@@ -947,12 +947,13 @@ class TextView (GUIControl)
 			require .d.parent == .upon._Lines
 			|| start = .upon.XY(.d)
 			|| Particles = 24 
+			|| S = .starttime + .d.position
 			for p in particles
-				|| V2 = (.starttime + p).RandomVec2 - 0.5
-				|| A  = (.starttime - p).RandomVec2 - 0.5
+				|| V2 = (S + p).RandomVec2 - 0.5
+				|| A  = (S - p).RandomVec2 - 0.5
 				A.y *= 4.0
 				V2 = (V2 * 25.0) + .V * 250.0
-				.DrawParticle(V2, A, progress, p|float|, start)
+				.DrawParticle(V2, A, Progress, p|float|, start)
 
 
 		function DrawParticle (|vec2| V, |vec2| A, |float| T, |float| p, |ivec2| start)
@@ -961,12 +962,11 @@ class TextView (GUIControl)
 				str = 0.5
 			|| T2 = T - p * 0.0125
 			|| s = start.vec2 + (V*T2 + A)
-			|| z = vec2(2.5)
-			|| r = (s - z, s + z)
 			|| Alpha = (1.0-(T2*1.5)) * (1.0-T)
-			Alpha *= str * .strength
+			Alpha *= str * .Strength
 			|| C1 = (1.0, 1.0, 2.0, alpha)
-			sdlapp.DrawSpace.DrawCircle2(r, C1)
+			|| Rect = (s-2.5, s+2.5)
+			sdlapp.Screen.DrawCircle2( Rect,  C1 )
 
 
 	helper message.LastAfter (|int| IgnoreAfter, |ind|)
@@ -1931,12 +1931,12 @@ class TextView (GUIControl)
 		return R1
 	}
 	
-	function ScrollToEnd
-		opt norefcounts
-		|| w = .Window
-			w.reflow
-		.preparelinesoftext // sigh
-		.StartWithoutScrollDraw = .FindStayAtEnd
+//	function ScrollToEnd
+//		opt norefcounts
+//		|| w = .Window
+//			w.reflow
+//		.preparelinesoftext // sigh
+//		.StartWithoutScrollDraw = .FindStayAtEnd
 	
 	
 	helper TextCopy (GUICopyEvent)

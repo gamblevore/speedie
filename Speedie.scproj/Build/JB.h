@@ -3532,10 +3532,6 @@ void SC_TemporalStatements_do(SCFunction* fn, Message* node, SCNode* name_space)
 
 void SC_TemporalStatements_ignore(SCFunction* fn, Message* node, SCNode* name_space);
 
-void SC_TestNumeric();
-
-int SC_TestNumeric2(float f);
-
 bool SC_TooManyErrors();
 
 void SC_Tran_ArgArray(Message* Exp, SCNode* name_space, SCDecl* decl);
@@ -4075,8 +4071,6 @@ uint64 JB_uint64_LowestBit(uint64 self);
 
 
 // vec2
-vec2 JB_vec2__New2(float a, float b);
-
 
 
 // vec3
@@ -7300,6 +7294,8 @@ bool SC_Msg_IsSetRel(Message* self);
 
 bool SC_Msg_IsSettablePlace(Message* self);
 
+bool SC_Msg_IsSmallInt(Message* self, SCDecl* T);
+
 bool SC_Msg_IsStatementExpr(Message* self);
 
 bool JB_Msg_IsString(Message* self);
@@ -9062,8 +9058,6 @@ bool SC_Task_LessThan3_interface_SyntaxCall(JB_Task* self, int i);
 // JB_LessThan3
 bool SC_Task_LessThan3_run(LessThan3* self, int i);
 
-inline float JB_Date_CastFloat(Date self);
-
 inline bool JB_ErrorInt_SyntaxCast(ErrorInt self);
 
 inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker self);
@@ -9146,10 +9140,6 @@ inline SCDecl* SC_TypeOfSwiz(Message* exp, SCNode* name_space, Message* side, SC
 
 
 //// HEADER Inlines.h
-inline float JB_Date_CastFloat(Date self) {
-	return (((float)self) * kJB__Date_kOneStep);
-}
-
 inline bool JB_ErrorInt_SyntaxCast(ErrorInt self) {
 	return self == 0;
 }

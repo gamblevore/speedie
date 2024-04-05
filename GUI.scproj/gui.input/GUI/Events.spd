@@ -140,7 +140,7 @@ function ivec2.SDLXY (|ivec2|)
 	|| y = xy.y
 
 	|| w = __modules__.window.front $
-	|| scr = sdlapp.DrawSpace.size.y
+	|| scr = sdlapp.Screen.size.y
 	|| v = (x, scr - y)
 	v -= w.lastrect.xy
 	return v
