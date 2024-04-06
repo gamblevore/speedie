@@ -510,6 +510,11 @@ class GUIControl (list)
 			w.tasks <~ t
 
 
+// should I remove upon... and move duration/start to the task itself?
+// i mean... tasks in general want a time? UNLESS... its like functional programming
+// (which sucks anyhow). I guess we can worry about this when we make functional
+// programming or nested subtasks.
+
 	task TaskGUI ( |...!| Upon,  |date| duration,  |date| StartTime=date.now )
 		contains –parentclass			// super cool feature
 		constructor						// upon,  StartTime,  duration are automatically set
@@ -518,28 +523,7 @@ class GUIControl (list)
 		function Progress (|date| now, |float|)
 			|| Over = now - .StartTime
 			return (Over)|float| / .duration|float|
-		
-		function SmartRun (|bool| Animated, |bool|)
-			opt NoRefCounts
-			require .upon.parent
-			if !animated and self is animation
-				return true
 				
-			|| s = .starttime
-			|| e = s + .duration
-			|| now = sdlapp.LastFrameDate
-			if now >= s
-				if now > e
-					require self isnt finished
-					is Finished
-				is started
-			  elseif self isnt waitstillstart
-				return true
-			|| ok = (self)(.progress(now))
-			if self is Animation
-				sdlapp.touch
-			if self isnt Finished
-				return ok
-		
-		run (|float| progress, |ErrorInt|)
+		run (|window| window, |float| progress, |ErrorInt|)
 			return -1
+

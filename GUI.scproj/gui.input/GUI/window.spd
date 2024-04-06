@@ -472,9 +472,32 @@ class Window (GUIControl)
 		opt norefcounts
 		if !.HaveRunTasks
 			for p in .Tasks
-				if !p.SmartRun(Animated)
+				if !.SmartRunTask(p, Animated)
 					p.Remove
 		.HaveRunTasks = Animated
+
+
+	function SmartRunTask (|taskgui| P,  |bool| Animated, |bool|)
+		opt NoRefCounts
+//			require .upon.parent // perhaps don't do this?
+		if !animated and p is animation
+			return true
+			
+		|| s = p.starttime
+		|| e = s + p.duration
+		|| now = sdlapp.LastFrameDate
+		if now >= s
+			if now > e
+				require p isnt finished
+				(p is Finished)
+			(p is started)
+		  elseif p isnt waitstillstart
+			return true
+		|| ok = (p)(self, p.progress(now))
+		if p is Animation
+			sdlapp.touch
+		if p isnt Finished
+			return ok
 			 
 	
 	iterator
