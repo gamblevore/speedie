@@ -448,7 +448,7 @@
 "0};\n"
 "1"
 "10"
-"hi"
+"Invalid compression created for interpreter"
 "1024"
 "1025"
 "1048576"
@@ -2121,4 +2121,3 @@
 "Missing 'run' statement"
 "Speedie Success"
 "Invalid classlist created for interpreter"
-"Invalid compression created for interpreter"

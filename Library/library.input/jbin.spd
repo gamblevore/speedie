@@ -143,7 +143,7 @@ helper StringReader.NextMsgInfo (|uint64|)
 		return msg|uint64|
 
 	.userobj = nil
-	if info >= 0
+	if info >= 0 // assume that it is OK if we ran out of data
 		expect (T > @nil) (self, "StringReader.IsJBin was not called.")
 		error (self, "Corrupted jbin")
 

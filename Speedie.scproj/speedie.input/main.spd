@@ -2,12 +2,6 @@
 
 main // speedie main {
 	compiler.SetupEnv
-	|| j = jbin()
-	j.addstr("hi")
-	|| s = j.render
-	debugger
-	|| msg = s.parse
-	printline msg
 	compiler.MiniTests
 	compiler.Main
 	compiler.PrintResults
