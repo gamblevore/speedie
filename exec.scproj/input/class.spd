@@ -33,10 +33,9 @@ class Class
 			error (cls, "Missing Type")
 			
 		.src = cls
-		class.table[cls.name.LowerCase] = self
+		class.table.valuelower(cls.name) = self
 
 
-	
 	function CreateLowLevelClass (|int| behaviours, |int| size, |&ClassData|)
 		.realclass = rz
 
@@ -48,6 +47,8 @@ class Class
 		|| b = .src..behaviours
 		// destructor/render should be assumed...
 		|| cls = .CreateLowLevelClass(b.slowcount, .size)
+		if !cls?
+			return 
 		|| i = 0
 		for fn in b
 			cls.Behaviour(i++) = function[fn.int]

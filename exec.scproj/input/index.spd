@@ -9,8 +9,9 @@ conf
 target !fast
 	import "GUI"
 	import "network"
-import "Speedie.scproj/speedie.input/ASMExec"
+import "Speedie.scproj/speedie.input/SpdExec"
 import "temporal"
+
 
 linkage
 	cpp_part pack

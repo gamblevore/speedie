@@ -1,7 +1,14 @@
 //jb
+
 pack
 	debug:
-	meta:
+	meta
+		conf 
+			date // auto-generated
+			name
+			version
+		pictures
+	
 	app 16K
 		strs
 			"hellø"
@@ -10,7 +17,11 @@ pack
 			+"init" #(00000000000000007B00080409A01A0516FF1F040046080700000838FAFF231800000001)#
 			+"main" #(00000000000000007B00080409A01A0516FF1F040046080700000838FAFF231800000001)#
 		clss
-			list
-				filerow2 []
-		link {
-		}
+			+"list"  object
+				size 40
+				behaviours
+					destructor
+					render
+		link
+			"malloc/JB_Alloc/JB_whatever"
+
