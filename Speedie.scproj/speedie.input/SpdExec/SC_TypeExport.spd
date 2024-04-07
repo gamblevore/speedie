@@ -42,8 +42,8 @@ datatype NilState (byte) // Exec.scproj needs this here
 
 struct ASMVarType
 	contains object
-	|int|					Contains // also a class
-	|int|					ClassNum
+	|uint16|				Contains // also a class
+	|uint16|				ClassNum
 	|int|					C_Array
 	|byte|					PointerCount
 	|NilState|				Expected
@@ -51,6 +51,3 @@ struct ASMVarType
 
 // OK, so we wanna export this and import it.
 // can we make this all numbers? no pointers.
-// I could make a type-tree system...
-// so each type is based on another type.
-// |DataTypeCode|  			TypeInfo // belongs on the class
