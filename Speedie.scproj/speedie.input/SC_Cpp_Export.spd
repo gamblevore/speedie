@@ -503,22 +503,8 @@ function ExportClass (|SCClass| cls, |FastStringCpp| CppFile)
 		cppfile <~ "_FuncTable_);\n\n"
 
 
-function scfunction.CanLibLoad (|bool|)
-	require .exportname
-	require !.isdisabled and .iscppinbuilt != 2
-	return .IsSTDLib
-	
-
-function scfunction.WrapName (|string|)
-	if .CanLibLoad
-		if .IsCppInBuilt
-			rz = .ExportNameBuilder + "Wrap"
-		  else
-			rz = .ExportName
-
-
 function MakeWrapperFor (|FastStringCpp| fs, |SCFunction| f)
-	|| n = f.WrapName
+	|| n = f.WrappedName
 	WriteFuncSub( f, n, fs )
 	fs <~ " {\n\t"
 	if f.returnType
@@ -533,8 +519,7 @@ function MakeWrapperFor (|FastStringCpp| fs, |SCFunction| f)
 
 function DoInterpreter
 	require options.ListAllLib
-	if options.ListAllLib
-		compiler.funclist.sort(funcsorter_fn)
+//	compiler.funclist.sort(funcsorter_fn)
 	|| fs = .ModuleProperties
 	.listAllFuncs(fs)
 	.ListAllClasses(fs)
@@ -571,11 +556,18 @@ ignore
 
 function ListAllClasses (|FastStringCpp| fs)
 	|| j = jbin()
+	// not being generated properly?
+	// do we only want the root classes???
+	// i don't think so? // also wants this to be a tree.
+	// what about project classes?
+	
 	for c in Compiler.ClassList
-		if c.IsSTDLib and !c.super
+		if c.IsSTDLib and c.super == typeobject
 			c.LibExport(j)
 	
+	j.up
 	|| s = j.getresult.compress
+	check (s.parse) ("Invalid classlist created for interpreter")
 	fs <~ `__lib__ const char* JB_LibClassInfo = `
 	fs.AppendCpp(s)
 	fs <~ ";
@@ -590,22 +582,27 @@ extern \"C\" JB_String* JB_App__LibClasses() {
 function ListAllFuncs (|FastStringCpp| fs)
 	fs <~ "// entire_function_list\n\n"
 	for f in ExecTable.Funcs
-		if f.isstdlib and f.iscppinbuilt == 1
+		if f.IsStdLib and f.iscppinbuilt == 1
 			.MakeWrapperFor(fs, f)
 	
-	|| bs = jbin()
 	fs <~ "\n__lib__ void* JB_AllFuncsList[] = {\n"
+
+	|| bs = jbin()
 	for f in ExecTable.Funcs
 		if f.isstdlib
 			fs <~ "\t(void*)"
-			|| name = f.WrapName
-				bs.add(@tmp, name)
-				fs <~ name
-				fs <~ ",\n"
-			
+			bs.add(@tmp, f.WrappedName)
+			fs <~ f.wrappedname
+			fs <~ ",\n"
+	
+	bs.up
 	fs <~ "0};\n"
 
-	|| s = bs.getresult.compress
+	|| str = bs.getresult
+	|| s = str.compress
+	|| cmp_test = s.parse
+	check (cmp_test) ("Invalid compression created for interpreter")
+	
 	fs <~ `__lib__ const char* JB_LibFuncInfo = `
 	fs.AppendCpp(s)
 	fs <~ ";\n"
@@ -1540,8 +1537,6 @@ function string.Safe (|faststring| fs)
 prototype fpMsgRenderCpp (|Message| self, |FastStringCpp| fs)
 class FastStringCpp (FastString)
 	|string|		Cpp_Name
-//	|scfunction|	CurrFunc
-
 
 	constructor (|string| name = "")
 		.cpp_name = name

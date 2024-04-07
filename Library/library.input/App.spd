@@ -292,8 +292,8 @@ function LeakMarkMemory
 function LeakUnMarkMemory
 	cpp_wrapper JB_Mem_Unmark
 	
-function ErrorStackTrace (|int| Signal)
-	cpp_wrapper JB__ErrorStackTrace
+//function ErrorStackTrace (|int| Signal)
+//	cpp_wrapper JB__ErrorStackTrace
 	
 function IsQuarantined (|bool|)	
 	return .path contains "/AppTranslocation/"

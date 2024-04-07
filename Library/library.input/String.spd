@@ -467,8 +467,8 @@ class String
 		function Error (|string|)
 			cpp_wrapper JB_Str__Error
 		
-		function Uniqify (|dictionary of string| D)
-			cpp_wrapper JB_Str__Uniqify
+//		function Uniqify (|dictionary of string| D)
+//			cpp_wrapper JB_Str__Uniqify
 
 		function Byte (|int| b, |string|)
 			cpp_wrapper JB_Str__Byte

@@ -143,7 +143,7 @@ JB_StringC* JB_StrC( const char* c ) {
 	return (JB_StringC*)(JB_Str3(c, n));
 }
 
-JB_StringC* JB_StrCN( void* c, int n ) {
+JB_StringC* JB_StrCN( const void* c, int n ) {
 	return (JB_StringC*)JB_Str3((const char*)c, n);
 }
 

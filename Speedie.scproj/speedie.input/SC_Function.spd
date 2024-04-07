@@ -377,9 +377,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		typecast |= ktypecastfromzero
 	
 	|| fin = .args.length
-	|| fi = 0
-	if  (self is constructor)  and  !Incoming.AllowSelfToConstructor
-		fi = 1
+	|| fi = ((self is constructor)  and  !Incoming.AllowSelfToConstructor)|int|
 	
 	debugat 0
 	while fi < fin
@@ -431,7 +429,8 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 
 function scdecl.IsInt (|bool|)
 	return  .isnormal  and  .type.typeinfo.isint
-	
+
+
 function message.IsSmallInt (|scdecl| T, |bool|)
 	if T and (.func == @num)// and T.isint
 		if .name contains "."
@@ -441,11 +440,8 @@ function message.IsSmallInt (|scdecl| T, |bool|)
 		
 		
 function HiderMatch (|bool| IsAssigns, |bool|)
-	if self
-		if .IsAssigns
-			return IsAssigns
-		 // elseif .HidesProperties
-		//	return !IsAssigns
+	if self and .IsAssigns
+		return IsAssigns
 
 
 function DescribeParamFail (|SCParamArray| params, |int| bad)
@@ -642,7 +638,7 @@ function MakeParamsReal // for cpp funcs...
 
 
 function CollectReturnAsReal (|bool|)
-	if .isallocornew and Options.NilTestAllocNeverFails
+	if .IsAllocOrNew and Options.NilTestAllocNeverFails
 		return true
 
 
@@ -1555,7 +1551,7 @@ function NewCppWrapper (CollectFunc)
 	|| thg = @thg + name.name
 	if node == "cpp_inbuilt"
 		thg = thg.WrapWith(@bra)
-	|| IsNothing = node == "cpp_nothing"
+	|| IsNothing = node == "cpp_nothing" // speedie will turn these into ASM isntructions
 	|| IsLib	 = node == "cpp_libwrapper"
 	node.name = "function"
 	node.msg(@Arg).msg(@Tmp, "cpp_wrapper") <~ thg

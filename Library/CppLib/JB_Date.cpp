@@ -65,9 +65,9 @@ bool JB_Date__TrySleep (Date Durr) {
 }
 
 
-uint64 JB_Date__TimeID () {
-	return JB_Date_TimeID(JB_Date__Now());
-}
+//uint64 JB_Date__TimeID () {
+//	return JB_Date_TimeID(JB_Date__Now());
+//}
 
 uint64 JB_Date_TimeID (Date Dt) {
 // 2017y02m13d05h10m --> 2017021305

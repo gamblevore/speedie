@@ -143,7 +143,7 @@ function string.UnicodeSafeName (|faststring| fs_in=nil, |string|)
 		  else
 			fs <~ 'x'
 			fs.appendhex(s)
-	return fs.getresult(fs_in)
+	return fs.GetResult(fs_in)
 
 
 
@@ -167,3 +167,9 @@ datatype SCBlockage (uint)
 	
 	
 	
+function fdb (|[scfunction]| r)
+	opt norefcounts
+	cpp_name fdb
+	visible
+	for f in r
+		printline f.WrappedName

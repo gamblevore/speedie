@@ -349,7 +349,7 @@ function scfunction.FindCppWrapperFunc (|message| place, |message|)
 function scfunction.FoundOneCpp (|string| n, |bool|)
 	if n == "cpp_nothing"
 		.noautocomplete = 1
-		.IsCppInBuilt = 2
+		.IsCppInBuilt = 2 // speedie will turn these into ASM isntructions
 		return true
 	if n == "cpp_inbuilt"
 		.noautocomplete = 1

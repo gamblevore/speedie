@@ -1,6 +1,6 @@
 //jb
 
-pack
+pack "xpd"
 	debug:
 	meta
 		conf 
@@ -12,7 +12,7 @@ pack
 	app 16K
 		strs
 			"hellø"
-			"uwu <3"
+			"goodbye"
 		fncs
 			+"init" #(00000000000000007B00080409A01A0516FF1F040046080700000838FAFF231800000001)#
 			+"main" #(00000000000000007B00080409A01A0516FF1F040046080700000838FAFF231800000001)#

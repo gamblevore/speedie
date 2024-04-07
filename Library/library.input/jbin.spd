@@ -80,7 +80,7 @@ role JBin (Faststring)
 			amount  -= (B-add)
 
 	function AddCstring (|syntax| type=@str, |cstring| data)
-		.addmemory(type, data|&byte|, false, data.length)
+		.AddMemory(type, data|&byte|, false, data.length)
 	
 	function AddMemory (|syntax| type, |&byte| data, |bool| GoIn, |uint64| L)
 		|uint| T = (type|uint|<<1) ||| (goin)
@@ -141,9 +141,11 @@ helper StringReader.NextMsgInfo (|uint64|)
 		if info & 1
 			.userobj = msg
 		return msg|uint64|
-	
-	expect (T > @nil) (self, "StringReader.IsJBin was not called.")
-	error (self, "Corrupted jbin")
+
+	.userobj = nil
+	if info >= 0
+		expect (T > @nil) (self, "StringReader.IsJBin was not called.")
+		error (self, "Corrupted jbin")
 
 
 function StringReader.IsJBin (|bool|)

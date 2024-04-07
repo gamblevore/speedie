@@ -97,16 +97,18 @@ module InternalTable
 
 	function Build (|bool|)
 		|&&nil| Internals 
-		||			spd = package.LibFuncLayout(&Internals).decompress.parse
+		|| spd = package.LibFuncLayout(&Internals).parse
 		rz = .Buildsub(spd.first, internals)
 	
 	function BuildSub (|message| spd, |&&nil| Internals, |bool|)
 		opt norefcounts
 		while spd
-			|| fn = (*Internals++, nil)(*Internals)
-				(InternalTable <~ function(fn, spd)) #loop
-			  else
+			|| fn = *Internals++
+			if !fn
 				error (spd, "Missing cpp function")
+				exit
+				
+			InternalTable <~ function(fn, spd)
 			spd++
 					
 		return (!*Internals) #check "Extra InternalFunction" 

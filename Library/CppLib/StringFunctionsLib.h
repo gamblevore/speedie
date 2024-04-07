@@ -17,7 +17,7 @@ JB_String* JB_StrFromPtr(void* c, int N, void* Free, void* Obj);
 JB_String* JB_Str__Freeable(uint8* p, int n);
 JB_String* JB_Str__Freeable0(const char* Msg);
 JB_StringC* JB_StrC( const char* c );
-JB_StringC* JB_StrCN( void* c, int N );
+JB_StringC* JB_StrCN( const void* c, int N );
 
 
 struct MiniStr;

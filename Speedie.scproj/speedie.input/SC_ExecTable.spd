@@ -8,25 +8,46 @@ module ExecTable
 	
 	function FuncFile (|file|)
 		return compiler.Library.child("funcs.jbin")
+	
 	function GlobFile (|file|)
 		return compiler.Library.child("globals.jbin")
 		
-	function AddAll (|[scfunction]| fl, |bool| WantLib)
+	function AddAll (|bool| WantLib, |faststring| fs)
 		opt norefcounts
-		for f in Compiler.FuncList // this is already sorted
-			if f.CanLibLoad == WantLib
-				f.Addtotable(fl)
+		for f in Compiler.FuncList
+			if f.CanLibLoad and (WantLib == f.IsStdLib)
+				.funcs <~ f
+				if f.IsCppInbuilt
+					f.WrappedName = f.ExportName + "Wrap"
+				  else
+					f.WrappedName = f.exportname
+		
+		.funcs.sort(ExecSorter)
+		
+		for (f in .funcs) (i)
+			f.tableid = i
+			fs <~ f.WrappedName
+			fs <~ '\n'
 	
 	function Run 
-		.AddAll(.funcs, true)
 		|| f = .FuncFile
-			f.SmartData = .FuncStr
-		
-	function scfunction.Addtotable (|[SCNode]| r)
-		r <~ self
-		.tableid = r.length
+			|| fs = FastString()
+			.AddAll(true, fs)
+			f.SmartData = fs
 	
-	render FuncStr
-		for f in .funcs
-			fs <~ f.exportname
-			fs <~ '\n'
+
+function scfunction.WrappedName (assigns:|string| s)
+	.description = s
+	
+function scfunction.WrappedName (|string|)
+	return .description
+	
+helper ExecSorter (sortercomparer)
+	return (a|scfunction|).Description < (b|scfunction|).Description
+
+
+
+function scfunction.CanLibLoad (|bool|)
+	require !.ismacro and !.isdisabled and .iscppinbuilt != 2
+	if !.exportname
+	return true

@@ -1,6 +1,6 @@
 
 
-main 	  	  	  	  	  	 	// main {
+main 	  	  	  	 // execmain {
 	error.AutoPrint = 1
 	InternalTable.Build						#require
 	package.LoadPack						#require

@@ -1841,13 +1841,10 @@ extern Dictionary* JB__TC_Types_Dict;
 #define kJB__TC_Vec2 (1 + (32 + (64 + (128 + 8))))
 #define kJB__TC_Vec3 (2 + (32 + (64 + (128 + 8))))
 #define kJB__TC_Vec4 (3 + (32 + (64 + (128 + 8))))
-#define kJB__Date_kClocksPerSecond (1000000)
-#define kJB__Date_kOneSecond (65536)
 #define kJB__Date_kOneStep (0.000015258789f)
 #define kJB__Date_kSecondsPerDay (86400)
 #define kJB__Date_kSecondsPerMonthApprox (2628000)
 #define kJB__Date_kSecondsPerWeek (604800)
-#define kJB__Date_kTickBits (16)
 #define kSC__DeclMode_Always (64)
 #define kSC__DeclMode_FuncParam (4)
 #define kSC__DeclMode_FunctionBody (8)
@@ -2532,11 +2529,9 @@ int JB_ErrorColors__InitCode_();
 
 
 // ExecTable
-void SC_ExecTable__AddAll(Array* fl, bool WantLib);
+void SC_ExecTable__AddAll(bool WantLib, FastString* fs);
 
 JB_File* SC_ExecTable__FuncFile();
-
-JB_String* SC_ExecTable__FuncStr(FastString* fs_in);
 
 int SC_ExecTable__Init_();
 
@@ -3388,9 +3383,13 @@ SCDecl* SC_DoOpCompare(Message* exp, SCDecl* lc, SCDecl* rc, SCOperator* comp, S
 
 JB_String* JB_EntityTest();
 
+bool SC_ExecSorter(JB_Object* a, JB_Object* b);
+
 Message* SC_ExpandToBool(Message* inside, SCNode* name_space);
 
 SCDecl* SC_ExtractDecl(Message* c, SCNode* name_space, DeclMode Purpose);
+
+void fdb(Array* r);
 
 Message* SC_FindBytePos(Message* Node);
 
@@ -3449,8 +3448,6 @@ bool SC_FuncPreReader_pragma(SCFunction* self, Message* msg);
 bool SC_FuncPreReader_real(SCFunction* self, Message* msg);
 
 bool SC_FuncPreReader_todo(SCFunction* self, Message* msg);
-
-bool SC_funcsorter_fn(JB_Object* a, JB_Object* b);
 
 int JB_Init_();
 
@@ -6741,6 +6738,8 @@ void JB_bin_AddInt(FastString* self, int64 data);
 
 void JB_bin_AddMemory(FastString* self, Syntax type, byte* data, bool GoIn, uint64 L);
 
+void JB_bin_AddStr(FastString* self, JB_String* data);
+
 void JB_bin_CloseSection(FastString* self, uint c);
 
 FastString* JB_bin_Constructor(FastString* self, Syntax type, JB_String* data);
@@ -8614,8 +8613,6 @@ void SC_Func_AddSelfPrm(SCFunction* self, SCClass* cls);
 
 void SC_Func_AddSelfToFunc(SCFunction* self, SCClass* cls, SCNode* space);
 
-void SC_Func_Addtotable(SCFunction* self, Array* r);
-
 void SC_Func_AnalyseRefs(SCFunction* self, Array* list);
 
 int SC_Func_ApparantArgCount(SCFunction* self);
@@ -8834,7 +8831,9 @@ int SC_Func_VisibleArgs(SCFunction* self);
 
 void SC_Func_WantAs(SCFunction* self, NilState NS);
 
-JB_String* SC_Func_WrapName(SCFunction* self);
+void SC_Func_WrappedNameSet(SCFunction* self, JB_String* s);
+
+JB_String* SC_Func_WrappedName(SCFunction* self);
 
 Message* SC_Func__AlterPostCond(Message* PostCond, Message* IterPostCond, Message* NodeSrc);
 

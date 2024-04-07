@@ -1,6 +1,6 @@
 
 
-class StringReader
+class StringReader 
 	|int|						Length
 	|FastBuff|					Data
 	|file?|						File

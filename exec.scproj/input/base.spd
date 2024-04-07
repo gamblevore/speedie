@@ -16,7 +16,8 @@ module package
 		cpp_wrapper JB_App__LibClasses
 	
 	function LibClasses (|message|)
-		return .LibClassLayout().decompress.parse
+		opt norefcounts
+		return .LibClassLayout().parse
 	
 	
 	function LoadAppClasses (|message| list)
@@ -28,6 +29,7 @@ module package
 
 
 	function LoadPack (|bool|)
+		opt norefcounts
 		.GetStructure
 		require StdErr.ok
 		class.Grab(.libClasses, nil)
@@ -36,6 +38,7 @@ module package
 	
 	
 	function GetStructure (|int|)
+		opt norefcounts
 		|| pk			= .InputPack
 		|| app_			= pk..app			#check "Missing 'app'"
 
@@ -53,8 +56,9 @@ module package
 		
 
 	function InputPack (|messageroot|)
+		opt norefcounts
 		|| x = app.args[0]
-		x := "~/Speedie/exec.scproj/demo.jx"
+		x := "~/Speedie/exec.scproj/demo.xpd"
 		|| fl = x.FileThatExists("load executable")
 			return fl.parse[@tmp, "pack"]
 

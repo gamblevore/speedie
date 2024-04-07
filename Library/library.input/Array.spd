@@ -88,8 +88,8 @@ class Array (saveable)
 	function Reverse
 		cpp_wrapper JB_Array_Reverse
 	
-	function Insert (|int| Pos, || Value)
-		cpp_wrapper JB_Array_Insert
+//	function Insert (|int| Pos, || Value)
+//		cpp_wrapper JB_Array_Insert
 	
 	function Remove (|int| Pos)
 		cpp_wrapper JB_Array_Remove

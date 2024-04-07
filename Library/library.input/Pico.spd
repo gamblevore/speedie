@@ -31,8 +31,8 @@ struct Pico
 	linkage: wrapper, cpp_part Pico, cpp_class PicoComms
 		
 
-	function CreateChild (|&pico|)
-		cpp_wrapper PicoChild
+//	function CreateChild (|&pico|)
+//		cpp_wrapper PicoChild
 
 	function IsParent (|bool|)
 		cpp_wrapper PicoIsParent

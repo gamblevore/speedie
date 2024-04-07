@@ -66,7 +66,8 @@ module TreeAssembler
 		for l in exp / ','
 			|| fn = compiler.ExportNames[l]
 			if fn isa SCFunction
-				fn.addtotable(rz)
+				rz <~ fn
+				fn.tableid = rz.length
 		
 		
 	function StampAll (|[scfunction]| Funcs)

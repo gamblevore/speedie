@@ -2,9 +2,10 @@
 // Copyright, Theodore H. Smith 2023.
 // Released under jeebox-licence http://jeebox.org/licence.txt
 
-#if !defined(__JB_NETWORK__)
-	void JB_CurlStub();
+#if defined(__JB_NETWORK__)
+	void JB_CurlStub() {;}
 #else
+#define __JB_NETWORK__
 
 
 

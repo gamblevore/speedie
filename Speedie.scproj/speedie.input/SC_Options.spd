@@ -98,6 +98,7 @@ module Feedback
 		if ""
 			"".debugprint // stop from being stripped
 			nil|message|.jdb2
+			fdb(nil|[scfunction]|)
 	
 	
 	function ParseArgsSub (|[]| args, |bool|) 

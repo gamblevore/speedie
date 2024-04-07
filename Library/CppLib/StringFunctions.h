@@ -138,7 +138,7 @@ int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int Expected);
 
 //JB_String* JB_Str_Mid(JB_String* self, int Start, int Count);
 JB_String* JB_Str_Range(JB_String* self, int Start, int Finish);
-void JB_Str__Uniqify(Dictionary* D);
+//void JB_Str__Uniqify(Dictionary* D);
 JB_String* JB_Str_Left(JB_String* self, int Count);
 JB_String* JB_Str_Right(JB_String* self, int Count);
 JB_String* JB_Str_OperatorPlus(JB_String* self, JB_String* other);
