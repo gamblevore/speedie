@@ -1,6 +1,6 @@
 
 
-datatype JSM (uint) // lol
+datatype JSM (uint)
 datatype ASM (JSM)
 	flags
 		Jump			= 32

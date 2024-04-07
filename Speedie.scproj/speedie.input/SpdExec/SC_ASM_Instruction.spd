@@ -3,22 +3,6 @@
 // why is this needed by exec?
 // exec wants to be able to load stuff, so we need the ASM datatype?
 // or just fake one. We just wanna call the VM really.
-// perry, exec-vm, speedie
-// how should they coordinate?
-// perry displays stuff...
-// exec will run the stuff
-// but who or how does the debugging get done? Do we need speedie for this?
-// its just a bunch of types and ways to print those types, right?
-// exec can do that? We don't need speedie, for that?
-// not even for debugging? Again... types and methods of printing them.
-// that should do everything we need.
-// So speedie is just for compilation, then. And reporting errors back to perry about compiles.
-// So... what do I need the instruction for then?
-// Well... I guess to display the current instruction so we can step through it ASM at a time?
-// seems like something we'll need
-
-// the other idea is just to run speedie as a lib.
-// so... we won't need most of it?
 
 
 class Instruction // class instruction
