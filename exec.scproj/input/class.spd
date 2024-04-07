@@ -61,16 +61,17 @@ class Class
 				c.Loadbehaviours
 			return true
 
-		function Grab (|message| all, |class| parent)
+		function GrabClasses (|message| all, |class?| parent=nil)
 			opt norefcounts
 			require all == @arg
 			for msg in all
 				|| c = class.new(msg)
 				c.super = parent
 				class.list <~ c
-				.grab(msg.last, c)
+				.GrabClasses(msg.last, c)
 			// load with jbin? we'll need a list of them!
 	
+		|class|					Object
 		|[class]|				List
 		|dictionary of class|	Table = dictionary.new
 

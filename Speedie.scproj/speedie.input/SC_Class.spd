@@ -71,7 +71,8 @@ constructor (|Message| node, |SCNode| parent, |bool| HasPtrs, |scmodule| m)
 	.name = LoadClassName(node)
 	.Source = node
 	.Modul = m
-	.project = parent.project
+//	if self ~= "bytemap"
+//	.project = parent.project // bad
 	.IsVisible = SCNode.CurrVisibility
 	.saveas = ""
 	.TypeInfo = DataTypeCode.UnusedType

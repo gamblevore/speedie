@@ -17,16 +17,12 @@ module ExecTable
 		for f in Compiler.FuncList
 			if f.CanLibLoad and (WantLib == f.IsStdLib)
 				.funcs <~ f
-				if f.IsCppInbuilt
-					f.WrappedName = f.ExportName + "Wrap"
-				  else
-					f.WrappedName = f.exportname
 		
 		.funcs.sort(ExecSorter)
 		
 		for (f in .funcs) (i)
-			f.tableid = i
-			fs <~ f.WrappedName
+			f.TableID = i
+			fs <~ f.exportname
 			fs <~ '\n'
 	
 	function Run 
@@ -34,13 +30,14 @@ module ExecTable
 			|| fs = FastString()
 			.AddAll(true, fs)
 			f.SmartData = fs
-	
 
-function scfunction.WrappedName (assigns:|string| s)
-	.description = s
-	
+
 function scfunction.WrappedName (|string|)
-	return .description
+	if .iscppinbuilt
+		return .exportname + "Wrap"
+	  else
+		return .exportname
+
 	
 helper ExecSorter (sortercomparer)
 	return (a|scfunction|).Description < (b|scfunction|).Description

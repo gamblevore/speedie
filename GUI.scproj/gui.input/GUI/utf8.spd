@@ -1,8 +1,7 @@
 
 
-// watch those morons burn
-
-
+// unused so far... also incomplete?
+// should represent an entire glyph. like a bunch of codepoints.
 
 
 class GlyphString
@@ -17,13 +16,13 @@ class GlyphString
 		.pos = pos
 
 	function Next (|string|)
+		require self
 		|| p = .pos
-		require (p < .text.Length)
 		.Length = .text[p].utf8size
 		.Pos = p + .Length
 		return .text[p, .pos]
 
 	syntax cast (|bool|)
-		return self!=nil and .Pos < .Length
+		return self!=nil and .Pos < .text.Length
 
 

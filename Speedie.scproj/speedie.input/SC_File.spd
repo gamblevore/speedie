@@ -32,7 +32,8 @@ class SCFile (file)
 			(message).restore
 	
 	
-	function Use
+	function Use 
+		scimport.curr = .proj
 		|| l = .LiveAst // if parse fails...
 			l.memoryLayer.Use
 	

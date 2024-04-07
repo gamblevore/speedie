@@ -14,7 +14,7 @@ import "temporal"
 
 
 linkage
-	cpp_part pack
+	cpp_part Pack
 
 
 compile_linking

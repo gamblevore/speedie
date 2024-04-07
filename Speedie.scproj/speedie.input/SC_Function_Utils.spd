@@ -172,4 +172,4 @@ function fdb (|[scfunction]| r)
 	cpp_name fdb
 	visible
 	for f in r
-		printline f.WrappedName
+		printline f.Exportname

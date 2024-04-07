@@ -53,28 +53,35 @@ function String.ParseWithError (|&Error| rec, |MessageRoot|)
 		if rec: *rec = r 
 
 
-helper String.ExecuteableJBin (|ind|)
-	|ind| nl = 0
+helper String.IsJbin (|ind|)
 	if  *self == '#'  and  self[1] == '!' // shebang
-		nl = .find('\n') + 1
-		if nl == 0
-			return -1
-	if .isjbin
-		return nl
+		|| nl = .find('\n')
+			nl++
+			if self[nl, _JbinHeader]
+				return nl
+	  elseif self[0, _JbinHeader]
+		return 0
 	return -1
 
 
 function String.Parse (|syntax| owner = @arg, |bool| AllowDecomp=true,  |MessageRoot|)
-	// language2.scproj uses owner
-	|| data = self
-	if allowdecomp and .iscompressed
+	|| data = self[.isjbin max 0, int.max]
+
+	if AllowDecomp and data.iscompressed
 		data = data.decompress(int.max)
-	|| j = data.ExecuteableJBin
-		return data[j, int.max].parsejbin
+	|| j2 = data.isjbin
+		data = data[j2, int.max]
+		rz = data.parsejbin
+	  else
+		rz = data.parsesub(owner, allowdecomp)
+		
+
+
+helper String.ParseSub (|syntax| owner, |bool| AllowDecomp,  |MessageRoot|)
+	// language2.scproj uses owner
 	if !Parser.CppInited
 	    Parser.Init
-
-	parser.StartParse( data )
+	parser.StartParse( self )
 	parser.StopBars = 0
 	|| OK		= StdErr.mark
 	|| Flags	= parser.kTemporal

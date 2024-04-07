@@ -1,7 +1,7 @@
 
  
 module package
-	linkage: cpp_part pack
+	linkage: cpp_part Pack
 	|memory|		globals
 	|config|		funcs
 	|config|		linkage
@@ -11,33 +11,37 @@ module package
 	
 	function LibFuncLayout (|&&&nil| funcs, |string|)
 		cpp_wrapper JB_App__LibFuncs
-	
+
+
 	function LibClassLayout (|string|)
 		cpp_wrapper JB_App__LibClasses
 	
-	function LibClasses (|message|)
-		opt norefcounts
-		return .LibClassLayout().parse
-	
 	
 	function LoadAppClasses (|message| list)
+		opt norefcounts
 		for s in list
-			|| cls = class.Table[s.name]
-				class.grab(s[@arg], cls)
-			  else
-				error (s, "Linked to missing class: " + s.name)
+			|| SuperCls = s.next.Supper
+				class.GrabClasses(s[@arg], SuperCls)
+	
+
+	function message.Supper (|class|)
+		opt norefcounts
+		if !self
+			return class.object
+			
+		return (class.Table[.name])  #expect (self, "Linked to missing class")
 
 
 	function LoadPack (|bool|)
 		opt norefcounts
-		.GetStructure
-		require StdErr.ok
-		class.Grab(.libClasses, nil)
-		.LoadAppClasses(.ProjClasses)
-		return stderr.ok
+		if .GetStructure
+			|| all_cls = .LibClassLayout.parse 
+			class.GrabClasses(all_cls)
+			.LoadAppClasses(.ProjClasses)
+			return stderr.ok
 	
 	
-	function GetStructure (|int|)
+	function GetStructure (|bool|)
 		opt norefcounts
 		|| pk			= .InputPack
 		|| app_			= pk..app			#check "Missing 'app'"
@@ -53,6 +57,7 @@ module package
 		|| g = app_.int						#check "No globals requested."
 		(g <= 256MB)						#check "Over 256MB of globals requested."
 		.glob(g)
+		return stderr.ok
 		
 
 	function InputPack (|messageroot|)
@@ -61,4 +66,3 @@ module package
 		x := "~/Speedie/exec.scproj/demo.xpd"
 		|| fl = x.FileThatExists("load executable")
 			return fl.parse[@tmp, "pack"]
-
