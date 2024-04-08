@@ -779,15 +779,6 @@ function BuildConstructors
 function SortModulesAndClasses 
 	.ModuleList.sort(ModulesSorter)
 	.ClassList.sort(ClassSorter)
-
-
-/*
-function TaskPropertySorter (SorterComparer)
-	opt norefcounts
-	|| aa = a|scdecl|
-	|| bb = b|scdecl|
-	return aa.isobject >= bb.isobject
-*/
 	
 
 function ClassSorter (SorterComparer)

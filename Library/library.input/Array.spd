@@ -5,10 +5,11 @@
 
 
 class Array (saveable)
+	size 24
 	linkage
 		wrapper
 
-	default		Array.new
+	default		array.new
 	contains	object
 
 	|int|		Marker

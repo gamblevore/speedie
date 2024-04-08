@@ -60,7 +60,7 @@ function CanOpt (|bool| force, |bool|)
 	if force
 		return true
 	|| c = CurrClass
-		return !c.minopt
+		return !c.MinOpt
 
 
 function OptStart (|FastStringCpp| fs, |int| m, |bool| force = 0)
@@ -90,7 +90,6 @@ function FuncStart (|FastStringCpp| fs, |scfunction| f, |string| funcheader)
 
 
 function CanExportFunc (|SCFunction| F, |bool|)
-	if f ~= "GUI_GUITask_Constructor"
 	require f.NeedsExport
 	if !f.IsExternalLib
 		require !f.IsWrapper and !f.isMacro
@@ -426,7 +425,7 @@ function FastStringCpp.AppendBehaviour (|string| name, |SCFunction| fn, |SCClass
 	self <~ ";\n"
 
 
-function ExportBehaviourInstance (|SCClass| cls, |FastStringCpp| fs, |bool|)
+function ExportBehaviourInstance (|SCClass| cls,  |FastStringCpp| fs,  |bool|)
 	|| b		= cls.behaviour									#require
 	|| TableCls = b.FuncTable!.cls
 	|| N		= TableCls.CstructName
@@ -439,6 +438,7 @@ function ExportBehaviourInstance (|SCClass| cls, |FastStringCpp| fs, |bool|)
 	fs <~ N
 	fs <~ " Result;\n"
 	
+	// behaviours are exported here! 679
 	fs.AppendBehaviour("", cls.destructorfunc, nil)
 	
 	while (b)
@@ -522,26 +522,45 @@ function DoInterpreter
 	.ExportAllClasses(.ModuleProperties)
 
 
-
 function SCClass.LibExport (|jbin| j, |bool| IsProj)
 	opt norefcounts
 	j.enter(@tmp, .name)
-	j.addint(.size)
-
-	j.enter(@list)
+	|| sz = (0, .size)(.iswrapper)
+	j.addint(sz)
+	
 	|| fn_list = .behaviour!.WrapperFuncs
-	for fn in fn_list
-		j.add(@thg, fn.exportname)
+	j.enter(@list)
+
+	|| name = "0"
+	|| df = .destructorfunc
+		name = df.exportname
+	j.add(@thg, name)
+
+	|| b = .behaviour
+	while (b)
+		for (M in b.interfaces)
+			|| fn = .BestBehaviourFor(m.name.InterfaceToBehaviour)
+				|| BaseClass = .InterfaceForBehaviour(fn)
+					j.add(@thg, fn.exportname)
+				  //else
+					 // seems to never happen?
+		b = b.upwards
+	
 	j.up
 
-	j.enter
+	|| MadeList = false	
 	for c in .children
-		if !c.isrole
-			if IsProj or c.isstdlib
-				c.libexport(j, IsProj)
+		if !c.isrole and (IsProj or c.IsStdLib)
+			if !MadeList
+				MadeList = true
+				j.enter
+			c.libexport(j, IsProj)
+
+	if MadeList
+		j.up
 	j.up
 
-	j.up
+
 
 
 function ExportAllClasses (|FastStringCpp| fs)
@@ -549,16 +568,14 @@ function ExportAllClasses (|FastStringCpp| fs)
 	typeobject!.LibExport(j, false)
 	
 	|| ClassExport = j.GetResult.compress
-	
-	check (ClassExport.parse) ("Invalid classlist created for interpreter")
 	fs <~ `__lib__ const char* JB_LibClassInfo = `
 	fs.AppendCpp(ClassExport)
-	fs <~ ";
+	fs   <~   ";
 extern \"C\" JB_String* JB_App__LibClasses() {
 	return JB_StrCN(JB_LibClassInfo, ${ClassExport.length});
 }
 "
-	// just need a func to actually read it.
+
 
 
 

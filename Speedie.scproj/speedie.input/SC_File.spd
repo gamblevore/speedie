@@ -10,7 +10,6 @@ class SCFile (file)
 	|string|		FData
 	|Message?|		LiveAST
 	|Message?|		OrigAST
-//	|date|			OrigDate
 	|uint16|		filenum
 	|bool|			IsInternal
 
@@ -19,8 +18,8 @@ class SCFile (file)
 		super.constructor((f.path, "")(f != nil))
 		flow off
 		.Proj = p
-		.isinternal = f == nil
-		.liveast = .start_ast
+		.IsInternal = f == nil
+		.LiveAST = .start_ast
 		Compiler.stTotalFileCount += .isinternal
 		(SCImport.Recent max= f.modified) 
 	

@@ -132,10 +132,20 @@ dispatch ClassLinkageTable (TranFunc)
 	+"visible"				{} // (SCFunction.Tran_Visible)
 	+"ignore"				{}
 	+"noearlyfree"			{}
-//	dontdestructlocally {}
-	+"wrapper"				{} //if name_space.mustbe(scclass) : name_space.IsWrapper = true}
+
+	+"wrapper"
+		if name_space isa scclass
+			name_space.IsWrapper = 1
+			|| f = node.first
+				f.expect(@thg)
+				f.expectlast
+				if f == "union"
+					name_space.iswrapper = 2
+				  else
+					error (f)
+
 	+"datatype"
-		if name_space.mustbe(SCClass, node)
+		if name_space isa SCClass
 			expect (name_space.isstruct) (node, "Expected this for a struct")
 			|| value = node[@thg]
 				value.expectlast

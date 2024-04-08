@@ -2,6 +2,7 @@
 // not the same as charset, charset has multiple-classes
 // like 1,2,3,4, etc.
 class ByteMap
+	size 260
 	linkage
 		wrapper
 		cpp_class ByteMap

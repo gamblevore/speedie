@@ -71,8 +71,6 @@ constructor (|Message| node, |SCNode| parent, |bool| HasPtrs, |scmodule| m)
 	.name = LoadClassName(node)
 	.Source = node
 	.Modul = m
-//	if self ~= "bytemap"
-//	.project = parent.project // bad
 	.IsVisible = SCNode.CurrVisibility
 	.saveas = ""
 	.TypeInfo = DataTypeCode.UnusedType
@@ -794,13 +792,9 @@ function TryAddToProject
 module
 	function SCClass.LoadLinkage
 		opt NoRefCounts
-		|| Arg = .LinkagePlace 				#require
-		if arg.DeprecatedClassOption("wrapper", "union") // for SDL2
-			.iswrapper = 2
-		  elseif arg.DeprecatedClassOption("wrapper")
-			.iswrapper = 1
+		|| Arg = .LinkagePlace 					#require
+
 		.NoAutoComplete = arg.DeprecatedClassOption("noauto")
-		  
 		.NoEarlyFree = arg.DeprecatedClassOption("pragma", "NoEarlyFree")
 		.TreatAsBaseType = arg.DeprecatedClassOption("pragma", "TreatAsBaseType")
 		.minopt = arg.DeprecatedClassOption("opt", "min")

@@ -91,16 +91,12 @@ class SCBehaviour (SCNode)
 	
 	
 	function SCClass.BestBehaviourFor (|string| name, |SCFunction|)
-		// Erm... we need to go through our behaviours, not our functions.
-		// or else... its bad.
-		
+		opt norefcounts
 		|| b = .behaviour
 		while (b)
 			|| fn = b[name]
 			if (fn isa SCFunction)
 				return fn
-			  elseif (fn)
-				debugger
 			b = b.upwards
 
 	
@@ -156,7 +152,7 @@ class SCBehaviour (SCNode)
 		return self[2, .length-2].lowercase
 
 		
-	function SCClass.ProcessBehaviours
+	function SCClass.ProcessBehaviours 
 		|| B = .behaviour										#require
 		|| Table = b.FuncTable									#require
 		|| TableCls = Table.cls									#require
@@ -220,7 +216,7 @@ class SCBehaviour (SCNode)
 	
 	function SCFunction.AddSelfPrm (|SCClass| cls)
 		|| prms = .source.find(@prm)
-		|| name = .source.first	#expect (.source, "No name found")
+		|| name = .source.first			#expect (.source, "No name found")
 		using name
 			if !prms
 				prms = «prm »

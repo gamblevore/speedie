@@ -2,9 +2,6 @@
 // Copyright, Theodore H. Smith 2019.
 // Released under jeebox-licence http://jeebox.org/licence.txt
 
-// OK so... we could merge constuctors and newing...
-// to have a "constuctornew" func... that returns a new object if nil
-
 
 /*
 Hidden Caches:
@@ -44,29 +41,29 @@ void JB_Sav_SaveWrite(Saveable* self, void* Saver);
 void JB_Sav_LoadProperties(Saveable* self, void* Other);
 void JB_Dict__Init();
 
-JBClassPlace( JB_String,        JB_BA_Destructor,      JB_AsClass(JB_Object),      JB_Str_Render );
-JBClassPlace( JB_StringC,       0,                     JB_AsClass(JB_String),      JB_Str_Render );
-JBClassPlace( JB_StringShared,  JB_Str_Destructor,     JB_AsClass(JB_String),      JB_Str_Render );
-JBClassPlace( JB_StringExternal,JB_XStr_Destructor,    JB_AsClass(JB_String),      JB_Str_Render );
-JBClassPlace( JB_String4,       0,                     JB_AsClass(JB_String),      JB_Str_Render );
-JBClassPlace( JB_String20,      0,                     JB_AsClass(JB_String),      JB_Str_Render );
+JBClassPlace( JB_String,		JB_BA_Destructor, 		JB_AsClass(JB_Object),		JB_Str_Render );
+JBClassPlace( JB_StringC,		0,                		JB_AsClass(JB_String),		JB_Str_Render );
+JBClassPlace( JB_StringShared,	JB_Str_Destructor,		JB_AsClass(JB_String),		JB_Str_Render );
+JBClassPlace( JB_StringExternal,JB_XStr_Destructor,		JB_AsClass(JB_String),		JB_Str_Render );
+JBClassPlace( JB_String4,		0,						JB_AsClass(JB_String),		JB_Str_Render );
+JBClassPlace( JB_String20,		0,						JB_AsClass(JB_String),		JB_Str_Render );
 
-JBClassPlace( Dictionary1,      JB_Dict_Destructor,    JB_AsClass(JB_Object),      0 );
-JBClassPlace( Dictionary2,      JB_Dict_Destructor,    JB_AsClass(JB_Object),      0 );
-JBClassPlace( Dictionary3,      JB_Dict_Destructor,    JB_AsClass(JB_Object),      0 );
-JBClassPlace( Dictionary4,      JB_Dict_Destructor,    JB_AsClass(JB_Object),      0 );
-JBClassPlace( DictionaryLeaf,   JB_Leaf_Destructor,    JB_AsClass(JB_Object),      0 );
-JBClassPlace( DictionaryReader, JB_Nav_Destructor,     JB_AsClass(JB_Object),      0 );
+JBClassPlace( Dictionary1,		JB_Dict_Destructor,		JB_AsClass(JB_Object),		0 );
+JBClassPlace( Dictionary2,		JB_Dict_Destructor,		JB_AsClass(JB_Object),		0 );
+JBClassPlace( Dictionary3,		JB_Dict_Destructor,		JB_AsClass(JB_Object),		0 );
+JBClassPlace( Dictionary4,		JB_Dict_Destructor,		JB_AsClass(JB_Object),		0 );
+JBClassPlace( DictionaryLeaf,	JB_Leaf_Destructor,		JB_AsClass(JB_Object),		0 );
+JBClassPlace( DictionaryReader, JB_Nav_Destructor,		JB_AsClass(JB_Object),		0 );
 
-JBClassPlaceSaver( Dictionary,	JB_Dict_Destructor,    JB_AsClass(Saveable),       JB_Dict_Render,  JB_Dict_LoadProperties,		JB_Dict_SaveCollect, JB_Dict_SaveWrite );
-JBClassPlaceSaver( Array,       JB_Array_Destructor,   JB_AsClass(Saveable),       JB_Array_Render, JB_Array_LoadProperties,	JB_Array_SaveCollect, JB_Array_SaveWrite );
-JBClassPlaceSaver( Saveable,	0,                     0,                          0,               JB_Sav_LoadProperties,                       JB_Sav_SaveCollect, JB_Sav_SaveWrite );
+JBClassPlaceSaver( Dictionary,	JB_Dict_Destructor,		JB_AsClass(Saveable),		JB_Dict_Render,  JB_Dict_LoadProperties,		JB_Dict_SaveCollect,	JB_Dict_SaveWrite );
+JBClassPlaceSaver( Array,       JB_Array_Destructor,   	JB_AsClass(Saveable),		JB_Array_Render, JB_Array_LoadProperties,	JB_Array_SaveCollect,	JB_Array_SaveWrite );
+JBClassPlaceSaver( Saveable,	0,                     	0,                         0,               JB_Sav_LoadProperties,      JB_Sav_SaveCollect,		JB_Sav_SaveWrite );
 
-JBClassPlace( FastString,       JB_FS_Destructor,      JB_AsClass(JB_Object),      JB_FS_Render );
-JBClassPlace( ByteMap,          0,                     JB_AsClass(JB_Object),      0 );
-JBClassPlace( CharSet,			0,                     JB_AsClass(JB_Object),      JB_CS_Render );
-JBClassPlace( JB_List,			JB_Ring_Destructor,    JB_AsClass(Saveable),       JB_List_Render );
-JBClassPlace( TokHan,			0,                     JB_AsClass(JB_Object),      0 );
+JBClassPlace( FastString,		JB_FS_Destructor,		JB_AsClass(JB_Object),		JB_FS_Render );
+JBClassPlace( ByteMap,			0,						JB_AsClass(JB_Object),		0 );
+JBClassPlace( CharSet,			0,						JB_AsClass(JB_Object),		JB_CS_Render );
+JBClassPlace( JB_List,			JB_Ring_Destructor,		JB_AsClass(Saveable),		JB_List_Render );
+JBClassPlace( TokHan,			0,						JB_AsClass(JB_Object),		0 );
 
 extern JB_Class JB_TaskData;
 
@@ -105,12 +102,12 @@ static JB_StringC* emptystr() {
 }
 
 
-CharSet* JB_CS_Constructor(CharSet* self, JB_String* Source, bool Ranges);
-JB_String** JB_Str__FindGlobals(u8** src, uint64* Hash);
-void JB_RemoveHandlers();
+CharSet*	JB_CS_Constructor	(CharSet* self, JB_String* Source, bool Ranges);
+JB_String** JB_Str__FindGlobals	(u8** src, uint64* Hash);
+void		JB_RemoveHandlers	();
 
 
-static uint DecodeLength(u8*& p) {
+static uint DecodeLength (u8*& p) {
 	int lim = 256-8;
 	uint rz = *p++;
 	if (rz >= lim) {
@@ -125,14 +122,16 @@ static uint DecodeLength(u8*& p) {
 	return rz;
 }
 
-void JB_Load_StrError(int num) {
+
+void JB_Load_StrError (int num) {
 	char  s[] = "jb.loadglob ";
 	s[11] = num+'0';
 	AddError(EILSEQ, s);
 	debugger;
 }
 
-void JB_Str__LoadGlobals() {
+
+void JB_Str__LoadGlobals () {
 	u8*					Start = 0;
 	uint64				StoredHash = 0;
 	JB_String**			Write = JB_Str__FindGlobals(&Start, &StoredHash);

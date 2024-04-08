@@ -1,6 +1,7 @@
 
 
 class ProcessOwner
+	size 32
 	linkage
 		wrapper
 		cpp_part PID

@@ -493,7 +493,7 @@ class GUIControl (list)
 		for r in self
 			|| r2 = r
 			r2.refsanity
-	
+
 
 	task SlideOpen (TaskGUI, |movecode| Dir = MoveCode.Open)
 		run 
@@ -509,9 +509,8 @@ class GUIControl (list)
 		|| w = .window
 			w.tasks <~ t
 
-
-// should I remove upon... and move duration/start to the task itself?
-// i mean... tasks in general want a time? UNLESS... its like functional programming
+// Should I remove upon... and move duration/start to the task itself?
+// I mean... tasks in general want a time? UNLESS... its like functional programming
 // (which sucks anyhow). I guess we can worry about this when we make functional
 // programming or nested subtasks.
 

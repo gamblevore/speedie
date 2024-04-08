@@ -10,6 +10,7 @@
 // abcd+numbers = continuation class :)
 
 class Charset
+	size 260
 	linkage
 		wrapper
 		cpp_class CharSet

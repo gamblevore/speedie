@@ -8,6 +8,7 @@
 //// Advice: Avoid using dictname within anything fast unless wrapped with norefcounts
 
 class Dictionary (saveable)
+	size 2080 // wow. would be great to use fixeddict instead.
 	linkage
 		wrapper
 		cpp_part Dict
@@ -100,6 +101,7 @@ class Dictionary (saveable)
 
 
 class DictionaryReader
+	size 48
 	linkage
 		wrapper
 	contains		object	
