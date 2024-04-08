@@ -18,31 +18,28 @@ function FoundListKeys (GuiKeyEvent)
 
 function DebugArgsGotFocus (guiaction)
 	opt norefcounts
-	|| v = state == 1
-	if (self is visible) != v
-		if self isa textview
-			.UpdateDebugArgs(v)
-	.SlideOpen(0.125s, (movecode.open)(v) )
+	|| vis = state == 1
+	if  self isa textview
+		.InitDebugArgs
+		if !vis
+			.save
+	.SlideOpen(0.5s, (movecode.open)(vis) )
 
 
-
-function textview.UpdateDebugArgs (|bool| Visible=false)
+function textview.InitDebugArgs
 	|| f = .ide.DebugArgsFile
 	if !.Document
 		.LoadDocument(Document(f))
 	if !.text
-		.text = defaultfiles.DebugArgs
-	if visible
-		.window.SetInnerFocus(self)?
-	  else
-		.Save
+		.text = DefaultFiles.DebugArgs
+//	if visible
+//		.window.SetInnerFocus(self)?
 		
 
 function fnStillRunning (fnConfirmCanceller)
 	if self isa perryide
 		.UpdateDebuggedApp(false)
-		if !.RunCompiledApp
-			return true
+		return .RunCompiledApp
 
 	
 function Window.Confirm (|string| Q, |fnConfirmCanceller| fn, |bool|)
@@ -68,8 +65,9 @@ function ClickedDebug (GUIAction)
 
 
 function PressingDebug (GUIAction)
-	|| d = .ide!.DebugArgsList
-	DebugArgsGotFocus(d, 1)
+	opt norefcounts
+	|| i = .ide!
+	i.DebugArgsList.setfocus
 
 
 function perryide.DebugEnvs (|message| env)
@@ -116,8 +114,8 @@ function perryide.DebugPath (|file| f, |message| conf)
 function PerryIDE.StartDebugging (|file!| f)
 	require f.MustExist and StdErr.ok
 
-	.DebugArgsList.UpdateDebugArgs
-	|| debugargs = .DebugArgsFile.parse				#require
+	.DebugArgsList.InitDebugArgs
+	|| debugargs = .DebugArgslist.text.parse		#require
 	|| ArgMsg = DebugArgs["args"]					#require
 	ArgMsg = ArgMsg.Copy
 	for a in ArgMsg

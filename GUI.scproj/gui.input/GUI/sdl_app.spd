@@ -201,7 +201,6 @@ module SDLApp
 		app.ClearCaches
 		|uint| n 
 		while .SingleFrame
-			window.RunAllTasks
 			if n++ isa 512
 				app.ClearCaches //  :)
 		.Quit
@@ -620,6 +619,7 @@ module SDLApp
 		.StartResize
 		|| Dlg = .DialogIsOpen
 		for w  in  window.all
+			w.RunmyTasks(false)
 			w.FixFocus
 			if !dlg or w.IsLiveAction // stop needless updates
 				w.__FrameUpdate__(dlg or w.openedmenu or .IsBackground)

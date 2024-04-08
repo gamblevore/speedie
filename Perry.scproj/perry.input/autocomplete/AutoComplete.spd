@@ -175,7 +175,7 @@ function PerryIDE.DisplayStr (|message| f, |bool|)
 
 
 function PerryIDE.DisplayInPopup (|string| s,  |bool| instant,  |vec4| Color=vec4(),  |ivec2| Corner=.PopupDisplayCorner)
-	// using guitask would be better... sigh.
+	// using GUITask would be better... sigh.
 	|| sizer_str = s.wrap(80)
 	|| size = .PopupDisplay.TextSize(sizer_str) + (10, 2)
 	(size.x max= 40)
@@ -198,7 +198,7 @@ function PerryIDE.DisplayInPopup (|string| s,  |bool| instant,  |vec4| Color=vec
 
 function PerryIDE.StartPopupVis (|bool| instant)
 	if !.PopupDateOn
-		// using guitask would be better... sigh.
+		// using GUITask would be better... sigh.
 		|| add = (-10.0s, 0.5s)(instant or keys.CmdAgo(2s))
 		.PopupDateOn = date.now + add
 	.PopupDisplayFadeIn

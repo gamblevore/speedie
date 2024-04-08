@@ -9,7 +9,6 @@ class Window (GUIControl)
 	|bool|								FlashSelf
 	|bool|								BlockRecurseKeyDown
 	|bool| 								IsLiveAction
-	|bool| 								HaveRunTasks
 	|GUIControl?|						Focus
 	|Guicontrol?|						InnerFocus
 	|GUIControl?|						CurrMouseDown
@@ -151,8 +150,9 @@ class Window (GUIControl)
 	helper SetFocus (|guicontrol| Focus)
 		.FocusAttempt = Focus
 		if focus
-			require focus.Takesfocus.able and (focus is visible)
-
+			require focus.Takesfocus.able	// and (focus is visible) // fixfocus will fix it.
+											// besides, important events could be missed, like a task
+											// that makes the control visible and slides it open.
 		if focus == .inlineeditor
 			.setInnerFocus(focus)
 			return
@@ -292,7 +292,7 @@ class Window (GUIControl)
 		.__draw__(where)
 		|| gd = .GNormal.Drawer
 			(gd)(where, .LastRect, .GNormal, true)
-		.RunAllTasks(true)
+		.RunmyTasks(true)
 
 
 	behaviour Draw
@@ -468,22 +468,16 @@ class Window (GUIControl)
 				return Found
 
 
-	function RunAllTasks (|bool| Animated)
+	function RunMyTasks (|bool| AnimationsOnly)
 		opt norefcounts
-		if !.HaveRunTasks
-			for p in .Tasks
-				if !.SmartRunTask(p, Animated)
+		for p in .Tasks
+			if (p is animation) == AnimationsOnly
+				if !.SmartRunTask(p, AnimationsOnly)
 					p.Remove
-		.HaveRunTasks = Animated
 
 
 	function SmartRunTask (|taskgui| P,  |bool| Animated, |bool|)
-		opt NoRefCounts
-//			require .upon.parent // perhaps don't do this?
-		if !animated and p is animation
-			return true
-			
-		|| s = p.starttime
+		|| s = p.StartTime
 		|| e = s + p.duration
 		|| now = sdlapp.LastFrameDate
 		if now >= s
@@ -491,9 +485,11 @@ class Window (GUIControl)
 				require p isnt finished
 				(p is Finished)
 			(p is started)
-		  elseif p isnt waitstillstart
+		  elseif P is WaitStillStart
 			return true
-		|| ok = (p)(self, p.progress(now))
+
+		|| Prog = p.progress(now)
+		|| ok = (p)(self, Prog)
 		if p is Animation
 			sdlapp.touch
 		if p isnt Finished
@@ -533,11 +529,6 @@ class Window (GUIControl)
 			for w in .all
 				if (w is visible) and !w.isdialog
 					rz++
-
-		function RunAllTasks
-			opt norefcounts
-			for w  in  .all
-				w.RunAllTasks(false)
 		
 
 

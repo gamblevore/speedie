@@ -70,13 +70,22 @@ extern "C" {
 //	}
 
 	double JB_Pow10(int x) {
+		if (x > 350) x = 350;
 		double rz = 1.0;
 		for_(x) {
 			rz *= 10.0;
 		}
 		return rz;
 	}
-
+	
+	double JB_Pow0_1(int x) {
+		if (x > 350) x = 350;
+		double rz = 1.0;
+		for_(x) {
+			rz *= 0.1;
+		}
+		return rz;
+	}
     
     u32 JB_uint_hash (u32 x) {
         x ^= x >> 16;
