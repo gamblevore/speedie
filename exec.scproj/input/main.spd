@@ -2,14 +2,13 @@
 
 main 	  	  	  	 // execmain {
 	error.AutoPrint = 1
-	Linker.LoadLibFuncs						#require
+	libtable.LoadLib						#require
 	class.LoadInbuiltClasses				#require
 	
 	package.GetStructure					#require
+	function.Loadfuncs						#require
 	class.LoadAppClasses					#require
-	Linker.LinkProj							#require
-	function.LoadApp						#require
-	class.Behave							#require
+	apptable.LinkEmUp‼						#require
 	debugger.load
 	rz  = apptable[0]!.Run
 	rz := apptable[1]!.Run

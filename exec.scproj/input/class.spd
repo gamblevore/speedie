@@ -9,31 +9,47 @@ class Type (Class)
 class Class 
 	linkage
 		cpp_class ClsInfo
-	|string|				Name
-	|?Message|				Src
-	|?class|				Super
-	|&classdata|			RealClass
+	|stringzeroterminated|				Name
+	|?Message|							Src
+	|?class|							Super
+	|&classdata|						RealClass
 	
 	
 	constructor (|!&classdata| Cls)
+		opt norefcounts
 		.realclass = cls
 		.name = string.Wrap(cls.name)
 		addclass(self)
 	
-	constructor (|message!| Cls, |class!| Parent)
+
+	constructor (|message!| Ch)
 		opt norefcounts
-		.name = cls.name
-		.src = cls
+		debugat
+		|| pr = ch[@str]
+		|| nums = pr.next(@adj)
+		|| sz = nums[@num]
+		|| sb = sz.next(@num).int
+		|| beh = nums.next(@list)
+		|&ClassData| ParentCls
+		|| parent = class.Table[pr.name]
+			parentcls = parent.realclass
+		  else
+			error (pr, "Linked to missing class")		
+		
+		.name = ch.name.cstr
+		.src = Ch
 		.super = parent
-		|| cstr = .name.cstr.cstring
-		|| f = cls.first
-		|| b = f.next.slowcount
-		.realclass = classdata.new(cstr, f.int, parent.realclass, b max 2)
+		
+		|| bc = beh.slowcount max sb max 2
+		.RealClass = classdata.new(.name.cstring, sz.int, parentcls, bc)
+		.LoadBehaviours(sb)
 		addclass(self)
+
 
 	function Size (|int|)
 		return .realclass.size
-		
+	
+	
 	function LoadSuper 
 		opt norefcounts
 		|| P = .realclass.Parent
@@ -42,9 +58,11 @@ class Class
 				.super = cls
 				return
 		.super = Obj
-		
+	
+	
 	syntax equals (|string| s, |bool| aware, |bool|)
 		return .name ~= s
+	
 	
 	render
 		|| sup = .super.name?
@@ -54,51 +72,44 @@ class Class
 	function ClassData.Behaviour (assigns:|int| i, |function| fn)
 		//.behaviour
 
+
 	helper ClassData.Behaviour (|int| i, assigns:|&nil| Beh)
 		cpp_wrapper JB_SetBehaviour	
 	
 
-	function LoadBehaviours
-		|| b = .src.second
+/*
+		clss
+			+"mycuteclass"   "list"         16~2  (des1, ren1)
+			+"mycuteclass2"  "mycuteclass"  24~2  (des2, ren2)
+*/
+	function LoadBehaviours	(|int| sb)
+		opt norefcounts
+		|| list = .src.last
 		|| i = 0
-		for fn in b
-			.realclass.Behaviour(i++) = function[fn.int]
+		for fn in list
+			.realclass.Behaviour(i++) = function[fn]
 		
 				
 	module
-		function Behave (|bool|)
-			opt norefcounts
-			for c in .list
-				c.Loadbehaviours
-			return true
-
 		function AddClass (|class| c)
 			.list <~ c
 			.table.valuelower(c.name) = c
 		
-	
+
 		function LoadAppClasses (|bool|)
 			opt norefcounts
-			for s in package.ProjClasses
-				|| SuperCls = s.next.Supper
-					class.JbinClasses(s[@arg], SuperCls)
+			for ch in package.ProjClasses
+				|| c = class.new(ch)
 			return stderr.ok
 
 
 		function LoadInbuiltClasses (|bool|)
 			opt norefcounts
-			object.TotalSanity(true)
 			for cd in ClassData.first
-				|| c = class.new(cd)
-				if c.name ~= "Object"
-					.obj = c
-//			debugger
-			|| o = .Obj
-				for c in .list
-					c.LoadSuper
-//			|| all_cls = package.LibClassLayout.parse 
-//			class.JbinClasses(all_cls, o)
-			object.TotalSanity(true)
+				class.new(cd)
+			.obj = table.valuelower("object")$
+			for c in .list
+				c.LoadSuper
 			return stderr.ok
 		
 		
@@ -107,15 +118,6 @@ class Class
 				|| s = n.str
 				rz = self.valuelower(s)
 			
-		function JbinClasses (|message| all, |!class| parent)
-			opt norefcounts
-			require all.expect(@arg)
-			for msg in all
-				|| c = class.new(msg, parent)
-				|| arg = msg.last
-				if arg == @arg
-					.JbinClasses(arg, c)
-
 	
 		|class|					Obj
 		|[class]|				List

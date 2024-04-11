@@ -1,4 +1,5 @@
 
+
 class function
 	|int|				Index
 	|int|				Length
@@ -6,27 +7,38 @@ class function
 	|Message?|			Src
 	|?&ASMblob|			SpeedieFunc
 	|?&nil|				CFunc
-
-	constructor (|string| name)
-		cpp_Part Basic
-		.name  = name
 	
-	constructor (|?&nil| cpp, |message| spd)
+
+	constructor (|message| spd)
+		opt norefcounts
 		.name = spd.name
-		|| ASM = spd[0]
 		.speediefunc = nil
-		if asm == @sstr or @bin       // noice
-			|| s    = asm.name
-			|| blob = s.addr|&ASMBlob|
-			|| n    = (s.length/4) - 2
-			// we actually aren't allowed to write to string addresses!!
-			// right? I mean... internal ones anyhow?
-			.length = n
-			check (n > 0) ("Missing asm for: " + .name)
-			check (!blob.guard and !blob.callcount) ("Corrupted asm for: " + .name)
-			blob.guard = bear // bobobear
-			blob.callcount = 0
-			.speediefunc = blob
+		|| ASM = spd.first
+		if asm.IsString
+			.LoadCode(asm)
+		  else
+			asm.Expect(@bin)
+		
+
+	
+	constructor (|?&nil| fn, |string| name)
+		.name = name
+		.CFunc = fn
+	
+		
+	function LoadCode (|message| asm)
+		opt norefcounts
+		|| s    = asm.name
+		|| blob = s.addr|&ASMBlob|
+		|| n    = (s.length/4) - 2
+		// we actually aren't allowed to write to string addresses!!
+		// right? I mean... internal ones anyhow?
+		.length = n
+		check (n > 0) ("Missing asm for: " + .name)
+		check (!blob.guard and !blob.callcount) ("Corrupted asm for: " + .name)
+		blob.guard = bear // bobobear
+		blob.callcount = 0
+		.speediefunc = blob
 	
 	
 	function Run (|int64|)
@@ -52,95 +64,87 @@ class function
 		bear = 0xB0B0BA14
 
 	module
-		function LoadApp (|bool|)
+		function LoadFuncs (|bool|)
 			opt norefcounts
 			for spd in package.funcs 
-				|| fn = function(nil, spd)
-				(apptable <~ fn) #loop
-				fn.LinkCpp
-				fn.LinkSpd
+				|| fn = function(spd)
+				linker <~ fn
+				if apptable <~ fn
+					fn.LinkCpp
+					fn.LinkSpd
 
-			check (apptable.table >= 1) ("Missing 'init'")
-			check (apptable.table >= 2) ("Missing 'main'")
+			check (AppTable.table >= 1) ("Missing 'init'")
+			check (AppTable.table >= 2) ("Missing 'main'")
 			return stderr.ok
 			
+		syntax access (|message| s, |function|)
+			if s == @num
+				return self[s.int]
+			return Linker[s.name]
 		
 		syntax access (|int| i, |function|)
-			if i > 0
-				return apptable[i]
-			return Linker[1-i]
+			if i & 1
+				return apptable[i >> 1]
+			return libtable[i >> 1]
 
 	
 	
 	
 	
 	
-//////////          //////////            //////////
-// our super table thingy				  //////////
-//////////          //////////            //////////
-
 module Linker
-	|[function]|				Table
-	|dictionary of function|	Names
-	|string|					Failed
+	|dictionary of function|	AllFuncs = dictionary()		// this is for the entire app...  inbuilt,  and pack combined
 
-	syntax append (|function| fn, |bool|)
-		ifn (.table < 16K)
-			error ("Too many functions")
-			return false
-		fn.index = .table.length
-		.table <~ fn
-		return true
+	syntax append (|function| fn)
+		AllFuncs.ValueLower(fn.name) = fn
 		
-	syntax access (|int| i, |function|)
-		return .table[i]
+	syntax access (|string| s, |function|)
+		return .AllFuncs.ValueLower(s)
 
-	function LoadLibFuncs (|bool|)
+
+
+
+module LibTable	
+	|[function]|				Funcs
+
+	function AddLibFunc (|function| fn, |bool|)
+		expect (.Funcs < 16K) ("Too many functions")
+		fn.index = .Funcs.length
+		.Funcs <~ fn
+		linker <~ fn
+		return true
+	
+	
+	syntax access (|int| i, |function|)
+		return .Funcs[i]
+
+
+	function LoadLib (|bool|)
 		|&&nil| Internals 
 		|| spd = package.LibFuncLayout(&Internals).parse
-		rz = .Buildsub(spd.first, internals)
+		rz = .LoadLibSub(spd.first, internals)
+
 	
-	function BuildSub (|message| spd, |&&nil| Internals, |bool|)
+	function LoadLibSub (|message| spd, |&&nil| Internals, |bool|)
 		opt norefcounts
 		while spd
-			|| fn = *Internals++
-			if !fn
-				error (spd, "Missing cpp function")
-				exit
+			|| fn = *Internals++  #expect  (spd, "Missing cpp function")
 				
-			Linker <~ function(fn, spd)
+			require .AddLibFunc( function(fn, spd.name) )
 			spd++
 					
 		return (!*Internals) #check "Extra InternalFunction" 
 		
 
-	function LinkProj (|bool|)
-		Description "Checks that stdlib has all needed functions... and gets a reference to them."
-		
-		debugger
-		|| list = StringFields(package.linkage.name, '\n')
-		.LoadNameTableSub(list)
-		expect !.Failed ("Lib lacks needed function: " + .failed)
-		return stderr.ok 
 
-
-	function LoadNameTableSub (|StringFields| flist)
-		opt norefcounts
-		for l in flist
-			.Failed = l
-			if l
-				|| name = Linker.names[l]		#require
-				AppTable.linkorder <~ name
-		.Failed = ""
-
-
-
-module AppTable
+module AppTable 
+	|int|			FnLim = 64K // allow configure? its more about corrupted files,
+								// Not "we can't handle more"!
 	|[function]|	Table
 	|[function]|	LinkOrder 
 
 	syntax append (|function| fn, |bool|)
-		if (.table < 4M)
+		if (.table < FnLim)
 			fn.index = .table.length
 			.table <~ fn
 			return true
@@ -148,6 +152,26 @@ module AppTable
 	
 	syntax access (|int| i, |function|)
 		return .table[i]
+		
+	function LinkEmUp‼ (|bool|)
+		Description "Checks that stdlib has all needed functions... and gets a reference to them."
+		
+		debugger
+		|| list = StringFields(package.linkage.name, '\n')
+		.LoadNameTableSub(list)
+		return stderr.ok
+
+
+	function LoadNameTableSub (|StringFields| flist)
+		opt norefcounts
+		for name in flist
+			if name
+				|| fn = Linker[name]
+					AppTable.linkorder <~ fn
+				  else
+					error "Can't find function: " + name
+
+		
 
 //////////          //////////            //////////
 //////////          //////////            //////////

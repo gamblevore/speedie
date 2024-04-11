@@ -67,11 +67,11 @@ struct SDL_TextEditingEvent
     
     function Str (|string|)
 		|| b = (&.text[0])|cstring|
-		return string.fromc(b).copy
+		return string.wrap(b).copy
 	
 	render
 		|| b = (&.text[0])|cstring|
-		fs <~ string.fromc(b)
+		fs <~ string.wrap(b)
 
 
 

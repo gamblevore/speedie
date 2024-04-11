@@ -15,31 +15,31 @@ module package
 
 	function LibClassLayout (|string|)
 		cpp_wrapper JB_App__LibClasses
-	
 
-	function message.Supper (|class|)
+
+	function message.Arg (|string| name, |bool| Err=false, |message|)
 		opt norefcounts
-		if !self
-			return class.list[0]
-			
-		return (class.Table[.name])  #expect (self, "Linked to missing class")
-
+		|| Ch = self[name]
+			return ch
+		if !err
+			return message()
+		.AccessErr(@tmp, name)
 	
 	
 	function GetStructure (|bool|)
 		opt norefcounts
 		|| pk			= .InputPack
-		|| app_			= pk..app			#check "Missing 'app'"
+		|| app			= pk.arg("app", true)
 
-		debugger.root	= pk..debug
-		debugger.meta	= pk..meta
+		debugger.root	= pk.arg("debug")
+		debugger.meta	= pk.arg("meta")
 		
-		.strings		= app_..strs ?? Message()
-		.projclasses	= app_..clss ?? message()
-		.funcs			= app_..fncs		#check "Missing 'fncs'"
-		.linkage		= app_..link		#check "Missing 'link'"
+		.strings		= app.arg("strs")
+		.projclasses	= app.arg("clss")
+		.funcs			= app.arg("fncs", true)
+		.linkage		= app.arg("link", true)
 
-		|| g = app_.int						#check "No globals requested."
+		|| g = app.int						#check "No globals requested."
 		(g <= 256MB)						#check "Over 256MB of globals requested."
 		.glob(g)
 		return stderr.ok

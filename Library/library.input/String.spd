@@ -442,11 +442,11 @@ class String
 			cpp_wrapper JB_Str__Freeable
 		function Copy (|&byte| addr,  |int| n, |string|)
 			cpp_wrapper JB_Str_CopyFromPtr
-		function Wrap (|cstring| Addr, |string|)
+
+		function Wrap (|cstring| Addr, |stringzeroterminated|)
 			return stringzeroterminated(addr)
 
-		
-		function Copy (|cstring| str, |string|)
+		function Copy (|cstring| str, |stringzeroterminated|)
 			cpp_wrapper JB_Str_CopyFromCString
 
 		function Hex (|int64| i, |string|)

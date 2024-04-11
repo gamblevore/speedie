@@ -23,7 +23,7 @@ module clipboard
 
 
 function cstring.SDLText (|string|)
-	|| s = string.fromc(self).copy
+	|| s = string.wrap(self).copy
 	memory.free(self|&byte|)
 	return s
 

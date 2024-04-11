@@ -114,7 +114,7 @@ class Object
 	module
 		function DebugAllMemory (assigns:|bool|)
 			cpp_wrapper JB_DebugAllMemory
-		function TotalSanity (|bool| Force=false, |bool|)
+		function TotalSanity (|bool| Force=true, |bool|)
 			cpp_wrapper JB_TotalSanity
 			// something like that?
 
