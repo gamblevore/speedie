@@ -26,7 +26,7 @@ class function
 		.CFunc = fn
 	
 		
-	function LoadCode (|message| asm)
+	function LoadCode (|message| ASM)
 		opt norefcounts
 		|| s    = asm.name
 		|| blob = s.addr|&ASMBlob|
@@ -64,19 +64,6 @@ class function
 		bear = 0xB0B0BA14
 
 	module
-		function LoadFuncs (|bool|)
-			opt norefcounts
-			for spd in package.funcs 
-				|| fn = function(spd)
-				linker <~ fn
-				if apptable <~ fn
-					fn.LinkCpp
-					fn.LinkSpd
-
-			check (AppTable.table >= 1) ("Missing 'init'")
-			check (AppTable.table >= 2) ("Missing 'main'")
-			return stderr.ok
-			
 		syntax access (|message| s, |function|)
 			if s == @num
 				return self[s.int]
@@ -119,7 +106,7 @@ module LibTable
 		return .Funcs[i]
 
 
-	function LoadLib (|bool|)
+	function LoadLibFuncs (|bool|)
 		|&&nil| Internals 
 		|| spd = package.LibFuncLayout(&Internals).parse
 		rz = .LoadLibSub(spd.first, internals)
@@ -140,18 +127,18 @@ module LibTable
 module AppTable 
 	|int|			FnLim = 64K // allow configure? its more about corrupted files,
 								// Not "we can't handle more"!
-	|[function]|	Table
+	|[function]|	Funcs
 	|[function]|	LinkOrder 
 
 	syntax append (|function| fn, |bool|)
-		if (.table < FnLim)
-			fn.index = .table.length
-			.table <~ fn
+		if (.Funcs < FnLim)
+			fn.index = .Funcs.length
+			.Funcs <~ fn
 			return true
 		error (package.funcs, "Too many functions")
 	
 	syntax access (|int| i, |function|)
-		return .table[i]
+		return .Funcs[i]
 		
 	function LinkEmUp‼ (|bool|)
 		Description "Checks that stdlib has all needed functions... and gets a reference to them."

@@ -70,7 +70,7 @@ class Class
 
 
 	function ClassData.Behaviour (assigns:|int| i, |function| fn)
-		//.behaviour
+		// what if some behaviours are C++ and others speedie? do we need two func-tables?
 
 
 	helper ClassData.Behaviour (|int| i, assigns:|&nil| Beh)

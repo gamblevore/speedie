@@ -2,11 +2,11 @@
 
 main 	  	  	  	 // execmain {
 	error.AutoPrint = 1
-	libtable.LoadLib						#require
+	libtable.LoadLibFuncs					#require
 	class.LoadInbuiltClasses				#require
 	
 	package.GetStructure					#require
-	function.Loadfuncs						#require
+	package.Loadfuncs						#require
 	class.LoadAppClasses					#require
 	apptable.LinkEmUp‼						#require
 	debugger.load

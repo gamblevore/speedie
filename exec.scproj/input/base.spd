@@ -51,3 +51,19 @@ module package
 		x := "~/Speedie/exec.scproj/demo.xpd"
 		|| fl = x.FileThatExists("load executable")
 			return fl.parse[@tmp, "pack"]
+
+
+	function LoadFuncs (|bool|)
+		opt norefcounts
+		expect (package.funcs.hasany)      ("No functions found!")
+
+		for spd in package.funcs
+			|| fn = function(spd)
+			linker <~ fn
+			if apptable <~ fn
+				fn.LinkCpp
+				fn.LinkSpd
+
+		check  (AppTable.Funcs >= 2) ("Missing 'main'")
+		return stderr.ok
+		
