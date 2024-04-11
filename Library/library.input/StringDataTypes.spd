@@ -100,7 +100,7 @@ datatype cstring
 		cpp_wrapper puts // hehe
 	
 	function Str (|string|)
-		return string.fromc(self)
+		return string.Wrap(self)
 
 	function Name (|cstring|)
 		|| c = self|&byte|

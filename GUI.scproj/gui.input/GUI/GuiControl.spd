@@ -497,7 +497,6 @@ class GUIControl (list)
 
 	task SlideOpen (TaskGUI, |movecode| Dir = MoveCode.Open)
 		run 
-			printline progress
 			|| hide = (progress >= 1.0 and .dir is close)
 			(.upon is visible) = !hide
 			if .dir is close

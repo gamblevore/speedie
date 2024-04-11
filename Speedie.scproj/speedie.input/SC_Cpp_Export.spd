@@ -519,7 +519,7 @@ function MakeWrapperFor (|FastStringCpp| fs, |SCFunction| f)
 function DoInterpreter
 	require options.ListAllLib
 	.listAllFuncs(.ModuleProperties)
-	.ExportAllClasses(.ModuleProperties)
+//	.ExportAllClasses(.ModuleProperties)
 
 
 function SCClass.LibExport (|jbin| j, |bool| IsProj)
@@ -542,7 +542,7 @@ function SCClass.LibExport (|jbin| j, |bool| IsProj)
 			|| fn = .BestBehaviourFor(m.name.InterfaceToBehaviour)
 				|| BaseClass = .InterfaceForBehaviour(fn)
 					j.add(@thg, fn.exportname)
-				  //else
+				  // else
 					 // seems to never happen?
 		b = b.upwards
 	
@@ -562,7 +562,7 @@ function SCClass.LibExport (|jbin| j, |bool| IsProj)
 
 
 
-
+/*
 function ExportAllClasses (|FastStringCpp| fs)
 	|| j = jbin()
 	typeobject!.LibExport(j, false)
@@ -575,6 +575,7 @@ extern \"C\" JB_String* JB_App__LibClasses() {
 	return JB_StrCN(JB_LibClassInfo, ${ClassExport.length});
 }
 "
+*/
 
 
 

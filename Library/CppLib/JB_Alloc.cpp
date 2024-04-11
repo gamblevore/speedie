@@ -85,10 +85,17 @@ static inline AllocationBlock* EndBlock_(SuperBlock* Block) {return (AllocationB
 JB_MemoryWorld MemoryManager;
 
 
-static JBObject_Behaviour DummyFuncTable = {0, 0};
+static JBObject_Behaviour DummyFuncTable = {};
 JB_Class* AllClasses;
 
-JB_Class JBClassInit(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent, JBObject_Behaviour* b) {
+static bool MiniCompare (const char* s, const char* find) {
+	while (auto c = *find++)
+		if (*s++ != c)
+			return false;
+	return true;
+}
+
+void JBClassInitReal(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent, JBObject_Behaviour* b) {
     if (!MemoryManager.Name) {
         MemoryManager.Name           = (uint8*)"JB Standard Memory";
         MemoryManager.SuperSize      = 20;
@@ -96,12 +103,15 @@ JB_Class JBClassInit(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent
         MemoryManager.Alignment      = 4;
         MemoryManager.SpareTrigger   = 0.75f;
     }
-
+	
+	Cls.RefCount = 1024;
+	if (MiniCompare(Name, "JB_"))
+		Name += 3;
     Cls.Name = Name;
     Cls.Parent = Parent;
     Cls.FuncTable = b;
     Cls.DefaultBlock = (AllocationBlock*)(&Cls.Memory.Dummy);
-    Cls.Memory.RefCount = 2;
+    Cls.Memory.RefCount = 1024;
     Cls.Memory.Class = &Cls;
     Cls.Memory.Dummy.Owner = &Cls.Memory;
     Cls.Memory.CurrBlock = (AllocationBlock*)(&Cls.Memory.Dummy);
@@ -114,7 +124,14 @@ JB_Class JBClassInit(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent
     
     Cls.NextClass = AllClasses;
     AllClasses = &Cls;
-    return Cls;
+}
+
+
+JB_Class* JBClassNew(const char* Name, int Size, JB_Class* Parent, int BehaviourCount) {
+	JB_Class* Cls = (JB_Class*)malloc(sizeof(JB_Class));
+	if (Cls)
+		JBClassInitReal(*Cls, Name, Size, Parent, (JBObject_Behaviour*)(calloc(1, BehaviourCount*sizeof(void*))));
+	return Cls;
 }
 
 
@@ -1192,6 +1209,14 @@ JB_MemoryWorld* JB_MemStandardWorld() {
     return &MemoryManager;
 }
 
+JB_Class* JB_AllClasses() {
+	return AllClasses;
+}
+
+void JB_SetBehaviour(JB_Class* Cls, int i, void* B) {
+	void** S = (void**)(&(Cls->FuncTable[0]));
+	S[i] = B;
+} 
 
 void JB_MemFree(JB_MemoryWorld* World) {
     World->Shutdown = true;

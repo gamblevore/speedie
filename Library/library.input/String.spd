@@ -442,6 +442,9 @@ class String
 			cpp_wrapper JB_Str__Freeable
 		function Copy (|&byte| addr,  |int| n, |string|)
 			cpp_wrapper JB_Str_CopyFromPtr
+		function Wrap (|cstring| Addr, |string|)
+			return stringzeroterminated(addr)
+
 		
 		function Copy (|cstring| str, |string|)
 			cpp_wrapper JB_Str_CopyFromCString
@@ -452,10 +455,7 @@ class String
 		function FromPtr (|&nil| Addr,  |int| N,  |&nil| free = nil,  |&nil| obj = nil,  |string|)
 			cpp_wrapper JB_StrFromPtr
 		
-		function FromC (|cstring| Addr, |string|)
-			return stringzeroterminated(addr)
-
-		function FromC (|&Byte| Addr, |string|)
+		function Wrap (|&Byte| Addr, |string|)
 			disabled "cast to a cstring first"
 			cpp_Part fromcstr2
 			

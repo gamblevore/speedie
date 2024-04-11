@@ -87,7 +87,7 @@ class Object
 		cpp_name jdb
 		visible true
 		if self
-			print string.FromC(.class.name)
+			print string.Wrap(.class.name)
 			print ": "
 		printline .render
 
@@ -115,8 +115,7 @@ class Object
 		function DebugAllMemory (assigns:|bool|)
 			cpp_wrapper JB_DebugAllMemory
 		function TotalSanity (|bool| Force=false, |bool|)
-			target debug
-				cpp_wrapper JB_TotalSanity
+			cpp_wrapper JB_TotalSanity
 			// something like that?
 
 
@@ -125,10 +124,9 @@ struct ClassData
 		wrapper
 		cpp_class JB_Class
 	
-	|&ClassData|			Parent
-	|&ClassData|			NextClass
+	|?&ClassData|			Parent
+	|?&ClassData|			NextClass
 	|cstring|				Name
-	|fpDestructor|			Destructor
 	|&byte|					SaveInfo
 	|bool|					HasSubclasses
 	|int|					Size
@@ -159,7 +157,13 @@ struct ClassData
 
 	function Restore
 		.DefaultLayer.Use
-
+		
+	module 
+		helper First (|&classdata|)
+			cpp_wrapper JB_AllClasses
+		
+		helper New (|cstring| Name, |int| Size, |?&ClassData| Parent, |int| BehaviourCount, |&ClassData|)
+			cpp_wrapper JBClassNew
 	
 	iterator
 		|| curr = self

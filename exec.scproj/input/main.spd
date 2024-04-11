@@ -2,9 +2,12 @@
 
 main 	  	  	  	 // execmain {
 	error.AutoPrint = 1
-	InternalTable.Build						#require
-	package.LoadPack						#require
-	internaltable.ReGather					#require
+	Linker.LoadLibFuncs						#require
+	class.LoadInbuiltClasses				#require
+	
+	package.GetStructure					#require
+	class.LoadAppClasses					#require
+	Linker.LinkProj							#require
 	function.LoadApp						#require
 	class.Behave							#require
 	debugger.load

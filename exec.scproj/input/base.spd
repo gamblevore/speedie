@@ -16,29 +16,14 @@ module package
 	function LibClassLayout (|string|)
 		cpp_wrapper JB_App__LibClasses
 	
-	
-	function LoadAppClasses (|message| list)
-		opt norefcounts
-		for s in list
-			|| SuperCls = s.next.Supper
-				class.GrabClasses(s[@arg], SuperCls)
-	
 
 	function message.Supper (|class|)
 		opt norefcounts
 		if !self
-			return class.object
+			return class.list[0]
 			
 		return (class.Table[.name])  #expect (self, "Linked to missing class")
 
-
-	function LoadPack (|bool|)
-		opt norefcounts
-		if .GetStructure
-			|| all_cls = .LibClassLayout.parse 
-			class.GrabClasses(all_cls)
-			.LoadAppClasses(.ProjClasses)
-			return stderr.ok
 	
 	
 	function GetStructure (|bool|)

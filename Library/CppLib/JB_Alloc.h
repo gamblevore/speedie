@@ -194,14 +194,13 @@ JBStructData (JB_MemoryLayer);
 
 
 
-struct JB_Class {
+struct JB_Class : JB_Object { // JB_ClassData
+    u16                 Size;
+    bool                HasSubclasses;  // for optimised isa testing
+    uint8               ClassDepth;		// also
     JB_Class*           Parent;
     AllocationBlock*    DefaultBlock;
     JB_Class*           NextClass;
-    u16                 Size; // Move to JB_MemoryLayer for refcountless allocs. Or put a "UsesRefCounts" bool in MemLayer
-    bool                HasSubclasses;  // for optimised isa testing
-    uint8               ClassDepth;		// for optimised isa testing
-    int					Flags;
     int					LeakCounter;
     JB_MemoryLayer      Memory;
     const char*         Name;
@@ -240,7 +239,13 @@ struct JBSaver_Behaviour {
 };
 
 
-JB_Class JBClassInit(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent, JBObject_Behaviour* b);
+
+void JBClassInitReal(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent, JBObject_Behaviour* b);
+JB_Class* JBClassNew(const char* Name, int Size, JB_Class* Parent, int b);
+inline JB_Class JBClassInit(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent, JBObject_Behaviour* b) {
+	JBClassInitReal(Cls, Name, Size, Parent, b);
+	return Cls;
+}
 
 JBStructData(JB_Object);
 struct Array;
@@ -292,6 +297,7 @@ void JB_FindLeakedObject(JB_Object* Obj, Array* R);
 void JB_Mem_ClassLeakCounter ();
 __hot void JB_ClusterDelete( FreeObject* Obj );
 void JB_MemFree(JB_MemoryWorld* World);
+JB_Class* JB_AllClasses();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef JB_DEBUG_ON

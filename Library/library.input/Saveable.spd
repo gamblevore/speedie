@@ -280,7 +280,7 @@ class SaverClassInfo (array)
 		|| D = saver.dest
 		require d and self
 		D <~ '\n'
-		D <~ string.fromc(.cls!.name).lowercase // lol.
+		D <~ string.Wrap(.cls!.name).lowercase // lol.
 		D <~ ' '
 		
 		if (.HasData)

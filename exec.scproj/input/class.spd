@@ -1,59 +1,70 @@
 
 
-class Class
+
+class Type (Class)  
+	|datatypecode|			DataType
+	|BaseType|				BaseType
+
+
+class Class 
 	linkage
 		cpp_class ClsInfo
 	|string|				Name
-	|int|					Size
-	|datatypecode|			DataType
-	|BaseType|				BaseType
-	|Message|				Src
+	|?Message|				Src
 	|?class|				Super
-	|?&classdata|			RealClass
+	|&classdata|			RealClass
 	
 	
-	constructor (|message!| Cls)
+	constructor (|!&classdata| Cls)
+		.realclass = cls
+		.name = string.Wrap(cls.name)
+		addclass(self)
+	
+	constructor (|message!| Cls, |class!| Parent)
+		opt norefcounts
 		.name = cls.name
-		|| Type = cls[0]
-			if type == @char // datatype
-				.basetype = BaseType.DataType
-				.DataType = type.name.parsehex
-			  elseif type == @num // struct
-				.basetype = BaseType.struct
-				.size = type.int		#check "Size == 0?"
-			  elseif type == @arr
-				.basetype = Basetype.Object
-				// lib->collect the size via the system?
-				// app->actually we need a size.
-			  elseif type == @list
-				.basetype = basetype.funcproto
-			  else
-				error type
-		  else
-			error (cls, "Missing Type")
-			
 		.src = cls
-		class.table.valuelower(cls.name) = self
+		.super = parent
+		|| cstr = .name.cstr.cstring
+		|| f = cls.first
+		|| b = f.next.slowcount
+		.realclass = classdata.new(cstr, f.int, parent.realclass, b max 2)
+		addclass(self)
 
-
-	function CreateLowLevelClass (|int| behaviours, |int| size, |&ClassData|)
-		.realclass = rz
+	function Size (|int|)
+		return .realclass.size
+		
+	function LoadSuper 
+		opt norefcounts
+		|| P = .realclass.Parent
+			|| str = P.name.str
+			|| cls = table.valuelower(str)
+				.super = cls
+				return
+		.super = Obj
+		
+	syntax equals (|string| s, |bool| aware, |bool|)
+		return .name ~= s
+	
+	render
+		|| sup = .super.name?
+		fs <~ "Class: $.name ($.size, $sup)"
 
 
 	function ClassData.Behaviour (assigns:|int| i, |function| fn)
-		
+		//.behaviour
+
+	helper ClassData.Behaviour (|int| i, assigns:|&nil| Beh)
+		cpp_wrapper JB_SetBehaviour	
+	
 
 	function LoadBehaviours
-		|| b = .src..behaviours
-		// destructor/render should be assumed...
-		|| cls = .CreateLowLevelClass(b.slowcount, .size)
-		if !cls?
-			return 
+		|| b = .src.second
 		|| i = 0
 		for fn in b
-			cls.Behaviour(i++) = function[fn.int]
+			.realclass.Behaviour(i++) = function[fn.int]
 		
-			
+				
 	module
 		function Behave (|bool|)
 			opt norefcounts
@@ -61,35 +72,56 @@ class Class
 				c.Loadbehaviours
 			return true
 
-		function GrabClasses (|message| all, |class?| parent=nil)
-			opt norefcounts
-			require all == @arg
-			for msg in all
-				|| c = class.new(msg)
-				c.super = parent
-				class.list <~ c
-				.GrabClasses(msg.last, c)
-			// load with jbin? we'll need a list of them!
+		function AddClass (|class| c)
+			.list <~ c
+			.table.valuelower(c.name) = c
+		
 	
-		|class|					Object
+		function LoadAppClasses (|bool|)
+			opt norefcounts
+			for s in package.ProjClasses
+				|| SuperCls = s.next.Supper
+					class.JbinClasses(s[@arg], SuperCls)
+			return stderr.ok
+
+
+		function LoadInbuiltClasses (|bool|)
+			opt norefcounts
+			object.TotalSanity(true)
+			for cd in ClassData.first
+				|| c = class.new(cd)
+				if c.name ~= "Object"
+					.obj = c
+//			debugger
+			|| o = .Obj
+				for c in .list
+					c.LoadSuper
+//			|| all_cls = package.LibClassLayout.parse 
+//			class.JbinClasses(all_cls, o)
+			object.TotalSanity(true)
+			return stderr.ok
+		
+		
+		function dictionary.syntaxaccess (|&classdata| c, ||)
+			|| n = c.name
+				|| s = n.str
+				rz = self.valuelower(s)
+			
+		function JbinClasses (|message| all, |!class| parent)
+			opt norefcounts
+			require all.expect(@arg)
+			for msg in all
+				|| c = class.new(msg, parent)
+				|| arg = msg.last
+				if arg == @arg
+					.JbinClasses(arg, c)
+
+	
+		|class|					Obj
 		|[class]|				List
 		|dictionary of class|	Table = dictionary.new
 
 
-
-// create array of behaviours... associate with funcs
-// so... what if the behaviours are partly c and partly spd?
-// annoying?? Well... firstly, how do behaviours work?
-// its a func, that calls another func... and they should be spd.
-// i suppose the behaviour can be a c-func that returns another func?
-// also, the c-code might want to call speedie code? sigh...
-// i think we decided that "mostly" when we call c-code, it stays in
-// c-code. To call back into the VM is hard.
-// but for behaviours we have no choice! the c-code has to call speedie.
-// so... our "behaviour" has to be a func that calls the VM!
-// what about from speedie?
-// behaviours are rarely used anyhow?
-// mostly for render... i guess, but even that is mostly direct
 
 
 datatype BaseType (int)
