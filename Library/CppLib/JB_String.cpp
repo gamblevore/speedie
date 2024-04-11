@@ -1948,7 +1948,7 @@ JB_String* JB_ObjRender(JB_Object* self, FastString* fs_in) {
     }
     
     JB_Class* Cls = JB_ObjClass(self);
-    auto R = Cls->FuncTable->render;
+    auto R = Cls->CppTable->render;
     fpRenderer FN = (fpRenderer)R;
     if (!FN or (FN == JB_ObjRender)) {
         return JB_Obj_GenericRender(self, fs_in);

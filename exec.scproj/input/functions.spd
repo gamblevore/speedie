@@ -18,7 +18,6 @@ class function
 			.LoadCode(asm)
 		  else
 			asm.Expect(@bin)
-		
 
 	
 	constructor (|?&nil| fn, |string| name)
@@ -66,16 +65,21 @@ class function
 	module
 		syntax access (|message| s, |function|)
 			if s == @num
-				return self[s.int]
-			return Linker[s.name]
+				return .int(s)
+			return Linker[s]
 		
-		syntax access (|int| i, |function|)
+		function int (|message| s, |function|)
+			opt norefcounts
+			|| i = s.int
+			|| i2 = i >> 1
 			if i & 1
-				return apptable[i >> 1]
-			return libtable[i >> 1]
+				|| fn = AppTable[i2]
+					return fn
+			  else
+				|| fn = LibTable[i2]
+					return fn
+			s.CantFindFunc
 
-	
-	
 	
 	
 	
@@ -85,8 +89,11 @@ module Linker
 	syntax append (|function| fn)
 		AllFuncs.ValueLower(fn.name) = fn
 		
-	syntax access (|string| s, |function|)
-		return .AllFuncs.ValueLower(s)
+	syntax access (|message| s, |function|)
+		opt norefcounts
+		|| fn = .AllFuncs.ValueLower(s.name)
+			return fn
+		s.cantfindfunc
 
 
 
@@ -143,22 +150,23 @@ module AppTable
 	function LinkEmUp‼ (|bool|)
 		Description "Checks that stdlib has all needed functions... and gets a reference to them."
 		
-		debugger
-		|| list = StringFields(package.linkage.name, '\n')
-		.LoadNameTableSub(list)
+		.LoadNameTableSub(package.linkage)
 		return stderr.ok
 
 
-	function LoadNameTableSub (|StringFields| flist)
+	function LoadNameTableSub (|message| func_list)
 		opt norefcounts
-		for name in flist
-			if name
-				|| fn = Linker[name]
-					AppTable.linkorder <~ fn
-				  else
-					error "Can't find function: " + name
+		for name in func_list
+			|| fn = Linker[name]
+				AppTable.LinkOrder <~ fn
+			  else
+				name.cantfindfunc
 
-		
+
+
+function message.CantFindFunc
+	error (self, "Can't find function: " + .name)
+
 
 //////////          //////////            //////////
 //////////          //////////            //////////

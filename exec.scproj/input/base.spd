@@ -39,8 +39,8 @@ module package
 		.funcs			= app.arg("fncs", true)
 		.linkage		= app.arg("link", true)
 
-		|| g = app.int						#check "No globals requested."
-		(g <= 256MB)						#check "Over 256MB of globals requested."
+		|| g = app.int
+		check (G > 0 and g <= 256MB) ("Globals must be >= 1 and <= 256MB")
 		.glob(g)
 		return stderr.ok
 		

@@ -67,7 +67,7 @@ static bool IsDummy( const AllocationBlock* Block ) {
     return OwnersDummy == Block;
 }
 static fpDestructor GetDestructor_(AllocationBlock* B) {
-	return (fpDestructor)(B->FuncTable->__destructor__);
+	return (fpDestructor)(B->CppTable->__destructor__);
 }
 
 
@@ -95,7 +95,7 @@ static bool MiniCompare (const char* s, const char* find) {
 	return true;
 }
 
-void JBClassInitReal(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent, JBObject_Behaviour* b) {
+void JBClassInitReal(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent, JBObject_Behaviour* Table) {
     if (!MemoryManager.Name) {
         MemoryManager.Name           = (uint8*)"JB Standard Memory";
         MemoryManager.SuperSize      = 20;
@@ -109,7 +109,9 @@ void JBClassInitReal(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent
 		Name += 3;
     Cls.Name = Name;
     Cls.Parent = Parent;
-    Cls.FuncTable = b;
+    if (!Table) //
+		Table = &DummyFuncTable;
+    Cls.CppTable = Table;
     Cls.DefaultBlock = (AllocationBlock*)(&Cls.Memory.Dummy);
     Cls.Memory.RefCount = 1024;
     Cls.Memory.Class = &Cls;
@@ -127,19 +129,31 @@ void JBClassInitReal(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent
 }
 
 
-JB_Class* JBClassNew(const char* Name, int Size, JB_Class* Parent, int BehaviourCount) {
+JB_Class* JBClassNew(const char* Name, int Size, JB_Class* Parent) {
 	JB_Class* Cls = (JB_Class*)malloc(sizeof(JB_Class));
 	if (Cls)
-		JBClassInitReal(*Cls, Name, Size, Parent, (JBObject_Behaviour*)(calloc(1, BehaviourCount*sizeof(void*))));
+		JBClassInitReal(*Cls, Name, Size, Parent, 0);
 	return Cls;
+}
+
+
+void JBClassAllocBehaviour (JB_Class* cls, int n, void*** Cpp, void*** Spd) {
+	void** A = (void**)(malloc(sizeof(void*) * n));
+	cls->CppTable = (JBObject_Behaviour*)A; // both tables should agree with each other 
+	*Cpp = A;
+
+	void** B = (void**)(malloc(sizeof(void*) * n));
+    cls->SpdTable = B;
+	*Spd = B;
 }
 
 
 MemStats JB_MemoryStats(JB_MemoryWorld* World, bool CountObjs, u16 Mark) {
     SuperBlock* First = World->CurrSuper;			// issue?
     SuperBlock* Super = First;						// issue?
-    MemStats Result = {0, 0};
-    if (!Super) { return Result; }
+    if (!Super)
+		return {};
+    MemStats Result = {};
     
 	u16 ActualMark = Mark &~ 0xf000;
 	bool IsCheck   = Mark & 0xf000;
@@ -153,9 +167,9 @@ MemStats JB_MemoryStats(JB_MemoryWorld* World, bool CountObjs, u16 Mark) {
             do {
 				if (Start->Owner) {
 					if (IsCheck) {
-						Start->Unused_ = 0;
+						Start->DebugMark = 0;
 					} else {
-						Start->Unused_ = ActualMark;
+						Start->DebugMark = ActualMark;
 					}
 				}
                 int C = Start->ObjCount + Start->HiddenObjCount;
@@ -548,7 +562,7 @@ int JB_ObjRefCount(JB_Object* Obj) {
 uint8* JB_ObjClassBehaviours(JB_Object* Obj) {
     // assume exists.
     auto Block = ObjBlock_(Obj);
-    return (uint8*)(Block->FuncTable);
+    return (uint8*)(Block->CppTable);
 }
 
 
@@ -651,7 +665,7 @@ static inline void SetupSuper_(SuperBlock* Super, JB_MemoryWorld* W) {
     while (Curr < End) {
         AllocationBlock* Next = JBShift(Curr, Size);
         Curr->Super = Super;
-        Curr->FuncTable = &SuperSanityTable;
+        Curr->CppTable = &SuperSanityTable;
         Curr->Owner = 0; // for clearing
         Curr->Next = Next;
         Curr = Next;
@@ -728,27 +742,19 @@ static AllocationBlock* SuperBlockSetup_( SuperBlock* Super, JB_MemoryWorld* Wor
 }
 
 
-static JBObject_Behaviour* NeedRealTable_(JBObject_Behaviour* T) {
-    if (T) {
-        return T;
-    }
-    return &DummyFuncTable;
-}
-
-
 static FreeObject* BlockSetup_ ( JB_MemoryLayer* Mem, AllocationBlock* NewBlock, JB_MemoryWorld* World ) {
-    if (!NewBlock) {
+    if (!NewBlock)
         return 0;
-    }
+
     Sanity(NewBlock);
     JB_Class* Class = Mem->Class;
-    NewBlock->FuncTable = NeedRealTable_(Class->FuncTable); // helps avoid touching uncached RAM.
+    NewBlock->CppTable = Class->CppTable; // faster vfuncs
+    NewBlock->SpdTable = Class->SpdTable;
     NewBlock->Owner = Mem;
 
 	int Size = Class->Size;
-    if (NewBlock->ObjSize != Size) {
+    if (NewBlock->ObjSize != Size)
 		InitObjectsInBlock_( Mem, NewBlock, World, Size );
-    }
 
     JB_Helper_SelfLink((JB_RingList*)NewBlock);
 
@@ -1031,7 +1037,7 @@ static void BlockFree_( AllocationBlock* FreeBlock ) {
         // return block to superblock
 
         FreeBlock->Prev = 0;
-        FreeBlock->FuncTable = &SuperSanityTable;
+        FreeBlock->CppTable = &SuperSanityTable;
         FreeBlock->Next = Super->FirstBlock;
         Super->FirstBlock = FreeBlock;
         Sanity(FreeBlock->Next);
@@ -1212,11 +1218,6 @@ JB_MemoryWorld* JB_MemStandardWorld() {
 JB_Class* JB_AllClasses() {
 	return AllClasses;
 }
-
-void JB_SetBehaviour(JB_Class* Cls, int i, void* B) {
-	void** S = (void**)(&(Cls->FuncTable[0]));
-	S[i] = B;
-} 
 
 void JB_MemFree(JB_MemoryWorld* World) {
     World->Shutdown = true;

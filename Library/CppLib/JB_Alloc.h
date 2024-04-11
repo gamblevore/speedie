@@ -159,21 +159,18 @@ struct SuperBlock {
 struct AllocationBlock {
     u16                     ObjCount;
     u16                     HiddenObjCount;
-    u16                     CurrFast;		// allocate these in a line... 
-    u16                     MaxFast;		// until we hit the max
+    u16                     ObjSize;
+    u16                     DebugMark; 
     AllocationBlock*        Next;
     AllocationBlock*        Prev;
     
     JB_MemoryLayer*         Owner;
-    FreeObject*             FirstFree;
-    JBObject_Behaviour*     FuncTable;		// speed things up a bit.
     SuperBlock*             Super;
 
+    FreeObject*             FirstFree;
 
-    u16                     Unused_;
-    u16                     Unused2_;
-    u16                     Unused3_;
-    u16                     ObjSize;
+    JBObject_Behaviour*     CppTable;		// speed things up a bit.
+	void** 					SpdTable;
 };
 
 
@@ -204,7 +201,8 @@ struct JB_Class : JB_Object { // JB_ClassData
     int					LeakCounter;
     JB_MemoryLayer      Memory;
     const char*         Name;
-    JBObject_Behaviour* FuncTable;
+    JBObject_Behaviour* CppTable; // both tables should agree with each other 
+    void**				SpdTable;
     uint8*              SaveInfo;
 };
 
@@ -240,9 +238,10 @@ struct JBSaver_Behaviour {
 
 
 
-void JBClassInitReal(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent, JBObject_Behaviour* b);
-JB_Class* JBClassNew(const char* Name, int Size, JB_Class* Parent, int b);
-inline JB_Class JBClassInit(JB_Class& Cls, const char* Name, int Size, JB_Class* Parent, JBObject_Behaviour* b) {
+void JBClassInitReal (JB_Class& Cls, const char* Name, int Size, JB_Class* Parent, JBObject_Behaviour* b);
+JB_Class* JBClassNew (const char* Name, int Size, JB_Class* Parent);
+void JBClassAllocBehaviour (JB_Class* cls, int n, void*** Cpp, void*** Spd);
+inline JB_Class JBClassInit (JB_Class& Cls, const char* Name, int Size, JB_Class* Parent, JBObject_Behaviour* b) {
 	JBClassInitReal(Cls, Name, Size, Parent, b);
 	return Cls;
 }

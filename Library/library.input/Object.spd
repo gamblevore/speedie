@@ -130,6 +130,7 @@ struct ClassData
 	|&byte|					SaveInfo
 	|bool|					HasSubclasses
 	|int|					Size
+	|&&nil|					SpdTable
 	
 	function Init (|&MemoryWorld| World, |int| Size)
 		// don't call this... unless you create one yourself.
@@ -162,7 +163,7 @@ struct ClassData
 		helper First (|&classdata|)
 			cpp_wrapper JB_AllClasses
 		
-		helper New (|cstring| Name, |int| Size, |?&ClassData| Parent, |int| BehaviourCount, |&ClassData|)
+		helper New (|cstring| Name, |int| Size, |?&ClassData| Parent, |&ClassData|)
 			cpp_wrapper JBClassNew
 	
 	iterator

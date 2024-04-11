@@ -26,10 +26,8 @@ class Class
 		opt norefcounts
 		debugat
 		|| pr = ch[@str]
-		|| nums = pr.next(@adj)
-		|| sz = nums[@num]
-		|| sb = sz.next(@num).int
-		|| beh = nums.next(@list)
+		|| sz = pr.next(@num)
+		|| beh = sz.next(@list)
 		|&ClassData| ParentCls
 		|| parent = class.Table[pr.name]
 			parentcls = parent.realclass
@@ -40,9 +38,8 @@ class Class
 		.src = Ch
 		.super = parent
 		
-		|| bc = beh.slowcount max sb max 2
-		.RealClass = classdata.new(.name.cstring, sz.int, parentcls, bc)
-		.LoadBehaviours(sb)
+		.RealClass = classdata.new(.name.cstring, sz.int, parentcls)
+		.LoadBehaviours(beh)
 		addclass(self)
 
 
@@ -69,31 +66,38 @@ class Class
 		fs <~ "Class: $.name ($.size, $sup)"
 
 
-	function ClassData.Behaviour (assigns:|int| i, |function| fn)
-		// what if some behaviours are C++ and others speedie? do we need two func-tables?
+	function ClassData.AllocateBehaviour (|int| n, |&&&nil| Cpp, |&&&nil| Spd) 
+		cpp_Wrapper JBClassAllocBehaviour
 
-
-	helper ClassData.Behaviour (|int| i, assigns:|&nil| Beh)
-		cpp_wrapper JB_SetBehaviour	
-	
 
 /*
 		clss
-			+"mycuteclass"   "list"         16~2  (des1, ren1)
-			+"mycuteclass2"  "mycuteclass"  24~2  (des2, ren2)
+			+"mycuteclass"   "List"         16  (des1, ren1)
+			+"mycuteclass2"  "MyCuteClass"  24  (des2, ren2)
 */
-	function LoadBehaviours	(|int| sb)
+
+
+	function LoadBehaviours	(|message| list)
 		opt norefcounts
-		|| list = .src.last
 		|| i = 0
-		for fn in list
-			.realclass.Behaviour(i++) = function[fn]
+		|| bc = list.SlowCount max 2
+		|&?&nil| Cpp,  |&?&nil| Spd 
+		
+		debugat
+		.realclass.AllocateBehaviour(bc, cpp, spd)
+		
+		for ch in list
+			|| fn = function[ch]
+				debugat
+				cpp[i] = fn.CFunc
+				spd[i] = fn.SpeedieFunc   #check   (fn.src, "Cpp function lacks a speedie-wrapper")
+			i++
 		
 				
 	module
 		function AddClass (|class| c)
 			.list <~ c
-			.table.valuelower(c.name) = c
+			.table.ValueLower(c.name) = c
 		
 
 		function LoadAppClasses (|bool|)
