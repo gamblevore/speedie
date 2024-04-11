@@ -531,8 +531,6 @@ typedef AsmReg (*fn_OpASM)(ASMFuncState* self, AsmReg dest, AsmReg L, AsmReg R, 
 
 typedef AsmReg (*fn_asm)(ASMFuncState* self, Message* exp, AsmReg Reg);
 
-typedef void (*FP_fpDestructor)(JB_Object* self);
-
 typedef void (*FP_fpMsgRender)(Message* self, FastString* fs);
 
 typedef void (*FP_fpMsgRenderCpp)(Message* self, FastStringCpp* fs);
@@ -4727,7 +4725,7 @@ AsmReg SC_flat_AllocRegDecl(ASMFuncState* self, Message* exp, SCDecl* decl, AsmR
 
 void SC_flat_CloseVars(ASMFuncState* self, uint64 Old);
 
-void JB_flat_Destructor(ASMFuncState* self);
+void SC_flat_Destructor(ASMFuncState* self);
 
 AsmReg SC_flat_DoFunc(ASMFuncState* self, Message* prms, AsmReg dest);
 
@@ -4795,7 +4793,7 @@ NilState SC_nil_Declare(ArchonPurger* self, SCDecl* D, NilState nd);
 
 NilState SC_nil_DeclareSub(ArchonPurger* self, SCDecl* D, NilState nd);
 
-void JB_nil_Destructor(ArchonPurger* self);
+void SC_nil_Destructor(ArchonPurger* self);
 
 void SC_nil_FinishNil(ArchonPurger* self, SCFunction* f);
 
@@ -5063,7 +5061,7 @@ void JB_MsgPos_SyntaxUsingComplete(MessagePosition* self);
 
 
 // JB_NameAndMsg
-void JB_NameAndMsg_Destructor(NameAndMsg* self);
+void SC_NameAndMsg_Destructor(NameAndMsg* self);
 
 void SC_NameAndMsg_SyntaxAppend(NameAndMsg* self, Message* m);
 
@@ -5479,7 +5477,7 @@ void SC_CppRefs_AddOne(CppRefs* self, Message* C);
 
 CppRefs* SC_CppRefs_Constructor(CppRefs* self, Message* s);
 
-void JB_CppRefs_Destructor(CppRefs* self);
+void SC_CppRefs_Destructor(CppRefs* self);
 
 Array* SC_CppRefs_DisturbsGet(CppRefs* self);
 
@@ -5512,7 +5510,7 @@ Cpp_Export* SC_Cpp_Constructor(Cpp_Export* self);
 
 void SC_Cpp_CppFunc(Cpp_Export* self, FastStringCpp* fs, SCFunction* F);
 
-void JB_Cpp_Destructor(Cpp_Export* self);
+void SC_Cpp_Destructor(Cpp_Export* self);
 
 void SC_Cpp_DoInterpreter(Cpp_Export* self);
 
@@ -5539,8 +5537,6 @@ void SC_Cpp_FinalMergeOutputIntoACpp(Cpp_Export* self);
 JB_String* SC_Cpp_FuncHeader(Cpp_Export* self, FastStringCpp* fs, SCFunction* F);
 
 void SC_Cpp_FuncStart(Cpp_Export* self, FastStringCpp* fs, SCFunction* f, JB_String* funcheader);
-
-void SC_Cpp_ListAllClasses(Cpp_Export* self, FastStringCpp* fs);
 
 void SC_Cpp_ListAllFuncs(Cpp_Export* self, FastStringCpp* fs);
 
@@ -5878,7 +5874,7 @@ void SC_Instruction_Const(Instruction* self);
 
 Instruction* SC_Instruction_Constructor(Instruction* self, JB_String* FormName, JB_String* name, int pos);
 
-void JB_Instruction_Destructor(Instruction* self);
+void SC_Instruction_Destructor(Instruction* self);
 
 bool SC_Instruction_IsSetConst(Instruction* self);
 
@@ -5961,7 +5957,7 @@ byte* JB_Mrap__Zalloc(int n);
 // JB_NilTest
 NilTest* SC_NilTest_Constructor(NilTest* self);
 
-void JB_NilTest_Destructor(NilTest* self);
+void SC_NilTest_Destructor(NilTest* self);
 
 NilTest* SC_NilTest_Exists3(NilTest* self, NilTest* p);
 
@@ -5987,7 +5983,7 @@ bool SC_Imp_CanBan(SCImport* self, SCFile* scf);
 
 SCImport* SC_Imp_Constructor(SCImport* self, JB_File* F, bool Builtin);
 
-void JB_Imp_Destructor(SCImport* self);
+void SC_Imp_Destructor(SCImport* self);
 
 SCFile* SC_Imp_ImportDir(SCImport* self, JB_File* f);
 
@@ -6040,9 +6036,9 @@ void SC_NR_CollectDclThg(SCNodeRenamer* self, Message* DclThg);
 
 void SC_NR_CollectSelfs(SCNodeRenamer* self, Message* root);
 
-SCNodeRenamer* JB_NR_Constructor(SCNodeRenamer* self);
+SCNodeRenamer* SC_NR_Constructor(SCNodeRenamer* self);
 
-void JB_NR_Destructor(SCNodeRenamer* self);
+void SC_NR_Destructor(SCNodeRenamer* self);
 
 void SC_NR_Rename(SCNodeRenamer* self, Message* name);
 
@@ -6067,7 +6063,7 @@ JB_String* SC_SCObject_CanAutoSub(SCObject* self, JB_String* search);
 
 SCObject* SC_SCObject_Constructor(SCObject* self);
 
-void JB_SCObject_Destructor(SCObject* self);
+void SC_SCObject_Destructor(SCObject* self);
 
 SCFunction* SC_SCObject_Disambiguate(SCObject* self, Message* src);
 
@@ -6094,7 +6090,7 @@ JB_String* SC_Opp_CaseAwareStr(SCOperator* self);
 
 SCOperator* SC_Opp_Constructor(SCOperator* self, JB_String* name, fn_OpASM ASM, OpMode mode);
 
-void JB_Opp_Destructor(SCOperator* self);
+void SC_Opp_Destructor(SCOperator* self);
 
 void SC_Opp_InitComp(SCOperator* self, JB_String* name_);
 
@@ -6262,8 +6258,6 @@ JB_String* JB_Str_EscapeChr(JB_String* self);
 
 bool JB_Str_EscapeTest(JB_String* self);
 
-Ind JB_Str_ExecuteableJBin(JB_String* self);
-
 JB_String* JB_Str_Ext(JB_String* self);
 
 JB_File* JB_Str_AsFile(JB_String* self);
@@ -6300,7 +6294,7 @@ bool JB_Str_IsInt(JB_String* self);
 
 bool JB_Str_IsIntFrom(JB_String* self, int i);
 
-bool JB_Str_IsJbin(JB_String* self);
+Ind JB_Str_IsJbin(JB_String* self);
 
 bool JB_Str_IsLower(JB_String* self);
 
@@ -6377,6 +6371,8 @@ Message* SC_Str_ParseClean(JB_String* self);
 Message* SC_Str_ParseCleanWipe(JB_String* self);
 
 Message* JB_Str_ParseJbin(JB_String* self, int64 max);
+
+Message* JB_Str_ParseSub(JB_String* self, Syntax owner, bool AllowDecomp);
 
 Message* JB_Str_ParseWithError(JB_String* self, JB_Error** rec);
 
@@ -6456,13 +6452,11 @@ bool JB_Str_WriteSet(JB_String* self, JB_String* Value);
 
 bool JB_Str_Yes(JB_String* self);
 
-JB_String* JB_Str__FromC(_cstring Addr);
-
 JB_String* JB_Str__FromPico(PicoMessage M);
 
-JB_String* JB_Str__Hex(int64 i);
-
 bool JB_Str__Sorter(JB_Object* a, JB_Object* b);
+
+JB_StringC* JB_Str__Wrap(_cstring Addr);
 
 
 
@@ -6551,9 +6545,9 @@ DTWrap* SC___junktest_6____AbcVis();
 
 
 // JB_autoitem
-autoitem* JB_autoitem_ConstructorAuto(autoitem* self, JB_String* Sort, JB_String* Insert, SCObject* Value, JB_String* Display, bool Exact, int type);
+autoitem* SC_autoitem_ConstructorAuto(autoitem* self, JB_String* Sort, JB_String* Insert, SCObject* Value, JB_String* Display, bool Exact, int type);
 
-void JB_autoitem_Destructor(autoitem* self);
+void SC_autoitem_Destructor(autoitem* self);
 
 bool SC_autoitem_OKBy(autoitem* self, autoitem* prev);
 
@@ -6566,7 +6560,7 @@ xC2xB5Form* SC_xC2xB5Form_ConstructorWithStr(xC2xB5Form* self, JB_String* data);
 
 xC2xB5Form* SC_xC2xB5Form_ConstructorWithMsg(xC2xB5Form* self, Message* tmp);
 
-void JB_xC2xB5Form_Destructor(xC2xB5Form* self);
+void SC_xC2xB5Form_Destructor(xC2xB5Form* self);
 
 void SC_xC2xB5Form_Finish(xC2xB5Form* self);
 
@@ -6589,7 +6583,7 @@ xC2xB5Form* SC_xC2xB5Form__Needform(JB_String* Form);
 // JB_µFunc
 ASMFunc* SC_ASMFunc_Constructor(ASMFunc* self, SCFunction* fn);
 
-void JB_ASMFunc_Destructor(ASMFunc* self);
+void SC_ASMFunc_Destructor(ASMFunc* self);
 
 ASMFunc2* SC_ASMFunc_Finish(ASMFunc* self);
 
@@ -6658,7 +6652,7 @@ void SC_FastStringCpp_AppendBehaviour(FastStringCpp* self, JB_String* name, SCFu
 
 FastStringCpp* SC_FastStringCpp_Constructor(FastStringCpp* self, JB_String* name);
 
-void JB_FastStringCpp_Destructor(FastStringCpp* self);
+void SC_FastStringCpp_Destructor(FastStringCpp* self);
 
 
 
@@ -6738,8 +6732,6 @@ void JB_bin_AddInt(FastString* self, int64 data);
 
 void JB_bin_AddMemory(FastString* self, Syntax type, byte* data, bool GoIn, uint64 L);
 
-void JB_bin_AddStr(FastString* self, JB_String* data);
-
 void JB_bin_CloseSection(FastString* self, uint c);
 
 FastString* JB_bin_Constructor(FastString* self, Syntax type, JB_String* data);
@@ -6759,7 +6751,7 @@ void JB_bin_Up(FastString* self, int amount);
 // JB_MaterialsLol
 MaterialsLol* SC_MaterialsLol_Constructor(MaterialsLol* self, Selector* Next, Selector** Place, JB_String* name1);
 
-void JB_MaterialsLol_Destructor(MaterialsLol* self);
+void SC_MaterialsLol_Destructor(MaterialsLol* self);
 
 void SC_MaterialsLol____LoadSel(MaterialsLol** Place, JB_String* Name);
 
@@ -6778,9 +6770,9 @@ JB_String* JB_Sh_Render(ShellStream* self, FastString* fs_in);
 
 
 // JB_SCNamed
-SCNamed* JB_Named_Constructor(SCNamed* self);
+SCNamed* SC_Named_Constructor(SCNamed* self);
 
-void JB_Named_Destructor(SCNamed* self);
+void SC_Named_Destructor(SCNamed* self);
 
 JB_String* SC_Named_Render(SCNamed* self, FastString* fs_in);
 
@@ -6789,7 +6781,7 @@ JB_String* SC_Named_Render(SCNamed* self, FastString* fs_in);
 // JB_SavingTest
 SavingTest* SC_SavingTest_Constructor(SavingTest* self, int n);
 
-void JB_SavingTest_Destructor(SavingTest* self);
+void SC_SavingTest_Destructor(SavingTest* self);
 
 void SC_SavingTest_LoadProperties(SavingTest* self, ObjectLoader* Loader);
 
@@ -6864,7 +6856,7 @@ JB_List* JB_Tree_WrapWith(JB_List* self, JB_List* W);
 
 
 // JB_µFunc1
-void JB_ASMFunc2_Destructor(ASMFunc2* self);
+void SC_ASMFunc2_Destructor(ASMFunc2* self);
 
 int64 SC_ASMFunc2_RunArgs(ASMFunc2* self, int64* Args, int ArgCount);
 
@@ -7805,7 +7797,7 @@ SCDecl* SC_Decl_DeReference(SCDecl* self, Message* brel, SCNode* name_space, boo
 
 SCDecl* SC_Decl_DeReferenceSub(SCDecl* self, Message* brel, SCNode* name_space, bool IsAccess);
 
-void JB_Decl_Destructor(SCDecl* self);
+void SC_Decl_Destructor(SCDecl* self);
 
 SCDecl* SC_Decl_DownGrade(SCDecl* self);
 
@@ -8028,7 +8020,7 @@ void SC_SCFile_CollectGlobals(SCFile* self, SCNode* p);
 
 SCFile* SC_SCFile_Constructor(SCFile* self, JB_File* f, SCImport* p);
 
-void JB_SCFile_Destructor(SCFile* self);
+void SC_SCFile_Destructor(SCFile* self);
 
 void SC_SCFile_DetectInsecureWords(SCFile* self);
 
@@ -8047,7 +8039,7 @@ void SC_Iter_Check(SCIterator* self, SCClass* cls);
 
 SCIterator* SC_Iter_Constructor(SCIterator* self, SCClass* parent, Message* msg);
 
-void JB_Iter_Destructor(SCIterator* self);
+void SC_Iter_Destructor(SCIterator* self);
 
 Message* SC_Iter_MakeWhile(SCIterator* self, Message* arg, Message* postcond);
 
@@ -8094,7 +8086,7 @@ SCNode* SC_Base_ConstructorMsg(SCNode* self, Message* node);
 
 void SC_Base_CreateNameDict(SCNode* self, Message* FuncName, Array* NameList);
 
-void JB_Base_Destructor(SCNode* self);
+void SC_Base_Destructor(SCNode* self);
 
 Message* SC_Base_DiissplayObj(SCNode* self, Message* rz);
 
@@ -8324,7 +8316,7 @@ void JB_Err__SourceRemove();
 // JB_SCArg
 SCArg* SC_Arg_Constructor(SCArg* self, Message* node);
 
-void JB_Arg_Destructor(SCArg* self);
+void SC_Arg_Destructor(SCArg* self);
 
 JB_String* SC_Arg_Render(SCArg* self, FastString* fs_in);
 
@@ -8339,7 +8331,7 @@ SCBehaviour* SC_Beh_Constructor(SCBehaviour* self, SCClass* parent);
 
 void SC_Beh_CreateFuncTable(SCBehaviour* self, Message* ErrPlace);
 
-void JB_Beh_Destructor(SCBehaviour* self);
+void SC_Beh_Destructor(SCBehaviour* self);
 
 SCBehaviour* SC_Beh_Upwards(SCBehaviour* self);
 
@@ -8416,7 +8408,7 @@ void SC_Class_DataTypePostLoad(SCClass* self);
 
 void SC_Class_DeclModel(SCClass* self);
 
-void JB_Class_Destructor(SCClass* self);
+void SC_Class_Destructor(SCClass* self);
 
 SCFunction* SC_Class_DoSaver(SCClass* self, JB_String* name, int stage);
 
@@ -8491,8 +8483,6 @@ bool SC_Class_IsStruct(SCClass* self);
 bool SC_Class_IsTask(SCClass* self);
 
 void SC_Class_Iterfailed(SCClass* self, JB_String* name, Message* node);
-
-void SC_Class_LibExport(SCClass* self, FastString* j);
 
 void SC_Class_LoadClassType(SCClass* self);
 
@@ -8681,7 +8671,7 @@ JB_String* SC_Func_Describe(SCFunction* self, FastString* fs_in);
 
 void SC_Func_DescribeParamFail(SCFunction* self, SCParamArray* params, int bad);
 
-void JB_Func_Destructor(SCFunction* self);
+void SC_Func_Destructor(SCFunction* self);
 
 SCFunction* SC_Func_Disambiguate(SCFunction* self, Message* src);
 
@@ -8830,8 +8820,6 @@ void SC_Func_ValidateSaver(SCFunction* self, JB_String* name);
 int SC_Func_VisibleArgs(SCFunction* self);
 
 void SC_Func_WantAs(SCFunction* self, NilState NS);
-
-void SC_Func_WrappedNameSet(SCFunction* self, JB_String* s);
 
 JB_String* SC_Func_WrappedName(SCFunction* self);
 
@@ -8996,7 +8984,7 @@ JB_String* SC_Mod_CppPath(SCModule* self);
 
 void SC_Mod_DelayedInitFuncTransform(SCModule* self);
 
-void JB_Mod_Destructor(SCModule* self);
+void SC_Mod_Destructor(SCModule* self);
 
 SCObject* SC_Mod_GetTheNewer(SCModule* self);
 
