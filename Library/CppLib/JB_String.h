@@ -160,10 +160,6 @@ inline bool SectFix_( int& srOffset, int& srLength, int CurrLen ) {
      * We want to allow huge ranges, like String.kEnd (largest possible number)
      * We don't need it to be ints or uints specifically.
      * As few operations as possible!
-     
-     It used to fail with kMax! because kMax + 1 = -1
-     
-     I hope using u32 fixes this. I can't remember :(
 */
     u32 Final = (u32)srLength + (u32)srOffset;
     if (Final > (u32)CurrLen) {

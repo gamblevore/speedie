@@ -829,9 +829,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		
 		if (d.exportName)
 			T <~ ' '
-			if d is local
-				t <~ '$'
-			d.exportName.safe(t)
+			d.exportName.safe(t, d is local)
 			if d.IsCArray
 				T <~ '['
 				T <~ d.C_Array
@@ -1491,15 +1489,11 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		  elseif (d is TypeImprove) and (MsgOKToImprove(msg))
 			fs <~ '('
 			WriteDeclBrackets( msg, fs )
-			if d is local
-				fs <~ '$'
-			d.exportname.safe(fs)
+			d.exportname.safe(fs, d is local)
 			fs <~ ')'
 
 		  else
-			if d is local
-				fs <~ '$'
-			d.exportname.safe(fs)
+			d.exportname.safe(fs, d is local)
 
 		// plink plink plonk
 		// plantasy star is so beautiful.
@@ -1511,9 +1505,13 @@ function message.Safe (|faststring| fs)
 	.name.safe(fs)
 
 
-function string.Safe (|faststring| fs)
+function string.Safe (|faststring| fs, |bool| Local=false)
 	if .isascii
-		fs <~ self
+		if local and .islower
+			fs <~ .first.uppercase
+			fs.appendsection(self, 1)
+		  else 
+			fs <~ self
 		return
 		
 	for s in self

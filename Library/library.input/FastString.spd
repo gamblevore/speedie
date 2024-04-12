@@ -52,7 +52,7 @@ class FastString {
 	function AppendHexData (|&byte| Data, |int| N, |int| Spaces=0)
 		cpp_wrapper JB_FS_AppendHexData
 
-	function AppendSection (|String| Data, |int| Start, |int| Length)
+	function AppendSection (|String| Data, |int| Start, |int| Length=int.max)
 		cpp_wrapper JB_FS_AppendSection
 
 	function AppendHex3 (|int|Num)

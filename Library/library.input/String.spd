@@ -229,7 +229,7 @@ class String
 		return .lowercase.TrimExtAndPath
 	
 	function UpperFirst (|String|)
-		if ((*self).IsUpper)
+		if .first.IsUpper
 			return self
 		Return self[0,1].Uppercase + self[1...]
 	
