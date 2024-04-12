@@ -10,13 +10,14 @@ module SC_Init
 
 
 	function Message.SettingToNil (|bool|)
+		opt norefcounts
 		if (self == @Decl)
 			|| d = .Last
 			if (d == @Rel) and (d.Last ~= "nil")
 				Return true
 
 
-	function SCModule.MoveToInitFunc (|Message| c)	
+	function SCModule.MoveToInitFunc (|Message| c, |bool| visible)	
 		opt norefcounts
 		if (c == @sheb or @url)
 			c.remove

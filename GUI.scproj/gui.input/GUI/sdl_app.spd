@@ -10,7 +10,7 @@ module SDLApp
 	|string|					LastSearch
 	|uint|						FrameCount
 
-	private
+	visible false
 	|SDL_Event|					Event
 	|KeyMod|					KeyMod
 	|[string]|					PendingAlerts
@@ -44,7 +44,7 @@ module SDLApp
 	|byte|						TouchFingersDown
 	|byte|						CanDrag
 	|byte|						ResizedCounter // for resize bug fix
-	
+	visible true
 	
 	cpp_wrapper SDL_Init				(|uint| c)
 	cpp_wrapper SDL_Quit				()

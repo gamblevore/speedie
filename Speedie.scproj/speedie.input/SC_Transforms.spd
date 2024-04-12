@@ -666,7 +666,7 @@ function Tran_Syx (|Message| msg, |Message|)
 	dcl.first!.replacewith(fn_msg)
 
 	Compiler.SyxArray <~ OldName
-	Compiler.Collect( dcl, true )
+	Compiler.program.Collectone( dcl, true )
 	
 	Return msg
 

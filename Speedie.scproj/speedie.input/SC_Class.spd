@@ -540,8 +540,6 @@ function HasObjectProperties (|bool|)
 
 function LoadConstructors
 	.Use									// parsed messages come from our source's file
-	SCNode.CurrVisibility = false			// for allocators that we generate
-	
 	.CreateConstructors
 		
 	|| s = .super
@@ -842,14 +840,13 @@ module
 
 	
 	function SCClass.ClassCollect
-		.Collect( .Sourcearg, .IsVisible )
+		.CollectFromNode( .Sourcearg, .IsVisible )
 
 
 	function DataTypeSub (|Message| Node, |SCNode| Parent, |Message| ErrPlace, |string| ForInterface, |SCNodetype| BaseType, |SCModule|)
 		if node.obj
 			Return Compiler.program						// already done
 		
-		SCNode.CurrVisibility = false
 		node.GiveArg
 		
 		|| it = .NeuClassSub( node, parent, ErrPlace, ForInterface, BaseType )
@@ -1000,7 +997,7 @@ module
 				  else
 					B.project.use
 		
-				B.Collect(arg, SCNode.CurrVisibility, m.SourceArg)
+				B.CollectFromNode(arg, SCNode.CurrVisibility, m.SourceArg)
 	
 	
 	function ProcessAs (CollectFunc) // node, parent, errplace

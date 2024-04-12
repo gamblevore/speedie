@@ -79,7 +79,7 @@ class GraphicsEditor (GuiControl)
 		j.enter @arg
 		for l in .Layers
 			j.addimage(l, l.name)
-		j.up 5
+		j.exit 5
 		j.Flush
 	
 	
@@ -92,7 +92,7 @@ class GraphicsEditor (GuiControl)
 		.addint(img.Width)
 		.addint(img.height)
 		.add(@bin, img.rawdata.compress)
-		.up
+		.exit
 	
 	
 	function DoMerge (|bool| bg=true)

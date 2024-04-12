@@ -138,7 +138,7 @@ function LoadModule (|Message| node)
 	.Source = arg
 	
 	compiler.disammodules!.TryAdd(nil, self, .safename)
-	.Collect( .source, SCNode.CurrVisibility )
+	.CollectFromNode( .source, SCNode.CurrVisibility )
 
 
 function GetTheNewer (|SCObject|)

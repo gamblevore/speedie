@@ -121,7 +121,7 @@ class SCImport
 			|| str = (arg.render, arg.renderjbin)(Options.SelfReplacement)
 			|| x = makedecl("", "__AppConfString", @str+str)
 			conf.become(x)
-			compiler.program.movetoinitfunc(conf)
+			compiler.program.movetoinitfunc(conf, false)
 
 	
 	function  IndexLinkage (|message| link, |scfile| scf)

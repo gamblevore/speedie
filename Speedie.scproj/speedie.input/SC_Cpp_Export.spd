@@ -519,10 +519,9 @@ function MakeWrapperFor (|FastStringCpp| fs, |SCFunction| f)
 function DoInterpreter
 	require options.ListAllLib
 	.listAllFuncs(.ModuleProperties)
-//	.ExportAllClasses(.ModuleProperties)
 
 
-function SCClass.LibExport (|jbin| j, |bool| IsProj)
+function SCClass.PackExport (|jbin| j)
 	opt norefcounts
 	j.enter(@tmp, .name)
 	|| sz = (0, .size)(.iswrapper)
@@ -542,75 +541,57 @@ function SCClass.LibExport (|jbin| j, |bool| IsProj)
 			|| fn = .BestBehaviourFor(m.name.InterfaceToBehaviour)
 				|| BaseClass = .InterfaceForBehaviour(fn)
 					j.add(@thg, fn.exportname)
-				  // else
-					 // seems to never happen?
 		b = b.upwards
 	
-	j.up
+	j.exit
 
-	|| MadeList = false	
+	j.enter
 	for c in .children
-		if !c.isrole and (IsProj or c.IsStdLib)
-			if !MadeList
-				MadeList = true
-				j.enter
-			c.libexport(j, IsProj)
-
-	if MadeList
-		j.up
-	j.up
-
-
-
-/*
-function ExportAllClasses (|FastStringCpp| fs)
-	|| j = jbin()
-	typeobject!.LibExport(j, false)
-	
-	|| ClassExport = j.GetResult.compress
-	fs <~ `__lib__ const char* JB_LibClassInfo = `
-	fs.AppendCpp(ClassExport)
-	fs   <~   ";
-extern \"C\" JB_String* JB_App__LibClasses() {
-	return JB_StrCN(JB_LibClassInfo, ${ClassExport.length});
-}
-"
-*/
-
+		if !c.isrole
+			c.packexport(j)
+	j.exit
+	j.exit
 
 
 
 function ListAllFuncs (|FastStringCpp| fs)
 	fs <~ "// entire_function_list\n\n"
-	for f in ExecTable.Funcs
-		if f.IsStdLib and f.iscppinbuilt == 1
+	for f in PackMaker.libFuncs
+		if (f.iscppinbuilt == 1)
 			.MakeWrapperFor(fs, f)
 	
 	fs <~ "\n__lib__ void* JB_AllFuncsList[] = {\n"
 
-	|| bs = jbin()
-	for f in ExecTable.Funcs
-		if f.isstdlib
-			fs <~ "\t(void*)"
-			bs.add(@tmp, f.WrappedName)
-			fs <~ f.wrappedname
-			fs <~ ",\n"
+	|| lib_pack = jbin()
+	lib_pack.enter(@tmp, "fncs")
+	lib_pack.enter
+	for f in PackMaker.libFuncs
+		fs <~ "\t(void*)"
+		lib_pack.add(@tmp, f.WrappedName)
+		fs <~ f.wrappedname
+		fs <~ ",\n"
+	lib_pack.exit(2)
+	lib_pack.enter(@tmp, "glob")
+	lib_pack.enter
 	
 	fs <~ "0};\n"
 
-	|| str = bs.getresult
-	|| s = str.compress
-	|| cmp_test = s.parse
+	|| pack_str = lib_pack.getresult.compress
+	|| cmp_test = pack_str.parse
 	check (cmp_test) ("Invalid compression created for interpreter")
 	
 	fs <~ `__lib__ const char* JB_LibFuncInfo = `
-	fs.AppendCpp(s)
-	fs <~ ";\n"
+	fs.AppendCpp(pack_str)
 	
-	fs <~ "
-extern \"C\" JB_String* JB_App__LibFuncs(void*** Funcs) {
+	fs <~ ";
+
+extern \"C\" JB_String* JB_App__LibFuncs(void*** Funcs) { // rename this to libpack
 	* Funcs = JB_AllFuncsList;
-	return JB_StrCN(JB_LibFuncInfo, ${s.length});
+	return JB_StrCN(JB_LibFuncInfo, ${pack_str.length});
+}
+
+extern \"C\" JB_String* JB_App__LibPack(void*** Funcs) { // rename this to libpack
+	return JB_App__LibFuncs(Funcs);
 }
 "
 
@@ -882,7 +863,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		return .CppLicenceStr
 
 	
-	function ExportAllSource
+	function ExportAllSource (|string| pack)
 		require StdErr.ok
 		
 		|| exp = Cpp_Export()

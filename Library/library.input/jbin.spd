@@ -31,7 +31,7 @@ extend message
 			|| curr		= ch
 			ch			= curr.FlatNextDepth(depth)
 			js.Add(curr.func, curr.name, depth > 0)
-			js.up(-depth)
+			js.exit(-depth)
 	
 
 role JBin (Faststring)
@@ -72,7 +72,7 @@ role JBin (Faststring)
 		self <~ data
 		self <~ '\n' // noice
 
-	function Up (|int| amount = 1)
+	function Exit (|int| amount = 1)
 		|| add = 239
 		while amount > 0
 			|| B  = (add + amount)  min  (255)

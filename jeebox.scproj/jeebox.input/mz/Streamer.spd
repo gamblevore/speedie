@@ -19,7 +19,7 @@ function StringReader.CompressInto (|object| dest, |int|Strength=mzlab.default, 
 		st.LiveUpdate(str.length, j.length - place)
 		if !.NoMoreChunks
 			j.flush // we are calling it after anyhow	
-	j.up(2)
+	j.exit(2)
 	j.flush			// we definitely need to flush it.  Im serious!
 	j.CompressChunk(nil)						// cleanup
 	st.end

@@ -285,21 +285,22 @@ class File (String)
 	helper CurrChild (|String|)
 		cpp_wrapper
 	
-	function Open (|int| Flags = File.O_RDWR ||| File.O_CREAT, |bool|AllowMissing=false, |int|)
+	function Open (|int| Flags = File.O_RDWR ||| File.O_CREAT, |bool|AllowMissing=false, |filedes|)
 		cpp_wrapper
 
-	function OpenForRead (|bool| AllowMissing = false, |int|)
+	function OpenForRead (|bool| AllowMissing = false, |filedes|)
 		return .open(0, AllowMissing)
 	
-	function OpenDes (|int|)
+	function OpenDes (|filedes|)
 		.openempty
 		return .descriptor
 	
 	
-	function OpenBlank (|int|)
+	function OpenBlank (|filedes|)
 		disabled "Use OpenEmpty instead"
 
 	function OpenEmpty (|bool|)
+		nil checker
 		cpp_wrapper JB_File_OpenBlank
 	
 	function EOF (|bool|)
@@ -472,7 +473,7 @@ class File (String)
 			return .path.idealapp.file
 
 
-		function NewPipe (|int| Pipe, |file|)
+		function NewPipe (|filedes| Pipe, |file|)
 			cpp_wrapper JB_File__NewPipe
 		
 // can rename these from path into files :)
@@ -540,4 +541,5 @@ datatype FileMode (int)
 		CanExec = 1<<6  + 1<<3 + 1<<0
 		Process = Owner + 5<<3 + 5<<0
 		Data    = 6<<6  + 4<<2 + 4<<2
+
 

@@ -7,10 +7,11 @@ class TerminalCell
 
 
 module Terminal
-	private
+	visible false
 	|array of array|	Screen
 	|faststring| 		fs
 	|date| 				LastDisplay
+	visible true
 	
 	constants
 		w = 80

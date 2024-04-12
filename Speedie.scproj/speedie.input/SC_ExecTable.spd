@@ -2,34 +2,46 @@
 
 // some kinda function table... saved to a file
 
-module ExecTable
-	|[scfunction]|			Funcs
-	|[SCNode]|				Globs
+module PackMaker
+	|[scfunction]|			LibFuncs
+	|[SCDecl]|				LibGlobs
+	|[scfunction]|			PackFuncs
+	|[SCDecl]|				PackGlobs
+
 	
-	function FuncFile (|file|)
-		return compiler.Library.child("funcs.jbin")
-	
-	function GlobFile (|file|)
-		return compiler.Library.child("globals.jbin")
-		
-	function AddAll (|bool| WantLib, |faststring| fs)
+	function AddAll
 		opt norefcounts
 		for f in Compiler.FuncList
-			if f.CanLibLoad and (WantLib == f.IsStdLib)
-				.funcs <~ f
+			if !f.CanLibLoad
+				0
+			  elseif (f.IsStdLib)
+				.libfuncs <~ f
+			  else
+				.packfuncs <~ f
 		
-		.funcs.sort(ExecSorter)
-		
-		for (f in .funcs) (i)
-			f.TableID = i
-			fs <~ f.exportname
-			fs <~ '\n'
 	
-	function Run 
-		|| f = .FuncFile
-			|| fs = FastString()
-			.AddAll(true, fs)
-			f.SmartData = fs
+	function Oof (|[scfunction]| r, |jbin| pack)
+		opt norefcounts
+		r.sort(ExecSorter)
+		
+		for (f in r) (i)
+			f.TableID = i
+			if pack
+				pack.Add(@thg, f.exportname)
+
+
+	function Run (|string|)
+		.AddAll
+		.oof(.PackFuncs, nil)
+
+		|| pack = jbin()
+		pack.enter(@prm) // our funcs
+		.oof(.libfuncs, pack)
+		pack.exit
+
+		pack.enter(@arr) // our globs
+		pack.exit
+		return pack
 
 
 function scfunction.WrappedName (|string|)
@@ -43,8 +55,6 @@ helper ExecSorter (sortercomparer)
 	return (a|scfunction|).Description < (b|scfunction|).Description
 
 
-
 function scfunction.CanLibLoad (|bool|)
 	require !.ismacro and !.isdisabled and .iscppinbuilt != 2
-	if !.exportname
 	return true

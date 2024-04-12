@@ -180,9 +180,7 @@ function CompileAll (|bool|)
 	if Options.Cpp
 		.Timer( "Export Cpp" )
 		StringCorrector.CorrectConsts
-		if linkage.Interpreter
-			ExecTable.Run
-		Cpp_Export.ExportAllSource
+		Cpp_Export.ExportAllSource(PackMaker.Run)
 
 	SCImport.ExportShaders
 
@@ -893,10 +891,6 @@ function AddMain (|int| mark, |bool|)
 
 	stderr.LowerErrorsTo = 0
 	return mark == stderr.errorcount
-
-
-function Collect (|Message| m, |bool| visible)
-	Compiler.program.CollectOne( m, visible ) // delete. compiler.collect --> .MyProj.Collect
 
 
 syntax append (|message| m)
