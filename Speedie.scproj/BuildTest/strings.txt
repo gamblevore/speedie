@@ -902,7 +902,7 @@
 "H_"
 "Handling Function Prototypes"
 "Has no return type."
-"Helpers need lowercase names"
+"private"
 "Hex"
 "Hider"
 "I think you mean 'beep'?"
@@ -2118,4 +2118,3 @@
 "set reuse"
 "fixed get"
 "134217727"
-"private"

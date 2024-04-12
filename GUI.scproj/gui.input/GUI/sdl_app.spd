@@ -7,7 +7,10 @@ module SDLApp
 	|error|						ToolTip = error()
 	|date|						OpenedFirst
 	|GUIPasteEvent|				AppDocumentOpen
+	|string|					LastSearch
+	|uint|						FrameCount
 
+	private
 	|SDL_Event|					Event
 	|KeyMod|					KeyMod
 	|[string]|					PendingAlerts
@@ -15,7 +18,6 @@ module SDLApp
 	|&SDL_Window|				ScreenWindow
 	|&SDL_Renderer|				Renderer
 	|&SDL_Texture|				Raw
-	|string|					LastSearch
 	|ivec2| 					NewSize
 	|ivec2| 					CurrMouseXY
 	|ivec2|						TryResizeLater
@@ -26,7 +28,6 @@ module SDLApp
 	|date|						FastToolTipDate
 	|date|						ChangeSelFlash
 	|date|						BlurBackgroundStart
-	|uint|						FrameCount
 	|float|						Scale
 	|bool|						StartedProperly
 	|bool|						IsBackground
@@ -134,7 +135,7 @@ module SDLApp
 
 	function Title (|string|)
 		|| s = .ScreenWindow
-			return $SDL_GetWindowTitle(s)
+			return SDL_GetWindowTitle(s).Render
 
 
 	function Title (assigns:|string|)
@@ -529,7 +530,7 @@ module SDLApp
 		img.DrawCircleStyled(sigh, ¥.DragAndDrop, 7.0)
 		
 		img.controlclip = sigh
-		|| t	= $s.length
+		|| t	= s.length.Render
 		|| x	= t.length*font.width
 		|| h	= font.height
 		|| P2	= (x, h)/2

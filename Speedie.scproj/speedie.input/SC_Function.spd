@@ -427,8 +427,8 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		error (self.source,  "Function here:")
 
 
-function scdecl.IsInt (|bool|)
-	return  .isnormal  and  .type.typeinfo.isint
+//function scdecl.IsInt (|bool|)
+//	return  .isnormal  and  .type.typeinfo.isint
 
 
 function message.IsSmallInt (|scdecl| T, |bool|)
@@ -1573,9 +1573,9 @@ function NewHider (CollectFunc)
 
 
 function NewHelper (CollectFunc)
-	if !node.name.IsLower
-		deprecate (node, "Helpers need lowercase names")
-	return SCFunction.NewFunc( node, name_space, ErrPlace )
+	rz = SCFunction.NewFunc( node, name_space, ErrPlace )
+	if rz
+		(rz isnt visible)
 
 
 function message.NeedsPreprocess (|bool|)
