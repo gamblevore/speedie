@@ -18,6 +18,7 @@ function Compiler.EnterCompile (|bool|)
 
 
 function Compiler.PrintResults
+	|| OK = stderr.ok
 	.PrintStats
 	.PrintCompileErrors
 	if SpdProcess.parent != nil
@@ -25,10 +26,10 @@ function Compiler.PrintResults
 
 	if options.selfreplacement and filedes.stdout.isterminal
 		if .variantsuffix ~= "Test"
-			if stderr.ok
+			if ok
 				app.say("Speedie Success", false)
-//			  else
-//				app.say("Speedie Failed", false)
+			  else
+				app.say("Failed", false)
 	if Options.Beep
 		"\07"
 

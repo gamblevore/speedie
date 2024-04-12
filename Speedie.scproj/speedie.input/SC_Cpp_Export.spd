@@ -829,6 +829,8 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		
 		if (d.exportName)
 			T <~ ' '
+			if d is local
+				t <~ '$'
 			d.exportName.safe(t)
 			if d.IsCArray
 				T <~ '['
@@ -1141,6 +1143,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		  else
 			fs <~ name
 		
+//		if scfunction.currfunc ~= "SC_Comp__FindFunction"
 		for mv in self
 			fs <~ ' '
 			mv.Export( fs )
@@ -1404,6 +1407,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	
 
 	function C_FSListComma (fpMsgRenderCpp)
+		opt norefcounts
 		for (item in self)
 			fs <~ ", "
 			start
@@ -1481,17 +1485,22 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		// ADD MORE ❤️‍🔥FIRE❤️‍🔥
 		
 		if !d.exportName
+			error (msg, errorreceiver.nonfatal) // should never happen
 			msg.safe(fs)
-			"@thg has no declname! 😭"
 
 		  elseif (d is TypeImprove) and (MsgOKToImprove(msg))
 			fs <~ '('
 			WriteDeclBrackets( msg, fs )
+			if d is local
+				fs <~ '$'
 			d.exportname.safe(fs)
 			fs <~ ')'
 
 		  else
+			if d is local
+				fs <~ '$'
 			d.exportname.safe(fs)
+
 		// plink plink plonk
 		// plantasy star is so beautiful.
 		// and i was... too. 

@@ -130,7 +130,7 @@ function Tran_Using (TranFunc)
 	arg.AppendAfter(decl, Start)
 	arg.AppendBefore(item, arg.Unreachable)
 
-	if (arg.parent == node)
+	if (arg in node)
 		node.name = "if"
 		node.first <~ «thg "true"»
 	  else
@@ -696,6 +696,7 @@ function Tran_OneIsa (|Message| isa_f, |Message| arg, |SCNode!| space)
 	expect (!cls.IsRole) (r, "This is not a real class. Test it's super-class instead.")
 	|| OldDecl		= space.LookupVarDecl( L.name )					#require
 	|| NewDecl		= OldDecl.copydecl
+	(newdecl is body)
 	NewDecl.IsTypeImprove = true
 	NewDecl.IsLookupOnly = OldDecl
 	

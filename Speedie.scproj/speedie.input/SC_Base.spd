@@ -35,7 +35,7 @@ function CollectFromNode (|Message| AST, |bool| Visible, |message| dest=nil)
 
 	require dest // sigh
 	for c in r
-		if c.parent == ast
+		if c in ast
 			dest <~ c
 
 

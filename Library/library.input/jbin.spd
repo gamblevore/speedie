@@ -118,7 +118,7 @@ function StringReader.NextMsg (|message| parent=nil, |syntax| fn, |string| name=
 	cpp_part NextMsgExpect
 	opt norefcounts
 	rz = .NextMsg #require
-	expect (rz.expect(fn, name) and (rz.parent == parent)) (rz)
+	expect (rz.expect(fn, name) and (rz in parent)) (rz)
 
 
 helper StringReader.NextMsg (|message|)
