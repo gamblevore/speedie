@@ -140,7 +140,7 @@ extend PerryIDE
 			.gnormal.solid	= vec4(0.1, 0.974)
 			.OnSelChanged   = EditMeSelChange
 			.onselerror		= EditMeSelError
-			.ColoriseAsRoot = autocomplete.functions
+//			.ColoriseAsRoot = autocomplete.functions
 
 
 		with .autocomplete

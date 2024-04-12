@@ -1287,11 +1287,11 @@ JBClass ( LessThan3 , JB_Task ,
 	JB_String* c;
 );
 extern Message* JB__App__Conf;
+extern Array* JB__App__OldArgs;
 extern JB_String* JB__App__Path;
 extern Message* JB__App__Prefs;
 extern JB_File* JB__App__stdin;
 extern JB_File* JB__App__StdOut;
-extern Array* JB__App_OldArgs;
 extern JB_String* JB__App_Usage;
 extern JB_String* SC__AutoComplete_function_names;
 extern Dictionary* SC__AutoComplete_Functions;
@@ -1398,7 +1398,7 @@ extern int SC__AC_max_total;
 extern JB_String* SC__AC_TestCrash;
 extern int SC__AC_total;
 extern bool SC__AC_WillExit;
-extern u16 JB__API_NilHappened;
+extern u16 JB__API_NilHappened_;
 extern CharSet* JB__Constants_CSAfterStatement;
 extern CharSet* JB__Constants_CSLettersOnly;
 extern CharSet* JB__Constants_CSLine;
@@ -1411,7 +1411,6 @@ extern Dictionary* JB__Constants_EscapeChr;
 extern Dictionary* JB__Constants_EscapeStr;
 extern Dictionary* JB__Constants_JS_EscapeStr;
 extern Dictionary* JB__Constants_JS_UnEscapeStr;
-extern JB_String* JB__Constants_Name;
 extern Dictionary* JB__Constants_UnEscapeStr;
 extern Dictionary* JB__Constants_XML_EscapeStr;
 extern Dictionary* JB__Constants_XML_UnEscapeStr;
@@ -1487,7 +1486,7 @@ extern bool SC__Options_UseFuncCallCount;
 extern byte SC__Options_UseScriptLoc;
 extern JB_String* SC__Options_Variant;
 extern bool SC__Options_Warnings;
-extern JB_File* JB__Platform_Logger;
+extern JB_File* JB__Platform_Logger_;
 extern Dictionary* SC__SCGame3D_Types;
 extern int SC__SC_UniqueNum;
 #define kSC__Refs_kBasisCArray (8)
@@ -1601,7 +1600,6 @@ extern JB_String* JB_kNameConf;
 extern Message* JB_ReturnSelfEqNil;
 extern Dictionary* JB_RootCollectTable;
 extern JB_ErrorReceiver* JB_StdErr;
-extern JB_ErrorReceiver* JB_StdErrOriginal;
 extern Syntax JB_SyxAcc;
 extern Syntax JB_SyxAdj;
 extern Syntax JB_SyxARel;
@@ -1695,10 +1693,11 @@ extern SCDecl* JB_TypeVoid;
 extern SCClass* JB_TypeVoid_;
 extern SCDecl* JB_TypeVoidPtr;
 extern SCClass* JB_TypeWrapper;
+extern bool JB__Tk__DotInsertAllow;
+extern Message* JB__Tk__EndOfLineMarker;
+extern Dictionary* JB__Tk__ErrorNames;
+extern u16 JB__Tk__StopBars;
 extern JB_String* JB__Tk_Data;
-extern bool JB__Tk_DotInsertAllow;
-extern Message* JB__Tk_EndOfLineMarker;
-extern Dictionary* JB__Tk_ErrorNames;
 #define kJB__Tk_kAdjectiveOp (1)
 #define kJB__Tk_kAllow (false)
 #define kJB__Tk_kColon (2)
@@ -1737,12 +1736,11 @@ extern Dictionary* JB__Tk_ErrorNames;
 #define kJB__Tk_kTmpOpp (32768 | 16)
 #define kJB__Tk_LargestFlag (8388607)
 extern FP_fnIDGenerator JB__Tk_Splitter;
-extern u16 JB__Tk_StopBars;
 extern MessagePosition JB__Tk_Using;
-extern JB_String* JB__zalgo_down;
-extern JB_String* JB__zalgo_mid;
+#define kJB__zalgo_down (JB_LUB[2105])
+#define kJB__zalgo_mid (JB_LUB[2104])
 extern Random JB__zalgo_R;
-extern JB_String* JB__zalgo_up;
+#define kJB__zalgo_up (JB_LUB[2103])
 #define kJB__byte_max (255)
 #define kJB__byte_min (0)
 #define kJB__char_max (127)
@@ -1862,11 +1860,11 @@ extern Dictionary* JB__TC_Types_Dict;
 #define kJB__ErrorFlags_PreferNoRenderPath (2)
 #define kJB__ErrorFlags_PrintAndKeep (1)
 #define kJB__ErrorFlags_PrintAndRemove (2)
+extern Array* JB__ErrorSeverity__names;
 #define kJB__ErrorSeverity_Critical (5)
 #define kJB__ErrorSeverity_Error (4)
 #define kJB__ErrorSeverity_Hint (1)
 #define kJB__ErrorSeverity_MaxError (6)
-extern Array* JB__ErrorSeverity_names;
 #define kJB__ErrorSeverity_OK (0)
 #define kJB__ErrorSeverity_Problem (3)
 #define kJB__ErrorSeverity_Warning (2)
@@ -2018,7 +2016,8 @@ extern Array* SC__NilReason_values;
 #define kSC__SCDeclInfo_Disabled (8192)
 #define kSC__SCDeclInfo_GameFlyingMem (2097152)
 #define kSC__SCDeclInfo_Global (131072)
-#define kSC__SCDeclInfo_LargestFlag (67108863)
+#define kSC__SCDeclInfo_Hidden (67108864)
+#define kSC__SCDeclInfo_LargestFlag (134217727)
 #define kSC__SCDeclInfo_Local (32768 + 16384)
 #define kSC__SCDeclInfo_NewlyCreated (64)
 #define kSC__SCDeclInfo_Param (16384)
@@ -2046,8 +2045,7 @@ extern Array* SC__NilReason_values;
 #define kSC__SCNodeType_Nil (1)
 #define kSC__SCNodeType_Object (5)
 #define kSC__SCNodeType_Struct (4)
-extern int JB__Syx_CurrFuncID;
-extern int JB__Syx_MaxFuncID;
+extern int JB__Syx_CurrFuncID_;
 #define kJB__TaskState_Animation (16)
 #define kJB__TaskState_Finished (64)
 #define kJB__TaskState_HadErrors (8)
@@ -2170,7 +2168,7 @@ extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_kDelete (2)
 #define kJB__Wrap_kFree (1)
 #define kJB__Wrap_kNothing (0)
-extern JB_String* JB__Rec_NonFatal;
+#define kJB__Rec_NonFatal (JB_LUB[1088])
 extern double JB__Rec_Progress;
 #define kJB__fix_TypeDict (3)
 #define kJB__fix_TypeObj (1)
@@ -2189,8 +2187,8 @@ extern CompressionStats JB__Flow_Stats;
 #define kSC__Instruction_kTypeFunc (1)
 extern Dictionary* SC__Instruction_TypeDict;
 extern Instruction* SC__Instruction_TypeList[128];
-extern Array* JB__Macro_TmpPrms;
-extern uint64 JB__Mrap_MDummy[2];
+extern Array* JB__Macro_TmpPrms_;
+extern uint64 JB__Mrap_MDummy_[2];
 extern NilTest* SC__NilTest_n0;
 extern NilTest* SC__NilTest_n1;
 extern byte SC__NilTest_NilTestByte;
@@ -2236,7 +2234,7 @@ extern bool SC__Base_CurrVisibility;
 #define kSC__Base_NoErrors (1)
 extern SpdProcess* JB__Proc_Parent;
 extern byte JB__Err_AutoPrint;
-extern Array* JB__Err_CurrSource;
+extern Array* JB__Err_CurrSource_;
 extern bool JB__Err_KeepStackTrace;
 #define kSC__Beh_kBehaviourProto (2)
 #define kSC__Beh_kBehaviourProtoRequired (6)
@@ -7013,7 +7011,7 @@ Message* SC_Msg_CmdImprove(Message* self);
 
 void JB_Msg_Cnj__(Message* self, FastString* fs);
 
-bool SC_Msg_CollectAGlobalDecl(Message* self, SCNode* scarg);
+bool SC_Msg_CollectAGlobalDecl(Message* self, SCNode* scarg, bool IsHidden);
 
 Message* SC_Msg_CollectDclName(Message* self);
 

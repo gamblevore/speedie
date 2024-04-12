@@ -14,6 +14,7 @@ module clipboard
 		  else
 			Notifications <~ "Can't fix line-endings in clipboard text."
 		return s
+	
 	function Text (assigns: |string| s)
 		if s // don't copy empty string!
 			._backup = s.cstr // macos hates copying binary data.

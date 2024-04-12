@@ -32,7 +32,7 @@ class TextView (GUIControl)
 	|GUIKeyEvent?|				OnKeyDown
 	|GUITextEvent?|				OnTextChanged
 	|GUITextEvent?|				OnSelChanged
-	|dictionary?|				ColoriseAsRoot // a callback would be better
+//	|dictionary?|				ColoriseAsRoot // a callback would be better
 	|Document?|					_Viewing
 
 	|Error?|					MyError
@@ -1810,23 +1810,23 @@ class TextView (GUIControl)
 			return p
 		|| sel = .SelRange
 		if !sel.width and sel.x > 0
-			parser.DotInsertAllow = true
+			parser._DotInsertAllow = true
 
 		p = .ValidateNewText
 		
 		if expect <= textview.AllowJeebox
 			.myerror = nil
-		  elseif !.myerror and .coloriseasroot
-			.ColoriseRoot(p)
+//		  elseif !.myerror// and .coloriseasroot
+//			.ColoriseRoot(p)
 		return p
 
 
 	helper ColoriseRoot (|message| p)
 		opt norefcounts
-		for m in p	// do this directly in the actual coloriser!!
-					// uncool to do this here
-			if (m == @tmp) and .coloriseasroot.ValueLower(m.name)
-				m.flags |= textview.NotRoot
+//		for m in p	// do this directly in the actual coloriser!!
+//					// uncool to do this here
+//			if (m == @tmp) and .coloriseasroot.ValueLower(m.name)
+//				m.flags |= textview.NotRoot
 
 
 	helper IsCleared (|bool|)

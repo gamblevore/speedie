@@ -13,6 +13,7 @@ class ColorScheme
 	|int|					HistoryIndex
 	|int|					Altered
 
+	|drawstyle| 			Scroll
 	|drawstyle| 			TextSelection
 	|drawstyle|				TextCopy
 	|drawstyle|				TextSelectionUnfocus
@@ -26,7 +27,7 @@ class ColorScheme
 
 
 	function LoadDefaults
-		.load(defaultjeebox.parse)
+		.load(DefaultColors.parse)
 	
 	
 	function LoadFromPrefs
@@ -36,6 +37,8 @@ class ColorScheme
 
 	
 	constructor
+		.scroll.bg				<~ ((0.5, 0.0, 0.7, 0.4)) 
+		.scroll.edge			<~ ((0.75, 0.25, 0.9, 0.5))
 		.TextSelection.bg		<~ ((1.0, 0.25, 0.75, 0.5))
 		.TextCopy.bg			<~ ((0.6, 0.6, 0.1, 0.2))
 		.TextCopy.edge			<~ ((0.6, 0.6, 0.1, 0.2))

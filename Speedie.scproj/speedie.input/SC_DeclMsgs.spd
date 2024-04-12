@@ -138,12 +138,17 @@ function scclass.CollectProp (|Message| msg, |bool|)
 // remove these... but later.
 function CollectDeclsGlobals (|Message| arg, |SCNode| scarg)
 	opt norefcounts
+	|| IsHidden = false
 	for item in arg
+		if item istmp "private"
+			IsHidden = true
+			item.expectempty
+		
 		if item == @decl
-			require item.CollectAGlobalDecl(scarg)
+			require item.CollectAGlobalDecl(scarg, IsHidden)
 
 
-function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
+function Message.CollectAGlobalDecl (|SCNode| scarg, |bool| IsHidden, |bool|)
 	opt norefcounts
 	
 	|| dcl = .CollectDecl(scarg, scarg, declmode.Globals, nil, nil)
@@ -154,6 +159,19 @@ function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
 				dcl.nildeclared = nilstate.real // in case of something like |object| x = real()
 		(dcl is property)
 		(dcl is Global)
+		if ishidden
+			(dcl is hidden)
+		  elseif dcl isnt hidden
+			|| n = dcl.name
+			if '_' == n.first or n.Last
+				(dcl is hidden)
+/*
+		if dcl isnt hidden
+			print "|"
+			print dcl.type.name
+			print "| "
+			printline dcl.Name
+*/
 		return true
 
 

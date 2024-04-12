@@ -96,6 +96,15 @@ struct Pico
 
 	module
 		|?&pico| Parent_
+		function Parent (|&pico|)
+			|| p = .Parent_
+				return p
+			require .HasParentSocket
+			rz = pico.new
+			.Parent_ = rz
+			if rz
+				rz.CompleteExec
+
 		function Conf (|&PicoGlobalConfig|)
 			cpp_wrapper PicoGlobalConf
 			
@@ -130,16 +139,6 @@ struct Pico
 			|PicoGlobalStats| St
 			St.Read
 			error ("Couldn't create a pico object. Too many picos: " + St.OpenPicos)
-				
-			
-		function Parent (|&pico|)
-			|| p = .Parent_
-				return p
-			require .HasParentSocket
-			rz = pico.new
-			.Parent_ = rz
-			if rz
-				rz.CompleteExec
 	
 
 struct PicoConfig

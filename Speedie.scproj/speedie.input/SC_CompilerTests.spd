@@ -17,14 +17,15 @@ function Compiler.FileSanityTests
 helper Compiler.FileTestsSub (|file| Dest, |file| Src, |string| A, |string| B)
 	Dest.DeleteAll
 	Src.DeleteAll
-	expect (!Dest.Exists and !Src.Exists) ("Unable to delete files")
+	|| q = "Unable to delete files"
+	expect (!Dest.Exists and !Src.Exists) (q)
 	
 	// So we have a few paths... and they don't exist, lets create them.
 	Src.linkto(Dest)
-	A <~ Jeebox.name
+	A <~ q
 
 	|| ReadBack = B.file.ReadAll
-	check (ReadBack == Jeebox.name) ("Testing link+write failed. Read: " + Readback)
+	check (ReadBack == q) ("Testing link+write failed. Read: " + Readback)
 		
 
 //function app.FlowTest (|string| path)

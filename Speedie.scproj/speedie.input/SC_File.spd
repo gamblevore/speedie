@@ -86,7 +86,7 @@ class SCFile (file)
 			|| Layer = (Message).CreateUseLayer(self, str)
 			.fData = str
 			StdErr.source = .path
-			parser.DotInsertallow = true	// more consistant with IDE
+			parser._DotInsertallow = true	// more consistant with IDE
 			
 			|| oldimp = scimport.CurrIsManuallyImported
 			scimport.CurrIsManuallyImported = .proj.depth
@@ -100,7 +100,7 @@ class SCFile (file)
 			.DetectInsecureWords
 			
 			parser.using.tag = 0
-			parser.DotInsertallow = false
+			parser._DotInsertallow = false
 			StdErr.source = ""
 		(Message).restore
 

@@ -5,7 +5,7 @@
 
 
 module App {
-|[string]?|					OldArgs = nil
+|[string]?|					_OldArgs = nil
 |string| 					Usage
 |message|					_Conf
 |config|					_Prefs
@@ -98,7 +98,7 @@ function Switches (|[string]|)
 		if R.ArgName
 			rz <~ R
 	
-function args_ (|[string]|)
+helper args_ (|[string]|)
 	opt norefcounts
 	for R in .rawargs
 		if R.argname ~= ""
@@ -107,10 +107,10 @@ function args_ (|[string]|)
 function Args (|[string]|)
 	cpp_part ArgsArray
 	opt norefcounts
-	rz = .OldArgs
+	rz = ._OldArgs
 	if rz == nil // == nil important here
 		rz = .args_
-		.OldArgs = rz
+		._OldArgs = rz
 
 function CrashPrint
 	cpp_wrapper JB_CrashTracer
@@ -344,4 +344,6 @@ function NeedsIdealPath (|file|)
 	if f.path != app.apppath
 		return f
 }
+
+
 

@@ -60,7 +60,7 @@ class Error (Message)
 		opt norefcounts
 		|| node = .node
 		if ! node
-			node = currsource.last  #require
+			node = currsource_.last  #require
 			.node = node
 		.position = node.position
 
@@ -206,11 +206,11 @@ class Error (Message)
 
 	module
 		function SourceAdd (|message| m)
-			.currsource <~ m
+			.currsource_ <~ m
 		function SourceRemove
-			.currsource.pop
+			.currsource_.pop
 			
-		|[message]|		CurrSource
+		|[message]|		CurrSource_
 		|byte|			AutoPrint = 0 // errorflags.PrintAndRemove
 		|bool|			KeepStackTrace = false
 
@@ -262,11 +262,11 @@ datatype ErrorSeverity (Byte)
 		OK			= 0
 	
 	module
-		|array of string| names
+		|array of string| _names
 	
 		function InitNames (|[string]|)
 			opt norefcounts
-			return .names init "OK note warning problem error critical".words
+			return ._names init "OK note warning problem error critical".words
 		
 		function Find (|string| name, |message| err=nil, |errorseverity|)
 			opt norefcounts

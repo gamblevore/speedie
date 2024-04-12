@@ -30,7 +30,7 @@ extend Parser
 		.token(",") = .handler(kComma (|) kEndOfline, fEndOfLine) 
 		.token(":") = .handler(kColon, fEndOfLine).link(kColonArg, fArgColon)
 
-		.EndOfLineMarker = message(@nil, "\n")
+		._EndOfLineMarker = message(@nil, "\n")
 
 
 		|| numb     =   "0123456789".bytesplit
@@ -132,7 +132,7 @@ extend Parser
 	
 	function BarThings (|int| Start, |syntax| Syx, |Message|)
 		require (.nextbyte != '=')
-		StopBars = kTemporalSyx (|) kFuncAfterBar
+		_StopBars = kTemporalSyx (|) kFuncAfterBar
 		|| item = .ProcessThingNoBar // maybe we can remove stopbars? we'll see...
 									 // can't just comment out above line, but maybe use
 									 // ProcessThingNoBar in more places?
@@ -141,7 +141,7 @@ extend Parser
 		  else
 			item = parser.newempty(nil, @Emb, start, start)
 
-		StopBars = 0
+		_StopBars = 0
 		require .ExpectEndChar(parser.nextstart, "|")
 
 		rz = parser.new(nil, Syx, start)
@@ -200,9 +200,9 @@ extend Parser
 		|int| after = parser[++start]
 		if jeebox.CSWordStart[after]
 			after = .WordAfter(start)						#require
-		  elseif parser.DotInsertallow
+		  elseif parser._DotInsertallow
 			after = start
-			parser.DotInsertallow = false
+			parser._DotInsertallow = false
 		  else
 			return .ErrorAdd("Missing name after dot", start)
 		
@@ -422,7 +422,7 @@ extend Parser
 	
 	function fCommentLine (ParseHandler)
 		.gotoendofline(parser.Nextstart)
-		return parser.EndOfLineMarker
+		return parser._EndOfLineMarker
 
 
 	function fComment (ParseHandler)
@@ -441,7 +441,7 @@ extend Parser
 		} (count)
 		
 		parser.NextStart = i + 1
-		return parser.endoflinemarker
+		return parser._endoflinemarker
 
 
 	function fDecl (ParseHandler)
@@ -476,7 +476,7 @@ extend Parser
 
 
 	function fEndOfLine (ParseHandler)
-		return parser.EndOfLineMarker
+		return parser._EndOfLineMarker
 
 
 	function fFuncCall (ParseHandler)
@@ -843,7 +843,7 @@ ive been~running #since morning
 
 	function GetFuncAfter (|Message!| result, |Message!|)
 		while
-			|| ThisAfter = kFuncAfterAny &~ StopBars
+			|| ThisAfter = kFuncAfterAny &~ _StopBars
 			if NoFuncAfter(.NextByte)
 				ThisAfter &= ~kFuncAfterNoSpace
 			
@@ -882,7 +882,7 @@ ive been~running #since morning
 
 	function ParseLoopFlags (|Message| Output, |string| Ender, |int| TmpoFlags, |bool|)
 		|ind| err = parser.nextstart
-		rz = .ParseLoop( Output, TmpoFlags &~ parser.StopBars )
+		rz = .ParseLoop( Output, TmpoFlags &~ parser._StopBars )
 		// Remove stopbars!!! BarThings doesn't need parseloop!
 		if Ender
 			parser.ExpectEndChar(err, Ender)
@@ -1041,7 +1041,7 @@ ive been~running #since morning
 				.nextstart = n-1
 				|| line = .Process( kendofline, Parser.kAllow, parent )
 				n = .nextstart
-				if line != parser.EndOfLineMarker
+				if line != parser._EndOfLineMarker
 					exit
 
 			  else
@@ -1222,12 +1222,12 @@ module parser
 		cpp_Part Tk
 
 	|string|				Data
-	|message|				EndOfLineMarker
-	|dictionary of string|  ErrorNames = nil
+	|message|				_EndOfLineMarker
+	|dictionary of string|  _ErrorNames = nil
 	|fnIDGenerator|			Splitter = &parser.range
 	|MessagePosition|		Using
-	|uint16|                StopBars
-	|bool|					DotInsertAllow
+	|uint16|                _StopBars
+	|bool|					_DotInsertAllow
 
 	using.Position = -1
 

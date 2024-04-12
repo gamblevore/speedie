@@ -3,32 +3,30 @@
 module SDLApp
 	linkage
 		cpp_part App
+	|image|						Screen = image("read")
+	|error|						ToolTip = error()
+	|date|						OpenedFirst
+	|GUIPasteEvent|				AppDocumentOpen
+
 	|SDL_Event|					Event
 	|KeyMod|					KeyMod
-	|GUIPasteEvent|				AppDocumentOpen
 	|[string]|					PendingAlerts
 	|array?|					DrawDrag = nil
-	|image|						Screen = image("read")
 	|&SDL_Window|				ScreenWindow
 	|&SDL_Renderer|				Renderer
 	|&SDL_Texture|				Raw
-	|error|						ToolTip = error()
 	|string|					LastSearch
 	|ivec2| 					NewSize
 	|ivec2| 					CurrMouseXY
 	|ivec2|						TryResizeLater
 	|date|						FrameLength
-	|date|						OpenedFirst
 	|date|						LastFrameDate = 1 // wont fire otherwise
 	|date|						LastWindowClose
-	|date|						SelSolidUntil
 	|date|						FixScreenBug
 	|date|						FastToolTipDate
 	|date|						ChangeSelFlash
 	|date|						BlurBackgroundStart
-	|uint|						LastMouseDownRepeat
 	|uint|						FrameCount
-	|uint|						DrawCount
 	|float|						Scale
 	|bool|						StartedProperly
 	|bool|						IsBackground
@@ -454,8 +452,8 @@ module SDLApp
 			
 	function PreframeText (|window| W)
 		.TextInputEnabledAtStart = .TextInputEnabled		
-		if ListView.delayedItTill.fired
-			ListView.delayedItTill = 0
+		if ListView.delayedItTill_.fired
+			ListView.delayedItTill_ = 0
 			|| lv = w.realfocus
 			if lv isa ListView
 				lv.TryDelayedEdit
@@ -471,8 +469,8 @@ module SDLApp
 	
 	function HandleOpenFile
 		|| d = .DocumentOpened$
-		.opendocument(d)
-		if .openedfirst.ago < 3s
+		.OpenDocument(d)
+		if .OpenedFirst.ago < 3s
 			.FixScreenBug = date.now + 1s
 
 
@@ -709,7 +707,6 @@ module SDLApp
 
 	
 	function EndFrame (|&SDL_Texture| T)
-		.Drawcount++
 		t.UnlockThatCopiesEvenThoughItShouldnt // seems like we are double doing this?
 		|SDL_Rect| dstrect
 		SDL_GL_GetDrawableSize( .screenwindow!,  &dstrect.w,  &dstrect.h )
@@ -946,7 +943,6 @@ module SDLApp
 	helper MouseUpEvent (|window| w, |ivec2| XY, |int| Button,  |int|)
 		SDL_CaptureMouse(false)
 		//.AppResizingXY = nil
-		.LastMouseDownRepeat = nil
 		|| dd   = .drawdrag 
 		|| di	= w.DroppingInto
 			for c in dd
@@ -957,9 +953,9 @@ module SDLApp
 		w.ClearDrops
 		if !(di and dd) and (button == 3) and (dow != F) and f and (f contains xy)
 			f.__rightclick__(xy)
-		  elseif dow and (button!=3) and !ScrollInfo.JustClicked
+		  elseif dow and (button!=3) and !ScrollInfo.JustClicked_
 			dow.__MouseUp__(xy)
-		ScrollInfo.JustClicked = false
+		ScrollInfo.JustClicked_ = false
 		return SDLActivity.activity
 
 

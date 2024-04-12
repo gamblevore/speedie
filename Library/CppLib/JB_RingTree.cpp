@@ -396,7 +396,6 @@ void JB_Ring_NextSibSet( JB_List* self, JB_List* Mover ) {
 	if ( self->Parent and PrepareMove_( self, Mover ) ) {
 		InsertAfter_( self, Mover );
 	}
-	//return false;
 }
 
 
@@ -445,21 +444,6 @@ bool JB_Ring_FirstSet( JB_List* self, JB_List* Mover ) {
 			return JB_Ring_PrevSibSet( First, Mover );
     }
     return false;
-}
-
-
-JB_List* JB_Ring_MakeFirst( JB_List* self ) {
-	// buggy? the order seems altered...
-	JB_List* P = self->Parent;
-	require(P);
-	JB_List* F = P->Child;
-	JB_List* L = F->Prev;
-	JB_List* Pr = self->Prev;
-	L->Next = F;							// Restore the links!
-	P->Child = self;						// OK... so we become the first...
-	Pr->Next = nil;							// Thats it???
-	Sanity_(self);
-	return F;
 }
 
 
@@ -514,7 +498,7 @@ void JB_Ring_Destructor( JB_List* self ) {
 		JB_Decr( Curr );
 		Curr = Next;
 	};
-    if (self->Parent) {				// from .dispose
+    if (self->Parent) {
 		RingLeave_( self );
 		RingOwnForDeref_( self );
 		JB_SafeDecr( self );

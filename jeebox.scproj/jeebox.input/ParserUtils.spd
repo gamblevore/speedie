@@ -82,7 +82,7 @@ helper String.ParseSub (|syntax| owner, |bool| AllowDecomp,  |MessageRoot|)
 	if !Parser.CppInited
 	    Parser.Init
 	parser.StartParse( self )
-	parser.StopBars = 0
+	parser._StopBars = 0
 	|| OK		= StdErr.mark
 	|| Flags	= parser.kTemporal
 	|| into		= message.new(nil, owner, 0, "", 0)
@@ -176,17 +176,17 @@ extend Parser
 
 	function FindError (|int| num, |int|)
 		if num == kThing: return kThing
-		for (ErrorNames) (Key)
+		for (_ErrorNames) (Key)
 	        || i = key.parseint|int|
 			if (num & i) == i
 				return i
 
 
 	function MessageErrorSub (|FastString| fs, |int| num, |int| ButFound, |int|)
-		|| e = .ErrorNames
+		|| e = ._ErrorNames
 		if !e
 			e = Dictionary()
-			.ErrorNames = e
+			._ErrorNames = e
 	        e[kTemporal]           = "temporal"
 	        e[kTemporalSyx]        = "declaration"
 	        e[kTemporalWord]       = "statement"

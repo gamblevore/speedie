@@ -6,7 +6,7 @@
 
 
 extend_module ColorScheme
-	|| DefaultJeebox = `
+	|| DefaultColors = `
 syx 
 	nil "0c808080ff"
 	arg "0cE0B060FF"

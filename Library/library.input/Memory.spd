@@ -157,10 +157,10 @@ class Memory
 		|| L = .length
 		if (L >= .Capacity)
 			// try grow
-			|| NewSize = (.itemsize*L*2)
+			|| NewSize = .itemsize*L*2
 			|| P2 = Memory.realloc(._ptr, NewSize)
 			if (!P2) // fail
-				return (&Memory.MDummy)|&...|
+				return (&Memory.MDummy_)|&...|
 			|| OldSize = .ByteCapacity
 			Memory.zero((p2 + OldSize), NewSize - OldSize) 
 			._ptr = p2
@@ -258,7 +258,7 @@ class Memory
 		return .ptr
 
 	module
-		|uint64[2]| MDummy
+		|uint64[2]| MDummy_
 		function Object (|int| Count, |int| ItemSize, |Memory|)
 			visible 
 			|| p = byte.zalloc(Count * ItemSize)

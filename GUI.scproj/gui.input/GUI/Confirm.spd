@@ -6,21 +6,13 @@ module beep
 		app.beep(s)
 
 
-//function errorreceiver.Beep (|bool|)
-//	if .ok
-//		return true
-//	|| err = .LastError()
-//	|| s = ($err, "Unknown error occurred.")(err)
-//	app.beep(s)
-
-
 extend_module app
 	function BeepSub
 		cpp_Wrapper JB_App__Beep
 	
 	function Beep (|string?| q="")
 		if beep.OK.fired
-			.beepsub
+			.BeepSub
 			beep.OK = date() + (1s/12)
 		if q
 			.alert(q)
@@ -29,7 +21,7 @@ extend_module app
 		if sdlapp.StartedProperly
 			ConfirmIt(q, "", ["OK"])
 		  else
-			sdlapp.pendingalerts <~ q
+			sdlapp.PendingAlerts <~ q
 
 
 function ConfirmCancel (|string| Q,  |string| Title="",  |int|)
@@ -54,7 +46,7 @@ function string.Ask_Named (|string| Answers,  |int|)
 function string.Ask (|string| response="",  |string| Title="",  |stringthatwasreadsafely|)
 	|| Answers = ["OK", "Cancel"]
 	if ConfirmIt(self, title, Answers, response) == 1
-		return ConfirmWindow_.asker!.response.text
+		return ConfirmWindow_._asker!.response.text
 	return String.Error
 
 
@@ -82,7 +74,7 @@ helper window.CanJustCloseForQuit (|bool|)
 
 
 function ConfirmIt (|string| Q,  |string| Title,  |[string]| answers,  |string| Response=string.byte(0), |ConfirmCanceller| Cancel = nil, |int|)
-	|| w = ConfirmWindow_.asker init ConfirmWindow_()
+	|| w = ConfirmWindow_._asker init ConfirmWindow_()
 	if !q or w is visible		// recursive... sigh
 		if answers[2]
 			return -1			// cancel
@@ -201,7 +193,7 @@ class ConfirmWindow_ (Window)
 		btn.gnormal.solid	= (0.15, 0.15,0.15,1.0)
 	
 	module	
-		|ConfirmWindow_| asker
+		|ConfirmWindow_| _asker
 
 
 

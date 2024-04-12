@@ -333,7 +333,7 @@ module JB_API
 	linkage
 		cpp_part API
 
-	|uint16| NilHappened = 0 // save 2 bytes XD
+	|uint16| NilHappened_ = 0 // save 2 bytes XD
 	cpp_wrapper JB_LibInit (|&cstring| Args=nil, |bool| IsThread=false, |int|)
 	cpp_wrapper JB_LibShutdown ()
 
@@ -377,9 +377,9 @@ module JB_API
 		require stderr.ok
 		
 		debugger
-		if ++.NilHappened < 16
+		if ++.NilHappened_ < 16
 			.NilCallBack("Jeebox: NilObjectError in caller.")
-		  elseif .NilHappened == 16
+		  elseif .NilHappened_ == 16
 			.NilCallBack("Jeebox: Too many NilObjectErrors. Silencing.")
 	
 	

@@ -74,8 +74,6 @@ helper CompareError (|Message?| expected, |Message?| found, |bool|)
 
 
 helper EntityTest (|string|)
-// Should spell (ĴëêƁoⓧ)
-
 	|| replicate	= `\n\(&#x134;&#xEB;\C3\AA\C6\81o&#9447;\) `
 
 	|dictionary of string| repl = dictionary.new
@@ -86,7 +84,8 @@ helper EntityTest (|string|)
 	|| s3 = replicate.unescape               // inbuilt
 	replicate = replicate.ReplaceAll(repl)   // cobbled together
 
-	debugger (Jeebox.Name == replicate and s3)
+	|| jb = "\n\(&#x134;&#xEB;\C3\AA\C6\81o&#9447;\) "
+	debugger (jb == replicate and s3)
 
 	return replicate.lowercase + " loaded successfully\n"
 

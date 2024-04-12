@@ -63,13 +63,13 @@ function image.ClippedRectDrawer (GUIDrawEvent)
 
 
 extend_module Image
-	|image| _CurlieQue
+	|image| CurlieQue_
 	function CurlieQue (|image|)
-		|| c = ._Curlieque
+		|| c = .Curlieque_
 			return c
 		c = ( img://curlieque.png ).LoadQOI #require
 		c.Rotate(c)
-		._Curlieque = c
+		.Curlieque_ = c
 		return c
 
 

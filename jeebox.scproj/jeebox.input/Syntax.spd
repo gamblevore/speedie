@@ -105,8 +105,7 @@ datatype Syntax (Byte)
 	
 	
 	module 
-		|int|		CurrFuncID
-		|int|		MaxFuncID  
+		|int|		CurrFuncID_
 		
 		function Func (|string?| name, |message| where=nil, |syntax|)
 			visible
@@ -118,9 +117,8 @@ datatype Syntax (Byte)
 		// called by the compiler via "syx" syntax.
 		// would be better to just make these all consts?
 		// at least... the syxnum should be.		
-			|| ID = .CurrFuncID++
+			|| ID = .CurrFuncID_++
 			|| result = Syntaxobj.new(msg, name, ID)
-			MaxFuncID = ID
 			_syxdict_[name] = result
 			_Funcarray_[ID] = result
 			if (LongName)

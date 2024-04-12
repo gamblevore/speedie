@@ -204,7 +204,7 @@ class ListView (GUIControl) {
 	
 	behaviour RightClick
 		.EditDelayed = nil
-		delayEditTill = nil
+		listview.delayEditTill_ = nil
 		.MouseDownCell = .FindClickedCell(P)
 		|| mdc = .MouseDownCell$
 		|| r = mdc.row
@@ -690,7 +690,7 @@ class ListView (GUIControl) {
 
 	function DelayedRename (|ListViewCell| i)
 		.EditDelayed = i
-		delayedittill = (date() + 0.5s, nil)(i)
+		delayedittill_ = (date() + 0.5s, nil)(i)
 
 
 	function TryDelayedEdit
@@ -1494,19 +1494,15 @@ class ListView (GUIControl) {
 			f = f.next
 
 	module
-		|drawstyle| 		gscroll
-		|date|				DelayEditTill
+		|date|				DelayEditTill_
 		.init
 
 		function Init
-			.gscroll = drawstyle()
-			.gscroll.bg <~ ((0.5, 0.0, 0.7, 0.4)) 
-			.gscroll.edge <~ ((0.75, 0.25, 0.9, 0.5))
 	
 	
-		helper pf (|string|s, |string|)
+		helper pf (|string| s, |string|)
 			for (c in s) (i)
-				if c.isalphanum
+				if c.IsAlphaNum
 					return s[i...].lowercase
 			
 }
@@ -1522,5 +1518,3 @@ function ListViewrow.Depth (|listview| me, |int|)
 		rz++
 		c = c.parent
 
-
-|ivec4| LastCB

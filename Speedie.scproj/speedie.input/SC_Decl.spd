@@ -73,8 +73,9 @@ datatype SCDeclInfo (uint)
 		Task
 		Atomic
 		Self
-		SetTo			// a var sets it... like: rz = obj
-		Local = Body + Param
+		SetTo					// a var sets it... like: rz = obj
+		Hidden					// internal global... should not be exposed to non-lib stuff
+		Local		 = Body + Param
 		SelfImplicit = Self + local // local is set by CollectOneParam, anyhow?
 		DclCopied    = altered + stayborrowed + static + api + UpgradeableContained + compilercreated // need more too? do later
 

@@ -17,7 +17,7 @@ function app.AskSave (|string| SingleType, |string| base="", |string|question=""
 	
 
 function OpenSaveRequest (|string| types,  |string| base,  |string| Accept,  |bool| Save,  |string| question,  |string| RestoreDir="",  |string|)
-	|| w = OpenSaveDialog.asker init OpenSaveDialog()
+	|| w = OpenSaveDialog._asker init OpenSaveDialog()
 	
 	with w
 		.types				= types
@@ -182,19 +182,14 @@ class OpenSaveDialog (Window)
 	
 	
 	module
-		|message|						PrefPlace 
-		|OpenSaveDialog|				Asker
+		|OpenSaveDialog|				_Asker
 		
-		function StartPrefs (|message|)
+		function LastDir (|message|)
 			rz = (app.prefsinit)("opensave")
 			rz.keep(20)
 			for f in rz
 				if f != @tmp
 					f.remove
-		
-		function LastDir (|message|)
-			opt norefcounts
-			return .PrefPlace init .startprefs
 			
 		function FindFileName (|listview| s, |string| name, |filerow|)
 			for r.all in s

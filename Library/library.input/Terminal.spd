@@ -7,6 +7,7 @@ class TerminalCell
 
 
 module Terminal
+	private
 	|array of array|	Screen
 	|faststring| 		fs
 	|date| 				LastDisplay
@@ -100,7 +101,7 @@ module Terminal
 	
 
 	function Size (|ivec2|)
-		return (w,h)
+		return (w, h)
 	
 	syntax Expect (|string| msg="")
 		"\07"

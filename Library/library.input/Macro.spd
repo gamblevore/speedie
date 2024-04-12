@@ -29,13 +29,13 @@ class Macro
 	function Run (|message| prm1=nil, |message| prm2=nil, |message|)
 		cpp_part CallFast
 		rz = message()
-		TmpPrms <~ prm1
-		TmpPrms <~ prm2
-		rz.BecomeMacro(self, TmpPrms)
-		TmpPrms.clear
+		TmpPrms_ <~ prm1
+		TmpPrms_ <~ prm2
+		rz.BecomeMacro(self, TmpPrms_)
+		TmpPrms_.clear
 	
 	module
-		|array of message| TmpPrms
+		|array of message| TmpPrms_
 
 
 macro string.Macro

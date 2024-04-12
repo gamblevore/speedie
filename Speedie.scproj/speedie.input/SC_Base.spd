@@ -880,7 +880,6 @@ function DontRemove (CollectFunc)
 	return Compiler.Program // OK
 
 
-
 dispatch RootCollectTable (CollectFunc)
 	+"love"					SCGame3D.Love
 	+"function"				SCFunction.NewFunc
@@ -913,6 +912,7 @@ dispatch RootCollectTable (CollectFunc)
 	+"linkage"				CppRefs.Linkage
 	+"struct"				SCClass.newstruct
 	+"datatype"				SCClass.DataType
+	+"private"				(dontremove)
 	+"extend"				SCClass.StoreExtend
 	+"extend_module"		SCClass.StoreExtendModule
 	+"extends"				{ error (node, "I think you mean 'extend'"), return compiler.program }

@@ -5,15 +5,15 @@ module ScrollInfo
 	constants
 		TimerStart = 45
 	
-	|int|								InDrag = -1
-	|bool|								JustClicked
+	|int|								InDrag_ = -1
+	|bool|								JustClicked_
 	
 	function Timer (|uint|)
 		return date.ticks
 	
 	function EndDrag
-		if .InDrag >= 0 
-			.InDrag = -1	
+		if .InDrag_ >= 0 
+			.InDrag_ = -1	
 
 
 function ListView.SLH (|vec3|)
@@ -63,10 +63,11 @@ function DrawScroll (|vec3| slh, |image?| where=nil, |float|)
 	if !where
 		return s
 	if s
-		using listview.gscroll
-			sdlapp.touch
-			ListView.gscroll.Strengthen(s)
-			where.RectStyled(R, ListView.gscroll)
+		|| scr = ¥.scroll
+		using scr
+		sdlapp.touch
+		scr.Strengthen(s)
+		where.RectStyled(R, scr)
 	  else
 		._ScrollDrawTimer = 0
 
@@ -111,13 +112,13 @@ function ClickedScrollbar (|ivec2| P,  |int| Clicks,  |vec3| slh,  |&uint| Timer
 	|| y = (p.y - r.y)
 
 	if clicks == -1 // dragged
-		require (ScrollInfo.InDrag >= 0) 
-		.ScrollbarMove(slh, y - ScrollInfo.InDrag)
+		require (ScrollInfo.InDrag_ >= 0) 
+		.ScrollbarMove(slh, y - ScrollInfo.InDrag_)
 	  elseif r contains p
-		ScrollInfo.JustClicked = true
-		ScrollInfo.InDrag = y
+		ScrollInfo.JustClicked_ = true
+		ScrollInfo.InDrag_ = y
 	  else
-		ScrollInfo.indrag = -1
+		ScrollInfo.indrag_ = -1
 		return false
 	*Timer = ScrollInfo.TimerStart + date.ticks
 	return true

@@ -294,8 +294,8 @@ class TextViewLine (list)
 		isnt last
 		return i
 	
-	module
-		|Error|					TextErrors 
+//	module
+//		|Error|					TextErrors 
 
 
 

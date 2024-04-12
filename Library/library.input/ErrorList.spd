@@ -1,7 +1,6 @@
 
 
 |ErrorReceiver| StdErr = ErrorReceiver.new
-|ErrorReceiver| StdErrOriginal = stderr // remove?
 
 // how to remove log
 
@@ -31,7 +30,7 @@ class ErrorReceiver
 		.errors = error()
 		.MaxErrors = 512
 		.MaxProblems = 16
-		JB_API.NilHappened = nil
+		JB_API.NilHappened_ = nil
 
 
 	function Clear
@@ -218,7 +217,6 @@ class ErrorReceiver
 
 	module
 		|f64|		Progress
-		|String|	NonFatal = "Non-Fatal Internal Error"
 		function OutOfMemory (|bool|)
 			cpp_Wrapper JB_OutOfMemoryOccurred
 			
@@ -229,6 +227,9 @@ class ErrorReceiver
 			|| N = curr_err.next
 			yield curr_err
 			curr_err = N
+			
+	constants
+		NonFatal = "Non-Fatal Internal Error"
 
 
 

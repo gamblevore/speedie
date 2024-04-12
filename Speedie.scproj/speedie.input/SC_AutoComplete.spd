@@ -291,7 +291,7 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 		return fn
 	|| orig = fn.insertin(parent, src.name)
 	|| pos = mpos.int
-	parser.dotinsertallow = true
+	parser._dotinsertallow = true
 	if fn.update_source(pos, str.name, myfile, orig)
 		.AnonParent = parent
 		.anontext = str.name
