@@ -923,8 +923,7 @@ module
 	
 	function StoreExtend (CollectFunc)
 		opt norefcounts
-		// if node.objectid == 1171272
-		node.indent = 255 - scnode.currvisibility
+		node.visible = scnode.currvisibility
 		Compiler.ExtendList <~ node
 		node.obj = SCImport.curr
 		Return Compiler.program

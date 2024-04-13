@@ -9,7 +9,7 @@
 //role DataObject (DataTypeWrapper)
 
 
-class DataObject
+class DataObject 
 	linkage
 		cpp_part Wrap
 		cpp_class DTWrap
@@ -40,7 +40,7 @@ class DataObject
 		.PrivValue = b|int|
 
 	
-	constructor (|&nil| p)
+	constructor (|?&nil| p)
 		cpp_part ConstructorVoidPtr
 		.datatype = datatypecode.unusedtype
 		.PrivValue = p|int64|

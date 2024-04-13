@@ -39,7 +39,7 @@ module Math
 	function float.tan (|float|)
 		return math.tan(self) //sigh
 
-	helper float.__sincospi (|&float| a, |&float| b)
+	helper float.__sincospi (|&float| A, |&float| B)
 		cpp_wrapper (__sincospif)
 		
 	function float.SinCos (|vec2|)

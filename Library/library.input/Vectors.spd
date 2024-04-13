@@ -82,7 +82,7 @@ datatype vec4
 			cpp_part New4
 			numeric
 			return (a,b,c,d)
-		function Load (|&byte| b, |vec4|)
+		function Load (|&byte| B, |vec4|)
 			cpp_inbuilt JB_vec4_Load
 
 
@@ -233,7 +233,7 @@ datatype ivec4
 		fs <~ "(${.x}, ${.y}, ${.z}, ${.w})"
 	
 	module
-		function Load (|&byte| b, |ivec4|)
+		function Load (|&byte| B, |ivec4|)
 			cpp_inbuilt JB_ivec4_Load
 
 		function New (|ivec4|)

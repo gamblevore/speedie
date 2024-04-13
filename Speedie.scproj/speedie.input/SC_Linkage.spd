@@ -6,17 +6,23 @@ module Linkage
 	|| Flagz = message()		// for the linker i guess...
 	
 	function Interpreter (|bool|)
-		return linkage["interpreter"].yes
+		return linkage.GetFlag("interpreter").yes
 	
-	syntax access (|string| name, |string|)
+	function CombineFlags (|string| name,, |string|)
 		|| fs = faststring()
+		.getflag(name, fs)
+		return fs
+	
+	function GetFlag (|string| name, |faststring| fs=nil, |string|)
+		opt norefcounts
 		for ch in .Flagz
 			if ch ~= name
+				if !fs
+					return ch.firstname
 				|| str = ch.firstname
 					if fs.length
 						fs <~ ' '
 					fs <~ str
-		return fs
 
 
 	function message.ConfTake (|message| dest, |string| name)
@@ -25,22 +31,25 @@ module Linkage
 			dest.takeallfrom(F)
 			F.parent!.remove
 
-	
-	function LinkerSub (CollectFunc) // linkagesub
+
+	function CompilerCollect (|message| s)
 		opt norefcounts
+		Linkage.Collect(s, Compiler.Program, nil)
+		options.MakeInterpreter = linkage.interpreter
+		s.remove
+	
+
+	function Collect (CollectFunc)
+		opt norefcounts
+		expect  (name_space == Compiler.Program)  (node, "This must be at root.")
 		|| arg = node[@arg]
 			arg.ConfTake(.Flagz, "flags")
 			arg.ConfTake(.osxframeworks, "frameworks")
 			for ch in arg
 				error (ch)
 			return Compiler.program
-			
-				
-		
-	function Collect (CollectFunc)
-		expect  (name_space == Compiler.Program)  (node, "This must be at root.")
 
-		return LinkerSub(node, name_space, ErrPlace)		#expect (ErrPlace, `Supposed to be like: linkage { osx = "linker flags", win = "linker flags2" }` )
+		error (ErrPlace, `Supposed to be like: linkage { osx = "linker flags", win = "linker flags2" }` )
 
 
 

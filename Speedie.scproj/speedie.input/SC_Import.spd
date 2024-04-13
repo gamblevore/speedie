@@ -5,7 +5,7 @@
 
 
 
-class SCImport
+class SCImport 
 	linkage
 		cpp_part		Imp
 	
@@ -14,6 +14,7 @@ class SCImport
 	|errorseverity|			BlindCast
 	|int|					Depth
 	|file?|					Where
+	|scfile?|				Conf
 	|[SCFile]|				Files
 	|MemoryLayer|			DeclLayer
 	|SCModule|				Mod
@@ -91,11 +92,14 @@ class SCImport
 		opt norefcounts
 		.Mod.ExportName = "App" // make it simple
 		require scf
+		.conf = scf
 		for s in scf.AST
 			if s != @tmp
 				0
 			  elseif s ~= "linkage"
 				.IndexLinkage(s, scf)
+			  elseif s ~= "compile_linking"
+				Linkage.CompilerCollect(s)
 			  elseif s ~= "conf"
 				.IndexConf(s)
 			  elseif s ~= "targets"

@@ -494,12 +494,14 @@ function Argument (Niltrackerfn)
 		target debugnil
 			s.DebugPrint
 		|| t = test&-s.islast
+		if (rz is borked) and !stderr.ok
+			exit // needs a clean space for borking
 		|| prev = rz
 		rz = .jump(s, T ||| nilcheckmode.Disappears)
 		if prev is borked
 			error.autoprint = .oldprint
 			expect !(stderr.ok) (s, "Borking but no zergs found?")
-			stderr.pop
+			stderr.clear
 		if rz is Killer
 			exit
 	
@@ -662,7 +664,9 @@ function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nils
 			fs <~ to.Name
 		  else
 			to.rendertitle(fs)
+		error (to, kUsingStr)
 	error (where, fs)
+	
 }
 
 

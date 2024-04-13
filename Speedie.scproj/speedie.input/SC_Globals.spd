@@ -1113,8 +1113,11 @@ function TypeOfExprNeeded ( |message| exp, |SCNode| name_space, |SCDecl| )
 	if (oldcount == stderr.errorcount)
 		error (exp, "This expression doesn't return anything.")
 		|| it = exp.expfunc
-			error (it.source, "(Using this function.)")
+			error (it.source, kUsingStr)
 			
+constants
+	kusingStr = "Function here:"
+
 
 function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name_space, |message| side, |scdecl|) {
 	|| cls = typeofexpr(self, name_space)

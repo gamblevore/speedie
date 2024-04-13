@@ -2,7 +2,7 @@
 
 main 	  	  	  	 // execmain {
 	error.AutoPrint = 1
-	libtable.LoadLibFuncs					#require
+	LibLoader.LoadLibAll					#require
 	class.LoadInbuiltClasses				#require
 	
 	package.GetStructure					#require

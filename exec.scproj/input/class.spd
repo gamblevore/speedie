@@ -24,7 +24,6 @@ class Class
 
 	constructor (|message!| Ch)
 		opt norefcounts
-		debugat
 		|| pr = ch[@str]
 		|| sz = pr.next(@num)
 		|| beh = sz.next(@list)
@@ -83,14 +82,13 @@ class Class
 		|| bc = list.SlowCount max 2
 		|&?&nil| Cpp,  |&?&nil| Spd 
 		
-		debugat
 		.realclass.AllocateBehaviour(bc, cpp, spd)
 		
 		for ch in list
 			|| fn = function[ch]
-				debugat
 				cpp[i] = fn.CFunc
-				spd[i] = fn.SpeedieFunc   #check   (fn.src, "Cpp function lacks a speedie-wrapper")
+				spd[i] = fn.SpeedieFunc   #check   (fn.src, "Missing behaviour")
+				// the spd version should call the c++ version...
 			i++
 		
 				

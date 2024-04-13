@@ -233,6 +233,11 @@ function message.visible (|bool|)
 	return SCNode.CurrVisibility
 
 
+function message.visible (assigns:|bool|)
+//	if .objectid == 1136656
+	.indent = 255 - value
+
+
 function Use
 	opt norefcounts
 	|| s = .source
@@ -581,7 +586,7 @@ function ImportFile (|SCFile| file)
 	 we should remove the "Visible" statement from within class scope... only allowed in the linkage.
 	 within modules... it should only apply to global vars`
 	file.Use
-	|| v = .isstdlib and Options.MakeInterpreter
+	|| v = file.proj.isstdlib and Options.MakeInterpreter
 	compiler.program.CollectFromNode( ast, v )
 
 
@@ -720,7 +725,7 @@ function CollectOne (|Message| c, |bool| Visible, |bool|)
 	
 	// SHOULDN'T DO .MoveToInitFunc FOR GLOBALS
 	// better to collect immediately. lose visibility, and other issues
-	c.indent = 255 - Visible // save lost visibility
+	c.Visible = Visible // save lost visibility
 	
 	if !.CollectSub( C ) and (self isa SCModule)
 		.MoveToInitFunc( C, visible )
@@ -905,7 +910,6 @@ dispatch RootCollectTable (CollectFunc)
 	+"prototype"			SCFunction.NewProtoType
 	+"render"				SCFunction.NewRender
 	+"import"				(DontRemove)
-	+"compile_linking"		Linkage.Collect
 	+"shell_args"			InbuiltShellArgs.collect
 	+"syntax"				SCClass.LoadSyntax
 	+"linkage"				CppRefs.Linkage

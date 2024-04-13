@@ -272,7 +272,6 @@ function InitBasicStuff (|int|) // compiler.init
 		stderr.LowerErrorsTo = ErrorSeverity.Warning
 		compiler.InitedOK = false
 	(Message).Restore
-	options.MakeInterpreter = linkage.interpreter
 	.ModuleList <~ .program
 	
 	.InitTypes

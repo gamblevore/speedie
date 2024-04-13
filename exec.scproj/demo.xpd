@@ -25,7 +25,8 @@ pack "xpd"
 			+"mycuteclass"   "list"         16  (des1, ren1)
 			+"mycuteclass2"  "mycuteclass"  24  (des2, ren2)
 		
-				
-		link
-			"malloc/JB_Alloc/JB_whatever"
+		link 
+			JB_zalloc
+			JB_ASCII
+			strlen
 

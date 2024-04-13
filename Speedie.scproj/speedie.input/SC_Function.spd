@@ -422,9 +422,9 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 	if Pos >= Incoming.Size
 		Return result
 
-	if (typecast & ktypeCastDescribeErrors) and !incoming.madeerror
+	if (typecast & ktypeCastDescribeErrors) and !incoming.MadeError
 		error (incoming.exp, "Too many params to " + .rendertitle)
-		error (self.source,  "Function here:")
+		error (self.source,  kusingstr)
 
 
 //function scdecl.IsInt (|bool|)

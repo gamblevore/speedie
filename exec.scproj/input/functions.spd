@@ -76,7 +76,7 @@ class function
 				|| fn = AppTable[i2]
 					return fn
 			  else
-				|| fn = LibTable[i2]
+				|| fn = LibLoader[i2]
 					return fn
 			s.CantFindFunc
 
@@ -98,14 +98,22 @@ module Linker
 
 
 
-module LibTable	
+module LibLoader	
 	|[function]|				Funcs
+	|dictionary of &nil|		Globals = dictionary()
+	|int|						GlobalCount
 
 	function AddLibFunc (|function| fn, |bool|)
-		expect (.Funcs < 16K) ("Too many functions")
+		expect (.Funcs < 16K) ("Too many functions")			// for detecting corrupt lib
 		fn.index = .Funcs.length
 		.Funcs <~ fn
 		linker <~ fn
+		return true
+	
+	function AddLibGlob (|?&nil| where, |string| name, |bool|)
+		opt norefcounts
+		expect (.GlobalCount++ < 1K) ("Too many globals")		// for detecting corrupt lib
+		.Globals.valuelower(name) = where
 		return true
 	
 	
@@ -113,21 +121,32 @@ module LibTable
 		return .Funcs[i]
 
 
-	function LoadLibFuncs (|bool|)
-		|&&nil| Internals 
-		|| spd = package.LibFuncLayout(&Internals).parse
-		rz = .LoadLibSub(spd.first, internals)
+	function LoadLibAll (|bool|)
+		|&&nil| Funcs, |&&nil| Globs, 
+		|| spd = package.LibFuncLayout(&funcs, &globs).parse
+		.LoadLibFuncs(spd, funcs)
+		.LoadLibGlobs(spd, globs)
+		return stderr.ok
 
 	
-	function LoadLibSub (|message| spd, |&&nil| Internals, |bool|)
+	function LoadLibFuncs (|message| spd, |&&nil| Internals)
 		opt norefcounts
-		while spd
-			|| fn = *Internals++  #expect  (spd, "Missing cpp function")
+		for ch in spd[@prm]
+			|| fn = *Internals++  #expect  (ch, "Missing lib function")
 				
-			require .AddLibFunc( function(fn, spd.name) )
-			spd++
+			require .AddLibFunc( function(fn, ch.name) )
 					
-		return (!*Internals) #check "Extra InternalFunction" 
+		check (!*Internals) ("Extra InternalFunction") 
+
+
+	function LoadLibGlobs (|message| spd, |&&nil| Internals)
+		opt norefcounts
+		for ch in spd[@arr, 1]
+			//|| G = *Internals++  #expect  (ch, "Missing lib global")
+				
+			require .AddLibGlob( nil, ch.name )
+
+		check (!*Internals) ("Extra global") 
 		
 
 
@@ -148,20 +167,15 @@ module AppTable
 		return .Funcs[i]
 		
 	function LinkEmUp‼ (|bool|)
+		opt norefcounts
 		Description "Checks that stdlib has all needed functions... and gets a reference to them."
 		
-		.LoadNameTableSub(package.linkage)
-		return stderr.ok
-
-
-	function LoadNameTableSub (|message| func_list)
-		opt norefcounts
-		for name in func_list
+		for name in package.linkage
 			|| fn = Linker[name]
 				AppTable.LinkOrder <~ fn
 			  else
 				name.cantfindfunc
-
+		return stderr.ok
 
 
 function message.CantFindFunc

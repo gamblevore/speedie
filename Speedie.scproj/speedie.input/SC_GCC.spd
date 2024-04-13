@@ -204,7 +204,7 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	rz.AppendWords( "-w  -Wno-return-type-c-linkage")
 	rz.AppendWords( "-finput-charset=UTF-8 -fextended-identifiers" )
 	rz.AppendWords( " -fno-strict-aliasing  -fvisibility=hidden  -fvisibility-inlines-hidden" )
-	rz.AppendWords( Linkage[Platform.name] )
+	rz.AppendWords( Linkage.CombineFlags(Platform.name) )
 	if platform.lin
 		rz.appendwords( " -lrt" )
 	
