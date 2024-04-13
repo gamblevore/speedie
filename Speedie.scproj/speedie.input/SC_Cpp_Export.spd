@@ -561,6 +561,7 @@ function faststring.appendvoid (|string| s, |byte| extra=0)
 	self <~ s
 	self <~ ",\n"
 
+
 function ListAllFuncs (|FastStringCpp| fs, |string| lib_pack)
 	fs <~ "// entire_function_list\n\n"
 	for f in PackMaker.libFuncs

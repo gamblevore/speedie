@@ -9,7 +9,7 @@ module package
 	|config|		strings
 	
 	
-	function LibFuncLayout (|&&&nil| funcs, |&&&nil| globs, |string|)
+	function LibFuncLayout (|&&&nil| funcs, |?&&&nil| globs, |string|)
 		cpp_wrapper JB_App__LibPack
 
 
