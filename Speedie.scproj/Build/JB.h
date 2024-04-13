@@ -812,6 +812,7 @@ JBClass ( SCImport , JB_Object ,
 	ErrorSeverity BlindCast;
 	int Depth;
 	JB_File* Where;
+	SCFile* Conf;
 	Array* Files;
 	JB_MemoryLayer* DeclLayer;
 	SCModule* Mod;
@@ -1605,6 +1606,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_kTypeCastTrue (1 | 2)
 #define kJB_kTypeCastWantSuperDistance (128)
 #define kJB_kUseDefaultParams (8 << 22)
+#define kJB_kusingStr (JB_LUB[890])
 #define kJB_kVoidPtrMatch (5 << 22)
 extern Message* JB_ReturnSelfEqNil;
 extern Dictionary* JB_RootCollectTable;
@@ -2804,15 +2806,17 @@ void SC_LinkMap__Store(Array** Darr, SCObject* Obj);
 // Linkage
 SCNode* SC_Linkage__Collect(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
+JB_String* SC_Linkage__CombineFlags(JB_String* Name);
+
+void SC_Linkage__CompilerCollect(Message* S);
+
+JB_String* SC_Linkage__GetFlag(JB_String* Name, FastString* Fs);
+
 int SC_Linkage__Init_();
 
 int SC_Linkage__InitCode_();
 
 bool SC_Linkage__Interpreter();
-
-SCNode* SC_Linkage__LinkerSub(Message* Node, SCNode* Name_space, Message* ErrPlace);
-
-JB_String* SC_Linkage__SyntaxAccess(JB_String* Name);
 
 
 
@@ -5798,6 +5802,8 @@ void JB_FS_AppendObjectOrNil(FastString* Self, JB_Object* O);
 
 void JB_FS_AppendQuotedEscape(FastString* Self, JB_String* S);
 
+void SC_FS_appendvoid(FastString* Self, JB_String* S, byte Extra);
+
 void SC_FS_AppendWidth(FastString* Self, JB_String* S, int Width);
 
 void SC_FS_CArrayAdd(FastString* Self, JB_String* S);
@@ -7712,6 +7718,8 @@ JB_String* JB_Msg_Value(Message* Self);
 JB_String* SC_Msg_VarName(Message* Self);
 
 bool SC_Msg_visible(Message* Self);
+
+void SC_Msg_visibleSet(Message* Self, bool Value);
 
 Message* SC_Msg_LayerWipeCopy(Message* Self, Message* Oof);
 
