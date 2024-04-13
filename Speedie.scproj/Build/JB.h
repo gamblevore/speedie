@@ -1453,7 +1453,6 @@ extern Dictionary* SC__Options_BannedClasses;
 extern bool SC__Options_Beep;
 extern bool SC__Options_CheckMaxVars;
 extern bool SC__Options_Compile;
-extern MaybeBool SC__Options_Compile32Bit;
 extern bool SC__Options_Cpp;
 extern bool SC__Options_ExternalCompile;
 extern bool SC__Options_Final;
@@ -2591,10 +2590,6 @@ bool SC_FB__AppOptions_keepallerrors(JB_String* Name, JB_String* Value, FastStri
 
 bool SC_FB__AppOptions_log(JB_String* Name, JB_String* Value, FastString* Purpose);
 
-bool SC_FB__AppOptions_m32(JB_String* Name, JB_String* Value, FastString* Purpose);
-
-bool SC_FB__AppOptions_m64(JB_String* Name, JB_String* Value, FastString* Purpose);
-
 bool SC_FB__AppOptions_maxvars(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_nil(JB_String* Name, JB_String* Value, FastString* Purpose);
@@ -2851,13 +2846,17 @@ int SC_Options__InitCode_();
 // PackMaker
 void SC_PackMaker__AddAll();
 
+void SC_PackMaker__DoLibGlobs(FastString* Pack);
+
 int SC_PackMaker__Init_();
 
 int SC_PackMaker__InitCode_();
 
-void SC_PackMaker__Oof(Array* R, FastString* Pack);
-
 JB_String* SC_PackMaker__Run();
+
+JB_String* SC_PackMaker__RunLib();
+
+void SC_PackMaker__SortAndPackFuncs(Array* R, FastString* Pack);
 
 
 
@@ -3400,8 +3399,6 @@ SCDecl* SC_DoOpCompare(Message* Exp, SCDecl* Lc, SCDecl* Rc, SCOperator* Comp, S
 
 JB_String* JB_EntityTest();
 
-bool SC_ExecSorter(JB_Object* A, JB_Object* B);
-
 Message* SC_ExpandToBool(Message* Inside, SCNode* Name_space);
 
 SCDecl* SC_ExtractDecl(Message* C, SCNode* Name_space, DeclMode Purpose);
@@ -3521,6 +3518,8 @@ SCNode* SC_RootCollectTable_static(Message* Node, SCNode* Name_space, Message* E
 SCDecl* SC_SameTypeSub(Message* First, Message* Second, SCNode* Name_space);
 
 void SC_SC_MakeComment(Message* Msg);
+
+bool SC_SCNodeSorter(JB_Object* A, JB_Object* B);
 
 Message* SC_SettingAProperty(Message* Rel);
 
@@ -4289,15 +4288,9 @@ int JB_Rg_Width(IntRange Self);
 
 
 // MaybeBool
-bool JB_MaybeBool_Default(MaybeBool Self);
-
 bool JB_MaybeBool_IsFalse(MaybeBool Self);
 
-bool JB_MaybeBool_IsKnown(MaybeBool Self);
-
 bool JB_MaybeBool_IsTrue(MaybeBool Self);
-
-MaybeBool JB_MaybeBool__New(bool Default);
 
 
 
@@ -5541,8 +5534,6 @@ void SC_Cpp_CppFunc(Cpp_Export* Self, FastStringCpp* Fs, SCFunction* F);
 
 void SC_Cpp_Destructor(Cpp_Export* Self);
 
-void SC_Cpp_DoInterpreter(Cpp_Export* Self);
-
 void SC_Cpp_ExportBehaviourHeader(Cpp_Export* Self, SCClass* Cls);
 
 bool SC_Cpp_ExportBehaviourInstance(Cpp_Export* Self, SCClass* Cls, FastStringCpp* Fs);
@@ -5567,7 +5558,9 @@ JB_String* SC_Cpp_FuncHeader(Cpp_Export* Self, SCFunction* F);
 
 void SC_Cpp_FuncStart(Cpp_Export* Self, FastStringCpp* Fs, SCFunction* F, JB_String* Funcheader);
 
-void SC_Cpp_ListAllFuncs(Cpp_Export* Self, FastStringCpp* Fs);
+void SC_Cpp_ListAllFuncs(Cpp_Export* Self, FastStringCpp* Fs, JB_String* Lib_pack);
+
+void SC_Cpp_MakeInterpreter(Cpp_Export* Self, JB_String* Lib_pack);
 
 void SC_Cpp_MakeWrapperFor(Cpp_Export* Self, FastStringCpp* Fs, SCFunction* F);
 
@@ -5655,7 +5648,7 @@ int SC_Cpp__DontNeedMoreBrackets(Message* Msg);
 
 bool SC_Cpp__DoSavers();
 
-void SC_Cpp__ExportAllSource(JB_String* Pack);
+void SC_Cpp__ExportAllSource(JB_String* Lib_pack);
 
 void SC_Cpp__GenLub(FastString* Fs);
 
