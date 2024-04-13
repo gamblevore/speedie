@@ -24,7 +24,7 @@ module Options
 	||		Scripting				= false
 	||		MakeLib					= false // for now
 	||		CheckMaxVars			= false
-	||		ListAllLib				= false
+	||		MakeInterpreter			= false
 	||		ForceRecompile			= false
 	||		Silent					= false
 	||		IsDirectTest			= false

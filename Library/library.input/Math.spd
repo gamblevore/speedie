@@ -335,7 +335,7 @@ function int.Towards (|int| Dest, |int| N, |int|)
 	return self
 
 
-function float.Multiply (|bool|b, |float| mul, |float|)
+function float.Multiplyy (|bool| b, |float| mul, |float|)
 	disabled "use .mul instead"
 
 	

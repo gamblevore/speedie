@@ -90,13 +90,15 @@ function FuncStart (|FastStringCpp| fs, |scfunction| f, |string| funcheader)
 
 
 function CanExportFunc (|SCFunction| F, |bool|)
-	require f.NeedsExport
+	// (.MyReacher) or .isapi
+	require (f.MyReacher or f.isapi)
+	require !f.isdisabled
 	if !f.IsExternalLib
 		require !f.IsWrapper and !f.isMacro
-	return f isnt NewStruct and f isnt alreadyexported
+	return f isnt NewStruct  and  f isnt alreadyexported
 
 
-function FuncHeader (|FastStringCpp| fs, |SCFunction| F, |string|)
+function FuncHeader (|SCFunction| F, |string|)
 	WriteFunctionHeader( F, .T )	
 	rz = .T.GetResult
 	.HeaderProj <~ rz
@@ -109,7 +111,7 @@ function CppFunc (|FastStringCpp| fs, |SCFunction| F)
 	opt norefcounts	
 	scfunction.currfunc = f
 	(f is AlreadyExported)
-	|| funcheader = .FuncHeader(fs, f)$
+	|| FuncHeader = .FuncHeader(f)$
 	.SetupFlow(F)
 
 	.funcStart(fs, f, funcheader)
@@ -517,8 +519,8 @@ function MakeWrapperFor (|FastStringCpp| fs, |SCFunction| f)
 
 
 function DoInterpreter
-	require options.ListAllLib
-	.listAllFuncs(.ModuleProperties)
+	if options.MakeInterpreter
+		.listAllFuncs(.ModuleProperties)
 
 
 function SCClass.PackExport (|jbin| j)

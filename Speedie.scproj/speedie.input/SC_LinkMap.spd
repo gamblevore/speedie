@@ -155,7 +155,7 @@ function compiler.DeadStrip
 	for f in .FuncList
 		f.striptest
 
-	if options.ListAllLib // must come before the next loop
+	if options.MakeInterpreter // must come before the next loop
 		for c in .classlist
 			c.reach(Compiler.Interpreter)
 	

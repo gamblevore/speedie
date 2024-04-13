@@ -25,7 +25,7 @@ function IsSTDLib (|bool|) // .islib, .isprojlib, .isproject, .isntproject, .isn
 
 function CollectFromNode (|Message| AST, |bool| Visible, |message| dest=nil)
 	.Source := AST // not good! Considering that one "project" module covers multiple files!
-	|| r = ast.listall
+	|| r = ast.ListAll
 	
 	|| Old = scnode.CurrVisibility
 	scnode.CurrVisibility = Visible
@@ -40,6 +40,7 @@ function CollectFromNode (|Message| AST, |bool| Visible, |message| dest=nil)
 
 
 function FuncSrc (|Message|)
+	opt norefcounts
 	return .Owningfunc$.Source
 
 
@@ -225,27 +226,14 @@ constructor (|Message?| node)
 
 
 function Use
+	opt norefcounts
 	|| s = .source
 		s.memoryLayer.Use
 	.Project.use
 
 
-
 function SubProjName (|string|)
 	return Compiler.Program.ExportName
-
-
-function SCFunction.NameOfClassAllocator (|string| s, |string| CppPart, |string|)
-	rz = Cpppart
-	if rz
-		rz = "_" + rz
-	  else
-		rz = "_New"
-	
-	if s contains "Constructor"
-		rz = s.ReplaceAll( "Constructor", rz, true )
-	  else
-		rz = s + Rz
 
 
 function SCFunction.UseExportWrapper (|string| CppWrapper, |bool|)
@@ -262,6 +250,7 @@ function SCFunction.UseCppName (|string| CppName, |bool|)
 
 
 function LinkagePlace (|message|)
+	opt norefcounts
 	|| Place = .SourceArg
 	|| Link = Place.find(@tmp, "linkage")
 	return Link[@arg] ?? Place
@@ -313,8 +302,6 @@ function scmodule.CppPath (|string|)
 				continue
 		exit
 	return f
-	
-	// So... whats the path
 	
 
 function FindCppWrapper (|message| place, |bool|isclass, |message|)
@@ -547,9 +534,6 @@ constants (
 	kPurposeVar
 	kPurposeVarDecl
 	kPurposeHider=0x10000
-)
-
-flags (
 	NoErrors = 1
 	DontGoUp = 2
 )
@@ -584,9 +568,13 @@ function LookUpVarDecl (|String| name, |SCDecl|)
 
 function ImportFile (|SCFile| file)
 	|| AST = file.AST								#require
-	scnode.CurrVisibility = .isstdlib
+	
+	todo `visibility needs to make a bit more sense than this...
+	 we should remove the "Visible" statement from within class scope... only allowed in the linkage.
+	 within modules... it should only apply to global vars`
 	file.Use
-	compiler.program.CollectFromNode( ast, .isstdlib )
+	|| v = .isstdlib and Options.MakeInterpreter
+	compiler.program.CollectFromNode( ast, v )
 
 
 function RequireContained (|Message| exp, |SCDecl|)
@@ -609,7 +597,6 @@ function RequireContained (|Message| exp, |SCDecl|)
 			cls = f.Cls
 	
 	expect (cls and cls.Contained)   (exp, "Can’t use '...' here, no contained type found.")
-
 	return cls.Contained
 
 
@@ -648,7 +635,7 @@ function scfunction.ParamUniquer (|string| s, |string|)
 function UniquifyExport (|String| s, |string|)
 	if (self isa scfunction)
 		|| s2 = .ParamUniquer(s)
-		if !compiler.exportnames[s2]
+		if !compiler.ExportNames[s2]
 			return s2
 	
 	|| u = SCGlobals.UniqueNum++
@@ -660,8 +647,8 @@ function UniquifyExport (|String| s, |string|)
 function RehomeExport (|bool|)
 	check (!.IsSTDLib) (self, "Can't rehome a std lib function. Use cpp_part to give a unique name.")
 	|| newhome = .UniquifyExport(.exportname)			#require
-	compiler.exportnames[.exportname] = nil
-	compiler.exportnames[newhome] = self
+	compiler.ExportNames[.exportname] = nil
+	compiler.ExportNames[newhome] = self
 	.exportname = newhome
 	return true
 
@@ -697,10 +684,6 @@ function SetExportName (|String| s, |bool| Explicit)
 
 	(self is ExplicitExport) = Explicit
 	.ExportName = s
-
-
-function SCFunction.NeedsExport (|bool|)
-	Return  (.MyReacher) or .isapi
 
 
 function NeedsExport (|bool|)

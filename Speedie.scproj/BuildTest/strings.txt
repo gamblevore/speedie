@@ -1434,7 +1434,7 @@
 "_FuncTable_ = InitTable"
 "_FuncTable_);\n\n"
 "_L"
-"_New"
+"Failed"
 "_Speedie"
 "__"
 "__AppConfString"
@@ -2116,4 +2116,3 @@
 "fixed set reuse"
 "set"
 "set reuse"
-"Failed"

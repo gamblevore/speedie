@@ -281,7 +281,7 @@ function LoadSuperClass
 	
 	if (S)
 		.Super = S
-		if Options.ListAllLib
+		if Options.MakeInterpreter
 			s.Children <~ self
 		if !.IsRole
 			s.HasSubClass = true

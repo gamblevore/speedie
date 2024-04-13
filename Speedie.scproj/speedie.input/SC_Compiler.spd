@@ -149,9 +149,6 @@ function BuildFolder (|file|)
 	return B!
 
 
-function PrepareInterpreter
-	require options.ListAllLib
-
 
 function CompileAll (|bool|)
 	require .stage("Compilation")
@@ -161,7 +158,6 @@ function CompileAll (|bool|)
 	ErrorDelayer.ReturnErrors
 	require .InitedOK
 	
-	.PrepareInterpreter
 	if .Stage( "More constructors" )
 		.BuildConstructors // constructors
 	.CheckIsGoodLibrary
@@ -275,7 +271,7 @@ function InitBasicStuff (|int|) // compiler.init
 		stderr.LowerErrorsTo = ErrorSeverity.Warning
 		compiler.InitedOK = false
 	(Message).Restore
-	options.ListAllLib = linkage.interpreter
+	options.MakeInterpreter = linkage.interpreter
 	.ModuleList <~ .program
 	
 	.InitTypes
@@ -816,7 +812,7 @@ function scfunction.StripTest
 	|| Base = Compiler.VisibleFuncs!
 	
 	if !.IsVisible	
-		require options.ListAllLib and !.IsDisabled
+		require options.MakeInterpreter and !.IsDisabled
 		base = Compiler.Interpreter!
 	
 	.FindReached(base)
