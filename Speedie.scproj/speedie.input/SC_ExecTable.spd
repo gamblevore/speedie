@@ -20,9 +20,16 @@ module PackMaker
 				.packfuncs <~ f
 		
 	
-	function Oof (|[scfunction]| r, |jbin| pack)
+	function DoLibGlobs (|jbin| pack)
+		LibGlobs.sort(SCNodeSorter)
+		
+		for (f in LibGlobs)
+			pack.Add(@thg, f.exportname)
+
+
+	function SortAndPackFuncs (|[scfunction]| r, |jbin| pack)
 		opt norefcounts
-		r.sort(ExecSorter)
+		r.sort(SCNodeSorter)
 		
 		for (f in r) (i)
 			f.TableID = i
@@ -32,14 +39,18 @@ module PackMaker
 
 	function Run (|string|)
 		.AddAll
-		.oof(.PackFuncs, nil)
+		.SortAndPackFuncs(.PackFuncs, nil)
+		if Options.MakeInterpreter
+			return .RunLib
 
+	function RunLib (|string|)
 		|| pack = jbin()
 		pack.enter(@prm) // our funcs
-		.oof(.libfuncs, pack)
+		.SortAndPackFuncs(.libfuncs, pack)
 		pack.exit
 
 		pack.enter(@arr) // our globs
+		.DoLibGlobs(pack)
 		pack.exit
 		return pack
 
@@ -50,9 +61,10 @@ function scfunction.WrappedName (|string|)
 	  else
 		return .exportname
 
-	
-helper ExecSorter (sortercomparer)
-	return (a|scfunction|).Description < (b|scfunction|).Description
+
+helper SCNodeSorter (sortercomparer)
+	// just to help compression. otherside will use a dictionary anyhow.
+	return (a|scnode|).exportname < (b|scnode|).exportname
 
 
 function scfunction.CanLibLoad (|bool|)

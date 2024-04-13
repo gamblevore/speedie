@@ -22,7 +22,8 @@ dispatch FuncPreReader (fnPreReader)
 		opt norefcounts
 		.isdisabled = true
 		.description = "Called a disabled function."
-		|| s = msg[@str, @nil]
+		|| s = msg.first
+			s.ExpectString
 			.description = s.name
 			
 	+"todo"
@@ -90,7 +91,7 @@ dispatch FuncPreReader (fnPreReader)
 			if .IsDisabled
 				error (msg, "Already disabled")
 			  else
-				check !.description (msg, "Can’t have multiple descriptions.")
+				check !.description (msg, "Multiple descriptions.")
 				.Description = str.name
 	
 

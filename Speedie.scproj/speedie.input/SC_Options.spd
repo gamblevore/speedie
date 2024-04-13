@@ -14,17 +14,19 @@ module Options
 	||		HideMultipleErrors		= true
 	|| 		NilTestAllocNeverFails	= true
 	|| 		Beep					= false
+
 	||		Cpp						= true
-	||		Compile					= true
 	||		MakeASM					= false
+	||		MakeInterpreter			= false
+	||		MakeLib					= false // for now
+
+	||		Compile					= true
 	||		TargetDebug				= false
 	||		PrintLibraries			= false
 	||		GenFlowControlCode		= false
 	||		KeepAllErrors			= false
 	||		Scripting				= false
-	||		MakeLib					= false // for now
 	||		CheckMaxVars			= false
-	||		MakeInterpreter			= false
 	||		ForceRecompile			= false
 	||		Silent					= false
 	||		IsDirectTest			= false
@@ -40,7 +42,7 @@ module Options
 	||		ExternalCompile			= false
 	||		Final					= false // won't call gcc.
 	||		Products				= native
-	||		Compile32Bit			= maybebool(false)
+//	||		Compile32Bit			= maybebool(false) // Scrap 32-bit? Use pointer-compression on 64-bit?
 	|byte|	Optimise				= 1
 	|bool|	SelfReplacement			= 0
 	|byte|	OperationCount			= 0
@@ -367,18 +369,18 @@ module Feedback
 				error "Use 'targetdebug' instead."
 			SC_Targets[value] = true
 			
-		+"m64"
-			Explain(Purpose, "64-bit compile")$
-			options.Compile32Bit = false
+//		+"m64"
+//			Explain(Purpose, "64-bit compile")$
+//			options.Compile32Bit = false
 		
 		+"funccount"
 			Explain(Purpose, "Spams each func with a static int, to count the number of times it's called. Useful debugging feature.")$
 			options.UseFuncCallCount = value.optionbool
 
 
-		+"m32"
-			Explain(Purpose, "32-bit compile")$
-			options.Compile32Bit = true
+//		+"m32"
+//			Explain(Purpose, "32-bit compile")$
+//			options.Compile32Bit = true
 
 		
 		+"warn"

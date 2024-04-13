@@ -586,6 +586,7 @@ function ImportFile (|SCFile| file)
 
 
 function RequireContained (|Message| exp, |SCDecl|)
+	opt norefcounts
 	|SCClass| cls
 	
 	if (self isa SCFunction)
@@ -824,6 +825,7 @@ function FindVis (|Message| c, |bool|)
 
 
 function LoadVisibility (|Message| p, |bool|)
+	opt norefcounts
 	rz = .FindVis(p.first) //   visible false,   visibile true,   visible
 	.IsVisible = rz
 	scnode.CurrVisibility = rz

@@ -1148,7 +1148,7 @@ class Message (list)
 		|| f = .func
 		return f == @arg or @list or @prm or @arr or @bra
 
-	function IsString (|bool|)
+	function IsString (|bool|) // use .expectstring if you need this to be a string
 		if self
 			return .func.isstring
 

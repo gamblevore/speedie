@@ -18,8 +18,7 @@ linkage:cpp_part Ext
 
 function TmpBase (|string| V, |string|)
 	opt norefcounts
-	|| s = ("/tmp/Speedie/", "/tmp/Speedie64/")(options.Compile32Bit.Default)
-	return s + V
+	return "/tmp/Speedie/" + V
 
 
 function TmpOut (|string| V, |string|)
@@ -189,8 +188,8 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	
 	rz.AppendWords( cmode )
 
-	if options.Compile32Bit.IsKnown
-		rz.AppendWords( ("-m32", "-m64")(options.Compile32Bit.default) )
+//	if options.Compile32Bit.IsKnown
+//		rz.AppendWords( ("-m32", "-m64")(options.Compile32Bit.default) )
 	
 	|| spdroot = compiler.FindSpeedieRoot
 	rz.appendwords("-L$spdroot/Library")

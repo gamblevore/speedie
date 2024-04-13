@@ -155,24 +155,11 @@ function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
 		(dcl is property)
 		(dcl is Global)
 		
-		if .Indent == 255
+		if (.Indent == 255) or ('_' == dcl.name.first or dcl.name.Last)
 			(dcl is hidden)
-//			print dcl.name
-//			printline "!!!!"
-		  elseif dcl isnt hidden
-			if '_' == dcl.name.first or dcl.name.Last
-				(dcl is hidden)
+		  elseif Options.MakeInterpreter
+			PackMaker.LibGlobs <~ dcl
 
-/*
-		|| c = scimport.curr
-		if !c
-			debugger
-		  elseif (dcl isnt hidden) and c.isstdlib
-			print "|"
-			print dcl.type.name
-			print "| "
-			printline dcl.Name
-*/
 		return true
 
 

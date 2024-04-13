@@ -176,7 +176,8 @@ function CompileAll (|bool|)
 	if Options.Cpp
 		.Timer( "Export Cpp" )
 		StringCorrector.CorrectConsts
-		Cpp_Export.ExportAllSource(PackMaker.Run)
+		|| lpck = PackMaker.Run
+		Cpp_Export.ExportAllSource(lpck)
 
 	SCImport.ExportShaders
 
