@@ -220,9 +220,17 @@ constructor (|string| Name, |bool| Dummy)
 
 constructor (|Message?| node)
 	cpp_part ConstructorMsg
-	.source = node
-	.IsVisible = scnode.CurrVisibility
 	.Project = scimport.curr // why not?
+	.source = node
+	.isvisible = node.visible
+
+
+function message.visible (|bool|)
+	if self
+		|| i = .indent
+		if i >= 254
+			return i == 254 // retrieve visibility of a delayed node.
+	return SCNode.CurrVisibility
 
 
 function Use
@@ -712,7 +720,6 @@ function CollectOne (|Message| c, |bool| Visible, |bool|)
 	// SHOULDN'T DO .MoveToInitFunc FOR GLOBALS
 	// better to collect immediately. lose visibility, and other issues
 	c.indent = 255 - Visible // save lost visibility
-	
 	
 	if !.CollectSub( C ) and (self isa SCModule)
 		.MoveToInitFunc( C, visible )

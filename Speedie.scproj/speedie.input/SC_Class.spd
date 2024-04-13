@@ -922,6 +922,9 @@ module
 			return scclass.neuclass(node, name_Space.modul, errplace)
 	
 	function StoreExtend (CollectFunc)
+		opt norefcounts
+		// if node.objectid == 1171272
+		node.indent = 255 - scnode.currvisibility
 		Compiler.ExtendList <~ node
 		node.obj = SCImport.curr
 		Return Compiler.program
@@ -996,8 +999,8 @@ module
 					imp.use
 				  else
 					B.project.use
-		
-				B.CollectFromNode(arg, SCNode.CurrVisibility, m.SourceArg)
+				
+				B.CollectFromNode(arg, c.visible, m.SourceArg)
 	
 	
 	function ProcessAs (CollectFunc) // node, parent, errplace

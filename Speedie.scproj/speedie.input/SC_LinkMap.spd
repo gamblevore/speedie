@@ -71,7 +71,7 @@ function CollectLinks (|object!| obj)
 			return
 
 
-function FindReached (|SCNode| from, |bool|)
+function ReachFunc (|SCNode| from, |bool|)
 	opt norefcounts
 	flow off // memory order dependant!
 	
@@ -89,7 +89,7 @@ function FindReached (|SCNode| from, |bool|)
 		if (o.MyReacher)
 			//
 		  elseif (o isa SCFunction)
-			o.FindReached(self)
+			o.ReachFunc(self)
 			rz = true
 		  elseif (o isa SCClass)
 			o.Reach(self)
@@ -111,7 +111,6 @@ function message.HateUnusedFuncs
 	  else
 		.expect(.func, "Can't find project")
 
-			
 
 
 function scclass.Reach (|SCNode| from, |message| src=nil)
@@ -129,7 +128,7 @@ function scclass.Reach (|SCNode| from, |message| src=nil)
 		b.FuncTable!.cls!.reach(self)
 	
 	|| df = .DestructorFunc
-		df.findReached(self)
+		df.ReachFunc(self)
 	
 	for d in .Properties
 		d.TypeReach(self, d.source!)
@@ -141,19 +140,18 @@ function scclass.ReachBehaviours
 	for f in .Access
 		if f isa SCFunction
 			if f.IsBehaviour
-				f.FindReached(self)
-
+				f.ReachFunc(self)
 
 
 function compiler.DeadStrip
 	opt norefcounts
-	Compiler.VisibleFuncs = SCNode("Visible",	false)
-	Compiler.Interpreter = SCNode("Interpreter", false)
+	Compiler.VisibleFuncs = SCNode("Visible",	  false)
+	Compiler.Interpreter  = SCNode("Interpreter", false)
 
-	compiler.MainFunc.StripTest?
+	compiler.MainFunc.ReachedDetect?
 	
 	for f in .FuncList
-		f.striptest
+		f.ReachedDetect
 
 	if options.MakeInterpreter // must come before the next loop
 		for c in .classlist

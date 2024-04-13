@@ -293,7 +293,7 @@ extend FastString
 		cpp_wrapper JB_FS_FileSet
 
 	// use syntax-append instead? "fs <~ (doubles, n)"
-	function AppendFloats (|float[1]| Data, |int| N)
+	function AppendFloats (|&float| Data, |int| N)
 		self <~ '['
 		for (i in N)
 			self <~ ", "
@@ -301,7 +301,7 @@ extend FastString
 			self <~ Data[i]
 		self <~ ']'
 
-	function AppendDoubles (|f64[1]| Data, |int| N)
+	function AppendDoubles (|&f64| Data, |int| N)
 		self <~ '['
 		for (i in N)
 			self <~ ", "
@@ -309,7 +309,7 @@ extend FastString
 			self <~ Data[i]
 		self <~ ']'
 
-	function AppendInts (|int[1]| Data, |int| N)
+	function AppendInts (|&int| Data, |int| N)
 		self <~ '['
 		for (i in N)
 			self <~ ", "
@@ -317,7 +317,7 @@ extend FastString
 			self <~ Data[i]
 		self <~ ']'
 
-	function AppendInt64s (|int64[1]| Data, |int| N)
+	function AppendInt64s (|&int64| Data, |int| N)
 		self <~ '['
 		for (i in N)
 			self <~ ", "

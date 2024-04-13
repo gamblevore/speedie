@@ -1464,8 +1464,8 @@ extern bool SC__Options_IgnoreCantSaveErrors;
 extern bool SC__Options_IsDirectTest;
 extern bool SC__Options_KeepAllErrors;
 #define kSC__Options_LargestFlag (3)
-extern bool SC__Options_ListAllLib;
 extern bool SC__Options_MakeASM;
+extern bool SC__Options_MakeInterpreter;
 extern bool SC__Options_MakeLib;
 #define kSC__Options_native (1)
 extern ErrorSeverity SC__Options_NilStrength;
@@ -2240,7 +2240,6 @@ extern bool SC__Base_CurrVisibility;
 #define kSC__Base_kPurposeHider (65536)
 #define kSC__Base_kPurposeVar (3)
 #define kSC__Base_kPurposeVarDecl (4)
-#define kSC__Base_LargestFlag (0)
 #define kSC__Base_NoErrors (1)
 extern SpdProcess* JB__Proc_Parent;
 extern byte JB__Err_AutoPrint;
@@ -2457,8 +2456,6 @@ void SC_Comp__NewConst(SCDecl* D);
 void SC_Comp__Package();
 
 void SC_Comp__PostInitCodeCall();
-
-void SC_Comp__PrepareInterpreter();
 
 void SC_Comp__PrintCompileErrors();
 
@@ -5566,7 +5563,7 @@ void SC_Cpp_ExportSyx(Cpp_Export* Self);
 
 void SC_Cpp_FinalMergeOutputIntoACpp(Cpp_Export* Self);
 
-JB_String* SC_Cpp_FuncHeader(Cpp_Export* Self, FastStringCpp* Fs, SCFunction* F);
+JB_String* SC_Cpp_FuncHeader(Cpp_Export* Self, SCFunction* F);
 
 void SC_Cpp_FuncStart(Cpp_Export* Self, FastStringCpp* Fs, SCFunction* F, JB_String* Funcheader);
 
@@ -7721,6 +7718,8 @@ JB_String* JB_Msg_Value(Message* Self);
 
 JB_String* SC_Msg_VarName(Message* Self);
 
+bool SC_Msg_visible(Message* Self);
+
 Message* SC_Msg_LayerWipeCopy(Message* Self, Message* Oof);
 
 Message* SC_Msg_WipeCopy(Message* Self);
@@ -8741,8 +8740,6 @@ Message* SC_Func_FindCppWrapperFunc(SCFunction* Self, Message* Place);
 
 int SC_Func_FindDepths(SCFunction* Self);
 
-bool SC_Func_FindReached(SCFunction* Self, SCNode* From);
-
 void SC_Func_FixCnj(SCFunction* Self, Message* Exp);
 
 void SC_Func_FixCnjSub(SCFunction* Self, Message* Exp);
@@ -8791,8 +8788,6 @@ JB_String* SC_Func_MakeProtoClassName(SCFunction* Self, JB_String* Start);
 
 void SC_Func_MarkRecursive(SCFunction* Self, SCFunction* EndAt);
 
-bool SC_Func_NeedsExport(SCFunction* Self);
-
 Message* SC_Func_NewDefaultRel(SCFunction* Self, Message* Place, SCDecl* D);
 
 void SC_Func_NilSelff(SCFunction* Self, Message* Where, NilState V);
@@ -8813,6 +8808,10 @@ Message* SC_Func_Prms(SCFunction* Self);
 
 void SC_Func_ProtoExportName(SCFunction* Self);
 
+void SC_Func_ReachedDetect(SCFunction* Self);
+
+bool SC_Func_ReachFunc(SCFunction* Self, SCNode* From);
+
 void SC_Func_RefFunc(SCFunction* Self, Message* Prm, Message* After);
 
 DataTypeCode SC_Func_RegType(SCFunction* Self);
@@ -8830,8 +8829,6 @@ SCDecl* SC_Func_Self(SCFunction* Self);
 void SC_Func_SetBlindCasts(SCFunction* Self, SCNode* Name_space);
 
 Message* SC_Func_SourceArg(SCFunction* Self);
-
-void SC_Func_StripTest(SCFunction* Self);
 
 bool SC_Func_SyntaxEquals(SCFunction* Self, JB_String* Name, bool Aware);
 

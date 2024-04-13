@@ -90,7 +90,7 @@ class $name (selector)
 				init = line.next
 				if init == @list
 					init.func = @prm
-			ifn line.expect(@thg): exit
+			if !line.expect(@thg): exit
 			
 			using (line)
 			DeclareOneSel(line.name, type, dot3)

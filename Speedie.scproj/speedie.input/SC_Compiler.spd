@@ -807,7 +807,7 @@ function ModulesSorter (SorterComparer)
 	return aa.name < bb.name
 
 
-function scfunction.StripTest
+function SCFunction.ReachedDetect
 	opt norefcounts
 	|| Base = Compiler.VisibleFuncs!
 	
@@ -815,8 +815,7 @@ function scfunction.StripTest
 		require options.MakeInterpreter and !.IsDisabled
 		base = Compiler.Interpreter!
 	
-	.FindReached(base)
-
+	.ReachFunc(base)
 	
 			
 
