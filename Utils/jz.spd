@@ -10,6 +10,7 @@ Convert files between jbin, box, xml formats. Additionally can compress or decom
 	-box -b			Convert to jeebox
 	-bin -n			Convert to jbin
 	-c				Compress (c=0 to c=6)
+	-d				Decompress (even if not a .mz file)
 	-s				Replace file in-place
 	-json			Source is json
 	-p				Print to stdout
@@ -122,6 +123,8 @@ function App.GetActions (|Type|)
 		  elseif name ~= "test"
 			rz |= type.TestComp
 			rz |= type.compressed
+		  elseif name ~= "d"
+			conv.Detected |= type.compressed
 		  elseif name ~= "c"
 			rz |= type.compressed
 			if v!="true"
