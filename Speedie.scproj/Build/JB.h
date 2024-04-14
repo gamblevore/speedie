@@ -1606,7 +1606,7 @@ extern JB_String* JB_kNameConf;
 #define kJB_kTypeCastTrue (1 | 2)
 #define kJB_kTypeCastWantSuperDistance (128)
 #define kJB_kUseDefaultParams (8 << 22)
-#define kJB_kusingStr (JB_LUB[890])
+#define kJB_kUsingStr (JB_LUB[890])
 #define kJB_kVoidPtrMatch (5 << 22)
 extern Message* JB_ReturnSelfEqNil;
 extern Dictionary* JB_RootCollectTable;
