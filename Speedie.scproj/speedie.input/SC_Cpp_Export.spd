@@ -519,7 +519,7 @@ function MakeWrapperFor (|FastStringCpp| fs, |SCFunction| f)
 
 
 function MakeInterpreter (|string| lib_pack)
-	.listAllFuncs(.ModuleProperties, lib_pack)
+	.ListAllFuncs(.ModuleProperties, lib_pack)
 
 
 function SCClass.PackExport (|jbin| j)
@@ -861,7 +861,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	|| CppLicenceStr = ""
 	function CppLicence (|string|)
 		if !.CppLicenceStr
-			|| f = compiler.inputfile(nil, "licence.txt", nil)
+			|| f = compiler.InputFile(nil, "licence.txt", nil)
 				.Cpplicencestr = f.readall(16KB, true)
 			.CppLicenceStr := " "
 		return .CppLicenceStr

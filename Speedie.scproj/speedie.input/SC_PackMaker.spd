@@ -27,8 +27,26 @@ module PackMaker
 			pack.Add(@thg, f.exportname)
 
 
+/*
+	instead of this... SortAndPackFuncs could create some cpp... like
+	
+struct LibPack
+	|int|			FuncCount
+	|int|			GlobCount
+	|LibEntry[1]|	Item
+
+struct LibEntry
+	|&nil|		Where
+	|cstring|	Name
+
+then we just return a LibPack* from C++.
+
+Then exec can just... use the table directly, as it is already sorted. :)
+*/
+
 	function SortAndPackFuncs (|[scfunction]| r, |jbin| pack)
 		opt norefcounts
+		todo "Write the data as c++ instead of a pack"
 		r.sort(SCNodeSorter)
 		
 		for (f in r) (i)
@@ -42,6 +60,7 @@ module PackMaker
 		.SortAndPackFuncs(.PackFuncs, nil)
 		if Options.MakeInterpreter
 			return .RunLib
+
 
 	function RunLib (|string|)
 		|| pack = jbin()
@@ -64,9 +83,9 @@ function scfunction.WrappedName (|string|)
 
 helper SCNodeSorter (sortercomparer)
 	// just to help compression. otherside will use a dictionary anyhow.
-	return (a|scnode|).exportname < (b|scnode|).exportname
+	return (a|SCNode|).ExportName < (b|SCNode|).ExportName
 
 
 function scfunction.CanLibLoad (|bool|)
-	require !.ismacro and !.isdisabled and .iscppinbuilt != 2
-	return true
+	if !.ismacro and !.isdisabled and .iscppinbuilt != 2
+		return true
