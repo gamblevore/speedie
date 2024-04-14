@@ -1116,7 +1116,7 @@ function TypeOfExprNeeded ( |message| exp, |SCNode| name_space, |SCDecl| )
 			error (it.source, kUsingStr)
 			
 constants
-	kusingStr = "Function here:"
+	kUsingStr = "Function here:"
 
 
 function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name_space, |message| side, |scdecl|) {
@@ -1508,7 +1508,8 @@ function TypeOfList (ExprResolver)
 	return TypeOfExpr(exp, name_space)
 
 
-function ClassOfObjForC (|Message| curr, |SCClass|) {
+function ClassOfObjForC (|Message| curr, |SCClass|)
+	opt norefcounts
 	if curr == @Func
 		|| fnc = curr.MsgFunc
 			|| rt = fnc.ReturnType
@@ -1518,14 +1519,13 @@ function ClassOfObjForC (|Message| curr, |SCClass|) {
 	|| obj = curr.obj
 	if obj isa SCDecl:		return obj.Type
 	if obj isa SCClass:		return obj
-//	if obj isa SCFunction:	return obj.ReturnType.Type // never happens?
 	
 	if obj isa SCModule
 		if obj.Cls: Return TypeJBClass
-}
 
 
 function DeclOfObjForC (|Message| curr, |SCDecl|)
+	opt norefcounts
 	if curr == @Func
 		|| fnc = curr.MsgFunc
 		if fnc: Return fnc.ReturnType
@@ -1592,6 +1592,7 @@ function Message.FixErl
 
 
 function AddToStaticSection (|Message| arg, |Message| ToAdd)
+	opt norefcounts
 	|| Static = arg.find(@tmp, "module")
 
 	if (static)
@@ -1600,17 +1601,16 @@ function AddToStaticSection (|Message| arg, |Message| ToAdd)
 	  else
 		static = «tmp "module"»
 		arg <~ static 
-		arg = «arg »
-		static <~ arg
+		arg = static.msg(@arg)
 
 	arg <~ ToAdd
 
 
 function Message.Resync (|Message| parent, |Message|)
-	|| curr = self
-	While curr and (curr.parent != parent)
-		curr = curr.parent
-	Return curr
+	opt norefcounts
+	rz = self
+	While rz and (rz.parent != parent)
+		rz = rz.parent
 
 
 function TypeOfSyntaxCall (|Message| exp, |SCNode| name_space, |Message| side, |scdecl|)
