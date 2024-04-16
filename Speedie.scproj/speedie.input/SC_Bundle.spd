@@ -6,10 +6,10 @@
 function compiler.Bundle 
 	require !Compiler.IsTest and !Options.ExternalCompile
 	require SC_Targets..gui
-	|| Pd = TransCompiler.productpath
+	|| Pd = .productfile
 	|| Pj = .BaseProjectPath.path
 	if platform.osx
-		.AppleBuildApp(pj.file, pd.file)
+		.AppleBuildApp(pj.file, pd)
 
 	
 function compiler.WrongConf (CollectFunc)

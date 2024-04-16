@@ -141,7 +141,7 @@ constants
 
 function BuildFolder (|file|)
 	opt norefcounts
-	|| b = ._buildfolder!
+	|| b = ._BuildFolder!
 	if !B.Exists
 		B.MakeDir
 	return B!
@@ -893,7 +893,7 @@ function Stage (|string| name, |bool|)
 function @transcompiler.PrintProduct (|string| s)
 	print s
 	print " `"
-	print transcompiler.ProductPath
+	print compiler.ProductPath
 	printline "`"
 
 

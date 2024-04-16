@@ -345,7 +345,7 @@ module Feedback
 			explain(purpose, "Crashes speedie to test it's crash handlers.")$
 			app.crash
 		
-		+"asm" // nothing... for now.
+		+"pack" // nothing... for now.
 			options.ModePack = value.optionbool
 		
 		+"targetdebug" // basically

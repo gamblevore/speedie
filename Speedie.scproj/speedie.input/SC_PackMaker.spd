@@ -55,12 +55,13 @@ Then exec can just... use the table directly, as it is already sorted. :)    */
 		j.Exit
 
 
-	function MakePack
+	function MakePack 
 		|| pack = jbin(@tmp, "xpd")
 		.MakePackSub(pack)
+		compiler.ProductFile.smartdata = pack
 		
 		
-	function MakePackSub (|jbin| j)
+	helper MakePackSub (|jbin| j)
 		opt norefcounts
 		.PackFuncs.sort(SCNodeSorter)
 		for (f in .PackFuncs) (i)
