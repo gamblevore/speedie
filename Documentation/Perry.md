@@ -81,6 +81,7 @@ And after all that, the C++ debugging experience was slow!
 
 Perry on the other hand, there really is no project setup. You just open a project in perry, and it sees all your files, you can compile, run and use it. There is zero project setup. There isn't even a .proj file. Theres none!
 
+
 ## Simplicity
 
 Let make a whole section out of that last point. Perry's overall design is to make your life simple.
@@ -113,3 +114,8 @@ I still prefer Xcode sometimes. I'm actually going to continue to improve Perry,
 * Needs skinning and themes
 * Maybe we could animate the text or add explosions or animations into Perry. That would be cool.
 
+## Combining IDEs Is A Good Idea
+
+Sometimes, perry lacks a certain feature that you need or just prefer. For me, that will be the smooth-fonts and general-aesthetic, that Xcode has. Each person has their favourite IDE.
+
+You are encouraged to use Perry + another IDE. Ideally we wouldn't need this, but for now its a good idea. Because Speedie just uses normal plain text files, its quite easy to edit the files in another IDE. Speedie can be accessed via the command-line, via your IDE also, so it will report build errors in standard clang format, which many IDEs understand. You'll lose syntax coloring and autocomplete and a lot more, but its still handy.

@@ -10,13 +10,15 @@ module PackMaker
 
 	function AddAll
 		opt norefcounts
+		|| MakeExec = options.makeinterpreter
 		for f in Compiler.FuncList
 			if !f.CanLibLoad
 				0
-			  elseif (f.IsStdLib)
-				.libfuncs <~ f
-			  else
-				.packfuncs <~ f
+			  elseif f.IsStdLib
+				if MakeExec or f.needsexport
+					.LibFuncs <~ f
+			  elseif f.NeedsExport
+				.PackFuncs <~ f
 		
 	
 	function DoLibGlobs (|jbin| pack)
@@ -28,7 +30,6 @@ module PackMaker
 		pack.exit
 
 /* Instead of this... SortAndPackFuncs could create some cpp... like
-	
 struct LibPack
 	|int|			FuncCount
 	|int|			GlobCount
@@ -42,24 +43,25 @@ then we just return a LibPack* from C++.
 
 Then exec can just... use the table directly, as it is already sorted. :)    */
 
-	function SortAndPackFuncs (|[scfunction]| r, |jbin!| j, |syntax| Kind)
+	function SortLibFuncs (|jbin!| j)
 		opt norefcounts
 		todo "Write the data as c++ instead of a pack"
-		r.sort(SCNodeSorter)
+		.libfuncs.sort(SCNodeSorter)
 		
 		j.Enter(@prm)
-		for (f in r) (i)
+		for (f in .libfuncs) (i)
 			f.TableID = i
-			j.Add(kind, f.exportname)
+			j.Add(@thg, f.exportname)
 		j.Exit
 
 
 	function MakePack
 		|| pack = jbin(@tmp, "xpd")
-		.makepacksub(pack)
+		.MakePackSub(pack)
 		
 		
 	function MakePackSub (|jbin| j)
+		opt norefcounts
 		.PackFuncs.sort(SCNodeSorter)
 		for (f in .PackFuncs) (i)
 			f.TableID = i
@@ -67,8 +69,9 @@ Then exec can just... use the table directly, as it is already sorted. :)    */
 		j.enter(@tmp, "app")
 		|| GlobSize = TreeAssembler.VacuumPack(packfuncs)
 		j.add(@num, GlobSize)
-
 		j.enter
+
+
 		j.tmp("fncs")
 		for f in .PackFuncs
 			j.Add(@tmp, f.exportname, true)
@@ -84,31 +87,70 @@ Then exec can just... use the table directly, as it is already sorted. :)    */
 		
 		j.tmp("strs")
 		for s in StringCorrector.list
+			if !s.length // hmmm we dont want this
 			j.add(@str, s)
 		j.exit(2)
 
-		
-		<(`
-		strs
-			"hellø"
-			"goodbye"
 
-		clss
-			+"mycuteclass"   "list"         16  (des1, ren1)
-			+"mycuteclass2"  "mycuteclass"  24  (des2, ren2)
+		j.tmp("clss")
+		typeobject!.PackClassChildren(j)
+		j.exit(2)
 		
-		link 
-			JB_zalloc
-			JB_ASCII
-			strlen
-`)>
+		
+		j.tmp("link")
+		for linked in .libfuncs
+			j.add(@thg, linked.exportname)
+		j.exit(2)
 
 
+	function SCClass.PackClassChildren (|jbin| j, |int|)
+		opt norefcounts
+		for c in .children
+			if !c.isrole
+				if !rz
+					j.enter
+				c.packexport(j)
+				rz++
+		if rz
+			j.exit
+	
+	
+	function SCClass.PackExport (|jbin| j, |int|)
+		opt norefcounts
+		j.enter(@tmp, .name)
+		if !.IsSTDLib
+			.DescribeInPack(j)
+		rz = .PackClassChildren(j)
+		j.exit
 		
-	function MakeInterpreter (|string|)
-		.AddAll
+		
+	function SCClass.DescribeInPack (|jbin| j)
+		opt norefcounts
+		|| sz = (0, .size)(.iswrapper)
+		j.addint(sz)
+		
+		|| fn_list = .behaviour!.WrapperFuncs
+		j.enter(@list)
+	
+		|| name = "0"
+		|| df = .DestructorFunc
+			name = df.exportname
+		j.add(@thg, name)
+	
+		|| b = .behaviour
+		while (b)
+			for (M in b.interfaces)
+				|| fn = .BestBehaviourFor(m.name.InterfaceToBehaviour)
+					|| BaseClass = .InterfaceForBehaviour(fn)
+						j.add(@thg, fn.exportname)
+			b = b.upwards
+		
+		j.exit
+
+		
+	function BuildInterpreter (|string|)
 		|| pack = jbin()
-		.SortAndPackFuncs(.LibFuncs, pack, @thg)
+		.SortLibFuncs(pack)
 		.DoLibGlobs(pack)
 		return pack
 

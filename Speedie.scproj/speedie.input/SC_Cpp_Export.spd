@@ -517,40 +517,9 @@ function MakeWrapperFor (|FastStringCpp| fs, |SCFunction| f)
 
 
 function FillInterpreter
-	|| lib_pack = PackMaker.MakeInterpreter
+	|| lib_pack = PackMaker.BuildInterpreter
 	.ListAllFuncs(.ModuleProperties, lib_pack)
 
-
-function SCClass.PackExport (|jbin| j)
-	opt norefcounts
-	j.enter(@tmp, .name)
-	|| sz = (0, .size)(.iswrapper)
-	j.addint(sz)
-	
-	|| fn_list = .behaviour!.WrapperFuncs
-	j.enter(@list)
-
-	|| name = "0"
-	|| df = .destructorfunc
-		name = df.exportname
-	j.add(@thg, name)
-
-	|| b = .behaviour
-	while (b)
-		for (M in b.interfaces)
-			|| fn = .BestBehaviourFor(m.name.InterfaceToBehaviour)
-				|| BaseClass = .InterfaceForBehaviour(fn)
-					j.add(@thg, fn.exportname)
-		b = b.upwards
-	
-	j.exit
-
-	j.enter
-	for c in .children
-		if !c.isrole
-			c.packexport(j)
-	j.exit
-	j.exit
 
 
 function faststring.appendvoid (|string| s, |byte| extra=0)

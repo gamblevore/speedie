@@ -513,7 +513,7 @@ module StringCorrector
 			require !stdlib							// if we are making a pack... add non-lib strings.
 
 		|| p = Table2.MakePlace(m.name)
-		|| i = (*p)|messageid|
+		|| i = (*p)|MessageID|
 		if i == nil
 			i = .newID(m.name)
 			*p = i
@@ -531,8 +531,10 @@ module StringCorrector
 		.CorrectConsts
 		.CorrectStrings
 
+
 	function CorrectStrings
 		.CorrectFile(Compiler.GeneratedCppsFolder[ "strings.txt" ]!)
+
 	
 	function CorrectFile (|file| where)
 		if options.PrintCompileString

@@ -2106,5 +2106,6 @@
 "τ"
 "–"
 "“"
-"\n\t\tstrs\n\t\t\t\"hellø\"\n\t\t\t\"goodbye\"\n\n\t\tclss\n\t\t\t+\"mycuteclass\"   \"list\"         16  (des1, ren1)\n\t\t\t+\"mycuteclass2\"  \"mycuteclass\"  24  (des2, ren2)\n\t\t\n\t\tlink \n\t\t\tJB_zalloc\n\t\t\tJB_ASCII\n\t\t\tstrlen\n"
+"clss"
 "xpd"
+"link"
