@@ -13,7 +13,6 @@
 # General Features #
 * Modern object-oriented language, slightly more expressive than Python.
 * Runs faster than idiomatic C++
-* Fast compilation.
 * Cross-platform. Create shell tools and GUI apps
 * Message-passing-interface lets your multiple-processes talk.
 * Has an awesome IDE, “Perry”.
