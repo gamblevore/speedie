@@ -19,6 +19,7 @@ module PackMaker
 					.LibFuncs <~ f
 			  elseif f.NeedsExport
 				.PackFuncs <~ f
+		.SortAll
 		
 	
 	function DoLibGlobs (|jbin| pack)
@@ -43,14 +44,22 @@ then we just return a LibPack* from C++.
 
 Then exec can just... use the table directly, as it is already sorted. :)    */
 
+	function SortAll
+		.SortSub(.libfuncs)
+		.SortSub(.Packfuncs)
+			
+	helper SortSub (|[scfunction]| list)
+		opt norefcounts
+		list.sort(SCNodeSorter)
+		for (f in list) (i)
+			f.TableID = i
+
 	function SortLibFuncs (|jbin!| j)
 		opt norefcounts
 		todo "Write the data as c++ instead of a pack"
-		.libfuncs.sort(SCNodeSorter)
 		
 		j.Enter(@prm)
-		for (f in .libfuncs) (i)
-			f.TableID = i
+		for f in .libfuncs
 			j.Add(@thg, f.exportname)
 		j.Exit
 
@@ -58,12 +67,13 @@ Then exec can just... use the table directly, as it is already sorted. :)    */
 	function MakePack 
 		|| pack = jbin(@tmp, "xpd")
 		.MakePackSub(pack)
-		compiler.ProductFile.smartdata = pack
-		
-		
+		Compiler.ProductFile.SmartData = pack
+	
+	
 	helper MakePackSub (|jbin| j)
 		opt norefcounts
 		.PackFuncs.sort(SCNodeSorter)
+		.libFuncs.sort(SCNodeSorter)
 		for (f in .PackFuncs) (i)
 			f.TableID = i
 
@@ -84,7 +94,7 @@ Then exec can just... use the table directly, as it is already sorted. :)    */
 		// 1) whole-program lists. No pack involved. Code works as-is.
 			// 2) interpreter lists. No pack-strings involved. This is also whole-program.
 		// 3) pack-lists. No lib stuff.
-		// so baiscally... only collect, (newid), if its whole-program or its a non-stdlib
+		// so basically... only collect, (newid), if its whole-program or its a non-stdlib
 		
 		j.tmp("strs")
 		for s in StringCorrector.list
@@ -100,7 +110,7 @@ Then exec can just... use the table directly, as it is already sorted. :)    */
 		
 		j.tmp("link")
 		for linked in .libfuncs
-			j.add(@thg, linked.exportname)
+			j.add(@thg, linked.ExportName)
 		j.exit(2)
 
 

@@ -2470,6 +2470,10 @@ void SC_Comp__PrintResults();
 
 void SC_Comp__PrintStats();
 
+JB_File* SC_Comp__ProductFile();
+
+JB_String* SC_Comp__ProductPath();
+
 JB_String* SC_Comp__Projects();
 
 bool SC_Comp__Reached(JB_String* S);
@@ -2552,8 +2556,6 @@ bool SC_FB__AppOptions_arch(JB_String* Name, JB_String* Value, FastString* Purpo
 
 bool SC_FB__AppOptions_argstats(JB_String* Name, JB_String* Value, FastString* Purpose);
 
-bool SC_FB__AppOptions_asm(JB_String* Name, JB_String* Value, FastString* Purpose);
-
 bool SC_FB__AppOptions_beep(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_breakonerr(JB_String* Name, JB_String* Value, FastString* Purpose);
@@ -2607,6 +2609,8 @@ bool SC_FB__AppOptions_noisy(JB_String* Name, JB_String* Value, FastString* Purp
 bool SC_FB__AppOptions_optimise(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_output_path(JB_String* Name, JB_String* Value, FastString* Purpose);
+
+bool SC_FB__AppOptions_pack(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_path(JB_String* Name, JB_String* Value, FastString* Purpose);
 
@@ -3184,8 +3188,6 @@ int SC_Ext__NoGoodObject(JB_String* Cpp, JB_File* H, JB_File* O);
 void SC_Ext__PrintProduct(JB_String* S);
 
 JB_String* SC_Ext__ProductName();
-
-JB_String* SC_Ext__ProductPath(bool Direct);
 
 JB_String* SC_Ext__ProductSuffix();
 

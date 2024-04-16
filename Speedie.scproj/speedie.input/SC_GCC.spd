@@ -49,7 +49,7 @@ function ProductSuffix (|String|)
 	
 
 function compiler.ProductFile (|File|)
-	return .productpath.file
+	return .ProductPath.file
 
 function compiler.ProductPath (|string|)
 	if options.output_path
