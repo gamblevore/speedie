@@ -35,8 +35,6 @@ constructor
 
 
 function PreRun
-	StringCorrector.Correct(Compiler.GeneratedCppsFolder[ "strings.txt" ]!)
-	
 	.AllTypes <~ "
 #ifndef ObjCID
 	#define ObjCID void*
@@ -52,7 +50,7 @@ function PreRun
 
 `
 	|| str = "const char* JB_CrashLogFileName = \"/tmp/logs/${compiler.projectname}.crash.txt\";\n\n"
-	.moduleproperties <~ str
+	.ModuleProperties <~ str
 
 
 function CanOpt (|bool| force, |bool|)
@@ -518,7 +516,8 @@ function MakeWrapperFor (|FastStringCpp| fs, |SCFunction| f)
 	fs <~ ";\n}\n\n"
 
 
-function MakeInterpreter (|string| lib_pack)
+function FillInterpreter
+	|| lib_pack = PackMaker.MakeInterpreter
 	.ListAllFuncs(.ModuleProperties, lib_pack)
 
 
@@ -867,7 +866,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		return .CppLicenceStr
 
 	
-	function ExportAllSource (|string| lib_pack)
+	function ExportAllSource
 		require StdErr.ok
 		
 		|| exp = Cpp_Export()
@@ -875,8 +874,8 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		exp.run
 		exp.ExportSyx
 		exp.WriteHeader
-		if lib_pack
-			exp.MakeInterpreter(lib_pack)
+		if Options.MakeInterpreter
+			exp.FillInterpreter
 		exp.FinalMergeOutputIntoACpp
 	
 
@@ -1423,13 +1422,11 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| n = .name
 		if !n
 			fs <~ "JB_LUB[0]"
-		  else//if n isa messageid
+		  else
 			fs <~ "JB_LUB["
 			|int| ID = n|messageid|.ID
 			fs <~ (ID+1)
 			fs <~ "]"
-//		  else
-//			debugger
 
 
 	function C_RenderStr (fpMsgRenderCpp)
@@ -1532,9 +1529,5 @@ class FastStringCpp (FastString)
 
 	constructor (|string| name = "")
 		.cpp_name = name
-	
-
-helper funcsorter_fn (sortercomparer)
-	return (a|scfunction|).exportname < (b|scfunction|).exportname
 
 

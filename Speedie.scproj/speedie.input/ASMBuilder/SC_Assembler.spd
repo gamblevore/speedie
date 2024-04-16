@@ -2,13 +2,6 @@
 
 module TextAssembler
 	|dictionary of uint|			LabelsToDo
-
-	function FindRequests (|bool|)
-		return false
-		|| Missing = 0
-		for r in textassembler.RequestTable
-			Missing += (!r.find)
-		return (!Missing)				#expect ("$Missing functions can't be found!")
 		
 	
 	function TextFunc (|message| msg, |bool|) // assemble a function from text
@@ -68,31 +61,27 @@ module TreeAssembler
 			if fn isa SCFunction
 				rz <~ fn
 				fn.tableid = rz.length
+			
 		
-		
-	function StampAll (|[scfunction]| Funcs)
+	function VacuumPack (|[scfunction]| list, |int|)
 		opt norefcounts
-		for fn in funcs
-			if fn.MyReacher
-				.Stamp(fn)
-	
-		
-		
-	function BuildPack 
-		fn_asm.inittable
+		fn_asm.InitTable
 
-		|| str = ("A", "B")(platform.IsDebug)
-		require str == "A"
-		|| list = .CollectFuncs("asm_test,asm_test_sub")		#require
+		require platform.IsDebug
+		|| test_list = .CollectFuncs("asm_test,asm_test_sub")
+		|| f = test_list.first$
 		#!debugger
-		.StampAll(list)
-		scfunction.linkall(list)
+		for fn in test_list
+			.Vacuum(fn)
+		for fn in list
+			.Vacuum(fn)
+		
 		|| args = {8725l, 275l}
-		|| mu   = list[0]!.asm
+		|| mu   = f.asm
 			|| Result = mu.finish.run( &args[0], –count args )
 			if result != 9000
-			
-			.StampAll(compiler.funclist)
+		
+		return 1K
 
 
 	helper asm_test_add (|int| a, |int| b, |int|)
@@ -105,18 +94,12 @@ module TreeAssembler
 		return asm_test_add(b*b, a*a)
 
 
-	function scfunction.Flatten
-		|| fp = fn_asm_table[@arg]!
-		(fp)(TreeAssembler.StdState, .SourceArg!)
-
-
-	function Stamp (|SCFunction| fn)
+	function Vacuum (|SCFunction| fn)
 		opt norefcounts
 		.StdState.Initstate(fn)
-		fn.Flatten
+		|| fp = fn_asm_table[@arg]!
+		(fp)(TreeAssembler.StdState, fn.SourceArg!)
 		.StdState.FinishASM
-
-		
 
 
 
@@ -126,13 +109,14 @@ extend_module ASM
 			return fn.MyReacher
 
 
-//|| ASMPack = "digest" <(`
-//pack
-//	app 1K
-//		strs
-//			"hellø"
-//		fncs
-//			init #(00000000000000007B00080409A01A0516FF1F040046080700000838FAFF231800000001)#
-//			main #(00)#
-//`)>
+ignore
+	|| ASMPack = –digest <(`
+	pack
+		app 1K
+			strs
+				"hellø"
+			fncs
+				init #(00000000000000007B00080409A01A0516FF1F040046080700000838FAFF231800000001)#
+				main #(00)#
+	`)>
 

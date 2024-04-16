@@ -189,7 +189,7 @@ function message.ASMFunc (|fn_asm|)
 function ASMFuncState.TotalInit
 	opt norefcounts
 	|| j = ASMFuncState.JSMSpace
-	j.Capacity = 1MB
+	j.Capacity = 4MB
 	.maxlength = j.Capacity
 	.start = j.ptr
 	.Written = 0
@@ -197,8 +197,7 @@ function ASMFuncState.TotalInit
 
 function ASMFuncState.InitState (|scfunction| fn)
 	.TotalInit
-	.out = µfunc(fn)
-	.out.start = .written
+	.out = µfunc(fn, JSMSpace.ptr + .written)
 	.out.length = -.written
 	.LabelCount = 0
 	.fn  = fn

@@ -3,7 +3,7 @@
 // must create an error if not found... unless the name is "default"
 
 
-function compiler.Package 
+function compiler.Bundle 
 	require !Compiler.IsTest and !Options.ExternalCompile
 	require SC_Targets..gui
 	|| Pd = TransCompiler.productpath

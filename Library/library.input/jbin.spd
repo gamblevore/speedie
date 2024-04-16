@@ -36,26 +36,28 @@ extend message
 
 role JBin (Faststring)
 	linkage: cpp_part bin
-	constructor         (|syntax| type=@arg, |string| data="")
+	constructor         (|syntax| type=@arg, |string| name="")
 		cpp_part Constructor
 		 self <~ _JbinHeader
-		.enter(type, data)
+		.enter(type, name)
 	constructor (|int| n)
 		cpp_part Constructor0
 		if n // what?
-	function Enter		(|syntax| type=@arg, |string| data="")
-		.add(type, data, true)
-	function AddStr		(|string| data)
-		.add(@str, data)
-	function AddInt		(|int64| data)
-		.add(@num, data.render)
-	function Add		(|syntax| type, |string| data="", |bool|into = false)
-		|| L = data.length
-		|| addr = (data.addr, nil)(L)
-		.addmemory(type, addr, into, L)
-	function Add		(|syntax| type, |faststring| fs, |bool|into = false)
+	function Enter		(|syntax| type=@arg, |string| name="", |jbinleaver|)
+		return .add(type, name, true)
+	function Tmp		(|string| name)
+		.Enter(@tmp, name)
+		.Enter(@arg)
+			
+	function AddStr		(|string| name)
+		.add(@str, name)
+	function AddInt		(|int64| name)
+		.add(@num, name.render)
+	function Add		(|syntax| type, |string| name="", |bool|into = false, |jbinleaver|)
+		return .addmemory(type, name.length, into, name.addr)
+	function Add		(|syntax| type, |faststring| fs, |bool|into = false, |jbinleaver|)
 		cpp_part AddFS
-		.addmemory(Type, fs.resultptr, into, fs.length)
+		return .addmemory(Type, fs.length, into, fs.resultptr)
 
 
 	function AddComp (|faststring| fs, |int| strength=mzlab.strongest)
@@ -66,10 +68,10 @@ role JBin (Faststring)
 		  else
 			.add(@str, fs)
 		
-	function Sheb		(|string| data)
+	function Sheb		(|string| name)
 		self <~ '#'
 		self <~ '!'
-		self <~ data
+		self <~ name
 		self <~ '\n' // noice
 
 	function Exit (|int| amount = 1)
@@ -79,15 +81,16 @@ role JBin (Faststring)
 			self    <~ B|byte|
 			amount  -= (B-add)
 
-	function AddCstring (|syntax| type=@str, |cstring| data)
-		.AddMemory(type, data|&byte|, false, data.length)
+	function AddCstring (|syntax| type=@str, |cstring| name)
+		.AddMemory(type, name.length, false, name|&byte|)
 	
-	function AddMemory (|syntax| type, |&byte| data, |bool| GoIn, |uint64| L)
+	function AddMemory (|syntax| type, |uint64| L, |bool| GoIn=false, |?&byte| data=nil, |jbinleaver|)
 		|uint| T = (type|uint|<<1) ||| (goin)
 		self <~ T|byte|
 		.hint(L)
 		if data
 			.AppendMemory(data, L|int|)
+		return goin|int|
 
 
 	function OpenSection  (|int|)				// openstream 
@@ -113,6 +116,11 @@ role JBin (Faststring)
 		.length = CurrLen
 		.NoFlush--
 
+
+datatype jbinLeaver (int)
+	// need some nice syntax so we can do: using j.enter
+	// not finished
+	
 
 function StringReader.NextMsg (|message| parent=nil, |syntax| fn, |string| name=nil,  |Message|)
 	cpp_part NextMsgExpect

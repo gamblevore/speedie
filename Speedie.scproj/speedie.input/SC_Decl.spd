@@ -140,6 +140,12 @@ class SCDecl (SCNamed) {
 	function IsNil (|bool|)
 		return self == typenil
 	
+	function IsStdLib (|bool|)
+		|| p = .project
+		if p?
+			return p.isstdlib
+		debugger
+	
 //	function NilEither (|nilstate|)
 //		return .nilDeclared&nilstate.either
 

@@ -32,11 +32,12 @@ extend String
 	
 	
 	operator globs (|string| txt, |bool|)
+		real self
 		|&byte| text_backup
 		|&byte| wild_backup
-		|| text = txt.address
+		|| text = txt.addr
 		|| textEnd = text + txt.length
-		|| wild = .address
+		|| wild = .addr
 		|| wildEnd = wild + .length
 		
 		while text < textEnd

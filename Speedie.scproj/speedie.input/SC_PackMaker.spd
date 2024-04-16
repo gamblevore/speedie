@@ -8,7 +8,6 @@ module PackMaker
 	|[scfunction]|			PackFuncs
 	|[SCDecl]|				PackGlobs
 
-	
 	function AddAll
 		opt norefcounts
 		for f in Compiler.FuncList
@@ -23,12 +22,12 @@ module PackMaker
 	function DoLibGlobs (|jbin| pack)
 		LibGlobs.sort(SCNodeSorter)
 		
+		pack.enter(@arr)
 		for (f in LibGlobs)
-			pack.Add(@thg, f.exportname)
+			pack.Add(@thg, f.ExportName)
+		pack.exit
 
-
-/*
-	instead of this... SortAndPackFuncs could create some cpp... like
+/* Instead of this... SortAndPackFuncs could create some cpp... like
 	
 struct LibPack
 	|int|			FuncCount
@@ -41,36 +40,76 @@ struct LibEntry
 
 then we just return a LibPack* from C++.
 
-Then exec can just... use the table directly, as it is already sorted. :)
-*/
+Then exec can just... use the table directly, as it is already sorted. :)    */
 
-	function SortAndPackFuncs (|[scfunction]| r, |jbin| pack)
+	function SortAndPackFuncs (|[scfunction]| r, |jbin!| j, |syntax| Kind)
 		opt norefcounts
 		todo "Write the data as c++ instead of a pack"
 		r.sort(SCNodeSorter)
 		
+		j.Enter(@prm)
 		for (f in r) (i)
 			f.TableID = i
-			if pack
-				pack.Add(@thg, f.exportname)
+			j.Add(kind, f.exportname)
+		j.Exit
 
 
-	function Run (|string|)
+	function MakePack
+		|| pack = jbin(@tmp, "xpd")
+		.makepacksub(pack)
+		
+		
+	function MakePackSub (|jbin| j)
+		.PackFuncs.sort(SCNodeSorter)
+		for (f in .PackFuncs) (i)
+			f.TableID = i
+
+		j.enter(@tmp, "app")
+		|| GlobSize = TreeAssembler.VacuumPack(packfuncs)
+		j.add(@num, GlobSize)
+
+		j.enter
+		j.tmp("fncs")
+		for f in .PackFuncs
+			j.Add(@tmp, f.exportname, true)
+			j.add(f.asm #expect)
+			j.exit
+		j.Exit(2)
+		
+		// OK... so what do we have? 3 kinds of lists
+		// 1) whole-program lists. No pack involved. Code works as-is.
+			// 2) interpreter lists. No pack-strings involved. This is also whole-program.
+		// 3) pack-lists. No lib stuff.
+		// so baiscally... only collect, (newid), if its whole-program or its a non-stdlib
+		
+		j.tmp("strs")
+		for s in StringCorrector.list
+			j.add(@str, s)
+		j.exit(2)
+
+		
+		<(`
+		strs
+			"hellø"
+			"goodbye"
+
+		clss
+			+"mycuteclass"   "list"         16  (des1, ren1)
+			+"mycuteclass2"  "mycuteclass"  24  (des2, ren2)
+		
+		link 
+			JB_zalloc
+			JB_ASCII
+			strlen
+`)>
+
+
+		
+	function MakeInterpreter (|string|)
 		.AddAll
-		.SortAndPackFuncs(.PackFuncs, nil)
-		if Options.MakeInterpreter
-			return .RunLib
-
-
-	function RunLib (|string|)
 		|| pack = jbin()
-		pack.enter(@prm) // our funcs
-		.SortAndPackFuncs(.libfuncs, pack)
-		pack.exit
-
-		pack.enter(@arr) // our globs
+		.SortAndPackFuncs(.LibFuncs, pack, @thg)
 		.DoLibGlobs(pack)
-		pack.exit
 		return pack
 
 

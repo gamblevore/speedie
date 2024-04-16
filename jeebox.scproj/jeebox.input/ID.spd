@@ -25,6 +25,7 @@ class MessageID (stringshared)				// now is usefully used! :D
 	contains object
 	||					Obj
 	|uint64| 			ID
+	|uint64| 			User // user-value. system doesnt use it.
 	|Syntax|			Func
 	
 	render

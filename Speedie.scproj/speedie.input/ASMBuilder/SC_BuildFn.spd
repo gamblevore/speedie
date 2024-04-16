@@ -1,4 +1,5 @@
 
+
 extend_module ASM
 	helper TestASMSub (|message| tests)
 		opt norefcounts
@@ -12,7 +13,7 @@ extend_module ASM
 
 	function TestASM 
 		.enc1
-		require options.makeasm
+		require options.ModePack
 		|| dev = app.pref("dev").int
 		if dev >= 2
 			asm.noisyasm = 3
@@ -32,20 +33,6 @@ function message.GetASMFunc (|message|)
 		|| op = .next(@opp, "=")$
 		|| Adj = op.Next(@adj)$
 		return adj[@func]
-
-
-extend_module SCFunction
-	function LinkAll (|[scfunction]| Funcs)
-		opt norefcounts
-		for fn in funcs
-			if fn.MyReacher
-				.Link(fn)
-
-	function Link (|SCFunction| fn)
-		opt norefcounts
-		// so... this will be the ACTUAL link.
-		// as in the one that the run-time loader will do!
-		|| mu = fn.asm$
 
 
 function IR.Encode (|ASM|)

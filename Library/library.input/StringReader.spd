@@ -171,7 +171,7 @@ class StringReader
 
 		|| Remaining = n - skip
 		|| r = string(Remaining) #require
-		|| Dest = r.address
+		|| Dest = r.addr
 		while
 			|| Copied = .data.CopyTo(dest, .data.Remaining min Remaining)
 			Remaining -= Copied

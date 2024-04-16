@@ -465,7 +465,7 @@ module StringCorrector
 		.list <~ rz
 		.TotalSize += name.Length + 1 // nul terminated
 	
-	function Sort (|bool| IDOrder)
+	function IDSort (|bool| IDOrder)
 		opt norefcounts
 		if idorder
 			.list.sort(&messageid.idsorter)
@@ -507,8 +507,11 @@ module StringCorrector
 				s.id = nextID++
 			
 		
-	function CollectString (|message| m)
+	function CollectString (|message| m, |bool| StdLib)
 		opt norefcounts
+		if options.ModePack and !options.modecpp	// options.modecpp will be false anyhow, but this works
+			require !stdlib							// if we are making a pack... add non-lib strings.
+
 		|| p = Table2.MakePlace(m.name)
 		|| i = (*p)|messageid|
 		if i == nil
@@ -521,18 +524,26 @@ module StringCorrector
 		opt norefcounts
 		for d in compiler.DeclConstants
 			|| def = d.default
-				.CollectString(def)
-			
-	function Correct (|file| where)
+				.CollectString(def, d.IsStdLib)
+	
+	
+	function Correct
+		.CorrectConsts
+		.CorrectStrings
+
+	function CorrectStrings
+		.CorrectFile(Compiler.GeneratedCppsFolder[ "strings.txt" ]!)
+	
+	function CorrectFile (|file| where)
 		if options.PrintCompileString
 			printline where
 		
 		|| HasAnything = false 
 		|| m = where.parse(4MB, true)
-			HasAnything = m.hasany
+			HasAnything = m.HasAny
 			.MergeTable(m, m.Dict(true))
 		
-		.sort(HasAnything)
+		.IDsort(HasAnything)
 		
 		|| fs = where.Out
 			.WriteTable(fs)

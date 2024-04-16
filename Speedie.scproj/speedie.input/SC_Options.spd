@@ -15,8 +15,8 @@ module Options
 	|| 		NilTestAllocNeverFails	= true
 	|| 		Beep					= false
 
-	||		Cpp						= true
-	||		MakeASM					= false
+	||		ModeCpp					= true
+	||		ModePack				= false
 	||		MakeInterpreter			= false
 	||		MakeLib					= false // for now
 
@@ -41,8 +41,7 @@ module Options
 	||		UseFuncCallCount		= false
 	||		ExternalCompile			= false
 	||		Final					= false // won't call gcc.
-	||		Products				= native
-//	||		Compile32Bit			= maybebool(false) // Scrap 32-bit? Use pointer-compression on 64-bit?
+//	||		Products				= native
 	|byte|	Optimise				= 1
 	|bool|	SelfReplacement			= 0
 	|byte|	OperationCount			= 0
@@ -200,7 +199,7 @@ module Feedback
 		+"nocompile" // remove this later
 			Explain(Purpose, "Will not compile any .cpp generated.")$
 			Options.Compile = false
-			options.products &=~ (options.pack+options.native)
+//			options.products &=~ (options.pack+options.native)
 			
 		+"breakonerr" 
 			Explain(Purpose, "")$
@@ -251,8 +250,8 @@ module Feedback
 		+"check"
 			Explain(Purpose, "Check only. same as --nocompile --cpp=0")$
 			Options.Compile = false
-			Options.Cpp = false
-			options.products = 0
+			Options.ModeCpp = false
+//			options.products = 0
 		
 		+"errortest" 
 			explain(purpose, "Tests if error handling works OK.")$
@@ -289,17 +288,7 @@ module Feedback
 			return true
 		
 		+"products"
-			Explain(purpose, `Acceptable values: pack, cpp, native. Combine like pack/native. 'native' = compiled via GCC. 'pack' = interpreted.`)$
-			|| P = 0
-			for item in (value / '/')
-				if item ~= "native"
-					P |= options.native // these two seem the same?
-				if item ~= "cpp"
-					P |= options.cpp
-				if item ~= "pack"
-					P |= options.pack
-			options.products = P
-			
+			0 // does nothing
 
 		+"ignorecantsave" 
 			Explain(Purpose)$
@@ -357,7 +346,7 @@ module Feedback
 			app.crash
 		
 		+"asm" // nothing... for now.
-			options.MakeASM = value.optionbool
+			options.ModePack = value.optionbool
 		
 		+"targetdebug" // basically
 			Explain(Purpose, "")$
@@ -402,7 +391,7 @@ module Feedback
 
 		+"cpp"
 			explain(purpose, "Compiles to cpp. Default true")$
-			options.cpp = value.optionbool
+			options.ModeCpp = value.optionbool
 				
 		+"output_path"
 			explain(purpose, "Specifies the build product path")$

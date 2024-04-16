@@ -297,17 +297,14 @@ function IsCompilerAndNeedsInstall (|bool|)
 
 
 function ExportAndInstall (|bool| CanInstall)
-	if .ShouldTransComp
-		if options.products
-			if options.products & options.pack
-				TreeAssembler.BuildPack
-			if options.products & options.native
-				.RunCppCompile~quietly
-				if CanInstall and .IsCompilerAndNeedsInstall
-					.InstallCompiler
+	if .ShouldTransComp and (options.ModeCpp)
+		if Options.ModeCpp
+			.RunCppCompile~quietly
+			if CanInstall and .IsCompilerAndNeedsInstall
+				.InstallCompiler
 		.ClearThis~quietly
 		if stderr.ok
-			compiler.Package
+			compiler.Bundle
 	if stderr.ok and !options.scripting
 		 .PrintProduct("Product")
 

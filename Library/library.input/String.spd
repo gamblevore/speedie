@@ -25,8 +25,9 @@ class String
 	function Length (|int|)
 		nil checker
 		cpp_wrapper JB_Str_Length
-	function Address (|&byte|)		// actually not a nil-checker, cos it can return "" hmmmmm.
-		cpp_wrapper JB_Str_Address	// change this?
+	function Addr (|&byte|)
+		nil safe	 // never returns nil, even for a nil-self
+		cpp_wrapper JB_Str_Address
 	function LengthUTF8 (|int|)
 		nil checker
 		cpp_wrapper JB_Str_LengthUTF8
@@ -529,7 +530,7 @@ class String
 	
 	helper MoveCodePoint (|ind| Pos, |int| CodePoints, |ind|)
 		|| n	= .length
-		|| s0	= .address
+		|| s0	= .addr
 		|| s	= s0 + pos
 		if Codepoints >= 0
 			|| s2 = s0 + n
@@ -630,7 +631,7 @@ class String
 
 
 	iterator
-		|| Start = .Address
+		|| Start = .Addr
 		|| End = Start + .Length
 		while (Start < End)
 			yield Start[0] (Start - .Addr)
@@ -638,7 +639,7 @@ class String
 
 	
 	iterator Backwards
-		|| Start = .Address
+		|| Start = .Addr
 		|| i = .Length-1
 		while (i >= 0)
 			yield Start[i] (i)
@@ -655,7 +656,7 @@ class String
 
 	
 	iterator CodePoints
-		|| Start	= .Address
+		|| Start	= .Addr
 		|| End		= Start + .Length
 		while (Start < End)
 			|| c = codepoint.UTF8Read(&start)
@@ -663,7 +664,7 @@ class String
 
 
 	iterator CodePoints2
-		|| First	= .Address
+		|| First	= .Addr
 		|| Curr		= First
 		|| End		= first + .Length
 		while (Curr < End)

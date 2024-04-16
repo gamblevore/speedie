@@ -733,7 +733,7 @@ function CollectOne (|Message| c, |bool| Visible, |bool|)
 	return visible
 
 
-function CollectString (|string| s, |message|)
+function CollectStr (|string| s, |message|)
 	rz = s.ParseClean
 	.CollectFromNode( rz, false )
 

@@ -3,8 +3,8 @@
 pack "xpd"
 	debug:
 	meta
-		conf 
-			date // auto-generated
+		conf  // auto-generated
+			date
 			name
 			version
 		pictures

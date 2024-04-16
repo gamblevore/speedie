@@ -51,7 +51,6 @@ function Compiler.FindSpeedieRoot (|string|)
 	return "/usr/local/speedie"
 	
 
-
 module Compiler {
 linkage
 	cpp_part Comp
@@ -136,7 +135,6 @@ linkage
 |SCFunction|				ClassListInitFunc
 
 
-
 constants
 	kTimeWidth = 19
 
@@ -147,7 +145,6 @@ function BuildFolder (|file|)
 	if !B.Exists
 		B.MakeDir
 	return B!
-
 
 
 function CompileAll (|bool|)
@@ -173,11 +170,17 @@ function CompileAll (|bool|)
 	.Timer( "RefCounting" )
 	.DoRefAnalysis				// do actual refcounts.
 
-	if Options.Cpp
+	require .Stage( "String Correction" )
+	PackMaker.AddAll
+	StringCorrector.Correct
+	
+	if Options.ModePack
+		.Timer( "Export Pack" )
+		PackMaker.MakePack	
+	
+	if Options.ModeCpp
 		.Timer( "Export Cpp" )
-		StringCorrector.CorrectConsts
-		|| lpck = PackMaker.Run
-		Cpp_Export.ExportAllSource(lpck)
+		Cpp_Export.ExportAllSource
 
 	SCImport.ExportShaders
 
@@ -288,7 +291,6 @@ function InitBasicStuff (|int|) // compiler.init
 		compiler.InitedOK = false
 		
 
-
 function LoadTypeTest (|string| s, |scfunction|)
 	opt norefcounts
 	|| f = TypeObject![ s ]
@@ -363,7 +365,7 @@ function ImportAll
 	.ImportLibs
 	.ImportProj
 	.ImportAST
-	if options.SelfReplacement //and options.MakeASM
+	if options.SelfReplacement
 		VM_Builder.MakeTheVM
 
 	require .Stage( "Import" )
@@ -531,12 +533,10 @@ function ImportAll
 		|| c = m.cls
 			c.RenameInterfaces
 
-
 	for m in SortInitOrder(.ModuleList)
 		m.DelayedInitFuncTransform
 	.PostInitCodeCall
 	
-
 	.Stage( "Creating Exportnames For Function Prototypes" )
 	for f in .FuncList
 		|| p = f.ProtoDecl
@@ -544,11 +544,9 @@ function ImportAll
 		  else
 			f.AddConstructorReturn2
 	
-	
 	.Stage( "Checking Iterators" )
 	for c in .ClassList
 		c.CheckIterator
-
 
 	.Timer( "Transform" )
 	.Stage( "Transforming Functions" )
@@ -588,7 +586,7 @@ function InitCompiler
 	
 	////////////////////////////////////////////////
 	.TimerOutput <~ "\n"
-	StringCorrector.CollectString(@str.msg)
+	StringCorrector.CollectString(@str.msg, true)
 	.CurrStage = 1
 	SCGlobals.UniqueNum = 100
 	////////////////////////////////////////////////
@@ -691,48 +689,6 @@ function scfunction.IsAllocOrNew (|bool|)
 	return self is Constructor
 
 
-/*function scfunction.HasFloatparams (|int|)
-	opt norefcounts
-	for arg in .args
-		|| d = arg.type.TypeInfo
-		rz += (d.isfloat)
-
-
-function scfunction.HasFloatReturn (|int|)
-	opt norefcounts
-	|| f = .returntype
-		return f.isfloat|int|
-
-
-function CheckMaxVars
-	require options.CheckMaxVars
-	|| V    = 0
-	|| Used = 0
-	|| Args = 0
-	|int[10]| ArgVersions
-
-	for f in .FuncList
-		if (f.CurrReacher)
-			|| N = f.args.length
-			V = v max f.maxvars
-			ArgVersions[n min 9]++
-			used ++
-			|| FP = f.HasFloatparams
-			|| RP = f.HasFloatReturn
-			if fp or rp
-				"${f.RenderName} has $fp float params and $rp float result."
-
-	for i in (–count argversions)
-		if argversions[i]
-			"${argversions[i]} args of size $i"
-
-
-	"$v maxvars"
-	"$used funcs used. ${.funclist.length} funcs total."
-	// what about the function count
-*/
-
-
 function NewConst (|scdecl| d)
 	d <~ scdeclinfo.Const ||| scdeclinfo.Global
 	.DeclConstants <~ d
@@ -816,7 +772,6 @@ function SCFunction.ReachedDetect
 		base = Compiler.Interpreter!
 	
 	.ReachFunc(base)
-	
 			
 
 function CheckIsGoodLibrary
@@ -871,8 +826,7 @@ function MakeMainFunc (|message|)
 		return f.sourcearg
 	"Compiling as library."
 	Options.ProjectisLibrary = true
-	return .program.CollectString( "main:\n" ).last				// mainproj.collect
-
+	return .program.CollectStr( "main:\n" ).last				// mainproj.collect
 
 
 function AddMain (|int| mark, |bool|)
@@ -937,7 +891,10 @@ function Stage (|string| name, |bool|)
 
 
 function @transcompiler.PrintProduct (|string| s)
-	printline (s + " `") + (transcompiler.ProductPath + "`")
+	print s
+	print " `"
+	print transcompiler.ProductPath
+	printline "`"
 
 
 function IsTest (|bool|)
@@ -948,7 +905,6 @@ function VariantSuffix (|string|)
 	if (Options.SelfReplacement) and Options.Compile
 		return "Test" + Options.Variant
 	return Options.Variant
-
 
 
 function AddSCProj (|string| Path, |string|)

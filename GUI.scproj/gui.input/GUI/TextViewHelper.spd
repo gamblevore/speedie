@@ -87,7 +87,7 @@ class TextViewLine (list)
 		b -= .position
 		require b > 0
 		
-		|| StrEnd = b + .text.address
+		|| StrEnd = b + .text.addr
 		for (c.CodePoints in .text) (after)
 			if c == '\t'
 				rz += rz.tabswidth
@@ -546,7 +546,7 @@ helper string.CountBytesInSquares (|int| Remain, |int|)
 		  else
 			i++
 		if i >= remain
-			return (after - .address)|int|
+			return (after - .addr)|int|
 	return .length
 
 

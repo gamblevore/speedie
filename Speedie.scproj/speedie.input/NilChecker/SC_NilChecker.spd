@@ -150,7 +150,7 @@ function Char (niltrackerfn)
 
 
 function String (niltrackerfn)
-	StringCorrector.CollectString(msg)
+	StringCorrector.CollectString(msg, scfunction.currfunc!.isstdlib)
 	return .RealBool(!msg.length)
 
 
