@@ -135,6 +135,8 @@ typedef uint U24_8;
 
 typedef uint64 __junktest_7__;
 
+typedef int jbinLeaver;
+
 typedef vec4 mat2;
 
 typedef u16 ASMParam;
@@ -962,7 +964,7 @@ struct xC2xB5Func_Behaviour: Object_Behaviour {
 
 JBClass ( ASMFunc , JB_Object , 
 	SCFunction* Fn;
-	int Start;
+	IR* IR;
 	int Length;
 	bool OK;
 );
@@ -1047,6 +1049,7 @@ struct MessageID_Behaviour: StringShared_Behaviour {
 JBClass ( MessageID , JB_StringShared , 
 	JB_Object* Obj;
 	uint64 ID;
+	uint64 User;
 	Syntax Func;
 );
 
@@ -1454,7 +1457,6 @@ extern Dictionary* SC__Options_BannedClasses;
 extern bool SC__Options_Beep;
 extern bool SC__Options_CheckMaxVars;
 extern bool SC__Options_Compile;
-extern bool SC__Options_Cpp;
 extern bool SC__Options_ExternalCompile;
 extern bool SC__Options_Final;
 extern bool SC__Options_ForceRecompile;
@@ -1464,9 +1466,10 @@ extern bool SC__Options_IgnoreCantSaveErrors;
 extern bool SC__Options_IsDirectTest;
 extern bool SC__Options_KeepAllErrors;
 #define kSC__Options_LargestFlag (3)
-extern bool SC__Options_MakeASM;
 extern bool SC__Options_MakeInterpreter;
 extern bool SC__Options_MakeLib;
+extern bool SC__Options_ModeCpp;
+extern bool SC__Options_ModePack;
 #define kSC__Options_native (1)
 extern ErrorSeverity SC__Options_NilStrength;
 extern bool SC__Options_NilTestAllocNeverFails;
@@ -1479,7 +1482,6 @@ extern bool SC__Options_PrintCompileString;
 extern bool SC__Options_PrintFiles;
 extern bool SC__Options_PrintLibraries;
 extern bool SC__Options_PrintStages;
-extern int SC__Options_Products;
 extern bool SC__Options_ProjectIsLibrary;
 extern bool SC__Options_ProjectIsMiniLib;
 extern bool SC__Options_Scripting;
@@ -2352,6 +2354,8 @@ void SC_Comp__BuildConstructors();
 
 JB_File* SC_Comp__BuildFolder();
 
+void SC_Comp__Bundle();
+
 void SC_Comp__CheckIsGoodLibrary();
 
 bool SC_Comp__ClassSorter(JB_Object* A, JB_Object* B);
@@ -2453,8 +2457,6 @@ void SC_Comp__MiniTests();
 bool SC_Comp__ModulesSorter(JB_Object* A, JB_Object* B);
 
 void SC_Comp__NewConst(SCDecl* D);
-
-void SC_Comp__Package();
 
 void SC_Comp__PostInitCodeCall();
 
@@ -2856,11 +2858,13 @@ int SC_PackMaker__Init_();
 
 int SC_PackMaker__InitCode_();
 
-JB_String* SC_PackMaker__Run();
+JB_String* SC_PackMaker__MakeInterpreter();
 
-JB_String* SC_PackMaker__RunLib();
+void SC_PackMaker__MakePack();
 
-void SC_PackMaker__SortAndPackFuncs(Array* R, FastString* Pack);
+void SC_PackMaker__MakePackSub(FastString* J);
+
+void SC_PackMaker__SortAndPackFuncs(Array* R, FastString* J, Syntax Kind);
 
 
 
@@ -3056,13 +3060,19 @@ ErrorInt JB_Main();
 
 
 // Crkt
-void SC_Crkt__CollectString(Message* M);
+void SC_Crkt__CollectString(Message* M, bool StdLib);
 
-void SC_Crkt__Correct(JB_File* Where);
+void SC_Crkt__Correct();
 
 void SC_Crkt__CorrectConsts();
 
+void SC_Crkt__CorrectFile(JB_File* Where);
+
+void SC_Crkt__CorrectStrings();
+
 int SC_Crkt__Count();
+
+void SC_Crkt__IDSort(bool IDOrder);
 
 int SC_Crkt__Init_();
 
@@ -3071,8 +3081,6 @@ int SC_Crkt__InitCode_();
 void SC_Crkt__MergeTable(Message* Disk, Dictionary* D3);
 
 MessageID* SC_Crkt__NewID(JB_String* Name);
-
-void SC_Crkt__Sort(bool IDOrder);
 
 bool SC_Crkt__UseID(MessageID* S, Message* Old);
 
@@ -3208,8 +3216,6 @@ bool SC_Ext__UseAndCompile(Array* Input, JB_String* Output);
 
 
 // TreeAssembler
-void SC_TreeAssembler__BuildPack();
-
 Array* SC_TreeAssembler__CollectFuncs(JB_String* Exp);
 
 int SC_TreeAssembler__Init_();
@@ -3218,11 +3224,11 @@ void SC_TreeAssembler__InitAll();
 
 int SC_TreeAssembler__InitCode_();
 
-void SC_TreeAssembler__Stamp(SCFunction* Fn);
-
-void SC_TreeAssembler__StampAll(Array* Funcs);
-
 ASMFunc* SC_TreeAssembler__AccessStr(Message* M);
+
+void SC_TreeAssembler__Vacuum(SCFunction* Fn);
+
+int SC_TreeAssembler__VacuumPack(Array* List);
 
 
 
@@ -4444,6 +4450,9 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName);
 // int8
 
 
+// jbinLeaver
+
+
 // mat2
 
 
@@ -5556,6 +5565,8 @@ void SC_Cpp_ExportStruct(Cpp_Export* Self, SCClass* Cls, bool IsBehaviour);
 
 void SC_Cpp_ExportSyx(Cpp_Export* Self);
 
+void SC_Cpp_FillInterpreter(Cpp_Export* Self);
+
 void SC_Cpp_FinalMergeOutputIntoACpp(Cpp_Export* Self);
 
 JB_String* SC_Cpp_FuncHeader(Cpp_Export* Self, SCFunction* F);
@@ -5563,8 +5574,6 @@ JB_String* SC_Cpp_FuncHeader(Cpp_Export* Self, SCFunction* F);
 void SC_Cpp_FuncStart(Cpp_Export* Self, FastStringCpp* Fs, SCFunction* F, JB_String* Funcheader);
 
 void SC_Cpp_ListAllFuncs(Cpp_Export* Self, FastStringCpp* Fs, JB_String* Lib_pack);
-
-void SC_Cpp_MakeInterpreter(Cpp_Export* Self, JB_String* Lib_pack);
 
 void SC_Cpp_MakeWrapperFor(Cpp_Export* Self, FastStringCpp* Fs, SCFunction* F);
 
@@ -5652,7 +5661,7 @@ int SC_Cpp__DontNeedMoreBrackets(Message* Msg);
 
 bool SC_Cpp__DoSavers();
 
-void SC_Cpp__ExportAllSource(JB_String* Lib_pack);
+void SC_Cpp__ExportAllSource();
 
 void SC_Cpp__GenLub(FastString* Fs);
 
@@ -6617,7 +6626,7 @@ xC2xB5Form* SC_xC2xB5Form__Needform(JB_String* Form);
 
 
 // JB_µFunc
-ASMFunc* SC_ASMFunc_Constructor(ASMFunc* Self, SCFunction* Fn);
+ASMFunc* SC_ASMFunc_Constructor(ASMFunc* Self, SCFunction* Fn, IR* IR);
 
 void SC_ASMFunc_Destructor(ASMFunc* Self);
 
@@ -6762,25 +6771,29 @@ JB_File* JB_File__PrefsFolder();
 
 
 // JB_JBin
-void JB_bin_Add(FastString* Self, Syntax Type, JB_String* Data, bool Into);
+jbinLeaver JB_bin_Add(FastString* Self, Syntax Type, JB_String* Name, bool Into);
 
-void JB_bin_AddInt(FastString* Self, int64 Data);
+void SC_bin_Add(FastString* Self, ASMFunc* Fn);
 
-void JB_bin_AddMemory(FastString* Self, Syntax Type, byte* Data, bool GoIn, uint64 L);
+void JB_bin_AddInt(FastString* Self, int64 Name);
+
+jbinLeaver JB_bin_AddMemory(FastString* Self, Syntax Type, uint64 L, bool GoIn, byte* Data);
 
 void JB_bin_CloseSection(FastString* Self, uint C);
 
-FastString* JB_bin_Constructor(FastString* Self, Syntax Type, JB_String* Data);
+FastString* JB_bin_Constructor(FastString* Self, Syntax Type, JB_String* Name);
 
 FastString* JB_bin_Constructor0(FastString* Self, int N);
 
-void JB_bin_Enter(FastString* Self, Syntax Type, JB_String* Data);
+jbinLeaver JB_bin_Enter(FastString* Self, Syntax Type, JB_String* Name);
 
 void JB_bin_Exit(FastString* Self, int Amount);
 
 int JB_bin_OpenSection(FastString* Self);
 
-void JB_bin_Sheb(FastString* Self, JB_String* Data);
+void JB_bin_Sheb(FastString* Self, JB_String* Name);
+
+void JB_bin_Tmp(FastString* Self, JB_String* Name);
 
 
 
@@ -7907,6 +7920,8 @@ bool SC_Decl_IsReg(SCDecl* Self);
 
 JB_String* SC_Decl_IsSaveable(SCDecl* Self);
 
+bool SC_Decl_IsStdLib(SCDecl* Self);
+
 void SC_Decl_IsTypeImproveSet(SCDecl* Self, bool Value);
 
 bool SC_Decl_IsUintLike(SCDecl* Self);
@@ -8112,7 +8127,7 @@ bool SC_Base_CollectOne(SCNode* Self, Message* C, bool Visible);
 
 void SC_Base_CollectOneConstants(SCNode* Self, Message* Ch);
 
-Message* SC_Base_CollectString(SCNode* Self, JB_String* S);
+Message* SC_Base_CollectStr(SCNode* Self, JB_String* S);
 
 SCNode* SC_Base_CollectSub(SCNode* Self, Message* C);
 
@@ -8745,8 +8760,6 @@ void SC_Func_FixCnj(SCFunction* Self, Message* Exp);
 
 void SC_Func_FixCnjSub(SCFunction* Self, Message* Exp);
 
-void SC_Func_Flatten(SCFunction* Self);
-
 void SC_Func_FLookupSet(SCFunction* Self, SCNode* Value);
 
 bool SC_Func_FoundOneCpp(SCFunction* Self, JB_String* N);
@@ -8878,10 +8891,6 @@ bool SC_Func__InBuiltFunc(Message* Self, JB_String* Name);
 int SC_Func__Init_();
 
 int SC_Func__InitCode_();
-
-void SC_Func__Link(SCFunction* Fn);
-
-void SC_Func__LinkAll(Array* Funcs);
 
 SCNode* SC_Func__NeuLibrary(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
