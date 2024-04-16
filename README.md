@@ -47,10 +47,8 @@ Speedie right now, compiles to C++. I am writing a VM for Speedie, so it won't N
 * Has an awesome nil-checker and type-safety system! Write safe code while having an easy time of doing it!
 * Doesn't infantilise you like Javascript or Java. Allows you to mess around with pointers if you need... (but try to avoid pointers anyhow).
 * Integrates with C easily, so you can call C-library functions easily, if you need to, with no overhead.
+* Speedie is designed as a fast language. [Read More](Documentation/Speed.md)
 
-
-# Speed #
-Speedie is designed as a fast language. Ideally we want everything to be fast! There is a certain beauty in optimising code to run fast. When you remove all bloat, what remains can be a thing of beauty.  [Read More](Documentation/Speed.md)
 
 # Remaining Challenges #
 
