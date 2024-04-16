@@ -2852,19 +2852,19 @@ int SC_Options__InitCode_();
 // PackMaker
 void SC_PackMaker__AddAll();
 
+JB_String* SC_PackMaker__BuildInterpreter();
+
 void SC_PackMaker__DoLibGlobs(FastString* Pack);
 
 int SC_PackMaker__Init_();
 
 int SC_PackMaker__InitCode_();
 
-JB_String* SC_PackMaker__MakeInterpreter();
-
 void SC_PackMaker__MakePack();
 
 void SC_PackMaker__MakePackSub(FastString* J);
 
-void SC_PackMaker__SortAndPackFuncs(Array* R, FastString* J, Syntax Kind);
+void SC_PackMaker__SortLibFuncs(FastString* J);
 
 
 
@@ -8463,6 +8463,8 @@ void SC_Class_DataTypePostLoad(SCClass* Self);
 
 void SC_Class_DeclModel(SCClass* Self);
 
+void SC_Class_DescribeInPack(SCClass* Self, FastString* J);
+
 void SC_Class_Destructor(SCClass* Self);
 
 SCFunction* SC_Class_DoSaver(SCClass* Self, JB_String* Name, int Stage);
@@ -8570,6 +8572,10 @@ SCDecl* SC_Class_NotConst(SCClass* Self);
 int SC_Class_NumericCount(SCClass* Self);
 
 void SC_Class_OverrideSyntax(SCClass* Self);
+
+int SC_Class_PackClassChildren(SCClass* Self, FastString* J);
+
+int SC_Class_PackExport(SCClass* Self, FastString* J);
 
 int SC_Class_PassableCount(SCClass* Self);
 

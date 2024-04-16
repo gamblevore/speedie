@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2111];
+extern JB_StringC* JB_LUB[2112];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -2042,7 +2042,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[1227], (112281435035793)));
+			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(JB_Flow__FlowAllow(JB_LUB[1227], (112281717374976)));
 			SC_Comp__CompileTime();
 			JB_FlowControlStopper_SyntaxUsingComplete(_usingf0);
 		}
@@ -3241,7 +3241,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1954]);
-	JB_FS_AppendInt32(_fsf0, (2024041615));
+	JB_FS_AppendInt32(_fsf0, (2024041616));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -5255,6 +5255,7 @@ int SC_Options__InitCode_() {
 
 
 void SC_PackMaker__AddAll() {
+	bool MakeExec = SC__Options_MakeInterpreter;
 	{
 		Array* _LoopSrcf2 = SC__Comp_FuncList;
 		int _if0 = 0;
@@ -5267,14 +5268,26 @@ void SC_PackMaker__AddAll() {
 				0;
 			}
 			 else if (SC_Base_IsSTDLib(F)) {
-				JB_Array_SyntaxAppend(SC__PackMaker_LibFuncs, F);
+				if (MakeExec or SC_Base_NeedsExport(F)) {
+					JB_Array_SyntaxAppend(SC__PackMaker_LibFuncs, F);
+				}
 			}
-			 else {
+			 else if (SC_Base_NeedsExport(F)) {
 				JB_Array_SyntaxAppend(SC__PackMaker_PackFuncs, F);
 			}
 			_if0++;
 		};
 	};
+}
+
+JB_String* SC_PackMaker__BuildInterpreter() {
+	FastString* Pack = JB_Incr(JB_bin_Constructor(nil, JB_SyxArg, JB_LUB[0]));
+	SC_PackMaker__SortLibFuncs(Pack);
+	SC_PackMaker__DoLibGlobs(Pack);
+	JB_String* _tmPf0 = JB_Incr(JB_FS_SyntaxCast(Pack));
+	JB_Decr(Pack);
+	JB_SafeDecr(_tmPf0);
+	return _tmPf0;
 }
 
 void SC_PackMaker__DoLibGlobs(FastString* Pack) {
@@ -5312,17 +5325,6 @@ int SC_PackMaker__InitCode_() {
 	return 0;
 }
 
-JB_String* SC_PackMaker__MakeInterpreter() {
-	SC_PackMaker__AddAll();
-	FastString* Pack = JB_Incr(JB_bin_Constructor(nil, JB_SyxArg, JB_LUB[0]));
-	SC_PackMaker__SortAndPackFuncs(SC__PackMaker_LibFuncs, Pack, JB_SyxThg);
-	SC_PackMaker__DoLibGlobs(Pack);
-	JB_String* _tmPf0 = JB_Incr(JB_FS_SyntaxCast(Pack));
-	JB_Decr(Pack);
-	JB_SafeDecr(_tmPf0);
-	return _tmPf0;
-}
-
 void SC_PackMaker__MakePack() {
 	FastString* Pack = JB_Incr(JB_bin_Constructor(nil, JB_SyxTmp, JB_LUB[2110]));
 	SC_PackMaker__MakePackSub(Pack);
@@ -5332,20 +5334,17 @@ void SC_PackMaker__MakePack() {
 void SC_PackMaker__MakePackSub(FastString* J) {
 	JB_Array_Sort(SC__PackMaker_PackFuncs, SC_SCNodeSorter, false);
 	{
-		Array* _LoopSrcf3 = JB_Incr(SC__PackMaker_PackFuncs);
+		Array* _LoopSrcf3 = SC__PackMaker_PackFuncs;
 		int _if1 = 0;
 		while (true) {
-			SCFunction* F = JB_Incr(((SCFunction*)JB_Array_Value(_LoopSrcf3, _if1)));
+			SCFunction* F = ((SCFunction*)JB_Array_Value(_LoopSrcf3, _if1));
 			if (F == nil) {
-				JB_Decr(F);
 				break;
 			}
 			int I = _if1;
 			F->TableId = I;
-			JB_Decr(F);
 			_if1++;
 		};
-		JB_Decr(_LoopSrcf3);
 	}
 	;
 	JB_bin_Enter(J, JB_SyxTmp, JB_LUB[1483]);
@@ -5354,66 +5353,78 @@ void SC_PackMaker__MakePackSub(FastString* J) {
 	JB_bin_Enter(J, JB_SyxArg, JB_LUB[0]);
 	JB_bin_Tmp(J, JB_LUB[606]);
 	{
-		Array* _LoopSrcf6 = JB_Incr(SC__PackMaker_PackFuncs);
+		Array* _LoopSrcf6 = SC__PackMaker_PackFuncs;
 		int _if4 = 0;
 		while (true) {
-			SCFunction* F = JB_Incr(((SCFunction*)JB_Array_Value(_LoopSrcf6, _if4)));
+			SCFunction* F = ((SCFunction*)JB_Array_Value(_LoopSrcf6, _if4));
 			if (F == nil) {
-				JB_Decr(F);
 				break;
 			}
 			JB_bin_Add(J, JB_SyxTmp, F->ExportName, true);
-			ASMFunc* _tmPf0 = JB_Incr(F->ASM);
-			JB_Decr(F);
+			ASMFunc* _tmPf0 = F->ASM;
 			if ((!_tmPf0)) {
 				JB_Object_SyntaxExpect(nil);
-				JB_Decr(_tmPf0);
-				JB_Decr(_LoopSrcf6);
 				return;
 			}
 			SC_bin_Add(J, _tmPf0);
-			JB_Decr(_tmPf0);
 			JB_bin_Exit(J, 1);
 			_if4++;
 		};
-		JB_Decr(_LoopSrcf6);
 	}
 	;
 	JB_bin_Exit(J, 2);
 	JB_bin_Tmp(J, JB_LUB[642]);
 	{
-		Array* _LoopSrcf9 = JB_Incr(SC__Crkt_List);
+		Array* _LoopSrcf9 = SC__Crkt_List;
 		int _if7 = 0;
 		while (true) {
-			MessageID* S = JB_Incr(((MessageID*)JB_Array_Value(_LoopSrcf9, _if7)));
+			MessageID* S = ((MessageID*)JB_Array_Value(_LoopSrcf9, _if7));
 			if (S == nil) {
-				JB_Decr(S);
 				break;
 			}
+			if ((!JB_Str_Length(S))) {
+				debugger;
+			}
 			JB_bin_Add(J, JB_SyxStr, S, false);
-			JB_Decr(S);
 			_if7++;
 		};
-		JB_Decr(_LoopSrcf9);
 	}
 	;
 	JB_bin_Exit(J, 2);
-	JB_PrintLine(JB_LUB[2109]);
+	JB_bin_Tmp(J, JB_LUB[2109]);
+	SC_Class_PackClassChildren(JB_TypeObject, J);
+	JB_bin_Exit(J, 2);
+	JB_bin_Tmp(J, JB_LUB[2111]);
+	{
+		Array* _LoopSrcf12 = SC__PackMaker_LibFuncs;
+		int _if10 = 0;
+		while (true) {
+			SCFunction* Linked = ((SCFunction*)JB_Array_Value(_LoopSrcf12, _if10));
+			if (Linked == nil) {
+				break;
+			}
+			JB_bin_Add(J, JB_SyxThg, Linked->ExportName, false);
+			_if10++;
+		};
+	}
+	;
+	JB_bin_Exit(J, 2);
 }
 
-void SC_PackMaker__SortAndPackFuncs(Array* R, FastString* J, Syntax Kind) {
-	JB_Array_Sort(R, SC_SCNodeSorter, false);
+void SC_PackMaker__SortLibFuncs(FastString* J) {
+	JB_Array_Sort(SC__PackMaker_LibFuncs, SC_SCNodeSorter, false);
 	JB_bin_Enter(J, JB_SyxPrm, JB_LUB[0]);
 	{
+		Array* _LoopSrcf2 = SC__PackMaker_LibFuncs;
 		int _if0 = 0;
 		while (true) {
-			SCFunction* F = ((SCFunction*)JB_Array_Value(R, _if0));
+			SCFunction* F = ((SCFunction*)JB_Array_Value(_LoopSrcf2, _if0));
 			if (F == nil) {
 				break;
 			}
 			int I = _if0;
 			F->TableId = I;
-			JB_bin_Add(J, Kind, F->ExportName, false);
+			JB_bin_Add(J, JB_SyxThg, F->ExportName, false);
 			_if0++;
 		};
 	}
@@ -7733,7 +7744,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[925]);
-	JB_FS_AppendInt32(_fsf0, (2024041615));
+	JB_FS_AppendInt32(_fsf0, (2024041616));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -20040,7 +20051,7 @@ void SC_Cpp_ExportSyx(Cpp_Export* Self) {
 }
 
 void SC_Cpp_FillInterpreter(Cpp_Export* Self) {
-	JB_String* Lib_pack = JB_Incr(SC_PackMaker__MakeInterpreter());
+	JB_String* Lib_pack = JB_Incr(SC_PackMaker__BuildInterpreter());
 	SC_Cpp_ListAllFuncs(Self, Self->ModuleProperties, Lib_pack);
 	JB_Decr(Lib_pack);
 }
@@ -40581,6 +40592,42 @@ void SC_Class_DeclModel(SCClass* Self) {
 	}
 }
 
+void SC_Class_DescribeInPack(SCClass* Self, FastString* J) {
+	int Sz = JB_Ternary(((bool)Self->IsWrapper), 0, ((int)Self->Size));
+	JB_bin_AddInt(J, Sz);
+	Array* Fn_list = Self->Behaviour->WrapperFuncs;
+	JB_bin_Enter(J, JB_SyxList, JB_LUB[0]);
+	JB_String* Name = JB_LUB[440];
+	SCFunction* Df = Self->DestructorFunc;
+	if (Df) {
+		Name = Df->ExportName;
+	}
+	JB_bin_Add(J, JB_SyxThg, Name, false);
+	SCBehaviour* B = Self->Behaviour;
+	while (B) {
+		{
+			Dictionary* _LoopSrcf2 = B->Interfaces;
+			DictionaryReader* _navf0 = JB_Dict_Navigate(_LoopSrcf2);
+			while (true) {
+				SCModule* M = ((SCModule*)JB_DictionaryReader_NextValue(_navf0));
+				if (M == nil) {
+					break;
+				}
+				SCFunction* Fn = SC_Class_BestBehaviourFor(Self, SC_Str_InterfaceToBehaviour(M->Name));
+				if (Fn) {
+					SCClass* BaseClass = SC_Class_InterfaceForBehaviour(Self, Fn);
+					if (BaseClass) {
+						JB_bin_Add(J, JB_SyxThg, Fn->ExportName, false);
+					}
+				}
+			};
+		}
+		;
+		B = SC_Beh_Upwards(B);
+	};
+	JB_bin_Exit(J, 1);
+}
+
 void SC_Class_Destructor(SCClass* Self) {
 	JB_Clear(Self->Super);
 	JB_Clear(Self->Defawlt);
@@ -41530,6 +41577,44 @@ void SC_Class_OverrideSyntax(SCClass* Self) {
 	Self->HasCompareFunc = ((bool)JB_FreeIfDead(SC_Class_FindSpecialFunc(Self, JB_LUB[1253], true)));
 	Self->HasEqualsFunc = ((bool)JB_FreeIfDead(SC_Class_FindSpecialFunc(Self, JB_LUB[1256], true)));
 	JB_SetRef(Self->TheIsFunc, SC_Class_FindSpecialFunc(Self, JB_LUB[1257], true));
+}
+
+int SC_Class_PackClassChildren(SCClass* Self, FastString* J) {
+	int Rz = 0;
+	{
+		Array* _LoopSrcf2 = Self->Children;
+		int _if0 = 0;
+		while (true) {
+			SCClass* C = ((SCClass*)JB_Array_Value(_LoopSrcf2, _if0));
+			if (C == nil) {
+				break;
+			}
+			if ((!C->IsRole)) {
+				if ((!Rz)) {
+					JB_bin_Enter(J, JB_SyxArg, JB_LUB[0]);
+				}
+				SC_Class_PackExport(C, J);
+				Rz++;
+			}
+			_if0++;
+		};
+	}
+	;
+	if (Rz) {
+		JB_bin_Exit(J, 1);
+	}
+	return Rz;
+}
+
+int SC_Class_PackExport(SCClass* Self, FastString* J) {
+	int Rz = 0;
+	JB_bin_Enter(J, JB_SyxTmp, Self->Name);
+	if ((!SC_Base_IsSTDLib(Self))) {
+		SC_Class_DescribeInPack(Self, J);
+	}
+	Rz = SC_Class_PackClassChildren(Self, J);
+	JB_bin_Exit(J, 1);
+	return Rz;
 }
 
 int SC_Class_PassableCount(SCClass* Self) {
@@ -48036,4 +48121,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 2177017343546579254 -9118224799746288446
+// -7745924683982312650 7716582541796415016
