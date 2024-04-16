@@ -23,6 +23,7 @@ module PackMaker
 		
 	
 	function DoLibGlobs (|jbin| pack)
+		opt norefcounts
 		LibGlobs.sort(SCNodeSorter)
 		
 		pack.enter(@arr)
@@ -54,7 +55,7 @@ Then exec can just... use the table directly, as it is already sorted. :)    */
 		for (f in list) (i)
 			f.TableID = i
 
-	function SortLibFuncs (|jbin!| j)
+	function WriteLibFuncs (|jbin!| j)
 		opt norefcounts
 		todo "Write the data as c++ instead of a pack"
 		
@@ -161,7 +162,7 @@ Then exec can just... use the table directly, as it is already sorted. :)    */
 		
 	function BuildInterpreter (|string|)
 		|| pack = jbin()
-		.SortLibFuncs(pack)
+		.WriteLibFuncs(pack)
 		.DoLibGlobs(pack)
 		return pack
 

@@ -10,6 +10,7 @@ main 	  	  	  	 // execmain {
 	class.LoadAppClasses					#require
 	apptable.LinkEmUp‼						#require
 	debugger.load
+	|| main = apptable[1]					#expect ("Missing main")
 	rz  = apptable[0]!.Run
-	rz := apptable[1]!.Run
+	rz := main.Run
 

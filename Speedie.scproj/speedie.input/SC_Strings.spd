@@ -524,6 +524,7 @@ module StringCorrector
 		opt norefcounts
 		for d in compiler.DeclConstants
 			|| def = d.default
+			if def.isstring
 				.CollectString(def, d.IsStdLib)
 	
 	

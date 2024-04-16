@@ -22,8 +22,9 @@ pack "xpd"
 			+"ren2" #(00000000000000007B00080409A01A0516FF1F040046080700000838FAFF231800000001)#
 
 		clss
-			+"mycuteclass"   "list"         16  (des1, ren1)
-			+"mycuteclass2"  "mycuteclass"  24  (des2, ren2)
+			
+			+"mycuteclass"  16  (des1, ren1)
+				+"mycuteclass2"  24  (des2, ren2)
 		
 		link 
 			JB_zalloc

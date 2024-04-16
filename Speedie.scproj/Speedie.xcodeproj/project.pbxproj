@@ -511,7 +511,7 @@
 /* Begin PBXLegacyTarget section */
 		AC7D3DAA29A280F200148ADB /* exec debug */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--nocolor  --x --nocompile  --target=fast  --targetdebug /usr/local/speedie/exec.scproj";
+			buildArgumentsString = "--nocolor  --x --nocompile  --target=fast  --targetdebug  /usr/local/speedie/exec.scproj";
 			buildConfigurationList = AC7D3DAB29A280F200148ADB /* Build configuration list for PBXLegacyTarget "exec debug" */;
 			buildPhases = (
 			);
@@ -525,7 +525,7 @@
 		};
 		AC7D3DAE29A280F300148ADB /* exec release */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--nocolor  --x --nocompile /usr/local/speedie/exec.scproj";
+			buildArgumentsString = "--nocolor  --x  --nocompile  /usr/local/speedie/exec.scproj";
 			buildConfigurationList = AC7D3DAF29A280F300148ADB /* Build configuration list for PBXLegacyTarget "exec release" */;
 			buildPhases = (
 			);
@@ -658,12 +658,12 @@
 			projectRoot = "";
 			targets = (
 				AC6ADAE629872AA8009CFFBB /* Update */,
+				AC7D3DB229A2816600148ADB /* ExecDebug */,
+				AC7D3DDB29A2816700148ADB /* Exec */,
 				AC7D3D8129A280A700148ADB /* Direct Test */,
 				AC85018B299FF9AE00B63E29 /* speedie builder */,
 				AC7D3DAA29A280F200148ADB /* exec debug */,
 				AC7D3DAE29A280F300148ADB /* exec release */,
-				AC7D3DB229A2816600148ADB /* ExecDebug */,
-				AC7D3DDB29A2816700148ADB /* Exec */,
 			);
 		};
 /* End PBXProject section */

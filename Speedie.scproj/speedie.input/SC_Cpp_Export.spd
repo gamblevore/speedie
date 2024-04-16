@@ -557,13 +557,9 @@ function ListAllFuncs (|FastStringCpp| fs, |string| lib_pack)
 	
 	fs <~ ";
 
-extern \"C\" JB_String* JB_App__LibFuncs(void*** Funcs, void*** Globs) { // rename this to libpack
+extern \"C\" JB_String* JB_App__LibPack(void*** Funcs) { // rename this to libpack
 	*Funcs = JB_PackPtrs;
 	return JB_StrCN(JB_LibFuncInfo, ${pack_str.length});
-}
-
-extern \"C\" JB_String* JB_App__LibPack(void*** Funcs, void*** Globs) {
-	return JB_App__LibFuncs(Funcs, Globs);
 }
 "
 

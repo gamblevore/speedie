@@ -141,6 +141,7 @@ class SCDecl (SCNamed) {
 		return self == typenil
 	
 	function IsStdLib (|bool|)
+		opt norefcounts
 		|| p = .project
 		if p?
 			return p.isstdlib

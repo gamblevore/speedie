@@ -1750,10 +1750,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_LargestFlag (8388607)
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down (JB_LUB[2104])
-#define kJB__zalgo_mid (JB_LUB[2103])
+#define kJB__zalgo_down (JB_LUB[1971])
+#define kJB__zalgo_mid (JB_LUB[1685])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up (JB_LUB[2102])
+#define kJB__zalgo_up (JB_LUB[1352])
 #define kJB__byte_max (255)
 #define kJB__byte_min (0)
 #define kJB__char_max (127)
@@ -2868,7 +2868,11 @@ void SC_PackMaker__MakePack();
 
 void SC_PackMaker__MakePackSub(FastString* J);
 
-void SC_PackMaker__SortLibFuncs(FastString* J);
+void SC_PackMaker__SortAll();
+
+void SC_PackMaker__SortSub(Array* List);
+
+void SC_PackMaker__WriteLibFuncs(FastString* J);
 
 
 
