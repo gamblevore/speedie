@@ -10,7 +10,7 @@ module PackMaker
 
 	function AddAll
 		opt norefcounts
-		|| MakeExec = options.makeinterpreter
+		|| MakeExec = options.MakeInterpreter
 		for f in Compiler.FuncList
 			if !f.CanLibLoad
 				0
@@ -31,30 +31,27 @@ module PackMaker
 			pack.Add(@thg, f.ExportName)
 		pack.exit
 
-/* Instead of this... SortAndPackFuncs could create some cpp... like
-struct LibPack
-	|int|			FuncCount
-	|int|			GlobCount
-	|LibEntry[1]|	Item
-
-struct LibEntry
-	|&nil|		Where
-	|cstring|	Name
-
-then we just return a LibPack* from C++.
-
-Then exec can just... use the table directly, as it is already sorted. :)    */
 
 	function SortAll
+		opt norefcounts
+		|| FnInit = compiler.ExportNames["JB_Init_"]|scfunction|
+		|| FnMain = compiler.ExportNames["JB_Main"]|scfunction|
+		require fninit and fnmain
+		
+		fninit.tableid = 0 // put init and main first!
+		fnmain.tableid = 1
+
 		.SortSub(.libfuncs)
 		.SortSub(.Packfuncs)
-			
+	
+	
 	helper SortSub (|[scfunction]| list)
 		opt norefcounts
-		list.sort(SCNodeSorter)
+		list.sort(SCFuncSorter)
 		for (f in list) (i)
 			f.TableID = i
 
+	
 	function WriteLibFuncs (|jbin!| j)
 		opt norefcounts
 		todo "Write the data as c++ instead of a pack"
@@ -66,6 +63,7 @@ Then exec can just... use the table directly, as it is already sorted. :)    */
 
 
 	function MakePack 
+		debugger
 		|| pack = jbin(@tmp, "xpd")
 		.MakePackSub(pack)
 		Compiler.ProductFile.SmartData = pack
@@ -73,11 +71,6 @@ Then exec can just... use the table directly, as it is already sorted. :)    */
 	
 	helper MakePackSub (|jbin| j)
 		opt norefcounts
-		.PackFuncs.sort(SCNodeSorter)
-		.libFuncs.sort(SCNodeSorter)
-		for (f in .PackFuncs) (i)
-			f.TableID = i
-
 		j.enter(@tmp, "app")
 		|| GlobSize = TreeAssembler.VacuumPack(packfuncs)
 		j.add(@num, GlobSize)
@@ -174,11 +167,34 @@ function scfunction.WrappedName (|string|)
 		return .exportname
 
 
-helper SCNodeSorter (sortercomparer)
+helper SCFuncSorter (sortercomparer)
 	// just to help compression. otherside will use a dictionary anyhow.
-	return (a|SCNode|).ExportName < (b|SCNode|).ExportName
+	|| fA = (a|scfunction|).Tableid|int|
+	|| fB = (b|scfunction|).Tableid|int|
+	if fA != fB // we need init and main first
+		return fa < fb
+	return (a|scfunction|).ExportName < (b|scfunction|).ExportName
+
+
+helper SCNodeSorter (sortercomparer)
+	return (a|scfunction|).ExportName < (b|scfunction|).ExportName
 
 
 function scfunction.CanLibLoad (|bool|)
 	if !.ismacro and !.isdisabled and .iscppinbuilt != 2
 		return true
+
+
+/* Instead of this... SortAndPackFuncs could create some cpp... like
+struct LibPack
+	|int|			FuncCount
+	|int|			GlobCount
+	|LibEntry[1]|	Item
+
+struct LibEntry
+	|&nil|		Where
+	|cstring|	Name
+
+then we just return a LibPack* from C++.
+
+Then exec can just... use the table directly, as it is already sorted. :)    */
