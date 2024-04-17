@@ -102,6 +102,7 @@ class Memory
 	constructor (|int| ItemCount, |uint| ItemSize, |&byte| ptr, |byte| DeathAction=DataObject.kfree)
 		cpp_part ConstructorPtr
 		.ItemSize = ItemSize
+		.deathaction = deathaction
 		.length = 0
 		.Capacity = itemcount
 		._ptr = ptr

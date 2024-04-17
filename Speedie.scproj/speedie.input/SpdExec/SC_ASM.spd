@@ -1,7 +1,7 @@
 
 
-datatype JSM (uint)
-datatype ASM (JSM)
+//datatype JSM (uint)
+datatype ASM (uint)
 	flags
 		Jump			= 32
 		Num				= 64

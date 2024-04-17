@@ -186,17 +186,17 @@ function message.ASMFunc (|fn_asm|)
 			return rz!
 
 
-function ASMFuncState.TotalInit
+function ASMFuncState.TotalInit 
 	opt norefcounts
 	|| j = ASMFuncState.JSMSpace
 	j.Capacity = 4MB
 	.maxlength = j.Capacity
 	.start = j.ptr
 	.Written = 0
+	.AddASM(compiler.InternalFile.ast!, asm.RET, 0)
 
 
 function ASMFuncState.InitState (|scfunction| fn)
-	.TotalInit
 	.out = µfunc(fn, JSMSpace.ptr + .written)
 	.out.length = -.written
 	.LabelCount = 0
