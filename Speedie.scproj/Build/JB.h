@@ -3535,6 +3535,8 @@ SCDecl* SC_SameTypeSub(Message* First, Message* Second, SCNode* Name_space);
 
 void SC_SC_MakeComment(Message* Msg);
 
+bool SC_SCFuncSorter(JB_Object* A, JB_Object* B);
+
 bool SC_SCNodeSorter(JB_Object* A, JB_Object* B);
 
 Message* SC_SettingAProperty(Message* Rel);
