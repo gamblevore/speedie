@@ -191,7 +191,7 @@ class FlowControl
 
 
 datatype FlowControlStopper (uint)
-	syntax UsingComplete
+	syntax UsingComplete (|object| idk=nil)
 		flow off
 		flowcontrol.stop
 	

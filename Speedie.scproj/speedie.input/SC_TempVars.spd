@@ -176,10 +176,10 @@ extend_module scfunction
 
 
 
-	function TempMoveOut (|Message!| msg, |Message!| parent, |Message|)
+	function TempMoveOut (|Message!| msg, |Message!| place, |Message|)
 		|| OldDecl = msg.AsDecl
 		if !OldDecl
-			parent.prev = msg
+			place.prev = msg
 			return msg // right?
 	
 		|| Using = msg.syntaxusing
@@ -191,7 +191,7 @@ extend_module scfunction
 		
 		// here
 		|| declmsg = MakeDecl( "", name, msg, scdeclinfo.body )
-		parent.prev = declmsg
+		place.prev = declmsg
 		
 		|| d = declmsg.Obj!|scdecl|
 		NameThing.obj = d

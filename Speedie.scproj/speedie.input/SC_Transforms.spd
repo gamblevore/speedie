@@ -96,12 +96,14 @@ function Tran_Expect (TranFunc)
 
 function Tran_Temporal (|SCFunction| fn, |Message| s, |SCNode| name_space)
 	opt norefcounts
-	|| TmpInt = TemporalStatements[s.name]		#expect (s)
-	(*TmpInt)( FN, s, name_space )
+	|| TmpInt = TemporalStatements[s.name]
+		return (*TmpInt)( FN, s, name_space )
+	error s
 
 
 function Tran_Using (TranFunc)
-	// using (Exp) { f() } --> if (true) { || X = f().startusing, ..., x.stopusing }
+	// using (Exp) { f() } --> if (true) { || X = f().SyntaxUsing,             ...,  x.SyntaxUsingComplete(y) }
+	// using (Exp) { f() } --> if (true) { || Y = f(),  || X = Y.SyntaxUsing,  ...,  y.SyntaxUsingComplete(x) } // ideal.
 	
 	|| With     = node.needfirst					#require
 	|| Start    = node
@@ -115,16 +117,27 @@ function Tran_Using (TranFunc)
 	|| name		= UniqueTmpVar("using")
 	|| WithFirst= with.first
 	if with != @bra
-		withfirst = with
-		node.first = @bra.msg
-	|| UsingObj	= «dot "SyntaxUsing"
-		withfirst
-		«emb »
-	»
-	|| item = «dot "SyntaxUsingComplete"
-		«thg name »
-		«emb »
-	» 
+		WithFirst = with
+		with.wrapwith(@bra)
+	
+	ifn ((WithFirst == @thg or @num) or withfirst.isstring)
+		|| declname = UniqueTmpVar("_var") // maybe this should be the actual "make temp" function...
+										   // just these few lines of code.
+		|| ThgDecl = MakeDecl( "", declname, withfirst, scdeclinfo.Body )
+		|| WithFirst2 = @thg + declname
+		withfirst2.obj = withfirst!.obj
+		withfirst = withfirst2
+		arg.AppendAfter(thgdecl, Start)
+		start = ThgDecl
+
+	|| UsingObj	= @dot + "SyntaxUsing"
+	usingobj <~ WithFirst
+	usingobj <~ @emb
+
+	|| item = @dot + "SyntaxUsingComplete"
+	item <~ (@thg, name)
+	item.msg(@Prm)<~withfirst.copy
+
 	|| Decl = MakeDecl( "", name, UsingObj )
 
 	arg.AppendAfter(decl, Start)
@@ -132,7 +145,7 @@ function Tran_Using (TranFunc)
 
 	if (arg in node)
 		node.name = "if"
-		node.first <~ «thg "true"»
+		node.first <~ (@thg, "true")
 	  else
 		SC_MakeComment(node)
 
@@ -144,7 +157,7 @@ function Tran_Array (|Message| S, |SCNode| name_space) {
 	|| thg = s.IsSetIntoVar
 		
 	if (!thg)
-		thg = scfunction.tempmoveout(s, s.parentpoint!)
+		thg = scfunction.TempMoveOut(s, s.parentpoint!)
 		name_Space.tryadd(thg, thg.asdecl, thg.name)
 	
 	|| P = S.NiceParent!
@@ -156,7 +169,7 @@ function Tran_Array (|Message| S, |SCNode| name_space) {
 
 
 	if P in @Decl
-		|| d = p.asdecl #require
+		|| d = p.AsDecl #require
 		d.Default = dotnew
 
 

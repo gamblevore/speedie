@@ -196,7 +196,7 @@ class ErrorReceiver
 		return (.WarnCount < .MaxErrors)
 	
 	
-	Syntax UsingComplete
+	Syntax UsingComplete (|object| idk=nil)
 //		stderr.printerrors // don't do this!
 		stderr = self
 

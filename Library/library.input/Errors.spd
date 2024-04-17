@@ -247,7 +247,7 @@ datatype ErrorSeverity (Byte)
 		rz = StdErr.LowerErrorsTo
 		StdErr.LowerErrorsTo = self
 
-	syntax UsingComplete
+	syntax UsingComplete (|object| idk=nil)
 		StdErr.LowerErrorsTo = self
 
 

@@ -37,6 +37,8 @@ extern "C" {
 	#define ObjCID void*
 #endif
 
+typedef uint ASM;
+
 typedef u16 ASMtmp;
 
 typedef byte CharProp;
@@ -89,8 +91,6 @@ typedef int Ind;
 
 typedef ivec2 IntRange;
 
-typedef uint JSM;
-
 typedef byte MaybeBool;
 
 typedef byte MoveCode;
@@ -141,10 +141,6 @@ typedef vec4 mat2;
 
 typedef u16 ASMParam;
 
-typedef JSM ASM;
-
-typedef Date HumanDate;
-
 typedef ASM ASM_BFLD;
 
 typedef ASM ASM_Bra;
@@ -176,6 +172,8 @@ typedef ASM ASM_U2;
 typedef ASM ASM_U3;
 
 typedef ASM ASM_U4;
+
+typedef Date HumanDate;
 
 struct ASMFuncState;
 
@@ -1767,6 +1765,80 @@ extern Random JB__zalgo_R;
 #define kJB__uint16_max (65535)
 #define kJB__uint16_min (0)
 #define kJB__uint64_max (-1)
+#define kSC__ASM_ADD (12)
+#define kSC__ASM_ADDC (11)
+#define kSC__ASM_BAND (19)
+#define kSC__ASM_BFLG (23)
+#define kSC__ASM_BFLS (24)
+#define kSC__ASM_BNOT (22)
+#define kSC__ASM_BOR (20)
+#define kSC__ASM_BRA (31)
+#define kSC__ASM_BRAN (32)
+#define kSC__ASM_BROL (25)
+#define kSC__ASM_BROR (26)
+#define kSC__ASM_BXOR (21)
+#define kSC__ASM_CMPE (29)
+#define kSC__ASM_CMPF (28)
+#define kSC__ASM_CMPI (27)
+#define kSC__ASM_CMPN (30)
+#define kSC__ASM_CNTC (49)
+#define kSC__ASM_CONV (8)
+#define kSC__ASM_DADD (55)
+#define kSC__ASM_DDIV (58)
+#define kSC__ASM_DIV (15)
+#define kSC__ASM_DMUL (57)
+#define kSC__ASM_DSUB (56)
+extern ASM_Encoder2 SC__ASM_Encoders[128];
+#define kSC__ASM_EROR (0)
+#define kSC__ASM_Extended (255)
+#define kSC__ASM_FADD (51)
+#define kSC__ASM_FDIV (54)
+#define kSC__ASM_FMUL (53)
+#define kSC__ASM_FNC (112)
+#define kSC__ASM_FNCX (113)
+extern ASM_Encoder2 SC__ASM_Forms[32];
+#define kSC__ASM_FSUB (52)
+#define kSC__ASM_HALT (1)
+#define kSC__ASM_Jump (32)
+#define kSC__ASM_LargestFlag (0)
+#define kSC__ASM_LEAF (5)
+#define kSC__ASM_LUPD (34)
+#define kSC__ASM_LUPU (33)
+#define kSC__ASM_MEMM (50)
+#define kSC__ASM_MUL (14)
+#define kSC__ASM_NoExpect (512)
+extern byte SC__ASM_NoisyASM;
+#define kSC__ASM_Num (64)
+#define kSC__ASM_PositionBits (1024)
+#define kSC__ASM_PRNT (59)
+#define kSC__ASM_RALO (37)
+#define kSC__ASM_RARE (7)
+#define kSC__ASM_RD1S (39)
+#define kSC__ASM_RD1U (38)
+#define kSC__ASM_RD2S (41)
+#define kSC__ASM_RD2U (40)
+#define kSC__ASM_RD4S (43)
+#define kSC__ASM_RD4U (42)
+#define kSC__ASM_RD8U (44)
+#define kSC__ASM_Remainder (256)
+#define kSC__ASM_RET (4)
+#define kSC__ASM_RETL (6)
+#define kSC__ASM_RSDE (35)
+#define kSC__ASM_RSET (36)
+#define kSC__ASM_SET1 (9)
+#define kSC__ASM_SETK (10)
+#define kSC__ASM_SETN (114)
+#define kSC__ASM_SHLS (18)
+#define kSC__ASM_SHRS (16)
+#define kSC__ASM_SHRU (17)
+#define kSC__ASM_Signed (128)
+#define kSC__ASM_ST1U (45)
+#define kSC__ASM_ST2U (46)
+#define kSC__ASM_ST4U (47)
+#define kSC__ASM_ST8U (48)
+#define kSC__ASM_STCK (2)
+#define kSC__ASM_SUB (13)
+#define kSC__ASM_SWAP (3)
 #define kSC__ASMtmp_kContinue (4)
 #define kSC__ASMtmp_kDebugger (12)
 #define kSC__ASMtmp_kElseIf (1)
@@ -2071,80 +2143,6 @@ extern int JB__Syx_CurrFuncID_;
 #define kSC__TM_Halfmap (6148914691236517205)
 #define kSC__TM_MOUSEBUTTONDOWN (1025)
 #define kSC__TM_MOUSEMOTION (1024)
-#define kSC__ASM_ADD (12)
-#define kSC__ASM_ADDC (11)
-#define kSC__ASM_BAND (19)
-#define kSC__ASM_BFLG (23)
-#define kSC__ASM_BFLS (24)
-#define kSC__ASM_BNOT (22)
-#define kSC__ASM_BOR (20)
-#define kSC__ASM_BRA (31)
-#define kSC__ASM_BRAN (32)
-#define kSC__ASM_BROL (25)
-#define kSC__ASM_BROR (26)
-#define kSC__ASM_BXOR (21)
-#define kSC__ASM_CMPE (29)
-#define kSC__ASM_CMPF (28)
-#define kSC__ASM_CMPI (27)
-#define kSC__ASM_CMPN (30)
-#define kSC__ASM_CNTC (49)
-#define kSC__ASM_CONV (8)
-#define kSC__ASM_DADD (55)
-#define kSC__ASM_DDIV (58)
-#define kSC__ASM_DIV (15)
-#define kSC__ASM_DMUL (57)
-#define kSC__ASM_DSUB (56)
-extern ASM_Encoder2 SC__ASM_Encoders[128];
-#define kSC__ASM_EROR (0)
-#define kSC__ASM_Extended (255)
-#define kSC__ASM_FADD (51)
-#define kSC__ASM_FDIV (54)
-#define kSC__ASM_FMUL (53)
-#define kSC__ASM_FNC (112)
-#define kSC__ASM_FNCX (113)
-extern ASM_Encoder2 SC__ASM_Forms[32];
-#define kSC__ASM_FSUB (52)
-#define kSC__ASM_HALT (1)
-#define kSC__ASM_Jump (32)
-#define kSC__ASM_LargestFlag (0)
-#define kSC__ASM_LEAF (5)
-#define kSC__ASM_LUPD (34)
-#define kSC__ASM_LUPU (33)
-#define kSC__ASM_MEMM (50)
-#define kSC__ASM_MUL (14)
-#define kSC__ASM_NoExpect (512)
-extern byte SC__ASM_NoisyASM;
-#define kSC__ASM_Num (64)
-#define kSC__ASM_PositionBits (1024)
-#define kSC__ASM_PRNT (59)
-#define kSC__ASM_RALO (37)
-#define kSC__ASM_RARE (7)
-#define kSC__ASM_RD1S (39)
-#define kSC__ASM_RD1U (38)
-#define kSC__ASM_RD2S (41)
-#define kSC__ASM_RD2U (40)
-#define kSC__ASM_RD4S (43)
-#define kSC__ASM_RD4U (42)
-#define kSC__ASM_RD8U (44)
-#define kSC__ASM_Remainder (256)
-#define kSC__ASM_RET (4)
-#define kSC__ASM_RETL (6)
-#define kSC__ASM_RSDE (35)
-#define kSC__ASM_RSET (36)
-#define kSC__ASM_SET1 (9)
-#define kSC__ASM_SETK (10)
-#define kSC__ASM_SETN (114)
-#define kSC__ASM_SHLS (18)
-#define kSC__ASM_SHRS (16)
-#define kSC__ASM_SHRU (17)
-#define kSC__ASM_Signed (128)
-#define kSC__ASM_ST1U (45)
-#define kSC__ASM_ST2U (46)
-#define kSC__ASM_ST4U (47)
-#define kSC__ASM_ST8U (48)
-#define kSC__ASM_STCK (2)
-#define kSC__ASM_SUB (13)
-#define kSC__ASM_SWAP (3)
 extern IR SC__flat_Dummy;
 extern MWrap* SC__flat_JSMSpace;
 extern LoopInfo SC__nil_Loops;
@@ -4120,6 +4118,103 @@ uint64 JB_uint64_LowestBit(uint64 Self);
 // vec4
 
 
+// ASM
+ASM SC_ASM_BFLD_downSet(ASM Self, uint Value);
+
+ASM SC_ASM_BFLD_signSet(ASM Self, uint Value);
+
+ASM SC_ASM_BFLD_upSet(ASM Self, uint Value);
+
+ASM SC_ASM_Bra_c1Set(ASM Self, uint Value);
+
+ASM SC_ASM_Bra_jmpSet(ASM Self, uint Value);
+
+ASM SC_ASM_Cmp_CmpSet(ASM Self, uint Value);
+
+ASM SC_ASM_Cmp_LSet(ASM Self, uint Value);
+
+ASM SC_ASM_CmpEq_bytesSet(ASM Self, uint Value);
+
+ASM SC_ASM_CmpEq_JmpSet(ASM Self, uint Value);
+
+ASM SC_ASM_CNTC_cnstSet(ASM Self, uint Value);
+
+ASM SC_ASM_CNTC_LSet(ASM Self, uint Value);
+
+ASM SC_ASM_CNTC_sizeSet(ASM Self, uint Value);
+
+ASM SC_ASM_CNTR_incrSet(ASM Self, uint Value);
+
+ASM SC_ASM_CNTR_LSet(ASM Self, uint Value);
+
+ASM SC_ASM_CNTR_sizeSet(ASM Self, uint Value);
+
+ASM SC_ASM_Const_LSet(ASM Self, uint Value);
+
+ASM SC_ASM_Const_rotSet(ASM Self, uint Value);
+
+ASM SC_ASM_Func_JUMPSet(ASM Self, uint Value);
+
+ASM SC_ASM_Func_ModeSet(ASM Self, uint Value);
+
+ASM SC_ASM_Mem_incrSet(ASM Self, uint Value);
+
+ASM SC_ASM_Mem_LSet(ASM Self, uint Value);
+
+void ASMPrint(ASM Self);
+
+ASM SC_ASM_R1Set(ASM Self, uint Value);
+
+ASM SC_ASM_R2Set(ASM Self, uint Value);
+
+ASM SC_ASM_R3Set(ASM Self, uint Value);
+
+ASM SC_ASM_R4Set(ASM Self, uint Value);
+
+ASM SC_ASM_Setn_CondSet(ASM Self, uint Value);
+
+ASM SC_ASM_Setn_DestSet(ASM Self, uint Value);
+
+ASM SC_ASM_Setn_LSet(ASM Self, uint Value);
+
+ASM SC_ASM_Setn_lenSet(ASM Self, uint Value);
+
+ASM SC_ASM_SWAP_ASet(ASM Self, uint Value);
+
+ASM SC_ASM_SWAP_BSet(ASM Self, uint Value);
+
+ASM SC_ASM_SWAP_CSet(ASM Self, uint Value);
+
+ASM SC_ASM_SWAP_DSet(ASM Self, uint Value);
+
+ASM SC_ASM_SWAP_LSet(ASM Self, uint Value);
+
+ASM SC_ASM_U0_LSet(ASM Self, uint Value);
+
+ASM SC_ASM_U1_LSet(ASM Self, uint Value);
+
+ASM SC_ASM_U2_LSet(ASM Self, uint Value);
+
+ASM SC_ASM_U3_LSet(ASM Self, uint Value);
+
+ASM SC_ASM_U4_LSet(ASM Self, uint Value);
+
+void SC_ASM__Enc1();
+
+int SC_ASM__Init_();
+
+int SC_ASM__InitCode_();
+
+void SC_ASM__ListInstructions();
+
+bool SC_ASM__Needed();
+
+void SC_ASM__TestASM();
+
+void SC_ASM__TestASMSub(Message* Tests);
+
+
+
 // ASMtmp
 bool SC_ASMtmp_SyntaxIs(ASMtmp Self, ASMtmp T);
 
@@ -4252,7 +4347,7 @@ bool JB_ErrorSeverity_SyntaxIs(ErrorSeverity Self, ErrorSeverity E);
 
 ErrorSeverity JB_ErrorSeverity_SyntaxUsing(ErrorSeverity Self);
 
-void JB_ErrorSeverity_SyntaxUsingComplete(ErrorSeverity Self);
+void JB_ErrorSeverity_SyntaxUsingComplete(ErrorSeverity Self, JB_Object* Idk);
 
 ErrorSeverity JB_ErrorSeverity__Find(JB_String* Name, Message* Err);
 
@@ -4285,7 +4380,7 @@ Array* JB_ErrorSeverity__InitNames();
 // FlowControlStopper
 FlowControlStopper JB_FlowControlStopper_SyntaxUsing(FlowControlStopper Self);
 
-void JB_FlowControlStopper_SyntaxUsingComplete(FlowControlStopper Self);
+void JB_FlowControlStopper_SyntaxUsingComplete(FlowControlStopper Self, JB_Object* Idk);
 
 
 
@@ -4300,9 +4395,6 @@ bool JB_Rg_Contains1(IntRange Self, int I);
 
 int JB_Rg_Width(IntRange Self);
 
-
-
-// JSM
 
 
 // MaybeBool
@@ -4473,106 +4565,6 @@ bool SC_xC2xB5Param_IsReg(ASMParam Self);
 
 
 
-// ASM
-ASM SC_ASM_BFLD_downSet(ASM Self, uint Value);
-
-ASM SC_ASM_BFLD_signSet(ASM Self, uint Value);
-
-ASM SC_ASM_BFLD_upSet(ASM Self, uint Value);
-
-ASM SC_ASM_Bra_c1Set(ASM Self, uint Value);
-
-ASM SC_ASM_Bra_jmpSet(ASM Self, uint Value);
-
-ASM SC_ASM_Cmp_CmpSet(ASM Self, uint Value);
-
-ASM SC_ASM_Cmp_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_CmpEq_bytesSet(ASM Self, uint Value);
-
-ASM SC_ASM_CmpEq_JmpSet(ASM Self, uint Value);
-
-ASM SC_ASM_CNTC_cnstSet(ASM Self, uint Value);
-
-ASM SC_ASM_CNTC_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_CNTC_sizeSet(ASM Self, uint Value);
-
-ASM SC_ASM_CNTR_incrSet(ASM Self, uint Value);
-
-ASM SC_ASM_CNTR_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_CNTR_sizeSet(ASM Self, uint Value);
-
-ASM SC_ASM_Const_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_Const_rotSet(ASM Self, uint Value);
-
-ASM SC_ASM_Func_JUMPSet(ASM Self, uint Value);
-
-ASM SC_ASM_Func_ModeSet(ASM Self, uint Value);
-
-ASM SC_ASM_Mem_incrSet(ASM Self, uint Value);
-
-ASM SC_ASM_Mem_LSet(ASM Self, uint Value);
-
-void ASMPrint(ASM Self);
-
-ASM SC_ASM_R1Set(ASM Self, uint Value);
-
-ASM SC_ASM_R2Set(ASM Self, uint Value);
-
-ASM SC_ASM_R3Set(ASM Self, uint Value);
-
-ASM SC_ASM_R4Set(ASM Self, uint Value);
-
-ASM SC_ASM_Setn_CondSet(ASM Self, uint Value);
-
-ASM SC_ASM_Setn_DestSet(ASM Self, uint Value);
-
-ASM SC_ASM_Setn_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_Setn_lenSet(ASM Self, uint Value);
-
-ASM SC_ASM_SWAP_ASet(ASM Self, uint Value);
-
-ASM SC_ASM_SWAP_BSet(ASM Self, uint Value);
-
-ASM SC_ASM_SWAP_CSet(ASM Self, uint Value);
-
-ASM SC_ASM_SWAP_DSet(ASM Self, uint Value);
-
-ASM SC_ASM_SWAP_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_U0_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_U1_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_U2_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_U3_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_U4_LSet(ASM Self, uint Value);
-
-void SC_ASM__Enc1();
-
-int SC_ASM__Init_();
-
-int SC_ASM__InitCode_();
-
-void SC_ASM__ListInstructions();
-
-bool SC_ASM__Needed();
-
-void SC_ASM__TestASM();
-
-void SC_ASM__TestASMSub(Message* Tests);
-
-
-
-// HumanDate
-
-
 // ASM_BFLD
 ASM JB_ASM_BFLD__Encode(IR* Self);
 
@@ -4651,6 +4643,9 @@ ASM JB_ASM_U3__Encode(IR* Self);
 // ASM_U4
 ASM JB_ASM_U4__Encode(IR* Self);
 
+
+
+// HumanDate
 
 
 // ASM_Decoder2
@@ -5096,7 +5091,7 @@ void SC_LoopInfo_NextLoop(LoopInfo* Self);
 // JB_MessagePosition
 void JB_MsgPos_Destructor(MessagePosition* Self);
 
-void JB_MsgPos_SyntaxUsingComplete(MessagePosition* Self);
+void JB_MsgPos_SyntaxUsingComplete(MessagePosition* Self, JB_Object* Idk);
 
 
 
@@ -5788,7 +5783,7 @@ void JB_Rec_AppendErr(JB_ErrorReceiver* Self, JB_Error* Err);
 
 JB_ErrorReceiver* JB_Rec_SyntaxUsing(JB_ErrorReceiver* Self);
 
-void JB_Rec_SyntaxUsingComplete(JB_ErrorReceiver* Self);
+void JB_Rec_SyntaxUsingComplete(JB_ErrorReceiver* Self, JB_Object* Idk);
 
 int JB_Rec__Init_();
 
@@ -8940,7 +8935,7 @@ void SC_Func__String_Expand(Message* Msg, SCFunction* Fn);
 
 Message* SC_Func__TypedTempMoveOut(Message* Msg, JB_String* Name);
 
-Message* SC_Func__TempMoveOut(Message* Msg, Message* Parent);
+Message* SC_Func__TempMoveOut(Message* Msg, Message* Place);
 
 SCDecl* SC_Func__Tran_AfterRel(Message* Msg, SCNode* Name_space, Message* Side);
 
@@ -9368,9 +9363,10 @@ inline NilRecord SC_nil__EndBlock() {
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 	if ((!JB_Ring_HasChildCount(Self, 2))) {
 		if (true) {
-			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(F->Source);
+			Message* __varf1 = F->Source;
+			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(__varf1);
 			JB_Tree_SyntaxAppend(Self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1369])));
-			JB_MsgPos_SyntaxUsingComplete((&_usingf0));
+			JB_MsgPos_SyntaxUsingComplete((&_usingf0), __varf1);
 			JB_MsgPos_Destructor((&_usingf0));
 		}
 	}

@@ -892,17 +892,14 @@ class Message (list)
 	
 	
 	function NeedFirst (|message|)
-		Opt NoRefCounts
-		|| f = .first
-			return f
-		.accesserr(@nil, nil, nil)
+		return self[@nil]
 
 
 	syntax access (|Syntax| s, |Message|)
 		cpp_Part NeedSyx
 		Opt NoRefCounts
 		|| found = .first
-			if s == nil or found == s
+			if s == nil or found.func == s
 				return found
 		if self
 			.accesserr(s, "", found)
