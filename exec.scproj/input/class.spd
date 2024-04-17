@@ -22,22 +22,16 @@ class Class
 		addclass(self)
 	
 
-	constructor (|message!| Ch)
+	constructor (|message!| Ch, |class| parent)
 		opt norefcounts
-		|| pr = ch[@str]
-		|| sz = pr.next(@num)
+		|| sz = ch[@num]
 		|| beh = sz.next(@list)
-		|&ClassData| ParentCls
-		|| parent = class.Table[pr.name]
-			parentcls = parent.realclass
-		  else
-			error (pr, "Linked to missing class")		
 		
 		.name = ch.name.cstr
 		.src = Ch
 		.super = parent
 		
-		.RealClass = classdata.new(.name.cstring, sz.int, parentcls)
+		.RealClass = classdata.new(.name.cstring, sz.int, parent.realclass)
 		.LoadBehaviours(beh)
 		addclass(self)
 
@@ -69,13 +63,6 @@ class Class
 		cpp_Wrapper JBClassAllocBehaviour
 
 
-/*
-		clss
-			+"mycuteclass"   "List"         16  (des1, ren1)
-			+"mycuteclass2"  "MyCuteClass"  24  (des2, ren2)
-*/
-
-
 	function LoadBehaviours	(|message| list)
 		opt norefcounts
 		|| i = 0
@@ -100,26 +87,47 @@ class Class
 
 		function LoadAppClasses (|bool|)
 			opt norefcounts
-			for ch in package.ProjClasses
-				|| c = class.new(ch)
+			return .LoadAppClassSub(package.ProjClasses, class.obj!)
+		
+		
+		helper Give (|message| ch, |class!| parent, |class|)
+			opt norefcounts
+			|| f = ch.first
+			if f == @arg
+				return class[ch]
+			return class.new(ch, parent)
+		
+		helper LoadAppClassSub (|message| arg, |class| parent, |bool|)
+			opt norefcounts
+			for ch in arg
+				|| c = Class.give(ch, parent)#require
+				|| arg2 = ch.last
+				if arg2 == @arg
+					.LoadAppClassSub(arg2, c)
 			return stderr.ok
 
 
 		function LoadInbuiltClasses (|bool|)
 			opt norefcounts
 			for cd in ClassData.first
-				class.new(cd)
-			.obj = table.valuelower("object")$
+				|| c = class.new(cd)
+				if c.name ~= "object"
+					.obj = c
 			for c in .list
 				c.LoadSuper
 			return stderr.ok
 		
 		
-		function dictionary.syntaxaccess (|&classdata| c, ||)
+		function dictionary.SyntaxAccess (|&classdata| c, ||)
+			opt norefcounts
 			|| n = c.name
 				|| s = n.str
 				rz = self.valuelower(s)
 			
+		syntax access (|message| ch, |class|)
+			opt norefcounts
+			return .Table.valuelower(ch.name) #expect (ch, "Linked to missing class")		
+		
 	
 		|class|					Obj
 		|[class]|				List

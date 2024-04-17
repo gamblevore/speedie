@@ -76,7 +76,7 @@ class function
 				|| fn = AppTable[i2]
 					return fn
 			  else
-				|| fn = LibLoader[i2]
+				|| fn = Lib[i2]
 					return fn
 			s.CantFindFunc
 
@@ -98,7 +98,7 @@ module Linker
 
 
 
-module LibLoader	
+module Lib	
 	|[function]|				Funcs
 	|dictionary of &nil|		Globals = dictionary()
 	|int|						GlobalCount
@@ -121,12 +121,13 @@ module LibLoader
 		return .Funcs[i]
 
 
-	function LoadLibAll (|bool|)
+	function Load (|bool|)
 		|&&nil| Funcs 
 		|| spd = package.LibFuncLayout(&funcs).parse
 		|| globs = .LoadLibFuncs(spd, funcs)
 			.LoadLibGlobs(spd, globs)
-		return stderr.ok
+		if stderr.ok
+			return class.LoadInbuiltClasses
 
 	
 	function LoadLibFuncs (|message| spd, |&&nil| Internals, |&&nil|)
@@ -142,7 +143,6 @@ module LibLoader
 
 	function LoadLibGlobs (|message| spd, |&&nil| Internals)
 		opt norefcounts
-		debugger
 		for ch in spd[@arr, 1]
 			|| G = *Internals++  #expect  (ch, "Missing lib global")
 				
@@ -175,8 +175,6 @@ module AppTable
 		for name in package.linkage
 			|| fn = Linker[name]
 				AppTable.LinkOrder <~ fn
-			  else
-				name.cantfindfunc
 		return stderr.ok
 
 

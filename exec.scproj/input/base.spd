@@ -26,6 +26,9 @@ module package
 		.AccessErr(@tmp, name)
 	
 	
+	function Load (|bool|)
+		return .getstructure and .Loadfuncs
+	
 	function GetStructure (|bool|)
 		opt norefcounts
 		|| pk			= .InputPack
@@ -42,6 +45,7 @@ module package
 		|| g = app.int
 		check (G > 0 and g <= 256MB) ("Globals must be >= 1 and <= 256MB")
 		.glob(g)
+		
 		return stderr.ok
 		
 
