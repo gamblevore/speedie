@@ -26,8 +26,10 @@ module package
 		.AccessErr(@tmp, name)
 	
 	
-	function Load (|bool|)
-		return .getstructure and .Loadfuncs
+	function LoadPack (|bool|)
+		if .getstructure and .Loadfuncs
+			if class.LoadPackClasses
+				return apptable.LinkEmUp‼
 	
 	function GetStructure (|bool|)
 		opt norefcounts

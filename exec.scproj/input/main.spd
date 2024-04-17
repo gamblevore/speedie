@@ -3,13 +3,9 @@
 main 	  	  	  	 // execmain {
 	opt norefcounts
 	error.AutoPrint = 1
-	require Lib.Load
-	require package.load
-	require package.FinishUp
-	require class.LoadAppClasses and apptable.LinkEmUp‼
+	require Lib.LoadLib
+	require package.LoadPack
 	
 	debugger.load
-	|| main = apptable[1]					#expect ("Missing main")
-	rz  = apptable[0]!.Run
-	rz := main.Run
+	return apptable.RunMain
 

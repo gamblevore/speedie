@@ -165,7 +165,7 @@ void JB_Str__LoadGlobals () {
 void JB_FinalEvents() {
 	AddError(JB_Rec_ShellPrintErrors(nil),	"jb.stderr");
 	JB_LibShutdown();
-	JB_RemoveHandlers(); // some stupid systems call signals after we exit??
+	JB_RemoveHandlers(); // some wierd systems call signals after we exit??
 }
 
 Array*	JB_App__Args()						{ return App_Args; }

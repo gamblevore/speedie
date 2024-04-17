@@ -85,7 +85,7 @@ class Class
 			.table.ValueLower(c.name) = c
 		
 
-		function LoadAppClasses (|bool|)
+		function LoadPackClasses (|bool|)
 			opt norefcounts
 			return .LoadAppClassSub(package.ProjClasses, class.obj!)
 		
