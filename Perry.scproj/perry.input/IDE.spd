@@ -291,8 +291,7 @@ class PerryIDE (Window)
 
 	function Show (|bool| FromClick=false)
 		disabled "use .ShowIDE"
-	
-	function UnusedTest
+
 	
 	function ShowIDE (|bool| FromClick=false)
 		debug_require self // what?

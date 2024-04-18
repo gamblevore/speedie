@@ -10,7 +10,6 @@ module Perry
     |bool|							Checked	
     |byte| 							FindID
 	|Dictionary of String|			PathDict
-	prototype abc (|int| i, |bool|)
 	
 	constants
 		arc_newer	= 2
@@ -48,13 +47,13 @@ module Perry
 			ide.editme.ViewLineAndSel(line.x)
 			return ide
 
+
 	function OpenProj (|[PerryIDE]|)
 		opt norefcounts
 		for w in window.all
 			if w isa PerryIDE
 				rz <~ w
 
-	function Unused // test
 
 	function IDE (|PerryIDE|) // frontide, frontperry, firstperry
 		opt norefcounts
@@ -108,7 +107,7 @@ module Perry
 		.Projects = app.prefmsg("lastproj")
 		
 		if app.CWD == "/"
-			app.args.remove("YES")
+			app.args.remove("YES", true)
 
 		if filedes.StdOut.IsTerminal
 			app.AllowInteruptCrash = true // fails with 0 params... sigh whatever
@@ -227,7 +226,7 @@ function OutText (|textview|)
 
 
 function SwitchedToErrors
-	|| e = .errorlist
+	|| e = .ErrorList
 	if e.listsource.hasany and !e.FirstSelected
 		e.selectfirst
 	  else
@@ -265,10 +264,11 @@ function IsViewing (|guicontrol| g, |bool|)
 
 function IsSingleFileProject (|bool|)// IsProj
 	return !.project.isdir
-	
+
+
 function ViewAsBetter
 	if .IsSingleFileProject
-		.viewasproject
+		.ViewAsProject
 	  else
 		.viewascurr
 

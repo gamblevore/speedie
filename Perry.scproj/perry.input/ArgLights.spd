@@ -4,8 +4,7 @@
 "Why have a GUI when you can turn a textView INTO a GUI?"  !!Deleted this idea!!
 
 Instead we want a jeebox DTD, that auto-generates a GUI. Like:	
- 	{
-		(unordered)
+ 	unordered {
 		args	{"*"++}
 		notes	{"*"}++
 		env		{(@thg="*")++}

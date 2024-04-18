@@ -673,7 +673,7 @@ class String
 			yield (c) (pos)
 
 
-function array.remove (|array of string| self, |string| item, |bool| CaseAware=false,  |string|)
+function array.Remove (|array of string| self, |string| item, |bool| CaseAware=true,  |string|)
 	opt norefcounts
 	for (s.backwards in self) (ind)
 		if s.SyntaxCompare(item, CaseAware) // very annoying xcode behaviour
