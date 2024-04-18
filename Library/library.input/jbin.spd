@@ -45,9 +45,10 @@ role JBin (Faststring)
 		if n // what?
 	function Enter		(|syntax| type=@arg, |string| name="", |jbinleaver|)
 		return .add(type, name, true)
-	function Tmp		(|string| name)
+	function Tmp		(|string| name, |jbinLeaver|)
 		.Enter(@tmp, name)
 		.Enter(@arg)
+		return 2
 			
 	function AddStr		(|string| name)
 		.add(@str, name)
@@ -120,6 +121,20 @@ role JBin (Faststring)
 datatype jbinLeaver (int)
 	// need some nice syntax so we can do: using j.enter
 	// not finished
+
+	syntax UsingComplete (|jbin| jb)
+		StdErr.LowerErrorsTo = self
+		
+	module
+		function test
+			|| j = jbin()
+			j.Enter	// Sigh... syntaxusing is called upon the leaver, and not the jbin!
+							// how to make it work on j rather than on j.enter?
+							// we could do it.
+							// so... we call j.enter
+							// i mean we can just make it work on the thing inside the dot instead of the overall
+							// but that affects a lot of things. its not very reliable.
+						  
 	
 
 function StringReader.NextMsg (|message| parent=nil, |syntax| fn, |string| name=nil,  |Message|)

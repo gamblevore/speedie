@@ -8,7 +8,7 @@ class TerminalCell
 
 module Terminal
 	visible false
-	|array of array|	Screen
+	|array of array|	TermScreen
 	|faststring| 		fs
 	|date| 				LastDisplay
 	visible true
@@ -21,10 +21,10 @@ module Terminal
 	
 	
 	helper init
-		require !.Screen
+		require !.TermScreen
 		for h
 			|| s = []
-			.Screen <~ s
+			.TermScreen <~ s
 			for w
 				s <~ TerminalCell(0, " ")
 	
@@ -41,7 +41,7 @@ module Terminal
 			  elseif v inrange .size  and  c != ' '
 				if c == 127
 					c = ' ' // lol
-				|| row = .Screen[v.y]
+				|| row = .TermScreen[v.y]
 					row[v.x] = TerminalCell(colors, c)
 				v.x++
 	
@@ -65,7 +65,7 @@ module Terminal
 		opt norefcounts
 		|| f = .fs init FastString()
 		|| PrevCol = 0
-		for line in .Screen
+		for line in .TermScreen
 			for cell in line|array of terminalcell|
 				|| CCol = cell.color
 				if PrevCol != CCol
@@ -93,7 +93,7 @@ module Terminal
 		s = s.wrap(frame.width-2)
 		|| p = frame.xy+1
 		for i.rect in frame ± 1
-			|| row = .Screen[i.y]
+			|| row = .TermScreen[i.y]
 				row[i.x] = terminalcell(0," ")
 		for l.lines in s
 			self <~ (l, p, textcol)

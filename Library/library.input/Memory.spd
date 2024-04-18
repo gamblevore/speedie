@@ -107,6 +107,14 @@ class Memory
 		.Capacity = itemcount
 		._ptr = ptr
 	
+	
+	function UseExternalPointer (|&nil| P)
+		if .deathaction == dataobject.kfree
+			Memory.free(._ptr)
+		.deathaction = 0
+		._ptr = P|&byte|
+	
+	
 	function Ptr (|&...|)
 		return ._ptr|&...|
 		

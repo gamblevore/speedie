@@ -1529,7 +1529,7 @@ extern FastString* JB__Terminal_fs;
 extern Date JB__Terminal_LastDisplay;
 #define kJB__Terminal_Magenta (35)
 #define kJB__Terminal_Red (31)
-extern Array* JB__Terminal_Screen;
+extern Array* JB__Terminal_TermScreen;
 #define kJB__Terminal_w (80)
 #define kJB__Terminal_White (37)
 #define kJB__Terminal_Yellow (33)
@@ -6796,7 +6796,7 @@ int JB_bin_OpenSection(FastString* Self);
 
 void JB_bin_Sheb(FastString* Self, JB_String* Name);
 
-void JB_bin_Tmp(FastString* Self, JB_String* Name);
+jbinLeaver JB_bin_Tmp(FastString* Self, JB_String* Name);
 
 
 

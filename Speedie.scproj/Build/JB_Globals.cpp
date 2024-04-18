@@ -197,7 +197,7 @@ Dictionary* SC__Crkt_Table2;
 int SC__Crkt_TotalSize;
 FastString* JB__Terminal_fs;
 Date JB__Terminal_LastDisplay;
-Array* JB__Terminal_Screen;
+Array* JB__Terminal_TermScreen;
 Dictionary* SC__TextAssembler_LabelsToDo;
 Array* SC__Ext_Cleanup;
 int SC__Ext_CompilingLibFiles;

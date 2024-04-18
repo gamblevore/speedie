@@ -80,7 +80,7 @@ class DrawStyle
 		._Edge = .edge
 		return self
 
-	syntax UsingComplete
+	syntax UsingComplete (|object| idk)
 		.Edge = ._Edge
 		.bg = ._BG
 

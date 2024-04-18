@@ -2040,7 +2040,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1227], (112287786008576));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1227], (112291955264086));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3279,7 +3279,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1954]);
-	JB_FS_AppendInt32(_fsf0, (2024041718));
+	JB_FS_AppendInt32(_fsf0, (2024041812));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7192,7 +7192,7 @@ JB_String* JB_Terminal__Flat() {
 	});
 	int PrevCol = 0;
 	{
-		Array* _LoopSrcf3 = JB__Terminal_Screen;
+		Array* _LoopSrcf3 = JB__Terminal_TermScreen;
 		int _if1 = 0;
 		while (true) {
 			Array* Line = ((Array*)JB_Array_Value(_LoopSrcf3, _if1));
@@ -7240,7 +7240,7 @@ void JB_Terminal__FrameText(JB_String* S, ivec4 Frame, TerminalColor FrameCol, T
 		ivec2 I = ivec2{_LoopSrcf1[0], _LoopSrcf1[1]};
 		while (I[1] < _LoopSrcf1[3]) {
 			while (I[0] < _LoopSrcf1[2]) {
-				Array* Row = JB_Incr(((Array*)JB_Array_Value(JB__Terminal_Screen, I[1])));
+				Array* Row = JB_Incr(((Array*)JB_Array_Value(JB__Terminal_TermScreen, I[1])));
 				if (JB_Array_SyntaxCast(Row)) {
 					TerminalCell* _tmPf5 = JB_Incr(JB_TerminalCell_ConstructorAuto(nil, 0, JB_LUB[99]));
 					(JB_Array_ValueSet(Row, I[0], _tmPf5));
@@ -7273,14 +7273,14 @@ void JB_Terminal__FrameText(JB_String* S, ivec4 Frame, TerminalColor FrameCol, T
 }
 
 void JB_Terminal__init() {
-	if (JB_Array_SyntaxCast(JB__Terminal_Screen)) {
+	if (JB_Array_SyntaxCast(JB__Terminal_TermScreen)) {
 		return;
 	}
 	{
 		int _Valuef1 = 0;
 		while (_Valuef1 < kJB__Terminal_h) {
 			Array* S = JB_Incr((JB_Array_Constructor0(nil)));
-			JB_Array_SyntaxAppend(JB__Terminal_Screen, S);
+			JB_Array_SyntaxAppend(JB__Terminal_TermScreen, S);
 			{
 				int _Valuef3 = 0;
 				while (_Valuef3 < kJB__Terminal_w) {
@@ -7299,7 +7299,7 @@ void JB_Terminal__init() {
 
 int JB_Terminal__Init_() {
 	{
-		JB_SetRef(JB__Terminal_Screen, JB_Array_Constructor0(nil));
+		JB_SetRef(JB__Terminal_TermScreen, JB_Array_Constructor0(nil));
 		JB__Terminal_LastDisplay = 0;
 	}
 	;
@@ -7334,7 +7334,7 @@ void JB_Terminal__SyntaxAppend(JB_String* Text, ivec2 V, TerminalColor Colors) {
 				if (C == 127) {
 					C = ' ';
 				}
-				Array* Row = JB_Incr(((Array*)JB_Array_Value(JB__Terminal_Screen, V[1])));
+				Array* Row = JB_Incr(((Array*)JB_Array_Value(JB__Terminal_TermScreen, V[1])));
 				if (JB_Array_SyntaxCast(Row)) {
 					JB_String* _tmPf5 = JB_Incr(JB_CP_SyntaxCast(C));
 					TerminalCell* _tmPf4 = JB_Incr(JB_TerminalCell_ConstructorAuto(nil, Colors, _tmPf5));
@@ -7810,7 +7810,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[925]);
-	JB_FS_AppendInt32(_fsf0, (2024041718));
+	JB_FS_AppendInt32(_fsf0, (2024041812));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -27642,9 +27642,10 @@ void JB_bin_Sheb(FastString* Self, JB_String* Name) {
 	JB_FS_AppendByte(Self, '\n');
 }
 
-void JB_bin_Tmp(FastString* Self, JB_String* Name) {
+jbinLeaver JB_bin_Tmp(FastString* Self, JB_String* Name) {
 	JB_bin_Enter(Self, JB_SyxTmp, Name);
 	JB_bin_Enter(Self, JB_SyxArg, JB_LUB[0]);
+	return 2;
 }
 
 
@@ -48148,4 +48149,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -2884920708764576 -5529682349237818806
+// 2744344635973618238 -9013745841163384924

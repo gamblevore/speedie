@@ -702,8 +702,9 @@ module SDLApp
 	function StartFrame (|&SDL_Texture| T)
 		opt norefcounts
 		|| stride = 0
-		|| bytes = (&(.Screen._ptr))|&&nil|
-		t.lockThatZerosEventhoughItShouldnt(nil, bytes, &stride)
+		|&nil| SDLBuff
+		t.lockThatZerosEventhoughItShouldnt(nil, &sdlbuff, &stride)
+		.screen.UseExternalPointer(sdlbuff)
 		
 
 	

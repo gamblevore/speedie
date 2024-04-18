@@ -644,7 +644,7 @@ class PerryIDE (Window)
 		.showide
 
 
-	Syntax UsingComplete
+	Syntax UsingComplete (|object| idk)
 		.StillJumping = false
 		.AddToJumpHistory
 
