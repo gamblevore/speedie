@@ -1291,7 +1291,7 @@ function ArgToFunc (|string| NewName, |Message| Params, |Message| arg,  |Message
 
 function Tran_NotAllowed (TranFunc) // "continue"
 	opt norefcounts
-	if !node.tmptype
+	if !node.ASMType
 		error (node)
 
 
@@ -1299,7 +1299,7 @@ function Tran_Debugger (TranFunc) {
 	|| ch = node.first
 	if !ch
 		node.name = "debugger"
-		node.tmptype = asmtmp.kdebugger
+		node.ASMType = asmtmp.kdebugger
 		return
 	
 	expect ((node == "debugger") and (!ch.next)) (node)
@@ -1310,7 +1310,7 @@ function Tran_Debugger (TranFunc) {
 		node.first!.Negate
 		node.Name = "if"
 		|| dbg = node.msg(@arg).msg(@tmp, "debugger")
-		dbg.tmptype = asmtmp.kdebugger
+		dbg.ASMType = asmtmp.kdebugger
 	
 	Tran_If(fn, node, name_space)
 
@@ -1399,7 +1399,7 @@ function Tran_Once (TranFunc)
   
 
 function Tran_If (TranFunc) 
-	node.TmpType = asmtmp.kIf // for the ASM
+	node.ASMType = asmtmp.kIf // for the ASM
 	Tran_IfSub(node, name_space)
 
 
@@ -1428,7 +1428,7 @@ function Tran_IfSub (|message| node, |SCNode| name_space)
 		SubTest.ExpectLast
 		
 		if SubTest == "elseif"
-			subtest.tmptype = asmtmp.kelseIf		// for the ASM
+			subtest.ASMType = asmtmp.kelseIf		// for the ASM
 			Tran_IfSub(SubTest, name_Space)
 		  else // "else" branch
 			|| ElseArg = SubTest.first
@@ -1496,7 +1496,7 @@ function Tran_Deprecate (TranFunc)
 
 function Tran_Fails (TranFunc)
 	expect (fn) (node, "Only use this on functions")
-	node.TmpType = asmtmp.kFaille
+	node.ASMType = asmtmp.kFaille
 	fn.Badness |= 128
 	expect (!node.islast) (node, "Put 'borks' before some code.") 
 
@@ -1513,9 +1513,9 @@ function Tran_Visible (TranFunc)
 
 function Tran_Return (TranFunc)  // exitter
 	expect (fn) (node, "Only use this on functions")
-	if node.tmptype == asmtmp.kreturn
+	if node.ASMType == asmtmp.kreturn
 		debugat
-	node.tmptype = asmtmp.kreturn
+	node.ASMType = asmtmp.kreturn
 	
 	if !node.islast
 		expect (fn isnt ConOrDes)   (node, "You can’t return in a constructor or destructor")
@@ -1533,7 +1533,7 @@ function message.CheckNotInStateExpr (|message| top)
 
 
 function Tran_Rejoin (TranFunc)  // exitter
-	node.tmptype = asmtmp.kRejoin
+	node.ASMType = asmtmp.kRejoin
 	|| p = node.first
 	if p == @arg
 		|| arg = p.AsArg

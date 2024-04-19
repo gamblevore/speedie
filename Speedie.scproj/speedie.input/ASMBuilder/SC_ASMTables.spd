@@ -144,10 +144,10 @@ function Return			(fn_asm)
 
 // for some reason, replacing this will cause speedie to generate bad code
 // I guess I am setting the Flags somewhere, or testing them? but I can't see where.
-function Message.TmpType (|ASMTmp|)
+function Message.ASMType (|ASMTmp|)
 	rz = .FLAGS & 63
 
-function Message.TmpType (assigns:|ASMTmp|)
+function Message.ASMType (assigns:|ASMTmp|)
 	target debug: if .objectid == 0
 	value = (.FLAGS &~ 63) ||| value
 	.FLAGS = value 

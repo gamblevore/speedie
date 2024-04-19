@@ -68,7 +68,7 @@ function LastInBlock (|SCBlockage| Reason)
 		Reason = Reason.BlockCombine(B)
 
 		test = arg.parent!
-		if test.TmpType is kif // what about kElseIf? does this already handle that
+		if test.ASMType is kif // what about kElseIf? does this already handle that
 			return test.LastInBlock(reason) // bubble up :O
 		  else
 			test.Blocks = Reason

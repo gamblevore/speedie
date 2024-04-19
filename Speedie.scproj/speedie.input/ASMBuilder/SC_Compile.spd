@@ -178,7 +178,7 @@ struct ASMFuncState // why not just be a subclass of memory?
 		
 
 function message.ASMFunc (|fn_asm|)
-	|| ASM = .tmptype
+	|| ASM = .ASMType
 	asm := .func|int|
 	rz = fn_asm_table[asm]!
 	target debug

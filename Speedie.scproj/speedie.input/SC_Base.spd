@@ -234,7 +234,6 @@ function message.visible (|bool|)
 
 
 function message.visible (assigns:|bool|)
-//	if .objectid == 1136656
 	.indent = 255 - value
 
 

@@ -223,18 +223,18 @@ function Tran_BlindCasts (tranfunc)
 
 
 function Tran_Swap (TranFunc)
-	node.tmptype = asmtmp.kSwap	
+	node.ASMType = asmtmp.kSwap	
 	expect (node == 2) (node, "Just swap two items.")
 	node.name = "JB_Swap" 
 	Tran_Print(fn, node, name_space)
 
 
 function Tran_While (TranFunc)
-	if node.tmptype == asmtmp.kwhile
+	if node.ASMType == asmtmp.kwhile
 		return
 
 	node.name = "while"
-	node.tmptype = asmtmp.kWhile
+	node.ASMType = asmtmp.kWhile
 	|| Cond	= node.needfirst					#require
 	|| arg	= cond.next
 
@@ -370,7 +370,7 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |SCNode| space)
 
 	ifn (src.blocks is return) or (src.last istmp "return") 
 		|| ret = src.msg(@tmp, "return")
-		ret.tmptype = asmtmp.kreturn 
+		ret.ASMType = asmtmp.kreturn 
 		if used
 			ret.msg(@thg, "rz").obj = d 
 		  else
@@ -921,6 +921,6 @@ function message.LoopContinue
 
 function message.LoopExitter (|int| ASMType, |SCBlockage| ExitCode)
 	.ExpectEmpty
-	.TmpType = ASMType
+	.ASMType = ASMType
 	.LastInBlock(ExitCode)
 	

@@ -50,15 +50,15 @@ function Ignore (NilTrackerFn)
 
 		
 function StatementJump (NilTrackerFn)
-	return (NilTable[msg.TmpType]!)(msg)
+	return (NilTable[msg.ASMType]!)(msg)
 
 
 function Jump (NilTrackerFn)
 	pragma inline
-	|| t = msg.TmpType
+	|| t = msg.ASMType
 		return (NilTable[t]!)(msg, test)
 	t = msg.func|asmtmp|
-	msg.tmptype = t
+	msg.ASMType = t
 	return (NilTable[t]!)(msg, test)
 
 
@@ -68,7 +68,7 @@ function PropertyToFunc (|message!| dot, |scfunction!| fn, |nilstate|)
 	// b(a, c)
 	
 	dot.func = @func
-	dot.tmptype = (@func)|asmtmp|
+	dot.ASMType = (@func)|asmtmp|
 	|| upon = dot.First!
 	|| Prms = dot.Last!
 	Prms.obj = fn
@@ -150,7 +150,7 @@ function Function (NilTrackerFn)
 	test &=~ NilCheckMode.Disappears
 	|| fp = msg.first!
 	|| prms = fp.next!
-	if msg.tmptype == ASMtmp.kTern
+	if msg.ASMType == ASMtmp.kTern
 	
 	|| fn = prms.obj|SCFunction|
 	if !fn
@@ -325,7 +325,7 @@ function Tern (Niltrackerfn)
 	opt norefcounts
 	test &=~ NilCheckMode.Disappears
 	msg = msg.second!
-//	if msg.tmptype == ASMtmp.kTern
+//	if msg.ASMType == ASMtmp.kTern
 //		return tern(prms, test)
 
 	|| Orig = T.BranchEnter(msg)			#require

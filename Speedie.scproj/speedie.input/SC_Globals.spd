@@ -839,7 +839,7 @@ function TypeOfTernary (ExprResolver)
 		list.become(@thg, "JB_Ternary")
 		params.obj = compiler.TernaryFunc
 		params <~ list.first
-		exp.tmptype = ASMtmp.ktern
+		exp.ASMType = ASMtmp.ktern
 		return result
 
 
@@ -1320,7 +1320,7 @@ function TypeOfRel (ExprResolver) {
 			error (opch, "Can't use this operator here.")
 	  elseif (ShouldBeSet)
 		side = rn
-		exp.tmptype = asmtmp.ksetvar // for the ASM
+		exp.ASMType = asmtmp.ksetvar // for the ASM
 	  else
 		error (opch, "Did you mean '=='?")
 
@@ -1732,7 +1732,7 @@ function Tran_ArgArray (|Message| Exp, |SCNode| name_space, |scdecl| decl)
 		d.default = nil
 
 	rel.func = @sheb			// comment
-	rel.tmptype = asmtmp.kIgnore
+	rel.ASMType = asmtmp.kIgnore
 	if place == rel
 		rel.next = thg
 		Place = thg

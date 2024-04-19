@@ -43,7 +43,7 @@ function Message.MsgOwningFunc (|SCFunction|)
 
 
 function message.MakeComment // ignorenode ()  makeignored ()
-	.tmptype = asmtmp.kIgnore
+	.ASMType = asmtmp.kIgnore
 	.func = @Sheb
 	.clear
 
@@ -264,6 +264,7 @@ function Message.ReplaceWithChild (||)
 function Message.SafeRemove (|syntax| T=@sheb)
 	if self
 		.become(T)
+		.ASMType = 0
 		is inserted // stop issues with autocomplete :)
 		for (c in self)
 			c.remove
@@ -271,6 +272,7 @@ function Message.SafeRemove (|syntax| T=@sheb)
 
 function Message.SafeReplaceWith (|message| Incoming)
 	.saferemove(@bra)
+	.ASMType = 0
 	self <~ incoming
 
 
@@ -415,13 +417,13 @@ function NewEqRel (|string| L, |String| R, |Message|)
 	rz <~ (@Opp, "=")
 	rz <~ (@Thg, R)
 	
-	rz.TmpType = asmtmp.ksetvar
+	rz.ASMType = asmtmp.ksetvar
 
 
 
 function NewRejoin (|message|)
 	rz = @tmp + "rejoin"
-	rz.tmptype = asmtmp.kRejoin
+	rz.ASMType = asmtmp.kRejoin
 
 
 function NewDecl (|string| type, |string| name="", |message|)
@@ -451,7 +453,7 @@ function NewRel (|Message| L, |Message| R, |string| op, |Message|)
 function NewEqRel (|Message| L, |Message| R, |Message|)
 	opt norefcounts
 	rz = NewRel(l, r, "=")
-	rz.TmpType = ASMtmp.kSetVar
+	rz.ASMType = ASMtmp.kSetVar
 
 
 function message.WrapWith (|syntax| f, |string| s="", |message|)
