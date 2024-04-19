@@ -46,19 +46,14 @@ module TreeAssembler
 	syntax access (|message| m, |µFunc|)
 		cpp_part AccessStr
 		opt norefcounts
-		|| f = compiler.ExportNames[m.name]
-		if f isa SCFunction
+		|| f = compiler.XFunc(m.name, m)
 			return f.ASM					#expect (m, "This function has no ASM")
-		
-		|| err = ("This isn't a function", "Can't find this function")(f)
-		error (m, err)
 
 	
 	function CollectFuncs (|string| exp, |[scfunction]|)
 		opt norefcounts
 		for l in exp / ','
-			|| fn = compiler.ExportNames[l]
-			if fn isa SCFunction
+			|| fn = compiler.XFunc(l)
 				rz <~ fn
 				fn.tableid = rz.length
 			
@@ -80,13 +75,17 @@ module TreeAssembler
 		opt norefcounts
 		
 		.StdState.Initstate(fn)
-		|| fp = fn_asm_table[@arg]!
-		//(fp)(TreeAssembler.StdState, fn.SourceArg!)
+		|| fp = fn_asm_table[@arg]
+			|| R = 0.reg
+			|| A = fn.SourceArg!
+			|| ST = TreeAssembler.StdState
+			debugger
+			(fp)(ST, A, R)
 		.StdState.FinishASM
 
 
 
 extend_module ASM
 	function Needed (|bool|)
-		|| fn = compiler.exportnames["JB_ASM_Run"]
+		|| fn = compiler.XFunc("JB_ASM_Run")
 			return fn.MyReacher

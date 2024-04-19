@@ -1177,7 +1177,7 @@ function NewProtoTypeSub (|Message| node, |SCNode!| parent, |Message| ErrPlace, 
 
 
 function NeuSyx (CollectFunc)
-	|| Using = node.syntaxusing 
+	|| Using = node.syntaxusing
 	|| NewNode = Tran_Syx( node )
 		rz = SCFunction.NewHelper( NewNode, name_space, ErrPlace )
 
@@ -1496,7 +1496,7 @@ function Tran_Deprecate (TranFunc)
 
 function Tran_Fails (TranFunc)
 	expect (fn) (node, "Only use this on functions")
-	node.TmpType = asmtmp.kfail
+	node.TmpType = asmtmp.kFaille
 	fn.Badness |= 128
 	expect (!node.islast) (node, "Put 'borks' before some code.") 
 

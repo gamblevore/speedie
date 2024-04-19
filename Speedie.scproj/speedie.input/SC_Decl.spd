@@ -140,15 +140,9 @@ class SCDecl (SCNamed) {
 	function IsNil (|bool|)
 		return self == typenil
 	
-	function IsStdLib (|bool|)
+	function IsLib (|bool|)
 		opt norefcounts
-		|| p = .project
-		if p?
-			return p.isstdlib
-		debugger
-	
-//	function NilEither (|nilstate|)
-//		return .nilDeclared&nilstate.either
+		return .project.isstdlib
 
 	function RegType (|datatypecode|)
 		require self
@@ -173,7 +167,16 @@ class SCDecl (SCNamed) {
 		return (.pointercount == 1 and .type == typevoid_)
 	
 	
+	function CopyDeclWithLayer (|bool| ForNewVariable = false, |SCDecl|)
+		opt norefcounts
+		|| oldlayer = (scdecl).layer
+		.MemoryLayer.use
+		rz = .CopyDecl(fornewvariable)
+		oldlayer.use
+
+
 	function CopyDecl (|bool| ForNewVariable = false, |SCDecl|)
+		opt norefcounts
 		|| dcl = SCDecl(.type)
 		
 		.CopyTypeInfoTo( dcl )

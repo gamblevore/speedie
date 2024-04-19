@@ -606,7 +606,7 @@ function Message.RefDisappears (|bool|)
 
 function message.IsStatementExpr (|bool|)
 	opt norefcounts
-	return .TmpType == ASMtmp.kStatementExpression
+	return .TmpType == ASMtmp.kStatExpr
 
 
 function message.RC_HasTemporary (|int|)

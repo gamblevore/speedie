@@ -1,5 +1,7 @@
 
 
+|| perry_globaltest = 1
+
 class PerryIDE (Window) 
 	linkage: cpp_part IDE
 
@@ -906,3 +908,113 @@ function string.GetSpeedieProj (|string|)
 	while rz and !(rz isa "scproj")
 		rz = rz.parent
 
+
+/*
+SCFunction: helper Init_ (|int|) {
+	{
+		__AppConfString = ""
+		StdErr = JB_Rec_Constructor(nil)
+		_JbinHeader = ""
+		_jBinNotJbin = ""
+		_SyxDict_ = JB_Dict_Constructor(nil)
+		SyxNil = JB_Syx__StdNew(Message.Nil__, <(`nil`)>, <(`WildCard`)>)
+		SyxArg = JB_Syx__StdNew(Message.Arg__, <(`arg`)>, <(`Argument`)>)
+		SyxEmb = JB_Syx__StdNew(Message.Emb__, <(`emb`)>, <(`Embedded_Value`)>)
+		SyxType = JB_Syx__StdNew(Message.Type__, <(`type`)>, <(`Typecast`)>)
+		SyxDecl = JB_Syx__StdNew(Message.Decl__, <(`decl`)>, <(`Declaration`)>)
+		SyxTmp = JB_Syx__StdNew(Message.Tmp__, <(`tmp`)>, <(`Statement`)>)
+		SyxOat = JB_Syx__StdNew(Message.Oat__, <(`oat`)>, <(`Operator_As_Thing`)>)
+		SyxQues = JB_Syx__StdNew(Message.Ques__, <(`ques`)>, <(`Question`)>)
+		SyxCnj = JB_Syx__StdNew(Message.Cnj__, <(`cnj`)>, <(`conj`)>)
+		SyxOpp = JB_Syx__StdNew(Message.Opp__, <(`opp`)>, <(`Operator`)>)
+		SyxThg = JB_Syx__StdNew(Message.Thg__, <(`thg`)>, <(`Thing`)>)
+		SyxSheb = JB_Syx__StdNew(Message.Sheb__, <(`sheb`)>, <(`Shebang`)>)
+		SyxSCnj = JB_Syx__StdNew(Message.SCnj__, <(`scnj`)>, <(`Syntactic_conj`)>)
+		SyxSThg = JB_Syx__StdNew(Message.SThg__, <(`sthg`)>, <(`Syntactic_Thing`)>)
+		SyxNum = JB_Syx__StdNew(Message.Num__, <(`num`)>, <(`Number`)>)
+		SyxSStr = JB_Syx__StdNew(Message.SStr__, <(`sstr`)>, <(`Super_String`)>)
+		SyxBack = JB_Syx__StdNew(Message.Back__, <(`back`)>, <(`Backtick`)>)
+		SyxChar = JB_Syx__StdNew(Message.Char__, <(`char`)>, <(`Character`)>)
+		SyxBin = JB_Syx__StdNew(Message.Bin__, <(`bin`)>, <(`Hex`)>)
+		SyxStr = JB_Syx__StdNew(Message.Str__, <(`str`)>, <(`String`)>)
+		SyxUnit = JB_Syx__StdNew(Message.Unit__, <(`unit`)>, <(``)>)
+		SyxARel = JB_Syx__StdNew(Message.ARel__, <(`arel`)>, <(`After_Relationship`)>)
+		SyxName = JB_Syx__StdNew(Message.Name__, <(`name`)>, <(``)>)
+		SyxDot = JB_Syx__StdNew(Message.Dot__, <(`dot`)>, <(`Dot`)>)
+		SyxSDot = JB_Syx__StdNew(Message.SDot__, <(`sdot`)>, <(`Self_Dot`)>)
+		SyxFunc = JB_Syx__StdNew(Message.Func__, <(`func`)>, <(`Function`)>)
+		SyxBRel = JB_Syx__StdNew(Message.BRel__, <(`brel`)>, <(`Before_Relationship`)>)
+		SyxAdj = JB_Syx__StdNew(Message.Adj__, <(`adj`)>, <(`Adjective`)>)
+		SyxBadj = JB_Syx__StdNew(Message.Badj__, <(`badj`)>, <(`Backwards_Adjective`)>)
+		SyxAcc = JB_Syx__StdNew(Message.Acc__, <(`acc`)>, <(`Access`)>)
+		SyxItem = JB_Syx__StdNew(Message.Item__, <(`item`)>, <(``)>)
+		SyxBra = JB_Syx__StdNew(Message.Bra__, <(`bra`)>, <(`Bracket`)>)
+		SyxList = JB_Syx__StdNew(Message.List__, <(`list`)>, <(``)>)
+		SyxPrm = JB_Syx__StdNew(Message.Prm__, <(`prm`)>, <(`Parameter_List`)>)
+		SyxArr = JB_Syx__StdNew(Message.Arr__, <(`arr`)>, <(`Array`)>)
+		SyxFile = JB_Syx__StdNew(Message.File__, <(`file`)>, <(`File_List`)>)
+		SyxQuot = JB_Syx__StdNew(Message.Quot__, <(`quot`)>, <(`Quotation`)>)
+		SyxRel = JB_Syx__StdNew(Message.Rel__, <(`rel`)>, <(`Relationship`)>)
+		SyxERel = JB_Syx__StdNew(Message.ERel__, <(`erel`)>, <(`Equals_Relationship`)>)
+		SyxTRel = JB_Syx__StdNew(Message.TRel__, <(`trel`)>, <(`Temporal_Relationship`)>)
+		SyxTril = JB_Syx__StdNew(Message.Tril__, <(`tril`)>, <(`Temporal_Relationship2`)>)
+		Syxpinn = JB_Syx__StdNew(Message.pinn__, <(`pinn`)>, <(`Post_InnerAdj`)>)
+		Syxbinn = JB_Syx__StdNew(Message.binn__, <(`binn`)>, <(`InnerAdj`)>)
+		SyxAsk = JB_Syx__StdNew(Message.Ask__, <(`ask`)>, <(``)>)
+		SyxYoda = JB_Syx__StdNew(Message.Yoda__, <(`yoda`)>, <(`Yoda_Relationship`)>)
+		SyxSCom = JB_Syx__StdNew(Message.SCom__, <(`scom`)>, <(`Syntactic_Comment`)>)
+		SyxMsg = JB_Syx__StdNew(Message.Msg__, <(`msg`)>, <(`Message_List`)>)
+		SyxTodo = JB_Syx__StdNew(Message.Todo__, <(`todo`)>, <(`To_Do_List`)>)
+		Syxurl = JB_Syx__StdNew(Message.url__, <(`url`)>, <(`URL`)>)
+		perry_globaltest = 0
+		Speedie = JB_Str_AsFile(<(`/usr/local/bin/speedie`)>)
+		CppCompiler = <(`/usr/bin/g++`)>
+		SpdLibAlreadyInUse = false
+		¥ = colorscheme(nil)
+		SyxXAtt = JB_Syx__StdNew(Message.XAtt__, <(`xatt`)>, <(`XML_Attribute`)>)
+		SyxXML = JB_Syx__StdNew(Message.XML__, <(`xml`)>, <(`XML_Element`)>)
+		SyxXPI = JB_Syx__StdNew(Message.XPI__, <(`xpi`)>, <(`XML_ProcessingInstruction`)>)
+		SyxXCom = JB_Syx__StdNew(Message.XCom__, <(`xcom`)>, <(`XML_Comment`)>)
+		SyxXCDT = JB_Syx__StdNew(Message.XCDT__, <(`xcdt`)>, <(`XML_CDATA`)>)
+		SyxXTxt = JB_Syx__StdNew(Message.XTxt__, <(`xtxt`)>, <(`XML_Text`)>)
+		Syxmax = JB_Syx__StdNew(Message.max__, <(`max`)>, <(`EndMarker`)>)
+	}
+
+	JB_App__Init_()
+	App_AutoComplete__Init_()
+	Per_DefaultFiles__Init_()
+	JB_ErrorColors__Init_()
+	JB_API__Init_()
+	JB_Constants__Init_()
+	GUI_Note__Init_()
+	Per_Perry__Init_()
+	GUI_App__Init_()
+	GUI_ScrollInfo__Init_()
+	JB_Terminal__Init_()
+	GUI_beep__Init_()
+	GUI_clipboard__Init_()
+	JB_Tk__Init_()
+	JB_zalgo__Init_()
+	JB_ErrorSeverity__Init_()
+	GUI_Key__Init_()
+	GUI_MB__Init_()
+	JB_Syx__Init_()
+	JB_MzSt__Init_()
+	GUI_pix__Init_()
+	JB_Rnd__Init_()
+	GUI_Sch__Init_()
+	JB_Rec__Init_()
+	JB_Flow__Init_()
+	JB_Macro__Init_()
+	JB_File__Init_()
+	GUI_Doc__Init_()
+	JB_Err__Init_()
+	GUI_LV__Init_()
+	GUI_Bar__Init_()
+	GUI_Text__Init_()
+	GUI_Win__Init_()
+	Per_IDE__Init_()
+	initcode_()
+	return 0
+}
+*/

@@ -1,11 +1,11 @@
 
+
 dispatch fn_asm_table (fn_asm)
 	@arg:
 		opt norefcounts
 		|| OV = .openvars
-		|| garb = 31.reg
 		for ch.fast in exp
-			.µ(ch, garb)
+			.µ(ch, 0.reg)
 		.closevars(OV)
 
 
@@ -42,6 +42,8 @@ dispatch fn_asm_table (fn_asm)
 				return .µ(f, reg)
 			return ASMtmp.StateExpr(self, f)
 
+	@sheb: ASMtmp.Ignore
+		
 
 	@list: // vectors
 		debugger
@@ -71,53 +73,60 @@ dispatch fn_asm_table (fn_asm)
 		// could be others too? vectors?
 		debugger
 
-	(ASMtmp.kDebugger):	ASMtmp.Debugger // 63==max
-	(ASMtmp.kif):		ASMtmp.If
-	(ASMtmp.krejoin):	ASMtmp.Rejoin
-	(ASMtmp.kreturn):	ASMtmp.return
-	(ASMtmp.kwhile):	ASMtmp.While
+	(ASMtmp.kDebugger):		ASMtmp.Debugger
+	(ASMtmp.kif):			ASMtmp.If
+	(ASMtmp.krejoin):		ASMtmp.Rejoin
+	(ASMtmp.kreturn):		ASMtmp.return
+	(ASMtmp.kwhile):		ASMtmp.While
+
+	(asmtmp.kContinue):		ASMtmp.Continue
+	(asmtmp.kExit):			ASMtmp.Exit
+	(asmtmp.ksetvar):		ASMtmp.SetRel
+	(asmtmp.kStatExpr): 	ASMtmp.StatExpr
+	(asmtmp.kTern):			ASMtmp.Tern
+
+	(asmtmp.kIgnore):		ASMtmp.Ignore
+	(asmtmp.kFaille):		ASMtmp.Ignore
 
 	@tmp:
-		if exp == "debugger":	return ASMtmp.Debugger(self, exp)
-		if exp == "if":			return ASMtmp.If(self, exp)
-		if exp == "rejoin":		return ASMtmp.Rejoin(self,exp)
-		if exp == "return":		return ASMtmp.Return(self, exp)
-		if exp == "while":		return ASMtmp.While(self, exp)
-		error (exp, "Unknown statement in ASM")
+		#!the tmp type should have already been set
 		debugger
-	
 	63:
 		0
 
 
 datatype ASMtmp (uint16)
 	module {
-	function StateExpr	(fn_asm)
-	function Debugger	(fn_asm)
-		debugger
+function StateExpr		(fn_asm): debugger
+function Debugger		(fn_asm): debugger
+function Continue		(fn_asm): debugger
+function Exit			(fn_asm): debugger
+function SetRel			(fn_asm): debugger
+function StatExpr		(fn_asm): debugger
+function Tern			(fn_asm): debugger
+function Ignore			(fn_asm): debugger
+function If				(fn_asm): debugger
+function Rejoin			(fn_asm): debugger
+function While			(fn_asm): debugger
 
-	function If		(fn_asm)
-		debugger
+function Unexpected		(fn_asm)
+	"Bad asmtmp"
+	debugger
 
-	function Rejoin	(fn_asm)
-		debugger
-
-	function Return	(fn_asm)
-		opt norefcounts
-		|| f = exp.first
-			rz = .µ(f)
-		.AddASM(exp, asm.RET, rz)
-
-	function While		(fn_asm)
-		debugger
-	}
+function Return			(fn_asm)
+	opt norefcounts
+	|| f = exp.first
+		rz = .µ(f)
+	.AddASM(exp, asm.RET, rz)
+	
+}
 	
 	syntax is (|asmtmp| t, |bool|)
 		return self == t
 
 	constants
 		|asmtmp| 
-		kElseIf = 1
+		kElseIf = 48
 		kIf
 		kWhile
 		kContinue
@@ -126,20 +135,20 @@ datatype ASMtmp (uint16)
 		kRejoin
 		kSwap
 		kTern
-		kStatementExpression
+		kStatExpr
 		kSetVar
+		kIgnore
 		kDebugger
-		kFail
+		kFaille = 63
 	
-
 
 // for some reason, replacing this will cause speedie to generate bad code
 // I guess I am setting the Flags somewhere, or testing them? but I can't see where.
-
 function Message.TmpType (|ASMTmp|)
 	rz = .FLAGS & 63
 
 function Message.TmpType (assigns:|ASMTmp|)
+	target debug: if .objectid == 0
 	value = (.FLAGS &~ 63) ||| value
 	.FLAGS = value 
 

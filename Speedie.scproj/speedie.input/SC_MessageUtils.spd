@@ -42,10 +42,10 @@ function Message.MsgOwningFunc (|SCFunction|)
 			Return o
 
 
-function SC_MakeComment (|Message| msg) // ignorenode
-	expect (msg == @tmp)
-	msg.func = @Sheb
-	msg.clear
+function message.MakeComment // ignorenode ()  makeignored ()
+	.tmptype = asmtmp.kIgnore
+	.func = @Sheb
+	.clear
 
 
 function Message.NegateThg (|Message|)

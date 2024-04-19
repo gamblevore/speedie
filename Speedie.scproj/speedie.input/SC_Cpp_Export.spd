@@ -596,13 +596,8 @@ function ExportSyx
 	require Compiler.SyxArray
 	|| fs = .StreamChild( "SyntaxConstants.h" )
 	
-	for (i in Compiler.SyxArray.length)
-		.ExportOneSyx( i, fs )
-
-
-function ExportOneSyx (|int| i, |FastStringCpp| fs)
-	|| syx = Compiler.SyxArray[ i ]!
-	fs <~ "#define kSyx$syx $i\n"
+	for (syx in Compiler.SyxArray) (i)
+		fs <~ "#define kSyx$syx $i\n"
 
 
 function FinalMergeOutputIntoACpp

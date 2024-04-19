@@ -145,6 +145,8 @@ function CollectDeclsGlobals (|Message| arg, |SCNode| scarg)
 
 function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
 	opt norefcounts
+	|| f = .scfile
+		f.proj.decllayer.use
 	
 	|| dcl = .CollectDecl(scarg, scarg, declmode.Globals, nil, nil)
 		|| def = dcl.Default

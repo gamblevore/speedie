@@ -251,7 +251,6 @@ module Feedback
 			Explain(Purpose, "Check only. same as --nocompile --cpp=0")$
 			Options.Compile = false
 			Options.ModeCpp = false
-//			options.products = 0
 		
 		+"errortest" 
 			explain(purpose, "Tests if error handling works OK.")$
@@ -347,6 +346,8 @@ module Feedback
 		
 		+"pack" // nothing... for now.
 			options.ModePack = value.optionbool
+			if options.modepack
+				options.modecpp = false
 		
 		+"targetdebug" // basically
 			Explain(Purpose, "")$
@@ -392,6 +393,8 @@ module Feedback
 		+"cpp"
 			explain(purpose, "Compiles to cpp. Default true")$
 			options.ModeCpp = value.optionbool
+			if options.ModeCpp
+				options.modepack = false
 				
 		+"output_path"
 			explain(purpose, "Specifies the build product path")$

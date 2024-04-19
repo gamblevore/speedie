@@ -15,13 +15,9 @@ extend_module scfunction
 
 
 module FastStringOpts {
-	|| FSRemoved = 0
+	|| FSRemoved  = 0
 	|| StrRemoved = 0
 	|scfunction| _ByteFunc 
-
-
-function ByteFunc (|scfunction|)
-	return ._bytefunc init compiler.exportnames["JB_FS_AppendByte"]|scfunction|
 
 
 function FS (|Message| exp, |Message| getresult)
@@ -48,9 +44,11 @@ function FS (|Message| exp, |Message| getresult)
 
 function String (|Message| exp, |Message| str)
 	opt norefcounts
-	require (str == @str or @sstr or @back) and str.name == 1
+	require (str == @str or @sstr or @back) and (str.name == 1)
 	str.obj = typebyte!.typenormal
-	str.parent!.obj = .bytefunc
+
+	|| B  =  ._bytefunc  init  compiler.XFunc("JB_FS_AppendByte")
+	str.parent!.obj = b
 	str.func = @char
 	.StrRemoved++
 }

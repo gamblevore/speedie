@@ -32,6 +32,7 @@ class SCFile (file)
 	
 	
 	function Use 
+		opt norefcounts
 		scimport.curr = .proj
 		|| l = .LiveAst // if parse fails...
 			l.memoryLayer.Use

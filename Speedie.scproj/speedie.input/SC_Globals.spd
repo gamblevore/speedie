@@ -721,8 +721,7 @@ function message.TypeOfArrItem (|message|)
 
 
 function TypeOfSthg (ExprResolver)
-	exp.func = @Sheb
-	... // boomer
+	exp.MakeComment
 
 
 function TypeOfMsg (ExprResolver)
@@ -1733,6 +1732,7 @@ function Tran_ArgArray (|Message| Exp, |SCNode| name_space, |scdecl| decl)
 		d.default = nil
 
 	rel.func = @sheb			// comment
+	rel.tmptype = asmtmp.kIgnore
 	if place == rel
 		rel.next = thg
 		Place = thg

@@ -1,7 +1,7 @@
 
 
 extend_module ArchonPurger {
-	dispatch NilSyxes (NilTrackerFn)
+	dispatch NilTable (NilTrackerFn)
 		@thg:	Thing
 		@bra:	Bracket
 		@type:	Type
@@ -21,28 +21,25 @@ extend_module ArchonPurger {
 		@str:	String
 		@num:	Number
 		@char:	Char
-		63:
-			0     // for the size
-
-
-	dispatch NilTmps (niltrackerfn)
 		(asmtmp.kif):			If
 		(asmtmp.kWhile):		While
 		(asmtmp.kContinue):		Continue
 		(asmtmp.kExit):			Exit
+		(asmtmp.ksetvar):		SetRel
+		(asmtmp.kStatExpr): 	StatExpr
 		(asmtmp.kReturn):		Return
+		(asmtmp.kTern):			Tern
 		(asmtmp.kDebugger):		Debugger
-		(asmtmp.kFail):			Fail
+		(asmtmp.kIgnore):		Ignore
 		(asmtmp.krejoin):		Rejoin
-		63:
-			0 // for size also
+		(asmtmp.kFaille):		Fail
 
 	
 	TrackerDummies()
 	function TrackerDummies
 		for i in 64
-			NilSyxes[i] := Dummy
-			NilTmps[i] := Dummy
+			NilTable[i]     := &Dummy
+			fn_asm_table[i] := &asmtmp.unexpected
 
 
 
@@ -53,22 +50,17 @@ function Ignore (NilTrackerFn)
 
 		
 function StatementJump (NilTrackerFn)
-	return (NilTmps[msg.TmpType]!)(msg)
+	return (NilTable[msg.TmpType]!)(msg)
 
 
 function Jump (NilTrackerFn)
 	pragma inline
-	return (NilSyxes[msg.func]!)(msg, test)
+	|| t = msg.TmpType
+		return (NilTable[t]!)(msg, test)
+	t = msg.func|asmtmp|
+	msg.tmptype = t
+	return (NilTable[t]!)(msg, test)
 
-/*
-dot "b"
-	thg "a"
-	emb 
-func 
-	thg "a"
-	prm 
-		thg "b"
-*/
 
 function PropertyToFunc (|message!| dot, |scfunction!| fn, |nilstate|)
 	opt norefcounts
@@ -76,6 +68,7 @@ function PropertyToFunc (|message!| dot, |scfunction!| fn, |nilstate|)
 	// b(a, c)
 	
 	dot.func = @func
+	dot.tmptype = (@func)|asmtmp|
 	|| upon = dot.First!
 	|| Prms = dot.Last!
 	Prms.obj = fn
@@ -111,9 +104,7 @@ function UseChildAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason,
 	debugger // what?
 
 
-function Rel (NilTrackerFn)
-	if msg.TmpType is kSetVar							// x = y
-		return SetRel(msg, test)
+function Rel (NilTrackerFn)									// x = y
 	return ProcessCondRel(msg, test)
 
 
@@ -160,7 +151,6 @@ function Function (NilTrackerFn)
 	|| fp = msg.first!
 	|| prms = fp.next!
 	if msg.tmptype == ASMtmp.kTern
-		return tern(prms, test)
 	
 	|| fn = prms.obj|SCFunction|
 	if !fn
@@ -217,6 +207,7 @@ function Function (NilTrackerFn)
 
 function Rejoin (NilTrackerFn)
 	opt norefcounts
+	target debug: if msg != @tmp
 	return .jump(msg.first!, Test) 
 
 
@@ -240,6 +231,7 @@ function DetectStillChecks (|message| first, |nilstate|)
 
 function Return (NilTrackerFn)
 	opt norefcounts
+	target debug: if msg != @tmp
 	|| v = .DetectStillChecks(msg.first)
 	.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
 	.DeclKill
@@ -255,11 +247,13 @@ function Return (NilTrackerFn)
 
 
 function Exit (NilTrackerFn)
+	target debug: if msg != @tmp
 	.loops.ExitRecord |= .EndBlock
 	.loops.hasEscape = true
 
 
 function Continue (NilTrackerFn)
+	target debug: if msg != @tmp
 	.loops.ContRecord |= .EndBlock
 
 
@@ -276,6 +270,7 @@ function WhileInner (|message| Cond)
 
 function While (NilTrackerFn)
 	opt norefcounts
+	target debug: if msg != @tmp
 	|| cond = msg.first!
 	|| CondTest = cond.IsAlwaysBool
 
@@ -296,6 +291,7 @@ function While (NilTrackerFn)
 
 function If (NilTrackerFn)
 	opt norefcounts
+	target debug: if msg != @tmp
 	|| cond = msg.first!,  || arg1 = cond.next!
 	|| Else = arg1.next!,  || arg2 = else.first!
 	|| Always = cond.IsAlwaysBool
@@ -327,6 +323,11 @@ function If (NilTrackerFn)
 
 function Tern (Niltrackerfn)
 	opt norefcounts
+	test &=~ NilCheckMode.Disappears
+	msg = msg.second!
+//	if msg.tmptype == ASMtmp.kTern
+//		return tern(prms, test)
+
 	|| Orig = T.BranchEnter(msg)			#require
 	|| tC = msg.first!,  || tA = tC.next!,  || tB = tA.next!
 
@@ -486,6 +487,10 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 	return msg.Redundantvar(dcl, test)
 
 
+function StatExpr (Niltrackerfn)
+	opt norefcounts
+	return argument(msg.first, test)
+ 
 
 function Argument (Niltrackerfn)
 	opt norefcounts
@@ -587,12 +592,14 @@ function SetRel (NilTrackerfn)
 
 
 function Fail (NilTrackerFn)
+	target debug: if msg != @tmp
 	.OldPrint = error.autoprint 
 	error.AutoPrint = 0
 	return nilstate.borked
 
 
 function Debugger (NilTrackerFn)
+	target debug: if msg != @tmp
 	// do nothing :)
 
 

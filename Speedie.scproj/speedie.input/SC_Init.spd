@@ -171,9 +171,25 @@ function Message.InitRootDecl (|Message| before, |SCNode| name_space, |bool|) {
 			NewDefault = decl.WriteTypeCast(NewDefault)
 			NewDefault.Obj = nil // just keep doing what it used to do
 	
-	if NewDefault != "nil"
-		before.Prev = NewRel( «thg .name », NewDefault, "=" )
+	if newdefault
+		if !newdefault.IsNilOrZero and !(options.modepack and decl.islib)
+			before.Prev = NewRel( «thg .name », NewDefault, "=" )
 	Return true
 }
 
+
+function message.IsNilOrZero (|bool|)
+	opt norefcounts
+	|| f = .func
+	|| n = .name
+	if f == @thg
+		if .obj == typenil or FalseBool
+			return true
+		//target debug
+		if n == "nil" or "false" // what?
+	if f == @num
+		return .iszero
+	if f == @arg
+		return !.hasany
+		
 

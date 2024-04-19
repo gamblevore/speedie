@@ -34,8 +34,8 @@ module PackMaker
 
 	function SortAll
 		opt norefcounts
-		|| FnInit = compiler.ExportNames["JB_Init_"]|scfunction|
-		|| FnMain = compiler.ExportNames["JB_Main"]|scfunction|
+		|| FnInit = compiler.xfunc("JB_Init_")
+		|| FnMain = compiler.xfunc("JB_Main")
 		require fninit and fnmain
 		
 		fninit.tableid = 0 // put init and main first!
@@ -64,8 +64,11 @@ module PackMaker
 
 	function MakePack 
 		|| pack = jbin(@tmp, "xpd")
+		pack.enter
 		.MakePackSub(pack)
-		Compiler.ProductFile.SmartData = pack
+		|| str = pack.getresult
+		Compiler.ProductFile.SmartData = str
+		//printline str.parse
 	
 	
 	helper MakePackSub (|jbin| j)
@@ -82,7 +85,7 @@ module PackMaker
 			if result != 9000
 		
 		|| GlobSize = TreeAssembler.VacuumPack(upon)
-		j.add(@num, GlobSize)
+		j.addint(GlobSize)
 		j.enter
 
 
@@ -101,14 +104,13 @@ module PackMaker
 		
 		j.tmp("strs")
 		for s in StringCorrector.list
-			if !s.length // hmmm we dont want this
 			j.add(@str, s)
 		j.exit(2)
 
 
-		j.tmp("clss")
+		j.enter(@tmp, "clss")
 		typeobject!.PackClassChildren(j)
-		j.exit(2)
+		j.exit
 		
 		
 		j.tmp("link")
@@ -117,24 +119,32 @@ module PackMaker
 		j.exit(2)
 
 
-	function SCClass.PackClassChildren (|jbin| j, |int|)
+	function SCClass.HasPackChildren (|bool|)
 		opt norefcounts
 		for c in .children
-			if !c.isrole
-				if !rz
-					j.enter
-				c.packexport(j)
-				rz++
-		if rz
-			j.exit
-	
-	
-	function SCClass.PackExport (|jbin| j, |int|)
+			if !c.isrole and !c.isstdlib
+				return true
+			if c.HasPackChildren
+				return true
+
+	function SCClass.PackClassChildren (|jbin| j)
 		opt norefcounts
+		require .HasPackChildren
+		j.enter
+		for c in .children
+			if !c.isrole
+				c.packexport(j)
+		j.exit
+	
+	
+	function SCClass.PackExport (|jbin| j)
+		opt norefcounts
+		require .HasPackChildren or !.isstdlib
+
 		j.enter(@tmp, .name)
 		if !.IsSTDLib
 			.DescribeInPack(j)
-		rz = .PackClassChildren(j)
+		.PackClassChildren(j)
 		j.exit
 		
 		
@@ -207,3 +217,8 @@ struct LibEntry
 then we just return a LibPack* from C++.
 
 Then exec can just... use the table directly, as it is already sorted. :)    */
+
+
+function printfunc (|string| s)
+	|| fn = compiler.xfunc(s)
+		printline fn

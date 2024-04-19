@@ -1,10 +1,9 @@
 
-// empty
 
 helper asm_test_add (|int| a, |int| b, |int|)
 	cpp_name asm_test_sub
 	visible
-	return (a + b) - (a / b)
+	return ((a + b) / 2)  - ((a / b) * 2)
 
 
 helper asm_test_func (|int| a, |int| b, |int|)

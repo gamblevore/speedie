@@ -147,7 +147,7 @@ function Tran_Using (TranFunc)
 		node.name = "if"
 		node.first <~ (@thg, "true")
 	  else
-		SC_MakeComment(node)
+		node.MakeComment
 
 
 function Tran_Array (|Message| S, |SCNode| name_space) {
@@ -624,7 +624,7 @@ function Tran_ForStart (|Message| arg, |Message| index, |SCNode| p)
 	
 	arg.First = IfTest
 	IfTest.Next!.Move( start, iftest.last )
-	SC_MakeComment(start)
+	start.MakeComment
 
 
 function Tran_Syx (|Message| msg, |Message|)
@@ -653,33 +653,29 @@ function Tran_Syx (|Message| msg, |Message|)
 
 	expect ( OldName.Length <= 4 )  ( msg, "Name too long (max=4)" )
 	
-	|| DotNew = «dot "StdNew"
-		«thg "syntax"»
-		«prm
-			«dot name.name
-				«thg "Message"»
-				«emb »
-			»
-			«str OldName.lowercase »
-			«str Name2 »
-		»
-	»
+	|message| DotNew
+	if !Options.ModePack
+		dotnew = @dot + "StdNew"
+		dotnew <~ (@thg, "syntax")
+		|| prm = dotnew.msg(@prm)
+		|| dot2 = prm.msg(@dot, name.name)
+		dot2 <~ (@thg, "Message")
+		dot2 <~ @emb
+		prm <~ OldName.lowercase
+		prm <~ Name2
 
 	|| ArgPlace = msg.Ancestor(@Arg).Ancestor(@Arg)
 	|| dcl		= MakeDecl( "syntax", SyxName, DotNew )
 	ArgPlace <~ dcl
 
-	|| fn_msg = «func
-		«thg "syntax"»
-		«prm
-			«thg "api"»
-		»
-	»
+	|| fn_msg = @func.msg
+	fn_msg <~ (@thg, "syntax")
+	fn_msg.msg(@prm) <~ (@thg, "api")
 
-	dcl.first!.replacewith(fn_msg)
+	dcl.first!.ReplaceWith(fn_msg)
 
 	Compiler.SyxArray <~ OldName
-	Compiler.program.Collectone( dcl, true )
+	Compiler.program.CollectOne( dcl, true )
 	
 	Return msg
 

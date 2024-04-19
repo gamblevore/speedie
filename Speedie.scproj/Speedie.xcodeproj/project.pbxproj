@@ -543,7 +543,7 @@
 		};
 		AC85018B299FF9AE00B63E29 /* speedie builder */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--self --nocolor --x --target=speedie --nocompile";
+			buildArgumentsString = "--self --nocolor --x --target=speedie --nocompile --targetdebug";
 			buildConfigurationList = AC85018C299FF9AE00B63E29 /* Build configuration list for PBXLegacyTarget "speedie builder" */;
 			buildPhases = (
 			);

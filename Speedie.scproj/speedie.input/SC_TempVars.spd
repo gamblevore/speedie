@@ -28,7 +28,7 @@ function Message.CreateOwnBlock (|Message?|)
 
 
 function message.StatementExpr (assigns:|scarg| arg)
-	.TmpType = asmtmp.kStatementExpression
+	.TmpType = asmtmp.kStatExpr
 	arg.IsStatementExpr = true
 
 

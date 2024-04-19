@@ -64,7 +64,7 @@ linkage
 |String|					_Projects
 |String|					_SpeedieProj
 |File|						TempFolder
-|SCFile|					InternalFile = SCFile.new(nil, SCImport.new(nil, true))
+|SCFile|					InternalFile = SCFile.new(nil, SCImport(nil, true))
 |string|					ProjectName
 |string|					ReportedName
 |scimport|					Project
@@ -502,7 +502,7 @@ function ImportAll
 	scfunction.currfunc = nil
 
 
-	|| fn = .exportnames["JB_App__Quit"]|scfunction|
+	|| fn = .XFunc("JB_App__Quit")
 		fn.iskiller = true
 	
 
@@ -674,6 +674,18 @@ function LoadRefFunc (|String| name, |SCFunction|)
 	|| o = .FindFunction(name)
 		(o is Reffer)
 		return o
+
+		
+function XFunc (|string| name, |message| m=nil, |SCFunction|)
+	opt norefcounts
+	|| fn = .ExportNames[name]
+	if fn isa scfunction
+		return fn
+	if m
+		if fn
+			error (m, "This isn't a function")
+		  else
+			error (m, "Can't find this function")
 
 
 function FindFunction (|string| Name, |SCFunction|)

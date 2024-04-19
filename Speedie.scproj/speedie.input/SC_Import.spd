@@ -268,7 +268,7 @@ class SCImport
 			|| old = Compiler.ImportedNames[fpl]
 				return old
 			
-			rz = SCImport.new(f, builtin)
+			rz = SCImport(f, builtin)
 			Compiler.ImportedList <~ rz
 			rz.Depth = ImportDepth
 			Compiler.ImportedNames[fpl] = rz

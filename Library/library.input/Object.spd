@@ -150,9 +150,6 @@ struct ClassData
 	function Layer (|MemoryLayer|)
 		cpp_Wrapper JB_Class_Layer
 
-	function CurrLayer (|MemoryLayer|)
-		return .layer
-
 	function DefaultLayer (|MemoryLayer|)
 		cpp_Wrapper JB_Class_DefaultLayer
 
