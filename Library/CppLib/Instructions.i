@@ -145,6 +145,8 @@
 	u1 = mem(int);
 ı RD8U: _
 	u1 = mem(u64);
+ı RD16: _
+	u1 = mem(u64);
 ı ST1U: _
 	mem(uint8) = u1;
 ı ST2U: _
@@ -153,6 +155,8 @@
 	//  xcode only complains about this one? ?
 
 	mem(u32) = (u32) u1;
+ı ST16: _
+	mem(ivec4) = (ivec4) u1;
 ı ST8U: _
 	mem(u64) = u1;
 ı CNTC: _

@@ -11,7 +11,8 @@ struct ASMFuncState // why not just be a subclass of memory?
 	|uint|						MaxLength
 	|bool|						OK       
 	|byte|						LabelCount
-	|uint64|					UsedRegs // could use 256 bits really... would be better for opts
+	
+	|uint64|					UsedRegs  // can allocate > 31... then optimise down :)
 	|uint64[32]|				TrueBits 
 	|uint64[32]|				FalseBits
 	|uint|						AnyTrue	 
@@ -26,15 +27,15 @@ struct ASMFuncState // why not just be a subclass of memory?
 		return .start + .Written-1
 	
 	
+	
 	function AddASM (|int| SM, |message| dbg, |int| a, |int| b=0, |int| c=0, |int| d=0, |&IR|)
 		pragma inline,  opt norefcounts
-		rz = .RequestOp(sm)
+		rz = self <~ (sm, dbg)
 		rz.r[0] = a
 		rz.r[1] = b
 		rz.r[2] = c
 		rz.r[3] = d
-		rz.debug = dbg
-		if platform.isdebug
+		target debug
 			rz.print
 
 
@@ -42,14 +43,16 @@ struct ASMFuncState // why not just be a subclass of memory?
 		pragma inline
 		|| B = 1<<31
 		expect !(Bits&B) (err)
-		.RequestOp(asm.extended).rest = bits ||| B
+		bits |= b
+		(self <~ (asm.extended, err)).rest = bits
 		
 
-	function RequestOp (|uint| code, |&IR|)
+	syntax append (|uint| code, |message| dbg, |&IR|)
 		cpp_part RequestOp
 		if .Written < .MaxLength
 			|| P = .Start + .Written++
 			P.op = code
+			p.debug = dbg
 			return p
 		if .OK
 			error "ASM is out of memory."
@@ -126,13 +129,14 @@ struct ASMFuncState // why not just be a subclass of memory?
 
 	function FuncPrms (|message| pr, |int| Remain, |uint| Bits, |Message|)
 		opt norefcounts
+		|| fn = pr.parent!
 		while pr
 			|| reg = .µ2(pr)
 			pr++
 			Remain -= 5
 			Bits |= reg.reg << Remain
 			loop Remain >= 5
-		.addextended(pr, Bits)
+		.addextended(fn, Bits)
 		return pr
 
 
@@ -208,10 +212,3 @@ function ASMFuncState.FinishASM
 
 
 function @fn_asm.Default (fn_asm)
-
-
-function @fn_asm.InitTable
-	require !fn_asm_table[0]
-	for i in 64
-		fn_asm_table[i] := &fn_asm.default
-			

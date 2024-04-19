@@ -25,56 +25,12 @@ dispatch fn_asm_table (fn_asm)
 		.closevars(OV)
 
 
-	@thg:
-		opt norefcounts
-									// what if this is a constant?
-		|| d = exp.fastDecl
-		if d is local
-			if !d.dreg.reg // what?
-			// Only setrel uses .isset. SetRel never calls local regs.
-			// So we don't need to copy registers HERE.
-			return d.dreg
-		
-		if d is const				// we want a number, really
-			debugger
-
-		// only setvar will try to set anything...
-		// however... if it finds either side has a register... it won't come here (for that side)
-		// so we won't ever get something like setting a (specified) register from a global.
-		// meaning... we wont get "set" except TO a global
-		// so we will be reading a global... and putting it somewhere
-		// probably into a reg... but lets make sure we have one.
-		// register 0 is a real register. how do we tell that apart from "unused"?
-		// hmmmmm... We could refer to it as register 1... which isnt great
-		// or have a different way to refer to "unused register". probably the second.
-		
-		// what if our "reg" is a setreg... and we are setting from reg 0. 0 is a valid register.
-		// many things might want to read from a register?
-		if reg.isset
-			// Setting global to 'Reg'.  If reg is 0... explicitly clear mem.
-		  else
-			require !reg.isdiscard
-			reg = .NeedSomewhere(exp, reg)
-			.AddASM(asm.RD1U, exp, 0)
-			// now put that global into the reg!
-
-/*
-RD1U
-RD1S
-RD2U
-RD2S
-RD4U
-RD4S
-RD8U
-*/
+	@thg: ASMTmp.Thg
 
 
 	@bra:
 		opt norefcounts
-		|| f = exp.first
-			if f.func != @arg
-				return .µ(f, reg)
-			return ASMtmp.StateExpr(self, f)
+		return .µ(exp.first!, reg)
 
 	@sheb: ASMtmp.Ignore
 		
@@ -130,31 +86,6 @@ RD8U
 
 
 datatype ASMtmp (uint16)
-	module {
-function StateExpr		(fn_asm): debugger
-function Debugger		(fn_asm): debugger
-function Continue		(fn_asm): debugger
-function Exit			(fn_asm): debugger
-function SetRel			(fn_asm): debugger
-function StatExpr		(fn_asm): debugger
-function Tern			(fn_asm): debugger
-function If				(fn_asm): debugger
-function Rejoin			(fn_asm): debugger
-function While			(fn_asm): debugger
-
-function Ignore			(fn_asm)
-function Unexpected		(fn_asm)
-	"Bad asmtmp"
-	debugger
-
-function Return			(fn_asm)
-	opt norefcounts
-	|| f = exp.first
-		rz = .µ(f)
-	.AddASM(asm.RET, exp, rz)
-	
-}
-	
 	syntax is (|asmtmp| t, |bool|)
 		return self == t
 
@@ -186,3 +117,69 @@ function Message.ASMType (assigns:|ASMTmp|)
 	value = (.FLAGS &~ 63) ||| value
 	.FLAGS = value 
 
+
+extend_module ASMtmp {
+
+|asm_mem[10]| ReadASM
+|asm_mem[5]| WriteASM
+
+
+function StateExpr		(fn_asm): debugger
+function Debugger		(fn_asm): debugger
+function Continue		(fn_asm): debugger
+function Exit			(fn_asm): debugger
+function SetRel			(fn_asm): debugger
+function StatExpr		(fn_asm): debugger
+function Tern			(fn_asm): debugger
+function If				(fn_asm): debugger
+function Rejoin			(fn_asm): debugger
+function While			(fn_asm): debugger
+
+function Ignore			(fn_asm)
+function Unexpected		(fn_asm)
+	"Bad asmtmp"
+	debugger
+
+function Return			(fn_asm)
+	opt norefcounts
+	|| f = exp.first
+		rz = .µ(f)
+	.AddASM(asm.RET, exp, rz)
+
+
+function Thg (fn_asm)
+	opt norefcounts
+								// what if this is a constant?
+	|| d = exp.fastDecl
+	if d is local
+		if !d.dreg.reg			// what?
+		return d.dreg			// we don't copy registers HERE, but in SetRel
+	
+	if d is const				// we want a number, really
+		debugger
+// might be nice to store that value somewhere... on the decl. So we don't reparse it each time!
+//		if !.TrySmallConst(reg, value, orig): .AddASM(asm.setn, exp, reg)
+
+	if reg.isset
+		return SetGlobal(self, exp, reg)
+	if !reg.isdiscard
+		return ReadGlobal(self, exp, reg)
+
+
+
+function SetGlobal (fn_asm)
+
+
+
+function ReadGlobal (fn_asm)
+	reg = .NeedSomewhere(exp, reg)
+	.AddASM(asm.RD1U, exp, reg)
+
+// Now put that global into the reg!
+// need to look at how the mem() function works...
+// also need a table of ASM per bit-size
+// SIMDs will need a simd reader ASM...
+// i think just a RD16 is enough?
+
+}
+	

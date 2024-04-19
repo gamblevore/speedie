@@ -258,6 +258,8 @@ RD4S  (mem)
 	u1 = mem(int)
 RD8U  (mem)
 	u1 = mem(u64)
+RD16  (mem)
+	u1 = mem(u64)
 ST1U  (mem)
 	mem(uint8) = u1
 ST2U  (mem)
@@ -265,9 +267,11 @@ ST2U  (mem)
 ST4U  (mem)
 	#! xcode only complains about this one? ?
 	mem(u32) = (u32)u1
+ST16  (mem)
+	mem(ivec4) = (ivec4)u1		// wait... u1 only contins 64 bits... we need 128.
 ST8U  (mem)
 	mem(u64) = u1
-CNTC  (CNTC)				// aWESOME  JOBBBBBBBBBBB BROOOOOO LOLLLLLLL ::DDDDDD
+CNTC  (CNTC)					// aWESOME  JOBBBBBBBBBBB BROOOOOO LOLLLLLLL ::DDDDDD
 	CountConst(r, Op)
 MEMM  ("rrnl")
 	#! copy/fill/endian/xor

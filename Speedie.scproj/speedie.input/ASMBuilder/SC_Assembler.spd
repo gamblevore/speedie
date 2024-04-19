@@ -34,7 +34,19 @@ module TreeAssembler
 	
 	function InitAll
 		instruction.instructionInit
-		fn_asm.InitTable
+		|| R = &ASMtmp.ReadASM[0]
+		|| W = &ASMtmp.WriteASM[0]
+		*R++ = ASM.RD1U, *W++ = ASM.ST1U
+		*R++ = ASM.RD1S, *W++ = ASM.ST2U
+		*R++ = ASM.RD2U, *W++ = ASM.ST4U
+		*R++ = ASM.RD2S, *W++ = ASM.ST8U
+		*R++ = ASM.RD4U, *W++ = ASM.ST16
+		*R++ = ASM.RD4S
+		*R++ = ASM.RD8U
+		*R++ = ASM.RD8U
+		*R++ = ASM.RD16
+		*R++ = ASM.RD16
+		
 		Instruction[asm.SET1]!.Const
 		Instruction[asm.SETK]!.Const
 		Instruction[asm.SETN]!.Const
@@ -60,8 +72,6 @@ module TreeAssembler
 		
 	function VacuumPack (|[scfunction]| list, |int|)
 		opt norefcounts
-		fn_asm.InitTable
-
 		require platform.IsDebug
 		.stdstate.TotalInit
 		

@@ -66,7 +66,7 @@ extend AsmFuncState
 		if op.IsSetConst
 			return .SetConst(list, m)
 		
-		|| A = .RequestOp(op.opcode)
+		|| A = self <~ (op.opcode, m)
 		|| write = 0
 		for p in list
 			if p != @name

@@ -2000,3 +2000,5 @@
 "JB_Init_"
 "JB_Main"
 "Bad asmtmp"
+"RD16"
+"ST16"
