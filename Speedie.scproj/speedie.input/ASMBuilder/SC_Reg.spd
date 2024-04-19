@@ -1,38 +1,46 @@
 
 
 
-prototype fn_asm (|&ASMFuncState|self, |message| exp, |AsmReg| Reg=0.reg,  |AsmReg|)
+prototype fn_asm (|&ASMFuncState| self, |message| exp, |AsmReg| Reg=0.reg, |AsmReg|)
 
-struct AsmReg 
-	default nil
+datatype AsmReg (DataTypeCode) 
 	linkage
-		datatype true
 		cpp_part Reg
-	|DataTypeCode|		AType
-	|byte|				Reg
+	
+	function µType (|DataTypeCode|)
+		return self & 255
+	function µType (assigns:|DataTypeCode|, |asmreg|)
+		return (self & ~255) ||| value
+		
+	function IsSet (|bool|)
+		return (self & 4) // nice
 
+	function IsDiscard (|bool|)
+		return .reg >= 64
+
+	function MakeSet (|bool|)
+		return self ||| 4
+	
+	function Reg (|int|)
+		return self >> 8
+	
+	function Reg (assigns:|int|, |AsmReg|)
+		return .µtype ||| (value << 8)
 	
 	syntax cast (|bool|)
-		return self and (.AType != Datatypecode.UnusedType)
-	
+		return (.µType != Datatypecode.UnusedType)
 	
 	syntax cast (|int|)
 		cpp_part ToInt
 		return .reg
 	
-	
-	function int.Reg (|asmreg|)
-		rz.Atype = DataTypeCode.int64 // not really needed?
-		rz.reg = self
-
-	
-	function Sametype (|AsmReg| t, |message| err, |bool|)
-		|| T1 = .AType
-		|| t2 = t.AType
+	function SameType (|AsmReg| t, |message| err, |bool|)
+		|| T1 = .µType
+		|| t2 = t.µType
 		// what about a < b with diferent types?
 		// i guess speedie should sort that out on the C-level...
 		return ((t2 == t1) or  (t1.IsInt and t2.IsInt)) #expect (err, "Type-mismatch")
 
 
-
-
+function int.Reg (|asmreg|)
+	rz.reg = self

@@ -21,13 +21,13 @@ extend AsmFuncState
 	function TrySmallConst (|uint| reg,  |int64| Value, |message| where, |bool|)
 		|| set1_test = (value|int|<<12)>>12 // u1 takes 12 bits for stuff
 		if set1_test == value
-			.AddASM(where, asm.set1, reg).rest = set1_test
+			.AddASM(asm.set1, where, reg).rest = set1_test
 			return true
 
 		|| R = (~Value|uint64|).LongestBitStretch	// longest false-stretch
 		if r.x >= 50		// OK so we have the longest stretch in r.x
 			value = value rotl 63-r.y
-			.AddASM(where, asm.setk, reg, r.y).rest = value|int|
+			.AddASM(asm.setk, where, reg, r.y).rest = value|int|
 			return true
 
 
@@ -39,7 +39,7 @@ extend AsmFuncState
 
 		if !.TrySmallConst(reg, value, orig)
 			debugat
-			.AddASM(orig, asm.setn, reg)
+			.AddASM(asm.setn, orig, reg)
 		return true
 	
 	

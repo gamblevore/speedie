@@ -19,13 +19,14 @@ struct ASMFuncState // why not just be a subclass of memory?
 	function AddFuncParams (|scfunction| fn)
 		opt norefcounts
 		for a in fn.Args
-			.AllocReg(a.Source, a, 0.reg)
+			a.dreg = .NeedSomewhere(nil, a.RegType)
+
 
 	function Last (|&IR|)
 		return .start + .Written-1
 	
 	
-	function AddASM (|message| dbg, |int| SM, |int| a, |int| b=0, |int| c=0, |int| d=0, |&IR|)
+	function AddASM (|int| SM, |message| dbg, |int| a, |int| b=0, |int| c=0, |int| d=0, |&IR|)
 		pragma inline,  opt norefcounts
 		rz = .RequestOp(sm)
 		rz.r[0] = a
@@ -43,29 +44,29 @@ struct ASMFuncState // why not just be a subclass of memory?
 		expect !(Bits&B) (err)
 		.RequestOp(asm.extended).rest = bits ||| B
 		
-	
-	function RequestOp (|uint| Code, |&IR|)
-		cpp_part RequestOp2, pragma inline
-		rz = .RequestOp
-		rz.op = code
 
-	function RequestOp (|&IR|)
+	function RequestOp (|uint| code, |&IR|)
 		cpp_part RequestOp
 		if .Written < .MaxLength
-			return .Start + .Written++
+			|| P = .Start + .Written++
+			P.op = code
+			return p
 		if .OK
 			error "ASM is out of memory."
 			.OK = false
 		return ASMFuncState.Dummy
 	
 	
-	function NeedSomewhere (|Message| err, |&asmreg| dest, |DataTypeCode| T) // .needreg
-		require !dest.reg
-		|| B = (~.UsedRegs).LowestBit
-		check (B) (err, "No free registers.")
+	function RegAlloc (|Message| err, |DataTypeCode| T, |int|) // .needreg
+		|| B = (~.UsedRegs).LowestBit			#check (err, "No free registers.")
 		.UsedRegs |= B
-		dest.reg = B.log2
-		dest.aType = T
+		return b.log2
+	
+	
+	function NeedSomeWhere (|Message| err, |asmreg| T, |asmreg|) // .needreg
+		if !t.reg
+			T.reg = .RegAlloc(err, t)
+		return t
 
 	function OpenVars (|uint64|)
 		rz = .UsedRegs
@@ -80,8 +81,15 @@ struct ASMFuncState // why not just be a subclass of memory?
 
 	function µ (|message| exp,  |AsmReg| reg = 0.reg, |AsmReg|)
 		opt norefcounts
+		pragma inline
 		cpp_part Reg
-		return (exp.ASMFunc)(self, exp, reg)
+		|| T = exp.ASMType
+		|| fn = fn_asm_table[T]!
+		target debug
+			if !T
+				fn = fn_asm_table[exp.func|int|]!
+				debugger
+		return (fn)(self, exp, reg)
 
 
 	function µ2 (|message| exp, |AsmReg|)
@@ -111,19 +119,11 @@ struct ASMFuncState // why not just be a subclass of memory?
 		|| Dest = .AllocReg(L)$
 		|| result = .µ( r, dest )$
 
-		if !Dest.aType.IsPointer
+		if !Dest.µType.IsPointer
 			return result						// x = a+b
 		return .WriteReg(Dest, result)			// str.fld = a+b
 
 
-	function AllocReg   (|message| exp, |scdecl| decl, |asmreg| R,  |AsmReg|)
-		cpp_Part AllocRegDecl
-// what if "@thg:" calling this is a global?
-// Also, do we need R?
-		.NeedSomewhere(exp, &decl.DReg, decl.RegType)
-		return decl.DReg
-	
-	
 	function FuncPrms (|message| pr, |int| Remain, |uint| Bits, |Message|)
 		opt norefcounts
 		while pr
@@ -140,8 +140,9 @@ struct ASMFuncState // why not just be a subclass of memory?
 		opt norefcounts
 		|| fn = prms.asfunc					#debug_require
 
-		.NeedSomeWhere(prms, &dest, fn.RegType)
-		.AddASM(prms.parent!, asm.fnc, 0).rest = fn.TableId
+		dest = .NeedSomeWhere(prms, dest)
+		dest.µtype = fn.RegType
+		.AddASM(asm.fnc, prms.parent!, 0).rest = fn.TableId
 
 		|| OV     = .OpenVars
 		|| Bits   = Dest.reg<<25 ||| ov.log2<<20					// 6+5 bits, 20 left.
@@ -166,7 +167,9 @@ struct ASMFuncState // why not just be a subclass of memory?
 		.CloseVars(OV)			// allow overwriting either!
 		require ml.reg ||| mr.reg
 		
-		.NeedSomewhere(op, dest, ml.atype)
+		if !dest.reg
+			dest = .NeedSomewhere(op, ml.µtype)
+		// assignment conversion needs to be done also.
 		|| scop = op.obj|scoperator|
 			|| fn = scop.ASM
 				return (fn)(self, dest, ml, mr, op)
@@ -177,15 +180,6 @@ struct ASMFuncState // why not just be a subclass of memory?
 		|IR[]|					JSMSpace = IR[0]!
 		
 
-function message.ASMFunc (|fn_asm|)
-	|| ASM = .ASMType
-	asm := .func|int|
-	rz = fn_asm_table[asm]!
-	target debug
-		if !rz?
-			return rz!
-
-
 function ASMFuncState.TotalInit 
 	opt norefcounts
 	|| j = ASMFuncState.JSMSpace
@@ -193,7 +187,7 @@ function ASMFuncState.TotalInit
 	.maxlength = j.Capacity
 	.start = j.ptr
 	.Written = 0
-	.AddASM(compiler.InternalFile.ast!, asm.RET, 0)
+	.AddASM(asm.RET, compiler.InternalFile.ast!, 0)
 
 
 function ASMFuncState.InitState (|scfunction| fn)
@@ -210,7 +204,7 @@ function ASMFuncState.FinishASM
 	opt norefcounts
 	.out.length += .written
 	ifn .last isa asm.ret
-		.AddASM(.fn.source!, asm.RET, 0)
+		.AddASM(asm.RET, .fn.source!, 0)
 
 
 function @fn_asm.Default (fn_asm)

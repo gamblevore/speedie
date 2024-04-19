@@ -110,7 +110,6 @@ struct ArchonPurger
 		expect (N < 31)								(D, "Too many declarations")
 		.decls[n] = d
 		d.NilReg = N * d.TypeSuffers			
-		d.DReg.Reg = n								// right? might as well do this at the same time?
 		d.NilAllocDepth = .NestDepth
 		|| P = (.Neel)|&nilrecorder|
 		(p)(n) = nd

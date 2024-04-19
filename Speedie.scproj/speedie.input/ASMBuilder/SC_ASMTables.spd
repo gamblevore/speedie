@@ -4,8 +4,9 @@ dispatch fn_asm_table (fn_asm)
 	@arg:
 		opt norefcounts
 		|| OV = .openvars
+		|| DiscardResult = 128.reg
 		for ch.fast in exp
-			.µ(ch, 0.reg)
+			.µ(ch, DiscardResult)
 		.closevars(OV)
 
 
@@ -26,13 +27,46 @@ dispatch fn_asm_table (fn_asm)
 
 	@thg:
 		opt norefcounts
-		// what if this is a constant?
-		|| d = exp.AsDecl #debug_require
-		if d is const // we want a number, really
-		|| r = d.DReg
-		if r.reg
-			return r
-		return .AllocReg(exp, d, reg)
+									// what if this is a constant?
+		|| d = exp.fastDecl
+		if d is local
+			if !d.dreg.reg // what?
+			// Only setrel uses .isset. SetRel never calls local regs.
+			// So we don't need to copy registers HERE.
+			return d.dreg
+		
+		if d is const				// we want a number, really
+			debugger
+
+		// only setvar will try to set anything...
+		// however... if it finds either side has a register... it won't come here (for that side)
+		// so we won't ever get something like setting a (specified) register from a global.
+		// meaning... we wont get "set" except TO a global
+		// so we will be reading a global... and putting it somewhere
+		// probably into a reg... but lets make sure we have one.
+		// register 0 is a real register. how do we tell that apart from "unused"?
+		// hmmmmm... We could refer to it as register 1... which isnt great
+		// or have a different way to refer to "unused register". probably the second.
+		
+		// what if our "reg" is a setreg... and we are setting from reg 0. 0 is a valid register.
+		// many things might want to read from a register?
+		if reg.isset
+			// Setting global to 'Reg'.  If reg is 0... explicitly clear mem.
+		  else
+			require !reg.isdiscard
+			reg = .NeedSomewhere(exp, reg)
+			.AddASM(asm.RD1U, exp, 0)
+			// now put that global into the reg!
+
+/*
+RD1U
+RD1S
+RD2U
+RD2S
+RD4U
+RD4S
+RD8U
+*/
 
 
 	@bra:
@@ -104,11 +138,11 @@ function Exit			(fn_asm): debugger
 function SetRel			(fn_asm): debugger
 function StatExpr		(fn_asm): debugger
 function Tern			(fn_asm): debugger
-function Ignore			(fn_asm): debugger
 function If				(fn_asm): debugger
 function Rejoin			(fn_asm): debugger
 function While			(fn_asm): debugger
 
+function Ignore			(fn_asm)
 function Unexpected		(fn_asm)
 	"Bad asmtmp"
 	debugger
@@ -117,7 +151,7 @@ function Return			(fn_asm)
 	opt norefcounts
 	|| f = exp.first
 		rz = .µ(f)
-	.AddASM(exp, asm.RET, rz)
+	.AddASM(asm.RET, exp, rz)
 	
 }
 	

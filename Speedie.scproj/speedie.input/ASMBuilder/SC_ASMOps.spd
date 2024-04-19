@@ -9,71 +9,71 @@ module asmOps
 	function Plus	(fn_opasm)
 		// what about the type? i think we just figure iout.
 		debugger
-		.AddASM(dbg, asm.ADD, dest, L, R, 0)
+		.AddASM(asm.ADD, dbg, dest, L, R, 0)
 		return dest
 		
 	function Equals (fn_opasm)
 		debugger
-		.AddASM(dbg, asm.CMPE, L, R, 1, 0)
+		.AddASM(asm.CMPE, dbg, L, R, 1, 0)
 		return dest
 	function NotEq	(fn_opasm)
 		debugger
-		.AddASM(dbg, asm.CMPN, L, R, 1, 0)
+		.AddASM(asm.CMPN, dbg, L, R, 1, 0)
 		return dest
 	function Less	(fn_opasm)
 		debugger
-		.AddASM(dbg, asm.CMPI, L, R, 0, 1)
+		.AddASM(asm.CMPI, dbg, L, R, 0, 1)
 		return dest
 	function LessEq (fn_opasm)
 		debugger
-		.AddASM(dbg, asm.CMPI, L, R, 0, 1)
+		.AddASM(asm.CMPI, dbg, L, R, 0, 1)
 		return dest
 	function More	(fn_opasm)
 		debugger
-		.AddASM(dbg, asm.CMPI, L, R, 0, 1)
+		.AddASM(asm.CMPI, dbg, L, R, 0, 1)
 		return dest
 	function MoreEq (fn_opasm)
 		debugger
-		.AddASM(dbg, asm.CMPI, L, R, 0, 1)
+		.AddASM(asm.CMPI, dbg, L, R, 0, 1)
 		return dest
 	function Mod	(fn_opasm)
 		debugger
-		.AddASM(dbg, asm.div, dest, 31, L, R)
+		.AddASM(asm.div, dbg, dest, 31, L, R)
 		return dest
 	function Div	(fn_opasm)
 		debugger 
-		.AddASM(dbg, asm.div, 31, dest, L, R)
+		.AddASM(asm.div, dbg, 31, dest, L, R)
 		return dest
 	function Minus	(fn_opasm)
 		debugger
-		.AddASM(dbg, asm.SUB, dest, L, R, 0)
+		.AddASM(asm.SUB, dbg, dest, L, R, 0)
 		return dest
 	function Mul	(fn_opasm)
-		.AddASM(dbg, asm.MUL, dest, L, R, 0)
+		.AddASM(asm.MUL, dbg, dest, L, R, 0)
 		return dest
 	function BitAnd (fn_opasm)
-		.AddASM(dbg, asm.BAND, dest, L, R, 0)
+		.AddASM(asm.BAND, dbg, dest, L, R, 0)
 		return dest
 	function BitXor (fn_opasm)
-		.AddASM(dbg, asm.Bxor, dest, L, R, 0)
+		.AddASM(asm.Bxor, dbg, dest, L, R, 0)
 		return dest
 	function BitOr	(fn_opasm)
-		.AddASM(dbg, asm.bor, dest, L, R, 0)
+		.AddASM(asm.bor, dbg, dest, L, R, 0)
 		return dest
 	function ROL	(fn_opasm)
-		.AddASM(dbg, asm.brol, dest, L, R, 0)
+		.AddASM(asm.brol, dbg, dest, L, R, 0)
 		return dest
 	function ROR	(fn_opasm)
-		.AddASM(dbg, asm.bror, dest, L, R, 0)
+		.AddASM(asm.bror, dbg, dest, L, R, 0)
 		return dest
 	function SHR	(fn_opasm)
-		.AddASM(dbg, asm.SHRU, dest, L, R, 0)
+		.AddASM(asm.SHRU, dbg, dest, L, R, 0)
 		return dest
 	function SHL	(fn_opasm)
-		.AddASM(dbg, asm.SHLS, dest, L, R, 0)
+		.AddASM(asm.SHLS, dbg, dest, L, R, 0)
 		return dest
 	function Assign	(fn_opasm)
-		.AddASM(dbg, asm.bor, L, R)
+		.AddASM(asm.bor, dbg, L, R)
 		return dest
 
 //module asmOps // dummy

@@ -79,7 +79,6 @@ module TreeAssembler
 			|| R = 0.reg
 			|| A = fn.SourceArg!
 			|| ST = TreeAssembler.StdState
-			debugger
 			(fp)(ST, A, R)
 		.StdState.FinishASM
 

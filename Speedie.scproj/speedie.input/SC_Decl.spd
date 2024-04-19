@@ -1075,3 +1075,13 @@ function scdecl.ByteSize (|int|)
 		n *= .C_Array
 	return N
 
+/*
+
+datatype IntObjectID (uint)
+	
+function object.operatorisa (|IntObjectID| i, |bool|)
+	return .objectid == i
+function int.id (|IntObjectID|)
+	return self|IntObjectID|
+NO
+*/
