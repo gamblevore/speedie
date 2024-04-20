@@ -11,12 +11,9 @@ forms
 
 	Func ...	// func: fnc:
 		Mode		2
+		ENTR		6
+		SaveRegs	5		// SIMD	
 		JUMP		j
-	/*
-	FuncOld ...
-		ENTR		6		// dest
-		SaveRegs	5		// simd
-	*/
 	
 	Cmp		// cmp:
 		r1		r
@@ -25,7 +22,6 @@ forms
 	CmpEq	// cmpeq:
 		r1		r
 		r2		r
-		bytes	2
 		Jmp		j
 
 	Const	// const:
@@ -62,7 +58,7 @@ forms
 		r2		r
 		up		6
 		down	6
-		sign	3
+		sign	2
 
 	SWAP
 		A		6
@@ -72,7 +68,7 @@ forms
 
 
 // this file:
-// 1) builds the c++ vm
+// 1) builds the c++ codes, and the jump-table, and the ASM accessor functions
 // 2) builds the instruction-info speedie uses exec can just include this file too.
 // 3) builds the µforms
 
@@ -80,11 +76,7 @@ forms
 #!						 (((((STOP)))))
 EROR (U1)
 	debugger
-	return -1
-
-
-HALT (U1) // merge these two? don't need 16M codes just to stop
-	return u1
+	return u1+U1_Lu
 
 
 #!						 (((((FUNC)))))
@@ -92,8 +84,8 @@ STCK (U1)
 	r[-1] += u1 + U1_Lu
 
 SWAP (Swap)
-	std_swap(r[swap_A], r[swap_B])
-	std_swap(r[swap_C], r[swap_D])
+	std_swap(r[SWAP_Au], r[SWAP_Bu])
+	std_swap(r[SWAP_Cu], r[SWAP_Du])
 
 FNC  (Func)
 	__
@@ -259,18 +251,19 @@ RD4S  (mem)
 RD8U  (mem)
 	u1 = mem(u64)
 RD16  (mem)
-	u1 = mem(u64)
-ST1U  (mem)
+	((ivec4*)r)[n1] = mem(ivec4)
+WR1U  (mem)
 	mem(uint8) = u1
-ST2U  (mem)
+WR2U  (mem)
 	mem(u16) = u1
-ST4U  (mem)
+WR4U  (mem)
 	#! xcode only complains about this one? ?
 	mem(u32) = (u32)u1
-ST16  (mem)
-	mem(ivec4) = (ivec4)u1		// wait... u1 only contins 64 bits... we need 128.
-ST8U  (mem)
+WR8U  (mem)
 	mem(u64) = u1
+WR16  (mem)
+	mem(ivec4) = (ivec4)(((ivec4*)r)[n1])
+
 CNTC  (CNTC)					// aWESOME  JOBBBBBBBBBBB BROOOOOO LOLLLLLLL ::DDDDDD
 	CountConst(r, Op)
 MEMM  ("rrnl")

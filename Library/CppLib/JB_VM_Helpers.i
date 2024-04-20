@@ -45,7 +45,7 @@ AlwaysInline void divmath(s64* r, ASM Op) {
 
 AlwaysInline void loadconst(s64* r, ASM Op, ASM* Code) {
 	u32 Cond  = Setn_Condu;
-	u32 Count = Setn_RCntu+1;
+	u32 Count = Setn_lenu+1;
 	u32 Back  = Setn_Lu+1;
 	
 	u64* Read = ((u64*)Code)-Back;
@@ -129,7 +129,7 @@ AlwaysInline uint bitstats32(s64* r, ASM Op) {
 AlwaysInline JB_Object* alloc(void* o) {
 	// we need a class table, and look it up from there.
 	// we don't have dynamicly created classes anyhow...
-	return JB_AllocFrom(((JB_MemoryLayer*)o)->CurrBlock);
+	return JB_AllocNew(((JB_MemoryLayer*)o)->CurrBlock);
 }
 
 
@@ -262,15 +262,13 @@ AlwaysInline ASM* CompF(s64* r, ASM Op, ASM* Code) {
 }
 
 AlwaysInline ASM* CompEq(s64* r, ASM Op, ASM* Code) {
-	uint Shift = 64-(8<<CmpEq_bytesu);	// 0, 32, 48, 56  <-- 64, 32, 16, 8
-	if (!((u1 xor u2)<<Shift))
+	if (!(u1 xor u2))
 		return Code;
 	return Code + CmpEq_Jmpi;
 }
 
 AlwaysInline ASM* CompNeq(s64* r, ASM Op, ASM* Code) {
-	uint Shift = 64-(8<<CmpEq_bytesu);
-	if ( ((u1 xor u2)<<Shift))
+	if (u1 xor u2)
 		return Code;
 	return Code + CmpEq_Jmpi;
 }
@@ -346,7 +344,7 @@ AlwaysInline ASM* Return (s64*& r, ASM* Code, ASM Op) {
 #define RegCpy(n)    case n: Dest[n] = Src[Regs.R##n]
 AlwaysInline ASM* BumpStack (s64*& Src, ASM* Code, ASM j) { // jumpstack 
 	BasicRegs2	Regs = *((BasicRegs2*)Code); 
-	auto		N    = Func_RegsToSendu_(j.Raw);
+	auto		N    = 0;//Func_RegsToSendu_(j.Raw);
 	s64*		Dest = Src+Func_SaveRegsu_(j.Raw)+1;
 	*(u64*)Dest		 = (u64)(Code-1); // return point
 	Dest++;
@@ -383,7 +381,7 @@ AlwaysInline u64 ForeignFuncSimple(s64* r, ASM*& Code, ASM Op) {
 	auto j = *Oof;
 	Code = (ASM*)Oof;
 	Goto Fn = (Goto*)r[0]; // it was the register pointer... but needs fix now
-	switch (Func_RegsToSendu) {
+	switch (8/*Func_RegsToSendu*/) {
 	default:
 		FFISub(8 , (r[j.R1], r[j.R2], r[j.R3], r[j.R4], r[j.R5], r[j.R6], r[j.R7], r[j.R8]));
 		FFISub(7 , (r[j.R1], r[j.R2], r[j.R3], r[j.R4], r[j.R5], r[j.R6], r[j.R7]));

@@ -1,5 +1,6 @@
 
 typedef const void* Goto;
+#define std_swap std::swap
 
 // // // // // // // // // // // //  
 

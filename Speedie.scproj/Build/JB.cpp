@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2005];
+extern JB_StringC* JB_LUB[2004];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -2028,7 +2028,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1227], (112299028551911));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1227], (112304766344083));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3286,7 +3286,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1954]);
-	JB_FS_AppendInt32(_fsf0, (2024041918));
+	JB_FS_AppendInt32(_fsf0, (2024042018));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7778,7 +7778,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[925]);
-	JB_FS_AppendInt32(_fsf0, (2024041918));
+	JB_FS_AppendInt32(_fsf0, (2024042018));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8303,15 +8303,15 @@ void SC_TreeAssembler__InitAll() {
 	ASM_Mem* R = (&SC__ASMtmp_ReadASM[0]);
 	ASM_Mem* W = (&SC__ASMtmp_WriteASM[0]);
 	(*R++) = kSC__ASM_RD1U;
-	(*W++) = kSC__ASM_ST1U;
+	(*W++) = kSC__ASM_WR1U;
 	(*R++) = kSC__ASM_RD1S;
-	(*W++) = kSC__ASM_ST2U;
+	(*W++) = kSC__ASM_WR2U;
 	(*R++) = kSC__ASM_RD2U;
-	(*W++) = kSC__ASM_ST4U;
+	(*W++) = kSC__ASM_WR4U;
 	(*R++) = kSC__ASM_RD2S;
-	(*W++) = kSC__ASM_ST8U;
+	(*W++) = kSC__ASM_WR8U;
 	(*R++) = kSC__ASM_RD4U;
-	(*W++) = kSC__ASM_ST16;
+	(*W++) = kSC__ASM_WR16;
 	(*R++) = kSC__ASM_RD4S;
 	(*R++) = kSC__ASM_RD8U;
 	(*R++) = kSC__ASM_RD8U;
@@ -8595,7 +8595,7 @@ int SC_VM_Builder__GenAcc(Message* Line, int Bit_pos, int Pname) {
 			JB_Msg_SyntaxExpect(F, JB_LUB[1322]);
 			return 0;
 		}
-		if (N > 25) {
+		if (N > 24) {
 			JB_Msg_SyntaxExpect(F, JB_Str_OperatorPlus(JB_LUB[1309], JB_int_RenderFS(N, nil)));
 			return 0;
 		}
@@ -8606,7 +8606,7 @@ int SC_VM_Builder__GenAcc(Message* Line, int Bit_pos, int Pname) {
 	Message* Fnc_src = JB_Macro_Run(SC__Macros_ASMSetter, Arr);
 	JB_FreeIfDead(SC_Func__NewFunc(Fnc_src, nil, Line));
 	SC_VM_Builder__FillTypePrm(Lname, Pname);
-	if (((Bit_pos + N) > 32) or (N > 25)) {
+	if (((Bit_pos + N) > 32) or (N > 24)) {
 		if (true) {
 			JB_Msg_SyntaxExpect(SC__VM_Builder_dt_prm, JB_LUB[1322]);
 		}
@@ -8642,7 +8642,7 @@ void SC_VM_Builder__GenerateOne(Message* Form_msg, int F) {
 	xC2xB5Form* Frm = SC_VM_Builder__AddForm(Form_msg);
 	JB_SetRef(SC__VM_Builder_dt_prm, SC_VM_Builder__DataTypeCreate(Form_msg, F));
 	JB_SetRef(SC__VM_Builder_parent, Form_msg->Name);
-	int Bit_pos = 7;
+	int Bit_pos = 8;
 	int P = 0;
 	Message* Arg = JB_Msg_NeedSyxInt(Form_msg, JB_SyxArg, -1);
 	if ((!Arg)) {
@@ -15492,7 +15492,7 @@ ASM SC_ASM_BFLD_downSet(ASM Self, uint Value) {
 }
 
 ASM SC_ASM_BFLD_signSet(ASM Self, uint Value) {
-	return Self | ((Value << 29) >> 29);
+	return Self | ((Value << 30) >> 29);
 }
 
 ASM SC_ASM_BFLD_upSet(ASM Self, uint Value) {
@@ -15515,12 +15515,8 @@ ASM SC_ASM_Cmp_LSet(ASM Self, uint Value) {
 	return Self | ((Value << 21) >> 21);
 }
 
-ASM SC_ASM_CmpEq_bytesSet(ASM Self, uint Value) {
-	return Self | ((Value << 30) >> 17);
-}
-
 ASM SC_ASM_CmpEq_JmpSet(ASM Self, uint Value) {
-	return Self | ((Value << 19) >> 19);
+	return Self | ((Value << 17) >> 17);
 }
 
 ASM SC_ASM_CNTC_cnstSet(ASM Self, uint Value) {
@@ -15555,12 +15551,20 @@ ASM SC_ASM_Const_rotSet(ASM Self, uint Value) {
 	return Self | ((Value << 26) >> 12);
 }
 
+ASM SC_ASM_Func_ENTRSet(ASM Self, uint Value) {
+	return Self | ((Value << 26) >> 9);
+}
+
 ASM SC_ASM_Func_JUMPSet(ASM Self, uint Value) {
-	return Self | ((Value << 9) >> 9);
+	return Self | ((Value << 20) >> 20);
 }
 
 ASM SC_ASM_Func_ModeSet(ASM Self, uint Value) {
 	return Self | ((Value << 30) >> 7);
+}
+
+ASM SC_ASM_Func_SaveRegsSet(ASM Self, uint Value) {
+	return Self | ((Value << 27) >> 15);
 }
 
 ASM SC_ASM_Mem_incrSet(ASM Self, uint Value) {
@@ -16675,8 +16679,7 @@ ASM JB_ASM_CmpEq__Encode(IR* Self) {
 	Rz = (Self->Op << 25);
 	Rz = SC_ASM_R1Set(Rz, Self->r[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->r[1]);
-	Rz = SC_ASM_CmpEq_bytesSet(Rz, Self->r[2]);
-	Rz = SC_ASM_CmpEq_JmpSet(Rz, Self->r[3]);
+	Rz = SC_ASM_CmpEq_JmpSet(Rz, Self->r[2]);
 	return Rz;
 }
 
@@ -16697,7 +16700,9 @@ ASM JB_ASM_Func__Encode(IR* Self) {
 	//visible;
 	Rz = (Self->Op << 25);
 	Rz = SC_ASM_Func_ModeSet(Rz, Self->r[0]);
-	Rz = SC_ASM_Func_JUMPSet(Rz, Self->r[1]);
+	Rz = SC_ASM_Func_ENTRSet(Rz, Self->r[1]);
+	Rz = SC_ASM_Func_SaveRegsSet(Rz, Self->r[2]);
+	Rz = SC_ASM_Func_JUMPSet(Rz, Self->r[3]);
 	return Rz;
 }
 
@@ -22605,67 +22610,66 @@ int SC_Instruction__InitCode_() {
 void SC_Instruction__InstructionInit() {
 	//;
 	SC_Instruction__Add(JB_LUB[511], JB_LUB[831], 0);
-	SC_Instruction__Add(JB_LUB[511], JB_LUB[900], 1);
-	SC_Instruction__Add(JB_LUB[511], JB_LUB[1198], 2);
-	SC_Instruction__Add(JB_LUB[1975], JB_LUB[1201], 3);
-	SC_Instruction__Add(JB_LUB[1901], JB_LUB[1160], 4);
-	SC_Instruction__Add(JB_LUB[1741], JB_LUB[981], 5);
-	SC_Instruction__Add(JB_LUB[1748], JB_LUB[1161], 6);
-	SC_Instruction__Add(JB_LUB[512], JB_LUB[1152], 7);
-	SC_Instruction__Add(JB_LUB[513], JB_LUB[686], 8);
-	SC_Instruction__Add(JB_LUB[1907], JB_LUB[1188], 9);
-	SC_Instruction__Add(JB_LUB[1559], JB_LUB[1189], 10);
-	SC_Instruction__Add(JB_LUB[1905], JB_LUB[609], 11);
-	SC_Instruction__Add(JB_LUB[513], JB_LUB[608], 12);
-	SC_Instruction__Add(JB_LUB[513], JB_LUB[1199], 13);
-	SC_Instruction__Add(JB_LUB[514], JB_LUB[1003], 14);
-	SC_Instruction__Add(JB_LUB[514], JB_LUB[804], 15);
-	SC_Instruction__Add(JB_LUB[513], JB_LUB[1192], 16);
-	SC_Instruction__Add(JB_LUB[513], JB_LUB[1193], 17);
-	SC_Instruction__Add(JB_LUB[513], JB_LUB[1191], 18);
-	SC_Instruction__Add(JB_LUB[513], JB_LUB[643], 19);
-	SC_Instruction__Add(JB_LUB[513], JB_LUB[647], 20);
-	SC_Instruction__Add(JB_LUB[513], JB_LUB[652], 21);
-	SC_Instruction__Add(JB_LUB[512], JB_LUB[646], 22);
-	SC_Instruction__Add(JB_LUB[1514], JB_LUB[644], 23);
-	SC_Instruction__Add(JB_LUB[1514], JB_LUB[645], 24);
-	SC_Instruction__Add(JB_LUB[513], JB_LUB[650], 25);
-	SC_Instruction__Add(JB_LUB[513], JB_LUB[651], 26);
-	SC_Instruction__Add(JB_LUB[1548], JB_LUB[683], 27);
-	SC_Instruction__Add(JB_LUB[1548], JB_LUB[682], 28);
-	SC_Instruction__Add(JB_LUB[1549], JB_LUB[681], 29);
-	SC_Instruction__Add(JB_LUB[1549], JB_LUB[684], 30);
-	SC_Instruction__Add(JB_LUB[1523], JB_LUB[648], 31);
-	SC_Instruction__Add(JB_LUB[1559], JB_LUB[649], 32);
-	SC_Instruction__Add(JB_LUB[1904], JB_LUB[984], 33);
-	SC_Instruction__Add(JB_LUB[1904], JB_LUB[983], 34);
-	SC_Instruction__Add(JB_LUB[1906], JB_LUB[1162], 35);
-	SC_Instruction__Add(JB_LUB[514], JB_LUB[1163], 36);
-	SC_Instruction__Add(JB_LUB[512], JB_LUB[1151], 37);
-	SC_Instruction__Add(JB_LUB[1782], JB_LUB[1154], 38);
-	SC_Instruction__Add(JB_LUB[1782], JB_LUB[1153], 39);
-	SC_Instruction__Add(JB_LUB[1782], JB_LUB[1156], 40);
-	SC_Instruction__Add(JB_LUB[1782], JB_LUB[1155], 41);
-	SC_Instruction__Add(JB_LUB[1782], JB_LUB[1158], 42);
-	SC_Instruction__Add(JB_LUB[1782], JB_LUB[1157], 43);
-	SC_Instruction__Add(JB_LUB[1782], JB_LUB[1159], 44);
-	SC_Instruction__Add(JB_LUB[1782], JB_LUB[2003], 45);
+	SC_Instruction__Add(JB_LUB[511], JB_LUB[1198], 1);
+	SC_Instruction__Add(JB_LUB[1975], JB_LUB[1201], 2);
+	SC_Instruction__Add(JB_LUB[1901], JB_LUB[1160], 3);
+	SC_Instruction__Add(JB_LUB[1741], JB_LUB[981], 4);
+	SC_Instruction__Add(JB_LUB[1748], JB_LUB[1161], 5);
+	SC_Instruction__Add(JB_LUB[512], JB_LUB[1152], 6);
+	SC_Instruction__Add(JB_LUB[513], JB_LUB[686], 7);
+	SC_Instruction__Add(JB_LUB[1907], JB_LUB[1188], 8);
+	SC_Instruction__Add(JB_LUB[1559], JB_LUB[1189], 9);
+	SC_Instruction__Add(JB_LUB[1905], JB_LUB[609], 10);
+	SC_Instruction__Add(JB_LUB[513], JB_LUB[608], 11);
+	SC_Instruction__Add(JB_LUB[513], JB_LUB[1199], 12);
+	SC_Instruction__Add(JB_LUB[514], JB_LUB[1003], 13);
+	SC_Instruction__Add(JB_LUB[514], JB_LUB[804], 14);
+	SC_Instruction__Add(JB_LUB[513], JB_LUB[1192], 15);
+	SC_Instruction__Add(JB_LUB[513], JB_LUB[1193], 16);
+	SC_Instruction__Add(JB_LUB[513], JB_LUB[1191], 17);
+	SC_Instruction__Add(JB_LUB[513], JB_LUB[643], 18);
+	SC_Instruction__Add(JB_LUB[513], JB_LUB[647], 19);
+	SC_Instruction__Add(JB_LUB[513], JB_LUB[652], 20);
+	SC_Instruction__Add(JB_LUB[512], JB_LUB[646], 21);
+	SC_Instruction__Add(JB_LUB[1514], JB_LUB[644], 22);
+	SC_Instruction__Add(JB_LUB[1514], JB_LUB[645], 23);
+	SC_Instruction__Add(JB_LUB[513], JB_LUB[650], 24);
+	SC_Instruction__Add(JB_LUB[513], JB_LUB[651], 25);
+	SC_Instruction__Add(JB_LUB[1548], JB_LUB[683], 26);
+	SC_Instruction__Add(JB_LUB[1548], JB_LUB[682], 27);
+	SC_Instruction__Add(JB_LUB[1549], JB_LUB[681], 28);
+	SC_Instruction__Add(JB_LUB[1549], JB_LUB[684], 29);
+	SC_Instruction__Add(JB_LUB[1523], JB_LUB[648], 30);
+	SC_Instruction__Add(JB_LUB[1559], JB_LUB[649], 31);
+	SC_Instruction__Add(JB_LUB[1904], JB_LUB[984], 32);
+	SC_Instruction__Add(JB_LUB[1904], JB_LUB[983], 33);
+	SC_Instruction__Add(JB_LUB[1906], JB_LUB[1162], 34);
+	SC_Instruction__Add(JB_LUB[514], JB_LUB[1163], 35);
+	SC_Instruction__Add(JB_LUB[512], JB_LUB[1151], 36);
+	SC_Instruction__Add(JB_LUB[1782], JB_LUB[1154], 37);
+	SC_Instruction__Add(JB_LUB[1782], JB_LUB[1153], 38);
+	SC_Instruction__Add(JB_LUB[1782], JB_LUB[1156], 39);
+	SC_Instruction__Add(JB_LUB[1782], JB_LUB[1155], 40);
+	SC_Instruction__Add(JB_LUB[1782], JB_LUB[1158], 41);
+	SC_Instruction__Add(JB_LUB[1782], JB_LUB[1157], 42);
+	SC_Instruction__Add(JB_LUB[1782], JB_LUB[1159], 43);
+	SC_Instruction__Add(JB_LUB[1782], JB_LUB[2003], 44);
+	SC_Instruction__Add(JB_LUB[1782], JB_LUB[900], 45);
 	SC_Instruction__Add(JB_LUB[1782], JB_LUB[1194], 46);
 	SC_Instruction__Add(JB_LUB[1782], JB_LUB[1195], 47);
 	SC_Instruction__Add(JB_LUB[1782], JB_LUB[1196], 48);
-	SC_Instruction__Add(JB_LUB[1782], JB_LUB[2004], 49);
-	SC_Instruction__Add(JB_LUB[1782], JB_LUB[1197], 50);
-	SC_Instruction__Add(JB_LUB[1551], JB_LUB[685], 51);
-	SC_Instruction__Add(JB_LUB[1905], JB_LUB[1002], 52);
-	SC_Instruction__Add(JB_LUB[513], JB_LUB[862], 53);
-	SC_Instruction__Add(JB_LUB[513], JB_LUB[868], 54);
-	SC_Instruction__Add(JB_LUB[514], JB_LUB[864], 55);
-	SC_Instruction__Add(JB_LUB[513], JB_LUB[863], 56);
-	SC_Instruction__Add(JB_LUB[513], JB_LUB[802], 57);
-	SC_Instruction__Add(JB_LUB[513], JB_LUB[806], 58);
-	SC_Instruction__Add(JB_LUB[514], JB_LUB[805], 59);
-	SC_Instruction__Add(JB_LUB[513], JB_LUB[803], 60);
-	SC_Instruction__Add(JB_LUB[511], JB_LUB[1119], 61);
+	SC_Instruction__Add(JB_LUB[1782], JB_LUB[1197], 49);
+	SC_Instruction__Add(JB_LUB[1551], JB_LUB[685], 50);
+	SC_Instruction__Add(JB_LUB[1905], JB_LUB[1002], 51);
+	SC_Instruction__Add(JB_LUB[513], JB_LUB[862], 52);
+	SC_Instruction__Add(JB_LUB[513], JB_LUB[868], 53);
+	SC_Instruction__Add(JB_LUB[514], JB_LUB[864], 54);
+	SC_Instruction__Add(JB_LUB[513], JB_LUB[863], 55);
+	SC_Instruction__Add(JB_LUB[513], JB_LUB[802], 56);
+	SC_Instruction__Add(JB_LUB[513], JB_LUB[806], 57);
+	SC_Instruction__Add(JB_LUB[514], JB_LUB[805], 58);
+	SC_Instruction__Add(JB_LUB[513], JB_LUB[803], 59);
+	SC_Instruction__Add(JB_LUB[511], JB_LUB[1119], 60);
 	SC_Instruction__Add(JB_LUB[1670], JB_LUB[865], 112);
 	SC_Instruction__Add(JB_LUB[1670], JB_LUB[866], 113);
 	SC_Instruction__Add(JB_LUB[1938], JB_LUB[1190], 114);
@@ -48135,4 +48139,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 4909456680377285646 -6366839975780577716
+// 2434631928025347157 -6417807697733598683

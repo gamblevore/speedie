@@ -25,7 +25,7 @@ Later:
 #include "JB_VM.h"
 
 extern "C" {
-#if 0
+#if 1
 #include "JB_VM_Helpers.i"
 
 

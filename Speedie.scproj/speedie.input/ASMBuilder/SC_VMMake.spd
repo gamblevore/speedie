@@ -54,7 +54,7 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int|)
 		if f0.isint
 			n = f.int
 		expect (n >= 1)  (f, "Too many total bits")
-		expect (n <= 25) (f, "Too large field. 25 bits max, found: " + n.render)
+		expect (n <= 24) (f, "Too large field. 24 bits max, found: " + n.render)
 		lname = "_" + line.name 
 	
 	lname = .parent + lname
@@ -64,12 +64,12 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int|)
 	
 	.FillTypePrm(lname, pname)
 	
-	if  bit_pos+n > 32  or  n > 25  // bad
+	if  bit_pos+n > 32  or  n > 24  // bad
 		error (.dt_prm, "Too many total bits")
 	return n+bit_pos
 
 
-function DataTypeModule
+function DataTypeModule 
 	opt norefcounts
 	|| module = "extend_module ASM:constants:"~parse
 	compiler <~ module
@@ -123,7 +123,7 @@ function GenerateOne (|message| form_msg, |int| f)
 	|| frm = .AddForm(form_msg)
 	.dt_prm = .DataTypeCreate(form_msg, f)
 	.parent = form_msg.name
-	|| bit_pos = 7
+	|| bit_pos = 8
 	|| p    = 0
 	|| arg  = form_msg[@arg,-1]							#require
 	if arg.prev == "..."

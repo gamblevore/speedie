@@ -1,15 +1,13 @@
 	// 						 (((((STOP)))))
 ı EROR: _
 	debugger;
-	return -1;
-ı HALT: _
-	return u1;
+	return u1 + U1_Lu;
 	// 						 (((((FUNC)))))
 ı STCK: _
 	r[-1] += u1 + U1_Lu;
 ı SWAP: _
-	std_swap(r[swap_A], r[swap_B]);
-	std_swap(r[swap_C], r[swap_D]);
+	std_swap(r[SWAP_Au], r[SWAP_Bu]);
+	std_swap(r[SWAP_Cu], r[SWAP_Du]);
 ı RET: 
 	__;
 	Code = Return(r, Code, Op);
@@ -146,19 +144,19 @@
 ı RD8U: _
 	u1 = mem(u64);
 ı RD16: _
-	u1 = mem(u64);
-ı ST1U: _
+	((ivec4 *) r)[n1] = mem(ivec4);
+ı WR1U: _
 	mem(uint8) = u1;
-ı ST2U: _
+ı WR2U: _
 	mem(u16) = u1;
-ı ST4U: _
+ı WR4U: _
 	//  xcode only complains about this one? ?
 
 	mem(u32) = (u32) u1;
-ı ST16: _
-	mem(ivec4) = (ivec4) u1;
-ı ST8U: _
+ı WR8U: _
 	mem(u64) = u1;
+ı WR16: _
+	mem(ivec4) = (ivec4)(((ivec4 *) r)[n1]);
 ı CNTC: _
 	CountConst(r, Op);
 ı MEMM: _
