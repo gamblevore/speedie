@@ -1783,14 +1783,14 @@ extern Random JB__zalgo_R;
 #define kSC__ASM_DIV (14)
 #define kSC__ASM_DMUL (58)
 #define kSC__ASM_DSUB (57)
-extern ASM_Encoder2 SC__ASM_Encoders[128];
+extern ASM_Encoder2 SC__ASM_Encoders[256];
 #define kSC__ASM_EROR (0)
 #define kSC__ASM_Extended (255)
 #define kSC__ASM_FADD (52)
 #define kSC__ASM_FDIV (55)
 #define kSC__ASM_FMUL (54)
-#define kSC__ASM_FNC (112)
-#define kSC__ASM_FNCX (113)
+#define kSC__ASM_FNC (240)
+#define kSC__ASM_FNCX (241)
 extern ASM_Encoder2 SC__ASM_Forms[32];
 #define kSC__ASM_FSUB (53)
 #define kSC__ASM_Jump (32)
@@ -1822,7 +1822,7 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_RSET (35)
 #define kSC__ASM_SET1 (8)
 #define kSC__ASM_SETK (9)
-#define kSC__ASM_SETN (114)
+#define kSC__ASM_SETN (242)
 #define kSC__ASM_SHLS (17)
 #define kSC__ASM_SHRS (15)
 #define kSC__ASM_SHRU (16)
@@ -2195,7 +2195,7 @@ extern CompressionStats JB__Flow_Stats;
 #define kSC__Instruction_kTypeConst (2)
 #define kSC__Instruction_kTypeFunc (1)
 extern Dictionary* SC__Instruction_TypeDict;
-extern Instruction* SC__Instruction_TypeList[128];
+extern Instruction* SC__Instruction_TypeList[256];
 extern Array* JB__Macro_TmpPrms_;
 extern uint64 JB__Mrap_MDummy_[2];
 extern NilTest* SC__NilTest_n0;
@@ -4178,8 +4178,6 @@ ASM SC_ASM_SWAP_BSet(ASM Self, uint Value);
 ASM SC_ASM_SWAP_CSet(ASM Self, uint Value);
 
 ASM SC_ASM_SWAP_DSet(ASM Self, uint Value);
-
-ASM SC_ASM_SWAP_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_U0_LSet(ASM Self, uint Value);
 

@@ -339,7 +339,7 @@ JB_String* JB__Tk_Data;
 FP_fnIDGenerator JB__Tk_Splitter;
 MessagePosition JB__Tk_Using;
 Random JB__zalgo_R;
-ASM_Encoder2 SC__ASM_Encoders[128];
+ASM_Encoder2 SC__ASM_Encoders[256];
 ASM_Encoder2 SC__ASM_Forms[32];
 byte SC__ASM_NoisyASM;
 ASM_Mem SC__ASMtmp_ReadASM[10];
@@ -433,7 +433,7 @@ FlowControl_Behaviour FlowControl_FuncTable_ = InitTableFlowControl_();
 JBClassPlace4(FlowControl, JB_AsClass(JB_Object), FlowControl_FuncTable_);
 
 Dictionary* SC__Instruction_TypeDict;
-Instruction* SC__Instruction_TypeList[128];
+Instruction* SC__Instruction_TypeList[256];
 Instruction_Behaviour InitTableInstruction_() { // Behaviour 
 	Instruction_Behaviour Result;
 	Result.__destructor__ = (void*)SC_Instruction_Destructor;

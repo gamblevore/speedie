@@ -2028,7 +2028,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1227], (112304766344083));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1227], (112304795564815));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -8672,7 +8672,7 @@ int SC_VM_Builder__Init_() {
 		JB_SetRef(SC__VM_Builder_NameList, JB_Array_Constructor0(nil));
 		JB_SetRef(SC__VM_Builder_form_h, JB_FS_Constructor(nil));
 		JB_SetRef(SC__VM_Builder_parent, JB_LUB[0]);
-		SC__VM_Builder_HighPos = 112;
+		SC__VM_Builder_HighPos = 240;
 	}
 	;
 	return 0;
@@ -8784,7 +8784,7 @@ void SC_VM_Builder__VMLine(Message* Line, FastString* Vm) {
 
 Array* SC_VM_Builder__VMSpd(Message* List) {
 	Array* Rz = ((Array*)JB_Array_Constructor0(nil));
-	JB_Array_AppendCount(Rz, JB_Syx_OperatorPlus(JB_SyxThg, JB_LUB[831]), 128);
+	JB_Array_AppendCount(Rz, JB_Syx_OperatorPlus(JB_SyxThg, JB_LUB[831]), 256);
 	{
 		Message* Ch = ((Message*)JB_Ring_First(List));
 		while (Ch) {
@@ -15488,91 +15488,91 @@ uint64 JB_uint64_LowestBit(uint64 Self) {
 
 
 ASM SC_ASM_BFLD_downSet(ASM Self, uint Value) {
-	return Self | ((Value << 26) >> 23);
+	return Self | ((Value << 26) >> 24);
 }
 
 ASM SC_ASM_BFLD_signSet(ASM Self, uint Value) {
-	return Self | ((Value << 30) >> 29);
+	return Self | ((Value << 30) >> 30);
 }
 
 ASM SC_ASM_BFLD_upSet(ASM Self, uint Value) {
-	return Self | ((Value << 26) >> 17);
+	return Self | ((Value << 26) >> 18);
 }
 
 ASM SC_ASM_Bra_c1Set(ASM Self, uint Value) {
-	return Self | ((Value << 30) >> 12);
+	return Self | ((Value << 30) >> 13);
 }
 
 ASM SC_ASM_Bra_jmpSet(ASM Self, uint Value) {
-	return Self | ((Value << 14) >> 14);
+	return Self | ((Value << 15) >> 15);
 }
 
 ASM SC_ASM_Cmp_CmpSet(ASM Self, uint Value) {
-	return Self | ((Value << 28) >> 17);
+	return Self | ((Value << 28) >> 18);
 }
 
 ASM SC_ASM_Cmp_LSet(ASM Self, uint Value) {
-	return Self | ((Value << 21) >> 21);
+	return Self | ((Value << 22) >> 22);
 }
 
 ASM SC_ASM_CmpEq_JmpSet(ASM Self, uint Value) {
-	return Self | ((Value << 17) >> 17);
-}
-
-ASM SC_ASM_CNTC_cnstSet(ASM Self, uint Value) {
-	return Self | ((Value << 24) >> 12);
-}
-
-ASM SC_ASM_CNTC_LSet(ASM Self, uint Value) {
-	return Self | ((Value << 22) >> 22);
-}
-
-ASM SC_ASM_CNTC_sizeSet(ASM Self, uint Value) {
-	return Self | ((Value << 30) >> 20);
-}
-
-ASM SC_ASM_CNTR_incrSet(ASM Self, uint Value) {
-	return Self | ((Value << 29) >> 17);
-}
-
-ASM SC_ASM_CNTR_LSet(ASM Self, uint Value) {
-	return Self | ((Value << 22) >> 22);
-}
-
-ASM SC_ASM_CNTR_sizeSet(ASM Self, uint Value) {
-	return Self | ((Value << 30) >> 20);
-}
-
-ASM SC_ASM_Const_LSet(ASM Self, uint Value) {
 	return Self | ((Value << 18) >> 18);
 }
 
+ASM SC_ASM_CNTC_cnstSet(ASM Self, uint Value) {
+	return Self | ((Value << 24) >> 13);
+}
+
+ASM SC_ASM_CNTC_LSet(ASM Self, uint Value) {
+	return Self | ((Value << 23) >> 23);
+}
+
+ASM SC_ASM_CNTC_sizeSet(ASM Self, uint Value) {
+	return Self | ((Value << 30) >> 21);
+}
+
+ASM SC_ASM_CNTR_incrSet(ASM Self, uint Value) {
+	return Self | ((Value << 29) >> 18);
+}
+
+ASM SC_ASM_CNTR_LSet(ASM Self, uint Value) {
+	return Self | ((Value << 23) >> 23);
+}
+
+ASM SC_ASM_CNTR_sizeSet(ASM Self, uint Value) {
+	return Self | ((Value << 30) >> 21);
+}
+
+ASM SC_ASM_Const_LSet(ASM Self, uint Value) {
+	return Self | ((Value << 19) >> 19);
+}
+
 ASM SC_ASM_Const_rotSet(ASM Self, uint Value) {
-	return Self | ((Value << 26) >> 12);
+	return Self | ((Value << 26) >> 13);
 }
 
 ASM SC_ASM_Func_ENTRSet(ASM Self, uint Value) {
-	return Self | ((Value << 26) >> 9);
+	return Self | ((Value << 26) >> 10);
 }
 
 ASM SC_ASM_Func_JUMPSet(ASM Self, uint Value) {
-	return Self | ((Value << 20) >> 20);
+	return Self | ((Value << 21) >> 21);
 }
 
 ASM SC_ASM_Func_ModeSet(ASM Self, uint Value) {
-	return Self | ((Value << 30) >> 7);
+	return Self | ((Value << 30) >> 8);
 }
 
 ASM SC_ASM_Func_SaveRegsSet(ASM Self, uint Value) {
-	return Self | ((Value << 27) >> 15);
+	return Self | ((Value << 27) >> 16);
 }
 
 ASM SC_ASM_Mem_incrSet(ASM Self, uint Value) {
-	return Self | ((Value << 30) >> 17);
+	return Self | ((Value << 30) >> 18);
 }
 
 ASM SC_ASM_Mem_LSet(ASM Self, uint Value) {
-	return Self | ((Value << 19) >> 19);
+	return Self | ((Value << 20) >> 20);
 }
 
 void ASMPrint(ASM Self) {
@@ -15596,59 +15596,55 @@ ASM SC_ASM_R4Set(ASM Self, uint Value) {
 }
 
 ASM SC_ASM_Setn_CondSet(ASM Self, uint Value) {
-	return Self | ((Value << 30) >> 14);
+	return Self | ((Value << 30) >> 15);
 }
 
 ASM SC_ASM_Setn_DestSet(ASM Self, uint Value) {
-	return Self | ((Value << 27) >> 9);
+	return Self | ((Value << 27) >> 10);
 }
 
 ASM SC_ASM_Setn_LSet(ASM Self, uint Value) {
-	return Self | ((Value << 16) >> 16);
-}
-
-ASM SC_ASM_Setn_lenSet(ASM Self, uint Value) {
-	return Self | ((Value << 30) >> 7);
-}
-
-ASM SC_ASM_SWAP_ASet(ASM Self, uint Value) {
-	return Self | ((Value << 26) >> 7);
-}
-
-ASM SC_ASM_SWAP_BSet(ASM Self, uint Value) {
-	return Self | ((Value << 26) >> 13);
-}
-
-ASM SC_ASM_SWAP_CSet(ASM Self, uint Value) {
-	return Self | ((Value << 26) >> 19);
-}
-
-ASM SC_ASM_SWAP_DSet(ASM Self, uint Value) {
-	return Self | ((Value << 26) >> 25);
-}
-
-ASM SC_ASM_SWAP_LSet(ASM Self, uint Value) {
-	return Self | ((Value << 31) >> 31);
-}
-
-ASM SC_ASM_U0_LSet(ASM Self, uint Value) {
-	return Self | ((Value << 7) >> 7);
-}
-
-ASM SC_ASM_U1_LSet(ASM Self, uint Value) {
-	return Self | ((Value << 12) >> 12);
-}
-
-ASM SC_ASM_U2_LSet(ASM Self, uint Value) {
 	return Self | ((Value << 17) >> 17);
 }
 
+ASM SC_ASM_Setn_lenSet(ASM Self, uint Value) {
+	return Self | ((Value << 30) >> 8);
+}
+
+ASM SC_ASM_SWAP_ASet(ASM Self, uint Value) {
+	return Self | ((Value << 26) >> 8);
+}
+
+ASM SC_ASM_SWAP_BSet(ASM Self, uint Value) {
+	return Self | ((Value << 26) >> 14);
+}
+
+ASM SC_ASM_SWAP_CSet(ASM Self, uint Value) {
+	return Self | ((Value << 26) >> 20);
+}
+
+ASM SC_ASM_SWAP_DSet(ASM Self, uint Value) {
+	return Self | ((Value << 26) >> 26);
+}
+
+ASM SC_ASM_U0_LSet(ASM Self, uint Value) {
+	return Self | ((Value << 8) >> 8);
+}
+
+ASM SC_ASM_U1_LSet(ASM Self, uint Value) {
+	return Self | ((Value << 13) >> 13);
+}
+
+ASM SC_ASM_U2_LSet(ASM Self, uint Value) {
+	return Self | ((Value << 18) >> 18);
+}
+
 ASM SC_ASM_U3_LSet(ASM Self, uint Value) {
-	return Self | ((Value << 22) >> 22);
+	return Self | ((Value << 23) >> 23);
 }
 
 ASM SC_ASM_U4_LSet(ASM Self, uint Value) {
-	return Self | ((Value << 27) >> 27);
+	return Self | ((Value << 28) >> 28);
 }
 
 void SC_ASM__Enc1() {
@@ -15679,7 +15675,7 @@ void SC_ASM__ListInstructions() {
 	int N = 0;
 	{
 		int Opcode = 0;
-		while (Opcode < 128) {
+		while (Opcode < 256) {
 			Instruction* Inst = SC__Instruction_TypeList[Opcode];
 			if (((bool)Inst) and ((!Opcode) or ((bool)Inst->OpCode))) {
 				JB_FS_AppendIntegerAsText(Fs, Opcode, 2);
@@ -16727,7 +16723,6 @@ ASM JB_ASM_SWAP__Encode(IR* Self) {
 	Rz = SC_ASM_SWAP_BSet(Rz, Self->r[1]);
 	Rz = SC_ASM_SWAP_CSet(Rz, Self->r[2]);
 	Rz = SC_ASM_SWAP_DSet(Rz, Self->r[3]);
-	Rz = SC_ASM_SWAP_LSet(Rz, Self->Rest);
 	return Rz;
 }
 
@@ -22670,9 +22665,9 @@ void SC_Instruction__InstructionInit() {
 	SC_Instruction__Add(JB_LUB[514], JB_LUB[805], 58);
 	SC_Instruction__Add(JB_LUB[513], JB_LUB[803], 59);
 	SC_Instruction__Add(JB_LUB[511], JB_LUB[1119], 60);
-	SC_Instruction__Add(JB_LUB[1670], JB_LUB[865], 112);
-	SC_Instruction__Add(JB_LUB[1670], JB_LUB[866], 113);
-	SC_Instruction__Add(JB_LUB[1938], JB_LUB[1190], 114);
+	SC_Instruction__Add(JB_LUB[1670], JB_LUB[865], 240);
+	SC_Instruction__Add(JB_LUB[1670], JB_LUB[866], 241);
+	SC_Instruction__Add(JB_LUB[1938], JB_LUB[1190], 242);
 }
 
 Instruction* SC_Instruction__SyntaxAccessWithMsg(Message* M) {
@@ -48139,4 +48134,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 2434631928025347157 -6417807697733598683
+// -5562929482866044299 -2395643704205806093
