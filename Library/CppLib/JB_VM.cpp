@@ -9,8 +9,7 @@ todo:
 	* FFI
 Limits:
 	* 16M instructions per-program
-	* 128 OpCodes 5x5 regs, more easily swappable
-	* 8+8 params max
+	* 256 OpCodes, and a few variable length opcodes
 	* r0 = 0
 	* can recursive vm->c->vm! 
 

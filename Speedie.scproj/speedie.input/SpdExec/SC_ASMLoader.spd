@@ -10,7 +10,7 @@ extend_module ASM
 		|| fs = faststring()
 		fs <~ "Opcodes:\n"
 		|| n = 0
-		for opcode in 128
+		for opcode in 256
 			|instruction--| inst = Instruction.typelist[opcode]
 			if inst and (!opcode or inst.opcode)
 				fs.AppendIntegerAsText(opcode, 2)

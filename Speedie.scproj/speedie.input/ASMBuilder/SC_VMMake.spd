@@ -13,7 +13,7 @@ module VM_Builder {
 |message|		dt_prm
 |string|		parent
 |byte|			NormalPos = 0
-|byte|			HighPos = 112
+|byte|			HighPos = 240
 
 
 function DefineGetSub (|string| fname,  |int| up,  |int| down, |byte| c, |byte| c2)
@@ -206,7 +206,7 @@ function Clean   (|message| msg)
 
 function VMSpd   (|message| list, |[message]|)
 	opt norefcounts
-	rz <~ (@thg+"EROR",  128)
+	rz <~ (@thg+"EROR",  256)
 	for ch in list
 		.VMTmp(ch, rz)
 

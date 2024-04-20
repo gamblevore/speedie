@@ -48,7 +48,7 @@ class Instruction // class instruction
 
 	module
 		|dictionary of instruction|			TypeDict = dictionary()
-		|instruction[128]|					TypeList
+		|instruction[256]|					TypeList
 
 		syntax access (|message| m, |instruction|)
 			opt norefcounts

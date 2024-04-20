@@ -30,8 +30,8 @@ datatype ASM (uint)
 	module
 		|byte|					NoisyASM = 1
 		|asm_encoder2[32]|		Forms
-		|asm_encoder2[128]| 	Encoders
-		|asm_decoder2[128]| 	Decoders
+		|asm_encoder2[256]| 	Encoders
+		|asm_decoder2[256]| 	Decoders
 
 
 prototype ASM_Decoder2  (|&IR| self, |asm| A)
