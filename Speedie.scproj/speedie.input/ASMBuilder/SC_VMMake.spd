@@ -41,30 +41,30 @@ function FillTypePrm (|string| fname, |int| pname)
 		.dt_prm <~ macros.ASMcopier.run(prop, pname.msg)
 
 
-function GenAcc (|message| line, |int| bit_pos, |int| pname, |int|)
+function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max,   |int|)
 	opt norefcounts
-	|| n = 32 - bit_pos
+	|| n = Max - bit_pos
 	|| lname = "_L"
 	if line
-		|| f = line.needfirst$
+		|| f = line.NeedFirst$
 		|| f0 = *f.name
 		if f0 == 'r'
 			.FillTypePrm(line.name, pname)
 			return 5+bit_pos
 		if f0.isint
 			n = f.int
-		expect (n >= 1)  (f, "Too many total bits")
-		expect (n <= 24) (f, "Too large field. 24 bits max, found: " + n.render)
+		expect (n >= 1)  (line, "Too many total bits")
+		expect (n <= (Max-8)) (line, "Too large field. Found: " + n.render)
 		lname = "_" + line.name 
 	
-	lname = .parent + lname
-	|| arr = .DefineGet(lname, 32-n, bit_pos, bit_pos+n==32)
+	lname = .Parent + lname
+	|| arr = .DefineGet(lname, Max-n, bit_pos, bit_pos+n==Max)
 	|| fnc_src = macros.ASMSetter.run(arr)
 	SCFunction.newfunc(fnc_src, nil, line)
 	
 	.FillTypePrm(lname, pname)
 	
-	if  bit_pos+n > 32  or  n > 24  // bad
+	if  (bit_pos+n) > Max  or  n > (Max-8)  // bad
 		error (.dt_prm, "Too many total bits")
 	return n+bit_pos
 
@@ -126,13 +126,15 @@ function GenerateOne (|message| form_msg, |int| f)
 	|| bit_pos = 8
 	|| p    = 0
 	|| arg  = form_msg[@arg,-1]							#require
+	|| Max = 32
 	if arg.prev == "..."
 		frm.Varies = true
+		Max = 64
 	for l in arg
-		bit_pos = .GenAcc(l, bit_pos, p++)
+		bit_pos = .GenAcc(l, bit_pos, p++, max)
 	
-	if bit_pos < 32 and p < 5
-		.GenAcc(nil, bit_pos, 5)
+	if bit_pos < max and p < 5
+		.GenAcc(nil, bit_pos, 5, max)
 	.form_h <~ '\n'
 
 	

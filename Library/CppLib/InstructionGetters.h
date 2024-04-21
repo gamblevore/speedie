@@ -34,20 +34,17 @@
 #define   U4_Lu_(x)   (((uint)((x)<<28))>>28)
 
 
-#define   Func_Modeu       (((uint)((Op.Raw)<<8))>>30)
-#define   Func_Modeu_(x)   (((uint)((x)<<8))>>30)
+#define   Func_Incru       (((uint)((Op.Raw)<<8))>>63)
+#define   Func_Incru_(x)   (((uint)((x)<<8))>>63)
 
-#define   Func_ENTRu       (((uint)((Op.Raw)<<10))>>26)
-#define   Func_ENTRu_(x)   (((uint)((x)<<10))>>26)
+#define   Func_SaveRegsu       (((uint)((Op.Raw)<<9))>>59)
+#define   Func_SaveRegsu_(x)   (((uint)((x)<<9))>>59)
 
-#define   Func_SaveRegsu       (((uint)((Op.Raw)<<16))>>27)
-#define   Func_SaveRegsu_(x)   (((uint)((x)<<16))>>27)
+#define   Func_JUMPi       ((( int)((Op.Raw)<<14))>>14)
+#define   Func_JUMPi_(x)   ((( int)((x)<<14))>>14)
 
-#define   Func_JUMPi       ((( int)((Op.Raw)<<21))>>21)
-#define   Func_JUMPi_(x)   ((( int)((x)<<21))>>21)
-
-#define   Func_JUMPu       (((uint)((Op.Raw)<<21))>>21)
-#define   Func_JUMPu_(x)   (((uint)((x)<<21))>>21)
+#define   Func_JUMPu       (((uint)((Op.Raw)<<14))>>14)
+#define   Func_JUMPu_(x)   (((uint)((x)<<14))>>14)
 
 
 #define   Cmp_Cmpu       (((uint)((Op.Raw)<<18))>>28)
@@ -97,14 +94,14 @@
 #define   Mem_Lu_(x)   (((uint)((x)<<20))>>20)
 
 
-#define   Setn_lenu       (((uint)((Op.Raw)<<8))>>30)
-#define   Setn_lenu_(x)   (((uint)((x)<<8))>>30)
+#define   Setn_lenu       (((uint)((Op.Raw)<<8))>>62)
+#define   Setn_lenu_(x)   (((uint)((x)<<8))>>62)
 
-#define   Setn_Destu       (((uint)((Op.Raw)<<10))>>27)
-#define   Setn_Destu_(x)   (((uint)((x)<<10))>>27)
+#define   Setn_Destu       (((uint)((Op.Raw)<<10))>>59)
+#define   Setn_Destu_(x)   (((uint)((x)<<10))>>59)
 
-#define   Setn_Condu       (((uint)((Op.Raw)<<15))>>30)
-#define   Setn_Condu_(x)   (((uint)((x)<<15))>>30)
+#define   Setn_Condu       (((uint)((Op.Raw)<<15))>>62)
+#define   Setn_Condu_(x)   (((uint)((x)<<15))>>62)
 
 #define   Setn_Li       ((( int)((Op.Raw)<<17))>>17)
 #define   Setn_Li_(x)   ((( int)((x)<<17))>>17)

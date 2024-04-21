@@ -1,13 +1,28 @@
 
 
 
+// how would I do  || x = a+b+c+d+e+f?
+// lets see...     lets do it with tmps and regs
+// first we get the register for x... thats easy.
+// now we need to get the register for a, and for b+...
+// the register for a is done, the register for b+... doesnt exist.
+// so it allocates a temp.
+// then tries to calculate it. well... to calculate it... , it needs the inner stuff
+// We just do the inner stuff first, THEN allocate a result?
+// we need to be able to allocate registers that we don't need anymore.
+// Like "Here is your register... go fuck it if you want"
+// basically a "Returned result" so... can we do that? lets try a simpler version
+//          || x = a+b+c
+// b+c
+
+
 // we use IR first, then opt the IR, then turn it to ASM last.
 
 struct IR // µfunc uses this. // "class IR"
 	|byte|			Op
-	|byte|			Label // 255 labels per function
-	|byte[2]|		Nothing
-	|byte[4]|		r
+	|byte|			Label	// 255 labels per function
+							// Can we remove the label? I don't like it. It seems OK though... unused bytes.
+	|byte[6]|		r	
 	|int|			Rest
 	|uint|			Debug
 	
@@ -16,7 +31,6 @@ struct IR // µfunc uses this. // "class IR"
 		
 	setter Debug (|message|)
 		|| FilePos  = value.position & MsgDebugPosShift.bits
-//		|| FileInfo = value. tag << MsgDebugPosShift
 		.debug = CurrFileNum ||| FilePos
 		
 	function BytePos (|ind|)

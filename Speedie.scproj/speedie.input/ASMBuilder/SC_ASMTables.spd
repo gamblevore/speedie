@@ -21,7 +21,7 @@ dispatch fn_asm_table (fn_asm)
 	@rel:
 		opt norefcounts
 		|| OV = .openvars
-		rz = .DoRels(exp.first!, reg)
+		rz = .DoRels(exp.first!, dest)
 		.closevars(OV)
 
 
@@ -30,7 +30,7 @@ dispatch fn_asm_table (fn_asm)
 
 	@bra:
 		opt norefcounts
-		return .µ(exp.first!, reg)
+		return .µ(exp.first!, dest)
 
 	@sheb: ASMtmp.Ignore
 		
@@ -43,7 +43,7 @@ dispatch fn_asm_table (fn_asm)
 		opt norefcounts
 		// 0, a, b, fn(), b*b, a*a
 		// 0, a, b, b*b, a*a, fn()
-		rz = .DoFunc(exp.last!, reg)
+		rz = .DoFunc(exp.last!, dest)
 
 
 	@acc: // pointers?
@@ -160,10 +160,10 @@ function Thg (fn_asm)
 // might be nice to store that value somewhere... on the decl. So we don't reparse it each time!
 //		if !.TrySmallConst(reg, value, orig): .AddASM(asm.setn, exp, reg)
 
-	if reg.isset
-		return SetGlobal(self, exp, reg)
-	if !reg.isdiscard
-		return ReadGlobal(self, exp, reg)
+	if dest.isset
+		return SetGlobal(self, exp, dest)
+	if !dest.isdiscard
+		return ReadGlobal(self, exp, dest)
 
 
 
@@ -172,8 +172,9 @@ function SetGlobal (fn_asm)
 
 
 function ReadGlobal (fn_asm)
-	reg = .NeedSomewhere(exp, reg)
-	.AddASM(asm.RD1U, exp, reg)
+	dest = .NeedSomewhere(exp, dest)
+	.AddASM(asm.RD1U, exp, dest)
+	return dest
 
 // Now put that global into the reg!
 // need to look at how the mem() function works...

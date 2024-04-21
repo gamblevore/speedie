@@ -1306,7 +1306,7 @@
 "Time"
 "To_Do_List"
 "Too few params"
-"Too large field. 24 bits max, found: "
+"Too large field. Found: "
 "Too many arguments"
 "Too many declarations"
 "Too many disconnections, blocking reconnection."

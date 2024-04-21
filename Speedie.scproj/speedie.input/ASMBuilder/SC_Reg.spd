@@ -1,7 +1,7 @@
 
 
 
-prototype fn_asm (|&ASMFuncState| self, |message| exp, |AsmReg| Reg=0.reg, |AsmReg|)
+prototype fn_asm (|&ASMFuncState| self, |message| exp, |AsmReg| Dest=0.reg, |AsmReg|)
 
 datatype AsmReg (DataTypeCode) 
 	linkage
@@ -14,6 +14,9 @@ datatype AsmReg (DataTypeCode)
 		
 	function IsSet (|bool|)
 		return (self & 4) // nice
+		
+	function IsUnused (|bool|)
+		return (self & 8)
 
 	function IsDiscard (|bool|)
 		return .reg >= 64

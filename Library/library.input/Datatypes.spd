@@ -112,8 +112,10 @@ datatype int
 	function CountBits (|int|)
 		cpp_wrapper JB_Int_CountBits
 
+	function HighestBit (|int|) // highbit 
+		disabled "use .log2"
 
-	function Log2 (|int|) // highestbit, highbit
+	function Log2 (|int|)
 		cpp_wrapper JB_Int_Log2
 
 	function Ctz (|int|)

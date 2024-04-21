@@ -328,15 +328,15 @@ AlwaysInline void CountConst(s64* r, ASM Op) {
 AlwaysInline ASM* Return (s64*& r, ASM* Code, ASM Op) {
 	Code			= (ASM*)(r[-1]);
 	auto CpyFrom    = u1; 
-	auto CpyLen     = u2; // unused
-	auto j			= *Code; // this is at where we are going back to.
+	//auto CpyLen     = u2;		// unused // should use this!
+	auto j			= *Code;	// this is at where we are going back to.
 	Code += 2;
 
 	auto Result     = r[CpyFrom];
 	r			   -= Func_SaveRegsu_(j) + 2;
-	if (Func_Modeu_(j))
+	if (Func_Incru_(j))
 		incr(Result);
-	r[Func_ENTRu_(j)] = Result;
+	r[Func_SaveRegsu_(j)+1] = Result;
 	return Code;
 }
 
