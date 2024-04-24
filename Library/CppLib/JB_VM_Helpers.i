@@ -124,7 +124,10 @@ AlwaysInline uint bitstats32(s64* r, ASM Op) {
 #define decr(o)				JB_Decr((JB_Object*)o)
 #define safedecr(o)			JB_SafeDecr((JB_Object*)o)
 #define setref(t, a, b)		{if (t) JB_SetRef(a,b); else incr(b);}  
+#define table(b, c)			((u64)(((void**)(&vm.Env))[b])+c)  
 
+#define mem(t)				((t*)u2)[Mem_Lu]
+#define mem2(t)				(u2 = (u64)((t*)u2 + Mem_moveu-1))
 
 AlwaysInline JB_Object* alloc(void* o) {
 	// we need a class table, and look it up from there.

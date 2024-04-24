@@ -7,6 +7,7 @@ module PackMaker
 	|[SCDecl]|				LibGlobs
 	|[scfunction]|			PackFuncs
 	|[SCDecl]|				PackGlobs
+	|int| 					ExportPos
 
 	function AddAll
 		opt norefcounts
@@ -20,16 +21,21 @@ module PackMaker
 			  elseif f.NeedsExport
 				.PackFuncs <~ f
 		.SortAll
-		
 	
-	function DoLibGlobs (|jbin| pack)
-		opt norefcounts
-		LibGlobs.sort(SCNodeSorter)
 		
-		pack.enter(@arr)
+	function AddLibGlob (|scdecl| d)
+		.LibGlobs <~ d
+		d.ExportPosition = ++.ExportPos
+	
+	
+	function DoLibGlobs (|jbin| lib)
+		opt norefcounts
+		LibGlobs.sort(NodeSorter)
+		
+		lib.enter(@arr)
 		for (f in LibGlobs)
-			pack.Add(@thg, f.ExportName)
-		pack.exit
+			lib.Add(@thg, f.ExportName)
+		lib.exit
 
 
 	function SortAll
@@ -54,7 +60,7 @@ module PackMaker
 	
 	function WriteLibFuncs (|jbin!| j)
 		opt norefcounts
-		todo "Write the data as c++ instead of a pack"
+		todo "Write the libfuncs via c++ structs, instead of jbin, like array of name/ptr pairs"
 		
 		j.Enter(@prm)
 		for f in .libfuncs
@@ -63,58 +69,90 @@ module PackMaker
 
 
 	function MakePack 
+		|| upon = TreeAssembler.CollectFuncs("asm_test,asm_test_sub")
+			treeassembler.VacuumPack(upon)
+			.MakePackMid(upon)
+
+
+	function MakePackMid (|[scfunction]| upon) 
 		|| pack = jbin(@tmp, "xpd")
 		pack.enter
-		.MakePackSub(pack)
-		|| str = pack.getresult
-		Compiler.ProductFile.SmartData = str
-		//printline str.parse
-	
-	
-	helper MakePackSub (|jbin| j)
+		pack.enter(@tmp, "app")
+		.orderglobals(pack)
+		.MakePackSub(pack, upon)
+
+		Compiler.ProductFile.SmartData = pack
+
+
+	function OrderGlobals (|jbin| j)
+		.PackGlobs.sort(PackGlobSorter)
+		|| g = .OrderGlobalsSub
+		j.addint(G + 16)
+
+
+	function OrderGlobalsSub (|int|)
 		opt norefcounts
-		j.enter(@tmp, "app")
+		|| G = 1				// So we can detect bugs easier... if something lacks an export position.
+		for (d in .PackGlobs)
+			|| s = d.ByteSize
+			G = G align s
+			d.ExportPosition = G
+			G += s
+		return g
 
 
-		|| upon = TreeAssembler.CollectFuncs("asm_test,asm_test_sub")
-		|| fn1 = upon.first$
+	function MakePackSub (|jbin| j, |[scfunction]| upon)
+		opt norefcounts
+		j.enter
+		.MiniTest(upon.first!)
+		.ListPackFuncs(j, upon)
+		.DumpStrings(j)
+		.PackClass(j)
+		.FuncLink(j)
+		.GlobLink(j)
 
+	
+	function MiniTest (|scfunction| fn1)
 		|| args = {8725l, 275l}
 		|| mu   = fn1.asm
 			|| Result = mu.finish.run( &args[0], –count args )
 			if result != 9000
-		
-		|| GlobSize = TreeAssembler.VacuumPack(upon)
-		j.addint(GlobSize)
-		j.enter
+	
 
-
+	function ListPackFuncs (|jbin| j, |[scfunction]| upon)
 		j.tmp("fncs")
 		for f in upon
-			j.Add(@tmp, f.exportname, true)
-			j.add(f.asm #expect)
+			j.Add(@tmp, f.ExportName, true)
+			j.add(f.ASM #expect)
 			j.exit
 		j.Exit(2)
 		
-		// OK... so what do we have? 3 kinds of lists
-		// 1) whole-program lists. No pack involved. Code works as-is.
-			// 2) interpreter lists. No pack-strings involved. This is also whole-program.
-		// 3) pack-lists. No lib stuff.
-		// so basically... only collect, (newid), if its whole-program or its a non-stdlib
-		
+	
+	function DumpStrings (|jbin| j)
 		j.tmp("strs")
 		for s in StringCorrector.list
 			j.add(@str, s)
 		j.exit(2)
 
 
+
+	function PackClass (|jbin| j)
 		j.enter(@tmp, "clss")
 		typeobject!.PackClassChildren(j)
 		j.exit
-		
-		
-		j.tmp("link")
+	
+	function FuncLink (|jbin| j)
+		opt norefcounts
+		j.tmp("flnk")
 		for linked in .libfuncs
+			j.add(@thg, linked.ExportName)
+		j.exit(2)
+	
+	
+	function GlobLink (|jbin| j)
+		opt norefcounts
+		j.tmp("blnk")
+		for linked in .LibGlobs
 			j.add(@thg, linked.ExportName)
 		j.exit(2)
 
@@ -195,12 +233,16 @@ helper SCFuncSorter (sortercomparer)
 	return (a|scfunction|).ExportName < (b|scfunction|).ExportName
 
 
-helper SCNodeSorter (sortercomparer)
+helper NodeSorter (sortercomparer)
 	return (a|scfunction|).ExportName < (b|scfunction|).ExportName
 
 
+helper PackGlobSorter (sortercomparer)
+	return (a|Scdecl|).ByteSize < (b|Scdecl|).ByteSize
+
+
 function scfunction.CanLibLoad (|bool|)
-	if !.ismacro and !.isdisabled and .iscppinbuilt != 2
+	if !.ismacro and !.isdisabled and (.iscppinbuilt != 2)
 		return true
 
 
@@ -220,5 +262,6 @@ Then exec can just... use the table directly, as it is already sorted. :)    */
 
 
 function printfunc (|string| s)
+	visible
 	|| fn = compiler.xfunc(s)
 		printline fn

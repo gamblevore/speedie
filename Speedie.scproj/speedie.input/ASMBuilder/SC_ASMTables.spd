@@ -4,9 +4,8 @@ dispatch fn_asm_table (fn_asm)
 	@arg:
 		opt norefcounts
 		|| OV = .openvars
-		|| DiscardResult = 128.reg
 		for ch.fast in exp
-			.µ(ch, DiscardResult)
+			.µ(ch, AsmReg.discard)
 		.closevars(OV)
 
 
@@ -18,11 +17,7 @@ dispatch fn_asm_table (fn_asm)
 		debugger
 
 
-	@rel:
-		opt norefcounts
-		|| OV = .openvars
-		rz = .DoRels(exp.first!, dest)
-		.closevars(OV)
+	@rel: asmtmp.DoMath
 
 
 	@thg: ASMTmp.Thg
@@ -43,7 +38,7 @@ dispatch fn_asm_table (fn_asm)
 		opt norefcounts
 		// 0, a, b, fn(), b*b, a*a
 		// 0, a, b, b*b, a*a, fn()
-		rz = .DoFunc(exp.last!, dest)
+		return .DoFunc(exp.last!, dest)
 
 
 	@acc: // pointers?
@@ -73,10 +68,11 @@ dispatch fn_asm_table (fn_asm)
 	(asmtmp.kExit):			ASMtmp.Exit
 	(asmtmp.ksetvar):		ASMtmp.SetRel
 	(asmtmp.kStatExpr): 	ASMtmp.StatExpr
+	(asmtmp.kPointer):		asmtmp.Pointer
 	(asmtmp.kTern):			ASMtmp.Tern
 
 	(asmtmp.kIgnore):		ASMtmp.Ignore
-	(asmtmp.kFaille):		ASMtmp.Ignore
+	(asmtmp.kFail):			ASMtmp.Ignore
 
 	@tmp:
 		#!the tmp type should have already been set
@@ -102,9 +98,10 @@ datatype ASMtmp (uint16)
 		kTern
 		kStatExpr
 		kSetVar
+		kPointer
 		kIgnore
 		kDebugger
-		kFaille = 63
+		kFail = 63
 	
 
 // for some reason, replacing this will cause speedie to generate bad code
@@ -123,12 +120,24 @@ extend_module ASMtmp {
 |asm_mem[10]| ReadASM
 |asm_mem[5]| WriteASM
 
+function InitAccess
+	|| R = &ASMtmp.ReadASM[0]
+	|| W = &ASMtmp.WriteASM[0]
+	*R++ = ASM.RD1U, *W++ = ASM.WR1U
+	*R++ = ASM.RD1S, *W++ = ASM.WR2U
+	*R++ = ASM.RD2U, *W++ = ASM.WR4U
+	*R++ = ASM.RD2S, *W++ = ASM.WR8U
+	*R++ = ASM.RD4U, *W++ = ASM.WR16
+	*R++ = ASM.RD4S
+	*R++ = ASM.RD8U
+	*R++ = ASM.RD8U
+	*R++ = ASM.RD16
+	*R++ = ASM.RD16	
 
-function StateExpr		(fn_asm): debugger
+
 function Debugger		(fn_asm): debugger
 function Continue		(fn_asm): debugger
 function Exit			(fn_asm): debugger
-function SetRel			(fn_asm): debugger
 function StatExpr		(fn_asm): debugger
 function Tern			(fn_asm): debugger
 function If				(fn_asm): debugger
@@ -147,40 +156,107 @@ function Return			(fn_asm)
 	.AddASM(asm.RET, exp, rz)
 
 
+function Pointer		(fn_asm)
+	opt	NoRefCounts
+	|| Addr = .µ(exp.first!)
+	
+	|| A = Dest.ReadOrWrite // does this work?
+	.AddASM(A, exp, dest,  addr)
+		
+
+function SetRel	(fn_asm)
+	opt	norefcounts
+	|| Var = SimpleVar(self, exp.first!)	
+	|| R = .µ(exp.last!, Var)
+	if r isnt discard    // x = 1, already done!
+		(r is set)
+		.µ(exp.first!, R)
+	// seems simple?
+
+
+function SimpleVar (fn_asm)
+	opt	norefcounts
+	|| fn = exp.func 
+	while fn == @bra or @type
+		exp = exp.first!
+		fn = exp.func
+	if fn == @thg
+		return thg(self, exp)
+
+
 function Thg (fn_asm)
 	opt norefcounts
-								// what if this is a constant?
-	|| d = exp.fastDecl
+												// what if this is a constant?
+	|| d = exp.FastDecl
 	if d is local
-		if !d.dreg.reg			// what?
-		return d.dreg			// we don't copy registers HERE, but in SetRel
+		if dest isnt set						// copy a reg
+			if !d.dreg.var						// what?
+			.AddASM(asm.BOR, exp, dest, d.dreg)
+			return dest
+		return d.dreg
 	
-	if d is const				// we want a number, really
-		debugger
-// might be nice to store that value somewhere... on the decl. So we don't reparse it each time!
-//		if !.TrySmallConst(reg, value, orig): .AddASM(asm.setn, exp, reg)
+	if d is const								// We want a number, really
+		|| R = dest.var
+		expect (R and dest isnt set) (exp)
+		.NumToReg(d.ExportPosition, R, exp)
+		return dest
 
-	if dest.isset
-		return SetGlobal(self, exp, dest)
-	if !dest.isdiscard
-		return ReadGlobal(self, exp, dest)
-
-
-
-function SetGlobal (fn_asm)
+	expect (d is global) (Exp)
+	if dest isnt discard
+		return DoGlobal(self, exp, dest, d)
 
 
 
-function ReadGlobal (fn_asm)
-	dest = .NeedSomewhere(exp, dest)
-	.AddASM(asm.RD1U, exp, dest)
-	return dest
+// how to compile:    pglob++, pglob2++
+// without loading the address of the pack glob table 4x?
+// pre-allocate a position (after the decls) containing our global?
+// and load on the first use of any global? otherwise just optimise.
 
-// Now put that global into the reg!
-// need to look at how the mem() function works...
-// also need a table of ASM per bit-size
-// SIMDs will need a simd reader ASM...
-// i think just a RD16 is enough?
+
+function DoGlobal (|&ASMFuncState| self, |message| exp, |AsmReg| Value, |scdecl| D, |AsmReg|)
+	|| addr = value
+	if value isnt set				// a = glob
+		addr = .tempme(exp, value)
+
+	.AddASM(asm.tabl,  exp, addr,   d.IsLib|int|)
+		// exec takes the exportpos and alters it to the new exportpos
+
+	|| i = d.exportposition
+	if !i
+	.AddASM(Value.ReadOrWrite, exp, Value,  addr, i)
+	return addr
+	
+
+function DoMath (fn_asm)
+	opt norefcounts
+
+	debugger
+	|| F = exp.first!
+	|| op = F.next!
+	dest = .tempme(op, dest)
+
+	|| OV = .OpenVars
+	|| ml = .µ(F, dest)
+	|| mr = .µ(op.next!, ml • dest)
+	.CloseVars(OV)
+	require ml.var ||| mr.var
+	
+	dest.µtype = ml.µtype						// assignment conversion needs to be done also.
+	|| scop = op.obj|scoperator|
+		|| fn = scop.ASM
+			return (fn)(self, dest, ml, mr, op)
+	error (op, "No ASM for this operator?")
+
 
 }
-	
+
+function asmreg.operator• (|asmreg| dest, |asmreg|)
+	if .var == dest.var
+		return 0.var
+	return dest
+
+function ASMReg.ReadOrWrite (|asm|)
+	|| bytes = .bytesize.log2
+	if self is set
+		return ASMtmp.WriteASM[bytes]
+	return ASMtmp.ReadASM[(bytes<<1) + .issigned]

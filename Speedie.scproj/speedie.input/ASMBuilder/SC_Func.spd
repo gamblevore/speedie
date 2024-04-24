@@ -5,11 +5,11 @@ class µFunc {
 		cpp_class ASMFunc
 		cpp_part ASMFunc 
 	|scfunction|			Fn
-	|&IR|					IR
+	|&FatASM|				IR
 	|int|					Length
 	|bool|					OK
 	
-	constructor (|scfunction| fn, |&IR| IR)
+	constructor (|scfunction| fn, |&FatASM| IR)
 		.fn = fn
 		.IR = ir
 		fn.asm = self
@@ -40,6 +40,6 @@ class µFunc {
 			yield Addr+currinst
 			currinst++
 
-	syntax append (|IR| A)
+	syntax append (|FatASM| A)
 		disabled "Append the fields directly via asmfuncstate"
 }

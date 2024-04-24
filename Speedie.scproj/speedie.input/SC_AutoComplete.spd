@@ -168,7 +168,7 @@ function UnusedFuncs (|message| cmd, |message|)
 			if lib.ExpectString
 				lib.HateUnusedFuncs
 			
-	cmd.Clear												// so... now what?
+	cmd.Clear
 	
 	if !.CompiledOK
 		return cmd

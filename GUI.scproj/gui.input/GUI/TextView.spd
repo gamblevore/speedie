@@ -474,13 +474,6 @@ class TextView (GUIControl)
 		.DoExplode(D, 4.0)
 
 
-	function DoExplode (|textviewline| D, |float| strength)
-		opt NoRefCounts
-		|| w = .window
-			for i in 3
-				.SoftExplode(5s, date.now + 0.25s*i, (-2.0, 0), D, strength)
-
-
 	function ShowAndSel (|int| P, |int| length=0, |bool| Explode=false, |textviewline|)
 		opt NoRefCounts
 		rz = .show(P)
@@ -937,6 +930,13 @@ class TextView (GUIControl)
 		if r.TrySetError(e) or !.MyError
 			.MyError := e
 			sdlapp.touch(Self)
+
+
+	function DoExplode (|textviewline| D, |float| strength)
+		opt NoRefCounts
+		|| w = .window
+			for i in 3
+				.SoftExplode(5s, date.now + 0.25s*i, (-3.0, 0), D, strength)
 
 
 	task SoftExplode (taskgui, |vec2| V, |TextViewLine| D, |float| Strength)

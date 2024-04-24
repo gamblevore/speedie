@@ -670,7 +670,7 @@ function Tran_Syx (|Message| msg, |Message|)
 
 	|| fn_msg = @func.msg
 	fn_msg <~ (@thg, "syntax")
-	fn_msg.msg(@prm) <~ (@thg, "api")
+	// fn_msg.msg(@prm) <~ (@thg, "const") // sigh. We need to make proper consts
 
 	dcl.first!.ReplaceWith(fn_msg)
 

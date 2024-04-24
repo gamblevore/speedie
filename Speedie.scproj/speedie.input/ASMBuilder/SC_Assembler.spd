@@ -34,26 +34,13 @@ module TreeAssembler
 	
 	function InitAll
 		instruction.instructionInit
-		|| R = &ASMtmp.ReadASM[0]
-		|| W = &ASMtmp.WriteASM[0]
-		*R++ = ASM.RD1U, *W++ = ASM.WR1U
-		*R++ = ASM.RD1S, *W++ = ASM.WR2U
-		*R++ = ASM.RD2U, *W++ = ASM.WR4U
-		*R++ = ASM.RD2S, *W++ = ASM.WR8U
-		*R++ = ASM.RD4U, *W++ = ASM.WR16
-		*R++ = ASM.RD4S
-		*R++ = ASM.RD8U
-		*R++ = ASM.RD8U
-		*R++ = ASM.RD16
-		*R++ = ASM.RD16
-		
+		asmtmp.InitAccess
 		Instruction[asm.SET1]!.Const
 		Instruction[asm.SETK]!.Const
 		Instruction[asm.SETN]!.Const
 		return 
 		TextAssembler.Requests		:= dictionary()
 		TextAssembler.RequestTable	:= array()
-
 
 	syntax access (|message| m, |µFunc|)
 		cpp_part AccessStr
@@ -70,15 +57,13 @@ module TreeAssembler
 				fn.tableid = rz.length
 			
 		
-	function VacuumPack (|[scfunction]| list, |int|)
+	function VacuumPack (|[scfunction]| list)
 		opt norefcounts
 		require platform.IsDebug
 		.stdstate.TotalInit
 		
 		for fn in list
 			.Vacuum(fn)
-		
-		return 1K
 
 
 	function Vacuum (|SCFunction| fn)
@@ -86,10 +71,9 @@ module TreeAssembler
 		
 		.StdState.Initstate(fn)
 		|| fp = fn_asm_table[@arg]
-			|| R = 0.reg
+			|| R = 0.var
 			|| A = fn.SourceArg!
-			|| ST = TreeAssembler.StdState
-			(fp)(ST, A, R)
+			(fp)(TreeAssembler.StdState, A, R)
 		.StdState.FinishASM
 
 

@@ -543,7 +543,7 @@ function ListAllFuncs (|FastStringCpp| fs, |string| lib_pack)
 	
 	fs.appendvoid("0")
 	
-	for g in packmaker.libglobs
+	for g in packmaker.LibGlobs
 		fs.appendvoid(g.exportname, '&')
 
 	fs.appendvoid("0")
@@ -581,7 +581,7 @@ function ExportModuleProperties (|SCModule| modl, |FastStringCpp?| IntoModule)
 			if !IntoModule
 				fs <~ "extern "
 			  elseif prop is api
-				fs <~ "__lib__ " 
+				fs <~ "__lib__ "
 
 			if IntoModule and prop is GameFlyingMem
 				prop.StringData.replaceall("$(N)", prop.name, fs)
@@ -1324,10 +1324,17 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function C_RenderNum (fpMsgRenderCpp)
 		opt norefcounts
-		fs <~ .name
-		|| d = .asdecl
-			if d.type.typeinfo == datatypecode.float
-				fs <~ 'f'
+		|| d = .FastDecl
+		|| Num = d.ExportPosition|int64|
+		if d.IsFloat
+			// no point converting it ourselves...
+			fs <~ .name
+			fs <~ 'f'
+		  else
+			if num
+				fs <~ num
+			  else
+				fs <~ .name
 
 
 	function C_RenderBra (fpMsgRenderCpp)

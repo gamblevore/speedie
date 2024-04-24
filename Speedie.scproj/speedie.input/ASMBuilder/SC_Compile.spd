@@ -2,41 +2,61 @@
 
 // ADDC? optimise stages... OR special-case it specifically.
 
-struct ASMFuncState // why not just be a subclass of memory?
-	linkage: cpp_part flat
+struct ASMFuncState
+	linkage: cpp_part Vac
 	|SCFunction--|				fn       
 	|µFunc|						Out      
-	|&IR|						Start    
+	|&FatASM|					Start    
 	|int|						Written  
 	|uint|						MaxLength
 	|bool|						OK       
 	|byte|						LabelCount
 	
-	|uint|						FreeRegs
+	|byte|						VDecls
+	|byte|						VTmps
 	|uint64[32]|				TrueBits 
 	|uint64[32]|				FalseBits
 	|uint|						AnyTrue	 
 
-	function AddFuncParams (|scfunction| fn)
+	function AddFuncParams (|SCFunction| fn)
 		opt norefcounts
 		for a in fn.Args
-			a.dreg = .NeedSomewhere(nil, a.RegType, false)
+			a.dreg = .DeclareMe(nil, a.RegType|asmreg|)
 
 
-	function Last (|&IR|)
+	function Last (|&FatASM|)
 		return .start + .Written-1
 	
 	
-	
-	function AddASM (|int| SM, |message| dbg, |int| a, |int| b=0, |int| c=0, |int| d=0, |&IR|)
-		pragma inline,  opt norefcounts
+	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |int| c, |int| d, |&FatASM|)
+		pragma inline,  opt norefcounts,  cpp_part AddASM4
 		rz = self <~ (sm, dbg)
 		rz.r[0] = a
 		rz.r[1] = b
 		rz.r[2] = c
 		rz.r[3] = d
-		target debug
-			rz.print
+		target debug: rz.print
+
+	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |int| c, |&FatASM|)
+		pragma inline,  opt norefcounts,  cpp_part AddASM3
+		rz = self <~ (sm, dbg)
+		rz.r[0] = a
+		rz.r[1] = b
+		rz.r[2] = c
+		target debug: rz.print
+
+	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |&FatASM|)
+		pragma inline,  opt norefcounts,  cpp_part AddASM2
+		rz = self <~ (sm, dbg)
+		rz.r[0] = a
+		rz.r[1] = b
+		target debug: rz.print
+
+	function AddASM (|int| SM, |message| dbg, |int| a, |&FatASM|)
+		pragma inline,  opt norefcounts,  cpp_part AddASM2
+		rz = self <~ (sm, dbg)
+		rz.r[0] = a
+		target debug: rz.print
 
 
 	function AddExtended (|message| err, |uint| Bits)
@@ -47,7 +67,7 @@ struct ASMFuncState // why not just be a subclass of memory?
 		(self <~ (asm.extended, err)).rest = bits
 		
 
-	syntax append (|uint| code, |message| dbg, |&IR|)
+	syntax append (|uint| code, |message| dbg, |&FatASM|)
 		cpp_part RequestOp
 		if .Written < .MaxLength
 			|| P = .Start + .Written++
@@ -57,134 +77,112 @@ struct ASMFuncState // why not just be a subclass of memory?
 		if .OK
 			error "ASM is out of memory."
 			.OK = false
-		return ASMFuncState.Dummy
+		return JSMSpace[0]
 	
 		
-	function NeedSomeWhere (|Message| where, |asmreg| T,  |bool| Tmp=true,  |asmreg|) // .needreg
-		if t.reg
+	function DeclareMe (|Message| where,  |asmreg| T,  |asmreg|)
+		if t.var
 			return t
 		
-		|| i = .FreeRegs|int|			#expect (where, "No free registers.")
-		|| L = i.log2
-		if !tmp
-			L = i.LowestBit.log2
-		t.reg = l
-		.freeregs &= ~(1<<L)
+		|| d = .VDecls|int| + 1
+		expect (d + .vtmps <= 31) (where, "No free local variables.")
+		t.var = d
+		.vdecls = d
+		return t
+	
+	
+	function TempMe (|Message| where,  |asmreg| T,  |asmreg|) // .needreg
+		if t.var
+			return t
+		
+		|| d = .vtmps|int| + 1
+		expect (d + .vdecls <= 31) (where, "No free local variables.")
+		t.var = d
+		.vdecls = d
 		return t
 
 
-	function OpenVars (|int|)
-		rz = .freeregs
-		if !(rz&1)
+	function OpenVars (|uint|)
+		return .vdecls ||| (.vtmps << 8)
 
 
-	function CloseVars (|int| Old)
-		if !(old&1)
-		.freeregs = old
+	function CloseVars (|uint| Old)
+		.vdecls = old & 255
+		.vtmps  = old >> 8
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	function µ (|message| exp,  |AsmReg| reg = 0.reg, |AsmReg|)
+	function µ (|message| exp,  |AsmReg| var = 0.var, |AsmReg|)
 		opt norefcounts
 		pragma inline
-		cpp_part Reg
+		cpp_part Var
 		|| T = exp.ASMType
 		|| fn = fn_asm_table[T]!
 		target debug
 			if !T
 				fn = fn_asm_table[exp.func|int|]!
 				debugger
-		return (fn)(self, exp, reg)
+		return (fn)(self, exp, var)
 
 
-	function µ2 (|message| exp, |AsmReg|)
-		cpp_part RegSaved
-		rz = .µ(exp)
-		.freeregs |= ~(1<<rz.reg)
+/*
+	Tempvars... hmmm... the problem is... that anything that is going into a func.
+	We need to make sure it stays? We need to allocate it properly. or have it already allocated.
+*/
 
-	function AllocReg (|message| exp, |AsmReg|)
-		debugger
-
-
-	function WriteReg (|AsmReg| exp, |AsmReg| out,  |AsmReg|)
-		// write something to memory... :)
-		debugger
-
-
-	function ArgLine (|message| exp, |AsmReg|)
-		opt NoRefCounts
-		if exp != @rel
-			return .µ(exp)
-			
-		debugger
-		// A REL
-		|| L = exp.first
-		|| R = L.next(@opp, "=").Next$
+	function prm (|message| prm, |asmreg|)
+		|| r = asmtmp.simplevar(self, prm)
+		if r != 0
+			return r
+		return .µ(prm, .DeclareMe(prm, 0))
 		
-		|| Dest = .AllocReg(L)$
-		|| result = .µ( r, dest )$
-
-		if !Dest.µType.IsPointer
-			return result						// x = a+b
-		return .WriteReg(Dest, result)			// str.fld = a+b
-
-
-	function FuncPrms (|message| pr, |int| Remain, |uint| Bits, |Message|)
-		opt norefcounts
-		|| fn = pr.parent!
-		while pr
-			|| reg = .µ2(pr)
-			pr++
-			Remain -= 5
-			Bits |= reg.reg << Remain
-			loop Remain >= 5
-		.addextended(fn, Bits)
-		return pr
-
+		
 
 	function DoFunc (|message| prms, |asmreg| dest, |asmreg|)
 		opt norefcounts
-		|| fn = prms.asfunc					#debug_require
+		|| fn = prms.asfunc
+		expect (fn and fn.args <= 16) (prms, "Too many parameters")
 
-		dest = .NeedSomeWhere(prms, dest)
-		dest.µtype = fn.RegType
-		.AddASM(asm.fnc, prms.parent!, 0).rest = fn.TableId
+		if dest is discard
+			dest = 0
+		  else
+			dest = .tempme(prms, dest)
+			dest.µtype = fn.RegType
 
-		|| OV     = .OpenVars
-		|| Bits   = Dest.reg<<25 ||| ov.log2<<20					// 6+5 bits, 20 left.
-		|| Remain = 20
-		|| p      = prms.first
-		while
-			p = .FuncPrms(p, Remain, Bits) #loop
-			Remain = 31
-			Bits = 0
+		|byte[16]| Regs
+		|| i = 0
+
+		|| OV = .OpenVars
+		for p.fast in prms
+			regs[i++] = .prm(p)
 		.closevars(OV)
 
+		|| Fnc = .AddASM(asm.fnc, prms.parent!, .vdecls) 
+		fnc.rest = fn.TableId
+
+// so... lets make function call 64-bit flat. No extension.
+// and have a "push" instruction... that we call BEFORE the func. It can push 4 vars
+// 
+
+
+		|uint64| B
+		while i > 0
+			B <<= 5
+			B |= regs[--i]
+		// what if there are more than 6 regs passed?
+			// we need to fill this in
+/*
+	Func
+		SaveRegs	5 
+		Incr		1 // parent can fill this in.
+		JUMP		j
+*/
 		return dest
 
 
-	function DoRels (|message| L, |asmreg| dest, |asmreg|)
-		opt norefcounts
-
-		|| op = L.next!
-		|| OV = .OpenVars
-		|| mL = .µ2(L)			// µ2 stops mR breaking mL
-		|| mR = .µ(op.next!)
-		.CloseVars(OV)			// allow overwriting either!
-		require ml.reg ||| mr.reg
-		
-		dest = .NeedSomewhere(op, dest)
-		dest.µtype = ml.µtype
-		// assignment conversion needs to be done also.
-		|| scop = op.obj|scoperator|
-			|| fn = scop.ASM
-				return (fn)(self, dest, ml, mr, op)
-		error (op, "No ASM for this operator?")
-
 	module
-		|IR|					Dummy
-		|IR[]|					JSMSpace = IR[0]!
+		|FatASM[]|					JSMSpace = FatASM[0]!
 		
 
 function ASMFuncState.TotalInit 
@@ -194,7 +192,7 @@ function ASMFuncState.TotalInit
 	.maxlength = j.Capacity
 	.start = j.ptr
 	.Written = 0
-	.AddASM(asm.RET, compiler.InternalFile.ast!, 0)
+	.AddASM(asm.EROR, compiler.InternalFile.ast!, 0)
 
 
 function ASMFuncState.InitState (|scfunction| fn)
@@ -203,7 +201,8 @@ function ASMFuncState.InitState (|scfunction| fn)
 	.LabelCount = 0
 	.fn  = fn
 	.ok  = true
-	.FreeRegs = ~1
+	.vdecls = 0
+	.vtmps = 0
 	.AddFuncParams(fn)
 
 
@@ -213,5 +212,3 @@ function ASMFuncState.FinishASM
 	ifn .last isa asm.ret
 		.AddASM(asm.RET, .fn.source!, 0)
 
-
-function @fn_asm.Default (fn_asm)

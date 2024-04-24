@@ -127,7 +127,7 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 
 function scclass.CollectProp (|Message| msg, |bool|)
 	opt norefcounts
-	|| dcl = msg.CollectDecl( .modul, self, declmode.properties, self, nil)
+	|| dcl = msg.CollectDecl( .modul, self, declmode.properties, self)
 		.properties <~ dcl
 		(dcl is property)
 		dcl.becomereal
@@ -148,21 +148,25 @@ function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
 	|| f = .scfile
 		f.proj.decllayer.use
 	
-	|| dcl = .CollectDecl(scarg, scarg, declmode.Globals, nil, nil)
-		|| def = dcl.Default
-		if def and !dcl.nilstated
-			|| d = def.msgdecl
-			if d and d.StatedReal
-				dcl.nildeclared = nilstate.real // in case of something like |object| x = real()
-		(dcl is property)
-		(dcl is Global)
-		
-		if (.Indent == 255) or ('_' == dcl.name.first or dcl.name.Last)
-			(dcl is hidden)
-		  elseif Options.MakeInterpreter
-			PackMaker.LibGlobs <~ dcl
+	|| dcl = .CollectDecl(scarg, scarg, declmode.Globals)		#require
+	|| def = dcl.Default
+	if def and !dcl.nilstated
+		|| d = def.msgdecl
+		if d and d.StatedReal
+			dcl.nildeclared = nilstate.real			// in case of something like |object| x = real()
+	(dcl is property)
+	(dcl is Global)
+	
+	if (.Indent == 255) or ('_' == dcl.name.first or dcl.name.Last)
+		(dcl is hidden)
+	if dcl.islib
+		if (dcl isnt hidden) and (Options.MakeInterpreter or options.ModePack)
+			PackMaker.AddLibGlob(dcl)
+	  else
+		if options.ModePack
+			packmaker.PackGlobs <~ dcl
 
-		return true
+	return true
 
 
 function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCNode| scarg) 	// remove later... :)
@@ -174,7 +178,7 @@ function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCNode| scarg)
 
 function Message.CollectFromBody (|SCNode| scarg, |bool|)
 	opt norefcounts
-	|| dcl = .CollectDecl(scarg, scarg, declmode.FunctionBody, nil, nil)
+	|| dcl = .CollectDecl(scarg, scarg, declmode.FunctionBody)
 		(dcl is body)
 		(dcl isnt dataconst)
 		|| def = dcl.Default
@@ -193,11 +197,11 @@ function CollectDeclsFuncBody (|Message| arg, |SCNode| scarg)
 	CollectDeclsFuncBodyJustWhatWeNewlyMade(arg, scarg)
 
 
-function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |int| Mode, |scclass| cls, |scfunction| FuncPrms,  |scdecl|)
+function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |int| Mode, |scclass| cls=nil, |scfunction| FuncPrmz=nil,  |scdecl|)
 	|| Types = .first!
 	|| Names = types.Next
 
-	expect (FuncPrms or Names)  (self, "No name found.")
+	expect (FuncPrmz or Names)  (self, "No name found.")
 	//if (Mode & 2)
 	//	expect (names == @thg) (names, "Must be a proper name (a-z or unicode-letters)")
 
@@ -208,7 +212,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |int| Mode, |scclass| c
 
 	|| NameItm = names.CollectDclName
 	|SCDecl--| DefaultDcl
-	if FuncPrms
+	if FuncPrmz
 		0
 	  elseif (Default and mode != declmode.Properties)
 		DefaultDcl = TypeOfExprNeeded( Default, P ) #require
@@ -228,7 +232,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |int| Mode, |scclass| c
 		if (cls) and (cls.Contained)
 			sdcl = cls.Contained! // (|| x = Y), (|object| x = Y)
 		  else
-			expect (!FuncPrms and defaultdcl) ( self, ("Missing type", "Missing type, or default value.")(!FuncPrms) )
+			expect (!FuncPrmz and defaultdcl) ( self, ("Missing type", "Missing type, or default value.")(!FuncPrmz) )
 			sdcl = DefaultDcl
 	
 	if sdcl.NeedsContainedfix
@@ -239,10 +243,10 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |int| Mode, |scclass| c
 	|| dcl = Sdcl.copydecl
 	if !NameItm
 		check (.islast) ( self, "Parameter is missing a name." )
-		if funcprms
-			if FuncPrms.CollectReturnAsReal // allocs dont fail (assumed so)
+		if funcprmz
+			if FuncPrmz.CollectReturnAsReal // allocs dont fail (assumed so)
 				dcl.nildeclared = nilstate.real
-			FuncPrms.ReturnType = dcl // we need the copy
+			FuncPrmz.ReturnType = dcl // we need the copy
 		return nil
 
 	if !Default

@@ -34,11 +34,11 @@
 #define   U4_Lu_(x)   (((uint)((x)<<28))>>28)
 
 
-#define   Func_Incru       (((uint)((Op.Raw)<<8))>>63)
-#define   Func_Incru_(x)   (((uint)((x)<<8))>>63)
+#define   Func_SaveRegsu       (((uint)((Op.Raw)<<8))>>59)
+#define   Func_SaveRegsu_(x)   (((uint)((x)<<8))>>59)
 
-#define   Func_SaveRegsu       (((uint)((Op.Raw)<<9))>>59)
-#define   Func_SaveRegsu_(x)   (((uint)((x)<<9))>>59)
+#define   Func_Incru       (((uint)((Op.Raw)<<13))>>63)
+#define   Func_Incru_(x)   (((uint)((x)<<13))>>63)
 
 #define   Func_JUMPi       ((( int)((Op.Raw)<<14))>>14)
 #define   Func_JUMPi_(x)   ((( int)((x)<<14))>>14)
@@ -84,8 +84,8 @@
 #define   Bra_jmpu_(x)   (((uint)((x)<<15))>>15)
 
 
-#define   Mem_incru       (((uint)((Op.Raw)<<18))>>30)
-#define   Mem_incru_(x)   (((uint)((x)<<18))>>30)
+#define   Mem_moveu       (((uint)((Op.Raw)<<18))>>30)
+#define   Mem_moveu_(x)   (((uint)((x)<<18))>>30)
 
 #define   Mem_Li       ((( int)((Op.Raw)<<20))>>20)
 #define   Mem_Li_(x)   ((( int)((x)<<20))>>20)

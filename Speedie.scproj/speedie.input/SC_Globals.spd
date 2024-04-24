@@ -380,16 +380,28 @@ function TypeOfUnit (ExprResolver)
 
 
 function TypeOfNum (ExprResolver)
-	if (exp.name contains ".")
-		exp.float
-		Return typefloat!.TypeNormal
+	opt norefcounts
+	|| n = exp.name
+	|| z = n.iszero
+	if (n contains ".")
+		if z
+			Return typefloat!.TypeNormal
+		return Typefloat!.typenormal
+//		|| D = typefloat!.TypeNormal.copydecl
+//		d.ExportPosition = exp.float.asint
+//		Return D
 
+	if z
+		return typeint!.typenormal
+	
 	|| Val = exp.int
-	exp.become Val
-
+	|| d2 = typeint!.typenormal
 	if ((Val << 32) >> 32) != Val
-		return typeint64!.typenormal
-	return typeint!.typenormal
+		d2 = typeint64!.typenormal
+	d2 = d2.CopyDecl
+	d2.exportposition = val
+	return d2
+	
 
 
 function Message.CollectionPlace (|Message|)
@@ -1435,7 +1447,7 @@ function datatypecode.FloatIntMerge (|int| old, |message| s, |int|)
 
 function string.IsZero (|bool|)
 	for c in self
-		require  (c == '.')  or  (c == '0')
+		require  (c == '.' or '0')
 	return true
 
 function string.Isnull (|bool|)

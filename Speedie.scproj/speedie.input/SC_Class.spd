@@ -36,7 +36,7 @@ linkage
 |SCClass?|					DowngradeTo
 |SCDecl?|					DataObject
 |uint|						TaskObjectCount
-|uint16|					Size
+|uint16|					Size			// use scdecl.ByteSize to find the size of this in a var.
 |uint16|					Depth
 |uint16|					StructContainerDepth
 |DataTypeCode|  			TypeInfo
@@ -948,8 +948,6 @@ module
 
 
 	function ProcessExtend (|Message| c, |bool| PreferClass, |scmodule| m=nil, |scfunction|)
-		// OK now what?
-
 		if (c == @tmp and "extend_module" or "extend")
 			.ProcessExtendOld(c, preferclass)
 			return nil

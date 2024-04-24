@@ -607,7 +607,7 @@ function InitCompiler
 	.CreateRoot
 	.CreateDisambiguation
 	SCImport.AllFiles <~ .InternalFile
-	ir.Resources = SCImport.AllFiles // why not? its just the same thing really. scfile is a subclass of file
+	FatASM.Resources = SCImport.AllFiles // why not? its just the same thing really. scfile is a subclass of file
 
 
 

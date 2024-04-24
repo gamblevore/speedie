@@ -28,19 +28,19 @@ constants
 	kDontSaveProperty	= 0 // sets the variable to zero on load.
 
 
-	kTypeCastMost = 1
-	kTypeCastNumbers = 2
-	kTypeCastIgnoreContained = 4
-	kTypeCastIgnoreAddressOf = 8
-	kTypeCastBothWays = 16
-	kTypeCastTrue = kTypeCastMost ||| kTypeCastNumbers   // to replace whatever we used to do when we passed "true"
-	kNoBoolTypeCast = 32
-	kTypeCastAssigns = 64
-	kTypeCastWantSuperDistance = 128
-	kTypeCastDescribeErrors = 256
-	kTypeCastFromZero = 512
-	kActualTypecasts = ~(kTypeCastWantSuperDistance ||| kNoBoolTypeCast)  
-	kTypeCastFalse = 0
+	kTypeCastMost				= 1
+	kTypeCastNumbers			= 2
+	kTypeCastIgnoreContained	= 4
+	kTypeCastIgnoreAddressOf	= 8
+	kTypeCastBothWays			= 16
+	kTypeCastTrue				= kTypeCastMost ||| kTypeCastNumbers   // to replace whatever we used to do when we passed "true"
+	kNoBoolTypeCast				= 32
+	kTypeCastAssigns			= 64
+	kTypeCastWantSuperDistance	= 128
+	kTypeCastDescribeErrors		= 256
+	kTypeCastFromZero			= 512
+	kActualTypecasts			= ~(kTypeCastWantSuperDistance ||| kNoBoolTypeCast)  
+	kTypeCastFalse				= 0
 
 
 
@@ -93,6 +93,7 @@ class SCDecl (SCNamed) {
 
 	|int|				C_Array
 	
+	|uint64|			ExportPosition
 	|SCFunction--?|		HiderFunc		// todo: replace the .StringData/hider thing with this.
 	|Object?|			IsLookupOnly
 	|string|			StringData		// 3 special objects. Aren't they exclusive? Write some code to see if they are.
@@ -165,14 +166,6 @@ class SCDecl (SCNamed) {
 
 	function IsVoidPtr (|bool|) 
 		return (.pointercount == 1 and .type == typevoid_)
-	
-	
-	function CopyDeclWithLayer (|bool| ForNewVariable = false, |SCDecl|)
-		opt norefcounts
-		|| oldlayer = (scdecl).layer
-		.MemoryLayer.use
-		rz = .CopyDecl(fornewvariable)
-		oldlayer.use
 
 
 	function CopyDecl (|bool| ForNewVariable = false, |SCDecl|)
@@ -315,7 +308,8 @@ class SCDecl (SCNamed) {
 		.NilDeclared = nilstate.real
 		.Internal = of
 		.nildeclared = nilstate.realish
-	
+
+
 	function DeReference (|message| brel, |SCNode|name_space,  |bool| IsAccess,  |scdecl|)
 		opt norefcounts
 		|| c = .DeReferenceSub(brel, name_space, isaccess)
@@ -325,7 +319,6 @@ class SCDecl (SCNamed) {
 	
 	function DeReferenceSub (|message| brel, |SCNode| name_space,  |bool| IsAccess, |scdecl|)
 		opt norefcounts
-		// "adas".DebugFunc
 		if .IsCArray
 			check (IsAccess) (brel, "Use [0] instead.")
 			|| i = .Internal$				
@@ -334,6 +327,7 @@ class SCDecl (SCNamed) {
 			return i
 		
 		if .PointerCount > 0
+			brel.ASMType = ASMtmp.kPointer
 			return .internal
 		
 		if !isaccess and .isnormalobject
@@ -420,8 +414,6 @@ class SCDecl (SCNamed) {
 	function IsInteger (|bool|)
 		return .isnormal and .type.TypeInfo.isint
 
-//	function IsDataTypeOrFP (|bool|)
-//		return .Type.IsDataTypeOrFP and !.PointerCount and !.IsCArray
 
 	function IsDataTypeOnly (|bool|)
 		return .Type.IsdatatypeOnly and !.PointerCount and !.IsCArray
@@ -434,7 +426,6 @@ class SCDecl (SCNamed) {
 			|| t = d.type
 			return t.funcproto
 
-	
 
 	function IsObject (|bool|)
 		return .Type.IsObject and !.IsCArray
@@ -799,10 +790,6 @@ class SCDecl (SCNamed) {
 		return .MakeExistance(nilstate.optional, .type.typeOptional)
 
 	
-//	function MakeEither (|SCDecl|)
-//		return .MakeExistance(nilstate.either, nil)
-
-	
 	function MakeContainedOptional (|scdecl|)
 		if .nilstated
 			return self
@@ -873,14 +860,19 @@ class SCDecl (SCNamed) {
 			return NilState.optional
 
 	function RefineDecl (|message| list, |SCDecl|)
+		opt norefcounts
 		rz = .copydecl
 		for p in list
-			if (p isthing "tag")
-				(rz is borrowed) = options.ProjectIsLibrary
-			  elseif (p isthing "api")
-				(rz is api)
-			  else
-				error p
+			if p.expect(@thg)
+				|| n = p.name
+				if (n ~= "tag")
+					(rz is borrowed) = options.ProjectIsLibrary
+				  elseif (n ~= "api")
+					(rz is api)
+				  elseif (n ~= "const")
+					(rz is const)
+				  else
+					error p
 
 
 	function Message.WrapExpr (|scdecl| src, |int|)
@@ -940,7 +932,6 @@ class SCDecl (SCNamed) {
 		cst <~ self
 		cst.msg(@thg, typeName).obj = Type.TypeNormal 
 		cst.obj = Type.TypeNormal	 // hmmm.... why not do it anyhow?
-		//.obj = Type.TypeNormal
 		Return loss	
 
 	
@@ -1066,22 +1057,12 @@ function scdecl.TypeIsReached (|bool|)
 	return .type.MyReacher
 
 
-function scdecl.ByteSize (|int|)
+function scdecl.ByteSize (|bool| TheVarItself=false, |int|)
 	opt norefcounts
-	if .PointerCount
-		return platform.PointerBytes
-	|| n = .type.CalculateSize
+	|| n = Platform.PointerBytes
+	ifn .PointerCount or (TheVarItself and .isobject)
+		n = .type.CalculateSize
 	if .IsCArray
 		n *= .C_Array
 	return N
 
-/*
-
-datatype IntObjectID (uint)
-	
-function object.operatorisa (|IntObjectID| i, |bool|)
-	return .objectid == i
-function int.id (|IntObjectID|)
-	return self|IntObjectID|
-NO
-*/

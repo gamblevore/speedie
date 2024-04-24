@@ -30,9 +30,10 @@ extend_module ArchonPurger {
 		(asmtmp.kReturn):		Return
 		(asmtmp.kTern):			Tern
 		(asmtmp.kDebugger):		Debugger
+		(asmtmp.kPointer):		Pointer
 		(asmtmp.kIgnore):		Ignore
 		(asmtmp.krejoin):		Rejoin
-		(asmtmp.kFaille):		Fail
+		(asmtmp.kFail):			Fail
 
 	
 	TrackerDummies()
@@ -535,11 +536,15 @@ function Type (NilTrackerFn)
 	return d.nildeclared // we created new suffering, so lets pass that back.
 
 
+function Pointer (Niltrackerfn)
+	return .UseChildAsReal(msg, test, nilreason.accessing)				// *abc
+
+
 function Brel (Niltrackerfn)
 	opt norefcounts
 	|| b = msg.name.first
 	if b == '*'
-		return .UseChildAsReal(msg, test, nilreason.accessing)				// *abc
+		return pointer(msg, test)				// *abc
 
 	|| ch = (*msg)!
 	if b == '-' or '+' // for ++ or --
@@ -586,8 +591,11 @@ function SetRel (NilTrackerfn)
 	|| L = msg.first!
 	|| LD = L.FastDecl
 	test = (nilcheckmode.soft) * (ld isnt local  and  ld.nildeclared == nilstate.optional)
-	|| RN = .Jump(R, test)			// R is defined as coming first
+	|| RN = .Jump(R, test)
+	// to run this:  *a = *b
+	// we would need to run *b first to get the value. So right-side has to be run first.
 	.Jump(L)
+								
 	return .VariableSet(LD, L, R.FastDecl, R, RN)
 
 

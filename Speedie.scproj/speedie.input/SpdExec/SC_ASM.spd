@@ -34,5 +34,5 @@ datatype ASM (uint)
 		|asm_decoder2[256]| 	Decoders
 
 
-prototype ASM_Decoder2  (|&IR| self, |asm| A)
-prototype ASM_Encoder2  (|&IR| self, |asm|)
+prototype ASM_Decoder2  (|&FatASM| self, |asm| A)
+prototype ASM_Encoder2  (|&FatASM| self, |asm|)

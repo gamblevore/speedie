@@ -39,22 +39,15 @@ datatype Syntax (Byte)
 
 	function Message.Translateable (|bool|) 
 		return .Func.Translateable
-
-//	render 
-//		opt norefcounts
-//		|| o = .Obj
-//			o.render(fs)
-	
+			
 	operator plus (|string| m, |message|)
-		return self.msg(m)
+		return .msg(m)
+	
 	operator plus (|int| m, |message|)
 		opt norefcounts
 		cpp_Part PlusNum
-		return self.msg(m.render)
-	
-//	syntax access (|string| m, |message|)
-//		return .msg(m)
-	
+		return .msg(m.render)
+		
 	function Name (|string|) 
 		Opt NoRefCounts
 		if self

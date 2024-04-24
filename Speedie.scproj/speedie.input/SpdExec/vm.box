@@ -62,8 +62,8 @@ forms
 
 
 	Func ...	// func: fnc:
-		Incr		1
 		SaveRegs	5
+		Incr		1
 		JUMP		j
 	
 	Cmp		// cmp:
@@ -88,7 +88,7 @@ forms
 	Mem		// mem:
 		r1		r
 		r2		r
-		incr	2
+		move	2
 	
 	Setn ...
 		len		2
@@ -211,7 +211,7 @@ SHLS  (U3)
 BAND  (U3)
 	u1 = u2 &  (u3|||L3)
 BOR   (U3)
-	u1  |= i3|||L3
+	u1  |= (u2|||u3)
 BXOR  (U3)
 	u1 = u2 ^ u3
 BNOT  (U2)
@@ -294,33 +294,48 @@ RALO  (U2)
 
 	
 #!						(((((Memory)))))
+TABL  (U2)
+	u1 = table(u2, L2)
 RD1U  (mem)				// OKALL
 	u1 = mem(uint8)
+	mem2(uint8)
 RD1S  (mem)
 	u1 = mem(char)
+	mem2(char)
 RD2U  (mem)
 	u1 = mem(u16)
+	mem2(u16)
 RD2S  (mem)
 	u1 = mem(s16)
+	mem2(s16)
 RD4U  (mem)
 	u1 = mem(u32)
+	mem2(u32)
 RD4S  (mem)
 	u1 = mem(int)
+	mem2(int)
 RD8U  (mem)
 	u1 = mem(u64)
+	mem2(u64)
 RD16  (mem)
 	((ivec4*)r)[n1] = mem(ivec4)
+	mem2(ivec4)
 WR1U  (mem)
 	mem(uint8) = u1
+	mem2(uint8)
 WR2U  (mem)
 	mem(u16) = u1
+	mem2(u16)
 WR4U  (mem)
 	#! xcode only complains about this one? ?
 	mem(u32) = (u32)u1
+	mem2(u32)
 WR8U  (mem)
 	mem(u64) = u1
+	mem2(u64)
 WR16  (mem)
 	mem(ivec4) = (ivec4)(((ivec4*)r)[n1])
+	mem2(ivec4)
 
 CNTC  (CNTC)					// aWESOME  JOBBBBBBBBBBB BROOOOOO LOLLLLLLL ::DDDDDD
 	CountConst(r, Op)

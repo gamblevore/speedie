@@ -31,15 +31,20 @@ extend AsmFuncState
 			return true
 
 
+	function ReserveData (|int| bytes)
+	function NumToReg (|uint64| V, |int| Reg, |message| exp)
+		if !.TrySmallConst(reg, V, exp)
+			debugat
+			.AddASM(asm.setn, exp, reg)
+		
+
 	function SetConst (|Message| List,  |message| Orig,  |bool|)
 		opt norefcounts								// set1: r1, 123
-		|| RegMsg = list[@thg] #require
-		|| Reg    = RegMsg.reg
-		|| Value  = regmsg.Next$.ASMConst
-
-		if !.TrySmallConst(reg, value, orig)
-			debugat
-			.AddASM(asm.setn, orig, reg)
+		|| RegMsg = list[@thg]				#require
+		|| ValMsg = regmsg.Next				#require
+		|| Value  = ValMsg.ASMConst
+		
+		.NumToReg(value, RegMsg.var, orig)
 		return true
 	
 	
@@ -95,18 +100,19 @@ extend AsmFuncState
 		return true
 	
 	
-	function IR.File (|string|)
-		|| s = IR.Resources[.filepos]
+	function FatASM.File (|string|)
+		opt norefcounts
+		|| s = FatASM.Resources[.filepos]
 			return s
 	
 	
-	function IR.SyntaxExpect (|string| Error)
+	function FatASM.SyntaxExpect (|string| Error)
 		|| err = Error(nil, error, ErrorSeverity.Error, .file)
 		err.position = .BytePos
 		stderr <~ err
 
 
-	function FindLabel (|&IR| dbg, |&IR|)
+	function FindLabel (|&FatASM| dbg, |&FatASM|)
 		opt norefcounts
 		|| num = dbg.rest
 		for A in .out

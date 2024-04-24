@@ -9,7 +9,7 @@
 */
 
 
-function IR.AddRegParam (|message| src, |uint| write)
+function FatASM.AddRegParam (|message| src, |uint| write)
 	opt norefcounts
 	|| Num = src.regornum
 	if write < 4
@@ -62,8 +62,8 @@ datatype µParam (uint16) {
 
 
 
-function message.Reg (|uint|)
-	return .regornum(true)
+function message.Var (|asmreg|)
+	return .regornum(true)|int|.var
 
 function message.RegOrNum (|bool| NeedReg = false, |uint|)
 	if !NeedReg and ((*.name).lowercase != 'r')

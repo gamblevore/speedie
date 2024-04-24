@@ -558,5 +558,3 @@ module StringCorrector
 			fs.AppendQuotedEscape(s)
 			fs <~ '\n'
 		
-	// so the tables are now merged
-	// now what? we need to export! and in order too.	

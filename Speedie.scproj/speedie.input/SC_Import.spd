@@ -181,9 +181,7 @@ class SCImport
 		.files <~ rz
 		|| n = scimport.allfiles.length
 		check (n < 64K) (c, "Too many files included")
-		rz.FileNum = n		// now what? somethng to do with allfiles?
-							// i wasn't doing anyting with it?
-							// its just for the internal file, right?
+		rz.FileNum = n
 		scimport.allfiles <~ rz
 	
 	

@@ -7,7 +7,7 @@ module SCTasks {
 || tmp = message()
 function CollectAll
 	opt norefcounts
-	|| T = typetask		// now what?
+	|| T = typetask
 	require T
 	for ch in compiler.TasksTodo
 		|| P = ch.obj|SCNode|!
@@ -20,7 +20,6 @@ function CollectAll
 
 function NewTaskActual (|Message| node, |SCNode| name_space)
 	opt norefcounts
-	// OK so... now what?
 	|| name = node[@thg, @dot]$
 	|| fields = name.Next
 	if fields == @bra or @list

@@ -1496,7 +1496,7 @@ function Tran_Deprecate (TranFunc)
 
 function Tran_Fails (TranFunc)
 	expect (fn) (node, "Only use this on functions")
-	node.ASMType = asmtmp.kFaille
+	node.ASMType = asmtmp.kFail
 	fn.Badness |= 128
 	expect (!node.islast) (node, "Put 'borks' before some code.") 
 

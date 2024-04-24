@@ -39,15 +39,14 @@ s64 RunVM (jb_vm& vm) {		// vm_run, vm__run, vmrun, run_vm
     const static Goto JumpTable[] = {
         #include "InstructionList.h"
     };
-    require (VerifyTable(vm, &JumpTable[0]));
+    if (!VerifyTable(vm, &JumpTable[0])) return -12345678;
 
     ASM  Op;
     ASM  Op2;
-    ASM* LeafCode = 0;
-    ASM* Code	  = vm.Code;
+    ASM* LeafCode = 0;			 // maybe remove leaffuncs? I mean... why not just inline them?
+    ASM* Code	  = vm.Env.Code; // we want to minimise vars anyhow
     Goto Next     = 0;
     s64* r		  = vm.Stack.Registers;
-    s64  Tmp	  = 0;
 
 	START: ___;
 	#include "Instructions.i"
@@ -89,17 +88,17 @@ jb_vm* JB_ASM_VM() {
 	vm->EXIT[0] = VMExitReturn;
 	vm->EXIT[1] = 1; // halt
 	vm->Stack.JumpBackTo = vm->EXIT;	// yay
-	vm->Stack.ResultRegister = 1;		// No args/returns in r0. 
+//	vm->Stack.ResultRegister = 1;		// Remove this? the calling instruction should specify the result.
 	vm->StackSize  = (StackSize - sizeof(jb_vm))/sizeof(u64);
 	return vm;
 }
 
 
-s64 JB_ASM_Run(u32* Code, u32 CodeSize) {
+s64 JB_ASM_Run(u32* Code, u32 CodeLength) {
 	auto V = JB_ASM_VM();
 	if (V) {
-		V->Code    = (ASM*)Code;
-		V->CodeEnd = (ASM*)Code + (CodeSize-1);
+		V->Env.Code       = (ASM*)Code;
+		V->Env.CodeLength = CodeLength;
 		return RunVM(*V);
 	}
 	return -1;

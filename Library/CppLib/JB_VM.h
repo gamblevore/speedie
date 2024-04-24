@@ -32,14 +32,6 @@ struct BasicRegs3 {
 	u64 Unused		: 4;
 };
 
-struct BasicASM {
-	u32 Op			: 7;
-	u32	R1    		: 5;
-	u32	R2    		: 5;
-	u32	R3    		: 5;
-	u32	R4    		: 5;
-	u32	L    		: 5;
-};
 
 struct ASM {
 	union {
@@ -49,7 +41,7 @@ struct ASM {
 		Raw = 0;
     }
     ASM(u32 Op) {
-		Raw = Op<<25;
+		Raw = Op<<24;
     }
  	operator u32() {
 		return Raw;
@@ -58,7 +50,7 @@ struct ASM {
 
 
 struct RegInfo {
-	uint8			ResultRegister;
+//	uint8			ResultRegister;
 	uint8			CallerRegCount;
 	bool			Verified;
 	ASM*			JumpBackTo;
@@ -67,19 +59,25 @@ struct RegInfo {
 
 
 struct Function {
-	const char*		Name;
-	uint8*			Data;
-	ASM				Code[];
+	uint			CallCount;
+	u16				NameLength;				
+	u16				DataLength;				
+	byte			Data[];
+};
+
+
+struct vm_globs {
+    byte*			LibGlobs;
+    byte*			PackGlobs;
+    Function*		DebugFuncTable;
+    ASM*            Code;
+    int             CodeLength;
 };
 
 
 struct jb_vm {
-    Function*		FuncTable;
-    ASM*            Code;
-    ASM*            CodeEnd;
+	vm_globs		Env;
     s64*			CurrStack;
-    const char*     Location;
-    const char**    Args;
     int             StackSize;
     ASM				EXIT[2];
     int             GuardValue;

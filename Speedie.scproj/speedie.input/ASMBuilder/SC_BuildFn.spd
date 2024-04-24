@@ -29,18 +29,18 @@ extend_module ASM
 
 function message.GetASMFunc (|message|)
 	opt norefcounts
-	if .reg >= 0
-		|| op = .next(@opp, "=")$
-		|| Adj = op.Next(@adj)$
-		return adj[@func]
+	if .var >= 0
+		|| op = .next(@opp, "=")
+			|| Adj = op.Next(@adj)
+				return adj[@func]
 
 
-function IR.Encode (|ASM|)
+function FatASM.Encode (|ASM|)
 	return (ASM.encoders[.op]!)(self)		
 
 	
 function @asm.Enc1
-	|IR| R
+	|FatASM| R
 	R.op = ASM.DSUB
 	R.r[0] = 3
 	R.r[1] = 2

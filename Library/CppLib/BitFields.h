@@ -37,7 +37,7 @@
 #define o2      (*(JB_Object**)&i2)
 #define o3      (*(JB_Object**)&i3)
 #define o4      (*(JB_Object**)&i4)
-#define mem(t)	((t*)u2)[Mem_Lu]
+
 
 #define signext32(a,b)				((((int  )(a)) << (32-(b))) >> (32-(b)))
 #define signext64(a,b)				((((int64)(a)) << (64-(b))) >> (64-(b)))
