@@ -98,14 +98,23 @@ extend PerryIDE
 			  else
 				h.name = ""
 
+	function ExpandCompileSep (|bool|)
+		|| coll = .ProductSep.div.Collapsed
+			.ShowCompileTab(.SpeedieText, true)
+			// doent seem to work all the time... ? strange.
+		|| coll2 = .ProductSep.div.Collapsed
+		
+//		beep "sep collapsed from $coll to $coll2"
+		if coll and !coll2
+			return true
+
 
 	function Compile (|string| operation)
 		if !.isBuilding // they pressed it twice
 			.ActualCompile(operation)
-		  elseif .ProductSep.div.Collapsed
-			.ShowCompileTab(.SpeedieText, true)
-		  else
-			ClickedCancel(.BuildButton)
+			return 
+		if !.ExpandCompileSep					// appeared to do nothing
+			ClickedCancel(.BuildButton)			// might as well just do the next thing then
 	
 	
 	function CheckMsg (|string| operation, |bool| SaveAll, |message|)

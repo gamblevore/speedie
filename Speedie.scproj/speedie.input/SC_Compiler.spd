@@ -4,7 +4,6 @@
 */
 
 |SCClass|	Typef64
-|SCClass|	Typef32
 |SCClass|	Typefloat
 |scclass|	Typehfloat
 |SCClass|	TypeSaveable
@@ -235,9 +234,8 @@ function InitTypes
 	TypeuInt16			= compiler["uint16"]
 	TypeuInt64			= compiler["uint64"]
 	Typef64				= compiler["f64"]
-	Typef32				= compiler["float"]
 	Typehfloat			= compiler["hfloat"]
-	Typefloat			= Typef32 // whyyyyy... why I do dis. 
+	Typefloat			= compiler["float"] 
 	TypeBool			= compiler["bool"]
 	TypeString			= compiler["string"]
 	TypeStringZero		= compiler["stringzeroterminated"]	

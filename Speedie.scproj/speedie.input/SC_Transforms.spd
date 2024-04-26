@@ -417,7 +417,6 @@ function Tran_For (TranFunc)
 		tran_ForSub(fn, node, name_space)
 
 
-
 function Tran_ForSub (TranFunc)					// :3
 	//////// COLLECT VARIABLES
 	|| list = node.needfirst$
@@ -435,7 +434,6 @@ function Tran_ForSub (TranFunc)					// :3
 			Bad +=! arg.expect(@arg)
 		  else
 			arg = node.msg(@arg)
-
 
 	
 	|message| value
@@ -638,6 +636,7 @@ function Tran_Syx (|Message| msg, |Message|)
 	msg.name	= "helper"
 	|| name		= msg[@thg]							#require
 	|| arg		= msg.last(@arg)					#require
+	expect ( name.Length <= 4 )  ( msg, "Name too long (max=4)" )
 	|| Params	= msg.find(@bra).find(@thg)
 
 	using (msg)
@@ -645,29 +644,27 @@ function Tran_Syx (|Message| msg, |Message|)
 		params = «thg »
 		name.Next = «bra, params »
 
-	|| name2	= Params.name		
+
 	|| OldName	= name.name
 	|| SyxName	= "Syx" + OldName
 
 	name.name	= OldName + "__"
 	Params.Name = "fpMsgRender"
 
-	expect ( OldName.Length <= 4 )  ( msg, "Name too long (max=4)" )
 	
 	|| ArgPlace = msg.Ancestor(@Arg).Ancestor(@Arg)
 	Compiler.SyxArray <~ OldName
 
 	if !Options.ModePack
-		|| dotnew = @dot + "StdNew"
+		|| dotnew = argplace.msg(@dot, "StdNew")
 		dotnew <~ (@thg, "syntax")
 		|| prm = dotnew.msg(@prm)
 		|| dot2 = prm.msg(@dot, name.name)
 		dot2 <~ (@thg, "Message")
 		dot2 <~ @emb
 		prm <~ OldName.lowercase
-		prm <~ Name2
+		prm <~ Params.name
 		prm <~ SyxID
-		ArgPlace <~ dotnew
 		Compiler.program.CollectOne( dotnew, true )
 
 	|| SyxConst = SCDecl(TypeSyntax!)

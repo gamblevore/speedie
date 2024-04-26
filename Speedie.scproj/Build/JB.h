@@ -1441,13 +1441,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RightOnlyIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBetter (32)
-#define kJB__ErrorColors_bold (JB_LUB[95])
+#define kJB__ErrorColors_bold (JB_LUB[94])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[92])
-#define kJB__ErrorColors_good (JB_LUB[93])
-#define kJB__ErrorColors_normal (JB_LUB[96])
-#define kJB__ErrorColors_underline (JB_LUB[93])
-#define kJB__ErrorColors_warn (JB_LUB[94])
+#define kJB__ErrorColors_error (JB_LUB[91])
+#define kJB__ErrorColors_good (JB_LUB[92])
+#define kJB__ErrorColors_normal (JB_LUB[95])
+#define kJB__ErrorColors_underline (JB_LUB[92])
+#define kJB__ErrorColors_warn (JB_LUB[93])
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
 extern int SC__FastStringOpts_StrRemoved;
@@ -1621,7 +1621,7 @@ extern Dictionary* JB__SyxDict_;
 extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
-#define kJB_codesign_native (JB_LUB[1555])
+#define kJB_codesign_native (JB_LUB[1554])
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
 extern CharSet* SC_CSNum;
@@ -1635,7 +1635,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kActualTypecasts ((~(128 | 32)))
 #define kJB_kAddressOfMatch (3 << 22)
 #define kJB_kASM (63)
-#define kJB_kBitOr (JB_LUB[278])
+#define kJB_kBitOr (JB_LUB[277])
 #define kJB_kCastedMatch (6 << 22)
 #define kJB_kDontSaveProperty (0)
 #define kJB_kLossyCastedMatch (7 << 22)
@@ -1650,65 +1650,9 @@ extern JB_String* SC_kNameConf;
 #define kJB_kSaveProperty (1)
 #define kJB_kSavePropertyAndGoIn (2)
 #define kJB_kSaverEnd (JB_LUB[0])
-#define kJB_kSaverStart1 (JB_LUB[603])
+#define kJB_kSaverStart1 (JB_LUB[602])
 #define kJB_kSimpleMatch (1 << 22)
 #define kJB_kSuperClassMatch (4 << 22)
-#define kJB_kSyxAcc (29)
-#define kJB_kSyxAdj (27)
-#define kJB_kSyxARel (21)
-#define kJB_kSyxArg (1)
-#define kJB_kSyxArr (34)
-#define kJB_kSyxAsk (43)
-#define kJB_kSyxBack (16)
-#define kJB_kSyxBadj (28)
-#define kJB_kSyxBin (18)
-#define kJB_kSyxbinn (42)
-#define kJB_kSyxBra (31)
-#define kJB_kSyxBRel (26)
-#define kJB_kSyxChar (17)
-#define kJB_kSyxCnj (8)
-#define kJB_kSyxDecl (4)
-#define kJB_kSyxDot (23)
-#define kJB_kSyxEmb (2)
-#define kJB_kSyxERel (38)
-#define kJB_kSyxFile (35)
-#define kJB_kSyxFunc (25)
-#define kJB_kSyxItem (30)
-#define kJB_kSyxList (32)
-#define kJB_kSyxmax (55)
-#define kJB_kSyxMsg (46)
-#define kJB_kSyxName (22)
-#define kJB_kSyxNil (0)
-#define kJB_kSyxNum (14)
-#define kJB_kSyxOat (6)
-#define kJB_kSyxOpp (9)
-#define kJB_kSyxpinn (41)
-#define kJB_kSyxPrm (33)
-#define kJB_kSyxQues (7)
-#define kJB_kSyxQuot (36)
-#define kJB_kSyxRel (37)
-#define kJB_kSyxSCnj (12)
-#define kJB_kSyxSCom (45)
-#define kJB_kSyxSDot (24)
-#define kJB_kSyxSheb (11)
-#define kJB_kSyxSStr (15)
-#define kJB_kSyxSThg (13)
-#define kJB_kSyxStr (19)
-#define kJB_kSyxThg (10)
-#define kJB_kSyxTmp (5)
-#define kJB_kSyxTodo (47)
-#define kJB_kSyxTRel (39)
-#define kJB_kSyxTril (40)
-#define kJB_kSyxType (3)
-#define kJB_kSyxUnit (20)
-#define kJB_kSyxurl (48)
-#define kJB_kSyxXAtt (49)
-#define kJB_kSyxXCDT (53)
-#define kJB_kSyxXCom (52)
-#define kJB_kSyxXML (50)
-#define kJB_kSyxXPI (51)
-#define kJB_kSyxXTxt (54)
-#define kJB_kSyxYoda (44)
 #define kJB_kTypeCastAssigns (64)
 #define kJB_kTypeCastBothWays (16)
 #define kJB_kTypeCastDescribeErrors (256)
@@ -1721,67 +1665,67 @@ extern JB_String* SC_kNameConf;
 #define kJB_kTypeCastTrue (1 | 2)
 #define kJB_kTypeCastWantSuperDistance (128)
 #define kJB_kUseDefaultParams (8 << 22)
-#define kJB_kUsingStr (JB_LUB[891])
+#define kJB_kUsingStr (JB_LUB[890])
 #define kJB_kVoidPtrMatch (5 << 22)
 extern Message* SC_ReturnSelfEqNil;
 extern Dictionary* SC_RootCollectTable;
 extern JB_ErrorReceiver* JB_StdErr;
-extern Syntax JB_SyxAcc;
-extern Syntax JB_SyxAdj;
-extern Syntax JB_SyxARel;
-extern Syntax JB_SyxArg;
-extern Syntax JB_SyxArr;
-extern Syntax JB_SyxAsk;
-extern Syntax JB_SyxBack;
-extern Syntax JB_SyxBadj;
-extern Syntax JB_SyxBin;
-extern Syntax JB_Syxbinn;
-extern Syntax JB_SyxBra;
-extern Syntax JB_SyxBRel;
-extern Syntax JB_SyxChar;
-extern Syntax JB_SyxCnj;
-extern Syntax JB_SyxDecl;
-extern Syntax JB_SyxDot;
-extern Syntax JB_SyxEmb;
-extern Syntax JB_SyxERel;
-extern Syntax JB_SyxFile;
-extern Syntax JB_SyxFunc;
-extern Syntax JB_SyxItem;
-extern Syntax JB_SyxList;
-extern Syntax JB_Syxmax;
-extern Syntax JB_SyxMsg;
-extern Syntax JB_SyxName;
-extern Syntax JB_SyxNil;
-extern Syntax JB_SyxNum;
-extern Syntax JB_SyxOat;
-extern Syntax JB_SyxOpp;
-extern Syntax JB_Syxpinn;
-extern Syntax JB_SyxPrm;
-extern Syntax JB_SyxQues;
-extern Syntax JB_SyxQuot;
-extern Syntax JB_SyxRel;
-extern Syntax JB_SyxSCnj;
-extern Syntax JB_SyxSCom;
-extern Syntax JB_SyxSDot;
-extern Syntax JB_SyxSheb;
-extern Syntax JB_SyxSStr;
-extern Syntax JB_SyxSThg;
-extern Syntax JB_SyxStr;
-extern Syntax JB_SyxThg;
-extern Syntax JB_SyxTmp;
-extern Syntax JB_SyxTodo;
-extern Syntax JB_SyxTRel;
-extern Syntax JB_SyxTril;
-extern Syntax JB_SyxType;
-extern Syntax JB_SyxUnit;
-extern Syntax JB_Syxurl;
-extern Syntax JB_SyxXAtt;
-extern Syntax JB_SyxXCDT;
-extern Syntax JB_SyxXCom;
-extern Syntax JB_SyxXML;
-extern Syntax JB_SyxXPI;
-extern Syntax JB_SyxXTxt;
-extern Syntax JB_SyxYoda;
+#define kJB_SyxAcc (29)
+#define kJB_SyxAdj (27)
+#define kJB_SyxARel (21)
+#define kJB_SyxArg (1)
+#define kJB_SyxArr (34)
+#define kJB_SyxAsk (43)
+#define kJB_SyxBack (16)
+#define kJB_SyxBadj (28)
+#define kJB_SyxBin (18)
+#define kJB_Syxbinn (42)
+#define kJB_SyxBra (31)
+#define kJB_SyxBRel (26)
+#define kJB_SyxChar (17)
+#define kJB_SyxCnj (8)
+#define kJB_SyxDecl (4)
+#define kJB_SyxDot (23)
+#define kJB_SyxEmb (2)
+#define kJB_SyxERel (38)
+#define kJB_SyxFile (35)
+#define kJB_SyxFunc (25)
+#define kJB_SyxItem (30)
+#define kJB_SyxList (32)
+#define kJB_Syxmax (55)
+#define kJB_SyxMsg (46)
+#define kJB_SyxName (22)
+#define kJB_SyxNil (0)
+#define kJB_SyxNum (14)
+#define kJB_SyxOat (6)
+#define kJB_SyxOpp (9)
+#define kJB_Syxpinn (41)
+#define kJB_SyxPrm (33)
+#define kJB_SyxQues (7)
+#define kJB_SyxQuot (36)
+#define kJB_SyxRel (37)
+#define kJB_SyxSCnj (12)
+#define kJB_SyxSCom (45)
+#define kJB_SyxSDot (24)
+#define kJB_SyxSheb (11)
+#define kJB_SyxSStr (15)
+#define kJB_SyxSThg (13)
+#define kJB_SyxStr (19)
+#define kJB_SyxThg (10)
+#define kJB_SyxTmp (5)
+#define kJB_SyxTodo (47)
+#define kJB_SyxTRel (39)
+#define kJB_SyxTril (40)
+#define kJB_SyxType (3)
+#define kJB_SyxUnit (20)
+#define kJB_Syxurl (48)
+#define kJB_SyxXAtt (49)
+#define kJB_SyxXCDT (53)
+#define kJB_SyxXCom (52)
+#define kJB_SyxXML (50)
+#define kJB_SyxXPI (51)
+#define kJB_SyxXTxt (54)
+#define kJB_SyxYoda (44)
 extern SCDecl* SC_TrueBool;
 extern SCClass* SC_TypeArray;
 extern SCClass* SC_TypeBool;
@@ -1790,7 +1734,6 @@ extern SCClass* SC_TypeCharSet;
 extern SCClass* SC_TypeCodePoint;
 extern SCClass* SC_TypeDate;
 extern SCClass* SC_TypeDictionary;
-extern SCClass* SC_Typef32;
 extern SCClass* SC_Typef64;
 extern SCClass* SC_TypeFastString;
 extern SCClass* SC_Typefloat;
@@ -1863,10 +1806,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_LargestFlag (8388607)
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down (JB_LUB[1972])
-#define kJB__zalgo_mid (JB_LUB[1673])
+#define kJB__zalgo_down (JB_LUB[1558])
+#define kJB__zalgo_mid (JB_LUB[1685])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up (JB_LUB[1353])
+#define kJB__zalgo_up (JB_LUB[1352])
 #define kJB__byte_max (255)
 #define kJB__byte_min (0)
 #define kJB__char_max (127)
@@ -2301,7 +2244,7 @@ extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_kDelete (2)
 #define kJB__Wrap_kFree (1)
 #define kJB__Wrap_kNothing (0)
-#define kJB__Rec_NonFatal (JB_LUB[1088])
+#define kJB__Rec_NonFatal (JB_LUB[1087])
 extern double JB__Rec_Progress;
 #define kJB__fix_TypeDict (3)
 #define kJB__fix_TypeObj (1)
@@ -9340,6 +9283,8 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, NilState New);
 
 inline void SC_nil__DeclKill();
 
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
+
 inline NilRecord SC_nil__Value();
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
@@ -9347,8 +9292,6 @@ inline bool JB_Safe_SyntaxCast(JB_String* Self);
 inline bool SC_Decl_IsUnknownParam(SCDecl* Self);
 
 inline NilRecord SC_nil__EndBlock();
-
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
@@ -9432,7 +9375,7 @@ inline JB_String* SC_Named_Name(SCNamed* Self) {
 	if (Self) {
 		return Self->Name;
 	}
-	return JB_LUB[276];
+	return JB_LUB[275];
 }
 
 inline bool SC_PA_SyntaxCast(SCParamArray* Self) {
@@ -9502,10 +9445,6 @@ inline bool SC_NilTest_SyntaxCast(NilTest* Self) {
 inline AsmReg SC_Vac_Var(ASMFuncState* Self, Message* Exp, AsmReg Var) {
 	ASMtmp T = SC_Msg_ASMType(Exp);
 	fn_asm Fn = SC_fn_asm_table[T];
-	if ((!T)) {
-		Fn = SC_fn_asm_table[((int)Exp->Func)];
-		debugger;
-	}
 	return (Fn)(Self, Exp, Var);
 }
 
@@ -9520,6 +9459,16 @@ inline void SC_nil__DeclKill() {
 		SC__nil_T.RootReturned = true;
 	}
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
+}
+
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
+	ASMtmp T = SC_Msg_ASMType(Msg);
+	if (T) {
+		return (SC__nil_NilTable[T])(Msg, Test);
+	}
+	T = ((ASMtmp)Msg->Func);
+	(SC_Msg_ASMTypeSet(Msg, T));
+	return (SC__nil_NilTable[T])(Msg, Test);
 }
 
 inline NilRecord SC_nil__Value() {
@@ -9541,22 +9490,12 @@ inline NilRecord SC_nil__EndBlock() {
 	return Rz;
 }
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
-	ASMtmp T = SC_Msg_ASMType(Msg);
-	if (T) {
-		return (SC__nil_NilTable[T])(Msg, Test);
-	}
-	T = ((ASMtmp)Msg->Func);
-	(SC_Msg_ASMTypeSet(Msg, T));
-	return (SC__nil_NilTable[T])(Msg, Test);
-}
-
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 	if ((!JB_Ring_HasChildCount(Self, 2))) {
 		if (true) {
 			Message* __varf1 = F->Source;
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(__varf1);
-			JB_Tree_SyntaxAppend(Self, (JB_Syx_Msg(JB_SyxThg, JB_LUB[1370])));
+			JB_Tree_SyntaxAppend(Self, (JB_Syx_Msg(kJB_SyxThg, JB_LUB[1369])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0), __varf1);
 			JB_MsgPos_Destructor((&_usingf0));
 		}
@@ -9567,7 +9506,6 @@ inline FatASM* SC_Vac_AddASM2WithIntMsgInt(ASMFuncState* Self, int SM, Message* 
 	FatASM* Rz = nil;
 	Rz = SC_Vac_RequestOp(Self, SM, Dbg);
 	Rz->r[0] = A;
-	SC_FatASM_Print(Rz);
 	return Rz;
 }
 
@@ -9576,7 +9514,6 @@ inline FatASM* SC_Vac_AddASM2WithIntMsgIntInt(ASMFuncState* Self, int SM, Messag
 	Rz = SC_Vac_RequestOp(Self, SM, Dbg);
 	Rz->r[0] = A;
 	Rz->r[1] = B;
-	SC_FatASM_Print(Rz);
 	return Rz;
 }
 
@@ -9586,7 +9523,6 @@ inline FatASM* SC_Vac_AddASM3(ASMFuncState* Self, int SM, Message* Dbg, int A, i
 	Rz->r[0] = A;
 	Rz->r[1] = B;
 	Rz->r[2] = C;
-	SC_FatASM_Print(Rz);
 	return Rz;
 }
 
@@ -9597,7 +9533,6 @@ inline FatASM* SC_Vac_AddASM4(ASMFuncState* Self, int SM, Message* Dbg, int A, i
 	Rz->r[1] = B;
 	Rz->r[2] = C;
 	Rz->r[3] = D;
-	SC_FatASM_Print(Rz);
 	return Rz;
 }
 
