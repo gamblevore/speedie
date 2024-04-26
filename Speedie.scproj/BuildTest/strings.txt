@@ -2004,5 +2004,4 @@
 "blnk"
 "TABL"
 "vm"
-"k"
 "\n#define __VM__ 1\n"

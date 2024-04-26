@@ -654,9 +654,11 @@ function Tran_Syx (|Message| msg, |Message|)
 
 	expect ( OldName.Length <= 4 )  ( msg, "Name too long (max=4)" )
 	
-	|message| DotNew
+	|| ArgPlace = msg.Ancestor(@Arg).Ancestor(@Arg)
+	Compiler.SyxArray <~ OldName
+
 	if !Options.ModePack
-		dotnew = @dot + "StdNew"
+		|| dotnew = @dot + "StdNew"
 		dotnew <~ (@thg, "syntax")
 		|| prm = dotnew.msg(@prm)
 		|| dot2 = prm.msg(@dot, name.name)
@@ -665,24 +667,15 @@ function Tran_Syx (|Message| msg, |Message|)
 		prm <~ OldName.lowercase
 		prm <~ Name2
 		prm <~ SyxID
-
-	|| ArgPlace = msg.Ancestor(@Arg).Ancestor(@Arg)
-	|| DclMsg		= MakeDecl( "syntax", SyxName, DotNew )
-	ArgPlace <~ dclmsg
-
-	|| fn_msg = @func.msg
-	fn_msg <~ (@thg, "syntax")
-
-	dclmsg.first!.ReplaceWith(fn_msg)
-
-	Compiler.SyxArray <~ OldName
-	Compiler.program.CollectOne( dclmsg, true )
+		ArgPlace <~ dotnew
+		Compiler.program.CollectOne( dotnew, true )
 
 	|| SyxConst = SCDecl(TypeSyntax!)
 	Compiler.newconst(SyxConst)
-	NewDeclNum( SyxConst, syxid, "k"+syxname )
+	NewDeclNum( SyxConst, syxid, syxname )
 	compiler.program.TryAdd( msg, SyxConst, SyxConst.Name )
 	compiler.actualsyxes <~ SyxConst
+
 	SyxID++
 	Return msg
 
