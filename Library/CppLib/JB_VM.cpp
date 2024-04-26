@@ -8,7 +8,6 @@
 todo:
 	* FFI
 Limits:
-	* 16M instructions per-program
 	* 256 OpCodes, and a few variable length opcodes
 	* r0 = 0
 	* can recursive vm->c->vm! 
@@ -20,11 +19,11 @@ Later:
 
 
 #include "JB_Umbrella.hpp"
-#include "BitFields.h"
-#include "JB_VM.h"
 
 extern "C" {
-#if 1
+#if __VM__
+#include "BitFields.h"
+#include "JB_VM.h"
 #include "JB_VM_Helpers.i"
 
 

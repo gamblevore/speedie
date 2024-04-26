@@ -20,4 +20,5 @@ linkage
 compile_linking
 	flags
 		interpreter true
+		vm			true
 

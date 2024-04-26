@@ -47,3 +47,8 @@ function @asm.Enc1
 	R.r[2] = 1
 	R.Rest = 0
 	|| oof = R.Encode
+
+
+function message.Var (|asmreg|)
+	return .regornum(true)|int|.var
+

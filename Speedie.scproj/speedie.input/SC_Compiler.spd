@@ -84,6 +84,7 @@ linkage
 |[SCModule]|				ModuleList
 |[SCFunction]|				FuncList
 |[SCFunction]|				ProtoTypes
+|[scdecl]|					ActualSyxes
 
 |Dictionary of SCNode|		ExportNames = Dictionary()
 |dictionary of dictionary of macro|	AdjDicts = dictionary()
@@ -267,9 +268,12 @@ function InitTypes
 	typevoid = TypeVoid_!.TypeNormal
 	TypeVoidPtr = typevoid!.GetAddress
 	TypeString!.HasSubClass = true // compiler doesn't know about internal-subclasses of string.
+	for s in .actualsyxes
+		s.type = typesyntax! // sigh
 
 
 function InitBasicStuff (|int|) // compiler.init
+	opt norefcounts
 	rz = stderr.errorcount
 	if rz > 0
 		stderr.LowerErrorsTo = ErrorSeverity.Warning
@@ -278,6 +282,7 @@ function InitBasicStuff (|int|) // compiler.init
 	.ModuleList <~ .program
 	
 	.InitTypes
+	
 	TypeNil   = .AddGlobalConst( "nil",   TypeObject!,   NilState.ActuallyNil )
 	TrueBool  = .AddGlobalConst( "true",  TypeBool!,     NilState.real ||| NilState.trueValue )
 	FalseBool = .AddGlobalConst( "false", TypeBool!,     NilState.real ||| NilState.falseValue )
@@ -702,6 +707,7 @@ function scfunction.IsAllocOrNew (|bool|)
 
 
 function NewConst (|scdecl| d)
+	d.nildeclared = nilstate.real
 	d <~ scdeclinfo.Const ||| scdeclinfo.Global
 	.DeclConstants <~ d
 	

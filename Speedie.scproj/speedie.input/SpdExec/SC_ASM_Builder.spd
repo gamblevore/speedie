@@ -1,9 +1,4 @@
 
-
-// building from asm-text = assembling
-// building from source   = flattening
-
-
 /*
 	Jeebox internals. By Theodore H. Smith...
 */
@@ -62,8 +57,6 @@ datatype µParam (uint16) {
 
 
 
-function message.Var (|asmreg|)
-	return .regornum(true)|int|.var
 
 function message.RegOrNum (|bool| NeedReg = false, |uint|)
 	if !NeedReg and ((*.name).lowercase != 'r')

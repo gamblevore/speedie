@@ -1033,7 +1033,8 @@ function string.IsSwizzle (|int| Width, |int|)
 
 
 function TypeOfSyx (ExprResolver)
-	exp.becomesyx
+	exp.func = @thg
+	exp.name = "syx" + exp.name
 	return typeofthg(exp, name_space, side)
 
 
@@ -1656,7 +1657,6 @@ function NewDeclNum (|SCDecl| D, |int64| N, |string| VarName, |Message|)
 	opt norefcounts
 	rz = n.msg
 	rz.obj = d
-	D.type = TypeInt!
 	if  n < int.min  or  n > int.max
 		d.type = typeint64!
 	d.name = varname

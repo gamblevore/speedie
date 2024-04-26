@@ -278,11 +278,6 @@ function Message.Clean (|bool| erl = false)
 						curr.name = "ignore"
 
 
-function message.BecomeSyx
-	.func = @thg
-	.name = "syx" + .name
-
-
 function message.Tran_Isnt (|string| name)
 	// is dead --> (self is dead)
 	|| type = self.needfirst

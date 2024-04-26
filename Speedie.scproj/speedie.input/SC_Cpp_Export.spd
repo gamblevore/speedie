@@ -18,6 +18,7 @@ linkage
 |FastStringCpp|						AllTypes
 |FastStringCpp|						TypesProj
 |FastStringCpp|						HeaderProj
+|FastStringCpp|						Syxes
 |FastStringCpp|						Inlines
 |FastStringCpp|						ModuleProperties
 
@@ -26,6 +27,7 @@ constructor
 	.Outputs_h = []
 	.T = FastStringCpp.new
 	.AllTypes   = .StreamChild( "AllTypes.h"  )
+	.syxes		= .StreamChild( "SyntaxConstants.h" )
 	.TypesProj  = .StreamChild( "Proj.h" )
 	
 	.HeaderProj = .StreamChild( "JB.h" )
@@ -594,8 +596,7 @@ function ExportModuleProperties (|SCModule| modl, |FastStringCpp?| IntoModule)
 
 function ExportSyx
 	require Compiler.SyxArray
-	|| fs = .StreamChild( "SyntaxConstants.h" )
-	
+	|| fs = .syxes
 	for (syx in Compiler.SyxArray) (i)
 		fs <~ "#define kSyx$syx $i\n"
 
@@ -647,7 +648,9 @@ extern "C" {
 function WriteHeader
 	|| fs = FastStringCpp.new
 	fs <~ "\n\n // Auto-generated file, by speedie.\n"
-	fs <~ Cpp_Export.CppLicence
+	fs <~ Cpp_Export.CppLicence	
+	if Linkage.VM
+		fs <~ "\n#define __VM__ 1\n"
 	
 	fs <~ "\n#define __SPEEDIE__ 1\n"
 	for h in Cpp_Export.H_Input
@@ -831,8 +834,8 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		
 		|| exp = Cpp_Export()
 		exp.PreRun
-		exp.run
 		exp.ExportSyx
+		exp.run
 		exp.WriteHeader
 		if Options.MakeInterpreter
 			exp.FillInterpreter

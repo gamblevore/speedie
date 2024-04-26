@@ -5,8 +5,14 @@ module Linkage
 	|| OSXFrameworks = message()
 	|| Flagz = message()		// for the linker i guess...
 	
+	syntax access (|string| name, |bool|)
+		return linkage.GetFlag(name).yes
+	
 	function Interpreter (|bool|)
-		return linkage.GetFlag("interpreter").yes
+		return self["interpreter"]
+	
+	function VM (|bool|)
+		return self["vm"]
 	
 	function CombineFlags (|string| name,, |string|)
 		|| fs = faststring()

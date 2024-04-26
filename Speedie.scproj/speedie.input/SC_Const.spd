@@ -73,7 +73,7 @@ function SCNode.CollectConstantsSub (|Message| ch)
 			|| thg = line[ @Thg ]							#require
 			|| OMGType = TypeOfExpr( ValueNode, self )		#require // can’t seem to remove this.
 			|| NewType = CurrType
-			if !(NewType?)
+			if !NewType
 				newtype = OMGType
 			NewItem = SCDecl(newtype.type)
 
@@ -91,9 +91,8 @@ function SCNode.CollectConstantsSub (|Message| ch)
 			NewItem.Default = ValueNode
 			newitem.source = thg
 
-		newitem.nildeclared = nilstate.real // no point in having a nil constant.
 		compiler.newconst(newitem)
-		NameList <~ NewItem.source! // crappy work around for now...
+		NameList <~ NewItem.source!
 		.TryAdd( line, NewItem, NewItem.Name )
 	
 	
@@ -124,7 +123,7 @@ function SCNode.Tran_Const (|SCDecl| D, |SCNode| base)
 				|| BetterVersion = actual.Default!.Copy(curr)
 				curr.ReplaceWith( BetterVersion )				
 			  else
-				expect ((curr.obj == TypeString!.typenormal) or (curr ~= "true") or (curr ~= "false")) (curr, "This type isn't allowed for a constant.")
+				expect ((curr.obj == TypeString!.TypeNormal) or (curr ~= "true") or (curr ~= "false")) (curr, "This type isn't allowed for a constant.")
 			
 		  elseif curr == @unit
 			require TypeOfExpr(curr, base)

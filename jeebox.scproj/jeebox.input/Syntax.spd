@@ -106,11 +106,7 @@ datatype Syntax (Byte)
 				|| obj = _syxdict_.valuelower(name) #expect (where, "Unknown syntax " + name)
 				return obj.id
 			
-		function StdNew (|fpMsgRender| msg, |string|name, |String| LongName, |Syntax|) 
-		// called by the compiler via "syx" syntax.
-		// would be better to just make these all consts?
-		// at least... the syxnum should be.		
-			|| ID = .CurrFuncID_++
+		function StdNew (|fpMsgRender| msg, |string|name, |String| LongName, |int| ID,  |Syntax|) 
 			|| result = Syntaxobj.new(msg, name, ID)
 			_syxdict_[name] = result
 			_Funcarray_[ID] = result

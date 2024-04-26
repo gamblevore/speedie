@@ -627,8 +627,9 @@ function Tran_ForStart (|Message| arg, |Message| index, |SCNode| p)
 	start.MakeComment
 
 
+|| SyxID = 0
 function Tran_Syx (|Message| msg, |Message|)
-	// if the msg is a extend function (delayed processing), then its in the extendlist
+	// If the msg is a extend function (delayed processing), then its in the extendlist
 	// which is a message... so when we get "argplace" below, we end up getting the
 	// extendlist, meaning we now put a decl into the extendlist... which isnt what expected
 	// something seems wrong with the design? I guess its fixed by movetoinitfunc...
@@ -648,7 +649,7 @@ function Tran_Syx (|Message| msg, |Message|)
 	|| OldName	= name.name
 	|| SyxName	= "Syx" + OldName
 
-	name.name	= OldName + "__" // just cos that's what I'm used to.
+	name.name	= OldName + "__"
 	Params.Name = "fpMsgRender"
 
 	expect ( OldName.Length <= 4 )  ( msg, "Name too long (max=4)" )
@@ -663,20 +664,26 @@ function Tran_Syx (|Message| msg, |Message|)
 		dot2 <~ @emb
 		prm <~ OldName.lowercase
 		prm <~ Name2
+		prm <~ SyxID
 
 	|| ArgPlace = msg.Ancestor(@Arg).Ancestor(@Arg)
-	|| dcl		= MakeDecl( "syntax", SyxName, DotNew )
-	ArgPlace <~ dcl
+	|| DclMsg		= MakeDecl( "syntax", SyxName, DotNew )
+	ArgPlace <~ dclmsg
 
 	|| fn_msg = @func.msg
 	fn_msg <~ (@thg, "syntax")
-	// fn_msg.msg(@prm) <~ (@thg, "const") // sigh. We need to make proper consts
 
-	dcl.first!.ReplaceWith(fn_msg)
+	dclmsg.first!.ReplaceWith(fn_msg)
 
 	Compiler.SyxArray <~ OldName
-	Compiler.program.CollectOne( dcl, true )
-	
+	Compiler.program.CollectOne( dclmsg, true )
+
+	|| SyxConst = SCDecl(TypeSyntax!)
+	Compiler.newconst(SyxConst)
+	NewDeclNum( SyxConst, syxid, "k"+syxname )
+	compiler.program.TryAdd( msg, SyxConst, SyxConst.Name )
+	compiler.actualsyxes <~ SyxConst
+	SyxID++
 	Return msg
 
 

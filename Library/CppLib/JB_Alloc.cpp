@@ -1189,8 +1189,8 @@ void JB_Mem_ClassLeakCounter () {
 
 
 static inline JB_Object* Trap_ (FreeObject* Obj) { // what a task_ to trap
-//	if (JB_ObjectID((JB_Object*)Obj)==39894124)
-//		debugger;
+	if (JB_ObjectID((JB_Object*)Obj)==16854826)
+		debugger;
 	Obj->FakeRefCount = 0;
     return (JB_Object*)Obj;
 }

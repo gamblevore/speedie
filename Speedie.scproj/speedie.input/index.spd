@@ -11,6 +11,11 @@ conf
 	fun_and_fashion "tasks_function_correctly"
 
 
+compile_linking
+	flags
+		vm			true
+
+
 ignore // better append syntax?
 	WriteTo <~ { tmp "ello"
 		thg "you"
