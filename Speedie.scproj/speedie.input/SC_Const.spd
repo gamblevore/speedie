@@ -97,11 +97,8 @@ function SCNode.CollectConstantsSub (|Message| ch)
 	
 	
 	if (ch == "flags")
-		|| NewItem = SCDecl(TypeInt!)
-		Compiler.newconst(NewItem)
 		|| s = (FuncName.Name, "Flag")(FuncName)
-		NewDeclNum( NewItem, lastflag|int|.bits, "Largest" + s )
-		.TryAdd( ch, NewItem, NewItem.Name )
+		.AddNumericConst("Largest" + s, lastflag|int|.bits, ch)
 	
 	for (D in FixLater)
 		.Tran_Const( D, self )

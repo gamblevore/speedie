@@ -187,6 +187,10 @@ function SimpleVar (fn_asm)
 		fn = exp.func
 	if fn == @thg
 		return thg(self, exp)
+	if fn == @num
+		|| d = exp.FastDecl
+		if !d.exportposition
+			return 0.var
 
 
 function Thg (fn_asm)
@@ -203,8 +207,10 @@ function Thg (fn_asm)
 	if d is const								// We want a number, really
 		|| R = dest.var
 		expect (R and dest isnt set) (exp)
-		.NumToReg(d.ExportPosition, R, exp)
-		return dest
+		|| val = d.exportposition
+			.NumToReg(val, R, exp)
+			return dest
+		return 0.var
 
 	expect (d is global) (Exp)
 	if dest isnt discard

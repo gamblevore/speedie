@@ -620,11 +620,8 @@ function Message.File (|SCFile|)
 
 function Message.FileNum (|int|)
 	opt norefcounts
-	nil self
-	for S.up in self
-		|| r = S.memoryLayer.num3
-			Return r
-		require S != @arg
+	return .memoryLayer.num3
+
 
 
 function scclass.IsMArray (|message| arr, |bool|)

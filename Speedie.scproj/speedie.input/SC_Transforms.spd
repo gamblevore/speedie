@@ -667,11 +667,7 @@ function Tran_Syx (|Message| msg, |Message|)
 		prm <~ SyxID
 		Compiler.program.CollectOne( dotnew, true )
 
-	|| SyxConst = SCDecl(TypeSyntax!)
-	Compiler.newconst(SyxConst)
-	NewDeclNum( SyxConst, syxid, syxname )
-	compiler.program.TryAdd( msg, SyxConst, SyxConst.Name )
-	compiler.actualsyxes <~ SyxConst
+	compiler.actualsyxes <~ compiler.program.AddNumericConst(syxname, syxid, msg)
 
 	SyxID++
 	Return msg
@@ -920,4 +916,13 @@ function message.LoopExitter (|int| ASMType, |SCBlockage| ExitCode)
 	.ExpectEmpty
 	.ASMType = ASMType
 	.LastInBlock(ExitCode)
-	
+
+
+
+function scnode.AddNumericConst (|string| name, |int64| value, |message| where, |scdecl|)
+	opt norefcounts
+	|| SyxConst = SCDecl(TypeSyntax!)
+	Compiler.newconst(SyxConst)
+	NewDeclNum( SyxConst, value, name )
+	.TryAdd( where, SyxConst, SyxConst.Name )
+	return syxconst

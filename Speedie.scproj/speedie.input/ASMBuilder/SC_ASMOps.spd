@@ -5,6 +5,7 @@ prototype fn_OpASM (|&ASMFuncState| self, |asmreg| dest, |asmreg| L, |asmreg| R,
 // do add+mul during opt_phase
 // theres a lot more we can do there too.
 
+
 module asmOps
 	function Plus	(fn_opasm)
 		// what about the type? i think we just figure iout.

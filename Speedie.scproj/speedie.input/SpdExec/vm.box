@@ -137,28 +137,29 @@ EROR (U1)
 
 
 #!						 (((((FUNC)))))
-STCK (U1)
-	r[-1] += u1 + U1_Lu
-
-SWAP (Swap)
-	std_swap(r[SWAP_Au], r[SWAP_Bu])
-	std_swap(r[SWAP_Cu], r[SWAP_Du])
-
-FNC  (Func)
-	__
-	Code = BumpStack(r, Code, Op)
-	___
-
-FNCX (Func)
-	__
-	vm.CurrStack = r // to make this recursive
-	ForeignFuncSimple(r, Code, Op)
-	___
 
 RET (rn)
 	__ 
 	Code = Return(r, Code, Op)
 	___
+
+FUNC  (Func,2,3)
+	__
+	Code = BumpStack(r, Code, Op)
+	___
+
+FNCX (Func,2,3)
+	__
+	vm.CurrStack = r // to make this recursive
+	ForeignFuncSimple(r, Code, Op)
+	___
+
+//STCK (U1) // is this for leaf-funcs? idk what this does
+//	r[-1] += u1 + U1_Lu
+
+SWAP (Swap)
+	std_swap(r[SWAP_Au], r[SWAP_Bu])
+	std_swap(r[SWAP_Cu], r[SWAP_Du])
 
 LEAF ("j")
 	__

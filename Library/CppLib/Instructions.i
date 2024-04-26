@@ -2,13 +2,11 @@
 ı EROR: _
 	debugger;
 	return u1 + U1_Lu;
-	// 						 (((((FUNC)))))
-ı STCK: _
-	r[-1] += u1 + U1_Lu;
-ı SWAP: _
-	std_swap(r[SWAP_Au], r[SWAP_Bu]);
-	std_swap(r[SWAP_Cu], r[SWAP_Du]);
-ı FNC: 
+ı FUNC: 
+	__;
+	Code = BumpStack(r, Code, Op);
+	___;
+ı FUNC: 
 	__;
 	Code = BumpStack(r, Code, Op);
 	___;
@@ -17,10 +15,19 @@
 	vm.CurrStack = r;
 	ForeignFuncSimple(r, Code, Op);
 	___;
+ı FNCX: 
+	__;
+	vm.CurrStack = r;
+	ForeignFuncSimple(r, Code, Op);
+	___;
+	// 						 (((((FUNC)))))
 ı RET: 
 	__;
 	Code = Return(r, Code, Op);
 	___;
+ı SWAP: _
+	std_swap(r[SWAP_Au], r[SWAP_Bu]);
+	std_swap(r[SWAP_Cu], r[SWAP_Du]);
 ı LEAF: 
 	__;
 	JumpLeaf(Code + U0_Li);

@@ -285,6 +285,7 @@ function InitBasicStuff (|int|) // compiler.init
 	TrueBool  = .AddGlobalConst( "true",  TypeBool!,     NilState.real ||| NilState.trueValue )
 	FalseBool = .AddGlobalConst( "false", TypeBool!,     NilState.real ||| NilState.falseValue )
 	
+	TrueBool!.exportposition = 1
 	.AddGlobalConstNum( "__time_id__",  typeint!,  scimport.recent.timeid )
 	.AddGlobalConstNum( "__now__",      typedate!, date.now )
 	.AddGlobalConstNum( "__modified__", typedate!, scimport.recent)

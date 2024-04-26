@@ -43,12 +43,12 @@ extend PerryIDE
 		.UpdateErrorCount
 		
 	
-	
 	function CheckedOK (|string| kind, |bool|)
 		.ClearErrors(kind=="compile")
 		if .viewing == .ViewErrors
 			.NoNeed(.CompileOKString, .viewfiles)
 		return true
+
 
 	function message.ActualReplaceError (|string| src)
 		|| SubError = src.parse.first

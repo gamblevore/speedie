@@ -1,20 +1,18 @@
 
 
+// exec.scproj uses this file.... so dont add too much to it!
+
 struct FatASM
+	|uint[6]|		R	
 	|byte|			Op
 	|byte|			Label	// 255 labels per function
 							// Can we remove the label? I don't like it. It seems OK though... unused bytes.
 	|uint16|		FileNum
-	|uint[6]|		R	
 	|uint|			BytePos
 	
 	operator isa (|int| m, |bool|)
 		return m == .op
 		
-	setter Debug (|message|)
-		.filenum = currfilenum
-		.Bytepos = value.position
-	
 	function FS (|FastString| fs)
 		opt norefcounts
 		|| op = instruction.typelist[.op] #debug_Require
@@ -41,10 +39,6 @@ struct FatASM
 	
 	render
 		.fs(fs)
-	
-	module
-		|[string]|	Resources
-		|int|		CurrFileNum // 
 
  
  

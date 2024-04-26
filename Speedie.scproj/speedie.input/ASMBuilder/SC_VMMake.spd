@@ -13,7 +13,6 @@ module VM_Builder {
 |message|		dt_prm
 |string|		parent
 |byte|			NormalPos = 0
-|byte|			HighPos = 240
 
 
 function DefineGetSub (|string| fname,  |int| up,  |int| down, |byte| c, |byte| c2)
@@ -124,9 +123,10 @@ function GenerateOne (|message| form_msg, |int| f)
 	|| p    = 0
 	|| arg  = form_msg[@arg,-1]							#require
 	|| Max = 32
-//	if arg.prev == "..."
-//		frm.Varies = true
-//		Max = 64
+	// think the max thing basically... is still OK for 2/3/4 opcodes
+	// because this only affects "normal named fields"... and the accessors it creates for them
+	// but the other extra fields just take an entire opcode... so its entirely separate
+	// i guess it just affects render/debug
 	for l in arg
 		bit_pos = .GenAcc(l, bit_pos, p++, max)
 	
@@ -239,15 +239,51 @@ function VMDecl (|message| tmp, |[message]| msgs)
 	opt norefcounts
 	|| arg = tmp.last
 	|| prms = tmp.first
-	|| name = prms.firstname.asmnormalise
+	|| P1 = prms.first
+	|| Counts = p1.next
+	
+	|| name = p1.name.ASMNormalise
 	|| form = µform.forms.valuelower(name)			#require
-	|| id = (.highpos++, .normalpos++)(form.varies)
-	asm.Encoders[id] = asm.Forms[form.Index]
-	msgs[id] = tmp
 	name = "ASM_" + name
 	.ModuleArg <~ NewDecl(name)
-	.ModuleArg <~ NeweqRel(@thg+tmp.name, id|int|.msg)
-// TypeList
+	|| tn = tmp.name
+	
+	while
+		|| id = .NextID(counts)
+		asm.Encoders[id] = asm.Forms[form.Index]
+		msgs[id] = tmp
+		if !counts or counts == p1.next
+			.AddASM(tn, id)
+		if counts
+			.AddASM(tn+counts.render, id)
+		counts = counts.next #loop
+
+
+function AddASM (|string| name, |int| id) 
+	opt norefcounts
+	|| msg = id.msg
+	|| thg = @thg + name
+	.ModuleArg <~ NewEqRel(thg, msg)
+
+
+function NextIDWithCounts (|message!| counts, |int|)
+	|| i = counts.int(0, 1, 4)
+		i--
+		while i < 16
+			if i and !asm.Encoders[i]
+				return i
+			i += 4
+	error (counts, "Can't find free ID for ASM")
+
+	
+function NextID (|message?| counts, |int|)
+	if counts
+		return .NextIDWithCounts(counts)
+	rz = .normalpos
+	if rz
+		.normalpos = rz+1
+	  else
+		.normalpos = 16
 
 
 function VMTmp (|message| tmp, |[message]| msgs)		

@@ -7,10 +7,10 @@ module TextAssembler
 	function TextFunc (|message| msg, |bool|) // assemble a function from text
 		|| fn = SCFunction.new
 		fn.source = msg
-		TreeAssembler.StdState.Initstate(fn)
-		|| arg = TreeAssembler.StdState.TextFuncSub(msg)
+		TreeAssembler.State.Initstate(fn)
+		|| arg = TreeAssembler.State.TextFuncSub(msg)
 			compiler.exportnames[fn.exportname] = fn
-		TreeAssembler.StdState.FinishASM
+		TreeAssembler.State.FinishASM
 		.LabelsToDo.dispose
 
 
@@ -29,7 +29,7 @@ module TextAssembler
 
 
 module TreeAssembler
-	|ASMFuncState|				StdState
+	|ASMFuncState|				State
 	|[scfunction]|				PackFuncs
 	
 	function InitAll
@@ -60,7 +60,7 @@ module TreeAssembler
 	function VacuumPack (|[scfunction]| list)
 		opt norefcounts
 		require platform.IsDebug
-		.stdstate.TotalInit
+		.State.TotalInit
 		
 		for fn in list
 			.Vacuum(fn)
@@ -69,12 +69,12 @@ module TreeAssembler
 	function Vacuum (|SCFunction| fn)
 		opt norefcounts
 		
-		.StdState.Initstate(fn)
+		.State.Initstate(fn)
 		|| fp = fn_asm_table[@arg]
 			|| R = 0.var
 			|| A = fn.SourceArg!
-			(fp)(TreeAssembler.StdState, A, R)
-		.StdState.FinishASM
+			(fp)(TreeAssembler.State, A, R)
+		.State.FinishASM
 
 
 

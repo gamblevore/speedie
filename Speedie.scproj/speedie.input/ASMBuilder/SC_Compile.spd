@@ -119,11 +119,6 @@ struct ASMFuncState
 		return (fn)(self, exp, var)
 
 
-/*
-	Tempvars... hmmm... the problem is... that anything that is going into a func.
-	We need to make sure it stays? We need to allocate it properly. or have it already allocated.
-*/
-
 	function prm (|message| prm, |asmreg|)
 		|| r = asmtmp.simplevar(self, prm)
 		if r != 0
@@ -131,11 +126,10 @@ struct ASMFuncState
 		return .µ(prm, .DeclareMe(prm, 0))
 		
 		
-
 	function DoFunc (|message| prms, |asmreg| dest, |asmreg|)
 		opt norefcounts
 		|| fn = prms.asfunc
-		expect (fn and fn.args <= 16) (prms, "Too many parameters")
+		expect (fn and fn.args <= 10) (prms, "Too many parameters")
 
 		if dest is discard
 			dest = 0
@@ -143,33 +137,27 @@ struct ASMFuncState
 			dest = .tempme(prms, dest)
 			dest.µtype = fn.RegType
 
-		|byte[16]| Regs
-		|| i = 0
+		|uint| Reg2
+		|uint| Reg3
+		|| sh2 = 0
+		|| sh3 = 0
 
 		|| OV = .OpenVars
 		for p.fast in prms
-			regs[i++] = .prm(p)
+			|| v = .prm(p)
+			if sh2 <= 24
+				reg2 |= (v << sh2)
+				sh2 += 6
+			  else
+				reg3 |= (v << sh3)
+				sh3 += 6
 		.closevars(OV)
 
-		|| Fnc = .AddASM(asm.fnc, prms.parent!, .vdecls, fn.TableId) 
+		|| OP = (asm.func3, asm.func2)(sh3)
+		|| Fnc = .AddASM(OP, prms.parent!, save : .vdecls, incr : 0, jump : fn.TableId)
+		fnc.r[3] = reg2
+		fnc.r[4] = reg3 
 
-// so... lets make function call 64-bit flat. No extension.
-// and have a "push" instruction... that we call BEFORE the func. It can push 4 vars
-// 
-
-
-		|uint64| B
-		while i > 0
-			B <<= 5
-			B |= regs[--i]
-		// what if there are more than 6 regs passed?
-			// we need to fill this in
-/*
-	Func
-		SaveRegs	5 
-		Incr		1 // parent can fill this in.
-		JUMP		j
-*/
 		return dest
 
 
