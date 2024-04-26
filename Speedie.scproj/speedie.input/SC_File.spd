@@ -10,18 +10,20 @@ class SCFile (file)
 	|string|		FData
 	|Message?|		LiveAST
 	|Message?|		OrigAST
-	|uint16|		filenum
+	|uint16|		FileNum
 	|bool|			IsInternal
 
 
-	constructor (|File| f, |scimport| p)
+	constructor (|File| f, |scimport| p, |int| n)
 		super.constructor((f.path, "")(f != nil))
 		flow off
 		.Proj = p
+		.filenum = scimport.allfiles.length
 		.IsInternal = f == nil
 		.LiveAST = .start_ast
 		Compiler.stTotalFileCount += .isinternal
 		(SCImport.Recent max= f.modified) 
+		
 	
 	
 	function Start_AST (|message|)
@@ -34,7 +36,7 @@ class SCFile (file)
 	function Use 
 		opt norefcounts
 		scimport.curr = .proj
-		|| l = .LiveAst // if parse fails...
+		|| l = .LiveAst
 			l.memoryLayer.Use
 	
 	
@@ -59,7 +61,6 @@ class SCFile (file)
 	
 	function Orig (|message|)
 		if !.OrigAST// or .OrigDate < .Modified
-//			.OrigDate = .Modified
 			.OrigAST = .ASTSub(true)
 		return .OrigAST
 	
@@ -85,6 +86,7 @@ class SCFile (file)
 		
 		|| str = .Readall(true).decompress
 			|| Layer = (Message).CreateUseLayer(self, str)
+			layer.num3 = .filenum
 			.fData = str
 			StdErr.source = .path
 			parser._DotInsertallow = true	// more consistant with IDE

@@ -34,11 +34,11 @@
 #define   U4_Lu_(x)   (((uint)((x)<<28))>>28)
 
 
-#define   Func_SaveRegsu       (((uint)((Op.Raw)<<8))>>59)
-#define   Func_SaveRegsu_(x)   (((uint)((x)<<8))>>59)
+#define   Func_SaveRegsu       (((uint)((Op.Raw)<<8))>>27)
+#define   Func_SaveRegsu_(x)   (((uint)((x)<<8))>>27)
 
-#define   Func_Incru       (((uint)((Op.Raw)<<13))>>63)
-#define   Func_Incru_(x)   (((uint)((x)<<13))>>63)
+#define   Func_Incru       (((uint)((Op.Raw)<<13))>>31)
+#define   Func_Incru_(x)   (((uint)((x)<<13))>>31)
 
 #define   Func_JUMPi       ((( int)((Op.Raw)<<14))>>14)
 #define   Func_JUMPi_(x)   ((( int)((x)<<14))>>14)
@@ -94,14 +94,14 @@
 #define   Mem_Lu_(x)   (((uint)((x)<<20))>>20)
 
 
-#define   Setn_lenu       (((uint)((Op.Raw)<<8))>>62)
-#define   Setn_lenu_(x)   (((uint)((x)<<8))>>62)
+#define   Setn_lenu       (((uint)((Op.Raw)<<8))>>30)
+#define   Setn_lenu_(x)   (((uint)((x)<<8))>>30)
 
-#define   Setn_Destu       (((uint)((Op.Raw)<<10))>>59)
-#define   Setn_Destu_(x)   (((uint)((x)<<10))>>59)
+#define   Setn_Destu       (((uint)((Op.Raw)<<10))>>27)
+#define   Setn_Destu_(x)   (((uint)((x)<<10))>>27)
 
-#define   Setn_Condu       (((uint)((Op.Raw)<<15))>>62)
-#define   Setn_Condu_(x)   (((uint)((x)<<15))>>62)
+#define   Setn_Condu       (((uint)((Op.Raw)<<15))>>30)
+#define   Setn_Condu_(x)   (((uint)((x)<<15))>>30)
 
 #define   Setn_Li       ((( int)((Op.Raw)<<17))>>17)
 #define   Setn_Li_(x)   ((( int)((x)<<17))>>17)
@@ -142,11 +142,11 @@
 #define   BFLD_downu       (((uint)((Op.Raw)<<24))>>26)
 #define   BFLD_downu_(x)   (((uint)((x)<<24))>>26)
 
-#define   BFLD_signi       ((( int)((Op.Raw)<<30))>>30)
-#define   BFLD_signi_(x)   ((( int)((x)<<30))>>30)
+#define   BFLD_Li       ((( int)((Op.Raw)<<30))>>30)
+#define   BFLD_Li_(x)   ((( int)((x)<<30))>>30)
 
-#define   BFLD_signu       (((uint)((Op.Raw)<<30))>>30)
-#define   BFLD_signu_(x)   (((uint)((x)<<30))>>30)
+#define   BFLD_Lu       (((uint)((Op.Raw)<<30))>>30)
+#define   BFLD_Lu_(x)   (((uint)((x)<<30))>>30)
 
 
 #define   SWAP_Au       (((uint)((Op.Raw)<<8))>>26)

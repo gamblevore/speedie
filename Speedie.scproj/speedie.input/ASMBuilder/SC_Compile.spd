@@ -58,13 +58,6 @@ struct ASMFuncState
 		rz.r[0] = a
 		target debug: rz.print
 
-
-	function AddExtended (|message| err, |uint| Bits)
-		pragma inline
-		|| B = 1<<31
-		expect !(Bits&B) (err)
-		bits |= b
-		(self <~ (asm.extended, err)).rest = bits
 		
 
 	syntax append (|uint| code, |message| dbg, |&FatASM|)
@@ -158,8 +151,7 @@ struct ASMFuncState
 			regs[i++] = .prm(p)
 		.closevars(OV)
 
-		|| Fnc = .AddASM(asm.fnc, prms.parent!, .vdecls) 
-		fnc.rest = fn.TableId
+		|| Fnc = .AddASM(asm.fnc, prms.parent!, .vdecls, fn.TableId) 
 
 // so... lets make function call 64-bit flat. No extension.
 // and have a "push" instruction... that we call BEFORE the func. It can push 4 vars

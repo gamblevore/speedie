@@ -147,6 +147,7 @@ function CollectCppsInto ( |File| Fol,  |File| Objects, |?&int| stdafx, |[File]|
 	
  
 function Clean (|bool|)
+	"/tmp/Speedie".file.deleteall
 	"/tmp/Speedie64".file.deleteall
 	"/tmp/SpeedieApps".file.deleteall
 	return stderr.ok
@@ -251,6 +252,9 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	|| cgcf = compiler.generatedcppsfolder
 		
 	rz.AppendWords( "   -D TARGET_UNIX=1 -D __SPEEDIE__=1  -I $cppl  -I $cbf -I $cgcf  " )
+	if linkage.vm
+		rz.AppendWords( "-D __VM__" )
+		
 	
 
 

@@ -22,11 +22,6 @@ constants
 	kNumericMatch		= 2 << 22
 	kSimpleMatch		= 1 << 22
 	kNoMatch			= 0
-	
-	kSaveProperty		= 1 // for when we want to save the property, but not go into the object to add it to save-list
-	kSavePropertyAndGoIn= 2 // for most of them?  
-	kDontSaveProperty	= 0 // sets the variable to zero on load.
-
 
 	kTypeCastMost				= 1
 	kTypeCastNumbers			= 2
@@ -93,7 +88,7 @@ class SCDecl (SCNamed) {
 
 	|int|				C_Array
 	
-	|uint64|			ExportPosition
+	|uint64|			ExportPosition	// also can store numeric constants float/int up to 64-bits
 	|SCFunction--?|		HiderFunc		// todo: replace the .StringData/hider thing with this.
 	|Object?|			IsLookupOnly
 	|string|			StringData		// 3 special objects. Aren't they exclusive? Write some code to see if they are.

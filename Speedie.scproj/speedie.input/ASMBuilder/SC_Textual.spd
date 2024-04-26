@@ -21,13 +21,13 @@ extend AsmFuncState
 	function TrySmallConst (|uint| reg,  |int64| Value, |message| where, |bool|)
 		|| set1_test = (value|int|<<12)>>12 // u1 takes 12 bits for stuff
 		if set1_test == value
-			.AddASM(asm.set1, where, reg).rest = set1_test
+			.AddASM(asm.set1, where, reg, set1_test)
 			return true
 
 		|| R = (~Value|uint64|).LongestBitStretch	// longest false-stretch
 		if r.x >= 50		// OK so we have the longest stretch in r.x
 			value = value rotl 63-r.y
-			.AddASM(asm.setk, where, reg, r.y).rest = value|int|
+			.AddASM(asm.setk, where, reg, r.y, value)
 			return true
 
 
@@ -77,7 +77,7 @@ extend AsmFuncState
 			if p != @name
 				a.AddRegParam(p, write)
 			  else
-				a.rest = .GetLabelJump(p)
+				a.AddRegNum(p, write, .GetLabelJump(p))
 			expect (++write <= op.pcount) (list, "Too many params")
 
 		return (op.pcount == write) #expect (list, "Too few params")
@@ -96,13 +96,13 @@ extend AsmFuncState
 				|| Found = .findlabel(a)
 				if !found
 					debugger, .findlabel(a), return false
-				A.rest = Found-A
+				A.r[0] = Found-A
 		return true
 	
 	
 	function FatASM.File (|string|)
 		opt norefcounts
-		|| s = FatASM.Resources[.filepos]
+		|| s = scimport.allfiles[.filenum]
 			return s
 	
 	
@@ -114,7 +114,7 @@ extend AsmFuncState
 
 	function FindLabel (|&FatASM| dbg, |&FatASM|)
 		opt norefcounts
-		|| num = dbg.rest
+		|| num = dbg.r[0]
 		for A in .out
 			if a.label == num
 				return a

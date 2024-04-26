@@ -22,7 +22,7 @@ class SCObject
 	function File (|SCFile?|)
 		opt norefcounts
 		|| src = .Source
-			return src.SCFile
+			return src.File
 		if self isa SCModule
 			return .cls.file?
 	

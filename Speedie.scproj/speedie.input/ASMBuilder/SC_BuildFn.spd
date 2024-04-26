@@ -45,7 +45,7 @@ function @asm.Enc1
 	R.r[0] = 3
 	R.r[1] = 2
 	R.r[2] = 1
-	R.Rest = 0
+	r.r[3] = 0
 	|| oof = R.Encode
 
 

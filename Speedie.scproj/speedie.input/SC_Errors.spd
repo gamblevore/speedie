@@ -90,7 +90,7 @@ function Compiler.RenderErrors (|errorreceiver| stderr, |errorseverity| MinSev, 
 
 function Message.FileLocation (|string|)
 	opt norefcounts
-	return .SCfile$.path
+	return .file$.path
 
 
 function Error.Improve
@@ -101,9 +101,9 @@ function Error.Improve
 		.position = node.position
 
 	if !.path
-		|| SC = node.SCFile$
+		|| SC = node.File$
 		
-		if sc != .node.scfile
+		if sc != .node.file
 			.node = node // wrong file!!
 		if sc.exists
 			.path = sc.path

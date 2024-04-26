@@ -35,10 +35,7 @@ function DefineGet (|string| fname,  |int| up,  |int| down, |bool| last, |[messa
 // we need to create an array of forms...
 function FillTypePrm (|string| fname, |int| pname)
 	|| prop = @thg + fname
-	if pname >= 4
-		.dt_prm <~ macros.ASMcopier2.run(prop)	
-	  else
-		.dt_prm <~ macros.ASMcopier.run(prop, pname.msg)
+	.dt_prm <~ macros.ASMcopier.run(prop, pname.msg)
 
 
 function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max,   |int|)
@@ -127,9 +124,9 @@ function GenerateOne (|message| form_msg, |int| f)
 	|| p    = 0
 	|| arg  = form_msg[@arg,-1]							#require
 	|| Max = 32
-	if arg.prev == "..."
-		frm.Varies = true
-		Max = 64
+//	if arg.prev == "..."
+//		frm.Varies = true
+//		Max = 64
 	for l in arg
 		bit_pos = .GenAcc(l, bit_pos, p++, max)
 	

@@ -34,6 +34,11 @@ dispatch fn_asm_table (fn_asm)
 		debugger
 
 
+/*
+	we need the new system... this will be 1,2,3,4 per item below 16
+	we need some way to modify
+*/
+
 	@func:
 		opt norefcounts
 		// 0, a, b, fn(), b*b, a*a

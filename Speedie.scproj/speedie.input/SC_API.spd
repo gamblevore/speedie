@@ -4,7 +4,7 @@ module SC_API
 	// CreateAPI! (parsing input)
 	function Message.APICppProject (|string|)
 		opt norefcounts
-		|| f = .scfile
+		|| f = .file
 			|| it = f.exportname
 				return it.lowercase
 			|| a = f.proj

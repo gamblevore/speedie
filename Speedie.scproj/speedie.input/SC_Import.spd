@@ -172,17 +172,15 @@ class SCImport
 			item.expect(@thg)
 			x.valuelower(item.name) = "x"
 	
-	
+
 	function ImportSpd (|File| c, |SCFile|)
-		|| path = c.lowercase
-		check !(compiler.files![ path ]) (c, "File included twice")
-		rz = SCFile( c, self )
+		expect (scimport.allfiles < 64K) (c, "Too many files included")
+		|| path = c.LowerCase
+		check !compiler.files[ path ] (c, "File included twice")
+		rz = SCFile( c, self, scimport.allfiles.length )
 		compiler.files![ path ] = rz
-		.files <~ rz
-		|| n = scimport.allfiles.length
-		check (n < 64K) (c, "Too many files included")
-		rz.FileNum = n
 		scimport.allfiles <~ rz
+		.files <~ rz
 	
 	
 	function ImportDir (|File| f,  |SCFile?|)

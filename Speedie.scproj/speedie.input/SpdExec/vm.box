@@ -61,7 +61,7 @@ forms
 
 
 
-	Func ...	// func: fnc:
+	Func	// func: fnc:
 		SaveRegs	5
 		Incr		1
 		JUMP		j
@@ -90,7 +90,7 @@ forms
 		r2		r
 		move	2
 	
-	Setn ...
+	Setn
 		len		2
 		Dest	5
 		Cond	2	// 0 == always, 1 = only if dest == 0, 2 = only if dest != 0
@@ -116,7 +116,6 @@ forms
 		r2		r
 		up		6
 		down	6
-		sign	2
 	
 	SWAP
 		A		6
@@ -217,7 +216,7 @@ BXOR  (U3)
 BNOT  (U2)
 	u1 = ~u2
 BFLG  (BFLD)
-	if (BFLD_signu) // perhaps sign can allow for 1-4 contig regs to be masked?
+	if (BFLD_Lu) // perhaps sign can allow for 1-4 contig regs to be masked?
 		i1 = ((i2 << BFLD_upu) >> BFLD_downu)
 	else
 		u1 = ((u2 << BFLD_upu) >> BFLD_downu)

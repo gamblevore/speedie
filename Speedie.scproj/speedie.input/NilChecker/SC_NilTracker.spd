@@ -263,7 +263,7 @@ function message.OrigRender	(|faststring| fs = nil, |string|)
 
 function message.OrigMsg (|message|)
 	opt norefcounts
-	|| f = .SCFile
+	|| f = .File
 		return f.orig.findtightest(.position, false, true)
 
 

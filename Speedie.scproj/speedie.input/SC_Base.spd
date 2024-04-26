@@ -868,7 +868,7 @@ module {
 		require (name_space isa scclass) or (name_space isa scmodule)
 		
 		if (name_space == compiler.program) // it's at root!
-			|| file = node.scfile
+			|| file = node.file
 				file.exportname = node[@thg]$.name
 			node.remove
 		

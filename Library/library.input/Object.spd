@@ -220,6 +220,7 @@ class MemoryLayer
 
 	|Object|		Obj
 	|Object|		Obj2
+	|uint64|		Num3
 	
 	constructor (|&ClassData| Cls)
 		cpp_wrapper JB_Mem_Constructor

@@ -63,7 +63,7 @@ linkage
 |String|					_Projects
 |String|					_SpeedieProj
 |File|						TempFolder
-|SCFile|					InternalFile = SCFile.new(nil, SCImport(nil, true))
+|SCFile|					InternalFile = SCFile.new(nil, SCImport(nil, true), -1)
 |string|					ProjectName
 |string|					ReportedName
 |scimport|					Project
@@ -610,7 +610,6 @@ function InitCompiler
 	.CreateRoot
 	.CreateDisambiguation
 	SCImport.AllFiles <~ .InternalFile
-	FatASM.Resources = SCImport.AllFiles // why not? its just the same thing really. scfile is a subclass of file
 
 
 

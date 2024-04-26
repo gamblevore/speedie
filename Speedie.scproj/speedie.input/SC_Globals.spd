@@ -609,12 +609,20 @@ function TypeOfExpr (|Message?| Exp, |SCNode| name_space, |Message?| side = nil,
 			return obj
 
 
-function Message.SCFile (|SCFile|)
+function Message.File (|SCFile|)
 	opt norefcounts
 	nil self
 	for S.up in self
 		|| r = S.memoryLayer.obj
 		if r isa SCFile
+			Return r
+		require S != @arg
+
+function Message.FileNum (|int|)
+	opt norefcounts
+	nil self
+	for S.up in self
+		|| r = S.memoryLayer.num3
 			Return r
 		require S != @arg
 

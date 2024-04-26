@@ -546,7 +546,7 @@ function FLookup (assigns:|SCNode|)
 		return 
 
 	|| S = .Source
-		|| f = S.SCFile
+		|| f = S.File
 			.Project = f.Proj
 
 

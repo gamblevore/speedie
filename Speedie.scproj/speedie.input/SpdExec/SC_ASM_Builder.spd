@@ -4,16 +4,20 @@
 */
 
 
-function FatASM.AddRegParam (|message| src, |uint| write)
+
+function FatASM.AddRegNum (|message| src, |uint| write, |uint| num)
 	opt norefcounts
-	|| Num = src.regornum
-	if write < 4
+	if write < 5
 		.r[write] = num // what if it's the last one...
 		check (.r[write] == num) (src, "Number out of bounds.")
-	  elseif write == 4
-		.rest = num
 	  else
 		debugger
+
+
+function FatASM.AddRegParam (|message| src, |uint| write)
+	opt norefcounts
+	.addregnum(src,write,src.regornum)
+	
 
 
 

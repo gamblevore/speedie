@@ -8,6 +8,15 @@
 ı SWAP: _
 	std_swap(r[SWAP_Au], r[SWAP_Bu]);
 	std_swap(r[SWAP_Cu], r[SWAP_Du]);
+ı FNC: 
+	__;
+	Code = BumpStack(r, Code, Op);
+	___;
+ı FNCX: 
+	__;
+	vm.CurrStack = r;
+	ForeignFuncSimple(r, Code, Op);
+	___;
 ı RET: 
 	__;
 	Code = Return(r, Code, Op);
@@ -30,6 +39,8 @@
 	i1 = U1_Li;
 ı SETK: _
 	i1 = JB_u64_RotL(Const_Lu, Const_rotu);
+ı SETN: _
+	loadconst(r, Op, Code);
 	// 						 (((((Math)))))
 ı ADDC: _
 	i1 = i2 + JB_u64_RotL(L3, n3);
@@ -57,7 +68,7 @@
 ı BNOT: _
 	u1 = ~u2;
 ı BFLG: _
-	if (BFLD_signu) 
+	if (BFLD_Lu) 
 	i1 = ((i2 << BFLD_upu) >> BFLD_downu)
 ;
 	else 
@@ -197,16 +208,5 @@
 	d1 = d2 / d3;
 ı PRNT: _
 	printf("%lli\n", i1);
-ı FNC: 
-	__;
-	Code = BumpStack(r, Code, Op);
-	___;
-ı FNCX: 
-	__;
-	vm.CurrStack = r;
-	ForeignFuncSimple(r, Code, Op);
-	___;
-ı SETN: _
-	loadconst(r, Op, Code);
 ı 
 
