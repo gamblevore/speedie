@@ -19,7 +19,7 @@ typedef u64 (*Fn8)(u64, u64, u64, u64, u64, u64, u64, u64);
 #define AlwaysInline static inline __attribute__((__always_inline__))
 
 
-AlwaysInline void divmath(s64* r, ASM Op) {
+AlwaysInline void DivMath(Register* r, ASM Op) {
 	auto R3 = i3;
 	auto R4 = i4;
 	switch (Op & 3) { // so there are 4 possible divisions we can do
@@ -43,24 +43,24 @@ AlwaysInline void divmath(s64* r, ASM Op) {
 }
 
 
-AlwaysInline void loadconst(s64* r, ASM Op, ASM* Code) {
+AlwaysInline void loadconst(Register* r, ASM Op, ASM* Code) {
 	u32 Cond  = Setn_Condu;
 	u32 Count = Setn_lenu+1;
 	u32 Back  = Setn_Lu+1;
-	
-	u64* Read = ((u64*)Code)-Back;
-	auto Write = (u64*)(&i1);
-	if (Cond) {
-		if (Cond == 1) {
-			if (u1) return;
-		} else if (Cond == 2) {
-			if (!u1) return;
-		} else if (Cond == 3) {
-			if (u1) Read+=Count; // conditional const read :)
-		}
-	}
-	for_(Count)
-		*Write++ = *Read++;
+	// rewrite this
+//	u64* Read = ((u64*)Code)-Back;
+//	auto Write = (u64*)(&i1);
+//	if (Cond) {
+//		if (Cond == 1) {
+//			if (u1) return;
+//		} else if (Cond == 2) {
+//			if (!u1) return;
+//		} else if (Cond == 3) {
+//			if (u1) Read+=Count; // conditional const read :)
+//		}
+//	}
+//	for_(Count)
+//		*Write++ = *Read++;
 }
 
 
@@ -91,18 +91,7 @@ AlwaysInline u64 bitstats(u64 R2, u64 R3, u64 Mode) { // rotate
 	return 0;
 }
 
-//AlwaysInline u64 bitstats(s64* r, ASM Op) { // rotate
-//	if (L == 3) {					// rotate (rot 1 == rot 63)
-//		s64 R3 = u3 + _Const_rotu;
-//		return JB_u64_RotL(R2, R3);
-//	}
-//  if (L == 3) {
-//		s64 R3 = u3 + _Const_rotu;
-//		return JB_u32_RotL((u32)R2, (u32)R3);
-//	return 0;
-//}
-
-AlwaysInline uint bitstats32(s64* r, ASM Op) {
+AlwaysInline uint bitstats32(Register* r, ASM Op) {
 	int L = Const_Li;
 	u64 R2 = u2;
 	if (L == 0) {							// popcount
@@ -136,41 +125,41 @@ AlwaysInline JB_Object* alloc(void* o) {
 }
 
 
-AlwaysInline void Conv (s64* s, int Conv) {
+AlwaysInline void Conv (Register* r, int Conv, int Op) {
 	// float, double, u64, s64. 12 conversions possible (and 4 pointless ones)
-	float*	f = (float*)s;
-	double*	d = (double*)s;
-	u64*	u = (u64*)s;
+
+	Register& d = *(r + n1);  
+	Register& s = *(r + n3);  
     switch (Conv) {
-        case 0 : *f = *f; break;
-        case 1 : *f = *d; break;
-        case 2 : *f = *u; break;
-        case 3 : *f = *s; break;
+        case 0 : d.Float = s.Float;  break;
+        case 1 : d.Float = s.Double; break;
+        case 2 : d.Float = s.Uint;   break;
+        case 3 : d.Float = s.Int;    break;
         
-        case 4 : *d = *f; break;
-        case 5 : *d = *d; break;
-        case 6 : *d = *u; break;
-        case 7 : *d = *s; break;
+        case 4 : d.Double = s.Float;  break;
+        case 5 : d.Double = s.Double; break;
+        case 6 : d.Double = s.Uint;   break;
+        case 7 : d.Double = s.Int;    break;
         
-        case 8 : *u = *f; break;
-        case 9 : *u = *d; break;
-        case 10: *u = *u; break;
-        case 11: *u = *s; break;
+        case 8 : d.Uint = s.Float;  break;
+        case 9 : d.Uint = s.Double; break;
+        case 10: d.Uint = s.Uint;   break;
+        case 11: d.Uint = s.Int;    break;
         
-        case 12: *s = *f; break;
-        case 13: *s = *d; break;
-        case 14: *s = *u; break;
-        case 15: *s = *s; break;
+        case 12: d.Int = s.Float;  break;
+        case 13: d.Int = s.Double; break;
+        case 14: d.Int = s.Uint;   break;
+        case 15: d.Int = s.Int;    break;
     }
 }
 
 
-AlwaysInline bool Rare(s64* r, ASM Op) {
+AlwaysInline bool Rare (Register* r, ASM Op) {
 	auto r1 = i1;
 	auto r2 = i2;
 	if (!r1 and !r2) return true;	// HALT	
 	if (r2 == 1) {		// time
-		r[r1] = RDTSC();
+		r[r1].Uint = RDTSC();
 	} else if (r2 == 2) {
 		JB_Date__Sleep(1);
 	}
@@ -191,7 +180,7 @@ AlwaysInline bool Rare(s64* r, ASM Op) {
 #define CmpSub(Mode, Cmp) case Mode: return (Cmp);
 
 
-AlwaysInline bool CompI_(s64* r, ASM Op) {
+AlwaysInline bool CompI_(Register* r, ASM Op) {
 	auto A = &i1;
 	auto B = &i2;
 	switch (Cmp_Cmpu) {
@@ -219,7 +208,7 @@ AlwaysInline bool CompI_(s64* r, ASM Op) {
 }
 
 
-AlwaysInline bool CompF_(s64* r, ASM Op) {
+AlwaysInline bool CompF_(Register* r, ASM Op) {
 	auto A = &i1;
 	auto B = &i2;
 
@@ -239,7 +228,7 @@ AlwaysInline bool CompF_(s64* r, ASM Op) {
 }
 
 
-AlwaysInline ASM* CompI(s64* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* CompI(Register* r, ASM Op, ASM* Code) {
 	uint Jump = Cmp_Lu; 
 	bool b = CompI_(r, Op);
 	if (Jump >= 32) {
@@ -247,12 +236,12 @@ AlwaysInline ASM* CompI(s64* r, ASM Op, ASM* Code) {
 		return Code + Jump - (1<<9);
 	}
 		
-	r[Jump] = b;
+	r[Jump].Int = b;
 	return Code;
 }
 
 
-AlwaysInline ASM* CompF(s64* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* CompF(Register* r, ASM Op, ASM* Code) {
 	uint Jump = Cmp_Lu; 
 	bool b = CompF_(r, Op);
 	if (Jump >= 32) {
@@ -260,17 +249,17 @@ AlwaysInline ASM* CompF(s64* r, ASM Op, ASM* Code) {
 		return Code + Jump - (1<<9);
 	}
 		
-	r[Jump] = b;
+	r[Jump].Int = b;
 	return Code;
 }
 
-AlwaysInline ASM* CompEq(s64* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* CompEq(Register* r, ASM Op, ASM* Code) {
 	if (!(u1 xor u2))
 		return Code;
 	return Code + CmpEq_Jmpi;
 }
 
-AlwaysInline ASM* CompNeq(s64* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* CompNeq(Register* r, ASM Op, ASM* Code) {
 	if (u1 xor u2)
 		return Code;
 	return Code + CmpEq_Jmpi;
@@ -310,7 +299,7 @@ void MemStuff(u32* A, u32* B, u32 Operation, u32 L) {
 }
 
 			
-AlwaysInline void CountConst(s64* r, ASM Op) {
+AlwaysInline void CountConst(Register* r, ASM Op) {
 	int Size = CNTC_sizeu;
 	int Off  = CNTC_Lu-8;
 	int Add  = CNTC_cnstu-128;
@@ -328,74 +317,84 @@ AlwaysInline void CountConst(s64* r, ASM Op) {
 
 
 // BasicASMFunc
-AlwaysInline ASM* Return (s64*& r, ASM* Code, ASM Op) {
-	Code			= (ASM*)(r[-1]);
+AlwaysInline ASM* Return (Register*& r, ASM* Code, ASM Op) {
+	Code			= (ASM*)(r[-1].Addr);
 	auto CpyFrom    = u1; 
 	//auto CpyLen     = u2;		// unused // should use this!
 	auto j			= *Code;	// this is at where we are going back to.
 	Code += 2;
 
-	auto Result     = r[CpyFrom];
-	r			   -= Func_SaveRegsu_(j) + 2;
+	auto r2			= r - Func_SaveRegsu_(j) + 2;
 	if (Func_Incru_(j))
-		incr(Result);
-	r[Func_SaveRegsu_(j)+1] = Result;
+		incr(r[CpyFrom].Obj);
+	r2[Func_SaveRegsu_(j)+1] = r[CpyFrom];
 	return Code;
 }
 
 
-#define RegCpy(n)    case n: Dest[n] = Src[Regs.R##n]
-AlwaysInline ASM* BumpStack (s64*& Src, ASM* Code, ASM j) { // jumpstack 
-	BasicRegs2	Regs = *((BasicRegs2*)Code); 
-	auto		N    = 0;//Func_RegsToSendu_(j.Raw);
-	s64*		Dest = Src+Func_SaveRegsu_(j.Raw)+1;
-	*(u64*)Dest		 = (u64)(Code-1); // return point
-	Dest++;
-	switch (N) {
-	default:
-		RegCpy(8);
-		RegCpy(7);
-		RegCpy(6);
-		RegCpy(5);
-		RegCpy(4);
-		RegCpy(3);
-		RegCpy(2);
-		RegCpy(1);
-	case 0:
-		Dest[0] = 0;
-	};
+/*
+var transfers:
+	1) Variable width in memory: Complex. Slow. Can't be simultaneous.
+	2) Copy them by half: 		 Requires very long param lists. 7.5 simds max.
+	3) Bigger registers:		 Double the size. Slower to save/restore. Simpler and faster to call functions and SIMD.
+ */
 
-	u32 RP = Regs.Jump;
-	if (RP<32) {
-		Src = Dest;
-		return Code + signext32(RP-32, 25);
+
+#define Transfer(Input,Shift) (r[(Input>>(Shift*5))&31])
+AlwaysInline ASM* BumpStack (Register*& rp, ASM* Code, ASM Op) { // jumpstack
+	Register* r = rp;
+	ASM  Code2 = Code[0];
+	ASM  Code3 = Code[1];
+	int RemainCodes = Op&3;
+	Register* ENTR = r+Func_SaveRegsu+1;
+	ENTR->Addr = Code+RemainCodes;
+	r = ++ENTR; rp = r;
+	ENTR[0] = {};
+	ENTR[1] = Transfer(Code2, 0);
+	ENTR[2] = Transfer(Code2, 1);
+	ENTR[3] = Transfer(Code2, 2);
+	ENTR[4] = Transfer(Code2, 3);
+	ENTR[5] = Transfer(Code2, 4);
+	ENTR[6] = Transfer(Code2, 5); // isn't 5 registers enough?
+	if (RemainCodes>1) {  // transfer more regs.
+		debugger; 
+		ENTR[ 6] = Transfer(Code3, 0);
+		ENTR[ 7] = Transfer(Code3, 1);
+		ENTR[ 8] = Transfer(Code3, 2);
+		ENTR[ 9] = Transfer(Code3, 3);
+		ENTR[10] = Transfer(Code3, 4);
+		ENTR[11] = Transfer(Code3, 5);
 	}
-	ASM* Result = ((ASM**)Src)[RP];
-	Src = Dest;
-	return Result;
+	// we can take 31 values off the lower end. like 0x8000 is -32K 
+	// read from registers instead.
+
+	int j = Func_JUMPi;
+	Code += j;
+	return Code;
 }
 
 
 #define FFISub(Mode, FP)	case 11-Mode:	return ((Fn##Mode)Fn)FP;
-AlwaysInline u64 ForeignFuncSimple(s64* r, ASM*& Code, ASM Op) {
+AlwaysInline u64 ForeignFuncSimple(Register* r, ASM*& Code, ASM Op) {
 	// use libffi later
 	// Op.Raw |= *Code++;
-	auto Oof = (BasicRegs3*)Code;
-	auto j = *Oof;
-	Code = (ASM*)Oof;
-	Goto Fn = (Goto*)r[0]; // it was the register pointer... but needs fix now
-	switch (8/*Func_RegsToSendu*/) {
-	default:
-		FFISub(8 , (r[j.R1], r[j.R2], r[j.R3], r[j.R4], r[j.R5], r[j.R6], r[j.R7], r[j.R8]));
-		FFISub(7 , (r[j.R1], r[j.R2], r[j.R3], r[j.R4], r[j.R5], r[j.R6], r[j.R7]));
-		FFISub(6 , (r[j.R1], r[j.R2], r[j.R3], r[j.R4], r[j.R5], r[j.R6]));
-		FFISub(5 , (r[j.R1], r[j.R2], r[j.R3], r[j.R4], r[j.R5]));
-		FFISub(4 , (r[j.R1], r[j.R2], r[j.R3], r[j.R4]));
-		FFISub(3 , (r[j.R1], r[j.R2], r[j.R3]));
-		FFISub(2 , (r[j.R1], r[j.R1]));
-		FFISub(1 , (r[j.R1]));
-		FFISub(0 , ());
-	};
+//	auto Oof = (BasicRegs3*)Code;
+//	auto j = *Oof;
+//	Code = (ASM*)Oof;
+//	Goto Fn = (Goto*)r[0]; // it was the register pointer... but needs fix now
+//	switch (8/*Func_RegsToSendu*/) {
+//	default:
+//		FFISub(8 , (r[j.R1], r[j.R2], r[j.R3], r[j.R4], r[j.R5], r[j.R6], r[j.R7], r[j.R8]));
+//		FFISub(7 , (r[j.R1], r[j.R2], r[j.R3], r[j.R4], r[j.R5], r[j.R6], r[j.R7]));
+//		FFISub(6 , (r[j.R1], r[j.R2], r[j.R3], r[j.R4], r[j.R5], r[j.R6]));
+//		FFISub(5 , (r[j.R1], r[j.R2], r[j.R3], r[j.R4], r[j.R5]));
+//		FFISub(4 , (r[j.R1], r[j.R2], r[j.R3], r[j.R4]));
+//		FFISub(3 , (r[j.R1], r[j.R2], r[j.R3]));
+//		FFISub(2 , (r[j.R1], r[j.R1]));
+//		FFISub(1 , (r[j.R1]));
+//		FFISub(0 , ());
+//	};
+	return 0;
 }
 
 

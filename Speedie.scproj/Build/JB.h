@@ -3357,7 +3357,7 @@ void SC_VM_Builder__MakeJump(Message* Msg, FastString* Jump);
 
 void SC_VM_Builder__MakeTheVM();
 
-void SC_VM_Builder__MakeVM(Message* Tmp, FastString* Vm);
+void SC_VM_Builder__MakeVM(Message* Tmp, FastString* Vm, Message* NextxC2xA1);
 
 int SC_VM_Builder__NextID(Message* Counts);
 
@@ -4080,6 +4080,8 @@ JB_String* JB_dbl_RenderFloat(double Self, FastString* Fs_in);
 float JB_f_RoundTo(float Self, int To);
 
 float JB_f_Fract(float Self);
+
+JB_String* JB_f_PC(float Self, FastString* Fs_in);
 
 float JB_f_Pow(float Self, int N);
 
@@ -5956,6 +5958,8 @@ void JB_FS_MsgErrorName(FastString* Self, JB_String* Name);
 
 void JB_FS_Normal(FastString* Self, JB_String* S);
 
+void SC_FS_pc(FastString* Self, float Amount, float Over);
+
 void JB_FS_PrintNicely(FastString* Self, JB_String* S);
 
 void JB_FS_ProblemsFound(FastString* Self, int Count);
@@ -7024,7 +7028,7 @@ JB_List* JB_Tree_WrapWith(JB_List* Self, JB_List* W);
 // JB_µFunc1
 void SC_ASMFunc2_Destructor(ASMFunc2* Self);
 
-int64 SC_ASMFunc2_RunArgs(ASMFunc2* Self, int64* Args, int ArgCount);
+int64 SC_ASMFunc2_RunArgs(ASMFunc2* Self, ivec4* Args, int ArgCount);
 
 void SC_ASMFunc2_Visible(ASMFunc2* Self);
 

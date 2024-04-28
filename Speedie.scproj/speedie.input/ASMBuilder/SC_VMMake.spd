@@ -212,25 +212,27 @@ function VMSpd   (|message| list, |[message]|)
 	
 function VMCpp (|faststring| vm, |faststring| jump)
 	opt norefcounts
-	for tmp in .NameList
-		.MakeVM(tmp, vm)
+	for (tmp in .NameList) (i)
+		.MakeVM(tmp, vm, .NameList[i+1])
 		.MakeJump(tmp, jump)
 
 	vm <~ "ı \n\n"
 
 
-function MakeVM (|message| tmp, |faststring| vm)
+function MakeVM (|message| tmp, |faststring| vm, |message| Next¡)
 	opt norefcounts
 	require tmp == @tmp
 	|| p = tmp.prev
 	if P == @sheb
 		vm <~ "	// ${P.name}\n"
 
+	require Next¡ != tmp
 	|| arg = tmp.last
 	vm <~ "ı ${tmp.name}: "
 	if !arg.Find(@tmp, "__")
 		vm <~ "_"
 	vm <~ "\n"
+
 	for line in arg
 		.VMLine(line, vm)
 

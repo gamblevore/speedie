@@ -6,15 +6,6 @@
 	__;
 	Code = BumpStack(r, Code, Op);
 	___;
-ı FUNC: 
-	__;
-	Code = BumpStack(r, Code, Op);
-	___;
-ı FNCX: 
-	__;
-	vm.CurrStack = r;
-	ForeignFuncSimple(r, Code, Op);
-	___;
 ı FNCX: 
 	__;
 	vm.CurrStack = r;
@@ -40,7 +31,7 @@
 ı RARE: _
 	if_rare (Rare(r, Op)) return n3;
 ı CONV: _
-	Conv(r + n1, n2);
+	Conv(r, n2, Op);
 	// 						 (((((Consts)))))
 ı SET1: _
 	i1 = U1_Li;
@@ -58,7 +49,7 @@
 ı MUL: _
 	i1 = (i2 * i3) + i4;
 ı DIV: _
-	divmath(r, Op);
+	DivMath(r, Op);
 	// 						 (((((Bitops)))))
 ı SHRS: _
 	i1 = i2 >> (u3 + L3);

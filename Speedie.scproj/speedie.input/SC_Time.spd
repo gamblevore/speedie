@@ -22,12 +22,21 @@ function compiler.PrintStats
 	require options.argstats
 	|| fs = faststring()
 	fs <~ "FuncStats: "
+	|| n = 0
+	for i in 12
+		n += scfunction.FuncStats[i]
 	for i in 12
 		|| c = scfunction.FuncStats[i]
 			if i
 				fs <~ ", "
-			fs <~ "$i:$c"
+			fs <~ i
+			fs <~ ":"
+			fs.pc(i|float|, n|float|)
 	printline fs
+
+
+function faststring.pc (|float| amount, |float| over)
+	(amount/over).pc(self)
 
 
 function compiler.PrintCompileErrors

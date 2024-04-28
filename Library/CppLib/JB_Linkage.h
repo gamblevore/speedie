@@ -43,10 +43,23 @@ extern "C" {
 	int JB_SP_Run (const char** R, int Mode);
 	
 // VM 
+
+struct Register {
+	union {
+		void*		Addr;
+		JB_Object*	Obj;
+		s64			Int;
+		u64			Uint;
+		float		Float;
+		double		Double;
+		ivec4		Ivec;
+		vec4		Vec;
+	};
+};
+
 	int64 JB_ASM_Run(u32* Code, u32 CodeSize);
 	struct jb_vm;
-	s64* JB_ASM_Registers(jb_vm* V);
-	s64* JB_ASM_ClearRegisters(jb_vm* V, int n);
+	ivec4* JB_ASM_Registers(jb_vm* V, bool Clear);
 	jb_vm* JB_ASM_VM();
 	typedef void (*SaverLoadClass)(JB_Class* cls, char* Data);
 	void JB_InitClassList(SaverLoadClass fn);

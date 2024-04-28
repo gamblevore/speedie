@@ -51,11 +51,11 @@ class µFunc1 (memory)
 	function Visible
 		visible // needed to compile strangely...
 	
-	function Run (|&int64| Args = nil, |int| ArgCount=nil, |int64|)
+	function Run (|&ivec4| Args = nil, |int| ArgCount=nil, |int64|)
 		cpp_part RunArgs
 		require self
 		if args
-			|| r = jb_vm.vm.ClearRegisters(argcount)
+			|| r = jb_vm.vm.Registers(true)
 			for i in argcount
 				r[i] = args[i] 
 		

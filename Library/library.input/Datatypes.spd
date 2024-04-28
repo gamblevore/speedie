@@ -424,7 +424,7 @@ datatype float
 	render
 		fs <~ self
 
-	render PC
+	render PC // operator percent, operator pc 
 		if !self
 			fs <~ "0"
 		  else

@@ -529,6 +529,9 @@ module StringCorrector
 
 
 	function CorrectStrings
+		// if its speedie they should all use the same strings.txt file?
+		// at least... speedie compile vs speedie via xcode should use the same.
+		// cos the cpp file is put in the same place! perhaps we are copying the cpp file from build2 or build3?
 		.CorrectFile(Compiler.GeneratedCppsFolder[ "strings.txt" ]!)
 
 	

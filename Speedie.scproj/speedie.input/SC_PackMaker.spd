@@ -113,9 +113,9 @@ module PackMaker
 
 	
 	function MiniTest (|scfunction| fn1)
-		|| args = {8725l, 275l}
+		|| args = {8725l, 1l, 275l, 1l}
 		|| mu   = fn1.asm
-			|| Result = mu.finish.run( &args[0], –count args )
+			|| Result = mu.finish.run( (&args[0])|&ivec4|, –count args )
 			if result != 9000
 	
 

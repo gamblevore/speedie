@@ -130,6 +130,9 @@ struct ASMFuncState
 		opt norefcounts
 		|| fn = prms.asfunc
 		expect (fn and fn.args <= 10) (prms, "Too many parameters")
+		// speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:3, 8:1
+		// there are only 4 above 6!, only 14 above 5
+		// a count COULD be useful... but IDC really.
 
 		if dest is discard
 			dest = 0
@@ -137,24 +140,23 @@ struct ASMFuncState
 			dest = .tempme(prms, dest)
 			dest.µtype = fn.RegType
 
+		debugger
 		|uint| Reg2
 		|uint| Reg3
-		|| sh2 = 0
-		|| sh3 = 0
-
+		|| sh = 0
 		|| OV = .OpenVars
+
 		for p.fast in prms
 			|| v = .prm(p)
-			if sh2 <= 24
-				reg2 |= (v << sh2)
-				sh2 += 6
+			if sh <= 25
+				reg2 |= (v << sh)
 			  else
-				reg3 |= (v << sh3)
-				sh3 += 6
+				reg3 |= (v << (sh-30))
+			sh += 5
 		.closevars(OV)
 
-		|| OP = (asm.func3, asm.func2)(sh3)
-		|| Fnc = .AddASM(OP, prms.parent!, save : .vdecls, incr : 0, jump : fn.TableId)
+		|| OP = (asm.func3, asm.func2)(sh <= 25)
+		|| Fnc = .AddASM(OP,  prms.parent!,  save: .vdecls,  incr: 0,  jump: fn.TableId)
 		fnc.r[3] = reg2
 		fnc.r[4] = reg3 
 

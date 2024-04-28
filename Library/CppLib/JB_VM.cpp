@@ -19,7 +19,6 @@ Later:
 
 
 #include "JB_Umbrella.hpp"
-//#include "JB.h"
 
 extern "C" {
 #if __VM__
@@ -46,7 +45,7 @@ s64 RunVM (jb_vm& vm) {		// vm_run, vm__run, vmrun, run_vm
     ASM* LeafCode = 0;			 // maybe remove leaffuncs? I mean... why not just inline them?
     ASM* Code	  = vm.Env.Code; // we want to minimise vars anyhow
     Goto Next     = 0;
-    s64* r		  = vm.Stack.Registers;
+    Register* r	 = vm.Stack.Registers;
 
 	START: ___;
 	#include "Instructions.i"
@@ -58,16 +57,11 @@ s64 RunVM (jb_vm& vm) {		// vm_run, vm__run, vmrun, run_vm
 
 
 jb_vm* vm;
-s64* JB_ASM_Registers(jb_vm* V) {
-	return V->Stack.Registers+1;
-}
-s64* JB_ASM_ClearRegisters(jb_vm* V, int i) {
-	s64* Ret = V->Stack.Registers;
-	Ret[0] = 0;
-	while (++i <= 32) {
-		Ret[i] = 0;
-	}
-	return Ret+1;
+ivec4* JB_ASM_Registers(jb_vm* V, bool Clear) {
+	Register* Ret = V->Stack.Registers;
+	if (Clear)
+		memset(Ret, 0, sizeof(vec4)*32);
+	return (ivec4*)(Ret+1);
 }
 
 
@@ -87,7 +81,6 @@ jb_vm* JB_ASM_VM() {
 	vm->GuardValue = 1234567890;
 	vm->EXIT[0] = VMExitReturn;
 	vm->EXIT[1] = 1; // halt
-	vm->Stack.JumpBackTo = vm->EXIT;	// yay
 //	vm->Stack.ResultRegister = 1;		// Remove this? the calling instruction should specify the result.
 	vm->StackSize  = (StackSize - sizeof(jb_vm))/sizeof(u64);
 	return vm;

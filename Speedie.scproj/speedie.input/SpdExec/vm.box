@@ -176,7 +176,7 @@ RETL ("l")
 RARE (U2)
 	if_rare (Rare(r, Op)) return n3
 CONV (U3)
-	Conv(r+n1, n2)
+	Conv(r, n2, Op)
 
 
 #!						 (((((Consts)))))
@@ -198,7 +198,7 @@ SUB  (U3)
 MUL  (U4)
 	i1 = (i2 * i3) + i4
 DIV  (U4)
-	divmath(r, Op)
+	DivMath(r, Op)
 
 
 #!						 (((((Bitops)))))
