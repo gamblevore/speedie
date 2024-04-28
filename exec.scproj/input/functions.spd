@@ -41,7 +41,7 @@ class function
 	
 	
 	function Run (|int64|)
-		jb_vm.vm.ClearRegisters 
+		jb_vm.vm.Registers 
 		return jb_vm.Run(.speediefunc!.ASM[0], .length)
 	
 	
