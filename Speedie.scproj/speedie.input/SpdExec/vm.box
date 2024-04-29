@@ -91,8 +91,8 @@ forms
 		move	2
 	
 	Setn
+		r1		r
 		len		2
-		Dest	5
 		Cond	2	// 0 == always, 1 = only if dest == 0, 2 = only if dest != 0
 	
 	CNTR	// 
@@ -122,6 +122,12 @@ forms
 		B		6
 		C		6
 		D		6
+		
+	RET
+		r1		r
+		r2		r
+		Count	3
+		Exists	1
 
 
 // this file:
@@ -138,12 +144,12 @@ EROR (U1)
 
 #!						 (((((FUNC)))))
 
-RET (rn)
+RET (Ret)	// ret: 
 	__ 
 	Code = Return(r, Code, Op)
 	___
 
-FUNC  (Func,2,3)
+FUNC (Func,2,3) // func: 
 	__
 	Code = BumpStack(r, Code, Op)
 	___
@@ -154,8 +160,6 @@ FNCX (Func,2,3)
 	ForeignFuncSimple(r, Code, Op)
 	___
 
-//STCK (U1) // is this for leaf-funcs? idk what this does
-//	r[-1] += u1 + U1_Lu
 
 SWAP (Swap)
 	std_swap(r[SWAP_Au], r[SWAP_Bu])

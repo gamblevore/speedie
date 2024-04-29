@@ -42,7 +42,7 @@ struct FatASM
 
  
  
-class µFunc1 (memory)
+role µFunc1 (memory)
 	linkage
 		cpp_class ASMFunc2
 		cpp_part ASMFunc2

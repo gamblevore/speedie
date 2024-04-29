@@ -78,7 +78,7 @@ module PackMaker
 		|| pack = jbin(@tmp, "xpd")
 		pack.enter
 		pack.enter(@tmp, "app")
-		.orderglobals(pack)
+		.OrderGlobals(pack)
 		.MakePackSub(pack, upon)
 
 		Compiler.ProductFile.SmartData = pack

@@ -9,26 +9,32 @@ class µFunc {
 	|int|					Length
 	|bool|					OK
 	
+
 	constructor (|scfunction| fn, |&FatASM| IR)
 		.fn = fn
 		.IR = ir
 		fn.asm = self
 	
+
 	function Name (|string|)
 		return .fn.ExportName
 
+
 	function Finish (|µFunc1|)
-	
-	function JBin.Add (|µFunc| fn)
-		.AddMemory(@bin, fn.length*4)
-		for i in fn
-			.AppendInt(i.Encode)
+		debugger
+		return µFunc1(.length, 4, .IR|&byte|)
+		
 
 /// TEXTUAL STUFF		
 	render
 		fs <~ "asm ${.fn.name}\n"
+		|| skip = 0
 		for µ in self
-			ifn µ isa asm.Extended
+			if skip > 0
+				skip--
+			  else
+				if µ.op < 16
+					skip = µ.op & 3
 				fs <~ '\t'
 				µ.render(fs)
 				fs <~ '\n'
@@ -39,7 +45,9 @@ class µFunc {
 		while currinst < .length
 			yield Addr+currinst
 			currinst++
-
-	syntax append (|FatASM| A)
-		disabled "Append the fields directly via asmfuncstate"
 }
+
+function JBin.Add (|µFunc| fn)
+	.AddMemory(@bin, fn.length*4)
+	for i in fn
+		.AppendInt(i.Encode)

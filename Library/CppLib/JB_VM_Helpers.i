@@ -317,17 +317,25 @@ AlwaysInline void CountConst(Register* r, ASM Op) {
 
 
 // BasicASMFunc
-AlwaysInline ASM* Return (Register*& r, ASM* Code, ASM Op) {
-	Code			= (ASM*)(r[-1].Addr);
-	auto CpyFrom    = u1; 
-	//auto CpyLen     = u2;		// unused // should use this!
-	auto j			= *Code;	// this is at where we are going back to.
-	Code += 2;
+AlwaysInline ASM* Return (Register*& rp, ASM* Code, ASM Op) {
+	Register* r		= rp;
+	if ((u2 == 0) != RET_Existsu)
+		return Code; // skip
+	auto S			= r[-1].Stack;
+	Code			= (ASM*)S.Addr + 2;
+	auto To			= r - (S.Regs + 2);
+	auto From		= r+u1;
+	auto Result		= *From++;
+	rp = To;
 
-	auto r2			= r - Func_SaveRegsu_(j) + 2;
-	if (Func_Incru_(j))
-		incr(r[CpyFrom].Obj);
-	r2[Func_SaveRegsu_(j)+1] = r[CpyFrom];
+	if (S.Incr)
+		incr(Result.Obj);
+	int More = RET_Countu;
+	while (More -->= 0) {
+		To[++S.Regs] = Result;
+		Result = *From++;
+	}
+		
 	return Code;
 }
 
@@ -340,14 +348,18 @@ var transfers:
  */
 
 
-#define Transfer(Input,Shift) (r[(Input>>(Shift*5))&31])
+#define Transfer(Input,Shift)  (r[(Input>>(Shift*5))&31])
 AlwaysInline ASM* BumpStack (Register*& rp, ASM* Code, ASM Op) { // jumpstack
 	Register* r = rp;
 	ASM  Code2 = Code[0];
 	ASM  Code3 = Code[1];
 	int RemainCodes = Op&3;
-	Register* ENTR = r+Func_SaveRegsu+1;
-	ENTR->Addr = Code+RemainCodes;
+	int Save = Func_SaveRegsu;
+	Register* ENTR = r+Save+1;
+	ENTR->Stack.Addr = Code+RemainCodes;
+	ENTR->Stack.Regs = Save;
+	ENTR->Stack.Incr = Func_Incru;
+
 	r = ++ENTR; rp = r;
 	ENTR[0] = {};
 	ENTR[1] = Transfer(Code2, 0);
@@ -355,8 +367,8 @@ AlwaysInline ASM* BumpStack (Register*& rp, ASM* Code, ASM Op) { // jumpstack
 	ENTR[3] = Transfer(Code2, 2);
 	ENTR[4] = Transfer(Code2, 3);
 	ENTR[5] = Transfer(Code2, 4);
-	ENTR[6] = Transfer(Code2, 5); // isn't 5 registers enough?
-	if (RemainCodes>1) {  // transfer more regs.
+	ENTR[6] = Transfer(Code2, 5);			// Isn't 5 registers enough?
+	if (RemainCodes>1) {					// transfer more regs.
 		debugger; 
 		ENTR[ 6] = Transfer(Code3, 0);
 		ENTR[ 7] = Transfer(Code3, 1);

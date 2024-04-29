@@ -1,6 +1,6 @@
 
 
-prototype fn_OpASM (|&ASMFuncState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| dbg, |asmreg|)
+prototype fn_OpASM (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| dbg, |asmreg|)
 
 // do add+mul during opt_phase
 // theres a lot more we can do there too.

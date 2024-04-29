@@ -2,7 +2,7 @@
 
 // ADDC? optimise stages... OR special-case it specifically.
 
-struct ASMFuncState
+struct ASMState
 	linkage: cpp_part Vac
 	|SCFunction--|				fn       
 	|µFunc|						Out      
@@ -74,23 +74,23 @@ struct ASMFuncState
 	
 		
 	function DeclareMe (|Message| where,  |asmreg| T,  |asmreg|)
-		if t.var
+		if t.reg
 			return t
 		
 		|| d = .VDecls|int| + 1
 		expect (d + .vtmps <= 31) (where, "No free local variables.")
-		t.var = d
+		t.reg = d
 		.vdecls = d
 		return t
 	
 	
 	function TempMe (|Message| where,  |asmreg| T,  |asmreg|) // .needreg
-		if t.var
+		if t.reg
 			return t
 		
 		|| d = .vtmps|int| + 1
 		expect (d + .vdecls <= 31) (where, "No free local variables.")
-		t.var = d
+		t.reg = d
 		.vdecls = d
 		return t
 
@@ -106,7 +106,7 @@ struct ASMFuncState
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	function µ (|message| exp,  |AsmReg| var = 0.var, |AsmReg|)
+	function µ (|message| exp,  |AsmReg| var = 0.reg, |AsmReg|)
 		opt norefcounts
 		pragma inline
 		cpp_part Var
@@ -132,7 +132,6 @@ struct ASMFuncState
 		expect (fn and fn.args <= 10) (prms, "Too many parameters")
 		// speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:3, 8:1
 		// there are only 4 above 6!, only 14 above 5
-		// a count COULD be useful... but IDC really.
 
 		if dest is discard
 			dest = 0
@@ -165,19 +164,21 @@ struct ASMFuncState
 
 	module
 		|FatASM[]|					JSMSpace = FatASM[0]!
+		|ASMState|					Sh
 		
 
-function ASMFuncState.TotalInit 
+function ASMState.TotalInit (|bool|)
 	opt norefcounts
-	|| j = ASMFuncState.JSMSpace
-	j.Capacity = 4MB
-	.maxlength = j.Capacity
-	.start = j.ptr
-	.Written = 0
-	.AddASM(asm.EROR, compiler.InternalFile.ast!, 0)
+	|| j = ASMState.JSMSpace
+	if j.setcap(4MB)
+		.maxlength = j.Capacity
+		.start = j.ptr
+		.Written = 0
+		.AddASM(asm.EROR, compiler.InternalFile.ast!, 0)
+		return true
 
 
-function ASMFuncState.InitState (|scfunction| fn)
+function ASMState.InitState (|scfunction| fn)
 	.out = µfunc(fn, JSMSpace.ptr + .written)
 	.out.length = -.written
 	.LabelCount = 0
@@ -188,7 +189,7 @@ function ASMFuncState.InitState (|scfunction| fn)
 	.AddFuncParams(fn)
 
 
-function ASMFuncState.FinishASM
+function ASMState.FinishASM
 	opt norefcounts
 	.out.length += .written
 	ifn .last isa asm.ret

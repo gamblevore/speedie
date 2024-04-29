@@ -154,11 +154,12 @@ function Unexpected		(fn_asm)
 	"Bad asmtmp"
 	debugger
 
+
 function Return			(fn_asm)
 	opt norefcounts
 	|| f = exp.first
 		rz = .µ(f)
-	.AddASM(asm.RET, exp, rz)
+	.AddASM(asm.RET, exp, rz, 0.reg, 1, 0)
 
 
 function Pointer		(fn_asm)
@@ -190,7 +191,7 @@ function SimpleVar (fn_asm)
 	if fn == @num
 		|| d = exp.FastDecl
 		if !d.exportposition
-			return 0.var
+			return 0.reg
 
 
 function Thg (fn_asm)
@@ -199,18 +200,18 @@ function Thg (fn_asm)
 	|| d = exp.FastDecl
 	if d is local
 		if dest isnt set						// copy a reg
-			if !d.dreg.var						// what?
+			if !d.dreg.reg						// what?
 			.AddASM(asm.BOR, exp, dest, d.dreg)
 			return dest
 		return d.dreg
 	
 	if d is const								// We want a number, really
-		|| R = dest.var
+		|| R = dest.reg
 		expect (R and dest isnt set) (exp)
 		|| val = d.exportposition
 			.NumToReg(val, R, exp)
 			return dest
-		return 0.var
+		return 0.reg
 
 	expect (d is global) (Exp)
 	if dest isnt discard
@@ -224,7 +225,7 @@ function Thg (fn_asm)
 // and load on the first use of any global? otherwise just optimise.
 
 
-function DoGlobal (|&ASMFuncState| self, |message| exp, |AsmReg| Value, |scdecl| D, |AsmReg|)
+function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Value, |scdecl| D, |AsmReg|)
 	|| addr = value
 	if value isnt set				// a = glob
 		addr = .tempme(exp, value)
@@ -250,7 +251,7 @@ function DoMath (fn_asm)
 	|| ml = .µ(F, dest)
 	|| mr = .µ(op.next!, ml • dest)
 	.CloseVars(OV)
-	require ml.var ||| mr.var
+	require ml.reg ||| mr.reg
 	
 	dest.µtype = ml.µtype						// assignment conversion needs to be done also.
 	|| scop = op.obj|scoperator|
@@ -262,8 +263,8 @@ function DoMath (fn_asm)
 }
 
 function asmreg.operator• (|asmreg| dest, |asmreg|)
-	if .var == dest.var
-		return 0.var
+	if .reg == dest.reg
+		return 0.reg
 	return dest
 
 function ASMReg.ReadOrWrite (|asm|)

@@ -44,16 +44,22 @@ extern "C" {
 	
 // VM 
 
+struct PrevStack {
+	void*		Addr;
+	int			Regs;			
+	int			Incr;			
+};
+
 struct Register {
 	union {
-		void*		Addr;
-		JB_Object*	Obj;
-		s64			Int;
-		u64			Uint;
-		float		Float;
-		double		Double;
-		ivec4		Ivec;
-		vec4		Vec;
+		PrevStack		Stack;
+		JB_Object*		Obj;
+		s64				Int;
+		u64				Uint;
+		float			Float;
+		double			Double;
+		ivec4			Ivec;
+		vec4			Vec;
 	};
 };
 

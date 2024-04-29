@@ -1,7 +1,7 @@
 
 
 
-prototype fn_asm (|&ASMFuncState| self, |message| exp, |AsmReg| Dest=0.var, |AsmReg|)
+prototype fn_asm (|&ASMState| self, |message| exp, |AsmReg| Dest=0.reg, |AsmReg|)
 
 	
 	
@@ -31,10 +31,13 @@ datatype AsmReg (DataTypeCode)
 		  else
 			return  self &~ R
 	
-	function Var (|int|)
+	// we could do this instead
+	// (self-1)&31!!
+	// this will "rotate" 0 back to 31 and 1 to 0.
+	function Reg (|int|)
 		return (self|uint| >> 8) & 31
 	
-	function Var (assigns:|int|, |AsmReg|)
+	function Reg (assigns:|int|, |AsmReg|)
 		target debug
 			if value > 31
 		return (.µtype ||| (value << 8))|asmreg|
@@ -45,7 +48,7 @@ datatype AsmReg (DataTypeCode)
 	
 	syntax cast (|int|)
 		cpp_part ToInt
-		return .var
+		return .reg
 	
 	function SameType (|AsmReg| t, |message| err, |bool|)
 		|| T1 = .µType
@@ -55,6 +58,6 @@ datatype AsmReg (DataTypeCode)
 		return ((t2 == t1) or  (t1.IsInt and t2.IsInt)) #expect (err, "Type-mismatch")
 
 
-function int.Var (|asmreg|)
+function int.Reg (|asmreg|)
 	cpp_part ToReg
-	rz.var = self
+	rz.reg = self

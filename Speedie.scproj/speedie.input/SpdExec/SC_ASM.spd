@@ -9,7 +9,6 @@ datatype ASM (uint)
 		Remainder		= 256
 		NoExpect		= 512
 		PositionBits	= 1024  // no space left...
-		Extended		= 255
 	
 	function IsOK (|bool|)
 		 return self

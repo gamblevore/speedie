@@ -1736,7 +1736,7 @@
 "return"
 "return "
 "returnsdisowned"
-"rn"
+"ret"
 "role"
 "roles can't specify behaviours (roles aren't real classes!)"
 "rrj"

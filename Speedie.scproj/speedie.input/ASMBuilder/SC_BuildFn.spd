@@ -11,7 +11,9 @@ extend_module ASM
 		|| fn = TreeAssembler[testname]
 			|| ff = fn.finish.run
 
+
 	function TestASM 
+		debugger
 		.enc1
 		require options.ModePack
 		|| dev = app.pref("dev").int
@@ -23,13 +25,13 @@ extend_module ASM
 		require dev > 0
 
 		using ErrorSeverity.Warning
-			|| T = ( file://syntax.asm ).parse[@tmp, "tests"]
-				.TestASMSub(T)
+		|| T = ( file://syntax.asm ).parse[@tmp, "tests"]
+			.TestASMSub(T)
 	
 
 function message.GetASMFunc (|message|)
 	opt norefcounts
-	if .var >= 0
+	if .reg >= 0
 		|| op = .next(@opp, "=")
 			|| Adj = op.Next(@adj)
 				return adj[@func]
@@ -49,6 +51,6 @@ function @asm.Enc1
 	|| oof = R.Encode
 
 
-function message.Var (|asmreg|)
-	return .regornum(true)|int|.var
+function message.Reg (|asmreg|)
+	return .regornum(true)|int|.reg
 

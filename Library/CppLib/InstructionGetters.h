@@ -94,11 +94,8 @@
 #define   Mem_Lu_(x)   (((uint)((x)<<20))>>20)
 
 
-#define   Setn_lenu       (((uint)((Op.Raw)<<8))>>30)
-#define   Setn_lenu_(x)   (((uint)((x)<<8))>>30)
-
-#define   Setn_Destu       (((uint)((Op.Raw)<<10))>>27)
-#define   Setn_Destu_(x)   (((uint)((x)<<10))>>27)
+#define   Setn_lenu       (((uint)((Op.Raw)<<13))>>30)
+#define   Setn_lenu_(x)   (((uint)((x)<<13))>>30)
 
 #define   Setn_Condu       (((uint)((Op.Raw)<<15))>>30)
 #define   Setn_Condu_(x)   (((uint)((x)<<15))>>30)
@@ -163,4 +160,17 @@
 
 #define   SWAP_Du       (((uint)((Op.Raw)<<26))>>26)
 #define   SWAP_Du_(x)   (((uint)((x)<<26))>>26)
+
+
+#define   RET_Countu       (((uint)((Op.Raw)<<18))>>29)
+#define   RET_Countu_(x)   (((uint)((x)<<18))>>29)
+
+#define   RET_Existsu       (((uint)((Op.Raw)<<21))>>31)
+#define   RET_Existsu_(x)   (((uint)((x)<<21))>>31)
+
+#define   RET_Li       ((( int)((Op.Raw)<<22))>>22)
+#define   RET_Li_(x)   ((( int)((x)<<22))>>22)
+
+#define   RET_Lu       (((uint)((Op.Raw)<<22))>>22)
+#define   RET_Lu_(x)   (((uint)((x)<<22))>>22)
 

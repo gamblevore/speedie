@@ -1,7 +1,7 @@
 
 // FNC and FNCX are in the wrong place.
 
-extend AsmFuncState
+extend ASMState
 	function LoadTitle (|message| m, |message|)
 		// asm oof (9)
 		opt NoRefCounts
@@ -44,7 +44,7 @@ extend AsmFuncState
 		|| ValMsg = regmsg.Next				#require
 		|| Value  = ValMsg.ASMConst
 		
-		.NumToReg(value, RegMsg.var, orig)
+		.NumToReg(value, RegMsg.reg, orig)
 		return true
 	
 	
