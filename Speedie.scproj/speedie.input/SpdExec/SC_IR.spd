@@ -15,6 +15,7 @@ struct FatASM
 		
 	function FS (|FastString| fs)
 		opt norefcounts
+		/*
 		|| op = instruction.typelist[.op] #debug_Require
 		fs <~ op.name
 		fs <~ ':'
@@ -31,6 +32,7 @@ struct FatASM
 					fs <~ 'r'
 				fs <~ .r[i]
 				remain += bs
+		*/
 
 	function Print
 		visible
@@ -45,17 +47,14 @@ struct FatASM
 role µFunc1 (memory)
 	linkage
 		cpp_class ASMFunc2
-		cpp_part ASMFunc2
+		cpp_part  ASMFunc2
 	contains ASM
+	visible
 
-	function Visible
-		visible // needed to compile strangely...
-	
 	function Run (|&ivec4| Args = nil, |int| ArgCount=nil, |int64|)
 		cpp_part RunArgs
-		require self
+		|| r = jb_vm.vm.Registers(true)
 		if args
-			|| r = jb_vm.vm.Registers(true)
 			for i in argcount
 				r[i] = args[i] 
 		

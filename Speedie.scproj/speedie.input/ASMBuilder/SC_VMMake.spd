@@ -56,6 +56,7 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max,   |int|)
 	lname = .Parent + lname
 	|| arr = .DefineGet(lname, Max-n, bit_pos, bit_pos+n==Max)
 	|| fnc_src = macros.ASMSetter.run(arr)
+	
 	SCFunction.newfunc(fnc_src, nil, line)
 	
 	.FillTypePrm(lname, pname)
@@ -105,16 +106,16 @@ function DataTypeCreate (|message| form,  |int| fnum,  |message|)
 		compiler <~ sigh.first
 
 
-function GenerateForms (|message| forms)
+function GenerateForms (|message| forms, |bool| Rest)
 	opt norefcounts
 	|| f = 0
 	for form_msg in forms[@arg]
 		if (f < 32) #check (form_msg, "Too many forms")
 			using form_msg
-			.GenerateOne(form_msg, ++f)
+			.GenerateOne(form_msg, ++f, rest)
 
 
-function GenerateOne (|message| form_msg, |int| f)
+function GenerateOne (|message| form_msg, |int| f, |bool| rest)
 	opt norefcounts
 	|| frm = .AddForm(form_msg)
 	.dt_prm = .DataTypeCreate(form_msg, f)
@@ -123,10 +124,7 @@ function GenerateOne (|message| form_msg, |int| f)
 	|| p    = 0
 	|| arg  = form_msg[@arg,-1]							#require
 	|| Max = 32
-	// think the max thing basically... is still OK for 2/3/4 opcodes
-	// because this only affects "normal named fields"... and the accessors it creates for them
-	// but the other extra fields just take an entire opcode... so its entirely separate
-	// i guess it just affects render/debug
+
 	for l in arg
 		bit_pos = .GenAcc(l, bit_pos, p++, max)
 	
@@ -139,10 +137,21 @@ function CppLibFile (|string| ch, |file|)
 	return TransCompiler.CppLib[ch]
 	
 
+function VMBox (|message|)
+	|| v = Compiler.InputFile( nil, "vm.box", nil )
+		.vm_file = v
+		rz = v.parse
+
+
+function JustMakeMyBread (|bool|)
+	|| x = .VMBox
+		|| forms = x.find("forms")
+		.DataTypeModule
+		.GenerateForms(forms, false)
+
+
 function BuildFiles (|bool|)
-	|| v = Compiler.InputFile( nil, "vm.box", nil )	#require
-	|| x = v.parse									#require
-	.vm_file = v
+	|| x = .VMBox							#require
 	|| forms = x.find("forms")
 	forms.remove
 
@@ -151,7 +160,7 @@ function BuildFiles (|bool|)
 
 	.Clean(x)
 	.DataTypeModule
-	.GenerateForms(forms)
+	.GenerateForms(forms, true)
 	.NameList = .VMSpd(x)
 	.VMCpp(code, jump)
 
@@ -165,7 +174,7 @@ function BuildFiles (|bool|)
 function MakeTheVM
 	compiler.Project.use
 	require .BuildFiles	
-	treeassembler.InitAll
+	treeassembler.InitTree
 	asm.TestASM
 
 

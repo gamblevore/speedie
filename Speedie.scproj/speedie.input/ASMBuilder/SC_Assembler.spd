@@ -31,7 +31,8 @@ module TextAssembler
 module TreeAssembler
 	|[scfunction]|				PackFuncs
 	
-	function InitAll
+	function InitTree
+		debugger
 		instruction.instructionInit
 		asmtmp.InitAccess
 		Instruction[asm.SET1]!.Const
@@ -56,9 +57,9 @@ module TreeAssembler
 				fn.tableid = rz.length
 			
 		
-	function VacuumPack (|[scfunction]| list)
+	function VakPak (|[scfunction]| list)
 		opt norefcounts
-		ASmState.Sh.TotalInit
+		require ASMState.Sh.PackMakerInit
 		
 		for fn in list
 			.Vacuum(fn)
@@ -72,8 +73,9 @@ module TreeAssembler
 			|| R = 0.reg
 			|| A = fn.SourceArg!
 			(fp)(ASmState.Sh, A, R)
-			printline fn
-		ASmState.Sh.FinishASM
+			ASmState.Sh.FinishASM
+			debugat
+			printline fn.asm
 
 
 

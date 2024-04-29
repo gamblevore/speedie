@@ -1,4 +1,3 @@
-	// 						 (((((STOP)))))
 ı EROR: _
 	debugger;
 	return u1 + U1_Lu;
@@ -11,7 +10,6 @@
 	vm.CurrStack = r;
 	ForeignFuncSimple(r, Code, Op);
 	___;
-	// 						 (((((FUNC)))))
 ı RET: 
 	__;
 	Code = Return(r, Code, Op);
@@ -27,19 +25,16 @@
 	__;
 	Code = LeafCode;
 	___;
-	// 						 (((((Utils)))))
 ı RARE: _
 	if_rare (Rare(r, Op)) return n3;
 ı CONV: _
 	Conv(r, n2, Op);
-	// 						 (((((Consts)))))
 ı SET1: _
 	i1 = U1_Li;
 ı SETK: _
 	i1 = JB_u64_RotL(Const_Lu, Const_rotu);
 ı SETN: _
 	loadconst(r, Op, Code);
-	// 						 (((((Math)))))
 ı ADDC: _
 	i1 = i2 + JB_u64_RotL(L3, n3);
 ı ADD: _
@@ -50,7 +45,6 @@
 	i1 = (i2 * i3) + i4;
 ı DIV: _
 	DivMath(r, Op);
-	// 						 (((((Bitops)))))
 ı SHRS: _
 	i1 = i2 >> (u3 + L3);
 ı SHRU: _
@@ -78,7 +72,6 @@
 	i1 = JB_u64_RotL(u2, u3 + L3);
 ı BROR: _
 	i1 = JB_u64_RotR(u2, u3 + L3);
-	// 						 (((((Branches)))))
 ı CMPI: 
 	__;
 	Code = CompI(r, Op, Code);
@@ -120,7 +113,6 @@
 	Code -= U2_Lu
 ;
 	___;
-	// 						 (((((Refs)))))
 ı RSDE: 
 	__;
 	Code += U3_Li;
@@ -137,7 +129,6 @@
 	o1 = alloc(o2);
 	// should call constructor too.
 
-	// 						(((((Memory)))))
 ı TABL: _
 	u1 = table(u2, L2);
 ı RD1U: _
@@ -187,7 +178,6 @@
 	//  copy/fill/endian/xor
 
 	MemStuff((u32 *) u1, (u32 *) u2, n3, L3);
-	// 						(((((Float)))))
 ı FADD: _
 	f1 = f2 + f3;
 ı FSUB: _

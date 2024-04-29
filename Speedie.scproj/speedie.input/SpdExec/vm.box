@@ -9,57 +9,6 @@ forms
 	U3: r1 r,  r2 r,  r3 r
 	U4: r1 r,  r2 r,  r3 r,  r4 r
 
-// whats the max exe size ill allow?
-// 2mb? 4? 1? lets say... 2mb. reallyistically, it makes the most senes
-// so we'll 4mb range for +-
-// so thats 20-bits
-// using 32-bits, we lose 8, leaving 4.
-// its not enough, for saveregs.
-// OK... lets just try this... 64-bits, forget about anything else.
-// 64 - (7 + 20 + 6 + 1)
-
-// x = (a + b) - (c + d)
-// we put a+b into a temp reg, at the top, so reg 31.
-// the thing that makes it no longer needs it.
-// but what about us? there are two choices.
-// either IT allocates it and dumps it
-// or we allocate it.
-// if IT allocated and dumped it, it COULD be overwritten by us, by accident
-// however heres the thing... WE know we need it. So we could re-reserve it.
-
-// OK... lets say we just pre-reserve it.
-// We prereserve _1 and store a+b in it.
-// then we wanna do c+d
-// so... we need to pre-reserve that too.
-// great.
-  
-// x = _1 - (c + d)
-// x = _1 - _2
-// now we have two regs... that we don't need afterwards. so it does work.
-// but what about simpler things like || x = a+(b+c)
-// we can reuse the registers, but how does it know that. lets see.
-// well... the first + has "a", but needs (b+c)
-// so it asks for it... it has no reg. So we pre-allocate it.
-// then the operation can be done. Easy.
-// lets try this: || x = a+(b+(c+d))
-// we ask for: b+(c+d). lets pre-allocate.
-// it asks for (c+d). lets pre-allocate.
-// i mean... it works? it uses more regs than we need?
-// when we ask for b+(c+d)... we have a pre-allocated reg... but the reg is also unused.
-// how to state that its (currently) unused? set a bit on the reg?
-
-// I mean... why not? we are trying to compute: b+(c+d)
-// in fact... x could be used to store the temps even.
-// i know theres a simple wy to do this.
-
-// lets try again... lets say x = a+(b+(c+d))
-// so... x is unused... lets just mark it unused. we can simplify later.
-// so x is unused... its the dest. we pass the dest in. its been marked unused.
-
-// 
-
-
-
 
 	Func	// func: fnc:
 		SaveRegs	5

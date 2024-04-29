@@ -3,7 +3,7 @@
 // ADDC? optimise stages... OR special-case it specifically.
 
 struct ASMState
-	linkage: cpp_part Vac
+	linkage: cpp_part Pac
 	|SCFunction--|				fn       
 	|µFunc|						Out      
 	|&FatASM|					Start    
@@ -89,9 +89,9 @@ struct ASMState
 			return t
 		
 		|| d = .vtmps|int| + 1
-		expect (d + .vdecls <= 31) (where, "No free local variables.")
-		t.reg = d
-		.vdecls = d
+		expect (d + .vtmps <= 31) (where, "No free local variables.")
+		t.reg = 32-d
+		.vtmps = d
 		return t
 
 
@@ -106,21 +106,21 @@ struct ASMState
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	function µ (|message| exp,  |AsmReg| var = 0.reg, |AsmReg|)
+	function µ (|message| exp,  |AsmReg| R = 0.reg, |AsmReg|)
 		opt norefcounts
 		pragma inline
-		cpp_part Var
+		cpp_part Get
 		|| T = exp.ASMType
 		|| fn = fn_asm_table[T]!
 		target debug
 			if !T
 				fn = fn_asm_table[exp.func|int|]!
 				debugger
-		return (fn)(self, exp, var)
+		return (fn)(self, exp, R)
 
 
 	function prm (|message| prm, |asmreg|)
-		|| r = asmtmp.simplevar(self, prm)
+		|| r = prm.simplevar
 		if r != 0
 			return r
 		return .µ(prm, .DeclareMe(prm, 0))
@@ -146,7 +146,7 @@ struct ASMState
 		|| OV = .OpenVars
 
 		for p.fast in prms
-			|| v = .prm(p)
+			|| v = .prm(p).reg
 			if sh <= 25
 				reg2 |= (v << sh)
 			  else
@@ -154,7 +154,7 @@ struct ASMState
 			sh += 5
 		.closevars(OV)
 
-		|| OP = (asm.func3, asm.func2)(sh <= 25)
+		|| OP = (asm.func2, asm.func3)(sh <= 25)
 		|| Fnc = .AddASM(OP,  prms.parent!,  save: .vdecls,  incr: 0,  jump: fn.TableId)
 		fnc.r[3] = reg2
 		fnc.r[4] = reg3 
@@ -167,8 +167,13 @@ struct ASMState
 		|ASMState|					Sh
 		
 
-function ASMState.TotalInit (|bool|)
+function ASMState.PackMakerInit (|bool|)
 	opt norefcounts
+	VM_Builder.JustMakeMyBread		// FUCK FEMINISM
+									// AND FUCK ALL THOSE FUCKERS TELLING ME TO BE PROFESSIONAL IN MY CODE
+									// AS IF THEIr SHIT ISNT 100x slower and bloated compared to mine.
+									// AS IF THAT IS PROFESSIONAL. NOOBS AND IDIOTS AND GAYS.
+	treeassembler.InitTree			/// OOOFF
 	|| j = ASMState.JSMSpace
 	if j.setcap(4MB)
 		.maxlength = j.Capacity
@@ -191,7 +196,7 @@ function ASMState.InitState (|scfunction| fn)
 
 function ASMState.FinishASM
 	opt norefcounts
-	.out.length += .written
 	ifn .last isa asm.ret
 		.AddASM(asm.RET, .fn.source!, 0)
+	.out.length += .written
 

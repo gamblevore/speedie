@@ -32,6 +32,8 @@ extend ASMState
 
 
 	function ReserveData (|int| bytes)
+
+	
 	function NumToReg (|uint64| V, |int| Reg, |message| exp)
 		if !.TrySmallConst(reg, V, exp)
 			debugat

@@ -328,6 +328,7 @@ AlwaysInline ASM* Return (Register*& rp, ASM* Code, ASM Op) {
 	auto Result		= *From++;
 	rp = To;
 
+	// could use RET_Li to return true?
 	if (S.Incr)
 		incr(Result.Obj);
 	int More = RET_Countu;

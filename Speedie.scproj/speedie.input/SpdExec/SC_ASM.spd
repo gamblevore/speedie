@@ -1,6 +1,5 @@
 
 
-//datatype JSM (uint)
 datatype ASM (uint)
 	flags
 		Jump			= 32
@@ -30,8 +29,9 @@ datatype ASM (uint)
 		|byte|					NoisyASM = 1
 		|asm_encoder2[32]|		Forms
 		|asm_encoder2[256]| 	Encoders
-		|asm_decoder2[256]| 	Decoders
+//		|asm_decoder2[256]| 	Decoders
 
 
-prototype ASM_Decoder2  (|&FatASM| self, |asm| A)
+//prototype ASM_Decoder2  (|&FatASM| self, |asm| A)
 prototype ASM_Encoder2  (|&FatASM| self, |asm|)
+

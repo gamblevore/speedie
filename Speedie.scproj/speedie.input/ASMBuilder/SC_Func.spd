@@ -1,6 +1,6 @@
 
 
-class µFunc {
+class µFunc
 	linkage
 		cpp_class ASMFunc
 		cpp_part ASMFunc 
@@ -8,17 +8,14 @@ class µFunc {
 	|&FatASM|				IR
 	|int|					Length
 	|bool|					OK
-	
 
 	constructor (|scfunction| fn, |&FatASM| IR)
 		.fn = fn
 		.IR = ir
 		fn.asm = self
-	
 
 	function Name (|string|)
 		return .fn.ExportName
-
 
 	function Finish (|µFunc1|)
 		debugger
@@ -45,7 +42,8 @@ class µFunc {
 		while currinst < .length
 			yield Addr+currinst
 			currinst++
-}
+
+
 
 function JBin.Add (|µFunc| fn)
 	.AddMemory(@bin, fn.length*4)

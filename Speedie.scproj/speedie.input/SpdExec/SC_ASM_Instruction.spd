@@ -5,7 +5,7 @@
 // or just fake one. We just wanna call the VM really.
 
 
-class Instruction // class instruction
+class Instruction 
 	initafter (µform)
 	
 	|byte|			aType
@@ -19,17 +19,17 @@ class Instruction // class instruction
 	constants
 		kTypeConst		= 2
 		kTypeFunc		= 1
-
-	render
-		fs <~ .name
 	
-	constructor (|string| FormName, |string| name, |int| pos)
+	constructor (|string| FormName, |string| Name, |int| Pos)
 		.formname = formname
 		.opcode = pos
 		.name = name
 		.sizes = µform.NeedForm(.FormName)
 		.PCount = .sizes.count
 	
+	render
+		fs <~ .name
+
 	syntax equals (|string| other, |bool| aware, |bool|)
 		return .name.syntaxequals(other, aware)
 	
@@ -63,5 +63,8 @@ class Instruction // class instruction
 			.typedict[name] = ins
 	
 		function InstructionInit
-			__instructionlist__
+			__instructionlist__			// we need some way to put swearwords into code
+			|| ERR = .typelist[0]		// without idiots seeing it and blaming me for being too awesome
+			for i in 256				// while pretending that im bad as they are.
+				.typelist[i] := ERR 
 

@@ -47,55 +47,33 @@ module asmOps
 		return dest
 	function Minus	(fn_opasm)
 		debugger
-		.AddASM(asm.SUB, dbg, dest, L, R, 0)
+		.AddASM(asm.SUB, dbg, dest, L, R)
 		return dest
 	function Mul	(fn_opasm)
-		.AddASM(asm.MUL, dbg, dest, L, R, 0)
+		.AddASM(asm.MUL, dbg, dest, L, R)
 		return dest
 	function BitAnd (fn_opasm)
-		.AddASM(asm.BAND, dbg, dest, L, R, 0)
+		.AddASM(asm.BAND, dbg, dest, L, R)
 		return dest
 	function BitXor (fn_opasm)
-		.AddASM(asm.Bxor, dbg, dest, L, R, 0)
+		.AddASM(asm.Bxor, dbg, dest, L, R)
 		return dest
 	function BitOr	(fn_opasm)
-		.AddASM(asm.bor, dbg, dest, L, R, 0)
+		.AddASM(asm.bor, dbg, dest, L, R)
 		return dest
 	function ROL	(fn_opasm)
-		.AddASM(asm.brol, dbg, dest, L, R, 0)
+		.AddASM(asm.brol, dbg, dest, L, R)
 		return dest
 	function ROR	(fn_opasm)
-		.AddASM(asm.bror, dbg, dest, L, R, 0)
+		.AddASM(asm.bror, dbg, dest, L, R)
 		return dest
 	function SHR	(fn_opasm)
-		.AddASM(asm.SHRU, dbg, dest, L, R, 0)
+		.AddASM(asm.SHRU, dbg, dest, L, R)
 		return dest
 	function SHL	(fn_opasm)
-		.AddASM(asm.SHLS, dbg, dest, L, R, 0)
+		.AddASM(asm.SHLS, dbg, dest, L, R)
 		return dest
 	function Assign	(fn_opasm)
 		.AddASM(asm.bor, dbg, L, R)
 		return dest
 
-//module asmOps // dummy
-/*
-	function Plus	(fn_opasm)
-	function Equals (fn_opasm)
-	function NotEq	(fn_opasm)
-	function Less	(fn_opasm)
-	function LessEq (fn_opasm)
-	function More	(fn_opasm)
-	function MoreEq (fn_opasm)
-	function Mod	(fn_opasm)
-	function Div	(fn_opasm)
-	function Minus	(fn_opasm)
-	function Mul	(fn_opasm)
-	function BitAnd (fn_opasm)
-	function BitXor (fn_opasm)
-	function BitOr	(fn_opasm)
-	function ROL	(fn_opasm)
-	function ROR	(fn_opasm)
-	function SHR	(fn_opasm)
-	function SHL	(fn_opasm)
-	function Assign	(fn_opasm)
-*/

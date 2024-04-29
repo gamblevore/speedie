@@ -86,6 +86,18 @@ dispatch fn_asm_table (fn_asm)
 		0
 
 
+
+// for some reason, replacing this will cause speedie to generate bad code
+// I guess I am setting the Flags somewhere, or testing them? but I can't see where.
+function Message.ASMType (|ASMTmp|)
+	rz = .FLAGS & 63
+
+function Message.ASMType (assigns:|ASMTmp|)
+	target debug: if .objectid == 0
+	value = (.FLAGS &~ 63) ||| value
+	.FLAGS = value 
+
+
 datatype ASMtmp (uint16)
 	syntax is (|asmtmp| t, |bool|)
 		return self == t
@@ -109,18 +121,7 @@ datatype ASMtmp (uint16)
 		kFail = 63
 	
 
-// for some reason, replacing this will cause speedie to generate bad code
-// I guess I am setting the Flags somewhere, or testing them? but I can't see where.
-function Message.ASMType (|ASMTmp|)
-	rz = .FLAGS & 63
-
-function Message.ASMType (assigns:|ASMTmp|)
-	target debug: if .objectid == 0
-	value = (.FLAGS &~ 63) ||| value
-	.FLAGS = value 
-
-
-extend_module ASMtmp {
+	module {
 
 |asm_mem[10]| ReadASM
 |asm_mem[5]| WriteASM
@@ -172,7 +173,7 @@ function Pointer		(fn_asm)
 
 function SetRel	(fn_asm)
 	opt	norefcounts
-	|| Var = SimpleVar(self, exp.first!)	
+	|| Var = exp.first!.SimpleVar	
 	|| R = .µ(exp.last!, Var)
 	if r isnt discard    // x = 1, already done!
 		(r is set)
@@ -180,26 +181,13 @@ function SetRel	(fn_asm)
 	// seems simple?
 
 
-function SimpleVar (fn_asm)
-	opt	norefcounts
-	|| fn = exp.func 
-	while fn == @bra or @type
-		exp = exp.first!
-		fn = exp.func
-	if fn == @thg
-		return thg(self, exp)
-	if fn == @num
-		|| d = exp.FastDecl
-		if !d.exportposition
-			return 0.reg
-
-
 function Thg (fn_asm)
 	opt norefcounts
 												// what if this is a constant?
 	|| d = exp.FastDecl
 	if d is local
-		if dest isnt set						// copy a reg
+		if dest is set							// copy a reg
+			debugger
 			if !d.dreg.reg						// what?
 			.AddASM(asm.BOR, exp, dest, d.dreg)
 			return dest
@@ -251,7 +239,6 @@ function DoMath (fn_asm)
 	|| ml = .µ(F, dest)
 	|| mr = .µ(op.next!, ml • dest)
 	.CloseVars(OV)
-	require ml.reg ||| mr.reg
 	
 	dest.µtype = ml.µtype						// assignment conversion needs to be done also.
 	|| scop = op.obj|scoperator|
@@ -272,3 +259,17 @@ function ASMReg.ReadOrWrite (|asm|)
 	if self is set
 		return ASMtmp.WriteASM[bytes]
 	return ASMtmp.ReadASM[(bytes<<1) + .issigned]
+
+function message.SimpleVar (|asmreg|)
+	opt	norefcounts
+	real self
+	|| fn = .func 
+	while fn == @bra or @type
+		self = .first!
+		fn = .func
+	if fn == @thg
+		return asmtmp.thg(asmstate.sh, self)
+	if fn == @num
+		|| d = .FastDecl
+		if !d.exportposition
+			return 0.reg
