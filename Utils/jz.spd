@@ -1,8 +1,6 @@
 #!/usr/local/bin/speedie
 
 
-// * refering to the previous chunk could really make compression tighter.
-
 
 app.Usage = "Usage: jz File1 [File2...]
 Convert files between jbin, box, xml formats. Additionally can compress or decompress.
