@@ -1,0 +1,318 @@
+
+
+main (|int| AmountOfSwears=1)
+	|| hehe = fuck.off(AmountOfSwears)
+
+	if app.yes("speak")
+		printline `("killall say" in terminal to stop this.)
+`
+		app.say hehe
+	  else
+		print hehe
+		
+
+
+class Word
+	|string|	Name
+	|bool| 		Adjective
+
+	constructor (|string| s)
+		if s.first == '+'
+			s = s[1...]
+			.Adjective = true
+		
+		.name = s
+
+
+class Fuck
+	default Fuck()
+	|[word]|				Words
+	
+	function Load (|string| s)
+		for w.lines in s
+			if w
+				.words <~ word(w)
+		.Words.Sort(&string.sorter)
+			
+	syntax access (|word|)
+		return .words[]
+	
+	render
+		for s in .words
+			fs <~ s
+			fs <~ '\n'
+
+
+
+	module {
+	|Fuck|					First
+	|Fuck|					Second
+	|bool| 					Same = app.yes("same")
+
+	
+	function Accept (|word| a, |word| b, |bool|)
+		require a != b
+		if .same
+			require a.name.first == b.name.first
+		return true
+		
+		
+	function Off (|int| n = 1, |string|)
+		.load
+		|| fs = FastString()
+		for i in n
+			for 100 
+				|| w1 = .first[]	#loop
+				|| w2 = .Second[]	#loop
+				if .accept(w1, w2)
+					if fs.Length
+						fs <~ ", "
+					if 0.5[]
+						for 50
+							|| extra = .First[]!
+							if extra.Adjective and .Accept(w1, extra) and .Accept(w2, extra)
+								fs <~ extra.name
+								fs <~ " "
+								exit
+							
+					fs <~ w1.name
+					fs <~ " "
+					fs <~ w2.name
+					exit
+		return fs
+		
+		
+	function Load
+		require !.first.words
+		.First.load(firstwords)
+		.second.load(secondwords)
+			
+|| firstwords="
+arse
+ass
+assmonkey
+asswipe
++autistic
++barmy
++bastard
+bat
+berk
++bitçh
++bollock brain
+boomer
+bum
+butt
+buttbox
+butthole
++bumblefuck
++chucklefuck
+chunder
+clit
++clusterfuck
++cracker
++cocktastic
+coronavirus
+crab
+crack
++crap
+cum
+cunt
+cuntfoot
+cuntnugget
++cunty
+dick
+dildo
+toilet
++drunk
++dumb
+fag
++fat
++flaming
+fuck
+fuckfish
++fucking
+fucknugget
++fucknut
+fucksock
++fuckwit
+fur burger
++furry
++gay
++ginger
++hairy
+hairy clam
+hepatitis
++hermaphrodite
+jizz
++ladyboy
++lesbo
++mangina
++mouth breathing
++nîggerlicious
++nîggerlicious
+pandemic
++pedo
+pillow
+piss
+pissy
+poo
+poop
+puke
+pussy
+sandy vagina
+shag
+skank
+skinny
+slag
+snatch
++special
+stain
+stanky butt
++thundercunt
+tinfoil
++tiny
+toss
++total
++tranny
+tumor
++twat
+twatface
++ugly
++utter
+vagina
+vomit
+wanker"
+
+	
+|| secondwords = "
+ambassador
+arsed
+artist
+avalanche
+bandit
+bat
+biscuit
+biter
+blagger
+blizzard
+box
+boy
+boomer
+brother
+bucket
+butter
+cake
+casket
+celebrity
+cellist
+clown
+cow
+dad
+denier
+dirtbag
+disease
+dredger
+drinker
+dwarf
+eater
+face
+fatty
+fettler
+fish
+fondler
+foot
+furry
+geek
+grabber
+grinder
+handed
+hands
+haver
+head
+horse
+idiot
+imbecile
+influencer
+jar
+jerk
+jesus
+jew
+junkie
+kiddo
+kisser
+king
+lawyer
+libtard
+load
+lord
+lover
+manager
+mole
+mongrel
+monk
+monster
+mother
+mustard
+muncher
+mystic
+nazi
+nerd
+nibbler
+numpty
+nutfuckers
+nîgger
+oofer
+panda
+pants
+parade
+peasant
+pedant
+pianist
+pillow
+player
+plonker
+politician
+pudding
+prat
+prince
+princess
+punk
+raper
+recepticle
+rocket
+scrubber
+sheep
+shrimp
+sister
+smear
+sniffer
+snorter
+sorcerer
+spanner
+stirrer
+storm
+superhighway
+supporter
+slag
+tart
+teaser
+terrorist
+tits
+titties
+toker
+tornado
+trombone
+turkey
+turnip
+twerker
+twiddler
+twizzler
+utensil
+wad
+wagon
+wheel
+womble
+zoo
+"
+
+}
