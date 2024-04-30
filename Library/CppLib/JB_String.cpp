@@ -584,8 +584,6 @@ int JB_Str_Scan_BadUTF8AtEnd(JB_String* u) {
 
 
 static const uint8 EscapeTable_[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz._";
-static const uint8 SwearTable_[] = "|@$%^&*?";  // prepend any letter with ! to set the upper-bit
-												// that gives us 16 possibilities... == 4 -bits
 
 void JB_FS_AppendHexSub ( FastString* fs, int64 tVal,  int RoundTo, const uint8* CharMap);
 void JB_FS_AppendHexData( FastString* fs, uint8* Addr, int Len, int Spaces ) {
