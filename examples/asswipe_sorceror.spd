@@ -1,0 +1,10 @@
+
+
+main
+	"Hello asswipe_sorceror!"
+	|| SwearCoded = "Hello asswipe_sorceror!".Swear // encodes it haha
+	printline SwearCoded
+	if SwearCoded.Unswear == "Hello asswipe_sorceror!"
+		"swears successfully decoded"
+	
+
