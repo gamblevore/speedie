@@ -6,12 +6,12 @@ struct ASMState
 	linkage: cpp_part Pac
 	|SCFunction--|				fn       
 	|µFunc|						Out      
-	|&FatASM|					Start    
-	|int|						Written  
-	|uint|						MaxLength
+	|&FatASM|					Start		// a "slice" feature would be nice    
+	|&FatASM|					Curr    
+	|&FatASM|					End    
 	|bool|						OK       
 	|byte|						LabelCount
-	
+	|datatypecode|				ReturnType
 	|byte|						VDecls
 	|byte|						VTmps
 	|uint64[32]|				TrueBits 
@@ -25,7 +25,7 @@ struct ASMState
 
 
 	function Last (|&FatASM|)
-		return .start + .Written-1
+		return .curr-1
 	
 	
 	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |int| c, |int| d, |&FatASM|)
@@ -62,15 +62,16 @@ struct ASMState
 
 	syntax append (|uint| code, |message| dbg, |&FatASM|)
 		cpp_part RequestOp
-		if .Written < .MaxLength
-			|| P = .Start + .Written++
+		|| p = .curr
+		if p < .end
+			.curr = p + 1
 			P.op = code
 			p.debug = dbg
 			return p
 		if .OK
 			error "ASM is out of memory."
 			.OK = false
-		return JSMSpace[0]
+		return .start
 	
 		
 	function DeclareMe (|Message| where,  |asmreg| T,  |asmreg|)
@@ -121,9 +122,9 @@ struct ASMState
 
 	function prm (|message| prm, |asmreg|)
 		|| r = prm.simplevar
-		if r != 0
+		if r.Exists
 			return r
-		return .µ(prm, .DeclareMe(prm, 0))
+		return .µ(prm, .DeclareMe(prm, asmreg.empty))
 		
 		
 	function DoFunc (|message| prms, |asmreg| dest, |asmreg|)
@@ -134,12 +135,12 @@ struct ASMState
 		// there are only 4 above 6!, only 14 above 5
 
 		if dest is discard
-			dest = 0
+			dest = asmreg.empty
 		  else
-			dest = .tempme(prms, dest)
+			dest = .TempMe(prms, dest)
 			dest.µtype = fn.RegType
 
-		debugger
+//		debugger
 		|uint| Reg2
 		|uint| Reg3
 		|| sh = 0
@@ -155,7 +156,10 @@ struct ASMState
 		.closevars(OV)
 
 		|| OP = (asm.func2, asm.func3)(sh <= 25)
-		|| Fnc = .AddASM(OP,  prms.parent!,  save: .vdecls,  incr: 0,  jump: fn.TableId)
+		|| SaveAmount = 0
+		if dest isnt forreturn
+			SaveAmount = .vdecls
+		|| Fnc = .AddASM(OP,  prms.parent!,  save: SaveAmount,  incr: 0,  jump: fn.TableId)
 		fnc.r[3] = reg2
 		fnc.r[4] = reg3 
 
@@ -176,18 +180,18 @@ function ASMState.PackMakerInit (|bool|)
 	treeassembler.InitTree			/// OOOFF
 	|| j = ASMState.JSMSpace
 	if j.setcap(4MB)
-		.maxlength = j.Capacity
 		.start = j.ptr
-		.Written = 0
+		.curr = .start
+		.end = j.Capacity + .start
 		.AddASM(asm.EROR, compiler.InternalFile.ast!, 0)
 		return true
 
 
 function ASMState.InitState (|scfunction| fn)
-	.out = µfunc(fn, JSMSpace.ptr + .written)
-	.out.length = -.written
+	.out = µfunc(fn, .curr)
 	.LabelCount = 0
 	.fn  = fn
+	.returntype = fn.returntype.regtype
 	.ok  = true
 	.vdecls = 0
 	.vtmps = 0
@@ -197,6 +201,6 @@ function ASMState.InitState (|scfunction| fn)
 function ASMState.FinishASM
 	opt norefcounts
 	ifn .last isa asm.ret
-		.AddASM(asm.RET, .fn.source!, 0)
-	.out.length += .written
+		debugger
+	.out.length = .curr - .out.IR
 

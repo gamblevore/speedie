@@ -10,7 +10,9 @@ function compiler.PrintCompileTime (|date| durr)
 	|| avg = stringcorrector.TotalSize|float| / stringcorrector.list.length|float|
 	fs <~ "${stringcorrector.list.length} / "	
 	stringcorrector.TotalSize.strsize(fs)
-	fs <~ " // (avg $avg)"
+	fs <~ " // (avg "
+	fs.appenddouble(avg, 1)
+	fs <~ ")"
 	fs.normal  "Total Elapsed",	durr.renderdurr(fs), fs <~ "s"
 	fs.normal  "Input Src",		Compiler.stTotalSourceSize.strsize(fs)
 	if options.color

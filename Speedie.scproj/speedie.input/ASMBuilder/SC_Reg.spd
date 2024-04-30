@@ -5,31 +5,36 @@ prototype fn_asm (|&ASMState| self, |message| exp, |AsmReg| Dest=0.reg, |AsmReg|
 
 	
 	
-datatype AsmReg (DataTypeCode)
-	default 0
+datatype AsmReg (uint)
+	default 0|AsmReg|
 	linkage
 		cpp_part Reg
+		numeric false
 	
 	constants
 		|asmreg|
 		Set = 4
 		Unused = 8
-		Discard = 128 << 8
+		Discard = 1 << 14
+		ForReturn = (1 << 15) ||| (1<<8)
 	
+	
+	function Exists (|bool|)
+		return self|int|
 	
 	function µType (|DataTypeCode|)
-		return self & 255
+		return self|int| & 255
 	function µType (assigns:|DataTypeCode|, |asmreg|)
-		return (self & ~255) ||| value
+		return ((self|int| & ~255) ||| value)|asmreg|
 	
 	syntax is (|AsmReg| R, |bool|)
 		return self|uint| & R|uint|
 	
 	syntax is (|AsmReg| R, assigns:|bool|, |AsmReg|)
 		if (value)
-			return self ||| R
+			return (self|int| ||| R|int|)|asmreg|
 		  else
-			return  self &~ R
+			return  (self|int| &~ R|int|)|asmreg|
 	
 	// we could do this instead
 	// (self-1)&31!!
@@ -57,6 +62,10 @@ datatype AsmReg (DataTypeCode)
 		// i guess speedie should sort that out on the C-level...
 		return ((t2 == t1) or  (t1.IsInt and t2.IsInt)) #expect (err, "Type-mismatch")
 
+	module
+		function Empty (|asmreg|)
+			return 0|asmreg|
+	
 
 function int.Reg (|asmreg|)
 	cpp_part ToReg // (self - 1)&31 // would be better?

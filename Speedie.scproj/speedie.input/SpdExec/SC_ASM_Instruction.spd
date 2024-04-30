@@ -29,6 +29,8 @@ class Instruction
 	
 	render
 		fs <~ .name
+		fs <~ "\n"
+		.sizes.render(Fs)
 
 	syntax equals (|string| other, |bool| aware, |bool|)
 		return .name.syntaxequals(other, aware)
@@ -43,8 +45,9 @@ class Instruction
 		return .atype == kTypeConst
 
 	function Const 
-		.atype = kTypeConst
-		//.NoExpect // shouldnt have removed this?
+		if self
+			.atype = kTypeConst
+			//.NoExpect // shouldnt have removed this?
 
 	module
 		|dictionary of instruction|			TypeDict = dictionary()

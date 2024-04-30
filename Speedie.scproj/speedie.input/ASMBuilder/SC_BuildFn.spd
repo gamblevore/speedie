@@ -13,7 +13,6 @@ extend_module ASM
 
 
 	function TestASM 
-		debugger
 		.enc1
 		require options.ModePack
 		|| dev = app.pref("dev").int
@@ -31,10 +30,9 @@ extend_module ASM
 
 function message.GetASMFunc (|message|)
 	opt norefcounts
-	if .reg >= 0
-		|| op = .next(@opp, "=")
-			|| Adj = op.Next(@adj)
-				return adj[@func]
+	|| op = .next(@opp, "=")
+	|| Adj = op.Next(@adj)
+		return adj[@func]
 
 
 function FatASM.Encode (|ASM|)

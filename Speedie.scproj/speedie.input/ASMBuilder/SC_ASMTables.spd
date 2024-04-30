@@ -159,8 +159,10 @@ function Unexpected		(fn_asm)
 function Return			(fn_asm)
 	opt norefcounts
 	|| f = exp.first
-		rz = .µ(f)
-	.AddASM(asm.RET, exp, rz, 0.reg, 1, 0)
+		|| Where = asmreg.forreturn
+		where.µtype = asmstate.sh.ReturnType
+		rz = .µ(f, Where)
+	.AddASM(asm.RET, exp, rz, 0.reg, 1)
 
 
 function Pointer		(fn_asm)
@@ -230,7 +232,7 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Value, |scdecl| D, 
 function DoMath (fn_asm)
 	opt norefcounts
 
-	debugger
+//	debugger
 	|| F = exp.first!
 	|| op = F.next!
 	dest = .tempme(op, dest)
@@ -255,10 +257,11 @@ function asmreg.operator• (|asmreg| dest, |asmreg|)
 	return dest
 
 function ASMReg.ReadOrWrite (|asm|)
-	|| bytes = .bytesize.log2
+	|| T = .µtype
+	|| bytes = t.bytesize.log2
 	if self is set
 		return ASMtmp.WriteASM[bytes]
-	return ASMtmp.ReadASM[(bytes<<1) + .issigned]
+	return ASMtmp.ReadASM[(bytes<<1) + t.issigned]
 
 function message.SimpleVar (|asmreg|)
 	opt	norefcounts

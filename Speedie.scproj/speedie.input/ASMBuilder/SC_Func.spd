@@ -1,6 +1,6 @@
 
 
-class µFunc
+class µFunc 
 	linkage
 		cpp_class ASMFunc
 		cpp_part ASMFunc 
@@ -25,16 +25,10 @@ class µFunc
 /// TEXTUAL STUFF		
 	render
 		fs <~ "asm ${.fn.name}\n"
-		|| skip = 0
 		for µ in self
-			if skip > 0
-				skip--
-			  else
-				if µ.op < 16
-					skip = µ.op & 3
-				fs <~ '\t'
-				µ.render(fs)
-				fs <~ '\n'
+			fs <~ '\t'
+			µ.Renda(fs)
+			fs <~ '\n'
 
 	iterator
 		|| CurrInst = 0

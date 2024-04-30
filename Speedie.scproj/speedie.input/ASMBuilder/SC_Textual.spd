@@ -61,7 +61,7 @@ extend ASMState
 		opt norefcounts
 		
 		if m == @rel
-	//    r1 = jb_str_length(r2)~5    // save 5 regs
+	//    r1 = jb_str_length(r2)~5    // save 5 regs on the stack
 			|| Dest = m[@thg]$
 			|| funcMsg = dest.GetASMFunc$
 

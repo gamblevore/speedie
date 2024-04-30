@@ -22,13 +22,15 @@ function DefineGetSub (|string| fname,  |int| up,  |int| down, |byte| c, |byte| 
 "
 
 
-function DefineGet (|string| fname,  |int| up,  |int| down, |bool| last, |[message]|)
+function DefineGet (|string| fname,  |int| up,  |int| down, |bool| last, |message|)
 	if last
 		.DefineGetSub(fname, up, down, 'i', ' ')
 	.DefineGetSub(fname, up, down, 'u', 'u')
-	rz <~ @thg + fname
-	rz <~ up.msg
-	rz <~ down.msg
+	|[message]| arr
+	arr <~ @thg + fname
+	arr <~ up.msg
+	arr <~ down.msg
+	return macros.ASMSetter.run(arr)
 
 
 // we need to create an array of forms...
@@ -54,8 +56,7 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max,   |int|)
 		lname = "_" + line.name 
 	
 	lname = .Parent + lname
-	|| arr = .DefineGet(lname, Max-n, bit_pos, bit_pos+n==Max)
-	|| fnc_src = macros.ASMSetter.run(arr)
+	|| fnc_src = .DefineGet(lname, Max-n, bit_pos, bit_pos+n==Max)
 	
 	SCFunction.newfunc(fnc_src, nil, line)
 	
@@ -75,7 +76,7 @@ function DataTypeModule
 
 function AddForm (|message| form, |µform|)
 	opt norefcounts 
-	rz = µform(form)
+	rz = µform("", form)
 	µform.forms.valuelower(form.name) = rz 
 
 
@@ -118,13 +119,15 @@ function GenerateForms (|message| forms, |bool| Rest)
 function GenerateOne (|message| form_msg, |int| f, |bool| rest)
 	opt norefcounts
 	|| frm = .AddForm(form_msg)
+	require rest
 	.dt_prm = .DataTypeCreate(form_msg, f)
 	.parent = form_msg.name
 	|| bit_pos = 8
 	|| p    = 0
 	|| arg  = form_msg[@arg,-1]							#require
 	|| Max = 32
-
+	if form_msg ~= "func"
+	
 	for l in arg
 		bit_pos = .GenAcc(l, bit_pos, p++, max)
 	
@@ -141,36 +144,43 @@ function VMBox (|message|)
 	|| v = Compiler.InputFile( nil, "vm.box", nil )
 		.vm_file = v
 		rz = v.parse
+	  else
+		error "Can't find vm.box"
 
 
 function JustMakeMyBread (|bool|)
-	|| x = .VMBox
-		|| forms = x.find("forms")
-		.DataTypeModule
+	|| vmdef = .VMBox
+		|| forms = vmdef.find("forms")
 		.GenerateForms(forms, false)
+		.FillEncoders(vmdef, false)
 
 
 function BuildFiles (|bool|)
-	|| x = .VMBox							#require
-	|| forms = x.find("forms")
+	|| vmdef = .VMBox							#require
+	|| forms = vmdef.find("forms")
 	forms.remove
 
 	|| code = faststring()
 	|| jump = faststring()
 
-	.Clean(x)
+	.Clean(vmdef)
 	.DataTypeModule
 	.GenerateForms(forms, true)
-	.NameList = .VMSpd(x)
+	.NameList = .FillEncoders(vmdef)
 	.VMCpp(code, jump)
 
-	.CppLibFile("InstructionGetters.h")!.SmartData = form_h
-	.CppLibFile("Instructions.i")!.SmartData = code
-	.CppLibFile("InstructionList.h")!.SmartData = jump
+	.SafeWrite("InstructionGetters.h", form_h)
+	.SafeWrite("Instructions.i", code)
+	.SafeWrite("InstructionList.h", jump)
 	.form_h.size = 0
 	return true
 
-	
+function SafeWrite (|string| name, |faststring| data)
+	if data.length < 1K // oof?
+		debugger
+	  else
+		.CppLibFile(name)!.SmartData = data
+
 function MakeTheVM
 	compiler.Project.use
 	require .BuildFiles	
@@ -211,12 +221,20 @@ function Clean   (|message| msg)
 			  elseif ch == "|||"
 				ch.name = "|"
 
+function BadEncoder (ASM_Encoder2)
+	debugger
 
-function VMSpd   (|message| list, |[message]|)
+function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true, |[message]|)
 	opt norefcounts
-	rz <~ (@thg+"EROR",  256)
+	|| m = rz
+	if ActuallyMakeTheVM
+		rz <~ (@thg+"EROR",  256)
+	  else
+		m = nil
 	for ch in list
 		.VMTmp(ch, rz)
+	for i in 256
+		asm.encoders[i] := badencoder
 
 	
 function VMCpp (|faststring| vm, |faststring| jump)
@@ -246,7 +264,7 @@ function MakeVM (|message| tmp, |faststring| vm, |message| Next¡)
 		.VMLine(line, vm)
 
 
-function VMDecl (|message| tmp, |[message]| msgs)
+function VMDecl (|message| tmp, |[message]?| ActuallyMakeTheVM)
 	opt norefcounts
 	|| arg = tmp.last
 	|| prms = tmp.first
@@ -256,21 +274,23 @@ function VMDecl (|message| tmp, |[message]| msgs)
 	|| name = p1.name.ASMNormalise
 	|| form = µform.forms.valuelower(name)			#require
 	name = "ASM_" + name
-	.ModuleArg <~ NewDecl(name)
+	if ActuallyMakeTheVM!=nil		// otherwise speedie is just using the encoders.
+		.ModuleArg <~ NewDecl(name)
 	|| tn = tmp.name
 	
 	while
 		|| id = .NextID(counts)
 		asm.Encoders[id] = asm.Forms[form.Index]
-		msgs[id] = tmp
-		if !counts or counts == p1.next
-			.AddASM(tn, id)
-		if counts
-			.AddASM(tn+counts.render, id)
+		if ActuallyMakeTheVM!=nil
+			ActuallyMakeTheVM[id] = tmp
+			if !counts or counts == p1.next
+				.AddASM2(tn, id)
+			if counts
+				.AddASM2(tn+counts.render, id)
 		counts = counts.next #loop
 
 
-function AddASM (|string| name, |int| id) 
+function AddASM2 (|string| name, |int| id) 
 	opt norefcounts
 	|| msg = id.msg
 	|| thg = @thg + name
@@ -297,9 +317,9 @@ function NextID (|message?| counts, |int|)
 		.normalpos = 16
 
 
-function VMTmp (|message| tmp, |[message]| msgs)		
+function VMTmp (|message| tmp, |[message]?| ActuallyMakeTheVM)		
 	if (tmp == @tmp) and (tmp != "forms" and "ignore")
-		.VMDecl(tmp, msgs)
+		.VMDecl(tmp, ActuallyMakeTheVM)
 
 
 function VMLine (|message| line, |faststring| vm)

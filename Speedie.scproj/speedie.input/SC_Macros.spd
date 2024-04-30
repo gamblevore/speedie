@@ -45,7 +45,7 @@ while __ArgCurr < __ArgCount
 	module
 		function Encode (ASM_Encoder2,)
 			visible true
-			rz = .op << 25
+			rz = .op << 24
 		
 ASM.Forms[_1] = &_0.Encode // for now
 ".macro

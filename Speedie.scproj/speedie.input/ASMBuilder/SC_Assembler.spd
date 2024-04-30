@@ -32,12 +32,11 @@ module TreeAssembler
 	|[scfunction]|				PackFuncs
 	
 	function InitTree
-		debugger
 		instruction.instructionInit
 		asmtmp.InitAccess
-		Instruction[asm.SET1]!.Const
-		Instruction[asm.SETK]!.Const
-		Instruction[asm.SETN]!.Const
+		Instruction[asm.SET1].Const
+		Instruction[asm.SETK].Const
+		Instruction[asm.SETN].Const
 		return 
 		TextAssembler.Requests		:= dictionary()
 		TextAssembler.RequestTable	:= array()
@@ -74,8 +73,7 @@ module TreeAssembler
 			|| A = fn.SourceArg!
 			(fp)(ASmState.Sh, A, R)
 			ASmState.Sh.FinishASM
-			debugat
-			printline fn.asm
+			printline fn.asm!.render
 
 
 

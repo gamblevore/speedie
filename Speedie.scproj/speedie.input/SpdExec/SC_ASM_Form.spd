@@ -9,20 +9,26 @@ class µForm
 	|int|			Count
 	|int|			Index
 	
-	constructor (|string| data)
-		opt norefcounts
-		.name = data
-		for param in data
-			.loadparam( string.byte(param), nil )
-		.Finish
-		.index = ++µform.count
-
-	constructor (|message| tmp)
+	
+	render
+		fs <~ .name
+		for i in .count
+			fs <~ " "
+			fs <~ .params[i].BitSize
+		
+	constructor (|string| data, |message?| tmp)
 		opt norefcounts
 		.name = tmp.name
-		for line in tmp.last(@arg)
-			|| f = line.needfirst
-			.loadparam(f.name, f)
+		for i in 8
+			.params[i] = 0
+		if tmp
+			for line in tmp.last(@arg)
+				|| f = line.needfirst
+				.loadparam(f.name, f)
+		  else
+			for param in data
+				.loadparam( string.byte(param), nil )
+		
 		.Finish
 		.index = ++µform.count
 
@@ -37,7 +43,7 @@ class µForm
 		|| total = 0
 		for (s in self) (i)
 			if s & asm.remainder
-				s |= (25 - total)
+				s |= (24 - total)
 			self[i] = s ||| (total << 11)
 			total += s.bitsize
 		
@@ -93,7 +99,7 @@ class µForm
 		|int| Count
 		function Needform (|string| Form, |µform|)
 			opt norefcounts
-			return forms.valuelower(form) init µform(form)
+			return forms.valuelower(form) init µform(form, nil)
 
 
 function string.ASMint (|uint|)

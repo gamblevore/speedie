@@ -13,17 +13,16 @@ struct FatASM
 	operator isa (|int| m, |bool|)
 		return m == .op
 		
-	function FS (|FastString| fs)
+	function Renda (|FastString| fs)
 		opt norefcounts
-		/*
-		|| op = instruction.typelist[.op] #debug_Require
+		|| op = instruction.typelist[.op]		#debug_require
 		fs <~ op.name
 		fs <~ ':'
 		fs <~ (' ', 5-op.name.length)
 		|| GotAny = ""
 		|| Remain = 25
 		|| f = op.sizes
-		for i in 5
+		for i in f.count
 			|| bs = f[i].bitsize
 			if remain > 0 and bs
 				fs <~ gotany
@@ -32,15 +31,13 @@ struct FatASM
 					fs <~ 'r'
 				fs <~ .r[i]
 				remain += bs
-		*/
 
 	function Print
 		visible
 		if asm.NoisyASM >= 3
-			printline .render
-	
-	render
-		.fs(fs)
+			|| fs = faststring()
+			.Renda(fs)
+			printline fs
 
  
  
