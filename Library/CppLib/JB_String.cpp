@@ -538,12 +538,12 @@ u32 JB_Str_UTF8Size( u32 c ) {
 }
 
 
-int JB_Str_UTF8Value(JB_String* self) {
+int JB_Str_UTF8Value(JB_String* self, bool Strict) {
 	int Len = JB_Str_Length(self);
-	if (Len) {
+	if (Len and (!Strict or JB_Str_BadUTF8(self, 0) < 0)) {
 		uint8* Source = self->Addr;
 		int N = JB_u8_Size(*Source);
-		if (N <= Len) {
+		if ((N <= Len) and (!Strict or N == Len)) {
 			u32 Result;
 			u8Read( Source, &Result );
 			return (int)Result;
@@ -584,6 +584,8 @@ int JB_Str_Scan_BadUTF8AtEnd(JB_String* u) {
 
 
 static const uint8 EscapeTable_[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz._";
+static const uint8 SwearTable_[] = "|@$%^&*?";  // prepend any letter with ! to set the upper-bit
+												// that gives us 16 possibilities... == 4 -bits
 
 void JB_FS_AppendHexSub ( FastString* fs, int64 tVal,  int RoundTo, const uint8* CharMap);
 void JB_FS_AppendHexData( FastString* fs, uint8* Addr, int Len, int Spaces ) {

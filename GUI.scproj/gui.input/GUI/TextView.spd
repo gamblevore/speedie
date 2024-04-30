@@ -1197,8 +1197,8 @@ class TextView (GUIControl)
 			input = "\\"
 		  elseif (input == "§") and !(keys.option or keys.shift)
 			return false
-		if input.length == 1
-			if (.onkeydown)(self, input.codepoint)?
+		if input.LengthUTF8 == 1
+			if (.onkeydown)(self, input.codepoint(false))?
 				return true
 		return .typed(input, true)
 	

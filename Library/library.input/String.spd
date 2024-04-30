@@ -501,7 +501,7 @@ class String
 	syntax Access (|int| start, |int| after, |string|)
 		cpp_wrapper JB_Str_Range // technically it does nil check but its in a slow-path doesnt like it
 		
-	function Codepoint (|codepoint|)
+	function Codepoint (|bool| Strict=true, |codepoint|)
 		cpp_wrapper JB_Str_UTF8Value
 		
 	syntax Access (|ivec2| r, |string|)

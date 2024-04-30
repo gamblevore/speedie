@@ -85,7 +85,7 @@ int JB_Str_Compare(JB_String* self, JB_String* Search, bool Lexer);
 
 
 bool JB_Str_MidEquals(JB_String* self, int BeginOff, JB_String* find, bool Lexer);
-int JB_Str_UTF8Value(JB_String* self);
+int JB_Str_UTF8Value(JB_String* self, bool Error);
 int JB_Str_ByteValue(JB_String* self, int offset);
 int JB_Str_ByteValue2(JB_String* self, int offset, int Default);
 byte JB_Str_First(JB_String* self);

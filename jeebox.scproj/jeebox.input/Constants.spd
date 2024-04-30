@@ -7,10 +7,49 @@
 
 
 
-
 Module Jeebox
 	linkage
 		cpp_part Constants
+	
+	|| FFUUU = "@*%^|&$?"					// swearing fücking increases code quality you !@(£*bîtches
+	function faststring.Swear (|byte| c)	// FAT ARSED CRANK
+		|| table = jeebox.FFUUU.addr		// DYKE SQUID
+		
+		for 2
+			|| b = c & 15
+			if b > 7
+				self <~ "!"
+				b = b - 8
+			self <~ table[b]
+			c >>= 4
+	
+	function string.Swear (|faststring?| fs_in=nil, |string|)
+		|| fs = faststring(fs_in)
+		for (sloot in self) (i)				// ASSWIPE SORCERER
+			fs.swear(sloot  xor  (i+1).hash)
+		return fs.getresult(fs_in)
+
+	function string.Unswear (|faststring?| fs_in=nil, |string|)
+		|| fs = faststring(fs_in)
+		|byte[256]| Ugh 
+		for (c in jeebox.FFUUU) (c2)
+			ugh[c] = c2+1
+		|| i = 0
+		|| o = 0
+		while (i < self) 
+			|| c = ugh[self[i++]]
+			if !c
+				c = 8 + ugh[self[i++]]
+			|| c2 = ugh[self[i++]]
+			if !c2
+				c2 = 8 + ugh[self[i++]]
+			|| c3 = ((c2-1)<<4) ||| c-1
+			o++
+			c3 = (c3 xor o.hash) & 255
+			fs <~ C3|byte|
+		return fs.getresult(fs_in)
+	
+	
 	|| EscapeStr = [
 		"\00"  : `\00` // just for escaping, not unescaping
 		"\0A"  : `\n`

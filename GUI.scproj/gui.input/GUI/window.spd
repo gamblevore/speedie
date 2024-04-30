@@ -196,7 +196,7 @@ class Window (GUIControl)
 			if o.__TypedString__(input)
 				return true
 		if (Input == 1) and Input.IsASCII			// like a space basically?
-			return .__KeyDown__(input.codepoint)	// i think the ascii codes are the same?
+			return .__KeyDown__(input.codepoint(false))	// i think the ascii codes are the same?
 													// keydown doesn't handle non-ascii codes.
 													// probably would make more sense to do it the other way!
 													// missing keydown events send typedstring events
