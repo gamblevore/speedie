@@ -9294,8 +9294,6 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, NilState New);
 
 inline void SC_nil__DeclKill();
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
-
 inline NilRecord SC_nil__Value();
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
@@ -9303,6 +9301,8 @@ inline bool JB_Safe_SyntaxCast(JB_String* Self);
 inline bool SC_Decl_IsUnknownParam(SCDecl* Self);
 
 inline NilRecord SC_nil__EndBlock();
+
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
@@ -9456,6 +9456,10 @@ inline bool SC_NilTest_SyntaxCast(NilTest* Self) {
 inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg R) {
 	ASMtmp T = SC_Msg_ASMType(Exp);
 	fn_asm Fn = SC_fn_asm_table[T];
+	if ((!T)) {
+		Fn = SC_fn_asm_table[((int)Exp->Func)];
+		debugger;
+	}
 	return (Fn)(Self, Exp, R);
 }
 
@@ -9474,16 +9478,6 @@ inline void SC_nil__DeclKill() {
 		SC__nil_T.RootReturned = true;
 	}
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
-}
-
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
-	ASMtmp T = SC_Msg_ASMType(Msg);
-	if (T) {
-		return (SC__nil_NilTable[T])(Msg, Test);
-	}
-	T = ((ASMtmp)Msg->Func);
-	(SC_Msg_ASMTypeSet(Msg, T));
-	return (SC__nil_NilTable[T])(Msg, Test);
 }
 
 inline NilRecord SC_nil__Value() {
@@ -9505,6 +9499,16 @@ inline NilRecord SC_nil__EndBlock() {
 	return Rz;
 }
 
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
+	ASMtmp T = SC_Msg_ASMType(Msg);
+	if (T) {
+		return (SC__nil_NilTable[T])(Msg, Test);
+	}
+	T = ((ASMtmp)Msg->Func);
+	(SC_Msg_ASMTypeSet(Msg, T));
+	return (SC__nil_NilTable[T])(Msg, Test);
+}
+
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 	if ((!JB_Ring_HasChildCount(Self, 2))) {
 		if (true) {
@@ -9521,6 +9525,7 @@ inline FatASM* SC_Pac_AddASM2WithIntMsgInt(ASMState* Self, int SM, Message* Dbg,
 	FatASM* Rz = nil;
 	Rz = SC_Pac_RequestOp(Self, SM, Dbg);
 	Rz->R[0] = A;
+	SC_FatASM_Print(Rz);
 	return Rz;
 }
 
@@ -9529,6 +9534,7 @@ inline FatASM* SC_Pac_AddASM2WithIntMsgIntInt(ASMState* Self, int SM, Message* D
 	Rz = SC_Pac_RequestOp(Self, SM, Dbg);
 	Rz->R[0] = A;
 	Rz->R[1] = B;
+	SC_FatASM_Print(Rz);
 	return Rz;
 }
 
@@ -9538,6 +9544,7 @@ inline FatASM* SC_Pac_AddASM3(ASMState* Self, int SM, Message* Dbg, int A, int B
 	Rz->R[0] = A;
 	Rz->R[1] = B;
 	Rz->R[2] = C;
+	SC_FatASM_Print(Rz);
 	return Rz;
 }
 
@@ -9548,6 +9555,7 @@ inline FatASM* SC_Pac_AddASM4(ASMState* Self, int SM, Message* Dbg, int A, int B
 	Rz->R[1] = B;
 	Rz->R[2] = C;
 	Rz->R[3] = D;
+	SC_FatASM_Print(Rz);
 	return Rz;
 }
 
