@@ -1959,3 +1959,7 @@
 "DDIV"
 "PRNT"
 "Instructions.i"
+"tail"
+"TAIL"
+"Too many params."
+"Number out of range (1-24)"

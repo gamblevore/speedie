@@ -47,6 +47,13 @@
 #define   Func_JUMPu_(x)   (((uint)((x)<<14))>>14)
 
 
+#define   Tail_JUMPi       ((( int)((Op.Raw)<<8))>>8)
+#define   Tail_JUMPi_(x)   ((( int)((x)<<8))>>8)
+
+#define   Tail_JUMPu       (((uint)((Op.Raw)<<8))>>8)
+#define   Tail_JUMPu_(x)   (((uint)((x)<<8))>>8)
+
+
 #define   Cmp_Cmpu       (((uint)((Op.Raw)<<18))>>28)
 #define   Cmp_Cmpu_(x)   (((uint)((x)<<18))>>28)
 

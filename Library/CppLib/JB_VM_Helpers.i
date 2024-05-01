@@ -368,7 +368,7 @@ AlwaysInline ASM* BumpStack (Register*& rp, ASM* Code, ASM Op) { // jumpstack
 	ENTR[3] = Transfer(Code2, 2);
 	ENTR[4] = Transfer(Code2, 3);
 	ENTR[5] = Transfer(Code2, 4);
-	ENTR[6] = Transfer(Code2, 5);			// Isn't 5 registers enough?
+	ENTR[6] = Transfer(Code2, 5);
 	if (RemainCodes>1) {					// transfer more regs.
 		debugger; 
 		ENTR[ 6] = Transfer(Code3, 0);
@@ -382,8 +382,22 @@ AlwaysInline ASM* BumpStack (Register*& rp, ASM* Code, ASM Op) { // jumpstack
 	// read from registers instead.
 
 	int j = Func_JUMPi;
-	Code += j;
-	return Code;
+	return Code + j;
+}
+
+
+AlwaysInline ASM* TailStack (Register* r, ASM* Code, ASM Op) {
+	ASM Code2 = Code[0];
+	// What if this overwrites params that we mean to read from?
+	
+	r[1] = Transfer(Code2, 0);
+	r[2] = Transfer(Code2, 1);
+	r[3] = Transfer(Code2, 2);
+	r[4] = Transfer(Code2, 3);
+	r[5] = Transfer(Code2, 4);
+	r[6] = Transfer(Code2, 5);
+
+	return Code + Tail_JUMPi;
 }
 
 

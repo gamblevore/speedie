@@ -39,26 +39,28 @@ function FillTypePrm (|string| fname, |int| pname)
 	.dt_prm <~ macros.ASMcopier.run(prop, pname.msg)
 
 
-function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max,   |int|)
+function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max, |int|)
 	opt norefcounts
 	|| n = Max - bit_pos
 	|| lname = "_L"
 	if line
 		|| f = line.NeedFirst$
 		|| f0 = *f.name
+		if f0 == 'x' and bit_pos == 32
+			return bit_pos
 		if f0 == 'r'
 			.FillTypePrm(line.name, pname)
 			return 5+bit_pos
 		if f0.isint
 			n = f.int
-		expect (n >= 1)  (line, "Too many total bits")
-		expect (n <= (Max-8)) (line, "Too large field. Found: " + n.render)
+		expect (n >= 1)        (line, "Too many total bits")
+		expect (n <= (Max-8))  (line, "Too large field. Found: " + n.render)
 		lname = "_" + line.name 
 	
 	lname = .Parent + lname
 	|| fnc_src = .DefineGet(lname, Max-n, bit_pos, bit_pos+n==Max)
 	
-	SCFunction.newfunc(fnc_src, nil, line)
+	SCFunction.NewFunc(fnc_src, nil, line)
 	
 	.FillTypePrm(lname, pname)
 	
@@ -113,20 +115,20 @@ function GenerateForms (|message| forms, |bool| Rest)
 	for form_msg in forms[@arg]
 		if (f < 32) #check (form_msg, "Too many forms")
 			using form_msg
-			.GenerateOne(form_msg, ++f, rest)
+			.AddForm(form_msg)
+			f++
+			if rest
+				.GenerateOne(form_msg, f)
 
 
-function GenerateOne (|message| form_msg, |int| f, |bool| rest)
+function GenerateOne (|message| form_msg, |int| f)
 	opt norefcounts
-	|| frm = .AddForm(form_msg)
-	require rest
 	.dt_prm = .DataTypeCreate(form_msg, f)
 	.parent = form_msg.name
 	|| bit_pos = 8
 	|| p    = 0
 	|| arg  = form_msg[@arg,-1]							#require
 	|| Max = 32
-	if form_msg ~= "func"
 	
 	for l in arg
 		bit_pos = .GenAcc(l, bit_pos, p++, max)
@@ -170,16 +172,18 @@ function BuildFiles (|bool|)
 	.VMCpp(code, jump)
 
 	.SafeWrite("InstructionGetters.h", form_h)
-	.SafeWrite("Instructions.i", code)
-	.SafeWrite("InstructionList.h", jump)
+	.SafeWrite("Instructions.i",       code)
+	.SafeWrite("InstructionList.h",    jump)
 	.form_h.size = 0
 	return true
+
 
 function SafeWrite (|string| name, |faststring| data)
 	if data.length < 1K // oof?
 		debugger
 	  else
 		.CppLibFile(name)!.SmartData = data
+
 
 function MakeTheVM
 	compiler.Project.use

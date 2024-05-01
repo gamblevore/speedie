@@ -32,13 +32,11 @@ datatype µParam (uint16)
 		return self & 256
 	function NoExpect (|bool|)
 		return (self & 512)
-	function Position (|uint|)
-		return self >> 11
 	function Min (|int|)
 		if (.issigned)
 			return -.max
 	function BitSize (|uint|)
-		return self & 31
+		return (self & 31) + 1
 	function IsNumber (|bool|)
 		return self & 64
 	function IsReg (|bool|)

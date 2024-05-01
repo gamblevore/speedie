@@ -169,6 +169,8 @@ typedef ASM ASM_SWAP;
 
 typedef ASM ASM_Setn;
 
+typedef ASM ASM_Tail;
+
 typedef ASM ASM_U0;
 
 typedef ASM ASM_U1;
@@ -1007,9 +1009,10 @@ struct xC2xB5Form_Behaviour: Object_Behaviour {
 };
 
 JBClass ( xC2xB5Form , JB_Object , 
-	JB_String* Name;
-	ASMParam Params[8];
 	int Count;
+	JB_String* Name;
+	ASMParam Params[6];
+	int TotalBits;
 	int Index;
 );
 
@@ -1870,7 +1873,6 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_RD4S (58)
 #define kSC__ASM_RD4U (57)
 #define kSC__ASM_RD8U (59)
-#define kSC__ASM_Remainder (256)
 #define kSC__ASM_RET (16)
 #define kSC__ASM_RETL (19)
 #define kSC__ASM_RSDE (49)
@@ -1885,6 +1887,8 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_SUB (27)
 #define kSC__ASM_SWAP (17)
 #define kSC__ASM_TABL (52)
+#define kSC__ASM_TAIL (9)
+#define kSC__ASM_TAIL2 (9)
 #define kSC__ASM_WR16 (65)
 #define kSC__ASM_WR1U (61)
 #define kSC__ASM_WR2U (62)
@@ -3347,7 +3351,7 @@ int SC_VM_Builder__GenAcc(Message* Line, int Bit_pos, int Pname, int Max);
 
 void SC_VM_Builder__GenerateForms(Message* Forms, bool Rest);
 
-void SC_VM_Builder__GenerateOne(Message* Form_msg, int F, bool Rest);
+void SC_VM_Builder__GenerateOne(Message* Form_msg, int F);
 
 int SC_VM_Builder__Init_();
 
@@ -4279,6 +4283,8 @@ ASM SC_ASM_SWAP_CSet(ASM Self, uint Value);
 
 ASM SC_ASM_SWAP_DSet(ASM Self, uint Value);
 
+ASM SC_ASM_Tail_JUMPSet(ASM Self, uint Value);
+
 ASM SC_ASM_U0_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_U1_LSet(ASM Self, uint Value);
@@ -4761,6 +4767,11 @@ ASM JB_ASM_SWAP__Encode(FatASM* Self);
 
 // ASM_Setn
 ASM JB_ASM_Setn__Encode(FatASM* Self);
+
+
+
+// ASM_Tail
+ASM JB_ASM_Tail__Encode(FatASM* Self);
 
 
 
@@ -6371,8 +6382,6 @@ JB_String* SC_Str_ArgsMatchError(JB_String* Self, bool TypeCast);
 
 JB_String* JB_Str_ArgValue(JB_String* Self);
 
-uint SC_Str_ASMint(JB_String* Self);
-
 JB_String* SC_Str_ASMNormalise(JB_String* Self);
 
 JB_String* JB_Str_BackToApp(JB_String* Self);
@@ -6725,23 +6734,19 @@ bool SC_autoitem_OKBy(autoitem* Self, autoitem* Prev);
 
 
 // JB_µForm
+void SC_xC2xB5Form_addp(xC2xB5Form* Self, int Size, ASMParam P);
+
 void SC_xC2xB5Form_AddRemainder(xC2xB5Form* Self, uint U);
 
 xC2xB5Form* SC_xC2xB5Form_Constructor(xC2xB5Form* Self, JB_String* Data, Message* Tmp);
 
 void SC_xC2xB5Form_Destructor(xC2xB5Form* Self);
 
-void SC_xC2xB5Form_Finish(xC2xB5Form* Self);
-
 void SC_xC2xB5Form_LoadParam(xC2xB5Form* Self, JB_String* Pl, Message* Place);
 
 JB_String* SC_xC2xB5Form_Render(xC2xB5Form* Self, FastString* Fs_in);
 
 ASMParam SC_xC2xB5Form_AccessInt(xC2xB5Form* Self, int I);
-
-void SC_xC2xB5Form_SyntaxAccessSet(xC2xB5Form* Self, int I, ASMParam Value);
-
-void SC_xC2xB5Form_SyntaxAppend(xC2xB5Form* Self, ASMParam P);
 
 int SC_xC2xB5Form__Init_();
 
@@ -9294,6 +9299,8 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, NilState New);
 
 inline void SC_nil__DeclKill();
 
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
+
 inline NilRecord SC_nil__Value();
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
@@ -9301,8 +9308,6 @@ inline bool JB_Safe_SyntaxCast(JB_String* Self);
 inline bool SC_Decl_IsUnknownParam(SCDecl* Self);
 
 inline NilRecord SC_nil__EndBlock();
-
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
@@ -9456,10 +9461,6 @@ inline bool SC_NilTest_SyntaxCast(NilTest* Self) {
 inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg R) {
 	ASMtmp T = SC_Msg_ASMType(Exp);
 	fn_asm Fn = SC_fn_asm_table[T];
-	if ((!T)) {
-		Fn = SC_fn_asm_table[((int)Exp->Func)];
-		debugger;
-	}
 	return (Fn)(Self, Exp, R);
 }
 
@@ -9478,6 +9479,16 @@ inline void SC_nil__DeclKill() {
 		SC__nil_T.RootReturned = true;
 	}
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
+}
+
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
+	ASMtmp T = SC_Msg_ASMType(Msg);
+	if (T) {
+		return (SC__nil_NilTable[T])(Msg, Test);
+	}
+	T = ((ASMtmp)Msg->Func);
+	(SC_Msg_ASMTypeSet(Msg, T));
+	return (SC__nil_NilTable[T])(Msg, Test);
 }
 
 inline NilRecord SC_nil__Value() {
@@ -9499,16 +9510,6 @@ inline NilRecord SC_nil__EndBlock() {
 	return Rz;
 }
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
-	ASMtmp T = SC_Msg_ASMType(Msg);
-	if (T) {
-		return (SC__nil_NilTable[T])(Msg, Test);
-	}
-	T = ((ASMtmp)Msg->Func);
-	(SC_Msg_ASMTypeSet(Msg, T));
-	return (SC__nil_NilTable[T])(Msg, Test);
-}
-
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 	if ((!JB_Ring_HasChildCount(Self, 2))) {
 		if (true) {
@@ -9525,7 +9526,6 @@ inline FatASM* SC_Pac_AddASM2WithIntMsgInt(ASMState* Self, int SM, Message* Dbg,
 	FatASM* Rz = nil;
 	Rz = SC_Pac_RequestOp(Self, SM, Dbg);
 	Rz->R[0] = A;
-	SC_FatASM_Print(Rz);
 	return Rz;
 }
 
@@ -9534,7 +9534,6 @@ inline FatASM* SC_Pac_AddASM2WithIntMsgIntInt(ASMState* Self, int SM, Message* D
 	Rz = SC_Pac_RequestOp(Self, SM, Dbg);
 	Rz->R[0] = A;
 	Rz->R[1] = B;
-	SC_FatASM_Print(Rz);
 	return Rz;
 }
 
@@ -9544,7 +9543,6 @@ inline FatASM* SC_Pac_AddASM3(ASMState* Self, int SM, Message* Dbg, int A, int B
 	Rz->R[0] = A;
 	Rz->R[1] = B;
 	Rz->R[2] = C;
-	SC_FatASM_Print(Rz);
 	return Rz;
 }
 
@@ -9555,7 +9553,6 @@ inline FatASM* SC_Pac_AddASM4(ASMState* Self, int SM, Message* Dbg, int A, int B
 	Rz->R[1] = B;
 	Rz->R[2] = C;
 	Rz->R[3] = D;
-	SC_FatASM_Print(Rz);
 	return Rz;
 }
 

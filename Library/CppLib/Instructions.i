@@ -10,6 +10,10 @@
 	vm.CurrStack = r;
 	ForeignFuncSimple(r, Code, Op);
 	___;
+ı TAIL: 
+	__;
+	Code = TailStack(r, Code, Op);
+	___;
 ı RET: 
 	__;
 	Code = Return(r, Code, Op);

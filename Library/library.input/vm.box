@@ -14,8 +14,12 @@ forms
 		SaveRegs	5
 		Incr		1
 		JUMP		j
-//		Prm1		x
-//		Prm2		x
+		Prm1		x
+		Prm2		x
+	
+	Tail
+		JUMP		j
+		Prm1		x
 	
 	Cmp		// cmp:
 		r1		r
@@ -100,17 +104,21 @@ RET (Ret)	// ret:
 	Code = Return(r, Code, Op)
 	___
 
-FUNC (Func,2,3) // func: 
+FUNC (Func, 2,3) // func: 
 	__
 	Code = BumpStack(r, Code, Op)
 	___
 
-FNCX (Func,2,3)
+FNCX (Func, 2,3)
 	__
 	vm.CurrStack = r // to make this recursive
 	ForeignFuncSimple(r, Code, Op)
 	___
 
+TAIL (Tail, 2)
+	__
+	Code = TailStack(r, Code, Op)
+	___
 
 SWAP (Swap)
 	std_swap(r[SWAP_Au], r[SWAP_Bu])

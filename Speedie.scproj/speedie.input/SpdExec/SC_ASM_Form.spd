@@ -4,9 +4,10 @@
 
 
 class µForm 
-	|string|		Name
-	|µParam[8]|		Params
 	|int|			Count
+	|string|		Name
+	|µParam[6]|		Params
+	|int|			TotalBits
 	|int|			Index
 	
 	
@@ -19,7 +20,7 @@ class µForm
 	constructor (|string| data, |message?| tmp)
 		opt norefcounts
 		.name = tmp.name
-		for i in 8
+		for i in 6
 			.params[i] = 0
 		if tmp
 			for line in tmp.last(@arg)
@@ -29,24 +30,17 @@ class µForm
 			for param in data
 				.loadparam( string.byte(param), nil )
 		
-		.Finish
 		.index = ++µform.count
 
 
-	syntax append (|µParam| P)
+	function addp (|int| Size, |µParam| P)
+		if size <= 0 or size > 32 // hmm??
 		|| i = .count++
-		if (i < 8)
-			.params[i] = p // expect
-	
-
-	function Finish
-		|| total = 0
-		for (s in self) (i)
-			if s & asm.remainder
-				s |= (24 - total)
-			self[i] = s ||| (total << 11)
-			total += s.bitsize
-		
+		.totalbits += size
+		expect (i < 6) ("Too many params.")
+		p |= size-1
+		.params[i] = p
+			
 
 	function LastField (|µParam|)
 		return self[.Count-1]
@@ -65,29 +59,33 @@ class µForm
 			yield self[i] (i)
 			i++
 
-	function AddRemainder (|uint| U=0)
-		self <~ asm.num ||| asm.remainder ||| U
+	function AddRemainder (|uint| U)
+		.addp( 32 - .TotalBits, asm.num ||| U)
 	
 	function LoadParam (|string| pl, |message| place)
 		if (pl.isint)
-			self <~ pl.ASMint ||| asm.num
+			|| i = pl.int
+			check (i > 0 and i <= 24) (place, "Number out of range (1-24)")
+			.addp(i, asm.num)
 			return
 		expect (pl == 1) (self)
 		|| p = *pl
 		if  p == 'r'
-			self <~ 5 
+			.addp(5, 0)
+		  elseif p == 'x'
+			.addp(32, 0)
 		  elseif p == 'n'
-			self <~ 5 ||| asm.num
+			.addp(5, asm.num)
 		  elseif p == 'l'
-			.addremainder
+			.addremainder(0)
 		  elseif p == 'L'
-			.addremainder( asm.NoExpect)
+			.addremainder( asm.NoExpect )
 		  elseif p == 's'
-			.addremainder( asm.signed)
+			.addremainder( asm.signed )
 		  elseif p == 'S'
-			.addremainder( asm.signed + asm.NoExpect)
+			.addremainder( asm.signed + asm.NoExpect )
 		  elseif p == 'j'
-			.addremainder( asm.signed + asm.jump)
+			.addremainder( asm.signed + asm.jump )
 		  elseif place
 			error (place)
 		  else
@@ -100,8 +98,3 @@ class µForm
 		function Needform (|string| Form, |µform|)
 			opt norefcounts
 			return forms.valuelower(form) init µform(form, nil)
-
-
-function string.ASMint (|uint|)
-	rz = .int
-	debug_require rz|int| inrange 32
