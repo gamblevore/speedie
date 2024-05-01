@@ -1,11 +1,17 @@
 
 
-main (|int| AmountOfSwears=1)
-	|| hehe = fuck.off(AmountOfSwears)
+// This is meant to make people laugh.
+// Swearing is known to help reduce physical pain
+// And more intelligent people are known to swear more.
+// It is also found that source-code containing swears tends to be of higher-quality
+// Hope you enjoy!
 
+
+main (|int| AmountOfSwears=1)
+	|| hehe = SwearManager.Bleep(AmountOfSwears)
 	if app.yes("speak")
-		printline `("killall say" in terminal to stop this.)
-`
+		`("killall say" in terminal to stop this.)`
+		``
 		app.say hehe
 	  else
 		print hehe
@@ -24,12 +30,12 @@ class Word
 		.name = s
 
 
-class Fuck
-	default Fuck()
+class SwearManager
+	default SwearManager()
 	|[word]|				Words
 	
 	function Load (|string| s)
-		for w.lines in s
+		for w.lines in s.Unbleep
 			if w
 				.words <~ word(w)
 		.Words.Sort(&string.sorter)
@@ -39,15 +45,15 @@ class Fuck
 	
 	render
 		for s in .words
-			fs <~ s
+			fs <~ s.name
 			fs <~ '\n'
 
 
 
 	module {
-	|Fuck|					First
-	|Fuck|					Second
-	|bool| 					Same = app.yes("same")
+	|SwearManager|					First
+	|SwearManager|					Second
+	|bool| 							Same = app.yes("same")
 
 	
 	function Accept (|word| a, |word| b, |bool|)
@@ -57,7 +63,7 @@ class Fuck
 		return true
 		
 		
-	function Off (|int| n = 1, |string|)
+	function Bleep (|int| n = 1, |string|)
 		.load
 		|| fs = FastString()
 		for i in n
@@ -88,231 +94,223 @@ class Fuck
 		.second.load(secondwords)
 			
 || firstwords="
-arse
-ass
-assmonkey
-asswipe
-+autistic
-+barmy
-+bastard
-bat
-berk
-+bitçh
-+bollock brain
-boomer
-bum
-butt
-buttbox
-butthole
-+bumblefuck
-+chucklefuck
-chunder
-clit
-+clusterfuck
-+cracker
-+cocktastic
-coronavirus
-crab
-crack
-+crap
-cum
-cunt
-cuntfoot
-cuntnugget
-+cunty
-dick
-dildo
-toilet
-+drunk
-+dumb
-fag
-+fat
-+flaming
-fuck
-fuckfish
-+fucking
-fucknugget
-+fucknut
-fucksock
-+fuckwit
-fur burger
-+furry
-+gay
-+ginger
-+hairy
-hairy clam
-hepatitis
-+hermaphrodite
-jizz
-+ladyboy
-+lesbo
-+mangina
-+mouth breathing
-+nîggerlicious
-+nîggerlicious
-pandemic
-+pedo
-pillow
-piss
-pissy
-poo
-poop
-puke
-pussy
-sandy vagina
-shag
-skank
-skinny
-slag
-snatch
-+special
-stain
-stanky butt
-+thundercunt
-tinfoil
-+tiny
-toss
-+total
-+tranny
-tumor
-+twat
-twatface
-+ugly
-+utter
-vagina
-vomit
-wanker"
+*!%^!?!$!%|!^
+!?&!@!|&!*
+!^!&!@!&!$@$!*^@!?!*!&!@%%$*
+|!@!^%%!$!^!*!**!?!?$!%
+@!&!@!|$!*!$!^@$!%@!^!?!|&*!^
+!%!$!@!%?!@!*!?||&|
+$%@&&!**!^!|*|$&!@!^!?
+!?^???!&
+*^^%^^!^%
+!?!^@!$@$&@*^%^!*$
+^@!%!$*?$!&!?!^|!??!?*!| !%!%&!&!$@^$*$
+@^%|!$$!|^!??!%&
+%?!%!*|!@
+^!%?!@&!$%!%
+!%%&&&&^!?!^!??|!&^
+$!$^&!@|??!?%!%?!%!&&!^
+$!%!*!?!?^|$^!$^!^!^!^%!@!|$!?*!?!@
+?!&?!%?!*!%!^!@!$@$!@%?!*!?!$|%!^*!?%
+!?!|@&$^!??
+&?|!|!%!?|&^!%%^@!?!&|!^!*?!|&&!$|
+!$!*!|!^!&^!%|!|*|?$!@*!&
+*!$!*^!*!%!%$!?!^!?^!%|!&&$!%!|^$%
+&&*%!^!?@@$!*%*&!?&^!$!*$!?*&
+!@@!&!|!%!?%!?
+!|*!$?&^%|^!&
+!?*!%|$!%!%!$!?|
+$^!&!*%@
+@*$%^%!@^
+@%^%!@$%?!^!|!^|&|!|!%
+%!|?&@!^!%!@!?&&!@!@&@!@!%!@*@
+@?*^*$%!^!%!|!|*
+!^^&!|!%!%&%
+!$!?!^||!*!?^!?!%
+!|!&&!*!@&!?!@$!?^!*
+!^$!|!$!|!?!*$!*|?&
+!^^!|!$!|%|!|$?
+&?@*!*!&
+|&$!*!?!|?@
+|?!@@|!&^!$|*!&!|!%!$!%$
+&!?!?!&!?^!?@
+!?!*!@&!?!%!|!%*!^!@!|%%?!?
+!?%!&|!^!@!^@@?%!$&!@&*
+!*||^!?!*!%@!^*!$!?!&%!|!|!^&!^!$
+!*|!|^!|!&!&!**!&@^!%!@%!^
+!&!&!**!@^!*^!$!*&!?!&$!|!&
+!^!*%$!?&!&!?!&&&!?^!&%%
+!&*!&!|&% ?!|!|!?@@!@!@!$!$&@
+*&!|!?^!*&!@!?|!&^
+!|!?!&*!%!?!@!^
+|^!@!&!?^!@$!?!&!^!$$!@
+!%!|!?$!*!@|%!?!?!$!%
+!^|*^!@&!%|!@!& !*&!^!&$!*!?%
+?$@$$!^!||*@$%&@!$$^*
+!@&!%^^|**&$??$!%*%!|??&*!&?!&^!@%!%
+!%!*|!%$!@$!?
+$!|!*!|!&*!|!?!%$!@!?!@!*&!&
+!?!$^@|%!$?@!%!?*
+!^!%!^^%!@|%!|!^!^&*!&|!&
+*^?|!|!*!*!?%!&&!* !|!&*|!|$@!@^!|?!?!^*!*!@!$%
+!?!&!$@!^||!*?%@!|$!%!?!^!$!%?!|!^!&%%@!?*$!*!^
+?!^@??%$!?!&$!%!|&!^^!?!?|?^!?!$@&^!%!$!$!*!|
+!?!|?!^!*!?!$!|&^%*!%$!^?
+!@|%!%!|!^%@!@|
+$!?^!**!^*!|!?!&!|!@
+!|^!@$!*!$|!%
+!*!|!*@%$|%$@
+*&|&$?
+^|!&!&&$!*%
+!&$!|&|@^!&
+!&!*&!?!*%**%!*
+|!@||!*!^$!*!?* *?!*$@!|?!&!&?!$|
+*@!**@%?&
+!&@!*!*^*%!|!^!?
+!&!@!|!@!*$?$%$&$
+!&@!%!|?!&?@
+@!@!*!*^!*!$$!*!&%&
+%!^!?**^!&@!&!|!@*!?%&!|
+@!?!^!%@?!%$^^
+!?!?!|^$!*?!*|!&&!& %!%^|!?!$%!^
+!|%^!%%^!*!*?*!%^?$!$!$&!$^!*!*!@!*!@
+!$!%@?!*&!%!*$?@!@^@
+%&!&!^&*!?!|%&
+!%!*!%!%!%!$|%
+%*$%^@^!^!?$^*
+!^!&?!%^&!@!@$&!|@!|*
+!*@$!*!&!%!|&|!|
+?!?@!|&!&!^!^?^
+|*!?!^!|?&&^%$$&%^!&
+!&!|^!|$^*%!?%
+!?*!?!$@|*?%&$@
+^**|*?!$!*^!&!$^
+!??*!|!%?!@^!*?
+?|!^&*!$|!*&|*%"
 
 	
 || secondwords = "
-ambassador
-arsed
-artist
-avalanche
-bandit
-bat
-biscuit
-biter
-blagger
-blizzard
-box
-boy
-boomer
-brother
-bucket
-butter
-cake
-casket
-celebrity
-cellist
-clown
-cow
-dad
-denier
-dirtbag
-disease
-dredger
-drinker
-dwarf
-eater
-face
-fatty
-fettler
-fish
-fondler
-foot
-furry
-geek
-grabber
-grinder
-handed
-hands
-haver
-head
-horse
-idiot
-imbecile
-influencer
-jar
-jerk
-jesus
-jew
-junkie
-kiddo
-kisser
-king
-lawyer
-libtard
-load
-lord
-lover
-manager
-mole
-mongrel
-monk
-monster
-mother
-mustard
-muncher
-mystic
-nazi
-nerd
-nibbler
-numpty
-nutfuckers
-nîgger
-oofer
-panda
-pants
-parade
-peasant
-pedant
-pianist
-pillow
-player
-plonker
-politician
-pudding
-prat
-prince
-princess
-punk
-raper
-recepticle
-rocket
-scrubber
-sheep
-shrimp
-sister
-smear
-sniffer
-snorter
-sorcerer
-spanner
-stirrer
-storm
-superhighway
-supporter
-slag
-tart
-teaser
-terrorist
-tits
-titties
-toker
-tornado
-trombone
-turkey
-turnip
-twerker
-twiddler
-twizzler
-utensil
-wad
-wagon
-wheel
-womble
-zoo
+artist*!%^!?!*!%!@!^!&|!?!|
+?!@!|!|!%!|**!%!*%@%!*!$!@%%
+!&@|!@$^&!?&!@|@
+!&!$%!%!?!@
+!^!|!%!@!*!^!%$!|@$!$*|
+@!^!@!%!$!^^!@!*!?
+!^|@&!|$&&^!*?!%!%*
+?$!^!*$!??%!|$%!|*%%%
+^%!?%!|!$
+@!$$$!@@
+@!*!%!?!$$&|!&!$!|$
+!@!&*!%|!?@!$%!|!&!%&!&
+!&@!??!|$!*^!@|&?
+^^!?$!|&|$!%!@!^!*
+%!%^!*!%!?^!^
+!^%*|%&!|!$!|!?!|&
+$%*!$!%|!*&*$&^!|?%!|!*!%
+!$!$!$!?$%&$!@!$!|!%!%!%
+?!@&?^*^!*%!*
+?!%@!*!@!^
+!?!$!%$@%
+$!*!|!$!?^***%!$!&
+!@&$^!*?!%%&!|?!?$|
+|!^!?%$!$!%&!|!**!|^&
+*|?!|!%!^!^%!||!%*!&$
+?!@*!&^!%|^!&!%!|$$!%
+!?%!|&!?|@!%^^
+@%?&!%^!|!$!&*
+!$!*%*@!$!*^
+!%!@%!$$&!?*$!|
+!&!?&!?!^@!@?!@^||!%!|
+%&@|?!%^!$
+!*&!%^$!@!^@!?*$^!?^
+!%%!|%!*^%?
+@$!@!&$&!@&*!%
+$!|?|!^!^&!*
+$&*!*!^|%!@!$!@@@^%
+&^$$!&!^!|!&?@!%^!$!&
+!$!%!|^^!?!||!|!*!$^%!^
+@!|!^!*!?&?!@$!?^!@
+!@%!*!$@!$!@?|&
+|&*?!$!?!|^!^!&
+!|?$?@*!%!&
+?*!?!*!|!&@@!%^
+?@!|!&!^!$$*@!&
+!&!$@$*!?!?!|!?^!&@&!*!@|
+&!%!*!%*!^!&!||%!%!?!%$!@|!^!*!%*
+*?!%!$!*!*
+!@*!%|^^?!*
+!^@@*!@!?!?^!@!&
+|&!%!?&*
+@^!|!&@!**!&?^!%!*
+!&!%%!&!@@!?^!&^
+$!@^!?!&?|!|&!&$?
+*|?!?!@&&!$
+$!&?^!|@*!|%^?!&
+&!$!^*!&!@!?!?$*!@@!$!?
+!%!@!@!*!|&@%
+!^!^&*!*!$&!%
+^?@!&@%^$!%!|
+^!$&!*!?!@$$!?!@!@%!?!?
+!%!^!||!|^|&
+&&!$!||&@!&&!@?%^$
+!@$!*!%^|!$*
+%%!$*!*$^*?@?^|&
+!$@?$%$!$!^!|%!|?
+&&@!|!&!|^!@$!%%!@!*!%
+*!*!*!?^!@$!||*!&!?*$
+?!?!$!@!?!&@!^$@%%
+^$^!%!%@!*!$
+!@^$!@!@^!?!^
+!|&$!&?!&!@?$|$!*!$!?
+!@!|!@!@^!&^|!&?!@!*
+!*!&!%!$$@*!@!|^?!*!^@!&!$!@|^^
+!*!|@@^$&!%!*!|!&!&!*^
+@!?!^?!|!%!*!?!|$
+|!*!*^|$!*!|*!^
+*!?%|@^!@!?!%|
+!|!^!%!?!@!|!$!&%!^%!?
+!%!&&^!$*@?!*?!&@$!%
+!*!%^@^|?!$|!*!*!%
+!&!&!*!&!%!*%%!@$!*!$^!%
+!*!|!*@!&?!^^@*$&
+!^|&?%&!^!|!?$!^%
+!&$&|@@!@!&$!@&!$!@%
+%*|!@!^!*!||^!%!^!*&@!$$!*$!*!|
+!$!|$$!^|$*!@*!?%?&
+!$@@!@^*!@!&
+@!$!|!@!$!@!$$!%$!*$
+!|$!|@!?!|!@!&^@$!*|!@*!@
+!%$!?!||&%!?
+!$*@%!@*!^!|^@
+!|^$!|@!$|!^|???
+!$%!?!$!%^%!@!^!*!&!&!*!|%!^
+&|^!?^!%%$?!%
+!*%&!@!%@!%%?$!$!$
+&!?!^!@%!@!|!*!@!%
+!%$!*&&!*!??!?!@!%@!^@
+!%!^%*!$!|!*&!%!*@!%!^!$
+|%$&@%!?@%!%!|?!%*%!@
+@!%*&!@!@$&!|@@@!?@
+@!*|!^!%&|!|!$!%*!&@!&
+!*!%?^!?@!%!^@?
+%&@^??^%|!|!$!@!?!&$^&%*%&&^!$
+?|@??||@!%@%&%$%!*!?!|
+!|%&$!?!|@?
+&%!|$%|!$|
+!^!?!%!**|@%!&*^!$
+@!@^&&!*??!%&!&^*!@!&|!^!*
+^&|%!$!&!%!?
+!%!&*!&%@&!@^!^&|@!|
+?!*!&&!??!@!?&@
+!*!*!?!||!?^$?!&!^*%!?
+!*$!|^^!**$$!%%&
+&*^!@?!%!@@!@@?%
+*!%!@^@!&!^!&!&%!*?!%!&
+$^?*!^!&&@!*!@!%%!?@
+@*$!?@!$
+!|!?&!^!%!?$!?^|
+^&!*!&!&|?!|!%!?
+|@&^!&*
 "
 
 }

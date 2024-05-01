@@ -1,0 +1,56 @@
+	
+
+extend_module Jeebox
+	|| FFUUU = "@*%^|&$?"				// swearing fücking increases code quality you !@(£*bîtches
+
+function faststring.Swear (|byte| c)	// FAT ARSED CRANK
+	|| table = jeebox.FFUUU.addr		// DYKE SQUID
+	
+	for 2
+		|| b = c & 15
+		if b > 7
+			self <~ "!"
+			b = b - 8
+		self <~ table[b]
+		c >>= 4
+
+function string.Bleep (|faststring?| fs_in=nil, |string|)
+	|| fs = faststring(fs_in)
+	|| o = 0
+	for (sloot in self)					// ASSWIPE SORCERER
+		if sloot.IsWhite
+			fs <~ sloot
+		  else
+			fs.swear(sloot  xor  (++o).hash)
+	return fs.getresult(fs_in)
+
+function string.Unbleep (|faststring?| fs_in=nil, |string|)
+	|| fs = faststring(fs_in)
+	|byte[256]| Ugh 
+	for (c in jeebox.FFUUU) (c2)
+		ugh[c] = c2+1
+	|| i = 0
+	|| o = 0
+	while (i < self) 
+		|| c = self[i++]
+		if c.IsWhite
+			fs <~ c
+			continue 
+		
+		if c == '!'
+			c = 8 + ugh[self[i++]]
+		  else
+			|| c1 = ugh[c]
+			if !c1
+				fs <~ c
+				continue 
+			c = c1
+
+		|| c2 = ugh[self[i++]]
+		if !c2
+			c2 = 8 + ugh[self[i++]]
+		|| c3 = ((c2-1)<<4) ||| c-1
+		o++
+		c3 = (c3 xor o.hash) & 255
+		fs <~ C3|byte|
+	return fs.GetResult(fs_in)
