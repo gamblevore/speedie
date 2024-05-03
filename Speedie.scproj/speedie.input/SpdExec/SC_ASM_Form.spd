@@ -33,7 +33,7 @@ class µForm
 		.index = ++µform.count
 
 
-	function addp (|int| Size, |µParam| P)
+	function AddP (|int| Size, |µParam| P)
 		if size <= 0 or size > 32 // hmm??
 		|| i = .count++
 		.totalbits += size

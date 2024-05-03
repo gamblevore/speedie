@@ -215,7 +215,7 @@ class SpdProcess (Process)
 datatype ProcessMode (byte)
 	flags
 		CaptureStdOut
-		CaptureOrPrintErrors = (CaptureErrors, AutoPrintErrors)
+		CaptureOrPrintErrors = [CaptureErrors, AutoPrintErrors]
 		CaptureAll = CaptureStdOut ||| AutoPrintErrors
 
 	syntax is (|ProcessMode| M, |bool|)

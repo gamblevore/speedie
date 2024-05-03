@@ -1237,12 +1237,12 @@ module parser
 		kColon
 		kColonArg
 
-		kTemporal       = (kTemporalWord,	kTemporalSyxNoBar,  kTemporalBar)
-		kEnd            = (kEndOfLine,		kComma,				kEndContainer) 
-		kFuncAfterAny   = (kFuncAfterNormal,kFuncAfterNoSpace,  kFuncAfterBar) 
-		kOpp            = (kOppBra,			kOppSNB,			kOppBar, kOppTemporal,		kOppWord,	kOppYoda)
+		kTemporal       = [kTemporalWord,	kTemporalSyxNoBar,  kTemporalBar]
+		kEnd            = [kEndOfLine,		kComma,				kEndContainer] 
+		kFuncAfterAny   = [kFuncAfterNormal,kFuncAfterNoSpace,  kFuncAfterBar]
+		kOpp            = [kOppBra,			kOppSNB,			kOppBar, kOppTemporal,		kOppWord,	kOppYoda]
 		kTemporalWordColon
-		kThing          = (kThingSyx, kThingBar, kThingWord)
+		kThing          = [kThingSyx, kThingBar, kThingWord]
 		kOppSyx			= koppSNB (|) koppbar
 		kTemporalSyx    = kTemporalSyxNoBar (|) kTemporalBar
 		kOppNoBar		= kopp &~ koppbar

@@ -9,25 +9,25 @@
 datatype OpMode (uint16)
 	flags
 		|OpMode|
-		CompSet = (Compare, Assigns)
-		MathLike = (Bit, Math)
+		CompSet  = [Compare, Assigns]
+		MathLike = [Bit, Math]
 		Addition
 		LeftOnly
 		MakesSigned
 		ExactlyEquals
 		EqualOrNot
 		NilTest		// not the same as equalornot... because those include customops
-		SameOrLessBits = (NoExtraBits, LoseBits)
+		SameOrLessBits = [NoExtraBits, LoseBits]
 		Left = LeftOnly + NoExtraBits
-		AndOr = (OR, AND)
+		AndOr = [OR, AND]
 		Custom
 		CaseAware
 		ExactEquals = niltest + exactlyequals + equalornot + compare
 		ExactNotEquals = niltest + equalornot + compare
-
 		
 	syntax is (|OpMode| x, |bool|)
 		return (self & x) == x
+
 
 
 class SCOperator {

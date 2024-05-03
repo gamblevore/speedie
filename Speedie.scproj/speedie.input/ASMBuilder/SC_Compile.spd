@@ -35,7 +35,6 @@ struct ASMState
 		rz.r[1] = b
 		rz.r[2] = c
 		rz.r[3] = d
-		target debug: rz.print
 
 	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |int| c, |&FatASM|)
 		pragma inline,  opt norefcounts,  cpp_part AddASM3
@@ -43,22 +42,17 @@ struct ASMState
 		rz.r[0] = a
 		rz.r[1] = b
 		rz.r[2] = c
-		target debug: rz.print
 
 	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |&FatASM|)
 		pragma inline,  opt norefcounts,  cpp_part AddASM2
 		rz = self <~ (sm, dbg)
 		rz.r[0] = a
 		rz.r[1] = b
-		target debug: rz.print
 
 	function AddASM (|int| SM, |message| dbg, |int| a, |&FatASM|)
-		pragma inline,  opt norefcounts,  cpp_part AddASM2
+		pragma inline,  opt norefcounts,  cpp_part AddASM1
 		rz = self <~ (sm, dbg)
-		rz.r[0] = a
-		target debug: rz.print
-
-		
+		rz.r[0] = a		
 
 	syntax append (|uint| code, |message| dbg, |&FatASM|)
 		cpp_part RequestOp
@@ -75,25 +69,24 @@ struct ASMState
 	
 		
 	function DeclareMe (|Message| where,  |asmreg| T,  |asmreg|)
-		if t.reg
-			return t
-		
 		|| d = .VDecls|int| + 1
-		expect (d + .vtmps <= 31) (where, "No free local variables.")
-		t.reg = d
-		.vdecls = d
-		return t
+		if (d + .vtmps <= 31)
+			t.reg = d
+			.vdecls = d
+			return t
+		error (where, "No free local variables.")			
 	
 	
-	function TempMe (|Message| where,  |asmreg| T,  |asmreg|) // .needreg
+	function TempMe (|Message| where,  |asmreg| T=asmreg.discard,  |asmreg|) // .needreg
 		if t.reg
 			return t
 		
 		|| d = .vtmps|int| + 1
-		expect (d + .vtmps <= 31) (where, "No free local variables.")
-		t.reg = 32-d
-		.vtmps = d
-		return t
+		if (d + .vtmps <= 31)
+			t.reg = 32-d
+			.vtmps = d
+			return t
+		error (where, "No free local variables.")
 
 
 	function OpenVars (|uint|)
@@ -121,7 +114,7 @@ struct ASMState
 
 
 	function prm (|message| prm, |asmreg|)
-		|| r = prm.simplevar
+		|| r = prm.SimpleVar
 		if r.Exists
 			return r
 		return .µ(prm, .DeclareMe(prm, asmreg.empty))

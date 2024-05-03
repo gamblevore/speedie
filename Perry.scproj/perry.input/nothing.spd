@@ -3,7 +3,8 @@
 helper asm_test_add (|int| a, |int| b, |int|)
 	cpp_name asm_test_sub
 	visible
-	return ((a + b) / 2)  - ((a / b) * 2)
+	|| y = 2.0
+	return ((a + b) / 2) - ((a / b) * 2)
 
 
 helper asm_test_func (|int| a, |int| b, |int|)
@@ -11,3 +12,21 @@ helper asm_test_func (|int| a, |int| b, |int|)
 	visible
 	return asm_test_add(b*b, a*a)
 
+
+ignore {
+asm asm_test_add
+	SETK: r3, 29, 1				// 2.0
+	ADD:  r31, r1, r2			// a+b
+	SETK: r30, 0, 1				// 2
+	DIV:  r0, r31, r31, r30, 0	// (a+b)/ 2
+	DIV:  r0, r30, r1, r2, 0	// (a/b)
+	SETK: r29, 0, 1				// could be improved... to save consts. like a 3rd group of bits just for consts
+								// they can be overwritten if we run out of space.
+	MUL:  r30, r30, r29, r0		// (a/b) * 2
+	SUB:  r1, r31, r30			// -
+	RET:  r1, r0, 1, 0			// return
+// Seems to be ok actually? Just the const can be removed...
+// also values that are written but never used.
+// we could store the regs in ONE value that is a 64-bit value... so each 2 bits gives us a type of 0-3
+// awkward to be honest... but maybe ok. we could store two versions? like a condensed version?
+}

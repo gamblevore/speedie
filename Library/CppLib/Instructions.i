@@ -33,12 +33,10 @@
 	if_rare (Rare(r, Op)) return n3;
 ı CONV: _
 	Conv(r, n2, Op);
-ı SET1: _
-	i1 = U1_Li;
 ı SETK: _
-	i1 = JB_u64_RotL(Const_Lu, Const_rotu);
+	RotateConst(r, Op);
 ı SETN: _
-	loadconst(r, Op, Code);
+	LoadConst(r, Op, Code);
 ı ADDC: _
 	i1 = i2 + JB_u64_RotL(L3, n3);
 ı ADD: _

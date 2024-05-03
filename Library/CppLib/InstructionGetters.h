@@ -74,11 +74,14 @@
 #define   Const_rotu       (((uint)((Op.Raw)<<13))>>26)
 #define   Const_rotu_(x)   (((uint)((x)<<13))>>26)
 
-#define   Const_Li       ((( int)((Op.Raw)<<19))>>19)
-#define   Const_Li_(x)   ((( int)((x)<<19))>>19)
+#define   Const_invu       (((uint)((Op.Raw)<<19))>>31)
+#define   Const_invu_(x)   (((uint)((x)<<19))>>31)
 
-#define   Const_Lu       (((uint)((Op.Raw)<<19))>>19)
-#define   Const_Lu_(x)   (((uint)((x)<<19))>>19)
+#define   Const_Valuei       ((( int)((Op.Raw)<<20))>>20)
+#define   Const_Valuei_(x)   ((( int)((x)<<20))>>20)
+
+#define   Const_Valueu       (((uint)((Op.Raw)<<20))>>20)
+#define   Const_Valueu_(x)   (((uint)((x)<<20))>>20)
 
 
 #define   Bra_c1u       (((uint)((Op.Raw)<<13))>>30)
@@ -101,17 +104,20 @@
 #define   Mem_Lu_(x)   (((uint)((x)<<20))>>20)
 
 
-#define   Setn_lenu       (((uint)((Op.Raw)<<13))>>30)
-#define   Setn_lenu_(x)   (((uint)((x)<<13))>>30)
+#define   Setn_Condu       (((uint)((Op.Raw)<<13))>>31)
+#define   Setn_Condu_(x)   (((uint)((x)<<13))>>31)
 
-#define   Setn_Condu       (((uint)((Op.Raw)<<15))>>30)
-#define   Setn_Condu_(x)   (((uint)((x)<<15))>>30)
+#define   Setn_Invu       (((uint)((Op.Raw)<<14))>>31)
+#define   Setn_Invu_(x)   (((uint)((x)<<14))>>31)
 
-#define   Setn_Li       ((( int)((Op.Raw)<<17))>>17)
-#define   Setn_Li_(x)   ((( int)((x)<<17))>>17)
+#define   Setn_Valueu       (((uint)((Op.Raw)<<15))>>16)
+#define   Setn_Valueu_(x)   (((uint)((x)<<15))>>16)
 
-#define   Setn_Lu       (((uint)((Op.Raw)<<17))>>17)
-#define   Setn_Lu_(x)   (((uint)((x)<<17))>>17)
+#define   Setn_Prm1i       ((( int)((Op.Raw)<<31))>>31)
+#define   Setn_Prm1i_(x)   ((( int)((x)<<31))>>31)
+
+#define   Setn_Prm1u       (((uint)((Op.Raw)<<31))>>31)
+#define   Setn_Prm1u_(x)   (((uint)((x)<<31))>>31)
 
 
 #define   CNTR_incru       (((uint)((Op.Raw)<<18))>>29)
@@ -180,4 +186,8 @@
 
 #define   RET_Lu       (((uint)((Op.Raw)<<22))>>22)
 #define   RET_Lu_(x)   (((uint)((x)<<22))>>22)
+
+
+#define   Div_Kindu       (((uint)((Op.Raw)<<28))>>30)
+#define   Div_Kindu_(x)   (((uint)((x)<<28))>>30)
 

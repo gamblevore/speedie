@@ -206,7 +206,7 @@ datatype ListViewState (uint16)
 	flags
 		|ListViewState| 
 		AlignLeft = 0
-		Align		= (AlignCenter, AlignRight)
+		Align		= [AlignCenter, AlignRight]
 		Selected 
 		Modified
 		Disabled

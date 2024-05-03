@@ -22,45 +22,60 @@ typedef u64 (*Fn8)(u64, u64, u64, u64, u64, u64, u64, u64);
 AlwaysInline void DivMath(Register* r, ASM Op) {
 	auto R3 = i3;
 	auto R4 = i4;
-	switch (Op & 3) { // so there are 4 possible divisions we can do
+	uint A = n1;
+	uint B = n2;
+	if (!A) A = 32; // dump it safely
+	if (!B) B = 32; // dump it safely
+	auto pA = &(r[A].Int);
+	auto pB = &(r[B].Int);
+
+	switch (Div_Kindu & 3) { // so there are 4 possible divisions we can do
 	  case 0:
-		i1 = (s64)R3 % (s64)R4;
-		i2 = (s64)R3 / (s64)R4;
+		*pA = (s64)R3 % (s64)R4;
+		*pB = (s64)R3 / (s64)R4;
 		return;
 	  case 1:
-		i1 = (u64)R3 % (u64)R4;
-		i2 = (u64)R3 / (u64)R4;		
+		*pA = (u64)R3 % (u64)R4;
+		*pB = (u64)R3 / (u64)R4;
 		return;
 	  case 2:
-		i1 = (int)R3 % (int)R4;
-		i2 = (int)R3 / (int)R4;
+		*pA = (int)R3 % (int)R4;
+		*pB = (int)R3 / (int)R4;
 		return;
 	  case 3:
-		i1 = (uint)R3 %(uint)R4;
-		i2 = (uint)R3 /(uint)R4;
+		*pA = (uint)R3 %(uint)R4;
+		*pB = (uint)R3 /(uint)R4;
 		return;
 	}
 }
 
 
-AlwaysInline void loadconst(Register* r, ASM Op, ASM* Code) {
-	u32 Cond  = Setn_Condu;
-	u32 Count = Setn_lenu+1;
-	u32 Back  = Setn_Lu+1;
-	// rewrite this
-//	u64* Read = ((u64*)Code)-Back;
-//	auto Write = (u64*)(&i1);
-//	if (Cond) {
-//		if (Cond == 1) {
-//			if (u1) return;
-//		} else if (Cond == 2) {
-//			if (!u1) return;
-//		} else if (Cond == 3) {
-//			if (u1) Read+=Count; // conditional const read :)
-//		}
-//	}
-//	for_(Count)
-//		*Write++ = *Read++;
+AlwaysInline void RotateConst (Register* r, ASM Op) {
+	int64 A = JB_u64_RotL(Const_Valueu, Const_rotu);
+	if (Const_invu)
+		A = ~A;
+	i1 = A;
+}
+
+AlwaysInline ASM* LoadConst (Register* r, ASM Op, ASM* Code) {
+	uint64 Value = Setn_Valueu;
+	int Remain = Op&3;
+	if (Remain) {
+		if (Remain == 1)
+			Value <<= 32; 
+		  else
+			// these 16-bits arent really needed. Even for SIMD!
+			// we need like... loading 4 small values
+			// or 4 same values. Or loading one value into a specific field.
+			Value = (uint64)(*Code++) << 32;
+		Value |= *Code++;
+	}
+	if (!Setn_Condu or !r->Int) {
+		if (Setn_Invu)
+			Value = ~Value;
+		r->Int = Value; 
+	}
+	return Code; 
 }
 
 
@@ -92,7 +107,7 @@ AlwaysInline u64 bitstats(u64 R2, u64 R3, u64 Mode) { // rotate
 }
 
 AlwaysInline uint bitstats32(Register* r, ASM Op) {
-	int L = Const_Li;
+	int L = Const_Valuei;
 	u64 R2 = u2;
 	if (L == 0) {							// popcount
 		return __builtin_popcount((u32)R2); 

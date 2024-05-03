@@ -18,8 +18,7 @@ class µFunc
 		return .fn.ExportName
 
 	function Finish (|µFunc1|)
-		debugger
-		return µFunc1(.length, 4, .IR|&byte|)
+		return µFunc1(.length, 4, .IR|&byte|, 0)
 		
 
 /// TEXTUAL STUFF		

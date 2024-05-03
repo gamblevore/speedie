@@ -16,7 +16,7 @@ function FatASM.AddRegNum (|message| src, |uint| write, |uint| num)
 
 function FatASM.AddRegParam (|message| src, |uint| write)
 	opt norefcounts
-	.addregnum(src,write,src.regornum)
+	.addregnum(src, write, src.regornum)
 
 
 

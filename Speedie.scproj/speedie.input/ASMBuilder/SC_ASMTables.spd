@@ -10,11 +10,31 @@ dispatch fn_asm_table (fn_asm)
 
 
 	@decl: // yay
-		debugger
+		opt norefcounts
+		|| rel = exp.last!
+		|| ty = rel.first!.fastdecl
+		dest = ty.dreg
+		(dest is ReallyTemp)
+		|| reg = .DeclareMe(Exp, dest)
+		return .µ(rel.last!, reg)
 
 
 	@num:
-		debugger
+		opt norefcounts
+		|| d = exp.fastdecl
+		Dest = .TempMe(exp, dest)
+		|| X = d.exportposition
+		if d.isfloat
+			|| f8 = exp.float
+			if d.bytesize == 4
+				|| f4 = f8|float|
+				x = f4.asint
+			  else
+				debugger
+				x = f8.asint
+		.NumToReg(X, exp, Dest)
+		return dest
+		// loadconst?
 
 
 	@rel: asmtmp.DoMath
@@ -47,20 +67,24 @@ dispatch fn_asm_table (fn_asm)
 
 
 	@acc: // pointers?
+		opt norefcounts
 		debugger
 
 
 	@brel: // ++, --, -
+		opt norefcounts
 		debugger
 
 
 	@arel: // ++, --, 
+		opt norefcounts
 		debugger
 
 
 	@type: // 
 		// bit narrowing, float conversion, etc?
 		// could be others too? vectors?
+		opt norefcounts
 		debugger
 
 	(ASMtmp.kDebugger):		ASMtmp.Debugger
@@ -176,11 +200,10 @@ function Pointer		(fn_asm)
 function SetRel	(fn_asm)
 	opt	norefcounts
 	|| Var = exp.first!.SimpleVar	
-	|| R = .µ(exp.last!, Var)
+	|| R = .µ(exp.last!, var)
 	if r isnt discard    // x = 1, already done!
 		(r is set)
-		.µ(exp.first!, R)
-	// seems simple?
+		return .µ(exp.first!, R)
 
 
 function Thg (fn_asm)
@@ -199,7 +222,7 @@ function Thg (fn_asm)
 		|| R = dest.reg
 		expect (R and dest isnt set) (exp)
 		|| val = d.exportposition
-			.NumToReg(val, R, exp)
+			.NumToReg(val, exp, R)
 			return dest
 		return 0.reg
 
@@ -229,18 +252,32 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Value, |scdecl| D, 
 	return addr
 	
 
+/*
+	x = x * x		// self-replace. easy
+	x = x * 9		// same
+	x = x + y		// same
+	x = x + x * x	// run x*x first... put it into a temp, then replace x as above
+
+	
+	return x * x		// self-replace. also
+	return x + x * x	// run x*x first... put it into a temp, then replace x as above
+*/
+
 function DoMath (fn_asm)
 	opt norefcounts
 
-//	debugger
 	|| F = exp.first!
 	|| op = F.next!
-	dest = .tempme(op, dest)
 
 	|| OV = .OpenVars
-	|| ml = .µ(F, dest)
-	|| mr = .µ(op.next!, ml • dest)
+	// could we store ml or mr in dest?
+	// a = b + 5
+	// 5 could be stored in a?
+//	|| innerdest = dest.TryUse // boomers in my way
+	|| ml = .µ(F)
+	|| mr = .µ(op.next!)
 	.CloseVars(OV)
+	dest = .tempme(op, dest) 
 	
 	dest.µtype = ml.µtype						// assignment conversion needs to be done also.
 	|| scop = op.obj|scoperator|
@@ -250,11 +287,6 @@ function DoMath (fn_asm)
 
 
 }
-
-function asmreg.operator• (|asmreg| dest, |asmreg|)
-	if .reg == dest.reg
-		return 0.reg
-	return dest
 
 function ASMReg.ReadOrWrite (|asm|)
 	|| T = .µtype

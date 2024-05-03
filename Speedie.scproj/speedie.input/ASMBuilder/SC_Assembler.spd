@@ -34,7 +34,7 @@ module TreeAssembler
 	function InitTree
 		instruction.instructionInit
 		asmtmp.InitAccess
-		Instruction[asm.SET1].Const
+//		Instruction[asm.SET1].Const
 		Instruction[asm.SETK].Const
 		Instruction[asm.SETN].Const
 		return 

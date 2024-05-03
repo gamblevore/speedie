@@ -649,6 +649,8 @@ function Tran_Syx (|Message| msg, |Message|)
 	|| SyxName	= "Syx" + OldName
 
 	name.name	= OldName + "__"
+
+	|| longname = params.name
 	Params.Name = "fpMsgRender"
 
 	
@@ -663,7 +665,7 @@ function Tran_Syx (|Message| msg, |Message|)
 		dot2 <~ (@thg, "Message")
 		dot2 <~ @emb
 		prm <~ OldName.lowercase
-		prm <~ Params.name
+		prm <~ longname
 		prm <~ SyxID
 		Compiler.program.CollectOne( dotnew, true )
 

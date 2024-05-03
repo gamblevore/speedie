@@ -55,6 +55,8 @@ datatype DataTypeCode (uint16)
 		_void = 0
 		_voidptr = 48
 		cstring = 48
+		Failed = 0x8000
+		numeric = 8
 		
 		UnusedType = int64 &~ 8
 	
@@ -81,17 +83,17 @@ datatype DataTypeCode (uint16)
 		return (self >> 6) & 1
 
 	function IsNumeric (|bool|)
-		return (self & 8)
+		return (self & numeric)
 
 	function IsAtomic (|bool|)
 		return (self & 4)
 
 	function NumericCount (|int|)
-		if (self & 8)
+		if (self & numeric)
 			return .count
 	
 	function NumericCountBoolsToo (|int|)
-		if (Self & 8)
+		if (Self & numeric)
 			return .count
 		if !self
 			return 1

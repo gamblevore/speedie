@@ -34,6 +34,8 @@ forms
 	Const	// const:
 		r1		r
 		rot		6
+		inv		1
+		Value	12
 	
 	Bra		// bra:
 		r1		r
@@ -47,8 +49,12 @@ forms
 	
 	Setn
 		r1		r
-		len		2
-		Cond	2	// 0 == always, 1 = only if dest == 0, 2 = only if dest != 0
+		Cond	1	// 0 == always, 1 = only if dest == 0
+		Inv		1
+		Value	16
+		Prm1	x
+		Prm2	x
+		
 	
 	CNTR	// 
 		r1		r
@@ -83,6 +89,13 @@ forms
 		r2		r
 		Count	3
 		Exists	1
+	
+	Div
+		r1		r
+		r2		r
+		r3		r
+		r4		r
+		Kind	2
 
 
 // this file:
@@ -143,12 +156,10 @@ CONV (U3)
 
 
 #!						 (((((Consts)))))
-SET1 ("rS")
-	i1 = U1_Li
 SETK (Const)
-	i1 = JB_u64_RotL(Const_Lu, Const_rotu)
-SETN (setn)			// OK
-	loadconst(r, Op, Code)
+	RotateConst(r, Op)
+SETN (setn)//, 1, 2, 3)			// OK
+	LoadConst(r, Op, Code)
 
 
 #!						 (((((Math)))))
@@ -160,7 +171,7 @@ SUB  (U3)
 	i1  =  i2 - (i3 << L3)
 MUL  (U4)
 	i1 = (i2 * i3) + i4
-DIV  (U4)
+DIV  (Div)
 	DivMath(r, Op)
 
 
@@ -211,14 +222,14 @@ CMPN  (CmpEq)				// NO (But easy to fix)
 	__
 	Code = CompNeq(r, Op, Code)
 	___
-BRA   (Bra)					// NO (But easy to fix)
+BRA   (Bra)					// Merge these two?
 	__
 	if (!i1)
 		Code += Bra_jmpi
 	___
 	i1 += Bra_c1u-1
 	
-BRAN  (Const)				// NO (But easy to fix)
+BRAN  (Bra)					
 	__
 	if (i1)
 		Code += Bra_jmpi

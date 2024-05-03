@@ -4,8 +4,8 @@ datatype CopyPasteFlags (Byte)
 		cpp_part CPF
 	Flags
 		|CopyPasteFlags| 
-		Copy  = (CopyFile,  CopyText,  CopyImage,  CopyNode)
-		Paste = (PasteFile, PasteText, PasteImage, PasteNode)
+		Copy  = [CopyFile,  CopyText,  CopyImage,  CopyNode]
+		Paste = [PasteFile, PasteText, PasteImage, PasteNode]
 		PasteTextLike = (PasteText|||PasteFile)
 	function CanCopy (|CopyPasteFlags|)
 		return self&Copy

@@ -9,7 +9,141 @@ function SCNode.CollectOneConstants (|Message| ch)
 	.project.use
 	using ch
 	.CollectConstantsSub( ch )
-	constantsloadingoverride = false
+	ConstantsLoadingOverride = false
+
+	
+
+function SCNode.CalculateConstRel (|message!| value, |&datatypecode| Ty, |uint64|)
+	opt norefcounts
+	|| A = value.first!
+	|| L = .CalculateConst(A, Ty)
+	require *ty isnt failed
+	
+	|| B = A.next!
+	|| C = b.next!
+	if value == @brel
+		expect (*ty is int) (value, "Not an integer")
+		return ~L
+		
+	|| op = scoperator.lookup(B)
+	#!SSSSS
+	|| R = .CalculateConst(C, Ty)
+	expect (op is MathLike) (B)
+	|| N = B.name.first
+	|| Lg = b.name.length
+	|| Ints = (*ty).isint
+	if n == '+'
+		if Ints
+			return L + R
+		  else
+			return (L|int64|.asfloat + R|int64|.asfloat).asint
+	if n == '-'
+		if Ints
+			return L - R
+		  else
+			return (L|int64|.asfloat - R|int64|.asfloat).asint
+	if n == '/'
+		if Ints
+			return L / R
+		  else
+			return (L|int64|.asfloat / R|int64|.asfloat).asint
+	if n == '*'
+		if Ints
+			return L * R
+		  else
+			return (L|int64|.asfloat * R|int64|.asfloat).asint
+	
+	expect (ints) (value, "Not an integer")
+	if n == '&'
+		return L & R
+	if n == '|' or '('
+		return L ||| R
+	if lg == 2
+		if n == '<'
+			|| T = L << R
+			expect ((T >> R) == L) (value, "Loses numeric info.")
+			return T
+		if n == '>'
+			|| T = L >> R
+			expect ((T << R) == L) (value, "Loses numeric info.")
+			return T
+	
+	error (value)
+	
+	
+
+function SCNode.CalculateConst (|message!| value, |uint64|)
+	|datatypecode| Ty = 0
+	return .CalculateConst(value, ty)
+/*
+	print "$value --> "
+	if ty is float
+		printline rz|int64|.asfloat.render(16)
+	  else
+		printline rz|int64|.render
+*/	
+
+
+function message.TypeExpect (|&datatypecode| Ty, |datatypecode| In)
+	|| v = *ty
+		if  v != in  and  v isnt failed
+			* ty = datatypecode.failed
+			error (self, "Can't mix floats/ints here.")
+	  else
+		* ty = In
+
+
+function SCNode.CalculateConst (|message!| value, |&datatypecode| Ty, |uint64|)
+	opt norefcounts
+	|| f = value.func
+	if f == @num
+		if value.name contains '.'
+			value.TypeExpect(ty, datatypecode.float)
+			return value.float.asint
+		value.TypeExpect(ty, datatypecode.int)
+		return value.int
+
+	if f == @bra
+		return .calculateconst(Value.first!, ty)
+	
+	if f == @thg
+		if value ~= "true"
+			value.TypeExpect(ty, datatypecode.bool)
+			return 1
+		if value ~= "false"
+			value.TypeExpect(ty, datatypecode.bool)
+			return 0
+		|| d = self[value]
+		if d isa scdecl 
+			expect (d is const) (value, "Not a constant")
+			if d.isfloat
+				value.typeexpect(ty, datatypecode.float)
+			  elseif d.isint
+				value.typeexpect(ty, datatypecode.int)
+			  else
+				error (value, "Not a number")
+				
+			return d.exportposition
+		  else
+			error (value)
+		return 0
+	
+	if f == @rel
+		return .CalculateConstRel(value, ty)
+		
+	if f == @char
+		return value.name.codepoint
+	
+	if value isbrel "~"
+		return .CalculateConstRel(value, ty)
+	
+	error value
+	return 0
+	
+	
+		
+	
+	
 
 
 function SCNode.CollectConstantsSub (|Message| ch)
@@ -34,7 +168,9 @@ function SCNode.CollectConstantsSub (|Message| ch)
 	|SCDecl|	CurrType
 
 	for (line in arg)
-		if (line == @rel) and (line.first == @List) or (line.last == @list)
+		|| LF = line.first.func
+		|| LL = line.Last.func
+		if (line == @rel) and (LF == @List or @arr) or (LL == @list or @arr)
 			.ConstantExpand( line )
 		  elseif (line == @tmp)
 			expect !line.hasany (line)
@@ -64,25 +200,29 @@ function SCNode.CollectConstantsSub (|Message| ch)
 				NextNum++
 
 			if currtype
-				currtype.constcheck(nil, newnum, currtype)  
+				currtype.constcheck(nil, newnum, currtype)
 				currtype.copytypeinfoto(newitem)
 			
 		  else
-			require  line.expect(@rel)  and  line[@opp, 1].expect(@opp, "=")
-			|| ValueNode = Line[2]							#expect Line
-			|| thg = line[ @Thg ]							#require
+			|| ValueNode = Line.last
+			|| thg = line[ @Thg ]
+			require  line.expect(@rel)  and  line[@opp, 1].expect(@opp, "=")  and  valuenode  and  thg
 			|| OMGType = TypeOfExpr( ValueNode, self )		#require // can’t seem to remove this.
 			|| NewType = CurrType
 			if !NewType
 				newtype = OMGType
 			NewItem = SCDecl(newtype.type)
 
-			if (ValueNode == @Str)
+			if (ValueNode == @Str or @sstr)
 				SCFunction.ObjectifyString(ValueNode)
 				ValueNode.obj = TypeString!.typenormal
 			  elseif (valuenode.isint) or (valuenode == @unit)
 				NewType.constcheck(nil, ValueNode, OMGType)  
-				nextnum = valuenode.int + 1
+				nextnum = valuenode.int
+				newitem.exportposition = nextnum
+				nextnum++
+			  else
+				newitem.exportposition = .CalculateConst(Valuenode)
 			
 			FixLater <~ NewItem
 			

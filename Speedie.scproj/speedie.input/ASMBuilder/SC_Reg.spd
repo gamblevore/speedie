@@ -14,9 +14,9 @@ datatype AsmReg (uint)
 	constants
 		|asmreg|
 		Set = 4
-		Unused = 8
 		Discard = 1 << 14
-		ForReturn = (1 << 15) ||| (1<<8)
+		ReallyTemp = (1 << 16)
+		ForReturn = (1 << 16) ||| (1<<8)
 	
 	
 	function Exists (|bool|)
@@ -62,6 +62,16 @@ datatype AsmReg (uint)
 		// i guess speedie should sort that out on the C-level...
 		return ((t2 == t1) or  (t1.IsInt and t2.IsInt)) #expect (err, "Type-mismatch")
 
+
+	function operator• (|asmreg| dest, |asmreg|)
+		if .reg == dest.reg
+			return 0.reg
+		return dest
+		
+	function TryUse (|asmreg|)
+		if self is ReallyTemp
+			return (self|uint| &~ ReallyTemp|uint|)|asmreg|
+	
 	module
 		function Empty (|asmreg|)
 			return 0|asmreg|

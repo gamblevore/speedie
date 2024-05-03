@@ -62,6 +62,12 @@ function CollectSub (|Message| c, |SCNode|)
 	Return base
 
 
+
+syntax access (|message| s, |SCObject|)
+	opt norefcounts
+	rz = self[s.name]	#expect (s, "Can't find: " + s.name)
+
+
 syntax access (|string| s, |SCObject|)
 	opt norefcounts
 	|| a = .Access

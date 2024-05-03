@@ -195,6 +195,8 @@ class SCDecl (SCNamed) {
 
 	function SCDecl.IsFloat (|bool|)
 		return .type.typeinfo.isfloat
+	function SCDecl.IsInt (|bool|)
+		return .type.typeinfo.isint
 
 
 	function datatypecode.Better_Numeric_Sub (|datatypecode| t, |opmode| Op, |SCClass|)

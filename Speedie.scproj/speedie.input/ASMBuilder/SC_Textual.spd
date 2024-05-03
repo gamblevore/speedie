@@ -1,5 +1,4 @@
 
-// FNC and FNCX are in the wrong place.
 
 extend ASMState
 	function LoadTitle (|message| m, |message|)
@@ -18,35 +17,44 @@ extend ASMState
 		rz.expectlast
 
 		
-	function TrySmallConst (|uint| reg,  |int64| Value, |message| where, |bool|)
-		|| set1_test = (value|int|<<12)>>12 // u1 takes 12 bits for stuff
-		if set1_test == value
-			.AddASM(asm.set1, where, reg, set1_test)
-			return true
-
+	function TryRotateConst (|int64| Value,  |message| where, |uint| reg,  |bool|)
+		|| Inv = value|uint64|.countbits > 32 
+			value = ~value
 		|| R = (~Value|uint64|).LongestBitStretch	// longest false-stretch
 		if r.x >= 50		// OK so we have the longest stretch in r.x
 			value = value rotl 63-r.y
-			.AddASM(asm.setk, where, reg, r.y, value)
+			.AddASM(asm.setk, where, reg, r.y, inv|int|, value|int|)
 			return true
 
-
-	function ReserveData (|int| bytes)
-
 	
-	function NumToReg (|uint64| V, |int| Reg, |message| exp)
-		if !.TrySmallConst(reg, V, exp)
-			debugat
-			.AddASM(asm.setn, exp, reg)
-		
+	function NumToReg (|int64| V, |message| exp, |int| Reg)
+		if .TryRotateConst(v, exp, reg)
+			return
 
+		debugat
+		|| signed = (v < 0)|int|
+			v = ~v
+
+		|| µ = .AddASM(asm.setn, exp, reg, 0, signed, v|int|)
+		if v >= (1 << 48)
+			if v >= 64K
+				µ.op+=2
+				µ.r[3] = v >> 32
+				µ.R[4] = v & 0xFFFFffff
+			  else
+				µ.op++
+				µ.r[3] = 0
+				µ.R[4] = v >> 32
+				µ.R[5] = v & 0xFFFFffff
+				
+			
 	function SetConst (|Message| List,  |message| Orig,  |bool|)
 		opt norefcounts								// set1: r1, 123
 		|| RegMsg = list[@thg]				#require
 		|| ValMsg = regmsg.Next				#require
 		|| Value  = ValMsg.ASMConst
 		
-		.NumToReg(value, RegMsg.reg, orig)
+		.NumToReg(value, orig, RegMsg.reg)
 		return true
 	
 	

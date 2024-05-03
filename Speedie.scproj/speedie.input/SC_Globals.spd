@@ -1270,14 +1270,8 @@ function scdecl.ConstInRangeSub (|int64| Value, |bool|)
 
 function scdecl.ConstInRange (|message| RN, |scdecl| rt, |bool|)
 	opt norefcounts
-	if RN == @num	
-		if rn.isint 
-			return .ConstInRangeSub(rn.int)
-	
-	  elseif (rn == @thg) and (rt is DataOnlyConst) and rt.isnormalnumber and rt.isinteger
-		|| def = rt.default
-			return .ConstInRangeSub(def.int)
-
+	if .isint
+		return .ConstInRangeSub(.exportposition)
 	// if RN == @num... check the type of self big enough
 	// if RN == @thg and is a const... check the type of self big enough
 	// if num == -1 then... allow into unsigned... otherwise no negative consts.
@@ -1665,6 +1659,7 @@ function NewDeclNum (|SCDecl| D, |int64| N, |string| VarName, |Message|)
 	if  n < int.min  or  n > int.max
 		d.type = typeint64!
 	d.name = varname
+	d.exportposition = n
 	if varname								// SetVarName later?
 		D.Default = rz
 	
