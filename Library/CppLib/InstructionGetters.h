@@ -94,14 +94,14 @@
 #define   Bra_jmpu_(x)   (((uint)((x)<<15))>>15)
 
 
-#define   Mem_moveu       (((uint)((Op.Raw)<<18))>>30)
-#define   Mem_moveu_(x)   (((uint)((x)<<18))>>30)
+#define   Mem_Lu       (((uint)((Op.Raw)<<23))>>25)
+#define   Mem_Lu_(x)   (((uint)((x)<<23))>>25)
 
-#define   Mem_Li       ((( int)((Op.Raw)<<20))>>20)
-#define   Mem_Li_(x)   ((( int)((x)<<20))>>20)
+#define   Mem_movei       ((( int)((Op.Raw)<<30))>>30)
+#define   Mem_movei_(x)   ((( int)((x)<<30))>>30)
 
-#define   Mem_Lu       (((uint)((Op.Raw)<<20))>>20)
-#define   Mem_Lu_(x)   (((uint)((x)<<20))>>20)
+#define   Mem_moveu       (((uint)((Op.Raw)<<30))>>30)
+#define   Mem_moveu_(x)   (((uint)((x)<<30))>>30)
 
 
 #define   Setn_Condu       (((uint)((Op.Raw)<<13))>>31)

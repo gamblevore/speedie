@@ -162,6 +162,8 @@ function message.ASMConst (|uint64|)
 
 
 function uint64.LongestBitStretch (|ivec2|)
+	if self == -1
+		return (64,0)
 	|uint64| last
     while self
 		last = self

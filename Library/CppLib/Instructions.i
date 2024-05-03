@@ -38,7 +38,7 @@
 ı SETN: _
 	LoadConst(r, Op, Code);
 ı ADDC: _
-	i1 = i2 + JB_u64_RotL(L3, n3);
+	i1 = i2 + U2_Li;
 ı ADD: _
 	i1 = i2 + (i3 << L3);
 ı SUB: _

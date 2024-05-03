@@ -61,24 +61,17 @@ dispatch fn_asm_table (fn_asm)
 
 	@func:
 		opt norefcounts
-		// 0, a, b, fn(), b*b, a*a
-		// 0, a, b, b*b, a*a, fn()
 		return .DoFunc(exp.last!, dest)
 
 
-	@acc: // pointers?
-		opt norefcounts
-		debugger
+	@dot:	ASMTmp.Dot
+	@acc:	ASMTmp.Access
 
 
-	@brel: // ++, --, -
-		opt norefcounts
-		debugger
+	@brel: asmtmp.Brel		// ++, --, -, &
 
 
-	@arel: // ++, --, 
-		opt norefcounts
-		debugger
+	@arel: asmtmp.arel      // ++, --, 
 
 
 	@type: // 
@@ -97,7 +90,7 @@ dispatch fn_asm_table (fn_asm)
 	(asmtmp.kExit):			ASMtmp.Exit
 	(asmtmp.ksetvar):		ASMtmp.SetRel
 	(asmtmp.kStatExpr): 	ASMtmp.StatExpr
-	(asmtmp.kPointer):		asmtmp.Pointer
+	(asmtmp.kPointer):		asmtmp.Access
 	(asmtmp.kTern):			ASMtmp.Tern
 
 	(asmtmp.kIgnore):		ASMtmp.Ignore
@@ -190,11 +183,61 @@ function Return			(fn_asm)
 
 
 function Pointer		(fn_asm)
+	// *a, x = *(a.b) 
 	opt	NoRefCounts
-	|| Addr = .µ(exp.first!)
+	dest = .tempme(exp, dest)
+	|| Ptr = .µ(exp.first!, dest)
+	|| A = Dest.ReadOrWrite(exp)
+	.AddASM(A, exp, dest,  Ptr)
+	return dest
+
+
+function Access		(fn_asm)
+	// a[b], struct.mem[b], func()[func2()]
+	opt	NoRefCounts
+	dest = .tempme(exp, dest)
+
+	|| Ptr = .µ(exp.first!, dest.requestpos)		// x = a.b[0]
+	|| Ind = .µ(exp.second!, ptr.unrequest • dest)
+	|| A = Dest.ReadOrWrite(exp)
+
+	.AddASM(A, exp, dest,  Ptr, ind)
+	return dest
+
+/*
+		r1		r	// dest
+		r2		r	// Ptr
+		r3		r	// Index
+		L		7	// Const A
+		move	2
+*/	
+		
+
+function Dot		(fn_asm)
+	// a.b
+	opt	NoRefCounts
+	dest = .tempme(exp, dest)
+	|| Obj = .µ(exp.first!, dest)
+	|| prop = exp.fastdecl
+	|| T = prop.typeinfo
+	dest.µtype = T
+	debugger
 	
-	|| A = Dest.ReadOrWrite // does this work?
-	.AddASM(A, exp, dest,  addr)
+	|| B = t.ByteSize.log2
+	|| A = Dest.ReadOrWriteSub(exp, t, b)	 #require
+
+	|| Pos = prop.exportposition >> B
+	if !pos // what?
+	|| WantAddr = dest is positionrequest
+	if WantAddr or pos >= 128					// oof
+		.AddASM(asm.ADDC, exp, dest, obj, pos)
+		if WantAddr
+			return dest
+		pos = 0
+	
+	.AddASM(A, exp, dest: dest,  ptr: Obj,  index: 0, Pos)
+	return dest
+		
 		
 
 function SetRel	(fn_asm)
@@ -231,37 +274,51 @@ function Thg (fn_asm)
 		return DoGlobal(self, exp, dest, d)
 
 
-
-// how to compile:    pglob++, pglob2++
-// without loading the address of the pack glob table 4x?
-// pre-allocate a position (after the decls) containing our global?
-// and load on the first use of any global? otherwise just optimise.
-
-
 function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Value, |scdecl| D, |AsmReg|)
 	|| addr = value
 	if value isnt set				// a = glob
 		addr = .tempme(exp, value)
 
 	.AddASM(asm.tabl,  exp, addr,   d.IsLib|int|)
-		// exec takes the exportpos and alters it to the new exportpos
 
 	|| i = d.exportposition
 	if !i
-	.AddASM(Value.ReadOrWrite, exp, Value,  addr, i)
+	.AddASM(Value.ReadOrWrite(Exp), exp, Value,  addr, i)
 	return addr
 	
 
-/*
-	x = x * x		// self-replace. easy
-	x = x * 9		// same
-	x = x + y		// same
-	x = x + x * x	// run x*x first... put it into a temp, then replace x as above
+function ARel		(fn_asm)
+	return brel(self, exp, dest, 1)
 
+
+function BRel		(fn_asm)
+	//  --a,  ++a,  &a,  --glob,  --a.b
+	opt	NoRefCounts
+	|| n = exp.name.first
+	|| F = exp.first!
+	if n == '&'
+		return .µ(F, dest.requestpos)
+
+	|| Src = .µ(F, dest) // src has the old value.
+	// now... if we are doing: x = --a
+	// we want to return the old value, which is src
+	if (mode == 1) // we want the old value, which is in src.
+		dest = src
+	  else
+		dest = .TempMe(exp, dest)	
+		
+	|| D = F.FastDecl
+	|| Incr = (D.bytesize, 1)(D.typesuffers)
+	if n == '-'
+		Incr = -Incr
 	
-	return x * x		// self-replace. also
-	return x + x * x	// run x*x first... put it into a temp, then replace x as above
-*/
+	.AddASM(ASM.ADDC, exp, dest, src, incr)
+	if d isnt local
+		.µ(F, dest.set)		// we need to write it back again.
+	
+	return dest
+
+
 
 function DoMath (fn_asm)
 	opt norefcounts
@@ -270,10 +327,6 @@ function DoMath (fn_asm)
 	|| op = F.next!
 
 	|| OV = .OpenVars
-	// could we store ml or mr in dest?
-	// a = b + 5
-	// 5 could be stored in a?
-//	|| innerdest = dest.TryUse // boomers in my way
 	|| ml = .µ(F)
 	|| mr = .µ(op.next!)
 	.CloseVars(OV)
@@ -288,12 +341,24 @@ function DoMath (fn_asm)
 
 }
 
-function ASMReg.ReadOrWrite (|asm|)
+
+helper ASMReg.ReadOrWriteSub (|message| m, |datatypecode| t, |int| bytes, |asm|)
+	if self is set
+		if bytes <= 4
+			return ASMtmp.WriteASM[bytes]
+		error (m, "Object to large to write")
+	  else
+		|| B = (bytes<<1) + t.issigned
+		if b <= 9
+			return ASMtmp.ReadASM[b]
+		error (m, "Object to large to read")
+
+
+function ASMReg.ReadOrWrite (|message| m, |asm|)
 	|| T = .µtype
 	|| bytes = t.bytesize.log2
-	if self is set
-		return ASMtmp.WriteASM[bytes]
-	return ASMtmp.ReadASM[(bytes<<1) + t.issigned]
+	return .ReadOrWriteSub(m, t, bytes)
+
 
 function message.SimpleVar (|asmreg|)
 	opt	norefcounts

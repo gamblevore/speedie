@@ -349,14 +349,14 @@ function ImportLibs
 	SCImport.Importpath( "jeebox",		.Jeebox,		1, true )
 
 
-function ImportProj
+function ImportProj 
 	SCImport.STDLibTime = false
 	|| ToUse = (options.SingleFileInput.file, .BaseProjectPath!)(options.SingleFileInput)
 	compiler.Project = SCImport.ImportPath( "",  ToUse,  0, false )
 	expect compiler.Project ("No user-project found.")
 
 
-function ImportAST
+function PrepareAST 
 	opt norefcounts
 	for rz in .ImportedList
 		rz.PrepareAll
@@ -368,7 +368,8 @@ function ImportAll
 	
 	.ImportLibs
 	.ImportProj
-	.ImportAST
+	SCImport.AllFiles.sort(&string.sorter) // or else file-dates can mess things up.
+	.PrepareAST
 	if options.SelfReplacement
 		VM_Builder.MakeTheVM
 

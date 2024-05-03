@@ -267,7 +267,6 @@ function TypeOfBra (ExprResolver)
 
 function TypeOfStr (ExprResolver)
 	opt norefcounts
-	// this is better than calling tran_strings, right?
 	scfunction.String_Expand(exp, exp.MsgOwningFunc)
 	Return TypeStringzero!.TypeReal
 
@@ -1270,8 +1269,13 @@ function scdecl.ConstInRangeSub (|int64| Value, |bool|)
 
 function scdecl.ConstInRange (|message| RN, |scdecl| rt, |bool|)
 	opt norefcounts
-	if .isint
-		return .ConstInRangeSub(.exportposition)
+	if RN == @num	
+		if rn.isint 
+			return .ConstInRangeSub(rn.int)
+	
+	  elseif (rn == @thg) and (rt is DataOnlyConst) and rt.isnormalnumber and rt.isinteger
+		return .ConstInRangeSub(rt.exportposition)
+
 	// if RN == @num... check the type of self big enough
 	// if RN == @thg and is a const... check the type of self big enough
 	// if num == -1 then... allow into unsigned... otherwise no negative consts.
@@ -1283,7 +1287,9 @@ function SCDecl.ConstCheck (|message|ln, |message| RN, |scdecl| rc, |bool|)
 		expect ((LN.IsAssignable) and (self isnt const)) (LN, "Not assignable.")
 		if !rn
 			return true
-	return !rn or (.ConstInRange(RN, rc))		#expect (RN, "Loses numeric info.") 
+	if rc is const
+		return !rn or (.ConstInRange(RN, rc))		#expect (RN, "Loses numeric info.") 
+	return true
 
 
 function message.AndOrExpansionTest (|uint|)

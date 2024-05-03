@@ -13,15 +13,39 @@ helper asm_test_func (|int| a, |int| b, |int|)
 	return asm_test_add(b*b, a*a)
 
 
+helper asm_test_ptr (|fixeddict| a, |&int| b,  |int|)
+	cpp_name asm_test_ptr
+	visible
+	a.letter = -1
+	*b = 0
+	b[0] = 1
+	|| n = 10
+	b[n] = 5
+	n = b[1]
+	n = b[0]
+	a.Value = a|&nil|
+	a.items[1] = 5|&nil|
+	a.items[n] = 5|&nil|
+	
+
+helper asm_test_flow (|int| a, |int| b, |int|)
+	cpp_name asm_test_flow
+	visible
+
+
 ignore {
+
+function asm_test_add (|int| a, |int| b, |int|)
+	|| y = 2.0
+	return ((a + b) / 2) - ((a / b) * 2)
+-->
 asm asm_test_add
 	SETK: r3, 29, 1				// 2.0
 	ADD:  r31, r1, r2			// a+b
-	SETK: r30, 0, 1				// 2
+	SETK: r30, 0, 1				// const 2
 	DIV:  r0, r31, r31, r30, 0	// (a+b)/ 2
 	DIV:  r0, r30, r1, r2, 0	// (a/b)
-	SETK: r29, 0, 1				// could be improved... to save consts. like a 3rd group of bits just for consts
-								// they can be overwritten if we run out of space.
+	SETK: r29, 0, 1				// load const 2 (could be optimised)
 	MUL:  r30, r30, r29, r0		// (a/b) * 2
 	SUB:  r1, r31, r30			// -
 	RET:  r1, r0, 1, 0			// return

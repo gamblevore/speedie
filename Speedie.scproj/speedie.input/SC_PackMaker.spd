@@ -69,7 +69,7 @@ module PackMaker
 
 
 	function MakePack 
-		|| upon = TreeAssembler.CollectFuncs("asm_test,asm_test_sub")
+		|| upon = TreeAssembler.CollectFuncs("asm_test,asm_test_sub,asm_test_ptr,asm_test_flow")
 			treeassembler.VakPak(upon)
 			.MakePackMid(upon)
 

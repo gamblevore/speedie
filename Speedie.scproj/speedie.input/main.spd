@@ -68,9 +68,9 @@ function compiler.SetupEnv
 
 api Speedie_Main (|&pico| comms, |int| Mode, |&cstring| args, |ErrorInt|)
 	cpp_name Speedie_Main 
+	comms.config.name = "Speedie"
 	pico.parent_ = comms // phew
 	rz = app.sp_run(args, mode&4)
-	comms.config.name = "Speedie"
 	if rz == 0
 		rz = app.sp_run(args, mode)
 

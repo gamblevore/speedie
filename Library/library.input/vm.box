@@ -43,8 +43,10 @@ forms
 		jmp		j
 	
 	Mem		// mem:
-		r1		r
-		r2		r
+		r1		r	// dest
+		r2		r	// Base
+		r3		r	// VarAdd
+		L		7	// Const A
 		move	2
 	
 	Setn
@@ -164,7 +166,7 @@ SETN (setn)//, 1, 2, 3)			// OK
 
 #!						 (((((Math)))))
 ADDC ("rrnl")
-	i1  =  i2 + JB_u64_RotL(L3, n3)
+	i1  =  i2 + U2_Li
 ADD  (U3)
 	i1  =  i2 + (i3 << L3) // only need 6 bits for shift! can we save 3 conditional add?
 SUB  (U3)

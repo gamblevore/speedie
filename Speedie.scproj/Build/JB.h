@@ -535,7 +535,7 @@ typedef bool (*FP_fnPreReader)(SCFunction* self, Message* msg);
 
 typedef AsmReg (*fn_OpASM)(ASMState* self, AsmReg Dest, AsmReg L, AsmReg R, Message* dbg);
 
-typedef AsmReg (*fn_asm)(ASMState* self, Message* exp, AsmReg Dest);
+typedef AsmReg (*fn_asm)(ASMState* self, Message* exp, AsmReg Dest, int Mode);
 
 typedef void (*FP_fpMsgRender)(Message* self, FastString* fs);
 
@@ -1912,9 +1912,10 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASMtmp_kWhile (50)
 extern ASM_Mem SC__ASMtmp_ReadASM[10];
 extern ASM_Mem SC__ASMtmp_WriteASM[5];
-#define kSC__Reg_Discard (1 << 14)
-#define kSC__Reg_ForReturn ((1 << 16) | (1 << 8))
-#define kSC__Reg_ReallyTemp ((1 << 16))
+#define kSC__Reg_Discard (1 << 31)
+#define kSC__Reg_ForReturn ((1 << 30) | (1 << 8))
+#define kSC__Reg_PositionRequest ((1 << 29))
+#define kSC__Reg_ReallyTemp ((1 << 30))
 #define kSC__Reg_Set (4)
 #define kJB__CharProp_AlmostLetter (6)
 #define kJB__CharProp_Letters (7)
@@ -2475,8 +2476,6 @@ JB_String* SC_Comp__IdealName();
 
 void SC_Comp__ImportAll();
 
-void SC_Comp__ImportAST();
-
 void SC_Comp__ImportLibs();
 
 void SC_Comp__ImportProj();
@@ -2520,6 +2519,8 @@ bool SC_Comp__ModulesSorter(JB_Object* A, JB_Object* B);
 void SC_Comp__NewConst(SCDecl* D);
 
 void SC_Comp__PostInitCodeCall();
+
+void SC_Comp__PrepareAST();
 
 void SC_Comp__PrintCompileErrors();
 
@@ -3524,29 +3525,23 @@ Message* SC_FindBytePos(Message* Node);
 
 Message* SC_FindBytePosSub(Message* Node);
 
-AsmReg SC_fn_asm_table_63(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_fn_asm_table_63(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_fn_asm_table_ACC(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_fn_asm_table_ARG(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_fn_asm_table_AREL(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_fn_asm_table_BRA(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_fn_asm_table_ARG(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_fn_asm_table_DECL(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_fn_asm_table_BRA(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_fn_asm_table_FUNC(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_fn_asm_table_BREL(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_fn_asm_table_LIST(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_fn_asm_table_DECL(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_fn_asm_table_NUM(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_fn_asm_table_FUNC(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_fn_asm_table_TMP(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_fn_asm_table_LIST(ASMState* Self, Message* Exp, AsmReg Dest);
-
-AsmReg SC_fn_asm_table_NUM(ASMState* Self, Message* Exp, AsmReg Dest);
-
-AsmReg SC_fn_asm_table_TMP(ASMState* Self, Message* Exp, AsmReg Dest);
-
-AsmReg SC_fn_asm_table_TYPE(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_fn_asm_table_TYPE(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
 void SC_FuncLinkageTable_cpp_part(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
@@ -4323,19 +4318,27 @@ void SC_ASM__TestASMSub(Message* Tests);
 // ASMtmp
 bool SC_ASMtmp_SyntaxIs(ASMtmp Self, ASMtmp T);
 
-AsmReg SC_ASMtmp__Continue(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_ASMtmp__Access(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_ASMtmp__Debugger(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_ASMtmp__ARel(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+
+AsmReg SC_ASMtmp__BRel(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+
+AsmReg SC_ASMtmp__Continue(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+
+AsmReg SC_ASMtmp__Debugger(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
 AsmReg SC_ASMtmp__DoGlobal(ASMState* Self, Message* Exp, AsmReg Value, SCDecl* D);
 
-AsmReg SC_ASMtmp__DoMath(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_ASMtmp__DoMath(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_ASMtmp__Exit(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_ASMtmp__Dot(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_ASMtmp__If(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_ASMtmp__Exit(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_ASMtmp__Ignore(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_ASMtmp__If(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+
+AsmReg SC_ASMtmp__Ignore(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
 int SC_ASMtmp__Init_();
 
@@ -4343,38 +4346,50 @@ void SC_ASMtmp__InitAccess();
 
 int SC_ASMtmp__InitCode_();
 
-AsmReg SC_ASMtmp__Pointer(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_ASMtmp__Rejoin(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_ASMtmp__Rejoin(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_ASMtmp__Return(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_ASMtmp__Return(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_ASMtmp__SetRel(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_ASMtmp__SetRel(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_ASMtmp__StatExpr(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_ASMtmp__StatExpr(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_ASMtmp__Tern(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_ASMtmp__Tern(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_ASMtmp__Thg(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_ASMtmp__Thg(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_ASMtmp__Unexpected(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_ASMtmp__Unexpected(ASMState* Self, Message* Exp, AsmReg Dest);
-
-AsmReg SC_ASMtmp__While(ASMState* Self, Message* Exp, AsmReg Dest);
+AsmReg SC_ASMtmp__While(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
 
 
 // AsmReg
 bool SC_Reg_Exists(AsmReg Self);
 
-ASM SC_Reg_ReadOrWrite(AsmReg Self);
+AsmReg SC_Reg_OperatorAs(AsmReg Self, AsmReg A);
+
+AsmReg SC_Reg_OperatorAsnt(AsmReg Self, AsmReg A);
+
+AsmReg SC_Reg_operatorxE2x80xA2(AsmReg Self, AsmReg Dest);
+
+ASM SC_Reg_ReadOrWrite(AsmReg Self, Message* M);
+
+ASM SC_Reg_ReadOrWriteSub(AsmReg Self, Message* M, DataTypeCode T, int Bytes);
 
 int SC_Reg_Reg(AsmReg Self);
 
 AsmReg SC_Reg_RegSet(AsmReg Self, int Value);
 
+AsmReg SC_Reg_RequestPos(AsmReg Self);
+
+AsmReg SC_Reg_Set(AsmReg Self);
+
 bool SC_Reg_SyntaxIs(AsmReg Self, AsmReg R);
 
 AsmReg SC_Reg_SyntaxIsSet(AsmReg Self, AsmReg R, bool Value);
+
+AsmReg SC_Reg_Unrequest(AsmReg Self);
 
 DataTypeCode SC_Reg_xC2xB5Type(AsmReg Self);
 
@@ -9485,7 +9500,7 @@ inline bool SC_NilTest_SyntaxCast(NilTest* Self) {
 inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg R) {
 	ASMtmp T = SC_Msg_ASMType(Exp);
 	fn_asm Fn = SC_fn_asm_table[T];
-	return (Fn)(Self, Exp, R);
+	return (Fn)(Self, Exp, R, 0);
 }
 
 inline int SC_Reg_ToInt(AsmReg Self) {
