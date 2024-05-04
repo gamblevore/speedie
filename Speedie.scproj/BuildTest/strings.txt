@@ -2020,3 +2020,5 @@
 "XML_Text"
 "Object to large to read"
 "asm_test,asm_test_sub,asm_test_ptr,asm_test_flow"
+"Class Hierarchy too deep"
+"Struct containership too deep"

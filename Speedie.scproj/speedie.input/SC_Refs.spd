@@ -550,7 +550,7 @@ function LastUsedRefPlace (|Message| name, |Message| arg, |Message|)
 	opt norefcounts
 	|| d = name.AsDecl #expect
 	|| Type = d.Type
-	require !Type.NoEarlyFree 
+	require Type isnt NoEarlyFree 
 	
 	|| s = name.name
 	|| found = name

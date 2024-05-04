@@ -1108,7 +1108,6 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		  else
 			fs <~ name
 		
-//		if scfunction.currfunc ~= "SC_Comp__FindFunction"
 		for mv in self
 			fs <~ ' '
 			mv.Export( fs )
@@ -1117,7 +1116,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function C_RenderOpp (fpMsgRenderCpp)
 		opt norefcounts
 		|| s = .name
-		if s == kBitOr
+		if s == "(|)"
 			fs <~ "|"
 		  elseif s == "&"
 			fs <~ "&"

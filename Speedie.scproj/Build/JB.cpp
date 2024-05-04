@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2023];
+extern JB_StringC* JB_LUB[2025];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -642,7 +642,7 @@ bool SC_Comp__CollectIsaTests(Message* S) {
 			SCClass* Cls = SC_Msg_ObjCls(R1);
 			if (Cls) {
 				if (F == SC__Comp_fnIsa) {
-					if ((!Cls->HasSubClass)) {
+					if (!(SC_Class_SyntaxIs(Cls, kSC__ClassInfo_HasSubClass))) {
 						JB_SetRef(List->Obj, SC__Comp_fnFastIsa);
 					}
 				}
@@ -1874,7 +1874,7 @@ void SC_Comp__InitTypes() {
 	JB_SetRef(SC_TypeStringZero->DowngradeTo, SC_TypeString);
 	JB_SetRef(SC_TypeVoid, SC_TypeVoid_->TypeNormal);
 	JB_SetRef(SC_TypeVoidPtr, SC_Decl_GetAddress(SC_TypeVoid, kSC__DeclMode_Always));
-	SC_TypeString->HasSubClass = true;
+	(SC_Class_SyntaxIsSet(SC_TypeString, kSC__ClassInfo_HasSubClass, true));
 	{
 		Array* _LoopSrcf2 = JB_Incr(SC__Comp_ActualSyxes);
 		int _if0 = 0;
@@ -2029,7 +2029,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1228], (112378068140032));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1228], (112381959077888));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3308,7 +3308,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[644]);
-	JB_FS_AppendInt32(_fsf0, (2024050317));
+	JB_FS_AppendInt32(_fsf0, (2024050409));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -5863,7 +5863,7 @@ Message* SC_Refs__LastUsedRefPlace(Message* Name, Message* Arg) {
 		return nil;
 	}
 	SCClass* Type = D->Type;
-	if (Type->NoEarlyFree) {
+	if ((!(!SC_Class_SyntaxIs(Type, kSC__ClassInfo_NoEarlyFree)))) {
 		return nil;
 	}
 	JB_String* S = Name->Name;
@@ -7900,7 +7900,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[926]);
-	JB_FS_AppendInt32(_fsf0, (2024050317));
+	JB_FS_AppendInt32(_fsf0, (2024050409));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -9497,7 +9497,7 @@ SCDecl* SC_CustomFuncOp(Message* Exp, SCOperator* Comp, SCNode* Name_space, Mess
 	if (((bool)RN) and (Prm->Obj == SC__Comp_fnAs)) {
 		SCClass* Cls = SC_Msg_ObjCls(RN);
 		if (Cls) {
-			if ((!Cls->HasSubClass)) {
+			if (!(SC_Class_SyntaxIs(Cls, kSC__ClassInfo_HasSubClass))) {
 				JB_SetRef(Prm->Obj, SC__Comp_fnFastAs);
 			}
 			return Cls->TypeNormal;
@@ -9967,18 +9967,25 @@ AsmReg SC_fn_asm_table_63(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 }
 
 AsmReg SC_fn_asm_table_ARG(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
+	AsmReg M = kSC__Reg_Discard;
+	if ((!Mode)) {
+		Dest = M;
+	}
 	uint OV = SC_Pac_OpenVars(Self);
 	{
 		Message* Ch = ((Message*)JB_Ring_First(Exp));
 		while (Ch) {
-			SC_Pac_Get(Self, Ch, kSC__Reg_Discard);
+			if (JB_Tree_IsLast(Ch)) {
+				M = Dest;
+			}
+			Dest = SC_Pac_Get(Self, Ch, M);
 			Ch = ((Message*)JB_Ring_NextSib(Ch));
 		};
 		;
 	}
 	;
 	SC_Pac_CloseVars(Self, OV);
-	return ((AsmReg)0);
+	return Dest;
 }
 
 AsmReg SC_fn_asm_table_BRA(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
@@ -10020,12 +10027,6 @@ AsmReg SC_fn_asm_table_NUM(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) 
 	}
 	SC_Pac_NumToReg(Self, X, Exp, SC_Reg_ToInt(Dest));
 	return Dest;
-}
-
-AsmReg SC_fn_asm_table_TMP(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
-	//the tmp type should have already been set;
-	debugger;
-	return ((AsmReg)0);
 }
 
 AsmReg SC_fn_asm_table_TYPE(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
@@ -10178,7 +10179,6 @@ int JB_Init_() {
 		JB_SetRef(JB_StdErr, JB_Rec_Constructor(nil));
 		JB_SetRef(JB__JbinHeader, JB_LUB[4]);
 		JB_SetRef(JB__jBinNotJbin, JB_LUB[1098]);
-		JB_SetRef(JB__SyxDict_, JB_Dict_Constructor(nil));
 		SC_fn_asm_table[1] = (&SC_fn_asm_table_ARG);
 		SC_fn_asm_table[4] = (&SC_fn_asm_table_DECL);
 		SC_fn_asm_table[14] = (&SC_fn_asm_table_NUM);
@@ -10193,20 +10193,20 @@ int JB_Init_() {
 		SC_fn_asm_table[26] = (&SC_ASMtmp__BRel);
 		SC_fn_asm_table[21] = (&SC_ASMtmp__ARel);
 		SC_fn_asm_table[3] = (&SC_fn_asm_table_TYPE);
+		SC_fn_asm_table[5] = (&SC_ASMtmp__Unexpected);
 		SC_fn_asm_table[(kSC__ASMtmp_kDebugger)] = (&SC_ASMtmp__Debugger);
 		SC_fn_asm_table[(kSC__ASMtmp_kIf)] = (&SC_ASMtmp__If);
 		SC_fn_asm_table[(kSC__ASMtmp_kRejoin)] = (&SC_ASMtmp__Rejoin);
 		SC_fn_asm_table[(kSC__ASMtmp_kReturn)] = (&SC_ASMtmp__Return);
 		SC_fn_asm_table[(kSC__ASMtmp_kWhile)] = (&SC_ASMtmp__While);
+		SC_fn_asm_table[(kSC__ASMtmp_kTern)] = (&SC_ASMtmp__Tern);
 		SC_fn_asm_table[(kSC__ASMtmp_kContinue)] = (&SC_ASMtmp__Continue);
 		SC_fn_asm_table[(kSC__ASMtmp_kExit)] = (&SC_ASMtmp__Exit);
 		SC_fn_asm_table[(kSC__ASMtmp_kSetVar)] = (&SC_ASMtmp__SetRel);
 		SC_fn_asm_table[(kSC__ASMtmp_kStatExpr)] = (&SC_ASMtmp__StatExpr);
 		SC_fn_asm_table[(kSC__ASMtmp_kPointer)] = (&SC_ASMtmp__Access);
-		SC_fn_asm_table[(kSC__ASMtmp_kTern)] = (&SC_ASMtmp__Tern);
 		SC_fn_asm_table[(kSC__ASMtmp_kIgnore)] = (&SC_ASMtmp__Ignore);
 		SC_fn_asm_table[(kSC__ASMtmp_kFail)] = (&SC_ASMtmp__Ignore);
-		SC_fn_asm_table[5] = (&SC_fn_asm_table_TMP);
 		SC_fn_asm_table[63] = (&SC_fn_asm_table_63);
 		//;
 		JB_SetRef(SC_C_Letters, JB_Str_CharSetWithBool(JB_LUB[620], true));
@@ -10568,6 +10568,7 @@ int JB_Init_() {
 		(JB_Dict_ValueSet(SC_ClassLinkageTable, JB_LUB[1833], _tmPf105));
 		JB_Decr(_tmPf105);
 		JB_SetRef(SC_fs_tmp_num, JB_FS_Constructor(nil));
+		JB_SetRef(JB__SyxDict_, JB_Dict_Constructor(nil));
 	}
 	;
 	//// App;
@@ -13162,7 +13163,7 @@ int SC_UseCustomOperators(SCDecl* LC, SCDecl* RC, SCOperator* Comp, Message* Err
 			}
 		}
 	}
-	if ((!SC__Base_ConstantsLoadingOverride) and LC->Type->TreatAsBaseType) {
+	if ((!SC__Base_ConstantsLoadingOverride) and SC_Class_SyntaxIs(LC->Type, kSC__ClassInfo_TreatAsBaseType)) {
 		return kSC__CustomOps_Needed | Extra;
 	}
 	if ((LN > 1) and CompOrSet) {
@@ -16200,8 +16201,7 @@ AsmReg SC_ASMtmp__SetRel(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 }
 
 AsmReg SC_ASMtmp__StatExpr(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
-	debugger;
-	return ((AsmReg)0);
+	return SC_fn_asm_table_ARG(Self, Exp, Dest, 1);
 }
 
 AsmReg SC_ASMtmp__Tern(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
@@ -16347,6 +16347,7 @@ AsmReg SC_Reg_xC2xB5TypeSet(AsmReg Self, DataTypeCode Value) {
 AsmReg SC_Reg__Empty() {
 	return ((AsmReg)0);
 }
+
 
 
 
@@ -21354,7 +21355,7 @@ void SC_Cpp__C_RenderNum(Message* Self, FastStringCpp* Fs) {
 
 void SC_Cpp__C_RenderOpp(Message* Self, FastStringCpp* Fs) {
 	JB_String* S = Self->Name;
-	if (JB_Str_Equals(S, kJB_kBitOr, false)) {
+	if (JB_Str_Equals(S, JB_LUB[278], false)) {
 		JB_FS_AppendByte(Fs, '|');
 	}
 	 else if (JB_Str_Equals(S, JB_LUB[242], false)) {
@@ -24769,7 +24770,7 @@ int SC_PA_IgnoreSelfContain(SCParamArray* Self) {
 			if (SC_Class_IsStruct(Cls)) {
 				Rz = (Rz | kJB_kTypeCastIgnoreAddressOf);
 			}
-			if (Cls->IgnoreContainedSelf) {
+			if (SC_Class_SyntaxIs(Cls, kSC__ClassInfo_IgnoreContainedSelf)) {
 				Rz = (Rz | kJB_kTypeCastIgnoreContained);
 			}
 		}
@@ -35556,7 +35557,7 @@ bool SC_Decl_CanNilCheck(SCDecl* Self) {
 	if (SC_Decl_IsCArray(Self)) {
 		return false;
 	}
-	return Self->Type->HasNilChecker;
+	return (SC_Class_SyntaxIs(Self->Type, kSC__ClassInfo_HasNilChecker));
 }
 
 bool SC_Decl_CantBeNilInCpp(SCDecl* Self) {
@@ -37035,7 +37036,7 @@ JB_String* SC_Decl_TryUseSaveable(SCDecl* Self, bool IsSave, SCClass* Cls) {
 		JB_Decr(Type);
 		return JB_LUB[0];
 	}
-	if (Self->Type->SavingCanSkip) {
+	if (SC_Class_SyntaxIs(Self->Type, kSC__ClassInfo_SavingCanSkip)) {
 		SCDecl* Con = JB_Incr(Self->Contains);
 		if (Con) {
 			JB_String* _tmPf2 = JB_Incr(SC_Decl_TryUseSaveable(Con, true, Cls));
@@ -38558,7 +38559,7 @@ bool SC_Base_FindVis(SCNode* Self, Message* C) {
 		Message* First = JB_Msg_NeedSyxName(C, kJB_SyxThg, JB_LUB[1545]);
 		JB_String* Name = JB_Msg_Name(JB_Msg_NeedSyxInt(C, kJB_SyxThg, 1));
 		SCClass* Cls = SC_Comp__FindClassName(Name);
-		return ((bool)Cls) and (!Cls->Banned);
+		return ((bool)Cls) and (!SC_Class_SyntaxIs(Cls, kSC__ClassInfo_Banned));
 	}
 	if (true) {
 		JB_Msg_SyntaxExpect(C, nil);
@@ -40565,11 +40566,11 @@ void SC_Class_AddBehaviourOrInterface(SCClass* Self, SCNode* M, Message* ErrPlac
 void SC_Class_AfterAfterFuncs(SCClass* Self) {
 	SCClass* S = JB_Incr(Self->Super);
 	if (S) {
-		if ((!(Self->HasCompareFunc))) {
-			Self->HasCompareFunc = S->HasCompareFunc;
+		if (SC_Class_SyntaxIs(S, kSC__ClassInfo_HasCompareFunc)) {
+			(SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_HasCompareFunc, true));
 		}
-		if ((!(Self->HasEqualsFunc))) {
-			Self->HasEqualsFunc = S->HasEqualsFunc;
+		if (SC_Class_SyntaxIs(S, kSC__ClassInfo_HasEqualsFunc)) {
+			(SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_HasEqualsFunc, true));
 		}
 	}
 	JB_Decr(S);
@@ -40767,14 +40768,14 @@ int SC_Class_CalculateSizeRaw(SCClass* Self, int Depth) {
 }
 
 bool SC_Class_CanCompare(SCClass* Self, SCDecl* Against, bool AsEquals) {
-	bool CanUseEquals = AsEquals and Self->HasEqualsFunc;
-	if ((!Self->HasCompareFunc) and (!CanUseEquals)) {
+	bool CanUseEquals = AsEquals and (SC_Class_SyntaxIs(Self, kSC__ClassInfo_HasEqualsFunc));
+	if (((!SC_Class_SyntaxIs(Self, kSC__ClassInfo_HasCompareFunc))) and (!CanUseEquals)) {
 		return false;
 	}
 	if (CanUseEquals and SC_Class_CanCompareSub(Self, JB_LUB[674], Against)) {
 		return true;
 	}
-	if (Self->HasCompareFunc) {
+	if (SC_Class_SyntaxIs(Self, kSC__ClassInfo_HasCompareFunc)) {
 		return SC_Class_CanCompareSub(Self, JB_LUB[760], Against);
 	}
 	return false;
@@ -40944,23 +40945,13 @@ SCClass* SC_Class_Constructor(SCClass* Self, Message* Node, SCNode* Parent, bool
 	Self->ProcessAs = nil;
 	Self->DowngradeTo = nil;
 	Self->DataObject = nil;
-	Self->TaskObjectCount = 0;
 	Self->Size = 0;
+	Self->TaskObjectCount = 0;
 	Self->Depth = 0;
 	Self->StructContainerDepth = 0;
 	Self->MinOpt = 0;
 	Self->IsBehaviour = 0;
 	Self->IsWrapper = 0;
-	Self->ContainsParentClass = false;
-	Self->IgnoreContainedSelf = false;
-	Self->HasCompareFunc = false;
-	Self->HasEqualsFunc = false;
-	Self->HasSubClass = false;
-	Self->NoEarlyFree = false;
-	Self->AutoGeneratedSavers = false;
-	Self->SavingCanSkip = false;
-	Self->TreatAsBaseType = false;
-	Self->HasNilChecker = false;
 	Self->DefaultsToReal = false;
 	Self->IsRole = 0;
 	Self->IsBuiltin = false;
@@ -40969,6 +40960,7 @@ SCClass* SC_Class_Constructor(SCClass* Self, Message* Node, SCNode* Parent, bool
 	Self->NumericReduction = 0;
 	SC__Comp_stClasses++;
 	JB_SetRef(Node->Obj, Self);
+	Self->Flags = 0;
 	JB_String* _tmPf3 = SC_Class__LoadClassName(Node);
 	Self->Name = JB_Incr(_tmPf3);
 	Self->Source = JB_Incr(Node);
@@ -40977,7 +40969,7 @@ SCClass* SC_Class_Constructor(SCClass* Self, Message* Node, SCNode* Parent, bool
 	JB_StringC* _tmPf2 = JB_LUB[0];
 	Self->SaveAs = JB_Incr(_tmPf2);
 	Self->TypeInfo = kJB__TC_UnusedType;
-	Self->Banned = SC_Class_TestBanned(Self);
+	((SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_Banned, SC_Class_TestBanned(Self))));
 	SCDecl* T = JB_Incr(SC_Decl_Constructor(nil, Self));
 	T->NilDeclared = (kSC__NilState_Real >> HasPtrs);
 	Self->TypeNormal = JB_Incr(T);
@@ -41009,8 +41001,10 @@ void SC_Class_ContainedTypeLoad(SCClass* Self) {
 			SC_Class_NeedsDefaultValue(Self, Sup->Defawlt, (&Self->Defawlt), JB_LUB[1597]);
 			SC_Class_NeedsDefaultValue(Self, Sup->False, (&Self->False), JB_LUB[1649]);
 		}
-		Self->IgnoreContainedSelf = ((bool)(Self->IgnoreContainedSelf | Sup->IgnoreContainedSelf));
-		Self->ContainsParentClass = Sup->ContainsParentClass;
+		if (SC_Class_SyntaxIs(Sup, kSC__ClassInfo_IgnoreContainedSelf)) {
+			(SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_IgnoreContainedSelf, true));
+		}
+		((SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_ContainsParentClass, (SC_Class_SyntaxIs(Sup, kSC__ClassInfo_ContainsParentClass)))));
 	}
 	JB_Decr(Sup);
 	if ((!(Self->Defawlt))) {
@@ -41034,7 +41028,9 @@ void SC_Class_ContainedTypeLoad(SCClass* Self) {
 	(SC_Decl_SyntaxIsSet(Cont, kSC__SCDeclInfo_UpgradeableContained, true));
 	JB_SetRef(Self->Contained, Cont);
 	JB_Decr(Cont);
-	Self->IgnoreContainedSelf = ((bool)(Self->IgnoreContainedSelf | SC_Class_IsDataTypeOrFP(Cls)));
+	if (SC_Class_IsDataTypeOrFP(Cls)) {
+		(SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_IgnoreContainedSelf, true));
+	}
 	JB_Decr(Cls);
 	JB_SetRef(Self->SelfDecl->Contains, TN);
 	JB_Decr(TN);
@@ -41578,7 +41574,7 @@ SCFunction* SC_Class_FindAllocFunc(SCClass* Self, JB_String* Fname, bool DontCre
 SCClass* SC_Class_FindContainedClass(SCClass* Self) {
 	Message* C = JB_Msg_NeedSyx(JB_Msg_FindSyxName(SC_Base_SourceArg(Self), kJB_SyxTmp, JB_LUB[1565], false), kJB_SyxNil);
 	if ((!C)) {
-		if (Self->ContainsParentClass) {
+		if (SC_Class_SyntaxIs(Self, kSC__ClassInfo_ContainsParentClass)) {
 			SCNode* P = Self->Modul->Parent;
 			if (JB_Object_FastIsa(P, &SCModuleData)) {
 				return ((SCModule*)P)->Cls;
@@ -41597,12 +41593,12 @@ SCClass* SC_Class_FindContainedClass(SCClass* Self) {
 			JB_Msg_SyntaxExpect(C, JB_LUB[1081]);
 			return nil;
 		}
-		Self->ContainsParentClass = true;
+		(SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_ContainsParentClass, true));
 		return P->Cls;
 	}
 	SCClass* Cls = SC_Base_FindClassMsg(M, C, kSC__SCNodeFindMode_WantAType);
 	if (Cls) {
-		Self->ContainsParentClass = false;
+		(SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_ContainsParentClass, (!true)));
 		return Cls;
 	}
 	return nil;
@@ -41662,15 +41658,21 @@ SCFunction* SC_Class_FirstDestructor(SCClass* Self) {
 }
 
 void SC_Class_GetDepth(SCClass* Self) {
-	if ((!Self->Depth)) {
-		Self->Depth = 1;
+	int D = Self->Depth;
+	if ((!D)) {
+		D = 1;
 		{
 			SCClass* C = Self;
 			while (C) {
-				Self->Depth++;
+				D++;
 				C = C->Super;
 			};
-		};
+		}
+		;
+		if (D >= 64) {
+			SC_SCObject_Fail(Self, JB_LUB[2023]);
+		}
+		Self->Depth = D;
 	}
 	Message* Msg = Self->Defawlt;
 	if (((bool)Msg) and (SC_Class_IsObject(Self) and (!(SC_Msg_OperatorIsThing(Msg, JB_LUB[1811]))))) {
@@ -41726,11 +41728,11 @@ SCIterator* SC_Class_GetIteratorAny(SCClass* Self, JB_String* Name, Message* Nod
 }
 
 void SC_Class_GetStructDepth(SCClass* Self) {
-	if (Self->StructContainerDepth == -1) {
+	if (Self->StructContainerDepth == 255) {
 		SC_SCObject_Fail(Self, JB_LUB[1303]);
 		return;
 	}
-	Self->StructContainerDepth = -1;
+	Self->StructContainerDepth = 255;
 	int R = 0;
 	{
 		Array* _LoopSrcf2 = Self->Properties;
@@ -41749,6 +41751,9 @@ void SC_Class_GetStructDepth(SCClass* Self) {
 		};
 	}
 	;
+	if (R >= 64) {
+		SC_SCObject_Fail(Self, JB_LUB[2024]);
+	}
 	Self->StructContainerDepth = R;
 }
 
@@ -41983,8 +41988,8 @@ void SC_Class_LoadConstructors(SCClass* Self) {
 	SC_Class_CreateConstructors(Self);
 	SCClass* S = JB_Incr(Self->Super);
 	if (S) {
-		if ((!(Self->NoEarlyFree))) {
-			Self->NoEarlyFree = S->NoEarlyFree;
+		if (SC_Class_SyntaxIs(S, kSC__ClassInfo_NoEarlyFree)) {
+			(SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_NoEarlyFree, true));
 		}
 	}
 	JB_Decr(S);
@@ -41997,8 +42002,8 @@ void SC_Class_LoadLinkage(SCClass* Self) {
 		return;
 	}
 	Self->NoAutoComplete = SC_Msg_DeprecatedClassOption(Arg, JB_LUB[1815], JB_LUB[215]);
-	Self->NoEarlyFree = ((bool)SC_Msg_DeprecatedClassOption(Arg, JB_LUB[1874], JB_LUB[1084]));
-	Self->TreatAsBaseType = ((bool)SC_Msg_DeprecatedClassOption(Arg, JB_LUB[1874], JB_LUB[1328]));
+	((SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_NoEarlyFree, ((bool)SC_Msg_DeprecatedClassOption(Arg, JB_LUB[1874], JB_LUB[1084])))));
+	((SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_TreatAsBaseType, ((bool)SC_Msg_DeprecatedClassOption(Arg, JB_LUB[1874], JB_LUB[1328])))));
 	Self->MinOpt = SC_Msg_DeprecatedClassOption(Arg, JB_LUB[1853], JB_LUB[1786]);
 }
 
@@ -42039,7 +42044,7 @@ void SC_Class_LoadSaver(SCClass* Self) {
 			JB_SetRef(Self->SaveAs, S);
 		}
 		 else if (JB_Str_Equals(S, JB_LUB[1536], false)) {
-			Self->SavingCanSkip = true;
+			(SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_SavingCanSkip, true));
 		}
 		 else {
 			JB_SetRef(Self->SaveAs, S);
@@ -42182,7 +42187,7 @@ void SC_Class_LoadSuperClass(SCClass* Self) {
 			JB_Array_SyntaxAppend(S->Children, Self);
 		}
 		if ((!Self->IsRole)) {
-			S->HasSubClass = true;
+			(SC_Class_SyntaxIsSet(S, kSC__ClassInfo_HasSubClass, true));
 		}
 		 else if ((!OldMod)) {
 			Self->Modul->Parent = S->Modul;
@@ -42272,7 +42277,7 @@ void SC_Class_OverrideSyntax(SCClass* Self) {
 	SCFunction* Cast = JB_Incr(SC_Class_FindSpecialFunc(Self, JB_LUB[1253], false));
 	JB_SetRef(Self->Casts, JB_Array_Constructor0(nil));
 	if ((!SC_Class_IsStruct(Self))) {
-		Self->HasNilChecker = true;
+		(SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_HasNilChecker, true));
 	}
 	{
 		SCFunction* F = JB_Incr(Cast);
@@ -42302,7 +42307,7 @@ void SC_Class_OverrideSyntax(SCClass* Self) {
 				int Mode = SC_Msg_NilCheckMode(_tmPf2, OK);
 				JB_Decr(_tmPf2);
 				F->IsNilChecker = Mode;
-				Self->HasNilChecker = true;
+				(SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_HasNilChecker, true));
 			}
 			JB_Decr(Ret);
 			JB_SetRef(F, F->NextFunc);
@@ -42311,9 +42316,9 @@ void SC_Class_OverrideSyntax(SCClass* Self) {
 	}
 	;
 	JB_Decr(Cast);
-	Self->HasCompareFunc = ((bool)JB_FreeIfDead(SC_Class_FindSpecialFunc(Self, JB_LUB[1254], true)));
-	Self->HasEqualsFunc = ((bool)JB_FreeIfDead(SC_Class_FindSpecialFunc(Self, JB_LUB[1257], true)));
-	JB_SetRef(Self->TheIsFunc, SC_Class_FindSpecialFunc(Self, JB_LUB[1258], true));
+	((SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_HasCompareFunc, JB_FreeIfDead(SC_Class_FindSpecialFunc(Self, JB_LUB[1254], true)) != nil)));
+	((SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_HasEqualsFunc, JB_FreeIfDead(SC_Class_FindSpecialFunc(Self, JB_LUB[1257], true)) != nil)));
+	JB_SetRef((Self->TheIsFunc), SC_Class_FindSpecialFunc(Self, JB_LUB[1258], true));
 }
 
 void SC_Class_PackClassChildren(SCClass* Self, FastString* J) {
@@ -42691,7 +42696,7 @@ void SC_Class_StartupSaver(SCClass* Self, JB_String* Name) {
 	SCNode* Fn = JB_Incr(SC_Base_CollectSub(Self, Src));
 	if (JB_Object_FastIsa(Fn, &SCFunctionData)) {
 		((SCFunction*)Fn)->AutoGeneratedSaver = true;
-		Self->AutoGeneratedSavers = true;
+		(SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_AutoGeneratedSavers, true));
 	}
 	JB_Decr(Fn);
 	JB_Decr(Src);
@@ -42716,6 +42721,19 @@ bool SC_Class_EqualsType(SCClass* Self, SCNodeType D, bool Aware) {
 		return Self->BaseType == D;
 	}
 	return false;
+}
+
+bool SC_Class_SyntaxIs(SCClass* Self, ClassInfo Cls) {
+	return ((bool)(Self->Flags & Cls));
+}
+
+void SC_Class_SyntaxIsSet(SCClass* Self, ClassInfo Cls, bool Value) {
+	if (Value) {
+		Self->Flags = (Self->Flags | Cls);
+	}
+	 else {
+		Self->Flags = (Self->Flags & (~Cls));
+	}
 }
 
 void SC_Class_TaskProperties(SCClass* Self) {
@@ -48823,4 +48841,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 3437467603703577628 -6715761720398049168
+// -6846653956397994301 7057760446798799721

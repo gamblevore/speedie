@@ -839,7 +839,7 @@ class SCDecl (SCNamed) {
 			return true
 		if .IsCArray
 			return false
-		return .type.HasNilChecker
+		return (.type is HasNilChecker)
 	
 
 	function NilConstructor (|nilstate| type,  |scdecl|)

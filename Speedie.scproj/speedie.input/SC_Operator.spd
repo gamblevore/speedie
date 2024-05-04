@@ -341,7 +341,7 @@ function CustomFuncOp (|Message| exp, |SCOperator| comp, |SCNode|name_space, |Me
 	|| ty = TypeOfExpr( exp, name_space )$
 	if rn and (prm.obj == compiler.fnAs)
 		|| cls = rn.ObjCls
-			if !cls.Hassubclass
+			if cls isnt Hassubclass
 				prm.obj = compiler.fnFastas // noice
 			return cls.typenormal
 	return ty
@@ -396,7 +396,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 			  elseif (comp is MakesSigned) and lc.isuintlike
 				extra = CustomOps.TypeCastToBetter
 
-	if (!SCNode.ConstantsLoadingOverride and LC.Type.TreatAsBaseType)
+	if (!SCNode.ConstantsLoadingOverride and LC.Type is TreatAsBaseType)
 		return CustomOps.Needed ||| extra
 	if ((LN > 1) and CompOrSet)					// can't compare vectors directly in C++
 		return CustomOps.Needed ||| extra

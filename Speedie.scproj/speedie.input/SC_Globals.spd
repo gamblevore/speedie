@@ -4,10 +4,6 @@
 */
 
 
-constants
-	kBitOr = "(|)"
-
-
 
 prototype ExprResolver (|Message| Exp, |SCNode| name_space, |Message?| side=nil, |SCObject?|)
 

@@ -265,7 +265,7 @@ function InitTypes
 	TypeStringZero!.DowngradeTo = TypeString
 	typevoid = TypeVoid_!.TypeNormal
 	TypeVoidPtr = typevoid!.GetAddress
-	TypeString!.HasSubClass = true // compiler doesn't know about internal-subclasses of string.
+	(TypeString! is HasSubClass) // compiler doesn't know about internal-subclasses of string.
 	for s in .actualsyxes
 		s.type = typesyntax! // sigh
 

@@ -857,7 +857,6 @@ function compiler.CollectIsaTests (|Message| s, |bool|)
 			Return A2 or B2
 		Return (op != "or")
 	
-	
 	if s != @func
 		Return true
 
@@ -870,7 +869,7 @@ function compiler.CollectIsaTests (|Message| s, |bool|)
 		|| R1 = L1.next
 			|| cls = R1.ObjCls
 				if f == .fnisa
-					if !cls.Hassubclass
+					if cls isnt Hassubclass
 						list.obj = .fnFastisa
 				if L1 == @Thg
 					IsaTester <~ s

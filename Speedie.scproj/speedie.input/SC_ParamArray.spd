@@ -73,7 +73,7 @@ class SCParamArray
 			if (.IsDot and .IsNotModule)
 				if cls.isstruct
 					rz |= kTypeCastIgnoreAddressOf
-				if cls.IgnoreContainedSelf
+				if cls is IgnoreContainedSelf
 					rz |= kTypeCastIgnoreContained
 
 	function RenderKind (|string|)

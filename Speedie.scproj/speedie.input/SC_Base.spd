@@ -830,7 +830,7 @@ function FindVis (|Message| c, |bool|)
 		|| first = c[@thg, "class"]
 		|| name  = c[@thg, 1].name
 		|| cls   = compiler[name]
-		return cls and !cls.banned
+		return cls and cls isnt banned
 	error c
 
 

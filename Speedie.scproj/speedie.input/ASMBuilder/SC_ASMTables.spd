@@ -3,10 +3,16 @@
 dispatch fn_asm_table (fn_asm)
 	@arg:
 		opt norefcounts
-		|| OV = .openvars
+		|| M = asmreg.discard
+		if !mode
+			dest = m
+		|| OV = .OpenVars
 		for ch.fast in exp
-			.µ(ch, AsmReg.discard)
-		.closevars(OV)
+			if ch.islast
+				m = dest
+			dest = .µ(ch, M)
+		.CloseVars(OV)
+		return dest
 
 
 	@decl: // yay
@@ -53,12 +59,6 @@ dispatch fn_asm_table (fn_asm)
 	@list: // vectors
 		debugger
 
-
-/*
-	we need the new system... this will be 1,2,3,4 per item below 16
-	we need some way to modify
-*/
-
 	@func:
 		opt norefcounts
 		return .DoFunc(exp.last!, dest)
@@ -80,25 +80,25 @@ dispatch fn_asm_table (fn_asm)
 		opt norefcounts
 		debugger
 
+	@tmp:					asmtmp.unexpected
+
 	(ASMtmp.kDebugger):		ASMtmp.Debugger
 	(ASMtmp.kif):			ASMtmp.If
 	(ASMtmp.krejoin):		ASMtmp.Rejoin
 	(ASMtmp.kreturn):		ASMtmp.return
 	(ASMtmp.kwhile):		ASMtmp.While
+	(asmtmp.kTern):			ASMtmp.Tern
 
 	(asmtmp.kContinue):		ASMtmp.Continue
 	(asmtmp.kExit):			ASMtmp.Exit
+
 	(asmtmp.ksetvar):		ASMtmp.SetRel
 	(asmtmp.kStatExpr): 	ASMtmp.StatExpr
 	(asmtmp.kPointer):		asmtmp.Access
-	(asmtmp.kTern):			ASMtmp.Tern
 
 	(asmtmp.kIgnore):		ASMtmp.Ignore
 	(asmtmp.kFail):			ASMtmp.Ignore
 
-	@tmp:
-		#!the tmp type should have already been set
-		debugger
 	63:
 		0
 
@@ -161,7 +161,9 @@ function InitAccess
 function Debugger		(fn_asm): debugger
 function Continue		(fn_asm): debugger
 function Exit			(fn_asm): debugger
-function StatExpr		(fn_asm): debugger
+function StatExpr		(fn_asm)
+	return fn_asm_table_arg(self, exp, dest, 1)
+
 function Tern			(fn_asm): debugger
 function If				(fn_asm): debugger
 function Rejoin			(fn_asm): debugger
@@ -192,8 +194,7 @@ function Pointer		(fn_asm)
 	return dest
 
 
-function Access		(fn_asm)
-	// a[b], struct.mem[b], func()[func2()]
+function Access		(fn_asm)			// a[b], struct.mem[b], func()[func2()]
 	opt	NoRefCounts
 	dest = .tempme(exp, dest)
 
@@ -213,8 +214,7 @@ function Access		(fn_asm)
 */	
 		
 
-function Dot		(fn_asm)
-	// a.b
+function Dot		(fn_asm)			// a.b
 	opt	NoRefCounts
 	dest = .tempme(exp, dest)
 	|| Obj = .µ(exp.first!, dest)
@@ -291,18 +291,15 @@ function ARel		(fn_asm)
 	return brel(self, exp, dest, 1)
 
 
-function BRel		(fn_asm)
-	//  --a,  ++a,  &a,  --glob,  --a.b
+function BRel		(fn_asm)			//  --a,  ++a,  &a,  --glob,  --a.b
 	opt	NoRefCounts
 	|| n = exp.name.first
 	|| F = exp.first!
 	if n == '&'
 		return .µ(F, dest.requestpos)
 
-	|| Src = .µ(F, dest) // src has the old value.
-	// now... if we are doing: x = --a
-	// we want to return the old value, which is src
-	if (mode == 1) // we want the old value, which is in src.
+	|| Src = .µ(F, dest)				// src has the old value.
+	if (mode == 1)						// we want the old value, which is in src.
 		dest = src
 	  else
 		dest = .TempMe(exp, dest)	
@@ -314,7 +311,7 @@ function BRel		(fn_asm)
 	
 	.AddASM(ASM.ADDC, exp, dest, src, incr)
 	if d isnt local
-		.µ(F, dest.set)		// we need to write it back again.
+		.µ(F, dest.set)					// we need to write it back again.
 	
 	return dest
 
