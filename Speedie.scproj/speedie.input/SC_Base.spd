@@ -189,7 +189,7 @@ function TryAddSub (|Message| ErrPlace, |SCObject| IncObj, |String| name)
 				old.Last.NextFunc = IncObj
 				Return
 		  elseif incobj isa scdecl
-			if old.HidesProperties
+			if old is HidesProperties
 				expect (!IncObj.hiderfunc) (errplace, "Multiple property-hiders found.")
 				incobj.hiderfunc = old
 				.access![ name ] = IncObj
@@ -256,7 +256,7 @@ function SubProjName (|string|)
 
 function SCFunction.UseExportWrapper (|string| CppWrapper, |bool|)
 	if CppWrapper
-		.IsWrapper = 1
+		is Wrapper
 		.SetExportName( CppWrapper, true )
 		return true
 
@@ -366,7 +366,7 @@ function scfunction.FoundOneCpp (|string| n, |bool|)
 		return true
 	if n == "cpp_libwrapper"
 		.noautocomplete = 1
-		.IsExternalLib = true
+		Is ExternalLib
 		return true
 
 
@@ -392,7 +392,7 @@ function LoadExportName
 
 ///  ///  ///  ///  ///	 ///  ///  ///	 ///  ///  ///	 ///  ///  ///
 		cppname = .exportnamebuilder(cpppart)
-		.IsWrapper = cw
+		(self Is Wrapper) = cw!=nil
 	  else
 		CppPart := .Name
 		CppName := CppPart

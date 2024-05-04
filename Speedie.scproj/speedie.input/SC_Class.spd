@@ -403,7 +403,7 @@ function CreateEmptyConstructors (|scfunction|)
 
 
 function scfunction.AddConstructorReturn2
-	require !.IsWrapper and self is newnew
+	require self Isnt Wrapper and self is newnew
 	|| args = .source![@arg,2]
 	using .source!
 	|| type = message(@thg, .cls!.name)
@@ -688,7 +688,7 @@ function CheckAllocVsWrapper (|SCFunction| f, |bool| IsConstructor)
 	if !IsConstructor
 		require .FirstDestructor
 	
-	if !f.IsWrapper
+	if (f Isnt Wrapper)
 		error (.Source, "Wrapper classes must have a constructor that is a wrapper function.")
 
 

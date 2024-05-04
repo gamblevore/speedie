@@ -93,8 +93,8 @@ function CanExportFunc (|SCFunction| F, |bool|)
 	// (.MyReacher) or .isapi
 	require (f.MyReacher or f is api)
 	require (f isnt disabled)
-	if !f.IsExternalLib
-		require !f.IsWrapper and !f.isMacro
+	if f Isnt ExternalLib
+		require (f Isnt Wrapper) and !f.isMacro
 	return f isnt NewStruct  and  f isnt alreadyexported
 
 
@@ -103,7 +103,7 @@ function FuncHeader (|SCFunction| F, |string|)
 	rz = .T.GetResult
 	.HeaderProj <~ rz
 	.HeaderProj <~ ";\n\n"
-	if f.IsExternalLib
+	if f Is ExternalLib
 		rz = ""
 
 
@@ -161,7 +161,7 @@ function Codify (|SCModule| scb, |string| fName)
 
 function SetupFlow (|SCFunction| f)
 	scfunction.CurrFunc = f
-	if Options.GenFlowControlCode and !f.FlowDisabled
+	if Options.GenFlowControlCode and f isnt FlowDisabled
 		Cpp_Export.IfName = "iif"
 		Cpp_Export.WhileName = "wwhile"
 		compiler.TernaryFunc!.exportname = "JB_Ternaryy"
@@ -266,7 +266,7 @@ struct jbobject {int RefCount;};
 				fs <~ "Global"
 			fs <~ " functions\n\n"
 		
-		if !f.iswrapper
+		if (f Isnt Wrapper)
 			.WriteAPIFuncHeader( f, fs )
 		fs <~ ';'
 		if (f.description)

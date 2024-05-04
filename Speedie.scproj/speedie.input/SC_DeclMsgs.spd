@@ -86,7 +86,7 @@ function scfunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 	|| ns = .nilself
 		.WantAs(ns)
 	|| r = .returntype
-	if r and .HidesProperties
+	if r and self is HidesProperties
 		.returntype = r.makereal
 			
 

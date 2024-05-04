@@ -6,7 +6,7 @@ function Tran_Flow (TranFunc)
 	msg.ExpectLast
 	node.SafeRemove
 	check (msg == "off")  (msg, "Only allowed value is 'off'.")
-	fn.FlowDisabled = true
+	(fn is FlowDisabled)
 
 	
 insertion

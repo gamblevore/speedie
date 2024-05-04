@@ -69,7 +69,7 @@ dispatch FuncPreReader (fnPreReader)
 			.MakeNilChecker(msg)
 		  elseif f ~= "safe"
 			.MakeNilChecker(msg)
-			.HidesProperties = true 
+			is HidesProperties
 			is inline
 			.isvisible = true
 			

@@ -181,7 +181,7 @@ function scdecl.NilStated (|bool|)
 function scfunction.CanNil (|bool|)
 	if .badness != 0 and .badness != 128
 		return false
-	return !.IsMacro and !.IsWrapper and (self isnt disabled)
+	return !.IsMacro and (self Isnt Wrapper) and (self isnt disabled)
 
 
 function scfunction.WantAs (|nilstate| NS)
