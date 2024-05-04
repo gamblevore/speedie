@@ -2029,7 +2029,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1228], (112381959077888));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1228], (112382010195968));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3308,7 +3308,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[644]);
-	JB_FS_AppendInt32(_fsf0, (2024050409));
+	JB_FS_AppendInt32(_fsf0, (2024050410));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7900,7 +7900,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[926]);
-	JB_FS_AppendInt32(_fsf0, (2024050409));
+	JB_FS_AppendInt32(_fsf0, (2024050410));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -21961,7 +21961,7 @@ void SC_Cpp__WriteThgMaybeTypeToo(Message* Msg, SCDecl* D, FastStringCpp* Fs) {
 }
 
 void SC_Cpp__WriteType(SCClass* C, FastStringCpp* Fs, bool Always) {
-	if (C->IsBuiltin) {
+	if ((!(!SC_Class_SyntaxIs(C, kSC__ClassInfo_Builtin)))) {
 		return;
 	}
 	if ((!Always)) {
@@ -36133,7 +36133,6 @@ SCDecl* SC_Decl_HighestMatch(SCDecl* Self, SCDecl* Other, Message* Exp) {
 		if ((!O2)) {
 			break;
 		}
-		O2->IsBuiltin;
 		O = O2;
 		M = M->Super;
 		if ((!M)) {
@@ -40577,7 +40576,7 @@ void SC_Class_AfterAfterFuncs(SCClass* Self) {
 	Message* Def = JB_Incr(Self->Defawlt);
 	if (Def) {
 		SCDecl* D = JB_Incr(SC_TypeOfExpr(Def, Self->Modul, nil));
-		if (((bool)D) and Self->DefaultsToReal) {
+		if (((bool)D) and (SC_Class_SyntaxIs(Self, kSC__ClassInfo_DefaultsToReal))) {
 			if ((!SC_Decl_StatedReal(D))) {
 				JB_Msg_SyntaxExpect(Def, JB_LUB[1104]);
 			}
@@ -40808,7 +40807,7 @@ bool SC_Class_CanHaveEmptyConstructor(SCClass* Self) {
 				break;
 			}
 			if (SC_Decl_TypeSuffers(P) and ((bool)SC_Decl_StatedReal(P))) {
-				if ((!P->Type->DefaultsToReal)) {
+				if ((!SC_Class_SyntaxIs(P->Type, kSC__ClassInfo_DefaultsToReal))) {
 					return nil;
 				}
 			}
@@ -40945,6 +40944,7 @@ SCClass* SC_Class_Constructor(SCClass* Self, Message* Node, SCNode* Parent, bool
 	Self->ProcessAs = nil;
 	Self->DowngradeTo = nil;
 	Self->DataObject = nil;
+	Self->Flags = 0;
 	Self->Size = 0;
 	Self->TaskObjectCount = 0;
 	Self->Depth = 0;
@@ -40952,15 +40952,11 @@ SCClass* SC_Class_Constructor(SCClass* Self, Message* Node, SCNode* Parent, bool
 	Self->MinOpt = 0;
 	Self->IsBehaviour = 0;
 	Self->IsWrapper = 0;
-	Self->DefaultsToReal = false;
 	Self->IsRole = 0;
-	Self->IsBuiltin = false;
 	Self->BaseType = 0;
-	Self->IsASM = false;
 	Self->NumericReduction = 0;
 	SC__Comp_stClasses++;
 	JB_SetRef(Node->Obj, Self);
-	Self->Flags = 0;
 	JB_String* _tmPf3 = SC_Class__LoadClassName(Node);
 	Self->Name = JB_Incr(_tmPf3);
 	Self->Source = JB_Incr(Node);
@@ -41259,7 +41255,7 @@ void SC_Class_DataTypePostLoad(SCClass* Self) {
 				Self->Size = 16;
 			}
 			Self->TypeInfo = T;
-			Self->IsBuiltin = true;
+			(SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_Builtin, true));
 			if ((!(JB_TC_IsInt(T) and (!Self->Signed)))) {
 				JB_Decr(Td);
 				JB_Decr(Sup);
@@ -41676,7 +41672,7 @@ void SC_Class_GetDepth(SCClass* Self) {
 	}
 	Message* Msg = Self->Defawlt;
 	if (((bool)Msg) and (SC_Class_IsObject(Self) and (!(SC_Msg_OperatorIsThing(Msg, JB_LUB[1811]))))) {
-		Self->DefaultsToReal = true;
+		(SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_DefaultsToReal, true));
 		Self->TypeNormal->NilDeclared = kSC__NilState_Real;
 	}
 }
@@ -46364,7 +46360,7 @@ SCModule* SC_Func__NewProtoTypeSub(Message* Node, SCNode* Parent, Message* ErrPl
 	if (Modul) {
 		SCClass* Clss = JB_Incr(Modul->Cls);
 		Clss->BaseType = kSC__SCNodeType_FuncProto;
-		Clss->IsBuiltin = false;
+		(SC_Class_SyntaxIsSet(Clss, kSC__ClassInfo_Builtin, (!true)));
 		JB_SetRef(Clss->FuncProto, F);
 		JB_SetRef(F->ProtoType, Clss);
 		JB_Decr(Clss);
@@ -48841,4 +48837,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -6846653956397994301 7057760446798799721
+// -1820724221868234156 7057760446798799721

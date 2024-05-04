@@ -885,7 +885,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		
 
 	function WriteType (|SCClass| c, |FastStringCpp| fs, |bool| always)
-		require !c.IsBuiltin
+		require c isnt Builtin
 		if !always
 			require c.NeedsExport
 		|| f = c.FuncProto

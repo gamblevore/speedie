@@ -22,7 +22,7 @@ datatype ClassInfo (uint)
 		DefaultsToReal
 		IsRole
 		IsTask
-		IsBuiltin
+		Builtin
 		Symbol
 		Fixed
 		ASM
@@ -71,15 +71,9 @@ linkage
 |Byte|						IsBehaviour
 |byte|						IsWrapper
 
-// these could all just be an int?
-//|bool|						NoEarlyFree
-//|bool|						SavingCanSkip
-//|bool|						TreatAsBaseType
-|bool|						DefaultsToReal
+
 |byte|						IsRole
-|bool|						IsBuiltin // SCNodeType
 |SCNodetype| 				BaseType
-|bool|						IsASM
 |byte|						NumericReduction
 
 
@@ -87,7 +81,6 @@ constructor (|Message| node, |SCNode| parent, |bool| HasPtrs, |scmodule| m)
 	Compiler.stClasses++
 	
 	node.obj = self			// for autocomplete :)
-	.flags = 0
 	.name = LoadClassName(node)
 	.Source = node
 	.Modul = m
@@ -217,7 +210,7 @@ function GetDepth
 			
 	|| msg = .defawlt
 	if msg and .isobject and !(msg isthing "nil")
-		.DefaultsToReal = true // what if .defawlt is optional? // fuck them :D
+		is DefaultsToReal // what if .defawlt is optional? // fuck them :D
 		.TypeNormal.NilDeclared = NilState.real
 	
 
@@ -378,7 +371,7 @@ function CanHaveEmptyConstructor (|bool|)
 	opt norefcounts
 	for p in .Properties
 		if p.TypeSuffers and p.StatedReal
-			require p.type.DefaultsToReal
+			require p.type is DefaultsToReal
 	return true
 
 
@@ -783,8 +776,8 @@ function AfterAfterFuncs
 	
 	|| def = .Defawlt
 		|| D = TypeOfExpr( def, .Modul )
-		if d and .DefaultsToReal
-			check (d.StatedReal) (def, "Object default must be real (non-nil)")
+			if self is DefaultsToReal
+				check (d.StatedReal) (def, "Object default must be real (non-nil)")
 	
 	.DeclModel
 
@@ -929,7 +922,7 @@ module
 				if t == datatypecode.Vec3 or datatypecode.iVec3
 					.size = 16 // sigh 
 				.TypeInfo	= T
-				.IsBuiltin	= true
+				is Builtin
 				
 				require T.isint and !.Signed
 				|| s2		= t.CreateSignedStuff

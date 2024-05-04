@@ -1161,7 +1161,7 @@ function NewProtoTypeSub (|Message| node, |SCNode!| parent, |Message| ErrPlace, 
 	|| modul = SCClass.DataTypeSub( tmp, parent, node, ForInterface, SCNodetype.funcproto )
 		|| clss = modul.Cls!
 		clss.BaseType = SCNodeType.funcproto
-		clss.IsBuiltin = false		// datatype sets it to true.
+		(clss isnt Builtin)		// datatype sets it to true.
 		clss.FuncProto = f
 		f.ProtoType = clss
 		Compiler.ProtoTypes <~ f

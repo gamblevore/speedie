@@ -525,7 +525,6 @@ class SCDecl (SCNamed) {
 
 		while (o != m)
 			|| o2 = o.super		#loop
-			o2.IsBuiltin
 			o = o2
 			m = m.super			#require
 		return o.typenormal
