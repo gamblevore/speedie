@@ -388,7 +388,7 @@ function LoadExportName
 		.IsCppInBuilt := (cw == @bra)|int|
 		|| CppWrapper = cw.cpp_Wrapper
 			.MakeParamsReal
-		require !.UseExportWrapper(CppWrapper) and !.UseCppName(CppName) and !.isdisabled
+		require !.UseExportWrapper(CppWrapper) and !.UseCppName(CppName) and (self isnt disabled)
 
 ///  ///  ///  ///  ///	 ///  ///  ///	 ///  ///  ///	 ///  ///  ///
 		cppname = .exportnamebuilder(cpppart)
@@ -480,7 +480,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 					Missing = o
 				o = nil
 			  else
-				if o.isdisabled
+				if o is disabled
 					error (exp,     o.description)
 					error (o.source, "Disabled here.")
 
@@ -512,7 +512,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 	require (exp)
 	
 	if f
-		if f.isdisabled
+		if (f is disabled)
 			error (exp, f.description)
 		  elseif !paramsarray.MadeError
 			f.ArgsMatch( contains, arg_space, ParamsArray, kTypeCastDescribeErrors )

@@ -195,10 +195,10 @@ function Function (NilTrackerFn)
 				.VariableSet(infernal, recv.source!, ri, p!, ri.nilcurr)
 			p++
 
-	if fn.IsKiller
+	if fn Is Killer
 		.DeclKill
 		if (t.nestdepth == 0)  and  !t.AnyReturns // also if no returns happened...
-			scfunction.currfunc!.iskiller = true
+			(scfunction.currfunc! is killer)
 		return nilstate.Killer
 	
 	|| ret = fn.ReturnType

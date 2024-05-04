@@ -116,6 +116,9 @@ function GuiControl.CanSearch (|int|)
 			return -1
 		if .SingleLine
 			return 0
+		if self isnt editable
+			require .hasfocus
+				
 	return 1
 
 

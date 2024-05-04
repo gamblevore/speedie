@@ -92,7 +92,7 @@ function FuncStart (|FastStringCpp| fs, |scfunction| f, |string| funcheader)
 function CanExportFunc (|SCFunction| F, |bool|)
 	// (.MyReacher) or .isapi
 	require (f.MyReacher or f.isapi)
-	require !f.isdisabled
+	require (f isnt disabled)
 	if !f.IsExternalLib
 		require !f.IsWrapper and !f.isMacro
 	return f isnt NewStruct  and  f isnt alreadyexported
@@ -174,7 +174,7 @@ function SetupFlow (|SCFunction| f)
 function CodifyInlines
 	opt norefcounts
 	for (f in compiler.funclist)
-		if f.isinline and .CanExportFunc(f)
+		if (f is inline) and .CanExportFunc(f)
 			.cppfunc( .Inlines, f )
 	scfunction.CurrFunc = nil
 
@@ -182,7 +182,7 @@ function CodifyInlines
 function CodifyFuncs (|FastStringCpp| file, |[SCFunction]| list)
 	opt norefcounts
 	for (f in list)
-		if !f.isinline and .canexportfunc(f)
+		if (f isnt inline) and .canexportfunc(f)
 			.cppfunc( file, f )
 	scfunction.CurrFunc = nil
 
@@ -776,7 +776,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		
 	function WriteFunctionHeader (|SCFunction| F, |FastStringCpp| T)
 		// int example(int a, int b)
-		if f.IsInline
+		if f Is Inline
 			t <~ "inline "
 		
 		.WriteFuncSub(F, f.exportname, t)

@@ -85,7 +85,7 @@ module PackMaker
 
 
 	function OrderGlobals (|jbin| j)
-		.PackGlobs.sort(PackGlobSorter)
+		.PackGlobs.sort(DeclSizeSorter)
 		|| g = .OrderGlobalsSub
 		j.addint(G + 16)
 
@@ -94,7 +94,7 @@ module PackMaker
 		opt norefcounts
 		|| G = 1				// So we can detect bugs easier... if something lacks an export position.
 		for (d in .PackGlobs)
-			|| s = d.ByteSize
+			|| s = d.DeclSize
 			G = G align s
 			d.ExportPosition = G
 			G += s
@@ -224,25 +224,8 @@ function scfunction.WrappedName (|string|)
 		return .exportname
 
 
-helper SCFuncSorter (sortercomparer)
-	// just to help compression. otherside will use a dictionary anyhow.
-	|| fA = (a|scfunction|).Tableid|int|
-	|| fB = (b|scfunction|).Tableid|int|
-	if fA != fB // we need init and main first
-		return fa < fb
-	return (a|scfunction|).ExportName < (b|scfunction|).ExportName
-
-
-helper NodeSorter (sortercomparer)
-	return (a|scfunction|).ExportName < (b|scfunction|).ExportName
-
-
-helper PackGlobSorter (sortercomparer)
-	return (a|Scdecl|).ByteSize < (b|Scdecl|).ByteSize
-
-
 function scfunction.CanLibLoad (|bool|)
-	if !.ismacro and !.isdisabled and (.iscppinbuilt != 2)
+	if !.ismacro and (self isnt disabled) and (.iscppinbuilt != 2)
 		return true
 
 

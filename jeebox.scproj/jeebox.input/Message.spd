@@ -1113,9 +1113,10 @@ class Message (list)
 		.RangeLength = r.width
 
 
-	function Yes (|bool|)
+	function Yes (|bool| Default=false, |bool|)
 		if self
-			return .name.yes
+			return .name.yes(self)
+		return Default
 			
 
 	function After (|int|)

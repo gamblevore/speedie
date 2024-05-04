@@ -269,14 +269,14 @@ void JB_Array_Shuffle( Array* self ) {
 
 
 
-static int SortABit(obj* array, int j, int high, SorterComparer fp) {
+static int SortABit(obj* array, int j, int high, SorterComparer fp, bool Up) {
     auto pivot = array[high];
-    while ((fp)(array[j++], pivot)) // no need swap
+    while ((fp)(array[j++], pivot)==Up) // no need swap
 		if (j >= high)
 			return j;
 	int i = j-2;
     while (j < high) {
-        if ((fp)(array[j], pivot))
+        if ((fp)(array[j], pivot)==Up)
             std::swap(array[++i], array[j]);
 		j++;
 	}
@@ -285,11 +285,11 @@ static int SortABit(obj* array, int j, int high, SorterComparer fp) {
 }
 
 
-static void QuickSort(obj* array, int start, int end, SorterComparer fp) {
+static void QuickSort(obj* array, int start, int end, SorterComparer fp, bool Up) {
     require0 (start < end);
-    int p = SortABit(	 array, start, end,   fp);
-    QuickSort(			 array, start, p - 1, fp);
-    QuickSort(			 array, p + 1, end,   fp);
+    int p = SortABit(	 array, start, end,   fp, Up);
+    QuickSort(			 array, start, p - 1, fp, Up);
+    QuickSort(			 array, p + 1, end,   fp, Up);
 }
 
 
@@ -298,7 +298,7 @@ void JB_Array_Sort ( Array* self, SorterComparer fp, bool down ) {
 	require0 (fp and N>1);
 	
 	obj* J = self->_Ptr;
-	QuickSort(J, 0, N-1, fp); // oop?
+	QuickSort(J, 0, N-1, fp, !down); // oop?
 }
 
 

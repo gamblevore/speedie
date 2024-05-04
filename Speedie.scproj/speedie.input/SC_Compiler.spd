@@ -508,7 +508,7 @@ function ImportAll
 
 
 	|| fn = .XFunc("JB_App__Quit")
-		fn.iskiller = true
+		(fn is killer)
 	
 
 	require .Stage( "A Bit More Stuff On Classes" )
@@ -785,7 +785,7 @@ function SCFunction.ReachedDetect
 	|| Base = Compiler.VisibleFuncs!
 	
 	if !.IsVisible	
-		require options.MakeInterpreter and !.IsDisabled
+		require options.MakeInterpreter and (self Isnt Disabled)
 		base = Compiler.Interpreter!
 	
 	.ReachFunc(base)

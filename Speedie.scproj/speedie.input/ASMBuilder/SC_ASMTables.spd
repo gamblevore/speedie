@@ -32,7 +32,7 @@ dispatch fn_asm_table (fn_asm)
 		|| X = d.exportposition
 		if d.isfloat
 			|| f8 = exp.float
-			if d.bytesize == 4
+			if d.DeclSize == 4
 				|| f4 = f8|float|
 				x = f4.asint
 			  else
@@ -305,7 +305,7 @@ function BRel		(fn_asm)			//  --a,  ++a,  &a,  --glob,  --a.b
 		dest = .TempMe(exp, dest)	
 		
 	|| D = F.FastDecl
-	|| Incr = (D.bytesize, 1)(D.typesuffers)
+	|| Incr = (D.DeclSize, 1)(D.typesuffers)
 	if n == '-'
 		Incr = -Incr
 	

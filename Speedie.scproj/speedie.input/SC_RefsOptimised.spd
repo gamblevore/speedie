@@ -19,6 +19,7 @@
 class CppRefs
 	|uint16|			DisturbParams
 	|bool|				Owned
+//	|uint|				Test
 	|[string]?|			Disturbs		// cant be a class cos this is called BEFORE the classes are inited.
 										// awkward.
 	
@@ -132,6 +133,13 @@ dispatch ClassLinkageTable (TranFunc)
 	+"visible"				{} // (SCFunction.Tran_Visible)
 	+"ignore"				{}
 	+"noearlyfree"			{}
+	
+	+"tighten"
+		if name_space isa scclass
+			expect (name_Space.isobject or name_Space.isstruct) (name_space, "Only applies to structs or objects")
+			expect !(name_space.iswrapper) (name_space, "Can't tighten wrapper classes")
+			|| yes = node.first.yes(true)
+			(name_space is sortsproperties) = yes
 
 	+"wrapper"
 		if name_space isa scclass

@@ -269,12 +269,12 @@ class String
 		return fs
 
 
-	function Yes (|bool|) // ispositive, isaffirmative, istrue
+	function Yes (|message| where=nil, |bool|) // ispositive, isaffirmative, istrue
 		if !self
 			return false
 		if self ~= "no"  or "false" or "off" or "0" or "":	return false
 		if self ~= "yes" or "true"  or "on"  or "1": return true
-		error ("Not a boolean value: '" + self + "'")
+		error (where, "Not a boolean value: '" + self + "'")
 
 
 	function CharSet (|bool| Range = true, |!CharSet|)

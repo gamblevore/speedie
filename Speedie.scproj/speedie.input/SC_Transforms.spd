@@ -209,7 +209,7 @@ function Tran_Array (|Message| S, |SCNode| name_space) {
 function Tran_Description (TranFunc)
 	expect (fn) (node, "Only use this on functions")
 	|| str = node[@str]
-		if !fn.isdisabled
+		if fn isnt disabled
 			check !fn.description (node, "Can’t have multiple descriptions.")
 			fn.Description = str.name
 		node.remove

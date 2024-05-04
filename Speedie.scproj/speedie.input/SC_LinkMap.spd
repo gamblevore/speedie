@@ -99,7 +99,7 @@ function IsUnused (|bool|)
 	opt norefcounts
 	|| p = .project
 		require p.WarnUnusedFuncs
-	return !.MyReacher and !.IsDisabled and !.isvisible and (self isnt ConOrDes) and !.IsAllocOrNew
+	return !.MyReacher and (self isnt Disabled) and !.isvisible and (self isnt ConOrDes) and !.IsAllocOrNew
 
 }
 

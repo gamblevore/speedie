@@ -70,6 +70,7 @@ datatype SCDeclInfo (uint)
 		Self
 		SetTo					// a var sets it... like: rz = obj
 		Hidden					// internal global... should not be exposed to non-lib stuff
+		Biggest
 		Local		 = Body + Param
 		SelfImplicit = Self + local // local is set by CollectOneParam, anyhow?
 		DclCopied    = altered + stayborrowed + static + api + UpgradeableContained + compilercreated // need more too? do later
@@ -1053,7 +1054,15 @@ function scdecl.TypeIsReached (|bool|)
 	return .type.MyReacher
 
 
-function scdecl.ByteSize (|bool| TheVarItself=false, |int|)
+function scdecl.AllocatedSize (|int|)
+	return .varsizesub(false)
+
+function scdecl.DeclSize (|int|)
+	if self is biggest
+		return 1K
+	return .varsizesub(true)
+
+function scdecl.VarSizeSub (|bool| TheVarItself, |int|)
 	opt norefcounts
 	|| n = Platform.PointerBytes
 	ifn .PointerCount or (TheVarItself and .isobject)

@@ -20,7 +20,7 @@ function scfunction.PreRead (|message| Arg)
 dispatch FuncPreReader (fnPreReader)
 	+"disabled"
 		opt norefcounts
-		.isdisabled = true
+		is disabled
 		.description = "Called a disabled function."
 		|| s = msg.first
 			s.ExpectString
@@ -37,7 +37,7 @@ dispatch FuncPreReader (fnPreReader)
 		|| f = msg[@thg]
 			f.expectlast
 			if f ~= "inline"
-				.IsInline = true
+				Is Inline
 			  else
 				error f
 				
@@ -70,7 +70,7 @@ dispatch FuncPreReader (fnPreReader)
 		  elseif f ~= "safe"
 			.MakeNilChecker(msg)
 			.HidesProperties = true 
-			.isinline = true
+			is inline
 			.isvisible = true
 			
 		  else
@@ -88,7 +88,7 @@ dispatch FuncPreReader (fnPreReader)
 
 	+"description"
 		|| str = msg[@str]
-			if .IsDisabled
+			if (self Is Disabled)
 				error (msg, "Already disabled")
 			  else
 				check !.description (msg, "Multiple descriptions.")

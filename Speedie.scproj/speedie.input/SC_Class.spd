@@ -23,10 +23,9 @@ datatype ClassInfo (uint)
 		IsRole
 		IsTask
 		Builtin
+		SortsProperties
 		NumericReduction = [Symbol, Fixed, Flags]
 		ASM
-		Wrapper
-		Union
 		
 
 class SCClass (SCNode) {
@@ -72,7 +71,6 @@ linkage
 
 |byte|						IsRole
 |SCNodetype| 				BaseType
-//|byte|						NumericReduction
 
 
 constructor (|Message| node, |SCNode| parent, |bool| HasPtrs, |scmodule| m)
@@ -140,6 +138,7 @@ function PassableCount (|int|)
 		rz += !p.IsCArray
 
 
+
 function CreateAutoConstructor (|scfunction|)
 	opt norefcounts
 	rz = .CreateEmptyFunc( "Constructor", "ConstructorAuto" )		#require
@@ -147,17 +146,16 @@ function CreateAutoConstructor (|scfunction|)
 	|| prms = node.Second
 	|| arg	= prms.next
 
-	for prop in .properties
-		if !prop.IsCArray
-			|| name = prop.name
-			if name ~= "super"
-				name = "sooper"
-			check (name != "__rz__") (prop.source, "Invalid name.")
-			prms <~ prop.WriteDeclTypeAndName(name, 0)
+	for prop in .sourcearg
+		if prop == @decl
+			|| name = prop.declname.name
+			check (name != "__rz__") (prop, "Invalid name.")
+			prms <~ prop.copy
 			|| rel = arg.msg(@rel)
 			rel <~ (@sdot, name)
 			rel <~ (@opp,  "=")
 			rel <~ (@thg,  name)
+
 
 
 function IsTask (|bool|)
@@ -184,11 +182,8 @@ function CollectProperties
 		.TaskProperties
 	  else
 		|| it = .properties.first
+			.sortproperties
 			expect (!.IsRole) (it.source, "Roles can't have properties!")
-
-// i guess they can now
-//	for (p in .properties)
-//		expect (!p.default) (p.source, "Class properties can’t have default values.")
 
 	if .IsModel
 		.ModelDecls
@@ -250,7 +245,6 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 		count = 4 // refcount
 	|| s = .super
 		Count = s.CalculateSizeRaw				#debug_require
-
 	|| bits = 0
 	for p in .properties
 		|| curr = platform.PointerBytes
@@ -269,6 +263,23 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 		.taskobjectcount = .super!.taskobjectcount ||| bits
 		check (.size <= 128) (.source, "Task size is over 128.") // could make it dynamic. Perhaps just allocate the largest task found? still limit to 256 bytes tho.
 	return count	
+
+
+function array.Find4bytes (|array of scdecl| self, |scdecl|)
+	opt norefcounts
+	for p in self
+		if p.declsize == 4
+			return p
+			
+
+function SortProperties
+	if (self is SortsProperties) and (!.iswrapper) and !.isrole
+		|| FBD = .Properties.find4bytes
+			if .isobject
+				(fbd is biggest)
+		.Properties.sort(DeclSizeSorter, true)
+		if fbd
+			(fbd isnt biggest)
 
 
 function LoadSuperClass
@@ -548,13 +559,13 @@ function OverrideSyntax
 		is HasNilChecker // default to true
 	
 	for f in cast
-		f.IsInline = true
+		(f Is Inline)
 		check  (f.args == 1)		  (f.Source, "No params allowed." )
 		|| ret = f.ReturnType #expect (f.Source, "Need a return type.")
 		f.NextFunc.DontWantSameReturnType(f)
 		.Casts <~ f
 		if ret.IsNormalBool
-			|| OK = !f.isdisabled
+			|| OK = (f isnt disabled)
 				f.args.first!.nildeclared = nilstate.Optional
 			|| Mode = f.sourcearg!.nilcheckmode(ok)
 			f.IsNilChecker = Mode
@@ -845,8 +856,10 @@ module
 			require parent.ExpectModule(errplace)
 		
 		|| arg = node.GiveArg
-		|| cls = SCClass.new( node, parent, base.hasptrs, SCModule.new )
+		|| cls = SCClass.new( node, parent, base.HasPtrs, SCModule.new )
 		cls.BaseType = base
+		if base is Object
+			(cls is SortsProperties)
 		cls.IsRole = (node ~= "role")
 
 		|| SA = cls.SourceArg
@@ -854,7 +867,7 @@ module
 		Compiler.ClassList <~ cls
 
 		|| Module = arg.find( @tmp, "module" )
-		cls.loadModuleForCls( Module, parent )
+		cls.LoadModuleForCls( Module, parent )
 
 		if (ForInterface and parent isa scmodule)
 			cls.CppClass = "__${parent.cls!.name.UnicodeSafeName}_${ForInterface.UnicodeSafeName}__"
@@ -1064,5 +1077,4 @@ extend SCClass
 		while (Curr_)
 			yield Curr_
 			Curr_ = Curr_.super
-
 

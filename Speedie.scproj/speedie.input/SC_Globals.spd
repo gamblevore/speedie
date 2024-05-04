@@ -104,7 +104,7 @@ function TypeOfFunc (ExprResolver)
 		|| obj = fn.ReturnType
 		if !obj
 			exp.obj = typevoid
-		if fn.IsKiller
+		if fn Is Killer
 			exp.LastInBlock(SCBlockage.Quit)
 		return obj // voids are so annoying.
 	return fn
@@ -1133,8 +1133,8 @@ constants
 
 
 function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name_space, |message| side, |scdecl|) {
-	|| cls = typeofexpr(self, name_space)
-	require cls and cls.isnormal
+	|| cls = typeofexpr(self, name_space) #require
+	expect (cls.isnormal) (self, "Can't use 'is' on this type.")
 
 	|| ty = cls.type
 	|| fn = ty.TheIsFunc			#expect (opch, "${ty.name} doesn‘t have 'syntax is' specified.")
@@ -1317,6 +1317,7 @@ function message.AndOrExpansionTest (|uint|)
 
 
 function TypeOfRel (ExprResolver) {
+	if exp.objectid == 8456160
 	|| LN = exp.first!
 	|| opch = ln.Next!
 	|| Comp = SCOperator.Lookup( opch )
@@ -1683,7 +1684,7 @@ function SCFunction.DotFuncToNormalFunc (|Message| dot)
 
 	using (dot)
 		dot.First = «thg .ExportName »
-	if .IsKiller
+	if self Is Killer
 		dot.LastInBlock(SCBlockage.Quit)
 
 

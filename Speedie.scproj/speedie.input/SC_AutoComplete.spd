@@ -538,7 +538,7 @@ function SCObject.CallFromName (|string|)
 
 function SCObject.Display (|bool| exact, |string|)
 	if self isa scfunction
-		if .IsAllocOrNew or .isdisabled
+		if .IsAllocOrNew or (self is disabled)
 			return ""
 		return (.RenderTitle(false), .name)(Exact)
 	if self isa SCDecl
@@ -1077,6 +1077,8 @@ function LocateDefinitionSub (|message!| msg, |SCObject| already_defined, |scdec
 prototype autosort_fn (|autoitem| a, |autoitem| b, |bool|)
 
 class autoitem
+	linkage
+		tighten false
 	|string|		Sort
 	|string|		Insert
 	|SCObject|		Value
