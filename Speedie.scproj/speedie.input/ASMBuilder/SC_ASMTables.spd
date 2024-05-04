@@ -167,7 +167,7 @@ function If				(fn_asm)
 	|| Where = .µ(cond, asmreg.Cond)
 	|| Start = .curr
 	if Where isnt cond
-		Start = .AddASM(asm.CMPN, exp, where)	// comparison against 0
+		Start = .AddASM(asm.CMPN, exp, where)					// comparison against 0
 	|| arg = cond.next
 	fn_asm_table_arg(self, arg)
 	|| ElseIf = arg.next
@@ -191,6 +191,7 @@ function While			(fn_asm)
 			write.op = ASM.Jump
 			write.r[0] = finish - write
 		write++
+
 	
 function Exit			(fn_asm)
 	opt norefcounts
@@ -212,7 +213,6 @@ function Ignore			(fn_asm)
 function Unexpected		(fn_asm)
 	"Bad asmtmp"
 	debugger
-
 
 
 function Return			(fn_asm)
@@ -269,7 +269,7 @@ function Pointer		(fn_asm)
 	return dest
 
 
-function Access		(fn_asm)			// a[b], struct.mem[b], func()[func2()]
+function Access		(fn_asm)						// a[b], struct.mem[b], func()[func2()]
 	opt	NoRefCounts
 	dest = .tempme(exp, dest)
 
@@ -282,7 +282,7 @@ function Access		(fn_asm)			// a[b], struct.mem[b], func()[func2()]
 
 		
 
-function Dot		(fn_asm)			// a.b
+function Dot		(fn_asm)						// a.b
 	opt	NoRefCounts
 	dest = .tempme(exp, dest)
 	|| Obj = .µ(exp.first!, dest)
@@ -292,12 +292,12 @@ function Dot		(fn_asm)			// a.b
 	debugger
 	
 	|| B = t.ByteSize.log2
-	|| A = Dest.ReadOrWriteSub(exp, t, b)	 #require
+	|| A = Dest.ReadOrWriteSub(exp, t, b)			 #require
 
 	|| Pos = prop.exportposition >> B
 	if !pos // what?
 	|| WantAddr = dest is positionrequest
-	if WantAddr or pos >= 128					// oof
+	if WantAddr or pos >= 128						// oof
 		.AddASM(asm.ADDC, exp, dest, obj, pos)
 		if WantAddr
 			return dest
@@ -312,7 +312,7 @@ function SetRel	(fn_asm)
 	opt	norefcounts
 	|| Var = exp.first!.SimpleVar	
 	|| R = .µ(exp.last!, var)
-	if r isnt discard    // x = 1, already done!
+	if r isnt discard							// x = 1, already done!
 		(r is set)
 		return .µ(exp.first!, R)
 
@@ -344,7 +344,7 @@ function Thg (fn_asm)
 
 function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Value, |scdecl| D, |AsmReg|)
 	|| addr = value
-	if value isnt set				// a = glob
+	if value isnt set							// a = glob
 		addr = .tempme(exp, value)
 
 	.AddASM(asm.tabl,  exp, addr,   d.IsLib|int|)
@@ -359,15 +359,15 @@ function ARel		(fn_asm)
 	return brel(self, exp, dest, 1)
 
 
-function BRel		(fn_asm)			//  --a,  ++a,  &a,  --glob,  --a.b
+function BRel		(fn_asm)					//  --a,  ++a,  &a,  --glob,  --a.b
 	opt	NoRefCounts
 	|| n = exp.name.first
 	|| F = exp.first!
 	if n == '&'
 		return .µ(F, dest.requestpos)
 
-	|| Src = .µ(F, dest)				// src has the old value.
-	if (mode == 1)						// we want the old value, which is in src.
+	|| Src = .µ(F, dest)						// src has the old value.
+	if (mode == 1)								// we want the old value, which is in src.
 		dest = src
 	  else
 		dest = .TempMe(exp, dest)	
@@ -379,7 +379,7 @@ function BRel		(fn_asm)			//  --a,  ++a,  &a,  --glob,  --a.b
 	
 	.AddASM(ASM.ADDC, exp, dest, src, incr)
 	if d isnt local
-		.µ(F, dest.set)					// we need to write it back again.
+		.µ(F, dest.set)							// we need to write it back again.
 	
 	return dest
 
