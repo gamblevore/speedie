@@ -98,6 +98,10 @@ forms
 		r3		r
 		r4		r
 		Kind	2
+	
+	Trap
+		Func	1		// what about breaking if the func hits a certain level?
+		Signal  1		// signal, breakpoint
 
 
 // this file:
@@ -108,9 +112,15 @@ forms
  
 #!						 (((((STOP)))))
 EROR (U1)
-	debugger
-	return u1+U1_Lu
+	// all 0000 means no-op
+	if (n1 or U1_Lu)
+		return u1+U1_Lu
 
+TRAP (Trap)
+	if (Trap_Signalu)
+		JB_App__SelfSignal(Trap_Lu)
+	else if (!Trap_Funcu)
+		debugger
 
 #!						 (((((FUNC)))))
 
@@ -138,16 +148,6 @@ TAIL (Tail, 2)
 SWAP (Swap)
 	std_swap(r[SWAP_Au], r[SWAP_Bu])
 	std_swap(r[SWAP_Cu], r[SWAP_Du])
-
-LEAF ("j")
-	__
-	JumpLeaf(Code + U0_Li)
-	___
-	
-RETL ("l")
-	__
-	Code = LeafCode
-	___
 	
 
 #!						 (((((Utils)))))
@@ -191,7 +191,7 @@ BOR   (U3)
 BXOR  (U3)
 	u1 = u2 ^ u3
 BNOT  (U2)
-	u1 = ~u2
+	u1 = ~u2 // & U3_Li
 BFLG  (BFLD)
 	if (BFLD_Lu) // perhaps sign can allow for 1-4 contig regs to be masked?
 		i1 = ((i2 << BFLD_upu) >> BFLD_downu)
@@ -209,6 +209,9 @@ BROR  (U3)
 	i1 = JB_u64_RotR(u2, u3 + L3)
 
 #!						 (((((Branches)))))
+JUMP (U0)
+	Code += l0
+
 CMPI  (Cmp)					// Yes. int/uint/u64/i64 versions
 	__
 	Code = CompI(r, Op, Code)
@@ -230,7 +233,7 @@ BRA   (Bra)					// Merge these two?
 		Code += Bra_jmpi
 	___
 	i1 += Bra_c1u-1
-	
+
 BRAN  (Bra)					
 	__
 	if (i1)

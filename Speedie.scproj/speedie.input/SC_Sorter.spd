@@ -20,7 +20,7 @@ helper NodeSorter (SorterComparerFn)
 
 
 helper DeclSizeSorter (sortercomparerdecl)
-	return a.DeclSize < b.DeclSize
+	return a.DeclSizeSort < b.DeclSizeSort
 
 
 module CodeSorter

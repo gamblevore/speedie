@@ -141,15 +141,6 @@ class SCDecl (SCNamed) {
 		opt norefcounts
 		return .project.isstdlib
 
-	function RegType (|datatypecode|)
-		require self
-		|| T = .type.typeinfo 
-		if T.isint
-			return datatypecode.int64
-		if t.bytesize == 4
-			return datatypecode.float
-		return datatypecode.double
-
 
 	function Found (|bool|)
 		opt	norefcounts
@@ -1057,10 +1048,29 @@ function scdecl.TypeIsReached (|bool|)
 function scdecl.AllocatedSize (|int|)
 	return .varsizesub(false)
 
-function scdecl.DeclSize (|int|)
+function scdecl.DeclSizeSort (|int|)
 	if self is biggest
 		return 1K
 	return .varsizesub(true)
+
+
+function scdecl.DeclSize (|int|)
+	return .VarSizeSub(true)
+
+
+function scdecl.RegType (|datatypecode|)
+	opt norefcounts
+	if self
+		|| Ty = .type
+		debug_require !(.c_array ||| ty.IsStruct)
+		
+		if ty.IsObject
+			return datatypecode.cstring
+		rz = ty.typeinfo
+		if .pointercount
+			rz &=~ datatypecode.numeric
+
+
 
 function scdecl.VarSizeSub (|bool| TheVarItself, |int|)
 	opt norefcounts

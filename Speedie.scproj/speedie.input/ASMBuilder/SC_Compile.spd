@@ -9,6 +9,7 @@ struct ASMState
 	|&FatASM|					Start		// a "slice" feature would be nice    
 	|&FatASM|					Curr    
 	|&FatASM|					End    
+	|&FatASM|					WhileStart
 	|bool|						OK       
 	|byte|						LabelCount
 	|datatypecode|				ReturnType
@@ -161,27 +162,41 @@ struct ASMState
 
 	module
 		|FatASM[]|					JSMSpace = FatASM[0]!
+		|[memory of fatasm]|		Olds
 		|ASMState|					Sh
 		
 
 function ASMState.PackMakerInit (|bool|)
 	opt norefcounts
-	VM_Builder.JustMakeMyBread		// FUCK FEMINISM
-									// AND FUCK ALL THOSE FUCKERS TELLING ME TO BE PROFESSIONAL IN MY CODE
-									// AS IF THEIr SHIT ISNT 100x slower and bloated compared to mine.
-									// AS IF THAT IS PROFESSIONAL. NOOBS AND IDIOTS AND GAYS.
-	treeassembler.InitTree			/// OOOFF
-	|| j = ASMState.JSMSpace
+	VM_Builder.JustMakeMyBread
+	treeassembler.InitTree
+	return .alloc(ASMState.JSMSpace)
+
+
+function ASMState.Alloc (|memory of fatasm| j, |bool|)
 	if j.setcap(4MB)
 		.start = j.ptr
 		.curr = .start
 		.end = j.Capacity + .start
 		.AddASM(asm.EROR, compiler.InternalFile.ast!, 0)
+		olds <~ j
 		return true
 
 
+function @ASMState.Expand (|bool|)
+	require olds < 16
+	|| j = FatASM[4MB]
+		.JSMSpace = j
+		return sh.Alloc(j)
+	// actually will leak on purpose. Which is good. Advanced memory managment :)
+	
+
+
 function ASMState.InitState (|scfunction| fn)
-	.out = µfunc(fn, .curr)
+	if fn.ASM
+		.out = fn.asm!
+	  else
+		.out = µfunc(fn, .curr)
 	.LabelCount = 0
 	.fn  = fn
 	.returntype = fn.returntype.regtype

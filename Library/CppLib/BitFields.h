@@ -1,10 +1,12 @@
 
 #include "InstructionGetters.h"
 
+#define l0      U0_Li
 #define l1      U1_Li
 #define l2      U2_Li
 #define l3      U3_Li
 #define l4      U4_Li
+#define L0      U0_Lu
 #define L1      U1_Lu
 #define L2      U2_Lu
 #define L3      U3_Lu

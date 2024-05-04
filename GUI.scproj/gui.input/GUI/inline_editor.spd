@@ -26,19 +26,24 @@ struct InlineEditor
 			beep
 
 	
-	function AcceptSearch (|string| s)
+	function AcceptSearch (|string| s, |bool| hide=false)
 		sdlapp.LastSearch = s
 		.NextSearch
+		if hide
+			.clear
 	
 	
+/*
 	function Accept (|string| s, |bool| hide)
+		.AcceptSearch(s)
+	 // not sure why it did this? it never made sense
 		if .editingfor isa textview
 			.AcceptSearch(s)
 			if hide
 				.clear
 		  elseif .editingfor isa listview
 			.finishandclear
-	
+		*/
 	
 	function UpdateSearch (|string| s)
 		|| l = .editingfor

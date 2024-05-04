@@ -58,22 +58,32 @@ module TreeAssembler
 		
 	function VakPak (|[scfunction]| list)
 		opt norefcounts
-		require ASMState.Sh.PackMakerInit
+		require ASMState.Sh.PackMakerInit // and fn_asm_table[@arg]
 		
 		for fn in list
-			.Vacuum(fn)
+			require .Vacuum(fn)
 			
 
-	function Vacuum (|SCFunction| fn)
+	function Vacuum (|SCFunction| fn, |bool|)
 		opt norefcounts
 		
-		ASmState.Sh.Initstate(fn)
-		|| fp = fn_asm_table[@arg]
-			|| R = 0.reg
-			|| A = fn.SourceArg!
-			(fp)(ASmState.Sh, A, R)
-			ASmState.Sh.FinishASM
+		if .VakSub(fn)
+			return true
+		if ASMState.Expand
+			return .VakSub(fn)
+
+
+	function VakSub (|scfunction| fn, |bool|)
+		opt norefcounts
+		ASMState.Sh.Initstate(fn)
+		|| fp = fn_asm_table[@arg]!
+		|| R = 0.reg
+		|| A = fn.SourceArg!
+		(fp)(ASmState.Sh, A, R)
+		ASMState.Sh.FinishASM
+		if ASMState.Sh.ok
 			printline fn.asm!.render
+			return true
 
 
 

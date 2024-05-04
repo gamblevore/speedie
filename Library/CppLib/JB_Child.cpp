@@ -31,6 +31,10 @@ int JB_App__ID() {
 	return getpid();
 }
 
+void JB_App__SelfSignal(int Sig) {
+	kill(getpid(), Sig);
+}
+
 
 
 void JB_Rec__CrashLog(const char* c);

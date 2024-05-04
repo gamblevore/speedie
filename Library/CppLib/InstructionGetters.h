@@ -191,3 +191,16 @@
 #define   Div_Kindu       (((uint)((Op.Raw)<<28))>>30)
 #define   Div_Kindu_(x)   (((uint)((x)<<28))>>30)
 
+
+#define   Trap_Funcu       (((uint)((Op.Raw)<<8))>>31)
+#define   Trap_Funcu_(x)   (((uint)((x)<<8))>>31)
+
+#define   Trap_Signalu       (((uint)((Op.Raw)<<9))>>31)
+#define   Trap_Signalu_(x)   (((uint)((x)<<9))>>31)
+
+#define   Trap_Li       ((( int)((Op.Raw)<<10))>>10)
+#define   Trap_Li_(x)   ((( int)((x)<<10))>>10)
+
+#define   Trap_Lu       (((uint)((Op.Raw)<<10))>>10)
+#define   Trap_Lu_(x)   (((uint)((x)<<10))>>10)
+

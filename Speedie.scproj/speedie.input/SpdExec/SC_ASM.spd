@@ -1,14 +1,6 @@
 
 
 datatype ASM (uint)
-	flags
-		Jump			= 32
-		Num				= 64
-		Signed			= 128
-//		Remainder		= 256
-		NoExpect		= 512
-		PositionBits	= 1024  // no space left...
-	
 	function IsOK (|bool|)
 		 return self
 	

@@ -1,6 +1,7 @@
 ı EROR: _
-	debugger;
-	return u1 + U1_Lu;
+	if (n1 or U1_Lu) 
+	return u1 + U1_Lu
+;
 ı FUNC: 
 	__;
 	Code = BumpStack(r, Code, Op);
@@ -14,6 +15,13 @@
 	__;
 	Code = TailStack(r, Code, Op);
 	___;
+ı TRAP: _
+	if (Trap_Signalu) 
+	JB_App__SelfSignal(Trap_Lu)
+;
+	else if (!Trap_Funcu) 
+	debugger
+;
 ı RET: 
 	__;
 	Code = Return(r, Code, Op);
@@ -21,14 +29,6 @@
 ı SWAP: _
 	std_swap(r[SWAP_Au], r[SWAP_Bu]);
 	std_swap(r[SWAP_Cu], r[SWAP_Du]);
-ı LEAF: 
-	__;
-	JumpLeaf(Code + U0_Li);
-	___;
-ı RETL: 
-	__;
-	Code = LeafCode;
-	___;
 ı RARE: _
 	if_rare (Rare(r, Op)) return n3;
 ı CONV: _
@@ -74,6 +74,8 @@
 	i1 = JB_u64_RotL(u2, u3 + L3);
 ı BROR: _
 	i1 = JB_u64_RotR(u2, u3 + L3);
+ı JUMP: _
+	Code += l0;
 ı CMPI: 
 	__;
 	Code = CompI(r, Op, Code);

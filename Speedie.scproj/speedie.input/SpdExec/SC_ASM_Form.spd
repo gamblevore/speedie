@@ -10,6 +10,14 @@ class µForm
 	|int|			TotalBits
 	|int|			Index
 	
+	flags
+		Jump			= 32
+		Num				= 64
+		Signed			= 128
+//		Remainder		= 256
+		NoExpect		= 512
+		PositionBits	= 1024  // no space left...
+	
 	
 	render
 		fs <~ .name
@@ -60,13 +68,13 @@ class µForm
 			i++
 
 	function AddRemainder (|uint| U)
-		.addp( 32 - .TotalBits, asm.num ||| U)
+		.addp( 32 - .TotalBits, µform.num ||| U)
 	
 	function LoadParam (|string| pl, |message| place)
 		if (pl.isint)
 			|| i = pl.int
 			check (i > 0 and i <= 24) (place, "Number out of range (1-24)")
-			.addp(i, asm.num)
+			.addp(i, µform.num)
 			return
 		expect (pl == 1) (self)
 		|| p = *pl
@@ -75,17 +83,17 @@ class µForm
 		  elseif p == 'x'
 			.addp(32, 0)
 		  elseif p == 'n'
-			.addp(5, asm.num)
+			.addp(5, µform.num)
 		  elseif p == 'l'
 			.addremainder(0)
 		  elseif p == 'L'
-			.addremainder( asm.NoExpect )
+			.addremainder( µform.NoExpect )
 		  elseif p == 's'
-			.addremainder( asm.signed )
+			.addremainder( µform.signed )
 		  elseif p == 'S'
-			.addremainder( asm.signed + asm.NoExpect )
+			.addremainder( µform.signed + µform.NoExpect )
 		  elseif p == 'j'
-			.addremainder( asm.signed + asm.jump )
+			.addremainder( µform.signed + µform.jump )
 		  elseif place
 			error (place)
 		  else

@@ -14,6 +14,7 @@ extern "C" {
     int JB_App__LostChild();
     int JB_App__ParentID();
     int JB_App__ID();
+    void JB_App__SelfSignal(int Sig);
     Dictionary* JB_App__Env();
     void JB_App__Quit (JB_String* Err, int Code);
     int* JB_App__ErrorNumber ();

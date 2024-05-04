@@ -1101,7 +1101,7 @@ class TextView (GUIControl)
 	helper AcceptEditing (|bool|hide, |bool|)
 		opt norefcounts
 		|| i = .isinline #debug_require
-		i.Accept(.text, hide)
+		i.AcceptSearch(.text, hide)
 		return true
 	
 	

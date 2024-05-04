@@ -192,6 +192,8 @@ class Memory
 		|| S = .itemsize|int|
 		|| old = S * .capacity
 		|| New = S * value
+		if new == old
+			return true // right?
 		|| Mem = Memory.realloc(._ptr, New)
 			._ptr = mem
 			.Capacity = Value 

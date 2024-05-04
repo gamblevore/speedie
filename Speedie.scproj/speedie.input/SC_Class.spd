@@ -616,7 +616,7 @@ function IsFunc (|bool|)
 
 
 function IsObject (|bool|)
-	Return (!.IsDataTypeOrFP) and (!.IsStruct)
+	Return .BaseType is object
 
 
 function CreateEmptyFunc (|String| fname, |string| cpp_name="", |SCFunction|)

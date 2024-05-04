@@ -126,6 +126,9 @@ datatype DataTypeCode (uint16)
 	function ByteSize (|int|)
 		return .Count << ._Shift
 
+	function BitCount (|int|)
+		return (.Count << ._Shift) << 3
+
 	function Count (|int|)
 		return (self & 0x03) + 1
 	

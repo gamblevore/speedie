@@ -74,11 +74,8 @@ dispatch fn_asm_table (fn_asm)
 	@arel: asmtmp.arel      // ++, --, 
 
 
-	@type: // 
-		// bit narrowing, float conversion, etc?
-		// could be others too? vectors?
-		opt norefcounts
-		debugger
+	@type:					asmtmp.TypeCast
+
 
 	@tmp:					asmtmp.unexpected
 
@@ -94,7 +91,7 @@ dispatch fn_asm_table (fn_asm)
 
 	(asmtmp.ksetvar):		ASMtmp.SetRel
 	(asmtmp.kStatExpr): 	ASMtmp.StatExpr
-	(asmtmp.kPointer):		asmtmp.Access
+	(asmtmp.kPointer):		asmtmp.Pointer
 
 	(asmtmp.kIgnore):		ASMtmp.Ignore
 	(asmtmp.kFail):			ASMtmp.Ignore
@@ -158,21 +155,64 @@ function InitAccess
 	*R++ = ASM.RD16	
 
 
-function Debugger		(fn_asm): debugger
-function Continue		(fn_asm): debugger
-function Exit			(fn_asm): debugger
+function Debugger		(fn_asm)
+	.addasm(asm.TRAP, exp, 0)
+
+
+function If				(fn_asm)
+	opt norefcounts
+	debugger
+	
+	|| cond = exp.first!
+	|| Where = .µ(cond, asmreg.Cond)
+	|| Start = .curr
+	if Where isnt cond
+		Start = .AddASM(asm.CMPN, exp, where)	// comparison against 0
+	|| arg = cond.next
+	fn_asm_table_arg(self, arg)
+	|| ElseIf = arg.next
+		if mode // what?
+		IF(self, elseif, 0.reg, 1)
+	Start.r[3] = (mode + .curr) - Start
+	
+	
+function While			(fn_asm)
+	opt norefcounts
+	debugger
+	|| write = .WhileStart
+	.WhileStart = .curr
+	IF(self, exp, 0.reg, 1)
+	|| finish = .curr
+	.AddASM(asm.JUMP, exp, .whilestart - finish)				// jump back
+	.WhileStart = write
+
+	while write < finish
+		if write.Op == 255 // exit
+			write.op = ASM.Jump
+			write.r[0] = finish - write
+		write++
+	
+function Exit			(fn_asm)
+	opt norefcounts
+	self <~ (255, exp)											// request jump fwd
+
+
+function Continue		(fn_asm)
+	opt norefcounts
+	.AddASM(asm.JUMP, exp, .whilestart - .curr)					// jump back
+	
+
 function StatExpr		(fn_asm)
 	return fn_asm_table_arg(self, exp, dest, 1)
 
 function Tern			(fn_asm): debugger
-function If				(fn_asm): debugger
 function Rejoin			(fn_asm): debugger
-function While			(fn_asm): debugger
 
 function Ignore			(fn_asm)
 function Unexpected		(fn_asm)
 	"Bad asmtmp"
 	debugger
+
 
 
 function Return			(fn_asm)
@@ -182,6 +222,41 @@ function Return			(fn_asm)
 		where.µtype = asmstate.sh.ReturnType
 		rz = .µ(f, Where)
 	.AddASM(asm.RET, exp, rz, 0.reg, 1)
+
+
+function TypeCast		(fn_asm)		// 
+	opt norefcounts
+	debugger
+	|| src = .µ(exp.first!, dest)
+	|| T = src.µtype
+
+	|| OldDecl = exp.first!.fastdecl
+	|| OldType = olddecl.regtype
+	|| OS = T.BitCount
+	if oldtype.bitcount != OS // hmmm. How? they should match up.
+
+	|| NewType = exp.second!.fastdecl
+	|| NS = newtype.Regtype
+	|| FloatDiff = T.isfloat != newtype.isfloat
+	if !FloatDiff and (ns == os)
+		return src
+
+	dest = .tempme(exp, dest)
+	if t.isfloat or newtype.isfloat
+		|| Conv = .AddASM(asm.CONV, exp, dest, src)
+		debugger,   #!put in actual numbers later
+		if floatdiff
+			Conv.r[2] = 1
+		  else
+			Conv.r[2] = 3
+	  else
+		|| A = .AddASM(asm.BFLG, exp, dest, src)
+		a.r[2] = 64-os
+		a.r[3] = 64-os
+		a.r[4] = NS.issigned|int|
+	
+	return dest
+		// extend bits if signed int?
 
 
 function Pointer		(fn_asm)
@@ -205,13 +280,6 @@ function Access		(fn_asm)			// a[b], struct.mem[b], func()[func2()]
 	.AddASM(A, exp, dest,  Ptr, ind)
 	return dest
 
-/*
-		r1		r	// dest
-		r2		r	// Ptr
-		r3		r	// Index
-		L		7	// Const A
-		move	2
-*/	
 		
 
 function Dot		(fn_asm)			// a.b
