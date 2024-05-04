@@ -23,10 +23,8 @@ datatype ClassInfo (uint)
 		IsRole
 		IsTask
 		Builtin
-		Symbol
-		Fixed
+		NumericReduction = [Symbol, Fixed, Flags]
 		ASM
-		Flags
 		Wrapper
 		Union
 		
@@ -74,7 +72,7 @@ linkage
 
 |byte|						IsRole
 |SCNodetype| 				BaseType
-|byte|						NumericReduction
+//|byte|						NumericReduction
 
 
 constructor (|Message| node, |SCNode| parent, |bool| HasPtrs, |scmodule| m)
@@ -470,6 +468,10 @@ function NeedsDefaultValue (|message| def, |&message| place, |string| name)
 		if def and !(def isthing "nil")
 			error (self, "Missing "+name+" value for class: "  + .name)
 	*place = def
+
+
+function NumericReduction (|classinfo|)
+	return .flags & ClassInfo.NumericReduction
 
 
 function ContainedTypeLoad 

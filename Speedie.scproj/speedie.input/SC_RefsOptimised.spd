@@ -156,11 +156,11 @@ dispatch ClassLinkageTable (TranFunc)
 			|| type = node[@thg]$
 			name_space.typeinfo = datatypecode.unusedtype
 			if type == "false" or "symbol"
-				name_space.NumericReduction = NumericLoss.symbol
+				(name_space is symbol)
 			  elseif type == "fixed"
-				name_space.NumericReduction = NumericLoss.fixed
+				(name_space is fixed)
 			  elseif type == "flags"
-				name_space.NumericReduction = NumericLoss.flag
+				(name_space is flags)
 			  else
 				error type
 
@@ -177,10 +177,3 @@ function SCNode.ProcessLinkage (|message| node, |dictionary of tranfunc| Table, 
 
 	return compiler.program
 
-
-datatype NumericLoss (byte)
-	flags
-		Normal = 0
-		Symbol
-		Fixed
-		Flag
