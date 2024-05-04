@@ -77,8 +77,8 @@ function DeclInit (|Message| dcl, |SCFunction| fn, |bool| IsJustAnArg)
 		Curr = Curr.FlatNext
 
 
-function scfunction.doRefs (|bool|)
-	return !.NoRefCounts
+function scfunction.DoRefs (|bool|)
+	return self isnt NoRefCounts
 
 
 function RefBasis (|Message| msg, |bool| SetOnly, |int|)
