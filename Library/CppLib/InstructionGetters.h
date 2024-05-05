@@ -214,6 +214,19 @@
 #define   BFLD_Lu_(x)   (((uint)((x)<<30))>>30)
 
 
+#define   BCmp_Shifti       ((( int)((Op.Raw)<<23))>>26)
+#define   BCmp_Shifti_(x)   ((( int)((x)<<23))>>26)
+
+#define   BCmp_Shiftu       (((uint)((Op.Raw)<<23))>>26)
+#define   BCmp_Shiftu_(x)   (((uint)((x)<<23))>>26)
+
+#define   BCmp_Invi       ((( int)((Op.Raw)<<29))>>29)
+#define   BCmp_Invi_(x)   ((( int)((x)<<29))>>29)
+
+#define   BCmp_Invu       (((uint)((Op.Raw)<<29))>>29)
+#define   BCmp_Invu_(x)   (((uint)((x)<<29))>>29)
+
+
 #define   SWAP_Ai       ((( int)((Op.Raw)<<8))>>26)
 #define   SWAP_Ai_(x)   ((( int)((x)<<8))>>26)
 

@@ -145,6 +145,8 @@ typedef vec4 mat2;
 
 typedef u16 ASMParam;
 
+typedef ASM ASM_BCmp;
+
 typedef ASM ASM_BFLD;
 
 typedef ASM ASM_Bra;
@@ -1805,6 +1807,7 @@ extern Random JB__zalgo_R;
 #define kSC__ASM_ADD (25)
 #define kSC__ASM_ADDC (24)
 #define kSC__ASM_BAND (32)
+#define kSC__ASM_BCMP (40)
 #define kSC__ASM_BFLG (36)
 #define kSC__ASM_BFLS (37)
 #define kSC__ASM_BNOT (35)
@@ -1814,10 +1817,9 @@ extern Random JB__zalgo_R;
 #define kSC__ASM_BROL (38)
 #define kSC__ASM_BROR (39)
 #define kSC__ASM_BXOR (34)
-#define kSC__ASM_CMPB (43)
 #define kSC__ASM_CMPE (44)
-#define kSC__ASM_CMPF (42)
-#define kSC__ASM_CMPI (41)
+#define kSC__ASM_CMPF (43)
+#define kSC__ASM_CMPI (42)
 #define kSC__ASM_CMPN (45)
 #define kSC__ASM_CNTC (67)
 #define kSC__ASM_CONV (21)
@@ -1836,7 +1838,7 @@ extern ASM_Encoder2 SC__ASM_Forms[32];
 #define kSC__ASM_FUNC (1)
 #define kSC__ASM_FUNC2 (1)
 #define kSC__ASM_FUNC3 (2)
-#define kSC__ASM_JUMP (40)
+#define kSC__ASM_JUMP (41)
 #define kSC__ASM_LUPD (49)
 #define kSC__ASM_LUPU (48)
 #define kSC__ASM_MEMM (68)
@@ -4237,6 +4239,10 @@ uint JB_uint_LowestBit(uint Self);
 
 
 // ASM
+ASM SC_ASM_BCmp_InvSet(ASM Self, uint Value);
+
+ASM SC_ASM_BCmp_ShiftSet(ASM Self, uint Value);
+
 ASM SC_ASM_BFLD_downSet(ASM Self, uint Value);
 
 ASM SC_ASM_BFLD_LSet(ASM Self, uint Value);
@@ -4787,6 +4793,11 @@ uint SC_xC2xB5Param_BitSize(ASMParam Self);
 bool SC_xC2xB5Param_IsNumber(ASMParam Self);
 
 bool SC_xC2xB5Param_IsReg(ASMParam Self);
+
+
+
+// ASM_BCmp
+ASM JB_ASM_BCmp__Encode(FatASM* Self);
 
 
 
@@ -9461,8 +9472,6 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, NilState New);
 
 inline void SC_nil__DeclKill();
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
-
 inline NilRecord SC_nil__Value();
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
@@ -9470,6 +9479,8 @@ inline bool JB_Safe_SyntaxCast(JB_String* Self);
 inline bool SC_Decl_IsUnknownParam(SCDecl* Self);
 
 inline NilRecord SC_nil__EndBlock();
+
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
@@ -9628,6 +9639,10 @@ inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 	AsmReg Rz = ((AsmReg)0);
 	ASMtmp T = SC_Msg_ASMType(Exp);
 	fn_asm Fn = SC_fn_asm_table[T];
+	if ((!T)) {
+		Fn = SC_fn_asm_table[((int)Exp->Func)];
+		debugger;
+	}
 	if (!(SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen))) {
 		uint OV = SC_Pac_OpenVars(Self);
 		Rz = (Fn)(Self, Exp, Dest, 0);
@@ -9635,6 +9650,10 @@ inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 	}
 	 else {
 		Rz = (Fn)(Self, Exp, Dest, 0);
+	}
+	int Dd = SC_Reg_Reg(Dest);
+	if (((bool)Dd) and (SC_Reg_Reg(Rz) != Dd)) {
+		//FFFFFFASSDJKLASDM<>AS;
 	}
 	return Rz;
 }
@@ -9676,16 +9695,6 @@ inline void SC_nil__DeclKill() {
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 }
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
-	ASMtmp T = SC_Msg_ASMType(Msg);
-	if (T) {
-		return (SC__nil_NilTable[T])(Msg, Test);
-	}
-	T = ((ASMtmp)Msg->Func);
-	(SC_Msg_ASMTypeSet(Msg, T));
-	return (SC__nil_NilTable[T])(Msg, Test);
-}
-
 inline NilRecord SC_nil__Value() {
 	return SC_nil_Value((&SC__nil_T));
 }
@@ -9703,6 +9712,16 @@ inline NilRecord SC_nil__EndBlock() {
 	Rz = SC_nil__Value();
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 	return Rz;
+}
+
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
+	ASMtmp T = SC_Msg_ASMType(Msg);
+	if (T) {
+		return (SC__nil_NilTable[T])(Msg, Test);
+	}
+	T = ((ASMtmp)Msg->Func);
+	(SC_Msg_ASMTypeSet(Msg, T));
+	return (SC__nil_NilTable[T])(Msg, Test);
 }
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {

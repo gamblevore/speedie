@@ -60,7 +60,9 @@ inline int JB_Int_Log2 (int X) {
     return 31- __builtin_clz(X);
 }
 
-inline int JB_Int_CTZ (int X) {return __builtin_ctz(X);}
+inline int JB_Int_CTZ (int X) {
+	return __builtin_ctz(X);
+}
 
 inline uint64 JB_u64_Log2 (u64 X) {
     return 63-__builtin_clzll(X);

@@ -244,31 +244,6 @@ AlwaysInline bool CompI_ (Register* r, ASM Op) {
 }
 
 
-AlwaysInline bool CompB_ (Register* r, ASM Op) {
-	auto A = &i1;
-	auto B = &i2;
-
-	switch (Cmp_Cmpu) {
-// these are handy too
-		CmpSub(0 , bA == bB);
-		CmpSub(1 , sA == sB);
-		CmpSub(2 , uA == uB);
-		CmpSub(3 , UA == UB);
-		CmpSub(4 , sA != sB);
-		CmpSub(5 , bA != bB);
-		CmpSub(6 , uA != uB);
-		CmpSub(7 , UA != UB);
-
-// could we also compare simds with this? seems fair?
-		CmpSub(8 , FA == FB);
-		CmpSub(9,  DA == DB);
-		CmpSub(10, FA != FB);
-	default:
-		CmpSub(11, DA != DB);
-	};
-}
-
-
 AlwaysInline bool CompF_ (Register* r, ASM Op) {
 	auto A = &i1;
 	auto B = &i2;
@@ -282,8 +257,13 @@ AlwaysInline bool CompF_ (Register* r, ASM Op) {
 		CmpSub(4 , DA <  DB);
 		CmpSub(5 , DA >  DB);
 		CmpSub(6 , DA <= DB);
-	default:
 		CmpSub(7 , DA >= DB);
+
+		CmpSub(8 , FA == FB);
+		CmpSub(9 , FA != FB);
+		CmpSub(10, DA == DB);
+	default:
+		CmpSub(11, DA != DB);
 	};
 }
 
@@ -315,16 +295,16 @@ AlwaysInline ASM* CompF (Register* r, ASM Op, ASM* Code) {
 }
 
 
-AlwaysInline ASM* CompB (Register* r, ASM Op, ASM* Code) {
-	uint Jump = Cmp_Lu; 
-	bool b = CompB_(r, Op);
-	if (Jump >= 32) {
-		if (!b) return Code;
-		return Code + Jump - (1<<9);
-	}
-		
-	r[Jump].Int = b;
-	return Code;
+AlwaysInline uint64 BitComp (Register* r, ASM Op) {
+	auto i = BCmp_Invu;
+	auto A = (u1 << BCmp_Shiftu);
+	auto B = (u2 << BCmp_Shiftu);
+	if (i&2)
+		A = ~A;
+	if (i&4)
+		B = ~B;
+	bool Result = A==B;
+	return Result xor (i&1);
 }
 
 

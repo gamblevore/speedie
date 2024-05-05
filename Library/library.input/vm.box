@@ -85,6 +85,13 @@ forms
 		up		6
 		down	6
 	
+	BCmp	// bcmp:
+		r1		r
+		r2		r
+		r3		r
+		Shift	6
+		Inv		3
+
 	SWAP
 		A		6
 		B		6
@@ -230,6 +237,8 @@ BROL  (U3)
 	i1 = JB_u64_RotL(u2, u3 + L3)
 BROR  (U3)
 	i1 = JB_u64_RotR(u2, u3 + L3)
+BCMP  (BCmp)
+	u1 = BitComp(r, Op)
 
 
 #!						 (((((Branches)))))
@@ -244,10 +253,8 @@ CMPF  (Cmp)
 	__
 	Code = CompF(r, Op, Code)
 	___
-CMPB  (Cmp)
-	Code = CompB(r, Op, Code)
-	___
 CMPE  (CmpEq)
+	__
 	Code = CompEq(r, Op, Code)
 	___
 CMPN  (CmpEq)				// NO (But easy to fix)

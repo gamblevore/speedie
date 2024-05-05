@@ -78,6 +78,8 @@
 	i1 = JB_u64_RotL(u2, u3 + L3);
 ı BROR: _
 	i1 = JB_u64_RotR(u2, u3 + L3);
+ı BCMP: _
+	u1 = BitComp(r, Op);
 ı JUMP: _
 	Code += l0;
 ı CMPI: 
@@ -88,10 +90,8 @@
 	__;
 	Code = CompF(r, Op, Code);
 	___;
-ı CMPB: _
-	Code = CompB(r, Op, Code);
-	___;
-ı CMPE: _
+ı CMPE: 
+	__;
 	Code = CompEq(r, Op, Code);
 	___;
 ı CMPN: 

@@ -331,17 +331,17 @@ function Not		(fn_asm)
 	opt	NoRefCounts
 	
 	if dest is cond // if !x
-		// use compeq... has greater jump-range
+		// use compeq... can encode as bra/jump if it needs
 
 
 	// y = !x
 	|| src = .µ(exp.first!, dest)
-	|| cmp = src.µtype.ByteCount.log2
-	if src.isfloat
-		cmp += 6
-	.addasm(asm.CMPB, exp, 0, src, cmp, dest)
-	
-	dest.µtype = datatypecode.bool
+	if src.isfloat // need to use asm.cmpe instead
+		debugger
+	  else
+		.addasm(asm.BCMP, exp, dest, 0, src, 64-src.µtype.bitcount, 1)
+
+	dest.µtype = DataTypeCode.bool
 	return dest
 	
 
