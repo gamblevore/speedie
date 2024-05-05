@@ -195,20 +195,28 @@ AlwaysInline bool Rare (Register* r, ASM Op) {
 }
 
 
-#define  FA  *((float*)A)
-#define  FB  *((float*)B)
+
 #define  DA  *((double*)A)
 #define  DB  *((double*)B)
+#define  FA  *((float*)A)
+#define  FB  *((float*)B)
+
 #define  UA  *((u64*)A)
 #define  UB  *((u64*)B)
 #define  IA  *((int*)A)
 #define  IB  *((int*)B)
 #define  uA  *((uint*)A)
 #define  uB  *((uint*)B)
+
+#define  sA  *((u16*)A)
+#define  sB  *((u16*)B)
+#define  bA  *((byte*)A)
+#define  bB  *((byte*)B)
+
 #define CmpSub(Mode, Cmp) case Mode: return (Cmp);
 
 
-AlwaysInline bool CompI_(Register* r, ASM Op) {
+AlwaysInline bool CompI_ (Register* r, ASM Op) {
 	auto A = &i1;
 	auto B = &i2;
 	switch (Cmp_Cmpu) {
@@ -236,7 +244,32 @@ AlwaysInline bool CompI_(Register* r, ASM Op) {
 }
 
 
-AlwaysInline bool CompF_(Register* r, ASM Op) {
+AlwaysInline bool CompB_ (Register* r, ASM Op) {
+	auto A = &i1;
+	auto B = &i2;
+
+	switch (Cmp_Cmpu) {
+// these are handy too
+		CmpSub(0 , bA == bB);
+		CmpSub(1 , sA == sB);
+		CmpSub(2 , uA == uB);
+		CmpSub(3 , UA == UB);
+		CmpSub(4 , sA != sB);
+		CmpSub(5 , bA != bB);
+		CmpSub(6 , uA != uB);
+		CmpSub(7 , UA != UB);
+
+// could we also compare simds with this? seems fair?
+		CmpSub(8 , FA == FB);
+		CmpSub(9,  DA == DB);
+		CmpSub(10, FA != FB);
+	default:
+		CmpSub(11, DA != DB);
+	};
+}
+
+
+AlwaysInline bool CompF_ (Register* r, ASM Op) {
 	auto A = &i1;
 	auto B = &i2;
 
@@ -251,12 +284,12 @@ AlwaysInline bool CompF_(Register* r, ASM Op) {
 		CmpSub(6 , DA <= DB);
 	default:
 		CmpSub(7 , DA >= DB);
-		// add vec2 and vec4 later... assume vec3 has 0 for w
 	};
 }
 
 
-AlwaysInline ASM* CompI(Register* r, ASM Op, ASM* Code) {
+
+AlwaysInline ASM* CompI (Register* r, ASM Op, ASM* Code) {
 	uint Jump = Cmp_Lu; 
 	bool b = CompI_(r, Op);
 	if (Jump >= 32) {
@@ -269,7 +302,7 @@ AlwaysInline ASM* CompI(Register* r, ASM Op, ASM* Code) {
 }
 
 
-AlwaysInline ASM* CompF(Register* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* CompF (Register* r, ASM Op, ASM* Code) {
 	uint Jump = Cmp_Lu; 
 	bool b = CompF_(r, Op);
 	if (Jump >= 32) {
@@ -281,13 +314,27 @@ AlwaysInline ASM* CompF(Register* r, ASM Op, ASM* Code) {
 	return Code;
 }
 
-AlwaysInline ASM* CompEq(Register* r, ASM Op, ASM* Code) {
+
+AlwaysInline ASM* CompB (Register* r, ASM Op, ASM* Code) {
+	uint Jump = Cmp_Lu; 
+	bool b = CompB_(r, Op);
+	if (Jump >= 32) {
+		if (!b) return Code;
+		return Code + Jump - (1<<9);
+	}
+		
+	r[Jump].Int = b;
+	return Code;
+}
+
+
+AlwaysInline ASM* CompEq (Register* r, ASM Op, ASM* Code) {
 	if (!(u1 xor u2))
 		return Code;
 	return Code + CmpEq_Jmpi;
 }
 
-AlwaysInline ASM* CompNeq(Register* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* CompNeq (Register* r, ASM Op, ASM* Code) {
 	if (u1 xor u2)
 		return Code;
 	return Code + CmpEq_Jmpi;

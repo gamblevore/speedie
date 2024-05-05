@@ -25,6 +25,11 @@ forms
 		r1		r
 		r2		r
 		Cmp		4
+
+	CmpD	// cmpd:
+		r1		r
+		r2		r
+		r3		r
 	
 	CmpEq	// cmpeq:
 		r1		r
@@ -227,7 +232,6 @@ BROR  (U3)
 	i1 = JB_u64_RotR(u2, u3 + L3)
 
 
-
 #!						 (((((Branches)))))
 JUMP (U0)
 	Code += l0
@@ -240,7 +244,10 @@ CMPF  (Cmp)
 	__
 	Code = CompF(r, Op, Code)
 	___
-CMPE  (CmpEq)				// NO (add 8/16/32/64 versions? and a neq version?)
+CMPB  (Cmp)
+	Code = CompB(r, Op, Code)
+	___
+CMPE  (CmpEq)
 	Code = CompEq(r, Op, Code)
 	___
 CMPN  (CmpEq)				// NO (But easy to fix)

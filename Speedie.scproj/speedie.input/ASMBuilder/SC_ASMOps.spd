@@ -166,6 +166,7 @@ module asmOps
 			return .doconsts(dest, l, r, opmode.shl)
 		return dest
 	function Assign (fn_opasm)
-		debugat
+		if dest.reg == l.reg
+			return dest // haha!
 		return bitor(self, dest, l, asmreg(), dbg)
 

@@ -1239,7 +1239,7 @@ function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| c
 
 function scdecl.ConstInRangeSub (|int64| Value, |bool|)
 	|| T = .type.typeinfo
-	|| S = t.bytesize
+	|| S = t.ByteCount
 	if S == 8
 		return true
 	if t.isint

@@ -123,7 +123,7 @@ datatype DataTypeCode (uint16)
 	function _Shift (|int|)
 		return (self >> 4) & 3
 
-	function ByteSize (|int|)
+	function ByteCount (|int|)
 		return .Count << ._Shift
 
 	function BitCount (|int|)

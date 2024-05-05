@@ -1,4 +1,5 @@
 
+// check for four/eightbytes... how do they handle 1/2???
 
 dispatch fn_asm_table (fn_asm)
 	@arg:
@@ -263,7 +264,7 @@ function Dot		(fn_asm)						// a.b
 	dest.µtype = T
 	debugger
 	
-	|| B = t.ByteSize.log2
+	|| B = t.ByteCount.log2
 	|| A = Dest.ReadOrWriteSub(exp, t, b)			 #require
 
 	|| Pos = prop.exportposition >> B
@@ -328,9 +329,20 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Value, |scdecl| D, 
 
 function Not		(fn_asm)
 	opt	NoRefCounts
-	// if !x
-	if dest is cond
-	debugger 
+	
+	if dest is cond // if !x
+		// use compeq... has greater jump-range
+
+
+	// y = !x
+	|| src = .µ(exp.first!, dest)
+	|| cmp = src.µtype.ByteCount.log2
+	if src.isfloat
+		cmp += 6
+	.addasm(asm.CMPB, exp, 0, src, cmp, dest)
+	
+	dest.µtype = datatypecode.bool
+	return dest
 	
 
 function ARel		(fn_asm)
@@ -341,10 +353,21 @@ function ARel		(fn_asm)
 function Minus			(fn_asm)					// -a
 	opt	NoRefCounts
 	|| Src = .µ(exp, dest)
-	dest = .tempme(exp, dest)
-	.AddASM(ASM.ADD, exp.parent!, dest, 0, 0, src)
-	
-	return dest
+	return asmops.minus(self, dest, asmreg(), src, exp)
+
+
+function AddFloat	(|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| src, |int| Incr)
+	|| big = dest.fourbytes
+
+/*
+		r1		r
+		r2		r
+		D		1
+		High	13
+*/
+
+	incr = (127 + ((incr==1)<<7))
+	.AddASM(ASM.FADC, exp.parent!, dest, src, big|int|, incr<<5)
 
 
 function Precrement		(fn_asm)					// --a, ++a
@@ -361,7 +384,7 @@ function Precrement		(fn_asm)					// --a, ++a
 		Incr = -Incr
 
 	if dest.isfloat
-		.AddASM(ASM.FADC, exp.parent!, dest, src, incr)
+		AddFloat(self, exp, dest, src, incr)
 	  else
 		.AddASM(ASM.ADDC, exp.parent!, dest, src, incr)
 	if d isnt local
@@ -435,7 +458,7 @@ helper ASMReg.ReadOrWriteSub (|message| m, |datatypecode| t, |int| bytes, |asm|)
 
 function ASMReg.ReadOrWrite (|message| m, |asm|)
 	|| T = .µtype
-	|| bytes = t.bytesize.log2
+	|| bytes = t.ByteCount.log2
 	return .ReadOrWriteSub(m, t, bytes)
 
 
@@ -452,3 +475,5 @@ function message.SimpleVar (|asmreg|)
 		|| d = .FastDecl
 		if !d.exportposition
 			return asmreg()
+
+

@@ -88,6 +88,9 @@
 	__;
 	Code = CompF(r, Op, Code);
 	___;
+ı CMPB: _
+	Code = CompB(r, Op, Code);
+	___;
 ı CMPE: _
 	Code = CompEq(r, Op, Code);
 	___;

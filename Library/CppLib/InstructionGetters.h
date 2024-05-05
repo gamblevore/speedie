@@ -73,6 +73,13 @@
 #define   Cmp_Lu_(x)   (((uint)((x)<<22))>>22)
 
 
+#define   CmpD_Li       ((( int)((Op.Raw)<<23))>>23)
+#define   CmpD_Li_(x)   ((( int)((x)<<23))>>23)
+
+#define   CmpD_Lu       (((uint)((Op.Raw)<<23))>>23)
+#define   CmpD_Lu_(x)   (((uint)((x)<<23))>>23)
+
+
 #define   CmpEq_Jmpi       ((( int)((Op.Raw)<<18))>>18)
 #define   CmpEq_Jmpi_(x)   ((( int)((x)<<18))>>18)
 

@@ -236,7 +236,7 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 		.size = Platform.PointerBytes
 		return .size
 	if .IsDataTypeOnly
-		.size = .typeinfo.bytesize
+		.size = .typeinfo.ByteCount
 		return .size
 
 	expect (Depth < 16) (.sourceArg, "Class hierarchy too deep")
@@ -933,7 +933,7 @@ module
 		|| Td		= DataTypeCode.Types[n]
 			|| t = *td
 			if T != 255
-				.size = T.bytesize
+				.size = T.ByteCount
 				if t == datatypecode.Vec3 or datatypecode.iVec3
 					.size = 16 // sigh 
 				.TypeInfo	= T

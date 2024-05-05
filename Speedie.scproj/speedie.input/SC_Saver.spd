@@ -74,7 +74,7 @@ module SC_Saver {
 					fs <~ Item.Name
 					if (AppendAsData)
 						fs <~ ")|&byte|, "
-						fs <~ T.ByteSize * Count
+						fs <~ T.ByteCount * Count
 					  elseif (Count)
 						fs <~ "[i]"
 					fs <~ ')'
@@ -84,7 +84,7 @@ module SC_Saver {
 				fs <~ "loader.LoadRaw((&."
 				fs <~ item.name
 				fs <~ ")|&byte|, "
-				fs <~ T.ByteSize * Count
+				fs <~ T.ByteCount * Count
 				fs <~ ")\n"
 		
 			 else

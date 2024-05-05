@@ -155,6 +155,8 @@ typedef ASM ASM_CNTR;
 
 typedef ASM ASM_Cmp;
 
+typedef ASM ASM_CmpD;
+
 typedef ASM ASM_CmpEq;
 
 typedef ASM ASM_Const;
@@ -1807,25 +1809,26 @@ extern Random JB__zalgo_R;
 #define kSC__ASM_BFLS (37)
 #define kSC__ASM_BNOT (35)
 #define kSC__ASM_BOR (33)
-#define kSC__ASM_BRA (45)
-#define kSC__ASM_BRAN (46)
+#define kSC__ASM_BRA (46)
+#define kSC__ASM_BRAN (47)
 #define kSC__ASM_BROL (38)
 #define kSC__ASM_BROR (39)
 #define kSC__ASM_BXOR (34)
-#define kSC__ASM_CMPE (43)
+#define kSC__ASM_CMPB (43)
+#define kSC__ASM_CMPE (44)
 #define kSC__ASM_CMPF (42)
 #define kSC__ASM_CMPI (41)
-#define kSC__ASM_CMPN (44)
-#define kSC__ASM_CNTC (66)
+#define kSC__ASM_CMPN (45)
+#define kSC__ASM_CNTC (67)
 #define kSC__ASM_CONV (21)
 #define kSC__ASM_DIV (28)
 extern ASM_Encoder2 SC__ASM_Encoders[256];
 #define kSC__ASM_EROR (0)
-#define kSC__ASM_FADC (68)
-#define kSC__ASM_FADD (69)
-#define kSC__ASM_FDIV (71)
-#define kSC__ASM_FFRC (72)
-#define kSC__ASM_FMUL (70)
+#define kSC__ASM_FADC (69)
+#define kSC__ASM_FADD (70)
+#define kSC__ASM_FDIV (72)
+#define kSC__ASM_FFRC (73)
+#define kSC__ASM_FMUL (71)
 #define kSC__ASM_FNCX (5)
 #define kSC__ASM_FNCX2 (5)
 #define kSC__ASM_FNCX3 (6)
@@ -1834,25 +1837,25 @@ extern ASM_Encoder2 SC__ASM_Forms[32];
 #define kSC__ASM_FUNC2 (1)
 #define kSC__ASM_FUNC3 (2)
 #define kSC__ASM_JUMP (40)
-#define kSC__ASM_LUPD (48)
-#define kSC__ASM_LUPU (47)
-#define kSC__ASM_MEMM (67)
+#define kSC__ASM_LUPD (49)
+#define kSC__ASM_LUPU (48)
+#define kSC__ASM_MEMM (68)
 #define kSC__ASM_MUL (27)
 extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_PRNT (19)
-#define kSC__ASM_RALO (51)
+#define kSC__ASM_RALO (52)
 #define kSC__ASM_RARE (20)
-#define kSC__ASM_RD16 (60)
-#define kSC__ASM_RD1S (54)
-#define kSC__ASM_RD1U (53)
-#define kSC__ASM_RD2S (56)
-#define kSC__ASM_RD2U (55)
-#define kSC__ASM_RD4S (58)
-#define kSC__ASM_RD4U (57)
-#define kSC__ASM_RD8U (59)
+#define kSC__ASM_RD16 (61)
+#define kSC__ASM_RD1S (55)
+#define kSC__ASM_RD1U (54)
+#define kSC__ASM_RD2S (57)
+#define kSC__ASM_RD2U (56)
+#define kSC__ASM_RD4S (59)
+#define kSC__ASM_RD4U (58)
+#define kSC__ASM_RD8U (60)
 #define kSC__ASM_RET (17)
-#define kSC__ASM_RSDE (49)
-#define kSC__ASM_RSET (50)
+#define kSC__ASM_RSDE (50)
+#define kSC__ASM_RSET (51)
 #define kSC__ASM_SETK (22)
 #define kSC__ASM_SETN (23)
 #define kSC__ASM_SHLS (31)
@@ -1860,15 +1863,15 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_SHRU (30)
 #define kSC__ASM_SUB (26)
 #define kSC__ASM_SWAP (18)
-#define kSC__ASM_TABL (52)
+#define kSC__ASM_TABL (53)
 #define kSC__ASM_TAIL (9)
 #define kSC__ASM_TAIL2 (9)
 #define kSC__ASM_TRAP (16)
-#define kSC__ASM_WR16 (65)
-#define kSC__ASM_WR1U (61)
-#define kSC__ASM_WR2U (62)
-#define kSC__ASM_WR4U (63)
-#define kSC__ASM_WR8U (64)
+#define kSC__ASM_WR16 (66)
+#define kSC__ASM_WR1U (62)
+#define kSC__ASM_WR2U (63)
+#define kSC__ASM_WR4U (64)
+#define kSC__ASM_WR8U (65)
 #define kSC__ASMtmp_kContinue (51)
 #define kSC__ASMtmp_kDebugger (61)
 #define kSC__ASMtmp_kElseIf (48)
@@ -4248,6 +4251,8 @@ ASM SC_ASM_Cmp_CmpSet(ASM Self, uint Value);
 
 ASM SC_ASM_Cmp_LSet(ASM Self, uint Value);
 
+ASM SC_ASM_CmpD_LSet(ASM Self, uint Value);
+
 ASM SC_ASM_CmpEq_JmpSet(ASM Self, uint Value);
 
 ASM SC_ASM_CNTC_cnstSet(ASM Self, uint Value);
@@ -4354,6 +4359,8 @@ void SC_ASM__TestASMSub(Message* Tests);
 bool SC_ASMtmp_SyntaxIs(ASMtmp Self, ASMtmp T);
 
 AsmReg SC_ASMtmp__Access(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+
+void SC_ASMtmp__AddFloat(ASMState* Self, Message* Exp, AsmReg Dest, AsmReg Src, int Incr);
 
 AsmReg SC_ASMtmp__ARel(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
@@ -4488,7 +4495,7 @@ SCClass* SC_TC_Better_Numeric_Sub(DataTypeCode Self, DataTypeCode T, OpMode Op);
 
 int JB_TC_BitCount(DataTypeCode Self);
 
-int JB_TC_ByteSize(DataTypeCode Self);
+int JB_TC_ByteCount(DataTypeCode Self);
 
 int JB_TC_Count(DataTypeCode Self);
 
@@ -4805,6 +4812,11 @@ ASM JB_ASM_CNTR__Encode(FatASM* Self);
 
 // ASM_Cmp
 ASM JB_ASM_Cmp__Encode(FatASM* Self);
+
+
+
+// ASM_CmpD
+ASM JB_ASM_CmpD__Encode(FatASM* Self);
 
 
 
@@ -9449,8 +9461,6 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, NilState New);
 
 inline void SC_nil__DeclKill();
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
-
 inline NilRecord SC_nil__Value();
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
@@ -9458,6 +9468,8 @@ inline bool JB_Safe_SyntaxCast(JB_String* Self);
 inline bool SC_Decl_IsUnknownParam(SCDecl* Self);
 
 inline NilRecord SC_nil__EndBlock();
+
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
@@ -9616,6 +9628,10 @@ inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 	AsmReg Rz = ((AsmReg)0);
 	ASMtmp T = SC_Msg_ASMType(Exp);
 	fn_asm Fn = SC_fn_asm_table[T];
+	if ((!T)) {
+		Fn = SC_fn_asm_table[((int)Exp->Func)];
+		debugger;
+	}
 	if (!(SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen))) {
 		uint OV = SC_Pac_OpenVars(Self);
 		Rz = (Fn)(Self, Exp, Dest, 0);
@@ -9623,6 +9639,10 @@ inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 	}
 	 else {
 		Rz = (Fn)(Self, Exp, Dest, 0);
+	}
+	int Dd = SC_Reg_Reg(Dest);
+	if (((bool)Dd) and (SC_Reg_Reg(Rz) != Dd)) {
+		//FFFFFFASSDJKLASDM<>AS;
 	}
 	return Rz;
 }
@@ -9664,16 +9684,6 @@ inline void SC_nil__DeclKill() {
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 }
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
-	ASMtmp T = SC_Msg_ASMType(Msg);
-	if (T) {
-		return (SC__nil_NilTable[T])(Msg, Test);
-	}
-	T = ((ASMtmp)Msg->Func);
-	(SC_Msg_ASMTypeSet(Msg, T));
-	return (SC__nil_NilTable[T])(Msg, Test);
-}
-
 inline NilRecord SC_nil__Value() {
 	return SC_nil_Value((&SC__nil_T));
 }
@@ -9691,6 +9701,16 @@ inline NilRecord SC_nil__EndBlock() {
 	Rz = SC_nil__Value();
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 	return Rz;
+}
+
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
+	ASMtmp T = SC_Msg_ASMType(Msg);
+	if (T) {
+		return (SC__nil_NilTable[T])(Msg, Test);
+	}
+	T = ((ASMtmp)Msg->Func);
+	(SC_Msg_ASMTypeSet(Msg, T));
+	return (SC__nil_NilTable[T])(Msg, Test);
 }
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
