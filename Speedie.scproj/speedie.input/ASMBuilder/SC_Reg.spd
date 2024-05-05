@@ -1,7 +1,7 @@
 
 
 
-prototype fn_asm (|&ASMState| self, |message| exp, |AsmReg| Dest=0.reg, |int| Mode = 0, |AsmReg|)
+prototype fn_asm (|&ASMState| self, |message| exp, |AsmReg| Dest=asmreg(), |int| Mode = 0, |AsmReg|)
 
 	
 	
@@ -14,16 +14,21 @@ datatype AsmReg (uint)
 	constants
 		|asmreg|
 		Set = 4
+		Alternate		= (1 << 26)
+		Const			= (1 << 27)
 		Cond			= (1 << 28)
 		PositionRequest = (1 << 29)
-		ReallyTemp = (1 << 30)
-		ForReturn = (1 << 30) ||| (1<<8)
-		Discard = 1 << 31
+		ForReturn		= (1 << 30)
+		ForReturnReg	= (1 << 30) ||| (1<<8)
+		Discard			= (1 << 31)
+		Zero			= Const
 	
 	
 	function Exists (|bool|)
 		return self|int|
 	
+	function Signed (|bool|)
+		return self|DataTypeCode|.issigned
 	function µType (|DataTypeCode|)
 		return self|int| & 255
 	function µType (assigns:|DataTypeCode|, |asmreg|)
@@ -81,7 +86,7 @@ datatype AsmReg (uint)
 	
 	function operator• (|asmreg| dest, |asmreg|)
 		if .reg == dest.reg
-			return 0.reg
+			return asmreg()
 		return dest
 		
 //	function TryUse (|asmreg|)
@@ -89,8 +94,9 @@ datatype AsmReg (uint)
 //			return (self|uint| &~ ReallyTemp|uint|)|asmreg|
 	
 	module
-		function Empty (|asmreg|)
-			return 0|asmreg|
+		function New (|asmreg|)
+			return const
+		
 	
 
 function int.Reg (|asmreg|)

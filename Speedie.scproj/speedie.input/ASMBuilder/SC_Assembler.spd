@@ -77,7 +77,7 @@ module TreeAssembler
 		opt norefcounts
 		ASMState.Sh.Initstate(fn)
 		|| fp = fn_asm_table[@arg]!
-		|| R = 0.reg
+		|| R = asmreg()
 		|| A = fn.SourceArg!
 		(fp)(ASmState.Sh, A, R)
 		ASMState.Sh.FinishASM

@@ -15,8 +15,7 @@ struct ASMState
 	|datatypecode|				ReturnType
 	|byte|						VDecls
 	|byte|						VTmps
-	|uint64[32]|				TrueBits 
-	|uint64[32]|				FalseBits
+	|uint64[32]|				Consts 
 	|uint|						AnyTrue	 
 
 	function AddFuncParams (|SCFunction| fn)
@@ -27,8 +26,7 @@ struct ASMState
 
 	function Last (|&FatASM|)
 		return .curr-1
-	
-	
+		
 	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |int| c, |int| d, |&FatASM|)
 		pragma inline,  opt norefcounts,  cpp_part AddASM4
 		rz = self <~ (sm, dbg)
@@ -53,7 +51,11 @@ struct ASMState
 	function AddASM (|int| SM, |message| dbg, |int| a, |&FatASM|)
 		pragma inline,  opt norefcounts,  cpp_part AddASM1
 		rz = self <~ (sm, dbg)
-		rz.r[0] = a		
+		rz.r[0] = a
+	
+	function AddASM (|int| SM, |message| dbg, |&FatASM|)
+		pragma inline,  opt norefcounts,  cpp_part AddASM0
+		return self <~ (sm, dbg)
 
 	syntax append (|uint| code, |message| dbg, |&FatASM|)
 		cpp_part RequestOp
@@ -100,8 +102,9 @@ struct ASMState
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	function µ (|message| exp,  |AsmReg| R = 0.reg, |AsmReg|)
+	
+	
+	function µ (|message| exp,  |AsmReg| Dest = asmreg(), |AsmReg|)
 		opt norefcounts
 		pragma inline
 		cpp_part Get
@@ -111,14 +114,22 @@ struct ASMState
 			if !T
 				fn = fn_asm_table[exp.func|int|]!
 				debugger
-		return (fn)(self, exp, R)
+			|| Found = (fn)(self, exp, dest)
+			|| dd = dest.reg
+			if dd and found.reg != dd
+				// its not about "being different"... but "did it allocate soemthing that it didnt need to"
+				#!FFFFFFASSDJKLASDM<>AS
+			return found
+		return (fn)(self, exp, dest)
 
 
-	function prm (|message| prm, |asmreg|)
+	function Prm (|message| prm, |asmreg|)
 		|| r = prm.SimpleVar
 		if r.Exists
 			return r
-		return .µ(prm, .DeclareMe(prm, asmreg.empty))
+		|| Where = .DeclareMe(prm, asmreg())
+		// if this fails then... IDK I guess prm.simplevar failed?
+		return .µ(prm, where)
 		
 		
 	function DoFunc (|message| prms, |asmreg| dest, |asmreg|)
@@ -129,12 +140,11 @@ struct ASMState
 		// there are only 4 above 6!, only 14 above 5
 
 		if dest is discard
-			dest = asmreg.empty
+			dest = asmreg()
 		  else
 			dest = .TempMe(prms, dest)
 			dest.µtype = fn.RegType
 
-//		debugger
 		|uint| Reg2
 		|uint| Reg3
 		|| sh = 0

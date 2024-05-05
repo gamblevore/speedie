@@ -47,6 +47,11 @@ function SCNode.CalculateConstRel (|message!| value, |&datatypecode| Ty, |uint64
 			return L / R
 		  else
 			return (L|int64|.asfloat / R|int64|.asfloat).asint
+	if n == 'm' // mod
+		if Ints
+			return L mod R
+		  else
+			return (L|int64|.asfloat mod R|int64|.asfloat).asint
 	if n == '*'
 		if Ints
 			return L * R

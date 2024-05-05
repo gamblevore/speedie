@@ -6,7 +6,7 @@
 // we have opposites... perhaps the negate operator could use it.
 
 
-datatype OpMode (uint16)
+datatype OpMode (uint)
 	flags
 		|OpMode|
 		CompSet  = [Compare, Assigns]
@@ -22,6 +22,7 @@ datatype OpMode (uint16)
 		AndOr = [OR, AND]
 		Custom
 		CaseAware
+		NeedsCppFuncOnFloats
 		ExactEquals = niltest + exactlyequals + equalornot + compare
 		ExactNotEquals = niltest + equalornot + compare
 		
@@ -113,6 +114,7 @@ function InitComp (|string| name_)
 module {
 	|Dictionary of SCOperator|			Dict = dictionary()
 	|int|								CustomOperatorScore
+	|scoperator|						Assigns
 
 	function Lookup ( |Message| opch, |SCOperator| )
 		opt norefcounts
@@ -152,15 +154,15 @@ module {
 
 		.AddAssign( "=" )
 
-		.AddMath( "mod",	"mod",		&asmops.Mod)
-		.AddMath( "+",		"Plus",		&asmops.Plus, opmode.Addition)
+		.AddMath( "mod",	"mod",		&asmops.Mod,   opmode.NeedsCppFuncOnFloats)
+		.AddMath( "+",		"Plus",		&asmops.Plus,  opmode.Addition)
 		.AddMath( "-",		"Minus",	&asmops.Minus, opmode.makessigned + opmode.Addition)
 		.AddMath( "*",		"Mul",		&asmops.Mul)
 		.AddMath( "/",		"Divide",	&asmops.Div)
 
-		.AddBit( "<<<",	"RotateLeft",	&asmops.ROL, opmode.Left)
-		.AddBit( ">>>",	"RotateRight",	&asmops.ROR, opmode.Left)
-		.addbit( ">>",	"ShiftRight",	&asmops.SHR, opmode.Left)
+		.AddBit( "<<<",	"RotateLeft",	&asmops.ROL,	opmode.Left)
+		.AddBit( ">>>",	"RotateRight",	&asmops.ROR,	opmode.Left)
+		.addbit( ">>",	"ShiftRight",	&asmops.SHR,	opmode.Left)
 		.addbit( "<<",	"ShiftLeft",	&asmops.SHL)
 		.AddBit( "(|)",	"BitOr",		&asmops.BitOr)
 		.AddBit( "&",	"BitAnd",		&asmops.BitAnd, opmode.SameOrLessBits)
@@ -173,6 +175,7 @@ module {
 		.AddBit( "isnt",	"isnt" )           		// if obj isnt flag
 
 		.BuildOrder
+	
 
 	function OppositeComp (|string| A, |string| B)
 		opt norefcounts
@@ -181,6 +184,7 @@ module {
 		if pa and pb
 			pa.Opposite = pB
 			pb.Opposite = pa
+
 
 	function AddComp (|string| s, |fn_opasm| ASM, |OpMode| Mode=0)
 		|| opp = SCOperator.new(s, ASM, mode ||| opmode.compare)
@@ -192,7 +196,7 @@ module {
 	
 		
 	function AddAssign (|string| s)
-		SCOperator.new(s, &asmops.Assign, OpMode.assigns)
+		.assigns = SCOperator.new(s, &asmops.Assign, OpMode.assigns)
 
 		
 	function AddMath (|string| s, |string| FuncName, |fn_opasm| ASM, |OpMode| Mode=0, |SCOperator|)

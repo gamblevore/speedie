@@ -31,6 +31,18 @@ helper asm_test_ptr (|fixeddict| a, |&int| b,  |int|)
 helper asm_test_flow (|int| a, |int| b, |int|)
 	cpp_name asm_test_flow
 	visible
+	if a > b
+		a = a
+	if b < a
+		b = b
+	if a == a
+		a = a
+	if b != b
+		b = b
+	if 1.CountBits == 2.CountBits
+		|| x = 2
+	
+	
 
 
 ignore {

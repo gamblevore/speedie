@@ -7,27 +7,15 @@ prototype fn_OpASM (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |me
 
 
 module asmOps
-	function Plus	(fn_opasm)
-		// what about the type? i think we just figure it out.
-		.AddASM(asm.ADD, dbg, dest, L, R, 0)
-		return dest
-		
-	function Mod	(fn_opasm)
-		.AddASM(asm.div, dbg, dest, 0, L, R)
-		return dest
-	function Div	(fn_opasm)
-		.AddASM(asm.div, dbg, 0, dest, L, R)
-		return dest
-
 	function Equals (fn_opasm)
 		debugger
 		.AddASM(asm.CMPE, dbg, L, R, 1, 0)
 		return dest
-	function NotEq	(fn_opasm)
+	function NotEq  (fn_opasm)
 		debugger
 		.AddASM(asm.CMPN, dbg, L, R, 1, 0)
 		return dest
-	function Less	(fn_opasm)
+	function Less   (fn_opasm)
 		debugger
 		.AddASM(asm.CMPI, dbg, L, R, 0, 1)
 		return dest
@@ -35,7 +23,7 @@ module asmOps
 		debugger
 		.AddASM(asm.CMPI, dbg, L, R, 0, 1)
 		return dest
-	function More	(fn_opasm)
+	function More   (fn_opasm)
 		debugger
 		.AddASM(asm.CMPI, dbg, L, R, 0, 1)
 		return dest
@@ -43,34 +31,119 @@ module asmOps
 		debugger
 		.AddASM(asm.CMPI, dbg, L, R, 0, 1)
 		return dest
-	function Minus	(fn_opasm)
+
+
+	// MATH
+	function Plus   (fn_opasm)
+		.AddASM(asm.ADD, dbg, dest, L, R, 0)
+		if dest is const
+			|| T = dest.µtype
+			|| LL = &.consts[L.reg], || RR = &.consts[R.reg]
+			if !T.isfloat
+				*LL += *RR
+			  elseif t._shift == 2
+				*(LL|&float|) += *(RR|&float|)
+			  else
+				*(LL|&f64  |) += *(RR|&f64  |)
+			.consts[dest.reg] = *LL
+		return dest
+	function Minus  (fn_opasm)
 		.AddASM(asm.SUB, dbg, dest, L, R)
+		if dest is const
+			|| T = dest.µtype
+			|| LL = &.consts[L.reg], || RR = &.consts[R.reg]
+			if !T.isfloat
+				*LL -= *RR
+			  elseif t._shift == 2
+				*(LL|&float|) -= *(RR|&float|)
+			  else
+				*(LL|&f64  |) -= *(RR|&f64  |)
+			.consts[dest.reg] = *LL
 		return dest
-	function Mul	(fn_opasm)
+	function Mul    (fn_opasm)
 		.AddASM(asm.MUL, dbg, dest, L, R)
+		if dest is const
+			|| T = dest.µtype
+			|| LL = &.consts[L.reg], || RR = &.consts[R.reg]
+			if !T.isfloat
+				*LL *= *RR
+			  elseif t._shift == 2
+				*(LL|&float|) *= *(RR|&float|)
+			  else
+				*(LL|&f64  |) *= *(RR|&f64  |)
+			.consts[dest.reg] = *LL
 		return dest
+	function Div    (fn_opasm)
+		|| Alt = l is alternate
+			.AddASM(asm.div, dbg, dest, 0, L, R)
+		  else
+			.AddASM(asm.div, dbg, 0, dest, L, R)
+		
+		//|| x = 0.5 mod 0.1
+		if dest is const
+			|| T = dest.µtype
+			|| LL = &.consts[L.reg], || RR = &.consts[R.reg]
+			if !T.isfloat
+				if L.signed or R.signed
+					if alt
+						*(LL|&int64 |) /= *(RR|&int64 |)
+					  else
+						*(LL|&int64 |) mod= *(RR|&int64 |)
+				  else
+					if alt
+						*(LL|&uint64|) /= *(RR|&uint64|)
+					  else
+						*(LL|&uint64|) mod= *(RR|&uint64|)
+			  elseif t._shift == 2
+				*(LL|&float|) /= *(RR|&float|)
+			  else
+				*(LL|&f64  |) /= *(RR|&f64  |)
+			.consts[dest.reg] = *LL
+		return dest
+	function Mod    (fn_opasm)
+		(l is Alternate)
+		return div(self, dest, l, r, dbg)
+
+
+	// BITS
 	function BitAnd (fn_opasm)
 		.AddASM(asm.BAND, dbg, dest, L, R)
+		if dest is const
+			.consts[dest.reg] = .consts[L.reg] & .consts[R.reg]
 		return dest
 	function BitXor (fn_opasm)
 		.AddASM(asm.Bxor, dbg, dest, L, R)
+		if dest is const
+			.consts[dest.reg] = .consts[L.reg] xor .consts[R.reg]
 		return dest
-	function BitOr	(fn_opasm)
-		.AddASM(asm.bor, dbg, dest, L, R)
+	function BitOr  (fn_opasm)
+		.AddASM(asm.bor,  dbg, dest, L, R)
+		if dest is const
+			.consts[dest.reg] = .consts[L.reg] ||| .consts[R.reg]
 		return dest
-	function ROL	(fn_opasm)
+	function ROL    (fn_opasm)
 		.AddASM(asm.brol, dbg, dest, L, R)
 		return dest
-	function ROR	(fn_opasm)
+	function ROR    (fn_opasm)
 		.AddASM(asm.bror, dbg, dest, L, R)
 		return dest
-	function SHR	(fn_opasm)
+	function SHR    (fn_opasm)
 		.AddASM(asm.SHRU, dbg, dest, L, R)
+		if dest is const
+			|| LL = .consts[L.reg], || RR = .consts[R.reg]
+			if dest.µtype.issigned
+				.consts[dest.reg] = LL| int64| >> RR|uint64|
+			  else
+				.consts[dest.reg] = LL|uint64| >> RR|uint64|
 		return dest
-	function SHL	(fn_opasm)
+	function SHL    (fn_opasm)
 		.AddASM(asm.SHLS, dbg, dest, L, R)
+		if dest is const
+			.consts[dest.reg] = .consts[L.reg] << .consts[R.reg]
 		return dest
-	function Assign	(fn_opasm)
-		.AddASM(asm.bor, dbg, L, R)
+	function Assign (fn_opasm)
+		.AddASM(asm.bor,  dbg,  Dest,   L)
+		if dest is const
+			.consts[dest.reg] = .consts[L.reg]
 		return dest
 

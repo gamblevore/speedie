@@ -70,7 +70,7 @@ struct Random
 		if !step
 			return self[from, to]
 		rz = self[from, to+step]
-		rz -= rz modf step
+		rz -= rz mod step
 		
 	function Float (|float| From, |float| To, |float|step, |float| Power, |float|) 
 		cpp_part FloatPow

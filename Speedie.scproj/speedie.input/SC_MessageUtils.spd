@@ -410,14 +410,20 @@ function Message.GetMarker (|String| s, |Message|)
 			return a
 
 
-function NewEqRel (|string| L, |String| R, |Message|)
+function NewEqRel (|Message| L, |Message| R, |Message|)
 	opt norefcounts
 	rz = @rel.msg
-	rz <~ (@Thg, L)
-	rz <~ (@Opp, "=")
-	rz <~ (@Thg, R)
-	
-	rz.ASMType = asmtmp.ksetvar
+	rz <~ L
+	|| op = rz.msg(@Opp, "=")
+	op.obj = scoperator.assigns
+	rz <~ R
+
+	rz.ASMType = ASMtmp.kSetVar
+
+
+function NewEqRel (|string| L, |String| R, |Message|)
+	opt norefcounts
+	return neweqrel(@thg+l, @thg+r)
 
 
 
@@ -450,11 +456,6 @@ function NewRel (|Message| L, |Message| R, |string| op, |Message|)
 	rz <~ (@Opp, op)
 	rz <~ R
 	
-function NewEqRel (|Message| L, |Message| R, |Message|)
-	opt norefcounts
-	rz = NewRel(l, r, "=")
-	rz.ASMType = ASMtmp.kSetVar
-
 
 function message.WrapWith (|syntax| f, |string| s="", |message|)
 	opt norefcounts

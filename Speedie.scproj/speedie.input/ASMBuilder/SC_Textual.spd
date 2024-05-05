@@ -18,34 +18,43 @@ extend ASMState
 
 		
 	function TryRotateConst (|int64| Value,  |message| where, |uint| reg,  |bool|)
-		|| Inv = value|uint64|.countbits > 32 
-			value = ~value
-		|| R = (~Value|uint64|).LongestBitStretch	// longest false-stretch
-		if r.x >= 50		// OK so we have the longest stretch in r.x
-			value = value rotl 63-r.y
-			.AddASM(asm.setk, where, reg, r.y, inv|int|, value|int|)
-			return true
 
 	
 	function NumToReg (|int64| V, |message| exp, |int| Reg)
-		if .TryRotateConst(v, exp, reg)
+		.AddASM(asm.setk, exp, reg, (V << 32) >> 32, V>>32)
+		.consts[reg] = v
+		
+	
+	function FatASM.FixConst
+		|| V = .r[1]|uint64| << 32
+		V |= 0
+		|| Inv = V|uint64|.countbits > 32 
+			V = ~V
+		|| R = (~V|uint64|).LongestBitStretch	// longest false-stretch
+		if r.x >= 50		// OK so we have the longest stretch in r.x
+			V = V rotl 63-r.y
+			.r[2] = inv|int|
+			.r[3] = V|int|
 			return
 
 		debugat
 		|| signed = (v < 0)|int|
 			v = ~v
 
-		|| µ = .AddASM(asm.setn, exp, reg, 0, signed, v|int|)
+		.op = asm.setn
+		.r[1] = 0
+		.r[2] = signed
+		.r[3] = v|int|
 		if v >= (1 << 48)
 			if v >= 64K
-				µ.op+=2
-				µ.r[3] = v >> 32
-				µ.R[4] = v & 0xFFFFffff
+				//.op = asm.setn2
+				.r[3] = v >> 32
+				.R[4] = v & 0xFFFFffff
 			  else
-				µ.op++
-				µ.r[3] = 0
-				µ.R[4] = v >> 32
-				µ.R[5] = v & 0xFFFFffff
+				//.op = asm.setn3
+				.r[3] = 0
+				.R[4] = v >> 32
+				.R[5] = v & 0xFFFFffff
 				
 			
 	function SetConst (|Message| List,  |message| Orig,  |bool|)

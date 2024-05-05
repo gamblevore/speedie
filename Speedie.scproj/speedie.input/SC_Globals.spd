@@ -1317,7 +1317,6 @@ function message.AndOrExpansionTest (|uint|)
 
 
 function TypeOfRel (ExprResolver) {
-	if exp.objectid == 8456160
 	|| LN = exp.first!
 	|| opch = ln.Next!
 	|| Comp = SCOperator.Lookup( opch )

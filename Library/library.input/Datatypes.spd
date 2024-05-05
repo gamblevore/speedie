@@ -29,6 +29,10 @@ datatype int
 	operator FTD (|uint| belf, |bool|)
 		return self and ((self&belf) == self)
 
+	function AsFloat (|float|)
+		|int[1]| abc = {self}
+		|| def = (&abc[0])|&float|
+		return def[0]
 
 	function IsKnown (|bool|)
 		pragma inline
@@ -308,7 +312,6 @@ datatype uint
 	operator dtf (|uint| belf, |bool|)
 		return self and ((self&belf) == belf)
 
-
 	operator max (|uint| other, |uint|)
 		if (self > other) { return self }
 		return other
@@ -525,9 +528,6 @@ datatype float
 		for n
 			rz = self pow rz
 
-	operator modf (|float| F, |float|)
-		cpp_wrapper (fmodf)
-
 	function vec2.operatorby (|float| step,  |FloatRange|)
 		rz.From = .x
 		rz.To = .y
@@ -555,9 +555,6 @@ datatype f64
 
 	syntax cast (|bool|)
 		return self|bool|
-	
-	operator modf (|f64| F, |f64|)
-		cpp_wrapper (fmod)
 	
 	function AsInt (|int64|)
 		|f64[1]| abc = {self}
