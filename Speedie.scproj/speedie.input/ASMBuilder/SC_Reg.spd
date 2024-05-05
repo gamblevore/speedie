@@ -14,6 +14,7 @@ datatype AsmReg (uint)
 	constants
 		|asmreg|
 		Set = 4
+		StayOpen		= (1 << 25)
 		Alternate		= (1 << 26)
 		Const			= (1 << 27)
 		Cond			= (1 << 28)
@@ -26,6 +27,27 @@ datatype AsmReg (uint)
 	
 	function Exists (|bool|)
 		return self|int|
+		
+	function FourBytes (|bool|)
+		pragma inline
+		return self|datatypecode|._shift == 2
+
+	function EightBytes (|bool|)
+		pragma inline
+		return self|datatypecode|._shift == 3
+
+	function IsFloat (|bool|)
+		pragma inline
+		return self|datatypecode|.isfloat
+
+	function IsInt (|bool|)
+		pragma inline
+		return self|datatypecode|.isfloat
+
+	function DivType (|int|)
+		|| FourBytes = .µtype._shift == 2
+			rz = 2
+		rz += !.signed
 	
 	function Signed (|bool|)
 		return self|DataTypeCode|.issigned

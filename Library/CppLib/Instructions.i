@@ -29,6 +29,10 @@
 ı SWAP: _
 	std_swap(r[SWAP_Au], r[SWAP_Bu]);
 	std_swap(r[SWAP_Cu], r[SWAP_Du]);
+ı PRNT: _
+	printf("%lli\n", i1);
+	// better to print this also as float/double/signed/unsigned...
+
 ı RARE: _
 	if_rare (Rare(r, Op)) return n3;
 ı CONV: _
@@ -182,23 +186,40 @@
 	//  copy/fill/endian/xor
 
 	MemStuff((u32 *) u1, (u32 *) u2, n3, L3);
+ı FADC: _
+	if (FloatIncr_Du) 
+	d1 += d2 + FloatIncr2(Op)
+;
+	else 
+	f1 += f2 + FloatIncr1(Op)
+;
 ı FADD: _
-	f1 = f2 + f3;
-ı FSUB: _
-	f1 = f2 - f3;
+	if (Float_Du) 
+	d1 = d2 + d3 - d4
+;
+	else 
+	f1 = f2 + f3 - f4
+;
 ı FMUL: _
-	f1 = (f2 * f3) + f4;
+	if (Float_Du) 
+	d1 = (d2 * d3) + d4
+;
+	else 
+	f1 = (f2 * f3) + f4
+;
 ı FDIV: _
-	f1 = f2 / f3;
-ı DADD: _
-	d1 = d2 + d3;
-ı DSUB: _
-	d1 = d2 - d3;
-ı DMUL: _
-	d1 = (d2 * d3) + d4;
-ı DDIV: _
-	d1 = d2 / d3;
-ı PRNT: _
-	printf("%lli\n", i1);
+	if (Float_Du) 
+	d1 = d2 / d3
+;
+	else 
+	f1 = f2 / f3
+;
+ı FFRC: _
+	if (Float_Du) 
+	d1 = (d2 - floor(d2)) * d3
+;
+	else 
+	f1 = (f2 - floor(f2)) * f3
+;
 ı 
 

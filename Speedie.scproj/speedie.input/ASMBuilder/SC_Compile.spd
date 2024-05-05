@@ -23,9 +23,21 @@ struct ASMState
 		for a in fn.Args
 			a.dreg = .DeclareMe(nil, a.RegType|asmreg|)
 
-
 	function Last (|&FatASM|)
 		return .curr-1
+	
+	syntax access (|asmreg| a, |&uint64|)
+		cpp_part GetConst, pragma inline
+		return .consts[a.reg]
+		
+	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |int| c, |int| d, |int| e, |&FatASM|)
+		pragma inline,  opt norefcounts,  cpp_part AddASM5
+		rz = self <~ (sm, dbg)
+		rz.r[0] = a
+		rz.r[1] = b
+		rz.r[2] = c
+		rz.r[3] = d
+		rz.r[4] = e
 		
 	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |int| c, |int| d, |&FatASM|)
 		pragma inline,  opt norefcounts,  cpp_part AddASM4
@@ -104,6 +116,13 @@ struct ASMState
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	
+	function NeedCond (|message| cond, |&fatasm|)
+		|| Where = .µ(cond, asmreg.Cond)
+		rz = .curr
+		if Where isnt cond
+			rz = .AddASM(asm.CMPN, cond, where)					// comparison against 0
+
+
 	function µ (|message| exp,  |AsmReg| Dest = asmreg(), |AsmReg|)
 		opt norefcounts
 		pragma inline
@@ -114,13 +133,19 @@ struct ASMState
 			if !T
 				fn = fn_asm_table[exp.func|int|]!
 				debugger
-			|| Found = (fn)(self, exp, dest)
+
+		if dest isnt StayOpen
+			|| OV = .OpenVars		
+			rz = (fn)(self, exp, dest)
+			.CloseVars(ov)
+		  else
+			rz = (fn)(self, exp, dest)
+		
+		target debug
 			|| dd = dest.reg
-			if dd and found.reg != dd
-				// its not about "being different"... but "did it allocate soemthing that it didnt need to"
+			if dd and rz.reg != dd
+				// its not about "being different"... but "did it allocate something that it didnt need to"
 				#!FFFFFFASSDJKLASDM<>AS
-			return found
-		return (fn)(self, exp, dest)
 
 
 	function Prm (|message| prm, |asmreg|)

@@ -87,6 +87,7 @@ extern "C" {
 		return rz;
 	}
     
+    
     u32 JB_uint_hash (u32 x) {
         x ^= x >> 16;
         x *= UINT32_C(0x7feb352d);

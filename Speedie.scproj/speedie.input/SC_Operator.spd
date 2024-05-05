@@ -26,6 +26,22 @@ datatype OpMode (uint)
 		ExactEquals = niltest + exactlyequals + equalornot + compare
 		ExactNotEquals = niltest + equalornot + compare
 		
+		
+	constants
+		Add
+		Sub
+		Mul
+		Div
+		Mod
+
+		Shl
+		Shr
+		BNt
+		BAn
+		BOr
+		Xor
+		
+		
 	syntax is (|OpMode| x, |bool|)
 		return (self & x) == x
 

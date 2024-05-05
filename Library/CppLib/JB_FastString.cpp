@@ -300,10 +300,10 @@ void JB_FS_AppendReplaceB(FastString* self, JB_String* Data, int From, int To) {
 
 uint8* JB__WriteIntToBuffer (uint8* wp, int64 LeftOver) {
     do {
-        int64 NewLeftOver = LeftOver / 10;
-        int64 ThisChar = LeftOver - (NewLeftOver * 10) + '0';
-        *--wp = (uint8)ThisChar;
-        LeftOver = NewLeftOver;
+		auto Div = std::div(LeftOver, (int64)10);
+
+        *--wp = (uint8)(Div.rem + '0');
+        LeftOver = Div.quot;
     } while (LeftOver);
     return wp;
 }

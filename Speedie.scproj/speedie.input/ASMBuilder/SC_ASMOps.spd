@@ -34,72 +34,100 @@ module asmOps
 
 
 	// MATH
-	function Plus   (fn_opasm)
-		.AddASM(asm.ADD, dbg, dest, L, R, 0)
-		if dest is const
-			|| T = dest.µtype
-			|| LL = &.consts[L.reg], || RR = &.consts[R.reg]
-			if !T.isfloat
-				*LL += *RR
-			  elseif t._shift == 2
-				*(LL|&float|) += *(RR|&float|)
-			  else
-				*(LL|&f64  |) += *(RR|&f64  |)
-			.consts[dest.reg] = *LL
-		return dest
-	function Minus  (fn_opasm)
-		.AddASM(asm.SUB, dbg, dest, L, R)
-		if dest is const
-			|| T = dest.µtype
-			|| LL = &.consts[L.reg], || RR = &.consts[R.reg]
-			if !T.isfloat
-				*LL -= *RR
-			  elseif t._shift == 2
-				*(LL|&float|) -= *(RR|&float|)
-			  else
-				*(LL|&f64  |) -= *(RR|&f64  |)
-			.consts[dest.reg] = *LL
-		return dest
-	function Mul    (fn_opasm)
-		.AddASM(asm.MUL, dbg, dest, L, R)
-		if dest is const
-			|| T = dest.µtype
-			|| LL = &.consts[L.reg], || RR = &.consts[R.reg]
-			if !T.isfloat
-				*LL *= *RR
-			  elseif t._shift == 2
-				*(LL|&float|) *= *(RR|&float|)
-			  else
-				*(LL|&f64  |) *= *(RR|&f64  |)
-			.consts[dest.reg] = *LL
-		return dest
-	function Div    (fn_opasm)
-		|| Alt = l is alternate
-			.AddASM(asm.div, dbg, dest, 0, L, R)
+	function asmstate.CanAddC (|asmreg| V, |int64| T, |bool|)
+		if (V is const) and v.isint
+			|| B = (t << 50)>>50
+			return B == t
+	
+	
+	function PlusInt     (fn_opasm)
+		|| LL = self[L][0], || RR = self[R][0]
+		// a - 1,  a + 1
+		// 1 - a,  1 + a
+		|| Addition = (l isnt alternate)
+		if !Addition
+			RR = -RR
+
+		if Addition and .CanAddC(L, LL)	// 1 + a
+			.AddASM(asm.ADDC, dbg, dest, R, LL)
+
+		  elseif .CanAddC(R, RR)			// a - 1, a + 1
+			.AddASM(asm.ADDC, dbg, dest, L, RR)
+
 		  else
-			.AddASM(asm.div, dbg, 0, dest, L, R)
+			|| OPP = (asm.ADD, asm.SUB)(Addition)
+			.AddASM(OPP, dbg, dest, L, R, 0)
 		
-		//|| x = 0.5 mod 0.1
 		if dest is const
-			|| T = dest.µtype
-			|| LL = &.consts[L.reg], || RR = &.consts[R.reg]
-			if !T.isfloat
-				if L.signed or R.signed
-					if alt
-						*(LL|&int64 |) /= *(RR|&int64 |)
-					  else
-						*(LL|&int64 |) mod= *(RR|&int64 |)
-				  else
-					if alt
-						*(LL|&uint64|) /= *(RR|&uint64|)
-					  else
-						*(LL|&uint64|) mod= *(RR|&uint64|)
-			  elseif t._shift == 2
-				*(LL|&float|) /= *(RR|&float|)
-			  else
-				*(LL|&f64  |) /= *(RR|&f64  |)
-			.consts[dest.reg] = *LL
+			return .doconsts(dest, L, R, opmode.add)
 		return dest
+
+		
+	function PlusFloat   (fn_opasm)
+		|| SubTract = (l is alternate)
+		|| Double = dest.EightBytes
+		|| F = .AddASM(asm.fADD, dbg, dest, l)
+		f.r[2+subtract] = r
+		f.r[4] = double|int|
+		
+		if dest is const
+			return .doconsts(dest, L, R, opmode.add+subtract)
+		return dest
+
+		
+	function Plus   (fn_opasm)
+		if !r.reg
+			return assign(self, dest, l, asmreg(), dbg)
+		if !l.reg and (l isnt alternate)
+			return assign(self, dest, R, asmreg(), dbg)
+		if l.isint
+			return PlusInt(self, dest, l, r, dbg)
+		return PlusFloat(self, dest, l, r, dbg)
+
+
+	function Minus  (fn_opasm)
+		(l is alternate) // the logic ismostly shared...
+		return plus(self, dest, l, r, dbg)
+
+	
+	function Mul    (fn_opasm)
+		if l.isint
+			.AddASM(asm.MUL , dbg, dest, L, R)
+		  else
+			.AddASM(asm.FMUL, dbg, dest, L, R).r[4] = l.eightbytes|int|
+		if dest is const
+			return .doconsts(dest, L, R, opmode.mul)
+		return dest
+	
+
+	function Div    (fn_opasm)
+		if dest.isint
+			return divint(self, dest, l, r, dbg)
+		return divfloat(self, dest, l, r, dbg)
+	
+	
+	function DivFloat    (fn_opasm)
+		|| big = dest.eightbytes|int|
+		.AddASM(asm.FDIV, dbg, dest, big, L, R)
+		|| Alt = l is alternate
+			.AddASM(asm.FFRC, dbg, dest, big, dest, R)
+		
+		if dest is const
+			return .doconsts(Dest, L, R, OpMode.div + alt)
+		return dest
+	
+	
+
+	function DivInt    (fn_opasm)
+		|| Fat = .AddASM(asm.div, dbg, 0, 0, L, R, dest.divtype)
+		|| Alt = l is alternate
+		fat.r[alt] = dest
+		
+		if dest is const
+			return .doconsts(dest, l, r, opmode.div + alt)
+		return dest
+	
+	
 	function Mod    (fn_opasm)
 		(l is Alternate)
 		return div(self, dest, l, r, dbg)
@@ -109,17 +137,17 @@ module asmOps
 	function BitAnd (fn_opasm)
 		.AddASM(asm.BAND, dbg, dest, L, R)
 		if dest is const
-			.consts[dest.reg] = .consts[L.reg] & .consts[R.reg]
+			return .doconsts(dest, l, r, opmode.ban)
 		return dest
 	function BitXor (fn_opasm)
 		.AddASM(asm.Bxor, dbg, dest, L, R)
 		if dest is const
-			.consts[dest.reg] = .consts[L.reg] xor .consts[R.reg]
+			return .doconsts(dest, l, r, opmode.xor)
 		return dest
 	function BitOr  (fn_opasm)
 		.AddASM(asm.bor,  dbg, dest, L, R)
 		if dest is const
-			.consts[dest.reg] = .consts[L.reg] ||| .consts[R.reg]
+			return .doconsts(dest, l, r, opmode.bor)
 		return dest
 	function ROL    (fn_opasm)
 		.AddASM(asm.brol, dbg, dest, L, R)
@@ -130,20 +158,14 @@ module asmOps
 	function SHR    (fn_opasm)
 		.AddASM(asm.SHRU, dbg, dest, L, R)
 		if dest is const
-			|| LL = .consts[L.reg], || RR = .consts[R.reg]
-			if dest.µtype.issigned
-				.consts[dest.reg] = LL| int64| >> RR|uint64|
-			  else
-				.consts[dest.reg] = LL|uint64| >> RR|uint64|
+			return .doconsts(dest, l, r, opmode.shr)
 		return dest
 	function SHL    (fn_opasm)
 		.AddASM(asm.SHLS, dbg, dest, L, R)
 		if dest is const
-			.consts[dest.reg] = .consts[L.reg] << .consts[R.reg]
+			return .doconsts(dest, l, r, opmode.shl)
 		return dest
 	function Assign (fn_opasm)
-		.AddASM(asm.bor,  dbg,  Dest,   L)
-		if dest is const
-			.consts[dest.reg] = .consts[L.reg]
-		return dest
+		debugat
+		return bitor(self, dest, l, asmreg(), dbg)
 

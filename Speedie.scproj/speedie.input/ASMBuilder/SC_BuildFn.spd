@@ -13,7 +13,6 @@ extend_module ASM
 
 
 	function TestASM 
-		.enc1
 		require options.ModePack
 		|| dev = app.pref("dev").int
 		if dev >= 2
@@ -39,15 +38,6 @@ function FatASM.Encode (|ASM|)
 	return (ASM.encoders[.op]!)(self)		
 
 	
-function @asm.Enc1
-	|FatASM| R
-	R.op = ASM.DSUB
-	R.r[0] = 3
-	R.r[1] = 2
-	R.r[2] = 1
-	r.r[3] = 0
-	|| oof = R.Encode
-
 
 function message.Reg (|asmreg|)
 	return .regornum(true)|int|.reg

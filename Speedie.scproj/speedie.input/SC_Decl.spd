@@ -1076,7 +1076,7 @@ function scdecl.VarSizeSub (|bool| TheVarItself, |int|)
 	opt norefcounts
 	|| n = Platform.PointerBytes
 	ifn .PointerCount or (TheVarItself and .isobject)
-		n = .type.CalculateSize
+		n = .type.Size
 	if .IsCArray
 		n *= .C_Array
 	return N

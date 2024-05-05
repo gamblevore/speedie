@@ -30,9 +30,7 @@ datatype int
 		return self and ((self&belf) == self)
 
 	function AsFloat (|float|)
-		|int[1]| abc = {self}
-		|| def = (&abc[0])|&float|
-		return def[0]
+		cpp_wrapper
 
 	function IsKnown (|bool|)
 		pragma inline
@@ -447,7 +445,7 @@ datatype float
 		cpp_wrapper (floorf)
 
 	function AsInt (|int|)
-		cpp_wrapper JB_f_AsInt
+		cpp_wrapper
 	
 	function Round (|float|)
 		cpp_wrapper (roundf)
@@ -557,9 +555,7 @@ datatype f64
 		return self|bool|
 	
 	function AsInt (|int64|)
-		|f64[1]| abc = {self}
-		|| def = (&abc[0])|&int64|
-		return def[0]
+		cpp_wrapper
 
 	function Floor (|f64|)
 		cpp_wrapper (floor)
@@ -662,9 +658,7 @@ datatype int64
 		return self & ((one<<n)-one)
 
 	function AsFloat (|f64|)
-		|int64[1]| abc = {self}
-		|| def = (&abc[0])|&f64|
-		return def[0]
+		cpp_wrapper
 	
 	render Hex
 		fs.appendhex(self)

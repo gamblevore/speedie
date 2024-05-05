@@ -212,9 +212,15 @@ extend ivec2
 		return (.x minus0 a.x, .y minus0 a.y)
 
 
+extend f64
+	function Negate (|bool|b, |f64|)
+		if (b)
+			return -self
+		return self
+
 
 extend float
-	function SetSign (|bool|b, |float|)
+	function Negate (|bool|b, |float|)
 		if (b)
 			return -self
 		return self

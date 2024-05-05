@@ -1,0 +1,120 @@
+
+
+function ASMState.DoConsts (|asmreg| D, |asmreg| L, |asmreg| R, |opmode| M, |asmreg|)
+	|| LL = self[L], || RR = self[R], || DD = self[D]
+	if l.isfloat
+		if l.fourbytes
+			return .DoF32Const(D, DD|&float|, LL|&float|, RR|&float|, M)
+		return .DoF64Const(D, DD|&f64|, LL|&f64|, RR|&f64|, M)
+			
+	if l.fourbytes
+		return .DoI32Const(D, DD|&int|, LL|&int|, RR|&int|, M)
+	return .DoI64Const(D, DD|&int64|, LL|&int64|, RR|&int64|, M)
+
+
+
+function asmstate.DoF32Const (|asmreg| D, |&float| DD, |&float| LL, |&float| RR, |opmode| M, |asmreg|)
+	|| LLL = *LL
+	|| RRR = *RR
+		
+	if 0
+		0
+	  elseif M == opmode.Add
+		LLL += RRR 
+	  elseif M == opmode.Sub
+		LLL -= RRR 
+	  elseif M == opmode.Mul
+		LLL *= RRR 
+	  elseif M == opmode.Div
+		LLL /= RRR 
+	  elseif M == opmode.Mod
+		(LLL mod= RRR)
+
+	*(DD|&uint64|) = 0 // clear high bits
+	if LLL.abs
+		*DD = LLL
+		return D
+	*DD = 0
+	return asmreg.const
+
+
+
+function asmstate.DoF64Const (|asmreg| D, |&f64| DD, |&f64| LL, |&f64| RR, |opmode| M, |asmreg|)
+	|| LLL = *LL
+	|| RRR = *RR
+		
+	if 0
+		0
+	  elseif M == opmode.Add
+		LLL += RRR 
+	  elseif M == opmode.Sub
+		LLL -= RRR 
+	  elseif M == opmode.Mul
+		LLL *= RRR 
+	  elseif M == opmode.Div
+		LLL /= RRR 
+	  elseif M == opmode.Mod
+		(LLL mod= RRR)
+
+	if LLL.abs
+		*DD = LLL
+		return D
+	*DD = 0
+	return asmreg.const
+
+
+
+function asmstate.DoI32Const (|asmreg| D, |&int| DD, |&int| LL, |&int| RR, |opmode| M, |asmreg|)
+	if M != opmode.div and opmode.mod
+		return .DoI64Const(D, DD|&int64|, LL|&int64|, RR|&int64|, M|opmode|)
+	|| LLL = *LL
+	|| RRR = *RR
+		
+	if M == opmode.Div
+		LLL /= RRR 
+	  elseif M == opmode.Mod
+		(LLL mod= RRR)		
+
+	*(DD|&uint64|) = 0 // clear high bits
+	*DD = LLL
+	if LLL
+		return D
+	return asmreg.const
+
+
+
+function asmstate.DoI64Const (|asmreg| D, |&int64| DD, |&int64| LL, |&int64| RR, |opmode| M, |asmreg|)
+	|| LLL = *LL
+	|| RRR = *RR
+		
+	if 0
+		0
+	  elseif M == opmode.Add
+		LLL += RRR 
+	  elseif M == opmode.Sub
+		LLL -= RRR 
+	  elseif M == opmode.Mul
+		LLL *= RRR 
+	  elseif M == opmode.Div
+		LLL /= RRR 
+	  elseif M == opmode.Mod
+		(LLL mod= RRR)
+	  elseif M == opmode.Shl
+		debugger, #!signed or not?
+		LLL >>= RRR
+	  elseif M == opmode.Shr
+		LLL <<= RRR
+	  elseif M == opmode.Bnt
+		LLL = ~LLL
+	  elseif M == opmode.Ban
+		LLL &= RRR
+	  elseif M == opmode.Xor
+		LLL ^= RRR
+		
+
+	*DD = LLL
+	if LLL
+		return D
+	return asmreg.const
+
+

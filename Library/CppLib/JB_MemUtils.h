@@ -56,13 +56,6 @@ inline int JB_Int_CountBits (int X) {
     return __builtin_popcount(X);
 }
 
-inline int JB_f_AsInt(float f) {
-    float* fp = &f;
-    int* ip = (int*)fp;
-    return *ip;
-}
-
-
 inline int JB_Int_Log2 (int X) {
     return 31- __builtin_clz(X);
 }

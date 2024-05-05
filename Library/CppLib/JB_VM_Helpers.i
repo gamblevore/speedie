@@ -31,8 +31,8 @@ AlwaysInline void DivMath(Register* r, ASM Op) {
 
 	switch (Div_Kindu & 3) { // so there are 4 possible divisions we can do
 	  case 0:
-		*pA = (s64)R3 % (s64)R4;
-		*pB = (s64)R3 / (s64)R4;
+		*pA = R3 % R4;
+		*pB = R3 / R4;
 		return;
 	  case 1:
 		*pA = (u64)R3 % (u64)R4;
@@ -51,11 +51,24 @@ AlwaysInline void DivMath(Register* r, ASM Op) {
 
 
 AlwaysInline void RotateConst (Register* r, ASM Op) {
-	int64 A = JB_u64_RotL(Const_Valueu, Const_rotu);
-	if (Const_invu)
+	int64 A = JB_u64_RotL(Const_Valueu, Const_Rotu);
+	if (Const_Invu)
 		A = ~A;
 	i1 = A;
 }
+
+
+float FloatIncr1 (ASM Op) {
+    uint f = (FloatIncr_Highu << 19);
+    return reinterpret_cast<float&>(f);
+}
+
+double FloatIncr2 (ASM Op) {
+    uint64 f = ((uint64)FloatIncr_Highu << 51);
+    return reinterpret_cast<double&>(f);
+}
+
+
 
 AlwaysInline ASM* LoadConst (Register* r, ASM Op, ASM* Code) {
 	uint64 Value = Setn_Valueu;
@@ -116,7 +129,7 @@ AlwaysInline uint bitstats32(Register* r, ASM Op) {
 	} else if (L == 2) {					// msb
 		return (uint)JB_u32_Log2(R2);
 	} else if (L == 3) {
-		s64 R3 = u3 + Const_rotu;
+		s64 R3 = u3 + Const_Rotu;
 		return JB_u32_RotL((u32)R2, (u32)R3);
 	}
 	return 0;

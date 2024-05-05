@@ -23,8 +23,7 @@ function DefineGetSub (|string| fname,  |int| up,  |int| down, |byte| c, |byte| 
 
 
 function DefineGet (|string| fname,  |int| up,  |int| down, |bool| last, |message|)
-	if last
-		.DefineGetSub(fname, up, down, 'i', ' ')
+	.DefineGetSub(fname, up, down, 'i', ' ')
 	.DefineGetSub(fname, up, down, 'u', 'u')
 	|[message]| arr
 	arr <~ @thg + fname

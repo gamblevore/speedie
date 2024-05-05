@@ -3,16 +3,8 @@
 dispatch fn_asm_table (fn_asm)
 	@arg:
 		opt norefcounts
-		|| M = asmreg.discard
-		if !mode
-			dest = m
-		|| OV = .OpenVars
 		for ch.fast in exp
-			if ch.islast
-				m = dest
-			dest = .µ(ch, M)
-		.CloseVars(OV)
-		return dest
+			.µ(ch, asmreg.discard)
 
 
 	@decl: // yay
@@ -98,41 +90,7 @@ dispatch fn_asm_table (fn_asm)
 
 
 
-// for some reason, replacing this will cause speedie to generate bad code
-// I guess I am setting the Flags somewhere, or testing them? but I can't see where.
-function Message.ASMType (|ASMTmp|)
-	rz = .FLAGS & 63
-
-function Message.ASMType (assigns:|ASMTmp|)
-	target debug: if .objectid == 0
-	value = (.FLAGS &~ 63) ||| value
-	.FLAGS = value 
-
-
-datatype ASMtmp (uint16)
-	syntax is (|asmtmp| t, |bool|)
-		return self == t
-
-	constants
-		|asmtmp| 
-		kElseIf = 48
-		kIf
-		kWhile
-		kContinue
-		kExit
-		kReturn
-		kRejoin
-		kSwap
-		kTern
-		kStatExpr
-		kSetVar
-		kPointer
-		kIgnore
-		kDebugger
-		kFail = 63
-	
-
-	module {
+extend_module ASMTmp {
 
 |asm_mem[10]| ReadASM
 |asm_mem[5]| WriteASM
@@ -155,13 +113,6 @@ function InitAccess
 function Debugger		(fn_asm)
 	.addasm(asm.TRAP, exp, 0)
 
-
-function asmstate.NeedCond (|message| cond, |&fatasm|)
-	|| Where = .µ(cond, asmreg.Cond)
-	rz = .curr
-	if Where isnt cond
-		rz = .AddASM(asm.CMPN, cond, where)					// comparison against 0
-
 	
 function If				(fn_asm)
 	opt norefcounts
@@ -169,8 +120,8 @@ function If				(fn_asm)
 	
 	|| cond = exp.first!
 	|| Start = .NeedCond(cond)
-	|| arg = cond.next
-	fn_asm_table_arg(self, arg)
+	|| arg = cond.next!
+	.µ(arg)
 	|| ElseIf = arg.next
 		if mode // what?
 		IF(self, elseif, asmreg(), 1)
@@ -205,7 +156,11 @@ function Continue		(fn_asm)
 	
 
 function StatExpr		(fn_asm)
-	return fn_asm_table_arg(self, exp, dest, 1)
+	opt norefcounts
+	for ch.fast in exp
+		if ch.islast
+			return .µ(ch, dest)
+		.µ(ch, asmreg.discard)
 
 
 function Tern			(fn_asm)
@@ -379,10 +334,43 @@ function Not		(fn_asm)
 	
 
 function ARel		(fn_asm)
-	return brel(self, exp, dest, 1)
+	|| Sub = exp.name.first == '-'
+	return Precrement(self, exp.first!, dest, 2 + Sub)
 	
 
-function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b
+function Minus			(fn_asm)					// -a
+	opt	NoRefCounts
+	|| Src = .µ(exp, dest)
+	dest = .tempme(exp, dest)
+	.AddASM(ASM.ADD, exp.parent!, dest, 0, 0, src)
+	
+	return dest
+
+
+function Precrement		(fn_asm)					// --a, ++a
+	opt	NoRefCounts
+	|| Src = .µ(exp, dest)							// src has the old value.
+	if (mode & 2)									// we want src.
+		dest = src
+	  else
+		dest = .TempMe(exp, dest)	
+	
+	|| D = exp.FastDecl
+	|| Incr = (D.DeclSize, 1)(D.typesuffers)
+	if mode & 1
+		Incr = -Incr
+
+	if dest.isfloat
+		.AddASM(ASM.FADC, exp.parent!, dest, src, incr)
+	  else
+		.AddASM(ASM.ADDC, exp.parent!, dest, src, incr)
+	if d isnt local
+		.µ(exp, dest.set)							// write it back again
+	
+	return dest
+	
+	
+function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 	opt	NoRefCounts
 	|| n = exp.name.first
 	|| F = exp.first!
@@ -391,22 +379,11 @@ function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b
 	if n == '!'
 		return Not(self, F, dest)
 
-	|| Src = .µ(F, dest)							// src has the old value.
-	if (mode == 1)									// we want src.
-		dest = src
-	  else
-		dest = .TempMe(exp, dest)	
-		
-	|| D = F.FastDecl
-	|| Incr = (D.DeclSize, 1)(D.typesuffers)
-	if n == '-'
-		Incr = -Incr
+	if exp.name == 1								// -a
+		return Minus(Self, f, dest)
 	
-	.AddASM(ASM.ADDC, exp, dest, src, incr)
-	if d isnt local
-		.µ(F, dest.set)								// write it back again
-	
-	return dest
+	|| Sub = n == '-'
+	return Precrement(self, F, dest, Sub|int|)
 
 
 
@@ -417,8 +394,8 @@ function DoMath (fn_asm)
 	|| op = F.next!
 
 	|| OV = .OpenVars
-	|| ml = .µ(F)
-	|| mr = .µ(op.next!)
+	|| ml = .µ(F, 		 asmreg.StayOpen)
+	|| mr = .µ(op.next!, asmreg.StayOpen)
 	.CloseVars(OV)
 
 	dest = .tempme(op, dest) 

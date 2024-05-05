@@ -4,10 +4,10 @@
 // vm.box
 forms
 	U0:
-	U1: r1 r
-	U2: r1 r,  r2 r
-	U3: r1 r,  r2 r,  r3 r
-	U4: r1 r,  r2 r,  r3 r,  r4 r
+	U1:		r1 r
+	U2:		r1 r,  r2 r
+	U3:		r1 r,  r2 r,  r3 r
+	U4:		r1 r,  r2 r,  r3 r,  r4 r
 
 
 	Func	// func: fnc:
@@ -33,8 +33,8 @@ forms
 
 	Const	// const:
 		r1		r
-		rot		6
-		inv		1
+		Rot		6
+		Inv		1
 		Value	12
 	
 	Bra		// bra:
@@ -103,13 +103,22 @@ forms
 		Func	1		// what about breaking if the func hits a certain level?
 		Signal  1		// signal, breakpoint
 
+	Float:		r1 r,  r2 r,  r3 r,  r4 r,  D  1
+
+	FloatIncr
+		r1		r
+		r2		r
+		D		1
+		High	13
+
 
 // this file:
 // 1) builds the c++ codes, and the jump-table, and the ASM accessor functions
 // 2) builds the instruction-info speedie uses exec can just include this file too.
 // 3) builds the µforms
 
- 
+
+
 #!						 (((((STOP)))))
 EROR (U1)
 	// all 0000 means no-op
@@ -121,6 +130,8 @@ TRAP (Trap)
 		JB_App__SelfSignal(Trap_Lu)
 	else if (!Trap_Funcu)
 		debugger
+
+
 
 #!						 (((((FUNC)))))
 
@@ -150,11 +161,16 @@ SWAP (Swap)
 	std_swap(r[SWAP_Cu], r[SWAP_Du])
 	
 
+
 #!						 (((((Utils)))))
+PRNT (U1)
+	printf("%lli\n", i1)
+	#!better to print this also as float/double/signed/unsigned...
 RARE (U2)
 	if_rare (Rare(r, Op)) return n3
 CONV (U3)
 	Conv(r, n2, Op)
+
 
 
 #!						 (((((Consts)))))
@@ -162,6 +178,7 @@ SETK (Const)
 	RotateConst(r, Op)
 SETN (setn)//, 1, 2, 3)			// OK
 	LoadConst(r, Op, Code)
+
 
 
 #!						 (((((Math)))))
@@ -175,6 +192,7 @@ MUL  (U4)
 	i1 = (i2 * i3) + i4
 DIV  (Div)
 	DivMath(r, Op)
+
 
 
 #!						 (((((Bitops)))))
@@ -207,6 +225,8 @@ BROL  (U3)
 	i1 = JB_u64_RotL(u2, u3 + L3)
 BROR  (U3)
 	i1 = JB_u64_RotR(u2, u3 + L3)
+
+
 
 #!						 (((((Branches)))))
 JUMP (U0)
@@ -253,8 +273,8 @@ LUPD  ("rrj")			 	// same
 	___
 
 
-#!						 (((((Refs)))))
 
+#!						 (((((Refs)))))
 RSDE  ("rrrj")
 	__
 	Code += U3_Li
@@ -271,11 +291,12 @@ RALO  (U2)
 	o1 = alloc(o2)
 	#!should call constructor too.
 
-	
+
+
 #!						(((((Memory)))))
 TABL  (U2)
 	u1 = table(u2, L2)
-RD1U  (mem)				// OKALL
+RD1U  (mem)
 	u1 = mem(uint8)
 	mem2(uint8)
 RD1S  (mem)
@@ -324,21 +345,33 @@ MEMM  ("rrnl")
 
 
 #!						(((((Float)))))
-FADD  (U3)
-	f1 = f2 + f3
-FSUB  (U3)
-	f1 = f2 - f3
-FMUL  (U4)
-	f1 = (f2 * f3)+f4
-FDIV  (U3)
-	f1 = f2 / f3
-DADD  (U3)
-	d1 = d2 + d3
-DSUB  (U3)
-	d1 = d2 - d3
-DMUL  (U4)
-	d1 = (d2 * d3) + d4
-DDIV  (U3)
-	d1 = d2 / d3
-PRNT (U1)
-	printf("%lli\n", i1)
+FADC (FloatIncr)
+	// we just want simple things like MyFloat += 2.0
+	if (FloatIncr_Du)
+		d1 += d2 + FloatIncr2(Op)
+	else
+		f1 += f2 + FloatIncr1(Op)
+
+FADD  (Float)
+	if (Float_Du)
+		d1 = d2 + d3 - d4
+	else
+		f1 = f2 + f3 - f4
+
+FMUL  (Float)
+	if (Float_Du)
+		d1 = (d2 * d3)+d4
+	else
+		f1 = (f2 * f3)+f4
+
+FDIV  (Float)
+	if (Float_Du)
+		d1 = d2 / d3
+	else
+		f1 = f2 / f3
+
+FFRC  (Float)
+	if (Float_Du)
+		d1 = (d2 - floor(d2)) * d3
+	else
+		f1 = (f2 - floor(f2)) * f3

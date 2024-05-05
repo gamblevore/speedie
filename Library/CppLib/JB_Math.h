@@ -14,6 +14,23 @@ extern "C" {
     double JB_Pow0_1(int x);
     u32 JB_uint_unhash (u32 x);
     u64 JB_uint64_hash (u64 x);
+    
+
+	inline double JB_int64_AsFloat(int64 Self) {
+		return reinterpret_cast<double&>(Self);	
+	}
+
+	inline float JB_int_AsFloat(int Self) {
+		return reinterpret_cast<float&>(Self);	
+	}
+
+	inline int JB_f_AsInt(float Self) {
+		return reinterpret_cast<int&>(Self);	
+	}
+
+	inline int64 JB_dbl_AsInt(double Self) {
+		return reinterpret_cast<int64&>(Self);	
+	}
      
     inline float JB_f__max () {
         return __FLT_MAX__;
