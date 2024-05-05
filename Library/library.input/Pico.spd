@@ -105,7 +105,7 @@ struct Pico
 			if rz
 				rz.CompleteExec
 
-		function Conf (|&PicoGlobalConfig|)
+		function GlobalConfig (|&PicoGlobalConfig|)
 			cpp_wrapper PicoGlobalConf
 			
 		function SleepForSend (|float| During=5.0, |float| After = 0.5)
@@ -122,7 +122,6 @@ struct Pico
 			.destroy(where, "replace")
 			*where = new
 			return true
-
 
 		function HasParentSocket (|bool|)
 			cpp_wrapper PicoHasParentSocket
@@ -152,13 +151,15 @@ struct PicoConfig
 	|int|						ReadFailCount
 	|int|						QueueBytesRemaining
 	|int|						Bits
+	|&PicoGlobalConfig|			Realm
 
 
 struct PicoGlobalConfig
 	linkage: wrapper
+	|cstring| 					Name
 	|Date|						LastActivity
 	|Date|						TimeOut
-	|int|						TimeOutExitCode
+	|int|						ExitCode
 	|int|						DesiredThreadCount
 	|bool|						SuicideIfParentDies
 	

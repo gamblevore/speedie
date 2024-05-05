@@ -98,7 +98,7 @@ s64 JB_ASM_Run(u32* Code, u32 CodeLength) {
 }
 
 #else
-s64* JB_ASM_ClearRegisters(jb_vm* V, int i) {
+ivec4* JB_ASM_Registers(jb_vm* V, bool i) {
 	return 0;
 }
 jb_vm* JB_ASM_VM() {

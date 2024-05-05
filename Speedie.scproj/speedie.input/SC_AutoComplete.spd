@@ -66,7 +66,10 @@ function EnterAutoComplete (|bool|)
 	app.ClearCaches
 	if options.PrintLibraries
 		perry.pico.config.noise = -1
-	pico.Conf.TimeOut = 30s
+
+	|| Realm = pico.GlobalConfig
+	Realm.TimeOut = 30s
+	realm.Name = "Speedie"
 	compiler.InPerry = true
 	.PerryTalk(perry)
 	"ExitingCommands"						// this also

@@ -32,23 +32,28 @@
 typedef int64_t	PicoDate;  // 16 bits for small stuff
 
 struct			PicoComms;
+struct			PicoGlobalConfig;
 struct			PicoMessage { char* Data; int Length;   operator bool () {return Data;}; };
 
 struct 			PicoConfig  {
-	const char* Name;			/// Used for reporting events to stdout.
-	PicoDate	LastRead;		/// The date of the last Read. This is a signed 64-bit number. The lower 16-bits used for sub-second resolution, and the upper 47-bits are for seconds. 1 bit used for the sign.
-	PicoDate	LastSend;		/// The date of the last send.
-	int 		Noise;			/// How much printing to stdout that PicoMsg does. Anything from PicoSilent to PicoNoiseAll.
-	float		SendTimeOut;	/// The number of seconds before a send will timeout (if the send is not instant)
-	int			SendFailCount;	/// How many time sending failed.
-	int			ReadFailCount;	/// How many times reading failed.
-	int			QueueSize;		/// The allowed combined-size for unread messages. There is no hard limit. 8MB default.
-	int			Bits;			// The buffer-size in 1<<Bits. must be set before calling `PicoStart...()`
+  const char* 		Name;			/// Used for reporting events to stdout.
+  PicoDate			LastRead;		/// The date of the last Read. This is a signed 64-bit number. The lower 16-bits used for sub-second resolution, and the upper 47-bits are for seconds. 1 bit used for the sign.
+  PicoDate			LastSend;		/// The date of the last send.
+  int 				Noise;			/// How much printing to stdout that PicoMsg does. Anything from PicoSilent to PicoNoiseAll.
+  float				SendTimeOut;	/// The number of seconds before a send will timeout (if the send is not instant)
+  int				SendFailCount;	/// How many time sending failed.
+  int				ReadFailCount;	/// How many times reading failed.
+  int				QueueSize;		/// The allowed combined-size for unread messages. There is no hard limit. 8MB default.
+  int				Bits;			/// The buffer-size in 1<<Bits. Set before calling `PicoStart...()`
+  PicoGlobalConfig*	Realm;
 };
 
 
 struct PicoGlobalConfig {
 ///
+	const char*				Name;  
+// Just for debug.
+
 	PicoDate				TimeOut;
 /// Quits the app, if the app doesn't receive a "keep alive" signal for too long.
 /// Set TimeOut to zero, to remove the self-quit ability.
@@ -333,6 +338,7 @@ struct PicoComms {
 		QueueTail = &QueueHead;
 		Conf.Noise = noise;
 		Conf.SendTimeOut = 10.0f;
+		Conf.Realm = &pico_global_conf;
 
 		int B = 31 - __builtin_clz(Size);
 		if (B < 10) B = 10;
@@ -522,6 +528,7 @@ struct PicoComms {
 		pthread_t T = 0;   ;;;/*_*/;;;   // creeping upwards!!
 		auto D = (PicoThreadData*)malloc(sizeof(PicoThreadData));
 		D->C = C; D->fn = fn; D->Self = Self; D->Args = Args;
+		auto &G = pico_global_conf;
 		if (!pthread_create(&T, nullptr, pico_thread_wrapper, D) and !pthread_detach(T))
 			return true;
 		C->Destroy("ThreadFailed");
@@ -531,7 +538,7 @@ struct PicoComms {
 
 	bool queue_sub (const char* msg, int n) {
 		if (!Sending or !Sending->AppendMsg(msg, n)) return false;
-		if (Socket == -1) Conf.LastSend = PicoDate();
+		if (Socket == -1) Conf.LastSend = PicoGetDate();
 		return true;
 	}
 
@@ -540,11 +547,12 @@ struct PicoComms {
 		if (!Reading->WorkerThread.enter()) return;
 		if (Socket < 0) // memory only
 			while (acquire_msg()) {;}
-		  else
+		  else 
 			while ( auto Msg = Reading->AskUnused() ) {
 				if (HalfClosed&1) break; 
 				int Amount = (int)recv(Socket, Msg.Data, Msg.Length, MSG_NOSIGNAL|MSG_DONTWAIT);
 				if (Amount > 0) {
+					pico_timeout_count = 0; // reset
 					Reading->gained(Amount);
 					if (CanSayDebug()) Say("|recv|", "", Amount);
 					while (acquire_msg()) {;}
@@ -597,7 +605,7 @@ struct PicoComms {
 			L = LengthBuff = ntohl(LengthBuff); 
 		}
 		
-		pico_last_read = PicoDate();
+		pico_last_read = PicoGetDate();
 		if (L <= 0)
 			return L < 0 and failed(EILSEQ);
 
@@ -753,11 +761,8 @@ static bool pico_try_exit () {
 	if (!pico_global_conf.TimeOut)
 		return false;
 
-	if (!pico_last_read)
-		return false;
-
 	PicoDate MaxTime = pico_global_conf.TimeOut + pico_last_read;
-	auto D = PicoDate();
+	auto D = PicoGetDate();
 	if (MaxTime >= D)
 		return false;
 
@@ -766,7 +771,8 @@ static bool pico_try_exit () {
 		return true;
 	}
 	
-	pico_last_read = D - (pico_global_conf.TimeOut + 64*1024);
+//	puts("Pico: TimeOut");
+	pico_last_read = D - (pico_global_conf.TimeOut - 163840); // over 30 seconds
 	return false;
 }
 
@@ -801,13 +807,23 @@ static void pico_keep_sending () {
 
 
 static void* pico_worker (void* Dummy) {
-	int p = pico_thread_count++;
-	pico_global_conf.LastActivity = PicoGetDate(); // get to work!
+	char PicoName[] = {'P','i','c','o','W','o','r','k','e','r','0','0',0};
+	int p = ++pico_thread_count;
+	PicoName[10] += p / 10;
+	PicoName[11] += p % 10;
+#if __APPLE__
+	pthread_setname_np(PicoName); // why?
+#else
+	pthread_setname_np(pthread_self(), PicoName);
+#endif 
+
+	auto &G = pico_global_conf; // for debug
+	G.LastActivity = PicoGetDate(); // get to work!
 	while (true) {
 		pico_work_comms(); pico_work_comms(); pico_work_comms();
-		if (!p) {
+		if (p == 1) {
 			if (pico_try_exit())
-				exit(pico_global_conf.ExitCode);
+				exit(G.ExitCode);
 			pico_cleanup();
 		}
 	}
@@ -921,6 +937,9 @@ extern "C" bool PicoStart () _pico_code_ (
 		pico_at_exit_done = true;
 		atexit(pico_keep_sending);
 	}
+
+	if (!pico_last_read)
+		pico_last_read = PicoGetDate();
 
 	int N = std::clamp(pico_global_conf.DesiredThreadCount, 1, 6);
 	pthread_t T = 0;   ;;;/*_*/;;;   // creeping downwards!!

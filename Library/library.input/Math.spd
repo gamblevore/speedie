@@ -213,14 +213,14 @@ extend ivec2
 
 
 extend f64
-	function Negate (|bool|b, |f64|)
+	function Negate (|bool| b, |f64|)
 		if (b)
 			return -self
 		return self
 
 
 extend float
-	function Negate (|bool|b, |float|)
+	function Negate (|bool| b, |float|)
 		if (b)
 			return -self
 		return self
@@ -339,10 +339,6 @@ function int.Towards (|int| Dest, |int| N, |int|)
 		if (self >= dest)
 			return dest
 	return self
-
-
-function float.Multiplyy (|bool| b, |float| mul, |float|)
-	disabled "use .mul instead"
 
 	
 function float.Mul (|float| by, |bool| Cond, |float|)

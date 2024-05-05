@@ -229,9 +229,9 @@ function Input (|string|)
 	cpp_Wrapper JB_App__Readline
 
 function IsMainThread (|bool|)
-	return !.IsntMainThread
+	return !.IsThreadedAsLib
 
-helper IsntMainThread (|bool|)
+helper IsThreadedAsLib (|bool|)
 	cpp_wrapper JB_LibIsThreaded
 	
 helper ParentID (|pid_int|)

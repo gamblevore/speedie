@@ -331,7 +331,7 @@ function Not		(fn_asm)
 	opt	NoRefCounts
 	
 	if dest is cond // if !x
-		// use compeq... can encode as bra/jump if it needs
+		// use compe... can encode as bra/jump if it needs
 
 
 	// y = !x
@@ -356,20 +356,6 @@ function Minus			(fn_asm)					// -a
 	return asmops.minus(self, dest, asmreg(), src, exp)
 
 
-function AddFloat	(|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| src, |int| Incr)
-	|| big = dest.fourbytes
-
-/*
-		r1		r
-		r2		r
-		D		1
-		High	13
-*/
-
-	incr = (127 + ((incr==1)<<7))
-	.AddASM(ASM.FADC, exp.parent!, dest, src, big|int|, incr<<5)
-
-
 function Precrement		(fn_asm)					// --a, ++a
 	opt	NoRefCounts
 	|| Src = .µ(exp, dest)							// src has the old value.
@@ -383,8 +369,14 @@ function Precrement		(fn_asm)					// --a, ++a
 	if mode & 1
 		Incr = -Incr
 
+	/*		r1		r
+			r2		r
+			D		1
+			High	13		*/
 	if dest.isfloat
-		AddFloat(self, exp, dest, src, incr)
+		|| big = dest.fourbytes
+		incr = (127 + ((incr==1)<<7))
+		.AddASM(ASM.FADC, exp.parent!, dest, src, big|int|, incr<<5)
 	  else
 		.AddASM(ASM.ADDC, exp.parent!, dest, src, incr)
 	if d isnt local

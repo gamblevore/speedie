@@ -25,7 +25,7 @@ class SpdProcess (Process)
 		.output = (faststring(), nil)(.Mode is CaptureStdOut)
 		.erroroutput = (faststring(), nil)(.mode is CaptureOrPrintErrors)
 		.writer = FastString()
-		.pico = pico // (pico.new(path), pico.parent)(.WeAreParent)
+		.pico = pico
 
 			
 	destructor

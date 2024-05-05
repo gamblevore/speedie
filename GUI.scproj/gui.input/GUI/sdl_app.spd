@@ -347,7 +347,7 @@ module SDLApp
 	
 	
 	function Init (|ivec2| s=(414,256)) // startup
-		pico.conf.SuicideIfParentDies = false
+		pico.GlobalConfig.SuicideIfParentDies = false
 		pico.start
 		target !gui
 			disabled `Put "targets gui" in the app's conf section to use this!`
