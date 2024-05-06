@@ -138,7 +138,7 @@ function FilterCppsIfAlreadyDone (|[string]| List,  |File| Objects,  |[File]|)
 	for Cpp in List
 		|| reason = .NeedNewObjForSrc(cpp, objects) 
 			rz <~ Cpp.File
-	if rz
+	if rz and Options.PrintCompileString
 		print "// "
 		printline rz
 
@@ -347,7 +347,7 @@ function TestNewestLib (|file| cpplib)
 	for s.files in cpplib
 		if s.visible and !s.IsDir
 			(LatestLibDate max= s.Modified)
-	printline LatestLibDate.LocalTime
+//	printline LatestLibDate.LocalTime
 	
 
 function RunCppCompile
