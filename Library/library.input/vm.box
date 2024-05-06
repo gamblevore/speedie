@@ -194,7 +194,7 @@ SETN (setn)//, 1, 2, 3)			// OK
 
 
 #!						 (((((Math)))))
-ADDC ("rrnl")
+ADDK ("rrnl")
 	i1  =  i2 + U2_Li
 ADD  (U3)
 	i1  =  i2 + (i3 << L3) // only need 6 bits for shift! can we save 3 conditional add?
@@ -359,7 +359,7 @@ MEMM  ("rrnl")
 
 
 #!						(((((Float)))))
-FADC (FloatIncr)
+FADK (FloatIncr)
 	// we just want simple things like MyFloat += 2.0
 	if (FloatIncr_Du)
 		d1 += d2 + FloatIncr2(Op)

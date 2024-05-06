@@ -1584,6 +1584,7 @@ extern Array* SC__Ext_Cleanup;
 extern int SC__Ext_CompilingLibFiles;
 extern JB_String* SC__Ext_CppCompilerPath;
 extern Array* SC__Ext_FoundObjects;
+extern Date SC__Ext_LatestLibDate;
 extern Array* SC__TreeAssembler_PackFuncs;
 extern Message* SC__VM_Builder_dt_prm;
 extern FastString* SC__VM_Builder_form_h;
@@ -1805,7 +1806,7 @@ extern Random JB__zalgo_R;
 #define kJB__uint16_min (0)
 #define kJB__uint64_max (-1)
 #define kSC__ASM_ADD (25)
-#define kSC__ASM_ADDC (24)
+#define kSC__ASM_ADDK (24)
 #define kSC__ASM_BAND (32)
 #define kSC__ASM_BCMP (40)
 #define kSC__ASM_BFLG (36)
@@ -1826,8 +1827,8 @@ extern Random JB__zalgo_R;
 #define kSC__ASM_DIV (28)
 extern ASM_Encoder2 SC__ASM_Encoders[256];
 #define kSC__ASM_EROR (0)
-#define kSC__ASM_FADC (69)
 #define kSC__ASM_FADD (70)
+#define kSC__ASM_FADK (69)
 #define kSC__ASM_FDIV (72)
 #define kSC__ASM_FFRC (73)
 #define kSC__ASM_FMUL (71)
@@ -1995,6 +1996,7 @@ extern Dictionary* JB__TC_Types_Dict;
 #define kJB__TC_Vec2 (1 + (32 + (64 + (128 + 8))))
 #define kJB__TC_Vec3 (2 + (32 + (64 + (128 + 8))))
 #define kJB__TC_Vec4 (3 + (32 + (64 + (128 + 8))))
+#define kJB__Date_Highest (9223372036854775807)
 #define kJB__Date_kOneStep (0.000015258789f)
 #define kJB__Date_kSecondsPerDay (86400)
 #define kJB__Date_kSecondsPerMonthApprox (2628000)
@@ -3265,9 +3267,9 @@ void SC_Ext__ClearThis();
 
 bool SC_Ext__CollectAndCompile(JB_File* Input, JB_String* Output);
 
-Array* SC_Ext__CollectCppsInto(JB_File* Fol, JB_File* Objects, int* Stdafx);
+Array* SC_Ext__CollectCppsInto(JB_File* Fol, JB_File* Objects);
 
-void SC_Ext__CollectPico();
+void SC_Ext__CollectPico(JB_String* Lib);
 
 JB_File* SC_Ext__CppLib();
 
@@ -3277,7 +3279,7 @@ bool SC_Ext__ExecuteGCC(Array* Commands);
 
 void SC_Ext__ExportAndInstall(bool CanInstall);
 
-Array* SC_Ext__FilterCppsIfAlreadyDone(Array* Cpps, JB_File* Objects, int* Stdafx);
+Array* SC_Ext__FilterCppsIfAlreadyDone(Array* List, JB_File* Objects);
 
 bool SC_Ext__HasType(Array* CppList, JB_String* Type);
 
@@ -3324,6 +3326,8 @@ void SC_Ext__SayTest(JB_String* N);
 bool SC_Ext__ShouldTransComp();
 
 bool SC_Ext__TestNewCompiler();
+
+void SC_Ext__TestNewestLib(JB_File* Cpplib);
 
 JB_String* SC_Ext__TmpBase(JB_String* V);
 
@@ -4537,6 +4541,8 @@ Date JB_Date_Ago(Date Self);
 int JB_Date_DayOfWeek(Date Self);
 
 int64 JB_Date_Days(Date Self);
+
+JB_String* JB_Date_LocalTime(Date Self, FastString* Fs_in);
 
 JB_String* JB_Date_RenderDurr(Date Self, FastString* Fs_in);
 

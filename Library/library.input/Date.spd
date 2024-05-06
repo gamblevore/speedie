@@ -19,6 +19,7 @@ datatype Date (int64)
 	
 	
 	constants
+		Highest = 0x7FFFffffFFFFffff_
 		kOneStep = 0.000015258789 // 1.0 / 64.0K
 		kSecondsPerDay = 86400
 		kSecondsPerWeek = 604800

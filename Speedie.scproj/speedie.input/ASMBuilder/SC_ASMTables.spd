@@ -271,7 +271,7 @@ function Dot		(fn_asm)						// a.b
 	if !pos // what?
 	|| WantAddr = dest is positionrequest
 	if WantAddr or pos >= 128						// oof
-		.AddASM(asm.ADDC, exp, dest, obj, pos)
+		.AddASM(asm.ADDK, exp, dest, obj, pos)
 		if WantAddr
 			return dest
 		pos = 0
@@ -374,11 +374,15 @@ function Precrement		(fn_asm)					// --a, ++a
 			D		1
 			High	13		*/
 	if dest.isfloat
+		incr = (incr == 1)|int|
 		|| big = dest.fourbytes
-		incr = (127 + ((incr==1)<<7))
-		.AddASM(ASM.FADC, exp.parent!, dest, src, big|int|, incr<<5)
+			incr =  127 + (incr<<7)
+		  else
+			incr = 1023 + (incr<<10)
+		
+		.AddASM(ASM.FADK, exp.parent!, dest, src, big|int|, incr<<5)
 	  else
-		.AddASM(ASM.ADDC, exp.parent!, dest, src, incr)
+		.AddASM(ASM.ADDK, exp.parent!, dest, src, incr)
 	if d isnt local
 		.µ(exp, dest.set)							// write it back again
 	

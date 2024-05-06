@@ -49,10 +49,10 @@ module asmOps
 			RR = -RR
 
 		if Addition and .CanAddC(L, LL)	// 1 + a
-			.AddASM(asm.ADDC, dbg, dest, R, LL)
+			.AddASM(asm.ADDK, dbg, dest, R, LL)
 
 		  elseif .CanAddC(R, RR)			// a - 1, a + 1
-			.AddASM(asm.ADDC, dbg, dest, L, RR)
+			.AddASM(asm.ADDK, dbg, dest, L, RR)
 
 		  else
 			|| OPP = (asm.ADD, asm.SUB)(Addition)

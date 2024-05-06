@@ -41,7 +41,7 @@
 	RotateConst(r, Op);
 ı SETN: _
 	LoadConst(r, Op, Code);
-ı ADDC: _
+ı ADDK: _
 	i1 = i2 + U2_Li;
 ı ADD: _
 	i1 = i2 + (i3 << L3);
@@ -189,7 +189,7 @@
 	//  copy/fill/endian/xor
 
 	MemStuff((u32 *) u1, (u32 *) u2, n3, L3);
-ı FADC: _
+ı FADK: _
 	if (FloatIncr_Du) 
 	d1 += d2 + FloatIncr2(Op)
 ;

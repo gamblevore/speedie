@@ -11,6 +11,7 @@ linkage:cpp_part Ext
 |[File]|		Cleanup
 |int| 			CompilingLibFiles
 |string| 		CppCompilerPath = "/usr/bin/g++"
+|date|			LatestLibDate = date.highest
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -50,6 +51,7 @@ function ProductSuffix (|String|)
 
 function compiler.ProductFile (|File|)
 	return .ProductPath.file
+
 
 function compiler.ProductPath (|string|)
 	if options.output_path
@@ -92,21 +94,26 @@ function AllowedThisFile (|string| name, |bool|)
 		return false
 	return true
 
+
 function CanCompile ( |string| name, |bool| )
 	return name.ext.isclike and .AllowedThisFile(name)
 
 
 function string.isCLike (|bool|)
+	if self ~= "cpp"
+		return true
 	if platform.osx
-		return (self ~= "cpp" or "m" or "mm") // mm gets wierd errors that cpp doesnt?
-	  else
-		return (self ~= "cpp") // mm gets wierd errors that cpp doesnt?
+		return (self ~= "m" or "mm") // mm gets wierd errors that cpp doesnt?
 
 
-function NoGoodObject ( |string| Cpp, |File| h, |File| o, |int| )
-	if (h.exists) and (h IsNewerThan o):	return 4 // most important
-	ifn o.exists:							return 1
-	if Cpp.file IsNewerThan o
+function NoGoodObject ( |string| Cpp,  |File| h,  |File| o,  |int| )
+	if (h.exists and h isnewerthan o)
+		return 4
+	if !o.exists
+		return 1
+	|| cpd = cpp.file.Modified
+	|| od = o.Modified
+	if cpd > od or LatestLibDate > od 
 		return 2
 
  
@@ -118,7 +125,7 @@ function NeedNewObjForSrc ( |string| cpp, |file| objects, |int| )
 	require ! (!(SC_Targets..gui or linkage.interpreter) and cpp contains "/JB_OSX.")  // should be "JB_Native.o"
 
 	|| name		= cpp.name
-	|| Prefix	= name.trimextandpath
+	|| Prefix	= name.TrimExtAndPath
 	|| h		= cpp.Sibling(Prefix + ".h").file
 	|| o		= Objects[Prefix + ".o"]!
 	.FoundObjects <~ o
@@ -127,29 +134,36 @@ function NeedNewObjForSrc ( |string| cpp, |file| objects, |int| )
 
 
 
-function FilterCppsIfAlreadyDone (|[string]| Cpps,  |File| Objects,  |?&int| stdafx,  |[File]|)
-	|| wierd = cpp_export.CppProduct
-	for Cpp in Cpps
+function FilterCppsIfAlreadyDone (|[string]| List,  |File| Objects,  |[File]|)
+	for Cpp in List
 		|| reason = .NeedNewObjForSrc(cpp, objects) 
 			rz <~ Cpp.File
-			if (reason == 4) and stdafx
-				*stdafx = 1
+	if rz
+		print "// "
+		printline rz
 
 
-function CollectCppsInto ( |File| Fol,  |File| Objects, |?&int| stdafx, |[File]| )
+function CollectCppsInto ( |File| Fol,  |File| Objects, |[File]| )
 	|[string]| Cpps
 	for name in Fol.list
 		if .CanCompile(name)
 			Cpps <~ Fol.path.child( name )
 
-	return .FilterCppsIfAlreadyDone(Cpps, Objects, stdafx)
-
+	return .FilterCppsIfAlreadyDone(Cpps, Objects)
 	
  
 function Clean (|bool|)
-	"/tmp/Speedie".file.deleteall
-	"/tmp/Speedie64".file.deleteall
-	"/tmp/SpeedieApps".file.deleteall
+	|| paths = "
+/tmp/Speedie
+/tmp/Speedie64
+/tmp/SpeedieApps
+/usr/local/speedie/Speedie.scproj/BuildTest
+/usr/local/speedie/Speedie.scproj/BuildTest2
+/usr/local/speedie/Speedie.scproj/BuildTest3
+"
+	for l.lines in paths
+		if l
+			l.file.delete
 	return stderr.ok
 
 
@@ -267,13 +281,13 @@ function ExecuteGCC (|[string]| Commands, |bool|)
 
 function CollectAndCompile (|File| Input, |String| Output, |bool|)
 	|| TmpFol = Output.MakeAndGoInto
-	|| Cpps = .CollectCppsInto( Input, TmpFol, nil )
+	|| Cpps = .CollectCppsInto( Input, TmpFol )
 	return .TransCompileWrap(cpps)
 
 
 function UseAndCompile (|[string]| Input, |String| Output, |bool|)
 	|| TmpFol = Output.MakeAndGoInto
-	|| Cpps = .FilterCppsIfAlreadyDone( Input, TmpFol, nil )
+	|| Cpps = .FilterCppsIfAlreadyDone( Input, TmpFol )
 	return .TransCompileWrap(cpps)
 
 
@@ -319,14 +333,22 @@ function ExportAndInstall (|bool| CanInstall)
 // copy this... by hard-linking. this is because xcode goes around fucking up all my files
 // I can't just hard-link it myself... xcode UNHARD-LINKS IT!! Now I get separate versions
 // cos xcode fucks up my shit for me. So I have to do this to work around it's stupidity.
-function CollectPico
+function CollectPico (|string| lib)
 	|| OfficialLocation = "/usr/local/include/PicoMsg/PicoMsg.h".file
 	require OfficialLocation.exists
-	|| SpdLocation = "/usr/local/speedie/Library/CppLib/PicoMsg.h".file
+	|| SpdLocation = (lib+"PicoMsg.h").file
 	if SpdLocation.exists // remove it.
 		SpdLocation.delete
 	OfficialLocation.HardLinkTo(SpdLocation)
 
+
+function TestNewestLib (|file| cpplib)
+	LatestLibDate = 0
+	for s.files in cpplib
+		if s.visible and !s.IsDir
+			(LatestLibDate max= s.Modified)
+	printline LatestLibDate.LocalTime
+	
 
 function RunCppCompile
 	require (StdErr.OK)
@@ -334,7 +356,9 @@ function RunCppCompile
 	if !options.silent
 		.PrintProduct("\nCompiling c++ to")
 	
-	.CollectPico
+	|| CppLib = "/usr/local/speedie/Library/CppLib/".file
+	.TestNewestLib(cpplib)
+	.CollectPico(cpplib)
 	.CompilingLibFiles++
 	.CollectAndCompile(	.CppLib,						.LibTmpPath )$
 	.CompilingLibFiles--
