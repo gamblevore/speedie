@@ -811,7 +811,7 @@ So anything not 0 means "its OK"`
 			return -1
 		
 		|| Loaded =  E.LoadDocument(doc) #require
-		|| spd = .IsSpeedieCode
+		|| spd = r.location.PathIsCode
 		doc.CompareTreesOnSave = spd
 		.ListAllFuncs
 		.CheckScrollErrors(0, date.now + 0.25s)		
