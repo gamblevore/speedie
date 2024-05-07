@@ -29,7 +29,7 @@
 &&DIV,
 &&SHRS,
 &&SHRU,
-&&SHLS,
+&&SHLU,
 &&BAND,
 &&BOR,
 &&BXOR,

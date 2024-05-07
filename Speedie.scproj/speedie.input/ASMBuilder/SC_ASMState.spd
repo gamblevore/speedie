@@ -29,14 +29,18 @@ struct ASMState
 	syntax access (|asmreg| a, |&uint64|)
 		cpp_part GetConst, pragma inline
 		return .consts[a.reg]
+
 	
-	function KnownZero (|asmreg| r, |bool|)
-		|| i = r.reg
-		if !i
-			return true
+	function Ptoi (|asmreg| r,  |ind|)
+		// 0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
 		if r is const
-			// a const of 0 should already have a 0 reg!?
-//			return .Consts[i]		
+			|| v = .Consts[r.reg]
+			if v.IsPo2
+				return v.Log2+1
+
+		if (!r.reg) // what?
+		
+
 		
 	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |int| c, |int| d, |int| e, |&FatASM|)
 		pragma inline,  opt norefcounts,  cpp_part AddASM5

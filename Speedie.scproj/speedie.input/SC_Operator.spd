@@ -167,7 +167,7 @@ module {
 
 		.AddBit( "<<<",	"RotateLeft",	&asmops.ROL,	asmmath.ROL,	opmode.Left)
 		.AddBit( ">>>",	"RotateRight",	&asmops.ROR,	asmmath.ROR,	opmode.Left)
-		.addbit( ">>",	"ShiftRight",	&asmops.SHR,	asmmath.shr,	opmode.Left)
+		.addbit( ">>",	"ShiftRight",	&asmops.SHR,	asmmath.shru,	opmode.Left)
 		.addbit( "<<",	"ShiftLeft",	&asmops.SHL,	asmmath.shl)
 		.AddBit( "(|)",	"BitOr",		&asmops.BitOr,	asmmath.bor)
 		.AddBit( "&",	"BitAnd",		&asmops.BitAnd,	asmmath.ban,	opmode.SameOrLessBits)

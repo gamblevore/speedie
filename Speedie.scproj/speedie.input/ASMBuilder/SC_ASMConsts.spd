@@ -1,7 +1,7 @@
 
 
 
-function ASMState.DoConsts (|asmreg| D, |asmreg| L, |asmreg| R, |asmreg|)
+function ASMState.DoConsts (|asmreg| D,  |asmreg| L,  |asmreg| R,  |uint64| RImm=0,  |asmreg|)
 	|| LL = self[L],  || RR = self[R],  || DD = self[D]
 	|| m = d.math
 	if l.isfloat
@@ -101,10 +101,13 @@ function asmstate.DoI64Const (|asmreg| D, |&int64| DD, |&int64| LL, |&int64| RR,
 		LLL /= RRR 
 	  elseif M == ASMMath.Mod
 		(LLL mod= RRR)
+	  elseif M == ASMMath.Shru
+		LLL = LLL|uint64|>>RRR|uint64|
+	  elseif M == ASMMath.Shrs
+		LLL = LLL>>RRR
+		// is this 32-bit or 64-bit or what-bit? right-shifting a signed short... sigh
+		// what if we disable any except 64-bit?
 	  elseif M == ASMMath.Shl
-		debugger, #!signed or not?
-		LLL >>= RRR
-	  elseif M == ASMMath.Shr
 		LLL <<= RRR
 	  elseif M == ASMMath.Bnt
 		LLL = ~LLL

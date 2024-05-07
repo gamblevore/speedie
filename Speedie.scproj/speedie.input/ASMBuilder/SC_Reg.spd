@@ -16,7 +16,8 @@ datatype ASMMath (uint)
 		ROL
 		ROR
 		Shl
-		Shr
+		Shru
+		Shrs
 		BNt
 		BAn
 		BOr
@@ -116,8 +117,7 @@ datatype AsmReg (uint)
 		return self
 	
 	syntax cast (|bool|)
-		disabled "are we testing .reg, or if this is unused, or discarded?"
-		return self|uint|
+		return .reg
 	
 	syntax cast (|int|)
 		cpp_part ToInt

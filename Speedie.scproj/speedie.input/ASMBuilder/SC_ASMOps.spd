@@ -103,9 +103,30 @@ module asmOps
 		(l is alternate) // the logic ismostly shared...
 		return plus(self, dest, l, r, dbg)
 
+			
+	function QuickMul    (fn_opasm)
+		|| PToi = .Ptoi(r)
+		require ptoi >= 0
+
+		if ptoi <= 1
+			if ptoi == 0
+				l = asmreg()
+			return assign(self, dest, l, asmreg(), dbg)
+	
+		.AddASM(asm.SHLU , dbg, dest, l, ptoi - 1)
+		if dest is const
+			|| Val = 1|uint64| << (ptoi-1)
+			(Dest as= asmmath.shl)
+			return .DoConsts(dest, L, R, val)
+		return dest // we just lost a const? we are shifting by a const!
+
 	
 	function Mul    (fn_opasm)
 		if l.isint
+			|| D1 = QuickMul(self, dest, R, L, dbg)
+				return D1
+			|| D2 = QuickMul(self, dest, L, R, dbg)
+				return D2
 			.AddASM(asm.MUL , dbg, dest, L, R)
 		  else
 			.AddASM(asm.FMUL, dbg, dest, L, R).r[4] = l.eightbytes|int|
@@ -153,13 +174,10 @@ module asmOps
 		debugat
 		return SimpleOp(self, dest, l, r, dbg, asm.BXOR)
 	
-	
 	function BitXor (fn_opasm)
 		return SimpleOp(self, dest, l, r, dbg, asm.BXOR)
 	
 	function BitOr  (fn_opasm)
-//		if (dest.reg == l.reg) and .KnownZero(r)
-//			return dest // // why are we doing:  A = A ??  // seems unnecessary to optimise this?
 		return SimpleOp(self, dest, l, r, dbg, asm.BOR)
 	
 	function BitAnd (fn_opasm)
@@ -172,10 +190,19 @@ module asmOps
 		return SimpleOp(self, dest, l, r, dbg, asm.BROR)
 	
 	function SHR    (fn_opasm)
-		return SimpleOp(self, dest, l, r, dbg, asm.SHRU)
+		|| shop = asm.SHRU
+		if l.signed
+			shop = asm.SHRS
+			|| bc = l.µtype.bitcount 
+			expect (bc == 32 or bc == 64) (dbg, "Can't sign-shift this type. (todo)")
+			// we could but its gonna add so much complexity... We need to also change how the constants are
+			// I'll need to add a bit-masking instruction to the constlist
+			// lets just fix this later!
+				
+		return SimpleOp(self, dest, l, r, dbg, shop)
 	
 	function SHL    (fn_opasm)
-		return SimpleOp(self, dest, l, r, dbg, asm.SHLS)
+		return SimpleOp(self, dest, l, r, dbg, asm.SHLU)
 	
 	function Assign (fn_opasm)
 		return bitor(self, dest, l, asmreg(), dbg)

@@ -1865,7 +1865,7 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_RSET (52)
 #define kSC__ASM_SETK (22)
 #define kSC__ASM_SETN (23)
-#define kSC__ASM_SHLS (31)
+#define kSC__ASM_SHLU (31)
 #define kSC__ASM_SHRS (29)
 #define kSC__ASM_SHRU (30)
 #define kSC__ASM_SUB (26)
@@ -1880,19 +1880,20 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_WR4U (65)
 #define kSC__ASM_WR8U (66)
 #define kSC__ASMMath_Add (0)
-#define kSC__ASMMath_BAn (10)
-#define kSC__ASMMath_BNt (9)
-#define kSC__ASMMath_BOr (11)
+#define kSC__ASMMath_BAn (11)
+#define kSC__ASMMath_BNt (10)
+#define kSC__ASMMath_BOr (12)
 #define kSC__ASMMath_Div (3)
 #define kSC__ASMMath_Mod (4)
 #define kSC__ASMMath_Mul (2)
 #define kSC__ASMMath_ROL (5)
 #define kSC__ASMMath_ROR (6)
 #define kSC__ASMMath_Shl (7)
-#define kSC__ASMMath_Shr (8)
+#define kSC__ASMMath_Shrs (9)
+#define kSC__ASMMath_Shru (8)
 #define kSC__ASMMath_Sub (1)
-#define kSC__ASMMath_Xnr (13)
-#define kSC__ASMMath_Xor (12)
+#define kSC__ASMMath_Xnr (14)
+#define kSC__ASMMath_Xor (13)
 #define kSC__ASMtmp_kContinue (51)
 #define kSC__ASMtmp_kDebugger (61)
 #define kSC__ASMtmp_kElseIf (48)
@@ -3491,6 +3492,8 @@ AsmReg SC_asmOps__PlusFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Mes
 
 AsmReg SC_asmOps__PlusInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Dbg);
 
+AsmReg SC_asmOps__QuickMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Dbg);
+
 AsmReg SC_asmOps__ROL(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Dbg);
 
 AsmReg SC_asmOps__ROR(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Dbg);
@@ -5073,7 +5076,7 @@ AsmReg SC_Pac_DeclareMe(ASMState* Self, Message* Where, AsmReg T);
 
 void SC_Pac_Destructor(ASMState* Self);
 
-AsmReg SC_Pac_DoConsts(ASMState* Self, AsmReg D, AsmReg L, AsmReg R);
+AsmReg SC_Pac_DoConsts(ASMState* Self, AsmReg D, AsmReg L, AsmReg R, uint64 RImm);
 
 AsmReg SC_Pac_DoF32Const(ASMState* Self, AsmReg D, float* DD, float* LL, float* RR, OpMode M);
 
@@ -5108,6 +5111,8 @@ uint SC_Pac_OpenVars(ASMState* Self);
 bool SC_Pac_PackMakerInit(ASMState* Self);
 
 AsmReg SC_Pac_Prm(ASMState* Self, Message* Prm);
+
+Ind SC_Pac_Ptoi(ASMState* Self, AsmReg R);
 
 bool SC_Pac_SetConst(ASMState* Self, Message* List, Message* Orig);
 
@@ -9461,6 +9466,8 @@ inline bool JB_int64_OperatorInRange(int64 Self, int64 D);
 
 inline bool JB_int_OperatorInRange(int Self, int D);
 
+inline bool JB_uint64_IsPo2(uint64 Self);
+
 inline JB_String* SC_Named_Name(SCNamed* Self);
 
 inline bool SC_PA_SyntaxCast(SCParamArray* Self);
@@ -9516,6 +9523,8 @@ inline bool JB_Safe_SyntaxCast(JB_String* Self);
 inline bool SC_Decl_IsUnknownParam(SCDecl* Self);
 
 inline uint64* SC_Pac_GetConst(ASMState* Self, AsmReg A);
+
+inline bool SC_Reg_SyntaxCast(AsmReg Self);
 
 inline int SC_Reg_ToInt(AsmReg Self);
 
@@ -9601,6 +9610,10 @@ inline bool JB_int_OperatorInRange(int Self, int D) {
 		return (((uint)Self) < ((uint)D));
 	}
 	return false;
+}
+
+inline bool JB_uint64_IsPo2(uint64 Self) {
+	return (Self & (Self - 1)) == 0;
 }
 
 inline JB_String* SC_Named_Name(SCNamed* Self) {
@@ -9742,6 +9755,10 @@ inline bool SC_Decl_IsUnknownParam(SCDecl* Self) {
 
 inline uint64* SC_Pac_GetConst(ASMState* Self, AsmReg A) {
 	return (&Self->Consts[SC_Reg_Reg(A)]);
+}
+
+inline bool SC_Reg_SyntaxCast(AsmReg Self) {
+	return ((bool)SC_Reg_Reg(Self));
 }
 
 inline int SC_Reg_ToInt(AsmReg Self) {

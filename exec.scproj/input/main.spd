@@ -1,6 +1,6 @@
 
 
-main 	  	  	  	 // execmain {
+main 	  	  	  	 // exec main {
 	opt norefcounts
 	error.AutoPrint = 1
 	require Lib.LoadLib

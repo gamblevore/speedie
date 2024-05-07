@@ -55,8 +55,8 @@
 	i1 = i2 >> (u3 + L3);
 ı SHRU: _
 	u1 = u2 >> (u3 + L3);
-ı SHLS: _
-	i1 = i2 >> (u3 + L3);
+ı SHLU: _
+	i1 = i2 << (u3 + L3);
 ı BAND: _
 	u1 = u2 & (u3 | L3);
 ı BOR: _
