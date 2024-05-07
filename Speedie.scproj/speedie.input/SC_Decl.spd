@@ -100,7 +100,7 @@ class SCDecl (SCNamed) {
 	|Message?|			Default
 	|SCClass|			Type
 	|SCDeclInfo|		Info
-	|AsmReg|			DReg
+	|Datatypecode|		DType
 	|Byte|				PointerCount
 	|NilState|			NilDeclared
 	|byte| 				NilReg
@@ -119,7 +119,10 @@ class SCDecl (SCNamed) {
 	function Project (|scimport!|)
 		opt norefcounts
 		return (.MemoryLayer.obj as SCImport)!
-			
+	
+	function Reg (|asmreg|)
+		return .DType|asmreg|
+	
 	syntax append (|SCDeclInfo| d)
 		.info |= d
 

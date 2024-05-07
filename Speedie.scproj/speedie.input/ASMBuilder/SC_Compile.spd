@@ -21,7 +21,7 @@ struct ASMState
 	function AddFuncParams (|SCFunction| fn)
 		opt norefcounts
 		for a in fn.Args
-			a.dreg = .DeclareMe(nil, a.RegType|asmreg|)
+			a.dtype = .DeclareMe(nil, a.RegType|asmreg|)|datatypecode|
 
 	function Last (|&FatASM|)
 		return .curr-1
@@ -29,6 +29,14 @@ struct ASMState
 	syntax access (|asmreg| a, |&uint64|)
 		cpp_part GetConst, pragma inline
 		return .consts[a.reg]
+	
+	function KnownZero (|asmreg| r, |bool|)
+		|| i = r.reg
+		if !i
+			return true
+		if r is const
+			// a const of 0 should already have a 0 reg!?
+//			return .Consts[i]		
 		
 	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |int| c, |int| d, |int| e, |&FatASM|)
 		pragma inline,  opt norefcounts,  cpp_part AddASM5

@@ -77,10 +77,6 @@ class String
 	
 	function First (|Byte|)
 		cpp_wrapper JB_Str_First
-	
-	operator minus (|int| n, |int|)
-		disabled 
-		return .length - n
 		
 	operator divide (|byte| sep, |[string]|)
 		return .split(sep)

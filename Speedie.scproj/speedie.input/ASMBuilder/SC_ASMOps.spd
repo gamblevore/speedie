@@ -34,58 +34,72 @@ module asmOps
 
 
 	// MATH
-	function asmstate.CanAddC (|asmreg| V, |int64| T, |bool|)
+	function ASMState.CanAddC (|asmreg| V, |int64| T, |bool|)
 		if (V is const) and v.isint
 			|| B = (t << 50)>>50
 			return B == t
 	
 	
 	function PlusInt     (fn_opasm)
-		|| LL = self[L][0], || RR = self[R][0]
+		|| LL = self[L][0],  || RR = self[R][0]
 		// a - 1,  a + 1
 		// 1 - a,  1 + a
-		|| Addition = (l isnt alternate)
-		if !Addition
+		|| subtract = l is alternate
 			RR = -RR
+		|| OPP = asm.ADD + subtract
+		dest = dest as asmmath.add + subtract
 
-		if Addition and .CanAddC(L, LL)	// 1 + a
+		if (opp == asm.add) and .CanAddC(L, LL)			// 1 + a
+			// can we step back one?
+			if L is mathconst
+				// OK so... what if it is?
+				// we can step back one? 
+				debugger 
+				.curr--
 			.AddASM(asm.ADDK, dbg, dest, R, LL)
 
-		  elseif .CanAddC(R, RR)			// a - 1, a + 1
+		  elseif .CanAddC(R, RR)						// a - 1, a + 1
+			if L is mathconst
+				debugger // same
+				.curr--
 			.AddASM(asm.ADDK, dbg, dest, L, RR)
 
 		  else
-			|| OPP = (asm.ADD, asm.SUB)(Addition)
 			.AddASM(OPP, dbg, dest, L, R, 0)
 		
 		if dest is const
-			return .doconsts(dest, L, R, opmode.add)
+			return .DoConsts(dest, L, R)
 		return dest
 
 		
 	function PlusFloat   (fn_opasm)
 		|| SubTract = (l is alternate)
 		|| Double = dest.EightBytes
+		if !Subtract
+			if (l is FromMath) and (l isa ASMMath.Mul)
+				// 
+		
 		|| F = .AddASM(asm.fADD, dbg, dest, l)
 		f.r[2+subtract] = r
 		f.r[4] = double|int|
 		
 		if dest is const
-			return .doconsts(dest, L, R, opmode.add+subtract)
+			dest = dest as ASMMath.add+subtract
+			return .doconsts(dest, L, R)
 		return dest
 
 		
 	function Plus   (fn_opasm)
 		if !r.reg
-			return assign(self, dest, l, asmreg(), dbg)
+			return assign(self, dest, l, AsmReg(), dbg)
 		if !l.reg and (l isnt alternate)
-			return assign(self, dest, R, asmreg(), dbg)
+			return assign(self, dest, R, AsmReg(), dbg)
 		if l.isint
 			return PlusInt(self, dest, l, r, dbg)
 		return PlusFloat(self, dest, l, r, dbg)
 
 
-	function Minus  (fn_opasm)
+	function Subtract  (fn_opasm)
 		(l is alternate) // the logic ismostly shared...
 		return plus(self, dest, l, r, dbg)
 
@@ -96,7 +110,7 @@ module asmOps
 		  else
 			.AddASM(asm.FMUL, dbg, dest, L, R).r[4] = l.eightbytes|int|
 		if dest is const
-			return .doconsts(dest, L, R, opmode.mul)
+			return .doconsts(dest, L, R)
 		return dest
 	
 
@@ -113,18 +127,19 @@ module asmOps
 			.AddASM(asm.FFRC, dbg, dest, big, dest, R)
 		
 		if dest is const
-			return .doconsts(Dest, L, R, OpMode.div + alt)
+			dest = dest as ASMMath.div + alt
+			return .doconsts(Dest, L, R)
 		return dest
-	
 	
 
 	function DivInt    (fn_opasm)
-		|| Fat = .AddASM(asm.div, dbg, 0, 0, L, R, dest.divtype)
+		|| Fat = .AddASM(asm.div, dbg, 0, 0, L, R, dest.intdivtype)
 		|| Alt = l is alternate
 		fat.r[alt] = dest
 		
 		if dest is const
-			return .doconsts(dest, l, r, opmode.div + alt)
+			dest = dest as ASMMath.div + alt
+			return .doconsts(dest, l, r)
 		return dest
 	
 	
@@ -134,39 +149,41 @@ module asmOps
 
 
 	// BITS
-	function BitAnd (fn_opasm)
-		.AddASM(asm.BAND, dbg, dest, L, R)
-		if dest is const
-			return .doconsts(dest, l, r, opmode.ban)
-		return dest
+	function BitXnor (fn_opasm)
+		debugat
+		return SimpleOp(self, dest, l, r, dbg, asm.BXOR)
+	
+	
 	function BitXor (fn_opasm)
-		.AddASM(asm.Bxor, dbg, dest, L, R)
-		if dest is const
-			return .doconsts(dest, l, r, opmode.xor)
-		return dest
+		return SimpleOp(self, dest, l, r, dbg, asm.BXOR)
+	
 	function BitOr  (fn_opasm)
-		.AddASM(asm.bor,  dbg, dest, L, R)
-		if dest is const
-			return .doconsts(dest, l, r, opmode.bor)
-		return dest
+//		if (dest.reg == l.reg) and .KnownZero(r)
+//			return dest // // why are we doing:  A = A ??  // seems unnecessary to optimise this?
+		return SimpleOp(self, dest, l, r, dbg, asm.BOR)
+	
+	function BitAnd (fn_opasm)
+		return SimpleOp(self, dest, l, r, dbg, asm.BAND)
+	
 	function ROL    (fn_opasm)
-		.AddASM(asm.brol, dbg, dest, L, R)
-		return dest
+		return SimpleOp(self, dest, l, r, dbg, asm.BROL)
+	
 	function ROR    (fn_opasm)
-		.AddASM(asm.bror, dbg, dest, L, R)
-		return dest
+		return SimpleOp(self, dest, l, r, dbg, asm.BROR)
+	
 	function SHR    (fn_opasm)
-		.AddASM(asm.SHRU, dbg, dest, L, R)
-		if dest is const
-			return .doconsts(dest, l, r, opmode.shr)
-		return dest
+		return SimpleOp(self, dest, l, r, dbg, asm.SHRU)
+	
 	function SHL    (fn_opasm)
-		.AddASM(asm.SHLS, dbg, dest, L, R)
-		if dest is const
-			return .doconsts(dest, l, r, opmode.shl)
-		return dest
+		return SimpleOp(self, dest, l, r, dbg, asm.SHLS)
+	
 	function Assign (fn_opasm)
-		if dest.reg == l.reg
-			return dest // haha!
 		return bitor(self, dest, l, asmreg(), dbg)
+
+	function SimpleOp (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| dbg,  |ASM| ASM, |asmreg|)
+		.AddASM(asm, dbg, dest, L, R)
+		if dest is const
+			return .doconsts(dest, l, r)
+		return dest
+		
 

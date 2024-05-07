@@ -964,7 +964,6 @@ function message.CutifyCopy (|message!|)
 				name.remove
 
 
-
 function message.IdentifyFunc (|scfunction|)
 	opt NoRefCounts
 	if self == @tmp
@@ -972,10 +971,6 @@ function message.IdentifyFunc (|scfunction|)
 	|| obj = .obj
 	if obj isa scfunction
 		return obj
-
-
-//function message.IsClassOrExtOrModule (|bool|)
-//	return (self == @tmp) and (.IsClassType or .IsExtender or .MsgIsProperModule)
 
 
 function object.ClassOrModule (|SCNode|)

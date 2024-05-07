@@ -1,7 +1,9 @@
 
 
-function ASMState.DoConsts (|asmreg| D, |asmreg| L, |asmreg| R, |opmode| M, |asmreg|)
-	|| LL = self[L], || RR = self[R], || DD = self[D]
+
+function ASMState.DoConsts (|asmreg| D, |asmreg| L, |asmreg| R, |asmreg|)
+	|| LL = self[L],  || RR = self[R],  || DD = self[D]
+	|| m = d.math
 	if l.isfloat
 		if l.fourbytes
 			return .DoF32Const(D, DD|&float|, LL|&float|, RR|&float|, M)
@@ -19,15 +21,15 @@ function asmstate.DoF32Const (|asmreg| D, |&float| DD, |&float| LL, |&float| RR,
 		
 	if 0
 		0
-	  elseif M == opmode.Add
+	  elseif M == ASMMath.Add
 		LLL += RRR 
-	  elseif M == opmode.Sub
+	  elseif M == ASMMath.Sub
 		LLL -= RRR 
-	  elseif M == opmode.Mul
+	  elseif M == ASMMath.Mul
 		LLL *= RRR 
-	  elseif M == opmode.Div
+	  elseif M == ASMMath.Div
 		LLL /= RRR 
-	  elseif M == opmode.Mod
+	  elseif M == ASMMath.Mod
 		(LLL mod= RRR)
 
 	*(DD|&uint64|) = 0 // clear high bits
@@ -35,7 +37,7 @@ function asmstate.DoF32Const (|asmreg| D, |&float| DD, |&float| LL, |&float| RR,
 		*DD = LLL
 		return D
 	*DD = 0
-	return asmreg.const
+	return asmreg.zero
 
 
 
@@ -45,41 +47,41 @@ function asmstate.DoF64Const (|asmreg| D, |&f64| DD, |&f64| LL, |&f64| RR, |opmo
 		
 	if 0
 		0
-	  elseif M == opmode.Add
+	  elseif M == ASMMath.Add
 		LLL += RRR 
-	  elseif M == opmode.Sub
+	  elseif M == ASMMath.Sub
 		LLL -= RRR 
-	  elseif M == opmode.Mul
+	  elseif M == ASMMath.Mul
 		LLL *= RRR 
-	  elseif M == opmode.Div
+	  elseif M == ASMMath.Div
 		LLL /= RRR 
-	  elseif M == opmode.Mod
+	  elseif M == ASMMath.Mod
 		(LLL mod= RRR)
 
 	if LLL.abs
 		*DD = LLL
 		return D
 	*DD = 0
-	return asmreg.const
+	return asmreg.zero
 
 
 
 function asmstate.DoI32Const (|asmreg| D, |&int| DD, |&int| LL, |&int| RR, |opmode| M, |asmreg|)
-	if M != opmode.div and opmode.mod
+	if M != ASMMath.div and ASMMath.mod
 		return .DoI64Const(D, DD|&int64|, LL|&int64|, RR|&int64|, M|opmode|)
 	|| LLL = *LL
 	|| RRR = *RR
 		
-	if M == opmode.Div
+	if M == ASMMath.Div
 		LLL /= RRR 
-	  elseif M == opmode.Mod
+	  elseif M == ASMMath.Mod
 		(LLL mod= RRR)		
 
 	*(DD|&uint64|) = 0 // clear high bits
 	*DD = LLL
 	if LLL
 		return D
-	return asmreg.const
+	return asmreg.zero
 
 
 
@@ -89,32 +91,33 @@ function asmstate.DoI64Const (|asmreg| D, |&int64| DD, |&int64| LL, |&int64| RR,
 		
 	if 0
 		0
-	  elseif M == opmode.Add
+	  elseif M == ASMMath.Add
 		LLL += RRR 
-	  elseif M == opmode.Sub
+	  elseif M == ASMMath.Sub
 		LLL -= RRR 
-	  elseif M == opmode.Mul
+	  elseif M == ASMMath.Mul
 		LLL *= RRR 
-	  elseif M == opmode.Div
+	  elseif M == ASMMath.Div
 		LLL /= RRR 
-	  elseif M == opmode.Mod
+	  elseif M == ASMMath.Mod
 		(LLL mod= RRR)
-	  elseif M == opmode.Shl
+	  elseif M == ASMMath.Shl
 		debugger, #!signed or not?
 		LLL >>= RRR
-	  elseif M == opmode.Shr
+	  elseif M == ASMMath.Shr
 		LLL <<= RRR
-	  elseif M == opmode.Bnt
+	  elseif M == ASMMath.Bnt
 		LLL = ~LLL
-	  elseif M == opmode.Ban
+	  elseif M == ASMMath.Ban
 		LLL &= RRR
-	  elseif M == opmode.Xor
+	  elseif M == ASMMath.Xor
 		LLL ^= RRR
-		
+	  elseif M == ASMMath.Xnr
+		LLL = ~(LLL ^ RRR)
 
 	*DD = LLL
 	if LLL
 		return D
-	return asmreg.const
+	return asmreg.zero
 
 

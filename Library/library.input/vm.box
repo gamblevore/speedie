@@ -220,6 +220,8 @@ BOR   (U3)
 	u1  |= (u2|||u3)
 BXOR  (U3)
 	u1 = u2 ^ u3
+BXNR  (U3)		// for A = ~B
+	u1 = (~u2 ^ u3)
 BNOT  (U2)
 	u1 = ~u2 // & U3_Li
 BFLG  (BFLD)

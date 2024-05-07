@@ -163,7 +163,7 @@ function Clean (|bool|)
 "
 	for l.lines in paths
 		if l
-			l.file.delete
+			l.file.deleteall
 	return stderr.ok
 
 

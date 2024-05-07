@@ -12,7 +12,7 @@ dispatch fn_asm_table (fn_asm)
 		opt norefcounts
 		|| rel = exp.last!
 		|| ty = rel.first!.fastdecl
-		|| reg = .DeclareMe(Exp, ty.dreg)
+		|| reg = .DeclareMe(Exp, ty.reg)
 		return .µ(rel.last!, reg)
 
 
@@ -294,12 +294,13 @@ function Thg (fn_asm)
 													// what if this is a constant?
 	|| d = exp.FastDecl
 	if d is local
+		|| reg = d.reg
 		if dest is set								// copy a reg
 			debugger
-			if !d.dreg.reg							// what?
-			.AddASM(asm.BOR, exp, dest, d.dreg)
+			if !reg.reg					// what?
+			.AddASM(asm.BOR, exp, dest, reg)
 			return dest
-		return d.dreg
+		return reg
 	
 	if d is const									// We want a number, really
 		|| R = dest.reg
@@ -313,7 +314,7 @@ function Thg (fn_asm)
 	expect (d is global) (Exp)
 	if dest isnt discard
 		return DoGlobal(self, exp, dest, d)
-
+ 
 
 function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Value, |scdecl| D, |AsmReg|)
 	|| addr = value
@@ -352,8 +353,8 @@ function ARel		(fn_asm)
 
 function Minus			(fn_asm)					// -a
 	opt	NoRefCounts
-	|| Src = .µ(exp, dest)
-	return asmops.minus(self, dest, asmreg(), src, exp)
+	return asmtmp.DoSingleMath(self, exp, dest, scoperator.minus)
+		
 
 
 function Precrement		(fn_asm)					// --a, ++a
@@ -395,6 +396,8 @@ function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 	|| F = exp.first!
 	if n == '&'
 		return .µ(F, dest.requestpos)
+	if n == '~'
+		return dosinglemath(self, exp, dest, scoperator.bnot)
 	if n == '!'
 		return Not(self, F, dest)
 
@@ -405,26 +408,45 @@ function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 	return Precrement(self, F, dest, Sub|int|)
 
 
+function MathConst (|&ASMState| self, |AsmReg| Dest, |asmreg| ml, |asmreg| mr, |message| Op, |fn_opasm| fn, |AsmReg|)
+	(Dest is const)
+	|| R = (fn)(self, dest, ml, mr, op)
+	if r isnt const // hmm?
+		debugger 
+		(fn)(self, dest, ml, mr, op)
+	return R
+
+
+function DoSingleMath (|&ASMState| self, |message| exp, |AsmReg| Dest, |scoperator| Scop, |AsmReg|)
+	|| Src = .µ(exp, dest)
+	return DoMathSub(self, exp, dest, asmreg(), src, scop)
+
 
 function DoMath (fn_asm)
 	opt norefcounts
 
 	|| F = exp.first!
-	|| op = F.next!
 
 	|| OV = .OpenVars
 	|| ml = .µ(F, 		 asmreg.StayOpen)
-	|| mr = .µ(op.next!, asmreg.StayOpen)
+	|| mr = .µ(exp.last!, asmreg.StayOpen)
 	.CloseVars(OV)
 
-	dest = .tempme(op, dest) 
-	dest.µtype = ml.µtype							// assignment conversion needs doing?
-
+	|| op = F.next!
 	|| scop = op.obj|scoperator|
-		|| fn = scop.ASM
-			if ml is const and mr is const
-				(Dest is const)
+		return DoMathSub(self, op, dest, ml, mr, scop)
+	error (op, "No ASM for this operator?")
+
+
+function DoMathSub (|&ASMState| self,  |message| op,  |AsmReg| Dest,  |asmreg| ml,  |asmreg| mr,  |scoperator| Scop, |AsmReg|)
+	|| fn = scop.ASM
+		dest = .tempme(op, dest) 
+		dest.µtype = ml.µtype							// assignment conversion needs doing?	
+		dest = dest as scop.code
+		(dest is frommath)
+		ifn ml is const and mr is const
 			return (fn)(self, dest, ml, mr, op)
+		return MathConst(self, dest, ml, mr, op, fn)
 	error (op, "No ASM for this operator?")
 	
 

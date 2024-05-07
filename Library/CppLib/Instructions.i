@@ -63,6 +63,8 @@
 	u1 |= (u2 | u3);
 ı BXOR: _
 	u1 = u2 ^ u3;
+ı BXNR: _
+	u1 = (~u2 ^ u3);
 ı BNOT: _
 	u1 = ~u2;
 ı BFLG: _

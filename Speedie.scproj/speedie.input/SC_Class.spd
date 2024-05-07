@@ -265,21 +265,36 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 	return count	
 
 
-function array.Find4bytes (|array of scdecl| self, |scdecl|)
+function SortPropHelper (|scdecl|)
 	opt norefcounts
-	for p in self
+	require .isobject
+	|| s = .Super
+//	|| Align = 4
+	if s != TypeObject
+		return nil
+//		Align = s.Size mod 8
+//	require Align
+//	|| Missing = 8 - Align
+//
+//	|[scdecl]| New = Array()
+// OK so... if its off by 1... we still want to "make up" the missing properties
+// honestly it seems like what we really want is just a plain simple "Grabber"
+// meaning we need to make a new array! how else to grab items?
+// even then... its not so simple. we need to mark the new array... items as removed
+// and sort them after.
+
+	for p in .Properties
 		if p.declsize == 4
+			(p is biggest)
 			return p
-			
+
 
 function SortProperties
 	if (self is SortsProperties) and (!.iswrapper) and !.isrole
-		|| FBD = .Properties.find4bytes
-			if .isobject
-				(fbd is biggest)
+		|| Aligner = .SortPropHelper
 		.Properties.sort(DeclSizeSorter, true)
-		if fbd
-			(fbd isnt biggest)
+		if Aligner
+			(Aligner isnt biggest)
 
 
 function LoadSuperClass
@@ -940,14 +955,14 @@ module
 				is Builtin
 				
 				require T.isint and !.Signed
-				|| s2		= t.CreateSignedStuff
+				|| s2		= t.SignedStuffClass
 					.Signed		= s2.typenormal
 					s2.Signed	= .typenormal
 
 		expect (sup or .HasGameType) (node, "Datatypes must subclass off another type")
 	
 	
-	function datatypecode.CreateSignedStuff (|scclass|)
+	function datatypecode.SignedStuffClass (|scclass|)
 		opt norefcounts
 		|| s = .SetSigned(!.IsSigned)
 		|| keymsg = Message(@thg)

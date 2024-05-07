@@ -3,8 +3,27 @@
 
 prototype fn_asm (|&ASMState| self, |message| exp, |AsmReg| Dest=asmreg(), |int| Mode = 0, |AsmReg|)
 
-	
-	
+
+datatype ASMMath (uint)
+	constants
+		|ASMMath|
+		Add
+		Sub
+		Mul
+		Div
+		Mod
+
+		ROL
+		ROR
+		Shl
+		Shr
+		BNt
+		BAn
+		BOr
+		Xor
+		Xnr
+
+
 datatype AsmReg (uint)
 	default 0|AsmReg|
 	linkage
@@ -12,19 +31,30 @@ datatype AsmReg (uint)
 		numeric false
 	
 	constants
-		|asmreg|
+		MathTypes		= (31 << 16)
+		|asmreg|		// start at 21!
 		Set = 4
-		StayOpen		= (1 << 25)
-		Alternate		= (1 << 26)
-		Const			= (1 << 27)
-		Cond			= (1 << 28)
-		PositionRequest = (1 << 29)
-		ForReturn		= (1 << 30)
-		ForReturnReg	= (1 << 30) ||| (1<<8)
-		Discard			= (1 << 31)
+		FromMath		= (1 << 21)
+		StayOpen		= (1 << 22)
+		Alternate		= (1 << 23)
+		Const			= (1 << 24)
+		MathConst		= (1 << 21) ||| (1<<24)
+		Cond			= (1 << 25)
+		PositionRequest = (1 << 26)
+		ForReturn		= (1 << 27)
+		ForReturnReg	= (1 << 27) ||| (1<< 11)
+		Discard			= (1 << 28)
 		Zero			= Const
 	
-	
+	function Math (|asmmath|)
+		return (self|asmmath| >> 16) & 31
+		
+	operator isa (|ASMMath| M, |bool|)
+		return .math == M
+
+	operator as (|ASMMath| M, |asmreg|)
+		return ((self|uint| &~ MathTypes) ||| (M<<16))|ASMReg|
+
 	function Exists (|bool|)
 		return self|int|
 		
@@ -44,26 +74,28 @@ datatype AsmReg (uint)
 		pragma inline
 		return self|datatypecode|.isfloat
 
-	function DivType (|int|)
+	function IntDivType (|int|)
 		|| FourBytes = .µtype._shift == 2
 			rz = 2
 		rz += !.signed
 	
 	function Signed (|bool|)
 		return self|DataTypeCode|.issigned
+		
 	function µType (|DataTypeCode|)
-		return self|int| & 255
+		return self|int| & 0xFFFF
+	
 	function µType (assigns:|DataTypeCode|, |asmreg|)
-		return ((self|int| & ~255) ||| value)|asmreg|
+		return ((self|int| & ~0xFFFF) ||| value)|asmreg|
 	
 	syntax is (|AsmReg| R, |bool|)
-		return self|uint| & R|uint|
+		return (self|uint| & R|uint|) == r|uint|
 	
 	syntax is (|AsmReg| R, assigns:|bool|, |AsmReg|)
 		if (value)
-			return (self|int| ||| R|int|)|asmreg|
+			return self as r
 		  else
-			return  (self|int| &~ R|int|)|asmreg|
+			return self asnt r
 			
 	function RequestPos (|asmreg|)
 		return self as positionrequest
@@ -75,12 +107,13 @@ datatype AsmReg (uint)
 	// (self-1)&31!!
 	// this will "rotate" 0 back to 31 and 1 to 0.
 	function Reg (|int|)
-		return (self|uint| >> 8) & 31
+		return .µType.Register
 	
 	function Reg (assigns:|int|, |AsmReg|)
-		target debug
-			if value > 31
-		return (.µtype ||| (value << 8))|asmreg|
+		|| t = .µType
+		t.Register = Value
+		.µType = t
+		return self
 	
 	syntax cast (|bool|)
 		disabled "are we testing .reg, or if this is unused, or discarded?"
