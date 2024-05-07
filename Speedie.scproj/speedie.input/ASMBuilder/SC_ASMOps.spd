@@ -115,10 +115,24 @@ module asmOps
 	
 		.AddASM(asm.SHLU , dbg, dest, l, ptoi - 1)
 		if dest is const
-			|| Val = 1|uint64| << (ptoi-1)
+			|| Val = 1|uint64| << (ptoi-1)|uint64|
 			(Dest as= asmmath.shl)
-			return .DoConsts(dest, L, R, val)
-		return dest // we just lost a const? we are shifting by a const!
+			return .DoConsts(dest, L, R, &val)
+		return dest
+
+			
+	function QuickFDouble    (fn_opasm)
+		expect (r.isfloat) (dbg, "ugh")
+		
+		|| foy = .Ptoif(r)$
+		
+		if foy == -1
+			return subtract(self, dest, asmreg(), l, dbg)
+		if foy <= 1
+			if foy == 0
+				l = asmreg()
+			return assign(self, dest, l, asmreg(), dbg)
+		return plus(self, dest, l, l, dbg)
 
 	
 	function Mul    (fn_opasm)
@@ -129,6 +143,10 @@ module asmOps
 				return D2
 			.AddASM(asm.MUL , dbg, dest, L, R)
 		  else
+			|| D1 = QuickFDouble(self, dest, R, L, dbg)
+				return D1
+			|| D2 = QuickFDouble(self, dest, L, R, dbg)
+				return D2
 			.AddASM(asm.FMUL, dbg, dest, L, R).r[4] = l.eightbytes|int|
 		if dest is const
 			return .doconsts(dest, L, R)

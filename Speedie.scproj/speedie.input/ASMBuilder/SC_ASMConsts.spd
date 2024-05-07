@@ -1,14 +1,16 @@
 
 
 
-function ASMState.DoConsts (|asmreg| D,  |asmreg| L,  |asmreg| R,  |uint64| RImm=0,  |asmreg|)
+function ASMState.DoConsts (|asmreg| D,  |asmreg| L,  |asmreg| R,  |&uint64| RImm=nil,  |asmreg|)
 	|| LL = self[L],  || RR = self[R],  || DD = self[D]
 	|| m = d.math
 	if l.isfloat
 		if l.fourbytes
 			return .DoF32Const(D, DD|&float|, LL|&float|, RR|&float|, M)
 		return .DoF64Const(D, DD|&f64|, LL|&f64|, RR|&f64|, M)
-			
+	
+	if rimm
+		RR = rimm
 	if l.fourbytes
 		return .DoI32Const(D, DD|&int|, LL|&int|, RR|&int|, M)
 	return .DoI64Const(D, DD|&int64|, LL|&int64|, RR|&int64|, M)

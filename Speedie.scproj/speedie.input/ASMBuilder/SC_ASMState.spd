@@ -31,7 +31,7 @@ struct ASMState
 		return .consts[a.reg]
 
 	
-	function Ptoi (|asmreg| r,  |ind|)
+	function Ptoi (|asmreg| r,  |UghInt|)
 		// 0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
 		if r is const
 			|| v = .Consts[r.reg]
@@ -39,7 +39,29 @@ struct ASMState
 				return v.Log2+1
 
 		if (!r.reg) // what?
-		
+	
+	
+	// now what? well... well what about || x = b*-1 --> x = -b
+	function Ptoif (|asmreg| r,  |UghInt|)
+		require r is const
+		|| p = &.consts[r.reg]
+		|f64| v
+		if r.eightbytes
+			v = p|&f64|[0]
+		 else
+			v = p|&float|[0]
+		if v == -1.0: return -1
+		if v == 0.0:  return 0
+		if v == 1.0:  return 1
+		if v == 2.0:  return 2
+
+
+//	function Floats (|int| i, |&float|)
+//		return (&.consts[i])|&float|
+//		
+//
+//	function Doubles (|int| i, |&f64|)
+//		return (&.consts[i])|&f64|
 
 		
 	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |int| c, |int| d, |int| e, |&FatASM|)

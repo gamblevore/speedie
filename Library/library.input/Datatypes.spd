@@ -207,6 +207,16 @@ datatype ErrorInt (int) // useful for unix-functions which has 0 == success
 
 
 
+datatype UghInt (int) // useful when you want most numbers, even negatives, and zero but still want AN error code
+	constants
+		Fail = 0x8000_0000
+	default UghInt.fail // defaults to true... unlike everything else?
+	false UghInt.fail
+	syntax cast (|bool|)
+		return self != fail
+
+
+
 struct RetroFloat
 // for doing pixel-based animations that move smoothly for retro-games
 	|float|		Amount
