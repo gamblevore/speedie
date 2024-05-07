@@ -2029,7 +2029,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1123], (112400556721238));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1123], (112400571692972));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -9302,10 +9302,13 @@ AsmReg SC_asmOps__QuickFDouble(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, 
 
 AsmReg SC_asmOps__QuickMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Dbg) {
 	UghInt PToi = SC_Pac_Ptoi(Self, R);
-	if (PToi < 0) {
+	if ((!JB_UghInt_SyntaxCast(PToi))) {
 		return nil;
 	}
 	if (PToi <= 1) {
+		if (PToi == -1) {
+			return SC_asmOps__Subtract(Self, Dest, SC_Reg__New(), L, Dbg);
+		}
 		if (PToi == 0) {
 			L = SC_Reg__New();
 		}
@@ -18251,6 +18254,9 @@ AsmReg SC_Pac_Prm(ASMState* Self, Message* Prm) {
 UghInt SC_Pac_Ptoi(ASMState* Self, AsmReg R) {
 	if (SC_Reg_SyntaxIs(R, kSC__Reg_Const)) {
 		uint64 V = Self->Consts[SC_Reg_Reg(R)];
+		if (V == -1) {
+			return V;
+		}
 		if (JB_uint64_IsPo2(V)) {
 			return JB_u64_Log2(V) + 1;
 		}

@@ -32,16 +32,17 @@ struct ASMState
 
 	
 	function Ptoi (|asmreg| r,  |UghInt|)
-		// 0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
+		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
 		if r is const
 			|| v = .Consts[r.reg]
+			if v == -1
+				return v
 			if v.IsPo2
 				return v.Log2+1
 
 		if (!r.reg) // what?
 	
 	
-	// now what? well... well what about || x = b*-1 --> x = -b
 	function Ptoif (|asmreg| r,  |UghInt|)
 		require r is const
 		|| p = &.consts[r.reg]

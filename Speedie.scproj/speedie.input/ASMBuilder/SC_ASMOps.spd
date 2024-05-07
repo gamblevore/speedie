@@ -105,15 +105,17 @@ module asmOps
 
 			
 	function QuickMul    (fn_opasm)
-		|| PToi = .Ptoi(r)
-		require ptoi >= 0
+		|| PToi = .Ptoi(r)$
 
 		if ptoi <= 1
-			if ptoi == 0
+			if ptoi == -1   //   y = x * -1  -->  y = 0-x 
+				return subtract(self, dest, asmreg(), l, dbg)
+			if ptoi == 0    //   y = x * 0   -->  y = 0
 				l = asmreg()
+							//   y = x * 1   -->  y = x 
 			return assign(self, dest, l, asmreg(), dbg)
 	
-		.AddASM(asm.SHLU , dbg, dest, l, ptoi - 1)
+		.AddASM(asm.SHLU , dbg, dest, l, ptoi - 1)  // y = x * 4 --> y = x << 2
 		if dest is const
 			|| Val = 1|uint64| << (ptoi-1)|uint64|
 			(Dest as= asmmath.shl)
