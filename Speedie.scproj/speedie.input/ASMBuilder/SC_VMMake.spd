@@ -64,7 +64,7 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max, |int|)
 	.FillTypePrm(lname, pname)
 	
 	if  (bit_pos+n) > Max  or  n > (Max-8)  // bad
-		error (.dt_prm, "Too many total bits")
+		error (line, "Too many total bits")
 	return n+bit_pos
 
 

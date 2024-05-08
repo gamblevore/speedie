@@ -192,12 +192,21 @@
 
 	MemStuff((u32 *) u1, (u32 *) u2, n3, L3);
 ı FADK: _
-	if (FloatIncr_Du) 
+	if (FloatConst_Du) 
 	d1 += d2 + FloatIncr2(Op)
 ;
 	else 
 	f1 += f2 + FloatIncr1(Op)
 ;
+ı FMLK: _
+	if (FloatConst_Du) 
+	d1 = d2 * FloatIncr2(Op)
+;
+	else 
+	f1 = f2 * FloatIncr1(Op)
+;
+ı FEXK: _
+	f1 = FloatSh1(u2, FloatAddExp_Sh2i) + FloatSh1(u3, FloatAddExp_Sh3i);
 ı FADD: _
 	if (Float_Du) 
 	d1 = d2 + d3 - d4

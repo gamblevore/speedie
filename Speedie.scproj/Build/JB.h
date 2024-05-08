@@ -171,7 +171,9 @@ typedef ASM ASM_Div;
 
 typedef ASM ASM_Float;
 
-typedef ASM ASM_FloatIncr;
+typedef ASM ASM_FloatAddExp;
+
+typedef ASM ASM_FloatConst;
 
 typedef ASM ASM_Func;
 
@@ -1833,11 +1835,13 @@ extern Random JB__zalgo_R;
 #define kSC__ASM_DIV (28)
 extern ASM_Encoder2 SC__ASM_Encoders[256];
 #define kSC__ASM_EROR (0)
-#define kSC__ASM_FADD (71)
+#define kSC__ASM_FADD (73)
 #define kSC__ASM_FADK (70)
-#define kSC__ASM_FDIV (73)
-#define kSC__ASM_FFRC (74)
-#define kSC__ASM_FMUL (72)
+#define kSC__ASM_FDIV (75)
+#define kSC__ASM_FEXK (72)
+#define kSC__ASM_FFRC (76)
+#define kSC__ASM_FMLK (71)
+#define kSC__ASM_FMUL (74)
 #define kSC__ASM_FNCX (5)
 #define kSC__ASM_FNCX2 (5)
 #define kSC__ASM_FNCX3 (6)
@@ -3495,7 +3499,9 @@ AsmReg SC_asmOps__PlusFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Mes
 
 AsmReg SC_asmOps__PlusInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Dbg);
 
-AsmReg SC_asmOps__QuickFDouble(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Dbg);
+AsmReg SC_asmOps__QuickFloatDiv(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Dbg);
+
+AsmReg SC_asmOps__QuickFloatExp(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Dbg);
 
 AsmReg SC_asmOps__QuickMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Dbg);
 
@@ -4311,9 +4317,13 @@ ASM SC_ASM_Div_KindSet(ASM Self, uint Value);
 
 ASM SC_ASM_Float_DSet(ASM Self, uint Value);
 
-ASM SC_ASM_FloatIncr_DSet(ASM Self, uint Value);
+ASM SC_ASM_FloatAddExp_Sh2Set(ASM Self, uint Value);
 
-ASM SC_ASM_FloatIncr_HighSet(ASM Self, uint Value);
+ASM SC_ASM_FloatAddExp_Sh3Set(ASM Self, uint Value);
+
+ASM SC_ASM_FloatConst_DSet(ASM Self, uint Value);
+
+ASM SC_ASM_FloatConst_HighSet(ASM Self, uint Value);
 
 ASM SC_ASM_Func_IncrSet(ASM Self, uint Value);
 
@@ -4899,8 +4909,13 @@ ASM JB_ASM_Float__Encode(FatASM* Self);
 
 
 
-// ASM_FloatIncr
-ASM JB_ASM_FloatIncr__Encode(FatASM* Self);
+// ASM_FloatAddExp
+ASM JB_ASM_FloatAddExp__Encode(FatASM* Self);
+
+
+
+// ASM_FloatConst
+ASM JB_ASM_FloatConst__Encode(FatASM* Self);
 
 
 
@@ -5123,6 +5138,8 @@ AsmReg SC_Pac_Prm(ASMState* Self, Message* Prm);
 UghInt SC_Pac_Ptoi(ASMState* Self, AsmReg R);
 
 UghInt SC_Pac_Ptoif(ASMState* Self, AsmReg R);
+
+UghInt SC_Pac_PtoifAny(ASMState* Self, AsmReg R);
 
 bool SC_Pac_SetConst(ASMState* Self, Message* List, Message* Orig);
 

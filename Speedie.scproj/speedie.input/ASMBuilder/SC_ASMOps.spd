@@ -50,18 +50,9 @@ module asmOps
 		dest = dest as asmmath.add + subtract
 
 		if (opp == asm.add) and .CanAddC(L, LL)			// 1 + a
-			// can we step back one?
-			if L is mathconst
-				// OK so... what if it is?
-				// we can step back one? 
-				debugger 
-				.curr--
 			.AddASM(asm.ADDK, dbg, dest, R, LL)
 
 		  elseif .CanAddC(R, RR)						// a - 1, a + 1
-			if L is mathconst
-				debugger // same
-				.curr--
 			.AddASM(asm.ADDK, dbg, dest, L, RR)
 
 		  else
@@ -103,6 +94,20 @@ module asmOps
 		(l is alternate) // the logic ismostly shared...
 		return plus(self, dest, l, r, dbg)
 
+
+	function QuickFloatDiv    (fn_opasm)
+		expect (r.isfloat) (dbg, "ugh")
+		
+		|| foy = .PtoifAny(r)$
+		debugger
+		if foy == -1
+			return subtract(self, dest, asmreg(), l, dbg)
+		if foy <= 1
+			if foy == 0
+				l = asmreg()
+			return assign(self, dest, l, asmreg(), dbg)
+		return plus(self, dest, l, l, dbg)
+
 			
 	function QuickMul    (fn_opasm)
 		|| PToi = .Ptoi(r)$
@@ -123,7 +128,7 @@ module asmOps
 		return dest
 
 			
-	function QuickFDouble    (fn_opasm)
+	function QuickFloatExp    (fn_opasm)
 		expect (r.isfloat) (dbg, "ugh")
 		
 		|| foy = .Ptoif(r)$
@@ -145,9 +150,9 @@ module asmOps
 				return D2
 			.AddASM(asm.MUL , dbg, dest, L, R)
 		  else
-			|| D1 = QuickFDouble(self, dest, R, L, dbg)
+			|| D1 = QuickFloatExp(self, dest, R, L, dbg)
 				return D1
-			|| D2 = QuickFDouble(self, dest, L, R, dbg)
+			|| D2 = QuickFloatExp(self, dest, L, R, dbg)
 				return D2
 			.AddASM(asm.FMUL, dbg, dest, L, R).r[4] = l.eightbytes|int|
 		if dest is const
@@ -162,6 +167,10 @@ module asmOps
 	
 	
 	function DivFloat    (fn_opasm)
+		|| D1 = QuickFloatDiv(self, dest, R, L, dbg)
+			return D1
+		|| D2 = QuickFloatDiv(self, dest, L, R, dbg)
+			return D2
 		|| big = dest.eightbytes|int|
 		.AddASM(asm.FDIV, dbg, dest, big, L, R)
 		|| Alt = l is alternate

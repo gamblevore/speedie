@@ -310,6 +310,7 @@ datatype uint
 	function Unhash (|uint|)
 		cpp_wrapper JB_uint_unhash 
 	
+	
 	function SwapEndian (|uint|)
 		cpp_Wrapper (__builtin_bswap32)
 	
@@ -450,6 +451,12 @@ datatype float
 	syntax cast (|bool|)
 		cpp_part AsBool
 		return self|bool|
+	
+
+	function Exponent (|int|)
+		cpp_wrapper JB_F_Log2
+	function f64.Exponent (|int|)
+		cpp_wrapper JB_F64_Log2
 	
 	function Floor (|float|)
 		cpp_wrapper (floorf)

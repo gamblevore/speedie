@@ -117,11 +117,19 @@ forms
 
 	Float:		r1 r,  r2 r,  r3 r,  r4 r,  D  1
 
-	FloatIncr
+	FloatConst
 		r1		r
 		r2		r
 		D		1
 		High	13
+	
+	FloatAddExp
+		r1		r
+		r2		r
+		r3		r
+		Sh2		4
+		Sh3		4
+	
 
 
 // this file:
@@ -361,12 +369,21 @@ MEMM  ("rrnl")
 
 
 #!						(((((Float)))))
-FADK (FloatIncr)
+FADK (FloatConst)
 	// we just want simple things like MyFloat += 2.0
-	if (FloatIncr_Du)
+	if (FloatConst_Du)
 		d1 += d2 + FloatIncr2(Op)
 	else
 		f1 += f2 + FloatIncr1(Op)
+
+FMLK  (FloatConst)
+	if (FloatConst_Du)
+		d1 = d2 * FloatIncr2(Op)
+	else
+		f1 = f2 * FloatIncr1(Op)
+
+FEXK  (FloatAddExp)
+	f1 = FloatSh1(u2, FloatAddExp_Sh2i) + FloatSh1(u3, FloatAddExp_Sh3i)
 
 FADD  (Float)
 	if (Float_Du)

@@ -14,6 +14,8 @@ extern "C" {
     double JB_Pow0_1(int x);
     u32 JB_uint_unhash (u32 x);
     u64 JB_uint64_hash (u64 x);
+	int JB_F_Log2(float x);
+	int JB_F64_Log2(double x);
     
 
 	inline double JB_int64_AsFloat(int64 Self) {

@@ -87,6 +87,19 @@ extern "C" {
 		return rz;
 	}
     
+	int JB_F_Log2(float x) {
+		uint ix = reinterpret_cast<uint&>(x);
+		uint exp = (ix<<1) >> 24;
+		int log2 = exp - 127;
+		return log2;
+	}
+
+	int JB_F64_Log2(double x) {
+		uint64 ix = reinterpret_cast<uint64&>(x);
+		uint64 exp = (ix<<1) >> 53;
+		int log2 = (uint)exp - 1023;
+		return log2;
+	}
     
     u32 JB_uint_hash (u32 x) {
         x ^= x >> 16;

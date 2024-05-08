@@ -43,7 +43,7 @@ struct ASMState
 		if (!r.reg) // what?
 	
 	
-	function Ptoif (|asmreg| r,  |UghInt|)
+	function Ptoif (|asmreg| r,   |UghInt|)
 		require r is const
 		|| p = &.consts[r.reg]
 		|f64| v
@@ -55,6 +55,24 @@ struct ASMState
 		if v == 0.0:  return 0
 		if v == 1.0:  return 1
 		if v == 2.0:  return 2
+
+	
+	function PtoifAny (|asmreg| r,  |UghInt|)
+		require r is const
+		|| p = &.consts[r.reg]
+		if r.eightbytes
+			|| v = p|&f64|[0]
+			|| One = 1.0|f64|
+			|| v2 = One / v
+			if One/v2 == v
+				return v.exponent
+		 else
+			|| v = p|&float|[0]
+			|| One = 1.0|float|
+			|| v2 = One / v
+			if One/v2 == v
+				return v.exponent
+
 
 
 //	function Floats (|int| i, |&float|)
