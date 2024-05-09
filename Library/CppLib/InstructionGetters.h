@@ -304,17 +304,11 @@
 #define   Float_Du_(x)   (((uint)((x)<<28))>>31)
 
 
-#define   FloatConst_Di       ((( int)((Op.Raw)<<18))>>31)
-#define   FloatConst_Di_(x)   ((( int)((x)<<18))>>31)
+#define   FloatConst_Highi       ((( int)((Op.Raw)<<18))>>18)
+#define   FloatConst_Highi_(x)   ((( int)((x)<<18))>>18)
 
-#define   FloatConst_Du       (((uint)((Op.Raw)<<18))>>31)
-#define   FloatConst_Du_(x)   (((uint)((x)<<18))>>31)
-
-#define   FloatConst_Highi       ((( int)((Op.Raw)<<19))>>19)
-#define   FloatConst_Highi_(x)   ((( int)((x)<<19))>>19)
-
-#define   FloatConst_Highu       (((uint)((Op.Raw)<<19))>>19)
-#define   FloatConst_Highu_(x)   (((uint)((x)<<19))>>19)
+#define   FloatConst_Highu       (((uint)((Op.Raw)<<18))>>18)
+#define   FloatConst_Highu_(x)   (((uint)((x)<<18))>>18)
 
 
 #define   FloatAddExp_Sh2i       ((( int)((Op.Raw)<<23))>>28)

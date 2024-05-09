@@ -87,18 +87,18 @@ extern "C" {
 		return rz;
 	}
     
-	int JB_F_Log2(float x) {
-		uint ix = reinterpret_cast<uint&>(x);
-		uint exp = (ix<<1) >> 24;
-		int log2 = exp - 127;
-		return log2;
+	ivec2 JB_F_Exponent(float f) {
+		uint i = reinterpret_cast<uint&>(f);
+		uint x = (i<<1) >> 24;
+		int x2 = x - 127;
+		return (ivec2){ x2, JB_uint_IsPo2(i<<9) };
 	}
 
-	int JB_F64_Log2(double x) {
-		uint64 ix = reinterpret_cast<uint64&>(x);
-		uint64 exp = (ix<<1) >> 53;
-		int log2 = (uint)exp - 1023;
-		return log2;
+	ivec2 JB_F64_Exponent(double d) {
+		uint64 i = reinterpret_cast<uint64&>(d);
+		uint64 x = (i<<1) >> 53;
+		int x2 = (int)x - 1023;
+		return (ivec2){ x2, JB_uint64_IsPo2(i<<12) };
 	}
     
     u32 JB_uint_hash (u32 x) {

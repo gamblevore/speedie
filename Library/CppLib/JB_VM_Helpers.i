@@ -63,11 +63,6 @@ float FloatIncr1 (ASM Op) {
     return reinterpret_cast<float&>(f);
 }
 
-double FloatIncr2 (ASM Op) {
-    uint64 f = ((uint64)FloatConst_Highu << 51);
-    return reinterpret_cast<double&>(f);
-}
-
 float FloatSh1 (uint64 u, int S) {
 	uint64 Exp = u + (S << 24); // don't do any error-checking :) overflows according to exactly this definition.
 	return reinterpret_cast<float&>(Exp);

@@ -6,17 +6,25 @@
 #include "JB_Umbrella.h"
 
 extern "C" {
-    int JB_Math_Rnd32();
-    float fclampf (float d, float min, float max);
-    float JB_fCluster (float x);
-    u32 JB_uint_hash (u32 x);
-    double JB_Pow10(int x);
-    double JB_Pow0_1(int x);
-    u32 JB_uint_unhash (u32 x);
-    u64 JB_uint64_hash (u64 x);
-	int JB_F_Log2(float x);
-	int JB_F64_Log2(double x);
-    
+    int    JB_Math_Rnd32();
+    float  fclampf         (float d, float min, float max);
+    float  JB_fCluster     (float x);
+    u32    JB_uint_hash    (u32 x);
+    double JB_Pow10        (int x);
+    double JB_Pow0_1       (int x);
+    u32    JB_uint_unhash  (u32 x);
+    u64    JB_uint64_hash  (u64 x);
+	ivec2  JB_F_Exponent   (float x);
+	ivec2  JB_F64_Exponent (double x);
+	
+	
+	inline bool JB_uint64_IsPo2(uint64 Self) {
+		return (Self & (Self - 1)) == 0;
+	}
+
+	inline bool JB_uint_IsPo2(uint Self) {
+		return (Self & (Self - 1)) == 0;
+	}
 
 	inline double JB_int64_AsFloat(int64 Self) {
 		return reinterpret_cast<double&>(Self);	

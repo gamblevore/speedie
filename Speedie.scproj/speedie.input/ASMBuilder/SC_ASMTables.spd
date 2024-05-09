@@ -304,14 +304,14 @@ function Thg (fn_asm)
 	
 	if d is const									// We want a number, really
 		|| R = dest.reg
-		expect (R and dest isnt set) (exp)
+		check (R and dest isnt set) (exp)
 		|| val = d.exportposition
 			.NumToReg(val, exp, R)
 			(dest is const)
 			return dest
 		return asmreg.Zero
 
-	expect (d is global) (Exp)
+	check (d is global) (Exp)
 	if dest isnt discard
 		return DoGlobal(self, exp, dest, d)
  
@@ -353,9 +353,24 @@ function ARel		(fn_asm)
 
 function Minus			(fn_asm)					// -a
 	opt	NoRefCounts
-	return asmtmp.DoSingleMath(self, exp, dest, scoperator.minus)
-		
+	return ASMTmp.DoSingleMath(self, exp, dest, scoperator.minus)
 
+
+function AddConstantToReg (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asm| Op)
+	if dest.isint
+		if value.CanStoreAsIntImmediate
+			.AddASM(op.next, exp.parent!, dest, src, Value)
+			return
+	  elseif dest.fourbytes
+		if value|uint64|.CanStoreAsFloatImmediate
+			.AddASM(op.next, exp.parent!, dest, src, Value)
+			return
+	
+	|| K = .tempme(Exp, src • dest)
+	.NumToReg(Value, exp, K)
+	.AddASM(op, exp.parent!, dest, src, K)
+	
+  
 
 function Precrement		(fn_asm)					// --a, ++a
 	opt	NoRefCounts
@@ -364,31 +379,25 @@ function Precrement		(fn_asm)					// --a, ++a
 		dest = src
 	  else
 		dest = .TempMe(exp, dest)	
-	
-	|| D = exp.FastDecl
-	|| Incr = (D.DeclSize, 1)(D.typesuffers)
-	if mode & 1
-		Incr = -Incr
 
-	/*		r1		r
-			r2		r
-			D		1
-			High	13		*/
+	|| D = exp.FastDecl
+	|int64| Value = (-1,1)(mode & 1)
 	if dest.isfloat
-		incr = (incr == 1)|int|
-		|| big = dest.fourbytes
-			incr =  127 + (incr<<7)
+		if dest.fourbytes
+			value = value|float|.asint
 		  else
-			incr = 1023 + (incr<<10)
-		
-		.AddASM(ASM.FADK, exp.parent!, dest, src, big|int|, incr<<5)
-	  else
-		.AddASM(ASM.ADDK, exp.parent!, dest, src, incr)
+			value = value|f64|.asint
+	  elseif D.typesuffers
+		Value *= D.typesuffers
+		check Value.CanStoreAsIntImmediate (exp, "Object too large to increment")
+			
+	AddConstantToReg(self, exp, dest, src, Value, asm.add)
+
 	if d isnt local
 		.µ(exp, dest.set)							// write it back again
 	
 	return dest
-	
+
 	
 function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 	opt	NoRefCounts
@@ -494,4 +503,11 @@ function message.SimpleVar (|asmreg|)
 		if !d.exportposition
 			return asmreg()
 
+
+function int64.CanStoreAsIntImmediate (|bool|)
+	return ((self << 50)>>50) == self
+
+
+function uint64.CanStoreAsFloatImmediate (|bool|)
+	return ((self << 50)>>50) == self
 

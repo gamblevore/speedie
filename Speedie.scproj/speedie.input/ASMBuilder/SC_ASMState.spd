@@ -31,7 +31,7 @@ struct ASMState
 		return .consts[a.reg]
 
 	
-	function Ptoi (|asmreg| r,  |UghInt|)
+	function IntPowerOfTwo (|asmreg| r,  |FailableInt|)
 		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
 		if r is const
 			|| v = .Consts[r.reg]
@@ -43,7 +43,7 @@ struct ASMState
 		if (!r.reg) // what?
 	
 	
-	function Ptoif (|asmreg| r,   |UghInt|)
+	function FloatUnMultiplier (|asmreg| r,   |FailableInt|)
 		require r is const
 		|| p = &.consts[r.reg]
 		|f64| v
@@ -57,30 +57,16 @@ struct ASMState
 		if v == 2.0:  return 2
 
 	
-	function PtoifAny (|asmreg| r,  |UghInt|)
-		require r is const
+	function FloatPowerOfTwo (|asmreg| r,  |failableint|)
 		|| p = &.consts[r.reg]
+		|ivec2| exp
 		if r.eightbytes
-			|| v = p|&f64|[0]
-			|| One = 1.0|f64|
-			|| v2 = One / v
-			if One/v2 == v
-				return v.exponent
-		 else
-			|| v = p|&float|[0]
-			|| One = 1.0|float|
-			|| v2 = One / v
-			if One/v2 == v
-				return v.exponent
-
-
-
-//	function Floats (|int| i, |&float|)
-//		return (&.consts[i])|&float|
-//		
-//
-//	function Doubles (|int| i, |&f64|)
-//		return (&.consts[i])|&f64|
+			exp = p|&f64|[0].exponent
+		  else
+			exp = p|&float|[0].exponent
+			
+		if exp.y == 1
+			return exp.x
 
 		
 	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |int| c, |int| d, |int| e, |&FatASM|)

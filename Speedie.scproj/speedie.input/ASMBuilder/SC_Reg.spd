@@ -139,7 +139,7 @@ datatype AsmReg (uint)
 	function Set (|asmreg|)
 		return self as set
 	
-	function operator• (|asmreg| dest, |asmreg|)
+	operator • (|asmreg| dest, |asmreg|)
 		if .reg == dest.reg
 			return asmreg()
 		return dest

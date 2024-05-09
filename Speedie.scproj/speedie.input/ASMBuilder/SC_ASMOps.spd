@@ -96,21 +96,32 @@ module asmOps
 
 
 	function QuickFloatDiv    (fn_opasm)
-		expect (r.isfloat) (dbg, "ugh")
-		
-		|| foy = .PtoifAny(r)$
-		debugger
-		if foy == -1
-			return subtract(self, dest, asmreg(), l, dbg)
-		if foy <= 1
-			if foy == 0
-				l = asmreg()
-			return assign(self, dest, l, asmreg(), dbg)
-		return plus(self, dest, l, l, dbg)
+		expect (r.isfloat) (dbg)
+		require r is const
+		// only optimises poweroftwo... the reason is that   x/3 != x*0.333333
+		// for example 9/3-->3, but 0*0.33333->2.99997. We could optimise this
+		// only with extra syntax, at which point they might as well just adjust their code.
+		// like x/5 --> x*5th
 
+		|| v = .FloatPowerOfTwo(r)$
+		
+		if v < 0 // it exists but it is < 0, like x = x / -2.0. We can just make it into a mul.
 			
-	function QuickMul    (fn_opasm)
-		|| PToi = .Ptoi(r)$
+
+		// So... we have an exponent change. We can do this with a float instruction?
+		//return Subtract(self, dest, l, 0, )
+
+/*
+	FloatAddExp
+		r1		r
+		r2		r
+		r3		r
+		Sh2		4
+		Sh3		4
+*/
+
+	function QuickIntMul    (fn_opasm)
+		|| PToi = .IntPowerOftwo(r)$
 
 		if ptoi <= 1
 			if ptoi == -1   //   y = x * -1  -->  y = 0-x 
@@ -128,15 +139,16 @@ module asmOps
 		return dest
 
 			
-	function QuickFloatExp    (fn_opasm)
-		expect (r.isfloat) (dbg, "ugh")
+	function QuickFloatMul    (fn_opasm)
+		expect (r.isfloat) (dbg)
 		
-		|| foy = .Ptoif(r)$
+		// we can do float consts here too.
+		|| exp = .FloatUnmultiplier(r)$
 		
-		if foy == -1
-			return subtract(self, dest, asmreg(), l, dbg)
-		if foy <= 1
-			if foy == 0
+		if exp == -1
+			return Subtract(self, dest, asmreg(), l, dbg)
+		if exp <= 1
+			if exp == 0
 				l = asmreg()
 			return assign(self, dest, l, asmreg(), dbg)
 		return plus(self, dest, l, l, dbg)
@@ -144,15 +156,15 @@ module asmOps
 	
 	function Mul    (fn_opasm)
 		if l.isint
-			|| D1 = QuickMul(self, dest, R, L, dbg)
+			|| D1 = QuickIntMul(self, dest, R, L, dbg)
 				return D1
-			|| D2 = QuickMul(self, dest, L, R, dbg)
+			|| D2 = QuickIntMul(self, dest, L, R, dbg)
 				return D2
 			.AddASM(asm.MUL , dbg, dest, L, R)
 		  else
-			|| D1 = QuickFloatExp(self, dest, R, L, dbg)
+			|| D1 = QuickFloatMul(self, dest, R, L, dbg)
 				return D1
-			|| D2 = QuickFloatExp(self, dest, L, R, dbg)
+			|| D2 = QuickFloatMul(self, dest, L, R, dbg)
 				return D2
 			.AddASM(asm.FMUL, dbg, dest, L, R).r[4] = l.eightbytes|int|
 		if dest is const

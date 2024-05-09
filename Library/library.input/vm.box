@@ -120,8 +120,7 @@ forms
 	FloatConst
 		r1		r
 		r2		r
-		D		1
-		High	13
+		High	14
 	
 	FloatAddExp
 		r1		r
@@ -140,271 +139,266 @@ forms
 
 
 #!						 (((((STOP)))))
-EROR (U1)
-	// all 0000 means no-op
-	if (n1 or U1_Lu)
-		return u1+U1_Lu
+/**/ EROR (U1)
+		// all 0000 means no-op
+		if (n1 or U1_Lu)
+			return u1+U1_Lu
 
-TRAP (Trap)
-	if (Trap_Signalu)
-		JB_App__SelfSignal(Trap_Lu)
-	else if (!Trap_Funcu)
-		debugger
+/**/ TRAP (Trap)
+		if (Trap_Signalu)
+			JB_App__SelfSignal(Trap_Lu)
+		else if (!Trap_Funcu)
+			debugger
 
 
 
 #!						 (((((FUNC)))))
 
-RET (Ret)	// ret: 
-	__ 
-	Code = Return(r, Code, Op)
-	___
+/**/ RET (Ret)	// ret: 
+		__ 
+		Code = Return(r, Code, Op)
+		___
 
-FUNC (Func, 2,3) // func: 
-	__
-	Code = BumpStack(r, Code, Op)
-	___
+/**/ FUNC (Func, 2,3) // func: 
+		__
+		Code = BumpStack(r, Code, Op)
+		___
 
-FNCX (Func, 2,3)
-	__
-	vm.CurrStack = r // to make this recursive
-	ForeignFuncSimple(r, Code, Op)
-	___
+/**/ FNCX (Func, 2,3)
+		__
+		vm.CurrStack = r // to make this recursive
+		ForeignFuncSimple(r, Code, Op)
+		___
 
-TAIL (Tail, 2)
-	__
-	Code = TailStack(r, Code, Op)
-	___
+/**/ TAIL (Tail, 2)
+		__
+		Code = TailStack(r, Code, Op)
+		___
 
-SWAP (Swap)
-	std_swap(r[SWAP_Au], r[SWAP_Bu])
-	std_swap(r[SWAP_Cu], r[SWAP_Du])
+/**/ SWAP (Swap)
+		std_swap(r[SWAP_Au], r[SWAP_Bu])
+		std_swap(r[SWAP_Cu], r[SWAP_Du])
 	
 
 
 #!						 (((((Utils)))))
-PRNT (U1)
-	printf("%lli\n", i1)
-	#!better to print this also as float/double/signed/unsigned...
-RARE (U2)
-	if_rare (Rare(r, Op)) return n3
-CONV (U3)
-	Conv(r, n2, Op)
+/**/ PRNT (U1)
+		printf("%lli\n", i1)
+		#!better to print this also as float/double/signed/unsigned...
+/**/ RARE (U2)
+		if_rare (Rare(r, Op)) return n3
+/**/ CONV (U3)
+		Conv(r, n2, Op)
 
 
 
 #!						 (((((Consts)))))
-SETK (Const)
-	RotateConst(r, Op)
-SETN (setn)//, 1, 2, 3)			// OK
-	LoadConst(r, Op, Code)
+/**/ SETK (Const)
+		RotateConst(r, Op)
+/**/ SETN (setn)//, 1, 2, 3)			// OK
+		LoadConst(r, Op, Code)
 
 
 
 #!						 (((((Math)))))
-ADDK ("rrnl")
-	i1  =  i2 + U2_Li
-ADD  (U3)
-	i1  =  i2 + (i3 << L3) // only need 6 bits for shift! can we save 3 conditional add?
-SUB  (U3)
-	i1  =  i2 - (i3 << L3)
-MUL  (U4)
-	i1 = (i2 * i3) + i4
-DIV  (Div)
-	DivMath(r, Op)
+/**/ ADD  (U3)
+		i1 = i2 + (i3 << L3) // only need 6 bits for shift! can we save 3 conditional add?
+/**/ ADDK ("rrnl")
+		i1 = i2 + U2_Li
+/**/ SUB  (U3)
+		i1 = i2 - (i3 << L3)
+/**/ MUL  (U4)
+		i1 = (i2 * i3) + i4
+/**/ DIV  (Div)
+		DivMath(r, Op)
 
 
 
 #!						 (((((Bitops)))))
-SHRS  (U3)
-	i1 = i2 >> (u3 + L3)
-SHRU  (U3)
-	u1 = u2 >> (u3 + L3)
-SHLU  (U3) 
-	i1 = i2 << (u3 + L3)
-BAND  (U3)
-	u1 = u2 &  (u3|||L3)
-BOR   (U3)
-	u1  |= (u2|||u3)
-BXOR  (U3)
-	u1 = u2 ^ u3
-BXNR  (U3)		// for A = ~B
-	u1 = (~u2 ^ u3)
-BNOT  (U2)
-	u1 = ~u2 // & U3_Li
-BFLG  (BFLD)
-	if (BFLD_Lu) // perhaps sign can allow for 1-4 contig regs to be masked?
-		i1 = ((i2 << BFLD_upu) >> BFLD_downu)
-	else
-		u1 = ((u2 << BFLD_upu) >> BFLD_downu)
-BFLS  (BFLD)		 // same?
-	i1 |= ((i2 << BFLD_downu) >> BFLD_upu)
+/**/ SHRS  (U3)
+		i1 = i2 >> (u3 + L3)
+/**/ SHRU  (U3)
+		u1 = u2 >> (u3 + L3)
+/**/ SHLU  (U3) 
+		i1 = i2 << (u3 + L3)
+/**/ BAND  (U3)
+		u1 = u2 &  (u3|||L3)
+/**/ BOR   (U3)
+		u1  |= (u2|||u3)
+/**/ BXOR  (U3)
+		u1 = u2 ^ u3
+/**/ BXNR  (U3)		// for A = ~B
+		u1 = (~u2 ^ u3)
+/**/ BNOT  (U2)
+		u1 = ~u2 // & U3_Li
+/**/ BFLG  (BFLD)
+		if (BFLD_Lu) // perhaps sign can allow for 1-4 contig regs to be masked?
+			i1 = ((i2 << BFLD_upu) >> BFLD_downu)
+		else
+			u1 = ((u2 << BFLD_upu) >> BFLD_downu)
+/**/ BFLS  (BFLD)		 // same?
+		i1 |= ((i2 << BFLD_downu) >> BFLD_upu)
 
 	
-//BSTT  (U4)
-//	i1 = 0//bitstats(u2, u3, u4)
-BROL  (U3)
-	i1 = JB_u64_RotL(u2, u3 + L3)
-BROR  (U3)
-	i1 = JB_u64_RotR(u2, u3 + L3)
-BCMP  (BCmp)
-	u1 = BitComp(r, Op)
+///**/ BSTT  (U4)
+//		i1 = 0//bitstats(u2, u3, u4)
+/**/ BROL  (U3)
+		i1 = JB_u64_RotL(u2, u3 + L3)
+/**/ BROR  (U3)
+		i1 = JB_u64_RotR(u2, u3 + L3)
+/**/ BCMP  (BCmp)
+		u1 = BitComp(r, Op)
 
 
 #!						 (((((Branches)))))
-JUMP (U0)
-	Code += l0
+/**/ JUMP (U0)
+		Code += l0
 
-CMPI  (Cmp)					// Yes. int/uint/u64/i64 versions
-	__
-	Code = CompI(r, Op, Code)
-	___
-CMPF  (Cmp)
-	__
-	Code = CompF(r, Op, Code)
-	___
-CMPE  (CmpEq)
-	__
-	Code = CompEq(r, Op, Code)
-	___
-CMPN  (CmpEq)				// NO (But easy to fix)
-	__
-	Code = CompNeq(r, Op, Code)
-	___
-BRA   (Bra)					// Merge these two?
-	__
-	if (!i1)
-		Code += Bra_jmpi
-	___
-	i1 += Bra_c1u-1
+/**/ CMPI  (Cmp)					// Yes. int/uint/u64/i64 versions
+		__
+		Code = CompI(r, Op, Code)
+		___
+/**/ CMPF  (Cmp)
+		__
+		Code = CompF(r, Op, Code)
+		___
+/**/ CMPE  (CmpEq)
+		__
+		Code = CompEq(r, Op, Code)
+		___
+/**/ CMPN  (CmpEq)				// NO (But easy to fix)
+		__
+		Code = CompNeq(r, Op, Code)
+		___
+/**/ BRA   (Bra)					// Merge these two?
+		__
+		if (!i1)
+			Code += Bra_jmpi
+		___
+		i1 += Bra_c1u-1
 
-BRAN  (Bra)					
-	__
-	if (i1)
-		Code += Bra_jmpi
-	___
-	i1 += Bra_c1u-1
+/**/ BRAN  (Bra)					
+		__
+		if (i1)
+			Code += Bra_jmpi
+		___
+		i1 += Bra_c1u-1
 
-LUPU  ("rrj")				// assume uint64
-	__
-	if (i1++ < i2)
-		Code -= U2_Lu
-	___
-LUPD  ("rrj")			 	// same
-	__
-	if (i1-- > i2)
-		Code -= U2_Lu
-	___
+/**/ LUPU  ("rrj")				// assume uint64
+		__
+		if (i1++ < i2)
+			Code -= U2_Lu
+		___
+/**/ LUPD  ("rrj")			 	// same
+		__
+		if (i1-- > i2)
+			Code -= U2_Lu
+		___
 
 
 
 #!						 (((((Refs)))))
-RSDE  ("rrrj")
-	__
-	Code += U3_Li
-	___
-	decr(o3)
-	decr(o2)
-	safedecr(o1)
-	#!jump too? for branches...
-RSET  (U4)
-	setref(n1, o1, o2)
-	setref(n3, o3, o4)
+/**/ RSDE  ("rrrj")
+		__
+		Code += U3_Li
+		___
+		decr(o3)
+		decr(o2)
+		safedecr(o1)
+		#!jump too? for branches...
+/**/ RSET  (U4)
+		setref(n1, o1, o2)
+		setref(n3, o3, o4)
 
-RALO  (U2)
-	o1 = alloc(o2)
-	#!should call constructor too.
+/**/ RALO  (U2)
+		o1 = alloc(o2)
+		#!should call constructor too.
 
 
 
 #!						(((((Memory)))))
-TABL  (U2)
-	u1 = table(u2, L2)
-RD1U  (mem)
-	u1 = mem(uint8)
-	mem2(uint8)
-RD1S  (mem)
-	u1 = mem(char)
-	mem2(char)
-RD2U  (mem)
-	u1 = mem(u16)
-	mem2(u16)
-RD2S  (mem)
-	u1 = mem(s16)
-	mem2(s16)
-RD4U  (mem)
-	u1 = mem(u32)
-	mem2(u32)
-RD4S  (mem)
-	u1 = mem(int)
-	mem2(int)
-RD8U  (mem)
-	u1 = mem(u64)
-	mem2(u64)
-RD16  (mem)
-	((ivec4*)r)[n1] = mem(ivec4)
-	mem2(ivec4)
-WR1U  (mem)
-	mem(uint8) = u1
-	mem2(uint8)
-WR2U  (mem)
-	mem(u16) = u1
-	mem2(u16)
-WR4U  (mem)
-	#! xcode only complains about this one? ?
-	mem(u32) = (u32)u1
-	mem2(u32)
-WR8U  (mem)
-	mem(u64) = u1
-	mem2(u64)
-WR16  (mem)
-	mem(ivec4) = (ivec4)(((ivec4*)r)[n1])
-	mem2(ivec4)
+/**/ TABL  (U2)
+		u1 = table(u2, L2)
+/**/ RD1U  (mem)
+		u1 = mem(uint8)
+		mem2(uint8)
+/**/ RD1S  (mem)
+		u1 = mem(char)
+		mem2(char)
+/**/ RD2U  (mem)
+		u1 = mem(u16)
+		mem2(u16)
+/**/ RD2S  (mem)
+		u1 = mem(s16)
+		mem2(s16)
+/**/ RD4U  (mem)
+		u1 = mem(u32)
+		mem2(u32)
+/**/ RD4S  (mem)
+		u1 = mem(int)
+		mem2(int)
+/**/ RD8U  (mem)
+		u1 = mem(u64)
+		mem2(u64)
+/**/ RD16  (mem)
+		((ivec4*)r)[n1] = mem(ivec4)
+		mem2(ivec4)
+/**/ WR1U  (mem)
+		mem(uint8) = u1
+		mem2(uint8)
+/**/ WR2U  (mem)
+		mem(u16) = u1
+		mem2(u16)
+/**/ WR4U  (mem)
+		#! xcode only complains about this one? ?
+		mem(u32) = (u32)u1
+		mem2(u32)
+/**/ WR8U  (mem)
+		mem(u64) = u1
+		mem2(u64)
+/**/ WR16  (mem)
+		mem(ivec4) = (ivec4)(((ivec4*)r)[n1])
+		mem2(ivec4)
 
-CNTC  (CNTC)					// aWESOME  JOBBBBBBBBBBB BROOOOOO LOLLLLLLL ::DDDDDD
-	CountConst(r, Op)
-MEMM  ("rrnl")
-	#! copy/fill/endian/xor
-	MemStuff((u32*)u1, (u32*)u2, n3, L3)
+/**/ CNTC  (CNTC)					// aWESOME  JOBBBBBBBBBBB BROOOOOO LOLLLLLLL ::DDDDDD
+		CountConst(r, Op)
+/**/ MEMM  ("rrnl")
+		#! copy/fill/endian/xor
+		MemStuff((u32*)u1, (u32*)u2, n3, L3)
 
 
 #!						(((((Float)))))
-FADK (FloatConst)
-	// we just want simple things like MyFloat += 2.0
-	if (FloatConst_Du)
-		d1 += d2 + FloatIncr2(Op)
-	else
+
+/**/ FEXK  (FloatAddExp)
+		f1 = FloatSh1(u2, FloatAddExp_Sh2i) + FloatSh1(u3, FloatAddExp_Sh3i)
+
+/**/ FADD  (Float)
+		if (Float_Du)
+			d1 = d2 + d3 - d4
+		else
+			f1 = f2 + f3 - f4
+
+/**/ FADK (FloatConst)
+		// we just want simple things like MyFloat += 2.0
 		f1 += f2 + FloatIncr1(Op)
 
-FMLK  (FloatConst)
-	if (FloatConst_Du)
-		d1 = d2 * FloatIncr2(Op)
-	else
+/**/ FMUL  (Float)
+		if (Float_Du)
+			d1 = (d2 * d3)+d4
+		else
+			f1 = (f2 * f3)+f4
+
+/**/ FMLK  (FloatConst)
 		f1 = f2 * FloatIncr1(Op)
 
-FEXK  (FloatAddExp)
-	f1 = FloatSh1(u2, FloatAddExp_Sh2i) + FloatSh1(u3, FloatAddExp_Sh3i)
+/**/ FDIV  (Float)
+		if (Float_Du)
+			d1 = d2 / d3
+		else
+			f1 = f2 / f3
 
-FADD  (Float)
-	if (Float_Du)
-		d1 = d2 + d3 - d4
-	else
-		f1 = f2 + f3 - f4
-
-FMUL  (Float)
-	if (Float_Du)
-		d1 = (d2 * d3)+d4
-	else
-		f1 = (f2 * f3)+f4
-
-FDIV  (Float)
-	if (Float_Du)
-		d1 = d2 / d3
-	else
-		f1 = f2 / f3
-
-FFRC  (Float)
-	if (Float_Du)
-		d1 = (d2 - floor(d2)) * d3
-	else
-		f1 = (f2 - floor(f2)) * f3
+/**/ FFRC  (Float)
+		if (Float_Du)
+			d1 = (d2 - floor(d2)) * d3
+		else
+			f1 = (f2 - floor(f2)) * f3
