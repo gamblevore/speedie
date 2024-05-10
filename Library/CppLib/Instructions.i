@@ -52,11 +52,11 @@
 ı DIV: _
 	DivMath(r, Op);
 ı SHRS: _
-	i1 = i2 >> (u3 + L3);
+	i1 = ((uint64)((i2 << L3) >> u3)) >> L3;
 ı SHRU: _
-	u1 = u2 >> (u3 + L3);
+	u1 = (u2 >> u3) | u4;
 ı SHLU: _
-	i1 = i2 << (u3 + L3);
+	i1 = (i2 << u3) | u4;
 ı BAND: _
 	u1 = u2 & (u3 | L3);
 ı BOR: _
@@ -192,7 +192,12 @@
 
 	MemStuff((u32 *) u1, (u32 *) u2, n3, L3);
 ı FEXK: _
-	f1 = FloatSh1(u2, FloatAddExp_Sh2i) + FloatSh1(u3, FloatAddExp_Sh3i);
+	if FloatAddExp_Du 
+	f1 = FloatSh2(u2, FloatAddExp_Sh2i) + FloatSh2(u3, FloatAddExp_Sh3i)
+;
+	else 
+	f1 = FloatSh1(u2, FloatAddExp_Sh2i) + FloatSh1(u3, FloatAddExp_Sh3i)
+;
 ı FADD: _
 	if (Float_Du) 
 	d1 = d2 + d3 - d4

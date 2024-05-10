@@ -572,7 +572,7 @@ function File.TestSpeedie (|string| v, |bool|)
 		cmd_args <~ "--arch="+options.arch
 	
 	|| p = .path
-	p.execute(cmd_args)
+	p.execute(cmd_args, 0)
 	|| TestProd = "/usr/local/speedie/Terminal/SpeedieTest" + v
 	testprod.file.mustexist("Compile Speedie")	
 	print TransCompiler.TmpOut(Variant).ReadFile

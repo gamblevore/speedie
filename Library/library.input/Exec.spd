@@ -46,10 +46,10 @@ datatype ErrorInt2 (ivec2)
 
 
 extend string	
-	function Execute (|[string]?| Args = [],  |faststring?| Out = nil,  |faststring?| Errs = nil,  |bool| StdOutFlowsThroughUs=true, |ErrorInt2|)
+	function Execute       (|[string]?| Args = [],  |faststring?| Out = nil, |faststring?| Errs = nil, |bool| StdOutFlowsThroughUs=true, |date| timeout=0, |ErrorInt2|)
 		cpp_wrapper JB_Str_Execute
 
-	function SilentExecute (|[string]| Args=[],  |faststring|Out=nil,  |faststring| Errs=nil,  |ErrorInt2|)
+	function SilentExecute (|[string]?| Args = [],  |faststring?| Out = nil, |faststring?| Errs = nil, |date| timeout=0,  |ErrorInt2|)
 		return .execute(args, out, errs, false)
 
 	function ExecuteStr (|[string]| Args=nil, |string|)

@@ -41,32 +41,25 @@ struct ASMState
 				return v.Log2+1
 
 		if (!r.reg) // what?
-	
-	
-	function FloatUnMultiplier (|asmreg| r,   |FailableInt|)
-		require r is const
-		|| p = &.consts[r.reg]
-		|f64| v
-		if r.eightbytes
-			v = p|&f64|[0]
-		 else
-			v = p|&float|[0]
-		if v == -1.0: return -1
-		if v == 0.0:  return 0
-		if v == 1.0:  return 1
-		if v == 2.0:  return 2
 
-	
-	function FloatPowerOfTwo (|asmreg| r,  |failableint|)
-		|| p = &.consts[r.reg]
-		|ivec2| exp
-		if r.eightbytes
-			exp = p|&f64|[0].exponent
-		  else
-			exp = p|&float|[0].exponent
-			
-		if exp.y == 1
-			return exp.x
+
+	function AddConstantToReg (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asm| Op, |bool|)
+		if .TryUseConstant(exp, dest, src, value, op)
+			return true
+		|| K = .tempme(Exp, src • dest)
+		.NumToReg(Value, exp, K)
+		.AddASM(op, exp.parent!, dest, src, K)
+		
+		
+	function TryUseConstant (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asm| Op, |bool|)
+		if dest.isint
+			if value.CanStoreAsIntImmediate
+				.AddASM(op.next, exp.parent!, dest, src, Value)
+				return true
+		  elseif dest.fourbytes
+			if value|uint64|.CanStoreAsFloatImmediate
+				.AddASM(op.next, exp.parent!, dest, src, Value)
+				return true
 
 		
 	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |int| c, |int| d, |int| e, |&FatASM|)
@@ -154,14 +147,73 @@ struct ASMState
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	function AsTemp (|asmreg| T, |message| exp, |asmreg|)
+		if t.reg > .vdecls
+			return t 
+		return .tempme(exp)
 	
-	function NeedCond (|message| cond, |&fatasm|)
-		|| Where = .µ(cond, asmreg.Cond)
-		rz = .curr
-		if Where isnt cond
-			rz = .AddASM(asm.CMPN, cond, where)					// comparison against 0
+	
+	function Branch (|message| cond,  |&fatasm|)
+		|| Src = .µ(cond, asmreg.CondRequest)
+		if Src is cond
+/*
+	uint Jump = Cmp_Lu; 
+	bool b = CompI_(r, Op);
+	if (Jump >= 32) {
+		if (!b) return Code;
+		return Code + Jump - (1<<9);
+	}
+		
+	r[Jump].Int = b;
+	return Code;
+*/	
+	
+	
+			return .curr - 1
+		
+		|| T = Src.µtype
+		|| Negated = src is Negate
+		|| tb = t.bitcount
+		if t.isint
+			if  t is bool  or  tb == 64
+				debugat
+				return .AddASM(asm.BRA • Negated, cond, Src, 1)
+			
+			if  tb == 32
+				debugat
+				return .AddASM(asm.CMPI, cond, src, 0, 5 + Negated)
+
+			debugat			// 16 or 8
+			|| dest = .AsTemp(src, cond)
+			|| Sh = 64 - tb
+			.AddASM(asm.BFLG, cond, dest, src, sh, sh, src.signed|int|)
+			return .AddASM(asm.CMPE • !Negated, cond, 0, dest)
 
 
+		|| M = 8 + (tb==64)<<1
+		M += Negated
+		return .AddASM(asm.CMPF, cond, 0, Src, M)					// comparison against 0
+		/*
+			CmpSub(8 , FA == FB)
+			CmpSub(9 , FA != FB)
+			CmpSub(10, DA == DB)
+			CmpSub(11, DA != DB)
+		*/		
+
+	
+	function FindConst (|uint64| Code, |asmreg|)
+		if Code
+			return asmreg()
+		|int| i = 31 - .VTmps
+		// any flow-control can destroy this
+		// what about something like:
+		// || x = (1,2+1)
+		// perhaps tern should open/close?
+		while i > .VDecls
+			if .Consts[i] == code
+				return i.reg as asmreg.const
+			i--
+	
 	function µ (|message| exp,  |AsmReg| Dest = asmreg(), |AsmReg|)
 		opt norefcounts
 		pragma inline
@@ -227,10 +279,7 @@ struct ASMState
 		|| SaveAmount = 0
 		if dest isnt forreturn
 			SaveAmount = .vdecls
-		|| Fnc = .AddASM(OP,  prms.parent!,  save: SaveAmount,  incr: 0,  jump: fn.TableId)
-		fnc.r[3] = reg2
-		fnc.r[4] = reg3 
-
+		.AddASM(OP,  prms.parent!,  save: SaveAmount,  incr: 0,  jump: fn.TableId,  reg2,  reg3)
 		return dest
 
 

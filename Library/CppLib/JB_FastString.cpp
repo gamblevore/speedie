@@ -499,7 +499,9 @@ int JB_FS_Length(FastString* self) {
 }
 
 int JB_FS_StreamLength(FastString* self) {
-	return self->Length + self->WrittenLength;
+	if (self)
+		return self->Length + self->WrittenLength;
+	return 0;
 }
 
 void JB_FS_LengthSet(FastString* fs, int NewLength) {

@@ -294,17 +294,17 @@ function message.UnitMatch (|string| a, |string| b, |bool|)
 		error (self, "Unit should be " + a)
 
 
-
 function TypeOfUnit (ExprResolver)	
+	|message--| it = exp.first!
 	if exp == "l"
-		using (exp)
-		exp.become(@type)
-		exp <~ (@thg, "l")
-		return TypeInt64!.TypeNormal
+//		debugger
+		exp.become(@bra)
+		it.func = @num
+		return typeofnum(it, name_space, exp)
 
 	|f64| Mul = 0.0
-	|| Type = TypeInt!
-	|| unit = exp.name
+	|scclass--| Type = TypeInt!
+	|string--| unit = exp.name
 	if unit == "KB" or "K"
 		Mul = (1<<10)|f64|
 	  elseif unit == "MB" or "M"
@@ -341,36 +341,44 @@ function TypeOfUnit (ExprResolver)
 		  else
 			error (exp, "Unknown unit")
 	
-	|| it = exp.first$
-	|| str = ""
 	|| val = it.float
 	if !mul
-		str = (1.0 / val).render
+		val = (1.0 / val)
 		Type = TypeFloat!
 	  else
 		val *= mul
-		if type != TypeInt
-			str = val.renderfloat
-		  elseif it.name contains '.'
-			str = val.renderfloat
-			|f64| big = 16.0*1024.0*1024.0
-			if val >= big  or val < -big
-				type = TypeF64!
-			  else
-				type = TypeFloat!
-			// So... then what should I do?
+	
+	|| str = ""
+	|| D = type.typenormal.copydecl
+	|| X = val|uint64|
+	if type == typedate
+		str = val|int64|.render
+		
+	  elseif type.typeinfo.isfloat  or  it.name contains '.'
+		str = val.renderfloat
+		|f64| big = 16.0*1024.0*1024.0
+		if val >= big  or val < -big
+			D.type = TypeF64!
+			X = val.asint
 		  else
-			str = val|int64|.render
-			|f64| big = (1|int64| << 31|int64|)|f64|
-			if val >= big  or val < -big
-				type = TypeInt64!
-
+			D.type = TypeFloat!
+			X = val|float|.asint
+		// So... then what should I do?
+	  else
+		str = val|int64|.render
+		|f64| big = (1|int64| << 31|int64|)|f64|
+		if val >= big  or val < -big
+			D.type = TypeInt64!
+		if mul == 1
+			X = it.int
+	
+	d.ExportPosition = x
 	if it == str
 		str = it.name
 
 	exp.become(@num, str)
-	it.remove
-	return type.TypeNormal
+	exp.clear
+	return D
 
 
 
@@ -380,20 +388,27 @@ function TypeOfNum (ExprResolver)
 	|| z = n.iszero
 	if (n contains ".")
 		if z
+			if side
+				return typef64!.TypeNormal 
 			Return typefloat!.TypeNormal
-		return Typefloat!.typenormal
-//		|| D = typefloat!.TypeNormal.copydecl
-//		d.ExportPosition = exp.float.asint
-//		Return D
+		|| d = Typefloat!.typenormal.copydecl
+		|| f8 = exp.float
+		if (d.DeclSize == 4) and !side
+			d.ExportPosition = f8|float|.asint
+		  else
+			debugat
+			d.ExportPosition = f8.asint
+		Return D
 
 	if z
+		if side
+			return typeInt64!.TypeNormal 
 		return typeint!.typenormal
 	
 	|| Val = exp.int
-	|| d2 = typeint!.typenormal
-	if ((Val << 32) >> 32) != Val
-		d2 = typeint64!.typenormal
-	d2 = d2.CopyDecl
+	|| d2 = typeint!.typenormal.copydecl
+	if (((Val << 32) >> 32) != Val)  or  side
+		d2.type = typeint64!
 	d2.exportposition = val
 	return d2
 	
@@ -1132,6 +1147,11 @@ constants
 	kUsingStr = "Function here:"
 
 
+function message.BecomeSetRel
+	.func = @rel
+	//.asmtype = asmtmp.ksetvar
+
+
 function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name_space, |message| side, |scdecl|) {
 	|| cls = typeofexpr(self, name_space) #require
 	expect (cls.isnormal) (self, "Can't use 'is' on this type.")
@@ -1160,7 +1180,7 @@ function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name
 			if bra == exp // a is b = c --> (a is b)=c
 				bra = exp.WrapWith(@bra)
 
-			bra.func = @rel
+			bra.BecomeSetRel
 			|| eq = bra.msg(@opp, "=")
 			eq.obj = opch.obj
 			bra <~ (@thg, "true")

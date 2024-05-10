@@ -35,8 +35,12 @@ datatype AsmReg (uint)
 		MathTypes		= (31 << 16)
 		|asmreg|		// start at 21!
 		Set = 4
+		// could save some bits if we make an exclusive area
+		// can something be frommath and a positionrequset?
+		// or discard + return? who knows?
 		FromMath		= (1 << 21)
 		StayOpen		= (1 << 22)
+		AlreadyNegated	= (1 << 22)
 		Alternate		= (1 << 23)
 		Const			= (1 << 24)
 		MathConst		= (1 << 21) ||| (1<<24)
@@ -45,6 +49,9 @@ datatype AsmReg (uint)
 		ForReturn		= (1 << 27)
 		ForReturnReg	= (1 << 27) ||| (1<< 11)
 		Discard			= (1 << 28)
+		SingleExpr		= (1 << 29)
+		CondRequest		= (1 << 30)
+		Negate			= (1 << 31)
 		Zero			= Const
 	
 	function Math (|asmmath|)

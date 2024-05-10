@@ -32,7 +32,7 @@ void JB_File_ListEnd( JB_File* self );
 bool JB_File_ListActive( JB_File* self );
 
 JB_Object JB_File__File( JB_File* self );
-bool JB_FS_AppendPipe(FastString* self, int fd, int Mode);
+int JB_FS_AppendPipe(FastString* self, int fd, int Mode);
 
 int* JB_File__Compar();
 JB_String* JB_Str_ResolvePath( JB_String* self, bool AllowMissing );

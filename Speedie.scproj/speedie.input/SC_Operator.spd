@@ -62,6 +62,12 @@ function CaseAwareStr (|String|)
 	return (self is caseaware)|bool|.render
 
 
+function ASM2 (|fn_opasm?|)
+	nil checker
+	if self
+		return .asm
+	
+
 syntax equals (|string| s, |bool| aware, |bool|)
 	return .name.syntaxequals(s, aware)
 
@@ -117,8 +123,8 @@ module {
 	|Dictionary of SCOperator|			Dict = dictionary()
 	|int|								CustomOperatorScore
 	|scoperator|						Assigns
-	|scoperator| 						Minus = SCOperator.new("", &asmops.subtract, 0)
-	|scoperator| 						Bnot = SCOperator.new("", &asmops.BitXnor, 0)
+	|scoperator| 						Minus = SCOperator.new("", &asmstate.subtract, 0)
+	|scoperator| 						Bnot = SCOperator.new("", &asmstate.BitXnor, 0)
 	
 	function Lookup ( |Message| opch, |SCOperator| )
 		opt norefcounts
@@ -147,31 +153,31 @@ module {
 
 	function Init 
 		opt norefcounts
-		.AddComp("==",					&asmops.Equals, OpMode.ExactEquals)
-		.AddComp( "<",					&asmops.Less)
-		.AddComp( ">",					&asmops.More)
-		.AddComp( "<=",					&asmops.LessEq)
-		.AddComp( ">=",					&asmops.MoreEq)
-		.AddComp( "!=",					&asmops.NotEq,  OpMode.ExactNotEquals)
+		.AddComp("==",					&asmstate.Equals,	OpMode.ExactEquals)
+		.AddComp( "<",					&asmstate.Less)
+		.AddComp( ">",					&asmstate.More)
+		.AddComp( "<=",					&asmstate.LessEq)
+		.AddComp( ">=",					&asmstate.MoreEq)
+		.AddComp( "!=",					&asmstate.NotEq,	OpMode.ExactNotEquals)
 		.OppositeComp("==", "!=")
 		.OppositeComp("<", ">=")
 		.OppositeComp(">", "<=")
 
 		.AddAssign( "=" )
 
-		.AddMath( "mod",	"mod",		&asmops.Mod,	asmmath.Mod,	opmode.NeedsCppFuncOnFloats)
-		.AddMath( "+",		"Plus",		&asmops.Plus,	asmmath.Add,	opmode.Addition)
-		.AddMath( "-",		"Minus",	&asmops.Subtract,	asmmath.sub,	opmode.makessigned + opmode.Addition)
-		.AddMath( "*",		"Mul",		&asmops.Mul,	asmmath.mul)
-		.AddMath( "/",		"Divide",	&asmops.Div,	asmmath.div)
+		.AddMath( "mod",	"mod",		&asmstate.Mod,		asmmath.Mod,	opmode.NeedsCppFuncOnFloats)
+		.AddMath( "+",		"Plus",		&asmstate.Plus,		asmmath.Add,	opmode.Addition)
+		.AddMath( "-",		"Minus",	&asmstate.Subtract,	asmmath.sub,	opmode.makessigned + opmode.Addition)
+		.AddMath( "*",		"Mul",		&asmstate.Mul,		asmmath.mul)
+		.AddMath( "/",		"Divide",	&asmstate.Div,		asmmath.div)
 
-		.AddBit( "<<<",	"RotateLeft",	&asmops.ROL,	asmmath.ROL,	opmode.Left)
-		.AddBit( ">>>",	"RotateRight",	&asmops.ROR,	asmmath.ROR,	opmode.Left)
-		.addbit( ">>",	"ShiftRight",	&asmops.SHR,	asmmath.shru,	opmode.Left)
-		.addbit( "<<",	"ShiftLeft",	&asmops.SHL,	asmmath.shl)
-		.AddBit( "(|)",	"BitOr",		&asmops.BitOr,	asmmath.bor)
-		.AddBit( "&",	"BitAnd",		&asmops.BitAnd,	asmmath.ban,	opmode.SameOrLessBits)
-		.AddBit( "^",	"Xor",			&asmops.bitxor,	asmmath.xor,	opmode.noextrabits)
+		.AddBit( "<<<",	"RotateLeft",	&asmstate.ROL,		asmmath.ROL,	opmode.Left)
+		.AddBit( ">>>",	"RotateRight",	&asmstate.ROR,		asmmath.ROR,	opmode.Left)
+		.addbit( ">>",	"ShiftRight",	&asmstate.SHR,		asmmath.shru,	opmode.Left)
+		.addbit( "<<",	"ShiftLeft",	&asmstate.SHL,		asmmath.shl)
+		.AddBit( "(|)",	"BitOr",		&asmstate.BitOr,	asmmath.bor)
+		.AddBit( "&",	"BitAnd",		&asmstate.BitAnd,	asmmath.ban,	opmode.SameOrLessBits)
+		.AddBit( "^",	"Xor",			&asmstate.bitxor,	asmmath.xor,	opmode.noextrabits)
 
 		Minus.name = "-"
 		Bnot.name = "~"
@@ -207,7 +213,7 @@ module {
 	
 		
 	function AddAssign (|string| s)
-		.assigns = SCOperator.new(s, &asmops.Assign, OpMode.assigns)
+		.assigns = SCOperator.new(s, &asmstate.Assign, OpMode.assigns)
 
 		
 	function AddMath (|string| s,  |string| FuncName, |fn_opasm| ASM, |asmmath| Code, |OpMode| Mode=0)

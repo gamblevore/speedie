@@ -17,6 +17,12 @@ datatype ASM (uint)
 		return self ||| (value << 27) >> 18
 	function R4 (assigns:|uint|, |asm|)
 		return self ||| (value << 27) >> 23
+		
+	operator • (|bool| b, |asm|)
+		if b
+			return .next
+		return self
+
 	module
 		|byte|					NoisyASM = 1
 		|asm_encoder2[32]|		Forms

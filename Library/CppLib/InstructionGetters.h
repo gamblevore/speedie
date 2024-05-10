@@ -323,3 +323,9 @@
 #define   FloatAddExp_Sh3u       (((uint)((Op.Raw)<<27))>>28)
 #define   FloatAddExp_Sh3u_(x)   (((uint)((x)<<27))>>28)
 
+#define   FloatAddExp_Di       ((( int)((Op.Raw)<<31))>>31)
+#define   FloatAddExp_Di_(x)   ((( int)((x)<<31))>>31)
+
+#define   FloatAddExp_Du       (((uint)((Op.Raw)<<31))>>31)
+#define   FloatAddExp_Du_(x)   (((uint)((x)<<31))>>31)
+

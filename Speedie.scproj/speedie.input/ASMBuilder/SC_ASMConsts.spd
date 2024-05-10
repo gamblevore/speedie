@@ -12,7 +12,7 @@ function ASMState.DoConsts (|asmreg| D,  |asmreg| L,  |asmreg| R,  |&uint64| RIm
 	if rimm
 		RR = rimm
 	if l.fourbytes
-		return .DoI32Const(D, DD|&int|, LL|&int|, RR|&int|, M)
+		return .DoI32Const(D, DD|&int|, LL|&int|, RR|&int|,   M)
 	return .DoI64Const(D, DD|&int64|, LL|&int64|, RR|&int64|, M)
 
 
@@ -33,6 +33,8 @@ function asmstate.DoF32Const (|asmreg| D, |&float| DD, |&float| LL, |&float| RR,
 		LLL /= RRR 
 	  elseif M == ASMMath.Mod
 		(LLL mod= RRR)
+	  else
+		debugger // missed one!
 
 	*(DD|&uint64|) = 0 // clear high bits
 	if LLL.abs
@@ -59,6 +61,8 @@ function asmstate.DoF64Const (|asmreg| D, |&f64| DD, |&f64| LL, |&f64| RR, |opmo
 		LLL /= RRR 
 	  elseif M == ASMMath.Mod
 		(LLL mod= RRR)
+	  else
+		debugger // missed one!
 
 	if LLL.abs
 		*DD = LLL
@@ -78,6 +82,8 @@ function asmstate.DoI32Const (|asmreg| D, |&int| DD, |&int| LL, |&int| RR, |opmo
 		LLL /= RRR 
 	  elseif M == ASMMath.Mod
 		(LLL mod= RRR)		
+	  else
+		debugger // missed one!
 
 	*(DD|&uint64|) = 0 // clear high bits
 	*DD = LLL
@@ -106,9 +112,12 @@ function asmstate.DoI64Const (|asmreg| D, |&int64| DD, |&int64| LL, |&int64| RR,
 	  elseif M == ASMMath.Shru
 		LLL = LLL|uint64|>>RRR|uint64|
 	  elseif M == ASMMath.Shrs
-		LLL = LLL>>RRR
-		// is this 32-bit or 64-bit or what-bit? right-shifting a signed short... sigh
-		// what if we disable any except 64-bit?
+		if !d.signed
+			LLL >>= RRR
+		  else
+			|| bc = 64 - d.µtype.bitcount
+			LLL <<= bc
+			LLL >>= (bc+RRR)
 	  elseif M == ASMMath.Shl
 		LLL <<= RRR
 	  elseif M == ASMMath.Bnt
@@ -119,6 +128,12 @@ function asmstate.DoI64Const (|asmreg| D, |&int64| DD, |&int64| LL, |&int64| RR,
 		LLL ^= RRR
 	  elseif M == ASMMath.Xnr
 		LLL = ~(LLL ^ RRR)
+	  elseif M == ASMMath.ROL
+		LLL = LLL|uint64| rol RRR
+	  elseif M == ASMMath.ROR
+		LLL = LLL|uint64| ror RRR
+	  else
+		debugger // missed one!
 
 	*DD = LLL
 	if LLL

@@ -517,17 +517,29 @@ void JB_Rec__CrashLog(const char* c) {
 }
 
 
-bool JB_FS_AppendPipe(FastString* self, int fd, int Mode) {
-	// Error:
-	//	0  means finished. we wanna close. Same with errors. So (>= 0) --> close
-	//  -1 means  call back later
-	//  -2 means we need more buffer
-    while (self and fd >= 0) {
-		int Error = InterPipe(self, 64 * 1024, fd, Mode);
-		if (Error >=  -1) return Error == -1; // true means call back later.
-											  // false  means we are finished.
+int JB_FS_AppendPipe(FastString* self, int fd, int Mode) {
+	if (!self)
+		return 0;
+	int OrigLength = JB_FS_StreamLength(self);
+	int Error = 0;
+    while (fd >= 0) {
+// Error:
+//	0  means finished. we wanna close. Same with errors. So (>= 0) --> close
+//  -1 means  call back later
+//  -2 means we need more buffer
+		Error = InterPipe(self, 64 * 1024, fd, Mode);
+		if (Error >=  -1) break;
     }
-    return false;
+	int Result = Error == -1;
+	if (OrigLength < JB_FS_StreamLength(self))
+		Result |= 2;
+
+// return codes:
+	//  &1  means call back later.
+	// !&1  means we are finished.
+	//  &2  means we got anything
+	// !&2  means we got nothing
+    return Result;
 }
 
 

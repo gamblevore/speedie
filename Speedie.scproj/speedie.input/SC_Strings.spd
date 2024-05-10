@@ -284,7 +284,7 @@ function message.Tran_Isnt (|string| name)
 	require type.ExpectLast
 	
 	using (self)
-		.func = @rel
+		.BecomeSetRel
 		self <~ «thg name »
 		self <~ «opp .name »
 		self <~ type
@@ -529,10 +529,10 @@ module StringCorrector
 
 
 	function CorrectStrings
-		// if its speedie they should all use the same strings.txt file?
-		// at least... speedie compile vs speedie via xcode should use the same.
-		// cos the cpp file is put in the same place! perhaps we are copying the cpp file from build2 or build3?
-		.CorrectFile(Compiler.GeneratedCppsFolder[ "strings.txt" ]!)
+		|| f = Compiler.GeneratedCppsFolder[ "strings.txt" ]!
+		if options.selfreplacement
+			f = "/usr/local/speedie/Speedie.scproj/BuildTest/strings.txt".file			
+		.CorrectFile( f )
 
 	
 	function CorrectFile (|file| where)

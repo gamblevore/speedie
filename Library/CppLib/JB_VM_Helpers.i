@@ -68,6 +68,11 @@ float FloatSh1 (uint64 u, int S) {
 	return reinterpret_cast<float&>(Exp);
 }
 
+double FloatSh2 (uint64 u, int S) {
+	uint64 Exp = u + ((uint64)S << 53);
+	return reinterpret_cast<double&>(Exp);
+}
+
 
 
 AlwaysInline ASM* LoadConst (Register* r, ASM Op, ASM* Code) {
@@ -203,8 +208,8 @@ AlwaysInline bool Rare (Register* r, ASM Op) {
 
 #define  UA  *((u64*)A)
 #define  UB  *((u64*)B)
-#define  IA  *((int*)A)
-#define  IB  *((int*)B)
+#define  iA  *((int*)A)
+#define  iB  *((int*)B)
 #define  uA  *((uint*)A)
 #define  uB  *((uint*)B)
 
@@ -220,10 +225,10 @@ AlwaysInline bool CompI_ (Register* r, ASM Op) {
 	auto A = &i1;
 	auto B = &i2;
 	switch (Cmp_Cmpu) {
-		CmpSub(0 , IA <  IB);
-		CmpSub(1 , IA >  IB);
-		CmpSub(2 , IA <= IB);
-		CmpSub(3 , IA >= IB);
+		CmpSub(0 , iA <  iB);
+		CmpSub(1 , iA >  iB);
+		CmpSub(2 , iA <= iB);
+		CmpSub(3 , iA >= iB);
 
 		CmpSub(4 , uA <  uB);
 		CmpSub(5 , uA >  uB);
@@ -309,13 +314,13 @@ AlwaysInline uint64 BitComp (Register* r, ASM Op) {
 
 
 AlwaysInline ASM* CompEq (Register* r, ASM Op, ASM* Code) {
-	if (!(u1 xor u2))
+	if (u1 == u2)
 		return Code;
 	return Code + CmpEq_Jmpi;
 }
 
 AlwaysInline ASM* CompNeq (Register* r, ASM Op, ASM* Code) {
-	if (u1 xor u2)
+	if (u1 != u2)
 		return Code;
 	return Code + CmpEq_Jmpi;
 }

@@ -223,14 +223,14 @@ bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoCom
 }
 
 
-bool JB_Sh_UpdatePipes(ShellStream* self) {
+int JB_Sh_UpdatePipes(ShellStream* self) {
 	auto& Sh = *self;
 	CheckStillAlive(self);
-	bool ContinueOut = JB_FS_AppendPipe(Sh.Output, Sh.CaptureOut[RD], 1);
+	int ContinueOut = JB_FS_AppendPipe(Sh.Output, Sh.CaptureOut[RD], 1);
 	// this will only return, once the app has finished... unless we are Streaming.
 	// either way, if both return false, we can finish.
-	bool ContinueErr = JB_FS_AppendPipe(Sh.ErrorOutput, Sh.CaptureErr[RD], 1);
-	return (ContinueOut or ContinueErr);
+	int ContinueErr = JB_FS_AppendPipe(Sh.ErrorOutput, Sh.CaptureErr[RD], 1);
+	return ContinueOut | ContinueErr;
 }
 
 
@@ -270,14 +270,25 @@ ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastStr
 }
 
 
-ivec2 JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, bool StdOutFlowThru) {
+ivec2 JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, bool StdOutFlowThru, Date TimeOut) {
 	auto Sh = ShellStart(self, R, FSOut, FSErrIn, StdOutFlowThru);
 	if (!Sh) return ivec2{1, 0};
 	
+	Date ExitAfter = 0;
+	if (TimeOut > 0)
+		ExitAfter = JB_Date__Now() + TimeOut;
+
 	while (true) {
-		JB_Sh_UpdatePipes(Sh);
+		bool DidAnything = JB_Sh_UpdatePipes(Sh) & 2;
 		if (JB_PID_Exit(Sh) != -1  or  JB_PID_Status(Sh) != 0)
 			break;
+		if (TimeOut > 0) {
+			auto Now = JB_Date__Now();
+			if (DidAnything)
+				ExitAfter = Now + TimeOut;
+			  else if (Now >= ExitAfter)
+				break;
+		}
 		JB_Date__Sleep(1);
 	}
 
@@ -351,7 +362,7 @@ bool JB_Sh_Step(ShellStream* self) {
 	ShellStream& Sh = *self;
 	if (!Sh.IsClosed) {
 		Smooth_(Sh);
-		if (JB_Sh_UpdatePipes(self))
+		if (JB_Sh_UpdatePipes(self)&1)
 			return true;
 		JB_FEPDWEE_Finish(Sh);
 	}
