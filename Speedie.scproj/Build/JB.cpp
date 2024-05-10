@@ -2029,7 +2029,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112419004756238));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112419083583488));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3308,7 +3308,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024051022));
+	JB_FS_AppendInt32(_fsf0, (2024051023));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7920,7 +7920,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024051022));
+	JB_FS_AppendInt32(_fsf0, (2024051023));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -16399,7 +16399,12 @@ AsmReg SC_ASMtmp__While(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 
 AsmReg SC_Reg_boolasm(AsmReg Self) {
 	Self = SC_Reg_xC2xB5TypeSet(Self, kJB__TC_bool);
-	return ((AsmReg)0);
+	Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_AlreadyNegated, true);
+	if (SC_Reg_SyntaxIs(Self, kSC__Reg_CondRequest)) {
+		Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_CondRequest, (!true));
+		Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_Cond, true);
+	}
+	return Self;
 }
 
 bool SC_Reg_CanAddK(AsmReg Self, int64 T) {
@@ -17731,6 +17736,24 @@ void SC_Pac_CloseVars(ASMState* Self, uint Old) {
 	Self->VTmps = (Old >> 8);
 }
 
+AsmReg SC_Pac_Compare(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Dbg, uint BaseMode) {
+	int Bl = JB_TC_BitCount(SC_Reg_xC2xB5Type(L));
+	if (Bl != JB_TC_BitCount(SC_Reg_xC2xB5Type(R))) {
+		debugger;
+	}
+	if (SC_Reg_IsInt(Dest)) {
+		JB_DoAt(1);
+		SC_Pac_AddASM4(Self, SC_ASM_OperatorxE2x80xA2(kSC__ASM_CMPI, (SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate))), Dbg, SC_Reg_ToInt(L), SC_Reg_ToInt(R), BaseMode, SC_Reg_ToInt(Dest));
+	}
+	 else {
+		JB_DoAt(1);
+		uint M = (BaseMode + (Bl == 64)) << 1;
+		M = (M + (SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate)));
+		SC_Pac_AddASM4(Self, kSC__ASM_CMPF, Dbg, SC_Reg_ToInt(L), SC_Reg_ToInt(R), M, SC_Reg_ToInt(Dest));
+	}
+	return SC_Reg_boolasm(Dest);
+}
+
 AsmReg SC_Pac_DeclareMe(ASMState* Self, Message* Where, AsmReg T) {
 	int D = ((int)Self->VDecls) + 1;
 	if ((D + Self->VTmps) <= 31) {
@@ -18005,7 +18028,7 @@ AsmReg SC_Pac_Equals(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* D
 	int Sh = 64 - Bl;
 	if (SC_Reg_IsInt(Dest)) {
 		if (SC_Reg_SyntaxIs(Dest, kSC__Reg_CondRequest)) {
-			SC_Pac_AddASM2(Self, SC_ASM_OperatorxE2x80xA2(kSC__ASM_CMPE, (SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate))), Dbg, SC_Reg_ToInt(L), SC_Reg_ToInt(R));
+			SC_Pac_AddASM3(Self, SC_ASM_OperatorxE2x80xA2(kSC__ASM_CMPE, (SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate))), Dbg, SC_Reg_ToInt(L), SC_Reg_ToInt(R), SC_Reg_ToInt(Dest));
 		}
 		 else {
 			SC_Pac_AddASM5(Self, kSC__ASM_BCMP, Dbg, SC_Reg_ToInt(Dest), SC_Reg_ToInt(L), SC_Reg_ToInt(R), Sh, ((int)(SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate))));
@@ -18186,15 +18209,13 @@ AsmReg SC_Pac_Mod(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Dbg)
 }
 
 AsmReg SC_Pac_More(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Dbg) {
-	debugger;
-	SC_Pac_AddASM4(Self, kSC__ASM_CMPI, Dbg, SC_Reg_ToInt(L), SC_Reg_ToInt(R), 0, 1);
-	return Dest;
+	JB_DoAt(1);
+	return SC_Pac_Compare(Self, Dest, L, R, Dbg, 1);
 }
 
 AsmReg SC_Pac_MoreEq(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Dbg) {
-	debugger;
-	SC_Pac_AddASM4(Self, kSC__ASM_CMPI, Dbg, SC_Reg_ToInt(L), SC_Reg_ToInt(R), 0, 1);
-	return Dest;
+	JB_DoAt(1);
+	return SC_Pac_Compare(Self, Dest, L, R, Dbg, 4);
 }
 
 AsmReg SC_Pac_Mul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Dbg) {
@@ -49794,4 +49815,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 2391739411239583627 4088850932818295558
+// 3014005949429807835 4088850932818295558

@@ -5064,6 +5064,8 @@ FatASM* SC_Pac_Branch(ASMState* Self, Message* Cond);
 
 void SC_Pac_CloseVars(ASMState* Self, uint Old);
 
+AsmReg SC_Pac_Compare(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Dbg, uint BaseMode);
+
 AsmReg SC_Pac_DeclareMe(ASMState* Self, Message* Where, AsmReg T);
 
 void SC_Pac_Destructor(ASMState* Self);
