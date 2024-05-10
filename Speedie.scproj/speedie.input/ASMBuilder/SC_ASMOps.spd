@@ -9,14 +9,20 @@ function asmreg.CanAddK (|int64| T, |bool|)
 		return B == t
 
 
-function ASMReg.boolasm (|asmreg|)
-	.µtype = datatypecode.bool
+function message.abc (|asmreg| r)
+	is Style2
+	(r is CondRequest)
 
-//	is AlreadyNegated
-//	if self is CondRequest
-//		isnt condrequest
-//		is cond
-//	return self 
+
+function ASMReg.boolasm (|asmreg|)
+	.µtype = DataTypeCode.bool
+
+//	is AlreadyNegated			// speedie crashing somehow but it is used OK elsewhere?
+	(self is AlreadyNegated)
+	if self is CondRequest
+		(self isnt condrequest)
+		(self is cond)
+	return self 
 	
 	
 extend ASMState
@@ -26,7 +32,7 @@ extend ASMState
 		|| sh = 64 - bl
 		if dest.IsInt
 			if dest is CondRequest
-				.AddASM(asm.CMPE • (dest is Negate), dbg, L, R)
+				.AddASM(asm.CMPE • (dest is Negate), dbg, L, R, dest)
 			  else
 				.AddASM(asm.BCMP, dbg, dest, L, R, sh, (dest is Negate)|int|)
 		  else
@@ -50,15 +56,28 @@ extend ASMState
 		(dest is Negate) = (dest isnt Negate)
 		return .more(dest, l, r, dbg)
 
+	function Compare (|asmreg| dest, |asmreg| L, |asmreg| R, |message| dbg, |uint| BaseMode,  |asmreg|)
+		|| bl = l.µtype.bitcount
+		if bl != r.µtype.bitcount
+		// equals can call this too! at least for where its behaviour is the same
+		if dest.IsInt
+			debugat // put in actual numbers
+			.AddASM(asm.CMPI • (dest is Negate), dbg, L, R, basemode, dest)
+		  else
+			debugat // put in actual numbers
+			|| M = basemode + (bl == 64)<<1
+			M += (dest is negate)
+			.AddASM(asm.CMPF, dbg, L, R, M, dest) // it is cmpf either way
+	
+		return dest.BoolASM
+
 	function More   (fn_opasm)
-		debugger
-		.AddASM(asm.CMPI, dbg, L, R, 0, 1)
-		return dest
+		debugat // put in actual numbers
+		return .Compare(dest, l, r, dbg, 1)
 	
 	function MoreEq (fn_opasm)
-		debugger
-		.AddASM(asm.CMPI, dbg, L, R, 0, 1)
-		return dest
+		debugat // put in actual numbers
+		return .Compare(dest, l, r, dbg, 4)
 
 
 	// MATH
