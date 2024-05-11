@@ -7906,6 +7906,8 @@ NilState SC_Msg_RedundantVar(Message* Self, SCDecl* Dcl, NilCheckMode Test);
 
 bool SC_Msg_RefDisappears(Message* Self);
 
+bool SC_Msg_RefTransparent(Message* Self);
+
 AsmReg SC_Msg_Reg(Message* Self);
 
 uint SC_Msg_RegOrNum(Message* Self, bool NeedReg);
@@ -8025,6 +8027,8 @@ void JB_Msg_SyntaxWarn(Message* Self, JB_String* Error);
 bool SC_Msg_TargetTest(Message* Self);
 
 Message* SC_Msg_TaskConBefore(Message* Self);
+
+void SC_Msg_tEENGAGERS(Message* Self);
 
 Message* SC_Msg_TempIntoBlock(Message* Self, Message* ParentPlace);
 

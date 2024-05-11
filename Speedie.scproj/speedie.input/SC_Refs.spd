@@ -467,9 +467,21 @@ function Message.NiceParent (|Message|)
 	return .UseNonRefChangers(true)
 
 
+function message.RefTransparent (|bool|)
+	opt norefcounts
+	|| f = .func
+	if f == @bra
+		return true
+	if f == @type
+		return true
+	if f == @arel or @brel
+		|| n = .name.first
+		return n == '?' or '!'
+
+
 function Message.RemoveTypeCasts (|Message|) 
 	opt norefcounts
-	while (rz and (rz == @bra or @type))
+	while rz and rz.RefTransparent
 		rz = rz.first
 
 
@@ -484,15 +496,13 @@ function Message.UseNonRefChangers (|bool| parent=false, |Message|)
 		if !curr : return last
 
 		|| f = curr.func
-		if (f == @Bra)
-			// lame
-		  elseif (f != @Type)
-			return (curr, Last)(parent)
-		  else 
+		if f == @type
 			|| D = Curr.Obj
 			if (D isa SCDecl)
 				if !D.IsNormalObject
 					return (curr, last)(parent)
+		  elseif !curr.reftransparent
+			return (curr, Last)(parent)
 		
 		Last = Curr // Make sure it's not a (bracket) or obj|typecast|
 
@@ -586,12 +596,12 @@ function Message.RefDisappears (|bool|)
 		self = .parent // sigh
 	for (P.up in self)
 		|| f = p.func
-		if (f == @bra)
-			0 // go up
-		  elseif (f == @Type)
+		if (f == @Type)
 			|| D = P.AsDecl #debug_require
 			if !D.IsNormalObject
 				return true
+		  elseif p.RefTransparent
+			0 // go up
 		  elseif f == @prm
 			return false
 		  elseif (F == @arg)
@@ -858,3 +868,8 @@ function scdecl.RefDestructor (|message|)
 	return SCRefs.RefClearMsg( m )
 
 
+function message.tEENGAGERS
+	visible
+	|| RP   = .NiceParent
+	|| RightSide = rp.Last! // in case of syntax_cast
+	|| RightSide2 = rp.Last // in case of syntax_cast
