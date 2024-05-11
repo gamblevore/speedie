@@ -2017,7 +2017,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112424013780530));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112424898658304));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3296,7 +3296,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024051120));
+	JB_FS_AppendInt32(_fsf0, (2024051123));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7892,7 +7892,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024051120));
+	JB_FS_AppendInt32(_fsf0, (2024051123));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -15991,7 +15991,7 @@ AsmReg SC_ASMtmp__DoMathSub(ASMState* Self, Message* Exp, AsmReg Dest, AsmReg Mr
 		uint OV = SC_Pac_OpenVars(Self);
 		Ml = SC_Pac_Get(Self, F, kSC__Reg_StayOpen);
 		Mr = SC_Pac_Get(Self, ((Message*)JB_Ring_Last(Exp)), kSC__Reg_StayOpen);
-		SC_Pac_CloseVars(Self, OV);
+		SC_Pac_CloseVars(Self, OV, true);
 		Ml = SC_Reg_SyntaxIsSet(Ml, kSC__Reg_StayOpen, (!true));
 		Mr = SC_Reg_SyntaxIsSet(Mr, kSC__Reg_StayOpen, (!true));
 	}
@@ -17656,15 +17656,10 @@ FatASM* SC_Pac_Branch(ASMState* Self, Message* Cond) {
 	AsmReg Src = SC_Pac_Get(Self, Cond, kSC__Reg_CondRequest);
 	if (!(SC_Reg_SyntaxIs(Src, kSC__Reg_Cond))) {
 		AsmReg Dest = SC_Reg__New();
-		Dest = (SC_Reg_SyntaxIsSet(Dest, kSC__Reg_Negate, ((!SC_Reg_SyntaxIs(Src, kSC__Reg_Negate)))));
+		Dest = (SC_Reg_SyntaxIsSet(Dest, kSC__Reg_Negate, ((!SC_Reg_SyntaxIs(Src, kSC__Reg_AlreadyNegated)))));
 		SC_Pac_Equals(Self, Dest, Dest, Src, Cond);
 	}
 	return Self->Curr - 1;
-}
-
-void SC_Pac_CloseVars(ASMState* Self, uint Old) {
-	Self->VDecls = (Old & 255);
-	Self->VTmps = (Old >> 8);
 }
 
 AsmReg SC_Pac_Compare(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Dbg, uint Mode) {
@@ -17858,7 +17853,7 @@ AsmReg SC_Pac_DoFunc(ASMState* Self, Message* Prms, AsmReg Dest) {
 		;
 	}
 	;
-	SC_Pac_CloseVars(Self, OV);
+	SC_Pac_CloseVars(Self, OV, true);
 	ASM_Func OP = ((ASM_Func)JB_Ternary(Sh <= 25, kSC__ASM_FUNC2, ((ASM_Func)kSC__ASM_FUNC3)));
 	int SaveAmount = 0;
 	if (!(SC_Reg_SyntaxIs(Dest, kSC__Reg_ForReturn))) {
@@ -49650,4 +49645,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -8314909080302117119 920046876511060213
+// -6208599258278031114 920046876511060213

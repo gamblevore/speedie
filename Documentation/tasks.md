@@ -56,7 +56,7 @@ Speedie basically uses ["the erlang model"](https://www.youtube.com/watch?v=lKXe
 
 So you run a separate process, an instance of your program, and communicate with message-passing.
 
-It could be started via `app.fork()` or via running a speedie program (on disk) via `spdprocess.RunChild()`.
+It could be started via `spdprocess.fork()` or via running a speedie program (on disk) via `spdprocess.Run()`.
 
 Both return an `spdprocess` class. The `SpdProcess` class lets you talk to speedie processes... via message-passing.
 

@@ -203,7 +203,7 @@ class SpdProcess (Process)
 			cpp_wrapper JB_App__BackTrace
 
 
-		function RunChild (|string| app_path, |[string]| params=[], |string| DebugName="", |ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
+		function Run (|string| app_path, |[string]| params=[], |string| DebugName="", |ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
 			require app_path.file.mustexist
 			|| pico = pico.new(app_path)
 				rz = SpdProcess(app_path, nil, pico, params, Mode)
@@ -233,6 +233,6 @@ prototype SpdMainFn	(|&nil| Obj, |&cstring| args, |&pico| Comms, |bool|)
 prototype SpdDeathActionFn
 
 
-function app.Fork (|[string]| r, |SpdProcess|)
-	return SpdProcess.RunChild(.path, r)
+function @spdprocess.Fork (|[string]| r, |SpdProcess|)
+	return SpdProcess.Run(app.path, r)
 

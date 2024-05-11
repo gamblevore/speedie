@@ -5067,8 +5067,6 @@ AsmReg SC_Pac_BoolMul(ASMState* Self, AsmReg Dest, AsmReg Boo, AsmReg R, Message
 
 FatASM* SC_Pac_Branch(ASMState* Self, Message* Cond);
 
-void SC_Pac_CloseVars(ASMState* Self, uint Old);
-
 AsmReg SC_Pac_Compare(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Dbg, uint Mode);
 
 AsmReg SC_Pac_DeclareMe(ASMState* Self, Message* Where, AsmReg T);
@@ -9535,6 +9533,8 @@ inline JB_String* SC_Named_Name(SCNamed* Self);
 
 inline bool SC_PA_SyntaxCast(SCParamArray* Self);
 
+inline void SC_Pac_CloseVars(ASMState* Self, uint Old, bool DeclsToo);
+
 inline void SC_nil_SetAllNil(ArchonPurger* Self, NilRecord Dest);
 
 inline NilRecord SC_nil_Value(ArchonPurger* Self);
@@ -9690,6 +9690,13 @@ inline bool SC_PA_SyntaxCast(SCParamArray* Self) {
 	return (Self != nil) and Self->HasProperParams;
 }
 
+inline void SC_Pac_CloseVars(ASMState* Self, uint Old, bool DeclsToo) {
+	if (DeclsToo) {
+		Self->VDecls = (Old & 255);
+	}
+	Self->VTmps = (Old >> 8);
+}
+
 inline void SC_nil_SetAllNil(ArchonPurger* Self, NilRecord Dest) {
 	(*Self->Neel) = (Dest & Self->Realnesses);
 }
@@ -9759,7 +9766,7 @@ inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 		// Can't close declarations in args!;
 		uint OV = SC_Pac_OpenVars(Self);
 		Rz = (Fn)(Self, Exp, Dest, 0);
-		SC_Pac_CloseVars(Self, OV);
+		SC_Pac_CloseVars(Self, OV, (!SC_Reg_SyntaxIs(Dest, kSC__Reg_Discard)));
 	}
 	 else {
 		Rz = (Fn)(Self, Exp, Dest, 0);
