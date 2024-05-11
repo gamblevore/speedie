@@ -54,7 +54,7 @@ Running this, you should see this output:
 
 Speedie basically uses ["the erlang model"](https://www.youtube.com/watch?v=lKXe3HUG2l4) of concurrency. This is simply "the right choice". Any other choice is wrong. 🥰 (Unless its compatible with it.) 🤭
 
-So... we want to pass messages to communicate across threads. Basically you run a separate process, an instance of your program, and communicate.
+So you run a separate process, an instance of your program, and communicate with message-passing.
 
 It could be started via `app.fork()` or via running a speedie program (on disk) via `spdprocess.RunChild()`.
 
