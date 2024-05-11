@@ -140,24 +140,26 @@ struct ASMState
 		return .vdecls ||| (.vtmps << 8)
 
 
-	function CloseVars (|uint| Old)
-		.vdecls = old & 255
+	function CloseVars (|uint| Old, |bool| DeclsToo=true)
+		pragma inline
+		if DeclsToo
+			.vdecls = old & 255
 		.vtmps  = old >> 8
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	function AsTemp (|asmreg| T, |message| exp, |asmreg|)
-		if t.reg > .vdecls
-			return t 
-		return .tempme(exp)
+//	function AsTemp (|asmreg| T, |message| exp, |asmreg|)
+//		if t.reg > .vdecls
+//			return t 
+//		return .tempme(exp)
 	
 	
 	function Branch (|message| cond,  |&fatasm|)
 		|| Src = .µ(cond, asmreg.CondRequest)
 		if Src isnt cond
 			|| dest = asmreg()
-			(dest is negate) = (src isnt negate)
+			(dest is negate) = (src isnt AlreadyNegated)
 			.equals(dest, dest, src, cond)
 		return .curr - 1
 	
@@ -190,7 +192,7 @@ struct ASMState
 			debugger, #! Can't close declarations in args!
 			|| OV = .OpenVars		
 			rz = (fn)(self, exp, dest)
-			.CloseVars(ov)
+			.CloseVars(ov, dest isnt discard)
 		  else
 			rz = (fn)(self, exp, dest)
 		
