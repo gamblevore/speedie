@@ -106,7 +106,7 @@ function UseChildAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason,
 
 
 function Rel (NilTrackerFn)									// x = y
-	return ProcessCondRel(msg, test)
+	return ProcessNormalRel(msg, test)
 
 
 function List (NilTrackerFn)
@@ -432,7 +432,7 @@ function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperat
 	error (ll.next, "Nil can't accept this operator. Use != or ==.")
 
 
-function ProcessCondRel (NilTrackerfn)
+function ProcessNormalRel (NilTrackerfn)
 	opt norefcounts
 	|| ll = msg.first!
 	|| op = ll.next!

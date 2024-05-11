@@ -811,6 +811,8 @@ So anything not 0 means "its OK"`
 			return -1
 		
 		|| Loaded =  E.LoadDocument(doc) #require
+		|| m = .FunctionMenu.SubControl as menu
+			m.StopFilter
 		|| spd = r.location.PathIsCode
 		doc.CompareTreesOnSave = spd
 		.ListAllFuncs

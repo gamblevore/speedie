@@ -12,13 +12,13 @@ datatype OpMode (uint)
 		CompSet  = [Compare, Assigns]
 		MathLike = [Bit, Math]
 		Addition
-		LeftOnly
+		ShiftOnly
 		MakesSigned
 		ExactlyEquals
 		EqualOrNot
-		NilTest		// not the same as equalornot... because those include customops
+		NilTest		// not the same as EqualOrNot... because those include customops
 		SameOrLessBits = [NoExtraBits, LoseBits]
-		Left = LeftOnly + NoExtraBits
+		Shift = ShiftOnly + NoExtraBits
 		AndOr = [OR, AND]
 		Custom
 		CaseAware
@@ -163,7 +163,7 @@ module {
 		.OppositeComp("<", ">=")
 		.OppositeComp(">", "<=")
 
-		.AddAssign( "=" )
+		.AddAssign
 
 		.AddMath( "mod",	"mod",		&asmstate.Mod,		asmmath.Mod,	opmode.NeedsCppFuncOnFloats)
 		.AddMath( "+",		"Plus",		&asmstate.Plus,		asmmath.Add,	opmode.Addition)
@@ -171,10 +171,10 @@ module {
 		.AddMath( "*",		"Mul",		&asmstate.Mul,		asmmath.mul)
 		.AddMath( "/",		"Divide",	&asmstate.Div,		asmmath.div)
 
-		.AddBit( "<<<",	"RotateLeft",	&asmstate.ROL,		asmmath.ROL,	opmode.Left)
-		.AddBit( ">>>",	"RotateRight",	&asmstate.ROR,		asmmath.ROR,	opmode.Left)
-		.addbit( ">>",	"ShiftRight",	&asmstate.SHR,		asmmath.shru,	opmode.Left)
-		.addbit( "<<",	"ShiftLeft",	&asmstate.SHL,		asmmath.shl)
+		.AddBit( "<<<",	"RotateLeft",	&asmstate.ROL,		asmmath.ROL,	opmode.shift)
+		.AddBit( ">>>",	"RotateRight",	&asmstate.ROR,		asmmath.ROR,	opmode.shift)
+		.addbit( ">>",	"ShiftRight",	&asmstate.SHR,		asmmath.shru,	opmode.shift)
+		.addbit( "<<",	"ShiftLeft",	&asmstate.SHL,		asmmath.shl,	opmode.shiftonly) // can add bits
 		.AddBit( "(|)",	"BitOr",		&asmstate.BitOr,	asmmath.bor)
 		.AddBit( "&",	"BitAnd",		&asmstate.BitAnd,	asmmath.ban,	opmode.SameOrLessBits)
 		.AddBit( "^",	"Xor",			&asmstate.bitxor,	asmmath.xor,	opmode.noextrabits)
@@ -212,8 +212,8 @@ module {
 		SCOperator.new(newname, nil, mode ||| OpMode.custom).InitComp( newname )
 	
 		
-	function AddAssign (|string| s)
-		.assigns = SCOperator.new(s, &asmstate.Assign, OpMode.assigns)
+	function AddAssign
+		.assigns = SCOperator.new("=", &asmstate.Assign, OpMode.assigns)
 
 		
 	function AddMath (|string| s,  |string| FuncName, |fn_opasm| ASM, |asmmath| Code, |OpMode| Mode=0)
@@ -376,8 +376,8 @@ module CustomOps
 		TypeCastFromBool = 16
 		TypeCastToBetter = 32
 		Needed = 64
-		LeftOnlyIsVector = 65
-		RightOnlyIsVector = 66
+		OnlyLeftIsVector = 65
+		OnlyRightIsVector = 66
 
 
 
@@ -398,9 +398,9 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 			
 			expect (LNT.SameBasicType(RNT)) (errplace, "Vector type mismatch.")
 			if LN > RN
-				return CustomOps.LeftOnlyIsVector
+				return CustomOps.OnlyLeftIsVector
 			  else
-				return CustomOps.RightOnlyIsVector
+				return CustomOps.OnlyRightIsVector
 		return CustomOps.Needed				// num + obj
 	
 	
@@ -408,7 +408,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 	if LN and RN
 		|| GotABool = (DataTypeCode.bool == lnt or rnt)
 		if lnt != rnt
-			expect !(gotabool and comp is compare) (errplace, "Cant compare bools to non-bools")
+			expect !(GotABool and comp is compare) (ErrPlace, "Cant compare bools to non-bools")
 			if (comp is mathlike) and comp isnt NoExtraBits
 				extra = CustomOps.TypeCastToBetter
 				

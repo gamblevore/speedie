@@ -261,18 +261,22 @@ function Message.ReplaceWithChild (||)
 	.Remove
 
 
+function message.SpdFunc (assigns:|syntax|)
+	.func = value
+	.asmtype = 0
+
+
 function Message.SafeRemove (|syntax| T=@sheb)
 	if self
-		.become(T)
-		.ASMType = 0
+		.SpdFunc = t
+		.name = ""
 		is inserted // stop issues with autocomplete :)
 		for (c in self)
 			c.remove
 
 
 function Message.SafeReplaceWith (|message| Incoming)
-	.saferemove(@bra)
-	.ASMType = 0
+	.saferemove @bra
 	self <~ incoming
 
 

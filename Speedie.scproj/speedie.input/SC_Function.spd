@@ -328,7 +328,7 @@ function message.AssignsFix (|scfunction| f)
 		rp.first = L // put it back
 		rp.first = upon.FailOrCopy(rp)
 	  else
-		RP.Func = @Bra	
+		rp.SpdFunc = @Bra
 
 
 function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming, |int| Options=0, |SCFunction|)

@@ -9,15 +9,15 @@ function asmreg.CanAddK (|int64| T, |bool|)
 		return B == t
 
 
-function message.abc (|asmreg| r)
+function message.abcd (|asmreg| r)
 	is Style2
-	(r is CondRequest)
 
 
 function ASMReg.boolasm (|asmreg|)
 	.µtype = DataTypeCode.bool
-
-//	is AlreadyNegated			// speedie crashing somehow but it is used OK elsewhere?
+	
+	target debug2
+		is AlreadyNegated			// speedie crashing somehow but it is used OK elsewhere?
 	(self is AlreadyNegated)
 	if self is CondRequest
 		(self isnt condrequest)

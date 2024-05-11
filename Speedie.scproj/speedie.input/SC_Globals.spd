@@ -1149,7 +1149,7 @@ constants
 
 function message.BecomeSetRel
 	.func = @rel
-	//.asmtype = asmtmp.ksetvar
+	.asmtype = asmtmp.ksetvar
 
 
 function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name_space, |message| side, |scdecl|) {
@@ -1182,11 +1182,12 @@ function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name
 
 			bra.BecomeSetRel
 			|| eq = bra.msg(@opp, "=")
-			eq.obj = opch.obj
+			eq.obj = scoperator.assigns
 			bra <~ (@thg, "true")
 			side = bra.last
+			
 	
-	exp.func = @dot
+	exp.SpdFunc = @dot		// i don't like this... harder to keep in sync
 	|| OpchIsnt = opch == "isnt"
 		exp.name = "syntaxisnt"
 	  else
@@ -1406,7 +1407,7 @@ function TypeOfRel (ExprResolver) {
 	
 	if Custom <= CustomOps.needed
 		LC.ExpectRelMatch( RC, RN, side, exp )
-	  elseif Custom == CustomOps.LeftOnlyIsVector
+	  elseif Custom == CustomOps.OnlyLeftIsVector
 		return LC		// LC is bigger (vec3 vs float)
 	  else
 		return RC		// RC is bigger (float vs vec3)

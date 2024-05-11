@@ -205,28 +205,30 @@ class SCDecl (SCNamed) {
 			return typehfloat
 		
 		if Op
-			if Op is MakesSigned			// -
-				|| UnSigned = !.issigned or !t.issigned
-				if bits+UnSigned > 32
+			if Op is MakesSigned				// -
+				|| bits2 = (.ItemBitCount + !.issigned) max (t.ItemBitCount + !t.issigned)
+				if bits2 > 32
 					return typeint64
 				return typeint
-			if Op is LoseBits				// &
+			if Op is LoseBits					// &
 				bits = .ItemBitCount min t.ItemBitCount
-			  elseif Op is LeftOnly			// >>, rotr, rotl
+			  elseif Op is ShiftOnly			// >>, rotr, rotl
 				bits = .ItemBitCount
-			  elseif Op is NoExtraBits		// xor
+			  elseif Op is NoExtraBits			// (xor, <<) can add bits
 				0
 			  elseif (Op is mathlike) and bits < 32
 				bits = 32
 		
-		|| Signed = .issigned or t.issigned
+		|| Signed = .issigned
+		if Op isnt ShiftOnly
+			 signed := t.issigned
 		if bits > 32
 			return (typeint64, typeuint64)(signed)
 		if bits > 16
 			return (typeint  , typeuint  )(signed)
 		if bits >  8
 			return (typeint16, typeuint16)(signed)
-		return typebyte
+		return TypeByte
 
 
 	function PointeryMatch (|scdecl| O, |bool|)

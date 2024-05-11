@@ -1429,10 +1429,10 @@ extern SCFunction* SC__Comp_TernaryFunc;
 extern FastString* SC__Comp_TimerOutput;
 extern Array* SC__Comp_TodoList;
 extern SCNode* SC__Comp_VisibleFuncs;
-#define kSC__CustomOps_LeftOnlyIsVector (65)
 #define kSC__CustomOps_Needed (64)
 #define kSC__CustomOps_NotCustom (0)
-#define kSC__CustomOps_RightOnlyIsVector (66)
+#define kSC__CustomOps_OnlyLeftIsVector (65)
+#define kSC__CustomOps_OnlyRightIsVector (66)
 #define kSC__CustomOps_TypeCastFromBool (16)
 #define kSC__CustomOps_TypeCastToBetter (32)
 #define kJB__ErrorColors_bold (JB_LUB[94])
@@ -2177,8 +2177,6 @@ extern Array* SC__NilReason_values;
 #define kSC__OpMode_ExactlyEquals (128)
 #define kSC__OpMode_ExactNotEquals (512 + (256 + 1))
 #define kSC__OpMode_LargestFlag (131071)
-#define kSC__OpMode_Left (32 + 1024)
-#define kSC__OpMode_LeftOnly (32)
 #define kSC__OpMode_LoseBits (2048)
 #define kSC__OpMode_MakesSigned (64)
 #define kSC__OpMode_Math (8)
@@ -2188,6 +2186,8 @@ extern Array* SC__NilReason_values;
 #define kSC__OpMode_NoExtraBits (1024)
 #define kSC__OpMode_OR (4096)
 #define kSC__OpMode_SameOrLessBits (1024 | 2048)
+#define kSC__OpMode_Shift (32 + 1024)
+#define kSC__OpMode_ShiftOnly (32)
 #define kJB__ProcessMode_AutoPrintErrors (4)
 #define kJB__ProcessMode_CaptureAll (1 | 4)
 #define kJB__ProcessMode_CaptureErrors (2)
@@ -3477,6 +3477,8 @@ void SC___junktest_1__();
 void SC___junktest_2__();
 
 bool SC___junktest_3__(IntRange Data);
+
+void SC_abc();
 
 void SC_AddToStaticSection(Message* Arg, Message* ToAdd);
 
@@ -5272,7 +5274,7 @@ NilState SC_nil__Number(Message* Msg, NilCheckMode Test);
 
 NilState SC_nil__Pointer(Message* Msg, NilCheckMode Test);
 
-NilState SC_nil__ProcessCondRel(Message* Msg, NilCheckMode Test);
+NilState SC_nil__ProcessNormalRel(Message* Msg, NilCheckMode Test);
 
 NilState SC_nil__Property(Message* Msg, NilCheckMode Test);
 
@@ -6503,7 +6505,7 @@ bool SC_Opp_SyntaxEquals(SCOperator* Self, JB_String* S, bool Aware);
 
 OpMode SC_Opp_SyntaxIs(SCOperator* Self, OpMode X);
 
-void SC_Opp__AddAssign(JB_String* S);
+void SC_Opp__AddAssign();
 
 void SC_Opp__AddBit(JB_String* S, JB_String* FuncName, fn_OpASM ASM, ASMMath Code, OpMode Mode);
 
@@ -7971,6 +7973,8 @@ void JB_Msg_Sheb__(Message* Self, FastString* Fs);
 AsmReg SC_Msg_SimpleVar(Message* Self);
 
 void SC_Msg_SlidePositions(Message* Self, int Add);
+
+void SC_Msg_SpdFuncSet(Message* Self, Syntax Value);
 
 void JB_Msg_SStr__(Message* Self, FastString* Fs);
 
