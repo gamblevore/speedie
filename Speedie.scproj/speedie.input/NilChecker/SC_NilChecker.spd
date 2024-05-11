@@ -449,7 +449,7 @@ function ProcessNormalRel (NilTrackerfn)
 	|| L = .Jump(ll) & NilState.Either		// (ptr+1) or (1+ptr) still needs nilness check
 	|| R = .Jump(rr) & NilState.Either
 	|| D = msg.FastDecl
-	if !D.TypeSuffers			// (ptr-ptr) is actually a number... so thats OK.
+	if !D.TypeSuffers						// (ptr-ptr) is actually a number... so thats OK.
 		return nilstate.real
 	if NilState.Nilish == l or r
 		return nilstate.nilish
@@ -547,13 +547,13 @@ function Brel (Niltrackerfn)
 		return pointer(msg, test)				// *abc
 
 	|| ch = (*msg)!
-	if b == '-' or '+' // for ++ or --
+	if b == '-' or '+'							// for ++ or --
 		return .jump(ch, test)
 	if b == '!'
 		return .Not(ch, test)
 	
 	.Jump(ch, test)
-	return nilstate.real // & ~ both return real
+	return nilstate.real						// & ~ both return real
 
 
 function Not (niltrackerfn)
