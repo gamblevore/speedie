@@ -51,7 +51,7 @@ class SpdProcess (Process)
 
 	syntax append (|string| str, |bool|)
 		cpp_Part SendStr
-		return self <~ (@sstr.msg(str))
+		return self <~ @sstr.msg(str)
 
 
 	syntax append (|message| msg, |bool|)
@@ -203,10 +203,9 @@ class SpdProcess (Process)
 			cpp_wrapper JB_App__BackTrace
 
 
-		function RunChild (|string| app_path, |string| DebugName="", |[string]| params=[], |ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
+		function RunChild (|string| app_path, |[string]| params=[], |string| DebugName="", |ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
 			require app_path.file.mustexist
 			|| pico = pico.new(app_path)
-				 // (pico.new(path), pico.parent)(.WeAreParent)
 				rz = SpdProcess(app_path, nil, pico, params, Mode)
 				if !rz.RunChild
 					rz = nil

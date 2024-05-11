@@ -495,13 +495,12 @@ class GUIControl (list)
 			r2.refsanity
 
 
-	task SlideOpen (TaskGUI, |movecode| Dir = MoveCode.Open)
-		run 
-			|| hide = (progress >= 1.0 and .dir is close)
-			(.upon is visible) = !hide
-			if .dir is close
-				progress = 1.0 - progress			
-			.upon.SizeFraction() = progress
+	task_run SlideOpen (TaskGUI, |movecode| Dir = MoveCode.Open)
+		|| hide = (progress >= 1.0 and .dir is close)
+		(.upon is visible) = !hide
+		if .dir is close
+			progress = 1.0 - progress			
+		.upon.SizeFraction() = progress
 
 
 	helper AddTask (|TaskGUI| t)

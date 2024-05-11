@@ -2039,7 +2039,6 @@ class TextView (GUIControl)
 		|| csAntiWords		= makeanti()
 		|| CounterParts		= <(`{[(`'"|`)>
 		|| CounterParts2	= <(`}])`'"|`)>
-//		|| _LastVLine		= 0
 
 		function MakeAnti (|charset|)
 			return jeebox.CSWordMiddle.Invert

@@ -191,6 +191,10 @@ class FastString {
 		cpp_part AppendUint
 		.AppendIntegerAsText(data, 1)
 
+	syntax Append (|uint16| data)
+		cpp_part AppendUint16
+		.AppendIntegerAsText(data, 1)
+
 	syntax Append (|int| data)
 		cpp_part AppendInt32
 		.AppendIntegerAsText(data, 1)

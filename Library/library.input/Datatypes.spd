@@ -321,7 +321,9 @@ datatype uint
 	operator max (|uint| other, |uint|)
 		if (self > other) { return self }
 		return other
-	
+		
+	render
+		fs <~ self|int64|
 
 	syntax cast (|bool|)
 		return self|bool|

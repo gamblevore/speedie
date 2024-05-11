@@ -148,7 +148,7 @@ function CmdWrap (|Message| arg, |bool|)
 	|| response = .cmdresponse(cmd, arg) 
 
 	if cmd != response
-		cmd.replacewith(response)
+		cmd.ReplaceWith(response)
 	SpdProcess.parent! <~ arg
 	stderr.clear						// super-important!!!
 	

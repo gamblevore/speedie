@@ -1,0 +1,25 @@
+
+
+// Basic empty file
+main
+	|| hello = abc.HelloSayer()
+	(hello)()
+	|| say = abc.stringsayer("goodbye")
+	(say)()
+	|| rsay = abc.randomsayer("hehe")
+	(rsay)()
+
+
+module abc
+	task_run HelloSayer
+		"hello" // will print "hello" when run
+
+	task_run StringSayer (|string| str)
+		printline .str
+	
+	task RandomSayer (|string| name)
+		|uint16| RandomID = 0
+		constructor
+			.randomid = random.shared.int
+		run
+			"$.name $.randomid"
