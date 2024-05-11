@@ -155,51 +155,12 @@ struct ASMState
 	
 	function Branch (|message| cond,  |&fatasm|)
 		|| Src = .µ(cond, asmreg.CondRequest)
-		if Src is cond
-/*
-	uint Jump = Cmp_Lu; 
-	bool b = CompI_(r, Op);
-	if (Jump >= 32) {
-		if (!b) return Code;
-		return Code + Jump - (1<<9);
-	}
-		
-	r[Jump].Int = b;
-	return Code;
-*/	
+		if Src isnt cond
+			|| dest = asmreg()
+			(dest is negate) = (src isnt negate)
+			.equals(dest, dest, src, cond)
+		return .curr - 1
 	
-	
-			return .curr - 1
-		
-		|| T = Src.µtype
-		|| Negated = src is Negate
-		|| tb = t.bitcount
-		if t.isint
-			if  t is bool  or  tb == 64
-				debugat
-				return .AddASM(asm.BRA • Negated, cond, Src, 1)
-			
-			if  tb == 32
-				debugat
-				return .AddASM(asm.CMPI, cond, src, 0, 5 + Negated)
-
-			debugat			// 16 or 8
-			|| dest = .AsTemp(src, cond)
-			|| Sh = 64 - tb
-			.AddASM(asm.BFLG, cond, dest, src, sh, sh, src.signed|int|)
-			return .AddASM(asm.CMPE • !Negated, cond, 0, dest)
-
-
-		|| M = 8 + (tb==64)<<1
-		M += Negated
-		return .AddASM(asm.CMPF, cond, 0, Src, M)					// comparison against 0
-		/*
-			CmpSub(8 , FA == FB)
-			CmpSub(9 , FA != FB)
-			CmpSub(10, DA == DB)
-			CmpSub(11, DA != DB)
-		*/		
-
 	
 	function FindConst (|uint64| Code, |asmreg|)
 		if Code
@@ -307,12 +268,12 @@ function ASMState.Alloc (|memory of fatasm| j, |bool|)
 		return true
 
 
-function @ASMState.Expand (|bool|)
-	require olds < 16
+function @ASMState.ExpandJSM (|bool|)
+	require .olds < 16
 	|| j = FatASM[4MB]
+		.olds <~ .jsmspace
 		.JSMSpace = j
 		return sh.Alloc(j)
-	// actually will leak on purpose. Which is good. Advanced memory managment :)
 	
 
 

@@ -326,8 +326,6 @@ function Tern (Niltrackerfn)
 	opt norefcounts
 	test &=~ NilCheckMode.Disappears
 	msg = msg.second!
-//	if msg.ASMType == ASMtmp.kTern
-//		return tern(prms, test)
 
 	|| Orig = T.BranchEnter(msg)			#require
 	|| tC = msg.first!,  || tA = tC.next!,  || tB = tA.next!

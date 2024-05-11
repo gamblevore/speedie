@@ -20,6 +20,31 @@ function ASMReg.boolasm (|asmreg|)
 	
 	
 extend ASMState
+/*
+	// this needs to be put back in!!
+		|| tb = t.bitcount
+		// why not just call the compare vs 0 function?
+		if t.isint
+			if  t is bool  or  tb == 64
+				debugat
+				return .AddASM(asm.BRA • Negated, cond, Src, 1)
+			
+			if  tb == 32
+				debugat
+				return .AddASM(asm.CMPI, cond, src, 0, 6 + Negated)
+
+			debugat			// 16 or 8
+			|| dest = .AsTemp(src, cond)
+			|| Sh = 64 - tb
+			.AddASM(asm.BFLG, cond, dest, src, sh, sh, src.signed|int|)
+			return .AddASM(asm.CMPE • !Negated, cond, 0, dest)
+
+
+		|| M = 8 + (tb==64)<<1
+		M += Negated
+		return .AddASM(asm.CMPF, cond, 0, Src, M)					// comparison against 0
+*/
+
 	function Equals (fn_opasm)
 		|| bl = l.µtype.bitcount
 		if bl != r.µtype.bitcount, #!l and r have different bitcounts?
@@ -42,6 +67,51 @@ extend ASMState
 		(dest is Negate) = (dest isnt Negate)
 		return .equals(dest, l, r, dbg)
 
+
+	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| dbg,  |uint| Mode,  |asmreg|)
+		|| bl = l.µtype.bitcount, if bl != r.µtype.bitcount
+
+		mode ^= (dest is negate)
+		
+		if dest.IsInt
+			if dest.IsBig
+				mode += 8
+			if !dest.signed
+				mode += 4
+			.AddASM(asm.CMPI, dbg, L, R, mode, dest)
+		  else
+			if dest.IsBig
+				mode += 4
+			.AddASM(asm.CMPF, dbg, L, R, Mode, dest) // it is cmpf either way
+	
+		return dest.BoolASM
+/*
+	0 :		iA >= iB
+	1 :		iA <  iB
+	2 :		iA <= iB
+	3 :		iA >  iB
+	4 :		uA >= uB
+	5 :		uA <  uB
+	6 :		uA <= uB
+	7 :		uA >  uB
+	8 :		A  >= B 
+	9 :		A  <  B 
+	10:		A  <= B 
+	11:		A  >  B 
+	12:		UA >= UB
+	13:		UA <  UB
+	14:		UA <= UB
+	15:		UA >  UB
+	0 :		FA >= FB
+	1 :		FA <  FB
+	2 :		FA <= FB
+	3 :		FA >  FB
+	4 :		DA >= DB
+	5 :		DA <  DB
+	6 :		DA <= DB
+	7 :		DA >  DB
+*/
+
 	function Less   (fn_opasm)
 		(dest is Negate) = (dest isnt Negate)
 		return .moreeq(dest, l, r, dbg)
@@ -50,28 +120,13 @@ extend ASMState
 		(dest is Negate) = (dest isnt Negate)
 		return .more(dest, l, r, dbg)
 
-	function Compare (|asmreg| dest, |asmreg| L, |asmreg| R, |message| dbg, |uint| BaseMode,  |asmreg|)
-		|| bl = l.µtype.bitcount
-		if bl != r.µtype.bitcount
-		// equals can call this too! at least for where its behaviour is the same
-		if dest.IsInt
-			debugat // put in actual numbers
-			.AddASM(asm.CMPI • (dest is Negate), dbg, L, R, basemode, dest)
-		  else
-			debugat // put in actual numbers
-			|| M = basemode + (bl == 64)<<1
-			M += (dest is negate)
-			.AddASM(asm.CMPF, dbg, L, R, M, dest) // it is cmpf either way
-	
-		return dest.BoolASM
-
 	function More   (fn_opasm)
 		debugat // put in actual numbers
-		return .Compare(dest, l, r, dbg, 1)
+		return .Compare(dest, l, r, dbg, 3)
 	
 	function MoreEq (fn_opasm)
 		debugat // put in actual numbers
-		return .Compare(dest, l, r, dbg, 4)
+		return .Compare(dest, l, r, dbg, 0)
 
 
 	// MATH
@@ -106,7 +161,7 @@ extend ASMState
 		|| p = self[r]
 		|ivec2| exp
 		// we could optimise f/-1.0 or f/-0.5... but who cares. dont write such dumb code.
-		if l.eightbytes
+		if l.IsBig
 			|| f = p|&f64|[0]
 			require f > 0
 			exp = f.exponent
@@ -116,7 +171,7 @@ extend ASMState
 			exp = f.exponent
 		
 		if exp.y == 1
-			.AddASM(asm.FEXK, dbg, dest, L, 0, exp.x, l.eightbytes|int|)
+			.AddASM(asm.FEXK, dbg, dest, L, 0, exp.x, l.IsBig|int|)
 			return dest
 
 
@@ -232,7 +287,7 @@ extend ASMState
 				return D1
 			|| D2 = .QuickFloatMul(dest, L, R, dbg)
 				return D2
-			.AddASM(asm.FMUL, dbg, dest, L, R, l.eightbytes|int|) 
+			.AddASM(asm.FMUL, dbg, dest, L, R, l.IsBig|int|) 
 		return dest
 	
 
@@ -247,7 +302,7 @@ extend ASMState
 			return D1
 		|| D2 = .QuickFloatDiv(dest, L, R, dbg)
 			return D2
-		|| big = dest.eightbytes|int|
+		|| big = dest.IsBig|int|
 		.AddASM(asm.FDIV, dbg, dest, big, L, R)
 		|| Alt = l is alternate
 			.AddASM(asm.FFRC, dbg, dest, big, dest, R)

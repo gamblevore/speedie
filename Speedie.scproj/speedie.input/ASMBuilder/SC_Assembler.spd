@@ -69,7 +69,7 @@ module TreeAssembler
 		
 		if .VakSub(fn)
 			return true
-		if ASMState.Expand
+		if ASMState.ExpandJSM
 			return .VakSub(fn)
 
 

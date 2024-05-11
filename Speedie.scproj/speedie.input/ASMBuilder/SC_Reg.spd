@@ -73,7 +73,7 @@ datatype AsmReg (uint)
 		pragma inline
 		return self|datatypecode|._shift == 2
 
-	function EightBytes (|bool|)
+	function IsBig (|bool|)
 		pragma inline
 		return self|datatypecode|._shift == 3
 

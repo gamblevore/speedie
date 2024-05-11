@@ -225,26 +225,25 @@ AlwaysInline bool CompI_ (Register* r, ASM Op) {
 	auto A = &i1;
 	auto B = &i2;
 	switch (Cmp_Cmpu) {
-		CmpSub(0 , iA <  iB);
-		CmpSub(1 , iA >  iB);
+		CmpSub(0 , iA >= iB);
+		CmpSub(1 , iA <  iB);
 		CmpSub(2 , iA <= iB);
-		CmpSub(3 , iA >= iB);
+		CmpSub(3 , iA >  iB);
 
-		CmpSub(4 , uA <  uB);
-		CmpSub(5 , uA >  uB);
+		CmpSub(4 , uA >= uB);
+		CmpSub(5 , uA <  uB);
 		CmpSub(6 , uA <= uB);
-		CmpSub(7 , uA >= uB);
+		CmpSub(7 , uA >  uB);
 
-		CmpSub(8 , A  <  B );
-		CmpSub(9 , A  >  B );
+		CmpSub(8 , A  >= B );
+		CmpSub(9 , A  <  B );
 		CmpSub(10, A  <= B );
-		CmpSub(11, A  >= B );
+		CmpSub(11, A  >  B );
 
-		CmpSub(12, UA <  UB);
-		CmpSub(13, UA >  UB);
-		CmpSub(14, UA <= UB);
-	default:
-		CmpSub(15, UA >= UB);
+		CmpSub(12, UA >= UB);
+		CmpSub(13, UA <  UB);
+		CmpSub(14, UA <= UB);	default:
+		CmpSub(15, UA >  UB);
 	};
 }
 
@@ -254,20 +253,19 @@ AlwaysInline bool CompF_ (Register* r, ASM Op) {
 	auto B = &i2;
 
 	switch (Cmp_Cmpu) {
-		CmpSub(0 , FA <  FB);
-		CmpSub(1 , FA >  FB);
+		CmpSub(0 , FA >= FB);
+		CmpSub(1 , FA <  FB);
 		CmpSub(2 , FA <= FB);
-		CmpSub(3 , FA >= FB);
+		CmpSub(3 , FA >  FB);
 
-		CmpSub(4 , DA <  DB);
-		CmpSub(5 , DA >  DB);
+		CmpSub(4 , DA >= DB);
+		CmpSub(5 , DA <  DB);
 		CmpSub(6 , DA <= DB);
-		CmpSub(7 , DA >= DB);
+		CmpSub(7 , DA >  DB);
 
 		CmpSub(8 , FA == FB);
 		CmpSub(9 , FA != FB);
-		CmpSub(10, DA == DB);
-	default:
+		CmpSub(10, DA == DB);	default:
 		CmpSub(11, DA != DB);
 	};
 }

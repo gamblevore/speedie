@@ -1,5 +1,5 @@
 
-// check for four/eightbytes... how do they handle 1/2???
+
 
 dispatch fn_asm_table (fn_asm)
 	@arg:
@@ -498,6 +498,7 @@ function asmstate.SimpleVar (|message| m, |asmreg|)
 		return asmtmp.thg(asmstate.sh, m)
 	if fn == @num
 		return asmtmp.num(asmstate.sh, m)
+
 
 function int64.CanStoreAsIntImmediate (|bool|)
 	return ((self << 50)>>50) == self
