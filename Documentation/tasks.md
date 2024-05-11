@@ -52,7 +52,7 @@ Running this, you should see this output:
 
 #### Message-Passing
 
-Speedie basically uses ["the erlang model"](https://www.youtube.com/watch?v=lKXe3HUG2l4) of concurrency. This is simply "the right choice". Any other choice is wrong. :)
+Speedie basically uses ["the erlang model"](https://www.youtube.com/watch?v=lKXe3HUG2l4) of concurrency. This is simply "the right choice". Any other choice is wrong. 🥰 (Unless its compatible with it.) 🤭
 
 So... we want to pass messages to communicate across threads. Basically you run a separate process, an instance of your program, and communicate.
 
