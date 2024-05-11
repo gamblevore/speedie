@@ -230,9 +230,13 @@ prototype SpdMainFn	(|&nil| Obj, |&cstring| args, |&pico| Comms, |bool|)
 				rz = nil
 
 
-prototype SpdDeathActionFn
+function app.fork
+	disabled "use spdprocess.fork... same thing!"
 
 
 function @spdprocess.Fork (|[string]| r, |SpdProcess|)
 	return SpdProcess.Run(app.path, r)
+
+
+prototype SpdDeathActionFn
 
