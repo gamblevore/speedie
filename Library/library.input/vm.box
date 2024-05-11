@@ -251,7 +251,14 @@ forms
 		u1 = BitComp(r, Op)
 
 
+
 #!						 (((((Branches)))))
+/**/ TERN  (U4)
+	if (u2)
+		u1 = u3
+	else
+		u1 = u4
+
 /**/ JUMP (U0)
 		Code += l0
 

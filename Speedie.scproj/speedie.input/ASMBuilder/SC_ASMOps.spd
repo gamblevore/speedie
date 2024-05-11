@@ -9,19 +9,13 @@ function asmreg.CanAddK (|int64| T, |bool|)
 		return B == t
 
 
-function message.abcd (|asmreg| r)
-	is Style2
-
-
 function ASMReg.boolasm (|asmreg|)
 	.µtype = DataTypeCode.bool
 	
-	target debug2
-		is AlreadyNegated			// speedie crashing somehow but it is used OK elsewhere?
-	(self is AlreadyNegated)
+	is AlreadyNegated			// speedie crashing somehow but it is used OK elsewhere?
 	if self is CondRequest
-		(self isnt condrequest)
-		(self is cond)
+		isnt condrequest
+		is cond
 	return self 
 	
 	
@@ -199,6 +193,11 @@ extend ASMState
 		
 		return dest
 
+
+	function BoolMul (|asmreg| dest, |asmreg| Boo, |asmreg| R, |message| dbg, |asmreg|)
+		.addasm(asm.TERN, dbg, dest, boo, r, 0)
+		return dest
+
 		
 	function Plus   (fn_opasm)
 		if !r.reg
@@ -216,6 +215,12 @@ extend ASMState
 
 
 	function Mul    (fn_opasm)
+		|| b = DataTypeCode.bool
+		if l isa b
+			return .BoolMul(dest, l, r, dbg)
+		if r isa b
+			return .BoolMul(dest, r, l, dbg)
+			
 		if l.isint
 			|| D1 = .QuickIntMul(dest, R, L, dbg)
 				return D1

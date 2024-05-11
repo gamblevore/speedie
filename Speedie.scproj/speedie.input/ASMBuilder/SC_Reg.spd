@@ -60,6 +60,9 @@ datatype AsmReg (uint)
 	operator isa (|ASMMath| M, |bool|)
 		return .math == M
 
+	operator isa (|datatypecode| M, |bool|)
+		return .µtype == M
+
 	operator as (|ASMMath| M, |asmreg|)
 		return ((self|uint| &~ MathTypes) ||| (M<<16))|ASMReg|
 

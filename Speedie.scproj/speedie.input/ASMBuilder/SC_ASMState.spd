@@ -226,6 +226,7 @@ struct ASMState
 				debugger
 
 		if dest isnt StayOpen
+			debugger, #! Can't close declarations in args!
 			|| OV = .OpenVars		
 			rz = (fn)(self, exp, dest)
 			.CloseVars(ov)
@@ -240,7 +241,7 @@ struct ASMState
 
 
 	function Prm (|message| prm, |asmreg|)
-		|| r = prm.SimpleVar
+		|| r = .SimpleVar(prm)
 		if r.Exists
 			return r
 		|| Where = .DeclareMe(prm, asmreg())

@@ -82,6 +82,13 @@
 	i1 = JB_u64_RotR(u2, u3 + L3);
 ı BCMP: _
 	u1 = BitComp(r, Op);
+ı TERN: _
+	if (u2) 
+	u1 = u3
+;
+	else 
+	u1 = u4
+;
 ı JUMP: _
 	Code += l0;
 ı CMPI: 

@@ -57,7 +57,7 @@ dispatch fn_asm_table (fn_asm)
 	(ASMtmp.krejoin):		ASMtmp.First
 	(ASMtmp.kreturn):		ASMtmp.return
 	(ASMtmp.kwhile):		ASMtmp.While
-	(asmtmp.kTern):			ASMtmp.Tern
+	(asmtmp.kTern):			ASMtmp.Ternary
 
 	(asmtmp.kContinue):		ASMtmp.Continue
 	(asmtmp.kExit):			ASMtmp.Exit
@@ -72,6 +72,16 @@ dispatch fn_asm_table (fn_asm)
 	63:
 		0
 
+
+
+
+function asmstate.SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond, |asmreg|)
+	opt norefcounts
+	|| dr = dest.reg
+	|| mc = (asmreg(), dest)(dr == ma.reg or mb.reg)
+	mc = .µ(cond, mc)
+	.addasm(asm.TERN, cond, dest, mc, ma, mb)
+	return dest
 
 
 extend_module ASMTmp {
@@ -147,14 +157,26 @@ function StatExpr		(fn_asm)
 		.µ(ch, asmreg.discard)
 
 
-function Tern			(fn_asm)
+function Ternary		(fn_asm)
 	opt norefcounts
+	
 	|| prms = exp.second
 	|| cond = prms.first!
 	|| A = cond.next!
 	|| B = A.next!
+	
+	|| mA = .simplevar(a)
+	|| mB = .simplevar(b)
+	if ma and mb
+		return .SimpleTernary(dest, ma, mb, cond)
+	
+	#! we'll need to protect registers...  x = (1,1+2)(cond)
+	#! x can be set to 1, then we find the number 1 as a constant in a register
+	#! Except its not really there cos it hasnt been done yet!
+	#! Its actually quite good that we set it directly, though.
+	#! We need some kinda way to block off "unknown registers" 
+
 	dest = .TempMe(exp, dest)
-	// x = (1, 1+2)(x)
 	|| FailToSecond = .Branch(cond)
 	.µ(A, dest)
 	|| Exit = .AddASM(asm.jump, exp)
@@ -267,7 +289,7 @@ function Dot		(fn_asm)						// a.b
 
 function SetRel	(fn_asm)
 	opt	norefcounts
-	|| Var = exp.first!.SimpleVar	
+	|| Var = .SimpleVar(exp.first!)	
 	|| R = .µ(exp.last!, var)
 	if r isnt discard								// x = 1, already done!
 		(r is set)
@@ -465,17 +487,17 @@ function ASMReg.ReadOrWrite (|message| m, |asm|)
 	return .ReadOrWriteSub(m, t, bytes)
 
 
-function message.SimpleVar (|asmreg|)
+function asmstate.SimpleVar (|message| m, |asmreg|)
 	opt	norefcounts
 	real self
-	|| fn = .func 
+	|| fn = m.func 
 	while fn == @bra or @type
-		self = .first!
-		fn = .func
+		m = m.first!
+		fn = m.func
 	if fn == @thg
-		return asmtmp.thg(asmstate.sh, self)
+		return asmtmp.thg(asmstate.sh, m)
 	if fn == @num
-		return asmtmp.num(asmstate.sh, self)
+		return asmtmp.num(asmstate.sh, m)
 
 function int64.CanStoreAsIntImmediate (|bool|)
 	return ((self << 50)>>50) == self
