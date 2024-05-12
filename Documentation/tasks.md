@@ -136,15 +136,7 @@ Then the other side could import this interface and run it. Perhaps something li
     
 We could add more functions... like `MailBox.ValueHasArrived()` (but named shorter), or `MailBox.wait()`... etc etc.
 
-We could make this even shorter and more natural, at the cost of loss of some control:
-
-    || P = "/My/Cool/File/Reader" #run  // imports the interface from the program (on compile) and then runs it (At runtime)
-    || Data = P.Read("afile.txt") #wait 5s // gets the data and waits for 5s max
-        printline Data
-      else
-        printerror p.lasterror
-    
-We could even add callbacks to mailboxes... so you don't need to wait or write convoluted code to check all the time.
+We could make this even shorter and more natural, with callbacks to mailboxes... so you don't need to wait or write convoluted code to check all the time:
 
     || P = "/My/Cool/File/Reader" #run
     run P.Read("afile.txt") for 5s
