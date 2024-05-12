@@ -179,7 +179,7 @@ function Perryide.IsBuilding (|bool|) // .isbuilding, .iscompiling, .compiling
 
 
 function ClickedCancel (GUIAction)
-	|| i = .ide!
+	|| i = .ide
 	if !i.Isbuilding
 		return true
 	|| can = ConfirmCanceller(i, fnBuildIsDead)
@@ -191,11 +191,11 @@ function ClickedCancel (GUIAction)
 		
 
 function ClickedCompile (GUIaction)
-	.ide!.compile("compile")
+	.ide.compile("compile")
 
 		
 function PerryRecheckEvent (guilistevent)
-	.ide!.ForceRecheck
+	.ide.ForceRecheck
 
 
 function ReturnProjectPath (GUIListEvent)
@@ -205,24 +205,24 @@ function ReturnProjectPath (GUIListEvent)
 
 
 function ReturnAllFuncs (GUIListEvent)
-	|| e = .ide!.EditMe
+	|| e = .ide.EditMe
 	e.ShowAndSel(row!.position, true)
 	e.SetFocus
 	return true
 
 	
 function OpenProjectPath (GUIaction)
-	|| f = .ide!.filelist.FirstSelected as FileRow
+	|| f = .ide.filelist.FirstSelected as FileRow
 		if (self isa buttonview)
 			.FillMenuPath(f.location)
 
 
 function ClickedStatus (GUIaction)
-	.ide!.editme.ShowNextParseError
+	.ide.editme.ShowNextParseError
 
 
 function ClickedProjectInfo (GUIaction)
-	.ide!.NextProjInfo
+	.ide.NextProjInfo
 
 
 function PerryIDE.SaveAndShowErrors (|bool| FromKeys, |bool|)
@@ -253,7 +253,7 @@ function PerryIDE.ShowErrors (|bool|)
 function ClickedAView (GUIaction)
 	opt norefcounts
 	if self isa ButtonView
-		.ide!.UseThisView(self, true)
+		.ide.UseThisView(self, true)
 
 
 function perryide.UseThisView (|buttonview| btn, |bool| chng=false)
@@ -266,8 +266,8 @@ function perryide.UseThisView (|buttonview| btn, |bool| chng=false)
 
 function ClickedNoNeed (GUIaction)
 	opt norefcounts
-	|| t = .tag as buttonview
-		.ide!.view(t)	
+	|| i = .ide
+	i.view(i.viewfiles)
 
 
 function PerryIDE.ShowText (|textview| field, |string?| Text, |bool| Always, |bool|)
@@ -306,14 +306,14 @@ function PerryIDE.BatchPhind (|string| text, |uint| ID, |bool|)
 
 function PressedSelInfo (GUIaction)
 	opt norefcounts
-	|| i = .ide!
+	|| i = .ide
 	|| q = i.filelist.quickopen
 	q.text = "line " + i.editme.CurrLine.Render
 	i.filelist.showquickopen
 
 
 function PressedSearchWithin (Guiaction)
-	|| i = .ide!
+	|| i = .ide
 	|| f = i.FileList
 	|| r = f.SearchWithin
 		f.SearchWithin = nil
@@ -324,7 +324,7 @@ function PressedSearchWithin (Guiaction)
 	
 function PressedSearchKeys (GUIKeyEvent)
 	opt norefcounts
-	|| w = .ide!
+	|| w = .ide
 	|| t = self as textview #require
 	
 	if key.isaccept
@@ -351,7 +351,7 @@ function PressedSearchKeys (GUIKeyEvent)
 
 function EditMeSelChange (GUITextEvent)
 	opt norefcounts
-	|| i = .ide!
+	|| i = .ide
 	if i.ProductSep.IsOpen and i.jeeboxtext is visible
 		i.UpdateJeeboxField
 	i.popuphide
@@ -386,7 +386,7 @@ function PressedEditKeys (GUIKeyEvent)
 		
 		|| tabkind = .PerryInsertSyntax(key)
 			if tabkind == 1
-				.ide!.EditMeTabRetryThing = 0
+				.ide.EditMeTabRetryThing = 0
 			return true
 
 
@@ -459,7 +459,7 @@ error
 	
 	
 function ClickedError (GUIListEvent)
-	|| ide = .ide!
+	|| ide = .ide
 	if row isa error
 		if self == ide.errorlist
 			ide.ClickedError(row)
@@ -473,8 +473,8 @@ function ClickedError (GUIListEvent)
 
 function LogAreaKeys (GuiKeyEvent)
 	if key iscmd keys.k
-		|| s1 = .ide!.LogComms!
-		|| s2 = .ide!.LogActions!
+		|| s1 = .ide.LogComms!
+		|| s2 = .ide.LogActions!
 		|| c = s1.slowcount + s2.SlowCount
 			if "Clear log?\n\nContains $c items.".confirm
 				s1.clear
@@ -484,7 +484,7 @@ function LogAreaKeys (GuiKeyEvent)
 
 function ReturnErrorList (GuiListEvent)
 	.select(row)
-	.ide!.editme.setfocus
+	.ide.editme.setfocus
 	return true
 
 
@@ -497,7 +497,7 @@ function perryide.ReTextSubFind
 
 function SelectedFile (GuiListevent)
 	if row isa FileRow
-		return .ide!.EditFile(row)
+		return .ide.EditFile(row)
 
 
 //function RightClickErrorList (GUIListEvent)

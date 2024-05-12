@@ -605,7 +605,7 @@ class TextView (GUIControl)
 				if key.IsCancel:		return .CancelEditing
 				if key.IsAccept:		return .InlineAcceptKey
 				if key iscmd keys.g:	return .InlineAcceptSearch
-				if key is tab:			return .FinishEditing
+				if key is tab:			return .FinishEditing(true)
 			if key.IsAccept:			return .NewLine
 			if .ClickOutsideCloses and key.IsCancel
 				return .CancelEditing

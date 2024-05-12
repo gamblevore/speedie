@@ -46,7 +46,7 @@ function Window.Confirm (|string| Q, |fnConfirmCanceller| fn, |bool|)
 	
 
 function ClickedDebug (GUIAction)
-	|| i = .ide!
+	|| i = .ide
 	if .text == "\02"		// play
 		i.DebugIsWaitingForCompile = true
 		i.compile("debug")
@@ -63,7 +63,7 @@ function ClickedDebug (GUIAction)
 
 function PressingDebug (GUIAction)
 	opt norefcounts
-	|| i = .ide!
+	|| i = .ide
 	i.DebugArgsList.setfocus
 
 

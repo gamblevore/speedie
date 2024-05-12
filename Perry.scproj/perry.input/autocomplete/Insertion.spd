@@ -158,11 +158,11 @@ function TextView.PerryTryAutoComplete (|int| x, |string| type, |string| Reason,
 			return .DoTheParamDisplayThing(x, reason ~= PerryAutoCompleteReason.escape)
 	
 	if (reason ~!= "Sel") and (type ~= "autocomplete") and (.FakeAutoComplete >= 1)
-		.ide!.ShowAutoBeep(true)
+		.ide.ShowAutoBeep(true)
 		return true
 	
 	|| ok2 = false
-	|| i = .ide!
+	|| i = .ide
 	|| msg = .ClickedMsg(x, true)
 		i.editme.CanAutoComplete = true
 		ok2 = i.MaybeSendMessage(type, msg, msg.name, reason)
@@ -331,7 +331,7 @@ helper String.DetectNoSpaces (|string| find, |int| start, |bool| Fwd=true,  |ind
 	
 function textview.PerryInsertSyntax (|keys| Key, |int|)
 	opt norefcounts
-	|| ide = .ide!
+	|| ide = .ide
 	if  key is escape  and  ide.PopupDateOn.ago > 0.5s
 		ide.PopupHide
 		return 1
@@ -399,7 +399,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 	if ide.EditMeTabRetryThing
 		return 0
 	if  !s.width  and  (key is tab)  and  self[s.x].istextline
-		|| C = .ide!.autocomplete.listsource.slowcount
+		|| C = .ide.autocomplete.listsource.slowcount
 		if C > 0 
 			if c == 1 and .FakeAutoComplete == -1
 				return 0 // what?

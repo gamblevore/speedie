@@ -125,7 +125,7 @@ function PerryIDE.ShowAuto (|bool|)
 
 function AutoCompleteInsertText (GuiListEvent)
 	opt norefcounts
-	|| i = .ide!
+	|| i = .ide
 	|| e = i.editme
 	if row >= 3
 		|| file = row.firstname
@@ -288,12 +288,12 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 
 function EditMeKeyDown (guitextevent)
 	opt norefcounts 
-	.ide!.EditMeTabRetryThing = 0
-	.ide!.ShowStats
+	.ide.EditMeTabRetryThing = 0
+	.ide.ShowStats
 
 
 function EditMeModified (guitextevent)
-	|| i = .ide!
+	|| i = .ide
 	i.lastsendtime = 0
 	require i.projmsg
 	EditMeKeyDown(self, 0, false)
@@ -358,7 +358,7 @@ function JumpToDefinition (GUIAction)
 	|| rightclick = state == -1
 	|| cmd = state == -2
 	require (cmd or rightclick)
-	|| ide = .ide!
+	|| ide = .ide
 	|| msg = ide.EditMe.ClickedMsg
 		if msg in @url
 			msg = msg.parent!
