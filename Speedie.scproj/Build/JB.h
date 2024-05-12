@@ -8574,7 +8574,7 @@ bool SC_Base_LoadVisibility(SCNode* Self, Message* P);
 
 JB_Object* SC_Base_LookUpDot(SCNode* Self, JB_String* Name, Message* Exp, SCNode* Arg_space, SCDecl* Contains, Message* Side);
 
-SCFunction* SC_Base_LookUpFunc(SCNode* Self, JB_String* Name, Message* Exp, Message* ParamsHere);
+SCObject* SC_Base_LookUpFunc(SCNode* Self, JB_String* Name, Message* Exp, Message* ParamsHere);
 
 SCObject* SC_Base_LookUpSub(SCNode* Self, JB_String* OrigName, Message* Exp, Message* ParamsHere, SCNode* Arg_Space, SCDecl* Contains, Message* Side, int Purpose);
 

@@ -414,8 +414,8 @@ function TryAddBase (|Message| c, |SCNode| neu)
 	.TryAdd( c, neu, neu.Name )
 
 
-function LookUpFunc (|String| name, |Message| exp, |Message| ParamsHere, |scfunction|)
-	return .LookUpSub( name, exp, ParamsHere, self, nil, nil, kPurposeFunc )|scfunction|
+function LookUpFunc (|String| name, |Message| exp, |Message| ParamsHere, |scobject|)
+	return .LookUpSub( name, exp, ParamsHere, self, nil, nil, kPurposeFunc )
 
 
 function ProjectFix (|SCNode|)

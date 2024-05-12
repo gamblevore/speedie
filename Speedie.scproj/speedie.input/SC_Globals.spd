@@ -1656,10 +1656,14 @@ function TypeOfFuncSub (|Message| exp, |SCNode| name_space, |Message| side, |SCO
 	|| ch = exp.first
 	|| params = ch.next
 
+	|scdecl| thgdecl 
 	if ch == @Thg
-		return name_space.LookUpFunc( ch.name, exp, params )
+		thgdecl = name_space.LookUpFunc( ch.name, exp, params )|scdecl|
+		ifn thgdecl isa scdecl
+			return thgdecl
+	  else
+		ThgDecl = TypeOfExpr( ch, name_space )		   #require
 	
-	|| ThgDecl = TypeOfExpr( ch, name_space )		   #require
 	fn = ThgDecl.Type.FuncProto
 	if !fn
 		return TypeOfSyntaxCall(exp, name_space, side)

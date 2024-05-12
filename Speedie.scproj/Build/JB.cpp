@@ -2017,7 +2017,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112424898658304));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112428905569353));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3296,7 +3296,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024051123));
+	JB_FS_AppendInt32(_fsf0, (2024051216));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7892,7 +7892,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024051123));
+	JB_FS_AppendInt32(_fsf0, (2024051216));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -12086,24 +12086,30 @@ SCObject* SC_TypeOfFuncSub(Message* Exp, SCNode* Name_space, Message* Side) {
 	}
 	Message* Ch = JB_Incr(((Message*)JB_Ring_First(Exp)));
 	Message* Params = JB_Incr(((Message*)JB_Ring_NextSib(Ch)));
+	SCDecl* Thgdecl = nil;
 	if (JB_Msg_EqualsSyx(Ch, kJB_SyxThg, false)) {
-		SCFunction* _tmPf0 = JB_Incr(SC_Base_LookUpFunc(Name_space, Ch->Name, Exp, Params));
-		JB_Decr(Params);
-		JB_Decr(Ch);
-		JB_Decr(Fn);
-		JB_SafeDecr(_tmPf0);
-		return _tmPf0;
+		JB_SetRef(Thgdecl, ((SCDecl*)SC_Base_LookUpFunc(Name_space, Ch->Name, Exp, Params)));
+		if ((!JB_Object_Isa(Thgdecl, &SCDeclData))) {
+			JB_Decr(Params);
+			JB_Decr(Ch);
+			JB_Decr(Fn);
+			JB_SafeDecr(Thgdecl);
+			return Thgdecl;
+		}
 	}
-	SCDecl* ThgDecl = JB_Incr(SC_TypeOfExpr(Ch, Name_space, nil));
+	 else {
+		JB_SetRef(Thgdecl, SC_TypeOfExpr(Ch, Name_space, nil));
+		if ((!Thgdecl)) {
+			JB_Decr(Thgdecl);
+			JB_Decr(Params);
+			JB_Decr(Ch);
+			JB_Decr(Fn);
+			return nil;
+		}
+	}
 	JB_Decr(Ch);
-	if ((!ThgDecl)) {
-		JB_Decr(ThgDecl);
-		JB_Decr(Params);
-		JB_Decr(Fn);
-		return nil;
-	}
-	JB_SetRef(Fn, ThgDecl->Type->FuncProto);
-	JB_Decr(ThgDecl);
+	JB_SetRef(Fn, Thgdecl->Type->FuncProto);
+	JB_Decr(Thgdecl);
 	if ((!Fn)) {
 		JB_Decr(Params);
 		JB_Decr(Fn);
@@ -19037,9 +19043,6 @@ NilState SC_nil__Function(Message* Msg, NilCheckMode Test) {
 	Test = (Test & (~kSC__khalai_Disappears));
 	Message* Fp = ((Message*)JB_Ring_First(Msg));
 	Message* Prms = ((Message*)JB_Ring_NextSib(Fp));
-	if (SC_Msg_ASMType(Msg) == kSC__ASMtmp_kTern) {
-		debugger;
-	}
 	SCFunction* Fn = ((SCFunction*)Prms->Obj);
 	if ((!Fn)) {
 		if (Fp->Func != kJB_SyxBra) {
@@ -39571,8 +39574,8 @@ JB_Object* SC_Base_LookUpDot(SCNode* Self, JB_String* Name, Message* Exp, SCNode
 	return SC_Base_LookUpSub(Self, Name, Exp, ((Message*)JB_Ring_Last(Exp)), Arg_space, Contains, Side, kSC__Base_kPurposeDot);
 }
 
-SCFunction* SC_Base_LookUpFunc(SCNode* Self, JB_String* Name, Message* Exp, Message* ParamsHere) {
-	return ((SCFunction*)SC_Base_LookUpSub(Self, Name, Exp, ParamsHere, Self, nil, nil, kSC__Base_kPurposeFunc));
+SCObject* SC_Base_LookUpFunc(SCNode* Self, JB_String* Name, Message* Exp, Message* ParamsHere) {
+	return SC_Base_LookUpSub(Self, Name, Exp, ParamsHere, Self, nil, nil, kSC__Base_kPurposeFunc);
 }
 
 SCObject* SC_Base_LookUpSub(SCNode* Self, JB_String* OrigName, Message* Exp, Message* ParamsHere, SCNode* Arg_Space, SCDecl* Contains, Message* Side, int Purpose) {
@@ -49645,4 +49648,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -6208599258278031114 920046876511060213
+// -5137541409775447307 920046876511060213

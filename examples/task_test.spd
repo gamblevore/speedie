@@ -3,23 +3,23 @@
 // Basic empty file
 main
 	|| hello = abc.HelloSayer()
-	(hello)()
+	hello()
 	|| say = abc.stringsayer("goodbye")
-	(say)()
+	say()
 	|| rsay = abc.randomsayer("hehe")
-	(rsay)()
+	rsay()
 
 
 module abc
 	task_run HelloSayer
-		"hello" // will print "hello" when run
+		app.say "hello" // will print "hello" when run
 
 	task_run StringSayer (|string| str)
-		printline .str
+		app.say  .str
 	
 	task RandomSayer (|string| name)
 		|uint16| RandomID = 0
 		constructor
 			.randomid = random.shared.int
 		run
-			"$.name $.randomid"
+			app.say "$.name $.randomid"

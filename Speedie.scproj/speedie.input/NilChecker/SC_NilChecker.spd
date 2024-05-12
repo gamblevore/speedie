@@ -151,7 +151,6 @@ function Function (NilTrackerFn)
 	test &=~ NilCheckMode.Disappears
 	|| fp = msg.first!
 	|| prms = fp.next!
-	if msg.ASMType == ASMtmp.kTern
 	
 	|| fn = prms.obj|SCFunction|
 	if !fn
