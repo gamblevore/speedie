@@ -102,16 +102,6 @@ My (unreleased) game engine in speedie, also uses threads for the audio. Again..
 Hopefully you are seeing the pattern. Speedie uses message-passing. It is our way.
 
 
-_The exception..._
-
-There is an interesting exception, though. Speedie programs can be compiled as libraries. As a lib, a speedie program is basically "Self-contained". Each has it's own memory-manager space, it's own objects, its own everthing.
-
-So you can open up another speedie program as a library, and use message-passing to talk to it concurrently within your main speedie program.
-
-I've done this myself, I've ran Speedie (The compiler) from within Perry (the IDE) as a library. This makes debugging easier. As I'm debugging one program, not two.
-
-But it could be used to run speedie code concurrently for other reasons.
-
 
 ## Future Upgrades
 
