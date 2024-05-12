@@ -235,6 +235,7 @@ function app.fork
 
 
 function @spdprocess.Fork (|[string]| r, |SpdProcess|)
+	// wait... this is quite not the same... forking actually copies the current process!
 	return SpdProcess.Run(app.path, r)
 
 

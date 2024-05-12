@@ -46,13 +46,12 @@ Running this, you should see this output:
     hello
     goodbye
     hehe <random number here>
-    
-    
+
 
 
 #### Message-Passing
 
-Speedie basically uses ["the erlang model"](https://www.youtube.com/watch?v=lKXe3HUG2l4) of concurrency. This is simply "the right choice". Any other choice is wrong. 🥰 (Unless its compatible with it.) 🤭
+Speedie basically uses ["the erlang model"](https://www.youtube.com/watch?v=TTM_b7EJg5E) of concurrency. This is simply "the right choice". Any other choice is wrong. 🥰 (Unless its compatible with it.) 🤭
 
 So you run a separate process, an instance of your program, and communicate with message-passing.
 
@@ -83,6 +82,7 @@ You can pass [`jbin`](jbin.md) directly to the spdprocess... but thats a bit mor
 
 Either way... that is about it. The other side can retrieve the message and gets it back as a [message class](Message.md).
 
+
 #### Threads
 
 Speedie also has threads. Threads are only for expert users... 🐲 (Beware here are dragons) 🐉 .
@@ -111,3 +111,47 @@ So you can open up another speedie program as a library, and use message-passing
 I've done this myself, I've ran Speedie (The compiler) from within Perry (the IDE) as a library. This makes debugging easier. As I'm debugging one program, not two.
 
 But it could be used to run speedie code concurrently for other reasons.
+
+
+## Future Upgrades
+
+In the future, I plan to improve messages and tasks. Here are some of my ideas:
+
+* Make task syntax even simpler
+* Allow functional programming to look syntactically "natural"? (it can be done but its not so elegant currently). Its not terrible right now... just could be even better!
+* Allow functions to be run as separate processes and communicate with them nicely. (can already be done using `fork()`, but we want this to look nice and simple)
+* Make message-passing even more natural. We want to define interfaces naturally to our message-passing system.
+
+For example:
+
+    class FileReader
+        interface
+            function Read (|string| Path, |string|)
+                // code here
+            function Write (|string| Path, |string| Data, |ErrorInt|)
+                // code here
+
+
+Then the other side could import this interface and run it. Perhaps something like this:
+
+    import "/My/Cool/File/Reader" as FileReader
+
+    || P = FileReader.Run
+    || MailBox = P.Read("afile.txt") // doesnt return data immediately... but allows processing to continue
+    
+    DoSomeStuffInbetween()
+    || Data = MailBox.get(5s) // waits up to 5 seconds for the data to appear.
+        printline Data
+      else
+        printerror p.lasterror
+    
+We could add more functions... like `MailBox.ValueHasArrived()` (but named shorter), or `MailBox.wait()`... etc etc.
+
+We could make this even shorter and more natural, at the cost of loss of some control:
+
+    || P = "/My/Cool/File/Reader" #run  // imports the interface from the program (on compile) and then runs it (At runtime)
+    || Data = P.Read("afile.txt") #wait 5s // gets the data and waits for 5s max
+        printline Data
+      else
+        printerror p.lasterror
+    
