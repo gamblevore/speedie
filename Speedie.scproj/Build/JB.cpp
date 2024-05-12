@@ -2017,7 +2017,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112428905569353));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112429483870772));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3296,7 +3296,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024051216));
+	JB_FS_AppendInt32(_fsf0, (2024051219));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -6553,7 +6553,14 @@ void SC_SCTasks__NewTaskActual(Message* Node, SCNode* Name_space) {
 		Arg = JB_Msg_Msg(Node, kJB_SyxArg, JB_LUB[0]);
 	}
 	Message* Supper = ((Message*)JB_Ring_First(Fields));
-	JB_Tree_TakeAllFrom(SC__SCTasks_tmp, Fields);
+	while ((true)) {
+		Message* L = ((Message*)JB_Ring_Last(Fields));
+		if ((!L)) {
+			break;
+		}
+		(JB_Msg_SyntaxIsSet(L, kJB__MsgParseFlags_Editable, true));
+		(JB_Ring_FirstSet(SC__SCTasks_tmp, L));
+	};
 	int Level = 2;
 	//using;
 	MessagePosition _usingf0 = JB_Msg_SyntaxUsing(Node);
@@ -7892,7 +7899,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024051216));
+	JB_FS_AppendInt32(_fsf0, (2024051219));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -16922,6 +16929,10 @@ int JB_Rg_Width(IntRange Self) {
 
 bool JB_MaybeBool_IsFalse(MaybeBool Self) {
 	return ((byte)Self) == 0;
+}
+
+bool JB_MaybeBool_IsKnown(MaybeBool Self) {
+	return ((byte)Self) <= 1;
 }
 
 bool JB_MaybeBool_IsTrue(MaybeBool Self) {
@@ -29352,8 +29363,12 @@ bool JB_Tree_SyntaxEquals(JB_List* Self, int N, bool Aware) {
 }
 
 void JB_Tree_TakeAllFrom(JB_List* Self, JB_List* Src) {
-	while (JB_Ring_HasChildren(Src)) {
-		(JB_Ring_FirstSet(Self, JB_Ring_Last(Src)));
+	while ((true)) {
+		JB_List* L = JB_Ring_Last(Src);
+		if ((!L)) {
+			break;
+		}
+		(JB_Ring_FirstSet(Self, L));
 	};
 }
 
@@ -35927,17 +35942,25 @@ JB_String* SC_Msg_VarName(Message* Self) {
 }
 
 bool SC_Msg_visible(Message* Self) {
-	if (Self) {
-		byte I = Self->Indent;
-		if (I >= 254) {
-			return I == 254;
-		}
+	MaybeBool B = SC_Msg_visible2(Self);
+	if (JB_MaybeBool_IsKnown(B)) {
+		return JB_MaybeBool_IsTrue(B);
 	}
 	return SC__Base_CurrVisibility;
 }
 
 void SC_Msg_visibleSet(Message* Self, bool Value) {
 	Self->Indent = (255 - Value);
+}
+
+MaybeBool SC_Msg_visible2(Message* Self) {
+	if (Self) {
+		byte I = Self->Indent;
+		if (I >= 254) {
+			return ((MaybeBool)(I == 254));
+		}
+	}
+	return ((MaybeBool)8);
 }
 
 Message* SC_Msg_LayerWipeCopy(Message* Self, Message* Oof) {
@@ -42379,7 +42402,12 @@ void SC_Class_FillTaskConstructorSub(SCClass* Self, Message* Con, Message* Befor
 			if (P == nil) {
 				break;
 			}
-			SC_Msg_MakeTaskVar(P->Source, Con, Before, Depth == 0);
+			Message* S = P->Source;
+			if (S) {
+				if (JB_Msg_SyntaxIs(S, kJB__MsgParseFlags_Editable)) {
+					SC_Msg_MakeTaskVar(S, Con, Before, Depth == 0);
+				}
+			}
 			_if0++;
 		};
 	};
@@ -49648,4 +49676,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -5137541409775447307 920046876511060213
+// -528030126090519957 920046876511060213

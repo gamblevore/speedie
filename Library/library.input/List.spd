@@ -61,8 +61,8 @@ class list (Saveable)
 
 	function TakeAllFrom (|| src)
 		opt norefcounts
-		while src.hasany
-			.First = src.Last // should be .last = src.first
+		while (|| l = src.Last)
+			.First = l
 
 	function AtRoot (|bool|)
 		opt norefcounts

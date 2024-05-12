@@ -33,7 +33,10 @@ function NewTaskActual (|Message| node, |SCNode| name_space)
 		arg = node.msg(@arg)
 	
 	|| Supper = fields.first
-	tmp.TakeAllFrom(fields)
+	while (|| L = fields.Last)
+		(l is Editable) // not actually editable
+		tmp.First = L
+	
 	
 	|| level = 2
 	using node
@@ -95,7 +98,9 @@ function scclass.FillTaskConstructorSub (|message| con, |message| before, |int| 
 		pr.FillTaskConstructorSub(con, before, depth+1)
 	
 	for p in .properties
-		p.source!.MakeTaskVar(con, before, depth==0)
+		|| S = p.source
+			if s is Editable
+				S.MakeTaskVar(con, before, depth==0)
 
 
 function Message.MakeTaskVar  (|message!| con, |message| before, |bool| First)

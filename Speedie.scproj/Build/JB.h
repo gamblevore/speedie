@@ -4654,6 +4654,8 @@ int JB_Rg_Width(IntRange Self);
 // MaybeBool
 bool JB_MaybeBool_IsFalse(MaybeBool Self);
 
+bool JB_MaybeBool_IsKnown(MaybeBool Self);
+
 bool JB_MaybeBool_IsTrue(MaybeBool Self);
 
 
@@ -8106,6 +8108,8 @@ JB_String* SC_Msg_VarName(Message* Self);
 bool SC_Msg_visible(Message* Self);
 
 void SC_Msg_visibleSet(Message* Self, bool Value);
+
+MaybeBool SC_Msg_visible2(Message* Self);
 
 Message* SC_Msg_LayerWipeCopy(Message* Self, Message* Oof);
 

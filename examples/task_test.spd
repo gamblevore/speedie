@@ -1,6 +1,6 @@
 
 
-// Basic empty file
+
 main
 	|| hello = abc.HelloSayer()
 	hello()
@@ -18,7 +18,7 @@ module abc
 		app.say  .str
 	
 	task RandomSayer (|string| name)
-		|uint16| RandomID = 0
+		|uint16| RandomID
 		constructor
 			.randomid = random.shared.int
 		run
