@@ -20,11 +20,11 @@ Lets show a nice example 😰:
 
     main
     	|| hello = abc.HelloSayer()
-    	(hello)()
+    	hello()
     	|| say = abc.stringsayer("goodbye")
-    	(say)()
+    	say()
     	|| rsay = abc.randomsayer("hehe")
-    	(rsay)()
+    	rsay()
 
     module abc
     	task_run HelloSayer                       // one way of creating a task
@@ -34,7 +34,7 @@ Lets show a nice example 😰:
     		printline .str
     	
     	task RandomSayer (|string| name)          // a third way
-    		|uint16| RandomID = 0
+    		|uint16| RandomID
     		constructor
     			.randomid = random.shared.int
     		run
