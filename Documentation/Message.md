@@ -75,7 +75,7 @@ First, lets test that we can even read a file at all. Lets take the file via com
     
     main 
         || path = app.args[0]            #expect ("Pass a file-path")
-        || B = path.ExistingFile         #require
+        || B = path.FileThatExists       #require
         || jb = B.parse
         jb.xmltojeebox
         printline jb
@@ -103,7 +103,7 @@ We could do searching in the file, but first a few safety checks. Lets only do t
 Altogether that makes this:
 
     || path = app.args[0]            #expect ("Pass a file-path")
-    || B = path.ExistingFile         #require
+    || B = path.FileThatExists       #require
     || jb = B.Parse                  #require
     if b isa "xml"
         jb.XMLToJeebox
@@ -116,7 +116,8 @@ Now, lets do the searching! Let's specify some search queries via command-line a
     ... // new code
     for arg in app.Switches
         || Found = BookSearch(jb, arg.ArgName, arg.ArgValue)
-            "$Found"
+            for f in found
+                printline f
           else
             "Can't find: ${arg.ArgName} '${arg.ArgValue}'"
         
@@ -209,35 +210,34 @@ Here is the final total code, with the logic bug fixed:
     #!/usr/local/bin/spd
     
     main 
-        || path = app.args[0]            #expect ("Pass a file-path")
-        || B = path.ExistingFile         #require
-        || jb = B.Parse                  #require
-        if b isa "xml"
-            jb.XMLToJeebox
-            || boxfile = path.SetExt("box")
-            if boxfile <~ jb.render // write file to disk
-                "Converted XML to Jeebox: $boxfile"
+    	|| path = app.args[0]            #expect ("Pass a file-path")
+    	|| B = path.FileThatExists       #require
+    	|| jb = B.Parse                  #require
+    	if b isa "xml"
+    		jb.XMLToJeebox
+    		path.SetExt("box") <~ jb.render // write file to disk
     
-        || Queries = app.Switches
-        || Found = BookSearch(jb, Queries)
-            "$Found"
-          else
-            "Can't find any books by: $Queries"
-            
-            
+    	|| Queries = app.Switches
+    	|| Found = BookSearch(jb, Queries)
+    		for f in found
+    			printline f
+    	  else
+    		"Can't find any books by: $Queries"
+    		
+    		
     function BookSearch (|message| BookFile, |[string]| Queries,  |[message]|)
-        || catalog = BookFile[@tmp, "catalog"] #require
-        for book in catalog[@arg]
-            if book.TestBook(Queries)
-                rz <~ book
-                
+    	|| catalog = BookFile[@tmp, "catalog"] #require
+    	for book in catalog[@arg]
+    		if book.TestBook(Queries)
+    			rz <~ book
+    			
     
     function message.TestBook (|[string]| queries, |bool|)
-        for row in self[@arg,-1]
-            for Q in queries
-                if row ~= q.ArgName // ~= is like == but case-insensitive
-                    require row.first.name contains q.ArgValue
-                    rz = true
+    	for row in self[@arg,-1]
+    		for Q in queries
+    			if row ~= q.ArgName // ~= is like == but case-insensitive
+    				require row.first.name contains q.ArgValue
+    				rz = true
                 
         
 
