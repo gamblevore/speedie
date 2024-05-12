@@ -3,13 +3,13 @@
 https://github.com/gamblevore/speedie/blob/main/Documentation/Message.md // docs here
 file:///usr/local/speedie/Documentation/Messages.md						 // locally
 
+
 main (|existingfile| input)
 	|| jb = input.parse$
 	if input isa "xml"
 		jb.XMLToJeebox
 		|| BoxFile = input.setext("box")
-		if BoxFile <~ jb		// write to disk
-			"Converted XML to Jeebox: $boxfile"
+		BoxFile <~ jb		// write to disk
 
 	|| Found = BookSearch(jb, app.Switches)
 		""
@@ -31,6 +31,5 @@ function message.TestBook (|[string]| queries, |message|)
 		require row.Expect(@tmp)
 		for Q in queries
 			if row ~= q.ArgName
-				|| Value = Row[@nil]
-					require Value.name contains q.ArgValue
-					rz = self
+				require Row.first.name contains q.ArgValue
+				rz = self

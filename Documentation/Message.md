@@ -201,43 +201,43 @@ Will return this book:
         publish_date "2000-11-17"
         description "After the collapse of a nanotechnologysociety in England, the young survivors lay the foundation for a new society."
 
-### Success! ### 
+
+### Success!
+
 We could probably improve our code. If we search for multiple-queries, it doesn't reduce the books found but increases it. This isn't a jeebox problem anymore but just a basic logic problem. But lets fix that anyhow for completeness.
 
 Here is the final total code, with the logic bug fixed:
 
         
-    #!/usr/local/bin/spd
+    main (|existingfile| input)
+        || jb = input.parse$
+        if input isa "xml"
+            jb.XMLToJeebox
+            || BoxFile = input.setext("box")
+            BoxFile <~ jb		// write to disk
     
-    main 
-    	|| path = app.args[0]            #expect ("Pass a file-path")
-    	|| B = path.FileThatExists       #require
-    	|| jb = B.Parse                  #require
-    	if b isa "xml"
-    		jb.XMLToJeebox
-    		path.SetExt("box") <~ jb.render // write file to disk
+        || Found = BookSearch(jb, app.Switches)
+            ""
+            for bk in found
+                "$bk"
+          else
+            "Can't find any books using: ${app.Switches}"
+            
+            
+    function BookSearch (|message| BookFile, |[string]| Queries, |[message]|)
+        || list = BookFile[@tmp, "catalog"][@arg]
+        for book in list
+            if book.Expect(@tmp, "book") 
+                rz <~ book.TestBook(Queries)
     
-    	|| Queries = app.Switches
-    	|| Found = BookSearch(jb, Queries)
-    		for f in found
-    			printline f
-    	  else
-    		"Can't find any books by: $Queries"
-    		
-    		
-    function BookSearch (|message| BookFile, |[string]| Queries,  |[message]|)
-    	|| catalog = BookFile[@tmp, "catalog"] #require
-    	for book in catalog[@arg]
-    		if book.TestBook(Queries)
-    			rz <~ book
-    			
     
-    function message.TestBook (|[string]| queries, |bool|)
-    	for row in self[@arg,-1]
-    		for Q in queries
-    			if row ~= q.ArgName // ~= is like == but case-insensitive
-    				require row.first.name contains q.ArgValue
-    				rz = true
+    function message.TestBook (|[string]| queries, |message|)
+        for row in .last(@arg)
+            require row.Expect(@tmp)
+            for Q in queries
+                if row ~= q.ArgName
+                    require Row.first.name contains q.ArgValue
+                    rz = self
                 
         
 
