@@ -148,7 +148,7 @@ We could make this even shorter and more natural, at the cost of loss of some co
 We could even add callbacks to mailboxes... so you don't need to wait or write convoluted code to check all the time.
 
     || P = "/My/Cool/File/Reader" #run
-    run P.Read("afile.txt")
+    run P.Read("afile.txt") for 5s
         printline  .get
       else
         printerror .lasterror
