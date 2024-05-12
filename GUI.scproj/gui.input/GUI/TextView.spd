@@ -562,7 +562,7 @@ class TextView (GUIControl)
 	behaviour Search
 		|| inl = .IsInline
 		if inl and inl.editingfor
-			.AcceptEditing(false)
+			.InlineAcceptSearch
 			return true
 		if JustUpdate
 			return true
@@ -603,8 +603,8 @@ class TextView (GUIControl)
 		if self is editable
 			if .IsInline
 				if key.IsCancel:		return .CancelEditing
-				if key.IsAccept:		return .AcceptEditing(true)
-				if key iscmd keys.g:	return .AcceptEditing(false)
+				if key.IsAccept:		return .InlineAcceptKey
+				if key iscmd keys.g:	return .InlineAcceptSearch
 				if key is tab:			return .FinishEditing
 			if key.IsAccept:			return .NewLine
 			if .ClickOutsideCloses and key.IsCancel
@@ -1085,7 +1085,7 @@ class TextView (GUIControl)
 				return t
 	
 	
-	helper FinishEditing (|bool| Focus=true, |bool|)
+	helper FinishEditing (|bool| Focus, |bool|)
 		|| it = .isinline
 			|| c = it.cell
 			|| lv = it.editingfor
@@ -1098,11 +1098,23 @@ class TextView (GUIControl)
 		return true
 	
 	
-	helper AcceptEditing (|bool|hide, |bool|)
+	helper InlineAcceptSearch (|bool|)
 		opt norefcounts
 		|| i = .isinline #debug_require
-		i.AcceptSearch(.text, hide)
+		i.AcceptSearch(.text, false)
 		return true
+
+
+	helper InlineAcceptKey (|bool|)
+		opt norefcounts
+		|| i = .isinline$
+		|| e = i.editingfor
+		if e isa listview
+			if e.isediting
+				.finishediting(e.IsSpreadSheetLike)
+				return true
+		
+		return .InlineAcceptSearch
 	
 	
 	function SelectAll
