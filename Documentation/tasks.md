@@ -64,8 +64,7 @@ Funnily enough, the [message class](Message.md) is perfect for passing... well..
 So we use the message class. Here is a good example:
 
     || WorkerAppPath = "/path/to/worker"
-    || child = spdprocess.run(WorkerAppPath, ["data1", "data2"])
-    require child
+    || child = spdprocess.run(WorkerAppPath, ["data1", "data2"])   #require
     || pass = @tmp + "hello"
     || adj = pass.msg(@adj)
     adj <~ (@thg, "my")
