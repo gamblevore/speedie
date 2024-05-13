@@ -9,6 +9,7 @@ main (|existingfile| input)
 	if input isa "xml"
 		jb.XMLToJeebox
 		|| BoxFile = input.setext("box")
+		"writing to: $boxfile"
 		BoxFile <~ jb		// write to disk
 
 	|| Found = BookSearch(jb, app.Switches)
