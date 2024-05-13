@@ -179,7 +179,7 @@ static void CheckStillAlive (ShellStream* Sh) {
 
 
 bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, bool CaptureStdOut) {
-// fcntl,Fork,execvp,Pipe,Dup2,Waitid,Errno,Close,Eintr,_exit // unix simplicity :)
+// fcntl,Fork,execvp,Pipe,Dup2,Waitid,Errno,Close,Eintr,_exit // far too much stuff in unix.
 	auto& Sh = *self; auto sh = self;
 	auto argv = JB_Proc__CreateArgs(path, Args);
 	if (!argv) return false;

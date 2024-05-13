@@ -196,7 +196,7 @@ forms
 #!						 (((((Consts)))))
 /**/ SETK (Const)
 		RotateConst(r, Op)
-/**/ SETN (setn)//, 1, 2, 3)			// OK
+/**/ SETN (setn, 1, 2, 3)			// OK
 		LoadConst(r, Op, Code)
 
 

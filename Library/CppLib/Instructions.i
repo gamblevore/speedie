@@ -6,6 +6,8 @@
 	__;
 	Code = BumpStack(r, Code, Op);
 	___;
+ı SETN: _
+	LoadConst(r, Op, Code);
 ı FNCX: 
 	__;
 	vm.CurrStack = r;
@@ -39,8 +41,6 @@
 	Conv(r, n2, Op);
 ı SETK: _
 	RotateConst(r, Op);
-ı SETN: _
-	LoadConst(r, Op, Code);
 ı ADD: _
 	i1 = i2 + (i3 << L3);
 ı ADDK: _

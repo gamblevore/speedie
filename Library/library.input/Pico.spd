@@ -89,10 +89,6 @@ struct Pico
 		cpp_wrapper PicoStillSending
 		
 	
-	function Fork (|&pico|)
-		|| f = .startfork
-		if f >= 0
-			return self
 
 	module
 		|?&pico| Parent_
@@ -104,6 +100,7 @@ struct Pico
 			.Parent_ = rz
 			if rz
 				rz.CompleteExec
+
 
 		function GlobalConfig (|&PicoGlobalConfig|)
 			cpp_wrapper PicoGlobalConf

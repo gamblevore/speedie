@@ -42,8 +42,7 @@ s64 RunVM (jb_vm& vm) {		// vm_run, vm__run, vmrun, run_vm
 
     ASM  Op;
     ASM  Op2;
-    ASM* LeafCode = 0;			 // maybe remove leaffuncs? I mean... why not just inline them?
-    ASM* Code	  = vm.Env.Code; // we want to minimise vars anyhow
+    ASM* Code	  = vm.Env.Code;
     Goto Next     = 0;
     Register* r	 = vm.Stack.Registers;
 

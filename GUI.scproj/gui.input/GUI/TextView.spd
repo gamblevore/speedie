@@ -1945,7 +1945,7 @@ class TextView (GUIControl)
 		
 	
 	helper TextCopy (GUICopyEvent)
-		rz = self[.selrange]
+		rz = .SelText
 		if keys.shift //(.ExpectsParse >= CurrentlyJeebox)
 			rz = rz.AddTabs(false) // untabbifying WITHIN our GUI is actually bad.
 								   // i could paste it from one part of our gui to another.

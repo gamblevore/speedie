@@ -131,7 +131,7 @@ class SpdProcess (Process)
 		cpp_Wrapper JB_Sh_StartProcess
 
 	
-	function RunChild (|bool|)
+	function SpawnChild (|bool|)
 		if !.pico.isok
 			require pico.replace(.pico)
 
@@ -166,7 +166,7 @@ class SpdProcess (Process)
 		
 		if .CanActivate
 			expect (.path) (self, "Can't re-activate process without a path.")
-			return .RunChild
+			return .SpawnChild
 
 
 	iterator
@@ -203,12 +203,27 @@ class SpdProcess (Process)
 			cpp_wrapper JB_App__BackTrace
 
 
-		function Run (|string| app_path, |[string]| params=[], |string| DebugName="", |ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
+		function Spawn (|string| app_path, |[string]| params=[], |string| DebugName="", |ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
 			require app_path.file.mustexist
 			|| pico = pico.new(app_path)
 				rz = SpdProcess(app_path, nil, pico, params, Mode)
-				if !rz.RunChild
+				if !rz.SpawnChild
 					rz = nil
+
+
+		function SpawnFork (|ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
+			|| p = pico.new$
+			|| id = p.startfork
+			if id < 0
+				pico.destroy(p, "fork failed")
+				return nil
+
+			if id == 0 // we are child
+				id = app.parentid
+				mode = 0
+			rz = spdprocess(app.path, nil, p, nil, mode)
+			rz.pid = id
+
 
 
 datatype ProcessMode (byte)
@@ -222,7 +237,7 @@ datatype ProcessMode (byte)
 
 
 prototype SpdMainFn	(|&nil| Obj, |&cstring| args, |&pico| Comms, |bool|)
-	function RunThreaded (|[string]| R = [],  |SpdProcess|)
+	function SpawnThread (|[string]| R = [],  |SpdProcess|)
 		|| c_args = SpdProcess.CreateArgs("", r)
 		|| pico_fn = pico.new("SpdMainFn()")
 			rz = SpdProcess("SpdMainFn()", self, pico_fn, r)
@@ -230,13 +245,10 @@ prototype SpdMainFn	(|&nil| Obj, |&cstring| args, |&pico| Comms, |bool|)
 				rz = nil
 
 
-function app.fork
-	disabled "use spdprocess.fork... same thing!"
 
-
-function @spdprocess.Fork (|[string]| r, |SpdProcess|)
-	// wait... this is quite not the same... forking actually copies the current process!
-	return SpdProcess.Run(app.path, r)
+function app.fork (|PID_Int|)
+	cpp_wrapper fork
+	description "Forks the process normally using `fork()`. To fork with message-passing, use spdprocess.spawnfork()"
 
 
 prototype SpdDeathActionFn
