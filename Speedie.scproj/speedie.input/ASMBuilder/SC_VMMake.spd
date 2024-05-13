@@ -259,7 +259,7 @@ function MakeVM (|message| tmp, |faststring| vm)
 	require tmp isnt editable
 	(tmp is editable)
 	|| arg = tmp.last
-	if tmp ~= "SETN"
+
 	vm <~ "ı ${tmp.name}: "
 	if !arg.Find(@tmp, "__")
 		vm <~ "_"

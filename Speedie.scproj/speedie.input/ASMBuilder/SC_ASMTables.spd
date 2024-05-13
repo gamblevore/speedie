@@ -165,8 +165,8 @@ function Ternary		(fn_asm)
 	|| A = cond.next!
 	|| B = A.next!
 	
-	|| mA = .simplevar(a)
-	|| mB = .simplevar(b)
+	|| mA = .SimpleVar(a)
+	|| mB = .SimpleVar(b)
 	if ma and mb
 		return .SimpleTernary(dest, ma, mb, cond)
 	
@@ -213,21 +213,22 @@ function TypeCast		(fn_asm)		//
 		return .NotEq(dest, asmreg(), src, exp)
 
 	|| OldDecl = exp.first!.fastdecl
+	|| NewDecl = exp.second!.fastdecl
 	|| OldType = olddecl.regtype
-	|| OS = T.BitCount
-	if oldtype.bitcount != OS // hmmm. How? they should match up.
+	|| NewType = newdecl.regtype
+	|| OC = T.BitCount
+	|| NC = newtype.BitCount
+	if  oldtype.BitCount != OC  or  newtype.BitCount != NC  // hmmm. How? they should match up.
 
-	|| NewType = exp.second!.fastdecl
-	|| NS = newtype.Regtype
 	|| FloatDiff = T.isfloat != newtype.isfloat
-	if !FloatDiff and (ns == os)
+	if !FloatDiff and (nc == oc)
 		return src
 
 	dest = .TempMe(exp, dest)
 	ifn t.isfloat or newtype.isfloat
-		|| Sh = 64 - os
+		|| Sh = 64 - oc
 		.AddASM(asm.BFLG, exp, dest, src, sh, sh, src.signed|int|)
-		return dest
+		return dest as ASMMath.bitcorrect
 	
 	|| Conv = .AddASM(asm.CONV, exp, dest, src)
 	debugger,   #!put in actual numbers later
@@ -246,7 +247,7 @@ function Pointer		(fn_asm)
 	|| Ptr = .µ(exp.first!, dest)
 	|| A = Dest.ReadOrWrite(exp)
 	.AddASM(A, exp, dest,  Ptr)
-	return dest
+	return dest as asmmath.Bitcorrect
 
 
 function Access		(fn_asm)						// a[b], struct.mem[b], func()[func2()]
@@ -258,7 +259,7 @@ function Access		(fn_asm)						// a[b], struct.mem[b], func()[func2()]
 	|| A = Dest.ReadOrWrite(exp)
 
 	.AddASM(A, exp, dest,  Ptr, ind)
-	return dest
+	return dest as asmmath.Bitcorrect
 
 		
 
@@ -339,6 +340,7 @@ function Thg (fn_asm)
  
 
 function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |AsmReg|)
+	opt	NoRefCounts
 	|| addr = dest
 	if dest isnt set								// a = glob
 		addr = .tempme(exp, dest)
@@ -347,7 +349,7 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 
 	|| i = d.ExportPosition				#check (exp, "Internal error: No global address")
 	.AddASM(dest.ReadOrWrite(Exp), exp, dest,  addr, i)
-	return addr
+	return addr as asmmath.Bitcorrect
 	
 
 function Not		(fn_asm)
@@ -360,6 +362,7 @@ function Not		(fn_asm)
 	
 
 function ARel		(fn_asm)
+	opt	NoRefCounts
 	|| Sub = exp.name.first == '-'
 	return Precrement(self, exp.first!, dest, 2 + Sub)
 	

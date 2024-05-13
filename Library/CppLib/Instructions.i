@@ -82,6 +82,8 @@
 	i1 = JB_u64_RotR(u2, u3 + L3);
 ı BCMP: _
 	u1 = BitComp(r, Op);
+ı BCLR: _
+	BitClear(r, Op);
 ı TERN: _
 	if (u2) 
 	u1 = u3

@@ -1,6 +1,6 @@
 
 
-prototype fn_OpASM (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| dbg, |asmreg|)
+prototype fn_OpASM (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asmreg|)
 
 
 function asmreg.CanAddK (|int64| T, |bool|)
@@ -25,10 +25,16 @@ extend ASMState
 		|| tb = t.bitcount
 		// why not just call the compare vs 0 function?
 		if t.isint
-			if  t is bool  or  tb == 64
+			if  tb == 64 // just because one is 64... doesnt mean both are.
+				// of course... we could be comparing to 0.
+				// so if we are comparing a 64-bit number to a const... then what?
+				// both should be OK really? What if its a 32-bit const? I think not :D
 				debugat
 				return .AddASM(asm.BRA • Negated, cond, Src, 1)
 			
+			if (lt is bool or rt is bool)
+				.AddASM(asm.BRA • negate, dbg, L, 1)
+		  
 			if  tb == 32
 				debugat
 				return .AddASM(asm.CMPI, cond, src, 0, 6 + Negated)
@@ -45,30 +51,100 @@ extend ASMState
 		return .AddASM(asm.CMPF, cond, 0, Src, M)					// comparison against 0
 */
 
-	function Equals (fn_opasm)
-		|| bl = l.µtype.bitcount
+
+	function asmreg.Compareability (|asmreg| r, |ASMCompareability|)
+		|| bl =  .µtype.bitcount
+		|| br = r.µtype.bitcount
+		if 64 == bl and br
+			return -1
+		|| cl =  .math is bitcorrect  or   .reg == 0  
+		|| cr = r.math is bitcorrect  or  r.reg == 0
+		if (cl and cr)
+			return ASMCompareability.both  +  (.reg == 0) * ASMCompareability.bra 
+
+		if (bl == br)
+			if (br == 32)
+				return ASMCompareability.both
+			return ASMCompareability.bcmp // 8/16bit compares... may have garbage.
+		
+		if (bl < br)
+			if cl and (br == 32)
+				return ASMCompareability.cmpi
+		  else
+			if cr and (bl == 32)
+				return ASMCompareability.cmpi
+			
+		// if the smaller one is bit-correct... its ok? lets see:
+		// byte    vs int OK	// needs correct
+		// char    vs int OK	// needs correct
+		// byte OK vs int   	// can CMPI
+		// char OK vs int		// can CMPI
+
+
+	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |bool| negate, |&FATASM|)
+		|| lt = l.µtype
+		|| rt = r.µtype
+		|| bl = lt.bitcount
+		|| br = rt.bitcount
+		|| BitsOK = l.Compareability(r) 
+		if dest isnt CondRequest  and  bitsok is bcmp
+			if !dest.reg // what?? doMathSub???
+			return .AddASM(asm.BCMP, exp, dest, L, R, 64 - bl, negate|int|)
+
+		if dest is CondRequest
+			if (bitsok is bra)
+				return .AddASM(asm.BRA • negate, exp, R, 1)
+
+			if (bitsok is cmpi)
+				return .AddASM(asm.CMPE • Negate, exp, L, R, dest)
+
+			if (bitsok is bcmp)											// just... bcmp and then branch
+				if dest.reg												// What? Dest should be 0!				
+				dest = .tempme(exp, dest)
+				.AddASM(asm.BCMP, exp, dest, L, R, 64 - bl, negate|int|)
+				return .AddASM(asm.BRA • negate, exp, dest, 1)
+
+		if bitsok is bcmp
+			return .AddASM(asm.BCMP, exp, dest, L, R, 64 - bl, negate|int|)
+		if bitsok isnt cmpi
+			.AddASM(asm.BCLR, exp, L, R, 64-bl, 64-br, (l.signed|int|) + (r.signed|int|<<1))
+		return .AddASM(asm.CMPE • Negate, exp, L, R, dest)
+
+				
+	
+	function EqualsFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |bool| negate, |&FATASM|)
+		|| lt = l.µtype
+		|| rt = r.µtype
+		|| bl = lt.bitcount
 		if bl != r.µtype.bitcount, #!l and r have different bitcounts?
 		|| sh = 64 - bl
-		if dest.IsInt
-			if dest is CondRequest
-				.AddASM(asm.CMPE • (dest is Negate), dbg, L, R, dest)
-			  else
-				.AddASM(asm.BCMP, dbg, dest, L, R, sh, (dest is Negate)|int|)
-		  else
-				// depends if this is floats or not. as -0.0 == 0.0
-			|| M = 8 + (!sh)<<1
-			M += (dest is negate)
-			.AddASM(asm.CMPF, dbg, L, R, M, dest) // it is cmpf either way
+		// depends if this is floats or not. as -0.0 == 0.0
+		|| M = 8 + (!sh)<<1
+		M += negate
+		.AddASM(asm.CMPF, exp, L, R, M, dest) // it is cmpf either way
+		
 	
-		return dest.BoolASM
+	function Equals (fn_opasm)
+		if r.reg == 0  and  l.reg != 0
+			|| t = l, l = r, r = t // put reg 0 into the left... more convenient.
+
+		|| negate = dest is negate
+		target debug
+			if !dest.reg and dest isnt condrequest // shouldn't happen... domathsub allocates a dest!
+		
+		if dest.IsInt
+			.equalsint(dest, l, r, exp, negate)
+		  else
+			.equalsfloat(dest, l, r, exp, negate)
+		return dest.boolasm
 	
 		
 	function NotEq  (fn_opasm)
 		(dest is Negate) = (dest isnt Negate)
-		return .equals(dest, l, r, dbg)
+		return .equals(dest, l, r, exp)
 
 
-	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| dbg,  |uint| Mode,  |asmreg|)
+	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |uint| Mode,  |asmreg|)
 		|| bl = l.µtype.bitcount, if bl != r.µtype.bitcount
 
 		mode ^= (dest is negate)
@@ -78,11 +154,11 @@ extend ASMState
 				mode += 8
 			if !dest.signed
 				mode += 4
-			.AddASM(asm.CMPI, dbg, L, R, mode, dest)
+			.AddASM(asm.CMPI, exp, L, R, mode, dest)
 		  else
 			if dest.IsBig
 				mode += 4
-			.AddASM(asm.CMPF, dbg, L, R, Mode, dest) // it is cmpf either way
+			.AddASM(asm.CMPF, exp, L, R, Mode, dest) // it is cmpf either way
 	
 		return dest.BoolASM
 /*
@@ -114,19 +190,19 @@ extend ASMState
 
 	function Less   (fn_opasm)
 		(dest is Negate) = (dest isnt Negate)
-		return .moreeq(dest, l, r, dbg)
+		return .moreeq(dest, l, r, exp)
 			
 	function LessEq (fn_opasm)
 		(dest is Negate) = (dest isnt Negate)
-		return .more(dest, l, r, dbg)
+		return .more(dest, l, r, exp)
 
 	function More   (fn_opasm)
 		debugat // put in actual numbers
-		return .Compare(dest, l, r, dbg, 3)
+		return .Compare(dest, l, r, exp, 3)
 	
 	function MoreEq (fn_opasm)
 		debugat // put in actual numbers
-		return .Compare(dest, l, r, dbg, 0)
+		return .Compare(dest, l, r, exp, 0)
 
 
 	// MATH
@@ -142,36 +218,36 @@ extend ASMState
 		require r is const
 		|| v = .f(r)
 		if v == 0.0
-			return .assign(dest, l, asmreg(), dbg)
+			return .assign(dest, l, asmreg(), exp)
 		
 		if r.fourbytes
-			return .quickfloatop(asm.FADK, dbg, dest, l, r)
+			return .quickfloatop(asm.FADK, exp, dest, l, r)
 
 
-	function QuickFloatOp (|&asmstate| self, |asm| Op, |message| dbg, |asmreg| dest, |asmreg| l, |asmreg| r, |asmreg|)
+	function QuickFloatOp (|&asmstate| self, |asm| Op, |message| exp, |asmreg| dest, |asmreg| l, |asmreg| r, |asmreg|)
 		|| x = .consts[r.reg]							// how can we test this?
 		|| y = x >> 18
 		if x == y << 18
-			.AddASM(op, dbg, dest, l, y)
+			.AddASM(op, exp, dest, l, y)
 			return dest
 
 		
 	function QuickFloatDiv    (fn_opasm)
 		require r is const
 		|| p = self[r]
-		|ivec2| exp
+		|ivec2| ex
 		// we could optimise f/-1.0 or f/-0.5... but who cares. dont write such dumb code.
 		if l.IsBig
 			|| f = p|&f64|[0]
 			require f > 0
-			exp = f.exponent
+			ex = f.exponent
 		  else
 			|| f = p|&float|[0]
 			require f > 0
-			exp = f.exponent
+			ex = f.exponent
 		
-		if exp.y == 1
-			.AddASM(asm.FEXK, dbg, dest, L, 0, exp.x, l.IsBig|int|)
+		if ex.y == 1
+			.AddASM(asm.FEXK, exp, dest, L, 0, ex.x, l.IsBig|int|)
 			return dest
 
 
@@ -180,12 +256,12 @@ extend ASMState
 
 		if ptoi <= 1
 			if ptoi == -1							//   y = x * -1  -->  y = 0-x 
-				return .subtract(dest, asmreg(), l, dbg)
+				return .subtract(dest, asmreg(), l, exp)
 			if ptoi == 0    						//   y = x * 0   -->  y = 0
 				l = asmreg()						//   y = x * 1   -->  y = x 
-			return .assign(dest, l, asmreg(), dbg)
+			return .assign(dest, l, asmreg(), exp)
 	
-		.AddASM(asm.SHLU , dbg, dest, l, ptoi - 1)  // y = x * 4 --> y = x << 2
+		.AddASM(asm.SHLU , exp, dest, l, ptoi - 1)  // y = x * 4 --> y = x << 2
 		return dest
 
 
@@ -193,19 +269,19 @@ extend ASMState
 		require r is const
 		|| v = .f(r)
 		if  v == -1.0
-			return .Subtract(dest, asmreg(), l, dbg)
+			return .Subtract(dest, asmreg(), l, exp)
 		
 		if  v == 1.0  or  v == 0.0
 			if v == 0.0
 				l = asmreg()
-			return .assign(dest, l, asmreg(), dbg)
+			return .assign(dest, l, asmreg(), exp)
 		
 		if  v == 2.0
-			return .plus(dest, l, l, dbg)
+			return .plus(dest, l, l, exp)
 		
 		if r.Fourbytes
-			return .QuickFloatOp(asm.FMLK, dbg, dest, l, r)
-		
+			return .QuickFloatOp(asm.FMLK, exp, dest, l, r)
+
 	
 	function PlusInt     (fn_opasm)
 		|| LL = self[L][0],		|| RR = self[R][0]
@@ -218,22 +294,22 @@ extend ASMState
 		(dest as= ASMMath.add + subtract)
 
 		if (opp == asm.add) and l.CanAddK(LL)			// 1 + a
-			.AddASM(asm.ADDK, dbg, dest, R, LL)
+			.AddASM(asm.ADDK, exp, dest, R, LL)
 
 		  elseif r.CanAddK(RR)							// a - 1, a + 1
-			.AddASM(asm.ADDK, dbg, dest, L, RR)
+			.AddASM(asm.ADDK, exp, dest, L, RR)
 
 		  else
-			.AddASM(OPP, dbg, dest, L, R, 0)
+			.AddASM(OPP, exp, dest, L, R, 0)
 		
 		return dest
 
 
 	function PlusFloat   (fn_opasm)
 		|| IsFloat = dest.FourBytes
-			if .QuickFloatPlus(dest, r, l, dbg)
+			if .QuickFloatPlus(dest, r, l, exp)
 				return dest
-			if .QuickFloatPlus(dest, l, r, dbg)
+			if .QuickFloatPlus(dest, l, r, exp)
 				return dest
 
 		|| SubTract = (l is alternate)
@@ -242,76 +318,76 @@ extend ASMState
 				// 
 		
 		
-		|| F = .AddASM(asm.fADD, dbg, dest, l)
+		|| F = .AddASM(asm.fADD, exp, dest, l)
 		f.r[2+subtract] = r
 		f.r[4] = (!IsFloat)|int|
 		
 		return dest
 
 
-	function BoolMul (|asmreg| dest, |asmreg| Boo, |asmreg| R, |message| dbg, |asmreg|)
-		.addasm(asm.TERN, dbg, dest, boo, r, 0)
+	function BoolMul (|asmreg| dest, |asmreg| Boo, |asmreg| R, |message| exp, |asmreg|)
+		.addasm(asm.TERN, exp, dest, boo, r, 0)
 		return dest
 
 		
 	function Plus   (fn_opasm)
 		if !r.reg
-			return .assign(dest, l, AsmReg(), dbg)
+			return .assign(dest, l, AsmReg(), exp)
 		if !l.reg and (l isnt alternate)
-			return .assign(dest, R, AsmReg(), dbg)
+			return .assign(dest, R, AsmReg(), exp)
 		if l.isint
-			return .PlusInt(dest, l, r, dbg)
-		return .PlusFloat(dest, l, r, dbg)
+			return .PlusInt(dest, l, r, exp)
+		return .PlusFloat(dest, l, r, exp)
 
 
 	function Subtract  (fn_opasm)
 		(l is alternate) // the logic ismostly shared...
-		return .plus(dest, l, r, dbg)
+		return .plus(dest, l, r, exp)
 
 
 	function Mul    (fn_opasm)
 		|| b = DataTypeCode.bool
 		if l isa b
-			return .BoolMul(dest, l, r, dbg)
+			return .BoolMul(dest, l, r, exp)
 		if r isa b
-			return .BoolMul(dest, r, l, dbg)
+			return .BoolMul(dest, r, l, exp)
 			
 		if l.isint
-			|| D1 = .QuickIntMul(dest, R, L, dbg)
+			|| D1 = .QuickIntMul(dest, R, L, exp)
 				return D1
-			|| D2 = .QuickIntMul(dest, L, R, dbg)
+			|| D2 = .QuickIntMul(dest, L, R, exp)
 				return D2
-			.AddASM(asm.MUL , dbg, dest, L, R)
+			.AddASM(asm.MUL , exp, dest, L, R)
 		  else
-			|| D1 = .QuickFloatMul(dest, R, L, dbg)
+			|| D1 = .QuickFloatMul(dest, R, L, exp)
 				return D1
-			|| D2 = .QuickFloatMul(dest, L, R, dbg)
+			|| D2 = .QuickFloatMul(dest, L, R, exp)
 				return D2
-			.AddASM(asm.FMUL, dbg, dest, L, R, l.IsBig|int|) 
+			.AddASM(asm.FMUL, exp, dest, L, R, l.IsBig|int|) 
 		return dest
 	
 
 	function Div    (fn_opasm)
 		if dest.isint
-			return .DivInt(dest, l, r, dbg)
-		return .DivFloat(dest, l, r, dbg)
+			return .DivInt(dest, l, r, exp)
+		return .DivFloat(dest, l, r, exp)
 	
 	
 	function DivFloat    (fn_opasm)
-		|| D1 = .QuickFloatDiv(dest, R, L, dbg)
+		|| D1 = .QuickFloatDiv(dest, R, L, exp)
 			return D1
-		|| D2 = .QuickFloatDiv(dest, L, R, dbg)
+		|| D2 = .QuickFloatDiv(dest, L, R, exp)
 			return D2
 		|| big = dest.IsBig|int|
-		.AddASM(asm.FDIV, dbg, dest, big, L, R)
+		.AddASM(asm.FDIV, exp, dest, big, L, R)
 		|| Alt = l is alternate
-			.AddASM(asm.FFRC, dbg, dest, big, dest, R)
+			.AddASM(asm.FFRC, exp, dest, big, dest, R)
 		
 		return dest
 	
 
 	function DivInt    (fn_opasm)
-		|| Fat = .AddASM(asm.div, dbg, 0, 0, L, R, dest.IntDivType)
+		|| Fat = .AddASM(asm.div, exp, 0, 0, L, R, dest.IntDivType)
 		|| Alt = l is alternate
 		fat.r[alt] = dest
 		return dest
@@ -319,47 +395,47 @@ extend ASMState
 	
 	function Mod    (fn_opasm)
 		(l is Alternate)
-		return .div(dest, l, r, dbg)
+		return .div(dest, l, r, exp)
 
 
 	// BITS
 	function BitXnor (fn_opasm)
-		.AddASM(asm.BXNR, dbg, dest, L, R), return dest
+		.AddASM(asm.BXNR, exp, dest, L, R), return dest
 	
 	function BitXor (fn_opasm)
-		.AddASM(asm.BXOR, dbg, dest, L, R), return dest
+		.AddASM(asm.BXOR, exp, dest, L, R), return dest
 
 	function BitOr  (fn_opasm)
-		.AddASM(asm.BOR, dbg, dest, L, R), return dest
+		.AddASM(asm.BOR, exp, dest, L, R), return dest
 	
 	function BitAnd (fn_opasm)
-		.AddASM(asm.BAND, dbg, dest, L, R), return dest
+		.AddASM(asm.BAND, exp, dest, L, R), return dest
 	
 	function ROL    (fn_opasm)
-		.AddASM(asm.BROL, dbg, dest, L, R), return dest
+		.AddASM(asm.BROL, exp, dest, L, R), return dest
 	
 	function ROR    (fn_opasm)
-		.AddASM(asm.BROR, dbg, dest, L, R), return dest
+		.AddASM(asm.BROR, exp, dest, L, R), return dest
 	
 	function SHR    (fn_opasm)
 		|| up = 64 - l.µtype.bitcount
 		if r is const
 			|| sh = self[r][0]
 			if l.signed
-				.AddASM(asm.BFLG, dbg, dest, l, up, sh+up)
+				.AddASM(asm.BFLG, exp, dest, l, up, sh+up)
 			  else
-				.AddASM(asm.BFLG, dbg, dest, l,  0, sh, 1)
+				.AddASM(asm.BFLG, exp, dest, l,  0, sh, 1)
 			return dest
 
-		|| FAT = .AddASM(asm.SHRS • !l.signed, dbg, dest, L, R)
+		|| FAT = .AddASM(asm.SHRS • !l.signed, exp, dest, L, R)
 		if l.signed
 			FAT.r[3] = up
 		return dest
 	
 	function SHL    (fn_opasm)
-		.AddASM(asm.SHLU, dbg, dest, L, R), return dest
+		.AddASM(asm.SHLU, exp, dest, L, R), return dest
 	
 	function Assign (fn_opasm)
-		return .bitor(dest, l, asmreg(), dbg)
+		return .bitor(dest, l, asmreg(), exp)
 
 

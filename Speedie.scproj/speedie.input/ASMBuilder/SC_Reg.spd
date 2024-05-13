@@ -23,6 +23,21 @@ datatype ASMMath (uint)
 		BOr
 		Xor
 		Xnr
+		BitCorrect = 31 // removes garbage bits
+	syntax is (|asmmath| r, |bool|)
+		return self == r
+
+
+
+datatype ASMCompareability (uint)
+	Flags
+		bcmp
+		cmpi
+		bra
+		both = bcmp + cmpi
+	syntax is (|ASMCompareability| r, |bool|)
+		return self & r
+
 
 
 datatype AsmReg (uint)
@@ -39,10 +54,10 @@ datatype AsmReg (uint)
 		// can something be frommath and a positionrequset?
 		// or discard + return? who knows?
 		FromMath		= (1 << 21)
-		StayOpen		= (1 << 22)
-		AlreadyNegated	= (1 << 22)
+		StayOpen		= (1 << 22) // input
+		AlreadyNegated	= (1 << 22) // result. what if we return the input?
 		Alternate		= (1 << 23)
-		Const			= (1 << 24)
+		Const			= (1 << 24) ||| (31 << 16)
 		MathConst		= (1 << 21) ||| (1<<24)
 		Cond			= (1 << 25)
 		PositionRequest = (1 << 26)
@@ -50,7 +65,8 @@ datatype AsmReg (uint)
 		ForReturnReg	= (1 << 27) ||| (1<< 11)
 		Discard			= (1 << 28)
 		SingleExpr		= (1 << 29)
-		CondRequest		= (1 << 30)
+		CondRequest		= (1 << 30) ||| (1 << 24) ||| (31 << 16)
+		NewCondRequest	= (1 << 30)
 		Negate			= (1 << 31)
 		Zero			= Const
 	

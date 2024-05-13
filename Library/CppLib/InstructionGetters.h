@@ -227,6 +227,25 @@
 #define   BCmp_Invu_(x)   (((uint)((x)<<29))>>29)
 
 
+#define   BClear_Shift1i       ((( int)((Op.Raw)<<18))>>26)
+#define   BClear_Shift1i_(x)   ((( int)((x)<<18))>>26)
+
+#define   BClear_Shift1u       (((uint)((Op.Raw)<<18))>>26)
+#define   BClear_Shift1u_(x)   (((uint)((x)<<18))>>26)
+
+#define   BClear_Shift2i       ((( int)((Op.Raw)<<24))>>26)
+#define   BClear_Shift2i_(x)   ((( int)((x)<<24))>>26)
+
+#define   BClear_Shift2u       (((uint)((Op.Raw)<<24))>>26)
+#define   BClear_Shift2u_(x)   (((uint)((x)<<24))>>26)
+
+#define   BClear_Signi       ((( int)((Op.Raw)<<30))>>30)
+#define   BClear_Signi_(x)   ((( int)((x)<<30))>>30)
+
+#define   BClear_Signu       (((uint)((Op.Raw)<<30))>>30)
+#define   BClear_Signu_(x)   (((uint)((x)<<30))>>30)
+
+
 #define   SWAP_Ai       ((( int)((Op.Raw)<<8))>>26)
 #define   SWAP_Ai_(x)   ((( int)((x)<<8))>>26)
 

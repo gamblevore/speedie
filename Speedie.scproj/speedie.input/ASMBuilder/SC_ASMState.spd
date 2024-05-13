@@ -148,17 +148,11 @@ struct ASMState
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	
-//	function AsTemp (|asmreg| T, |message| exp, |asmreg|)
-//		if t.reg > .vdecls
-//			return t 
-//		return .tempme(exp)
-	
-	
+		
 	function Branch (|message| cond,  |&fatasm|)
-		|| Src = .µ(cond, asmreg.CondRequest)
+		|| dest = asmreg.newCondRequest
+		|| Src = .µ(cond, dest)
 		if Src isnt cond
-			|| dest = asmreg()
 			(dest is negate) = (src isnt AlreadyNegated)
 			.equals(dest, dest, src, cond)
 		return .curr - 1
@@ -176,6 +170,7 @@ struct ASMState
 			if .Consts[i] == code
 				return i.reg as asmreg.const
 			i--
+	
 	
 	function µ (|message| exp,  |AsmReg| Dest = asmreg(), |AsmReg|)
 		opt norefcounts
