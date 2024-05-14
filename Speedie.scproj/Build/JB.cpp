@@ -2017,7 +2017,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112436124820480));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112436129310248));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -18081,33 +18081,19 @@ FatASM* SC_Pac_EqualsInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Messag
 		return SC_Pac_AddASM5(Self, kSC__ASM_BCMP, Exp, SC_Reg_ToInt(Dest), SC_Reg_ToInt(L), SC_Reg_ToInt(R), 64 - Bl, ((int)Negate));
 	}
 	if (SC_Reg_SyntaxIs(Dest, kSC__Reg_CondRequest)) {
-		if (SC_ASMCompareability_SyntaxIs(BitsOK, kSC__ASMCompareability_bcmp)) {
-			if (SC_ASMCompareability_SyntaxIs(BitsOK, kSC__ASMCompareability_cmpi)) {
-				return SC_Pac_AddASM3(Self, SC_ASM_OperatorxE2x80xA2(kSC__ASM_CMPE, Negate), Exp, SC_Reg_ToInt(L), SC_Reg_ToInt(R), SC_Reg_ToInt(Dest));
-			}
-			if (SC_Reg_Reg(Dest)) {
-				debugger;
-			}
-			Dest = SC_Pac_TempMe(Self, Exp, Dest);
-			SC_Pac_AddASM5(Self, kSC__ASM_BCMP, Exp, SC_Reg_ToInt(Dest), SC_Reg_ToInt(L), SC_Reg_ToInt(R), 64 - Bl, ((int)Negate));
-			return SC_Pac_AddASM2(Self, SC_ASM_OperatorxE2x80xA2(kSC__ASM_BRA, Negate), Exp, SC_Reg_ToInt(Dest), 1);
-		}
-		if (SC_ASMCompareability_SyntaxIs(BitsOK, kSC__ASMCompareability_cmpi) and SC_ASMCompareability_SyntaxIs(BitsOK, kSC__ASMCompareability_bcmp)) {
-			debugger;
-		}
-		if ((!SC_ASMCompareability_SyntaxIs(BitsOK, kSC__ASMCompareability_cmpi)) and SC_ASMCompareability_SyntaxIs(BitsOK, kSC__ASMCompareability_bcmp)) {
-			if (SC_Reg_Reg(Dest)) {
-				debugger;
-			}
-			Dest = SC_Pac_TempMe(Self, Exp, Dest);
-			SC_Pac_AddASM5(Self, kSC__ASM_BCMP, Exp, SC_Reg_ToInt(Dest), SC_Reg_ToInt(L), SC_Reg_ToInt(R), 64 - Bl, ((int)Negate));
-			return SC_Pac_AddASM2(Self, SC_ASM_OperatorxE2x80xA2(kSC__ASM_BRA, Negate), Exp, SC_Reg_ToInt(Dest), 1);
-		}
-		if (SC_ASMCompareability_SyntaxIs(BitsOK, kSC__ASMCompareability_cmpi) and SC_ASMCompareability_SyntaxIs(BitsOK, kSC__ASMCompareability_bcmp)) {
-			debugger;
-		}
 		if (SC_ASMCompareability_SyntaxIs(BitsOK, kSC__ASMCompareability_bra)) {
 			return SC_Pac_AddASM2(Self, SC_ASM_OperatorxE2x80xA2(kSC__ASM_BRA, Negate), Exp, SC_Reg_ToInt(R), 1);
+		}
+		if (SC_ASMCompareability_SyntaxIs(BitsOK, kSC__ASMCompareability_cmpi)) {
+			return SC_Pac_AddASM3(Self, SC_ASM_OperatorxE2x80xA2(kSC__ASM_CMPE, Negate), Exp, SC_Reg_ToInt(L), SC_Reg_ToInt(R), SC_Reg_ToInt(Dest));
+		}
+		if (SC_ASMCompareability_SyntaxIs(BitsOK, kSC__ASMCompareability_bcmp)) {
+			if (SC_Reg_Reg(Dest)) {
+				debugger;
+			}
+			Dest = SC_Pac_TempMe(Self, Exp, Dest);
+			SC_Pac_AddASM5(Self, kSC__ASM_BCMP, Exp, SC_Reg_ToInt(Dest), SC_Reg_ToInt(L), SC_Reg_ToInt(R), 64 - Bl, ((int)Negate));
+			return SC_Pac_AddASM2(Self, SC_ASM_OperatorxE2x80xA2(kSC__ASM_BRA, Negate), Exp, SC_Reg_ToInt(Dest), 1);
 		}
 	}
 	if (SC_ASMCompareability_SyntaxIs(BitsOK, kSC__ASMCompareability_bcmp)) {

@@ -217,11 +217,41 @@ AlwaysInline bool Rare (Register* r, ASM Op) {
 #define  sB  *((u16*)B)
 #define  bA  *((byte*)A)
 #define  bB  *((byte*)B)
+#define  zA  *((s16*)A)
+#define  zB  *((s16*)B)
+#define  cA  *((char*)A)
+#define  cB  *((char*)B)
 
 #define CmpSub(Mode, Cmp) case Mode: return (Cmp);
 
 
-AlwaysInline bool CompI_ (Register* r, ASM Op) {
+AlwaysInline bool CompIBig_ (Register* r, ASM Op) {
+	auto A = &i1;
+	auto B = &i2;
+	switch (Cmp_Cmpu) {
+		CmpSub(0 , iA >= iB);
+		CmpSub(1 , iA <  iB);
+		CmpSub(2 , iA <= iB);
+		CmpSub(3 , iA >  iB);
+
+		CmpSub(4 , uA >= uB);
+		CmpSub(5 , uA <  uB);
+		CmpSub(6 , uA <= uB);
+		CmpSub(7 , uA >  uB);
+
+		CmpSub(8 , A  >= B );
+		CmpSub(9 , A  <  B );
+		CmpSub(10, A  <= B );
+		CmpSub(11, A  >  B );
+
+		CmpSub(12, UA >= UB);
+		CmpSub(13, UA <  UB);
+		CmpSub(14, UA <= UB);	default:
+		CmpSub(15, UA >  UB);
+	};
+}
+
+AlwaysInline bool CompISmall_ (Register* r, ASM Op) {
 	auto A = &i1;
 	auto B = &i2;
 	switch (Cmp_Cmpu) {
@@ -274,10 +304,10 @@ AlwaysInline bool CompF_ (Register* r, ASM Op) {
 
 AlwaysInline ASM* CompI (Register* r, ASM Op, ASM* Code) {
 	uint Jump = Cmp_Lu; 
-	bool b = CompI_(r, Op);
+	bool b = CompIBig_(r, Op);
 	if (Jump >= 32) {
 		if (!b) return Code;
-		return Code + Jump - (1<<9);
+		return Code + Jump - 31;
 	}
 		
 	r[Jump].Int = b;
@@ -290,7 +320,7 @@ AlwaysInline ASM* CompF (Register* r, ASM Op, ASM* Code) {
 	bool b = CompF_(r, Op);
 	if (Jump >= 32) {
 		if (!b) return Code;
-		return Code + Jump - (1<<9);
+		return Code + Jump - 31;
 	}
 		
 	r[Jump].Int = b;
@@ -300,8 +330,8 @@ AlwaysInline ASM* CompF (Register* r, ASM Op, ASM* Code) {
 
 AlwaysInline uint64 BitComp (Register* r, ASM Op) {
 	auto i = BCmp_Invu;
-	auto A = (u1 << BCmp_Shiftu);
-	auto B = (u2 << BCmp_Shiftu);
+	auto A = u1 << BCmp_Shiftu;
+	auto B = u2 << BCmp_Shiftu;
 	if (i&2)
 		A = ~A;
 	if (i&4)
