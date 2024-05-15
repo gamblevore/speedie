@@ -35,7 +35,7 @@ class function
 		.length = n
 		check (n > 0) ("Missing asm for: " + .name)
 		check (!blob.guard and !blob.callcount) ("Corrupted asm for: " + .name)
-		blob.guard = bear // bobobear
+		blob.guard = bear|int| // bobobear
 		blob.callcount = 0
 		.speediefunc = blob
 	

@@ -15,6 +15,7 @@ Speedie has a lot of safety features built in, including:
 Speedie's memory-manager is a form of safety... its what you expect from most OOP systems, but its worth mentioning as C/C++ doesn't have it.
 
 
+
 ### Speedie's Safe Library
 
 Speedie's library is safe too. It won't crash. _(If it crashes, then thats a bug that the speedie devs should fix. But I haven't seen that for a long time.)_ This isn't like C++ where `strlen(nil)` can crash your app.
@@ -31,6 +32,7 @@ For example this:
 That won't crash. It just returns `nil`. Which is totally valid. Same with accessing `myarray[-1]`. It just returns `nil`.
     
 
+
 ### Loop Safety
 
 Speedie recognises a basic infinite loop. Not all but a basic one. It also recognises a recursion bug.
@@ -46,18 +48,44 @@ Speedie recognises a basic infinite loop. Not all but a basic one. It also recog
 Not a common bug, but nice that speedie saves you from it!
 
 
+
 ### Error Handling
 
 Speedie has a great error-handling system that is exceptionless. It is really nice. Read about [it in it's own article](Errors.md). Its actually perfect.
+
 
 
 ### Numeric Safety
 
 Speedie has a little numeric safety. Mostly on constants, so you can't define a constant that won't fit its type. Like defining a byte-constant of 1000, which is more than 255.
 
-Also Speedie won't allow int / float conversions, to happen silently. You need to explicitly convert them. We allow a small leeway when it comes to integer constants, for example adding `2` to a float variable, is OK, as `2` is exactly representable as a float anyhow. We don't allow this for ints that are too big and would lose precision as a float!
+Also Speedie won't allow `int` / `float` conversions, to happen silently. You need to explicitly convert them. We allow a small leeway when it comes to integer constants, for example adding `2` to a float variable, is OK, as `2` is exactly representable as a float anyhow. We don't allow this for ints that are too big and would lose precision as a float!
 
 Also Speedie won't allow passing objects or numbers to a boolean parameter... because this is very dangerous, almost everything is convertible to boolean which means you can easily pass the wrong param!
+
+Also speedie doesn't allow comparing signed and unsigned numbers in an "unclear" way. For example:
+
+    function unclear (|int| x, |uint| y)
+        if x > y        // speedie complains here! Rightfully so!
+            DoSomething()
+    
+    function unclear2 (|uint| y)
+        if y < 0  // never true
+    
+    function unclear3 (|uint| y)
+        if y >= 0 // always true
+    
+    function silly (|uint| y)
+        if y <= 0 // a silly test. Just write: if y == 0
+    
+
+This is OK though!
+
+    function testOK (|uint| y,  |byte| b,  |int| c)
+        if y > 0  // just fine!
+        
+        if b > c  // bytes fit in ints easily.
+        if b < c  // also ok
 
 
 
@@ -88,6 +116,8 @@ And the `mustbe` operator.
 
 
 Lets finish with the biggest safety feature...
+
+
 
 ### Nil-safety
 
