@@ -214,9 +214,6 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |int| Mode, |scclass| c
 	|| Names = types.Next
 
 	expect (FuncPrmz or Names)  (self, "No name found.")
-	//if (Mode & 2)
-	//	expect (names == @thg) (names, "Must be a proper name (a-z or unicode-letters)")
-
 	|| Default = DeclsDefault( names )
 	|| Sdcl = ExtractDecl( Types, P, mode )
 	if !sdcl  and  !default  and  (P isa SCArg)
@@ -283,7 +280,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |int| Mode, |scclass| c
 	(dcl Isnt Const) // on "|| bla = true", make "bla" editable.
 
 	if default and defaultdcl
-		dcl.ConstCheck(nil, default, DefaultDcl)
+		dcl.AssignabilityCheck(nil, default, DefaultDcl)
 
 	if Recv // nil for prototypes
 		Recv.TryAdd( self, dcl, dcl.Name )

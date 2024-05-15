@@ -1299,13 +1299,20 @@ function scdecl.ConstInRange (|message| RN, |scdecl| rt, |bool|)
 	return true
 
 
-function SCDecl.ConstCheck (|message|ln, |message| RN, |scdecl| rc, |bool|)
+function SCDecl.AssignabilityCheck (|message?| ln, |message!| RN, |scdecl| rc, |bool|)
+	opt norefcounts
+	
 	if ln
 		expect ((LN.IsAssignable) and (self isnt const)) (LN, "Not assignable.")
-		if !rn
-			return true
+
+	if  .c_array > 0  or  rc.c_Array > 0
+		expect  (.c_array == rc.c_Array) (rn, "Carray sizes don't match")
+		if rn in @sheb
+			return true						// ignore it:  x = {a,b,c}
+		error (rn, "Carrays can't be assigned.")
+
 	if rc is const
-		return !rn or (.ConstInRange(RN, rc))		#expect (RN, "Loses numeric info.") 
+		return (.ConstInRange(RN, rc))		#expect (RN, "Loses numeric info.") 
 	return true
 
 
@@ -1378,7 +1385,7 @@ function TypeOfRel (ExprResolver) {
 	
 	if (side)
 		// check for dumb stuff like "func() = nil" or "abc|bool| = false"
-		require LC.ConstCheck(LN, RN, rc)
+		require LC.AssignabilityCheck(LN, RN, rc)
 	
 	opch.obj = comp // shouldn't this be higher even?
 	

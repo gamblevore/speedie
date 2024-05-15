@@ -23,14 +23,18 @@ module SC_Errors
 	|dictionary of message| IgnoredBranches = dictionary.new
 
 	function AlreadyIgnored (|Message| F, |bool|)
-		|| RipRoot = F$.MsgOwningFunc$.SourceArg
+		opt norefcounts
+		if .IgnoredBranches.obj(F)
+			return true
+		|| RipRoot = F.MsgOwningFunc$.SourceArg
 		for Curr.up in F
-			if (Curr == @arg) and (.IgnoredBranches[Curr._DictName])
+			if (Curr == @arg) and (.IgnoredBranches.obj(Curr))
 				return true
 			require (Curr != RipRoot)
 
 	
-	syntax access (|Error| Err, |bool|)
+	function CanKeep (|Error| Err, |bool|)
+		opt norefcounts
 		if Err is dontstrip
 			return true
 		if (!Err.node or Err.iswarning)
@@ -39,7 +43,7 @@ module SC_Errors
 		|| A = Err.node.Ancestor(@arg)
 			if Options.HideMultipleErrors
 				require !.AlreadyIgnored(A)
-			.IgnoredBranches[A._DictName] = A
+			.IgnoredBranches.obj(A) = A
 		return true
 
  
@@ -48,7 +52,7 @@ function errorreceiver.PrePrintErrors
 		err.improve
 	if !options.KeepAllErrors
 		for err in .errors
-			if !SC_Errors[err]
+			if !SC_Errors.CanKeep(err)
 				err.remove
 
 
@@ -75,7 +79,7 @@ function Compiler.RenderErrors (|errorreceiver| stderr, |errorseverity| MinSev, 
 		if err.severity >= MinSev
 			Count++
 			err.scrender(msg)
-
+	
 	if !count
 		|| problems = 0
 		for (err in stderr)

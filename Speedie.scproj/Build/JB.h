@@ -3190,11 +3190,11 @@ void SC_SC_API__NewExportAPISub(Message* Node, SCObject* Parent);
 // Errors
 bool SC_Errors__AlreadyIgnored(Message* F);
 
+bool SC_Errors__CanKeep(JB_Error* Err);
+
 int SC_Errors__Init_();
 
 int SC_Errors__InitCode_();
-
-bool SC_Errors__SyntaxAccess(JB_Error* Err);
 
 
 
@@ -3487,8 +3487,6 @@ void SC___junktest_1__();
 void SC___junktest_2__();
 
 bool SC___junktest_3__(IntRange Data);
-
-void SC_abc();
 
 void SC_AddToStaticSection(Message* Arg, Message* ToAdd);
 
@@ -7060,6 +7058,10 @@ JB_Object* JB_Dict_Expect(Dictionary* Self, Message* M);
 
 void JB_Dict_LoadProperties(Dictionary* Self, ObjectLoader* Loader);
 
+JB_Object* JB_Dict_Obj(Dictionary* Self, JB_Object* Prm);
+
+void JB_Dict_ObjSet(Dictionary* Self, JB_Object* Prm, JB_Object* Value);
+
 void JB_Dict_SaveCollect(Dictionary* Self, ObjectSaver* Saver);
 
 void JB_Dict_SaveWrite(Dictionary* Self, ObjectSaver* Saver);
@@ -8198,6 +8200,8 @@ int SC_Decl_AllocatedSize(SCDecl* Self);
 
 bool SC_Decl_AlreadyContains(SCDecl* Self);
 
+bool SC_Decl_AssignabilityCheck(SCDecl* Self, Message* Ln, Message* RN, SCDecl* Rc);
+
 JB_String* SC_Decl_AutoCompleteName(SCDecl* Self);
 
 void SC_Decl_BecomeReal(SCDecl* Self);
@@ -8215,8 +8219,6 @@ bool SC_Decl_CanUseDefault(SCDecl* Self);
 bool SC_Decl_CanWrap(SCDecl* Self);
 
 SCDecl* SC_Decl_CheckMath(SCDecl* Self, Message* Exp);
-
-bool SC_Decl_ConstCheck(SCDecl* Self, Message* Ln, Message* RN, SCDecl* Rc);
 
 bool SC_Decl_ConstInRange(SCDecl* Self, Message* RN, SCDecl* Rt);
 
@@ -9023,8 +9025,6 @@ SCClass* SC_Class_RealClass(SCClass* Self);
 
 SCClass* SC_Class_RealSuper(SCClass* Self);
 
-void SC_Class_RejectProperty(SCClass* Self, SCDecl* Dcl);
-
 void SC_Class_RenameInterfaces(SCClass* Self);
 
 JB_String* SC_Class_Render(SCClass* Self, FastString* Fs_in);
@@ -9596,6 +9596,8 @@ inline int JB_uint64_LELength(uint64 Self);
 
 inline bool SC_NilTest_SyntaxCast(NilTest* Self);
 
+inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest);
+
 inline bool SC_Reg_FourBytes(AsmReg Self);
 
 inline bool SC_Reg_IsBig(AsmReg Self);
@@ -9608,21 +9610,19 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, NilState New);
 
 inline void SC_nil__DeclKill();
 
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
+
 inline NilRecord SC_nil__Value();
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
 
 inline bool SC_Decl_IsUnknownParam(SCDecl* Self);
 
-inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest);
-
 inline uint64* SC_Pac_GetConst(ASMState* Self, AsmReg A);
 
 inline bool SC_Reg_SyntaxCast(AsmReg Self);
 
 inline NilRecord SC_nil__EndBlock();
-
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
@@ -9788,6 +9788,23 @@ inline bool SC_NilTest_SyntaxCast(NilTest* Self) {
 	return (Self != nil) and JB_Str_Exists(Self->V2);
 }
 
+inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
+	AsmReg Rz = ((AsmReg)0);
+	ASMtmp T = SC_Msg_ASMType(Exp);
+	fn_asm Fn = SC_fn_asm_table[T];
+	if (!(SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen))) {
+		debugger;
+		// Can't close declarations in args!;
+		int OV = SC_Pac_OpenVars(Self);
+		Rz = (Fn)(Self, Exp, Dest, 0);
+		SC_Pac_CloseVars(Self, OV, (!SC_Reg_SyntaxIs(Dest, kSC__Reg_Discard)));
+	}
+	 else {
+		Rz = (Fn)(Self, Exp, Dest, 0);
+	}
+	return Rz;
+}
+
 inline bool SC_Reg_FourBytes(AsmReg Self) {
 	return JB_TC__Shift(((DataTypeCode)Self)) == 2;
 }
@@ -9817,6 +9834,16 @@ inline void SC_nil__DeclKill() {
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 }
 
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
+	ASMtmp T = SC_Msg_ASMType(Msg);
+	if (T) {
+		return (SC__nil_NilTable[T])(Msg, Test);
+	}
+	T = ((ASMtmp)Msg->Func);
+	(SC_Msg_ASMTypeSet(Msg, T));
+	return (SC__nil_NilTable[T])(Msg, Test);
+}
+
 inline NilRecord SC_nil__Value() {
 	return SC_nil_Value((&SC__nil_T));
 }
@@ -9827,31 +9854,6 @@ inline bool JB_Safe_SyntaxCast(JB_String* Self) {
 
 inline bool SC_Decl_IsUnknownParam(SCDecl* Self) {
 	return ((!SC_Decl_NilStated(Self))) and (SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Param));
-}
-
-inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
-	AsmReg Rz = ((AsmReg)0);
-	ASMtmp T = SC_Msg_ASMType(Exp);
-	fn_asm Fn = SC_fn_asm_table[T];
-	if ((!T)) {
-		Fn = SC_fn_asm_table[((int)Exp->Func)];
-		debugger;
-	}
-	if (!(SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen))) {
-		debugger;
-		// Can't close declarations in args!;
-		int OV = SC_Pac_OpenVars(Self);
-		Rz = (Fn)(Self, Exp, Dest, 0);
-		SC_Pac_CloseVars(Self, OV, (!SC_Reg_SyntaxIs(Dest, kSC__Reg_Discard)));
-	}
-	 else {
-		Rz = (Fn)(Self, Exp, Dest, 0);
-	}
-	int Dd = SC_Reg_Reg(Dest);
-	if (((bool)Dd) and (SC_Reg_Reg(Rz) != Dd)) {
-		//FFFFFFASSDJKLASDM<>AS;
-	}
-	return Rz;
 }
 
 inline uint64* SC_Pac_GetConst(ASMState* Self, AsmReg A) {
@@ -9867,16 +9869,6 @@ inline NilRecord SC_nil__EndBlock() {
 	Rz = SC_nil__Value();
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 	return Rz;
-}
-
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
-	ASMtmp T = SC_Msg_ASMType(Msg);
-	if (T) {
-		return (SC__nil_NilTable[T])(Msg, Test);
-	}
-	T = ((ASMtmp)Msg->Func);
-	(SC_Msg_ASMTypeSet(Msg, T));
-	return (SC__nil_NilTable[T])(Msg, Test);
 }
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {

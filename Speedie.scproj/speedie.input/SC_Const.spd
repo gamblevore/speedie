@@ -205,7 +205,7 @@ function SCNode.CollectConstantsSub (|Message| ch)
 				NextNum++
 
 			if currtype
-				currtype.constcheck(nil, newnum, currtype)
+				currtype.AssignabilityCheck(nil, newnum, currtype)
 				currtype.copytypeinfoto(newitem)
 			
 		  else
@@ -222,7 +222,7 @@ function SCNode.CollectConstantsSub (|Message| ch)
 				SCFunction.ObjectifyString(ValueNode)
 				ValueNode.obj = TypeString!.typenormal
 			  elseif (valuenode.isint) or (valuenode == @unit)
-				NewType.constcheck(nil, ValueNode, OMGType)  
+				NewType.AssignabilityCheck(nil, ValueNode, OMGType)  
 				nextnum = valuenode.int
 				newitem.exportposition = nextnum
 				nextnum++

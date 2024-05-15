@@ -75,11 +75,3 @@ api Speedie_Main (|&pico| comms, |int| Mode, |&cstring| args, |ErrorInt|)
 	if rz == 0
 		rz = app.sp_run(args, mode)
 
-
-function abc
-	visible
-	|uint64| a
-	|int|    b
-	|| x = a << b
-
-	
