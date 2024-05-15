@@ -217,15 +217,10 @@ You can also override the nil-checker using the `!` symbol.
 Obviously, if you get this wrong, your program crashes. The "!" symbol is better avoided, but you will have to decide for yourself. Its not such a problem to do this instead:
 
     || msg = "abc, def".parse
+    if msg
         msg.position = 30 // now is nil safe
     
-That example used the implicit "`if`" syntax in speedie:
-
-    || x = 4
-        "x is not 0"
-
-    // same as below
-    || y = 4
-    if y
-        "y is not 0"
+    // or just do this. Same thing but shorter.
+    || msg = "abc, def".parse
+        msg.position = 30 // now is nil safe
 
