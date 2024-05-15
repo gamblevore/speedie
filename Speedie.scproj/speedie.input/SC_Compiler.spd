@@ -70,6 +70,7 @@ linkage
 |scfunction|				MainFunc
 |message|					ConfMsg
 |dictionary|				InsecureWords
+|dictionary of scdecl|		Numbers = dictionary()
 |[message]| 				TodoList
 
 |Dictionary of SCFile|		Files = nil
@@ -285,12 +286,12 @@ function InitBasicStuff (|int|) // compiler.init
 	TrueBool  = .AddGlobalConst( "true",  TypeBool!,     NilState.real ||| NilState.trueValue )
 	FalseBool = .AddGlobalConst( "false", TypeBool!,     NilState.real ||| NilState.falseValue )
 	
-	TrueBool!.exportposition = 1
+	TrueBool!.numberconst = 1
 	.AddGlobalConstNum( "__time_id__",  typeint!,  scimport.recent.timeid )
 	.AddGlobalConstNum( "__now__",      typedate!, date.now )
 	.AddGlobalConstNum( "__modified__", typedate!, scimport.recent)
-	.AddGlobalConstNum( "π",            typef64! , "3.1415926535897932")
-	.AddGlobalConstNum( "τ",            typef64! , "6.2831853071795864")
+	.AddGlobalConstFloat( "π",            typef64! , "3.1415926535897932")
+	.AddGlobalConstFloat( "τ",            typef64! , "6.2831853071795864")
 	if stderr.ErrorCount > rz
 		compiler.InitedOK = false
 		
@@ -821,14 +822,22 @@ function InputFile (|File| Default, |String| s, |message| where,  |File|)
 
 
 function AddGlobalConstNum (|string| name, |SCClass| c, |int64| value)
-	.AddGlobalConstNum(name, c, value.render)
+	|| d = .AddGlobalConst(name, c)
+	d.IsLookupOnly = @num + value.render
+	d.numberconst = value
 
-function AddGlobalConstNum (|string| name, |SCClass| c, |string| value)
-	.AddGlobalConst(name, c).IsLookupOnly = @num + value
+
+function AddGlobalConstFloat (|string| name, |SCClass| c, |string| value)
+	|| d = .AddGlobalConst(name, c)
+	d.IsLookupOnly = @num + value
+	d.numberconst = value.float.asint
+
 
 function AddGlobalConst (|string| name, |SCClass| c, |nilstate| dcl = NilState.real, |SCDecl|)
+	opt norefcounts
 	|| d = SCDecl(c)
-	(D is dataconst)
+	(D is const)
+	(D is NumberConst)
 	d.NilDeclared = dcl
 	d.IsLookupOnly = "" // it is lookuponly... but what for? "" i guess... whatever.
 	d.Name = name

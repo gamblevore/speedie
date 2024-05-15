@@ -923,7 +923,8 @@ function message.LoopExitter (|int| ASMType, |SCBlockage| ExitCode)
 function scnode.AddNumericConst (|string| name, |int64| value, |message| where, |scdecl|)
 	opt norefcounts
 	|| SyxConst = SCDecl(TypeSyntax!)
-	Compiler.newconst(SyxConst)
+	Compiler.NewConst(SyxConst)
 	NewDeclNum( SyxConst, value, name )
 	.TryAdd( where, SyxConst, SyxConst.Name )
 	return syxconst
+

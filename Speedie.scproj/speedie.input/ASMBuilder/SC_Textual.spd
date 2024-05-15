@@ -38,7 +38,7 @@ extend ASMState
 			return
 
 		debugat
-		|| signed = (v < 0)|int|
+		|| signed = (v|int64| < 0)|int|
 			v = ~v
 
 		.op = asm.setn

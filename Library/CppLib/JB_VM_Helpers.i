@@ -302,7 +302,20 @@ AlwaysInline bool CompF_ (Register* r, ASM Op) {
 
 
 
-AlwaysInline ASM* CompI (Register* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* CompIB (Register* r, ASM Op, ASM* Code) {
+	uint Jump = Cmp_Lu; 
+	bool b = CompIBig_(r, Op);
+	if (Jump >= 32) {
+		if (!b) return Code;
+		return Code + Jump - 31;
+	}
+		
+	r[Jump].Int = b;
+	return Code;
+}
+
+
+AlwaysInline ASM* CompIS (Register* r, ASM Op, ASM* Code) {
 	uint Jump = Cmp_Lu; 
 	bool b = CompIBig_(r, Op);
 	if (Jump >= 32) {

@@ -1360,7 +1360,7 @@ function SCNode.LateAddTempory (|string| type, |string| name1, |message| Value, 
 	TypeOfExpr(Value, self)
 	|| msg = MakeDecl(type, name, Value, scdeclinfo.body)
 	|| D = TypeOfExpr(msg, self)$
-	(d is dataconst) = false
+	(d is NumberConst) = false
 	.Source <~ msg
 	.TryAdd( err, D, name )
 	return name

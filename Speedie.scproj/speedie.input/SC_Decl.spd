@@ -44,9 +44,9 @@ datatype SCDeclInfo (int)
 		|SCDeclInfo|
 		Borrowed
 		StayBorrowed
-		DataOnlyConst
+		DirectNumber						// 7
 		Const
-		DataConst = DataOnlyConst + Const
+		NumberConst = DirectNumber + Const	// const: x = 7
 		Static
 		UpgradeableContained
 		NewlyCreated
@@ -171,7 +171,7 @@ class SCDecl (SCNamed) {
 		Return dcl
 
 	
-	function Better_Numeric (|scdecl| o, |opmode| Mode=0, |scdecl|)
+	function Better_Numeric (|scdecl| o, |opmode| Mode=0, |message| where = nil, |scdecl|)
 		opt norefcounts
 										// int+float-->float
 										// int+double-->double
@@ -180,7 +180,7 @@ class SCDecl (SCNamed) {
 		if mode isnt MakesSigned
 			if (s &~ datatypecode.sign) == (t &~ datatypecode.sign)
 				return self
-		|| cls = s.better_numeric_sub(t, Mode)!
+		|| cls = s.better_numeric_sub(t, Mode, where)!
 		if cls.typeinfo == s
 			return self					// in case of: || x = (date(), 0)(test)
 		if cls.typeinfo == t
@@ -193,9 +193,32 @@ class SCDecl (SCNamed) {
 	function SCDecl.IsInt (|bool|)
 		return .type.typeinfo.isint
 
+//	function asdasd_bad
+//		|int|  x
+//		|uint| y
+//		if x > y
+//		
+//	function asdasd_bad
+//		|char| x
+//		|uint| y
+//		if x > y
 
-	function datatypecode.Better_Numeric_Sub (|datatypecode| t, |opmode| Op, |SCClass|)
-		|| bits	= .ItemBitCount max t.ItemBitCount
+	function asdasd_bad
+		|uint64| V
+		|| signed2 = (v < 1)|int|
+//		|| signed  = (v < 0)|int|
+//			v = ~v
+		
+	function asdasd_OK
+		|int|  x
+		|byte| y
+		if x > y
+
+
+	function datatypecode.Better_Numeric_Sub (|datatypecode| t, |opmode| Op, |message| where, |SCClass|)
+		|| bme = .itembitcount
+		|| bt = t.itembitcount
+		|| bits	= bme max bt
 		// what about a float + an int? f64 right?
 		if .isfloat or t.isfloat
 			if bits > 32
@@ -206,14 +229,14 @@ class SCDecl (SCNamed) {
 		
 		if Op
 			if Op is MakesSigned				// -
-				|| bits2 = (.ItemBitCount + !.issigned) max (t.ItemBitCount + !t.issigned)
+				|| bits2 = (bme + !.issigned) max (bt + !t.issigned)
 				if bits2 > 32
 					return typeint64
 				return typeint
 			if Op is LoseBits					// &
-				bits = .ItemBitCount min t.ItemBitCount
+				bits = bme min bt
 			  elseif Op is ShiftOnly			// >>, rotr, rotl
-				bits = .ItemBitCount
+				bits = bme
 			  elseif Op is NoExtraBits			// (xor, <<) can add bits
 				0
 			  elseif (Op is mathlike) and bits < 32
@@ -961,7 +984,7 @@ class SCDecl (SCNamed) {
 				
 		if (self is self) and (scfunction.currfunc is Destructor) 
 			error (exp, "You can’t modify 'self' in a constructor or destructor.")
-		  elseif side and (self is local) and .isobject
+		  elseif side and (self is local)
 			.MarkAsRefAltered
 						
 

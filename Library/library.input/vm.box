@@ -271,9 +271,13 @@ forms
 /**/ JUMP (U0)
 		Code += l0
 
-/**/ CMPI  (Cmp)					// Yes. int/uint/u64/i64 versions
+/**/ CMPS  (Cmp)
 		__
-		Code = CompI(r, Op, Code)
+		Code = CompIS(r, Op, Code) // 8/16 bit compares
+		___
+/**/ CMPI  (Cmp)
+		__
+		Code = CompIB(r, Op, Code) // 32/64 bit compares
 		___
 /**/ CMPF  (Cmp)
 		__

@@ -16,7 +16,10 @@ datatype OpMode (int)
 		MakesSigned
 		ExactlyEquals
 		EqualOrNot
-		NilTest		// not the same as EqualOrNot... because those include customops
+		Comparison  	// >  >=  <  <=
+		More  			// >				// if unsigned > 0
+		Less  			// <				// if 0 < unsigned
+		NilTest			// not the same as EqualOrNot... because those include customops
 		SameOrLessBits = [NoExtraBits, LoseBits]
 		Shift = ShiftOnly + NoExtraBits
 		AndOr = [OR, AND]
@@ -155,10 +158,10 @@ module {
 	function Init 
 		opt norefcounts
 		.AddComp("==",					&asmstate.Equals,	OpMode.ExactEquals)
-		.AddComp( "<",					&asmstate.Less)
-		.AddComp( ">",					&asmstate.More)
-		.AddComp( "<=",					&asmstate.LessEq)
-		.AddComp( ">=",					&asmstate.MoreEq)
+		.AddComp( "<",					&asmstate.Less,		opmode.Comparison + opmode.less)
+		.AddComp( ">",					&asmstate.More,		opmode.Comparison + opmode.more)
+		.AddComp( "<=",					&asmstate.LessEq,	opmode.Comparison)
+		.AddComp( ">=",					&asmstate.MoreEq,	opmode.Comparison)
 		.AddComp( "!=",					&asmstate.NotEq,	OpMode.ExactNotEquals)
 		.OppositeComp("==", "!=")
 		.OppositeComp("<", ">=")
@@ -381,6 +384,18 @@ module CustomOps
 		OnlyRightIsVector = 66
 
 
+function scdecl.CompareUnclear (|scdecl| d, |bool| MakesSenseVsZero, |bool|)
+	|| L = .typeinfo, || R = d.typeinfo
+	|| bitdiff = l.bitcount - r.bitcount
+	
+	if (l.issigned and bitdiff <= 0)
+		if (self is directnumber)
+			|| x = .exportposition
+			if x == 0
+				return !MakesSenseVsZero
+			return x|int64| < 0
+		return true
+
 
 function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |message| ErrPlace, |int|)
 	opt norefcounts
@@ -392,6 +407,15 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 	|| RNT		= RC.TypeInfo
 	|| LN		= LNT.NumericCountBoolsToo
 	|| RN		= RNT.NumericCountBoolsToo
+
+
+	if (comp is Comparison) and (lnt.issigned != rnt.issigned)
+		//   What are we comparing?   byte vs int is ok.   uint vs int NOT OK
+		if errplace.position == 927  //  if u > 0,  if 0 < u
+		if lc.CompareUnclear(rc, comp is less) or rc.CompareUnclear(lc, comp is more)
+			error (errplace, "Unclear signed vs unsigned comparison.")
+
+
 	ifn LN and LN == RN	   		// not both same numbers
 		if ln and rn and (ln == 1 or rn == 1)
 			if (CompOrSet)

@@ -120,7 +120,7 @@ function Message.CanGetAddress (|SCNode| name_space, |bool|)
 
 	|| T2 = TypeOfExpr(curr, name_space)				#require // might transform it
 	expect (curr == @thg or @dot) (curr, "Can't get address of this.")
-	expect (T2 isnt dataonlyconst)        (curr, "Can't get the address of a const.")
+	expect (T2 isnt NumberConst)        (curr, "Can't get the address of a const.")
 	
 	if (curr == @thg) and (t2 is local) and !(t2.IsNormalStruct or t2.IsCArray)
 		|| p = .ParentForAddress
@@ -372,7 +372,7 @@ function TypeOfUnit (ExprResolver)
 		if mul == 1
 			X = it.int
 	
-	d.ExportPosition = x
+	d.NumberConst = x
 	if it == str
 		str = it.name
 
@@ -381,35 +381,38 @@ function TypeOfUnit (ExprResolver)
 	return D
 
 
+function scdecl.numberconst (assigns:|uint64| v)
+	(.ExportPosition = v)
+	is NumberConst
+
 
 function TypeOfNum (ExprResolver)
 	opt norefcounts
+	|| p = compiler.numbers.makeplace(exp.name)
+	|| y = *p
+		return y|scdecl|
+	rz = TypeOfNumSub(exp, name_space, side)!
+	*p = rz
+
+
+function TypeOfNumSub (ExprResolver)
 	|| n = exp.name
-	|| z = n.iszero
 	if (n contains ".")
-		if z
-			if side
-				return typef64!.TypeNormal 
-			Return typefloat!.TypeNormal
 		|| d = Typefloat!.typenormal.copydecl
 		|| f8 = exp.float
+		|uint64| V
 		if (d.DeclSize == 4) and !side
-			d.ExportPosition = f8|float|.asint
+			V = f8|float|.asint
 		  else
-			debugat
-			d.ExportPosition = f8.asint
+			V = f8.asint
+		d.numberconst = V
 		Return D
 
-	if z
-		if side
-			return typeInt64!.TypeNormal 
-		return typeint!.typenormal
-	
 	|| Val = exp.int
 	|| d2 = typeint!.typenormal.copydecl
 	if (((Val << 32) >> 32) != Val)  or  side
 		d2.type = typeint64!
-	d2.exportposition = val
+	d2.numberconst = val
 	return d2
 	
 
@@ -1290,7 +1293,7 @@ function scdecl.ConstInRange (|message| RN, |scdecl| rt, |bool|)
 		if rn.isint 
 			return .ConstInRangeSub(rn.int)
 	
-	  elseif (rn == @thg) and (rt is DataOnlyConst) and rt.isnormalnumber and rt.isinteger
+	  elseif (rn == @thg) and (rt is NumberConst) and rt.isnormalnumber and rt.isinteger
 		return .ConstInRangeSub(rt.exportposition)
 
 	// if RN == @num... check the type of self big enough
@@ -1306,10 +1309,10 @@ function SCDecl.AssignabilityCheck (|message?| ln, |message!| RN, |scdecl| rc, |
 		expect ((LN.IsAssignable) and (self isnt const)) (LN, "Not assignable.")
 
 	if  .c_array > 0  or  rc.c_Array > 0
-		expect  (.c_array == rc.c_Array) (rn, "Carray sizes don't match")
+		expect  (.c_array == rc.c_Array) (rn, "Sizes don't match")
 		if rn in @sheb
 			return true						// ignore it:  x = {a,b,c}
-		error (rn, "Carrays can't be assigned.")
+		error (rn, "Not assignable.")
 
 	if rc is const
 		return (.ConstInRange(RN, rc))		#expect (RN, "Loses numeric info.") 
@@ -1352,7 +1355,6 @@ function TypeOfRel (ExprResolver) {
 	if opch == "is" or "isnt"
 		return LN.NiceIsFlagSyntax(opch, RN, name_space, side)
 	
-
 	side = nil
 	|| P = exp.niceParent
 	|| ParentFunc = P.func
@@ -1424,7 +1426,7 @@ function TypeOfRel (ExprResolver) {
 		Return TypeBool!.TypeNormal
 
 	if custom & CustomOps.TypeCastToBetter
-		return lc.better_numeric(rc, comp.Kind)
+		return lc.better_numeric(rc, comp.Kind, opch)
 	
 	Return LC
 	
@@ -1451,17 +1453,15 @@ function VecType (|bool| isfloat, |int| count, |SCClass|) {
 
 function scclass.NotConst (|scdecl|)
 // da egg didnt make it... :(
-// ORANGE GREEN FLAMES
 	opt norefcounts
 	require self
 	
 	|| d = ._NotConst
 		return d
 	d = .typenormal
-	if (d is dataOnlyconst)
-		D = D.copydecl	// erase IsConst, like collectdecls does...
-		(D Isnt DataOnlyConst)
-		// future opts could speed this up! like all da magic eggs... transform into a new space!!!
+	if (d is NumberConst)
+		D = D.copydecl		// erase IsConst, like collectdecls does...
+		(D Isnt NumberConst)
 	._NotConst = d			// a space of new eggs!!!
 	return D
 
@@ -1693,7 +1693,7 @@ function NewDeclNum (|SCDecl| D, |int64| N, |string| VarName, |Message|)
 	if  n < int.min  or  n > int.max
 		d.type = typeint64!
 	d.name = varname
-	d.exportposition = n
+	d.numberconst = n
 	if varname								// SetVarName later?
 		D.Default = rz
 	

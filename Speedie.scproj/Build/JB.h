@@ -1398,6 +1398,7 @@ extern JB_String* SC__Comp_LastTimeName;
 extern SCFunction* SC__Comp_MainFunc;
 extern Array* SC__Comp_ModuleList;
 extern SCFunction* SC__Comp_NewFunc;
+extern Dictionary* SC__Comp_Numbers;
 extern JB_String* SC__Comp_OriginalInputPath;
 extern SCFunction* SC__Comp_PrivateProperty;
 extern SCModule* SC__Comp_program;
@@ -1819,28 +1820,29 @@ extern Random JB__zalgo_R;
 #define kSC__ASM_BFLS (37)
 #define kSC__ASM_BNOT (35)
 #define kSC__ASM_BOR (32)
-#define kSC__ASM_BRA (48)
-#define kSC__ASM_BRAN (49)
+#define kSC__ASM_BRA (49)
+#define kSC__ASM_BRAN (50)
 #define kSC__ASM_BROL (38)
 #define kSC__ASM_BROR (39)
 #define kSC__ASM_BXNR (34)
 #define kSC__ASM_BXOR (33)
-#define kSC__ASM_CMPE (46)
-#define kSC__ASM_CMPF (45)
-#define kSC__ASM_CMPI (44)
-#define kSC__ASM_CMPN (47)
-#define kSC__ASM_CNTC (69)
+#define kSC__ASM_CMPE (47)
+#define kSC__ASM_CMPF (46)
+#define kSC__ASM_CMPI (45)
+#define kSC__ASM_CMPN (48)
+#define kSC__ASM_CMPS (44)
+#define kSC__ASM_CNTC (70)
 #define kSC__ASM_CONV (21)
 #define kSC__ASM_DIV (27)
 extern ASM_Encoder2 SC__ASM_Encoders[256];
 #define kSC__ASM_EROR (0)
-#define kSC__ASM_FADD (72)
-#define kSC__ASM_FADK (73)
-#define kSC__ASM_FDIV (76)
-#define kSC__ASM_FEXK (71)
-#define kSC__ASM_FFRC (77)
-#define kSC__ASM_FMLK (75)
-#define kSC__ASM_FMUL (74)
+#define kSC__ASM_FADD (73)
+#define kSC__ASM_FADK (74)
+#define kSC__ASM_FDIV (77)
+#define kSC__ASM_FEXK (72)
+#define kSC__ASM_FFRC (78)
+#define kSC__ASM_FMLK (76)
+#define kSC__ASM_FMUL (75)
 #define kSC__ASM_FNCX (5)
 #define kSC__ASM_FNCX2 (5)
 #define kSC__ASM_FNCX3 (6)
@@ -1849,25 +1851,25 @@ extern ASM_Encoder2 SC__ASM_Forms[32];
 #define kSC__ASM_FUNC2 (1)
 #define kSC__ASM_FUNC3 (2)
 #define kSC__ASM_JUMP (43)
-#define kSC__ASM_LUPD (51)
-#define kSC__ASM_LUPU (50)
-#define kSC__ASM_MEMM (70)
+#define kSC__ASM_LUPD (52)
+#define kSC__ASM_LUPU (51)
+#define kSC__ASM_MEMM (71)
 #define kSC__ASM_MUL (26)
 extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_PRNT (19)
-#define kSC__ASM_RALO (54)
+#define kSC__ASM_RALO (55)
 #define kSC__ASM_RARE (20)
-#define kSC__ASM_RD16 (63)
-#define kSC__ASM_RD1S (57)
-#define kSC__ASM_RD1U (56)
-#define kSC__ASM_RD2S (59)
-#define kSC__ASM_RD2U (58)
-#define kSC__ASM_RD4S (61)
-#define kSC__ASM_RD4U (60)
-#define kSC__ASM_RD8U (62)
+#define kSC__ASM_RD16 (64)
+#define kSC__ASM_RD1S (58)
+#define kSC__ASM_RD1U (57)
+#define kSC__ASM_RD2S (60)
+#define kSC__ASM_RD2U (59)
+#define kSC__ASM_RD4S (62)
+#define kSC__ASM_RD4U (61)
+#define kSC__ASM_RD8U (63)
 #define kSC__ASM_RET (17)
-#define kSC__ASM_RSDE (52)
-#define kSC__ASM_RSET (53)
+#define kSC__ASM_RSDE (53)
+#define kSC__ASM_RSET (54)
 #define kSC__ASM_SETK (22)
 #define kSC__ASM_SETN (4)
 #define kSC__ASM_SETN1 (4)
@@ -1878,16 +1880,16 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_SHRU (29)
 #define kSC__ASM_SUB (25)
 #define kSC__ASM_SWAP (18)
-#define kSC__ASM_TABL (55)
+#define kSC__ASM_TABL (56)
 #define kSC__ASM_TAIL (9)
 #define kSC__ASM_TAIL2 (9)
 #define kSC__ASM_TERN (42)
 #define kSC__ASM_TRAP (16)
-#define kSC__ASM_WR16 (68)
-#define kSC__ASM_WR1U (64)
-#define kSC__ASM_WR2U (65)
-#define kSC__ASM_WR4U (66)
-#define kSC__ASM_WR8U (67)
+#define kSC__ASM_WR16 (69)
+#define kSC__ASM_WR1U (65)
+#define kSC__ASM_WR2U (66)
+#define kSC__ASM_WR4U (67)
+#define kSC__ASM_WR8U (68)
 #define kSC__ASMCompareability_bcmp (1)
 #define kSC__ASMCompareability_both (1 + 2)
 #define kSC__ASMCompareability_bra (4)
@@ -2174,29 +2176,32 @@ extern Array* SC__NilReason_values;
 #define kSC__NilState_Stated (4)
 #define kSC__NilState_TrueValue (32)
 #define kSC__OpMode_Addition (16)
-#define kSC__OpMode_AND (8192)
-#define kSC__OpMode_AndOr (4096 | 8192)
+#define kSC__OpMode_AND (65536)
+#define kSC__OpMode_AndOr (32768 | 65536)
 #define kSC__OpMode_Assigns (2)
 #define kSC__OpMode_Bit (4)
-#define kSC__OpMode_CaseAware (32768)
+#define kSC__OpMode_CaseAware (262144)
 #define kSC__OpMode_Compare (1)
+#define kSC__OpMode_Comparison (512)
 #define kSC__OpMode_CompSet (1 | 2)
-#define kSC__OpMode_Custom (16384)
+#define kSC__OpMode_Custom (131072)
 #define kSC__OpMode_EqualOrNot (256)
-#define kSC__OpMode_ExactEquals (512 + (128 + (256 + 1)))
+#define kSC__OpMode_ExactEquals (4096 + (128 + (256 + 1)))
 #define kSC__OpMode_ExactlyEquals (128)
-#define kSC__OpMode_ExactNotEquals (512 + (256 + 1))
-#define kSC__OpMode_LargestFlag (131071)
-#define kSC__OpMode_LoseBits (2048)
+#define kSC__OpMode_ExactNotEquals (4096 + (256 + 1))
+#define kSC__OpMode_LargestFlag (1048575)
+#define kSC__OpMode_Less (2048)
+#define kSC__OpMode_LoseBits (16384)
 #define kSC__OpMode_MakesSigned (64)
 #define kSC__OpMode_Math (8)
 #define kSC__OpMode_MathLike (4 | 8)
-#define kSC__OpMode_NeedsCppFuncOnFloats (65536)
-#define kSC__OpMode_NilTest (512)
-#define kSC__OpMode_NoExtraBits (1024)
-#define kSC__OpMode_OR (4096)
-#define kSC__OpMode_SameOrLessBits (1024 | 2048)
-#define kSC__OpMode_Shift (32 + 1024)
+#define kSC__OpMode_More (1024)
+#define kSC__OpMode_NeedsCppFuncOnFloats (524288)
+#define kSC__OpMode_NilTest (4096)
+#define kSC__OpMode_NoExtraBits (8192)
+#define kSC__OpMode_OR (32768)
+#define kSC__OpMode_SameOrLessBits (8192 | 16384)
+#define kSC__OpMode_Shift (32 + 8192)
 #define kSC__OpMode_ShiftOnly (32)
 #define kJB__ProcessMode_AutoPrintErrors (4)
 #define kJB__ProcessMode_CaptureAll (1 | 4)
@@ -2220,9 +2225,8 @@ extern Array* SC__NilReason_values;
 #define kSC__SCDeclInfo_ClassObj (1024)
 #define kSC__SCDeclInfo_CompilerCreated (2048)
 #define kSC__SCDeclInfo_Const (8)
-#define kSC__SCDeclInfo_DataConst (4 + 8)
-#define kSC__SCDeclInfo_DataOnlyConst (4)
 #define kSC__SCDeclInfo_DclCopied (1048576 + (2 + (16 + (512 + (32 + 2048)))))
+#define kSC__SCDeclInfo_DirectNumber (4)
 #define kSC__SCDeclInfo_Disabled (8192)
 #define kSC__SCDeclInfo_GameFlyingMem (2097152)
 #define kSC__SCDeclInfo_Global (131072)
@@ -2230,6 +2234,7 @@ extern Array* SC__NilReason_values;
 #define kSC__SCDeclInfo_LargestFlag (268435455)
 #define kSC__SCDeclInfo_Local (32768 + 16384)
 #define kSC__SCDeclInfo_NewlyCreated (64)
+#define kSC__SCDeclInfo_NumberConst (4 + 8)
 #define kSC__SCDeclInfo_Param (16384)
 #define kSC__SCDeclInfo_Property (65536)
 #define kSC__SCDeclInfo_PropertyWasConstructed (4096)
@@ -2460,9 +2465,9 @@ void SC_CodeSorter__LeafsFirst();
 // Comp
 SCDecl* SC_Comp__AddGlobalConst(JB_String* Name, SCClass* C, NilState Dcl);
 
-void SC_Comp__AddGlobalConstNumWithStrClassInt64(JB_String* Name, SCClass* C, int64 Value);
+void SC_Comp__AddGlobalConstFloat(JB_String* Name, SCClass* C, JB_String* Value);
 
-void SC_Comp__AddGlobalConstNumWithStrClassStr(JB_String* Name, SCClass* C, JB_String* Value);
+void SC_Comp__AddGlobalConstNum(JB_String* Name, SCClass* C, int64 Value);
 
 bool SC_Comp__AddMain(int Mark);
 
@@ -3736,6 +3741,8 @@ SCObject* SC_TypeOfNothing(Message* Exp, SCNode* Name_space, Message* Side);
 
 SCObject* SC_TypeOfNum(Message* Exp, SCNode* Name_space, Message* Side);
 
+SCObject* SC_TypeOfNumSub(Message* Exp, SCNode* Name_space, Message* Side);
+
 SCObject* SC_TypeOfQues(Message* Exp, SCNode* Name_space, Message* Side);
 
 SCObject* SC_TypeOfReal(Message* Exp, SCNode* Name_space, Message* Side);
@@ -4532,7 +4539,7 @@ bool JB_CP_IsWhite(Codepoint Self);
 // DataTypeCode
 int JB_TC__Shift(DataTypeCode Self);
 
-SCClass* SC_TC_Better_Numeric_Sub(DataTypeCode Self, DataTypeCode T, OpMode Op);
+SCClass* SC_TC_Better_Numeric_Sub(DataTypeCode Self, DataTypeCode T, OpMode Op, Message* Where);
 
 int JB_TC_BitCount(DataTypeCode Self);
 
@@ -6709,6 +6716,8 @@ Ind JB_Str_FindSlash(JB_String* Self, int From);
 
 int JB_Str_FindTrailingSlashes(JB_String* Self);
 
+double JB_Str_Float(JB_String* Self);
+
 int64 JB_Str_Int(JB_String* Self);
 
 JB_String* SC_Str_InterfaceToBehaviour(JB_String* Self);
@@ -8206,7 +8215,7 @@ JB_String* SC_Decl_AutoCompleteName(SCDecl* Self);
 
 void SC_Decl_BecomeReal(SCDecl* Self);
 
-SCDecl* SC_Decl_Better_Numeric(SCDecl* Self, SCDecl* O, OpMode Mode);
+SCDecl* SC_Decl_Better_Numeric(SCDecl* Self, SCDecl* O, OpMode Mode, Message* Where);
 
 bool SC_Decl_CanNilCheck(SCDecl* Self);
 
@@ -8219,6 +8228,8 @@ bool SC_Decl_CanUseDefault(SCDecl* Self);
 bool SC_Decl_CanWrap(SCDecl* Self);
 
 SCDecl* SC_Decl_CheckMath(SCDecl* Self, Message* Exp);
+
+bool SC_Decl_CompareUnclear(SCDecl* Self, SCDecl* D, bool MakesSenseVsZero);
 
 bool SC_Decl_ConstInRange(SCDecl* Self, Message* RN, SCDecl* Rt);
 
@@ -8391,6 +8402,8 @@ bool SC_Decl_NilStated(SCDecl* Self);
 void SC_Decl_NoBlindCasts(SCDecl* Self, SCDecl* Old, Message* Exp, SCNode* Name_space);
 
 bool SC_Decl_NoFloat(SCDecl* Self, Message* Exp);
+
+void SC_Decl_numberconstSet(SCDecl* Self, uint64 V);
 
 bool SC_Decl_OperatorExact_isa(SCDecl* Self, SCClass* V);
 

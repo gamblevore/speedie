@@ -49,7 +49,6 @@ function compiler.ClearEnvs
 
 function compiler.SetupEnv
 	opt norefcounts
-
 	FlowControl.FlowMode = FlowControl.Off // can enable via "log"
 	.Clearenvs
 	app.PrefsInit(-1)

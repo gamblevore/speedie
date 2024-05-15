@@ -790,7 +790,7 @@ datatype uint64
 			curr = curr &~ value
 
 	iterator
-		|| i = 0
+		|uint64| i = 0
 		while (i < self)
 			yield i (i)
 			i++

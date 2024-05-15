@@ -224,10 +224,10 @@ function SCNode.CollectConstantsSub (|Message| ch)
 			  elseif (valuenode.isint) or (valuenode == @unit)
 				NewType.AssignabilityCheck(nil, ValueNode, OMGType)  
 				nextnum = valuenode.int
-				newitem.exportposition = nextnum
+				newitem.numberconst = nextnum
 				nextnum++
 			  else
-				newitem.exportposition = .CalculateConst(Valuenode)
+				newitem.numberconst = .CalculateConst(Valuenode)
 			
 			FixLater <~ NewItem
 			

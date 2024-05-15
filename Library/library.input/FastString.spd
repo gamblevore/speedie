@@ -94,12 +94,11 @@ class FastString {
 			n >>= 8
 
 	function EncodeLength (|uint64| N)  // maybe hInt is better? like how many speedie-strings are over 128 anyhow?
-		|| lim = 256-8					// you get 14 bits instead of 11 in two bytes.
 		|| L2 = N|byte|					// remove these two funcs? (one below)
-		if N >= lim
-			l2 = lim + n.lelength
+		if N >= 248
+			l2 = 248 + n.lelength
 		self <~ L2|byte|
-		if N >= lim
+		if N >= 248
 			.lint(N)
 
 	function uint64.LELength (|int|)    // could remove this also

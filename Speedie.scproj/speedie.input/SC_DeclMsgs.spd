@@ -114,7 +114,7 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 	if dcl.default isthing "nil"
 		dcl.nildeclared = nilstate.optional
 	func.args <~ dcl
-	(dcl isnt DataConst)
+	(dcl isnt NumberConst)
 	if dcl.name
 		(dcl is Param)
 		(dcl isnt Altered)
@@ -130,10 +130,8 @@ function scclass.RejectProperty (|scdecl| dcl)
 		|| t = dcl.typeinfo
 		|| bc = t.bitcount
 		if !t.issigned and (bc == 16 or 32 or 64)
-			error (dcl.source, "Unsigned values are discouraged.")
-			// nevermind... its used all over. including in faststring...
+			error (dcl.source, "Unsigned values are discouraged.") // nevermind... its used all over. including in faststring...
 */
-
 
 function scclass.CollectProp (|Message| msg, |bool|)
 	opt norefcounts
@@ -192,7 +190,7 @@ function Message.CollectFromBody (|SCNode| scarg, |bool|)
 	opt norefcounts
 	|| dcl = .CollectDecl(scarg, scarg, declmode.FunctionBody)
 		(dcl is body)
-		(dcl isnt dataconst)
+		(dcl isnt NumberConst)
 		|| def = dcl.Default
 			check (def != @thg or def.name ~!= dcl.name) (def, "Same name!")
 		return true

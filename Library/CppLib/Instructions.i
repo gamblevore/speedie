@@ -93,9 +93,13 @@
 ;
 ı JUMP: _
 	Code += l0;
+ı CMPS: 
+	__;
+	Code = CompIS(r, Op, Code);
+	___;
 ı CMPI: 
 	__;
-	Code = CompI(r, Op, Code);
+	Code = CompIB(r, Op, Code);
 	___;
 ı CMPF: 
 	__;
