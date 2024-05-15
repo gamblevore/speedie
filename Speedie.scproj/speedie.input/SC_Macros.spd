@@ -51,7 +51,7 @@ ASM.Forms[_1] = &_0.Encode // for now
 ".macro
 
 |macro|     ASMCopier  = "rz._0 = .r[_1]".macro
-|macro|		ASMSetter = "function asm._0 (assigns:|uint|, |asm|): return self ||| ((value << _1) >> _2)".macro
+|macro|		ASMSetter = "function asm._0 (assigns:|int|, |asm|): return self ||| ((value << _1) >> _2)".macro
 }
 
 

@@ -15,12 +15,6 @@ class Selector
 	syntax cast (|int|)
 		cpp_part Cast
 		return .ID
-	syntax cast (|uint|)
-		cpp_part UCast
-		return .ID
-	syntax cast (|uint16|)
-		cpp_part U16Cast
-		return .ID
 	function ID (|int|)
 		nil safe
 		if (self)

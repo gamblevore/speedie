@@ -1309,7 +1309,7 @@ function SCDecl.ConstCheck (|message|ln, |message| RN, |scdecl| rc, |bool|)
 	return true
 
 
-function message.AndOrExpansionTest (|uint|)
+function message.AndOrExpansionTest (|int|)
 	opt norefcounts
 
 	|| ln = .first

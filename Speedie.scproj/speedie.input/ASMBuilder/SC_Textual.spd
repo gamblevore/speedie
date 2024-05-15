@@ -17,7 +17,7 @@ extend ASMState
 		rz.expectlast
 
 		
-	function TryRotateConst (|int64| Value,  |message| where, |uint| reg,  |bool|)
+	function TryRotateConst (|int64| Value,  |message| where, |int| reg,  |bool|)
 
 	
 	function NumToReg (|int64| V, |message| exp, |int| Reg)
@@ -102,7 +102,7 @@ extend ASMState
 		return (op.pcount == write) #expect (list, "Too few params")
 
 	
-	function GetLabelJump (|message| P, |uint|)
+	function GetLabelJump (|message| P, |int|)
 		opt NoRefCounts
 		return *(textassembler.LabelsToDo.valuelower(p.name) #expect (P, "Label not found"))
 

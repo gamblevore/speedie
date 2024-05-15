@@ -6,7 +6,7 @@ class Task (list)
 		cpp_class JB_Task
 
 	|taskstate| 		State
-	|uint|				_Object
+	|int|				_Object
 	|&nil|				_func
 	
 	constructor

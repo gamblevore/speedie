@@ -61,7 +61,7 @@ class MessageID (stringshared)				// now is usefully used! :D
 				
 			return aa|uint64| < bb|uint64|
 
-/*function Message.Identify (|&Messagecompressor| d,  |[messageid]| table, |uint|)
+/*function Message.Identify (|&Messagecompressor| d,  |[messageid]| table, |int|)
 	opt NoRefCounts
 	|| s = self
 	|| Count = 0
@@ -121,7 +121,7 @@ struct MessageDecompressor
 struct MessageCompressor
 	linkage:cpp_part MCmp
 	|(dictionary of messageID)[64]| D
-	|uint|			Position
+	|int|			Position
 	
 	function MakePlace (|message| m, |&byte|)
 		opt norefcounts

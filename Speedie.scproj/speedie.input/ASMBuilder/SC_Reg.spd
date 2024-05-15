@@ -4,7 +4,7 @@
 prototype fn_asm (|&ASMState| self, |message| exp, |AsmReg| Dest=asmreg(), |int| Mode = 0, |AsmReg|)
 
 
-datatype ASMMath (uint)
+datatype ASMMath (int)
 	constants
 		|ASMMath|
 		Add
@@ -24,12 +24,13 @@ datatype ASMMath (uint)
 		Xor
 		Xnr
 		BitCorrect = 31 // removes garbage bits
+	
 	syntax is (|asmmath| r, |bool|)
 		return self == r
 
 
 
-datatype ASMCompareability (uint)
+datatype ASMCompareability (int)
 	Flags
 		bcmp
 		cmpi
@@ -40,7 +41,7 @@ datatype ASMCompareability (uint)
 
 
 
-datatype AsmReg (uint)
+datatype AsmReg (int)
 	default 0|AsmReg|
 	linkage
 		cpp_part Reg
@@ -80,7 +81,7 @@ datatype AsmReg (uint)
 		return .µtype == M
 
 	operator as (|ASMMath| M, |asmreg|)
-		return ((self|uint| &~ MathTypes) ||| (M<<16))|ASMReg|
+		return ((self|int| &~ MathTypes) ||| (M<<16))|ASMReg|
 
 	function Exists (|bool|)
 		return self|int|
@@ -116,7 +117,7 @@ datatype AsmReg (uint)
 		return ((self|int| & ~0xFFFF) ||| value)|asmreg|
 	
 	syntax is (|AsmReg| R, |bool|)
-		return (self|uint| & R|uint|) == r|uint|
+		return (self|int| & R|int|) == r|int|
 	
 	syntax is (|AsmReg| R, assigns:|bool|, |AsmReg|)
 		if (value)
@@ -157,10 +158,10 @@ datatype AsmReg (uint)
 //		return ((t2 == t1) or  (t1.IsInt and t2.IsInt)) #expect (err, "Type-mismatch")
 
 	operator as (|asmreg| A, |asmreg|)
-		return (self|uint| ||| A|uint|)|asmreg|
+		return (self|int| ||| A|int|)|asmreg|
 
 	operator asnt (|asmreg| A, |asmreg|)
-		return (self|uint| &~ A|uint|)|asmreg|
+		return (self|int| &~ A|int|)|asmreg|
 
 	function Set (|asmreg|)
 		return self as set
@@ -170,10 +171,6 @@ datatype AsmReg (uint)
 			return asmreg()
 		return dest
 		
-//	function TryUse (|asmreg|)
-//		if self is ReallyTemp
-//			return (self|uint| &~ ReallyTemp|uint|)|asmreg|
-	
 	module
 		function New (|asmreg|)
 			return const

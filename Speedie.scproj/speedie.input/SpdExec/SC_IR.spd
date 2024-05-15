@@ -8,7 +8,7 @@ struct FatASM
 	|byte|			Label	// 255 labels per function
 							// Can we remove the label? I don't like it. It seems OK though... unused bytes.
 	|uint16|		FileNum
-	|uint|			BytePos
+	|int|			BytePos
 	
 	operator isa (|int| m, |bool|)
 		return m == .op

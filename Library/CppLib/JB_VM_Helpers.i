@@ -252,28 +252,28 @@ AlwaysInline bool CompIBig_ (Register* r, ASM Op) {
 }
 
 AlwaysInline bool CompISmall_ (Register* r, ASM Op) {
-	auto A = &i1;
-	auto B = &i2;
-	switch (Cmp_Cmpu) {
-		CmpSub(0 , iA >= iB);
-		CmpSub(1 , iA <  iB);
-		CmpSub(2 , iA <= iB);
-		CmpSub(3 , iA >  iB);
+	auto A = &i1; // unavoidable... sadly.
+	auto B = &i2; // we could disable byte/byte comparisons in speedie
+	switch (Cmp_Cmpu) { // or typecast them up to a bigger type. otherwise we can't avoid.
+		CmpSub(0 , cA >= cB);
+		CmpSub(1 , cA <  cB);
+		CmpSub(2 , cA <= cB);
+		CmpSub(3 , cA >  cB);
 
-		CmpSub(4 , uA >= uB);
-		CmpSub(5 , uA <  uB);
-		CmpSub(6 , uA <= uB);
-		CmpSub(7 , uA >  uB);
+		CmpSub(4 , bA >= bB); // a lot of string processing will be comparing bA >= bB
+		CmpSub(5 , bA <  bB); // or other byte ops.
+		CmpSub(6 , bA <= bB);
+		CmpSub(7 , bA >  bB);
 
-		CmpSub(8 , A  >= B );
-		CmpSub(9 , A  <  B );
-		CmpSub(10, A  <= B );
-		CmpSub(11, A  >  B );
+		CmpSub(8 , zA >= zB ); // I'd like to disable the rest, though!
+		CmpSub(9 , zA <  zB ); // Why compare a signed16 bit value vs another?
+		CmpSub(10, zA <= zB );
+		CmpSub(11, zA >  zB );
 
-		CmpSub(12, UA >= UB);
-		CmpSub(13, UA <  UB);
-		CmpSub(14, UA <= UB);	default:
-		CmpSub(15, UA >  UB);
+		CmpSub(12, sA >= sB);
+		CmpSub(13, sA <  sB);
+		CmpSub(14, sA <= sB);	default:
+		CmpSub(15, sA >  sB);
 	};
 }
 

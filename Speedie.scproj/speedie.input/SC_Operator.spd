@@ -6,7 +6,7 @@
 // we have opposites... perhaps the negate operator could use it.
 
 
-datatype OpMode (uint)
+datatype OpMode (int)
 	flags
 		|OpMode|
 		CompSet  = [Compare, Assigns]
@@ -52,7 +52,8 @@ constructor (|string| name, |fn_opasm?| ASM, |OpMode| mode)
 	.name = name
 	.kind = mode
 	.asm = asm
-	dict[name] = self
+	if name
+		dict[name] = self
 
 syntax is (|OpMode| x, |opmode|)
 	return .kind & x
@@ -171,8 +172,8 @@ module {
 		.AddMath( "*",		"Mul",		&asmstate.Mul,		asmmath.mul)
 		.AddMath( "/",		"Divide",	&asmstate.Div,		asmmath.div)
 
-		.AddBit( "<<<",	"RotateLeft",	&asmstate.ROL,		asmmath.ROL,	opmode.shift)
-		.AddBit( ">>>",	"RotateRight",	&asmstate.ROR,		asmmath.ROR,	opmode.shift)
+		.AddBit( "",	"RotateLeft",	&asmstate.ROL,		asmmath.ROL,	opmode.shift)
+		.AddBit( "",	"RotateRight",	&asmstate.ROR,		asmmath.ROR,	opmode.shift)
 		.addbit( ">>",	"ShiftRight",	&asmstate.SHR,		asmmath.shru,	opmode.shift)
 		.addbit( "<<",	"ShiftLeft",	&asmstate.SHL,		asmmath.shl,	opmode.shiftonly) // can add bits
 		.AddBit( "(|)",	"BitOr",		&asmstate.BitOr,	asmmath.bor)

@@ -5,7 +5,7 @@ struct FastBuff
 	|&byte|		Start
 	|&byte|		End
 	|?string|	ReadFrom
-	|uint| 		ErrorReported
+	|int| 		ErrorReported
 	
 	destructor
 		visible
@@ -56,7 +56,7 @@ struct FastBuff
 		v = v min (.size-reduce)
 		return .start + v
 		
-	function CopyTo (|&byte| Dest, |int| Length, |uint|)
+	function CopyTo (|&byte| Dest, |int| Length, |int|)
 		|| A = .curr
 		require (A < .end and length > 0)
 		|| B = A + Length

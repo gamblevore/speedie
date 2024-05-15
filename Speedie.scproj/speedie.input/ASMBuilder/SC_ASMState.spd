@@ -16,7 +16,6 @@ struct ASMState
 	|byte|						VDecls
 	|byte|						VTmps
 	|uint64[32]|				Consts 
-	|uint|						AnyTrue	 
 
 	function AddFuncParams (|SCFunction| fn)
 		opt norefcounts
@@ -101,7 +100,7 @@ struct ASMState
 		pragma inline,  opt norefcounts,  cpp_part AddASM0
 		return self <~ (sm, dbg)
 
-	syntax append (|uint| code, |message| dbg, |&FatASM|)
+	syntax append (|int| code, |message| dbg, |&FatASM|)
 		cpp_part RequestOp
 		|| p = .curr
 		if p < .end
@@ -136,19 +135,19 @@ struct ASMState
 		error (where, "No free local variables.")
 
 
-	function OpenVars (|uint|)
+	function OpenVars (|int|)
 		return .vdecls ||| (.vtmps << 8)
 
 
-	function CloseVars (|uint| Old, |bool| DeclsToo=true)
+	function CloseVars (|int| Old, |bool| DeclsToo=true)
 		pragma inline
 		if DeclsToo
 			.vdecls = old & 255
-		.vtmps  = old >> 8
+		.vtmps  = old|uint| >> 8
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-		
+	
 	function Branch (|message| cond,  |&fatasm|)
 		|| dest = asmreg.newCondRequest
 		|| Src = .µ(cond, dest)
@@ -220,8 +219,8 @@ struct ASMState
 			dest = .TempMe(prms, dest)
 			dest.µtype = fn.RegType
 
-		|uint| Reg2
-		|uint| Reg3
+		|int| Reg2
+		|int| Reg3
 		|| sh = 0
 		|| OV = .OpenVars
 

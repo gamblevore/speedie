@@ -10,9 +10,9 @@ datatype NilRecord (Uint64)
 		item <<= 1
 		return (self >> item) & NilState.either
 		
-	function DepthOfVars (|uint|)
+	function DepthOfVars (|int|)
 		if self
-			return .log2|uint|>>1
+			return .log2|int|>>1
 
 
 struct NilRecorder 
@@ -27,7 +27,7 @@ struct NilRecorder
 		target debugnil: archonpurger.ndb4
 
 
-datatype NilCheckMode (uint)
+datatype NilCheckMode (int)
 	linkage: cpp_part khalai
 	flags
 		|NilCheckMode| 

@@ -39,7 +39,7 @@ constants
 
 
 
-datatype SCDeclInfo (uint)
+datatype SCDeclInfo (int)
 	flags
 		|SCDeclInfo|
 		Borrowed
@@ -236,7 +236,7 @@ class SCDecl (SCNamed) {
 			return (o.IsCArray == .IsCArray)
 
 
-	function PointeryMatchSub (|SCDecl| O, |int| TypeCast, |uint|)
+	function PointeryMatchSub (|SCDecl| O, |int| TypeCast, |int|)
 		opt norefcounts
 		|| OType = O.Type
 		|| t = .type

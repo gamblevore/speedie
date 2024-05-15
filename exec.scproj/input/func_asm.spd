@@ -1,7 +1,7 @@
 
 	
 struct ASMBlob
-	|uint|			Guard		// like boobiess or something
-	|uint|			CallCount		
+	|int|			Guard
+	|int|			CallCount		
 	|ASM[1]|		ASM
 

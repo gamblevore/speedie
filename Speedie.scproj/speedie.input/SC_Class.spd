@@ -5,7 +5,7 @@
 
 
 
-datatype ClassInfo (uint)
+datatype ClassInfo (int)
 	Flags
 		|ClassInfo|
 		ContainsParentClass

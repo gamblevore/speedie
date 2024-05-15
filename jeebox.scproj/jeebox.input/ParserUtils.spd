@@ -224,7 +224,7 @@ struct MessagePosition
 	
 	|MemoryLayer--|     Layer
 	|int|               Position
-	|uint|              Length
+	|int|               Length
 	|MsgParseFlags|		Flags
 	|uint16|            Tag
 	

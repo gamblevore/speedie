@@ -144,7 +144,7 @@ extend ASMState
 		return .equals(dest, l, r, exp)
 
 
-	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |uint| Mode,  |asmreg|)
+	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |int| Mode,  |asmreg|)
 		|| bl = l.µtype.bitcount, if bl != r.µtype.bitcount
 
 		mode ^= (dest is negate)
@@ -319,7 +319,7 @@ extend ASMState
 		
 		
 		|| F = .AddASM(asm.fADD, exp, dest, l)
-		f.r[2+subtract] = r
+		f.r[2+subtract] = r|uint|
 		f.r[4] = (!IsFloat)|int|
 		
 		return dest
@@ -389,7 +389,7 @@ extend ASMState
 	function DivInt    (fn_opasm)
 		|| Fat = .AddASM(asm.div, exp, 0, 0, L, R, dest.IntDivType)
 		|| Alt = l is alternate
-		fat.r[alt] = dest
+		fat.r[alt] = dest|uint|
 		return dest
 	
 	

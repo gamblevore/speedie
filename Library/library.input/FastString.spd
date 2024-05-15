@@ -246,7 +246,7 @@ class FastString {
 			.fieldstart(name)
 			self <~ data
 
-	function AppendMemory (|&byte| Str, |uint| N)
+	function AppendMemory (|&byte| Str, |int| N)
 		cpp_wrapper JB_FS_AppendMem_
 	
 

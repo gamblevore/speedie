@@ -99,7 +99,7 @@ class Memory
 	contains byte // should be byte?
 	
 
-	constructor (|int| ItemCount, |uint| ItemSize, |&byte| ptr, |byte| DeathAction=DataObject.kfree)
+	constructor (|int| ItemCount, |int| ItemSize, |&byte| ptr, |byte| DeathAction=DataObject.kfree)
 		cpp_part ConstructorPtr
 		.ItemSize = ItemSize
 		.deathaction = deathaction

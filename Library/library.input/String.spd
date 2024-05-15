@@ -479,7 +479,7 @@ class String
 
 
 	syntax cast ( |bool| )							{ cpp_wrapper JB_Str_Exists }
-//	syntax cast ( |&char| )							{ disabled,return .addr|&char| }
+
 	syntax cast ( |&byte| )
 		cpp_part CastByte
 		return .addr|&byte|

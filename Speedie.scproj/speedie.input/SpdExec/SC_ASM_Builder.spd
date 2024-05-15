@@ -5,16 +5,15 @@
 
 
 
-function FatASM.AddRegNum (|message| src, |uint| write, |uint| num)
+function FatASM.AddRegNum (|message| src, |int| write, |int| num)
 	opt norefcounts
-	if write < 5
+	if write <= 5
 		.r[write] = num // what if it's the last one...
-		check (.r[write] == num) (src, "Number out of bounds.")
 	  else
 		debugger
 
 
-function FatASM.AddRegParam (|message| src, |uint| write)
+function FatASM.AddRegParam (|message| src, |int| write)
 	opt norefcounts
 	.addregnum(src, write, src.regornum)
 
@@ -35,7 +34,7 @@ datatype µParam (uint16)
 	function Min (|int|)
 		if (.issigned)
 			return -.max
-	function BitSize (|uint|)
+	function BitSize (|int|)
 		return (self & 31) + 1
 	function IsNumber (|bool|)
 		return self & 64
@@ -56,11 +55,11 @@ datatype µParam (uint16)
 
 
 
-function message.RegOrNum (|bool| NeedReg = false, |uint|)
+function message.RegOrNum (|bool| NeedReg = false, |int|)
 	if !NeedReg and ((*.name).lowercase != 'r')
 		return .int
 	|| reg = .int(1)
 	if (reg <= 31)
-		return reg|uint|
+		return reg|int|
 	error (self, "Expected register between r0 and r31")
 

@@ -124,7 +124,7 @@ class FlowControl
 		|flowcontrol|			Flow			// DONT directly alter this 
 
 		|CompressionStats| 		Stats
-		|uint| 					Disabled		= int.max
+		|int| 					Disabled		= int.max
 		|byte|					FlowMode		= FlowControl.Validate
 		|bool|					AlwaysMove		= true
 		|bool|					BreakOnFail
@@ -190,7 +190,7 @@ class FlowControl
 
 
 
-datatype FlowControlStopper (uint)
+datatype FlowControlStopper (int)
 	syntax UsingComplete (|object| idk=nil)
 		flow off
 		flowcontrol.stop

@@ -67,7 +67,7 @@ class µForm
 			yield self[i] (i)
 			i++
 
-	function AddRemainder (|uint| U)
+	function AddRemainder (|int| U)
 		.addp( 32 - .TotalBits, µform.num ||| U)
 	
 	function LoadParam (|string| pl, |message| place)

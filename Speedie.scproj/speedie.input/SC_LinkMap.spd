@@ -1,7 +1,7 @@
 
 
 module LinkMap 
-	|uint| 			CurrID
+	|int| 			CurrID
 
 	function scfunction.CanLinkTo (|SCNode| To, |bool|)
 		if to.LinkedFrom < LinkMap.CurrID

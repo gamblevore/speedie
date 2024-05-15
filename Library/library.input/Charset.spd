@@ -33,10 +33,10 @@ class Charset
 	operator contains (|string| Data, |bool|)
 		return !Data.OutCharSet(self)
 		
-	syntax Access (|uint| c, assigns:|bool|)
+	syntax Access (|int| c, assigns:|bool|)
 		cpp_wrapper JB_CS_HasCharSet
 	
-	syntax Access (|uint| C, |bool|)
+	syntax Access (|int| C, |bool|)
 		cpp_wrapper JB_CS_HasChar
 		
 	helper NextInCharset (|&int| p, |bool|)

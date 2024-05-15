@@ -19,7 +19,6 @@
 class CppRefs
 	|uint16|			DisturbParams
 	|bool|				Owned
-//	|uint|				Test
 	|[string]?|			Disturbs		// cant be a class cos this is called BEFORE the classes are inited.
 										// awkward.
 	

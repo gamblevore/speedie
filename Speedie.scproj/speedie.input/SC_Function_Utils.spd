@@ -148,11 +148,8 @@ function string.UnicodeSafeName (|faststring| fs_in=nil, |string|)
 
 
 
-constants
-	kASM			= 0x3F			// 1 to 0x3F is used by the ASM
 
-
-datatype SCBlockage (uint)
+datatype SCBlockage (int)
 	flags
 		Bits		= 0b111100000	// reserve 1 more bit
 	

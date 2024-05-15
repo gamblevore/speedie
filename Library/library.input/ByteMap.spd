@@ -17,7 +17,7 @@ class ByteMap
 	function Clear (|int| to=-1)
 		cpp_wrapper JB_BM_Clear
 
-	syntax Access  (|uint| C, |byte|)
+	syntax Access  (|int| C, |byte|)
 		cpp_wrapper JB_BM_Access
 	
 	syntax Access  (|string| S, assigns:|byte|)
@@ -25,5 +25,5 @@ class ByteMap
 		for c in s
 			self[c] = value
 	
-	syntax Access (|uint| C, assigns:|byte|)
+	syntax Access (|int| C, assigns:|byte|)
 		cpp_wrapper JB_BM_AccessSet

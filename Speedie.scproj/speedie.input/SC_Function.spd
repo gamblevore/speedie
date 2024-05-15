@@ -3,16 +3,18 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-datatype DotUseType (uint)
+
+datatype DotUseType (int)
 	flags
 		|DotUseType|
 		Property
 		Memory
+		
 	syntax is (|DotUseType| d, |bool|)
 		return self == d
 
 
-datatype FunctionType (uint)
+datatype FunctionType (int)
 	flags
 		|FunctionType|
 		Constructor
@@ -43,8 +45,10 @@ datatype FunctionType (uint)
 		HidesProperties
 			
 		ConOrDes = Constructor + Destructor
+		
 	syntax is (|FunctionType| t, |bool|)
 		return self & t
+
 
 
 class SCFunction (SCNode) {
@@ -363,7 +367,7 @@ function ArgsMatch1 (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming
 	return macro
 
 
-function uint.IsNormalMatch (|bool|)
+function int.IsNormalMatch (|bool|)
 	return (self == kSimpleMatch or kNumericMatch or kSuperClassMatch)
 
 

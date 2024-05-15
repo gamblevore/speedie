@@ -53,7 +53,7 @@ function scdecl.FastMatch (|SCDecl| O, |bool|)
 	return o.c_array == .c_array
 
 
-function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil, |uint|)
+function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil, |int|)
 // Make TypeCast = true able to deal with... pointers to structs!
 	real self
 	if (o == nil)

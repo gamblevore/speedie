@@ -247,6 +247,6 @@ extend string
 		errorreceiver.NewError(nil, self)
 
 
-datatype ErrorMarker (uint)
+datatype ErrorMarker (int)
 	syntax cast (|bool|)
 		return stderr.errorcount == self

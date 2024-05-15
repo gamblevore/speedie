@@ -86,7 +86,7 @@ role JBin (Faststring)
 		.AddMemory(type, name.length, false, name|&byte|)
 	
 	function AddMemory (|syntax| type, |uint64| L, |bool| GoIn=false, |?&byte| data=nil, |jbinleaver|)
-		|uint| T = (type|uint|<<1) ||| (goin)
+		|int| T = (type|int|<<1) ||| (goin)
 		self <~ T|byte|
 		.hint(L)
 		if data
@@ -99,7 +99,7 @@ role JBin (Faststring)
 		.length += 6
 		return .length
 
-	function CloseSection (|uint| c)			// closestream
+	function CloseSection (|int| c)			// closestream
 		|| CurrLen = .length
 		expect (CurrLen >= c) (self, "Unable to close section")
 		.length = c - 6

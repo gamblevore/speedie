@@ -123,10 +123,10 @@ datatype DataTypeCode (uint16)
 	function SameBasicType (|datatypecode| b, |bool|)
 		return (.isfloat == b.isfloat) // this will do for now.
 	
-	function Register (|uint|)
+	function Register (|int|)
 		return self >> 11
 	
-	function Register (assigns:|uint|, |Datatypecode|)
+	function Register (assigns:|int|, |Datatypecode|)
 		return (self &~ (31<<11)) ||| (value << 11)
 	
 	// unused?
