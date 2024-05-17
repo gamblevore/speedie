@@ -48,12 +48,12 @@ function Perry.CreateProj (|string| path)
 	  else
 		expect (!path.fileexists) (path, "Can't create over existing project.")
 
-		proj.child("input/main.spd")!.data(Main) #require
+		proj.child("input/main.spd").data(Main) #require
 
 		|| R = defaultfiles.Roots
 		|| T = defaultfiles.Todo
-		proj.child(".perry")!.data = R
-		proj.child("input/.todo")!.data = T
+		proj.child(".perry").data = R
+		proj.child("input/.todo").data = T
 	IdeAddProj(path)
 
 

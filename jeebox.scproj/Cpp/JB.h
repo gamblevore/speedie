@@ -2221,6 +2221,8 @@ Array* JB_Str_ByteSplit(JB_String* Self);
 
 CharSet* JB_Str_CharSetWithBool(JB_String* Self, bool Range);
 
+JB_String* JB_Str_Child(JB_String* Self, JB_String* Cname);
+
 JB_String* JB_Str_Compress(JB_String* Self, int Strength, CompressionStats* St);
 
 void JB_Str_CompressInto(JB_String* Self, JB_Object* Fs, int Strength, CompressionStats* St);
@@ -2289,8 +2291,6 @@ Message* JB_Str_ParseJbin(JB_String* Self, int64 Max);
 
 Message* JB_Str_ParseSub(JB_String* Self, Syntax Owner, bool AllowDecomp);
 
-JB_String* JB_Str_PathDir(JB_String* Self);
-
 JB_String* JB_Str_Preview(JB_String* Self, int N);
 
 Array* JB_Str_Split(JB_String* Self, byte Sep);
@@ -2306,8 +2306,6 @@ void JB_Str_SyntaxExpect(JB_String* Self);
 int JB_Str_TrimLastSub(JB_String* Self, byte B);
 
 JB_String* JB_Str_TrimSlashes(JB_String* Self, bool Pathfix);
-
-JB_String* JB_Str_TrimStart(JB_String* Self, JB_String* S, bool All);
 
 JB_String* JB_Str_Unescape(JB_String* Self);
 

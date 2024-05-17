@@ -629,7 +629,7 @@ extend PerryIDE
 
 
 	function PerryFile (|file!|)
-		return .project.child(".perry")!
+		return .project.child(".perry")
 	
 	
 	function LoadConfSub

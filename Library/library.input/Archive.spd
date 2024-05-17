@@ -29,7 +29,7 @@ role FileArchive (message)
 	function Install (|message| item, |file| base, |bool| overwrite, |int64|)
 		|| path = item.name
 			|| data = item..data.value
-			|| chld = base.child(path)!
+			|| chld = base.child(path)
 			if overwrite and chld.isdir
 				chld.DeleteAll
 			if chld.Data(data)

@@ -407,7 +407,7 @@ class File (String)
 			return .copyto(dest.file, AttrOnly)
 
 		for f in self
-			rz = .child(f)!.copyall(dest[f]) 
+			rz = .child(f).copyall(dest[f]) 
 			if !rz
 				exit
 	
@@ -442,7 +442,7 @@ class File (String)
 	iterator Files
 		.ListStart
 		while ( .MoveNext )
-			yield self.child(.CurrChild)!
+			yield self.child(.CurrChild)
 		.listend
 	
 

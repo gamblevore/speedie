@@ -4707,6 +4707,29 @@ CharSet* JB_Str_CharSetWithBool(JB_String* Self, bool Range) {
 	return JB_CS_Constructor(nil, Self, Range);
 }
 
+JB_String* JB_Str_Child(JB_String* Self, JB_String* Cname) {
+	if ((!JB_Str_Exists(Self))) {
+		return Cname;
+	}
+	int C = ((int)(JB_Str_Last(Self, 0) == '/'));
+	C = (C + (JB_Str_First(Cname) == '/'));
+	if (C == 1) {
+		return JB_Str_OperatorPlus(Self, Cname);
+	}
+	if (C == 0) {
+		JB_String* _tmPf0 = JB_Incr(JB_Str_OperatorPlus(JB_LUB[121], Cname));
+		JB_String* _tmPf3 = JB_Incr(JB_Str_OperatorPlus(Self, _tmPf0));
+		JB_Decr(_tmPf0);
+		JB_SafeDecr(_tmPf3);
+		return _tmPf3;
+	}
+	JB_String* _tmPf1 = JB_Incr(JB_Str_Range(Cname, 1, JB_int__Max()));
+	JB_String* _tmPf2 = JB_Incr(JB_Str_OperatorPlus(Self, _tmPf1));
+	JB_Decr(_tmPf1);
+	JB_SafeDecr(_tmPf2);
+	return _tmPf2;
+}
+
 JB_String* JB_Str_Compress(JB_String* Self, int Strength, CompressionStats* St) {
 	FastString* J = JB_Incr(JB_bin_Constructor0(nil, 0));
 	JB_Str_CompressInto(Self, J, Strength, St);
@@ -5033,13 +5056,6 @@ Message* JB_Str_ParseSub(JB_String* Self, Syntax Owner, bool AllowDecomp) {
 	return ((Message*)Into);
 }
 
-JB_String* JB_Str_PathDir(JB_String* Self) {
-	if (JB_Str_Exists(Self) and (JB_Str_Last(Self, 0) != '/')) {
-		return JB_Str_OperatorPlus(Self, JB_LUB[121]);
-	}
-	return Self;
-}
-
 JB_String* JB_Str_Preview(JB_String* Self, int N) {
 	//visible;
 	if (JB_Str_Length(Self) <= N) {
@@ -5160,17 +5176,6 @@ JB_String* JB_Str_TrimSlashes(JB_String* Self, bool Pathfix) {
 	}
 	JB_SafeDecr(Rz);
 	return Rz;
-}
-
-JB_String* JB_Str_TrimStart(JB_String* Self, JB_String* S, bool All) {
-	int I = 0;
-	while (JB_Str_MidEquals(Self, I, S, false)) {
-		I = (I + JB_Str_Length(S));
-		if ((!All)) {
-			break;
-		}
-	};
-	return JB_Str_Range(Self, I, JB_int__Max());
 }
 
 JB_String* JB_Str_Unescape(JB_String* Self) {
@@ -5917,24 +5922,16 @@ Dictionary* JB_Dict__Reverse(Dictionary* Dict) {
 
 
 JB_File* JB_File_Child(JB_File* Self, JB_String* Name) {
-	JB_String* Name2 = JB_Incr(JB_Str_TrimStart(Name, JB_LUB[121], true));
-	if (JB_Str_Exists(Name2)) {
-		JB_String* _tmPf1 = JB_Incr(JB_Str_PathDir(Self));
-		JB_String* _tmPf0 = JB_Incr(JB_Str_OperatorPlus(_tmPf1, Name));
-		JB_Decr(_tmPf1);
-		JB_File* _tmPf3 = JB_Incr(JB_File_Constructor(nil, _tmPf0));
+	if ((!JB_Str_Exists(Name))) {
+		JB_String* _tmPf0 = JB_Incr(JB_Str_OperatorPlus(JB_LUB[274], Self));
+		JB_File_Fail(Self, _tmPf0);
 		JB_Decr(_tmPf0);
-		JB_Decr(Name2);
-		JB_SafeDecr(_tmPf3);
-		return _tmPf3;
 	}
-	JB_Decr(Name2);
-	if (true) {
-		JB_String* _tmPf2 = JB_Incr(JB_Str_OperatorPlus(JB_LUB[274], Self));
-		JB_File_Fail(Self, _tmPf2);
-		JB_Decr(_tmPf2);
-	}
-	return nil;
+	JB_String* _tmPf1 = JB_Incr(JB_Str_Child(((JB_String*)Self), Name));
+	JB_File* _tmPf2 = JB_Incr(JB_File_Constructor(nil, _tmPf1));
+	JB_Decr(_tmPf1);
+	JB_SafeDecr(_tmPf2);
+	return _tmPf2;
 }
 
 bool JB_File_Opened(JB_File* Self) {
@@ -8344,7 +8341,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024051713);
+	return (2024051718);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8356,4 +8353,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 549422235751884040 2949288912827223679
+// 7796578953066441599 8416008063961578873 2949288912827223679
