@@ -149,7 +149,9 @@ $SpdTerm $Speedie/Perry.scproj
 
 
 function app.gen (|string| plat, |bool| IsCurrentPlatform) {
-expect !.args (.args, "This script takes no arguments.")
+|| IsGit = app.args.Last isa "git"
+if !IsGit
+	expect !.args (.args, "This script takes no arguments: " + .args.render)
 vars.initvars(plat)
 
 
