@@ -285,12 +285,10 @@ function Transform ()
 		.Badness |= 1
 	  else
 		.CallParents // hehe 🥰
-		if .CanBuildConstructor			// this isn't ideal. we really want to do some of this BEFORE transform
-			.BuildConstructorDestructor // specifically filling in missing constructor elements.
-										// .FillInMissingConstructorDefaults actually calls newdefaultrel...
-										// so it can inject code thats not transformed.
-										// BUT the constructor build code relies on transform being called first
-										// so its kinda hard to fix.
+		if .CanBuildConstructor
+			.BuildConstructorDestructor
+			Tran_All( self, n, space )
+
 	CurrFunc = nil
 	scmodule.curr = nil
 
@@ -1521,10 +1519,9 @@ function Tran_Visible (TranFunc)
 
 
 function Tran_Return (TranFunc)  // exitter
-	expect (fn) (node, "Only use this on functions")
-	if node.ASMType == asmtmp.kreturn
-		debugat
+	require node.ASMType != asmtmp.kreturn
 	node.ASMType = asmtmp.kreturn
+	expect (fn) (node, "Only use this on functions")
 	
 	if !node.islast
 		expect (fn isnt ConOrDes)   (node, "You can’t return in a constructor or destructor")

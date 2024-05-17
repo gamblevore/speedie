@@ -1,10 +1,9 @@
 
 class CheeseShop
-	|dictionarylower of string| inventory
+	|dictionarylower of string| inventory = dictionary()
 	|string| ClerkName
 
 	constructor (|message| cfg)
-		.inventory = Dictionary()
 		for name in cfg["cheeses"]
 			.inventory[name.name] = name.name
 		.clerkName = cfg["clerk"].Value

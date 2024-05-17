@@ -358,7 +358,7 @@ function PrepareAST
 		rz.PrepareAll
 
 
-function ImportAll
+function ImportAll 
 	.Timer( "Read" )
 	require .Stage( "Finding Files" )
 	
@@ -558,6 +558,7 @@ function ImportAll
 	scfunction.currfunc = nil
 		
 
+
 function LoadSuperClasses
 	opt norefcounts
 	for c in .ClassList
@@ -725,8 +726,7 @@ function scfunction.IsARealSpdFunc (|bool|)
 
 
 function scfunction.CanBuildConstructor (|bool|)
-	if (self is ConOrDes) and .IsARealSpdFunc
-		return true
+	return (self is ConOrDes) and .IsARealSpdFunc
 
 
 

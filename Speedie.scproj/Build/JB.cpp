@@ -1975,7 +1975,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112458359938257));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112458688336952));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3258,7 +3258,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024051721));
+	JB_FS_AppendInt32(_fsf0, (2024051723));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7845,7 +7845,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024051721));
+	JB_FS_AppendInt32(_fsf0, (2024051723));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -16126,9 +16126,6 @@ AsmReg SC_ASMtmp__Not(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 AsmReg SC_ASMtmp__Num(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 	SCDecl* D = SC_Msg_FastDecl(Exp);
 	uint64 X = D->ExportPosition;
-	if ((X == 0) != SC_Msg_IsZero(Exp)) {
-		debugger;
-	}
 	AsmReg R = SC_Pac_FindConst((&SC__Pac_Sh), X);
 	if (SC_Reg_SyntaxCast(R)) {
 		return R;
@@ -18030,9 +18027,6 @@ AsmReg SC_Pac_Equals(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* E
 		R = T;
 	}
 	bool Negate = SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate);
-	if ((!SC_Reg_Reg(Dest)) and (!SC_Reg_SyntaxIs(Dest, kSC__Reg_CondRequest))) {
-		debugger;
-	}
 	if (SC_Reg_IsInt(Dest)) {
 		SC_Pac_EqualsInt(Self, Dest, L, R, Exp, Negate);
 	}
@@ -19000,17 +18994,11 @@ NilState SC_nil__CompareObjs(Message* Ll, Message* Rr, NilCheckMode Test, SCOper
 }
 
 NilState SC_nil__Continue(Message* Msg, NilCheckMode Test) {
-	if ((!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false))) {
-		debugger;
-	}
 	SC__nil_Loops.ContRecord = (SC__nil_Loops.ContRecord | SC_nil__EndBlock());
 	return 0;
 }
 
 NilState SC_nil__Debugger(Message* Msg, NilCheckMode Test) {
-	if ((!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false))) {
-		debugger;
-	}
 	return 0;
 }
 
@@ -19057,9 +19045,6 @@ NilState SC_nil__Dummy(Message* Msg, NilCheckMode Test) {
 }
 
 NilState SC_nil__Exit(Message* Msg, NilCheckMode Test) {
-	if ((!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false))) {
-		debugger;
-	}
 	SC__nil_Loops.ExitRecord = (SC__nil_Loops.ExitRecord | SC_nil__EndBlock());
 	SC__nil_Loops.HasEscape = true;
 	return 0;
@@ -19077,9 +19062,6 @@ void SC_nil__ExterminateZergBugs(SCFunction* F) {
 }
 
 NilState SC_nil__Fail(Message* Msg, NilCheckMode Test) {
-	if ((!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false))) {
-		debugger;
-	}
 	SC__nil_OldPrint = JB__Err_AutoPrint;
 	JB__Err_AutoPrint = 0;
 	return kSC__NilState_Borked;
@@ -19252,9 +19234,6 @@ NilState SC_nil__Function(Message* Msg, NilCheckMode Test) {
 }
 
 NilState SC_nil__If(Message* Msg, NilCheckMode Test) {
-	if ((!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false))) {
-		debugger;
-	}
 	Message* Cond = ((Message*)JB_Ring_First(Msg));
 	Message* Arg1 = ((Message*)JB_Ring_NextSib(Cond));
 	Message* Else = ((Message*)JB_Ring_NextSib(Arg1));
@@ -19443,9 +19422,6 @@ NilState SC_nil__RealBool(bool B) {
 }
 
 NilState SC_nil__Rejoin(Message* Msg, NilCheckMode Test) {
-	if ((!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false))) {
-		debugger;
-	}
 	return SC_nil__Jump(((Message*)JB_Ring_First(Msg)), Test);
 }
 
@@ -19454,9 +19430,6 @@ NilState SC_nil__Rel(Message* Msg, NilCheckMode Test) {
 }
 
 NilState SC_nil__Return(Message* Msg, NilCheckMode Test) {
-	if ((!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false))) {
-		debugger;
-	}
 	NilState V = SC_nil__DetectStillChecks(((Message*)JB_Ring_First(Msg)));
 	SC__nil_Loops.ExitRecord = (SC__nil_Loops.ExitRecord | kSC__NilState_Basic);
 	SC_nil__DeclKill();
@@ -19673,9 +19646,6 @@ NilState SC_nil__VariableSet(SCDecl* Recv, Message* RecvMsg, SCDecl* Sent, Messa
 }
 
 NilState SC_nil__While(Message* Msg, NilCheckMode Test) {
-	if ((!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false))) {
-		debugger;
-	}
 	Message* Cond = ((Message*)JB_Ring_First(Msg));
 	MaybeBool CondTest = SC_Msg_IsAlwaysBool(Cond);
 	if ((!((!JB_MaybeBool_IsFalse(CondTest)) and ((bool)SC_nil_BranchEnter((&SC__nil_T), Msg))))) {
@@ -20360,7 +20330,7 @@ void JB_Saver_AppendString(ObjectSaver* Self, JB_String* S) {
 }
 
 void JB_Saver_Destructor(ObjectSaver* Self) {
-	if (Self->CantSaveThis) {
+	if ((Self->CantSaveThis)) {
 		JB_Object_Fail(Self->CantSaveThis, JB_LUB[1182]);
 	}
 	JB_Clear(Self->Dest);
@@ -22333,6 +22303,8 @@ void SC_Cpp__C_RenderRel(Message* Self, FastStringCpp* Fs) {
 	Message* First = ((Message*)JB_Ring_First(Self));
 	Message* Op = ((Message*)JB_Ring_NextSib(First));
 	Message* Last = ((Message*)JB_Ring_NextSib(Op));
+	float X = std::fmod(1.0f, 2.0f);
+	double Y = std::fmod(((double)1.0f), ((double)2.0f));
 	SCOperator* Scop = ((SCOperator*)Op->Obj);
 	if ((!Scop)) {
 		debugger;
@@ -23292,7 +23264,7 @@ int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* Self) {
 }
 
 void JB_Rec_AppendErr(JB_ErrorReceiver* Self, JB_Error* Err) {
-	bool CanPrint = (!JB_Rec_BadCount(Self)) and ((bool)JB__Err_AutoPrint);
+	bool CanPrint = false;
 	//"Speedie" // useful marker for debugging...;
 	JB_Rec_Incr(Self, Err, true);
 	if ((!(JB_Str_Exists(Err->Path)))) {
@@ -29888,9 +29860,6 @@ ASMtmp SC_Msg_ASMType(Message* Self) {
 }
 
 void SC_Msg_ASMTypeSet(Message* Self, ASMtmp Value) {
-	if (JB_ObjectID(Self) == 0) {
-		debugger;
-	}
 	Value = ((Self->Flags & (~63)) | Value);
 	Self->Flags = Value;
 }
@@ -30865,7 +30834,10 @@ SCDecl* SC_Msg_CollectDecl(Message* Self, SCNode* P, SCNode* Recv, int Mode, SCC
 	return Dcl;
 }
 
-bool SC_Msg_CollectFromBody(Message* Self, SCNode* Scarg) {
+void SC_Msg_CollectFromBody(Message* Self, SCNode* Scarg) {
+	if (Self->Obj) {
+		return;
+	}
 	SCDecl* Dcl = SC_Msg_CollectDecl(Self, Scarg, Scarg, kSC__DeclMode_FunctionBody, nil, nil);
 	if (Dcl) {
 		(SC_Decl_SyntaxIsSet(Dcl, kSC__SCDeclInfo_Body, true));
@@ -30876,9 +30848,7 @@ bool SC_Msg_CollectFromBody(Message* Self, SCNode* Scarg) {
 				JB_Msg_SyntaxExpect(Def, JB_LUB[1099]);
 			}
 		}
-		return true;
 	}
-	return false;
 }
 
 JB_String* SC_Msg_CollectFuncTableName(Message* Self) {
@@ -44650,10 +44620,7 @@ void SC_Func_CallSuperMem(SCFunction* Self, SCFunction* Fn) {
 }
 
 bool SC_Func_CanBuildConstructor(SCFunction* Self) {
-	if ((SC_Func_SyntaxIs(Self, kSC__FunctionType_ConOrDes)) and SC_Func_IsARealSpdFunc(Self)) {
-		return true;
-	}
-	return false;
+	return (SC_Func_SyntaxIs(Self, kSC__FunctionType_ConOrDes)) and SC_Func_IsARealSpdFunc(Self);
 }
 
 bool SC_Func_CanCompare(SCFunction* Self, SCDecl* Against) {
@@ -44965,7 +44932,7 @@ SCFunction* SC_Func_Constructor(SCFunction* Self, Message* Msg) {
 	Self->Badness = 0;
 	Self->LinkTo = nil;
 	Self->TableId = 65535;
-	if (Msg) {
+	if ((Msg)) {
 		SC__Comp_stFuncs++;
 	}
 	return Self;
@@ -46732,6 +46699,7 @@ void SC_Func_Transform(SCFunction* Self) {
 		SC_Func_CallParents(Self);
 		if (SC_Func_CanBuildConstructor(Self)) {
 			SC_Func_BuildConstructorDestructor(Self);
+			SC_Func__Tran_All(Self, N, Space);
 		}
 	}
 	SC__Func_CurrFunc = nil;
@@ -48999,14 +48967,14 @@ void SC_Func__Tran_ResultFinish(SCFunction* F, Message* R_z, SCNode* Space) {
 }
 
 void SC_Func__Tran_Return(SCFunction* Fn, Message* Node, SCNode* Name_space) {
+	if (SC_Msg_ASMType(Node) == kSC__ASMtmp_kReturn) {
+		return;
+	}
+	(SC_Msg_ASMTypeSet(Node, kSC__ASMtmp_kReturn));
 	if ((!Fn)) {
 		JB_Msg_SyntaxExpect(Node, JB_LUB[1010]);
 		return;
 	}
-	if (SC_Msg_ASMType(Node) == kSC__ASMtmp_kReturn) {
-		JB_DoAt(1);
-	}
-	(SC_Msg_ASMTypeSet(Node, kSC__ASMtmp_kReturn));
 	if ((!JB_Tree_IsLast(Node))) {
 		if ((!(!SC_Func_SyntaxIs(Fn, kSC__FunctionType_ConOrDes)))) {
 			JB_Msg_SyntaxExpect(Node, JB_LUB[1303]);
@@ -49851,4 +49819,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -5660776441806354224 3240329495552101757
+// -8782907536749697531 3240329495552101757
