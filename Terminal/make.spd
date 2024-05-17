@@ -77,7 +77,7 @@ module Vars
 		if plat ~= "osx"
 			shared = "dynamiclib"
 			ext = "dylib"
-			CFlags += " -arch=arm64  -arch=x86_64  -lc++"
+			CFlags += " -lc++"
 		if plat ~= "linux"
 			CFlags += " -rdynamic"
 			LinkLibFlags += "-lrt -pthread"
