@@ -3,7 +3,7 @@
 main // main { 
 	SDLApp.init
 	Perry.Startup
-	notifications.ShowTip
+	notifications.ShowTip( file://tips.box )
 	return SDLApp.Run
 	
 

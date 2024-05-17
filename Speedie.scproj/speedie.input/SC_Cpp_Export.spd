@@ -763,8 +763,8 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| ForLib = arg.find(@tmp, "libraryname")[@str]
 			|| FolName = arg.find(@tmp, "exportplace")[@str]
 				|| Fol = Compiler.BaseProjectPath![ FolName.name ]
-					if fol.mustexist("Create API-Header for API: ${arg.filelocation}")
-						rz = Fol[compiler.ProjectName + "_api.h"]
+				if fol.mustexist("Create API-Header for API: ${arg.filelocation}")
+					rz = Fol[compiler.ProjectName + "_api.h"]
 	
 	
 	function WriteFuncSub (|SCFunction| F, |string| E, |FastStringCpp| T)

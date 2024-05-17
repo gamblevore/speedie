@@ -6,6 +6,7 @@ import "Speedie.scproj/speedie.input/AutoCompleteHelpers"
 
 linkage
 	cpp_part Per
+	apps_folder true
 	 
  
 conf

@@ -189,7 +189,7 @@ function PrefPath (|string|)
 		rz = ""
 	
 	if *rz != '/'
-		rz = file.appPrefs(rz)
+		rz = file.Prefs(rz)
 	check (*rz == '/' or '~') ("App pref path should be 'default' or a full-path.")
 
 
@@ -335,14 +335,6 @@ function ShowURL (|string| path)
 
 function ShowURLC (|cstring| path)
 	cpp_wrapper JB_App__ShowURL
-
-function IdealPath (|file|)
-	return .apppath.idealApp.file
-
-function NeedsIdealPath (|file|)
-	|| f = .idealpath
-	if f.path != app.apppath
-		return f
 }
 
 

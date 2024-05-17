@@ -172,14 +172,12 @@ class File (String)
 
 
 	function Child (|string| name, |File|)
-		|| name2 = Name.trimstart("/", true)
-			return File( .PathDir + name )
-		error (Self, "No name specified for sub-file of directory: " + self)
+		check (name) (Self, "No name specified for sub-file of directory: " + self)
+		return File( self|string|.child(name) )
 	
 	function ChildExisting (|string| name, |File|)
 		rz = .child(name)
-		if rz
-			expect (rz.exists) (Self, "Can't find file/folder: " + rz)
+		expect (rz.exists) (Self, "Can't find file/folder: " + rz)
 	
 	
 	function Parent (|File|)
@@ -491,21 +489,33 @@ class File (String)
 				return `C:\$Recycle.Bin`
 			if platform.lin
 				return "~/.local/share/Trash"
+		function SystemDrive (|string|)
+			target win
+				return getenv("%ProgramFiles%")
+			  else
+				return "/"
+		function Applications (|string|)
+			target OSX
+				return "/Applications/"
+			target win
+				return `C:\$Recycle.Bin`
+			target lin
+				return "~/.local/share/Trash"
 
-		function AppPrefs (|string|name = "", |string|)
+		function Prefs (|string|name = "", |string|)
 			if !name
 				name = app.FileName.lowercase
 				name := app.conf("name")
 				name += ".pref"
-			return .preferencespath.child(name)		
+			return .preferencespath.child(name)
 
-		function Preferences (|file|)
+		function PreferencesFolder (|file|)
 			return .PreferencesPath.resolve.file 
 		
 		function HomePath (|string|)
 			cpp_wrapper JB_File__Home
 
-		function PreferencesPath (|string|)
+		helper PreferencesPath (|string|)
 			if platform.osx
 				return "~/Library/Preferences"
 			if platform.win

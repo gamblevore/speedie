@@ -360,3 +360,12 @@ function file.AppDate (|date|)
 		|| n = "/Contents/MacOS/" + .TrimExtAndPath
 		|| c = .childexisting(n)
 			return c.anydate
+
+
+function app.IdealPath (|file|)
+	return .apppath.idealApp.file
+
+function app.NeedsIdealPath (|file|)
+	|| f = .idealpath
+	if f.path != app.apppath
+		return f

@@ -614,7 +614,7 @@ function InitCompiler
 
 
 function GeneratedCppsFolder (|File!|)
-	// * For most projects (Galaxies), we build jb.cpp in the temp folder, when built from terminal.
+	// * For most projects (Galaxxies), we build jb.cpp in the temp folder, when built from terminal.
 	// * For xcode compiles, we use ExternalCompile, which creates a "Cpp" folder for the jb.cpp to be in
 	//   keeping it nice and separate from the builds that we want to use.
 		// * we COULD build straight from the temp-folder? I don't see why not...
@@ -626,8 +626,8 @@ function GeneratedCppsFolder (|File!|)
 	if !Options.ExternalCompile
 		return .TempFolder!
 	if  Options.SelfReplacement
-		return .BuildFolder!
-	return .BaseProjectPath!["Cpp"]!
+		return .BuildFolder
+	return .BaseProjectPath!["Cpp"]
 
 
 
@@ -812,10 +812,10 @@ function InputFile (|File| Default, |String| s, |message| where,  |File|)
 		return rz
 
 	rz = Compiler.BaseProjectPath![s]
-	if (Default != nil)
-		rz := default[s]
-	if !rz.exists
-		rz = nil
+	if (Default != nil) and !rz.Exists
+		rz = default[s]
+		if !rz.exists
+			rz = nil
 
 
 function AddGlobalConstNum (|string| name, |SCClass| c, |int64| value)

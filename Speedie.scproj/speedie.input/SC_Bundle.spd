@@ -20,7 +20,7 @@ function compiler.WrongConf (CollectFunc)
 function compiler.IdealName (|string|)
 	|| s = .confmsg["name"]
 		return s.name
-	return TransCompiler.productname.trimextandpath
+	return TransCompiler.ProductBaseName.trimextandpath
 
 
 

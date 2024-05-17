@@ -123,15 +123,17 @@ class SCImport
 			compiler.ConfMsg = arg
 			// check Options.SelfReplacement, in case I alter how jbin works 
 			|| str = (arg.render, arg.renderjbin)(Options.SelfReplacement)
-			|| x = makedecl("", "__AppConfString", @str+str)
+			|| x = MakeDecl("", "__AppConfString", @str+str)
 			conf.become(x)
-			compiler.program.movetoinitfunc(conf, false)
+			compiler.program.MoveToInitFunc(conf, false)
 
 	
 	function  IndexLinkage (|message| link, |scfile| scf)
 		if link["type"] ~= "library"
 			.IsSTDLib = true
 			.WarnUnusedFuncs = false 
+		if link["apps_folder"].yes
+			Options.output_path = file.Applications[compiler.Productpath.name]
 		if .canBan(scf)
 			.LoadBanned(link["bannedclasses"])
 		|| arg = link[@arg]
@@ -304,7 +306,7 @@ class SCImport
 			Compiler.stage( "Copying Shaders" )
 			compiler.Timer( "Copying Shaders" )
 			
-			|| P = compiler.BuildFolder!["Resources/Shaders"]		#expect
+			|| P = compiler.BuildFolder["Resources/Shaders"]
 			P.MakeAndGoInto
 			
 			for (f in shaders) (sh_name)

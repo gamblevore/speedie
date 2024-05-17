@@ -3343,7 +3343,9 @@ int SC_Ext__NoGoodObject(JB_String* Cpp, JB_File* H, JB_File* O);
 
 void SC_Ext__PrintProduct(JB_String* S);
 
-JB_String* SC_Ext__ProductName();
+JB_String* SC_Ext__ProductBaseName();
+
+JB_String* SC_Ext__ProductNameFull();
 
 JB_String* SC_Ext__ProductSuffix();
 
@@ -6866,8 +6868,6 @@ int JB_Str_TrimLastSub(JB_String* Self, byte B);
 
 JB_String* JB_Str_TrimSlashes(JB_String* Self, bool Pathfix);
 
-JB_String* JB_Str_TrimStart(JB_String* Self, JB_String* S, bool All);
-
 bool SC_Str_UnderScoreAtAnyEnd(JB_String* Self);
 
 JB_String* JB_Str_Unescape(JB_String* Self);
@@ -7155,7 +7155,7 @@ bool SC_File_TestSpeedie(JB_File* Self, JB_String* V);
 
 ErrorInt2 JB_File_Touch(JB_File* Self);
 
-JB_String* JB_File__AppPrefs(JB_String* Name);
+JB_String* JB_File__Applications();
 
 int JB_File__Init_();
 
@@ -7164,6 +7164,8 @@ int JB_File__InitCode_();
 JB_File* JB_File__Logs();
 
 JB_String* JB_File__PreferencesPath();
+
+JB_String* JB_File__Prefs(JB_String* Name);
 
 JB_File* JB_File__PrefsFolder();
 

@@ -106,7 +106,7 @@ module Notifications
 		rz.GNormal.BG <~ B
 	
 	
-	function ShowTip (|string| prefix = "Tip:  ",  |string| data = file://tips.box? )
+	function ShowTip (|string| data, |string| prefix = "Tip:  ")
 		|| p = data.parse[]
 			Notifications.silentappend(prefix + p.name)
 
