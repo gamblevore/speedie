@@ -153,8 +153,6 @@ function CompileAll (|bool|)
 	ErrorDelayer.ReturnErrors
 	require .InitedOK
 	
-	if .Stage( "More constructors" )
-		.BuildConstructors // constructors
 	.CheckIsGoodLibrary
 
 	if .Stage( "Stripping dead code" )
@@ -730,15 +728,6 @@ function scfunction.CanBuildConstructor (|bool|)
 	if (self is ConOrDes) and .IsARealSpdFunc
 		return true
 
-
-function BuildConstructors 
-	opt norefcounts
-	require stderr.ok
-	for f in .FuncList
-		if f.CanBuildConstructor
-			f.BuildConstructorDestructor
-		
-	scfunction.currfunc = nil
 
 
 function SortModulesAndClasses 

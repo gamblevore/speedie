@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2043];
+extern JB_StringC* JB_LUB[2042];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -496,28 +496,6 @@ bool SC_Comp__Banned(JB_String* Name) {
 	return false;
 }
 
-void SC_Comp__BuildConstructors() {
-	if ((!JB_Rec_OK(JB_StdErr))) {
-		return;
-	}
-	{
-		Array* _LoopSrcf2 = SC__Comp_FuncList;
-		int _if0 = 0;
-		while (true) {
-			SCFunction* F = ((SCFunction*)JB_Array_Value(_LoopSrcf2, _if0));
-			if (F == nil) {
-				break;
-			}
-			if (SC_Func_CanBuildConstructor(F)) {
-				SC_Func_BuildConstructorDestructor(F);
-			}
-			_if0++;
-		};
-	}
-	;
-	JB_SetRef(SC__Func_CurrFunc, nil);
-}
-
 JB_File* SC_Comp__BuildFolder() {
 	JB_File* B = SC__Comp__BuildFolder;
 	if ((!JB_File_Exists(B, false))) {
@@ -667,9 +645,6 @@ bool SC_Comp__CompileAll() {
 	SC_Rec_ReturnErrors(SC_ErrorDelayer, JB_StdErr);
 	if ((!SC__Comp_InitedOK)) {
 		return nil;
-	}
-	if (SC_Comp__Stage(JB_LUB[924])) {
-		SC_Comp__BuildConstructors();
 	}
 	SC_Comp__CheckIsGoodLibrary();
 	if (SC_Comp__Stage(JB_LUB[1139])) {
@@ -2000,7 +1975,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112457717186560));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112458359938257));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3283,7 +3258,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024051718));
+	JB_FS_AppendInt32(_fsf0, (2024051721));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7870,7 +7845,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024051718));
+	JB_FS_AppendInt32(_fsf0, (2024051721));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -16151,6 +16126,9 @@ AsmReg SC_ASMtmp__Not(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 AsmReg SC_ASMtmp__Num(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 	SCDecl* D = SC_Msg_FastDecl(Exp);
 	uint64 X = D->ExportPosition;
+	if ((X == 0) != SC_Msg_IsZero(Exp)) {
+		debugger;
+	}
 	AsmReg R = SC_Pac_FindConst((&SC__Pac_Sh), X);
 	if (SC_Reg_SyntaxCast(R)) {
 		return R;
@@ -18052,6 +18030,9 @@ AsmReg SC_Pac_Equals(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* E
 		R = T;
 	}
 	bool Negate = SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate);
+	if ((!SC_Reg_Reg(Dest)) and (!SC_Reg_SyntaxIs(Dest, kSC__Reg_CondRequest))) {
+		debugger;
+	}
 	if (SC_Reg_IsInt(Dest)) {
 		SC_Pac_EqualsInt(Self, Dest, L, R, Exp, Negate);
 	}
@@ -19019,11 +19000,17 @@ NilState SC_nil__CompareObjs(Message* Ll, Message* Rr, NilCheckMode Test, SCOper
 }
 
 NilState SC_nil__Continue(Message* Msg, NilCheckMode Test) {
+	if ((!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false))) {
+		debugger;
+	}
 	SC__nil_Loops.ContRecord = (SC__nil_Loops.ContRecord | SC_nil__EndBlock());
 	return 0;
 }
 
 NilState SC_nil__Debugger(Message* Msg, NilCheckMode Test) {
+	if ((!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false))) {
+		debugger;
+	}
 	return 0;
 }
 
@@ -19070,6 +19057,9 @@ NilState SC_nil__Dummy(Message* Msg, NilCheckMode Test) {
 }
 
 NilState SC_nil__Exit(Message* Msg, NilCheckMode Test) {
+	if ((!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false))) {
+		debugger;
+	}
 	SC__nil_Loops.ExitRecord = (SC__nil_Loops.ExitRecord | SC_nil__EndBlock());
 	SC__nil_Loops.HasEscape = true;
 	return 0;
@@ -19087,6 +19077,9 @@ void SC_nil__ExterminateZergBugs(SCFunction* F) {
 }
 
 NilState SC_nil__Fail(Message* Msg, NilCheckMode Test) {
+	if ((!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false))) {
+		debugger;
+	}
 	SC__nil_OldPrint = JB__Err_AutoPrint;
 	JB__Err_AutoPrint = 0;
 	return kSC__NilState_Borked;
@@ -19259,6 +19252,9 @@ NilState SC_nil__Function(Message* Msg, NilCheckMode Test) {
 }
 
 NilState SC_nil__If(Message* Msg, NilCheckMode Test) {
+	if ((!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false))) {
+		debugger;
+	}
 	Message* Cond = ((Message*)JB_Ring_First(Msg));
 	Message* Arg1 = ((Message*)JB_Ring_NextSib(Cond));
 	Message* Else = ((Message*)JB_Ring_NextSib(Arg1));
@@ -19447,6 +19443,9 @@ NilState SC_nil__RealBool(bool B) {
 }
 
 NilState SC_nil__Rejoin(Message* Msg, NilCheckMode Test) {
+	if ((!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false))) {
+		debugger;
+	}
 	return SC_nil__Jump(((Message*)JB_Ring_First(Msg)), Test);
 }
 
@@ -19455,6 +19454,9 @@ NilState SC_nil__Rel(Message* Msg, NilCheckMode Test) {
 }
 
 NilState SC_nil__Return(Message* Msg, NilCheckMode Test) {
+	if ((!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false))) {
+		debugger;
+	}
 	NilState V = SC_nil__DetectStillChecks(((Message*)JB_Ring_First(Msg)));
 	SC__nil_Loops.ExitRecord = (SC__nil_Loops.ExitRecord | kSC__NilState_Basic);
 	SC_nil__DeclKill();
@@ -19671,6 +19673,9 @@ NilState SC_nil__VariableSet(SCDecl* Recv, Message* RecvMsg, SCDecl* Sent, Messa
 }
 
 NilState SC_nil__While(Message* Msg, NilCheckMode Test) {
+	if ((!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false))) {
+		debugger;
+	}
 	Message* Cond = ((Message*)JB_Ring_First(Msg));
 	MaybeBool CondTest = SC_Msg_IsAlwaysBool(Cond);
 	if ((!((!JB_MaybeBool_IsFalse(CondTest)) and ((bool)SC_nil_BranchEnter((&SC__nil_T), Msg))))) {
@@ -23287,7 +23292,7 @@ int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* Self) {
 }
 
 void JB_Rec_AppendErr(JB_ErrorReceiver* Self, JB_Error* Err) {
-	bool CanPrint = false;
+	bool CanPrint = (!JB_Rec_BadCount(Self)) and ((bool)JB__Err_AutoPrint);
 	//"Speedie" // useful marker for debugging...;
 	JB_Rec_Incr(Self, Err, true);
 	if ((!(JB_Str_Exists(Err->Path)))) {
@@ -24667,7 +24672,7 @@ void SC_Imp_IndexLinkage(SCImport* Self, Message* Link, SCFile* Scf) {
 		Self->IsSTDLib = true;
 		Self->WarnUnusedFuncs = false;
 	}
-	Message* _tmPf1 = JB_Incr(JB_Msg_GetConf(Link, JB_LUB[2042], false));
+	Message* _tmPf1 = JB_Incr(JB_Msg_GetConf(Link, JB_LUB[924], false));
 	if (JB_Msg_Yes(_tmPf1, false)) {
 		JB_String* _tmPf2 = JB_Incr(JB_File__Applications());
 		JB_String* _tmPf4 = JB_Incr(SC_Comp__ProductPath());
@@ -29532,6 +29537,7 @@ int64 SC_ASMFunc2_RunArgs(MWrap* Self, ivec4* Args, int ArgCount) {
 
 
 
+
 void JB_Msg_Acc__(Message* Self, FastString* Fs) {
 	Message* F = JB_Incr(((Message*)JB_Ring_First(Self)));
 	if (F) {
@@ -29882,6 +29888,9 @@ ASMtmp SC_Msg_ASMType(Message* Self) {
 }
 
 void SC_Msg_ASMTypeSet(Message* Self, ASMtmp Value) {
+	if (JB_ObjectID(Self) == 0) {
+		debugger;
+	}
 	Value = ((Self->Flags & (~63)) | Value);
 	Self->Flags = Value;
 }
@@ -42956,6 +42965,9 @@ bool SC_Class_IsSaveableObject(SCClass* Self) {
 	if ((!SC_Class_IsObject(Self))) {
 		return nil;
 	}
+	if (Self->IsRole) {
+		return nil;
+	}
 	JB_String* S = JB_Incr(Self->SaveAs);
 	bool _tmPf0 = JB_Str_Exists(S) and ((!JB_Str_Equals(S, JB_LUB[1721], false)));
 	JB_Decr(S);
@@ -46718,6 +46730,9 @@ void SC_Func_Transform(SCFunction* Self) {
 	}
 	 else {
 		SC_Func_CallParents(Self);
+		if (SC_Func_CanBuildConstructor(Self)) {
+			SC_Func_BuildConstructorDestructor(Self);
+		}
 	}
 	SC__Func_CurrFunc = nil;
 	SC__Mod_Curr = nil;
@@ -49830,11 +49845,10 @@ void JB_InitClassList(SaverLoadClass fn) {
 	fn(&JB_FileData, (char*)"|int| Length_, |int| Descriptor");
 	fn(&SavingTestData, (char*)"|string| Name, |int| Value, |int| ABC");
 	fn(&JB_StringSharedData, (char*)"|int| Length_");
-	fn(&JB_StringData, (char*)"|int| Length_");
 	fn(&JB_StringCData, (char*)"|int| Length_");
 	fn(&MessageIDData, (char*)"|int| Length_, |int| ID, |int| User, |int| Func");
 	fn(&SCFileData, (char*)"|int| Length_, |int| Descriptor, |string| ExportName, |string| FData, |int| FileNum, |bool| IsInternal");
 }
 }
 
-// -8683686661394309421 7844759199299092785
+// -5660776441806354224 3240329495552101757

@@ -1,19 +1,19 @@
 
 class CheeseShop
-	|dictionary of string| inventory
+	|dictionarylower of string| inventory
 	|string| ClerkName
 
 	constructor (|message| cfg)
 		.inventory = Dictionary()
 		for name in cfg["cheeses"]
-			.inventory.valuelower(name.name) = name.name
+			.inventory[name.name] = name.name
 		.clerkName = cfg["clerk"].Value
 
 	syntax access (|string| cheeseName, |string|)
 		if (cheeseName == .clerkName)
 			return "Sir?"
 		
-		return ("yes", "no")(.inventory.valuelower(cheeseName)!=nil)
+		return ("yes", "no")(.inventory[cheeseName])
 
 
 main

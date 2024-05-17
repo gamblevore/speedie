@@ -62,7 +62,7 @@ function compiler.ProductPath (|string|)
 	
 	|| prod = transcompiler.ProductNameFull
 	if Options.SelfReplacement
-		return Compiler.Projects.child("Terminal/"+prod)
+		return Compiler.Projects.child("Terminal/" + prod)
 	return Compiler.BuildFolder.child( prod )
 
 

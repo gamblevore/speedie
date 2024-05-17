@@ -285,7 +285,12 @@ function Transform ()
 		.Badness |= 1
 	  else
 		.CallParents // hehe 🥰
-
+		if .CanBuildConstructor			// this isn't ideal. we really want to do some of this BEFORE transform
+			.BuildConstructorDestructor // specifically filling in missing constructor elements.
+										// .FillInMissingConstructorDefaults actually calls newdefaultrel...
+										// so it can inject code thats not transformed.
+										// BUT the constructor build code relies on transform being called first
+										// so its kinda hard to fix.
 	CurrFunc = nil
 	scmodule.curr = nil
 

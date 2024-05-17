@@ -6,7 +6,14 @@ function dictionary.Sort (|SorterComparer| fn, |int| count, |[...]|)
 	rz = .values // a more efficient sorter could extract only needed
 	rz.sort(fn)
 	rz.Length = count
-	
+
+
+role DictionaryLower (Dictionary)
+	syntax Access (|string| Key, assigns:||)
+		super.valuelower(key) = value
+	syntax Access (|string| Key, ||)
+		return super.valuelower(key)
+		
 	
 function message.AllNames (|[string]|)
 	opt norefcounts
