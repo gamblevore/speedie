@@ -109,9 +109,11 @@ cd ${vars.CppLib}
 $GetUserName
 echo \"Compiling $LibPath for user '\$U'\"
 g++ -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
+${unmod(LibPath)}
 
 echo \"Compiling Speedie to $SpdTerm\"
 g++ -o $SpdTerm  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp $LinkLibFlags
+${unmod(SpdTerm)}
 
 
 cd $Speedie/jeebox.scproj/Examples
@@ -121,7 +123,7 @@ ${mkdir(`/usr/local/include/`)}
 ${mkdir(`/usr/local/bin/`)}
 
 echo \"Cleaning old files\"
-rm -rf Build/*
+rm -rf Build/* 2>/dev/null
 
 echo \"Installing headers\"
 cp    *.h /usr/local/include/
