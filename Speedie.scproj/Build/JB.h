@@ -7544,7 +7544,7 @@ int SC_Msg_DeprecatedClassOption(Message* Self, JB_String* Name, JB_String* Kind
 
 void JB_Msg_Destructor(Message* Self);
 
-Dictionary* JB_Msg_Dict(Message* Self, bool DoCount);
+Dictionary* JB_Msg_Dict(Message* Self, bool DoCount, bool DoLower);
 
 bool SC_Msg_DoesAnything(Message* Self);
 

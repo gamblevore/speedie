@@ -1975,7 +1975,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112458688336952));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112459052220416));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3258,7 +3258,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024051723));
+	JB_FS_AppendInt32(_fsf0, (2024051800));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7013,7 +7013,7 @@ void SC_Crkt__CorrectFile(JB_File* Where) {
 	Message* M = JB_Incr(JB_File_Parse(Where, 4194304, true));
 	if (M) {
 		HasAnything = JB_Ring_HasChildren(M);
-		Dictionary* _tmPf0 = JB_Incr(JB_Msg_Dict(M, true));
+		Dictionary* _tmPf0 = JB_Incr(JB_Msg_Dict(M, true, false));
 		SC_Crkt__MergeTable(M, _tmPf0);
 		JB_Decr(_tmPf0);
 	}
@@ -7845,7 +7845,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024051723));
+	JB_FS_AppendInt32(_fsf0, (2024051800));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -22303,8 +22303,6 @@ void SC_Cpp__C_RenderRel(Message* Self, FastStringCpp* Fs) {
 	Message* First = ((Message*)JB_Ring_First(Self));
 	Message* Op = ((Message*)JB_Ring_NextSib(First));
 	Message* Last = ((Message*)JB_Ring_NextSib(Op));
-	float X = std::fmod(1.0f, 2.0f);
-	double Y = std::fmod(((double)1.0f), ((double)2.0f));
 	SCOperator* Scop = ((SCOperator*)Op->Obj);
 	if ((!Scop)) {
 		debugger;
@@ -31472,7 +31470,7 @@ void JB_Msg_Destructor(Message* Self) {
 	JB_Ring_Destructor(Self);
 }
 
-Dictionary* JB_Msg_Dict(Message* Self, bool DoCount) {
+Dictionary* JB_Msg_Dict(Message* Self, bool DoCount, bool DoLower) {
 	Dictionary* Rz = ((Dictionary*)nil);
 	Rz = JB_Dict_Constructor(nil);
 	int I = 0;
@@ -49819,4 +49817,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -8782907536749697531 3240329495552101757
+// -7069647913418934779 3240329495552101757

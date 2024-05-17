@@ -1,11 +1,10 @@
 
 class CheeseShop
-	|dictionarylower of string| inventory = dictionary()
+	|dictionarylower of message| inventory
 	|string| ClerkName
 
 	constructor (|message| cfg)
-		for name in cfg["cheeses"]
-			.inventory[name.name] = name.name
+		.inventory = cfg["cheeses"].DictLower
 		.clerkName = cfg["clerk"].Value
 
 	syntax access (|string| cheeseName, |string|)
@@ -17,11 +16,11 @@ class CheeseShop
 
 main
 	|| shop = CheeseShop(configData.parse$)
-	printline "Red Leicester? " + shop["Red Leicester"]
-	printline "Tilsit? " + shop["Tilsit"]
-	printline "Wenslydale? " + shop["Wenslydale"]
-	printline "Cheddar? " + shop["Cheddar"]
-	printline "Joke " + shop["Barris"]
+	"Red Leicester? ${shop[`Red Leicester`]}"
+	"Tilsit? ${shop[`Tilsit`]}"
+	"Wenslydale? ${shop[`Wenslydale`]}"
+	"Cheddar? ${shop[`Cheddar`]}"
+	"Joke ${shop[`Barris`]}"
 
 
 || ConfigData = `

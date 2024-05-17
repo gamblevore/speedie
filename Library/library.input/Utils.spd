@@ -39,7 +39,7 @@ function message.GoodName (|bool| NeedName=false, |string|)
 	return name
 
 
-function message.smartname (assigns:|string|)
+function message.SmartName (assigns:|string|)
 	if .name != value
 		.name = value // save memory for often generated strings
 	
@@ -47,12 +47,10 @@ function message.smartname (assigns:|string|)
 helper message.GoodNameSub (|bool| NeedName=false, |string|)
 	opt norefcounts
 	|| f = .func
-	if .IsString or f == @thg or @num
+	if f.IsString or f == @thg or @num
 		return .name
-	if f == @tmp
-		|| c = .first
-		if !c
-			return .name
+	if (f == @tmp) and !.IsFirst
+		return .name
 	error (self, "Make sure this item is a string or a proper-name.")
 	return string.Error
 
@@ -62,7 +60,13 @@ function ivec4.List (|message|)
 	for i in 4
 		rz <~ self[i]
 
-function message.Dict (|bool| DoCount=false, |dictionary of message|)
+
+function message.DictLower (|bool| DoCount=false,  |dictionary of message|)
+	pragma inline
+	return .dict(docount, true)
+
+	
+function message.Dict (|bool| DoCount=false,  |bool| DoLower=false,  |dictionary of message|)
 	opt norefcounts
 	rz = Dictionary()
 	|| i = 0
@@ -71,8 +75,10 @@ function message.Dict (|bool| DoCount=false, |dictionary of message|)
 		if DoCount
 			s.Position = i++
 
+
 function @file.Dictionary (|file|)
 	disabled "Use .words"
+
 	
 function @file.Words (|file|)
 	return "/usr/share/dict/words".file
@@ -150,8 +156,6 @@ struct StringDigitIterator
 		while .i < .s.length
 			yield (.s[.i]|int| - '0') (.i)
 			.i++
-	
-	function ZeroValue (|int64|)
 
 
 function String.Digits (|StringDigitIterator|)
