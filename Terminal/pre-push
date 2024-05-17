@@ -1,6 +1,1 @@
-#!/usr/local/bin/spd
-
-main
-	// we actually want to run make.spd... doesnt it need sudo?
-	// not sure how to do that.
-	printline app.args.render
+/usr/local/speedie/Terminal/make.spd

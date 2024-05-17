@@ -207,5 +207,5 @@ if IsCurrentPlatform
 
 // TODO:
 	// Make this NOT alter the creator of /usr/local/include or /usr/local/bin
-	// at least if they alredy exist!
+	// at least if they already exist!
 	// what should they be owned by then?
