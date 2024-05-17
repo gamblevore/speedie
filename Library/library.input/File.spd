@@ -456,6 +456,13 @@ class File (String)
 	module
 		|| DebugExecute = false
 				
+		function Speedie (|string|)
+			|| paths = app.exepath.resolve.parent
+			|| srch = "/speedie/"
+			|| found = paths.find(srch, 0, int.max, true)
+				return paths[0, found + srch.length]
+			return "/usr/local/speedie/"
+		
 		function SizeSorter (SorterComparer)
 			|| aa = a|file|.size
 			|| bb = b|file|.size

@@ -42,12 +42,9 @@
 |SCDecl|	FalseBool
 
 
-function Compiler.FindSpeedieRoot (|string|)
-	|| paths = app.exepath.resolve.parent
-	|| srch = "/Speedie/"
-	|| found = paths.find(srch, 0, int.max, true)
-		return paths[0, found + srch.length]
-	return "/usr/local/speedie"
+
+function Compiler.SpeedieDir (|string| s, |file|)
+	return file.Speedie.Child(s).file
 	
 
 module Compiler {
@@ -192,7 +189,7 @@ function CompileAll (|bool|)
 
 
 function Projects (|String|)
-	return ._projects init .findspeedieRoot
+	return ._projects init file.Speedie
 
 
 function SpeedieProj (|String|)

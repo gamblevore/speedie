@@ -126,7 +126,7 @@ module Feedback
 
 	function string.ResolveSpd (|string|)
 		if self[0, "@spd/"]
-			return (compiler.FindSpeedieRoot+self[5...]).resolve(fileResolveMode.allowmissing)
+			return (file.Speedie+self[5...]).resolve(fileResolveMode.allowmissing)
 		return .resolve(fileResolveMode.allowmissing)
 
 	function TryUseProject (|String| path, |bool| IsScript=false, |string|)

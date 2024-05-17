@@ -63,21 +63,3 @@ extend message
 			if self != @arg
 				return .name
 			return .FirstName
-
-// move these to utils?
-	function IsTypeOfDecl (|bool|)
-		return .WithinType(1)
-			
-	function WithinType (|int| Allowed=3, |bool|)
-		opt norefcounts
-		|| p = .parent
-		|| msg = self
-		while p and p != @arg
-			if (allowed&1) and (p == @decl)
-				return msg.isfirst
-			if (allowed&2) and (p == @type)
-				return msg.islast
-			msg = p
-			p = p.parent
-	
-	

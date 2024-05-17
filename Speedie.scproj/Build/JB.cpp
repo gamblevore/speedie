@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2041];
+extern JB_StringC* JB_LUB[2042];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -1047,26 +1047,6 @@ JB_String* SC_Comp__FindProjNoSuffix(JB_String* Path) {
 	return JB_Str_OperatorPlus(Path, JB_LUB[375]);
 }
 
-JB_String* SC_Comp__FindSpeedieRoot() {
-	JB_String* _tmPf1 = JB_Incr(JB_App__Path());
-	JB_String* _tmPf0 = JB_Incr(JB_Str_ResolvePath(_tmPf1, false));
-	JB_Decr(_tmPf1);
-	JB_String* Paths = JB_Incr(JB_Str_Parent(_tmPf0));
-	JB_Decr(_tmPf0);
-	JB_String* Srch = JB_Incr(JB_LUB[405]);
-	Ind Found = JB_Str_InStr(Paths, Srch, 0, JB_int__Max(), true);
-	if (JB_Ind_SyntaxCast(Found)) {
-		JB_String* _tmPf2 = JB_Incr(JB_Str_Range(Paths, 0, Found + JB_Str_Length(Srch)));
-		JB_Decr(Srch);
-		JB_Decr(Paths);
-		JB_SafeDecr(_tmPf2);
-		return _tmPf2;
-	}
-	JB_Decr(Paths);
-	JB_Decr(Srch);
-	return JB_LUB[427];
-}
-
 JB_File* SC_Comp__GeneratedCppsFolder() {
 	if ((!SC__Options_ExternalCompile)) {
 		return SC__Comp_TempFolder;
@@ -2022,7 +2002,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112456135147520));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112456392245248));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -2297,7 +2277,7 @@ JB_String* SC_Comp__Projects() {
 	return ({
 		JB_String* _X = JB_Incr(SC__Comp__Projects);
 		if ((!JB_Str_Exists(_X))) {
-			JB_SetRef(_X, SC_Comp__FindSpeedieRoot());
+			JB_SetRef(_X, JB_File__Speedie());
 			JB_SetRef(SC__Comp__Projects, _X);
 		}
 		JB_SafeDecr(_X);
@@ -2449,6 +2429,16 @@ JB_File* SC_Comp__Speedie() {
 	JB_Decr(_tmPf0);
 	JB_SafeDecr(_tmPf1);
 	return _tmPf1;
+}
+
+JB_File* SC_Comp__SpeedieDir(JB_String* S) {
+	JB_String* _tmPf1 = JB_Incr(JB_File__Speedie());
+	JB_String* _tmPf0 = JB_Incr(JB_Str_Child(_tmPf1, S));
+	JB_Decr(_tmPf1);
+	JB_File* _tmPf2 = JB_Incr(JB_Str_AsFile(_tmPf0));
+	JB_Decr(_tmPf0);
+	JB_SafeDecr(_tmPf2);
+	return _tmPf2;
 }
 
 JB_String* SC_Comp__SpeedieProj() {
@@ -3301,7 +3291,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024051712));
+	JB_FS_AppendInt32(_fsf0, (2024051713));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7074,7 +7064,7 @@ void SC_Crkt__CorrectStrings() {
 	JB_File* F = JB_Incr(JB_File_SyntaxAccess(_tmPf0, JB_LUB[1882]));
 	JB_Decr(_tmPf0);
 	if (SC__Options_SelfReplacement) {
-		JB_SetRef(F, JB_Str_AsFile(JB_LUB[2036]));
+		JB_SetRef(F, SC_Comp__SpeedieDir(JB_LUB[2036]));
 	}
 	SC_Crkt__CorrectFile(F);
 	JB_Decr(F);
@@ -7527,16 +7517,17 @@ bool SC_Ext__CanCompile(JB_String* Name) {
 }
 
 bool SC_Ext__Clean() {
-	JB_String* Paths = JB_Incr(JB_LUB[71]);
+	JB_String* _tmPf3 = JB_Incr(JB_File__Speedie());
+	JB_String* Paths = JB_Incr(JB_Str_ReplaceAll(JB_LUB[71], JB_LUB[2041], _tmPf3, false, nil));
 	{
 		int _Prevf0 = 0;
 		while (JB_Str_Exists(Paths)) {
 			Ind _Curr_f1 = JB_Str_Find(Paths, JB__Constants_CSLine, _Prevf0, JB_int__Max());
 			JB_String* L = JB_Incr(JB_Str_Range(Paths, _Prevf0, _Curr_f1));
 			if (JB_Str_Exists(L)) {
-				JB_File* _tmPf3 = JB_Incr(JB_Str_AsFile(L));
-				JB_File_DeleteAll(_tmPf3);
-				JB_Decr(_tmPf3);
+				JB_File* _tmPf4 = JB_Incr(JB_Str_AsFile(L));
+				JB_File_DeleteAll(_tmPf4);
+				JB_Decr(_tmPf4);
 			}
 			JB_Decr(L);
 			_Prevf0 = (_Curr_f1 + 1);
@@ -7544,6 +7535,7 @@ bool SC_Ext__Clean() {
 				break;
 			}
 		};
+		JB_Decr(_tmPf3);
 	}
 	;
 	JB_Decr(Paths);
@@ -7676,7 +7668,7 @@ Array* SC_Ext__CreateCompileString(Array* FileList, JB_String* Product, JB_Strin
 	}
 	SC_Array_AppendWords(Rz, Cmode);
 	JB_Decr(Cmode);
-	JB_String* Spdroot = JB_Incr(SC_Comp__FindSpeedieRoot());
+	JB_String* Spdroot = JB_Incr(JB_File__Speedie());
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[328]);
 	JB_FS_AppendString(_fsf0, Spdroot);
@@ -7886,7 +7878,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024051712));
+	JB_FS_AppendInt32(_fsf0, (2024051713));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8154,7 +8146,7 @@ void SC_Ext__RunCppCompile() {
 	if ((!SC__Options_Silent)) {
 		SC_Ext__PrintProduct(JB_LUB[72]);
 	}
-	JB_File* CppLib = JB_Incr(JB_Str_AsFile(JB_LUB[428]));
+	JB_File* CppLib = JB_Incr(SC_Comp__SpeedieDir(JB_LUB[428]));
 	SC_Ext__TestNewestLib(CppLib);
 	SC_Ext__CollectPico(CppLib);
 	JB_Decr(CppLib);
@@ -13022,7 +13014,7 @@ int SC_UseCustomOperators(SCDecl* LC, SCDecl* RC, SCOperator* Comp, Message* Err
 		}
 		if (SC_Decl_CompareUnclear(LC, RC, ((bool)SC_Opp_SyntaxIs(Comp, kSC__OpMode_Less))) or SC_Decl_CompareUnclear(RC, LC, ((bool)SC_Opp_SyntaxIs(Comp, kSC__OpMode_More)))) {
 			if (true) {
-				JB_Msg_SyntaxExpect(ErrPlace, JB_LUB[2040]);
+				JB_Msg_SyntaxExpect(ErrPlace, JB_LUB[430]);
 			}
 		}
 	}
@@ -26964,7 +26956,7 @@ JB_String* JB_Str_ReplacePathComponent(JB_String* Self, int Num, JB_String* With
 
 JB_String* SC_Str_ResolveSpd(JB_String* Self) {
 	if (JB_Str_MidEquals(Self, 0, JB_LUB[491], false)) {
-		JB_String* _tmPf1 = JB_Incr(SC_Comp__FindSpeedieRoot());
+		JB_String* _tmPf1 = JB_Incr(JB_File__Speedie());
 		JB_String* _tmPf2 = JB_Incr(JB_Str_Range(Self, (5), JB_int__Max()));
 		JB_String* _tmPf0 = JB_Incr(JB_Str_OperatorPlus(_tmPf1, _tmPf2));
 		JB_Decr(_tmPf1);
@@ -28923,11 +28915,11 @@ bool SC_File_TestSpeedie(JB_File* Self, JB_String* V) {
 	JB_Str_Execute(P, Cmd_args, nil, nil, true, 0);
 	JB_Decr(Cmd_args);
 	JB_Decr(P);
-	JB_String* TestProd = JB_Incr(JB_Str_OperatorPlus(JB_LUB[430], V));
-	JB_File* _tmPf4 = JB_Incr(JB_Str_AsFile(TestProd));
-	JB_Decr(TestProd);
-	JB_File_MustExist(_tmPf4, JB_LUB[666]);
+	JB_String* _tmPf4 = JB_Incr(JB_Str_OperatorPlus(JB_LUB[2040], V));
+	JB_File* TestProd = JB_Incr(SC_Comp__SpeedieDir(_tmPf4));
 	JB_Decr(_tmPf4);
+	JB_File_MustExist(TestProd, JB_LUB[666]);
+	JB_Decr(TestProd);
 	JB_String* _tmPf6 = JB_Incr(SC_Ext__TmpOut(Variant));
 	JB_String* _tmPf5 = JB_Incr(JB_Str_ReadFile(_tmPf6, 1073741824, true));
 	JB_Decr(_tmPf6);
@@ -29003,6 +28995,26 @@ JB_String* JB_File__PreferencesPath() {
 
 JB_File* JB_File__PrefsFolder() {
 	return JB_Str_AsFile(JB_LUB[2011]);
+}
+
+JB_String* JB_File__Speedie() {
+	JB_String* _tmPf1 = JB_Incr(JB_App__Path());
+	JB_String* _tmPf0 = JB_Incr(JB_Str_ResolvePath(_tmPf1, false));
+	JB_Decr(_tmPf1);
+	JB_String* Paths = JB_Incr(JB_Str_Parent(_tmPf0));
+	JB_Decr(_tmPf0);
+	JB_String* Srch = JB_Incr(JB_LUB[405]);
+	Ind Found = JB_Str_InStr(Paths, Srch, 0, JB_int__Max(), true);
+	if (JB_Ind_SyntaxCast(Found)) {
+		JB_String* _tmPf2 = JB_Incr(JB_Str_Range(Paths, 0, Found + JB_Str_Length(Srch)));
+		JB_Decr(Srch);
+		JB_Decr(Paths);
+		JB_SafeDecr(_tmPf2);
+		return _tmPf2;
+	}
+	JB_Decr(Paths);
+	JB_Decr(Srch);
+	return JB_LUB[427];
 }
 
 
@@ -49834,4 +49846,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -8135714708358286802 638614224058657991
+// -3102792817262132556 5727328691313269410

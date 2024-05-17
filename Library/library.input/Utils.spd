@@ -31,6 +31,7 @@ function message.GoodName (|bool| NeedName=false, |string|)
 		return string.Error
 	return name
 
+
 function message.smartname (assigns:|string|)
 	if .name != value
 		.name = value // save memory for often generated strings
@@ -88,6 +89,23 @@ function Message.FindNotInserted (|message|)
 		if c.position > -1
 			return c
 	return self
+
+// move these to utils?
+function message.IsTypeOfDecl (|bool|)
+	return .WithinType(1)
+
+
+function message.WithinType (|int| Allowed=3, |bool|)
+	opt norefcounts
+	|| p = .parent
+	|| msg = self
+	while p and p != @arg
+		if (allowed&1) and (p == @decl)
+			return msg.isfirst
+		if (allowed&2) and (p == @type)
+			return msg.islast
+		msg = p
+		p = p.parent	
 
 
 helper message.FindTightest (|int| pos, |bool| named=false, |bool| SamePosition=false,  |message|) // findpos, findat

@@ -157,10 +157,10 @@ function Clean (|bool|)
 /tmp/Speedie
 /tmp/Speedie64
 /tmp/SpeedieApps
-/usr/local/speedie/Speedie.scproj/BuildTest
-/usr/local/speedie/Speedie.scproj/BuildTest2
-/usr/local/speedie/Speedie.scproj/BuildTest3
-"
+@spd/Speedie.scproj/BuildTest
+@spd/Speedie.scproj/BuildTest2
+@spd/Speedie.scproj/BuildTest3
+".ReplaceAll("@spd", file.Speedie)
 	for l.lines in paths
 		if l
 			l.file.deleteall
@@ -209,7 +209,7 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 //	if options.Compile32Bit.IsKnown
 //		rz.AppendWords( ("-m32", "-m64")(options.Compile32Bit.default) )
 	
-	|| spdroot = compiler.FindSpeedieRoot
+	|| spdroot = file.Speedie
 	rz.appendwords("-L$spdroot/Library")
 	rz.appendwords("-L/usr/local/lib/")
 	rz.appendwords("-I /usr/local/include")
@@ -356,7 +356,7 @@ function RunCppCompile
 	if !options.silent
 		.PrintProduct("\nCompiling c++ to")
 	
-	|| CppLib = "/usr/local/speedie/Library/CppLib/".file
+	|| CppLib = compiler.SpeedieDir("Library/CppLib/")
 	.TestNewestLib(cpplib)
 	.CollectPico(cpplib)
 	.CompilingLibFiles++
@@ -573,8 +573,8 @@ function File.TestSpeedie (|string| v, |bool|)
 	
 	|| p = .path
 	p.execute(cmd_args, 0)
-	|| TestProd = "/usr/local/speedie/Terminal/SpeedieTest" + v
-	testprod.file.mustexist("Compile Speedie")	
+	|| TestProd = compiler.SpeedieDir("Terminal/SpeedieTest" + v)
+	testprod.mustexist("Compile Speedie")	
 	print TransCompiler.TmpOut(Variant).ReadFile
 	|| test_err = TransCompiler.TmpErr(Variant).ReadFile
 	if test_Err.length

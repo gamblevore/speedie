@@ -531,7 +531,7 @@ module StringCorrector
 	function CorrectStrings
 		|| f = Compiler.GeneratedCppsFolder[ "strings.txt" ]!
 		if options.selfreplacement
-			f = "/usr/local/speedie/Speedie.scproj/BuildTest/strings.txt".file			
+			f = compiler.speediedir("Speedie.scproj/BuildTest/strings.txt")
 		.CorrectFile( f )
 
 	

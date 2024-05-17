@@ -2534,8 +2534,6 @@ JB_File* SC_Comp__FindProjectSub(JB_String* Base, JB_String* Path);
 
 JB_String* SC_Comp__FindProjNoSuffix(JB_String* Path);
 
-JB_String* SC_Comp__FindSpeedieRoot();
-
 JB_File* SC_Comp__GeneratedCppsFolder();
 
 JB_String* SC_Comp__IdealName();
@@ -2621,6 +2619,8 @@ void SC_Comp__SetupEnv();
 void SC_Comp__SortModulesAndClasses();
 
 JB_File* SC_Comp__Speedie();
+
+JB_File* SC_Comp__SpeedieDir(JB_String* S);
 
 JB_String* SC_Comp__SpeedieProj();
 
@@ -7166,6 +7166,8 @@ JB_File* JB_File__Logs();
 JB_String* JB_File__PreferencesPath();
 
 JB_File* JB_File__PrefsFolder();
+
+JB_String* JB_File__Speedie();
 
 
 
