@@ -104,7 +104,9 @@ extend ASMState
 	
 	function GetLabelJump (|message| P, |int|)
 		opt NoRefCounts
-		return *(textassembler.LabelsToDo.valuelower(p.name) #expect (P, "Label not found"))
+		|| val = textassembler.LabelsToDo.valuelower(p.name)
+			return *val
+		error (P, "Label not found")
 
 	
 	function LoadLabelJumps (|bool|)
@@ -193,4 +195,3 @@ extend FatASM
 	setter Debug (|message|)
 		.filenum = value.FileNum
 		.Bytepos = value.position
-	

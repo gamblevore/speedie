@@ -41,8 +41,6 @@ extern "C" {
 
 typedef uint ASM;
 
-typedef int ASMCompareability;
-
 typedef int ASMMath;
 
 typedef u16 ASMtmp;
@@ -1890,11 +1888,6 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_WR2U (66)
 #define kSC__ASM_WR4U (67)
 #define kSC__ASM_WR8U (68)
-#define kSC__ASMCompareability_bcmp (1)
-#define kSC__ASMCompareability_both (1 + 2)
-#define kSC__ASMCompareability_bra (4)
-#define kSC__ASMCompareability_cmpi (2)
-#define kSC__ASMCompareability_LargestFlag (7)
 #define kSC__ASMMath_Add (0)
 #define kSC__ASMMath_BAn (11)
 #define kSC__ASMMath_BitCorrect (31)
@@ -4375,11 +4368,6 @@ void SC_ASM__TestASMSub(Message* Tests);
 
 
 
-// ASMCompareability
-bool SC_ASMCompareability_SyntaxIs(ASMCompareability Self, ASMCompareability R);
-
-
-
 // ASMMath
 bool SC_ASMMath_SyntaxIs(ASMMath Self, ASMMath R);
 
@@ -4451,13 +4439,17 @@ AsmReg SC_ASMtmp__While(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
 
 // AsmReg
+ErrorInt SC_Reg_BadBits(AsmReg Self, AsmReg R);
+
+bool SC_Reg_BitsAreCorrect(AsmReg Self, int Gap);
+
 AsmReg SC_Reg_boolasm(AsmReg Self);
 
 bool SC_Reg_CanAddK(AsmReg Self, int64 T);
 
-ASMCompareability SC_Reg_Compareability(AsmReg Self, AsmReg R);
-
 bool SC_Reg_Exists(AsmReg Self);
+
+int SC_Reg_GapBits(AsmReg Self);
 
 int SC_Reg_IntDivType(AsmReg Self);
 
@@ -5101,6 +5093,10 @@ AsmReg SC_Pac_BoolMul(ASMState* Self, AsmReg Dest, AsmReg Boo, AsmReg R, Message
 FatASM* SC_Pac_Branch(ASMState* Self, Message* Cond);
 
 AsmReg SC_Pac_Compare(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode);
+
+FatASM* SC_Pac_CompareFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode);
+
+FatASM* SC_Pac_CompareInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode);
 
 AsmReg SC_Pac_DeclareMe(ASMState* Self, Message* Where, AsmReg T);
 
@@ -7079,7 +7075,7 @@ void JB_Dict_SetValue(Dictionary* Self, JB_String* Key, int64 Value);
 
 JB_Object* JB_Dict_Syntax(Dictionary* Self, JB_String* Key);
 
-JB_Object* JB_Dict_ValueStr(Dictionary* Self, JB_String* Key);
+JB_Object* JB_Dict_JB_Dict_Value(Dictionary* Self, JB_String* Key);
 
 void JB_Dict_SetInt(Dictionary* Self, uint64 Key, JB_Object* Value);
 

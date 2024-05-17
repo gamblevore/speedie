@@ -1,0 +1,92 @@
+
+class CheeseShop
+	|dictionary of string| inventory
+	|string| ClerkName
+
+	constructor (|message| cfg)
+		.inventory = Dictionary()
+		for name in cfg["cheeses"]
+			.inventory.valuelower(name.name) = name.name
+		.clerkName = cfg["clerk"].Value
+
+	syntax access (|string| cheeseName, |string|)
+		if (cheeseName == .clerkName)
+			return "Sir?"
+		
+		return ("yes", "no")(.inventory.valuelower(cheeseName)!=nil)
+
+
+main
+	|| shop = CheeseShop(configData.parse$)
+	printline "Red Leicester? " + shop["Red Leicester"]
+	printline "Tilsit? " + shop["Tilsit"]
+	printline "Wenslydale? " + shop["Wenslydale"]
+	printline "Cheddar? " + shop["Cheddar"]
+	printline "Joke " + shop["Barris"]
+
+
+|| ConfigData = `
+cheeses
+	"Red Leicester"
+	"Flamange"
+	"Chester"
+clerk
+	Barris
+`
+
+
+/*
+original C++
+// just a comparison to show how terrible c++ is.
+
+class CheeseShop {
+	public:
+		CheeseShop() :
+			clerkName{nullptr} {}
+		CheeseShop(std::string configPath) :
+			clerkName{nullptr}
+		{
+			auto cfg = toml::parse(configPath);
+
+			auto cheeses = toml::find<std::vector<std::string>>(cfg, "cheeses");
+			for (auto name : cheeses)
+				inventory.insert(name);
+
+			if (cfg.contains("clerk")) {
+				clerkName = new std::string{toml::find<std::string>(cfg, "clerk")};
+			}
+		}
+
+		~CheeseShop() {
+			if (clerkName)
+				delete clerkName;
+		}
+
+		std::string gotAny(std::string cheeseName) const {
+			if (clerkName && cheeseName == *clerkName)
+				return "Sir?";
+
+			return inventory.count(cheeseName) == 1 ? "Yes" : "No";
+		}
+
+	private:
+		std::unordered_set<std::string> inventory;
+		std::string *clerkName;
+};
+
+int main() {
+	CheeseShop shop;
+	try {
+		shop = CheeseShop{"config.toml"};
+	} catch(std::exception &e) {
+		// Silently continue anyway..
+	}
+
+	std::cout << "Red Leicester? " << shop.gotAny("Red Leicester") << std::endl;
+	std::cout << "Tilsit? " << shop.gotAny("Tilsit") << std::endl;
+	std::cout << "Wenslydale? " << shop.gotAny("Wenslydale") << std::endl;
+	std::cout << "Cheddar? " << shop.gotAny("Cheddar") << std::endl;
+
+	return 0;
+}
+*/

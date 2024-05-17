@@ -30,17 +30,6 @@ datatype ASMMath (int)
 
 
 
-datatype ASMCompareability (int)
-	Flags
-		bcmp
-		cmpi
-		bra
-		both = bcmp + cmpi
-	syntax is (|ASMCompareability| r, |bool|)
-		return self & r
-
-
-
 datatype AsmReg (int)
 	default 0|AsmReg|
 	linkage
@@ -110,6 +99,9 @@ datatype AsmReg (int)
 	function Signed (|bool|)
 		return self|DataTypeCode|.issigned
 		
+	function GapBits (|int|)
+		return 64 - .µType.BitCount
+	
 	function µType (|DataTypeCode|)
 		return self|int| & 0xFFFF
 	
@@ -146,7 +138,7 @@ datatype AsmReg (int)
 	syntax cast (|bool|)
 		return .reg
 	
-	syntax cast (|int|)
+	syntax cast (|int|) // strange? not even to .asmadd params?
 		cpp_part ToInt
 		return .reg
 	

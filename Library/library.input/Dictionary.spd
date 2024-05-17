@@ -21,10 +21,12 @@ class Dictionary (saveable)
 		
 	syntax Access (|string| Key, assigns:||)
 		cpp_wrapper JB_Dict_ValueSet
+			
 	syntax Access (|string| Key, ||)
-		cpp_part ValueStr
-		return self[key,nil]
-	syntax Access (|string| Key, |...| Default, ||)
+		cpp_part JB_Dict_Value
+		return self[key, nil]
+			
+	syntax Access (|string| Key, |...| Default=nil, ||)
 		nil checker
 		cpp_wrapper JB_Dict_Value
 		
@@ -183,3 +185,10 @@ function string.idcase    (|string|): return .lowercase
 // literally two words with different diacritics
 
 
+////////////////////////////////////////////////////
+//role DictionaryLower (Dictionary) // speedie doesnt like this??
+//	syntax Access (|string| Key, assigns:||)
+//		cpp_wrapper JB_Dict_ValueSet
+//	syntax Access (|string| Key, |...| Default=nil, ||)
+//		nil checker
+//		cpp_wrapper JB_Dict_Value

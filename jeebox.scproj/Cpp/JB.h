@@ -39,7 +39,7 @@ extern "C" {
 
 typedef byte CharProp;
 
-typedef uint Codepoint;
+typedef int Codepoint;
 
 typedef byte ControlClipMode;
 
@@ -59,9 +59,13 @@ typedef int ErrorInt;
 
 typedef ivec2 ErrorInt2;
 
-typedef uint ErrorMarker;
+typedef int ErrorMarker;
 
 typedef byte ErrorSeverity;
+
+typedef int FailableInt;
+
+typedef int FileDes;
 
 typedef int FileMode;
 
@@ -73,7 +77,7 @@ typedef vec4 FloatRangeConverter;
 
 typedef vec2 FloatRangeConverterBasic;
 
-typedef uint FlowControlStopper;
+typedef int FlowControlStopper;
 
 typedef int Ind;
 
@@ -97,7 +101,7 @@ typedef byte TaskState;
 
 typedef int TerminalColor;
 
-typedef uint U24_8;
+typedef int jbinLeaver;
 
 typedef vec4 mat2;
 
@@ -138,8 +142,6 @@ struct StringDigitIterator;
 struct StringLengthSplit;
 
 struct StructSaveTest;
-
-struct uint24;
 
 struct ByteMap_Behaviour;
 
@@ -237,8 +239,6 @@ struct SyntaxObj;
 
 struct TerminalCell;
 
-struct JB_String;
-
 struct FastString;
 
 struct FastString;
@@ -271,29 +271,85 @@ struct Message;
 
 typedef Message* (*FP_ParseHandler)(int Start, Message* Parent);
 
-typedef JB_Object* (*TokenHandler_fp)(int Start, Message* parent);
+typedef JB_Object* (*TokenHandler_fp)(int Start, Message* Parent);
 
 typedef JB_String* (*__Message_CopyID__)(Message* self);
 
 typedef void (*__Saveable_LoadProperties__)(Saveable* self, ObjectLoader* Loader);
 
-typedef JB_String* (*__Object_Render__)(JB_Object* self, FastString* fs_in);
+typedef JB_String* (*__Object_Render__)(JB_Object* self, FastString* Fs_in);
 
 typedef void (*__Saveable_SaveCollect__)(Saveable* self, ObjectSaver* Saver);
 
 typedef void (*__Saveable_SaveWrite__)(Saveable* self, ObjectSaver* Saver);
 
-typedef bool (*__Message_TextSet__)(Message* self, int i, JB_String* v);
+typedef bool (*__Message_TextSet__)(Message* self, int I, JB_String* V);
 
-typedef JB_String* (*__Message_Text__)(Message* self, int i);
+typedef JB_String* (*__Message_Text__)(Message* self, int I);
 
 typedef void (*FP_fnErrorLogger)(JB_ErrorReceiver* self, JB_String* Data);
 
-typedef JB_String* (*FP_fnIDGenerator)(int Start, int End, Syntax f);
-
-typedef void (*FP_fpDestructor)(JB_Object* self);
+typedef JB_String* (*FP_fnIDGenerator)(int Start, int End, Syntax F);
 
 typedef void (*FP_fpMsgRender)(Message* self, FastString* fs);
+
+//// HEADER SyntaxConstants.h
+#define kSyxNil 0
+#define kSyxArg 1
+#define kSyxEmb 2
+#define kSyxType 3
+#define kSyxDecl 4
+#define kSyxTmp 5
+#define kSyxOat 6
+#define kSyxQues 7
+#define kSyxCnj 8
+#define kSyxOpp 9
+#define kSyxThg 10
+#define kSyxSheb 11
+#define kSyxSCnj 12
+#define kSyxSThg 13
+#define kSyxNum 14
+#define kSyxSStr 15
+#define kSyxBack 16
+#define kSyxChar 17
+#define kSyxBin 18
+#define kSyxStr 19
+#define kSyxUnit 20
+#define kSyxARel 21
+#define kSyxName 22
+#define kSyxDot 23
+#define kSyxSDot 24
+#define kSyxFunc 25
+#define kSyxBRel 26
+#define kSyxAdj 27
+#define kSyxBadj 28
+#define kSyxAcc 29
+#define kSyxItem 30
+#define kSyxBra 31
+#define kSyxList 32
+#define kSyxPrm 33
+#define kSyxArr 34
+#define kSyxFile 35
+#define kSyxQuot 36
+#define kSyxRel 37
+#define kSyxERel 38
+#define kSyxTRel 39
+#define kSyxTril 40
+#define kSyxpinn 41
+#define kSyxbinn 42
+#define kSyxAsk 43
+#define kSyxYoda 44
+#define kSyxSCom 45
+#define kSyxMsg 46
+#define kSyxTodo 47
+#define kSyxurl 48
+#define kSyxXAtt 49
+#define kSyxXML 50
+#define kSyxXPI 51
+#define kSyxXCom 52
+#define kSyxXCDT 53
+#define kSyxXTxt 54
+#define kSyxmax 55
 
 //// HEADER Proj.h
 
@@ -305,13 +361,13 @@ struct FastBuff {
 	byte* Start;
 	byte* End;
 	JB_String* ReadFrom;
-	uint ErrorReported;
+	int ErrorReported;
 };
 
 struct MessagePosition {
 	JB_MemoryLayer* Layer;
 	int Position;
-	uint Length;
+	int Length;
 	MsgParseFlags Flags;
 	u16 Tag;
 };
@@ -362,9 +418,9 @@ struct DataObject_Behaviour: Object_Behaviour {
 };
 
 JBClass ( DTWrap , JB_Object , 
+	int64 PrivValue;
 	DataTypeCode DataType;
 	byte DeathAction;
-	int64 PrivValue;
 );
 
 struct DictionaryReader_Behaviour: Object_Behaviour {
@@ -374,17 +430,17 @@ struct ErrorReceiver_Behaviour: Object_Behaviour {
 };
 
 JBClass ( JB_ErrorReceiver , JB_Object , 
-	JB_Error* Errors;
-	FP_fnErrorLogger _LogFunc;
-	JB_Object* _LogObj;
 	int MaxErrors;
+	JB_Object* _LogObj;
+	JB_Error* Errors;
+	JB_String* Source;
 	int MaxProblems;
 	int ErrorCount;
 	int ProblemCount;
 	int WarnCount;
 	int LowerErrorsTo;
 	bool BlockErrors;
-	JB_String* Source;
+	FP_fnErrorLogger _LogFunc;
 );
 
 struct FastString_Behaviour: Object_Behaviour {
@@ -394,10 +450,10 @@ struct FlowControl_Behaviour: Object_Behaviour {
 };
 
 JBClass ( FlowControl , JB_Object , 
-	FastBuff Buff;
 	StringReader* ReadInput;
 	FastString* Write;
 	FastString* Excuse;
+	FastBuff Buff;
 );
 
 struct LeakTester_Behaviour: Object_Behaviour {
@@ -454,23 +510,31 @@ struct StringReader_Behaviour: Object_Behaviour {
 
 JBClass ( StringReader , JB_Object , 
 	int Length;
-	FastBuff Data;
 	JB_File* File;
 	JB_Object* UserObj;
 	int ChunkSize;
 	int StartFrom;
 	bool _NoMoreChunks;
+	FastBuff Data;
 );
 
 struct SyntaxObj_Behaviour: Object_Behaviour {
 };
 
 JBClass ( SyntaxObj , JB_Object , 
-	FP_fpMsgRender RenderAddr;
-	FP_fpMsgRender ExportAddr;
 	JB_String* Name;
 	JB_String* LongName;
 	Syntax ID;
+	FP_fpMsgRender ExportAddr;
+	FP_fpMsgRender RenderAddr;
+);
+
+struct TerminalCell_Behaviour: Object_Behaviour {
+};
+
+JBClass ( TerminalCell , JB_Object , 
+	int Color;
+	JB_String* Text;
 );
 
 struct TokenHandler_Behaviour: Object_Behaviour {
@@ -500,11 +564,11 @@ struct Message_Behaviour: list_Behaviour {
 JBClass ( Message , JB_List , 
 	JB_String* Name;
 	JB_Object* Obj;
-	Syntax Func;
-	byte Indent;
 	u16 RangeLength;
 	MsgParseFlags Flags;
 	u16 Tag;
+	byte Indent;
+	Syntax Func;
 );
 
 struct SaverClassInfo_Behaviour: Array_Behaviour {
@@ -520,9 +584,9 @@ struct Task_Behaviour: list_Behaviour {
 };
 
 JBClass ( JB_Task , JB_List , 
-	TaskState State;
-	byte _ObjectCount;
 	void* _func;
+	int _Object;
+	TaskState State;
 );
 
 struct Error_Behaviour: Message_Behaviour {
@@ -539,19 +603,19 @@ JBClass ( JB_Error , Message ,
 	ErrorFlags ErrorFlags;
 );
 extern Message* JB__App__Conf;
+extern Array* JB__App__OldArgs;
 extern JB_String* JB__App__Path;
 extern JB_File* JB__App__stdin;
 extern JB_File* JB__App__StdOut;
-extern Array* JB__App_OldArgs;
 extern JB_String* JB__App_Usage;
-#define kJB__ErrorColors_bold (JB_LUB[370])
+#define kJB__ErrorColors_bold (JB_LUB[19])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[371])
-#define kJB__ErrorColors_good (JB_LUB[372])
-#define kJB__ErrorColors_normal (JB_LUB[373])
-#define kJB__ErrorColors_underline (JB_LUB[372])
-#define kJB__ErrorColors_warn (JB_LUB[374])
-extern u16 JB__API_NilHappened;
+#define kJB__ErrorColors_error (JB_LUB[16])
+#define kJB__ErrorColors_good (JB_LUB[17])
+#define kJB__ErrorColors_normal (JB_LUB[20])
+#define kJB__ErrorColors_underline (JB_LUB[17])
+#define kJB__ErrorColors_warn (JB_LUB[18])
+extern u16 JB__API_NilHappened_;
 extern CharSet* JB__Constants_CSAfterStatement;
 extern CharSet* JB__Constants_CSLettersOnly;
 extern CharSet* JB__Constants_CSLine;
@@ -562,9 +626,9 @@ extern CharSet* JB__Constants_CSWordStart;
 extern CharSet* JB__Constants_CSWrapSplit;
 extern Dictionary* JB__Constants_EscapeChr;
 extern Dictionary* JB__Constants_EscapeStr;
+extern JB_String* JB__Constants_FFUUU;
 extern Dictionary* JB__Constants_JS_EscapeStr;
 extern Dictionary* JB__Constants_JS_UnEscapeStr;
-extern JB_String* JB__Constants_Name;
 extern Dictionary* JB__Constants_UnEscapeStr;
 extern Dictionary* JB__Constants_XML_EscapeStr;
 extern Dictionary* JB__Constants_XML_UnEscapeStr;
@@ -577,10 +641,7 @@ extern CharSet* JB__Constants_XMLWordMiddle;
 #define kJB__MZLab_Strongest (4)
 #define kJB__Math_E (2.7182818284590452353602874713526f)
 #define kJB__Math_iTau (0.15915494309f)
-#define kJB__Pipe_StdErr_ (2)
-#define kJB__Pipe_StdIn_ (0)
-#define kJB__Pipe_StdOut_ (1)
-extern JB_File* JB__Platform_Logger;
+extern JB_File* JB__Platform_Logger_;
 #define kJB__Terminal_Black (30)
 #define kJB__Terminal_Blue (34)
 #define kJB__Terminal_Cyan (36)
@@ -590,7 +651,7 @@ extern FastString* JB__Terminal_fs;
 extern Date JB__Terminal_LastDisplay;
 #define kJB__Terminal_Magenta (35)
 #define kJB__Terminal_Red (31)
-extern Array* JB__Terminal_Screen;
+extern Array* JB__Terminal_TermScreen;
 #define kJB__Terminal_w (80)
 #define kJB__Terminal_White (37)
 #define kJB__Terminal_Yellow (33)
@@ -599,69 +660,69 @@ extern JB_String* JB__JbinHeader;
 extern JB_String* JB__jBinNotJbin;
 extern Dictionary* JB__SyxDict_;
 #define kJB_kSaverEnd (JB_LUB[0])
-#define kJB_kSaverStart1 (JB_LUB[375])
+#define kJB_kSaverStart1 (JB_LUB[177])
 extern JB_ErrorReceiver* JB_StdErr;
-extern JB_ErrorReceiver* JB_StdErrOriginal;
-extern Syntax JB_SyxAcc;
-extern Syntax JB_SyxAdj;
-extern Syntax JB_SyxARel;
-extern Syntax JB_SyxArg;
-extern Syntax JB_SyxArr;
-extern Syntax JB_SyxAsk;
-extern Syntax JB_SyxBack;
-extern Syntax JB_SyxBadj;
-extern Syntax JB_SyxBin;
-extern Syntax JB_Syxbinn;
-extern Syntax JB_SyxBra;
-extern Syntax JB_SyxBRel;
-extern Syntax JB_SyxChar;
-extern Syntax JB_SyxCnj;
-extern Syntax JB_SyxDecl;
-extern Syntax JB_SyxDot;
-extern Syntax JB_SyxEmb;
-extern Syntax JB_SyxERel;
-extern Syntax JB_SyxFile;
-extern Syntax JB_SyxFunc;
-extern Syntax JB_SyxItem;
-extern Syntax JB_SyxList;
-extern Syntax JB_Syxmax;
-extern Syntax JB_SyxMsg;
-extern Syntax JB_SyxName;
-extern Syntax JB_SyxNil;
-extern Syntax JB_SyxNum;
-extern Syntax JB_SyxOat;
-extern Syntax JB_SyxOpp;
-extern Syntax JB_Syxpinn;
-extern Syntax JB_SyxPrm;
-extern Syntax JB_SyxQues;
-extern Syntax JB_SyxQuot;
-extern Syntax JB_SyxRel;
-extern Syntax JB_SyxSCnj;
-extern Syntax JB_SyxSCom;
-extern Syntax JB_SyxSDot;
-extern Syntax JB_SyxSheb;
-extern Syntax JB_SyxSStr;
-extern Syntax JB_SyxSThg;
-extern Syntax JB_SyxStr;
-extern Syntax JB_SyxThg;
-extern Syntax JB_SyxTmp;
-extern Syntax JB_SyxTodo;
-extern Syntax JB_SyxTRel;
-extern Syntax JB_SyxTril;
-extern Syntax JB_SyxType;
-extern Syntax JB_SyxUnit;
-extern Syntax JB_Syxurl;
-extern Syntax JB_SyxXAtt;
-extern Syntax JB_SyxXCDT;
-extern Syntax JB_SyxXCom;
-extern Syntax JB_SyxXML;
-extern Syntax JB_SyxXPI;
-extern Syntax JB_SyxXTxt;
-extern Syntax JB_SyxYoda;
+#define kJB_SyxAcc (29)
+#define kJB_SyxAdj (27)
+#define kJB_SyxARel (21)
+#define kJB_SyxArg (1)
+#define kJB_SyxArr (34)
+#define kJB_SyxAsk (43)
+#define kJB_SyxBack (16)
+#define kJB_SyxBadj (28)
+#define kJB_SyxBin (18)
+#define kJB_Syxbinn (42)
+#define kJB_SyxBra (31)
+#define kJB_SyxBRel (26)
+#define kJB_SyxChar (17)
+#define kJB_SyxCnj (8)
+#define kJB_SyxDecl (4)
+#define kJB_SyxDot (23)
+#define kJB_SyxEmb (2)
+#define kJB_SyxERel (38)
+#define kJB_SyxFile (35)
+#define kJB_SyxFunc (25)
+#define kJB_SyxItem (30)
+#define kJB_SyxList (32)
+#define kJB_Syxmax (55)
+#define kJB_SyxMsg (46)
+#define kJB_SyxName (22)
+#define kJB_SyxNil (0)
+#define kJB_SyxNum (14)
+#define kJB_SyxOat (6)
+#define kJB_SyxOpp (9)
+#define kJB_Syxpinn (41)
+#define kJB_SyxPrm (33)
+#define kJB_SyxQues (7)
+#define kJB_SyxQuot (36)
+#define kJB_SyxRel (37)
+#define kJB_SyxSCnj (12)
+#define kJB_SyxSCom (45)
+#define kJB_SyxSDot (24)
+#define kJB_SyxSheb (11)
+#define kJB_SyxSStr (15)
+#define kJB_SyxSThg (13)
+#define kJB_SyxStr (19)
+#define kJB_SyxThg (10)
+#define kJB_SyxTmp (5)
+#define kJB_SyxTodo (47)
+#define kJB_SyxTRel (39)
+#define kJB_SyxTril (40)
+#define kJB_SyxType (3)
+#define kJB_SyxUnit (20)
+#define kJB_Syxurl (48)
+#define kJB_SyxXAtt (49)
+#define kJB_SyxXCDT (53)
+#define kJB_SyxXCom (52)
+#define kJB_SyxXML (50)
+#define kJB_SyxXPI (51)
+#define kJB_SyxXTxt (54)
+#define kJB_SyxYoda (44)
+extern bool JB__Tk__DotInsertAllow;
+extern Message* JB__Tk__EndOfLineMarker;
+extern Dictionary* JB__Tk__ErrorNames;
+extern u16 JB__Tk__StopBars;
 extern JB_String* JB__Tk_Data;
-extern bool JB__Tk_DotInsertAllow;
-extern Message* JB__Tk_EndOfLineMarker;
-extern Dictionary* JB__Tk_ErrorNames;
 #define kJB__Tk_kAdjectiveOp (1)
 #define kJB__Tk_kAllow (false)
 #define kJB__Tk_kColon (2)
@@ -700,12 +761,11 @@ extern Dictionary* JB__Tk_ErrorNames;
 #define kJB__Tk_kTmpOpp (32768 | 16)
 #define kJB__Tk_LargestFlag (8388607)
 extern FP_fnIDGenerator JB__Tk_Splitter;
-extern u16 JB__Tk_StopBars;
 extern MessagePosition JB__Tk_Using;
-extern JB_String* JB__zalgo_down;
-extern JB_String* JB__zalgo_mid;
+#define kJB__zalgo_down (JB_LUB[575])
+#define kJB__zalgo_mid (JB_LUB[574])
 extern Random JB__zalgo_R;
-extern JB_String* JB__zalgo_up;
+#define kJB__zalgo_up (JB_LUB[573])
 #define kJB__byte_max (255)
 #define kJB__byte_min (0)
 #define kJB__char_max (127)
@@ -758,6 +818,7 @@ extern JB_String* JB__zalgo_up;
 #define kJB__TC_Double (0 + (48 + (64 + (128 + 8))))
 #define kJB__TC_f16 (kJB__TC_HFloat)
 #define kJB__TC_f64 (kJB__TC_Double)
+#define kJB__TC_Failed (32768)
 #define kJB__TC_Float (0 + (32 + (64 + (128 + 8))))
 #define kJB__TC_HFloat (0 + (16 + (64 + (128 + 8))))
 #define kJB__TC_Int (0 + (32 + (64 + (0 + 8))))
@@ -767,6 +828,7 @@ extern JB_String* JB__zalgo_up;
 #define kJB__TC_iVec2 (1 + (32 + (64 + (0 + 8))))
 #define kJB__TC_iVec3 (2 + (32 + (64 + (0 + 8))))
 #define kJB__TC_iVec4 (3 + (32 + (64 + (0 + 8))))
+#define kJB__TC_numeric (8)
 #define kJB__TC_s16 (kJB__TC_int16)
 #define kJB__TC_s16x2 (1 + (16 + (64 + (0 + 8))))
 #define kJB__TC_s16x3 (2 + (16 + (64 + (0 + 8))))
@@ -789,13 +851,11 @@ extern Dictionary* JB__TC_Types_Dict;
 #define kJB__TC_Vec2 (1 + (32 + (64 + (128 + 8))))
 #define kJB__TC_Vec3 (2 + (32 + (64 + (128 + 8))))
 #define kJB__TC_Vec4 (3 + (32 + (64 + (128 + 8))))
-#define kJB__Date_kClocksPerSecond (1000000)
-#define kJB__Date_kOneSecond (65536)
+#define kJB__Date_Highest (9223372036854775807)
 #define kJB__Date_kOneStep (0.000015258789f)
 #define kJB__Date_kSecondsPerDay (86400)
 #define kJB__Date_kSecondsPerMonthApprox (2628000)
 #define kJB__Date_kSecondsPerWeek (604800)
-#define kJB__Date_kTickBits (16)
 #define kJB__ErrorFlags_DontStrip (1)
 #define kJB__ErrorFlags_Keep (0)
 #define kJB__ErrorFlags_LargestFlag (7)
@@ -803,14 +863,18 @@ extern Dictionary* JB__TC_Types_Dict;
 #define kJB__ErrorFlags_PreferNoRenderPath (2)
 #define kJB__ErrorFlags_PrintAndKeep (1)
 #define kJB__ErrorFlags_PrintAndRemove (2)
+extern Array* JB__ErrorSeverity__names;
 #define kJB__ErrorSeverity_Critical (5)
 #define kJB__ErrorSeverity_Error (4)
 #define kJB__ErrorSeverity_Hint (1)
 #define kJB__ErrorSeverity_MaxError (6)
-extern Array* JB__ErrorSeverity_names;
 #define kJB__ErrorSeverity_OK (0)
 #define kJB__ErrorSeverity_Problem (3)
 #define kJB__ErrorSeverity_Warning (2)
+#define kJB__FailableInt_Fail (2147483648)
+#define kJB__FileDes_StdErr (2)
+#define kJB__FileDes_StdIn (0)
+#define kJB__FileDes_StdOut (1)
 #define kJB__FileMode_CanExec (1 << ((6 + 1) << ((3 + 1) << 0)))
 #define kJB__FileMode_Data (6 << ((6 + 4) << ((2 + 4) << 2)))
 #define kJB__FileMode_Group (7 << 3)
@@ -823,23 +887,29 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__MoveCode_Backward (32)
 #define kJB__MoveCode_Bottom (kJB__MoveCode_Down)
 #define kJB__MoveCode_Center (63)
-#define kJB__MoveCode_CenterH (1 + 2)
-#define kJB__MoveCode_CenterV (4 + 8)
+#define kJB__MoveCode_Close (128)
 #define kJB__MoveCode_Down (8)
 #define kJB__MoveCode_Forward (16)
 #define kJB__MoveCode_Front (kJB__MoveCode_Forward)
-#define kJB__MoveCode_LargestFlag (63)
+#define kJB__MoveCode_Horizontal (1 + 2)
+#define kJB__MoveCode_LargestFlag (255)
 #define kJB__MoveCode_Left (2)
 #define kJB__MoveCode_MiddleLeft (2 + (4 + 8))
 #define kJB__MoveCode_MiddleRight (1 + (4 + 8))
+#define kJB__MoveCode_Negative ((2 + (8 + (32 + 128))))
+#define kJB__MoveCode_Open (64)
+#define kJB__MoveCode_Positive ((1 + (4 + (16 + 64))))
 #define kJB__MoveCode_Right (1)
 #define kJB__MoveCode_Top (kJB__MoveCode_Up)
 #define kJB__MoveCode_Up (4)
+#define kJB__MoveCode_Vertical (4 + 8)
 #define kJB__MsgParseFlags_BreakPoint (32768)
-#define kJB__MsgParseFlags_Editable (4096)
-#define kJB__MsgParseFlags_Inserted (8192)
+#define kJB__MsgParseFlags_Editable (2048)
+#define kJB__MsgParseFlags_Inserted (4096)
 #define kJB__MsgParseFlags_LargestFlag (0)
-#define kJB__MsgParseFlags_NicelyPositioned (2048)
+#define kJB__MsgParseFlags_MacroInserted (12288)
+#define kJB__MsgParseFlags_MacroMade (8192)
+#define kJB__MsgParseFlags_NicelyPositioned (1024)
 #define kJB__MsgParseFlags_Style2 (16384)
 #define kJB__ProcessMode_AutoPrintErrors (4)
 #define kJB__ProcessMode_CaptureAll (1 | 4)
@@ -847,14 +917,15 @@ extern Array* JB__ErrorSeverity_names;
 #define kJB__ProcessMode_CaptureOrPrintErrors (2 | 4)
 #define kJB__ProcessMode_CaptureStdOut (1)
 #define kJB__ProcessMode_LargestFlag (7)
-extern int JB__Syx_CurrFuncID;
-extern int JB__Syx_MaxFuncID;
-#define kJB__TaskState_Finished (16)
-#define kJB__TaskState_HadErrors (4)
-#define kJB__TaskState_LargestFlag (31)
+extern int JB__Syx_CurrFuncID_;
+#define kJB__TaskState_Animation (16)
+#define kJB__TaskState_Finished (64)
+#define kJB__TaskState_HadErrors (8)
+#define kJB__TaskState_LargestFlag (127)
 #define kJB__TaskState_Paused (2)
 #define kJB__TaskState_Started (1)
-#define kJB__TaskState_Successful (8)
+#define kJB__TaskState_Successful (32)
+#define kJB__TaskState_WaitsTillStart (4)
 extern CompressionStats JB__MzSt_all;
 extern Dictionary* JB__LD_ClassList;
 #define kJB__Saver_RefMark (1073741824)
@@ -863,7 +934,7 @@ extern Random JB__Rnd_Shared;
 #define kJB__Wrap_kDelete (2)
 #define kJB__Wrap_kFree (1)
 #define kJB__Wrap_kNothing (0)
-extern JB_String* JB__Rec_NonFatal;
+#define kJB__Rec_NonFatal (JB_LUB[275])
 extern double JB__Rec_Progress;
 #define kJB__fix_TypeDict (3)
 #define kJB__fix_TypeObj (1)
@@ -871,26 +942,26 @@ extern double JB__Rec_Progress;
 #define kJB__fix_TypeValue (0)
 extern bool JB__Flow_AlwaysMove;
 extern bool JB__Flow_BreakOnFail;
-extern uint JB__Flow_Disabled;
+extern int JB__Flow_Disabled;
 extern FlowControl* JB__Flow_Flow;
 extern byte JB__Flow_FlowMode;
 #define kJB__Flow_Log (1)
 #define kJB__Flow_Off (0)
 extern CompressionStats JB__Flow_Stats;
 #define kJB__Flow_Validate (2)
-extern Array* JB__Macro_TmpPrms;
-extern uint64 JB__Mrap_MDummy[2];
+extern Array* JB__Macro_TmpPrms_;
+extern uint64 JB__Mrap_MDummy_[2];
 extern bool JB__File_DebugExecute;
 #define kJB__File_IgnoreErrors (true)
 #define kJB__File_O_APPEND (8)
 #define kJB__File_O_CREAT (512)
 #define kJB__File_O_EXCL (2048)
-#define kJB__File_O_RDONLY (0)
+#define kJB__File_O_RDONLY (0x000)
 #define kJB__File_O_RDWR (2)
 #define kJB__File_O_TRUNC (1024)
 #define kJB__File_O_WRONLY (1)
 extern byte JB__Err_AutoPrint;
-extern Array* JB__Err_CurrSource;
+extern Array* JB__Err_CurrSource_;
 extern bool JB__Err_KeepStackTrace;
 
 //// HEADER JB.h
@@ -910,9 +981,9 @@ JB_String* JB_App__OrigPath();
 
 void JB_PrintStackTrace();
 
-ErrorInt2 JB_App__Say(JB_String* s, bool print);
+ErrorInt2 JB_App__Say(JB_String* S, bool Print);
 
-JB_String* JB_App__StackTrace(int skip, FastString* fs_in);
+JB_String* JB_App__StackTrace(int Skip, FastString* Fs_in);
 
 
 
@@ -926,7 +997,7 @@ int JB_ErrorColors__InitCode_();
 // API
 Message* JB_API__Errors();
 
-int JB_API__Init(int flags);
+int JB_API__Init(int Flags);
 
 int JB_API__Init_();
 
@@ -936,12 +1007,12 @@ void JB_API__NilCallBack(JB_String* ErrorMessage);
 
 bool JB_API__NilHandler();
 
-Message* JB_API__Parse(JB_String* s, JB_String* path);
+Message* JB_API__Parse(JB_String* S, JB_String* Path);
 
 
 
 // Constants
-void JB_Constants__AddEscape(byte i, FastString* fs);
+void JB_Constants__AddEscape(byte I, FastString* Fs);
 
 int JB_Constants__Init_();
 
@@ -961,24 +1032,37 @@ bool JB_Constants__TestCasting();
 // Math
 
 
-// Pipe
-
-
 // Platform
 int JB_Platform__Init_();
 
 int JB_Platform__InitCode_();
 
-void JB_Platform__Log(JB_String* s);
+void JB_Platform__Log(JB_String* S);
 
 JB_File* JB_Platform__OpenLog();
 
 
 
 // Terminal
+void JB_Terminal__Display();
+
+void JB_Terminal__DrawRect(ivec4 Rect, JB_String* Inside, TerminalColor Colors);
+
+JB_String* JB_Terminal__Flat();
+
+void JB_Terminal__FrameText(JB_String* S, ivec4 Frame, TerminalColor FrameCol, TerminalColor TextCol);
+
+void JB_Terminal__init();
+
 int JB_Terminal__Init_();
 
 int JB_Terminal__InitCode_();
+
+ivec2 JB_Terminal__Size();
+
+void JB_Terminal__SyntaxAppend(JB_String* Text, ivec2 V, TerminalColor Colors);
+
+void JB_Terminal__SyntaxExpect(JB_String* Msg);
 
 
 
@@ -994,7 +1078,7 @@ ErrorInt JB_Main();
 
 
 // main
-bool JB_CompareError(Message* expected, Message* found);
+bool JB_CompareError(Message* Expected, Message* Found);
 
 JB_String* JB_EntityTest();
 
@@ -1002,16 +1086,16 @@ int JB_Init_();
 
 int JB_InitCode_();
 
-void JB_PrintLine(JB_String* data);
+void JB_PrintLine(JB_String* Data);
 
-void JB_Obj_PrintLine(JB_Object* o);
+void JB_Obj_PrintLine(JB_Object* O);
 
 
 
 // Tk
-Message* JB_Tk__AddToOutput(Message* Output, Message* curr, Message* prev, int pos);
+Message* JB_Tk__AddToOutput(Message* Output, Message* Curr, Message* Prev, int Pos);
 
-void JB_Tk__AddXMLText(Message* XML, JB_String* s, int start, int i);
+void JB_Tk__AddXMLText(Message* XML, JB_String* S, int Start, int I);
 
 Message* JB_Tk__BarThings(int Start, Syntax Syx);
 
@@ -1019,27 +1103,27 @@ Message* JB_Tk__BeforeRelSub(int Start, bool Mode);
 
 bool JB_Tk__CanStatement();
 
-Message* JB_Tk__ChainTemporalRels(Message* FirstThing, Message* opp);
+Message* JB_Tk__ChainTemporalRels(Message* FirstThing, Message* Opp);
 
-JB_String* JB_Tk__CharName(int start, byte find);
+JB_String* JB_Tk__CharName(int Start, byte Find);
 
-Message* JB_Tk__CloseXML(Message* XML, int i, JB_String* s);
+Message* JB_Tk__CloseXML(Message* XML, int I, JB_String* S);
 
 Message* JB_Tk__DecorateThing(Message* R, int Ops);
 
-Message* JB_Tk__DotSub(Syntax fn, int Start, Message* parent);
+Message* JB_Tk__DotSub(Syntax Fn, int Start, Message* Parent);
 
-int JB_Tk__EmbeddedCode(JB_String* close, Message* dest, int TmpoFlags);
+int JB_Tk__EmbeddedCode(JB_String* Close, Message* Dest, int TmpoFlags);
 
-Message* JB_Tk__ErrorAdd(JB_String* s, Ind Start);
+Message* JB_Tk__ErrorAdd(JB_String* S, Ind Start);
 
-Message* JB_Tk__ErrorAlwaysAdd(JB_String* s, Ind Start);
+Message* JB_Tk__ErrorAlwaysAdd(JB_String* S, Ind Start);
 
 void JB_Tk__ErrorEvent(int Start, int ExpectedBits, int RealBits);
 
 void JB_Tk__ErrorLetter(int Start);
 
-bool JB_Tk__ExpectEndChar(int start, JB_String* s, bool Expect);
+bool JB_Tk__ExpectEndChar(int Start, JB_String* S, bool Expect);
 
 Message* JB_Tk__fAccess(int Start, Message* Parent);
 
@@ -1059,7 +1143,7 @@ Message* JB_Tk__fArray(int Start, Message* Parent);
 
 Message* JB_Tk__fAsk(int Start, Message* Parent);
 
-Message* JB_Tk__fAskSub(int Start, Message* Parent, Syntax f);
+Message* JB_Tk__fAskSub(int Start, Message* Parent, Syntax F);
 
 Message* JB_Tk__fAtName(int Start, Message* Parent);
 
@@ -1081,7 +1165,7 @@ Message* JB_Tk__fBracket(int Start, Message* Parent);
 
 Message* JB_Tk__fChar(int Start, Message* Parent);
 
-Message* JB_Tk__fCharSub(int pos, int start, byte find);
+Message* JB_Tk__fCharSub(int Pos, int Start, byte Find);
 
 Message* JB_Tk__fComment(int Start, Message* Parent);
 
@@ -1101,13 +1185,13 @@ Message* JB_Tk__fError2(int Start, Message* Parent);
 
 Message* JB_Tk__fFuncCall(int Start, Message* Parent);
 
-Message* JB_Tk__FillXML(Message* XML, Ind i);
+Message* JB_Tk__FillXML(Message* XML, Ind I);
 
-int JB_Tk__FindError(int num);
+int JB_Tk__FindError(int Num);
 
 Message* JB_Tk__fInnerNiceAdj(int Start, Message* Parent);
 
-Message* JB_Tk__FixTRels(Message* self, Message* Last);
+Message* JB_Tk__FixTRels(Message* Self, Message* Last);
 
 Message* JB_Tk__fMsgList(int Start, Message* Parent);
 
@@ -1151,11 +1235,11 @@ Message* JB_Tk__fThingSyx(int Start, Message* Parent);
 
 Message* JB_Tk__fThingWord(int Start, Message* Parent);
 
-Message* JB_Tk__fTmp(int Start, int OpFlags, int ThingFlags, Message* parent);
+Message* JB_Tk__fTmp(int Start, int OpFlags, int ThingFlags, Message* Parent);
 
 Message* JB_Tk__fTmpPlus(int Start, Message* Parent);
 
-Message* JB_Tk__fTmpSub(Message* result, int OpFlags, int ThingFlags);
+Message* JB_Tk__fTmpSub(Message* Result, int OpFlags, int ThingFlags);
 
 Message* JB_Tk__fTypeCast(int Start, Message* Parent);
 
@@ -1171,11 +1255,11 @@ Message* JB_Tk__fXML_PI(int Start, Message* Parent);
 
 Message* JB_Tk__fYoda(int Start, Message* Parent);
 
-Message* JB_Tk__GetFuncAfter(Message* result);
+Message* JB_Tk__GetFuncAfter(Message* Result);
 
-int JB_Tk__GotoEndOfLine(int from);
+int JB_Tk__GotoEndOfLine(int From);
 
-Message* JB_Tk__IndentBug(Message* curr);
+Message* JB_Tk__IndentBug(Message* Curr);
 
 void JB_Tk__Init();
 
@@ -1183,17 +1267,17 @@ int JB_Tk__Init_();
 
 int JB_Tk__InitCode_();
 
-Message* JB_Tk__LoweredIndent(Message* output, Message* curr);
+Message* JB_Tk__LoweredIndent(Message* Output, Message* Curr);
 
-Message* JB_Tk__MakeInvisArg(Message* tmp, int indent);
+Message* JB_Tk__MakeInvisArg(Message* Tmp, int Indent);
 
-Message* JB_Tk__MakeRel(Message* first, int Bits);
+Message* JB_Tk__MakeRel(Message* First, int Bits);
 
-int JB_Tk__MessageErrorSub(FastString* fs, int num, int ButFound);
+int JB_Tk__MessageErrorSub(FastString* Fs, int Num, int ButFound);
 
-bool JB_Tk__NeedName(Message* thg);
+bool JB_Tk__NeedName(Message* Thg);
 
-Message* JB_Tk__NewParentName(Message* Parent, Syntax Func, int Start, JB_String* name);
+Message* JB_Tk__NewParentName(Message* Parent, Syntax Func, int Start, JB_String* Name);
 
 Message* JB_Tk__NewParent(Message* Parent, Syntax Func, int Start, int End);
 
@@ -1203,9 +1287,9 @@ Message* JB_Tk__NewSkip(Message* P, Syntax F, int Start, int NameStart, int Name
 
 Message* JB_Tk__NewWord(Message* P, Syntax F, int Start, int SearchFrom);
 
-ParserLineAndIndent JB_Tk__NextLineAndIndent(Message* parent);
+ParserLineAndIndent JB_Tk__NextLineAndIndent(Message* Parent);
 
-bool JB_Tk__NoFuncAfter(byte b);
+bool JB_Tk__NoFuncAfter(byte B);
 
 Message* JB_Tk__NumberSub(int Start, int RealStart);
 
@@ -1213,11 +1297,11 @@ int JB_Tk__NumEnd(JB_String* NumStr, int Start);
 
 bool JB_Tk__OK();
 
-Message* JB_Tk__OppChain(Message* opp);
+Message* JB_Tk__OppChain(Message* Opp);
 
 void JB_Tk__Params(Message* Parent, int N);
 
-Message* JB_Tk__ParseItem(Message* ch, int TemporalFlags, int ops);
+Message* JB_Tk__ParseItem(Message* Ch, int TemporalFlags, int Ops);
 
 int JB_Tk__ParseLoop(Message* Output, int TmpoFlags);
 
@@ -1225,31 +1309,31 @@ bool JB_Tk__ParseLoopFlags(Message* Output, JB_String* Ender, int TmpoFlags);
 
 Message* JB_Tk__ParseLoopItem(Message* Output, int TmpoFlags, Message* Prev, int Indent);
 
-Message* JB_Tk__PostInnerAdj(Message* Rel, Message* opp);
+Message* JB_Tk__PostInnerAdj(Message* Rel, Message* Opp);
 
 Message* JB_Tk__ProcessThing(int Ops, bool Expect);
 
 Message* JB_Tk__ProcessThingNoBar(int Ops, bool Expect);
 
-Message* JB_Tk__ProcessThingOrTmp(int opps);
+Message* JB_Tk__ProcessThingOrTmp(int Opps);
 
-Message* JB_Tk__ProcessThingParent(Message* parent, int Ops, int ThingFlags);
+Message* JB_Tk__ProcessThingParent(Message* Parent, int Ops, int ThingFlags);
 
 Message* JB_Tk__ProcessThingSub(Message* Parent, int Ops, int KindOfThing, bool Expect);
 
-Message* JB_Tk__ReRoute(Message* output, Message* cnj, Message* f);
+Message* JB_Tk__ReRoute(Message* Output, Message* Cnj, Message* F);
 
 void JB_Tk__StopParse();
 
-Message* JB_Tk__ThingXMLAtt(int start, Message* Parent);
+Message* JB_Tk__ThingXMLAtt(int Start, Message* Parent);
 
-void JB_Tk__TokensFn(Array* arr, int bits, FP_ParseHandler func);
+void JB_Tk__TokensFn(Array* Arr, int Bits, FP_ParseHandler Func);
 
-void JB_Tk__TokensHan(Array* arr, TokHan* H);
+void JB_Tk__TokensHan(Array* Arr, TokHan* H);
 
-void JB_Tk__TokenzFn(JB_String* s, int bits, FP_ParseHandler func);
+void JB_Tk__TokenzFn(JB_String* S, int Bits, FP_ParseHandler Func);
 
-Message* JB_Tk__UnexpectedSyntax(Message* bad);
+Message* JB_Tk__UnexpectedSyntax(Message* Bad);
 
 Message* JB_Tk__UnTmpPlace(Message* R);
 
@@ -1257,11 +1341,11 @@ bool JB_Tk__WillEnd();
 
 int JB_Tk__WordAfter(int Start);
 
-int JB_Tk__WordAfterSub(int Start, CharSet* cs);
+int JB_Tk__WordAfterSub(int Start, CharSet* Cs);
 
-int JB_Tk__XMLAttribs(Message* XML, int start);
+int JB_Tk__XMLAttribs(Message* XML, int Start);
 
-Message* JB_Tk__XMLWhatever(int s, int skip, JB_String* ender, Syntax fn);
+Message* JB_Tk__XMLWhatever(int S, int Skip, JB_String* Ender, Syntax Fn);
 
 Ind JB_Tk__XMLWordEnd(int From);
 
@@ -1290,21 +1374,21 @@ int JB_zalgo__InitCode_();
 
 
 // byte
-bool JB_byte_CanPrintAsNormalChar(byte self);
+bool JB_byte_CanPrintAsNormalChar(byte Self);
 
-bool JB_byte_IsInt(byte self);
+bool JB_byte_IsInt(byte Self);
 
-bool JB_byte_IsLetter(byte self);
+bool JB_byte_IsLetter(byte Self);
 
-bool JB_byte_IsTextLine(byte self);
+bool JB_byte_IsTextLine(byte Self);
 
-bool JB_byte_IsUpper(byte self);
+bool JB_byte_IsUpper(byte Self);
 
-bool JB_byte_IsWhite(byte self);
+bool JB_byte_IsWhite(byte Self);
 
-byte JB_byte_LowerCase(byte self);
+byte JB_byte_LowerCase(byte Self);
 
-JB_String* JB_byte_Render(byte self, FastString* fs_in);
+JB_String* JB_byte_Render(byte Self, FastString* Fs_in);
 
 
 
@@ -1318,11 +1402,11 @@ JB_String* JB_byte_Render(byte self, FastString* fs_in);
 
 
 // float
-float JB_f_RoundTo(float self, float to);
+float JB_f_RoundTo(float Self, int To);
 
-float JB_f_Fract(float self);
+float JB_f_Fract(float Self);
 
-float JB_f_Pow(float self, int n);
+float JB_f_Pow(float Self, int N);
 
 
 
@@ -1330,15 +1414,21 @@ float JB_f_Pow(float self, int n);
 
 
 // int
-int JB_int_OperatorAlign(int self, int To);
+int JB_int_LowestBit(int Self);
 
-bool JB_int_OperatorIsa(int self, uint n);
+int JB_int_OperatorAlign(int Self, int To);
 
-int JB_int_OperatorMin(int self, int other);
+bool JB_int_OperatorIsa(int Self, uint N);
 
-int JB_int_OperatorPow(int self, int a);
+int JB_int_OperatorMax(int Self, int Other);
 
-IntRange JB_int_OperatorTo(int self, int other);
+int JB_int_OperatorMin(int Self, int Other);
+
+int JB_int_OperatorPow(int Self, int A);
+
+IntRange JB_int_OperatorTo(int Self, int Other);
+
+int JB_int_TabsWidth(int Self);
 
 int JB_int__Max();
 
@@ -1348,25 +1438,31 @@ int JB_int__Max();
 
 
 // int64
-double JB_int64_AsFloat(int64 self);
+int64 JB_int64_OperatorMin(int64 Self, int64 D);
 
-int64 JB_int64_OperatorMin(int64 self, int64 d);
+JB_String* JB_int64_Render(int64 Self, FastString* Fs_in);
 
-JB_String* JB_int64_Render(int64 self, FastString* fs_in);
+void JB_int64_RenderSizePart(int64 Self, FastString* Fs, int Size, JB_String* Suff);
 
-void JB_int64_RenderSizePart(int64 self, FastString* fs, float Size, JB_String* Suff);
-
-JB_String* JB_int64_StrSize(int64 self, FastString* fs_in);
+JB_String* JB_int64_StrSize(int64 Self, FastString* Fs_in);
 
 
 
 // ivec2
+bool JB_ivec2_OperatorContains(ivec2 Self, int X);
+
+bool JB_ivec2_OperatorInrange(ivec2 Self, ivec2 P);
+
 
 
 // ivec3
 
 
 // ivec4
+ivec4 JB_ivec4_Shrink(ivec4 Self, int I);
+
+int JB_ivec4_Width(ivec4 Self);
+
 
 
 // uint
@@ -1391,17 +1487,17 @@ JB_String* JB_int64_StrSize(int64 self, FastString* fs_in);
 
 
 // Codepoint
-bool JB_CP_In(Codepoint self, int a, int b);
+bool JB_CP_In(Codepoint Self, int A, int B);
 
-bool JB_CP_IsHigher(Codepoint self);
+bool JB_CP_IsHigher(Codepoint Self);
 
-bool JB_CP_IsLetter(Codepoint self);
+bool JB_CP_IsLetter(Codepoint Self);
 
-bool JB_CP_IsLower(Codepoint self);
+bool JB_CP_IsLower(Codepoint Self);
 
-bool JB_CP_IsUpper(Codepoint self);
+bool JB_CP_IsUpper(Codepoint Self);
 
-bool JB_CP_IsWhite(Codepoint self);
+bool JB_CP_IsWhite(Codepoint Self);
 
 
 
@@ -1418,7 +1514,7 @@ bool JB_CP_IsWhite(Codepoint self);
 
 
 // DataTypeCode
-bool JB_TC_IsFloat(DataTypeCode self);
+bool JB_TC_IsFloat(DataTypeCode Self);
 
 
 
@@ -1440,7 +1536,7 @@ Date JB_Date__New0();
 
 
 // ErrorSeverity
-JB_String* JB_ErrorSeverity_Render(ErrorSeverity self, FastString* fs_in);
+JB_String* JB_ErrorSeverity_Render(ErrorSeverity Self, FastString* Fs_in);
 
 int JB_ErrorSeverity__Init_();
 
@@ -1448,6 +1544,12 @@ int JB_ErrorSeverity__InitCode_();
 
 Array* JB_ErrorSeverity__InitNames();
 
+
+
+// FailableInt
+
+
+// FileDes
 
 
 // FileMode
@@ -1472,7 +1574,7 @@ Array* JB_ErrorSeverity__InitNames();
 
 
 // IntRange
-int JB_Rg_Width(IntRange self);
+int JB_Rg_Width(IntRange Self);
 
 
 
@@ -1495,31 +1597,31 @@ int JB_Rg_Width(IntRange self);
 
 
 // Syntax
-bool JB_Syx_IsString(Syntax self);
+bool JB_Syx_IsString(Syntax Self);
 
-bool JB_Syx_ListViewable(Syntax self);
+bool JB_Syx_ListViewable(Syntax Self);
 
-JB_String* JB_Syx_LongName(Syntax self);
+JB_String* JB_Syx_LongName(Syntax Self);
 
-Message* JB_Syx_Msg(Syntax self, JB_String* name);
+Message* JB_Syx_Msg(Syntax Self, JB_String* Name);
 
-JB_String* JB_Syx_Name(Syntax self);
+JB_String* JB_Syx_Name(Syntax Self);
 
-bool JB_Syx_NoChildren(Syntax self);
+bool JB_Syx_NoChildren(Syntax Self);
 
-SyntaxObj* JB_Syx_Obj(Syntax self);
+SyntaxObj* JB_Syx_Obj(Syntax Self);
 
-FP_fpMsgRender JB_Syx_RenderAddr(Syntax self);
+FP_fpMsgRender JB_Syx_RenderAddr(Syntax Self);
 
-bool JB_Syx_Translateable(Syntax self);
+bool JB_Syx_Translateable(Syntax Self);
 
-Syntax JB_Syx__Func(JB_String* name, Message* where);
+Syntax JB_Syx__Func(JB_String* Name, Message* Where);
 
 int JB_Syx__Init_();
 
 int JB_Syx__InitCode_();
 
-Syntax JB_Syx__StdNew(FP_fpMsgRender msg, JB_String* name, JB_String* LongName);
+Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, int ID);
 
 
 
@@ -1529,10 +1631,10 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender msg, JB_String* name, JB_String* LongName);
 // TerminalColor
 
 
-// U24_8
-
-
 // int8
+
+
+// jbinLeaver
 
 
 // mat2
@@ -1605,22 +1707,22 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender msg, JB_String* name, JB_String* LongName);
 
 
 // JB_ClassData
-JB_MemoryLayer* JB_ClassData_CreateUseLayer(JB_Class* self, JB_Object* obj, JB_Object* obj2);
+JB_MemoryLayer* JB_ClassData_CreateUseLayer(JB_Class* Self, JB_Object* Obj, JB_Object* Obj2);
 
-void JB_ClassData_Restore(JB_Class* self);
+void JB_ClassData_Restore(JB_Class* Self);
 
 
 
 // JB_CompressionStats
-void JB_MzSt_Clear(CompressionStats* self);
+void JB_MzSt_Clear(CompressionStats* Self);
 
-void JB_MzSt_end(CompressionStats* self);
+void JB_MzSt_end(CompressionStats* Self);
 
-void JB_MzSt_liveupdate(CompressionStats* self, int s, int outt);
+void JB_MzSt_liveupdate(CompressionStats* Self, int S, int Outt);
 
-void JB_MzSt_Print(CompressionStats* self);
+void JB_MzSt_Print(CompressionStats* Self);
 
-void JB_MzSt_start(CompressionStats* self);
+void JB_MzSt_start(CompressionStats* Self);
 
 int JB_MzSt__Init_();
 
@@ -1632,35 +1734,35 @@ int JB_MzSt__InitCode_();
 
 
 // JB_FastBuff
-byte JB_FastBuff_Byte(FastBuff* self);
+byte JB_FastBuff_Byte(FastBuff* Self);
 
-byte* JB_FastBuff_Clip(FastBuff* self, int v, int reduce);
+byte* JB_FastBuff_Clip(FastBuff* Self, int V, int Reduce);
 
-uint JB_FastBuff_CopyTo(FastBuff* self, byte* Dest, int Length);
+int JB_FastBuff_CopyTo(FastBuff* Self, byte* Dest, int Length);
 
-void JB_FastBuff_Destructor(FastBuff* self);
+void JB_FastBuff_Destructor(FastBuff* Self);
 
-bool JB_FastBuff_Has(FastBuff* self, int n);
+bool JB_FastBuff_Has(FastBuff* Self, int N);
 
-bool JB_FastBuff_HasAny(FastBuff* self);
+bool JB_FastBuff_HasAny(FastBuff* Self);
 
-int JB_FastBuff_Length(FastBuff* self);
+int JB_FastBuff_Length(FastBuff* Self);
 
-int64 JB_FastBuff_Position(FastBuff* self);
+int64 JB_FastBuff_Position(FastBuff* Self);
 
-void JB_FastBuff_PositionSet(FastBuff* self, int64 Value);
+void JB_FastBuff_PositionSet(FastBuff* Self, int64 Value);
 
-void JB_FastBuff_ReadFromSet(FastBuff* self, JB_String* Value);
+void JB_FastBuff_ReadFromSet(FastBuff* Self, JB_String* Value);
 
-int64 JB_FastBuff_Remaining(FastBuff* self);
+int64 JB_FastBuff_Remaining(FastBuff* Self);
 
-int JB_FastBuff_Size(FastBuff* self);
+int JB_FastBuff_Size(FastBuff* Self);
 
-JB_String* JB_FastBuff_AccessStr(FastBuff* self, int pos, int after);
+JB_String* JB_FastBuff_AccessStr(FastBuff* Self, int Pos, int After);
 
-void JB_FastBuff_SyntaxExpect(FastBuff* self, JB_String* s);
+void JB_FastBuff_SyntaxExpect(FastBuff* Self, JB_String* S);
 
-JB_String* JB_FastBuff_TmpStr(FastBuff* self);
+JB_String* JB_FastBuff_TmpStr(FastBuff* Self);
 
 
 
@@ -1677,34 +1779,34 @@ JB_String* JB_FastBuff_TmpStr(FastBuff* self);
 
 
 // JB_MessagePosition
-void JB_MsgPos_Destructor(MessagePosition* self);
+void JB_MsgPos_Destructor(MessagePosition* Self);
 
-void JB_MsgPos_SyntaxUsingComplete(MessagePosition* self);
+void JB_MsgPos_SyntaxUsingComplete(MessagePosition* Self, JB_Object* Idk);
 
 
 
 // JB_ObjectLoader
-void JB_LD_Destructor(ObjectLoader* self);
+void JB_LD_Destructor(ObjectLoader* Self);
 
-bool JB_LD_HasItem(ObjectLoader* self);
+bool JB_LD_HasItem(ObjectLoader* Self);
 
-int64 JB_LD_Int(ObjectLoader* self);
+int64 JB_LD_Int(ObjectLoader* Self);
 
-int64 JB_LD_ItemInt(ObjectLoader* self);
+int64 JB_LD_ItemInt(ObjectLoader* Self);
 
-bool JB_LD_ItemIsInt(ObjectLoader* self);
+bool JB_LD_ItemIsInt(ObjectLoader* Self);
 
-JB_String* JB_LD_ItemName(ObjectLoader* self);
+JB_String* JB_LD_ItemName(ObjectLoader* Self);
 
-JB_Object* JB_LD_ItemObject(ObjectLoader* self);
+JB_Object* JB_LD_ItemObject(ObjectLoader* Self);
 
-Message* JB_LD_Next(ObjectLoader* self);
+Message* JB_LD_Next(ObjectLoader* Self);
 
-JB_Object* JB_LD_Object(ObjectLoader* self);
+JB_Object* JB_LD_Object(ObjectLoader* Self);
 
-JB_Object* JB_LD_ObjectSub(ObjectLoader* self, Message* c);
+JB_Object* JB_LD_ObjectSub(ObjectLoader* Self, Message* C);
 
-JB_String* JB_LD_String(ObjectLoader* self);
+JB_String* JB_LD_String(ObjectLoader* Self);
 
 int JB_LD__Init_();
 
@@ -1713,13 +1815,13 @@ int JB_LD__InitCode_();
 
 
 // JB_ObjectSaver
-void JB_Saver_AppendInt(ObjectSaver* self, int64 i);
+void JB_Saver_AppendInt(ObjectSaver* Self, int64 I);
 
-void JB_Saver_AppendObject(ObjectSaver* self, JB_Object* o);
+void JB_Saver_AppendObject(ObjectSaver* Self, JB_Object* O);
 
-void JB_Saver_AppendString(ObjectSaver* self, JB_String* s);
+void JB_Saver_AppendString(ObjectSaver* Self, JB_String* S);
 
-void JB_Saver_Destructor(ObjectSaver* self);
+void JB_Saver_Destructor(ObjectSaver* Self);
 
 int JB_Saver__Init_();
 
@@ -1753,13 +1855,13 @@ int JB_Pico__InitCode_();
 
 
 // JB_Random
-void JB_Rnd_LoadProperties(Random* self, ObjectLoader* Loader);
+void JB_Rnd_LoadProperties(Random* Self, ObjectLoader* Loader);
 
-void JB_Rnd_SaveWrite(Random* self, ObjectSaver* Saver);
+void JB_Rnd_SaveWrite(Random* Self, ObjectSaver* Saver);
 
-void JB_Rnd_SeedSet(Random* self, uint64 Value);
+void JB_Rnd_SeedSet(Random* Self, uint64 Value);
 
-void JB_Rnd_TimeSeed(Random* self);
+void JB_Rnd_TimeSeed(Random* Self);
 
 int JB_Rnd__Init_();
 
@@ -1780,15 +1882,12 @@ int JB_Rnd__InitCode_();
 
 
 // JB_StructSaveTest
-void JB_StructSaveTest_Destructor(StructSaveTest* self);
+void JB_StructSaveTest_Destructor(StructSaveTest* Self);
 
-void JB_StructSaveTest_LoadProperties(StructSaveTest* self, ObjectLoader* Loader);
+void JB_StructSaveTest_LoadProperties(StructSaveTest* Self, ObjectLoader* Loader);
 
-void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
+void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 
-
-
-// JB_uint24
 
 
 // JB_ByteMap_Behaviour
@@ -1897,17 +1996,17 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* self, ObjectSaver* Saver);
 
 
 // JB_Object
-void jdb(JB_Object* self);
+void jdb(JB_Object* Self);
 
-bool JB_Object_FastIsa(JB_Object* self, JB_Class* x);
+bool JB_Object_FastIsa(JB_Object* Self, JB_Class* X);
 
-bool JB_Object_Isa(JB_Object* self, JB_Class* cls);
+bool JB_Object_Isa(JB_Object* Self, JB_Class* Cls);
 
-void JB_Object_SaveTryCollect(JB_Object* self, ObjectSaver* Saver);
+void JB_Object_SaveTryCollect(JB_Object* Self, ObjectSaver* Saver);
 
-void JB_Object_Fail(JB_Object* self, JB_String* Error);
+void JB_Object_Fail(JB_Object* Self, JB_String* Error);
 
-void JB_Object_SyntaxExpect(JB_Object* self);
+void JB_Object_SyntaxExpect(JB_Object* Self);
 
 
 
@@ -1918,111 +2017,111 @@ void JB_Object_SyntaxExpect(JB_Object* self);
 
 
 // JB_Charset
-Array* JB_CS_Bytes(CharSet* self);
+Array* JB_CS_Bytes(CharSet* Self);
 
-bool JB_CS_NextInCharset(CharSet* self, int* p);
+bool JB_CS_NextInCharset(CharSet* Self, int* P);
 
-bool JB_CS_OperatorContains(CharSet* self, JB_String* Data);
+bool JB_CS_OperatorContains(CharSet* Self, JB_String* Data);
 
 
 
 // JB_DataObject
-DTWrap* JB_Wrap_ConstructorInt(DTWrap* self, int64 v);
+DTWrap* JB_Wrap_ConstructorInt(DTWrap* Self, int64 V);
 
-void JB_Wrap_Destructor(DTWrap* self);
+void JB_Wrap_Destructor(DTWrap* Self);
 
-double JB_Wrap_FloatValue(DTWrap* self);
+double JB_Wrap_FloatValue(DTWrap* Self);
 
-JB_String* JB_Wrap_Render(DTWrap* self, FastString* fs_in);
+JB_String* JB_Wrap_Render(DTWrap* Self, FastString* Fs_in);
 
-int64 JB_Wrap_Value(DTWrap* self);
+int64 JB_Wrap_Value(DTWrap* Self);
 
 
 
 // JB_DictionaryReader
-JB_Object* JB_DictionaryReader_NextValue(DictionaryReader* self);
+JB_Object* JB_DictionaryReader_NextValue(DictionaryReader* Self);
 
 
 
 // JB_ErrorReceiver
-int JB_Rec_BadCount(JB_ErrorReceiver* self);
+int JB_Rec_BadCount(JB_ErrorReceiver* Self);
 
-bool JB_Rec_CanAddMore(JB_ErrorReceiver* self, ErrorSeverity level);
+bool JB_Rec_CanAddMore(JB_ErrorReceiver* Self, ErrorSeverity Level);
 
-void JB_Rec_Clear(JB_ErrorReceiver* self);
+void JB_Rec_Clear(JB_ErrorReceiver* Self);
 
-JB_ErrorReceiver* JB_Rec_Constructor(JB_ErrorReceiver* self);
+JB_ErrorReceiver* JB_Rec_Constructor(JB_ErrorReceiver* Self);
 
-void JB_Rec_Destructor(JB_ErrorReceiver* self);
+void JB_Rec_Destructor(JB_ErrorReceiver* Self);
 
-void JB_Rec_Incr(JB_ErrorReceiver* self, JB_Error* err, bool add);
+void JB_Rec_Incr(JB_ErrorReceiver* Self, JB_Error* Err, bool Add);
 
-JB_Error* JB_Rec_LastError(JB_ErrorReceiver* self);
+JB_Error* JB_Rec_LastError(JB_ErrorReceiver* Self);
 
-void JB_Rec_LogFileWriter(JB_ErrorReceiver* self, JB_String* Data);
+void JB_Rec_LogFileWriter(JB_ErrorReceiver* Self, JB_String* Data);
 
-ErrorMarker JB_Rec_Mark(JB_ErrorReceiver* self);
+ErrorMarker JB_Rec_Mark(JB_ErrorReceiver* Self);
 
-bool JB_Rec_OK(JB_ErrorReceiver* self);
+bool JB_Rec_OK(JB_ErrorReceiver* Self);
 
-int JB_Rec_PrintErrorsMain(JB_ErrorReceiver* self, ErrorSeverity Level, bool PrintCount, bool shell);
+int JB_Rec_PrintErrorsMain(JB_ErrorReceiver* Self, ErrorSeverity Level, bool PrintCount, bool Shell);
 
-JB_String* JB_Rec_Render(JB_ErrorReceiver* self, FastString* fs_in);
+JB_String* JB_Rec_Render(JB_ErrorReceiver* Self, FastString* Fs_in);
 
-int JB_Rec_RenderErrors(JB_ErrorReceiver* self, FastString* fs, ErrorSeverity Level, bool shell);
+int JB_Rec_RenderErrors(JB_ErrorReceiver* Self, FastString* Fs, ErrorSeverity Level, bool Shell);
 
-int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* self);
+int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* Self);
 
-void JB_Rec_AppendErr(JB_ErrorReceiver* self, JB_Error* Err);
+void JB_Rec_AppendErr(JB_ErrorReceiver* Self, JB_Error* Err);
 
 int JB_Rec__Init_();
 
 int JB_Rec__InitCode_();
 
-void JB_Rec__NewErrorWithNode(Message* node, JB_String* Desc, JB_String* path);
+void JB_Rec__NewErrorWithNode(Message* Node, JB_String* Desc, JB_String* Path);
 
-void JB_Rec__NewErrorSub(Message* node, JB_String* Desc, JB_String* path, int sev);
+void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, int Sev);
 
 
 
 // JB_FastString
-void JB_FS_AppendEscape(FastString* self, JB_String* s);
+void JB_FS_AppendEscape(FastString* Self, JB_String* S);
 
-void JB_FS_AppendHexStr(FastString* self, JB_String* Data);
+void JB_FS_AppendHexStr(FastString* Self, JB_String* Data);
 
-void JB_FS_AppendObjectID(FastString* self, Saveable* o);
+void JB_FS_AppendObjectID(FastString* Self, Saveable* O);
 
-void JB_FS_AppendObjectOrNil(FastString* self, JB_Object* o);
+void JB_FS_AppendObjectOrNil(FastString* Self, JB_Object* O);
 
-void JB_FS_AppendQuotedEscape(FastString* self, JB_String* s);
+void JB_FS_AppendQuotedEscape(FastString* Self, JB_String* S);
 
-void JB_FS_AppendInfo(FastString* self, JB_String* name, JB_String* data);
+void JB_FS_AppendInfo(FastString* Self, JB_String* Name, JB_String* Data);
 
-void JB_FS_AppendInfoNum(FastString* self, JB_String* name, int64 data);
+void JB_FS_AppendInfoNum(FastString* Self, JB_String* Name, int64 Data);
 
-void JB_FS_AppendInfoFloat(FastString* self, JB_String* name, double data);
+void JB_FS_AppendInfoFloat(FastString* Self, JB_String* Name, double Data);
 
-void JB_FS_FieldStart(FastString* self, JB_String* name);
+void JB_FS_FieldStart(FastString* Self, JB_String* Name);
 
-void JB_FS_hInt(FastString* self, uint64 n);
+void JB_FS_hInt(FastString* Self, uint64 N);
 
-void JB_FS_MsgErrorName(FastString* self, JB_String* name);
+void JB_FS_MsgErrorName(FastString* Self, JB_String* Name);
 
-void JB_FS_PrintNicely(FastString* self, JB_String* s);
+void JB_FS_PrintNicely(FastString* Self, JB_String* S);
 
-void JB_FS_ProblemsFound(FastString* self, int count);
+void JB_FS_ProblemsFound(FastString* Self, int Count);
 
-JB_String* JB_FS_Render(FastString* self, FastString* fs_in);
+JB_String* JB_FS_Render(FastString* Self, FastString* Fs_in);
 
-void JB_FS_AppendFastString(FastString* self, FastString* fs);
+void JB_FS_AppendFastString(FastString* Self, FastString* Fs);
 
-void JB_FS_AppendInt64(FastString* self, int64 data);
+void JB_FS_AppendInt64(FastString* Self, int64 Data);
 
-void JB_FS_AppendInt32(FastString* self, int data);
+void JB_FS_AppendInt32(FastString* Self, int Data);
 
-void JB_FS_SyntaxAppend(FastString* self, Message* msg);
+void JB_FS_SyntaxAppend(FastString* Self, Message* Msg);
 
-FastString* JB_FS__Use(JB_Object* other);
+FastString* JB_FS__Use(JB_Object* Other);
 
 
 
@@ -2030,34 +2129,34 @@ FastString* JB_FS__Use(JB_Object* other);
 
 
 // JB_FlowControl
-void JB_Flow_AddByte(FlowControl* self, byte value);
+void JB_Flow_AddByte(FlowControl* Self, byte Value);
 
-bool JB_Flow_Cond(FlowControl* self, byte value);
+bool JB_Flow_Cond(FlowControl* Self, byte Value);
 
-void JB_Flow_Destructor(FlowControl* self);
+void JB_Flow_Destructor(FlowControl* Self);
 
-void JB_Flow_Fail(FlowControl* self, JB_String* found, JB_String* expected, JB_String* InputName);
+void JB_Flow_Fail(FlowControl* Self, JB_String* Found, JB_String* Expected, JB_String* InputName);
 
-void JB_Flow_Flush(FlowControl* self);
+void JB_Flow_Flush(FlowControl* Self);
 
 int JB_Flow__Init_();
 
 int JB_Flow__InitCode_();
 
-void JB_Flow__Input(JB_String* data, JB_String* name);
+void JB_Flow__Input(JB_String* Data, JB_String* Name);
 
-bool JB_Flow__Cond(bool value);
+bool JB_Flow__Cond(bool Value);
 
 
 
 // JB_LeakTester
-LeakTester* JB_Lk_Constructor(LeakTester* self, JB_String* name);
+LeakTester* JB_Lk_Constructor(LeakTester* Self, JB_String* Name);
 
-void JB_Lk_Destructor(LeakTester* self);
+void JB_Lk_Destructor(LeakTester* Self);
 
-void JB_Lk_FinalTest(LeakTester* self);
+void JB_Lk_FinalTest(LeakTester* Self);
 
-void JB_Lk_Test2(LeakTester* self);
+void JB_Lk_Test2(LeakTester* Self);
 
 
 
@@ -2069,11 +2168,11 @@ int JB_Macro__InitCode_();
 
 
 // JB_Memory
-MWrap* JB_Mrap_ConstructorPtr(MWrap* self, int ItemCount, uint ItemSize, byte* ptr, byte DeathAction);
+MWrap* JB_Mrap_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Ptr, byte DeathAction);
 
-void JB_Mrap_Destructor(MWrap* self);
+void JB_Mrap_Destructor(MWrap* Self);
 
-Array* JB_Mrap__CollectLeaks_(JB_Object* self);
+Array* JB_Mrap__CollectLeaks_(JB_Object* Self);
 
 int JB_Mrap__Init_();
 
@@ -2081,7 +2180,7 @@ int JB_Mrap__InitCode_();
 
 MWrap* JB_Mrap__Object(int Count, int ItemSize);
 
-void jbl(JB_Object* self);
+void jbl(JB_Object* Self);
 
 
 
@@ -2092,245 +2191,250 @@ void jbl(JB_Object* self);
 
 
 // JB_Saveable
-bool JB_Sav_IsSaveMarked(Saveable* self);
+bool JB_Sav_IsSaveMarked(Saveable* Self);
 
-void JB_Sav_LoadProperties(Saveable* self, ObjectLoader* Loader);
+void JB_Sav_LoadProperties(Saveable* Self, ObjectLoader* Loader);
 
-void JB_Sav_SaveCollect(Saveable* self, ObjectSaver* Saver);
+void JB_Sav_SaveCollect(Saveable* Self, ObjectSaver* Saver);
 
-bool JB_Sav_SaveMark(Saveable* self);
+bool JB_Sav_SaveMark(Saveable* Self);
 
-SaverClassInfo* JB_Sav_SaverInfo(Saveable* self);
+SaverClassInfo* JB_Sav_SaverInfo(Saveable* Self);
 
-void JB_Sav_SaveWrite(Saveable* self, ObjectSaver* Saver);
+void JB_Sav_SaveWrite(Saveable* Self, ObjectSaver* Saver);
 
 
 
 // JB_Selector
-void JB_Sel_Destructor(Selector* self);
+void JB_Sel_Destructor(Selector* Self);
 
 
 
 // JB_String
-JB_String* JB_Str_AfterByte(JB_String* self, byte b, int Last);
+JB_String* JB_Str_AfterByte(JB_String* Self, byte B, int Last);
 
-JB_String* JB_Str_BackToApp(JB_String* self);
+JB_String* JB_Str_BackToApp(JB_String* Self);
 
-JB_String* JB_Str_BeforeLastByte(JB_String* self, byte b, int fudge);
+JB_String* JB_Str_BeforeLastByte(JB_String* Self, byte B, int Fudge);
 
-Array* JB_Str_ByteSplit(JB_String* self);
+Array* JB_Str_ByteSplit(JB_String* Self);
 
-CharSet* JB_Str_CharSetWithBool(JB_String* self, bool Range);
+CharSet* JB_Str_CharSetWithBool(JB_String* Self, bool Range);
 
-JB_String* JB_Str_Compress(JB_String* self, int Strength, CompressionStats* st);
+JB_String* JB_Str_Compress(JB_String* Self, int Strength, CompressionStats* St);
 
-void JB_Str_CompressInto(JB_String* self, JB_Object* fs, int Strength, CompressionStats* st);
+void JB_Str_CompressInto(JB_String* Self, JB_Object* Fs, int Strength, CompressionStats* St);
 
-int JB_Str_Count(JB_String* self, byte b);
+int JB_Str_Count(JB_String* Self, byte B);
 
-JB_String* JB_Str_Decompress(JB_String* self, int lim, CompressionStats* st);
+JB_String* JB_Str_Decompress(JB_String* Self, int Lim, CompressionStats* St);
 
-bool JB_Str_EndsWith(JB_String* self, JB_String* s, bool aware);
+bool JB_Str_EndsWith(JB_String* Self, JB_String* S, bool Aware);
 
-JB_String* JB_Str_Escape(JB_String* self);
+JB_String* JB_Str_Escape(JB_String* Self);
 
-JB_String* JB_Str_EscapeChr(JB_String* self);
+JB_String* JB_Str_EscapeChr(JB_String* Self);
 
-bool JB_Str_EscapeTest(JB_String* self);
+bool JB_Str_EscapeTest(JB_String* Self);
 
-Ind JB_Str_ExecuteableJBin(JB_String* self);
+JB_File* JB_Str_AsFile(JB_String* Self);
 
-JB_File* JB_Str_AsFile(JB_String* self);
+Ind JB_Str_FindByte(JB_String* Self, byte Find, int Start, int After);
 
-Ind JB_Str_FindByte(JB_String* self, byte find, int Start, int After);
+Ind JB_Str_Find(JB_String* Self, CharSet* Cs, int Start, int After);
 
-Ind JB_Str_Find(JB_String* self, CharSet* cs, int Start, int After);
+Ind JB_Str_FindSlash(JB_String* Self, int From);
 
-Ind JB_Str_FindSlash(JB_String* self, int from);
+Ind JB_Str_InWhite(JB_String* Self, int Start, int After);
 
-Ind JB_Str_InWhite(JB_String* self, int Start, int After);
+bool JB_Str_IsCompressed(JB_String* Self);
 
-bool JB_Str_IsCompressed(JB_String* self);
+int JB_Str_IsHexLike(JB_String* Self, int N);
 
-int JB_Str_IsHexLike(JB_String* self, int N);
+Ind JB_Str_IsJbin(JB_String* Self);
 
-bool JB_Str_IsJbin(JB_String* self);
+bool JB_Str_IsLower(JB_String* Self);
 
-bool JB_Str_IsLower(JB_String* self);
+bool JB_Str_IsOK(JB_String* Self);
 
-bool JB_Str_IsOK(JB_String* self);
+bool JB_Str_IsStatementName(JB_String* Self);
 
-bool JB_Str_IsStatementName(JB_String* self);
+Ind JB_Str_JBFind(JB_String* Self, byte Find, int Off, int After);
 
-Ind JB_Str_JBFind(JB_String* self, byte find, int Off, int After);
+byte JB_Str_Last(JB_String* Self, int Minus);
 
-byte JB_Str_Last(JB_String* self, int minus);
+int JB_Str_LineCount(JB_String* Self);
 
-int JB_Str_LineCount(JB_String* self);
+ErrorInt JB_Str_MakeEntirePath(JB_String* Self, bool Last);
 
-ErrorInt JB_Str_MakeEntirePath(JB_String* self, bool Last);
+JB_String* JB_Str_Name(JB_String* Self);
 
-JB_String* JB_Str_Name(JB_String* self);
+bool JB_Str_ContainsString(JB_String* Self, JB_String* S);
 
-bool JB_Str_ContainsString(JB_String* self, JB_String* s);
+bool JB_Str_OperatorEndsWith(JB_String* Self, JB_String* S);
 
-bool JB_Str_OperatorEndsWith(JB_String* self, JB_String* s);
+int JB_Str_OperatorMinus(JB_String* Self, JB_String* S);
 
-int JB_Str_OperatorMinus(JB_String* self, JB_String* s);
+FastString* JB_Str_Out(JB_String* Self, bool Clear);
 
-bool JB_Str_OperatorStarts(JB_String* self, JB_String* s);
+Ind JB_Str_OutCharSet(JB_String* Self, CharSet* Cs, int Start, int After);
 
-FastString* JB_Str_Out(JB_String* self, bool Clear);
+Ind JB_Str_OutWhite(JB_String* Self, int Start, int After);
 
-Ind JB_Str_OutCharSet(JB_String* self, CharSet* cs, int Start, int After);
+JB_String* JB_Str_Parent(JB_String* Self);
 
-Ind JB_Str_OutWhite(JB_String* self, int Start, int After);
+Message* JB_Str_Parse(JB_String* Self, Syntax Owner, bool AllowDecomp);
 
-JB_String* JB_Str_Parent(JB_String* self);
+Message* JB_Str_ParseJbin(JB_String* Self, int64 Max);
 
-Message* JB_Str_Parse(JB_String* self, Syntax owner, bool AllowDecomp);
+Message* JB_Str_ParseSub(JB_String* Self, Syntax Owner, bool AllowDecomp);
 
-Message* JB_Str_ParseJbin(JB_String* self, int64 max);
+JB_String* JB_Str_PathDir(JB_String* Self);
 
-JB_String* JB_Str_PathDir(JB_String* self);
+JB_String* JB_Str_Preview(JB_String* Self, int N);
 
-JB_String* JB_Str_Preview(JB_String* self, int N);
+Array* JB_Str_Split(JB_String* Self, byte Sep);
 
-Array* JB_Str_Split(JB_String* self, byte sep);
+JB_String* JB_Str_Squeeze(JB_String* Self);
 
-JB_String* JB_Str_Squeeze(JB_String* self);
+StringReader* JB_Str_Stream(JB_String* Self);
 
-StringReader* JB_Str_Stream(JB_String* self);
+int JB_Str_CompareInt(JB_String* Self, int Other, bool Aware);
 
-void JB_Str_SyntaxExpect(JB_String* self);
+void JB_Str_SyntaxExpect(JB_String* Self);
 
-int JB_Str_TrimLastSub(JB_String* self, byte b);
+int JB_Str_TrimLastSub(JB_String* Self, byte B);
 
-JB_String* JB_Str_TrimSlashes(JB_String* self, bool Pathfix);
+JB_String* JB_Str_TrimSlashes(JB_String* Self, bool Pathfix);
 
-JB_String* JB_Str_TrimStart(JB_String* self, JB_String* s, bool All);
+JB_String* JB_Str_TrimStart(JB_String* Self, JB_String* S, bool All);
 
-JB_String* JB_Str_Unescape(JB_String* self);
+JB_String* JB_Str_Unescape(JB_String* Self);
 
-CharSet* JB_Str_UniCS(JB_String* self);
+CharSet* JB_Str_UniCS(JB_String* Self);
 
-int JB_Str_UnPrintable(JB_String* self);
+int JB_Str_UnPrintable(JB_String* Self);
 
-Array* JB_Str_Words(JB_String* self);
+Array* JB_Str_Words(JB_String* Self);
 
-JB_String* JB_Str__FromC(_cstring Addr);
+JB_String* JB_Str_Wrap(JB_String* Self, int MaxWidth, FastString* Fs_in);
+
+int JB_Str_WrapSub(JB_String* Self, int MaxWidth, bool IsInline, int P);
+
+JB_StringC* JB_Str__Wrap(_cstring Addr);
 
 
 
 // JB_StringFields
-StringFields* JB_FI_Constructor(StringFields* self, JB_String* Source, byte Sep);
+StringFields* JB_FI_Constructor(StringFields* Self, JB_String* Source, byte Sep);
 
-void JB_FI_Destructor(StringFields* self);
+void JB_FI_Destructor(StringFields* Self);
 
-JB_String* JB_FI_Field(StringFields* self, Ind Prev, Ind Curr);
+JB_String* JB_FI_Field(StringFields* Self, Ind Prev, Ind Curr);
 
-Ind JB_FI_NextSep(StringFields* self, int Prev);
+Ind JB_FI_NextSep(StringFields* Self, int Prev);
 
 
 
 // JB_StringReader
-int JB_SS_Byte(StringReader* self);
+int JB_SS_Byte(StringReader* Self);
 
-void JB_SS_CompressInto(StringReader* self, JB_Object* dest, int Strength, CompressionStats* st);
+void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, CompressionStats* St);
 
-StringReader* JB_SS_Constructor(StringReader* self, JB_String* Data);
+StringReader* JB_SS_Constructor(StringReader* Self, JB_String* Data);
 
-JB_String* JB_SS_Decompress(StringReader* self, int lim, CompressionStats* st, bool Multi);
+JB_String* JB_SS_Decompress(StringReader* Self, int Lim, CompressionStats* St, bool Multi);
 
-bool JB_SS_DecompressInto(StringReader* self, JB_Object* dest, int lim, CompressionStats* st);
+bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, CompressionStats* St);
 
-void JB_SS_Destructor(StringReader* self);
+void JB_SS_Destructor(StringReader* Self);
 
-bool JB_SS_HasAny(StringReader* self);
+bool JB_SS_HasAny(StringReader* Self);
 
-int64 JB_SS_hInt(StringReader* self);
+int64 JB_SS_hInt(StringReader* Self);
 
-bool JB_SS_IsCompressed(StringReader* self);
+bool JB_SS_IsCompressed(StringReader* Self);
 
-bool JB_SS_IsJBin(StringReader* self);
+bool JB_SS_IsJBin(StringReader* Self);
 
-bool JB_SS_NextChunk(StringReader* self);
+bool JB_SS_NextChunk(StringReader* Self);
 
-Message* JB_SS_NextMsgExpect(StringReader* self, Message* parent, Syntax fn, JB_String* name);
+Message* JB_SS_NextMsgExpect(StringReader* Self, Message* Parent, Syntax Fn, JB_String* Name);
 
-Message* JB_SS_NextMsg(StringReader* self);
+Message* JB_SS_NextMsg(StringReader* Self);
 
-uint64 JB_SS_NextMsgInfo(StringReader* self);
+uint64 JB_SS_NextMsgInfo(StringReader* Self);
 
-bool JB_SS_NoMoreChunks(StringReader* self);
+bool JB_SS_NoMoreChunks(StringReader* Self);
 
-int JB_SS_NonZeroByte(StringReader* self);
+int JB_SS_NonZeroByte(StringReader* Self);
 
-Message* JB_SS_ParseJbin(StringReader* self, int64 Remain);
+Message* JB_SS_ParseJbin(StringReader* Self, int64 Remain);
 
-int64 JB_SS_Position(StringReader* self);
+int64 JB_SS_Position(StringReader* Self);
 
-void JB_SS_PositionSet(StringReader* self, int64 Value);
+void JB_SS_PositionSet(StringReader* Self, int64 Value);
 
-JB_String* JB_SS_ReadAll(StringReader* self);
+JB_String* JB_SS_ReadAll(StringReader* Self);
 
-bool JB_SS_ReadChunk(StringReader* self, JB_File* f);
+bool JB_SS_ReadChunk(StringReader* Self, JB_File* F);
 
-int JB_SS_Remaining(StringReader* self);
+int JB_SS_Remaining(StringReader* Self);
 
-JB_String* JB_SS_Str(StringReader* self, int n, int skip);
+JB_String* JB_SS_Str(StringReader* Self, int N, int Skip);
 
-JB_String* JB_SS_StrNoAdvance(StringReader* self, int n, int skip);
+JB_String* JB_SS_StrNoAdvance(StringReader* Self, int N, int Skip);
 
-void JB_SS_SyntaxExpect(StringReader* self, JB_String* Error);
+void JB_SS_SyntaxExpect(StringReader* Self, JB_String* Error);
 
 
 
 // JB_SyntaxObj
-SyntaxObj* JB_Fn_Constructor(SyntaxObj* self, FP_fpMsgRender msg, JB_String* name, int ID);
+SyntaxObj* JB_Fn_Constructor(SyntaxObj* Self, FP_fpMsgRender Msg, JB_String* Name, int ID);
 
-void JB_Fn_Destructor(SyntaxObj* self);
+void JB_Fn_Destructor(SyntaxObj* Self);
 
-JB_String* JB_Fn_Render(SyntaxObj* self, FastString* fs_in);
+JB_String* JB_Fn_Render(SyntaxObj* Self, FastString* Fs_in);
 
 
 
 // JB_TerminalCell
+TerminalCell* JB_TerminalCell_ConstructorAuto(TerminalCell* Self, int Color, JB_String* Text);
+
+void JB_TerminalCell_Destructor(TerminalCell* Self);
+
 
 
 // JB_TokenHandler
 
 
 // JB_Array
-JB_Object* JB_Array_Last(Array* self);
+JB_Object* JB_Array_Last(Array* Self);
 
-void JB_Array_LoadProperties(Array* self, ObjectLoader* Loader);
+void JB_Array_LoadProperties(Array* Self, ObjectLoader* Loader);
 
-void JB_Array_SaveCollect(Array* self, ObjectSaver* Saver);
+void JB_Array_SaveCollect(Array* Self, ObjectSaver* Saver);
 
-void JB_Array_SaveWrite(Array* self, ObjectSaver* Saver);
+void JB_Array_SaveWrite(Array* Self, ObjectSaver* Saver);
 
-void JB_Array_SyntaxAppend(Array* self, JB_Object* item);
+void JB_Array_SyntaxAppend(Array* Self, JB_Object* Item);
 
-
-
-// JB_BigNum
 
 
 // JB_Dictionary
-void JB_Dict_LoadProperties(Dictionary* self, ObjectLoader* Loader);
+void JB_Dict_LoadProperties(Dictionary* Self, ObjectLoader* Loader);
 
-void JB_Dict_SaveCollect(Dictionary* self, ObjectSaver* Saver);
+void JB_Dict_SaveCollect(Dictionary* Self, ObjectSaver* Saver);
 
-void JB_Dict_SaveWrite(Dictionary* self, ObjectSaver* Saver);
+void JB_Dict_SaveWrite(Dictionary* Self, ObjectSaver* Saver);
 
-JB_Object* JB_Dict_ValueStr(Dictionary* self, JB_String* Key);
+JB_Object* JB_Dict_JB_Dict_Value(Dictionary* Self, JB_String* Key);
 
-void JB_Dict_SetInt(Dictionary* self, uint64 Key, JB_Object* Value);
+void JB_Dict_SetInt(Dictionary* Self, uint64 Key, JB_Object* Value);
 
-JB_Object* JB_Dict_ValueInt(Dictionary* self, uint64 Key);
+JB_Object* JB_Dict_ValueInt(Dictionary* Self, uint64 Key);
 
-JB_Object* JB_Dict_ValueLower(Dictionary* self, JB_String* s);
+JB_Object* JB_Dict_ValueLower(Dictionary* Self, JB_String* S);
 
 Dictionary* JB_Dict__Copy(Dictionary* Dict);
 
@@ -2339,15 +2443,15 @@ Dictionary* JB_Dict__Reverse(Dictionary* Dict);
 
 
 // JB_File
-JB_File* JB_File_Child(JB_File* self, JB_String* name);
+JB_File* JB_File_Child(JB_File* Self, JB_String* Name);
 
-bool JB_File_Opened(JB_File* self);
+bool JB_File_Opened(JB_File* Self);
 
-JB_File* JB_File_SyntaxAccess(JB_File* self, JB_String* name);
+JB_File* JB_File_SyntaxAccess(JB_File* Self, JB_String* Name);
 
-void JB_File_SyntaxAppend(JB_File* self, JB_String* data);
+void JB_File_SyntaxAppend(JB_File* Self, JB_String* Data);
 
-void JB_File_Fail(JB_File* self, JB_String* Error);
+void JB_File_Fail(JB_File* Self, JB_String* Error);
 
 int JB_File__Init_();
 
@@ -2358,23 +2462,23 @@ JB_File* JB_File__Logs();
 
 
 // JB_JBin
-void JB_bin_Add(FastString* self, Syntax type, JB_String* data, bool into);
+jbinLeaver JB_bin_Add(FastString* Self, Syntax Type, JB_String* Name, bool Into);
 
-void JB_bin_AddInt(FastString* self, int64 data);
+void JB_bin_AddInt(FastString* Self, int64 Name);
 
-void JB_bin_AddMemory(FastString* self, Syntax type, byte* data, bool GoIn, uint64 L);
+jbinLeaver JB_bin_AddMemory(FastString* Self, Syntax Type, uint64 L, bool GoIn, byte* Data);
 
-void JB_bin_CloseSection(FastString* self, uint c);
+void JB_bin_CloseSection(FastString* Self, int C);
 
-FastString* JB_bin_Constructor0(FastString* self, int n);
+FastString* JB_bin_Constructor0(FastString* Self, int N);
 
-void JB_bin_Enter(FastString* self, Syntax type, JB_String* data);
+jbinLeaver JB_bin_Enter(FastString* Self, Syntax Type, JB_String* Name);
 
-int JB_bin_OpenSection(FastString* self);
+void JB_bin_Exit(FastString* Self, int Amount);
 
-void JB_bin_Sheb(FastString* self, JB_String* data);
+int JB_bin_OpenSection(FastString* Self);
 
-void JB_bin_Up(FastString* self, int amount);
+void JB_bin_Sheb(FastString* Self, JB_String* Name);
 
 
 
@@ -2394,23 +2498,23 @@ void JB_bin_Up(FastString* self, int amount);
 
 
 // JB_list
-void JB_Tree_Clear(JB_List* self);
+void JB_Tree_Clear(JB_List* Self);
 
-bool JB_Tree_HasOneChild(JB_List* self);
+bool JB_Tree_HasOneChild(JB_List* Self);
 
-void jdb2(JB_List* self);
+void jdb2(JB_List* Self);
 
-void jdb3(JB_List* self);
+void jdb3(JB_List* Self);
 
-void JB_Tree_Remove(JB_List* self);
+void JB_Tree_Remove(JB_List* Self);
 
-JB_String* JB_Tree_Render(JB_List* self, FastString* fs_in);
+JB_String* JB_List_Render(JB_List* Self, FastString* Fs_in);
 
-JB_List* JB_Tree_Second(JB_List* self);
+JB_List* JB_Tree_Second(JB_List* Self);
 
-void JB_Tree_SyntaxAppend(JB_List* self, JB_List* Last);
+void JB_Tree_SyntaxAppend(JB_List* Self, JB_List* Last);
 
-JB_List* JB_Tree_Upward(JB_List* self, int n);
+JB_List* JB_Tree_Upward(JB_List* Self, int N);
 
 
 
@@ -2421,243 +2525,245 @@ JB_List* JB_Tree_Upward(JB_List* self, int n);
 
 
 // JB_Message
-void JB_Msg_Acc__(Message* self, FastString* fs);
+void JB_Msg_Acc__(Message* Self, FastString* Fs);
 
-void JB_Msg_CantFind(Message* self, Syntax s, JB_String* name, Message* found);
+void JB_Msg_CantFind(Message* Self, Syntax S, JB_String* Name, Message* Found);
 
-void JB_Msg_Adj__(Message* self, FastString* fs);
+void JB_Msg_Adj__(Message* Self, FastString* Fs);
 
-int JB_Msg_After(Message* self);
+int JB_Msg_After(Message* Self);
 
-void JB_Msg_AfterSet(Message* self, int Value);
+void JB_Msg_AfterSet(Message* Self, int Value);
 
-void JB_Msg_ARel__(Message* self, FastString* fs);
+void JB_Msg_ARel__(Message* Self, FastString* Fs);
 
-void JB_Msg_Arg__(Message* self, FastString* fs);
+void JB_Msg_Arg__(Message* Self, FastString* Fs);
 
-void JB_Msg_Arr__(Message* self, FastString* fs);
+void JB_Msg_Arr__(Message* Self, FastString* Fs);
 
-void JB_Msg_Ask__(Message* self, FastString* fs);
+void JB_Msg_Ask__(Message* Self, FastString* Fs);
 
-void JB_Msg_Back__(Message* self, FastString* fs);
+void JB_Msg_Back__(Message* Self, FastString* Fs);
 
-void JB_Msg_Badj__(Message* self, FastString* fs);
+void JB_Msg_Badj__(Message* Self, FastString* Fs);
 
-void JB_Msg_BecomeStr(Message* self, Syntax fn, JB_String* name);
+void JB_Msg_BecomeStr(Message* Self, Syntax Fn, JB_String* Name);
 
-void JB_Msg_Bin__(Message* self, FastString* fs);
+void JB_Msg_Bin__(Message* Self, FastString* Fs);
 
-void JB_Msg_binn__(Message* self, FastString* fs);
+void JB_Msg_binn__(Message* Self, FastString* Fs);
 
-void JB_Msg_BinnRender(Message* self, FastString* fs, JB_String* sepa, JB_String* sepb);
+void JB_Msg_BinnRender(Message* Self, FastString* Fs, JB_String* Sepa, JB_String* Sepb);
 
-void JB_Msg_Bra__(Message* self, FastString* fs);
+void JB_Msg_Bra__(Message* Self, FastString* Fs);
 
-void JB_Msg_BRel__(Message* self, FastString* fs);
+void JB_Msg_BRel__(Message* Self, FastString* Fs);
 
-void JB_Msg_Char__(Message* self, FastString* fs);
+void JB_Msg_Char__(Message* Self, FastString* Fs);
 
-int JB_Msg_CleanIndent(Message* self);
+int JB_Msg_CleanIndent(Message* Self);
 
-void JB_Msg_Cnj__(Message* self, FastString* fs);
+void JB_Msg_Cnj__(Message* Self, FastString* Fs);
 
-Message* JB_Msg_ConstructorCopy(Message* self, Message* other);
+Message* JB_Msg_ConstructorCopy(Message* Self, Message* Other);
 
-Message* JB_Msg_ConstructorEmpty(Message* self);
+Message* JB_Msg_ConstructorEmpty(Message* Self);
 
-Message* JB_Msg_ConstructorNormal(Message* self, Syntax Func, JB_String* Name);
+Message* JB_Msg_ConstructorNormal(Message* Self, Syntax Func, JB_String* Name);
 
-Message* JB_Msg_ConstructorRange(Message* self, Message* Parent, Syntax Func, int BytePos, JB_String* name, int RangeLength);
+Message* JB_Msg_ConstructorRange(Message* Self, Message* Parent, Syntax Func, int BytePos, JB_String* Name, int RangeLength);
 
-Message* JB_Msg_Copy(Message* self, Message* pos_msg);
+Message* JB_Msg_Copy(Message* Self, Message* Pos_msg);
 
-JB_String* JB_Msg_CopyID(Message* self);
+JB_String* JB_Msg_CopyID(Message* Self);
 
-Message* JB_Msg_CopySub(Message* self, Message* P);
+Message* JB_Msg_CopySub(Message* Self, Message* P);
 
-void JB_Msg_Decl__(Message* self, FastString* fs);
+void JB_Msg_Decl__(Message* Self, FastString* Fs);
 
-void JB_Msg_Destructor(Message* self);
+void JB_Msg_Destructor(Message* Self);
 
-void JB_Msg_Dot__(Message* self, FastString* fs);
+void JB_Msg_Dot__(Message* Self, FastString* Fs);
 
-void JB_Msg_Dummy(Message* self, FastString* fs);
+void JB_Msg_Dummy(Message* Self, FastString* Fs);
 
-void JB_Msg_Emb__(Message* self, FastString* fs);
+void JB_Msg_Emb__(Message* Self, FastString* Fs);
 
-void JB_Msg_ERel__(Message* self, FastString* fs);
+void JB_Msg_ERel__(Message* Self, FastString* Fs);
 
-bool JB_Msg_Expect(Message* self, Syntax type, JB_String* name);
+bool JB_Msg_Expect(Message* Self, Syntax Type, JB_String* Name);
 
-bool JB_Msg_ExpectLast(Message* self, JB_String* err);
+bool JB_Msg_ExpectLast(Message* Self, JB_String* Err);
 
-void JB_Msg_File__(Message* self, FastString* fs);
+void JB_Msg_File__(Message* Self, FastString* Fs);
 
-JB_String* JB_Msg_FilePath(Message* self);
+JB_String* JB_Msg_FilePath(Message* Self);
 
-Message* JB_Msg_FindSyxName(Message* self, Syntax s, JB_String* name, bool Err);
+Message* JB_Msg_FindSyxName(Message* Self, Syntax S, JB_String* Name, bool Err);
 
-Message* JB_Msg_FindNotInserted(Message* self);
+Message* JB_Msg_FindNotInserted(Message* Self);
 
-JB_String* JB_Msg_FirstName(Message* self);
+JB_String* JB_Msg_FirstName(Message* Self);
 
-void JB_Msg_FSListArg(Message* self, FastString* fs, bool AddLine);
+void JB_Msg_FSListArg(Message* Self, FastString* Fs, bool AddLine);
 
-void JB_Msg_FSListSep(Message* self, FastString* fs, JB_String* sep);
+void JB_Msg_FSListSep(Message* Self, FastString* Fs, JB_String* Sep);
 
-void JB_Msg_Func__(Message* self, FastString* fs);
+void JB_Msg_Func__(Message* Self, FastString* Fs);
 
-JB_String* JB_Msg_FuncName(Message* self);
+JB_String* JB_Msg_FuncName(Message* Self);
 
-Message* JB_Msg_GoIntoInvisArg(Message* self, Message* tmp, int pos);
+Message* JB_Msg_GoIntoInvisArg(Message* Self, Message* Tmp, int Pos);
 
-int JB_Msg_IndentScore(Message* self);
+int JB_Msg_IndentScore(Message* Self);
 
-bool JB_Msg_InInvisArg(Message* self);
+bool JB_Msg_InInvisArg(Message* Self);
 
-int64 JB_Msg_Int(Message* self, int i);
+int64 JB_Msg_Int(Message* Self, int StrStart);
 
-void JB_Msg_Item__(Message* self, FastString* fs);
+void JB_Msg_Item__(Message* Self, FastString* Fs);
 
-bool JB_Msg_jbinTest(Message* self);
+bool JB_Msg_jbinTest(Message* Self);
 
-JB_String* JB_Msg_JDB2_(Message* self, int Flags, FastString* fs_in);
+JB_String* JB_Msg_JDB2_(Message* Self, int Flags, FastString* Fs_in);
 
-JB_String* JB_Msg_JDB_(Message* self, FastString* fs_in, int flags);
+JB_String* JB_Msg_JDB_(Message* Self, FastString* Fs_in, int Flags);
 
-int JB_Msg_Length(Message* self);
+int JB_Msg_Length(Message* Self);
 
-void JB_Msg_List__(Message* self, FastString* fs);
+void JB_Msg_List__(Message* Self, FastString* Fs);
 
-bool JB_Msg_ListViewable(Message* self);
+bool JB_Msg_ListViewable(Message* Self);
 
-JB_String* JB_Msg_Locate(Message* self);
+JB_String* JB_Msg_Locate(Message* Self);
 
-void JB_Msg_max__(Message* self, FastString* fs);
+void JB_Msg_max__(Message* Self, FastString* Fs);
 
-JB_String* JB_Msg_MiniName(Message* self, JB_String* prefix);
+JB_String* JB_Msg_MiniName(Message* Self, JB_String* Prefix);
 
-Message* JB_Msg_Msg(Message* self, Syntax fn, JB_String* name);
+Message* JB_Msg_Msg(Message* Self, Syntax Fn, JB_String* Name);
 
-void JB_Msg_Msg__(Message* self, FastString* fs);
+void JB_Msg_Msg__(Message* Self, FastString* Fs);
 
-void JB_Msg_Name__(Message* self, FastString* fs);
+void JB_Msg_Name__(Message* Self, FastString* Fs);
 
-void JB_Msg_Nil__(Message* self, FastString* fs);
+void JB_Msg_Nil__(Message* Self, FastString* Fs);
 
-void JB_Msg_Num__(Message* self, FastString* fs);
+void JB_Msg_Num__(Message* Self, FastString* Fs);
 
-void JB_Msg_Oat__(Message* self, FastString* fs);
+void JB_Msg_Oat__(Message* Self, FastString* Fs);
 
-bool JB_Msg_OperatorIn(Message* self, Syntax f);
+bool JB_Msg_InMsg(Message* Self, Message* F);
 
-void JB_Msg_Opp__(Message* self, FastString* fs);
+bool JB_Msg_OperatorIn(Message* Self, Syntax F);
 
-JB_String* JB_Msg_OriginalParseData(Message* self);
+void JB_Msg_Opp__(Message* Self, FastString* Fs);
 
-Message* JB_Msg_ParseAST(Message* self);
+JB_String* JB_Msg_OriginalParseData(Message* Self);
 
-void JB_Msg_pinn__(Message* self, FastString* fs);
+Message* JB_Msg_ParseAST(Message* Self);
 
-Message* JB_Msg_PoorAnt(Message* self);
+void JB_Msg_pinn__(Message* Self, FastString* Fs);
 
-int JB_Msg_PrevIndentCheck(Message* self, Message* pr);
+Message* JB_Msg_PoorAnt(Message* Self);
 
-void JB_Msg_Prm__(Message* self, FastString* fs);
+int JB_Msg_PrevIndentCheck(Message* Self, Message* Pr);
 
-void JB_Msg_Ques__(Message* self, FastString* fs);
+void JB_Msg_Prm__(Message* Self, FastString* Fs);
 
-void JB_Msg_Quot__(Message* self, FastString* fs);
+void JB_Msg_Ques__(Message* Self, FastString* Fs);
 
-void JB_Msg_RangeSet(Message* self, IntRange r);
+void JB_Msg_Quot__(Message* Self, FastString* Fs);
 
-void JB_Msg_Rel__(Message* self, FastString* fs);
+void JB_Msg_RangeSet(Message* Self, IntRange R);
 
-JB_String* JB_Msg_Render(Message* self, FastString* fs_in);
+void JB_Msg_Rel__(Message* Self, FastString* Fs);
 
-void JB_Msg_render_jbin_sub(Message* self, FastString* js);
+JB_String* JB_Msg_Render(Message* Self, FastString* Fs_in);
 
-JB_String* JB_Msg_RenderAST(Message* self, int flags, FastString* fs_in);
+void JB_Msg_render_jbin_sub(Message* Self, FastString* Js);
 
-JB_String* JB_Msg_RenderJbin(Message* self, JB_String* shell_path, FastString* fs_in);
+JB_String* JB_Msg_RenderAST(Message* Self, int Flags, FastString* Fs_in);
 
-void JB_Msg_RenderPrm(Message* self, FastString* fs, byte b1, byte b2);
+JB_String* JB_Msg_RenderJbin(Message* Self, JB_String* Shell_path, FastString* Fs_in);
 
-void JB_Msg_RenderWithSpaces(Message* self, FastString* fs, Message* ch);
+void JB_Msg_RenderPrm(Message* Self, FastString* Fs, byte B1, byte B2);
 
-void JB_Msg_SCnj__(Message* self, FastString* fs);
+void JB_Msg_RenderWithSpaces(Message* Self, FastString* Fs, Message* Ch);
 
-void JB_Msg_SCom__(Message* self, FastString* fs);
+void JB_Msg_SCnj__(Message* Self, FastString* Fs);
 
-void JB_Msg_SDot__(Message* self, FastString* fs);
+void JB_Msg_SCom__(Message* Self, FastString* Fs);
 
-void JB_Msg_Sheb__(Message* self, FastString* fs);
+void JB_Msg_SDot__(Message* Self, FastString* Fs);
 
-void JB_Msg_SStr__(Message* self, FastString* fs);
+void JB_Msg_Sheb__(Message* Self, FastString* Fs);
 
-void JB_Msg_SThg__(Message* self, FastString* fs);
+void JB_Msg_SStr__(Message* Self, FastString* Fs);
 
-void JB_Msg_Str__(Message* self, FastString* fs);
+void JB_Msg_SThg__(Message* Self, FastString* Fs);
 
-bool JB_Msg_SyntaxEquals(Message* self, JB_String* name, bool Aware);
+void JB_Msg_Str__(Message* Self, FastString* Fs);
 
-bool JB_Msg_EqualsSyx(Message* self, Syntax X, bool Aware);
+bool JB_Msg_SyntaxEquals(Message* Self, JB_String* Name, bool Aware);
 
-void JB_Msg_SyntaxExpect(Message* self, JB_String* Error);
+bool JB_Msg_EqualsSyx(Message* Self, Syntax X, bool Aware);
 
-bool JB_Msg_SyntaxIs(Message* self, MsgParseFlags F);
+void JB_Msg_SyntaxExpect(Message* Self, JB_String* Error);
 
-void JB_Msg_SyntaxIsSet(Message* self, MsgParseFlags F, bool Value);
+bool JB_Msg_SyntaxIs(Message* Self, MsgParseFlags F);
 
-MessagePosition JB_Msg_SyntaxUsing(Message* self);
+void JB_Msg_SyntaxIsSet(Message* Self, MsgParseFlags F, bool Value);
 
-void JB_Msg_Test(Message* self, JB_String* new_render, JB_String* name);
+MessagePosition JB_Msg_SyntaxUsing(Message* Self);
 
-void JB_Msg_test_style(Message* self);
+void JB_Msg_Test(Message* Self, JB_String* New_render, JB_String* Name);
 
-bool JB_Msg_TestSub(Message* self, JB_String* new_render, JB_String* name);
+void JB_Msg_test_style(Message* Self);
 
-JB_String* JB_Msg_Text(Message* self, int i);
+bool JB_Msg_TestSub(Message* Self, JB_String* New_render, JB_String* Name);
 
-bool JB_Msg_TextSet(Message* self, int i, JB_String* v);
+JB_String* JB_Msg_Text(Message* Self, int I);
 
-void JB_Msg_Thg__(Message* self, FastString* fs);
+bool JB_Msg_TextSet(Message* Self, int I, JB_String* V);
 
-void JB_Msg_Tmp__(Message* self, FastString* fs);
+void JB_Msg_Thg__(Message* Self, FastString* Fs);
 
-void JB_Msg_Todo__(Message* self, FastString* fs);
+void JB_Msg_Tmp__(Message* Self, FastString* Fs);
 
-void JB_Msg_TRel__(Message* self, FastString* fs);
+void JB_Msg_Todo__(Message* Self, FastString* Fs);
 
-void JB_Msg_Tril__(Message* self, FastString* fs);
+void JB_Msg_TRel__(Message* Self, FastString* Fs);
 
-Message* JB_Msg_TViewCH(Message* self);
+void JB_Msg_Tril__(Message* Self, FastString* Fs);
 
-void JB_Msg_Type__(Message* self, FastString* fs);
+Message* JB_Msg_TViewCH(Message* Self);
 
-void JB_Msg_UnEmbedStr(Message* self);
+void JB_Msg_Type__(Message* Self, FastString* Fs);
 
-void JB_Msg_Unit__(Message* self, FastString* fs);
+void JB_Msg_UnEmbedStr(Message* Self);
 
-void JB_Msg_url__(Message* self, FastString* fs);
+void JB_Msg_Unit__(Message* Self, FastString* Fs);
 
-void JB_Msg_XAtt__(Message* self, FastString* fs);
+void JB_Msg_url__(Message* Self, FastString* Fs);
 
-void JB_Msg_XCDT__(Message* self, FastString* fs);
+void JB_Msg_XAtt__(Message* Self, FastString* Fs);
 
-void JB_Msg_XCom__(Message* self, FastString* fs);
+void JB_Msg_XCDT__(Message* Self, FastString* Fs);
 
-void JB_Msg_XML__(Message* self, FastString* fs);
+void JB_Msg_XCom__(Message* Self, FastString* Fs);
 
-void JB_Msg_XPI__(Message* self, FastString* fs);
+void JB_Msg_XML__(Message* Self, FastString* Fs);
 
-void JB_Msg_XTxt__(Message* self, FastString* fs);
+void JB_Msg_XPI__(Message* Self, FastString* Fs);
 
-void JB_Msg_Yoda__(Message* self, FastString* fs);
+void JB_Msg_XTxt__(Message* Self, FastString* Fs);
 
-bool JB_Msg__TreeCompare(Message* orig, Message* reparse, bool PrintIfSame);
+void JB_Msg_Yoda__(Message* Self, FastString* Fs);
 
-void JB_Msg__TreeComparePrint(Message* orig);
+bool JB_Msg__TreeCompare(Message* Orig, Message* Reparse, bool PrintIfSame);
+
+void JB_Msg__TreeComparePrint(Message* Orig);
 
 
 
@@ -2665,7 +2771,7 @@ void JB_Msg__TreeComparePrint(Message* orig);
 
 
 // JB_SaverClassInfo
-void JB_sci_Destructor(SaverClassInfo* self);
+void JB_sci_Destructor(SaverClassInfo* Self);
 
 
 
@@ -2680,44 +2786,44 @@ void JB_Proc__InitOwner();
 
 
 // JB_Task
-void JB_Task_Destructor(JB_Task* self);
+void JB_Task_Destructor(JB_Task* Self);
 
 
 
 // JB_Error
-JB_Error* JB_Err_Constructor(JB_Error* self, Message* node, JB_String* desc, ErrorSeverity level, JB_String* path);
+JB_Error* JB_Err_Constructor(JB_Error* Self, Message* Node, JB_String* Desc, ErrorSeverity Level, JB_String* Path);
 
-JB_Error* JB_Err_ConstructorNothing(JB_Error* self);
+JB_Error* JB_Err_ConstructorNothing(JB_Error* Self);
 
-void JB_Err_Destructor(JB_Error* self);
+void JB_Err_Destructor(JB_Error* Self);
 
-void JB_Err_Fill(JB_Error* self, JB_String* path, JB_String* desc);
+void JB_Err_Fill(JB_Error* Self, JB_String* Path, JB_String* Desc);
 
-void JB_Err_GrabLine(JB_Error* self, FastString* fs, bool Usecolor);
+void JB_Err_GrabLine(JB_Error* Self, FastString* Fs, bool Usecolor);
 
-bool JB_Err_HasPosition(JB_Error* self);
+bool JB_Err_HasPosition(JB_Error* Self);
 
-bool JB_Err_IsBad(JB_Error* self);
+bool JB_Err_IsBad(JB_Error* Self);
 
-bool JB_Err_IsError(JB_Error* self);
+bool JB_Err_IsError(JB_Error* Self);
 
-bool JB_Err_IsWarning(JB_Error* self);
+bool JB_Err_IsWarning(JB_Error* Self);
 
-bool JB_Err_LineIdentifiers(JB_Error* self, FastString* fs, JB_String* path);
+bool JB_Err_LineIdentifiers(JB_Error* Self, FastString* Fs, JB_String* Path);
 
-int JB_Err_LinePos(JB_Error* self, JB_String* data);
+int JB_Err_LinePos(JB_Error* Self, JB_String* Data);
 
-JB_String* JB_Err_Render(JB_Error* self, FastString* fs_in);
+JB_String* JB_Err_Render(JB_Error* Self, FastString* Fs_in);
 
-JB_String* JB_Err_RenderClang(JB_Error* self, FastString* fs_in);
+JB_String* JB_Err_RenderClang(JB_Error* Self, FastString* Fs_in);
 
-bool JB_Err_SyntaxIs(JB_Error* self, ErrorFlags F);
+bool JB_Err_SyntaxIs(JB_Error* Self, ErrorFlags F);
 
-void JB_Err_SyntaxIsSet(JB_Error* self, ErrorFlags F, bool Value);
+void JB_Err_SyntaxIsSet(JB_Error* Self, ErrorFlags F, bool Value);
 
-void JB_Err_UpgradeWithNode(JB_Error* self);
+void JB_Err_UpgradeWithNode(JB_Error* Self);
 
-void JB_Err__CantParseNum(Message* Where, JB_String* num, int Pos);
+void JB_Err__CantParseNum(Message* Where, JB_String* Num, int Pos);
 
 int JB_Err__Init_();
 
@@ -2732,137 +2838,141 @@ int JB_Err__InitCode_();
 
 
 // JB_config
-inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker self);
+inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self);
 
-inline bool JB_FastBuff_AppendByte(FastBuff* self, byte v);
+inline bool JB_FastBuff_AppendByte(FastBuff* Self, byte V);
 
-inline bool JB_File_SyntaxCast(JB_File* self);
+inline bool JB_File_SyntaxCast(JB_File* Self);
 
-inline bool JB_Ind_SyntaxCast(Ind self);
+inline bool JB_Ind_SyntaxCast(Ind Self);
 
-inline Syntax JB_Msg_Func(Message* self);
+inline Syntax JB_Msg_Func(Message* Self);
 
-inline JB_String* JB_Msg_Name(Message* self);
+inline JB_String* JB_Msg_Name(Message* Self);
 
-inline JB_String* JB_Msg_Name_(Message* self);
+inline JB_String* JB_Msg_Name_(Message* Self);
 
-inline int JB_Sel_ID(Selector* self);
+inline int JB_Sel_ID(Selector* Self);
 
-inline JB_String* JB_Tk__SyntaxAccess(int s, int e, Syntax f);
+inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F);
 
-inline bool JB_Array_SyntaxCast(Array* self);
+inline bool JB_int_OperatorInRange(int Self, int D);
 
-inline JB_String* JB_FS_SyntaxCast(FastString* self);
+inline bool JB_Array_SyntaxCast(Array* Self);
 
-inline JB_String* JB_Object___Render__(JB_Object* self, FastString* fs_in);
+inline JB_String* JB_CP_SyntaxCast(Codepoint Self);
 
-inline void JB_Sav___SaveCollect__(Saveable* self, ObjectSaver* Saver);
+inline JB_String* JB_FS_SyntaxCast(FastString* Self);
 
-inline JB_StringC* JB_Str_CastZero(JB_String* self);
+inline JB_String* JB_Object___Render__(JB_Object* Self, FastString* Fs_in);
 
-inline bool JB_Safe_SyntaxCast(JB_String* self);
+inline void JB_Sav___SaveCollect__(Saveable* Self, ObjectSaver* Saver);
 
-inline bool JB_Msg_NilCheck(Message* self);
+inline JB_StringC* JB_Str_CastZero(JB_String* Self);
 
-inline bool JB_Syx_NilCheck(Syntax self);
+inline bool JB_Safe_SyntaxCast(JB_String* Self);
 
-JB_String* jb_msg_name(Message* self);
+inline bool JB_Msg_NilCheck(Message* Self);
 
-Syntax jb_msg_func(Message* self);
+inline bool JB_Syx_NilCheck(Syntax Self);
 
-int jb_msg_position(Message* self);
+JB_String* jb_msg_name(Message* Self);
 
-void* jb_msg_tag(Message* self);
+Syntax jb_msg_func(Message* Self);
 
-void jb_msg_nameset(Message* self, JB_String* Result);
+int jb_msg_position(Message* Self);
 
-void jb_msg_funcset(Message* self, Syntax Result);
+void* jb_msg_tag(Message* Self);
 
-void jb_msg_positionset(Message* self, int Result);
+void jb_msg_nameset(Message* Self, JB_String* Result);
 
-void jb_msg_tagset(Message* self, void* Result);
+void jb_msg_funcset(Message* Self, Syntax Result);
 
-void jb_msg_firstset(Message* self, Message* Result);
+void jb_msg_positionset(Message* Self, int Result);
 
-void jb_msg_lastset(Message* self, Message* Result);
+void jb_msg_tagset(Message* Self, void* Result);
 
-void jb_msg_prevset(Message* self, Message* Result);
+void jb_msg_firstset(Message* Self, Message* Result);
 
-void jb_msg_nextset(Message* self, Message* Result);
+void jb_msg_lastset(Message* Self, Message* Result);
 
-Message* jb_msg_first(Message* self);
+void jb_msg_prevset(Message* Self, Message* Result);
 
-Message* jb_msg_last(Message* self);
+void jb_msg_nextset(Message* Self, Message* Result);
 
-Message* jb_msg_prev(Message* self);
+Message* jb_msg_first(Message* Self);
 
-Message* jb_msg_next(Message* self);
+Message* jb_msg_last(Message* Self);
 
-Message* jb_msg_parent(Message* self);
+Message* jb_msg_prev(Message* Self);
 
-Message* jb_msg_flatnext(Message* self);
+Message* jb_msg_next(Message* Self);
 
-Message* jb_msg_flatafter(Message* self);
+Message* jb_msg_parent(Message* Self);
 
-Message* jb_msg_root(Message* self);
+Message* jb_msg_flatnext(Message* Self);
 
-void jb_msg_remove(Message* self);
+Message* jb_msg_flatafter(Message* Self);
 
-JB_String* jb_msg_render(Message* self, int mode);
+Message* jb_msg_root(Message* Self);
 
-JB_String* jb_msg_ast(Message* self);
+void jb_msg_remove(Message* Self);
 
-Message* jb_msg_parseast(Message* self);
+JB_String* jb_msg_render(Message* Self, int Mode);
 
-Message* jb_msg_copy(Message* self, Message* layer);
+JB_String* jb_msg_ast(Message* Self);
 
-Message* jb_msg_create(Message* self, Syntax Type, JB_String* Name);
+Message* jb_msg_parseast(Message* Self);
 
-void jb_msg_error(Message* self, JB_String* ErrorMsg);
+Message* jb_msg_copy(Message* Self, Message* Layer);
 
-Message* jb_msg_expect(Message* self, Syntax Type, JB_String* name, Message* ErrPlace);
+Message* jb_msg_create(Message* Self, Syntax Type, JB_String* Name);
 
-Message* jb_msg_access(Message* self, Syntax Type, JB_String* name, bool IsError);
+void jb_msg_error(Message* Self, JB_String* ErrorMsg);
 
-JB_String* jb_syx_name(Syntax self);
+Message* jb_msg_expect(Message* Self, Syntax Type, JB_String* Name, Message* ErrPlace);
 
-JB_String* jb_syx_longname(Syntax self);
+Message* jb_msg_access(Message* Self, Syntax Type, JB_String* Name, bool IsError);
 
-_cstring jb_string_address(JB_String* self);
+JB_String* jb_syx_name(Syntax Self);
 
-int jb_string_length(JB_String* self);
+JB_String* jb_syx_longname(Syntax Self);
 
-JB_String* jb_string_compress(JB_String* self);
+_cstring jb_string_address(JB_String* Self);
 
-JB_String* jb_string_decompress(JB_String* self);
+int jb_string_length(JB_String* Self);
 
-JB_String* jb_string_copy(JB_String* self);
+JB_String* jb_string_compress(JB_String* Self);
 
-Message* jb_string_parse(JB_String* self, JB_String* path);
+JB_String* jb_string_decompress(JB_String* Self);
 
-JB_String* jb_string_escape(JB_String* self);
+JB_String* jb_string_copy(JB_String* Self);
 
-void jb_string_print(JB_String* self);
+Message* jb_string_parse(JB_String* Self, JB_String* Path);
 
-void jb_string_printline(JB_String* self);
+JB_String* jb_string_escape(JB_String* Self);
 
-int64 jb_string_int(JB_String* self, Message* m);
+void jb_string_print(JB_String* Self);
 
-double jb_string_float(JB_String* self, Message* m);
+void jb_string_printline(JB_String* Self);
 
-Syntax jb_syntax(JB_String* name);
+int64 jb_string_int(JB_String* Self, Message* M);
+
+double jb_string_float(JB_String* Self, Message* M);
+
+Syntax jb_syntax(JB_String* Name);
 
 JB_String* jb_str(_cstring Str, int Length, void* Release, void* Tag);
 
 JB_String* jb_cstr(_cstring Str);
 
-void jb_delete_(JB_Object* obj);
+void jb_delete_(JB_Object* Obj);
 
 Message* jb_errors();
 
 bool jb_ok();
 
-void jb_debug(JB_Object* o);
+void jb_debug(JB_Object* O);
 
 int jb_init(int Flags);
 
@@ -2870,151 +2980,104 @@ int jb_shutdown();
 
 int jb_version();
 
-JB_String* jb_readfile(_cstring path, bool AllowMissingFile);
+JB_String* jb_readfile(_cstring Path, bool AllowMissingFile);
 
 
 //// HEADER Inlines.h
-inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker self) {
-	return JB_StdErr->ErrorCount == self;
+inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self) {
+	return JB_StdErr->ErrorCount == Self;
 }
 
-inline bool JB_FastBuff_AppendByte(FastBuff* self, byte v) {
-	(*self->Curr++) = v;
-	return self->Curr >= self->End;
+inline bool JB_FastBuff_AppendByte(FastBuff* Self, byte V) {
+	(*Self->Curr++) = V;
+	return Self->Curr >= Self->End;
 }
 
-inline bool JB_File_SyntaxCast(JB_File* self) {
-	return self != nil;
+inline bool JB_File_SyntaxCast(JB_File* Self) {
+	return Self != nil;
 }
 
-inline bool JB_Ind_SyntaxCast(Ind self) {
-	return self >= 0;
+inline bool JB_Ind_SyntaxCast(Ind Self) {
+	return Self >= 0;
 }
 
-inline Syntax JB_Msg_Func(Message* self) {
-	if (self) {
-		return self->Func;
+inline Syntax JB_Msg_Func(Message* Self) {
+	if (Self) {
+		return Self->Func;
 	}
 	return nil;
 }
 
-inline JB_String* JB_Msg_Name(Message* self) {
-	if (self) {
-		return self->Name;
+inline JB_String* JB_Msg_Name(Message* Self) {
+	if (Self) {
+		return Self->Name;
 	}
 	return JB_LUB[0];
 }
 
-inline JB_String* JB_Msg_Name_(Message* self) {
-	if (self) {
-		return self->Name;
+inline JB_String* JB_Msg_Name_(Message* Self) {
+	if (Self) {
+		return Self->Name;
 	}
 	return JB_LUB[0];
 }
 
-inline int JB_Sel_ID(Selector* self) {
-	if (self) {
-		return self->ID;
+inline int JB_Sel_ID(Selector* Self) {
+	if (Self) {
+		return Self->ID;
 	}
 	return 0;
 }
 
-inline JB_String* JB_Tk__SyntaxAccess(int s, int e, Syntax f) {
-	return (JB__Tk_Splitter)(s, e, f);
+inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F) {
+	return (JB__Tk_Splitter)(S, E, F);
 }
 
-inline bool JB_Array_SyntaxCast(Array* self) {
-	return JB_Array_Size(self) > 0;
+inline bool JB_int_OperatorInRange(int Self, int D) {
+	if (D > 0) {
+		return (((uint)Self) < ((uint)D));
+	}
+	return false;
 }
 
-inline JB_String* JB_FS_SyntaxCast(FastString* self) {
-	return JB_FS_GetResult(self);
+inline bool JB_Array_SyntaxCast(Array* Self) {
+	return JB_Array_Size(Self) > 0;
 }
 
-inline JB_String* JB_Object___Render__(JB_Object* self, FastString* fs_in) {
-	Object_Behaviour* Table = ((Object_Behaviour*)JB_ObjClassBehaviours(self));
-	return (Table->render)(self, fs_in);
+inline JB_String* JB_CP_SyntaxCast(Codepoint Self) {
+	return JB_Str_ChrUTF8(Self);
 }
 
-inline void JB_Sav___SaveCollect__(Saveable* self, ObjectSaver* Saver) {
-	Saveable_Behaviour* Table = ((Saveable_Behaviour*)JB_ObjClassBehaviours(self));
-	return (Table->savecollect)(self, Saver);
+inline JB_String* JB_FS_SyntaxCast(FastString* Self) {
+	return JB_FS_GetResult(Self);
 }
 
-inline JB_StringC* JB_Str_CastZero(JB_String* self) {
-	return JB_Str_MakeC(self);
+inline JB_String* JB_Object___Render__(JB_Object* Self, FastString* Fs_in) {
+	Object_Behaviour* Table = ((Object_Behaviour*)JB_ObjClassBehaviours(Self));
+	return (Table->render)(Self, Fs_in);
 }
 
-inline bool JB_Safe_SyntaxCast(JB_String* self) {
-	return JB_Str_IsOK(self);
+inline void JB_Sav___SaveCollect__(Saveable* Self, ObjectSaver* Saver) {
+	Saveable_Behaviour* Table = ((Saveable_Behaviour*)JB_ObjClassBehaviours(Self));
+	return (Table->savecollect)(Self, Saver);
 }
 
-inline bool JB_Msg_NilCheck(Message* self) {
-	return ((bool)self) or JB_API__NilHandler();
+inline JB_StringC* JB_Str_CastZero(JB_String* Self) {
+	return JB_Str_MakeC(Self);
 }
 
-inline bool JB_Syx_NilCheck(Syntax self) {
-	return ((bool)self) or JB_API__NilHandler();
+inline bool JB_Safe_SyntaxCast(JB_String* Self) {
+	return JB_Str_IsOK(Self);
 }
 
+inline bool JB_Msg_NilCheck(Message* Self) {
+	return ((bool)Self) or JB_API__NilHandler();
+}
 
-//// HEADER SyntaxConstants.h
-#define kSyxNil 0
-#define kSyxArg 1
-#define kSyxEmb 2
-#define kSyxType 3
-#define kSyxDecl 4
-#define kSyxTmp 5
-#define kSyxOat 6
-#define kSyxQues 7
-#define kSyxCnj 8
-#define kSyxOpp 9
-#define kSyxThg 10
-#define kSyxSheb 11
-#define kSyxSCnj 12
-#define kSyxSThg 13
-#define kSyxNum 14
-#define kSyxSStr 15
-#define kSyxBack 16
-#define kSyxChar 17
-#define kSyxBin 18
-#define kSyxStr 19
-#define kSyxUnit 20
-#define kSyxARel 21
-#define kSyxName 22
-#define kSyxDot 23
-#define kSyxSDot 24
-#define kSyxFunc 25
-#define kSyxBRel 26
-#define kSyxAdj 27
-#define kSyxBadj 28
-#define kSyxAcc 29
-#define kSyxItem 30
-#define kSyxBra 31
-#define kSyxList 32
-#define kSyxPrm 33
-#define kSyxArr 34
-#define kSyxFile 35
-#define kSyxQuot 36
-#define kSyxRel 37
-#define kSyxERel 38
-#define kSyxTRel 39
-#define kSyxTril 40
-#define kSyxpinn 41
-#define kSyxbinn 42
-#define kSyxAsk 43
-#define kSyxYoda 44
-#define kSyxSCom 45
-#define kSyxMsg 46
-#define kSyxTodo 47
-#define kSyxurl 48
-#define kSyxXAtt 49
-#define kSyxXML 50
-#define kSyxXPI 51
-#define kSyxXCom 52
-#define kSyxXCDT 53
-#define kSyxXTxt 54
-#define kSyxmax 55
+inline bool JB_Syx_NilCheck(Syntax Self) {
+	return ((bool)Self) or JB_API__NilHandler();
+}
+
 
 
 }

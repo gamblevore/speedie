@@ -62,6 +62,7 @@ extend message
 				return .firstname
 			if self != @arg
 				return .name
+			return .FirstName
 
 // move these to utils?
 	function IsTypeOfDecl (|bool|)

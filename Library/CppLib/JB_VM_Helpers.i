@@ -213,12 +213,12 @@ AlwaysInline bool Rare (Register* r, ASM Op) {
 #define  uA  *((uint*)A)
 #define  uB  *((uint*)B)
 
-#define  sA  *((u16*)A)
-#define  sB  *((u16*)B)
+#define  zA  *((u16*)A)
+#define  zB  *((u16*)B)
 #define  bA  *((byte*)A)
 #define  bB  *((byte*)B)
-#define  zA  *((s16*)A)
-#define  zB  *((s16*)B)
+#define  sA  *((s16*)A)
+#define  sB  *((s16*)B)
 #define  cA  *((char*)A)
 #define  cB  *((char*)B)
 
@@ -229,51 +229,23 @@ AlwaysInline bool CompIBig_ (Register* r, ASM Op) {
 	auto A = &i1;
 	auto B = &i2;
 	switch (Cmp_Cmpu) {
-		CmpSub(0 , iA >= iB);
-		CmpSub(1 , iA <  iB);
-		CmpSub(2 , iA <= iB);
-		CmpSub(3 , iA >  iB);
-
-		CmpSub(4 , uA >= uB);
-		CmpSub(5 , uA <  uB);
-		CmpSub(6 , uA <= uB);
-		CmpSub(7 , uA >  uB);
-
-		CmpSub(8 , A  >= B );
-		CmpSub(9 , A  <  B );
-		CmpSub(10, A  <= B );
-		CmpSub(11, A  >  B );
-
-		CmpSub(12, UA >= UB);
-		CmpSub(13, UA <  UB);
-		CmpSub(14, UA <= UB);	default:
-		CmpSub(15, UA >  UB);
-	};
-}
-
-AlwaysInline bool CompISmall_ (Register* r, ASM Op) {
-	auto A = &i1; // unavoidable... sadly.
-	auto B = &i2; // we could disable byte/byte comparisons in speedie
-	switch (Cmp_Cmpu) { // or typecast them up to a bigger type. otherwise we can't avoid.
 		CmpSub(0 , cA >= cB);
-		CmpSub(1 , cA <  cB);
-		CmpSub(2 , cA <= cB);
-		CmpSub(3 , cA >  cB);
+		CmpSub(1 , cA >  cB);
+		CmpSub(2 , sA >= sB);
+		CmpSub(3 , sA >  sB);
+		CmpSub(4 , iA >= iB);
+		CmpSub(5 , iA >  iB);
+		CmpSub(6 , A  >= B );
+		CmpSub(7 , A  >  B );
 
-		CmpSub(4 , bA >= bB); // a lot of string processing will be comparing bA >= bB
-		CmpSub(5 , bA <  bB); // or other byte ops.
-		CmpSub(6 , bA <= bB);
-		CmpSub(7 , bA >  bB);
-
-		CmpSub(8 , zA >= zB ); // I'd like to disable the rest, though!
-		CmpSub(9 , zA <  zB ); // Why compare a signed16 bit value vs another?
-		CmpSub(10, zA <= zB );
-		CmpSub(11, zA >  zB );
-
-		CmpSub(12, sA >= sB);
-		CmpSub(13, sA <  sB);
-		CmpSub(14, sA <= sB);	default:
-		CmpSub(15, sA >  sB);
+		CmpSub(8 , bA >= bB); // a lot of string processing will be comparing bA >= bB
+		CmpSub(9 , bA >  bB); // or other byte ops.
+		CmpSub(10, zA >= zB);
+		CmpSub(11, zA >  zB);
+		CmpSub(12, uA >= uB);
+		CmpSub(13, uA >  uB);
+		CmpSub(14, UA >= UB); default:;
+		CmpSub(15, UA >  UB);
 	};
 }
 
@@ -284,19 +256,22 @@ AlwaysInline bool CompF_ (Register* r, ASM Op) {
 
 	switch (Cmp_Cmpu) {
 		CmpSub(0 , FA >= FB);
-		CmpSub(1 , FA <  FB);
-		CmpSub(2 , FA <= FB);
-		CmpSub(3 , FA >  FB);
-
+		CmpSub(1 , FA >  FB);
+		CmpSub(2 , FA == FB);
+		CmpSub(3 , FA != FB);
 		CmpSub(4 , DA >= DB);
-		CmpSub(5 , DA <  DB);
-		CmpSub(6 , DA <= DB);
-		CmpSub(7 , DA >  DB);
+		CmpSub(5 , DA >  DB);
+		CmpSub(6 , DA == DB);
+		CmpSub(7 , DA != DB);
 
-		CmpSub(8 , FA == FB);
-		CmpSub(9 , FA != FB);
-		CmpSub(10, DA == DB);	default:
-		CmpSub(11, DA != DB);
+		CmpSub(8 , FA >= DB);
+		CmpSub(9 , FA >  DB);
+		CmpSub(10, FA == DB);
+		CmpSub(11, FA != DB);
+		CmpSub(12, DA >= FB);
+		CmpSub(13, DA >  FB);
+		CmpSub(14, DA == FB); default: // dupe
+		CmpSub(15, DA != FB); // dupe also... do something else with these 2?
 	};
 }
 

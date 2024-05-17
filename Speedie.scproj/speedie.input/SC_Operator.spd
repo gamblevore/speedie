@@ -128,7 +128,7 @@ module {
 	|int|								CustomOperatorScore
 	|scoperator|						Assigns
 	|scoperator| 						Minus = SCOperator.new("", &asmstate.subtract, 0)
-	|scoperator| 						Bnot = SCOperator.new("", &asmstate.BitXnor, 0)
+	|scoperator| 						Bnot  = SCOperator.new("", &asmstate.BitXnor,  0)
 	
 	function Lookup ( |Message| opch, |SCOperator| )
 		opt norefcounts
@@ -385,15 +385,15 @@ module CustomOps
 
 
 function scdecl.CompareUnclear (|scdecl| d, |bool| MakesSenseVsZero, |bool|)
+	todo "Reject a==b if the signs are different and neither are constants"
 	|| L = .typeinfo, || R = d.typeinfo
 	|| bitdiff = l.bitcount - r.bitcount
 	
 	if (l.issigned and bitdiff <= 0)
 		if (self is directnumber)
 			|| x = .exportposition
-			if x == 0
-				return !MakesSenseVsZero
-			return x|int64| < 0
+				return x|int64| < 0
+			return !MakesSenseVsZero
 		return true
 
 
@@ -407,7 +407,6 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 	|| RNT		= RC.TypeInfo
 	|| LN		= LNT.NumericCountBoolsToo
 	|| RN		= RNT.NumericCountBoolsToo
-
 
 	if (comp is Comparison) and (lnt.issigned != rnt.issigned)
 		//   What are we comparing?   byte vs int is ok.   uint vs int NOT OK

@@ -208,7 +208,7 @@ class_api String (string)
 	// cpp_name JB_String, cpp_part string
 	api address (|cstring|)
 		require (self)
-		return .address|cstring|
+		return .addr|cstring|
 		/*description `The cstring returned may become invalid, if you call jb_decr on this JBString or calling jb_msg_nameset removed the last reference to this string. Just use this value before doing these things.`*/
 		
 	api length (|int|)

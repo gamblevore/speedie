@@ -20,108 +20,65 @@ function ASMReg.boolasm (|asmreg|)
 	
 	
 extend ASMState
-/*
-	// this needs to be put back in!!
-		|| tb = t.bitcount
-		// why not just call the compare vs 0 function?
-		if t.isint
-			if  tb == 64 // just because one is 64... doesnt mean both are.
-				// of course... we could be comparing to 0.
-				// so if we are comparing a 64-bit number to a const... then what?
-				// both should be OK really? What if its a 32-bit const? I think not :D
-				debugat
-				return .AddASM(asm.BRA • Negated, cond, Src, 1)
-			
-			if (lt is bool or rt is bool)
-				.AddASM(asm.BRA • negate, dbg, L, 1)
-		  
-			if  tb == 32
-				debugat
-				return .AddASM(asm.CMPI, cond, src, 0, 6 + Negated)
-
-			debugat			// 16 or 8
-			|| dest = .AsTemp(src, cond)
-			|| Sh = 64 - tb
-			.AddASM(asm.BFLG, cond, dest, src, sh, sh, src.signed|int|)
-			return .AddASM(asm.CMPE • !Negated, cond, 0, dest)
+	function asmreg.BitsAreCorrect (|int| gap, |bool|)
+		return  gap == 0  or   .math is bitcorrect  or   .reg == 0  or  .µtype is bool
 
 
-		|| M = 8 + (tb==64)<<1
-		M += Negated
-		return .AddASM(asm.CMPF, cond, 0, Src, M)					// comparison against 0
-*/
-
-
-	function asmreg.Compareability (|asmreg| r, |ASMCompareability|)
-		|| bl =  .µtype.bitcount
-		|| br = r.µtype.bitcount
-		if 64 == bl and br
-			return -1
-		|| cl =  .math is bitcorrect  or   .reg == 0  
-		|| cr = r.math is bitcorrect  or  r.reg == 0
+	function asmreg.BadBits (|asmreg| r, |errorint|)
+		|| gl = .GapBits
+		|| gr = r.GapBits
+		|| cl =  .BitsAreCorrect(gl)
+		|| cr = r.BitsAreCorrect(gr)
 		if (cl and cr)
-			return ASMCompareability.both  +  (.reg == 0) * ASMCompareability.bra 
-
-		if (bl == br)
-			if (br == 32)
-				return ASMCompareability.both
-			return ASMCompareability.bcmp // 8/16bit compares... may have garbage.
+			return 0
+		if (gl == gr)
+			return gl
+		if (gl < gr) and cr
+			return gl
+		if (gl > gr) and cl
+			return gr
 		
-		if (bl < br)
-			if cl and (br == 32)
-				return ASMCompareability.cmpi
-		  else
-			if cr and (bl == 32)
-				return ASMCompareability.cmpi
+		return -1
 			
 		// if the smaller one is bit-correct... its ok? lets see:
-		// byte    vs int OK	// needs correct
-		// char    vs int OK	// needs correct
-		// byte OK vs int   	// can CMPI
-		// char OK vs int		// can CMPI
+		// byte GB vs int  OK	// needs correct
+		// int  OK vs byte GB 	// needs correct
+		// byte OK vs int  GB 	// can CMPI
+		// int  GB vs byte OK	// can CMPI
 
 
 	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |bool| negate, |&FATASM|)
-		|| lt = l.µtype
-		|| rt = r.µtype
-		|| bl = lt.bitcount
-		|| br = rt.bitcount
-		|| BitsOK = l.Compareability(r) 
-		if dest isnt CondRequest  and  bitsok is bcmp
-			if !dest.reg // what?? doMathSub???
-			return .AddASM(asm.BCMP, exp, dest, L, R, 64 - bl, negate|int|)
+		|| badness = l.BadBits(r) 
 
-		if dest is CondRequest
-			if (bitsok is bra)
+		if (dest is condrequest) and (badness >= 0)
+			if badness > 0
+				dest = .TempMe(exp, dest)
+				.AddASM(asm.BCMP, exp, dest, L, R, badness, Negate|int|)
+				r = dest
+				l = 0.reg
+			if !l.reg
 				return .AddASM(asm.BRA • negate, exp, R, 1)
+			return .AddASM(asm.CMPE • Negate, exp, L, R)
 
-			if (bitsok is cmpi)
-				return .AddASM(asm.CMPE • Negate, exp, L, R, dest)
+		
+		if badness > 0
+			return .AddASM(asm.BCMP, exp, dest, L, R, badness, negate|int|)
 
-			if (bitsok is bcmp)											// just... bcmp and then branch
-				if dest.reg												// What? Dest should be 0!				
-				dest = .tempme(exp, dest)
-				.AddASM(asm.BCMP, exp, dest, L, R, 64 - bl, negate|int|)
-				return .AddASM(asm.BRA • negate, exp, dest, 1)
-
-		if bitsok is bcmp
-			return .AddASM(asm.BCMP, exp, dest, L, R, 64 - bl, negate|int|)
-		if bitsok isnt cmpi
-			.AddASM(asm.BCLR, exp, L, R, 64-bl, 64-br, (l.signed|int|) + (r.signed|int|<<1))
+		if badness == -1
+			|| gl = l.GapBits
+			|| gr = r.GapBits
+			.AddASM(asm.BCLR, exp, L, R, gl, gr, (l.signed|int|) + (r.signed|int|<<1))
 		return .AddASM(asm.CMPE • Negate, exp, L, R, dest)
-
 				
 	
 	function EqualsFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |bool| negate, |&FATASM|)
-		|| lt = l.µtype
-		|| rt = r.µtype
-		|| bl = lt.bitcount
-		if bl != r.µtype.bitcount, #!l and r have different bitcounts?
-		|| sh = 64 - bl
-		// depends if this is floats or not. as -0.0 == 0.0
-		|| M = 8 + (!sh)<<1
+		|| M = 10
+		|| sh = l.GapBits
+			m -= 2
 		M += negate
-		.AddASM(asm.CMPF, exp, L, R, M, dest) // it is cmpf either way
+		if r.GapBits != sh
+			m += 4
+		return .AddASM(asm.CMPF, exp, L, R, M, dest) // it is cmpf either way
 		
 	
 	function Equals (fn_opasm)
@@ -130,7 +87,7 @@ extend ASMState
 
 		|| negate = dest is negate
 		target debug
-			if !dest.reg and dest isnt condrequest // shouldn't happen... domathsub allocates a dest!
+			if !dest.reg and dest isnt CondRequest // shouldn't happen... domathsub allocates a dest!
 		
 		if dest.IsInt
 			.equalsint(dest, l, r, exp, negate)
@@ -141,26 +98,80 @@ extend ASMState
 		
 	function NotEq  (fn_opasm)
 		(dest is Negate) = (dest isnt Negate)
-		return .equals(dest, l, r, exp)
+		return .Equals(dest, l, r, exp)
 
 
-	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |int| Mode,  |asmreg|)
-		|| bl = l.µtype.bitcount, if bl != r.µtype.bitcount
-
-		mode ^= (dest is negate)
+	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |&FATASM|)
+/*
+		|| bl = l.µtype.bitcount
+		|| br = r.µtype.bitcount
+		|| bm = bl max br
 		
-		if dest.IsInt
-			if dest.IsBig
+		if bm <= 16
+			if bm == 16
+				mode += 8
+			if !dest.signed
+				mode += 4
+			.AddASM(asm.CMPS, exp, L, R, mode, dest)
+		  else
+			if bm == 8
 				mode += 8
 			if !dest.signed
 				mode += 4
 			.AddASM(asm.CMPI, exp, L, R, mode, dest)
-		  else
-			if dest.IsBig
-				mode += 4
-			.AddASM(asm.CMPF, exp, L, R, Mode, dest) // it is cmpf either way
+*/		
+		|| negate = false
+		|| badness = l.BadBits(r) 
+
+		if (dest is condrequest) and (badness >= 0)
+			if badness > 0
+				dest = .TempMe(exp, dest)
+				.AddASM(asm.BCMP, exp, dest, L, R, badness, Negate|int|)
+				r = dest
+				l = 0.reg
+			return .AddASM(asm.CMPI, exp, L, R)
+
+		
+		if badness > 0
+			return .AddASM(asm.BCMP, exp, dest, L, R, badness, negate|int|)
+
+		if badness == -1
+			|| gl = l.GapBits
+			|| gr = r.GapBits
+			.AddASM(asm.BCLR, exp, L, R, gl, gr, (l.signed|int|) + (r.signed|int|<<1))
+		return .AddASM(asm.CMPI, exp, L, R, dest)
+
+
+	function CompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |&FATASM|)
+/*
+	|| bl = l.µtype.bitcount
+	|| br = r.µtype.bitcount
+	|| bm = bl max br
 	
+	if bm <= 16 // what?
+	if dest.IsBig
+		mode += 4
+	.AddASM(asm.CMPF, exp, L, R, Mode, dest) // it is cmpf either way
+*/	
+		|| negate = false
+		|| M = 10
+		|| sh = l.GapBits
+			m -= 2
+		M += negate
+		if r.GapBits != sh
+			m += 4
+		return .AddASM(asm.CMPF, exp, L, R, M, dest) // it is cmpf either way
+
+
+	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |int| Mode,  |asmreg|)
+		if dest.IsInt
+			.compareint(dest, l, r, exp, mode)
+		  else
+			.comparefloat(dest, l, r, exp, mode)
+		
 		return dest.BoolASM
+	
+	
 /*
 	0 :		iA >= iB
 	1 :		iA <  iB
@@ -189,20 +200,18 @@ extend ASMState
 */
 
 	function Less   (fn_opasm)
-		(dest is Negate) = (dest isnt Negate)
-		return .moreeq(dest, l, r, exp)
+		return .compare(dest, l, r, exp, 0 + (dest isnt Negate))
 			
+	function MoreEq (fn_opasm)
+		return .Compare(dest, l, r, exp, 0 + (dest is Negate))
+
 	function LessEq (fn_opasm)
 		(dest is Negate) = (dest isnt Negate)
-		return .more(dest, l, r, exp)
+		return .compare(dest, l, r, exp, 2 + (dest is Negate))
 
 	function More   (fn_opasm)
-		debugat // put in actual numbers
-		return .Compare(dest, l, r, exp, 3)
+		return .compare(dest, l, r, exp, 2 + (dest isnt Negate))
 	
-	function MoreEq (fn_opasm)
-		debugat // put in actual numbers
-		return .Compare(dest, l, r, exp, 0)
 
 
 	// MATH
@@ -316,7 +325,6 @@ extend ASMState
 		if !Subtract
 			if (l is FromMath) and (l isa ASMMath.Mul)
 				// 
-		
 		
 		|| F = .AddASM(asm.fADD, exp, dest, l)
 		f.r[2+subtract] = r|uint|
