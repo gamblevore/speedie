@@ -632,7 +632,7 @@ function RightClickFileList (GUIListEvent)
 
 		m <~ ("Show In Desktop",	FileViewerCMMShow)
 		m.AddSep
-		m <~ ("Move To Trash",		FileViewerTrash)
+		m <~ ("Delete File",		FileViewerTrash)
 	return true
 
 

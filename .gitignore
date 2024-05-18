@@ -33,3 +33,4 @@ Perry.scproj/perry.input/.todo
 examples/prototest.spd
 examples/prototest
 Speedie.scproj/BuildTest/strings.txt
+examples/encoding_test(ignore).spd
