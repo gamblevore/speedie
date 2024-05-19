@@ -1453,7 +1453,6 @@ function Tran_IfSub (|message| node, |SCNode| name_space)
 	  elseif cond.IsAlwaysFalse
 		cond.ElseNeverFires
 	  else
-//		cond.NeedBra
 		if cond.first == @arg // if a.b? --> if ({||x=a.b, rejoin x}), fails in c cos if ({}) is bad
 			cond.wrapwith(@bra).obj = cond.obj 
 		Tran_Isa(node, name_space)
