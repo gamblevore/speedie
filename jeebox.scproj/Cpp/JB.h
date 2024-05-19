@@ -245,6 +245,8 @@ struct FastString;
 
 struct JB_String;
 
+struct Dictionary;
+
 struct JB_File;
 
 struct JB_File;
@@ -2514,6 +2516,9 @@ void JB_Tree_SyntaxAppend(JB_List* Self, JB_List* Last);
 
 JB_List* JB_Tree_Upward(JB_List* Self, int N);
 
+
+
+// JB_DictionaryLower
 
 
 // JB_ExistingFile
