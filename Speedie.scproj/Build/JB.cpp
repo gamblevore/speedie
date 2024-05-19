@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2047];
+extern JB_StringC* JB_LUB[2048];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -566,9 +566,9 @@ void SC_Comp__CodeSign(JB_File* Gui_exe) {
 	}
 	 else {
 		JB_String* _tmPf1 = JB_Incr(JB_File_Path(Gui_exe));
-		JB_String* _tmPf0 = JB_Incr(JB_Str_OperatorPlus(JB_LUB[961], _tmPf1));
+		JB_String* _tmPf0 = JB_Incr(JB_Str_OperatorPlus(JB_LUB[2047], _tmPf1));
 		JB_Decr(_tmPf1);
-		JB_Rec__NewProblem(nil, _tmPf0, nil);
+		JB_Rec__NewWarning(nil, _tmPf0, nil);
 		JB_Decr(_tmPf0);
 	}
 	JB_Decr(Sign);
@@ -1927,7 +1927,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112469650964480));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112469857337344));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -2783,8 +2783,10 @@ bool SC_FB__AppOptions_codesign(JB_String* Name, JB_String* Value, FastString* P
 		JB_Decr(Value);
 		return nil;
 	}
-	if (JB_Str_Equals(Value, JB_LUB[0], false)) {
-		JB_String* _tmPf0 = JB_Incr(JB_App__GetPref(kJB_codesign_native));
+	if ((JB_Str_Equals(Value, JB_LUB[0], true)) or (JB_Str_Equals(Value, JB_LUB[1922], true))) {
+		JB_String* _tmPf1 = JB_Incr(JB_App__GetPref(kJB_codesign_native));
+		JB_String* _tmPf0 = JB_Incr(JB_Str_OperatorPlus(JB_LUB[961], _tmPf1));
+		JB_Decr(_tmPf1);
 		JB_PrintLine(_tmPf0);
 		JB_Decr(_tmPf0);
 		JB_Decr(Value);
@@ -2795,10 +2797,10 @@ bool SC_FB__AppOptions_codesign(JB_String* Name, JB_String* Value, FastString* P
 	}
 	(JB_App__PrefSet(kJB_codesign_native, Value));
 	JB_App__SavePrefs();
-	JB_String* _tmPf1 = JB_Incr(JB_Str_OperatorPlus(JB_LUB[661], Value));
+	JB_String* _tmPf2 = JB_Incr(JB_Str_OperatorPlus(JB_LUB[661], Value));
 	JB_Decr(Value);
-	JB_PrintLine(_tmPf1);
-	JB_Decr(_tmPf1);
+	JB_PrintLine(_tmPf2);
+	JB_Decr(_tmPf2);
 	return true;
 }
 
@@ -3234,7 +3236,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024051921));
+	JB_FS_AppendInt32(_fsf0, (2024051922));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7829,7 +7831,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024051921));
+	JB_FS_AppendInt32(_fsf0, (2024051922));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -49837,4 +49839,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -6069604156332958074 -970576398684750646
+// -6069604156332958074 -4333062463349668476

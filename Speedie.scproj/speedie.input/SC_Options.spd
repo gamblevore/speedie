@@ -420,8 +420,8 @@ module Feedback
 		
 		+"codesign"
 			Explain(Purpose, "Gets/Sets the codesign certificate")$
-			if value == ""
-				printline app.pref(codesign_native)
+			if value ~= "" or "true"
+				printline "Codesign: " + app.pref(codesign_native)
 				return true
 			
 			if value == "none" or "nil" or "-"

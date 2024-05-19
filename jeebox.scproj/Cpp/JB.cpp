@@ -3470,7 +3470,9 @@ int JB_FastBuff_CopyTo(FastBuff* Self, byte* Dest, int Length) {
 }
 
 void JB_FastBuff_Destructor(FastBuff* Self) {
-	//visible;
+	if (Self->Owns) {
+		JB_free(Self->Start);
+	}
 	JB_Clear(Self->ReadFrom);
 }
 
@@ -4355,7 +4357,7 @@ FastString* JB_FS__Use(JB_Object* Other) {
 
 void JB_Flow_AddByte(FlowControl* Self, byte Value) {
 	//;
-	if (JB_FastBuff_AppendByte((&Self->Buff), Value)) {
+	if (JB_FastBuff_AppendU8((&Self->Buff), Value)) {
 		JB_Flow_Flush(Self);
 	}
 }
@@ -8342,7 +8344,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024051919);
+	return (2024051921);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8354,4 +8356,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 8496285982459222848 2949288912827223679
+// 7796578953066441599 -7041497638527966161 2949288912827223679
