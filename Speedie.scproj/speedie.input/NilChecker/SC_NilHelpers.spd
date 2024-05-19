@@ -37,7 +37,7 @@ function FastDecl (|SCDecl!|)
 		if l isa scdecl
 			return l
 		return obj
-	error (self, "Compiler error. No decl found.")
+	error (self, "No decl found.".internal)
 	return typevoid!
 
 

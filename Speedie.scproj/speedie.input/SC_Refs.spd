@@ -757,7 +757,7 @@ function SCFunction.BuildConstructorDestructor
 	opt norefcounts
 	|| TheCall = .FindCallParents
 	|| IsConstructor = self is Constructor
-	|| root = .SourceArg!
+	|| root = .SourceArg$
 	.CheckConstructorAndDestructor( root, IsConstructor )
 	if IsConstructor
 		if !thecall
@@ -765,7 +765,7 @@ function SCFunction.BuildConstructorDestructor
 		.FillInMissingConstructorDefaults( root, TheCall )
 	require StdErr.OK and !IsConstructor
 	
-	|| c = .cls!
+	|| c = .cls$
 	if !c.HasStuffToHandleInDestructor
 		if !Root.HasAny
 			c.DestructorFunc = nil

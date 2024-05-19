@@ -24,6 +24,7 @@ bugs:
 	* refcounter passing properties as function param, SHOULD NOT assume it won't be cleared... not without disturbance checker
 
 additions:
+	* class descriptions!
 	* add bit shifts to floats. kinda nice to do 1.0<<x
 	* add \123 numeric type (mostly for jbin). use a float/int format, that is signed. 2 exponent bits per byte.
 		* first byte (if float) can also store the sign of the exponent.

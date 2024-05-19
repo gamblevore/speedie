@@ -673,6 +673,7 @@ struct FastBuff {
 	byte* Start;
 	byte* End;
 	JB_String* ReadFrom;
+	bool Owns;
 	int ErrorReported;
 };
 
@@ -9562,7 +9563,7 @@ inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self);
 
 inline bool JB_FailableInt_SyntaxCast(FailableInt Self);
 
-inline bool JB_FastBuff_AppendByte(FastBuff* Self, byte V);
+inline bool JB_FastBuff_AppendU8(FastBuff* Self, byte V);
 
 inline bool JB_File_SyntaxCast(JB_File* Self);
 
@@ -9674,7 +9675,7 @@ inline bool JB_FailableInt_SyntaxCast(FailableInt Self) {
 	return Self != kJB__FailableInt_Fail;
 }
 
-inline bool JB_FastBuff_AppendByte(FastBuff* Self, byte V) {
+inline bool JB_FastBuff_AppendU8(FastBuff* Self, byte V) {
 	(*Self->Curr++) = V;
 	return Self->Curr >= Self->End;
 }

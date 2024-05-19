@@ -1927,7 +1927,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112469127916535));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112469650964480));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3234,7 +3234,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024051919));
+	JB_FS_AppendInt32(_fsf0, (2024051921));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7829,7 +7829,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024051919));
+	JB_FS_AppendInt32(_fsf0, (2024051921));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -19757,6 +19757,7 @@ bool JB_FastBuff_Alloc(FastBuff* Self, int N) {
 	Self->Start = Mem;
 	Self->Curr = Mem;
 	Self->End = (Mem + N);
+	Self->Owns = true;
 	JB_SetRef(Self->ReadFrom, nil);
 	return ((bool)Self->Start);
 }
@@ -19790,7 +19791,9 @@ int JB_FastBuff_CopyTo(FastBuff* Self, byte* Dest, int Length) {
 }
 
 void JB_FastBuff_Destructor(FastBuff* Self) {
-	//visible;
+	if (Self->Owns) {
+		JB_free(Self->Start);
+	}
 	JB_Clear(Self->ReadFrom);
 }
 
@@ -23722,7 +23725,7 @@ FastString* JB_FS__Use(JB_Object* Other) {
 
 void JB_Flow_AddByte(FlowControl* Self, byte Value) {
 	//;
-	if (JB_FastBuff_AppendByte((&Self->Buff), Value)) {
+	if (JB_FastBuff_AppendU8((&Self->Buff), Value)) {
 		JB_Flow_Flush(Self);
 	}
 }
@@ -31803,7 +31806,7 @@ SCDecl* SC_Msg_FastDecl(Message* Self) {
 		return Obj;
 	}
 	if (true) {
-		JB_Msg_SyntaxExpect(Self, JB_LUB[669]);
+		JB_Msg_SyntaxExpect(Self, SC_Str_internal(JB_LUB[669]));
 	}
 	return SC_TypeVoid;
 }
@@ -44551,6 +44554,9 @@ void SC_Func_BuildConstructorDestructor(SCFunction* Self) {
 	Message* TheCall = SC_Func_FindCallParents(Self);
 	bool IsConstructor = SC_Func_SyntaxIs(Self, kSC__FunctionType_Constructor);
 	Message* Root = SC_Func_SourceArg(Self);
+	if (!Root) {
+		return;
+	}
 	SC_Func_CheckConstructorAndDestructor(Self, Root, IsConstructor);
 	if (IsConstructor) {
 		if (!TheCall) {
@@ -44562,6 +44568,9 @@ void SC_Func_BuildConstructorDestructor(SCFunction* Self) {
 		return;
 	}
 	SCClass* C = Self->Cls;
+	if (!C) {
+		return;
+	}
 	if (!SC_Class_HasStuffToHandleInDestructor(C)) {
 		if (!JB_Ring_HasChildren(Root)) {
 			JB_SetRef(C->DestructorFunc, nil);
@@ -49828,4 +49837,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -4155435848919961839 2474463740783914951
+// -6069604156332958074 -970576398684750646

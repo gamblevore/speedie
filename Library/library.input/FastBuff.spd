@@ -5,13 +5,28 @@ struct FastBuff
 	|&byte|		Start
 	|&byte|		End
 	|?string|	ReadFrom
+	|bool| 		Owns
 	|int| 		ErrorReported
 	
 	destructor
-		visible
+		if .owns
+			Memory.Free(.start)
 	
 	function TmpStr (|string|)
-		return string.FromPtr(.start, .length)
+		return string.FromPtr(.Start, .Length)
+	
+	function Divide (|&fastbuff| buff, |int| length)
+		length = length min .Remaining
+		require length > 0
+		|| c = .curr
+		buff.curr = c
+		buff.Start = c
+		c += length
+		buff.end = c
+		.curr = c 
+
+	function Reset
+		.curr = .start
 	
 	function String (|string|)
 		opt norefcounts
@@ -24,7 +39,7 @@ struct FastBuff
 		return .Length - n
 	
 	syntax Append (|byte| v, |bool|)
-		cpp_part AppendByte
+		cpp_part AppendU8
 		pragma inline
 		*.curr++ = v
 		return .curr >= .end
@@ -33,6 +48,12 @@ struct FastBuff
 		cpp_part AppendU16
 		pragma inline
 		|| c = .curr|&uint16|,  *c++ = v,  .curr = c|&byte|
+		return c|&byte| >= .end
+
+	syntax Append (|uint| v, |bool|)
+		cpp_part AppendU32
+		pragma inline
+		|| c = .curr|&uint|,  *c++ = v,  .curr = c|&byte|
 		return c|&byte| >= .end
 	
 	syntax access (|int| pos, |byte|)
@@ -121,14 +142,17 @@ struct FastBuff
 		.start = mem
 		.curr = mem
 		.end = mem+n
+		.owns = true
 		.ReadFrom = nil
 		return .start
 	
 	function Length (|int|)
+		description "Returns the actual filled length of the data." 
 		if self
 			return .curr - .start
 	
 	function Size (|int|)
+		description "Returns the buffer-size including both used and unused data." 
 		if self
 			return .end - .start
 
