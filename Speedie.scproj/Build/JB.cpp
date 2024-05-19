@@ -1975,7 +1975,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112468322691260));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112468336463647));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -22291,8 +22291,6 @@ void SC_Cpp__C_RenderRel(Message* Self, FastStringCpp* Fs) {
 	Message* First = ((Message*)JB_Ring_First(Self));
 	Message* Op = ((Message*)JB_Ring_NextSib(First));
 	Message* Last = ((Message*)JB_Ring_NextSib(Op));
-	float X = std::fmod(1.0f, 2.0f);
-	double Y = std::fmod(((double)1.0f), ((double)2.0f));
 	SCOperator* Scop = ((SCOperator*)Op->Obj);
 	if (!Scop) {
 		debugger;
