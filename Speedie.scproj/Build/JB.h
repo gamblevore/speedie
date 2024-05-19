@@ -257,13 +257,11 @@ struct StringLengthSplit;
 
 struct StructSaveTest;
 
-struct ContainerStruct2;
-
-struct ContainerStruct;
-
 struct ByteMap_Behaviour;
 
 struct Charset_Behaviour;
+
+struct ContainerStruct2;
 
 struct CppRefs_Behaviour;
 
@@ -332,6 +330,8 @@ struct xC2xB5Form_Behaviour;
 struct xC2xB5Func_Behaviour;
 
 struct Array_Behaviour;
+
+struct ContainerStruct;
 
 struct Dictionary_Behaviour;
 
@@ -1286,7 +1286,6 @@ JBClass ( SCClass , SCNode ,
 	u16 Size;
 	u16 TaskObjectCount;
 	byte Depth;
-	byte StructContainerDepth;
 	byte MinOpt;
 	byte IsBehaviour;
 	byte IsWrapper;
@@ -2615,7 +2614,7 @@ bool SC_Comp__ScriptRecompile(JB_File* F, JB_File* Script_build);
 
 void SC_Comp__SetupEnv();
 
-void SC_Comp__SortModulesAndClasses();
+bool SC_Comp__SortModulesAndClasses();
 
 JB_File* SC_Comp__Speedie();
 
@@ -3674,8 +3673,6 @@ void SC_TemporalStatements_crash(SCFunction* Fn, Message* Node, SCNode* Name_spa
 void SC_TemporalStatements_do(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
 void SC_TemporalStatements_ignore(SCFunction* Fn, Message* Node, SCNode* Name_space);
-
-bool SC_TooManyErrors();
 
 void SC_Tran_ArgArray(Message* Exp, SCNode* Name_space, SCDecl* Decl);
 
@@ -5663,16 +5660,13 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 // JB_jb_vm
 
 
-// JB_ContainerStruct2
-
-
-// JB_ContainerStruct
-
-
 // JB_ByteMap_Behaviour
 
 
 // JB_Charset_Behaviour
+
+
+// JB_ContainerStruct2
 
 
 // JB_CppRefs_Behaviour
@@ -5775,6 +5769,9 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 
 
 // JB_Array_Behaviour
+
+
+// JB_ContainerStruct
 
 
 // JB_Dictionary_Behaviour
@@ -6177,6 +6174,8 @@ void JB_Rec_AppendErr(JB_ErrorReceiver* Self, JB_Error* Err);
 JB_ErrorReceiver* JB_Rec_SyntaxUsing(JB_ErrorReceiver* Self);
 
 void JB_Rec_SyntaxUsingComplete(JB_ErrorReceiver* Self, JB_Object* Idk);
+
+bool SC_Rec_TooMany(JB_ErrorReceiver* Self);
 
 int JB_Rec__Init_();
 
@@ -8938,15 +8937,13 @@ SCFunction* SC_Class_FindSpecialFunc(SCClass* Self, JB_String* Keyword, bool Che
 
 SCFunction* SC_Class_FirstDestructor(SCClass* Self);
 
-void SC_Class_GetDepth(SCClass* Self);
+int SC_Class_GetDepth(SCClass* Self);
 
 SCClass* SC_Class_GetFlyingMemClassFor(SCClass* Self);
 
 SCDecl* SC_Class_GetFlyingMemory(SCClass* Self, Message* Exp);
 
 SCIterator* SC_Class_GetIteratorAny(SCClass* Self, JB_String* Name, Message* Node);
-
-void SC_Class_GetStructDepth(SCClass* Self);
 
 SCClass* SC_Class_GoUpTo(SCClass* Self, int D);
 
@@ -9061,6 +9058,8 @@ SCDecl* SC_Class_SortPropHelper(SCClass* Self);
 void SC_Class_StartupSaver(SCClass* Self, JB_String* Name);
 
 JB_String* SC_Class_StructName(SCClass* Self);
+
+bool SC_Class_EqualsName(SCClass* Self, JB_String* Name, bool Aware);
 
 bool SC_Class_EqualsType(SCClass* Self, SCNodeType D, bool Aware);
 

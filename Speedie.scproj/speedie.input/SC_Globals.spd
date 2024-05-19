@@ -1582,8 +1582,8 @@ function DeclOfObjForC (|Message| curr, |SCDecl|)
 			return cls.ClassType
 
 
-function TooManyErrors (|bool|)
-	return StdErr.errorCount >= 50
+function errorreceiver.TooMany (|bool|)
+	return .errorCount >= 50
 
 
 function message.PrepareAST (|string| path="")

@@ -294,7 +294,7 @@ function Tran_Print (TranFunc)
 
 
 function Tran_All (|SCFunction| fn, |Message| s, |SCNode!| p) // transform ()
-	require !TooManyErrors()
+	require !stderr.TooMany
 	|| f = s.func
 	
 	if (f == @Arg)

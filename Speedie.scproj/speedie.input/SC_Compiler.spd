@@ -405,13 +405,7 @@ function ImportAll
 	
 	.LoadSuperClasses
 	
-	for c in .ClassList
-		c.GetDepth
-	
-	
-	require stderr.ok
-	
-	.SortModulesAndClasses
+	require .SortModulesAndClasses
 
 	for c in .ClassList
 		c.DataTypePostLoad
@@ -437,23 +431,17 @@ function ImportAll
 		c.ContainedTypeLoad
 
 	require .Stage( "Parsing Class Properties" ) // just moved this... used to come after
-	for c in .ClassList					  // handling function prototypes.
+	for c in .ClassList							 // handling function prototypes.
 		c.CollectProperties
-		require !TooManyErrors()
+		require !stderr.TooMany
 
 
-	for c in .ClassList					  // handling function prototypes.
-		if c.isstruct
-			c.GetStructDepth
-
-	.SortModulesAndClasses	// need to re-sort array by depth
+	require .SortModulesAndClasses	// need to re-sort array by depth
 
 
 	for c in .ClassList
 		c.CalculateSize
-
-
-	for c in .ClassList: c.LoadConstructors
+		c.LoadConstructors
 	
 	require .Stage( "Collecting Constants" )
 	.CollectConstants
@@ -499,7 +487,7 @@ function ImportAll
 	for f in .FuncList
 		f.FuncDecls
 		f.LoadExportName
-		require !TooManyErrors()
+		require !stderr.TooMany
 	scfunction.currfunc = nil
 
 
@@ -729,10 +717,16 @@ function scfunction.CanBuildConstructor (|bool|)
 	return (self is ConOrDes) and .IsARealSpdFunc
 
 
-
-function SortModulesAndClasses 
+function SortModulesAndClasses (|bool|)
+	opt norefcounts
+	for c in .ClassList
+		c.depth = 0
+	for c in .ClassList
+		c.GetDepth
+	
 	.ModuleList.sort(ModulesSorter)
 	.ClassList.sort(ClassSorter)
+	return stderr.ok
 	
 
 function ClassSorter (SorterComparer)
@@ -746,10 +740,10 @@ function ModulesSorter (SorterComparer)
 	|| ca = aa.cls
 	|| cb = bb.cls
 	
+	if (ca ~= "compressor" and cb ~= "rangecollector") or (cb ~= "compressor" and ca ~= "rangecollector")
 	if !ca or !cb // a module
 		if ca or cb
 			return cb
-		// could use initafter?
 	  else
 		|| tt = ca.basetype
 		|| D = tt|int| - cb.basetype|int|
@@ -758,11 +752,6 @@ function ModulesSorter (SorterComparer)
 		D = ca.depth|int| - cb.depth|int|
 		if D
 			return D < 0
-
-		if tt == SCNodetype.struct 
-			D = ca.StructContainerDepth|int| - cb.StructContainerDepth|int|
-			if D
-				return D < 0
 		
 	return aa.name < bb.name
 

@@ -63,7 +63,6 @@ linkage
 |uint16|					Size			// use scdecl.ByteSize to find the size of this in a var.
 |uint16|					TaskObjectCount
 |byte|						Depth
-|byte|						StructContainerDepth
 |Byte|						MinOpt
 |Byte|						IsBehaviour
 |byte|						IsWrapper
@@ -189,38 +188,27 @@ function CollectProperties
 		.ModelDecls
 
 
-
-function GetDepth
+function GetDepth (|int|)
 	opt norefcounts
+	|| d = .depth
+		expect (d != 255) (self, "This struct contains itself?")
+		return d
+	.depth = 255
 	
-	|int| d = .depth
-	if !d
-		d = 1
-		for c.Upwards in self
-			d++
-		check (d < 64) (self, "Class Hierarchy too deep")
-		.depth = d
-			
-	|| msg = .defawlt
-	if msg and .isobject and !(msg isthing "nil")
-		is DefaultsToReal // what if .defawlt is optional? // fuck them :D
-		.TypeNormal.NilDeclared = NilState.real
-	
-
-
-function GetStructDepth
-	opt norefcounts
-	expect (.StructContainerDepth != 255) (self, "This struct contains itself?")
-	.StructContainerDepth = 255
-	
-	|| r = 0
+	rz = 1
+	|| s = .super
+		(rz max= s.GetDepth+1)
 	for p in .properties
 		|| t = p.type
 		if (t.IsStruct) and (p.pointercount == 0) 
-			t.GetStructDepth
-			r = r max t.StructContainerDepth+1
-	check (r < 64) (self, "Struct containership too deep")
-	.StructContainerDepth = r
+			(rz max= t.GetDepth+1)
+	check (rz < 64) (self, "Class hierarchy too deep")
+	.depth = rz
+
+	|| msg = .defawlt
+		if .isobject and !(msg isthing "nil")
+			is DefaultsToReal // what if .defawlt is optional? // fuck them :D
+			.TypeNormal.NilDeclared = NilState.real
 
 
 function CalculateSize (|int| Depth = 0, |int|)

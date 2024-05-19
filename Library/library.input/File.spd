@@ -240,7 +240,7 @@ class File (String)
 		return .CompareMsg(code, error)
 
 	
-	function ReadAll (|int| lim = 128MB, |bool| AllowMissing = true, |stringthatwasreadsafely!|)
+	function ReadAll (|int| lim = 128MB, |bool| AllowMissing = true, |stringthatwasreadsafely|)
 		cpp_wrapper JB_File_ReadAll
 	
 	

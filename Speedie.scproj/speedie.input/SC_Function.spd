@@ -256,7 +256,7 @@ function FuncDecls
 function @scfunction.TransformAll 
 	opt norefcounts
 	for f in compiler.FuncList
-		require !TooManyErrors()
+		require !stderr.TooMany
 		f.Transform
 
 

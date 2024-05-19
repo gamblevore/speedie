@@ -287,6 +287,9 @@ static int SortABit(obj* array, int j, int high, SorterComparer fp, bool Up) {
 
 static void QuickSort(obj* array, int start, int end, SorterComparer fp, bool Up) {
     require0 (start < end);
+    /// todo: this could be a lot faster if we used alloca and a depth and stored p
+    /// vars there... I got a stack depth of over 100 on just storing modules. strange!
+    /// could also be used for my compression code also... perhaps with a macro.
     int p = SortABit(	 array, start, end,   fp, Up);
     QuickSort(			 array, start, p - 1, fp, Up);
     QuickSort(			 array, p + 1, end,   fp, Up);
