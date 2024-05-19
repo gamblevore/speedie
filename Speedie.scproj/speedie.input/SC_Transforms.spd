@@ -254,7 +254,7 @@ function Tran_While (TranFunc)
 			|| dname = decl.declname
 				decl.next = macros.WhileDecl.run(dname.copy)
 		  else
-			cond = ExpandToBool( Cond, name_Space ) #require
+			cond = Cond.ExpandToBool( name_Space ) #require
 
 	
 	Cond.NeedBra
@@ -263,13 +263,12 @@ function Tran_While (TranFunc)
 	Tran_Isa(node, name_space)	
 
 	|| ExitCond = arg.Next
-	if ExitCond.Expect(@bra)
 		ExitCond.Remove
 		ExitCond = ExitCond.Negate
 	
 		|| Exit = «tmp "exit"»
 		arg <~ «tmp "if"
-			ExitCond.NeedBra
+			ExitCond//.NeedBra
 			«arg, exit »
 		»
 		exit.LoopExit
@@ -502,7 +501,7 @@ function Tran_ForSub (TranFunc)					// :3
 	
 				////////  CONSTRUCT "WHILE" STRUCTURE
 	|| PostCond = AlterPostCond( arg.Next, iter.LoopEndCond, node )
-		postcond = postcond.needbra
+//		postcond = postcond.needbra
 	|| node2 = iter.MakeWhile(arg, PostCond)				#require // sigh
 	node <~ node2
 	
@@ -525,8 +524,7 @@ function Tran_ForSub (TranFunc)					// :3
 				////////  COPY STUFF INSIDE LOOP
 	|| EndLoopMarker = arg.NeedMarker( "finish", true )
 	iter.Yield.CopyAllAfter( EndLoopMarker, node ) // Perhaps we don't need this marker anymore...
-	using arg
-		iter.Yield.CopyAllBeforeInto( arg, node )
+	iter.Yield.CopyAllBeforeInto( arg, node )
 
 
 	if (dcl.IsCArray)

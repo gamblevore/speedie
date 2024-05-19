@@ -504,7 +504,7 @@ class PerryIDE (Window)
 				t.text = ""
 			return true
 		if key is e
-			return .SaveAndShowErrors(true)
+			return .SaveAndShowErrors
 		if key is i
 			FileViewerCountCode(.filelist, nil, .filelist.LastSelected.cell)
 			return true
@@ -887,8 +887,12 @@ So anything not 0 means "its OK"`
 		opt norefcounts
 		if .DrawMe is visible
 			return .SaveDrawing
-		|| e = .editme
 		.ParseErrorDetect
+		
+		|| e = .editme
+		if purpose == documentstate.errorchecking
+			require e is modified
+		// otherwise resave anyhow.
 		
 		if (!keys.shift and .IsSpeedieCode)
 			.filelist.saveall(Purpose)

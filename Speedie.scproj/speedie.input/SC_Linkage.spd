@@ -40,12 +40,12 @@ module Linkage
 
 	function CompilerCollect (|message| s)
 		opt norefcounts
-		Linkage.Collect(s, Compiler.Program, nil)
+		Linkage.LinkCollect(s, Compiler.Program, nil)
 		options.MakeInterpreter = linkage.interpreter
 		s.remove
 	
 
-	function Collect (CollectFunc)
+	function LinkCollect (CollectFunc)
 		opt norefcounts
 		expect  (name_space == Compiler.Program)  (node, "This must be at root.")
 		|| arg = node[@arg]

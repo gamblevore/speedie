@@ -1823,7 +1823,10 @@ Array* JB_Str_ArgV(const char** ArgV) {
     Array* Result = JB_Array_Constructor0(nil);
     while (ArgV) {
         const char* c = *++ArgV;
-        if (!c) {break;}
+        if (!c)
+			break;
+        if (c[0] == '-' and c[1] == '-' and c[2] == 0)
+			break; // useful to ignore arguments that xcode is spamming us with.
         JB_Array_Append(Result, JB_StrC(c));
     }
     return Result;

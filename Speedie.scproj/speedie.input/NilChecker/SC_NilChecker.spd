@@ -291,19 +291,13 @@ function While (NilTrackerFn)
 
 function If (NilTrackerFn)
 	opt norefcounts
-	target debug: if msg != @tmp
 	|| cond = msg.first!,  || arg1 = cond.next!
-	|| Else = arg1.next!,  || arg2 = else.first!
-	|| Always = cond.IsAlwaysBool
-	if always.istrue
-		// what about something like   (x.func(&obj) or true)
-		// it is always true. I think we just don't need this.
-		return .Argument(arg1)
-	
-	if always.isfalse
-		return .Argument(arg2)
-	
-	if NilTrapper
+	|| Else = arg1.next!,  || arg2 = else.first
+	|message| ElseIfCond
+	if arg2 and arg2 != @arg
+		ElseIfCond = arg2
+		arg2 = arg2.next
+
 	|| Orig = T.BranchEnter(msg)				#require
 	#!"First Branch"
 	.Jump(Cond, NilCheckMode.positive)
@@ -313,11 +307,10 @@ function If (NilTrackerFn)
 
 	#!"Second Branch"
 	.jump(cond, NilCheckMode.negative) // we need the negative, for the merging.
-	if arg2.HasAny
-		if arg2.islast
-			.Argument(arg2)
-		  else
-			.if(else)
+	if ElseIfCond
+		.if(Else)
+	  elseif arg2.HasAny
+		.Argument(arg2)
 	return t.BranchExit(First)
 
 

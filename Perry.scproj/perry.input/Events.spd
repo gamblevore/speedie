@@ -225,7 +225,7 @@ function ClickedProjectInfo (GUIaction)
 	.ide.NextProjInfo
 
 
-function PerryIDE.SaveAndShowErrors (|bool| FromKeys, |bool|)
+function PerryIDE.SaveAndShowErrors (|bool|)
 	opt norefcounts
 	.SaveEditing(documentstate.ErrorChecking)
 	.Recheck

@@ -1079,19 +1079,23 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function C_RenderTmp (fpMsgRenderCpp)
 		opt norefcounts			
 		|| name = .name
+		|| needbra = false
 		
 		if (name == "exit")
 			fs <~ "break"
 			
 		  elseif (name == "if")
 			fs <~ Cpp_Export.IfName
+			needbra = true	
 
 		  elseif (name == "while") 
 			fs <~ Cpp_Export.WhileName
+			needbra = true	
 
 		  elseif (name == "elseif")
 			fs <~ "else "
 			fs <~ Cpp_Export.IfName
+			needbra = true	
 
 		  elseif (name == "ignore")
 			return
@@ -1108,9 +1112,18 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		  else
 			fs <~ name
 		
+		if needbra
+			|| f = .first!
+			needbra  =  f != @bra and @brel
+		
 		for mv in self
 			fs <~ ' '
+			if needbra
+				fs <~ '('
 			mv.Export( fs )
+			if needbra
+				fs <~ ')'
+			needbra = false
 		
 
 	function C_RenderOpp (fpMsgRenderCpp)
@@ -1138,7 +1151,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			s = "~"
 		
 		fs <~ s
-		RenderInBracketsIfRel( .first!, fs )		
+		RenderInBracketsIfRel( .first!, fs )
 		fs <~ ')'
 
 
@@ -1408,10 +1421,21 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			fs <~ "JB_LUB[0]"
 		  else
 			fs <~ "JB_LUB["
-			|int| ID = n|messageid|.ID
-			fs <~ (ID+1)
+			|uint| ID = 0
+			if n isa Messageid
+				id = n|messageid|.ID + 1
+				if ID > stringcorrector.Count|uint| // now what?
+					ID = 0
+					debugger 
+					error (self, "Invalid String ID".internal)
+			  else
+				error (self, "This isnt even a string ID!!".internal)
+				
+			fs <~ ID
 			fs <~ "]"
 
+	function string.internal (|string|)
+		return "InternalError: " + self
 
 	function C_RenderStr (fpMsgRenderCpp)
 		fs.AppendCpp(.name)

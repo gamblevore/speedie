@@ -82,14 +82,19 @@ class SCParamArray
 		return "module"
 	
 	function ModuleName (|string|)
-		opt norefcounts
 		|| p = self[0] 
 		if !.IsNotModule
 			p = .exp.first
 		
 		if p
-			return p.RenderType
+			rz = p.RenderType.nicerclassname
 
+
+	function string.NicerClassName (|string|)
+		if self ~= "StringZeroTerminated"
+			return "string"
+		return self
+		
 
 
 	function PreReadTypes (|SCNode| Name_Space, |Message?| P, |message?| side, |bool|)

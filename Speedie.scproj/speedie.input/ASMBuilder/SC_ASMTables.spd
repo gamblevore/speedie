@@ -347,7 +347,7 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 
 	.AddASM(asm.tabl,  exp, addr,   d.IsLib|int|)
 
-	|| i = d.ExportPosition				#check (exp, "Internal error: No global address")
+	|| i = d.ExportPosition				#check (exp, "No global address".internal)
 	.AddASM(dest.ReadOrWrite(Exp), exp, dest,  addr, i)
 	return addr as asmmath.Bitcorrect
 	

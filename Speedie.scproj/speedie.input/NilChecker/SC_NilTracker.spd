@@ -210,7 +210,6 @@ struct ArchonPurger
 		|LoopInfo| 				Loops
 		|ArchonPurger|			T
 		|byte|					OldPrint
-		|byte|					NilTrapper
 
 
 		function Value (|NilRecord|)

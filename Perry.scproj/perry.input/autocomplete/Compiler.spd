@@ -64,7 +64,7 @@ extend PerryIDE
 					e.ActualReplaceError(str)
 
 
-	function ShowCompileErrors (|message!| msg, |bool|)
+	function ShowCompileErrors (|message!| msg, |bool| RealCompile, |bool|)
 		|| MaybeOK = msg.last
 		if (MaybeOK == @thg and "ok")
 			.ErrorList.clear
@@ -85,7 +85,7 @@ extend PerryIDE
 		newlist := Error()
 		.errorlist.listsource = newlist
 		.UpdateErrorCount
-		if .ErrorList isnt Visible
+		if RealCompile or .ErrorList isnt Visible
 			beep
 		.ShowErrors
 
@@ -133,7 +133,7 @@ extend PerryIDE
 	function ErrorListFB (|message| msg, |bool|)			// errorfb, errorsfb
 		|| RealErrors	= msg ~!= "check"
 		.ClearErrors(RealErrors)
-		|| NoErrors		= .ShowCompileErrors(msg)
+		|| NoErrors		= .ShowCompileErrors(msg, RealErrors)
 		|| ErrsVis		= .isviewing(.ErrorList) 
 		.errorlist.SelectFirst
 		if !RealErrors
@@ -163,12 +163,12 @@ extend PerryIDE
 
 		|| errs = c.ErrorOutput.GetResult
 			|| p = errs.parse
-				.ShowCompileErrors(p)
+				.ShowCompileErrors(p, true)
 			// notifications will pick up the err otherwise!
 		  elseif OK
 			|| msg = @tmp + "compile"
 			msg <~ (@thg, "ok")
-			.ShowCompileErrors(msg)
+			.ShowCompileErrors(msg, false)
 			.CompiledOK
 		.compilr = nil
 		.RenableAfterCompile

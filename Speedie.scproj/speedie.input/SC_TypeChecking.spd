@@ -1,11 +1,13 @@
 
 
 
-function ExpandToBool (|Message| inside, |SCNode| name_space, |Message|)
+function Message.ExpandToBool (|SCNode| name_space, |Message|)
 	opt norefcounts
-	|| decl = TypeOfExpr( inside, name_space )$
+	|| decl = TypeOfExpr( self, name_space )$
 
-	rz = TypeBool!.TypeNormal.ExpectMatch( decl, kTypeCastTrue, inside )
+	|| upon = .unbra
+
+	rz = TypeBool!.TypeNormal.ExpectMatch( decl, kTypeCastTrue, upon )
 
 	While (rz == @bra) and (rz.first == @bra)
 		rz = rz.ReplaceWithChild
@@ -40,9 +42,9 @@ function Or_And_Expansion (|SCDecl| LC, |SCDecl| RC, |Message| exp, |SCNode| nam
 	|| ch0 = exp.first!
 	|| ch2 = ch0.next.next! // ch0 could change
 	if !LBool
-		ExpandToBool( ch0, name_space )
+		ch0.ExpandToBool( name_space )
 	if !RBool
-		ExpandToBool( ch2, name_space )
+		ch2.ExpandToBool( name_space )
 	
 	Return TypeBool!.TypeNormal
 

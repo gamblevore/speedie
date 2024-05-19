@@ -154,7 +154,7 @@ function TranRender (|message| exp, |SCNode| name_space, |SCObject|)
 function TranNegate (|message| f, |SCNode| name_space, |SCObject|)
 // if this is @thg... do we really NEED to expand this to a bool?
 	opt norefcounts
-	f = ExpandToBool( F, name_space )$
+	f = F.ExpandToBool( name_space )$
 	|| d = f.obj
 	if (d isa scdecl)
 		if d.IsConstOf(Falsebool)
@@ -864,7 +864,7 @@ function TypeOfTernary (ExprResolver)
 
 	|| Test = params[@nil]$
 	|| result = SameTypeSub(first, second, name_space)	
-	if result and ExpandToBool( test, name_space )
+	if result and test.ExpandToBool( name_space )
 		params <~ list.first
 		list.become(@thg, "JB_Ternary")
 		params.obj = compiler.TernaryFunc
@@ -1618,7 +1618,7 @@ function Message.FixErl
 		ch = ch.copy
 		if IsBitOr
 			|| new_if = @tmp+"if"
-			new_if <~ ch.NeedBra.wrapwith(@brel, "!")
+			new_if <~ ch.wrapwith(@brel, "!")
 			.Prev = new_if
 			new_if.msg(@arg) <~ self
 

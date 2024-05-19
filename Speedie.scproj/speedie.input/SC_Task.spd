@@ -92,7 +92,7 @@ function message.TaskConBefore (|message!|)
 
 function scclass.FillTaskConstructorSub (|message| con, |message| before, |int| depth)
 	opt norefcounts
-	expect (depth <= 16) (con, "Recursion bug. Sheesh.") // what?
+	expect (depth <= 16) // what?
 	|| pr = .super
 	if pr.istask
 		pr.FillTaskConstructorSub(con, before, depth+1)

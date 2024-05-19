@@ -2273,7 +2273,6 @@ extern Array* SC__Pac_Olds;
 extern ASMState SC__Pac_Sh;
 extern LoopInfo SC__nil_Loops;
 extern FP_NilTrackerFn SC__nil_NilTable[64];
-extern byte SC__nil_NilTrapper;
 extern byte SC__nil_OldPrint;
 extern ArchonPurger SC__nil_T;
 extern CompressionStats JB__MzSt_All;
@@ -2929,6 +2928,8 @@ void SC_LinkMap__Collect(SCFunction* Self);
 
 void SC_LinkMap__CollectAll();
 
+void SC_LinkMap__CollectFromSource(SCFunction* Self, Message* Src, bool InBranch);
+
 int SC_LinkMap__Init_();
 
 int SC_LinkMap__InitCode_();
@@ -2938,8 +2939,6 @@ void SC_LinkMap__Store(Array** Darr, SCObject* Obj);
 
 
 // Linkage
-SCNode* SC_Linkage__Collect(Message* Node, SCNode* Name_space, Message* ErrPlace);
-
 JB_String* SC_Linkage__CombineFlags(JB_String* Name);
 
 void SC_Linkage__CompilerCollect(Message* S);
@@ -2951,6 +2950,8 @@ int SC_Linkage__Init_();
 int SC_Linkage__InitCode_();
 
 bool SC_Linkage__Interpreter();
+
+SCNode* SC_Linkage__LinkCollect(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
 bool SC_Linkage__SyntaxAccess(JB_String* Name);
 
@@ -3549,8 +3550,6 @@ SCNode* SC_DontRemove(Message* Node, SCNode* Name_space, Message* ErrPlace);
 SCDecl* SC_DoOpCompare(Message* Exp, SCDecl* Lc, SCDecl* Rc, SCOperator* Comp, SCNode* Name_space);
 
 JB_String* JB_EntityTest();
-
-Message* SC_ExpandToBool(Message* Inside, SCNode* Name_space);
 
 SCDecl* SC_ExtractDecl(Message* C, SCNode* Name_space, DeclMode Purpose);
 
@@ -6720,6 +6719,8 @@ int64 JB_Str_Int(JB_String* Self);
 
 JB_String* SC_Str_InterfaceToBehaviour(JB_String* Self);
 
+JB_String* SC_Str_internal(JB_String* Self);
+
 Ind JB_Str_InWhite(JB_String* Self, int Start, int After);
 
 bool SC_Str_isCLike(JB_String* Self);
@@ -6765,6 +6766,8 @@ JB_String* JB_Str_Moat(JB_String* Self);
 Message* JB_Str_Msg(JB_String* Self);
 
 JB_String* JB_Str_Name(JB_String* Self);
+
+JB_String* SC_Str_NicerClassName(JB_String* Self);
 
 bool JB_Str_ContainsString(JB_String* Self, JB_String* S);
 
@@ -7563,6 +7566,8 @@ void SC_Msg_ElseNeverFires(Message* Self);
 void JB_Msg_Emb__(Message* Self, FastString* Fs);
 
 void JB_Msg_ERel__(Message* Self, FastString* Fs);
+
+Message* SC_Msg_ExpandToBool(Message* Self, SCNode* Name_space);
 
 bool JB_Msg_Expect(Message* Self, Syntax Type, JB_String* Name);
 
@@ -9158,7 +9163,7 @@ void SC_Func_Cleanupfunc(SCFunction* Self, Message* S);
 
 void SC_Func_CollectDeclsParams(SCFunction* Self, Message* Prms, SCNode* AddToSpace);
 
-void SC_Func_CollectLinks(SCFunction* Self, JB_Object* Obj);
+void SC_Func_CollectLinks(SCFunction* Self, JB_Object* Obj, bool InBranch);
 
 bool SC_Func_CollectReturnAsReal(SCFunction* Self);
 
@@ -9808,7 +9813,7 @@ inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 	AsmReg Rz = ((AsmReg)0);
 	ASMtmp T = SC_Msg_ASMType(Exp);
 	fn_asm Fn = SC_fn_asm_table[T];
-	if (!(SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen))) {
+	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen)) {
 		debugger;
 		// Can't close declarations in args!;
 		int OV = SC_Pac_OpenVars(Self);
@@ -9844,7 +9849,7 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, NilState New) {
 }
 
 inline void SC_nil__DeclKill() {
-	if ((!SC_nil_NestDepth((&SC__nil_T)))) {
+	if (!SC_nil_NestDepth((&SC__nil_T))) {
 		SC__nil_T.RootReturned = true;
 	}
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
@@ -9888,7 +9893,7 @@ inline NilRecord SC_nil__EndBlock() {
 }
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
-	if ((!JB_Ring_HasChildCount(Self, 2))) {
+	if (!JB_Ring_HasChildCount(Self, 2)) {
 		if (true) {
 			Message* __varf1 = F->Source;
 			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(__varf1);

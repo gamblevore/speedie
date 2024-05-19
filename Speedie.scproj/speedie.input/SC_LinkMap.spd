@@ -38,23 +38,36 @@ module LinkMap
 		scfunction.currfunc = self
 		CurrID++
 	
-		|| arg = .SourceArg
-		for msg.flat in arg
-			|| o = msg.obj
-				.CollectLinks( o )
-	
 		for d in .args
 			.CollectLinks( d )
 	
 		|| r = .returntype
 			.CollectLinks( r )
 	
-
+		collectfromsource(self, .sourcearg, false)
+	
+	
+	function CollectFromSource (|scfunction| self, |message| src, |bool| InBranch)
+		opt norefcounts
+		for msg in src
+			|| o = msg.obj
+				.CollectLinks( o, InBranch )
+			if msg.HasAny
+				if !inbranch
+					|| T = msg.ASMType
+					inbranch = (t == asmtmp.kIf or asmtmp.kwhile or asmtmp.ktern)
+								// how do we check that this isnt recursive?
+								// seems to do this, we need to go over the entire program
+								// anytime we wanna add a function! like if we call .parse
+								// now we gotta test every other function... its not so simple is it.
+								// We could just do it 1 level deep? 
+				collectfromsource(Self, msg, inbranch)
+		
 
 
 extend scfunction {
 
-function CollectLinks (|object!| obj)
+function CollectLinks (|object!| obj, |bool| InBranch=false)
 	opt norefcounts
 	
 	while 

@@ -181,7 +181,7 @@ class Document (list)
 		|| Options	= ["Save", "Reload"]
 		|| Answer	= ConfirmIt("The file ${f.name} has been externally modified. Reload or resave?", "", Options) 
 		if answer >=  1			// save
-			.save(DocumentState.errorchecking)
+			.save(DocumentState.Saving)
 		if answer ==  0			// reload
 			.load(true)
 		return true
@@ -399,3 +399,5 @@ class DocumentState (list)
 		fs <~ '"'
 		fs.appendescape(.text.preview(150))
 		fs <~ '"'
+
+

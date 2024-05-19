@@ -131,7 +131,9 @@ struct FastBuff
 	function Size (|int|)
 		if self
 			return .end - .start
-	
+
+
+
 function jbin.Add		(|syntax| type, |&FastBuff| data, |bool|into = false)
 	cpp_part AddBuff
 	|| L = data.length

@@ -90,7 +90,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 		if !.UsingSpdLib
 			.UsingSpdLib = true
 			f.name = name.TrimExt + "()"
-		spd = (Speedie_Main).RunThreaded(p)
+		spd = (Speedie_Main).SpawnThread(p)
 		}
 
 	if !spd?

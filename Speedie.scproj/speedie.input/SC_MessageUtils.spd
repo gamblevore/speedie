@@ -61,7 +61,7 @@ function Message.NegateThg (|Message|)
 	return .WrapWith(@BRel, "!")
 
 
-function Message.Negate (|Message|)
+function Message.Negate (|Message!|)
 	opt norefcounts
 	real self
 	|| upon = self
@@ -92,7 +92,7 @@ function Message.Negate (|Message|)
 		return self
 
 	using self
-		rz = .WrapWith(@BRel,  "!")			// also the negator!
+	rz = .WrapWith(@BRel,  "!")			// also the negator!
 
 
 function Message.IsAssignable (|bool|)
@@ -461,7 +461,7 @@ function NewRel (|Message| L, |Message| R, |string| op, |Message|)
 	rz <~ R
 	
 
-function message.WrapWith (|syntax| f, |string| s="", |message|)
+function message.WrapWith (|syntax| f, |string| s="", |message!|)
 	opt norefcounts
 	rz = f + s
 	.prev = rz
@@ -469,7 +469,7 @@ function message.WrapWith (|syntax| f, |string| s="", |message|)
 
 
 function Message.NeedBra (|Message|)
-	if (self == @Bra)
+	if (self == @Bra or self in @bra)
 		 return self
 	
 	return .wrapwith(@bra)

@@ -777,19 +777,20 @@ function Message.SelfUsedForProperty (|int|)
 function CheckConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 	opt norefcounts
 	require !.Badness
-	|| Supper = .cls!.super
 	|| GotSuperConstructor = false
-	if supper
+	|| Supper = .cls!.super
 		GotSuperConstructor  =  Supper == typeobject  or  (typetask == supper.parent or supper)
 	|| NoNesting = "This should be at the function root. (not nested)."
 	
 	for dot.flat in root
 		if dot == @func
-			|| prms = dot.last!
-			|| fn = (prms.obj as scfunction)!
-			if fn is constructor and prms.first!.obj|scdecl| is self // super.constructor...
-				GotSuperConstructor = true
-				check (dot in root) (dot, NoNesting)
+			|| prms = dot.last
+				|| fn = prms.obj as scfunction
+				|| pf = prms.first
+					|| pfdecl = pf.obj as SCDecl
+					if fn is constructor  and  pfdecl is self // super.constructor...
+						GotSuperConstructor = true
+						check (dot in root) (dot, NoNesting)
 				
 		|| UsedAtAll = dot.SelfUsedForProperty
 			|| t = TypeOfExpr(dot, nil)
@@ -1312,7 +1313,7 @@ function Tran_Debugger (TranFunc) {
 	expect ((node == "debugger") and (!ch.next)) (node)
 
 	using (node)
-		ExpandToBool(ch, name_space)
+		ch.ExpandToBool(name_space)
 		// why cant I use negate?
 		node.first!.Negate
 		node.Name = "if"
@@ -1446,13 +1447,13 @@ function Tran_IfSub (|message| node, |SCNode| name_space)
 	
 	name_space = arg.scarg(name_space) #require
 	using (node)	
-	cond = ExpandToBool( cond, name_space )
+	cond = cond.ExpandToBool( name_space )
 	if !cond
 		0 //
 	  elseif cond.IsAlwaysFalse
 		cond.ElseNeverFires
 	  else
-		cond.NeedBra
+//		cond.NeedBra
 		if cond.first == @arg // if a.b? --> if ({||x=a.b, rejoin x}), fails in c cos if ({}) is bad
 			cond.wrapwith(@bra).obj = cond.obj 
 		Tran_Isa(node, name_space)
