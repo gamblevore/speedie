@@ -8,7 +8,7 @@ extend_module perry
 			app.pref("ftp_dest") = rz
 
 ///// abc
-	function Monthly_Name (|date| n, |string|)	
+	function Monthly_Name (|date| n, |string|)
 		|| fs = faststring()
 		fs <~ "~/Backups/perry_monthly/".PathFix
 		fs.AppendIntegerAsText(n.MonthsApprox, 4)

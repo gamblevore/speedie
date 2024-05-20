@@ -39,7 +39,7 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 					*inrange = true
 					*found = msg0
 					return 4					// 4: function a.b (|*|)
-		if msg0 == @thg and msg0 in @decl and msg0.prev == @emb
+		if  msg0 == @thg  and  msg0 in @decl  and  msg0.prev == @emb
 			return -2
 		if CanUsePrms  // myfunc(a,b,c ^)
 			*found = msg0
@@ -56,6 +56,7 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 		
 		*found = msg
 		return 10
+	
 	|| ConstructorLike = msg ~= "constructor" or "render"
 	|| func_name = msg.first
 	|message| prms
@@ -358,7 +359,10 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 	
 	require key isnt escape
 	|| dd = .FindDrawInfo(s.x)
-	require  (dd contains i2)  and  !dd.drawerror
+	require  (dd contains i2)
+	|| err = dd.drawerror
+		require err isnt parse
+	
 	|message| where
 	|| inrange = false
 	|| state = .CodeInsertion(dd, i2, inrange, where)
@@ -372,7 +376,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 		require state != 10 
 		if !s.width
 			require !self[s.x-1].istextline
-		if (state >= 3)  and  !s.width 
+		if (state >= 4)  and  !s.width 
 			return (s.x <= i2)|int|
 		if (state == 2)
 			if s.width
