@@ -76,6 +76,8 @@ class Window (GUIControl)
 		for c in self
 			c.__AppForegroundChanged__(isforeground)
 	
+	virtual Tickle
+		description "Called when an mouse or keyboard event arrives. Can be used to wakeup sleeping threads for greater responsivity." 
 	
 	setter Size (|ivec2|)
 		cpp_Part Size2

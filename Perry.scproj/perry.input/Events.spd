@@ -320,7 +320,7 @@ function PressedSearchWithin (Guiaction)
 	  else
 		f.SearchWithin = f.FindSearchWithin
 	i.ReTextSubFind
-	
+
 	
 function PressedSearchKeys (GUIKeyEvent)
 	opt norefcounts

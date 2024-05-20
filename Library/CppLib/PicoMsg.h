@@ -436,7 +436,7 @@ struct PicoComms {
 	}
 	
 	bool QueueSend (const char* msg, int n, int Policy) {
-		if (!msg or n <= 0 or HalfClosed&2 or !Sending) return false;
+		if (!msg or n < 0 or HalfClosed&2 or !Sending) return false; //
 		if (queue_sub(msg, n)) return true;
 		if (n+4 > Sending->Size)
 			return SayEvent("CantSend: Message too large!");
@@ -538,7 +538,7 @@ struct PicoComms {
 
 	bool queue_sub (const char* msg, int n) {
 		if (!Sending or !Sending->AppendMsg(msg, n)) return false;
-		if (Socket == -1) Conf.LastSend = PicoGetDate();
+		if (Socket == -1) Conf.LastSend = PicoGetDate(); // threaded
 		return true;
 	}
 
@@ -606,8 +606,9 @@ struct PicoComms {
 		}
 		
 		pico_last_read = PicoGetDate();
-		if (L <= 0)
+		if (L <= 0) {
 			return L < 0 and failed(EILSEQ);
+		}
 
 		if (Reading->Length() < L) return false;
 		int QS = L + sizeof(PicoMessage)*2;
@@ -783,7 +784,7 @@ static void pico_work_comms () {
 		M->io();
 	
 	float S = (PicoGetDate() - pico_global_conf.LastActivity) * (0.000015258789f * 0.005f);
-	pico_sleep(std::clamp(S*S, 0.001f, 0.5f));
+	pico_sleep(std::clamp(S*S, 0.001f, 0.125f));
 }
 
 

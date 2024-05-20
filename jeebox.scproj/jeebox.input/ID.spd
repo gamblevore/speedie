@@ -16,7 +16,7 @@ class StringShared (string)
 	false			""
 
 
-class MessageID (stringshared)				// now is usefully used! :D
+class MessageID (stringshared)
 	linkage
 		cpp_part ID
 	

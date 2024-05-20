@@ -60,6 +60,10 @@ struct Pico
 		
 	function Send (|PicoMessage| msg, |bool| Wait=false, |bool|)
 		cpp_wrapper PicoSend
+	
+	function Tickle
+		|| msg = PicoMessage.from("")
+		.send(msg)
 
 	function Config (|&PicoConfig|)
 		// this should not allow a nil-self. why does it?
@@ -167,7 +171,7 @@ struct PicoGlobalStats
 	|int|						OpenSockets
 	|int|						OpenPicos
 
-	function Read
+	helper Read
 		cpp_wrapper PicoStats
 	module
 		function Read (|PicoGlobalStats|)

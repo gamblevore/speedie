@@ -886,6 +886,8 @@ module SDLApp
 		if (!w)
 			return SDLActivity.nothing
 
+
+		w.__Tickle__
 		if T is dropbegin
 			w.DroppingInto = w[.MouseXY] ?? w
 			return SDLActivity.activity
@@ -944,7 +946,6 @@ module SDLApp
 
 	helper MouseUpEvent (|window| w, |ivec2| XY, |int| Button,  |int|)
 		SDL_CaptureMouse(false)
-		//.AppResizingXY = nil
 		|| dd   = .drawdrag 
 		|| di	= w.DroppingInto
 			for c in dd
@@ -969,6 +970,7 @@ module SDLApp
 	
 		.CurrMouseXY = mxy
 		.ShowCursor
+		
 		if (.CanDrag >= mousedragging.Within) and (MB is left)
 			w.DoMouseDrag(xy, .CanDrag >= mousedragging.Beyond)
 			return SDLActivity.activity
