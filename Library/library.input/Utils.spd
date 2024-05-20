@@ -182,7 +182,11 @@ function bool.Msg (|message|)
 datatype HumanDate (date)
 	render
 		fs.AppendLocalTime(self)
-		
+
+function Faststring.syntaxappend (|humandate| d)
+	.appendlocaltime(d)
+
+
 function message.date (|humanDate|)
 	return .int
 
