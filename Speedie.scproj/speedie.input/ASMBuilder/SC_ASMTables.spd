@@ -354,7 +354,7 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 
 function Not		(fn_asm)
 	opt	NoRefCounts
-	(dest is negate) = dest isnt Negate
+	dest = dest.negate
 	|| src = .µ(exp.first!, dest)
 	if src is AlreadyNegated
 		return src

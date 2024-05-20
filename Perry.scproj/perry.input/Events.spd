@@ -11,10 +11,10 @@ function perryide.UnusedFuncsFB (|message| stuff)
 	require arg == @arg
 	|| where = stuff.firstname
 	for tmp in arg
-		.unused_hoe(tmp, where)
+		.unused_hope(tmp, where)
 
 
-function perryide.unused_hoe (|message| tmp, |string| where)
+function perryide.unused_hope (|message| tmp, |string| where)
 	|| err = error(nil, tmp.name, ErrorSeverity.warning, where )
 	err.position = tmp.first.int
 	.editme.LineErrorAdd(err)

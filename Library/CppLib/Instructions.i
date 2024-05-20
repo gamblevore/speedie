@@ -80,10 +80,10 @@
 	i1 = JB_u64_RotL(u2, u3 + L3);
 ı BROR: _
 	i1 = JB_u64_RotR(u2, u3 + L3);
-ı BCMP: _
-	u1 = BitComp(r, Op);
 ı BCLR: _
 	BitClear(r, Op);
+ı BCMP: _
+	u1 = BitComp(r, Op);
 ı TERN: _
 	if (u2) 
 	u1 = u3
@@ -91,25 +91,25 @@
 	else 
 	u1 = u4
 ;
+ı CMPI: _
+	CompI(r, Op);
+ı CMPF: _
+	CompF(r, Op);
 ı JUMP: _
 	Code += l0;
-ı CMPS: 
+ı JMPI: 
 	__;
-	Code = CompIS(r, Op, Code);
+	Code = JompI(r, Op, Code);
 	___;
-ı CMPI: 
+ı JMPF: 
 	__;
-	Code = CompIB(r, Op, Code);
+	Code = JompF(r, Op, Code);
 	___;
-ı CMPF: 
-	__;
-	Code = CompF(r, Op, Code);
-	___;
-ı CMPE: 
+ı JMPE: 
 	__;
 	Code = CompEq(r, Op, Code);
 	___;
-ı CMPN: 
+ı JMPN: 
 	__;
 	Code = CompNeq(r, Op, Code);
 	___;

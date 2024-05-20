@@ -60,6 +60,13 @@ datatype AsmReg (int)
 		Negate			= (1 << 31)
 		Zero			= Const
 	
+	function Negate (|asmreg|)
+		(self is negate) = (Self isnt negate)
+		return self
+	
+	function BitCount (|int|)
+		return .µtype.bitcount
+	
 	function Math (|asmmath|)
 		return (self|asmmath| >> 16) & 31
 		
@@ -100,7 +107,7 @@ datatype AsmReg (int)
 		return self|DataTypeCode|.issigned
 		
 	function GapBits (|int|)
-		return 64 - .µType.BitCount
+		return 64 - .bitcount
 	
 	function µType (|DataTypeCode|)
 		return self|int| & 0xFFFF

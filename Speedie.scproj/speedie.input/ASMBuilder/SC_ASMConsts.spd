@@ -115,7 +115,7 @@ function asmstate.DoI64Const (|asmreg| D, |&int64| DD, |&int64| LL, |&int64| RR,
 		if !d.signed
 			LLL >>= RRR
 		  else
-			|| bc = 64 - d.µtype.bitcount
+			|| bc = 64 - d.bitcount
 			LLL <<= bc
 			LLL >>= (bc+RRR)
 	  elseif M == ASMMath.Shl

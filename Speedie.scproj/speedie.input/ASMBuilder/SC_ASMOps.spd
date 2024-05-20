@@ -3,28 +3,28 @@
 prototype fn_OpASM (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asmreg|)
 
 
-function asmreg.CanAddK (|int64| T, |bool|)
-	if (self is const) and .isint
-		|| B = (t << 50)>>50
-		return B == t
+extend asmreg
+	function CanAddK (|int64| T, |bool|)
+		if (self is const) and .isint
+			|| B = (t << 50)>>50
+			return B == t
 
 
-function ASMReg.boolasm (|asmreg|)
-	.µtype = DataTypeCode.bool
-	
-	is AlreadyNegated			// speedie crashing somehow but it is used OK elsewhere?
-	if self is CondRequest
-		isnt condrequest
-		is cond
-	return self 
-	
-	
-extend ASMState
-	function asmreg.BitsAreCorrect (|int| gap, |bool|)
+	function boolasm (|asmreg|)
+		.µtype = DataTypeCode.bool
+		
+		is AlreadyNegated			// speedie crashing somehow but it is used OK elsewhere?
+		if self is CondRequest
+			isnt condrequest
+			is cond
+		return self 
+		
+		
+	function BitsAreCorrect (|int| gap, |bool|)
 		return  gap == 0  or   .math is bitcorrect  or   .reg == 0  or  .µtype is bool
 
 
-	function asmreg.BadBits (|asmreg| r, |errorint|)
+	function BadBits (|asmreg| r, |errorint|)
 		|| gl = .GapBits
 		|| gr = r.GapBits
 		|| cl =  .BitsAreCorrect(gl)
@@ -47,6 +47,8 @@ extend ASMState
 		// int  GB vs byte OK	// can CMPI
 
 
+
+extend ASMState
 	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |bool| negate, |&FATASM|)
 		|| badness = l.BadBits(r) 
 
@@ -58,7 +60,7 @@ extend ASMState
 				l = 0.reg
 			if !l.reg
 				return .AddASM(asm.BRA • negate, exp, R, 1)
-			return .AddASM(asm.CMPE • Negate, exp, L, R)
+			return .AddASM(asm.JMPE • Negate, exp, L, R)
 
 		
 		if badness > 0
@@ -68,7 +70,7 @@ extend ASMState
 			|| gl = l.GapBits
 			|| gr = r.GapBits
 			.AddASM(asm.BCLR, exp, L, R, gl, gr, (l.signed|int|) + (r.signed|int|<<1))
-		return .AddASM(asm.CMPE • Negate, exp, L, R, dest)
+		return .AddASM(asm.JMPE • Negate, exp, L, R, dest)
 				
 	
 	function EqualsFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |bool| negate, |&FATASM|)
@@ -97,55 +99,52 @@ extend ASMState
 	
 		
 	function NotEq  (fn_opasm)
-		(dest is Negate) = (dest isnt Negate)
-		return .Equals(dest, l, r, exp)
+		return .Equals(dest.negate, l, r, exp)
 
 
 	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |&FATASM|)
+
 /*
-		|| bl = l.µtype.bitcount
-		|| br = r.µtype.bitcount
-		|| bm = bl max br
+	0 : cA > B
+	1 : cA < B
+	2 : sA > B
+	3 : sA < B
+	4 : iA > B
+	5 : iA < B
+	6 :  A > B
+	7 :  A < B
+	8 : bA > B
+	9 : bA < B
+	10: zA > B
+	11: zA < B
+	12: uA > B
+	13: uA < B
+	14: UA > B
+	15: UA < B
+*/
+
+		|| bb = l.bitcount max r.bitcount
+		if !l.signed
+			mode += 8
+			if r.signed and r.bitcount >= l.bitcount // bad
+		  elseif !r.signed
+			if l.signed and l.bitcount >= r.bitcount // bad
+		|| bigness = (bb.log2-3)<<1
+		mode += bigness
 		
-		if bm <= 16
-			if bm == 16
-				mode += 8
-			if !dest.signed
-				mode += 4
-			.AddASM(asm.CMPS, exp, L, R, mode, dest)
-		  else
-			if bm == 8
-				mode += 8
-			if !dest.signed
-				mode += 4
-			.AddASM(asm.CMPI, exp, L, R, mode, dest)
-*/		
-		|| negate = false
-		|| badness = l.BadBits(r) 
-
-		if (dest is condrequest) and (badness >= 0)
-			if badness > 0
-				dest = .TempMe(exp, dest)
-				.AddASM(asm.BCMP, exp, dest, L, R, badness, Negate|int|)
-				r = dest
-				l = 0.reg
-			return .AddASM(asm.CMPI, exp, L, R)
-
-		
-		if badness > 0
-			return .AddASM(asm.BCMP, exp, dest, L, R, badness, negate|int|)
-
-		if badness == -1
+		if l.BadBits(r) 
 			|| gl = l.GapBits
 			|| gr = r.GapBits
 			.AddASM(asm.BCLR, exp, L, R, gl, gr, (l.signed|int|) + (r.signed|int|<<1))
-		return .AddASM(asm.CMPI, exp, L, R, dest)
+
+		|| OPP = (asm.JMPI, asm.CMPI)(dest is condrequest)
+		return .AddASM(OPP, exp, L, R, mode, dest)
 
 
 	function CompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |&FATASM|)
 /*
-	|| bl = l.µtype.bitcount
-	|| br = r.µtype.bitcount
+	|| bl = l.bitcount
+	|| br = r.bitcount
 	|| bm = bl max br
 	
 	if bm <= 16 // what?
@@ -164,6 +163,10 @@ extend ASMState
 
 
 	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |int| Mode,  |asmreg|)
+		if dest is negate
+			|| t = l, l = r, r = t, #! swap
+			(dest isnt negate)
+		
 		if dest.IsInt
 			.compareint(dest, l, r, exp, mode)
 		  else
@@ -171,46 +174,17 @@ extend ASMState
 		
 		return dest.BoolASM
 	
-	
-/*
-	0 :		iA >= iB
-	1 :		iA <  iB
-	2 :		iA <= iB
-	3 :		iA >  iB
-	4 :		uA >= uB
-	5 :		uA <  uB
-	6 :		uA <= uB
-	7 :		uA >  uB
-	8 :		A  >= B 
-	9 :		A  <  B 
-	10:		A  <= B 
-	11:		A  >  B 
-	12:		UA >= UB
-	13:		UA <  UB
-	14:		UA <= UB
-	15:		UA >  UB
-	0 :		FA >= FB
-	1 :		FA <  FB
-	2 :		FA <= FB
-	3 :		FA >  FB
-	4 :		DA >= DB
-	5 :		DA <  DB
-	6 :		DA <= DB
-	7 :		DA >  DB
-*/
-
 	function Less   (fn_opasm)
-		return .compare(dest, l, r, exp, 0 + (dest isnt Negate))
-			
-	function MoreEq (fn_opasm)
-		return .Compare(dest, l, r, exp, 0 + (dest is Negate))
+		return .compare(dest, l, r, exp, 1)
 
-	function LessEq (fn_opasm)
-		(dest is Negate) = (dest isnt Negate)
-		return .compare(dest, l, r, exp, 2 + (dest is Negate))
+	function MoreEq (fn_opasm)
+		return .compare(Dest.negate, l, r, exp, 1)
 
 	function More   (fn_opasm)
-		return .compare(dest, l, r, exp, 2 + (dest isnt Negate))
+		return .compare(dest, l, r, exp, 0)
+
+	function LessEq (fn_opasm)
+		return .compare(Dest.negate, l, r, exp, 0)
 	
 
 
@@ -426,7 +400,7 @@ extend ASMState
 		.AddASM(asm.BROR, exp, dest, L, R), return dest
 	
 	function SHR    (fn_opasm)
-		|| up = 64 - l.µtype.bitcount
+		|| up = 64 - l.bitcount
 		if r is const
 			|| sh = self[r][0]
 			if l.signed

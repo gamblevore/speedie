@@ -225,51 +225,50 @@ AlwaysInline bool Rare (Register* r, ASM Op) {
 #define CmpSub(Mode, Cmp) case Mode: return (Cmp);
 
 
-AlwaysInline bool CompIBig_ (Register* r, ASM Op) {
+bool CompI_ (Register* r, ASM Op) {
 	auto A = &i1;
 	auto B = &i2;
 	switch (Cmp_Cmpu) {
-		CmpSub(0 , cA >= cB);
-		CmpSub(1 , cA >  cB);
-		CmpSub(2 , sA >= sB);
-		CmpSub(3 , sA >  sB);
-		CmpSub(4 , iA >= iB);
-		CmpSub(5 , iA >  iB);
-		CmpSub(6 , A  >= B );
-		CmpSub(7 , A  >  B );
+		CmpSub(0 , cA > cB);
+		CmpSub(1 , cA < cB);
+		CmpSub(2 , sA > sB);
+		CmpSub(3 , sA < sB);
+		CmpSub(4 , iA > iB);
+		CmpSub(5 , iA < iB);
+		CmpSub(6 ,  A >  B);
+		CmpSub(7 ,  A <  B);
 
-		CmpSub(8 , bA >= bB); // a lot of string processing will be comparing bA >= bB
-		CmpSub(9 , bA >  bB); // or other byte ops.
-		CmpSub(10, zA >= zB);
-		CmpSub(11, zA >  zB);
-		CmpSub(12, uA >= uB);
-		CmpSub(13, uA >  uB);
-		CmpSub(14, UA >= UB); default:;
-		CmpSub(15, UA >  UB);
+		CmpSub(8 , bA >  bB); // a lot of string processing will be comparing bA >= bB
+		CmpSub(9 , bA <  bB); // or other byte ops.
+		CmpSub(10, zA >  zB);
+		CmpSub(11, zA <  zB);
+		CmpSub(12, uA >  uB);
+		CmpSub(13, uA <  uB);
+		CmpSub(14, UA >  UB); default:;
+		CmpSub(15, UA <  UB);
 	};
 }
 
-
-AlwaysInline bool CompF_ (Register* r, ASM Op) {
+bool CompF_ (Register* r, ASM Op) {
 	auto A = &i1;
 	auto B = &i2;
 
 	switch (Cmp_Cmpu) {
-		CmpSub(0 , FA >= FB);
-		CmpSub(1 , FA >  FB);
+		CmpSub(0 , FA >  FB);
+		CmpSub(1 , FA <  FB);
 		CmpSub(2 , FA == FB);
 		CmpSub(3 , FA != FB);
-		CmpSub(4 , DA >= DB);
-		CmpSub(5 , DA >  DB);
+		CmpSub(4 , DA >  DB);
+		CmpSub(5 , DA <  DB);
 		CmpSub(6 , DA == DB);
 		CmpSub(7 , DA != DB);
 
-		CmpSub(8 , FA >= DB);
-		CmpSub(9 , FA >  DB);
+		CmpSub(8 , FA >  DB);
+		CmpSub(9 , FA <  DB);
 		CmpSub(10, FA == DB);
 		CmpSub(11, FA != DB);
-		CmpSub(12, DA >= FB);
-		CmpSub(13, DA >  FB);
+		CmpSub(12, DA >  FB);
+		CmpSub(13, DA <  FB);
 		CmpSub(14, DA == FB); default: // dupe
 		CmpSub(15, DA != FB); // dupe also... do something else with these 2?
 	};
@@ -277,55 +276,32 @@ AlwaysInline bool CompF_ (Register* r, ASM Op) {
 
 
 
-AlwaysInline ASM* CompIB (Register* r, ASM Op, ASM* Code) {
-	uint Jump = Cmp_Lu; 
-	bool b = CompIBig_(r, Op);
-	if (Jump >= 32) {
-		if (!b) return Code;
-		return Code + Jump - 31;
-	}
-		
-	r[Jump].Int = b;
-	return Code;
+AlwaysInline ASM* JompI (Register* r, ASM Op, ASM* Code) {
+	return Code + Cmp_Lu*CompI_(r, Op);
 }
 
-
-AlwaysInline ASM* CompIS (Register* r, ASM Op, ASM* Code) {
-	uint Jump = Cmp_Lu; 
-	bool b = CompIBig_(r, Op);
-	if (Jump >= 32) {
-		if (!b) return Code;
-		return Code + Jump - 31;
-	}
+AlwaysInline ASM* JompF (Register* r, ASM Op, ASM* Code) {
+	return Code + Cmp_Lu*CompF_(r, Op);
+}
 		
-	r[Jump].Int = b;
-	return Code;
+AlwaysInline void CompI (Register* r, ASM Op) {
+	r[Cmp_Lu].Int = CompI_(r, Op);
 }
 
-
-AlwaysInline ASM* CompF (Register* r, ASM Op, ASM* Code) {
-	uint Jump = Cmp_Lu; 
-	bool b = CompF_(r, Op);
-	if (Jump >= 32) {
-		if (!b) return Code;
-		return Code + Jump - 31;
-	}
-		
-	r[Jump].Int = b;
-	return Code;
+AlwaysInline void CompF (Register* r, ASM Op) {
+	r[Cmp_Lu].Int = CompF_(r, Op);
 }
 
 
 AlwaysInline uint64 BitComp (Register* r, ASM Op) {
 	auto i = BCmp_Invu;
-	auto A = u1 << BCmp_Shiftu;
-	auto B = u2 << BCmp_Shiftu;
+	auto A = u2 << BCmp_Shiftu;
+	auto B = u3 << BCmp_Shiftu;
 	if (i&2)
 		A = ~A;
 	if (i&4)
 		B = ~B;
-	bool Result = A==B;
-	return Result xor (i&1);
+	return (A==B) xor (i&1);
 }
 
 

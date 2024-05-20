@@ -254,40 +254,46 @@ forms
 		i1 = JB_u64_RotL(u2, u3 + L3)
 /**/ BROR  (U3)
 		i1 = JB_u64_RotR(u2, u3 + L3)
-/**/ BCMP  (BCmp)
-		u1 = BitComp(r, Op)
 /**/ BCLR  (BClear)
 		BitClear(r, Op)
 
 
+#!						 (((((MiniCompare)))))
+/**/ BCMP  (BCmp)
+		u1 = BitComp(r, Op)
 
-#!						 (((((Branches)))))
 /**/ TERN  (U4)
 	if (u2)
 		u1 = u3
 	else
 		u1 = u4
 
+
+/**/ CMPI  (Cmp)
+	CompI(r, Op)
+
+
+/**/ CMPF  (Cmp)
+	CompF(r, Op)
+
+
+#!						 (((((Branches)))))
 /**/ JUMP (U0)
 		Code += l0
 
-/**/ CMPS  (Cmp)
+/**/ JMPI  (Cmp)
 		__
-		Code = CompIS(r, Op, Code) // 8/16 bit compares
+		Code = JompI(r, Op, Code)
 		___
-/**/ CMPI  (Cmp)
+/**/ JMPF  (Cmp)
 		__
-		Code = CompIB(r, Op, Code) // 32/64 bit compares
+		Code = JompF(r, Op, Code)
 		___
-/**/ CMPF  (Cmp)
-		__
-		Code = CompF(r, Op, Code)
-		___
-/**/ CMPE  (CmpEq)
+/**/ JMPE  (CmpEq)
 		__
 		Code = CompEq(r, Op, Code)
 		___
-/**/ CMPN  (CmpEq)
+/**/ JMPN  (CmpEq)
 		__
 		Code = CompNeq(r, Op, Code)
 		___
