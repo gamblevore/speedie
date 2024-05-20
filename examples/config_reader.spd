@@ -1,27 +1,20 @@
-
+#!/usr/local/bin/spd
 
 || ConfData = `
-date "109638486383396"
-dev true
+date 109638486383396 // actually this is jan 5 2023
 theme "hello_kitty"
-lastproj {
-	+"/usr/local/speedie/Perry.scproj/" "Perry" {
-		edit "/usr/local/speedie/Perry.scproj/perry.input/"
-		pos 0
-	}
-
-	+"/usr/local/speedie/examples/config_reader.spd" "config_reader" {
-		edit "/usr/local/speedie/examples/config_reader.spd"
-		pos 0
-	}
-}
-
-curropen "/usr/local/speedie/examples/config_reader.spd"
+irrelevant "this isnt used by the code below"
+curropen "/Users/jojosiwa/HowILostMySiwa"
 `
 
 main
 	|| conf = ConfData.parse		#require
-	"Theme: ${conf[`theme`]}"
-	"Last Opened: ${conf[`date`].date}"
-	"Curr File: ${conf[`curropen`]}"
+	"Theme:       ${conf[`theme`]}"
+	"Last Opened: ${conf[`date`].date}" // .date makes this as some human understandable text... kinda. Well a type that convets to that.
+	"Curr File:   ${conf[`curropen`]}"
+
+	if 0.5[] // just added this for fun
+		error "failed half the time"
+	  else
+		"Everything worked great!"
 
