@@ -181,10 +181,11 @@ class Window (GUIControl)
 
 	behaviour MouseWheel
 		opt norefcounts
+		|| XY = sdlapp.MouseXY
 		|| it = .OpenedMenu()
+		if it and it.lastrect.Contains(xy)
 			return it.__MouseWheel__(P, direction)
-			
-		|| R = self[sdlapp.MouseXY]
+		|| R = self[xy]
 			R.__MouseWheel__(P, Direction)
 		return true
 
