@@ -156,7 +156,7 @@
 	// should call constructor too.
 
 ı TABL: _
-	u1 = table(u2, L2);
+	u1 = table(n2);
 ı RD1U: _
 	u1 = mem(uint8);
 	mem2(uint8);

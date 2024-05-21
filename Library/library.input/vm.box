@@ -159,6 +159,11 @@ forms
 			debugger
 
 
+// unused oof:     BFLS, CNTC, 
+// needs opt:      lupu, lupd, tail, fncx
+// needs ASM-text: swap, rare, RSDE, RALO, RSET, MEMM
+
+
 
 #!						 (((((FUNC)))))
 
@@ -345,7 +350,7 @@ forms
 
 #!						(((((Memory)))))
 /**/ TABL  (U2)
-		u1 = table(u2, L2)
+		u1 = table(n2)
 /**/ RD1U  (mem)
 		u1 = mem(uint8)
 		mem2(uint8)
@@ -389,6 +394,7 @@ forms
 
 /**/ CNTC  (CNTC)					// aWESOME  JOBBBBBBBBBBB BROOOOOO LOLLLLLLL ::DDDDDD
 		CountConst(r, Op)
+
 /**/ MEMM  ("rrnl")
 		#! copy/fill/endian/xor
 		MemStuff((u32*)u1, (u32*)u2, n3, L3)

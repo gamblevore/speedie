@@ -37,25 +37,23 @@ datatype AsmReg (int)
 		numeric false
 	
 	constants
-		MathTypes		= (31 << 16)
-		|asmreg|		// start at 21!
+		MathTypes		= (31 << 13)
+		|asmreg|		// start at 19!
 		Set = 4
-		// could save some bits if we make an exclusive area
-		// can something be frommath and a positionrequset?
-		// or discard + return? who knows?
+		Unused 		    = (1 << 19)
+		ContainsAddr    = (1 << 20)
 		FromMath		= (1 << 21)
 		StayOpen		= (1 << 22) // input
 		AlreadyNegated	= (1 << 22) // result. what if we return the input?
 		Alternate		= (1 << 23)
-		Const			= (1 << 24) ||| (31 << 16)
+		Const			= (1 << 24) ||| (31 << 13)
 		MathConst		= (1 << 21) ||| (1<<24)
 		Cond			= (1 << 25)
-		PositionRequest = (1 << 26)
+		AddrRequest     = (1 << 26)
 		ForReturn		= (1 << 27)
-		ForReturnReg	= (1 << 27) ||| (1<< 11)
 		Discard			= (1 << 28)
 		SingleExpr		= (1 << 29)
-		CondRequest		= (1 << 30) ||| (1 << 24) ||| (31 << 16)
+		CondRequest		= (1 << 30) ||| (1 << 24) ||| (31 << 13)
 		NewCondRequest	= (1 << 30)
 		Negate			= (1 << 31)
 		Zero			= Const
@@ -68,7 +66,7 @@ datatype AsmReg (int)
 		return .µtype.bitcount
 	
 	function Math (|asmmath|)
-		return (self|asmmath| >> 16) & 31
+		return (self|asmmath| >> 13) & 31
 		
 	operator isa (|ASMMath| M, |bool|)
 		return .math == M
@@ -77,7 +75,7 @@ datatype AsmReg (int)
 		return .µtype == M
 
 	operator as (|ASMMath| M, |asmreg|)
-		return ((self|int| &~ MathTypes) ||| (M<<16))|ASMReg|
+		return ((self|int| &~ MathTypes) ||| (M<<13))|ASMReg|
 
 	function Exists (|bool|)
 		return self|int|
@@ -110,10 +108,10 @@ datatype AsmReg (int)
 		return 64 - .bitcount
 	
 	function µType (|DataTypeCode|)
-		return self|int| & 0xFFFF
+		return self|int| & 13.bits
 	
 	function µType (assigns:|DataTypeCode|, |asmreg|)
-		return ((self|int| & ~0xFFFF) ||| value)|asmreg|
+		return ((self|int| & ~13.bits) ||| value)|asmreg|
 	
 	syntax is (|AsmReg| R, |bool|)
 		return (self|int| & R|int|) == r|int|
@@ -125,10 +123,12 @@ datatype AsmReg (int)
 			return self asnt r
 			
 	function RequestPos (|asmreg|)
-		return self as positionrequest
+		return self as addrrequest
 			
-	function Unrequest (|asmreg|)
-		return self asnt positionrequest
+	function HaveAddr (|asmreg|)
+		|| x = self|int| &~ AddrRequest|int|
+		x |= ContainsAddr|int|  (|)  asmmath.Bitcorrect|int|
+		return x|asmreg|
 		
 	// we could do this instead
 	// (self-1)&31!!
@@ -149,13 +149,6 @@ datatype AsmReg (int)
 		cpp_part ToInt
 		return .reg
 	
-//	function SameType (|AsmReg| t, |message| err, |bool|)
-//		|| T1 = .µType
-//		|| t2 = t.µType
-//		// what about a < b with diferent types?
-//		// i guess speedie should sort that out on the C-level...
-//		return ((t2 == t1) or  (t1.IsInt and t2.IsInt)) #expect (err, "Type-mismatch")
-
 	operator as (|asmreg| A, |asmreg|)
 		return (self|int| ||| A|int|)|asmreg|
 

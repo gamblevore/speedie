@@ -114,7 +114,8 @@ extend ASMState
 	function CompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |&FATASM|)
 		mode += 8 * l.isbig
 		mode += 4 * r.isbig
-		return .AddASM(asm.CMPF, exp, L, R, Mode, dest) // it is cmpf either way
+		|| OPP = (asm.JMPF, asm.CMPF)(dest is condrequest)
+		return .AddASM(OPP, exp, L, R, Mode, dest) // it is cmpf either way
 
 
 	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |int| Mode,  |asmreg|)
@@ -259,7 +260,7 @@ extend ASMState
 		return dest
 
 		
-	function Plus   (fn_opasm)
+	function Plus   (fn_opasm) // add (
 		if !r.reg
 			return .assign(dest, l, AsmReg(), exp)
 		if !l.reg and (l isnt alternate)

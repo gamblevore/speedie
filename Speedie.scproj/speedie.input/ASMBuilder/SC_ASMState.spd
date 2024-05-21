@@ -42,22 +42,14 @@ struct ASMState
 		if (!r.reg) // what?
 
 
-	function AddConstantToReg (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asm| Op, |bool|)
-		if .TryUseConstant(exp, dest, src, value, op)
-			return true
-		|| K = .tempme(Exp, src • dest)
-		.NumToReg(Value, exp, K)
-		.AddASM(op, exp.parent!, dest, src, K)
-		
-		
-	function TryUseConstant (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asm| Op, |bool|)
+	function TryAddConstant (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value, |bool|)
 		if dest.isint
 			if value.CanStoreAsIntImmediate
-				.AddASM(op.next, exp.parent!, dest, src, Value)
+				.AddASM(asm.ADDK, exp.parent!, dest, src, Value)
 				return true
 		  elseif dest.fourbytes
 			if value|uint64|.CanStoreAsFloatImmediate
-				.AddASM(op.next, exp.parent!, dest, src, Value)
+				.AddASM(asm.FADK, exp.parent!, dest, src, Value)
 				return true
 
 		

@@ -124,24 +124,8 @@ datatype DataTypeCode (uint16)
 		return (.isfloat == b.isfloat) // this will do for now.
 	
 	function Register (|int|)
-		return self >> 11
+		return self >> 8
 	
 	function Register (assigns:|int|, |Datatypecode|)
-		return (self &~ (31<<11)) ||| (value << 11)
+		return (self &~ (31<<8)) ||| (value << 8)
 	
-	// unused?
-	// can just set the individually anyhow
-	// like code.isfloat = true, code.bits = 8, etc.
-//	module
-//		function Create (|bool| Float, |int|bits, |bool|sign=true, |int|vec=1, |DataTypeCode|)
-//			|| R = (128+64, 0)(float)
-//			bits = bits&~15 // 0 means a byte...
-//			if (bits == 64)
-//				bits = 48
-//			R |= bits
-//			if sign
-//				R |= 64
-//			R |= vec - 1
-//			return R
-//
-//

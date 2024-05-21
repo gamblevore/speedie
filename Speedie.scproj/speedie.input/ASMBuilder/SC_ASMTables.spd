@@ -84,12 +84,10 @@ function asmstate.SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |messa
 	return dest
 
 
-function asmstate.TrueOrOne (|message| Val, |bool|)
-	opt norefcounts
-	if val == @thg or @num
-		|| d = val.FastDecl
-		if (d is const)
-			return d.exportposition == 1
+function asmstate.AddToReg (|asmreg| addr, |int| add, |message| exp)
+	if add
+		.plus(addr, addr, .numtoegg(add, exp), exp)
+
 
 
 extend_module ASMTmp {
@@ -211,7 +209,8 @@ function First			(fn_asm)
 function Return			(fn_asm)
 	opt norefcounts
 	|| f = exp.first
-		|| Where = asmreg.ForReturnReg
+		|| Where = asmreg.ForReturn
+		where.reg = 1
 		where.µtype = asmstate.sh.ReturnType
 		rz = .µ(f, Where)
 	.AddASM(asm.RET, exp, rz, asmreg(), 1)
@@ -268,11 +267,12 @@ function Access		(fn_asm)						// a[b], struct.mem[b], func()[func2()]
 	dest = .tempme(exp, dest)
 
 	|| Ptr = .µ(exp.first!, dest.requestpos)		// x = a.b[0]
-	|| Ind = .µ(exp.second!, ptr.unrequest • dest)
+	expect (ptr is containsaddr) (exp)
+	|| Ind = .µ(exp.second!, ptr • dest)
 	|| A = Dest.ReadOrWrite(exp)
 
 	.AddASM(A, exp, dest,  Ptr, ind)
-	return dest as asmmath.Bitcorrect
+	return dest asnt asmreg.containsaddr as asmmath.Bitcorrect 
 
 		
 
@@ -290,11 +290,10 @@ function Dot		(fn_asm)						// a.b
 
 	|| Pos = prop.exportposition >> B
 	if !pos // what?
-	|| WantAddr = dest is positionrequest
-	if WantAddr or pos >= 128						// oof
+	if (dest is addrrequest) or (pos >= 128)						// read/write only allows up to 127
 		.AddASM(asm.ADDK, exp, dest, obj, pos)
-		if WantAddr
-			return dest
+		if dest is addrrequest
+			return dest.haveaddr
 		pos = 0
 	
 	.AddASM(A, exp, dest: dest,  ptr: Obj,  index: 0, Pos)
@@ -337,7 +336,6 @@ function Thg (fn_asm)
 			.AddASM(asm.BOR, exp, dest, reg)
 			return dest
 		return reg
-	
 
 	if d is const
 		|| R = dest.reg
@@ -353,6 +351,8 @@ function Thg (fn_asm)
 	check (d is global) (Exp)
 	if dest isnt discard
 		return DoGlobal(self, exp, dest, d)
+	  else
+		debugger
  
 
 function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |AsmReg|)
@@ -361,10 +361,34 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 	if dest isnt set								// a = glob
 		addr = .tempme(exp, dest)
 
-	.AddASM(asm.tabl,  exp, addr,   d.IsLib|int|)
+	|int64| iTable = d.ExportPosition
+	expect (iTable > 0)      (exp, "No global address".internal)
+	expect (iTable < 16MB)   (exp, "Too much global data")
 
-	|| i = d.ExportPosition				#check (exp, "No global address".internal)
-	.AddASM(dest.ReadOrWrite(Exp), exp, dest,  addr, i)
+	if dest is addrrequest
+		|| iAdd = iTable
+		if itable >= 16K
+			debugger // does this ever happen?
+			itable &= 16K-1
+		.AddASM(asm.tabl,  exp,  addr,  (!d.IsLib)|int|,  itable)
+		.addtoreg(addr, iadd-itable, exp)
+		return addr.haveaddr
+
+
+	|| iRead = iTable
+	|| iOld = iRead
+	if iTable < 128
+		iTable = 0		// keep the current table. More optimisable.
+	  elseif iTable < 16K
+		iRead = 0		// itable has a bigger range... so use that. 
+	  else
+		itable = 0		// Make this optimisable.
+		iRead = 0
+
+	.AddASM(asm.TABL,  exp,  addr,  (!d.IsLib)|int|, iTable)
+	if !itable and !iread
+		.addtoreg(addr, iold, exp)
+	.AddASM(dest.ReadOrWrite(Exp), exp, dest, addr, iRead)
 	return addr as asmmath.Bitcorrect
 	
 
@@ -377,12 +401,6 @@ function Not		(fn_asm)
 	return .Equals(dest, asmreg(), src, exp)
 	
 
-function ARel		(fn_asm)
-	opt	NoRefCounts
-	|| Sub = exp.name.first == '-'
-	return Precrement(self, exp.first!, dest, 2 + Sub)
-	
-
 function Minus			(fn_asm)					// -a
 	opt	NoRefCounts
 	return ASMTmp.DoSingleMath(self, exp, dest, scoperator.minus)
@@ -390,30 +408,36 @@ function Minus			(fn_asm)					// -a
 
 function Precrement		(fn_asm)					// --a, ++a
 	opt	NoRefCounts
-	|| Src = .µ(exp, dest)							// src has the old value.
+	|| Src = .µ(exp, dest.RequestPos)				// src has the old value.
 	if (mode & 2)									// we want src.
 		dest = src
 	  else
 		dest = .TempMe(exp, dest)	
 	
 	|| D = exp.FastDecl
-	|int64| Value = (-1,1)(mode & 1)
+	|int64| Value = (1,-1)(mode & 1)
 	if dest.isfloat
 		if dest.fourbytes
 			value = value|float|.asint
 		  else
 			value = value|f64|.asint
 	  elseif D.typesuffers
-		Value *= D.typesuffers
+		Value *= D.PointerIncrement
 		check Value.CanStoreAsIntImmediate (exp, "Object too large to increment")
-			
-	check .TryUseConstant(exp, dest, src, Value, asm.add)		(exp) // shouldn't fail!
+	
+	check .TryAddConstant(exp, dest, src, Value)		(exp) // shouldn't fail!
 
 	if d isnt local
 		.µ(exp, dest.set)							// write it back again
 	
 	return dest
 
+
+function ARel		(fn_asm)
+	opt	NoRefCounts
+	|| PlusPlus = exp.name.first == '+'
+	return Precrement(self, exp.first!, dest, 2 + PlusPlus)
+	
 	
 function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 	opt	NoRefCounts
@@ -429,8 +453,8 @@ function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 	if exp.name == 1								// -a
 		return Minus(Self, f, dest)
 	
-	|| Sub = n == '-'
-	return Precrement(self, F, dest, Sub|int|)
+	|| PlusPlus = n == '+'
+	return Precrement(self, F, dest, PlusPlus|int|)
 
 
 

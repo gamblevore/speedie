@@ -1039,6 +1039,50 @@ class SCDecl (SCNamed) {
 				fs <~ " of "
 				fs <~ c.type.name
 
+	function AllocatedSize (|int|)
+		return .varsizesub(false)
+
+	function DeclSizeSort (|int|)
+		if self is biggest
+			return 1K
+		return .varsizesub(true)
+
+
+	function DeclSize (|int|)
+		return .VarSizeSub(true)
+
+
+	function RegType (|datatypecode|)
+		opt norefcounts
+		if self
+			|| Ty = .type
+			debug_require !(.c_array ||| ty.IsStruct)
+			
+			if ty.IsObject
+				return datatypecode.cstring
+			rz = ty.typeinfo
+			if .pointercount
+				rz &=~ datatypecode.numeric
+
+	function VarSizeSub (|bool| TheVarItself, |int|)
+		opt norefcounts
+		|| n = Platform.PointerBytes
+		ifn .PointerCount or (TheVarItself and .isobject)
+			n = .type.Size
+		if .IsCArray
+			n *= .C_Array
+		return N
+		
+	function PointerIncrement (|int|)
+		// only called on pointers
+		if .pointercount > 1
+			rz = Platform.PointerBytes
+		  else
+			rz = .type.size
+		if .IsCArray
+			rz *= .C_Array
+		
+
 }
 
 
@@ -1072,40 +1116,4 @@ function Message.RenderType (|string|)
 function scdecl.TypeIsReached (|bool|)
 	return .type.MyReacher
 
-
-function scdecl.AllocatedSize (|int|)
-	return .varsizesub(false)
-
-function scdecl.DeclSizeSort (|int|)
-	if self is biggest
-		return 1K
-	return .varsizesub(true)
-
-
-function scdecl.DeclSize (|int|)
-	return .VarSizeSub(true)
-
-
-function scdecl.RegType (|datatypecode|)
-	opt norefcounts
-	if self
-		|| Ty = .type
-		debug_require !(.c_array ||| ty.IsStruct)
-		
-		if ty.IsObject
-			return datatypecode.cstring
-		rz = ty.typeinfo
-		if .pointercount
-			rz &=~ datatypecode.numeric
-
-
-
-function scdecl.VarSizeSub (|bool| TheVarItself, |int|)
-	opt norefcounts
-	|| n = Platform.PointerBytes
-	ifn .PointerCount or (TheVarItself and .isobject)
-		n = .type.Size
-	if .IsCArray
-		n *= .C_Array
-	return N
 

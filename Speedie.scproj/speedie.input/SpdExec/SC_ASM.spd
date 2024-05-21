@@ -7,8 +7,7 @@ datatype ASM (uint)
 	function Print
 		visible
 		cpp_name ASMPrint
-	function Next (|asm|)
-		return self ||| (1<<24)
+
 	function R1 (assigns:|uint|, |asm|)
 		return self ||| (value << 27) >> 8
 	function R2 (assigns:|uint|, |asm|)
@@ -20,7 +19,7 @@ datatype ASM (uint)
 		
 	operator • (|bool| b, |asm|)
 		if b
-			return .next
+			return self + (1<<24)
 		return self
 
 	module

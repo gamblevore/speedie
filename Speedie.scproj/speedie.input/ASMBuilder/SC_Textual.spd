@@ -20,6 +20,12 @@ extend ASMState
 	function NumToReg (|int64| V, |message| exp, |int| Reg)
 		.AddASM(asm.setk, exp, reg, (V << 32) >> 32, V>>32)
 		.consts[reg] = v
+
+
+	function NumToEgg (|int64| V, |message| exp, |asmreg|)
+		rz = .TempMe(exp)
+		.NumToReg(v, exp, rz)
+
 		
 	
 	function FatASM.FixConst

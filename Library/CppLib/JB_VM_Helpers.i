@@ -146,7 +146,7 @@ AlwaysInline uint bitstats32(Register* r, ASM Op) {
 #define decr(o)				JB_Decr((JB_Object*)o)
 #define safedecr(o)			JB_SafeDecr((JB_Object*)o)
 #define setref(t, a, b)		{if (t) JB_SetRef(a,b); else incr(b);}  
-#define table(b, c)			((u64)(((void**)(&vm.Env))[b])+c)  
+#define table(b)			((u64)(((void**)(&vm.Env))[b])+L2)  
 
 #define mem(t)				((t*)u2)[u3+Mem_Lu]
 #define mem2(t)				(u2 = (u64)((t*)u2 + Mem_moveu-1))
@@ -328,14 +328,12 @@ AlwaysInline ASM* CompEq (Register* r, ASM Op, ASM* Code) {
 	return Code + CmpEq_Jmpi;
 }
 
+
 AlwaysInline ASM* CompNeq (Register* r, ASM Op, ASM* Code) {
 	if (u1 != u2)
 		return Code;
 	return Code + CmpEq_Jmpi;
 }
-
-
-
 
 
 void bswap32 (u32* Start, uint Count) {
@@ -371,7 +369,7 @@ void MemStuff(u32* A, u32* B, u32 Operation, u32 L) {
 AlwaysInline void CountConst(Register* r, ASM Op) {
 	int Size = CNTC_sizeu;
 	int Off  = CNTC_Lu-8;
-	int Add  = CNTC_cnstu-128;
+	int Add  = CNTC_cnsti;
 	switch (Size) {
 	case 0:
 		p1(u8 )[Off] += Add;  break;
