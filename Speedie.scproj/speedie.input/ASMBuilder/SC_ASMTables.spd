@@ -84,6 +84,14 @@ function asmstate.SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |messa
 	return dest
 
 
+function asmstate.TrueOrOne (|message| Val, |bool|)
+	opt norefcounts
+	if val == @thg or @num
+		|| d = val.FastDecl
+		if (d is const)
+			return d.exportposition == 1
+
+
 extend_module ASMTmp {
 
 |asm_mem[10]| ReadASM
@@ -107,14 +115,19 @@ function InitAccess
 function Debugger		(fn_asm)
 	.addasm(asm.TRAP, exp)
 
+
 	
 function If				(fn_asm)
 	opt norefcounts
 	debugger
 	
 	|| cond = exp.first!
-	|| Start = .Branch(cond)
 	|| arg = cond.next!
+	|| F = arg.first
+//	if !mode and f and (f.asmtype == kreturn) and IfAsReturn(self, F, exp) // we can do an optional return? but only if returning a reg or true/false
+//		return nil // too fiddly. I hate writing this :)
+			
+	|| Start = .Branch(cond)
 	.µ(arg)
 	|| ElseIf = arg.next
 		if mode // what?
@@ -165,8 +178,8 @@ function Ternary		(fn_asm)
 	|| A = cond.next!
 	|| B = A.next!
 	
-	|| mA = .SimpleVar(a)
-	|| mB = .SimpleVar(b)
+	|| mA = .ExistingVar(a) // shouldn't allow globals
+	|| mB = .ExistingVar(b)
 	if ma and mb
 		return .SimpleTernary(dest, ma, mb, cond)
 	
@@ -290,7 +303,7 @@ function Dot		(fn_asm)						// a.b
 
 function SetRel	(fn_asm)
 	opt	norefcounts
-	|| Var = .SimpleVar(exp.first!)	
+	|| Var = .ExistingVar(exp.first!)	
 	|| R = .µ(exp.last!, var)
 	if r isnt discard								// x = 1, already done!
 		(r is set)
@@ -325,15 +338,18 @@ function Thg (fn_asm)
 			return dest
 		return reg
 	
-	if d is const									// We want a number, really
+
+	if d is const
 		|| R = dest.reg
 		check (R and dest isnt set) (exp)
 		|| val = d.exportposition
+			require !(mode & asmtmp.ImmediatesOnly)
 			.NumToReg(val, exp, R)
 			(dest is const)
 			return dest
 		return asmreg.Zero
 
+	require !(mode & asmtmp.ImmediatesOnly)
 	check (d is global) (Exp)
 	if dest isnt discard
 		return DoGlobal(self, exp, dest, d)
@@ -490,7 +506,7 @@ function ASMReg.ReadOrWrite (|message| m, |asm|)
 	return .ReadOrWriteSub(m, t, bytes)
 
 
-function asmstate.SimpleVar (|message| m, |asmreg|)
+function asmstate.ExistingVar (|message| m, |asmreg|)
 	opt	norefcounts
 	real self
 	|| fn = m.func 
@@ -498,9 +514,11 @@ function asmstate.SimpleVar (|message| m, |asmreg|)
 		m = m.first!
 		fn = m.func
 	if fn == @thg
-		return asmtmp.thg(asmstate.sh, m)
-	if fn == @num
-		return asmtmp.num(asmstate.sh, m)
+		return asmtmp.thg(asmstate.sh, m, asmtmp.ImmediatesOnly)
+	if fn == @num // only if 0.
+		|| d = m.fastdecl
+		if !d.exportposition
+			return asmreg.zero()
 
 
 function int64.CanStoreAsIntImmediate (|bool|)

@@ -198,11 +198,10 @@ struct ASMState
 
 
 	function Prm (|message| prm, |asmreg|)
-		|| r = .SimpleVar(prm)
+		|| r = .ExistingVar(prm)
 		if r.Exists
 			return r
 		|| Where = .DeclareMe(prm, asmreg())
-		// if this fails then... IDK I guess prm.simplevar failed?
 		return .µ(prm, where)
 		
 		

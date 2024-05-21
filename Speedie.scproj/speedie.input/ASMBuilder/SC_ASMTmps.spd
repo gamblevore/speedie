@@ -44,6 +44,8 @@ datatype ASMtmp (uint16)
 		return self == t
 
 	constants
+		ImmediatesOnly = 2
+
 		|asmtmp| 
 		kElseIf = 48 // align this to line 48...
 		kIf
@@ -60,4 +62,5 @@ datatype ASMtmp (uint16)
 		kIgnore
 		kDebugger // so yeah... alomst no space left. just 1 last slot possible.
 		kFail = 63
+	
 	
