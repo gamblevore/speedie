@@ -927,7 +927,7 @@ ive been~running #since morning
 		|| i = .indent|int| align 4
 		|| f = tmp.func
 		ifn f == @tmp or @item or @decl
-			return parser.erroradd("Indented blocks must be within @tmp or @item or @decl", tmp.position)
+			return parser.erroradd("Indented blocks not allowed here.", tmp.position)
 		
 		|| it = parser.MakeInvisArg( tmp, i )
 			it.indent = i

@@ -301,7 +301,7 @@ module ErrorColors
 		self <~ "\n"
 		self <~ s
 		self <~ ":"
-		self <~ (' ', 18-s.length)
+		self <~ (' ', 18-s.LengthUTF8)
 		if (errorcolors.enabled):  self <~ ErrorColors.good
 		
 	

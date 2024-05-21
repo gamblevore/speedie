@@ -12,6 +12,7 @@ module VM_Builder {
 |faststring|	form_h = faststring()
 |message|		dt_prm
 |string|		parent
+|int| 			Total
 |byte|			NormalPos = 0
 
 
@@ -282,6 +283,7 @@ function VMDecl (|message| tmp, |[message]?| ActuallyMakeTheVM)
 	if ActuallyMakeTheVM!=nil		// otherwise speedie is just using the encoders.
 		.ModuleArg <~ NewDecl(name)
 	|| tn = tmp.name
+	.Total++
 	
 	while
 		|| id = .NextID(counts)

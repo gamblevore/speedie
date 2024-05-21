@@ -67,13 +67,13 @@ module TreeAssembler
 	function Vacuum (|SCFunction| fn, |bool|)
 		opt norefcounts
 		
-		if .VakSub(fn)
+		if .VacuumReal(fn)
 			return true
 		if ASMState.ExpandJSM
-			return .VakSub(fn)
+			return .VacuumReal(fn)
 
 
-	function VakSub (|scfunction| fn, |bool|)
+	function GenerateASM (|scfunction| fn)
 		opt norefcounts
 		ASMState.Sh.Initstate(fn)
 		|| fp = fn_asm_table[@arg]!
@@ -81,6 +81,25 @@ module TreeAssembler
 		|| A = fn.SourceArg!
 		(fp)(ASmState.Sh, A, R)
 		ASMState.Sh.FinishASM
+
+
+	function Optimise (|bool|)
+
+	
+	function FlowControl (|bool|)
+
+	
+	function VacuumReal (|scfunction| fn, |bool|)
+		opt norefcounts
+		.GenerateASM(fn)
+		while .Optimise
+		.FlowControl
+/*		
+		* flowcontrol
+			* opts
+		* rendering
+			* const fixing
+*/	
 		if ASMState.Sh.ok
 			printline fn.asm!.render
 			return true
