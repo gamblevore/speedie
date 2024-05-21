@@ -258,19 +258,21 @@ bool CompF_ (Register* r, ASM Op) {
 		CmpSub(1 , FA <  FB);
 		CmpSub(2 , FA == FB);
 		CmpSub(3 , FA != FB);
-		CmpSub(4 , DA >  DB);
-		CmpSub(5 , DA <  DB);
-		CmpSub(6 , DA == DB);
-		CmpSub(7 , DA != DB);
-
-		CmpSub(8 , FA >  DB);
-		CmpSub(9 , FA <  DB);
-		CmpSub(10, FA == DB);
-		CmpSub(11, FA != DB);
-		CmpSub(12, DA >  FB);
-		CmpSub(13, DA <  FB);
-		CmpSub(14, DA == FB); default: // dupe
-		CmpSub(15, DA != FB); // dupe also... do something else with these 2?
+		
+		CmpSub(4 , FA >  DB);
+		CmpSub(5 , FA <  DB);
+		CmpSub(6 , FA == DB);
+		CmpSub(7 , FA != DB);
+		
+		CmpSub(8 , DA >  FB);
+		CmpSub(9 , DA <  FB);
+		CmpSub(10, DA == FB);
+		CmpSub(11, DA != FB);
+		
+		CmpSub(12, DA >  DB);
+		CmpSub(13, DA <  DB);
+		CmpSub(14, DA == DB); default:
+		CmpSub(15, DA != DB);
 	};
 }
 

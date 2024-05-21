@@ -49,7 +49,8 @@ extend asmreg
 
 
 extend ASMState
-	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |bool| negate, |&FATASM|)
+	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |&FATASM|)
+		|| negate = dest is negate
 		|| badness = l.BadBits(r) 
 
 		if (dest is condrequest) and (badness >= 0)
@@ -73,28 +74,16 @@ extend ASMState
 		return .AddASM(asm.JMPE • Negate, exp, L, R, dest)
 				
 	
-	function EqualsFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |bool| negate, |&FATASM|)
-		|| M = 10
-		|| sh = l.GapBits
-			m -= 2
-		M += negate
-		if r.GapBits != sh
-			m += 4
-		return .AddASM(asm.CMPF, exp, L, R, M, dest) // it is cmpf either way
-		
 	
 	function Equals (fn_opasm)
 		if r.reg == 0  and  l.reg != 0
 			|| t = l, l = r, r = t // put reg 0 into the left... more convenient.
 
-		|| negate = dest is negate
-		target debug
-			if !dest.reg and dest isnt CondRequest // shouldn't happen... domathsub allocates a dest!
-		
 		if dest.IsInt
-			.equalsint(dest, l, r, exp, negate)
+			.equalsint(dest, l, r, exp)
 		  else
-			.equalsfloat(dest, l, r, exp, negate)
+			|| Mode = 2+(dest is negate)
+			.Compare(dest, l, r, exp, mode)
 		return dest.boolasm
 	
 		
@@ -103,32 +92,13 @@ extend ASMState
 
 
 	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |&FATASM|)
-
-/*
-	0 : cA > B
-	1 : cA < B
-	2 : sA > B
-	3 : sA < B
-	4 : iA > B
-	5 : iA < B
-	6 :  A > B
-	7 :  A < B
-	8 : bA > B
-	9 : bA < B
-	10: zA > B
-	11: zA < B
-	12: uA > B
-	13: uA < B
-	14: UA > B
-	15: UA < B
-*/
-
 		|| bb = l.bitcount max r.bitcount
 		if !l.signed
 			mode += 8
 			if r.signed and r.bitcount >= l.bitcount // bad
 		  elseif !r.signed
 			if l.signed and l.bitcount >= r.bitcount // bad
+
 		|| bigness = (bb.log2-3)<<1
 		mode += bigness
 		
@@ -142,31 +112,12 @@ extend ASMState
 
 
 	function CompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |&FATASM|)
-/*
-	|| bl = l.bitcount
-	|| br = r.bitcount
-	|| bm = bl max br
-	
-	if bm <= 16 // what?
-	if dest.IsBig
-		mode += 4
-	.AddASM(asm.CMPF, exp, L, R, Mode, dest) // it is cmpf either way
-*/	
-		|| negate = false
-		|| M = 10
-		|| sh = l.GapBits
-			m -= 2
-		M += negate
-		if r.GapBits != sh
-			m += 4
-		return .AddASM(asm.CMPF, exp, L, R, M, dest) // it is cmpf either way
+		mode += 8 * l.isbig
+		mode += 4 * r.isbig
+		return .AddASM(asm.CMPF, exp, L, R, Mode, dest) // it is cmpf either way
 
 
 	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |int| Mode,  |asmreg|)
-		if dest is negate
-			|| t = l, l = r, r = t, #! swap
-			(dest isnt negate)
-		
 		if dest.IsInt
 			.compareint(dest, l, r, exp, mode)
 		  else
@@ -178,13 +129,13 @@ extend ASMState
 		return .compare(dest, l, r, exp, 1)
 
 	function MoreEq (fn_opasm)
-		return .compare(Dest.negate, l, r, exp, 1)
+		return .compare(Dest, r, l, exp, 1)
 
 	function More   (fn_opasm)
 		return .compare(dest, l, r, exp, 0)
 
 	function LessEq (fn_opasm)
-		return .compare(Dest.negate, l, r, exp, 0)
+		return .compare(Dest, r, l, exp, 0)
 	
 
 
