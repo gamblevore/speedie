@@ -887,7 +887,7 @@ module SDLApp
 			return SDLActivity.nothing
 
 
-		w.__Tickle__
+//		w.__Tickle__ // seems to cause blockages sometimes? but othertimes it does work!
 		if T is dropbegin
 			w.DroppingInto = w[.MouseXY] ?? w
 			return SDLActivity.activity
