@@ -520,7 +520,9 @@ function Message.StartUsingAfter // for "return" debugging.
 	.MemoryLayer.use
 
 
-extend string
-	function DebugFunc
-		visible
-		if scfunction.currfunc ~= self
+function Message.PrmFunc (|scfunction|)
+	opt norefcounts
+	if self
+		|| s = .second
+			return s.obj as scfunction
+		

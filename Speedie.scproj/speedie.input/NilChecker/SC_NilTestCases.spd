@@ -258,7 +258,6 @@ function scdecl.NilPrint (|string| reason="")
 		.nilcurr.nilname(fs, false)
 		fs <~ ")"
 	printline fs
-	// if scfunction.currfunc!.name contains "Broken"
 
 
 function UpgradeIntsTest
