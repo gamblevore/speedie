@@ -247,10 +247,6 @@ extend ASMState
 				return dest
 
 		|| SubTract = (l is alternate)
-		if !Subtract
-			if (l is FromMath) and (l isa ASMMath.Mul)
-				// 
-		
 		|| F = .AddASM(asm.fADD, exp, dest, l)
 		f.r[2+subtract] = r|uint|
 		f.r[4] = (!IsFloat)|int|

@@ -17,9 +17,6 @@ extend ASMState
 		rz.expectlast
 
 		
-	function TryRotateConst (|int64| Value,  |message| where, |int| reg,  |bool|)
-
-	
 	function NumToReg (|int64| V, |message| exp, |int| Reg)
 		.AddASM(asm.setk, exp, reg, (V << 32) >> 32, V>>32)
 		.consts[reg] = v
