@@ -411,7 +411,7 @@ class Message (list)
 	
 ////////////////////////////////////////////////////////////////////////////////		
 	
-	function RenderWithSpaces (|FastString| fs, |Message|ch=nil)
+	helper RenderWithSpaces (|FastString| fs, |Message|ch=nil)
 		Opt NoRefCounts
 		ch := .First
 
@@ -561,7 +561,7 @@ class Message (list)
 		|| f = .first
 			fs <~ f.name
 	
-	function RenderPrm (|FastString| fs, |Byte| b1, |Byte| b2)
+	helper RenderPrm (|FastString| fs, |Byte| b1, |Byte| b2)
 		fs <~ b1
 		.FSListSep( fs, ", " )
 		fs <~ b2
