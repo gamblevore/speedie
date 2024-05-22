@@ -55,7 +55,6 @@ function StatementJump (NilTrackerFn)
 
 
 function SyncJump (NilTrackerFn)
-	// how to syncronise arels? 
 	t.PostIncrementSync = true
 	rz = .jump(msg, test)
 	t.ClearPost
@@ -332,12 +331,12 @@ function Tern (Niltrackerfn)
 
 	#!"First Branch"
 	.jump(tC, NilCheckMode.positive)
-	rz = .Jump(tA, test)
+	rz = .JumpNoPosts(tA, test)
 	|| First = T.BranchSwap(Orig)
 
 	#!"Second Branch"
 	.jump(tC, nilcheckmode.negative)
-	rz |= .Jump(tB, test)
+	rz |= .JumpNoPosts(tB, test)
 	t.BranchExit(First)
 	rz &= ~nilstate.FnBecomesNilCh	// in theory if BOTH were nil-testers... its OK
 									// but thats sooo awkward to even think of a real-case
