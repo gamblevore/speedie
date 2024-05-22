@@ -31,7 +31,7 @@ datatype ASMMath (int)
 
 
 // why squeeze these in? Why not give it clear ranges?
-// µtype = 1-8,  regs = 9-16,  math = 17-24,  extra = 33-64
+// µtype = 1-8,  regs = 9-16,  math = 17-24,  RegStuff = 33-64
 // sigh... more changes!
 
 datatype AsmReg (int64)
@@ -40,28 +40,38 @@ datatype AsmReg (int64)
 		cpp_part Reg
 		numeric false
 	
+//	target debug2
+//		Flags
+//			|asmreg|
+//			SrcConst		= ConstAny ||| asmmath.all
+//	  else
 	Flags
-		MathTypes		= (31 << 16)
-		|asmreg|		// start at 19!
-		ASMBase		    = (1 << 19)
-		ContainsAddr    = (1 << 20)
-		FromMath		= (1 << 21)
-		StayOpen		= (1 << 22) // input
-		AlreadyNegated	= (1 << 22) // result. what if we return the input?
-		Alternate		= (1 << 23)
-		Const			= (1 << 24) ||| (31 << 13)
-		MathConst		= (1 << 21) ||| (1<<24)
-		Cond			= (1 << 25)
-		AddrRequest     = (1 << 26)
-		ForReturn		= (1 << 27)
-		Temp			= (1 << 28)
-		SingleExpr		= (1 << 29)
-		CondRequest		= (1 << 30) ||| (1 << 24) ||| (31 << 13)
-		NewCondRequest	= (1 << 30)
-		Negate			= (1 << 31)
-		Discard			= (1 << 32)
-		Set				= (1 << 33)
-		Zero			= Const
+		|asmreg|
+		xxxx = 0
+	
+	Flags
+		|asmreg|
+		(1<<32)		// starting point
+		SrcConst		= 0
+		ASMBase
+		ContainsAddr
+		FromMath
+		StayOpen
+		AlreadyNegated
+		Alternate
+		Cond
+		Negate
+		Discard
+		Set
+		AddrRequest
+		ForReturn
+		Temp
+		SingleExpr
+		NewCondRequest
+		ConstAny
+		CondRequest		= 00//NewCondRequest ||| SrcConst
+		MathConst		= 0//ConstAny ||| FromMath
+		Zero			= SrcConst
 	
 	function Negate (|asmreg|)
 		(self is negate) = (Self isnt negate)
@@ -80,7 +90,7 @@ datatype AsmReg (int64)
 		return .µtype == M
 
 	operator as (|ASMMath| M, |asmreg|)
-		return ((self|int64| &~ MathTypes) ||| (M<<13))|ASMReg|
+		return ((self|int64| &~ asmmath.all) ||| (M<<13))|ASMReg|
 
 	function Exists (|bool|)
 		return self|int64|
@@ -170,7 +180,7 @@ datatype AsmReg (int64)
 		
 	module
 		function New (|asmreg|)
-			return const
+			return Zero
 		
 	
 

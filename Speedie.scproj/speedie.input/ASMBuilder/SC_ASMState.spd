@@ -32,7 +32,7 @@ struct ASMState
 	
 	function IntPowerOfTwo (|asmreg| r,  |FailableInt|)
 		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
-		if r is const
+		if r is ConstAny
 			|| v = .Consts[r.reg]
 			if v == -1
 				return v
@@ -159,7 +159,7 @@ struct ASMState
 		// perhaps tern should open/close?
 		while i > .VDecls
 			if .Consts[i] == code
-				return i.reg as asmreg.const
+				return i.reg as asmreg.ConstAny
 			--i
 	
 	

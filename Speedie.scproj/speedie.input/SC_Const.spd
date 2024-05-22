@@ -168,7 +168,7 @@ function SCNode.CollectConstantsSub (|Message| ch)
 	for (line in arg)
 		|| LF = line.first.func
 		|| LL = line.Last.func
-		if (line == @rel) and (LF == @List or @arr) or (LL == @list or @arr)
+		if (line == @rel) and (LF == @arr) or (LL == @arr)
 			.ConstantExpand( line )
 		  elseif (line == @tmp)
 			expect !line.hasany (line)
@@ -239,9 +239,9 @@ function SCNode.CollectConstantsSub (|Message| ch)
 			.TryAdd( line, NewItem, NewItem.Name )
 	
 	
-	if (ch == "flags")
-		|| s = (FuncName.Name, "Flag")(FuncName)
-		.AddNumericConst("Largest" + s, lastflag|int|.bits, ch)
+//	if (ch == "flags")
+//		|| s = (FuncName.Name, "Flag")(FuncName)
+//		.AddNumericConst("Largest" + s, lastflag|int|.bits, ch)
 	
 	for (D in FixLater)
 		.Tran_Const( D, self )

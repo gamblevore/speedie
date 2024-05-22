@@ -323,7 +323,7 @@ function Num (fn_asm)
 		return r
 	Dest = .TempMe(exp, dest)
 	.NumToReg(X, exp, Dest)
-	(Dest is const)
+	(Dest is constany)
 	return dest
 	// loadconst?
 
@@ -347,7 +347,7 @@ function Thg (fn_asm)
 		|| val = d.exportposition
 			require !(mode & asmtmp.ImmediatesOnly)
 			.NumToReg(val, exp, R)
-			(dest is const)
+			(dest is constany)
 			return dest
 		return asmreg.Zero
 
@@ -549,12 +549,12 @@ function DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| 
 	(dest as= scop!.code)
 	(dest is frommath)
 
-	ifn  ml is const  and  mr is const
+	ifn  ml is constany  and  mr is constany
 		return (fn)(self, dest, ml, mr, op)
 
-	(Dest is const)
+	(Dest is mathconst)
 	|| R = (fn)(self, dest, ml, mr, op)
-	if r isnt const // hmm?
+	if r isnt mathconst // hmm?
 		debugger 
 		(fn)(self, dest, ml, mr, op)
 	return .DoConsts(dest, ml, mr)

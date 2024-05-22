@@ -5,7 +5,7 @@ prototype fn_OpASM (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |me
 
 extend asmreg
 	function CanAddK (|int64| T, |bool|)
-		if (self is const) and .isint
+		if (self is constany) and .isint
 			|| B = (t << 50)>>50
 			return B == t
 
@@ -150,7 +150,7 @@ extend ASMState
 
 
 	function QuickFloatPlus    (fn_opasm)
-		require r is const
+		require r is ConstAny
 		|| v = .f(r)
 		if v == 0.0
 			return .assign(dest, l, asmreg(), exp)
@@ -168,7 +168,7 @@ extend ASMState
 
 		
 	function QuickFloatDiv    (fn_opasm)
-		require r is const
+		require r is ConstAny
 		|| p = self[r]
 		|ivec2| ex
 		// we could optimise f/-1.0 or f/-0.5... but who cares. dont write such dumb code.
@@ -201,7 +201,7 @@ extend ASMState
 
 
 	function QuickFloatMul    (fn_opasm)
-		require r is const
+		require r is ConstAny	
 		|| v = .f(r)
 		if  v == -1.0
 			return .Subtract(dest, asmreg(), l, exp)
@@ -349,7 +349,7 @@ extend ASMState
 	
 	function SHR    (fn_opasm)
 		|| up = 64 - l.bitcount
-		if r is const
+		if r is ConstAny
 			|| sh = self[r][0]
 			if l.signed
 				.AddASM(asm.BFLG, exp, dest, l, up, sh+up)
