@@ -53,6 +53,7 @@ function compiler.SetupEnv
 	.Clearenvs
 	app.PrefsInit(-1)
 	
+	options.dev = app.pref("dev").int
 	if !app.IsMainThread
 		app.ThreadName = "SpeedieDebug"
 

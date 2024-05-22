@@ -14,13 +14,12 @@ extend_module ASM
 
 	function TestASM 
 		require options.ModePack
-		|| dev = app.pref("dev").int
-		if dev >= 2
+		if options.dev >= 2
 			asm.noisyasm = 3
 		if asm.noisyasm >= 3
 			.Listinstructions
 
-		require dev > 0
+		require options.dev > 0
 
 		using ErrorSeverity.Warning
 		|| T = ( file://syntax.asm ).parse[@tmp, "tests"]

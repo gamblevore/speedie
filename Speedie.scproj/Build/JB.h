@@ -1509,6 +1509,7 @@ extern Dictionary* SC__Options_BannedClasses;
 extern bool SC__Options_Beep;
 extern bool SC__Options_CheckMaxVars;
 extern bool SC__Options_Compile;
+extern int SC__Options_Dev;
 extern bool SC__Options_ExternalCompile;
 extern bool SC__Options_Final;
 extern bool SC__Options_ForceRecompile;
@@ -1931,14 +1932,13 @@ extern ASM_Mem SC__ASMtmp_WriteASM[5];
 #define kSC__Reg_Alternate (274877906944)
 #define kSC__Reg_ASMBase (8589934592)
 #define kSC__Reg_Cond (549755813888)
-#define kSC__Reg_CondRequest (0)
-#define kSC__Reg_CondRequest2 (140737488355328 | 4294967296)
+#define kSC__Reg_CondRequest (140737488355328 | 4294967296)
 #define kSC__Reg_ConstAny (281474976710656)
 #define kSC__Reg_ContainsAddr (17179869184)
 #define kSC__Reg_Discard (2199023255552)
 #define kSC__Reg_ForReturn (17592186044416)
 #define kSC__Reg_FromMath (34359738368)
-#define kSC__Reg_MathConst (0)
+#define kSC__Reg_MathConst (281474976710656 | 34359738368)
 #define kSC__Reg_Negate (1099511627776)
 #define kSC__Reg_NewCondRequest (140737488355328)
 #define kSC__Reg_Set (4398046511104)

@@ -146,6 +146,7 @@ Dictionary* SC__Options_BannedClasses;
 bool SC__Options_Beep;
 bool SC__Options_CheckMaxVars;
 bool SC__Options_Compile;
+int SC__Options_Dev;
 bool SC__Options_ExternalCompile;
 bool SC__Options_Final;
 bool SC__Options_ForceRecompile;

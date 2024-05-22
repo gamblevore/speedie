@@ -92,7 +92,7 @@ function TypeOfARel (ExprResolver)
 		return TypeOfDotDotDot(exp, name_Space)
 	|| Brel = exp.niceparent == @arg
 		exp.func = @brel
-	return SCFunction.Tran_AfterRel(exp, name_space, side, !brel)
+	return SCFunction.Tran_AfterRel(exp, name_space, side, false)// for now//!brel)
 
 
 function TypeOfFunc (ExprResolver)

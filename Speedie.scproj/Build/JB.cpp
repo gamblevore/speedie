@@ -1927,7 +1927,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112485559612412));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112486181109760));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -2324,6 +2324,7 @@ void SC_Comp__SetupEnv() {
 	JB__Flow_FlowMode = kJB__Flow_Off;
 	SC_Comp__ClearEnvs();
 	JB_FreeIfDead(JB_App__PrefsInit(-1));
+	SC__Options_Dev = JB_Str_Int(JB_App__GetPref(JB_LUB[1508]));
 	if (!JB_App__IsMainThread()) {
 		(JB_App__SetThreadName(JB_LUB[1125]));
 	}
@@ -3238,7 +3239,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024052216));
+	JB_FS_AppendInt32(_fsf0, (2024052219));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7838,7 +7839,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024052216));
+	JB_FS_AppendInt32(_fsf0, (2024052219));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -11449,7 +11450,7 @@ SCObject* SC_TypeOfARel(Message* Exp, SCNode* Name_space, Message* Side) {
 	if (Brel) {
 		Exp->Func = kJB_SyxBRel;
 	}
-	return SC_Func__Tran_AfterRel(Exp, Name_space, Side, (!Brel));
+	return SC_Func__Tran_AfterRel(Exp, Name_space, Side, false);
 }
 
 SCObject* SC_TypeOfArgArr(Message* Exp, SCNode* Name_space, Message* Side) {
@@ -15857,31 +15858,28 @@ void SC_ASM__TestASM() {
 	if (!SC__Options_ModePack) {
 		return;
 	}
-	JB_String* _tmPf2 = JB_Incr(JB_App__GetPref(JB_LUB[1508]));
-	int64 Dev = JB_Str_Int(_tmPf2);
-	JB_Decr(_tmPf2);
-	if (Dev >= 2) {
+	if (SC__Options_Dev >= 2) {
 		SC__ASM_NoisyASM = 3;
 	}
 	if (SC__ASM_NoisyASM >= 3) {
 		SC_ASM__ListInstructions();
 	}
-	if (Dev <= 0) {
+	if (SC__Options_Dev <= 0) {
 		return;
 	}
 	//using;
 	ErrorSeverity __varf1 = kJB__ErrorSeverity_Warning;
 	ErrorSeverity _usingf0 = JB_ErrorSeverity_SyntaxUsing(__varf1);
-	Message* _tmPf3 = JB_Incr(JB_Str_Parse((JB_LUB[395]), kJB_SyxArg, true));
-	Message* T = JB_Incr(JB_Msg_NeedSyxName(_tmPf3, kJB_SyxTmp, JB_LUB[1907]));
+	Message* _tmPf2 = JB_Incr(JB_Str_Parse((JB_LUB[395]), kJB_SyxArg, true));
+	Message* T = JB_Incr(JB_Msg_NeedSyxName(_tmPf2, kJB_SyxTmp, JB_LUB[1907]));
 	if (T) {
 		SC_ASM__TestASMSub(T);
 	}
 	JB_Decr(T);
-	DTWrap* _tmPf4 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
-	JB_ErrorSeverity_SyntaxUsingComplete(_usingf0, _tmPf4);
-	JB_Decr(_tmPf4);
+	DTWrap* _tmPf3 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
+	JB_ErrorSeverity_SyntaxUsingComplete(_usingf0, _tmPf3);
 	JB_Decr(_tmPf3);
+	JB_Decr(_tmPf2);
 }
 
 void SC_ASM__TestASMSub(Message* Tests) {
@@ -49993,4 +49991,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -1192267527394170655 -2499241987004650375
+// 4885793950732684059 -5870404885950331125
