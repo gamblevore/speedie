@@ -642,7 +642,7 @@ class String
 		|| i = .Length-1
 		while (i >= 0)
 			yield Start[i] (i)
-			i--
+			--i
 
 
 	iterator Lines

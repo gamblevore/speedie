@@ -1,8 +1,8 @@
 
 
 datatype ASM (uint)
-	function IsOK (|bool|)
-		 return self
+//	function IsOK (|bool|)
+//		 return self
 	
 	function Print
 		visible

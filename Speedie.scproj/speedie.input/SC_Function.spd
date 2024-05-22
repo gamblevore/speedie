@@ -1199,7 +1199,6 @@ function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side, |SCD
 
 	expect (msg == "--" or "++") (msg)
 	
-	
 	|| P = msg.parent
 	Using (exp)
 	|message| exp_copy
@@ -1209,10 +1208,12 @@ function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side, |SCD
 
 	|| Type = TypeOfExpr( exp, name_space )					#require
 	if type.PointerCount > 0
+		deprecate msg
 		return type.CheckMath(msg)
 
 	|| numc = Type.type.NumericCount
 	if !Type.type.IsObject  and  !type.hiderfunc  and  numc <= 1
+		deprecate msg
 		return type
 
 	|message| R

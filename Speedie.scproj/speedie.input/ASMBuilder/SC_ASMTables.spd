@@ -406,6 +406,36 @@ function Minus			(fn_asm)					// -a
 	return ASMTmp.DoSingleMath(self, exp, dest, scoperator.minus)
   
 
+// how to do this? lets look at some examples... we want the old value returned
+// while updating the curr value.
+// in order to do this, the new value msut be updated.
+// so it seems like we need to copy the value
+// but it really depends what we are doing...
+
+// *x = y++ --> *x = y, y++
+// we don't really need to store y in a temp-var!
+
+// the problem is, that seems to rely on the other side knowing what to do.
+// is it just for setrels?
+
+/*
+optimiseables
+
+	x = y++
+	*x = y++
+	x = y++ * 3 // --> x = y*3, y++
+	
+
+non optimiseables?
+	x = y++ * y++ --> || tmp = y,  y++,  x = y * tmp,  y++
+	func(y++, 7)
+	
+I could just REMOVE the ++????? I mean... its not very useful, is it?
+worth a try!
+
+*/
+
+
 function Precrement		(fn_asm)					// --a, ++a
 	opt	NoRefCounts
 	|| Src = .µ(exp, dest.RequestPos)				// src has the old value.
@@ -431,6 +461,7 @@ function Precrement		(fn_asm)					// --a, ++a
 		.µ(exp, dest.set)							// write it back again
 	
 	return dest
+
 
 
 function ARel		(fn_asm)

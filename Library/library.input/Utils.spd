@@ -142,7 +142,7 @@ function message.LOC (|ivec2|)
 	description "Calculate Lines of content" 
 	opt norefcounts
 	for s.flat in self
-		rz[1] ++
+		++(rz[1])
 		|| p = s.parent
 			|| pf = p.func
 			rz[0] += (pf == @arg) or (pf == @tmp  and  s == @tmp)
@@ -155,7 +155,7 @@ struct StringDigitIterator
 	iterator
 		while .i < .s.length
 			yield (.s[.i]|int| - '0') (.i)
-			.i++
+			++.i
 
 
 function String.Digits (|StringDigitIterator|)

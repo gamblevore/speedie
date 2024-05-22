@@ -247,7 +247,7 @@ class Memory
 		|| i = 0
 		while (i < .length)
 			yield self[i] (i)
-			i++
+			++i
 
 
 	iterator
@@ -256,7 +256,7 @@ class Memory
 		|| After = curr + .length
 		while (Curr < after)
 			yield Curr[0] (curr - FFFirst)
-			Curr++
+			++Curr
 
 		
 	macro SyntaxAccess

@@ -163,4 +163,4 @@ class SCParamArray
 		|int| i = 0
 		while i < n
 			yield .items[i]
-			i++
+			++i
