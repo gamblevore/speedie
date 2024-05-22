@@ -454,7 +454,12 @@ class SCDecl (SCNamed) {
 
 
 	function IsNormalNumber (|bool|)
-		return (!.IsCArray) and (!.PointerCount) and (.Type.NumericCount == 1) 
+		require (!.IsCArray) and (!.PointerCount)
+		if (.Type.NumericCount == 1)
+			return true
+		if scnode.ConstantsLoadingOverride and (self is const) and .typeinfo.count == 1 
+			return true
+
 	
 	
 	function IsNormalBool (|bool|)
@@ -569,6 +574,7 @@ class SCDecl (SCNamed) {
 	function ExpectMatch (|SCDecl| O, |int| TypeCast, |Message?| exp, |Message?| ErrNode = nil, |Message|)
 		if exp and exp.IsSmallInt(O)
 			typecast |= kTypeCastFromZero
+		debugat 176
 		|| Matched = .TypeMatch(O, TypeCast, exp)
 		if (Matched == kCastedMatch or kLossyCastedMatch)
 			return exp!.CastedParent

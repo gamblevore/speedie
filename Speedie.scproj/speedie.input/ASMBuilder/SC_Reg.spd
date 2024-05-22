@@ -30,9 +30,11 @@ datatype ASMMath (int)
 		return self == r
 
 
-// why squeeze these in? Why not give it clear ranges?
+
+// Why squeeze these in? Why not give it clear ranges?
 // µtype = 1-8,  regs = 9-16,  math = 17-24,  RegStuff = 33-64
 // sigh... more changes!
+
 
 datatype AsmReg (int64)
 	default 0|AsmReg|
@@ -40,14 +42,11 @@ datatype AsmReg (int64)
 		cpp_part Reg
 		numeric false
 	
-//	target debug2
-//		Flags
-//			|asmreg|
-//			SrcConst		= ConstAny ||| asmmath.all
-//	  else
-	Flags
-		|asmreg|
-		xxxx = 0
+	target debug2
+		Flags
+			|asmreg|
+			xxxx = 0
+			yyyy = xxxx * 2
 	
 	Flags
 		|asmreg|
@@ -81,7 +80,7 @@ datatype AsmReg (int64)
 		return .µtype.bitcount
 	
 	function Math (|asmmath|)
-		return (self|asmmath| >> 13) & 31
+		return (self|uint| & asmmath.all)
 		
 	operator isa (|ASMMath| M, |bool|)
 		return .math == M
@@ -90,7 +89,7 @@ datatype AsmReg (int64)
 		return .µtype == M
 
 	operator as (|ASMMath| M, |asmreg|)
-		return ((self|int64| &~ asmmath.all) ||| (M<<13))|ASMReg|
+		return ((self|int64| &~ asmmath.all) ||| M)|ASMReg|
 
 	function Exists (|bool|)
 		return self|int64|
@@ -123,10 +122,10 @@ datatype AsmReg (int64)
 		return 64 - .bitcount
 	
 	function µType (|DataTypeCode|)
-		return self|int64| & 13.bits
+		return self|DataTypeCode|
 	
 	function µType (assigns:|DataTypeCode|, |asmreg|)
-		return ((self|int64| & ~13.bits) ||| value)|asmreg|
+		return ((self|int64| &~ 0xFFFF) ||| value)|asmreg|
 	
 	syntax is (|AsmReg| R, |bool|)
 		return (self|int64| & R|int64|) == r|int64|
@@ -145,9 +144,6 @@ datatype AsmReg (int64)
 		x |= ContainsAddr|int64|  (|)  asmmath.Bitcorrect|int64|
 		return x|asmreg|
 		
-	// we could do this instead
-	// (self-1)&31!!
-	// this will "rotate" 0 back to 31 and 1 to 0.
 	function Reg (|int|)
 		return .µType.Register
 	
@@ -184,6 +180,9 @@ datatype AsmReg (int64)
 		
 	
 
+// we could do this instead
+// (self-1)&31!!
+// this will "rotate" 0 back to 31 and 1 to 0.
 function int.Reg (|asmreg|)
-	cpp_part ToReg // (self - 1)&31 // would be better?
-	rz.reg = self
+	cpp_part ToReg
+	rz.reg = self // (self - 1)&31 // would be better?

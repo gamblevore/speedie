@@ -344,3 +344,14 @@ function compiler.CollectConstants
 	for ch in .constantslist
 		|| b = ch.obj as SCNode
 			b.CollectOneConstants(ch)
+
+
+function datatypecode.NumericCountBoolsToo (|scdecl| D, |int|)
+	if (Self & numeric)
+		return .count
+	if !self
+		return 1
+	if scnode.ConstantsLoadingOverride and d is const
+		return .count
+		
+

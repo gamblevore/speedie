@@ -58,6 +58,7 @@ datatype DataTypeCode (uint16)
 		Failed = 0x8000
 		numeric = 8
 		
+		
 		UnusedType = int64 &~ 8
 	
 	
@@ -92,12 +93,6 @@ datatype DataTypeCode (uint16)
 		if (self & numeric)
 			return .count
 	
-	function NumericCountBoolsToo (|int|)
-		if (Self & numeric)
-			return .count
-		if !self
-			return 1
-	
 	function SetSigned (|bool| b, |DataTypeCode|)
 		if b
 			return (self) ||| (1 << 6)
@@ -106,7 +101,6 @@ datatype DataTypeCode (uint16)
 	
 	function ItemBitCount (|int|)
 		return 8 << ._shift
-			
 	
 	function _Shift (|int|)
 		return (self >> 4) & 3
@@ -127,5 +121,5 @@ datatype DataTypeCode (uint16)
 		return self >> 8
 	
 	function Register (assigns:|int|, |Datatypecode|)
-		return (self &~ (31<<8)) ||| (value << 8)
+		return (self &~ (31<<11)) ||| (value << 8)
 	

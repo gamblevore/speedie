@@ -109,9 +109,14 @@ function PerryIDE.ActualCompile (|string| operation)
 	if .compilr: return app.beep // wah?
 	
 	require .filelist.SaveAll(documentstate.saving)
-	|| args = [.project, "--perry=bin", "--nocolor"]
+	|| IsSCProj  =  .name ~= "Speedie.scproj"
+	|| args = [.project, "--nocolor", ]
 	if .DebugIsWaitingForCompile
 		args <~ "--usescriptloc"
+	if !IsSCProj
+		args <~ "--perry=bin"
+	  else
+		args <~ "--perry"
 
 	.compilr = process.Stream(speedie, args)		#require
 	.SpeedieText.text = ""
@@ -122,7 +127,7 @@ function PerryIDE.ActualCompile (|string| operation)
 	(.Progress is visible)
 
 	is active
-	.ShowCompileTab(.speedietext, .name ~= "Speedie.scproj")
+	.ShowCompileTab(.speedietext, IsSCProj)
 	.ViewAsCurr
 
 

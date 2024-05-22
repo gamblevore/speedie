@@ -1401,6 +1401,7 @@ function TypeOfRel (ExprResolver) {
 	if (RC != TypeNil)
 		|| IPM = IsPointerMath(LC, RC, comp, exp)
 			return ipm.CheckMath(exp)
+			
 	Custom = UseCustomOperators(LC, RC, comp, exp) 
 	if Custom == CustomOps.needed
 		if (!comp.IsCompset)
