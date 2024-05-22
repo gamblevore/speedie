@@ -1191,7 +1191,7 @@ function NeuSyx (CollectFunc)
 
 
 
-function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side, |SCDecl|)
+function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side, |bool| After,  |SCDecl|)
 	|| exp = msg.first!
 	if msg == "!"
 		|| ty = TypeOfExpr( exp, name_space )				#require
@@ -1208,12 +1208,14 @@ function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side, |SCD
 
 	|| Type = TypeOfExpr( exp, name_space )					#require
 	if type.PointerCount > 0
-		deprecate msg
+		if after
+			deprecate msg
 		return type.CheckMath(msg)
 
 	|| numc = Type.type.NumericCount
 	if !Type.type.IsObject  and  !type.hiderfunc  and  numc <= 1
-		deprecate msg
+		if After
+			deprecate msg
 		return type
 
 	|message| R

@@ -34,7 +34,6 @@ extern "C" {
         int					ErrorStart;
 		
 		int					NextStart;
-        //bool                ErrorImprove;
 	);
 	
 	

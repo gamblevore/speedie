@@ -80,13 +80,6 @@ function SCNode.CalculateConstRel (|message!| value, |&datatypecode| Ty, |uint64
 function SCNode.CalculateConst (|message!| value, |uint64|)
 	|datatypecode| Ty = 0
 	return .CalculateConst(value, ty)
-/*
-	print "$value --> "
-	if ty is float
-		printline rz|int64|.asfloat.render(16)
-	  else
-		printline rz|int64|.render
-*/	
 
 
 function message.TypeExpect (|&datatypecode| Ty, |datatypecode| In)
@@ -221,13 +214,17 @@ function SCNode.CollectConstantsSub (|Message| ch)
 			if (ValueNode == @Str or @sstr)
 				SCFunction.ObjectifyString(ValueNode)
 				ValueNode.obj = TypeString!.typenormal
+				
 			  elseif (valuenode.isint) or (valuenode == @unit)
 				NewType.AssignabilityCheck(nil, ValueNode, OMGType)  
 				nextnum = valuenode.int
 				newitem.numberconst = nextnum
 				nextnum++
 			  else
-				newitem.numberconst = .CalculateConst(Valuenode)
+				|| kk = .CalculateConst(Valuenode)
+				newitem.numberconst = kk
+//				if ch ~= "flags"
+//					lastflag = kk.log2
 			
 			FixLater <~ NewItem
 			

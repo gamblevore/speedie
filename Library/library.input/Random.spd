@@ -110,7 +110,7 @@ struct Random
 		if !.store
 			.TimeSeed
 	
-		
+	
 	module  // module random
 		|Random| Shared
 		.shared.TimeSeed

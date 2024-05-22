@@ -169,7 +169,7 @@ struct ImageTiler
 			while curr.x < B.x2
 				yield (curr) (i)
 				curr += .tile.x_x_
-				i++
+				++i
 			curr += .tile._y_y
 
 

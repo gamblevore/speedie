@@ -168,7 +168,7 @@ class Error (Message)
 
 	render Render
 		fs <~ "error"
-		fs.indent++
+		++fs.indent
 		fs.field( "", .name )
 		if .position >= 0
 			fs.field( "pos", .position )
@@ -178,12 +178,12 @@ class Error (Message)
 			fs.fieldfloat( "progress", .progress )
 		if .StackTrace
 			fs.field( "stack", "" )
-			fs.indent++
+			++fs.indent
 			for fn.lines in .stacktrace
 				fs.field( "fn", fn )
-			fs.indent--
+			--fs.indent
 		fs <~ "\n"
-		fs.indent-- 
+		--fs.indent
 
 
 	render RenderClang

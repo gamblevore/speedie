@@ -30,7 +30,7 @@ class Selector
 		|| ID = 0
 		for (curr in self)
 			curr.id = id
-			id++
+			++id
 	
 	
 	iterator

@@ -316,8 +316,11 @@ helper textview.DrawError (|image| Where, |int| y, |TextViewLine| D)
 	 
 	if e.severity == errorseverity.ok
 		v = (0.6, 0.6, 0.6, 0.25)
+	  elseif e.severity == errorseverity.problem
+		v.g = v.r*0.5
+		v.a = v.a*0.5
 	  elseif e.severity < errorseverity.problem
-		v = (0.6, 0.6, 0.1, 0.25)
+		v = (0.6, 0.6, 0.1, 0.1)
 
 	if d contains .sel1
 		.myerror = e

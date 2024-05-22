@@ -51,7 +51,6 @@ inline bool Running_( u32 NextStart ) {
 
 struct Message;
 void JB_Tk__ErrorEvent(int A, int B, int C);
-//void JB_Tk__ErrorImprove(Message* Msg);
 
 
 

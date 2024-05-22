@@ -116,7 +116,7 @@ function GenerateForms (|message| forms, |bool| Rest)
 		if (f < 32) #check (form_msg, "Too many forms")
 			using form_msg
 			.AddForm(form_msg)
-			f++
+			++f
 			if rest
 				.GenerateOne(form_msg, f)
 
@@ -126,12 +126,12 @@ function GenerateOne (|message| form_msg, |int| f)
 	.dt_prm = .DataTypeCreate(form_msg, f)
 	.parent = form_msg.name
 	|| bit_pos = 8
-	|| p    = 0
+	|| p    = -1
 	|| arg  = form_msg[@arg,-1]							#require
 	|| Max = 32
 	
 	for l in arg
-		bit_pos = .GenAcc(l, bit_pos, p++, max)
+		bit_pos = .GenAcc(l, bit_pos, ++p, max)
 	
 	if bit_pos < max and p < 5
 		.GenAcc(nil, bit_pos, 5, max)
@@ -283,7 +283,7 @@ function VMDecl (|message| tmp, |[message]?| ActuallyMakeTheVM)
 	if ActuallyMakeTheVM!=nil		// otherwise speedie is just using the encoders.
 		.ModuleArg <~ NewDecl(name)
 	|| tn = tmp.name
-	.Total++
+	++.Total
 	
 	while
 		|| id = .NextID(counts)
@@ -306,7 +306,7 @@ function AddASM2 (|string| name, |int| id)
 
 function NextIDWithCounts (|message!| counts, |int|)
 	|| i = counts.int(0, 1, 4)
-		i--
+		--i
 		while i < 16
 			if i and !asm.Encoders[i]
 				return i

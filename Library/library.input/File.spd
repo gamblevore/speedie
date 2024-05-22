@@ -189,12 +189,12 @@ class File (String)
 	
 	function CompareFile (|File| A, |string| Error="", |bool|)
 		cpp_part FileCompare
-		FlowControl.Disabled++
+		++FlowControl.Disabled
 		|| code = .CompareSub(a)
 		.Close
 		A.Close
 		rz = .CompareMsg(code, Error)
-		FlowControl.Disabled--
+		--FlowControl.Disabled
 	
 	
 	helper CompareMsg (|errorint| code, |string| Error, |bool|)
@@ -533,7 +533,7 @@ class File (String)
 
 		function DocumentsFolder (|file|)
 			return "~/Documents/".file			// .file calls pathfix already
-
+ 
 		function PrefsFolder (|file|)
 			target osx
 				return "~/Library/Preferences".file

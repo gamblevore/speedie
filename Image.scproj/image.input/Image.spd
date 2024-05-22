@@ -339,7 +339,7 @@ class Image (memory)
 		while (curr.y < end.y)
 			while (curr.x < end.x)
 				yield (self[curr]) (curr)
-				curr.x++
+				++curr.x
 			curr = (xstart, curr.y+1)
 	
 	
@@ -605,8 +605,8 @@ struct ImageReader
 			|| v2	= v1 + .rect.width
 			while v1 < v2
 				yield v1 (v)
-				v.x++
-				v1++
-			.rect.y++
+				++v.x
+				++v1
+			++.rect.y
 
 

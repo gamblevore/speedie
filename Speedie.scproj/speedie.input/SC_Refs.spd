@@ -700,10 +700,11 @@ function scfunction.CallSuperMem (|SCFunction| fn)
 	
 function scfunction.FillInDestructor
 	opt norefcounts
-	|| s = .sourcearg!
+	|| s = .sourcearg$
+	|| c = .cls$
 	|| first = s.FindDestructor
 	Using s
-	for d in .cls!.Properties
+	for d in c.Properties
 		if d.IsReffable(true)
 			s.AddBefore( first, d.RefDestructor )
 		  else

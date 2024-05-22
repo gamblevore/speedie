@@ -95,7 +95,7 @@ role JBin (Faststring)
 
 
 	function OpenSection  (|int|)				// openstream 
-		.NoFlush ++
+		++ .NoFlush
 		.length += 6
 		return .length
 
@@ -108,14 +108,14 @@ role JBin (Faststring)
 		|| Actual = c
 		while {
 			Actual >>= 7
-			blen--
+			--blen
 		} (Actual)
 
 		self <~ (0|byte|, blen) 
 		self <~ (@bin|int|<<1)|byte|
 		.hint(c)
 		.length = CurrLen
-		.NoFlush--
+		--.NoFlush
 
 
 datatype jbinLeaver (int)

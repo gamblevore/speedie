@@ -157,42 +157,23 @@
 #define   Setn_Prm1u_(x)   (((uint)((x)<<31))>>31)
 
 
-#define   CNTR_incri       ((( int)((Op.Raw)<<18))>>29)
-#define   CNTR_incri_(x)   ((( int)((x)<<18))>>29)
+#define   CNTC_offseti       ((( int)((Op.Raw)<<18))>>28)
+#define   CNTC_offseti_(x)   ((( int)((x)<<18))>>28)
 
-#define   CNTR_incru       (((uint)((Op.Raw)<<18))>>29)
-#define   CNTR_incru_(x)   (((uint)((x)<<18))>>29)
+#define   CNTC_offsetu       (((uint)((Op.Raw)<<18))>>28)
+#define   CNTC_offsetu_(x)   (((uint)((x)<<18))>>28)
 
-#define   CNTR_sizei       ((( int)((Op.Raw)<<21))>>30)
-#define   CNTR_sizei_(x)   ((( int)((x)<<21))>>30)
+#define   CNTC_cnsti       ((( int)((Op.Raw)<<22))>>24)
+#define   CNTC_cnsti_(x)   ((( int)((x)<<22))>>24)
 
-#define   CNTR_sizeu       (((uint)((Op.Raw)<<21))>>30)
-#define   CNTR_sizeu_(x)   (((uint)((x)<<21))>>30)
+#define   CNTC_cnstu       (((uint)((Op.Raw)<<22))>>24)
+#define   CNTC_cnstu_(x)   (((uint)((x)<<22))>>24)
 
-#define   CNTR_Li       ((( int)((Op.Raw)<<23))>>23)
-#define   CNTR_Li_(x)   ((( int)((x)<<23))>>23)
+#define   CNTC_sizei       ((( int)((Op.Raw)<<30))>>30)
+#define   CNTC_sizei_(x)   ((( int)((x)<<30))>>30)
 
-#define   CNTR_Lu       (((uint)((Op.Raw)<<23))>>23)
-#define   CNTR_Lu_(x)   (((uint)((x)<<23))>>23)
-
-
-#define   CNTC_cnsti       ((( int)((Op.Raw)<<13))>>24)
-#define   CNTC_cnsti_(x)   ((( int)((x)<<13))>>24)
-
-#define   CNTC_cnstu       (((uint)((Op.Raw)<<13))>>24)
-#define   CNTC_cnstu_(x)   (((uint)((x)<<13))>>24)
-
-#define   CNTC_sizei       ((( int)((Op.Raw)<<21))>>30)
-#define   CNTC_sizei_(x)   ((( int)((x)<<21))>>30)
-
-#define   CNTC_sizeu       (((uint)((Op.Raw)<<21))>>30)
-#define   CNTC_sizeu_(x)   (((uint)((x)<<21))>>30)
-
-#define   CNTC_Li       ((( int)((Op.Raw)<<23))>>23)
-#define   CNTC_Li_(x)   ((( int)((x)<<23))>>23)
-
-#define   CNTC_Lu       (((uint)((Op.Raw)<<23))>>23)
-#define   CNTC_Lu_(x)   (((uint)((x)<<23))>>23)
+#define   CNTC_sizeu       (((uint)((Op.Raw)<<30))>>30)
+#define   CNTC_sizeu_(x)   (((uint)((x)<<30))>>30)
 
 
 #define   BFLD_upi       ((( int)((Op.Raw)<<18))>>26)
@@ -296,6 +277,12 @@
 #define   Div_Kindu       (((uint)((Op.Raw)<<28))>>30)
 #define   Div_Kindu_(x)   (((uint)((x)<<28))>>30)
 
+#define   Div_Li       ((( int)((Op.Raw)<<30))>>30)
+#define   Div_Li_(x)   ((( int)((x)<<30))>>30)
+
+#define   Div_Lu       (((uint)((Op.Raw)<<30))>>30)
+#define   Div_Lu_(x)   (((uint)((x)<<30))>>30)
+
 
 #define   Trap_Funci       ((( int)((Op.Raw)<<8))>>31)
 #define   Trap_Funci_(x)   ((( int)((x)<<8))>>31)
@@ -321,6 +308,12 @@
 
 #define   Float_Du       (((uint)((Op.Raw)<<28))>>31)
 #define   Float_Du_(x)   (((uint)((x)<<28))>>31)
+
+#define   Float_Li       ((( int)((Op.Raw)<<29))>>29)
+#define   Float_Li_(x)   ((( int)((x)<<29))>>29)
+
+#define   Float_Lu       (((uint)((Op.Raw)<<29))>>29)
+#define   Float_Lu_(x)   (((uint)((x)<<29))>>29)
 
 
 #define   FloatConst_Highi       ((( int)((Op.Raw)<<18))>>18)

@@ -231,7 +231,7 @@ class FastString {
 
 	function FieldEnter (|string| name)
 		.fieldstart(name)
-		.indent++
+		++.indent
 
 	function FieldFloat (|string| name, |f64| data)
 		cpp_part AppendInfoFloat

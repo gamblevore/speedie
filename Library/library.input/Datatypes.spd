@@ -153,13 +153,13 @@ datatype int
 		|| i = 0
 		while (i < self)
 			yield i (i)
-			i++
+			++i
 
 	iterator down
 		|| i = seLf - 1
 		while (i >= 0)
 			yield i (i)
-			i--
+			--i
 	
 	iterator bit		// Get 1 bit of the original per loop
 		|| curr = self|int|
@@ -227,8 +227,8 @@ struct RetroFloat
 		|| A = .Amount // 1.1... every 10th frame returns 2
 		|| rem = A.fract + .remain
 		if rem >= 1.0
-			rem--
-			A++
+			--rem
+			++A
 		.remain = rem
 		return A|int|
 
@@ -241,7 +241,7 @@ struct IntDownRange   /// :3
 		|| _c = .from
 		while (_c >= .To)
 			yield _c (_c)
-			_c--
+			--_c
 
 
 struct FloatRange   /// :3
@@ -341,7 +341,7 @@ datatype uint
 		|uint| i = 0
 		while i < self
 			yield i
-			i++
+			++i
 	
 	 
 	iterator flags
@@ -493,7 +493,7 @@ datatype float
 	function Ceil (|float|)
 		rz = .floor
 		if rz != rz
-			rz++
+			++rz
 
 	helper IntegerToMod2 (|float|)
 		return (self*0.5).Fract*2.0
@@ -547,7 +547,7 @@ datatype float
 		|| i = 0.0
 		while (i < self)
 			yield i (i)
-			i++
+			++i
 
 
 
@@ -703,7 +703,7 @@ datatype int64
 		|int64| i = 0
 		while (i < self)
 			yield i (i)
-			i++
+			++i
 
 
 
@@ -793,7 +793,7 @@ datatype uint64
 		|uint64| i = 0
 		while (i < self)
 			yield i (i)
-			i++
+			++i
 
 
 
@@ -858,7 +858,7 @@ datatype bool
 		|| num = 1
 		while (num >= 0)
 			yield (num == 1)
-			num--
+			--num
 
 
 datatype MoveCode (byte)

@@ -5,7 +5,7 @@ dispatch fn_asm_table (fn_asm)
 	@arg:
 		opt norefcounts
 		for ch.fast in exp
-			.µ(ch, asmreg.discard)
+			.µ(ch, asmreg.ASMBase)
 
 
 	@decl: // yay
@@ -13,6 +13,7 @@ dispatch fn_asm_table (fn_asm)
 		|| rel = exp.last!
 		|| ty = rel.first!.fastdecl
 		|| reg = .DeclareMe(Exp, ty.reg)
+		(reg is ASMBase)
 		return .µ(rel.last!, reg)
 
 
@@ -165,7 +166,7 @@ function StatExpr		(fn_asm)
 	for ch.fast in exp
 		if ch.islast
 			return .µ(ch, dest)
-		.µ(ch, asmreg.discard)
+		.µ(ch, asmreg.ASMBase)
 
 
 function Ternary		(fn_asm)
@@ -266,7 +267,7 @@ function Access		(fn_asm)						// a[b], struct.mem[b], func()[func2()]
 	opt	NoRefCounts
 	dest = .tempme(exp, dest)
 
-	|| Ptr = .µ(exp.first!, dest.requestpos)		// x = a.b[0]
+	|| Ptr = .µ(exp.first!, dest.RequestPos)		// x = a.b[0]
 	expect (ptr is containsaddr) (exp)
 	|| Ind = .µ(exp.second!, ptr • dest)
 	|| A = Dest.ReadOrWrite(exp)
@@ -302,9 +303,12 @@ function Dot		(fn_asm)						// a.b
 
 function SetRel	(fn_asm)
 	opt	norefcounts
+//   x[func()] = y++
 	|| Var = .ExistingVar(exp.first!)	
+	(Var is stayopen)
 	|| R = .µ(exp.last!, var)
-	if r isnt discard								// x = 1, already done!
+	if !r.reg // what?
+	if var.reg != r.reg
 		(r is set)
 		return .µ(exp.first!, R)
 
@@ -349,10 +353,7 @@ function Thg (fn_asm)
 
 	require !(mode & asmtmp.ImmediatesOnly)
 	check (d is global) (Exp)
-	if dest isnt discard
-		return DoGlobal(self, exp, dest, d)
-	  else
-		debugger
+	return DoGlobal(self, exp, dest, d)
  
 
 function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |AsmReg|)
@@ -419,21 +420,47 @@ function Minus			(fn_asm)					// -a
 // is it just for setrels?
 
 /*
-optimiseables
+	Super-easy easy cases:
+		* discard vars: y++
+		* discard mem:  a.b++, *x++, a[y]++
+		* ++y
 
-	x = y++
-	*x = y++
-	x = y++ * 3 // --> x = y*3, y++
+	optimiseables
+		x = y++
+		*x = y++
+		x = y++ * 3 // --> x = y*3, y++
+		
+	non optimiseables?
+		x = y++ * y++ --> || tmp = y,  y++,  x = y * tmp,  y++
+		func(y++, 7)
+		
+	I could just REMOVE the ++????? I mean... its not very useful, is it?
+	worth a try!
+
+	Easy cases:
+		* x = y++									// can special-case
+		* x = *y++									// special-case also
+		* func(*y++)								// similar special-case
+		* x[0] = y++								// probably not too hard.
+
+	Other cases?
+		* x < y++									// just do the opp, then add after all is done.
+		* while *x++ == *y++
+		x = y++ * 3 // --> x = y*3, y++
 	
+	Suspect cases:
+		* func(y++, y++)
+		* x = y++ * y++
+		*  *func(y++) = *func2(y++)
+		* x < y++ - y
+		
 
-non optimiseables?
-	x = y++ * y++ --> || tmp = y,  y++,  x = y * tmp,  y++
-	func(y++, 7)
+	blocked cases: // boolean logic
+		*  if  x  and  z++ < y
 	
-I could just REMOVE the ++????? I mean... its not very useful, is it?
-worth a try!
-
+		
 */
+
 
 
 function Precrement		(fn_asm)					// --a, ++a
@@ -466,8 +493,9 @@ function Precrement		(fn_asm)					// --a, ++a
 
 function ARel		(fn_asm)
 	opt	NoRefCounts
-	|| PlusPlus = exp.name.first == '+'
-	return Precrement(self, exp.first!, dest, 2 + PlusPlus)
+	|| M = (exp.name.first == '+')|int|
+	M += 2*(dest isnt ASMBase)
+	return Precrement(self, exp.first!, dest, M)
 	
 	
 function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a

@@ -20,16 +20,17 @@ module SC_Errors
 40 - 47: black, red, green, yellow, blue, magenta, cyan, and white background
 */	
 
-	|dictionary of message| IgnoredBranches = dictionary.new
+	|dictionary of error| IgnoredBranches = dictionary.new
 
-	function AlreadyIgnored (|Message| F, |bool|)
+	function AlreadyIgnored (|Message| F, |error|)
 		opt norefcounts
-		if .IgnoredBranches.obj(F)
-			return true
+		|| e = .IgnoredBranches.obj(F)
+			return e
 		|| RipRoot = F.MsgOwningFunc$.SourceArg
 		for Curr.up in F
-			if (Curr == @arg) and (.IgnoredBranches.obj(Curr))
-				return true
+			if (Curr == @arg)
+				|| e2 = .IgnoredBranches.obj(Curr)
+					return e2
 			require (Curr != RipRoot)
 
 	
@@ -42,8 +43,10 @@ module SC_Errors
 		
 		|| A = Err.node.Ancestor(@arg)
 			if Options.HideMultipleErrors
-				require !.AlreadyIgnored(A)
-			.IgnoredBranches.obj(A) = A
+				|| OldErr = .AlreadyIgnored(A)
+				if olderr and OldErr.Severity >= err.Severity
+					return false
+			.IgnoredBranches.obj(A) = err
 		return true
 
  

@@ -8,13 +8,9 @@
 todo:
 	* FFI
 Limits:
-	* 256 OpCodes, and a few variable length opcodes
+	* 256 OpCodes, including a few variable length opcodes
 	* r0 = 0
 	* can recursive vm->c->vm! 
-
-Later:
-	* endian / sign-extend / popcount / truncate bits?
-	* use gccbuiltin for all
 */
 
 

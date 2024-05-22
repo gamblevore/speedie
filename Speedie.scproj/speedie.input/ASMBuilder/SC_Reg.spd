@@ -7,40 +7,43 @@ prototype fn_asm (|&ASMState| self, |message| exp, |AsmReg| Dest=asmreg(), |int|
 datatype ASMMath (int)
 	constants
 		|ASMMath|
-		Add
-		Sub
-		Mul
-		Div
-		Mod
+		Add = (1 << 16)
+		Sub = (2 << 16)
+		Mul = (3 << 16)
+		Div = (4 << 16)
+		Mod = (5 << 16)
 
-		ROL
-		ROR
-		Shl
-		Shru
-		Shrs
-		BNt
-		BAn
-		BOr
-		Xor
-		Xnr
-		BitCorrect = 31 // removes garbage bits
+		ROL = (6 << 16)
+		ROR = (7 << 16)
+		Shl = (8 << 16)
+		Shru = (9 << 16)
+		Shrs = (10 << 16)
+		BNt = (11 << 16)
+		BAn = (12 << 16)
+		BOr = (13 << 16)
+		Xor = (14 << 16)
+		Xnr = (15 << 16)
+		BitCorrect = (31 << 16) // removes garbage bits
+		All = BitCorrect
 	
 	syntax is (|asmmath| r, |bool|)
 		return self == r
 
 
+// why squeeze these in? Why not give it clear ranges?
+// µtype = 1-8,  regs = 9-16,  math = 17-24,  extra = 33-64
+// sigh... more changes!
 
-datatype AsmReg (int)
+datatype AsmReg (int64)
 	default 0|AsmReg|
 	linkage
 		cpp_part Reg
 		numeric false
 	
-	constants
-		MathTypes		= (31 << 13)
+	Flags
+		MathTypes		= (31 << 16)
 		|asmreg|		// start at 19!
-		Set = 4
-		Unused 		    = (1 << 19)
+		ASMBase		    = (1 << 19)
 		ContainsAddr    = (1 << 20)
 		FromMath		= (1 << 21)
 		StayOpen		= (1 << 22) // input
@@ -51,11 +54,13 @@ datatype AsmReg (int)
 		Cond			= (1 << 25)
 		AddrRequest     = (1 << 26)
 		ForReturn		= (1 << 27)
-		Discard			= (1 << 28)
+		Temp			= (1 << 28)
 		SingleExpr		= (1 << 29)
 		CondRequest		= (1 << 30) ||| (1 << 24) ||| (31 << 13)
 		NewCondRequest	= (1 << 30)
 		Negate			= (1 << 31)
+		Discard			= (1 << 32)
+		Set				= (1 << 33)
 		Zero			= Const
 	
 	function Negate (|asmreg|)
@@ -75,10 +80,10 @@ datatype AsmReg (int)
 		return .µtype == M
 
 	operator as (|ASMMath| M, |asmreg|)
-		return ((self|int| &~ MathTypes) ||| (M<<13))|ASMReg|
+		return ((self|int64| &~ MathTypes) ||| (M<<13))|ASMReg|
 
 	function Exists (|bool|)
-		return self|int|
+		return self|int64|
 		
 	function FourBytes (|bool|)
 		pragma inline
@@ -108,13 +113,13 @@ datatype AsmReg (int)
 		return 64 - .bitcount
 	
 	function µType (|DataTypeCode|)
-		return self|int| & 13.bits
+		return self|int64| & 13.bits
 	
 	function µType (assigns:|DataTypeCode|, |asmreg|)
-		return ((self|int| & ~13.bits) ||| value)|asmreg|
+		return ((self|int64| & ~13.bits) ||| value)|asmreg|
 	
 	syntax is (|AsmReg| R, |bool|)
-		return (self|int| & R|int|) == r|int|
+		return (self|int64| & R|int64|) == r|int64|
 	
 	syntax is (|AsmReg| R, assigns:|bool|, |AsmReg|)
 		if (value)
@@ -126,8 +131,8 @@ datatype AsmReg (int)
 		return self as addrrequest
 			
 	function HaveAddr (|asmreg|)
-		|| x = self|int| &~ AddrRequest|int|
-		x |= ContainsAddr|int|  (|)  asmmath.Bitcorrect|int|
+		|| x = self|int64| &~ AddrRequest|int64|
+		x |= ContainsAddr|int64|  (|)  asmmath.Bitcorrect|int64|
 		return x|asmreg|
 		
 	// we could do this instead
@@ -145,15 +150,15 @@ datatype AsmReg (int)
 	syntax cast (|bool|)
 		return .reg
 	
-	syntax cast (|int|) // strange? not even to .asmadd params?
+	syntax cast (|int|)
 		cpp_part ToInt
 		return .reg
 	
 	operator as (|asmreg| A, |asmreg|)
-		return (self|int| ||| A|int|)|asmreg|
+		return (self|int64| ||| A|int64|)|asmreg|
 
 	operator asnt (|asmreg| A, |asmreg|)
-		return (self|int| &~ A|int|)|asmreg|
+		return (self|int64| &~ A|int64|)|asmreg|
 
 	function Set (|asmreg|)
 		return self as set

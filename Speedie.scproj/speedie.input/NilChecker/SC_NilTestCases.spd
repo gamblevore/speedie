@@ -149,7 +149,7 @@ class NilTest
 		|| xx = &NilTestByte
 		borks
 		if xx
-			xx++
+			++xx
 
 	function GoodPtr (|&niltest| xp0, |&niltest| xp2)
 		if xp0
@@ -165,7 +165,7 @@ class NilTest
 	function BadBadPtr (|&niltest| p)
 		if p
 			|| v = *p
-				v.v++
+				++v.v
 	
 	function NilGlobals
 		borks
@@ -173,7 +173,7 @@ class NilTest
 		
 	function GoodBadPtr (|&niltest| p)
 		|| v = *p
-			v.v++
+			++v.v
 		.V
 
 // I think those are some good tests... for now. but what about modules? thats a tricky one.

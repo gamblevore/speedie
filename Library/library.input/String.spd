@@ -380,7 +380,7 @@ class String
 			if p < pos	
 				exit
 			pos = p+1
-			rz++
+			++rz
 			
 	operator plus (|string| other, |string|)
 		cpp_wrapper JB_Str_OperatorPlus
@@ -415,7 +415,7 @@ class String
 		for (item in list) (i)
 			if item == self
 				return i
-
+	
 	operator in (|string| s, |bool|)
 		cpp_part OpInStr
 		return s contains self
@@ -533,13 +533,13 @@ class String
 		|| s	= s0 + pos
 		if Codepoints >= 0
 			|| s2 = s0 + n
-			while (CodePoints-- > 0) and (s < s2)
+			while (--CodePoints >= 0) and (s < s2)
 				codepoint.utf8read(&s)
 		  else
 			while (s > s0)
 				|| c = (--s)[0]
 				if (c < 0x80) or (c > 0xC0)
-					Codepoints++
+					++Codepoints
 					if (CodePoints >= 0)
 						exit
 		return (s - s0)|ind|
@@ -596,11 +596,11 @@ class String
 				|| extra = 0
 				|| found = 0
 				while (find[i+extra] == ' ')
-					extra++
+					++extra
 				// so now we need to find that many extra spaces
 				while c == ' ' or '\t'
 					c = self[from + i + found]
-					found++
+					++found
 				require found > extra
 				i+=extra
 				from+=found-(extra+1)
@@ -615,13 +615,13 @@ class String
 			while from <= to
 				|| l = .StretchyFindSub(find, from)
 					return (from, l)
-				from++
+				++from
 		  else
 			from -= find.length
 			while from >= to
 				|| l = .StretchyFindSub(find, from)
 					return (from, l)
-				from--
+				--from
 		return (-1, 0)
 					
 
@@ -634,7 +634,7 @@ class String
 		|| End = Start + .Length
 		while (Start < End)
 			yield Start[0] (Start - .Addr)
-			Start++
+			++Start
 
 	
 	iterator Backwards

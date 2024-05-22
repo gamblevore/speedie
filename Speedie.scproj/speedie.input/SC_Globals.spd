@@ -90,7 +90,9 @@ function TypeOfARel (ExprResolver)
 		return TypeOfReal(exp, name_space, side)
 	if Exp == "..."
 		return TypeOfDotDotDot(exp, name_Space)
-	return SCFunction.Tran_AfterRel(exp, name_space, side)
+	|| Brel = exp.niceparent == @arg
+		exp.func = @brel
+	return SCFunction.Tran_AfterRel(exp, name_space, side, !brel)
 
 
 function TypeOfFunc (ExprResolver)
@@ -193,7 +195,7 @@ function TypeOfBRel (ExprResolver)
 	if n == '$'
 		return TranRender(exp, name_space)
 		
-	SCFunction.Tran_AfterRel( exp, name_space, side )
+	SCFunction.Tran_AfterRel( exp, name_space, side, false )
 	Return SubType
 
 

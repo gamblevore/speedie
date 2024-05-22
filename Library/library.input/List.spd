@@ -86,8 +86,8 @@ class list (Saveable)
 		|| c = .first
 		while c
 			require n > 0
-			n--
-			c++
+			--n
+			++c
 		return true
 
 	
@@ -172,8 +172,8 @@ class list (Saveable)
 		while F
 			if self == F
 				return c
-			F++
-			c++
+			++F
+			++C
 			
 
 	function BackDist (|list!| B, |int|)
@@ -182,8 +182,8 @@ class list (Saveable)
 		while B
 			if self == B
 				return c
-			B--
-			c--
+			--B
+			--C
 		
 	operator gt (|list| rt, |bool|)
 		return .fwddist(rt)
@@ -243,7 +243,7 @@ class list (Saveable)
 		while m < lim
 			c = c.step(n > 0)
 			if !c: Exit
-			m++
+			++m
 
 		if r
 			*r = m
@@ -307,13 +307,13 @@ class list (Saveable)
 	function SlowCount (|int|)
 		opt norefcounts
 		for c in self
-			rz++
+			++rz
 
 
 	function FlatCount (|int|)
 		opt norefcounts
 		for c.flat in self
-			rz++
+			++rz
 
 
 	function ExtractChild (||)
@@ -465,7 +465,7 @@ class list (Saveable)
 	
 	function Upward (|int| n, |...?|)
 		opt norefcounts
-		while self and n-- >= 1
+		while self and --n >= 0
 			self = .parent
 		return self
 

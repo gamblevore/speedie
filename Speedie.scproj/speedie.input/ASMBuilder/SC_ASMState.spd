@@ -115,7 +115,7 @@ struct ASMState
 		error (where, "No free local variables.")			
 	
 	
-	function TempMe (|Message| where,  |asmreg| T=asmreg.discard,  |asmreg|) // .needreg
+	function TempMe (|Message| where,  |asmreg| T=asmreg.Temp,  |asmreg|) // .needreg
 		if t.reg
 			return t
 		
@@ -160,7 +160,7 @@ struct ASMState
 		while i > .VDecls
 			if .Consts[i] == code
 				return i.reg as asmreg.const
-			i--
+			--i
 	
 	
 	function µ (|message| exp,  |AsmReg| Dest = asmreg(), |AsmReg|)

@@ -368,17 +368,33 @@ void MemStuff(u32* A, u32* B, u32 Operation, u32 L) {
 			
 AlwaysInline void CountConst(Register* r, ASM Op) {
 	int Size = CNTC_sizeu;
-	int Off  = CNTC_Lu-8;
+	int Off  = CNTC_offsetu;
 	int Add  = CNTC_cnsti;
+	auto PP = p1(u8);
+	PP += Off << Size;
+	uint64 Old = 0;
 	switch (Size) {
 	case 0:
-		p1(u8 )[Off] += Add;  break;
+		Old = *PP;
+		*PP = Old+Add;
+		u2 = Old;
+		return;
 	case 1:
-		p1(u16)[Off] += Add;  break;
+		Old = *((u16*)PP);
+		*((u16*)PP) = Old+Add;
+		u2 = Old;
+		return;
 	case 2:
-		p1(u32)[Off] += Add;  break;
+		Old = *((u32*)PP);
+		*((u32*)PP) = (u32)(Old+Add);
+		u2 = Old;
+		return;
+	default:
 	case 3:
-		p1(u64)[Off] += Add;  break;
+		Old = *((u64*)PP);
+		*((u64*)PP) = Old+Add;
+		u2 = Old;
+		return;
 	}
 }
 

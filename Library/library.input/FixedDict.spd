@@ -42,7 +42,7 @@ class FixedDict
 		while T
 			if T & 3
 				jb_decr( self[i] )
-			i++
+			++i
 			T >>= 2
 		if .valuetype == typeobj
 			jb_decr( .value|object| )

@@ -196,8 +196,8 @@ class StringReader
 	syntax expect (|string| Error)
 		opt norefcounts
 		.UserObj = nil
-		|| D = .data.ErrorReported++
-		require !D
+		|| D = ++.data.ErrorReported
+		require D == 1
 		
 		if !error
 			if (.file)	

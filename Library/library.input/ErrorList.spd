@@ -29,7 +29,7 @@ class ErrorReceiver
 	constructor
 		.errors = error()
 		.MaxErrors = 512
-		.MaxProblems = 16
+		.MaxProblems = 64
 		JB_API.NilHappened_ = nil
 
 
@@ -68,7 +68,7 @@ class ErrorReceiver
 			(log)(self, err.render)
 		if CanPrint and err.IsBad
 			printline err.render
-		if error.autoprint and err.severity >= Errorseverity.problem
+		if error.autoprint and err.severity > Errorseverity.problem
 			debugat
 		if error.autoprint != errorflags.PrintAndRemove
 			.errors <~ err
@@ -139,7 +139,7 @@ class ErrorReceiver
 		require self
 		for err in self
 			if err.severity >= level
-				RZ++
+				++RZ
 				if shell
 					err.renderclang(Fs)
 				  else

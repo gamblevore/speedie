@@ -65,7 +65,7 @@ class µForm
 		|| i = 0
 		while (i < .count)
 			yield self[i] (i)
-			i++
+			++i
 
 	function AddRemainder (|int| U)
 		.addp( 32 - .TotalBits, µform.num ||| U)

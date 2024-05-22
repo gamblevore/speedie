@@ -172,7 +172,7 @@ class Array (saveable)
 			|| Item = self[i]
 			if item == nil: exit 
 			yield Item (i)
-			i++
+			++i
 
 	iterator Backwards
 		|| i = .length - 1
@@ -180,7 +180,7 @@ class Array (saveable)
 			|| Item = self[i]
 			if item == nil: exit 
 			yield Item (i)
-			i--
+			--i
 
 
 

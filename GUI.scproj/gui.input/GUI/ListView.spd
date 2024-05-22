@@ -113,7 +113,7 @@ class ListView (GUIControl) {
 		for r.all in self
 			if r == a
 				rz.y = rz.x
-			rz.x++
+			++rz.x
 
 	
 	function ColorRow (|int| Depth, |int| Column, |int| y, |imagepixel|)
@@ -131,14 +131,14 @@ class ListView (GUIControl) {
 			if a == b
 				return rz
 			a = .Hiernext(a)
-			rz++
+			++rz
 		a = c
 		rz = 0
 		while a
 			if a == b
 				return rz
 			a = .Hierprev(a)
-			rz--
+			--rz
 
 
 	function OpenMenu (|ListViewRow| r, |int| y)
@@ -1469,7 +1469,7 @@ class ListView (GUIControl) {
 		while f and n >= 1
 			yield f
 			f = .Hiernext(f)
-			n--
+			--n
 
 
 	iterator FullyVisible
@@ -1479,7 +1479,7 @@ class ListView (GUIControl) {
 		while f and n >= 1
 			yield f
 			f = .Hiernext(f)
-			n--
+			--n
 
 
 	iterator All

@@ -34,7 +34,7 @@ class µFunc
 		|| Addr = .IR
 		while currinst < .length
 			yield Addr+currinst
-			currinst++
+			++currinst
 
 
 

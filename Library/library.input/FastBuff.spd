@@ -43,7 +43,7 @@ struct FastBuff
 		pragma inline
 		*.curr++ = v
 		return .curr >= .end
-	
+
 	syntax Append (|uint16| v, |bool|)
 		cpp_part AppendU16
 		pragma inline
@@ -106,7 +106,7 @@ struct FastBuff
 	syntax Expect (|string| s)
 		if !.ErrorReported
 			error s
-		.ErrorReported++
+		++.ErrorReported
 		
 	function UInt16 (|uint16|)
 		|| c = .curr|&uint16|,  rz = *c++,  .curr = c|&byte|
@@ -117,7 +117,7 @@ struct FastBuff
 		while Pos < End
 			if *Pos == b
 				return pos - .Start
-			Pos++
+			++Pos
 		
 	function Has (|int| n, |bool|)
 		return .end - .curr >= n

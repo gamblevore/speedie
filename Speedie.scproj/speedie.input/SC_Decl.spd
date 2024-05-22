@@ -71,11 +71,12 @@ datatype SCDeclInfo (int)
 		SetTo					// a var sets it... like: rz = obj
 		Hidden					// internal global... should not be exposed to non-lib stuff
 		Biggest
+		PostIncremented
 		Local		 = Body + Param
 		SelfImplicit = Self + local // local is set by CollectOneParam, anyhow?
 		DclCopied    = altered + stayborrowed + static + api + UpgradeableContained + compilercreated // need more too? do later
 
-		
+
 	function Set (|SCDeclInfo| d, |bool| b, |SCDeclInfo|)
 		if b
 			return self ||| d

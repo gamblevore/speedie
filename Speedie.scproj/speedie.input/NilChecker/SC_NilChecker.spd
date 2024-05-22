@@ -54,6 +54,19 @@ function StatementJump (NilTrackerFn)
 	return (NilTable[msg.ASMType]!)(msg)
 
 
+function SyncJump (NilTrackerFn)
+	// how to syncronise arels? 
+	t.PostIncrementSync = true
+	rz = .jump(msg, test)
+	t.ClearPost
+
+
+function JumpNoPosts (niltrackerfn)
+	t.InsideBoolLogic++
+	rz = .jump(msg, test)
+	t.InsideBoolLogic--
+
+
 function Jump (NilTrackerFn)
 	pragma inline
 	|| t = msg.ASMType
@@ -257,17 +270,6 @@ function Continue (NilTrackerFn)
 	.loops.ContRecord |= .EndBlock
 
 
-function WhileInner (|message| Cond)
-	opt norefcounts
-
-	for i in 3
-		.jump(cond, NilCheckMode.whilepos)
-		.Argument(cond.next)
-		.Loops.NextLoop
-		//if i == 1:    OldCont =  .Value // seems to change even after the second time?
-		//if i == 2 and OldCont != .Value : debugat // Test the first two loops.
-	
-
 function While (NilTrackerFn)
 	opt norefcounts
 	target debug: if msg != @tmp
@@ -277,7 +279,12 @@ function While (NilTrackerFn)
 	require !CondTest.IsFalse and T.BranchEnter(msg)
 
 	|| W = .loops.BeginLoop(!condtest.IsTrue)
-	WhileInner(cond)
+
+	for i in 3 
+		.SyncJump(cond, NilCheckMode.whilepos)
+		.Argument(cond.next)
+		.Loops.NextLoop
+
 	if !condtest.IsTrue
 		.jump(cond, NilCheckMode.whileneg)
 		.loops.exitrecord |= .value // merge this
@@ -300,7 +307,7 @@ function If (NilTrackerFn)
 
 	|| Orig = T.BranchEnter(msg)				#require
 	#!"First Branch"
-	.Jump(Cond, NilCheckMode.positive)
+	.SyncJump(Cond, NilCheckMode.positive)
 	.Argument(arg1)
 	
 	|| First = T.BranchSwap(Orig)
@@ -312,6 +319,7 @@ function If (NilTrackerFn)
 	  elseif arg2.HasAny
 		.Argument(arg2)
 	return t.BranchExit(First)
+
 
 
 function Tern (Niltrackerfn)
@@ -336,6 +344,7 @@ function Tern (Niltrackerfn)
 									// where I want this! Just don't do it!
 
 
+
 function BooleanLogic (niltrackerfn)
 	opt norefcounts
 	|| AA = msg.first!
@@ -344,7 +353,7 @@ function BooleanLogic (niltrackerfn)
 	(test is AND) = false 
 	if IsAnd == (test is positive)
 		|| NC = .Jump(AA, test)						// x = (!a or !a.y)
-		NC   |= .Jump(BB, test)
+		NC   |= .JumpNoPosts(BB, test)
 		return nilstate.real ||| (NC & nilstate.FnBecomesNilCh)
 
 	|| Orig = T.BranchEnter(AA)				#require
@@ -355,7 +364,7 @@ function BooleanLogic (niltrackerfn)
 
 	#!"test A-B+"
 	.Jump(AA, test.negate)
-	.Jump(BB, test)
+	.JumpNoPosts(BB, test)
 
 	return t.BranchExit(First)
 
@@ -493,7 +502,7 @@ function Argument (Niltrackerfn)
 		if (rz is borked) and !stderr.ok
 			exit // needs a clean space for borking
 		|| prev = rz
-		rz = .jump(s, T ||| nilcheckmode.Disappears)
+		rz = .SyncJump(s, T ||| nilcheckmode.Disappears)
 		if prev is borked
 			error.autoprint = .oldprint
 			expect !(stderr.ok) (s, "Borking but no zergs found?")
@@ -554,17 +563,23 @@ function Not (niltrackerfn)
 
 function arel (Niltrackerfn)
 	opt norefcounts
+//	|| i = 0
+//	if i-- > 0 and i++ > 0
 	|| ch = *msg
 		rz = .jump(ch, test)
 		|| b = msg.name.first
 		if b == '!'
-//			expect (rz&nilstate.either != NilState.Nilish) (ch, "This value is known to be nil")
-// what if it's later optional? or real? due to a loop... sigh.
 			rz &=~ nilstate.nilish
 			rz |=  nilstate.realish
+		  elseif b == '?' // won't it be transformed already?
+			0
+		  else
+			|| PI = t.PostIncrementSync
+				t.post(ch.fastdecl, ch)
+			if t.InsideBoolLogic
+				error (ch, "Can't post-increment within boolean-logic")
 
 
-// 
 function Declaration (niltrackerfn) // function decl 
 	opt norefcounts
 	|| rel = msg.last

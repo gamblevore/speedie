@@ -62,22 +62,14 @@ forms
 		Prm1	x
 		Prm2	x
 		
-	
-	CNTR	// 
-		r1		r
-		r2		r
-		incr	3
-		size	2 // 1, 2, 4, 8
-		// *(u1+L3-8) += i2
-		// u1+=incr-3
-		// this can add a reg to an obj property
-		// incr useful for writing to an array?
-	
+		
 	CNTC
 		r1		r
+		r2		r
+		offset	4
 		cnst	8
 		size	2 // 1, 2, 4, 8
-		// *(u1+CNTC_Lu-8) += CNTC_cnsti
+		// *p1[offset] += cnst
 	
 	BFLD
 		r1		r
@@ -159,8 +151,8 @@ forms
 			debugger
 
 
-// unused oof:     BFLS, CNTC, 
-// needs opt:      lupu, lupd, tail, fncx
+// unused oof:     CNTC 
+// needs opt:      lupu, lupd, tail, fncx, BFLS, BFLG
 // needs ASM-text: swap, rare, RSDE, RALO, RSET, MEMM
 
 
