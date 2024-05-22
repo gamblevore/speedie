@@ -36,11 +36,6 @@ class Task (list)
 			.state |= s
 		  else
 			.state &= ~s
-		TaskState.Started
-		TaskState.Paused
-		TaskState.WaitsTillStart
-		TaskState.HadErrors
-		TaskState.Animation
 
 
 datatype TaskState (byte)

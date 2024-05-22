@@ -201,6 +201,9 @@ function SCNode.CollectConstantsSub (|Message| ch)
 				currtype.AssignabilityCheck(nil, newnum, currtype)
 				currtype.copytypeinfoto(newitem)
 			
+		  elseif line == @bra
+			nextnum = .CalculateConst(line.first!)
+		
 		  else
 			|| ValueNode = Line.last
 			|| thg = line[ @Thg ]
@@ -221,10 +224,7 @@ function SCNode.CollectConstantsSub (|Message| ch)
 				newitem.numberconst = nextnum
 				nextnum++
 			  else
-				|| kk = .CalculateConst(Valuenode)
-				newitem.numberconst = kk
-//				if ch ~= "flags"
-//					lastflag = kk.log2
+				newitem.numberconst = .CalculateConst(Valuenode)
 			
 			FixLater <~ NewItem
 			
@@ -233,9 +233,10 @@ function SCNode.CollectConstantsSub (|Message| ch)
 			NewItem.Default = ValueNode
 			newitem.source = thg
 
-		compiler.newconst(newitem)
-		NameList <~ NewItem.source!
-		.TryAdd( line, NewItem, NewItem.Name )
+		if newitem
+			compiler.newconst(newitem)
+			NameList <~ NewItem.source!
+			.TryAdd( line, NewItem, NewItem.Name )
 	
 	
 	if (ch == "flags")
