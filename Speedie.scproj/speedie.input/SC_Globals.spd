@@ -1411,7 +1411,7 @@ function TypeOfRel (ExprResolver) {
 		  elseif (comp is caseaware) or CanOpCompare(exp, lc, rc, comp)
 			return DoOpCompare(exp, lc, rc, comp, name_space)
 	  elseif (comp is Bit)
-		require RC.NoFloat(RN) and LC.NoFloat(LN)
+		require RC.IntsOnly(RN) and LC.IntsOnly(LN)
 	
 	if (custom & CustomOps.TypeCastFromBool) and !side
 		lc = typeint!.typenormal

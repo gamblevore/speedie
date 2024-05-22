@@ -53,8 +53,11 @@ function MakeDeclOrRel (|Message| Into, |message| namemsg, |Message| value, |Mes
 
 
 
-function SCDecl.NoFloat (|Message| exp, |bool|)
+function SCDecl.IntsOnly (|Message| exp, |bool|)
 	|| T = .type.TypeInfo
+	if (.isnormalnumber and t.isint)
+		return true // for constants... isnormalnumber allows constants a bit better.
+	
 	expect (T != DataTypeCode.UnusedType)	(exp, "Can’t do bit ops on this")
 	expect (!T.isfloat)						(exp, "Can’t do bit ops on floats")
 	return true

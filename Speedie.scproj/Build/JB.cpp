@@ -1927,7 +1927,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112485528309764));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112485559612412));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -12484,7 +12484,7 @@ SCObject* SC_TypeOfRel(Message* Exp, SCNode* Name_space, Message* Side) {
 		}
 	}
 	 else if ((bool)SC_Opp_SyntaxIs(Comp, kSC__OpMode_Bit)) {
-		if (!(SC_Decl_NoFloat(RC, RN) and SC_Decl_NoFloat(LC, LN))) {
+		if (!(SC_Decl_IntsOnly(RC, RN) and SC_Decl_IntsOnly(LC, LN))) {
 			JB_Decr(Side);
 			JB_Decr(LC);
 			JB_Decr(RC);
@@ -37061,7 +37061,6 @@ Message* SC_Decl_ExpectMatch(SCDecl* Self, SCDecl* O, int TypeCast, Message* Exp
 	if (((bool)Exp) and SC_Msg_IsSmallInt(Exp, O)) {
 		TypeCast = (TypeCast | kJB_kTypeCastFromZero);
 	}
-	JB_DoAt(176);
 	int Matched = SC_Decl_TypeMatch(Self, O, TypeCast, Exp);
 	if ((Matched == kJB_kCastedMatch) or (Matched == kJB_kLossyCastedMatch)) {
 		return SC_Msg_CastedParent(Exp);
@@ -37254,6 +37253,22 @@ SCDecl* SC_Decl_HighestMatch(SCDecl* Self, SCDecl* Other, Message* Exp) {
 		}
 	};
 	return O->TypeNormal;
+}
+
+bool SC_Decl_IntsOnly(SCDecl* Self, Message* Exp) {
+	DataTypeCode T = Self->Type->TypeInfo;
+	if (SC_Decl_IsNormalNumber(Self) and JB_TC_IsInt(T)) {
+		return true;
+	}
+	if (T == kJB__TC_UnusedType) {
+		JB_Msg_SyntaxExpect(Exp, JB_LUB[622]);
+		return nil;
+	}
+	if ((JB_TC_IsFloat(T))) {
+		JB_Msg_SyntaxExpect(Exp, JB_LUB[621]);
+		return nil;
+	}
+	return true;
 }
 
 void SC_Decl_IsCarray(SCDecl* Self, int Size, SCDecl* Of) {
@@ -37674,19 +37689,6 @@ void SC_Decl_NoBlindCasts(SCDecl* Self, SCDecl* Old, Message* Exp, SCNode* Name_
 			}
 		}
 	}
-}
-
-bool SC_Decl_NoFloat(SCDecl* Self, Message* Exp) {
-	DataTypeCode T = Self->Type->TypeInfo;
-	if (T == kJB__TC_UnusedType) {
-		JB_Msg_SyntaxExpect(Exp, JB_LUB[622]);
-		return nil;
-	}
-	if ((JB_TC_IsFloat(T))) {
-		JB_Msg_SyntaxExpect(Exp, JB_LUB[621]);
-		return nil;
-	}
-	return true;
 }
 
 void SC_Decl_numberconstSet(SCDecl* Self, uint64 V) {
@@ -49991,4 +49993,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -7429784503346771878 -2499241987004650375
+// -1192267527394170655 -2499241987004650375

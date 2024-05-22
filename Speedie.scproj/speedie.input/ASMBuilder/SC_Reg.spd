@@ -42,16 +42,11 @@ datatype AsmReg (int64)
 		cpp_part Reg
 		numeric false
 	
-	target debug2
-		Flags
-			|asmreg|
-			xxxx = 0
-			yyyy = xxxx * 2
-	
+
 	Flags
 		|asmreg|
 		(1<<32)		// starting point
-		SrcConst		= 0
+		SrcConst
 		ASMBase
 		ContainsAddr
 		FromMath
@@ -68,9 +63,10 @@ datatype AsmReg (int64)
 		SingleExpr
 		NewCondRequest
 		ConstAny
-		CondRequest		= 00//NewCondRequest ||| SrcConst
-		MathConst		= 0//ConstAny ||| FromMath
+		CondRequest		= NewCondRequest ||| SrcConst
+		MathConst		= ConstAny ||| FromMath
 		Zero			= SrcConst
+	
 	
 	function Negate (|asmreg|)
 		(self is negate) = (Self isnt negate)

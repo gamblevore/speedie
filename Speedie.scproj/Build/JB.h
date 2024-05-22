@@ -1926,27 +1926,26 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASMtmp_kWhile (50)
 extern ASM_Mem SC__ASMtmp_ReadASM[10];
 extern ASM_Mem SC__ASMtmp_WriteASM[5];
-#define kSC__Reg_AddrRequest (1024)
-#define kSC__Reg_AlreadyNegated (16)
-#define kSC__Reg_Alternate (32)
-#define kSC__Reg_ASMBase (1)
-#define kSC__Reg_Cond (64)
-#define kSC__Reg_CondRequest (00)
-#define kSC__Reg_ConstAny (32768)
-#define kSC__Reg_ContainsAddr (2)
-#define kSC__Reg_Discard (256)
-#define kSC__Reg_ForReturn (2048)
-#define kSC__Reg_FromMath (4)
+#define kSC__Reg_AddrRequest (8796093022208)
+#define kSC__Reg_AlreadyNegated (137438953472)
+#define kSC__Reg_Alternate (274877906944)
+#define kSC__Reg_ASMBase (8589934592)
+#define kSC__Reg_Cond (549755813888)
+#define kSC__Reg_CondRequest (0)
+#define kSC__Reg_CondRequest2 (140737488355328 | 4294967296)
+#define kSC__Reg_ConstAny (281474976710656)
+#define kSC__Reg_ContainsAddr (17179869184)
+#define kSC__Reg_Discard (2199023255552)
+#define kSC__Reg_ForReturn (17592186044416)
+#define kSC__Reg_FromMath (34359738368)
 #define kSC__Reg_MathConst (0)
-#define kSC__Reg_Negate (128)
-#define kSC__Reg_NewCondRequest (16384)
-#define kSC__Reg_Set (512)
-#define kSC__Reg_SingleExpr (8192)
-#define kSC__Reg_SrcConst (0)
-#define kSC__Reg_StayOpen (8)
-#define kSC__Reg_Temp (4096)
-#define kSC__Reg_xxxx (0)
-#define kSC__Reg_yyyy (0 * 2)
+#define kSC__Reg_Negate (1099511627776)
+#define kSC__Reg_NewCondRequest (140737488355328)
+#define kSC__Reg_Set (4398046511104)
+#define kSC__Reg_SingleExpr (70368744177664)
+#define kSC__Reg_SrcConst (4294967296)
+#define kSC__Reg_StayOpen (68719476736)
+#define kSC__Reg_Temp (35184372088832)
 #define kSC__Reg_Zero (kSC__Reg_SrcConst)
 #define kJB__CharProp_AlmostLetter (6)
 #define kJB__CharProp_Letters (7)
@@ -8311,6 +8310,8 @@ SCDecl* SC_Decl_HighestArrayContainMatch(SCDecl* Self, SCDecl* Other, Message* E
 
 SCDecl* SC_Decl_HighestMatch(SCDecl* Self, SCDecl* Other, Message* Exp);
 
+bool SC_Decl_IntsOnly(SCDecl* Self, Message* Exp);
+
 void SC_Decl_IsCarray(SCDecl* Self, int Size, SCDecl* Of);
 
 bool SC_Decl_IsCArray(SCDecl* Self);
@@ -8406,8 +8407,6 @@ void SC_Decl_NilPrmFail(SCDecl* Self, Message* Where, SCFunction* F);
 bool SC_Decl_NilStated(SCDecl* Self);
 
 void SC_Decl_NoBlindCasts(SCDecl* Self, SCDecl* Old, Message* Exp, SCNode* Name_space);
-
-bool SC_Decl_NoFloat(SCDecl* Self, Message* Exp);
 
 void SC_Decl_numberconstSet(SCDecl* Self, uint64 V);
 
