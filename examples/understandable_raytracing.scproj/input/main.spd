@@ -1,6 +1,7 @@
 
 // simple raytracing demo...
-// based on code from https://www.scratchapixel.com
+// based on code from
+https://www.scratchapixel.com
 
 main
 	sdlapp.Rescale(3)
@@ -12,6 +13,9 @@ struct RayHit
 	|float| Dist
 	function ok (|bool|)
 		return .dist < float.max
+	module
+		function New (|rayhit|)
+			rz.Dist = float.max
 	
 
 class RayScene (window)
@@ -34,12 +38,6 @@ class RayScene (window)
 		.shapes <~ Sphere(( -2.0, 9.0, 24.0), 6)
 		.shapes <~ CubeShape(( 12.0, 3.0, 24.0), 4)
 	
-		
-	function Bounce
-		opt norefcounts
-		for sp in .shapes
-			sp.Move(.g)
-	
 	behaviour Drawbackground
 		opt norefcounts
 		opt min 3
@@ -59,8 +57,7 @@ class RayScene (window)
 			|| XY = (p.vec2 + adjust) * scale
 			|| xyz = (xy, 1.0).Normal
 			|| ixyz = -1.0 / xyz
-			|rayhit| Found
-			found.Dist = float.max
+			|| Found = RayHit()
 			for sp in .Shapes
 				sp.color(.cam, xyz, ixyz, Found)
 			if (Found.ok)
@@ -79,7 +76,8 @@ class RayScene (window)
 		|| m = .moved
 			.cam += m * 0.2
 			SDLApp.touch
-		.Bounce
+		for sp in .shapes
+			sp.Move(.g)
 
 
 
