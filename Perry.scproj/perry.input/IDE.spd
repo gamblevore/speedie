@@ -273,7 +273,7 @@ class PerryIDE (Window)
 		fs <~ t[0, sel0].LineCount
 		if n
 			fs <~ "+"
-			fs <~ n
+			fs <~ n+1
 		fs.PadTo 9
 		fs <~ " ch "
 		fs <~ t.charcount(0, sel0)
