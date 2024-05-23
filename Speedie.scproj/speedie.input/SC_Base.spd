@@ -508,7 +508,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 				ifn exp in @dot			// x = a.b is still a function call
 					|| err = "Function must have a prototype."		// what about the side thing?
 					if side and !paramsarray.MacroSize
-						err = "Not assignable"
+						err = "Not assignable."
 					check (o|scfunction|.ProtoDecl) (exp, err)
 					Return o|scfunction|.ProtoDecl
 

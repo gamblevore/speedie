@@ -200,6 +200,8 @@
 	mem2(ivec4);
 ı CNTC: _
 	CountConst(r, Op);
+ı CNTD: _
+	CountConstNew(r, Op);
 ı MEMM: _
 	//  copy/fill/endian/xor
 

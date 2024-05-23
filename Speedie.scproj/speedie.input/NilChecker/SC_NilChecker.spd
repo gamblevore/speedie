@@ -285,7 +285,7 @@ function While (NilTrackerFn)
 		.Loops.NextLoop
 
 	if !condtest.IsTrue
-		.jump(cond, NilCheckMode.whileneg)
+		.SyncJump(cond, NilCheckMode.whileneg)
 		.loops.exitrecord |= .value // merge this
 	
 	.loops.FinishLoop(msg)
@@ -312,7 +312,7 @@ function If (NilTrackerFn)
 	|| First = T.BranchSwap(Orig)
 
 	#!"Second Branch"
-	.jump(cond, NilCheckMode.negative) // we need the negative, for the merging.
+	.SyncJump(cond, NilCheckMode.negative) // we need the negative, for the merging.
 	if ElseIfCond
 		.if(Else)
 	  elseif arg2.HasAny

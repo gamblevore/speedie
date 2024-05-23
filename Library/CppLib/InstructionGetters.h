@@ -157,17 +157,17 @@
 #define   Setn_Prm1u_(x)   (((uint)((x)<<31))>>31)
 
 
-#define   CNTC_offseti       ((( int)((Op.Raw)<<18))>>28)
-#define   CNTC_offseti_(x)   ((( int)((x)<<18))>>28)
+#define   CNTC_offseti       ((( int)((Op.Raw)<<18))>>27)
+#define   CNTC_offseti_(x)   ((( int)((x)<<18))>>27)
 
-#define   CNTC_offsetu       (((uint)((Op.Raw)<<18))>>28)
-#define   CNTC_offsetu_(x)   (((uint)((x)<<18))>>28)
+#define   CNTC_offsetu       (((uint)((Op.Raw)<<18))>>27)
+#define   CNTC_offsetu_(x)   (((uint)((x)<<18))>>27)
 
-#define   CNTC_cnsti       ((( int)((Op.Raw)<<22))>>24)
-#define   CNTC_cnsti_(x)   ((( int)((x)<<22))>>24)
+#define   CNTC_cnsti       ((( int)((Op.Raw)<<23))>>25)
+#define   CNTC_cnsti_(x)   ((( int)((x)<<23))>>25)
 
-#define   CNTC_cnstu       (((uint)((Op.Raw)<<22))>>24)
-#define   CNTC_cnstu_(x)   (((uint)((x)<<22))>>24)
+#define   CNTC_cnstu       (((uint)((Op.Raw)<<23))>>25)
+#define   CNTC_cnstu_(x)   (((uint)((x)<<23))>>25)
 
 #define   CNTC_sizei       ((( int)((Op.Raw)<<30))>>30)
 #define   CNTC_sizei_(x)   ((( int)((x)<<30))>>30)

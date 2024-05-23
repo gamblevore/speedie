@@ -366,37 +366,78 @@ void MemStuff(u32* A, u32* B, u32 Operation, u32 L) {
 }
 
 			
-AlwaysInline void CountConst(Register* r, ASM Op) {
+AlwaysInline void CountConst (Register* r, ASM Op) {
 	int Size = CNTC_sizeu;
 	int Off  = CNTC_offsetu;
 	int Add  = CNTC_cnsti;
 	auto PP = p1(u8);
 	PP += Off << Size;
 	uint64 Old = 0;
+	auto ni = n2;
+	if (!ni) ni = 32; // just write past the end.
+	auto Where = &(r[ni].Uint);
+
 	switch (Size) {
 	case 0:
 		Old = *PP;
 		*PP = Old+Add;
-		u2 = Old;
-		return;
+		*Where = Old;
+		break;
 	case 1:
 		Old = *((u16*)PP);
 		*((u16*)PP) = Old+Add;
-		u2 = Old;
-		return;
+		*Where = Old;
+		break;
 	case 2:
 		Old = *((u32*)PP);
 		*((u32*)PP) = (u32)(Old+Add);
-		u2 = Old;
-		return;
+		*Where = Old;
+		break;
 	default:
 	case 3:
 		Old = *((u64*)PP);
 		*((u64*)PP) = Old+Add;
-		u2 = Old;
-		return;
+		*Where = Old;
+		break;
 	}
 }
+
+
+AlwaysInline void CountConstNew (Register* r, ASM Op) {
+	int Size = CNTC_sizeu;
+	int Off  = CNTC_offsetu;
+	int64 New = CNTC_cnsti;
+	auto PP = p1(u8);
+	PP += Off << Size;
+	auto ni = n2;
+	if (!ni) ni = 32; // just write past the end.
+	auto Where = &(r[ni].Uint);
+
+	switch (Size) {
+	case 0:
+		New += (*PP);
+		*PP = New;
+		*Where = New;
+		break;
+	case 1:
+		New += *((u16*)PP);
+		*((u16*)PP) = New;
+		*Where = New;
+		break;
+	case 2:
+		New += *((u32*)PP);
+		*((u32*)PP) = (u32)(New);
+		*Where = New;
+		break;
+	default:
+	case 3:
+		New += *((u64*)PP);
+		*((u64*)PP) = New;
+		*Where = New;
+		break;
+	}
+}
+
 
 
 // BasicASMFunc

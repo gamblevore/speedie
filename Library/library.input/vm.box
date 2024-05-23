@@ -66,8 +66,8 @@ forms
 	CNTC
 		r1		r
 		r2		r
-		offset	4
-		cnst	8
+		offset	5
+		cnst	7
 		size	2 // 1, 2, 4, 8
 		// *p1[offset] += cnst
 	
@@ -151,8 +151,7 @@ forms
 			debugger
 
 
-// unused oof:     CNTC 
-// needs opt:      lupu, lupd, tail, fncx, BFLS, BFLG
+// needs opt:      lupu, lupd, tail, fncx, BFLS, BFLG, CNTC (glob = glob + constfunc())
 // needs ASM-text: swap, rare, RSDE, RALO, RSET, MEMM
 
 
@@ -384,8 +383,10 @@ forms
 		mem(ivec4) = (ivec4)(((ivec4*)r)[n1])
 		mem2(ivec4)
 
-/**/ CNTC  (CNTC)					// aWESOME  JOBBBBBBBBBBB BROOOOOO LOLLLLLLL ::DDDDDD
+/**/ CNTC  (CNTC)
 		CountConst(r, Op)
+/**/ CNTD  (CNTC)
+		CountConstNew(r, Op)
 
 /**/ MEMM  ("rrnl")
 		#! copy/fill/endian/xor

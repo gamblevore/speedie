@@ -405,27 +405,16 @@ function Not		(fn_asm)
 function Minus			(fn_asm)					// -a
 	opt	NoRefCounts
 	return ASMTmp.DoSingleMath(self, exp, dest, scoperator.minus)
-  
-
-// how to do this? lets look at some examples... we want the old value returned
-// while updating the curr value.
-// in order to do this, the new value msut be updated.
-// so it seems like we need to copy the value
-// but it really depends what we are doing...
-
-// *x = y++ --> *x = y, y++
-// we don't really need to store y in a temp-var!
-
-// the problem is, that seems to rely on the other side knowing what to do.
-// is it just for setrels?
-
 /*
-	Super-easy easy cases:
+	DONE:
 		* discard vars: y++
 		* discard mem:  a.b++, *x++, a[y]++
 		* ++y
+*/
 
-	optimiseables
+
+/*
+	seems easy
 		x = y++
 		*x = y++
 		x = y++ * 3 // --> x = y*3, y++
@@ -433,40 +422,90 @@ function Minus			(fn_asm)					// -a
 	non optimiseables?
 		x = y++ * y++ --> || tmp = y,  y++,  x = y * tmp,  y++
 		func(y++, 7)
-		
-	I could just REMOVE the ++????? I mean... its not very useful, is it?
-	worth a try!
+	
 
 	Easy cases:
-		* x = y++									// can special-case
-		* x = *y++									// special-case also
-		* func(*y++)								// similar special-case
-		* x[0] = y++								// probably not too hard.
+		x =  y++								// can special-case
+		x = *y++								// special-case also
+		func(*y++)								// similar special-case
+		x[0] = y++								// probably not too hard.
 
 	Other cases?
-		* x < y++									// just do the opp, then add after all is done.
-		* while *x++ == *y++
+		x < y++									// just do the opp, then add after all is done.
+		while *x++ == *y++
 		x = y++ * 3 // --> x = y*3, y++
-	
-	Suspect cases:
-		* func(y++, y++)
-		* x = y++ * y++
-		*  *func(y++) = *func2(y++)
-		* x < y++ - y
-		
+
 
 	blocked cases: // boolean logic
-		*  if  x  and  z++ < y
-	
-		
+		func(y++, y++)
+		x = y++ * y++
+		*func(y++) = *func2(y++)
+		x < y++ - y
+		if  x  and  z++ < y
 */
 
+
+/*
+	possible read/write ++ cases (Excluding floats)
+	TABL gets the address of a global.
+	
+		glob++,  		x = glob++,		++glob,		// TABL, CNTC			// what if glob is float?
+		(*pglb)++,		x = ++(*pglb),	++(*pglb)	// TABL, CNTD
+
+		
+		++obj.prop,  	obj.prop++					// READ, CNTC
+		(*obj.gprp)++,	++(*obj.gprp)				// READ, READ, CNTC
+
+		x = ++glob									// TABL, CNTD
+		local++,	++ local						// .plus()				// gen diff ops per float/int
+		x = local++									// assign, .plus()
+		
+		*(pglb++)									// TABL, READ+
+										
+		x = *(obj.gprp++),	x = *(pglb++)			// READ, READ+, WRIT (read val, use read for *val++, then write new val)
+		x = *(++pglb)								// TABL, .plus(), READ
+		++(*obj.gprp)								// READ, CNTD		// what if is float-ptr
+		(*plocal)++	/ ++(*plocal)					// CNTC
+		*(plocal++)									// READ+
+		
+		*(++plocal)									// .plus(), READ
+		
+		
+		x = (*pglb)++								// TABL, READ, CNTC
+		*(pglb++) = x								// TABL, WRIT+, 
+		*(++pglb) = x								// TABL, CNTD, WRIT
+		x = *(plocal++)								// READ+
+		x = (*plocal)++								// CNTC
+		*(plocal++) = x								// WRIT+
+		
+		*(++pglb) = x								// TABL, CNTD, WRIT
+		x = ++(*plocal)								// CNTD
+		x = *(++plocal)								// .plus(), READ
+		*(++plocal) = x								// .plus(), WRIT
+*/
+
+
+function Precrement2		(fn_asm)				// --a, ++a
+	visible
+	opt	NoRefCounts
+	|| Src = .µ(exp, dest.RequestPos)
+//	if (mode & 2)
+//		dest = src
+//	  else
+//		dest = .TempMe(exp, dest)	
+	
+	|| D = exp.FastDecl
+
+	if d isnt local
+		.µ(exp, dest.set)
+	
+	return dest
 
 
 function Precrement		(fn_asm)					// --a, ++a
 	opt	NoRefCounts
 	|| Src = .µ(exp, dest.RequestPos)				// src has the old value.
-	if (mode & 2)									// we want src.
+	if (mode & 2)		 							// we want src.
 		dest = src
 	  else
 		dest = .TempMe(exp, dest)	
