@@ -17,7 +17,7 @@ roots 	// Extra roots for the IDE to display. This doesn't affect compilation.
 `
 
 	function EmptyMainFile (|string| name, |string|)
-		return "
+		return "#!/usr/local/bin/spd
 
 // Basic empty file
 main
