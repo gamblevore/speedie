@@ -51,6 +51,34 @@ struct LoopInfo
 
 
 	
+module PostIncrementNil
+	|message--[32]| 		Msgs
+	|int|					Size
+	|bool|					Sync
+
+	function Check (|message| ch)
+		opt norefcounts
+		|| d = ch.FastDecl
+		check (d isnt PostIncremented) (ch, "Can't post-increment twice within a statement")
+		(d is PostIncremented)
+		self <~ ch
+
+	syntax append (|message| ch)
+		|| s = .Size
+		expect (s < 32) (ch, "Too many post-increments in one statement!")
+		.msgs[s] = ch
+		.Size = s + 1
+	
+	function Clear
+		for i in .size
+			|| d = .msgs[i]!.FastDecl
+			(d isnt postincremented)
+
+		.msgs[0] = nil
+		.Size = 0
+		.Sync = false
+
+
 
 struct ArchonPurger
 	linkage: cpp_part nil
@@ -60,31 +88,11 @@ struct ArchonPurger
 	|Scdecl--[32]| 			Decls
 	|scdecl?|				Return
 	|int| 					InsideBoolLogic
-	|Scdecl--[32]| 			PostRemovers
-	|int|					PostSize
-	|bool|					PostIncrementSync
 	|bool|					FnAbleToNilCheck
 	|bool| 					RootReturned	// for recursive funcs
 	|bool|					AnyReturns
 	|NilRecord[64]| 		Rows
 	
-	
-	function Post (|scdecl| d, |message| ch)
-		check (d isnt PostIncremented) (ch, "Can't post-increment twice within a statement")
-		(d is PostIncremented)
-		|| s = .PostSize
-		expect (s < 32) (ch, "Too many post-increments in one statement!")
-		.PostRemovers[s] = d
-		.PostSize = s + 1
-	
-	
-	function ClearPost
-		for i in .postsize
-			.postremovers[i]! isnt postincremented
-			.postremovers[i] = nil
-		.PostSize = 0
-		.PostIncrementSync = false
-
 	
 	function NestDepth (|int|)
 		return (.Neel - &.rows[0])|int|

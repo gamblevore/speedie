@@ -68,7 +68,9 @@ function TypeOfNothing (ExprResolver)
 
 function SCDecl.IsntReallyCastable (|message| side = nil, |bool|)
 	require (.type.IsStruct or .IsCArray) and (!.pointercount)
-	return  (side.RemoveTypeCasts != @arg)
+	if !side
+		return true
+	return  side.RemoveTypeCasts != @arg
 
 
 function scdecl.NoBlindCasts (|scdecl| old, |message| exp, |SCNode| name_space)

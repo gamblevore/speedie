@@ -63,7 +63,7 @@ class Instruction
 		function Add (|string| FormName, |string| name, |int| pos)
 			|| ins = instruction(formname, name, pos)
 			.typelist[pos] = ins
-			.typedict[name] = ins
+			.typedict.valuelower(name) = ins
 	
 		function InstructionInit
 			__instructionlist__			// we need some way to put swearwords into code

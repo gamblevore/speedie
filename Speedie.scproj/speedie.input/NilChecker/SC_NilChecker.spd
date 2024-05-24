@@ -55,9 +55,9 @@ function StatementJump (NilTrackerFn)
 
 
 function SyncJump (NilTrackerFn)
-	t.PostIncrementSync = true
+	PostIncrementNil.Sync = true
 	rz = .jump(msg, test)
-	t.ClearPost
+	PostIncrementNil.Clear
 
 
 function JumpNoPosts (niltrackerfn)
@@ -517,7 +517,7 @@ function Bracket (Niltrackerfn)
 	opt norefcounts
 	if msg.length					// a? --> (a) // but the bra has a name
 		test |= NilCheckMode.Soft
-	return .Jump((*msg)!, test)
+	return .Jump(msg.first!, test)
 
 
 function Type (NilTrackerFn)
@@ -544,7 +544,7 @@ function Brel (Niltrackerfn)
 	if b == '*'
 		return pointer(msg, test)				// *abc
 
-	|| ch = (*msg)!
+	|| ch = msg.first!
 	if b == '-' or '+'							// for ++ or --
 		return .jump(ch, test)
 	if b == '!'
@@ -562,9 +562,7 @@ function Not (niltrackerfn)
 
 function arel (Niltrackerfn)
 	opt norefcounts
-//	|| i = 0
-//	if i-- > 0 and i++ > 0
-	|| ch = *msg
+	|| ch = msg.first
 		rz = .jump(ch, test)
 		|| b = msg.name.first
 		if b == '!'
@@ -573,8 +571,8 @@ function arel (Niltrackerfn)
 		  elseif b == '?' // won't it be transformed already?
 			0
 		  else
-			|| PI = t.PostIncrementSync
-				t.post(ch.fastdecl, ch)
+			if PostIncrementNil.Sync
+				PostIncrementNil.Check(ch)
 			if t.InsideBoolLogic
 				error (ch, "Can't post-increment within boolean-logic")
 

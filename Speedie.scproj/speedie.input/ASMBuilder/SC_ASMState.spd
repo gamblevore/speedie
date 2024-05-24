@@ -42,18 +42,22 @@ struct ASMState
 		if (!r.reg) // what?
 
 
-	function AddConstant (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value)
+	function AddConstant (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value, |asmreg|)
 		if dest.isint
 			if value.CanStoreAsIntImmediate
 				.AddASM(asm.ADDK, exp.parent!, dest, src, Value)
-				return 
+				return dest
+			  else
+				debugat
 		  else
 			if dest.FourBytes and value|uint64|.CanStoreAsFloatImmediate
 				.AddASM(asm.FADK, exp.parent!, dest, src, Value)
-				return 
+				return dest
+			  else
+				debugat
 
 		|| where = .NumToEgg(value, exp)
-		.Plus(dest, dest, where, exp)
+		return .Plus(dest, src, where, exp)
 		
 
 		
@@ -167,6 +171,11 @@ struct ASMState
 			--i
 	
 	
+	function µSync (|message| exp, |AsmReg|)
+		rz = .µ(exp)
+		.DoPostIncr
+	
+	
 	function µ (|message| exp,  |AsmReg| Dest = asmreg(), |AsmReg|)
 		opt norefcounts
 		pragma inline
@@ -201,11 +210,28 @@ struct ASMState
 		return .µ(prm, where)
 
 
+	function DoPostIncr
+		opt norefcounts
+		for i in PostIncrementNil.size
+			|| exp = PostIncrementNil.Msgs[i]!
+			|| f = exp.first!
+			|| Src = .µ(f)
+			|| mode = (exp.name.first == '+')|int|
+			|| Amount = ASMTmp.IncrAmount(src, mode, f.FastDecl)
+			
+			ASMState.sh.AddConstant(exp, src, src, Amount)	// ++x, y = ++x
+		PostIncrementNil.size = 0
+
 	module
 		|FatASM[]|					JSMSpace = FatASM[0]!
 		|[memory of fatasm]|		Ancients
 		|ASMState|					Sh
 		
+		function AddPostIncr (|message| ch)
+			PostIncrementNil <~ ch
+
+
+
 		
 function @ASMTmp.DoFunc (fn_Asm)
 	opt norefcounts

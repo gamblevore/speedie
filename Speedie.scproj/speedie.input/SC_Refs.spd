@@ -479,10 +479,13 @@ function message.RefTransparent (|bool|)
 		return n == '?' or '!'
 
 
-function Message.RemoveTypeCasts (|Message|) 
+function Message.RemoveTypeCasts (|Message!|)
 	opt norefcounts
-	while rz and rz.RefTransparent
-		rz = rz.first
+	real self
+	rz = self
+	while rz.RefTransparent
+		|| f = rz.first #loop
+		rz = f
 
 
 function Message.UseNonRefChangers (|bool| parent=false, |Message|)

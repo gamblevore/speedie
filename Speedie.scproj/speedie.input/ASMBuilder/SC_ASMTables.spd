@@ -119,7 +119,7 @@ function If				(fn_asm)
 //		return nil // too fiddly. I hate writing this :)
 			
 	|| Start = .Branch(cond)
-	.µ(arg)
+	.µSync(arg)
 	|| ElseIf = arg.next
 		if mode // what?
 		IF(self, elseif, asmreg(), 1)
@@ -479,22 +479,23 @@ function Minus			(fn_asm)					// -a
 */
 
 
-function CountOnAddr (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int| Amount, |asmreg|)
-	require addr is ContainsAddr
-	require dest.isint
-	require amount <= 63  and  amount >= -64
-	|| opp = (ASM.CNTC, ASM.CNTD)(mode & IncrAfter)
-	ignore
-		r1		r
-		r2		r
-		offset	5
-		cnst	7
-		size	2 // 1, 2, 4, 8
-	
+		
+function SlowerCountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| src, |int| Amount, |asmreg|)
+	|| d = f.FastDecl
+	if d isnt local
+		ifn (amount <= 63  and  amount >= -64)
+			debugat // aren't these done by containsaddr?
+		.µ(f, src.set)
+
+
+function CountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| src, |int| Amount, |asmreg|)
+	ifn  dest.isint  and  amount <= 63  and  amount >= -64
+		return SlowerCountOnAddr(self, f, dest, mode, src, amount)
+	|| opp = (ASM.CNTC, ASM.CNTD)(mode & IncrAfter)	
 	|| bc  = dest.µtype.ByteCount
-	|| log = bc.log2
+	|| log = bc.Log2
 	if dest.BitCount * (1<<log) != bc // hmm? maths bug?
-	.AddASM(opp, exp, addr, dest, 0, amount, log)
+	.AddASM(opp, f, src, dest, 0, amount, log)
 	return dest
 
 
@@ -502,40 +503,35 @@ function IncrAmount (|asmreg| dest, |int| mode, |scdecl| D,  |int64|)
 	opt norefcounts
 	rz = (1,-1)(mode & 1)
 	if dest.isfloat
-		if dest.fourbytes
+		if dest.FourBytes
 			rz = rz|float|.asint
 		  else
 			rz = rz|f64|.asint
-	  elseif D.typesuffers
+	  elseif D.TypeSuffers
 		rz *= D.PointerIncrement
+
 
 
 function Incrementatulatorifier		(fn_asm)				// --a++
 	visible
 	opt	NoRefCounts
 	|| f = exp.first!
-	|| D = f.FastDecl
 	|| Src = .µ(f, dest.RequestPos)
-	|| Amount = IncrAmount(src, mode, d)
-	|| oof = CountOnAddr(self, exp, dest, mode, src, amount)
-	if oof.Exists
-		return oof
+	|| Amount = IncrAmount(src, mode, f.FastDecl)
+	if src is ContainsAddr
+		return CountOnAddr(self, f, dest, mode, src, amount)
 	
 	expect (src isnt temp) (exp, "Can't increment temporary value.")
-	
-	if mode & IncrAfter					//	x++,	y = x++
-		.Assign(dest, src, src, exp)
-		.AddConstant(exp, src, src, Amount)
-	  else								//  ++x,	y = ++x
-		.AddConstant(exp, src, src, Amount)
-		.Assign(dest, src, src, exp)
-	
-	if d isnt local
-		ifn (amount <= 63  and  amount >= -64)
-			debugat // aren't these done by containsaddr?
-		.µ(f, src.set)
-	
-	return dest
+	if mode & IncrAfter						//	x++,	y = x++
+		f = f.RemoveTypeCasts!
+		if f!=@thg
+		if .µ(f)!=src
+			debugger, .µ(f)
+		ASMState.addpostincr(f)				// process later.
+		return src
+
+	return .AddConstant(exp, src, src, Amount)	// ++x, y = ++x
+
 
 
 function ARel		(fn_asm)
