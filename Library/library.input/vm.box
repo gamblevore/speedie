@@ -42,6 +42,22 @@ forms
 		Inv		1
 		Value	12
 	
+	ConstStretchy
+		r1		r
+		Cond	1	// 0 == always, 1 = only if dest == 0
+		Inv		1
+		Value	16
+		Prm1	x
+		Prm2	x
+	
+	Setn
+		r1		r
+		Cond	1	// 0 == always, 1 = only if dest == 0
+		Inv		1
+		Value	16
+		Prm1	x
+		Prm2	x
+
 	Bra		// bra:
 		r1		r
 		c1		2
@@ -53,14 +69,6 @@ forms
 		r3		r	// VarAdd
 		L		7	// Const A
 		move	2
-	
-	Setn
-		r1		r
-		Cond	1	// 0 == always, 1 = only if dest == 0
-		Inv		1
-		Value	16
-		Prm1	x
-		Prm2	x
 		
 		
 	CNTC
@@ -197,9 +205,9 @@ forms
 
 
 #!						 (((((Consts)))))
-/**/ SETK (Const)
+/**/ KSTR (Const)
 		RotateConst(r, Op)
-/**/ SETN (setn, 1, 2, 3)			// OK
+/**/ KNST (ConstStretchy, 1, 2, 3)			// OK
 		LoadConst(r, Op, Code)
 
 
@@ -209,11 +217,11 @@ forms
 		i1 = i2 + (i3 << L3) // only need 6 bits for shift! can we save 3 conditional add?
 /**/ ADDK ("rrnl")
 		i1 = i2 + U2_Li
-/**/ SUB  (U3)
+/**/ SUBB  (U3)
 		i1 = i2 - (i3 << L3)
-/**/ MUL  (U4)
+/**/ MULT  (U4)
 		i1 = (i2 * i3) + i4
-/**/ DIV  (Div)
+/**/ DIVV (Div)
 		DivMath(r, Op)
 
 
@@ -227,7 +235,7 @@ forms
 		i1 = (i2 << u3) ||| u4
 /**/ BAND  (U3)
 		u1 = u2 &  (u3|||L3)
-/**/ BOR   (U3)
+/**/ BOAR  (U3)
 		u1  |= (u2|||u3)
 /**/ BXOR  (U3)
 		u1 = u2 ^ u3
@@ -293,7 +301,7 @@ forms
 		__
 		Code = CompNeq(r, Op, Code)
 		___
-/**/ BRA   (Bra)
+/**/ BRAA  (Bra)
 		__
 		if (!i1)
 			Code += Bra_jmpi
@@ -384,9 +392,10 @@ forms
 		mem2(ivec4)
 
 /**/ CNTC  (CNTC)
-		CountConst(r, Op)
+		CountConst(r, Op, 1)
+
 /**/ CNTD  (CNTC)
-		CountConstNew(r, Op)
+		CountConst(r, Op, 0)
 
 /**/ MEMM  ("rrnl")
 		#! copy/fill/endian/xor

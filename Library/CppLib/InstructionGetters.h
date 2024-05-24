@@ -106,30 +106,29 @@
 #define   Const_Valueu_(x)   (((uint)((x)<<20))>>20)
 
 
-#define   Bra_c1i       ((( int)((Op.Raw)<<13))>>30)
-#define   Bra_c1i_(x)   ((( int)((x)<<13))>>30)
+#define   ConstStretchy_Condi       ((( int)((Op.Raw)<<13))>>31)
+#define   ConstStretchy_Condi_(x)   ((( int)((x)<<13))>>31)
 
-#define   Bra_c1u       (((uint)((Op.Raw)<<13))>>30)
-#define   Bra_c1u_(x)   (((uint)((x)<<13))>>30)
+#define   ConstStretchy_Condu       (((uint)((Op.Raw)<<13))>>31)
+#define   ConstStretchy_Condu_(x)   (((uint)((x)<<13))>>31)
 
-#define   Bra_jmpi       ((( int)((Op.Raw)<<15))>>15)
-#define   Bra_jmpi_(x)   ((( int)((x)<<15))>>15)
+#define   ConstStretchy_Invi       ((( int)((Op.Raw)<<14))>>31)
+#define   ConstStretchy_Invi_(x)   ((( int)((x)<<14))>>31)
 
-#define   Bra_jmpu       (((uint)((Op.Raw)<<15))>>15)
-#define   Bra_jmpu_(x)   (((uint)((x)<<15))>>15)
+#define   ConstStretchy_Invu       (((uint)((Op.Raw)<<14))>>31)
+#define   ConstStretchy_Invu_(x)   (((uint)((x)<<14))>>31)
 
+#define   ConstStretchy_Valuei       ((( int)((Op.Raw)<<15))>>16)
+#define   ConstStretchy_Valuei_(x)   ((( int)((x)<<15))>>16)
 
-#define   Mem_Li       ((( int)((Op.Raw)<<23))>>25)
-#define   Mem_Li_(x)   ((( int)((x)<<23))>>25)
+#define   ConstStretchy_Valueu       (((uint)((Op.Raw)<<15))>>16)
+#define   ConstStretchy_Valueu_(x)   (((uint)((x)<<15))>>16)
 
-#define   Mem_Lu       (((uint)((Op.Raw)<<23))>>25)
-#define   Mem_Lu_(x)   (((uint)((x)<<23))>>25)
+#define   ConstStretchy_Prm1i       ((( int)((Op.Raw)<<31))>>31)
+#define   ConstStretchy_Prm1i_(x)   ((( int)((x)<<31))>>31)
 
-#define   Mem_movei       ((( int)((Op.Raw)<<30))>>30)
-#define   Mem_movei_(x)   ((( int)((x)<<30))>>30)
-
-#define   Mem_moveu       (((uint)((Op.Raw)<<30))>>30)
-#define   Mem_moveu_(x)   (((uint)((x)<<30))>>30)
+#define   ConstStretchy_Prm1u       (((uint)((Op.Raw)<<31))>>31)
+#define   ConstStretchy_Prm1u_(x)   (((uint)((x)<<31))>>31)
 
 
 #define   Setn_Condi       ((( int)((Op.Raw)<<13))>>31)
@@ -155,6 +154,32 @@
 
 #define   Setn_Prm1u       (((uint)((Op.Raw)<<31))>>31)
 #define   Setn_Prm1u_(x)   (((uint)((x)<<31))>>31)
+
+
+#define   Bra_c1i       ((( int)((Op.Raw)<<13))>>30)
+#define   Bra_c1i_(x)   ((( int)((x)<<13))>>30)
+
+#define   Bra_c1u       (((uint)((Op.Raw)<<13))>>30)
+#define   Bra_c1u_(x)   (((uint)((x)<<13))>>30)
+
+#define   Bra_jmpi       ((( int)((Op.Raw)<<15))>>15)
+#define   Bra_jmpi_(x)   ((( int)((x)<<15))>>15)
+
+#define   Bra_jmpu       (((uint)((Op.Raw)<<15))>>15)
+#define   Bra_jmpu_(x)   (((uint)((x)<<15))>>15)
+
+
+#define   Mem_Li       ((( int)((Op.Raw)<<23))>>25)
+#define   Mem_Li_(x)   ((( int)((x)<<23))>>25)
+
+#define   Mem_Lu       (((uint)((Op.Raw)<<23))>>25)
+#define   Mem_Lu_(x)   (((uint)((x)<<23))>>25)
+
+#define   Mem_movei       ((( int)((Op.Raw)<<30))>>30)
+#define   Mem_movei_(x)   ((( int)((x)<<30))>>30)
+
+#define   Mem_moveu       (((uint)((Op.Raw)<<30))>>30)
+#define   Mem_moveu_(x)   (((uint)((x)<<30))>>30)
 
 
 #define   CNTC_offseti       ((( int)((Op.Raw)<<18))>>27)

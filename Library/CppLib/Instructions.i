@@ -6,7 +6,7 @@
 	__;
 	Code = BumpStack(r, Code, Op);
 	___;
-ı SETN: _
+ı KNST: _
 	LoadConst(r, Op, Code);
 ı FNCX: 
 	__;
@@ -39,17 +39,17 @@
 	if_rare (Rare(r, Op)) return n3;
 ı CONV: _
 	Conv(r, n2, Op);
-ı SETK: _
+ı KSTR: _
 	RotateConst(r, Op);
 ı ADD: _
 	i1 = i2 + (i3 << L3);
 ı ADDK: _
 	i1 = i2 + U2_Li;
-ı SUB: _
+ı SUBB: _
 	i1 = i2 - (i3 << L3);
-ı MUL: _
+ı MULT: _
 	i1 = (i2 * i3) + i4;
-ı DIV: _
+ı DIVV: _
 	DivMath(r, Op);
 ı SHRS: _
 	i1 = ((uint64)((i2 << L3) >> u3)) >> L3;
@@ -59,7 +59,7 @@
 	i1 = (i2 << u3) | u4;
 ı BAND: _
 	u1 = u2 & (u3 | L3);
-ı BOR: _
+ı BOAR: _
 	u1 |= (u2 | u3);
 ı BXOR: _
 	u1 = u2 ^ u3;
@@ -113,7 +113,7 @@
 	__;
 	Code = CompNeq(r, Op, Code);
 	___;
-ı BRA: 
+ı BRAA: 
 	__;
 	if (!i1) 
 	Code += Bra_jmpi
@@ -199,9 +199,9 @@
 	mem(ivec4) = (ivec4)(((ivec4 *) r)[n1]);
 	mem2(ivec4);
 ı CNTC: _
-	CountConst(r, Op);
+	CountConst(r, Op, 1);
 ı CNTD: _
-	CountConstNew(r, Op);
+	CountConst(r, Op, 0);
 ı MEMM: _
 	//  copy/fill/endian/xor
 

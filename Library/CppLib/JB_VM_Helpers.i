@@ -76,7 +76,7 @@ double FloatSh2 (uint64 u, int S) {
 
 
 AlwaysInline ASM* LoadConst (Register* r, ASM Op, ASM* Code) {
-	uint64 Value = Setn_Valueu;
+	uint64 Value = ConstStretchy_Valueu;
 	int Remain = Op&3;
 	if (Remain) {
 		if (Remain == 1)
@@ -88,8 +88,8 @@ AlwaysInline ASM* LoadConst (Register* r, ASM Op, ASM* Code) {
 			Value = (uint64)(*Code++) << 32;
 		Value |= *Code++;
 	}
-	if (!Setn_Condu or !r->Int) {
-		if (Setn_Invu)
+	if (!ConstStretchy_Condu or !r->Int) {
+		if (ConstStretchy_Invu)
 			Value = ~Value;
 		r->Int = Value; 
 	}
@@ -350,7 +350,6 @@ void bswap64 (u64* Start, uint Count) {
 		Start++; 
 	}
 }
-
 		
 
 void MemStuff(u32* A, u32* B, u32 Operation, u32 L) {
@@ -366,76 +365,41 @@ void MemStuff(u32* A, u32* B, u32 Operation, u32 L) {
 }
 
 			
-AlwaysInline void CountConst (Register* r, ASM Op) {
+AlwaysInline void CountConst (Register* r, ASM Op, bool UseOld) {
 	int Size = CNTC_sizeu;
 	int Off  = CNTC_offsetu;
 	int Add  = CNTC_cnsti;
 	auto PP = p1(u8);
 	PP += Off << Size;
 	uint64 Old = 0;
+	uint64 New = 0;
 	auto ni = n2;
 	if (!ni) ni = 32; // just write past the end.
 	auto Where = &(r[ni].Uint);
 
 	switch (Size) {
 	case 0:
-		Old = *PP;
-		*PP = Old+Add;
-		*Where = Old;
-		break;
-	case 1:
-		Old = *((u16*)PP);
-		*((u16*)PP) = Old+Add;
-		*Where = Old;
-		break;
-	case 2:
-		Old = *((u32*)PP);
-		*((u32*)PP) = (u32)(Old+Add);
-		*Where = Old;
-		break;
-	default:
-	case 3:
-		Old = *((u64*)PP);
-		*((u64*)PP) = Old+Add;
-		*Where = Old;
-		break;
-	}
-}
-
-
-AlwaysInline void CountConstNew (Register* r, ASM Op) {
-	int Size = CNTC_sizeu;
-	int Off  = CNTC_offsetu;
-	int64 New = CNTC_cnsti;
-	auto PP = p1(u8);
-	PP += Off << Size;
-	auto ni = n2;
-	if (!ni) ni = 32; // just write past the end.
-	auto Where = &(r[ni].Uint);
-
-	switch (Size) {
-	case 0:
-		New += (*PP);
+		Old = *PP;         New = Old+Add;
 		*PP = New;
-		*Where = New;
 		break;
 	case 1:
-		New += *((u16*)PP);
+		Old = *((u16*)PP); New = Old+Add;
 		*((u16*)PP) = New;
-		*Where = New;
 		break;
 	case 2:
-		New += *((u32*)PP);
+		Old = *((u32*)PP); New = Old+Add;
 		*((u32*)PP) = (u32)(New);
-		*Where = New;
 		break;
 	default:
 	case 3:
-		New += *((u64*)PP);
+		Old = *((u64*)PP); New = Old+Add;
 		*((u64*)PP) = New;
-		*Where = New;
 		break;
 	}
+	if (UseOld)
+		*Where = Old;
+	  else
+		*Where = New;
 }
 
 

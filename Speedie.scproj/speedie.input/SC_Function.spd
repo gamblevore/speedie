@@ -1211,8 +1211,8 @@ function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side, |boo
 		if after
 			problem msg
 		check (!side) (msg, "Not assignable.")
-			
 		return type.CheckMath(msg)
+
 
 	|| numc = Type.type.NumericCount
 	if !Type.type.IsObject  and  !type.hiderfunc  and  numc <= 1
@@ -1220,6 +1220,7 @@ function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side, |boo
 			problem msg
 		check (!side) (msg, "Not assignable.")
 		return type
+
 
 	|message| R
 	if numc or type.hiderfunc

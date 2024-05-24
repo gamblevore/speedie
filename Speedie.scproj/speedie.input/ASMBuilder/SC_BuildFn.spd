@@ -3,6 +3,7 @@
 extend_module ASM
 	helper TestASMSub (|message| tests)
 		opt norefcounts
+		asmstate.sh.PackMakerInit
 		|| list = tests.last(@arg)
 		|| testname = tests[@thg]
 		require list and testname

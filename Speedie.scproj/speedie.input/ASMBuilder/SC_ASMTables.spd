@@ -5,51 +5,40 @@ dispatch fn_asm_table (fn_asm)
 	@arg:
 		opt norefcounts
 		for ch.fast in exp
-			.µ(ch, asmreg.ASMBase)
-
+			.µ(ch, asmreg.Arg)
 
 	@decl: // yay
 		opt norefcounts
 		|| rel = exp.last!
 		|| ty = rel.first!.fastdecl
 		|| reg = .DeclareMe(Exp, ty.reg)
-		(reg is ASMBase)
+		(reg is NotYetUsed)
 		return .µ(rel.last!, reg)
 
+	@num:  ASMTmp.num
 
-	@num: asmtmp.num
+	@rel:  ASMTmp.DoMath
 
-	@rel: asmtmp.DoMath
+	@thg:  ASMTmp.Thg
 
-
-	@thg: ASMTmp.Thg
-
-
-	@bra: ASMTmp.First
+	@bra:  ASMTmp.First
 
 	@sheb: ASMtmp.Ignore
 		
-
 	@list: // vectors
 		debugger
 
-	@func:
-		opt norefcounts
-		return .DoFunc(exp.last!, dest)
+	@func: asmtmp.DoFunc
 
-
-	@dot:	ASMTmp.Dot
-	@acc:	ASMTmp.Access
-
+	@dot:  ASMTmp.Dot
+	
+	@acc:  ASMTmp.Access
 
 	@brel: asmtmp.Brel		// ++, --, -, &
 
-
 	@arel: asmtmp.arel      // ++, --, 
 
-
 	@type:					asmtmp.TypeCast
-
 
 	@tmp:					asmtmp.unexpected
 
@@ -169,7 +158,7 @@ function StatExpr		(fn_asm)
 	for ch.fast in exp
 		if ch.islast
 			return .µ(ch, dest)
-		.µ(ch, asmreg.ASMBase)
+		.µ(ch, asmreg.Arg)
 
 
 function Ternary		(fn_asm)
@@ -341,7 +330,7 @@ function Thg (fn_asm)
 		if dest is set								// copy a reg
 			debugger
 			if !reg.reg					// what?
-			.AddASM(asm.BOR, exp, dest, reg)
+			.AddASM(asm.BOAR, exp, dest, reg)
 			return dest
 		return reg
 
@@ -454,101 +443,106 @@ function Minus			(fn_asm)					// -a
 	TABL gets the address of a global.
 	// do these during optimise? seems better.
 	
-		glob++,  		x = glob++,		++glob,		// TABL, CNTC			// what if glob is float?
-		(*pglb)++,		x = ++(*pglb),	++(*pglb)	// TABL, CNTD
+	glob++,  		x = glob++,		++glob,		// TABL, CNTC			// what if glob is float?
+	(*pglb)++,		x = ++(*pglb),	++(*pglb)	// TABL, CNTD
 
-		
-		++obj.prop,  	obj.prop++					// READ, CNTC
-		(*obj.gprp)++,	++(*obj.gprp)				// READ, READ, CNTC
+	
+	++obj.prop,  	obj.prop++					// READ, CNTC
+	(*obj.gprp)++,	++(*obj.gprp)				// READ, READ, CNTC
 
-		x = ++glob									// TABL, CNTD
-		local++,	++ local						// .plus()				// gen diff ops per float/int
-		x = local++									// assign, .plus()
-		
-		*(pglb++)									// TABL, READ+
-										
-		x = *(obj.gprp++),	x = *(pglb++)			// READ, READ+, WRIT (read val, use read for *val++, then write new val)
-		x = *(++pglb)								// TABL, .plus(), READ
-		++(*obj.gprp)								// READ, CNTD		// what if is float-ptr
-		(*plocal)++	/ ++(*plocal)					// CNTC
-		*(plocal++)									// READ+
-		
-		*(++plocal)									// .plus(), READ
-		
-		
-		x = (*pglb)++								// TABL, READ, CNTC
-		*(pglb++) = x								// TABL, WRIT+, 
-		*(++pglb) = x								// TABL, CNTD, WRIT
-		x = *(plocal++)								// READ+
-		x = (*plocal)++								// CNTC
-		*(plocal++) = x								// WRIT+
-		
-		*(++pglb) = x								// TABL, CNTD, WRIT
-		x = ++(*plocal)								// CNTD
-		x = *(++plocal)								// .plus(), READ
-		*(++plocal) = x								// .plus(), WRIT
+	x = ++glob									// TABL, CNTD
+	local++,	++ local						// .plus()				// gen diff ops per float/int
+	x = local++									// assign, .plus()
+	
+	*(pglb++)									// TABL, READ+
+									
+	x = *(obj.gprp++),	x = *(pglb++)			// READ, READ+, WRIT (read val, use read for *val++, then write new val)
+	x = *(++pglb)								// TABL, .plus(), READ
+	++(*obj.gprp)								// READ, CNTD		// what if is float-ptr
+	(*plocal)++	/ ++(*plocal)					// CNTC
+	*(plocal++)									// READ+
+	
+	*(++plocal)									// .plus(), READ
+	
+	
+	x = (*pglb)++								// TABL, READ, CNTC
+	*(pglb++) = x								// TABL, WRIT+, 
+	*(++pglb) = x								// TABL, CNTD, WRIT
+	x = *(plocal++)								// READ+
+	x = (*plocal)++								// CNTC
+	*(plocal++) = x								// WRIT+
+	
+	*(++pglb) = x								// TABL, CNTD, WRIT
+	x = ++(*plocal)								// CNTD
+	x = *(++plocal)								// .plus(), READ
+	*(++plocal) = x								// .plus(), WRIT
 */
 
 
-function CountOnAddr		(|&ASMState| self, |message| exp, |AsmReg| Dest,  |int| Mode,  |AsmReg| Addr, |AsmReg|)				// --glob--
-	 // cntc? 
-
-
-function Precrement2		(fn_asm)				// --a--
-	visible
-	opt	NoRefCounts
-	|| Src = .µ(exp, dest.RequestPos)
-	if src is ContainsAddr
-		return CountOnAddr(self, exp, dest, mode, src)
+function CountOnAddr (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int| Amount, |asmreg|)
+	require addr is ContainsAddr
+	require dest.isint
+	require amount <= 63  and  amount >= -64
+	|| opp = (ASM.CNTC, ASM.CNTD)(mode & IncrAfter)
+	ignore
+		r1		r
+		r2		r
+		offset	5
+		cnst	7
+		size	2 // 1, 2, 4, 8
 	
-	// So... lets just... implement the two cases separately. then possibly combine.
-	
-	|| f = exp.first!
-	|| D = f.FastDecl
-	if mode & IncrAfter
-	
-	else
-		
-
-	if d isnt local
-		.µ(exp, dest.set)
-	
+	|| bc  = dest.µtype.ByteCount
+	|| log = bc.log2
+	if dest.BitCount * (1<<log) != bc // hmm? maths bug?
+	.AddASM(opp, exp, addr, dest, 0, amount, log)
 	return dest
 
 
-function Precrement		(fn_asm)					// --a, ++a
-	opt	NoRefCounts
-	|| Src = .µ(exp, dest.RequestPos)				// src has the old value.
-	if (mode & IncrAfter)							// we want src.
-		dest = src
-	  else
-		dest = .TempMe(exp, dest)	
-	
-	|| D = exp.FastDecl
-	|int64| Value = (1,-1)(mode & 1)
+function IncrAmount (|asmreg| dest, |int| mode, |scdecl| D,  |int64|)
+	opt norefcounts
+	rz = (1,-1)(mode & 1)
 	if dest.isfloat
 		if dest.fourbytes
-			value = value|float|.asint
+			rz = rz|float|.asint
 		  else
-			value = value|f64|.asint
+			rz = rz|f64|.asint
 	  elseif D.typesuffers
-		Value *= D.PointerIncrement
-		check Value.CanStoreAsIntImmediate (exp, "Object too large to increment")
-	
-	check .TryAddConstant(exp, dest, src, Value)		(exp) // shouldn't fail!
+		rz *= D.PointerIncrement
 
+
+function Incrementatulatorifier		(fn_asm)				// --a++
+	visible
+	opt	NoRefCounts
+	|| f = exp.first!
+	|| D = f.FastDecl
+	|| Src = .µ(f, dest.RequestPos)
+	|| Amount = IncrAmount(src, mode, d)
+	|| oof = CountOnAddr(self, exp, dest, mode, src, amount)
+	if oof.Exists
+		return oof
+	
+	expect (src isnt temp) (exp, "Can't increment temporary value.")
+	
+	if mode & IncrAfter					//	x++,	y = x++
+		.Assign(dest, src, src, exp)
+		.AddConstant(exp, src, src, Amount)
+	  else								//  ++x,	y = ++x
+		.AddConstant(exp, src, src, Amount)
+		.Assign(dest, src, src, exp)
+	
 	if d isnt local
-		.µ(exp, dest.set)							// write it back again
+		ifn (amount <= 63  and  amount >= -64)
+			debugat // aren't these done by containsaddr?
+		.µ(f, src.set)
 	
 	return dest
-
 
 
 function ARel		(fn_asm)
 	opt	NoRefCounts
 	|| M = (exp.name.first == '+')|int|
-	M += IncrAfter*(dest isnt ASMBase)
-	return Precrement(self, exp.first!, dest, M)
+	M += IncrAfter*(dest isnt discard)
+	return Incrementatulatorifier(self, exp.first!, dest, M)
 	
 	
 function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
@@ -566,7 +560,7 @@ function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 		return Minus(Self, f, dest)
 	
 	|| PlusPlus = n == '+'
-	return Precrement(self, F, dest, PlusPlus|int|)
+	return Incrementatulatorifier(self, F, dest, PlusPlus|int|)
 
 
 

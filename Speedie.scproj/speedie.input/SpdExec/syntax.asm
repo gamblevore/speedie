@@ -2,11 +2,11 @@
 
 tests oofit
 	asm oofit (0)
-		SET1  (r1, 3458764513820540931) //test
-		SET1  (r1, 123)
+		KNST  (r1, 3458764513820540931) //test
+		KNST  (r1, 123)
 		@test
-		SET1  (r3, 18874368)
-		SET1  (r3, -234)
+		KNST  (r3, 18874368)
+		KNST  (r3, -234)
 		ADD   (r1, r1, r3)
 		PRNT  (r1,)			// -111
 		BRA   (r4, 1, @test)

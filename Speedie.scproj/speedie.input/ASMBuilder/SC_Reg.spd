@@ -47,7 +47,7 @@ datatype AsmReg (int64)
 		|asmreg|
 		(1<<32)		// starting point
 		SrcConst
-		ASMBase
+		NotYetUsed	// for   || y = a + b,   y is (currently) unused.
 		ContainsAddr
 		FromMath
 		StayOpen
@@ -63,6 +63,7 @@ datatype AsmReg (int64)
 		SingleExpr
 		NewCondRequest
 		ConstAny
+		Arg				= NotYetUsed ||| Discard
 		CondRequest		= NewCondRequest ||| SrcConst
 		MathConst		= ConstAny ||| FromMath
 		Zero			= SrcConst

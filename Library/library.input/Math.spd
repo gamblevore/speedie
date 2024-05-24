@@ -71,7 +71,7 @@ module Math
 		rz = -.ATan2Bad(y)				   // our result is +-pi, but we want 0-1...
 		rz *= math.iTau
 		if rz < 0.0
-			rz += 1.0
+			rz ++
 
 	function int.Abs (|int|)
 		cpp_wrapper (abs)

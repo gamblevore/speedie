@@ -60,7 +60,7 @@ extend ASMState
 				r = dest
 				l = 0.reg
 			if !l.reg
-				return .AddASM(asm.BRA • negate, exp, R, 1)
+				return .AddASM(asm.BRAA • negate, exp, R, 1)
 			return .AddASM(asm.JMPE • Negate, exp, L, R)
 
 		
@@ -228,7 +228,7 @@ extend ASMState
 		|| OPP = asm.ADD + subtract
 		(dest as= ASMMath.add + subtract)
 
-		if (opp == asm.add) and l.CanAddK(LL)			// 1 + a
+		if !subtract and l.CanAddK(LL)					// 1 + a
 			.AddASM(asm.ADDK, exp, dest, R, LL)
 
 		  elseif r.CanAddK(RR)							// a - 1, a + 1
@@ -287,7 +287,7 @@ extend ASMState
 				return D1
 			|| D2 = .QuickIntMul(dest, L, R, exp)
 				return D2
-			.AddASM(asm.MUL , exp, dest, L, R)
+			.AddASM(asm.MULT , exp, dest, L, R)
 		  else
 			|| D1 = .QuickFloatMul(dest, R, L, exp)
 				return D1
@@ -317,7 +317,7 @@ extend ASMState
 	
 
 	function DivInt    (fn_opasm)
-		|| Fat = .AddASM(asm.div, exp, 0, 0, L, R, dest.IntDivType)
+		|| Fat = .AddASM(asm.DIVV, exp, 0, 0, L, R, dest.IntDivType)
 		|| Alt = l is alternate
 		fat.r[alt] = dest|uint|
 		return dest
@@ -333,10 +333,20 @@ extend ASMState
 		.AddASM(asm.BXNR, exp, dest, L, R), return dest
 	
 	function BitXor (fn_opasm)
+//		if (l.reg == r.reg)
+//			return .BitOr(dest, asmreg(), asmreg(), exp)
 		.AddASM(asm.BXOR, exp, dest, L, R), return dest
 
 	function BitOr  (fn_opasm)
-		.AddASM(asm.BOR, exp, dest, L, R), return dest
+		|| dd = dest.reg					#debug_require
+		|| rr = r.reg,  || ll = l.reg
+		if ll == 0							// swap
+			|| tt = ll,  ll = rr,  rr = tt
+		  elseif (ll == rr)
+			rr = 0							// same thing
+		if rr == 0 and dd == ll
+			return dest						// no need
+		.AddASM(asm.BOAR, exp, dest, L, R), return dest
 	
 	function BitAnd (fn_opasm)
 		.AddASM(asm.BAND, exp, dest, L, R), return dest

@@ -18,7 +18,7 @@ extend ASMState
 
 		
 	function NumToReg (|int64| V, |message| exp, |int| Reg)
-		.AddASM(asm.setk, exp, reg, (V << 32) >> 32, V>>32)
+		.AddASM(asm.KNST, exp, reg, (V << 32) >> 32, V>>32, -1, -1)
 		.consts[reg] = v
 
 
@@ -44,7 +44,7 @@ extend ASMState
 		|| signed = (v|int64| < 0)|int|
 			v = ~v
 
-		.op = asm.setn
+		.op = asm.KNST
 		.r[1] = 0
 		.r[2] = signed
 		.r[3] = v|int|

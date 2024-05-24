@@ -34,9 +34,8 @@ module TreeAssembler
 	function InitTree
 		instruction.instructionInit
 		asmtmp.InitAccess
-//		Instruction[asm.SET1].Const
-		Instruction[asm.SETK].Const
-		Instruction[asm.SETN].Const
+		Instruction[asm.KSTR].Const
+		Instruction[asm.KNST].Const
 		return 
 		TextAssembler.Requests		:= dictionary()
 		TextAssembler.RequestTable	:= array()
@@ -54,24 +53,7 @@ module TreeAssembler
 			|| fn = compiler.XFunc(l)
 				rz <~ fn
 				fn.tableid = rz.length
-			
-		
-	function VakPak (|[scfunction]| list)
-		opt norefcounts
-		require ASMState.Sh.PackMakerInit // and fn_asm_table[@arg]
-		
-		for fn in list
-			require .Vacuum(fn)
-			
-
-	function Vacuum (|SCFunction| fn, |bool|)
-		opt norefcounts
-		
-		if .VacuumReal(fn)
-			return true
-		if ASMState.ExpandJSM
-			return .VacuumReal(fn)
-
+						
 
 	function GenerateASM (|scfunction| fn)
 		opt norefcounts
@@ -89,21 +71,17 @@ module TreeAssembler
 	function FlowControl (|bool|)
 
 	
-	function VacuumReal (|scfunction| fn, |bool|)
+	function Vacuum (|scfunction| fn, |bool|)
 		opt norefcounts
-		.GenerateASM(fn)
-		while .Optimise
-		.FlowControl
-/*		
-		* flowcontrol
-			* opts
-		* rendering
-			* const fixing
-*/	
-		if ASMState.Sh.ok
-			printline fn.asm!.render
-			return true
-
+		|| tries = 2
+		while tries -- > 0
+			.GenerateASM(fn)
+			while .Optimise
+			.FlowControl
+			if ASMState.Sh.ok
+				printline fn.asm!.render
+				return true
+			require ASMState.ExpandJSM
 
 
 extend_module ASM

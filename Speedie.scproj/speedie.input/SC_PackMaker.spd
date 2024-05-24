@@ -69,19 +69,26 @@ module PackMaker
 
 
 	function MakePack 
-		|| upon = TreeAssembler.CollectFuncs("asm_test,asm_test_sub,asm_test_ptr,asm_test_flow")
-			treeassembler.VakPak(upon)
-			.MakePackMid(upon)
+		require ASMState.Sh.PackMakerInit // and fn_asm_table[@arg]
 
+		|| upon = TreeAssembler.CollectFuncs("asm_test,asm_test_sub,asm_test_ptr,asm_test_flow")$
+		
+		for fn in upon
+			require treeassembler.Vacuum(fn)
 
-	function MakePackMid (|[scfunction]| upon) 
-		|| pack = jbin(@tmp, "xpd")
-		pack.enter
-		pack.enter(@tmp, "app")
-		.OrderGlobals(pack)
-		.MakePackSub(pack, upon)
+		|| j = jbin(@tmp, "xpd")
+		j.enter
+		j.enter(@tmp, "app")
+		.OrderGlobals(j)
+		j.enter
+		.MiniTest(upon.first!)
+		.ListPackFuncs(j, upon)
+		.DumpStrings(j)
+		.PackClass(j)
+		.FuncLink(j)
+		.GlobLink(j)
 
-		Compiler.ProductFile.SmartData = pack
+		Compiler.ProductFile.SmartData = j
 
 
 	function OrderGlobals (|jbin| j)
@@ -99,17 +106,6 @@ module PackMaker
 			d.ExportPosition = G
 			G += s
 		return g
-
-
-	function MakePackSub (|jbin| j, |[scfunction]| upon)
-		opt norefcounts
-		j.enter
-		.MiniTest(upon.first!)
-		.ListPackFuncs(j, upon)
-		.DumpStrings(j)
-		.PackClass(j)
-		.FuncLink(j)
-		.GlobLink(j)
 
 	
 	function MiniTest (|scfunction| fn1)

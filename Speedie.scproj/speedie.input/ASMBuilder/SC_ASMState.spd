@@ -42,15 +42,19 @@ struct ASMState
 		if (!r.reg) // what?
 
 
-	function TryAddConstant (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value, |bool|)
+	function AddConstant (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value)
 		if dest.isint
 			if value.CanStoreAsIntImmediate
 				.AddASM(asm.ADDK, exp.parent!, dest, src, Value)
-				return true
-		  elseif dest.fourbytes
-			if value|uint64|.CanStoreAsFloatImmediate
+				return 
+		  else
+			if dest.FourBytes and value|uint64|.CanStoreAsFloatImmediate
 				.AddASM(asm.FADK, exp.parent!, dest, src, Value)
-				return true
+				return 
+
+		|| where = .NumToEgg(value, exp)
+		.Plus(dest, dest, where, exp)
+		
 
 		
 	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |int| c, |int| d, |int| e, |&FatASM|)
@@ -195,48 +199,49 @@ struct ASMState
 			return r
 		|| Where = .DeclareMe(prm, asmreg())
 		return .µ(prm, where)
-		
-		
-	function DoFunc (|message| prms, |asmreg| dest, |asmreg|)
-		opt norefcounts
-		|| fn = prms.asfunc
-		expect (fn and fn.args <= 10) (prms, "Too many parameters")
-		// speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:3, 8:1
-		// there are only 4 above 6!, only 14 above 5
-
-		if dest is discard
-			dest = asmreg()
-		  else
-			dest = .TempMe(prms, dest)
-			dest.µtype = fn.RegType
-
-		|int| Reg2
-		|int| Reg3
-		|| sh = 0
-		|| OV = .OpenVars
-
-		for p.fast in prms
-			|| v = .prm(p).reg
-			if sh <= 25
-				reg2 |= (v << sh)
-			  else
-				reg3 |= (v << (sh-30))
-			sh += 5
-		.closevars(OV)
-
-		|| OP = (asm.func2, asm.func3)(sh <= 25)
-		|| SaveAmount = 0
-		if dest isnt forreturn
-			SaveAmount = .vdecls
-		.AddASM(OP,  prms.parent!,  save: SaveAmount,  incr: 0,  jump: fn.TableId,  reg2,  reg3)
-		return dest
 
 
 	module
 		|FatASM[]|					JSMSpace = FatASM[0]!
-		|[memory of fatasm]|		Olds
+		|[memory of fatasm]|		Ancients
 		|ASMState|					Sh
 		
+		
+function @ASMTmp.DoFunc (fn_Asm)
+	opt norefcounts
+	|| prms = exp.last!
+	|| fn = prms.asfunc
+	expect (fn and fn.args <= 10) (prms, "Too many parameters")
+	// speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:3, 8:1
+	// there are only 4 above 6!, only 14 above 5
+
+	if dest is discard
+		dest = asmreg()
+	  else
+		dest = .TempMe(prms, dest)
+		dest.µtype = fn.RegType
+
+	|int| Reg2
+	|int| Reg3
+	|| sh = 0
+	|| OV = .OpenVars
+
+	for p.fast in prms
+		|| v = .prm(p).reg
+		if sh <= 25
+			reg2 |= (v << sh)
+		  else
+			reg3 |= (v << (sh-30))
+		sh += 5
+	.closevars(OV)
+
+	|| OP = (asm.func2, asm.func3)(sh <= 25)
+	|| SaveAmount = 0
+	if dest isnt forreturn
+		SaveAmount = .vdecls
+	.AddASM(OP,  prms.parent!,  save: SaveAmount,  incr: 0,  jump: fn.TableId,  reg2,  reg3)
+	return dest
+
 
 function ASMState.PackMakerInit (|bool|)
 	opt norefcounts
@@ -251,14 +256,14 @@ function ASMState.Alloc (|memory of fatasm| j, |bool|)
 		.curr = .start
 		.end = j.Capacity + .start
 		.AddASM(asm.EROR, compiler.InternalFile.ast!, 0)
-		olds <~ j
+		Ancients <~ j
 		return true
 
 
 function @ASMState.ExpandJSM (|bool|)
-	require .olds < 16
+	require .Ancients < 16
 	|| j = FatASM[4MB]
-		.olds <~ .jsmspace
+		.Ancients <~ .jsmspace
 		.JSMSpace = j
 		return sh.Alloc(j)
 	
