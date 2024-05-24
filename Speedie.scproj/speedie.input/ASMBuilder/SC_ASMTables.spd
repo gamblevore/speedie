@@ -296,12 +296,11 @@ function Dot		(fn_asm)						// a.b
 		
 
 function SetRel	(fn_asm)
-	opt	norefcounts
-//   x[func()] = y++
+	opt	norefcounts					//   x[func()] = y++
 	|| Var = .ExistingVar(exp.first!)	
-	(Var is stayopen)
+	(Var is StayOpen)
 	|| R = .µ(exp.last!, var)
-	if !r.reg // what?
+	if !r.reg						// what?
 	if var.reg != r.reg
 		(r is set)
 		return .µ(exp.first!, R)
@@ -535,14 +534,15 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 
 
 
-
 function ARel		(fn_asm)
 	opt	NoRefCounts
 	|| M = (exp.name.first == '+')|int|
-	M += IncrAfter*(dest isnt discard)
+	if dest
+		M += IncrAfter
 	return Incrementatulatorifier(self, exp.first!, dest, M)
-	
-	
+
+
+
 function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 	opt	NoRefCounts
 	|| n = exp.name.first
@@ -562,7 +562,7 @@ function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 
 
 
-function DoSingleMath (|&ASMState| self, |message| exp, |AsmReg| Dest, |scoperator| Scop, |AsmReg|)
+function DoSingleMath (|&ASMState| self, |message| exp, |AsmReg| Dest, |scoperator!| Scop, |AsmReg|)
 	|| Src = .µ(exp, dest)
 	(src is SingleExpr)
 	return DoMathSub(self, exp, dest, src, scop)
@@ -570,36 +570,34 @@ function DoSingleMath (|&ASMState| self, |message| exp, |AsmReg| Dest, |scoperat
 
 function DoMath (fn_asm)
 	|| op = exp.second!
-	return domathsub(self, exp, dest, 0.reg, op.obj|scoperator|)
+	|| scop = op.obj|scoperator|
+		return domathsub(self, exp, dest, 0.reg, scop)
+	debugger // what?
 		
 
-function DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr,  |scoperator?| Scop, |AsmReg|)
+function DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr,  |scoperator!| Scop, |AsmReg|)
 	opt norefcounts
 
 	|| F = exp.first!
 	|| op = f.next!
 	
-	|| ml = asmreg()
+	|| ml = AsmReg()
 	if mr isnt singleexpr
 		|| OV = .OpenVars
-		ml = .µ(F, asmreg.StayOpen)
-		mr = .µ(exp.last!, asmreg.StayOpen)
+		ml = .µOpen(F)
+		mr = .µopen(exp.last!)
 		.CloseVars(OV)
-		(ml isnt StayOpen)
-		(mr isnt StayOpen)
 
-	|| fn = scop.ASM2					#expect (op, "No ASM for this operator?")
-	dest = .tempme(exp, dest) 
+	|| fn = scop.asm					#expect (op, "No ASM for this operator?")
+	dest = .TempMe(exp, dest) 
 	dest.µtype = ml.µtype				// assignment conversion needs doing?	
 	(dest as= scop!.code)
 	(dest is frommath)
 
-	ifn  ml is constany  and  mr is constany
-		return (fn)(self, dest, ml, mr, op)
-
-	(Dest is mathconst)
+	|| ConstInput = ml is constany  and  mr is constany
+		(Dest is mathconst)
 	|| R = (fn)(self, dest, ml, mr, op)
-	if r isnt mathconst // hmm?
+	if Constinput and (r isnt mathconst) // hmm?
 		debugger 
 		(fn)(self, dest, ml, mr, op)
 	return .DoConsts(dest, ml, mr)

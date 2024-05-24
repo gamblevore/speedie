@@ -66,12 +66,6 @@ function CaseAwareStr (|String|)
 	return (self is caseaware)|bool|.render
 
 
-function ASM2 (|fn_opasm?|)
-	nil checker
-	if self
-		return .asm
-	
-
 syntax equals (|string| s, |bool| aware, |bool|)
 	return .name.syntaxequals(s, aware)
 

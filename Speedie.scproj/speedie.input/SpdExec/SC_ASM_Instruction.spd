@@ -61,9 +61,12 @@ class Instruction
 			return .TypeList[pos]
 		
 		function Add (|string| FormName, |string| name, |int| pos)
-			|| ins = instruction(formname, name, pos)
+			opt norefcounts
+			|| ins = .typedict.valuelower(name) // can occur multiply
+			if !ins
+				ins = instruction(formname, name, pos)
+				.typedict.valuelower(name) = ins
 			.typelist[pos] = ins
-			.typedict.valuelower(name) = ins
 	
 		function InstructionInit
 			__instructionlist__			// we need some way to put swearwords into code

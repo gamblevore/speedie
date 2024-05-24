@@ -10,7 +10,8 @@ struct ASMState
 	|&FatASM|					Curr    
 	|&FatASM|					End    
 	|&FatASM|					WhileStart
-	|bool|						OK       
+	|bool|						OK    
+	|bool|						Inited   
 	|byte|						LabelCount
 	|datatypecode|				ReturnType
 	|byte|						VDecls
@@ -175,6 +176,9 @@ struct ASMState
 		rz = .µ(exp)
 		.DoPostIncr
 	
+	function µOpen (|message| exp, |AsmReg|)
+		return .µ( exp, AsmReg.StayOpen) asnt asmreg.StayOpen
+
 	
 	function µ (|message| exp,  |AsmReg| Dest = asmreg(), |AsmReg|)
 		opt norefcounts
@@ -191,7 +195,7 @@ struct ASMState
 			debugger, #! Can't close declarations in args!
 			|| OV = .OpenVars		
 			rz = (fn)(self, exp, dest)
-			.CloseVars(ov, dest isnt discard)
+			.CloseVars(ov, dest.reg)
 		  else
 			rz = (fn)(self, exp, dest)
 		
@@ -243,7 +247,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 	// speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:3, 8:1
 	// there are only 4 above 6!, only 14 above 5
 
-	if dest is discard
+	if !dest
 		dest = asmreg()
 	  else
 		dest = .TempMe(prms, dest)
@@ -273,8 +277,11 @@ function @ASMTmp.DoFunc (fn_Asm)
 
 function ASMState.PackMakerInit (|bool|)
 	opt norefcounts
+	if sh.Inited
+		return true
+	sh.inited = true
 	VM_Builder.JustMakeMyBread
-	treeassembler.InitTree
+	SpdAssembler.InitAss
 	return .alloc(ASMState.JSMSpace)
 
 

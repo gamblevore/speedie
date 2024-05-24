@@ -9,7 +9,7 @@ extend_module ASM
 		require list and testname
 
 		textassembler.assemble(list)
-		|| fn = TreeAssembler[testname]
+		|| fn = SpdAssembler[testname]
 			|| ff = fn.finish.run
 
 

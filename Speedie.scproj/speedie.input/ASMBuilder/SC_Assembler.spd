@@ -28,11 +28,11 @@ module TextAssembler
 
 
 
-module TreeAssembler
+module SpdAssembler
 	|[scfunction]|				PackFuncs
 	
-	function InitTree
-		instruction.instructionInit
+	function InitAss
+		instruction.InstructionInit
 		asmtmp.InitAccess
 		Instruction[asm.KSTR].Const
 		Instruction[asm.KNST].Const

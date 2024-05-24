@@ -71,10 +71,10 @@ module PackMaker
 	function MakePack 
 		require ASMState.Sh.PackMakerInit // and fn_asm_table[@arg]
 
-		|| upon = TreeAssembler.CollectFuncs("asm_test,asm_test_sub,asm_test_ptr,asm_test_flow")$
+		|| upon = SpdAssembler.CollectFuncs("asm_test,asm_test_sub,asm_test_ptr,asm_test_flow")$
 		
 		for fn in upon
-			require treeassembler.Vacuum(fn)
+			require SpdAssembler.Vacuum(fn)
 
 		|| j = jbin(@tmp, "xpd")
 		j.enter

@@ -42,7 +42,6 @@ datatype AsmReg (int64)
 		cpp_part Reg
 		numeric false
 	
-
 	Flags
 		|asmreg|
 		(1<<32)		// starting point
@@ -55,7 +54,7 @@ datatype AsmReg (int64)
 		Alternate
 		Cond
 		Negate
-		Discard
+//		Discard
 		Set
 		AddrRequest
 		ForReturn
@@ -63,7 +62,7 @@ datatype AsmReg (int64)
 		SingleExpr
 		NewCondRequest
 		ConstAny
-		Arg				= NotYetUsed ||| Discard
+		Arg				= NotYetUsed ||| SrcConst // ||| Discard
 		CondRequest		= NewCondRequest ||| SrcConst
 		MathConst		= ConstAny ||| FromMath
 		Zero			= SrcConst

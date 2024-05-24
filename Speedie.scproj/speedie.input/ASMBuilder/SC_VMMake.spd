@@ -187,9 +187,8 @@ function SafeWrite (|string| name, |faststring| data)
 
 function MakeTheVM
 	compiler.Project.use
-	require .BuildFiles	
-	treeassembler.InitTree
-	asm.TestASM
+	if .BuildFiles	
+		asm.TestASM
 
 
 function BuildInstructions (TranFunc) // __instructionlist__
