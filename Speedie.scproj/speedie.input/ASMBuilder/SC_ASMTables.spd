@@ -522,15 +522,17 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 		return CountOnAddr(self, f, dest, mode, src, amount)
 	
 	expect (src isnt temp) (exp, "Can't increment temporary value.")
-	if mode & IncrAfter						//	x++,	y = x++
-		f = f.RemoveTypeCasts!
-		if f!=@thg
-		if .µ(f)!=src
-			debugger, .µ(f)
-		ASMState.addpostincr(f)				// process later.
-		return src
+	ifn mode & IncrAfter
+		return .AddConstant(exp, src, src, Amount)	// ++x,	 y = ++x
 
-	return .AddConstant(exp, src, src, Amount)	// ++x, y = ++x
+	f = f.RemoveTypeCasts!							// x++,	 y = x++
+	if f!=@thg
+	if .µ(f)!=src
+		debugger, .µ(f)
+	PostIncrementNil <~ exp							// process later.
+	if 0: .DoPostIncr
+	return src
+
 
 
 

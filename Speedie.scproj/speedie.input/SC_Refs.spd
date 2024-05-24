@@ -481,7 +481,6 @@ function message.RefTransparent (|bool|)
 
 function Message.RemoveTypeCasts (|Message!|)
 	opt norefcounts
-	real self
 	rz = self
 	while rz.RefTransparent
 		|| f = rz.first #loop

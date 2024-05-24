@@ -210,16 +210,21 @@ struct ASMState
 		return .µ(prm, where)
 
 
+	function PostOne (|message| exp)
+		opt norefcounts
+		|| f = exp.first!.RemoveTypeCasts
+		if f != @thg // wat?
+		|| d = f.FastDecl
+		|| Src = d.reg
+		|| mode = (exp.name.first == '+')|int|
+		|| Amount = ASMTmp.IncrAmount(src, mode, d)
+		ASMState.sh.AddConstant(exp, src, src, Amount)	// ++x, y = ++x
+
+
 	function DoPostIncr
 		opt norefcounts
 		for i in PostIncrementNil.size
-			|| exp = PostIncrementNil.Msgs[i]!
-			|| f = exp.first!
-			|| Src = .µ(f)
-			|| mode = (exp.name.first == '+')|int|
-			|| Amount = ASMTmp.IncrAmount(src, mode, f.FastDecl)
-			
-			ASMState.sh.AddConstant(exp, src, src, Amount)	// ++x, y = ++x
+			.postone(PostIncrementNil.Msgs[i]!)
 		PostIncrementNil.size = 0
 
 	module
@@ -227,9 +232,6 @@ struct ASMState
 		|[memory of fatasm]|		Ancients
 		|ASMState|					Sh
 		
-		function AddPostIncr (|message| ch)
-			PostIncrementNil <~ ch
-
 
 
 		
