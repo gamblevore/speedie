@@ -239,10 +239,10 @@ function Message.Clean (|bool| erl = false)
 		
 		  elseif (f == @opp or @cnj or @erel)
 			if curr == "<>"
-				deprecate (curr, "Use !=")
+				problem (curr, "Use !=")
 				curr.name = "!="
 			  elseif curr == "~<>"
-				deprecate (curr, "Use ~!=")
+				problem (curr, "Use ~!=")
 				curr.name = "~!="
 			  elseif curr == "<~"
 				curr.BecomeAppend("SyntaxAppend")

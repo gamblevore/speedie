@@ -298,7 +298,7 @@ function Message.OpScore (|int|)
 function Message.OarExpand (|bool|)
 	if self in @rel
 		if self ~= "oar"
-			deprecate (self, "Prefer '??' these days.")
+			problem (self, "Prefer '??' these days.")
 		.name = "or"
 		.parent!.BunchFix()
 	return true

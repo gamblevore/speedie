@@ -433,7 +433,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 
 	if (typecast & ktypeCastDescribeErrors) and !incoming.MadeError
 		error (incoming.exp, "Too many params to " + .rendertitle)
-		error (self.source,  kusingstr)
+		problem (self.source,  kusingstr)
 
 
 //function scdecl.IsInt (|bool|)
@@ -467,7 +467,7 @@ function DescribeParamFail (|SCParamArray| params, |int| bad)
 	  else
 		|| Num = bad - isself
 		error ( params.exp, "Missing param $num: ${.args[bad]}" )
-	error ( .Source, "to " + .RenderTitle )
+	problem ( .Source, "to " + .RenderTitle )
 
 
 function String.ArgsMatchError (|bool| TypeCast, |string|)
@@ -1209,7 +1209,7 @@ function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side, |boo
 	|| Type = TypeOfExpr( exp, name_space )					#require
 	if type.PointerCount > 0
 		if after
-			deprecate msg
+			problem msg
 		check (!side) (msg, "Not assignable.")
 			
 		return type.CheckMath(msg)
@@ -1217,7 +1217,7 @@ function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side, |boo
 	|| numc = Type.type.NumericCount
 	if !Type.type.IsObject  and  !type.hiderfunc  and  numc <= 1
 		if After
-			deprecate msg
+			problem msg
 		check (!side) (msg, "Not assignable.")
 		return type
 
@@ -1487,9 +1487,14 @@ function Tran_Else (TranFunc)
 
 
 function Tran_Deprecate (TranFunc)
-	// deprecate (msg, "error")
+	problem (node, "deprecate is deprecated. Use 'problem' instead.")
+	return Tran_Problem(fn, node, name_space)
+
+
+function Tran_Problem (TranFunc)
+	// problem (msg, "error")
 				// -->
-	// msg.Syntaxdeprecate((test), "error")
+	// msg.SyntaxProblem((test), "error")
 	
 	|| stuff = node.needfirst						#require
 	require stuff.expectlast
@@ -1500,7 +1505,7 @@ function Tran_Deprecate (TranFunc)
 	using (node)
 		stuff.func = @prm
 		node.become(@bra)
-		|| Dot = node.msg(@dot, "SyntaxDeprecate")
+		|| Dot = node.msg(@dot, "SyntaxProblem")
 		Dot <~ stuff.first
 		Dot <~ stuff
 

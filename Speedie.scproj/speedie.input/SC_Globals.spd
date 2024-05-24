@@ -498,7 +498,7 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |S
 			return R.MakeNewOptional
 		if (C == "!")
 			if R.StatedReal and c isnt inserted
-				deprecate (c, "Already assumed real. Only '?' needs to be specified.")
+				problem (c, "Already assumed real. Only '?' needs to be specified.")
 			return R.MakeNewReal
 		if (C == "--")
 			return R.MakeBorrowed(c.uptotype != nil)
@@ -535,7 +535,7 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |S
 			rz.Type = TypeArray!
 		
 	  elseif (f == @Adj)
-		deprecate (c, "Use 'of' instead.")
+		problem (c, "Use 'of' instead.")
 		rz.LoadContained(c.first!, c.last!, name_Space, purpose)		#require
 		
 	  elseif (f == @rel)
@@ -1146,7 +1146,7 @@ function TypeOfExprNeeded ( |message| exp, |SCNode| name_space, |SCDecl| )
 	if (oldcount == stderr.errorcount)
 		error (exp, "This expression doesn't return anything.")
 		|| it = exp.expfunc
-			error (it.source, kUsingStr)
+			problem (it.source, kUsingStr)
 			
 constants
 	kUsingStr = "Function here:"

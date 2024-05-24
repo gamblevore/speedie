@@ -1033,9 +1033,12 @@ class Message (list)
 		errorreceiver.NewError( self, Error )
 
 	Syntax Deprecate ( |string| Error = "Deprecated." )
+		.syntaxproblem(error)
+
+	Syntax Problem ( |string?| Error = nil )
 		errorreceiver.NewProblem( self, Error )
 	
-	Syntax Warn ( |string| Error = nil )
+	Syntax Warn ( |string?| Error = nil )
 		errorreceiver.NewWarning( self, Error )
 	
 	Syntax Append (|syntax| Fn, |string| name="")

@@ -92,7 +92,10 @@ function asmstate.AddToReg (|asmreg| addr, |int| add, |message| exp)
 
 
 extend_module ASMTmp {
-
+constants
+	IncrAfter = 2
+	IncrBefore = 0
+	
 |asm_mem[10]| ReadASM
 |asm_mem[5]| WriteASM
 
@@ -256,6 +259,7 @@ function TypeCast		(fn_asm)		//
 function Pointer		(fn_asm)
 	// *a, x = *(a.b) 
 	opt	NoRefCounts
+	if dest is AddrRequest // hmmm?
 	dest = .tempme(exp, dest)
 	|| Ptr = .µ(exp.first!, dest)
 	|| A = Dest.ReadOrWrite(exp)
@@ -268,14 +272,15 @@ function Access		(fn_asm)						// a[b], struct.mem[b], func()[func2()]
 	dest = .tempme(exp, dest)
 
 	|| Ptr = .µ(exp.first!, dest.RequestPos)		// x = a.b[0]
-	expect (ptr is containsaddr) (exp)
+	expect (ptr is ContainsAddr) (exp)
 	|| Ind = .µ(exp.second!, ptr • dest)
+	if (dest is addrrequest)
+		return .plus(dest.HaveAddr, ptr, ind, exp)
+	
 	|| A = Dest.ReadOrWrite(exp)
-
 	.AddASM(A, exp, dest,  Ptr, ind)
 	return dest asnt asmreg.containsaddr as asmmath.Bitcorrect 
 
-		
 
 function Dot		(fn_asm)						// a.b
 	opt	NoRefCounts
@@ -325,7 +330,6 @@ function Num (fn_asm)
 	.NumToReg(X, exp, Dest)
 	(Dest is constany)
 	return dest
-	// loadconst?
 
 
 function Thg (fn_asm)
@@ -366,7 +370,7 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 	expect (iTable > 0)      (exp, "No global address".internal)
 	expect (iTable < 16MB)   (exp, "Too much global data")
 
-	if dest is addrrequest
+	if dest is AddrRequest
 		|| iAdd = iTable
 		if itable >= 16K
 			debugger // does this ever happen?
@@ -448,6 +452,7 @@ function Minus			(fn_asm)					// -a
 /*
 	possible read/write ++ cases (Excluding floats)
 	TABL gets the address of a global.
+	// do these during optimise? seems better.
 	
 		glob++,  		x = glob++,		++glob,		// TABL, CNTC			// what if glob is float?
 		(*pglb)++,		x = ++(*pglb),	++(*pglb)	// TABL, CNTD
@@ -485,16 +490,25 @@ function Minus			(fn_asm)					// -a
 */
 
 
-function Precrement2		(fn_asm)				// --a, ++a
+function CountOnAddr		(|&ASMState| self, |message| exp, |AsmReg| Dest,  |int| Mode,  |AsmReg| Addr, |AsmReg|)				// --glob--
+	 // cntc? 
+
+
+function Precrement2		(fn_asm)				// --a--
 	visible
 	opt	NoRefCounts
 	|| Src = .µ(exp, dest.RequestPos)
-//	if (mode & 2)
-//		dest = src
-//	  else
-//		dest = .TempMe(exp, dest)	
+	if src is ContainsAddr
+		return CountOnAddr(self, exp, dest, mode, src)
 	
-	|| D = exp.FastDecl
+	// So... lets just... implement the two cases separately. then possibly combine.
+	
+	|| f = exp.first!
+	|| D = f.FastDecl
+	if mode & IncrAfter
+	
+	else
+		
 
 	if d isnt local
 		.µ(exp, dest.set)
@@ -505,7 +519,7 @@ function Precrement2		(fn_asm)				// --a, ++a
 function Precrement		(fn_asm)					// --a, ++a
 	opt	NoRefCounts
 	|| Src = .µ(exp, dest.RequestPos)				// src has the old value.
-	if (mode & 2)		 							// we want src.
+	if (mode & IncrAfter)							// we want src.
 		dest = src
 	  else
 		dest = .TempMe(exp, dest)	
@@ -533,7 +547,7 @@ function Precrement		(fn_asm)					// --a, ++a
 function ARel		(fn_asm)
 	opt	NoRefCounts
 	|| M = (exp.name.first == '+')|int|
-	M += 2*(dest isnt ASMBase)
+	M += IncrAfter*(dest isnt ASMBase)
 	return Precrement(self, exp.first!, dest, M)
 	
 	

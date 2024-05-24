@@ -683,7 +683,7 @@ function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nils
 			fs <~ to.Name
 		  else
 			to.rendertitle(fs)
-		error (to, kUsingStr)
+		problem (to.source, kUsingStr)
 	error (where, fs)
 	
 }

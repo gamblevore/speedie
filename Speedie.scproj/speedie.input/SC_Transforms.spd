@@ -24,6 +24,7 @@ dispatch TemporalStatements (TranFunc)
 	debugger				(Tran_Debugger)
 	crash					{app.crash(node.firstname)}
 	deprecate				(Tran_Deprecate)
+	problem					(Tran_Problem)
 	borks					(Tran_Fails)
 	
 	blindcasts				(Tran_BlindCasts)
