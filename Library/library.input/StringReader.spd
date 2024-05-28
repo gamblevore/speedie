@@ -43,9 +43,7 @@ class StringReader
 			.position = .length
 		  else
 			.position += p
-		
-	syntax cast (|bool|)
-		disabled "Do you mean self != nil, or self.HasAny"
+	
 		
 	function HasAny (|bool|)
 		nil checker
@@ -102,11 +100,11 @@ class StringReader
 			rz |= b << i << 3
 
 
-	function Noob (|uint64|)
+	function Small (|uint64|)
 		|| b = .byte
 		if b < 224
 			return b
-		return (.hint<<5) ||| (b-224)
+		return 32 + ((.hint<<5) ||| (b-224))
 
 
 	function hInt (|int64|)
@@ -135,14 +133,17 @@ class StringReader
 	
 	function UpTo (|int| end, |int|)
 		return end - .position
+	
 	function UInt (|int| size, |int| mult=256, |uint64|) // mult used by selftools id3 decoder, passes 128.
 		for size
 			|| b = .byte
 			loop b >= 0
 			rz *= mult
 			rz += b
+	
 	function Trim (|int| n, |string|)
-		return .str(n).trim
+		return .str(n).Trim
+	
 	function Remaining (|int|)
 		return .length - .position
 	

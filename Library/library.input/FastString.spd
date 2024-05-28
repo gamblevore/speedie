@@ -72,7 +72,7 @@ class FastString {
 	function Copy (|string|)
 		cpp_wrapper JB_FS_Copy
 
-	function Noob (|uint64| n)
+	function AppendSmall (|uint64| n)
 		if n < 224
 			self <~ n|byte|
 		  else

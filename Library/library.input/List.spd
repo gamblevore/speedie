@@ -126,7 +126,7 @@ class list (Saveable)
 				// C2
 		// D
 	
-	function FlatNextDepth  (|&int|Depth, |bool|Down=true, ||)
+	function FlatNextDepth  (|&int| Depth, |bool| Down=true, ||)
 		cpp_wrapper JB_Ring_FlatNextDepth, nil checker
 	
 	function FlatAfter (||)

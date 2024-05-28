@@ -34,12 +34,19 @@ class MessageID (stringshared)
 		fs.AppendQuotedEscape(self)
 			
 	syntax cast (|bool|)
-		disabled "Do you mean .length > 0  or  self != nil"
+		return self!=nil
 	
 	constructor (|string| Name, |Syntax| Fn, |uint64| ID=0)
 		super.constructor(name)
 		.Func = fn
 		.obj = nil               // c++ generator fails otherwise
+		.ID = ID
+
+	constructor (|message| s, |uint64| ID=0)
+		cpp_part Msg
+		super.constructor(s.name)
+		.Func = s.func
+		.obj = nil
 		.ID = ID
 
 	constructor
@@ -49,7 +56,7 @@ class MessageID (stringshared)
 		.ID = 0
 		
 		
-	function Msg (|message| parent, |message|)
+	function Msg (|message| parent=nil, |message|)
 		return Message(parent, .func, -1, .name, .name.length)
 
 	module
@@ -60,85 +67,3 @@ class MessageID (stringshared)
 				return diff > 0							// more frequent should have lower lengths
 				
 			return aa|uint64| < bb|uint64|
-
-/*function Message.Identify (|&Messagecompressor| d,  |[messageid]| table, |int|)
-	opt NoRefCounts
-	|| s = self
-	|| Count = 0
-	while s
-		|| name = s.name
-		|| Found = d.makeplace(s)|&messageID|
-		|| ID = *found
-		if ID != nil
-			ID.mTag++
-		  else
-			rz += name.Length				// a direct result within self
-			id = MessageID(name, s.func, 0)
-//			id.Position = Count++
-			*found = id
-			if table != nil
-				table <~ id
-		s.Name = id
-		s = s.flatnext
-
-
-struct MessageDecompressor
-	linkage:cpp_part Mxpd
-	|(&Message--)?|					End
-	|(&Message--)?|					Curr
-	|(&Message--)?|					Table
-
-	helper Allocate (|bool|)
-		require StdErr.ok
-		
-		|| pos = .Curr - .Table
-		|| Amount = (pos*2) max 4K
-		|| rz = Memory.realloc(.table, Amount * platform.PointerBytes)|&message|
-			
-		expect rz ("jbin decompressor can't allocate")
-		.Table = rz
-		.Curr = rz + pos
-		.End = rz + Amount
-		return true
-	
-	syntax append (|Message| New, |bool|)
-		|| c = .Curr
-		if c >= .End
-			require .Allocate
-			c = .curr
-		*c++ = New
-		.Curr = c
-		return true
-	
-	destructor
-		memory.Free(.Table)
-		.End = nil
-		.Table = nil
-		.Curr = nil
-	
-
-
-struct MessageCompressor
-	linkage:cpp_part MCmp
-	|(dictionary of messageID)[64]| D
-	|int|			Position
-	
-	function MakePlace (|message| m, |&byte|)
-		opt norefcounts
-		|| fn = m.func
-		if fn|int| < 64
-			|| pl = &.d[fn]
-			|| v = (*pl) init dictionary()
-			return v.MakePlace(m.name)|&byte|
-
-	function Find (|message| m, |MessageID|)
-		opt norefcounts
-		|| where = .MakePlace(m)|&messageID|
-			|| f = *where
-				return f
-			*where = MessageID(m.name, m.func, .Position++)
-		return nil
-		
-	destructor
-
-*/
