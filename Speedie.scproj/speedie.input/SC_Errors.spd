@@ -71,7 +71,7 @@ function Compiler.PrintErrors (|errorseverity| MinSev)
 		print s
 
 
-function Compiler.RenderErrors (|errorreceiver| stderr, |errorseverity| MinSev, |string|)
+function Compiler.RenderErrors (|errorreceiver| stderr, |errorseverity| MinSev, |string|) // render_errors
 	|| Printable = stderr.problemcount+stderr.errorcount 
 	if (Printable and minsev < errorseverity.problem)
 		minsev = errorseverity.problem
@@ -100,7 +100,7 @@ function Message.FileLocation (|string|)
 	return .file$.path
 
 
-function Error.Improve
+function Error.Improve					// sc_improve 
 	opt norefcounts
 	|| node = FindBytePos( .node )		#require
 	
@@ -109,8 +109,7 @@ function Error.Improve
 
 	if !.path
 		|| SC = node.File$
-		
-		if sc != .node.file
+		if SC != .node.file
 			.node = node // wrong file!!
 		if sc.exists
 			.path = sc.path
@@ -181,6 +180,7 @@ extend Error
 		|| f = .SCOriginalData	#require
 		return .LinePos( f )
 	
+	
 	function SCLineIdentifiers (|faststring|fs, |string| Data)
 		if (!.HasPosition)
 			|| fn = .node.MsgOwningFunc #require // fallback...
@@ -249,3 +249,4 @@ extend Error
 
 
 || ErrorDelayer = ErrorReceiver()
+

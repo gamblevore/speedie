@@ -674,7 +674,7 @@ function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nils
 		fs <~ raw
 	fs <~ ':'
 	fs <~ ' '
-	where.OrigRender(fs)
+	fs <~ where.OrigRender
 	if To
 		fs <~ " to "
 		if where.isfirst and to.cls

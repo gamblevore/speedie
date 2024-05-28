@@ -283,11 +283,23 @@ struct ArchonPurger
 
 
 			
-function message.OrigRender	(|faststring| fs = nil, |string|)
+function message.OrigRender	(|string|)
 	opt norefcounts
-	|| n = .OrigMsg
-		return n.Render(fs)
-	return .Render(fs)
+	|| n  = .OrigMsg
+	|| fs = faststring()
+
+	if n and n != self
+		n.Render(fs)
+		n = self
+		if self is inserted
+			fs <~ " ("
+			.render(fs)
+			fs <~ ")"
+	  else
+		.Render(fs)
+	
+	return fs
+
 
 
 function message.OrigMsg (|message|)
