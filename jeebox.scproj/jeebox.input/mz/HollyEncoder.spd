@@ -12,7 +12,7 @@ helper StringReader.HollyPart (|message| root, |stringreader|)
 			rz = nil
 
 
-function StringReader.Holly (|message|)
+function StringReader.UnHoly (|message|)
 	|| root    = .NextMsg(@tmp, "ћ")
 	|| Strings = .HollyPart(root)
 	|| Types   = .HollyPart(root)
@@ -60,7 +60,7 @@ helper StringReader.HollyDecode (|StringReader| Str,  |StringReader| Ty,  |Strin
 struct ћ
 	|(dictionary of messageID)[64]| D
 	
-	function Compress (|message!| root, |int| mode, |jbin| fs)
+	function Compress (|message!| root, |int| mode, |jbin!| fs)
 		fs <~ _JbinHeader
 		fs.enter(@tmp, "ћ")
 		|| tree = FastString()
@@ -118,17 +118,20 @@ struct ћ
 	
 	module
 		function TestHolly (|file| input)
-			return 
 			require input.MustExist
 			|| p = input.path
 			if input isa "jbin"
 				p = input.trimext
-			|| out = p.addext("hol").file 
-			|| back = p.addext("back").file
-			input.file.parse.Holly(out)
-			"${input.size.strsize} compressed to ${out.size.strsize}"
-			|| msg = out.in.holly()				#require
-			msg.renderjbin(back.out)
-			if back.CompareFile(input, input)
-				printline "Holly Tested OK: " + input
+			|ћ| Hol
+			|| out = p.AddExt("hol").file
+			|| back = p.AddExt("back").file
+			|| pp = input.parse
+			|| sout = out.out
+			if pp and sout
+				Hol.Compress(pp, -1, sout)
+				"${input.size.strsize} compressed to ${out.size.strsize}"
+				|| msg = out.in!.unholy
+					msg.renderjbin(back.out)
+					if back.CompareFile(input, input)
+						"Holly Tested OK: $input"
 
