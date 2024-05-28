@@ -32,7 +32,8 @@ extend message
 			ch			= curr.FlatNextDepth(depth)
 			js.Add(curr.func, curr.name, depth > 0)
 			js.exit(-depth)
-	
+
+
 
 role JBin (Faststring)
 	linkage: cpp_part bin
@@ -116,6 +117,7 @@ role JBin (Faststring)
 		.hint(c)
 		.length = CurrLen
 		--.NoFlush
+
 
 
 datatype jbinLeaver (int)
