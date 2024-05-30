@@ -160,7 +160,7 @@ struct ћ
 				.types <~ id.func										// TYPES
 				.lengths.AppendSmall(id.length)							// LENGTHS
 		
-		"sorting ${.palette.length} items"
+//		"sorting ${.palette.length} items"
 		(&MessageID.ByFreq).sort(.Palette) // this is awful. we need a way to do this but faster.
 		for i in 64
 			|| t = .Palette[i] #loop

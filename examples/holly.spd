@@ -1,18 +1,19 @@
 #!/usr/local/bin/spd
 
 main (|[existingfile]| files)
-	CompressionStats.All.Live = true
+//	CompressionStats.All.Live = true
 	for f in files
 		|| d = f.ReadAll#loop
 		"$f: ${f.size.strsize}"
-//		|| mz = d.compress
-//		"µz: ${mz.strsize}"
+		|| mz = d.compress
+		"    µz: ${mz.strsize}"
 		|| s = d.parse
-			"parsed $f"
+//			"    parsed $f"
 			|| out = f.AddExt("hol").out
 				s.hollyencode(out)
-				"hol: ${out.streamlength.strsize}"
-				out.flush
-				|| back = out.File.parse
-				message.treecompare(back, s)				
+				"    hol: ${out.streamlength.strsize}"
+				if app.yes("dbg")
+					out.flush
+					|| back = out.File.parse
+					message.treecompare(back, s)				
 
