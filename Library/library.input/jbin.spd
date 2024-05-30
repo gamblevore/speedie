@@ -63,7 +63,6 @@ role JBin (Faststring)
 
 
 	function AddComp (|faststring| fs, |int| strength=mzlab.strongest)
-		CompressionStats.All.Clear
 		if strength > 0
 			|| Place = .OpenSection
 			fs.compressinto(self, strength)

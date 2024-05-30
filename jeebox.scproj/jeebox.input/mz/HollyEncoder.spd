@@ -1,6 +1,8 @@
 
 
 // Holistic Jeebox Compressor
+// !!Experimental!!
+// !!TESTS SHOW IT NEEDS MORE WORK TO IMPROVE RATIO!!
 
 
 helper StringReader.HollyPart (|message| root, |stringreader|)
@@ -108,16 +110,25 @@ struct ћ
 			.Dicts[i] = dictionary()
 	
 	
+	function jbin.addcomp_view (|faststring| src, |int| Strength, |string| name)
+		CompressionStats.All.Clear
+		if CompressionStats.All.Live and name
+			print name
+			print ": "
+		.AddComp(src, strength)
+		CompressionStats.All.Clear
+
+
 	function Encode (|message!| root, |jbin!| j)
 		.init
 		j <~ _JbinHeader
 		j.enter(@tmp, "ћ")
 		.EncodeSub(root, j)
-		print "str ", j.addcomp(.strings, 1)
-		print "tyy ", j.addcomp(.types,   1)
-		print "len ", j.addcomp(.lengths, 0)
-		print "com ", j.addcomp(.Common, 0)
-		print "tre ", j.addcomp(.Tree,    0)
+		j.addcomp_view(.strings, 1, "string")
+		j.addcomp_view(.types,   1, "type")
+		j.addcomp_view(.lengths, 1, "length")
+		j.addcomp_view(.Common,  0, "")
+		j.addcomp_view(.Tree,    1, "tree")
 		j.exit
 
 
@@ -169,8 +180,8 @@ struct ћ
 			
 			id.id = OutCount
 			|| Combined = 8 + (Ref<<1) + (depth == 1)
-			hrint(Combined)
-			.tree.AppendSmall(Combined)				// DOWN TREE
+//			hrint(Combined)
+			.tree.AppendSmall(Combined)									// DOWN TREE
 			OutCount++
 			if depth < 0
 				depth = -depth
@@ -181,7 +192,6 @@ struct ћ
 			ch = next
 
 		j.AddInt(OutCount)
-		"\n"
 
 	
 	
@@ -193,13 +203,6 @@ struct ћ
 	
 	
 	module {
-	|Stuff[16000]| DBG
-	
-	function Hrint (|int| ref)
-		print ref.Render
-		print ", "
-
-
 	function TestHolly (|file| input)
 		require input.MustExist
 		|| p = input.path
@@ -218,7 +221,3 @@ struct ћ
 				message.TreeCompare(pp, back)
 }
 
-
-struct Stuff
-	|int|			Ref
-	|messageID?|	ID
