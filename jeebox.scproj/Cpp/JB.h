@@ -143,6 +143,8 @@ struct StringLengthSplit;
 
 struct StructSaveTest;
 
+struct xD1x9B;
+
 struct ByteMap_Behaviour;
 
 struct Charset_Behaviour;
@@ -356,6 +358,7 @@ typedef void (*FP_fpMsgRender)(Message* self, FastString* fs);
 //// HEADER Proj.h
 
 struct CompressionStats {
+	bool Live;
 };
 
 struct FastBuff {
@@ -1354,9 +1357,6 @@ int JB_zalgo__InitCode_();
 
 
 
-// xD1x9B
-
-
 // _void
 
 
@@ -1887,6 +1887,9 @@ void JB_StructSaveTest_LoadProperties(StructSaveTest* Self, ObjectLoader* Loader
 
 void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 
+
+
+// JB_ћ
 
 
 // JB_ByteMap_Behaviour

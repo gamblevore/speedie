@@ -257,8 +257,6 @@ struct StringLengthSplit;
 
 struct StructSaveTest;
 
-struct Stuff;
-
 struct xD1x9B;
 
 struct ByteMap_Behaviour;
@@ -755,16 +753,6 @@ struct StructSaveTest {
 	Saveable* Sav;
 	int64 Intt;
 	JB_String* Str;
-};
-
-struct xD1x9B {
-	Dictionary* Dicts[64];
-	FastString* Lengths;
-	FastString* Tree;
-	FastString* Types;
-	FastString* Common;
-	FastString* Strings;
-	Array* Palette;
 };
 
 struct Object_Behaviour {
@@ -5705,31 +5693,10 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 
 
 
-// JB_Stuff
-
-
 // JB_jb_vm
 
 
 // JB_ћ
-void JB_xD1x9B_Destructor(xD1x9B* Self);
-
-void JB_xD1x9B_Encode(xD1x9B* Self, Message* Root, FastString* J);
-
-void JB_xD1x9B_EncodeSub(xD1x9B* Self, Message* Ch, FastString* J);
-
-MessageID* JB_xD1x9B_Find(xD1x9B* Self, Message* M);
-
-void JB_xD1x9B_init(xD1x9B* Self);
-
-MessageID** JB_xD1x9B_MakePlace(xD1x9B* Self, Message* M);
-
-int JB_xD1x9B__Init_();
-
-int JB_xD1x9B__InitCode_();
-
-void JB_xD1x9B__TestHolly(JB_File* Input);
-
 
 
 // JB_ByteMap_Behaviour
@@ -6278,8 +6245,6 @@ void JB_FS_AppendObjectOrNil(FastString* Self, JB_Object* O);
 
 void JB_FS_AppendQuotedEscape(FastString* Self, JB_String* S);
 
-void JB_FS_AppendSmall(FastString* Self, uint64 N);
-
 void SC_FS_appendvoid(FastString* Self, JB_String* S, byte Extra);
 
 void SC_FS_AppendWidth(FastString* Self, JB_String* S, int Width);
@@ -6289,8 +6254,6 @@ void SC_FS_CArrayAdd(FastString* Self, JB_String* S);
 void SC_FS_CArrayAddB(FastString* Self, byte B);
 
 void SC_FS_CArrayAddB0(FastString* Self, byte B);
-
-void JB_FS_CompressInto(FastString* Self, JB_Object* Fs, int Strength, CompressionStats* St);
 
 void JB_FS_EncodeLength(FastString* Self, uint64 N);
 
@@ -6786,8 +6749,6 @@ int JB_Str_FindTrailingSlashes(JB_String* Self);
 
 double JB_Str_Float(JB_String* Self);
 
-StringReader* JB_Str_In(JB_String* Self, JB_String* Header, int ChunkSize);
-
 int64 JB_Str_Int(JB_String* Self);
 
 JB_String* SC_Str_InterfaceToBehaviour(JB_String* Self);
@@ -6936,8 +6897,6 @@ JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in);
 
 JB_String* JB_Str_Shorten(JB_String* Self, int N);
 
-JB_String* JB_Str_TrimExt(JB_String* Self);
-
 JB_String* JB_Str_TrimExtAndPath(JB_String* Self, bool KeepPath);
 
 JB_String* JB_Str_TrimFirst(JB_String* Self, byte B);
@@ -6996,8 +6955,6 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 
 StringReader* JB_SS_Constructor(StringReader* Self, JB_String* Data);
 
-StringReader* JB_SS_ConstructorFile(StringReader* Self, JB_File* File, int ChunkSize);
-
 JB_String* JB_SS_Decompress(StringReader* Self, int Lim, CompressionStats* St, bool Multi);
 
 bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, CompressionStats* St);
@@ -7009,16 +6966,6 @@ bool JB_SS_ExpectJbin(StringReader* Self);
 bool JB_SS_HasAny(StringReader* Self);
 
 int64 JB_SS_hInt(StringReader* Self);
-
-void JB_SS_HollyBuildCommon(StringReader* Self, StringReader* Common, Array* Palette, Array* Out);
-
-int JB_SS_HollyBuildPalette(StringReader* Self, StringReader* Str, StringReader* Ty, StringReader* Ln, Array* Palette);
-
-Message* JB_SS_HollyDecode(StringReader* Self);
-
-Message* JB_SS_HollyDecodeSub(StringReader* Self, StringReader* Tree, Array* Palette, Array* Common, Array* Recent);
-
-StringReader* JB_SS_HollyPart(StringReader* Self, Message* Root);
 
 bool JB_SS_IsCompressed(StringReader* Self);
 
@@ -7050,15 +6997,11 @@ int JB_SS_Remaining(StringReader* Self);
 
 void JB_SS_Reset(StringReader* Self, JB_String* Data);
 
-uint64 JB_SS_Small(StringReader* Self);
-
 JB_String* JB_SS_Str(StringReader* Self, int N, int Skip);
 
 JB_String* JB_SS_StrNoAdvance(StringReader* Self, int N, int Skip);
 
 void JB_SS_SyntaxExpect(StringReader* Self, JB_String* Error);
-
-bool JB_SS_Test(StringReader* Self, JB_String* Header);
 
 
 
@@ -7274,11 +7217,7 @@ JB_String* JB_File__Speedie();
 // JB_JBin
 jbinLeaver JB_bin_Add(FastString* Self, Syntax Type, JB_String* Name, bool Into);
 
-jbinLeaver JB_bin_AddFS(FastString* Self, Syntax Type, FastString* Fs, bool Into);
-
 void SC_bin_Add(FastString* Self, ASMFunc* Fn);
-
-void JB_bin_AddComp(FastString* Self, FastString* Fs, int Strength);
 
 void JB_bin_AddInt(FastString* Self, int64 Name);
 
@@ -8305,17 +8244,9 @@ void JB_Msg__TreeComparePrint(Message* Orig);
 // JB_MessageID
 MessageID* JB_ID_Constructor(MessageID* Self, JB_String* Name, Syntax Fn, uint64 ID);
 
-MessageID* JB_ID_ConstructorMsg(MessageID* Self, Message* S, uint64 ID);
-
-MessageID* JB_ID_ConstructorEmpty(MessageID* Self);
-
 void JB_ID_Destructor(MessageID* Self);
 
-Message* JB_ID_Msg(MessageID* Self, Message* Parent);
-
 JB_String* JB_ID_Render(MessageID* Self, FastString* Fs_in);
-
-bool JB_ID__ByFreq(JB_Object* A, JB_Object* B);
 
 bool JB_ID__ByID(JB_Object* A, JB_Object* B);
 
@@ -9680,8 +9611,6 @@ inline bool JB_FastBuff_AppendU8(FastBuff* Self, byte V);
 
 inline bool JB_File_SyntaxCast(JB_File* Self);
 
-inline bool JB_ID_SyntaxCast(MessageID* Self);
-
 inline bool JB_Ind_SyntaxCast(Ind Self);
 
 inline Syntax JB_Msg_Func(Message* Self);
@@ -9744,6 +9673,8 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, NilState New);
 
 inline void SC_nil__DeclKill();
 
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
+
 inline NilRecord SC_nil__Value();
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
@@ -9759,8 +9690,6 @@ inline bool SC_Reg_SyntaxCast(AsmReg Self);
 inline int SC_Reg_ToInt(AsmReg Self);
 
 inline NilRecord SC_nil__EndBlock();
-
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
@@ -9798,10 +9727,6 @@ inline bool JB_FastBuff_AppendU8(FastBuff* Self, byte V) {
 }
 
 inline bool JB_File_SyntaxCast(JB_File* Self) {
-	return Self != nil;
-}
-
-inline bool JB_ID_SyntaxCast(MessageID* Self) {
 	return Self != nil;
 }
 
@@ -9959,6 +9884,16 @@ inline void SC_nil__DeclKill() {
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 }
 
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
+	ASMtmp T = SC_Msg_ASMType(Msg);
+	if (T) {
+		return (SC__nil_NilTable[T])(Msg, Test);
+	}
+	T = ((ASMtmp)Msg->Func);
+	(SC_Msg_ASMTypeSet(Msg, T));
+	return (SC__nil_NilTable[T])(Msg, Test);
+}
+
 inline NilRecord SC_nil__Value() {
 	return SC_nil_Value((&SC__nil_T));
 }
@@ -9975,10 +9910,6 @@ inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 	AsmReg Rz = ((AsmReg)0);
 	ASMtmp T = SC_Msg_ASMType(Exp);
 	fn_asm Fn = SC_fn_asm_table[T];
-	if (!T) {
-		Fn = SC_fn_asm_table[((int)Exp->Func)];
-		debugger;
-	}
 	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen)) {
 		debugger;
 		// Can't close declarations in args!;
@@ -9988,10 +9919,6 @@ inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 	}
 	 else {
 		Rz = (Fn)(Self, Exp, Dest, 0);
-	}
-	int Dd = SC_Reg_Reg(Dest);
-	if (((bool)Dd) and (SC_Reg_Reg(Rz) != Dd)) {
-		//FFFFFFASSDJKLASDM<>AS;
 	}
 	return Rz;
 }
@@ -10013,16 +9940,6 @@ inline NilRecord SC_nil__EndBlock() {
 	Rz = SC_nil__Value();
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 	return Rz;
-}
-
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
-	ASMtmp T = SC_Msg_ASMType(Msg);
-	if (T) {
-		return (SC__nil_NilTable[T])(Msg, Test);
-	}
-	T = ((ASMtmp)Msg->Func);
-	(SC_Msg_ASMTypeSet(Msg, T));
-	return (SC__nil_NilTable[T])(Msg, Test);
 }
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
