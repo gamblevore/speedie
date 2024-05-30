@@ -159,8 +159,9 @@ struct ћ
 				.strings <~ id											// STRINGS
 				.types <~ id.func										// TYPES
 				.lengths.AppendSmall(id.length)							// LENGTHS
-				
-		(&MessageID.ByFreq).sort(.Palette)
+		
+		"sorting ${.palette.length} items"
+		(&MessageID.ByFreq).sort(.Palette) // this is awful. we need a way to do this but faster.
 		for i in 64
 			|| t = .Palette[i] #loop
 			.Common.AppendSmall(t.id)
@@ -195,11 +196,9 @@ struct ћ
 
 	
 	
-	helper message.HollyEncode (|string|)
-		|| fs = faststring()
+	helper message.HollyEncode (|faststring| fs)
 		|ћ| Hol
 		hol.encode(self, fs)
-		return fs
 	
 	
 	module {

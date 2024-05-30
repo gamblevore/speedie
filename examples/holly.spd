@@ -4,11 +4,15 @@ main (|[existingfile]| files)
 	CompressionStats.All.Live = true
 	for f in files
 		|| d = f.ReadAll#loop
+		"$f: ${f.size.strsize}"
+//		|| mz = d.compress
+//		"µz: ${mz.strsize}"
 		|| s = d.parse
-			|| hol = s.hollyencode
-			|| mz = d.compress
-			f.AddExt("hol") <~ hol
-			"$f: ${f.size.strsize}
-	hol: ${hol.strsize}
-	µz: ${mz.strsize}
-"
+			"parsed $f"
+			|| out = f.AddExt("hol").out
+				s.hollyencode(out)
+				"hol: ${out.streamlength.strsize}"
+				out.flush
+				|| back = out.File.parse
+				message.treecompare(back, s)				
+
