@@ -10,6 +10,8 @@
 // format. the thing is, hol only works on jbin. Still... it can have an optional "wrap"
 // setting...
 // also seems to be corrupting data...
+// someone also tried encoding my tree offsets as LEB... and it came out smaller? wow.
+// unexpected.
 
 
 helper StringReader.HollyPart (|message| root, |stringreader|)
@@ -167,7 +169,6 @@ struct ћ
 				.types <~ id.func										// TYPES
 				.lengths.AppendSmall(id.length)							// LENGTHS
 		
-//		"sorting ${.palette.length} items"
 		(&MessageID.ByFreq).sort(.Palette) // this is awful. we need a way to do this but faster.
 		for i in 64
 			|| t = .Palette[i] #loop
@@ -187,7 +188,7 @@ struct ћ
 					Ref = 73 + (OutCount - ID.id)
 			
 			id.id = OutCount
-			dbg(ref, id)
+			ћ.dbg(ref, id, OutCount)
 			|| Combined = 8 + (Ref<<1) + (depth == 1)
 			.tree.AppendSmall(Combined)									// DOWN TREE
 			OutCount++
@@ -210,7 +211,7 @@ struct ћ
 	
 	module {
 	
-	helper dbg (|int| ref, |messageid| id)
+	helper dbg (|int| ref, |messageid| id, |int| pos)
 		"$ref --> $id"
 	
 	helper TestHolly (|file| input)
