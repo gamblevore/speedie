@@ -34,3 +34,4 @@ examples/prototest.spd
 examples/prototest
 Speedie.scproj/BuildTest/strings.txt
 examples/encoding_test(ignore).spd
+*.hol

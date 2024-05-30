@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[583];
+extern JB_StringC* JB_LUB[591];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -3765,6 +3765,7 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver) {
 	JB_Saver_AppendInt(Saver, Self->Intt);
 	JB_Saver_AppendString(Saver, Self->Str);
 }
+
 
 
 
@@ -8344,7 +8345,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024052412);
+	return (2024052814);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8356,4 +8357,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 2222403852153970606 2379300365067640975
+// 7796578953066441599 -2393990118947162116 1407462364652115131

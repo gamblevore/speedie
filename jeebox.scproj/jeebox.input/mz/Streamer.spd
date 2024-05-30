@@ -14,7 +14,6 @@ function StringReader.CompressInto (|object| dest, |int|Strength=mzlab.default, 
 		|| str = .str(1MB)
 		|| Place = j.OpenSection
 		j.CompressChunk(str)
-		
 		j.CloseSection(Place)
 		st.LiveUpdate(str.length, j.length - place)
 		if !.NoMoreChunks
@@ -33,7 +32,7 @@ helper StringReader.DecompressInto (|object| dest, |int| lim=int.max, |&compress
 	st := compressionstats.all
 
 	|| OK = StdErr.Mark
-	check (.isjbin) (self, _jBinNotJbin)
+	.ExpectJbin
 	
 	|| mz = .NextMsg
 	if mz == @arg // remove this later

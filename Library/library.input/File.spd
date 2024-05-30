@@ -66,9 +66,9 @@ class File (String)
 		opt norefcounts // what? why is this necessary?
 		RETURN self != nil
 
-	syntax cast (|faststring|)
-		cpp_part CastToStream
-		return .out
+//	syntax cast (|faststring|)
+//		cpp_part CastToStream
+//		return .out
 
 	syntax equals (|string|s, |bool| aware, |bool|)
 		if self != nil

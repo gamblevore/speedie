@@ -1,0 +1,10 @@
+#!/usr/local/bin/spd
+
+main (|existingfile| file)
+	|| s = file.parse
+		CompressionStats.All.Live = true
+		|| str = s.hollyencode
+		file.AddExt("hol") <~ str
+		str.hollydecode
+		"in: ${file.size.strsize}"
+		"out: ${str.strsize}"

@@ -4,7 +4,7 @@
 // Just... share strings, and IDs, the rest can be chucked.
 
 helper StringReader.HollyPart (|message| root, |stringreader|)
-	|| s = .NextMsg(root, @nil)
+	|| s = .NextMsg(root)
 		if s == @bin
 			s.name = s.name.Decompress
 		rz = s.name.Stream()
@@ -12,19 +12,24 @@ helper StringReader.HollyPart (|message| root, |stringreader|)
 			rz = nil
 
 
-function StringReader.UnHoly (|message|)
+function String.HollyDecode (|message|)
+	return .Stream.hollydecode
+
+function StringReader.HollyDecode (|message|)
+	require .ExpectJbin
 	|| root    = .NextMsg(@tmp, "ћ")
+	|| Count = .nextmsg(root).int
 	|| Strings = .HollyPart(root)
 	|| Types   = .HollyPart(root)
 	|| lengths = .HollyPart(root)
 	|| Tree    = .HollyPart(root)
 		|[messageid]| table = []
-		table <~ (messageID(), Types!.hInt)
-		rz = .HollyDecode(strings!, types, lengths!, tree!, table!)
+		table <~ (messageID(), Count)
+		rz = .HollyDecodeSub(strings!, types!, lengths!, tree!, table!)
 
 
 
-helper StringReader.HollyDecode (|StringReader| Str,  |StringReader| Ty,  |StringReader| Ln,  |StringReader| Tree,  |[messageid]| table,  |message|)
+helper StringReader.HollyDecodeSub (|StringReader| Str,  |StringReader| Ty,  |StringReader| Ln,  |StringReader| Tree,  |[messageid]| table,  |message|)
 	opt norefcounts
 
 	|| Found = 0
@@ -35,18 +40,16 @@ helper StringReader.HollyDecode (|StringReader| Str,  |StringReader| Ty,  |Strin
 		table[Found++] = MessageID(Str.str(Ln.Small), fn, found)
 	(Found == table.Length)							#expect (self, "Too few IDs")
 	
-	Tree.Small
-	|| TM = table[0]								#expect (self, "No nodes found")
-	|| parent = TM.msg
+	|message| parent
 	Found = 0
-	rz = parent
 	while Tree.HasAny
 		|| Raw = Tree.Small - 8
 		if Raw < 0
-			parent = parent.Upward(-Raw)			#expect (self, "Went up too far")
+			parent = parent.Upward(9+Raw)
+			if !parent
+				!(tree.hasany)						#check (self, "Went up too far")
 			continue
 		|| ID = raw>>1
-		if ID
 			ID = found - ID
 		  else
 			ID = found++
@@ -54,84 +57,83 @@ helper StringReader.HollyDecode (|StringReader| Str,  |StringReader| Ty,  |Strin
 		|| Down = mid.msg(parent)
 		if Raw & 1
 			parent = Down
+			rz := down
 
 
 
-struct ћ
-	|(dictionary of messageID)[64]| D
+module ћ     ////  Should keep entire table of every item... and update the IDs to the latest position.
+			 ////  Shrinks the offset size!
 	
-	function Compress (|message!| root, |int| mode, |jbin!| fs)
-		fs <~ _JbinHeader
-		fs.enter(@tmp, "ћ")
+	function Encode (|message!| root, |jbin!| j)
+		|(dictionary of messageID)[64]| D
+		j <~ _JbinHeader
+		j.enter(@tmp, "ћ")
 		|| tree = FastString()
 		|| lengths = FastString()
 		|| types = FastString()
-		|| Strings = .Encode(root, tree, lengths, types)		
-		fs.addcomp(strings, mode&1)
-		fs.addcomp(types,   mode&2)
-		fs.addcomp(lengths, mode&4)
-		fs.addcomp(Tree,    mode&8)
-		fs.exit
-		for i in –count .d
-			.d[i] = nil
+		|| strings = faststring()
+		|| Count = .EncodeSub(root, tree, lengths, types, strings, &d[0])
+		j.AddInt(count)
+		j.addcomp(strings, 1)
+		j.addcomp(types,   1)
+		j.addcomp(lengths, 0)
+		j.addcomp(Tree,    0)
+		j.exit
+		for i in –count d
+			d[i] = nil
 
 
-	function MakePlace (|message| m, |&messageID|)
+	helper MakePlace (|message| m, |&(dictionary of messageID)| D, |&messageID|)
 		opt norefcounts
-		|| pl = &.d[(m.func)|int| & 63]
+		|| pl = &d[(m.func)|int| & 63]
 		|| v = (*pl) init dictionary()
 		return v.MakePlace(m.name)|&messageID|
 
 
-	function Encode (|Message| s,  |faststring| tree, |faststring| lengths, |faststring| types,  |faststring!|)
+	helper EncodeSub (|Message| s, |FastString| tree, |FastString| lengths, |FastString| types, |FastString!| strings, |&(dictionary of messageID)| D, |int|)
 		opt NoRefCounts
-		rz = FastString()
-		|| Table = 0
 		while s
+			|| Where = .MakePlace(s, d)
 			|| depth = 0
-			|| next = s.FlatNextDepth(depth)
-			while depth < 0												// GO UP TREE
-				|| item = -depth min 8
-				tree <~ (item-1)|byte|
-				depth += item
+			|| Next = s.FlatNextDepth(depth)
 			
-			|| Found = .MakePlace(s)
 			|| Back = 0
-			ifn found[0]
-				|| id = MessageID(s, table++),  *found = id				// (internal)
-				types <~ s.func											// TYPES
-				rz <~ id												// STRINGS
-				lengths.AppendSmall(id.length)							// LENGTHS
+			|| Found = Where[0]
+				Back = rz - found.id
 			  else
-				Back = table - found.id
+				|| id = MessageID(s, rz++),  *where = id				// (internal)
+				types <~ s.func											// TYPES
+				strings <~ id											// STRINGS
+				lengths.AppendSmall(id.length)							// LENGTHS
 		
-			tree.AppendSmall(Back<<1 + depth)							// TREE
+			|| DOWN = depth max 0										// 1 or 0
+			tree.AppendSmall(8 + (Back<<1) + DOWN)						// DOWN TREE
+			if depth < 0
+				depth = -depth
+				while depth												// UP TREE
+					|| item = depth min 8
+					tree <~ (item-1)|byte|
+					depth -= item
 			s = next
 	
 	
-	helper message.Holly (|int| Mode=-1, |string|)
-		|ћ| Hol
-		|| fs = jbin()
-		Hol.Compress(self, Mode, fs)
+	helper message.HollyEncode (|string|)
+		|| fs = faststring()
+		ћ.encode(self, fs)
 		return fs
 	
 	
-	module
-		function TestHolly (|file| input)
-			require input.MustExist
-			|| p = input.path
-			if input isa "jbin"
-				p = input.trimext
-			|ћ| Hol
-			|| out = p.AddExt("hol").file
-			|| back = p.AddExt("back").file
-			|| pp = input.parse
-			|| sout = out.out
-			if pp and sout
-				Hol.Compress(pp, -1, sout)
-				"${input.size.strsize} compressed to ${out.size.strsize}"
-				|| msg = out.in!.unholy
-					msg.renderjbin(back.out)
-					if back.CompareFile(input, input)
-						"Holly Tested OK: $input"
 
+	function TestHolly (|file| input)
+		require input.MustExist
+		|| p = input.path
+		if input isa "jbin"
+			p = input.trimext
+		|| out = p.AddExt("hol").file
+		|| pp = input.parse
+		|| sout = out.out
+		if pp and sout
+			ћ.encode(pp, sout)
+			sout = nil
+			|| back = out.in!.HollyDecode
+				message.treecompare(pp, back)

@@ -479,15 +479,22 @@ function Minus			(fn_asm)					// -a
 
 
 		
-function SlowerCountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| src, |int| Amount, |asmreg|)
-	|| d = f.FastDecl
-	if d isnt local
-		ifn (amount <= 63  and  amount >= -64)
-			debugat // aren't these done by containsaddr?
-		.µ(f, src.set)
+function SlowerCountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| src, |int64| Amount, |asmreg|)
+	if mode & IncrAfter
+		// still need to read and write
+		.Assign(dest, src, asmreg(), f)
+		|| b = .AddConstant(f, src, src, amount )
+		if b!=src // what?
+	  else
+		|| b = .AddConstant(f, src, src, amount )
+		if b!=src // what?
+		.Assign(dest, src, asmreg(), f)
+		
+		
+	.µ(f, dest.set)
 
 
-function CountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| src, |int| Amount, |asmreg|)
+function CountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| src, |int64| Amount, |asmreg|)
 	ifn  dest.isint  and  amount <= 63  and  amount >= -64
 		return SlowerCountOnAddr(self, f, dest, mode, src, amount)
 	|| opp = (ASM.CNTC, ASM.CNTD)(mode & IncrAfter)	

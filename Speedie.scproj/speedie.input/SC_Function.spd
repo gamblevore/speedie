@@ -813,7 +813,7 @@ function FillInMissingConstructorDefaults (|Message| root, |Message| AfterHere)
 	// fillindefaultconstructor, fillconstructordefaults, defaultconstructors, fillinconstructor
 	opt norefcounts
 	|| cls = .cls$
-	|| oof = .ConstructorLinePlace!
+	|| oof = .ConstructorLinePlace$
 	using (oof)
 	
 	for (d.backwards in cls.Properties)

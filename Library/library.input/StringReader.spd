@@ -12,10 +12,7 @@ class StringReader
 	linkage:cpp_Part SS
 	
 	constructor (|string| Data)
-		.data.readfrom = Data
-		.length = Data.length
-		._NoMoreChunks = true
-	
+		.reset(Data)
 	
 	constructor (|file!| file, |int| ChunkSize=4MB)
 		cpp_part ConstructorFile
@@ -24,6 +21,11 @@ class StringReader
 		.ChunkSize = chunksize
 		.length = file.size
 		.ReadChunk(file)
+	
+	function Reset (|string| Data)
+		.data.readfrom = Data
+		.length = Data.length
+		._NoMoreChunks = true
 
 	function ReadAll (|string|)
 		return .str(.length - .startfrom)
@@ -105,6 +107,15 @@ class StringReader
 		if b < 224
 			return b
 		return 32 + ((.hint<<5) ||| (b-224))
+
+
+	function faststring.AppendSmall (|uint64| n)
+		if n < 224
+			self <~ n|byte|
+		  else
+			n -= 32
+			self <~ (224+(n & 31))|byte|
+			.hInt(n>>5)
 
 
 	function hInt (|int64|)

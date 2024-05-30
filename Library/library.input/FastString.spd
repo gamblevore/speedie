@@ -71,13 +71,6 @@ class FastString {
 		cpp_wrapper JB_FS_SmartResult
 	function Copy (|string|)
 		cpp_wrapper JB_FS_Copy
-
-	function AppendSmall (|uint64| n)
-		if n < 224
-			self <~ n|byte|
-		  else
-			self <~ (224+(n & 31))|byte|
-			.hInt(n>>5)
 		
 	function hInt (|uint64| n)
 		while

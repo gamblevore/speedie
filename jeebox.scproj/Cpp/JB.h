@@ -143,6 +143,8 @@ struct StringLengthSplit;
 
 struct StructSaveTest;
 
+struct xD1x9B;
+
 struct ByteMap_Behaviour;
 
 struct Charset_Behaviour;
@@ -1884,6 +1886,9 @@ void JB_StructSaveTest_LoadProperties(StructSaveTest* Self, ObjectLoader* Loader
 
 void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 
+
+
+// JB_ћ
 
 
 // JB_ByteMap_Behaviour

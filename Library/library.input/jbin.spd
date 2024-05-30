@@ -65,6 +65,7 @@ role JBin (Faststring)
 	function AddComp (|faststring| fs, |int| strength=mzlab.strongest)
 		if strength > 0
 			|| Place = .OpenSection
+			CompressionStats.All.Clear
 			fs.compressinto(self, strength)
 			.CloseSection(Place)
 		  else
@@ -139,7 +140,7 @@ datatype jbinLeaver (int)
 						  
 	
 
-function StringReader.NextMsg (|message| parent=nil, |syntax| fn, |string| name=nil,  |Message|)
+function StringReader.NextMsg (|message| parent=nil, |syntax| fn=@nil, |string| name=nil,  |Message|)
 	cpp_part NextMsgExpect
 	opt norefcounts
 	rz = .NextMsg #require
@@ -177,8 +178,13 @@ function StringReader.IsJBin (|bool|)
 	return .str(4).IsJbin
 	
 	
+function StringReader.ExpectJbin (|bool|)	
+	if .IsJBin: return true
+	error (Self, _jBinNotJbin)
+
+
 function StringReader.ParseJbin (|int64| Remain=int64.max, |MessageRoot|)	
-	expect .IsJBin (Self, _jBinNotJbin )
+	require .ExpectJbin
 	.UserObj = nil
 	rz = .NextMsg
 	while --Remain > 0

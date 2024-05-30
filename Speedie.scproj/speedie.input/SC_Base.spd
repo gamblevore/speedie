@@ -91,7 +91,7 @@ function FindModuleMsg (|Message| where, |SCNodeFindMode| Mode=0, |SCModule?|)
 
 function scnode.FindClassMsg (|Message| where, |SCNodeFindMode| Mode=scnodefindmode.WantAType,  |SCClass|)
 	opt norefcounts
-	|| mod = .FindModuleMsg(where, Mode)
+	|| mod = .FindModuleMsg(where, Mode ||| SCNodeFindMode.ForClass)
 		|| C = mod.cls
 			return C
 		if mode isnt noerrors
@@ -100,7 +100,7 @@ function scnode.FindClassMsg (|Message| where, |SCNodeFindMode| Mode=scnodefindm
 
 function FindClass (|String| name, |Message| where=nil, |SCNodeFindMode| Mode=0,  |SCClass|)
 	opt norefcounts
-	|| Mod = .FindModule(name, where, Mode)
+	|| Mod = .FindModule(name, where, Mode ||| SCNodeFindMode.ForClass)
 		if mod.cls
 			return mod.cls
 		if Mode isnt noerrors
@@ -136,7 +136,10 @@ function FindModule (|String| name, |Message| where, |SCNodeFindMode| Mode=0, |S
 		upon = upon.FindModuleParent(mode)
 		
 	if where and (Mode isnt noerrors)
-		error (where, "Can’t find module: " + name)
+		if mode is ForClass
+			error (where, "Can’t find class: " + name)
+		  else
+			error (where, "Can’t find module: " + name)
 
 
 function UpCheck (|string| name, |bool| LookUp=true, |SCObject|) {
@@ -993,9 +996,10 @@ datatype SCNodeInfo (int)
 datatype SCNodeFindMode (int)
 	flags
 		|SCNodeFindMode|
-		NoErrors = 1
-		DontGoUp = 2
-		WantAType = 4
+		NoErrors
+		DontGoUp
+		WantAType
+		ForClass
 	syntax is (|SCNodeFindMode| m, |bool|)
 		return self & m
 
