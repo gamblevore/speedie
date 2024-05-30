@@ -25,7 +25,8 @@ class MessageID (stringshared)
 	contains object
 	||					Obj
 	|uint64| 			ID
-	|uint64| 			User // user-value. system doesnt use it.
+	|uint64| 			Frequency	// user-value. system doesnt use it.
+	|int| 				Position	// also
 	|Syntax|			Func
 	
 	render
@@ -60,10 +61,15 @@ class MessageID (stringshared)
 		return Message(parent, .func, -1, .name, .name.length)
 
 	module
-		function IDSorter (SorterComparer)
+		function ByID (SorterComparer)
 			opt norefcounts
 			|| aa = a|MessageID|,   || bb = b|MessageID| 
 			|| diff = bb.ID  -  aa.ID
 				return diff > 0							// more frequent should have lower lengths
 				
 			return aa|uint64| < bb|uint64|
+		
+		function ByFreq (SorterComparer)
+			opt norefcounts
+			|| aa = a|MessageID|,   || bb = b|MessageID| 
+			return bb.Frequency  <  aa.Frequency

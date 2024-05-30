@@ -4,7 +4,9 @@ main (|existingfile| file)
 	|| s = file.parse
 		CompressionStats.All.Live = true
 		|| str = s.hollyencode
+		CompressionStats.All.Live = false
 		file.AddExt("hol") <~ str
+		
 		str.hollydecode
 		"in: ${file.size.strsize}"
 		"out: ${str.strsize}"

@@ -100,7 +100,7 @@ class Array (saveable)
 		|| p = .pop
 			self[pos] = P
 
-	function Sort (|SorterComparer| Srt, |bool| down=false)
+	function Sort (|SorterComparer| Srt, |bool| Reverse=false)
 		cpp_wrapper JB_Array_Sort
 	
 	function Count (|int|)
@@ -185,6 +185,9 @@ class Array (saveable)
 
 
 prototype SorterComparer (|object| a, |object| b, |bool|)
+	function sort (|array| a, |bool| reverse=false)
+		a.sort(self, reverse)
+
 prototype SorterComparer2 (|object| a, |object| b, |int|) // we have two list sort funcs... need to remove one
 //function MySorter (SorterComparer) // should be: sortercomparer of message
 	// sortercomparer should be (|| a, || b, |bool|)... so a contained type, basically!

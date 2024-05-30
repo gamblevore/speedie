@@ -463,7 +463,7 @@ module StringCorrector
 	function IDSort (|bool| IDOrder)
 		opt norefcounts
 		if idorder
-			.list.sort(&messageid.idsorter)
+			(&messageid.byid).sort(.list)
 		  else
 			.list.sort(&string.sorter)
 			for (s in .list) (i)

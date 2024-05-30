@@ -143,8 +143,6 @@ struct StringLengthSplit;
 
 struct StructSaveTest;
 
-struct xD1x9B;
-
 struct ByteMap_Behaviour;
 
 struct Charset_Behaviour;
@@ -1356,6 +1354,9 @@ int JB_zalgo__InitCode_();
 
 
 
+// xD1x9B
+
+
 // _void
 
 
@@ -1888,9 +1889,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 
 
 
-// JB_ћ
-
-
 // JB_ByteMap_Behaviour
 
 
@@ -2348,6 +2346,8 @@ bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, Compress
 
 void JB_SS_Destructor(StringReader* Self);
 
+bool JB_SS_ExpectJbin(StringReader* Self);
+
 bool JB_SS_HasAny(StringReader* Self);
 
 int64 JB_SS_hInt(StringReader* Self);
@@ -2379,6 +2379,8 @@ JB_String* JB_SS_ReadAll(StringReader* Self);
 bool JB_SS_ReadChunk(StringReader* Self, JB_File* F);
 
 int JB_SS_Remaining(StringReader* Self);
+
+void JB_SS_Reset(StringReader* Self, JB_String* Data);
 
 JB_String* JB_SS_Str(StringReader* Self, int N, int Skip);
 

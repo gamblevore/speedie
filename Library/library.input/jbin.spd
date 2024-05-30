@@ -63,13 +63,15 @@ role JBin (Faststring)
 
 
 	function AddComp (|faststring| fs, |int| strength=mzlab.strongest)
+		CompressionStats.All.Clear
 		if strength > 0
 			|| Place = .OpenSection
-			CompressionStats.All.Clear
 			fs.compressinto(self, strength)
 			.CloseSection(Place)
 		  else
 			.add(@str, fs)
+			CompressionStats.all.LiveUpdate(fs.length, fs.length)
+
 		
 	function Sheb		(|string| name)
 		self <~ '#'

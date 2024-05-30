@@ -2960,6 +2960,7 @@ int JB_zalgo__InitCode_() {
 
 
 
+
 bool JB_byte_CanPrintAsNormalChar(byte Self) {
 	return ((Self < 127) and (Self >= 32));
 }
@@ -3765,7 +3766,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver) {
 	JB_Saver_AppendInt(Saver, Self->Intt);
 	JB_Saver_AppendString(Saver, Self->Str);
 }
-
 
 
 
@@ -5371,14 +5371,14 @@ StringReader* JB_SS_Constructor(StringReader* Self, JB_String* Data) {
 	if (Self == nil) {
 		Self = ((StringReader*)JB_NewClass(&StringReaderData));
 	}
+	Self->Length = 0;
 	Self->File = nil;
 	Self->UserObj = nil;
 	Self->ChunkSize = 0;
 	Self->StartFrom = 0;
+	Self->_NoMoreChunks = false;
 	Self->Data = ((FastBuff){});
-	(JB_FastBuff_ReadFromSet((&Self->Data), Data));
-	Self->Length = JB_Str_Length(Data);
-	Self->_NoMoreChunks = true;
+	JB_SS_Reset(Self, Data);
 	return Self;
 }
 
@@ -5416,9 +5416,7 @@ bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, Compress
 		St = (&JB__MzSt_all);
 	}
 	ErrorMarker OK = JB_Rec_Mark(JB_StdErr);
-	if (!JB_SS_IsJBin(Self)) {
-		JB_SS_SyntaxExpect(Self, JB__jBinNotJbin);
-	}
+	JB_SS_ExpectJbin(Self);
 	Message* Mz = JB_Incr(JB_SS_NextMsg(Self));
 	if (JB_Msg_EqualsSyx(Mz, kJB_SyxArg, false)) {
 		JB_SetRef(Mz, JB_SS_NextMsgExpect(Self, nil, kJB_SyxTmp, nil));
@@ -5481,6 +5479,16 @@ bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, Compress
 void JB_SS_Destructor(StringReader* Self) {
 	JB_Clear(Self->File);
 	JB_FastBuff_Destructor((&Self->Data));
+}
+
+bool JB_SS_ExpectJbin(StringReader* Self) {
+	if (JB_SS_IsJBin(Self)) {
+		return true;
+	}
+	if (true) {
+		JB_SS_SyntaxExpect(Self, JB__jBinNotJbin);
+	}
+	return false;
 }
 
 bool JB_SS_HasAny(StringReader* Self) {
@@ -5618,8 +5626,7 @@ int JB_SS_NonZeroByte(StringReader* Self) {
 
 Message* JB_SS_ParseJbin(StringReader* Self, int64 Remain) {
 	Message* Rz = JB_Incr(((Message*)nil));
-	if (!JB_SS_IsJBin(Self)) {
-		JB_SS_SyntaxExpect(Self, JB__jBinNotJbin);
+	if (!JB_SS_ExpectJbin(Self)) {
 		JB_Decr(Rz);
 		return nil;
 	}
@@ -5661,6 +5668,12 @@ bool JB_SS_ReadChunk(StringReader* Self, JB_File* F) {
 
 int JB_SS_Remaining(StringReader* Self) {
 	return Self->Length - JB_SS_Position(Self);
+}
+
+void JB_SS_Reset(StringReader* Self, JB_String* Data) {
+	(JB_FastBuff_ReadFromSet((&Self->Data), Data));
+	Self->Length = JB_Str_Length(Data);
+	Self->_NoMoreChunks = true;
 }
 
 JB_String* JB_SS_Str(StringReader* Self, int N, int Skip) {
@@ -8345,7 +8358,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024052814);
+	return (2024053014);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8357,4 +8370,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 -2393990118947162116 1407462364652115131
+// 7796578953066441599 1365519922800409380 -1638516501031807414
