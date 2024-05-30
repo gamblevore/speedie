@@ -210,9 +210,10 @@ struct ћ
 	
 	
 	module {
+//		|bool|	Lebanese
 	
 	helper dbg (|int| ref, |messageid| id, |int| pos)
-		"$ref --> $id"
+//		"$ref --> $id"
 	
 	helper TestHolly (|file| input)
 		require input.MustExist

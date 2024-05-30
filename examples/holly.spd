@@ -9,7 +9,7 @@ main (|[existingfile]| files)
 		"    µz: ${mz.strsize}"
 		|| s = d.parse
 			|| out = f.AddExt("hol").out
-				s.hollyencode(out)
+				s.HollyEncode(out)
 				"    hol: ${out.streamlength.strsize}"
 				if app.yes("dbg")
 					out.flush
