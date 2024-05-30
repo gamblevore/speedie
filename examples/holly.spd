@@ -3,12 +3,11 @@
 main (|[existingfile]| files)
 //	CompressionStats.All.Live = true
 	for f in files
-		|| d = f.ReadAll#loop
+		|| d = f.ReadAll #loop
 		"$f: ${f.size.strsize}"
 		|| mz = d.compress
 		"    µz: ${mz.strsize}"
 		|| s = d.parse
-//			"    parsed $f"
 			|| out = f.AddExt("hol").out
 				s.hollyencode(out)
 				"    hol: ${out.streamlength.strsize}"

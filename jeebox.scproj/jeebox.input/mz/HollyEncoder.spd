@@ -3,6 +3,13 @@
 // Holistic Jeebox Compressor
 // !!Experimental!!
 // !!TESTS SHOW IT NEEDS MORE WORK TO IMPROVE RATIO!!
+// !!!NEEDS SOME KINDA HUFFMAN. Perhaps 1 or 2 byte huff!!!
+// perhaps reimplement mz so that it splits data into: strs, offsets, lengths, ranges
+// then huff each separately.
+// maybe need to integrate hol and mz into one format.... as its better to have one
+// format. the thing is, hol only works on jbin. Still... it can have an optional "wrap"
+// setting...
+// also seems to be corrupting data...
 
 
 helper StringReader.HollyPart (|message| root, |stringreader|)
@@ -14,11 +21,11 @@ helper StringReader.HollyPart (|message| root, |stringreader|)
 			rz = nil
 
 
-function String.HollyDecode (|message|)
+helper String.HollyDecode (|message|) // helper cos not finished
 	return .Stream.hollydecode
 
 
-function StringReader.HollyDecode (|message|)
+helper StringReader.HollyDecode (|message|)
 	require .ExpectJbin
 	|[messageid]| Recent = []
 	|| root    = .NextMsg(@tmp, "ћ")
@@ -180,8 +187,8 @@ struct ћ
 					Ref = 73 + (OutCount - ID.id)
 			
 			id.id = OutCount
+			dbg(ref, id)
 			|| Combined = 8 + (Ref<<1) + (depth == 1)
-//			hrint(Combined)
 			.tree.AppendSmall(Combined)									// DOWN TREE
 			OutCount++
 			if depth < 0
@@ -202,7 +209,11 @@ struct ћ
 	
 	
 	module {
-	function TestHolly (|file| input)
+	
+	helper dbg (|int| ref, |messageid| id)
+		"$ref --> $id"
+	
+	helper TestHolly (|file| input)
 		require input.MustExist
 		|| p = input.path
 		if input isa "jbin"

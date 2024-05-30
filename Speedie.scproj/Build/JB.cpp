@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2069];
+extern JB_StringC* JB_LUB[2067];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -1927,7 +1927,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112532144783332));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112532170276864));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -50204,4 +50204,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -1655189100630705674 -190530516029393136
+// -1655189100630705674 -1740929786423243341
