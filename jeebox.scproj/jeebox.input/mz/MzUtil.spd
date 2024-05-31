@@ -25,7 +25,8 @@ function StringReader.Decompress (|int|lim=256MB, |?&compressionstats| st=nil, |
 	while .HasAny
 		if !.Decompressinto(fs, lim, st)
 			return string.error
-		if !multi:exit
+		if !multi
+			exit
 	return fs
 
 
@@ -104,7 +105,7 @@ Module MZLab
 		|[string]| Inputs
 		for ch.files in d
 			if ch.visible
-				inputs <~ ch.readall
+				inputs <~ ch.ReadAll
 	
 		|| total = 0
 		|| fs = FastString()
@@ -148,8 +149,11 @@ struct CompressionStats
 		.in = nil
 		.out = nil
 
-	function Start
+	function Start (|&CompressionStats|)
+		nil self
+		self := CompressionStats.all
 		.Duration -= date()
+		return self
 	
 	function End
 		.Duration += date()

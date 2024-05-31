@@ -4,14 +4,11 @@
 // !!Experimental!!
 // !!TESTS SHOW IT NEEDS MORE WORK TO IMPROVE RATIO!!
 // !!!NEEDS SOME KINDA HUFFMAN.!!!
-// perhaps reimplement mz so that it splits data into: strs, offsets, lengths, ranges
-// then huff each separately.
+// perhaps reimplement mz to use huff...
 // maybe need to integrate hol and mz into one format.... as its better to have one
 // format. the thing is, hol only works on jbin. Still... it can have an optional "wrap"
 // setting...
-// also seems to be corrupting data...
-// someone also tried encoding my tree offsets as LEB... and it came out smaller? wow.
-// unexpected.
+// my faststring.small encoder is pretty good.
 
 
 helper StringReader.HollyPart (|message| root, |stringreader|)
@@ -133,7 +130,6 @@ struct ћ
 		j <~ _JbinHeader
 		j.enter(@tmp, "ћ")
 		.EncodeSub(root, j)
-//		HuffByteCoder.Test .strings.copy
 		j.addcomp_view(.strings, 1, "string")
 		j.addcomp_view(.types,   1, "type")
 		j.addcomp_view(.lengths, 1, "length")
@@ -159,7 +155,7 @@ struct ћ
 		opt NoRefCounts
 		for s.flat in ch												// SCORE
 			|| Where = .MakePlace(s)
-			|| id = Where[0]
+			|| id = Where[]
 				id.Frequency++
 			  else
 				id = MessageID(s, .Palette.length),  where[] = id
@@ -211,7 +207,6 @@ struct ћ
 	
 	
 	module {
-//		|bool|	Lebanese
 	
 	helper dbg (|int| ref, |messageid| id, |int| pos)
 //		"$ref --> $id"

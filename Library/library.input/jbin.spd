@@ -180,7 +180,8 @@ function StringReader.IsJBin (|bool|)
 	
 	
 function StringReader.ExpectJbin (|bool|)	
-	if .IsJBin: return true
+	if .IsJBin
+		return true
 	error (Self, _jBinNotJbin)
 
 

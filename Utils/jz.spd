@@ -227,7 +227,7 @@ module Conv
 		
 	function CompressOnly (|bool| Decomp)
 		printline .out!|string|
-		|| d = .realout!.out
+		|| d = .RealOut!.out
 		|| src = .in!.in
 		require src!=nil and d != nil
 		.start = date() 

@@ -73,7 +73,7 @@ function Crash (|string| reason="")
 	if reason
 		printline reason
 	.CrashLog "AboutToCrash".cstr
-	(-1|&byte|)[] = 0
+	-1|&byte|[] = 0
 	"Crash Failed!"
 	app.quit(-1)
 
@@ -291,9 +291,6 @@ function LeakMarkMemory
 
 function LeakUnMarkMemory
 	cpp_wrapper JB_Mem_Unmark
-	
-//function ErrorStackTrace (|int| Signal)
-//	cpp_wrapper JB__ErrorStackTrace
 	
 function IsQuarantined (|bool|)	
 	return .path contains "/AppTranslocation/"

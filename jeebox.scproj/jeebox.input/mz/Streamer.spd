@@ -3,9 +3,7 @@
 function StringReader.CompressInto (|object| dest, |int|Strength=mzlab.default, |?&compressionstats| st=nil) 
 	expect (self!=nil) ("Nil object given to CompressInto")
 	|jbin| j = faststring.use(dest)				#require
-	if !st
-		st = CompressionStats.All
-	st.start
+	st = st.start
 	j <~ _JbinHeader
 	j.enter(@tmp, "µz")
 	j.addint(.length)
@@ -24,51 +22,36 @@ function StringReader.CompressInto (|object| dest, |int|Strength=mzlab.default, 
 	st.end
 
 
-helper StringReader.DecompressInto (|object| dest, |int| lim=int.max, |&compressionstats| st=nil, |bool|)
+helper StringReader.DecompressInto (|object| dest,  |int| lim=int.max,  |&compressionstats| st=nil,  |bool|)
 	|| fs = faststring.use(dest)				#require
 	if !.IsCompressed
 		fs <~ .readall
 		return true
-	st := compressionstats.all
 
-	|| OK = StdErr.Mark
 	.ExpectJbin
-	
-	|| mz = .NextMsg
-	if mz == @arg // remove this later
-		mz = .NextMsg(@tmp)
-	  elseif !mz.expect(@tmp)
-		mz = nil
-	require mz
-	st.start
-
-	|| size = .NextMsg(mz, @num)
+	|| mz = .NextMsg(@tmp)
+	|| Remaining = .NextMsg(mz, @num).int
 	|| arg = .NextMsg(mz, @arg)
-	|| Remaining = size.int
-	ifn size and arg and Remaining <= lim
-		if (Remaining > lim)
-			error (self, "mz would decompress too large")
-		  else
-			error (self, "Invalid mz header")
+
+	ifn (Remaining > 0) and (Remaining <= lim) and (arg)
+		error (self, ("mz would decompress too large", "Invalid mz header")(Remaining > lim))
 	  else
-		mz.name = ""
-		size.name = ""
-		while
-			|| c = .NextMsg(arg, @bin)			#loop
-			|| s = c.name
+		st = st.start
+		while (|| c = .NextMsg(arg, @bin))
 			|| Expected = Remaining min 1MB
 			loop fs.DecompressChunk(c.name, Expected)
 			Remaining -= Expected
 			fs.Flush
 			st.LiveUpdate(c.length, Expected)
 			c.remove
-	st.end
-	return OK
+		st.end
+	return !.Data.WentBad
 
 		
 helper faststring.CompressChunk (|string?| str) 
 	description "Passing nil will free the internal buffers" 
 	cpp_wrapper JB_Str_CompressChunk
+
 
 helper faststring.DecompressChunk (|string| str, |int| Expected, |int|) 
 	cpp_wrapper JB_Str_DecompressChunk
