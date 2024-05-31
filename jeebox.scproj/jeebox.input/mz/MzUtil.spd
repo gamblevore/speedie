@@ -124,7 +124,8 @@ target minilib {
 struct CompressionStats 
 	|bool| Live
 	linkage:cpp_part MzSt
-	function start
+	function start (|&compressionstats|)
+		return self
 	function end
 	function len (|int| n)
 	function liveupdate (|int| s, |int| outt)

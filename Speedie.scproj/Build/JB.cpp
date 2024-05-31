@@ -1927,7 +1927,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112537866600448));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112538002259968));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3239,7 +3239,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024053122));
+	JB_FS_AppendInt32(_fsf0, (2024053123));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7998,7 +7998,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024053122));
+	JB_FS_AppendInt32(_fsf0, (2024053123));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -19939,8 +19939,12 @@ JB_String* JB_MzSt_Render(CompressionStats* Self, FastString* Fs_in) {
 	return _tmPf0;
 }
 
-void JB_MzSt_Start(CompressionStats* Self) {
+CompressionStats* JB_MzSt_Start(CompressionStats* Self) {
+	if (!Self) {
+		Self = (&JB__MzSt_All);
+	}
 	Self->Duration = (Self->Duration - JB_Date__New0());
+	return Self;
 }
 
 int JB_MzSt__Init_() {
@@ -27656,10 +27660,7 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 		JB_Decr(J);
 		return;
 	}
-	if (!St) {
-		St = (&JB__MzSt_All);
-	}
-	JB_MzSt_Start(St);
+	St = JB_MzSt_Start(St);
 	JB_FS_AppendString(J, JB__JbinHeader);
 	JB_bin_Enter(J, kJB_SyxTmp, JB_LUB[2020]);
 	JB_bin_AddInt(J, Self->Length);
@@ -27727,47 +27728,28 @@ bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, Compress
 		JB_Decr(Fs);
 		return true;
 	}
-	if (!St) {
-		St = (&JB__MzSt_All);
-	}
-	ErrorMarker OK = JB_Rec_Mark(JB_StdErr);
 	JB_SS_ExpectJbin(Self);
-	Message* Mz = JB_Incr(JB_SS_NextMsg(Self));
-	if (!JB_Msg_Expect(Mz, kJB_SyxTmp, nil)) {
-		JB_SetRef(Mz, nil);
-	}
-	if (!Mz) {
-		JB_Decr(Mz);
-		JB_Decr(Fs);
-		return nil;
-	}
-	JB_MzSt_Start(St);
-	Message* Size = JB_Incr(JB_SS_NextMsgExpect(Self, Mz, kJB_SyxNum, nil));
+	Message* Mz = JB_Incr(JB_SS_NextMsgExpect(Self, nil, kJB_SyxTmp, nil));
+	Message* _tmPf1 = JB_Incr(JB_SS_NextMsgExpect(Self, Mz, kJB_SyxNum, nil));
+	int64 Remaining = JB_Msg_Int(_tmPf1, 0);
+	JB_Decr(_tmPf1);
 	Message* Arg = JB_Incr(JB_SS_NextMsgExpect(Self, Mz, kJB_SyxArg, nil));
-	int64 Remaining = JB_Msg_Int(Size, 0);
-	if (!(((bool)Size) and (((bool)Arg) and (Remaining <= Lim)))) {
-		if (Remaining > Lim) {
-			if (true) {
-				JB_SS_SyntaxExpect(Self, JB_LUB[1716]);
-			}
-		}
-		 else {
-			if (true) {
-				JB_SS_SyntaxExpect(Self, JB_LUB[825]);
-			}
+	JB_Decr(Mz);
+	if (!((Remaining > 0) and ((Remaining <= Lim) and ((bool)Arg)))) {
+		if (true) {
+			JB_StringC* _tmPf2 = JB_Incr(((JB_StringC*)JB_Ternary(Remaining > Lim, JB_LUB[1716], JB_LUB[825])));
+			JB_SS_SyntaxExpect(Self, _tmPf2);
+			JB_Decr(_tmPf2);
 		}
 	}
 	 else {
-		JB_SetRef(Mz->Name, JB_LUB[0]);
-		JB_SetRef(Size->Name, JB_LUB[0]);
+		St = JB_MzSt_Start(St);
 		while (true) {
 			Message* C = JB_Incr(JB_SS_NextMsgExpect(Self, Arg, kJB_SyxBin, nil));
-			if (!C) {
+			if ((!C)) {
 				JB_Decr(C);
 				break;
 			}
-			JB_String* S = JB_Incr(C->Name);
-			JB_Decr(S);
 			int64 Expected = JB_int64_OperatorMin(Remaining, 1048576);
 			if (!JB_Str_DecompressChunk(Fs, C->Name, Expected)) {
 				JB_Decr(C);
@@ -27779,13 +27761,11 @@ bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, Compress
 			JB_Tree_Remove(C);
 			JB_Decr(C);
 		};
+		JB_MzSt_End(St);
 	}
 	JB_Decr(Fs);
-	JB_Decr(Mz);
-	JB_Decr(Size);
 	JB_Decr(Arg);
-	JB_MzSt_End(St);
-	return JB_ErrorMarker_SyntaxCast(OK);
+	return (!Self->Data.WentBad);
 }
 
 void JB_SS_Destructor(StringReader* Self) {
@@ -50163,4 +50143,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -8749319981804938585 -4952308853400179641
+// 1320931111602465629 -4952308853400179641

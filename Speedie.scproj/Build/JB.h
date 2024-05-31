@@ -5430,7 +5430,7 @@ void JB_MzSt_Print(CompressionStats* Self);
 
 JB_String* JB_MzSt_Render(CompressionStats* Self, FastString* Fs_in);
 
-void JB_MzSt_Start(CompressionStats* Self);
+CompressionStats* JB_MzSt_Start(CompressionStats* Self);
 
 int JB_MzSt__Init_();
 

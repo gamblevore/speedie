@@ -85,7 +85,7 @@ helper StringReader.HollyDecodeSub (|StringReader| Tree,  |[messageid]| Palette,
 		  else
 			MID = Palette[PalPoint++]				#expect (self, "Bad Palette")
 		
-//		ћ.print(ref, mid, OutCount)
+		ћ.dbg(ref, mid, OutCount)
 		|| Item = mid.msg(parent)
 		if Raw & 1
 			parent = Item
