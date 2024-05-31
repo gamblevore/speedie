@@ -2363,7 +2363,7 @@ Message* JB_Tk__MakeRel(Message* First, int Bits) {
 		(++Opp->RangeLength);
 	}
 	bool Mode = kJB__Tk_kAllow;
-	if (!JB_byte_IsLetter((JB_Str_ByteValue(Opp->Name, 0)))) {
+	if (!JB_byte_IsLetter((JB_Str_First(Opp->Name)))) {
 		Bits = (Bits | kJB__Tk_kOppWord);
 	}
 	JB_Tree_SyntaxAppend(Rel, JB_Tk__ProcessThing(Bits, Mode));
@@ -4719,7 +4719,7 @@ JB_String* JB_Str_Child(JB_String* Self, JB_String* Cname) {
 		return Cname;
 	}
 	int C = ((int)(JB_Str_Last(Self, 0) == '/'));
-	C = (C + (JB_Str_ByteValue(Cname, 0) == '/'));
+	C = (C + (JB_Str_First(Cname) == '/'));
 	if (C == 1) {
 		return JB_Str_OperatorPlus(Self, Cname);
 	}
@@ -4861,7 +4861,7 @@ int JB_Str_IsHexLike(JB_String* Self, int N) {
 }
 
 Ind JB_Str_IsJbin(JB_String* Self) {
-	if ((JB_Str_ByteValue(Self, 0) == '#') and (JB_Str_ByteValue(Self, 1) == '!')) {
+	if ((JB_Str_First(Self) == '#') and (JB_Str_ByteValue(Self, 1) == '!')) {
 		Ind Nl = JB_Str_FindByte(Self, '\n', 0, JB_int__Max());
 		if (JB_Ind_SyntaxCast(Nl)) {
 			(++Nl);
@@ -4897,7 +4897,7 @@ bool JB_Str_IsOK(JB_String* Self) {
 }
 
 bool JB_Str_IsStatementName(JB_String* Self) {
-	return (JB_CS_OperatorContains(JB__Constants_CSWordMiddle, Self)) and ((!JB_byte_IsInt(JB_Str_ByteValue(Self, 0))));
+	return (JB_CS_OperatorContains(JB__Constants_CSWordMiddle, Self)) and ((!JB_byte_IsInt(JB_Str_First(Self))));
 }
 
 Ind JB_Str_JBFind(JB_String* Self, byte Find, int Off, int After) {
