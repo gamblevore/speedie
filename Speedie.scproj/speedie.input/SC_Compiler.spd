@@ -218,11 +218,11 @@ function FastString.AppendWidth (|string| s, |int| Width)
 
 function Reached (|string| s, |bool|)
 	flow off
-	|| obj = self[s]
+	|| obj = .SoftClass(S)
 		return (obj.MyReacher)
 
 
-function InitTypes
+function InitTypes (|bool|)
 	TypeInt				= compiler["int"]
 	TypeInt16			= compiler["int16"]
 	TypeInt64			= compiler["int64"]
@@ -264,6 +264,7 @@ function InitTypes
 	(TypeString! is HasSubClass) // compiler doesn't know about internal-subclasses of string.
 	for s in .actualsyxes
 		s.type = typesyntax! // sigh
+	return StdErr.ok
 
 
 function InitBasicStuff (|int|) // compiler.init
@@ -275,7 +276,8 @@ function InitBasicStuff (|int|) // compiler.init
 	(Message).Restore
 	.ModuleList <~ .program
 	
-	.InitTypes
+	if !.InitTypes
+		Compiler.InitedOK = false
 	
 	TypeNil   = .AddGlobalConst( "nil",   TypeObject!,   NilState.ActuallyNil )
 	TrueBool  = .AddGlobalConst( "true",  TypeBool!,     NilState.real ||| NilState.trueValue )
@@ -379,7 +381,7 @@ function ImportAll
 	.Stage( "Initialising Compiler" )
 
 	|| mark = .InitBasicStuff
-	require .AddMain(mark)
+	require .AddMain(mark) and .InitedOK
 		
 	
 	parser.using.Flags = MsgParseFlags.Inserted // noice
@@ -626,9 +628,12 @@ function CreateDisambiguation
 	.DisamModules = SCModule.newContainer("__modules__")
 
 
-syntax access (|string| name, |SCClass|)
+function SoftClass (|string| name, |scclass|)
+	return compiler[name, SCNodeFindMode.NoErrors]
+
+syntax access (|string| name, |SCNodeFindMode| Mode=0, |SCClass|)
 	cpp_part FindClassName
-	return compiler.program.FindClass(name, nil)
+	return compiler.program.FindClass(name, mode)
 
 
 syntax access (|Message| name, |SCClass|)

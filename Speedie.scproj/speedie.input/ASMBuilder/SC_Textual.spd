@@ -108,7 +108,7 @@ extend ASMState
 	function GetLabelJump (|message| P, |int|)
 		opt NoRefCounts
 		|| val = textassembler.LabelsToDo.valuelower(p.name)
-			return val.first
+			return val[]
 		error (P, "Label not found")
 
 	

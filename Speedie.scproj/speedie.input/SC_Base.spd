@@ -55,7 +55,7 @@ function CollectSub (|Message| c, |SCNode|)
 		return nil
 	
 	|| FnObj = T[c.name]									#expect c
-	|| base = (FnObj.first)( c, self, c )					#require
+	|| base = (FnObj[])( c, self, c )						#require
 	if (base != Compiler.program) // OK
 		.TryAdd( c, base, base.Name )
 	
@@ -105,6 +105,9 @@ function FindClass (|String| name, |Message| where=nil, |SCNodeFindMode| Mode=0,
 			return mod.cls
 		if Mode isnt noerrors
 			error (where, "Expected a class but found module.")
+		return nil
+	if Mode isnt noerrors
+		error (where, "Can't find class: " + name )
 
 
 function FindModuleParent (|SCNodeFindMode| Mode, |SCnode|)
@@ -838,7 +841,7 @@ function FindVis (|Message| c, |bool|)
 	if c == @adj
 		|| first = c[@thg, "class"]
 		|| name  = c[@thg, 1].name
-		|| cls   = compiler[name]
+		|| cls   = compiler.softclass(name)
 		return cls and cls isnt banned
 	error c
 

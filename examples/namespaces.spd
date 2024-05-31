@@ -1,0 +1,21 @@
+#!/usr/local/bin/spd
+
+// simple name-space example test.
+
+main
+	abc.test
+	abc.def.test
+	abc.ghi.test
+
+module abc
+	function test
+		"test1"
+	
+	module def
+		function test
+			"test2"
+			
+extend_module abc
+	module ghi
+		function test
+			"test3"

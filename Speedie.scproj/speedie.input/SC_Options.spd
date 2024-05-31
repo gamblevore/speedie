@@ -168,7 +168,7 @@ module Feedback
 
 		if Name
 			|| opt = AppOptions[name]
-				options.OperationCount += ((opt.first)(name, value, nil))
+				options.OperationCount += ((opt[])(name, value, nil))
 			  else
 				app.quit("Unknown switch '$Name'\n")
 		  elseif value.isjbin // ignore it
@@ -470,7 +470,7 @@ module Feedback
 		fs <~ "  SelfFlow: ",  fs <~ app.pref("self_flow")
 		fs <~ "  @max: ${@max|int|}"
 		for (v in AppOptions) (k) 
-			(v.first)("", "", fs_tester)
+			(v[])("", "", fs_tester)
 			|| val = v.Value|shelloption|
 			if (val and fs_tester.length) 
 				fs_tester.length = 0

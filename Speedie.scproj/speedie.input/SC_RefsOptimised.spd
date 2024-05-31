@@ -180,7 +180,7 @@ function SCNode.ProcessLinkage (|message| node, |dictionary of tranfunc| Table, 
 	for ch in node
 		require ch.expect(@tmp)
 		|| linker = Table[ch.name] #expect (ch)
-		(linker.first)(fn, ch, self)
+		(linker[])(fn, ch, self)
 
 	return compiler.program
 

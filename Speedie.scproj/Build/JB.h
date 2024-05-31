@@ -231,8 +231,6 @@ struct Mat4;
 
 struct MessagePosition;
 
-struct MiniHuffItem;
-
 struct ModelTest;
 
 struct NameAndMsg;
@@ -248,6 +246,8 @@ struct Object_Behaviour;
 struct ParserLineAndIndent;
 
 struct Random;
+
+struct RangeCoderItem;
 
 struct RetroFloat;
 
@@ -284,8 +284,6 @@ struct FileComparer_Behaviour;
 struct FixedDict_Behaviour;
 
 struct FlowControl_Behaviour;
-
-struct HuffByteCoder_Behaviour;
 
 struct Instruction_Behaviour;
 
@@ -359,11 +357,11 @@ struct StringZeroTerminated_Behaviour;
 
 struct list_Behaviour;
 
-struct HuffNode_Behaviour;
-
 struct MessageID_Behaviour;
 
 struct Message_Behaviour;
+
+struct RangeCoder_Behaviour;
 
 struct SCDecl_Behaviour;
 
@@ -408,8 +406,6 @@ struct FileComparer;
 struct FixedDict;
 
 struct FlowControl;
-
-struct HuffByteCoder;
 
 struct Instruction;
 
@@ -469,13 +465,13 @@ struct Dictionary;
 
 struct JB_File;
 
-struct HuffNode;
-
 struct JB_File;
 
 struct Message;
 
 struct MessageID;
+
+struct RangeCoder;
 
 struct SCDecl;
 
@@ -2565,7 +2561,7 @@ int SC_Comp__InitCode_();
 
 void SC_Comp__InitCompiler();
 
-void SC_Comp__InitTypes();
+bool SC_Comp__InitTypes();
 
 JB_File* SC_Comp__InputFile(JB_File* Default, JB_String* S, Message* Where);
 
@@ -2627,6 +2623,8 @@ bool SC_Comp__ScriptRecompile(JB_File* F, JB_File* Script_build);
 
 void SC_Comp__SetupEnv();
 
+SCClass* SC_Comp__SoftClass(JB_String* Name);
+
 bool SC_Comp__SortModulesAndClasses();
 
 JB_File* SC_Comp__Speedie();
@@ -2637,7 +2635,7 @@ JB_String* SC_Comp__SpeedieProj();
 
 bool SC_Comp__Stage(JB_String* Name);
 
-SCClass* SC_Comp__FindClassName(JB_String* Name);
+SCClass* SC_Comp__FindClassName(JB_String* Name, SCNodeFindMode Mode);
 
 SCClass* SC_Comp__SyntaxAccess(Message* Name);
 
@@ -5539,9 +5537,6 @@ void JB_MsgPos_SyntaxUsingComplete(MessagePosition* Self, JB_Object* Idk);
 
 
 
-// JB_MiniHuffItem
-
-
 // JB_ModelTest
 
 
@@ -5685,6 +5680,9 @@ int JB_Rnd__InitCode_();
 
 
 
+// JB_RangeCoderItem
+
+
 // JB_RetroFloat
 
 
@@ -5746,9 +5744,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 
 
 // JB_FlowControl_Behaviour
-
-
-// JB_HuffByteCoder_Behaviour
 
 
 // JB_Instruction_Behaviour
@@ -5859,13 +5854,13 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 // JB_list_Behaviour
 
 
-// JB_HuffNode_Behaviour
-
-
 // JB_MessageID_Behaviour
 
 
 // JB_Message_Behaviour
+
+
+// JB_RangeCoder_Behaviour
 
 
 // JB_SCDecl_Behaviour
@@ -6171,11 +6166,11 @@ DTWrap* JB_Wrap_ConstructorVoidPtr(DTWrap* Self, void* P);
 
 void JB_Wrap_Destructor(DTWrap* Self);
 
-int64 JB_Wrap_First(DTWrap* Self);
-
 double JB_Wrap_FloatValue(DTWrap* Self);
 
 JB_String* JB_Wrap_Render(DTWrap* Self, FastString* Fs_in);
+
+int64 JB_Wrap_SyntaxAccess(DTWrap* Self);
 
 int64 JB_Wrap_Value(DTWrap* Self);
 
@@ -6361,9 +6356,6 @@ void JB_Flow__Stop();
 
 bool JB_Flow__Cond(bool Value);
 
-
-
-// JB_HuffByteCoder
 
 
 // JB_Instruction
@@ -7381,9 +7373,6 @@ int64 SC_ASMFunc2_RunArgs(MWrap* Self, ivec4* Args, int ArgCount);
 // JB_ExistingFile
 
 
-// JB_HuffNode
-
-
 // JB_JeeboxFile
 
 
@@ -8277,6 +8266,9 @@ bool JB_ID__ByID(JB_Object* A, JB_Object* B);
 
 
 
+// JB_RangeCoder
+
+
 // JB_SCDecl
 int SC_Decl_AllocatedSize(SCDecl* Self);
 
@@ -9009,7 +9001,7 @@ SCFunction* SC_Class_FirstDestructor(SCClass* Self);
 
 int SC_Class_GetDepth(SCClass* Self);
 
-SCClass* SC_Class_GetFlyingMemClassFor(SCClass* Self);
+SCClass* SC_Class_GetFlyingMemClass(SCClass* Self);
 
 SCDecl* SC_Class_GetFlyingMemory(SCClass* Self, Message* Exp);
 

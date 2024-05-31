@@ -1,62 +1,20 @@
 
 
+// Huff Coder
 
 
-class HuffByteCoder
-	function Encode (|string| input, |faststring| fs)
-		|MiniHuffItem[256]| Table = nil
-		.collect(input, &Table[0])
-		
-		|uint64| Bits
-		|int|    Bits_Used
-		fs.freesize = input.length + 64 // can we fit the table in 64 bytes?
-		target !self
-			for b in input
-				bits_used += table[b].depth
-		|| bytes = (Bits_Used + 7) >> 3
-		"${input.strsize} to ${bytes.strsize}"
-				
-		
-	function Collect (|string| input, |&MiniHuffItem| items=nil)
-		|int[256]| Histo = nil
-		|| root = huffnode()
-		|| h = &histo[0]
-		
-		for b in input
-			h[b]++
-
-		for i in 256
-			|| hi = h[i]
-				root <~ huffnode(i, hi)
-		
-		root.sort(&HuffNode.sorter)
-		root.LinkAll
-		|| s = root.first!
-		s.Encode(items)
-
-		root.PrintScore
-
-
-	module
-		function Test (|string| s="he ties the tether")
-			|| coder = new()
-			|| fs = faststring()
-			coder.encode(s, fs)
-			
-
-
-struct MiniHuffItem
+struct RangeCoderItem
 	|uint16|  Code
 	|uint16|  Depth
 
 
-class HuffNode (list)
-	contains huffnode
+class RangeCoder (list)
+	contains RangeCoder
 	|int|   Char = -1
 	|int|   Freq = 0
 	|int|	Code = 0
 	
-	function Place (|huffnode| after)
+	function Place (|RangeCoder| after)
 		opt norefcounts
 		|| f = .freq
 		while
@@ -67,10 +25,10 @@ class HuffNode (list)
 			after = n
 
 
-	function Encode (|&MiniHuffItem| n, |int| Depth=0, |int| Code=0)
+	function Encode (|&RangeCoderItem| n, |int| Depth=0, |int| Code=0)
 		opt norefcounts
 		if n
-			|| k = .char
+			|| k = .Char
 			if k >= 0
 				|| c = &n[k]
 				c.code = code
@@ -89,7 +47,7 @@ class HuffNode (list)
 		while
 			|| l = .first
 			|| r = l.next #loop
-			|| Comb = huffnode(-1,  l!.freq + r.freq)
+			|| Comb = RangeCoder(-1,  l!.freq + r.freq)
 			Comb.place(r)
 			Comb <~ l
 			Comb <~ r
@@ -128,6 +86,59 @@ class HuffNode (list)
 	module
 		helper Sorter (SorterComparer)
 			target debug
-				if a|huffnode|.freq == b|huffnode|.freq
-					return a|huffnode|.char > b|huffnode|.char
-			return a|huffnode|.freq > b|huffnode|.freq 
+				if a|RangeCoder|.freq == b|RangeCoder|.freq
+					return a|RangeCoder|.char > b|RangeCoder|.char
+			return a|RangeCoder|.freq > b|RangeCoder|.freq 
+
+
+		function EncodeBytes (|string| input, |faststring| fs)
+			|RangeCoderItem[256]| Table = nil
+			.CollectBytes(input, &Table[0])
+			
+			|uint64| Bits
+			|int|    Bits_Used
+			fs.FreeSize = input.length + 96 // The table fits in 96 bytes?
+			|| ptr = fs.ResultPtr + fs.Length
+			|| Code = 0
+			|| Remain = 8
+			for b in input
+				|| c = table[b]
+				|| d = c.Depth
+				code <<= d
+				code |= c.Code
+				Remain -= d
+				if Remain <= 0
+					ptr++[] = code >> -Remain
+					Remain += 8
+					code >>= 8 // better to accumulate 64 bits... but lets do that next time.
+			if Remain > 0 
+				ptr++[] = code >> -Remain
+			
+	//		|| bytes = (Bits_Used + 7) >> 3
+	//		"${input.strsize} to ${bytes.strsize}"
+					
+			
+		function CollectBytes (|string| input, |&RangeCoderItem| items=nil)
+			|int[256]| Histo = nil
+			|| root = RangeCoder()
+			|| h = &histo[0]
+			
+			for b in input
+				h[b]++
+	
+			for i in 256
+				|| hi = h[i]
+					root <~ RangeCoder(i, hi)
+			
+			root.sort(&RangeCoder.sorter)
+			root.LinkAll
+			|| s = root.first!
+			s.Encode(items)
+	
+			root.PrintScore
+	
+		
+		function Test (|string| s = "he ties the tether")
+			|| fs = faststring()
+			.EncodeBytes(s, fs)
+				

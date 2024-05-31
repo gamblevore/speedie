@@ -934,7 +934,7 @@ module
 
 		|| N		= .name.lowercase
 		|| Td		= DataTypeCode.Types[n]
-			|| t = td.First
+			|| t = td[]
 			if T != 255
 				.size = T.ByteCount
 				if t == datatypecode.Vec3 or datatypecode.iVec3

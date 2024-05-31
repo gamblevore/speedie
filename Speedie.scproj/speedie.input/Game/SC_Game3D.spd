@@ -56,12 +56,12 @@ extend SCClass
 			debugger
 
 
-	function GetFlyingMemClassFor (|SCClass|)
+	function GetFlyingMemClass (|SCClass|)
 		return Compiler["GameFlyingMem"]
 
 	
 	function ModelDecls
-		|| M = .GetFlyingMemClassFor
+		|| M = .GetFlyingMemClass
 			.NewDeclInClassModule("_AllocDraw", M)
 	
 	function HasGameType (|bool|)

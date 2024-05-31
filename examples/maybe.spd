@@ -28,7 +28,7 @@ function PrintNum (|int64| b1)
 
 function app.Stuff
 	printnum(60GB)
-	printnum(7.9MB)
+	printnum(8MB)
 	printnum(9524600)
 	
     || P = person(12, "fred")
@@ -60,7 +60,7 @@ function app.Stuff
 	FlowControl.Disabled--
     
     || G = RPGHero("fred")
-    (*DoAction["jump"])(G, "hes scared")
+    (DoAction["jump"][])(G, "hes scared")
 
 
 prototype SayerFunction (|string?| input)

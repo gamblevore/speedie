@@ -156,7 +156,7 @@ struct ObjectLoader {
 	function GetClassOf (|message| msg, |&ClassData|)
 		opt norefcounts
 		|| Data = ObjectLoader.ClassList![msg.name] 
-			return (data.first)|&classdata|
+			return (data[])|&classdata|
 		.Noclass = msg
 	
 	
