@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[595];
+extern JB_StringC* JB_LUB[597];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -2363,7 +2363,7 @@ Message* JB_Tk__MakeRel(Message* First, int Bits) {
 		(++Opp->RangeLength);
 	}
 	bool Mode = kJB__Tk_kAllow;
-	if (!JB_byte_IsLetter((JB_Str_First(Opp->Name)))) {
+	if (!JB_byte_IsLetter((JB_Str_ByteValue(Opp->Name, 0)))) {
 		Bits = (Bits | kJB__Tk_kOppWord);
 	}
 	JB_Tree_SyntaxAppend(Rel, JB_Tk__ProcessThing(Bits, Mode));
@@ -3442,7 +3442,7 @@ int JB_MzSt__InitCode_() {
 
 
 byte JB_FastBuff_Byte(FastBuff* Self) {
-	return (*Self->Curr++);
+	return Self->Curr++[0];
 }
 
 byte* JB_FastBuff_Clip(FastBuff* Self, int V, int Reduce) {
@@ -3555,8 +3555,9 @@ JB_String* JB_FastBuff_TmpStr(FastBuff* Self) {
 
 
 
+
 void JB_MsgPos_Destructor(MessagePosition* Self) {
-	JB__Tk_Using = (*Self);
+	JB__Tk_Using = Self[0];
 	JB_Mem_Use(Self->Layer);
 }
 
@@ -3803,6 +3804,8 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver) {
 
 
 
+
+
 __lib__ void jdb(JB_Object* Self) {
 	//visible;
 	if (Self) {
@@ -3890,10 +3893,10 @@ Array* JB_CS_Bytes(CharSet* Self) {
 }
 
 bool JB_CS_NextInCharset(CharSet* Self, int* P) {
-	int I = (*P);
+	int I = P[0];
 	while ((++I) < 256) {
 		if (JB_CS_HasChar(Self, I)) {
-			(*P) = I;
+			P[0] = I;
 			return true;
 		}
 	};
@@ -4496,6 +4499,7 @@ bool JB_Flow__Cond(bool Value) {
 }
 
 
+
 LeakTester* JB_Lk_Constructor(LeakTester* Self, JB_String* Name) {
 	if (Self == nil) {
 		Self = ((LeakTester*)JB_NewClass(&LeakTesterData));
@@ -4715,7 +4719,7 @@ JB_String* JB_Str_Child(JB_String* Self, JB_String* Cname) {
 		return Cname;
 	}
 	int C = ((int)(JB_Str_Last(Self, 0) == '/'));
-	C = (C + (JB_Str_First(Cname) == '/'));
+	C = (C + (JB_Str_ByteValue(Cname, 0) == '/'));
 	if (C == 1) {
 		return JB_Str_OperatorPlus(Self, Cname);
 	}
@@ -4857,7 +4861,7 @@ int JB_Str_IsHexLike(JB_String* Self, int N) {
 }
 
 Ind JB_Str_IsJbin(JB_String* Self) {
-	if ((JB_Str_First(Self) == '#') and (JB_Str_ByteValue(Self, 1) == '!')) {
+	if ((JB_Str_ByteValue(Self, 0) == '#') and (JB_Str_ByteValue(Self, 1) == '!')) {
 		Ind Nl = JB_Str_FindByte(Self, '\n', 0, JB_int__Max());
 		if (JB_Ind_SyntaxCast(Nl)) {
 			(++Nl);
@@ -4893,7 +4897,7 @@ bool JB_Str_IsOK(JB_String* Self) {
 }
 
 bool JB_Str_IsStatementName(JB_String* Self) {
-	return (JB_CS_OperatorContains(JB__Constants_CSWordMiddle, Self)) and ((!JB_byte_IsInt((JB_Str_First(Self)))));
+	return (JB_CS_OperatorContains(JB__Constants_CSWordMiddle, Self)) and ((!JB_byte_IsInt(JB_Str_ByteValue(Self, 0))));
 }
 
 Ind JB_Str_JBFind(JB_String* Self, byte Find, int Off, int After) {
@@ -6154,6 +6158,7 @@ JB_List* JB_Tree_Upward(JB_List* Self, int N) {
 	};
 	return Self;
 }
+
 
 
 
@@ -8358,7 +8363,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024053110);
+	return (2024053117);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8370,4 +8375,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 -2273982830918669969 3460009421739776019
+// 7796578953066441599 -3917995550733313767 -766316816660040130

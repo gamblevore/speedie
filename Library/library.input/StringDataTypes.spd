@@ -30,7 +30,7 @@ datatype byte
 		
 	function Equals (|string| B, |bool|)
 		cpp_part EqualsByte
-		return b.length == 1 and b.first == self
+		return b.length == 1 and b[] == self
 
 	syntax cast (|bool|)
 		return self|bool|

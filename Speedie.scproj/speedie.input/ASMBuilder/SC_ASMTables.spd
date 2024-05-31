@@ -543,7 +543,7 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 
 function ARel		(fn_asm)
 	opt	NoRefCounts
-	|| M = (exp.name.first == '+')|int|
+	|| M = (exp.name[] == '+')|int|
 	if dest
 		M += IncrAfter
 	return Incrementatulatorifier(self, exp.first!, dest, M)
@@ -552,7 +552,7 @@ function ARel		(fn_asm)
 
 function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 	opt	NoRefCounts
-	|| n = exp.name.first
+	|| n = exp.name[]
 	|| F = exp.first!
 	if n == '&'
 		return .µ(F, dest.requestpos)

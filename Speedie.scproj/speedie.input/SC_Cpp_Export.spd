@@ -1374,7 +1374,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		opt norefcounts
 		// ("arl" @x "++" )								x++
 		.first!.Export( fs )
-		|| s = .name.first
+		|| s = .name[]
 		if (s != '&' and '!')
 			fs <~ .name
 
@@ -1511,7 +1511,7 @@ function message.Safe (|faststring| fs)
 function string.Safe (|faststring| fs, |bool| Local=false)
 	if .isascii
 		if local and .islower
-			fs <~ .first.uppercase
+			fs <~ self[].uppercase
 			fs.appendsection(self, 1)
 		  else 
 			fs <~ self

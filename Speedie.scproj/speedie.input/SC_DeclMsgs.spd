@@ -170,7 +170,7 @@ function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
 	(dcl is property)
 	(dcl is Global)
 	
-	if (.Indent == 255) or ('_' == dcl.name.first or dcl.name.Last)
+	if (.Indent == 255) or ('_' == dcl.name[] or dcl.name.Last)
 		(dcl is hidden)
 	if dcl.islib
 		if (dcl isnt hidden) and (Options.MakeInterpreter or options.ModePack)

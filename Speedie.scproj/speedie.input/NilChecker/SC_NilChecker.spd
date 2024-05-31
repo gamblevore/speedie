@@ -540,7 +540,7 @@ function Pointer (Niltrackerfn)
 
 function Brel (Niltrackerfn)
 	opt norefcounts
-	|| b = msg.name.first
+	|| b = msg.name[]
 	if b == '*'
 		return pointer(msg, test)				// *abc
 
@@ -564,7 +564,7 @@ function arel (Niltrackerfn)
 	opt norefcounts
 	|| ch = msg.first
 		rz = .jump(ch, test)
-		|| b = msg.name.first
+		|| b = msg.name[]
 		if b == '!'
 			rz &=~ nilstate.nilish
 			rz |=  nilstate.realish

@@ -220,7 +220,7 @@ struct ASMState
 		if f != @thg // wat?
 		|| d = f.FastDecl
 		|| Src = d.reg
-		|| mode = (exp.name.first == '+')|int|
+		|| mode = (exp.name[] == '+')|int|
 		|| Amount = ASMTmp.IncrAmount(src, mode, d)
 		ASMState.sh.AddConstant(exp, src, src, Amount)	// ++x, y = ++x
 

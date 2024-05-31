@@ -29,7 +29,7 @@ function SCNode.CalculateConstRel (|message!| value, |&datatypecode| Ty, |uint64
 	#!SSSSS
 	|| R = .CalculateConst(C, Ty)
 	expect (op is MathLike) (B)
-	|| N = B.name.first
+	|| N = B.name[]
 	|| Lg = b.name.length
 	|| Ints = (ty[]).isint
 	if n == '+'

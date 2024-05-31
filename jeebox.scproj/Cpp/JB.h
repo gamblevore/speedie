@@ -117,6 +117,8 @@ struct FastBuff;
 
 struct FloatRange;
 
+struct HuffItem;
+
 struct IntDownRange;
 
 struct Mat4;
@@ -161,6 +163,8 @@ struct FixedDict_Behaviour;
 
 struct FlowControl_Behaviour;
 
+struct HuffByteCoder_Behaviour;
+
 struct LeakTester_Behaviour;
 
 struct Macro_Behaviour;
@@ -201,6 +205,8 @@ struct StringZeroTerminated_Behaviour;
 
 struct list_Behaviour;
 
+struct HuffNode_Behaviour;
+
 struct MessageID_Behaviour;
 
 struct Message_Behaviour;
@@ -224,6 +230,8 @@ struct JB_ErrorReceiver;
 struct FixedDict;
 
 struct FlowControl;
+
+struct HuffByteCoder;
 
 struct LeakTester;
 
@@ -250,6 +258,8 @@ struct JB_String;
 struct Dictionary;
 
 struct JB_File;
+
+struct HuffNode;
 
 struct JB_File;
 
@@ -1768,6 +1778,9 @@ JB_String* JB_FastBuff_TmpStr(FastBuff* Self);
 // JB_FloatRange
 
 
+// JB_HuffItem
+
+
 // JB_IntDownRange
 
 
@@ -1916,6 +1929,9 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 // JB_FlowControl_Behaviour
 
 
+// JB_HuffByteCoder_Behaviour
+
+
 // JB_LeakTester_Behaviour
 
 
@@ -1974,6 +1990,9 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 
 
 // JB_list_Behaviour
+
+
+// JB_HuffNode_Behaviour
 
 
 // JB_MessageID_Behaviour
@@ -2149,6 +2168,9 @@ void JB_Flow__Input(JB_String* Data, JB_String* Name);
 
 bool JB_Flow__Cond(bool Value);
 
+
+
+// JB_HuffByteCoder
 
 
 // JB_LeakTester
@@ -2526,6 +2548,9 @@ JB_List* JB_Tree_Upward(JB_List* Self, int N);
 
 
 // JB_ExistingFile
+
+
+// JB_HuffNode
 
 
 // JB_JeeboxFile
@@ -2996,7 +3021,7 @@ inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self) {
 }
 
 inline bool JB_FastBuff_AppendU8(FastBuff* Self, byte V) {
-	(*Self->Curr++) = V;
+	Self->Curr++[0] = V;
 	return Self->Curr >= Self->End;
 }
 

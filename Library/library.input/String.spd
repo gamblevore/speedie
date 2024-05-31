@@ -75,7 +75,8 @@ class String
 	function Last (|int| minus = 0, |Byte|)
 		return self[.length-(1+minus)]
 	
-	function First (|Byte|)
+		
+	syntax access (|byte|)
 		cpp_wrapper JB_Str_First
 		
 	operator divide (|byte| sep, |[string]|)
@@ -226,7 +227,7 @@ class String
 		return .lowercase.TrimExtAndPath
 	
 	function UpperFirst (|String|)
-		if .first.IsUpper
+		if self[].IsUpper
 			return self
 		Return self[0,1].Uppercase + self[1...]
 	
@@ -493,7 +494,7 @@ class String
 	function Byte (|int| index, |Byte| Default, |int|)
 		cpp_wrapper JB_Str_ByteValue2
 		
-	syntax Access (|int| index=0, |Byte|)
+	syntax Access (|int| index, |Byte|)
 		nil checker
 		cpp_wrapper JB_Str_ByteValue
 		

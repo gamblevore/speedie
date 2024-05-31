@@ -173,7 +173,7 @@ function TypeOfBRel (ExprResolver)
 	|| name = exp.name
 	|| F = exp.first									#require
 	|| SubType = TypeOfExpr( F, name_space )			#require
-	|| n = name.first
+	|| n = name[]
 	
 	if n == '*'
 		problem (exp, "Use [] instead")

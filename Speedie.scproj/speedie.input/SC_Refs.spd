@@ -475,7 +475,7 @@ function message.RefTransparent (|bool|)
 	if f == @type
 		return true
 	if f == @arel or @brel
-		|| n = .name.first
+		|| n = .name[]
 		return n == '?' or '!'
 
 

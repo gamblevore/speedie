@@ -9700,8 +9700,6 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, NilState New);
 
 inline void SC_nil__DeclKill();
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
-
 inline NilRecord SC_nil__Value();
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
@@ -9717,6 +9715,8 @@ inline bool SC_Reg_SyntaxCast(AsmReg Self);
 inline int SC_Reg_ToInt(AsmReg Self);
 
 inline NilRecord SC_nil__EndBlock();
+
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
@@ -9911,16 +9911,6 @@ inline void SC_nil__DeclKill() {
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 }
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
-	ASMtmp T = SC_Msg_ASMType(Msg);
-	if (T) {
-		return (SC__nil_NilTable[T])(Msg, Test);
-	}
-	T = ((ASMtmp)Msg->Func);
-	(SC_Msg_ASMTypeSet(Msg, T));
-	return (SC__nil_NilTable[T])(Msg, Test);
-}
-
 inline NilRecord SC_nil__Value() {
 	return SC_nil_Value((&SC__nil_T));
 }
@@ -9937,6 +9927,10 @@ inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 	AsmReg Rz = ((AsmReg)0);
 	ASMtmp T = SC_Msg_ASMType(Exp);
 	fn_asm Fn = SC_fn_asm_table[T];
+	if (!T) {
+		Fn = SC_fn_asm_table[((int)Exp->Func)];
+		debugger;
+	}
 	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen)) {
 		debugger;
 		// Can't close declarations in args!;
@@ -9946,6 +9940,10 @@ inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 	}
 	 else {
 		Rz = (Fn)(Self, Exp, Dest, 0);
+	}
+	int Dd = SC_Reg_Reg(Dest);
+	if (((bool)Dd) and (SC_Reg_Reg(Rz) != Dd)) {
+		//FFFFFFASSDJKLASDM<>AS;
 	}
 	return Rz;
 }
@@ -9967,6 +9965,16 @@ inline NilRecord SC_nil__EndBlock() {
 	Rz = SC_nil__Value();
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 	return Rz;
+}
+
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
+	ASMtmp T = SC_Msg_ASMType(Msg);
+	if (T) {
+		return (SC__nil_NilTable[T])(Msg, Test);
+	}
+	T = ((ASMtmp)Msg->Func);
+	(SC_Msg_ASMTypeSet(Msg, T));
+	return (SC__nil_NilTable[T])(Msg, Test);
 }
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {

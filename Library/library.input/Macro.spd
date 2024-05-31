@@ -59,7 +59,7 @@ extend message
 	helper MacroPrm (|message| root,  |array? of message| prms,  |message| dest,  |Message|)
 		opt norefcounts
 		|| n = .name
-		|| c = n.First
+		|| c = n[]
 		if (c == '*') and (self == @brel)
 			|| f = .first
 			if f == "_" and @thg
