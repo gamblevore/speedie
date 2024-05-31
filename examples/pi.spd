@@ -1,6 +1,12 @@
 #!/usr/local/bin/spd
 
 main
-	"Please enter a number:"	
-	|| input = app.input.Float
-	"$input * π = ${input*π}" 
+	while
+		"Please enter a number:"
+		|| s = app.input #loop
+		|| input = s.Float
+		if StdErr.ok
+			"$input * π = ${input*π}" 
+		  else
+			StdErr.ShellPrintErrors
+			StdErr.clear
