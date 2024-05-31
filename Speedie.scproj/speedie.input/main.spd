@@ -1,8 +1,11 @@
 
 main // speedie main {
 	compiler.SetupEnv
-//	target debug
-//		ћ.TestHolly("~/Downloads/SF/A.box".file)
+	target debug2
+		|| x = 7.9MB
+		|| y = 1
+		if x == y
+	
 	compiler.MiniTests
 	compiler.Main
 	compiler.PrintResults

@@ -2,5 +2,5 @@
 
 main
 	"Please enter a number:"	
-	|| input = app.input.int
+	|| input = app.input.Float
 	"$input * π = ${input*π}" 

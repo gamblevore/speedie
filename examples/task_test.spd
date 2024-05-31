@@ -3,10 +3,10 @@
 
 main
 	|| hello = abc.HelloSayer()
-	hello()
 	|| say = abc.stringsayer("goodbye")
-	say()
 	|| rsay = abc.randomsayer("hehe")
+	hello()
+	say()
 	rsay()
 
 

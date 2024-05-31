@@ -23,7 +23,7 @@ class Word
 	|bool| 		Adjective
 
 	constructor (|string| s)
-		if s.first == '+'
+		if s[] == '+'
 			s = s[1...]
 			.Adjective = true
 		
@@ -59,7 +59,7 @@ class SwearManager
 	function Accept (|word| a, |word| b, |bool|)
 		require a != b
 		if .same
-			require a.name.first == b.name.first
+			require a.name[] == b.name[]
 		return true
 		
 		

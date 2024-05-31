@@ -302,7 +302,6 @@ function message.UnitMatch (|string| a, |string| b, |bool|)
 function TypeOfUnit (ExprResolver)	
 	|message--| it = exp.first!
 	if exp == "l"
-//		debugger
 		exp.become(@bra)
 		it.func = @num
 		return typeofnum(it, name_space, exp)
