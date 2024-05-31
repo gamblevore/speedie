@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[597];
+extern JB_StringC* JB_LUB[596];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -3424,7 +3424,11 @@ void JB_MzSt_liveupdate(CompressionStats* Self, int S, int Outt) {
 void JB_MzSt_Print(CompressionStats* Self) {
 }
 
-void JB_MzSt_start(CompressionStats* Self) {
+CompressionStats* JB_MzSt_start(CompressionStats* Self) {
+	if (!Self) {
+		return (&JB__MzSt_all);
+	}
+	return Self;
 }
 
 int JB_MzSt__Init_() {
@@ -3549,7 +3553,6 @@ void JB_FastBuff_SyntaxExpect(FastBuff* Self, JB_String* S) {
 JB_String* JB_FastBuff_TmpStr(FastBuff* Self) {
 	return JB_StrFromPtr(Self->Start, JB_FastBuff_Length(Self), nil, nil);
 }
-
 
 
 
@@ -3748,6 +3751,7 @@ int JB_Rnd__InitCode_() {
 
 
 
+
 void JB_StructSaveTest_Destructor(StructSaveTest* Self) {
 	JB_Clear(Self->Sav);
 	JB_Clear(Self->Str);
@@ -3766,7 +3770,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver) {
 	JB_Saver_AppendInt(Saver, Self->Intt);
 	JB_Saver_AppendString(Saver, Self->Str);
 }
-
 
 
 
@@ -4497,7 +4500,6 @@ bool JB_Flow__Cond(bool Value) {
 	JB__Flow_Disabled = 0;
 	return Value;
 }
-
 
 
 LeakTester* JB_Lk_Constructor(LeakTester* Self, JB_String* Name) {
@@ -5345,10 +5347,7 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 		JB_Decr(J);
 		return;
 	}
-	if (!St) {
-		St = (&JB__MzSt_all);
-	}
-	JB_MzSt_start(St);
+	St = JB_MzSt_start(St);
 	JB_FS_AppendString(J, JB__JbinHeader);
 	JB_bin_Enter(J, kJB_SyxTmp, JB_LUB[571]);
 	JB_bin_AddInt(J, Self->Length);
@@ -5416,50 +5415,28 @@ bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, Compress
 		JB_Decr(Fs);
 		return true;
 	}
-	if (!St) {
-		St = (&JB__MzSt_all);
-	}
-	ErrorMarker OK = JB_Rec_Mark(JB_StdErr);
 	JB_SS_ExpectJbin(Self);
-	Message* Mz = JB_Incr(JB_SS_NextMsg(Self));
-	if (JB_Msg_EqualsSyx(Mz, kJB_SyxArg, false)) {
-		JB_SetRef(Mz, JB_SS_NextMsgExpect(Self, nil, kJB_SyxTmp, nil));
-	}
-	 else if (!JB_Msg_Expect(Mz, kJB_SyxTmp, nil)) {
-		JB_SetRef(Mz, nil);
-	}
-	if (!Mz) {
-		JB_Decr(Mz);
-		JB_Decr(Fs);
-		return nil;
-	}
-	JB_MzSt_start(St);
-	Message* Size = JB_Incr(JB_SS_NextMsgExpect(Self, Mz, kJB_SyxNum, nil));
+	Message* Mz = JB_Incr(JB_SS_NextMsgExpect(Self, nil, kJB_SyxTmp, nil));
+	Message* _tmPf1 = JB_Incr(JB_SS_NextMsgExpect(Self, Mz, kJB_SyxNum, nil));
+	int64 Remaining = JB_Msg_Int(_tmPf1, 0);
+	JB_Decr(_tmPf1);
 	Message* Arg = JB_Incr(JB_SS_NextMsgExpect(Self, Mz, kJB_SyxArg, nil));
-	int64 Remaining = JB_Msg_Int(Size, 0);
-	if (!(((bool)Size) and (((bool)Arg) and (Remaining <= Lim)))) {
-		if (Remaining > Lim) {
-			if (true) {
-				JB_SS_SyntaxExpect(Self, JB_LUB[468]);
-			}
-		}
-		 else {
-			if (true) {
-				JB_SS_SyntaxExpect(Self, JB_LUB[251]);
-			}
+	JB_Decr(Mz);
+	if (!((Remaining > 0) and ((Remaining <= Lim) and ((bool)Arg)))) {
+		if (true) {
+			JB_StringC* _tmPf2 = JB_Incr(((JB_StringC*)JB_Ternary(Remaining > Lim, JB_LUB[468], JB_LUB[251])));
+			JB_SS_SyntaxExpect(Self, _tmPf2);
+			JB_Decr(_tmPf2);
 		}
 	}
 	 else {
-		JB_SetRef(Mz->Name, JB_LUB[0]);
-		JB_SetRef(Size->Name, JB_LUB[0]);
+		St = JB_MzSt_start(St);
 		while (true) {
 			Message* C = JB_Incr(JB_SS_NextMsgExpect(Self, Arg, kJB_SyxBin, nil));
-			if (!C) {
+			if ((!C)) {
 				JB_Decr(C);
 				break;
 			}
-			JB_String* S = JB_Incr(C->Name);
-			JB_Decr(S);
 			int64 Expected = JB_int64_OperatorMin(Remaining, 1048576);
 			if (!JB_Str_DecompressChunk(Fs, C->Name, Expected)) {
 				JB_Decr(C);
@@ -5471,13 +5448,11 @@ bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, Compress
 			JB_Tree_Remove(C);
 			JB_Decr(C);
 		};
+		JB_MzSt_end(St);
 	}
 	JB_Decr(Fs);
-	JB_Decr(Mz);
-	JB_Decr(Size);
 	JB_Decr(Arg);
-	JB_MzSt_end(St);
-	return JB_ErrorMarker_SyntaxCast(OK);
+	return (!Self->Data.WentBad);
 }
 
 void JB_SS_Destructor(StringReader* Self) {
@@ -6158,7 +6133,6 @@ JB_List* JB_Tree_Upward(JB_List* Self, int N) {
 	};
 	return Self;
 }
-
 
 
 
@@ -7729,6 +7703,7 @@ void JB_Msg__TreeComparePrint(Message* Orig) {
 
 
 
+
 void JB_sci_Destructor(SaverClassInfo* Self) {
 	JB_Clear(Self->NextInfo);
 	JB_Array_Destructor(Self);
@@ -8363,7 +8338,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024053117);
+	return (2024060100);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8375,4 +8350,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 -3917995550733313767 -766316816660040130
+// 7796578953066441599 3807862181434247010 2997985800942882790

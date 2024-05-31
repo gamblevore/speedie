@@ -117,8 +117,6 @@ struct FastBuff;
 
 struct FloatRange;
 
-struct HuffItem;
-
 struct IntDownRange;
 
 struct Mat4;
@@ -134,6 +132,8 @@ struct Object_Behaviour;
 struct ParserLineAndIndent;
 
 struct Random;
+
+struct RangeCoderItem;
 
 struct RetroFloat;
 
@@ -162,8 +162,6 @@ struct FastString_Behaviour;
 struct FixedDict_Behaviour;
 
 struct FlowControl_Behaviour;
-
-struct HuffByteCoder_Behaviour;
 
 struct LeakTester_Behaviour;
 
@@ -205,11 +203,11 @@ struct StringZeroTerminated_Behaviour;
 
 struct list_Behaviour;
 
-struct HuffNode_Behaviour;
-
 struct MessageID_Behaviour;
 
 struct Message_Behaviour;
+
+struct RangeCoder_Behaviour;
 
 struct SaverClassInfo_Behaviour;
 
@@ -230,8 +228,6 @@ struct JB_ErrorReceiver;
 struct FixedDict;
 
 struct FlowControl;
-
-struct HuffByteCoder;
 
 struct LeakTester;
 
@@ -259,13 +255,13 @@ struct Dictionary;
 
 struct JB_File;
 
-struct HuffNode;
-
 struct JB_File;
 
 struct Message;
 
 struct MessageID;
+
+struct RangeCoder;
 
 struct SaverClassInfo;
 
@@ -1731,7 +1727,7 @@ void JB_MzSt_liveupdate(CompressionStats* Self, int S, int Outt);
 
 void JB_MzSt_Print(CompressionStats* Self);
 
-void JB_MzSt_start(CompressionStats* Self);
+CompressionStats* JB_MzSt_start(CompressionStats* Self);
 
 int JB_MzSt__Init_();
 
@@ -1776,9 +1772,6 @@ JB_String* JB_FastBuff_TmpStr(FastBuff* Self);
 
 
 // JB_FloatRange
-
-
-// JB_HuffItem
 
 
 // JB_IntDownRange
@@ -1881,6 +1874,9 @@ int JB_Rnd__InitCode_();
 
 
 
+// JB_RangeCoderItem
+
+
 // JB_RetroFloat
 
 
@@ -1927,9 +1923,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 
 
 // JB_FlowControl_Behaviour
-
-
-// JB_HuffByteCoder_Behaviour
 
 
 // JB_LeakTester_Behaviour
@@ -1992,13 +1985,13 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 // JB_list_Behaviour
 
 
-// JB_HuffNode_Behaviour
-
-
 // JB_MessageID_Behaviour
 
 
 // JB_Message_Behaviour
+
+
+// JB_RangeCoder_Behaviour
 
 
 // JB_SaverClassInfo_Behaviour
@@ -2168,9 +2161,6 @@ void JB_Flow__Input(JB_String* Data, JB_String* Name);
 
 bool JB_Flow__Cond(bool Value);
 
-
-
-// JB_HuffByteCoder
 
 
 // JB_LeakTester
@@ -2550,9 +2540,6 @@ JB_List* JB_Tree_Upward(JB_List* Self, int N);
 // JB_ExistingFile
 
 
-// JB_HuffNode
-
-
 // JB_JeeboxFile
 
 
@@ -2800,6 +2787,9 @@ void JB_Msg__TreeComparePrint(Message* Orig);
 
 
 // JB_MessageID
+
+
+// JB_RangeCoder
 
 
 // JB_SaverClassInfo
