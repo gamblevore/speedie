@@ -6,7 +6,7 @@ struct FastBuff
 	|&byte|		End
 	|?string|	ReadFrom
 	|bool| 		Owns
-	|int| 		ErrorReported
+	|bool| 		WentBad
 	
 	destructor
 		if .owns
@@ -104,9 +104,9 @@ struct FastBuff
 		return *.curr++
 	
 	syntax Expect (|string| s)
-		if !.ErrorReported
+		if !.WentBad
 			error s
-		++.ErrorReported
+		.WentBad = true
 		
 	function UInt16 (|uint16|)
 		|| c = .curr|&uint16|,  rz = *c++,  .curr = c|&byte|

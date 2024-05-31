@@ -59,7 +59,7 @@ role JBin (Faststring)
 		return .addmemory(type, name.length, into, name.addr)
 	function Add		(|syntax| type, |faststring| fs, |bool|into = false, |jbinleaver|)
 		cpp_part AddFS
-		return .addmemory(Type, fs.length, into, fs.resultptr)
+		return .addmemory(Type, fs.length, into, fs.Resultptr)
 
 
 	function AddComp (|faststring| fs, |int| strength=mzlab.strongest)
@@ -191,7 +191,7 @@ function StringReader.ParseJbin (|int64| Remain=int64.max, |MessageRoot|)
 	while --Remain > 0
 		loop .NextMsginfo
 	
-	if .Data.ErrorReported
+	if .Data.WentBad
 		rz = nil // be consistant with .parse!
 	
 
