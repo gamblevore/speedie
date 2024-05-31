@@ -221,8 +221,6 @@ struct FatASM;
 
 struct FloatRange;
 
-struct HuffItem;
-
 struct IntDownRange;
 
 struct IsaTester;
@@ -232,6 +230,8 @@ struct LoopInfo;
 struct Mat4;
 
 struct MessagePosition;
+
+struct MiniHuffItem;
 
 struct ModelTest;
 
@@ -5505,9 +5505,6 @@ void SC_FatASM_SyntaxExpect(FatASM* Self, JB_String* Error);
 // JB_GameFlyingMem
 
 
-// JB_HuffItem
-
-
 // JB_IntDownRange
 
 
@@ -5540,6 +5537,9 @@ void JB_MsgPos_Destructor(MessagePosition* Self);
 
 void JB_MsgPos_SyntaxUsingComplete(MessagePosition* Self, JB_Object* Idk);
 
+
+
+// JB_MiniHuffItem
 
 
 // JB_ModelTest

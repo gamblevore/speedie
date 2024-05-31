@@ -3,7 +3,7 @@
 // Holistic Jeebox Compressor
 // !!Experimental!!
 // !!TESTS SHOW IT NEEDS MORE WORK TO IMPROVE RATIO!!
-// !!!NEEDS SOME KINDA HUFFMAN. Perhaps 1 or 2 byte huff!!!
+// !!!NEEDS SOME KINDA HUFFMAN.!!!
 // perhaps reimplement mz so that it splits data into: strs, offsets, lengths, ranges
 // then huff each separately.
 // maybe need to integrate hol and mz into one format.... as its better to have one
@@ -133,6 +133,7 @@ struct ћ
 		j <~ _JbinHeader
 		j.enter(@tmp, "ћ")
 		.EncodeSub(root, j)
+//		HuffByteCoder.Test .strings.copy
 		j.addcomp_view(.strings, 1, "string")
 		j.addcomp_view(.types,   1, "type")
 		j.addcomp_view(.lengths, 1, "length")

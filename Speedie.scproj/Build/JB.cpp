@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2070];
+extern JB_StringC* JB_LUB[2069];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -1927,7 +1927,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112536765305511));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112536817242259));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3239,7 +3239,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024053117));
+	JB_FS_AppendInt32(_fsf0, (2024053118));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7998,7 +7998,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024053117));
+	JB_FS_AppendInt32(_fsf0, (2024053118));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -11663,7 +11663,7 @@ SCObject* SC_TypeOfBRel(Message* Exp, SCNode* Name_space, Message* Side) {
 	}
 	byte N = JB_Str_First(Name);
 	if (N == '*') {
-		(JB_Msg_SyntaxProblem(Exp, JB_LUB[2069]));
+		(JB_Msg_SyntaxProblem(Exp, JB_LUB[2068]));
 		SCDecl* _tmPf0 = JB_Incr(SC_Decl_DeReference(SubType, Exp, Name_space, false));
 		JB_Decr(SubType);
 		JB_Decr(F);
@@ -20202,7 +20202,6 @@ void SC_FatASM_SyntaxExpect(FatASM* Self, JB_String* Error) {
 
 
 
-
 int SC_IsaTester__Init_() {
 	{
 		SC__IsaTester_T = ((IsaTester){});
@@ -20260,6 +20259,7 @@ void JB_MsgPos_Destructor(MessagePosition* Self) {
 
 void JB_MsgPos_SyntaxUsingComplete(MessagePosition* Self, JB_Object* Idk) {
 }
+
 
 
 
@@ -50193,4 +50193,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 7411760688651717623 190018401028861401
+// -7401012152898360352 -4952308853400179641
