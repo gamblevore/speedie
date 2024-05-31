@@ -20,10 +20,10 @@ module LinkMap
 	
 	function Store (|&(array? of SCObject)| darr, |SCObject| obj)
 		opt norefcounts
-		|| arr = *darr
+		|| arr = darr[]
 		if arr == nil
 			arr = []
-			*darr = arr
+			darr[] = arr
 		arr <~ obj
 
 

@@ -128,7 +128,7 @@ class GraphicsEditor (GuiControl)
 		|| w = colors.white
 		for (p in .Merged) (v)
 			|| col = (v<<size).sum isa 2
-			*p = (g,w)(col)
+			p[0] = (g,w)(col)
 	
 	
 	function Export (|file| dest)

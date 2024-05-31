@@ -55,7 +55,7 @@ function CollectSub (|Message| c, |SCNode|)
 		return nil
 	
 	|| FnObj = T[c.name]									#expect c
-	|| base = (*FnObj)( c, self, c )						#require
+	|| base = (FnObj.first)( c, self, c )					#require
 	if (base != Compiler.program) // OK
 		.TryAdd( c, base, base.Name )
 	

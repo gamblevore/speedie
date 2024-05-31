@@ -150,7 +150,7 @@ class Memory
 		|| pc = other._ptr
 		
 		while p1 < pz
-			if *pc++ != *p1++
+			if pc++[] != p1++[]
 				return (p1-1) - ._ptr
 		
 	
@@ -227,7 +227,7 @@ class Memory
 		fs <~ "dumping memory:\n"
 		
 		while (p < p2)
-			|| c = *p++
+			|| c = p++[]
 			fs.appendhex(c, 2)
 			if (++i >= row)
 				i = 0

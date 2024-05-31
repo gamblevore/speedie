@@ -150,7 +150,7 @@ struct ћ
 	helper MakePlace (|message| m, |&messageID|)
 		opt norefcounts
 		|| pl = &.Dicts[(m.func)|int| & 63]
-		|| v = (*pl) init dictionary()
+		|| v = (pl[]) init dictionary()
 		return v.MakePlace(m.name)|&messageID|
 
 
@@ -161,7 +161,7 @@ struct ћ
 			|| id = Where[0]
 				id.Frequency++
 			  else
-				id = MessageID(s, .Palette.length),  *where = id
+				id = MessageID(s, .Palette.length),  where[] = id
 				id.frequency = 1
 				id.Position = 4K
 				.Palette <~ id

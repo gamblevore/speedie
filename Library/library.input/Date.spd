@@ -114,8 +114,8 @@ datatype Date (int64)
 
 		helper Now2 (|&Date| out, |Date|)
 			cpp_part KindaNow
-			*out = .now()
-			return *out
+			rz = .now()
+			out[] = rz
 
 		function New (|Date|)
 			cpp_part New0

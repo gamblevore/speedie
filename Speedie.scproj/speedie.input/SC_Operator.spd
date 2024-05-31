@@ -88,7 +88,7 @@ function IsCompSet (|bool|)
 
 
 function InitComp (|string| name_)
-	if *name_ == '~'
+	if name_[] == '~'
 		.kind |= opmode.CaseAware
 	.kind |= opmode.Compare
 	.FuncName = "OperatorCompare"

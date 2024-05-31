@@ -121,7 +121,7 @@ struct Pico
 		function Replace (|&&pico| Where, |bool|)
 			|| New = pico.new #require
 			.destroy(where, "replace")
-			*where = new
+			where[0] = new
 			return true
 
 		function HasParentSocket (|bool|)

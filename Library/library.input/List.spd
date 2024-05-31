@@ -246,7 +246,7 @@ class list (Saveable)
 			++m
 
 		if r
-			*r = m
+			r[] = m
 		return c
 
 

@@ -872,7 +872,7 @@ ive been~running #since morning
 			opp.RangeLength++
 		
 		|| Mode = Parser.kAllow
-		if !(*opp.name).isletter
+		if !(opp.name[]).isletter
 			Bits |= koppWord
 
 		Rel <~ .ProcessThing( Bits, Mode )

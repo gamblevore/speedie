@@ -1,0 +1,127 @@
+
+
+
+struct HuffItem
+	|uint| Code
+	|int|  Depth
+
+
+class HuffByteCoder
+	function Encode (|string| input, |faststring| fs)
+		|HuffItem[256]| Table = nil
+		.collect(input, &Table[0])
+		
+		|uint64| Bits
+		|int|    Bits_Used
+		fs.freesize = input.length + 64 // can we fit the table in 64 bytes?
+
+		
+	function Collect (|string| input, |&huffitem| items=nil)
+		|int[256]| Histo = nil
+		|| root = huffnode()
+		|| h = &histo[0]
+		
+		for b in input
+			h[b]++
+
+		for i in 256
+			|| hi = h[i]
+				root <~ huffnode(i, hi)
+		
+		root.sort(&HuffNode.sorter)
+		root.LinkAll
+		|| s = root.first!
+		s.Encode(items)
+
+		root.PrintScore
+
+
+	module
+		function Test
+			|| coder = new()
+			|| fs = faststring()
+			coder.encode("he ties the tether", fs)
+			
+
+
+class HuffNode (list)
+	contains huffnode
+	|int|   Char = -1
+	|int|   Freq = 0
+	|int|	Code = 0
+	
+	function Place (|huffnode| after)
+		opt norefcounts
+		|| f = .freq
+		while
+			|| n = after.next
+			if !n or n.freq >= f
+				after.next = self
+				exit
+			after = n
+
+
+	function Encode (|&huffitem| n, |int| Depth=0, |int| Code=0)
+		opt norefcounts
+		if n
+			|| k = .char
+			if k >= 0
+				|| c = &n[k]
+				c.code = code
+				c.depth = depth
+		.position = depth++
+		.code = code
+		code <<= 1
+		|| l = .first
+		|| r = l.next
+			l!.encode(n, depth, code)
+			r!.encode(n, depth, code|||1)
+
+
+	function LinkAll
+		opt norefcounts
+		while
+			|| l = .first
+			|| r = l.next #loop
+			|| Comb = huffnode(-1,  l!.freq + r.freq)
+			Comb.place(r)
+			Comb <~ l
+			Comb <~ r
+	
+	
+	function PrintScore
+		|| fs = faststring()
+		for s.flat in self
+			if s.freq and s.char >= 0
+				fs <~ s.char|byte|
+				fs <~ "  |  "
+				for i.down in s.position
+					fs <~ ('0' + s.code[i])|byte|
+				fs <~ "\n"
+		printline fs
+					
+				
+	render
+		if .freq
+			fs <~ .freq
+			fs <~ ": "
+
+		if .char >= 0
+			fs.appendescape(.char|byte|.render)
+		  elseif .hasany
+			fs <~ "(" 
+			|| any = false
+			for ch in self
+				if any
+					fs <~ ",  "
+				any = true
+				ch.render(fs)
+			fs <~ ")"
+			
+		
+	module
+		helper Sorter (SorterComparer)
+			target debug
+				if a|huffnode|.freq == b|huffnode|.freq
+					return a|huffnode|.char > b|huffnode|.char
+			return a|huffnode|.freq > b|huffnode|.freq 

@@ -101,7 +101,7 @@ class File (String)
 		.msg.render(.out(false))
 	
 	function string.Visible (|bool|)
-		return *.name != '.'
+		return .name[] != '.'
 		
 	function Hidden (|bool|)
 		return !.visible
@@ -249,7 +249,7 @@ class File (String)
 			return true
 		|| fs = faststring()
 		fs <~ "File does not exist"
-		if *super != '/'
+		if super[] != '/'
 			fs <~ " at "
 			fs <~ app.cwd
 		if operation
@@ -414,7 +414,7 @@ class File (String)
 	function List (|bool| invis = false, |[string]|)
 		flow off
 		for name in self
-			if (invis) or (*name != '.')
+			if (invis) or (name[] != '.')
 				rz <~ name
 		rz.sort(&string.sorter)
 		if !flowcontrol.disabled

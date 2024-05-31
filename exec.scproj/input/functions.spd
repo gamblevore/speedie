@@ -133,22 +133,22 @@ module Lib
 	function LoadLibFuncs (|message| spd, |&&nil| Internals, |&&nil|)
 		opt norefcounts
 		for ch in spd[@prm]
-			|| fn = *Internals++  #expect  (ch, "Missing lib function")
+			|| fn = Internals++[]  #expect  (ch, "Missing lib function")
 				
 			require .AddLibFunc( function(fn, ch.name) )
 					
-		check (!*Internals) ("Extra InternalFunction")
+		check (!Internals[]) ("Extra InternalFunction")
 		return internals+1
 
 
 	function LoadLibGlobs (|message| spd, |&&nil| Internals)
 		opt norefcounts
 		for ch in spd[@arr, 1]
-			|| G = *Internals++  #expect  (ch, "Missing lib global")
+			|| G = Internals++[]  #expect  (ch, "Missing lib global")
 				
 			require .AddLibGlob( G, ch.name )
 
-		check (!*Internals) ("Extra global") 
+		check (!Internals[]) ("Extra global") 
 		
 
 

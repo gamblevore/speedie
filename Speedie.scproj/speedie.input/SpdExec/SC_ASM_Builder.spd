@@ -56,7 +56,7 @@ datatype µParam (uint16)
 
 
 function message.RegOrNum (|bool| NeedReg = false, |int|)
-	if !NeedReg and ((*.name).lowercase != 'r')
+	if !NeedReg and (.name[].lowercase != 'r')
 		return .int
 	|| reg = .int(1)
 	if (reg <= 31)

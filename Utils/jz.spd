@@ -404,8 +404,8 @@ module Conv
 		|| num = mz[@num]
 		|| arg = num.next(@arg)
 			arg.ExpectLast
-			*size = num.int
-			if *size
+			size[] = num.int
+			if size[]
 				.Detected |= type.compressed
 				return "µz"
 		return string.error

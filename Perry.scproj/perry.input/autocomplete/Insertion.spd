@@ -13,13 +13,13 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 	visible
 	opt norefcounts
 	
-	|| i2 = *s_end
+	|| i2 = s_end[]
 	|| prevchar = self[i2-1]
 	while prevchar == ' '
 		prevchar = self[--i2]
-	*s_end = i2
+	s_end[] = i2
 
-	|| msg	= d.message.FindTightest(*s_End)
+	|| msg	= d.message.FindTightest(s_End[])
 	|| msg0 = msg
 	|| CanUsePrms = false
 	
@@ -36,13 +36,13 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 				if (msg0 in @decl) and msg0.isfirst
 					msg0 = msg0.parent
 				if msg0 == @decl
-					*inrange = true
-					*found = msg0
+					inrange[] = true
+					found[] = msg0
 					return 4					// 4: function a.b (|*|)
 		if  msg0 == @thg  and  msg0 in @decl  and  msg0.prev == @emb
 			return -2
 		if CanUsePrms  // myfunc(a,b,c ^)
-			*found = msg0
+			found[] = msg0
 			return 3
 			
 		return nil
@@ -51,10 +51,10 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 
 	if !autocomplete.IsAFunc(msg)
 		if CanUsePrms  // myfunc(a,b,c ^)
-			*found = msg0
+			found[] = msg0
 			return 3
 		
-		*found = msg
+		found[] = msg
 		return 10
 	
 	|| ConstructorLike = msg ~= "constructor" or "render"
@@ -63,31 +63,31 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 	if ConstructorLike and (func_name == @bra or @list)
 		prms = func_name
 		func_name = nil						// 0: constructor (|int| x)
-		*inrange = .RangeCheck(*s_end, msg, prms)
+		inrange[] = .RangeCheck(s_end[], msg, prms)
 	  else
 		if !func_name or func_name == @arg
-			*found = msg // i guess?
+			found[] = msg // i guess?
 			if msg == "main"
 				return 0 // all is good
 			return 1 + ConstructorLike
 		prms = func_name.next
-		*inrange = .RangeCheck(*s_end, func_name, prms)
+		inrange[] = .RangeCheck(s_end[], func_name, prms)
 		if prms == nil							// 2: constructor *
-			*found = func_name
+			found[] = func_name
 			return 2							// 2: function a.b*
 		if (func_name == @arg)
-			*found = msg
+			found[] = msg
 			return 1 + ConstructorLike			// 1: function *{}
 												// 2: constructor *{}
 		ifn prms == @list or @bra // great
-			*found = func_name
+			found[] = func_name
 			return 2							// 2: function a.b*
 		
 	
 	|| arg = prms.next
 	require (arg==nil or @arg)
 	|| decl = prms.first
-	*s_end = prms.after
+	s_end[] = prms.after
 	
 	|message| Name
 	while decl == @decl
@@ -96,14 +96,14 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 		if name == "..."
 			return -1
 		if !name
-			*found = decl
+			found[] = decl
 			return 4						// 4: function a.b (|*|)
 		decl = decl.next
 	
 	if Name
-		*found = name
+		found[] = name
 		return 5							// 5:function a.b (|type| name*)
-	*found = prms
+	found[] = prms
 	return 3
 
 

@@ -250,7 +250,7 @@ function Message.Clean (|bool| erl = false)
 				curr.BecomeAppend("SyntaxSendTo")
 			  elseif curr.OppExpand
 				0 // 
-			  elseif jeebox.CSWordStart[*(curr.name)]
+			  elseif jeebox.CSWordStart[curr.name[]]
 				curr.name = curr.name.Lowercase
 		
 		  elseif (f == @tmp)
@@ -508,10 +508,10 @@ module StringCorrector
 			require !stdlib							// if we are making a pack... add non-lib strings.
 
 		|| p = Table2.MakePlace(m.name)
-		|| i = (*p)|MessageID|
+		|| i = (p[])|MessageID|
 		if i == nil
 			i = .newID(m.name)
-			*p = i
+			p[] = i
 		m.name = i
 
 

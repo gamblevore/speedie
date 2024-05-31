@@ -81,7 +81,7 @@ function string.Moat (|string|)
 
 
 function string.IsFileLike (|bool|)
-	|| c = *self
+	|| c = self[]
 	return (c == '/') or ((c == '.' or c == '~') and ((self[1] == '.') or (self[1] == '/')))
 	// so... we want to wrap to w... but prefer to wrap at a SPACE or comma
 	
@@ -149,7 +149,7 @@ function String.ExtractPathAndLine (|&ivec2| LineAndByte, |string|)
 				path := curr["path"]
 				if path and pos
 					|int| n = pos.int // make the c++ compile D:
-					*LineAndByte = (1, n)
+					LineAndByte[] = (1, n)
 					return path.name
 				curr++
 
@@ -157,14 +157,14 @@ function String.ExtractPathAndLine (|&ivec2| LineAndByte, |string|)
 	|| tr = rz.trim
 	if tr.isint
 		|| v = (tr.int|int|, 0)
-		*LineAndByte = v
+		LineAndByte[] = v
 		return ""
 	
 	|| parts = rz / ':'
 	rz = parts[0].trim
 	|| v2 = (parts[1].trim.int|int|, parts[2].trim.int|int|) 
-	*LineAndByte = v2
-	if *rz == '~'
+	LineAndByte[] = v2
+	if rz[] == '~'
 		rz = rz.Resolve(fileResolveMode.allowmissing)
 
 

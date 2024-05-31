@@ -3,7 +3,7 @@
 function string.ArgName (|string|)
 	// "--Name=Value" --> "Name"
 	// "--Name" --> "Name"
-	if (*self == '-') 
+	if (self[] == '-') 
 		|| i = .find( '=' ) ?? int.max
 		|| S = self[ 0, i ]
 		S = S.TrimFirst('-')
@@ -14,7 +14,7 @@ function string.ArgValue (|string|)
 	// "--Name=Value" --> "Value"
 	// "--Name" --> ""
 	// "Value" --> "Value"
-	if (*self != '-')
+	if (self[0] != '-')
 		return self
 
 	|| it = .find( '=' )

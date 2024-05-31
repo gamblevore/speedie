@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[596];
+extern JB_StringC* JB_LUB[595];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -3538,12 +3538,12 @@ JB_String* JB_FastBuff_AccessStr(FastBuff* Self, int Pos, int After) {
 }
 
 void JB_FastBuff_SyntaxExpect(FastBuff* Self, JB_String* S) {
-	if (!Self->ErrorReported) {
+	if (!Self->WentBad) {
 		if (true) {
 			JB_Str_SyntaxExpect(S);
 		}
 	}
-	(++Self->ErrorReported);
+	Self->WentBad = true;
 }
 
 JB_String* JB_FastBuff_TmpStr(FastBuff* Self) {
@@ -5637,7 +5637,7 @@ Message* JB_SS_ParseJbin(StringReader* Self, int64 Remain) {
 			break;
 		}
 	};
-	if (Self->Data.ErrorReported) {
+	if (Self->Data.WentBad) {
 		JB_SetRef(Rz, nil);
 	}
 	JB_SafeDecr(Rz);
@@ -5722,10 +5722,10 @@ JB_String* JB_SS_StrNoAdvance(StringReader* Self, int N, int Skip) {
 
 void JB_SS_SyntaxExpect(StringReader* Self, JB_String* Error) {
 	Self->UserObj = nil;
-	int D = (++Self->Data.ErrorReported);
-	if (D != 1) {
+	if (Self->Data.WentBad) {
 		return;
 	}
+	Self->Data.WentBad = true;
 	if (!JB_Str_Exists(Error)) {
 		if (((JB_File*)JB_File_SyntaxCast(Self->File))) {
 			Error = JB_LUB[230];
@@ -8358,7 +8358,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024053100);
+	return (2024053110);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8370,4 +8370,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 1550842132103416577 -7386124721516288993
+// 7796578953066441599 -2273982830918669969 3460009421739776019

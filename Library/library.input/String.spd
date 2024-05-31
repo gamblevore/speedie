@@ -153,7 +153,7 @@ class String
 	function LowerCase	(|string|)					{ cpp_wrapper JB_Str_LowerCase }
 
 	render TitleCase
-		fs <~ (*self).uppercase
+		fs <~ (self[]).uppercase
 		fs <~ self[1, int.max].lowercase
 
 	render Remove (|charset| remove, |int| to=-1)
@@ -493,7 +493,7 @@ class String
 	function Byte (|int| index, |Byte| Default, |int|)
 		cpp_wrapper JB_Str_ByteValue2
 		
-	syntax Access (|int| index, |Byte|)
+	syntax Access (|int| index=0, |Byte|)
 		nil checker
 		cpp_wrapper JB_Str_ByteValue
 		

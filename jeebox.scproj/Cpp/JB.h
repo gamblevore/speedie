@@ -367,7 +367,7 @@ struct FastBuff {
 	byte* End;
 	JB_String* ReadFrom;
 	bool Owns;
-	int ErrorReported;
+	bool WentBad;
 };
 
 struct MessagePosition {

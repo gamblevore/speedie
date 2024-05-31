@@ -17,12 +17,12 @@ function SCNode.CalculateConstRel (|message!| value, |&datatypecode| Ty, |uint64
 	opt norefcounts
 	|| A = value.first!
 	|| L = .CalculateConst(A, Ty)
-	require *ty isnt failed
+	require ty[] isnt failed
 	
 	|| B = A.next!
 	|| C = b.next!
 	if value == @brel
-		expect (*ty is int) (value, "Not an integer")
+		expect (ty[] is int) (value, "Not an integer")
 		return ~L
 		
 	|| op = scoperator.lookup(B)
@@ -31,7 +31,7 @@ function SCNode.CalculateConstRel (|message!| value, |&datatypecode| Ty, |uint64
 	expect (op is MathLike) (B)
 	|| N = B.name.first
 	|| Lg = b.name.length
-	|| Ints = (*ty).isint
+	|| Ints = (ty[]).isint
 	if n == '+'
 		if Ints
 			return L + R
@@ -83,12 +83,12 @@ function SCNode.CalculateConst (|message!| value, |uint64|)
 
 
 function message.TypeExpect (|&datatypecode| Ty, |datatypecode| In)
-	|| v = *ty
+	|| v = ty[]
 		if  v != in  and  v isnt failed
-			* ty = datatypecode.failed
+			ty[] = datatypecode.failed
 			error (self, "Can't mix floats/ints here.")
 	  else
-		* ty = In
+		ty[] = In
 
 
 function SCNode.CalculateConst (|message!| value, |&datatypecode| Ty, |uint64|)
@@ -280,12 +280,12 @@ function message.ConstIntValueSub (|SCNode| name_space, |&int64| v, |bool|)
 	while s == @bra
 		s = s.first!
 	if s == @num
-		*v = s.int
+		v[] = s.int
 		return true
-	if @thg and s.name[0,"syx"]
+	if (s == @thg) and s.name[0,"syx"]
 		|| find = _syxdict_.valuelower(s.name[3...])
-			* v = find.id|int64|
-			s.become(@num, (*v).render)
+			v[] = find.id|int64|
+			s.become(@num, v[].render)
 			return true
 
 

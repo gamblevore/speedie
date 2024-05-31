@@ -23,7 +23,7 @@ class Selector
 	constructor (|selector?| Next, |&selector| Place, |string| name)
 		.name = name
 		.next = next
-		*place = self
+		place[] = self
 	
 	Function GiveIDs
 		opt norefcounts

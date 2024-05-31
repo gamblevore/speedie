@@ -334,7 +334,7 @@ function Message.DotType (|DotUseType|)
 function RelChangesDisowned (|Message| msg, |String| name, |bool|)
 	return false // for now
 	
-	|| first = *msg
+	|| first = msg.first
 	if (first IsThing name)
 		Return first.VarOptFlag(kHoldsDisowned)
 

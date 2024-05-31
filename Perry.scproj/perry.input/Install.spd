@@ -160,10 +160,10 @@ extend_module perry
 		|| p = app.NeedsIdealPath$
 		
 		if !p.exists
-			*not_Exist = true
+			not_Exist[] = true
 			return " * Move Perry to /Applications"
 		  elseif p.appDate < app.Created
-			*age_Bad = true
+			age_bad[] = true
 			return " * Replace old Perry (in /Applications)"
 				
 

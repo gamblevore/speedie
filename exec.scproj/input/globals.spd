@@ -10,7 +10,7 @@ function package.Glob (|int| size)
 	.globals = byte[size]	#require
 	|| write = .globals!.Ptr|&string|
 	for ch in .strings
-		*(write++) = ch.name
+		(write++[]) = ch.name
 		write = write + 1
 
 

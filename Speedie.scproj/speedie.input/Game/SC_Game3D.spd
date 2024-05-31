@@ -184,7 +184,7 @@ extend SCDecl
 		fs <~ "const char $(N)_Init[] = {"
 
 		fs.CArrayAdd( oof.name )
-		fs.CArrayAddB( *M.ModelType!.name )
+		fs.CArrayAddB( M.ModelType!.name[] )
 		fs.CArrayAddB0( 8 ) // SuggestedCount. for the moment!
 		fs.CArrayAddB0( M.ModelMode ) // Alpha + Depth
 

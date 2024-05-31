@@ -930,7 +930,7 @@ function FindProject (|string| Path, |bool| error, |File|)
 
 	
 helper FindProjectSub (|string| base, |string| Path, |File|)
-	if (*Path == '/')
+	if (Path[] == '/')
 		return Path.FileThatExists
 	
 	|| First = Path

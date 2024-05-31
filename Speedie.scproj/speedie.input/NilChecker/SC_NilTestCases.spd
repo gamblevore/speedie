@@ -16,7 +16,7 @@ class NilTest
 			"hello"
 		|| v = .v3
 		borks // amazing
-		*v = 'x'
+		v[] = 'x'
 	
 	function Broken
 //		borks
@@ -31,17 +31,17 @@ class NilTest
 			|| x = a.Addr
 			|| y = b.Addr
 			if (p2 and p3)
-				*p2 = 0
+				p2[] = 0
 
 			if (p3 and p2)
-				*p3 = 0
+				p3[] = 0
 
 			if (p3 and p4?)
-				*p4 = 0
+				p4[] = 0
 
 			if (p3 and p4? and x? and y?)
-				*x = *y
-				*p3 = *p4
+				x[] = y[]
+				p3[] = p4[]
 
 
 	function recurse (|bool| pos, |bool|)
@@ -139,12 +139,12 @@ class NilTest
 	function BorkedPtr (|?&(niltest!)| xp0, |&niltest| xp2, |niltest| xp3)
 		if !xp0
 			borks
-			*xp0 = self
+			xp0[] = self
 		  else
-			*xp0 = self
+			xp0[] = self
 			
 		borks	
-		(*xp0).v
+		(xp0[]).v
 
 		|| xx = &NilTestByte
 		borks
@@ -153,18 +153,18 @@ class NilTest
 
 	function GoodPtr (|&niltest| xp0, |&niltest| xp2)
 		if xp0
-			*xp0 = self
+			xp0[] = self
 		if xp2
-			|| x = *xp2
+			|| x = xp2[]
 				x.v
 
 	function BadGoodPtr (|&niltest| p)
 		if p
-			*p = self
+			p[] = self
 		
 	function BadBadPtr (|&niltest| p)
 		if p
-			|| v = *p
+			|| v = p[]
 				++v.v
 	
 	function NilGlobals
@@ -172,7 +172,7 @@ class NilTest
 		x2 = nil
 		
 	function GoodBadPtr (|&niltest| p)
-		|| v = *p
+		|| v = p[]
 			++v.v
 		.V
 
@@ -278,7 +278,7 @@ function NilState.NilName (|faststring| fs, |bool| Expected)
 function @ArchonPurger.ndb4
 	cpp_name ndb4
 	visible
-	(*t.Neel).ndb5()
+	(t.Neel[]).ndb5()
 
 
 function NilRecord.ndb5 

@@ -55,7 +55,7 @@ class MessageID (stringshared)
 		super.constructor("")
 		.Func = @arg
 		.ID = 0
-		
+				
 		
 	function Msg (|message| parent=nil, |message|)
 		return Message(parent, .func, -1, .name, .name.length)

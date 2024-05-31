@@ -106,8 +106,8 @@ datatype cstring
 		|| c = self|&byte|
 		|| b = c
 		
-		while *c
-			if *c++ == '/'
+		while c[]
+			if c++[] == '/'
 				b = c
 		return b|cstring|
 	

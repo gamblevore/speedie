@@ -123,7 +123,7 @@ function Message.IsVarUseableInLoop (|String| name, |bool|)
 function Message.IsVarAltered (|String| name, |bool|)
 	opt norefcounts
 	for msg.flat in self
-		if (msg == @Rel) and (msg in @arg) and (*msg IsThing name)
+		if (msg == @Rel) and (msg in @arg) and (msg.first IsThing name)
 			Return true
 
 

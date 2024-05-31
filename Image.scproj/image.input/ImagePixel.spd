@@ -47,7 +47,7 @@ struct ImagePixel
 		return .r or .g or .b
 
 	function HasAny (|bool|)
-		return *(self|&int|)
+		return (self|&int|)[]
 			
 	syntax cast (|bool|)
 		cpp_part Exists
@@ -75,7 +75,7 @@ struct ImagePixel
 		.Alpha = .Alpha + v
 		
 	syntax append (|&imagepixel| r)
-		*self = *r
+		self[0] = r[0]
 
 	syntax append (|vec4| V)
 		cpp_part AppendVec
@@ -144,7 +144,7 @@ struct ImagePixel
 		.a = value.a
 	
 	function Uint (|uint|)
-		return *(self|&uint|)
+		return (self|&uint|)[]
 		
 	function Parts (|&byte|)
 		return &.r

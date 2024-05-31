@@ -592,7 +592,7 @@ extend PerryIDE
 		for ro in conf..roots
 			error.SourceAdd(ro)
 			if ro.expect(@str)
-				*file.OSXMaxCaseWarnings max= 1 // like /usr/local/bin vs /USR/LOCAL/BIN . Allows to report case errors.
+				file.OSXMaxCaseWarnings[] max= 1 // like /usr/local/bin vs /USR/LOCAL/BIN . Allows to report case errors.
 				|| str = .ExpandStr(ro.name)
 					f.addroot(str.file)
 				  else
@@ -606,7 +606,7 @@ extend PerryIDE
 	function DesiredStart (|filerow| projfol, |&int| pos,  |filerow|)
 		opt norefcounts
 		|| edit = .ProjMsg["edit"]
-			*pos = .ProjMsg["pos"].int
+			pos[] = .ProjMsg["pos"].int
 			|| n = edit.name
 				return self.filelist[n]
 		|| tod = .nottodo

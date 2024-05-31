@@ -480,15 +480,15 @@ struct MsgTextDrawState
 	
 	function Next (|&codepoint| pc, |&int| ppos, |int|)
 		opt norefcounts
-		|| c = *pc
+		|| c = pc[]
 		|| w = (1, .i.tabsWidth)(c != '\t')
 		rz   = .x
 		.x   = rz + w*font.width
 		.i  += w
 		|| m = .msg
-			|| pos	= *ppos
-			*pc		= c.ImproveDraw(.t, pos)
-			pos	   += .adder, *ppos = pos
+			|| pos	= ppos[]
+			pc[]	= c.ImproveDraw(.t, pos)
+			pos	   += .adder, ppos[] = pos
 			.msg	= m.NextColor(pos)
 			
 		

@@ -77,7 +77,7 @@ class µForm
 			.addp(i, µform.num)
 			return
 		expect (pl == 1) (self)
-		|| p = *pl
+		|| p = pl[]
 		if  p == 'r'
 			.addp(5, 0)
 		  elseif p == 'x'

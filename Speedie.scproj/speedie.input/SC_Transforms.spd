@@ -98,7 +98,7 @@ function Tran_Expect (TranFunc)
 function Tran_Temporal (|SCFunction| fn, |Message| s, |SCNode| name_space)
 	opt norefcounts
 	|| TmpInt = TemporalStatements[s.name]
-		return (*TmpInt)( FN, s, name_space )
+		return (TmpInt.first)( FN, s, name_space )
 	error s
 
 

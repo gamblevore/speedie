@@ -40,10 +40,10 @@ class Charset
 		cpp_wrapper JB_CS_HasChar
 		
 	helper NextInCharset (|&int| p, |bool|)
-		|| i = *p
+		|| i = p[]
 		while ++i < 256
 			if self[i]
-				*p = i
+				p[] = i
 				return true
 		
 	iterator

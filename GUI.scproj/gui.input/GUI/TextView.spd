@@ -181,7 +181,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		|| d = .LineAtY(p.y)
 		if d_
-			*d_ = d
+			d_[] = d
 		if d
 			return .LastLineFix(d, .xadjust(p))
 		if p.y < .lasttop
@@ -1478,7 +1478,7 @@ class TextView (GUIControl)
 				c = 0
 			if !n or .FoundInfo(d.DrawRange, char, sec)
 				if vline
-					*vline = c
+					vline[] = c
 //				_LastVLine = c
 				return d
 			d = n

@@ -213,10 +213,10 @@ class SCImport
 		if (self starts "Library/")
 			return self[6...].IsOKForImport
 			
-		while *X == '/'
+		while X[] == '/'
 			X = X[1...]
 		
-		if (!X or Jeebox.CSWordStart[*X])
+		if (!X or Jeebox.CSWordStart[X[]])
 			return true
 		error  (x, "Invalid path")
 

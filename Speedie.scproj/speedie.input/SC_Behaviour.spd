@@ -207,7 +207,7 @@ class SCBehaviour (SCNode)
 	
 	
 	function String.UnderScoreAtAnyEnd (|bool|)
-		return (*Self == '_') or (self[-1] == '_')
+		return (Self[] == '_') or (self[-1] == '_')
 	
 
 	function SCNode.ShouldBeClass (|message|errplace, |SCClass|)

@@ -50,11 +50,11 @@ function String.ParseWithError (|&Error| rec, |MessageRoot|)
 	rz = .parse
 	if !rz
 		|| r = stderr.pop
-		if rec: *rec = r 
+		if rec: rec[] = r 
 
 
 helper String.IsJbin (|ind|)
-	if  *self == '#'  and  self[1] == '!' // shebang
+	if  self[] == '#'  and  self[1] == '!' // shebang
 		|| nl = .find('\n')
 			nl++
 			if self[nl, _JbinHeader]
@@ -229,7 +229,7 @@ struct MessagePosition
 	|uint16|            Tag
 	
 	destructor
-		parser.using = *self
+		parser.using = self[0]
 	    .Layer.use 
 	
 	function SyntaxUsingComplete (|object| idk=nil)

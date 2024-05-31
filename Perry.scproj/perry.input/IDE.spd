@@ -389,7 +389,7 @@ class PerryIDE (Window)
 
 
 	function CheckNotCrashed (|&Process| pp, |string| what, |bool|)
-		|| p = *pp
+		|| p = pp[]
 		if !p or p.status
 			return true
 		|| fs = faststring()
@@ -397,7 +397,7 @@ class PerryIDE (Window)
 		fs <~ p.erroroutput.getresult.FindStacktrace
 		.notify(fs, @emb + what)
 		.CancelCompile("crashed")
-		*pp = nil
+		pp[] = nil
 
 
 	function string.FindStacktrace (|string|)

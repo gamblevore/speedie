@@ -477,11 +477,11 @@ function FindFunc (|string| keyword, |bool| CheckParents, |bool| DoError, |SCFun
 
 
 function NeedsDefaultValue (|message| def, |&message| place, |string| name)
-	require !*place
+	require !place[]
 	if .IsObject and !.IsRole
 		if def and !(def isthing "nil")
 			error (self, "Missing "+name+" value for class: "  + .name)
-	*place = def
+	place[] = def
 
 
 function NumericReduction (|classinfo|)
@@ -934,7 +934,7 @@ module
 
 		|| N		= .name.lowercase
 		|| Td		= DataTypeCode.Types[n]
-			|| t = *td
+			|| t = td.First
 			if T != 255
 				.size = T.ByteCount
 				if t == datatypecode.Vec3 or datatypecode.iVec3

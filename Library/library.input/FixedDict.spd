@@ -70,7 +70,7 @@ class FixedDict
 
 		|| BT = .typeof(b)
 		|| place = &.items[b]
-		|| obj = (*place)|fixeddict|		// verbose but faster
+		|| obj = (place[])|fixeddict|		// verbose but faster
 		if BT >= typestem
 			if obj
 				if obj.valuetype
@@ -81,7 +81,7 @@ class FixedDict
 				debugger // obj will never be nil here
 		  else
 			.typeof(b) = type
-			*place = val|&nil|
+			place[] = val|&nil|
 			if bt
 				jb_decr( obj )				// cos we call this last, compiler can opt it.
 	

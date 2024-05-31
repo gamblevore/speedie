@@ -91,16 +91,16 @@ constants
 function InitAccess
 	|| R = &ASMtmp.ReadASM[0]
 	|| W = &ASMtmp.WriteASM[0]
-	*R++ = ASM.RD1U, *W++ = ASM.WR1U
-	*R++ = ASM.RD1S, *W++ = ASM.WR2U
-	*R++ = ASM.RD2U, *W++ = ASM.WR4U
-	*R++ = ASM.RD2S, *W++ = ASM.WR8U
-	*R++ = ASM.RD4U, *W++ = ASM.WR16
-	*R++ = ASM.RD4S
-	*R++ = ASM.RD8U
-	*R++ = ASM.RD8U
-	*R++ = ASM.RD16
-	*R++ = ASM.RD16	
+	R++[] = ASM.RD1U, W++[] = ASM.WR1U
+	R++[] = ASM.RD1S, W++[] = ASM.WR2U
+	R++[] = ASM.RD2U, W++[] = ASM.WR4U
+	R++[] = ASM.RD2S, W++[] = ASM.WR8U
+	R++[] = ASM.RD4U, W++[] = ASM.WR16
+	R++[] = ASM.RD4S
+	R++[] = ASM.RD8U
+	R++[] = ASM.RD8U
+	R++[] = ASM.RD16
+	R++[] = ASM.RD16	
 
 
 function Debugger		(fn_asm)

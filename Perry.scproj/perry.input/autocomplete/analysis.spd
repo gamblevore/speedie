@@ -90,8 +90,8 @@ function PerryFuncMenuSelected (GUIListEvent)
 
 function FuncListSorter (SorterComparerMsg)
 	opt norefcounts
-	|| aa = *a
-	|| bb = *b
+	|| aa = a[]
+	|| bb = b[]
 	if (!aa or !bb)
 		return aa < bb
 	if aa.func != bb.func
@@ -100,8 +100,8 @@ function FuncListSorter (SorterComparerMsg)
 	if aa == @emb
 		return bb.name.SyntaxCompare(aa.name, true) < 0
 	
-	|| af = *aa
-	|| bf = *bb
+	|| af = aa[]
+	|| bf = bb[]
 	if (!af or !bf)
 		return af < bf
 	|| an = af.name

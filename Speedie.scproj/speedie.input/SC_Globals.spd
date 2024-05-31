@@ -176,6 +176,7 @@ function TypeOfBRel (ExprResolver)
 	|| n = name.first
 	
 	if n == '*'
+		problem (exp, "Use [] instead")
 		return SubType.Dereference(exp, name_space, false)
 	
 	if n == '-' and name == 1 // minus
@@ -393,10 +394,10 @@ function scdecl.numberconst (assigns:|uint64| v)
 function TypeOfNum (ExprResolver)
 	opt norefcounts
 	|| p = compiler.numbers.makeplace(exp.name)
-	|| y = *p
+	|| y = p[]
 		return y|scdecl|
 	rz = TypeOfNumSub(exp, name_space, side)!
-	*p = rz
+	p[] = rz
 
 
 function TypeOfNumSub (ExprResolver)
@@ -620,7 +621,7 @@ function TypeOfExprSub (|Message| Exp, |SCNode| name_space, |Message?| side = ni
 
 function TypeOfExpr (|Message?| Exp, |SCNode| name_space, |Message?| side = nil, |SCDecl|)
 	opt norefcounts
-	if exp // remove this check??? once the nil checker is done
+	if exp
 		|| obj = exp.obj|SCObject| ?? TypeOfExprSub(Exp, name_Space, side)
 		if obj isa SCDecl
 			return obj
@@ -692,29 +693,46 @@ function Message.ExpectInt (|scdecl| type, |bool|)
 	return true
 
 
+function scdecl.TypeOfAccess (|scdecl| access, |message| ch, |int|)
+	opt norefcounts
+	|| W = .isnumeric
+	if W > 1
+		return 1
+	if .IsCArray
+		return 2
+	if .PointerCount
+		if !access
+			require !.Type.IsStruct
+			return 2
+		if (Access matches typeint!)
+			ifn (ch == @bra and ch.first == @bra)
+				return 2
+
+
 function TypeOfAccess (ExprResolver)
+	opt norefcounts
 	|| ch = exp.first!
 	|| Ty0 = TypeOfExprModulesOK( ch, name_space )
 	|| arr = ch.next!
+	|| Index = Arr.first
 
 	if (ty0 isa scmodule)
 		|| cls = ty0.Cls
-		if cls and cls.IsMArray(arr) and arr.first!.ExpectMatch(name_Space, typeint!)
+		if cls and cls.IsMArray(arr) and index!.ExpectMatch(name_Space, typeint!)
 			return LowlevelArrayTransform(exp, Cls)
-	  elseif (Ty0 isa SCDecl) and (Arr.HasOneChild)
-		|| Index = Arr.first!
-		|| Access = TypeOfExpr(index, name_space)$
-		|| W = ty0.isnumeric
-		if (W > 1)
-			require Index.ExpectInt(Access)
-			return TypeOfVecAccess(index, ty0, w)
-		if Ty0.IsCArray
-			require Index.ExpectInt(Access)
-			return ty0.Dereference(exp, name_space, true)		// TypeOfPointerAccess(ty0)
-		if (Ty0.PointerCount and Access matches typeint!)
-			ifn (ch == @bra and ch.first == @bra)				// should work now
-				require Index.ExpectInt(Access)
-				return ty0.Dereference(exp, name_space, true)
+	  elseif (Ty0 isa SCDecl) and !index.next
+		|| Access = TypeOfExpr(index, name_space)
+		|| oof = ty0.TypeOfAccess(access, ch)
+			if !index
+				using arr
+				index = arr.msg(@num, "0")
+				access = TypeOfExpr(index, name_space)
+			
+			if access and Index.ExpectInt(Access)
+				if oof == 1
+					return TypeOfVecAccess(index, ty0, ty0.isnumeric)
+				  else
+					return ty0.Dereference(exp, name_space, true)
 
 	arr.Func = @prm
 	exp.become(@dot, "SyntaxAccess")

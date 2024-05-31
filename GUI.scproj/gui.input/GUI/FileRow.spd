@@ -119,7 +119,7 @@ class FileRow (ListViewRow)
 
 
 	helper AddFileSub (|file| f, |dictionary?| excl, |string| folfile, |&int| Count, |bool|)
-		|| C = (*Count)--
+		|| C = (Count[])--
 		require C > 0
 		|| r = filerow(f.path, f.name)
 		self <~ r
@@ -227,7 +227,7 @@ class FileRow (ListViewRow)
 		require t and !t.IsBinary
 		
 		|error| parent
-		|| Lim		= *Remain
+		|| Lim		= Remain[]
 		|| i		= 0
 		while (i < t.length) and (lim > 0)
 			|| R	= t.StretchyFind(pattern, i)
@@ -248,7 +248,7 @@ class FileRow (ListViewRow)
 			if !pattern[0].iswhite
 				s = s.trim.remove(jeebox.csline)
 			err.name = s
-		*Remain = lim
+		Remain[] = lim
 
 
 	syntax append (|filerow| r)

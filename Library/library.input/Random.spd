@@ -103,7 +103,7 @@ struct Random
 		|| p = mem.ptr|&uint64|
 		|| after = (mem.ptr + mem.ByteCapacity - 7)|&uint64|
 		while p < after
-			*p++ = .int
+			p++[] = .int
 		mem.Length = mem.Capacity
 	
 	function Init

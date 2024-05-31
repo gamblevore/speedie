@@ -211,10 +211,10 @@ class FileViewer (ListView)
 		if Purpose == DocumentState.ErrorChecking
 			return false 
 		if (purpose == DocumentState.Saving)
-			if !*Decision
+			if !Decision[]
 				|| q = "Save invalid jeebox for document?\n" + f.location
-				*decision = q.confirm.dir
-			return *Decision > 0
+				decision[] = q.confirm.dir
+			return Decision[] > 0
 		return true
 
 

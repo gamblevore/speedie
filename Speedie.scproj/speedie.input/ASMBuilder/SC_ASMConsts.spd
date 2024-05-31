@@ -18,8 +18,8 @@ function ASMState.DoConsts (|asmreg| D,  |asmreg| L,  |asmreg| R,  |&uint64| RIm
 
 
 function asmstate.DoF32Const (|asmreg| D, |&float| DD, |&float| LL, |&float| RR, |opmode| M, |asmreg|)
-	|| LLL = *LL
-	|| RRR = *RR
+	|| LLL = LL[]
+	|| RRR = RR[]
 		
 	if 0
 		0
@@ -36,18 +36,18 @@ function asmstate.DoF32Const (|asmreg| D, |&float| DD, |&float| LL, |&float| RR,
 	  else
 		debugger // missed one!
 
-	*(DD|&uint64|) = 0 // clear high bits
+	(DD|&uint64|)[] = 0 // clear high bits
 	if LLL.abs
-		*DD = LLL
+		DD[] = LLL
 		return D
-	*DD = 0
+	DD[] = 0
 	return asmreg.zero
 
 
 
 function asmstate.DoF64Const (|asmreg| D, |&f64| DD, |&f64| LL, |&f64| RR, |opmode| M, |asmreg|)
-	|| LLL = *LL
-	|| RRR = *RR
+	|| LLL = LL[]
+	|| RRR = RR[]
 		
 	if 0
 		0
@@ -65,9 +65,9 @@ function asmstate.DoF64Const (|asmreg| D, |&f64| DD, |&f64| LL, |&f64| RR, |opmo
 		debugger // missed one!
 
 	if LLL.abs
-		*DD = LLL
+		DD[] = LLL
 		return D
-	*DD = 0
+	DD[] = 0
 	return asmreg.zero
 
 
@@ -75,8 +75,8 @@ function asmstate.DoF64Const (|asmreg| D, |&f64| DD, |&f64| LL, |&f64| RR, |opmo
 function asmstate.DoI32Const (|asmreg| D, |&int| DD, |&int| LL, |&int| RR, |opmode| M, |asmreg|)
 	if M != ASMMath.div and ASMMath.mod
 		return .DoI64Const(D, DD|&int64|, LL|&int64|, RR|&int64|, M|opmode|)
-	|| LLL = *LL
-	|| RRR = *RR
+	|| LLL = LL[]
+	|| RRR = RR[]
 		
 	if M == ASMMath.Div
 		LLL /= RRR 
@@ -85,8 +85,8 @@ function asmstate.DoI32Const (|asmreg| D, |&int| DD, |&int| LL, |&int| RR, |opmo
 	  else
 		debugger // missed one!
 
-	*(DD|&uint64|) = 0 // clear high bits
-	*DD = LLL
+	(DD|&uint64|)[] = 0 // clear high bits
+	DD[] = LLL
 	if LLL
 		return D
 	return asmreg.zero
@@ -94,8 +94,8 @@ function asmstate.DoI32Const (|asmreg| D, |&int| DD, |&int| LL, |&int| RR, |opmo
 
 
 function asmstate.DoI64Const (|asmreg| D, |&int64| DD, |&int64| LL, |&int64| RR, |opmode| M, |asmreg|)
-	|| LLL = *LL
-	|| RRR = *RR
+	|| LLL = LL[]
+	|| RRR = RR[]
 		
 	if 0
 		0
@@ -135,7 +135,7 @@ function asmstate.DoI64Const (|asmreg| D, |&int64| DD, |&int64| LL, |&int64| RR,
 	  else
 		debugger // missed one!
 
-	*DD = LLL
+	DD[] = LLL
 	if LLL
 		return D
 	return asmreg.zero

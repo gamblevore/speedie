@@ -196,7 +196,7 @@ class Image (memory)
 				p.overlay(w)
 			  else
 				ifn i.x & 1
-					c = vec4.colorise(*in, strength).PreMul
+					c = vec4.colorise(in[0], strength).PreMul
 					if ++in >= after
 						in = data.ptr
 				p.overlay(c)
@@ -227,7 +227,7 @@ class Image (memory)
 
 	syntax access (|ivec2| P, assigns:|ImagePixel|)
 		if self contains p
-			*self[p] = value
+			self[p][0] = value
 	
 	
 	syntax access (|ivec2| P, |&ImagePixel|)
@@ -279,7 +279,7 @@ class Image (memory)
 			if mark >= 0
 				sigh.a = Mark
 			  elseif col.a == 255
-				*sigh = Col
+				sigh[0] = Col
 			  else
 				sigh.Overlay(ColV)
 			sigh++
@@ -297,7 +297,7 @@ class Image (memory)
 			if mark >= 0
 				sigh.a = Mark
 			  elseif col.a == 255
-				*sigh = Col
+				sigh[0] = Col
 			  else
 				sigh.Overlay(ColV)
 			sigh -= iw
@@ -422,7 +422,7 @@ class Image (memory)
 			|| b1 = g.seps
 			|| b2 = g.edge
 			for (P in self[BackDown]) (V)
-				|| pp = *p
+				|| pp = p[0]
 				if (v.x>>4) + (v.y>>4) isa 2
 					pp.underlay(b1)
 				  else
@@ -469,7 +469,7 @@ class Image (memory)
 			|| start = (R,L)(right)
 			|| Write = into[start]
 			for i in w
-				*Write = Read[i]
+				Write[0] = Read[i]
 				Write += step
 
 		if dest == self
@@ -488,7 +488,7 @@ class Image (memory)
 			memory.fillint(.ptr|&int|, .length, color.uint)
 		  else
 			for (sigh in self[rect]) (v)
-				*sigh = color
+				sigh[0] = color
 
 
 	function RectOutlineOnly (|ivec4| R, |ImagePixel| Edge, |imagepixel| attached_edge=imagepixel.clear, |MoveCode| AllowEdge=MoveCode.all)

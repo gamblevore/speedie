@@ -41,19 +41,19 @@ struct FastBuff
 	syntax Append (|byte| v, |bool|)
 		cpp_part AppendU8
 		pragma inline
-		*.curr++ = v
+		.curr++[] = v
 		return .curr >= .end
 
 	syntax Append (|uint16| v, |bool|)
 		cpp_part AppendU16
 		pragma inline
-		|| c = .curr|&uint16|,  *c++ = v,  .curr = c|&byte|
+		|| c = .curr|&uint16|,  c++[] = v,  .curr = c|&byte|
 		return c|&byte| >= .end
 
 	syntax Append (|uint| v, |bool|)
 		cpp_part AppendU32
 		pragma inline
-		|| c = .curr|&uint|,  *c++ = v,  .curr = c|&byte|
+		|| c = .curr|&uint|,  c++[] = v,  .curr = c|&byte|
 		return c|&byte| >= .end
 	
 	syntax access (|int| pos, |byte|)
@@ -101,7 +101,7 @@ struct FastBuff
 		.curr = c
 		
 	function Byte (|byte|)
-		return *.curr++
+		return .curr++[]
 	
 	syntax Expect (|string| s)
 		if !.WentBad
@@ -109,13 +109,13 @@ struct FastBuff
 		.WentBad = true
 		
 	function UInt16 (|uint16|)
-		|| c = .curr|&uint16|,  rz = *c++,  .curr = c|&byte|
+		|| c = .curr|&uint16|,  rz = c++[],  .curr = c|&byte|
 		
 	function Find (|byte| b, |int| from, |int| After, |ind|)
 		|| Pos = .clip(from)
 		|| End = .clip(after, 0)
 		while Pos < End
-			if *Pos == b
+			if Pos[] == b
 				return pos - .Start
 			++Pos
 		
@@ -155,6 +155,13 @@ struct FastBuff
 		description "Returns the buffer-size including both used and unused data." 
 		if self
 			return .end - .start
+	
+	iterator
+		|| c = .start
+		|| e = .curr
+		while c < e
+			yield c[]
+			c++
 
 
 

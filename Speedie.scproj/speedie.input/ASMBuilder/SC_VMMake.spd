@@ -45,7 +45,7 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max, |int|)
 	|| lname = "_L"
 	if line
 		|| f = line.NeedFirst$
-		|| f0 = *f.name
+		|| f0 = f.name[]
 		if f0 == 'x' and bit_pos == 32
 			return bit_pos
 		if f0 == 'r'
