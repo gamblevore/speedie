@@ -125,6 +125,9 @@ struct CompressionStats
 	|bool| Live
 	linkage:cpp_part MzSt
 	function start (|&compressionstats|)
+		nil self
+		if !self
+			return all
 		return self
 	function end
 	function len (|int| n)
