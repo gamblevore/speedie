@@ -92,13 +92,16 @@ function PropertyToFunc (|message!| dot, |scfunction!| fn, |nilstate|)
 	dot.First = message(nil, @thg, dot.position, fn.exportname, 0)
 	return nilstate.real
 	
-	
+
+
 function UseChildAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason, |NilState|) 	// a.b, *a, a[0], (a)()
 	opt norefcounts
 
-	// So... UseChildAsReal... well... if its a property, we can still do this?
 	|| dcl = msg.FastDecl
-	if dcl is Global and msg == @thg // globals are rarely not @thg... if so usually a function prototype?
+	if dcl is Global
+//		if (msg != @thg) and (dcl isnt const)
+//			printline msg
+//			printline nilcount
 		return dcl.NilDeclared
 	|| ch = msg.first
 		|| actual = .Jump(ch)

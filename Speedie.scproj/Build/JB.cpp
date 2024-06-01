@@ -1931,7 +1931,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112540829089792));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112541816522165));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3247,7 +3247,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024060111));
+	JB_FS_AppendInt32(_fsf0, (2024060115));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8006,7 +8006,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024060111));
+	JB_FS_AppendInt32(_fsf0, (2024060115));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -16259,6 +16259,9 @@ AsmReg SC_ASMtmp__Not(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 AsmReg SC_ASMtmp__Num(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 	SCDecl* D = SC_Msg_FastDecl(Exp);
 	uint64 X = D->ExportPosition;
+	if ((X == 0) != SC_Msg_IsZero(Exp)) {
+		debugger;
+	}
 	AsmReg R = SC_Pac_FindConst((&SC__Pac_Sh), X);
 	if (SC_Reg_SyntaxCast(R)) {
 		return R;
@@ -19168,11 +19171,17 @@ NilState SC_nil__CompareObjs(Message* Ll, Message* Rr, NilCheckMode Test, SCOper
 }
 
 NilState SC_nil__Continue(Message* Msg, NilCheckMode Test) {
+	if (!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false)) {
+		debugger;
+	}
 	SC__nil_Loops.ContRecord = (SC__nil_Loops.ContRecord | SC_nil__EndBlock());
 	return 0;
 }
 
 NilState SC_nil__Debugger(Message* Msg, NilCheckMode Test) {
+	if (!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false)) {
+		debugger;
+	}
 	return 0;
 }
 
@@ -19219,6 +19228,9 @@ NilState SC_nil__Dummy(Message* Msg, NilCheckMode Test) {
 }
 
 NilState SC_nil__Exit(Message* Msg, NilCheckMode Test) {
+	if (!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false)) {
+		debugger;
+	}
 	SC__nil_Loops.ExitRecord = (SC__nil_Loops.ExitRecord | SC_nil__EndBlock());
 	SC__nil_Loops.HasEscape = true;
 	return 0;
@@ -19236,6 +19248,9 @@ void SC_nil__ExterminateZergBugs(SCFunction* F) {
 }
 
 NilState SC_nil__Fail(Message* Msg, NilCheckMode Test) {
+	if (!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false)) {
+		debugger;
+	}
 	SC__nil_OldPrint = JB__Err_AutoPrint;
 	JB__Err_AutoPrint = 0;
 	return kSC__NilState_Borked;
@@ -19597,6 +19612,9 @@ NilState SC_nil__RealBool(bool B) {
 }
 
 NilState SC_nil__Rejoin(Message* Msg, NilCheckMode Test) {
+	if (!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false)) {
+		debugger;
+	}
 	return SC_nil__Jump(((Message*)JB_Ring_First(Msg)), Test);
 }
 
@@ -19605,6 +19623,9 @@ NilState SC_nil__Rel(Message* Msg, NilCheckMode Test) {
 }
 
 NilState SC_nil__Return(Message* Msg, NilCheckMode Test) {
+	if (!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false)) {
+		debugger;
+	}
 	NilState V = SC_nil__DetectStillChecks(((Message*)JB_Ring_First(Msg)));
 	SC__nil_Loops.ExitRecord = (SC__nil_Loops.ExitRecord | kSC__NilState_Basic);
 	SC_nil__DeclKill();
@@ -19768,7 +19789,7 @@ NilState SC_nil__Type(Message* Msg, NilCheckMode Test) {
 
 NilState SC_nil__UseChildAsReal(Message* Msg, NilCheckMode Test, NilReason Reason) {
 	SCDecl* Dcl = SC_Msg_FastDecl(Msg);
-	if (SC_Decl_SyntaxIs(Dcl, kSC__SCDeclInfo_Global) and (JB_Msg_EqualsSyx(Msg, kJB_SyxThg, false))) {
+	if (SC_Decl_SyntaxIs(Dcl, kSC__SCDeclInfo_Global)) {
 		return Dcl->NilDeclared;
 	}
 	Message* Ch = ((Message*)JB_Ring_First(Msg));
@@ -19829,6 +19850,9 @@ NilState SC_nil__VariableSet(SCDecl* Recv, Message* RecvMsg, SCDecl* Sent, Messa
 }
 
 NilState SC_nil__While(Message* Msg, NilCheckMode Test) {
+	if (!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false)) {
+		debugger;
+	}
 	Message* Cond = ((Message*)JB_Ring_First(Msg));
 	MaybeBool CondTest = SC_Msg_IsAlwaysBool(Cond);
 	if (!((!JB_MaybeBool_IsFalse(CondTest)) and ((bool)SC_nil_BranchEnter((&SC__nil_T), Msg)))) {
@@ -23481,7 +23505,7 @@ int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* Self) {
 }
 
 void JB_Rec_AppendErr(JB_ErrorReceiver* Self, JB_Error* Err) {
-	bool CanPrint = false;
+	bool CanPrint = (!JB_Rec_BadCount(Self)) and ((bool)JB__Err_AutoPrint);
 	//"Speedie" // useful marker for debugging...;
 	JB_Rec_Incr(Self, Err, true);
 	if (!JB_Str_Exists(Err->Path)) {
@@ -30111,6 +30135,9 @@ ASMtmp SC_Msg_ASMType(Message* Self) {
 }
 
 void SC_Msg_ASMTypeSet(Message* Self, ASMtmp Value) {
+	if (JB_ObjectID(Self) == 0) {
+		debugger;
+	}
 	Value = ((Self->Flags & (~63)) | Value);
 	Self->Flags = Value;
 }
@@ -50166,4 +50193,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 6059491560186539117 4177915989567914487
+// -8354372613255251578 4177915989567914487
