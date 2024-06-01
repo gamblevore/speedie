@@ -71,7 +71,7 @@ JB_String* JB_App__OrigPath() {
 		return P;
 	}
 	Dictionary* _tmPf0 = JB_Incr(JB_App__Env());
-	JB_SetRef(P, ((JB_String*)JB_Dict_JB_Dict_Value(_tmPf0, JB_LUB[286])));
+	JB_SetRef(P, ((JB_String*)JB_Dict_Value0(_tmPf0, JB_LUB[286])));
 	JB_Decr(_tmPf0);
 	if (JB_Str_Exists(P)) {
 		JB_SetRef(JB__App__Path, P);
@@ -237,16 +237,16 @@ Message* JB_API__Parse(JB_String* S, JB_String* Path) {
 
 void JB_Constants__AddEscape(byte I, FastString* Fs) {
 	JB_String* F = JB_Str__Byte(I);
-	if (!((!JB_Str_Exists(((JB_StringC*)JB_Dict_JB_Dict_Value(JB__Constants_EscapeStr, F)))) or (!JB_Str_Exists(((JB_String*)JB_Dict_JB_Dict_Value(JB__Constants_EscapeChr, F)))))) {
+	if (!((!JB_Str_Exists(((JB_StringC*)JB_Dict_Value0(JB__Constants_EscapeStr, F)))) or (!JB_Str_Exists(((JB_String*)JB_Dict_Value0(JB__Constants_EscapeChr, F)))))) {
 		return;
 	}
 	JB_FS_AppendByte(Fs, '\\');
 	JB_FS_AppendHex(Fs, I, 2);
 	JB_String* T = JB_FS_GetResult(Fs);
-	if (!JB_Str_Exists(((JB_StringC*)JB_Dict_JB_Dict_Value(JB__Constants_EscapeStr, F)))) {
+	if (!JB_Str_Exists(((JB_StringC*)JB_Dict_Value0(JB__Constants_EscapeStr, F)))) {
 		(JB_Dict_ValueSet(JB__Constants_EscapeStr, F, JB_Str_CastZero(T)));
 	}
-	if (!JB_Str_Exists(((JB_String*)JB_Dict_JB_Dict_Value(JB__Constants_EscapeChr, F)))) {
+	if (!JB_Str_Exists(((JB_String*)JB_Dict_Value0(JB__Constants_EscapeChr, F)))) {
 		(JB_Dict_ValueSet(JB__Constants_EscapeChr, F, T));
 	}
 }
@@ -394,7 +394,7 @@ JB_String* JB_Constants__TestJB() {
 
 bool JB_Constants__TestCasting() {
 	Dictionary* D2 = JB_Incr(JB_Dict_Constructor(nil));
-	DTWrap* _tmPf1 = JB_Incr(((DTWrap*)JB_Dict_JB_Dict_Value(D2, JB_LUB[370])));
+	DTWrap* _tmPf1 = JB_Incr(((DTWrap*)JB_Dict_Value0(D2, JB_LUB[370])));
 	DTWrap* _tmPf0 = JB_Incr(JB_Wrap_ConstructorInt(nil, JB_Wrap_Value(_tmPf1) + 1));
 	JB_Decr(_tmPf1);
 	(JB_Dict_ValueSet(D2, JB_LUB[370], _tmPf0));
@@ -3627,7 +3627,7 @@ JB_Object* JB_LD_Object(ObjectLoader* Self) {
 
 JB_Object* JB_LD_ObjectSub(ObjectLoader* Self, Message* C) {
 	if ((JB_Msg_EqualsSyx(C, kJB_SyxThg, false))) {
-		return JB_Dict_JB_Dict_Value(Self->Dict, C->Name);
+		return JB_Dict_Value0(Self->Dict, C->Name);
 	}
 	 else if ((JB_Msg_EqualsSyx(C, kJB_SyxStr, false))) {
 		return JB_Str_Unshare(C->Name);
@@ -3936,7 +3936,6 @@ double JB_Wrap_FloatValue(DTWrap* Self) {
 
 JB_String* JB_Wrap_Render(DTWrap* Self, FastString* Fs_in) {
 	FastString* Fs = JB_Incr(JB_FS__FastNew(Fs_in));
-	//visible;
 	if (JB_TC_IsFloat(Self->DataType)) {
 		JB_FS_AppendDoubleAsText0(Fs, JB_Wrap_FloatValue(Self));
 	}
@@ -5846,7 +5845,7 @@ void JB_Dict_SaveWrite(Dictionary* Self, ObjectSaver* Saver) {
 	};
 }
 
-JB_Object* JB_Dict_JB_Dict_Value(Dictionary* Self, JB_String* Key) {
+JB_Object* JB_Dict_Value0(Dictionary* Self, JB_String* Key) {
 	return JB_Dict_Value(Self, Key, nil);
 }
 
@@ -5855,15 +5854,15 @@ void JB_Dict_SetInt(Dictionary* Self, uint64 Key, JB_Object* Value) {
 }
 
 JB_Object* JB_Dict_ValueInt(Dictionary* Self, uint64 Key) {
-	return JB_Dict_JB_Dict_Value(Self, JB_int64_DictName(((int64)Key)));
+	return JB_Dict_Value0(Self, JB_int64_DictName(((int64)Key)));
 }
 
 JB_Object* JB_Dict_ValueLower(Dictionary* Self, JB_String* S) {
 	if (JB_Str_IsLower(S)) {
-		return JB_Dict_JB_Dict_Value(Self, S);
+		return JB_Dict_Value0(Self, S);
 	}
 	JB_String* _tmPf0 = JB_Incr(JB_Str_LowerCase(S));
-	JB_Object* _tmPf1 = JB_Incr(JB_Dict_JB_Dict_Value(Self, _tmPf0));
+	JB_Object* _tmPf1 = JB_Incr(JB_Dict_Value0(Self, _tmPf0));
 	JB_Decr(_tmPf0);
 	JB_SafeDecr(_tmPf1);
 	return _tmPf1;
@@ -8338,7 +8337,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024060100);
+	return (2024060110);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8350,4 +8349,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 3807862181434247010 2997985800942882790
+// 7796578953066441599 3266869101388525822 2997985800942882790
