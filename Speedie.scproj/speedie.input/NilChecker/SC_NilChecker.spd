@@ -68,9 +68,6 @@ function JumpNoPosts (niltrackerfn)
 
 function Jump (NilTrackerFn)
 	pragma inline
-//	if scfunction.currfunc ~= "idk"
-//		printline msg
-//		debugger
 	|| t = msg.ASMType
 		return (NilTable[t]!)(msg, test)
 	t = msg.func|asmtmp|

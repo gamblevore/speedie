@@ -19,14 +19,14 @@ class Person
 
 main
 	using flowcontrol("maybe")
-		app.IDK
+		app.TestSyntax
 	
 
 function PrintNum (|int64| b1)
 	"${B1.strsize} = $B1"
 
 
-function app.IDK
+function app.TestSyntax
 	printnum(60GB)
 	printnum(7.9MB|int|)
 	printnum(9524600)

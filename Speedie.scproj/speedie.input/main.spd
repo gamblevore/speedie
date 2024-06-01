@@ -1,11 +1,6 @@
 
 main // speedie main {
-	compiler.SetupEnv
-	target debug2
-		|| x = 7.9MB
-		|| y = 1
-		if x == y
-	
+	compiler.SetupEnv	
 	compiler.MiniTests
 	compiler.Main
 	compiler.PrintResults

@@ -7399,6 +7399,8 @@ Message* JB_Msg_Ancestor(Message* Self, Syntax F);
 
 int SC_Msg_AndOrExpansionTest(Message* Self);
 
+bool SC_Msg_AOrBExpand(Message* Self);
+
 JB_String* SC_Msg_APICppProject(Message* Self);
 
 void SC_Msg_AppendAllInto(Message* Self, Message* Dest);
@@ -7482,8 +7484,6 @@ void JB_Msg_BRel__(Message* Self, FastString* Fs);
 bool SC_Msg_BuildRunTask(Message* Self, Message* Fields, int Level);
 
 void SC_Msg_BuildTask(Message* Self, Message* Fields, Message* Root, int Level);
-
-void SC_Msg_BunchFix(Message* Self);
 
 Message* SC_Msg_BunchFixPrepare(Message* Self);
 
@@ -7936,8 +7936,6 @@ Message* SC_Msg_NormaliseFunc(Message* Self, SCClass* AddSelf);
 void SC_Msg_NotNilRZ(Message* Self, SCDecl* Type, SCNode* Space);
 
 void JB_Msg_Num__(Message* Self, FastString* Fs);
-
-bool SC_Msg_OarExpand(Message* Self);
 
 void JB_Msg_Oat__(Message* Self, FastString* Fs);
 

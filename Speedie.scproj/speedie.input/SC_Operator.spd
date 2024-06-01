@@ -289,20 +289,49 @@ function Message.OpScore (|int|)
 	return scoperator.customoperatorscore
 
 
-function Message.OarExpand (|bool|)
-	if self in @rel
-		if self ~= "oar"
-			problem (self, "Prefer '??' these days.")
-		.name = "or"
-		.parent!.BunchFix()
+function Message.AOrBExpand (|bool|)
+	ifn self in @rel
+		return true
+
+	.name = "or"
+	|| rel = .parent!
+/*
+	({
+		|| _t = _0|()--|
+		if !_t
+			_t = _1|()--|
+		rejoin _t
+	})
+*/
+// only has 1 caller. why not fix this to use the above macro?
+
+	using (rel)
+	|| f = rel.first!
+	|| fn = f.func
+	if !f.HasAny
+		|| list = rel.msg(@list)
+		rel <~ self
+		rel.func = @func
+		.become(@prm)
+		.msg(f.func, f.name)
+		list <~ f
+		list <~ rel.first
+//		x ?? b --> (x,b)(x)
+	  else
+		|| P			= rel.BunchFixPrepare
+		|| subject		= P.first!
+		|| multi_opp	= subject.Next
+			rel.RelFix(false)
+			P.ReplaceWith(rel)
+			multi_opp.BunchFixSub(subject, rel)
 	return true
 
 
 function Message.OppExpand (|bool|)
 	if self == @opp
-		if self ~= "oar" or "??"
-			return .oarexpand
-		if self ~= "init"
+		if self == "??"
+			return .AOrBExpand
+		if self == "init"
 			return .initexpand
 
 
