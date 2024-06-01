@@ -54,7 +54,6 @@ class DataObject
 
 
 	render
-		visible// remove this, once we fix the dtwrap bug
 		if .datatype.isfloat
 			fs <~ .FloatValue
 		  elseif .datatype == datatypecode.unusedtype

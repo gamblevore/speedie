@@ -24,7 +24,8 @@ linkage
 
 constructor
 	.defaultrefs = cpprefs.new
-	if compiler.modulelist != nil
+	|| c = compiler.modulelist
+	if (c? != nil)
 		compiler.modulelist <~ self
 
 

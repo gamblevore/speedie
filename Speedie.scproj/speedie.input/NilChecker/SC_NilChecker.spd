@@ -68,6 +68,9 @@ function JumpNoPosts (niltrackerfn)
 
 function Jump (NilTrackerFn)
 	pragma inline
+//	if scfunction.currfunc ~= "idk"
+//		printline msg
+//		debugger
 	|| t = msg.ASMType
 		return (NilTable[t]!)(msg, test)
 	t = msg.func|asmtmp|
@@ -98,7 +101,7 @@ function UseChildAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason,
 
 	// So... UseChildAsReal... well... if its a property, we can still do this?
 	|| dcl = msg.FastDecl
-	if dcl is Global
+	if dcl is Global and msg == @thg // globals are rarely not @thg... if so usually a function prototype?
 		return dcl.NilDeclared
 	|| ch = msg.first
 		|| actual = .Jump(ch)
@@ -495,8 +498,6 @@ function Argument (Niltrackerfn)
 	opt norefcounts
 	|| v = .value.depthofvars + 1
 	for s.fast in msg
-		target debugnil
-			s.DebugPrint
 		|| t = test&-s.islast
 		if (rz is borked) and !stderr.ok
 			exit // needs a clean space for borking

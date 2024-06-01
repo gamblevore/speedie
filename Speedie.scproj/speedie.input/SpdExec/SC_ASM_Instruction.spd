@@ -58,7 +58,7 @@ class Instruction
 			return TypeDict.valuelower(m.name)			#expect (m, "Isn't a valid instruction.")
 
 		syntax Access (|int| pos, |instruction|)
-			return .TypeList[pos]
+			return .TypeList[pos]!
 		
 		function Add (|string| FormName, |string| name, |int| pos)
 			opt norefcounts

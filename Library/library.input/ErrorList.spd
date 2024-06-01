@@ -2,7 +2,6 @@
 
 |ErrorReceiver| StdErr = ErrorReceiver.new
 
-// how to remove log
 
 prototype fnErrorLogger (|ErrorReceiver| self, |string| Data)
 
@@ -197,7 +196,7 @@ class ErrorReceiver
 	
 	
 	Syntax UsingComplete (|object| idk=nil)
-//		stderr.printerrors // don't do this!
+//		stderr.printerrors // note to self: don't readd this!
 		stderr = self
 
 		

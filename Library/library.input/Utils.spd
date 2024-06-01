@@ -71,7 +71,10 @@ function message.Dict (|bool| DoCount=false,  |bool| DoLower=false,  |dictionary
 	rz = Dictionary()
 	|| i = 0
 	for s in self
-		rz[s.name] = s
+		if DoLower
+			rz.Valuelower(s.name) = s
+		  else
+			rz[s.name] = s
 		if DoCount
 			s.Position = i++
 

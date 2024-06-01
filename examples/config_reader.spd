@@ -14,7 +14,7 @@ main
 	"Curr File:   ${conf[`curropen`]}"
 
 	if 0.5[] // just added this for fun
-		error "failed half the time"
+		error "failed half the time (on purpose!) Rerun a few times to see this work."
 	  else
 		"Everything worked great!"
 

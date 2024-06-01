@@ -26,7 +26,7 @@ function OpenSaveRequest (|string| types,  |string| base,  |string| Accept,  |bo
 		.question.vistext = question
 	
 	|| bigger = question and save
-	|| wsize = (350 by 216,  350 by 200)(bigger)
+	|| wsize = (350 by 300,  350 by 275)(bigger)
 	w.size = wsize
 	|| bot = (39~up, 23~up)(bigger)
 	w.files.size = 1~inside by bot to 16~down
@@ -88,7 +88,7 @@ class OpenSaveDialog (Window)
 		.question		= textview(self)
 		.Name			= textview(self, OnAskSaveName)
 		.Reveal			= buttonview(self, OnAskSaveReveal)
-		.size			= 350 by 200
+		.size			= 500 by 225
 		.id				= "opensave"
 		isnt visible
 		.AddButton(.accept, "Open", true)

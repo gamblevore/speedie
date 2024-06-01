@@ -7130,7 +7130,7 @@ void JB_Dict_SetValue(Dictionary* Self, JB_String* Key, int64 Value);
 
 JB_Object* JB_Dict_Syntax(Dictionary* Self, JB_String* Key);
 
-JB_Object* JB_Dict_JB_Dict_Value(Dictionary* Self, JB_String* Key);
+JB_Object* JB_Dict_Value0(Dictionary* Self, JB_String* Key);
 
 void JB_Dict_SetInt(Dictionary* Self, uint64 Key, JB_Object* Value);
 

@@ -4,7 +4,7 @@ main
 	|| x_ = "abcd/abcdefg/eeeefffff/aaaaabbbbcccdddd" / '/'
 	|| y_ = "a*d/*//abc*/*abc*/*abcd*/*a*b*c*d*/ef*/*ef*/*dd*" / '/'
 	
-	"avail = $x_"
+	"avail = ${x_.render}"
 	
 	for y in y_
 		"testing \"$y\" "

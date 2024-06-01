@@ -5,7 +5,7 @@ class CheeseShop
 
 	constructor (|message| cfg)
 		.inventory = cfg["cheeses"].DictLower
-		.clerkName = cfg["clerk"].Value
+		.clerkName = cfg["clerk"]
 
 	syntax access (|string| cheeseName, |string|)
 		if (cheeseName == .clerkName)
@@ -28,6 +28,7 @@ cheeses
 	"Red Leicester"
 	"Flamange"
 	"Chester"
+	"Cheddar"
 clerk
 	Barris
 `

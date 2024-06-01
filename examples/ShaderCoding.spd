@@ -1,7 +1,8 @@
 https://www.shadertoy.com/view/mtyGWy // original by kishimisu
 https://youtu.be/f4s1h2YETNY
 
-import "GUI", main
+import "GUI"
+main
 	sdlapp.Rescale(4)
 	return MainImage
 

@@ -5,8 +5,5 @@ main
 		"Please enter a number:"
 		|| s = app.input #loop
 		|| input = s.Float
-		if StdErr.ok
-			"$input * π = ${input*π}" 
-		  else
-			StdErr.ShellPrintErrors
-			StdErr.clear
+		require StdErr.ok
+		"$input * π = ${input*π}" 

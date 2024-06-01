@@ -18,7 +18,8 @@ role config (message)
 			return l|message|.first
 			
 	syntax cast (|string|)
-		return .name
+		if self
+			return .name
 	
 	function Save (|bool|)
 		|| f = .obj as file

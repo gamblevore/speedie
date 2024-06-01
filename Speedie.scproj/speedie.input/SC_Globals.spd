@@ -355,10 +355,13 @@ function TypeOfUnit (ExprResolver)
 	|| str = ""
 	|| D = type.typenormal.copydecl
 	|| X = val|uint64|
+	|| CanFloat = type.typeinfo.isfloat
+	if !CanFloat// and !(type == typeint and mul != 0.0)
+		CanFloat = it.name contains '.'
 	if type == typedate
 		str = val|int64|.render
 		
-	  elseif type.typeinfo.isfloat  or  it.name contains '.'
+	  elseif CanFloat
 		str = val.renderfloat
 		|f64| big = 16.0*1024.0*1024.0
 		if val >= big  or val < -big

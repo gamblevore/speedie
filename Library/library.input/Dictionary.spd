@@ -23,7 +23,7 @@ class Dictionary (saveable)
 		cpp_wrapper JB_Dict_ValueSet
 			
 	syntax Access (|string| Key, ||)
-		cpp_part JB_Dict_Value
+		cpp_part Value0
 		return self[key, nil]
 			
 	syntax Access (|string| Key, |...| Default=nil, ||)

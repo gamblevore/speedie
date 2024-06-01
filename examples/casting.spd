@@ -10,7 +10,6 @@ main
 	if s.mustbe(message, s)
 		"Approach 2: '$s' was tested using 'mustbe'. Creates errors if s is not a message"
 	|| msg = s as Message
-	if msg
 		"Approach 3: '$s' was tested using 'as'"
 	
 	|| blindly = losing_type|message| // comment this out, to get the code working! :)
