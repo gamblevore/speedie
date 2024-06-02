@@ -1,11 +1,8 @@
 #!/usr/local/bin/spd
-
 // maybe.spd: Tests a lot of different syntax and features in one project.
 // doesnt really actually do anything useful otherwise.
 
 targets: flow
-
-
 class Person
     |int| age
     |string| name
@@ -20,7 +17,6 @@ class Person
 main
 	using flowcontrol("maybe")
 		app.TestSyntax
-	
 
 function PrintNum (|int64| b1)
 	"${B1.strsize} = $B1"
@@ -58,18 +54,28 @@ function app.TestSyntax
 	    || fn = (mesayer, shesayer)(0.5[])
 	    (fn)(app.args[0])
 	FlowControl.Disabled--
-    
+
+	bug()
+
+
+function bug (|fn_doaction!|)
+	opt norefcounts
     || G = RPGHero("fred")
-    (DoAction["jump"]![])(G, "hes scared")
+    |dictionary of fn_doaction| dict
+    || x = dict["hello"]	
+	    (x[])(G, "no reason")
+	|| j = DoAction["jump"]
+	    j[](G, "hes scared")
+    if x
+	    return x[]
+	return DoAction_duck
 
 
 prototype SayerFunction (|string?| input)
 
-function MeSayer (SayerFunction)
-    "Me says: $input"
+function MeSayer (SayerFunction): "Me says: $input"
 
-function SheSayer (SayerFunction)
-    "Rebecca says: $input (very quietly)"
+function SheSayer (SayerFunction): "Rebecca says: $input (very quietly)"
 
 
 class RPGHero // for a tile-based board game

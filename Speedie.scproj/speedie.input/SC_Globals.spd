@@ -149,6 +149,7 @@ function Message.ParentForAddress (|Message|)
 
 
 function TranRender (|message| exp, |SCNode| name_space, |SCObject|)
+//	problem (exp) // too much syntax in speedie?
 	exp.become(@dot, "Render")
 	exp.msg(@prm)
 	return TypeOfExpr(exp, name_space)
@@ -952,6 +953,7 @@ function TypeOfArr (ExprResolver)
 	
 	
 	|| c = result.contains
+		c = c.ForContained
 		if IsDispatch and result.type != typedictionary! // dispatches use function pointers... 
 			result.type = c.type						// so we might as well make a c-array
 			result.contains = nil

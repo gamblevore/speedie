@@ -500,11 +500,11 @@ class SCDecl (SCNamed) {
 	
 	function NewWrapper (|scdecl| CastTo, |scdecl|)
 		opt norefcounts
-		|| IsNormal = castto and castto.isnormal
+		|| IsNormal = castto and CastTo.isnormal
 			|| it = .type.DataObject
-				return it
+				return it.ForContained
 		|| dcl = SCDecl(TypeWrapper!)
-		dcl.contains = castto
+		dcl.contains = castto.ForContained
 		if IsNormal
 			.type.DataObject = dcl
 		return dcl

@@ -4156,6 +4156,8 @@ int JB_int_OperatorMax(int Self, int Other);
 
 int JB_int_OperatorMin(int Self, int Other);
 
+JB_String* JB_int_operatorof(int Self, JB_String* Type, JB_String* Nothing);
+
 int JB_int_OperatorPow(int Self, int A);
 
 IntRange JB_int_OperatorTo(int Self, int Other);
@@ -6867,6 +6869,8 @@ Message* JB_Str_ParseWithError(JB_String* Self, JB_Error** Rec);
 
 JB_String* JB_Str_PathDir(JB_String* Self);
 
+JB_String* JB_Str_Pluralize(JB_String* Self, int Amount, JB_String* Nothing);
+
 JB_String* JB_Str_Preview(JB_String* Self, int N);
 
 void JB_Str_PrintlineColor(JB_String* Self, JB_String* Color);
@@ -8349,6 +8353,8 @@ SCDecl* SC_Decl_ExtractAmount(SCDecl* Self, Message* Prms, SCNode* Name_space);
 SCDecl* SC_Decl_ExtractAmountSub(SCDecl* Self, Message* Prms, SCNode* Name_space);
 
 bool SC_Decl_FastMatch(SCDecl* Self, SCDecl* O);
+
+SCDecl* SC_Decl_ForContained(SCDecl* Self);
 
 bool SC_Decl_Found(SCDecl* Self);
 

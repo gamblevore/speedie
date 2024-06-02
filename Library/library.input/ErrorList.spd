@@ -176,11 +176,8 @@ class ErrorReceiver
 
 
 	function faststring.ProblemsFound (|int| count)
-		self <~ Count
-		self <~ " issue"
-		if Count > 1
-			self <~ 's'
-		self <~ " found.\n" // found."
+		self <~ Count of "issue"
+		self <~ " found\n" // "1 issue found"
 	
 	function BadCount (|int|)
 		visible

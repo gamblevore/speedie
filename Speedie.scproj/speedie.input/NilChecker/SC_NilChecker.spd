@@ -68,6 +68,7 @@ function JumpNoPosts (niltrackerfn)
 
 function Jump (NilTrackerFn)
 	pragma inline
+//	"bug".trap(msg)
 	|| t = msg.ASMType
 		return (NilTable[t]!)(msg, test)
 	t = msg.func|asmtmp|
@@ -169,7 +170,7 @@ function Function (NilTrackerFn)
 	
 	|| fn = prms.obj|SCFunction|
 	if !fn
-		expect (fp.func == @bra) (prms, errorreceiver.NonFatal)
+//		expect (fp.func == @bra) (prms, errorreceiver.NonFatal) // no longer true.
 		fn = fp.GetFunctionPointer
 		require fn and .UseChildAsReal(fp, 0, nilreason.accessing)					// (abc)()
 

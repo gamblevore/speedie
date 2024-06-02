@@ -156,6 +156,18 @@ function CollectDeclsGlobals (|Message| arg, |SCNode| scarg)
 			require item.CollectAGlobalDecl(scarg)
 
 
+function scdecl.ForContained (|scdecl|)
+	|| Strong = (.NilDeclared isnt nilish) and .typesuffers
+	if (self isnt global) and !.name and !strong 
+		return self
+	// strange that it can have a name and be marked as !
+	// surely... all contained classes can be nil?
+	rz = .copydecl
+	rz.name = ""
+	rz.nildeclared |= nilstate.nilish
+	(rz isnt global)
+
+
 function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
 	opt norefcounts
 	|| f = .file

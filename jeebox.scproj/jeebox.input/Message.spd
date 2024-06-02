@@ -75,7 +75,6 @@ class Message (list)
 
 ///////////////////////////////////////////////////////////////////////////////
 	
-	
 	function Copy (|message| pos_msg=nil, |Message!|)
 		opt norefcounts
 		rz = pos_msg ?? self
@@ -99,10 +98,6 @@ class Message (list)
 
 	operator Starts (|string| s, |bool|)
 		return .name[0, s, true]
-
-
-//	function ClearPosition
-//		.Position = parser.using.position
 
 
 ////////////////////////////////////////////////////////////////////////////////
