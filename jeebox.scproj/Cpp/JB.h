@@ -1429,6 +1429,8 @@ int JB_int_OperatorMax(int Self, int Other);
 
 int JB_int_OperatorMin(int Self, int Other);
 
+JB_String* JB_int_operatorof(int Self, JB_String* Type, JB_String* Nothing);
+
 int JB_int_OperatorPow(int Self, int A);
 
 IntRange JB_int_OperatorTo(int Self, int Other);
@@ -2304,6 +2306,8 @@ Message* JB_Str_Parse(JB_String* Self, Syntax Owner, bool AllowDecomp);
 Message* JB_Str_ParseJbin(JB_String* Self, int64 Max);
 
 Message* JB_Str_ParseSub(JB_String* Self, Syntax Owner, bool AllowDecomp);
+
+JB_String* JB_Str_Pluralize(JB_String* Self, int Amount, JB_String* Nothing);
 
 JB_String* JB_Str_Preview(JB_String* Self, int N);
 

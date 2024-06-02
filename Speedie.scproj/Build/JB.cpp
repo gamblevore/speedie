@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2070];
+extern JB_StringC* JB_LUB[2071];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -1941,7 +1941,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112548257202176));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112548849596053));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3257,7 +3257,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024060218));
+	JB_FS_AppendInt32(_fsf0, (2024060221));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8016,7 +8016,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024060218));
+	JB_FS_AppendInt32(_fsf0, (2024060221));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -9544,6 +9544,13 @@ SCObject* SC_DollaDolla(Message* Exp, SCNode* Name_space) {
 	JB_Tree_SyntaxAppend(Prm, ((Message*)JB_Ring_First(Exp)));
 	if (Swearyness > 0) {
 		JB_Msg_AppendNum(Prm, Swearyness);
+	}
+	if (JB_Msg_OperatorIn(Exp, kJB_SyxArg)) {
+		Message* Dot = JB_Syx_OperatorPlus(kJB_SyxDot, JB_LUB[2070]);
+		(JB_Ring_NextSibSet(Exp, Dot));
+		JB_Msg_AppendSyx(Dot, kJB_SyxThg, JB_LUB[1386]);
+		JB_Tree_SyntaxAppend(JB_Msg_Msg(Dot, kJB_SyxPrm, JB_LUB[0]), Exp);
+		JB_FreeIfDead(SC_TypeOfExpr(Dot, Name_space, nil));
 	}
 	JB_MsgPos_SyntaxUsingComplete((&_usingf0), Exp);
 	SCDecl* _tmPf1 = JB_Incr(SC_TypeOfExpr(Exp, Name_space, nil));
@@ -50228,4 +50235,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 4400756022827889670 -4793512864448946746
+// 4400756022827889670 7172945621315781491

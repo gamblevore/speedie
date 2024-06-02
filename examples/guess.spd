@@ -2,8 +2,6 @@
 // compare this file to the original and see how much smaller (and faster?) it is in speedie!
 https://github.com/contextfreecode/jai-comparisons/blob/main/guess.jai 
 
-import "LeFunny" // also speedie has le funny
-
 main
 	zalgoline "Finished in ${game(100).play}\n\n" // and wierdness
 
@@ -25,10 +23,10 @@ class game
 			loop guess != .answer
 		
 	function report (|int| guess, |string|)
-		if guess < 1 or guess > .high: return "I said between 1 and $.high!! What would I expect from a ${swearword()} like you!"
-		if guess == .last: return "you just said $guess you " + SwearWord()
-		if guess < .answer: return "too low you " + swearword() 
-		if guess > .answer: return "you " + swearword() + " $guess is way too high"
+		if guess < 1 or guess > .high: return "I said between 1 and $.high!! What would I expect from a ${$1} like you!"
+		if guess == .last: return "you just said $guess you " + $1
+		if guess < .answer: return "too low you " + $1
+		if guess > .answer: return "you " + $1 + " $guess is way too high"
 		return "correct!"
 
 	function ask (|int|)
@@ -36,4 +34,4 @@ class game
 			|| word = app.input
 			|| result = word.int
 				return result
-			zalgoline "Uhhhh? $word? just what I expect from a " + swearword() + "\n\n"
+			zalgoline "Uhhhh? $word? just what I expect from a " + $1 + "\n\n"

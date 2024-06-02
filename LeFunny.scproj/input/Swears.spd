@@ -29,12 +29,14 @@ extend_module swearword
 			require a.name[] == b.name[]
 		return true
 		
+	function New (|string|)
+		return new("", 1)
 	function New (|int| n = 1,  |string|)
 		return new("", n)
 	function New (|int| a, |int| b,  |string|)
 		return new("", a+b)
 	
-	function New (|string| upon="", |int| n = 1,  |string|)
+	function New (|string| upon, |int| n = 1,  |string|)
 		if !n
 			return upon
 		if !.first

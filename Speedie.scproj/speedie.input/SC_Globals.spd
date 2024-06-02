@@ -149,12 +149,13 @@ function Message.ParentForAddress (|Message|)
 
 
 function DollaDolla (|message| exp, |SCNode| name_space, |SCObject|)
+	opt norefcounts
 	// $x --> swearword(x)
 	// $$$x --> swearword(x)
 	// !!$$!x -- swearword(X,3)
 	// $1 --> swearword(1)
+	// {$1} --> {app.say swearword(1)}
 	|| swearyness = 0
-	opt norefcounts
 	|| ch = exp
 	while ch == @brel
 		|| n = ch.name
@@ -171,6 +172,12 @@ function DollaDolla (|message| exp, |SCNode| name_space, |SCObject|)
 	prm <~ exp.first
 	if swearyness > 0
 		prm<~swearyness
+	if exp in @arg
+		|| dot = @dot + "say"
+		exp.next = dot
+		dot <~ (@thg, "app")
+		dot.msg(@prm) <~ exp
+		TypeOfExpr(dot, name_space)
 	return TypeOfExpr(exp, name_space)
 
 

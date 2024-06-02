@@ -3059,6 +3059,10 @@ int JB_int_OperatorMin(int Self, int Other) {
 	return Other;
 }
 
+JB_String* JB_int_operatorof(int Self, JB_String* Type, JB_String* Nothing) {
+	return JB_Str_Pluralize(Type, Self, Nothing);
+}
+
 int JB_int_OperatorPow(int Self, int A) {
 	int Rz = 0;
 	if (A == 2) {
@@ -4306,12 +4310,10 @@ void JB_FS_PrintNicely(FastString* Self, JB_String* S) {
 }
 
 void JB_FS_ProblemsFound(FastString* Self, int Count) {
-	JB_FS_AppendInt32(Self, Count);
+	JB_String* _tmPf0 = JB_Incr(JB_int_operatorof(Count, JB_LUB[44], JB_LUB[0]));
+	JB_FS_AppendString(Self, _tmPf0);
+	JB_Decr(_tmPf0);
 	JB_FS_AppendString(Self, JB_LUB[49]);
-	if (Count > 1) {
-		JB_FS_AppendByte(Self, 's');
-	}
-	JB_FS_AppendString(Self, JB_LUB[44]);
 }
 
 JB_String* JB_FS_Render(FastString* Self, FastString* Fs_in) {
@@ -5059,6 +5061,31 @@ Message* JB_Str_ParseSub(JB_String* Self, Syntax Owner, bool AllowDecomp) {
 	}
 	JB_SafeDecr(Into);
 	return ((Message*)Into);
+}
+
+JB_String* JB_Str_Pluralize(JB_String* Self, int Amount, JB_String* Nothing) {
+	if ((!Amount) and JB_Str_Exists(Nothing)) {
+		return Nothing;
+	}
+	FastString* Fs = JB_Incr(JB_FS_Constructor(nil));
+	if (Amount) {
+		JB_FS_AppendInt32(Fs, Amount);
+	}
+	 else {
+		JB_FS_AppendString(Fs, JB_LUB[472]);
+	}
+	JB_FS_AppendByte(Fs, ' ');
+	JB_FS_AppendString(Fs, Self);
+	if (Amount != 1) {
+		if (JB_Str_Last(Self, 0) == 's') {
+			JB_FS_AppendByte(Fs, 'e');
+		}
+		JB_FS_AppendByte(Fs, 's');
+	}
+	JB_String* _tmPf0 = JB_Incr(JB_FS_SyntaxCast(Fs));
+	JB_Decr(Fs);
+	JB_SafeDecr(_tmPf0);
+	return _tmPf0;
 }
 
 JB_String* JB_Str_Preview(JB_String* Self, int N) {
@@ -8331,7 +8358,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024060201);
+	return (2024060211);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8343,4 +8370,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 3266869101388525822 2997985800942882790
+// 7796578953066441599 -5732947445617429858 -6211541417332001752
