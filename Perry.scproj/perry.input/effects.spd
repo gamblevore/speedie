@@ -1,0 +1,35 @@
+
+
+// finish later
+module Effects
+	function DoFirework (|float| strength)
+		opt NoRefCounts
+		for i in 3
+			.Fireworks(window.all, 5s, date.now + 0.25s*i, (-3.0, 0), (0,0), strength)
+
+
+	task Fireworks (guicontrol.taskgui, |vec2| V, |ivec2| Start, |float| Strength)
+		constructor
+			is Animation
+		
+		run
+			|| Particles = 24 
+			|| S = .starttime// + .d.position
+			for p in particles
+				|| V2 = (S + p).RandomVec2 - 0.5
+				|| A  = (S - p).RandomVec2 - 0.5
+				A.y *= 4.0
+				V2 = (V2 * 25.0) + .V * 250.0
+				.DrawParticle(V2, A, Progress, p|float|, .start)
+
+
+		function DrawParticle (|vec2| V, |vec2| A, |float| T, |float| p, |ivec2| start)
+			|| str = 1.0
+
+			|| T2 = T - p * 0.0125
+			|| s = start.vec2 + (V*T2 + A)
+			|| Alpha = (1.0-(T2*1.5)) * (1.0-T)
+			Alpha *= str * .Strength
+			|| C1 = (1.0, 1.0, 2.0, alpha)
+			|| Rect = (s-2.5, s+2.5)
+			sdlapp.Screen.DrawCircle2( Rect,  C1 )
