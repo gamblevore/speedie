@@ -34,7 +34,7 @@ class SwearWord
 		return true
 		
 		
-	function Bleep (|int| n = 1, |string|)
+	function New (|int| n = 1, |string|)
 		.load
 		|| fs = FastString()
 		for i in n

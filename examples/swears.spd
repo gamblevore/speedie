@@ -9,7 +9,7 @@ import "LeFunny"
 
 main (|int| AmountOfSwears=1)
 	SwearWord.AllowSame = app.yes("same")
-	|| hehe = Swearword.Bleep(AmountOfSwears)
+	|| hehe = Swearword(AmountOfSwears)
 	if app.yes("speak")
 		`("killall say" in terminal to stop this.)`
 		``
