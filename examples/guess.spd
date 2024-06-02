@@ -33,4 +33,4 @@ function ask_guess_multi (|int| high, |int|)
 		zalgoline "I didn't understand"
 
 main
-	zalgoline "Finished in ${game(100).play}\n\n"
+	zalgoline "Finished in ${game(100).play}\n\n" // and wierdness

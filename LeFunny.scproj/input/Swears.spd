@@ -20,7 +20,7 @@ class SwearWord
 		for w.lines in s.Unbleep
 			if w
 				list <~ SwearWord(w)
-		list.Sort(&string.sorter)
+		string.sort(list)
 	
 //	render (|[swearword]| W)
 //		for s in W

@@ -3936,6 +3936,7 @@ double JB_Wrap_FloatValue(DTWrap* Self) {
 
 JB_String* JB_Wrap_Render(DTWrap* Self, FastString* Fs_in) {
 	FastString* Fs = JB_Incr(JB_FS__FastNew(Fs_in));
+	//visible;
 	if (JB_TC_IsFloat(Self->DataType)) {
 		JB_FS_AppendDoubleAsText0(Fs, JB_Wrap_FloatValue(Self));
 	}
@@ -8330,7 +8331,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024060110);
+	return (2024060201);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
