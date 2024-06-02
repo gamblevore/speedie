@@ -100,25 +100,31 @@ function UseChildAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason,
 
 	|| dcl = msg.FastDecl
 	if dcl is Global
-//		if (msg != @thg) and (dcl isnt const)
-//			printline msg
-//			printline nilcount
 		return dcl.NilDeclared
 	|| ch = msg.first
-		|| actual = .Jump(ch)
-		if actual is nilish
-			|| ddd = dcl.hiderfunc
-			if ddd and (reason is property) and !ddd.isassigns				// OK... 
-				return .PropertyToFunc(msg, ddd)
-				
-			.BecomeReal(ch.FastDecl, ch, reason)
-		|| nd = dcl.nildeclared
-		if test isnt active or test is soft
-			return nd
-		if nd.statedreal and dcl.typesuffers
-			return msg.RedundantDeclare(nd)
-		return nd
+		return .UseAsRealSub(ch, test, reason, dcl)
 	debugger // what?
+
+
+function UseAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason, |NilState|) 	// a.b, *a, a[0], (a)()
+	return .useasrealsub(msg, test, reason, msg.fastdecl)
+
+
+function UseAsRealSub (|message| ch, |nilcheckmode| test, |nilreason| reason, |scdecl| dcl, |NilState|) 	// a.b, *a, a[0], (a)()
+	opt norefcounts
+	|| actual = .Jump(ch)
+	if actual is nilish
+		|| ddd = dcl.hiderfunc
+		if ddd and (reason is property) and !ddd.isassigns				// OK... 
+			return .PropertyToFunc(ch.parent!, ddd)
+			
+		.BecomeReal(ch.FastDecl, ch, reason)
+	|| nd = dcl.nildeclared
+	if test isnt active or test is soft
+		return nd
+	if nd.statedreal and dcl.typesuffers
+		return ch.RedundantDeclare(nd)
+	return nd
 
 
 function Rel (NilTrackerFn)									// x = y
@@ -171,8 +177,9 @@ function Function (NilTrackerFn)
 	|| fn = prms.obj|SCFunction|
 	if !fn
 //		expect (fp.func == @bra) (prms, errorreceiver.NonFatal) // no longer true.
-		fn = fp.GetFunctionPointer
-		require fn and .UseChildAsReal(fp, 0, nilreason.accessing)					// (abc)()
+		fn = fp.GetFunctionPointer$
+		fp = fp.unbra
+		require .UseAsReal(fp, 0, nilreason.accessing)					// (abc)()
 
 	expect ((fn != scfunction.currfunc) or t.anyreturns or t.nestdepth > 0) (msg, "Recursion bug. Sheesh.")
 	

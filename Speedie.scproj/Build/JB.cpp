@@ -1931,7 +1931,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112546482309591));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112546565026637));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -19318,7 +19318,11 @@ NilState SC_nil__Function(Message* Msg, NilCheckMode Test) {
 	SCFunction* Fn = ((SCFunction*)Prms->Obj);
 	if (!Fn) {
 		Fn = SC_Msg_GetFunctionPointer(Fp);
-		if (!(((bool)Fn) and ((bool)SC_nil__UseChildAsReal(Fp, 0, kSC__NilReason_Accessing)))) {
+		if (!Fn) {
+			return 0;
+		}
+		Fp = SC_Msg_UnBra(Fp);
+		if (!SC_nil__UseAsReal(Fp, 0, kSC__NilReason_Accessing)) {
 			return 0;
 		}
 	}
@@ -19767,6 +19771,32 @@ NilState SC_nil__Type(Message* Msg, NilCheckMode Test) {
 	return D->NilDeclared;
 }
 
+NilState SC_nil__UseAsReal(Message* Msg, NilCheckMode Test, NilReason Reason) {
+	SCDecl* _tmPf0 = JB_Incr(SC_Msg_FastDecl(Msg));
+	NilState _tmPf1 = SC_nil__UseAsRealSub(Msg, Test, Reason, _tmPf0);
+	JB_Decr(_tmPf0);
+	return _tmPf1;
+}
+
+NilState SC_nil__UseAsRealSub(Message* Ch, NilCheckMode Test, NilReason Reason, SCDecl* Dcl) {
+	NilState Actual = SC_nil__Jump(Ch, 0);
+	if (SC_NilState_SyntaxIs(Actual, kSC__NilState_Nilish)) {
+		SCFunction* Ddd = Dcl->HiderFunc;
+		if (((bool)Ddd) and ((SC_NilReason_SyntaxIs(Reason, kSC__NilReason_Property)) and (!Ddd->IsAssigns))) {
+			return SC_nil__PropertyToFunc(((Message*)JB_Ring_Parent(Ch)), Ddd);
+		}
+		SC_nil__BecomeReal(SC_Msg_FastDecl(Ch), Ch, Reason, nil, nil);
+	}
+	NilState Nd = Dcl->NilDeclared;
+	if ((!SC_khalai_SyntaxIs(Test, kSC__khalai_Active)) or SC_khalai_SyntaxIs(Test, kSC__khalai_Soft)) {
+		return Nd;
+	}
+	if (((bool)SC_NilState_StatedReal(Nd)) and SC_Decl_TypeSuffers(Dcl)) {
+		return SC_Msg_RedundantDeclare(Ch, Nd);
+	}
+	return Nd;
+}
+
 NilState SC_nil__UseChildAsReal(Message* Msg, NilCheckMode Test, NilReason Reason) {
 	SCDecl* Dcl = SC_Msg_FastDecl(Msg);
 	if (SC_Decl_SyntaxIs(Dcl, kSC__SCDeclInfo_Global)) {
@@ -19774,22 +19804,7 @@ NilState SC_nil__UseChildAsReal(Message* Msg, NilCheckMode Test, NilReason Reaso
 	}
 	Message* Ch = ((Message*)JB_Ring_First(Msg));
 	if (Ch) {
-		NilState Actual = SC_nil__Jump(Ch, 0);
-		if (SC_NilState_SyntaxIs(Actual, kSC__NilState_Nilish)) {
-			SCFunction* Ddd = Dcl->HiderFunc;
-			if (((bool)Ddd) and ((SC_NilReason_SyntaxIs(Reason, kSC__NilReason_Property)) and (!Ddd->IsAssigns))) {
-				return SC_nil__PropertyToFunc(Msg, Ddd);
-			}
-			SC_nil__BecomeReal(SC_Msg_FastDecl(Ch), Ch, Reason, nil, nil);
-		}
-		NilState Nd = Dcl->NilDeclared;
-		if ((!SC_khalai_SyntaxIs(Test, kSC__khalai_Active)) or SC_khalai_SyntaxIs(Test, kSC__khalai_Soft)) {
-			return Nd;
-		}
-		if (((bool)SC_NilState_StatedReal(Nd)) and SC_Decl_TypeSuffers(Dcl)) {
-			return SC_Msg_RedundantDeclare(Msg, Nd);
-		}
-		return Nd;
+		return SC_nil__UseAsRealSub(Ch, Test, Reason, Dcl);
 	}
 	debugger;
 	return 0;
@@ -50206,4 +50221,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 2904514863146581578 7023315488452414323
+// -547171360407055228 7023315488452414323

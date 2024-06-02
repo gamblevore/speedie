@@ -5392,6 +5392,10 @@ void SC_nil__TrackerDummies();
 
 NilState SC_nil__Type(Message* Msg, NilCheckMode Test);
 
+NilState SC_nil__UseAsReal(Message* Msg, NilCheckMode Test, NilReason Reason);
+
+NilState SC_nil__UseAsRealSub(Message* Ch, NilCheckMode Test, NilReason Reason, SCDecl* Dcl);
+
 NilState SC_nil__UseChildAsReal(Message* Msg, NilCheckMode Test, NilReason Reason);
 
 NilState SC_nil__VariableSet(SCDecl* Recv, Message* RecvMsg, SCDecl* Sent, Message* SentMsg, NilState SentState);
