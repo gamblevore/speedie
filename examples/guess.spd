@@ -6,6 +6,7 @@ import "LeFunny" // also speedie has le funny
 
 class game
 	|int|   answer
+	|int|   last = int.min
 	|int|   high
 	
 	constructor (|int| high)
@@ -13,23 +14,27 @@ class game
 		.answer = high() + 1
 
 	function play (|int|)
+		"::Guess a number between 1 and $.high::"
 		while
-			|| guess = .ask
-			"    $guess is ${.report(guess)}"
-			loop guess != .answer
 			rz++
+			|| guess = .ask
+			printline .report(guess)
+			.last = guess
+			loop guess != .answer
 		
 	function report (|int| guess, |string|)
-		if guess < .answer: return "too low" 
-		if guess > .answer: return "too high"
+		if guess < 1 or guess > .high: return "I said between 1 and $.high!! What would I expect from a ${swearword()} like you!"
+		if guess == .last: return "you just said $guess you " + SwearWord()
+		if guess < .answer: return "too low you " + swearword() 
+		if guess > .answer: return "you " + swearword() + " $guess is way too high"
 		return "correct!"
 
 	function ask (|int|)
 		while
-			"::Hey ${swearword.bleep}! Guess a number between 1 and $.high::"
-			|| result = app.input.int
+			|| word = app.input
+			|| result = word.int
 				return result
-			zalgoline "Uhhhh?"
+			zalgoline "Uhhhh? $word? just what I expect from a " + swearword() + "\n\n"
 
 main
 	zalgoline "Finished in ${game(100).play}\n\n" // and wierdness
