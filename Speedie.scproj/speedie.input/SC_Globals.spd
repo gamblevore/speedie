@@ -149,11 +149,29 @@ function Message.ParentForAddress (|Message|)
 
 
 function DollaDolla (|message| exp, |SCNode| name_space, |SCObject|)
-	problem (exp) // too much syntax in speedie?
-	exp.become(@dot, "Render")
-	exp.msg(@prm)
+	// $x --> swearword(x)
+	// $$$x --> swearword(x)
+	// !!$$!x -- swearword(X,3)
+	// $1 --> swearword(1)
+	|| swearyness = 0
+	opt norefcounts
+	|| ch = exp
+	while ch == @brel
+		|| n = ch.name
+		if n == "!" // ok
+			swearyness++
+		  elseif n != "$"
+			exit
+		ch.become @bra
+		ch = ch.first!
+	exp.become(@func)
+	using exp
+	exp <~ (@thg, "swearword")
+	|| prm = exp.msg(@prm)
+	prm <~ exp.first
+	if swearyness > 0
+		prm<~swearyness
 	return TypeOfExpr(exp, name_space)
-	// $i --> i.render
 
 
 function TranNegate (|message| f, |SCNode| name_space, |SCObject|)
@@ -171,10 +189,15 @@ function TranNegate (|message| f, |SCNode| name_space, |SCObject|)
 	
 
 function TypeOfBRel (ExprResolver)
+	opt norefcounts
 	|| name = exp.name
-	|| F = exp.first									#require
-	|| SubType = TypeOfExpr( F, name_space )			#require
 	|| n = name[]
+	|| F = exp.first									#require
+
+	if (n == '$') or (n == '!'  and  f isbrel "$")
+		return DollaDolla(exp, name_space)
+
+	|| SubType = TypeOfExpr( F, name_space )			#require
 	
 	if n == '*'
 		problem (exp, "Use [] instead")
@@ -195,9 +218,6 @@ function TypeOfBRel (ExprResolver)
 	if n == '~'
 		check (subtype.IsInteger) (exp, "Expected an integer.") 
 		Return subtype
-
-	if n == '$'
-		return DollaDolla(exp, name_space)
 		
 	SCFunction.Tran_AfterRel( exp, name_space, side, false )
 	Return SubType

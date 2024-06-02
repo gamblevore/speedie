@@ -119,6 +119,7 @@ linkage
 |SCModule|					DisamModules
 
 |bool|						InPerry 
+|bool| 						HasFunny
 |bool|						HasMainFunc
 |bool| 						InitedOK = true
 |int|						stClasses

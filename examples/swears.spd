@@ -1,15 +1,22 @@
 
 
-// This is meant to make people laugh.
-// Swearing is known to help reduce physical pain
-// And more intelligent people are known to swear more.
-// It is also found that source-code containing swears tends to be of higher-quality
+// Swearing is known to:
+	// make people laugh.
+	// help reduce physical pain
+	// More intelligent people are known to swear more.
+	// Source-code containing swears tends to be higher-quality
+
+
 // Hope you enjoy!
+
 import "LeFunny"
 
 main (|int| AmountOfSwears=1)
+////  You can always replace the word-list by altering ////
+////  swearword.firstwords or swearwords.secondwords   ////
+//	swearword.firstwords = "a\nb\nc\nd", swearword.secondwords = "a\nb\nc\nd"
 	SwearWord.AllowSame = app.yes("same")
-	|| hehe = Swearword(AmountOfSwears)
+	|| hehe = SwearWord(amountofSwears)
 	if app.yes("speak")
 		`("killall say" in terminal to stop this.)`
 		``

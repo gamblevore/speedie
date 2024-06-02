@@ -1005,6 +1005,12 @@ class Message (list)
 	syntax equals (|Syntax| X, |bool|Aware, |bool|)
 		cpp_part EqualsSyx
 		return self and (.Func == X)
+
+//	sadly... this would mess up anything that tests msg == 1
+//  bytes aren't really numbers...
+//	syntax equals (|byte| B, |bool|Aware, |bool|)
+//		cpp_part EqualsByte
+//		return self and .name == B
 	
 	function HasPosition (|bool|)
 		return .Position >= 0
@@ -1076,10 +1082,10 @@ class Message (list)
 			|| f = .First
 			if !f or self != @unit
 				return .name.ParseInt(StrStart, self)
-			if self == "x"
+			if self == 'x'
 				return F.name.ParseHex(StrStart, F)
 			|| mul = f.name.ParseFloat
-			if self == "K"
+			if self == 'K'
 				mul *= 1K|float|
 			  elseif self == "M"
 				mul *= 1M|float|
@@ -1147,6 +1153,12 @@ class Message (list)
 		opt norefcounts
 		|| p = .parent
 			return p.func == f
+
+	operator In (|syntax| f, |string| name, |bool|)
+		cpp_Part InStr
+		opt norefcounts
+		|| p = .parent
+			return p.func == f and p.name == name
 
 	function IsContainer (|bool|)
 		|| f = .func

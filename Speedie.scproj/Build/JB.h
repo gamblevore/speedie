@@ -1395,6 +1395,7 @@ extern SCFunction* SC__Comp_fnIsa;
 extern SCFunction* SC__Comp_fnMustbe;
 extern SCFunction* SC__Comp_fnOpMustBe;
 extern Array* SC__Comp_FuncList;
+extern bool SC__Comp_HasFunny;
 extern bool SC__Comp_HasMainFunc;
 extern Array* SC__Comp_ImportedList;
 extern Dictionary* SC__Comp_ImportedNames;
@@ -2465,6 +2466,8 @@ void SC_CodeSorter__LeafsFirst();
 
 
 // Comp
+void SC_Comp__AddFunny(Message* Msg);
+
 SCDecl* SC_Comp__AddGlobalConst(JB_String* Name, SCClass* C, NilState Dcl);
 
 void SC_Comp__AddGlobalConstFloat(JB_String* Name, SCClass* C, JB_String* Value);

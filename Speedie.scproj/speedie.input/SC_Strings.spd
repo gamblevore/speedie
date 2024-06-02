@@ -227,6 +227,10 @@ function Message.Clean (|bool| erl = false)
 			if !QEscape and curr == "?"
 				curr.Tran_QMark
 				continue_with curr.flatnext
+
+		  elseif (f == @brel)
+			if curr == "$"
+				Compiler.AddFunny(self)
 			
 		  elseif (f == @decl)
 			|| l = curr.last

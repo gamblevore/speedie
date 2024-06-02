@@ -23,7 +23,6 @@ function TypeOfDotDotDot (ExprResolver)
 
 
 
-
 function message.QMarkRel (|message|)
 	opt norefcounts
 	|| x = self
@@ -34,9 +33,9 @@ function message.QMarkRel (|message|)
 			return p
 		x = p
 		require x == @dot
-		
 
-	
+
+
 function message.Tran_QMark 
 	|| thedot		= .first$
 	|| IsNormal		= (thedot == @dot or @sdot or @func) 
@@ -190,5 +189,13 @@ if __ArgCount == 0
 		.AppendMacro(macros.mainargNone, [i.msg])
 
 	self <~ "require stderr.ok"~parse
+
+
+
+function compiler.AddFunny (|message| msg)	// autoimport
+	require !.HasFunny
+	.HasFunny = true
+	msg.msg(@tmp, "import") <~ "LeFunny" // hehe
+
 
 
