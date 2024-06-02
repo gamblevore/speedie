@@ -14,7 +14,7 @@ class game
 
 	function play (|int|)
 		while
-			|| guess = ask_guess_multi(.high)
+			|| guess = .ask
 			"    $guess is ${.report(guess)}"
 			loop guess != .answer
 			rz++
@@ -22,15 +22,14 @@ class game
 	function report (|int| guess, |string|)
 		if guess < .answer: return "too low" 
 		if guess > .answer: return "too high"
-		return "the answer"
+		return "correct!"
 
-
-function ask_guess_multi (|int| high, |int|)
-	while
-		"::Hey ${swearword.bleep}! Guess a number between 1 and $high::"
-		|| result = app.input.int
-			return result
-		zalgoline "I didn't understand"
+	function ask (|int|)
+		while
+			"::Hey ${swearword.bleep}! Guess a number between 1 and $.high::"
+			|| result = app.input.int
+				return result
+			zalgoline "Uhhhh?"
 
 main
 	zalgoline "Finished in ${game(100).play}\n\n" // and wierdness
