@@ -336,7 +336,6 @@ extend PerryIDE
 		.SpeedieText.SetupOut("speedie")
 		.ProductOut.SetupOut("product", TextView.AllowJeebox)
 		.ProductErrors.SetupOut("errors")
-		.ProductErrors.gnormal.solid = vec4(0.077, 0.4, 0.4, 0.95)
 		
 
 		.AddIDEButton(.RunButton,	"\02", "Debug Project", "debug")
@@ -363,7 +362,7 @@ extend PerryIDE
 		with .ProjectTabs
 			.id = "Tabs"
 			.size = 10~after to the~right  by  3~inside
-			.itemwidth = 75
+			.itemwidth = 84
 			.items = perry.projects
 			|| pf = perry.projects.first 
 				 (pf is selected)
@@ -375,7 +374,7 @@ extend PerryIDE
 		with .CompileTabs
 			.id = "CompileTabs"
 			.size = the~area
-			.itemwidth = 75
+			.itemwidth = 101
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)
 			.items = ("Speedie, Jeebox, '', Errors"~parse)|listviewrow|
 			|| C = .items.first!
@@ -386,6 +385,7 @@ extend PerryIDE
 			c = c.next(self.ProductOut)
 			c = c.next(self.ProductErrors)
 			(c is hidden)
+			(c is Broken)
 			
 
 		.AddIDEButton(.StartScreen,	"\1a", "Startup screen", "startup")
