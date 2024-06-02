@@ -4,6 +4,9 @@ https://github.com/contextfreecode/jai-comparisons/blob/main/guess.jai
 
 import "LeFunny" // also speedie has le funny
 
+main
+	zalgoline "Finished in ${game(100).play}\n\n" // and wierdness
+
 class game
 	|int|   answer
 	|int|   last = int.min
@@ -15,8 +18,7 @@ class game
 
 	function play (|int|)
 		"::Guess a number between 1 and $.high::"
-		while
-			rz++
+		while ++Rz
 			|| guess = .ask
 			printline .report(guess)
 			.last = guess
@@ -35,6 +37,3 @@ class game
 			|| result = word.int
 				return result
 			zalgoline "Uhhhh? $word? just what I expect from a " + swearword() + "\n\n"
-
-main
-	zalgoline "Finished in ${game(100).play}\n\n" // and wierdness

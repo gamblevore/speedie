@@ -48,11 +48,18 @@ datatype int
 		
 	syntax compare (|string|s, |bool| aware, |int|)
 		return self - s.length
+
+	syntax access (|bool|) // should be a bool?
+		cpp_part rnd
+		disabled "use intnum() for a random int, or floatnum[] for a chance at getting true"
+
 	syntax access (|int| bit, |bool|)
 		return self&(1<<bit)
+
 	syntax access (|int| bit, assigns:|bool|, |int|)
 		|| mask = 1<<bit
 		return (self &~ mask) ||| (value|int| << bit) 
+
 	function Clz (|int|)
 		cpp_inbuilt __builtin_clz
 	

@@ -12,7 +12,7 @@ linkage
 conf
 	version	0_75
 	name	Perry
-	creator	jeebox
+	creator	gamblevore
 	helpurl	"http://docs.gamblevore.org/Perry.md"
 	prefs	"Perry.prefs"
 	registration

@@ -148,8 +148,8 @@ function Message.ParentForAddress (|Message|)
 		p = p.parent
 
 
-function TranRender (|message| exp, |SCNode| name_space, |SCObject|)
-//	problem (exp) // too much syntax in speedie?
+function DollaDolla (|message| exp, |SCNode| name_space, |SCObject|)
+	problem (exp) // too much syntax in speedie?
 	exp.become(@dot, "Render")
 	exp.msg(@prm)
 	return TypeOfExpr(exp, name_space)
@@ -197,7 +197,7 @@ function TypeOfBRel (ExprResolver)
 		Return subtype
 
 	if n == '$'
-		return TranRender(exp, name_space)
+		return DollaDolla(exp, name_space)
 		
 	SCFunction.Tran_AfterRel( exp, name_space, side, false )
 	Return SubType

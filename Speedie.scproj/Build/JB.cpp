@@ -1931,7 +1931,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112546565026637));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112546869971788));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3247,7 +3247,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024060211));
+	JB_FS_AppendInt32(_fsf0, (2024060212));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8006,7 +8006,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024060211));
+	JB_FS_AppendInt32(_fsf0, (2024060212));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -9510,6 +9510,13 @@ Message* SC_DefaultStitch(Message* Default, Message* Dcl) {
 	JB_MsgPos_SyntaxUsingComplete((&_usingf0), Dcl);
 	JB_MsgPos_Destructor((&_usingf0));
 	return Rz;
+}
+
+SCObject* SC_DollaDolla(Message* Exp, SCNode* Name_space) {
+	(JB_Msg_SyntaxProblem(Exp, nil));
+	JB_Msg_BecomeStr(Exp, kJB_SyxDot, JB_LUB[1077]);
+	JB_FreeIfDead(JB_Msg_Msg(Exp, kJB_SyxPrm, JB_LUB[0]));
+	return SC_TypeOfExpr(Exp, Name_space, nil);
 }
 
 SCNode* SC_DontRemove(Message* Node, SCNode* Name_space, Message* ErrPlace) {
@@ -11354,12 +11361,6 @@ SCObject* SC_TranNegate(Message* F, SCNode* Name_space) {
 	return SC_TypeBool->TypeNormal;
 }
 
-SCObject* SC_TranRender(Message* Exp, SCNode* Name_space) {
-	JB_Msg_BecomeStr(Exp, kJB_SyxDot, JB_LUB[1077]);
-	JB_FreeIfDead(JB_Msg_Msg(Exp, kJB_SyxPrm, JB_LUB[0]));
-	return SC_TypeOfExpr(Exp, Name_space, nil);
-}
-
 SCObject* SC_TypeOfAccess(Message* Exp, SCNode* Name_space, Message* Side) {
 	Message* Ch = ((Message*)JB_Ring_First(Exp));
 	SCObject* Ty0 = SC_TypeOfExprModulesOK(Ch, Name_space, nil);
@@ -11723,7 +11724,7 @@ SCObject* SC_TypeOfBRel(Message* Exp, SCNode* Name_space, Message* Side) {
 	}
 	if (N == '$') {
 		JB_Decr(SubType);
-		return SC_TranRender(Exp, Name_space);
+		return SC_DollaDolla(Exp, Name_space);
 	}
 	JB_FreeIfDead(SC_Func__Tran_AfterRel(Exp, Name_space, Side, false));
 	JB_SafeDecr(SubType);
@@ -50221,4 +50222,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -547171360407055228 7023315488452414323
+// -3528466334711256520 7023315488452414323

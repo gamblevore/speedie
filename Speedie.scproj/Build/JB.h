@@ -3566,6 +3566,8 @@ bool SC_DeclSizeSorter(SCDecl* A, SCDecl* B);
 
 Message* SC_DefaultStitch(Message* Default, Message* Dcl);
 
+SCObject* SC_DollaDolla(Message* Exp, SCNode* Name_space);
+
 SCNode* SC_DontRemove(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
 SCDecl* SC_DoOpCompare(Message* Exp, SCDecl* Lc, SCDecl* Rc, SCOperator* Comp, SCNode* Name_space);
@@ -3703,8 +3705,6 @@ void SC_Tran_Msg(SCFunction* Fn, Message* Exp, SCNode* Name_space);
 void SC_Tran_MsgList(SCFunction* Fn, Message* Exp, SCNode* Name_space);
 
 SCObject* SC_TranNegate(Message* F, SCNode* Name_space);
-
-SCObject* SC_TranRender(Message* Exp, SCNode* Name_space);
 
 SCObject* SC_TypeOfAccess(Message* Exp, SCNode* Name_space, Message* Side);
 
