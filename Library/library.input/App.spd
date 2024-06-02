@@ -225,7 +225,7 @@ function ChildEnv (|StringZeroTerminated| s, assigns:|?StringZeroTerminated| val
 	cpp_wrapper JB_App__SetEnv
 
 
-function Input (|string|)
+function Input (|stringthatwasreadsafely|)
 	cpp_Wrapper JB_App__Readline
 
 function IsMainThread (|bool|)

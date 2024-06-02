@@ -136,18 +136,7 @@ module Perry
 		while rz endswith "()"
 			rz = rz[0, rz.length-2]
 	
-	
-	function perryide.SetTab2Name (|message| old)
-		opt norefcounts
-		.ProjectTabs.selected = old
-
-		|| f = old[@nil]
-			f.name = f.name.ProjCleanName
-			.id = "IDE: " + f.name
-			|| ii = .CompileTabs.items[@nil, 2]
-				ii.name = f.name + "[]"
-		
-		
+			
 	function AddProj (|string| path, |PerryIDE| i)
 		opt norefcounts
 		|| old	= .FindProj(path)
@@ -159,9 +148,21 @@ module Perry
 		
 		i.ProjMsg = old
 		i.SetTab2Name(old)
-			
+
+
 
 extend PerryIDE {
+function SetTab2Name (|message| old)
+	opt norefcounts
+	.ProjectTabs.selected = old
+
+	|| f = old[@nil]
+		f.name = f.name.ProjCleanName
+		.id = "IDE: " + f.name
+		|| ii = .CompileTabs.items[@nil, 2]
+			ii.name = f.name + "[]"
+
+
 function IsSpeedieCode (|bool|)
 	opt norefcounts
 	|| r = .filelist.listsource.First as filerow
@@ -216,7 +217,7 @@ function ShowCompileCutely (|bool| Always=false)
 
 	
 function ShowCompileTab (|object| tab, |bool| always) // showtab
-	.ShowCompileCutely
+	.ShowCompileCutely           // OOOP. 
 	.CompileTabSelect(tab, always)
 
 

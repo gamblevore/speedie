@@ -336,6 +336,7 @@ extend PerryIDE
 		.SpeedieText.SetupOut("speedie")
 		.ProductOut.SetupOut("product", TextView.AllowJeebox)
 		.ProductErrors.SetupOut("errors")
+		.ProductErrors.gnormal.solid = vec4(0.077, 0.4, 0.4, 0.95)
 		
 
 		.AddIDEButton(.RunButton,	"\02", "Debug Project", "debug")
@@ -368,7 +369,6 @@ extend PerryIDE
 				 (pf is selected)
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.2)
 			.GNormal.Drawer = image.RoundRectDrawer
-//			.GNormal.Drawer = image.ClippedRectDrawer // bugged somehow
 			.GNormal.CornersCut = 12
 			.GNormal.CornerSize = 6
 

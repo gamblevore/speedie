@@ -27,38 +27,38 @@ function PrintNum (|int64| b1)
 
 
 function app.TestSyntax
-	printnum(60GB)
-	printnum(7.9MB|int|)
-	printnum(9524600)
-	
-    || P = person(12, "fred")
-    P.age = -2 // try to corrupt the age 
-    "$p" // see if it worked or not?
-	|| x = ["a", "b", "c"]
-	if x == 3
-	    "$x has three items."
-	|| H = "house"
-	if H == 5
-	    "'$H' has five letters"
-	|| L = "(a,b,c,d)".parse
-	if L == 4
-	    "The list $L has four items!"
-    || z = 0
-    for i in 1 to 6
-        if i isa 2
-            "$i is even"
-            z[i] = true
-          else
-            "$i is odd"
-    "z is $z"
-    
-
-	FlowControl.Disabled++
-	for 4
-	    || fn = (mesayer, shesayer)(0.5[])
-	    (fn)(app.args[0])
-	FlowControl.Disabled--
-    
+//	printnum(60GB)
+//	printnum(7.9MB|int|)
+//	printnum(9524600)
+//	
+//    || P = person(12, "fred")
+//    P.age = -2 // try to corrupt the age 
+//    "$p" // see if it worked or not?
+//	|| x = ["a", "b", "c"]
+//	if x == 3
+//	    "$x has three items."
+//	|| H = "house"
+//	if H == 5
+//	    "'$H' has five letters"
+//	|| L = "(a,b,c,d)".parse
+//	if L == 4
+//	    "The list $L has four items!"
+//    || z = 0
+//    for i in 1 to 6
+//        if i isa 2
+//            "$i is even"
+//            z[i] = true
+//          else
+//            "$i is odd"
+//    "z is $z"
+//    
+//
+//	FlowControl.Disabled++
+//	for 4
+//	    || fn = (mesayer, shesayer)(0.5[])
+//	    (fn)(app.args[0])
+//	FlowControl.Disabled--
+//    
     || G = RPGHero("fred")
     (DoAction["jump"]![])(G, "hes scared")
 

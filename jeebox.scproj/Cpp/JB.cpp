@@ -4194,11 +4194,7 @@ void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, int Se
 		if (Desc == nil) {
 			Desc = JB_Msg_MiniName(Node, JB_LUB[324]);
 		}
-		JB_String* _tmP0 = Path;
-		if (!JB_Str_Exists(_tmP0)) {
-			_tmP0 = JB_LUB[0];
-		}
-		JB_Rec_AppendErr(JB_StdErr, JB_Err_Constructor(nil, JB_Msg_FindNotInserted(Node), Desc, Sev, _tmP0));
+		JB_Rec_AppendErr(JB_StdErr, JB_Err_Constructor(nil, JB_Msg_FindNotInserted(Node), Desc, Sev, ((JB_String*)JB_Ternary(JB_Str_Exists(Path), ((JB_String*)Path), ((JB_String*)JB_LUB[0])))));
 	}
 }
 
@@ -6411,10 +6407,7 @@ Message* JB_Msg_ConstructorRange(Message* Self, Message* Parent, Syntax Func, in
 
 Message* JB_Msg_Copy(Message* Self, Message* Pos_msg) {
 	Message* Rz = nil;
-	Rz = Pos_msg;
-	if (!Rz) {
-		Rz = Self;
-	}
+	Rz = ((Message*)JB_Ternary(((bool)Pos_msg), Pos_msg, Self));
 	if (true) {
 		MessagePosition _usingf0 = JB_Msg_SyntaxUsing(Rz);
 		Rz = JB_Msg_CopySub(Self, Pos_msg);

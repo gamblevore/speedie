@@ -54,6 +54,7 @@ class DataObject
 
 
 	render
+		visible //hmmm
 		if .datatype.isfloat
 			fs <~ .FloatValue
 		  elseif .datatype == datatypecode.unusedtype

@@ -1,0 +1,36 @@
+#!/usr/local/bin/spd
+// compare this file to the original and see how much smaller (and faster?) it is in speedie!
+https://github.com/contextfreecode/jai-comparisons/blob/main/guess.jai 
+
+import "LeFunny" // also speedie has le funny
+
+class game
+	|int|   answer
+	|int|   high
+	
+	constructor (|int| high)
+		.high = high
+		.answer = high() + 1
+
+	function play (|int|)
+		while
+			|| guess = ask_guess_multi(.high)
+			"    $guess is ${.report(guess)}"
+			loop guess != .answer
+			rz++
+		
+	function report (|int| guess, |string|)
+		if guess < .answer: return "too low" 
+		if guess > .answer: return "too high"
+		return "the answer"
+
+
+function ask_guess_multi (|int| high, |int|)
+	while
+		"::Hey ${swearword.bleep}! Guess a number between 1 and $high::"
+		|| result = app.input.int
+			return result
+		zalgoline "I didn't understand"
+
+main
+	zalgoline "Finished in ${game(100).play}\n\n"
