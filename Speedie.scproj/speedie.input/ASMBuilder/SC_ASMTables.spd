@@ -122,14 +122,18 @@ function While			(fn_asm)
 	|| ArgStart = .WhileStart
 	.µ(exp.second!)						// arg
 	|| CondStart = .curr				// right?
-	|| GoBackUp = .branch(exp.first!)	// cond
-	GoBackUp.r[3] = .curr - ArgStart
+	|| ExitPlace = .branch(exp.first!)	// cond
+	ExitPlace.r[3] = .curr - ArgStart
 
-	while ArgStart < GoBackUp
+	while ArgStart < ExitPlace
 		#!ClearExits
-		if ArgStart.Op == 255 // exit
+		|| op = ArgStart.Op
+		if op >= 254 // exit/continue
 			ArgStart.op = ASM.Jump
-			ArgStart.r[0] = GoBackUp - ArgStart
+			if op == 254
+				ArgStart.r[0] = CondStart - ArgStart
+			  else
+				ArgStart.r[0] = ExitPlace - ArgStart
 		ArgStart++
 
 
@@ -140,7 +144,7 @@ function Exit			(fn_asm)
 
 function Continue		(fn_asm)
 	opt norefcounts
-	.AddASM(asm.JUMP, exp, .whilestart - .curr)					// jump back
+	self <~ (254, exp)											// request jump fwd a little less
 	
 
 function StatExpr		(fn_asm)
