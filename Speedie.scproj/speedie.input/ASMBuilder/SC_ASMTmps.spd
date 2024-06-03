@@ -13,32 +13,6 @@ function Message.ASMType (assigns:|ASMTmp|)
 	.FLAGS = value 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 datatype ASMtmp (uint16)
 	syntax is (|asmtmp| t, |bool|)
 		return self == t

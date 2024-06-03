@@ -280,9 +280,9 @@ function Dot		(fn_asm)						// a.b
 	dest.µtype = T
 	debugger
 	
-	|| B = t.ByteCount.log2
-	|| A = Dest.ReadOrWriteSub(exp, t, b)			 #require
+	|| A = Dest.ReadOrWrite(exp)			 #require
 
+	|| B = t.ByteCount.log2
 	|| Pos = prop.exportposition >> B
 	if !pos // what?
 	if (dest is addrrequest) or (pos >= 128)						// read/write only allows up to 127
@@ -478,30 +478,36 @@ function Minus			(fn_asm)					// -a
 */
 
 
+//function Pointer		(fn_asm)
+
 		
-function SlowerCountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| src, |int64| Amount, |asmreg|)
-	if mode & IncrAfter
-		// still need to read and write
-		.Assign(dest, src, asmreg(), f)
-		|| b = .AddConstant(f, src, src, amount )
-		if b!=src // what?
-	  else
-		|| b = .AddConstant(f, src, src, amount )
-		if b!=src // what?
-		.Assign(dest, src, asmreg(), f)
-		
-		
-	.µ(f, dest.set)
+function SlowCountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |asmreg|)
+//	    *a, x = *(a.b) 
+	opt	NoRefCounts
+	// need to read... also save old value
+	|| x = .OpenVars
+	.AddASM(Dest.Read(F), f, dest, addr)
+
+	// we have read... now we need to add		
+	|| NewValue = (.TempMe(f), dest)(mode & IncrAfter)
+	.AddConstant(f, NewValue, dest, amount)
+
+	// now we have the new value... lets write it back again
+	.AddASM(Dest.write(F), f, NewValue, addr)
+
+	// we wrote back the old value... the new value should exist!
+	.CloseVars(x)
+	return dest
 
 
-function CountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| src, |int64| Amount, |asmreg|)
+function CountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |asmreg|)
 	ifn  dest.isint  and  amount <= 63  and  amount >= -64
-		return SlowerCountOnAddr(self, f, dest, mode, src, amount)
+		return SlowCountOnAddr(self, f, dest, mode, Addr, amount)
 	|| opp = (ASM.CNTC, ASM.CNTD)(mode & IncrAfter)	
 	|| bc  = dest.µtype.ByteCount
 	|| log = bc.Log2
 	if dest.BitCount * (1<<log) != bc // hmm? maths bug?
-	.AddASM(opp, f, src, dest, 0, amount, log)
+	.AddASM(opp, f, Addr, dest, 0, amount, log)
 	return dest
 
 
@@ -621,22 +627,26 @@ function Unexpected		(fn_asm)
 }
 
 
-helper ASMReg.ReadOrWriteSub (|message| m, |datatypecode| t, |int| bytes, |asm|)
+function ASMReg.ReadOrWrite (|message| m,  |asm|)
 	if self is set
-		if bytes <= 4
-			return ASMtmp.WriteASM[bytes]
-		error (m, "Object to large to write")
-	  else
-		|| B = (bytes<<1) + t.issigned
-		if b <= 9
-			return ASMtmp.ReadASM[b]
-		error (m, "Object to large to read")
+		return .Write(m)
+	return .Read(m)
+	
 
-
-function ASMReg.ReadOrWrite (|message| m, |asm|)
+function ASMReg.Read (|message| m,  |asm|)
 	|| T = .µtype
 	|| bytes = t.ByteCount.log2
-	return .ReadOrWriteSub(m, t, bytes)
+	|| B = (bytes<<1) + t.issigned
+	if b <= 9
+		return ASMtmp.ReadASM[b]
+	error (m, "Object to large to read")
+	
+	
+function ASMReg.Write (|message| m,  |asm|)
+	|| bytes = .µtype.ByteCount.log2
+	if bytes <= 4
+		return ASMtmp.WriteASM[bytes]
+	error (m, "Object to large to write")
 
 
 function asmstate.ExistingVar (|message| m, |asmreg|)
