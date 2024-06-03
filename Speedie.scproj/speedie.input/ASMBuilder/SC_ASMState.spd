@@ -47,16 +47,16 @@ struct ASMState
 		if (!r.reg) // what?
 
 
-	function AddConstantAndReturnOld (|message| exp,  |AsmReg| WantOld,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
+	function AddConstantAndReturnOld (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
 		|| x = .VTmps
 		rz = .TempMe(exp)
-		if WantOld.isint and value.CanStoreAsIntImmediate
-			.AddASM(asm.ADPK, exp.parent!, WantOld, ToGrow, Value)
-			.VTmps = (x)
+		if Dest.isint and value.CanStoreAsIntImmediate
+			.AddASM(asm.ADPK, exp.parent!, Dest, ToGrow, Value)
+			.VTmps = x
 		  else
 			.Assign(rz, ToGrow, asmreg(), exp)
-			.VTmps = (x) // dont need to close the constants... not yet anyhow.
-			.AddConstant(exp, WantOld, ToGrow, value)
+			.VTmps = x // dont need to close the constants... not yet anyhow.
+			.AddConstant(exp, Dest, ToGrow, value)
 	
 	
 	function AddConstant (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
