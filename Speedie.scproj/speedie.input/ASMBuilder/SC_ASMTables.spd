@@ -2,18 +2,9 @@
 
 
 dispatch fn_asm_table (fn_asm)
-	@arg:
-		opt norefcounts
-		for ch.fast in exp
-			.µ(ch, asmreg.Arg)
+	@arg: ASMTmp.Arg
 
-	@decl: // yay
-		opt norefcounts
-		|| rel = exp.last!
-		|| ty = rel.first!.fastdecl
-		|| reg = .DeclareMe(Exp, ty.reg)
-		(reg is NotYetUsed)
-		return .µ(rel.last!, reg)
+	@decl: asmtmp.decl
 
 	@num:  ASMTmp.num
 
@@ -74,6 +65,7 @@ function asmstate.SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |messa
 	return dest
 
 
+
 function asmstate.AddToReg (|asmreg| addr, |int| add, |message| exp)
 	if add
 		.plus(addr, addr, .numtoegg(add, exp), exp)
@@ -107,19 +99,15 @@ function Debugger		(fn_asm)
 	.addasm(asm.TRAP, exp)
 
 
-	
 function If				(fn_asm)
 	opt norefcounts
 	debugger
 	
 	|| cond = exp.first!
 	|| arg = cond.next!
-	|| F = arg.first
-//	if !mode and f and (f.asmtype == kreturn) and IfAsReturn(self, F, exp) // we can do an optional return? but only if returning a reg or true/false
-//		return nil // too fiddly. I hate writing this :)
-			
+	|| F = arg.first			
 	|| Start = .Branch(cond)
-	.µSync(arg)
+	.µ(arg)
 	|| ElseIf = arg.next
 		if mode // what?
 		IF(self, elseif, asmreg(), 1)
@@ -142,7 +130,7 @@ function While			(fn_asm)
 			write.r[0] = finish - write
 		write++
 
-	
+
 function Exit			(fn_asm)
 	opt norefcounts
 	self <~ (255, exp)											// request jump fwd
@@ -254,6 +242,25 @@ function Pointer		(fn_asm)
 	|| A = Dest.ReadOrWrite(exp)
 	.AddASM(A, exp, dest,  Ptr)
 	return dest as asmmath.Bitcorrect
+
+
+function Decl (fn_asm)
+// yay
+	opt norefcounts
+	|| rel = exp.last!
+	|| ty = rel.first!.fastdecl
+	|| reg = .DeclareMe(Exp, ty.reg)
+	(reg is NotYetUsed)
+	return .µ(rel.last!, reg)
+
+
+function Arg   (fn_asm)
+	opt norefcounts
+	|| decls = .VDecls
+	for ch.fast in exp
+		.µ(ch, asmreg.Arg)
+		.DoPostIncr
+	.VDecls = decls
 
 
 function Access		(fn_asm)						// a[b], struct.mem[b], func()[func2()]
@@ -397,95 +404,13 @@ function Not		(fn_asm)
 function Minus			(fn_asm)					// -a
 	opt	NoRefCounts
 	return ASMTmp.DoSingleMath(self, exp, dest, scoperator.minus)
-/*
-	DONE:
-		* discard vars: y++
-		* discard mem:  a.b++, *x++, a[y]++
-		* ++y
-*/
 
 
-/*
-	seems easy
-		x = y++
-		*x = y++
-		x = y++ * 3 // --> x = y*3, y++
-		
-	non optimiseables?
-		x = y++ * y++ --> || tmp = y,  y++,  x = y * tmp,  y++
-		func(y++, 7)
-	
-
-	Easy cases:
-		x =  y++								// can special-case
-		x = *y++								// special-case also
-		func(*y++)								// similar special-case
-		x[0] = y++								// probably not too hard.
-
-	Other cases?
-		x < y++									// just do the opp, then add after all is done.
-		while *x++ == *y++
-		x = y++ * 3 // --> x = y*3, y++
-
-
-	blocked cases: // boolean logic
-		func(y++, y++)
-		x = y++ * y++
-		*func(y++) = *func2(y++)
-		x < y++ - y
-		if  x  and  z++ < y
-*/
-
-
-/*
-	possible read/write ++ cases (Excluding floats)
-	TABL gets the address of a global.
-	// do these during optimise? seems better.
-	
-	glob++,  		x = glob++,		++glob,		// TABL, CNTC			// what if glob is float?
-	(*pglb)++,		x = ++(*pglb),	++(*pglb)	// TABL, CNTD
-
-	
-	++obj.prop,  	obj.prop++					// READ, CNTC
-	(*obj.gprp)++,	++(*obj.gprp)				// READ, READ, CNTC
-
-	x = ++glob									// TABL, CNTD
-	local++,	++ local						// .plus()				// gen diff ops per float/int
-	x = local++									// assign, .plus()
-	
-	*(pglb++)									// TABL, READ+
-									
-	x = *(obj.gprp++),	x = *(pglb++)			// READ, READ+, WRIT (read val, use read for *val++, then write new val)
-	x = *(++pglb)								// TABL, .plus(), READ
-	++(*obj.gprp)								// READ, CNTD		// what if is float-ptr
-	(*plocal)++	/ ++(*plocal)					// CNTC
-	*(plocal++)									// READ+
-	
-	*(++plocal)									// .plus(), READ
-	
-	
-	x = (*pglb)++								// TABL, READ, CNTC
-	*(pglb++) = x								// TABL, WRIT+, 
-	*(++pglb) = x								// TABL, CNTD, WRIT
-	x = *(plocal++)								// READ+
-	x = (*plocal)++								// CNTC
-	*(plocal++) = x								// WRIT+
-	
-	*(++pglb) = x								// TABL, CNTD, WRIT
-	x = ++(*plocal)								// CNTD
-	x = *(++plocal)								// .plus(), READ
-	*(++plocal) = x								// .plus(), WRIT
-*/
-
-
-//function Pointer		(fn_asm)
-
-		
 function SlowCountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |asmreg|)
 //	    *a, x = *(a.b) 
 	opt	NoRefCounts
 	// need to read... also save old value
-	|| x = .OpenVars
+	|| x = .VTmps
 	.AddASM(Dest.Read(F), f, dest, addr)
 
 	// we have read... now we need to add		
@@ -496,7 +421,7 @@ function SlowCountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mo
 	.AddASM(Dest.write(F), f, NewValue, addr)
 
 	// we wrote back the old value... the new value should exist!
-	.CloseVars(x)
+	.VTmps = (x)
 	return dest
 
 
@@ -537,12 +462,55 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 	ifn mode & IncrAfter
 		return .AddConstant(exp, src, src, Amount)	// ++x,	 y = ++x
 
-	f = f.RemoveTypeCasts!							// x++,	 y = x++
-	if f!=@thg
+
+	|| f2 = f.RemoveTypeCasts!							// x++,	 y = x++
+	
+	if .WithinBranch // do immediately
+		return .AddConstantAndReturnOld(f, dest, src, amount)
+/*		if a++>b				-->
+		c = a
+		a++
+		compare&jump c, b
+			// Could have an instruction to store old value while incring?
+			// Would resolve all this bullshit. Would it take a constant or not, though?
+			// Postincr Src(r), Old(r), Const(14) // So... not much of a const.
+
+		while a++<b: x++		-->
+1) simple	
+		c = a
+		a++
+		compare&jump c, b
+		x++
+		jump (to c=a)
+2) post	
+		jump (to c = a):
+		x++
+		c = a
+		a++
+		compare&jump (c, b) (to x++)
+
+3) Special
+		c = a++
+		compare&jump c, b
+		x++
+		jump (to c=a)
+
+4) SpecialPost	
+		jump (to c = a):
+		x++
+		c = a++
+		compare&jump (c, b) (to x++)
+		post-test seems better?
+		jump to the end first...
+*/
+			
+		return NewValue
+
+
+	if f2!=@thg
 	if .µ(f)!=src
 		debugger, .µ(f)
-	PostIncrementNil <~ exp							// process later.
-	if 0: .DoPostIncr
+	PostIncrementNil <~ exp							// process later
 	return src
 
 
@@ -584,22 +552,22 @@ function DoSingleMath (|&ASMState| self, |message| exp, |AsmReg| Dest, |scoperat
 function DoMath (fn_asm)
 	|| op = exp.second!
 	|| scop = op.obj|scoperator|
-		return domathsub(self, exp, dest, 0.reg, scop)
+		return DoMathSub(self, exp, dest, 0.reg, scop)
 	debugger // what?
 		
 
-function DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr,  |scoperator!| Scop, |AsmReg|)
+helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr,  |scoperator!| Scop, |AsmReg|)
 	opt norefcounts
 
 	|| F = exp.first!
 	|| op = f.next!
 	
 	|| ml = AsmReg()
-	if mr isnt singleexpr
-		|| OV = .OpenVars
+	if mr isnt SingleExpr
+		|| OV = .VTmps
 		ml = .µOpen(F)
 		mr = .µopen(exp.last!)
-		.CloseVars(OV)
+		.VTmps = OV
 
 	|| fn = scop.asm					#expect (op, "No ASM for this operator?")
 	dest = .TempMe(exp, dest) 

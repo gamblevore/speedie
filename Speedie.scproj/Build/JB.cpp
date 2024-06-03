@@ -1941,7 +1941,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112553759241946));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112554083614720));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3257,7 +3257,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024060318));
+	JB_FS_AppendInt32(_fsf0, (2024060319));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8016,7 +8016,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024060318));
+	JB_FS_AppendInt32(_fsf0, (2024060319));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -15954,9 +15954,9 @@ AsmReg SC_ASMtmp__Continue(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) 
 	return ((AsmReg)0);
 }
 
-AsmReg SC_ASMtmp__CountOnAddr(ASMState* Self, Message* F, AsmReg Dest, int Mode, AsmReg Src, int64 Amount) {
+AsmReg SC_ASMtmp__CountOnAddr(ASMState* Self, Message* F, AsmReg Dest, int Mode, AsmReg Addr, int64 Amount) {
 	if (!(SC_Reg_IsInt(Dest) and ((Amount <= 63) and (Amount >= -64)))) {
-		return SC_ASMtmp__SlowerCountOnAddr(Self, F, Dest, Mode, Src, Amount);
+		return SC_ASMtmp__SlowCountOnAddr(Self, F, Dest, Mode, Addr, Amount);
 	}
 	ASM_CNTC Opp = ((ASM_CNTC)JB_Ternary(((bool)(Mode & kSC__ASMtmp_IncrAfter)), kSC__ASM_CNTC, ((ASM_CNTC)kSC__ASM_CNTD)));
 	int Bc = JB_TC_ByteCount(SC_Reg_xC2xB5Type(Dest));
@@ -15964,7 +15964,7 @@ AsmReg SC_ASMtmp__CountOnAddr(ASMState* Self, Message* F, AsmReg Dest, int Mode,
 	if ((SC_Reg_BitCount(Dest) * (1 << Log)) != Bc) {
 		debugger;
 	}
-	SC_Pac_AddASM5(Self, Opp, F, SC_Reg_ToInt(Src), SC_Reg_ToInt(Dest), 0, Amount, Log);
+	SC_Pac_AddASM5(Self, Opp, F, SC_Reg_ToInt(Addr), SC_Reg_ToInt(Dest), 0, Amount, Log);
 	return Dest;
 }
 
@@ -16119,11 +16119,11 @@ AsmReg SC_ASMtmp__Dot(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 	DataTypeCode T = SC_Decl_TypeInfo(Prop);
 	Dest = SC_Reg_xC2xB5TypeSet(Dest, T);
 	debugger;
-	int B = JB_Int_Log2(JB_TC_ByteCount(T));
-	ASM A = SC_Reg_ReadOrWriteSub(Dest, Exp, T, B);
+	ASM A = SC_Reg_ReadOrWrite(Dest, Exp);
 	if (!A) {
 		return nil;
 	}
+	int B = JB_Int_Log2(JB_TC_ByteCount(T));
 	uint64 Pos = Prop->ExportPosition >> B;
 	if (!Pos) {
 		debugger;
@@ -16312,23 +16312,14 @@ AsmReg SC_ASMtmp__SetRel(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 	return ((AsmReg)0);
 }
 
-AsmReg SC_ASMtmp__SlowerCountOnAddr(ASMState* Self, Message* F, AsmReg Dest, int Mode, AsmReg Src, int64 Amount) {
-	if (((bool)(Mode & kSC__ASMtmp_IncrAfter))) {
-		SC_Pac_Assign(Self, Dest, Src, SC_Reg__New(), F);
-		AsmReg B = SC_Pac_AddConstant(Self, F, Src, Src, Amount);
-		if (B != Src) {
-			debugger;
-		}
-	}
-	 else {
-		AsmReg B = SC_Pac_AddConstant(Self, F, Src, Src, Amount);
-		if (B != Src) {
-			debugger;
-		}
-		SC_Pac_Assign(Self, Dest, Src, SC_Reg__New(), F);
-	}
-	SC_Pac_Get(Self, F, SC_Reg_Set(Dest));
-	return ((AsmReg)0);
+AsmReg SC_ASMtmp__SlowCountOnAddr(ASMState* Self, Message* F, AsmReg Dest, int Mode, AsmReg Addr, int64 Amount) {
+	int X = SC_Pac_OpenVars(Self);
+	SC_Pac_AddASM2(Self, SC_Reg_Read(Dest, F), F, SC_Reg_ToInt(Dest), SC_Reg_ToInt(Addr));
+	AsmReg NewValue = ((AsmReg)JB_Ternary(((bool)(Mode & kSC__ASMtmp_IncrAfter)), SC_Pac_TempMe(Self, F, kSC__Reg_Temp), ((AsmReg)Dest)));
+	SC_Pac_AddConstant(Self, F, NewValue, Dest, Amount);
+	SC_Pac_AddASM2(Self, SC_Reg_Write(Dest, F), F, SC_Reg_ToInt(NewValue), SC_Reg_ToInt(Addr));
+	SC_Pac_CloseVars(Self, X, true);
+	return Dest;
 }
 
 AsmReg SC_ASMtmp__StatExpr(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
@@ -16576,31 +16567,24 @@ AsmReg SC_Reg_OperatorxE2x80xA2(AsmReg Self, AsmReg Dest) {
 	return Dest;
 }
 
-ASM SC_Reg_ReadOrWrite(AsmReg Self, Message* M) {
+ASM SC_Reg_Read(AsmReg Self, Message* M) {
 	DataTypeCode T = SC_Reg_xC2xB5Type(Self);
 	int Bytes = JB_Int_Log2(JB_TC_ByteCount(T));
-	return SC_Reg_ReadOrWriteSub(Self, M, T, Bytes);
-}
-
-ASM SC_Reg_ReadOrWriteSub(AsmReg Self, Message* M, DataTypeCode T, int Bytes) {
-	if (SC_Reg_SyntaxIs(Self, kSC__Reg_Set)) {
-		if (Bytes <= 4) {
-			return SC__ASMtmp_WriteASM[Bytes];
-		}
-		if (true) {
-			JB_Msg_SyntaxExpect(M, JB_LUB[1005]);
-		}
+	int B = (Bytes << 1) + JB_TC_IsSigned(T);
+	if (B <= 9) {
+		return SC__ASMtmp_ReadASM[B];
 	}
-	 else {
-		int B = (Bytes << 1) + JB_TC_IsSigned(T);
-		if (B <= 9) {
-			return SC__ASMtmp_ReadASM[B];
-		}
-		if (true) {
-			JB_Msg_SyntaxExpect(M, JB_LUB[1004]);
-		}
+	if (true) {
+		JB_Msg_SyntaxExpect(M, JB_LUB[1004]);
 	}
 	return 0;
+}
+
+ASM SC_Reg_ReadOrWrite(AsmReg Self, Message* M) {
+	if (SC_Reg_SyntaxIs(Self, kSC__Reg_Set)) {
+		return SC_Reg_Write(Self, M);
+	}
+	return SC_Reg_Read(Self, M);
 }
 
 int SC_Reg_Reg(AsmReg Self) {
@@ -16618,10 +16602,6 @@ AsmReg SC_Reg_RequestPos(AsmReg Self) {
 	return SC_Reg_OperatorAsWithReg(Self, kSC__Reg_AddrRequest);
 }
 
-AsmReg SC_Reg_Set(AsmReg Self) {
-	return SC_Reg_OperatorAsWithReg(Self, kSC__Reg_Set);
-}
-
 bool SC_Reg_Signed(AsmReg Self) {
 	return JB_TC_IsSigned(((DataTypeCode)Self));
 }
@@ -16637,6 +16617,17 @@ AsmReg SC_Reg_SyntaxIsSet(AsmReg Self, AsmReg R, bool Value) {
 	 else {
 		return SC_Reg_OperatorAsnt(Self, R);
 	}
+}
+
+ASM SC_Reg_Write(AsmReg Self, Message* M) {
+	int Bytes = JB_Int_Log2(JB_TC_ByteCount(SC_Reg_xC2xB5Type(Self)));
+	if (Bytes <= 4) {
+		return SC__ASMtmp_WriteASM[Bytes];
+	}
+	if (true) {
+		JB_Msg_SyntaxExpect(M, JB_LUB[1005]);
+	}
+	return 0;
 }
 
 DataTypeCode SC_Reg_xC2xB5Type(AsmReg Self) {
@@ -50207,4 +50198,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 9101879259194606638 -1446033740624683881
+// 6288279457766012367 -1446033740624683881

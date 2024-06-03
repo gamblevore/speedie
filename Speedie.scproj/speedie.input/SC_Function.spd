@@ -79,6 +79,7 @@ linkage
 |byte|					IsNilChecker
 |nilstate|				NilSelf
 |byte| 					Badness
+|byte| 					OptCounts
 
 
 

@@ -9,6 +9,8 @@ struct FatASM
 							// Can we remove the label? I don't like it. It seems OK though... unused bytes.
 	|uint16|		FileNum
 	|int|			BytePos
+	|uint16| 		BlockNum
+	|uint16| 		ParentBlock
 	
 	operator isa (|int| m, |bool|)
 		return m == .op

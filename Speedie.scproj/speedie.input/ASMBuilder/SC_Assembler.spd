@@ -63,25 +63,23 @@ module SpdAssembler
 		|| A = fn.SourceArg!
 		(fp)(ASmState.Sh, A, R)
 		ASMState.Sh.FinishASM
+		ASMState.sh.AddASM(ASM.EROR, fn.source!|message|)
 
-
-	function Optimise (|bool|)
-
-	
-	function FlowControl (|bool|)
 
 	
 	function Vacuum (|scfunction| fn, |bool|)
 		opt norefcounts
-		|| tries = 2
-		while tries -- > 0
+		for 2
 			.GenerateASM(fn)
-			while .Optimise
-			.FlowControl
 			if ASMState.Sh.ok
 				printline fn.asm!.render
-				return true
+				exit
 			require ASMState.ExpandJSM
+		
+		while .Optimise(fn)
+			fn.OptCounts++
+			expect (fn.optcounts < 16) (fn, "Optimisation is not stopping".internal)
+		.FlowControl
 
 
 extend_module ASM

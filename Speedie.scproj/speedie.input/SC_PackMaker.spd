@@ -73,6 +73,7 @@ module PackMaker
 
 		|| upon = SpdAssembler.CollectFuncs("asm_test,asm_test_sub,asm_test_ptr,asm_test_flow")$
 		
+		ASMState.sh.AddASM(ASM.EROR, compiler.constantslist)
 		for fn in upon
 			require SpdAssembler.Vacuum(fn)
 

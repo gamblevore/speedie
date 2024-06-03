@@ -159,7 +159,6 @@ forms
 			debugger
 
 
-// needs opt:      lupu, lupd, tail, fncx, BFLS, BFLG, CNTC (glob = glob + constfunc())
 // needs ASM-text: swap, rare, RSDE, RALO, RSET, MEMM
 
 
@@ -217,6 +216,9 @@ forms
 		i1 = i2 + (i3 << L3) // only need 6 bits for shift! can we save 3 conditional add?
 /**/ ADDK ("rrnl")
 		i1 = i2 + U2_Li
+/**/ ADPK ("rrnl")
+		i1 = i2
+		i2 = i2 + U2_Li
 /**/ SUBB  (U3)
 		i1 = i2 - (i3 << L3)
 /**/ MULT  (U4)

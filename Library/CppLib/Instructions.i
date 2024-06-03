@@ -45,6 +45,9 @@
 	i1 = i2 + (i3 << L3);
 ı ADDK: _
 	i1 = i2 + U2_Li;
+ı ADPK: _
+	i1 = i2;
+	i2 = i2 + U2_Li;
 ı SUBB: _
 	i1 = i2 - (i3 << L3);
 ı MULT: _

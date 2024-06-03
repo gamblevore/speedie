@@ -4409,7 +4409,7 @@ AsmReg SC_ASMtmp__BRel(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
 AsmReg SC_ASMtmp__Continue(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_ASMtmp__CountOnAddr(ASMState* Self, Message* F, AsmReg Dest, int Mode, AsmReg Src, int64 Amount);
+AsmReg SC_ASMtmp__CountOnAddr(ASMState* Self, Message* F, AsmReg Dest, int Mode, AsmReg Addr, int64 Amount);
 
 AsmReg SC_ASMtmp__Debugger(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
@@ -4455,7 +4455,7 @@ AsmReg SC_ASMtmp__Return(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
 AsmReg SC_ASMtmp__SetRel(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_ASMtmp__SlowerCountOnAddr(ASMState* Self, Message* F, AsmReg Dest, int Mode, AsmReg Src, int64 Amount);
+AsmReg SC_ASMtmp__SlowCountOnAddr(ASMState* Self, Message* F, AsmReg Dest, int Mode, AsmReg Addr, int64 Amount);
 
 AsmReg SC_ASMtmp__StatExpr(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
@@ -4504,9 +4504,9 @@ bool SC_Reg_OperatorIsaWithTc(AsmReg Self, DataTypeCode M);
 
 AsmReg SC_Reg_OperatorxE2x80xA2(AsmReg Self, AsmReg Dest);
 
-ASM SC_Reg_ReadOrWrite(AsmReg Self, Message* M);
+ASM SC_Reg_Read(AsmReg Self, Message* M);
 
-ASM SC_Reg_ReadOrWriteSub(AsmReg Self, Message* M, DataTypeCode T, int Bytes);
+ASM SC_Reg_ReadOrWrite(AsmReg Self, Message* M);
 
 int SC_Reg_Reg(AsmReg Self);
 
@@ -4514,13 +4514,13 @@ AsmReg SC_Reg_RegSet(AsmReg Self, int Value);
 
 AsmReg SC_Reg_RequestPos(AsmReg Self);
 
-AsmReg SC_Reg_Set(AsmReg Self);
-
 bool SC_Reg_Signed(AsmReg Self);
 
 bool SC_Reg_SyntaxIs(AsmReg Self, AsmReg R);
 
 AsmReg SC_Reg_SyntaxIsSet(AsmReg Self, AsmReg R, bool Value);
+
+ASM SC_Reg_Write(AsmReg Self, Message* M);
 
 DataTypeCode SC_Reg_xC2xB5Type(AsmReg Self);
 

@@ -136,7 +136,7 @@ class Document (list)
 		return t
 
 
-	function Save (|int| Purpose=0, |bool|)
+	function Save (|int| Purpose=0, |ind|)
 		// purpose is unused, right now.
 		// it was used, originally... and might be again.
 		|| l = .Location			#require
@@ -144,11 +144,14 @@ class Document (list)
 		|| f = l.file
 		|| t = .SaveText(c)
 		|| KeepDate = false
+		rz = t.Length
 		if !t and !f.visible
-			rz = f.delete
+			if !f.delete
+				rz = -1
 		  else
 			KeepDate = .FindKeepDate(t, f)
-			rz = f.data(t)
+			if !f.data(t)
+				rz = -1
 		if rz
 			.original = c
 			if KeepDate
@@ -187,9 +190,9 @@ class Document (list)
 		return true
 
 
-	function Length (|int|)
-		|| c = .current
-			return c.text.length
+//	function Length (|int|)
+//		|| c = .current
+//			return c.text.length
 
 
 	function ShowParseErrorInViewers
@@ -383,7 +386,7 @@ class DocumentState (list)
 	linkage
 		cpp_part dcs
 	contains DocumentState
-	|string|			Text
+	|string|			_Text
 	|IntRange|			TypingPlace 
 
 	constants
@@ -393,14 +396,19 @@ class DocumentState (list)
 		Saving = -3
 		Closing = -4
 		ErrorChecking = -5
-		
+
+	function Text	(|string|)
+		if UseCompression
+			return ._Text.Decompress
+		  else
+			return ._Text
 
 	setter Text (|string|)
-		.text = value
-		
-	render
-		fs <~ '"'
-		fs.appendescape(.text.preview(150))
-		fs <~ '"'
+		if UseCompression
+			._text = value.Compress // mz is pretty fast anyway
+		  else
+			._Text = value
+	module
+		|bool| UseCompression
 
 

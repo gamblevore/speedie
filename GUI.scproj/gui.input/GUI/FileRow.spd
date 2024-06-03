@@ -185,8 +185,8 @@ class FileRow (ListViewRow)
 	function Save (|int| Purpose=documentstate.saving, |bool|)
 		opt norefcounts
 		|| d = ._Document
-			require D.save(purpose)
-			.lastsize = D.length
+			|| tsize = D.save(purpose)
+				.lastsize = tsize
 		return true
 
 

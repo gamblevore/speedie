@@ -1,27 +1,31 @@
 
 
-// ADDC? optimise stages... OR special-case it specifically.
+// ADDK? optimise stages... OR special-case it specifically. 
 
 struct ASMState
 	linkage: cpp_part Pac
+	|uint16| 					BlockNum
+	|uint16| 					ParentBlock
+	|datatypecode|				ReturnType
+	|bool|						OK    
+	|bool|						Inited   
+	|byte|						LabelCount
+	|byte|						VDecls
+	|byte|						VTmps
+	|byte|						WithinBranch
+
 	|SCFunction--|				fn       
 	|µFunc|						Out      
 	|&FatASM|					Start		// a "slice" feature would be nice    
 	|&FatASM|					Curr    
 	|&FatASM|					End    
 	|&FatASM|					WhileStart
-	|bool|						OK    
-	|bool|						Inited   
-	|byte|						LabelCount
-	|datatypecode|				ReturnType
-	|byte|						VDecls
-	|byte|						VTmps
 	|uint64[32]|				Consts 
 
 	function AddFuncParams (|SCFunction| fn)
 		opt norefcounts
 		for a in fn.Args
-			a.dtype = .DeclareMe(nil, a.RegType|asmreg|)|datatypecode|
+			a.dtype = .DeclareMe(nil, a.RegType|AsmReg|)|datatypecode|
 
 	function Last (|&FatASM|)
 		return .curr-1
@@ -43,24 +47,31 @@ struct ASMState
 		if (!r.reg) // what?
 
 
-	function AddConstant (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value, |asmreg|)
+	function AddConstantAndReturnOld (|message| exp,  |AsmReg| WantOld,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
+		|| x = .VTmps
+		rz = .TempMe(exp)
+		if WantOld.isint and value.CanStoreAsIntImmediate
+			.AddASM(asm.ADPK, exp.parent!, WantOld, ToGrow, Value)
+			.VTmps = (x)
+		  else
+			.Assign(rz, ToGrow, asmreg(), exp)
+			.VTmps = (x) // dont need to close the constants... not yet anyhow.
+			.AddConstant(exp, WantOld, ToGrow, value)
+	
+	
+	function AddConstant (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
 		if dest.isint
 			if value.CanStoreAsIntImmediate
 				.AddASM(asm.ADDK, exp.parent!, dest, src, Value)
 				return dest
-			  else
-				debugat
-		  else
-			if dest.FourBytes and value|uint64|.CanStoreAsFloatImmediate
-				.AddASM(asm.FADK, exp.parent!, dest, src, Value)
-				return dest
-			  else
-				debugat
+		  elseif dest.FourBytes and value|uint64|.CanStoreAsFloatImmediate
+			.AddASM(asm.FADK, exp.parent!, dest, src, Value)
+			return dest
+		debugat
 
 		|| where = .NumToEgg(value, exp)
 		return .Plus(dest, src, where, exp)
 		
-
 		
 	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |int| c, |int| d, |int| e, |&FatASM|)
 		pragma inline,  opt norefcounts,  cpp_part AddASM5
@@ -108,6 +119,8 @@ struct ASMState
 			.curr = p + 1
 			P.op = code
 			p.debug = dbg
+			p.BlockNum = .BlockNum
+			p.ParentBlock = .ParentBlock
 			return p
 		if .OK
 			error "ASM is out of memory."
@@ -136,22 +149,25 @@ struct ASMState
 		error (where, "No free local variables.")
 
 
-	function OpenVars (|int|)
-		return .vdecls ||| (.vtmps << 8)
+//	function OpenTmps (|int|)
+//		return .vtmps
 
 
-	function CloseVars (|int| Old, |bool| DeclsToo=true)
-		pragma inline
-		if DeclsToo
-			.vdecls = old & 255
-		.vtmps  = old|uint| >> 8
-
+//	function CloseTmps (|int| Old)
+//		pragma inline
+//		.vtmps  = old
+//
+//	function CloseVars (|int| Old)
+//		pragma inline
+//		.vdecls  = old
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	function Branch (|message| cond,  |&fatasm|)
 		|| dest = asmreg.newCondRequest
+		.WithinBranch++
 		|| Src = .µ(cond, dest)
+		.WithinBranch--
 		if Src isnt cond
 			(dest is negate) = (src isnt AlreadyNegated)
 			.equals(dest, dest, src, cond)
@@ -172,10 +188,6 @@ struct ASMState
 			--i
 	
 	
-	function µSync (|message| exp, |AsmReg|)
-		rz = .µ(exp)
-		.DoPostIncr
-	
 	function µOpen (|message| exp, |AsmReg|)
 		return .µ( exp, AsmReg.StayOpen) asnt asmreg.StayOpen
 
@@ -191,13 +203,10 @@ struct ASMState
 				fn = fn_asm_table[exp.func|int|]!
 				debugger
 
+		|| OV = .VTmps		
+		rz = (fn)(self, exp, dest)
 		if dest isnt StayOpen
-			debugger, #! Can't close declarations in args!
-			|| OV = .OpenVars		
-			rz = (fn)(self, exp, dest)
-			.CloseVars(ov, dest.reg)
-		  else
-			rz = (fn)(self, exp, dest)
+			.VTmps = (ov)
 		
 		target debug
 			|| dd = dest.reg
@@ -210,7 +219,8 @@ struct ASMState
 		|| r = .ExistingVar(prm)
 		if r.Exists
 			return r
-		|| Where = .DeclareMe(prm, asmreg())
+		// why not use tmps? won't these interfere with the function-passing??
+		|| Where = .tempme(prm, asmreg())
 		return .µ(prm, where)
 
 
@@ -256,7 +266,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 	|int| Reg2
 	|int| Reg3
 	|| sh = 0
-	|| OV = .OpenVars
+	|| OV = .VTmps
 
 	for p.fast in prms
 		|| v = .prm(p).reg
@@ -265,7 +275,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 		  else
 			reg3 |= (v << (sh-30))
 		sh += 5
-	.closevars(OV)
+	.VTmps = (OV)
 
 	|| OP = (asm.func2, asm.func3)(sh <= 25)
 	|| SaveAmount = 0
