@@ -1941,7 +1941,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112554856415232));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112554966515712));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3257,7 +3257,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024060322));
+	JB_FS_AppendInt32(_fsf0, (2024060323));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7094,25 +7094,29 @@ int SC_SpdAssembler__InitCode_() {
 }
 
 bool SC_SpdAssembler__Optimise(SCFunction* Fn) {
-	ASMFunc* ASM = JB_Incr(Fn->ASM);
-	if (!ASM) {
-		JB_Decr(ASM);
+	ASMFunc* Raw = Fn->ASM;
+	if (!Raw) {
 		return nil;
 	}
-	FatASM* Curr = ASM->IR;
-	int Length = ASM->Length;
-	JB_Decr(ASM);
+	FatASM* Curr = Raw->IR;
+	int Length = Raw->Length;
 	if (((bool)Curr[-1].Op) or ((bool)Curr[Length - 1].Op)) {
 		debugger;
 	}
 	{
 		int I = 0;
 		while (I < Length) {
-			SC_FatASM_TryOpt(Curr);
+			Fn_µOpt X = (SC_xC2xB5Opt[I]);
+			if (X) {
+				(X)(Curr + I);
+			}
 			(++I);
 		};
 	}
 	;
+	if (((bool)Curr[-1].Op) or ((bool)Curr[Length - 1].Op)) {
+		debugger;
+	}
 	return false;
 }
 
@@ -8046,7 +8050,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024060322));
+	JB_FS_AppendInt32(_fsf0, (2024060323));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -10160,6 +10164,24 @@ int JB_Init_() {
 		SC_fn_asm_table[(kSC__ASMtmp_kIgnore)] = (&SC_ASMtmp__Ignore);
 		SC_fn_asm_table[(kSC__ASMtmp_kFail)] = (&SC_ASMtmp__Ignore);
 		SC_fn_asm_table[63] = (&SC_fn_asm_table_63);
+		//;
+		SC_xC2xB5Opt[(kSC__ASM_ADDK)] = (&SC_xC2xB5Opt_ADDK);
+		SC_xC2xB5Opt[(kSC__ASM_FUNC)] = (&SC_xC2xB5Opt_FUNC);
+		SC_xC2xB5Opt[(kSC__ASM_CNTC)] = (&SC_xC2xB5Opt_CNTC);
+		SC_xC2xB5Opt[(kSC__ASM_TABL)] = (&SC_xC2xB5Opt_TABL);
+		SC_xC2xB5Opt[(kSC__ASM_ADD)] = (&SC_xC2xB5Opt_ADD);
+		SC_xC2xB5Opt[(kSC__ASM_FADD)] = (&SC_xC2xB5Opt_FADD);
+		SC_xC2xB5Opt[(kSC__ASM_SHRU)] = (&SC_xC2xB5Opt_SHRU);
+		SC_xC2xB5Opt[(kSC__ASM_SHRS)] = (&SC_xC2xB5Opt_SHRS);
+		SC_xC2xB5Opt[(kSC__ASM_SHLU)] = (&SC_xC2xB5Opt_SHLU);
+		SC_xC2xB5Opt[(kSC__ASM_BOAR)] = (&SC_xC2xB5Opt_BOAR);
+		SC_xC2xB5Opt[(kSC__ASM_CMPF)] = (&SC_xC2xB5Opt_CMPF);
+		SC_xC2xB5Opt[(kSC__ASM_CMPI)] = (&SC_xC2xB5Opt_CMPI);
+		SC_xC2xB5Opt[(kSC__ASM_JMPI)] = (&SC_xC2xB5Opt_JMPI);
+		SC_xC2xB5Opt[(kSC__ASM_JMPF)] = (&SC_xC2xB5Opt_JMPF);
+		SC_xC2xB5Opt[(kSC__ASM_JMPN)] = (&SC_xC2xB5Opt_JMPN);
+		SC_xC2xB5Opt[(kSC__ASM_JMPE)] = (&SC_xC2xB5Opt_JMPE);
+		SC_xC2xB5Opt[255] = (&SC_xC2xB5Opt_255);
 		//;
 		JB_SetRef(SC_C_Letters, JB_Str_CharSetWithBool(JB_LUB[504], true));
 		JB_SetRef(SC_RootCollectTable, (JB_Dict_Constructor(nil)));
@@ -13074,6 +13096,74 @@ void* SC_voidtest2(void* Abc) {
 	void* Abc2 = SC_voidtest(Abc);
 	//visible;
 	return nil;
+}
+
+int SC_xC2xB5Opt_255(FatASM* Self) {
+	return 0;
+}
+
+int SC_xC2xB5Opt_ADD(FatASM* Self) {
+	return 0;
+}
+
+int SC_xC2xB5Opt_ADDK(FatASM* Self) {
+	return 0;
+}
+
+int SC_xC2xB5Opt_BOAR(FatASM* Self) {
+	return 0;
+}
+
+int SC_xC2xB5Opt_CMPF(FatASM* Self) {
+	return 0;
+}
+
+int SC_xC2xB5Opt_CMPI(FatASM* Self) {
+	return 0;
+}
+
+int SC_xC2xB5Opt_CNTC(FatASM* Self) {
+	return 0;
+}
+
+int SC_xC2xB5Opt_FADD(FatASM* Self) {
+	return 0;
+}
+
+int SC_xC2xB5Opt_FUNC(FatASM* Self) {
+	return 0;
+}
+
+int SC_xC2xB5Opt_JMPE(FatASM* Self) {
+	return 0;
+}
+
+int SC_xC2xB5Opt_JMPF(FatASM* Self) {
+	return 0;
+}
+
+int SC_xC2xB5Opt_JMPI(FatASM* Self) {
+	return 0;
+}
+
+int SC_xC2xB5Opt_JMPN(FatASM* Self) {
+	return 0;
+}
+
+int SC_xC2xB5Opt_SHLU(FatASM* Self) {
+	return 0;
+}
+
+int SC_xC2xB5Opt_SHRS(FatASM* Self) {
+	return 0;
+}
+
+int SC_xC2xB5Opt_SHRU(FatASM* Self) {
+	return 0;
+}
+
+int SC_xC2xB5Opt_TABL(FatASM* Self) {
+	return 0;
 }
 
 
@@ -17771,6 +17861,7 @@ ASM JB_ASM_U4__Encode(FatASM* Self) {
 
 
 
+
 void JB_SorterComparer_sort(FP_SorterComparer Self, Array* A, bool Reverse) {
 	JB_Array_Sort(A, Self, Reverse);
 }
@@ -20240,9 +20331,6 @@ void SC_FatASM_SyntaxExpect(FatASM* Self, JB_String* Error) {
 	Err->Position = Self->BytePos;
 	JB_Rec_AppendErr(JB_StdErr, Err);
 	JB_Decr(Err);
-}
-
-void SC_FatASM_TryOpt(FatASM* Self) {
 }
 
 
@@ -50244,4 +50332,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -2091230774126807706 3140604098764879096
+// -7794365048813311988 1369442101044885797

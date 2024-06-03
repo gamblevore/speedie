@@ -282,6 +282,7 @@ SCDecl* SC_TypeVoid;
 SCClass* SC_TypeVoid_;
 SCDecl* SC_TypeVoidPtr;
 SCClass* SC_TypeWrapper;
+Fn_µOpt SC_xC2xB5Opt[256];
 bool JB__Tk__DotInsertAllow;
 Message* JB__Tk__EndOfLineMarker;
 Dictionary* JB__Tk__ErrorNames;

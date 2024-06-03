@@ -229,12 +229,12 @@ forms
 
 
 #!						 (((((Bitops)))))
-/**/ SHRS  (U3)
+/**/ BRUS  (U3)
 		i1 = ((uint64)((i2 << L3) >> u3))>>L3
-/**/ SHRU  (U4)
+/**/ BRUE  (U4)
 		u1 = (u2 >> u3) ||| u4
-/**/ SHLU  (U4) 
-		i1 = (i2 << u3) ||| u4
+/**/ BLUE  (U4) 
+		u1 = (u2 << u3) ||| u4
 /**/ BAND  (U3)
 		u1 = u2 &  (u3|||L3)
 /**/ BOAR  (U3)

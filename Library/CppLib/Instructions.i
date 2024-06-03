@@ -54,12 +54,12 @@
 	i1 = (i2 * i3) + i4;
 ı DIVV: _
 	DivMath(r, Op);
-ı SHRS: _
+ı BRUS: _
 	i1 = ((uint64)((i2 << L3) >> u3)) >> L3;
-ı SHRU: _
+ı BRUE: _
 	u1 = (u2 >> u3) | u4;
-ı SHLU: _
-	i1 = (i2 << u3) | u4;
+ı BLUE: _
+	u1 = (u2 << u3) | u4;
 ı BAND: _
 	u1 = u2 & (u3 | L3);
 ı BOAR: _

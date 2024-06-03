@@ -1,11 +1,6 @@
 
 
-/*
-	* BFLS, BFLG					// x = (a & b)>>c (so SHL SHR)
-									// x = x | (y << 5) // whatever... that kinda thing
-	* add blocks to the "if (" function :)
-*/
-
+// what about inlining?
 
 function SpdAssembler.Optimise (|scfunction| fn, |bool|)
 	opt norefcounts
@@ -16,26 +11,52 @@ function SpdAssembler.Optimise (|scfunction| fn, |bool|)
 
 	for i in length
 		|| x = (µOpt[i])
-			(x)(curr+i)
+			(x)(curr+i, curr)
 //	.AddASM(asm.ADDK, exp, dest, obj, pos)
 
 	if curr[-1].op or curr[length-1].op // bad
 
 
 
-dispatch µOpt (|&fatasm| self, |int|)
-	(ASM.ADDK):    {}
+dispatch µOpt (|&fatasm| self, |&fatasm| blockstart, |int|)
 	(ASM.FUNC):    {} // tail, fncx
 	(ASM.CNTC):    {} // (addr+=n), cntc(addr, 0) --> cntc(addr, n)
 	(ASM.TABL):    {} // Glob = glob + 1-127 // --> cntc
+
+// and combinations... we should make some kinda block-detector? perhaps just give a pointer to where the block starts?
+	(ASM.ADDK):    {}
 	(ASM.ADD):     {} //a*b + c --> MUL
 	(ASM.FADD):    {} //a*b + c --> MUL,   a*k1 + b*k2 -> FEXK // could perhaps do these at the time.
 
+
+
+
 /*
+BFLG
+	if (BFLD_Lu)
+		i1 = ((i2 << BFLD_upu) >> BFLD_downu)
+	else
+		u1 = ((u2 << BFLD_upu) >> BFLD_downu)
+
+BFLS
+	i1 |= ((i2 << BFLD_downu) >> BFLD_upu)
+
+	// x = (a & k1)>>k2	// if b is contiguous bit-const... yes even like a high or low-bit!
+	// x = x | (y << 5) // 5 is a const...
+
+*/
+	(ASM.BRUE):    {}
+	(ASM.BRUS):    {}
+	(ASM.BLUE):    {}
+	(ASM.BOAR):    {} // i1 |= ((i2 << BFLD_downu) >> BFLD_upu)
+
+/*
+	* add blocks to the "if (" function :)
 	* flowcontrol
 		* LUPU/LUPD
 		* if x: return true/false --> conditional return 
 */
+
 	(ASM.CMPF):    {} // control flow?
 	(ASM.CMPI):    {}
 	(ASM.JMPI):    {}

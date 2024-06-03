@@ -517,6 +517,8 @@ typedef SCNode* (*FP_CollectFunc)(Message* node, SCNode* name_space, Message* Er
 
 typedef SCObject* (*FP_ExprResolver)(Message* Exp, SCNode* name_space, Message* Side);
 
+typedef int (*Fn_µOpt)(FatASM* self);
+
 typedef NilState (*FP_NilTrackerFn)(Message* msg, NilCheckMode Test);
 
 typedef Message* (*FP_ParseHandler)(int Start, Message* Parent);
@@ -1771,6 +1773,7 @@ extern SCDecl* SC_TypeVoid;
 extern SCClass* SC_TypeVoid_;
 extern SCDecl* SC_TypeVoidPtr;
 extern SCClass* SC_TypeWrapper;
+extern Fn_µOpt SC_xC2xB5Opt[256];
 extern bool JB__Tk__DotInsertAllow;
 extern Message* JB__Tk__EndOfLineMarker;
 extern Dictionary* JB__Tk__ErrorNames;
@@ -3800,6 +3803,40 @@ void* SC_voidtest(void* Abc);
 
 void* SC_voidtest2(void* Abc);
 
+int SC_xC2xB5Opt_255(FatASM* Self);
+
+int SC_xC2xB5Opt_ADD(FatASM* Self);
+
+int SC_xC2xB5Opt_ADDK(FatASM* Self);
+
+int SC_xC2xB5Opt_BOAR(FatASM* Self);
+
+int SC_xC2xB5Opt_CMPF(FatASM* Self);
+
+int SC_xC2xB5Opt_CMPI(FatASM* Self);
+
+int SC_xC2xB5Opt_CNTC(FatASM* Self);
+
+int SC_xC2xB5Opt_FADD(FatASM* Self);
+
+int SC_xC2xB5Opt_FUNC(FatASM* Self);
+
+int SC_xC2xB5Opt_JMPE(FatASM* Self);
+
+int SC_xC2xB5Opt_JMPF(FatASM* Self);
+
+int SC_xC2xB5Opt_JMPI(FatASM* Self);
+
+int SC_xC2xB5Opt_JMPN(FatASM* Self);
+
+int SC_xC2xB5Opt_SHLU(FatASM* Self);
+
+int SC_xC2xB5Opt_SHRS(FatASM* Self);
+
+int SC_xC2xB5Opt_SHRU(FatASM* Self);
+
+int SC_xC2xB5Opt_TABL(FatASM* Self);
+
 
 
 // Tk
@@ -5022,6 +5059,9 @@ ASM JB_ASM_U4__Encode(FatASM* Self);
 // ExprResolver
 
 
+// Fn_µOpt
+
+
 // NilTrackerFn
 
 
@@ -5510,8 +5550,6 @@ void SC_FatASM_Print(FatASM* Self);
 void SC_FatASM_Renda(FatASM* Self, FastString* Fs);
 
 void SC_FatASM_SyntaxExpect(FatASM* Self, JB_String* Error);
-
-void SC_FatASM_TryOpt(FatASM* Self);
 
 
 

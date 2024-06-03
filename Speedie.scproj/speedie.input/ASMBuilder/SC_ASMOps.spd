@@ -196,7 +196,7 @@ extend ASMState
 				l = asmreg()						//   y = x * 1   -->  y = x 
 			return .assign(dest, l, asmreg(), exp)
 	
-		.AddASM(asm.SHLU , exp, dest, l, ptoi - 1)  // y = x * 4 --> y = x << 2
+		.AddASM(asm.BLUE , exp, dest, l, ptoi - 1)  // y = x * 4 --> y = x << 2
 		return dest
 
 
@@ -367,13 +367,13 @@ extend ASMState
 				.AddASM(asm.BFLG, exp, dest, l,  0, sh, 1)
 			return dest
 
-		|| FAT = .AddASM(asm.SHRS • !l.signed, exp, dest, L, R)
+		|| FAT = .AddASM(asm.BRUS • !l.signed, exp, dest, L, R)
 		if l.signed
 			FAT.r[3] = up
 		return dest
 	
 	function SHL    (fn_opasm)
-		.AddASM(asm.SHLU, exp, dest, L, R), return dest
+		.AddASM(asm.BLUE, exp, dest, L, R), return dest
 	
 	function Assign (fn_opasm)
 		return .bitor(dest, l, asmreg(), exp)
