@@ -12,7 +12,7 @@ module SDLApp
 
 	visible false
 	|SDL_Event|					Event
-	|KeyMod|					KeyMod
+	|SDL_KeyMod|				KeyMod
 	|[string]|					PendingAlerts
 	|array?|					DrawDrag = nil
 	|&SDL_Window|				ScreenWindow
@@ -74,7 +74,7 @@ module SDLApp
 	cpp_wrapper SDL_GetWindowPosition	(|&SDL_Window| w,  |&int| x, |&int| y)
 	cpp_wrapper SDL_GetWindowSize		(|&SDL_Window| w,  |&int| x, |&int| y)
 	cpp_wrapper SDL_SetWindowSize		(|&SDL_Window| window, |int| w, |int| h, |int|)
-	cpp_WRapper SDL_GetModState			(|keymod|)
+	cpp_WRapper SDL_GetModState			(|SDL_KeyMod|)
 	cpp_wrapper SDL_StartTextInput		()
 	cpp_wrapper SDL_StopTextInput		()
 	cpp_wrapper SDL_ShowSimpleMessageBox		(|int| Flags, |cstring| title, |cstring| msg, |?&SDL_Window| window)

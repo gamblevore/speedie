@@ -359,6 +359,8 @@ extend TextView
 		.UndoChecker = -1
 		if reason == DocumentState.UndoOrRedo
 			.ShowTypingplace(ty)
+
+		.GuessExpectsParse
 		.Clear(l.text, reason < 0)
 		if (reason == 0) and (ty.x2 > 0  and  d.scrollpos <= 0)
 			d.scrollpos = ty.x2
@@ -367,7 +369,8 @@ extend TextView
 		.GuessExpectsParse
 		|| pos = d.ScrollPos
 		if reason != DocumentState.UndoOrRedo  and  pos >= 2
-			.PrepareLinesOfText
+			.PrepareLinesOfText // Clear seems to be calling PrepareLinesOfText anyhow
+								// Please fix??
 			if reason != DocumentState.typing 
 				.viewpos(pos)
 		

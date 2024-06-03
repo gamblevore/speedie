@@ -2534,6 +2534,8 @@ JB_List* JB_Tree_Second(JB_List* Self);
 
 void JB_Tree_SyntaxAppend(JB_List* Self, JB_List* Last);
 
+bool JB_Tree_SyntaxEquals(JB_List* Self, int N, bool Aware);
+
 JB_List* JB_Tree_Upward(JB_List* Self, int N);
 
 

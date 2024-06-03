@@ -246,7 +246,7 @@ module Feedback
 
 		+"usescriptloc"
 			Explain(Purpose, "")$
-			options.usescriptloc = true
+			options.usescriptloc = maybebool.Known(true)
 
 		+"check"
 			Explain(Purpose, "Check only. same as --nocompile --cpp=0")$

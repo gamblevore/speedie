@@ -1941,7 +1941,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112548849596053));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112552426050329));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3066,7 +3066,7 @@ bool SC_FB__AppOptions_perry(JB_String* Name, JB_String* Value, FastString* Purp
 	}
 	SC__Options_PerryOutput = 1;
 	bool RealPerry = (JB_Str_Equals(Value, JB_LUB[1420], true));
-	SC__Options_PerryOutput = (SC__Options_PerryOutput + ((MaybeBool)RealPerry));
+	SC__Options_PerryOutput = (SC__Options_PerryOutput + RealPerry);
 	JB_File* _tmPf2 = JB_Incr(JB_File__PrefsFolder());
 	JB_File* _tmPf1 = JB_Incr(JB_File_SyntaxAccess(_tmPf2, JB_LUB[1661]));
 	JB_Decr(_tmPf2);
@@ -3161,7 +3161,7 @@ bool SC_FB__AppOptions_usescriptloc(JB_String* Name, JB_String* Value, FastStrin
 	if (!SC_FB__Explain(Purpose, JB_LUB[0])) {
 		return nil;
 	}
-	SC__Options_UseScriptLoc = ((MaybeBool)true);
+	SC__Options_UseScriptLoc = JB_MaybeBool__Known(true);
 	return false;
 }
 
@@ -3257,7 +3257,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024060221));
+	JB_FS_AppendInt32(_fsf0, (2024060312));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -3537,7 +3537,7 @@ void SC_FB__ParseOption(JB_Object* Obj) {
 	if (JB_Str_Exists(Name)) {
 		DTWrap* Opt = JB_Incr(((DTWrap*)JB_Dict_Value0(SC__FB_AppOptions, Name)));
 		if (Opt) {
-			SC__Options_OperationCount = (SC__Options_OperationCount + ((MaybeBool)(((FP_ShellOption)JB_Wrap_SyntaxAccess(Opt)))(Name, Value, nil)));
+			SC__Options_OperationCount = (SC__Options_OperationCount + ((((FP_ShellOption)JB_Wrap_SyntaxAccess(Opt)))(Name, Value, nil)));
 		}
 		 else {
 			FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
@@ -8016,7 +8016,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024060221));
+	JB_FS_AppendInt32(_fsf0, (2024060312));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -17108,6 +17108,10 @@ bool JB_MaybeBool_IsKnown(MaybeBool Self) {
 
 bool JB_MaybeBool_IsTrue(MaybeBool Self) {
 	return ((byte)Self) == 1;
+}
+
+MaybeBool JB_MaybeBool__Known(bool As) {
+	return ((MaybeBool)(As));
 }
 
 
@@ -36139,10 +36143,10 @@ MaybeBool SC_Msg_Trueness(Message* Self, NilState Found) {
 	if (SC_Decl_FastMatch(D, Ret)) {
 		NilState N = D->NilDeclared;
 		if (((bool)(N & kSC__NilState_KnownValue))) {
-			return ((MaybeBool)SC_NilState_SyntaxIs(N, kSC__NilState_TrueValue));
+			return JB_MaybeBool__Known(SC_NilState_SyntaxIs(N, kSC__NilState_TrueValue));
 		}
 		if (((bool)(Found & kSC__NilState_KnownValue))) {
-			return ((MaybeBool)SC_NilState_SyntaxIs(Found, kSC__NilState_TrueValue));
+			return JB_MaybeBool__Known(SC_NilState_SyntaxIs(Found, kSC__NilState_TrueValue));
 		}
 	}
 	 else if (SC_Decl_IsDataTypeOnly(Ret) and SC_Decl_IsDataTypeOnly(D)) {
@@ -36151,7 +36155,7 @@ MaybeBool SC_Msg_Trueness(Message* Self, NilState Found) {
 		};
 		Message* Rtf = Ret->Type->False;
 		if (((bool)Rtf) and (((bool)Self) and JB_Msg_OperatorMatches(Self, Rtf))) {
-			return ((MaybeBool)false);
+			return JB_MaybeBool__Known(false);
 		}
 	}
 	return ((MaybeBool)8);
@@ -44336,7 +44340,7 @@ SCClass* SC_Class__NeuClassSub(Message* Node, SCNode* Parent, Message* ErrPlace,
 	if (SC_SCNodeType_SyntaxIs(Base, kSC__SCNodeType_Object)) {
 		(SC_Class_SyntaxIsSet(Cls, kSC__ClassInfo_SortsProperties, true));
 	}
-	Cls->IsRole = (((MaybeBool)JB_Msg_SyntaxEquals(Node, JB_LUB[1815], true)));
+	Cls->IsRole = ((int)((JB_Msg_SyntaxEquals(Node, JB_LUB[1815], true))));
 	Message* SA = JB_Incr(SC_Base_SourceArg(Cls));
 	JB_Decr(SA);
 	SC_Class_LoadLinkage(Cls);
@@ -44375,7 +44379,7 @@ SCNode* SC_Class__NeuRole(Message* Node, SCNode* Name_space, Message* ErrPlace) 
 		JB_Decr(Mod);
 		return nil;
 	}
-	Cls->IsRole = ((MaybeBool)true);
+	Cls->IsRole = 1;
 	if (!(((Array*)JB_Array_SyntaxCast(Cls->Properties)))) {
 		JB_Decr(Cls);
 		JB_SafeDecr(Mod);
@@ -50235,4 +50239,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 4400756022827889670 7172945621315781491
+// 3692725804634560342 7172945621315781491

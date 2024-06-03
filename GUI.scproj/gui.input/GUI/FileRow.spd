@@ -221,7 +221,7 @@ class FileRow (ListViewRow)
 		found <~ rz
 
 
-	function FindAll (|string| pattern,  |error| found,  |&int| Remain)
+	function FindInFile (|string| pattern,  |error| found,  |&int| Remain,  |bool| ForReplace)
 		require pattern
 		|| t		= .visibletext
 		require t and !t.IsBinary
@@ -229,25 +229,29 @@ class FileRow (ListViewRow)
 		|error| parent
 		|| Lim		= Remain[]
 		|| i		= 0
+		|| LastBefore = -1
 		while (i < t.length) and (lim > 0)
 			|| R	= t.StretchyFind(pattern, i)
 			|| p = r.x
 			if p < 0
 				exit
-			|| err	= error(nil, errorseverity.ok)
-			parent := .FindAllParent(found)
-			parent <~ err
-			lim--
-			err.position = p
-			err.path = .location
-			
 			i = r.x2
-			|| after  = t.find(jeebox.csline, i, i+30)   ??  (i+30)
-			|| before = t.find(jeebox.csline, p, p-30 max 0)   ??  (p-10)
+			|| after  = t.find(Jeebox.CSLine, i, i+30)   ??  (i+30)
+			|| before = t.find(Jeebox.CSLine, p, p-30 max 0)   ??  (p-10)
 			|| s = t[before, after]
-			if !pattern[0].iswhite
-				s = s.trim.remove(jeebox.csline)
-			err.name = s
+			if ForReplace or (lastbefore != before)
+				LastBefore = before
+				
+				if !pattern[0].iswhite
+					s = s.trim.remove(jeebox.csline)
+				|| err	= error(nil, ErrorSeverity.OK)
+				parent := .FindAllParent(found)
+				parent <~ err
+				
+				lim--
+				err.position = p
+				err.path = .location
+				err.name = s
 		Remain[] = lim
 
 

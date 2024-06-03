@@ -863,7 +863,7 @@ module
 		cls.BaseType = base
 		if base is Object
 			(cls is SortsProperties)
-		cls.IsRole = (node ~= "role")
+		cls.IsRole = (node ~= "role")|int|
 
 		|| SA = cls.SourceArg
 		cls.loadlinkage
@@ -881,7 +881,7 @@ module
 	function NeuRole (CollectFunc)
 		|| mod = neuclass(node, name_Space, errplace)|scmodule| $
 		|| cls = mod.cls$
-		cls.IsRole = true
+		cls.IsRole = 1
 		if !(cls.properties)
 			return mod
 		

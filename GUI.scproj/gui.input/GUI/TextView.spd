@@ -32,7 +32,6 @@ class TextView (GUIControl)
 	|GUIKeyEvent?|				OnKeyDown
 	|GUITextEvent?|				OnTextChanged
 	|GUITextEvent?|				OnSelChanged
-//	|dictionary?|				ColoriseAsRoot // a callback would be better
 	|Document?|					_Viewing
 
 	|Error?|					MyError
@@ -102,7 +101,10 @@ class TextView (GUIControl)
 		
 	helper ClickedScroll (|ivec2| P, |int| Clicks, |bool|)
 		return .ClickedScrollbar(P, Clicks, .slh, ._ScrollDrawTimer)
-			
+	
+	setter expectsparse (|byte|)
+		if self ~= "editme" and .path contains "perry"
+		.expectsparse = value
 		
 	behaviour LostFocus
 		.isinline.clear(False)?
@@ -1873,10 +1875,11 @@ class TextView (GUIControl)
 		return ._lines.last!.movecapped(1 - .MaxVisibleLines, nil)
 
 
-	helper PrepareLinesOfText
+	helper PrepareLinesOfText 
 		opt norefcounts
 		|| Changed    = .NeedsPrepare						#require
 		.TextAlteredForDraw = 0
+		if (self ~= "editme") and keys.control
 		|| expect	  = .FindExpectsParse
 		|| msg   	  = .Parse(changed >= 2, expect)
 		|| ParsedOK   = msg!=nil
@@ -2013,6 +2016,16 @@ class TextView (GUIControl)
 		return .FindExpectsParse >= ProbablyJeebox
 
 
+
+	helper string.PathJeeboxness (|byte|)
+		|| ext = .ext
+		rz = textview.allowjeebox
+		if ext ~= "spd" or "box" or "jbin" or "xml" or "jb" // i wanna debug my xml code
+			rz = textview.CurrentlyJeebox
+		  elseif ext ~!= "todo" and "txt"
+			rz = textview.ProbablyJeebox // this seems wrong
+	
+	
 	function GuessExpectsParse
 		opt norefcounts
 
@@ -2027,8 +2040,8 @@ class TextView (GUIControl)
 					mode = CurrentlyJeebox
 				  elseif ext ~!= "todo" and "txt"
 					mode = ProbablyJeebox // this seems wrong
-		.expectsparse = mode
-	
+		.ExpectsParse = mode
+
 	
 	flags
 		NotRoot = 0x800

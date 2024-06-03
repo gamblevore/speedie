@@ -4714,6 +4714,8 @@ bool JB_MaybeBool_IsKnown(MaybeBool Self);
 
 bool JB_MaybeBool_IsTrue(MaybeBool Self);
 
+MaybeBool JB_MaybeBool__Known(bool As);
+
 
 
 // MoveCode

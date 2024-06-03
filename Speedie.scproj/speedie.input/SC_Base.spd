@@ -241,7 +241,7 @@ function message.visible2 (|maybebool|)
 	if self
 		|| i = .indent
 		if i >= 254
-			return i == 254 // retrieve visibility of a delayed node.
+			return (i == 254)|maybebool| // retrieve visibility of a delayed node.
 
 
 function message.visible (|bool|)

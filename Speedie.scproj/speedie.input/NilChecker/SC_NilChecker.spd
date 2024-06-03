@@ -708,15 +708,15 @@ function message.Trueness (|nilstate| found, |maybebool|)
 	if d.FastMatch(ret)
 		|| n = d.nildeclared
 		if n & nilstate.KnownValue
-			return n is TrueValue
+			return maybebool.Known(n is TrueValue)
 		if found & nilstate.knownValue
-			return found is TrueValue
+			return maybebool.Known(found is TrueValue)
 
 	  elseif Ret.isdatatypeonly and d.isdatatypeonly // nothing special
 		while self == @arg or @bra
 			self = self.last
 		|| rtf = ret.type.false
 		if rtf and self and self matches rtf
-			return false
+			return maybebool.Known(false)
 	// return maybe
 

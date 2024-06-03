@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[596];
+extern JB_StringC* JB_LUB[595];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -6150,6 +6150,10 @@ void JB_Tree_SyntaxAppend(JB_List* Self, JB_List* Last) {
 	(JB_Ring_LastSet(Self, Last));
 }
 
+bool JB_Tree_SyntaxEquals(JB_List* Self, int N, bool Aware) {
+	return JB_Ring_HasChildCount(Self, N);
+}
+
 JB_List* JB_Tree_Upward(JB_List* Self, int N) {
 	while (((bool)Self) and ((--N) >= 0)) {
 		Self = JB_Ring_Parent(Self);
@@ -6760,11 +6764,11 @@ int64 JB_Msg_Int(Message* Self, int StrStart) {
 		if ((!F) or (!JB_Msg_EqualsSyx(Self, kJB_SyxUnit, false))) {
 			return JB_Str_TextIntegerSection(Self->Name, StrStart, Self);
 		}
-		if (JB_Msg_SyntaxEquals(Self, JB_LUB[547], false)) {
+		if (JB_Tree_SyntaxEquals(Self, 'x', false)) {
 			return JB_Str_HexIntegerSection(F->Name, StrStart, F);
 		}
 		double Mul = JB_Str_TextDouble(F->Name, nil);
-		if (JB_Msg_SyntaxEquals(Self, JB_LUB[255], false)) {
+		if (JB_Tree_SyntaxEquals(Self, 'K', false)) {
 			Mul = (Mul * ((float)1024));
 		}
 		 else if (JB_Msg_SyntaxEquals(Self, JB_LUB[258], false)) {
@@ -8358,7 +8362,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024060211);
+	return (2024060213);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8370,4 +8374,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 -5732947445617429858 -6211541417332001752
+// 7796578953066441599 8367301448240025199 -6720784475268466743

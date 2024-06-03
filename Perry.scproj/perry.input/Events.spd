@@ -296,7 +296,7 @@ function perryIDE.UpdateJeeboxField (|bool|)
 
 
 function PerryIDE.BatchPhind (|string| text, |uint| ID, |bool|)
-	|| found = .filelist.BatchFind(text, ID)
+	|| found = .filelist.BatchFind(text, ID, false)
 	.foundlist.use(found)
 	.foundlist.setfocus
 	return found.hasany

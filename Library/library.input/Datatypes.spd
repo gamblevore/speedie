@@ -819,8 +819,10 @@ datatype MaybeBool (byte) // could just put these on int? do we need a whole new
 	syntax cast (|bool|)
 		disabled "Do you mean .istrue? Maybebools can have an unknown state."
 	module
-		function New (|bool| Default, |Maybebool|)
+		function Default (|bool| Default, |Maybebool|)
 			return (8+default)|Maybebool|
+		function Known (|bool| As, |Maybebool|)
+			return (as)|Maybebool|
 	
 	
 
@@ -839,8 +841,8 @@ datatype bool
 	function Sign
 		disabled "use .dir"
 	
-	syntax cast (|maybebool|)
-		return self|maybebool|
+//	syntax cast (|maybebool|) // bad. Many types seem to cast via this unintentionally.
+//		return self|maybebool|
 
 	function Set (|int| old, |int| flag, |int|)
 		cpp_part setflag
