@@ -36,7 +36,7 @@ function textview.InitDebugArgs
 function fnStillRunning (fnConfirmCanceller)
 	if self isa perryide
 		.UpdateDebuggedApp(false)
-		return .RunCompiledApp
+		return !.RunCompiledApp
 
 	
 function Window.Confirm (|string| Q, |fnConfirmCanceller| fn, |bool|)
