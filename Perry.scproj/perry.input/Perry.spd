@@ -200,7 +200,8 @@ function View (|ButtonView| btn, |bool| CanChangeFocus=true)
 	  elseif (btn == .viewerrors)
 		.SwitchedToErrors
 	if changed
-		g.setfocus
+		if CanChangeFocus
+			g.setfocus
 	  elseif btn == .viewfiles
 		if !.InConstructor
 			.filelist.ShowQuickOpen

@@ -5,6 +5,7 @@ https://github.com/contextfreecode/jai-comparisons/blob/main/guess.jai
 main
 	zalgoline "Finished in ${game(100).play}\n\n" // and wierdness
 
+
 class game
 	|int|   answer
 	|int|   last = int.min

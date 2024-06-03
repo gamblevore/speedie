@@ -21,6 +21,7 @@ module SDLApp
 	|ivec2| 					NewSize
 	|ivec2| 					CurrMouseXY
 	|ivec2|						TryResizeLater
+	|date|						CmdReleaseDate
 	|date|						FrameLength
 	|date|						LastFrameDate = 1 // wont fire otherwise
 	|date|						LastWindowClose
@@ -74,7 +75,9 @@ module SDLApp
 	cpp_wrapper SDL_GetWindowPosition	(|&SDL_Window| w,  |&int| x, |&int| y)
 	cpp_wrapper SDL_GetWindowSize		(|&SDL_Window| w,  |&int| x, |&int| y)
 	cpp_wrapper SDL_SetWindowSize		(|&SDL_Window| window, |int| w, |int| h, |int|)
-	cpp_WRapper SDL_GetModState			(|SDL_KeyMod|)
+	cpp_wrapper SDL_GetModState			(|SDL_KeyMod|)
+	cpp_wrapper SDL_SetModState			(|SDL_KeyMod| State) // can we use this to clear the cmd-key
+	
 	cpp_wrapper SDL_StartTextInput		()
 	cpp_wrapper SDL_StopTextInput		()
 	cpp_wrapper SDL_ShowSimpleMessageBox		(|int| Flags, |cstring| title, |cstring| msg, |?&SDL_Window| window)
@@ -863,31 +866,47 @@ module SDLApp
 		return SDLActivity.activity
 		
 
+	function CheckKeyMods
+		|| old = .KeyMod
+		|| New = .SDL_GetModState
+		.KeyMod = New
+		
+		#!Work around some SDL bug... the cmd-key seems to get sticky sometimes
+		// only the cmd-key! not even shift or control!
+		if ((Old xor New) is cmd)
+			if new is cmd
+				.CmdReleaseDate = date.now + 5s
+			  else
+				.CmdReleaseDate = 0
+		  elseif .CmdReleaseDate.Fired
+			.SDL_SetModState(New&~sdl_keymod.cmd)
+
+
 	function CheckEvent (|&SDL_Event| ev, |int|)
 		visible
-		.keymod = .SDL_GetModState
+		.CheckKeyMods
 		|| KeyW = .LastWasKeyWindowClose
 		.LastWasKeyWindowClose = false
 		|| t = ev.type
 		 
-		if (t is APP_DIDENTERFOREGROUND or APP_DIDENTERBACKGROUND)
+		if t is APP_DIDENTERFOREGROUND or APP_DIDENTERBACKGROUND
 			return .AppIsBackground(t is APP_DIDENTERBACKGROUND)
 		
 		if  t is APP_TERMINATING
 			return .tryquit
 		
-		if (t is QUIT)
+		if  t is QUIT
 			return .tryquit(sdlclosereason.QuitEvent)
 		
 		if  t is WINDOWEVENT
 			return .windowevent(ev, keyw)
 
 		|| w = .FrontDialog ?? __modules__.window.front
-		if (!w)
+		if !w
 			return SDLActivity.nothing
 
 
-//		w.__Tickle__ // seems to cause blockages sometimes? but othertimes it does work!
+		w.__Tickle__
 		if T is dropbegin
 			w.DroppingInto = w[.MouseXY] ?? w
 			return SDLActivity.activity
@@ -895,7 +914,7 @@ module SDLApp
 		if t is DROPFILE or Droptext
 			return .FileDroppedIntoApp(w, ev.drop.filestr, t)
 		
-		if (t is dropcomplete)
+		if t is dropcomplete
 			w.DroppingInto = nil
 			return SDLActivity.activity
 
@@ -912,11 +931,10 @@ module SDLApp
 			return .MousewheelEvent(ev,	w)
 
 		|| b = ev.button
-		|| xy = b.xy
-		
 		if t is MOUSEDOWN
 			return .mousedownevent(w, b)
 
+		|| xy = b.xy
 		if t is MOUSEMOVE
 			return .MouseMoveEvent(w, xy)
 

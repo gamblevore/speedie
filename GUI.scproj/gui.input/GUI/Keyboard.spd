@@ -8,7 +8,10 @@ datatype SDL_KeyMod (int)
 
 	syntax cast (|bool|)
 		return (self|uint|) & (sdlapp.keymod|uint|)
-
+	
+	syntax is (|sdl_keymod| k, |bool|)
+		return self&k
+		
 	constants
 		|SDL_KeyMod|
 		LSHIFT	= 0x0001

@@ -103,7 +103,6 @@ class TextView (GUIControl)
 		return .ClickedScrollbar(P, Clicks, .slh, ._ScrollDrawTimer)
 	
 	setter expectsparse (|byte|)
-		if self ~= "editme" and .path contains "perry"
 		.expectsparse = value
 		
 	behaviour LostFocus
@@ -1879,7 +1878,6 @@ class TextView (GUIControl)
 		opt norefcounts
 		|| Changed    = .NeedsPrepare						#require
 		.TextAlteredForDraw = 0
-		if (self ~= "editme") and keys.control
 		|| expect	  = .FindExpectsParse
 		|| msg   	  = .Parse(changed >= 2, expect)
 		|| ParsedOK   = msg!=nil

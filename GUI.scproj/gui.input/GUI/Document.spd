@@ -369,8 +369,8 @@ extend TextView
 		.GuessExpectsParse
 		|| pos = d.ScrollPos
 		if reason != DocumentState.UndoOrRedo  and  pos >= 2
-			.PrepareLinesOfText // Clear seems to be calling PrepareLinesOfText anyhow
-								// Please fix??
+			.PrepareLinesOfText // Clear seems to be calling PrepareLinesOfText anyhow (Sometimes?)
+								// Please fix?? seems better to call it after.
 			if reason != DocumentState.typing 
 				.viewpos(pos)
 		

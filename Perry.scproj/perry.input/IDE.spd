@@ -139,7 +139,8 @@ class PerryIDE (Window)
 	
 	behaviour Tickle
 		opt norefcounts
-		.Feedback$.Pico.Tickle
+// seems to cause blockages sometimes? why?
+//		.Feedback$.Pico.Tickle
 	
 	behaviour Drawbackground
 		opt norefcounts

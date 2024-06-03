@@ -387,6 +387,8 @@ datatype uint16
 		return self|bool|
 
 
+
+
 datatype int16
 	default 0
 	
@@ -401,20 +403,6 @@ datatype int16
 	syntax cast (|bool|)
 		return self|bool|
 
-
-
-/*
-struct uint24
-	|byte[3]| Data
-	syntax cast	(|uint|)
-		return .data[2] ||| .data[1]<<8 ||| .data[0]<<16
-
-function int.SyntaxCast (|uint24|)
-	cpp_part U24
-	rz.data[0] = self>>16
-	rz.data[1] = self>> 8
-	rz.data[2] = self
-*/
 
 
 datatype float
@@ -555,6 +543,7 @@ datatype float
 		while (i < self)
 			yield i (i)
 			++i
+
 
 
 
@@ -868,6 +857,7 @@ datatype bool
 		while (num >= 0)
 			yield (num == 1)
 			--num
+
 
 
 datatype MoveCode (byte)
