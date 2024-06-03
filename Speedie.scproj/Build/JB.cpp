@@ -1941,7 +1941,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112554849992704));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112554856415232));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -16483,24 +16483,20 @@ AsmReg SC_ASMtmp__While(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 	debugger;
 	Self->WhileStart = Self->Curr;
 	SC_Pac_AddASM0(Self, kSC__ASM_JUMP, Exp);
-	FatASM* ArgStart = Self->WhileStart;
+	FatASM* Jumper = Self->WhileStart;
 	SC_Pac_Get(Self, ((Message*)JB_Tree_Second(Exp)), SC_Reg__New());
 	FatASM* CondStart = Self->Curr;
 	FatASM* ExitPlace = SC_Pac_Branch(Self, ((Message*)JB_Ring_First(Exp)));
-	ExitPlace->R[3] = (Self->Curr - ArgStart);
-	while (ArgStart < ExitPlace) {
+	ExitPlace->R[3] = (Self->Curr - Jumper);
+	while (Jumper < ExitPlace) {
 		//ClearExits;
-		byte Op = ArgStart->Op;
+		byte Op = Jumper->Op;
 		if (Op >= 254) {
-			ArgStart->Op = kSC__ASM_JUMP;
-			if (Op == 254) {
-				ArgStart->R[0] = (CondStart - ArgStart);
-			}
-			 else {
-				ArgStart->R[0] = (ExitPlace - ArgStart);
-			}
+			Jumper->Op = kSC__ASM_JUMP;
+			FatASM* Oof = ((FatASM*)JB_Ternary(Op == 254, CondStart, ((FatASM*)ExitPlace)));
+			Jumper->R[0] = (Oof - Jumper);
 		}
-		(++ArgStart);
+		(++Jumper);
 	};
 	return ((AsmReg)0);
 }

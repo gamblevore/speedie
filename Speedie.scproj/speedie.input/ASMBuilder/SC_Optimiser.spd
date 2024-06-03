@@ -1,34 +1,46 @@
 
 
 /*
-* BFLS, BFLG
-* functions: tail, fncx
-* (addr+=n), cntc(addr, 0) --> cntc(addr, n)
-* Glob = glob + 1-127 // --> cntc
-* flowcontrol
-	* LUPU/LUPD
-	* if x: return true/false --> conditional return 
-* a*b + c --> MUL
-* a*k1 + b*k2 -> FEXK
+	* BFLS, BFLG					// x = (a & b)>>c (so SHL SHR)
+									// x = x | (y << 5) // whatever... that kinda thing
+	* add blocks to the "if (" function :)
 */
 
 
 function SpdAssembler.Optimise (|scfunction| fn, |bool|)
-	|| ASM = fn.ASM$
-	|| Curr = ASM.IR
-	|| length = ASM.length
+	opt norefcounts
+	|| raw = fn.ASM$
+	|| Curr = raw.IR
+	|| length = raw.length
 	if curr[-1].op or curr[length-1].op // bad
 
 	for i in length
-		Curr.TryOpt()
-		
+		|| x = (µOpt[i])
+			(x)(curr+i)
+//	.AddASM(asm.ADDK, exp, dest, obj, pos)
 
-function FatASM.TryOpt
-	// Now optimise! :D
-	// how to make sure that we don't mess up a jump?
-	// if something jumps into a thing...
-	// we need to organise these into blocks... so we don't optimise math across blocks.
-	// what about something like this?
-	// if x: return true/false. Thats legit not the same block! Well it is a dependant block
-	// so we need a way to see what block depends on what?
-	
+	if curr[-1].op or curr[length-1].op // bad
+
+
+
+dispatch µOpt (|&fatasm| self, |int|)
+	(ASM.ADDK):    {}
+	(ASM.FUNC):    {} // tail, fncx
+	(ASM.CNTC):    {} // (addr+=n), cntc(addr, 0) --> cntc(addr, n)
+	(ASM.TABL):    {} // Glob = glob + 1-127 // --> cntc
+	(ASM.ADD):     {} //a*b + c --> MUL
+	(ASM.FADD):    {} //a*b + c --> MUL,   a*k1 + b*k2 -> FEXK // could perhaps do these at the time.
+
+/*
+	* flowcontrol
+		* LUPU/LUPD
+		* if x: return true/false --> conditional return 
+*/
+	(ASM.CMPF):    {} // control flow?
+	(ASM.CMPI):    {}
+	(ASM.JMPI):    {}
+	(ASM.JMPF):    {}
+	(ASM.JMPN):    {}
+	(ASM.JMPE):    {}
+	255:  {}
+
