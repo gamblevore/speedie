@@ -5120,7 +5120,7 @@ void JB_SorterComparer_sort(FP_SorterComparer Self, Array* A, bool Reverse);
 // JB_ASMState
 AsmReg SC_Pac_AddConstant(ASMState* Self, Message* Exp, AsmReg Dest, AsmReg Src, int64 Value);
 
-AsmReg SC_Pac_AddConstantAndReturnOld(ASMState* Self, Message* Exp, AsmReg WantOld, AsmReg ToGrow, int64 Value);
+AsmReg SC_Pac_AddConstantAndReturnOld(ASMState* Self, Message* Exp, AsmReg Dest, AsmReg ToGrow, int64 Value);
 
 void SC_Pac_AddFuncParams(ASMState* Self, SCFunction* Fn);
 

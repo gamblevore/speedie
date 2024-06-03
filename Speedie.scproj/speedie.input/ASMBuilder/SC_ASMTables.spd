@@ -117,19 +117,20 @@ function If				(fn_asm)
 function While			(fn_asm)
 	opt norefcounts
 	debugger
-	|| write = .WhileStart
 	.WhileStart = .curr
-	// should do a jump to end... THEN do the arg and jump back.
-	// right?
-	|| finish = .curr
-	.AddASM(asm.JUMP, exp, .whilestart - finish)				// jump back
-	.WhileStart = write
+	.AddASM(asm.JUMP, exp)				// jump to end... THEN EMIT arg and jump back.
+	|| ArgStart = .WhileStart
+	.µ(exp.second!)						// arg
+	|| CondStart = .curr				// right?
+	|| GoBackUp = .branch(exp.first!)	// cond
+	GoBackUp.r[3] = .curr - ArgStart
 
-	while write < finish
-		if write.Op == 255 // exit
-			write.op = ASM.Jump
-			write.r[0] = finish - write
-		write++
+	while ArgStart < GoBackUp
+		#!ClearExits
+		if ArgStart.Op == 255 // exit
+			ArgStart.op = ASM.Jump
+			ArgStart.r[0] = GoBackUp - ArgStart
+		ArgStart++
 
 
 function Exit			(fn_asm)

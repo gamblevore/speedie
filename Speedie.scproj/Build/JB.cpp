@@ -1941,7 +1941,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112554755227648));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112554792386560));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -16235,11 +16235,11 @@ AsmReg SC_ASMtmp__Incrementatulatorifier(ASMState* Self, Message* Exp, AsmReg De
 	if (!((bool)(Mode & kSC__ASMtmp_IncrAfter))) {
 		return SC_Pac_AddConstant(Self, Exp, Src, Src, Amount);
 	}
-	Message* F2 = SC_Msg_RemoveTypeCasts(F);
-	if (Self->WithinBranch) {
+	if (((bool)Self->WithinBranch) or (SC_Reg_IsInt(Dest) and SC_int64_CanStoreAsIntImmediate(Amount))) {
 		return SC_Pac_AddConstantAndReturnOld(Self, F, Dest, Src, Amount);
 	}
-	if (!JB_Msg_EqualsSyx(F2, kJB_SyxThg, false)) {
+	JB_DoAt(1);
+	if (!JB_Msg_EqualsSyx(SC_Msg_RemoveTypeCasts(F), kJB_SyxThg, false)) {
 		debugger;
 	}
 	if (SC_Pac_Get(Self, F, SC_Reg__New()) != Src) {
@@ -16483,7 +16483,6 @@ AsmReg SC_ASMtmp__While(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 	debugger;
 	FatASM* Write = Self->WhileStart;
 	Self->WhileStart = Self->Curr;
-	SC_ASMtmp__If(Self, Exp, SC_Reg__New(), 1);
 	FatASM* Finish = Self->Curr;
 	SC_Pac_AddASM1(Self, kSC__ASM_JUMP, Exp, Self->WhileStart - Finish);
 	Self->WhileStart = Write;
@@ -17817,20 +17816,20 @@ AsmReg SC_Pac_AddConstant(ASMState* Self, Message* Exp, AsmReg Dest, AsmReg Src,
 	return SC_Pac_Plus(Self, Dest, Src, Where, Exp);
 }
 
-AsmReg SC_Pac_AddConstantAndReturnOld(ASMState* Self, Message* Exp, AsmReg WantOld, AsmReg ToGrow, int64 Value) {
+AsmReg SC_Pac_AddConstantAndReturnOld(ASMState* Self, Message* Exp, AsmReg Dest, AsmReg ToGrow, int64 Value) {
 	AsmReg Rz = ((AsmReg)0);
 	byte X = Self->VTmps;
 	Rz = SC_Pac_TempMe(Self, Exp, kSC__Reg_Temp);
-	if (SC_Reg_IsInt(WantOld) and SC_int64_CanStoreAsIntImmediate(Value)) {
+	if (SC_Reg_IsInt(Dest) and SC_int64_CanStoreAsIntImmediate(Value)) {
 		Message* _tmPf0 = JB_Incr(((Message*)JB_Ring_Parent(Exp)));
-		SC_Pac_AddASM3(Self, kSC__ASM_ADPK, _tmPf0, SC_Reg_ToInt(WantOld), SC_Reg_ToInt(ToGrow), Value);
+		SC_Pac_AddASM3(Self, kSC__ASM_ADPK, _tmPf0, SC_Reg_ToInt(Dest), SC_Reg_ToInt(ToGrow), Value);
 		JB_Decr(_tmPf0);
-		Self->VTmps = (X);
+		Self->VTmps = X;
 	}
 	 else {
 		SC_Pac_Assign(Self, Rz, ToGrow, SC_Reg__New(), Exp);
-		Self->VTmps = (X);
-		SC_Pac_AddConstant(Self, Exp, WantOld, ToGrow, Value);
+		Self->VTmps = X;
+		SC_Pac_AddConstant(Self, Exp, Dest, ToGrow, Value);
 	}
 	return Rz;
 }
@@ -50240,4 +50239,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 6346006488696652440 3140604098764879096
+// -2091230774126807706 3140604098764879096
