@@ -157,13 +157,13 @@ class list (Saveable)
 		if (Metoo)
 			.dispose
 	
-	function Dist (|list| r, |int|)
-		opt norefcounts
-		require self and r
-		
-		debug_require r.parent == .parent
-		if r != self
-			return .fwddist(R) ?? .backdist(r)
+//	function Dist (|list| r, |int|)
+//		opt norefcounts
+//		require self and r
+//		
+//		debug_require r.parent == .parent
+//		if r != self
+//			return .fwddist(R) ?? .backdist(r)
 			
 
 	function FwdDist (|list!| F, |int|)
@@ -176,22 +176,22 @@ class list (Saveable)
 			++C
 			
 
-	function BackDist (|list!| B, |int|)
-		opt norefcounts
-		|| c = 0
-		while B
-			if self == B
-				return c
-			--B
-			--C
+//	function BackDist (|list!| B, |int|)
+//		opt norefcounts
+//		|| c = 0
+//		while B
+//			if self == B
+//				return c
+//			--B
+//			--C
 		
 	operator gt (|list| rt, |bool|)
 		return .fwddist(rt)
 
-	operator min (|| rt, ||)
-		if rt gt self
-			return self
-		return rt
+//	operator min (|| rt, ||)
+//		if rt gt self
+//			return self
+//		return rt
 
 	operator plus (|int| n, ||)
 		disabled ".moveflat or .move?"
@@ -209,9 +209,9 @@ class list (Saveable)
 		cpp_part MoveN
 		return .movesub(n, nil)
 
-	function Step (|bool| dir, ||)
+	function Step (|bool| fwd, ||)
 		cpp_Part stepbool
-		if dir
+		if fwd
 			return .next
 		return .prev
 	
@@ -269,6 +269,7 @@ class list (Saveable)
 
 
 	function MoveTo (|...!| dest)
+		// remove?
 		require self != dest
 		if Dest gt self
 			dest.next = self
@@ -446,19 +447,19 @@ class list (Saveable)
 		parent.first = self // smallest
 
 
-	function Loop (|bool| dir=true, |list| Owner=nil, |...!|)
+	function Loop (|bool| fwd=true, |list| Owner=nil, |...!|)
 		description "Owner must be nil... or contain us. Otherwise this function will break."
 		opt norefcounts
 		real self
 		if Owner
-			if dir
+			if fwd
 				return .FlatNext ?? Owner.first!
 			return .flatPrev ?? Owner.FlatLast!
 		
 		|| p = .parent
 		if !p
 			return self
-		if dir
+		if fwd
 			return .next ?? p.first!
 		return .prev ?? p.last!
 	

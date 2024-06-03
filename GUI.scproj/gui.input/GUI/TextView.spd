@@ -90,7 +90,8 @@ class TextView (GUIControl)
 		if self is editable or AlwaysScrollable
 			if clicks >= 1
 				._ClicksDown = clicks
-			.EditClick(p, clicks, false)
+			|| x = .EditClick(p, clicks, false)
+				return x
 		|| onc = .onclicked
 		if (onc) and clicks >= 0				// -1 = drag
 			(onc)(self, clicks)
@@ -209,15 +210,16 @@ class TextView (GUIControl)
 		return t
 
 
-	function EditClick (|ivec2| p, |int| clicks, |bool| CmdKey)
+	function EditClick (|ivec2| p, |int| clicks, |bool| CmdKey, |int|)
 		|textviewline| d
 		|| bs = .ByteAtXY(p, d)
 		|| b = bs.x
 		if !cmdkey  and  !clicks  and  .SelRange contains b
-			return
+			return 0
 		
 		ifn .lastrect.vert contains p.y
-			.show(b)
+			.show(b, sdleventtype.MOUSEMOVE)
+			rz = mousedragging.EvenIfNoMovement
 		
 		|| t = ._UncorrectedSel
 		if keys.shift or (clicks == -1)
@@ -464,8 +466,8 @@ class TextView (GUIControl)
 			.ShowAndSel(d.position)
 
 	
-	function Show (|int| x, |TextViewLine|)
-		return .ViewPos(x, (.MaxVisibleLines/3))
+	function Show (|int| x, |sdleventtype| Reason=0,  |TextViewLine|)
+		return .ViewPos(x, .MaxVisibleLines/3, 0, reason)
 	
 	
 	function MarkAsFound (|message| Where)
@@ -484,13 +486,15 @@ class TextView (GUIControl)
 			.Doexplode(rz, 2.0)
 
 
-	function ViewPos (|int| x,  |int|before=0, |int| back=0, |bool| Exact=false, |TextViewLine|)
+	helper ViewPos (|int| x, |int| before, |int| back, |sdleventtype| reason,   |TextViewLine|)
 		opt NoRefCounts
 		|| i	= 0
 		|| d	= .FindDrawInfo(x, i)
-		if !exact and (i inrange (1+.MaxVisibleLines - back))
+		before = before.abs
+		|| lim = .MaxVisibleLines - (back + before/2)
+		if i inrange lim
 			return d
-		.StartLine = d.movecapped(-before.abs) 
+		.StartLine(reason) = d.movecapped(-before) 
 		sdlapp.touch(self)
 		return d
 
@@ -514,7 +518,7 @@ class TextView (GUIControl)
 		opt norefcounts		
 		|| t = ._typingplace
 		x = .Clamp(x)
-		|| d = .ViewPos(x, before, 2) // idk
+		|| d = .ViewPos(x, before, 2, 0) // idk
 			
 		if keys.shift
 			t.x2 = x
@@ -581,7 +585,7 @@ class TextView (GUIControl)
 			require range.x >= 0
 		
 		.SelDirect(range, nil)
-		.ViewPos(range.x, .MaxVisibleLines/2, 2)
+		.ViewPos(range.x, .MaxVisibleLines/2, 2, 0)
 		return true
 			
 	
@@ -1688,9 +1692,9 @@ class TextView (GUIControl)
 		return ._Start
 	
 	
-	helper StartLine (assigns:|TextViewLine| d)
+	helper StartLine (|sdleventtype| reason=0, assigns:|TextViewLine| d)
 		cpp_part StartAtLine
-		.StartWithoutScrollDraw = d
+		.StartWithoutScrollDraw(reason) = d
 		.bumpscroll
 	
 	
@@ -1707,16 +1711,32 @@ class TextView (GUIControl)
 		._lines <~ rz
 	
 	
-	helper StartWithoutScrollDraw (assigns:|TextViewLine!| d)
+	function TextViewLine.SlowMove (|TextViewLine| start, |int| amount, |...!|)
+		if start == self
+			return self
+		|| diff = start.vline - .vline
+		rz = start
+		for amount
+			|| curr = start.Step(diff<0) #loop
+			rz = curr		
+	
+	
+	helper StartWithoutScrollDraw (|sdleventtype| reason=0, assigns:|TextViewLine!| d)
 		opt norefcounts
-		|| last = ._lines.last!.movecapped(3 - .maxvisiblelines)!
-		if d gt last
+		if reason is mousemove
+			d = d.SlowMove(._Start, 2)
+		  else
+		|| last = ._lines.last!.movecapped(3 - .MaxVisibleLines)!
+		
+		if d.position > last.position
 			d = last
 		.ReallySetStart(d)
 	
 	
 	helper ReallySetStart (|textviewline!| d)
 		opt norefcounts
+		if (._start != d) and self ~= "editme"
+			d = d
 		._Start = d
 		.ShowExtraInfo(sdlapp.mousexy, false)
 		if d.position >= 0

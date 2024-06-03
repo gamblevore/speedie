@@ -1941,7 +1941,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112552478275870));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112552956129808));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3257,7 +3257,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024060312));
+	JB_FS_AppendInt32(_fsf0, (2024060314));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8016,7 +8016,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024060312));
+	JB_FS_AppendInt32(_fsf0, (2024060314));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -9149,17 +9149,8 @@ void SC___junktest_2__() {
 	if (0.5f) {
 		JB_SetRef(R1, nil);
 	}
-	JB_List* R2 = JB_Incr(JB_Ring_Constructor0(nil));
-	{
-		JB_List* _tmP0 = JB_Incr(JB_Ring_First(R1));
-		if (_tmP0) {
-			int I2 = 0;
-			I2 = JB_Tree_Dist(_tmP0, R2);
-		}
-		JB_Decr(_tmP0);
-	}
-	;
 	JB_Decr(R1);
+	JB_List* R2 = JB_Incr(JB_Ring_Constructor0(nil));
 	JB_Decr(R2);
 }
 
@@ -29529,18 +29520,6 @@ void JB_Tree_AppendBefore(JB_List* Self, JB_List* Item, JB_List* Before) {
 	}
 }
 
-int JB_Tree_BackDist(JB_List* Self, JB_List* B) {
-	int C = 0;
-	while (B) {
-		if (Self == B) {
-			return C;
-		}
-		B = JB_Ring_PrevSib(B);
-		(--C);
-	};
-	return 0;
-}
-
 void JB_Tree_Clear(JB_List* Self) {
 	while (true) {
 		JB_List* _tmPf0 = JB_Ring_First(Self);
@@ -29549,24 +29528,6 @@ void JB_Tree_Clear(JB_List* Self) {
 		}
 		JB_Tree_Remove(_tmPf0);
 	};
-}
-
-int JB_Tree_Dist(JB_List* Self, JB_List* R) {
-	if (!(((bool)Self) and ((bool)R))) {
-		return 0;
-	}
-	if (JB_Ring_Parent(R) != JB_Ring_Parent(Self)) {
-		debugger;
-		return 0;
-	}
-	if (R != Self) {
-		int _tmP0 = JB_Tree_FwdDist(Self, R);
-		if (!_tmP0) {
-			_tmP0 = JB_Tree_BackDist(Self, R);
-		}
-		return _tmP0;
-	}
-	return 0;
 }
 
 JB_List* JB_Tree_FlatLast(JB_List* Self) {
@@ -29580,18 +29541,6 @@ JB_List* JB_Tree_FlatLast(JB_List* Self) {
 		Rz = _tmPf0;
 	};
 	return Rz;
-}
-
-int JB_Tree_FwdDist(JB_List* Self, JB_List* F) {
-	int C = 0;
-	while (F) {
-		if (Self == F) {
-			return C;
-		}
-		F = JB_Ring_NextSib(F);
-		(++C);
-	};
-	return 0;
 }
 
 bool JB_Tree_HasOneChild(JB_List* Self) {
@@ -50239,4 +50188,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 3692725804634560342 7172945621315781491
+// 5264125212855428248 7172945621315781491

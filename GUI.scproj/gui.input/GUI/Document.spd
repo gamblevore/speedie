@@ -372,7 +372,7 @@ extend TextView
 			.PrepareLinesOfText // Clear seems to be calling PrepareLinesOfText anyhow (Sometimes?)
 								// Please fix?? seems better to call it after.
 			if reason != DocumentState.typing 
-				.viewpos(pos)
+				.viewpos(pos, 0, 0, 0)
 		
 		.UpdateModState(d, reason)
 	

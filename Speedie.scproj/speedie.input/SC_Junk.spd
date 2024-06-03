@@ -31,9 +31,6 @@ helper __junktest_2__
 	if (0.5)
 		r1 = nil
 	|| r2 = list()
-	with r1.first
-		|| i2 = 0
-		i2 = .dist(r2)
 
 
 helper message.__junktest_18__ (|bool| named=false) // findpos, findat

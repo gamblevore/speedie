@@ -7327,15 +7327,9 @@ void JB_Tree_AppendAfter(JB_List* Self, JB_List* Item, JB_List* After);
 
 void JB_Tree_AppendBefore(JB_List* Self, JB_List* Item, JB_List* Before);
 
-int JB_Tree_BackDist(JB_List* Self, JB_List* B);
-
 void JB_Tree_Clear(JB_List* Self);
 
-int JB_Tree_Dist(JB_List* Self, JB_List* R);
-
 JB_List* JB_Tree_FlatLast(JB_List* Self);
-
-int JB_Tree_FwdDist(JB_List* Self, JB_List* F);
 
 bool JB_Tree_HasOneChild(JB_List* Self);
 
