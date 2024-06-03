@@ -13,7 +13,7 @@ class Macro
 		cpp_part ConstructorMsg
 		._parsed = s
 		
-	function Source (|message|)
+	function Source (|message|) // can't I use a getter?
 		opt norefcounts
 		rz = ._parsed
 		if !rz

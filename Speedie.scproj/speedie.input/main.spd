@@ -1,4 +1,5 @@
 
+
 main // speedie main {
 	compiler.SetupEnv	
 	compiler.MiniTests

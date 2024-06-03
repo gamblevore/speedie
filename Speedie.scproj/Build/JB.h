@@ -7870,6 +7870,8 @@ Message* JB_Msg_MacroPrm(Message* Self, Message* Root, Array* Prms, Message* Des
 
 Message* JB_Msg_MacroSame(Message* Self, Message* Prm);
 
+bool SC_Msg_MainArgsCanBeZero(Message* Self);
+
 Message* SC_Msg_MainFix(Message* Self);
 
 void SC_Msg_mainfix2(Message* Self);

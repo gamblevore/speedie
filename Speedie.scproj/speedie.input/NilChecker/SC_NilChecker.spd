@@ -101,7 +101,7 @@ function UseChildAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason,
 	|| dcl = msg.FastDecl
 	if dcl is Global
 		return dcl.NilDeclared
-	|| ch = msg.first
+	|| ch = msg.First
 		return .UseAsRealSub(ch, test, reason, dcl)
 	debugger // what?
 
@@ -120,7 +120,7 @@ function UseAsRealSub (|message| ch, |nilcheckmode| test, |nilreason| reason, |s
 			
 		.BecomeReal(ch.FastDecl, ch, reason)
 	|| nd = dcl.nildeclared
-	if test isnt active or test is soft
+	if  test isnt active  or  test is soft
 		return nd
 	if nd.statedreal and dcl.typesuffers
 		return ch.RedundantDeclare(nd)

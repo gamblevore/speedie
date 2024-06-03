@@ -1941,7 +1941,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112552956129808));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112553759241946));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3257,7 +3257,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024060314));
+	JB_FS_AppendInt32(_fsf0, (2024060318));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -5202,9 +5202,9 @@ int SC_Macros__Init_() {
 		JB_SetRef(SC__Macros_MultiDecr, JB_Macro_ConstructorStr(nil, (JB_LUB[25])));
 		JB_SetRef(SC__Macros_ConstructorNew, JB_Macro_ConstructorStr(nil, (JB_LUB[18])));
 		JB_SetRef(SC__Macros_ConstructorNewTask, JB_Macro_ConstructorStr(nil, (JB_LUB[17])));
-		JB_SetRef(SC__Macros_MainArgBasic, JB_Macro_ConstructorStr(nil, (JB_LUB[6])));
-		JB_SetRef(SC__Macros_MainArgBasicReq, JB_Macro_ConstructorStr(nil, (JB_LUB[7])));
-		JB_SetRef(SC__Macros_MainArgDefault, JB_Macro_ConstructorStr(nil, (JB_LUB[5])));
+		JB_SetRef(SC__Macros_MainArgBasic, JB_Macro_ConstructorStr(nil, (JB_LUB[5])));
+		JB_SetRef(SC__Macros_MainArgBasicReq, JB_Macro_ConstructorStr(nil, (JB_LUB[6])));
+		JB_SetRef(SC__Macros_MainArgDefault, JB_Macro_ConstructorStr(nil, (JB_LUB[7])));
 		JB_SetRef(SC__Macros_MainArgArray, JB_Macro_ConstructorStr(nil, (JB_LUB[8])));
 		JB_SetRef(SC__Macros_MainArgNoNE, JB_Macro_ConstructorStr(nil, (JB_LUB[12])));
 		JB_SetRef(SC__Macros_ASM_Datatype, JB_Macro_ConstructorStr(nil, (JB_LUB[13])));
@@ -8016,7 +8016,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024060314));
+	JB_FS_AppendInt32(_fsf0, (2024060318));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -32942,6 +32942,9 @@ void SC_Msg_InsertBefore(Message* Self, Message* J, Message* Ch) {
 void SC_Msg_InsertMainArgs(Message* Self, Message* Prms) {
 	JB_String* Usage = SC_Msg_CollectUsage(Prms);
 	Macro* FirstArg = JB_Macro_ConstructorStr(nil, (JB_LUB[10]));
+	if (SC_Msg_MainArgsCanBeZero(Prms)) {
+		JB_Tree_Remove(((Message*)JB_Ring_Last(JB_Macro_Source(FirstArg))));
+	}
 	//using;
 	MessagePosition _usingf0 = JB_Msg_SyntaxUsing(Prms);
 	Array* _tmPf1 = (JB_Array_Constructor0(nil));
@@ -33673,6 +33676,22 @@ Message* JB_Msg_MacroSame(Message* Self, Message* Prm) {
 	JB_SetRef(Rz->Name, Prm->Name);
 	JB_SafeDecr(Rz);
 	return Rz;
+}
+
+bool SC_Msg_MainArgsCanBeZero(Message* Self) {
+	{
+		Message* Dcl = ((Message*)JB_Ring_First(Self));
+		while (Dcl) {
+			Message* _Nf1 = (((Message*)JB_Ring_NextSib(Dcl)));
+			if (!((JB_Msg_EqualsSyx(((Message*)JB_Tree_Second(Dcl)), kJB_SyxRel, false)) or (JB_Msg_EqualsSyx(((Message*)JB_Ring_First(Dcl)), kJB_SyxArr, false)))) {
+				return nil;
+			}
+			Dcl = _Nf1;
+		};
+		;
+	}
+	;
+	return true;
 }
 
 Message* SC_Msg_MainFix(Message* Self) {
@@ -50188,4 +50207,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 5264125212855428248 7172945621315781491
+// 9101879259194606638 -1446033740624683881

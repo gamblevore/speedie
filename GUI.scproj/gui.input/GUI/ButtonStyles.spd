@@ -14,6 +14,7 @@ function image.RoundRectDrawer (GUIDrawEvent)
     || SubX = center.x - (rect.x|float| + CS)
     || SubY = center.y - (rect.y|float| + CS)
     
+    rect = .Clip(rect)
     for Y in rect.Vert
         || Y2 = (Y|float| - center.Y).abs.minus0(suby).Pow2
         || W = self[rect.x, Y]
@@ -38,7 +39,7 @@ function image.ClippedRectDrawer (GUIDrawEvent)
 	|| Lim = (G.CornerSize|float| * 0.5 + 1.0)|int|
 	|| center = rect.Center.iVec2
 	|| Active = g.CornersCut
-	
+
 	for Y in rect.Vert
 		|| W = self[rect.x, Y]
 		|| YCorner = (y >= center.y)

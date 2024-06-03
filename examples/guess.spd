@@ -2,8 +2,8 @@
 // compare this file to the original and see how much smaller (and faster?) it is in speedie!
 https://github.com/contextfreecode/jai-comparisons/blob/main/guess.jai 
 
-main
-	zalgoline "Finished in ${game(100).play}\n\n" // and wierdness
+main (|int| Highest_Number = 100)
+	zalgoline "Finished in ${game(Highest_Number).play}\n\n" // and wierdness
 
 
 class game
@@ -25,7 +25,7 @@ class game
 		
 	function report (|int| guess, |string|)
 		if guess < 1 or guess > .high: return "I said between 1 and $.high!! What would I expect from a ${$1} like you!"
-		if guess == .last: return "you just said $guess you " + $1
+		if guess == .last:  return "you just said $guess you " + $1
 		if guess < .answer: return "too low you " + $1
 		if guess > .answer: return "you " + $1 + " $guess is way too high"
 		return "correct!"

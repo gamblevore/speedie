@@ -93,7 +93,8 @@ function message.Tran_QMark
 		cond.name = "_t"
 		inside.replaceWith(@thg.msg("_t"))
 		tern.prev = MakeDecl("",  "_t", inside)
-	
+
+
 
 function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 	opt norefcounts
@@ -123,7 +124,7 @@ function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 		if MaybeNil
 			arg.AppendMacro(macros.MainArgBasic.clean, prms)
 		  else
-			arg.AppendMacro(macros.MainArgbasicreq.clean, prms)
+			arg.AppendMacro(macros.MainArgbasicReq.clean, prms)
 		return 2
 	name = name[@thg]					#require
 	prms[0] = name
@@ -163,6 +164,14 @@ function message.CollectUsage (|string|)
 	return fs
 
 
+
+function message.MainArgsCanBeZero (|bool|)
+	opt norefcounts
+	for dcl in self
+		require  dcl.second == @rel  or  dcl.first == @arr
+	return true
+
+		
 function message.InsertMainArgs (|message| prms)
 	opt norefcounts
 	|| usage = prms.CollectUsage
@@ -176,9 +185,11 @@ if __ArgCount == 0
 	return 0
 
 `.macro
+	if prms.MainArgsCanBeZero
+		firstarg.Source.last.remove
 
 	using prms
-	.AppendMacro(firstarg, [Usage.msg])
+	.AppendMacro(FirstArg, [Usage.msg])
 	|| i = 0
 	|| Found = 0
 	for ch in prms

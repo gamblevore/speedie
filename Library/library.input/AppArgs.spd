@@ -94,13 +94,13 @@ role JeeboxFile   (file)
 role OutputFile   (faststring)
 
 
-helper @string.MainArgSub (|int| Pos,  |string| name, |string| type,   |stringthatwasreadsafely|)
+helper @string.MainArgSub (|int| Pos,  |string| name,  |string| type,  |stringthatwasreadsafely|)
 	// could remove "pos", and use array.mark?
 	opt norefcounts
-	|| str = app.args[pos]
+	|| str = app.args[pos.abs-1]
 	if str != nil
 		return str
-	if StdErr.ok
+	if (pos >= 0) and StdErr.ok
 		|| usage = app.Usage
 		error "Missing $name ($type).\n\n$usage"
 	return string.Error
