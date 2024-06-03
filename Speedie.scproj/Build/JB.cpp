@@ -1941,7 +1941,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112554826268672));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112554849992704));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -15975,7 +15975,7 @@ AsmReg SC_ASMtmp__BRel(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 }
 
 AsmReg SC_ASMtmp__Continue(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
-	SC_Pac_AddASM1(Self, kSC__ASM_JUMP, Exp, Self->WhileStart - Self->Curr);
+	SC_Pac_RequestOp(Self, 254, Exp);
 	return ((AsmReg)0);
 }
 
@@ -16486,13 +16486,19 @@ AsmReg SC_ASMtmp__While(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 	FatASM* ArgStart = Self->WhileStart;
 	SC_Pac_Get(Self, ((Message*)JB_Tree_Second(Exp)), SC_Reg__New());
 	FatASM* CondStart = Self->Curr;
-	FatASM* GoBackUp = SC_Pac_Branch(Self, ((Message*)JB_Ring_First(Exp)));
-	GoBackUp->R[3] = (Self->Curr - ArgStart);
-	while (ArgStart < GoBackUp) {
+	FatASM* ExitPlace = SC_Pac_Branch(Self, ((Message*)JB_Ring_First(Exp)));
+	ExitPlace->R[3] = (Self->Curr - ArgStart);
+	while (ArgStart < ExitPlace) {
 		//ClearExits;
-		if (ArgStart->Op == 255) {
+		byte Op = ArgStart->Op;
+		if (Op >= 254) {
 			ArgStart->Op = kSC__ASM_JUMP;
-			ArgStart->R[0] = (GoBackUp - ArgStart);
+			if (Op == 254) {
+				ArgStart->R[0] = (CondStart - ArgStart);
+			}
+			 else {
+				ArgStart->R[0] = (ExitPlace - ArgStart);
+			}
 		}
 		(++ArgStart);
 	};

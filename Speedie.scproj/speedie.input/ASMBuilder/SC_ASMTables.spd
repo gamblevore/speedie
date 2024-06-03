@@ -118,23 +118,21 @@ function While			(fn_asm)
 	opt norefcounts
 	debugger
 	.WhileStart = .curr
-	.AddASM(asm.JUMP, exp)				// jump to end... THEN EMIT arg and jump back.
-	|| ArgStart = .WhileStart
-	.µ(exp.second!)						// arg
-	|| CondStart = .curr				// right?
-	|| ExitPlace = .branch(exp.first!)	// cond
-	ExitPlace.r[3] = .curr - ArgStart
+	.AddASM(asm.JUMP, exp)						// jump to end... THEN EMIT arg and jump back.
+	|| Jumper = .WhileStart
+	.µ(exp.second!)								// arg
+	|| CondStart = .curr						// right?
+	|| ExitPlace = .branch(exp.first!)			// cond
+	ExitPlace.r[3] = .curr - Jumper
 
-	while ArgStart < ExitPlace
+	while Jumper < ExitPlace
 		#!ClearExits
-		|| op = ArgStart.Op
-		if op >= 254 // exit/continue
-			ArgStart.op = ASM.Jump
-			if op == 254
-				ArgStart.r[0] = CondStart - ArgStart
-			  else
-				ArgStart.r[0] = ExitPlace - ArgStart
-		ArgStart++
+		|| op = Jumper.Op
+		if op >= 254							// exit/continue
+			Jumper.op = ASM.Jump
+			|| oof = (condstart, exitplace)(op==254)
+			Jumper.r[0] = oof - Jumper
+		Jumper++
 
 
 function Exit			(fn_asm)
