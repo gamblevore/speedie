@@ -653,6 +653,7 @@ module SDLApp
 		
 		|| occured = .PreFrame
 		.ClearAlerts
+		.CheckKeyMods
 		.HandleAppResize
 		.PostLoads
 		occured |= .FrameAndEvents
@@ -871,15 +872,17 @@ module SDLApp
 		|| New = .SDL_GetModState
 		.KeyMod = New
 		
-		#!Work around some SDL bug... the cmd-key seems to get sticky sometimes
-		// only the cmd-key! not even shift or control!
+		#!Work around some SDL bug... the cmd-key (not shift or ctrl) gets sticky sometimes
 		if ((Old xor New) is cmd)
 			if new is cmd
 				.CmdReleaseDate = date.now + 5s
 			  else
 				.CmdReleaseDate = 0
 		  elseif .CmdReleaseDate.Fired
-			.SDL_SetModState(New&~sdl_keymod.cmd)
+			.CmdReleaseDate = 0
+			New &= ~sdl_keymod.cmd
+			.keymod = new
+			.SDL_SetModState(New)
 
 
 	function CheckEvent (|&SDL_Event| ev, |int|)

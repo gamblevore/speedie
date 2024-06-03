@@ -5,12 +5,12 @@ datatype SDL_KeyMod (int)
 		wrapper
 		cpp_class SDL_Keymod
 		cpp_part KM
-
-	syntax cast (|bool|)
-		return (self|uint|) & (sdlapp.keymod|uint|)
 	
+	syntax access (|bool|)
+		return (self|uint|) & (sdlapp.keymod|uint|)
+
 	syntax is (|sdl_keymod| k, |bool|)
-		return self&k
+		return (self & k) != 0
 		
 	constants
 		|SDL_KeyMod|
@@ -166,10 +166,10 @@ dataType Keys (int) {
 					return i
 
 		function Cmd (|bool|)
-			if SDL_KeyMod.ctrl
+			if SDL_KeyMod.ctrl[]
 				return true
 			target osx
-				return SDL_KeyMod.cmd
+				return SDL_KeyMod.cmd[]
 			
 			
 		function CmdAgo (|date| ago, |bool|)
@@ -180,25 +180,25 @@ dataType Keys (int) {
 				return keys.LGUI.HeldKey(ago) or keys.RGUI.HeldKey(ago)
 
 		function RealCmd (|bool|)
-			return SDL_KeyMod.cmd
+			return SDL_KeyMod.cmd[]
 
 		function PlatCmd (|bool|yes=true,|bool|)
 			if platform.osx==yes
-				return SDL_KeyMod.cmd
+				return SDL_KeyMod.cmd[]
 			  else
-				return SDL_KeyMod.ctrl
+				return SDL_KeyMod.ctrl[]
 
 		function Control (|bool|)
-			return SDL_KeyMod.ctrl
+			return SDL_KeyMod.ctrl[]
 
 		function Shift (|bool|) 
-			return SDL_KeyMod.shift			
+			return SDL_KeyMod.shift[]		
 
 		function Cancel (|bool|) 
 			return (cancelkey or escape or AC_BACK)
 
 		function Option (|bool|) 
-			return SDL_KeyMod.option		
+			return SDL_KeyMod.option[]		
 
 
 	constants
