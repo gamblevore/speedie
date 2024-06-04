@@ -36,9 +36,9 @@ What if we made a "temporal VM". This is where we basically use our code for art
 
 Basically, we record the amount of time it takes for your code to run, per-instruction. Running your code will now generate a large amount of fresh data. *(This entire thing will be an optional feature).*
 
-Because the CPU is a physical thing... the amount of **time** it takes to do anything is unpredictable. No matter what input is given... the output can't be mathematically predicted.
+Because the CPU is a physical thing... the amount of **time** it takes to do anything is unpredictable. No matter what input is given... the output can't be mathematically predicted. That is because it comes from the soul... or at least why not? Why not use your willpower to change the effects of the dice-roll? Thats what most dungeons and dragons players believe in anyhow (hahaha).
 
-This can be used to create interesting textures or patterns that come out of the heart of your CPU's inner world... Or be used for "electronic divination", perhaps even "mind-machine-interfaces", art. Or randomness input for games and more.
+This temporal output can be used to create interesting textures or patterns that come out of the heart of your CPU's inner world... Or be used for "electronic divination", perhaps even "mind-machine-interfaces", art. Or randomness input for games and more.
 
 The best example of this is like when you are playing a computer game, and the RNG just happens to create some very annoying or funny event for you.
 
