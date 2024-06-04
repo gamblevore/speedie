@@ -36,7 +36,7 @@ What if we made a "temporal VM". This is where we basically use our code for art
 
 Basically, we record the amount of time it takes for your code to run, per-instruction. Running your code will now generate a large amount of fresh data. *(This entire thing will be an optional feature).*
 
-Because the CPU is a physical thing... the amount of **time** it takes to do anything "random" and unpredictable. No matter what input is given... the output can't be mathematically predicted.
+Because the CPU is a physical thing... the amount of **time** it takes to do anything is unpredictable. No matter what input is given... the output can't be mathematically predicted.
 
 This can be used to create interesting textures or patterns that come out of the heart of your CPU's inner world... Or be used for "electronic divination", perhaps even "mind-machine-interfaces", art. Or randomness input for games and more.
 
