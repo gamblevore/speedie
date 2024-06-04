@@ -475,10 +475,11 @@ datatype ivec2
 			return 1
 		if (Lsq < osq)
 			return -1
-//	function Rnd (|ivec2|)
-//		|int| cw = random[0.0, .x, 1.0]
-//		|int| ch = random[0.0, .y, 1.0]
-//		return (cw, ch)
+
+	syntax access (|ivec2|) // speedrogue uses this
+		|| cw = random[0.0, .x|float|, 1.0]
+		|| ch = random[0.0, .y|float|, 1.0]
+		return (cw, ch).iVec2
 
 	syntax cast (|intrange|)
 		return self|intrange|
@@ -559,7 +560,7 @@ datatype ivec2
 
 	syntax Equals (|int| v, |bool|Aware, |bool|)
 		return (.x == v) and (.y == v) 
-
+		
 	render
 		fs <~ "(${.x}, ${.y})"
 	

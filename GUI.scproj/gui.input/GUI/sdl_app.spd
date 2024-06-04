@@ -1035,6 +1035,8 @@ module SDLApp
 	
 	helper KeyDownEvent (|&SDL_Event| ev, |window| w, |int|)
 		#!keydown!
+		if .CmdReleaseDate
+			.CmdReleaseDate = date.now + 5s
 		|| kev = ev.keysym
 		|| key = kev.sym
 		if key.IsCancelled or .CanDrag >= mousedragging.Within

@@ -15,7 +15,7 @@ role RogueObject (Message)
 		
 	function TryAttack (|RogueCell| cell, |bool|)
 		|| mon = cell.monster #require
-		|int| dmg = .ATK * random[0.7, 1.5]  -  mon.DEF * random[0.2, 1.0]
+		|int| dmg = (.ATK|float| * random[0.7, 1.5]  -  mon.DEF|float| * random[0.2, 1.0])|int|
 		|int| LIF = mon.hp - (dmg max 0)
 		mon.HP = LIF
 		.DescribeAttack(mon, dmg)
@@ -69,7 +69,7 @@ role RogueObject (Message)
 		|| r = 7
 		for V.rect in (-r, -r, r, r)
 			|| cell = map[v+pos]
-			if !cell or v > r
+			if !cell or v > r|float|
 				0
 			  elseif IsPlayer
 				cell.flags |= RogueCellState.Discovered
@@ -221,9 +221,9 @@ function LoadLevel (|int| i)
 		for cell in row.arg
 			.data <~ cell
 	.player = info.GameBank..classes[]!.copy
-	.Player..max = .Player..health!.copy
+	.Player!..max = .Player!..health!.copy
 	|| Wep = info.GameBank..weapons.filter(.player.strength)[]
-		.Player..weapon = wep.copy
+		.Player!..weapon = wep.copy
 	
 
 function IsRoomOK (|ivec4| i, |bool|)
@@ -238,9 +238,9 @@ function OKSize (|ivec4|)
 			return RoomSize
 
 function RndSize (|ivec4|)
-	|| c1 = .size.rnd
-	|int| w = random[5, 25, 1]+2
-	|int| h = random[4, 15, 1]+2
+	|| c1 = .size()
+	|int| w = (random[5, 25, 1]+2.0)|int|
+	|int| h = (random[4, 15, 1]+2.0)|int|
 	|| c2 = c1 + (w,h)
 	if c2.x >= .size.x // reflect room size back inwards if too far
 		c2.x = c1.x
@@ -327,10 +327,10 @@ function CanConnect (|rogueroom| r, |ivec2| p, |ivec2| d, |bool| AllowCoridoors=
 
 function ConnectRoom (|rogueroom| r)
 	|| n = 5 * r.size.area/(25*15)
-	|| needed = random[1, n, 1]|int|
+	|| needed = random[1.0, n|float|, 1.0]|int|
 	|| ToTest = r.size.EdgeLength
 	for 1000
-		|| Cell = r.size.Edge(Random[0, ToTest])
+		|| Cell = r.size.Edge(Random[0.0, ToTest|float|]|int|)
 		if .CanConnect(r, cell.xy, cell.x2y2)
 			.Connect(cell.xy, cell.x2y2)
 			needed--
@@ -540,7 +540,7 @@ function FrameStep
 
 function Heal
 	.Healing <~ 12th
-	.Player <~ .Healing[]
+	.Player! <~ .Healing[]
 	
 	
 function DrawMap
@@ -559,11 +559,12 @@ function Splash
 	for secs in 10s
 		Terminal.DrawRect((0, 0, terminal.w, h))
 		for i in 5.0
-			|| Title = " <3 SpeedRogue ".Rotate(i + secs*3)
+			|| Title = " <3 SpeedRogue ".Rotate((i + secs*3.0)|int|)
 			|| f = i*1.234 + secs*(0.33+i*0.05)
-			|int| x = (1.5*f/scale).bounce * (Terminal.w-(title.length+2))
-			|int| y = f.bounce*(h-2)
-			Terminal <~ (Title, (x+1, y+1), terminal.Red+i)
+			|int| x = ((1.5*f/scale).bounce * (Terminal.w-(title.length+2))|float|)|int|
+			|int| y = (f.bounce*(h|float|-2.0))|int|
+			|| col = (terminal.Red+i|int|)|terminalcolor|
+			Terminal <~ (Title, (x+1, y+1), col)
 
 		|| title2 = "Welcome to SpeedRogue"
 		|| x2 = (terminal.w - title2.length) / 2

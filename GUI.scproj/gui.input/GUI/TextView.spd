@@ -218,7 +218,7 @@ class TextView (GUIControl)
 			return 0
 		
 		ifn .lastrect.vert contains p.y
-			.show(b, sdleventtype.MOUSEMOVE)
+			.show(b, textviewjumpmode.slowscroll)
 			rz = mousedragging.EvenIfNoMovement
 		
 		|| t = ._UncorrectedSel
@@ -466,8 +466,8 @@ class TextView (GUIControl)
 			.ShowAndSel(d.position)
 
 	
-	function Show (|int| x, |sdleventtype| Reason=0,  |TextViewLine|)
-		return .ViewPos(x, .MaxVisibleLines/3, 0, reason)
+	function Show (|int| x, |TextViewJumpMode| Mode=0,  |TextViewLine|)
+		return .ViewPos(x, .MaxVisibleLines/3, 0, mode)
 	
 	
 	function MarkAsFound (|message| Where)
@@ -479,22 +479,24 @@ class TextView (GUIControl)
 
 	function ShowAndSel (|int| P, |int| length=0, |bool| Explode=false, |textviewline|)
 		opt NoRefCounts
-		rz = .show(P)
+		rz = .show(P, textviewjumpmode.wantagoodview)
 		.SelDirect((P, P + length), rz)
 
 		if explode
 			.Doexplode(rz, 2.0)
 
 
-	helper ViewPos (|int| x, |int| before, |int| back, |sdleventtype| reason,   |TextViewLine|)
+	helper ViewPos (|int| x, |int| before, |int| back, |TextViewJumpMode| Mode=0,   |TextViewLine|)
 		opt NoRefCounts
 		|| i	= 0
 		|| d	= .FindDrawInfo(x, i)
 		before = before.abs
-		|| lim = .MaxVisibleLines - (back + before/2)
+		if mode is wantagoodview
+			back += before/2
+		|| lim = .MaxVisibleLines - back
 		if i inrange lim
 			return d
-		.StartLine(reason) = d.movecapped(-before) 
+		.StartLine(mode) = d.movecapped(-before) 
 		sdlapp.touch(self)
 		return d
 
@@ -518,7 +520,7 @@ class TextView (GUIControl)
 		opt norefcounts		
 		|| t = ._typingplace
 		x = .Clamp(x)
-		|| d = .ViewPos(x, before, 2, 0) // idk
+		|| d = .ViewPos(x, before, 2) // idk
 			
 		if keys.shift
 			t.x2 = x
@@ -585,7 +587,7 @@ class TextView (GUIControl)
 			require range.x >= 0
 		
 		.SelDirect(range, nil)
-		.ViewPos(range.x, .MaxVisibleLines/2, 2, 0)
+		.ViewPos(range.x, .MaxVisibleLines/2, 2)
 		return true
 			
 	
@@ -1692,9 +1694,9 @@ class TextView (GUIControl)
 		return ._Start
 	
 	
-	helper StartLine (|sdleventtype| reason=0, assigns:|TextViewLine| d)
+	helper StartLine (|TextViewJumpMode| mode=0, assigns:|TextViewLine| d)
 		cpp_part StartAtLine
-		.StartWithoutScrollDraw(reason) = d
+		.StartWithoutScrollDraw(mode) = d
 		.bumpscroll
 	
 	
@@ -1721,11 +1723,11 @@ class TextView (GUIControl)
 			rz = curr		
 	
 	
-	helper StartWithoutScrollDraw (|sdleventtype| reason=0, assigns:|TextViewLine!| d)
+	helper StartWithoutScrollDraw (|TextViewJumpMode| mode=0, assigns:|TextViewLine!| d)
 		opt norefcounts
-		if reason is mousemove
+		if mode is slowscroll
 			d = d.SlowMove(._Start, 2)
-		  else
+
 		|| last = ._lines.last!.movecapped(3 - .MaxVisibleLines)!
 		
 		if d.position > last.position
@@ -2127,3 +2129,13 @@ extend Window
 		rz.GNormal.Edge <~ (0,0,0,0)
 		rz.Size = (3~right for 89)  by 18~down
 		
+
+datatype TextViewJumpMode (int)
+	linkage: numeric false
+	flags
+		|TextViewJumpMode|
+		Nothing = 0
+		SlowScroll
+		WantAGoodView
+	syntax is (|TextViewJumpMode| m, |bool|)
+		return self|int| & m|int|
