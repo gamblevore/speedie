@@ -194,7 +194,3 @@ function uint64.LongestBitStretch (|ivec2|)
 // OK now what? where is the range? we really want the last value!
 // whhere does the range start/end?
 
-extend FatASM
-	setter Debug (|message|)
-		.filenum = value.FileNum
-		.Bytepos = value.position

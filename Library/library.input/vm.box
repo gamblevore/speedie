@@ -41,22 +41,6 @@ forms
 		Rot		6
 		Inv		1
 		Value	12
-	
-	ConstStretchy
-		r1		r
-		Cond	1	// 0 == always, 1 = only if dest == 0
-		Inv		1
-		Value	16
-		Prm1	x
-		Prm2	x
-	
-	Setn
-		r1		r
-		Cond	1	// 0 == always, 1 = only if dest == 0
-		Inv		1
-		Value	16
-		Prm1	x
-		Prm2	x
 
 	Bra		// bra:
 		r1		r
@@ -128,7 +112,11 @@ forms
 		r1		r
 		r2		r
 		High	14
-	
+
+
+// Can (should?) we reduce this down to 5 values?
+// I could merge cond/inv. 		// as for floataddexp... perhaps merge shifts?
+
 	FloatAddExp
 		r1		r
 		r2		r
@@ -137,6 +125,13 @@ forms
 		Sh3		4
 		D		1
 	
+	ConstStretchy
+		r1		r
+		Cond	1	// 0 == always, 1 = only if dest == 0
+		Inv		1
+		Value	16
+		Prm1	x
+		Prm2	x
 
 
 // this file:
@@ -317,14 +312,15 @@ forms
 		___
 		i1 += Bra_c1u-1
 
-/**/ LUPU  ("rrj")				// assume uint64
-		__
-		if (i1++ < i2)
-			Code -= U2_Lu
-		___
 /**/ LUPD  ("rrj")			 	// same
 		__
 		if (i1-- > i2)
+			Code -= U2_Lu
+		___
+
+/**/ LUPU  ("rrj")				// assume uint64
+		__
+		if (i1++ < i2)
 			Code -= U2_Lu
 		___
 

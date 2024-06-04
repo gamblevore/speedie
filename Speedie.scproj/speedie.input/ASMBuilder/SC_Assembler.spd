@@ -76,7 +76,7 @@ module SpdAssembler
 				exit
 			require ASMState.ExpandJSM
 		
-		while .Optimise(fn)
+		while .Optimise(fn.asm!)
 			fn.OptCounts++
 			expect (fn.optcounts < 16) (fn, "Optimisation is not stopping".internal)
 		.FlowControl

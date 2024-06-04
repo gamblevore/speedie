@@ -130,15 +130,15 @@
 ;
 	___;
 	i1 += Bra_c1u - 1;
-ı LUPU: 
-	__;
-	if (i1++ < i2) 
-	Code -= U2_Lu
-;
-	___;
 ı LUPD: 
 	__;
 	if (i1-- > i2) 
+	Code -= U2_Lu
+;
+	___;
+ı LUPU: 
+	__;
+	if (i1++ < i2) 
 	Code -= U2_Lu
 ;
 	___;

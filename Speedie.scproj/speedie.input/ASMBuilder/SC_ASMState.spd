@@ -4,8 +4,7 @@
 
 struct ASMState
 	linkage: cpp_part Pac
-	|uint16| 					BlockNum
-	|uint16| 					ParentBlock
+//	|uint16| 					ParentBlock
 	|datatypecode|				ReturnType
 	|bool|						OK    
 	|bool|						Inited   
@@ -119,8 +118,8 @@ struct ASMState
 			.curr = p + 1
 			P.op = code
 			p.debug = dbg
-			p.BlockNum = .BlockNum
-			p.ParentBlock = .ParentBlock
+//			p.BlockNum = .BlockNum
+//			p.ParentBlock = .ParentBlock
 			return p
 		if .OK
 			error "ASM is out of memory."
@@ -325,6 +324,8 @@ function ASMState.InitState (|scfunction| fn)
 	.ok  = true
 	.vdecls = 0
 	.vtmps = 0
+//	.BlockNum = 1
+//	.ParentBlock = 0
 	.AddFuncParams(fn)
 
 

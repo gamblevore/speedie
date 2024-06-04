@@ -96,29 +96,39 @@ function InitAccess
 
 
 function Debugger		(fn_asm)
-	.addasm(asm.TRAP, exp)
+	if Options.targetdebug
+		.addasm(asm.TRAP, exp) // nice!
 
 
 function If				(fn_asm)
 	opt norefcounts
 	debugger
 	
-	|| cond = exp.first!
-	|| arg = cond.next!
-	|| F = arg.first			
+	|| cond = exp.first!,  || arg1 = cond.next!
+	|| Else = arg1.next!,  || arg2 = else.first
+	|message| ElseIfCond
+	if arg2 and arg2 != @arg
+		ElseIfCond = arg2
+		arg2 = arg2.next
+
 	|| Start = .Branch(cond)
-	.µ(arg)
-	|| ElseIf = arg.next
-		if mode // what?
-		IF(self, elseif, asmreg(), 1)
-	Start.r[3] = (mode + .curr) - Start
+	.µ(arg1)
+	|| AfterFirst = .AddASM(asm.jump, arg1) // marks as ended... to prevent opts. can be removed later during optimisation
+	if ElseIfCond or arg2.HasAny
+		if ElseIfCond
+			IF(self, elseifcond, asmreg())
+		  else
+			ARG(self, arg2)
+		AfterFirst.r[3] = .curr - afterfirst
+	Start.r[3] = .curr - Start
+
 	
 	
 function While			(fn_asm)
 	opt norefcounts
 	debugger
-	.WhileStart = .curr
-	.AddASM(asm.JUMP, exp)						// jump to end... THEN EMIT arg and jump back.
+//	.AddASM(asm.EROR, exp)						// allow for lupu/lupd?
+	.WhileStart = .AddASM(asm.JUMP, exp)		// jump to end... THEN EMIT arg and jump back.
 	|| Jumper = .WhileStart
 	.µ(exp.second!)								// arg
 	|| CondStart = .curr						// right?

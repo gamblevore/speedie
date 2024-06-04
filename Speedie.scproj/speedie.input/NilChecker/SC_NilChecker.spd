@@ -22,6 +22,7 @@ extend_module ArchonPurger {
 		@num:	Number
 		@char:	Char
 		(asmtmp.kif):			If
+		(asmtmp.kdebugger):		ignore
 		(asmtmp.kWhile):		While
 		(asmtmp.kContinue):		Continue
 		(asmtmp.kExit):			Exit
@@ -29,7 +30,6 @@ extend_module ArchonPurger {
 		(asmtmp.kStatExpr): 	StatExpr
 		(asmtmp.kReturn):		Return
 		(asmtmp.kTern):			Tern
-		(asmtmp.kDebugger):		Debugger
 		(asmtmp.kPointer):		Pointer
 		(asmtmp.kIgnore):		Ignore
 		(asmtmp.krejoin):		Rejoin
@@ -611,15 +611,9 @@ function SetRel (NilTrackerfn)
 
 
 function Fail (NilTrackerFn)
-	target debug: if msg != @tmp
 	.OldPrint = error.autoprint 
 	error.AutoPrint = 0
 	return nilstate.borked
-
-
-function Debugger (NilTrackerFn)
-	target debug: if msg != @tmp
-	// do nothing :)
 
 
 function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where, |scfunction| f, |nilstate| v)

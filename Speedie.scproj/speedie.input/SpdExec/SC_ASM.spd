@@ -8,6 +8,8 @@ datatype ASM (uint)
 		visible
 		cpp_name ASMPrint
 
+	function Op (|int|)
+		return self >> 24
 	function R1 (assigns:|uint|, |asm|)
 		return self ||| (value << 27) >> 8
 	function R2 (assigns:|uint|, |asm|)

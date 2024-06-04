@@ -1,17 +1,32 @@
 
 
-// what about inlining?
+// inlining do separately
 
-//		* if a==b+c
-//			debugger // remove entire thing
+// dead code removal... IDK?
+// "sing like your life depended on it"
+// yeah sounds so fake. as if everrrr.....
+// if (a+b==x)
+	//// do nothing
+// a = b
 
 
-function SpdAssembler.Optimise (|scfunction| fn, |bool|)
-	opt norefcounts
-	|| raw = fn.ASM$
+function SpdAssembler.MarkBlocks (|&FatASM| curr, |int| length,   |bool|)
+	|| first = asm.JUMP.op
+	|| last = asm.LUPu.op
+	|| B = 1
+	for i in length
+		curr.BlockNum = b
+		|| op = curr.op
+		if (op >= first and op <= last)
+			B++
+
+	
+function SpdAssembler.Optimise (|µfunc| raw, |bool|)
 	|| Curr = raw.IR
 	|| length = raw.length
 	if curr[-1].op or curr[length-1].op // bad
+
+	.MarkBlocks(Curr, length)
 
 	for i in length
 		|| x = (µOpt[i])
@@ -39,7 +54,7 @@ dispatch µOpt (|&fatasm| self, |&fatasm| write, |int|)
 BFLG
 	if (BFLD_Lu)
 		i1 = ((i2 << BFLD_upu) >> BFLD_downu)
-	else
+	  else
 		u1 = ((u2 << BFLD_upu) >> BFLD_downu)
 
 BFLS
@@ -70,4 +85,14 @@ BFLS
 	(ASM.JMPN):    {}
 	(ASM.JMPE):    {}
 	255:  {}
+
+
+
+
+extend FatASM
+	setter Debug (|message|)
+		|| fn = Value.FileNum
+		if fn >= 4096
+			fn = 0 // sigh
+		.Location = fn ||| Value.Position << 12 // 4K max files
 
