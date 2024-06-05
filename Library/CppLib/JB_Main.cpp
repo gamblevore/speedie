@@ -7,5 +7,7 @@
 
 extern "C" int JB_SP_Run (const char** args, int Mode);
 extern "C" int main (int count, const char** args) {
+	float x = 1.0;
+	x = x << 1;
     return 255 & JB_SP_Run(args, 3);
 }

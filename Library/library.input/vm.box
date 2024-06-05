@@ -146,6 +146,9 @@ forms
 		// all 0000 means no-op
 		if (n1 or U1_Lu)
 			return u1+U1_Lu
+/**/ NOOP (U0)
+	0
+	// does nothing
 
 /**/ TRAP (Trap)
 		if (Trap_Signalu)
@@ -208,14 +211,14 @@ forms
 
 
 #!						 (((((Math)))))
-/**/ ADD  (U3)
-		i1 = i2 + (i3 << L3) // only need 6 bits for shift! can we save 3 conditional add?
 /**/ ADDK ("rrnl")
 		i1 = i2 + U2_Li
 /**/ ADPK ("rrnl")
 		i1 = i2
 		i2 = i2 + U2_Li
-/**/ SUBB  (U3)
+/**/ ADD  (U3)
+		i1 = i2 + (i3 << L3) // only need 6 bits for shift! can we save 3 conditional add?
+/**/ SUBB  (U3)              // must come after ADD
 		i1 = i2 - (i3 << L3)
 /**/ MULT  (U4)
 		i1 = (i2 * i3) + i4
@@ -234,7 +237,7 @@ forms
 /**/ BAND  (U3)
 		u1 = u2 &  (u3|||L3)
 /**/ BOAR  (U3)
-		u1  |= (u2|||u3)
+		u1  = (u2|||u3)&~u4
 /**/ BXOR  (U3)
 		u1 = u2 ^ u3
 /**/ BXNR  (U3)		// for A = ~B

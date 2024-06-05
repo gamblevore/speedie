@@ -17,59 +17,7 @@ extend ASMState
 		rz.expectlast
 
 		
-	function NumToReg (|int64| V, |message| exp, |int| Reg)
-		.AddASM(asm.KNST, exp, reg, (V << 32) >> 32, V>>32, -1, -1)
-		.consts[reg] = v
 
-
-	function NumToEgg (|int64| V, |message| exp, |asmreg|)
-		rz = .TempMe(exp)
-		.NumToReg(v, exp, rz)
-
-		
-	
-	function FatASM.FixConst
-		|| V = .r[1]|uint64| << 32
-		V |= 0
-		|| Inv = V|uint64|.countbits > 32 
-			V = ~V
-		|| R = (~V|uint64|).LongestBitStretch	// longest false-stretch
-		if r.x >= 50		// OK so we have the longest stretch in r.x
-			V = V rotl 63-r.y
-			.r[2] = inv|int|
-			.r[3] = V|int|
-			return
-
-		debugat
-		|| signed = (v|int64| < 0)|int|
-			v = ~v
-
-		.op = asm.KNST
-		.r[1] = 0
-		.r[2] = signed
-		.r[3] = v|int|
-		if v >= (1 << 48)
-			if v >= 64K
-				//.op = asm.setn2
-				.r[3] = v >> 32
-				.R[4] = v & 0xFFFFffff
-			  else
-				//.op = asm.setn3
-				.r[3] = 0
-				.R[4] = v >> 32
-				.R[5] = v & 0xFFFFffff
-				
-			
-	function SetConst (|Message| List,  |message| Orig,  |bool|)
-		opt norefcounts								// set1: r1, 123
-		|| RegMsg = list[@thg]				#require
-		|| ValMsg = regmsg.Next				#require
-		|| Value  = ValMsg.ASMConst
-		
-		.NumToReg(value, orig, RegMsg.reg)
-		return true
-	
-	
 	function TextInstruction (|message| m)
 		if !.TextOp(m)
 			debugat // retry
@@ -162,35 +110,4 @@ extend ASMState
 			  else
 				.TextInstruction(ch)
 		return .LoadLabelJumps
-
-
-function message.ASMConst (|uint64|) 
-	opt norefcounts
-	if (self == @unit)
-		.expect(@nil, "d")$
-		return .first.float.AsInt
-	.expect(@num)$
-	if (.name contains '.')
-		return .float32.asint
-	return .int
-
-
-function uint64.LongestBitStretch (|ivec2|)
-	if self == -1
-		return (64,0)
-	|uint64| last
-    while self
-		last = self
-        self &= self rotl 1
-		rz.x++
-	rz.y = last.log2
-	
-
-// how to tell where the range is? we only know how long it is?
-
-// 0101010000000000101010101-->
-// 1010101111111111010101010
-// 0000001111111110000000000
-// OK now what? where is the range? we really want the last value!
-// whhere does the range start/end?
 

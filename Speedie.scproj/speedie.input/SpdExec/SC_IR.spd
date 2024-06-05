@@ -15,17 +15,35 @@ struct FatASM
 	
 	function BytePos (|int|)
 		return .Location >> 12
-	
-	operator isa (|int| m, |bool|)
-		return m == .op
-	
-//	syntax is (|asm| a, |bool|)
-//		return .op == a.op
 		
-	function PrevInBlock (|asm| op, |&FatASM|)
+	operator isa (|int| m, |bool|)
+		nil checker
+		if self
+			return m == .op
+
+	syntax is (|int| m, |bool|)
+		nil checker
+		if self
+			return m == .op
+	
+	function Swap (|int| a, |int| b)
+		|| t = .r[a]
+		.r[a] = .r[b]
+		.r[b] = t
+	
+	function Prev (|&FatASM|)
 		|| p = self - 1
-		if (p.BlockNum == .BlockNum) and p.op == op.op
+		if p.BlockNum == .BlockNum
 			return p
+		
+	function Next (|&FatASM|)
+		|| p = self + 1
+		if p.BlockNum == .BlockNum
+			return p
+	
+	function Nop (|int|)
+		.op = asm.noop
+		return 2
 		
 	function Renda (|FastString| fs)
 		opt norefcounts

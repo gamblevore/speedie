@@ -63,9 +63,11 @@ module SpdAssembler
 		|| A = fn.SourceArg!
 		(fp)(ASmState.Sh, A, R)
 		ASMState.Sh.FinishASM
-		ASMState.sh.AddASM(ASM.EROR, fn.source!|message|)
+		self <~ asm.NOOP
 
-
+	syntax append (|asm| A)
+		ASMState.sh.AddASM(A, compiler.InternalFile.ast!)
+	
 	
 	function Vacuum (|scfunction| fn, |bool|)
 		opt norefcounts

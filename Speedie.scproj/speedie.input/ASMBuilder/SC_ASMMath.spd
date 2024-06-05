@@ -156,14 +156,18 @@ extend ASMState
 			return .assign(dest, l, asmreg(), exp)
 		
 		if r.fourbytes
-			return .quickfloatop(asm.FADK, exp, dest, l, r)
+			|| k = .Consts[r.reg]
+			if (k >> 18) << 18 != k
+				debugger, #!hmmm. const-optimiser/renderer will handle it, but lets check to make sure
+			.AddASM(asm.fadk, exp, dest, l, k)
+			return dest
 
 
 	function QuickFloatOp (|&asmstate| self, |asm| Op, |message| exp, |asmreg| dest, |asmreg| l, |asmreg| r, |asmreg|)
-		|| x = .consts[r.reg]							// how can we test this?
+		|| x = .consts[r.reg]
 		|| y = x >> 18
 		if x == y << 18
-			.AddASM(op, exp, dest, l, y)
+			.AddASM(op, exp, dest, l, .consts[r.reg])
 			return dest
 
 		
@@ -357,10 +361,22 @@ extend ASMState
 	function ROR    (fn_opasm)
 		.AddASM(asm.BROR, exp, dest, L, R), return dest
 	
+	function ConstForShift (|asmreg| r, |int| btc, |message| exp,  |int64|)
+		rz = self[r][] #debug_require
+		if rz < 0
+			error (exp, "Can't negative shift")
+		  elseif rz >= btc
+			error (exp, "Shift too large for type")
+		
+		
 	function SHR    (fn_opasm)
-		|| up = 64 - l.bitcount
+		if !r.Reg
+			return l
+		|| btc = l.bitcount
+		|| up = 64 - btc
 		if r is ConstAny
-			|| sh = self[r][0]
+			|| sh = .ConstForShift(r, btc, exp)
+			if !sh: return l // what?
 			if l.signed
 				.AddASM(asm.BFLG, exp, dest, l, up, sh+up)
 			  else
@@ -372,8 +388,19 @@ extend ASMState
 			FAT.r[3] = up
 		return dest
 	
+	
 	function SHL    (fn_opasm)
+		if !r.Reg
+			return l
+		|| btc = l.bitcount
+		|| up = 64 - btc
+		if r is ConstAny
+			|| sh = .ConstForShift(r, btc, exp)
+			if !sh: return l // what?
+			.AddASM(asm.BFLG, exp, dest, l,  sh, 0, 1)
+			return dest
 		.AddASM(asm.BLUE, exp, dest, L, R), return dest
+	
 	
 	function Assign (fn_opasm)
 		return .bitor(dest, l, asmreg(), exp)

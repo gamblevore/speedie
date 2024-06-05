@@ -17,6 +17,8 @@
 	__;
 	Code = TailStack(r, Code, Op);
 	___;
+ı NOOP: _
+	0;
 ı TRAP: _
 	if (Trap_Signalu) 
 	JB_App__SelfSignal(Trap_Lu)
@@ -41,13 +43,13 @@
 	Conv(r, n2, Op);
 ı KSTR: _
 	RotateConst(r, Op);
-ı ADD: _
-	i1 = i2 + (i3 << L3);
 ı ADDK: _
 	i1 = i2 + U2_Li;
 ı ADPK: _
 	i1 = i2;
 	i2 = i2 + U2_Li;
+ı ADD: _
+	i1 = i2 + (i3 << L3);
 ı SUBB: _
 	i1 = i2 - (i3 << L3);
 ı MULT: _
@@ -63,7 +65,7 @@
 ı BAND: _
 	u1 = u2 & (u3 | L3);
 ı BOAR: _
-	u1 |= (u2 | u3);
+	u1 = (u2 | u3) & ~u4;
 ı BXOR: _
 	u1 = u2 ^ u3;
 ı BXNR: _

@@ -61,14 +61,18 @@ struct ASMState
 	
 	function AddConstant (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
 		if dest.isint
-			if value.CanStoreAsIntImmediate
+			if Value.CanInt32
+//			if value.CanStoreAsIntImmediate
+//  make the ADDK renderer or const-optimiser deal with too big values.
 				.AddASM(asm.ADDK, exp.parent!, dest, src, Value)
 				return dest
-		  elseif dest.FourBytes and value|uint64|.CanStoreAsFloatImmediate
-			.AddASM(asm.FADK, exp.parent!, dest, src, Value)
-			return dest
+		  elseif dest.FourBytes
+// same
+			if value.CanFloat32
+				.AddASM(asm.FADK, exp.parent!, dest, src, value)
+				return dest
+			debugger // how is this possible? we are adding a 64 bit float to a 32-bit?
 		debugat
-
 		|| where = .NumToEgg(value, exp)
 		return .Plus(dest, src, where, exp)
 		
@@ -149,31 +153,6 @@ struct ASMState
 		error (where, "No free local variables.")
 
 
-//	function OpenTmps (|int|)
-//		return .vtmps
-
-
-//	function CloseTmps (|int| Old)
-//		pragma inline
-//		.vtmps  = old
-//
-//	function CloseVars (|int| Old)
-//		pragma inline
-//		.vdecls  = old
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	function Branch (|message| cond,  |&fatasm|)
-		|| dest = asmreg.newCondRequest
-		.WithinBranch++
-		|| Src = .µ(cond, dest)
-		.WithinBranch--
-		if Src isnt cond
-			(dest is negate) = (src isnt AlreadyNegated)
-			.equals(dest, dest, src, cond)
-		return .curr - 1
-	
-	
 	function FindConst (|uint64| Code, |asmreg|)
 		if Code
 			return asmreg()
@@ -187,7 +166,19 @@ struct ASMState
 				return i.reg as asmreg.ConstAny
 			--i
 	
+///////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	function Branch (|message| cond,  |&fatasm|)
+		|| dest = asmreg.newCondRequest
+		.WithinBranch++
+		|| Src = .µ(cond, dest)
+		.WithinBranch--
+		if Src isnt cond
+			(dest is negate) = (src isnt AlreadyNegated)
+			.equals(dest, dest, src, cond)
+		return .curr - 1
+	
+
 	function µOpen (|message| exp, |AsmReg|)
 		return .µ( exp, AsmReg.StayOpen) asnt asmreg.StayOpen
 
@@ -284,7 +275,8 @@ function ASMState.Alloc (|memory of fatasm| j, |bool|)
 		.start = j.ptr
 		.curr = .start
 		.end = j.Capacity + .start
-		.AddASM(asm.EROR, compiler.InternalFile.ast!, 0)
+		spdassembler <~ asm.eror
+		spdassembler <~ asm.NOOP
 		Ancients <~ j
 		return true
 
@@ -309,8 +301,6 @@ function ASMState.InitState (|scfunction| fn)
 	.ok  = true
 	.vdecls = 0
 	.vtmps = 0
-//	.BlockNum = 1
-//	.ParentBlock = 0
 	.AddFuncParams(fn)
 
 
@@ -320,3 +310,11 @@ function ASMState.FinishASM
 		debugger
 	.out.length = .curr - .out.IR
 
+
+function int64.CanInt32 (|bool|)
+	return  (self <<32)>>32 == self
+	
+
+function int64.CanFloat32 (|bool|)
+	return  (self|uint64|>>32)<<32 == self
+	

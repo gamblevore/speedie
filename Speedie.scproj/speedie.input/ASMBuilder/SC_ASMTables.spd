@@ -127,7 +127,7 @@ function If				(fn_asm)
 function While			(fn_asm)
 	opt norefcounts
 	debugger
-//	.AddASM(asm.EROR, exp)						// allow for lupu/lupd?
+	.AddASM(asm.NOOP, exp)						// allow for lupu/lupd?
 	.WhileStart = .AddASM(asm.JUMP, exp)		// jump to end... THEN EMIT arg and jump back.
 	|| Jumper = .WhileStart
 	.µ(exp.second!)								// arg
