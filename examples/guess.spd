@@ -3,7 +3,7 @@
 https://github.com/contextfreecode/jai-comparisons/blob/main/guess.jai 
 
 main (|int| Highest_Number = 100)
-	zalgoline "Finished in ${game(Highest_Number).play}\n\n" // and wierdness
+	zalgoline "Finished in ${game(Highest_Number).play}\n\n"
 
 
 class game
@@ -36,3 +36,5 @@ class game
 			|| result = word.int
 				return result
 			zalgoline "Uhhhh? $word? just what I expect from a " + $1 + "\n\n"
+			StdErr.clear // why not
+
