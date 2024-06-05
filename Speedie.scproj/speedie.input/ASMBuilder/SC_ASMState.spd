@@ -48,9 +48,10 @@ struct ASMState
 
 	function AddConstantAndReturnOld (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
 		|| x = .VTmps
-		rz = .TempMe(exp)
-		if Dest.isint and value.CanStoreAsIntImmediate
-			.AddASM(asm.ADPK, exp.parent!, Dest, ToGrow, Value)
+		rz = .TempMe(exp, dest)
+		if togrow.isint and value.CanStoreAsIntImmediate
+			// x = y++
+			.AddASM(asm.ADPK, exp.parent!, rz, ToGrow, Value)
 			.VTmps = x
 		  else
 			.Assign(rz, ToGrow, asmreg(), exp)
@@ -222,23 +223,6 @@ struct ASMState
 		|| Where = .tempme(prm, asmreg())
 		return .µ(prm, where)
 
-
-	function PostOne (|message| exp)
-		opt norefcounts
-		|| f = exp.first!.RemoveTypeCasts
-		if f != @thg // wat?
-		|| d = f.FastDecl
-		|| Src = d.reg
-		|| mode = (exp.name[] == '+')|int|
-		|| Amount = ASMTmp.IncrAmount(src, mode, d)
-		ASMState.sh.AddConstant(exp, src, src, Amount)	// ++x, y = ++x
-
-
-	function DoPostIncr
-		opt norefcounts
-		for i in PostIncrementNil.size
-			.postone(PostIncrementNil.Msgs[i]!)
-		PostIncrementNil.size = 0
 
 	module
 		|FatASM[]|					JSMSpace = FatASM[0]!

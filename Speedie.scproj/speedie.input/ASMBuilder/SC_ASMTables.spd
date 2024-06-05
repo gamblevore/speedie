@@ -273,7 +273,6 @@ function Arg   (fn_asm)
 	|| decls = .VDecls
 	for ch.fast in exp
 		.µ(ch, asmreg.Arg)
-		.DoPostIncr
 	.VDecls = decls
 
 
@@ -476,32 +475,7 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 	ifn mode & IncrAfter
 		return .AddConstant(exp, src, src, Amount)							// ++x,	 y = ++x
 
-
-	// x++,	 y = x++
-	if .WithinBranch or (dest.isint and amount.CanStoreAsIntImmediate)		// do immediately
-		return .AddConstantAndReturnOld(f, dest, src, amount)
-
-/*   while a++<b: x++     -->     
-1) Special
-		c = a++
-		compare&jump c, b
-		x++
-		jump (to c=a)
-
-2) SpecialPost	
-		jump (to c = a):
-		x++
-		c = a++
-		compare&jump (c, b) (to x++)
-*/
-
-
-	debugat
-	if f.RemoveTypeCasts!!=@thg
-	if .µ(f)!=src
-		debugger, .µ(f)
-	PostIncrementNil <~ exp							// process later
-	return src
+	return .AddConstantAndReturnOld(f, dest, src, amount)					// x++,	 y = x++
 
 
 

@@ -2,8 +2,8 @@
 // inlining do separately
 
 // dead code removal... IDK?
-// "sing like your life depended on it"
-// yeah sounds so fake. as if everrrr.....
+// we need to also opt a+0 into a
+// basically most of the quickopts I already did... need to be redone??
 // if (a+b==x)
 	//// do nothing
 // a = b
