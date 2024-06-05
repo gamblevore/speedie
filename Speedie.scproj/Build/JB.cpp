@@ -1941,7 +1941,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112564577446746));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112564874903552));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3257,7 +3257,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024060515));
+	JB_FS_AppendInt32(_fsf0, (2024060517));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7122,9 +7122,8 @@ bool SC_SpdAssembler__Optimise(ASMFunc* Raw) {
 			FatASM* P = SC_FatASM_Prev(Curr);
 			FatASM* N = SC_FatASM_Next(Curr);
 			if (((bool)N) or ((bool)P)) {
-				int Code = (X)(Curr, P, N);
-				Rz = ((bool)(Rz | (Code != 0)));
-				Opts = (Opts + (Code >> 1));
+				Rz = ((bool)(Rz | (X)(Curr, P, N)));
+				(++Opts);
 			}
 		}
 	};
@@ -7185,7 +7184,6 @@ ErrorInt JB_Main() {
 	SC_Comp__SetupEnv();
 	SC_Comp__MiniTests();
 	SC_Comp__Main();
-	float X = 1.0f;
 	SC_Comp__PrintResults();
 	return 0;
 }
@@ -8069,7 +8067,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024060515));
+	JB_FS_AppendInt32(_fsf0, (2024060517));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -10977,127 +10975,161 @@ bool SC_NodeSorter(SCFunction* A, SCFunction* B) {
 	return JB_Str_CompareStr(A->ExportName, B->ExportName, false) <= -1;
 }
 
-int SC_OptAddF(FatASM* Self, FatASM* P, FatASM* N) {
-	if (SC_FatASM_OperatorIsa(P, kSC__ASM_FADD)) {
-		debugger;
+bool SC_OptAddF(FatASM* Self, FatASM* P, FatASM* N) {
+	if (!(((bool)P) and (SC_FatASM_a5(P) == SC_FatASM_a5(Self)))) {
+		return nil;
 	}
-	return 0;
+	uint Out = SC_FatASM_a1(P);
+	if (SC_FatASM_OperatorIsa(P, kSC__ASM_FADD)) {
+		if ((!SC_FatASM_a2(Self)) or (Out == SC_FatASM_a3(Self))) {
+			SC_FatASM_Swap(Self, 2, 3);
+		}
+		if (Out != SC_FatASM_a2(Self)) {
+			return nil;
+		}
+		if ((!SC_FatASM_a4(P)) and (!SC_FatASM_a3(Self))) {
+			(SC_FatASM_a3Set(Self, SC_FatASM_a3(P)));
+			(SC_FatASM_a2Set(Self, SC_FatASM_a2(P)));
+			return true;
+		}
+		if ((!SC_FatASM_a3(P)) and (!SC_FatASM_a4(Self))) {
+			(SC_FatASM_a4Set(Self, SC_FatASM_a4(P)));
+			(SC_FatASM_a2Set(Self, SC_FatASM_a2(P)));
+			return true;
+		}
+	}
+	if (SC_FatASM_a4(Self)) {
+		return nil;
+	}
+	if (SC_FatASM_OperatorIsa(P, kSC__ASM_FMUL)) {
+		if (SC_FatASM_match3_2(Self, Out)) {
+			return nil;
+		}
+		Self->Op = kSC__ASM_FMUL;
+		(SC_FatASM_a4Set(Self, SC_FatASM_a2(Self)));
+		(SC_FatASM_a3Set(Self, SC_FatASM_a3(P)));
+		(SC_FatASM_a2Set(Self, SC_FatASM_a2(P)));
+		return true;
+	}
+	if (SC_FatASM_OperatorIsa(P, kSC__ASM_FMLK)) {
+		float K = JB_int_AsFloat(((int)SC_FatASM_a3(P)));
+		if (JB_f_IsPow2(K)) {
+			debugger;
+		}
+	}
+	return false;
 }
 
-int SC_OptAddI(FatASM* Self, FatASM* P, FatASM* N) {
-	if (!(((bool)P) and (!Self->R[3]))) {
-		return 0;
+bool SC_OptAddI(FatASM* Self, FatASM* P, FatASM* N) {
+	if (!(((bool)P) and (!SC_FatASM_a4(Self)))) {
+		return nil;
 	}
-	uint Out = P->R[0];
-	if (Out == Self->R[1]) {
-		SC_FatASM_Swap(Self, 1, 2);
-	}
-	 else {
-		if (Out != Self->R[2]) {
-			return 0;
+	uint Out = SC_FatASM_a1(P);
+	if (SC_FatASM_OperatorIsa(P, kSC__ASM_BFLG)) {
+		if (!(((bool)SC_FatASM_a5(P)) and SC_FatASM_match3_2(Self, Out))) {
+			return nil;
 		}
+		(SC_FatASM_a4Set(Self, SC_FatASM_a3(P)));
+		(SC_FatASM_a3Set(Self, SC_FatASM_a2(P)));
+		return true;
 	}
 	if (SC_FatASM_OperatorIsa(P, kSC__ASM_MULT)) {
+		if (!SC_FatASM_match3_2(Self, Out)) {
+			return nil;
+		}
 		Self->Op = kSC__ASM_MULT;
-		Self->R[3] = Self->R[1];
-		Self->R[2] = P->R[2];
-		Self->R[1] = P->R[1];
-		return 2;
+		(SC_FatASM_a4Set(Self, SC_FatASM_a2(Self)));
+		(SC_FatASM_a3Set(Self, SC_FatASM_a3(P)));
+		(SC_FatASM_a2Set(Self, SC_FatASM_a2(P)));
+		return true;
 	}
-	if (SC_FatASM_OperatorIsa(P, kSC__ASM_BFLG)) {
-		if (P->R[4]) {
-			Self->R[3] = P->R[2];
-			Self->R[2] = P->R[1];
-			return 2;
-		}
-	}
-	return 0;
+	return false;
 }
 
-int SC_OptAddK(FatASM* Self, FatASM* P, FatASM* N) {
+bool SC_OptAddK(FatASM* Self, FatASM* P, FatASM* N) {
 	if (!SC_FatASM_OperatorIsa(P, kSC__ASM_ADDK)) {
-		return 0;
+		return nil;
 	}
-	uint Pout = P->R[0];
-	uint Myin = Self->R[1];
+	uint Pout = SC_FatASM_a1(P);
+	uint Myin = SC_FatASM_a2(Self);
 	if (Pout == Myin) {
-		int64 Add2 = ((int64)P->R[2]) + ((int64)Self->R[1]);
+		int64 Add2 = ((int64)SC_FatASM_a3(P)) + ((int64)SC_FatASM_a2(Self));
 		if (SC_int64_CanInt32(Add2)) {
-			Self->R[1] = Add2;
-			return 2;
+			(SC_FatASM_a2Set(Self, Add2));
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
 
-int SC_OptBitOr(FatASM* Self, FatASM* P, FatASM* N) {
-	return 0;
+bool SC_OptBitOr(FatASM* Self, FatASM* P, FatASM* N) {
+	return false;
 }
 
-int SC_OptBra(FatASM* Self, FatASM* P, FatASM* N) {
-	return 0;
+bool SC_OptBra(FatASM* Self, FatASM* P, FatASM* N) {
+	return false;
 }
 
-int SC_OptCompare(FatASM* Self, FatASM* P, FatASM* N) {
-	return 0;
+bool SC_OptCompare(FatASM* Self, FatASM* P, FatASM* N) {
+	return false;
 }
 
-int SC_OptCount(FatASM* Self, FatASM* P, FatASM* N) {
-	return 0;
+bool SC_OptCount(FatASM* Self, FatASM* P, FatASM* N) {
+	return false;
 }
 
-int SC_OptFADK(FatASM* Self, FatASM* P, FatASM* N) {
+bool SC_OptFADK(FatASM* Self, FatASM* P, FatASM* N) {
 	if (!SC_FatASM_OperatorIsa(P, kSC__ASM_FADK)) {
-		return 0;
+		return nil;
 	}
-	uint Pout = P->R[0];
-	uint Myin = Self->R[1];
+	uint Pout = SC_FatASM_a1(P);
+	uint Myin = SC_FatASM_a2(Self);
 	if (Pout == Myin) {
-		float Add2 = JB_int_AsFloat(((int)P->R[2])) + JB_int_AsFloat(((int)Self->R[1]));
-		Self->R[1] = JB_f_AsInt(Add2);
-		return 2;
+		float Add2 = JB_int_AsFloat(((int)SC_FatASM_a3(P))) + JB_int_AsFloat(((int)SC_FatASM_a2(Self)));
+		(SC_FatASM_a2Set(Self, JB_f_AsInt(Add2)));
+		return true;
 	}
-	return 0;
+	return false;
 }
 
-int SC_OptFunc(FatASM* Self, FatASM* P, FatASM* N) {
+bool SC_OptFunc(FatASM* Self, FatASM* P, FatASM* N) {
 	if (!SC_FatASM_OperatorIsa(N, kSC__ASM_RET)) {
-		return 0;
+		return nil;
 	}
-	uint RetResult = N->R[0];
-	uint FuncResult = Self->R[0];
+	uint RetResult = SC_FatASM_a1(N);
+	uint FuncResult = SC_FatASM_a1(Self);
 	if (RetResult == FuncResult) {
 		Self->Op = kSC__ASM_TAIL;
-		return SC_FatASM_Nop(N);
+		return ((bool)SC_FatASM_Nop(N));
 	}
-	return 0;
+	return false;
 }
 
-int SC_OptJump(FatASM* Self, FatASM* P, FatASM* N) {
-	return 0;
+bool SC_OptJump(FatASM* Self, FatASM* P, FatASM* N) {
+	return false;
 }
 
-int SC_OptJumpC(FatASM* Self, FatASM* P, FatASM* N) {
-	return 0;
+bool SC_OptJumpC(FatASM* Self, FatASM* P, FatASM* N) {
+	return false;
 }
 
-int SC_OptJumpE(FatASM* Self, FatASM* P, FatASM* N) {
-	return 0;
+bool SC_OptJumpE(FatASM* Self, FatASM* P, FatASM* N) {
+	return false;
 }
 
-int SC_OptShifting(FatASM* Self, FatASM* P, FatASM* N) {
-	return 0;
+bool SC_OptShifting(FatASM* Self, FatASM* P, FatASM* N) {
+	return false;
 }
 
-int SC_OptSubI(FatASM* Self, FatASM* P, FatASM* N) {
+bool SC_OptSubI(FatASM* Self, FatASM* P, FatASM* N) {
 	if (SC_FatASM_OperatorIsa(P, kSC__ASM_BFLG)) {
 		return SC_OptAddI(Self, P, N);
 	}
-	return 0;
+	return false;
 }
 
-int SC_OptTabl(FatASM* Self, FatASM* P, FatASM* N) {
-	return 0;
+bool SC_OptTabl(FatASM* Self, FatASM* P, FatASM* N) {
+	return false;
 }
 
 SCDecl* SC_Or_And_Expansion(SCDecl* LC, SCDecl* RC, Message* Exp, SCNode* Name_space) {
@@ -13244,8 +13276,8 @@ void* SC_voidtest2(void* Abc) {
 	return nil;
 }
 
-int SC_xC2xB5Opt_255(FatASM* Self, FatASM* P, FatASM* N) {
-	return 0;
+bool SC_xC2xB5Opt_255(FatASM* Self, FatASM* P, FatASM* N) {
+	return false;
 }
 
 
@@ -15420,6 +15452,10 @@ float JB_f_Fract(float Self) {
 	return Self - floorf(Self);
 }
 
+bool JB_f_IsPow2(float Self) {
+	return false;
+}
+
 JB_String* JB_f_PC(float Self, FastString* Fs_in) {
 	FastString* Fs = JB_Incr(JB_FS__FastNew(Fs_in));
 	if (!Self) {
@@ -16459,9 +16495,6 @@ AsmReg SC_ASMtmp__Not(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 AsmReg SC_ASMtmp__Num(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 	SCDecl* D = SC_Msg_FastDecl(Exp);
 	uint64 X = D->ExportPosition;
-	if ((X == 0) != SC_Msg_IsZero(Exp)) {
-		debugger;
-	}
 	AsmReg R = SC_Pac_FindConst((&SC__Pac_Sh), X);
 	if (SC_Reg_SyntaxCast(R)) {
 		return R;
@@ -18793,17 +18826,12 @@ AsmReg SC_Pac_QuickFloatMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Mes
 		return SC_Pac_Plus(Self, Dest, L, L, Exp);
 	}
 	if (SC_Reg_FourBytes(R)) {
-		return SC_Pac_QuickFloatOp(Self, kSC__ASM_FMLK, Exp, Dest, L, R);
-	}
-	return ((AsmReg)0);
-}
-
-AsmReg SC_Pac_QuickFloatOp(ASMState* Self, ASM Op, Message* Exp, AsmReg Dest, AsmReg L, AsmReg R) {
-	uint64 X = Self->Consts[SC_Reg_Reg(R)];
-	uint64 Y = X >> 18;
-	if (X == (Y << 18)) {
-		SC_Pac_AddASM3(Self, Op, Exp, SC_Reg_ToInt(Dest), SC_Reg_ToInt(L), Self->Consts[SC_Reg_Reg(R)]);
-		return Dest;
+		uint64 X = Self->Consts[SC_Reg_Reg(R)];
+		uint64 Y = X >> 18;
+		if (X == (Y << 18)) {
+			SC_Pac_AddASM3(Self, kSC__ASM_FMLK, Exp, SC_Reg_ToInt(Dest), SC_Reg_ToInt(L), X);
+			return Dest;
+		}
 	}
 	return ((AsmReg)0);
 }
@@ -19383,9 +19411,6 @@ NilState SC_nil__CompareObjs(Message* Ll, Message* Rr, NilCheckMode Test, SCOper
 }
 
 NilState SC_nil__Continue(Message* Msg, NilCheckMode Test) {
-	if (!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false)) {
-		debugger;
-	}
 	SC__nil_Loops.ContRecord = (SC__nil_Loops.ContRecord | SC_nil__EndBlock());
 	return 0;
 }
@@ -19433,9 +19458,6 @@ NilState SC_nil__Dummy(Message* Msg, NilCheckMode Test) {
 }
 
 NilState SC_nil__Exit(Message* Msg, NilCheckMode Test) {
-	if (!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false)) {
-		debugger;
-	}
 	SC__nil_Loops.ExitRecord = (SC__nil_Loops.ExitRecord | SC_nil__EndBlock());
 	SC__nil_Loops.HasEscape = true;
 	return 0;
@@ -19814,9 +19836,6 @@ NilState SC_nil__RealBool(bool B) {
 }
 
 NilState SC_nil__Rejoin(Message* Msg, NilCheckMode Test) {
-	if (!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false)) {
-		debugger;
-	}
 	return SC_nil__Jump(((Message*)JB_Ring_First(Msg)), Test);
 }
 
@@ -19825,9 +19844,6 @@ NilState SC_nil__Rel(Message* Msg, NilCheckMode Test) {
 }
 
 NilState SC_nil__Return(Message* Msg, NilCheckMode Test) {
-	if (!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false)) {
-		debugger;
-	}
 	NilState V = SC_nil__DetectStillChecks(((Message*)JB_Ring_First(Msg)));
 	SC__nil_Loops.ExitRecord = (SC__nil_Loops.ExitRecord | kSC__NilState_Basic);
 	SC_nil__DeclKill();
@@ -20075,9 +20091,6 @@ NilState SC_nil__VariableSet(SCDecl* Recv, Message* RecvMsg, SCDecl* Sent, Messa
 }
 
 NilState SC_nil__While(Message* Msg, NilCheckMode Test) {
-	if (!JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false)) {
-		debugger;
-	}
 	Message* Cond = ((Message*)JB_Ring_First(Msg));
 	MaybeBool CondTest = SC_Msg_IsAlwaysBool(Cond);
 	if (!((!JB_MaybeBool_IsFalse(CondTest)) and ((bool)SC_nil_BranchEnter((&SC__nil_T), Msg)))) {
@@ -20355,6 +20368,38 @@ JB_String* JB_FastBuff_TmpStr(FastBuff* Self) {
 }
 
 
+uint SC_FatASM_a1(FatASM* Self) {
+	return Self->R[0];
+}
+
+uint SC_FatASM_a2(FatASM* Self) {
+	return Self->R[1];
+}
+
+void SC_FatASM_a2Set(FatASM* Self, uint Value) {
+	Self->R[1] = Value;
+}
+
+uint SC_FatASM_a3(FatASM* Self) {
+	return Self->R[2];
+}
+
+void SC_FatASM_a3Set(FatASM* Self, uint Value) {
+	Self->R[2] = Value;
+}
+
+uint SC_FatASM_a4(FatASM* Self) {
+	return Self->R[3];
+}
+
+void SC_FatASM_a4Set(FatASM* Self, uint Value) {
+	Self->R[3] = Value;
+}
+
+uint SC_FatASM_a5(FatASM* Self) {
+	return Self->R[4];
+}
+
 void SC_FatASM_AddRegNum(FatASM* Self, Message* Src, int Write, int Num) {
 	if (Write <= 5) {
 		Self->R[Write] = Num;
@@ -20394,6 +20439,14 @@ JB_String* SC_FatASM_File(FatASM* Self) {
 
 int SC_FatASM_FileNum(FatASM* Self) {
 	return Self->Location & 16533;
+}
+
+bool SC_FatASM_match3_2(FatASM* Self, int Reg) {
+	if (Reg == SC_FatASM_a2(Self)) {
+		SC_FatASM_Swap(Self, 2, 3);
+		return true;
+	}
+	return Reg == SC_FatASM_a3(Self);
 }
 
 FatASM* SC_FatASM_Next(FatASM* Self) {
@@ -20466,8 +20519,8 @@ void SC_FatASM_Renda(FatASM* Self, FastString* Fs) {
 }
 
 void SC_FatASM_Swap(FatASM* Self, int A, int B) {
-	uint T = Self->R[A];
-	Self->R[A] = Self->R[B];
+	uint T = Self->R[(--A)];
+	Self->R[A] = Self->R[(--B)];
 	Self->R[B] = T;
 }
 
@@ -23772,7 +23825,7 @@ int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* Self) {
 }
 
 void JB_Rec_AppendErr(JB_ErrorReceiver* Self, JB_Error* Err) {
-	bool CanPrint = (!JB_Rec_BadCount(Self)) and ((bool)JB__Err_AutoPrint);
+	bool CanPrint = false;
 	//"Speedie" // useful marker for debugging...;
 	JB_Rec_Incr(Self, Err, true);
 	if (!JB_Str_Exists(Err->Path)) {
@@ -30393,9 +30446,6 @@ ASMtmp SC_Msg_ASMType(Message* Self) {
 }
 
 void SC_Msg_ASMTypeSet(Message* Self, ASMtmp Value) {
-	if (JB_ObjectID(Self) == 0) {
-		debugger;
-	}
 	Value = ((Self->Flags & (~63)) | Value);
 	Self->Flags = Value;
 }
@@ -50500,4 +50550,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -793205849950712414 7538940022194211670
+// 4004940570965934149 7538940022194211670

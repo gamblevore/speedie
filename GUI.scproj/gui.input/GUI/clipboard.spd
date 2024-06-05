@@ -33,7 +33,7 @@ function string.FixLineEndings (|string| dest="\n", |StringThatWasReadSafely|)
 	|| type = .DetectLineEndings
 	if type <= 1
 		return self
-	if !type.IsPo2
+	if !type.IsPow2
 		return string.error // sigh
 	if type == 4
 		return .ReplaceAll("\r\n", dest)

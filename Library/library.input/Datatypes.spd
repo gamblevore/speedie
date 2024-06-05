@@ -36,7 +36,7 @@ datatype int
 		pragma inline
 		return (self & (self - 1)) == 0
 
-	function IsPo2 (|bool|)
+	function IsPow2 (|bool|)
 		pragma inline
 		return (self & (self - 1)) == 0
 
@@ -146,9 +146,6 @@ datatype int
 		if d > 0 // can fail otherwise
 			return (self|uint| < d|uint|)
 
-
-	function IsPow2 (|bool|)
-		disabled ".IsPo2"
 	
 	operator Align (|int| To, |int|)
 		|| Missing = (self mod To)
@@ -301,14 +298,11 @@ datatype uint
 	operator nobits (|uint| n, |uint|)
 		return self &~ ((1<<n)-1)
 
-	function IsPo2 (|bool|)
-		cpp_wrapper
-	
 	function IsPow2 (|bool|)
-		disabled ".IsPo2"
+		cpp_wrapper JB_uint_IsPo2
 	
 	function IsKnown (|bool|)
-		return .ispo2
+		return .ispow2
 
 	function Hash (|uint|)
 		cpp_wrapper JB_uint_hash
@@ -439,7 +433,7 @@ datatype float
 	
 	function Exponent (|ivec2|)
 		cpp_wrapper JB_F_Exponent
-
+			
 	function f64.Exponent (|ivec2|)
 		cpp_wrapper JB_F64_Exponent
 	
@@ -481,8 +475,14 @@ datatype float
 	
 	function Fract (|float|)
 		return self - .floor
-	
-	function Exp (|float|)
+		
+	function IsPow2 (|bool|)
+		return !.log2.Fract
+		
+	function Log2 (|float|)
+		cpp_wrapper (log2f)
+
+	function AsExponentOfE (|float|)
 		cpp_wrapper (expf)
 	
 	function Ceil (|float|)
@@ -503,7 +503,7 @@ datatype float
 		return 1.0-f
 	
 	operator IsNear (|float|other, |bool|)
-		disabled "what usse this even?"
+		disabled "what uses this even?"
 		return (self - other).abs < 0.0001 // seems close enough?
 	
 	function Mix (|float| y, |float| a, |float|)
@@ -688,12 +688,10 @@ datatype int64
 			.RenderSizePart(fs, 1TB, "TB")
 	
 	
-	function IsPo2 (|bool|)
+	function IsPow2 (|bool|)
 		pragma inline // as above
 		return (self & (self - 1)) == 0
 	
-	function IsPow2 (|bool|)
-		disabled ".IsPo2"
 
 	iterator
 		|int64| i = 0
@@ -762,14 +760,11 @@ datatype uint64
 		|| xelf = self xor belf
 		return (self&xelf) and (belf&xelf) 
 
-	function IsPo2 (|bool|)
-		cpp_wrapper
-	
 	function IsPow2 (|bool|)
-		disabled ".IsPo2"
+		cpp_wrapper JB_u64_IsPo2
 
 	function IsKnown (|bool|)
-		return .ispo2
+		return .ispow2
 	
 	iterator bits				// Get 1 bit of the original per loop
 		|| curr = self|uint64|

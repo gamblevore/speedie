@@ -229,11 +229,11 @@ forms
 
 #!						 (((((Bitops)))))
 /**/ BRUS  (U3)
-		i1 = ((uint64)((i2 << L3) >> u3))>>L3
-/**/ BRUE  (U4)
-		u1 = (u2 >> u3) ||| u4
-/**/ BLUE  (U4) 
-		u1 = (u2 << u3) ||| u4
+		i1 = (i2 >> i3+U3_Lu)
+/**/ BRUU  (U3)
+		u1 = (u2 >> u3+U3_Lu)
+/**/ BLUE  (U3) 
+		u1 = (u2 << u3+U3_Lu)
 /**/ BAND  (U3)
 		u1 = u2 &  (u3|||L3)
 /**/ BOAR  (U3)
@@ -243,13 +243,13 @@ forms
 /**/ BXNR  (U3)		// for A = ~B
 		u1 = (~u2 ^ u3)
 /**/ BNOT  (U2)
-		u1 = ~u2 // & U3_Li
-/**/ BFLG  (BFLD)
-		if (BFLD_Lu) // perhaps sign can allow for 1-4 contig regs to be masked?
+		u1 = ~u3 & ~u2
+/**/ BFLG  (BFLD) // perhaps sign can allow for SIMD opts?
+		if (BFLD_Lu)
 			i1 = ((i2 << BFLD_upu) >> BFLD_downu)
 		else
 			u1 = ((u2 << BFLD_upu) >> BFLD_downu)
-/**/ BFLS  (BFLD)		 // same?
+/**/ BFLS  (BFLD)
 		i1 |= ((i2 << BFLD_downu) >> BFLD_upu)
 
 	

@@ -57,11 +57,11 @@
 ı DIVV: _
 	DivMath(r, Op);
 ı BRUS: _
-	i1 = ((uint64)((i2 << L3) >> u3)) >> L3;
-ı BRUE: _
-	u1 = (u2 >> u3) | u4;
+	i1 = (i2 >> i3 + U3_Lu);
+ı BRUU: _
+	u1 = (u2 >> u3 + U3_Lu);
 ı BLUE: _
-	u1 = (u2 << u3) | u4;
+	u1 = (u2 << u3 + U3_Lu);
 ı BAND: _
 	u1 = u2 & (u3 | L3);
 ı BOAR: _
@@ -71,7 +71,7 @@
 ı BXNR: _
 	u1 = (~u2 ^ u3);
 ı BNOT: _
-	u1 = ~u2;
+	u1 = ~u3 & ~u2;
 ı BFLG: _
 	if (BFLD_Lu) 
 	i1 = ((i2 << BFLD_upu) >> BFLD_downu)

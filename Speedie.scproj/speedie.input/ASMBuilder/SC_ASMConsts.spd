@@ -217,13 +217,11 @@ function uint64.LongestBitStretch (|ivec2|)
 		self &= self rotl 1
 		rz.x++
 	rz.y = last.log2
-	
 
-// how to tell where the range is? we only know how long it is?
 
-// 0101010000000000101010101-->
-// 1010101111111111010101010
-// 0000001111111110000000000
-// OK now what? where is the range? we really want the last value!
-// whhere does the range start/end?
+// needs SSA upgrade.
+function uint.isconst (|bool|)
+
+function uint.ConstValue (|int64|)
+
 

@@ -163,14 +163,6 @@ extend ASMState
 			return dest
 
 
-	function QuickFloatOp (|&asmstate| self, |asm| Op, |message| exp, |asmreg| dest, |asmreg| l, |asmreg| r, |asmreg|)
-		|| x = .consts[r.reg]
-		|| y = x >> 18
-		if x == y << 18
-			.AddASM(op, exp, dest, l, .consts[r.reg])
-			return dest
-
-		
 	function QuickFloatDiv    (fn_opasm)
 		require r is ConstAny
 		|| p = self[r]
@@ -219,7 +211,11 @@ extend ASMState
 			return .plus(dest, l, l, exp)
 		
 		if r.Fourbytes
-			return .QuickFloatOp(asm.FMLK, exp, dest, l, r)
+			|| x = .consts[r.reg]
+			|| y = x >> 18
+			if x == y << 18
+				.AddASM(asm.FMLK, exp, dest, l, x)
+				return dest
 
 	
 	function PlusInt     (fn_opasm)
@@ -255,12 +251,25 @@ extend ASMState
 		|| F = .AddASM(asm.fADD, exp, dest, l)
 		f.r[2+subtract] = r|uint|
 		f.r[4] = (!IsFloat)|int|
+
+// do this transform here:
+// p1 = p2 * k3,  f1 = f2 + p1  -->  f1 = f2 + (p2 << log2(k3))	
+// we need the info on double/float...
+//	if p isa ASM.FMLK
+//		|| k = p.a3|int|.asfloat.Log2
+//		require !k.Fract and !.match3_2(out)
+//		.op = asm.fexk
+//		.a3 = p.a2
+//		.a4 = k|int|
+//		return true
+// FEXK  (FloatAddExp)
+//		f1 = FloatSh1(u2, r4) + FloatSh1(u3, r5)
 		
 		return dest
 
 
-	function BoolMul (|asmreg| dest, |asmreg| Boo, |asmreg| R, |message| exp, |asmreg|)
-		.addasm(asm.TERN, exp, dest, boo, r, 0)
+	function BoolMul (|asmreg| dest, |asmreg| Boo, |asmreg| V, |message| exp, |asmreg|)
+		.addasm(asm.TERN, exp, dest, boo, V)
 		return dest
 
 		
@@ -286,6 +295,8 @@ extend ASMState
 		if r isa b
 			return .BoolMul(dest, r, l, exp)
 			
+		if l is ConstAny
+			||  t = l,  l = r,  r = t
 		if l.isint
 			|| D1 = .QuickIntMul(dest, R, L, exp)
 				return D1
@@ -334,14 +345,20 @@ extend ASMState
 
 	// BITS
 	function BitXnor (fn_opasm)
+		if l is ConstAny
+			||  t = l,  l = r,  r = t
 		.AddASM(asm.BXNR, exp, dest, L, R), return dest
 	
 	function BitXor (fn_opasm)
-//		if (l.reg == r.reg)
-//			return .BitOr(dest, asmreg(), asmreg(), exp)
+		if (l.reg == r.reg)
+			return .BitOr(dest, asmreg(), asmreg(), exp)
+		if l is ConstAny
+			||  t = l,  l = r,  r = t
 		.AddASM(asm.BXOR, exp, dest, L, R), return dest
 
 	function BitOr  (fn_opasm)
+		if l is ConstAny
+			||  t = l,  l = r,  r = t
 		|| dd = dest.reg					#debug_require
 		|| rr = r.reg,  || ll = l.reg
 		if ll == 0							// swap
@@ -353,6 +370,9 @@ extend ASMState
 		.AddASM(asm.BOAR, exp, dest, L, R), return dest
 	
 	function BitAnd (fn_opasm)
+		if l is ConstAny
+			||  t = l,  l = r,  r = t
+		
 		.AddASM(asm.BAND, exp, dest, L, R), return dest
 	
 	function ROL    (fn_opasm)

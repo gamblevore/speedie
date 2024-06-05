@@ -142,8 +142,6 @@ function scclass.CollectProp (|Message| msg, |bool|)
 		.properties <~ dcl
 		(dcl is property)
 		dcl.becomereal
-//		.RejectProperty(dcl)
-		// now what? how to reject bad properties?
 		return true
 
 

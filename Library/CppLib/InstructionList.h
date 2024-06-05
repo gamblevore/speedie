@@ -29,7 +29,7 @@
 &&MULT,
 &&DIVV,
 &&BRUS,
-&&BRUE,
+&&BRUU,
 &&BLUE,
 &&BAND,
 &&BOAR,

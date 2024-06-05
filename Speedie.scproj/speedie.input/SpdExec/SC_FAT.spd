@@ -25,10 +25,21 @@ struct FatASM
 		nil checker
 		if self
 			return m == .op
-	
+			
+	function a1 (|uint|): return .r[0]
+	function a1 (assigns:|uint|): .r[0] = value
+	function a2 (|uint|): return .r[1]
+	function a2 (assigns:|uint|): .r[1] = value
+	function a3 (|uint|): return .r[2]
+	function a3 (assigns:|uint|): .r[2] = value
+	function a4 (|uint|): return .r[3]
+	function a4 (assigns:|uint|): .r[3] = value
+	function a5 (|uint|): return .r[4]
+	function a5 (assigns:|uint|): .r[4] = value
+
 	function Swap (|int| a, |int| b)
-		|| t = .r[a]
-		.r[a] = .r[b]
+		|| t = .r[--a]
+		.r[a] = .r[--b]
 		.r[b] = t
 	
 	function Prev (|&FatASM|)
@@ -41,10 +52,6 @@ struct FatASM
 		if p.BlockNum == .BlockNum
 			return p
 	
-	function Nop (|int|)
-		.op = asm.noop
-		return 2
-		
 	function Renda (|FastString| fs)
 		opt norefcounts
 		|| op = instruction.typelist[.op]		#debug_require

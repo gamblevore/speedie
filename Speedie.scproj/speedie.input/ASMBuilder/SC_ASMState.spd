@@ -40,7 +40,7 @@ struct ASMState
 			|| v = .Consts[r.reg]
 			if v == -1
 				return v
-			if v.IsPo2
+			if v.IsPow2
 				return v.Log2+1
 
 		if (!r.reg) // what?

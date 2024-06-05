@@ -35,9 +35,8 @@ function SpdAssembler.Optimise (|µfunc| raw, |bool|)
 			|| p = curr.prev
 			|| n = curr.next
 			if n or p
-				|| Code = (x)(curr, p, n)
-				rz |= Code!=0
-				opts += Code>>1
+				rz |= (x)(curr, p, n)
+				opts++
 	raw.Sanity
 
 
@@ -49,8 +48,12 @@ extend FatASM
 			fn = 0 // sigh
 		.Location = fn ||| Value.Position << 12 // 4K max files
 
+	function Nop (|int|)
+		.op = asm.noop
+		return 2
+		
 
-dispatch µOpt (|&fatasm| self, |?&fatasm| P, |?&fatasm| N, |int|)
+dispatch µOpt (|&fatasm| self, |?&fatasm| P, |?&fatasm| N, |bool|)
 	(ASM.FUNC2):  OptFunc
 	(ASM.FUNC3):  OptFunc
 		
@@ -65,9 +68,13 @@ dispatch µOpt (|&fatasm| self, |?&fatasm| P, |?&fatasm| N, |int|)
 	(ASM.FADK):   OptFADK
 	
 
-	(ASM.BRUE):   OptShifting
+	(ASM.TERN):   OptTern
+	(ASM.BFLG):   OptBFLG
+	(ASM.BFLS):   OptBFLS
+	(ASM.BRUU):   OptShifting
 	(ASM.BRUS):   OptShifting
 	(ASM.BLUE):   OptShifting
+	(ASM.BAND):   OptBitAnd
 	(ASM.BOAR):   OptBitOr
 	(ASM.CMPF):	  OptCompare
 	(ASM.CMPI):   OptCompare
@@ -85,8 +92,8 @@ dispatch µOpt (|&fatasm| self, |?&fatasm| P, |?&fatasm| N, |int|)
 function OptFunc (Fn_µOpt)
 	// TAILCALL
 	require N isa asm.ret
-	|| RetResult = N.r[0]
-	|| FuncResult = .r[0]
+	|| RetResult = N.a1
+	|| FuncResult = .a1
 	if RetResult == FuncResult // Return the result of this function
 		.op = asm.tail
 		return N.nop
@@ -103,24 +110,24 @@ function OptTabl (Fn_µOpt)
 function OptAddK (Fn_µOpt)	
 	// a = b + k1 + k2   -->   a = b + k3
 	require p isa asm.addk
-	|| pout = p.r[0]
-	|| myin = .r[1]
+	|| pout = p.a1
+	|| myin = .a2
 	if pout == myin
-		|| add2 = p.r[2]|int64| + .r[1]|int64|
+		|| add2 = p.a3|int64| + .a2|int64|
 		if add2.Canint32
-			.r[1] = add2
-			return 2
+			.a2 = add2
+			return true
 
 
 function OptFADK (Fn_µOpt)	
 	// a = b + k1 + k2   -->   a = b + k3
 	require p isa asm.fadk
-	|| pout = p.r[0]
-	|| myin = .r[1]
+	|| pout = p.a1
+	|| myin = .a2
 	if pout == myin
-		|| add2 = p.r[2]|int|.asfloat + .r[1]|int|.asfloat
-		.r[1] = add2.AsInt
-		return 2
+		|| add2 = p.a3|int|.asfloat + .a2|int|.asfloat
+		.a2 = add2.AsInt
+		return true
 	
 
 function OptSubI (Fn_µOpt)
@@ -128,87 +135,122 @@ function OptSubI (Fn_µOpt)
 		return OptAddI(self, p, n)
 
 
+function FatASM.match3_2 (|int| reg, |bool|)
+	// prefers the value to be at 3.
+	if reg == .a2
+		.swap(2,3)
+		return true
+	return reg == .a3
+
+
 function OptAddI (Fn_µOpt)
 	// a dead-code finder will remove old ops.
 
-	require p and !.r[3]
-	|| out = p.r[0]
-	if out == .r[1]
-		.swap(1,2)
-	  else
-		require out == .r[2]
-
-	if p isa asm.MULT   // needs SSA. lets just assume it is, for now.
-		// x2 = x1 * x1,  a = b + x2   -->   a = x1 * x1 + b
-		.op = asm.MULT
-		.r[3] = .r[1]
-		.r[2] = p.r[2]
-		.r[1] = p.r[1]
-		return 2
+	require p and !.a4
+	|| out = p.a1
 
 	// c = d << k,  a = b + c  <-- a = b + (d << k)
 	if (p isa asm.BFLG)
-		if p.r[4]					// unsigned
-			.r[3] = p.r[2]			// a = b + (c << k)
-			.r[2] = p.r[1]			// could trigger dead-code removal
-			return 2
+		require p.a5 and .match3_2(out)			// unsigned
+		.a4 = p.a3
+		.a3 = p.a2
+		return true
+
+	if p isa asm.MULT // needs SSA
+		// x2 = x1 * x1,  a = b + x2   -->   a = x1 * x1 + b
+		require .match3_2(out)
+		.op = asm.MULT
+		.a4 = .a2
+		.a3 = p.a3
+		.a2 = p.a2
+		return true
 
 
 function OptAddF (Fn_µOpt)
- //a*b + c --> MUL
-	require p  and  p.r[4] == .r[4] // both are 64.  or both are 32
-	|| out = p.r[0]
+    // a*b + c --> MUL
+	require p  and  p.a5 == .a5 // both are 64.  or both are 32
+	|| out = p.a1
 	if p isa asm.FADD
-		if !p.r[3] and !.r[2]
-			if out == .r[1]
-				
-//		pa = f2 + f3,   f1 = pa - f4   <--   f1 = f2 + f3 - f4
-			
-		if !p.r[2] and !.r[3]
-//		pa = p2 - p4,   f1 = pa + f3   <--   f1 = pa + f3 - p4
-//		pa = p2 - p4,   f1 = f2 + pa   <--   f1 = f2 + pa - p4
+		if !.a2 or out == .a3
+			.swap(2,3)
+		require out == .a2
+		if !p.a4 and !.a3    // pa = p2 + p3,   f1 = pa - f4   <--   f1 = p2 + p3 - f4
+			.a3 = p.a3
+			.a2 = p.a2
+			return true
+		if !p.a3 and !.a4	 // pa = p2 - p4,   f1 = pa + f3   <--   f1 = p2 + f3 - p4
+			.a4 = p.a4
+			.a2 = p.a2
+			return true
+
+	require !.a4
+	if p isa asm.FMUL		 // x2 = x1 * x1,  a = b + x2   -->   a = x1 * x1 + b
+		require !.match3_2(out)
+		.op = asm.FMUL
+		.a4 = .a2
+		.a3 = p.a3
+		.a2 = p.a2
+		return true
 
 
-	if p isa asm.FMUL
-// FADD  (Float)
-//		f1 = f2 + f3 - f4
-// FMUL  (Float)
-//		f1 = (f2 * f3)+f4
-// FEXK  (FloatAddExp)
-//		f1 = FloatSh1(u2, FloatAddExp_Sh2i) + FloatSh1(u3, FloatAddExp_Sh3i)
+// a1 = a2 << (a3+k4)
+function OptShifting (fn_µopt)   // can't really opt this unless registers contain consts...
+								 // I will rework to use SSA+Consts
+	// we need to combine a bflg with this.
+	// bflg(same side only) + shift --> shift
+	|| k = .a3
+	require k.IsConst and !.a4
+	|| v = k.ConstValue
+	require v.IsPow2
+	|| l = v.log2
+	if l >= 63
+		|| o = .op
+		if o == asm.blue		// left
+			.a3 = 0
+			.a4 = l
+		  else
+			.a3 = l
+			.a4 = 0
+		.a5 = (o == asm.brus)|int|
+		.op = asm.BFLG
+		return true
 
-// a*k1 + b*k2 -> FEXK // could perhaps do these at the time.
 
-
-
-function OptShifting (fn_µopt)
-/*
 //	BFLD
 //		r1		r
 //		r2		r
 //		up		6
 //		down	6
+function OptBFLG (fn_µopt)
+// can merge two bflg... just add up + down!  Works with SSA.  (if sign matches)
+//////  BFLG
+//	if (BFLD_Lu)
+//		i1 = ((i2 << up) >> down)
+//	  else
+//		u1 = ((u2 << up) >> down)
 
-BFLG
-	if (BFLD_Lu)
-		i1 = ((i2 << BFLD_upu) >> BFLD_downu)
-	  else
-		u1 = ((u2 << BFLD_upu) >> BFLD_downu)
 
-BFLS
-	i1 |= ((i2 << BFLD_downu) >> BFLD_upu)
-
-	// x = (a & k1)>>k2	// if b is contiguous bit-const... yes even like a high or low-bit!
-	// x = x | (y << 5) // 5 is a const...
-	// i think theres another case of setting or getting bits. like a = b&k... or a = a | k
-	// could just take a reg and ~it... including reg 0
-
-*/
+function OptBFLS (fn_µopt)
+// can merge bflg+bfls! same as above
+//////  BFLS
+//	i1 |= ((i2 << up) >> down)
+//  i1 = (i2 >> i3+U3_Lu)
 
 
 function OptBitOr (fn_µopt)
-	// i1 |= ((i2 << BFLD_downu) >> BFLD_upu) // can remove a const?
-	// u1  = (u2|||u3)&~u4
+	// bfls: x = x | (y << 5) // 5 is a const...
+	// boar: u1  = (u2|||u3) & (~u4)
+
+
+function OptBitAnd (fn_µopt)
+//  x = a & contig_k2 --> bflg(a,k2)   // optimises well
+	// lets find if one is a const...
+	if p isa asm.bnot // x = (~a & ~b) in two-passes? can check the double-prev instruction too
+
+
+function OptTern (fn_µopt)
+	if .a2 // if this reg is a const... then we can opt it to a BOAR
+
 
 
 function OptCompare (fn_µopt)

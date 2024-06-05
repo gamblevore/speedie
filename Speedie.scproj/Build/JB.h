@@ -515,7 +515,7 @@ typedef SCNode* (*FP_CollectFunc)(Message* node, SCNode* name_space, Message* Er
 
 typedef SCObject* (*FP_ExprResolver)(Message* Exp, SCNode* name_space, Message* Side);
 
-typedef int (*Fn_µOpt)(FatASM* self, FatASM* P, FatASM* N);
+typedef bool (*Fn_µOpt)(FatASM* self, FatASM* P, FatASM* N);
 
 typedef NilState (*FP_NilTrackerFn)(Message* msg, NilCheckMode Test);
 
@@ -3658,35 +3658,35 @@ Message* SC_NewRel(Message* L, Message* R, JB_String* Op);
 
 bool SC_NodeSorter(SCFunction* A, SCFunction* B);
 
-int SC_OptAddF(FatASM* Self, FatASM* P, FatASM* N);
+bool SC_OptAddF(FatASM* Self, FatASM* P, FatASM* N);
 
-int SC_OptAddI(FatASM* Self, FatASM* P, FatASM* N);
+bool SC_OptAddI(FatASM* Self, FatASM* P, FatASM* N);
 
-int SC_OptAddK(FatASM* Self, FatASM* P, FatASM* N);
+bool SC_OptAddK(FatASM* Self, FatASM* P, FatASM* N);
 
-int SC_OptBitOr(FatASM* Self, FatASM* P, FatASM* N);
+bool SC_OptBitOr(FatASM* Self, FatASM* P, FatASM* N);
 
-int SC_OptBra(FatASM* Self, FatASM* P, FatASM* N);
+bool SC_OptBra(FatASM* Self, FatASM* P, FatASM* N);
 
-int SC_OptCompare(FatASM* Self, FatASM* P, FatASM* N);
+bool SC_OptCompare(FatASM* Self, FatASM* P, FatASM* N);
 
-int SC_OptCount(FatASM* Self, FatASM* P, FatASM* N);
+bool SC_OptCount(FatASM* Self, FatASM* P, FatASM* N);
 
-int SC_OptFADK(FatASM* Self, FatASM* P, FatASM* N);
+bool SC_OptFADK(FatASM* Self, FatASM* P, FatASM* N);
 
-int SC_OptFunc(FatASM* Self, FatASM* P, FatASM* N);
+bool SC_OptFunc(FatASM* Self, FatASM* P, FatASM* N);
 
-int SC_OptJump(FatASM* Self, FatASM* P, FatASM* N);
+bool SC_OptJump(FatASM* Self, FatASM* P, FatASM* N);
 
-int SC_OptJumpC(FatASM* Self, FatASM* P, FatASM* N);
+bool SC_OptJumpC(FatASM* Self, FatASM* P, FatASM* N);
 
-int SC_OptJumpE(FatASM* Self, FatASM* P, FatASM* N);
+bool SC_OptJumpE(FatASM* Self, FatASM* P, FatASM* N);
 
-int SC_OptShifting(FatASM* Self, FatASM* P, FatASM* N);
+bool SC_OptShifting(FatASM* Self, FatASM* P, FatASM* N);
 
-int SC_OptSubI(FatASM* Self, FatASM* P, FatASM* N);
+bool SC_OptSubI(FatASM* Self, FatASM* P, FatASM* N);
 
-int SC_OptTabl(FatASM* Self, FatASM* P, FatASM* N);
+bool SC_OptTabl(FatASM* Self, FatASM* P, FatASM* N);
 
 SCDecl* SC_Or_And_Expansion(SCDecl* LC, SCDecl* RC, Message* Exp, SCNode* Name_space);
 
@@ -3832,7 +3832,7 @@ void* SC_voidtest(void* Abc);
 
 void* SC_voidtest2(void* Abc);
 
-int SC_xC2xB5Opt_255(FatASM* Self, FatASM* P, FatASM* N);
+bool SC_xC2xB5Opt_255(FatASM* Self, FatASM* P, FatASM* N);
 
 
 
@@ -4165,6 +4165,8 @@ JB_String* JB_dbl_RenderFloat(double Self, FastString* Fs_in);
 float JB_f_RoundTo(float Self, int To);
 
 float JB_f_Fract(float Self);
+
+bool JB_f_IsPow2(float Self);
 
 JB_String* JB_f_PC(float Self, FastString* Fs_in);
 
@@ -5258,8 +5260,6 @@ AsmReg SC_Pac_QuickFloatDiv(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Mes
 
 AsmReg SC_Pac_QuickFloatMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-AsmReg SC_Pac_QuickFloatOp(ASMState* Self, ASM Op, Message* Exp, AsmReg Dest, AsmReg L, AsmReg R);
-
 AsmReg SC_Pac_QuickFloatPlus(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
 AsmReg SC_Pac_QuickIntMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
@@ -5517,6 +5517,22 @@ JB_String* JB_FastBuff_TmpStr(FastBuff* Self);
 
 
 // JB_FatASM
+uint SC_FatASM_a1(FatASM* Self);
+
+uint SC_FatASM_a2(FatASM* Self);
+
+void SC_FatASM_a2Set(FatASM* Self, uint Value);
+
+uint SC_FatASM_a3(FatASM* Self);
+
+void SC_FatASM_a3Set(FatASM* Self, uint Value);
+
+uint SC_FatASM_a4(FatASM* Self);
+
+void SC_FatASM_a4Set(FatASM* Self, uint Value);
+
+uint SC_FatASM_a5(FatASM* Self);
+
 void SC_FatASM_AddRegNum(FatASM* Self, Message* Src, int Write, int Num);
 
 void SC_FatASM_AddRegParam(FatASM* Self, Message* Src, int Write);
@@ -5530,6 +5546,8 @@ ASM SC_FatASM_Encode(FatASM* Self);
 JB_String* SC_FatASM_File(FatASM* Self);
 
 int SC_FatASM_FileNum(FatASM* Self);
+
+bool SC_FatASM_match3_2(FatASM* Self, int Reg);
 
 FatASM* SC_FatASM_Next(FatASM* Self);
 
@@ -9730,6 +9748,8 @@ inline int JB_uint64_LELength(uint64 Self);
 
 inline bool SC_NilTest_SyntaxCast(NilTest* Self);
 
+inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest);
+
 inline bool SC_Reg_FourBytes(AsmReg Self);
 
 inline bool SC_Reg_IsBig(AsmReg Self);
@@ -9742,13 +9762,13 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, NilState New);
 
 inline void SC_nil__DeclKill();
 
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
+
 inline NilRecord SC_nil__Value();
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
 
 inline bool SC_Decl_IsUnknownParam(SCDecl* Self);
-
-inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest);
 
 inline uint64* SC_Pac_GetConst(ASMState* Self, AsmReg A);
 
@@ -9757,8 +9777,6 @@ inline bool SC_Reg_SyntaxCast(AsmReg Self);
 inline int SC_Reg_ToInt(AsmReg Self);
 
 inline NilRecord SC_nil__EndBlock();
-
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
@@ -9915,6 +9933,18 @@ inline bool SC_NilTest_SyntaxCast(NilTest* Self) {
 	return (Self != nil) and JB_Str_Exists(Self->V2);
 }
 
+inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
+	AsmReg Rz = ((AsmReg)0);
+	ASMtmp T = SC_Msg_ASMType(Exp);
+	fn_asm Fn = SC_fn_asm_table[T];
+	byte OV = Self->VTmps;
+	Rz = (Fn)(Self, Exp, Dest, 0);
+	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen)) {
+		Self->VTmps = (OV);
+	}
+	return Rz;
+}
+
 inline bool SC_Reg_FourBytes(AsmReg Self) {
 	return JB_TC__Shift(((DataTypeCode)Self)) == 2;
 }
@@ -9944,6 +9974,16 @@ inline void SC_nil__DeclKill() {
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 }
 
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
+	ASMtmp T = SC_Msg_ASMType(Msg);
+	if (T) {
+		return (SC__nil_NilTable[T])(Msg, Test);
+	}
+	T = ((ASMtmp)Msg->Func);
+	(SC_Msg_ASMTypeSet(Msg, T));
+	return (SC__nil_NilTable[T])(Msg, Test);
+}
+
 inline NilRecord SC_nil__Value() {
 	return SC_nil_Value((&SC__nil_T));
 }
@@ -9954,26 +9994,6 @@ inline bool JB_Safe_SyntaxCast(JB_String* Self) {
 
 inline bool SC_Decl_IsUnknownParam(SCDecl* Self) {
 	return ((!SC_Decl_NilStated(Self))) and (SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Param));
-}
-
-inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
-	AsmReg Rz = ((AsmReg)0);
-	ASMtmp T = SC_Msg_ASMType(Exp);
-	fn_asm Fn = SC_fn_asm_table[T];
-	if (!T) {
-		Fn = SC_fn_asm_table[((int)Exp->Func)];
-		debugger;
-	}
-	byte OV = Self->VTmps;
-	Rz = (Fn)(Self, Exp, Dest, 0);
-	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen)) {
-		Self->VTmps = (OV);
-	}
-	int Dd = SC_Reg_Reg(Dest);
-	if (((bool)Dd) and (SC_Reg_Reg(Rz) != Dd)) {
-		//FFFFFFASSDJKLASDM<>AS;
-	}
-	return Rz;
 }
 
 inline uint64* SC_Pac_GetConst(ASMState* Self, AsmReg A) {
@@ -9993,16 +10013,6 @@ inline NilRecord SC_nil__EndBlock() {
 	Rz = SC_nil__Value();
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 	return Rz;
-}
-
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
-	ASMtmp T = SC_Msg_ASMType(Msg);
-	if (T) {
-		return (SC__nil_NilTable[T])(Msg, Test);
-	}
-	T = ((ASMtmp)Msg->Func);
-	(SC_Msg_ASMTypeSet(Msg, T));
-	return (SC__nil_NilTable[T])(Msg, Test);
 }
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
