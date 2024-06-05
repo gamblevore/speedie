@@ -180,14 +180,15 @@ forms
 		__
 		Code = TailStack(r, Code, Op)
 		___
-
-/**/ SWAP (Swap)
-		std_swap(r[SWAP_Au], r[SWAP_Bu])
-		std_swap(r[SWAP_Cu], r[SWAP_Du])
 	
 
 
 #!						 (((((Utils)))))
+
+/**/ SWAP (Swap)
+		std_swap(r[SWAP_Au], r[SWAP_Bu])
+		std_swap(r[SWAP_Cu], r[SWAP_Du])
+
 /**/ PRNT (U1)
 		printf("%lli\n", i1)
 		#!better to print this also as float/double/signed/unsigned...
