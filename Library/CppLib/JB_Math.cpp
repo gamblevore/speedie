@@ -91,14 +91,14 @@ extern "C" {
 		uint i = reinterpret_cast<uint&>(f);
 		uint x = (i<<1) >> 24;
 		int x2 = x - 127;
-		return (ivec2){ x2, JB_uint_IsPo2(i<<9) };
+		return (ivec2){ x2, JB_uint_IsPow2(i<<9) };
 	}
 
 	ivec2 JB_F64_Exponent(double d) {
 		uint64 i = reinterpret_cast<uint64&>(d);
 		uint64 x = (i<<1) >> 53;
 		int x2 = (int)x - 1023;
-		return (ivec2){ x2, JB_uint64_IsPo2(i<<12) };
+		return (ivec2){ x2, JB_u64_IsPow2(i<<12) };
 	}
     
     u32 JB_uint_hash (u32 x) {

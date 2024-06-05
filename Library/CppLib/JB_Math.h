@@ -18,11 +18,11 @@ extern "C" {
 	ivec2  JB_F64_Exponent (double x);
 	
 	
-	inline bool JB_uint64_IsPo2(uint64 Self) {
+	inline bool JB_u64_IsPow2(uint64 Self) {
 		return (Self & (Self - 1)) == 0;
 	}
 
-	inline bool JB_uint_IsPo2(uint Self) {
+	inline bool JB_uint_IsPow2(uint Self) {
 		return (Self & (Self - 1)) == 0;
 	}
 

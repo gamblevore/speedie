@@ -1843,8 +1843,8 @@ extern Random JB__zalgo_R;
 #define kSC__ASM_BRAN (53)
 #define kSC__ASM_BROL (40)
 #define kSC__ASM_BROR (41)
-#define kSC__ASM_BRUE (31)
 #define kSC__ASM_BRUS (30)
+#define kSC__ASM_BRUU (31)
 #define kSC__ASM_BXNR (36)
 #define kSC__ASM_BXOR (35)
 #define kSC__ASM_CMPF (46)
@@ -3664,6 +3664,12 @@ bool SC_OptAddI(FatASM* Self, FatASM* P, FatASM* N);
 
 bool SC_OptAddK(FatASM* Self, FatASM* P, FatASM* N);
 
+bool SC_OptBFLG(FatASM* Self, FatASM* P, FatASM* N);
+
+bool SC_OptBFLS(FatASM* Self, FatASM* P, FatASM* N);
+
+bool SC_OptBitAnd(FatASM* Self, FatASM* P, FatASM* N);
+
 bool SC_OptBitOr(FatASM* Self, FatASM* P, FatASM* N);
 
 bool SC_OptBra(FatASM* Self, FatASM* P, FatASM* N);
@@ -3687,6 +3693,8 @@ bool SC_OptShifting(FatASM* Self, FatASM* P, FatASM* N);
 bool SC_OptSubI(FatASM* Self, FatASM* P, FatASM* N);
 
 bool SC_OptTabl(FatASM* Self, FatASM* P, FatASM* N);
+
+bool SC_OptTern(FatASM* Self, FatASM* P, FatASM* N);
 
 SCDecl* SC_Or_And_Expansion(SCDecl* LC, SCDecl* RC, Message* Exp, SCNode* Name_space);
 
@@ -4166,8 +4174,6 @@ float JB_f_RoundTo(float Self, int To);
 
 float JB_f_Fract(float Self);
 
-bool JB_f_IsPow2(float Self);
-
 JB_String* JB_f_PC(float Self, FastString* Fs_in);
 
 float JB_f_Pow(float Self, int N);
@@ -4236,6 +4242,8 @@ bool SC_int64_CanStoreAsIntImmediate(int64 Self);
 
 JB_String* JB_int64_Hex(int64 Self, FastString* Fs_in);
 
+int64 JB_int64_Log2(int64 Self);
+
 Message* JB_int64_Msg(int64 Self);
 
 int64 JB_int64_OperatorMax(int64 Self, int64 D);
@@ -4272,6 +4280,10 @@ int JB_ivec4_Width(ivec4 Self);
 
 
 // uint
+int64 SC_uint_ConstValue(uint Self);
+
+bool SC_uint_isconst(uint Self);
+
 
 
 // uint16
@@ -5170,7 +5182,7 @@ AsmReg SC_Pac_BitXnor(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* 
 
 AsmReg SC_Pac_BitXor(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-AsmReg SC_Pac_BoolMul(ASMState* Self, AsmReg Dest, AsmReg Boo, AsmReg R, Message* Exp);
+AsmReg SC_Pac_BoolMul(ASMState* Self, AsmReg Dest, AsmReg Boo, AsmReg V, Message* Exp);
 
 FatASM* SC_Pac_Branch(ASMState* Self, Message* Cond);
 
@@ -5532,6 +5544,8 @@ uint SC_FatASM_a4(FatASM* Self);
 void SC_FatASM_a4Set(FatASM* Self, uint Value);
 
 uint SC_FatASM_a5(FatASM* Self);
+
+void SC_FatASM_a5Set(FatASM* Self, uint Value);
 
 void SC_FatASM_AddRegNum(FatASM* Self, Message* Src, int Write, int Num);
 
@@ -9712,6 +9726,8 @@ inline int JB_Sel_ID(Selector* Self);
 
 inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F);
 
+inline bool JB_int64_IsPow2(int64 Self);
+
 inline bool JB_int64_OperatorInRange(int64 Self, int64 D);
 
 inline bool JB_int_OperatorInRange(int Self, int D);
@@ -9849,6 +9865,10 @@ inline int JB_Sel_ID(Selector* Self) {
 
 inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F) {
 	return (JB__Tk_Splitter)(S, E, F);
+}
+
+inline bool JB_int64_IsPow2(int64 Self) {
+	return (Self & (Self - 1)) == 0;
 }
 
 inline bool JB_int64_OperatorInRange(int64 Self, int64 D) {

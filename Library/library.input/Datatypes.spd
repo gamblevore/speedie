@@ -299,7 +299,7 @@ datatype uint
 		return self &~ ((1<<n)-1)
 
 	function IsPow2 (|bool|)
-		cpp_wrapper JB_uint_IsPo2
+		cpp_wrapper JB_uint_IsPow2
 	
 	function IsKnown (|bool|)
 		return .ispow2
@@ -761,7 +761,7 @@ datatype uint64
 		return (self&xelf) and (belf&xelf) 
 
 	function IsPow2 (|bool|)
-		cpp_wrapper JB_u64_IsPo2
+		cpp_wrapper JB_u64_IsPow2
 
 	function IsKnown (|bool|)
 		return .ispow2
