@@ -35,7 +35,7 @@ function SpdAssembler.Optimise (|µfunc| raw, |bool|)
 
 
 dispatch µOpt (|&fatasm| self, |&fatasm| write, |int|)
-	(ASM.FUNC):    {} // tail, fncx
+	(ASM.FUNC):    {} // tail
 	(ASM.CNTC):    {} // (addr+=n), cntc(addr, 0) --> cntc(addr, n)
 	(ASM.TABL):    {} // Glob = glob + 1-127 // --> cntc
 
