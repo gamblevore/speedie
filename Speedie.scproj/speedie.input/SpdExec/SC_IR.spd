@@ -18,6 +18,14 @@ struct FatASM
 	
 	operator isa (|int| m, |bool|)
 		return m == .op
+	
+//	syntax is (|asm| a, |bool|)
+//		return .op == a.op
+		
+	function PrevInBlock (|asm| op, |&FatASM|)
+		|| p = self - 1
+		if (p.BlockNum == .BlockNum) and p.op == op.op
+			return p
 		
 	function Renda (|FastString| fs)
 		opt norefcounts

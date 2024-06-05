@@ -51,7 +51,12 @@ function Ignore (NilTrackerFn)
 
 		
 function StatementJump (NilTrackerFn)
-	return (NilTable[msg.ASMType]!)(msg)
+	|| fn = NilTable[msg.ASMType]!
+	if fn != StatementJump
+		return (NilTable[msg.ASMType]!)(msg)
+	if stderr.ok
+		error (msg, "".internal)
+		debugger // what? how?
 
 
 function SyncJump (NilTrackerFn)

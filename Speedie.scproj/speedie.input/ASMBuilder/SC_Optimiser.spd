@@ -1,5 +1,4 @@
 
-
 // inlining do separately
 
 // dead code removal... IDK?
@@ -9,10 +8,8 @@
 	//// do nothing
 // a = b
 
-
-function SpdAssembler.MarkBlocks (|&FatASM| curr, |int| length,   |bool|)
-	|| first = asm.JUMP.op
-	|| last = asm.LUPu.op
+function SpdAssembler.MarkBlocks (|&FatASM| curr, |int| length)
+	|| first = asm.JUMP.op,  || last = asm.LUPU.op
 	|| B = 1
 	for i in length
 		curr.BlockNum = b
@@ -21,20 +18,20 @@ function SpdAssembler.MarkBlocks (|&FatASM| curr, |int| length,   |bool|)
 			B++
 
 	
-function SpdAssembler.Optimise (|µfunc| raw, |bool|)
-	|| Curr = raw.IR
-	|| length = raw.length
+function µfunc.Sanity
+	|| Curr = .IR
+	|| length = .length
 	if curr[-1].op or curr[length-1].op // bad
 
-	.MarkBlocks(Curr, length)
-
-	for i in length
+	
+function SpdAssembler.Optimise (|µfunc| raw, |bool|)
+	raw.Sanity
+	|| Curr = raw.IR
+	.MarkBlocks(Curr, raw.length)
+	for i in raw.length
 		|| x = (µOpt[i])
 			(x)(curr+i, curr+i)
-//	.AddASM(asm.ADDK, exp, dest, obj, pos)
-
-	if curr[-1].op or curr[length-1].op // bad
-
+	raw.Sanity
 
 
 dispatch µOpt (|&fatasm| self, |&fatasm| write, |int|)
@@ -44,11 +41,16 @@ dispatch µOpt (|&fatasm| self, |&fatasm| write, |int|)
 
 // and combinations... we should make some kinda block-detector? perhaps just give a pointer to where the block starts?
 	(ASM.ADDK):    {}
-	(ASM.ADD):     {} //a*b + c --> MUL
+	(ASM.ADD):     {
+		|| p = .PrevInBlock(asm.mult)
+	// can be optimised into either a MUL+add... or add + shift
+	// or an add
+//		i1 = i2 + (i3 << L3) // add with shift
+//		i1 = (i2 * i3) + i4 //mul+Add
+			
+			// analyse details to make sure they all make sense
+	} //a*b + c --> MUL
 	(ASM.FADD):    {} //a*b + c --> MUL,   a*k1 + b*k2 -> FEXK // could perhaps do these at the time.
-
-
-
 
 /*
 BFLG

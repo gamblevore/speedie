@@ -1,6 +1,7 @@
 #!/usr/local/bin/spd
 
 main
+	printline $1
 	|| orig = "Hello asswipe_sorceror!"
 	|| SwearCoded = orig.bleep // encodes it haha
 	printline SwearCoded

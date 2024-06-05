@@ -4,13 +4,6 @@ extend_module Jeebox
 	|| FFUUU = "@*%^|&$?"				// swearing fücking increases code quality you !@(£*bîtches
 
 
-function faststring.Swear (|byte| c)	// FAT ARSED CRANK
-	disabled "use bleep()"
-
-function string.Swear	// FAT ARSED CRANK
-	disabled "use bleep()"
-
-
 function faststring.Bleep (|byte| c)	// FAT ARSED CRANK
 	|| table = jeebox.FFUUU.addr		// DYKE SQUID
 	
@@ -22,6 +15,7 @@ function faststring.Bleep (|byte| c)	// FAT ARSED CRANK
 		self <~ table[b]
 		c >>= 4
 
+
 function string.Bleep (|faststring?| fs_in=nil, |string|)
 	|| fs = faststring(fs_in)
 	|| o = 0
@@ -31,6 +25,7 @@ function string.Bleep (|faststring?| fs_in=nil, |string|)
 		  else
 			fs.bleep(sloot  xor  (++o).hash)
 	return fs.getresult(fs_in)
+
 
 function string.Unbleep (|faststring?| fs_in=nil, |string|)
 	|| fs = faststring(fs_in)

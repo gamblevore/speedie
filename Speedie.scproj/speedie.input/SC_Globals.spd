@@ -150,34 +150,33 @@ function Message.ParentForAddress (|Message|)
 
 function DollaDolla (|message| exp, |SCNode| name_space, |SCObject|)
 	opt norefcounts
-	// $x --> swearword(x)
-	// $$$x --> swearword(x)
-	// !!$$!x -- swearword(X,3)
-	// $1 --> swearword(1)
+	// $x --> (swearword(x))
+	// $$$x --> (swearword(x))
+	// !!$$!x -- (swearword(X,3))
+	// $1 --> (swearword(1))
 	// {$1} --> {app.say swearword(1)}
-	|| swearyness = 0
+	|| strength = 0
 	|| ch = exp
 	while ch == @brel
 		|| n = ch.name
 		if n == "!" // ok
-			swearyness++
+			strength++
 		  elseif n != "$"
 			exit
 		ch.become @bra
 		ch = ch.first!
-	exp.become(@func)
+	exp.become(@bra)
 	using exp
-	exp <~ (@thg, "swearword")
-	|| prm = exp.msg(@prm)
+	|| fnc = "swearword()"~parse
+	|| prm = fnc.last
 	prm <~ exp.first
-	if swearyness > 0
-		prm<~swearyness
+	if strength > 0
+		prm <~ strength
 	if exp in @arg
-		|| dot = @dot + "say"
-		exp.next = dot
-		dot <~ (@thg, "app")
-		dot.msg(@prm) <~ exp
-		TypeOfExpr(dot, name_space)
+		|| say = "app.say()"~parse
+		say.last <~ fnc
+		fnc = say
+	exp <~ fnc
 	return TypeOfExpr(exp, name_space)
 
 
