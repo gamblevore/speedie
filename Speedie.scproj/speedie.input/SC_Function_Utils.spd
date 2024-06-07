@@ -3,6 +3,9 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
+constants
+	kUsingStr = "Function here:"
+
 
 
 

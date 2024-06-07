@@ -521,3 +521,8 @@ class list (Saveable)
 			_curr = _curr.parent
 		(self)
 
+
+
+module RingTree
+	function New ()
+		disabled "Use List() instead of ringtree()"

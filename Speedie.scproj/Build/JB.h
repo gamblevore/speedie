@@ -2940,8 +2940,6 @@ void JB_Constants__InitConstants();
 
 JB_String* JB_Constants__TestJB();
 
-bool JB_Constants__TestCasting();
-
 
 
 // LinkMap
@@ -3806,8 +3804,6 @@ SCObject* SC_TypeOfQues(Message* Exp, SCNode* Name_space, Message* Side);
 SCObject* SC_TypeOfReal(Message* Exp, SCNode* Name_space, Message* Side);
 
 SCObject* SC_TypeOfRel(Message* Exp, SCNode* Name_space, Message* Side);
-
-SCObject* SC_TypeOfRelSub(Message* Exp, SCNode* Name_space, Message* Side);
 
 SCObject* SC_TypeOfSDot(Message* Exp, SCNode* Name_space, Message* Side);
 
@@ -4882,8 +4878,6 @@ Message* JB_Syx_IntMsg(Syntax Self, int64 Name);
 
 JB_String* JB_Syx_Name(Syntax Self);
 
-bool JB_Syx_NoChildren(Syntax Self);
-
 SyntaxObj* JB_Syx_Obj(Syntax Self);
 
 Message* JB_Syx_OperatorPlus(Syntax Self, JB_String* M);
@@ -5436,6 +5430,8 @@ NilState SC_nil__String(Message* Msg, NilCheckMode Test);
 NilState SC_nil__SuperSmartMagicCompare(Message* Ll, Message* Rr, NilCheckMode Test, SCOperator* Scop);
 
 NilState SC_nil__Swap(Message* Msg, NilCheckMode Test);
+
+NilState SC_nil__Swapity(SCDecl* LD, Message* L, SCDecl* RD, Message* R, NilState RN);
 
 NilState SC_nil__SyncJump(Message* Msg, NilCheckMode Test);
 
@@ -9795,6 +9791,8 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, NilState New);
 
 inline void SC_nil__DeclKill();
 
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
+
 inline NilRecord SC_nil__Value();
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
@@ -9814,8 +9812,6 @@ inline bool SC_Reg_SyntaxCast(AsmReg Self);
 inline int SC_Reg_ToInt(AsmReg Self);
 
 inline NilRecord SC_nil__EndBlock();
-
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
@@ -10005,6 +10001,16 @@ inline void SC_nil__DeclKill() {
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 }
 
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
+	ASMtmp T = SC_Msg_ASMType(Msg);
+	if (T) {
+		return (SC__nil_NilTable[T])(Msg, Test);
+	}
+	T = ((ASMtmp)Msg->Func);
+	(SC_Msg_ASMTypeSet(Msg, T));
+	return (SC__nil_NilTable[T])(Msg, Test);
+}
+
 inline NilRecord SC_nil__Value() {
 	return SC_nil_Value((&SC__nil_T));
 }
@@ -10029,18 +10035,10 @@ inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 	AsmReg Rz = ((AsmReg)0);
 	ASMtmp T = SC_Msg_ASMType(Exp);
 	fn_asm Fn = SC_fn_asm_table[T];
-	if (!T) {
-		Fn = SC_fn_asm_table[((int)Exp->Func)];
-		debugger;
-	}
 	byte OV = Self->VTmps;
 	Rz = (Fn)(Self, Exp, Dest, 0);
 	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen)) {
 		Self->VTmps = (OV);
-	}
-	int Dd = SC_Reg_Reg(Dest);
-	if (((bool)Dd) and (SC_Reg_Reg(Rz) != Dd)) {
-		//FFFFFFASSDJKLASDM<>AS;
 	}
 	return Rz;
 }
@@ -10062,16 +10060,6 @@ inline NilRecord SC_nil__EndBlock() {
 	Rz = SC_nil__Value();
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 	return Rz;
-}
-
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
-	ASMtmp T = SC_Msg_ASMType(Msg);
-	if (T) {
-		return (SC__nil_NilTable[T])(Msg, Test);
-	}
-	T = ((ASMtmp)Msg->Func);
-	(SC_Msg_ASMTypeSet(Msg, T));
-	return (SC__nil_NilTable[T])(Msg, Test);
 }
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {

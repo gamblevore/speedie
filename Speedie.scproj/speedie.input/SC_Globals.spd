@@ -1198,9 +1198,6 @@ function TypeOfExprNeeded ( |message| exp, |SCNode| name_space, |SCDecl| )
 		|| it = exp.expfunc
 			problem (it.source, kUsingStr)
 			
-constants
-	kUsingStr = "Function here:"
-
 
 function message.BecomeSetRel
 	.func = @rel
@@ -1402,14 +1399,6 @@ function message.AndOrExpansionTest (|int|)
 
 
 function TypeOfRel (ExprResolver)
-	opt norefcounts
-	rz = TypeOfRelSub(exp, name_space, side)
-	if rz isa scdecl
-		if rz is local // well it can't be local... its a temp-var, right?
-			rz = rz.NotLocal // not sure?
-		
-
-function TypeOfRelSub (ExprResolver)
 	|| LN = exp.first!
 	|| opch = ln.Next!
 	|| Comp = SCOperator.Lookup( opch )
@@ -1480,18 +1469,18 @@ function TypeOfRelSub (ExprResolver)
 	if Custom <= CustomOps.needed
 		LC.ExpectRelMatch( RC, RN, side, exp )
 	  elseif Custom == CustomOps.OnlyLeftIsVector
-		return LC		// LC is bigger (vec3 vs float)
+		return LC.NotLocal		// LC is bigger (vec3 vs float)
 	  else
-		return RC		// RC is bigger (float vs vec3)
+		return RC.NotLocal		// RC is bigger (float vs vec3)
 
 	
 	if !side and (comp Is Compare)
-		Return TypeBool!.TypeNormal
+		Return TypeBool!.typenormal
 
 	if custom & CustomOps.TypeCastToBetter
-		return lc.better_numeric(rc, comp.Kind, opch)
+		return lc.better_numeric(rc, comp.Kind, opch).NotLocal
 	
-	Return LC
+	Return LC.NotLocal
 	
 	
 	// s =  "abc"   ->   s.eq("abc", false)

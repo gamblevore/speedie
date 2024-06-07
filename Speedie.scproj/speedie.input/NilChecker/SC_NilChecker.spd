@@ -597,7 +597,12 @@ function Declaration (niltrackerfn) // function decl
 			return T.Declare(D, J)
 
 
-	
+
+function Swapity (|scdecl| LD, |message| L, |scdecl| RD, |message| R, |nilstate| RN, |nilstate|)
+	check (LD is swappable) (L, l.origrender + " can't be swapped. Must be a real variable somewhere.")
+	return .VariableSet(LD,L,  RD,R,  RN)
+
+
 function Swap (NilTrackerfn)
 	opt norefcounts
 	|| P = msg.last
@@ -608,9 +613,8 @@ function Swap (NilTrackerfn)
 	|| RN = .Jump(R)
 	|| LN = .Jump(L)
 
-	check (ld is swappable and rd is swappable) (msg, "Can't swap these. Must be real variables somewhere.")
-	.VariableSet(LD,L,  RD,R,  RN)
-	.VariableSet(RD,R,  LD,L,  LN)
+	.swapity(LD,L,  RD,R,  RN)
+	.swapity(RD,R,  LD,L,  LN)
 
 
 function SetRel (NilTrackerfn)

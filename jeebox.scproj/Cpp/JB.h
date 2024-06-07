@@ -1027,8 +1027,6 @@ void JB_Constants__InitConstants();
 
 JB_String* JB_Constants__TestJB();
 
-bool JB_Constants__TestCasting();
-
 
 
 // MZLab
@@ -1407,10 +1405,6 @@ JB_String* JB_byte_Render(byte Self, FastString* Fs_in);
 
 
 // float
-float JB_f_RoundTo(float Self, int To);
-
-float JB_f_Fract(float Self);
-
 float JB_f_Pow(float Self, int N);
 
 
@@ -1431,8 +1425,6 @@ int JB_int_OperatorMin(int Self, int Other);
 
 JB_String* JB_int_operatorof(int Self, JB_String* Type, JB_String* Nothing);
 
-int JB_int_OperatorPow(int Self, int A);
-
 IntRange JB_int_OperatorTo(int Self, int Other);
 
 int JB_int_TabsWidth(int Self);
@@ -1448,10 +1440,6 @@ int JB_int__Max();
 int64 JB_int64_OperatorMin(int64 Self, int64 D);
 
 JB_String* JB_int64_Render(int64 Self, FastString* Fs_in);
-
-void JB_int64_RenderSizePart(int64 Self, FastString* Fs, int Size, JB_String* Suff);
-
-JB_String* JB_int64_StrSize(int64 Self, FastString* Fs_in);
 
 
 
@@ -1613,8 +1601,6 @@ JB_String* JB_Syx_LongName(Syntax Self);
 Message* JB_Syx_Msg(Syntax Self, JB_String* Name);
 
 JB_String* JB_Syx_Name(Syntax Self);
-
-bool JB_Syx_NoChildren(Syntax Self);
 
 SyntaxObj* JB_Syx_Obj(Syntax Self);
 
@@ -2022,8 +2008,6 @@ void JB_Object_SaveTryCollect(JB_Object* Self, ObjectSaver* Saver);
 
 void JB_Object_Fail(JB_Object* Self, JB_String* Error);
 
-void JB_Object_SyntaxExpect(JB_Object* Self);
-
 
 
 // JB_AppArgument
@@ -2049,8 +2033,6 @@ void JB_Wrap_Destructor(DTWrap* Self);
 double JB_Wrap_FloatValue(DTWrap* Self);
 
 JB_String* JB_Wrap_Render(DTWrap* Self, FastString* Fs_in);
-
-int64 JB_Wrap_Value(DTWrap* Self);
 
 
 

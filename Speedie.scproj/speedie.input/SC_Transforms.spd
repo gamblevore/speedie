@@ -233,13 +233,8 @@ function Tran_Swap (TranFunc)
 	|| lc = TypeOfExpr(ln, name_Space)
 	|| rc = TypeOfExpr(rn, name_Space)
 	if LC.AssignabilityCheck(LN, RN, rc) and RC.AssignabilityCheck(RN, LN, lc)
-		expect (lc.DeclSize == rc.DeclSize) (node, "These two types have different sizes")
 		expect (lc.type == rc.type) (node, "These two types are different")
 		LC.ExpectRelMatch( RC, RN, nil, node ) // will this do anything by now?
-		|| i = 0
-		|| b = 0
-		target debug2
-			swap (i) (b+1)
 		Tran_PrintSub(fn, node, name_space)
 		node.last!.obj = compiler.swapfunc
 		node.obj = typevoidptr
