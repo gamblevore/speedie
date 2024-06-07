@@ -1,7 +1,6 @@
 
 
-
-function ASMState.DoConsts (|asmreg| D,  |asmreg| L,  |asmreg| R,  |&uint64| RImm=nil,  |asmreg|)
+function ASMState.DoConsts (|asmreg| D,  |asmreg| L,  |asmreg| R,  |asmreg|)
 	|| LL = self[L],  || RR = self[R],  || DD = self[D]
 	|| m = d.math
 	if l.isfloat
@@ -9,8 +8,8 @@ function ASMState.DoConsts (|asmreg| D,  |asmreg| L,  |asmreg| R,  |&uint64| RIm
 			return .DoF32Const(D, DD|&float|, LL|&float|, RR|&float|, M)
 		return .DoF64Const(D, DD|&f64|, LL|&f64|, RR|&f64|, M)
 	
-	if rimm
-		RR = rimm
+//	if rimm
+//		RR = rimm
 	if l.fourbytes
 		return .DoI32Const(D, DD|&int|, LL|&int|, RR|&int|,   M)
 	return .DoI64Const(D, DD|&int64|, LL|&int64|, RR|&int64|, M)
@@ -126,8 +125,13 @@ function asmstate.DoI64Const (|asmreg| D, |&int64| DD, |&int64| LL, |&int64| RR,
 		LLL &= RRR
 	  elseif M == ASMMath.Xor
 		LLL ^= RRR
-	  elseif M == ASMMath.Xnr
-		LLL = ~(LLL ^ RRR)
+	  elseif M == ASMMath.Type
+		debugger 
+		|| up = 64-d.BitCount
+		if D.Signed
+			LLL = (LLL << up)>>up
+		  else
+			LLL = (LLL|uint64| << up) >> up
 	  elseif M == ASMMath.ROL
 		LLL = LLL|uint64| rol RRR
 	  elseif M == ASMMath.ROR
@@ -219,9 +223,15 @@ function uint64.LongestBitStretch (|ivec2|)
 	rz.y = last.log2
 
 
-// needs SSA upgrade.
+// needs refcount upgrade.
 function uint.isconst (|bool|)
+
 
 function uint.ConstValue (|int64|)
 
+
+function asmreg.CanAddK (|int64| T, |bool|) // used to be used from .plus()... works now from render
+	if (self is constany) and .isint
+		|| B = (t << 50)>>50
+		return B == t
 

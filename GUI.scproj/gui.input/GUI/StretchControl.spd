@@ -135,29 +135,47 @@ class StretchDivider (GuiControl)
 			.show
 
 
-	function Flip
+	function SlowFlip
 		if .Collapsed
 			if .min > 0 // shouldnt be possible
 				(.onshow)(self, 1)?
 			  else
-				.setCollapsed(true, false)
+				.Show
 		  else
 			if .min > 0
 				(.onhide)(self, 0)?
 			  else
-				.setCollapsed(true, true)
+				.collapse(true)
 
 
-	function Show 
+	task SlowShow (taskgui, |int| s)
+		constructor
+			is Animation
+		
+		run
+			// now what?
+			|| p = .upon.parent$
+			|| pr = p.LastRect
+			if .upon.ActiveEnd.length < 10
+				|| s = .upon.start.length
+				if s < 10
+					|| d = .upon.d
+					s = mix(pr[d]|float|, pr[d+2]|float|, 0.333)|int|
+				.upon.ActiveEnd = (.s)~up
+	
+	
+	function Show (|bool| anim=false)
 		opt norefcounts
 		|| p = .parent$
 		|| pr = p.lastrect
-		if .ActiveEnd.length < 10
-			|| s = .start.length
-			if s < 10
-				s = mix(pr[.d]|float|, pr[.d+2]|float|, 0.333)|int|
+		require .ActiveEnd.length < 10
+		|| s = .start.length
+		if s < 10
+			s = mix(pr[.d]|float|, pr[.d+2]|float|, 0.333)|int|
+		if anim
+			.slowshow(0.75s, s)
+		  else
 			.ActiveEnd = (s)~up
-//			.slideheight(0.5s)
 
 
 	function High (|guicontrol|)
@@ -180,7 +198,7 @@ class StretchDivider (GuiControl)
 	behaviour MouseDown
 		require .InTest(P, false)
 		if keys.cmd or (clicks == 2)
-			.Flip
+			.SlowFlip
 			return mousedragging.handled
 		|| pr = .parent!.lastrect ± 1
 		|| x  = p[.d] - pr[.d]
@@ -236,7 +254,6 @@ class StretchDivider (GuiControl)
 		||stride= (where.width, 1)(.d)
 		|| col  = .gnormal.edge.Color
 		|| center = (w,h)*0.5 - 0.5
-
 
 		for j in h
 			|| p = where[xy]

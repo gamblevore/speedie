@@ -229,9 +229,9 @@ int JB_SP_Run (_cstring* C, int Mode)	{
 		
 		if ((Mode & 1) and App_Args and !JB_ErrorNumber)
 			AddError(JB_Main(),			"occurred");
-		if ((Mode & 2) and App_Args) {
+
+		if ((Mode & 2) and App_Args)
 			JB_FinalEvents();
-		}
 	}
 	JB_Active = 0;
 	return JB_ErrorNumber;

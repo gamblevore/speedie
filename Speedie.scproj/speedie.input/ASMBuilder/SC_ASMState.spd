@@ -168,7 +168,7 @@ struct ASMState
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	function Branch (|message| cond,  |&fatasm|)
+	function Branch (|message| cond, |bool| neg=false,   |&fatasm|)
 		|| dest = asmreg.newCondRequest
 		.WithinBranch++
 		|| Src = .µ(cond, dest)
@@ -179,8 +179,8 @@ struct ASMState
 		return .curr - 1
 	
 
-	function µOpen (|message| exp, |AsmReg|)
-		return .µ( exp, AsmReg.StayOpen) asnt asmreg.StayOpen
+	function µOpen (|message| exp, |asmreg| mode,   |AsmReg|)
+		return .µ( exp, AsmReg.StayOpen as mode) asnt asmreg.StayOpen
 
 	
 	function µ (|message| exp,  |AsmReg| Dest = asmreg(), |AsmReg|)
@@ -194,7 +194,7 @@ struct ASMState
 				fn = fn_asm_table[exp.func|int|]!
 				debugger
 
-		|| OV = .VTmps		
+		|| OV = .VTmps
 		rz = (fn)(self, exp, dest)
 		if dest isnt StayOpen
 			.VTmps = (ov)

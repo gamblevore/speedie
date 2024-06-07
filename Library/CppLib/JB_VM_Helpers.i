@@ -50,6 +50,22 @@ AlwaysInline void DivMath(Register* r, ASM Op) {
 }
 
 
+AlwaysInline void BFLS (Register* r, ASM Op) { // rrxxbbb --> rr00bbb
+	auto o = i2; // we want to clear those middle bits
+	int up = BFLD_upu;
+	int down = BFLD_downu;
+	uint64 mask = -1;
+	mask <<= up; mask >>= down;
+	
+	auto i = o << up;
+	if (BFLD_Lu) 
+		i = i >> down;
+	  else 
+		i = (uint64)i >> down;
+	i2 = (o&mask) | i;
+}
+
+
 AlwaysInline void RotateConst (Register* r, ASM Op) {
 	int64 A = JB_u64_RotL(Const_Valueu, Const_Rotu);
 	if (Const_Invu)

@@ -1,4 +1,5 @@
 
+datatype ASM (uint)
 	
 struct ASMBlob
 	|int|			Guard

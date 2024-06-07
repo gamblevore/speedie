@@ -72,6 +72,7 @@ datatype SCDeclInfo (int)
 		Hidden					// internal global... should not be exposed to non-lib stuff
 		Biggest
 		PostIncremented
+		Swappable	 = Param + Body + Global + Property
 		Local		 = Body + Param
 		SelfImplicit = Self + local // local is set by CollectOneParam, anyhow?
 		DclCopied    = altered + stayborrowed + static + api + UpgradeableContained + compilercreated // need more too? do later

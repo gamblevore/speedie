@@ -68,10 +68,8 @@
 	u1 = (u2 | u3) & ~u4;
 ı BXOR: _
 	u1 = u2 ^ u3;
-ı BXNR: _
-	u1 = (~u2 ^ u3);
 ı BNOT: _
-	u1 = ~u3 & ~u2;
+	u1 = ~u2 & ~u3;
 ı BFLG: _
 	if (BFLD_Lu) 
 	i1 = ((i2 << BFLD_upu) >> BFLD_downu)
@@ -80,7 +78,7 @@
 	u1 = ((u2 << BFLD_upu) >> BFLD_downu)
 ;
 ı BFLS: _
-	i1 |= ((i2 << BFLD_downu) >> BFLD_upu);
+	BFLS(r, Op);
 ı BROL: _
 	i1 = JB_u64_RotL(u2, u3 + L3);
 ı BROR: _

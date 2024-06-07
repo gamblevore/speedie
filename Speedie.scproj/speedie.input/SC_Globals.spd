@@ -1204,7 +1204,7 @@ constants
 
 function message.BecomeSetRel
 	.func = @rel
-	.asmtype = asmtmp.ksetvar
+	.asmtype = asmtmp.kSetRel
 
 
 function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name_space, |message| side, |scdecl|) {
@@ -1356,6 +1356,8 @@ function scdecl.ConstInRange (|message| RN, |scdecl| rt, |bool|)
 
 function SCDecl.AssignabilityCheck (|message?| ln, |message!| RN, |scdecl| rc, |bool|)
 	opt norefcounts
+	nil checker
+	require self and rc
 	
 	if ln
 		expect ((LN.IsAssignable) and (self isnt const)) (LN, "Not assignable.")
@@ -1399,7 +1401,15 @@ function message.AndOrExpansionTest (|int|)
 	return 2 + bs
 
 
-function TypeOfRel (ExprResolver) {
+function TypeOfRel (ExprResolver)
+	opt norefcounts
+	rz = TypeOfRelSub(exp, name_space, side)
+	if rz isa scdecl
+		if rz is local // well it can't be local... its a temp-var, right?
+			rz = rz.NotLocal // not sure?
+		
+
+function TypeOfRelSub (ExprResolver)
 	|| LN = exp.first!
 	|| opch = ln.Next!
 	|| Comp = SCOperator.Lookup( opch )
@@ -1416,7 +1426,7 @@ function TypeOfRel (ExprResolver) {
 			error (opch, "Can't use this operator here.")
 	  elseif (ShouldBeSet)
 		side = rn
-		exp.ASMType = asmtmp.ksetvar // for the ASM
+		exp.ASMType = asmtmp.kSetRel // for the ASM
 	  else
 		error (opch, "Did you mean '=='?")
 
@@ -1486,7 +1496,6 @@ function TypeOfRel (ExprResolver) {
 	
 	// s =  "abc"   ->   s.eq("abc", false)
 	// s ~= "abc"   ->   s.eq("abc", true )
-}
 
 
 function VecType (|bool| isfloat, |int| count, |SCClass|) {

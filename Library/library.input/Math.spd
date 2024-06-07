@@ -126,7 +126,7 @@ module Math
 
 	function Int.FlipSign (|int| Sign, |int|)
 		// Sign is 0 or 1
-		return (self ^ -Sign) + Sign
+		return (self xor -Sign) + Sign
 
 	function int.SetSign (|bool| IsNeg, |int|)
 		// bool.dir is beter

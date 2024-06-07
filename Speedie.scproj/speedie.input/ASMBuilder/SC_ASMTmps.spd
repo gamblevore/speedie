@@ -31,7 +31,7 @@ datatype ASMtmp (uint16)
 		kSwap
 		kTern
 		kStatExpr
-		kSetVar
+		kSetRel
 		kPointer
 		kIgnore
 		kDebugger // so yeah... alomst no space left. just 1 last slot possible.

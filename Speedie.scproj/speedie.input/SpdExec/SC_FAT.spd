@@ -1,7 +1,5 @@
 
 
-// exec.scproj uses this file.... so dont add too much to it!
-
 struct FatASM
 	|uint[6]|		R	
 	|byte|			Op
@@ -36,21 +34,46 @@ struct FatASM
 	function a4 (assigns:|uint|): .r[3] = value
 	function a5 (|uint|): return .r[4]
 	function a5 (assigns:|uint|): .r[4] = value
+	function k2 (|int|): return .k(1)
+	function k3 (|int|): return .k(2)
 
+	function k (|int| i, |uint|)
+		
 	function Swap (|int| a, |int| b)
 		|| t = .r[--a]
 		.r[a] = .r[--b]
 		.r[b] = t
+
+	function Swap (|&FatASM| other, |bool|)
+		|| s = self|&ivec4|
+		|| o = other|&ivec4|
+		for 2
+			|| t = s[], s++[] = o[], o++[] = t // shame speedie doesn't have swap () finished...
+		
 	
+	helper Step (|int| dir, |&FatASM|)
+		real self
+		|| b = .blocknum
+		while
+			self += dir
+			if .op != asm.noop
+				return (self, nil)(b == .BlockNum)
+		
 	function Prev (|&FatASM|)
-		|| p = self - 1
-		if p.BlockNum == .BlockNum
-			return p
+		pragma inline
+		return .step(-1)
 		
 	function Next (|&FatASM|)
-		|| p = self + 1
-		if p.BlockNum == .BlockNum
-			return p
+		pragma inline
+		return .step(1)
+
+	function match3_2 (|int| reg, |bool|)
+		// prefers the value to be at 3.
+		if reg == .a2
+			.swap(2,3)
+			return true
+		return reg == .a3
+			
 	
 	function Renda (|FastString| fs)
 		opt norefcounts

@@ -9,7 +9,7 @@ conf
 target !fast
 	import "GUI"
 //	import "network"
-import "Speedie.scproj/speedie.input/SpdExec"
+//import "Speedie.scproj/speedie.input/SpdExec"
 import "temporal"
 
 

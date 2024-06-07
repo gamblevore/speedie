@@ -295,7 +295,7 @@ class Window (GUIControl)
 		.__draw__(where)
 		|| gd = .GNormal.Drawer
 			(gd)(where, .LastRect, .GNormal, true)
-		.RunmyTasks(true)
+		.RunMyTasks(true)
 
 
 	behaviour Draw

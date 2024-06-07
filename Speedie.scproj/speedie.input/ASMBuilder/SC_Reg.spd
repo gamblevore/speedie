@@ -22,7 +22,7 @@ datatype ASMMath (int)
 		BAn = (12 << 16)
 		BOr = (13 << 16)
 		Xor = (14 << 16)
-		Xnr = (15 << 16)
+		Type = (15 << 16)
 		BitCorrect = (31 << 16) // removes garbage bits
 		All = BitCorrect
 	
@@ -54,7 +54,7 @@ datatype AsmReg (int64)
 		Alternate
 		Cond
 		Negate
-//		Discard
+		Discard
 		Set
 		AddrRequest
 		ForReturn
@@ -62,7 +62,7 @@ datatype AsmReg (int64)
 		SingleExpr
 		NewCondRequest
 		ConstAny
-		Arg				= NotYetUsed ||| SrcConst // ||| Discard
+		Arg				= Discard ||| SrcConst // ||| Discard
 		CondRequest		= NewCondRequest ||| SrcConst
 		MathConst		= ConstAny ||| FromMath
 		Zero			= SrcConst
@@ -124,7 +124,7 @@ datatype AsmReg (int64)
 		return ((self|int64| &~ 0xFFFF) ||| value)|asmreg|
 	
 	syntax is (|AsmReg| R, |bool|)
-		return (self|int64| & R|int64|) == r|int64|
+		return (self & R) == r
 	
 	syntax is (|AsmReg| R, assigns:|bool|, |AsmReg|)
 		if (value)
@@ -155,6 +155,9 @@ datatype AsmReg (int64)
 	syntax cast (|int|)
 		cpp_part ToInt
 		return .reg
+
+	operator bitand (|asmreg| A, |asmreg|)
+		return (self|int64| & A|int64|)|asmreg|
 	
 	operator as (|asmreg| A, |asmreg|)
 		return (self|int64| ||| A|int64|)|asmreg|

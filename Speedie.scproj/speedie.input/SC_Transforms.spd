@@ -224,10 +224,26 @@ function Tran_BlindCasts (tranfunc)
 
 
 function Tran_Swap (TranFunc)
+	opt norefcounts
 	node.ASMType = asmtmp.kSwap	
 	expect (node == 2) (node, "Just swap two items.")
 	node.name = "JB_Swap" 
-	Tran_Print(fn, node, name_space)
+	|| ln = node.first!
+	|| rn = node.Second!
+	|| lc = TypeOfExpr(ln, name_Space)
+	|| rc = TypeOfExpr(rn, name_Space)
+	if LC.AssignabilityCheck(LN, RN, rc) and RC.AssignabilityCheck(RN, LN, lc)
+		expect (lc.DeclSize == rc.DeclSize) (node, "These two types have different sizes")
+		expect (lc.type == rc.type) (node, "These two types are different")
+		LC.ExpectRelMatch( RC, RN, nil, node ) // will this do anything by now?
+		|| i = 0
+		|| b = 0
+		target debug2
+			swap (i) (b+1)
+		Tran_PrintSub(fn, node, name_space)
+		node.last!.obj = compiler.swapfunc
+		node.obj = typevoidptr
+		node.ASMType = asmtmp.kSwap	
 
 
 function Tran_While (TranFunc)
@@ -284,13 +300,17 @@ function Tran_Quit (TranFunc)  // exitter
 	node.MiniTran(name_space, "app")
 
 
-function Tran_Print (TranFunc)
+function Tran_PrintSub (TranFunc)
 	using (node)
 		|| prm = @prm.msg
 		prm.takeallfrom(node)
 		node <~ prm
 		node.first = «Thg node.Name »
 		node.become(@Func)
+	
+
+function Tran_Print (TranFunc)
+	tran_printsub(fn, node, name_space)
 	TypeOfExpr( node, name_space )
 
 

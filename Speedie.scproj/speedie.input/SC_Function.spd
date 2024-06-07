@@ -1311,7 +1311,10 @@ function Tran_NotAllowed (TranFunc) // "continue"
 		error (node)
 
 
-function Tran_Debugger (TranFunc) {
+function Tran_Debugger (TranFunc)
+	if !Options.targetdebug
+		node.remove
+		return
 	|| ch = node.first
 	if !ch
 		node.name = "debugger"
@@ -1332,7 +1335,7 @@ function Tran_Debugger (TranFunc) {
 
 	// "Apple... I think I've heard of that name. Do they eat computers?"
 	// I think It's better to forget society.
-}
+
 
 
 function Tran_DoAt (TranFunc)

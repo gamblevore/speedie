@@ -422,7 +422,7 @@ function NewEqRel (|Message| L, |Message| R, |Message|)
 	op.obj = scoperator.assigns
 	rz <~ R
 
-	rz.ASMType = ASMtmp.kSetVar
+	rz.ASMType = ASMtmp.kSetRel
 
 
 function NewEqRel (|string| L, |String| R, |Message|)

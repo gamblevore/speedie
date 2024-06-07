@@ -146,9 +146,9 @@ forms
 		// all 0000 means no-op
 		if (n1 or U1_Lu)
 			return u1+U1_Lu
-/**/ NOOP (U0)
-	0
-	// does nothing
+
+/**/ NOOP (U0): 0	// does nothing
+
 
 /**/ TRAP (Trap)
 		if (Trap_Signalu)
@@ -240,17 +240,15 @@ forms
 		u1  = (u2|||u3)&~u4
 /**/ BXOR  (U3)
 		u1 = u2 ^ u3
-/**/ BXNR  (U3)		// for A = ~B
-		u1 = (~u2 ^ u3)
 /**/ BNOT  (U2)
-		u1 = ~u3 & ~u2
+		u1 = ~u2 & ~u3
 /**/ BFLG  (BFLD) // perhaps sign can allow for SIMD opts?
 		if (BFLD_Lu)
 			i1 = ((i2 << BFLD_upu) >> BFLD_downu)
 		else
 			u1 = ((u2 << BFLD_upu) >> BFLD_downu)
 /**/ BFLS  (BFLD)
-		i1 |= ((i2 << BFLD_downu) >> BFLD_upu)
+		BFLS(r, Op)
 
 	
 ///**/ BSTT  (U4)

@@ -26,7 +26,8 @@ extend_module ArchonPurger {
 		(asmtmp.kWhile):		While
 		(asmtmp.kContinue):		Continue
 		(asmtmp.kExit):			Exit
-		(asmtmp.ksetvar):		SetRel
+		(asmtmp.kSetRel):		SetRel
+		(asmtmp.kSwap):			Swap
 		(asmtmp.kStatExpr): 	StatExpr
 		(asmtmp.kReturn):		Return
 		(asmtmp.kTern):			Tern
@@ -235,7 +236,6 @@ function Function (NilTrackerFn)
 
 function Rejoin (NilTrackerFn)
 	opt norefcounts
-	target debug: if msg != @tmp
 	return .jump(msg.first!, Test) 
 
 
@@ -259,7 +259,6 @@ function DetectStillChecks (|message| first, |nilstate|)
 
 function Return (NilTrackerFn)
 	opt norefcounts
-	target debug: if msg != @tmp
 	|| v = .DetectStillChecks(msg.first)
 	.Loops.ExitRecord |= nilstate.Basic		// mark as exitting safely.
 	.DeclKill
@@ -275,19 +274,16 @@ function Return (NilTrackerFn)
 
 
 function Exit (NilTrackerFn)
-	target debug: if msg != @tmp
 	.loops.ExitRecord |= .EndBlock
 	.loops.hasEscape = true
 
 
 function Continue (NilTrackerFn)
-	target debug: if msg != @tmp
 	.loops.ContRecord |= .EndBlock
 
 
 function While (NilTrackerFn)
 	opt norefcounts
-	target debug: if msg != @tmp
 	|| cond = msg.first!
 	|| CondTest = cond.IsAlwaysBool
 
@@ -601,6 +597,22 @@ function Declaration (niltrackerfn) // function decl
 			return T.Declare(D, J)
 
 
+	
+function Swap (NilTrackerfn)
+	opt norefcounts
+	|| P = msg.last
+	|| R = P.last!
+	|| L = P.first!
+	|| LD = L.FastDecl
+	|| RD = R.Fastdecl
+	|| RN = .Jump(R)
+	|| LN = .Jump(L)
+
+	check (ld is swappable and rd is swappable) (msg, "Can't swap these. Must be real variables somewhere.")
+	.VariableSet(LD,L,  RD,R,  RN)
+	.VariableSet(RD,R,  LD,L,  LN)
+
+
 function SetRel (NilTrackerfn)
 	opt norefcounts
 	|| R = msg.last!
@@ -641,7 +653,7 @@ function VariableSet (|scdecl| Recv, |message| RecvMsg, |scdecl| Sent, |message|
 			return sentstate
 		if (SentState is realish) 
 			return .BecomeReal(sent, SentMsg, nilreason.using)
-		if (recv is property) and recvmsg.func == @dot
+		if (recv is property) and (recvmsg.func == @dot)
 			if (scfunction.currfunc is constructor) and (recvmsg.first!.fastdecl is self)
 				error (RecvMsg, "Property should be non-nil in constructor: " + recv.name)
 				return nilstate.real

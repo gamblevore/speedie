@@ -96,6 +96,7 @@ linkage
 |SCFunction|				RefSetRef
 
 |SCFunction|				NewFunc
+|SCFunction|				SwapFunc
 |SCFunction|				TernaryFunc
 |SCFunction|				fnFastIsa
 |SCFunction|				fnFastAs
@@ -311,6 +312,7 @@ function InitBasicFuncs (|bool|)
 	.RefFreeIfDead	= .LoadRefFunc( "JB_FreeIfDead" )
 	.RefSafeDecr	= .LoadRefFunc( "JB_SafeDecr" )
 	
+	.SwapFunc		= .FindFunction( "JB_Swap" )
 	.NewFunc		= .FindFunction( "JB_New" )
 	.TernaryFunc	= .FindFunction( "JB_Ternary" )
 	.fnAs			= .LoadTypeTest( "operatoras" )

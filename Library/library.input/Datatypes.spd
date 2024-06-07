@@ -113,10 +113,6 @@ datatype int
 		if self > other: return self
 		return other
 
-
-	operator XOR (|int| X, |int|)
-		return self ^ X
-
 	
 	function CountBits (|int|)
 		cpp_wrapper JB_Int_CountBits
@@ -453,7 +449,6 @@ datatype float
 		cpp_Part RoundTo
 		|| v = (10 pow to)|float|
 		return (self * v).Round / v
-//		std::ceil(value * 100.0) / 100.0
 
 	function SinR (|float|)
 		return (self * math.iTau).sin

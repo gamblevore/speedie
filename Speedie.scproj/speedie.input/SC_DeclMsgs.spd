@@ -154,7 +154,7 @@ function CollectDeclsGlobals (|Message| arg, |SCNode| scarg)
 			require item.CollectAGlobalDecl(scarg)
 
 
-function scdecl.ForContained (|scdecl|)
+function scdecl.ForContained (|scdecl|) // notglobal, noglobal
 	|| Strong = (.NilDeclared isnt nilish) and .typesuffers
 	if (self isnt global) and !.name and !strong 
 		return self
@@ -164,6 +164,14 @@ function scdecl.ForContained (|scdecl|)
 	rz.name = ""
 	rz.nildeclared |= nilstate.nilish
 	(rz isnt global)
+
+
+function scdecl.NotLocal (|scdecl|)
+	if (self isnt local) and !.name 
+		return self
+	rz = .copydecl
+	rz.name = ""
+	(rz isnt local)
 
 
 function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)

@@ -1,5 +1,8 @@
+// a dead-code finder will remove old ops.
 
-// inlining do separately
+// inlining do separately. opts better if we call .µ on inlinedfn... but within our range.
+// i guess returns can be replaced with sets... or turned to jumps, or eliminated
+
 
 // dead code removal... IDK?
 // we need to also opt a+0 into a
@@ -48,9 +51,9 @@ extend FatASM
 			fn = 0 // sigh
 		.Location = fn ||| Value.Position << 12 // 4K max files
 
-	function Nop (|int|)
+	function Nop (|bool|)
 		.op = asm.noop
-		return 2
+		return true
 		
 
 dispatch µOpt (|&fatasm| self, |?&fatasm| P, |?&fatasm| N, |bool|)
@@ -62,15 +65,15 @@ dispatch µOpt (|&fatasm| self, |?&fatasm| P, |?&fatasm| N, |bool|)
 	(ASM.TABL):   OptTabl
 
 	(ASM.SUBB):   OptSubI
-	(ASM.ADDK):   OptAddK
+//	(ASM.ADDK):   OptAddK
 	(ASM.ADD):    OptAddI
 	(ASM.FADD):   OptAddF
 	(ASM.FADK):   OptFADK
 	
 
+	(ASM.RET):    OptRet
 	(ASM.TERN):   OptTern
 	(ASM.BFLG):   OptBFLG
-	(ASM.BFLS):   OptBFLS
 	(ASM.BRUU):   OptShifting
 	(ASM.BRUS):   OptShifting
 	(ASM.BLUE):   OptShifting
@@ -106,18 +109,6 @@ function OptCount (Fn_µOpt)
 function OptTabl (Fn_µOpt)
 	// Glob = glob + 1-127 // --> cntc
 	
-	
-function OptAddK (Fn_µOpt)	
-	// a = b + k1 + k2   -->   a = b + k3
-	require p isa asm.addk
-	|| pout = p.a1
-	|| myin = .a2
-	if pout == myin
-		|| add2 = p.a3|int64| + .a2|int64|
-		if add2.Canint32
-			.a2 = add2
-			return true
-
 
 function OptFADK (Fn_µOpt)	
 	// a = b + k1 + k2   -->   a = b + k3
@@ -131,34 +122,63 @@ function OptFADK (Fn_µOpt)
 	
 
 function OptSubI (Fn_µOpt)
-	if p isa asm.bflg
-		return OptAddI(self, p, n)
-
-
-function FatASM.match3_2 (|int| reg, |bool|)
-	// prefers the value to be at 3.
-	if reg == .a2
-		.swap(2,3)
-		return true
-	return reg == .a3
+	if p 
+		|| op = p.op
+		if op == asm.bflg or asm.SUBB or asm.ADD
+			return OptAddI(self, p, n)
 
 
 function OptAddI (Fn_µOpt)
-	// a dead-code finder will remove old ops.
+	|| out = .a1
+	if .match3_2(0)
+		if out == .a2 // a = a + 0
+			return .nop
+		
+		// a = b + 0
+		.op = asm.boar // u1 = (u2|||u3)&~u4
+		.a4 = 0 // nice
+		return true
+		
 
 	require p and !.a4
-	|| out = p.a1
+		
+	|| pout = p.a1
+	if p isa asm.add or asm.subb
+		// p1 = p2 + k3
+		// a1 = p1 + kk3   -->   a1 = p2 + kkk3
+	
+		// p1 = p2 - k3
+		// a1 = p1 - kk3   -->   a1 = p2 - (k3+kk3)
+	
+	
+		// p1 = p2 + k3
+		// a1 = p1 - kk3   -->   a1 = p2 - (kk3 - k3)
+	
+		// p1 = p2 - k3
+		// a1 = p1 + kk3   -->   a1 = p2 + (kk3 - k3)		
+		require (pout == .a2) // we don't want any shifts... that can be done in the renderer
+		|| pk = p.k3
+		|| mk = .k3
+		require pk and mk
+		.a2 = pout
+		|| op = asmmath.Add|asmreg|
+		if (self isa asm.subb) != (p isa asm.SUBB)
+			op = ASMMath.sub|asmreg|
+		.a3 = asmstate.sh.DoConsts(asmmath.Add|asmreg|, mk.reg, pk.reg).reg
+		return true
 
-	// c = d << k,  a = b + c  <-- a = b + (d << k)
+
+
+	// c = d << k,  a = b + c  -->  a = b + (d << k)
 	if (p isa asm.BFLG)
-		require p.a5 and .match3_2(out)			// unsigned
+		require p.a5 and .match3_2(pout)			// unsigned
 		.a4 = p.a3
 		.a3 = p.a2
 		return true
 
-	if p isa asm.MULT // needs SSA
+	if p isa asm.MULT // needs refcounts
 		// x2 = x1 * x1,  a = b + x2   -->   a = x1 * x1 + b
-		require .match3_2(out)
+		require .match3_2(pout)
 		.op = asm.MULT
 		.a4 = .a2
 		.a3 = p.a3
@@ -167,25 +187,35 @@ function OptAddI (Fn_µOpt)
 
 
 function OptAddF (Fn_µOpt)
+	|| mout = .a1
+	|| a4 = .a4
+	// a = b + (c - c),   (a = b + 0 - 0)
+	if (a4 == .a3)	or (.match3_2(0) and !a4)
+		if mout == .a2 // a = a + 0
+			return .nop
+		
+		// a = b + 0
+		.op = asm.boar // u1 = (u2|||u3)&~u4
+		.a4 = 0 // nice
+		return true
+
     // a*b + c --> MUL
-	require p  and  p.a5 == .a5 // both are 64.  or both are 32
-	|| out = p.a1
+	require p  and  p.a5 == .a5		// Both are 64.  or both are 32
+	|| pout = p.a1
 	if p isa asm.FADD
-		if !.a2 or out == .a3
-			.swap(2,3)
-		require out == .a2
-		if !p.a4 and !.a3    // pa = p2 + p3,   f1 = pa - f4   <--   f1 = p2 + p3 - f4
+		require .match3_2(pout)
+		if !p.a4 and !.a3    		// pa = p2 + p3,   f1 = pa - f4   <--   f1 = p2 + p3 - f4
 			.a3 = p.a3
 			.a2 = p.a2
 			return true
-		if !p.a3 and !.a4	 // pa = p2 - p4,   f1 = pa + f3   <--   f1 = p2 + f3 - p4
+		if !p.a3 and !.a4			// pa = p2 - p4,   f1 = pa + f3   <--   f1 = p2 + f3 - p4
 			.a4 = p.a4
 			.a2 = p.a2
 			return true
 
 	require !.a4
-	if p isa asm.FMUL		 // x2 = x1 * x1,  a = b + x2   -->   a = x1 * x1 + b
-		require !.match3_2(out)
+	if p isa asm.FMUL				// x2 = x1 * x1,  a = b + x2   -->   a = x1 * x1 + b
+		require !.match3_2(pout)
 		.op = asm.FMUL
 		.a4 = .a2
 		.a3 = p.a3
@@ -195,7 +225,7 @@ function OptAddF (Fn_µOpt)
 
 // a1 = a2 << (a3+k4)
 function OptShifting (fn_µopt)   // can't really opt this unless registers contain consts...
-								 // I will rework to use SSA+Consts
+								 // I will rework to use refcounts+Consts
 	// we need to combine a bflg with this.
 	// bflg(same side only) + shift --> shift
 	|| k = .a3
@@ -222,7 +252,7 @@ function OptShifting (fn_µopt)   // can't really opt this unless registers cont
 //		up		6
 //		down	6
 function OptBFLG (fn_µopt)
-// can merge two bflg... just add up + down!  Works with SSA.  (if sign matches)
+// can merge two bflg... just add up + down!  Works with refcounts.  (if sign matches)
 //////  BFLG
 //	if (BFLD_Lu)
 //		i1 = ((i2 << up) >> down)
@@ -230,16 +260,13 @@ function OptBFLG (fn_µopt)
 //		u1 = ((u2 << up) >> down)
 
 
-function OptBFLS (fn_µopt)
-// can merge bflg+bfls! same as above
-//////  BFLS
-//	i1 |= ((i2 << up) >> down)
-//  i1 = (i2 >> i3+U3_Lu)
-
-
 function OptBitOr (fn_µopt)
-	// bfls: x = x | (y << 5) // 5 is a const...
-	// boar: u1  = (u2|||u3) & (~u4)
+	require p
+	if p isa asm.bnot // u1 = ~u2 & ~u3
+		|| p2 = p.a2,  || p3 = p.a3
+		if (p2 == p3) or .match3_2(0)
+			
+	// boar:   u1  = (u2|||u3)&~u4
 
 
 function OptBitAnd (fn_µopt)
@@ -257,6 +284,8 @@ function OptCompare (fn_µopt)
 
 
 
+//	* if x: {return a}, return b --> y = TERN(x,a,b)
+//		* also just with setting
 function OptJump (fn_µopt)
 // flowcontrol
 
@@ -279,17 +308,9 @@ function OptBra (fn_µopt)
 // LUPU/LUPD
 
 
-
-/*
-	perhaps all consts should simply be refered to... like 0-31 = reg, and 32+ = const
-	Then later the const-filler should insert them at the right places.
-	this actually is harder than it seems, because of function calls. but it does make
-	optimising consts away... much easier.
-	
-	a *= 3
-	a = func(a)
-	b *= 3 // 3 needs reload!
-	
-	
-*/
+function OptRet (fn_µopt)
+	// maybe easier to do from the ret?
+// flowcontrol
+// if x: return true/false --> conditional return 
+// LUPU/LUPD
 

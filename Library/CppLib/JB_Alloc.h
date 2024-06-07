@@ -322,7 +322,7 @@ u32 JB_ObjCount();
 #define JB_SafeDecr(Obj)		JB_SafeDecr_((JB_Object*)(Obj))
 #define JB_SetRef(a,b)			JB_SetRef_((JB_Object**)(&a), (JB_Object*)(b))
 #define JB_Clear(a)				JB_Clear_((JB_Object**)(&a))
-#define JB_Swap(a,b)			(std::swap(*(a),*(b)))
+#define JB_Swap(a,b)			(std::swap(a,b))
 #define JB_LongObjOr(A, B)            ({ \
     JB_Object* _T = (A);                 \
     if (!_T) {                           \

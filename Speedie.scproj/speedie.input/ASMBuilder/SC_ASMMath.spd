@@ -4,12 +4,6 @@ prototype fn_OpASM (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |me
 
 
 extend asmreg
-	function CanAddK (|int64| T, |bool|)
-		if (self is constany) and .isint
-			|| B = (t << 50)>>50
-			return B == t
-
-
 	function boolasm (|asmreg|)
 		.µtype = DataTypeCode.bool
 		
@@ -142,11 +136,20 @@ extend ASMState
 
 	// MATH
 	
+	
+	function TypeCast (fn_opasm)
+//function DoSingleMath (|&ASMState| self, |message| exp, |AsmReg| Dest, |scoperator!| Scop, |AsmReg|)
+//	|| Src = .µ(exp, dest)
+//	(src is SingleExpr)
+//		.AddBit( "",	"RotateRight",	&asmstate.ROR,		asmmath.ROR,	opmode.shift)
+//	return DoMathSub(self, exp, dest, src, scop)
+		
+	
 	function f (|asmreg| r, |f64|)
 		|| p = self[r]
 		if r.fourbytes
-			return p|&float|[0]
-		return p|&f64|[0]
+			return p|&float|[]
+		return p|&f64|[]
 
 
 	function QuickFloatPlus    (fn_opasm)
@@ -228,14 +231,16 @@ extend ASMState
 		|| OPP = asm.ADD + subtract
 		(dest as= ASMMath.add + subtract)
 
-		if !subtract and l.CanAddK(LL)					// 1 + a
-			.AddASM(asm.ADDK, exp, dest, R, LL)
-
-		  elseif r.CanAddK(RR)							// a - 1, a + 1
-			.AddASM(asm.ADDK, exp, dest, L, RR)
-
-		  else
-			.AddASM(OPP, exp, dest, L, R, 0)
+		// the const system could make this code irrelevant?
+		// we just do the addk at render-time?
+//		if !subtract and l.CanAddK(LL)					// 1 + a
+//			.AddASM(asm.ADDK, exp, dest, R, LL)
+//
+//		  elseif r.CanAddK(RR)							// a - 1, a + 1
+//			.AddASM(asm.ADDK, exp, dest, L, RR)
+//
+//		  else
+		.AddASM(OPP, exp, dest, L.l(r), R.r(l))
 		
 		return dest
 
@@ -344,17 +349,14 @@ extend ASMState
 
 
 	// BITS
-	function BitXnor (fn_opasm)
-		if l is ConstAny
-			||  t = l,  l = r,  r = t
-		.AddASM(asm.BXNR, exp, dest, L, R), return dest
+	function BitNot (fn_opasm)
+		if r.reg // what?
+		.AddASM(asm.BNOT, exp, dest, l, l), return dest
 	
 	function BitXor (fn_opasm)
 		if (l.reg == r.reg)
 			return .BitOr(dest, asmreg(), asmreg(), exp)
-		if l is ConstAny
-			||  t = l,  l = r,  r = t
-		.AddASM(asm.BXOR, exp, dest, L, R), return dest
+		.AddASM(asm.BXOR, exp, dest, L.l(r), R.r(l)), return dest
 
 	function BitOr  (fn_opasm)
 		if l is ConstAny
@@ -369,11 +371,8 @@ extend ASMState
 			return dest						// no need
 		.AddASM(asm.BOAR, exp, dest, L, R), return dest
 	
-	function BitAnd (fn_opasm)
-		if l is ConstAny
-			||  t = l,  l = r,  r = t
-		
-		.AddASM(asm.BAND, exp, dest, L, R), return dest
+	function BitAnd (fn_opasm)		
+		.AddASM(asm.BAND, exp, dest, L.l(R), R.r(l)), return dest
 	
 	function ROL    (fn_opasm)
 		.AddASM(asm.BROL, exp, dest, L, R), return dest
@@ -425,4 +424,12 @@ extend ASMState
 	function Assign (fn_opasm)
 		return .bitor(dest, l, asmreg(), exp)
 
+
+
+function asmreg.l (|asmreg| r, |asmreg|)
+	return (r, self)(self is ConstAny)
+
+
+function asmreg.r (|asmreg| r, |asmreg|)
+	return (r, self)(r is ConstAny)
 

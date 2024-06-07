@@ -51,7 +51,7 @@ linkage
 |SCOperator--?|	Opposite 
 
 
-constructor (|string| name, |fn_opasm?| ASM, |OpMode| mode)
+constructor (|string| name="", |fn_opasm?| ASM, |OpMode| mode=0)
 	.name = name
 	.kind = mode
 	.asm = asm
@@ -121,8 +121,9 @@ module {
 	|Dictionary of SCOperator|			Dict = dictionary()
 	|int|								CustomOperatorScore
 	|scoperator|						Assigns
-	|scoperator| 						Minus = SCOperator.new("", &asmstate.subtract, 0)
-	|scoperator| 						Bnot  = SCOperator.new("", &asmstate.BitXnor,  0)
+	|scoperator| 						Minus		= SCOperator.new(&asmstate.subtract)
+	|scoperator| 						Bnot		= SCOperator.new(&asmstate.BitNot)
+	|scoperator| 						TypeCast	= SCOperator.new(&asmstate.TypeCast)
 	
 	function Lookup ( |Message| opch, |SCOperator| )
 		opt norefcounts

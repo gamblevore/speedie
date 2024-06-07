@@ -43,7 +43,7 @@ dispatch fn_asm_table (fn_asm)
 	(asmtmp.kContinue):		ASMtmp.Continue
 	(asmtmp.kExit):			ASMtmp.Exit
 
-	(asmtmp.ksetvar):		ASMtmp.SetRel
+	(asmtmp.kSetRel):		ASMtmp.SetRel
 	(asmtmp.kStatExpr): 	ASMtmp.StatExpr
 	(asmtmp.kPointer):		asmtmp.Pointer
 
@@ -99,7 +99,11 @@ function Debugger		(fn_asm)
 	if Options.targetdebug
 		.addasm(asm.TRAP, exp) // nice!
 
+//	* make typecast a mathopp
+//		* typecast consts
 
+
+// abc(), if (x) return, def()   -->   abc(), if !x {def()}, return
 function If				(fn_asm)
 	opt norefcounts
 	debugger
@@ -110,8 +114,18 @@ function If				(fn_asm)
 	if arg2 and arg2 != @arg
 		ElseIfCond = arg2
 		arg2 = arg2.next
+	
+	|| Flip = !arg1.HasAsmStuff
+		if ElseIfCond		// if (x) {} elseif (y) {yy} else {zz} --> if (!x) {if (y) {yy} else {zz}}
+			arg1 = ElseIfCond
+		  elseif arg2		// if (x) {} else {y()}                --> if (!x) {y()}...
+			arg1 = arg2
+		  else				// if (X) --> {x} // with discard
+			return .µ(cond, asmreg.arg)
+		ElseIfCond = nil
+		arg2 = nil
 
-	|| Start = .Branch(cond)
+	|| Start = .Branch(cond, Flip)
 	.µ(arg1)
 	|| AfterFirst = .AddASM(asm.jump, arg1) // marks as ended... to prevent opts. can be removed later during optimisation
 	if ElseIfCond or arg2.HasAny
@@ -264,7 +278,7 @@ function Decl (fn_asm)
 	|| rel = exp.last!
 	|| ty = rel.first!.fastdecl
 	|| reg = .DeclareMe(Exp, ty.reg)
-	(reg is NotYetUsed)
+//	(reg is NotYetUsed)
 	return .µ(rel.last!, reg)
 
 
@@ -529,9 +543,12 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr
 	|| ml = AsmReg()
 	if mr isnt SingleExpr
 		|| OV = .VTmps
-		ml = .µOpen(F)
-		mr = .µopen(exp.last!)
+		ml = .µOpen(F, dest & asmreg.discard)
+		mr = .µOpen(exp.last!, dest & asmreg.discard)
 		.VTmps = OV
+	
+	if dest is Discard
+		return dest // no need to do anything. {a()+b()}
 
 	|| fn = scop.asm					#expect (op, "No ASM for this operator?")
 	dest = .TempMe(exp, dest) 
@@ -540,7 +557,7 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr
 	(dest is frommath)
 
 	|| ConstInput = ml is constany  and  mr is constany
-		(Dest is mathconst)
+		(Dest is MathConst)
 	|| R = (fn)(self, dest, ml, mr, op)
 	if Constinput and (r isnt mathconst) // hmm?
 		debugger 
@@ -603,3 +620,9 @@ function int64.CanStoreAsIntImmediate (|bool|)
 function uint64.CanStoreAsFloatImmediate (|bool|)
 	return ((self << 50)>>50) == self
 
+
+function message.HasAsmStuff (|bool|)
+	opt norefcounts
+	for ch in self
+		if ch.func != @sheb
+			return true
