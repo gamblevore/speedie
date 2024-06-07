@@ -1942,7 +1942,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112576571310080));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112576592740352));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -10624,14 +10624,13 @@ int JB_InitCode_() {
 	SC__ASM_Forms[15] = (&JB_ASM_BFLD__Encode);
 	SC__ASM_Forms[16] = (&JB_ASM_BCmp__Encode);
 	SC__ASM_Forms[17] = (&JB_ASM_BClear__Encode);
-	SC__ASM_Forms[18] = (&JB_ASM_SWAP__Encode);
-	SC__ASM_Forms[19] = (&JB_ASM_RET__Encode);
-	SC__ASM_Forms[20] = (&JB_ASM_Div__Encode);
-	SC__ASM_Forms[21] = (&JB_ASM_Trap__Encode);
-	SC__ASM_Forms[22] = (&JB_ASM_Float__Encode);
-	SC__ASM_Forms[23] = (&JB_ASM_FloatConst__Encode);
-	SC__ASM_Forms[24] = (&JB_ASM_FloatAddExp__Encode);
-	SC__ASM_Forms[25] = (&JB_ASM_ConstStretchy__Encode);
+	SC__ASM_Forms[18] = (&JB_ASM_RET__Encode);
+	SC__ASM_Forms[19] = (&JB_ASM_Div__Encode);
+	SC__ASM_Forms[20] = (&JB_ASM_Trap__Encode);
+	SC__ASM_Forms[21] = (&JB_ASM_Float__Encode);
+	SC__ASM_Forms[22] = (&JB_ASM_FloatConst__Encode);
+	SC__ASM_Forms[23] = (&JB_ASM_FloatAddExp__Encode);
+	SC__ASM_Forms[24] = (&JB_ASM_ConstStretchy__Encode);
 	JB_Syx__StdNew(JB_Msg_Nil__, JB_LUB[1721], JB_LUB[1282], 0);
 	JB_Syx__StdNew(JB_Msg_Arg__, JB_LUB[1390], JB_LUB[521], 1);
 	JB_Syx__StdNew(JB_Msg_Emb__, JB_LUB[1531], JB_LUB[723], 2);
@@ -15966,22 +15965,6 @@ ASM SC_ASM_RET_LSet(ASM Self, int Value) {
 	return Self | ((Value << 22) >> 22);
 }
 
-ASM SC_ASM_SWAP_ASet(ASM Self, int Value) {
-	return Self | ((Value << 26) >> 8);
-}
-
-ASM SC_ASM_SWAP_BSet(ASM Self, int Value) {
-	return Self | ((Value << 26) >> 14);
-}
-
-ASM SC_ASM_SWAP_CSet(ASM Self, int Value) {
-	return Self | ((Value << 26) >> 20);
-}
-
-ASM SC_ASM_SWAP_DSet(ASM Self, int Value) {
-	return Self | ((Value << 26) >> 26);
-}
-
 ASM SC_ASM_Tail_JUMPSet(ASM Self, int Value) {
 	return Self | ((Value << 8) >> 8);
 }
@@ -17868,18 +17851,6 @@ ASM JB_ASM_RET__Encode(FatASM* Self) {
 }
 
 
-ASM JB_ASM_SWAP__Encode(FatASM* Self) {
-	ASM Rz = 0;
-	//visible;
-	Rz = (Self->Op << 24);
-	Rz = SC_ASM_SWAP_ASet(Rz, Self->R[0]);
-	Rz = SC_ASM_SWAP_BSet(Rz, Self->R[1]);
-	Rz = SC_ASM_SWAP_CSet(Rz, Self->R[2]);
-	Rz = SC_ASM_SWAP_DSet(Rz, Self->R[3]);
-	return Rz;
-}
-
-
 ASM JB_ASM_Tail__Encode(FatASM* Self) {
 	ASM Rz = 0;
 	//visible;
@@ -19081,7 +19052,7 @@ bool SC_Pac__ExpandJSM() {
 	if (JB_Array_SyntaxCompare(SC__Pac_Ancients, 16, false) >= 0) {
 		return nil;
 	}
-	MWrap* J = JB_Incr(JB_Mrap__Object(4194304, 32));
+	MWrap* J = JB_Incr(JB_Mrap__Object(4194304, 64));
 	if (J) {
 		JB_Array_SyntaxAppend(SC__Pac_Ancients, SC__Pac_JSMSpace);
 		JB_SetRef(SC__Pac_JSMSpace, J);
@@ -19095,7 +19066,7 @@ bool SC_Pac__ExpandJSM() {
 
 int SC_Pac__Init_() {
 	{
-		JB_SetRef(SC__Pac_JSMSpace, JB_Mrap__Object(0, 32));
+		JB_SetRef(SC__Pac_JSMSpace, JB_Mrap__Object(0, 64));
 		JB_SetRef(SC__Pac_Ancients, JB_Array_Constructor0(nil));
 		SC__Pac_Sh = ((ASMState){});
 	}
@@ -24627,7 +24598,7 @@ void SC_Instruction__InstructionInit() {
 	SC_Instruction__Add(JB_LUB[1925], JB_LUB[2073], 16);
 	SC_Instruction__Add(JB_LUB[1917], JB_LUB[1164], 17);
 	SC_Instruction__Add(JB_LUB[1811], JB_LUB[1065], 18);
-	SC_Instruction__Add(JB_LUB[1888], JB_LUB[1097], 19);
+	SC_Instruction__Add(JB_LUB[1931], JB_LUB[1097], 19);
 	SC_Instruction__Add(JB_LUB[1926], JB_LUB[1022], 20);
 	SC_Instruction__Add(JB_LUB[1928], JB_LUB[1056], 21);
 	SC_Instruction__Add(JB_LUB[1929], JB_LUB[571], 22);
@@ -50597,4 +50568,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 2724112268284042578 -4278041914294442028
+// -458522346211651662 -4278041914294442028

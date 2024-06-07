@@ -181,8 +181,6 @@ typedef ASM ASM_Mem;
 
 typedef ASM ASM_RET;
 
-typedef ASM ASM_SWAP;
-
 typedef ASM ASM_Tail;
 
 typedef ASM ASM_Trap;
@@ -694,6 +692,7 @@ struct FatASM {
 	byte Label;
 	u16 BlockNum;
 	uint Location;
+	uint FAT[8];
 };
 
 struct IsaTester {
@@ -4400,14 +4399,6 @@ ASM SC_ASM_RET_ExistsSet(ASM Self, int Value);
 
 ASM SC_ASM_RET_LSet(ASM Self, int Value);
 
-ASM SC_ASM_SWAP_ASet(ASM Self, int Value);
-
-ASM SC_ASM_SWAP_BSet(ASM Self, int Value);
-
-ASM SC_ASM_SWAP_CSet(ASM Self, int Value);
-
-ASM SC_ASM_SWAP_DSet(ASM Self, int Value);
-
 ASM SC_ASM_Tail_JUMPSet(ASM Self, int Value);
 
 ASM SC_ASM_Trap_FuncSet(ASM Self, int Value);
@@ -5008,11 +4999,6 @@ ASM JB_ASM_Mem__Encode(FatASM* Self);
 
 // ASM_RET
 ASM JB_ASM_RET__Encode(FatASM* Self);
-
-
-
-// ASM_SWAP
-ASM JB_ASM_SWAP__Encode(FatASM* Self);
 
 
 

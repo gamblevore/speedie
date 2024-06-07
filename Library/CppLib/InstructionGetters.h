@@ -196,31 +196,6 @@
 #define   BClear_Signu_(x)   (((uint)((x)<<30))>>30)
 
 
-#define   SWAP_Ai       ((( int)((Op.Raw)<<8))>>26)
-#define   SWAP_Ai_(x)   ((( int)((x)<<8))>>26)
-
-#define   SWAP_Au       (((uint)((Op.Raw)<<8))>>26)
-#define   SWAP_Au_(x)   (((uint)((x)<<8))>>26)
-
-#define   SWAP_Bi       ((( int)((Op.Raw)<<14))>>26)
-#define   SWAP_Bi_(x)   ((( int)((x)<<14))>>26)
-
-#define   SWAP_Bu       (((uint)((Op.Raw)<<14))>>26)
-#define   SWAP_Bu_(x)   (((uint)((x)<<14))>>26)
-
-#define   SWAP_Ci       ((( int)((Op.Raw)<<20))>>26)
-#define   SWAP_Ci_(x)   ((( int)((x)<<20))>>26)
-
-#define   SWAP_Cu       (((uint)((Op.Raw)<<20))>>26)
-#define   SWAP_Cu_(x)   (((uint)((x)<<20))>>26)
-
-#define   SWAP_Di       ((( int)((Op.Raw)<<26))>>26)
-#define   SWAP_Di_(x)   ((( int)((x)<<26))>>26)
-
-#define   SWAP_Du       (((uint)((Op.Raw)<<26))>>26)
-#define   SWAP_Du_(x)   (((uint)((x)<<26))>>26)
-
-
 #define   RET_Counti       ((( int)((Op.Raw)<<18))>>29)
 #define   RET_Counti_(x)   ((( int)((x)<<18))>>29)
 

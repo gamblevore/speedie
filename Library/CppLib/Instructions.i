@@ -1,7 +1,5 @@
 ı EROR: _
-	if (n1 or U1_Lu) 
-	return u1 + U1_Lu
-;
+	return u1 + U1_Lu;
 ı FUNC: 
 	__;
 	Code = BumpStack(r, Code, Op);
@@ -31,8 +29,8 @@
 	Code = Return(r, Code, Op);
 	___;
 ı SWAP: _
-	std_swap(r[SWAP_Au], r[SWAP_Bu]);
-	std_swap(r[SWAP_Cu], r[SWAP_Du]);
+	std_swap(r[r1], r[r2]);
+	std_swap(r[r3], r[r4]);
 ı PRNT: _
 	printf("%lli\n", i1);
 	// better to print this also as float/double/signed/unsigned...
