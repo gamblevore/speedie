@@ -8,19 +8,19 @@ class CheeseShop
 		.clerkName = cfg["clerk"]
 
 	syntax access (|string| cheeseName, |string|)
-		if (cheeseName == .clerkName)
+		if (cheeseName ~= .clerkName)
 			return "Sir?"
 		
-		return ("yes", "no")(.inventory[cheeseName])
+		return ("Yes", "No")(.inventory[cheeseName])
 
 
 main
 	|| shop = CheeseShop(configData.parse$)
-	"Red Leicester? ${shop[`Red Leicester`]}"
-	"Tilsit? ${shop[`Tilsit`]}"
-	"Wenslydale? ${shop[`Wenslydale`]}"
-	"Cheddar? ${shop[`Cheddar`]}"
-	"Joke ${shop[`Barris`]}"
+	"Red Leicester? ${shop[`red leicester`]}"
+	"Tilsit? ${shop[`tilsit`]}"
+	"Wenslydale? ${shop[`wenslydale`]}"
+	"Cheddar? ${shop[`cheddar`]}"
+	"Joke ${shop[`barris`]}"
 
 
 || ConfigData = `

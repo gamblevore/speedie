@@ -2,26 +2,15 @@
 
 bugs:
 	* unify numeric types a lot. Many functions want to work on uint, int, etc... and one func is good enough for all!
-	* recursion blocker. We block any func from being recursive unless explicitly stated it could be. (can mark entire file as recursive though... like for my parser)
-	* don't use "syntax append", simply "function append". Same with "call". I mean *x --> x.first
-	* sdleventtype.mousedown() // compiles???
-		* cant do sdlapp.event is mousedown! is it cos its a struct? it shoudl work on modules and struct
-	* Function finding fails with dictionary subclasses? DictSub["abc"]
-	* collectdecls uppercase one letter at least... within funcs, unless 1 byte long
+	* don't use "syntax append", simply "function append". Same with "call". I mean x++ --> x.next
 	* vector constants
-	* || s = "".Address.IsLower // won't compile...
-	* Make perryide_Behaviour available from speedie, c-export only.
-		* Perhaps a unicode start letter. or don't add to lookup table
 	* &uint... allows &int
 	* passing .hfloatvar to  func(float) causes reporting error
-	* |string| s = __now__.render fails
 	* render float.fn {code} // won't compile
-	* v.operatormul(1.33) instead of v*1.33 :(
-	* ?? is kinda buggy for a lot of things.
-		x = a ?? x // sets x to x! should disallow? if a: x=a thats what we want.
 	*	status(.CurrMousePixelColor.render) // tmp struct.
 	* The "function case affects visibility" (from GoLang) thing needs deletion.
 	* refcounter passing properties as function param, SHOULD NOT assume it won't be cleared... not without disturbance checker
+
 
 additions:
 	* class descriptions!
@@ -30,8 +19,6 @@ additions:
 		* first byte (if float) can also store the sign of the exponent.
 		* could be an interesting type to have generally... like perhaps as a string subclass?
 	* refcount optimiser
-	* nil-checker could eliminate scope-escape... of local vars addresses. Its an error regardless.
-	* CollectDecls needs to not return early!! or break it up into pieces
 	* –container @ques ability... for macros. This returns the syntax that contained us. Useful for (all~files).delete
 	* unify macros? or just modernise. Why pass an array? why not a message~list? Arrays suck. list sexy.
 	* do we need lowercase in lookupsub??? all dots/funcs got lowered in parseclean?
@@ -46,12 +33,7 @@ additions:
 	* (node, err) = .text.parse --> |error| err, || node = .text.parse(err) // noice
 	* any object can be created with an virtual-function override table, just store before the refcount?
 		* if refcounts come in multiple of 2 (or even 4), we could store if we have a override table... per object
-
-	* could unify all the tmp names into IDs during the lookup phase. We use a dict of the names anyhow right?
 	* || x = .SomeCArray // should just get the address... :)
-	
-	* Errors in subprojects kinda suck with error-reporting
-		* errors with jbin also suck
 	* months.scproj demo needs better compiler support, including .render not being needed.
 
 	* auto foo() { // multiple return?
@@ -67,8 +49,6 @@ class-changes
 	* replace dictionary with fixeddict
 		* doesnt need datatype wrapper! We could use a dict of ints / pointers...
 * Get galaxxies compiling
-	* Condtionally use glm in galaxxies.
-	* (|xyz| a)	// Should be @decl					// Replace fTypeCast2 with fdecl...
 * GameFloodFill being generated despite not being used.
 	GameFloodFill_Behaviour GameFloodFill_FuncTable_ = InitTableGameFloodFill_();
 	JBClassPlace4(GameFloodFill, JB_AsClass(FastAppender), GameFloodFill_FuncTable_);
@@ -76,9 +56,6 @@ class-changes
 		Game_Flood_PopAllOff(self); // bug here
 	}
 I guess it's because it's a saveable? makes sense, sorta. We can just make it not saveable...
-* obj*bool = JB_ObjOrNot(obj,bool)
-	* need special "returns self" type?
-
 *	|FastString| StdOutFS // create .disposeall_ func. just search for ".initvarsarg"
 * Can't save GameMaterial... but we can save cell? neither are subclass of saveable.
 

@@ -19,7 +19,7 @@ role config (message)
 			
 	syntax cast (|string|)
 		if self
-			return .name
+			return .Value
 	
 	function Save (|bool|)
 		|| f = .obj as file
