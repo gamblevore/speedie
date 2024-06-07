@@ -55,6 +55,8 @@ function vec4.PreMul (|PreMultipliedColor|)
 function errorseverity.color (|vec4|)
 	if self == ErrorSeverity.Warning
 		return colors.yellow
+	if self == ErrorSeverity.Problem
+		return Colors.Orange
 	if self < ErrorSeverity.Warning
 		return colors.White
 	return colors.red

@@ -19,7 +19,7 @@ class TextViewLine (list)
 
 	|string|				Text
 	|message?|				Message
-	|Error?|				DrawError
+	|Error?|				LineError
 	|int|					MsgPos
 	|int|					vline
 	|int|					tline
@@ -251,9 +251,9 @@ class TextViewLine (list)
 	
 	function TrySetError (|error| e, |bool|)
 		opt norefcounts
-		|| old = .drawerror
+		|| old = .LineError
 			e.when = old.when
-		.drawerror = e
+		.LineError = e
 		e.Obj = self
 		return e == old
 
@@ -263,7 +263,7 @@ class TextViewLine (list)
 		|| e = parent.MyError
 			if (self contains e.position) and (!e.obj) 
 				e.obj = self
-				.drawerror = e
+				.LineError = e
 		if parent.ParsedMessage
 			is colored
 		return .SetLineNum(t)
@@ -293,17 +293,15 @@ class TextViewLine (list)
 			return -1
 		isnt last
 		return i
+
+
+
 	
-//	module
-//		|Error|					TextErrors 
-
-
-
 helper textview.DrawError (|image| Where, |int| y, |TextViewLine| D)
 	opt norefcounts
-	|| e = d.drawerror$
+	|| e = d.LineError$
 	if (e is parse) and .ParsedMessage			// obviously it parsed ok.
-		d.drawerror = nil
+		d.LineError = nil
 		return
 	|| r = .lastrect
 	y++
@@ -388,11 +386,11 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 	opt norefcounts
 	opt min 3
 	|| GoUp = (7 - .lineheight)/2
-	if d.drawError //  i guess right?
+	if d.LineError //  i guess right?
 		if .myerror 
 			.drawerror(where, y+GoUp, d)
 		  else
-			d.drawerror = nil // sigh. crappy bug fix
+			d.LineError = nil // sigh. crappy bug fix
 //	if d is found
 //		.drawfound(where, y+GoUp, d)
 	if .CanDrawLight(d)				// linelight
@@ -414,7 +412,7 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 		ifn useCol & 2
 			UseCol = (d is colored)|int|
 		|| col = ¥.GetColor(state.msg, usecol, pos)
-		if d.drawError and c == 9 and prev == 32 
+		if d.LineError and c == 9 and prev == 32 
 			c = -c
 		  elseif c.istextline
 			0

@@ -367,7 +367,7 @@ function EditMeSelError (GUITextErrorSelected)
 	|| i = .ide
 	|| el = i.errorlist
 	i.DuringMsgFB = true
-	el.select(error.drawerror)
+	el.select(error.lineerror)
 	i.DuringMsgFB = false
 
 	

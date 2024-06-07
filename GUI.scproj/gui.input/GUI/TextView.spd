@@ -290,7 +290,7 @@ class TextView (GUIControl)
 		if !.IsCleared
 			(.OnSelChanged)(self, 0, insert)?
 		require d
-		|| err = d.DrawError
+		|| err = d.LineError
 			(.OnSelError)(self, d)?
 			if .OnShowExtraInfo
 				.CancelDelayedError
@@ -897,8 +897,8 @@ class TextView (GUIControl)
 		|| start = .selectedline
 		|| d = start.Loop()
 		while d != start
-			if d.DrawError
-				.ErrorAt(d.drawerror)
+			|| err = d.LineError
+				.ErrorAt(err)
 				return 
 			d = d.loop
 	
@@ -916,16 +916,13 @@ class TextView (GUIControl)
 		if err
 			.ErrorJump(err.position)
 			.LineErrorAdd( err, true )
-	///// end of non-internal calls
-	// they will call finddrawinfo... which can parse and resplit the entire textview...
-	// bad to do that from within .parse itself which then becomes recursive.
-
+	
 
 	function ClearErrors
 		opt norefcounts
 		.myerror = nil
 		for d in ._lines
-			d.drawerror = nil
+			d.LineError = nil
 
 
 	helper LineErrorAdd (|error| e, |bool| ForceParse=true)
@@ -1587,7 +1584,7 @@ class TextView (GUIControl)
 		require strength > 0
 		|float| N = ._lines.last!.vline|float|
 		for s in ._lines
-			|| E = s.drawerror
+			|| E = s.LineError
 				|| v = s.vline|float|
 				|| Y = 1.0 - (v/n)
 				Y *= .height|float|
@@ -1658,8 +1655,8 @@ class TextView (GUIControl)
 
 		if keys.cmd
 			.ShowExtraInfoAtPos(B, "", nil)
-		  elseif d and d.DrawError
-			.ShowErrorInfo(b, d.drawerror!, mousemove)
+		  elseif d and d.LineError
+			.ShowErrorInfo(b, d.LineError!, mousemove)
 		  else
 			.CancelDelayedError
 			.ShowNoExtra

@@ -360,7 +360,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 	require key isnt escape
 	|| dd = .FindDrawInfo(s.x)
 	require  (dd contains i2)
-	|| err = dd.drawerror
+	|| err = dd.lineerror
 		require err isnt parse
 	
 	|message| where
