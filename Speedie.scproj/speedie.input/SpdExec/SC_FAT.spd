@@ -1,14 +1,46 @@
 
 
+/*
+	we need a very simple exmaple... where we set some regs... and all the everything else is done automatically.
+	all the refcounting... etc etc etc.
+	
+	does that mean something like this?
+	
+	asm.TERN(exp,1,2,3,4)
+	asm.TERN(1,2,3,4,exp)
+	exp.TERN(1,2,3,4)
+	exp <~ asm.TERN(1,2,3,4)
+	asm.TERN(1,2,3,4) <~ exp
+	
+	exp.TERN(1,2,3,4)
+	
+	we could do the refcounting later? like during the block-checking pass?
+	
+	what about closing of if/elsees... how can it know about that. seems like we should do the 
+	refcounting then. anyhow... lets assume its immediate. We can also make all of these inlined
+*/
+
+
+function message.Tern (|asmreg| a, |asmreg| b, |asmreg| c, |asmreg| d)
+	pragma inline,  opt norefcounts,  cpp_part ASMTern
+	|| fat = asmstate.sh <~ (asm.tern, self)
+	fat.r[0] = a.reg
+	fat.r[1] = b.reg
+	fat.r[2] = c.reg
+	fat.r[3] = d.reg
+
+	
+
 struct FatASM
 	|uint[6]|		R	
 	|byte|			Op
 	|byte|			Label	// 255 labels per function
 	|uint16| 		BlockNum
 	|uint|			Location
-	|uint[8]| 		FAT // just so i GET OVER TRYING TO MAKE THIS SMALL (for now :D)
+	|int| 			RefCount
+	|uint[5]| 		FAT // just so i GET OVER TRYING TO MAKE THIS SMALL (for now :D)
 						// speedie probably would only need like 8MB even then. Quite small.
-	
+	|int64| 		Const
 	
 	function FileNum (|int|)
 		return .Location & 0x4095

@@ -1942,7 +1942,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112576592740352));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112577577287680));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3253,7 +3253,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1866]);
-	JB_FS_AppendInt32(_fsf0, (2024060718));
+	JB_FS_AppendInt32(_fsf0, (2024060722));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7010,13 +7010,13 @@ bool SC_SpdAssembler__FlowControl() {
 }
 
 void SC_SpdAssembler__GenerateASM(SCFunction* Fn) {
-	SC_Pac_InitState((&SC__Pac_Sh), Fn);
+	SC_Pac_StartFunc((&SC__Pac_Sh), Fn);
 	fn_asm Fp = SC_fn_asm_table[kJB_SyxArg];
 	AsmReg R = SC_Reg__New();
 	Message* A = SC_Func_SourceArg(Fn);
 	(Fp)((&SC__Pac_Sh), A, R, 0);
 	SC_Pac_FinishASM((&SC__Pac_Sh));
-	SC_SpdAssembler__SyntaxAppend(kSC__ASM_NOOP);
+	SC_SpdAssembler__SyntaxAppend(kSC__ASM_EROR);
 }
 
 int SC_SpdAssembler__Init_() {
@@ -7581,7 +7581,7 @@ void SC_TextAssembler__TextData(Message* Msg) {
 bool SC_TextAssembler__TextFunc(Message* Msg) {
 	SCFunction* Fn = JB_Incr(SC_Func_Constructor(nil, nil));
 	JB_SetRef(Fn->Source, Msg);
-	SC_Pac_InitState((&SC__Pac_Sh), Fn);
+	SC_Pac_StartFunc((&SC__Pac_Sh), Fn);
 	bool Arg = SC_Pac_TextFuncSub((&SC__Pac_Sh), Msg);
 	if (Arg) {
 		(JB_Dict_ValueSet(SC__Comp_ExportNames, Fn->ExportName, Fn));
@@ -8018,7 +8018,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[814]);
-	JB_FS_AppendInt32(_fsf0, (2024060718));
+	JB_FS_AppendInt32(_fsf0, (2024060722));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -16655,14 +16655,8 @@ AsmReg SC_ASMtmp__TypeCast(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) 
 		SC_Pac_AddASM5(Self, kSC__ASM_BFLG, Exp, SC_Reg_ToInt(Dest), SC_Reg_ToInt(Src), Sh, Sh, ((int)SC_Reg_Signed(Src)));
 		return SC_Reg_OperatorAsWithAsmmath(Dest, kSC__ASMMath_BitCorrect);
 	}
-	FatASM* Conv = SC_Pac_AddASM2(Self, kSC__ASM_CONV, Exp, SC_Reg_ToInt(Dest), SC_Reg_ToInt(Src));
+	SC_Pac_AddASM3(Self, kSC__ASM_CONV, Exp, SC_Reg_ToInt(Dest), SC_Reg_ToInt(Src), 3 - (FloatDiff << ((bool)1)));
 	//put in actual numbers later;
-	if (FloatDiff) {
-		Conv->R[2] = 1;
-	}
-	 else {
-		Conv->R[2] = 3;
-	}
 	return Dest;
 }
 
@@ -18056,7 +18050,6 @@ bool SC_Pac_Alloc(ASMState* Self, MWrap* J) {
 		Self->Curr = Self->Start;
 		Self->End = (J->Capacity + Self->Start);
 		SC_SpdAssembler__SyntaxAppend(kSC__ASM_EROR);
-		SC_SpdAssembler__SyntaxAppend(kSC__ASM_NOOP);
 		JB_Array_SyntaxAppend(SC__Pac_Ancients, J);
 		return true;
 	}
@@ -18139,14 +18132,14 @@ AsmReg SC_Pac_Compare(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* 
 	return SC_Reg_boolasm(Dest);
 }
 
-FatASM* SC_Pac_CompareFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode) {
+void SC_Pac_CompareFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode) {
 	Mode = (Mode + (8 * SC_Reg_IsBig(L)));
 	Mode = (Mode + (4 * SC_Reg_IsBig(R)));
 	ASM_Cmp OPP = ((ASM_Cmp)JB_Ternary(SC_Reg_SyntaxIs(Dest, kSC__Reg_CondRequest), kSC__ASM_JMPF, ((ASM_Cmp)kSC__ASM_CMPF)));
-	return SC_Pac_AddASM4(Self, OPP, Exp, SC_Reg_ToInt(L), SC_Reg_ToInt(R), Mode, SC_Reg_ToInt(Dest));
+	SC_Pac_AddASM4(Self, OPP, Exp, SC_Reg_ToInt(L), SC_Reg_ToInt(R), Mode, SC_Reg_ToInt(Dest));
 }
 
-FatASM* SC_Pac_CompareInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode) {
+void SC_Pac_CompareInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode) {
 	int Bb = JB_int_OperatorMax(SC_Reg_BitCount(L), SC_Reg_BitCount(R));
 	if (!SC_Reg_Signed(L)) {
 		Mode = (Mode + 8);
@@ -18165,7 +18158,7 @@ FatASM* SC_Pac_CompareInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Messa
 		SC_Pac_AddASM5(Self, kSC__ASM_BCLR, Exp, SC_Reg_ToInt(L), SC_Reg_ToInt(R), Gl, Gr, ((int)SC_Reg_Signed(L)) + (((int)SC_Reg_Signed(R)) << 1));
 	}
 	ASM_Cmp OPP = ((ASM_Cmp)JB_Ternary(SC_Reg_SyntaxIs(Dest, kSC__Reg_CondRequest), kSC__ASM_JMPI, ((ASM_Cmp)kSC__ASM_CMPI)));
-	return SC_Pac_AddASM4(Self, OPP, Exp, SC_Reg_ToInt(L), SC_Reg_ToInt(R), Mode, SC_Reg_ToInt(Dest));
+	SC_Pac_AddASM4(Self, OPP, Exp, SC_Reg_ToInt(L), SC_Reg_ToInt(R), Mode, SC_Reg_ToInt(Dest));
 }
 
 int64 SC_Pac_ConstForShift(ASMState* Self, AsmReg R, int Btc, Message* Exp) {
@@ -18230,9 +18223,9 @@ AsmReg SC_Pac_DivFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message*
 }
 
 AsmReg SC_Pac_DivInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp) {
-	FatASM* Fat = SC_Pac_AddASM5(Self, kSC__ASM_DIVV, Exp, 0, 0, SC_Reg_ToInt(L), SC_Reg_ToInt(R), SC_Reg_IntDivType(Dest));
 	bool Alt = SC_Reg_SyntaxIs(L, kSC__Reg_Alternate);
-	Fat->R[Alt] = ((uint)Dest);
+	int D = SC_Reg_Reg(Dest);
+	SC_Pac_AddASM5(Self, kSC__ASM_DIVV, Exp, D * (!Alt), D * Alt, SC_Reg_ToInt(L), SC_Reg_ToInt(R), SC_Reg_IntDivType(Dest));
 	return Dest;
 }
 
@@ -18422,7 +18415,7 @@ AsmReg SC_Pac_Equals(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* E
 	return SC_Reg_boolasm(Dest);
 }
 
-FatASM* SC_Pac_EqualsInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp) {
+bool SC_Pac_EqualsInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp) {
 	bool Negate = SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate);
 	ErrorInt Badness = SC_Reg_BadBits(L, R);
 	if ((SC_Reg_SyntaxIs(Dest, kSC__Reg_CondRequest)) and (Badness >= 0)) {
@@ -18433,19 +18426,19 @@ FatASM* SC_Pac_EqualsInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Messag
 			L = SC_int_ToReg(0);
 		}
 		if (!SC_Reg_Reg(L)) {
-			return SC_Pac_AddASM2(Self, SC_ASM_OperatorxE2x80xA2(kSC__ASM_BRAA, Negate), Exp, SC_Reg_ToInt(R), 1);
+			return ((bool)SC_Pac_AddASM2(Self, SC_ASM_OperatorxE2x80xA2(kSC__ASM_BRAA, Negate), Exp, SC_Reg_ToInt(R), 1));
 		}
-		return SC_Pac_AddASM2(Self, SC_ASM_OperatorxE2x80xA2(kSC__ASM_JMPE, Negate), Exp, SC_Reg_ToInt(L), SC_Reg_ToInt(R));
+		return ((bool)SC_Pac_AddASM2(Self, SC_ASM_OperatorxE2x80xA2(kSC__ASM_JMPE, Negate), Exp, SC_Reg_ToInt(L), SC_Reg_ToInt(R)));
 	}
 	if (Badness > 0) {
-		return SC_Pac_AddASM5(Self, kSC__ASM_BCMP, Exp, SC_Reg_ToInt(Dest), SC_Reg_ToInt(L), SC_Reg_ToInt(R), Badness, ((int)Negate));
+		return ((bool)SC_Pac_AddASM5(Self, kSC__ASM_BCMP, Exp, SC_Reg_ToInt(Dest), SC_Reg_ToInt(L), SC_Reg_ToInt(R), Badness, ((int)Negate)));
 	}
 	if (Badness == -1) {
 		int Gl = SC_Reg_GapBits(L);
 		int Gr = SC_Reg_GapBits(R);
 		SC_Pac_AddASM5(Self, kSC__ASM_BCLR, Exp, SC_Reg_ToInt(L), SC_Reg_ToInt(R), Gl, Gr, ((int)SC_Reg_Signed(L)) + (((int)SC_Reg_Signed(R)) << 1));
 	}
-	return SC_Pac_AddASM3(Self, SC_ASM_OperatorxE2x80xA2(kSC__ASM_JMPE, Negate), Exp, SC_Reg_ToInt(L), SC_Reg_ToInt(R), SC_Reg_ToInt(Dest));
+	return ((bool)SC_Pac_AddASM3(Self, SC_ASM_OperatorxE2x80xA2(kSC__ASM_JMPE, Negate), Exp, SC_Reg_ToInt(L), SC_Reg_ToInt(R), SC_Reg_ToInt(Dest)));
 }
 
 AsmReg SC_Pac_ExistingVar(ASMState* Self, Message* M) {
@@ -18524,22 +18517,6 @@ int SC_Pac_GetLabelJump(ASMState* Self, Message* P) {
 		JB_Msg_SyntaxExpect(P, JB_LUB[879]);
 	}
 	return 0;
-}
-
-void SC_Pac_InitState(ASMState* Self, SCFunction* Fn) {
-	if (Fn->ASM) {
-		JB_SetRef(Self->Out, Fn->ASM);
-	}
-	 else {
-		JB_SetRef(Self->Out, SC_ASMFunc_Constructor(nil, Fn, Self->Curr));
-	}
-	Self->LabelCount = 0;
-	Self->fn = Fn;
-	Self->ReturnType = SC_Decl_RegType(Fn->ReturnType);
-	Self->OK = true;
-	Self->VDecls = 0;
-	Self->VTmps = 0;
-	SC_Pac_AddFuncParams(Self, Fn);
 }
 
 FailableInt SC_Pac_IntPowerOfTwo(ASMState* Self, AsmReg R) {
@@ -18723,9 +18700,7 @@ AsmReg SC_Pac_PlusFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message
 		}
 	}
 	bool SubTract = (SC_Reg_SyntaxIs(L, kSC__Reg_Alternate));
-	FatASM* F = SC_Pac_AddASM2(Self, kSC__ASM_FADD, Exp, SC_Reg_ToInt(Dest), SC_Reg_ToInt(L));
-	F->R[2 + SubTract] = ((uint)R);
-	F->R[4] = ((int)((!IsFloat)));
+	SC_Pac_AddASM5(Self, kSC__ASM_FADD, Exp, SC_Reg_ToInt(Dest), SC_Reg_ToInt(L), SC_Reg_Reg(R) * (!SubTract), SC_Reg_Reg(R) * SubTract, 1 - IsFloat);
 	return Dest;
 }
 
@@ -18905,10 +18880,7 @@ AsmReg SC_Pac_SHR(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp)
 		}
 		return Dest;
 	}
-	FatASM* FAT = SC_Pac_AddASM3(Self, SC_ASM_OperatorxE2x80xA2(kSC__ASM_BRUS, (!SC_Reg_Signed(L))), Exp, SC_Reg_ToInt(Dest), SC_Reg_ToInt(L), SC_Reg_ToInt(R));
-	if (SC_Reg_Signed(L)) {
-		FAT->R[3] = Up;
-	}
+	SC_Pac_AddASM4(Self, SC_ASM_OperatorxE2x80xA2(kSC__ASM_BRUS, (!SC_Reg_Signed(L))), Exp, SC_Reg_ToInt(Dest), SC_Reg_ToInt(L), SC_Reg_ToInt(R), Up * SC_Reg_Signed(L));
 	return Dest;
 }
 
@@ -18918,6 +18890,23 @@ AsmReg SC_Pac_SimpleTernary(ASMState* Self, AsmReg Dest, AsmReg Ma, AsmReg Mb, M
 	Mc = SC_Pac_Get(Self, Cond, Mc);
 	SC_Pac_AddASM4(Self, kSC__ASM_TERN, Cond, SC_Reg_ToInt(Dest), SC_Reg_ToInt(Mc), SC_Reg_ToInt(Ma), SC_Reg_ToInt(Mb));
 	return Dest;
+}
+
+void SC_Pac_StartFunc(ASMState* Self, SCFunction* Fn) {
+	if (Fn->ASM) {
+		JB_SetRef(Self->Out, Fn->ASM);
+	}
+	 else {
+		JB_SetRef(Self->Out, SC_ASMFunc_Constructor(nil, Fn, Self->Curr));
+	}
+	Self->FuncStart = Self->Start;
+	Self->LabelCount = 0;
+	Self->fn = Fn;
+	Self->ReturnType = SC_Decl_RegType(Fn->ReturnType);
+	Self->OK = true;
+	Self->VDecls = 0;
+	Self->VTmps = 0;
+	SC_Pac_AddFuncParams(Self, Fn);
 }
 
 AsmReg SC_Pac_Subtract(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp) {
@@ -45223,6 +45212,9 @@ bool SC_Func_Borked(SCFunction* Self) {
 }
 
 void SC_Func_BuildConstructorDestructor(SCFunction* Self) {
+	if (!Self) {
+		return;
+	}
 	Message* TheCall = SC_Func_FindCallParents(Self);
 	bool IsConstructor = SC_Func_SyntaxIs(Self, kSC__FunctionType_Constructor);
 	Message* Root = SC_Func_SourceArg(Self);
@@ -50568,4 +50560,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -458522346211651662 -4278041914294442028
+// 626559540462309830 -4278041914294442028

@@ -43,7 +43,7 @@ extend asmreg
 
 
 extend ASMState
-	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |&FATASM|)
+	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |bool|)
 		|| negate = dest is negate
 		|| badness = l.BadBits(r) 
 
@@ -85,7 +85,7 @@ extend ASMState
 		return .Equals(dest.negate, l, r, exp)
 
 
-	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |&FATASM|)
+	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode)
 		|| bb = l.bitcount max r.bitcount
 		if !l.signed
 			mode += 8
@@ -102,14 +102,14 @@ extend ASMState
 			.AddASM(asm.BCLR, exp, L, R, gl, gr, (l.signed|int|) + (r.signed|int|<<1))
 
 		|| OPP = (asm.JMPI, asm.CMPI)(dest is condrequest)
-		return .AddASM(OPP, exp, L, R, mode, dest)
+		.AddASM(OPP, exp, L, R, mode, dest)
 
 
-	function CompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |&FATASM|)
+	function CompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode)
 		mode += 8 * l.isbig
 		mode += 4 * r.isbig
 		|| OPP = (asm.JMPF, asm.CMPF)(dest is condrequest)
-		return .AddASM(OPP, exp, L, R, Mode, dest) // it is cmpf either way
+		.AddASM(OPP, exp, L, R, Mode, dest) // it is cmpf either way
 
 
 	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |int| Mode,  |asmreg|)
@@ -253,9 +253,7 @@ extend ASMState
 				return dest
 
 		|| SubTract = (l is alternate)
-		|| F = .AddASM(asm.fADD, exp, dest, l)
-		f.r[2+subtract] = r|uint|
-		f.r[4] = (!IsFloat)|int|
+		.AddASM(asm.fADD, exp, dest, l, r.reg*!subtract, r.reg*subtract, 1-isfloat)
 
 // do this transform here:
 // p1 = p2 * k3,  f1 = f2 + p1  -->  f1 = f2 + (p2 << log2(k3))	
@@ -337,9 +335,9 @@ extend ASMState
 	
 
 	function DivInt    (fn_opasm)
-		|| Fat = .AddASM(asm.DIVV, exp, 0, 0, L, R, dest.IntDivType)
 		|| Alt = l is alternate
-		fat.r[alt] = dest|uint|
+		|| d = dest.Reg
+		.AddASM(asm.DIVV, exp, d*!alt, d*alt, L, R, dest.IntDivType)
 		return dest
 	
 	
@@ -402,9 +400,8 @@ extend ASMState
 				.AddASM(asm.BFLG, exp, dest, l,  0, sh, 1)
 			return dest
 
-		|| FAT = .AddASM(asm.BRUS • !l.signed, exp, dest, L, R)
-		if l.signed
-			FAT.r[3] = up
+		.AddASM(asm.BRUS • !l.signed, exp, dest, L, R, up*l.signed)
+
 		return dest
 	
 	

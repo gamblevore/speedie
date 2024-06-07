@@ -637,6 +637,7 @@ struct ASMState {
 	byte WithinBranch;
 	SCFunction* fn;
 	ASMFunc* Out;
+	FatASM* FuncStart;
 	FatASM* Start;
 	FatASM* Curr;
 	FatASM* End;
@@ -692,7 +693,9 @@ struct FatASM {
 	byte Label;
 	u16 BlockNum;
 	uint Location;
-	uint FAT[8];
+	int RefCount;
+	uint FAT[5];
+	int64 Const;
 };
 
 struct IsaTester {
@@ -5176,9 +5179,9 @@ FatASM* SC_Pac_Branch(ASMState* Self, Message* Cond, bool Neg);
 
 AsmReg SC_Pac_Compare(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode);
 
-FatASM* SC_Pac_CompareFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode);
+void SC_Pac_CompareFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode);
 
-FatASM* SC_Pac_CompareInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode);
+void SC_Pac_CompareInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode);
 
 int64 SC_Pac_ConstForShift(ASMState* Self, AsmReg R, int Btc, Message* Exp);
 
@@ -5204,7 +5207,7 @@ AsmReg SC_Pac_DoI64Const(ASMState* Self, AsmReg D, int64* DD, int64* LL, int64* 
 
 AsmReg SC_Pac_Equals(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_EqualsInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+bool SC_Pac_EqualsInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
 AsmReg SC_Pac_ExistingVar(ASMState* Self, Message* M);
 
@@ -5217,8 +5220,6 @@ FatASM* SC_Pac_FindLabel(ASMState* Self, FatASM* Dbg);
 void SC_Pac_FinishASM(ASMState* Self);
 
 int SC_Pac_GetLabelJump(ASMState* Self, Message* P);
-
-void SC_Pac_InitState(ASMState* Self, SCFunction* Fn);
 
 FailableInt SC_Pac_IntPowerOfTwo(ASMState* Self, AsmReg R);
 
@@ -5275,6 +5276,8 @@ AsmReg SC_Pac_SHL(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp)
 AsmReg SC_Pac_SHR(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
 AsmReg SC_Pac_SimpleTernary(ASMState* Self, AsmReg Dest, AsmReg Ma, AsmReg Mb, Message* Cond);
+
+void SC_Pac_StartFunc(ASMState* Self, SCFunction* Fn);
 
 AsmReg SC_Pac_Subtract(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 

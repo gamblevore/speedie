@@ -568,7 +568,7 @@ class FileViewer (ListView)
 				ddd.alpha *= strength // sigh...
 				font.small!.drawicon(.Modifier, where, V, ddd)
 
-				if .HasError
+				if .HasError and (!.hasany or self isnt expanded)
 					v.x = z.x2-sh
 					font.small!.drawicon('\17', where, V, ddd) // not sure???
 				return (sh, 0)

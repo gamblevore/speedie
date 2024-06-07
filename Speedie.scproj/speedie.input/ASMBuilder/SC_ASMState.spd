@@ -15,6 +15,7 @@ struct ASMState
 
 	|SCFunction--|				fn       
 	|µFunc|						Out      
+	|&FatASM|					FuncStart
 	|&FatASM|					Start		// a "slice" feature would be nice    
 	|&FatASM|					Curr    
 	|&FatASM|					End    
@@ -275,8 +276,7 @@ function ASMState.Alloc (|memory of fatasm| j, |bool|)
 		.start = j.ptr
 		.curr = .start
 		.end = j.Capacity + .start
-		spdassembler <~ asm.eror
-		spdassembler <~ asm.NOOP
+		spdassembler <~ asm.EROR
 		Ancients <~ j
 		return true
 
@@ -290,11 +290,12 @@ function @ASMState.ExpandJSM (|bool|)
 	
 
 
-function ASMState.InitState (|scfunction| fn)
+function ASMState.StartFunc (|scfunction| fn)
 	if fn.ASM
 		.out = fn.asm!
 	  else
 		.out = µfunc(fn, .curr)
+	.FuncStart = .Start
 	.LabelCount = 0
 	.fn  = fn
 	.returntype = fn.returntype.regtype

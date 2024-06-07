@@ -29,8 +29,8 @@
 	Code = Return(r, Code, Op);
 	___;
 ı SWAP: _
-	std_swap(r[r1], r[r2]);
-	std_swap(r[r3], r[r4]);
+	std_swap(r[n1], r[n2]);
+	std_swap(r[n3], r[n4]);
 ı PRNT: _
 	printf("%lli\n", i1);
 	// better to print this also as float/double/signed/unsigned...

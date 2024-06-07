@@ -2,7 +2,6 @@
 
 bugs:
 	* unify numeric types a lot. Many functions want to work on uint, int, etc... and one func is good enough for all!
-	* don't use "syntax append", simply "function append". Same with "call". I mean x++ --> x.next
 	* vector constants
 	* &uint... allows &int
 	* passing .hfloatvar to  func(float) causes reporting error

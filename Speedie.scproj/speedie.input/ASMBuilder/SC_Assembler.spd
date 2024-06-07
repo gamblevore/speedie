@@ -7,7 +7,7 @@ module TextAssembler
 	function TextFunc (|message| msg, |bool|) // assemble a function from text
 		|| fn = SCFunction.new
 		fn.source = msg
-		ASmState.Sh.Initstate(fn)
+		ASmState.Sh.startfunc(fn)
 		|| arg = ASmState.Sh.TextFuncSub(msg)
 			compiler.exportnames[fn.exportname] = fn
 		ASmState.Sh.FinishASM
@@ -57,13 +57,13 @@ module SpdAssembler
 
 	function GenerateASM (|scfunction| fn)
 		opt norefcounts
-		ASMState.Sh.Initstate(fn)
+		ASMState.Sh.StartFunc(fn)
 		|| fp = fn_asm_table[@arg]!
 		|| R = asmreg()
 		|| A = fn.SourceArg!
 		(fp)(ASmState.Sh, A, R)
 		ASMState.Sh.FinishASM
-		self <~ asm.NOOP
+		self <~ asm.EROR
 
 	syntax append (|asm| A)
 		ASMState.sh.AddASM(A, compiler.InternalFile.ast!)

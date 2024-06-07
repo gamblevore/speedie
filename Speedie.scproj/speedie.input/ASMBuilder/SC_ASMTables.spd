@@ -251,12 +251,8 @@ function TypeCast		(fn_asm)		//
 		.AddASM(asm.BFLG, exp, dest, src, sh, sh, src.signed|int|)
 		return dest as ASMMath.bitcorrect
 	
-	|| Conv = .AddASM(asm.CONV, exp, dest, src)
+	.AddASM(asm.CONV, exp, dest, src, 3-(floatdiff<<1))
 	debugger,   #!put in actual numbers later
-	if floatdiff
-		Conv.r[2] = 1
-	  else
-		Conv.r[2] = 3
 	
 	return dest
 

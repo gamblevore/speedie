@@ -180,8 +180,8 @@ forms
 #!						 (((((Utils)))))
 
 /**/ SWAP (U4)
-		std_swap(r[r1], r[r2])
-		std_swap(r[r3], r[r4])
+		std_swap(r[n1], r[n2])
+		std_swap(r[n3], r[n4])
 
 /**/ PRNT (U1)
 		printf("%lli\n", i1)
