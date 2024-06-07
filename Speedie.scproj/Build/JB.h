@@ -3082,6 +3082,9 @@ void SC_PostIncrementNil__SyntaxAppend(Message* Ch);
 
 
 
+// RingTree
+
+
 // SCGame3D
 int SC_SCGame3D__Init_();
 
@@ -4368,8 +4371,6 @@ ASM SC_ASM_FloatAddExp_Sh2Set(ASM Self, int Value);
 ASM SC_ASM_FloatAddExp_Sh3Set(ASM Self, int Value);
 
 ASM SC_ASM_FloatConst_HighSet(ASM Self, int Value);
-
-ASM SC_ASM_Func_IncrSet(ASM Self, int Value);
 
 ASM SC_ASM_Func_JUMPSet(ASM Self, int Value);
 

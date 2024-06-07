@@ -432,6 +432,7 @@ JB_File* JB_Platform__OpenLog() {
 }
 
 
+
 void JB_Terminal__Display() {
 	Date Now = JB_Date__Now();
 	if (JB__Terminal_LastDisplay) {
@@ -8204,7 +8205,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024060717);
+	return (2024060718);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8216,4 +8217,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 3508334050717547345 -6720784475268466743
+// 7796578953066441599 -5848164465025993036 -6720784475268466743

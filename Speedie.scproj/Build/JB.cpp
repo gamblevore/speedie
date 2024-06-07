@@ -1942,7 +1942,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112576501710848));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1122], (112576571310080));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -5641,6 +5641,7 @@ void SC_PostIncrementNil__SyntaxAppend(Message* Ch) {
 	SC__PostIncrementNil_Msgs[S] = Ch;
 	SC__PostIncrementNil_Size = (S + 1);
 }
+
 
 
 int SC_SCGame3D__Init_() {
@@ -15906,12 +15907,8 @@ ASM SC_ASM_FloatConst_HighSet(ASM Self, int Value) {
 	return Self | ((Value << 18) >> 18);
 }
 
-ASM SC_ASM_Func_IncrSet(ASM Self, int Value) {
-	return Self | ((Value << 31) >> 13);
-}
-
 ASM SC_ASM_Func_JUMPSet(ASM Self, int Value) {
-	return Self | ((Value << 14) >> 14);
+	return Self | ((Value << 13) >> 13);
 }
 
 ASM SC_ASM_Func_SaveRegsSet(ASM Self, int Value) {
@@ -16258,7 +16255,7 @@ AsmReg SC_ASMtmp__DoFunc(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 		OP = ((ASM_Func)JB_Ternary(Sh <= 25, kSC__ASM_FNCX2, ((ASM_Func)kSC__ASM_FNCX3)));
 	}
 	byte SaveAmount = Self->VDecls * ((!SC_Reg_SyntaxIs(Dest, kSC__Reg_ForReturn)));
-	SC_Pac_AddASM5(Self, OP, ((Message*)JB_Ring_Parent(Prms)), SaveAmount, 0, Fn->TableId, Reg2, Reg3);
+	SC_Pac_AddASM4(Self, OP, ((Message*)JB_Ring_Parent(Prms)), SaveAmount, Fn->TableId, Reg2, Reg3);
 	return Dest;
 }
 
@@ -17840,8 +17837,7 @@ ASM JB_ASM_Func__Encode(FatASM* Self) {
 	//visible;
 	Rz = (Self->Op << 24);
 	Rz = SC_ASM_Func_SaveRegsSet(Rz, Self->R[0]);
-	Rz = SC_ASM_Func_IncrSet(Rz, Self->R[1]);
-	Rz = SC_ASM_Func_JUMPSet(Rz, Self->R[2]);
+	Rz = SC_ASM_Func_JUMPSet(Rz, Self->R[1]);
 	return Rz;
 }
 
@@ -18114,9 +18110,7 @@ AsmReg SC_Pac_BitNot(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* E
 
 AsmReg SC_Pac_BitOr(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp) {
 	if (SC_Reg_SyntaxIs(L, kSC__Reg_ConstAny)) {
-		AsmReg T = L;
-		L = R;
-		R = T;
+		JB_Swap((L), (R));
 	}
 	int Dd = SC_Reg_Reg(Dest);
 	if (!Dd) {
@@ -18445,9 +18439,7 @@ AsmReg SC_Pac_DoI64Const(ASMState* Self, AsmReg D, int64* DD, int64* LL, int64* 
 
 AsmReg SC_Pac_Equals(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp) {
 	if ((SC_Reg_Reg(R) == 0) and (SC_Reg_Reg(L) != 0)) {
-		AsmReg T = L;
-		L = R;
-		R = T;
+		JB_Swap((L), (R));
 	}
 	if (SC_Reg_IsInt(Dest)) {
 		SC_Pac_EqualsInt(Self, Dest, L, R, Exp);
@@ -18683,9 +18675,7 @@ AsmReg SC_Pac_Mul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp)
 		return SC_Pac_BoolMul(Self, Dest, R, L, Exp);
 	}
 	if (SC_Reg_SyntaxIs(L, kSC__Reg_ConstAny)) {
-		AsmReg T = L;
-		L = R;
-		R = T;
+		JB_Swap((L), (R));
 	}
 	if (SC_Reg_IsInt(L)) {
 		AsmReg D1 = SC_Pac_QuickIntMul(Self, Dest, R, L, Exp);
@@ -19951,12 +19941,11 @@ NilState SC_nil__Swap(Message* Msg, NilCheckMode Test) {
 }
 
 NilState SC_nil__Swapity(SCDecl* LD, Message* L, SCDecl* RD, Message* R, NilState RN) {
-	if (!SC_Decl_SyntaxIs(LD, kSC__SCDeclInfo_Swappable)) {
-		JB_String* _tmPf1 = JB_Incr(SC_Msg_OrigRender(L));
-		JB_String* _tmPf0 = JB_Incr(JB_Str_OperatorPlus(_tmPf1, JB_LUB[2075]));
-		JB_Decr(_tmPf1);
-		JB_Msg_SyntaxExpect(L, _tmPf0);
-		JB_Decr(_tmPf0);
+	Message* LL = SC_Msg_RemoveTypeCasts(L);
+	if (!JB_Msg_EqualsSyx(LL, kJB_SyxAcc, false)) {
+		if (!SC_Decl_SyntaxIs(LD, kSC__SCDeclInfo_Swappable)) {
+			JB_Msg_SyntaxExpect(L, JB_Str_OperatorPlus(SC_Msg_OrigRender(L), JB_LUB[2075]));
+		}
 	}
 	return SC_nil__VariableSet(LD, L, RD, R, RN);
 }
@@ -20558,9 +20547,7 @@ FatASM* SC_FatASM_Step(FatASM* Self, int Dir) {
 }
 
 void SC_FatASM_SwapWithIntInt(FatASM* Self, int A, int B) {
-	uint T = Self->R[(--A)];
-	Self->R[A] = Self->R[(--B)];
-	Self->R[B] = T;
+	JB_Swap((Self->R[A - 1]), (Self->R[B - 1]));
 }
 
 void SC_FatASM_SyntaxExpect(FatASM* Self, JB_String* Error) {
@@ -49810,8 +49797,6 @@ void SC_Func__Tran_Swap(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 			return;
 		}
 		SC_Decl_ExpectRelMatch(Lc, Rc, Rn, nil, Node);
-		int I = 0;
-		float B = 0.0f;
 		SC_Func__Tran_PrintSub(Fn, Node, Name_space);
 		JB_SetRef(((Message*)JB_Ring_Last(Node))->Obj, SC__Comp_SwapFunc);
 		JB_SetRef(Node->Obj, SC_TypeVoidPtr);
@@ -50612,4 +50597,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -8905616299306662425 -4278041914294442028
+// 2724112268284042578 -4278041914294442028

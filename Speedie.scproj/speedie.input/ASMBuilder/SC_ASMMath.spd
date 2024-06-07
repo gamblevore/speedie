@@ -71,7 +71,7 @@ extend ASMState
 	
 	function Equals (fn_opasm)
 		if r.reg == 0  and  l.reg != 0
-			|| t = l, l = r, r = t // put reg 0 into the left... more convenient.
+			swap (l) (r) // put reg 0 into the left... more convenient.
 
 		if dest.IsInt
 			.equalsint(dest, l, r, exp)
@@ -301,7 +301,7 @@ extend ASMState
 			return .BoolMul(dest, r, l, exp)
 			
 		if l is ConstAny
-			||  t = l,  l = r,  r = t
+			swap (l) (r)
 		if l.isint
 			|| D1 = .QuickIntMul(dest, R, L, exp)
 				return D1
@@ -360,7 +360,7 @@ extend ASMState
 
 	function BitOr  (fn_opasm)
 		if l is ConstAny
-			||  t = l,  l = r,  r = t
+			swap (l) (r)
 		|| dd = dest.reg					#debug_require
 		|| rr = r.reg,  || ll = l.reg
 		if ll == 0							// swap

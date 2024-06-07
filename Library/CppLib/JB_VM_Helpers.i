@@ -433,8 +433,8 @@ AlwaysInline ASM* Return (Register*& rp, ASM* Code, ASM Op) {
 	rp = To;
 
 	// could use RET_Li to return true?
-	if (S.Incr)
-		incr(Result.Obj);
+//	if (S.Incr)
+//		incr(Result.Obj);
 	int More = RET_Countu;
 	while (More -->= 0) {
 		To[++S.Regs] = Result;
@@ -463,7 +463,7 @@ AlwaysInline ASM* BumpStack (Register*& rp, ASM* Code, ASM Op) { // jumpstack
 	Register* ENTR = r+Save+1;
 	ENTR->Stack.Addr = Code+RemainCodes;
 	ENTR->Stack.Regs = Save;
-	ENTR->Stack.Incr = Func_Incru;
+//	ENTR->Stack.Incr = Func_Incru;
 
 	r = ++ENTR; rp = r;
 	ENTR[0] = {};

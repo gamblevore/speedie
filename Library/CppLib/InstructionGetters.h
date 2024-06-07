@@ -40,17 +40,11 @@
 #define   Func_SaveRegsu       (((uint)((Op.Raw)<<8))>>27)
 #define   Func_SaveRegsu_(x)   (((uint)((x)<<8))>>27)
 
-#define   Func_Incri       ((( int)((Op.Raw)<<13))>>31)
-#define   Func_Incri_(x)   ((( int)((x)<<13))>>31)
+#define   Func_JUMPi       ((( int)((Op.Raw)<<13))>>13)
+#define   Func_JUMPi_(x)   ((( int)((x)<<13))>>13)
 
-#define   Func_Incru       (((uint)((Op.Raw)<<13))>>31)
-#define   Func_Incru_(x)   (((uint)((x)<<13))>>31)
-
-#define   Func_JUMPi       ((( int)((Op.Raw)<<14))>>14)
-#define   Func_JUMPi_(x)   ((( int)((x)<<14))>>14)
-
-#define   Func_JUMPu       (((uint)((Op.Raw)<<14))>>14)
-#define   Func_JUMPu_(x)   (((uint)((x)<<14))>>14)
+#define   Func_JUMPu       (((uint)((Op.Raw)<<13))>>13)
+#define   Func_JUMPu_(x)   (((uint)((x)<<13))>>13)
 
 
 #define   Tail_JUMPi       ((( int)((Op.Raw)<<8))>>8)

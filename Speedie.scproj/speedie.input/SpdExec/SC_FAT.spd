@@ -6,6 +6,8 @@ struct FatASM
 	|byte|			Label	// 255 labels per function
 	|uint16| 		BlockNum
 	|uint|			Location
+	|uint[8]| 		FAT // just so i GET OVER TRYING TO MAKE THIS SMALL (for now :D)
+						// speedie probably would only need like 8MB even then. Quite small.
 	
 	
 	function FileNum (|int|)
@@ -40,15 +42,13 @@ struct FatASM
 	function k (|int| i, |uint|)
 		
 	function Swap (|int| a, |int| b)
-		|| t = .r[--a]
-		.r[a] = .r[--b]
-		.r[b] = t
+		swap (.r[a-1]) (.r[b-1])
 
 	function Swap (|&FatASM| other, |bool|)
 		|| s = self|&ivec4|
 		|| o = other|&ivec4|
-		for 2
-			|| t = s[], s++[] = o[], o++[] = t // shame speedie doesn't have swap () finished...
+		swap (s++[]) (o++[])
+		swap (s[])   (o[])
 		
 	
 	helper Step (|int| dir, |&FatASM|)

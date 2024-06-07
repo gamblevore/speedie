@@ -12,7 +12,6 @@ forms
 
 	Func	// func: fnc:
 		SaveRegs	5
-		Incr		1
 		JUMP		j
 		Prm1		x
 		Prm2		x
@@ -82,12 +81,6 @@ forms
 		Shift1	6
 		Shift2	6
 		Sign	2
-
-	SWAP
-		A		6
-		B		6
-		C		6
-		D		6
 		
 	RET
 		r1		r
@@ -143,9 +136,7 @@ forms
 
 #!						 (((((STOP)))))
 /**/ EROR (U1)
-		// all 0000 means no-op
-		if (n1 or U1_Lu)
-			return u1+U1_Lu
+		return u1+U1_Lu
 
 /**/ NOOP (U0): 0	// does nothing
 
@@ -157,7 +148,7 @@ forms
 			debugger
 
 
-// needs ASM-text: swap, rare, RSDE, RALO, RSET, MEMM
+// needs ASM-text: rare, RSDE, RALO, RSET, MEMM
 
 
 
@@ -188,9 +179,9 @@ forms
 
 #!						 (((((Utils)))))
 
-/**/ SWAP (Swap)
-		std_swap(r[SWAP_Au], r[SWAP_Bu])
-		std_swap(r[SWAP_Cu], r[SWAP_Du])
+/**/ SWAP (U4)
+		std_swap(r[r1], r[r2])
+		std_swap(r[r3], r[r4])
 
 /**/ PRNT (U1)
 		printf("%lli\n", i1)

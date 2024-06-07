@@ -48,7 +48,7 @@ extern "C" {
 struct PrevStack {
 	void*		Addr;
 	int			Regs;			
-	int			Incr;			
+//	int			Incr;			
 };
 
 struct Register {

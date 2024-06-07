@@ -256,7 +256,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 		op = (asm.fncx2, asm.fncx3)(sh <= 25)
 
 	|| SaveAmount = .vdecls * (dest isnt forreturn)
-	.AddASM(OP,  prms.parent!,  save: SaveAmount,  incr: 0,  jump: fn.TableId,  reg2,  reg3)
+	.AddASM(OP,  prms.parent!,  save: SaveAmount,  jump: fn.TableId,  reg2,  reg3)
 	return dest
 
 
