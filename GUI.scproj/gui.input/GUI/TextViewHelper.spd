@@ -122,11 +122,34 @@ class TextViewLine (list)
 
 		require !parsedok
 
+// setting .message seems to cause leaks
+// but that can only happen if THIS object is leking
+// so where/how is it leaking?
+// dont I have an object scan check thing?
+// first we need to mark an object as "leakble"
+// perhap jsut the last one drawn... as long as we hold shift key
+// then later we need to find it
+// i wish i could just enter commands
+// i cant... not easily or nicely.
+//		using leaktester("colorise") {{
 		|| r = .text.ParseWithError(nil)
 			.msgpos = .position
 			r.addpos(.position)
 			.ColoriseSub(r)
 			is fakemsg
+//			.message = nil }}
+// so now what? we need to actually store it.
+		if (1==0)
+			FindLeak()
+	
+	
+	function @textviewline.FindLeak ()
+		|| h = WhoLeakedme
+			|| r = []
+			JB_FindLeakedObject(r, r)
+			if r
+				printline r
+				debugger
 
 	
 	helper range (|intrange|)
@@ -146,7 +169,7 @@ class TextViewLine (list)
 			r = srch
 			while r
 				r = r.parent
-				if (r == @arg) and r.startsbefore(.range)
+				if (r == @arg) and r.StartsBefore(.range)
 					exit
 		
 		if r and !r.startsafter(.range)
@@ -605,3 +628,5 @@ function message.FlatRange (|intrange|)
 			rz.x = rz.x min ss.x
 			rz.x2 = rz.x2 max ss.x2
 
+
+|object--| WhoLeakedme

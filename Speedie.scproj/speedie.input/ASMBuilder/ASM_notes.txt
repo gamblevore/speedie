@@ -1,0 +1,17 @@
+
+
+OK... how how to do the consts... I guess there are 3 goals
+
+
+
+
+
+
+* refcounting + const collector
+	* not inserting consts "on first use" actually makes optimisation harder.
+		* How many instructions are there? looping over to see if an opt improved things... well did it?
+			* We want some ways to reduce consts... Like try to use existing consts in registers.
+			* check existing consts... then check if an addc or bflg can correct it.
+	* perhaps FatASM can store the const output? This means I don't need a separate constfucker.
+	* type-casting needs constifiying
+	* const injection

@@ -1016,7 +1016,7 @@ class ListView (GUIControl) {
 		.select(s, ListViewSelectMode.Fast)
 		
 		
-	function Select (|ListViewRow| s, |ListViewSelectMode| Mode = ListViewSelectMode.Normal)
+	function Select (|ListViewRow?| s, |ListViewSelectMode| Mode = ListViewSelectMode.Normal)
 		opt norefcounts
 		require s and s != .ListSource
 		require .owns(s)

@@ -1110,7 +1110,7 @@ __hot void JB_Delete( FreeObject* Obj ) {
 void JB_Array_Append(Array* R, JB_Object* Obj);
 
 static void BlockFindLeakedObject_(AllocationBlock* Block, JB_Object* Obj, Array* R) {
-	int N = Block->ObjSize;
+	int N = Block->ObjSize; if (N <= 0) return;
 	JB_Object* S = (JB_Object*)BlockStart_(Block);
 	while (S < (void*)Block) {
 		JB_Object** Prop	= JBShift((JB_Object**)S, 4); // allow unaligned?
