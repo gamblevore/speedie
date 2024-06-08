@@ -4,7 +4,7 @@
 
 struct ASMState
 	linkage: cpp_part Pac
-//	|uint16| 					ParentBlock
+	|uint16| 					ParentBlock
 	|datatypecode|				ReturnType
 	|bool|						OK    
 	|bool|						Inited   
@@ -20,7 +20,9 @@ struct ASMState
 	|&FatASM|					Curr    
 	|&FatASM|					End    
 	|&FatASM|					WhileStart
-	|uint64[32]|				Consts 
+	|uint64[32]|				Consts		// cant the fat ASM store these?
+	|(&FATASM)[32]|				Registers
+
 
 	function AddFuncParams (|SCFunction| fn)
 		opt norefcounts

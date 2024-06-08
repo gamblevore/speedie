@@ -170,8 +170,8 @@ module {
 		.AddMath( "*",		"Mul",		&asmstate.Mul,		asmmath.mul)
 		.AddMath( "/",		"Divide",	&asmstate.Div,		asmmath.div)
 
-		.AddBit( "",	"RotateLeft",	&asmstate.ROL,		asmmath.ROL,	opmode.shift)
-		.AddBit( "",	"RotateRight",	&asmstate.ROR,		asmmath.ROR,	opmode.shift)
+//		.AddBit( "",	"RotateLeft",	&asmstate.ROL,		asmmath.ROL,	opmode.shift)
+//		.AddBit( "",	"RotateRight",	&asmstate.ROR,		asmmath.ROR,	opmode.shift)
 		.addbit( ">>",	"ShiftRight",	&asmstate.SHR,		asmmath.shru,	opmode.shift)
 		.addbit( "<<",	"ShiftLeft",	&asmstate.SHL,		asmmath.shl,	opmode.shiftonly) // can add bits
 		.AddBit( "(|)",	"BitOr",		&asmstate.BitOr,	asmmath.bor)

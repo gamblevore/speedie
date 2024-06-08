@@ -132,10 +132,10 @@ function asmstate.DoI64Const (|asmreg| D, |&int64| DD, |&int64| LL, |&int64| RR,
 			LLL = (LLL << up)>>up
 		  else
 			LLL = (LLL|uint64| << up) >> up
-	  elseif M == ASMMath.ROL
-		LLL = LLL|uint64| rol RRR
-	  elseif M == ASMMath.ROR
-		LLL = LLL|uint64| ror RRR
+//	  elseif M == ASMMath.ROL
+//		LLL = LLL|uint64| rol RRR
+//	  elseif M == ASMMath.ROR
+//		LLL = LLL|uint64| ror RRR
 	  else
 		debugger // missed one!
 
