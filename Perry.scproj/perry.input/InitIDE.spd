@@ -113,7 +113,8 @@ extend PerryIDE
 			.onpaste		= PerryOpenDoc
 			.newcmm				// for the hideside test
 			.sizecheckers	= "spd,txt,frag,vert,sdf" / ','
-			.NoFind			= "jb.cpp,jb.h,jb_globals.cpp".dict(',')
+			if self.Project.isdir
+				.NoFind			= "jb.cpp,jb.h,jb_globals.cpp".dict(',')
 			isnt drawsfocus
 			is NoSearch
 			
@@ -570,7 +571,9 @@ extend PerryIDE
 		|| ProjConf	 = .perryfile
 		error.SourceAdd(@tmp+projconf)
 		|message| conf
-		if IsDir and projconf.exists
+		if !isdir
+			.FileList.NoFind = nil
+		  elseif projconf.exists
 			conf = projconf.parse
 
 		|| f = .FileList
