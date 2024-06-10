@@ -1,10 +1,10 @@
 	
 
 extend_module Jeebox
-	|| FFUUU = "@*%^|&$?"				// swearing fücking increases code quality you !@(£*bîtches
+	|| FFUUU = "@*%^|&$?"				// swearing increases code quality :D
 
 
-function faststring.Bleep (|byte| c)	// FAT ARSED CRANK
+function faststring.Bleep (|byte| c)
 	|| table = jeebox.FFUUU.addr		// DYKE SQUID
 	
 	for 2
@@ -19,7 +19,7 @@ function faststring.Bleep (|byte| c)	// FAT ARSED CRANK
 function string.Bleep (|faststring?| fs_in=nil, |string|)
 	|| fs = faststring(fs_in)
 	|| o = 0
-	for (sloot in self)					// ASSWIPE SORCERER
+	for (sloot in self)
 		if sloot.IsWhite
 			fs <~ sloot
 		  else
