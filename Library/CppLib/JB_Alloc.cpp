@@ -3,7 +3,7 @@
 // Released under jeebox-licence http://jeebox.org/licence.txt
 
 // todo
-// * Use list for world/super/block! makes code simpler!
+// * Use ringtree for world/super/block! makes code simpler!
 // * Can just do block = JB_RT_Next2(block); // goes up and down if hits end
 // 												easy way to list all blocks in the world!
 // * also... can put worlds together. Like sound/map/graphics/obj
@@ -87,6 +87,8 @@ JB_MemoryWorld MemoryManager;
 
 static JBObject_Behaviour DummyFuncTable = {};
 JB_Class* AllClasses;
+static int DM = 0;
+
 
 static bool MiniCompare (const char* s, const char* find) {
 	while (auto c = *find++)
@@ -165,13 +167,6 @@ MemStats JB_MemoryStats(JB_MemoryWorld* World, bool CountObjs, u16 Mark) {
             AllocationBlock* Finish = EndBlock_(Super);
 
             do {
-				if (Start->Owner) {
-					if (IsCheck) {
-						Start->DebugMark = 0;
-					} else {
-						Start->DebugMark = ActualMark;
-					}
-				}
                 int C = Start->ObjCount + Start->HiddenObjCount;
                 Result.Objs += C;
                 Start = JBShift(Start, 1 << World->BlockSize);
@@ -210,7 +205,7 @@ JBObject_Behaviour SuperSanityTable = {(void*)BlockIsFreeMark, 0};
 	#define TestMemory_(x)
 	#define SanityOfInUse(a,b)
 	#define SanityOfFree(a)
-	#define Sanity(x)
+	static void Sanity(AllocationBlock* B, bool HasBeenSetup = true) {}
 	#define ObjInBlock(a,b)
 #else
 	FreeObject* ObjInBlock(FreeObject* Obj, AllocationBlock* B) {
@@ -376,8 +371,10 @@ JBObject_Behaviour SuperSanityTable = {(void*)BlockIsFreeMark, 0};
 	}
 
 
-	static void Sanity(AllocationBlock* B) {
+	static void Sanity(AllocationBlock* B, bool HasBeenSetup = true) {
 		if (B) {
+			if (HasBeenSetup and !IsDummy(B) and !B->DebugMark)
+				debugger; // /?????
 			TestMemory_(B);
 		}
 	}
@@ -460,13 +457,6 @@ void JB_Mem_Destructor( JB_MemoryLayer* self ) {
 
 ///   ///   ///   ///   ///   ///   ///   ///   ///   ///   ///   ///   ///   ///   ///   ///   ///   ///   ///   ///   
 
-
-
-void JB_Helper_SelfLink(JB_RingList* New) {
-	New->PID = 0;
-    New->Prev = New;
-    New->Next = New;
-}
 
 
 void JB_Helper_PutBefore(JB_RingList* Old, JB_RingList* New) {
@@ -645,8 +635,8 @@ static AllocationBlock* LinkInSuper_(JB_MemoryWorld* World, SuperBlock* Super) {
         World->RefCount++;
     }
     AllocationBlock* First = Super->FirstBlock;
-Sanity(First);
-Sanity(First->Next);
+Sanity(First, false);
+Sanity(First->Next, false);
     Super->FirstBlock = First->Next;
     First->Next = 0;
     return First;
@@ -735,7 +725,8 @@ static AllocationBlock* SuperBlockSetup_( SuperBlock* Super, JB_MemoryWorld* Wor
 	if (World->CurrSuper) {
 		JB_Helper_PutBefore((JB_RingList*)(World->CurrSuper), (JB_RingList*)Super);
     } else {
-        JB_Helper_SelfLink((JB_RingList*)Super);
+		Super->Prev = Super;
+		Super->Next = Super;
     }
     SetupSuper_( Super, World );
     return LinkInSuper_(World, Super);
@@ -746,6 +737,8 @@ static FreeObject* BlockSetup_ ( JB_MemoryLayer* Mem, AllocationBlock* NewBlock,
     if (!NewBlock)
         return 0;
 
+//	printf("%x\n", NewBlock);
+	NewBlock->DebugMark = ++DM;
     Sanity(NewBlock);
     JB_Class* Class = Mem->Class;
     NewBlock->CppTable = Class->CppTable; // faster vfuncs
@@ -756,7 +749,8 @@ static FreeObject* BlockSetup_ ( JB_MemoryLayer* Mem, AllocationBlock* NewBlock,
     if (NewBlock->ObjSize != Size)
 		InitObjectsInBlock_( Mem, NewBlock, World, Size );
 
-    JB_Helper_SelfLink((JB_RingList*)NewBlock);
+    NewBlock->Prev = NewBlock;
+    NewBlock->Next = NewBlock;
 
     return LinkIn_(Mem, NewBlock);
 }
@@ -862,7 +856,7 @@ static AllocationBlock* FindAllocBlock_(JB_MemoryWorld* World) {
     do {
         AllocationBlock* Item = Curr->FirstBlock;
         if (Item) {
-            Sanity(Item);
+            Sanity(Item, false);
             if (Curr == World->SpareSuper) {
                 World->SpareSuper = 0;
             }
@@ -963,9 +957,9 @@ static void CleanSpares_( SuperBlock* Super ) {
     AllocationBlock* Curr = StartBlock_(Super);
     AllocationBlock* End = EndBlock_(Super);
 
-    while (Curr < End) { // not too sure this test is correct!
+    while (Curr < End) {	// not too sure this test is correct!
         JB_MemoryLayer* Mem = Curr->Owner;
-        if ( Mem ) { // Only exists if its a spare, seeing as the superblock's refcount is 0.
+        if ( Mem ) {		// Only exists if its a spare, seeing as the superblock's refcount is 0.
             Mem->SpareBlock = 0;
         }
         Curr = JBShift(Curr, N);
@@ -1040,7 +1034,7 @@ static void BlockFree_( AllocationBlock* FreeBlock ) {
         FreeBlock->CppTable = &SuperSanityTable;
         FreeBlock->Next = Super->FirstBlock;
         Super->FirstBlock = FreeBlock;
-        Sanity(FreeBlock->Next);
+        Sanity(FreeBlock->Next, false); // this might not even be a real block?
     }
 
     JB_Decr(Mem); // i hope this works...
@@ -1110,6 +1104,10 @@ __hot void JB_Delete( FreeObject* Obj ) {
 void JB_Array_Append(Array* R, JB_Object* Obj);
 
 static void BlockFindLeakedObject_(AllocationBlock* Block, JB_Object* Obj, Array* R) {
+	if (IsDummy(Block)) { // how???
+		debugger;
+		return;
+	}
 	int N = Block->ObjSize; if (N <= 0) return;
 	JB_Object* S = (JB_Object*)BlockStart_(Block);
 	while (S < (void*)Block) {

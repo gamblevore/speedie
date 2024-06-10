@@ -78,6 +78,13 @@ void JB_PID_Start() {
 	JB_PID_Constructor(&Root);
 }
 
+void JB_Helper_SelfLink(JB_RingList* New) {
+	New->PID = 0; // using this for the allocblock instead of just here... causes problemsssss
+    New->Prev = New;
+    New->Next = New;
+}
+
+
 ProcessOwner* JB_PID_Constructor(ProcessOwner* self) {
 	JB_New2(ProcessOwner);
 	JB_Helper_SelfLink((JB_RingList*)self);

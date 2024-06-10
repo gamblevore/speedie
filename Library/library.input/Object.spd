@@ -184,8 +184,6 @@ cpp_nothing JB_DecrMulti			(|Object| Obj,			|int| n)
 cpp_nothing JB_Ternary				(|Object| Obj,			|int|) // weird, only 1 param?
 cpp_nothing JB_Swap					(|Object| A,			|Object| B)
 cpp_wrapper JB_Delete				(|object| Obj)
-cpp_wrapper JB_FindLeakedObject 	(|object| Obj,			|array| dest)
-cpp_wrapper JB_Mem_ClassLeakCounter ()
 cpp_wrapper JB_Str3					(|Object| Data,			|int| N, |string|)
 cpp_nothing JB_New					(|&ClassData|  Class,	|Object|)
 cpp_nothing JB_NewClass				(|&ClassData|  Class,	|Object|)

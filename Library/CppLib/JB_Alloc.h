@@ -323,26 +323,22 @@ u32 JB_ObjCount();
 #define JB_SetRef(a,b)			JB_SetRef_((JB_Object**)(&a), (JB_Object*)(b))
 #define JB_Clear(a)				JB_Clear_((JB_Object**)(&a))
 #define JB_Swap(a,b)			(std::swap(a,b))
-#define JB_LongObjOr(A, B)            ({ \
-    JB_Object* _T = (A);                 \
-    if (!_T) {                           \
-        _T = (B);                        \
-    }                                    \
-    (_T);                                \
-})
 
 #if DEBUG
-	extern int RefTrap;
-    #define JBObjRefTest(obj) if ( (obj->RefCount) > 100000 and !RefTrap and !(obj->RefCount&~0x10000000)) { RefTrap = 1; debugger; }
-    #define JBObjRefTrap(obj) //if (JB_ObjectID(obj)==RefTrap) { printf("ref of %i: %i\n", RefTrap, obj->RefCount); debugger; }
+	inline void JBObjRefTest(JB_Object* obj) {
+//		int x = 1 << 30;
+//		auto r = obj->RefCount;
+//		if ( (r & x) and (r & ~x) )
+//			debugger;
+	}
     #define JBTestSanityOK 1
 #else
     #define JBObjRefTest(obj)
     #define JBTestSanityOK 0
 #endif
 
+
 bool JB_TotalSanity(bool Force);
-extern JB_Class ProcessData;
 
 
 inline JB_Object* JB_Incr_(JB_Object* self) {
@@ -356,9 +352,9 @@ inline JB_Object* JB_Incr_(JB_Object* self) {
 
 inline void JB_Decr(JB_Object* self) {
     if ( self ) {
-		JBObjRefTest(self);
 		JB_TotalSanity(false);
         int N = --self->RefCount; 
+		JBObjRefTest(self);
         if (!N)
             JB_Delete( (FreeObject*)self );
     }
@@ -368,8 +364,8 @@ inline void JB_Clear_(JB_Object** Place) {
 	JB_Object* self = *Place;
 	*Place = nil;
     if ( self ) {
-		JBObjRefTest(self);
         int N = --self->RefCount;
+		JBObjRefTest(self);
         if (!N) {
             JB_Delete( (FreeObject*)self );
 		}
@@ -386,8 +382,8 @@ inline void JB_DecrMulti_(JB_Object** Start, int n) {
 
 inline JB_Object* JB_SafeDecr_(JB_Object* self) {
     if (self) {
-		JBObjRefTest(self);
         self->RefCount--;
+		JBObjRefTest(self);
     }
     return self;
 }
@@ -418,7 +414,15 @@ inline void* ClearFor_(void* Place, u32 Size) {
     memset(JBShift(Place,4), 0, Size - 4); // refcount should be 0. Don't hide bug if refcount > 0!
     return Place;
 }
-    
+
+inline void JB_MarkRefCount(JB_Object* obj, bool On) {
+//	if (On)
+//		obj->RefCount |= 1<<30;
+//	  else
+//		obj->RefCount &=~ 1<<30;
+	
+}
+
 
 }
 

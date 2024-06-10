@@ -82,11 +82,11 @@ function CrashLog (|cstring| value)
 	cpp_wrapper JB_Rec__CrashLog
 
 syntax access (|string| name, |string|)
-	cpp_part ArgValue
 	opt norefcounts
 	for R in .rawargs
 		if R.argname ~= name
-			return R.argvalue
+			rz = R.argvalue
+			exit
 
 
 function Options (|[string]|)
@@ -99,7 +99,6 @@ function Switches (|[string]|)
 			rz <~ R
 	
 helper args_ (|[string]|)
-	opt norefcounts
 	for R in .rawargs
 		if R.argname ~= ""
 			rz <~ r

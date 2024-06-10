@@ -59,6 +59,18 @@ helper @memory.PrintLeaks_ (|object| self)
 		debugger
 	
 
+	
+function object.FindReferences
+	|| r = []
+	JB_FindLeakedObject(self, r)
+	printline r
+	debugger
+
+
+function object.MarkRefCount (|bool| Active=true)
+	cpp_wrapper JB_MarkRefCount
+
+
 
 struct SpeedTester
 	|Date|				Start
@@ -77,3 +89,7 @@ function string.SyntaxUsing (|SpeedTester|)
 	SpeedTester.log( "Starting: " + self )
 	rz.name = self
 	rz.start = date()
+
+
+cpp_wrapper JB_FindLeakedObject 	(|object| Obj,			|array| dest)
+cpp_wrapper JB_Mem_ClassLeakCounter ()

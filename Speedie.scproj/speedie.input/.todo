@@ -2,8 +2,9 @@
 
 bugs:
 	* unify numeric types a lot. Many functions want to work on uint, int, etc... and one func is good enough for all!
+		* datatype byte: inherit int // anything you can do on an int... can be done on a byte!
 	* vector constants
-	* &uint... allows &int
+	* &uint... allow &int in c++ gen
 	* passing .hfloatvar to  func(float) causes reporting error
 	* render float.fn {code} // won't compile
 	*	status(.CurrMousePixelColor.render) // tmp struct.

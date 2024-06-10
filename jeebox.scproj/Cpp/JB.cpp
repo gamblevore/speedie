@@ -3686,6 +3686,7 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver) {
 
 
 
+
 __lib__ void jdb(JB_Object* Self) {
 	//visible;
 	if (Self) {
@@ -8205,7 +8206,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024060718);
+	return (2024060722);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8217,4 +8218,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 -5848164465025993036 -6720784475268466743
+// 7796578953066441599 -5963021194466048683 -6720784475268466743

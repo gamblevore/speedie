@@ -564,6 +564,9 @@ class PerryIDE (Window)
 		if key is num1
 			.RunButton.dopressing(nil)
 			return true
+		if key is p or backslash
+			return .idecommand
+			
 
 	function Flip (|textview| s, |bool|)
 		|| Item = .compiletabs.selected
@@ -918,3 +921,13 @@ function string.GetSpeedieProj (|string|)
 	while rz and !(rz isa "scproj")
 		rz = rz.parent
 
+
+function perryide.IDECommand (|bool|)
+	|| cmd = "Enter Command".ask $
+	if cmd ~= "beep"
+		for 2s
+			beep
+      elseif cmd ~= "show"
+		beep sherlocdict.render
+	  else
+		beep "unrecognised"

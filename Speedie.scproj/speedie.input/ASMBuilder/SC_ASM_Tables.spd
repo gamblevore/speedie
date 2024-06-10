@@ -193,12 +193,12 @@ function Ternary		(fn_asm)
 	#! we'll need to protect registers...  x = (1,1+2)(cond)
 	#! x can be set to 1, then we find the number 1 as a constant in a register
 	#! Except its not really there cos it hasnt been done yet!
-	#! Its actually quite good that we set it directly, though.
-	#! We need some kinda way to block off "unknown registers" 
+	#! I think we need to put our constants into blocks via FATASM.
+	#! basically... we store the constant in a FATASM.
 
 	dest = .TempMe(exp, dest)
 	|| FailToSecond = .Branch(cond)
-	.µ(A, dest)
+	.µOpen(A, dest)
 	|| Exit = .AddASM(asm.jump, exp)
 
 	FailToSecond.r[3] = .curr - FailToSecond
@@ -338,7 +338,7 @@ function SetRel	(fn_asm)
 
 function Num (fn_asm)
 	opt norefcounts
-	|| d = exp.fastdecl
+	|| d = exp.FastDecl
 	|| X = d.exportposition
 	target debug
 		if x == 0 != exp.iszero // argh

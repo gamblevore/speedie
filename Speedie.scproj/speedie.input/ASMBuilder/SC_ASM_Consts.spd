@@ -153,6 +153,12 @@ extend asmstate
 		.AddASM(asm.KNST, exp, reg, (V << 32) >> 32, V>>32, -1, -1)
 		.consts[reg] = v
 
+	function f (|asmreg| r, |f64|)
+		|| p = self[r]
+		if r.fourbytes
+			return p|&float|[]
+		return p|&f64|[]
+
 
 	function NumToEgg (|int64| V, |message| exp, |asmreg|)
 		rz = .TempMe(exp)

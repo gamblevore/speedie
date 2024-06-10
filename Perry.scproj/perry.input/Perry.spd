@@ -116,7 +116,9 @@ module Perry
 			startupwindow.show
 			return 0
 		|| oof = (.FindProj(old),  .Projects.First)(old)
-			oof.ide.showide
+			|| ide = oof.ide
+			ide.showide
+			
 
 
 	function FindProj (|string| path, |message|)

@@ -1,4 +1,19 @@
 
+/*
+	we have a file
+	
+	we want a snapshot of what we created during the loading of that file.
+	
+	how?
+	
+	I want to set a checkbox? or just only test it if its a certain file?
+	
+
+	if its not that file... i wanna know that all the objects are being destroyed.
+	
+*/
+
+
 
 datatype TextLineFlags (uint16)
 	flags
@@ -24,11 +39,29 @@ class TextViewLine (list)
 	|int|					vline
 	|int|					tline
 	|TextLineFlags|			State
+	|bool|					dbg
 
 
-	constructor (|int| pos=0)
-		.position = pos
+	module
+		|| Count = 0
+		|| last = 0
 
+	constructor (|bool| debug=false, |int| p=0)
+		.dbg = debug
+		.position = p
+//		if debug
+//			sherlocdict[P.render(3)] = "x"
+//			count++
+//			"Con: $p ($count, ${.objectid})"
+//			.MarkRefCount
+	
+/*	destructor
+		if .dbg
+			last = .position
+			sherlocdict[.position.render(3)] = nil
+			Count--
+			"Des: $.position ($count, ${.objectid})"
+*/
 
 	render
 		if !.parent
@@ -316,7 +349,6 @@ class TextViewLine (list)
 			return -1
 		isnt last
 		return i
-
 
 
 	

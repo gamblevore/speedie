@@ -295,10 +295,25 @@ class list (Saveable)
 		disabled ".clear now"
 
 
-	function Clear
+	function Clear   // for debug
 		opt norefcounts
 		while
-			.first$.remove
+			|| f = .first$
+			f.remove
+
+
+	function Clear (|bool| ExpectDestroy) // for debug
+		opt norefcounts
+		cpp_part ClearAndLeakTest
+		while
+			|| f = .first$
+			f.markrefcount(false)
+			|| rc = f.refcount
+			|| Leaked = Rc != 1
+			f.remove
+			if leaked
+				#! Damn... What?
+				f.FindReferences
 
 
 	function Count (|int|)

@@ -42,8 +42,9 @@ class TextView (GUIControl)
 	constructor (|guicontrol| p, |guiaction| Clicked=nil, |GUIKeyEvent| keys=nil)
 		super.Constructor(p)
 		._reclaim = (0, 1GB, 0)
-		._Lines = TextViewLine()
-		._Start = TextViewLine() // make nilchecker happy
+		|| TV = TextViewLine()
+		._Lines = TV
+		._Start = TV				// make nilchecker happy
 		.TakesFocus = TakesFocusFlag.On
 		.OnClicked	= Clicked
 		.OnKeyDown	= keys
@@ -1709,7 +1710,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		|| f = ._lines.first
 			return f
-		rz = TextViewLine(0)
+		rz = TextViewLine()
 		._lines <~ rz
 	
 	
@@ -1737,8 +1738,6 @@ class TextView (GUIControl)
 	
 	helper ReallySetStart (|textviewline!| d)
 		opt norefcounts
-		if (._start != d) and self ~= "editme"
-			d = d
 		._Start = d
 		.ShowExtraInfo(sdlapp.mousexy, false)
 		if d.position >= 0
@@ -1763,9 +1762,10 @@ class TextView (GUIControl)
 		.TextAlteredForDraw |= 2 // this might not clear text?
 
 		require !Keepstart
-		._lines.clear
+		._Start = ._lines
+		._lines.clear(true)
 
-		|| d = textviewline(0)
+		|| d = textviewline()
 		._lines <~ d
 		.ClearReclaim
 		d.tline = 1
@@ -1773,12 +1773,12 @@ class TextView (GUIControl)
 		.ReallySetStart(D)
 
 
-	helper NextVline (|TextViewLine| place, |TextViewLine| curr, |TextViewLine|)
+	helper NextVline (|TextViewLine| place, |TextViewLine| curr, |int| p, |TextViewLine|)
 		opt norefcounts
 		
 		rz = curr.next
 		if !rz
-			rz = textviewline(0)
+			rz = textviewline((self ~= "Editme"), p)
 			place.next = rz
 
 		rz.vline = place.vline + 1
@@ -1922,9 +1922,9 @@ class TextView (GUIControl)
 			loop p >= 0
 			|| n = d.next
 			if  true  or  !n  or  n.position < ._reclaim[1]
-				d = .nextvline(d, d)
+				d = .nextvline(d, d, p)
 			  elseif p < ARGH
-				d = .nextvline(d, nil)
+				d = .nextvline(d, nil, p)
 			  else
 				d = d.ReclaimEnd(t, ._reclaim[2])
 				exit
@@ -2143,3 +2143,7 @@ datatype TextViewJumpMode (int)
 		WantAGoodView
 	syntax is (|TextViewJumpMode| m, |bool|)
 		return self|int| & m|int|
+
+
+
+|dictionary| sherlocdict = dictionary()

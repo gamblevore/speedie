@@ -1889,6 +1889,9 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 
 
 
+// JB_jb_vm
+
+
 // JB_ћ
 
 

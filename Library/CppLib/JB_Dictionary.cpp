@@ -87,11 +87,9 @@ void DictValueRemove_(JB_Object** Place) {
     if (!Item) return;
     *Place = 0; // just be safe?
     JB_Object* B = Obj_(Item);
-    if (Item == B) {                    // a normal object
-        if (--B->RefCount) return;
-    } else {
-        B->RefCount = 0;
-    }
+    if (Item == B)                    // a normal object
+		return JB_Decr(B);
+	B->RefCount = 0;
     JB_Delete((FreeObject*)B);
 }
 
@@ -99,6 +97,7 @@ void DictValueRemove_(JB_Object** Place) {
 static MiniStr LeafKey (DictionaryLeaf* Leaf) {
     return Mini(Leaf->Key, Leaf->Depth);
 }
+
 
 inline FindResult BeginFind_(Dictionary* self, MiniStr key) {
     FindResult F;
@@ -898,7 +897,7 @@ DictionaryReader* JB_Nav_Constructor( DictionaryReader* self, Dictionary* Dict )
 
 void JB_Dict__Init() {
     TheDictName = (JB_String20*)JB_Str_New(20);
-    TheDictName->RefCount = 2;
+    TheDictName->RefCount = 10000;
     TheDictName->Addr = TheDictName->Data;
 }
 

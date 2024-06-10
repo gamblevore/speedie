@@ -94,7 +94,7 @@ Dictionary* JB_App__Env() {
 static JB_StringC* emptystr() {
     JB_StringC* s = JB_New( JB_StringC );
     if (s) {
-		s->RefCount = 1;
+		JB_Incr(s);
 		s->Length = 0;
 		s->Addr = (uint8*)"";
 	}

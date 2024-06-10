@@ -679,7 +679,7 @@ class String
 function array.Remove (|array of string| self, |string| item, |bool| CaseAware=true,  |string|)
 	opt norefcounts
 	for (s.backwards in self) (ind)
-		if s.SyntaxCompare(item, CaseAware) // very annoying xcode behaviour
+		if s.SyntaxCompare(item, CaseAware) == 0
 			.remove(ind)
 
 
