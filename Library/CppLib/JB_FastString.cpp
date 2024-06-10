@@ -89,7 +89,7 @@ bool JB_FS_ResizeTo_(FastString* fs, int NewLength) {
 	auto S = fs->Result;
 //	if (S) {
 //		int OldLength = S->Length;
-//		if (NewLength < OldLength and S->RefCount > 1) {
+//		if (NewLength < OldLength and JB_RefCount(S) > 1) {
 //			JB_BA_Realloc_(S, fs->Length);
 			// OK... this is an interesting issue. We have a wierd sharing behaviour. We need to just...
 			// let go of it? or something? but at least shrink it down to the OldLength
@@ -606,7 +606,7 @@ FastString* JB_FS__FastNew(FastString* other) {
     }
     
 	FastString* fs = TheSharedFastString; 
-	if (fs and fs->RefCount > 100) debugger;
+	if (fs and JB_RefCount(fs) > 100) debugger;
 
 
 	if ( !fs or (JB_RefCount(fs) > 1)) {

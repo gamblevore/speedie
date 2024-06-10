@@ -83,7 +83,7 @@ void JB_Array_AppendCount( Array* self, JB_Object* Value, int Count ) {
 	require0 (Value and Count > 0);
 	int n = self->Length; 
 	require0(GrowToLength_(self, n+Count));
-	Value->RefCount += Count;
+	JB_SetRefCount(Value, JB_RefCount(Value) + Count);
 	auto P = self->_Ptr + n;
 	auto Pf = P + Count;
 	while (P < Pf)

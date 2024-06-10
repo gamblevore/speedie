@@ -131,6 +131,7 @@ struct DummyBlock {
 };
 
 
+#define JB_RefCountShift 1
 struct JB_Object {
     u32 RefCount;
 };
@@ -209,7 +210,7 @@ struct JB_Class : JB_Object { // JB_ClassData
 
 
 struct JB_MemoryWorld {
-    int                 RefCount;
+    int                 CountRef;
     SuperBlock*         CurrSuper;
     SuperBlock*         SpareSuper;
     uint8*              Name;
@@ -268,7 +269,7 @@ bool JB_ObjIsOwned(JB_Object* Obj);
 JB_Class* JB_ObjClass(JB_Object* Obj);
 void* JB_BlockShadow(AllocationBlock* B);
 void ClassWierdTest( );
-int JB_ObjRefCount(JB_Object* Obj);
+int JB_RefCount(JB_Object* Obj);
 uint8* JB_ObjClassBehaviours(JB_Object* Obj);
 JB_Object* JB_Mem_First( JB_MemoryLayer* Mem );
 JB_Object* JB_ObjNext(JB_Object* Obj);
@@ -406,10 +407,17 @@ inline void JB_SetRef_(JB_Object** Place, JB_Object* New) {
 	JB_Decr(Old);
 }
 
+
 inline int JB_RefCount( JB_Object* obj ) {
     return obj->RefCount;
 }
-    
+
+  
+inline void JB_SetRefCount(JB_Object* Obj, int C) {
+    Obj->RefCount = C;
+}
+
+
 inline void* ClearFor_(void* Place, u32 Size) {
     memset(JBShift(Place,4), 0, Size - 4); // refcount should be 0. Don't hide bug if refcount > 0!
     return Place;

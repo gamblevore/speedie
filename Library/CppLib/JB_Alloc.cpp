@@ -544,10 +544,6 @@ JB_Class* JB_ObjClass(JB_Object* Obj) {
 }
 
   
-int JB_ObjRefCount(JB_Object* Obj) {
-    return Obj->RefCount;
-}
-
 
 uint8* JB_ObjClassBehaviours(JB_Object* Obj) {
     // assume exists.
@@ -618,7 +614,7 @@ static FreeObject* LinkIn_(JB_MemoryLayer* Mem, AllocationBlock* NewBlock) {
 Sanity(NewBlock);
 // Call this when returning the first item from a newly allocated block.
     SetCurrBlock_( Mem, NewBlock );
-    Mem->RefCount++;
+    JB_Incr(Mem);
     FreeObject* First = NewBlock->FirstFree;
     NewBlock->FirstFree = First->Next;
     NewBlock->ObjCount++;
@@ -632,7 +628,7 @@ static AllocationBlock* LinkInSuper_(JB_MemoryWorld* World, SuperBlock* Super) {
         Super->World = World;
         Super->BlocksActive++;
         World->CurrSuper = Super; // issue?
-        World->RefCount++;
+        World->CountRef++;
     }
     AllocationBlock* First = Super->FirstBlock;
 Sanity(First, false);
@@ -807,7 +803,7 @@ static SuperBlock* Super_calloc(JB_MemoryWorld* World) {
 
 
 static void SuperFree_(SuperBlock* Super) {
-    Super->World->RefCount--;
+    Super->World->CountRef--;
     #if __linux__
     free(Super);
     #else 
@@ -940,8 +936,8 @@ static FreeObject* NewBlock( AllocationBlock* CurrBlock ) {
 
 static JB_Class* ResetClass_( JB_Class* Cls ) {
     auto Mem = &Cls->Memory;
-    if (Mem->RefCount != 2) {
-        Mem->RefCount = 2;
+    if (JB_RefCount(Mem) != 2) {
+        JB_SetRefCount(Mem, 2);
     }
     Mem->CurrBlock = Cls->DefaultBlock = (AllocationBlock*)&(Cls->Memory.Dummy);
     JB_Class* Result = Cls->NextClass;
@@ -1010,7 +1006,7 @@ static void BlockFree_( AllocationBlock* FreeBlock ) {
     Sanity(FreeBlock);
     JB_MemoryLayer* Mem = FreeBlock->Owner;
     SuperBlock* Super = FreeBlock->Super;
-    if (Mem->RefCount == 2) {
+    if (JB_RefCount(Mem) == 2) {
         if (!Mem->World->SpareSuper and IsAlone_( Super ) ) { // avoid freeing last super, avoid thrashing.
             return;
         }
@@ -1113,7 +1109,7 @@ static void BlockFindLeakedObject_(AllocationBlock* Block, JB_Object* Obj, Array
 	while (S < (void*)Block) {
 		JB_Object** Prop	= JBShift((JB_Object**)S, 4); // allow unaligned?
 		JB_Object** PropEnd = JBShift((JB_Object**)S, N);
-		if (S->RefCount < 1000) {
+		if (JB_RefCount(S) < 1000) {
 			while (Prop < PropEnd) {
 				if (*Prop == Obj) {
 					JB_Array_Append(R, S);

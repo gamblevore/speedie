@@ -71,7 +71,7 @@
 //        JB_LinkedList* N = C->_Next;
 //        C->_Next = 0;
 //        C->_BackRef = 0;
-//        if (C->RefCount) {  // Fix to allow call from destructor.
+//        if (JB_RefCount(C)) {  // Fix to allow call from destructor.
 //            JB_Decr(C);
 //        }
 //        C = N;

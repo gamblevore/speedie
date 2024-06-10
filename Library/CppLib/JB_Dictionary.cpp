@@ -89,7 +89,7 @@ void DictValueRemove_(JB_Object** Place) {
     JB_Object* B = Obj_(Item);
     if (Item == B)                    // a normal object
 		return JB_Decr(B);
-	B->RefCount = 0;
+	JB_SetRefCount(B,0);
     JB_Delete((FreeObject*)B);
 }
 
@@ -897,7 +897,7 @@ DictionaryReader* JB_Nav_Constructor( DictionaryReader* self, Dictionary* Dict )
 
 void JB_Dict__Init() {
     TheDictName = (JB_String20*)JB_Str_New(20);
-    TheDictName->RefCount = 10000;
+    JB_SetRefCount(TheDictName, 10000);
     TheDictName->Addr = TheDictName->Data;
 }
 

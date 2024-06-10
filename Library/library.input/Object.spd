@@ -27,7 +27,7 @@ class Object
 		cpp_wrapper JB_ObjLayer
 	
 	helper RefCount (|int|)
-		cpp_Wrapper JB_ObjRefCount
+		cpp_Wrapper JB_RefCount
 	
 	helper ObjectID (|int|)			// stable across Runs!
 		nil checker

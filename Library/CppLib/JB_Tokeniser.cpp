@@ -57,11 +57,11 @@ void JB_Tk__ErrorEvent(int A, int B, int C);
 ////////////////////////////////////////////////////////////////////////////////
 
 bool JB_Tk__CppInited() {
-    if (self->RefCount) {
+    if (JB_RefCount(self)) {
         return true;
     }
     
-    self->RefCount = 1000;
+    JB_SetRefCount(self, 1000);
     Dictionary* Dict = JB_Dict_Constructor(0);
 	self->WordDict = Dict;
     JB_Dict_ValueSet(Dict, JB_Str__Empty(), JB_NewEmpty(TokHan));
@@ -187,7 +187,7 @@ void JB_Tk__TokenSet( JB_String* TokStr, TokHan* New_ ) {
     TokHan* Old_ = (TokHan*)(*Place);
 
     if (Old_) {
-        if (Old_->RefCount==1) { // optimisation :)
+        if (JB_RefCount(Old_)==1) { // optimisation :)
             TH_Copy_(Old_, New_);
             return;
         } else {
