@@ -71,6 +71,11 @@ function object.MarkRefCount (|bool| Active=true)
 	cpp_wrapper JB_MarkRefCount
 
 
+function object.RefCountMark (|int|)
+	|| S = self|&int|
+	return S[] & 1
+
+
 
 struct SpeedTester
 	|Date|				Start

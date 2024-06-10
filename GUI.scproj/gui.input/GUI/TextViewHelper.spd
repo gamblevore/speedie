@@ -39,30 +39,24 @@ class TextViewLine (list)
 	|int|					vline
 	|int|					tline
 	|TextLineFlags|			State
-	|bool|					dbg
+//	|bool|					dbg 
 
 
-	module
-		|| Count = 0
-		|| last = 0
+//	module
+//		|| count = 0
 
 	constructor (|bool| debug=false, |int| p=0)
-		.dbg = debug
 		.position = p
+//		.dbg = debug
 //		if debug
-//			sherlocdict[P.render(3)] = "x"
-//			count++
-//			"Con: $p ($count, ${.objectid})"
 //			.MarkRefCount
-	
-/*	destructor
-		if .dbg
-			last = .position
-			sherlocdict[.position.render(3)] = nil
-			Count--
-			"Des: $.position ($count, ${.objectid})"
-*/
+//		if .refcountmark
+//			"++${++Count}"
 
+//	destructor
+//		if .dbg
+//			"--${--Count}"
+	
 	render
 		if !.parent
 			for c in self
@@ -155,25 +149,11 @@ class TextViewLine (list)
 
 		require !parsedok
 
-// setting .message seems to cause leaks
-// but that can only happen if THIS object is leking
-// so where/how is it leaking?
-// dont I have an object scan check thing?
-// first we need to mark an object as "leakble"
-// perhap jsut the last one drawn... as long as we hold shift key
-// then later we need to find it
-// i wish i could just enter commands
-// i cant... not easily or nicely.
-//		using leaktester("colorise") {{
 		|| r = .text.ParseWithError(nil)
 			.msgpos = .position
 			r.addpos(.position)
 			.ColoriseSub(r)
 			is fakemsg
-//			.message = nil }}
-// so now what? we need to actually store it.
-		if (1==0)
-			FindLeak()
 	
 	
 	function @textviewline.FindLeak ()

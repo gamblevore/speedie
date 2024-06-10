@@ -180,15 +180,14 @@ class TextView (GUIControl)
 			return p.x - (.lastleft+.LineNumWidth*font.width+5)			
 		
 		
-	helper ByteAtXY (|ivec2| p, |&(textviewline?)| d_, |ivec2|)
+	helper ByteAtXY (|ivec2| p, |!&ivec2| v, |textviewline|)
 		opt norefcounts
-		|| d = .LineAtY(p.y)
-		if d_
-			d_[] = d
-		if d
-			return .LastLineFix(d, .xadjust(p))
+		|| D = .LineAtY(p.y)
+			v[] = .LastLineFix(d, .xadjust(p))
+			return d
+		
 		if p.y < .lasttop
-			return (.text.length, 0)
+			v[] = (.text.length, 0)
 
 	
 	helper LastLineFix (|textviewline| d, |int| x, |ivec2|)
@@ -212,8 +211,9 @@ class TextView (GUIControl)
 
 
 	function EditClick (|ivec2| p, |int| clicks, |bool| CmdKey, |int|)
-		|textviewline| d
-		|| bs = .ByteAtXY(p, d)
+		opt norefcounts
+		|ivec2| bs
+		|| d = .ByteAtXY(p, bs)
 		|| b = bs.x
 		if !cmdkey  and  !clicks  and  .SelRange contains b
 			return 0
@@ -1471,7 +1471,7 @@ class TextView (GUIControl)
 		return .FindDrawInfoSub2(char, vline, sec)
 
 		
-	helper FindDrawInfoSub2 (|int| Char, |?&int| VLine,  |bool| sec, |TextViewLine!|)
+	helper FindDrawInfoSub2 (|int| Char,  |?&int| VLine,  |bool| sec,  |TextViewLine!|)
 		opt norefcounts
 		char = .clamp(char)
 		|| c = -int.max
@@ -1650,17 +1650,17 @@ class TextView (GUIControl)
 	
 
 	helper ShowExtraInfo (|ivec2| P, |bool| MouseMove=false)
-		opt NoRefCounts
+		opt norefcounts
 		require .OnShowExtraInfo and .isjeeboxmode
 
-		|textviewline| d
-		P += (0,2)				// +(0,2) cos its too easy to slip down to lower line
-		|| B = .ByteAtXY(P, d).x
+		|ivec2| b
+		P += (0,2)				// too easy to slip down to lower line otherwise
+		|| d = .ByteAtXY(P, b)
 
 		if keys.cmd
-			.ShowExtraInfoAtPos(B, "", nil)
+			.ShowExtraInfoAtPos(B.x, "", nil)
 		  elseif d and d.LineError
-			.ShowErrorInfo(b, d.LineError!, mousemove)
+			.ShowErrorInfo(b.x, d.LineError!, mousemove)
 		  else
 			.CancelDelayedError
 			.ShowNoExtra
@@ -1763,7 +1763,7 @@ class TextView (GUIControl)
 
 		require !Keepstart
 		._Start = ._lines
-		._lines.clear(true)
+		._lines.clear
 
 		|| d = textviewline()
 		._lines <~ d
@@ -1778,7 +1778,7 @@ class TextView (GUIControl)
 		
 		rz = curr.next
 		if !rz
-			rz = textviewline((self ~= "Editme"), p)
+			rz = textviewline(p)
 			place.next = rz
 
 		rz.vline = place.vline + 1
@@ -1940,14 +1940,16 @@ class TextView (GUIControl)
 
 
 	function EndPrepare (|TextViewLine| d, |bool| StayAtEnd, |int| pos)
+		opt norefcounts
 		d.RemoveAfter
 		._PreferPrevLine = false
 		if StayAtEnd
 			d = .FindStayAtEnd
-		if !StayAtEnd// or !d
+		if !StayAtEnd       // or !d
 			d = .FindDrawInfoSub2(pos, nil, false)
 		.StartWithoutScrollDraw = d
 		.ClearReclaim	
+	
 	
 	helper textview.ClearReclaim
 		._reclaim  = (0, 1GB, 0)

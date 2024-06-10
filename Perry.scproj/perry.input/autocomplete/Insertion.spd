@@ -9,7 +9,7 @@ function textview.RangeCheck (|int| r, |message| func_name, |message| prms, |boo
 	return r in (l, a) // allow a little lee-way
 	
 
-function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange, |&message| found, |int|)
+function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange, |&int| state, |message|)
 	visible
 	opt norefcounts
 	
@@ -37,13 +37,15 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 					msg0 = msg0.parent
 				if msg0 == @decl
 					inrange[] = true
-					found[] = msg0
-					return 4					// 4: function a.b (|*|)
+					state[] = 4
+					return msg0				// 4: function a.b (|*|)
 		if  msg0 == @thg  and  msg0 in @decl  and  msg0.prev == @emb
-			return -2
+			State[] = -2
+			return nil
+			
 		if CanUsePrms  // myfunc(a,b,c ^)
-			found[] = msg0
-			return 3
+			state[] = 3
+			return msg0
 			
 		return nil
 
@@ -51,11 +53,11 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 
 	if !autocomplete.IsAFunc(msg)
 		if CanUsePrms  // myfunc(a,b,c ^)
-			found[] = msg0
-			return 3
+			state[] = 3
+			return msg0
 		
-		found[] = msg
-		return 10
+		state[] = 10
+		return msg
 	
 	|| ConstructorLike = msg ~= "constructor" or "render"
 	|| func_name = msg.first
@@ -66,22 +68,23 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 		inrange[] = .RangeCheck(s_end[], msg, prms)
 	  else
 		if !func_name or func_name == @arg
-			found[] = msg // i guess?
 			if msg == "main"
-				return 0 // all is good
-			return 1 + ConstructorLike
+				state[] = 0 // all is good
+			  else
+				state[] = 1 + ConstructorLike
+			return msg // i guess?
 		prms = func_name.next
 		inrange[] = .RangeCheck(s_end[], func_name, prms)
 		if prms == nil							// 2: constructor *
-			found[] = func_name
-			return 2							// 2: function a.b*
+			state[] = 2
+			return func_name					// 2: function a.b*
 		if (func_name == @arg)
-			found[] = msg
-			return 1 + ConstructorLike			// 1: function *{}
+			state[] = 1 + ConstructorLike		// 1: function *{}
 												// 2: constructor *{}
+			return msg
 		ifn prms == @list or @bra // great
-			found[] = func_name
-			return 2							// 2: function a.b*
+			state[] = 2
+			return func_name					// 2: function a.b*
 		
 	
 	|| arg = prms.next
@@ -94,18 +97,19 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 		|| Type = decl.first$
 		Name = Type.next
 		if name == "..."
-			return -1
+			state[] = -1
+			return nil
 		if !name
-			found[] = decl
-			return 4						// 4: function a.b (|*|)
+			state[] = 4
+			return decl						// 4: function a.b (|*|)
 		decl = decl.next
 	
 	if Name
-		found[] = name
-		return 5							// 5:function a.b (|type| name*)
-	found[] = prms
-	return 3
-
+		state[] = 5
+		return name							// 5:function a.b (|type| name*)
+	
+	state[] = 3
+	return prms
 
 
 
@@ -363,9 +367,9 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 	|| err = dd.lineerror
 		require err isnt parse
 	
-	|message| where
+	|int| state
 	|| inrange = false
-	|| state = .CodeInsertion(dd, i2, inrange, where)
+	|| where = .CodeInsertion(dd, i2, inrange, state)
 	if state == -2
 		return 0
 	if state == -1

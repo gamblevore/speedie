@@ -327,10 +327,9 @@ u32 JB_ObjCount();
 
 #if DEBUG
 	inline void JBObjRefTest(JB_Object* obj) {
-//		int x = 1 << 30;
-//		auto r = obj->RefCount;
-//		if ( (r & x) and (r & ~x) )
-//			debugger;
+		auto r = obj->RefCount;
+		if ((r&1) and (r >= 4))
+			debugger;
 	}
     #define JBTestSanityOK 1
 #else
@@ -344,33 +343,29 @@ bool JB_TotalSanity(bool Force);
 
 inline JB_Object* JB_Incr_(JB_Object* self) {
     if (self) {
-		JBObjRefTest(self);
 		JB_TotalSanity(false);
-        self->RefCount++;
+        self->RefCount += 1<<JB_RefCountShift;
+		JBObjRefTest(self);
     }
     return self;
 }
 
+
 inline void JB_Decr(JB_Object* self) {
     if ( self ) {
 		JB_TotalSanity(false);
-        int N = --self->RefCount; 
+		int N = self->RefCount - (1<<JB_RefCountShift);  self->RefCount = N;
 		JBObjRefTest(self);
         if (!N)
             JB_Delete( (FreeObject*)self );
     }
 }
 
+
 inline void JB_Clear_(JB_Object** Place) {
 	JB_Object* self = *Place;
 	*Place = nil;
-    if ( self ) {
-        int N = --self->RefCount;
-		JBObjRefTest(self);
-        if (!N) {
-            JB_Delete( (FreeObject*)self );
-		}
-    }
+	JB_Decr(self);
 }
 
 #define JB_DecrMulti(a, b)  (JB_DecrMulti_((JB_Object**)(a),b))
@@ -383,7 +378,7 @@ inline void JB_DecrMulti_(JB_Object** Start, int n) {
 
 inline JB_Object* JB_SafeDecr_(JB_Object* self) {
     if (self) {
-        self->RefCount--;
+        self->RefCount -= 1<<JB_RefCountShift;
 		JBObjRefTest(self);
     }
     return self;
@@ -392,9 +387,8 @@ inline JB_Object* JB_SafeDecr_(JB_Object* self) {
 inline JB_Object* JB_FreeIfDead(JB_Object* self) {
     if (self) {
 		JBObjRefTest(self);
-        if (!self->RefCount) {
+        if (self->RefCount  <  1<<JB_RefCountShift)
             JB_Delete( (FreeObject*)self );
-        }
     }
     return self;
 }
@@ -409,12 +403,13 @@ inline void JB_SetRef_(JB_Object** Place, JB_Object* New) {
 
 
 inline int JB_RefCount( JB_Object* obj ) {
-    return obj->RefCount;
+    return obj->RefCount >> JB_RefCountShift;
 }
 
   
 inline void JB_SetRefCount(JB_Object* Obj, int C) {
-    Obj->RefCount = C;
+	int RC = Obj->RefCount & ((1<<JB_RefCountShift)-1);
+	Obj->RefCount = (C << JB_RefCountShift) | RC;
 }
 
 
@@ -424,11 +419,8 @@ inline void* ClearFor_(void* Place, u32 Size) {
 }
 
 inline void JB_MarkRefCount(JB_Object* obj, bool On) {
-//	if (On)
-//		obj->RefCount |= 1<<30;
-//	  else
-//		obj->RefCount &=~ 1<<30;
-	
+	int R = obj->RefCount &~ 1;
+	obj -> RefCount = R | On;
 }
 
 

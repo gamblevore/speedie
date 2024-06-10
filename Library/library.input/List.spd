@@ -302,18 +302,23 @@ class list (Saveable)
 			f.remove
 
 
-	function Clear (|bool| ExpectDestroy) // for debug
+	target debug {
+	function Clear (|bool| ExpectDestroy)
 		opt norefcounts
 		cpp_part ClearAndLeakTest
 		while
 			|| f = .first$
-			f.markrefcount(false)
-			|| rc = f.refcount
-			|| Leaked = Rc != 1
-			f.remove
-			if leaked
-				#! Damn... What?
-				f.FindReferences
+			if f.RefCountMark
+				f.markrefcount(false)
+				|| rc = f.refcount
+				|| Leaked = Rc != 1
+				f.remove
+				if leaked
+					#! Damn... What?
+					f.FindReferences
+			  else
+				f.remove
+	}
 
 
 	function Count (|int|)
