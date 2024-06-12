@@ -474,16 +474,15 @@ class PerryIDE (Window)
 		
 
 	function ProjClosed (|bool|)
-		opt norefcounts
 		require .CanAskingAboutMissing
 		|| f = .project
 		require !f.exists
 		.CanAskingAboutMissing = false
 		
-		if "This project can't be found on the file-system anymore.\n\nWould you like to close it?".confirm
+		if ("Project "+f.name+" can't be found on the file-system anymore.\n\nWould you like to close it?").confirm
 			.close
-			return true
-		if .IsSingleFileProject
+			rz = true
+		  elseif .IsSingleFileProject
 			f.write("")
 				
 

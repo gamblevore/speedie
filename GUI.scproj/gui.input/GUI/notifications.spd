@@ -107,7 +107,7 @@ module Notifications
 	
 	
 	function ShowTip (|string| data, |string| prefix = "Tip:  ")
-		|| p = data.parse[]
+		|| p = data.parse[0]
 			Notifications.silentappend(prefix + p.name)
 
 
