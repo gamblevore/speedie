@@ -462,6 +462,8 @@ function DescribeParamFail (|SCParamArray| params, |int| bad)
 		|| str = ("Wrong self: ",  "Wrong param ($bad): ")(IsSelf)
 		|| Type = TypeOfExpr(P, nil)
 			str += Type.RenderTypeName
+			str += " "
+			str += type.Name
 		  else
 			str += "(Unknown Type)"
 		error ( P, str )

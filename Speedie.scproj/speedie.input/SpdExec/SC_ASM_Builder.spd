@@ -54,12 +54,15 @@ datatype µParam (uint16)
 		return true
 
 
-
-function message.RegOrNum (|bool| NeedReg = false, |int|)
-	if !NeedReg and (.name[].lowercase != 'r')
-		return .int
+function message.Reg (|int|)
 	|| reg = .int(1)
 	if (reg <= 31)
 		return reg|int|
 	error (self, "Expected register between r0 and r31")
+
+
+function message.RegOrNum (|int|)
+	if .name[].lowercase != 'r'
+		return .int
+	return .reg
 

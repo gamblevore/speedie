@@ -18,6 +18,8 @@ dispatch fn_asm_table (fn_asm)
 		
 	@list: // vectors
 		debugger
+		return .Zero
+		
 
 	@func: asmtmp.DoFunc
 
@@ -51,24 +53,25 @@ dispatch fn_asm_table (fn_asm)
 	(asmtmp.kFail):			ASMtmp.Ignore
 
 	63:
-		0
+		return .Zero
 
 
 
 
-function asmstate.SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond, |asmreg|)
+function asmstate.SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond, |&FATASM|)
 	opt norefcounts
 	|| dr = dest.reg
 	|| mc = (asmreg(), dest)(dr == ma.reg or mb.reg)
-	mc = .µ(cond, mc)
-	.addasm(asm.TERN, cond, dest, mc, ma, mb)
-	return dest
+	|| µ = .µ(cond, mc)
+	return .addasm(asm.TERN, cond, dest, µ.reg, ma, mb)
 
 
 
-function asmstate.AddToReg (|asmreg| addr, |int| add, |message| exp)
+function asmstate.AddToReg (|&FATASM| addr, |int| add, |message| exp, |&fatasm|)
 	if add
-		.plus(addr, addr, .numtoegg(add, exp), exp)
+		|| reg = addr.reg
+		return .plus(reg, reg, .numtoegg(add, exp), exp)
+	return addr
 
 
 
@@ -98,6 +101,7 @@ function InitAccess
 function Debugger		(fn_asm)
 	if Options.targetdebug
 		.addasm(asm.TRAP, exp) // nice!
+	return .Zero
 
 //	* make typecast a mathopp
 //		* typecast consts
@@ -126,13 +130,14 @@ function If				(fn_asm)
 		arg2 = nil
 
 	|| Start = .Branch(cond, Flip)
-	.µ(arg1)
+	rz = .µ(arg1)
 	|| AfterFirst = .AddASM(asm.jump, arg1) // marks as ended... to prevent opts. can be removed later during optimisation
 	if ElseIfCond or arg2.HasAny
 		if ElseIfCond
-			IF(self, elseifcond, asmreg())
+			|| a = asmreg()
+			rz = IF(self, elseifcond, a)
 		  else
-			ARG(self, arg2)
+			rz = ARG(self, arg2)
 		AfterFirst.r[3] = .curr - afterfirst
 	Start.r[3] = .curr - Start
 
@@ -157,16 +162,20 @@ function While			(fn_asm)
 			|| oof = (condstart, exitplace)(op==254)
 			Jumper.r[0] = oof - Jumper
 		Jumper++
+	return .zero
+	
 
 
 function Exit			(fn_asm)
 	opt norefcounts
 	self <~ (255, exp)											// request jump fwd
+	return .Zero
 
 
 function Continue		(fn_asm)
 	opt norefcounts
 	self <~ (254, exp)											// request jump fwd a little less
+	return .Zero
 	
 
 function StatExpr		(fn_asm)
@@ -175,6 +184,7 @@ function StatExpr		(fn_asm)
 		if ch.islast
 			return .µ(ch, dest)
 		.µ(ch, asmreg.Arg)
+	return .Zero
 
 
 function Ternary		(fn_asm)
@@ -188,7 +198,7 @@ function Ternary		(fn_asm)
 	|| mA = .ExistingVar(a) // shouldn't allow globals
 	|| mB = .ExistingVar(b)
 	if ma and mb
-		return .SimpleTernary(dest, ma, mb, cond)
+		return .SimpleTernary(dest, ma.reg, mb.reg, cond)
 	
 	#! we'll need to protect registers...  x = (1,1+2)(cond)
 	#! x can be set to 1, then we find the number 1 as a constant in a register
@@ -203,10 +213,8 @@ function Ternary		(fn_asm)
 
 	FailToSecond.r[3] = .curr - FailToSecond
 
-	.µ(B, dest)
-	Exit.r[3] = .curr - Exit	
-
-	return dest
+	rz = .µ(B, dest)
+	Exit.r[3] = .curr - Exit
 	
 
 	
@@ -217,21 +225,22 @@ function First			(fn_asm)
 
 function Return			(fn_asm)
 	opt norefcounts
+	|| reg = 0
 	|| f = exp.first
 		|| Where = asmreg.ForReturn
 		where.reg = 1
 		where.µtype = asmstate.sh.ReturnType
-		rz = .µ(f, Where)
-	.AddASM(asm.RET, exp, rz, asmreg(), 1)
+		reg = .µ(f, Where).reg
+	return .AddASM(asm.RET, exp, reg, asmreg(), 1)
 
 
 function TypeCast		(fn_asm)		// 
 	opt norefcounts
 	debugger
 	|| src = .µ(exp.first!, dest)
-	|| T = src.µtype
+	|| T = src.reg.µtype
 	if t is bool
-		return .NotEq(dest, asmreg(), src, exp)
+		return .NotEq(dest, asmreg(), src.reg, exp)
 
 	|| OldDecl = exp.first!.fastdecl
 	|| NewDecl = exp.second!.fastdecl
@@ -248,13 +257,10 @@ function TypeCast		(fn_asm)		//
 	dest = .TempMe(exp, dest)
 	ifn t.isfloat or newtype.isfloat
 		|| Sh = 64 - oc
-		.AddASM(asm.BFLG, exp, dest, src, sh, sh, src.signed|int|)
-		return dest as ASMMath.bitcorrect
+		return .AddASM(asm.BFLG, exp, dest, src.reg, sh, sh, src.reg.signed|int|).bitcorrect
 	
-	.AddASM(asm.CONV, exp, dest, src, 3-(floatdiff<<1))
+	rz = .AddASM(asm.CONV, exp, dest, src.reg, 3-(floatdiff<<1))
 	debugger,   #!put in actual numbers later
-	
-	return dest
 
 
 function Pointer		(fn_asm)
@@ -264,8 +270,8 @@ function Pointer		(fn_asm)
 	dest = .tempme(exp, dest)
 	|| Ptr = .µ(exp.first!, dest)
 	|| A = Dest.ReadOrWrite(exp)
-	.AddASM(A, exp, dest,  Ptr)
-	return dest as asmmath.Bitcorrect
+	return .AddASM(A, exp, dest,  Ptr.reg).BitCorrect
+
 
 
 function Decl (fn_asm)
@@ -284,6 +290,7 @@ function Arg   (fn_asm)
 	for ch.fast in exp
 		.µ(ch, asmreg.Arg)
 	.VDecls = decls
+	return .Zero
 
 
 function Access		(fn_asm)						// a[b], struct.mem[b], func()[func2()]
@@ -291,14 +298,14 @@ function Access		(fn_asm)						// a[b], struct.mem[b], func()[func2()]
 	dest = .tempme(exp, dest)
 
 	|| Ptr = .µ(exp.first!, dest.RequestPos)		// x = a.b[0]
-	expect (ptr is ContainsAddr) (exp)
-	|| Ind = .µ(exp.second!, ptr • dest)
+	check (ptr.reg is ContainsAddr) (exp)
+	|| Ind = .µ(exp.second!, ptr.reg • dest)
 	if (dest is addrrequest)
-		return .plus(dest.HaveAddr, ptr, ind, exp)
+		return .plus(dest.HaveAddr, ptr.reg, ind.reg, exp)
 	
 	|| A = Dest.ReadOrWrite(exp)
-	.AddASM(A, exp, dest,  Ptr, ind)
-	return dest asnt asmreg.containsaddr as asmmath.Bitcorrect 
+	rz = .AddASM(A, exp, dest,  Ptr.reg, ind.reg).BitCorrect
+	rz.reg = rz.reg asnt asmreg.containsaddr// as asmreg.Bitcorrect 
 
 
 function Dot		(fn_asm)						// a.b
@@ -310,47 +317,52 @@ function Dot		(fn_asm)						// a.b
 	dest.µtype = T
 	debugger
 	
-	|| A = Dest.ReadOrWrite(exp)			 #require
-
+	|| A = Dest.ReadOrWrite(exp)
 	|| B = t.ByteCount.log2
 	|| Pos = prop.exportposition >> B
 	if !pos // what?
 	if (dest is addrrequest) or (pos >= 128)						// read/write only allows up to 127
-		.AddASM(asm.ADDK, exp, dest, obj, pos)
+		|| addk = .AddASM(asm.ADDK, exp, dest, obj.reg, pos)
 		if dest is addrrequest
-			return dest.haveaddr
+			return addk.haveaddr
 		pos = 0
 	
-	.AddASM(A, exp, dest: dest,  ptr: Obj,  index: 0, Pos)
-	return dest
+	return .AddASM(A, exp, dest: dest,  ptr: Obj.reg,  index: 0, Pos)
 		
 
 function SetRel	(fn_asm)
 	opt	norefcounts					//   x[func()] = y++
-	|| Var = .ExistingVar(exp.first!)	
-	(Var is StayOpen)
-	|| R = .µ(exp.last!, var)
+	|| L = exp.first!
+	|| Var = .ExistingVar(L)
+		Var <~ asmreg.StayOpen
+	|| R = .µ(exp.last!, var.reg)
 	if !r.reg						// what?
 	if var.reg != r.reg
-		(r is set)
-		return .µ(exp.first!, R)
-
+		r <~ asmreg.set
+		return .µ(L, R.reg)
+	return .zero
 
 function Num (fn_asm)
 	opt norefcounts
 	|| d = exp.FastDecl
-	|| X = d.exportposition
+	|| ConstValue = d.exportposition
 	target debug
-		if x == 0 != exp.iszero // argh
-	|| r = asmstate.sh.FindConst(x)
+		if ConstValue == 0 != exp.IsZero // argh
+	|| r = asmstate.sh.FindConst(ConstValue)
 		return r
 	Dest = .TempMe(exp, dest)
-	.NumToReg(X, exp, Dest)
+	rz = .NumToReg(ConstValue, exp, Dest)
 	(Dest is constany)
-	return dest
 
 
 function Thg (fn_asm)
+	rz = ThgSub(self, exp, dest, mode)
+	if !rz
+		error (exp)
+		rz = .zero
+
+
+function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |?&FATASM|)
 	opt norefcounts
 													// what if this is a constant?
 	|| d = exp.FastDecl
@@ -359,26 +371,25 @@ function Thg (fn_asm)
 		if dest is set								// copy a reg
 			debugger
 			if !reg.reg					// what?
-			.AddASM(asm.BOAR, exp, dest, reg)
-			return dest
-		return reg
+			return .AddASM(asm.BOAR, exp, dest, reg)
+		return reg.fat
 
 	if d is const
 		|| R = dest.reg
 		check (R and dest isnt set) (exp)
 		|| val = d.exportposition
-			require !(mode & asmtmp.ImmediatesOnly)
+			require !mode
 			.NumToReg(val, exp, R)
 			(dest is constany)
-			return dest
-		return asmreg.Zero
+			return dest.fat
+		return .Zero
 
-	require !(mode & asmtmp.ImmediatesOnly)
+	require !mode
 	check (d is global) (Exp)
 	return DoGlobal(self, exp, dest, d)
  
 
-function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |AsmReg|)
+function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |&FATASM|)
 	opt	NoRefCounts
 	|| addr = dest
 	if dest isnt set								// a = glob
@@ -393,10 +404,8 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 		if itable >= 16K
 			debugger // does this ever happen?
 			itable &= 16K-1
-		.AddASM(asm.tabl,  exp,  addr,  (!d.IsLib)|int|,  itable)
-		.addtoreg(addr, iadd-itable, exp)
-		return addr.haveaddr
-
+		|| a = .AddASM(asm.tabl,  exp,  addr,  (!d.IsLib)|int|,  itable)
+		return .addtoreg(a, iadd-itable, exp).haveaddr
 
 	|| iRead = iTable
 	|| iOld = iRead
@@ -408,28 +417,31 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 		itable = 0		// Make this optimisable.
 		iRead = 0
 
-	.AddASM(asm.TABL,  exp,  addr,  (!d.IsLib)|int|, iTable)
+	|| tabl = .AddASM(asm.TABL,  exp,  addr,  (!d.IsLib)|int|, iTable)
 	if !itable and !iread
-		.addtoreg(addr, iold, exp)
-	.AddASM(dest.ReadOrWrite(Exp), exp, dest, addr, iRead)
-	return addr as asmmath.Bitcorrect
+		.addtoreg(tabl, iold, exp)
+	debugger 
+	#!This used to return ADDR not DEST. so we we returnign addr.bitcorrect. is this faulse?
+	#!probably ok aksuually
+	return .AddASM(dest.ReadOrWrite(Exp), exp, dest, addr, iRead).BitCorrect
+
 	
 
 function Not		(fn_asm)
 	opt	NoRefCounts
 	dest = dest.negate
 	|| src = .µ(exp.first!, dest)
-	if src is AlreadyNegated
+	if src.reg is AlreadyNegated
 		return src
-	return .Equals(dest, asmreg(), src, exp)
+	return .Equals(dest, asmreg(), src.reg, exp)
 	
 
 function Minus			(fn_asm)					// -a
 	opt	NoRefCounts
-	return ASMTmp.DoSingleMath(self, exp, dest, scoperator.minus)
+	return ASMTmp.DoSingleMath(self, exp, dest, scoperator.minus.asm!)
 
 
-function SlowCountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |asmreg|)
+function SlowCountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |&FATASM|)
 //	    *a, x = *(a.b) 
 	opt	NoRefCounts
 	// need to read... also save old value
@@ -441,22 +453,20 @@ function SlowCountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mo
 	.AddConstant(f, NewValue, dest, amount)
 
 	// now we have the new value... lets write it back again
-	.AddASM(Dest.write(F), f, NewValue, addr)
+	rz = .AddASM(Dest.write(F), f, NewValue, addr)
 
 	// we wrote back the old value... the new value should exist!
 	.VTmps = (x)
-	return dest
 
 
-function CountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |asmreg|)
+function CountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |&FATASM|)
 	ifn  dest.isint  and  amount <= 63  and  amount >= -64
 		return SlowCountOnAddr(self, f, dest, mode, Addr, amount)
 	|| opp = (ASM.CNTC, ASM.CNTD)(mode & IncrAfter)	
 	|| bc  = dest.µtype.ByteCount
 	|| log = bc.Log2
 	if dest.BitCount * (1<<log) != bc // hmm? maths bug?
-	.AddASM(opp, f, Addr, dest, 0, amount, log)
-	return dest
+	return .AddASM(opp, f, Addr, dest, 0, amount, log)
 
 
 function IncrAmount (|asmreg| dest, |int| mode, |scdecl| D,  |int64|)
@@ -477,15 +487,16 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 	opt	NoRefCounts
 	|| f = exp.first!
 	|| Src = .µ(f, dest.RequestPos)
-	|| Amount = IncrAmount(src, mode, f.FastDecl)
-	if src is ContainsAddr
-		return CountOnAddr(self, f, dest, mode, src, amount)
+	|| sr = src.reg
+	|| Amount = IncrAmount(sr, mode, f.FastDecl)
+	if src.reg is ContainsAddr
+		return CountOnAddr(self, f, dest, mode, src.reg, amount)
 	
-	expect (src isnt temp) (exp, "Can't increment temporary value.")
+	check (sr isnt temp) (exp, "Can't increment temporary value.")
 	ifn mode & IncrAfter
-		return .AddConstant(exp, src, src, Amount)							// ++x,	 y = ++x
+		return .AddConstant(exp, sr, sr, Amount)							// ++x,	 y = ++x
 
-	return .AddConstantAndReturnOld(f, dest, src, amount)					// x++,	 y = x++
+	return .AddConstantAndReturnOld(f, dest, sr, amount)					// x++,	 y = x++
 
 
 
@@ -505,7 +516,7 @@ function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 	if n == '&'
 		return .µ(F, dest.requestpos)
 	if n == '~'
-		return dosinglemath(self, exp, dest, scoperator.bnot)
+		return dosinglemath(self, exp, dest, scoperator.bnot.asm!)
 	if n == '!'
 		return Not(self, F, dest)
 
@@ -517,20 +528,23 @@ function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 
 
 
-function DoSingleMath (|&ASMState| self, |message| exp, |AsmReg| Dest, |scoperator!| Scop, |AsmReg|)
+function DoSingleMath (|&ASMState| self, |message| exp, |AsmReg| Dest, |fn_opasm| fn, |&fatasm|)
 	|| Src = .µ(exp, dest)
-	(src is SingleExpr)
-	return DoMathSub(self, exp, dest, src, scop)
+	src <~ asmreg.SingleExpr
+	return DoMathSub(self, exp, dest, src.reg, fn)
 
 
 function DoMath (fn_asm)
 	|| op = exp.second!
 	|| scop = op.obj|scoperator|
-		return DoMathSub(self, exp, dest, 0.reg, scop)
+		|| fn = scop.asm
+			return DoMathSub(self, exp, dest, 0.asm, fn)
+		error (op, "No ASM for this operator?")
 	debugger // what?
+	return .Zero
 		
 
-helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr,  |scoperator!| Scop, |AsmReg|)
+helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr,  |fn_opasm!| fn, |!&FATASM|)
 	opt norefcounts
 
 	|| F = exp.first!
@@ -539,37 +553,36 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr
 	|| ml = AsmReg()
 	if mr isnt SingleExpr
 		|| OV = .VTmps
-		ml = .µOpen(F, dest & asmreg.discard)
-		mr = .µOpen(exp.last!, dest & asmreg.discard)
+		ml = .µOpen(F, dest & asmreg.discard).reg
+		mr = .µOpen(exp.last!, dest & asmreg.discard).reg
 		.VTmps = OV
 	
 	if dest is Discard
-		return dest // no need to do anything. {a()+b()}
+		return .zero // no need to do anything. {a()+b()}
 
-	|| fn = scop.asm					#expect (op, "No ASM for this operator?")
 	dest = .TempMe(exp, dest) 
 	dest.µtype = ml.µtype				// assignment conversion needs doing?	
-	(dest as= scop!.code)
 	(dest is frommath)
 
-	|| ConstInput = ml is constany  and  mr is constany
-		(Dest is MathConst)
-	|| R = (fn)(self, dest, ml, mr, op)
-	if Constinput and (r isnt mathconst) // hmm?
-		debugger 
-		(fn)(self, dest, ml, mr, op)
-	return .DoConsts(dest, ml, mr)
+	if ml isnt ConstAny or mr isnt ConstAny
+		return (fn)(self, dest, ml, mr, op)
+	(Dest is MathConst)
+	|| fat = (fn)(self, dest, ml, mr, op)
+	if fat.reg isnt mathconst // hmm?
+		debugger, (fn)(self, dest, ml, mr, op)
+	return .DoConsts(fat, ml, mr)
 
 
 function Ignore			(fn_asm)
-
+	return .Zero
 
 function Unexpected		(fn_asm)
 	"Bad asmtmp"
 	debugger
-
+	return .Zero
 
 }
+
 
 
 function ASMReg.ReadOrWrite (|message| m,  |asm|)
@@ -594,7 +607,7 @@ function ASMReg.Write (|message| m,  |asm|)
 	error (m, "Object to large to write")
 
 
-function asmstate.ExistingVar (|message| m, |asmreg|)
+function asmstate.ExistingVar (|message| m, |?&FATASM|)
 	opt	norefcounts
 	real self
 	|| fn = m.func 
@@ -602,19 +615,13 @@ function asmstate.ExistingVar (|message| m, |asmreg|)
 		m = m.first!
 		fn = m.func
 	if fn == @thg
-		return asmtmp.thg(asmstate.sh, m, asmtmp.ImmediatesOnly)
+		|| found = asmtmp.thgsub(asmstate.sh, m, asmreg(), 2)
+		if found == .zero
+			return nil
 	if fn == @num // only if 0.
 		|| d = m.fastdecl
 		if !d.exportposition
-			return asmreg.zero()
-
-
-function int64.CanStoreAsIntImmediate (|bool|)
-	return ((self << 50)>>50) == self
-
-
-function uint64.CanStoreAsFloatImmediate (|bool|)
-	return ((self << 50)>>50) == self
+			return .zero
 
 
 function message.HasAsmStuff (|bool|)

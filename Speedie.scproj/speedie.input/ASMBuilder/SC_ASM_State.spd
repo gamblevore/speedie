@@ -20,8 +20,8 @@ struct ASMState
 	|&FatASM|					Curr    
 	|&FatASM|					End    
 	|&FatASM|					WhileStart
-	|uint64[32]|				Consts		// cant the fat ASM store these?
 	|(&FATASM)[32]|				Registers
+	|FATASM| 					Zero
 
 
 	function AddFuncParams (|SCFunction| fn)
@@ -34,13 +34,20 @@ struct ASMState
 	
 	syntax access (|asmreg| a, |&uint64|)
 		cpp_part GetConst, pragma inline
-		return .consts[a.reg]
+		return .const(a.reg)
+	
+	function Const (|int| a, |&uint64|)
+		// remove this? seems wasteful. just read from .registers?
+		cpp_part GetConstInt, pragma inline
+		|| r = .registers[a]!
+		if r == .zero or r.Reg isnt ConstAny // now what?
+		return r.Const
 
 	
 	function IntPowerOfTwo (|asmreg| r,  |FailableInt|)
 		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
 		if r is ConstAny
-			|| v = .Consts[r.reg]
+			|| v = self[r][]
 			if v == -1
 				return v
 			if v.IsPow2
@@ -49,31 +56,26 @@ struct ASMState
 		if (!r.reg) // what?
 
 
-	function AddConstantAndReturnOld (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
+	function AddConstantAndReturnOld (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |&FATASM|)
 		|| x = .VTmps
-		rz = .TempMe(exp, dest)
+		|| reg = .TempMe(exp, dest)
 		if togrow.isint and value.CanStoreAsIntImmediate
 			// x = y++
-			.AddASM(asm.ADPK, exp.parent!, rz, ToGrow, Value)
+			rz = .AddASM(asm.ADPK, exp.parent!, reg, ToGrow, Value)
 			.VTmps = x
 		  else
-			.Assign(rz, ToGrow, asmreg(), exp)
+			.Assign(reg, ToGrow, asmreg(), exp)
 			.VTmps = x // dont need to close the constants... not yet anyhow.
-			.AddConstant(exp, Dest, ToGrow, value)
+			rz = .AddConstant(exp, Dest, ToGrow, value)
 	
 	
-	function AddConstant (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
+	function AddConstant (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |&fatasm|)
 		if dest.isint
-			if Value.CanInt32
-//			if value.CanStoreAsIntImmediate
-//  make the ADDK renderer or const-optimiser deal with too big values.
-				.AddASM(asm.ADDK, exp.parent!, dest, src, Value)
-				return dest
+			if Value.CanStoreAsIntImmediate
+				return .AddASM(asm.ADDK, exp.parent!, dest, src, Value)
 		  elseif dest.FourBytes
-// same
-			if value.CanFloat32
-				.AddASM(asm.FADK, exp.parent!, dest, src, value)
-				return dest
+			if value|uint64|.CanStoreAsfloatImmediate
+				return .AddASM(asm.FADK, exp.parent!, dest, src, value)
 			debugger // how is this possible? we are adding a 64 bit float to a 32-bit?
 		debugat
 		|| where = .NumToEgg(value, exp)
@@ -156,37 +158,39 @@ struct ASMState
 		error (where, "No free local variables.")
 
 
-	function FindConst (|uint64| Code, |asmreg|)
+	function FindConst (|uint64| Code, |&FATASM|)
 		if Code
-			return asmreg()
+			return .Zero
 		|int| i = 31 - .VTmps
 		// any flow-control can destroy this
 		// what about something like:
 		// || x = (1,2+1)
 		// perhaps tern should open/close?
 		while i > .VDecls
-			if .Consts[i] == code
-				return i.reg as asmreg.ConstAny
+			|| r = .Registers[i]
+			if .Const(i)[] == code
+				return r
 			--i
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	function Branch (|message| cond,  |bool| neg=false,  |&fatasm|)
+	function Branch (|message| cond,  |bool| neg=false,  |!&fatasm|)
 		|| dest = asmreg.newCondRequest
 		.WithinBranch++
-		|| Src = .µ(cond, dest)
+		rz = .µ(cond, dest)
 		.WithinBranch--
+		|| src = rz.reg
 		if Src isnt cond
 			(dest is negate) = (src isnt AlreadyNegated)
-			.equals(dest, dest, src, cond)
-		return .curr - 1
-	
+			rz = .equals(dest, dest, src, cond)!
 
-	function µOpen (|message| exp, |asmreg| mode,   |AsmReg|)
-		return .µ( exp, AsmReg.StayOpen as mode) asnt asmreg.StayOpen
+
+	function µOpen (|message| exp, |asmreg| mode,   |&FATASM|)
+		rz = .µ( exp, AsmReg.StayOpen as mode)
+		rz.Reg = rz.reg asnt asmreg.StayOpen
 
 	
-	function µ (|message| exp,  |AsmReg| Dest = asmreg(), |AsmReg|)
+	function µ (|message| exp, |AsmReg| Dest = asmreg(), |!&FATASM|)
 		opt norefcounts
 		pragma inline
 		cpp_part Get
@@ -209,9 +213,8 @@ struct ASMState
 				#!FFFFFFASSDJKLASDM<>AS
 
 
-	function Prm (|message| prm, |asmreg|)
+	function Prm (|message| prm, |&FATASM|)
 		|| r = .ExistingVar(prm)
-		if r.Exists
 			return r
 		// why not use tmps? won't these interfere with the function-passing??
 		|| Where = .tempme(prm, asmreg())
@@ -230,7 +233,10 @@ function @ASMTmp.DoFunc (fn_Asm)
 	opt norefcounts
 	|| prms = exp.last!
 	|| fn = prms.asfunc
-	expect (fn and fn.args <= 10) (prms, "Too many parameters")
+	ifn  fn and fn.args <= 10
+		error (prms, "Too many parameters")
+		return .Zero
+
 	// speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:3, 8:1
 	// there are only 4 above 6!, only 14 above 5
 
@@ -246,7 +252,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 	|| OV = .VTmps
 
 	for p.fast in prms
-		|| v = .prm(p).reg
+		|| v = .prm(p).reg.reg
 		if sh <= 25
 			reg2 |= (v << sh)
 		  else
@@ -259,8 +265,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 		op = (asm.fncx2, asm.fncx3)(sh <= 25)
 
 	|| SaveAmount = .vdecls * (dest isnt forreturn)
-	.AddASM(OP,  prms.parent!,  save: SaveAmount,  jump: fn.TableId,  reg2,  reg3)
-	return dest
+	return .AddASM(OP,  prms.parent!,  save: SaveAmount,  jump: fn.TableId,  reg2,  reg3)
 
 
 function ASMState.PackMakerInit (|bool|)
@@ -274,11 +279,11 @@ function ASMState.PackMakerInit (|bool|)
 
 
 function ASMState.Alloc (|memory of fatasm| j, |bool|)
-	if j.setcap(4MB)
+	if j.SetCap(4MB)
 		.start = j.ptr
 		.curr = .start
 		.end = j.Capacity + .start
-		spdassembler <~ asm.EROR
+		spdassembler.Guard
 		Ancients <~ j
 		return true
 
@@ -291,24 +296,28 @@ function @ASMState.ExpandJSM (|bool|)
 		return sh.Alloc(j)
 	
 
-
 function ASMState.StartFunc (|scfunction| fn)
 	if fn.ASM
 		.out = fn.asm!
 	  else
 		.out = µfunc(fn, .curr)
+	for i in 32
+		.Registers[i] = .zero
+	.zero = nil
+	.zero.reg = AsmReg()
 	.FuncStart = .Start
 	.LabelCount = 0
-	.fn  = fn
-	.returntype = fn.returntype.regtype
-	.ok  = true
-	.vdecls = 0
-	.vtmps = 0
+	.fn = fn
+	.ReturnType = fn.ReturnType.regtype
+	.OK = true
+	.VDecls = 0
+	.VTmps = 0
 	.AddFuncParams(fn)
 
 
 function ASMState.FinishASM
 	opt norefcounts
+	if .zero.Const // what?
 	ifn .last isa asm.ret
 		debugger
 	.out.length = .curr - .out.IR

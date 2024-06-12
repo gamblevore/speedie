@@ -37,8 +37,3 @@ function message.GetASMFunc (|message|)
 function FatASM.Encode (|ASM|)
 	return (ASM.encoders[.op]!)(self)		
 
-	
-
-function message.Reg (|asmreg|)
-	return .regornum(true)|int|.reg
-

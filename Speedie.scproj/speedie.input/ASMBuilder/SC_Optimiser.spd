@@ -138,36 +138,10 @@ function OptAddI (Fn_µOpt)
 		.op = asm.boar // u1 = (u2|||u3)&~u4
 		.a4 = 0 // nice
 		return true
-		
-
-	require p and !.a4
-		
+	
+	require  p  and  !.a4
 	|| pout = p.a1
-	if p isa asm.add or asm.subb
-		// p1 = p2 + k3
-		// a1 = p1 + kk3   -->   a1 = p2 + kkk3
-	
-		// p1 = p2 - k3
-		// a1 = p1 - kk3   -->   a1 = p2 - (k3+kk3)
-	
-	
-		// p1 = p2 + k3
-		// a1 = p1 - kk3   -->   a1 = p2 - (kk3 - k3)
-	
-		// p1 = p2 - k3
-		// a1 = p1 + kk3   -->   a1 = p2 + (kk3 - k3)		
-		require (pout == .a2) // we don't want any shifts... that can be done in the renderer
-		|| pk = p.k3
-		|| mk = .k3
-		require pk and mk
-		.a2 = pout
-		|| op = asmmath.Add|asmreg|
-		if (self isa asm.subb) != (p isa asm.SUBB)
-			op = ASMMath.sub|asmreg|
-		.a3 = asmstate.sh.DoConsts(asmmath.Add|asmreg|, mk.reg, pk.reg).reg
-		return true
-
-
+	require (pout == .a2)
 
 	// c = d << k,  a = b + c  -->  a = b + (d << k)
 	if (p isa asm.BFLG)

@@ -56,7 +56,7 @@ class list (Saveable)
 
 	function HasAny	 (|bool|)			{ cpp_wrapper JB_Ring_HasChildren, nil checker }
 	function HasChildren   (|bool|)		{ Disabled ".hasany" }
-	function HasChildCount (|int|Count, |bool|) { cpp_wrapper JB_Ring_HasChildCount, nil checker }
+	function HasChildCount (|int| Count, |bool|) { cpp_wrapper JB_Ring_HasChildCount, nil checker }
 		
 
 	function TakeAllFrom (|| src)
@@ -80,7 +80,7 @@ class list (Saveable)
 	operator More (|int| N, |bool|)
 		disabled ">" // has more children than N	
 	
-	operator LessOrEqual (|int|N, |bool|)
+	operator LessOrEqual (|int| N, |bool|)
 		// has N children or less.
 		opt norefcounts
 		|| c = .first
@@ -118,13 +118,7 @@ class list (Saveable)
 		opt norefcounts
 		|| p = .prev
 			return p.FlatLast ?? p
-		return .parent // i think thats it?
-	// Root
-		// A
-			// B
-			// C
-				// C2
-		// D
+		return .parent
 	
 	function FlatNextDepth  (|&int| Depth, |bool| Down=true, ||)
 		cpp_wrapper JB_Ring_FlatNextDepth, nil checker
@@ -343,7 +337,8 @@ class list (Saveable)
 
 
 	syntax access (||)
-		return .rand
+//		disabled // do you mean .rand or self[0]
+		return .first
 
 
 	syntax Access (|int| n, ||)

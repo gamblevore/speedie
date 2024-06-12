@@ -20,19 +20,20 @@ datatype CharProp (byte)
 	
 	function byte.SyntaxIs (|CharProp| s, |bool|)
 		return .Property == s
-	function byte.SyntaxIsnt (|CharProp| s, |bool|)
-		return .Property != s
 	
 	operator contains (|byte| b, |bool|)
 		return b.Property >= self
 
 	module
+		|CharProp[256]| Item
+		
 		function Byte.Property (|CharProp|)
 			// disabled
 //			return CharProp.default.item[self]
 //		|CharProps| default
 //		.default.MakeDefault
-		function test
+
+		function Test
 			expect 'a' is lower
 			expect 'b' is lower
 			expect 'C' is upper
@@ -46,7 +47,7 @@ datatype CharProp (byte)
 			printline fs
 
 	
-		function CharProps.MakeDefault
+		function MakeDefault
 			|| item = &.item[0]
 			for s in 0 to 32
 				if s|byte|.iswhite					
@@ -73,6 +74,4 @@ datatype CharProp (byte)
 				item[s] = charprop.number
 	
 	
-struct CharProps
-	|CharProp[256]| Item
 

@@ -1,36 +1,38 @@
 
 
-function ASMState.DoConsts (|asmreg| D,  |asmreg| L,  |asmreg| R,  |asmreg|)
-	|| LL = self[L],  || RR = self[R],  || DD = self[D]
-	|| m = d.math
-	if l.isfloat
-		if l.fourbytes
-			return .DoF32Const(D, DD|&float|, LL|&float|, RR|&float|, M)
-		return .DoF64Const(D, DD|&f64|, LL|&f64|, RR|&f64|, M)
-	
-//	if rimm
-//		RR = rimm
-	if l.fourbytes
-		return .DoI32Const(D, DD|&int|, LL|&int|, RR|&int|,   M)
-	return .DoI64Const(D, DD|&int64|, LL|&int64|, RR|&int64|, M)
+function ASMState.DoConsts (|&FatASM| D,  |asmreg| L,  |asmreg| R,  |&FatASM|)
+	// assume L and R only. only 2 inputs.
+	|| LL = self[L],  || RR = self[R],  || DD = self[D.dest]
+	// we can just ALWAYS write the output... into the ASM?
+	// then we DONT nEEd THIS AT ALL? if its not a const, the fat will know.
+	debugger 
+	return .Zero
+//	|| m = 0
+//	if l.isfloat
+//		.DoFloatConst(D.reg, DD|&f64|, LL|&f64|, RR|&f64|, M)
+//		return nil
+//	
+//	if l.fourbytes
+//		.DoI32Const(D, DD|&int|, LL|&int|, RR|&int|,   M)
+//	  else
+//		.DoI64Const(D, DD|&int64|, LL|&int64|, RR|&int64|, M)
+		
 
 
 
-function asmstate.DoF32Const (|asmreg| D, |&float| DD, |&float| LL, |&float| RR, |opmode| M, |asmreg|)
+function asmstate.DoFloatConst (|ASMReg| D, |&f64| DD, |&f64| LL, |&f64| RR, |asm| M, |ASMReg|)
 	|| LLL = LL[]
 	|| RRR = RR[]
-		
 	if 0
 		0
-	  elseif M == ASMMath.Add
+	  elseif M == asm.FAdd // fsub is fadd
+		// check alternate
 		LLL += RRR 
-	  elseif M == ASMMath.Sub
 		LLL -= RRR 
-	  elseif M == ASMMath.Mul
+	  elseif M == asm.FMUL
 		LLL *= RRR 
-	  elseif M == ASMMath.Div
+	  elseif M == asm.FDIV // fmod too
 		LLL /= RRR 
-	  elseif M == ASMMath.Mod
 		(LLL mod= RRR)
 	  else
 		debugger // missed one!
@@ -44,45 +46,16 @@ function asmstate.DoF32Const (|asmreg| D, |&float| DD, |&float| LL, |&float| RR,
 
 
 
-function asmstate.DoF64Const (|asmreg| D, |&f64| DD, |&f64| LL, |&f64| RR, |opmode| M, |asmreg|)
-	|| LLL = LL[]
-	|| RRR = RR[]
-		
-	if 0
-		0
-	  elseif M == ASMMath.Add
-		LLL += RRR 
-	  elseif M == ASMMath.Sub
-		LLL -= RRR 
-	  elseif M == ASMMath.Mul
-		LLL *= RRR 
-	  elseif M == ASMMath.Div
-		LLL /= RRR 
-	  elseif M == ASMMath.Mod
-		(LLL mod= RRR)
-	  else
-		debugger // missed one!
-
-	if LLL.abs
-		DD[] = LLL
-		return D
-	DD[] = 0
-	return asmreg.zero
-
-
-
 function asmstate.DoI32Const (|asmreg| D, |&int| DD, |&int| LL, |&int| RR, |opmode| M, |asmreg|)
-	if M != ASMMath.div and ASMMath.mod
-		return .DoI64Const(D, DD|&int64|, LL|&int64|, RR|&int64|, M|opmode|)
 	|| LLL = LL[]
 	|| RRR = RR[]
 		
-	if M == ASMMath.Div
+	if M == ASM.Divv
 		LLL /= RRR 
-	  elseif M == ASMMath.Mod
+	  elseif M == ASM.divv
 		(LLL mod= RRR)		
 	  else
-		debugger // missed one!
+		return .DoI64Const(D, DD|&int64|, LL|&int64|, RR|&int64|, M|opmode|)
 
 	(DD|&uint64|)[] = 0 // clear high bits
 	DD[] = LLL
@@ -93,39 +66,45 @@ function asmstate.DoI32Const (|asmreg| D, |&int| DD, |&int| LL, |&int| RR, |opmo
 
 
 function asmstate.DoI64Const (|asmreg| D, |&int64| DD, |&int64| LL, |&int64| RR, |opmode| M, |asmreg|)
+	// assume L and R only. only 2 inputs. we only want consts anyhow
+	// so don't need like x+y<<z as a const in one instruction
 	|| LLL = LL[]
 	|| RRR = RR[]
 		
 	if 0
 		0
-	  elseif M == ASMMath.Add
+	  elseif M == asm.Add
 		LLL += RRR 
-	  elseif M == ASMMath.Sub
+	  elseif M == asm.SUBB
 		LLL -= RRR 
-	  elseif M == ASMMath.Mul
+	  elseif M == asm.MULT
 		LLL *= RRR 
-	  elseif M == ASMMath.Div
+	  elseif M == asm.DIVV
 		LLL /= RRR 
-	  elseif M == ASMMath.Mod
+	  elseif M == asm.DIVV
 		(LLL mod= RRR)
-	  elseif M == ASMMath.Shru
+	  elseif M == asm.BRUU
 		LLL = LLL|uint64|>>RRR|uint64|
-	  elseif M == ASMMath.Shrs
-		if !d.signed
-			LLL >>= RRR
-		  else
-			|| bc = 64 - d.bitcount
-			LLL <<= bc
-			LLL >>= (bc+RRR)
-	  elseif M == ASMMath.Shl
+	  elseif M == asm.BRUS
+		|| bc = 64 - d.bitcount
+		LLL <<= bc
+		LLL >>= (bc+RRR)
+	  elseif M == asm.BLUE
 		LLL <<= RRR
-	  elseif M == ASMMath.Bnt
+	  elseif M == asm.BNOT
 		LLL = ~LLL
-	  elseif M == ASMMath.Ban
+	  elseif M == asm.BAND
 		LLL &= RRR
-	  elseif M == ASMMath.Xor
+	  elseif M == asm.BXOR
 		LLL ^= RRR
-	  elseif M == ASMMath.Type
+	  elseif M == asm.BFLG
+		debugger 
+		|| up = 64-d.BitCount
+		if D.Signed
+			LLL = (LLL << up)>>up
+		  else
+			LLL = (LLL|uint64| << up) >> up
+	  elseif M == asm.conv
 		debugger 
 		|| up = 64-d.BitCount
 		if D.Signed
@@ -138,7 +117,6 @@ function asmstate.DoI64Const (|asmreg| D, |&int64| DD, |&int64| LL, |&int64| RR,
 //		LLL = LLL|uint64| ror RRR
 	  else
 		debugger // missed one!
-
 	DD[] = LLL
 	if LLL
 		return D
@@ -146,12 +124,12 @@ function asmstate.DoI64Const (|asmreg| D, |&int64| DD, |&int64| LL, |&int64| RR,
 
 
 
-
-
 extend asmstate
-	function NumToReg (|int64| V, |message| exp, |int| Reg)
-		.AddASM(asm.KNST, exp, reg, (V << 32) >> 32, V>>32, -1, -1)
-		.consts[reg] = v
+	function NumToReg (|int64| V, |message| exp, |int| Reg, |&FATASM|)
+		rz = .AddASM(asm.KNST, exp, reg, (V << 32) >> 32, V>>32, -1, -1)
+		.Registers[reg] = rz
+		rz.Const = v
+		rz.Reg = reg.asm
 
 	function f (|asmreg| r, |f64|)
 		|| p = self[r]
@@ -203,7 +181,7 @@ extend asmstate
 		|| ValMsg = regmsg.Next				#require
 		|| Value  = ValMsg.ASMConst
 		
-		.NumToReg(value, orig, RegMsg.reg)
+		.NumToReg(value, orig, RegMsg.Reg)
 		return true
 	
 	
@@ -236,8 +214,15 @@ function uint.isconst (|bool|)
 function uint.ConstValue (|int64|)
 
 
+function int64.CanStoreAsIntImmediate (|bool|)
+	return ((self << 50)>>50) == self
+
+
+function uint64.CanStoreAsFloatImmediate (|bool|)
+	return ((self << 50)>>50) == self
+
+
 function asmreg.CanAddK (|int64| T, |bool|) // used to be used from .plus()... works now from render
 	if (self is constany) and .isint
-		|| B = (t << 50)>>50
-		return B == t
+		return t.CanStoreAsIntImmediate
 

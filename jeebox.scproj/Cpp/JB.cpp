@@ -5920,11 +5920,11 @@ void JB_bin_Sheb(FastString* Self, JB_String* Name) {
 
 void JB_Tree_Clear(JB_List* Self) {
 	while (true) {
-		JB_List* _tmPf0 = JB_Ring_First(Self);
-		if (!_tmPf0) {
+		JB_List* F = JB_Ring_First(Self);
+		if (!F) {
 			return;
 		}
-		JB_Tree_Remove(_tmPf0);
+		JB_Tree_Remove(F);
 	};
 }
 
@@ -8206,7 +8206,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024060722);
+	return (2024061018);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {

@@ -1,33 +1,33 @@
 
 
 
-prototype fn_asm (|&ASMState| self=asmstate.sh, |message| exp, |AsmReg| Dest=asmreg(), |int| Mode = 0, |AsmReg|)
+prototype fn_asm (|&ASMState| self=asmstate.sh, |message| exp, |AsmReg| Dest=asmreg(), |int| Mode = 0, |!&FATASM|)
 
 
-datatype ASMMath (int)
-	constants
-		|ASMMath|
-		Add = (1 << 16)
-		Sub = (2 << 16)
-		Mul = (3 << 16)
-		Div = (4 << 16)
-		Mod = (5 << 16)
-
-//		ROL = (6 << 16)
-//		ROR = (7 << 16)
-		Shl = (8 << 16)
-		Shru = (9 << 16)
-		Shrs = (10 << 16)
-		BNt = (11 << 16)
-		BAn = (12 << 16)
-		BOr = (13 << 16)
-		Xor = (14 << 16)
-		Type = (15 << 16)
-		BitCorrect = (31 << 16) // removes garbage bits
-		All = BitCorrect
-	
-	syntax is (|asmmath| r, |bool|)
-		return self == r
+//datatype ASMMath (int)
+//	constants
+//		|ASMMath|
+//		Add = (1 << 16)
+//		Sub = (2 << 16)
+//		Mul = (3 << 16)
+//		Div = (4 << 16)
+//		Mod = (5 << 16)
+//
+////		ROL = (6 << 16)
+////		ROR = (7 << 16)
+//		Shl = (8 << 16)
+//		Shru = (9 << 16)
+//		Shrs = (10 << 16)
+//		BNt = (11 << 16)
+//		BAn = (12 << 16)
+//		BOr = (13 << 16)
+//		Xor = (14 << 16)
+//		Type = (15 << 16)
+//		BitCorrect = (31 << 16) // removes garbage bits
+//		All = BitCorrect
+//	
+//	syntax is (|asmmath| r, |bool|)
+//		return self == r
 
 
 
@@ -47,7 +47,6 @@ datatype AsmReg (int64)
 		(1<<32)		// starting point
 		SrcConst
 		NotYetUsed	// for   || y = a + b,   y is (currently) unused.
-		ContainsAddr
 		FromMath
 		StayOpen
 		AlreadyNegated
@@ -56,12 +55,15 @@ datatype AsmReg (int64)
 		Negate
 		Discard
 		Set
-		AddrRequest
 		ForReturn
 		Temp
 		SingleExpr
 		NewCondRequest
 		ConstAny
+		ContainsAddr
+		AddrRequest
+		BitCorrect
+		CorrectAddr		= ContainsAddr ||| bitcorrect
 		Arg				= Discard ||| SrcConst // ||| Discard
 		CondRequest		= NewCondRequest ||| SrcConst
 		MathConst		= ConstAny ||| FromMath
@@ -74,18 +76,22 @@ datatype AsmReg (int64)
 	
 	function BitCount (|int|)
 		return .µtype.bitcount
-	
-	function Math (|asmmath|)
-		return (self|uint| & asmmath.all)
 		
-	operator isa (|ASMMath| M, |bool|)
-		return .math == M
+	function FAT (|!&fatasm|)
+		debugger //ooof
+		return ASMState.Sh.Registers[.reg]!
+	
+//	function Math (|asmmath|)
+//		return (self|uint| & asmmath.all)
+		
+//	operator isa (|ASMMath| M, |bool|)
+//		return .math == M
+
+//	operator as (|ASMMath| M, |asmreg|)
+//		return ((self|int64| &~ asmmath.all) ||| M)|ASMReg|
 
 	operator isa (|datatypecode| M, |bool|)
 		return .µtype == M
-
-	operator as (|ASMMath| M, |asmreg|)
-		return ((self|int64| &~ asmmath.all) ||| M)|ASMReg|
 
 	function Exists (|bool|)
 		return self|int64|
@@ -134,11 +140,14 @@ datatype AsmReg (int64)
 			
 	function RequestPos (|asmreg|)
 		return self as addrrequest
-			
+	
+	function Fatasm.HaveAddr (|&fatasm|)
+		.reg = .reg.HaveAddr
+		return self
+		
 	function HaveAddr (|asmreg|)
-		|| x = self|int64| &~ AddrRequest|int64|
-		x |= ContainsAddr|int64|  (|)  asmmath.Bitcorrect|int64|
-		return x|asmreg|
+		rz = self asnt AsmReg.AddrRequest
+		rz = rz as AsmReg.CorrectAddr
 		
 	function Reg (|int|)
 		return .µType.Register
@@ -165,9 +174,6 @@ datatype AsmReg (int64)
 	operator asnt (|asmreg| A, |asmreg|)
 		return (self|int64| &~ A|int64|)|asmreg|
 
-	function Set (|asmreg|)
-		return self as set
-	
 	operator • (|asmreg| dest, |asmreg|)
 		if .reg == dest.reg
 			return asmreg()
@@ -182,6 +188,6 @@ datatype AsmReg (int64)
 // we could do this instead
 // (self-1)&31!!
 // this will "rotate" 0 back to 31 and 1 to 0.
-function int.Reg (|asmreg|)
-	cpp_part ToReg
+function int.asm (|asmreg|)
+	cpp_part ToASM
 	rz.reg = self // (self - 1)&31 // would be better?

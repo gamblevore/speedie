@@ -79,7 +79,7 @@ function DataTypeModule
 function AddForm (|message| form, |µform|)
 	opt norefcounts 
 	rz = µform("", form)
-	µform.forms.valuelower(form.name) = rz 
+	µform.forms.ValueLower(form.name) = rz 
 
 
 function string.ASMNormalise (|string|)
@@ -126,8 +126,8 @@ function GenerateOne (|message| form_msg, |int| f)
 	.dt_prm = .DataTypeCreate(form_msg, f)
 	.parent = form_msg.name
 	|| bit_pos = 8
-	|| p    = -1
-	|| arg  = form_msg[@arg,-1]							#require
+	|| p   = -1
+	|| arg = form_msg[@arg,-1]							#require
 	|| Max = 32
 	
 	for l in arg
@@ -206,7 +206,7 @@ function BuildInstructions (TranFunc) // __instructionlist__
 			after.next = fnc
 			after = fnc
 
-	node.saferemove
+	node.SafeRemove
 
 
 function MakeJump   (|message| msg, |FastString| jump)
@@ -224,8 +224,10 @@ function Clean   (|message| msg)
 			  elseif ch == "|||"
 				ch.name = "|"
 
+
 function BadEncoder (ASM_Encoder2)
 	debugger
+
 
 function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true, |[message]|)
 	opt norefcounts
@@ -290,13 +292,13 @@ function VMDecl (|message| tmp, |[message]?| ActuallyMakeTheVM)
 		if ActuallyMakeTheVM!=nil
 			ActuallyMakeTheVM[id] = tmp
 			if !counts or counts == p1.next
-				.AddASM2(tn, id)
+				.AddµOp(tn, id)
 			if counts
-				.AddASM2(tn+counts.render, id)
+				.AddµOp(tn+counts.render, id)
 		counts = counts.next #loop
 
 
-function AddASM2 (|string| name, |int| id) 
+function AddµOp (|string| name, |int| id) 
 	opt norefcounts
 	|| msg = id.msg
 	|| thg = @thg + name
@@ -338,8 +340,5 @@ function VMLine (|message| line, |faststring| vm)
 	vm <~ "\n"
 }
 
-	
-	
-	
-	
+
 	

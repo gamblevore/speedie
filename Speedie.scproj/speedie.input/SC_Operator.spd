@@ -47,7 +47,7 @@ linkage
 |string|		FuncName
 |fn_OpASM?|		ASM
 |OpMode|		Kind
-|ASMMath|		Code
+//|ASMMath|		Code
 |SCOperator--?|	Opposite 
 
 
@@ -164,19 +164,19 @@ module {
 
 		.AddAssign
 
-		.AddMath( "mod",	"mod",		&asmstate.Mod,		asmmath.Mod,	opmode.NeedsCppFuncOnFloats)
-		.AddMath( "+",		"Plus",		&asmstate.Plus,		asmmath.Add,	opmode.Addition)
-		.AddMath( "-",		"Minus",	&asmstate.Subtract,	asmmath.sub,	opmode.makessigned + opmode.Addition)
-		.AddMath( "*",		"Mul",		&asmstate.Mul,		asmmath.mul)
-		.AddMath( "/",		"Divide",	&asmstate.Div,		asmmath.div)
+		.AddMath( "mod",	"mod",		&asmstate.Mod,		/*.Mod*/	opmode.NeedsCppFuncOnFloats)
+		.AddMath( "+",		"Plus",		&asmstate.Plus,		/*.Add*/	opmode.Addition)
+		.AddMath( "-",		"Minus",	&asmstate.Subtract,	/*.sub*/	opmode.makessigned + opmode.Addition)
+		.AddMath( "*",		"Mul",		&asmstate.Mul,		/*.mul*/)
+		.AddMath( "/",		"Divide",	&asmstate.Div,		/*.div*/)
 
 //		.AddBit( "",	"RotateLeft",	&asmstate.ROL,		asmmath.ROL,	opmode.shift)
 //		.AddBit( "",	"RotateRight",	&asmstate.ROR,		asmmath.ROR,	opmode.shift)
-		.addbit( ">>",	"ShiftRight",	&asmstate.SHR,		asmmath.shru,	opmode.shift)
-		.addbit( "<<",	"ShiftLeft",	&asmstate.SHL,		asmmath.shl,	opmode.shiftonly) // can add bits
-		.AddBit( "(|)",	"BitOr",		&asmstate.BitOr,	asmmath.bor)
-		.AddBit( "&",	"BitAnd",		&asmstate.BitAnd,	asmmath.ban,	opmode.SameOrLessBits)
-		.AddBit( "^",	"Xor",			&asmstate.bitxor,	asmmath.xor,	opmode.noextrabits)
+		.addbit( ">>",	"ShiftRight",	&asmstate.SHR,		/*.shru*/	opmode.shift)
+		.addbit( "<<",	"ShiftLeft",	&asmstate.SHL,		/*.shl*/	opmode.shiftonly) // can add bits
+		.AddBit( "(|)",	"BitOr",		&asmstate.BitOr,	/*.bor*/)
+		.AddBit( "&",	"BitAnd",		&asmstate.BitAnd,	/*.ban*/	opmode.SameOrLessBits)
+		.AddBit( "^",	"Xor",			&asmstate.bitxor,	/*.xor*/	opmode.noextrabits)
 
 		Minus.name = "-"
 		Bnot.name = "~"
@@ -215,10 +215,10 @@ module {
 		.assigns = SCOperator.new("=", &asmstate.Assign, OpMode.assigns)
 
 		
-	function AddMath (|string| s,  |string| FuncName, |fn_opasm| ASM, |asmmath| Code, |OpMode| Mode=0)
+	function AddMath (|string| s,  |string| FuncName, |fn_opasm| ASM, /*|asmmath| Code,*/ |OpMode| Mode=0)
 		|| opp = SCOperator.new(s, asm, mode ||| opmode.math)
 		opp.SetFuncName = funcname
-		opp.Code = code
+//		opp.Code = code
 	
 
 	function AddCustom (|string| s, |SCOperator|)
@@ -228,9 +228,9 @@ module {
 		return opp
 
 
-	function AddBit (|string| s, |String| FuncName,	|fn_opasm?| ASM, |asmmath| code, |OpMode| Mode=0)
+	function AddBit (|string| s, |String| FuncName,	|fn_opasm?| ASM, /*|asmmath| code,*/ |OpMode| Mode=0)
 		|| opp = SCOperator.new(s, asm, mode ||| opmode.Bit)
-		opp.code = code
+//		opp.code = code
 		opp.SetFuncName = FuncName
 	
 	

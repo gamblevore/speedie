@@ -63,10 +63,11 @@ module SpdAssembler
 		|| A = fn.SourceArg!
 		(fp)(ASmState.Sh, A, R)
 		ASMState.Sh.FinishASM
-		self <~ asm.EROR
+		.Guard
 
-	syntax append (|asm| A)
-		ASMState.sh.AddASM(A, compiler.InternalFile.ast!)
+
+	function Guard
+		ASMState.sh.AddASM(ASM.EROR, compiler.InternalFile.ast!)
 	
 	
 	function Vacuum (|scfunction| fn, |bool|)

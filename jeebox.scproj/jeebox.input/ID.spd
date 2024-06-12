@@ -24,8 +24,8 @@ class MessageID (stringshared)
 	false	NIL
 	contains object
 	||					Obj
-	|uint64| 			ID
-	|uint64| 			Frequency	// user-value. system doesnt use it.
+	|int64| 			ID
+	|int64| 			Frequency	// user-value. system doesnt use it.
 	|int| 				Position	// also
 	|Syntax|			Func
 	
@@ -37,7 +37,7 @@ class MessageID (stringshared)
 	syntax cast (|bool|)
 		return self!=nil
 	
-	constructor (|string| Name, |Syntax| Fn, |uint64| ID=0)
+	constructor (|string| Name, |Syntax| Fn=@str, |uint64| ID=0)
 		super.constructor(name)
 		.Func = fn
 		.obj = nil               // c++ generator fails otherwise

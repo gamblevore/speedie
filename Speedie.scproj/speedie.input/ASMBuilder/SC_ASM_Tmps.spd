@@ -18,7 +18,7 @@ datatype ASMtmp (uint16)
 		return self == t
 
 	constants
-		ImmediatesOnly = 2
+//		ImmediatesOnly = 2
 
 		|asmtmp| 
 		kElseIf = 48 // align this to line 48...
