@@ -538,6 +538,17 @@ function SCObject.CallFromName (|string|)
 	if self isa scnamed
 		return .Name
 
+	
+function scdecl.AutoCompleteName (|string|)
+	|| n = .realname
+	|| fs = faststring()
+	fs <~ n
+	fs <~ (' ', (32-n.LengthUTF8) max 1)
+	fs <~ '|'
+	fs <~ .WriteType
+	fs <~ '|'
+	return fs
+
 
 function SCObject.Display (|bool| exact, |string|)
 	if self isa scfunction
@@ -1100,19 +1111,8 @@ function message.IsClassType (|bool|)
 function message.IsLinkageType (|bool|)
 	return self ~= "linkage"
 
-//function message.IsExtender (|bool|)
-//	return self ~= "extend" or "extend_module"	
-
 function message.IsModuleType (|bool|)
 	return self ~= "module" or "extend_module" // don't need root. flags:=1 does it
-	
-	
-//function message.MsgIsProperModule (|bool|)
-//	opt norefcounts
-//	require self ~= "module"
-//	|| p = .parent
-//	require p == @arg
-//	return p.parent == nil
 
 	
 function message.FindPos (|int| fr, |int| len, |message|)

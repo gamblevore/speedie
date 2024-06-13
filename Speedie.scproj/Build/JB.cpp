@@ -1944,7 +1944,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1138], (112610488480509));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1138], (112611443474432));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3261,7 +3261,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1901]);
-	JB_FS_AppendInt32(_fsf0, (2024061318));
+	JB_FS_AppendInt32(_fsf0, (2024061322));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -3327,7 +3327,7 @@ void SC_FB__Help() {
 				(JB_FS_LengthSet(Fs_tester, 0));
 				JB_FS_AppendString(Fs, JB_LUB[69]);
 				JB_FS_AppendString(Fs, K);
-				JB_FS_AppendMultiByte(Fs, ' ', 17 - JB_Str_Length(K));
+				JB_FS_AppendMultiByte(Fs, ' ', 17 - JB_Str_LengthUTF8(K));
 				(Val)(JB_LUB[0], JB_LUB[0], Fs);
 			}
 			JB_Decr(K);
@@ -8311,7 +8311,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[826]);
-	JB_FS_AppendInt32(_fsf0, (2024061318));
+	JB_FS_AppendInt32(_fsf0, (2024061322));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -20653,7 +20653,24 @@ FatASM* SC_Pac_ModInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* 
 	FatASM* Rz = nil;
 	Rz = SC_Pac_AddASM5(Self, kSC__ASM_DIVV, Exp, 0, SC_Reg_ToInt(Dest), SC_Reg_ToInt(L), SC_Reg_ToInt(R), SC_Reg_IntDivType(Dest));
 	if (SC_Reg_SyntaxIs(Dest, kSC__Reg_ConstAny)) {
-		Rz->Const = (SC_Reg_Const(L) % SC_Reg_Const(R));
+		int64 C = 0;
+		if (SC_Reg_FourBytes(Dest)) {
+			if (SC_Reg_Signed(Dest)) {
+				C = (((int)SC_Reg_Const(L)) % ((int)SC_Reg_Const(R)));
+			}
+			 else {
+				C = (((uint)SC_Reg_Const(L)) % ((uint)SC_Reg_Const(R)));
+			}
+		}
+		 else {
+			if (SC_Reg_Signed(Dest)) {
+				C = (((int64)SC_Reg_Const(L)) % ((int64)SC_Reg_Const(R)));
+			}
+			 else {
+				C = (((uint64)SC_Reg_Const(L)) % ((uint64)SC_Reg_Const(R)));
+			}
+		}
+		Rz->Const = C;
 	}
 	return Rz;
 }
@@ -37159,7 +37176,7 @@ JB_String* SC_Decl_AutoCompleteName(SCDecl* Self) {
 	JB_String* N = JB_Incr(SC_Decl_RealName(Self));
 	FastString* Fs = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(Fs, N);
-	JB_FS_AppendMultiByte(Fs, ' ', JB_int_OperatorMax((32 - JB_Str_Length(N)), 1));
+	JB_FS_AppendMultiByte(Fs, ' ', JB_int_OperatorMax((32 - JB_Str_LengthUTF8(N)), 1));
 	JB_Decr(N);
 	JB_FS_AppendByte(Fs, '|');
 	Message* _tmPf0 = JB_Incr(SC_Decl_WriteType(Self, 0));

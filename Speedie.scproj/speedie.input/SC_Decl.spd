@@ -359,17 +359,6 @@ class SCDecl (SCNamed) {
 		if self
 			.WriteDeclFull("", 2).Render(fs)
 
-	
-	function AutoCompleteName (|string|)
-		|| n = .realname
-		|| fs = faststring()
-		fs <~ n
-		fs <~ (' ', (32-n.length) max 1)
-		fs <~ '|'
-		fs <~ .WriteType
-		fs <~ '|'
-		return fs
-
 
 	function WriteDeclFull (|String| DeclName = "", |int| minimal = 0, |Message|)
 		DeclName := .Name

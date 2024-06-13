@@ -476,7 +476,7 @@ module Feedback
 				fs_tester.length = 0
 				fs <~ "\n--"
 				fs <~ k
-				fs <~ (' ', 17-k.length)
+				fs <~ (' ', 17-k.LengthUTF8)
 				(val)("", "", fs)
 		printline fs.GetResult
 
