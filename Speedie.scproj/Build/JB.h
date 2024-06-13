@@ -1678,6 +1678,7 @@ extern JB_String* SC_kNameConf;
 #define kJB_kUseDefaultParams (8 << 22)
 #define kJB_kUsingStr (JB_LUB[793])
 #define kJB_kVoidPtrMatch (5 << 22)
+extern JB_File* SC_PerryLogFile;
 extern Message* SC_ReturnSelfEqNil;
 extern Dictionary* SC_RootCollectTable;
 extern JB_ErrorReceiver* JB_StdErr;
@@ -2586,6 +2587,8 @@ void SC_Comp__MiniTests();
 bool SC_Comp__ModulesSorter(JB_Object* A, JB_Object* B);
 
 void SC_Comp__NewConst(SCDecl* D);
+
+void SC_Comp__perrylog(JB_String* S);
 
 void SC_Comp__PostInitCodeCall();
 

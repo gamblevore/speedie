@@ -758,23 +758,36 @@ function SCClass.ConOrDesForCall (|bool| IsConstructor, |int| Task, |scfunction|
 
 function SCFunction.BuildConstructorDestructor
 	opt norefcounts
-	require self // is this the crash bug cause?
+	require self
+	compiler.perrylog "A"
+	// we need to log stuff here... if in perry?
 	|| TheCall = .FindCallParents
+	compiler.perrylog "B"
 	|| IsConstructor = self is Constructor
 	|| root = .SourceArg$
+	compiler.perrylog "C"
 	.CheckConstructorAndDestructor( root, IsConstructor )
+	compiler.perrylog "D"
 	if IsConstructor
 		if !thecall
 			thecall = root.first
+		compiler.perrylog "E"
 		.FillInMissingConstructorDefaults( root, TheCall )
+		compiler.perrylog "F"
 	require StdErr.OK and !IsConstructor
 	
 	|| c = .cls$
+	compiler.perrylog "G"
 	if !c.HasStuffToHandleInDestructor
+		compiler.perrylog "H"
 		if !Root.HasAny
 			c.DestructorFunc = nil
+		compiler.perrylog "I"
 	  elseif !c.IsWrapper
+		compiler.perrylog("J")
 		.FillInDestructor
+	compiler.perrylog "K"
+
 
 
 

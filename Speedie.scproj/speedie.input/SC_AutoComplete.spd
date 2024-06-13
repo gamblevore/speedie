@@ -1156,3 +1156,15 @@ extend message
 		cpp_name jdb4
 		visible
 		printline .jdb4_
+
+
+
+|| PerryLogFile = file.Logs["SpeedieDebug.txt"]
+
+function Compiler.PerryLog (|string| s)
+	require compiler.InPerry
+	if !PerryLogFile.Opened
+		PerryLogFile.OpenEmpty
+	PerryLogFile <~ s
+	PerryLogFile <~ "\n"
+
