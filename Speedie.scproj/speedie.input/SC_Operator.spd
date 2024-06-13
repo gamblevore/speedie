@@ -123,7 +123,7 @@ module {
 	|scoperator|						Assigns
 	|scoperator| 						Minus		= SCOperator.new(&asmstate.subtract)
 	|scoperator| 						Bnot		= SCOperator.new(&asmstate.BitNot)
-	|scoperator| 						TypeCast	= SCOperator.new(&asmstate.TypeCast)
+//	|scoperator| 						TypeCast	= SCOperator.new(&asmstate.TypeCast)
 	
 	function Lookup ( |Message| opch, |SCOperator| )
 		opt norefcounts

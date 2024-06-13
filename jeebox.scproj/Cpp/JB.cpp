@@ -3048,6 +3048,17 @@ int JB_ivec4_Width(ivec4 Self) {
 
 
 
+int JB_CharProp__Init_() {
+	{
+	}
+	;
+	return 0;
+}
+
+int JB_CharProp__InitCode_() {
+	return 0;
+}
+
 
 bool JB_CP_In(Codepoint Self, int A, int B) {
 	return ((uint)(Self - A)) <= ((uint)(B - A));
@@ -3244,7 +3255,6 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, 
 	JB_Decr(Result);
 	return ((Syntax)ID);
 }
-
 
 
 
@@ -8206,7 +8216,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024061018);
+	return (2024061121);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8218,4 +8228,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 -5963021194466048683 -6720784475268466743
+// 7796578953066441599 4146160502151773816 -6720784475268466743

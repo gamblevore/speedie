@@ -2,10 +2,10 @@
 
 function ASMState.DoConsts (|&FatASM| D,  |asmreg| L,  |asmreg| R,  |&FatASM|)
 	// assume L and R only. only 2 inputs.
-	|| LL = self[L],  || RR = self[R],  || DD = self[D.dest]
+//	|| LL = self[L],  || RR = self[R],  || DD = self[D.dest]
 	// we can just ALWAYS write the output... into the ASM?
 	// then we DONT nEEd THIS AT ALL? if its not a const, the fat will know.
-	debugger 
+//	debugger 
 	return .Zero
 //	|| m = 0
 //	if l.isfloat
@@ -20,29 +20,12 @@ function ASMState.DoConsts (|&FatASM| D,  |asmreg| L,  |asmreg| R,  |&FatASM|)
 
 
 
-function asmstate.DoFloatConst (|ASMReg| D, |&f64| DD, |&f64| LL, |&f64| RR, |asm| M, |ASMReg|)
-	|| LLL = LL[]
-	|| RRR = RR[]
-	if 0
-		0
-	  elseif M == asm.FAdd // fsub is fadd
-		// check alternate
-		LLL += RRR 
-		LLL -= RRR 
-	  elseif M == asm.FMUL
-		LLL *= RRR 
-	  elseif M == asm.FDIV // fmod too
-		LLL /= RRR 
-		(LLL mod= RRR)
-	  else
-		debugger // missed one!
-
-	(DD|&uint64|)[] = 0 // clear high bits
-	if LLL.abs
-		DD[] = LLL
-		return D
-	DD[] = 0
-	return asmreg.zero
+//function asmstate.DoFloatConst (|ASMReg| D, |&f64| DD, |&f64| LL, |&f64| RR, |asm| M, |ASMReg|)
+//	|| LLL = LL[]
+//	|| RRR = RR[]
+//	if M == asm.FDIV // fmod too
+//		LLL /= RRR 
+//		(LLL mod= RRR)
 
 
 

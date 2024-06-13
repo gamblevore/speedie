@@ -291,14 +291,14 @@ forms
 		__
 		Code = CompNeq(r, Op, Code)
 		___
-/**/ BRAA  (Bra)
+/**/ JBRA  (Bra)
 		__
 		if (!i1)
 			Code += Bra_jmpi
 		___
 		i1 += Bra_c1u-1
 
-/**/ BRAN  (Bra)					
+/**/ JBRN  (Bra)					
 		__
 		if (i1)
 			Code += Bra_jmpi

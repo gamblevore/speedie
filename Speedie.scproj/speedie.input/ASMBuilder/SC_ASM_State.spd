@@ -32,13 +32,8 @@ struct ASMState
 	function Last (|&FatASM|)
 		return .curr-1
 	
-	syntax access (|asmreg| a, |&uint64|)
+	syntax access (|int| a, |&uint64|)
 		cpp_part GetConst, pragma inline
-		return .const(a.reg)
-	
-	function Const (|int| a, |&uint64|)
-		// remove this? seems wasteful. just read from .registers?
-		cpp_part GetConstInt, pragma inline
 		|| r = .registers[a]!
 		if r == .zero or r.Reg isnt ConstAny // now what?
 		return r.Const
@@ -159,16 +154,12 @@ struct ASMState
 
 
 	function FindConst (|uint64| Code, |&FATASM|)
-		if Code
+		if !Code
 			return .Zero
 		|int| i = 31 - .VTmps
-		// any flow-control can destroy this
-		// what about something like:
-		// || x = (1,2+1)
-		// perhaps tern should open/close?
 		while i > .VDecls
-			|| r = .Registers[i]
-			if .Const(i)[] == code
+			|| r = .Registers[i]!
+			if r.const == code
 				return r
 			--i
 	
@@ -208,7 +199,7 @@ struct ASMState
 		
 		target debug
 			|| dd = dest.reg
-			if dd and rz.reg != dd
+			if dd and rz.reg.reg != dd
 				// its not about "being different"... but "did it allocate something that it didnt need to"
 				#!FFFFFFASSDJKLASDM<>AS
 

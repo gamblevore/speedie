@@ -107,8 +107,6 @@ typedef vec4 mat2;
 
 typedef Date HumanDate;
 
-struct CharProps;
-
 struct CompressionStats;
 
 struct FakeJBString;
@@ -1482,6 +1480,10 @@ int JB_ivec4_Width(ivec4 Self);
 
 
 // CharProp
+int JB_CharProp__Init_();
+
+int JB_CharProp__InitCode_();
+
 
 
 // Codepoint
@@ -1697,9 +1699,6 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, 
 
 
 // fpMsgRender
-
-
-// JB_CharProps
 
 
 // JB_ClassData

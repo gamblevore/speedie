@@ -114,14 +114,14 @@
 	__;
 	Code = CompNeq(r, Op, Code);
 	___;
-ı BRAA: 
+ı JBRA: 
 	__;
 	if (!i1) 
 	Code += Bra_jmpi
 ;
 	___;
 	i1 += Bra_c1u - 1;
-ı BRAN: 
+ı JBRN: 
 	__;
 	if (i1) 
 	Code += Bra_jmpi

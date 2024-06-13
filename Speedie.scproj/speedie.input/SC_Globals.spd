@@ -7,7 +7,7 @@
 
 prototype ExprResolver (|Message| Exp, |SCNode| name_space, |Message?| side=nil, |SCObject?|)
 
-dispatch ExprFuncs (ExprResolver)  {
+dispatch ExprFuncs (ExprResolver)
 /* @decl is BAD!   dont add it*/
 	@Rel  : (TypeOfRel)
 	@BRel : (TypeOfBRel)
@@ -37,7 +37,7 @@ dispatch ExprFuncs (ExprResolver)  {
 	@Emb  : (TypeOfNothing)
 	@Sheb : (TypeOfNothing)
 	63    : (TypeOfNothing)
-}
+
 
 
 function TypeOfSDot (ExprResolver)

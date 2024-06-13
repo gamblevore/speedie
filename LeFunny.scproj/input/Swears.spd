@@ -50,8 +50,8 @@ extend_module swearword
 		|| done = false
 		for i in n
 			for 100 
-				|| w1 = .first[]	#loop
-				|| w2 = .Second[]	#loop
+				|| w1 = .first.now	#loop
+				|| w2 = .Second.now	#loop
 				if .accept(w1, w2)
 					if done
 						fs <~ ", "

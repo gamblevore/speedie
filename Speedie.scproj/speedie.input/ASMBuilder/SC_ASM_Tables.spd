@@ -199,16 +199,10 @@ function Ternary		(fn_asm)
 	|| mB = .ExistingVar(b)
 	if ma and mb
 		return .SimpleTernary(dest, ma.reg, mb.reg, cond)
-	
-	#! we'll need to protect registers...  x = (1,1+2)(cond)
-	#! x can be set to 1, then we find the number 1 as a constant in a register
-	#! Except its not really there cos it hasnt been done yet!
-	#! I think we need to put our constants into blocks via FATASM.
-	#! basically... we store the constant in a FATASM.
 
 	dest = .TempMe(exp, dest)
 	|| FailToSecond = .Branch(cond)
-	.µOpen(A, dest)
+	.µ(A, dest)
 	|| Exit = .AddASM(asm.jump, exp)
 
 	FailToSecond.r[3] = .curr - FailToSecond
@@ -234,13 +228,15 @@ function Return			(fn_asm)
 	return .AddASM(asm.RET, exp, reg, asmreg(), 1)
 
 
-function TypeCast		(fn_asm)		// 
+
+function TypeCast		(fn_asm)
 	opt norefcounts
 	debugger
 	|| src = .µ(exp.first!, dest)
-	|| T = src.reg.µtype
+	|| sr = src.reg
+	|| T = sr.µtype
 	if t is bool
-		return .NotEq(dest, asmreg(), src.reg, exp)
+		return .NotEq(dest, asmreg(), sr, exp)
 
 	|| OldDecl = exp.first!.fastdecl
 	|| NewDecl = exp.second!.fastdecl
@@ -254,20 +250,34 @@ function TypeCast		(fn_asm)		//
 	if !FloatDiff and (nc == oc)
 		return src
 
+	#!type-casting needs constifiying
+
 	dest = .TempMe(exp, dest)
-	ifn t.isfloat or newtype.isfloat
-		|| Sh = 64 - oc
-		return .AddASM(asm.BFLG, exp, dest, src.reg, sh, sh, src.reg.signed|int|).bitcorrect
+	|| UponConst = sr is ConstAny
+	if t.isfloat or newtype.isfloat
+		debugger,   #!put in actual numbers later
+		rz = .AddASM(asm.CONV, exp, dest, sr, 3-(floatdiff<<1)).BitCorrect
+		if UponConst
+			if NewType.IsFloat and !FloatDiff
+				rz.FloatConvConst(src, NC)
+			  else
+				rz.FloatIntConvConst(src, oldtype, newtype)
+	  else
+		|| sh = 64 - oc
+		rz = .AddASM(asm.BFLG, exp, dest, sr, sh, sh, sr.signed|int|).bitcorrect
+		if UponConst
+			|| oof = src.Const << sh
+			rz.Const = (oof|int64| >> sh, oof|uint64| >> sh)(sr.Signed) // shift up and down
 	
-	rz = .AddASM(asm.CONV, exp, dest, src.reg, 3-(floatdiff<<1))
-	debugger,   #!put in actual numbers later
+	rz <~ src.reg & asmreg.ConstAny
+
 
 
 function Pointer		(fn_asm)
 	// *a, x = *(a.b) 
 	opt	NoRefCounts
 	if dest is AddrRequest // hmmm?
-	dest = .tempme(exp, dest)
+	dest = .TempMe(exp, dest)
 	|| Ptr = .µ(exp.first!, dest)
 	|| A = Dest.ReadOrWrite(exp)
 	return .AddASM(A, exp, dest,  Ptr.reg).BitCorrect
@@ -567,14 +577,14 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr
 	if ml isnt ConstAny or mr isnt ConstAny
 		return (fn)(self, dest, ml, mr, op)
 	(Dest is MathConst)
-	|| fat = (fn)(self, dest, ml, mr, op)
-	if fat.reg isnt mathconst // hmm?
+	rz = (fn)(self, dest, ml, mr, op)
+	if rz.reg isnt mathconst // hmm?
 		debugger, (fn)(self, dest, ml, mr, op)
-	return .DoConsts(fat, ml, mr)
 
 
 function Ignore			(fn_asm)
 	return .Zero
+
 
 function Unexpected		(fn_asm)
 	"Bad asmtmp"
@@ -629,3 +639,49 @@ function message.HasAsmStuff (|bool|)
 	for ch in self
 		if ch.func != @sheb
 			return true
+
+
+function FatASM.FloatConvConst (|&FatASM| src, |int| DestBitSize)
+	|| f = (&src.Const)|&nil|
+	|| d = (&.Const)|&nil|
+	if DestBitSize == 64			// f32 to f64
+		d|&f64|[]   = f|&float|[]
+	  elseif DestBitSize == 32		// f64 to f32
+		d|&float|[] = f|&f64|[]
+	  else
+		error (src.msg)
+
+
+function FatASM.FloatIntConvConst (|&FatASM| fat, |datatypecode| src, |datatypecode| dest)
+	|| dbc = dest.ByteCount
+	|| f = (&fat.Const)|&nil|
+	|| d = (&.Const)|&nil|
+	if src.IsInt
+		|| v = fat.Const
+		if src.IsSigned
+			if dbc == 4
+				(d|&float|)[] = v|float|				// i to f32
+			  else
+				(d|&f64|)[] = v|f64|					// i to f64
+		  else
+			if dbc == 4
+				(d|&float|)[] = v|uint64||float|		// u to f32
+			  else
+				(d|&f64|)[] = v|uint64||f64|			// u to f64
+	  else
+		|| i = d|&int64|
+		|| u = d|&uint64|
+		if dbc == 4
+			|| f32 = f|&float|
+			if dest.IsSigned
+				i[] = f32[]|int|						// f32 to i
+			  else
+				u[] = f32[]|int|						// f32 to u
+		  else
+			|| f64 = f|&f64|
+			if dest.IsSigned
+				i[] = f64[]|int64|						// f64 to i
+			  else
+				u[] = f64[]|uint64|						// f64 to u
+
+

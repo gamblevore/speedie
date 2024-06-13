@@ -38,6 +38,7 @@ dispatch TemporalStatements (TranFunc)
 	printerror				(Tran_Print)
 	log						(Tran_Log)
 	beep					(Tran_Beep)
+	optpath					(Tran_OptPath)
 	
 	ignore					{(node.remove)}
 

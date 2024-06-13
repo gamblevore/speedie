@@ -70,6 +70,18 @@ datatype AsmReg (int64)
 		Zero			= SrcConst
 	
 	
+
+	
+	function F32 (|float|)
+		
+		
+	function F64 (|float|)
+		
+
+	function Const (|int64|)
+		return .fat.const
+
+
 	function Negate (|asmreg|)
 		(self is negate) = (Self isnt negate)
 		return self
@@ -80,15 +92,6 @@ datatype AsmReg (int64)
 	function FAT (|!&fatasm|)
 		debugger //ooof
 		return ASMState.Sh.Registers[.reg]!
-	
-//	function Math (|asmmath|)
-//		return (self|uint| & asmmath.all)
-		
-//	operator isa (|ASMMath| M, |bool|)
-//		return .math == M
-
-//	operator as (|ASMMath| M, |asmreg|)
-//		return ((self|int64| &~ asmmath.all) ||| M)|ASMReg|
 
 	operator isa (|datatypecode| M, |bool|)
 		return .µtype == M

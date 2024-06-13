@@ -58,6 +58,7 @@ class Array (saveable)
 		.length = .length - 1
 	
 	function Pop (||)
+		nil checker
 		cpp_wrapper JB_Array_Pop
 
 	function SetAt (|...!| c, |int| i)
@@ -120,14 +121,13 @@ class Array (saveable)
 		cpp_wrapper JB_Array_Swap
 	
 	syntax Access (|int| pos, assigns:|...!|)
-		cpp_wrapper JB_Array_ValueSet // disable set nil? makes internals simpler/faster!
+		cpp_wrapper JB_Array_ValueSet
 	
-	syntax Access (|int| pos, ||)
+	syntax Access (|int| pos=0, ||)
 		nil checker
 		cpp_wrapper JB_Array_Value
 	
-	syntax Access (||)
-		cpp_part Rand
+	function Now (||)
 		return self[.length.now]
 	
 	syntax cast (|bool|)

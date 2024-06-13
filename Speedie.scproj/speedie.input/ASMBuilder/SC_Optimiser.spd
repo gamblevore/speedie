@@ -11,6 +11,22 @@
 	//// do nothing
 // a = b
 
+
+
+function Tran_OptPath (tranfunc)
+	// we need to make sure that every optimisation path is tested!!!
+	// we don't wanna generate buggy code!
+	|| name = node.first
+	require name.ExpectLast and name.ExpectString
+	if Options.TargetDebug
+		|| i = ++spdassembler.OptPathCount
+		SpdAssembler.OptPathNames[i] = name
+		node.BecomeMacro(Macros.OptPath, [i.msg])
+		TypeOfExpr(node, name_space)
+	  else
+		node.SafeRemove
+
+
 function SpdAssembler.MarkBlocks (|&FatASM| curr, |int| length)
 	|| first = asm.JUMP.op,  || last = asm.LUPU.op
 	|| B = 1
@@ -34,7 +50,7 @@ function SpdAssembler.Optimise (|µfunc| raw, |bool|)
 	|| opts = 0
 	|| last = curr + raw.Length
 	while curr < last
-		|| x = (µOpt[curr.op])
+		|| x = .µOpt[curr.op]
 			|| p = curr.prev
 			|| n = curr.next
 			if n or p
@@ -43,23 +59,17 @@ function SpdAssembler.Optimise (|µfunc| raw, |bool|)
 	raw.Sanity
 
 
-extend FatASM
-	setter Debug (|message|)
 
-		|| fn = Value.FileNum
-		if fn >= 4096
-			fn = 0 // sigh
-		.Location = fn ||| Value.Position << 12 // 4K max files
 
-	function Nop (|bool|)
-		.op = asm.noop
-		return true
-		
+extend SpdAssembler {
+	|int| 			OptPathCount
+	|int[64]|		OptPaths
+	|message[64]|	OptPathNames
+
 
 dispatch µOpt (|&fatasm| self, |?&fatasm| P, |?&fatasm| N, |bool|)
 	(ASM.FUNC2):  OptFunc
 	(ASM.FUNC3):  OptFunc
-		
 		
 	(ASM.CNTC):   OptCount
 	(ASM.TABL):   OptTabl
@@ -70,7 +80,6 @@ dispatch µOpt (|&fatasm| self, |?&fatasm| P, |?&fatasm| N, |bool|)
 	(ASM.FADD):   OptAddF
 	(ASM.FADK):   OptFADK
 	
-
 	(ASM.RET):    OptRet
 	(ASM.TERN):   OptTern
 	(ASM.BFLG):   OptBFLG
@@ -79,27 +88,33 @@ dispatch µOpt (|&fatasm| self, |?&fatasm| P, |?&fatasm| N, |bool|)
 	(ASM.BLUE):   OptShifting
 	(ASM.BAND):   OptBitAnd
 	(ASM.BOAR):   OptBitOr
+	(ASM.BNOT):	  OptBitNot
 	(ASM.CMPF):	  OptCompare
 	(ASM.CMPI):   OptCompare
+	
 	(ASM.JUMP):   OptJump // control flow?
 	(ASM.JMPI):   OptJumpC
 	(ASM.JMPF):   OptJumpC
 	(ASM.JMPN):   OptJumpE
 	(ASM.JMPE):   OptJumpE
-	(ASM.BRAA):   OptBra
-	(ASM.BRAN):   OptBra
-	255:  {}
+	(ASM.JBRA):   OptBra
+	(ASM.JBRN):   OptBra
+	255:		  OptNothing
 
+
+
+function OptNothing (fn_µopt) // do nothing
 
 
 function OptFunc (Fn_µOpt)
 	// TAILCALL
 	require N isa asm.ret
-	|| RetResult = N.a1
-	|| FuncResult = .a1
+	|| RetResult = N.out
+	|| FuncResult = .out
 	if RetResult == FuncResult // Return the result of this function
 		.op = asm.tail
-		return N.nop
+		OptPath "tail"
+		return N.nop // what if something jumps to this?
 
 
 function OptCount (Fn_µOpt)
@@ -112,13 +127,17 @@ function OptTabl (Fn_µOpt)
 
 function OptFADK (Fn_µOpt)	
 	// a = b + k1 + k2   -->   a = b + k3
-	require p isa asm.fadk
-	|| pout = p.a1
-	|| myin = .a2
-	if pout == myin
-		|| add2 = p.a3|int|.asfloat + .a2|int|.asfloat
-		.a2 = add2.AsInt
-		return true
+//	require p isa asm.fadk
+//	|| pout = p.out
+//	|| myin = .a
+//	if pout == myin
+//		OptPath "fadk()"
+//		|| add2 = p.b|int|.asfloat + .a|int|.asfloat
+//		// is this how we store consts in fadk? not just as a raw-const?
+//		// and what if the consts dont fit?
+//		// seems better to just add the raw numbers?
+//		.a = add2.AsInt
+//		return true
 	
 
 function OptSubI (Fn_µOpt)
@@ -129,71 +148,80 @@ function OptSubI (Fn_µOpt)
 
 
 function OptAddI (Fn_µOpt)
-	|| out = .a1
+	|| out = .out
 	if .match3_2(0)
-		if out == .a2 // a = a + 0
+		if out == .a // a = a + 0
+			OptPath "add->nop"
 			return .nop
 		
 		// a = b + 0
+		OptPath "add->boar"
 		.op = asm.boar // u1 = (u2|||u3)&~u4
-		.a4 = 0 // nice
+		.c = 0 // nice
 		return true
 	
-	require  p  and  !.a4
-	|| pout = p.a1
-	require (pout == .a2)
+	require  p  and  !.c
+	|| pout = p.out
+	require (pout == .a)
 
 	// c = d << k,  a = b + c  -->  a = b + (d << k)
 	if (p isa asm.BFLG)
-		require p.a5 and .match3_2(pout)			// unsigned
-		.a4 = p.a3
-		.a3 = p.a2
+		require p.d and .match3_2(pout)			// unsigned
+		OptPath "add+bflg"
+		.c = p.b
+		.b = p.a
 		return true
 
 	if p isa asm.MULT // needs refcounts
 		// x2 = x1 * x1,  a = b + x2   -->   a = x1 * x1 + b
 		require .match3_2(pout)
+		OptPath "add+mult"
 		.op = asm.MULT
-		.a4 = .a2
-		.a3 = p.a3
-		.a2 = p.a2
+		.c = .a
+		.b = p.b
+		.a = p.a
 		return true
 
 
 function OptAddF (Fn_µOpt)
-	|| mout = .a1
-	|| a4 = .a4
+	|| mout = .out
+	|| a4 = .c
 	// a = b + (c - c),   (a = b + 0 - 0)
-	if (a4 == .a3)	or (.match3_2(0) and !a4)
-		if mout == .a2 // a = a + 0
+	if (a4 == .b)	or (.match3_2(0) and !a4)
+		if mout == .a // a = a + 0
+			OptPath "fadd_nop"
 			return .nop
 		
 		// a = b + 0
+		OptPath "fadd+0"
 		.op = asm.boar // u1 = (u2|||u3)&~u4
-		.a4 = 0 // nice
+		.c = 0 // nice
 		return true
 
     // a*b + c --> MUL
-	require p  and  p.a5 == .a5		// Both are 64.  or both are 32
-	|| pout = p.a1
+	require p  and  p.d == .d		// Both are 64.  or both are 32
+	|| pout = p.out
 	if p isa asm.FADD
 		require .match3_2(pout)
-		if !p.a4 and !.a3    		// pa = p2 + p3,   f1 = pa - f4   <--   f1 = p2 + p3 - f4
-			.a3 = p.a3
-			.a2 = p.a2
+		if !p.c and !.b				// pa = p2 + p3,   f1 = pa - f4   <--   f1 = p2 + p3 - f4
+			OptPath "fadd+1"
+			.b = p.b
+			.a = p.a
 			return true
-		if !p.a3 and !.a4			// pa = p2 - p4,   f1 = pa + f3   <--   f1 = p2 + f3 - p4
-			.a4 = p.a4
-			.a2 = p.a2
+		if !p.b and !.c				// pa = p2 - p4,   f1 = pa + f3   <--   f1 = p2 + f3 - p4
+			OptPath "fadd+2"
+			.c = p.c
+			.a = p.a
 			return true
 
-	require !.a4
+	require !.c
 	if p isa asm.FMUL				// x2 = x1 * x1,  a = b + x2   -->   a = x1 * x1 + b
 		require !.match3_2(pout)
+		OptPath "fmul"
 		.op = asm.FMUL
-		.a4 = .a2
-		.a3 = p.a3
-		.a2 = p.a2
+		.c = .a
+		.b = p.b
+		.a = p.a
 		return true
 
 
@@ -202,20 +230,22 @@ function OptShifting (fn_µopt)   // can't really opt this unless registers cont
 								 // I will rework to use refcounts+Consts
 	// we need to combine a bflg with this.
 	// bflg(same side only) + shift --> shift
-	|| k = .a3
-	require k.IsConst and !.a4
+	|| k = .b
+	require k.IsConst and !.c
 	|| v = k.ConstValue
 	require v.IsPow2
 	|| l = v.log2
 	if l >= 63
 		|| o = .op
 		if o == asm.blue		// left
-			.a3 = 0
-			.a4 = l
+			OptPath "blue"
+			.b = 0
+			.c = l
 		  else
-			.a3 = l
-			.a4 = 0
-		.a5 = (o == asm.brus)|int|
+			OptPath "bru"
+			.b = l
+			.c = 0
+		.d = (o == asm.brus)|int|
 		.op = asm.BFLG
 		return true
 
@@ -235,22 +265,87 @@ function OptBFLG (fn_µopt)
 
 
 function OptBitOr (fn_µopt)
-	require p
-	if p isa asm.bnot // u1 = ~u2 & ~u3
-		|| p2 = p.a2,  || p3 = p.a3
-		if (p2 == p3) or .match3_2(0)
-			
+	require p			
+//	|| rr = r.reg,  || ll = l.reg
+//	if ll == 0							// swap
+//		swap (ll) (rr)
+//	  elseif (ll == rr)
+//		rr = 0							// same thing
+//	if rr == 0 and dd == ll
+//		debugger // we need to return the left asm. how to get it?
+//		return dest.fat						// no need
 	// boar:   u1  = (u2|||u3)&~u4
+
+
+function OptBitNot (fn_µopt)
+	require (p isa asm.bnot) and (n isa asm.band) and !n.c
+	require !(.b ||| p.b)
+
+	// this is such a pain... actually. to do at all.
+
+	|| nl = n.a
+	|| nr = n.b
+	|| x = p.out
+	|| y = .out
+	require  n.match3_2(x)  and  n.a == y
+	
+	if .has(x,y) or p.has(x,y)
+		|| a = p.a
+		|| b = .a
+		if x == a and y == b
+			//  x = ~y,  y = ~x		-->		z = ~y & ~~y	-->		z = 0
+			OptPath "bitnot_0"
+			n.op = asm.boar
+			n.a = 0
+			n.b = 0
+			return true
+		if x == a and y == a
+			//  x = ~x,  x = ~x		-->		Entire thing is a nop. Any other changes would corrupt.
+			OptPath "bitnot_nop"
+			p.nop
+			.nop
+			n.nop
+			return true
+		
+		if x != y  and  y == a and b
+			//  x = ~y,  y = ~y		-->		z = ~~y & ~~y		-->		z = y
+			OptPath "bitnot_set"
+			n.op = asm.boar
+			n.a = y
+			n.b = 0
+			return true
+		
+		return false
+	
+
+
+	
+	// if the inputs are altered... they must be nopped, or else we get input corruption.
+	// nopping requres that nothing else uses it. refcount is 1.
+	// just dont do for now!
+	//  x = ~x,  y = ~y		-->		z = ~x & ~y		// need nop xy
+	//  x = ~a,  y = ~y		-->		z = ~a & ~y		// need nop y
+	//  x = ~x,  y = ~b		-->		z = ~x & ~b		// need nop x
+
+	//  x = ~x,  y = ~x		-->		z = ~x & ~x		// ?????
+
+	//  x = ~y,  y = ~b		-->		z = ~x & ~y		// ?????
+	OptPath "bitnot_combine"	//  x = ~a,  y = ~b,  z = x & y 	-->		z = ~a & ~b
+	.b = p.a
+	return true
+	
+	
 
 
 function OptBitAnd (fn_µopt)
 //  x = a & contig_k2 --> bflg(a,k2)   // optimises well
 	// lets find if one is a const...
-	if p isa asm.bnot // x = (~a & ~b) in two-passes? can check the double-prev instruction too
+	require p
+	|| pout = p.out
 
 
 function OptTern (fn_µopt)
-	if .a2 // if this reg is a const... then we can opt it to a BOAR
+	if .a // if this reg is a const... then we can opt it to a BOAR
 
 
 
@@ -288,3 +383,5 @@ function OptRet (fn_µopt)
 // if x: return true/false --> conditional return 
 // LUPU/LUPD
 
+
+}

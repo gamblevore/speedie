@@ -55,7 +55,7 @@ extend ASMState
 				r = dest
 				l = 0.asm
 			if !l.reg
-				return .AddASM(asm.BRAA • negate, exp, R, 1)
+				return .AddASM(asm.JBRA • negate, exp, R, 1)
 			return .AddASM(asm.JMPE • Negate, exp, L, R)
 
 		
@@ -136,18 +136,7 @@ extend ASMState
 	
 
 
-	// MATH
-	
-	
-	function TypeCast (fn_OpASM)
-		debugger 
-		return .Zero
-//function DoSingleMath (|&ASMState| self, |message| exp, |AsmReg| Dest, |scoperator!| Scop, |AsmReg|)
-//	|| Src = .µ(exp, dest)
-//	(src is SingleExpr)
-//		.AddBit( "",	"RotateRight",	&asmstate.ROR,		asmmath.ROR,	opmode.shift)
-//	return DoMathSub(self, exp, dest, src, scop)
-		
+	// MATH		
 
 	function QuickFloatPlus    (fn_OpASM2)
 		require r is ConstAny
@@ -168,11 +157,11 @@ extend ASMState
 		|ivec2| ex
 		// we could optimise f/-1.0 or f/-0.5... but who cares. dont write such dumb code.
 		if l.IsBig
-			|| f = p|&f64|[0]
+			|| f = p|&f64|[]
 			require f > 0
 			ex = f.exponent
 		  else
-			|| f = p|&float|[0]
+			|| f = p|&float|[]
 			require f > 0
 			ex = f.exponent
 		
@@ -236,17 +225,36 @@ extend ASMState
 		
 		// so... how do we calculate the const? I'd rather do it in one place... honestly.
 		// we could go through one by one, though... its ok either way
-
-
+		
 	function PlusFloat   (fn_opasm)
-		|| IsFloat = dest.FourBytes
+		|| IsF32 = dest.FourBytes
 			|| A = .QuickFloatPlus(dest, r, l, exp)
 				return A
 			|| B = .QuickFloatPlus(dest, l, r, exp)
 				return B
 
-		|| SubTract = (l is alternate)
-		return .AddASM(asm.fADD, exp, dest, l, r.reg*!subtract, r.reg*subtract, 1-isfloat)
+		|| ss = (l is alternate)
+		|| rr = r.reg
+		rz = .AddASM(asm.fADD, exp, dest, l, rr*!ss, rr*ss, 1-IsF32)
+		ifn dest is ConstAny
+			0 //
+		  elseif IsF32
+			|| rf = r.F32
+			|| lf = l.F32
+			if ss
+				lf += rf
+			  else
+				lf -= rf
+			rz.F32 = lf
+		  else
+			|| rf = r.F64
+			|| lf = l.F64
+			if ss
+				lf += rf
+			  else
+				lf -= rf
+			rz.F64 = lf
+
 
 // do this transform here:
 // p1 = p2 * k3,  f1 = f2 + p1  -->  f1 = f2 + (p2 << log2(k3))	
@@ -282,6 +290,26 @@ extend ASMState
 		return .plus(dest, l, r, exp)
 
 
+	function IntMul (fn_opasm)
+		rz = .QuickIntMul(dest, R, L, exp)
+		rz := .QuickIntMul(dest, L, R, exp)
+		rz := .AddASM(asm.MULT , exp, dest, L, R)
+		if dest is ConstAny
+			rz.const = l.const * r.const
+
+
+	function FloatMul (fn_opasm)
+		rz = .QuickFloatMul(dest, R, L, exp)
+		rz := .QuickFloatMul(dest, L, R, exp)
+		rz := .AddASM(asm.FMUL, exp, dest, L, R, l.IsBig|int|) 
+		ifn dest is ConstAny
+			0 //
+		  elseif dest.FourBytes
+			rz.F32 = l.F32 * r.F32
+		  else
+			rz.F64 = l.F64 * r.F64
+
+
 	function Mul    (fn_opasm)
 		|| b = DataTypeCode.bool
 		if l isa b
@@ -298,11 +326,7 @@ extend ASMState
 				return D2
 			return .AddASM(asm.MULT , exp, dest, L, R)
 		  else
-			|| D1 = .QuickFloatMul(dest, R, L, exp)
-				return D1
-			|| D2 = .QuickFloatMul(dest, L, R, exp)
-				return D2
-			return .AddASM(asm.FMUL, exp, dest, L, R, l.IsBig|int|) 
+			return .floatmul(Dest, l, r, exp)
 	
 
 	function Div    (fn_opasm)
@@ -312,26 +336,56 @@ extend ASMState
 	
 	
 	function DivFloat    (fn_opasm)
-		|| D1 = .QuickFloatDiv(dest, R, L, exp)
-			return D1
-		|| D2 = .QuickFloatDiv(dest, L, R, exp)
-			return D2
-		|| big = dest.IsBig|int|
-		rz = .AddASM(asm.FDIV, exp, dest, big, L, R)
-		|| Alt = l is alternate
-			rz = .AddASM(asm.FFRC, exp, dest, big, dest, R)
+		rz = .QuickFloatDiv(dest, R, L, exp)
+		rz := .QuickFloatDiv(dest, L, R, exp)
+		rz := .AddASM(asm.FDIV,  exp,  dest,  dest.isbig|int|,  L,  R)
+		if dest is ConstAny
+			if dest.FourBytes
+				rz.f32 = l.f32 / r.f32
+			  else
+				rz.f64 = l.f64 / r.f64
 
-	
 
 	function DivInt    (fn_opasm)
-		|| Alt = l is alternate
-		|| d = dest.Reg
-		return .AddASM(asm.DIVV, exp, d*!alt, d*alt, L, R, dest.IntDivType)
+		rz = .AddASM(asm.DIVV, exp, dest.reg, 0, L, R, dest.IntDivType)
+		if dest is ConstAny
+			|int64| C
+			if dest.FourBytes
+				if dest.Signed
+					C = l.const|int| / r.const|int|
+				  else
+					C = l.const|uint| / r.const|uint|
+			  else
+				if dest.Signed
+					C = l.const|int64| / r.const|int64|
+				  else
+					C = l.const|uint64| / r.const|uint64|
+			rz.Const = C
+	
+	
+	function ModFloat    (fn_opasm)
+		|| d = dest.Reg #check (Exp)
+		|| big = dest.IsBig|int|
+		.AddASM(asm.FDIV, exp, dest, big, L, R)
+		rz = .AddASM(asm.FFRC, exp, dest, big, dest, R)
+		if dest is ConstAny
+			if dest.FourBytes
+				rz.f32 = l.f32 mod r.f32
+			  else
+				rz.f64 = l.f64 mod r.f64
+	
+	function ModInt    (fn_opasm)
+		rz = .AddASM(asm.DIVV, exp, 0, dest, L, R, dest.IntDivType)
+		if dest is ConstAny
+			// rework back into div/
+			rz.const = l.const mod r.const
 	
 	
 	function Mod    (fn_opasm)
-		(l is Alternate)
-		return .div(dest, l, r, exp)
+		if dest.isint
+			return .ModInt(dest, l, r, exp)
+		return .ModFloat(dest, l, r, exp)
+		
 
 
 	// BITS
@@ -350,14 +404,6 @@ extend ASMState
 		|| dd = dest.reg
 		if !dd
 			debugger 
-		|| rr = r.reg,  || ll = l.reg
-		if ll == 0							// swap
-			swap (ll) (rr)
-		  elseif (ll == rr)
-			rr = 0							// same thing
-		if rr == 0 and dd == ll
-			debugger // we need to return the left asm. how to get it?
-			return dest.fat						// no need
 		return .AddASM(asm.BOAR, exp, dest, L, R)
 	
 	function BitAnd (fn_opasm)		

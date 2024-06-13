@@ -24,7 +24,7 @@
 function message.Tern (|asmreg| a, |asmreg| b, |asmreg| c, |asmreg| d)
 	pragma inline,  cpp_part ASMTern
 	|| fat = asmstate.sh <~ (asm.tern, self)
-	fat.dest(0) = a
+	fat.out(0) = a
 	fat.prm(1) = b
 	fat.prm(2) = c
 	fat.prm(3) = d
@@ -36,22 +36,40 @@ struct FatASM
 	|byte|			Op
 	|byte|			Label	// 255 labels per function
 	|uint16| 		BlockNum
-	|uint|			Location
-	|int| 			RefCount
 	|ASMReg| 		Reg
-	|uint[3]| 		FAT // just so i GET OVER TRYING TO MAKE THIS SMALL (for now :D)
+	|int| 			RefCount
+	|message--| 	Msg
+	|uint[2]| 		FAT // just so i GET OVER TRYING TO MAKE THIS SMALL (for now :D)
 						// speedie probably would only need like 8MB even then. Quite small.
 	|uint64| 		Const
+	
+	
+	function F32 (assigns:|float|)
+		((&.const)|&float|)[] = Value
+
+	function F64 (assigns:|f64|)
+		((&.const)|&f64|)[] = Value
+		
+	setter Debug (|message|)
+		.msg = Value
+
+	function Nop (|bool|)
+		.op = asm.noop
+		return true
+
+	function has (|int| a, |int| b, |bool|)
+		|| out = .out
+		return out == a or b
 	
 	function Reg (|asmreg|)
 		nil safe
 		return .reg
 	
 	function FileNum (|int|)
-		return .Location & 0x4095
+		return .msg.filenum & 0x4095
 	
 	function BytePos (|int|)
-		return .Location >> 12
+		return .msg.position
 		
 	operator isa (|int| m, |bool|)
 		nil checker
@@ -70,24 +88,24 @@ struct FatASM
 		.reg = .reg as AsmReg.BitCorrect
 		return self
 		
-	function dest (|int|)
-		
-	function dest (|int| a, assigns:|asmreg| r)
+	function out (|int| a, assigns:|asmreg| r)
 		
 		
 	function prm (|int| a, assigns:|asmreg| r)
 		
 
-	function a1 (|uint|): return .r[0]
-	function a1 (assigns:|uint|): .r[0] = value
-	function a2 (|uint|): return .r[1]
-	function a2 (assigns:|uint|): .r[1] = value
-	function a3 (|uint|): return .r[2]
-	function a3 (assigns:|uint|): .r[2] = value
-	function a4 (|uint|): return .r[3]
-	function a4 (assigns:|uint|): .r[3] = value
-	function a5 (|uint|): return .r[4]
-	function a5 (assigns:|uint|): .r[4] = value
+	function out (|uint|): return .r[0]
+	function out (assigns:|uint|): .r[0] = value
+	
+	// easier to do maths ad figure stuff out if its expressed like abcd
+	function a (|uint|): return .r[1]
+	function a (assigns:|uint|): .r[1] = value
+	function b (|uint|): return .r[2]
+	function b (assigns:|uint|): .r[2] = value
+	function c (|uint|): return .r[3]
+	function c (assigns:|uint|): .r[3] = value
+	function d (|uint|): return .r[4]
+	function d (assigns:|uint|): .r[4] = value
 
 	function Swap (|int| a, |int| b)
 		swap (.r[a-1]) (.r[b-1])
@@ -117,10 +135,10 @@ struct FatASM
 
 	function match3_2 (|int| reg, |bool|)
 		// prefers the value to be at 3.
-		if reg == .a2
+		if reg == .a
 			.swap(2,3)
 			return true
-		return reg == .a3
+		return reg == .b
 			
 	
 	function Renda (|FastString| fs)
