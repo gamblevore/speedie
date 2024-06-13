@@ -374,11 +374,22 @@ extend ASMState
 			  else
 				rz.f64 = l.f64 mod r.f64
 	
+	
 	function ModInt    (fn_opasm)
 		rz = .AddASM(asm.DIVV, exp, 0, dest, L, R, dest.IntDivType)
 		if dest is ConstAny
-			// rework back into div/
-			rz.const = l.const mod r.const
+			|int64| C
+			if dest.FourBytes
+				if dest.Signed
+					C = l.const|int| mod r.const|int|
+				  else
+					C = l.const|uint| mod r.const|uint|
+			  else
+				if dest.Signed
+					C = l.const|int64| mod r.const|int64|
+				  else
+					C = l.const|uint64| mod r.const|uint64|
+			rz.Const = C
 	
 	
 	function Mod    (fn_opasm)

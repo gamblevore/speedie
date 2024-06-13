@@ -1,50 +1,8 @@
 
 
+
 function ASMState.DoConsts (|&FatASM| D,  |asmreg| L,  |asmreg| R,  |&FatASM|)
-	// assume L and R only. only 2 inputs.
-//	|| LL = self[L],  || RR = self[R],  || DD = self[D.dest]
-	// we can just ALWAYS write the output... into the ASM?
-	// then we DONT nEEd THIS AT ALL? if its not a const, the fat will know.
-//	debugger 
 	return .Zero
-//	|| m = 0
-//	if l.isfloat
-//		.DoFloatConst(D.reg, DD|&f64|, LL|&f64|, RR|&f64|, M)
-//		return nil
-//	
-//	if l.fourbytes
-//		.DoI32Const(D, DD|&int|, LL|&int|, RR|&int|,   M)
-//	  else
-//		.DoI64Const(D, DD|&int64|, LL|&int64|, RR|&int64|, M)
-		
-
-
-
-//function asmstate.DoFloatConst (|ASMReg| D, |&f64| DD, |&f64| LL, |&f64| RR, |asm| M, |ASMReg|)
-//	|| LLL = LL[]
-//	|| RRR = RR[]
-//	if M == asm.FDIV // fmod too
-//		LLL /= RRR 
-//		(LLL mod= RRR)
-
-
-
-function asmstate.DoI32Const (|asmreg| D, |&int| DD, |&int| LL, |&int| RR, |opmode| M, |asmreg|)
-	|| LLL = LL[]
-	|| RRR = RR[]
-		
-	if M == ASM.Divv
-		LLL /= RRR 
-	  elseif M == ASM.divv
-		(LLL mod= RRR)		
-	  else
-		return .DoI64Const(D, DD|&int64|, LL|&int64|, RR|&int64|, M|opmode|)
-
-	(DD|&uint64|)[] = 0 // clear high bits
-	DD[] = LLL
-	if LLL
-		return D
-	return asmreg.zero
 
 
 
@@ -60,12 +18,6 @@ function asmstate.DoI64Const (|asmreg| D, |&int64| DD, |&int64| LL, |&int64| RR,
 		LLL += RRR 
 	  elseif M == asm.SUBB
 		LLL -= RRR 
-	  elseif M == asm.MULT
-		LLL *= RRR 
-	  elseif M == asm.DIVV
-		LLL /= RRR 
-	  elseif M == asm.DIVV
-		(LLL mod= RRR)
 	  elseif M == asm.BRUU
 		LLL = LLL|uint64|>>RRR|uint64|
 	  elseif M == asm.BRUS
@@ -94,16 +46,6 @@ function asmstate.DoI64Const (|asmreg| D, |&int64| DD, |&int64| LL, |&int64| RR,
 			LLL = (LLL << up)>>up
 		  else
 			LLL = (LLL|uint64| << up) >> up
-//	  elseif M == ASMMath.ROL
-//		LLL = LLL|uint64| rol RRR
-//	  elseif M == ASMMath.ROR
-//		LLL = LLL|uint64| ror RRR
-	  else
-		debugger // missed one!
-	DD[] = LLL
-	if LLL
-		return D
-	return asmreg.zero
 
 
 
