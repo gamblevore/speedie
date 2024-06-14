@@ -15,7 +15,7 @@ function palette (|float| t,  |vec3|)
 function MainImage ( ShaderToyFunc )
 	|| uv = Coord * 2.0
 	|| L = uv.Length
-	|| lexp = (-L).exp
+	|| lexp = (-L).Exp
 	|| cam = 1.5 + .cam.xz * 0.2
 	
 	for i in (0.0 to 4.0)

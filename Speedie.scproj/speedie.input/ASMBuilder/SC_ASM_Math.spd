@@ -169,15 +169,20 @@ extend ASMState
 			return .AddASM(asm.FEXK, exp, dest, L, 0, ex.x, l.IsBig|int|)
 
 
+	// from 1 to -1
+	function Quick1Or1Sub (|&ASMState| self, |asmreg| dest, |asmreg| L, |int| ptoi, |message| exp, |&fatasm|)
+		if ptoi == -1								//   y = x * -1  -->  y = 0-x 
+			return .subtract(dest, asmreg(), l, exp)
+		if ptoi == 0    							//   y = x * 0   -->  y = 0
+			l = asmreg()							//   y = x * 1   -->  y = x 
+		return .assign(dest, l, asmreg(), exp)
+		
+
 	function QuickIntMul    (fn_OpASM2)
 		|| PToi = .IntPowerOftwo(r)$
 
 		if ptoi <= 1
-			if ptoi == -1								//   y = x * -1  -->  y = 0-x 
-				return .subtract(dest, asmreg(), l, exp)
-			if ptoi == 0    							//   y = x * 0   -->  y = 0
-				l = asmreg()							//   y = x * 1   -->  y = x 
-			return .assign(dest, l, asmreg(), exp)
+			return .Quick1Or1Sub(dest, l, ptoi, exp)
 	
 		return .BFLG_Const(exp, dest, l,  ptoi-1, 0)	// y = x * 4 --> y = x << 2
 
@@ -343,7 +348,13 @@ extend ASMState
 
 
 	function DivInt    (fn_opasm)
-		rz = exp.DIVV(dest, asmreg(), l, r, dest.intdivtype)
+		|| PToi = .IntPowerOftwo(r)
+			if ptoi <= 1   //   x/1  x/0  x/-1
+				return .Quick1Or1Sub(dest, l, ptoi, exp)
+			if !l.Signed
+				return .BFLG_Const(exp, dest, l, 0, ptoi) // u / 2 --> u >> 1
+		
+		rz = exp.DIVV(dest, asmreg(), l, r, dest.IntDivType)
 		if dest is ConstAny
 			|int64| C
 			if dest.FourBytes

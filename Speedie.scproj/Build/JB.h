@@ -2082,7 +2082,7 @@ extern Array* JB__ErrorSeverity__names;
 #define kJB__ErrorSeverity_OK (0)
 #define kJB__ErrorSeverity_Problem (3)
 #define kJB__ErrorSeverity_Warning (2)
-#define kJB__FailableInt_Fail (2147483648)
+#define kSC__FailableInt_Fail (2147483648)
 #define kJB__FileDes_StdErr (2)
 #define kJB__FileDes_StdIn (0)
 #define kJB__FileDes_StdOut (1)
@@ -2589,8 +2589,6 @@ void SC_Comp__MiniTests();
 bool SC_Comp__ModulesSorter(JB_Object* A, JB_Object* B);
 
 void SC_Comp__NewConst(SCDecl* D);
-
-void SC_Comp__PerryLog(JB_String* S);
 
 void SC_Comp__PostInitCodeCall();
 
@@ -5761,6 +5759,8 @@ FatASM* SC_Pac_PlusFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Messag
 FatASM* SC_Pac_PlusInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
 FatASM* SC_Pac_Prm(ASMState* Self, Message* Prm);
+
+FatASM* SC_Pac_Quick1Or1Sub(ASMState* Self, AsmReg Dest, AsmReg L, int Ptoi, Message* Exp);
 
 FatASM* SC_Pac_QuickFloatDiv(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
@@ -9724,8 +9724,6 @@ inline bool JB_ErrorInt_SyntaxCast(ErrorInt Self);
 
 inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self);
 
-inline bool JB_FailableInt_SyntaxCast(FailableInt Self);
-
 inline bool JB_FastBuff_AppendU8(FastBuff* Self, byte V);
 
 inline bool JB_File_SyntaxCast(JB_File* Self);
@@ -9747,6 +9745,8 @@ inline bool JB_int64_IsPow2(int64 Self);
 inline bool JB_int64_OperatorInRange(int64 Self, int64 D);
 
 inline bool JB_int_OperatorInRange(int Self, int D);
+
+inline bool SC_FailableInt_SyntaxCast(FailableInt Self);
 
 inline AsmReg SC_FatASM_Info(FatASM* Self);
 
@@ -9820,7 +9820,7 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
 inline FatASM* JB_Msg_ADD(Message* Self, AsmReg A, AsmReg B, AsmReg C);
 
-inline FatASM* JB_Msg_ADDK(Message* Self, AsmReg A, AsmReg B, AsmReg C);
+inline FatASM* JB_Msg_ADDK(Message* Self, AsmReg A, AsmReg B);
 
 inline FatASM* JB_Msg_ADPK(Message* Self, AsmReg A, AsmReg B, AsmReg C);
 
@@ -9844,9 +9844,9 @@ inline FatASM* JB_Msg_BROL(Message* Self, AsmReg A, AsmReg B, AsmReg C);
 
 inline FatASM* JB_Msg_BROR(Message* Self, AsmReg A, AsmReg B, AsmReg C);
 
-inline FatASM* JB_Msg_BRUS(Message* Self, AsmReg A, AsmReg B, AsmReg C);
+inline FatASM* JB_Msg_BRUS(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D);
 
-inline FatASM* JB_Msg_BRUU(Message* Self, AsmReg A, AsmReg B, AsmReg C);
+inline FatASM* JB_Msg_BRUU(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D);
 
 inline FatASM* JB_Msg_BXOR(Message* Self, AsmReg A, AsmReg B, AsmReg C);
 
@@ -9982,10 +9982,6 @@ inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self) {
 	return JB_StdErr->ErrorCount == Self;
 }
 
-inline bool JB_FailableInt_SyntaxCast(FailableInt Self) {
-	return Self != kJB__FailableInt_Fail;
-}
-
 inline bool JB_FastBuff_AppendU8(FastBuff* Self, byte V) {
 	Self->Curr++[0] = V;
 	return Self->Curr >= Self->End;
@@ -10044,6 +10040,10 @@ inline bool JB_int_OperatorInRange(int Self, int D) {
 		return (((uint)Self) < ((uint)D));
 	}
 	return false;
+}
+
+inline bool SC_FailableInt_SyntaxCast(FailableInt Self) {
+	return Self != kSC__FailableInt_Fail;
 }
 
 inline AsmReg SC_FatASM_Info(FatASM* Self) {
@@ -10235,12 +10235,11 @@ inline FatASM* JB_Msg_ADD(Message* Self, AsmReg A, AsmReg B, AsmReg C) {
 	return Rz;
 }
 
-inline FatASM* JB_Msg_ADDK(Message* Self, AsmReg A, AsmReg B, AsmReg C) {
+inline FatASM* JB_Msg_ADDK(Message* Self, AsmReg A, AsmReg B) {
 	FatASM* Rz = nil;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_ADDK, Self);
 	(SC_FatASM_prmSetWithIntReg(Rz, 0, A));
 	(SC_FatASM_prmSetWithIntReg(Rz, 1, B));
-	(SC_FatASM_prmSetWithIntReg(Rz, 2, C));
 	return Rz;
 }
 
@@ -10351,21 +10350,23 @@ inline FatASM* JB_Msg_BROR(Message* Self, AsmReg A, AsmReg B, AsmReg C) {
 	return Rz;
 }
 
-inline FatASM* JB_Msg_BRUS(Message* Self, AsmReg A, AsmReg B, AsmReg C) {
+inline FatASM* JB_Msg_BRUS(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D) {
 	FatASM* Rz = nil;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_BRUS, Self);
 	(SC_FatASM_prmSetWithIntReg(Rz, 0, A));
 	(SC_FatASM_prmSetWithIntReg(Rz, 1, B));
 	(SC_FatASM_prmSetWithIntReg(Rz, 2, C));
+	(SC_FatASM_prmSetWithIntReg(Rz, 3, D));
 	return Rz;
 }
 
-inline FatASM* JB_Msg_BRUU(Message* Self, AsmReg A, AsmReg B, AsmReg C) {
+inline FatASM* JB_Msg_BRUU(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D) {
 	FatASM* Rz = nil;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_BRUU, Self);
 	(SC_FatASM_prmSetWithIntReg(Rz, 0, A));
 	(SC_FatASM_prmSetWithIntReg(Rz, 1, B));
 	(SC_FatASM_prmSetWithIntReg(Rz, 2, C));
+	(SC_FatASM_prmSetWithIntReg(Rz, 3, D));
 	return Rz;
 }
 

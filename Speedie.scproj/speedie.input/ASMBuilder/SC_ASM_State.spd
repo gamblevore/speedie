@@ -41,6 +41,7 @@ struct ASMState
 	
 	function IntPowerOfTwo (|asmreg| r,  |FailableInt|)
 		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
+		// this is used for multiplication mostly. like x*-1, or x*0, or x*1
 		if r is ConstAny
 			|| v = self[r][]
 			if v == -1
