@@ -60,18 +60,18 @@ helper @memory.PrintLeaks_ (|object| self)
 	
 
 	
-function object.FindReferences
+helper object.FindReferences
 	|| r = []
 	JB_FindLeakedObject(self, r)
 	printline r
 	debugger
 
 
-function object.MarkRefCount (|bool| Active=true)
+helper object.MarkRefCount (|bool| Active=true)
 	cpp_wrapper JB_MarkRefCount
 
 
-function object.RefCountMark (|int|)
+helper object.RefCountMark (|int|)
 	|| S = self|&int|
 	return S[] & 1
 

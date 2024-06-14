@@ -15,8 +15,8 @@ class µForm
 		Num				= 64
 		Signed			= 128
 //		Remainder		= 256
-		NoExpect		= 512
-		PositionBits	= 1024  // no space left...
+		NoExpect		= 256
+		PositionBits	= 512  // no space left...
 	
 	
 	render

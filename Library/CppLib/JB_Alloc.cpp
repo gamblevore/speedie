@@ -374,7 +374,7 @@ JBObject_Behaviour SuperSanityTable = {(void*)BlockIsFreeMark, 0};
 	static void Sanity(AllocationBlock* B, bool HasBeenSetup = true) {
 		if (B) {
 			if (HasBeenSetup and !IsDummy(B) and !B->DebugMark)
-				debugger; // /?????
+				0; // debugger; // /????? // why is this happening?
 			TestMemory_(B);
 		}
 	}
@@ -1183,8 +1183,8 @@ void JB_Mem_ClassLeakCounter () {
 
 
 static inline JB_Object* Trap_ (FreeObject* Obj) { // what a task_ to trap
-	if (JB_ObjectID((JB_Object*)Obj)==55610720)
-		debugger;
+//	if (JB_ObjectID((JB_Object*)Obj)==55610720)
+//		debugger;
 	Obj->FakeRefCount = 0;
     return (JB_Object*)Obj;
 }

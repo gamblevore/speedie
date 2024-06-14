@@ -1,60 +1,11 @@
 
 
-
-function ASMState.DoConsts (|&FatASM| D,  |asmreg| L,  |asmreg| R,  |&FatASM|)
-	return .Zero
-
-
-
-function asmstate.DoI64Const (|asmreg| D, |&int64| DD, |&int64| LL, |&int64| RR, |opmode| M, |asmreg|)
-	// assume L and R only. only 2 inputs. we only want consts anyhow
-	// so don't need like x+y<<z as a const in one instruction
-	|| LLL = LL[]
-	|| RRR = RR[]
-		
-	if 0
-		0
-	  elseif M == asm.Add
-		LLL += RRR 
-	  elseif M == asm.SUBB
-		LLL -= RRR 
-	  elseif M == asm.BRUU
-		LLL = LLL|uint64|>>RRR|uint64|
-	  elseif M == asm.BRUS
-		|| bc = 64 - d.bitcount
-		LLL <<= bc
-		LLL >>= (bc+RRR)
-	  elseif M == asm.BLUE
-		LLL <<= RRR
-	  elseif M == asm.BNOT
-		LLL = ~LLL
-	  elseif M == asm.BAND
-		LLL &= RRR
-	  elseif M == asm.BXOR
-		LLL ^= RRR
-	  elseif M == asm.BFLG
-		debugger 
-		|| up = 64-d.BitCount
-		if D.Signed
-			LLL = (LLL << up)>>up
-		  else
-			LLL = (LLL|uint64| << up) >> up
-	  elseif M == asm.conv
-		debugger 
-		|| up = 64-d.BitCount
-		if D.Signed
-			LLL = (LLL << up)>>up
-		  else
-			LLL = (LLL|uint64| << up) >> up
-
-
-
 extend asmstate
 	function NumToReg (|int64| V, |message| exp, |int| Reg, |&FATASM|)
 		rz = .AddASM(asm.KNST, exp, reg, (V << 32) >> 32, V>>32, -1, -1)
 		.Registers[reg] = rz
 		rz.Const = v
-		rz.Reg = reg.asm
+		rz.info = reg.asm
 
 	function f (|asmreg| r, |f64|)
 		|| p = self[r]

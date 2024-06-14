@@ -35,7 +35,7 @@ struct ASMState
 	syntax access (|int| a, |&uint64|)
 		cpp_part GetConst, pragma inline
 		|| r = .registers[a]!
-		if r == .zero or r.Reg isnt ConstAny // now what?
+		if r == .zero or r.info isnt ConstAny // now what?
 		return r.Const
 
 	
@@ -170,7 +170,7 @@ struct ASMState
 		.WithinBranch++
 		rz = .µ(cond, dest)
 		.WithinBranch--
-		|| src = rz.reg
+		|| src = rz.info
 		if Src isnt cond
 			(dest is negate) = (src isnt AlreadyNegated)
 			rz = .equals(dest, dest, src, cond)!
@@ -178,7 +178,7 @@ struct ASMState
 
 	function µOpen (|message| exp, |asmreg| mode,   |&FATASM|)
 		rz = .µ( exp, AsmReg.StayOpen as mode)
-		rz.Reg = rz.reg asnt asmreg.StayOpen
+		rz.info = rz.info asnt asmreg.StayOpen
 
 	
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |!&FATASM|)
@@ -243,7 +243,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 	|| OV = .VTmps
 
 	for p.fast in prms
-		|| v = .prm(p).reg.reg
+		|| v = .prm(p).info.reg
 		if sh <= 25
 			reg2 |= (v << sh)
 		  else
@@ -295,7 +295,7 @@ function ASMState.StartFunc (|scfunction| fn)
 	for i in 32
 		.Registers[i] = .zero
 	.zero = nil
-	.zero.reg = AsmReg()
+	.zero.info = AsmReg()
 	.FuncStart = .Start
 	.LabelCount = 0
 	.fn = fn

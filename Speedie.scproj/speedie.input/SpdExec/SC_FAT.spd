@@ -21,13 +21,13 @@
 */
 
 
-function message.Tern (|asmreg| a, |asmreg| b, |asmreg| c, |asmreg| d)
-	pragma inline,  cpp_part ASMTern
-	|| fat = asmstate.sh <~ (asm.tern, self)
-	fat.out(0) = a
-	fat.prm(1) = b
-	fat.prm(2) = c
-	fat.prm(3) = d
+//function message.Tern (|asmreg| a, |asmreg| b, |asmreg| c, |asmreg| d)
+//	pragma inline,  cpp_part ASMTern
+//	|| fat = asmstate.sh <~ (asm.tern, self)
+//	fat.out(0) = a
+//	fat.prm(1) = b
+//	fat.prm(2) = c
+//	fat.prm(3) = d
 
 	
 
@@ -36,7 +36,7 @@ struct FatASM
 	|byte|			Op
 	|byte|			Label	// 255 labels per function
 	|uint16| 		BlockNum
-	|ASMReg| 		Reg
+	|ASMReg| 		Info
 	|int| 			RefCount
 	|message--| 	Msg
 	|uint[2]| 		FAT // just so i GET OVER TRYING TO MAKE THIS SMALL (for now :D)
@@ -61,9 +61,9 @@ struct FatASM
 		|| out = .out
 		return out == a or b
 	
-	function Reg (|asmreg|)
+	function Info (|asmreg|)
 		nil safe
-		return .reg
+		return .info
 	
 	function FileNum (|int|)
 		return .msg.filenum & 0x4095
@@ -78,20 +78,21 @@ struct FatASM
 	
 	syntax append (|asmreg| flags)
 		real self
-		.reg = .reg as flags
+		.info = .info as flags
 
 	syntax is (|asmreg| flags, |bool|)
 		if self
-			return .reg & flags
+			return .info & flags
 	
 	function BitCorrect (|&FATASM|)
-		.reg = .reg as AsmReg.BitCorrect
+		.info = .info as AsmReg.BitCorrect
 		return self
 		
 	function out (|int| a, assigns:|asmreg| r)
 		
 		
 	function prm (|int| a, assigns:|asmreg| r)
+	function prm (|int| a, assigns:|int| r)
 		
 
 	function out (|uint|): return .r[0]
@@ -106,6 +107,11 @@ struct FatASM
 	function c (assigns:|uint|): .r[3] = value
 	function d (|uint|): return .r[4]
 	function d (assigns:|uint|): .r[4] = value
+
+	function fa (|&FATASM|): return ASMState.Sh.Zero
+	function fb (|&FATASM|): return ASMState.Sh.Zero
+	function fc (|&FATASM|): return ASMState.Sh.Zero
+	function fd (|&FATASM|): return ASMState.Sh.Zero
 
 	function Swap (|int| a, |int| b)
 		swap (.r[a-1]) (.r[b-1])

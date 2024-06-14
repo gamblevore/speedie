@@ -40,8 +40,6 @@ datatype µParam (uint16)
 		return self & 64
 	function IsReg (|bool|)
 		return !.isnumber
-//	function IsJump (|bool|)
-//		return self & asm.jump
 	function IsSigned (|bool|)
 		return self & 128
 

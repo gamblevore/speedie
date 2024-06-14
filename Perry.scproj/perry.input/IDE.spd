@@ -612,11 +612,9 @@ class PerryIDE (Window)
 	
 	
 	function GotoAnyFile (|string| path, |bool|)
-		if path.FileExists
-			if .GotoIncludedFile(path)
-				return true
-			if .FileList.AddExtra(path)
-				return true
+		require path.FileExists
+		.Editme.SetFocus
+		return .GotoIncludedFile(path) or .FileList.AddExtra(path)
 	
 		
 	function Root (|filerow|)

@@ -107,7 +107,7 @@ class Object
 		errorreceiver.Newwarning( self )
 	
 	
-	function MemorySanity
+	helper MemorySanity
 		|| r = .refcount
 		if r < 0 or r > 100000 // sigh
 		

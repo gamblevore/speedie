@@ -280,15 +280,17 @@ function VMDecl (|message| tmp, |[message]?| ActuallyMakeTheVM)
 	
 	|| name = p1.name.ASMNormalise
 	|| form = µform.forms.valuelower(name)			#require
+	|| FormEnc = asm.Forms[form.Index]
 	name = "ASM_" + name
 	if ActuallyMakeTheVM!=nil		// otherwise speedie is just using the encoders.
 		.ModuleArg <~ NewDecl(name)
 	|| tn = tmp.name
 	++.Total
 	
+	.MakeMsgCreator(tn, form)
 	while
 		|| id = .NextID(counts)
-		asm.Encoders[id] = asm.Forms[form.Index]
+		asm.Encoders[id] = FormEnc
 		if ActuallyMakeTheVM!=nil
 			ActuallyMakeTheVM[id] = tmp
 			if !counts or counts == p1.next
@@ -297,6 +299,40 @@ function VMDecl (|message| tmp, |[message]?| ActuallyMakeTheVM)
 				.AddµOp(tn+counts.render, id)
 		counts = counts.next #loop
 
+
+
+function MakeMsgCreator (|string| name, |µform| form)
+	|| fn = icecream.run(@thg+name)
+	Compiler.ExtendList <~ fn
+	|| arg = fn.Last!
+	|| prm = arg.prev!
+	|| fatdecl = prm.last!
+	
+	/*
+		* lu/li needs to be counted in the params!
+			* Or remove throughout? Having a "maybe param" just seems wierd.
+		* all regs used must be explicitly marked!
+			* remove u4/u1/etc?
+	*/
+	
+	for (p in form) (i)
+		|| ty = ("asmreg", "int")(p.isreg)
+		|| pname = ('a' + i)|byte|.render
+		|| dcl = NewDecl(ty, pname)
+		fatdecl.prev = dcl
+		arg <~ legs.run([i.msg, @thg + pname])		
+	
+	
+
+|| icecream = `function message._0 (|&fatasm|) {
+	pragma inline
+	rz = asmstate.sh.syntaxappend(asm._0, self)
+}`.macro
+
+
+|| legs = "rz.prm(_0) = _1".macro
+	
+	
 
 function AddµOp (|string| name, |int| id) 
 	opt norefcounts

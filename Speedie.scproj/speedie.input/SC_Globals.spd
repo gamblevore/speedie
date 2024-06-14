@@ -1206,7 +1206,7 @@ function message.BecomeSetRel
 
 function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name_space, |message| side, |scdecl|) {
 	|| cls = typeofexpr(self, name_space) #require
-	expect (cls.isnormal) (self, "Can't use 'is' on this type.")
+	expect (cls.ismostlynormal) (self, "Can't use 'is' on this type.")
 
 	|| ty = cls.type
 	|| fn = ty.TheIsFunc			#expect (opch, "${ty.name} doesn‘t have 'syntax is' specified.")

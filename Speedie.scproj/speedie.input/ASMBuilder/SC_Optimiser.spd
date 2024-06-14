@@ -62,9 +62,9 @@ function SpdAssembler.Optimise (|µfunc| raw, |bool|)
 
 
 extend SpdAssembler {
-	|int| 			OptPathCount
-	|int[64]|		OptPaths
-	|message[64]|	OptPathNames
+|int| 			OptPathCount
+|int[64]|		OptPaths
+|message[64]|	OptPathNames
 
 
 dispatch µOpt (|&fatasm| self, |?&fatasm| P, |?&fatasm| N, |bool|)
@@ -100,7 +100,6 @@ dispatch µOpt (|&fatasm| self, |?&fatasm| P, |?&fatasm| N, |bool|)
 	(ASM.JBRA):   OptBra
 	(ASM.JBRN):   OptBra
 	255:		  OptNothing
-
 
 
 function OptNothing (fn_µopt) // do nothing

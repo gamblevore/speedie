@@ -81,6 +81,8 @@ datatype AsmReg (int64)
 	function Const (|int64|)
 		return .fat.const
 
+	function Const (assigns:|int64|)
+		.fat.const = value
 
 	function Negate (|asmreg|)
 		(self is negate) = (Self isnt negate)
@@ -145,7 +147,7 @@ datatype AsmReg (int64)
 		return self as addrrequest
 	
 	function Fatasm.HaveAddr (|&fatasm|)
-		.reg = .reg.HaveAddr
+		.info = .info.HaveAddr
 		return self
 		
 	function HaveAddr (|asmreg|)

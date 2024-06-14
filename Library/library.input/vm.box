@@ -179,7 +179,7 @@ forms
 
 #!						 (((((Utils)))))
 
-/**/ SWAP (U4)
+/**/ SWAP ("rrrr")
 		std_swap(r[n1], r[n2])
 		std_swap(r[n3], r[n4])
 

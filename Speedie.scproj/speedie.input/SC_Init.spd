@@ -163,8 +163,8 @@ function Message.InitRootDecl (|Message| before, |SCNode| name_space, |bool|) {
 	using (self)
 	
 	|| Decl = O|SCDecl|
-	ifn NewDefault
-		ifn Decl.IsNormal
+	if !NewDefault
+		if !Decl.IsNormal
 			return true
 		NewDefault = Decl.CreateDefault(self)
 		if (NewDefault and decl.contains)
