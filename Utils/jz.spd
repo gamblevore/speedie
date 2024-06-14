@@ -23,6 +23,28 @@ examples:
 	jz -bin A.box						// jeebox to jbin
 ".tabstospaces
 
+	
+main
+	if !app.args
+		print app.usage
+		return 0
+
+	conv.Dest = app.GetActions$
+	expect (conv.Dest.Format.CountBits <= 1) ("Error: Multiple formats specified.")
+	
+	|| GotAll = false
+	for r in app.args
+		if r == "**"
+			expect (!GotAll) ("Can't use '**' twice.")
+			app.useall(app.cwd.file)
+			GotAll = true
+		  else
+			app.useone(r.file)
+	
+	if (stderr.ok) and (!conv.done) and (conv.dest isnt report)
+		"Nothing to do. All files already in destination format."
+
+
 
 datatype Type (int)
 	flags
@@ -74,27 +96,7 @@ function app.UseAll (|file| start)
 			printline "Can't recursively enter link: " + c
 		  elseif c.visible
 			.UseAll(c) 
-	
-main {
-	if !app.args
-		print app.usage
-		return 0
 
-	conv.Dest = app.GetActions$
-	expect (conv.Dest.Format.CountBits <= 1) ("Error: Multiple formats specified.")
-	
-	|| GotAll = false
-	for r in app.args
-		if r == "**"
-			expect (!GotAll) ("Can't use '**' twice.")
-			app.useall(app.cwd.file)
-			GotAll = true
-		  else
-			app.useone(r.file)
-	
-	if (stderr.ok) and (!conv.done) and (conv.dest isnt report)
-		"Nothing to do. All files already in destination format."
-}
 
 function App.Singlefile (|string| sw)
 	check (app.args == 1) ("Can't write multiple files with switch: " + sw)
