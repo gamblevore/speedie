@@ -414,10 +414,8 @@ extend ASMState
 	function BitOr  (fn_opasm)
 		if l is ConstAny
 			swap (l) (r)
-		|| dd = dest.reg
-		if !dd
-			debugger 
-		rz = .AddASM(asm.BOAR, exp, dest, L, R)
+		if !dest.reg
+		rz = exp.BOAR(dest, L, R, asmreg())
 		if dest is ConstAny
 			rz.Const = l.const ||| r.const
 	
@@ -453,6 +451,12 @@ extend ASMState
 			if !l.signed
 				up = 0
 			return .BFLG_Const(exp, dest, l, up, r.const+up)
+// fix this later
+//		if l.Signed
+//			return exp.brus(dest, l, r, 0)
+//		else
+//			return exp.bruu(dest, l, r, 0)
+		
 		return .AddASM(asm.BRUS • !l.signed, exp, dest, L, R, up*l.signed)
 
 	

@@ -1944,7 +1944,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1138], (112616235073536));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1138], (112616295628800));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3272,7 +3272,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1901]);
-	JB_FS_AppendInt32(_fsf0, (2024061418));
+	JB_FS_AppendInt32(_fsf0, (2024061419));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8322,7 +8322,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[826]);
-	JB_FS_AppendInt32(_fsf0, (2024061418));
+	JB_FS_AppendInt32(_fsf0, (2024061419));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -20344,7 +20344,7 @@ FatASM* SC_Pac_BitOr(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* E
 	int Dd = SC_Reg_Reg(Dest);
 	if (!Dd) {
 	}
-	Rz = SC_Pac_AddASM3(Self, kSC__ASM_BOAR, Exp, SC_Reg_ToInt(Dest), SC_Reg_ToInt(L), SC_Reg_ToInt(R));
+	Rz = JB_Msg_BOAR(Exp, Dest, L, R, SC_Reg__New());
 	if (SC_Reg_SyntaxIs(Dest, kSC__Reg_ConstAny)) {
 		Rz->Const = (SC_Reg_Const(L) | SC_Reg_Const(R));
 	}
@@ -24805,7 +24805,7 @@ void SC_Instruction__InstructionInit() {
 	SC_Instruction__Add(JB_LUB[1966], JB_LUB[540], 31);
 	SC_Instruction__Add(JB_LUB[1966], JB_LUB[532], 32);
 	SC_Instruction__Add(JB_LUB[1966], JB_LUB[527], 33);
-	SC_Instruction__Add(JB_LUB[1966], JB_LUB[534], 34);
+	SC_Instruction__Add(JB_LUB[1968], JB_LUB[534], 34);
 	SC_Instruction__Add(JB_LUB[1966], JB_LUB[541], 35);
 	SC_Instruction__Add(JB_LUB[1965], JB_LUB[533], 36);
 	SC_Instruction__Add(JB_LUB[1447], JB_LUB[530], 37);
@@ -50790,4 +50790,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -971676293342447677 -5251917902163244488
+// -2675789717459851782 -5251917902163244488

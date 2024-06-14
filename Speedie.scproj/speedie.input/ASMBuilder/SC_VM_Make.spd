@@ -315,6 +315,7 @@ function MakeMsgCreator (|string| name, |µform| form)
 		* all regs used must be explicitly marked!
 			* remove u4/u1/etc?
 		* 'x' shouldn't be considered a register!
+			* 'n' also
 	*/
 	
 	for (p in form) (i)

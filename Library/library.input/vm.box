@@ -203,7 +203,7 @@ forms
 
 
 #!						 (((((Math)))))
-/**/ ADDK ("rrnl")
+/**/ ADDK ("rrl")
 		i1 = i2 + U2_Li
 /**/ ADPK ("rrnl")
 		i1 = i2
@@ -220,15 +220,15 @@ forms
 
 
 #!						 (((((Bitops)))))
-/**/ BRUS  (U3)
+/**/ BRUS  ("rrrn")
 		i1 = (i2 >> i3+U3_Lu)
-/**/ BRUU  (U3)
+/**/ BRUU  ("rrrn")
 		u1 = (u2 >> u3+U3_Lu)
 /**/ BLUE  (U3) 
 		u1 = (u2 << u3+U3_Lu)
 /**/ BAND  (U3)
 		u1 = u2 &  (u3|||L3)
-/**/ BOAR  (U3)
+/**/ BOAR  (U4)
 		u1  = (u2|||u3)&~u4
 /**/ BXOR  (U3)
 		u1 = u2 ^ u3

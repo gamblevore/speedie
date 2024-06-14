@@ -9838,7 +9838,7 @@ inline FatASM* JB_Msg_BLUE(Message* Self, AsmReg A, AsmReg B, AsmReg C);
 
 inline FatASM* JB_Msg_BNOT(Message* Self, AsmReg A, AsmReg B);
 
-inline FatASM* JB_Msg_BOAR(Message* Self, AsmReg A, AsmReg B, AsmReg C);
+inline FatASM* JB_Msg_BOAR(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D);
 
 inline FatASM* JB_Msg_BROL(Message* Self, AsmReg A, AsmReg B, AsmReg C);
 
@@ -10323,12 +10323,13 @@ inline FatASM* JB_Msg_BNOT(Message* Self, AsmReg A, AsmReg B) {
 	return Rz;
 }
 
-inline FatASM* JB_Msg_BOAR(Message* Self, AsmReg A, AsmReg B, AsmReg C) {
+inline FatASM* JB_Msg_BOAR(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D) {
 	FatASM* Rz = nil;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_BOAR, Self);
 	(SC_FatASM_prmSetWithIntReg(Rz, 0, A));
 	(SC_FatASM_prmSetWithIntReg(Rz, 1, B));
 	(SC_FatASM_prmSetWithIntReg(Rz, 2, C));
+	(SC_FatASM_prmSetWithIntReg(Rz, 3, D));
 	return Rz;
 }
 
