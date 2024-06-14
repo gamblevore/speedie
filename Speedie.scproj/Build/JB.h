@@ -670,7 +670,7 @@ struct FatASM {
 	byte Op;
 	byte Label;
 	u16 BlockNum;
-	AsmReg Reg;
+	AsmReg Info;
 	int RefCount;
 	Message* Msg;
 	uint FAT[2];
@@ -4314,6 +4314,8 @@ ASM SC_ASM_BFLD_downSet(ASM Self, int Value);
 
 ASM SC_ASM_BFLD_LSet(ASM Self, int Value);
 
+ASM SC_ASM_BFLD_signSet(ASM Self, int Value);
+
 ASM SC_ASM_BFLD_upSet(ASM Self, int Value);
 
 ASM SC_ASM_Bra_c1Set(ASM Self, int Value);
@@ -5396,7 +5398,11 @@ ASM SC_FatASM_Encode(FatASM* Self);
 
 void SC_FatASM_F32Set(FatASM* Self, float Value);
 
+float SC_FatASM_F32(FatASM* Self);
+
 void SC_FatASM_F64Set(FatASM* Self, double Value);
+
+double SC_FatASM_F64(FatASM* Self);
 
 JB_String* SC_FatASM_File(FatASM* Self);
 
@@ -5433,6 +5439,8 @@ void SC_FatASM_SwapWithIntInt(FatASM* Self, int A, int B);
 void SC_FatASM_SyntaxAppend(FatASM* Self, AsmReg Flags);
 
 void SC_FatASM_SyntaxExpect(FatASM* Self, JB_String* Error);
+
+bool SC_FatASM_SyntaxIs(FatASM* Self, AsmReg Flags);
 
 
 
@@ -9740,7 +9748,7 @@ inline bool JB_int64_OperatorInRange(int64 Self, int64 D);
 
 inline bool JB_int_OperatorInRange(int Self, int D);
 
-inline AsmReg SC_FatASM_Reg(FatASM* Self);
+inline AsmReg SC_FatASM_Info(FatASM* Self);
 
 inline JB_String* SC_Named_Name(SCNamed* Self);
 
@@ -9822,9 +9830,9 @@ inline FatASM* JB_Msg_BCLR(Message* Self, AsmReg A, AsmReg B, int C, int D, int 
 
 inline FatASM* JB_Msg_BCMP(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E);
 
-inline FatASM* JB_Msg_BFLG(Message* Self, AsmReg A, AsmReg B, int C, int D);
+inline FatASM* JB_Msg_BFLG(Message* Self, AsmReg A, AsmReg B, int C, int D, int E);
 
-inline FatASM* JB_Msg_BFLS(Message* Self, AsmReg A, AsmReg B, int C, int D);
+inline FatASM* JB_Msg_BFLS(Message* Self, AsmReg A, AsmReg B, int C, int D, int E);
 
 inline FatASM* JB_Msg_BLUE(Message* Self, AsmReg A, AsmReg B, AsmReg C);
 
@@ -10038,8 +10046,8 @@ inline bool JB_int_OperatorInRange(int Self, int D) {
 	return false;
 }
 
-inline AsmReg SC_FatASM_Reg(FatASM* Self) {
-	return SC_FatASM_Reg(Self);
+inline AsmReg SC_FatASM_Info(FatASM* Self) {
+	return SC_FatASM_Info(Self);
 }
 
 inline JB_String* SC_Named_Name(SCNamed* Self) {
@@ -10186,7 +10194,7 @@ inline FatASM* SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 
 inline uint64* SC_Pac_GetConst(ASMState* Self, int A) {
 	FatASM* R = Self->Registers[A];
-	if ((R == (&Self->Zero)) or (!SC_Reg_SyntaxIs(R->Reg, kSC__Reg_ConstAny))) {
+	if ((R == (&Self->Zero)) or (!SC_Reg_SyntaxIs(R->Info, kSC__Reg_ConstAny))) {
 	}
 	return (&R->Const);
 }
@@ -10276,23 +10284,25 @@ inline FatASM* JB_Msg_BCMP(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, i
 	return Rz;
 }
 
-inline FatASM* JB_Msg_BFLG(Message* Self, AsmReg A, AsmReg B, int C, int D) {
+inline FatASM* JB_Msg_BFLG(Message* Self, AsmReg A, AsmReg B, int C, int D, int E) {
 	FatASM* Rz = nil;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_BFLG, Self);
 	(SC_FatASM_prmSetWithIntReg(Rz, 0, A));
 	(SC_FatASM_prmSetWithIntReg(Rz, 1, B));
 	(SC_FatASM_prmSetWithIntInt(Rz, 2, C));
 	(SC_FatASM_prmSetWithIntInt(Rz, 3, D));
+	(SC_FatASM_prmSetWithIntInt(Rz, 4, E));
 	return Rz;
 }
 
-inline FatASM* JB_Msg_BFLS(Message* Self, AsmReg A, AsmReg B, int C, int D) {
+inline FatASM* JB_Msg_BFLS(Message* Self, AsmReg A, AsmReg B, int C, int D, int E) {
 	FatASM* Rz = nil;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_BFLS, Self);
 	(SC_FatASM_prmSetWithIntReg(Rz, 0, A));
 	(SC_FatASM_prmSetWithIntReg(Rz, 1, B));
 	(SC_FatASM_prmSetWithIntInt(Rz, 2, C));
 	(SC_FatASM_prmSetWithIntInt(Rz, 3, D));
+	(SC_FatASM_prmSetWithIntInt(Rz, 4, E));
 	return Rz;
 }
 
