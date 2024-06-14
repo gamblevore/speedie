@@ -69,7 +69,7 @@
 ı BNOT: _
 	u1 = ~u2 & ~u3;
 ı BFLG: _
-	if (BFLD_Lu) 
+	if (BFLD_signu) 
 	i1 = ((i2 << BFLD_upu) >> BFLD_downu)
 ;
 	else 

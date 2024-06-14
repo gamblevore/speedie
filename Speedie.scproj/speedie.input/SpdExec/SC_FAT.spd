@@ -19,16 +19,6 @@
 	what about closing of if/elsees... how can it know about that. seems like we should do the 
 	refcounting then. anyhow... lets assume its immediate. We can also make all of these inlined
 */
-
-
-//function message.Tern (|asmreg| a, |asmreg| b, |asmreg| c, |asmreg| d)
-//	pragma inline,  cpp_part ASMTern
-//	|| fat = asmstate.sh <~ (asm.tern, self)
-//	fat.out(0) = a
-//	fat.prm(1) = b
-//	fat.prm(2) = c
-//	fat.prm(3) = d
-
 	
 
 struct FatASM
@@ -49,6 +39,12 @@ struct FatASM
 
 	function F64 (assigns:|f64|)
 		((&.const)|&f64|)[] = Value
+		
+	function F32 (|float|)
+		return ((&.const)|&float|)[]
+
+	function F64 (|f64|)
+		return ((&.const)|&f64|)[]
 		
 	setter Debug (|message|)
 		.msg = Value
@@ -88,11 +84,12 @@ struct FatASM
 		.info = .info as AsmReg.BitCorrect
 		return self
 		
-	function out (|int| a, assigns:|asmreg| r)
-		
 		
 	function prm (|int| a, assigns:|asmreg| r)
+		
+		
 	function prm (|int| a, assigns:|int| r)
+		
 		
 
 	function out (|uint|): return .r[0]

@@ -157,11 +157,17 @@
 #define   BFLD_downu       (((uint)((Op.Raw)<<24))>>26)
 #define   BFLD_downu_(x)   (((uint)((x)<<24))>>26)
 
-#define   BFLD_Li       ((( int)((Op.Raw)<<30))>>30)
-#define   BFLD_Li_(x)   ((( int)((x)<<30))>>30)
+#define   BFLD_signi       ((( int)((Op.Raw)<<30))>>31)
+#define   BFLD_signi_(x)   ((( int)((x)<<30))>>31)
 
-#define   BFLD_Lu       (((uint)((Op.Raw)<<30))>>30)
-#define   BFLD_Lu_(x)   (((uint)((x)<<30))>>30)
+#define   BFLD_signu       (((uint)((Op.Raw)<<30))>>31)
+#define   BFLD_signu_(x)   (((uint)((x)<<30))>>31)
+
+#define   BFLD_Li       ((( int)((Op.Raw)<<31))>>31)
+#define   BFLD_Li_(x)   ((( int)((x)<<31))>>31)
+
+#define   BFLD_Lu       (((uint)((Op.Raw)<<31))>>31)
+#define   BFLD_Lu_(x)   (((uint)((x)<<31))>>31)
 
 
 #define   BCmp_Shifti       ((( int)((Op.Raw)<<23))>>26)

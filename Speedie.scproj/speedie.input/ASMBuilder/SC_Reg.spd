@@ -4,38 +4,6 @@
 prototype fn_asm (|&ASMState| self=asmstate.sh, |message| exp, |AsmReg| Dest=asmreg(), |int| Mode = 0, |!&FATASM|)
 
 
-//datatype ASMMath (int)
-//	constants
-//		|ASMMath|
-//		Add = (1 << 16)
-//		Sub = (2 << 16)
-//		Mul = (3 << 16)
-//		Div = (4 << 16)
-//		Mod = (5 << 16)
-//
-////		ROL = (6 << 16)
-////		ROR = (7 << 16)
-//		Shl = (8 << 16)
-//		Shru = (9 << 16)
-//		Shrs = (10 << 16)
-//		BNt = (11 << 16)
-//		BAn = (12 << 16)
-//		BOr = (13 << 16)
-//		Xor = (14 << 16)
-//		Type = (15 << 16)
-//		BitCorrect = (31 << 16) // removes garbage bits
-//		All = BitCorrect
-//	
-//	syntax is (|asmmath| r, |bool|)
-//		return self == r
-
-
-
-// Why squeeze these in? Why not give it clear ranges?
-// µtype = 1-8,  regs = 9-16,  math = 17-24,  RegStuff = 33-64
-// sigh... more changes!
-
-
 datatype AsmReg (int64)
 	default 0|AsmReg|
 	linkage
@@ -73,10 +41,10 @@ datatype AsmReg (int64)
 
 	
 	function F32 (|float|)
-		
+		return .fat.F32
 		
 	function F64 (|float|)
-		
+		return .fat.F64
 
 	function Const (|int64|)
 		return .fat.const
@@ -98,8 +66,8 @@ datatype AsmReg (int64)
 	operator isa (|datatypecode| M, |bool|)
 		return .µtype == M
 
-	function Exists (|bool|)
-		return self|int64|
+//	function Exists (|bool|)
+//		return self|int64|
 		
 	function FourBytes (|bool|)
 		pragma inline

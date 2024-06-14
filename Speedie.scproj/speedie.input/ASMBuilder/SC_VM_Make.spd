@@ -282,6 +282,7 @@ function VMDecl (|message| tmp, |[message]?| ActuallyMakeTheVM)
 	|| form = µform.forms.valuelower(name)			#require
 	|| FormEnc = asm.Forms[form.Index]
 	name = "ASM_" + name
+	using tmp
 	if ActuallyMakeTheVM!=nil		// otherwise speedie is just using the encoders.
 		.ModuleArg <~ NewDecl(name)
 	|| tn = tmp.name
@@ -313,6 +314,7 @@ function MakeMsgCreator (|string| name, |µform| form)
 			* Or remove throughout? Having a "maybe param" just seems wierd.
 		* all regs used must be explicitly marked!
 			* remove u4/u1/etc?
+		* 'x' shouldn't be considered a register!
 	*/
 	
 	for (p in form) (i)

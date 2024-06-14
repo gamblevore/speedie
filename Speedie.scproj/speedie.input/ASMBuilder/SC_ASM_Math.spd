@@ -295,7 +295,7 @@ extend ASMState
 	function IntMul (fn_opasm)
 		rz = .QuickIntMul(dest, R, L, exp)
 		rz := .QuickIntMul(dest, L, R, exp)
-		rz := .AddASM(asm.MULT , exp, dest, L, R)
+		rz := exp.MULT(dest, L, R, asmreg())
 		if dest is ConstAny
 			rz.const = l.const * r.const
 
@@ -303,7 +303,7 @@ extend ASMState
 	function FloatMul (fn_opasm)
 		rz = .QuickFloatMul(dest, R, L, exp)
 		rz := .QuickFloatMul(dest, L, R, exp)
-		rz := .AddASM(asm.FMUL, exp, dest, L, R, l.IsBig|int|) 
+		rz := exp.FMUL(dest, L, R, asmreg(), l.IsBig|int|) 
 		if dest is ConstAny
 			if dest.FourBytes
 				rz.F32 = l.F32 * r.F32
@@ -343,7 +343,7 @@ extend ASMState
 
 
 	function DivInt    (fn_opasm)
-		rz = .AddASM(asm.DIVV, exp, dest.reg, 0, L, R, dest.IntDivType)
+		rz = exp.DIVV(dest, asmreg(), l, r, dest.intdivtype)
 		if dest is ConstAny
 			|int64| C
 			if dest.FourBytes
@@ -362,8 +362,8 @@ extend ASMState
 	function ModFloat    (fn_opasm)
 		|| d = dest.Reg #check (Exp)
 		|| big = dest.IsBig|int|
-		.AddASM(asm.FDIV, exp, dest, big, L, R)
-		rz = .AddASM(asm.FFRC, exp, dest, big, dest, R)
+		exp.fdiv(     dest, asmreg(), L,    R, big)
+		rz = exp.FFRC(dest, asmreg(), dest, R, big)
 		if dest is ConstAny
 			if dest.FourBytes
 				rz.f32 = l.f32 mod r.f32
@@ -372,7 +372,7 @@ extend ASMState
 	
 	
 	function ModInt    (fn_opasm)
-		rz = .AddASM(asm.DIVV, exp, 0, dest, L, R, dest.IntDivType)
+		rz = exp.DIVV(asmreg(), dest, L, R, dest.IntDivType)
 		if dest is ConstAny
 			|int64| C
 			if dest.FourBytes
@@ -438,7 +438,7 @@ extend ASMState
 		
 
 	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| l, |int| up, |int| down, |&fatasm|)
-		rz = .AddASM(asm.BFLG,  exp,  dest,  l,  up,  down,  l.signed|int|)
+		rz = exp.BFLG(dest,  l,  up,  down,  l.signed|int|)
 		debugger
 		|| lll = l.Const
 		if l.Signed

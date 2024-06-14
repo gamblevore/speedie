@@ -199,7 +199,7 @@ struct ASMState
 		
 		target debug
 			|| dd = dest.reg
-			if dd and rz.reg.reg != dd
+			if dd and rz.info.reg != dd
 				// its not about "being different"... but "did it allocate something that it didnt need to"
 				#!FFFFFFASSDJKLASDM<>AS
 

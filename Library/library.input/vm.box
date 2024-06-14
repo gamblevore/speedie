@@ -67,6 +67,7 @@ forms
 		r2		r
 		up		6
 		down	6
+		sign	1
 	
 	BCmp	// bcmp:
 		r1		r
@@ -234,7 +235,7 @@ forms
 /**/ BNOT  (U2)
 		u1 = ~u2 & ~u3
 /**/ BFLG  (BFLD) // perhaps sign can allow for SIMD opts?
-		if (BFLD_Lu)
+		if (BFLD_signu)
 			i1 = ((i2 << BFLD_upu) >> BFLD_downu)
 		else
 			u1 = ((u2 << BFLD_upu) >> BFLD_downu)
