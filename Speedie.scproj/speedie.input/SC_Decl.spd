@@ -406,7 +406,7 @@ class SCDecl (SCNamed) {
 		Return dcl
 	
 
-	function IsNormalStruct (|bool|)
+	function IsBareStruct (|bool|)
 		return .Type.IsStruct and !.PointerCount and !.IsCArray
 
 	function IsStruct (|bool|)
@@ -476,7 +476,7 @@ class SCDecl (SCNamed) {
 		if (.pointercount or .type.funcproto)
 			return true
 
-		require !.IsNormalStruct
+		require !.IsBareStruct
 		require !.IsCArray
 		require .type.TypeInfo!=DataTypeCode.UnusedType
 		return true
@@ -641,6 +641,13 @@ class SCDecl (SCNamed) {
 	function IsNormal (|bool|)
 		return !.PointerCount and !.IsNil and !.IsCArray
 
+	function IsMostlyNormal (|bool|)
+		require !.IsNil and !.IsCArray
+		if !.PointerCount
+			return true
+		if .Type.IsStruct
+			return .PointerCount == 1
+
 	function AlreadyContains (|bool|)
 		opt norefcounts
 		|| ty = .type.contained
@@ -747,7 +754,7 @@ class SCDecl (SCNamed) {
 			return false
 
 		if (.Type.IsStruct and !.PointerCount)
-			return (.IsNormalStruct)
+			return (.IsBareStruct)
 		return true
 
 

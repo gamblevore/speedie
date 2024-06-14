@@ -1161,7 +1161,7 @@ extend message
 
 || PerryLogFile = file.Logs["SpeedieDebug.txt"]
 
-function Compiler.PerryLog (|string| s)
+function Compiler.PerryLog (|string| s) // try to find where this damn error came from.
 	require compiler.InPerry
 	if !PerryLogFile.Opened
 		PerryLogFile.OpenEmpty

@@ -126,7 +126,7 @@ function Message.CanGetAddress (|SCNode| name_space, |bool|)
 	expect (curr == @thg or @dot) (curr, "Can't get address of this.")
 	expect (T2 isnt NumberConst)        (curr, "Can't get the address of a const.")
 	
-	if (curr == @thg) and (t2 is local) and !(t2.IsNormalStruct or t2.IsCArray)
+	if (curr == @thg) and (t2 is local) and !(t2.IsBareStruct or t2.IsCArray)
 		|| p = .ParentForAddress
 		expect (p == @prm) (curr, "Can't store the address of register based variables.")
 			

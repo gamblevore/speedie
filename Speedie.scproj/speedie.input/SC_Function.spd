@@ -587,7 +587,7 @@ function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch
 		cst = (@thg + .ExportName).wrapwith(@func)  // JB_Str_Exists(obj)
 		exp.Next = cst
 		cst.msg(@prm) <~ exp
-		if MyType.IsNormalStruct
+		if MyType.IsBareStruct
 			exp.GetAddressOf(MyType)
 		cst.Last!.Obj = self
 
@@ -781,7 +781,7 @@ function CheckConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 	opt norefcounts
 	require !.Badness
 	|| GotSuperConstructor = false
-	|| Supper = .cls!.super
+	|| Supper = .cls$.super // will this fix it?
 		GotSuperConstructor  =  Supper == typeobject  or  (typetask == supper.parent or supper)
 	|| NoNesting = "This should be at the function root. (not nested)."
 	
