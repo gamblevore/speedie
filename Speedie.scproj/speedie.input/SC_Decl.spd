@@ -21,6 +21,7 @@ constants
 	kAddressOfMatch     = 3 << 22
 	kNumericMatch		= 2 << 22
 	kSimpleMatch		= 1 << 22
+	kMultipleErrors		= 1 << 21
 	kNoMatch			= 0
 
 	kTypeCastMost				= 1

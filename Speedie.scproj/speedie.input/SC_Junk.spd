@@ -146,3 +146,32 @@ struct ContainerStruct
 	|int|				B
 	|FastBuff|			C
 
+
+
+struct junk_abccc
+	|imagepixel| cc
+	module
+		|junk_abccc| dd
+
+
+datatype Imagepixel (uint)
+	linkage:cpp_part abc
+	function a (assigns:|int|, |imagepixel|)
+		return self + value
+	function a (|&imagepixel| self, assigns:|int|)
+		self[] = 0
+//			return self + value
+	function HasColor (|bool|)
+		return false
+	function AddInt (|&imagepixel| self, |int| i)
+	module
+		function test (|&imagepixel| b)
+			visible
+			|imagepixel| c
+			junk_abccc.dd.cc.a = 5
+			b.a = 5
+			c.a = 5
+//				b[] = b.a(5)
+			c.addint(1)
+			b.hascolor
+

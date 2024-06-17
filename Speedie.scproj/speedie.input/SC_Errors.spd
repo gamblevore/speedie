@@ -57,9 +57,7 @@ function errorreceiver.PrePrintErrors
 		err.improve
 	if !options.KeepAllErrors
 		for err in .errors
-			debugat 7
 			if !SC_Errors.CanKeep(err)
-				if err.isbad
 				err.remove
 
 

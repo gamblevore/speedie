@@ -389,15 +389,15 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		|| i = typeofexpr(incoming[0], name_space)
 		require i and a
 		
-		require   (typecast & kTypeCastassigns) or (!a.pointercount and i is local) // allow for tighter code
+		require  (typecast & kTypeCastassigns) or (!a.pointercount and i is local) // allow for tighter code
 		// Local.b = c --> local = local.breturn(c)...  structptr.b = c --> structptr.bset(C)
 	
-	if ((.IsAssigns!=0) != Incoming.IsAssigns)
+	ifn (.IsAssigns!=0) == Incoming.IsAssigns
 		require (TypeCast & kTypeCastassigns) and (!Incoming.IsAssigns)
 	
 	|| Pos = 0
 	|| Result = kSimpleMatch
-	|| SelfCast = Incoming.ignoreselfContain()
+	|| SelfCast = Incoming.ignoreSelfContain
 	TypeCast |= kNoBoolTypeCast ||| kTypeCastWantSuperDistance
 	if self is numbercreator
 		typecast |= ktypecastfromzero
@@ -420,13 +420,12 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		SelfCast = 0
 		
 		if (Matched != kNoMatch) and !((matched == kUseDefaultParams) and ThisAlter)
-			if (Matched > result)
-				result = Matched				// don't replace better matches with worse ones.
-			  elseif ((Matched ||| Result) & kNeedsAddressOfButAlsoNeedsSuperMatch)
-				result = kNeedsAddressOfButAlsoNeedsSuperMatch
-					// handled bugs from overloading functions belonging to structs.
-					// like struct.append(string) and struct.append(object) 
-					// but its handled separately now!! I can remove this branch?
+			if  result > kSimpleMatch  and  matched != kUseDefaultParams  and  matched != ksimplematch
+				result |= kMultipleErrors
+				matched |= kMultipleErrors
+			if Matched > result
+				result = matched
+				// don't replace better matches with worse ones.
 			pos++
 			
 		  elseif (!FuncArg.Default)
@@ -542,10 +541,12 @@ function ArgsMatch2 (|SCDecl| base, |int| TypeCast, |SCNode| name_space, |SCPara
 			if (Result)
 				|| CanKeepBetter = result.TryKeepBetter(OldMatch, f, Match)
 				if (!CanKeepBetter)
+					debugger 
+					|| first = result.ArgsMatch3( TypeCast, base, false, name_space, Incoming )
 					return incoming.ArgsMatchError(TypeCast, f, result)
 				Result = CanKeepBetter
 			
-			if (Match & kNeeds) or (Match == kUseDefaultParams)
+			if (Match & kNeeds) or (Match & kUseDefaultParams)
 				NeedsAlter = Match
 			
 			Result := f

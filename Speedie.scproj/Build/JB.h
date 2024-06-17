@@ -251,7 +251,7 @@ struct StringLengthSplit;
 
 struct StructSaveTest;
 
-struct abccc;
+struct junk_abccc;
 
 struct xD1x9B;
 
@@ -747,7 +747,7 @@ struct StructSaveTest {
 	JB_String* Str;
 };
 
-struct abccc {
+struct junk_abccc {
 	Imagepixel cc;
 };
 
@@ -1661,6 +1661,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kAddressOfMatch (3 << 22)
 #define kJB_kCastedMatch (6 << 22)
 #define kJB_kLossyCastedMatch (7 << 22)
+#define kJB_kMultipleErrors (1 << 21)
 extern JB_String* SC_kNameConf;
 #define kJB_kNeeds ((16 << 22) | ((32 << 22) | (64 << 22)))
 #define kJB_kNeedsAddressOf (32 << 22)
@@ -2294,7 +2295,7 @@ extern Dictionary* JB__LD_ClassList;
 extern SaverClassInfo* JB__Saver_SaveableList;
 extern PicoComms* JB__Pico_Parent_;
 extern Random JB__Rnd_Shared;
-extern abccc SC__abccc_dd;
+extern junk_abccc SC__junk_abccc_dd;
 extern Array* SC__Pac_Ancients;
 extern MWrap* SC__Pac_JSMSpace;
 extern ASMState SC__Pac_Sh;
@@ -2939,8 +2940,6 @@ int JB_Constants__InitCode_();
 void JB_Constants__InitConstants();
 
 JB_String* JB_Constants__TestJB();
-
-bool JB_Constants__TestCasting();
 
 
 
@@ -4891,8 +4890,6 @@ Message* JB_Syx_IntMsg(Syntax Self, int64 Name);
 
 JB_String* JB_Syx_Name(Syntax Self);
 
-bool JB_Syx_NoChildren(Syntax Self);
-
 SyntaxObj* JB_Syx_Obj(Syntax Self);
 
 Message* JB_Syx_OperatorPlus(Syntax Self, JB_String* M);
@@ -5676,14 +5673,14 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 
 
 
-// JB_abccc
-int SC_abccc__Init_();
-
-int SC_abccc__InitCode_();
-
-
-
 // JB_jb_vm
+
+
+// JB_junk_abccc
+int SC_junk_abccc__Init_();
+
+int SC_junk_abccc__InitCode_();
+
 
 
 // JB_ћ
@@ -9832,6 +9829,8 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, NilState New);
 
 inline void SC_nil__DeclKill();
 
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
+
 inline NilRecord SC_nil__Value();
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
@@ -9851,8 +9850,6 @@ inline bool SC_Reg_SyntaxCast(AsmReg Self);
 inline int SC_Reg_ToInt(AsmReg Self);
 
 inline NilRecord SC_nil__EndBlock();
-
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
@@ -10188,6 +10185,16 @@ inline void SC_nil__DeclKill() {
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 }
 
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
+	ASMtmp T = SC_Msg_ASMType(Msg);
+	if (T) {
+		return (SC__nil_NilTable[T])(Msg, Test);
+	}
+	T = ((ASMtmp)Msg->Func);
+	(SC_Msg_ASMTypeSet(Msg, T));
+	return (SC__nil_NilTable[T])(Msg, Test);
+}
+
 inline NilRecord SC_nil__Value() {
 	return SC_nil_Value((&SC__nil_T));
 }
@@ -10212,18 +10219,10 @@ inline FatASM* SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 	FatASM* Rz = nil;
 	ASMtmp T = SC_Msg_ASMType(Exp);
 	fn_asm Fn = SC_fn_asm_table[T];
-	if (!T) {
-		Fn = SC_fn_asm_table[((int)Exp->Func)];
-		debugger;
-	}
 	byte OV = Self->VTmps;
 	Rz = (Fn)(Self, Exp, Dest, 0);
 	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen)) {
 		Self->VTmps = (OV);
-	}
-	int Dd = SC_Reg_Reg(Dest);
-	if (((bool)Dd) and (SC_Reg_Reg(Rz->Info) != Dd)) {
-		//FFFFFFASSDJKLASDM<>AS;
 	}
 	return Rz;
 }
@@ -10231,7 +10230,6 @@ inline FatASM* SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 inline uint64* SC_Pac_GetConst(ASMState* Self, int A) {
 	FatASM* R = Self->Registers[A];
 	if ((R == (&Self->Zero)) or (!SC_Reg_SyntaxIs(R->Info, kSC__Reg_ConstAny))) {
-		debugger;
 	}
 	return (&R->Const);
 }
@@ -10249,16 +10247,6 @@ inline NilRecord SC_nil__EndBlock() {
 	Rz = SC_nil__Value();
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 	return Rz;
-}
-
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
-	ASMtmp T = SC_Msg_ASMType(Msg);
-	if (T) {
-		return (SC__nil_NilTable[T])(Msg, Test);
-	}
-	T = ((ASMtmp)Msg->Func);
-	(SC_Msg_ASMTypeSet(Msg, T));
-	return (SC__nil_NilTable[T])(Msg, Test);
 }
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {

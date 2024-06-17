@@ -317,7 +317,7 @@ Dictionary* JB__LD_ClassList;
 SaverClassInfo* JB__Saver_SaveableList;
 PicoComms* JB__Pico_Parent_;
 Random JB__Rnd_Shared;
-abccc SC__abccc_dd;
+junk_abccc SC__junk_abccc_dd;
 Array* SC__Pac_Ancients;
 MWrap* SC__Pac_JSMSpace;
 ASMState SC__Pac_Sh;
