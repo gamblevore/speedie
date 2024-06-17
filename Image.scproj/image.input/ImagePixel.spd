@@ -123,7 +123,7 @@ datatype ImagePixel (uint)
 		.g = g.clamp(255)
 		.b = b.clamp(255)
 		.a = a.clamp(255)
-		
+	
 	syntax append (|&imagepixel| self, |float| v)
 		disabled "Use a vector?"
 		cpp_part AppendFloat
