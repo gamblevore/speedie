@@ -1536,7 +1536,6 @@ extern bool SC__Options_ExternalCompile;
 extern bool SC__Options_Final;
 extern bool SC__Options_ForceRecompile;
 extern bool SC__Options_GenFlowControlCode;
-extern bool SC__Options_HideMultipleErrors;
 extern bool SC__Options_IgnoreCantSaveErrors;
 extern bool SC__Options_IsDirectTest;
 extern bool SC__Options_KeepAllErrors;

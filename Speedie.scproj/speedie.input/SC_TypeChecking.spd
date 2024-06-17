@@ -149,8 +149,6 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 	
 	if (.PointerCount + 1 == O.PointerCount)
 		|| found = .TryTypeCastAccess(o, exp, typecast)
-			if exp
-				printline exp.msgowningfunc
 			return found
 
 	if TypeCast & (kTypeCastMost|||kTypeCastNumbers)

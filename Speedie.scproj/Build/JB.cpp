@@ -1951,7 +1951,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1138], (112632324063862));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1138], (112632367802782));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -5256,7 +5256,6 @@ int SC_Options__Init_() {
 		JB_SetRef(SC__Options_Variant, JB_LUB[0]);
 		JB_SetRef(SC__Options_Arch, JB_LUB[0]);
 		SC__Options_SingleCppOutput = true;
-		SC__Options_HideMultipleErrors = true;
 		SC__Options_NilTestAllocNeverFails = true;
 		SC__Options_ModeCpp = true;
 		SC__Options_Compile = true;
@@ -6915,13 +6914,16 @@ bool SC_Errors__CanKeep(JB_Error* Err) {
 	if ((!Err->Node) or JB_Err_IsWarning(Err)) {
 		return true;
 	}
-	Message* A = JB_Msg_Ancestor(Err->Node, kJB_SyxArg);
+	Message* A = Err->Node;
 	if (A) {
-		if (SC__Options_HideMultipleErrors) {
-			JB_Error* OldErr = SC_Errors__AlreadyIgnored(A);
-			if (((bool)OldErr) and (OldErr->Severity >= Err->Severity)) {
-				return false;
-			}
+		if (!JB_Object_Isa(A->Obj, &SCFunctionData)) {
+			A = JB_Msg_Ancestor(A, kJB_SyxArg);
+		}
+	}
+	if (A) {
+		JB_Error* OldErr = SC_Errors__AlreadyIgnored(A);
+		if (((bool)OldErr) and (OldErr->Severity >= Err->Severity)) {
+			return false;
 		}
 		(JB_Dict_ObjSet(SC__Errors_IgnoredBranches, A, Err));
 	}
@@ -24081,7 +24083,11 @@ void SC_Rec_PrePrintErrors(JB_ErrorReceiver* Self) {
 			JB_Error* Err = JB_Incr(((JB_Error*)JB_Ring_First(_LoopSrcf5)));
 			while (Err) {
 				JB_Error* _Nf4 = JB_Incr(((JB_Error*)JB_Ring_NextSib(Err)));
+				JB_DoAt(7);
 				if (!SC_Errors__CanKeep(Err)) {
+					if (JB_Err_IsBad(Err)) {
+						debugger;
+					}
 					JB_Tree_Remove(Err);
 				}
 				JB_SetRef(Err, _Nf4);
@@ -38982,9 +38988,6 @@ int SC_Decl_TryTypeCast(SCDecl* Self, SCDecl* O, Message* Exp, int TypeCast) {
 	if ((Self->PointerCount + 1) == O->PointerCount) {
 		int Found = SC_Decl_TryTypeCastAccess(Self, O, Exp, TypeCast);
 		if (Found) {
-			if (Exp) {
-				JB_Obj_PrintLine(SC_Msg_MsgOwningFunc(Exp));
-			}
 			return Found;
 		}
 	}
@@ -51034,4 +51037,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 6184430208609875241 -3836179982787309360
+// -8869551356133127626 4353775502676764451

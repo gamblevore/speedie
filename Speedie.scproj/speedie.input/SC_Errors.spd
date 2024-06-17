@@ -41,11 +41,13 @@ module SC_Errors
 		if (!Err.node or Err.iswarning)
 			return true // why not
 		
-		|| A = Err.node.Ancestor(@arg)
-			if Options.HideMultipleErrors
-				|| OldErr = .AlreadyIgnored(A)
-				if olderr and OldErr.Severity >= err.Severity
-					return false
+		|| A = Err.node
+			ifn a.obj isa scfunction // keep otherwise
+				a = a.Ancestor(@arg)
+		if a
+			|| OldErr = .AlreadyIgnored(A)
+			if olderr and OldErr.Severity >= err.Severity
+				return false
 			.IgnoredBranches.obj(A) = err
 		return true
 
@@ -55,7 +57,9 @@ function errorreceiver.PrePrintErrors
 		err.improve
 	if !options.KeepAllErrors
 		for err in .errors
+			debugat 7
 			if !SC_Errors.CanKeep(err)
+				if err.isbad
 				err.remove
 
 
