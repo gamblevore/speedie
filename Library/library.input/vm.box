@@ -228,7 +228,7 @@ forms
 		u1 = (u2 << u3+U3_Lu)
 /**/ BAND  (U3)
 		u1 = u2 &  (u3|||L3)
-/**/ BOAR  (U4)
+/**/ BOAR  (U4) // maybe << k is better? idk that bfls is very useful...
 		u1  = (u2|||u3)&~u4
 /**/ BXOR  (U3)
 		u1 = u2 ^ u3

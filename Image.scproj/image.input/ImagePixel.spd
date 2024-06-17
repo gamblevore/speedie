@@ -1,43 +1,62 @@
 
 
+struct ImagePixelStruct
+	|byte| R
+	|byte| G
+	|byte| B
+	|byte| A
+	target debug {
+	module
+		|ImagePixelStruct| abc
+		test()
+		function test
+			abc.r = 1
+			abc.g = 2
+			abc.b = 3
+			abc.a = 4
+			|| cc = (&abc)|&ImagePixel|
+			debugger
+			cc.r+=1
+			cc.g+=1
+			cc.b+=1
+			cc.a+=1
+	}
 
 datatype ImagePixel (uint)
 //	|byte| R
 //	|byte| G
 //	|byte| B
 //	|byte| A
+// we should be able to define rgba like this... and have all these accessor functions auto-created.
+
 	linkage
 //		datatype true
 		cpp_part pix
 		opt min 3
 
-	function a (assigns:|int|, |imagepixel|)
-
+	function a (|int|):							return (self >> 24)
+	function a (assigns:|int|, |imagepixel|): 	return ((self << 8) >> 8) ||| (value << 24)
 	function a (|&imagepixel| self, assigns:|int|)
 		cpp_part A2
+		self|&ImagePixelStruct|.a = value
 
-	function a (|int|)
-
-	function b (assigns:|int|, |imagepixel|)
-
-//	function b (|&imagepixel| self, assigns:|int|)
-//		cpp_part B2
-	
-	function b (|int|)
-
-	function g (assigns:|int|, |imagepixel|)
-
-//	function g (|&imagepixel| self, assigns:|int|)
-//		cpp_part G2
+	function b (|int|):							return (self >> 16) & 255
+	function b (assigns:|int|, |imagepixel|):	return (self &~ 0x00FF0000) ||| ((value&255) << 16)
+	function b (|&imagepixel| self, assigns:|int|)
+		cpp_part B2
+		self|&ImagePixelStruct|.b = value
 		
-	function g (|int|)
-
-	function r (assigns:|int|, |imagepixel|)
-
-//	function r (|&imagepixel| self, assigns:|int|)
-//		cpp_part R2
-
-	function r (|int|)
+	function g (|int|):							return (self >> 8) & 255
+	function g (assigns:|int|, |imagepixel|):	return (self &~ 0x0000FF00) ||| ((value&255) << 8)
+	function g (|&imagepixel| self, assigns:|int|)
+		cpp_part G2
+		self|&ImagePixelStruct|.g = value
+	
+	function r (|int|):							return (self >> 0) & 255
+	function r (assigns:|int|, |imagepixel|): 	return (self &~ 0x000000ff) ||| ((value&255) << 0)
+	function r (|&imagepixel| self, assigns:|int|)
+		cpp_part R2
+		self|&ImagePixelStruct|.r = value
 		
 
 	render
@@ -156,11 +175,11 @@ datatype ImagePixel (uint)
 		C.a = old.a
 		self <~ C 
 	
-	function Color (|vec4|)
+	function Color (|&imagepixel| self, |vec4|)
 		rz = vec4.load(self|&byte|)
 		rz *= (1.0/254.99)
 		
-	function Raw (|ivec4|)
+	function Raw (|&imagepixel| self, |ivec4|)
 		return ivec4.load(self|&byte|)
 
 	function Raw (|&imagepixel| self, assigns:|ivec4|)
