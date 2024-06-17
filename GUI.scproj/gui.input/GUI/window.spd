@@ -259,8 +259,9 @@ class Window (GUIControl)
 			return true
 		
 		if key is tab
-			f := .first!
-			f = f.NextFocus(!keys.shift, keys.option)
+			f := .first
+			if f
+				f = f.NextFocus(!keys.shift, keys.option)
 			if f
 				if f isnt opensmenu
 					f.setfocus

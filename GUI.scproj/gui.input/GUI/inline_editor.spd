@@ -17,7 +17,7 @@ struct InlineEditor
 			.visible		= false
 			.SingleLine		= true
 			(self.editor! is editable)
-			.gnormal.bg		<~ (0, 0, 0, 255)
+			&.gnormal.bg	<~ (0, 0, 0, 255)
 	
 	
 	function NextSearch

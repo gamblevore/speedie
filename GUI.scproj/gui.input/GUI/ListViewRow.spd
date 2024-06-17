@@ -67,10 +67,6 @@ role ListViewRow (message)
 		if (self is expanded) or (self == root)
 			return .flatnext
 		return .next ?? .flatafter
-	
-	
-	function IsSelected	(|bool|)
-		return .state & ListViewState.selected
 		
 	
 	function InView (|listview| Of, |bool|)
@@ -128,8 +124,8 @@ role ListViewRow (message)
 		opt norefcounts
 		|| y = (rect.y + rect.y2+1)/2
 		rect = (rect.x+1, y, rect.x2, y+1)
-		|ImagePixel| A
-		A <~ ((1.0, 1.0, 1.0, 0.25*str))
+		|| v = (1.0, 1.0, 1.0, 0.25*str)
+		|| A = v.px
 		where.RectBasic(Rect, A) 
 	
 	

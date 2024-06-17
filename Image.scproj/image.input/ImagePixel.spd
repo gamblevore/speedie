@@ -1,18 +1,43 @@
 
 
 
-struct ImagePixel
-	|byte| R
-	|byte| G
-	|byte| B
-	|byte| A
+datatype ImagePixel (uint)
+//	|byte| R
+//	|byte| G
+//	|byte| B
+//	|byte| A
 	linkage
-		datatype true
+//		datatype true
 		cpp_part pix
 		opt min 3
 
-	constructor
-		.a = 255
+	function a (assigns:|int|, |imagepixel|)
+
+	function a (|&imagepixel| self, assigns:|int|)
+		cpp_part A2
+
+	function a (|int|)
+
+	function b (assigns:|int|, |imagepixel|)
+
+//	function b (|&imagepixel| self, assigns:|int|)
+//		cpp_part B2
+	
+	function b (|int|)
+
+	function g (assigns:|int|, |imagepixel|)
+
+//	function g (|&imagepixel| self, assigns:|int|)
+//		cpp_part G2
+		
+	function g (|int|)
+
+	function r (assigns:|int|, |imagepixel|)
+
+//	function r (|&imagepixel| self, assigns:|int|)
+//		cpp_part R2
+
+	function r (|int|)
 		
 
 	render
@@ -23,13 +48,13 @@ struct ImagePixel
 		fs.appendhex(.a)
 	
 	
-	function Load (|message| f)
+	function Load (|&imagepixel| self, |message| f)
 		opt norefcounts
 		cpp_Part LoadMsg
 		if f
 			.load(f.value)
 	
-	function Load (|string| s)
+	function Load (|&imagepixel| self, |string| s)
 		if s[0, "0c"]
 			s = s[2...]
 		for i in 4
@@ -47,11 +72,11 @@ struct ImagePixel
 		return .r or .g or .b
 
 	function HasAny (|bool|)
-		return (self|&int|)[]
+		return (self != 0)
 			
-	syntax cast (|bool|)
+	syntax cast (|&imagepixel| self, |bool|)
 		cpp_part Exists
-		return self and .a
+		return self and self[].a
 
 	syntax cast (|vec4|)
 		cpp_part CastVec4
@@ -64,6 +89,11 @@ struct ImagePixel
 	function Equals (|imagepixel|p, |bool|)
 		return .uint == p.uint
 		
+	function Alpha (|&imagepixel| self, assigns:|float| a)
+		cpp_part Alpha2
+		a = (a * 255.0) + 0.25
+		.a = a.clamp(255.0)|int|
+		
 	function Alpha (assigns:|float| a)
 		a = (a * 255.0) + 0.25
 		.a = a.clamp(255.0)|int|
@@ -71,13 +101,14 @@ struct ImagePixel
 	function Alpha (|float|)
 		return .a|float| * 255th
 	
-	function AddAlpha (|float| v)
-		.Alpha = .Alpha + v
+	function AddAlpha (|&imagepixel| self, |float| v)
+		v += self[].Alpha
+		.Alpha = v
 		
-	syntax append (|&imagepixel| r)
-		self[0] = r[0]
+	syntax append (|&imagepixel| self, |imagepixel| r)
+		self[0] = r
 
-	syntax append (|vec4| V)
+	syntax append (|&imagepixel| self, |vec4| V)
 		cpp_part AppendVec
 		v = (v.clamp * 255.0) + 0.25
 		|| b = v.iVec4
@@ -86,46 +117,41 @@ struct ImagePixel
 		.b = b.b
 		.a = b.a
 	
-	syntax append (|int| r, |int| g, |int| b, |int| a=255)
+	syntax append (|&imagepixel| self, |int| r, |int| g, |int| b, |int| a=255)
 		cpp_part AppendInts
-		.R=r.clamp(255)
-		.g=g.clamp(255)
-		.b=b.clamp(255)
-		.a=a.clamp(255)
+		.R = r.clamp(255)
+		.g = g.clamp(255)
+		.b = b.clamp(255)
+		.a = a.clamp(255)
 		
-	syntax append (|float| v)
+	syntax append (|&imagepixel| self, |float| v)
 		disabled "Use a vector?"
 		cpp_part AppendFloat
 		self <~ ((v,v,v,1.0))
 		
-	syntax append (|float| r, |float| g, |float| b, |float| a=255)
+	syntax append (|&imagepixel| self, |float| r, |float| g, |float| b, |float| a=255)
 		cpp_part AppendFloats
 		disabled "Just make a vector out of this and pass that instead"
 
 
-	function AddInt (|int| i)
-		// remove this func, only one thing needs it
-		.r += i
-		.g += i
-		.b += i
 		
-	function Add (|vec4| c)
+	function Add (|&imagepixel| self, |vec4| c)
 		cpp_part AddVec
-		self <~ (c + .Color)
+		self <~ (c + self[].Color)
 		
-	function Overlay (|vec4| T)
+	function Overlay (|&imagepixel| self, |vec4| T)
 		disabled "Call .Premul on this first for great speed boost!"
 
 		
-	function Overlay (|PreMultipliedColor| T)
-		|| R = .raw
+	function Overlay (|&imagepixel| self, |PreMultipliedColor| T)
+		|| R = self[].raw
 		|| D = ((R * t.a)>>16)+T
 		D.a = r.a
 		.raw = D
 		
 
-	function Underlay (|vec4| b) 
-		|| Old = .color
+	function Underlay (|&imagepixel| self, |vec4| b) 
+		|| Old = self[].color
 		|| C = mix(b, Old, Old.a)
 		C.a = old.a
 		self <~ C 
@@ -137,48 +163,55 @@ struct ImagePixel
 	function Raw (|ivec4|)
 		return ivec4.load(self|&byte|)
 
-	function Raw (assigns:|ivec4|)
+	function Raw (|&imagepixel| self, assigns:|ivec4|)
 		.r = value.r
 		.g = value.g
 		.b = value.b
 		.a = value.a
 	
-	function Uint (|uint|)
-		return (self|&uint|)[]
+	function Uint (|uint|) // delete this!
+		return self|uint|
 		
-	function Parts (|&byte|)
-		return &.r
-	
-	function vec4.Px (|imagepixel|)
-		rz <~ self
-	function vec3.Px (|imagepixel|)
-		rz <~ ((self,1.0))
-	function ivec4.Px (|imagepixel|)
-		rz <~ (.r, .g, .b, .a)
+	function Parts (|&imagepixel| self, |&byte|)
+		// delete this!
+		return self|&byte|
 	
 	module 
+		function New (|imagepixel|)
+			rz = 255
+		
 		|ImagePixel| Bad
 		|ImagePixel| White
 		|ImagePixel| Clear
 		init()
+		
 		function Init
 			white <~ vec4(1.0)
+		
 		function Char (|codepoint| c, |&imagepixel|)
 			if c&1
 				return .white
 			return .clear
 
 
-extend vec3
-	syntax cast (|imagepixel|)
-		cpp_part AsPixel
-		return .px
 extend vec4
 	syntax cast (|imagepixel|)
 		cpp_part AsPixel
 		return .px
-extend ivec4
+function vec4.Px (|imagepixel|)
+	rz <~ self
+
+extend vec3
 	syntax cast (|imagepixel|)
 		cpp_part AsPixel
 		return .px
-		
+function vec3.Px (|imagepixel|)
+	rz <~ ((self,1.0))
+
+extend ivec4
+	syntax cast (|imagepixel|)
+		cpp_part AsPixel
+		return .px		
+function ivec4.Px (|imagepixel|)
+	rz <~ (.r, .g, .b, .a)
+

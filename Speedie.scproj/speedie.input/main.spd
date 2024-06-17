@@ -1,10 +1,44 @@
 
 
 main // speedie main {
-	compiler.SetupEnv	
-	compiler.MiniTests
-	compiler.Main
-	compiler.PrintResults
+	Compiler.Compile
+
+
+target true
+	struct abccc
+		|imagepixel| cc
+		module
+			|abccc| dd
+		
+	datatype Imagepixel (uint)
+		linkage:cpp_part abc
+		function a (assigns:|int|, |imagepixel|)
+			return self + value
+		function a (|&imagepixel| self, assigns:|int|)
+			self[] = 0
+//			return self + value
+		function HasColor (|bool|)
+			return false
+		function AddInt (|&imagepixel| self, |int| i)
+		module
+			function test (|&imagepixel| b)
+				visible
+				|imagepixel| c
+				abccc.dd.cc.a = 5
+				b.a = 5
+				c.a = 5
+//				b[] = b.a(5)
+				c.addint(1)
+				b.hascolor
+
+	
+	
+
+function compiler.Compile
+	.SetupEnv	
+	.MiniTests
+	.Main
+	.PrintResults
 
 
 function Compiler.Main

@@ -2132,7 +2132,7 @@ extend Window
 		rz = TextView(self)
 		(rz is editable) = Editable
 		rz.text = txt
-		rz.GNormal.Edge <~ (0,0,0,0)
+		&rz.GNormal.Edge <~ (0,0,0,0)
 		rz.Size = (3~right for 89)  by 18~down
 		
 

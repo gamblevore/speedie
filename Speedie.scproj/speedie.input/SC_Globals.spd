@@ -70,7 +70,7 @@ function SCDecl.IsntReallyCastable (|message| side = nil, |bool|)
 	require (.type.IsStruct or .IsCArray) and (!.pointercount)
 	if !side
 		return true
-	return  side.RemoveTypeCasts != @arg
+	return  side.Unwrap != @arg
 
 
 function scdecl.NoBlindCasts (|scdecl| old, |message| exp, |SCNode| name_space)
@@ -127,13 +127,13 @@ function Message.CanGetAddress (|SCNode| name_space, |bool|)
 	expect (T2 isnt NumberConst)        (curr, "Can't get the address of a const.")
 	
 	if (curr == @thg) and (t2 is local) and !(t2.IsBareStruct or t2.IsCArray)
-		|| p = .ParentForAddress
-		expect (p == @prm) (curr, "Can't store the address of register based variables.")
+		|| f = .ParentForAddress
+		expect (f == @prm or @dot) (curr, "Can't store the address of register based variables.")
 			
 	return true
 
 
-function Message.ParentForAddress (|Message|)
+function Message.ParentForAddress (|syntax|)
 	opt norefcounts
 	|| gotaddr = 0
 	|| p = .parent
@@ -144,7 +144,7 @@ function Message.ParentForAddress (|Message|)
 				gotaddr++
 				require gotaddr <= 1
 			  else
-				return p
+				return p.func
 		p = p.parent
 
 

@@ -63,8 +63,6 @@ typedef int ErrorMarker;
 
 typedef byte ErrorSeverity;
 
-typedef int FailableInt;
-
 typedef int FileDes;
 
 typedef int FileMode;
@@ -878,7 +876,6 @@ extern Array* JB__ErrorSeverity__names;
 #define kJB__ErrorSeverity_OK (0)
 #define kJB__ErrorSeverity_Problem (3)
 #define kJB__ErrorSeverity_Warning (2)
-#define kJB__FailableInt_Fail (2147483648)
 #define kJB__FileDes_StdErr (2)
 #define kJB__FileDes_StdIn (0)
 #define kJB__FileDes_StdOut (1)
@@ -1544,9 +1541,6 @@ int JB_ErrorSeverity__InitCode_();
 
 Array* JB_ErrorSeverity__InitNames();
 
-
-
-// FailableInt
 
 
 // FileDes

@@ -410,7 +410,6 @@ helper TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,  |im
 
 
 helper TextView.UseColorAnyway (|int|)
-	// what about the expectsparse thing?
 	ifn .isinline
 		if .ParsedMessage or .myerror
 			return 2
@@ -421,7 +420,7 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 	opt norefcounts
 	opt min 3
 	|| GoUp = (7 - .lineheight)/2
-	if d.LineError //  i guess right?
+	if d.LineError
 		if .myerror 
 			.drawerror(where, y+GoUp, d)
 		  else
@@ -429,7 +428,9 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 //	if d is found
 //		.drawfound(where, y+GoUp, d)
 	if .CanDrawLight(d)				// linelight
-		lc.addint(80)				// need to use ._PreferPrevLine
+		lc.r += 80
+		lc.g += 80
+		lc.b += 80
 		.DrawLighter(where, y+goup)
 
 	|| x	 = .DrawLineNumber(where, d, y, lc)-1

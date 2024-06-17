@@ -600,7 +600,7 @@ function Declaration (niltrackerfn) // function decl
 
 function Swapity (|scdecl| LD, |message| L, |scdecl| RD, |message| R, |nilstate| RN, |nilstate|)
 	opt norefcounts
-	|| LL = l.RemoveTypeCasts
+	|| LL = l.Unwrap
 	if ll != @acc // memory access... must work
 		check (LD is swappable) (L, l.origrender + " can't be swapped. Must be a real variable somewhere.")
 	return .VariableSet(LD,L,  RD,R,  RN)

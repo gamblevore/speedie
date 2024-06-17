@@ -113,7 +113,7 @@ module Lib
 	function AddLibGlob (|?&nil| where, |string| name, |bool|)
 		opt norefcounts
 		expect (.GlobalCount++ < 1K) ("Too many globals")		// for detecting corrupt lib
-		.Globals.valuelower(name) = where
+		.Globals.valuelower(name) = where!
 		return true
 	
 	

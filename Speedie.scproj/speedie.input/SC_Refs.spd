@@ -479,7 +479,7 @@ function message.RefTransparent (|bool|)
 		return n == '?' or '!'
 
 
-function Message.RemoveTypeCasts (|Message!|)
+function Message.Unwrap (|Message!|)
 	opt norefcounts
 	rz = self
 	while rz.RefTransparent

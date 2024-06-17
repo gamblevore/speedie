@@ -39,9 +39,9 @@ function imagepixel.PreMul (|PreMultipliedColor|)
 	return .Color.PreMul
 
 
-function imagepixel.PreMul (|imagepixel| self, |PreMultipliedColor|)
-	cpp_part PreMul2 // shouldn't have to write this... dont do this!
-	return .Color.PreMul
+//function imagepixel.PreMul (|imagepixel| self, |PreMultipliedColor|)
+//	cpp_part PreMul2 // shouldn't have to write this... dont do this!
+//	return .Color.PreMul
 
 
 function vec4.PreMul (|PreMultipliedColor|)

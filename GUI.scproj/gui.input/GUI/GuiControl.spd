@@ -48,7 +48,7 @@ class GUIControl (list)
 			fs <~ "("
 			fs <~ .class.name
 			fs <~ "  "
-			fs <~ .lastrect
+			.lastrect.render(fs)
 			fs <~ `): '`
 			fs <~ .id
 			fs <~ "'"

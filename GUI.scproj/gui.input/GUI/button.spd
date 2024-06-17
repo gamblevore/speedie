@@ -278,7 +278,7 @@ class ButtonView (GUIControl)
 				  else
 					sdlapp.Touch
 				pn.y -= (ago-4.0)|int|
-			elseif .MenuIsOpen
+			  elseif .MenuIsOpen
 				pn.y += 4
 			font.small!.DrawText("\03", where, pn, TextCol, DrawInvis)
 		

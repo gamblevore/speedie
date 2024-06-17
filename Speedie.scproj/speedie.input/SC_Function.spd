@@ -312,8 +312,16 @@ function MacroFix (|SCDecl?| contains, |SCNode| name_space, |SCParamArray| Incom
 
 
 function message.FailOrCopy (|message| p, |message|)
-	if (self == @Thg)
+	opt norefcounts
+	|| f = .func
+	if f == @Thg
 		return .copy
+	|| ch = .first
+		ch = ch.Unwrap
+		if ch == @thg
+			if (self isbrel "&") or (f == @acc)
+				return .copy
+	
 	error (p, "Please simplify this expression")
 
 
@@ -376,6 +384,14 @@ function int.IsNormalMatch (|bool|)
 
 
 function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode| name_space,  |SCParamArray| Incoming,  |int|)
+	if  .isassigns  and  .returntype
+		|| a = .args[0]
+		|| i = typeofexpr(incoming[0], name_space)
+		require i and a
+		
+		require   (typecast & kTypeCastassigns) or (!a.pointercount and i is local) // allow for tighter code
+		// Local.b = c --> local = local.breturn(c)...  structptr.b = c --> structptr.bset(C)
+	
 	if ((.IsAssigns!=0) != Incoming.IsAssigns)
 		require (TypeCast & kTypeCastassigns) and (!Incoming.IsAssigns)
 	
@@ -389,7 +405,6 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 	|| fin = .args.length
 	|| fi = ((self is constructor)  and  !Incoming.AllowSelfToConstructor)|int|
 	
-	debugat 0
 	while fi < fin
 		|| FuncArg = .Args[fi]!
 		|| PArg_Ch = Incoming[Pos]

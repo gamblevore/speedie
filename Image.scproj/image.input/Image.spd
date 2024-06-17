@@ -201,29 +201,25 @@ class Image (memory)
 						in = data.ptr
 				p.overlay(c)
 		
-		
-	syntax access (|int| x, |int| y, |&imagePixel|)
-		cpp_part AtXYInt
-		return self[(x,y)]
-
 
 	function Interp (|vec2| P, |vec4|)
 		|| base = p.ifloor
 		for i in 4
 			|| base2 = base + (i>>1, i&1)
 			|| closeness = (base2.Vec2 - p).abs.sum
-			|| c0 = self[base2].color
+			|| c0 = self[base2][].color
 			rz += (closeness*c0*0.25)
-	
-	
-	syntax access (|vec2| P, |&ImagePixel|)
-		disabled "use ivec2 coords to get &pixel, or syntaxcall for interpolated result"
-		cpp_part AtVec2
-		return self[p.ivec2]
+
 	
 	operator contains (|ivec2| P, |bool|)
 		return (p+.windowbase) inrange .size
 		
+
+	syntax access (|ivec4| rect, |imagereader|)
+		cpp_part imagereader
+		rz.rect = .clip(rect)
+		rz.img = self
+	
 
 	syntax access (|ivec2| P, assigns:|ImagePixel|)
 		if self contains p
@@ -240,10 +236,21 @@ class Image (memory)
 		p.y = s.y - (1 + p.y) // invert
 		rz += (p fma s.x)
 
+		
+	syntax access (|int| x, |int| y, |&imagePixel|)
+		cpp_part AtXYInt
+		return self[(x,y)]
+	
+	
+	syntax access (|vec2| P, |&ImagePixel|)
+		disabled "use ivec2 coords to get &pixel, or syntaxcall for interpolated result"
+		cpp_part AtVec2
+		return self[p.ivec2]
+	
 
 	syntax call (|ivec2| P, |vec4|)
 		cpp_part ColXY
-		return .SyntaxAccess(p).Color
+		return .SyntaxAccess(p)[].Color
 	
 		
 	function SavePNG (|file| f) // writetofile
@@ -327,7 +334,7 @@ class Image (memory)
 		for y in .height
 			for x in .width
 				if x: print ", "
-				print self[x,y].render
+				print self[x,y][].render
 			printline
 		printline
 
@@ -430,12 +437,6 @@ class Image (memory)
 				where[v+d] <~ pp
 	
 	
-	syntax access (|ivec4| rect, |imagereader|)
-		cpp_part imagereader
-		rz.rect = .clip(rect)
-		rz.img = self
-	
-
 	function EdgeAlpha (|ivec4| R, |DrawStyle| G, |float| alpha, |MoveCode| AllowEdge=movecode.all)
 		using g
 			g.edge.alpha = alpha

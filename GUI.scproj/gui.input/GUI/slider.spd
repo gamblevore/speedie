@@ -68,8 +68,10 @@ class Slider (GuiControl)
 		|| v = .value		// up/down keys...
 		if key is up
 			v += .valuestep
+			rz = true
 		if key is down
 			v -= .valuestep
+			rz = true
 		.setvalue(v)
 	
 	

@@ -3156,7 +3156,6 @@ Array* JB_ErrorSeverity__InitNames() {
 
 
 
-
 int JB_Rg_Width(IntRange Self) {
 	return Self[1] - Self[0];
 }
@@ -8216,7 +8215,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024061417);
+	return (2024061423);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8228,4 +8227,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 4146160502151773816 -6720784475268466743
+// 7796578953066441599 3822196632365595137 -6720784475268466743

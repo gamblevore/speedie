@@ -976,6 +976,18 @@ class SCDecl (SCNamed) {
 		Return kAddressOfMatch
 	
 	
+	function Message.MakeDereference (|SCDecl| Type, |int|)
+		if !self
+			Return kNeedsAddressOf
+		
+		|| Addr = @acc.msg
+		.next = addr
+		Addr <~ self
+		addr.msg(@arr) <~ 0
+		Addr.obj = Type
+		Return kAddressOfMatch
+	
+	
 	function ExpectRelMatch (|SCDecl| O,  |Message| exp,  |Message?| side,  |Message?| ErrNode = nil)
 		opt norefcounts
 		// Just like ExpectMatch, except always does type-casting. and returns nothing.

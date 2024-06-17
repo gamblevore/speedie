@@ -95,6 +95,8 @@ typedef int FlowControlStopper;
 
 typedef int FunctionType;
 
+typedef uint Imagepixel;
+
 typedef int Ind;
 
 typedef ivec2 IntRange;
@@ -248,6 +250,8 @@ struct StringDigitIterator;
 struct StringLengthSplit;
 
 struct StructSaveTest;
+
+struct abccc;
 
 struct xD1x9B;
 
@@ -741,6 +745,10 @@ struct StructSaveTest {
 	Saveable* Sav;
 	int64 Intt;
 	JB_String* Str;
+};
+
+struct abccc {
+	Imagepixel cc;
 };
 
 struct ASMState {
@@ -2287,6 +2295,7 @@ extern Dictionary* JB__LD_ClassList;
 extern SaverClassInfo* JB__Saver_SaveableList;
 extern PicoComms* JB__Pico_Parent_;
 extern Random JB__Rnd_Shared;
+extern abccc SC__abccc_dd;
 extern Array* SC__Pac_Ancients;
 extern MWrap* SC__Pac_JSMSpace;
 extern ASMState SC__Pac_Sh;
@@ -2503,6 +2512,8 @@ void SC_Comp__CodeSign(JB_File* Gui_exe);
 void SC_Comp__CollectConstants();
 
 bool SC_Comp__CollectIsaTests(Message* S);
+
+void SC_Comp__Compile();
 
 bool SC_Comp__CompileAll();
 
@@ -2929,6 +2940,8 @@ int JB_Constants__InitCode_();
 void JB_Constants__InitConstants();
 
 JB_String* JB_Constants__TestJB();
+
+bool JB_Constants__TestCasting();
 
 
 
@@ -4739,6 +4752,19 @@ void JB_FlowControlStopper_SyntaxUsingComplete(FlowControlStopper Self, JB_Objec
 // FunctionType
 
 
+// Imagepixel
+Imagepixel SC_abc_aSetWithInt(Imagepixel Self, int Value);
+
+void SC_abc_aSet0(Imagepixel* Self, int Value);
+
+void SC_abc_AddInt(Imagepixel* Self, int I);
+
+bool SC_abc_HasColor(Imagepixel Self);
+
+void SC_abc__test(Imagepixel* B);
+
+
+
 // Ind
 
 
@@ -4865,6 +4891,8 @@ Message* JB_Syx_Msg(Syntax Self, JB_String* Name);
 Message* JB_Syx_IntMsg(Syntax Self, int64 Name);
 
 JB_String* JB_Syx_Name(Syntax Self);
+
+bool JB_Syx_NoChildren(Syntax Self);
 
 SyntaxObj* JB_Syx_Obj(Syntax Self);
 
@@ -5646,6 +5674,13 @@ void JB_StructSaveTest_Destructor(StructSaveTest* Self);
 void JB_StructSaveTest_LoadProperties(StructSaveTest* Self, ObjectLoader* Loader);
 
 void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
+
+
+
+// JB_abccc
+int SC_abccc__Init_();
+
+int SC_abccc__InitCode_();
 
 
 
@@ -7965,6 +8000,8 @@ int SC_Msg_MainOneArg(Message* Self, Message* Arg, int I, int Found);
 
 void SC_Msg_MakeComment(Message* Self);
 
+int SC_Msg_MakeDereference(Message* Self, SCDecl* Type);
+
 void SC_Msg_MakeTaskVar(Message* Self, Message* Con, Message* Before, bool First);
 
 void JB_Msg_max__(Message* Self, FastString* Fs);
@@ -8069,7 +8106,7 @@ Message* SC_Msg_OrigMsg(Message* Self);
 
 JB_String* SC_Msg_OrigRender(Message* Self);
 
-Message* SC_Msg_ParentForAddress(Message* Self);
+Syntax SC_Msg_ParentForAddress(Message* Self);
 
 Message* SC_Msg_ParentPoint(Message* Self);
 
@@ -8114,8 +8151,6 @@ int SC_Msg_RegOrNum(Message* Self);
 void JB_Msg_Rel__(Message* Self, FastString* Fs);
 
 bool SC_Msg_RelFix(Message* Self, bool Force);
-
-Message* SC_Msg_RemoveTypeCasts(Message* Self);
 
 JB_String* JB_Msg_Render(Message* Self, FastString* Fs_in);
 
@@ -8286,6 +8321,8 @@ void JB_Msg_Unit__(Message* Self, FastString* Fs);
 bool SC_Msg_UnitMatch(Message* Self, JB_String* A, JB_String* B);
 
 Message* SC_Msg_UnReachable(Message* Self);
+
+Message* SC_Msg_Unwrap(Message* Self);
 
 Message* SC_Msg_UpToType(Message* Self);
 
@@ -8623,6 +8660,8 @@ bool SC_Decl_SyntaxIs(SCDecl* Self, SCDeclInfo D);
 void SC_Decl_SyntaxIsSet(SCDecl* Self, SCDeclInfo D, bool Value);
 
 int SC_Decl_TryTypeCast(SCDecl* Self, SCDecl* O, Message* Exp, int TypeCast);
+
+int SC_Decl_TryTypeCastAccess(SCDecl* Self, SCDecl* O, Message* Exp, int TypeCast);
 
 int SC_Decl_TryTypeCastPointer(SCDecl* Self, SCDecl* O, Message* Exp, int TypeCast, bool CArray);
 
@@ -9794,8 +9833,6 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, NilState New);
 
 inline void SC_nil__DeclKill();
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
-
 inline NilRecord SC_nil__Value();
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
@@ -9815,6 +9852,8 @@ inline bool SC_Reg_SyntaxCast(AsmReg Self);
 inline int SC_Reg_ToInt(AsmReg Self);
 
 inline NilRecord SC_nil__EndBlock();
+
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
@@ -10150,16 +10189,6 @@ inline void SC_nil__DeclKill() {
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 }
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
-	ASMtmp T = SC_Msg_ASMType(Msg);
-	if (T) {
-		return (SC__nil_NilTable[T])(Msg, Test);
-	}
-	T = ((ASMtmp)Msg->Func);
-	(SC_Msg_ASMTypeSet(Msg, T));
-	return (SC__nil_NilTable[T])(Msg, Test);
-}
-
 inline NilRecord SC_nil__Value() {
 	return SC_nil_Value((&SC__nil_T));
 }
@@ -10184,10 +10213,18 @@ inline FatASM* SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 	FatASM* Rz = nil;
 	ASMtmp T = SC_Msg_ASMType(Exp);
 	fn_asm Fn = SC_fn_asm_table[T];
+	if (!T) {
+		Fn = SC_fn_asm_table[((int)Exp->Func)];
+		debugger;
+	}
 	byte OV = Self->VTmps;
 	Rz = (Fn)(Self, Exp, Dest, 0);
 	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen)) {
 		Self->VTmps = (OV);
+	}
+	int Dd = SC_Reg_Reg(Dest);
+	if (((bool)Dd) and (SC_Reg_Reg(Rz->Info) != Dd)) {
+		//FFFFFFASSDJKLASDM<>AS;
 	}
 	return Rz;
 }
@@ -10195,6 +10232,7 @@ inline FatASM* SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 inline uint64* SC_Pac_GetConst(ASMState* Self, int A) {
 	FatASM* R = Self->Registers[A];
 	if ((R == (&Self->Zero)) or (!SC_Reg_SyntaxIs(R->Info, kSC__Reg_ConstAny))) {
+		debugger;
 	}
 	return (&R->Const);
 }
@@ -10212,6 +10250,16 @@ inline NilRecord SC_nil__EndBlock() {
 	Rz = SC_nil__Value();
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 	return Rz;
+}
+
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
+	ASMtmp T = SC_Msg_ASMType(Msg);
+	if (T) {
+		return (SC__nil_NilTable[T])(Msg, Test);
+	}
+	T = ((ASMtmp)Msg->Func);
+	(SC_Msg_ASMTypeSet(Msg, T));
+	return (SC__nil_NilTable[T])(Msg, Test);
 }
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
