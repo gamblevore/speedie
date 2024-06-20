@@ -12,6 +12,7 @@ class SCParamArray
 	|Message--?[11]|	Items
 	|Message--?|		Exp
 	|SCClass--?|		Cls
+	|int|				RunNum
 	|int16|				Size
 	|int16|				ErrCount
 	|bool|				IsAssigns
@@ -31,6 +32,8 @@ class SCParamArray
 		.IsDot = (exp == @dot)
 		.IsAddress = (exp and exp.niceparent Isbrel "&")
 		.ErrCount = stderr.errorcount
+		.runnum = ++RunCount
+		// if .runnum == 8568
 
 
 	function addsub (|| m)
@@ -98,10 +101,20 @@ class SCParamArray
 
 
 	function PreReadTypes (|SCNode| Name_Space, |Message?| P, |message?| side, |bool|)
+		opt norefcounts
 		if p and !.exp
 			.exp = p
-		for  Item.fast in P  // in case '...' adds a param
+		|| item = p.first
+
+		while item
+			|| nxt = item.next
+			
 			require  .AddTestedParam(item, name_space)
+			if item in p // in case "..." adds a param
+				item = item.next
+			  else		 /// temped out! ouch!
+				item = nxt
+
 		.side = side
 		return true
 
@@ -148,16 +161,27 @@ class SCParamArray
 
 
 	function MacroSize (|int|)
-		if .isassigns
-			return .size-1
-		return .size
+		return .size - .isassigns
 
 
 	function Side (assigns:|Message|)
 		if (Value)
 			.addsub(Value)
 			.IsAssigns = true
+	
+	
+	function StructFix (|scdecl| type)
+		opt norefcounts
+		|| s = .exp
+			|| where = s.ParentPoint
+			if where != @decl
+				scfunction.TempMoveOut(s, type)
 
+	
+	module
+		|int|	RunCount
+		
+		
 	iterator
 		|int| n = .size
 		|int| i = 0

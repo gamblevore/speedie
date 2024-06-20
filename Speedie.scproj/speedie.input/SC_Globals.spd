@@ -1727,7 +1727,6 @@ function TypeOfFuncSub (|Message| exp, |SCNode| name_space, |Message| side, |SCO
 		fn = exp.prmfunc
 		if fn
 			return fn
-			
 		return TypeOfSyntaxCall(exp, name_space, side)
 	
 	|| PList = SCParamArray.new(exp)				// these 3 lines should be 2 lines...
@@ -1735,9 +1734,10 @@ function TypeOfFuncSub (|Message| exp, |SCNode| name_space, |Message| side, |SCO
 	|| fn2 = fn.ArgsMatch( nil, name_space, PList )
 	if !fn2
 		fn.ArgsMatch( nil, name_space, PList, kTypeCastDescribeErrors )
-	  elseif !fn2.ReturnType
-		exp.Obj = typevoid // save it being looked up over and over...
-	
+	  else
+		if !fn2.ReturnType
+			exp.Obj = typevoid // save it being looked up over and over...
+		
 	return fn2
 
 

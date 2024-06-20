@@ -151,14 +151,20 @@ struct ContainerStruct
 /*
 	OK how to do struct returns?
 	
-	|| x = struct()
+	|| x = structfn()
 		-->
 	|type| x
-	struct(&x)
+	Structfn(&x)
+	
+this is sutch a total bîtch. no one can do this except me. SO HOW TO FUCKING DO IT.
+
+its breaking all over anytime I change anything. this can easily spiral out.
+
+So just spiral?
 
 ...
 
-	rz = .send(picomessage.Make())
+	rz = .send(picomessage.Make)
 		-->
 	|| tmp = picomessage.Make()
 	rz = .send(tmp)
@@ -168,8 +174,9 @@ struct ContainerStruct
 	rz = .send(&tmp)
 
 
+
+
 // This is tiring... but I can do it.
-	
 	
 	* No passing structs
 		* turn into ptrs

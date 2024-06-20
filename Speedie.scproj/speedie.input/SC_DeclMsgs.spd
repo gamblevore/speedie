@@ -80,7 +80,7 @@ function scfunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 	if !cls
 		cls = .parent|SCModule|!.Cls
 	  elseif !prms.HasSelfAsFirst
-		expect (addtospace) (prms)
+		expect (AddToSpace) (prms)
 		.AddSelfToFunc(cls, AddToSpace)
 
 	for item in prms
@@ -89,8 +89,16 @@ function scfunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 	|| ns = .nilself
 		.WantAs(ns)
 	|| r = .returntype
-	if r and self is HidesProperties
-		.returntype = r.makereal
+		if self is HidesProperties
+			r = r.makereal
+			.ReturnType = r
+		if r.isbarestruct
+			//.args <~ r
+			//.ReturnType = typevoid
+			(r is returnedstruct)
+
+//	check (!dcl.isbarestruct) (self, "Structs can't be passed without a pointer")
+		
 			
 
 
@@ -124,8 +132,6 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 		(dcl isnt Altered)
 	  else
 		(dcl is return)
-
-	check (!dcl.isbarestruct) (self, "Structs can't be passed without a pointer")
 	
 	return true
 

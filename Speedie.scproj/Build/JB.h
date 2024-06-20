@@ -942,8 +942,9 @@ struct SCParamArray_Behaviour: Object_Behaviour {
 };
 
 JBClass ( SCParamArray , JB_Object , 
-	Message* Exp;
+	int RunNum;
 	SCClass* Cls;
+	Message* Exp;
 	s16 Size;
 	s16 ErrCount;
 	bool IsAssigns;
@@ -2237,6 +2238,7 @@ extern Array* SC__NilReason_values;
 #define kSC__SCDeclInfo_Property (65536)
 #define kSC__SCDeclInfo_PropertyWasConstructed (4096)
 #define kSC__SCDeclInfo_Return (262144)
+#define kSC__SCDeclInfo_ReturnedStruct (536870912)
 #define kSC__SCDeclInfo_Self (16777216)
 #define kSC__SCDeclInfo_SelfImplicit (16777216 + (32768 + 16384))
 #define kSC__SCDeclInfo_SetTo (33554432)
@@ -2341,6 +2343,7 @@ extern SCOperator* SC__Opp_Bnot;
 extern int SC__Opp_CustomOperatorScore;
 extern Dictionary* SC__Opp_Dict;
 extern SCOperator* SC__Opp_Minus;
+extern int SC__PA_RunCount;
 extern int SC__xC2xB5Form_Count;
 extern Dictionary* SC__xC2xB5Form_Forms;
 #define kSC__xC2xB5Form_Jump (32)
@@ -6746,7 +6749,13 @@ JB_String* SC_PA_RenderKind(SCParamArray* Self);
 
 void SC_PA_SideSet(SCParamArray* Self, Message* Value);
 
+void SC_PA_StructFix(SCParamArray* Self, SCDecl* Type);
+
 Message* SC_PA_SyntaxAccess(SCParamArray* Self, int I);
+
+int SC_PA__Init_();
+
+int SC_PA__InitCode_();
 
 
 
@@ -9346,8 +9355,6 @@ Message* SC_Func_CountCallsToParentAlloc(SCFunction* Self, Message* Root);
 
 int SC_Func_CreateTypeCast(SCFunction* Self, SCDecl* MyType, Message* Exp, int Loss);
 
-void SC_Func_DebugPrintOnce(SCFunction* Self);
-
 void SC_Func_DeclsProtoCleanup(SCFunction* Self, SCClass* fpType, Message* Ch0, bool AssumeSelf, bool Late, Message* Route);
 
 SCDecl* SC_Func_DeclsProtoTypeAdd(SCFunction* Self, SCClass* fpType);
@@ -9558,7 +9565,7 @@ void SC_Func__ObjectifyString(Message* Msg);
 
 void SC_Func__String_Expand(Message* Msg, SCFunction* Fn);
 
-Message* SC_Func__TypedTempMoveOut(Message* Msg, JB_String* Name);
+Message* SC_Func__TypedTempMoveOut(Message* Msg, JB_String* Name, SCDecl* Type);
 
 Message* SC_Func__TempMoveOut(Message* Msg, Message* Place);
 

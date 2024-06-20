@@ -73,6 +73,7 @@ datatype SCDeclInfo (int)
 		Hidden					// internal global... should not be exposed to non-lib stuff
 		Biggest
 		PostIncremented
+		ReturnedStruct
 		Swappable	 = Param + Body + Global + Property
 		Local		 = Body + Param
 		SelfImplicit = Self + local // local is set by CollectOneParam, anyhow?
