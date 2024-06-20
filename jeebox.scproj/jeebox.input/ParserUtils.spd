@@ -265,13 +265,13 @@ prototype SorterComparerMsg		(|message| a, |message| b, |bool|)
 
 
 
-struct ParserLineAndIndent
+datatype ParserLineAndIndent (ivec4)
+/*
 	|int|			Lines 
 	|int|			Indent
-	|int|			Commas
 	|int|			Pos
 	|bool|			IsDebug
-
+*/
 
  
 role MessageRoot (Message)

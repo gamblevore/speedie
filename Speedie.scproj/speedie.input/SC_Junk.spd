@@ -148,30 +148,50 @@ struct ContainerStruct
 
 
 
+/*
+	OK how to do struct returns?
+	
+	|| x = struct()
+		-->
+	|type| x
+	struct(&x)
+
+...
+
+	rz = .send(picomessage.Make())
+		-->
+	|| tmp = picomessage.Make()
+	rz = .send(tmp)
+		-->
+	|pico| tmp
+	picomessage.Make(&tmp)
+	rz = .send(&tmp)
+
+
+// This is tiring... but I can do it.
+	
+	
+	* No passing structs
+		* turn into ptrs
+		* disable passing structs directly.
+	
+	* No returning structs
+		* turn into ptr params
+		* some extra kinda rules? (Which?)
+			x = func()
+			x = func() // call destructor on old x, or block the thing entirely
+		* return func() // pass our pointer!
+	
+	* always call constructors
+		* unlesss its empty
+			* check for default values
+*/
+
+
+
 struct junk_abccc
-	|imagepixel| cc
+	|int| cc
 	module
-		|junk_abccc| dd
-
-
-datatype Imagepixel (uint)
-	linkage:cpp_part abc
-	function a (assigns:|int|, |imagepixel|)
-		return self + value
-	function a (|&imagepixel| self, assigns:|int|)
-		self[] = 0
-//			return self + value
-	function HasColor (|bool|)
-		return false
-	function AddInt (|&imagepixel| self, |int| i)
-	module
-		function test (|&imagepixel| b)
-			visible
-			|imagepixel| c
-			junk_abccc.dd.cc.a = 5
-			b.a = 5
-			c.a = 5
-//				b[] = b.a(5)
-			c.addint(1)
-			b.hascolor
+		function New (|junk_abccc|)
+			rz.cc = 1
 

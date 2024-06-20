@@ -411,7 +411,7 @@ class SCDecl (SCNamed) {
 		return .Type.IsStruct and !.PointerCount and !.IsCArray
 
 	function IsStruct (|bool|)
-		disabled "Use .IsNormalStruct"
+		disabled "Use .IsBareStruct"
 
 	function IsReg (|bool|)
 		require !.IsCArray

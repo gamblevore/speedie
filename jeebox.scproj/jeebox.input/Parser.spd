@@ -274,10 +274,10 @@ extend Parser
 			return .UnexpectedSyntax(it)
 		
 		|| Ops = kOppSyx (|) kOppTemporal (|) kOppYoda
-		while .NextLineAndIndent(Result).lines
+		while .NextLineAndIndent(Result).r
 			|| item = .ProcessThing(Ops, false) #loop
 			if item.name endswith "»" 
-				// design flaw. We need utf-8 math ops to split words.
+				// design flaw. We need utf-8 text ops to split words.
 				return .ErrorAdd("Needs a space here.", item.position)
 			result <~ item
 
@@ -1002,33 +1002,34 @@ ive been~running #since morning
 		|| end			= D.length
 		|| addr			= D.addr
 		|| State		= 0		// 2 = line, 1 = space, 0 = neither, 3 = both
+		|| Commas		= 0
 
 		while (n < end)
 			|| c = addr[n++]
 			if (c == '\t')
-				if !rz.commas
-					rz.indent += 4
-				if ((State&1) and rz.lines)
+				if !commas
+					rz.b += 4
+				if ((State&1) and rz.r)
 					.erroradd("Can't have tabs after spaces.", n-1)
 
 			  elseif (c == ',')
-				rz.commas++
+				commas++
 				|| l = parent.last
-					rz.indent = l.indent
+					rz.b = l.indent
 				  else
-					rz.indent = 0									// int.min
+					rz.b = 0									// int.min
 				State = 0
 
 			  elseif (c == ' ')
 				State |= 1
-				if !rz.commas
-					rz.indent++
+				if !commas
+					rz.b++
 
 			  elseif (c == '/')
 				|| c2 = d[n]
 				if (c2 != '/' and '*')
 					if state&2 // not quite working yet! but soon!
-						rz.IsDebug = true
+						rz.a = 1
 					n--
 					exit
 				State = 2
@@ -1036,8 +1037,8 @@ ive been~running #since morning
 					n = .GotoEndOfLine(n+1)
 					continue
 
-				rz.lines++
-				rz.indent = 0
+				rz.r++
+				rz.b = 0
 				.nextstart = n-1
 				|| line = .Process( kendofline, Parser.kAllow, parent )
 				n = .nextstart
@@ -1048,19 +1049,19 @@ ive been~running #since morning
 				ifn (c == '\n' or '\r')
 					n--
 					exit
-				rz.lines++
-				rz.isdebug=false
-				rz.indent = 0
-				rz.commas = 0 // right?
-				rz.pos    = n-1 // sigh
+				rz.r++
+				rz.a=0
+				rz.b = 0
+				commas = 0 // right?
+				rz.g    = n-1 // sigh
 				State = 2
 				if parent.func == @list
 					(parent is style2)
 
-		rz.lines += rz.commas
+		rz.r += commas
 		.nextstart = n
-		if ((first > 0) and !rz.lines) or (rz.indent < 0)
-			rz.indent = -1
+		if ((first > 0) and !rz.r) or (rz.b < 0)
+			rz.b = -1
 		
 	
 	function ParseLoopItem (|Message| Output, |int| TmpoFlags, |message| Prev, |int| Indent, |message|)
@@ -1107,17 +1108,17 @@ ive been~running #since morning
 		
 		while output
 			|| Info = .NextLineAndIndent(output)
-			RZ += info.lines
+			RZ += info.r
 
-			if .WillEnd or (prev and !info.lines)
+			if .WillEnd or (prev and !info.r)
 				exit
 			
-			|| ch = .ParseLoopItem(output, TmpoFlags, prev, info.indent)		#loop
+			|| ch = .ParseLoopItem(output, TmpoFlags, prev, info.b)		#loop
 			if ch != output // haha
 				RZ += (ch == @item)
-				if info.IsDebug
+				if info.a
 					ch.flags |= MsgParseFlags.breakpoint
-				output = .AddToOutput(output, ch, prev, info.pos)
+				output = .AddToOutput(output, ch, prev, info.g)
 				prev = ch
 
 	

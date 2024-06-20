@@ -95,8 +95,6 @@ typedef int FlowControlStopper;
 
 typedef int FunctionType;
 
-typedef uint Imagepixel;
-
 typedef int Ind;
 
 typedef ivec2 IntRange;
@@ -118,6 +116,8 @@ typedef byte NilState;
 typedef int OpMode;
 
 typedef int PID_Int;
+
+typedef ivec4 ParserLineAndIndent;
 
 typedef byte ProcessMode;
 
@@ -234,8 +234,6 @@ struct ObjectLoader;
 struct ObjectSaver;
 
 struct Object_Behaviour;
-
-struct ParserLineAndIndent;
 
 struct Random;
 
@@ -728,14 +726,6 @@ struct ObjectSaver {
 	JB_Object* Root;
 };
 
-struct ParserLineAndIndent {
-	int Lines;
-	int Indent;
-	int Commas;
-	int Pos;
-	bool IsDebug;
-};
-
 struct Random {
 	uint64 Store;
 	uint64 State;
@@ -745,10 +735,6 @@ struct StructSaveTest {
 	Saveable* Sav;
 	int64 Intt;
 	JB_String* Str;
-};
-
-struct junk_abccc {
-	Imagepixel cc;
 };
 
 struct ASMState {
@@ -2122,6 +2108,7 @@ extern Array* JB__ErrorSeverity__names;
 #define kSC__FunctionType_NewStruct (16)
 #define kSC__FunctionType_NoRefCounts (4194304)
 #define kSC__FunctionType_NumberCreator (32)
+#define kSC__FunctionType_PrintedForDebugViewing (67108864)
 #define kSC__FunctionType_Recursive (256)
 #define kSC__FunctionType_Reffer (8)
 #define kSC__FunctionType_Render (32768)
@@ -2295,7 +2282,6 @@ extern Dictionary* JB__LD_ClassList;
 extern SaverClassInfo* JB__Saver_SaveableList;
 extern PicoComms* JB__Pico_Parent_;
 extern Random JB__Rnd_Shared;
-extern junk_abccc SC__junk_abccc_dd;
 extern Array* SC__Pac_Ancients;
 extern MWrap* SC__Pac_JSMSpace;
 extern ASMState SC__Pac_Sh;
@@ -2940,6 +2926,8 @@ int JB_Constants__InitCode_();
 void JB_Constants__InitConstants();
 
 JB_String* JB_Constants__TestJB();
+
+bool JB_Constants__TestCasting();
 
 
 
@@ -4750,19 +4738,6 @@ void JB_FlowControlStopper_SyntaxUsingComplete(FlowControlStopper Self, JB_Objec
 // FunctionType
 
 
-// Imagepixel
-Imagepixel SC_abc_aSetWithInt(Imagepixel Self, int Value);
-
-void SC_abc_aSet0(Imagepixel* Self, int Value);
-
-void SC_abc_AddInt(Imagepixel* Self, int I);
-
-bool SC_abc_HasColor(Imagepixel Self);
-
-void SC_abc__test(Imagepixel* B);
-
-
-
 // Ind
 
 
@@ -4838,6 +4813,9 @@ bool SC_OpMode_SyntaxIs(OpMode Self, OpMode X);
 // PID_Int
 
 
+// ParserLineAndIndent
+
+
 // ProcessMode
 bool JB_ProcessMode_SyntaxIs(ProcessMode Self, ProcessMode M);
 
@@ -4889,6 +4867,8 @@ Message* JB_Syx_Msg(Syntax Self, JB_String* Name);
 Message* JB_Syx_IntMsg(Syntax Self, int64 Name);
 
 JB_String* JB_Syx_Name(Syntax Self);
+
+bool JB_Syx_NoChildren(Syntax Self);
 
 SyntaxObj* JB_Syx_Obj(Syntax Self);
 
@@ -5594,9 +5574,6 @@ ObjectSaver JB_Saver__New();
 // JB_Object_Behaviour
 
 
-// JB_ParserLineAndIndent
-
-
 // JB_Pico
 JB_String* JB_Pico_Get(PicoComms* Self, float T);
 
@@ -5677,10 +5654,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 
 
 // JB_junk_abccc
-int SC_junk_abccc__Init_();
-
-int SC_junk_abccc__InitCode_();
-
 
 
 // JB_ћ
@@ -9373,6 +9346,8 @@ Message* SC_Func_CountCallsToParentAlloc(SCFunction* Self, Message* Root);
 
 int SC_Func_CreateTypeCast(SCFunction* Self, SCDecl* MyType, Message* Exp, int Loss);
 
+void SC_Func_DebugPrintOnce(SCFunction* Self);
+
 void SC_Func_DeclsProtoCleanup(SCFunction* Self, SCClass* fpType, Message* Ch0, bool AssumeSelf, bool Late, Message* Route);
 
 SCDecl* SC_Func_DeclsProtoTypeAdd(SCFunction* Self, SCClass* fpType);
@@ -9829,8 +9804,6 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, NilState New);
 
 inline void SC_nil__DeclKill();
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
-
 inline NilRecord SC_nil__Value();
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
@@ -9850,6 +9823,8 @@ inline bool SC_Reg_SyntaxCast(AsmReg Self);
 inline int SC_Reg_ToInt(AsmReg Self);
 
 inline NilRecord SC_nil__EndBlock();
+
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
@@ -10185,16 +10160,6 @@ inline void SC_nil__DeclKill() {
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 }
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
-	ASMtmp T = SC_Msg_ASMType(Msg);
-	if (T) {
-		return (SC__nil_NilTable[T])(Msg, Test);
-	}
-	T = ((ASMtmp)Msg->Func);
-	(SC_Msg_ASMTypeSet(Msg, T));
-	return (SC__nil_NilTable[T])(Msg, Test);
-}
-
 inline NilRecord SC_nil__Value() {
 	return SC_nil_Value((&SC__nil_T));
 }
@@ -10219,10 +10184,18 @@ inline FatASM* SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 	FatASM* Rz = nil;
 	ASMtmp T = SC_Msg_ASMType(Exp);
 	fn_asm Fn = SC_fn_asm_table[T];
+	if (!T) {
+		Fn = SC_fn_asm_table[((int)Exp->Func)];
+		debugger;
+	}
 	byte OV = Self->VTmps;
 	Rz = (Fn)(Self, Exp, Dest, 0);
 	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen)) {
 		Self->VTmps = (OV);
+	}
+	int Dd = SC_Reg_Reg(Dest);
+	if (((bool)Dd) and (SC_Reg_Reg(Rz->Info) != Dd)) {
+		//FFFFFFASSDJKLASDM<>AS;
 	}
 	return Rz;
 }
@@ -10230,6 +10203,7 @@ inline FatASM* SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 inline uint64* SC_Pac_GetConst(ASMState* Self, int A) {
 	FatASM* R = Self->Registers[A];
 	if ((R == (&Self->Zero)) or (!SC_Reg_SyntaxIs(R->Info, kSC__Reg_ConstAny))) {
+		debugger;
 	}
 	return (&R->Const);
 }
@@ -10247,6 +10221,16 @@ inline NilRecord SC_nil__EndBlock() {
 	Rz = SC_nil__Value();
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 	return Rz;
+}
+
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
+	ASMtmp T = SC_Msg_ASMType(Msg);
+	if (T) {
+		return (SC__nil_NilTable[T])(Msg, Test);
+	}
+	T = ((ASMtmp)Msg->Func);
+	(SC_Msg_ASMTypeSet(Msg, T));
+	return (SC__nil_NilTable[T])(Msg, Test);
 }
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {

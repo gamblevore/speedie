@@ -113,9 +113,10 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 		.addvalue(func)
 
 	require .Expect(@decl)
+	
 	|| dcl = .CollectDecl(func, recv, declmode.FuncParam, cls, func) #require
 	if dcl.default isthing "nil"
-		dcl.nildeclared = nilstate.optional
+		dcl.NilDeclared = nilstate.optional
 	func.args <~ dcl
 	(dcl isnt NumberConst)
 	if dcl.name
@@ -123,18 +124,12 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 		(dcl isnt Altered)
 	  else
 		(dcl is return)
+
+	check (!dcl.isbarestruct) (self, "Structs can't be passed without a pointer")
 	
 	return true
 
 
-/*
-function scclass.RejectProperty (|scdecl| dcl)
-	if .isobject and dcl.isdatatypeonly
-		|| t = dcl.typeinfo
-		|| bc = t.bitcount
-		if !t.issigned and (bc == 16 or 32 or 64)
-			error (dcl.source, "Unsigned values are discouraged.") // nevermind... its used all over. including in faststring...
-*/
 
 function scclass.CollectProp (|Message| msg, |bool|)
 	opt norefcounts
