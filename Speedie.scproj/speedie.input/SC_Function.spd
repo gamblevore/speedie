@@ -404,6 +404,9 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 	
 	|| Pos = 0
 	|| Result = kSimpleMatch
+	
+	// we are returning a speedtester... so we want to now make it a param. 
+	
 	|| SelfCast = Incoming.ignoreSelfContain
 	TypeCast |= kNoBoolTypeCast ||| kTypeCastWantSuperDistance
 	if self is numbercreator
@@ -411,13 +414,14 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 	
 	|| fin = .args.length
 	|| fi = ((self is constructor)  and  !Incoming.AllowSelfToConstructor)|int|
+	//if .returntype is returnedstruct
+	//	.debugprintonce
+	// debugat 4247
 	
-	//debugat 4224
 	while fi < fin
 		|| FuncArg = .Args[fi]!
 		//if funcarg is returnedstruct
-		//	fi++
-		//	continue
+		//	.debugprintonce
 		|| PArg_Ch = Incoming[Pos]
 		|| PArg_Type = TypeOfExpr( PArg_Ch, name_Space )
 		if Base

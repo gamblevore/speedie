@@ -875,9 +875,9 @@ extern "C" int PicoStartFork (PicoComms* M, bool WillExec=false) _pico_code_ (
 
 
 /// **Communications** ///
-extern "C" bool PicoSend (PicoComms* M, PicoMessage Msg, int Policy=PicoSendGiveUp) _pico_code_ (
+extern "C" bool PicoSend (PicoComms* M, const char* Msg, int Length, int Policy=PicoSendGiveUp) _pico_code_ (
 /// Sends the message. The data is copied to internal buffers so you do not need to hold onto it after send. If `CanWait` is false and there is no buffer space, this function returns `false`. If `CanWait` is true, it will block until the timeout is reached. See the ["configuration"](#Configuration) section about how to change the timeout.
-	return M->QueueSend(Msg.Data, Msg.Length, Policy);
+	return M->QueueSend(Msg, Length, Policy);
 )
 
 extern "C" bool PicoSendStr (PicoComms* M, const char* Msg, bool Policy=PicoSendGiveUp) _pico_code_ (

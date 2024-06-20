@@ -123,12 +123,13 @@ function Message.CanGetAddress (|SCNode| name_space, |bool|)
 		return (T.isnumeric <= 1) #expect (curr, "Can't get address of vector element (c++ limitation).")
 
 	|| T2 = TypeOfExpr(curr, name_space)				#require // might transform it
-	expect (curr == @thg or @dot) (curr, "Can't get address of this.")
+	expect (curr == @thg or @dot)		(curr, "Can't get address of this.")
 	expect (T2 isnt NumberConst)        (curr, "Can't get the address of a const.")
 	
-	if (curr == @thg) and (t2 is local) and !(t2.IsBareStruct or t2.IsCArray)
+	if (curr == @thg) and t2.isregister
 		|| f = .ParentForAddress
-		expect (f == @prm or @dot) (curr, "Can't store the address of register based variables.")
+		t2.isregister
+		expect (f == @prm or @dot)		(curr, "Can't store the address of register based variables.")
 			
 	return true
 
@@ -215,6 +216,7 @@ function TypeOfBRel (ExprResolver)
 	if n == '&'
 		if Subtype.type.funcproto
 			return TypeOfFuncPointer(F, name_space, side)
+		F.CanGetAddress(name_Space)
 		require F.CanGetAddress(name_Space)
 		return Subtype.GetAddress
 		

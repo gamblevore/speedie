@@ -158,11 +158,11 @@ class SCParamArray
 
 
 	function MacroSize (|int|)
-		return .size-.isassigns
+		return .size - .isassigns
 
 
 	function Side (assigns:|Message|)
-		if (Value)
+		if Value
 			.addsub(Value)
 			.IsAssigns = true
 	

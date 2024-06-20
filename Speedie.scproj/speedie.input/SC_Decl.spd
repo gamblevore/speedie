@@ -162,6 +162,18 @@ class SCDecl (SCNamed) {
 		return (.pointercount == 1 and .type == typevoid_)
 
 
+	function IsRegister (|bool|)
+		return (self is local) and !(.IsBareStruct or .IsCArray)
+
+
+	function CopyDeclsButter (|int| mode, |SCDecl|)
+		if (mode & declmode.funcparam) and .isbarestruct
+			return .getaddress
+		if .refcount == 1
+			return self // nice
+		return .copydecl
+	
+	
 	function CopyDecl (|bool| ForNewVariable = false, |SCDecl|)
 		opt norefcounts
 		|| dcl = SCDecl(.type)

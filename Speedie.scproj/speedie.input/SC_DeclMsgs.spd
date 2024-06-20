@@ -132,7 +132,6 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 		(dcl isnt Altered)
 	  else
 		(dcl is return)
-	
 	return true
 
 
@@ -269,9 +268,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |int| Mode, |scclass| c
 	if sdcl.NeedsContainedfix
 		sdcl = sdcl.Containedfix
 	
-	// TODO: if sdcl's refcount is 1... just keep it? its obviously just been created.
-	// like: |dictionary of string| x
-	|| dcl = Sdcl.copydecl
+	|| dcl = Sdcl.CopyDeclsButter(mode * !!nameitm?)
 	if !NameItm
 		check (.islast) ( self, "Parameter is missing a name." )
 		if funcprmz

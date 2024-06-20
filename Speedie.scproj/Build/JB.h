@@ -5580,6 +5580,8 @@ ObjectSaver JB_Saver__New();
 // JB_Pico
 JB_String* JB_Pico_Get(PicoComms* Self, float T);
 
+bool JB_Pico_SendMsg(PicoComms* Self, PicoMessage* A, bool Wait);
+
 bool JB_Pico_SendFS(PicoComms* Self, FastString* Fs, bool Wait);
 
 int JB_Pico__Init_();
@@ -7050,7 +7052,7 @@ bool JB_Str_WriteSet(JB_String* Self, JB_String* Value);
 
 bool JB_Str_Yes(JB_String* Self, Message* Where);
 
-JB_String* JB_Str__FromPico(PicoMessage M);
+JB_String* JB_Str__FromPico(PicoMessage* M);
 
 bool JB_Str__Sorter(JB_Object* A, JB_Object* B);
 
@@ -8417,6 +8419,8 @@ bool SC_Decl_ContainsMatch(SCDecl* Self, SCDecl* O, int TypeCast);
 
 SCDecl* SC_Decl_CopyDecl(SCDecl* Self, bool ForNewVariable);
 
+SCDecl* SC_Decl_CopyDeclsButter(SCDecl* Self, int Mode);
+
 void SC_Decl_CopyTypeInfoTo(SCDecl* Self, SCDecl* Dcl);
 
 bool SC_Decl_CouldUpgradeToReal(SCDecl* Self);
@@ -8520,6 +8524,8 @@ bool SC_Decl_IsObject(SCDecl* Self);
 bool SC_Decl_IsReffable(SCDecl* Self, bool SetOnly);
 
 bool SC_Decl_IsReg(SCDecl* Self);
+
+bool SC_Decl_IsRegister(SCDecl* Self);
 
 JB_String* SC_Decl_IsSaveable(SCDecl* Self);
 

@@ -1951,7 +1951,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1138], (112648726587446));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1138], (112649057934568));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3273,7 +3273,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1901]);
-	JB_FS_AppendInt32(_fsf0, (2024062012));
+	JB_FS_AppendInt32(_fsf0, (2024062013));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8369,7 +8369,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[826]);
-	JB_FS_AppendInt32(_fsf0, (2024062012));
+	JB_FS_AppendInt32(_fsf0, (2024062013));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -12115,6 +12115,7 @@ SCObject* SC_TypeOfBRel(Message* Exp, SCNode* Name_space, Message* Side) {
 		if (SubType->Type->FuncProto) {
 			return SC_TypeOfFuncPointer(F, Name_space, Side);
 		}
+		SC_Msg_CanGetAddress(F, Name_space);
 		if (!SC_Msg_CanGetAddress(F, Name_space)) {
 			return nil;
 		}
@@ -20148,14 +20149,18 @@ ObjectSaver JB_Saver__New() {
 
 
 JB_String* JB_Pico_Get(PicoComms* Self, float T) {
-	PicoMessage _tmPf0 = PicoGet(Self, T);
-	return JB_Str__FromPico(_tmPf0);
+	PicoMessage Msg = PicoGet(Self, T);
+	return JB_Str__FromPico((&Msg));
+}
+
+bool JB_Pico_SendMsg(PicoComms* Self, PicoMessage* A, bool Wait) {
+	return PicoSend(Self, A->Data, A->Length, Wait);
 }
 
 bool JB_Pico_SendFS(PicoComms* Self, FastString* Fs, bool Wait) {
 	bool Rz = false;
-	PicoMessage _tmPf0 = JB_Pico__FromFS(Fs);
-	Rz = PicoSend(Self, _tmPf0, Wait);
+	PicoMessage Msg = JB_Pico__FromFS(Fs);
+	Rz = JB_Pico_SendMsg(Self, (&Msg), Wait);
 	(JB_FS_LengthSet(Fs, 0));
 	return Rz;
 }
@@ -28309,10 +28314,10 @@ bool JB_Str_Yes(JB_String* Self, Message* Where) {
 	return false;
 }
 
-JB_String* JB_Str__FromPico(PicoMessage M) {
-	byte* X = ((byte*)M.Data);
+JB_String* JB_Str__FromPico(PicoMessage* M) {
+	byte* X = ((byte*)M->Data);
 	if (X) {
-		return JB_Str__Freeable(X, M.Length);
+		return JB_Str__Freeable(X, M->Length);
 	}
 	return JB_LUB[0];
 }
@@ -31251,8 +31256,9 @@ bool SC_Msg_CanGetAddress(Message* Self, SCNode* Name_space) {
 		JB_Msg_SyntaxExpect(Curr, JB_LUB[604]);
 		return nil;
 	}
-	if (((JB_Msg_EqualsSyx(Curr, kJB_SyxThg, false))) and ((SC_Decl_SyntaxIs(T2, kSC__SCDeclInfo_Local)) and (!(SC_Decl_IsBareStruct(T2) or SC_Decl_IsCArray(T2))))) {
+	if (((JB_Msg_EqualsSyx(Curr, kJB_SyxThg, false))) and SC_Decl_IsRegister(T2)) {
 		Syntax F = SC_Msg_ParentForAddress(Self);
+		SC_Decl_IsRegister(T2);
 		if (!((F == kJB_SyxPrm) or (F == kJB_SyxDot))) {
 			JB_Msg_SyntaxExpect(Curr, JB_LUB[617]);
 			return nil;
@@ -31687,7 +31693,7 @@ SCDecl* SC_Msg_CollectDecl(Message* Self, SCNode* P, SCNode* Recv, int Mode, SCC
 	if (SC_Decl_NeedsContainedfix(Sdcl)) {
 		JB_SetRef(Sdcl, SC_Decl_Containedfix(Sdcl));
 	}
-	SCDecl* Dcl = JB_Incr(SC_Decl_CopyDecl(Sdcl, false));
+	SCDecl* Dcl = JB_Incr(SC_Decl_CopyDeclsButter(Sdcl, Mode * (!(!(NameItm)))));
 	if (!NameItm) {
 		if (!JB_Tree_IsLast(Self)) {
 			JB_Msg_SyntaxExpect(Self, JB_LUB[1046]);
@@ -37722,6 +37728,16 @@ SCDecl* SC_Decl_CopyDecl(SCDecl* Self, bool ForNewVariable) {
 	return Dcl;
 }
 
+SCDecl* SC_Decl_CopyDeclsButter(SCDecl* Self, int Mode) {
+	if ((((bool)(Mode & kSC__DeclMode_FuncParam))) and SC_Decl_IsBareStruct(Self)) {
+		return SC_Decl_GetAddress(Self, kSC__DeclMode_Always);
+	}
+	if (JB_RefCount(Self) == 1) {
+		return Self;
+	}
+	return SC_Decl_CopyDecl(Self, false);
+}
+
 void SC_Decl_CopyTypeInfoTo(SCDecl* Self, SCDecl* Dcl) {
 	JB_SetRef(Dcl->Type, Self->Type);
 	Dcl->PointerCount = Self->PointerCount;
@@ -38281,6 +38297,10 @@ bool SC_Decl_IsReg(SCDecl* Self) {
 		return true;
 	}
 	return (!SC_Class_IsStruct(Self->Type));
+}
+
+bool SC_Decl_IsRegister(SCDecl* Self) {
+	return (SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Local)) and (!(SC_Decl_IsBareStruct(Self) or SC_Decl_IsCArray(Self)));
 }
 
 JB_String* SC_Decl_IsSaveable(SCDecl* Self) {
@@ -51043,4 +51063,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 2548278243269645404 -197672339274720490
+// 6564256586710934087 -197672339274720490

@@ -164,15 +164,27 @@ So just spiral?
 
 ...
 
-	rz = .send(picomessage.Make)
+	rz = .send(PicoMessage.Make)
 		-->
-	|| tmp = picomessage.Make()
+	|| tmp = PicoMessage.Make()
 	rz = .send(tmp)
 		-->
+// how to do this part?
+// OK... lets keep the speedie part the same. so a return is a return
+// now... what about the c-generation?
+	
 	|pico| tmp
-	picomessage.Make(&tmp)
+	PicoMessage.Make(&tmp)
 	rz = .send(&tmp)
 
+// We could do this on a c-gen level?
+	|| tmp = PicoMessage.Make()
+		-->
+	|pico| tmp
+	PicoMessage.Make(&tmp)
+
+// I honestly think its better to be consistant... than fiddle the c++ gen
+// so... lets make the param as a pointer?
 
 
 

@@ -51,16 +51,22 @@ struct Pico
 	
 	syntax append (|string| str, |bool| Wait=false, |bool|)
 		cpp_part SendString
-		return .send(picomessage.From(Str), wait)
+		|| Msg = picomessage.From(Str)
+		return .send(msg, wait)
 
 	syntax append (|faststring| fs, |bool| Wait=false, |bool|)
 		cpp_part SendFS
-		rz = .send(picomessage.Fromfs(fs), wait)
+		|| msg = picomessage.Fromfs(fs)
+		rz = .send(msg, wait)
 		fs.length = 0
 		
-	function Send (|PicoMessage| msg, |bool| Wait=false, |bool|)
+	function Send (|?&char| msg, |int| Length, |bool| Wait=false, |bool|)
 		cpp_wrapper PicoSend
-	
+
+	function Send (|&picomessage| A, |bool| Wait=false, |bool|)
+		cpp_Part SendMsg
+		return .send(A.data, a.length, wait)
+		
 	function Tickle
 		|| msg = PicoMessage.from("")
 		.send(msg)
@@ -75,7 +81,8 @@ struct Pico
 
 	function Get (|float| T, |string|)
 		nil checker
-		return string.FromPico(.__get(T))
+		|| msg = .__get(T)
+		return string.FromPico(msg)
 		
 	function Close (|cstring| Why)
 		cpp_wrapper PicoClose
