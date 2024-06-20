@@ -89,6 +89,8 @@ typedef u16 MsgParseFlags;
 
 typedef int PID_Int;
 
+typedef ivec4 ParserLineAndIndent;
+
 typedef byte ProcessMode;
 
 typedef int SizeInt;
@@ -124,8 +126,6 @@ struct ObjectLoader;
 struct ObjectSaver;
 
 struct Object_Behaviour;
-
-struct ParserLineAndIndent;
 
 struct Random;
 
@@ -393,14 +393,6 @@ struct ObjectSaver {
 	FastString* Dest;
 	JB_Object* CantSaveThis;
 	JB_Object* Root;
-};
-
-struct ParserLineAndIndent {
-	int Lines;
-	int Indent;
-	int Commas;
-	int Pos;
-	bool IsDebug;
 };
 
 struct Random {
@@ -1584,6 +1576,9 @@ int JB_Rg_Width(IntRange Self);
 // PID_Int
 
 
+// ParserLineAndIndent
+
+
 // ProcessMode
 
 
@@ -1819,9 +1814,6 @@ int JB_Saver__InitCode_();
 
 
 // JB_Object_Behaviour
-
-
-// JB_ParserLineAndIndent
 
 
 // JB_Pico

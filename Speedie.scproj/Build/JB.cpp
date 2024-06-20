@@ -1951,7 +1951,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1138], (112648690166836));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1138], (112648726587446));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -26484,11 +26484,11 @@ void SC_Opp__OppositeComp(JB_String* A, JB_String* B) {
 
 
 void SC_PA_AddParam(SCParamArray* Self, Message* Item) {
-	SC_PA_addsub(Self, Item);
+	SC_PA_AddSub(Self, Item);
 	Self->HasProperParams = true;
 }
 
-void SC_PA_addsub(SCParamArray* Self, Message* M) {
+void SC_PA_AddSub(SCParamArray* Self, Message* M) {
 	if (Self->Size >= 11) {
 		JB_Msg_SyntaxExpect(M, JB_LUB[1242]);
 		return;
@@ -26570,7 +26570,7 @@ SCNode* SC_PA_DetectDotSuper(SCParamArray* Self, SCNode* Curr, SCNode* Arg_space
 				if (Ty) {
 					Self->Cls = Ty->Type;
 				}
-				SC_PA_addsub(Self, Exp0);
+				SC_PA_AddSub(Self, Exp0);
 				if (SC_Msg_OperatorIsThing(Exp0, JB_LUB[1922])) {
 					Self->IsSuper = true;
 					JB_SetRef(Exp0->Name, JB_LUB[1881]);
@@ -26634,19 +26634,23 @@ bool SC_PA_PreReadTypes(SCParamArray* Self, SCNode* Name_Space, Message* P, Mess
 	if (((bool)P) and (!Self->Exp)) {
 		Self->Exp = P;
 	}
-	Message* Item = ((Message*)JB_Ring_First(P));
+	Message* Item = JB_Incr(((Message*)JB_Ring_First(P)));
 	while (Item) {
-		Message* Nxt = ((Message*)JB_Ring_NextSib(Item));
+		Message* Nxt = JB_Incr(((Message*)JB_Ring_NextSib(Item)));
 		if (!SC_PA_AddTestedParam(Self, Item, Name_Space)) {
+			JB_Decr(Nxt);
+			JB_Decr(Item);
 			return nil;
 		}
 		if (JB_Msg_InMsg(Item, P)) {
-			Item = ((Message*)JB_Ring_NextSib(Item));
+			JB_SetRef(Item, ((Message*)JB_Ring_NextSib(Item)));
 		}
 		 else {
-			Item = Nxt;
+			JB_SetRef(Item, Nxt);
 		}
+		JB_Decr(Nxt);
 	};
+	JB_Decr(Item);
 	(SC_PA_SideSet(Self, Side));
 	return true;
 }
@@ -26690,19 +26694,21 @@ JB_String* SC_PA_RenderKind(SCParamArray* Self) {
 
 void SC_PA_SideSet(SCParamArray* Self, Message* Value) {
 	if (Value) {
-		SC_PA_addsub(Self, Value);
+		SC_PA_AddSub(Self, Value);
 		Self->IsAssigns = true;
 	}
 }
 
 void SC_PA_StructFix(SCParamArray* Self, SCDecl* Type) {
-	Message* S = Self->Exp;
+	Message* S = JB_Incr(Self->Exp);
 	if (S) {
-		Message* Where = SC_Msg_ParentPoint(S);
+		Message* Where = JB_Incr(SC_Msg_ParentPoint(S));
 		if (!JB_Msg_EqualsSyx(Where, kJB_SyxDecl, false)) {
 			JB_FreeIfDead(SC_Func__TypedTempMoveOut(S, JB_LUB[0], Type));
 		}
+		JB_Decr(Where);
 	}
+	JB_Decr(S);
 }
 
 Message* SC_PA_SyntaxAccess(SCParamArray* Self, int I) {
@@ -51037,4 +51043,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 8023645882046450199 -197672339274720490
+// 2548278243269645404 -197672339274720490

@@ -6717,7 +6717,7 @@ void SC_Opp__OppositeComp(JB_String* A, JB_String* B);
 // JB_SCParamArray
 void SC_PA_AddParam(SCParamArray* Self, Message* Item);
 
-void SC_PA_addsub(SCParamArray* Self, Message* M);
+void SC_PA_AddSub(SCParamArray* Self, Message* M);
 
 bool SC_PA_AddTestedParam(SCParamArray* Self, Message* Item, SCNode* Name_space);
 

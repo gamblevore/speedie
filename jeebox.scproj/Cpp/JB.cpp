@@ -1641,7 +1641,7 @@ Message* JB_Tk__fMsgList(int Start, Message* Parent) {
 	}
 	JB_Decr(It);
 	int Ops = kJB__Tk_kOppSyx | (kJB__Tk_kOppTemporal | kJB__Tk_kOppYoda);
-	while (JB_Tk__NextLineAndIndent(Result).Lines) {
+	while (JB_Tk__NextLineAndIndent(Result)[0]) {
 		Message* Item = JB_Incr(JB_Tk__ProcessThing(Ops, false));
 		if (!Item) {
 			JB_Decr(Item);
@@ -2401,38 +2401,39 @@ ParserLineAndIndent JB_Tk__NextLineAndIndent(Message* Parent) {
 	int End = JB_Str_Length(D);
 	byte* Addr = D->Addr;
 	int State = 0;
+	int Commas = 0;
 	while (N < End) {
 		byte C = Addr[N++];
 		if (C == '\t') {
-			if (!Rz.Commas) {
-				Rz.Indent = (Rz.Indent + 4);
+			if (!Commas) {
+				Rz[2] = (Rz[2] + 4);
 			}
-			if ((((bool)(State & 1))) and ((bool)Rz.Lines)) {
+			if ((((bool)(State & 1))) and ((bool)Rz[0])) {
 				JB_FreeIfDead(JB_Tk__ErrorAdd(JB_LUB[203], N - 1));
 			}
 		}
 		 else if (C == ',') {
-			(++Rz.Commas);
+			(++Commas);
 			Message* L = ((Message*)JB_Ring_Last(Parent));
 			if (L) {
-				Rz.Indent = L->Indent;
+				Rz[2] = L->Indent;
 			}
 			 else {
-				Rz.Indent = 0;
+				Rz[2] = 0;
 			}
 			State = 0;
 		}
 		 else if (C == ' ') {
 			State = (State | 1);
-			if (!Rz.Commas) {
-				(++Rz.Indent);
+			if (!Commas) {
+				(++Rz[2]);
 			}
 		}
 		 else if (C == '/') {
 			byte C2 = JB_Str_ByteValue(D, N);
 			if ((C2 != '/') and (C2 != '*')) {
 				if (((bool)(State & 2))) {
-					Rz.IsDebug = true;
+					Rz[3] = 1;
 				}
 				(--N);
 				break;
@@ -2442,8 +2443,8 @@ ParserLineAndIndent JB_Tk__NextLineAndIndent(Message* Parent) {
 				N = JB_Tk__GotoEndOfLine(N + 1);
 				continue;
 			}
-			(++Rz.Lines);
-			Rz.Indent = 0;
+			(++Rz[0]);
+			Rz[2] = 0;
 			(JB_Tk__NextStartSet(N - 1));
 			Message* Line = JB_Tk__Process(kJB__Tk_kEndOfLine, kJB__Tk_kAllow, Parent);
 			N = JB_Tk__NextStart();
@@ -2456,21 +2457,21 @@ ParserLineAndIndent JB_Tk__NextLineAndIndent(Message* Parent) {
 				(--N);
 				break;
 			}
-			(++Rz.Lines);
-			Rz.IsDebug = false;
-			Rz.Indent = 0;
-			Rz.Commas = 0;
-			Rz.Pos = (N - 1);
+			(++Rz[0]);
+			Rz[3] = 0;
+			Rz[2] = 0;
+			Commas = 0;
+			Rz[1] = (N - 1);
 			State = 2;
 			if (Parent->Func == kJB_SyxList) {
 				(JB_Msg_SyntaxIsSet(Parent, kJB__MsgParseFlags_Style2, true));
 			}
 		}
 	};
-	Rz.Lines = (Rz.Lines + Rz.Commas);
+	Rz[0] = (Rz[0] + Commas);
 	(JB_Tk__NextStartSet(N));
-	if (((First > 0) and (!Rz.Lines)) or (Rz.Indent < 0)) {
-		Rz.Indent = -1;
+	if (((First > 0) and (!Rz[0])) or (Rz[2] < 0)) {
+		Rz[2] = -1;
 	}
 	return Rz;
 }
@@ -2579,20 +2580,20 @@ int JB_Tk__ParseLoop(Message* Output, int TmpoFlags) {
 	Message* Prev = nil;
 	while (Output) {
 		ParserLineAndIndent Info = JB_Tk__NextLineAndIndent(Output);
-		Rz = (Rz + Info.Lines);
-		if (JB_Tk__WillEnd() or (((bool)Prev) and (!Info.Lines))) {
+		Rz = (Rz + Info[0]);
+		if (JB_Tk__WillEnd() or (((bool)Prev) and (!Info[0]))) {
 			break;
 		}
-		Message* Ch = JB_Tk__ParseLoopItem(Output, TmpoFlags, Prev, Info.Indent);
+		Message* Ch = JB_Tk__ParseLoopItem(Output, TmpoFlags, Prev, Info[2]);
 		if (!Ch) {
 			break;
 		}
 		if (Ch != Output) {
 			Rz = (Rz + ((JB_Msg_EqualsSyx(Ch, kJB_SyxItem, false))));
-			if (Info.IsDebug) {
+			if (Info[3]) {
 				Ch->Flags = (Ch->Flags | kJB__MsgParseFlags_BreakPoint);
 			}
-			Output = JB_Tk__AddToOutput(Output, Ch, Prev, Info.Pos);
+			Output = JB_Tk__AddToOutput(Output, Ch, Prev, Info[1]);
 			Prev = Ch;
 		}
 	};
@@ -3167,6 +3168,7 @@ int JB_Rg_Width(IntRange Self) {
 
 
 
+
 bool JB_Syx_IsString(Syntax Self) {
 	return (Self >= kJB_SyxSStr) and (Self <= kJB_SyxStr);
 }
@@ -3575,7 +3577,6 @@ int JB_Saver__Init_() {
 int JB_Saver__InitCode_() {
 	return 0;
 }
-
 
 
 
@@ -8215,7 +8216,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024061715);
+	return (2024062010);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8227,4 +8228,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 3822196632365595137 -6720784475268466743
+// 7796578953066441599 6618333674457142714 -6720784475268466743
