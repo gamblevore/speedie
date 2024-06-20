@@ -58,7 +58,20 @@ datatype ImagePixel (uint)
 		cpp_part R2
 		self|&ImagePixelStruct|.r = value
 		
-
+		
+	function Alpha (|&imagepixel| self, assigns:|float| a)
+		cpp_part Alpha2
+		a = (a * 255.0) + 0.25
+		.a = a.clamp(255.0)|int|
+		
+	function Alpha (assigns:|float| a, |imagepixel|)
+		a = (a * 255.0) + 0.25
+		.a = a.clamp(255.0)|int|
+		return self
+		
+	function Alpha (|float|)
+		return .a|float| * 255th
+	
 	render
 		fs <~ "0c"
 		fs.appendhex(.r)
@@ -95,7 +108,7 @@ datatype ImagePixel (uint)
 			
 	syntax cast (|&imagepixel| self, |bool|)
 		cpp_part Exists
-		return self and self[].a
+		return self and .a
 
 	syntax cast (|vec4|)
 		cpp_part CastVec4
@@ -107,25 +120,13 @@ datatype ImagePixel (uint)
 
 	function Equals (|imagepixel|p, |bool|)
 		return .uint == p.uint
-		
-	function Alpha (|&imagepixel| self, assigns:|float| a)
-		cpp_part Alpha2
-		a = (a * 255.0) + 0.25
-		.a = a.clamp(255.0)|int|
-		
-	function Alpha (assigns:|float| a)
-		a = (a * 255.0) + 0.25
-		.a = a.clamp(255.0)|int|
-		
-	function Alpha (|float|)
-		return .a|float| * 255th
 	
 	function AddAlpha (|&imagepixel| self, |float| v)
-		v += self[].Alpha
+		v += .Alpha
 		.Alpha = v
 		
 	syntax append (|&imagepixel| self, |imagepixel| r)
-		self[0] = r
+		self[] = r
 
 	syntax append (|&imagepixel| self, |vec4| V)
 		cpp_part AppendVec
@@ -156,21 +157,21 @@ datatype ImagePixel (uint)
 		
 	function Add (|&imagepixel| self, |vec4| c)
 		cpp_part AddVec
-		self <~ (c + self[].Color)
+		self <~ (c + .Color)
 		
 	function Overlay (|&imagepixel| self, |vec4| T)
 		disabled "Call .Premul on this first for great speed boost!"
 
 		
 	function Overlay (|&imagepixel| self, |PreMultipliedColor| T)
-		|| R = self[].raw
+		|| R = .raw
 		|| D = ((R * t.a)>>16)+T
 		D.a = r.a
 		.raw = D
 		
 
 	function Underlay (|&imagepixel| self, |vec4| b) 
-		|| Old = self[].color
+		|| Old = .color
 		|| C = mix(b, Old, Old.a)
 		C.a = old.a
 		self <~ C 
