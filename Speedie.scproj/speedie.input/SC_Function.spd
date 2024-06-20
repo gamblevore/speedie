@@ -111,10 +111,15 @@ function DebugPrintOnce
  
 
 syntax equals (|string| name, |bool| Aware, |bool|)
+	opt norefcounts
 	require (self)	
-	if .ExportName.syntaxequals( name, true )
+	if .Name.syntaxequals( name, true )		// never needs !aware.
 		return true
-	return .Name.syntaxequals( name, true )		// never needs !aware.
+	|| x = .ExportName
+	if x.syntaxequals( name, true )
+		return true
+	if x.endswith(name, true) and x[x.length - (name.length+1)] == '_'
+		return true
 
 
 function IsReal (|bool|)

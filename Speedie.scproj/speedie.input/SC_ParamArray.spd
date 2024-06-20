@@ -104,13 +104,7 @@ class SCParamArray
 		|| item = p.first
 
 		while item
-			|| nxt = item.next
-			
-			require  .AddTestedParam(item, name_space)
-			if item in p // in case "..." adds a param
-				item = item.next
-			  else		 /// temped out! ouch!
-				item = nxt
+			item = .AddTestedParam(item, name_space)
 
 		.side = side
 		return true
@@ -150,11 +144,22 @@ class SCParamArray
 		.HasProperParams = true
 
 
-	function AddTestedParam (|message| item, |SCNode| name_space, |bool|)
+	function AddTestedParam (|message| item, |SCNode| name_space, |message|)
 		opt norefcounts
+		|| nxt = item.next
+		|| pr = item.parent
 		expect TypeOfExpr( item, name_space ) ( item, "Can’t find type." )
-		.AddParam(Item)
-		return true
+
+		if item in pr // in case "..." adds a param
+			.AddParam(Item)
+			return item.next
+
+		/// temped out! ouch!
+		if nxt
+			.AddParam(nxt.prev)
+		  else
+			.addparam(pr.last)
+		return nxt
 
 
 	function MacroSize (|int|)

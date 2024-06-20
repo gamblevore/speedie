@@ -93,8 +93,6 @@ function scfunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 			r = r.makereal
 			.ReturnType = r
 		if r.isbarestruct
-			//.args <~ r
-			//.ReturnType = typevoid
 			(r is returnedstruct)
 
 //	check (!dcl.isbarestruct) (self, "Structs can't be passed without a pointer")
