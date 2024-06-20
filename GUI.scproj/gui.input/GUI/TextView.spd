@@ -2114,19 +2114,6 @@ helper string.DeleteTwoBytes (|ivec2|r, |string|)
 	return fs
 
 
-
-//	To fix textview style errors... dump viewline info?
-//		"range, text, parsed-msgs + their ranges"
-//	Rise and become alive..... // RISE MY CHILD!
-//
-//extend int
-//	operator minus (|string| s, |int|) // seeems risky...
-//		return s.movecapped(self, -1)
-//
-//	operator plus (|string| s, |int|)
-//		return s.move(self, 1)
-//	
-
 extend Window
 	function TextView (|string| txt="", |bool| Editable=true, |textview|)
 		rz = TextView(self)
