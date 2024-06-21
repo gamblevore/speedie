@@ -5,7 +5,7 @@
 */
 
 		
-class FlowControl
+class FlowControl 
 	linkage:cpp_part Flow
 	|FastBuff|				Buff
 	|StringReader?|			ReadInput

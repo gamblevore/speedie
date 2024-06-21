@@ -123,7 +123,7 @@ function Message.CanGetAddress (|SCNode| name_space, |bool|)
 		return (T.isnumeric <= 1) #expect (curr, "Can't get address of vector element (c++ limitation).")
 
 	|| T2 = TypeOfExpr(curr, name_space)				#require // might transform it
-	expect (curr == @thg or @dot)		(curr, "Can't get address of this.")
+	expect (curr == @thg or @dot)		(curr, "Can't get the address of this.")
 	expect (T2 isnt NumberConst)        (curr, "Can't get the address of a const.")
 	
 	if (curr == @thg) and t2.isregister

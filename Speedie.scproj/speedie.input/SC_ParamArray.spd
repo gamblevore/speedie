@@ -12,7 +12,6 @@ class SCParamArray
 	|Message--?[11]|	Items
 	|Message--?|		Exp
 	|SCClass--?|		Cls
-	|int|				RunNum
 	|int16|				Size
 	|int16|				ErrCount
 	|bool|				IsAssigns
@@ -32,7 +31,6 @@ class SCParamArray
 		.IsDot = (exp == @dot)
 		.IsAddress = (exp and exp.niceparent Isbrel "&")
 		.ErrCount = stderr.errorcount
-		.runnum = ++RunCount
 
 
 	function AddSub (|| m)
@@ -172,14 +170,61 @@ class SCParamArray
 			.IsAssigns = true
 	
 	
-	function StructFix (|scdecl| type)
+	function StructExtract (|scdecl| type)
 		|| s = .exp
-			|| where = s.ParentPoint
-			if where != @decl
+			|| where = s.UseNonRefChangers(True)!
+			|| fn = where.func
+			if fn != @rel
 				scfunction.TempMoveOut(s, type)
 	
-	module
-		|int|	RunCount
+	
+	
+	function StructAsReturn (|scdecl| type)
+		|| s = .exp$
+		|| x = s.UseNonRefChangers(True)
+		|| f = x.func
+		if  f == @tmp  and  x.ASMType is kreturn
+		if f == @prm or (f == @tmp  and  x.ASMType is kreturn)
+			x = scfunction.TempMoveOut(s, type).second!
+			f = x.func
+			/*
+				.TestAccept(YY.new)
+					-->
+				|| tmp = YY.new
+				.TestAccept(tmp)
+					-->
+				|YY| tmp
+				YY.new(&tmp)
+				.TestAccept(tmp)
+			*/
+		if  f == @rel
+			|| name = x.first
+			|| op = name.next!
+			if  x in @decl				/*	|| x = YY.new   -->   |YY| x,  YY.new(&x)  */
+				|| Dcl = x.parent!
+				|| dcltype = dcl.first
+					dcltype.become(@thg, type.type.name)
+				dcl.next = s
+				dcl <~ name
+			|| prm = s.last!			/*  y = YY.new --> YY.new(&y)  */
+			prm.first = x
+			prm.func = @prm
+			op.become(@thg, name.name)
+			x.become(@brel, "&")
+			op.obj = type.internal
+			x.obj = type
+		
+		  else
+			error (s, "Not sure how to handle this.")
+	
+		// returns need further processing!
+		// we do returns via params, right? the thing is... we want to keep the returns
+		// as returns... so that we can do more logic with it. at least... it will make things simpler.
+		
+		// in this case... we could expect the C++ renderer to do it, but thats quite lame.
+		// i think we could just post-process it? makes sense, right?! Do it after transform...
+		// probably do this before the nil-checker?
+		
 		
 		
 	iterator

@@ -167,11 +167,17 @@ function scdecl.ForContained (|scdecl|) // notglobal, noglobal
 function scdecl.NotLocal (|scdecl|)
 	if (self isnt local) and !.name 
 		return self
-//	if .IsNormal and !.Contains
-//		return .type.TypeNormal.MakeExistance(.nildeclared)
 	rz = .copydecl
 	rz.name = ""
 	(rz isnt local)
+
+
+function scdecl.AsLocal (|scdecl|)
+	if (self is local) 
+		return self
+	rz = .copydecl
+	rz.name = ""
+	(rz is local)
 
 
 function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)

@@ -693,7 +693,10 @@ function scfunction.CallSuperMem (|SCFunction| fn)
 
 	if (self is Constructor)
 		PCon.obj = fn.ReturnType
-		root.First!.next = PCon
+		|| f = root.first
+			f.next = PCon
+		  else
+			root <~ pcon
 	  else 
 		PCon.obj = typevoid
 		root <~ PCon

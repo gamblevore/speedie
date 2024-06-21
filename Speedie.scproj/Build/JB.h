@@ -217,6 +217,8 @@ struct IntDownRange;
 
 struct IsaTester;
 
+struct Junk_ABC;
+
 struct LoopInfo;
 
 struct Mat4;
@@ -248,8 +250,6 @@ struct StringDigitIterator;
 struct StringLengthSplit;
 
 struct StructSaveTest;
-
-struct junk_abccc;
 
 struct xD1x9B;
 
@@ -685,6 +685,10 @@ struct IsaTester {
 	bool InUse;
 };
 
+struct Junk_ABC {
+	int cc;
+};
+
 struct LoopInfo {
 	NilRecord ContRecord;
 	NilRecord ExitRecord;
@@ -942,9 +946,8 @@ struct SCParamArray_Behaviour: Object_Behaviour {
 };
 
 JBClass ( SCParamArray , JB_Object , 
-	int RunNum;
-	SCClass* Cls;
 	Message* Exp;
+	SCClass* Cls;
 	s16 Size;
 	s16 ErrCount;
 	bool IsAssigns;
@@ -2230,6 +2233,7 @@ extern Array* SC__NilReason_values;
 #define kSC__SCDeclInfo_GameFlyingMem (2097152)
 #define kSC__SCDeclInfo_Global (131072)
 #define kSC__SCDeclInfo_Hidden (67108864)
+#define kSC__SCDeclInfo_IntendedAsReturn (1073741824)
 #define kSC__SCDeclInfo_Local (32768 + 16384)
 #define kSC__SCDeclInfo_NewlyCreated (64)
 #define kSC__SCDeclInfo_NumberConst (4 + 8)
@@ -2343,7 +2347,6 @@ extern SCOperator* SC__Opp_Bnot;
 extern int SC__Opp_CustomOperatorScore;
 extern Dictionary* SC__Opp_Dict;
 extern SCOperator* SC__Opp_Minus;
-extern int SC__PA_RunCount;
 extern int SC__xC2xB5Form_Count;
 extern Dictionary* SC__xC2xB5Form_Forms;
 #define kSC__xC2xB5Form_Jump (32)
@@ -5463,6 +5466,15 @@ void SC_IsaTester__SyntaxAppend(Message* O);
 
 
 
+// JB_Junk_ABC
+Junk_ABC SC_Junk_ABC__New2();
+
+void SC_Junk_ABC__TestNew();
+
+Junk_ABC SC_Junk_ABC__TestReturn();
+
+
+
 // JB_LoopInfo
 LoopInfo SC_LoopInfo_BeginLoop(LoopInfo* Self, bool HasExitCond);
 
@@ -5652,9 +5664,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 
 
 // JB_jb_vm
-
-
-// JB_junk_abccc
 
 
 // JB_ћ
@@ -6747,13 +6756,11 @@ JB_String* SC_PA_RenderKind(SCParamArray* Self);
 
 void SC_PA_SideSet(SCParamArray* Self, Message* Value);
 
-void SC_PA_StructFix(SCParamArray* Self, SCDecl* Type);
+void SC_PA_StructAsReturn(SCParamArray* Self, SCDecl* Type);
+
+void SC_PA_StructExtract(SCParamArray* Self, SCDecl* Type);
 
 Message* SC_PA_SyntaxAccess(SCParamArray* Self, int I);
-
-int SC_PA__Init_();
-
-int SC_PA__InitCode_();
 
 
 
@@ -7013,8 +7020,6 @@ bool JB_Str_EqualsInt(JB_String* Self, int Other, bool Aware);
 void JB_Str_SyntaxExpect(JB_String* Self);
 
 JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in);
-
-void SC_Str_trap(JB_String* Self, Message* Msg);
 
 JB_String* JB_Str_Shorten(JB_String* Self, int N);
 
@@ -8381,6 +8386,8 @@ int SC_Decl_AllocatedSize(SCDecl* Self);
 
 bool SC_Decl_AlreadyContains(SCDecl* Self);
 
+SCDecl* SC_Decl_AsLocal(SCDecl* Self);
+
 bool SC_Decl_AssignabilityCheck(SCDecl* Self, Message* Ln, Message* RN, SCDecl* Rc);
 
 JB_String* SC_Decl_AutoCompleteName(SCDecl* Self);
@@ -9307,7 +9314,7 @@ void SC_Func_AnalyseRefs(SCFunction* Self, Array* List);
 
 int SC_Func_ApparantArgCount(SCFunction* Self);
 
-SCFunction* SC_Func_ArgsMatch(SCFunction* Self, SCDecl* Base, SCNode* Name_space, SCParamArray* Incoming, int Options);
+SCFunction* SC_Func_ArgsMatch(SCFunction* Self, SCDecl* Base, SCNode* Name_space, SCParamArray* Incoming, int Failed);
 
 SCFunction* SC_Func_ArgsMatch1(SCFunction* Self, SCDecl* Base, SCNode* Name_space, SCParamArray* Incoming, int Cast);
 
@@ -9337,7 +9344,7 @@ void SC_Func_CheckConstructorAndDestructor(SCFunction* Self, Message* Root, bool
 
 void SC_Func_CheckNotBadName(SCFunction* Self);
 
-void SC_Func_CheckReturnValue(SCFunction* Self, Message* Msg);
+void SC_Func_CheckReturnValue(SCFunction* Self, Message* Msg, SCNode* Name_space);
 
 void SC_Func_Cleanupfunc(SCFunction* Self, Message* S);
 
@@ -9483,6 +9490,8 @@ JB_String* SC_Func_RenderParams(SCFunction* Self, bool ForErrors, FastString* Fs
 
 JB_String* SC_Func_RenderTitle(SCFunction* Self, bool ForErrors, FastString* Fs_in);
 
+bool SC_Func_ReturnsObject(SCFunction* Self);
+
 SCDecl* SC_Func_Self(SCFunction* Self);
 
 void SC_Func_SetBlindCasts(SCFunction* Self, SCNode* Name_space);
@@ -9536,6 +9545,8 @@ bool SC_Func__InBuiltFunc(Message* Self, JB_String* Name);
 int SC_Func__Init_();
 
 int SC_Func__InitCode_();
+
+bool SC_Func__InType(SCNodeType Ty);
 
 SCNode* SC_Func__NeuLibrary(Message* Node, SCNode* Name_space, Message* ErrPlace);
 

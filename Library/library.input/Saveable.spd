@@ -18,7 +18,6 @@ struct ObjectSaver
 		|SaverClassInfo|		SaveableList
 		constants
 			RefMark = 0x40000000
-
 		
 		function New (|ObjectSaver|)
 			ObjectSaver.init

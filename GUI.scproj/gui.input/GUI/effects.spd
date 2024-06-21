@@ -50,7 +50,8 @@ struct JeeboxEffects
 		col[2] = (1.0, 0.0, 1.0, 1.0)
 		col[3] = (0.0, 1.0, 0.0, 1.0)
 		
-		for (t in img.tile((img.size+1)/2)) (i)
+		|| src = img.tile((img.size+1)/2)
+		for (t in src) (i)
 			img.RectBasic(t, col[i])
 		
 	

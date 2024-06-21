@@ -149,68 +149,42 @@ struct ContainerStruct
 
 
 /*
-	OK how to do struct returns?
-	
-	|| x = structfn()
-		-->
-	|type| x
-	Structfn(&x)
-	
-this is sutch a total bîtch. no one can do this except me. SO HOW TO FUCKING DO IT.
-
-its breaking all over anytime I change anything. this can easily spiral out.
-
-So just spiral?
-
-...
-
-	rz = .send(PicoMessage.Make)
-		-->
-	|| tmp = PicoMessage.Make()
-	rz = .send(tmp)
-		-->
-// how to do this part?
-// OK... lets keep the speedie part the same. so a return is a return
-// now... what about the c-generation?
-	
-	|pico| tmp
-	PicoMessage.Make(&tmp)
-	rz = .send(&tmp)
-
 // We could do this on a c-gen level?
 	|| tmp = PicoMessage.Make()
 		-->
 	|pico| tmp
 	PicoMessage.Make(&tmp)
 
-// I honestly think its better to be consistant... than fiddle the c++ gen
-// so... lets make the param as a pointer?
+	* always call constructors, unless empty (check for default values)
 
-
-
-// This is tiring... but I can do it.
-	
-	* No passing structs
-		* turn into ptrs
-		* disable passing structs directly.
-	
-	* No returning structs
-		* turn into ptr params
-		* some extra kinda rules? (Which?)
-			x = func()
-			x = func() // call destructor on old x, or block the thing entirely
+	* struct returns
+		* turn into ptr params do on a C++ level...
 		* return func() // pass our pointer!
-	
-	* always call constructors
-		* unlesss its empty
-			* check for default values
 */
 
 
 
-struct junk_abccc
+struct Junk_ABC
 	|int| cc
+	constructor
+		cpp_part GHI
+		.cc = 1
 	module
-		function New (|junk_abccc|)
+		function New2 (|Junk_ABC|)
+			visible
 			rz.cc = 1
+		function TestNew
+			visible
+			|| s = .new2
+		function TestReturn (|Junk_ABC|)
+			visible
+			return .new2
+		function TestAccept (|&Junk_ABC| s)
+
+
+		function TestNewNew (|junk_abc|)
+			target debug2
+				|| x = junk_abc.new
+				.TestAccept(junk_abc.new)
+				return junk_abc.new
 

@@ -235,7 +235,7 @@ function CheckNotBadName
 
 
 function FuncDecls 
-	scfunction.currfunc = self
+	scfunction.CurrFunc = self
 	|| P = .Source.second				#require
 	if self is constructor
 		.AddConstructorReturn(p)
@@ -255,8 +255,9 @@ function FuncDecls
 
 	if space and !.cls
 		|| L = .parent
-		if  (L isa SCModule)  and  (L|SCModule|.IsProperModule)
-			L.AddModuleToFunc( space )
+		if L isa SCModule
+			if l.IsProperModule
+				L.AddModuleToFunc( space )
 
 	if .FuncInfo
 		|| r = .ReturnType
@@ -360,17 +361,22 @@ function message.AssignsFix (|scfunction| f)
 		rp.SpdFunc = @Bra
 
 
-function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming, |int| Options=0, |SCFunction|)
+function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming, |int| Failed=0, |SCFunction|)
 	opt norefcounts
-	rz = .argsmatch1(base, name_Space, incoming, Options)
-	rz := .argsmatch1(base, name_Space, incoming, kTypeCastAssigns ||| Options)
-	if rz
-		|| t = rz.returntype
-		if t is returnedstruct
-			incoming.StructFix(t)
+	rz = .argsmatch1(base, name_Space, incoming, Failed)
+	rz := .argsmatch1(base, name_Space, incoming, kTypeCastAssigns ||| Failed)
 
-	if options and !incoming.madeerror // backup
+	if Failed and !incoming.MadeError // backup
 		error ( incoming.exp, "Wrong params to " + .RenderTitle )
+	  elseif rz
+//		if "TestNewNew".trap
+		|| rt = rz.returntype
+		|| ft = rz.args.first
+		if ft and ft is intendedasreturn
+			incoming.StructAsReturn(ft.aslocal)
+		  elseif rt is returnedstruct
+			incoming.StructExtract(rt)
+
 
 
 function ArgsMatch1 (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming, |int| Cast, |SCFunction|)
@@ -396,6 +402,7 @@ function int.IsNormalMatch (|bool|)
 
 
 function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode| name_space,  |SCParamArray| Incoming,  |int|)
+	//if "SendFS".trap
 	if  .isassigns  and  .returntype
 		|| a = .args[0]
 		|| i = typeofexpr(incoming[0], name_space)
@@ -414,7 +421,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 	
 	|| SelfCast = Incoming.ignoreSelfContain
 	TypeCast |= kNoBoolTypeCast ||| kTypeCastWantSuperDistance
-	if self is numbercreator
+	if self is NumberCreator
 		typecast |= ktypecastfromzero
 	
 	|| fin = .args.length
@@ -473,7 +480,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 
 
 function message.IsSmallInt (|scdecl| T, |bool|)
-	if T and (.func == @num)// and T.isint
+	if T and (.func == @num)
 		if .name contains "."
 			return false
 		|| i = .int
@@ -558,8 +565,7 @@ function ArgsMatch2 (|SCDecl| base, |int| TypeCast, |SCNode| name_space, |SCPara
 			if (Result)
 				|| CanKeepBetter = result.TryKeepBetter(OldMatch, f, Match)
 				if (!CanKeepBetter)
-					debugger 
-					|| first = result.ArgsMatch3( TypeCast, base, false, name_space, Incoming )
+//					|| first = result.ArgsMatch3( TypeCast, base, false, name_space, Incoming )
 					return incoming.ArgsMatchError(TypeCast, f, result)
 				Result = CanKeepBetter
 			
@@ -668,6 +674,12 @@ dot "d"
 			thg "a"
 */
 
+
+function ReturnsObject (|bool|)
+	opt norefcounts
+	|| r = .returntype
+		return r.isobject
+
 function scdecl.CouldUpgradeToReal (|bool|)
 	return .typesuffers and !.nilstated
 
@@ -725,7 +737,7 @@ function DeclsProtoCleanup (|SCClass| fpType, |Message| ch0, |bool| AssumeSelf, 
 		|| nxt = ch0.next
 		|| first = nxt.first
 		if first.next isthing "self"
-			first!.replacewith(route)
+			first.replacewith(route)
 		
 	ch0.Remove
 	
@@ -754,6 +766,7 @@ function IsSimpleCast (|Message|)
 	Return found
 
 
+
 function EqualOrMoreSpecific (|SCFunction| f, |bool|)
 	opt norefcounts
 	require self and f
@@ -769,7 +782,8 @@ function EqualOrMoreSpecific (|SCFunction| f, |bool|)
 	Return true
 
 
-function CheckReturnValue (|Message| msg)
+
+function CheckReturnValue (|Message| msg, |scnode| name_space)
 	|| c = msg.first
 	
 	if (!c)
@@ -782,7 +796,7 @@ function CheckReturnValue (|Message| msg)
 		c.Remove
 		return
 	
-	|| FoundReturnType = TypeOfExpr( c, msg.MsgArg )
+	|| FoundReturnType = TypeOfExpr( c, name_space )
 	if (FoundReturnType == TypeVoid)
 		FoundReturnType = nil
 
@@ -798,6 +812,7 @@ function CheckReturnValue (|Message| msg)
 			r.ExpectMatch( FoundReturnType, kTypeCastTrue, c )
 	  else
 		check (!FoundReturnType) ( msg, "This function has no return value." )
+
 
 
 function Message.SelfUsedForProperty (|int|)
@@ -824,7 +839,7 @@ function CheckConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 				|| fn = prms.obj as scfunction
 				|| pf = prms.first
 					|| pfdecl = pf.obj as SCDecl
-					if fn is constructor  and  pfdecl is self // super.constructor...
+					if  fn is constructor  and  pfdecl is self // super.constructor...
 						GotSuperConstructor = true
 						check (dot in root) (dot, NoNesting)
 				
@@ -1576,7 +1591,7 @@ function Tran_Return (TranFunc)  // exitter
 	
 	if !node.islast
 		expect (fn isnt ConOrDes)   (node, "You can’t return in a constructor or destructor")
-	fn.CheckReturnValue( node )
+	fn.CheckReturnValue( node, name_space )
 	node.LastInBlock(SCBlockage.Return)
 	node.CheckNotInStateExpr(fn.SourceArg)
 

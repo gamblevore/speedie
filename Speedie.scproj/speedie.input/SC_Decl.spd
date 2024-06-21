@@ -74,6 +74,7 @@ datatype SCDeclInfo (int)
 		Biggest
 		PostIncremented
 		ReturnedStruct
+		IntendedAsReturn
 		Swappable	 = Param + Body + Global + Property
 		Local		 = Body + Param
 		SelfImplicit = Self + local // local is set by CollectOneParam, anyhow?

@@ -138,7 +138,7 @@ function Tran_Using (TranFunc)
 
 	|| item = @dot + "SyntaxUsingComplete"
 	item <~ (@thg, name)
-	item.msg(@Prm)<~withfirst.copy
+	item.msg(@Prm) <~ withfirst.copy
 
 	|| Decl = MakeDecl( "", name, UsingObj )
 

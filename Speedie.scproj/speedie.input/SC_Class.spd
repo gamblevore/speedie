@@ -405,30 +405,35 @@ function CreateEmptyConstructors (|scfunction|)
 		rz := f2
 
 
-function scfunction.AddConstructorReturn2
-	require self Isnt Wrapper and self is newnew
-	|| args = .source![@arg,2]
-	using .source!
-	|| type = message(@thg, .cls!.name)
-	if .cls.IsTask
-		args.first = macros.ConstructorNewTask.run(type)
-	  else
-		args.first = macros.ConstructorNew.run(type)
-	args.msg(@tmp, "return") <~ (@thg, "self")
-
-
-function scfunction.AddConstructorReturn (|message| prms)
-	opt norefcounts
+function SCFunction.AddConstructorReturn2
 	|| c = .cls
-		require c.isobject
-		is newnew
-		using prms
-		|| dcl = prms.msg(@decl)
-		dcl.msg(@arel, "!") <~ (@thg, .cls!.name)
+	require c  and  self Isnt Wrapper  and  self is newnew
+	|| args = .source![@arg, 2]
+	using .source!
+	if c.isobject
+		|| type = message(@thg, c.name)
+		if c.IsTask
+			args.first = macros.ConstructorNewTask.run(type)
+		  else
+			args.first = macros.ConstructorNew.run(type)
+		args.msg(@tmp, "return") <~ (@thg, "self")
+	  else
+		|| ret = .args.first
+			(ret is IntendedAsReturn)
+
+
+function SCFunction.AddConstructorReturn (|message| prms)
+	opt norefcounts
+	|| c = .cls$
+	is newnew, using prms
+	//if c.isobject
+	|| dcl = prms.msg(@decl)
+	dcl.msg(@arel, "!") <~ (@thg, c.name)
+		
 
 
 function CreateConstructors 
-	if .IsObject
+	if .IsObject or (.isstruct and self ~= "Junk_ABC")
 		|| Con = .FindAllocFunc( "Constructor" )
 		if .IsRole
 			|| s = .super! // roles always have supers
@@ -460,6 +465,7 @@ function scclass.FillRoleConstructor (|scfunction| con)
 		(f is constructor)
 		if .istask
 			.FillTaskConstructor(f)
+
 
 function FindSpecialFunc (|string| keyword, |bool| CheckParents, |SCFunction|)
 	return .FindFunc(keyword.lowercase, CheckParents, true)
@@ -711,6 +717,8 @@ function FirstDestructor (|SCFunction|)
 
 function scfunction.AddSelfToFunc (|scclass| cls, |SCNode| space)
 	opt norefcounts
+//	if self is constructor
+//		require cls.isobject
 	|| sl = cls.SelfDecl					// for my nil-checker
 	if sl.TypeSuffers						// refcounting will set MarkAsRefAltered
 		sl = sl.copydecl

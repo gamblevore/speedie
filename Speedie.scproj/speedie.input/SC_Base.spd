@@ -180,6 +180,13 @@ function TryAdd (|Message?| ErrPlace, |SCObject?| IncObj, |String| name)
 	.tryaddsub(errplace, incobj, name.Lowercase)
 
 	
+function @scfunction.InType (|scnodetype| ty, |bool|)
+	opt norefcounts
+	|| fn = scfunction.currfunc
+		|| cls = fn.cls
+			return cls.basetype.syntaxis(ty)
+			
+
 function TryAddSub (|Message| ErrPlace, |SCObject| IncObj, |String| name)
 	opt norefcounts
 	|| Old = .Upcheck( name, !(IncObj isa SCFunction) )
@@ -200,8 +207,8 @@ function TryAddSub (|Message| ErrPlace, |SCObject| IncObj, |String| name)
 				incobj.hiderfunc = old
 				.access![ name ] = IncObj
 				return
-
-	if name == "self"
+	
+	if (name == "self") and scfunction.intype(scnodetype.object)
 		error ( ErrPlace, "Can't use 'self' here." )
 	  else
 		error ( ErrPlace, kNameConf )
@@ -454,8 +461,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 		owning_cls = scfunction.currfunc!.cls
 		if owning_cls
 			AllowSelfToConstructor = ParamsArray.IsSelfCon
-			//if AllowSelfToConstructor
-		
+
 	for (b.ListLookup in Curr)
 		|| o = b[ origname ]
 		if (!o)
@@ -498,8 +504,12 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 
 				if Paramshere
 					ParamsHere.obj = o // multiple return :3
-					if !paramsarray.AllowSelfToConstructor and o is constructor
-						ParamsHere.ConstructorAddNil(paramsarray.isdot and !(self isa scmodule))
+					if !paramsarray.AllowSelfToConstructor and (o is constructor)
+						if o.ReturnsObject
+							ParamsHere.ConstructorAddNil(paramsarray.isdot and !(self isa scmodule))
+						  else
+							printline o
+							//debugger
 				Return o
 		
 		if o
