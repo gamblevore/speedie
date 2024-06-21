@@ -149,17 +149,10 @@ struct ContainerStruct
 
 
 /*
-// We could do this on a c-gen level?
-	|| tmp = PicoMessage.Make()
-		-->
-	|pico| tmp
-	PicoMessage.Make(&tmp)
-
+	* add empty constructors, unless empty (check for default values)
 	* always call constructors, unless empty (check for default values)
-
-	* struct returns
-		* turn into ptr params do on a C++ level...
-		* return func() // pass our pointer!
+	* struct returns... return func() // pass our pointer!
+	* TestNewNew shouldn't be returning a struct
 */
 
 
@@ -185,11 +178,10 @@ struct Junk_ABC
 
 		function TestNewNew (|junk_abc|)			
 			visible
-			target debug3
-				junk_abc.D = .new2
-			target debug2
-				|| x = junk_abc.new
-				.TestAccept(junk_abc.new)
-				return junk_abc.new
+
+			junk_abc.D = .new2
+			|| x = junk_abc.new
+			.TestAccept(junk_abc.new)
+			return junk_abc.new
 		
 
