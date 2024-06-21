@@ -170,6 +170,7 @@ struct Junk_ABC
 		cpp_part GHI
 		.cc = 1
 	module
+		|Junk_ABC| D
 		function New2 (|Junk_ABC|)
 			visible
 			rz.cc = 1
@@ -182,9 +183,13 @@ struct Junk_ABC
 		function TestAccept (|&Junk_ABC| s)
 
 
-		function TestNewNew (|junk_abc|)
+		function TestNewNew (|junk_abc|)			
+			visible
+			target debug3
+				junk_abc.D = .new2
 			target debug2
 				|| x = junk_abc.new
 				.TestAccept(junk_abc.new)
 				return junk_abc.new
+		
 

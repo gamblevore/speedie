@@ -2283,6 +2283,7 @@ extern byte SC__nil_OldPrint;
 extern ArchonPurger SC__nil_T;
 extern CompressionStats JB__MzSt_All;
 extern IsaTester SC__IsaTester_T;
+extern Junk_ABC SC__Junk_ABC_D;
 extern Dictionary* JB__LD_ClassList;
 #define kJB__Saver_RefMark (1073741824)
 extern SaverClassInfo* JB__Saver_SaveableList;
@@ -2347,6 +2348,7 @@ extern SCOperator* SC__Opp_Bnot;
 extern int SC__Opp_CustomOperatorScore;
 extern Dictionary* SC__Opp_Dict;
 extern SCOperator* SC__Opp_Minus;
+extern Array* SC__PA_FixMe;
 extern int SC__xC2xB5Form_Count;
 extern Dictionary* SC__xC2xB5Form_Forms;
 #define kSC__xC2xB5Form_Jump (32)
@@ -5467,9 +5469,19 @@ void SC_IsaTester__SyntaxAppend(Message* O);
 
 
 // JB_Junk_ABC
+void SC_Junk_ABC_ConstructorGHI(Junk_ABC* Self);
+
+int SC_Junk_ABC__Init_();
+
+int SC_Junk_ABC__InitCode_();
+
 Junk_ABC SC_Junk_ABC__New2();
 
+void SC_Junk_ABC__TestAccept(Junk_ABC* S);
+
 void SC_Junk_ABC__TestNew();
+
+Junk_ABC SC_Junk_ABC__TestNewNew();
 
 Junk_ABC SC_Junk_ABC__TestReturn();
 
@@ -6761,6 +6773,12 @@ void SC_PA_StructAsReturn(SCParamArray* Self, SCDecl* Type);
 void SC_PA_StructExtract(SCParamArray* Self, SCDecl* Type);
 
 Message* SC_PA_SyntaxAccess(SCParamArray* Self, int I);
+
+int SC_PA__Init_();
+
+int SC_PA__InitCode_();
+
+void SC_PA__PostStructFix();
 
 
 

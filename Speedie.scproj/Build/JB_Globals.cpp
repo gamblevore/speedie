@@ -313,6 +313,7 @@ byte SC__nil_OldPrint;
 ArchonPurger SC__nil_T;
 CompressionStats JB__MzSt_All;
 IsaTester SC__IsaTester_T;
+Junk_ABC SC__Junk_ABC_D;
 Dictionary* JB__LD_ClassList;
 SaverClassInfo* JB__Saver_SaveableList;
 PicoComms* JB__Pico_Parent_;
@@ -500,6 +501,7 @@ SCOperator_Behaviour InitTableSCOperator_() { // Behaviour
 SCOperator_Behaviour SCOperator_FuncTable_ = InitTableSCOperator_();
 JBClassPlace4(SCOperator, JB_AsClass(JB_Object), SCOperator_FuncTable_);
 
+Array* SC__PA_FixMe;
 SCParamArray_Behaviour InitTableSCParamArray_() { // Behaviour 
 	SCParamArray_Behaviour Result;
 	Result.__destructor__ = nil;

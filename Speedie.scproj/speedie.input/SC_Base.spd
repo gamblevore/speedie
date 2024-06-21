@@ -507,9 +507,6 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 					if !paramsarray.AllowSelfToConstructor and (o is constructor)
 						if o.ReturnsObject
 							ParamsHere.ConstructorAddNil(paramsarray.isdot and !(self isa scmodule))
-						  else
-							printline o
-							//debugger
 				Return o
 		
 		if o

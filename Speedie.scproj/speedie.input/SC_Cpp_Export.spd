@@ -768,7 +768,10 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	
 	
 	function WriteFuncSub (|SCFunction| F, |string| E, |FastStringCpp| T)
-		.WriteDecl( f.ReturnType, T )
+		if (f is constructor) and !f.ReturnsObject
+			t <~ "void"
+		  else
+			.WriteDecl( f.ReturnType, T )
 		T <~ ' '
 		T <~ E
 		.WriteFuncArgs( F, T )

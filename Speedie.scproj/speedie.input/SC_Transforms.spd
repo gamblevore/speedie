@@ -375,6 +375,8 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCNode!| p) // transform ()
 
 function Tran_ResultFinish (|SCFunction| f, |message| r_z, |SCNode| space)
 	opt norefcounts
+	if f is constructor
+		require f.returnsobject
 	|| Src = f.SourceArg!
 	|| d = r_z.MsgDecl
 	|| Used = (d and d is usedbycode)
@@ -392,14 +394,17 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |SCNode| space)
 		  else
 			ret <~ f.ReturnType!.CreateDefault(src)
 
-	parser.Using.Flags = 0
 
 
 function Tran_Result (|SCFunction| f, |message|)
 	opt norefcounts
+	if f is constructor
+		require f.returnsobject
+
 	|| Type = f.ReturnType
 	|| Src  = f.SourceArg
 	require type and src and !(Src.Last IsTmp "return")
+
 	|| errs = src.last ?? src
 	using (errs)
 	parser.Using.Position = -1

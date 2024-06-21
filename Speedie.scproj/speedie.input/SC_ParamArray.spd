@@ -178,41 +178,37 @@ class SCParamArray
 				scfunction.TempMoveOut(s, type)
 	
 	
-	
-	function StructAsReturn (|scdecl| type)
+	function StructAsReturn (|SCDecl| type)
 		|| s = .exp$
 		|| x = s.UseNonRefChangers(True)
 		|| f = x.func
-		if  f == @tmp  and  x.ASMType is kreturn
+
 		if f == @prm or (f == @tmp  and  x.ASMType is kreturn)
-			x = scfunction.TempMoveOut(s, type).second!
-			f = x.func
-			/*
-				.TestAccept(YY.new)
-					-->
-				|| tmp = YY.new
-				.TestAccept(tmp)
-					-->
-				|YY| tmp
-				YY.new(&tmp)
-				.TestAccept(tmp)
-			*/
+			x = scfunction.TempMoveOut(s, type.internal).second!
+			f = x.func			/*   .TestAccept(YY.new)   -->   || tmp = YY.new, .TestAccept(tmp)   */
 		if  f == @rel
-			|| name = x.first
+			|| name = x.first!
 			|| op = name.next!
-			if  x in @decl				/*	|| x = YY.new   -->   |YY| x,  YY.new(&x)  */
-				|| Dcl = x.parent!
-				|| dcltype = dcl.first
-					dcltype.become(@thg, type.type.name)
-				dcl.next = s
-				dcl <~ name
-			|| prm = s.last!			/*  y = YY.new --> YY.new(&y)  */
-			prm.first = x
-			prm.func = @prm
-			op.become(@thg, name.name)
-			x.become(@brel, "&")
-			op.obj = type.internal
-			x.obj = type
+			if op != "="
+				// just temp it out...? we'll have a rel?
+				error (op, "Please simplify this expression")
+			  else
+				if  x in @decl				/*	|| x = YY.new   -->   |YY| x,  YY.new(&x)  */
+					|| Dcl = x.parent!
+					|| dcltype = dcl.first
+						dcltype.become(@thg, type.type.name)
+					dcl.next = s
+					dcl <~ name
+				|| prm = s.last!			/*  y = YY.new --> YY.new(&y)  */
+				prm.first = x
+				prm.func = @prm
+				op.become(@thg, name.name)
+				x.become(@brel, "&")
+				x.obj = type
+				op.obj = name.obj
+				if !op.obj
+					op.obj = name
+					FixMe <~ op
 		
 		  else
 			error (s, "Not sure how to handle this.")
@@ -225,8 +221,17 @@ class SCParamArray
 		// i think we could just post-process it? makes sense, right?! Do it after transform...
 		// probably do this before the nil-checker?
 		
+	module
+		|[message]| FixMe
 		
-		
+		function PostStructFix
+			opt norefcounts
+			for s in .FixMe
+				|| orig = s.obj as message
+					s.obj = orig.obj
+			.FixMe.clear
+	
+	
 	iterator
 		|int| n = .size
 		|int| i = 0

@@ -220,6 +220,7 @@ function Message.CollectFromBody (|SCNode| scarg)
 	|| dcl = .CollectDecl(scarg, scarg, declmode.FunctionBody)
 		(dcl is body)
 		(dcl isnt NumberConst)
+		scparamarray.PostStructFix
 		|| def = dcl.Default
 			check (def != @thg  or  def.name ~!= dcl.name) (def, "Same name!")
 
@@ -307,6 +308,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |int| Mode, |scclass| c
 
 	if Recv // nil for prototypes
 		Recv.TryAdd( self, dcl, dcl.Name )
+	
 	return dcl
 
 

@@ -295,6 +295,7 @@ function Transform ()
 		Tran_All( self, n, space )
 		if r_z
 			Tran_ResultFinish( self, r_z, space )
+		parser.Using.Flags = 0
 
 	if !StillOK
 		.Badness |= 1
