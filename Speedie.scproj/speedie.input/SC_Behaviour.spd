@@ -135,7 +135,7 @@ class SCBehaviour (SCNode)
 		
 	function SCClass.IsBehaviourTable (|bool|)
 		require self
-		return .isbehaviour == scbehaviour.kBehaviourTable
+		return .Behaviourness == scbehaviour.kBehaviourTable
 	
 	
 	function SCFunction.IsBehaviour (|bool|)
@@ -145,7 +145,7 @@ class SCBehaviour (SCNode)
 	
 	function SCClass.IsInterface (|bool|)
 		if self
-			return .isbehaviour & scbehaviour.kBehaviourProto
+			return .Behaviourness & scbehaviour.kBehaviourProto
 
 
 	function String.InterfaceToBehaviour (|string|)
@@ -199,7 +199,7 @@ class SCBehaviour (SCNode)
 		
 		.project.use
 		|| F = SCClass.NewStruct(msg, compiler.program, ErrPlace)|SCModule|
-			F.cls!.IsBehaviour = kBehaviourTable
+			F.cls!.Behaviourness = kBehaviourTable
 			f.cls!.IsRole = .cls!.IsRole
 			compiler.program.TryAddBase( ErrPlace, F )			
 			.FuncTable = F
@@ -303,9 +303,10 @@ function $InterName (,$InterName)
 			|| Mod = SCFunction.NewPrototypeSub(node, cls, ErrPlace, s) #require
 			Mod.IsRequiredInterface = required
 			cls.AddBehaviourOrInterface( Mod, ErrPlace )
-			mod.cls!.IsBehaviour = kBehaviourProto
-			if required
-				mod.cls!.IsBehaviour = kBehaviourProtoRequired
+			|| mcls = mod.cls
+				mcls.Behaviourness = kBehaviourProto
+				if required
+					mcls.Behaviourness = kBehaviourProtoRequired
 			Return Mod
 		}
 	}

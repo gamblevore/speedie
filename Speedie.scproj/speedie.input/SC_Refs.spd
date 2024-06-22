@@ -87,6 +87,7 @@ function RefBasis (|Message| msg, |bool| SetOnly, |int|)
 
 function RefBasisStruct (|Message| msg, |bool| SetOnly, |int|)
 	opt norefcounts
+
 	|| type = msg.asdecl
 	ifn type isa SCDecl
 		type = TypeOfExpr( msg, nil )$
@@ -98,7 +99,7 @@ function RefBasisStruct (|Message| msg, |bool| SetOnly, |int|)
 			return 0
 		Return kBasisObj
 	
-	if type.HasStruct
+	if type.HasStruct and type isnt returnedstruct // doesnt that just disable struct destructors?
 		|| fn = type.type.destructorfunc
 			return kBasisDestructable
 		|| p = msg.niceparent

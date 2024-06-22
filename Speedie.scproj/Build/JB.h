@@ -1298,7 +1298,7 @@ JBClass ( SCClass , SCNode ,
 	u16 TaskObjectCount;
 	byte Depth;
 	byte MinOpt;
-	byte IsBehaviour;
+	byte Behaviourness;
 	byte IsWrapper;
 	byte IsRole;
 	SCNodeType BaseType;
@@ -5578,6 +5578,8 @@ void JB_Saver_AppendObject(ObjectSaver* Self, JB_Object* O);
 
 void JB_Saver_AppendString(ObjectSaver* Self, JB_String* S);
 
+void JB_Saver_Constructor(ObjectSaver* Self);
+
 void JB_Saver_Destructor(ObjectSaver* Self);
 
 void JB_Saver_Finish(ObjectSaver* Self, Saveable* First);
@@ -5589,8 +5591,6 @@ int JB_Saver__Init_();
 int JB_Saver__InitCode_();
 
 void JB_Saver__LoadOne(JB_Class* Cls, char* Data);
-
-ObjectSaver JB_Saver__New();
 
 
 
@@ -6740,8 +6740,6 @@ void SC_PA_AddSub(SCParamArray* Self, Message* M);
 
 Message* SC_PA_AddTestedParam(SCParamArray* Self, Message* Item, SCNode* Name_space);
 
-SCFunction* SC_PA_ArgsMatchError(SCParamArray* Self, int TypeCast, SCFunction* F, SCFunction* R);
-
 SCParamArray* SC_PA_Constructor(SCParamArray* Self, Message* Exp);
 
 Array* SC_PA_CopyArgs(SCParamArray* Self);
@@ -6759,6 +6757,8 @@ int SC_PA_MacroSize(SCParamArray* Self);
 bool SC_PA_MadeError(SCParamArray* Self);
 
 JB_String* SC_PA_ModuleName(SCParamArray* Self);
+
+SCFunction* SC_PA_MultipleMatchingFunctions(SCParamArray* Self, int TypeCast, SCFunction* F, SCFunction* R);
 
 bool SC_PA_PreReadTypes(SCParamArray* Self, SCNode* Name_Space, Message* P, Message* Side);
 
@@ -7038,6 +7038,8 @@ bool JB_Str_EqualsInt(JB_String* Self, int Other, bool Aware);
 void JB_Str_SyntaxExpect(JB_String* Self);
 
 JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in);
+
+bool SC_Str_trap(JB_String* Self, Message* Msg);
 
 JB_String* JB_Str_Shorten(JB_String* Self, int N);
 

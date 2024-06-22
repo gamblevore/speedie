@@ -149,10 +149,8 @@ struct ContainerStruct
 
 
 /*
-	* add empty constructors, unless empty (check for default values)
-	* always call constructors, unless empty (check for default values)
-	* struct returns... return func() // pass our pointer!
 	* TestNewNew shouldn't be returning a struct
+		* struct returns... return func() // pass our pointer!
 */
 
 
@@ -166,7 +164,7 @@ struct Junk_ABC
 		|Junk_ABC| D
 		function New2 (|Junk_ABC|)
 			visible
-			rz.cc = 1
+			rz.cc = 2
 		function TestNew
 			visible
 			|| s = .new2

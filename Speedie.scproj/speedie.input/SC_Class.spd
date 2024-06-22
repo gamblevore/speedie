@@ -64,7 +64,7 @@ linkage
 |uint16|					TaskObjectCount
 |byte|						Depth
 |Byte|						MinOpt
-|Byte|						IsBehaviour
+|Byte|						Behaviourness
 |byte|						IsWrapper
 
 
@@ -378,7 +378,7 @@ function CanHaveEmptyConstructor (|bool|)
 // just having this function is evidence that automatically
 // creating an empty constructor, is a bad idea. We should
 // explicitly create it... like:
-// 			class abc: constructor empty, constructor auto
+// 			class abc: constructor auto
 
 	opt norefcounts
 	for p in .Properties
@@ -400,9 +400,10 @@ function CreateEmptyConstructors (|scfunction|)
 			rz.CopyParams(l)
 			pc = 0 // i guess?
 	
-	if pc >= 1 and pc <= 8
-		|| f2 = .CreateAutoConstructor
-		rz := f2
+	if .isobject
+		if pc >= 1 and pc <= 7
+			|| f2 = .CreateAutoConstructor
+			rz := f2
 
 
 function SCFunction.AddConstructorReturn2
@@ -426,14 +427,13 @@ function SCFunction.AddConstructorReturn (|message| prms)
 	opt norefcounts
 	|| c = .cls$
 	is newnew, using prms
-	//if c.isobject
 	|| dcl = prms.msg(@decl)
 	dcl.msg(@arel, "!") <~ (@thg, c.name)
 		
 
 
 function CreateConstructors 
-	if .IsObject or (.isstruct and self ~= "Junk_ABC")
+	if .IsObject or (.isstruct and !.Behaviourness and !.ismodel)
 		|| Con = .FindAllocFunc( "Constructor" )
 		if .IsRole
 			|| s = .super! // roles always have supers
@@ -455,6 +455,7 @@ function CreateConstructors
 	if !.IsRole
 		|| NeedsDestructor = .IsObject or (.IsStruct and .HasObjectProperties)
 		.DestructorFunc = .FindAllocFunc( "Destructor", !NeedsDestructor )
+	
 	  elseif .isrole == 3
 		check (.super!.isrole == 2) (self, "Tasks can't nestedly subclass.")
 

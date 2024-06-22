@@ -19,11 +19,6 @@ struct ObjectSaver
 		constants
 			RefMark = 0x40000000
 		
-		function New (|ObjectSaver|)
-			ObjectSaver.init
-			|ObjectSaver| Result = nil
-			return Result
-		
 		function LoadOne (SaverLoadClass)
 			|| N = SaverClassInfo.new( cls, data )
 			cls.saveinfo = N|&byte|
@@ -99,6 +94,7 @@ class Saveable
 	function SaveTo (|FastString| fs_in = nil, |string|)
 		cpp_part SaveTo
 		|| fs = FastString(fs_in)
+		ObjectSaver.init
 		|| Saver = objectsaver.new
 		saver.dest = fs
 		saver.root = self

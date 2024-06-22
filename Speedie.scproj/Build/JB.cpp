@@ -1951,7 +1951,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1138], (112656100622336));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1138], (112660051735575));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3268,7 +3268,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1901]);
-	JB_FS_AppendInt32(_fsf0, (2024062119));
+	JB_FS_AppendInt32(_fsf0, (2024062212));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -6061,7 +6061,7 @@ int SC_Refs__RefBasisStruct(Message* Msg, bool SetOnly) {
 		}
 		return kSC__Refs_kBasisObj;
 	}
-	if (SC_Decl_HasStruct(Type)) {
+	if (SC_Decl_HasStruct(Type) and (!SC_Decl_SyntaxIs(Type, kSC__SCDeclInfo_ReturnedStruct))) {
 		SCFunction* Fn = Type->Type->DestructorFunc;
 		if (Fn) {
 			return kSC__Refs_kBasisDeSTRUCTable;
@@ -8317,7 +8317,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[826]);
-	JB_FS_AppendInt32(_fsf0, (2024062119));
+	JB_FS_AppendInt32(_fsf0, (2024062212));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -19713,7 +19713,7 @@ int SC_Junk_ABC__InitCode_() {
 Junk_ABC SC_Junk_ABC__New2() {
 	Junk_ABC Rz = ((Junk_ABC){});
 	//visible;
-	Rz.cc = 1;
+	Rz.cc = 2;
 	return Rz;
 }
 
@@ -19727,6 +19727,7 @@ void SC_Junk_ABC__TestNew() {
 
 Junk_ABC SC_Junk_ABC__TestNewNew() {
 	//visible;
+	SC__Junk_ABC_D = SC_Junk_ABC__New2();
 	Junk_ABC X;
 	SC_Junk_ABC_ConstructorGHI((&X));
 	Junk_ABC _tmPf0;
@@ -20047,6 +20048,12 @@ void JB_Saver_AppendString(ObjectSaver* Self, JB_String* S) {
 	JB_FS_AppendByte(Self->Dest, ',');
 }
 
+void JB_Saver_Constructor(ObjectSaver* Self) {
+	Self->Dest = nil;
+	Self->CantSaveThis = nil;
+	Self->Root = nil;
+}
+
 void JB_Saver_Destructor(ObjectSaver* Self) {
 	if (((bool)Self->CantSaveThis)) {
 		JB_Object_Fail(Self->CantSaveThis, JB_LUB[1202]);
@@ -20089,12 +20096,6 @@ void JB_Saver__LoadOne(JB_Class* Cls, char* Data) {
 	JB_Decr(N);
 }
 
-ObjectSaver JB_Saver__New() {
-	JB_Saver__Init();
-	ObjectSaver Result = ((ObjectSaver){});
-	return Result;
-}
-
 
 
 JB_String* JB_Pico_Get(PicoComms* Self, float T) {
@@ -20108,8 +20109,8 @@ bool JB_Pico_SendMsg(PicoComms* Self, PicoMessage* A, bool Wait) {
 
 bool JB_Pico_SendFS(PicoComms* Self, FastString* Fs, bool Wait) {
 	bool Rz = false;
-	PicoMessage _tmPf0 = JB_Pico__FromFS(Fs);
-	Rz = JB_Pico_SendMsg(Self, (&_tmPf0), Wait);
+	PicoMessage Msg = JB_Pico__FromFS(Fs);
+	Rz = JB_Pico_SendMsg(Self, (&Msg), Wait);
 	(JB_FS_LengthSet(Fs, 0));
 	return Rz;
 }
@@ -23655,6 +23656,7 @@ void SC_Cpp__WriteFuncArgs(SCFunction* F, FastStringCpp* T, bool Names_only) {
 void SC_Cpp__WriteFuncSub(SCFunction* F, JB_String* E, FastStringCpp* T) {
 	if ((SC_Func_SyntaxIs(F, kSC__FunctionType_Constructor)) and (!SC_Func_ReturnsObject(F))) {
 		JB_FS_AppendString(T, JB_LUB[1996]);
+		JB_Obj_PrintLine(F);
 	}
 	 else {
 		SC_Cpp__WriteDecl(F->ReturnType, T, nil);
@@ -26456,23 +26458,6 @@ Message* SC_PA_AddTestedParam(SCParamArray* Self, Message* Item, SCNode* Name_sp
 	return Nxt;
 }
 
-SCFunction* SC_PA_ArgsMatchError(SCParamArray* Self, int TypeCast, SCFunction* F, SCFunction* R) {
-	if (!SC_PA_MadeError(Self)) {
-		if (true) {
-			JB_String* _tmPf0 = JB_Incr(SC_Str_ArgsMatchError(JB_LUB[951], TypeCast != 0));
-			JB_Msg_SyntaxExpect(Self->Exp, _tmPf0);
-			JB_Decr(_tmPf0);
-		}
-		if (true) {
-			JB_Msg_SyntaxExpect(F->Source, JB_LUB[628]);
-		}
-		if (true) {
-			JB_Msg_SyntaxExpect(R->Source, JB_LUB[629]);
-		}
-	}
-	return nil;
-}
-
 SCParamArray* SC_PA_Constructor(SCParamArray* Self, Message* Exp) {
 	if (Self == nil) {
 		Self = ((SCParamArray*)JB_NewClass(&SCParamArrayData));
@@ -26577,6 +26562,23 @@ JB_String* SC_PA_ModuleName(SCParamArray* Self) {
 	JB_Decr(P);
 	JB_SafeDecr(Rz);
 	return Rz;
+}
+
+SCFunction* SC_PA_MultipleMatchingFunctions(SCParamArray* Self, int TypeCast, SCFunction* F, SCFunction* R) {
+	if (!SC_PA_MadeError(Self)) {
+		if (true) {
+			JB_String* _tmPf0 = JB_Incr(SC_Str_ArgsMatchError(JB_LUB[951], TypeCast != 0));
+			JB_Msg_SyntaxExpect(Self->Exp, _tmPf0);
+			JB_Decr(_tmPf0);
+		}
+		if (true) {
+			JB_Msg_SyntaxExpect(F->Source, JB_LUB[628]);
+		}
+		if (true) {
+			JB_Msg_SyntaxExpect(R->Source, JB_LUB[629]);
+		}
+	}
+	return nil;
 }
 
 bool SC_PA_PreReadTypes(SCParamArray* Self, SCNode* Name_Space, Message* P, Message* Side) {
@@ -26688,7 +26690,7 @@ void SC_PA_StructAsReturn(SCParamArray* Self, SCDecl* Type) {
 	}
 	 else {
 		if (true) {
-			JB_Msg_SyntaxExpect(S, JB_LUB[2086]);
+			JB_Msg_SyntaxExpect(S, JB_LUB[2085]);
 		}
 	}
 	JB_Decr(S);
@@ -26784,7 +26786,9 @@ void JB_Sav_SaveToFile(Saveable* Self, JB_File* F) {
 
 JB_String* JB_Sav_SaveTo(Saveable* Self, FastString* Fs_in) {
 	FastString* Fs = JB_Incr(JB_FS__FastNew(Fs_in));
-	ObjectSaver Saver = JB_Saver__New();
+	JB_Saver__Init();
+	ObjectSaver Saver;
+	JB_Saver_Constructor((&Saver));
 	JB_SetRef(Saver.Dest, Fs);
 	Saver.Root = Self;
 	JB_FS_AppendString(Fs, kJB_kSaverStart1);
@@ -28066,6 +28070,16 @@ JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in) {
 	JB_Decr(Fs);
 	JB_SafeDecr(_tmPf2);
 	return _tmPf2;
+}
+
+bool SC_Str_trap(JB_String* Self, Message* Msg) {
+	if (SC_Func_SyntaxEquals(SC__Func_CurrFunc, Self, true)) {
+		if (Msg) {
+			JB_Obj_PrintLine(Msg);
+		}
+		return true;
+	}
+	return false;
 }
 
 JB_String* JB_Str_Shorten(JB_String* Self, int N) {
@@ -42455,7 +42469,7 @@ void SC_Beh_CreateFuncTable(SCBehaviour* Self, Message* ErrPlace) {
 	SCModule* F = JB_Incr(((SCModule*)SC_Class__NewStruct(Msg, SC__Comp_program, ErrPlace)));
 	JB_Decr(Msg);
 	if (F) {
-		F->Cls->IsBehaviour = kSC__Beh_kBehaviourTable;
+		F->Cls->Behaviourness = kSC__Beh_kBehaviourTable;
 		SCClass* _tmPf2 = JB_Incr(SC_Beh_Cls(Self));
 		F->Cls->IsRole = _tmPf2->IsRole;
 		JB_Decr(_tmPf2);
@@ -42624,10 +42638,14 @@ SCModule* SC_Beh__NewVirtualSub(Message* Node, SCClass* Cls, Message* ErrPlace) 
 	}
 	Mod->IsRequiredInterface = Required;
 	SC_Class_AddBehaviourOrInterface(Cls, Mod, ErrPlace);
-	Mod->Cls->IsBehaviour = kSC__Beh_kBehaviourProto;
-	if (Required) {
-		Mod->Cls->IsBehaviour = kSC__Beh_kBehaviourProtoRequired;
+	SCClass* Mcls = JB_Incr(Mod->Cls);
+	if (Mcls) {
+		Mcls->Behaviourness = kSC__Beh_kBehaviourProto;
+		if (Required) {
+			Mcls->Behaviourness = kSC__Beh_kBehaviourProtoRequired;
+		}
 	}
+	JB_Decr(Mcls);
 	JB_SafeDecr(Mod);
 	return Mod;
 }
@@ -43091,7 +43109,7 @@ SCClass* SC_Class_Constructor(SCClass* Self, Message* Node, SCNode* Parent, bool
 	Self->TaskObjectCount = 0;
 	Self->Depth = 0;
 	Self->MinOpt = 0;
-	Self->IsBehaviour = 0;
+	Self->Behaviourness = 0;
 	Self->IsWrapper = 0;
 	Self->IsRole = 0;
 	Self->BaseType = 0;
@@ -43218,7 +43236,7 @@ void SC_Class_CreateBehaviour(SCClass* Self) {
 }
 
 void SC_Class_CreateConstructors(SCClass* Self) {
-	if (SC_Class_IsObject(Self) or (SC_Class_IsStruct(Self) and (SC_Class_EqualsName(Self, JB_LUB[2085], true)))) {
+	if (SC_Class_IsObject(Self) or (SC_Class_IsStruct(Self) and ((!Self->Behaviourness) and (!Self->IsModel)))) {
 		SCFunction* Con = JB_Incr(SC_Class_FindAllocFunc(Self, JB_LUB[689], true));
 		if (Self->IsRole) {
 			SCClass* S = JB_Incr(Self->Super);
@@ -43283,12 +43301,14 @@ SCFunction* SC_Class_CreateEmptyConstructors(SCClass* Self) {
 		JB_Decr(L);
 	}
 	JB_Decr(S);
-	if ((Pc >= 1) and (Pc <= 8)) {
-		SCFunction* F2 = JB_Incr(SC_Class_CreateAutoConstructor(Self));
-		if (!Rz) {
-			JB_SetRef(Rz, F2);
+	if (SC_Class_IsObject(Self)) {
+		if ((Pc >= 1) and (Pc <= 7)) {
+			SCFunction* F2 = JB_Incr(SC_Class_CreateAutoConstructor(Self));
+			if (!Rz) {
+				JB_SetRef(Rz, F2);
+			}
+			JB_Decr(F2);
 		}
-		JB_Decr(F2);
 	}
 	JB_SafeDecr(Rz);
 	return Rz;
@@ -44029,7 +44049,7 @@ bool SC_Class_IsBehaviourTable(SCClass* Self) {
 	if (!Self) {
 		return nil;
 	}
-	return Self->IsBehaviour == kSC__Beh_kBehaviourTable;
+	return Self->Behaviourness == kSC__Beh_kBehaviourTable;
 }
 
 bool SC_Class_IsDataTypeOnly(SCClass* Self) {
@@ -44046,7 +44066,7 @@ bool SC_Class_IsFunc(SCClass* Self) {
 
 bool SC_Class_IsInterface(SCClass* Self) {
 	if (Self) {
-		return ((bool)(Self->IsBehaviour & kSC__Beh_kBehaviourProto));
+		return ((bool)(Self->Behaviourness & kSC__Beh_kBehaviourProto));
 	}
 	return false;
 }
@@ -45560,7 +45580,7 @@ SCFunction* SC_Func_ArgsMatch2(SCFunction* Self, SCDecl* Base, int TypeCast, SCN
 					SCFunction* CanKeepBetter = JB_Incr(SC_Func_TryKeepBetter(Result, OldMatch, F, Match));
 					if ((!CanKeepBetter)) {
 						JB_Decr(CanKeepBetter);
-						SCFunction* _tmPf2 = JB_Incr(SC_PA_ArgsMatchError(Incoming, TypeCast, F, Result));
+						SCFunction* _tmPf2 = JB_Incr(SC_PA_MultipleMatchingFunctions(Incoming, TypeCast, F, Result));
 						JB_Decr(F);
 						JB_Decr(Missing);
 						JB_Decr(Result);
@@ -45570,7 +45590,7 @@ SCFunction* SC_Func_ArgsMatch2(SCFunction* Self, SCDecl* Base, int TypeCast, SCN
 					JB_SetRef(Result, CanKeepBetter);
 					JB_Decr(CanKeepBetter);
 				}
-				if ((((bool)(Match & kJB_kNeeds))) or (((bool)(Match & kJB_kUseDefaultParams)))) {
+				if (((bool)(Match & (kJB_kNeeds | kJB_kUseDefaultParams)))) {
 					NeedsAlter = ((bool)Match);
 				}
 				if (!Result) {
@@ -48770,6 +48790,8 @@ void SC_Func__String_Expand(Message* Msg, SCFunction* Fn) {
 
 Message* SC_Func__TypedTempMoveOut(Message* Msg, JB_String* Name, SCDecl* Type) {
 	JB_Incr(Name);
+	if (SC_Str_trap(JB_LUB[2086], nil)) {
+	}
 	MessagePosition Using = JB_Msg_SyntaxUsing(Msg);
 	if (!JB_Str_Exists(Name)) {
 		SCFunction* _tmPf1 = JB_Incr(SC_Msg_MsgOwningFunc(Msg));
@@ -51118,4 +51140,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 4173362617780367530 -3090651815541561923
+// -6859474882419715870 1656275291351414575

@@ -519,7 +519,7 @@ function String.ArgsMatchError (|bool| TypeCast, |string|)
 	return self + " (But none matched exactly. All needed a type-cast.)"
 
 
-function SCParamArray.ArgsMatchError (|int| TypeCast, |SCFunction| f, |SCFunction| R, |SCFunction|)
+function SCParamArray.MultipleMatchingFunctions (|int| TypeCast, |SCFunction| f, |SCFunction| R, |SCFunction|)
 	if !.madeerror
 		error   (.Exp, "Multiple matching functions.".ArgsMatchError(TypeCast!=0) )
 		error   (f.Source, "Candidate 1")
@@ -566,11 +566,10 @@ function ArgsMatch2 (|SCDecl| base, |int| TypeCast, |SCNode| name_space, |SCPara
 			if (Result)
 				|| CanKeepBetter = result.TryKeepBetter(OldMatch, f, Match)
 				if (!CanKeepBetter)
-//					|| first = result.ArgsMatch3( TypeCast, base, false, name_space, Incoming )
-					return incoming.ArgsMatchError(TypeCast, f, result)
+					return incoming.MultipleMatchingFunctions(TypeCast, f, result)
 				Result = CanKeepBetter
 			
-			if (Match & kNeeds) or (Match & kUseDefaultParams)
+			if  Match  &  (kNeeds|||kUseDefaultParams)
 				NeedsAlter = Match
 			
 			Result := f
