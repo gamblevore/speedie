@@ -2663,7 +2663,7 @@ Message* JB_Msg_ParseAST(Message* Self);
 
 void JB_Msg_pinn__(Message* Self, FastString* Fs);
 
-Message* JB_Msg_PoorAnt(Message* Self);
+JB_String* JB_Msg_plocate(Message* Self);
 
 int JB_Msg_PrevIndentCheck(Message* Self, Message* Pr);
 

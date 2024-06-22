@@ -1332,6 +1332,7 @@ JBClass ( SCFunction , SCNode ,
 	byte IsNilChecker;
 	NilState NilSelf;
 	byte Badness;
+	byte StructReturnPos;
 	byte OptCounts;
 );
 
@@ -9507,6 +9508,8 @@ JB_String* SC_Func_RenderName(SCFunction* Self, FastString* Fs_in);
 JB_String* SC_Func_RenderParams(SCFunction* Self, bool ForErrors, FastString* Fs_in);
 
 JB_String* SC_Func_RenderTitle(SCFunction* Self, bool ForErrors, FastString* Fs_in);
+
+SCDecl* SC_Func_ReturnedStruct(SCFunction* Self);
 
 bool SC_Func_ReturnsObject(SCFunction* Self);
 

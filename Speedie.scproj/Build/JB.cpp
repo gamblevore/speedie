@@ -1951,7 +1951,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1138], (112660961558528));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1138], (112661027271740));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -20106,8 +20106,8 @@ bool JB_Pico_SendMsg(PicoComms* Self, PicoMessage* A, bool Wait) {
 
 bool JB_Pico_SendFS(PicoComms* Self, FastString* Fs, bool Wait) {
 	bool Rz = false;
-	PicoMessage Msg = JB_Pico__FromFS(Fs);
-	Rz = JB_Pico_SendMsg(Self, (&Msg), Wait);
+	PicoMessage _tmPf0 = JB_Pico__FromFS(Fs);
+	Rz = JB_Pico_SendMsg(Self, (&_tmPf0), Wait);
 	(JB_FS_LengthSet(Fs, 0));
 	return Rz;
 }
@@ -45360,6 +45360,7 @@ void SC_Func_AddConstructorReturn2(SCFunction* Self) {
 	 else {
 		SCDecl* Ret = JB_Incr(((SCDecl*)JB_Array_First(Self->Args)));
 		if (Ret) {
+			Self->StructReturnPos = 1;
 			(SC_Decl_SyntaxIsSet(Ret, kSC__SCDeclInfo_IntendedAsReturn, true));
 		}
 		JB_Decr(Ret);
@@ -45528,8 +45529,8 @@ SCFunction* SC_Func_ArgsMatch(SCFunction* Self, SCDecl* Base, SCNode* Name_space
 	}
 	 else if (((bool)Rz)) {
 		SCDecl* Rt = Rz->ReturnType;
-		SCDecl* Ft = ((SCDecl*)JB_Array_First(Rz->Args));
-		if (((bool)Ft) and SC_Decl_SyntaxIs(Ft, kSC__SCDeclInfo_IntendedAsReturn)) {
+		SCDecl* Ft = SC_Func_ReturnedStruct(Rz);
+		if (Ft) {
 			SC_PA_StructAsReturn(Incoming, SC_Decl_AsLocal(Ft));
 		}
 		 else if (SC_Decl_SyntaxIs(Rt, kSC__SCDeclInfo_ReturnedStruct)) {
@@ -46146,6 +46147,7 @@ SCFunction* SC_Func_Constructor(SCFunction* Self, Message* Msg) {
 	Self->IsNilChecker = 0;
 	Self->NilSelf = 0;
 	Self->Badness = 0;
+	Self->StructReturnPos = 0;
 	Self->OptCounts = 0;
 	Self->LinkTo = nil;
 	Self->TableId = 65535;
@@ -47837,6 +47839,17 @@ JB_String* SC_Func_RenderTitle(SCFunction* Self, bool ForErrors, FastString* Fs_
 	JB_Decr(Fs);
 	JB_SafeDecr(_tmPf0);
 	return _tmPf0;
+}
+
+SCDecl* SC_Func_ReturnedStruct(SCFunction* Self) {
+	byte P = Self->StructReturnPos;
+	if (P) {
+		SCDecl* F = ((SCDecl*)JB_Array_Value(Self->Args, P - 1));
+		if (SC_Decl_SyntaxIs(F, kSC__SCDeclInfo_IntendedAsReturn)) {
+			return F;
+		}
+	}
+	return nil;
 }
 
 bool SC_Func_ReturnsObject(SCFunction* Self) {
@@ -51137,4 +51150,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 1213248978926771723 7613157350487384137
+// 3474368156221668072 7613157350487384137

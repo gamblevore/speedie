@@ -420,6 +420,7 @@ function SCFunction.AddConstructorReturn2
 		args.msg(@tmp, "return") <~ (@thg, "self")
 	  else
 		|| ret = .args.first
+			.StructReturnPos = 1
 			(ret is IntendedAsReturn)
 
 

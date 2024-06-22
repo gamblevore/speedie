@@ -674,9 +674,7 @@ bool JB_CompareError(Message* Expected, Message* Found) {
 	//;
 	//;
 	JB_FS_AppendString(Fs, JB_LUB[482]);
-	Message* _tmPf6 = JB_Incr(JB_Msg_PoorAnt(Expected));
-	JB_String* _tmPf5 = JB_Incr(JB_Msg_Locate(_tmPf6));
-	JB_Decr(_tmPf6);
+	JB_String* _tmPf5 = JB_Incr(JB_Msg_plocate(Expected));
 	JB_FS_AppendString(Fs, _tmPf5);
 	JB_Decr(_tmPf5);
 	JB_FS_AppendByte(Fs, '\n');
@@ -684,11 +682,9 @@ bool JB_CompareError(Message* Expected, Message* Found) {
 	if (Found) {
 		//;
 		JB_FS_AppendString(Fs, JB_LUB[483]);
-		Message* _tmPf8 = JB_Incr(JB_Msg_PoorAnt(Found));
-		JB_String* _tmPf7 = JB_Incr(JB_Msg_Locate(_tmPf8));
-		JB_Decr(_tmPf8);
-		JB_FS_AppendString(Fs, _tmPf7);
-		JB_Decr(_tmPf7);
+		JB_String* _tmPf6 = JB_Incr(JB_Msg_plocate(Found));
+		JB_FS_AppendString(Fs, _tmPf6);
+		JB_Decr(_tmPf6);
 		JB_FS_AppendByte(Fs, '\n');
 		//;
 	}
@@ -6936,11 +6932,15 @@ void JB_Msg_pinn__(Message* Self, FastString* Fs) {
 	JB_FS_SyntaxAppend(Fs, ((Message*)JB_Ring_First(Opp)));
 }
 
-Message* JB_Msg_PoorAnt(Message* Self) {
+JB_String* JB_Msg_plocate(Message* Self) {
 	if (Self) {
-		return ((Message*)JB_Ring_Parent(Self));
+		Message* _tmPf0 = JB_Incr(((Message*)JB_Ring_Parent(Self)));
+		JB_String* _tmPf1 = JB_Incr(JB_Msg_Locate(_tmPf0));
+		JB_Decr(_tmPf0);
+		JB_SafeDecr(_tmPf1);
+		return _tmPf1;
 	}
-	return nil;
+	return JB_LUB[0];
 }
 
 int JB_Msg_PrevIndentCheck(Message* Self, Message* Pr) {
@@ -8216,7 +8216,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024062212);
+	return (2024062215);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8228,4 +8228,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 6618333674457142714 -6720784475268466743
+// 7796578953066441599 -3558337903863250249 -6720784475268466743

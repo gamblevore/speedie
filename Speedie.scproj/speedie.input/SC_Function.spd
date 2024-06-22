@@ -80,6 +80,7 @@ linkage
 |byte|					IsNilChecker
 |nilstate|				NilSelf
 |byte| 					Badness
+|byte|					StructReturnPos
 |byte| 					OptCounts
 
 
@@ -370,14 +371,19 @@ function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming,
 	if Failed and !incoming.MadeError // backup
 		error ( incoming.exp, "Wrong params to " + .RenderTitle )
 	  elseif rz
-//		if "TestNewNew".trap
-		|| rt = rz.returntype
-		|| ft = rz.args.first
-		if ft and ft is intendedasreturn
+		|| ft = rz.StructReturned
 			incoming.StructAsReturn(ft.aslocal)
-		  elseif rt is returnedstruct
-			incoming.StructExtract(rt)
+		  elseif rz.returntype is returnedstruct // remove this? its always the prev?
+			incoming.StructExtract(rz.returntype)
 
+
+function StructReturned (|scdecl|)
+	// now
+	opt norefcounts
+	|| p = .StructReturnPos
+		|| f = .args[p-1]
+		if f is intendedasreturn
+			return f
 
 
 function ArgsMatch1 (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming, |int| Cast, |SCFunction|)

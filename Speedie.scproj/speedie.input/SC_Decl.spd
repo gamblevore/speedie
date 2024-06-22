@@ -493,8 +493,7 @@ class SCDecl (SCNamed) {
 		if (.pointercount or .type.funcproto)
 			return true
 
-		require !.IsBareStruct
-		require !.IsCArray
+		require !.IsBareStruct and !.IsCArray
 		require .type.TypeInfo!=DataTypeCode.UnusedType
 		return true
 
