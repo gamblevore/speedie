@@ -25,14 +25,20 @@ Example:
 
 You can then pass it to a function, swap the addresses around randomly, store it in a global. How on earth is any of this optimisable? If you can't rely on that a function won't save the address of one of your local var... then you can't optimise it. That local var now CANNOT be a register-based var. Useless!
 
+    // example C code.
     int x1 = 1; int x2 = 2;
-    int* y = RandomBool() ? &x1 : &x2; // not possible in speedie.
+    int* y = RandomBool() ? &x1 : &x2;
     (*y)++;
 
 
-I checked over 4000 functions in 1MB of speedie code, and I found I used this in 3 places, and all 3 places didn't need this "feature"... I was just trying to call a function and pass the address of a register to a function. (Which speedie allows as an exception to the rule).
+I checked over 4000 functions in 1MB of speedie code, and I found I used this in 3 places, and all 3 places didn't need to save or store the address, just only pass it to a function. (Speedie allows this as an exception to the rule).
 
 Removing this makes the language make much more sense, and actually be optimiseable, as you can make assumptions about how the registers work and how they are, and that "other functions can't just come in and silently change our registers", which makes no sense to do but C allows it.
+
+    // speedie example
+    || x1 = 1,  || x2 = 2
+    || y = (&x1, &x2)(RandomBool()) // will not compile
+    SomeCFunction(&x1, &x2) // compiles OK. Assumes these addresses are NOT stored.
 
 You can still work with address of ints (if you need) in speedie. But they have to belong in a struct or c-array or some allocated memory. Not a local var.
 
