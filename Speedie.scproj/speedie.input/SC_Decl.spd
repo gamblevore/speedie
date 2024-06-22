@@ -167,9 +167,11 @@ class SCDecl (SCNamed) {
 		return (self is local) and !(.IsBareStruct or .IsCArray)
 
 
-	function CopyDeclsButter (|int| mode, |SCDecl|)
-		if (mode & declmode.funcparam) and .isbarestruct
-			return .getaddress
+	function CopyDeclsStructFixer (|message| src, |declmode| mode, |SCDecl|)
+		if (mode is funcparam)
+			check (!.iscarray) (src, "No c-arrays in function parameters")
+			if (.isbarestruct)
+				return .getaddress
 		if .refcount == 1
 			return self // nice
 		return .copydecl

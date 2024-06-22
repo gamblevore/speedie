@@ -53,9 +53,9 @@ function Message.Locate (|string|)
 	return fs
 
 
-helper message.PoorAnt (|message|)
+helper message.plocate (|string|)
 	if (self)
-		return .parent
+		return .parent.locate
 
 
 helper CompareError (|Message?| expected, |Message?| found, |bool|)
@@ -63,10 +63,10 @@ helper CompareError (|Message?| expected, |Message?| found, |bool|)
 	
 	|| fs = FastString()
 	fs <~ "Expected ${expected.locate} but found ${found.locate}\n"
-	fs <~ "parent of expected is ${expected.PoorAnt.locate}\n"
+	fs <~ "parent of expected is ${expected.plocate}\n"
 
 	if (found)
-		fs <~ "parent of found is ${found.PoorAnt.locate}\n"
+		fs <~ "parent of found is ${found.plocate}\n"
 	  else
 		found = expected
 	printline fs

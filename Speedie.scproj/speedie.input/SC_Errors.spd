@@ -183,7 +183,7 @@ extend Error
 		return .LinePos( f )
 	
 	
-	function SCLineIdentifiers (|faststring|fs, |string| Data)
+	function SCLineIdentifiers (|faststring| fs, |string| Data)
 		if (!.HasPosition)
 			|| fn = .node.MsgOwningFunc #require // fallback...
 			fs <~ fn.ExportName

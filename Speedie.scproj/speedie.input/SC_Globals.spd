@@ -479,7 +479,7 @@ function scdecl.ExtractAmountSub (|Message| Prms, |SCNode| name_space, |scdecl|)
 		rz.Default = @arg.msg
 
 
-function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |SCDecl?|)
+function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |int| Depth=0, |SCDecl?|)
 	// a bit recursive!
 	|| f = c.func
 	if (f == @Thg)		// usual case
@@ -487,15 +487,16 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |S
 			return typevoid
 		return Compiler.FindClassType( c )
 	
+	depth++
 	if (f == @Decl)
-		Return ExtractDecl( c.first!, name_space, purpose )
+		Return ExtractDecl( c.first!, name_space, purpose, depth )
 	
 	if (f == @Emb)
 		c.Expectempty
 		return nil
 	
 	if (f == @Bra)
-		return extractdecl(c.first!, name_space, purpose)
+		return extractdecl(c.first!, name_space, purpose, depth)
 		
 	if (f == @sthg) and (c == "...")
 		return name_space.RequireContained( c )
@@ -507,7 +508,7 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |S
 	if (c == @Acc)		// |Byte[10]| TenBytes
 		|| Prms = c.second
 		if prms.HasAny
-			|| R = ExtractDecl( c.first!, name_space, purpose )			#require
+			|| R = ExtractDecl( c.first!, name_space, purpose, depth )			#require
 			return R.ExtractAmount( Prms, name_space )
 			
 		f = @rel
@@ -519,14 +520,16 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |S
 		c <~ fi
 	
 	if (f == @func)
-		|| R = ExtractDecl( c.first!, name_space, purpose )				#require
+		|| R = ExtractDecl( c.first!, name_space, purpose, depth )				#require
 		return R.RefineDecl(c.last)
 	
 	if (f == @Arel or @brel)
-		|| R = ExtractDecl( c.first!, name_space, purpose )				#require
+		|| R = ExtractDecl( c.first!, name_space, purpose, depth )				#require
 		if C == "~"
 			return R.MakeDataObject(name_space, purpose)
 		if (C == "&")											// pointer
+//			if (purpose is FuncParam) and (depth == 1) and (r.PointerCount == 0) and r.IsBareStruct
+//				"No need to use & here, structs are always passed by pointer anyhow.   ${c.filepath}:${c.position.render}" // not so simple to get working
 			return r.GetAddress(purpose)
 		if (C == "?")
 			return R.MakeNewOptional
@@ -542,12 +545,12 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |S
 
 	if (F == @name)												// use instead of below!
 		c.func = @thg
-		|| d = ExtractDecl(c, name_Space, purpose)						#require
+		|| d = ExtractDecl(c, name_Space, purpose, depth)						#require
 		(d is compilercreated)
 		return d
 
 	if (F == @arg)												// a bit ugly... |{\n\tfaststring\n}|
-		|| d = ExtractDecl(c.first!, name_Space, purpose)$
+		|| d = ExtractDecl(c.first!, name_Space, purpose, depth)$
 		(d is compilercreated)
 		return d
 
@@ -564,7 +567,7 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |S
 			Return TypeArray!.TypeNormal
 		
 		expect (ch != @Item) (c)
-		|| dcl = ExtractDecl( ch, name_space, purpose )
+		|| dcl = ExtractDecl( ch, name_space, purpose, depth )
 			rz.Contains = dcl.MakeContainedOptional
 			rz.Type = TypeArray!
 		
@@ -1361,7 +1364,7 @@ function SCDecl.AssignabilityCheck (|message?| ln, |message!| RN, |scdecl| rc, |
 	if ln
 		expect ((LN.IsAssignable) and (self isnt const)) (LN, "Not assignable.")
 
-	if  .c_array > 0  or  rc.c_Array > 0
+	if  .IsCArray  or  rc.IsCArray
 		expect  (.c_array == rc.c_Array) (rn, "Sizes don't match")
 		if rn in @sheb
 			return true						// ignore it:  x = {a,b,c}

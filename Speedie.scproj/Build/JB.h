@@ -3627,7 +3627,7 @@ SCDecl* SC_DoOpCompare(Message* Exp, SCDecl* Lc, SCDecl* Rc, SCOperator* Comp, S
 
 JB_String* JB_EntityTest();
 
-SCDecl* SC_ExtractDecl(Message* C, SCNode* Name_space, DeclMode Purpose);
+SCDecl* SC_ExtractDecl(Message* C, SCNode* Name_space, DeclMode Purpose, int Depth);
 
 void fdb(Array* R);
 
@@ -7039,8 +7039,6 @@ void JB_Str_SyntaxExpect(JB_String* Self);
 
 JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in);
 
-bool SC_Str_trap(JB_String* Self, Message* Msg);
-
 JB_String* JB_Str_Shorten(JB_String* Self, int N);
 
 JB_String* JB_Str_TrimExtAndPath(JB_String* Self, bool KeepPath);
@@ -7653,7 +7651,7 @@ bool SC_Msg_CollectAGlobalDecl(Message* Self, SCNode* Scarg);
 
 Message* SC_Msg_CollectDclName(Message* Self);
 
-SCDecl* SC_Msg_CollectDecl(Message* Self, SCNode* P, SCNode* Recv, int Mode, SCClass* Cls, SCFunction* FuncPrmz);
+SCDecl* SC_Msg_CollectDecl(Message* Self, SCNode* P, SCNode* Recv, DeclMode Mode, SCClass* Cls, SCFunction* FuncPrmz);
 
 void SC_Msg_CollectFromBody(Message* Self, SCNode* Scarg);
 
@@ -8117,7 +8115,7 @@ Message* SC_Msg_ParseShaderSub(Message* Self);
 
 void JB_Msg_pinn__(Message* Self, FastString* Fs);
 
-Message* JB_Msg_PoorAnt(Message* Self);
+JB_String* JB_Msg_plocate(Message* Self);
 
 void SC_Msg_PrepareAST(Message* Self, JB_String* Path);
 
@@ -8444,7 +8442,7 @@ bool SC_Decl_ContainsMatch(SCDecl* Self, SCDecl* O, int TypeCast);
 
 SCDecl* SC_Decl_CopyDecl(SCDecl* Self, bool ForNewVariable);
 
-SCDecl* SC_Decl_CopyDeclsButter(SCDecl* Self, int Mode);
+SCDecl* SC_Decl_CopyDeclsStructFixer(SCDecl* Self, Message* Src, DeclMode Mode);
 
 void SC_Decl_CopyTypeInfoTo(SCDecl* Self, SCDecl* Dcl);
 

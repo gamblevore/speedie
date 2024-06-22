@@ -1,6 +1,6 @@
 
 
-prototype PicoThreadFn (|&pico| Comms, |&nil| Obj, |&cstring| Args=nil, |bool|)
+prototype PicoThreadFn (|pico| Comms, |&nil| Obj, |&cstring| Args=nil, |bool|)
 
 
 

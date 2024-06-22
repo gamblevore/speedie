@@ -47,16 +47,16 @@ class Saveable
 	constructor
 		cpp_wrapper
 
-	virtual SaveWrite (|&ObjectSaver| Saver)
+	virtual SaveWrite (|ObjectSaver| Saver)
 		Saver.CantSaveThis = self
 		saver.dest! <~ "nil,"
 	
-	virtual LoadProperties (|&ObjectLoader| Loader,)
+	virtual LoadProperties (|ObjectLoader| Loader,)
 	
 	behaviour LoadProperties // how to hide this? just use "_"?
 		Loader.CouldntLoad = self
 
-	virtual SaveCollect (|&ObjectSaver| Saver)
+	virtual SaveCollect (|ObjectSaver| Saver)
 
 	behaviour SaveCollect { /* not all objects need to collect anything... */ }	
 	

@@ -182,7 +182,6 @@ extend_module scfunction
 	function TempMoveOut (|Message| msg, |string| name="", |scdecl| type=nil, |Message!|)
 		cpp_part TypedTempMoveOut
 		// a.b.c -> || tmp1 = a.b.c
-		if "JB_Sav_SaveTo".trap
 	
 		|| Using = msg.SyntaxUsing
 		name := UniqueTmpVar(msg.MsgOwningFunc)

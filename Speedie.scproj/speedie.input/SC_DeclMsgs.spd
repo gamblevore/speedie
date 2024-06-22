@@ -94,9 +94,7 @@ function scfunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 			.ReturnType = r
 		if r.isbarestruct
 			(r is returnedstruct)
-
-//	check (!dcl.isbarestruct) (self, "Structs can't be passed without a pointer")
-		
+			
 			
 
 
@@ -123,6 +121,7 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 	|| dcl = .CollectDecl(func, recv, declmode.FuncParam, cls, func) #require
 	if dcl.default isthing "nil"
 		dcl.NilDeclared = nilstate.optional
+		
 	func.args <~ dcl
 	(dcl isnt NumberConst)
 	if dcl.name
@@ -235,7 +234,7 @@ function CollectDeclsFuncBody (|Message| arg, |SCNode| scarg)
 	CollectDeclsFuncBodyJustWhatWeNewlyMade(arg, scarg)
 
 
-function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |int| Mode, |scclass| cls=nil, |scfunction| FuncPrmz=nil,  |scdecl|)
+function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |scclass| cls=nil, |scfunction| FuncPrmz=nil,  |scdecl|)
 	|| Types = .first!
 	|| Names = types.Next
 
@@ -249,7 +248,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |int| Mode, |scclass| c
 	|SCDecl--| DefaultDcl
 	if FuncPrmz
 		0
-	  elseif (Default and mode != declmode.Properties)
+	  elseif (Default and mode isnt Properties)
 		DefaultDcl = TypeOfExprNeeded( Default, P ) #require
 		DefaultDcl = DefaultDcl.Downgrade
 		if (sdcl)   // make sure it matches.
@@ -273,19 +272,21 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |int| Mode, |scclass| c
 	if sdcl.NeedsContainedfix
 		sdcl = sdcl.Containedfix
 	
-	|| dcl = Sdcl.CopyDeclsButter(mode * !!nameitm?)
+	|| dcl = Sdcl.CopyDeclsStructFixer(self, mode * !!nameitm?)
+	dcl.source = self
 	if !NameItm
 		check (.islast) ( self, "Parameter is missing a name." )
 		if funcprmz
 			if FuncPrmz.CollectReturnAsReal // allocs dont fail (assumed so)
 				dcl.nildeclared = nilstate.real
+			check !dcl.IsCArray (self, "Can't return c-arrays")
 			FuncPrmz.ReturnType = dcl // we need the copy
 		return nil
 
 	if !Default
 		names.expectlast
 	
-	if mode != declmode.Properties // the old .obj is needed
+	if mode isnt Properties // the old .obj is needed
 		nameitm.obj = dcl
 	
 	if (Mode & 8) and NoOriginalDcl // functionbody
@@ -300,7 +301,6 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |int| Mode, |scclass| c
 	types.obj = dcl // might as well set it everywhere.
 	dcl.Default = Default
 	dcl.Name = nameitm.name
-	dcl.Source = self
 	(dcl Isnt Const) // on "|| bla = true", make "bla" editable.
 
 	if default and defaultdcl
