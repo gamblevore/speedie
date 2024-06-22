@@ -885,10 +885,12 @@ extern "C" bool PicoSendStr (PicoComms* M, const char* Msg, bool Policy=PicoSend
 	return M->QueueSend(Msg, (int)strlen(Msg)+1, Policy);
 )
 
-extern "C" PicoMessage PicoGet (PicoComms* M, float Time=0) _pico_code_ (
+extern "C" void PicoGet (PicoComms* M, PicoMessage* Out, float Time=0) _pico_code_ (
 /// Gets a message if any exist. You can either return immediately if none are queued up, or wait for one to arrive.
 /// Once it returns a PicoMessage, you must `free()` it's `Data` property, after you are finished with it.
-	if (M) return M->Get(Time); return {};
+	*Out = {};
+	if (M)
+		*Out = M->Get(Time);
 )
 
 

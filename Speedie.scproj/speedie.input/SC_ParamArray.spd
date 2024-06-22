@@ -178,14 +178,25 @@ class SCParamArray
 			if fn != @rel
 				scfunction.TempMoveOut(s, type)
 	
+
 	
-	function StructAsReturn (|SCDecl| type)
+	function StructAsReturn (|SCDecl| type, |scfunction| fn)
 		|| s = .exp$
 		|| Rel = s.UseNonRefChangers(True)
+		
 		|| f = Rel.func
-		if f == @prm or (f == @tmp  and  Rel.ASMType is kreturn)
+		if "TestNewNew".trap
+		if f == @prm
 			Rel = scfunction.TempMoveOut(s, type.internal).second!
 			f = Rel.func			/*   .TestAccept(YY.new)   -->   || tmp = YY.new, .TestAccept(tmp)   */
+		  elseif  (Rel.ASMType is kreturn)
+			/* return YY.new  --> yy.new(rz), return */
+			|| prm = s.last!
+			prm.func = @prm
+			|| subrz = prm.msg(@thg, "rz")			// we need to add rz.
+			subrz.obj = scfunction.currfunc!.StructReturned // right?
+			rel.prev = rel.first
+			return
 		
 		if  f == @rel
 			|| name = Rel.first!
@@ -194,7 +205,6 @@ class SCParamArray
 				// just temp it out...? we'll have a rel?
 				error (op, "Please simplify this expression")
 			  else
-				debugat 53
 				if  Rel in @decl				/*	|| x = YY.new   -->   |YY| x,  YY.new(&x)  */
 					op.become(@thg, name.name)
 					|| Dcl = Rel.parent!
@@ -210,7 +220,10 @@ class SCParamArray
 					Rel.next = s
 				
 				|| prm = s.last!			/*  y = YY.new --> YY.new(&y)  */
-				prm.first = Rel
+				if fn.StructReturnPos==1
+					prm.first = Rel
+				  else
+					prm.last = rel
 				prm.func = @prm
 				Rel.become(@brel, "&")
 				Rel.obj = type
@@ -230,7 +243,8 @@ class SCParamArray
 		// in this case... we could expect the C++ renderer to do it, but thats quite lame.
 		// i think we could just post-process it? makes sense, right?! Do it after transform...
 		// probably do this before the nil-checker?
-		
+	
+	
 	module
 		|[message]| FixMe
 		

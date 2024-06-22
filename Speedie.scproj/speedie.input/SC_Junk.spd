@@ -176,10 +176,9 @@ struct Junk_ABC
 
 		function TestNewNew (|junk_abc|)			
 			visible
-
-			junk_abc.D = new2()
-			|| x = junk_abc.new
-			.TestAccept(junk_abc.new)
+//			junk_abc.D = new2()
+//			|| x = junk_abc.new
+//			.TestAccept(junk_abc.new)
 			return junk_abc.new
 		
 

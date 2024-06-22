@@ -78,13 +78,14 @@ struct Pico
 		// this should not allow a nil-self. why does it?
 		cpp_wrapper PicoCommsConf
 	
-	helper __Get (|float| T, |PicoMessage|)
+	helper __Get (|PicoMessage| Msg, |float| T)
 		nil checker
 		cpp_wrapper PicoGet
 
 	function Get (|float| T, |string|)
 		nil checker
-		|| msg = .__get(T)
+		|picomessage| msg
+		.__get(msg, T)
 		return string.FromPico(msg)
 		
 	function Close (|cstring| Why)

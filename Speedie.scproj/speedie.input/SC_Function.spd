@@ -372,13 +372,13 @@ function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming,
 		error ( incoming.exp, "Wrong params to " + .RenderTitle )
 	  elseif rz
 		|| ft = rz.StructReturned
-			incoming.StructAsReturn(ft.aslocal)
+			incoming.StructAsReturn(ft.aslocal, self)
 		  elseif rz.returntype is returnedstruct // remove this? its always the prev?
 			incoming.StructExtract(rz.returntype)
 
 
 function StructReturned (|scdecl|)
-	// now
+	// remove this??!
 	opt norefcounts
 	|| p = .StructReturnPos
 		|| f = .args[p-1]
@@ -790,7 +790,8 @@ function CheckReturnValue (|Message| msg, |scnode| name_space)
 	|| c = msg.first
 	
 	if (!c)
-		check (!.ReturnType) (msg, "Need to specify a return value")
+		|| t = .ReturnType
+			check (t is returnedstruct) (msg, "Need to specify a return value")
 		return
 
 	expect ( c.IsOnlyChild ) ( msg, "Can’t return multiple values" )
@@ -1590,13 +1591,49 @@ function Tran_Visible (TranFunc)
 function Tran_Return (TranFunc)  // exitter
 	require node.ASMType != asmtmp.kreturn
 	node.ASMType = asmtmp.kreturn
+
 	expect (fn) (node, "Only use this on functions")
-	
 	if !node.islast
 		expect (fn isnt ConOrDes)   (node, "You can’t return in a constructor or destructor")
+
+	if fn.StructReturnPos // we can't return anything
+		node.StructReturnCleanup(fn, name_space)
+
 	fn.CheckReturnValue( node, name_space )
 	node.LastInBlock(SCBlockage.Return)
 	node.CheckNotInStateExpr(fn.SourceArg)
+	
+
+function scdecl.CanRemoveArgOnReturn (|message| r, |bool|)
+	opt norefcounts
+	if !self: return true
+	if self is intendedasreturn
+		return self == r.fastdecl
+
+
+function message.StructReturnCleanup (|scfunction| fn, |scnode| name_space)
+	// Should just write directly into the thing...  Requires more "sleuthing" to do that!!!!
+	if "TestNewNew".trap
+
+	|| R = .first$
+	typeofexpr(r, name_Space)
+	require r in self // may get fixed already
+	
+	|| arg = fn.args[fn.structreturnpos-1]
+	
+	if arg.CanRemoveArgOnReturn(r)
+		r.remove
+		return
+
+	using self
+	|| L = @thg + arg.name
+	L = l.wrapwith(@acc)
+	l.msg(@arr) <~ 0
+	|| rel = neweqrel(l,r)
+	.prev = rel
+	//debugat
+	typeofexpr(rel, name_space)
+	
 
 
 function message.CheckNotInStateExpr (|message| top)
