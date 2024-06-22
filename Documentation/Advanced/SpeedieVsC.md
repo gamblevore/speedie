@@ -37,7 +37,7 @@ Removing this makes the language make much more sense, and actually be optimisea
 You can still work with address of ints (if you need) in speedie. But they have to belong in a struct or c-array or some allocated memory. Not a local var.
 
 
-**Speedie has many [safety features](Safety.md) to protect you from writing bad code.**
+**Speedie has many [safety features](../Safety.md) to protect you from writing bad code.**
 
 * Type-casting objects is restricted safely
 * Our awesome nil-checker
