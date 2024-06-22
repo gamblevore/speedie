@@ -4,6 +4,7 @@
 
 
 
+|| iii = 0
 class SCParamArray
 	linkage
 		cpp_part		PA
@@ -180,35 +181,44 @@ class SCParamArray
 	
 	function StructAsReturn (|SCDecl| type)
 		|| s = .exp$
-		|| x = s.UseNonRefChangers(True)
-		|| f = x.func
-
-		if f == @prm or (f == @tmp  and  x.ASMType is kreturn)
-			x = scfunction.TempMoveOut(s, type.internal).second!
-			f = x.func			/*   .TestAccept(YY.new)   -->   || tmp = YY.new, .TestAccept(tmp)   */
+		|| Rel = s.UseNonRefChangers(True)
+		|| f = Rel.func
+		if f == @prm or (f == @tmp  and  Rel.ASMType is kreturn)
+			Rel = scfunction.TempMoveOut(s, type.internal).second!
+			f = Rel.func			/*   .TestAccept(YY.new)   -->   || tmp = YY.new, .TestAccept(tmp)   */
+		
 		if  f == @rel
-			|| name = x.first!
+			|| name = Rel.first!
 			|| op = name.next!
 			if op != "="
 				// just temp it out...? we'll have a rel?
 				error (op, "Please simplify this expression")
 			  else
-				if  x in @decl				/*	|| x = YY.new   -->   |YY| x,  YY.new(&x)  */
-					|| Dcl = x.parent!
+				debugat 53
+				if  Rel in @decl				/*	|| x = YY.new   -->   |YY| x,  YY.new(&x)  */
+					op.become(@thg, name.name)
+					|| Dcl = Rel.parent!
 					|| dcltype = dcl.first
 						dcltype.become(@thg, type.type.name)
 					dcl.next = s
 					dcl <~ name
+				  else
+					op.become(@bra)
+					op.obj = nil
+					op <~ name
+					op = name
+					Rel.next = s
+				
 				|| prm = s.last!			/*  y = YY.new --> YY.new(&y)  */
-				prm.first = x
+				prm.first = Rel
 				prm.func = @prm
-				op.become(@thg, name.name)
-				x.become(@brel, "&")
-				x.obj = type
-				op.obj = name.obj
-				if !op.obj
-					op.obj = name
-					FixMe <~ op
+				Rel.become(@brel, "&")
+				Rel.obj = type
+				if op != name
+					op.obj = name.obj
+					if !op.obj
+						op.obj = name
+						FixMe <~ op
 		
 		  else
 			error (s, "Not sure how to handle this.")

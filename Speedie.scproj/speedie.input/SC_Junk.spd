@@ -167,17 +167,17 @@ struct Junk_ABC
 			rz.cc = 2
 		function TestNew
 			visible
-			|| s = .new2
+			|| s = new2()
 		function TestReturn (|Junk_ABC|)
 			visible
-			return .new2
+			return new2()
 		function TestAccept (|&Junk_ABC| s)
 
 
 		function TestNewNew (|junk_abc|)			
 			visible
 
-			junk_abc.D = .new2
+			junk_abc.D = new2()
 			|| x = junk_abc.new
 			.TestAccept(junk_abc.new)
 			return junk_abc.new

@@ -272,7 +272,6 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 	if sdcl.NeedsContainedfix
 		sdcl = sdcl.Containedfix
 	
-	//if type ~= "speedtester"
 	|| dcl = Sdcl.CopyDeclsStructFixer(self, mode * !!nameitm?)
 	dcl.source = self
 	if !NameItm
@@ -282,19 +281,19 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 		if FuncPrmz.CollectReturnAsReal // allocs dont fail (assumed so)
 			dcl.nildeclared = nilstate.real
 			
-/*			
-		r = r.getaddress
-		r.name = "rz"
-		(r is intendedasreturn)
-		.StructReturnPos = .args.Length // sheesh a lot of work!
-*/			
 
 		check !dcl.IsCArray (self, "Can't return c-arrays")
 		FuncPrmz.ReturnType = dcl // we need the copy
-		if !dcl.isbarestruct
+		if !dcl.isbarestruct or funcprmz is constructor
 			return nil
-		return nil
-		dcl = 
+
+
+		(dcl is returnedstruct)
+		dcl = dcl.getaddress
+		nameitm = .msg(@thg,"rz")
+		(dcl is intendedasreturn)
+		funcprmz.StructReturnPos = funcprmz.args.Length+1 // sheesh a lot of work!
+
 
 	if !Default
 		name.expectlast

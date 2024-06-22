@@ -398,12 +398,11 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |SCNode| space)
 
 function Tran_Result (|SCFunction| f, |message|)
 	opt norefcounts
-	if f is constructor
-		require f.returnsobject
-
 	|| Type = f.ReturnType
+	require type isnt returnedstruct
+	
 	|| Src  = f.SourceArg
-	require type and src and !(Src.Last IsTmp "return")
+	require  type  and  src  and  !(Src.Last IsTmp "return")
 
 	|| errs = src.last ?? src
 	using (errs)

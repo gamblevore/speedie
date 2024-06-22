@@ -249,6 +249,7 @@ fn_asm SC_fn_asm_table[64];
 FastString* SC_fs_tmp_num;
 Dictionary* SC_FuncLinkageTable;
 Dictionary* SC_FuncPreReader;
+int SC_iii;
 JB_String* SC_kNameConf;
 JB_File* SC_PerryLogFile;
 Message* SC_ReturnSelfEqNil;
