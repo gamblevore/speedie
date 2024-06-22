@@ -9509,8 +9509,6 @@ JB_String* SC_Func_RenderParams(SCFunction* Self, bool ForErrors, FastString* Fs
 
 JB_String* SC_Func_RenderTitle(SCFunction* Self, bool ForErrors, FastString* Fs_in);
 
-SCDecl* SC_Func_ReturnedStruct(SCFunction* Self);
-
 bool SC_Func_ReturnsObject(SCFunction* Self);
 
 SCDecl* SC_Func_Self(SCFunction* Self);
@@ -9518,6 +9516,8 @@ SCDecl* SC_Func_Self(SCFunction* Self);
 void SC_Func_SetBlindCasts(SCFunction* Self, SCNode* Name_space);
 
 Message* SC_Func_SourceArg(SCFunction* Self);
+
+SCDecl* SC_Func_StructReturned(SCFunction* Self);
 
 bool SC_Func_SyntaxEquals(SCFunction* Self, JB_String* Name, bool Aware);
 

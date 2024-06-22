@@ -235,16 +235,16 @@ function CollectDeclsFuncBody (|Message| arg, |SCNode| scarg)
 
 
 function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |scclass| cls=nil, |scfunction| FuncPrmz=nil,  |scdecl|)
-	|| Types = .first!
-	|| Names = types.Next
+	|| Type = .first!
+	|| Name = type.Next
 
-	expect (FuncPrmz or Names)  (self, "No name found.")
-	|| Default = DeclsDefault( names )
-	|| Sdcl = ExtractDecl( Types, P, mode )
+	expect (FuncPrmz or Name)  (self, "No name found.")
+	|| Default = DeclsDefault( name )
+	|| Sdcl = ExtractDecl( Type, P, mode )
 	if !sdcl  and  !default  and  (P isa SCArg)
 		sdcl = P.ParentFunc!.ReturnType
 
-	|| NameItm = names.CollectDclName
+	|| NameItm = name.CollectDclName
 	|SCDecl--| DefaultDcl
 	if FuncPrmz
 		0
@@ -255,10 +255,10 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 			default = sdcl.ExpectMatch( DefaultDcl, kTypeCastTrue, default )
 		
 	  elseif (!cls) and (sdcl) and (sdcl.CanUseDefault)
-		Default = sdcl.CreateDefault(types, mode >= 4)
+		Default = sdcl.CreateDefault(type, mode >= 4)
 		if (Default)
 			TypeOfExpr( default, P )
-			names = DefaultStitch( Default, self )
+			name = DefaultStitch( Default, self )
 	
 	|| NoOriginalDcl = false
 	if !Sdcl
@@ -272,19 +272,32 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 	if sdcl.NeedsContainedfix
 		sdcl = sdcl.Containedfix
 	
+	//if type ~= "speedtester"
 	|| dcl = Sdcl.CopyDeclsStructFixer(self, mode * !!nameitm?)
 	dcl.source = self
 	if !NameItm
 		check (.islast) ( self, "Parameter is missing a name." )
-		if funcprmz
-			if FuncPrmz.CollectReturnAsReal // allocs dont fail (assumed so)
-				dcl.nildeclared = nilstate.real
-			check !dcl.IsCArray (self, "Can't return c-arrays")
-			FuncPrmz.ReturnType = dcl // we need the copy
+		if !funcprmz
+			return nil
+		if FuncPrmz.CollectReturnAsReal // allocs dont fail (assumed so)
+			dcl.nildeclared = nilstate.real
+			
+/*			
+		r = r.getaddress
+		r.name = "rz"
+		(r is intendedasreturn)
+		.StructReturnPos = .args.Length // sheesh a lot of work!
+*/			
+
+		check !dcl.IsCArray (self, "Can't return c-arrays")
+		FuncPrmz.ReturnType = dcl // we need the copy
+		if !dcl.isbarestruct
+			return nil
 		return nil
+		dcl = 
 
 	if !Default
-		names.expectlast
+		name.expectlast
 	
 	if mode isnt Properties // the old .obj is needed
 		nameitm.obj = dcl
@@ -298,7 +311,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 		nameitm.Parent!.obj = dcl
 	
 	.obj = dcl
-	types.obj = dcl // might as well set it everywhere.
+	type.obj = dcl // might as well set it everywhere.
 	dcl.Default = Default
 	dcl.Name = nameitm.name
 	(dcl Isnt Const) // on "|| bla = true", make "bla" editable.

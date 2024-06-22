@@ -434,13 +434,11 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 	|| fin = .args.length
 	|| fi = ((self is constructor)  and  !Incoming.AllowSelfToConstructor)|int|
 	//if .returntype is returnedstruct
-	//	.debugprintonce
-	// debugat 4247
+	if .structreturnpos and self isnt constructor
+	fi += (fi+1 == .structreturnpos)
 	
 	while fi < fin
 		|| FuncArg = .Args[fi]!
-		//if funcarg is returnedstruct
-		//	.debugprintonce
 		|| PArg_Ch = Incoming[Pos]
 		|| PArg_Type = TypeOfExpr( PArg_Ch, name_Space )
 		if Base
@@ -476,6 +474,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		  else
 			Result = kUseDefaultParams
 		fi++
+		fi += (fi+1 == .structreturnpos)
 	
 	if Pos >= Incoming.Size
 		Return result
