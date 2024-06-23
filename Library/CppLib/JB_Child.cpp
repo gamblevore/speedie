@@ -81,6 +81,7 @@ void JB_RemoveHandlers() {
 			signal(i, SIG_DFL);
 }
 
+extern const char** JB_Main__Args;
 void JB_CrashHandler(int Sig) {
 	if (Sig <= 0)
 		return; // some unixes/shells can do this?
@@ -96,6 +97,11 @@ void JB_CrashHandler(int Sig) {
 	
 				// log to file
 	JB_Rec__CrashLog("\n\n****** CRASHED ******");
+	JB_Rec__CrashLog("Args: [");
+	const char** c = JB_Main__Args;
+	while (*c)
+		JB_Rec__CrashLog(*c++);
+	JB_Rec__CrashLog("]");
 	JB_Rec__CrashLog(ErrorBuff);
 	JB_CrashTracer();
 	JB_Rec__CrashLog("-----------------------\n");

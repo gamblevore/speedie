@@ -1472,6 +1472,12 @@ function TypeOfRel (ExprResolver)
 		rc = lc
 	
 	if Custom <= CustomOps.needed
+		if lc is intendedasreturn
+			ln = ln.MakeAccess0
+			lc = lc.internal!
+			ln.obj = lc // put inside MakeAccess0?
+			// rz --> rz[]
+		
 		LC.ExpectRelMatch( RC, RN, side, exp )
 	  elseif Custom == CustomOps.OnlyLeftIsVector
 		return LC.NotLocal		// LC is bigger (vec3 vs float)

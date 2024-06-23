@@ -1637,7 +1637,7 @@ extern Dictionary* JB__SyxDict_;
 extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
-#define kJB_codesign_native (JB_LUB[1497])
+#define kJB_codesign_native (JB_LUB[1498])
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
 extern CharSet* SC_CSNum;
@@ -1819,10 +1819,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp (32768 | 16)
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down (JB_LUB[2078])
-#define kJB__zalgo_mid (JB_LUB[2077])
+#define kJB__zalgo_down (JB_LUB[2079])
+#define kJB__zalgo_mid (JB_LUB[2078])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up (JB_LUB[2076])
+#define kJB__zalgo_up (JB_LUB[2077])
 #define kJB__byte_max (255)
 #define kJB__byte_min (0)
 #define kJB__char_max (127)
@@ -4167,7 +4167,7 @@ byte JB_byte_UpperCase(byte Self);
 // cstring
 JB_String* JB_cstring_Str(_cstring Self);
 
-FakeJBString JB_cstring_temp(_cstring Self);
+void JB_cstring_temp(_cstring Self, FakeJBString* Rz);
 
 
 
@@ -5481,18 +5481,18 @@ int SC_Junk_ABC__Init_();
 
 int SC_Junk_ABC__InitCode_();
 
-Junk_ABC SC_Junk_ABC__New2();
+void SC_Junk_ABC__New2(Junk_ABC* Rz);
 
 void SC_Junk_ABC__TestNew();
 
-Junk_ABC SC_Junk_ABC__TestNewNew();
+void SC_Junk_ABC__TestNewNew(Junk_ABC* Rz);
 
-Junk_ABC SC_Junk_ABC__TestReturn();
+void SC_Junk_ABC__TestReturn(Junk_ABC* Rz);
 
 
 
 // JB_LoopInfo
-LoopInfo SC_LoopInfo_BeginLoop(LoopInfo* Self, bool HasExitCond);
+void SC_LoopInfo_BeginLoop(LoopInfo* Self, bool HasExitCond, LoopInfo* Rz);
 
 void SC_LoopInfo_FinishLoop(LoopInfo* Self, Message* Msg);
 
@@ -5628,7 +5628,7 @@ PicoComms* JB_Pico__Parent();
 
 
 // JB_PicoMessage
-PicoMessage JB_Pico__FromFS(FastString* Fs);
+void JB_Pico__FromFS(FastString* Fs, PicoMessage* Rz);
 
 
 
@@ -7043,8 +7043,6 @@ void JB_Str_SyntaxExpect(JB_String* Self);
 
 JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in);
 
-bool SC_Str_trap(JB_String* Self, Message* Msg);
-
 JB_String* JB_Str_Shorten(JB_String* Self, int N);
 
 JB_String* JB_Str_TrimExtAndPath(JB_String* Self, bool KeepPath);
@@ -7895,7 +7893,7 @@ int64 JB_Msg_IntRange(Message* Self, int StrStart, int64 Low, int64 High);
 
 int64 JB_Msg_Int(Message* Self, int StrStart);
 
-NameAndMsg SC_Msg_IntoVariable(Message* Self, SCNode* Name_space);
+void SC_Msg_IntoVariable(Message* Self, SCNode* Name_space, NameAndMsg* Rz);
 
 MaybeBool SC_Msg_IsAlwaysBool(Message* Self);
 
@@ -8004,6 +8002,8 @@ Message* SC_Msg_MainFix(Message* Self);
 void SC_Msg_mainfix2(Message* Self);
 
 int SC_Msg_MainOneArg(Message* Self, Message* Arg, int I, int Found);
+
+Message* SC_Msg_MakeAccess0(Message* Self);
 
 void SC_Msg_MakeComment(Message* Self);
 
@@ -8261,7 +8261,7 @@ void JB_Msg_SyntaxIsSet(Message* Self, MsgParseFlags F, bool Value);
 
 void JB_Msg_SyntaxProblem(Message* Self, JB_String* Error);
 
-MessagePosition JB_Msg_SyntaxUsing(Message* Self);
+void JB_Msg_SyntaxUsing(Message* Self, MessagePosition* Rz);
 
 void JB_Msg_SyntaxWarn(Message* Self, JB_String* Error);
 
@@ -8571,6 +8571,8 @@ bool SC_Decl_IsVoidPtr(SCDecl* Self);
 bool SC_Decl_LoadContained(SCDecl* Self, Message* Contained, Message* Wrap, SCNode* Name_Space, DeclMode Purpose);
 
 bool SC_Decl_LoadContainedSub(SCDecl* Self, SCDecl* Cont, Message* Wrap, SCNode* Name_Space, DeclMode Purpose);
+
+Message* SC_Decl_MakeAccess0(SCDecl* Self);
 
 SCDecl* SC_Decl_MakeAsObject(SCDecl* Self, SCDecl* Container, Message* ErrPlace);
 
@@ -10289,8 +10291,9 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 	if (!JB_Ring_HasChildCount(Self, 2)) {
 		if (true) {
 			Message* __varf1 = F->Source;
-			MessagePosition _usingf0 = JB_Msg_SyntaxUsing(__varf1);
-			JB_Tree_SyntaxAppend(Self, (JB_Syx_Msg(kJB_SyxThg, JB_LUB[1301])));
+			MessagePosition _usingf0 = ((MessagePosition){});
+			JB_Msg_SyntaxUsing(__varf1, (&_usingf0));
+			JB_Tree_SyntaxAppend(Self, (JB_Syx_Msg(kJB_SyxThg, JB_LUB[1302])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0), __varf1);
 			JB_MsgPos_Destructor((&_usingf0));
 		}

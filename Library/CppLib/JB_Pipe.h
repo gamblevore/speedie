@@ -79,6 +79,7 @@ void JB_KillWithParent();
 void JB__DefaultCrashHandler(int Signal);
 //void JB__ErrorStackTrace(int Signal);
 void JB_Rec__CrashLog(const char* c);
+bool JB_Rec__CrashLogSub(const char* c);
 struct SpdProcess;
 void JB_App__SetThreadName(JB_String* name);
 int JB_Pipe__IgnoreBreakPoints ();

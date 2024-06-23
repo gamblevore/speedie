@@ -378,7 +378,6 @@ function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming,
 
 
 function StructReturned (|scdecl|)
-	// remove this??!
 	opt norefcounts
 	|| p = .StructReturnPos
 		|| f = .args[p-1]
@@ -1613,8 +1612,6 @@ function scdecl.CanRemoveArgOnReturn (|message| r, |bool|)
 
 function message.StructReturnCleanup (|scfunction| fn, |scnode| name_space)
 	// Should just write directly into the thing...  Requires more "sleuthing" to do that!!!!
-	if "TestNewNew".trap
-
 	|| R = .first$
 	typeofexpr(r, name_Space)
 	require r in self // may get fixed already
@@ -1623,17 +1620,11 @@ function message.StructReturnCleanup (|scfunction| fn, |scnode| name_space)
 	
 	if arg.CanRemoveArgOnReturn(r)
 		r.remove
-		return
-
-	using self
-	|| L = @thg + arg.name
-	L = l.wrapwith(@acc)
-	l.msg(@arr) <~ 0
-	|| rel = neweqrel(l,r)
-	.prev = rel
-	//debugat
-	typeofexpr(rel, name_space)
-	
+	  else
+		using self
+			|| rel = neweqrel(arg!.MakeAccess0, r)
+			.prev = rel
+			typeofexpr(rel, name_space)
 
 
 function message.CheckNotInStateExpr (|message| top)

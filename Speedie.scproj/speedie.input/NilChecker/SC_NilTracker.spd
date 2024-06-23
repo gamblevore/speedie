@@ -18,9 +18,6 @@ struct LoopInfo
 	|byte| 				NestDepth
 	|bool| 				HasEscape
 	
-	function OOOO (|&loopinfo| def)
-		"hi!"
-		
 	function BeginLoop (|bool| HasExitCond, |Loopinfo|)
 		rz = self[0]
 		|| v = ArchonPurger.value

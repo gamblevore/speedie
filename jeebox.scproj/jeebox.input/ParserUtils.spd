@@ -217,7 +217,7 @@ extend Parser
 
 
 
-struct MessagePosition
+struct MessagePosition 
 	linkage
 		cpp_part MsgPos
 		noauto
@@ -231,6 +231,9 @@ struct MessagePosition
 	destructor
 		parser.using = self[0]
 	    .Layer.use 
+	
+	function CopyFrom (|&MessagePosition| x)
+		self[0] = x[0]
 	
 	function SyntaxUsingComplete (|object| idk=nil)
 

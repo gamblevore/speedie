@@ -1003,6 +1003,17 @@ class SCDecl (SCNamed) {
 		Addr.obj = Type
 		Return kAddressOfMatch
 	
+
+	function MakeAccess0 (|message|)
+		opt norefcounts
+		|| l = @thg + .name
+		return l.MakeAccess0
+	
+	function message.MakeAccess0 (|message|)
+		opt norefcounts
+		rz = .wrapwith(@acc)
+		rz.msg(@arr) <~ 0
+	
 	
 	function ExpectRelMatch (|SCDecl| O,  |Message| exp,  |Message?| side,  |Message?| ErrNode = nil)
 		opt norefcounts

@@ -496,8 +496,8 @@ static int InterPipe(FastString* self, int Desired, int fd, int Mode) {
 }
 
 
-void JB_Rec__CrashLog(const char* c) {
-	if (!c) return;
+bool JB_Rec__CrashLogSub(const char* c) {
+	if (!c) return false;
 
 	if (!CrashLogFile) {
 		mkdir("/tmp/logs", kDefaultMode);
@@ -509,11 +509,16 @@ void JB_Rec__CrashLog(const char* c) {
 	}
 
 	fputs(c, stderr);
-	fputc('\n', stderr);
 
-	if (!CrashLogFile) return;
+	if (!CrashLogFile) return false;
     JB_Write( CrashLogFile, (u8*)c, (int)strlen(c) );
-    JB_Write( CrashLogFile, (u8*)"\n", 1 );
+    return true;
+}
+
+void JB_Rec__CrashLog(const char* c) {
+	if (JB_Rec__CrashLogSub(c))
+		JB_Write( CrashLogFile, (u8*)"\n", 1 );
+	fputc('\n', stderr);
 }
 
 

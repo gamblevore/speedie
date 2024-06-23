@@ -172,6 +172,8 @@ class SCParamArray
 	
 	
 	function StructExtract (|scdecl| type)
+		// remove this?
+		debugat
 		|| s = .exp
 			|| where = s.UseNonRefChangers(True)!
 			|| fn = where.func
@@ -183,9 +185,8 @@ class SCParamArray
 	function StructAsReturn (|SCDecl| type, |scfunction| fn)
 		|| s = .exp$
 		|| Rel = s.UseNonRefChangers(True)
-		
 		|| f = Rel.func
-		if "TestNewNew".trap
+
 		if f == @prm
 			Rel = scfunction.TempMoveOut(s, type.internal).second!
 			f = Rel.func			/*   .TestAccept(YY.new)   -->   || tmp = YY.new, .TestAccept(tmp)   */
@@ -211,7 +212,7 @@ class SCParamArray
 					|| dcltype = dcl.first
 						dcltype.become(@thg, type.type.name)
 					dcl.next = s
-					dcl <~ name
+					dcl <~ Neweqrel(name, type.internal!.CreateStructNil(name))
 				  else
 					op.become(@bra)
 					op.obj = nil
@@ -219,7 +220,7 @@ class SCParamArray
 					op = name
 					Rel.next = s
 				
-				|| prm = s.last!			/*  y = YY.new --> YY.new(&y)  */
+				|| prm = s.last!				/*  y = YY.new --> YY.new(&y)  */
 				if fn.StructReturnPos==1
 					prm.first = Rel
 				  else
