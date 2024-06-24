@@ -1002,6 +1002,11 @@ function TypeOfArr (ExprResolver)
 	return result
 
 
+function message.DeclAddNumbInt (|int64| num, |scnode| name_space)
+	opt norefcounts
+	|| Numb = .msg(@num, num.render)
+	numb.obj = TypeOfNum(Numb, name_Space)
+
 
 function TypeOfSwizzle (|message| Exp, |scdecl| Type, |SCNode| name_space, |message| side, |int| swiz, |scdecl|)
 	// So... we are getting like: v.z --> v[2]	
@@ -1019,7 +1024,7 @@ function TypeOfSwizzle (|message| Exp, |scdecl| Type, |SCNode| name_space, |mess
 		expect (swiz < W) (prms, "Vector access is too large.")
 		exp.become(@acc)
 		prms.func = @arr
-		prms <~ swiz
+		prms.DeclAddNumbInt(swiz, name_space)
 
 	  else
 		prms.remove

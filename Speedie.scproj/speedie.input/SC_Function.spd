@@ -372,7 +372,7 @@ function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming,
 		error ( incoming.exp, "Wrong params to " + .RenderTitle )
 	  elseif rz
 		|| ft = rz.StructReturned
-			incoming.StructAsReturn(ft.aslocal, self)
+			incoming.StructLover(ft.aslocal, self)
 		  elseif rz.returntype is returnedstruct // remove this? its always the prev?
 			incoming.StructExtract(rz.returntype)
 

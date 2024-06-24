@@ -6291,7 +6291,8 @@ Message* JB_Msg_Copy(Message* Self, Message* Pos_msg) {
 	Message* Rz = nil;
 	Rz = ((Message*)JB_Ternary(((bool)Pos_msg), Pos_msg, Self));
 	if (true) {
-		MessagePosition _usingf0 = JB_Msg_SyntaxUsing(Rz);
+		MessagePosition _usingf0 = ((MessagePosition){});
+		JB_Msg_SyntaxUsing(Rz, (&_usingf0));
 		Rz = JB_Msg_CopySub(Self, Pos_msg);
 		JB_MsgPos_SyntaxUsingComplete((&_usingf0), Rz);
 		JB_MsgPos_Destructor((&_usingf0));
@@ -7216,16 +7217,14 @@ void JB_Msg_SyntaxIsSet(Message* Self, MsgParseFlags F, bool Value) {
 	}
 }
 
-MessagePosition JB_Msg_SyntaxUsing(Message* Self) {
-	MessagePosition Rz = ((MessagePosition){});
-	Rz = JB__Tk_Using;
-	Rz.Layer = JB_Class_Layer((&MessageData));
+void JB_Msg_SyntaxUsing(Message* Self, MessagePosition* Rz) {
+	Rz[0] = JB__Tk_Using;
+	Rz->Layer = JB_Class_Layer((&MessageData));
 	JB__Tk_Using.Position = Self->Position;
 	JB__Tk_Using.Length = Self->RangeLength;
 	JB__Tk_Using.Tag = Self->Tag;
 	JB__Tk_Using.Flags = kJB__MsgParseFlags_Inserted;
 	JB_Mem_Use(JB_ObjLayer(Self));
-	return Rz;
 }
 
 void JB_Msg_Test(Message* Self, JB_String* New_render, JB_String* Name) {
@@ -8216,7 +8215,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024062215);
+	return (2024062320);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8228,4 +8227,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 -3558337903863250249 -6720784475268466743
+// 7796578953066441599 -3889750039467382145 -6720784475268466743

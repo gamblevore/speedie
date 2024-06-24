@@ -526,3 +526,8 @@ function Message.PrmFunc (|scfunction|)
 		|| s = .second
 			return s.obj as scfunction
 		
+
+function Message.PrmFuncStructMsg (|message|)
+	opt norefcounts
+	|| list_fn = .PrmFunc
+		return .last[list_fn.structreturnpos-1]

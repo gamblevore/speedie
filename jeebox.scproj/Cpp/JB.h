@@ -2713,7 +2713,7 @@ bool JB_Msg_SyntaxIs(Message* Self, MsgParseFlags F);
 
 void JB_Msg_SyntaxIsSet(Message* Self, MsgParseFlags F, bool Value);
 
-MessagePosition JB_Msg_SyntaxUsing(Message* Self);
+void JB_Msg_SyntaxUsing(Message* Self, MessagePosition* Rz);
 
 void JB_Msg_Test(Message* Self, JB_String* New_render, JB_String* Name);
 

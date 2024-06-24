@@ -432,7 +432,6 @@ function CanKeepAsValue (|sciterator| iter, |Message| arg, |scdecl| dcl, |Messag
 
 function Tran_For (TranFunc)
 	using (node)
-		node.become(@Arg)							// calls destructors :)
 		name_space = node.scarg( name_space )
 		tran_ForSub(fn, node, name_space)
 
@@ -490,6 +489,7 @@ function Tran_ForSub (TranFunc)					// :3
 				bad +=! index[@thg]
 	
 	require dcl and !bad and iter and list
+	node.become(@Arg)
 
 	if index // remove nodes AFTER the error tests
 		index.Remove
@@ -505,10 +505,13 @@ function Tran_ForSub (TranFunc)					// :3
 				//////// Uniquify source/value names ////////
 	// for (x,y) in oof
 	|| ListName = list
-	if (!CanKeepSource)
-		ListName = «Thg UniqueTmpVar( name_space, "LoopSrc" )»
-		// what? listname.name? why not pass the thing itself?
-		MakeDeclOrRel( node, listname, list )
+	if !CanKeepSource
+		if dcl is returnedstruct // well its done already! just gotta find the thing!
+			|| list_msg = list.PrmFuncStructMsg
+				listname = list_msg.first!
+		  else
+			ListName = «Thg UniqueTmpVar( name_space, "LoopSrc" )»
+			MakeDeclOrRel( node, listname, list )
 	  elseif  dcl.IsCArray
 		listname = «ques "."» // not my best code ever
 

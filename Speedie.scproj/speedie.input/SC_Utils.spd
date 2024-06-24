@@ -70,11 +70,6 @@ extend Message {
 	// case blind...
 		Return (self) and (.func == @Brel) and (.name == name)
 
-//	operator IsRel (|String| name, |bool|)
-//		opt norefcounts
-//	// case blind...
-//		Return (self) and (.func == @Rel) and (.second == name)
-
 
 	operator IsDot (|string| name, |bool|)
 		Return (self) and (.func == @dot) and (.name ~= name)

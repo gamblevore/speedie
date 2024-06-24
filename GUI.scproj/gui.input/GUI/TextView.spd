@@ -1596,7 +1596,7 @@ class TextView (GUIControl)
 					C.a = 0.4 * Strength
 					if i == 0
 						C.a = 0.8 * Strength
-					for xx in p.x+4 downto p.x-4		// in 5
+					for xx in (p.x+4) downto (p.x-4)		// in 5
 						// || xx = p.x + j*((B*2)-1)
 						|| px = where[xx,p.y+i]
 						px.overlay(C.premul)

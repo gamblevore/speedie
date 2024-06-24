@@ -181,15 +181,25 @@ class SCParamArray
 				scfunction.TempMoveOut(s, type)
 	
 
-	
-	function StructAsReturn (|SCDecl| type, |scfunction| fn)
+	function message.SecondIs (|syntax| fn, |string| name, |bool|)
+		opt norefcounts
+		|| s = .second
+			return s == fn and name
+			
+	function StructLover (|SCDecl| type, |scfunction| fn)
 		|| s = .exp$
 		|| Rel = s.UseNonRefChangers(True)
 		|| f = Rel.func
+		if "DrawScrollErrors".trap
 
-		if f == @prm
-			Rel = scfunction.TempMoveOut(s, type.internal).second!
+		if (f == @prm) or ((f == @rel) and !rel.secondis(@opp, "="))
+			|| tmped = SCFunction.TempMoveOut(s, type.internal)
+			|| dcl2 = tmped.obj|scdecl|
+			|| name_space = tmped.parent!.obj as scnode
+				name_space.tryadd(rel, dcl2, dcl2.name)
+			Rel = tmped.second!
 			f = Rel.func			/*   .TestAccept(YY.new)   -->   || tmp = YY.new, .TestAccept(tmp)   */
+			
 		  elseif  (Rel.ASMType is kreturn)
 			/* return YY.new  --> yy.new(rz), return */
 			|| prm = s.last!
@@ -202,37 +212,33 @@ class SCParamArray
 		if  f == @rel
 			|| name = Rel.first!
 			|| op = name.next!
-			if op != "="
-				// just temp it out...? we'll have a rel?
-				error (op, "Please simplify this expression")
+			if  Rel in @decl				/*	|| x = YY.new   -->   |YY| x,  YY.new(&x)  */
+				op.become(@thg, name.name)
+				|| Dcl = Rel.parent!
+				|| dcltype = dcl.first
+					dcltype.become(@thg, type.type.name)
+				dcl.next = s
+				dcl <~ Neweqrel(name, type.internal!.CreateStructNil(name))
 			  else
-				if  Rel in @decl				/*	|| x = YY.new   -->   |YY| x,  YY.new(&x)  */
-					op.become(@thg, name.name)
-					|| Dcl = Rel.parent!
-					|| dcltype = dcl.first
-						dcltype.become(@thg, type.type.name)
-					dcl.next = s
-					dcl <~ Neweqrel(name, type.internal!.CreateStructNil(name))
-				  else
-					op.become(@bra)
-					op.obj = nil
-					op <~ name
-					op = name
-					Rel.next = s
-				
-				|| prm = s.last!				/*  y = YY.new --> YY.new(&y)  */
-				if fn.StructReturnPos==1
-					prm.first = Rel
-				  else
-					prm.last = rel
-				prm.func = @prm
-				Rel.become(@brel, "&")
-				Rel.obj = type
-				if op != name
-					op.obj = name.obj
-					if !op.obj
-						op.obj = name
-						FixMe <~ op
+				op.become(@bra)
+				op.obj = nil
+				op <~ name
+				op = name
+				Rel.next = s
+			
+			|| prm = s.last!				/*  y = YY.new --> YY.new(&y)  */
+			if fn.StructReturnPos==1
+				prm.first = Rel
+			  else
+				prm.last = rel
+			prm.func = @prm
+			Rel.become(@brel, "&")
+			Rel.obj = type
+			if op != name
+				op.obj = name.obj
+				if !op.obj
+					op.obj = name
+					FixMe <~ op
 		
 		  else
 			error (s, "Not sure how to handle this.")
