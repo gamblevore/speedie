@@ -11,11 +11,10 @@ main
 struct RayHit
 	|vec4|  Color
 	|float| Dist
+	constructor
+		.Dist = float.max
 	function ok (|bool|)
 		return .dist < float.max
-	module
-		function New (|rayhit|)
-			rz.Dist = float.max
 	
 
 class RayScene (window)
@@ -106,7 +105,7 @@ class Shape
 		.center += .speed
 		SDLApp.Touch
 
-	function Color (|Vec3| orig, |Vec3| dir, |vec3| idir, |&rayhit| H)
+	function Color (|Vec3| orig, |Vec3| dir, |vec3| idir, |rayhit| H)
 		opt min 3
 		|| t = .__dist__(orig, dir, idir)
 		if (t > 0) and (t < H.Dist)
