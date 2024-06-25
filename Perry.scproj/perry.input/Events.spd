@@ -5,6 +5,7 @@ function FileSepClicker (guiaction)
 	.ide.ViewAsSwap
 
 
+
 function perryide.UnusedFuncsFB (|message| stuff)
 	opt norefcounts
 	|| arg = stuff.last

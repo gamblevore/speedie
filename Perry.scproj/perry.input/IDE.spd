@@ -707,17 +707,20 @@ class PerryIDE (Window)
 		|| doc = txt.document
 		|| path = (doc.location, "")(doc)
 		|| lst = .errorlist
+		txt.clearerrors
 		.filelist.ClearErrors
 
 		|error| jumpto 
 		|| src = lst.ListSource
 		|| ActualErrors = 0
+		|| sel = txt.Selectedline
 		if src.hasany and src mustbe error
 			for err in src
 				if err.severity >= ErrorSeverity.Error
 					ActualErrors++
 				if err.path ~= path
-					txt.LineErrorAdd(err)
+					if txt.LineErrorAdd(err) == sel
+						txt.TryShowLineError(sel)
 					if jump and (!jumpto or err == lst.FirstSelected)
 						jumpto = err
 				if actual_compile
@@ -784,7 +787,6 @@ So anything not 0 means "its OK"`
 		.filelist.select(r)
 		
 		if !g
-			.editme.ClearErrors
 			.LoadErrors(true, false)
 			if .editme.FindExpectsParse < 2
 				.ProductSep.Collapse

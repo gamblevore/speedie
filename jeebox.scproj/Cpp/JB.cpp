@@ -2945,7 +2945,7 @@ float JB_f_Pow(float Self, int N) {
 	{
 		int _Valuef1 = 0;
 		while (_Valuef1 < N) {
-			Rz = (Rz * Rz);
+			Rz = (Rz * Self);
 			(++_Valuef1);
 		};
 	}
@@ -8215,7 +8215,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024062320);
+	return (2024062511);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {

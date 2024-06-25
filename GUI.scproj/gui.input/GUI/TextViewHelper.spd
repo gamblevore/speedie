@@ -25,6 +25,7 @@ datatype TextLineFlags (uint16)
 		Last
 		AvoidLastChar
 		FakeMsg
+//		Selected
 
 
 class TextViewLine (list)
@@ -39,23 +40,9 @@ class TextViewLine (list)
 	|int|					vline
 	|int|					tline
 	|TextLineFlags|			State
-//	|bool|					dbg 
 
-
-//	module
-//		|| count = 0
-
-	constructor (|bool| debug=false, |int| p=0)
+	constructor (|int| p=0)
 		.position = p
-//		.dbg = debug
-//		if debug
-//			.MarkRefCount
-//		if .refcountmark
-//			"++${++Count}"
-
-//	destructor
-//		if .dbg
-//			"--${--Count}"
 	
 	render
 		if !.parent
@@ -95,16 +82,6 @@ class TextViewLine (list)
 			.state |= f
 		  else
 			.state &= ~F
-
-//	function Contains (|int| x, |bool|)
-//		return x >= .position and x < .after
-//
-//	function NotReallyContains (|int| x, |bool|)
-//		if x < .position
-//			return true
-//		if x+1 > .after
-//			return true // what about being on the last byte?
-
 
 	function XOfChar (|ind| Pos, |int|)
 		return .SquaresAtByte(pos) * font.width
@@ -156,13 +133,13 @@ class TextViewLine (list)
 			is fakemsg
 	
 	
-	function @textviewline.FindLeak ()
-		|| h = WhoLeakedme
-			|| r = []
-			JB_FindLeakedObject(r, r)
-			if r
-				printline r
-				debugger
+//	function @textviewline.FindLeak ()
+//		|| h = WhoLeakedme
+//			|| r = []
+//			JB_FindLeakedObject(r, r)
+//			if r
+//				printline r
+//				debugger
 
 	
 	helper range (|intrange|)
@@ -365,14 +342,14 @@ helper textview.DrawError (|image| Where, |int| y, |TextViewLine| D)
 	where.RectBasic(r, v.px)
 
 
-helper textview.DrawFound (|image| Where, |int| y, |TextViewLine| D)
-	opt norefcounts
-	|| r = .lastrect
-	r.y	= y
-	r.y2 = y + 2
-	|| add = (0.15, 0.0)(d is currfound)
-	|| v = (0.6+Add, 0.5+Add, 0.1+Add, 0.4).px
-	where.RectBasic(r, v)
+//helper textview.DrawFound (|image| Where, |int| y, |TextViewLine| D)
+//	opt norefcounts
+//	|| r = .lastrect
+//	r.y	= y
+//	r.y2 = y + 2
+//	|| add = (0.15, 0.0)(d is currfound)
+//	|| v = (0.6+Add, 0.5+Add, 0.1+Add, 0.4).px
+//	where.RectBasic(r, v)
 
 
 helper textview.DrawLighter (|image| Where, |int| y)
@@ -642,4 +619,4 @@ function message.FlatRange (|intrange|)
 			rz.x2 = rz.x2 max ss.x2
 
 
-|object--| WhoLeakedme
+

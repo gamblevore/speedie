@@ -290,7 +290,18 @@ class TextView (GUIControl)
 			sdlapp.selchanged
 		if !.IsCleared
 			(.OnSelChanged)(self, 0, insert)?
-		require d
+		d := .FindDrawInfo(.sel0)
+
+		while
+//			(d is selected)
+			.TryShowLineError(d)
+			d++
+			if  !d  or  d.Position > .sel1
+				exit
+	
+	
+	function TryShowLineError (|textviewline| d)
+		opt norefcounts
 		|| err = d.LineError
 			(.OnSelError)(self, d)?
 			if .OnShowExtraInfo
@@ -914,6 +925,7 @@ class TextView (GUIControl)
 	
 	
 	function ErrorAt (|error| err)
+		opt norefcounts
 		if err
 			.ErrorJump(err.position)
 			.LineErrorAdd( err, true )
@@ -922,11 +934,15 @@ class TextView (GUIControl)
 	function ClearErrors
 		opt norefcounts
 		.myerror = nil
+		|| s = .Selectedline
 		for d in ._lines
-			d.LineError = nil
+			if d.LineError
+				if d == s
+					.shownoextra
+				d.LineError = nil
 
 
-	helper LineErrorAdd (|error| e, |bool| ForceParse=true)
+	helper LineErrorAdd (|error| e, |bool| ForceParse=true, |textviewline|)
 		opt norefcounts
 		require ForceParse or !.NeedsPrepare
 		|| p = .clamp(e.position)
@@ -935,6 +951,7 @@ class TextView (GUIControl)
 		if r.TrySetError(e) or !.MyError
 			.MyError := e
 			sdlapp.touch(Self)
+			return r
 
 
 	function DoExplode (|textviewline| D, |float| strength)
@@ -1637,8 +1654,6 @@ class TextView (GUIControl)
 	
 	
 	behaviour MouseMove
-//		if keys.option
-//			textviewline.FindLeak
 		.ShowExtraInfo(p, true)
 		return .HandleMouseInScrollArea(p, ._ScrollDrawTimer)
 	
