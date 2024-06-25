@@ -454,7 +454,6 @@ function Tran_ForSub (TranFunc)					// :3
 		  else
 			arg = node.msg(@arg)
 
-	
 	|message| value
 	|| IterName = ""
 
@@ -477,7 +476,8 @@ function Tran_ForSub (TranFunc)					// :3
 	|sciterator| iter
 	|scdecl| dcl
 	if !bad
-		dcl = TypeOfExpr( list, name_space ) #check ( list, "No class found.")
+		dcl = TypeOfExpr( list!, name_space ) #check ( list, "No class found.")
+		list = List!.unbra
 	if dcl
 		iter = dcl.GetIteratorAny( itername, node )
 		if iter

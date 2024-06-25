@@ -190,7 +190,6 @@ class SCParamArray
 		|| s = .exp$
 		|| Rel = s.UseNonRefChangers(True)
 		|| f = Rel.func
-		if "DrawScrollErrors".trap
 
 		if (f == @prm) or ((f == @rel) and !rel.secondis(@opp, "="))
 			|| tmped = SCFunction.TempMoveOut(s, type.internal)
@@ -207,7 +206,7 @@ class SCParamArray
 			|| subrz = prm.msg(@thg, "rz")			// we need to add rz.
 			subrz.obj = scfunction.currfunc!.StructReturned // right?
 			rel.prev = rel.first
-			return
+			f = @nil
 		
 		if  f == @rel
 			|| name = Rel.first!
@@ -240,7 +239,7 @@ class SCParamArray
 					op.obj = name
 					FixMe <~ op
 		
-		  else
+		  elseif f
 			error (s, "Not sure how to handle this.")
 	
 		// returns need further processing!
