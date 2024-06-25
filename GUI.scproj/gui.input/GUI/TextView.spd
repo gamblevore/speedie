@@ -1235,7 +1235,6 @@ class TextView (GUIControl)
 
 
 	helper ValidateNewText (|message|)
-//		return nil
 		if .MyError is parse
 			.MyError = nil
 		|| msg = .text.ParseWithError(.myerror)
@@ -1315,9 +1314,8 @@ class TextView (GUIControl)
 		if .undoer.save(DocumentState.saving)?
 			.AlphaFade
 			return true
-	
-		
-	
+
+
 	function Path (|string|)
 		|| u = .document
 			return u.Location
@@ -1325,7 +1323,7 @@ class TextView (GUIControl)
 
 	function DeleteKey (|bool| fwd, |bool|)
 		|| d = (1, -1)(fwd)
-		ifn .deletekeysub(d)
+		if !.deletekeysub(d)
 			beep
 		sdlapp.showcursor(false)
 		return true

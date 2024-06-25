@@ -5,22 +5,7 @@ struct ImagePixelStruct
 	|byte| G
 	|byte| B
 	|byte| A
-	target debug {
-	module
-		|ImagePixelStruct| abc
-		test()
-		function test
-			abc.r = 1
-			abc.g = 2
-			abc.b = 3
-			abc.a = 4
-			|| cc = (&abc)|&ImagePixel|
-			debugger
-			cc.r+=1
-			cc.g+=1
-			cc.b+=1
-			cc.a+=1
-	}
+
 
 datatype ImagePixel (uint)
 //	|byte| R

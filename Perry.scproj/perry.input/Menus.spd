@@ -80,7 +80,7 @@ function PerryIDE.GoToMarker (|message| m, |int| dir)
 	|| l = m.first
 	.duringNextPrev = dir
 	using self
-		.GoToAnyFile(m.firstname)
+		.GoToAnyFile(m.firstname, true)
 	.duringNextPrev = 0
 
 

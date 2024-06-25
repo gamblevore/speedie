@@ -510,12 +510,12 @@ datatype float
 		cpp_wrapper (powf)
 	
 	operator ShiftLeft (|int| x, |float|)
-		while x-- > 0 // there is a faster way, but this is good enough.
-			self *= 2.0 // mostly people wanna do x << 1 or x << 2
+		while --x >= 0	// there is a faster way, but this is good enough.
+			self *= 2.0	// mostly people wanna do x << 1 or x << 2
 		return self
 			
 	operator ShiftRight (|int| x, |float|)
-		while x-- > 0
+		while --x >= 0
 			self *= 0.5
 		return self
 	

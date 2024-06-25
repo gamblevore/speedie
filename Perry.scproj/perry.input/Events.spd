@@ -402,7 +402,7 @@ function PerryIDE.ClickedError (|error| row)
 	using self
 		|| f = row.path.file
 		if (row.path != .editme.path) and f.IsNicelyViewable
-			.GoToAnyFile(f)
+			.GoToAnyFile(f, false)
 		.editme.ShowAndSel(row.position, true)
 		.editme.MyError = row
 
