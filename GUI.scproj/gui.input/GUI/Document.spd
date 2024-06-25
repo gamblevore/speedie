@@ -27,7 +27,7 @@ class Document (list)
 	|date|					ViewDate
 	|intrange|				Sel
 	|DocumentViewer|		Viewers
-	|CachedPath|			Ref // remove too? dict into viewers?
+	|CachedPath|			Ref
 	
 	
 	constructor (|string| path, |bool| Dummy)
@@ -39,7 +39,7 @@ class Document (list)
 	
 	destructor
 		.Viewers.clear
-		.ref.clear
+		.ref.DeRef
 	
 	render
 		fs <~ .location
@@ -54,8 +54,13 @@ class Document (list)
 		super.clear
 		
 	
-//	function Name (|string|)
-//		return .Location.name
+	function MoveTo (|string| path)
+		require .Location != path
+		.ref.Cache.ValueLower(.location) = nil
+		.Location = path
+		.ref.Path = path
+		.ref.Cache.ValueLower(path) = .ref
+
 	
 	function Text (|string|)
 		opt norefcounts

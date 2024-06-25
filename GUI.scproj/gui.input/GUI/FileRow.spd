@@ -19,6 +19,15 @@ class FileRow (ListViewRow)
 	contains FileRow
 	
 	 
+	function Sanity 
+		return
+		|| d = ._document
+			|| dp = d.location.resolve(true)
+			|| l = .location.resolve(true)
+			if l and dp
+				if l != dp
+			
+	 
 	constructor (|FileRow| R)
 		cpp_Part ConstructorCopy
 		.func = r.func
@@ -56,10 +65,12 @@ class FileRow (ListViewRow)
 	
 	
 	behaviour Text
+		.Sanity
 		if i == 0
 			return .name
 
-	operator isa (|string|s, |bool|)
+	operator isa (|string| s, |bool|)
+		.Sanity
 		return .location isa s
 	
 
@@ -83,13 +94,15 @@ class FileRow (ListViewRow)
 	
 	
 	function MoveTo (|string| v, |bool|) // rename
+		.sanity
 		|| f = .movetosub(v) #expect beep
 		.location = f.path
 		.name = f.name
 		.parent.filesort
-		with ._document
-			.location = self.readfrom
-			return true
+		|| d = ._Document
+			d.MoveTo(.readfrom)
+		.sanity
+		return true
 
 
 	function IsDir (|bool|)
@@ -97,6 +110,7 @@ class FileRow (ListViewRow)
 	
 	
 	function ReadFrom (|string|)
+		.Sanity
 		return .Location + .dirfile
 
 
@@ -176,6 +190,7 @@ class FileRow (ListViewRow)
 
 
 	function ReadName (|string|)
+		.Sanity
 		|| n = .location.name
 		if .dirfile
 			return n.pathdir + .dirfile
@@ -184,6 +199,7 @@ class FileRow (ListViewRow)
 
 	function Save (|int| Purpose=documentstate.saving, |bool|)
 		opt norefcounts
+		.Sanity
 		|| d = ._Document
 			|| tsize = D.save(purpose)
 				.lastsize = tsize
@@ -191,18 +207,22 @@ class FileRow (ListViewRow)
 
 
 	function IsModified (|bool|)
-		return ._document$.ismodified
+		.Sanity
+		return ._Document$.ismodified
 
 
 	function Document (|document|)
-		return ._document init .makedoc
-
-
-	function MakeDoc (|document|)
-		return document(.readfrom)
+		opt norefcounts
+		|| s = ._Document
+			return s
+		s = document(.readfrom)
+		._Document = s
+		.Sanity
+		return s
 
 
 	function VisibleText (|bool|ignore=true, |string|)
+		.Sanity
 		|| d = ._Document
 			if d.current
 				return d.text

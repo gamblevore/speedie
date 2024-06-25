@@ -282,7 +282,7 @@ class ListView (GUIControl) {
 		
 		if willsel
 			willsel.ChangeSel(true)
-			.SelChangeEvent( willsel )
+			.SelectedEvent( willsel )
 
 		sdlapp.touch(self)
 		if Update
@@ -301,8 +301,6 @@ class ListView (GUIControl) {
 			.Select(f)
 		return true
 		
-//	function AddRow (|string| name = "", |listviewrow|)
-//		return .ListSource.msg(@str, name)
 		
 	function Rename (|bool|)
 		cpp_part RenameCurr
@@ -930,7 +928,7 @@ class ListView (GUIControl) {
 		if .onealwaysselected
 			|| it = .start
 				(it is selected)
-				self.SelChangeEvent( it )
+				self.SelectedEvent( it )
 				return it
 
 
@@ -965,7 +963,7 @@ class ListView (GUIControl) {
 			|| mode = listviewselectmode.normal
 			if all
 				mode = listviewselectmode.noshow
-			.SelChangeEvent( (m, nil)(i), mode )
+			.SelectedEvent( (m, nil)(i), mode )
 		return true
 
 
@@ -997,7 +995,7 @@ class ListView (GUIControl) {
 		
 		if .multiselection and multi
 			if m.ChangeSel(state)
-				.SelChangeEvent(m)
+				.SelectedEvent(m)
 		  else
 			.Select(m)
 
@@ -1027,7 +1025,7 @@ class ListView (GUIControl) {
 			modified += r.ChangeSel(r == s)
 		
 		if modified or .AlwaysSendChangeEvent or mode is SendEvent
-			.SelChangeEvent(s, mode)
+			.SelectedEvent(s, mode)
 		if mode isnt noshow
 			.show(s)
 
@@ -1039,7 +1037,7 @@ class ListView (GUIControl) {
 		.Select(r)
 
 	
-	function SelChangeEvent (|ListViewRow| s, |ListViewSelectMode| Mode=ListViewSelectMode.normal)
+	function SelectedEvent (|ListViewRow| s, |ListViewSelectMode| Mode=ListViewSelectMode.normal)
 		opt norefcounts
 		.ClearEdits
 		.SelJustChanged = true

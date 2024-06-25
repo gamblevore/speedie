@@ -86,13 +86,16 @@ class TextView (GUIControl)
 		if (clicks == 1) and (keys.cmd or keys.control)
 			.SendSpecialClick(p, !keys.PlatCmd)
 			return MouseDragging.handled
+		
 		if .ClickedScroll(P, clicks)
 			return MouseDragging.Within
+		
 		if self is editable or AlwaysScrollable
 			if clicks >= 1
 				._ClicksDown = clicks
 			|| x = .EditClick(p, clicks, false)
 				return x
+
 		|| onc = .onclicked
 		if (onc) and clicks >= 0				// -1 = drag
 			(onc)(self, clicks)
@@ -1359,13 +1362,13 @@ class TextView (GUIControl)
 
 
 	helper ProperSelectLine (|intrange|)
-		|| r = .selrange
-		|ind| A = .findline(r.x, 0)+1
+		|| r = .SelRange
+		|ind| A = .FindLine(r.x, 0)+1
 		|ind| B = r.x2
 		if (b > a) and self[b-1].istextline
 			b-- 
 		|| b2 = .findline(b)
-			return (a,b2+1)
+			return (a, b2+1)
 		return (a, .length+1) 
 	
 	

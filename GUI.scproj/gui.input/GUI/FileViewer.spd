@@ -478,10 +478,9 @@ class FileViewer (ListView)
 
 	module
 		function FileRowRenamer (guilisteditevent)
-			|| o = cell!.row
-			if o isa filerow
-				if o.moveto(value)
-					return true
+			opt norefcounts
+			|| o = cell!.row as filerow
+				return o.moveto(value)
 			
 		function FileRowScoreSorter (SorterComparerFileRow)
 			opt norefcounts
@@ -624,8 +623,8 @@ function RightClickFileList (GUIListEvent)
 	opt NoRefCounts
 	if self isa fileviewer
 		|| m = .newcmm
+		m <~ ("Show In Desktop",	FileViewerCMMShow)
 		m <~ ("Copy File Path",		FileViewerCopyPath)
-		m <~ ("Create File",		FileViewerCreateFile)
 		m <~ ("Rename File",		FileViewerRenameFile)
 		m.addsep
 		|| within = .FindSearchWithin
@@ -635,8 +634,8 @@ function RightClickFileList (GUIListEvent)
 			if (.extra contains rem) and rem != .extra
 				m <~ ("Remove From Project",	FileViewerRemove)
 
-		m <~ ("Show In Desktop",	FileViewerCMMShow)
 		m.AddSep
+		m <~ ("Create File",		FileViewerCreateFile)
 		m <~ ("Delete File",		FileViewerTrash)
 	return true
 
@@ -680,15 +679,11 @@ function File.CreateEmpty (|bool|)
 
 function FileViewerCopyPath (GuiMenuEvent)
 	opt norefcounts
-	|GuiMenuEvent| test
-	|| row = clicked!.row
-	if row isa FileRow
-		clipboard.text = row.location
-				
-				
-	
+	if Clicked
+		|| row = clicked.row as FileRow
+			clipboard.text = row.location
 
-//FileListSearchWithin
+
 function FileViewerTrash (GuiMenuEvent)
 	|| row = clicked!.row
 	if  row isa FileRow  and  self isa fileviewer

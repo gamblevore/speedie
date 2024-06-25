@@ -41,6 +41,8 @@ module Notifications
 				app.alert(n.name)
 			  elseif n == @url and "file"
 				n.firstname.Reveal
+			  else
+				clipboard.text = T.name
 		w.tag = nil
 		w.CreatedDate = date.now
 	

@@ -1,10 +1,9 @@
  
 
+	
 function dictionary.DocumentCached (|string| path, |document|)
 	opt norefcounts
-	require self
-	|| i = .valuelower(path)
-	if i isa CachedPath
+	|| i = .valuelower(path) as cachedpath
 		return i.value
 
 
@@ -13,7 +12,7 @@ class CachedPath
 		cpp_part CaP
 	|string|				Path
 	|document--?|			Value
-	|dictionary--?|			Cache
+	|dictionary--|			Cache
 
 	constructor (|string| p, |dictionary| c, |document| v)
 		c.valuelower(p) = self
@@ -22,13 +21,10 @@ class CachedPath
 		.value = v
 
 
-	function Clear
+	function DeRef
 		require self
-		|| c = .Cache
-			c.valuelower(.path) = nil
+		.cache.valuelower(.path) = nil
 		.path = ""
-		.value = nil
-		.cache = nil
 
 
 class DocumentViewer (list)

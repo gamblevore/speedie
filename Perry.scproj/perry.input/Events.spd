@@ -535,7 +535,7 @@ function PerryFileViewRightClick (GuiListEvent)
 	if row isa filerow
 		|| m = .CMM									#require
 		|| menu = menuitem("Count Lines Of Code", FileViewerCountCode)
-		|| where = m.listsource.Last.prev
+		|| where = m.listsource[4]
 			where.prev = menu
 	return true
 
