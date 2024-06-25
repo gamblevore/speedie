@@ -7563,6 +7563,8 @@ void SC_Msg_AssignsFix(Message* Self, SCFunction* F);
 
 int SC_Msg_Autocomplete_State(Message* Self);
 
+JB_String* SC_Msg_AutoCompleteDecl(Message* Self);
+
 SCFunction* SC_Msg_AutoMsgFunc(Message* Self);
 
 SCFunction* SC_Msg_AutoMsgFuncFn(Message* Self);
@@ -8168,8 +8170,6 @@ JB_String* JB_Msg_RenderJbin(Message* Self, JB_String* Shell_path, FastString* F
 void JB_Msg_RenderPrm(Message* Self, FastString* Fs, byte B1, byte B2);
 
 JB_String* SC_Msg_RenderType(Message* Self);
-
-JB_String* SC_Msg_RenderTypeAndName(Message* Self);
 
 void JB_Msg_RenderWithSpaces(Message* Self, FastString* Fs, Message* Ch);
 

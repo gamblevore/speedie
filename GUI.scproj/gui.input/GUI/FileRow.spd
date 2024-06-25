@@ -20,6 +20,7 @@ class FileRow (ListViewRow)
 	
 	 
 	function Sanity 
+		disabled 
 		return
 		|| d = ._document
 			|| dp = d.location.resolve(true)
@@ -65,12 +66,12 @@ class FileRow (ListViewRow)
 	
 	
 	behaviour Text
-		.Sanity
+//		.Sanity
 		if i == 0
 			return .name
 
 	operator isa (|string| s, |bool|)
-		.Sanity
+//		.Sanity
 		return .location isa s
 	
 
@@ -89,19 +90,22 @@ class FileRow (ListViewRow)
 	function MoveToSub (|string|v, |file|)
 		|| l = .location.file
 		rz = l.sibling(v)
-		if !l.moveto(rz)
+		if rz.Exists
+			beep v + " already exists!"
+			rz = nil
+		  elseif !l.moveto(rz)
 			rz = nil
 	
 	
 	function MoveTo (|string| v, |bool|) // rename
-		.sanity
+//		.sanity
 		|| f = .movetosub(v) #expect beep
 		.location = f.path
 		.name = f.name
 		.parent.filesort
 		|| d = ._Document
 			d.MoveTo(.readfrom)
-		.sanity
+//		.sanity
 		return true
 
 
@@ -110,7 +114,7 @@ class FileRow (ListViewRow)
 	
 	
 	function ReadFrom (|string|)
-		.Sanity
+//		.Sanity
 		return .Location + .dirfile
 
 
@@ -190,7 +194,7 @@ class FileRow (ListViewRow)
 
 
 	function ReadName (|string|)
-		.Sanity
+//		.Sanity
 		|| n = .location.name
 		if .dirfile
 			return n.pathdir + .dirfile
@@ -199,7 +203,7 @@ class FileRow (ListViewRow)
 
 	function Save (|int| Purpose=documentstate.saving, |bool|)
 		opt norefcounts
-		.Sanity
+//		.Sanity
 		|| d = ._Document
 			|| tsize = D.save(purpose)
 				.lastsize = tsize
@@ -207,7 +211,7 @@ class FileRow (ListViewRow)
 
 
 	function IsModified (|bool|)
-		.Sanity
+//		.Sanity
 		return ._Document$.ismodified
 
 
@@ -217,12 +221,12 @@ class FileRow (ListViewRow)
 			return s
 		s = document(.readfrom)
 		._Document = s
-		.Sanity
+//		.Sanity
 		return s
 
 
 	function VisibleText (|bool|ignore=true, |string|)
-		.Sanity
+//		.Sanity
 		|| d = ._Document
 			if d.current
 				return d.text
