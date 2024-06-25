@@ -1951,7 +1951,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1144], (112676881092054));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1144], (112679257636864));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3268,7 +3268,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1915]);
-	JB_FS_AppendInt32(_fsf0, (2024062511));
+	JB_FS_AppendInt32(_fsf0, (2024062521));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -4058,6 +4058,7 @@ Message* SC_AC__DefineOrCall(Message* Msg, JB_String* Purpose, JB_Object* Found)
 Message* SC_AC__Diissplay(Message* Msg, Message* S, JB_String* Purpose) {
 	Message* Rz = nil;
 	JB_SetRef(Rz, JB_Syx_Msg(kJB_SyxArg, JB_LUB[0]));
+	TaskState X = kJB__TaskState_Finished;
 	SCFunction* Fn = JB_Incr(SC_Msg_IdentifyFunc(S));
 	if (JB_Msg_EqualsSyx(Msg, kJB_SyxName, false)) {
 		if ((JB_Str_Equals(Purpose, JB_LUB[1558], false)) and SC_Msg_OperatorIsTmp(S, JB_LUB[1842])) {
@@ -4083,7 +4084,7 @@ Message* SC_AC__Diissplay(Message* Msg, Message* S, JB_String* Purpose) {
 		JB_Decr(_tmPf1);
 		 _tmPf0;
 	}))) {
-		JB_String* _tmPf2 = JB_Incr(SC_Msg_RenderTypeAndName(S));
+		JB_String* _tmPf2 = JB_Incr(SC_Msg_AutoCompleteDecl(S));
 		JB_Msg_AppendSyx(Rz, kJB_SyxEmb, _tmPf2);
 		JB_Decr(_tmPf2);
 		JB_Decr(Fn);
@@ -8321,7 +8322,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[828]);
-	JB_FS_AppendInt32(_fsf0, (2024062511));
+	JB_FS_AppendInt32(_fsf0, (2024062521));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -30900,6 +30901,14 @@ int SC_Msg_Autocomplete_State(Message* Self) {
 	return Rz;
 }
 
+JB_String* SC_Msg_AutoCompleteDecl(Message* Self) {
+	SCDecl* D = SC_Msg_MsgDecl(Self);
+	if (D) {
+		return SC_Decl_RenderTypeAndName(D, 1);
+	}
+	return JB_Msg_Render(Self, nil);
+}
+
 SCFunction* SC_Msg_AutoMsgFunc(Message* Self) {
 	SCFunction* Rz = nil;
 	Rz = SC_Msg_MsgFunc(Self);
@@ -35794,18 +35803,6 @@ JB_String* SC_Msg_RenderType(Message* Self) {
 	if (JB_Object_FastIsa(D, &SCModuleData)) {
 		return ((SCModule*)D)->Name;
 	}
-	return JB_Msg_Render(Self, nil);
-}
-
-JB_String* SC_Msg_RenderTypeAndName(Message* Self) {
-	SCDecl* D = JB_Incr(SC_Msg_MsgDecl(Self));
-	if (D) {
-		JB_String* _tmPf0 = JB_Incr(SC_Decl_RenderTypeAndName(D, 1));
-		JB_Decr(D);
-		JB_SafeDecr(_tmPf0);
-		return _tmPf0;
-	}
-	JB_Decr(D);
 	return JB_Msg_Render(Self, nil);
 }
 
@@ -51380,4 +51377,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 8578155472988206705 -4480758206804178745
+// -2733702931890515617 -4480758206804178745
