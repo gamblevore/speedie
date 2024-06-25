@@ -278,7 +278,7 @@ extend float
 		visible
 		rz = self
 		for n
-			rz *= rz
+			rz *= self
 
 	function Pow2 (|float|)
 		return self*self

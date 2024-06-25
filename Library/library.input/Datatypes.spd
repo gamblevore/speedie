@@ -497,7 +497,7 @@ datatype float
 		return self * (1.0 - a) + (y * a)
 
 	function SmoothStep (|float|)
-		|| x = .clamp-0.5
+		|| x = .clamp - 0.5
 		return x * x * (3.0 - 2.0 * x)
 
 	operator max (|float| other, |float|)
@@ -508,7 +508,17 @@ datatype float
 
 	operator pow (|float| other, |float|)
 		cpp_wrapper (powf)
+	
+	operator ShiftLeft (|int| x, |float|)
+		while x-- > 0 // there is a faster way, but this is good enough.
+			self *= 2.0 // mostly people wanna do x << 1 or x << 2
+		return self
 			
+	operator ShiftRight (|int| x, |float|)
+		while x-- > 0
+			self *= 0.5
+		return self
+	
 	operator ↑↑ (|int| n, |float|)
 		rz = self
 		for n

@@ -6,10 +6,10 @@ main
 	sdlapp.Rescale(4)
 	return MainImage
 
-	
+
 function palette (|float| t,  |vec3|)
 	|| col = (0.263, 0.416, 0.557)
-	return ((t+col).cos + 1.0) *0.5
+	return ((t+col).cos + 1.0) * 0.5
 
 
 function MainImage ( ShaderToyFunc )

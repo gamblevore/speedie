@@ -456,9 +456,12 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 		|| GotABool = (DataTypeCode.bool == lnt or rnt)
 		if lnt != rnt
 			expect !(GotABool and comp is compare) (ErrPlace, "Cant compare bools to non-bools")
-			if (comp is mathlike) and comp isnt NoExtraBits
-				extra = CustomOps.TypeCastToBetter
-				
+			if (comp is mathlike) and (comp isnt NoExtraBits)
+				if (comp is ShiftOnly) and (lnt.isfloat) and (rnt.isint)
+					extra = CustomOps.Needed
+				  else
+					extra = CustomOps.TypeCastToBetter
+			
 		  else
 			if GotABool and comp isnt Compare
 				extra = CustomOps.TypeCastFromBool
