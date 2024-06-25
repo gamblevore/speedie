@@ -19,30 +19,32 @@ The simplest task is like this:
 Lets show a nice example 😰:
 
     main
-    	|| hello = abc.HelloSayer()
-    	hello()
-    	|| say = abc.stringsayer("goodbye")
-    	say()
-    	|| rsay = abc.randomsayer("hehe")
-    	rsay()
-
-    module abc
-    	task_run HelloSayer                       // one way of creating a task
-    		"hello"
+        || hello = abc.HelloSayer()
+        || say = abc.stringsayer("goodbye")
+        || rsay = abc.randomsayer("hehe")
+        "Now that we made 3 tasks... lets try running them"
+        hello()
+        say()
+        rsay()
     
-    	task_run StringSayer (|string| str)       // a second way
-    		printline .str
-    	
-    	task RandomSayer (|string| name)          // a third way
-    		|uint16| RandomID
-    		constructor
-    			.randomid = random.shared.int
-    		run
-    			"$.name $.randomid"
-	// Currently tasks need to live within modules... Just deal with it OK. I'm doing this unpaid and I didn't need it outside of a module.
+    
+    module abc
+        task_run HelloSayer
+            app.say "hello" // will print "hello" when run
+    
+        task_run StringSayer (|string| str)
+            app.say  .str
+        
+        task RandomSayer (|string| name)
+            |uint16| RandomID
+            constructor
+                .randomid = random.shared.int
+            run
+                app.say "$.name $.randomid"
 	
 Running this, you should see this output:
 
+    Now that we made 3 tasks... lets try running them
     hello
     goodbye
     hehe <random number here>
@@ -55,7 +57,7 @@ Speedie basically uses ["the erlang model"](https://www.youtube.com/watch?v=TTM_
 
 So you run a separate process, an instance of your program, and communicate with message-passing.
 
-It could be started via `spdprocess.fork()` or via running a speedie program (on disk) via `spdprocess.Run()`.
+It could be started via `spdprocess.SpawnFork()` or via running a speedie program (on disk) via `spdprocess.Spawn()`.
 
 Both return an `spdprocess` class. The `SpdProcess` class lets you talk to speedie processes... via message-passing.
 
@@ -64,7 +66,7 @@ Funnily enough, the [message class](Message.md) is perfect for passing... well..
 So we use the message class. Here is a good example:
 
     || WorkerAppPath = "/path/to/worker"
-    || child = spdprocess.run(WorkerAppPath, ["data1", "data2"])   #require
+    || child = spdprocess.Spawn(WorkerAppPath, ["data1", "data2"])   #require
     || pass = @tmp + "hello"
     || adj = pass.msg(@adj)
     adj <~ (@thg, "my")

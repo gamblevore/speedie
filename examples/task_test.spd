@@ -1,10 +1,9 @@
 
-
-
 main
 	|| hello = abc.HelloSayer()
 	|| say = abc.stringsayer("goodbye")
 	|| rsay = abc.randomsayer("hehe")
+	"Now that we made 3 tasks... lets try running them"
 	hello()
 	say()
 	rsay()
