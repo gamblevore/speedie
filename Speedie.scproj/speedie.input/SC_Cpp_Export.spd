@@ -1162,9 +1162,13 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		opt norefcounts
 		T <~ "#define "
 		D.exportName.safe(T)
-		t <~ " ("
-		D.Default!.Export( T )
-		t <~ ')'
+		t <~ ' '
+		if d.ExportPosition and d.IsInt
+			t <~ d.ExportPosition|int64|
+		  else			
+			t <~ '('
+			D.Default!.Export( T )
+			t <~ ')'
 
 
 	function C_RenderUnt (fpMsgRenderCpp)

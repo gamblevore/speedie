@@ -202,16 +202,14 @@ class SCParamArray
 			
 		  elseif  (Rel.ASMType is kreturn)
 			/* return YY.new  --> yy.new(rz), return */
-			target false
-				|| prm = s.last
+			|| prm = s.last
+				prm.func = @prm
+				|| subrz = prm.msg(@thg, "rz")			// we need to add rz.
+				subrz.obj = SCFunction.currfunc!.StructReturned // right?
+				rel.prev = rel.first
+				f = @nil
 			  else
-				|| prm = s.last!
-			
-			prm.func = @prm
-			|| subrz = prm.msg(@thg, "rz")			// we need to add rz.
-			subrz.obj = SCFunction.currfunc!.StructReturned // right?
-			rel.prev = rel.first
-			f = @nil
+				debugger 
 		
 		if  f == @rel
 			|| name = Rel.first!

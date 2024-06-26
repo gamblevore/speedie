@@ -1951,7 +1951,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1144], (112683960508817));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1144], (112684462047232));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3268,7 +3268,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1915]);
-	JB_FS_AppendInt32(_fsf0, (2024062617));
+	JB_FS_AppendInt32(_fsf0, (2024062620));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8322,7 +8322,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[828]);
-	JB_FS_AppendInt32(_fsf0, (2024062617));
+	JB_FS_AppendInt32(_fsf0, (2024062620));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -20142,9 +20142,9 @@ bool JB_Pico_SendMsg(PicoComms* Self, PicoMessage* A, bool Wait) {
 
 bool JB_Pico_SendFS(PicoComms* Self, FastString* Fs, bool Wait) {
 	bool Rz = false;
-	PicoMessage _tmPf0 = ((PicoMessage){});
-	JB_Pico__FromFS(Fs, (&_tmPf0));
-	Rz = JB_Pico_SendMsg(Self, (&_tmPf0), Wait);
+	PicoMessage Msg = ((PicoMessage){});
+	JB_Pico__FromFS(Fs, (&Msg));
+	Rz = JB_Pico_SendMsg(Self, (&Msg), Wait);
 	(JB_FS_LengthSet(Fs, 0));
 	return Rz;
 }
@@ -23606,9 +23606,15 @@ void SC_Cpp__WriteClass(SCClass* C, FastStringCpp* T) {
 void SC_Cpp__WriteConst(SCDecl* D, FastStringCpp* T) {
 	JB_FS_AppendString(T, JB_LUB[233]);
 	SC_Str_Safe(D->ExportName, T, false);
-	JB_FS_AppendString(T, JB_LUB[127]);
-	JB_Msg_Export(D->Default, T);
-	JB_FS_AppendByte(T, ')');
+	JB_FS_AppendByte(T, ' ');
+	if (((bool)D->ExportPosition) and SC_Decl_IsInt(D)) {
+		JB_FS_AppendInt64(T, ((int64)D->ExportPosition));
+	}
+	 else {
+		JB_FS_AppendByte(T, '(');
+		JB_Msg_Export(D->Default, T);
+		JB_FS_AppendByte(T, ')');
+	}
 }
 
 void SC_Cpp__WriteDecl(SCDecl* D, FastStringCpp* T, Message* Equality) {
@@ -26710,15 +26716,19 @@ void SC_PA_StructLover(SCParamArray* Self, SCDecl* Type, SCFunction* Fn) {
 	}
 	 else if (SC_ASMtmp_SyntaxIs(SC_Msg_ASMType(Rel), kSC__ASMtmp_kReturn)) {
 		Message* Prm = JB_Incr(((Message*)JB_Ring_Last(S)));
-		Prm->Func = kJB_SyxPrm;
-		Message* Subrz = JB_Incr(JB_Msg_Msg(Prm, kJB_SyxThg, JB_LUB[1871]));
+		if (Prm) {
+			Prm->Func = kJB_SyxPrm;
+			Message* Subrz = JB_Incr(JB_Msg_Msg(Prm, kJB_SyxThg, JB_LUB[1871]));
+			JB_SetRef(Subrz->Obj, SC_Func_StructReturned(SC__Func_CurrFunc));
+			JB_Decr(Subrz);
+			Message* _tmPf2 = JB_Incr(((Message*)JB_Ring_First(Rel)));
+			(JB_Ring_PrevSibSet(Rel, _tmPf2));
+			JB_Decr(_tmPf2);
+			F = kJB_SyxNil;
+		}
+		 else {
+		}
 		JB_Decr(Prm);
-		JB_SetRef(Subrz->Obj, SC_Func_StructReturned(SC__Func_CurrFunc));
-		JB_Decr(Subrz);
-		Message* _tmPf2 = JB_Incr(((Message*)JB_Ring_First(Rel)));
-		(JB_Ring_PrevSibSet(Rel, _tmPf2));
-		JB_Decr(_tmPf2);
-		F = kJB_SyxNil;
 	}
 	if (F == kJB_SyxRel) {
 		Message* Name = JB_Incr(((Message*)JB_Ring_First(Rel)));
@@ -51390,4 +51400,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -4782036841375979759 -4480758206804178745
+// -4949497055145023702 -4480758206804178745

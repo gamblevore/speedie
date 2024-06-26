@@ -317,7 +317,9 @@ void JB_FS_AppendIntegerAsText(FastString* self, int64 LeftOver, int RoundTo) {
 	if (RoundTo <= 0) {RoundTo = 1;} else if (RoundTo > 16) {RoundTo = 16;}
      
 	if (!LeftOver) {
-		JB_FS_AppendMultiByte( self, '0', RoundTo ); return;
+		return JB_FS_AppendMultiByte( self, '0', RoundTo );
+	} else if (LeftOver == (1ull << 63ull)) {
+		return JB_FS_AppendCString(self, "-9223372036854775808");
 	}
 
 	const int Alloced = 21; 
@@ -325,13 +327,10 @@ void JB_FS_AppendIntegerAsText(FastString* self, int64 LeftOver, int RoundTo) {
 	if ( !wp )
         return;
 
-    int SignLen = 0; // can remove signlen and just put PadCount here...
-    
-    if (LeftOver < 0) {
+    int SignLen = LeftOver < 0;
+    if (SignLen) {
         *wp++ = '-';
         LeftOver = -LeftOver;
-        if (LeftOver <= 0) { return; } // PPC oddity
-        SignLen = 1;
     }
 	
     double tmpCount = log10( (double)LeftOver ); // all math lib funcs are DAMN fast.

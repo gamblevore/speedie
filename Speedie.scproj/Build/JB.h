@@ -1405,7 +1405,7 @@ extern bool SC__Comp_InPerry;
 extern Dictionary* SC__Comp_InsecureWords;
 extern SCFile* SC__Comp_InternalFile;
 extern SCNode* SC__Comp_Interpreter;
-#define kSC__Comp_kTimeWidth (19)
+#define kSC__Comp_kTimeWidth 19
 extern Date SC__Comp_LastTime;
 extern JB_String* SC__Comp_LastTimeName;
 extern SCFunction* SC__Comp_MainFunc;
@@ -1443,12 +1443,12 @@ extern SCFunction* SC__Comp_TernaryFunc;
 extern FastString* SC__Comp_TimerOutput;
 extern Array* SC__Comp_TodoList;
 extern SCNode* SC__Comp_VisibleFuncs;
-#define kSC__CustomOps_Needed (64)
+#define kSC__CustomOps_Needed 64
 #define kSC__CustomOps_NotCustom (0)
-#define kSC__CustomOps_OnlyLeftIsVector (65)
-#define kSC__CustomOps_OnlyRightIsVector (66)
-#define kSC__CustomOps_TypeCastFromBool (16)
-#define kSC__CustomOps_TypeCastToBetter (32)
+#define kSC__CustomOps_OnlyLeftIsVector 65
+#define kSC__CustomOps_OnlyRightIsVector 66
+#define kSC__CustomOps_TypeCastFromBool 16
+#define kSC__CustomOps_TypeCastToBetter 32
 #define kJB__ErrorColors_bold (JB_LUB[99])
 extern bool JB__ErrorColors_Enabled;
 #define kJB__ErrorColors_error (JB_LUB[96])
@@ -1493,12 +1493,12 @@ extern CharSet* JB__Constants_XMLWordMiddle;
 extern int SC__LinkMap_CurrID;
 extern Message* SC__Linkage_Flagz;
 extern Message* SC__Linkage_OSXFrameworks;
-#define kJB__MZLab_Default (kJB__MZLab_Strong)
-#define kJB__MZLab_Fast (2)
-#define kJB__MZLab_Fastest (1)
+#define kJB__MZLab_Default 3
+#define kJB__MZLab_Fast 2
+#define kJB__MZLab_Fastest 1
 #define kJB__MZLab_None (0)
-#define kJB__MZLab_Strong (3)
-#define kJB__MZLab_Strongest (4)
+#define kJB__MZLab_Strong 3
+#define kJB__MZLab_Strongest 4
 extern Macro* SC__Macros_ASM_Datatype;
 extern Macro* SC__Macros_ASMCopier;
 extern Macro* SC__Macros_ASMSetter;
@@ -1534,13 +1534,13 @@ extern bool SC__Options_MakeInterpreter;
 extern bool SC__Options_MakeLib;
 extern bool SC__Options_ModeCpp;
 extern bool SC__Options_ModePack;
-#define kSC__Options_native (1)
+#define kSC__Options_native 1
 extern ErrorSeverity SC__Options_NilStrength;
 extern bool SC__Options_NilTestAllocNeverFails;
 extern byte SC__Options_OperationCount;
 extern byte SC__Options_Optimise;
 extern JB_String* SC__Options_output_path;
-#define kSC__Options_pack (1 << 1)
+#define kSC__Options_pack 2
 extern byte SC__Options_PerryOutput;
 extern bool SC__Options_PrintCompileString;
 extern bool SC__Options_PrintFiles;
@@ -1569,16 +1569,16 @@ extern int SC__PostIncrementNil_Size;
 extern bool SC__PostIncrementNil_Sync;
 extern Dictionary* SC__SCGame3D_Types;
 extern int SC__SC_UniqueNum;
-#define kSC__Refs_kBasisCArray (1 << 3)
-#define kSC__Refs_kBasisDeSTRUCTable (1 << 1)
+#define kSC__Refs_kBasisCArray 8
+#define kSC__Refs_kBasisDeSTRUCTable 2
 #define kSC__Refs_kBasisNotObj (0)
-#define kSC__Refs_kBasisObj (1)
-#define kSC__Refs_kBasisTempStruct (1 << 2)
-#define kSC__Refs_kHoldsDisowned (1 << 7)
-#define kSC__Refs_kIsDisowner (1 << 6)
-#define kSC__Refs_kIsNoisy (1 << 5)
+#define kSC__Refs_kBasisObj 1
+#define kSC__Refs_kBasisTempStruct 4
+#define kSC__Refs_kHoldsDisowned 128
+#define kSC__Refs_kIsDisowner 64
+#define kSC__Refs_kIsNoisy 32
 #define kSC__Refs_kNotDisturbed (0)
-#define kSC__Refs_kSufferedNoise (1 << 4)
+#define kSC__Refs_kSufferedNoise 16
 extern Message* SC__SCStrings_RenderFinish;
 extern Message* SC__SCStrings_RenderInsides;
 extern Message* SC__SCStrings_RenderNewParams;
@@ -1594,19 +1594,19 @@ extern Fn_µOpt SC__SpdAssembler_xC2xB5Opt[256];
 extern Array* SC__Crkt_List;
 extern Dictionary* SC__Crkt_Table2;
 extern int SC__Crkt_TotalSize;
-#define kJB__Terminal_Black (30)
-#define kJB__Terminal_Blue (34)
-#define kJB__Terminal_Cyan (36)
+#define kJB__Terminal_Black 30
+#define kJB__Terminal_Blue 34
+#define kJB__Terminal_Cyan 36
 extern FastString* JB__Terminal_fs;
-#define kJB__Terminal_Green (1 << 5)
-#define kJB__Terminal_h (35)
+#define kJB__Terminal_Green 32
+#define kJB__Terminal_h 35
 extern Date JB__Terminal_LastDisplay;
-#define kJB__Terminal_Magenta (35)
-#define kJB__Terminal_Red (31)
+#define kJB__Terminal_Magenta 35
+#define kJB__Terminal_Red 31
 extern Array* JB__Terminal_TermScreen;
-#define kJB__Terminal_w (80)
-#define kJB__Terminal_White (37)
-#define kJB__Terminal_Yellow (33)
+#define kJB__Terminal_w 80
+#define kJB__Terminal_White 37
+#define kJB__Terminal_Yellow 33
 extern Dictionary* SC__TextAssembler_LabelsToDo;
 extern Array* SC__Ext_Cleanup;
 extern int SC__Ext_CompilingLibFiles;
@@ -1624,8 +1624,8 @@ extern JB_String* SC__VM_Builder_parent;
 extern int SC__VM_Builder_Total;
 extern JB_File* SC__VM_Builder_vm_file;
 #define kSC____junktest_5___a (0)
-#define kSC____junktest_5___b (1)
-#define kSC____junktest_5___c (1 << 1)
+#define kSC____junktest_5___b 1
+#define kSC____junktest_5___c 2
 extern int SC____junktest_5___x[3];
 extern JB_String* SC___AppConfString;
 extern SyntaxObj* JB__FuncArray_[64];
@@ -1649,97 +1649,97 @@ extern FastString* SC_fs_tmp_num;
 extern Dictionary* SC_FuncLinkageTable;
 extern Dictionary* SC_FuncPreReader;
 extern int SC_iii;
-#define kJB_kActualTypecasts ((~(128 | 32)))
-#define kJB_kAddressOfMatch (3 << 22)
-#define kJB_kCastedMatch (6 << 22)
-#define kJB_kLossyCastedMatch (7 << 22)
-#define kJB_kMultipleErrors (1 << 21)
+#define kJB_kActualTypecasts -161
+#define kJB_kAddressOfMatch 12582912
+#define kJB_kCastedMatch 25165824
+#define kJB_kLossyCastedMatch 29360128
+#define kJB_kMultipleErrors 2097152
 extern JB_String* SC_kNameConf;
-#define kJB_kNeeds ((16 << 22) | ((32 << 22) | (64 << 22)))
-#define kJB_kNeedsAddressOf (32 << 22)
-#define kJB_kNeedsAddressOfButAlsoNeedsSuperMatch (64 << 22)
-#define kJB_kNeedsTypeCast (16 << 22)
-#define kJB_kNoBoolTypeCast (32)
+#define kJB_kNeeds 469762048
+#define kJB_kNeedsAddressOf 134217728
+#define kJB_kNeedsAddressOfButAlsoNeedsSuperMatch 268435456
+#define kJB_kNeedsTypeCast 67108864
+#define kJB_kNoBoolTypeCast 32
 #define kJB_kNoMatch (0)
-#define kJB_kNumericMatch (2 << 22)
+#define kJB_kNumericMatch 8388608
 #define kJB_kSaverEnd (JB_LUB[0])
 #define kJB_kSaverStart1 (JB_LUB[491])
-#define kJB_kSimpleMatch (1 << 22)
-#define kJB_kSuperClassMatch (4 << 22)
-#define kJB_kTypeCastAssigns (64)
-#define kJB_kTypeCastBothWays (16)
-#define kJB_kTypeCastDescribeErrors (256)
+#define kJB_kSimpleMatch 4194304
+#define kJB_kSuperClassMatch 16777216
+#define kJB_kTypeCastAssigns 64
+#define kJB_kTypeCastBothWays 16
+#define kJB_kTypeCastDescribeErrors 256
 #define kJB_kTypeCastFalse (0)
-#define kJB_kTypeCastFromZero (512)
-#define kJB_kTypeCastIgnoreAddressOf (8)
-#define kJB_kTypeCastIgnoreContained (4)
-#define kJB_kTypeCastMost (1)
-#define kJB_kTypeCastNumbers (2)
-#define kJB_kTypeCastTrue (1 | 2)
-#define kJB_kTypeCastWantSuperDistance (128)
-#define kJB_kUseDefaultParams (8 << 22)
+#define kJB_kTypeCastFromZero 512
+#define kJB_kTypeCastIgnoreAddressOf 8
+#define kJB_kTypeCastIgnoreContained 4
+#define kJB_kTypeCastMost 1
+#define kJB_kTypeCastNumbers 2
+#define kJB_kTypeCastTrue 3
+#define kJB_kTypeCastWantSuperDistance 128
+#define kJB_kUseDefaultParams 33554432
 #define kJB_kUsingStr (JB_LUB[795])
-#define kJB_kVoidPtrMatch (5 << 22)
+#define kJB_kVoidPtrMatch 20971520
 extern JB_File* SC_PerryLogFile;
 extern Message* SC_ReturnSelfEqNil;
 extern Dictionary* SC_RootCollectTable;
 extern JB_ErrorReceiver* JB_StdErr;
-#define kJB_SyxAcc (29)
-#define kJB_SyxAdj (27)
-#define kJB_SyxARel (21)
-#define kJB_SyxArg (1)
-#define kJB_SyxArr (34)
-#define kJB_SyxAsk (43)
-#define kJB_SyxBack (16)
-#define kJB_SyxBadj (28)
-#define kJB_SyxBin (18)
-#define kJB_Syxbinn (42)
-#define kJB_SyxBra (31)
-#define kJB_SyxBRel (26)
-#define kJB_SyxChar (17)
-#define kJB_SyxCnj (8)
-#define kJB_SyxDecl (4)
-#define kJB_SyxDot (23)
-#define kJB_SyxEmb (2)
-#define kJB_SyxERel (38)
-#define kJB_SyxFile (35)
-#define kJB_SyxFunc (25)
-#define kJB_SyxItem (30)
-#define kJB_SyxList (32)
-#define kJB_Syxmax (55)
-#define kJB_SyxMsg (46)
-#define kJB_SyxName (22)
+#define kJB_SyxAcc 29
+#define kJB_SyxAdj 27
+#define kJB_SyxARel 21
+#define kJB_SyxArg 1
+#define kJB_SyxArr 34
+#define kJB_SyxAsk 43
+#define kJB_SyxBack 16
+#define kJB_SyxBadj 28
+#define kJB_SyxBin 18
+#define kJB_Syxbinn 42
+#define kJB_SyxBra 31
+#define kJB_SyxBRel 26
+#define kJB_SyxChar 17
+#define kJB_SyxCnj 8
+#define kJB_SyxDecl 4
+#define kJB_SyxDot 23
+#define kJB_SyxEmb 2
+#define kJB_SyxERel 38
+#define kJB_SyxFile 35
+#define kJB_SyxFunc 25
+#define kJB_SyxItem 30
+#define kJB_SyxList 32
+#define kJB_Syxmax 55
+#define kJB_SyxMsg 46
+#define kJB_SyxName 22
 #define kJB_SyxNil (0)
-#define kJB_SyxNum (14)
-#define kJB_SyxOat (6)
-#define kJB_SyxOpp (9)
-#define kJB_Syxpinn (41)
-#define kJB_SyxPrm (33)
-#define kJB_SyxQues (7)
-#define kJB_SyxQuot (36)
-#define kJB_SyxRel (37)
-#define kJB_SyxSCnj (12)
-#define kJB_SyxSCom (45)
-#define kJB_SyxSDot (24)
-#define kJB_SyxSheb (11)
-#define kJB_SyxSStr (15)
-#define kJB_SyxSThg (13)
-#define kJB_SyxStr (19)
-#define kJB_SyxThg (10)
-#define kJB_SyxTmp (5)
-#define kJB_SyxTodo (47)
-#define kJB_SyxTRel (39)
-#define kJB_SyxTril (40)
-#define kJB_SyxType (3)
-#define kJB_SyxUnit (20)
-#define kJB_Syxurl (48)
-#define kJB_SyxXAtt (49)
-#define kJB_SyxXCDT (53)
-#define kJB_SyxXCom (52)
-#define kJB_SyxXML (50)
-#define kJB_SyxXPI (51)
-#define kJB_SyxXTxt (54)
-#define kJB_SyxYoda (44)
+#define kJB_SyxNum 14
+#define kJB_SyxOat 6
+#define kJB_SyxOpp 9
+#define kJB_Syxpinn 41
+#define kJB_SyxPrm 33
+#define kJB_SyxQues 7
+#define kJB_SyxQuot 36
+#define kJB_SyxRel 37
+#define kJB_SyxSCnj 12
+#define kJB_SyxSCom 45
+#define kJB_SyxSDot 24
+#define kJB_SyxSheb 11
+#define kJB_SyxSStr 15
+#define kJB_SyxSThg 13
+#define kJB_SyxStr 19
+#define kJB_SyxThg 10
+#define kJB_SyxTmp 5
+#define kJB_SyxTodo 47
+#define kJB_SyxTRel 39
+#define kJB_SyxTril 40
+#define kJB_SyxType 3
+#define kJB_SyxUnit 20
+#define kJB_Syxurl 48
+#define kJB_SyxXAtt 49
+#define kJB_SyxXCDT 53
+#define kJB_SyxXCom 52
+#define kJB_SyxXML 50
+#define kJB_SyxXPI 51
+#define kJB_SyxXTxt 54
+#define kJB_SyxYoda 44
 extern SCDecl* SC_TrueBool;
 extern SCClass* SC_TypeArray;
 extern SCClass* SC_TypeBool;
@@ -1781,505 +1781,505 @@ extern Message* JB__Tk__EndOfLineMarker;
 extern Dictionary* JB__Tk__ErrorNames;
 extern u16 JB__Tk__StopBars;
 extern JB_String* JB__Tk_Data;
-#define kJB__Tk_kAdjectiveOp (1)
+#define kJB__Tk_kAdjectiveOp 1
 #define kJB__Tk_kAllow (false)
-#define kJB__Tk_kColon (1 << 1)
-#define kJB__Tk_kColonArg (1 << 2)
-#define kJB__Tk_kComma (1 << 7)
-#define kJB__Tk_kEnd (((1 << 6) | (1 << 7)) | (1 << 8))
-#define kJB__Tk_kEndContainer (1 << 8)
-#define kJB__Tk_kEndOfLine (1 << 6)
-#define kJB__Tk_kExpect (true)
-#define kJB__Tk_kFuncAfterAny (((1 << 9) | (1 << 10)) | (1 << 11))
-#define kJB__Tk_kFuncAfterBar (1 << 11)
-#define kJB__Tk_kFuncAfterNormal (1 << 9)
-#define kJB__Tk_kFuncAfterNoSpace (1 << 10)
-#define kJB__Tk_kIllegalChar (1 << 22)
-#define kJB__Tk_kLameTemporal ((1 << 3) | ((1 << 4) | (1 << 5)))
-#define kJB__Tk_kOpp ((((((1 << 12) | (1 << 13)) | (1 << 14)) | (1 << 15)) | (1 << 16)) | (1 << 17))
-#define kJB__Tk_kOppBar (1 << 14)
-#define kJB__Tk_kOppBra (1 << 12)
-#define kJB__Tk_kOppChain ((1 << 16) | ((1 << 12) | ((1 << 13) | (1 << 14))))
-#define kJB__Tk_kOppNoBar (((((((1 << 12) | (1 << 13)) | (1 << 14)) | (1 << 15)) | (1 << 16)) | (1 << 17)) & (~(1 << 14)))
-#define kJB__Tk_kOppSNB (1 << 13)
-#define kJB__Tk_kOppSyx ((1 << 13) | (1 << 14))
-#define kJB__Tk_kOppTemporal (1 << 15)
-#define kJB__Tk_kOppWord (1 << 16)
-#define kJB__Tk_kOppYoda (1 << 17)
-#define kJB__Tk_kTemporal (((1 << 3) | (1 << 4)) | (1 << 5))
-#define kJB__Tk_kTemporalBar (1 << 5)
-#define kJB__Tk_kTemporalSyx ((1 << 4) | (1 << 5))
-#define kJB__Tk_kTemporalSyxNoBar (1 << 4)
-#define kJB__Tk_kTemporalWord (1 << 3)
-#define kJB__Tk_kTemporalWordColon (1 << 18)
-#define kJB__Tk_kThing (((1 << 19) | (1 << 20)) | (1 << 21))
-#define kJB__Tk_kThingBar (1 << 20)
-#define kJB__Tk_kThingSyx (1 << 19)
-#define kJB__Tk_kThingWord (1 << 21)
-#define kJB__Tk_kTmpOpp ((1 << 15) | (1 << 4))
+#define kJB__Tk_kColon 2
+#define kJB__Tk_kColonArg 4
+#define kJB__Tk_kComma 128
+#define kJB__Tk_kEnd 448
+#define kJB__Tk_kEndContainer 256
+#define kJB__Tk_kEndOfLine 64
+#define kJB__Tk_kExpect 1
+#define kJB__Tk_kFuncAfterAny 3584
+#define kJB__Tk_kFuncAfterBar 2048
+#define kJB__Tk_kFuncAfterNormal 512
+#define kJB__Tk_kFuncAfterNoSpace 1024
+#define kJB__Tk_kIllegalChar 4194304
+#define kJB__Tk_kLameTemporal 56
+#define kJB__Tk_kOpp 258048
+#define kJB__Tk_kOppBar 16384
+#define kJB__Tk_kOppBra 4096
+#define kJB__Tk_kOppChain 94208
+#define kJB__Tk_kOppNoBar 241664
+#define kJB__Tk_kOppSNB 8192
+#define kJB__Tk_kOppSyx 24576
+#define kJB__Tk_kOppTemporal 32768
+#define kJB__Tk_kOppWord 65536
+#define kJB__Tk_kOppYoda 131072
+#define kJB__Tk_kTemporal 56
+#define kJB__Tk_kTemporalBar 32
+#define kJB__Tk_kTemporalSyx 48
+#define kJB__Tk_kTemporalSyxNoBar 16
+#define kJB__Tk_kTemporalWord 8
+#define kJB__Tk_kTemporalWordColon 262144
+#define kJB__Tk_kThing 3670016
+#define kJB__Tk_kThingBar 1048576
+#define kJB__Tk_kThingSyx 524288
+#define kJB__Tk_kThingWord 2097152
+#define kJB__Tk_kTmpOpp 32784
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
 #define kJB__zalgo_down (JB_LUB[2079])
 #define kJB__zalgo_mid (JB_LUB[2078])
 extern Random JB__zalgo_R;
 #define kJB__zalgo_up (JB_LUB[2077])
-#define kJB__byte_max (255)
+#define kJB__byte_max 255
 #define kJB__byte_min (0)
-#define kJB__char_max (127)
-#define kJB__char_min (-128)
-#define kJB__int16_max (32767)
-#define kJB__int16_min (-32768)
-#define kJB__int64_max (9223372036854775807)
-#define kJB__int64_min (9223372036854775807 + 1)
-#define kJB__uint_max (4294967295)
+#define kJB__char_max 127
+#define kJB__char_min -128
+#define kJB__int16_max 32767
+#define kJB__int16_min -32768
+#define kJB__int64_max 9223372036854775807
+#define kJB__int64_min -9223372036854775808
+#define kJB__uint_max 4294967295
 #define kJB__uint_min (0)
-#define kJB__uint16_max (65535)
+#define kJB__uint16_max 65535
 #define kJB__uint16_min (0)
-#define kJB__uint64_max (-1)
-#define kSC__ASM_ADD (26)
-#define kSC__ASM_ADDK (24)
-#define kSC__ASM_ADPK (25)
-#define kSC__ASM_BAND (33)
-#define kSC__ASM_BCLR (41)
-#define kSC__ASM_BCMP (42)
-#define kSC__ASM_BFLG (37)
-#define kSC__ASM_BFLS (38)
-#define kSC__ASM_BLUE (32)
-#define kSC__ASM_BNOT (36)
-#define kSC__ASM_BOAR (34)
-#define kSC__ASM_BROL (39)
-#define kSC__ASM_BROR (40)
-#define kSC__ASM_BRUS (30)
-#define kSC__ASM_BRUU (31)
-#define kSC__ASM_BXOR (35)
-#define kSC__ASM_CMPF (45)
-#define kSC__ASM_CMPI (44)
-#define kSC__ASM_CNTC (72)
-#define kSC__ASM_CNTD (73)
-#define kSC__ASM_CONV (22)
-#define kSC__ASM_DIVV (29)
+#define kJB__uint64_max -1
+#define kSC__ASM_ADD 26
+#define kSC__ASM_ADDK 24
+#define kSC__ASM_ADPK 25
+#define kSC__ASM_BAND 33
+#define kSC__ASM_BCLR 41
+#define kSC__ASM_BCMP 42
+#define kSC__ASM_BFLG 37
+#define kSC__ASM_BFLS 38
+#define kSC__ASM_BLUE 32
+#define kSC__ASM_BNOT 36
+#define kSC__ASM_BOAR 34
+#define kSC__ASM_BROL 39
+#define kSC__ASM_BROR 40
+#define kSC__ASM_BRUS 30
+#define kSC__ASM_BRUU 31
+#define kSC__ASM_BXOR 35
+#define kSC__ASM_CMPF 45
+#define kSC__ASM_CMPI 44
+#define kSC__ASM_CNTC 72
+#define kSC__ASM_CNTD 73
+#define kSC__ASM_CONV 22
+#define kSC__ASM_DIVV 29
 extern ASM_Encoder2 SC__ASM_Encoders[256];
 #define kSC__ASM_EROR (0)
-#define kSC__ASM_FADD (76)
-#define kSC__ASM_FADK (77)
-#define kSC__ASM_FDIV (80)
-#define kSC__ASM_FEXK (75)
-#define kSC__ASM_FFRC (81)
-#define kSC__ASM_FMLK (79)
-#define kSC__ASM_FMUL (78)
-#define kSC__ASM_FNCX (5)
-#define kSC__ASM_FNCX2 (5)
-#define kSC__ASM_FNCX3 (6)
+#define kSC__ASM_FADD 76
+#define kSC__ASM_FADK 77
+#define kSC__ASM_FDIV 80
+#define kSC__ASM_FEXK 75
+#define kSC__ASM_FFRC 81
+#define kSC__ASM_FMLK 79
+#define kSC__ASM_FMUL 78
+#define kSC__ASM_FNCX 5
+#define kSC__ASM_FNCX2 5
+#define kSC__ASM_FNCX3 6
 extern ASM_Encoder2 SC__ASM_Forms[32];
-#define kSC__ASM_FUNC (1)
-#define kSC__ASM_FUNC2 (1)
-#define kSC__ASM_FUNC3 (2)
-#define kSC__ASM_JBRA (51)
-#define kSC__ASM_JBRN (52)
-#define kSC__ASM_JMPE (49)
-#define kSC__ASM_JMPF (48)
-#define kSC__ASM_JMPI (47)
-#define kSC__ASM_JMPN (50)
-#define kSC__ASM_JUMP (46)
-#define kSC__ASM_KNST (4)
-#define kSC__ASM_KNST1 (4)
-#define kSC__ASM_KNST2 (13)
-#define kSC__ASM_KNST3 (10)
-#define kSC__ASM_KSTR (23)
-#define kSC__ASM_LUPD (53)
-#define kSC__ASM_LUPU (54)
-#define kSC__ASM_MEMM (74)
-#define kSC__ASM_MULT (28)
+#define kSC__ASM_FUNC 1
+#define kSC__ASM_FUNC2 1
+#define kSC__ASM_FUNC3 2
+#define kSC__ASM_JBRA 51
+#define kSC__ASM_JBRN 52
+#define kSC__ASM_JMPE 49
+#define kSC__ASM_JMPF 48
+#define kSC__ASM_JMPI 47
+#define kSC__ASM_JMPN 50
+#define kSC__ASM_JUMP 46
+#define kSC__ASM_KNST 4
+#define kSC__ASM_KNST1 4
+#define kSC__ASM_KNST2 13
+#define kSC__ASM_KNST3 10
+#define kSC__ASM_KSTR 23
+#define kSC__ASM_LUPD 53
+#define kSC__ASM_LUPU 54
+#define kSC__ASM_MEMM 74
+#define kSC__ASM_MULT 28
 extern byte SC__ASM_NoisyASM;
-#define kSC__ASM_NOOP (16)
-#define kSC__ASM_PRNT (20)
-#define kSC__ASM_RALO (57)
-#define kSC__ASM_RARE (21)
-#define kSC__ASM_RD16 (66)
-#define kSC__ASM_RD1S (60)
-#define kSC__ASM_RD1U (59)
-#define kSC__ASM_RD2S (62)
-#define kSC__ASM_RD2U (61)
-#define kSC__ASM_RD4S (64)
-#define kSC__ASM_RD4U (63)
-#define kSC__ASM_RD8U (65)
-#define kSC__ASM_RET (18)
-#define kSC__ASM_RSDE (55)
-#define kSC__ASM_RSET (56)
-#define kSC__ASM_SUBB (27)
-#define kSC__ASM_SWAP (19)
-#define kSC__ASM_TABL (58)
-#define kSC__ASM_TAIL (9)
-#define kSC__ASM_TAIL2 (9)
-#define kSC__ASM_TERN (43)
-#define kSC__ASM_TRAP (17)
-#define kSC__ASM_WR16 (71)
-#define kSC__ASM_WR1U (67)
-#define kSC__ASM_WR2U (68)
-#define kSC__ASM_WR4U (69)
-#define kSC__ASM_WR8U (70)
-#define kSC__ASMtmp_IncrAfter (2)
+#define kSC__ASM_NOOP 16
+#define kSC__ASM_PRNT 20
+#define kSC__ASM_RALO 57
+#define kSC__ASM_RARE 21
+#define kSC__ASM_RD16 66
+#define kSC__ASM_RD1S 60
+#define kSC__ASM_RD1U 59
+#define kSC__ASM_RD2S 62
+#define kSC__ASM_RD2U 61
+#define kSC__ASM_RD4S 64
+#define kSC__ASM_RD4U 63
+#define kSC__ASM_RD8U 65
+#define kSC__ASM_RET 18
+#define kSC__ASM_RSDE 55
+#define kSC__ASM_RSET 56
+#define kSC__ASM_SUBB 27
+#define kSC__ASM_SWAP 19
+#define kSC__ASM_TABL 58
+#define kSC__ASM_TAIL 9
+#define kSC__ASM_TAIL2 9
+#define kSC__ASM_TERN 43
+#define kSC__ASM_TRAP 17
+#define kSC__ASM_WR16 71
+#define kSC__ASM_WR1U 67
+#define kSC__ASM_WR2U 68
+#define kSC__ASM_WR4U 69
+#define kSC__ASM_WR8U 70
+#define kSC__ASMtmp_IncrAfter 2
 #define kSC__ASMtmp_IncrBefore (0)
-#define kSC__ASMtmp_kContinue (51)
-#define kSC__ASMtmp_kDebugger (61)
-#define kSC__ASMtmp_kElseIf (48)
-#define kSC__ASMtmp_kExit (52)
-#define kSC__ASMtmp_kFail (63)
-#define kSC__ASMtmp_kIf (49)
-#define kSC__ASMtmp_kIgnore (60)
-#define kSC__ASMtmp_kPointer (59)
-#define kSC__ASMtmp_kRejoin (54)
-#define kSC__ASMtmp_kReturn (53)
-#define kSC__ASMtmp_kSetRel (58)
-#define kSC__ASMtmp_kStatExpr (57)
-#define kSC__ASMtmp_kSwap (55)
-#define kSC__ASMtmp_kTern (56)
-#define kSC__ASMtmp_kWhile (50)
+#define kSC__ASMtmp_kContinue 51
+#define kSC__ASMtmp_kDebugger 61
+#define kSC__ASMtmp_kElseIf 48
+#define kSC__ASMtmp_kExit 52
+#define kSC__ASMtmp_kFail 63
+#define kSC__ASMtmp_kIf 49
+#define kSC__ASMtmp_kIgnore 60
+#define kSC__ASMtmp_kPointer 59
+#define kSC__ASMtmp_kRejoin 54
+#define kSC__ASMtmp_kReturn 53
+#define kSC__ASMtmp_kSetRel 58
+#define kSC__ASMtmp_kStatExpr 57
+#define kSC__ASMtmp_kSwap 55
+#define kSC__ASMtmp_kTern 56
+#define kSC__ASMtmp_kWhile 50
 extern ASM_Mem SC__ASMtmp_ReadASM[10];
 extern ASM_Mem SC__ASMtmp_WriteASM[5];
-#define kSC__Reg_AddrRequest (1 << 48)
-#define kSC__Reg_AlreadyNegated (1 << 36)
-#define kSC__Reg_Alternate (1 << 37)
-#define kSC__Reg_Arg ((1 << 40) | (1 << 32))
-#define kSC__Reg_BitCorrect (1 << 49)
-#define kSC__Reg_Cond (1 << 38)
-#define kSC__Reg_CondRequest ((1 << 45) | (1 << 32))
-#define kSC__Reg_ConstAny (1 << 46)
-#define kSC__Reg_ContainsAddr (1 << 47)
-#define kSC__Reg_CorrectAddr ((1 << 47) | (1 << 49))
-#define kSC__Reg_Discard (1 << 40)
-#define kSC__Reg_ForReturn (1 << 42)
-#define kSC__Reg_FromMath (1 << 34)
-#define kSC__Reg_MathConst ((1 << 46) | (1 << 34))
-#define kSC__Reg_Negate (1 << 39)
-#define kSC__Reg_NewCondRequest (1 << 45)
-#define kSC__Reg_NotYetUsed (1 << 33)
-#define kSC__Reg_Set (1 << 41)
-#define kSC__Reg_SingleExpr (1 << 44)
-#define kSC__Reg_SrcConst (1 << 32)
-#define kSC__Reg_StayOpen (1 << 35)
-#define kSC__Reg_Temp (1 << 43)
-#define kSC__Reg_Zero (kSC__Reg_SrcConst)
-#define kJB__CharProp_AlmostLetter (6)
-#define kJB__CharProp_Letters (7)
-#define kJB__CharProp_Lower (9)
+#define kSC__Reg_AddrRequest 281474976710656
+#define kSC__Reg_AlreadyNegated 68719476736
+#define kSC__Reg_Alternate 137438953472
+#define kSC__Reg_Arg 1103806595072
+#define kSC__Reg_BitCorrect 562949953421312
+#define kSC__Reg_Cond 274877906944
+#define kSC__Reg_CondRequest 35188667056128
+#define kSC__Reg_ConstAny 70368744177664
+#define kSC__Reg_ContainsAddr 140737488355328
+#define kSC__Reg_CorrectAddr 703687441776640
+#define kSC__Reg_Discard 1099511627776
+#define kSC__Reg_ForReturn 4398046511104
+#define kSC__Reg_FromMath 17179869184
+#define kSC__Reg_MathConst 70385924046848
+#define kSC__Reg_Negate 549755813888
+#define kSC__Reg_NewCondRequest 35184372088832
+#define kSC__Reg_NotYetUsed 8589934592
+#define kSC__Reg_Set 2199023255552
+#define kSC__Reg_SingleExpr 17592186044416
+#define kSC__Reg_SrcConst 4294967296
+#define kSC__Reg_StayOpen 34359738368
+#define kSC__Reg_Temp 8796093022208
+#define kSC__Reg_Zero 4294967296
+#define kJB__CharProp_AlmostLetter 6
+#define kJB__CharProp_Letters 7
+#define kJB__CharProp_Lower 9
 #define kJB__CharProp_Nothing (0)
-#define kJB__CharProp_Number (5)
-#define kJB__CharProp_Punct (1 << 1)
-#define kJB__CharProp_Unicode (10)
-#define kJB__CharProp_Upper (1 << 3)
-#define kJB__CharProp_VarNames (1 << 2)
-#define kJB__CharProp_White (1)
-#define kJB__CharProp_XMLPunct (3)
-#define kSC__ClassInfo_ASM (1 << 19)
-#define kSC__ClassInfo_AutoGeneratedSavers (1 << 6)
-#define kSC__ClassInfo_Banned (1 << 9)
-#define kSC__ClassInfo_Builtin (1 << 14)
-#define kSC__ClassInfo_ContainsParentClass (1)
-#define kSC__ClassInfo_DefaultsToReal (1 << 11)
-#define kSC__ClassInfo_Fixed (1 << 17)
-#define kSC__ClassInfo_Flags (1 << 18)
-#define kSC__ClassInfo_HasCompareFunc (1 << 2)
-#define kSC__ClassInfo_HasEqualsFunc (1 << 3)
-#define kSC__ClassInfo_HasNilChecker (1 << 10)
-#define kSC__ClassInfo_HasSubClass (1 << 4)
-#define kSC__ClassInfo_IgnoreContainedSelf (1 << 1)
-#define kSC__ClassInfo_IsRole (1 << 12)
-#define kSC__ClassInfo_IsTask (1 << 13)
-#define kSC__ClassInfo_NoEarlyFree (1 << 5)
-#define kSC__ClassInfo_NumericReduction (((1 << 16) | (1 << 17)) | (1 << 18))
-#define kSC__ClassInfo_SavingCanSkip (1 << 7)
-#define kSC__ClassInfo_SortsProperties (1 << 15)
-#define kSC__ClassInfo_Symbol (1 << 16)
-#define kSC__ClassInfo_TreatAsBaseType (1 << 8)
-#define kJB__ControlClipMode_Debug (1 << 2)
-#define kJB__ControlClipMode_SlideBackInParent (1)
-#define kJB__ControlClipMode_SlideBackInWindow (1 << 1)
-#define kJB__CL1_After (6)
-#define kJB__CL1_Before (4)
-#define kJB__CL1_Centered (7)
-#define kJB__CL1_High (2)
-#define kJB__CL1_Length (10)
+#define kJB__CharProp_Number 5
+#define kJB__CharProp_Punct 2
+#define kJB__CharProp_Unicode 10
+#define kJB__CharProp_Upper 8
+#define kJB__CharProp_VarNames 4
+#define kJB__CharProp_White 1
+#define kJB__CharProp_XMLPunct 3
+#define kSC__ClassInfo_ASM 524288
+#define kSC__ClassInfo_AutoGeneratedSavers 64
+#define kSC__ClassInfo_Banned 512
+#define kSC__ClassInfo_Builtin 16384
+#define kSC__ClassInfo_ContainsParentClass 1
+#define kSC__ClassInfo_DefaultsToReal 2048
+#define kSC__ClassInfo_Fixed 131072
+#define kSC__ClassInfo_Flags 262144
+#define kSC__ClassInfo_HasCompareFunc 4
+#define kSC__ClassInfo_HasEqualsFunc 8
+#define kSC__ClassInfo_HasNilChecker 1024
+#define kSC__ClassInfo_HasSubClass 16
+#define kSC__ClassInfo_IgnoreContainedSelf 2
+#define kSC__ClassInfo_IsRole 4096
+#define kSC__ClassInfo_IsTask 8192
+#define kSC__ClassInfo_NoEarlyFree 32
+#define kSC__ClassInfo_NumericReduction 458752
+#define kSC__ClassInfo_SavingCanSkip 128
+#define kSC__ClassInfo_SortsProperties 32768
+#define kSC__ClassInfo_Symbol 65536
+#define kSC__ClassInfo_TreatAsBaseType 256
+#define kJB__ControlClipMode_Debug 4
+#define kJB__ControlClipMode_SlideBackInParent 1
+#define kJB__ControlClipMode_SlideBackInWindow 2
+#define kJB__CL1_After 6
+#define kJB__CL1_Before 4
+#define kJB__CL1_Centered 7
+#define kJB__CL1_High 2
+#define kJB__CL1_Length 10
 #define kJB__CL1_Low (0)
-#define kJB__CL1_Percent (8)
+#define kJB__CL1_Percent 8
 #define kJB__TC__void (0)
-#define kJB__TC__voidptr (48)
-#define kJB__TC_atomic_byte (0 + (8 + 4))
-#define kJB__TC_atomic_int (0 + (32 + (64 + (0 + (8 + 4)))))
-#define kJB__TC_atomic_int64 (0 + (48 + (64 + (0 + (8 + 4)))))
-#define kJB__TC_atomic_uint (0 + (32 + (0 + (0 + (8 + 4)))))
-#define kJB__TC_atomic_uint64 (0 + (48 + (0 + (0 + (8 + 4)))))
+#define kJB__TC__voidptr 48
+#define kJB__TC_atomic_byte 12
+#define kJB__TC_atomic_int 108
+#define kJB__TC_atomic_int64 124
+#define kJB__TC_atomic_uint 44
+#define kJB__TC_atomic_uint64 60
 #define kJB__TC_bool (0)
-#define kJB__TC_byte (0 + 8)
-#define kJB__TC_Byte2 (1 + (0 + (0 + (0 + 8))))
-#define kJB__TC_Byte3 (2 + (0 + (0 + (0 + 8))))
-#define kJB__TC_Byte4 (3 + (0 + (0 + (0 + 8))))
-#define kJB__TC_char (0 + (0 + (64 + (0 + 8))))
-#define kJB__TC_cstring (48)
-#define kJB__TC_Double (0 + (48 + (64 + (128 + 8))))
-#define kJB__TC_f16 (kJB__TC_HFloat)
-#define kJB__TC_f64 (kJB__TC_Double)
-#define kJB__TC_Failed (32768)
-#define kJB__TC_Float (0 + (32 + (64 + (128 + 8))))
-#define kJB__TC_HFloat (0 + (16 + (64 + (128 + 8))))
-#define kJB__TC_Int (0 + (32 + (64 + (0 + 8))))
-#define kJB__TC_int16 (0 + (16 + (64 + (0 + 8))))
-#define kJB__TC_int64 (0 + (48 + (64 + (0 + 8))))
-#define kJB__TC_int8 (kJB__TC_char)
-#define kJB__TC_iVec2 (1 + (32 + (64 + (0 + 8))))
-#define kJB__TC_iVec3 (2 + (32 + (64 + (0 + 8))))
-#define kJB__TC_iVec4 (3 + (32 + (64 + (0 + 8))))
-#define kJB__TC_numeric (8)
-#define kJB__TC_s16 (kJB__TC_int16)
-#define kJB__TC_s16x2 (1 + (16 + (64 + (0 + 8))))
-#define kJB__TC_s16x3 (2 + (16 + (64 + (0 + 8))))
-#define kJB__TC_s16x4 (3 + (16 + (64 + (0 + 8))))
-#define kJB__TC_s64 (kJB__TC_int64)
-#define kJB__TC_SByte (0 + (0 + (64 + (0 + 8))))
-#define kJB__TC_SByte2 (1 + (0 + (64 + (0 + 8))))
-#define kJB__TC_SByte3 (2 + (0 + (64 + (0 + 8))))
-#define kJB__TC_SByte4 (3 + (0 + (64 + (0 + 8))))
-#define kJB__TC_sign (64)
+#define kJB__TC_byte 8
+#define kJB__TC_Byte2 9
+#define kJB__TC_Byte3 10
+#define kJB__TC_Byte4 11
+#define kJB__TC_char 72
+#define kJB__TC_cstring 48
+#define kJB__TC_Double 248
+#define kJB__TC_f16 216
+#define kJB__TC_f64 248
+#define kJB__TC_Failed 32768
+#define kJB__TC_Float 232
+#define kJB__TC_HFloat 216
+#define kJB__TC_Int 104
+#define kJB__TC_int16 88
+#define kJB__TC_int64 120
+#define kJB__TC_int8 72
+#define kJB__TC_iVec2 105
+#define kJB__TC_iVec3 106
+#define kJB__TC_iVec4 107
+#define kJB__TC_numeric 8
+#define kJB__TC_s16 88
+#define kJB__TC_s16x2 89
+#define kJB__TC_s16x3 90
+#define kJB__TC_s16x4 91
+#define kJB__TC_s64 120
+#define kJB__TC_SByte 72
+#define kJB__TC_SByte2 73
+#define kJB__TC_SByte3 74
+#define kJB__TC_SByte4 75
+#define kJB__TC_sign 64
 extern Dictionary* JB__TC_Types_Dict;
-#define kJB__TC_u16 (kJB__TC_uint16)
-#define kJB__TC_u32 (kJB__TC_UInt)
-#define kJB__TC_u64 (kJB__TC_uint64)
-#define kJB__TC_UInt (0 + (32 + (0 + (0 + 8))))
-#define kJB__TC_uint16 (0 + (16 + (0 + (0 + 8))))
-#define kJB__TC_uint64 (0 + (48 + (0 + (0 + 8))))
-#define kJB__TC_uint8 (kJB__TC_byte)
-#define kJB__TC_UnusedType ((0 + (48 + (64 + (0 + 8)))) & (~8))
-#define kJB__TC_Vec2 (1 + (32 + (64 + (128 + 8))))
-#define kJB__TC_Vec3 (2 + (32 + (64 + (128 + 8))))
-#define kJB__TC_Vec4 (3 + (32 + (64 + (128 + 8))))
-#define kJB__Date_Highest (9223372036854775807)
+#define kJB__TC_u16 24
+#define kJB__TC_u32 40
+#define kJB__TC_u64 56
+#define kJB__TC_UInt 40
+#define kJB__TC_uint16 24
+#define kJB__TC_uint64 56
+#define kJB__TC_uint8 8
+#define kJB__TC_UnusedType 112
+#define kJB__TC_Vec2 233
+#define kJB__TC_Vec3 234
+#define kJB__TC_Vec4 235
+#define kJB__Date_Highest 9223372036854775807
 #define kJB__Date_kOneStep (0.000015258789f)
-#define kJB__Date_kSecondsPerDay (86400)
-#define kJB__Date_kSecondsPerMonthApprox (2628000)
-#define kJB__Date_kSecondsPerWeek (604800)
-#define kSC__DeclMode_Always (64)
-#define kSC__DeclMode_FuncParam (4)
-#define kSC__DeclMode_FunctionBody (8)
-#define kSC__DeclMode_Globals (1)
-#define kSC__DeclMode_Local (4 + 8)
-#define kSC__DeclMode_Properties (3)
-#define kSC__DeclMode_Proto (16)
-#define kSC__DeclMode_ProtoParam (4 + 16)
-#define kSC__DeclMode_TypeCast (32)
-#define kSC__DotUseType_Memory (1 << 1)
-#define kSC__DotUseType_Property (1)
-#define kJB__ErrorFlags_DontStrip (1)
+#define kJB__Date_kSecondsPerDay 86400
+#define kJB__Date_kSecondsPerMonthApprox 2628000
+#define kJB__Date_kSecondsPerWeek 604800
+#define kSC__DeclMode_Always 64
+#define kSC__DeclMode_FuncParam 4
+#define kSC__DeclMode_FunctionBody 8
+#define kSC__DeclMode_Globals 1
+#define kSC__DeclMode_Local 12
+#define kSC__DeclMode_Properties 3
+#define kSC__DeclMode_Proto 16
+#define kSC__DeclMode_ProtoParam 20
+#define kSC__DeclMode_TypeCast 32
+#define kSC__DotUseType_Memory 2
+#define kSC__DotUseType_Property 1
+#define kJB__ErrorFlags_DontStrip 1
 #define kJB__ErrorFlags_Keep (0)
-#define kJB__ErrorFlags_Parse (1 << 2)
-#define kJB__ErrorFlags_PreferNoRenderPath (1 << 1)
-#define kJB__ErrorFlags_PrintAndKeep (1)
-#define kJB__ErrorFlags_PrintAndRemove (2)
+#define kJB__ErrorFlags_Parse 4
+#define kJB__ErrorFlags_PreferNoRenderPath 2
+#define kJB__ErrorFlags_PrintAndKeep 1
+#define kJB__ErrorFlags_PrintAndRemove 2
 extern Array* JB__ErrorSeverity__names;
-#define kJB__ErrorSeverity_Critical (5)
-#define kJB__ErrorSeverity_Error (4)
-#define kJB__ErrorSeverity_Hint (1)
-#define kJB__ErrorSeverity_MaxError (6)
+#define kJB__ErrorSeverity_Critical 5
+#define kJB__ErrorSeverity_Error 4
+#define kJB__ErrorSeverity_Hint 1
+#define kJB__ErrorSeverity_MaxError 6
 #define kJB__ErrorSeverity_OK (0)
-#define kJB__ErrorSeverity_Problem (3)
-#define kJB__ErrorSeverity_Warning (2)
-#define kSC__FailableInt_Fail (2147483648)
-#define kJB__FileDes_StdErr (2)
+#define kJB__ErrorSeverity_Problem 3
+#define kJB__ErrorSeverity_Warning 2
+#define kSC__FailableInt_Fail 2147483648
+#define kJB__FileDes_StdErr 2
 #define kJB__FileDes_StdIn (0)
-#define kJB__FileDes_StdOut (1)
-#define kJB__FileMode_CanExec (1 << ((6 + 1) << ((3 + 1) << 0)))
-#define kJB__FileMode_Data (6 << ((6 + 4) << ((2 + 4) << 2)))
-#define kJB__FileMode_Group (7 << 3)
-#define kJB__FileMode_Other (7 << 0)
-#define kJB__FileMode_Owner (7 << 6)
-#define kJB__FileMode_Process (((7 << 6) + 5) << ((3 + 5) << 0))
-#define kJB__FileResolveMode_AllowMissing (true)
-#define kSC__FunctionType_AlreadyExported (1 << 14)
-#define kSC__FunctionType_API (1 << 23)
-#define kSC__FunctionType_AutoGeneratedSaver (1 << 24)
-#define kSC__FunctionType_Behaviour (1 << 11)
-#define kSC__FunctionType_Comparison (1 << 2)
-#define kSC__FunctionType_ConOrDes (1 + (1 << 1))
-#define kSC__FunctionType_Constructor (1)
-#define kSC__FunctionType_Destructor (1 << 1)
-#define kSC__FunctionType_Disabled (1 << 21)
-#define kSC__FunctionType_EmptyConstructor (1 << 9)
-#define kSC__FunctionType_ExpectsRealVars (1 << 13)
-#define kSC__FunctionType_ExternalLib (1 << 17)
-#define kSC__FunctionType_FlowDisabled (1 << 16)
-#define kSC__FunctionType_HidesProperties (1 << 25)
-#define kSC__FunctionType_InitFunc (1 << 7)
-#define kSC__FunctionType_Inline (1 << 19)
-#define kSC__FunctionType_Killer (1 << 20)
-#define kSC__FunctionType_NewNew (1 << 12)
-#define kSC__FunctionType_NewStruct (1 << 4)
-#define kSC__FunctionType_NoRefCounts (1 << 22)
-#define kSC__FunctionType_NumberCreator (1 << 5)
-#define kSC__FunctionType_PrintedForDebugViewing (1 << 26)
-#define kSC__FunctionType_Recursive (1 << 8)
-#define kSC__FunctionType_Reffer (1 << 3)
-#define kSC__FunctionType_Render (1 << 15)
-#define kSC__FunctionType_TypeTest (1 << 6)
-#define kSC__FunctionType_VirtualCaller (1 << 10)
-#define kSC__FunctionType_Wrapper (1 << 18)
-#define kJB__MoveCode_All (63)
-#define kJB__MoveCode_Back (kJB__MoveCode_Backward)
-#define kJB__MoveCode_Backward (1 << 5)
-#define kJB__MoveCode_Bottom (kJB__MoveCode_Down)
-#define kJB__MoveCode_Center (63)
-#define kJB__MoveCode_Close (1 << 7)
-#define kJB__MoveCode_Down (1 << 3)
-#define kJB__MoveCode_Forward (1 << 4)
-#define kJB__MoveCode_Front (kJB__MoveCode_Forward)
-#define kJB__MoveCode_Horizontal (1 + (1 << 1))
-#define kJB__MoveCode_Left (1 << 1)
-#define kJB__MoveCode_MiddleLeft ((1 << 1) + ((1 << 2) + (1 << 3)))
-#define kJB__MoveCode_MiddleRight (1 + ((1 << 2) + (1 << 3)))
-#define kJB__MoveCode_Negative (((1 << 1) + ((1 << 3) + ((1 << 5) + (1 << 7)))))
-#define kJB__MoveCode_Open (1 << 6)
-#define kJB__MoveCode_Positive ((1 + ((1 << 2) + ((1 << 4) + (1 << 6)))))
-#define kJB__MoveCode_Right (1)
-#define kJB__MoveCode_Top (kJB__MoveCode_Up)
-#define kJB__MoveCode_Up (1 << 2)
-#define kJB__MoveCode_Vertical ((1 << 2) + (1 << 3))
-#define kJB__MsgParseFlags_BreakPoint (32768)
-#define kJB__MsgParseFlags_Editable (2048)
-#define kJB__MsgParseFlags_Inserted (4096)
-#define kJB__MsgParseFlags_MacroInserted (12288)
-#define kJB__MsgParseFlags_MacroMade (8192)
-#define kJB__MsgParseFlags_NicelyPositioned (1024)
-#define kJB__MsgParseFlags_Style2 (16384)
-#define kSC__khalai_Active ((1 << 1) + 1)
-#define kSC__khalai_And (1 << 3)
-#define kSC__khalai_Assigns (1 << 7)
-#define kSC__khalai_Basic (((1 << 1) + 1) + (1 << 2))
-#define kSC__khalai_Disappears (1 << 6)
-#define kSC__khalai_Negative (1)
+#define kJB__FileDes_StdOut 1
+#define kJB__FileMode_CanExec 281474976710656
+#define kJB__FileMode_Data 6
+#define kJB__FileMode_Group 56
+#define kJB__FileMode_Other 7
+#define kJB__FileMode_Owner 448
+#define kJB__FileMode_Process 115968
+#define kJB__FileResolveMode_AllowMissing 1
+#define kSC__FunctionType_AlreadyExported 16384
+#define kSC__FunctionType_API 8388608
+#define kSC__FunctionType_AutoGeneratedSaver 16777216
+#define kSC__FunctionType_Behaviour 2048
+#define kSC__FunctionType_Comparison 4
+#define kSC__FunctionType_ConOrDes 3
+#define kSC__FunctionType_Constructor 1
+#define kSC__FunctionType_Destructor 2
+#define kSC__FunctionType_Disabled 2097152
+#define kSC__FunctionType_EmptyConstructor 512
+#define kSC__FunctionType_ExpectsRealVars 8192
+#define kSC__FunctionType_ExternalLib 131072
+#define kSC__FunctionType_FlowDisabled 65536
+#define kSC__FunctionType_HidesProperties 33554432
+#define kSC__FunctionType_InitFunc 128
+#define kSC__FunctionType_Inline 524288
+#define kSC__FunctionType_Killer 1048576
+#define kSC__FunctionType_NewNew 4096
+#define kSC__FunctionType_NewStruct 16
+#define kSC__FunctionType_NoRefCounts 4194304
+#define kSC__FunctionType_NumberCreator 32
+#define kSC__FunctionType_PrintedForDebugViewing 67108864
+#define kSC__FunctionType_Recursive 256
+#define kSC__FunctionType_Reffer 8
+#define kSC__FunctionType_Render 32768
+#define kSC__FunctionType_TypeTest 64
+#define kSC__FunctionType_VirtualCaller 1024
+#define kSC__FunctionType_Wrapper 262144
+#define kJB__MoveCode_All 63
+#define kJB__MoveCode_Back 32
+#define kJB__MoveCode_Backward 32
+#define kJB__MoveCode_Bottom 8
+#define kJB__MoveCode_Center 63
+#define kJB__MoveCode_Close 128
+#define kJB__MoveCode_Down 8
+#define kJB__MoveCode_Forward 16
+#define kJB__MoveCode_Front 16
+#define kJB__MoveCode_Horizontal 3
+#define kJB__MoveCode_Left 2
+#define kJB__MoveCode_MiddleLeft 14
+#define kJB__MoveCode_MiddleRight 13
+#define kJB__MoveCode_Negative 170
+#define kJB__MoveCode_Open 64
+#define kJB__MoveCode_Positive 85
+#define kJB__MoveCode_Right 1
+#define kJB__MoveCode_Top 4
+#define kJB__MoveCode_Up 4
+#define kJB__MoveCode_Vertical 12
+#define kJB__MsgParseFlags_BreakPoint 32768
+#define kJB__MsgParseFlags_Editable 2048
+#define kJB__MsgParseFlags_Inserted 4096
+#define kJB__MsgParseFlags_MacroInserted 12288
+#define kJB__MsgParseFlags_MacroMade 8192
+#define kJB__MsgParseFlags_NicelyPositioned 1024
+#define kJB__MsgParseFlags_Style2 16384
+#define kSC__khalai_Active 3
+#define kSC__khalai_And 8
+#define kSC__khalai_Assigns 128
+#define kSC__khalai_Basic 7
+#define kSC__khalai_Disappears 64
+#define kSC__khalai_Negative 1
 #define kSC__khalai_Nothing (0)
-#define kSC__khalai_Positive (1 << 1)
-#define kSC__khalai_Reversed (1 << 4)
-#define kSC__khalai_Soft (1 << 2)
-#define kSC__khalai_While (1 << 5)
-#define kSC__khalai_WhileNeg (1 + (1 << 5))
-#define kSC__khalai_WhilePos ((1 << 1) + (1 << 5))
+#define kSC__khalai_Positive 2
+#define kSC__khalai_Reversed 16
+#define kSC__khalai_Soft 4
+#define kSC__khalai_While 32
+#define kSC__khalai_WhileNeg 33
+#define kSC__khalai_WhilePos 34
 #define kSC__NilReason_Accessing (0)
-#define kSC__NilReason_Passing (1 << 2)
-#define kSC__NilReason_Property (1)
-#define kSC__NilReason_Reading (1 << 1)
-#define kSC__NilReason_Using (3)
+#define kSC__NilReason_Passing 4
+#define kSC__NilReason_Property 1
+#define kSC__NilReason_Reading 2
+#define kSC__NilReason_Using 3
 extern Array* SC__NilReason_values;
-#define kSC__NilState_ActuallyNil (1 + (4 + 16))
-#define kSC__NilState_Basic (kSC__NilState_Realish)
-#define kSC__NilState_Borked (128)
-#define kSC__NilState_Either (3)
+#define kSC__NilState_ActuallyNil 21
+#define kSC__NilState_Basic 2
+#define kSC__NilState_Borked 128
+#define kSC__NilState_Either 3
 #define kSC__NilState_Failed (0)
-#define kSC__NilState_FalseValue (16)
-#define kSC__NilState_FnBecomesNilCh (8)
-#define kSC__NilState_Killer (255)
-#define kSC__NilState_KnownValue (16 + 32)
-#define kSC__NilState_Nilish (1)
-#define kSC__NilState_Optional (3 + 4)
-#define kSC__NilState_Real (2 + 4)
-#define kSC__NilState_Realish (2)
-#define kSC__NilState_Solved (64)
-#define kSC__NilState_Stated (4)
-#define kSC__NilState_TrueValue (32)
-#define kSC__OpMode_Addition (1 << 4)
-#define kSC__OpMode_AND (1 << 16)
-#define kSC__OpMode_AndOr ((1 << 15) | (1 << 16))
-#define kSC__OpMode_Assigns (1 << 1)
-#define kSC__OpMode_Bit (1 << 2)
-#define kSC__OpMode_CaseAware (1 << 18)
-#define kSC__OpMode_Compare (1)
-#define kSC__OpMode_Comparison (1 << 9)
-#define kSC__OpMode_CompSet (1 | (1 << 1))
-#define kSC__OpMode_Custom (1 << 17)
-#define kSC__OpMode_EqualOrNot (1 << 8)
-#define kSC__OpMode_ExactEquals ((1 << 12) + ((1 << 7) + ((1 << 8) + 1)))
-#define kSC__OpMode_ExactlyEquals (1 << 7)
-#define kSC__OpMode_ExactNotEquals ((1 << 12) + ((1 << 8) + 1))
-#define kSC__OpMode_Less (1 << 11)
-#define kSC__OpMode_LoseBits (1 << 14)
-#define kSC__OpMode_MakesSigned (1 << 6)
-#define kSC__OpMode_Math (1 << 3)
-#define kSC__OpMode_MathLike ((1 << 2) | (1 << 3))
-#define kSC__OpMode_More (1 << 10)
-#define kSC__OpMode_NeedsCppFuncOnFloats (1 << 19)
-#define kSC__OpMode_NilTest (1 << 12)
-#define kSC__OpMode_NoExtraBits (1 << 13)
-#define kSC__OpMode_OR (1 << 15)
-#define kSC__OpMode_SameOrLessBits ((1 << 13) | (1 << 14))
-#define kSC__OpMode_Shift ((1 << 5) + (1 << 13))
-#define kSC__OpMode_ShiftOnly (1 << 5)
-#define kJB__ProcessMode_AutoPrintErrors (1 << 2)
-#define kJB__ProcessMode_CaptureAll (1 | (1 << 2))
-#define kJB__ProcessMode_CaptureErrors (1 << 1)
-#define kJB__ProcessMode_CaptureOrPrintErrors ((1 << 1) | (1 << 2))
-#define kJB__ProcessMode_CaptureStdOut (1)
-#define kSC__SCBlockage_Bits (480)
-#define kSC__SCBlockage_Continue (64)
-#define kSC__SCBlockage_Exit (128)
-#define kSC__SCBlockage_Quit (kSC__SCBlockage_Return)
-#define kSC__SCBlockage_Return (192)
-#define kSC__SCDeclInfo_Altered (1 << 20)
-#define kSC__SCDeclInfo_AlteredViaPointer (1 << 19)
-#define kSC__SCDeclInfo_API (1 << 9)
-#define kSC__SCDeclInfo_Atomic (1 << 23)
-#define kSC__SCDeclInfo_Biggest (1 << 27)
-#define kSC__SCDeclInfo_Body (1 << 15)
-#define kSC__SCDeclInfo_Borrowed (1)
-#define kSC__SCDeclInfo_ClassObj (1 << 10)
-#define kSC__SCDeclInfo_CompilerCreated (1 << 11)
-#define kSC__SCDeclInfo_Const (1 << 3)
-#define kSC__SCDeclInfo_DclCopied ((1 << 20) + ((1 << 1) + ((1 << 4) + ((1 << 9) + ((1 << 5) + (1 << 11))))))
-#define kSC__SCDeclInfo_DirectNumber (1 << 2)
-#define kSC__SCDeclInfo_Disabled (1 << 13)
-#define kSC__SCDeclInfo_GameFlyingMem (1 << 21)
-#define kSC__SCDeclInfo_Global (1 << 17)
-#define kSC__SCDeclInfo_Hidden (1 << 26)
-#define kSC__SCDeclInfo_IntendedAsReturn (1 << 30)
-#define kSC__SCDeclInfo_Local ((1 << 15) + (1 << 14))
-#define kSC__SCDeclInfo_NewlyCreated (1 << 6)
-#define kSC__SCDeclInfo_NumberConst ((1 << 2) + (1 << 3))
-#define kSC__SCDeclInfo_Param (1 << 14)
-#define kSC__SCDeclInfo_PostIncremented (1 << 28)
-#define kSC__SCDeclInfo_Property (1 << 16)
-#define kSC__SCDeclInfo_PropertyWasConstructed (1 << 12)
-#define kSC__SCDeclInfo_Return (1 << 18)
-#define kSC__SCDeclInfo_ReturnedStruct (1 << 29)
-#define kSC__SCDeclInfo_Self (1 << 24)
-#define kSC__SCDeclInfo_SelfImplicit ((1 << 24) + ((1 << 15) + (1 << 14)))
-#define kSC__SCDeclInfo_SetTo (1 << 25)
-#define kSC__SCDeclInfo_Static (1 << 4)
-#define kSC__SCDeclInfo_StayBorrowed (1 << 1)
-#define kSC__SCDeclInfo_Swappable ((1 << 14) + ((1 << 15) + ((1 << 17) + (1 << 16))))
-#define kSC__SCDeclInfo_Task (1 << 22)
-#define kSC__SCDeclInfo_TypeImprove (1 << 7)
-#define kSC__SCDeclInfo_UpgradeableContained (1 << 5)
-#define kSC__SCDeclInfo_UsedByCode (1 << 8)
-#define kSC__SCNodeFindMode_DontGoUp (1 << 1)
-#define kSC__SCNodeFindMode_ForClass (1 << 3)
-#define kSC__SCNodeFindMode_NoErrors (1)
-#define kSC__SCNodeFindMode_WantAType (1 << 2)
+#define kSC__NilState_FalseValue 16
+#define kSC__NilState_FnBecomesNilCh 8
+#define kSC__NilState_Killer 255
+#define kSC__NilState_KnownValue 48
+#define kSC__NilState_Nilish 1
+#define kSC__NilState_Optional 7
+#define kSC__NilState_Real 6
+#define kSC__NilState_Realish 2
+#define kSC__NilState_Solved 64
+#define kSC__NilState_Stated 4
+#define kSC__NilState_TrueValue 32
+#define kSC__OpMode_Addition 16
+#define kSC__OpMode_AND 65536
+#define kSC__OpMode_AndOr 98304
+#define kSC__OpMode_Assigns 2
+#define kSC__OpMode_Bit 4
+#define kSC__OpMode_CaseAware 262144
+#define kSC__OpMode_Compare 1
+#define kSC__OpMode_Comparison 512
+#define kSC__OpMode_CompSet 3
+#define kSC__OpMode_Custom 131072
+#define kSC__OpMode_EqualOrNot 256
+#define kSC__OpMode_ExactEquals 4481
+#define kSC__OpMode_ExactlyEquals 128
+#define kSC__OpMode_ExactNotEquals 4353
+#define kSC__OpMode_Less 2048
+#define kSC__OpMode_LoseBits 16384
+#define kSC__OpMode_MakesSigned 64
+#define kSC__OpMode_Math 8
+#define kSC__OpMode_MathLike 12
+#define kSC__OpMode_More 1024
+#define kSC__OpMode_NeedsCppFuncOnFloats 524288
+#define kSC__OpMode_NilTest 4096
+#define kSC__OpMode_NoExtraBits 8192
+#define kSC__OpMode_OR 32768
+#define kSC__OpMode_SameOrLessBits 24576
+#define kSC__OpMode_Shift 8224
+#define kSC__OpMode_ShiftOnly 32
+#define kJB__ProcessMode_AutoPrintErrors 4
+#define kJB__ProcessMode_CaptureAll 5
+#define kJB__ProcessMode_CaptureErrors 2
+#define kJB__ProcessMode_CaptureOrPrintErrors 6
+#define kJB__ProcessMode_CaptureStdOut 1
+#define kSC__SCBlockage_Bits 480
+#define kSC__SCBlockage_Continue 64
+#define kSC__SCBlockage_Exit 128
+#define kSC__SCBlockage_Quit 192
+#define kSC__SCBlockage_Return 192
+#define kSC__SCDeclInfo_Altered 1048576
+#define kSC__SCDeclInfo_AlteredViaPointer 524288
+#define kSC__SCDeclInfo_API 512
+#define kSC__SCDeclInfo_Atomic 8388608
+#define kSC__SCDeclInfo_Biggest 134217728
+#define kSC__SCDeclInfo_Body 32768
+#define kSC__SCDeclInfo_Borrowed 1
+#define kSC__SCDeclInfo_ClassObj 1024
+#define kSC__SCDeclInfo_CompilerCreated 2048
+#define kSC__SCDeclInfo_Const 8
+#define kSC__SCDeclInfo_DclCopied 1051186
+#define kSC__SCDeclInfo_DirectNumber 4
+#define kSC__SCDeclInfo_Disabled 8192
+#define kSC__SCDeclInfo_GameFlyingMem 2097152
+#define kSC__SCDeclInfo_Global 131072
+#define kSC__SCDeclInfo_Hidden 67108864
+#define kSC__SCDeclInfo_IntendedAsReturn 1073741824
+#define kSC__SCDeclInfo_Local 49152
+#define kSC__SCDeclInfo_NewlyCreated 64
+#define kSC__SCDeclInfo_NumberConst 12
+#define kSC__SCDeclInfo_Param 16384
+#define kSC__SCDeclInfo_PostIncremented 268435456
+#define kSC__SCDeclInfo_Property 65536
+#define kSC__SCDeclInfo_PropertyWasConstructed 4096
+#define kSC__SCDeclInfo_Return 262144
+#define kSC__SCDeclInfo_ReturnedStruct 536870912
+#define kSC__SCDeclInfo_Self 16777216
+#define kSC__SCDeclInfo_SelfImplicit 16826368
+#define kSC__SCDeclInfo_SetTo 33554432
+#define kSC__SCDeclInfo_Static 16
+#define kSC__SCDeclInfo_StayBorrowed 2
+#define kSC__SCDeclInfo_Swappable 245760
+#define kSC__SCDeclInfo_Task 4194304
+#define kSC__SCDeclInfo_TypeImprove 128
+#define kSC__SCDeclInfo_UpgradeableContained 32
+#define kSC__SCDeclInfo_UsedByCode 256
+#define kSC__SCNodeFindMode_DontGoUp 2
+#define kSC__SCNodeFindMode_ForClass 8
+#define kSC__SCNodeFindMode_NoErrors 1
+#define kSC__SCNodeFindMode_WantAType 4
 #define kSC__SCNodeInfo_ExplicitExport (0)
-#define kSC__SCNodeInfo_Visible (1)
-#define kSC__SCNodeType_DataType (1 << 1)
-#define kSC__SCNodeType_FuncProto (3)
+#define kSC__SCNodeInfo_Visible 1
+#define kSC__SCNodeType_DataType 2
+#define kSC__SCNodeType_FuncProto 3
 #define kSC__SCNodeType_Module (0)
-#define kSC__SCNodeType_Nil (1)
-#define kSC__SCNodeType_Object (5)
-#define kSC__SCNodeType_Struct (1 << 2)
+#define kSC__SCNodeType_Nil 1
+#define kSC__SCNodeType_Object 5
+#define kSC__SCNodeType_Struct 4
 extern int JB__Syx_CurrFuncID_;
-#define kJB__TaskState_Animation (1 << 4)
-#define kJB__TaskState_Finished (1 << 6)
-#define kJB__TaskState_HadErrors (1 << 3)
-#define kJB__TaskState_Paused (1 << 1)
-#define kJB__TaskState_Started (1)
-#define kJB__TaskState_Successful (1 << 5)
-#define kJB__TaskState_WaitsTillStart (1 << 2)
+#define kJB__TaskState_Animation 16
+#define kJB__TaskState_Finished 64
+#define kJB__TaskState_HadErrors 8
+#define kJB__TaskState_Paused 2
+#define kJB__TaskState_Started 1
+#define kJB__TaskState_Successful 32
+#define kJB__TaskState_WaitsTillStart 4
 #define kSC__TM_BaseShrinkSpeed (0.0005f)
-#define kSC__TM_Halfmap (6148914691236517205)
-#define kSC__TM_MOUSEBUTTONDOWN (1025)
-#define kSC__TM_MOUSEMOTION (1024)
+#define kSC__TM_Halfmap 6148914691236517205
+#define kSC__TM_MOUSEBUTTONDOWN 1025
+#define kSC__TM_MOUSEMOTION 1024
 extern LoopInfo SC__nil_Loops;
 extern FP_NilTrackerFn SC__nil_NilTable[64];
 extern byte SC__nil_OldPrint;
@@ -2288,7 +2288,7 @@ extern CompressionStats JB__MzSt_All;
 extern IsaTester SC__IsaTester_T;
 extern Junk_ABC SC__Junk_ABC_D;
 extern Dictionary* JB__LD_ClassList;
-#define kJB__Saver_RefMark (1073741824)
+#define kJB__Saver_RefMark 1073741824
 extern SaverClassInfo* JB__Saver_SaveableList;
 extern PicoComms* JB__Pico_Parent_;
 extern Random JB__Rnd_Shared;
@@ -2303,33 +2303,33 @@ extern JB_String* SC__Cpp_FindGlobalsCpp;
 extern Array* SC__Cpp_H_Input;
 extern Array* SC__Cpp_H_PostInput;
 extern JB_String* SC__Cpp_IfName;
-#define kSC__Cpp_kNeedsInnerBrackets (1)
-#define kSC__Cpp_kNeedsNoBrackets (2)
+#define kSC__Cpp_kNeedsInnerBrackets 1
+#define kSC__Cpp_kNeedsNoBrackets 2
 #define kSC__Cpp_kNeedsOuterBrackets (0)
 extern uint64 SC__Cpp_LubHash;
 extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 extern bool SC__Cpp_WroteAny;
-#define kJB__Wrap_kDelete (2)
-#define kJB__Wrap_kFree (1)
+#define kJB__Wrap_kDelete 2
+#define kJB__Wrap_kFree 1
 #define kJB__Wrap_kNothing (0)
 #define kJB__Rec_NonFatal (JB_LUB[1010])
 extern double JB__Rec_Progress;
-#define kJB__fix_TypeDict (3)
-#define kJB__fix_TypeObj (1)
-#define kJB__fix_TypeStem (2)
+#define kJB__fix_TypeDict 3
+#define kJB__fix_TypeObj 1
+#define kJB__fix_TypeStem 2
 #define kJB__fix_TypeValue (0)
 extern bool JB__Flow_AlwaysMove;
 extern bool JB__Flow_BreakOnFail;
 extern int JB__Flow_Disabled;
 extern FlowControl* JB__Flow_Flow;
 extern byte JB__Flow_FlowMode;
-#define kJB__Flow_Log (1)
+#define kJB__Flow_Log 1
 #define kJB__Flow_Off (0)
 extern CompressionStats JB__Flow_Stats;
-#define kJB__Flow_Validate (2)
-#define kSC__Instruction_kTypeConst (2)
-#define kSC__Instruction_kTypeFunc (1)
+#define kJB__Flow_Validate 2
+#define kSC__Instruction_kTypeConst 2
+#define kSC__Instruction_kTypeFunc 1
 extern Dictionary* SC__Instruction_TypeDict;
 extern Instruction* SC__Instruction_TypeList[256];
 extern Array* JB__Macro_TmpPrms_;
@@ -2354,20 +2354,20 @@ extern SCOperator* SC__Opp_Minus;
 extern Array* SC__PA_FixMe;
 extern int SC__xC2xB5Form_Count;
 extern Dictionary* SC__xC2xB5Form_Forms;
-#define kSC__xC2xB5Form_Jump (32)
-#define kSC__xC2xB5Form_NoExpect (256)
-#define kSC__xC2xB5Form_Num (64)
-#define kSC__xC2xB5Form_PositionBits (512)
-#define kSC__xC2xB5Form_Signed (128)
+#define kSC__xC2xB5Form_Jump 32
+#define kSC__xC2xB5Form_NoExpect 256
+#define kSC__xC2xB5Form_Num 64
+#define kSC__xC2xB5Form_PositionBits 512
+#define kSC__xC2xB5Form_Signed 128
 extern bool JB__File_DebugExecute;
-#define kJB__File_IgnoreErrors (true)
-#define kJB__File_O_APPEND (8)
-#define kJB__File_O_CREAT (512)
-#define kJB__File_O_EXCL (2048)
+#define kJB__File_IgnoreErrors 1
+#define kJB__File_O_APPEND 8
+#define kJB__File_O_CREAT 512
+#define kJB__File_O_EXCL 2048
 #define kJB__File_O_RDONLY (0x000)
-#define kJB__File_O_RDWR (2)
-#define kJB__File_O_TRUNC (1024)
-#define kJB__File_O_WRONLY (1)
+#define kJB__File_O_RDWR 2
+#define kJB__File_O_TRUNC 1024
+#define kJB__File_O_WRONLY 1
 extern MaterialsLol* SC__MaterialsLol___First;
 extern MaterialsLol* SC__MaterialsLol_Iron;
 extern MaterialsLol* SC__MaterialsLol_Pellets;
@@ -2377,21 +2377,21 @@ extern SCIterator* SC__Iter_carray;
 extern SCIterator* SC__Iter_pointer;
 extern bool SC__Base_ConstantsLoadingOverride;
 extern bool SC__Base_CurrVisibility;
-#define kSC__Base_DontGoUp (2)
+#define kSC__Base_DontGoUp 2
 #define kSC__Base_kPurposeAddress (0)
-#define kSC__Base_kPurposeDot (1 << 1)
-#define kSC__Base_kPurposeFunc (1)
-#define kSC__Base_kPurposeHider (65536)
-#define kSC__Base_kPurposeVar (3)
-#define kSC__Base_kPurposeVarDecl (1 << 2)
-#define kSC__Base_NoErrors (1)
+#define kSC__Base_kPurposeDot 2
+#define kSC__Base_kPurposeFunc 1
+#define kSC__Base_kPurposeHider 65536
+#define kSC__Base_kPurposeVar 3
+#define kSC__Base_kPurposeVarDecl 4
+#define kSC__Base_NoErrors 1
 extern SpdProcess* JB__Proc_Parent;
 extern byte JB__Err_AutoPrint;
 extern Array* JB__Err_CurrSource_;
 extern bool JB__Err_KeepStackTrace;
-#define kSC__Beh_kBehaviourProto (2)
-#define kSC__Beh_kBehaviourProtoRequired (6)
-#define kSC__Beh_kBehaviourTable (1)
+#define kSC__Beh_kBehaviourProto 2
+#define kSC__Beh_kBehaviourProtoRequired 6
+#define kSC__Beh_kBehaviourTable 1
 extern SCFunction* SC__Func_CurrFunc;
 extern int SC__Func_DisabledPoints;
 extern int SC__Func_FuncStats[12];
