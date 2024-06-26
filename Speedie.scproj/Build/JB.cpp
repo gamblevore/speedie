@@ -368,7 +368,7 @@ SCDecl* SC_Comp__AddGlobalConst(JB_String* Name, SCClass* C, NilState Dcl) {
 void SC_Comp__AddGlobalConstFloat(JB_String* Name, SCClass* C, JB_String* Value) {
 	SCDecl* D = JB_Incr(SC_Comp__AddGlobalConst(Name, C, kSC__NilState_Real));
 	JB_SetRef(D->IsLookupOnly, JB_Syx_OperatorPlus(kJB_SyxNum, Value));
-	(SC_Decl_numberconstSet(D, JB_dbl_AsInt(JB_Str_Float(Value))));
+	(SC_Decl_NumberConstSet(D, JB_dbl_AsInt(JB_Str_Float(Value))));
 	JB_Decr(D);
 }
 
@@ -377,7 +377,7 @@ void SC_Comp__AddGlobalConstNum(JB_String* Name, SCClass* C, int64 Value) {
 	JB_String* _tmPf0 = JB_Incr(JB_int64_Render(Value, nil));
 	JB_SetRef(D->IsLookupOnly, JB_Syx_OperatorPlus(kJB_SyxNum, _tmPf0));
 	JB_Decr(_tmPf0);
-	(SC_Decl_numberconstSet(D, Value));
+	(SC_Decl_NumberConstSet(D, Value));
 	JB_Decr(D);
 }
 
@@ -1687,7 +1687,7 @@ int SC_Comp__InitBasicStuff() {
 	SC_TypeNil = SC_Comp__AddGlobalConst(JB_LUB[1766], SC_TypeObject, kSC__NilState_ActuallyNil);
 	SC_TrueBool = SC_Comp__AddGlobalConst(JB_LUB[1973], SC_TypeBool, kSC__NilState_Real | kSC__NilState_TrueValue);
 	SC_FalseBool = SC_Comp__AddGlobalConst(JB_LUB[1597], SC_TypeBool, kSC__NilState_Real | kSC__NilState_FalseValue);
-	(SC_Decl_numberconstSet(SC_TrueBool, 1));
+	(SC_Decl_NumberConstSet(SC_TrueBool, 1));
 	SC_Comp__AddGlobalConstNum(JB_LUB[1393], SC_TypeInt, JB_Date_TimeID(SC__Imp_Recent));
 	SC_Comp__AddGlobalConstNum(JB_LUB[1391], SC_TypeDate, JB_Date__Now());
 	SC_Comp__AddGlobalConstNum(JB_LUB[1389], SC_TypeDate, SC__Imp_Recent);
@@ -1951,7 +1951,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1144], (112679257636864));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1144], (112683651182584));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3268,7 +3268,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1915]);
-	JB_FS_AppendInt32(_fsf0, (2024062521));
+	JB_FS_AppendInt32(_fsf0, (2024062616));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8322,7 +8322,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[828]);
-	JB_FS_AppendInt32(_fsf0, (2024062521));
+	JB_FS_AppendInt32(_fsf0, (2024062616));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -11197,15 +11197,18 @@ Message* SC_NewDeclWithStrMsg(JB_String* Type, Message* RelOrName) {
 	return Rz;
 }
 
-Message* SC_NewDeclNum(SCDecl* D, int64 N, JB_String* VarName) {
+Message* SC_NewDeclNum(SCDecl* D, int64 N, JB_String* VarName, bool Shifts) {
 	Message* Rz = nil;
-	Rz = JB_int64_Msg(N);
+	if (!D) {
+		D = SC_Decl_Constructor(nil, SC_TypeInt);
+	}
+	Rz = SC_int64_MsgForConst(N, Shifts);
 	JB_SetRef(Rz->Obj, D);
 	if ((N < JB_int__Min()) or (N > JB_int__Max())) {
 		JB_SetRef(D->Type, SC_TypeInt64);
 	}
 	(SC_Decl_NameSet(D, VarName));
-	(SC_Decl_numberconstSet(D, N));
+	(SC_Decl_NumberConstSet(D, N));
 	if (JB_Str_Exists(VarName)) {
 		JB_SetRef(D->Default, Rz);
 	}
@@ -12427,13 +12430,13 @@ SCObject* SC_TypeOfFuncSub(Message* Exp, SCNode* Name_space, Message* Side) {
 	}
 	JB_Decr(Params);
 	SCFunction* Fn2 = JB_Incr(SC_Func_ArgsMatch(Fn, nil, Name_space, PList, 0));
-	if (!Fn2) {
-		JB_FreeIfDead(SC_Func_ArgsMatch(Fn, nil, Name_space, PList, kJB_kTypeCastDescribeErrors));
-	}
-	 else {
+	if (Fn2) {
 		if (!Fn2->ReturnType) {
 			JB_SetRef(Exp->Obj, SC_TypeVoid);
 		}
+	}
+	 else {
+		JB_FreeIfDead(SC_Func_ArgsMatch(Fn, nil, Name_space, PList, kJB_kTypeCastDescribeErrors));
 	}
 	JB_Decr(Fn);
 	JB_Decr(PList);
@@ -12603,7 +12606,7 @@ SCObject* SC_TypeOfNumSub(Message* Exp, SCNode* Name_space, Message* Side) {
 		 else {
 			V = JB_dbl_AsInt(F8);
 		}
-		(SC_Decl_numberconstSet(D, V));
+		(SC_Decl_NumberConstSet(D, V));
 		JB_Decr(N);
 		JB_SafeDecr(D);
 		return D;
@@ -12614,7 +12617,7 @@ SCObject* SC_TypeOfNumSub(Message* Exp, SCNode* Name_space, Message* Side) {
 	if ((((Val << 32) >> 32) != Val) or ((bool)Side)) {
 		JB_SetRef(D2->Type, SC_TypeInt64);
 	}
-	(SC_Decl_numberconstSet(D2, Val));
+	(SC_Decl_NumberConstSet(D2, Val));
 	JB_SafeDecr(D2);
 	return D2;
 }
@@ -13305,7 +13308,7 @@ SCObject* SC_TypeOfUnit(Message* Exp, SCNode* Name_space, Message* Side) {
 			X = JB_Msg_Int(It, 0);
 		}
 	}
-	(SC_Decl_numberconstSet(D, X));
+	(SC_Decl_NumberConstSet(D, X));
 	if (JB_Msg_SyntaxEquals(It, Str, false)) {
 		JB_SetRef(Str, It->Name);
 	}
@@ -15813,6 +15816,19 @@ Message* JB_int64_Msg(int64 Self) {
 	JB_Decr(_tmPf0);
 	JB_SafeDecr(_tmPf1);
 	return _tmPf1;
+}
+
+Message* SC_int64_MsgForConst(int64 Self, bool AllowShift) {
+	Message* Rz = nil;
+	if ((!AllowShift) or ((Self <= 1) or (!JB_int64_IsPow2(Self)))) {
+		return JB_int64_Msg(Self);
+	}
+	Rz = JB_Syx_Msg(kJB_SyxRel, JB_LUB[0]);
+	JB_Tree_SyntaxAppend(Rz, SC_NewDeclNum(nil, 1, JB_LUB[0], false));
+	Message* Op = JB_Msg_Msg(Rz, kJB_SyxOpp, JB_LUB[469]);
+	JB_SetRef(Op->Obj, SC_Opp__Lookup(Op));
+	JB_Tree_SyntaxAppend(Rz, SC_NewDeclNum(nil, JB_int64_Log2(Self), JB_LUB[0], false));
+	return Rz;
 }
 
 int64 JB_int64_OperatorMax(int64 Self, int64 D) {
@@ -20126,9 +20142,9 @@ bool JB_Pico_SendMsg(PicoComms* Self, PicoMessage* A, bool Wait) {
 
 bool JB_Pico_SendFS(PicoComms* Self, FastString* Fs, bool Wait) {
 	bool Rz = false;
-	PicoMessage Msg = ((PicoMessage){});
-	JB_Pico__FromFS(Fs, (&Msg));
-	Rz = JB_Pico_SendMsg(Self, (&Msg), Wait);
+	PicoMessage _tmPf0 = ((PicoMessage){});
+	JB_Pico__FromFS(Fs, (&_tmPf0));
+	Rz = JB_Pico_SendMsg(Self, (&_tmPf0), Wait);
 	(JB_FS_LengthSet(Fs, 0));
 	return Rz;
 }
@@ -33647,7 +33663,7 @@ SCFunction* SC_Msg_IdentifyFunc(Message* Self) {
 
 Message* SC_Msg_InBuiltSizeOf(Message* Self, SCNode* Name_space, SCDecl* Sulf, Message* Sulf_exp) {
 	SCDecl* _tmPf0 = JB_Incr(SC_Decl_Constructor(nil, SC_TypeInt));
-	Message* _tmPf1 = JB_Incr(SC_NewDeclNum(_tmPf0, SC_Decl_AllocatedSize(Sulf), JB_LUB[0]));
+	Message* _tmPf1 = JB_Incr(SC_NewDeclNum(_tmPf0, SC_Decl_AllocatedSize(Sulf), JB_LUB[0], false));
 	JB_Decr(_tmPf0);
 	JB_SafeDecr(_tmPf1);
 	return _tmPf1;
@@ -38795,8 +38811,8 @@ SCDecl* SC_Decl_NotLocal(SCDecl* Self) {
 	return Rz;
 }
 
-void SC_Decl_numberconstSet(SCDecl* Self, uint64 V) {
-	(Self->ExportPosition = V);
+void SC_Decl_NumberConstSet(SCDecl* Self, uint64 V) {
+	Self->ExportPosition = V;
 	(SC_Decl_SyntaxIsSet(Self, kSC__SCDeclInfo_NumberConst, true));
 }
 
@@ -40011,7 +40027,7 @@ SCIterator* SC_Iter__SimpleIter(JB_String* Src) {
 SCDecl* SC_Base_AddNumericConst(SCNode* Self, JB_String* Name, int64 Value, Message* Where) {
 	SCDecl* SyxConst = SC_Decl_Constructor(nil, SC_TypeSyntax);
 	SC_Comp__NewConst(SyxConst);
-	JB_FreeIfDead(SC_NewDeclNum(SyxConst, Value, Name));
+	JB_FreeIfDead(SC_NewDeclNum(SyxConst, Value, Name, false));
 	SC_Base_TryAdd(Self, Where, SyxConst, SyxConst->Name);
 	return SyxConst;
 }
@@ -40308,7 +40324,7 @@ void SC_Base_CollectConstantsSub(SCNode* Self, Message* Ch) {
 				MessagePosition _usingf0 = ((MessagePosition){});
 				JB_Msg_SyntaxUsing(Line, (&_usingf0));
 				JB_SetRef(NewItem, SC_Decl_Constructor(nil, SC_TypeInt));
-				Message* NewNum = JB_Incr(SC_NewDeclNum(NewItem, NextNum, Line->Name));
+				Message* NewNum = JB_Incr(SC_NewDeclNum(NewItem, NextNum, Line->Name, true));
 				JB_SetRef(NewItem->Source, Line);
 				if ((JB_Msg_SyntaxEquals(Ch, JB_LUB[1609], false))) {
 					(++LastFlag);
@@ -40366,10 +40382,7 @@ void SC_Base_CollectConstantsSub(SCNode* Self, Message* Ch) {
 					JB_Decr(FuncName);
 					return;
 				}
-				SCDecl* NewType = JB_Incr(CurrType);
-				if (!NewType) {
-					JB_SetRef(NewType, OMGType);
-				}
+				SCDecl* NewType = JB_Incr(((SCDecl*)JB_Ternary(((bool)CurrType), CurrType, OMGType)));
 				JB_SetRef(NewItem, SC_Decl_Constructor(nil, NewType->Type));
 				if ((JB_Msg_EqualsSyx(ValueNode, kJB_SyxStr, false)) or (JB_Msg_EqualsSyx(ValueNode, kJB_SyxSStr, false))) {
 					SC_Func__ObjectifyString(ValueNode);
@@ -40378,11 +40391,11 @@ void SC_Base_CollectConstantsSub(SCNode* Self, Message* Ch) {
 				 else if ((SC_Msg_IsInt(ValueNode)) or ((JB_Msg_EqualsSyx(ValueNode, kJB_SyxUnit, false)))) {
 					SC_Decl_AssignabilityCheck(NewType, nil, ValueNode, OMGType);
 					NextNum = JB_Msg_Int(ValueNode, 0);
-					(SC_Decl_numberconstSet(NewItem, NextNum));
+					(SC_Decl_NumberConstSet(NewItem, NextNum));
 					(++NextNum);
 				}
 				 else {
-					(SC_Decl_numberconstSet(NewItem, SC_Base_CalculateConstWithMsg(Self, ValueNode)));
+					(SC_Decl_NumberConstSet(NewItem, SC_Base_CalculateConstWithMsg(Self, ValueNode)));
 				}
 				JB_Decr(OMGType);
 				JB_Array_SyntaxAppend(FixLater, NewItem);
@@ -51377,4 +51390,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -2733702931890515617 -4480758206804178745
+// 6186159340290058113 -4480758206804178745

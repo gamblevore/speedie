@@ -189,7 +189,7 @@ function SCNode.CollectConstantsSub (|Message| ch)
 		if (line == @Thg) // default numeric constant
 			using (line)
 			NewItem = SCDecl(typeint!)
-			|| NewNum = NewDeclNum( NewItem, NextNum, line.name )
+			|| NewNum = NewDeclNum( NewItem, NextNum, line.name, true )
 			newitem.source = line
 			if (ch == "flags")
 				LastFlag++
@@ -209,9 +209,7 @@ function SCNode.CollectConstantsSub (|Message| ch)
 			|| thg = line[ @Thg ]
 			require  line.expect(@rel)  and  line[@opp, 1].expect(@opp, "=")  and  valuenode  and  thg
 			|| OMGType = TypeOfExpr( ValueNode, self )		#require // can’t seem to remove this.
-			|| NewType = CurrType
-			if !NewType
-				newtype = OMGType
+			|| NewType = CurrType ?? OMGType
 			NewItem = SCDecl(newtype.type)
 
 			if (ValueNode == @Str or @sstr)
@@ -221,10 +219,10 @@ function SCNode.CollectConstantsSub (|Message| ch)
 			  elseif (valuenode.isint) or (valuenode == @unit)
 				NewType.AssignabilityCheck(nil, ValueNode, OMGType)  
 				nextnum = valuenode.int
-				newitem.numberconst = nextnum
+				newitem.NumberConst = nextnum
 				nextnum++
 			  else
-				newitem.numberconst = .CalculateConst(Valuenode)
+				newitem.NumberConst = .CalculateConst(Valuenode)
 			
 			FixLater <~ NewItem
 			

@@ -417,8 +417,8 @@ function TypeOfUnit (ExprResolver)
 	return D
 
 
-function scdecl.numberconst (assigns:|uint64| v)
-	(.ExportPosition = v)
+function scdecl.NumberConst (assigns:|uint64| v)
+	.ExportPosition = v
 	is NumberConst
 
 
@@ -1748,18 +1748,19 @@ function TypeOfFuncSub (|Message| exp, |SCNode| name_space, |Message| side, |SCO
 	|| PList = SCParamArray.new(exp)				// these 3 lines should be 2 lines...
 	require PList.PreReadTypes(name_space, params, side)
 	|| fn2 = fn.ArgsMatch( nil, name_space, PList )
-	if !fn2
-		fn.ArgsMatch( nil, name_space, PList, kTypeCastDescribeErrors )
-	  else
 		if !fn2.ReturnType
 			exp.Obj = typevoid // save it being looked up over and over...
+	  else
+		fn.ArgsMatch( nil, name_space, PList, kTypeCastDescribeErrors )
 		
 	return fn2
 
 
-function NewDeclNum (|SCDecl| D, |int64| N, |string| VarName, |Message|)
+function NewDeclNum (|SCDecl?| D, |int64| N, |string| VarName, |bool| Shifts, |Message!|)
 	opt norefcounts
-	rz = n.msg
+	if !D
+		d = scdecl.new(typeint!)
+	rz = n.MsgForConst(Shifts)
 	rz.obj = d
 	if  n < int.min  or  n > int.max
 		d.type = typeint64!
