@@ -1951,7 +1951,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1144], (112683651182584));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1144], (112683960508817));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3268,7 +3268,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1915]);
-	JB_FS_AppendInt32(_fsf0, (2024062616));
+	JB_FS_AppendInt32(_fsf0, (2024062617));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8322,7 +8322,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[828]);
-	JB_FS_AppendInt32(_fsf0, (2024062616));
+	JB_FS_AppendInt32(_fsf0, (2024062617));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -18928,7 +18928,7 @@ NilState SC_nil__SetRel(Message* Msg, NilCheckMode Test) {
 	SCDecl* LD = SC_Msg_FastDecl(L);
 	Test = ((kSC__khalai_Soft) * ((!SC_Decl_SyntaxIs(LD, kSC__SCDeclInfo_Local)) and (LD->NilDeclared == kSC__NilState_Optional)));
 	NilState RN = SC_nil__Jump(R, Test);
-	SC_nil__Jump(L, 0);
+	SC_nil__Jump(L, kSC__khalai_Assigns);
 	return SC_nil__VariableSet(LD, L, SC_Msg_FastDecl(R), R, RN);
 }
 
@@ -19111,7 +19111,7 @@ NilState SC_nil__UseAsRealSub(Message* Ch, NilCheckMode Test, NilReason Reason, 
 	NilState Actual = SC_nil__Jump(Ch, 0);
 	if (SC_NilState_SyntaxIs(Actual, kSC__NilState_Nilish)) {
 		SCFunction* Ddd = Dcl->HiderFunc;
-		if (((bool)Ddd) and ((SC_NilReason_SyntaxIs(Reason, kSC__NilReason_Property)) and (!Ddd->IsAssigns))) {
+		if (((bool)Ddd) and ((SC_NilReason_SyntaxIs(Reason, kSC__NilReason_Property)) and ((!Ddd->IsAssigns) and ((!SC_khalai_SyntaxIs(Test, kSC__khalai_Assigns)))))) {
 			return SC_nil__PropertyToFunc(((Message*)JB_Ring_Parent(Ch)), Ddd);
 		}
 		SC_nil__BecomeReal(SC_Msg_FastDecl(Ch), Ch, Reason, nil, nil);
@@ -51390,4 +51390,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 6186159340290058113 -4480758206804178745
+// -4782036841375979759 -4480758206804178745

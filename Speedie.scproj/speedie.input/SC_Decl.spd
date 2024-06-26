@@ -1165,12 +1165,11 @@ function int64.MsgForConst (|bool| AllowShift, |message|)
 	if !AllowShift or (self <= 1) or !.IsPow2
 		return .msg
 
-	//debugger
 	rz = @rel.msg
-	rz <~ newdeclnum(nil, 1, "", false)
+	rz <~ newdeclnum(nil, 1)
 	|| op = rz.msg(@opp, "<<")
 	op.obj = scoperator.lookup(op) 
-	rz <~ newdeclnum(nil, .Log2, "", false)
+	rz <~ newdeclnum(nil, .Log2)
 
 
 

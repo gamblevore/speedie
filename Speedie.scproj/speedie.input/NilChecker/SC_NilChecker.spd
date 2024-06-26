@@ -121,7 +121,7 @@ function UseAsRealSub (|message| ch, |nilcheckmode| test, |nilreason| reason, |s
 	|| actual = .Jump(ch)
 	if actual is nilish
 		|| ddd = dcl.hiderfunc
-		if ddd and (reason is property) and !ddd.isassigns				// OK... 
+		if ddd and (reason is property) and !ddd.isassigns and (test isnt assigns)				// OK... 
 			return .PropertyToFunc(ch.parent!, ddd)
 			
 		.BecomeReal(ch.FastDecl, ch, reason)
@@ -629,7 +629,7 @@ function SetRel (NilTrackerfn)
 	|| RN = .Jump(R, test)
 	// to run this:  *a = *b
 	// we would need to run *b first to get the value. So right-side has to be run first.
-	.Jump(L)
+	.Jump(L, nilcheckmode.Assigns)
 								
 	return .VariableSet(LD, L, R.FastDecl, R, RN)
 

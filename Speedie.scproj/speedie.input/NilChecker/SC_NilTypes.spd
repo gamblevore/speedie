@@ -39,6 +39,7 @@ datatype NilCheckMode (int)
 		Reversed
 		While
 		Disappears
+		Assigns
 		WhilePos = Positive + While 
 		WhileNeg = Negative + While
 		Active  = Positive + Negative

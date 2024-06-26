@@ -370,15 +370,15 @@ function message.AddValue (|scfunction| f)
 datatype DeclMode (int)
 	constants
 		|DeclMode|
-		FuncParam	= 4
-		Properties	= 3
-		Globals		= 1
-		FunctionBody = 8
-		Local		= FuncParam+FunctionBody
-		Proto		= 16
-		TypeCast	= 32
-		ProtoParam	= FuncParam + Proto
-		Always		= 64
+		FuncParam		= 4
+		Properties		= 3
+		Globals			= 1
+		FunctionBody	= 8
+		Local			= FuncParam+FunctionBody
+		Proto			= 16
+		TypeCast		= 32
+		ProtoParam		= FuncParam + Proto
+		Always			= 64
 
 	syntax is (|DeclMode|o, |bool|)
 		return self == o

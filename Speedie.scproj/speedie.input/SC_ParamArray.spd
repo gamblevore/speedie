@@ -185,7 +185,8 @@ class SCParamArray
 		opt norefcounts
 		|| s = .second
 			return s == fn and name
-			
+		
+		
 	function StructLover (|SCDecl| type, |scfunction| fn)
 		|| s = .exp$
 		|| Rel = s.UseNonRefChangers(True)
@@ -201,10 +202,14 @@ class SCParamArray
 			
 		  elseif  (Rel.ASMType is kreturn)
 			/* return YY.new  --> yy.new(rz), return */
-			|| prm = s.last!
+			target false
+				|| prm = s.last
+			  else
+				|| prm = s.last!
+			
 			prm.func = @prm
 			|| subrz = prm.msg(@thg, "rz")			// we need to add rz.
-			subrz.obj = scfunction.currfunc!.StructReturned // right?
+			subrz.obj = SCFunction.currfunc!.StructReturned // right?
 			rel.prev = rel.first
 			f = @nil
 		

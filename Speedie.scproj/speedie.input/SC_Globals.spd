@@ -1756,7 +1756,7 @@ function TypeOfFuncSub (|Message| exp, |SCNode| name_space, |Message| side, |SCO
 	return fn2
 
 
-function NewDeclNum (|SCDecl?| D, |int64| N, |string| VarName, |bool| Shifts, |Message!|)
+function NewDeclNum (|SCDecl?| D, |int64| N, |string| VarName="", |bool| Shifts=false, |Message!|)
 	opt norefcounts
 	if !D
 		d = scdecl.new(typeint!)

@@ -2150,6 +2150,7 @@ extern Array* JB__ErrorSeverity__names;
 #define kJB__MsgParseFlags_Style2 (16384)
 #define kSC__khalai_Active ((1 << 1) + 1)
 #define kSC__khalai_And (1 << 3)
+#define kSC__khalai_Assigns (1 << 7)
 #define kSC__khalai_Basic (((1 << 1) + 1) + (1 << 2))
 #define kSC__khalai_Disappears (1 << 6)
 #define kSC__khalai_Negative (1)
