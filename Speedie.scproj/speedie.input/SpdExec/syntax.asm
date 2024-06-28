@@ -10,7 +10,7 @@ tests oofit
 		ADD   (r1, r1, r3)
 		PRNT  (r1,)			// -111
 		BRA   (r4, 1, @test)
-		HALT  (r0,)
+		HALT  (r0,0,0)
 
 
 

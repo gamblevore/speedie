@@ -69,8 +69,10 @@ class Instruction
 			.typelist[pos] = ins
 	
 		function InstructionInit
-			__instructionlist__			// we need some way to put swearwords into code
-			|| ERR = .typelist[0]		// without idiots seeing it and blaming me for being too awesome
-			for i in 256				// while pretending that im bad as they are.
+			__instructionlist__
+			|| ERR = .typelist[0]
+			for i in 256
 				.typelist[i] := ERR 
+			.TypeDict["bra"] = .TypeDict["jbra"]
+			.TypeDict["halt"] = .TypeDict["trap"]
 

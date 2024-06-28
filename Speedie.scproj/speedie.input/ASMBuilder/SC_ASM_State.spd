@@ -310,7 +310,8 @@ function ASMState.StartFunc (|scfunction| fn)
 function ASMState.FinishASM
 	opt norefcounts
 	if .zero.Const // what?
-	ifn .last isa asm.ret
+	|| l = .last
+	ifn (l isa asm.ret) or (l isa asm.trap) 
 		debugger
 	.out.length = .curr - .out.IR
 

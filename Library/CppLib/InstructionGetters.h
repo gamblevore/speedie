@@ -234,23 +234,23 @@
 #define   Div_Lu_(x)   (((uint)((x)<<30))>>30)
 
 
-#define   Trap_Funci       ((( int)((Op.Raw)<<8))>>31)
-#define   Trap_Funci_(x)   ((( int)((x)<<8))>>31)
+#define   Trap_Continuei       ((( int)((Op.Raw)<<13))>>31)
+#define   Trap_Continuei_(x)   ((( int)((x)<<13))>>31)
 
-#define   Trap_Funcu       (((uint)((Op.Raw)<<8))>>31)
-#define   Trap_Funcu_(x)   (((uint)((x)<<8))>>31)
+#define   Trap_Continueu       (((uint)((Op.Raw)<<13))>>31)
+#define   Trap_Continueu_(x)   (((uint)((x)<<13))>>31)
 
-#define   Trap_Signali       ((( int)((Op.Raw)<<9))>>31)
-#define   Trap_Signali_(x)   ((( int)((x)<<9))>>31)
+#define   Trap_Modei       ((( int)((Op.Raw)<<14))>>30)
+#define   Trap_Modei_(x)   ((( int)((x)<<14))>>30)
 
-#define   Trap_Signalu       (((uint)((Op.Raw)<<9))>>31)
-#define   Trap_Signalu_(x)   (((uint)((x)<<9))>>31)
+#define   Trap_Modeu       (((uint)((Op.Raw)<<14))>>30)
+#define   Trap_Modeu_(x)   (((uint)((x)<<14))>>30)
 
-#define   Trap_Li       ((( int)((Op.Raw)<<10))>>10)
-#define   Trap_Li_(x)   ((( int)((x)<<10))>>10)
+#define   Trap_Li       ((( int)((Op.Raw)<<16))>>16)
+#define   Trap_Li_(x)   ((( int)((x)<<16))>>16)
 
-#define   Trap_Lu       (((uint)((Op.Raw)<<10))>>10)
-#define   Trap_Lu_(x)   (((uint)((x)<<10))>>10)
+#define   Trap_Lu       (((uint)((Op.Raw)<<16))>>16)
+#define   Trap_Lu_(x)   (((uint)((x)<<16))>>16)
 
 
 #define   Float_Di       ((( int)((Op.Raw)<<28))>>31)

@@ -12,7 +12,7 @@ function No1 (|int| a, |int| b, |int| c, |int|)
 	return c
 
 
-function Noop1 (|int| a, |int| b, |int| c)
+function Yes1 (|int| a, |int| b, |int| c)
 	if a
 		b = 1		// fat1
 	  else

@@ -47,10 +47,11 @@ module SpdAssembler
 			return f.ASM					#expect (m, "This function has no ASM")
 
 	
-	function CollectFuncs (|string| exp, |[scfunction]|)
+	function CollectFuncs (|string| name, |[scfunction]|)
 		opt norefcounts
-		for l in exp / ','
-			|| fn = compiler.XFunc(l)
+		|| mod = Compiler.program.FindModule(name, nil)
+		for fn in Compiler.FuncList
+			if fn.parent == mod
 				rz <~ fn
 				fn.tableid = rz.length
 						
@@ -80,8 +81,7 @@ module SpdAssembler
 			require ASMState.ExpandJSM
 		
 		while .Optimise(fn.asm!)
-			fn.OptCounts++
-			expect (fn.optcounts < 16) (fn, "Optimisation is not stopping".internal)
+			loop ++fn.OptCounts <= 16
 		.FlowControl
 
 

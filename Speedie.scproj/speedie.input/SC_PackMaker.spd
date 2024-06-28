@@ -71,7 +71,8 @@ module PackMaker
 	function MakePack 
 		require ASMState.Sh.PackMakerInit // and fn_asm_table[@arg]
 
-		|| upon = SpdAssembler.CollectFuncs("asm_test,asm_test_sub,asm_test_ptr,asm_test_flow")$
+		|| upon = SpdAssembler.CollectFuncs("ASMExamples")$
+		debugger
 		for fn in upon
 			require SpdAssembler.Vacuum(fn)
 

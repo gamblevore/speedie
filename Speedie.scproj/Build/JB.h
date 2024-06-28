@@ -2938,6 +2938,8 @@ void JB_Constants__InitConstants();
 
 JB_String* JB_Constants__TestJB();
 
+bool JB_Constants__TestCasting();
+
 
 
 // LinkMap
@@ -3245,7 +3247,7 @@ void SC_SC_Targets__SyntaxAccessSet(JB_String* Name, bool Value);
 
 
 // SpdAssembler
-Array* SC_SpdAssembler__CollectFuncs(JB_String* Exp);
+Array* SC_SpdAssembler__CollectFuncs(JB_String* Name);
 
 bool SC_SpdAssembler__FlowControl();
 
@@ -4404,11 +4406,11 @@ ASM SC_ASM_RET_LSet(ASM Self, int Value);
 
 ASM SC_ASM_Tail_JUMPSet(ASM Self, int Value);
 
-ASM SC_ASM_Trap_FuncSet(ASM Self, int Value);
+ASM SC_ASM_Trap_ContinueSet(ASM Self, int Value);
 
 ASM SC_ASM_Trap_LSet(ASM Self, int Value);
 
-ASM SC_ASM_Trap_SignalSet(ASM Self, int Value);
+ASM SC_ASM_Trap_ModeSet(ASM Self, int Value);
 
 ASM SC_ASM_U0_LSet(ASM Self, int Value);
 
@@ -4878,6 +4880,8 @@ Message* JB_Syx_Msg(Syntax Self, JB_String* Name);
 Message* JB_Syx_IntMsg(Syntax Self, int64 Name);
 
 JB_String* JB_Syx_Name(Syntax Self);
+
+bool JB_Syx_NoChildren(Syntax Self);
 
 SyntaxObj* JB_Syx_Obj(Syntax Self);
 
@@ -9863,8 +9867,6 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, NilState New);
 
 inline void SC_nil__DeclKill();
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
-
 inline NilRecord SC_nil__Value();
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
@@ -9884,6 +9886,8 @@ inline bool SC_Reg_SyntaxCast(AsmReg Self);
 inline int SC_Reg_ToInt(AsmReg Self);
 
 inline NilRecord SC_nil__EndBlock();
+
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
@@ -10017,7 +10021,7 @@ inline FatASM* JB_Msg_TAIL(Message* Self, int A, AsmReg B);
 
 inline FatASM* JB_Msg_TERN(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D);
 
-inline FatASM* JB_Msg_TRAP(Message* Self, int A, int B);
+inline FatASM* JB_Msg_TRAP(Message* Self, AsmReg A, int B, int C);
 
 inline FatASM* JB_Msg_WR16(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E);
 
@@ -10219,16 +10223,6 @@ inline void SC_nil__DeclKill() {
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 }
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
-	ASMtmp T = SC_Msg_ASMType(Msg);
-	if (T) {
-		return (SC__nil_NilTable[T])(Msg, Test);
-	}
-	T = ((ASMtmp)Msg->Func);
-	(SC_Msg_ASMTypeSet(Msg, T));
-	return (SC__nil_NilTable[T])(Msg, Test);
-}
-
 inline NilRecord SC_nil__Value() {
 	return SC_nil_Value((&SC__nil_T));
 }
@@ -10253,10 +10247,18 @@ inline FatASM* SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 	FatASM* Rz = nil;
 	ASMtmp T = SC_Msg_ASMType(Exp);
 	fn_asm Fn = SC_fn_asm_table[T];
+	if (!T) {
+		Fn = SC_fn_asm_table[((int)Exp->Func)];
+		debugger;
+	}
 	byte OV = Self->VTmps;
 	Rz = (Fn)(Self, Exp, Dest, 0);
 	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen)) {
 		Self->VTmps = (OV);
+	}
+	int Dd = SC_Reg_Reg(Dest);
+	if (((bool)Dd) and (SC_Reg_Reg(Rz->Info) != Dd)) {
+		//FFFFFFASSDJKLASDM<>AS;
 	}
 	return Rz;
 }
@@ -10264,6 +10266,7 @@ inline FatASM* SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 inline uint64* SC_Pac_GetConst(ASMState* Self, int A) {
 	FatASM* R = Self->Registers[A];
 	if ((R == (&Self->Zero)) or (!SC_Reg_SyntaxIs(R->Info, kSC__Reg_ConstAny))) {
+		debugger;
 	}
 	return (&R->Const);
 }
@@ -10281,6 +10284,16 @@ inline NilRecord SC_nil__EndBlock() {
 	Rz = SC_nil__Value();
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 	return Rz;
+}
+
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
+	ASMtmp T = SC_Msg_ASMType(Msg);
+	if (T) {
+		return (SC__nil_NilTable[T])(Msg, Test);
+	}
+	T = ((ASMtmp)Msg->Func);
+	(SC_Msg_ASMTypeSet(Msg, T));
+	return (SC__nil_NilTable[T])(Msg, Test);
 }
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
@@ -10918,11 +10931,12 @@ inline FatASM* JB_Msg_TERN(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D
 	return Rz;
 }
 
-inline FatASM* JB_Msg_TRAP(Message* Self, int A, int B) {
+inline FatASM* JB_Msg_TRAP(Message* Self, AsmReg A, int B, int C) {
 	FatASM* Rz = nil;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_TRAP, Self);
-	(SC_FatASM_prmSetWithIntInt(Rz, 0, A));
+	(SC_FatASM_prmSetWithIntReg(Rz, 0, A));
 	(SC_FatASM_prmSetWithIntInt(Rz, 1, B));
+	(SC_FatASM_prmSetWithIntInt(Rz, 2, C));
 	return Rz;
 }
 

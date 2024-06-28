@@ -18,11 +18,11 @@
 ı NOOP: _
 	0;
 ı TRAP: _
-	if (Trap_Signalu) 
+	if (Trap_Continueu) 
 	JB_App__SelfSignal(Trap_Lu)
 ;
-	else if (!Trap_Funcu) 
-	debugger
+	else 
+	return u1
 ;
 ı RET: 
 	__;

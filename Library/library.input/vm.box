@@ -97,8 +97,9 @@ forms
 		Kind	2
 	
 	Trap
-		Func	1		// what about breaking if the func hits a certain level?
-		Signal  1		// signal, breakpoint
+		r1		 r
+		Continue 1		// trap or halt
+		Mode	 2		// 1 = trap on function-count,  2 = trap-always
 
 	Float:		r1 r,  r2 r,  r3 r,  r4 r,  D  1
 
@@ -143,10 +144,10 @@ forms
 
 
 /**/ TRAP (Trap)
-		if (Trap_Signalu)
+		if (Trap_Continueu)
 			JB_App__SelfSignal(Trap_Lu)
-		else if (!Trap_Funcu)
-			debugger
+		else
+			return u1
 
 
 // needs ASM-text: rare, RSDE, RALO, RSET, MEMM
