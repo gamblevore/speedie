@@ -33,7 +33,7 @@ fi
 function UnMod (|string| Dir, |string|)
 	return "chmod 775 $dir
 chown \$U $dir"
-	
+
 	
 function comp (|string| name, |string|)
 	return "echo \"Compiling ${name}.cpp\"
