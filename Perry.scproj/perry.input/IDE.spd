@@ -606,8 +606,9 @@ class PerryIDE (Window)
 			return true
 		if .openedmenu or key.IsModifier
 			return false
-		.Editme.SetFocus
-		return .editme.__KeyDown__(key)
+		if .focus isnt editable
+			.Editme.SetFocus
+			return .editme.__KeyDown__(key)
 
 	
 	function GotoIncludedFile (|string| path, |bool|)

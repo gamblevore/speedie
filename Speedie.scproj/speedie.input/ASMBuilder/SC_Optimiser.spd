@@ -1,25 +1,12 @@
-// a dead-code finder will remove old ops.
 
-// inlining do separately. opts better if we call .µ on inlinedfn... but within our range.
-// i guess returns can be replaced with sets... or turned to jumps, or eliminated
-
-
-// dead code removal... IDK?
-// we need to also opt a+0 into a
-// basically most of the quickopts I already did... need to be redone??
-// if (a+b==x)
-	//// do nothing
-// a = b
-
-
-
+// notes at bottom
 function Tran_OptPath (tranfunc)
 	// we need to make sure that every optimisation path is tested!!!
 	// we don't wanna generate buggy code!
 	|| name = node.first
 	require name.ExpectLast and name.ExpectString
 	if Options.TargetDebug
-		|| i = ++spdassembler.OptPathCount
+		|| i = ++SpdAssembler.OptPathCount
 		SpdAssembler.OptPathNames[i] = name
 		node.BecomeMacro(Macros.OptPath, [i.msg])
 		TypeOfExpr(node, name_space)
@@ -59,8 +46,6 @@ function SpdAssembler.Optimise (|µfunc| raw, |bool|)
 	raw.Sanity
 
 
-
-
 extend SpdAssembler {
 |int| 			OptPathCount
 |int[64]|		OptPaths
@@ -75,7 +60,6 @@ dispatch µOpt (|&fatasm| self, |?&fatasm| P, |?&fatasm| N, |bool|)
 	(ASM.TABL):   OptTabl
 
 	(ASM.SUBB):   OptSubI
-//	(ASM.ADDK):   OptAddK
 	(ASM.ADD):    OptAddI
 	(ASM.FADD):   OptAddF
 	(ASM.FADK):   OptFADK
@@ -115,29 +99,6 @@ function OptFunc (Fn_µOpt)
 		OptPath "tail"
 		return N.nop // what if something jumps to this?
 
-
-function OptCount (Fn_µOpt)
-	// (addr+=n), cntc(addr, 0) --> cntc(addr, n)
-
-
-function OptTabl (Fn_µOpt)
-	// Glob = glob + 1-127 // --> cntc
-	
-
-function OptFADK (Fn_µOpt)	
-	// a = b + k1 + k2   -->   a = b + k3
-//	require p isa asm.fadk
-//	|| pout = p.out
-//	|| myin = .a
-//	if pout == myin
-//		OptPath "fadk()"
-//		|| add2 = p.b|int|.asfloat + .a|int|.asfloat
-//		// is this how we store consts in fadk? not just as a raw-const?
-//		// and what if the consts dont fit?
-//		// seems better to just add the raw numbers?
-//		.a = add2.AsInt
-//		return true
-	
 
 function OptSubI (Fn_µOpt)
 	if p 
@@ -249,33 +210,6 @@ function OptShifting (fn_µopt)   // can't really opt this unless registers cont
 		return true
 
 
-//	BFLD
-//		r1		r
-//		r2		r
-//		up		6
-//		down	6
-function OptBFLG (fn_µopt)
-// can merge two bflg... just add up + down!  Works with refcounts.  (if sign matches)
-//////  BFLG
-//	if (BFLD_Lu)
-//		i1 = ((i2 << up) >> down)
-//	  else
-//		u1 = ((u2 << up) >> down)
-
-
-function OptBitOr (fn_µopt)
-	require p			
-//	|| rr = r.reg,  || ll = l.reg
-//	if ll == 0							// swap
-//		swap (ll) (rr)
-//	  elseif (ll == rr)
-//		rr = 0							// same thing
-//	if rr == 0 and dd == ll
-//		debugger // we need to return the left asm. how to get it?
-//		return dest.fat						// no need
-	// boar:   u1  = (u2|||u3)&~u4
-
-
 function OptBitNot (fn_µopt)
 	require (p isa asm.bnot) and (n isa asm.band) and !n.c
 	require !(.b ||| p.b)
@@ -316,9 +250,10 @@ function OptBitNot (fn_µopt)
 		
 		return false
 	
+	OptPath "bitnot_combine"	//  x = ~a,  y = ~b,  z = x & y 	-->		z = ~a & ~b
+	.b = p.a
+	return true
 
-
-	
 	// if the inputs are altered... they must be nopped, or else we get input corruption.
 	// nopping requres that nothing else uses it. refcount is 1.
 	// just dont do for now!
@@ -329,9 +264,6 @@ function OptBitNot (fn_µopt)
 	//  x = ~x,  y = ~x		-->		z = ~x & ~x		// ?????
 
 	//  x = ~y,  y = ~b		-->		z = ~x & ~y		// ?????
-	OptPath "bitnot_combine"	//  x = ~a,  y = ~b,  z = x & y 	-->		z = ~a & ~b
-	.b = p.a
-	return true
 	
 	
 
@@ -383,4 +315,70 @@ function OptRet (fn_µopt)
 // LUPU/LUPD
 
 
+//	BFLD
+//		r1		r
+//		r2		r
+//		up		6
+//		down	6
+function OptBFLG (fn_µopt)
+// can merge two bflg... just add up + down!  Works with refcounts.  (if sign matches)
+//////  BFLG
+//	if (BFLD_Lu)
+//		i1 = ((i2 << up) >> down)
+//	  else
+//		u1 = ((u2 << up) >> down)
+
+
+function OptBitOr (fn_µopt)
+	require p			
+//	|| rr = r.reg,  || ll = l.reg
+//	if ll == 0							// swap
+//		swap (ll) (rr)
+//	  elseif (ll == rr)
+//		rr = 0							// same thing
+//	if rr == 0 and dd == ll
+//		debugger // we need to return the left asm. how to get it?
+//		return dest.fat						// no need
+	// boar:   u1  = (u2|||u3)&~u4
+
+
+
+function OptCount (Fn_µOpt)
+	// (addr+=n), cntc(addr, 0) --> cntc(addr, n)
+
+
+function OptTabl (Fn_µOpt)
+	// Glob = glob + 1-127 // --> cntc
+	
+
+function OptFADK (Fn_µOpt)	
+	// a = b + k1 + k2   -->   a = b + k3
+//	require p isa asm.fadk
+//	|| pout = p.out
+//	|| myin = .a
+//	if pout == myin
+//		OptPath "fadk()"
+//		|| add2 = p.b|int|.asfloat + .a|int|.asfloat
+//		// is this how we store consts in fadk? not just as a raw-const?
+//		// and what if the consts dont fit?
+//		// seems better to just add the raw numbers?
+//		.a = add2.AsInt
+//		return true
+
 }
+
+
+// a dead-code finder will remove old ops.
+
+// inlining do separately. opts better if we call .µ on inlinedfn... but within our range.
+// i guess returns can be replaced with sets... or turned to jumps, or eliminated
+
+
+// dead code removal... IDK?
+// we need to also opt a+0 into a
+// basically most of the quickopts I already did... need to be redone??
+// if (a+b==x)
+	//// do nothing
+// a = b
+
+

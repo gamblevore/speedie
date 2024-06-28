@@ -1,0 +1,296 @@
+
+target pack { target debug2 {
+module ASMExamples {
+
+// case 1
+function No1 (|int| a, |int| b, |int| c, |int|)
+	if a
+		b = 1		// fat1
+	  else
+		b = 2		// fat2
+	c = b + 1
+	return c
+
+
+function Noop1 (|int| a, |int| b, |int| c)
+	if a
+		b = 1		// fat1
+	  else
+		b = 2		// fat2
+	c = b + 1
+	// noop whole thing. cos c is unused.
+
+
+// case 2
+function Yes2 (|int| y, |int|)
+	|| x = 1
+	if !y
+		y = 2
+	return x + 1	// should just be return 2
+	
+function No2 (|int| y, |int|)
+	|| x = 1
+	if !y
+		y = 2
+	return x + y
+
+
+// case 3
+function Yes3 (|int| b, |int|)
+	|| c = 0		// noop
+	b = b + 1		// noop
+	c = b + 2		// c = b + 3
+	return c
+
+function No3 (|int| x, |int| b, |int| c, |int|)
+	if x
+		b = b + 1
+	c = b + 2
+	return c
+
+
+// case 4
+function Yes4 (|int| b, |int| c, |int|)
+	b = b + 1
+	c = b + 2	// OPT  // only if (b = b + 1).refcount == 1
+	return c
+
+
+function No4 (|int| b, |int| c, |int| d, |int|)
+	b = b + 1
+	c = b + 2
+	d = b * 2
+	return c-d
+
+
+// case 5
+function Yes5 (|int| b, |int| c, |int|)
+	b = b + 0   // NOOP
+	b = b + 1	// NOOP
+	c = b + 2	// OPT  // cos (b = b + 1).refcount == 1
+	return c
+
+
+function No5 (|int| b, |int| c, |int| d, |int|)
+	b = b + 1
+	c = b + 2	// opt c = b + 3? but only if .refcount == 1
+	d = b * 2	// 
+	return c-d
+
+
+
+// case 6
+function YesTail6 (|int| b, |int| c, |int|)
+	return No5(b+1, c, c)
+
+
+function NoTail6 (|int| b, |int| c, |int|)
+	return No5(b, c, c) + 1
+
+
+// case 6
+function YesInline6 (|int| b, |int| c, |int|)
+	// how to do inlining? Not sure? Won't they inline anyhow?
+	
+	return No5(b+1, c, c)
+
+
+function NoInline6 (|int| b, |int| c, |int|)
+	return No5(b, c, c) + 1
+
+
+
+function LoopTest7 (|int|)
+	for 10
+		rz++
+
+
+function Loop2Test7 (|int| x, |int|)
+	for i in 10
+		if i&1 == x&1
+			rz += i
+
+function No8 (|int| x, |int| b, |int|)
+	if x == 1
+		b += 1
+	  elseif x == 2
+		b += 4
+	  elseif x == 3
+		b += 90
+	b += 5
+	return b
+	
+function Yes8 (|int| x, |int| b, |int|)
+	if x == 1
+		b += 1 // --> b += 6
+	  else
+		b += 2 // --> b += 7
+	b += 5		// NOOP
+	return b
+
+function Yes9 (|int| x, |int| b, |int| c, |int| d, |int| e, |int|)
+	b *= -1			// opt b = 0-b
+	if x
+		c = b+1		// refcounts (b*=-1)
+		d = b+2		// refcounts (b*=-1)
+	e = b + 1		// technically... this is still OK.  its not altered.  same parentblock.
+	return e + c + d
+
+function YesBasic10 (|int|)
+	|| x = 0 // noop
+	return x
+	
+
+function YesBasic11 (|int|)
+	|| x = 0+0+0+1+2+3+4 // 10
+	return x
+	
+function YesBasic12 (|int|)
+	|| x = (0+0+0+1+2+3+4)*12 // 120
+	return x
+
+function YesBasic13 (|int|)
+	|| x = (13*13*13)|byte| // 149
+	return x
+
+function YesBasic14 (|int| x, |int|)
+	return ((x + 0) * (1 * -1 * -1)) * 2 // << 1
+
+
+function YesBasic15 (|uint| x, |int|)
+	return x / (15+(8/8))
+
+
+function YesBasic16 (|uint| x, |int|)
+	return x / 256
+
+
+function YesBasic17 (|int|)
+	|| x = 0 // noop
+	return x
+	
+
+function YesBasic18 (|float|)
+	|| x = 0.0+0.0+0.0+1.0+2.0+3.0+4.0 // 10
+	return x
+	
+function YesBasic19 (|float|)
+	|| x = (0.0+0.0+0.0+1.0+2.0+3.0+4.0)*12.0 // 120
+	return x
+
+function YesBasic20 (|float|)
+	|| x = (13*13*13)|float| // 149.0
+	return x
+
+function YesBasic21 (|float| x, |float|)
+	return ((x + 0.0) * (1.0 * -1.0 * -1.0)) * 2.0 // << 1
+
+
+function YesBasic22 (|float| x, |float|)
+	return x / (15.0+(8.0/8.0))
+
+
+function YesBasic23 (|float| x, |float|)
+	return x / 256.0
+	
+
+function FloatConv24 (|float|)
+	|| x = 0
+	while ++x != 0
+		|| v = x|float|
+		rz += v
+	// just compare c++ and spd versions
+	
+
+function loop25 (|int| a, |int|)
+	for i in 24 // the loop might opt, though? just not the rz
+		if a[i] // unless we generate tight code in the first place?
+			rz += i*9
+	rz *= 2
+
+
+function Func26 (|message?| m, |string?|)
+	if m != @arg
+		return m.name
+	return nil
+
+
+function Func27 (|message?| m)
+	opt norefcounts
+	for s in m
+		printline s.name
+
+
+
+
+helper asm_test_add (|int| a, |int| b, |int|)
+	cpp_name asm_test_sub
+	visible
+	|| y = 2.0
+	return ((a + b) / 2) - ((a / b) * 2)
+
+
+helper asm_test_func (|int| a, |int| b, |int|)
+	cpp_name asm_test
+	visible
+	return asm_test_add(b*b, a*a)
+
+
+helper asm_test_ptr (|fixeddict| a, |&int| b,  |int|)
+	cpp_name asm_test_ptr
+	visible
+	a.letter = -1
+	b[] = 0
+	b[0] = 1
+	|| n = 10
+	b[n] = 5
+	n = b[1]
+	n = b[0]
+	a.Value = a|&nil|
+	a.items[1] = 5|&nil|
+	a.items[n] = 5|&nil|
+	
+
+helper asm_test_flow (|int| a, |int| b, |int|)
+	cpp_name asm_test_flow
+	visible
+	if a > b
+		a = b
+	if b < a
+		b = a
+	if a == a // NOOP
+		a = 0
+	if b != b // NOOP
+		b = 0
+	if 1.CountBits == 2.CountBits
+		|| x = 2
+	
+	
+
+
+ignore {
+
+function asm_test_add (|int| a, |int| b, |int|)
+	|| y = 2.0
+	return ((a + b) / 2) - ((a / b) * 2)
+-->
+asm asm_test_add
+	SETK: r3, 29, 1				// 2.0
+	ADD:  r31, r1, r2			// a+b
+	SETK: r30, 0, 1				// const 2
+	DIV:  r0, r31, r31, r30, 0	// (a+b)/ 2
+	DIV:  r0, r30, r1, r2, 0	// (a/b)
+	SETK: r29, 0, 1				// load const 2 (could be optimised)
+	MUL:  r30, r30, r29, r0		// (a/b) * 2
+	SUB:  r1, r31, r30			// -
+	RET:  r1, r0, 1, 0			// return
+// Seems to be ok actually? Just the const can be removed...
+// also values that are written but never used.
+// we could store the regs in ONE value that is a 64-bit value... so each 2 bits gives us a type of 0-3
+// awkward to be honest... but maybe ok. we could store two versions? like a condensed version?
+}
+
+}}}
+
+// im not sure what other tests need doing? We'll think of some... over time!!
+
