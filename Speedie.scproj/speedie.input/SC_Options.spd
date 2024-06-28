@@ -348,6 +348,7 @@ module Feedback
 			options.ModePack = value.optionbool
 			if options.modepack
 				options.modecpp = false
+			SC_Targets["pack"] = options.ModePack
 		
 		+"targetdebug" // basically
 			Explain(Purpose, "")$

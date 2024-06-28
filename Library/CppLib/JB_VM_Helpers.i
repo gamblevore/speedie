@@ -528,18 +528,3 @@ AlwaysInline u64 ForeignFuncSimple(Register* r, ASM*& Code, ASM Op) {
 	return 0;
 }
 
-
-bool VerifyTable(jb_vm& vm, const Goto* JumpTable) {
-	if (vm.Stack.Verified)
-		return true;
-	auto first = JumpTable[0];
-	for_(255) {
-		if (JumpTable[i]!=first and JumpTable[i+1]!=first and JumpTable[i] >= JumpTable[i+1]) {
-			debugger;
-			return false;
-		}
-	}
-	vm.Stack.Verified = true; 
-	return true;
-}
-

@@ -34,7 +34,6 @@ s64 RunVM (jb_vm& vm) {		// vm_run, vm__run, vmrun, run_vm
     const static Goto JumpTable[] = {
         #include "InstructionList.h"
     };
-    if (!VerifyTable(vm, &JumpTable[0])) return -12345678;
 
     ASM  Op;
     ASM  Op2;

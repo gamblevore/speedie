@@ -2,6 +2,7 @@
 target pack { target debug2 {
 module ASMExamples {
 
+
 // case 1
 function No1 (|int| a, |int| b, |int| c, |int|)
 	if a

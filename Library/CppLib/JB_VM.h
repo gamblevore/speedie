@@ -23,7 +23,6 @@ struct ASM {
 struct RegInfo {
 //	uint8			ResultRegister;
 	uint8			CallerRegCount;
-	bool			Verified;
 	Register		Registers[];
 };
 

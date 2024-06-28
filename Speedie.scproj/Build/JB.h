@@ -1449,13 +1449,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_OnlyRightIsVector 66
 #define kSC__CustomOps_TypeCastFromBool 16
 #define kSC__CustomOps_TypeCastToBetter 32
-#define kJB__ErrorColors_bold (JB_LUB[99])
+#define kJB__ErrorColors_bold (JB_LUB[2082])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[96])
-#define kJB__ErrorColors_good (JB_LUB[97])
-#define kJB__ErrorColors_normal (JB_LUB[100])
-#define kJB__ErrorColors_underline (JB_LUB[97])
-#define kJB__ErrorColors_warn (JB_LUB[98])
+#define kJB__ErrorColors_error (JB_LUB[2083])
+#define kJB__ErrorColors_good (JB_LUB[2084])
+#define kJB__ErrorColors_normal (JB_LUB[2081])
+#define kJB__ErrorColors_underline (JB_LUB[2084])
+#define kJB__ErrorColors_warn (JB_LUB[2085])
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
 extern int SC__FastStringOpts_StrRemoved;
@@ -1819,10 +1819,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp 32784
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down (JB_LUB[2079])
-#define kJB__zalgo_mid (JB_LUB[2078])
+#define kJB__zalgo_down (JB_LUB[2088])
+#define kJB__zalgo_mid (JB_LUB[2087])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up (JB_LUB[2077])
+#define kJB__zalgo_up (JB_LUB[2086])
 #define kJB__byte_max 255
 #define kJB__byte_min (0)
 #define kJB__char_max 127
@@ -2313,7 +2313,7 @@ extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_kDelete 2
 #define kJB__Wrap_kFree 1
 #define kJB__Wrap_kNothing (0)
-#define kJB__Rec_NonFatal (JB_LUB[1010])
+#define kJB__Rec_NonFatal (JB_LUB[2080])
 extern double JB__Rec_Progress;
 #define kJB__fix_TypeDict 3
 #define kJB__fix_TypeObj 1
@@ -3006,6 +3006,8 @@ int SC_Options__InitCode_();
 
 
 // PackMaker
+bool SC_PackMaker__ActualRealCompileAkaPackIt();
+
 void SC_PackMaker__AddAll();
 
 void SC_PackMaker__AddLibGlob(SCDecl* D);
@@ -3024,7 +3026,7 @@ int SC_PackMaker__Init_();
 
 int SC_PackMaker__InitCode_();
 
-void SC_PackMaker__ListPackFuncs(FastString* J, Array* Upon);
+void SC_PackMaker__ListPackFuncs(FastString* J);
 
 void SC_PackMaker__MakePack();
 
@@ -3035,6 +3037,8 @@ void SC_PackMaker__OrderGlobals(FastString* J);
 int SC_PackMaker__OrderGlobalsSub();
 
 void SC_PackMaker__PackClass(FastString* J);
+
+void SC_PackMaker__RevUpTheHoover(JB_String* Name);
 
 void SC_PackMaker__SortAll();
 
@@ -3247,8 +3251,6 @@ void SC_SC_Targets__SyntaxAccessSet(JB_String* Name, bool Value);
 
 
 // SpdAssembler
-Array* SC_SpdAssembler__CollectFuncs(JB_String* Name);
-
 bool SC_SpdAssembler__FlowControl();
 
 void SC_SpdAssembler__GenerateASM(SCFunction* Fn);
@@ -9496,6 +9498,8 @@ void SC_Func_MarkRecursive(SCFunction* Self, SCFunction* EndAt);
 Message* SC_Func_NewDefaultRel(SCFunction* Self, Message* Place, SCDecl* D);
 
 void SC_Func_NilSelff(SCFunction* Self, Message* Where, NilState V);
+
+bool SC_Func_operatorin(SCFunction* Self, SCModule* F);
 
 SCFunction* SC_Func_ParamlessConstructor(SCFunction* Self);
 

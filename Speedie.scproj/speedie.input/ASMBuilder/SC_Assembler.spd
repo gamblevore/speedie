@@ -45,15 +45,6 @@ module SpdAssembler
 		opt norefcounts
 		|| f = compiler.XFunc(m.name, m)
 			return f.ASM					#expect (m, "This function has no ASM")
-
-	
-	function CollectFuncs (|string| name, |[scfunction]|)
-		opt norefcounts
-		|| mod = Compiler.program.FindModule(name, nil)
-		for fn in Compiler.FuncList
-			if fn.parent == mod
-				rz <~ fn
-				fn.tableid = rz.length
 						
 
 	function GenerateASM (|scfunction| fn)

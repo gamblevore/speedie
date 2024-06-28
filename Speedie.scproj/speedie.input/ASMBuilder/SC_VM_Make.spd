@@ -151,6 +151,8 @@ function VMBox (|message|)
 
 
 function JustMakeMyBread (|bool|)
+	description "Shorter version that just makes the stuff we need, rather than generate the entire VM."
+	require !ModuleArg
 	|| vmdef = .VMBox
 		|| forms = vmdef.find("forms")
 		.GenerateForms(forms, false)
