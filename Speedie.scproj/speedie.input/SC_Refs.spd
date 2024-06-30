@@ -78,7 +78,7 @@ function DeclInit (|Message| dcl, |SCFunction| fn, |bool| IsJustAnArg)
 
 
 function scfunction.DoRefs (|bool|)
-	return self isnt NoRefCounts
+	return self isnt NotRefCounted
 
 
 function RefBasis (|Message| msg, |bool| SetOnly, |int|)
@@ -123,6 +123,15 @@ function RC_Rel (|Message| rel)
 	rel.ReplaceWith( result )
 
 
+function RC_CheckNoObjPms (|message| msg)
+	opt norefcounts
+	|| fn = msg.MsgFunc
+		for i in fn.args
+			if i.PointerCount
+				expect (!i.Type.IsObject) (msg, "Can't pass address of object while using 'opt norefcounts'")
+		// now what? check the arg is OK?
+
+	
 function RC_IgnoreReturn (|Message| msg, |bool| DoRefs)
 	opt norefcounts
 	require RefBasis( msg, false ) == kBasisObj
@@ -816,6 +825,8 @@ function SCFunction.AnalyseRefs (|[message]| list)
 			SCRefs.RC_IgnoreReturn( msg, .dorefs )
 			
 		  elseif (f == @Func)
+			if !.DoRefs
+				SCRefs.RC_CheckNoObjPms(msg)
 			SCRefs.RC_CheckFuncAllocOK( self, msg )
 			SCRefs.RC_IgnoreReturn( msg, .dorefs )  // func(a,b,c)
 			

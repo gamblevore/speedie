@@ -55,7 +55,7 @@ dispatch FuncPreReader (fnPreReader)
 		opt norefcounts
 		|| f = msg[@thg]
 		if f ~= "NoRefCounts"
-			is NoRefCounts
+			is NotRefCounted
 		  elseif f ~= "min"
 			|| Min = f.next(@num)
 				.minopt = min.int
