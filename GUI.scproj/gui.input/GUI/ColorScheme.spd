@@ -125,6 +125,10 @@ class ColorScheme
 function FixupColor (|message| self, |ind| pos, |message|)
 	opt norefcounts						// need to fixup container colors...
 	require self
+
+	if (self == @thg)
+		|| p = .Ancestor(@decl)
+			return p
 	if self == @emb
 		self = .Parent$
 
