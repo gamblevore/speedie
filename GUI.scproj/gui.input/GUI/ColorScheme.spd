@@ -122,12 +122,24 @@ class ColorScheme
 
 
 
+helper message.ColorDeclNicely (|message?|)
+	opt norefcounts
+	while self
+		|| p = .parent$
+		|| f = p.func
+		if f == @decl
+			require .IsFirst
+			return p
+		require f == @rel or @bra or @brel or @arel
+		self = p
+		
+	
 function FixupColor (|message| self, |ind| pos, |message|)
 	opt norefcounts						// need to fixup container colors...
 	require self
 
 	if (self == @thg)
-		|| p = .Ancestor(@decl)
+		|| p = .ColorDeclNicely
 			return p
 	if self == @emb
 		self = .Parent$
