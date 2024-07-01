@@ -53,8 +53,8 @@ module SpdAssembler
 		|| fp = fn_asm_table[@arg]!
 		|| R = asmreg()
 		|| A = fn.SourceArg!
-		debugger
 		(fp)(ASmState.Sh, A, R)
+		debugger
 		ASMState.Sh.FinishASM
 		.Guard
 		return ASMState.Sh.ok
@@ -77,3 +77,4 @@ extend_module ASM
 	function Needed (|bool|)
 		|| fn = compiler.XFunc("JB_ASM_Run")
 			return fn.MyReacher
+

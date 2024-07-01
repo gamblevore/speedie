@@ -7,3 +7,39 @@ datatype FailableInt (int) // useful when you want most numbers, even negatives,
 	false FailableInt.fail
 	syntax cast (|bool|)
 		return self != fail
+
+
+function message.ASMDecl (|SCDecl!|)
+	opt norefcounts
+	rz = .fastdecl
+	if rz.dtype == datatypecode.unusedtype
+		rz.dtype = rz.asmreg|datatypecode|
+	target debug: rz.ASMSanity
+
+
+function scdecl.ASMSanity
+	target debug
+		ifn .iscarray or .pointercount or .isobject
+			|| size = .type.Size
+			if size != .dtype.bytecount // sigh. what?
+				#!"Should we have set the dtype when the decl was created? or at least verified in the nil-checker?"
+				#!"We could change it if it is only 112."
+				debugger
+	// make sure it adds up.
+
+
+function scdecl.ASMReg (|asmreg|)
+	opt norefcounts
+	if .pointercount or .iscarray
+		// carrays must be allocated. So this reg will store a pointer to the carray.
+		return datatypecode._voidptr|asmreg|
+
+	|| t = .type
+	|| b = t.BaseType
+	if b > scnodetype.datatype
+		return datatypecode._voidptr|asmreg|
+
+	target debug
+		expect (b is datatype) ("Hello kitty")
+	
+	return t.typeinfo|asmreg|

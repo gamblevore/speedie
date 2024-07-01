@@ -2939,8 +2939,6 @@ void JB_Constants__InitConstants();
 
 JB_String* JB_Constants__TestJB();
 
-bool JB_Constants__TestCasting();
-
 
 
 // LinkMap
@@ -4645,8 +4643,6 @@ bool JB_TC_IsFloat(DataTypeCode Self);
 
 bool JB_TC_IsInt(DataTypeCode Self);
 
-bool JB_TC_IsNumeric(DataTypeCode Self);
-
 bool JB_TC_IsSigned(DataTypeCode Self);
 
 int JB_TC_ItemBitCount(DataTypeCode Self);
@@ -4891,8 +4887,6 @@ Message* JB_Syx_Msg(Syntax Self, JB_String* Name);
 Message* JB_Syx_IntMsg(Syntax Self, int64 Name);
 
 JB_String* JB_Syx_Name(Syntax Self);
-
-bool JB_Syx_NoChildren(Syntax Self);
 
 SyntaxObj* JB_Syx_Obj(Syntax Self);
 
@@ -7569,6 +7563,8 @@ void JB_Msg_Ask__(Message* Self, FastString* Fs);
 
 uint64 SC_Msg_ASMConst(Message* Self);
 
+SCDecl* SC_Msg_ASMDecl(Message* Self);
+
 ASMtmp SC_Msg_ASMType(Message* Self);
 
 void SC_Msg_ASMTypeSet(Message* Self, ASMtmp Value);
@@ -8429,6 +8425,8 @@ int SC_Decl_AllocatedSize(SCDecl* Self);
 bool SC_Decl_AlreadyContains(SCDecl* Self);
 
 SCDecl* SC_Decl_AsLocal(SCDecl* Self);
+
+AsmReg SC_Decl_ASMReg(SCDecl* Self);
 
 bool SC_Decl_AssignabilityCheck(SCDecl* Self, Message* Ln, Message* RN, SCDecl* Rc);
 
@@ -9876,6 +9874,8 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, NilState New);
 
 inline void SC_nil__DeclKill();
 
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
+
 inline NilRecord SC_nil__Value();
 
 inline FatASM* JB_Msg_ADD(Message* Self, AsmReg A, AsmReg B, AsmReg C);
@@ -10038,6 +10038,8 @@ inline FatASM* SC_Pac_AddASM4(ASMState* Self, int SM, Message* Dbg, int A, int B
 
 inline FatASM* SC_Pac_AddASM5(ASMState* Self, int SM, Message* Dbg, int A, int B, int C, int D, int E);
 
+inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest);
+
 inline uint64* SC_Pac_GetConst(ASMState* Self, int A);
 
 inline bool SC_Reg_SyntaxCast(AsmReg Self);
@@ -10046,11 +10048,7 @@ inline int SC_Reg_ToInt(AsmReg Self);
 
 inline NilRecord SC_nil__EndBlock();
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
-
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
-
-inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest);
 
 inline SCDecl* SC_TypeOfSwiz(Message* Exp, SCNode* Name_space, Message* Side, SCDecl* class_Space);
 
@@ -10230,6 +10228,16 @@ inline void SC_nil__DeclKill() {
 		SC__nil_T.RootReturned = true;
 	}
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
+}
+
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
+	ASMtmp T = SC_Msg_ASMType(Msg);
+	if (T) {
+		return (SC__nil_NilTable[T])(Msg, Test);
+	}
+	T = ((ASMtmp)Msg->Func);
+	(SC_Msg_ASMTypeSet(Msg, T));
+	return (SC__nil_NilTable[T])(Msg, Test);
 }
 
 inline NilRecord SC_nil__Value() {
@@ -10980,14 +10988,24 @@ inline FatASM* SC_Pac_AddASM5(ASMState* Self, int SM, Message* Dbg, int A, int B
 	return Rz;
 }
 
+inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
+	AsmReg Rz = ((AsmReg)0);
+	ASMtmp T = SC_Msg_ASMType(Exp);
+	fn_asm Fn = SC_fn_asm_table[T];
+	byte OV = Self->VTmps;
+	Rz = (Fn)(Self, Exp, Dest, 0);
+	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen)) {
+		Self->VTmps = (OV);
+	}
+	return Rz;
+}
+
 inline uint64* SC_Pac_GetConst(ASMState* Self, int A) {
 	if (((uint)A) > 31) {
-		debugger;
 		A = 0;
 	}
 	FatASM* R = Self->Registers[A];
 	if ((R == (&Self->Zero)) or (!SC_Reg_SyntaxIs(R->Info, kSC__Reg_ConstAny))) {
-		debugger;
 	}
 	return (&R->Const);
 }
@@ -11007,16 +11025,6 @@ inline NilRecord SC_nil__EndBlock() {
 	return Rz;
 }
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
-	ASMtmp T = SC_Msg_ASMType(Msg);
-	if (T) {
-		return (SC__nil_NilTable[T])(Msg, Test);
-	}
-	T = ((ASMtmp)Msg->Func);
-	(SC_Msg_ASMTypeSet(Msg, T));
-	return (SC__nil_NilTable[T])(Msg, Test);
-}
-
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 	if (!JB_Ring_HasChildCount(Self, 2)) {
 		if (true) {
@@ -11028,35 +11036,6 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 			JB_MsgPos_Destructor((&_usingf0));
 		}
 	}
-}
-
-inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
-	AsmReg Rz = ((AsmReg)0);
-	ASMtmp T = SC_Msg_ASMType(Exp);
-	fn_asm Fn = SC_fn_asm_table[T];
-	if (!T) {
-		Fn = SC_fn_asm_table[((int)Exp->Func)];
-		debugger;
-	}
-	byte OV = Self->VTmps;
-	Rz = (Fn)(Self, Exp, Dest, 0);
-	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen)) {
-		Self->VTmps = (OV);
-	}
-	DataTypeCode Rzt = SC_Reg_xC2xB5Type(Rz);
-	if (!SC_Reg_FatIndex(Rz)) {
-		if (((!SC_Reg_SyntaxIs(Rz, kSC__Reg_ConstAny))) or ((bool)SC_Reg_Const(Rz))) {
-			JB_PrintLine(JB_LUB[2091]);
-			debugger;
-			Rz = (Fn)(Self, Exp, Dest, 0);
-		}
-	}
-	 else if ((!JB_TC_IsNumeric(Rzt)) and JB_TC_SyntaxIs(Rzt, kJB__TC_bool)) {
-		JB_PrintLine(JB_LUB[2092]);
-		debugger;
-		Rz = (Fn)(Self, Exp, Dest, 0);
-	}
-	return Rz;
 }
 
 inline SCDecl* SC_TypeOfSwiz(Message* Exp, SCNode* Name_space, Message* Side, SCDecl* class_Space) {

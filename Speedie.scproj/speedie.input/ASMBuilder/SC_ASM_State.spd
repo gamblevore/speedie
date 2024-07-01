@@ -28,7 +28,7 @@ struct ASMState
 	function AddFuncParams (|SCFunction| fn)
 		opt norefcounts
 		for a in fn.Args
-			a.dtype = .DeclareMe(nil, a)|datatypecode|
+			.DeclareMe(a.source, a)
 
 	function Last (|&FatASM|)
 		return .curr-1
@@ -133,9 +133,11 @@ struct ASMState
 	function DeclareMe (|Message| where,  |scdecl| Dest,  |asmreg|)
 		|| d = .VDecls|int| + 1
 		if (d + .vtmps <= 31)
-			|| t = dest.Reg
+			|| t = dest.ASMReg
 			t.reg = d
-			dest.DType = t|datatypecode| // right?
+			// target debug: dest.ASMSanity		// probably set to datatypecode.UnusedType (112) by default
+			dest.DType = t|datatypecode|   		// right?
+			target debug: dest.ASMSanity
 			.vdecls = d
 			return t
 		error (where, "No free local variables.")			

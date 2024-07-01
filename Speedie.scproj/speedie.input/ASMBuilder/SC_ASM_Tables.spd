@@ -226,18 +226,16 @@ function TypeCast		(fn_asm)
 	opt norefcounts
 	debugger
 	|| sr = .µ(exp.first!, dest)
-//	|| sr = src.info
 	|| T = sr.µtype
 	if t is bool
 		return .NotEq(dest, asmreg(), sr, exp)
 
-	|| OldDecl = exp.first!.fastdecl
-	|| NewDecl = exp.second!.fastdecl
+	|| NewDecl = exp.ASMDecl
+	|| OldDecl = exp.first!.ASMDecl
 	|| OldType = olddecl.regtype
 	|| NewType = newdecl.regtype
 	|| OC = T.BitCount
 	|| NC = newtype.BitCount
-	if  oldtype.BitCount != OC  or  newtype.BitCount != NC  // hmmm. How? they should match up.
 
 	|| FloatDiff = T.isfloat != newtype.isfloat
 	if !FloatDiff and (nc == oc)
@@ -322,7 +320,7 @@ function Dot		(fn_asm)						// a.b
 	opt	NoRefCounts
 	dest = .tempme(exp, dest)
 	|| Obj = .µ(exp.first!, dest)
-	|| prop = exp.fastdecl
+	|| prop = exp.ASMDecl
 	|| T = prop.typeinfo
 	dest.µtype = T
 	debugger
@@ -354,7 +352,7 @@ function SetRel	(fn_asm)
 
 function Num (fn_asm)
 	opt norefcounts
-	|| d = exp.FastDecl
+	|| d = exp.ASMDecl
 	|| ConstValue = d.exportposition
 	
 	target debug
@@ -374,12 +372,11 @@ function Thg (fn_asm)
 function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |asmreg|)
 	opt norefcounts
 													// what if this is a constant?
-	|| d = exp.FastDecl
+	|| d = exp.ASMDecl
 	if d is local
 		|| reg = d.reg
 		if !reg.reg					// what?
 		if dest is set								// copy a reg
-			debugger
 			return .AddASM(asm.BOAR, exp, dest, reg) * dest
 		return reg
 
@@ -498,7 +495,7 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 	|| f = exp.first!
 	|| Src = .µ(f, dest.RequestPos)
 	|| sr = src
-	|| Amount = IncrAmount(sr, mode, f.FastDecl)
+	|| Amount = IncrAmount(sr, mode, f.ASMDecl)
 	if src is ContainsAddr
 		return CountOnAddr(self, f, dest, mode, src, amount)
 	
@@ -626,7 +623,7 @@ function asmstate.ExistingVar (|message| m, |asmreg|)
 		if found == 0|asmreg|
 			return nil
 	if fn == @num // only if 0.
-		|| d = m.fastdecl
+		|| d = m.ASMDecl
 		if !d.exportposition
 			return asmreg.zero
 
