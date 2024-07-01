@@ -555,9 +555,9 @@ typedef JB_String* (*FP_fnIDGenerator)(int Start, int End, Syntax F);
 
 typedef bool (*FP_fnPreReader)(SCFunction* self, Message* msg);
 
-typedef FatASM* (*fn_OpASM)(ASMState* self, AsmReg Dest, AsmReg L, AsmReg R, Message* exp);
+typedef AsmReg (*fn_OpASM)(ASMState* self, AsmReg Dest, AsmReg L, AsmReg R, Message* exp);
 
-typedef FatASM* (*fn_asm)(ASMState* self, Message* exp, AsmReg Dest, int Mode);
+typedef AsmReg (*fn_asm)(ASMState* self, Message* exp, AsmReg Dest, int Mode);
 
 typedef void (*FP_fpMsgRender)(Message* self, FastString* fs);
 
@@ -674,6 +674,7 @@ struct FatASM {
 	FatASM* BackLink;
 	uint R[6];
 	u16 BlockNum;
+	u16 ParentBlock;
 	u16 RefCount;
 	byte Op;
 	byte Label;
@@ -742,6 +743,7 @@ struct StructSaveTest {
 };
 
 struct ASMState {
+	u16 BlockNum;
 	u16 ParentBlock;
 	DataTypeCode ReturnType;
 	bool OK;
@@ -1959,7 +1961,7 @@ extern ASM_Mem SC__ASMtmp_WriteASM[5];
 #define kSC__Reg_SrcConst 65536
 #define kSC__Reg_StayOpen 524288
 #define kSC__Reg_Temp 134217728
-#define kSC__Reg_Zero 65536
+#define kSC__Reg_Zero 8590000128
 #define kJB__CharProp_AlmostLetter 6
 #define kJB__CharProp_Letters 7
 #define kJB__CharProp_Lower 9
@@ -3642,9 +3644,7 @@ Message* SC_FindBytePos(Message* Node);
 
 Message* SC_FindBytePosSub(Message* Node);
 
-FatASM* SC_fn_asm_table_63(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
-
-FatASM* SC_fn_asm_table_LIST(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_fn_asm_table_LIST(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
 void SC_FuncLinkageTable_cpp_part(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
@@ -4441,45 +4441,45 @@ void SC_ASM__TestASMSub(Message* Tests);
 // ASMtmp
 bool SC_ASMtmp_SyntaxIs(ASMtmp Self, ASMtmp T);
 
-FatASM* SC_ASMtmp__Access(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__Access(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__ARel(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__ARel(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__Arg(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__Arg(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__BRel(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__BRel(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__Continue(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__Continue(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__CountOnAddr(ASMState* Self, Message* F, AsmReg Dest, int Mode, AsmReg Addr, int64 Amount);
+AsmReg SC_ASMtmp__CountOnAddr(ASMState* Self, Message* F, AsmReg Dest, int Mode, AsmReg Addr, int64 Amount);
 
-FatASM* SC_ASMtmp__Debugger(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__Debugger(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__Decl(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__Decl(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__DoFunc(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__DoFunc(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__DoGlobal(ASMState* Self, Message* Exp, AsmReg Dest, SCDecl* D);
+AsmReg SC_ASMtmp__DoGlobal(ASMState* Self, Message* Exp, AsmReg Dest, SCDecl* D);
 
-FatASM* SC_ASMtmp__DoMath(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__DoMath(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__DoMathSub(ASMState* Self, Message* Exp, AsmReg Dest, AsmReg Mr, fn_OpASM Fn);
+AsmReg SC_ASMtmp__DoMathSub(ASMState* Self, Message* Exp, AsmReg Dest, AsmReg Mr, fn_OpASM Fn);
 
-FatASM* SC_ASMtmp__DoSingleMath(ASMState* Self, Message* Exp, AsmReg Dest, fn_OpASM Fn);
+AsmReg SC_ASMtmp__DoSingleMath(ASMState* Self, Message* Exp, AsmReg Dest, fn_OpASM Fn);
 
-FatASM* SC_ASMtmp__Dot(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__Dot(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__Exit(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__Exit(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__First(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__First(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__If(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__If(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__Ignore(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__Ignore(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
 int64 SC_ASMtmp__IncrAmount(AsmReg Dest, int Mode, SCDecl* D);
 
-FatASM* SC_ASMtmp__Incrementatulatorifier(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__Incrementatulatorifier(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
 int SC_ASMtmp__Init_();
 
@@ -4487,33 +4487,33 @@ void SC_ASMtmp__InitAccess();
 
 int SC_ASMtmp__InitCode_();
 
-FatASM* SC_ASMtmp__Minus(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__Minus(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__Not(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__Not(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__Num(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__Num(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__Pointer(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__Pointer(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__Return(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__Return(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__SetRel(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__SetRel(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__SlowCountOnAddr(ASMState* Self, Message* F, AsmReg Dest, int Mode, AsmReg Addr, int64 Amount);
+AsmReg SC_ASMtmp__SlowCountOnAddr(ASMState* Self, Message* F, AsmReg Dest, int Mode, AsmReg Addr, int64 Amount);
 
-FatASM* SC_ASMtmp__StatExpr(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__StatExpr(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__Ternary(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__Ternary(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__Thg(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__Thg(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__ThgSub(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__ThgSub(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__TypeCast(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__TypeCast(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__Unexpected(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__Unexpected(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-FatASM* SC_ASMtmp__While(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+AsmReg SC_ASMtmp__While(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
 
 
@@ -4539,6 +4539,8 @@ float SC_Reg_F64(AsmReg Self);
 FatASM* SC_Reg_FAT(AsmReg Self);
 
 uint SC_Reg_FatIndex(AsmReg Self);
+
+AsmReg SC_Reg_FatIndexSet(AsmReg Self, uint Value);
 
 int SC_Reg_GapBits(AsmReg Self);
 
@@ -4569,6 +4571,8 @@ AsmReg SC_Reg_RegSet(AsmReg Self, int Value);
 AsmReg SC_Reg_RequestPos(AsmReg Self);
 
 bool SC_Reg_Signed(AsmReg Self);
+
+AsmReg SC_Reg_SyntaxAppend(AsmReg Self, AsmReg M);
 
 bool SC_Reg_SyntaxIs(AsmReg Self, AsmReg R);
 
@@ -5439,6 +5443,8 @@ bool SC_FatASM_Nop(FatASM* Self);
 
 bool SC_FatASM_OperatorIsa(FatASM* Self, int M);
 
+AsmReg SC_FatASM_OperatorMul(FatASM* Self, AsmReg Info);
+
 uint SC_FatASM_out(FatASM* Self);
 
 void SC_FatASM_Print(FatASM* Self);
@@ -5453,11 +5459,7 @@ FatASM* SC_FatASM_Step(FatASM* Self, int Dir);
 
 void SC_FatASM_SwapWithIntInt(FatASM* Self, int A, int B);
 
-void SC_FatASM_SyntaxAppend(FatASM* Self, AsmReg Flags);
-
 void SC_FatASM_SyntaxExpect(FatASM* Self, JB_String* Error);
-
-bool SC_FatASM_SyntaxIs(FatASM* Self, AsmReg Flags);
 
 
 
@@ -5691,131 +5693,131 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 
 
 // JB_ASMState
-FatASM* SC_Pac_AddConstant(ASMState* Self, Message* Exp, AsmReg Dest, AsmReg Src, int64 Value);
+AsmReg SC_Pac_AddConstant(ASMState* Self, Message* Exp, AsmReg Dest, AsmReg Src, int64 Value);
 
-FatASM* SC_Pac_AddConstantAndReturnOld(ASMState* Self, Message* Exp, AsmReg Dest, AsmReg ToGrow, int64 Value);
+AsmReg SC_Pac_AddConstantAndReturnOld(ASMState* Self, Message* Exp, AsmReg Dest, AsmReg ToGrow, int64 Value);
 
 void SC_Pac_AddFuncParams(ASMState* Self, SCFunction* Fn);
 
 void SC_Pac_AddLabel(ASMState* Self, Message* Ch);
 
-FatASM* SC_Pac_AddToReg(ASMState* Self, FatASM* Addr, int Add, Message* Exp);
+AsmReg SC_Pac_AddToReg(ASMState* Self, FatASM* Addr, int Add, Message* Exp);
 
 bool SC_Pac_Alloc(ASMState* Self, MWrap* J);
 
-FatASM* SC_Pac_Assign(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_Assign(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_BFLG_Const(ASMState* Self, Message* Exp, AsmReg Dest, AsmReg L, int Up, int Down);
+AsmReg SC_Pac_BFLG_Const(ASMState* Self, Message* Exp, AsmReg Dest, AsmReg L, int Up, int Down);
 
-FatASM* SC_Pac_BitAnd(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_BitAnd(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_BitNot(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_BitNot(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_BitOr(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_BitOr(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_BitXor(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_BitXor(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_BoolMul(ASMState* Self, AsmReg Dest, AsmReg Boo, AsmReg V, Message* Exp);
+AsmReg SC_Pac_BoolMul(ASMState* Self, AsmReg Dest, AsmReg Boo, AsmReg V, Message* Exp);
 
 FatASM* SC_Pac_Branch(ASMState* Self, Message* Cond, bool Neg);
 
-FatASM* SC_Pac_Compare(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode);
+AsmReg SC_Pac_Compare(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode);
 
-FatASM* SC_Pac_CompareFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode);
+AsmReg SC_Pac_CompareFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode);
 
-FatASM* SC_Pac_CompareInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode);
+AsmReg SC_Pac_CompareInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode);
 
 AsmReg SC_Pac_DeclareMe(ASMState* Self, Message* Where, AsmReg T);
 
 void SC_Pac_Destructor(ASMState* Self);
 
-FatASM* SC_Pac_Div(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_Div(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_DivFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_DivFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_DivInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_DivInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_Equals(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_Equals(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_EqualsInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_EqualsInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_ExistingVar(ASMState* Self, Message* M);
+AsmReg SC_Pac_ExistingVar(ASMState* Self, Message* M);
 
 double SC_Pac_f(ASMState* Self, AsmReg R);
 
-FatASM* SC_Pac_FindConst(ASMState* Self, uint64 Code);
+AsmReg SC_Pac_FindConst(ASMState* Self, uint64 Code, AsmReg Dest);
 
 FatASM* SC_Pac_FindLabel(ASMState* Self, FatASM* Dbg);
 
 void SC_Pac_FinishASM(ASMState* Self);
 
-FatASM* SC_Pac_FloatMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_FloatMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
 int SC_Pac_GetLabelJump(ASMState* Self, Message* P);
 
-FatASM* SC_Pac_IntMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_IntMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
 FailableInt SC_Pac_IntPowerOfTwo(ASMState* Self, AsmReg R);
 
 FatASM* SC_Pac_Last(ASMState* Self);
 
-FatASM* SC_Pac_Less(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_Less(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_LessEq(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_LessEq(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
 bool SC_Pac_LoadLabelJumps(ASMState* Self);
 
 Message* SC_Pac_LoadTitle(ASMState* Self, Message* M);
 
-FatASM* SC_Pac_Mod(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_Mod(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_ModFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_ModFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_ModInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_ModInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_More(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_More(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_MoreEq(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_MoreEq(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_Mul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_Mul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_NotEq(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_NotEq(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
 AsmReg SC_Pac_NumToEgg(ASMState* Self, int64 V, Message* Exp);
 
-FatASM* SC_Pac_NumToReg(ASMState* Self, int64 V, Message* Exp, int Reg);
+AsmReg SC_Pac_NumToReg(ASMState* Self, int64 V, Message* Exp, AsmReg Reg);
 
 bool SC_Pac_PackMakerInit(ASMState* Self);
 
-FatASM* SC_Pac_Plus(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_Plus(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_PlusFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_PlusFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_PlusInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_PlusInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_Prm(ASMState* Self, Message* Prm);
+AsmReg SC_Pac_Prm(ASMState* Self, Message* Prm);
 
-FatASM* SC_Pac_Quick1Or1Sub(ASMState* Self, AsmReg Dest, AsmReg L, int Ptoi, Message* Exp);
+AsmReg SC_Pac_Quick1Or1Sub(ASMState* Self, AsmReg Dest, AsmReg L, int Ptoi, Message* Exp);
 
-FatASM* SC_Pac_QuickFloatDiv(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_QuickFloatDiv(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_QuickFloatMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_QuickFloatMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
 FatASM* SC_Pac_QuickFloatPlus(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_QuickIntMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_QuickIntMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
 bool SC_Pac_SetConst(ASMState* Self, Message* List, Message* Orig);
 
-FatASM* SC_Pac_SHL(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_SHL(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_SHR(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_SHR(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM* SC_Pac_SimpleTernary(ASMState* Self, AsmReg Dest, AsmReg Ma, AsmReg Mb, Message* Cond);
+AsmReg SC_Pac_SimpleTernary(ASMState* Self, AsmReg Dest, AsmReg Ma, AsmReg Mb, Message* Cond);
 
 void SC_Pac_StartFunc(ASMState* Self, SCFunction* Fn);
 
-FatASM* SC_Pac_Subtract(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+AsmReg SC_Pac_Subtract(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
 FatASM* SC_Pac_RequestOp(ASMState* Self, int Code, Message* Dbg);
 
@@ -5827,7 +5829,7 @@ void SC_Pac_TextInstruction(ASMState* Self, Message* M);
 
 bool SC_Pac_TextOp(ASMState* Self, Message* M);
 
-FatASM* SC_Pac_xC2xB5Open(ASMState* Self, Message* Exp, AsmReg Mode);
+AsmReg SC_Pac_xC2xB5Open(ASMState* Self, Message* Exp, AsmReg Mode);
 
 bool SC_Pac__ExpandJSM();
 
@@ -9883,7 +9885,7 @@ inline FatASM* SC_FatASM_Next(FatASM* Self);
 
 inline FatASM* SC_FatASM_Prev(FatASM* Self);
 
-inline FatASM* SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest);
+inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest);
 
 inline uint64* SC_Pac_GetConst(ASMState* Self, int A);
 
@@ -10257,8 +10259,8 @@ inline FatASM* SC_FatASM_Prev(FatASM* Self) {
 	return SC_FatASM_Step(Self, -1);
 }
 
-inline FatASM* SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
-	FatASM* Rz = nil;
+inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
+	AsmReg Rz = ((AsmReg)0);
 	ASMtmp T = SC_Msg_ASMType(Exp);
 	fn_asm Fn = SC_fn_asm_table[T];
 	byte OV = Self->VTmps;
