@@ -7,7 +7,7 @@
 // we can return it in a struct... which is fine i guess
 // its just done via pointers always.
 // couldnt an asmreg refer to a fat? like... it could, right? we have some spare bits?
-prototype fn_asm (|&ASMState| self=asmstate.sh, |message| exp, |AsmReg| Dest=asmreg(), |int| Mode = 0, |!&FATASM|)
+prototype fn_asm (|&ASMState| self=asmstate.sh, |message| exp, |AsmReg| Dest=asmreg(), |int| Mode = 0, |AsmReg|)
 
 
 datatype AsmReg (uint64)
@@ -41,7 +41,7 @@ datatype AsmReg (uint64)
 		Arg				= Discard ||| SrcConst // ||| Discard
 		CondRequest		= NewCondRequest ||| SrcConst
 		MathConst		= ConstAny ||| FromMath
-		Zero			= SrcConst
+		Zero			= SrcConst ||| BitCorrect
 	
 	
 
@@ -132,7 +132,7 @@ datatype AsmReg (uint64)
 		
 	function HaveAddr (|asmreg|)
 		rz = self asnt AsmReg.AddrRequest
-		rz = rz as AsmReg.CorrectAddr
+		rz <~ AsmReg.CorrectAddr
 		
 	function Reg (|int|)
 		return .µType.Register
@@ -149,7 +149,10 @@ datatype AsmReg (uint64)
 	syntax cast (|int|)
 		cpp_part ToInt
 		return .reg
-
+	
+	syntax append (|asmreg| m, |asmreg|)
+		return self as m
+		
 	operator bitand (|asmreg| A, |asmreg|)
 		return (self|int64| & A|int64|)|asmreg|
 	

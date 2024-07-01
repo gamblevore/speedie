@@ -22,17 +22,26 @@
 	
 
 struct FatASM
-	|ASMReg| 			Info
+	|ASMReg| 			Info	// only needs 32-bits of this. Could we make a smaller asmreg?
 	|message--| 		Msg
 	|uint64| 			Const
 	|&FatASM| 			BackLink // for multiple instructions setting the same register.
 
 	|uint[6]|			R	
 	|uint16| 			BlockNum
+	|uint16| 			ParentBlock
 	|uint16|			RefCount
 	|byte|				Op
 	|byte|				Label	// 255 labels per function
 	
+	
+	function AsReg (|asmreg|)
+		return self * .info
+
+	operator mul (|asmreg| info, |asmreg|)
+		info.FatIndex = 1 + (self - ASMState.Sh.FuncStart)
+		.info = info
+		return info
 	
 	function F32 (assigns:|float|)
 		((&.const)|&float|)[] = Value
@@ -81,7 +90,7 @@ struct FatASM
 			return .info & flags
 	
 	function BitCorrect (|&FATASM|)
-		.info = .info as AsmReg.BitCorrect
+		.info <~ AsmReg.BitCorrect
 		return self
 		
 		

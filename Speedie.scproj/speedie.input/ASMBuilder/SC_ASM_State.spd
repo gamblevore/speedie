@@ -4,6 +4,7 @@
 
 struct ASMState
 	linkage: cpp_part Pac
+	|uint16| 					BlockNum
 	|uint16| 					ParentBlock
 	|datatypecode|				ReturnType
 	|bool|						OK    
@@ -52,26 +53,21 @@ struct ASMState
 		if (!r.reg) // what?
 
 
-	function AddConstantAndReturnOld (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |&FATASM|)
-		|| x = .VTmps
+	function AddConstantAndReturnOld (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
 		|| reg = .TempMe(exp, dest)
 		if togrow.isint and value.CanStoreAsIntImmediate
-			// x = y++
-			rz = .AddASM(asm.ADPK, exp.parent!, reg, ToGrow, Value)
-			.VTmps = x
-		  else
-			.Assign(reg, ToGrow, asmreg(), exp)
-			.VTmps = x // dont need to close the constants... not yet anyhow.
-			rz = .AddConstant(exp, Dest, ToGrow, value)
+			return .AddASM(asm.ADPK, exp.parent!, reg, ToGrow, Value) * reg
+		.Assign(reg, ToGrow, asmreg(), exp)
+		rz = .AddConstant(exp, togrow, ToGrow, value)
 	
 	
-	function AddConstant (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |&fatasm|)
+	function AddConstant (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
 		if dest.isint
 			if Value.CanStoreAsIntImmediate
-				return .AddASM(asm.ADDK, exp.parent!, dest, src, Value)
+				return .AddASM(asm.ADDK, exp.parent!, dest, src, Value) * dest
 		  elseif dest.FourBytes
 			if value|uint64|.CanStoreAsfloatImmediate
-				return .AddASM(asm.FADK, exp.parent!, dest, src, value)
+				return .AddASM(asm.FADK, exp.parent!, dest, src, value) * dest
 			debugger // how is this possible? we are adding a 64 bit float to a 32-bit?
 		debugat
 		|| where = .NumToEgg(value, exp)
@@ -124,8 +120,8 @@ struct ASMState
 			.curr = p + 1
 			P.op = code
 			p.debug = dbg
-//			p.BlockNum = .BlockNum
-//			p.ParentBlock = .ParentBlock
+			p.BlockNum = .BlockNum
+			p.ParentBlock = .ParentBlock
 			return p
 		if .OK
 			error "ASM is out of memory."
@@ -154,36 +150,36 @@ struct ASMState
 		error (where, "No free local variables.")
 
 
-	function FindConst (|uint64| Code, |&FATASM|)
+	function FindConst (|uint64| Code, |asmreg| dest,  |asmreg|)
 		if !Code
-			return .Zero
+			return AsmReg()
 		// it should be within the current block only! So what is the current block!
 		|int| i = 31 - .VTmps
 		while i > .VDecls
 			|| r = .Registers[i]!
 			if r.const == code
-				return r
+				dest.reg = i
+				return dest
 			--i
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	function Branch (|message| cond,  |bool| neg=false,  |!&fatasm|)
+	function Branch (|message| cond,  |bool| neg=false,  |&fatasm|)
 		|| dest = asmreg.newCondRequest
 		.WithinBranch++
-		rz = .µ(cond, dest)
+		|| cmu = .µ(cond, dest)
 		.WithinBranch--
-		|| src = rz.info
-		if Src isnt cond
-			(dest is negate) = (src isnt AlreadyNegated)
-			rz = .equals(dest, dest, src, cond)!
+		if cmu isnt cond
+			(dest is negate) = (cmu isnt AlreadyNegated)
+			cmu = .equals(dest, dest, cmu, cond)
+		return cmu.fat
 
 
-	function µOpen (|message| exp, |asmreg| mode,   |&FATASM|)
-		rz = .µ( exp, AsmReg.StayOpen as mode)
-		rz.info = rz.info asnt asmreg.StayOpen
+	function µOpen (|message| exp, |asmreg| mode,   |asmreg|)
+		rz = .µ( exp, AsmReg.StayOpen as mode) asnt asmreg.StayOpen
 
 	
-	function µ (|message| exp, |AsmReg| Dest = asmreg(), |!&FATASM|)
+	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		opt norefcounts
 		pragma inline
 		cpp_part Get
@@ -200,8 +196,13 @@ struct ASMState
 			.VTmps = (ov)
 		
 		target debug
-			|| rzt = rz.info.µtype
-			if !rzt.isnumeric and rzt is bool
+			|| rzt = rz.µtype
+			if !rz.fatindex
+				"No asmgen!"
+				debugger
+				rz = (fn)(self, exp, dest)
+				
+			  elseif !rzt.isnumeric and rzt is bool
 				"No valid type on FAT info"
 				debugger
 				rz = (fn)(self, exp, dest)
@@ -213,7 +214,7 @@ struct ASMState
 			//	debugger
 
 
-	function Prm (|message| prm, |&FATASM|)
+	function Prm (|message| prm, |asmreg|)
 		|| r = .ExistingVar(prm)
 			return r
 		// why not use tmps? won't these interfere with the function-passing??
@@ -235,7 +236,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 	|| fn = prms.asfunc
 	ifn  fn and fn.args <= 10
 		error (prms, "Too many parameters")
-		return .Zero
+		return AsmReg()
 
 	// speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:3, 8:1
 	// there are only 4 above 6!, only 14 above 5
@@ -252,7 +253,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 	|| OV = .VTmps
 
 	for p.fast in prms
-		|| v = .prm(p).info.reg
+		|| v = .prm(p).reg
 		if sh <= 25
 			reg2 |= (v << sh)
 		  else
@@ -265,7 +266,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 		op = (asm.fncx2, asm.fncx3)(sh <= 25)
 
 	|| SaveAmount = .vdecls * (dest isnt forreturn)
-	return .AddASM(OP,  prms.parent!,  save: SaveAmount,  jump: fn.TableId,  reg2,  reg3)
+	return .AddASM(OP,  prms.parent!,  save: SaveAmount,  jump: fn.TableId,  reg2,  reg3) * dest
 
 
 function ASMState.PackMakerInit (|bool|)
