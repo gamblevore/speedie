@@ -1,10 +1,16 @@
 
 
 
+// we need to return both a type, and a fat.
+// or perhaps even an asmreg and a fat.
+// i think... returning both is better.
+// we can return it in a struct... which is fine i guess
+// its just done via pointers always.
+// couldnt an asmreg refer to a fat? like... it could, right? we have some spare bits?
 prototype fn_asm (|&ASMState| self=asmstate.sh, |message| exp, |AsmReg| Dest=asmreg(), |int| Mode = 0, |!&FATASM|)
 
 
-datatype AsmReg (int64)
+datatype AsmReg (uint64)
 	default 0|AsmReg|
 	linkage
 		cpp_part Reg
@@ -12,7 +18,7 @@ datatype AsmReg (int64)
 	
 	Flags
 		|asmreg|
-		(1<<32)		// starting point
+		(1<<16)		// starting point
 		SrcConst
 		NotYetUsed	// for   || y = a + b,   y is (currently) unused.
 		FromMath
@@ -58,17 +64,23 @@ datatype AsmReg (int64)
 	
 	function BitCount (|int|)
 		return .µtype.bitcount
-		
-	function FAT (|!&fatasm|)
-		debugger //ooof
-		return ASMState.Sh.Registers[.reg]!
+	
+	function FatIndex (|uint|)
+		return self|uint64| >> 48
+	
+	function FatIndex (assigns:|uint|, |asmreg|)
+		return (((self|uint64| << 16) >> 16) ||| (value << 48))|asmreg|
+	
+	function FAT (|&fatasm|)
+		|| i = .FatIndex
+			return asmstate.sh.FuncStart + i - 1
+		"reg is missing fat"
+		debugger
+		return asmstate.sh.zero
 
 	operator isa (|datatypecode| M, |bool|)
 		return .µtype == M
 
-//	function Exists (|bool|)
-//		return self|int64|
-		
 	function FourBytes (|bool|)
 		pragma inline
 		return self|datatypecode|._shift == 2

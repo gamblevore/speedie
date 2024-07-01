@@ -2,7 +2,6 @@
 
 extend asmstate
 	function NumToReg (|int64| V, |message| exp, |int| Reg, |&FATASM|)
-//		rz = exp.KNST()
 		rz = .AddASM(asm.KNST, exp, reg, (V << 32) >> 32, V>>32, -1, -1)
 		.Registers[reg] = rz
 		rz.Const = v

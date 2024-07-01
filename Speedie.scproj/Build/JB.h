@@ -43,7 +43,7 @@ typedef uint ASM;
 
 typedef u16 ASMtmp;
 
-typedef int64 AsmReg;
+typedef uint64 AsmReg;
 
 typedef byte CharProp;
 
@@ -668,15 +668,15 @@ struct FastBuff {
 };
 
 struct FatASM {
+	AsmReg Info;
+	Message* Msg;
+	uint64 Const;
+	FatASM* BackLink;
 	uint R[6];
+	u16 BlockNum;
+	u16 RefCount;
 	byte Op;
 	byte Label;
-	u16 BlockNum;
-	AsmReg Info;
-	int RefCount;
-	Message* Msg;
-	uint FAT[2];
-	uint64 Const;
 };
 
 struct IsaTester {
@@ -1449,13 +1449,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_OnlyRightIsVector 66
 #define kSC__CustomOps_TypeCastFromBool 16
 #define kSC__CustomOps_TypeCastToBetter 32
-#define kJB__ErrorColors_bold (JB_LUB[2082])
+#define kJB__ErrorColors_bold (JB_LUB[2084])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[2083])
-#define kJB__ErrorColors_good (JB_LUB[2084])
-#define kJB__ErrorColors_normal (JB_LUB[2081])
-#define kJB__ErrorColors_underline (JB_LUB[2084])
-#define kJB__ErrorColors_warn (JB_LUB[2085])
+#define kJB__ErrorColors_error (JB_LUB[2085])
+#define kJB__ErrorColors_good (JB_LUB[2086])
+#define kJB__ErrorColors_normal (JB_LUB[2083])
+#define kJB__ErrorColors_underline (JB_LUB[2086])
+#define kJB__ErrorColors_warn (JB_LUB[2087])
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
 extern int SC__FastStringOpts_StrRemoved;
@@ -1819,10 +1819,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp 32784
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down (JB_LUB[2088])
-#define kJB__zalgo_mid (JB_LUB[2087])
+#define kJB__zalgo_down (JB_LUB[2090])
+#define kJB__zalgo_mid (JB_LUB[2089])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up (JB_LUB[2086])
+#define kJB__zalgo_up (JB_LUB[2088])
 #define kJB__byte_max 255
 #define kJB__byte_min (0)
 #define kJB__char_max 127
@@ -1937,29 +1937,29 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASMtmp_kWhile 50
 extern ASM_Mem SC__ASMtmp_ReadASM[10];
 extern ASM_Mem SC__ASMtmp_WriteASM[5];
-#define kSC__Reg_AddrRequest 281474976710656
-#define kSC__Reg_AlreadyNegated 68719476736
-#define kSC__Reg_Alternate 137438953472
-#define kSC__Reg_Arg 1103806595072
-#define kSC__Reg_BitCorrect 562949953421312
-#define kSC__Reg_Cond 274877906944
-#define kSC__Reg_CondRequest 35188667056128
-#define kSC__Reg_ConstAny 70368744177664
-#define kSC__Reg_ContainsAddr 140737488355328
-#define kSC__Reg_CorrectAddr 703687441776640
-#define kSC__Reg_Discard 1099511627776
-#define kSC__Reg_ForReturn 4398046511104
-#define kSC__Reg_FromMath 17179869184
-#define kSC__Reg_MathConst 70385924046848
-#define kSC__Reg_Negate 549755813888
-#define kSC__Reg_NewCondRequest 35184372088832
-#define kSC__Reg_NotYetUsed 8589934592
-#define kSC__Reg_Set 2199023255552
-#define kSC__Reg_SingleExpr 17592186044416
-#define kSC__Reg_SrcConst 4294967296
-#define kSC__Reg_StayOpen 34359738368
-#define kSC__Reg_Temp 8796093022208
-#define kSC__Reg_Zero 4294967296
+#define kSC__Reg_AddrRequest 4294967296
+#define kSC__Reg_AlreadyNegated 1048576
+#define kSC__Reg_Alternate 2097152
+#define kSC__Reg_Arg 16842752
+#define kSC__Reg_BitCorrect 8589934592
+#define kSC__Reg_Cond 4194304
+#define kSC__Reg_CondRequest 536936448
+#define kSC__Reg_ConstAny 1073741824
+#define kSC__Reg_ContainsAddr 2147483648
+#define kSC__Reg_CorrectAddr 10737418240
+#define kSC__Reg_Discard 16777216
+#define kSC__Reg_ForReturn 67108864
+#define kSC__Reg_FromMath 262144
+#define kSC__Reg_MathConst 1074003968
+#define kSC__Reg_Negate 8388608
+#define kSC__Reg_NewCondRequest 536870912
+#define kSC__Reg_NotYetUsed 131072
+#define kSC__Reg_Set 33554432
+#define kSC__Reg_SingleExpr 268435456
+#define kSC__Reg_SrcConst 65536
+#define kSC__Reg_StayOpen 524288
+#define kSC__Reg_Temp 134217728
+#define kSC__Reg_Zero 65536
 #define kJB__CharProp_AlmostLetter 6
 #define kJB__CharProp_Letters 7
 #define kJB__CharProp_Lower 9
@@ -2112,7 +2112,7 @@ extern Array* JB__ErrorSeverity__names;
 #define kSC__FunctionType_Killer 1048576
 #define kSC__FunctionType_NewNew 4096
 #define kSC__FunctionType_NewStruct 16
-#define kSC__FunctionType_NoRefCounts 4194304
+#define kSC__FunctionType_NotRefCounted 4194304
 #define kSC__FunctionType_NumberCreator 32
 #define kSC__FunctionType_PrintedForDebugViewing 67108864
 #define kSC__FunctionType_Recursive 256
@@ -2313,7 +2313,7 @@ extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_kDelete 2
 #define kJB__Wrap_kFree 1
 #define kJB__Wrap_kNothing (0)
-#define kJB__Rec_NonFatal (JB_LUB[2080])
+#define kJB__Rec_NonFatal (JB_LUB[2082])
 extern double JB__Rec_Progress;
 #define kJB__fix_TypeDict 3
 #define kJB__fix_TypeObj 1
@@ -3122,6 +3122,8 @@ Message* SC_Refs__LastUsedRefPlace(Message* Name, Message* Arg);
 
 void SC_Refs__RC_CheckFuncAllocOK(SCFunction* Self, Message* Dot);
 
+void SC_Refs__RC_CheckNoObjPms(Message* Msg);
+
 void SC_Refs__RC_DeclArg(SCDecl* AR, SCFunction* Fn);
 
 void SC_Refs__RC_HandleDisappearing(SCFunction* Fn, Message* Msg, int Basis);
@@ -3307,7 +3309,7 @@ bool SC_SpdAssembler__OptTern(FatASM* Self, FatASM* P, FatASM* N);
 
 ASMFunc* SC_SpdAssembler__AccessStr(Message* M);
 
-bool SC_SpdAssembler__Vacuum(SCFunction* Fn);
+bool SC_SpdAssembler__VacGenerate(SCFunction* Fn);
 
 
 
@@ -4535,6 +4537,8 @@ float SC_Reg_F32(AsmReg Self);
 float SC_Reg_F64(AsmReg Self);
 
 FatASM* SC_Reg_FAT(AsmReg Self);
+
+uint SC_Reg_FatIndex(AsmReg Self);
 
 int SC_Reg_GapBits(AsmReg Self);
 

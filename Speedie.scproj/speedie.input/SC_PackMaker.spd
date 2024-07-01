@@ -90,11 +90,14 @@ module PackMaker
 		opt norefcounts
 		for fn in Compiler.FuncList
 			if fn.tableid
-				require SpdAssembler.Vacuum(fn)
+				require SpdAssembler.VacGenerate(fn)
 		return true
 	
 	
 	function MakePack 
+		|| sz = –sizeof FatASM
+		|| diff = sz - 64
+		if diff
 		require ASMState.Sh.PackMakerInit // and fn_asm_table[@arg]
 		.RevUpTheHoover("ASMExamples")
 		require .ActualRealCompileAkaPackIt

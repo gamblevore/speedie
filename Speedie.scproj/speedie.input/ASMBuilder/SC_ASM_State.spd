@@ -157,6 +157,7 @@ struct ASMState
 	function FindConst (|uint64| Code, |&FATASM|)
 		if !Code
 			return .Zero
+		// it should be within the current block only! So what is the current block!
 		|int| i = 31 - .VTmps
 		while i > .VDecls
 			|| r = .Registers[i]!
@@ -199,10 +200,17 @@ struct ASMState
 			.VTmps = (ov)
 		
 		target debug
-			|| dd = dest.reg
-			if dd and rz.info.reg != dd
-				// its not about "being different"... but "did it allocate something that it didnt need to"
-				#!FFFFFFASSDJKLASDM<>AS
+			|| rzt = rz.info.µtype
+			if !rzt.isnumeric and rzt is bool
+				"No valid type on FAT info"
+				debugger
+				rz = (fn)(self, exp, dest)
+				
+			//|| dd = dest.reg
+			//if dd and (rz.info.reg != dd)
+			//	// what about x = a? we could just exclude that.
+			//	"seemed to allocate a var unnecessarily?"
+			//	debugger
 
 
 	function Prm (|message| prm, |&FATASM|)

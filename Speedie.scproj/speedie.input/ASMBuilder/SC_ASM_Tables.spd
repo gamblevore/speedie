@@ -146,18 +146,18 @@ function If				(fn_asm)
 function While			(fn_asm)
 	opt norefcounts
 	debugger
-	.AddASM(asm.NOOP, exp)						// allow for lupu/lupd?
-	.WhileStart = .AddASM(asm.JUMP, exp)		// jump to end... THEN EMIT arg and jump back.
-	|| Jumper = .WhileStart
-	.µ(exp.second!)								// arg
-	|| CondStart = .curr						// right?
-	|| ExitPlace = .branch(exp.first!)			// cond
+//	.AddASM(asm.NOOP, exp)							// allow for lupu/lupd?
+	|| Jumper = .AddASM(asm.JUMP, exp)				// jump to end... THEN EMIT arg and jump back.
+	.WhileStart = jumper
+	ASMTmp.arg(self, exp.second)					// arg
+	|| CondStart = .curr							// right?
+	|| ExitPlace = .branch(exp.first!)				// cond
 	ExitPlace.r[3] = .curr - Jumper
 
 	while Jumper < ExitPlace
 		#!ClearExits
 		|| op = Jumper.Op
-		if op >= 254							// exit/continue
+		if op >= 254								// exit/continue
 			Jumper.op = ASM.Jump
 			|| oof = (condstart, exitplace)(op==254)
 			Jumper.r[0] = oof - Jumper
@@ -295,6 +295,7 @@ function Decl (fn_asm)
 	|| rel = exp.last!
 	|| ty = rel.first!.fastdecl
 	|| reg = .DeclareMe(Exp, ty.reg)
+	reg = reg as asmreg.set
 //	(reg is NotYetUsed)
 	return .µ(rel.last!, reg)
 
@@ -357,24 +358,45 @@ function SetRel	(fn_asm)
 		return .µ(L, R.info)
 	return .zero
 
+
 function Num (fn_asm)
 	opt norefcounts
 	|| d = exp.FastDecl
 	|| ConstValue = d.exportposition
+	
+	// we have our first fail. We want a number zero, but we want it of the specified type in D
+	// like a float 0, or a int, or a bool. or even f64.
+	// so we are returning the instruction that set it to 0.
+	// which is the zero instruction. But the zero instruction has no type on it.
+	// or a wrong type. Should I take the type out of the FAT? And return some other structure
+	// that contains the ASMReg + the fat? cos really... the params don't have a register.
+	// also... a reg might set a value that is true for different purposes. like 1 as int or bool.
+	// the type will be wrong, though. (i guess we could ignore that if its a known const)
+	
 	target debug
 		if ConstValue == 0 != exp.IsZero // argh
 	|| r = asmstate.sh.FindConst(ConstValue)
 		return r
 	Dest = .TempMe(exp, dest)
+
+	// this is also wrong. numtoreg. So... we have a number. but whats the type of the number.
+	// well... we have it, in dest. but its lost by NumToReg. So... it should take an asmreg then?
+	
+	// on the other hand, if we return both a fat + a type... it won't matter.
+	// why do instructions need a type? basically just to say "the thing that set the register... has a type"
+	// so we know the type of the value in the register.
+	// still... we may want to re-interpret that type? for constants anyhow.
+	// lets keep trying.
+	
 	rz = .NumToReg(ConstValue, exp, Dest)
-	(Dest is constany)
+	(rz.info as= AsmReg.constany)
 
 
 function Thg (fn_asm)
-	rz = ThgSub(self, exp, dest, mode)
-	if !rz
-		error (exp)
-		rz = .zero
+	|| thg = ThgSub(self, exp, dest, mode)
+		return thg
+	error (exp)
+	return .zero
 
 
 function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |?&FATASM|)
@@ -387,6 +409,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |?&
 			debugger
 			if !reg.reg					// what?
 			return .AddASM(asm.BOAR, exp, dest, reg)
+		#! what if this is a different block?
 		return reg.fat
 
 	if d is const

@@ -22,16 +22,16 @@
 	
 
 struct FatASM
-	|uint[6]|		R	
-	|byte|			Op
-	|byte|			Label	// 255 labels per function
-	|uint16| 		BlockNum
-	|ASMReg| 		Info
-	|int| 			RefCount
-	|message--| 	Msg
-	|uint[2]| 		FAT // just so i GET OVER TRYING TO MAKE THIS SMALL (for now :D)
-						// speedie probably would only need like 8MB even then. Quite small.
-	|uint64| 		Const
+	|ASMReg| 			Info
+	|message--| 		Msg
+	|uint64| 			Const
+	|&FatASM| 			BackLink // for multiple instructions setting the same register.
+
+	|uint[6]|			R	
+	|uint16| 			BlockNum
+	|uint16|			RefCount
+	|byte|				Op
+	|byte|				Label	// 255 labels per function
 	
 	
 	function F32 (assigns:|float|)

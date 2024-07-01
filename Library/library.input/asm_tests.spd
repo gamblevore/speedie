@@ -6,20 +6,20 @@ module ASMExamples {
 // case 1
 function No1 (|int| a, |int| b, |int| c, |int|)
 	if a
-		b = 1		// fat1
+		b = 1
 	  else
-		b = 2		// fat2
+		b = 2
 	c = b + 1
-	return c
+	return c // won't optimise
 
 
 function Yes1 (|int| a, |int| b, |int| c)
 	if a
-		b = 1		// fat1
+		b = 1
 	  else
-		b = 2		// fat2
+		b = 2
 	c = b + 1
-	// noop whole thing. cos c is unused.
+	// NOOP whole thing. cos c is unused.
 
 
 // case 2
@@ -56,7 +56,6 @@ function Yes4 (|int| b, |int| c, |int|)
 	c = b + 2	// OPT  // only if (b = b + 1).refcount == 1
 	return c
 
-
 function No4 (|int| b, |int| c, |int| d, |int|)
 	b = b + 1
 	c = b + 2
@@ -70,7 +69,6 @@ function Yes5 (|int| b, |int| c, |int|)
 	b = b + 1	// NOOP
 	c = b + 2	// OPT  // cos (b = b + 1).refcount == 1
 	return c
-
 
 function No5 (|int| b, |int| c, |int| d, |int|)
 	b = b + 1
@@ -196,10 +194,12 @@ function YesBasic23 (|float| x, |float|)
 	
 
 function FloatConv24 (|float|)
+	|| r = 1.0
 	|| x = 0
 	while ++x != 0
 		|| v = x|float|
-		rz += v
+		r += v
+	return r
 	// just compare c++ and spd versions
 	
 
