@@ -301,31 +301,19 @@ extend ASMState
 
 
 	function IntMul (fn_opasm)
-		|&fatasm| fat
 		rz = .QuickIntMul(dest, R, L, exp)
-		if !rz
-			rz = .QuickIntMul(dest, L, R, exp)
-			if !rz
-				fat = exp.MULT(dest, L, R, asmreg())
-				fat.info = dest
-				rz = fat * Dest
+		rz := .QuickIntMul(dest, L, R, exp)
+		rz := exp.MULT(dest, L, R, asmreg()) * Dest
 		if dest is ConstAny
-			if !fat
-				fat = rz.fat
-			fat.const = l.const * r.const
+			rz.fat.const = l.const * r.const
 
 
 	function FloatMul (fn_opasm)
-		|&fatasm| fat
 		rz = .QuickFloatMul(dest, R, L, exp)
-		if !rz
-			rz = .QuickFloatMul(dest, L, R, exp)
-			if !rz
-				fat = exp.FMUL(dest, L, R, asmreg(), l.IsBig|int|) 
-				rz = fat * dest
+		rz := .QuickFloatMul(dest, L, R, exp)
+		rz := exp.FMUL(dest, L, R, asmreg(), l.IsBig|int|) * Dest
 		if dest is ConstAny
-			if !fat
-				fat = rz.fat
+			|| fat = rz.fat
 			if dest.FourBytes
 				fat.F32 = l.F32 * r.F32
 			  else
@@ -342,8 +330,7 @@ extend ASMState
 			swap (l) (r)
 		if l.isint
 			return .IntMul(dest, r, l, exp)
-		  else
-			return .floatmul(Dest, l, r, exp)
+		return .floatmul(Dest, l, r, exp)
 	
 
 	function Div    (fn_opasm)

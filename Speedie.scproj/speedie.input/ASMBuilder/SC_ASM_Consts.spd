@@ -1,9 +1,10 @@
 
 
 extend asmstate
-	function NumToReg (|int64| V, |message| exp, |asmreg| Reg, |asmreg|)
+	function NumToReg (|int64| V, |message| exp, |asmreg| Reg=asmreg(), |asmreg|)
+		Reg = .TempMe(exp, Reg)	
 		|| fat = .AddASM(asm.KNST, exp, reg, (V << 32) >> 32, V>>32, -1, -1)
-		.Registers[reg] = fat
+		.Registers[reg.reg] = fat
 		fat.Const = v
 		return fat * reg
 
@@ -12,12 +13,6 @@ extend asmstate
 		if r.fourbytes
 			return p|&float|[]
 		return p|&f64|[]
-
-
-	function NumToEgg (|int64| V, |message| exp, |asmreg|)
-		rz = .TempMe(exp)
-		.NumToReg(v, exp, rz)
-
 	
 	function FatASM.FixConst
 		|| V = .r[1]|uint64| << 32

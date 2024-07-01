@@ -19,7 +19,7 @@ datatype AsmReg (uint64)
 	Flags
 		|asmreg|
 		(1<<16)		// starting point
-		SrcConst
+//		SrcConst   // what does this do? remove it?
 		NotYetUsed	// for   || y = a + b,   y is (currently) unused.
 		FromMath
 		StayOpen
@@ -38,10 +38,10 @@ datatype AsmReg (uint64)
 		AddrRequest
 		BitCorrect
 		CorrectAddr		= ContainsAddr ||| bitcorrect
-		Arg				= Discard ||| SrcConst // ||| Discard
-		CondRequest		= NewCondRequest ||| SrcConst
+		Arg				= Discard// ||| SrcConst
+		CondRequest		= NewCondRequest// ||| SrcConst
 		MathConst		= ConstAny ||| FromMath
-		Zero			= SrcConst ||| BitCorrect
+		Zero			= ConstAny ||| BitCorrect
 	
 	
 
@@ -53,6 +53,8 @@ datatype AsmReg (uint64)
 		return .fat.F64
 
 	function Const (|int64|)
+		if .reg == 0
+			return 0
 		return .fat.const
 
 	function Const (assigns:|int64|)
@@ -69,13 +71,12 @@ datatype AsmReg (uint64)
 		return self|uint64| >> 48
 	
 	function FatIndex (assigns:|uint|, |asmreg|)
-		return (((self|uint64| << 16) >> 16) ||| (value << 48))|asmreg|
+		return (((self|uint64| << 16) >> 16) ||| (value|uint64| << 48))|asmreg|
 	
 	function FAT (|&fatasm|)
 		|| i = .FatIndex
 			return asmstate.sh.FuncStart + i - 1
-		"reg is missing fat"
-		debugger
+		error "reg is too skinny"
 		return asmstate.sh.zero
 
 	operator isa (|datatypecode| M, |bool|)

@@ -68,7 +68,7 @@ function asmstate.SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |messa
 function asmstate.AddToReg (|&FATASM| addr, |int| add, |message| exp, |asmreg|)
 	|| reg = addr.info
 	if add
-		return .plus(reg, reg, .numtoegg(add, exp), exp)
+		return .plus(reg, reg, .NumToReg(add, exp), exp)
 	return reg
 
 
@@ -290,10 +290,8 @@ function Decl (fn_asm)
 	opt norefcounts
 	|| rel = exp.last!
 	|| ty = rel.first!.fastdecl
-	|| reg = .DeclareMe(Exp, ty.reg)
-	reg <~ asmreg.set
-//	(reg is NotYetUsed)
-	return .µ(rel.last!, reg)
+	|| reg = .DeclareMe(Exp, ty)
+	return .µ(rel.last!, reg as asmreg.set)
 
 
 function Arg   (fn_asm)
@@ -359,30 +357,11 @@ function Num (fn_asm)
 	|| d = exp.FastDecl
 	|| ConstValue = d.exportposition
 	
-	// we have our first fail. We want a number zero, but we want it of the specified type in D
-	// like a float 0, or a int, or a bool. or even f64.
-	// so we are returning the instruction that set it to 0.
-	// which is the zero instruction. But the zero instruction has no type on it.
-	// or a wrong type. Should I take the type out of the FAT? And return some other structure
-	// that contains the ASMReg + the fat? cos really... the params don't have a register.
-	// also... a reg might set a value that is true for different purposes. like 1 as int or bool.
-	// the type will be wrong, though. (i guess we could ignore that if its a known const)
-	
 	target debug
 		if ConstValue == 0 != exp.IsZero // argh
 	|| r = asmstate.sh.FindConst(ConstValue, dest)
+	if r != nil
 		return r
-	Dest = .TempMe(exp, dest)
-
-	// this is also wrong. numtoreg. So... we have a number. but whats the type of the number.
-	// well... we have it, in dest. but its lost by NumToReg. So... it should take an asmreg then?
-	
-	// on the other hand, if we return both a fat + a type... it won't matter.
-	// why do instructions need a type? basically just to say "the thing that set the register... has a type"
-	// so we know the type of the value in the register.
-	// still... we may want to re-interpret that type? for constants anyhow.
-	// lets keep trying.
-	
 	return .NumToReg(ConstValue, exp, Dest)
 
 

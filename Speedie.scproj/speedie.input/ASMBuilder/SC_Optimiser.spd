@@ -31,6 +31,10 @@ function µfunc.Sanity
 
 	
 function SpdAssembler.Optimise (|µfunc| raw, |bool|)
+	// would be better if this actually kept track of if the overallsize
+	// is decreasing or not. If it is decreasing... we should allow limitless optimisation.
+	// because its already limited, by the size. Assuming we have the size.
+	// we'd need to do that by removing NOOPs and then calculating the new size.
 	raw.Sanity
 	|| Curr = raw.IR
 	.MarkBlocks(Curr, raw.length)
@@ -40,10 +44,10 @@ function SpdAssembler.Optimise (|µfunc| raw, |bool|)
 		|| x = .µOpt[curr.op]
 			|| p = curr.prev
 			|| n = curr.next
-			if n or p
-				rz |= (x)(curr, p, n)
+			if (n or p) and (x)(curr, p, n)
 				opts++
 	raw.Sanity
+	return opts
 
 
 extend SpdAssembler {

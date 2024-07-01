@@ -47,7 +47,7 @@ module SpdAssembler
 			return f.ASM					#expect (m, "This function has no ASM")
 						
 
-	function GenerateASM (|scfunction| fn)
+	function GenerateASM (|scfunction| fn, |bool|)
 		opt norefcounts
 		ASMState.Sh.StartFunc(fn)
 		|| fp = fn_asm_table[@arg]!
@@ -57,6 +57,7 @@ module SpdAssembler
 		(fp)(ASmState.Sh, A, R)
 		ASMState.Sh.FinishASM
 		.Guard
+		return ASMState.Sh.ok
 
 
 	function Guard
@@ -64,14 +65,9 @@ module SpdAssembler
 	
 	
 	function VacGenerate (|scfunction| fn, |bool|)
-		opt norefcounts
-		for 2
-			.GenerateASM(fn)
-			if ASMState.Sh.ok
-				printline fn.asm!.render
-				exit
-			require ASMState.ExpandJSM
-		
+		expect (.GenerateASM(fn) or (ASMState.ExpandJSM and .GenerateASM(fn))) "ASM is out of memory." 
+
+		printline fn.asm!.render
 		while .Optimise(fn.asm!)
 			loop ++fn.OptCounts <= 16
 		.FlowControl

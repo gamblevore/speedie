@@ -36,9 +36,11 @@ struct FatASM
 	
 	
 	function AsReg (|asmreg|)
+		cpp_part AsReg0
 		return self * .info
 
 	operator mul (|asmreg| info, |asmreg|)
+		cpp_part AsReg
 		info.FatIndex = 1 + (self - ASMState.Sh.FuncStart)
 		.info = info
 		return info

@@ -28,13 +28,16 @@ struct ASMState
 	function AddFuncParams (|SCFunction| fn)
 		opt norefcounts
 		for a in fn.Args
-			a.dtype = .DeclareMe(nil, a.RegType|AsmReg|)|datatypecode|
+			a.dtype = .DeclareMe(nil, a)|datatypecode|
 
 	function Last (|&FatASM|)
 		return .curr-1
 	
 	syntax access (|int| a, |&uint64|)
 		cpp_part GetConst, pragma inline
+		if a|uint| > 31
+			debugger // sigh
+			a = 0
 		|| r = .registers[a]!
 		if r == .zero or r.info isnt ConstAny // now what?
 		return r.Const
@@ -70,7 +73,7 @@ struct ASMState
 				return .AddASM(asm.FADK, exp.parent!, dest, src, value) * dest
 			debugger // how is this possible? we are adding a 64 bit float to a 32-bit?
 		debugat
-		|| where = .NumToEgg(value, exp)
+		|| where = .NumToReg(value, exp)
 		return .Plus(dest, src, where, exp)
 		
 		
@@ -123,16 +126,16 @@ struct ASMState
 			p.BlockNum = .BlockNum
 			p.ParentBlock = .ParentBlock
 			return p
-		if .OK
-			error "ASM is out of memory."
-			.OK = false
+		.OK = false
 		return .start
 	
 		
-	function DeclareMe (|Message| where,  |asmreg| T,  |asmreg|)
+	function DeclareMe (|Message| where,  |scdecl| Dest,  |asmreg|)
 		|| d = .VDecls|int| + 1
 		if (d + .vtmps <= 31)
+			|| t = dest.Reg
 			t.reg = d
+			dest.DType = t|datatypecode| // right?
 			.vdecls = d
 			return t
 		error (where, "No free local variables.")			
@@ -198,9 +201,10 @@ struct ASMState
 		target debug
 			|| rzt = rz.µtype
 			if !rz.fatindex
-				"No asmgen!"
-				debugger
-				rz = (fn)(self, exp, dest)
+				if (rz isnt constany) or rz.const
+					"No asmgen!"
+					debugger
+					rz = (fn)(self, exp, dest)
 				
 			  elseif !rzt.isnumeric and rzt is bool
 				"No valid type on FAT info"
@@ -306,7 +310,7 @@ function ASMState.StartFunc (|scfunction| fn)
 		.Registers[i] = .zero
 	.zero = nil
 	.zero.info = AsmReg()
-	.FuncStart = .Start
+	.FuncStart = .curr
 	.LabelCount = 0
 	.fn = fn
 	.ReturnType = fn.ReturnType.regtype
