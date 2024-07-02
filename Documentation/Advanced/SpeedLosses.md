@@ -26,3 +26,11 @@ It is also possible that typecasting via the `isa` operator, is slower than doin
 
 It would be a very special and rare situation in which this could cause noticeable speed losses... One I haven't seen myself yet.
 
+...
+
+Overall, I would look at how much speed you are *gaining* by using speedie first. If you code is a lot faster than writing it in another language (java / C# / JS / python / etc)... then just don't bother ruining your experience by trying to get another 2 %. Especially if you just gained 30% to 1000% extra speed. (Depending on the lang you are comparing to).
+
+Its probably a nice fun thing to trust the language :) To see "how much speed can I get while trusting the language".
+
+Perry (my IDE) does this. Because its a simple app that relies on the libs to do all the heavy lifting. So if even an IDE doesn't need to fool with disabling refcounts, you can see most other apps won't either.
+
