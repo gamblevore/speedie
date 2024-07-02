@@ -142,7 +142,7 @@ extend ASMState
 		require r is ConstAny
 		|| v = .f(r)
 		if v == 0.0
-			return .assign(dest, l, asmreg(), exp).fat
+			return l.fat
 		
 		if r.fourbytes
 			|| k = self[r][]
@@ -154,17 +154,22 @@ extend ASMState
 
 	function QuickFloatDiv    (fn_OpASM)
 		require r is ConstAny
+		|| v = .f(r)
+		if v == 0.0
+			problem (Exp, "Divide by zero???")
+		if !v or v.abs == 1.0
+			return .Quick1Or1Sub(dest, l, v|int|, exp)
+
 		|| p = self[r]
 		|ivec2| ex
-		// we could optimise f/-1.0 or f/-0.5... but who cares. dont write such dumb code.
 		if l.IsBig
-			|| f = p|&f64|[]
-			require f > 0
-			ex = f.exponent
+			|| f8 = p|&f64|[]
+			require f8 > 0
+			ex = f8.exponent
 		  else
-			|| f = p|&float|[]
-			require f > 0
-			ex = f.exponent
+			|| f4 = p|&float|[]
+			require f4 > 0
+			ex = f4.exponent
 		
 		if ex.y == 1
 			return .AddASM(asm.FEXK, exp, dest, L, 0, ex.x, l.IsBig|int|) * Dest
@@ -172,11 +177,11 @@ extend ASMState
 
 	// from 1 to -1
 	function Quick1Or1Sub (|&ASMState| self, |asmreg| dest, |asmreg| L, |int| ptoi, |message| exp, |asmreg|)
-		if ptoi == -1								//   y = x * -1  -->  y = 0-x 
+		if ptoi == -1										//   x * -1  -->  0-x 
 			return .subtract(dest, asmreg(), l, exp)
-		if ptoi == 0    							//   y = x * 0   -->  y = 0
-			l = asmreg()							//   y = x * 1   -->  y = x 
-		return .assign(dest, l, asmreg(), exp)
+		if ptoi == 1										//   x * 1   -->  x 
+			return l
+		return asmreg.zero									//   x * 0   -->  0
 		
 
 	function QuickIntMul    (fn_OpASM)
@@ -190,15 +195,9 @@ extend ASMState
 
 	function QuickFloatMul    (fn_OpASM)
 		require r is ConstAny	
-		|| v = .f(r)
-		if  v == -1.0
-			return .Subtract(dest, asmreg(), l, exp)
-		
-		if  v == 1.0  or  v == 0.0
-			if v == 0.0
-				l = asmreg()
-			return .assign(dest, l, asmreg(), exp)
-		
+		|| v = .f(r)		
+		if  v == 1.0 or 0.0 or -1.0
+			return .Quick1Or1Sub(dest, l, v|int|, exp)
 		if  v == 2.0
 			return .plus(dest, l, l, exp)
 		
@@ -287,9 +286,9 @@ extend ASMState
 		
 	function Plus   (fn_opasm) // add (
 		if !r.reg
-			return .assign(dest, l, AsmReg(), exp)
+			return l
 		if !l.reg and (l isnt alternate)
-			return .assign(dest, R, AsmReg(), exp)
+			return r
 		if l.isint
 			return .PlusInt(dest, l, r, exp)
 		return .PlusFloat(dest, l, r, exp)
@@ -305,7 +304,7 @@ extend ASMState
 		rz := .QuickIntMul(dest, L, R, exp)
 		rz := exp.MULT(dest, L, R, asmreg()) * Dest
 		if dest is ConstAny
-			rz.fat.const = l.const * r.const
+			rz.needfat.const = l.const * r.const
 
 
 	function FloatMul (fn_opasm)
@@ -313,7 +312,7 @@ extend ASMState
 		rz := .QuickFloatMul(dest, L, R, exp)
 		rz := exp.FMUL(dest, L, R, asmreg(), l.IsBig|int|) * Dest
 		if dest is ConstAny
-			|| fat = rz.fat
+			|| fat = rz.needfat
 			if dest.FourBytes
 				fat.F32 = l.F32 * r.F32
 			  else
@@ -344,7 +343,7 @@ extend ASMState
 		rz := .QuickFloatDiv(dest, L, R, exp)
 		rz := .AddASM(asm.FDIV,  exp,  dest,  dest.isbig|int|,  L,  R) * dest
 		if dest is ConstAny
-			|| fat = rz.fat
+			|| fat = rz.needfat
 			if dest.FourBytes
 				fat.f32 = l.f32 / r.f32
 			  else
@@ -434,7 +433,7 @@ extend ASMState
 	function BitOr  (fn_opasm)
 		if l is ConstAny
 			swap (l) (r)
-		if !dest.reg
+		dest.Expect(exp)
 		|| fat = exp.BOAR(dest, L, R, asmreg())
 		if dest is ConstAny
 			fat.Const = l.const ||| r.const

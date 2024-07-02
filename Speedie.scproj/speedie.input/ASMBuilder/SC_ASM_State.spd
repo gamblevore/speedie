@@ -129,6 +129,12 @@ struct ASMState
 		.OK = false
 		return .start
 	
+	syntax expect (|message?| where=nil, |string| msg)
+		|| f = .fn.asm
+			f.length = .curr - .funcstart
+			printline f.render
+		debugger
+		error (where, msg)
 		
 	function DeclareMe (|Message| where,  |scdecl| Dest,  |asmreg|)
 		|| d = .VDecls|int| + 1
@@ -140,7 +146,7 @@ struct ASMState
 			target debug: dest.ASMSanity
 			.vdecls = d
 			return t
-		error (where, "No free local variables.")			
+		error (self, where, "No free local variables.")			
 	
 	
 	function TempMe (|Message| where,  |asmreg| T=asmreg.Temp,  |asmreg|) // .needreg
@@ -155,21 +161,28 @@ struct ASMState
 		error (where, "No free local variables.")
 
 
-	function FindConst (|uint64| Code, |asmreg| dest,  |asmreg|)
+	function FindConst (|scdecl| d, |asmreg|)
+		|uint64| Code = d.exportposition
+		|| dest = d.asmreg 
 		if !Code
-			return AsmReg()
-		// it should be within the current block only! So what is the current block!
+			dest.reg = 0
+			(Dest is constany) // why is the orig not const any?
+			return dest
+		
+		// it should be within the current block only! So what is the current block?
 		|int| i = 31 - .VTmps
 		while i > .VDecls
 			|| r = .Registers[i]!
 			if r.const == code
 				dest.reg = i
+				(Dest is constany)
 				return dest
 			--i
-	
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	function Branch (|message| cond,  |bool| neg=false,  |&fatasm|)
+	function Branch (|message| cond,  |bool| neg=false,  |!&fatasm|)
 		|| dest = asmreg.newCondRequest
 		.WithinBranch++
 		|| cmu = .µ(cond, dest)
@@ -177,13 +190,9 @@ struct ASMState
 		if cmu isnt cond
 			(dest is negate) = (cmu isnt AlreadyNegated)
 			cmu = .equals(dest, dest, cmu, cond)
-		return cmu.fat
+		return cmu.needfat
 
 
-	function µOpen (|message| exp, |asmreg| mode,   |asmreg|)
-		rz = .µ( exp, AsmReg.StayOpen as mode) asnt asmreg.StayOpen
-
-	
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		opt norefcounts
 		pragma inline
@@ -201,27 +210,19 @@ struct ASMState
 			.VTmps = (ov)
 		
 		target debug
-			|| rzt = rz.µtype
 			if !rz.fatindex
 				if (rz isnt constany) or rz.const
-					"No asmgen!"
-					debugger
+					error (self, "No asmgen!")
 					rz = (fn)(self, exp, dest)
 				
-			  elseif !rzt.isnumeric and rzt is bool
-				"No valid type on FAT info"
-				debugger
+			  elseif !rz.µtype.isnumeric and rz.µtype is bool
+				error (self, "No valid type on FAT info")
 				rz = (fn)(self, exp, dest)
-				
-			//|| dd = dest.reg
-			//if dd and (rz.info.reg != dd)
-			//	// what about x = a? we could just exclude that.
-			//	"seemed to allocate a var unnecessarily?"
-			//	debugger
 
 
 	function Prm (|message| prm, |asmreg|)
 		|| r = .ExistingVar(prm)
+		if r != nil
 			return r
 		// why not use tmps? won't these interfere with the function-passing??
 		|| Where = .tempme(prm, asmreg())

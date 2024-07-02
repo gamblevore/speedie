@@ -142,12 +142,12 @@ function If				(fn_asm)
 	
 function While			(fn_asm)
 	opt norefcounts
-	debugger
 //	.AddASM(asm.NOOP, exp)							// allow for lupu/lupd?
 	|| Jumper = .AddASM(asm.JUMP, exp)				// jump to end... THEN EMIT arg and jump back.
 	.WhileStart = jumper
 	ASMTmp.arg(self, exp.second)					// arg
 	|| CondStart = .curr							// right?
+	debugger
 	|| ExitPlace = .branch(exp.first!)				// cond
 	ExitPlace.r[3] = .curr - Jumper
 
@@ -188,9 +188,9 @@ function Ternary		(fn_asm)
 	|| A = cond.next!
 	|| B = A.next!
 	
-	|| mA = .ExistingVar(a) // shouldn't allow globals
+	|| mA = .ExistingVar(a)
 	|| mB = .ExistingVar(b)
-	if ma!=0|asmreg| and mb!=0|asmreg|
+	if ma!=nil and mb!=nil
 		return .SimpleTernary(dest, ma, mb, cond)
 
 	dest = .TempMe(exp, dest)
@@ -224,38 +224,43 @@ function Return			(fn_asm)
 
 function TypeCast		(fn_asm)
 	opt norefcounts
-	debugger
 	|| sr = .µ(exp.first!, dest)
-	|| T = sr.µtype
-	if t is bool
+	|| NewDecl = exp.ASMDecl
+	|| NewType = newdecl.regtype
+	if newtype is bool
+		debugat
 		return .NotEq(dest, asmreg(), sr, exp)
 
-	|| NewDecl = exp.ASMDecl
 	|| OldDecl = exp.first!.ASMDecl
 	|| OldType = olddecl.regtype
-	|| NewType = newdecl.regtype
-	|| OC = T.BitCount
+	|| OC = oldtype.BitCount
 	|| NC = newtype.BitCount
 
-	|| FloatDiff = T.isfloat != newtype.isfloat
+	|| FloatDiff = newtype.isfloat != oldtype.isfloat
 	if !FloatDiff and (nc == oc)
 		return sr
-
+	
+	if !sr.reg // x = 0|float|
+		sr.µtype = newtype
+		return sr
 	dest = .TempMe(exp, dest)
 	dest.µType = NewType
+	
 	// why can't i move this into a const collector?
 	// cos i don't know what the original input types were?
 	// not even from the original fats output?
 	// sighhh...... perhaps?
 	// its too much structure. its like the messgeid. good idea but NO WAY. leave it for now!
 	// old idea is good enough!
+	
 	|| UponConst = sr is ConstAny
 	|&fatasm| fat
-	if t.isfloat or newtype.isfloat
-		debugger,   #!put in actual numbers later
+	if oldtype.isfloat or newtype.isfloat
+		debugat,   #!put in actual numbers later
 		fat = .AddASM(asm.CONV, exp, dest, sr, 3-(floatdiff<<1)).BitCorrect
 		if UponConst
-			|| srf = sr.fat
+			(fat.info as= asmreg.ConstAny)
+			|| srf = sr.needfat
 			if NewType.IsFloat and !FloatDiff
 				fat.FloatConvConst(srf, NC)
 			  else
@@ -266,7 +271,7 @@ function TypeCast		(fn_asm)
 		if UponConst
 			|| oof = fat.Const << sh
 			fat.Const = (oof|int64| >> sh, oof|uint64| >> sh)(sr.Signed) // shift up and down
-	(fat.info as= asmreg.ConstAny)
+			(fat.info as= asmreg.ConstAny)
 	rz = fat*dest
 
 
@@ -282,14 +287,21 @@ function Pointer		(fn_asm)
 	return fat*dest
 
 
-
 function Decl (fn_asm)
 // yay
 	opt norefcounts
 	|| rel = exp.last!
 	|| ty = rel.first!.fastdecl
-	|| reg = .DeclareMe(Exp, ty)
-	return .µ(rel.last!, reg as asmreg.set)
+	|| dcl = .DeclareMe(Exp, ty)
+	return SetReg(self, rel.last!, dcl)
+
+
+function SetReg (|&ASMState| self=asmstate.sh, |message| exp, |AsmReg| Dest, |AsmReg|)
+	|| r2 = .µ(exp, dest as AsmReg.set)
+	r2 = r2 asnt asmreg.set
+	if r2.reg == dest.reg
+		return r2
+	return .Assign(dest, r2, asmreg(), exp)
 
 
 function Arg   (fn_asm)
@@ -342,29 +354,33 @@ function SetRel	(fn_asm)
 	opt	norefcounts					//   x[func()] = y++
 	|| L = exp.first!
 	|| Var = .ExistingVar(L)
-		Var <~ asmreg.StayOpen
 	|| R = .µ(exp.last!, var)
-	if !r						// what?
-	if var != r
-		r <~ asmreg.set
-		return .µ(L, R)
+	|| vr = var.reg
+		if r.reg == vr
+			return nil // done!
+	check (r.reg) (self, exp, "SetRel failed")
+	
+	// So what should this do? What *can* it do?
+	// a.b = r
+	// r = a.b // should already be caught?
+	// g = a.b
+	// v[x] = a.b
+	// no funcs are possible! its either memory, or register.
+	return setreg(self, exp, r)
 
 
 function Num (fn_asm)
 	opt norefcounts
 	|| d = exp.ASMDecl
-	|| ConstValue = d.exportposition
-	
-	target debug
-		if ConstValue == 0 != exp.IsZero // argh
-	|| r = asmstate.sh.FindConst(ConstValue, dest)
+	|| r = asmstate.sh.FindConst(d)
 	if r != nil
 		return r
-	return .NumToReg(ConstValue, exp, Dest)
+	return .NumToReg(d.exportposition, exp, Dest)
 
 
 function Thg (fn_asm)
 	|| thg = ThgSub(self, exp, dest, mode)
+	if thg != nil
 		return thg
 	error (exp)
 
@@ -375,9 +391,9 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |as
 	|| d = exp.ASMDecl
 	if d is local
 		|| reg = d.reg
-		if !reg.reg					// what?
-		if dest is set								// copy a reg
-			return .AddASM(asm.BOAR, exp, dest, reg) * dest
+		if (reg.reg-1)|uint| >= 31					// what?
+		if !reg.fatindex
+			// this reg doesn't have the fat. it should always have the fat
 		return reg
 
 	if d is const
@@ -390,7 +406,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |as
 		return AsmReg()
 
 	if mode
-		return 0|asmreg|
+		return nil
 	check (d is global) (Exp)
 	return DoGlobal(self, exp, dest, d)
  
@@ -537,16 +553,17 @@ function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 
 function DoSingleMath (|&ASMState| self, |message| exp, |AsmReg| Dest, |fn_opasm| fn, |asmreg|)
 	|| Src = .µ(exp, dest)
-	src <~ asmreg.SingleExpr
+	src = src <~ asmreg.SingleExpr
 	return DoMathSub(self, exp, dest, src, fn)
 
 
 function DoMath (fn_asm)
+	opt norefcounts
 	|| op = exp.second!
 	|| scop = op.obj|scoperator|
 		|| fn = scop.asm
 			return DoMathSub(self, exp, dest, 0.asm, fn)
-		error (op, "No ASM for this operator?")
+	error (op, "No ASM for this operator?")
 	debugger // what?
 		
 
@@ -559,8 +576,10 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr
 	|| ml = AsmReg()
 	if mr isnt SingleExpr
 		|| OV = .VTmps
-		ml = .µOpen(F, dest & asmreg.discard)
-		mr = .µOpen(exp.last!, dest & asmreg.discard)
+		|| D1 = (dest & asmreg.discard) as asmreg.stayopen
+		debugat 
+		ml = .µ(F, D1) asnt asmreg.stayopen
+		mr = .µ(exp.last!, dest & asmreg.discard)
 		.VTmps = OV
 	
 	if dest is Discard
@@ -620,12 +639,13 @@ function asmstate.ExistingVar (|message| m, |asmreg|)
 		fn = m.func
 	if fn == @thg
 		|| found = asmtmp.thgsub(asmstate.sh, m, asmreg(), 2)
-		if found == 0|asmreg|
-			return nil
-	if fn == @num // only if 0.
-		|| d = m.ASMDecl
-		if !d.exportposition
-			return asmreg.zero
+		if found != nil
+			return found
+	  elseif fn == @num
+		|| reg = asmstate.sh.findconst(m.ASMDecl)
+		if reg!=nil
+			return reg
+	return nil
 
 
 function message.HasAsmStuff (|bool|)

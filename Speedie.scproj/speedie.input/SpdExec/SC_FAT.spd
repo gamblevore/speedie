@@ -92,15 +92,20 @@ struct FatASM
 			return .info & flags
 	
 	function BitCorrect (|&FATASM|)
-		.info <~ AsmReg.BitCorrect
+		.info = .info <~ AsmReg.BitCorrect
 		return self
 		
 		
 	function prm (|int| a, assigns:|asmreg| r)
+		cpp_part SetReg
+		.r[a] = r.reg
+		|| f = r.fat
+			if !a // why?
+			f.refcount++
 		
-		
-	function prm (|int| a, assigns:|int| r)
-		
+	function prm (|int| a, assigns:|int| v)
+		cpp_part SetNum
+		.r[a] = v
 		
 
 	function out (|uint|): return .r[0]
@@ -162,7 +167,7 @@ struct FatASM
 		fs <~ ':'
 		fs <~ (' ', 5-op.name.length)
 		|| GotAny = ""
-		|| Remain = 25
+		|| Remain = 24
 		|| f = op.sizes
 		for i in f.count
 			|| bs = f[i].bitsize

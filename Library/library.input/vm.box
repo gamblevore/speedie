@@ -330,7 +330,8 @@ forms
 		decr(o2)
 		safedecr(o1)
 		#!jump too? for branches...
-/**/ RSET  (U4)
+
+/**/ RSET  (U4) // we need some way to also refcount objs in memory! not just in registers
 		setref(n1, o1, o2)
 		setref(n3, o3, o4)
 

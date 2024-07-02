@@ -47,22 +47,26 @@ datatype AsmReg (uint64)
 
 	
 	function F32 (|float|)
-		return .fat.F32
+		return .needfat.F32
 		
 	function F64 (|float|)
-		return .fat.F64
+		return .needfat.F64
 
 	function Const (|int64|)
 		if .reg == 0
 			return 0
-		return .fat.const
+		return .needfat.const
 
 	function Const (assigns:|int64|)
-		.fat.const = value
+		.needfat.const = value
 
 	function Negate (|asmreg|)
 		(self is negate) = (Self isnt negate)
 		return self
+	
+	function Expect (|message| where)
+		pragma inline
+		check (.reg) (asmstate.sh, where, "Internal ASM Error: Setting to register 0")
 	
 	function BitCount (|int|)
 		return .µtype.bitcount
@@ -74,6 +78,10 @@ datatype AsmReg (uint64)
 		return (((self|uint64| << 16) >> 16) ||| (value|uint64| << 48))|asmreg|
 	
 	function FAT (|&fatasm|)
+		|| i = .FatIndex
+			return asmstate.sh.FuncStart + i - 1
+
+	function NeedFAT (|&fatasm|)
 		|| i = .FatIndex
 			return asmstate.sh.FuncStart + i - 1
 		error "reg is too skinny"
@@ -133,7 +141,7 @@ datatype AsmReg (uint64)
 		
 	function HaveAddr (|asmreg|)
 		rz = self asnt AsmReg.AddrRequest
-		rz <~ AsmReg.CorrectAddr
+		rz = rz as AsmReg.CorrectAddr
 		
 	function Reg (|int|)
 		return .µType.Register
