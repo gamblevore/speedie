@@ -1,8 +1,8 @@
 ## Potential Loss Of Speedie Performance (relative to C)
 
-So... are there any places where speedie imposes overhead? Well... yes, theres one main one.
+So... are there any places where speedie imposes overhead? There are two: Refcounting and type-checking. Both are done on objects, not data-types.
 
-Firstly, there is refcounting. Refcounting objects imposes some (slight) overhead. In my experience, it really isn't too much, especially on ARM machines it tends to run fast. However it is there. For almost all code you won't notice it. Like 99.9% of code.
+Refcounting objects imposes some (slight) overhead. In my experience, it really isn't too much, especially on ARM machines it tends to run fast. However it is there. For almost all code you won't notice it. Like 99.9% of code.
 
 Unless what you are doing is making a high-performance library, it is almost certainly a bad idea to disable refcounting, as this can easily cause crashes and leaks.
 
