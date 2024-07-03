@@ -67,20 +67,6 @@
 #define   Cmp_Lu_(x)   (((uint)((x)<<22))>>22)
 
 
-#define   CmpD_Li       ((( int)((Op.Raw)<<23))>>23)
-#define   CmpD_Li_(x)   ((( int)((x)<<23))>>23)
-
-#define   CmpD_Lu       (((uint)((Op.Raw)<<23))>>23)
-#define   CmpD_Lu_(x)   (((uint)((x)<<23))>>23)
-
-
-#define   CmpEq_Jmpi       ((( int)((Op.Raw)<<18))>>18)
-#define   CmpEq_Jmpi_(x)   ((( int)((x)<<18))>>18)
-
-#define   CmpEq_Jmpu       (((uint)((Op.Raw)<<18))>>18)
-#define   CmpEq_Jmpu_(x)   (((uint)((x)<<18))>>18)
-
-
 #define   Const_Roti       ((( int)((Op.Raw)<<13))>>26)
 #define   Const_Roti_(x)   ((( int)((x)<<13))>>26)
 
@@ -100,6 +86,26 @@
 #define   Const_Valueu_(x)   (((uint)((x)<<20))>>20)
 
 
+#define   JCmpEq_Jmpi       ((( int)((Op.Raw)<<18))>>18)
+#define   JCmpEq_Jmpi_(x)   ((( int)((x)<<18))>>18)
+
+#define   JCmpEq_Jmpu       (((uint)((Op.Raw)<<18))>>18)
+#define   JCmpEq_Jmpu_(x)   (((uint)((x)<<18))>>18)
+
+
+#define   JCmp_Cmpi       ((( int)((Op.Raw)<<18))>>28)
+#define   JCmp_Cmpi_(x)   ((( int)((x)<<18))>>28)
+
+#define   JCmp_Cmpu       (((uint)((Op.Raw)<<18))>>28)
+#define   JCmp_Cmpu_(x)   (((uint)((x)<<18))>>28)
+
+#define   JCmp_Li       ((( int)((Op.Raw)<<22))>>22)
+#define   JCmp_Li_(x)   ((( int)((x)<<22))>>22)
+
+#define   JCmp_Lu       (((uint)((Op.Raw)<<22))>>22)
+#define   JCmp_Lu_(x)   (((uint)((x)<<22))>>22)
+
+
 #define   Bra_c1i       ((( int)((Op.Raw)<<13))>>30)
 #define   Bra_c1i_(x)   ((( int)((x)<<13))>>30)
 
@@ -113,17 +119,43 @@
 #define   Bra_jmpu_(x)   (((uint)((x)<<15))>>15)
 
 
-#define   Mem_Li       ((( int)((Op.Raw)<<23))>>25)
-#define   Mem_Li_(x)   ((( int)((x)<<23))>>25)
+#define   Read_Li       ((( int)((Op.Raw)<<23))>>25)
+#define   Read_Li_(x)   ((( int)((x)<<23))>>25)
 
-#define   Mem_Lu       (((uint)((Op.Raw)<<23))>>25)
-#define   Mem_Lu_(x)   (((uint)((x)<<23))>>25)
+#define   Read_Lu       (((uint)((Op.Raw)<<23))>>25)
+#define   Read_Lu_(x)   (((uint)((x)<<23))>>25)
 
-#define   Mem_movei       ((( int)((Op.Raw)<<30))>>30)
-#define   Mem_movei_(x)   ((( int)((x)<<30))>>30)
+#define   Read_movei       ((( int)((Op.Raw)<<30))>>30)
+#define   Read_movei_(x)   ((( int)((x)<<30))>>30)
 
-#define   Mem_moveu       (((uint)((Op.Raw)<<30))>>30)
-#define   Mem_moveu_(x)   (((uint)((x)<<30))>>30)
+#define   Read_moveu       (((uint)((Op.Raw)<<30))>>30)
+#define   Read_moveu_(x)   (((uint)((x)<<30))>>30)
+
+
+#define   Write_Li       ((( int)((Op.Raw)<<23))>>25)
+#define   Write_Li_(x)   ((( int)((x)<<23))>>25)
+
+#define   Write_Lu       (((uint)((Op.Raw)<<23))>>25)
+#define   Write_Lu_(x)   (((uint)((x)<<23))>>25)
+
+#define   Write_movei       ((( int)((Op.Raw)<<30))>>30)
+#define   Write_movei_(x)   ((( int)((x)<<30))>>30)
+
+#define   Write_moveu       (((uint)((Op.Raw)<<30))>>30)
+#define   Write_moveu_(x)   (((uint)((x)<<30))>>30)
+
+
+#define   MemUtil_Opi       ((( int)((Op.Raw)<<18))>>29)
+#define   MemUtil_Opi_(x)   ((( int)((x)<<18))>>29)
+
+#define   MemUtil_Opu       (((uint)((Op.Raw)<<18))>>29)
+#define   MemUtil_Opu_(x)   (((uint)((x)<<18))>>29)
+
+#define   MemUtil_Ni       ((( int)((Op.Raw)<<21))>>21)
+#define   MemUtil_Ni_(x)   ((( int)((x)<<21))>>21)
+
+#define   MemUtil_Nu       (((uint)((Op.Raw)<<21))>>21)
+#define   MemUtil_Nu_(x)   (((uint)((x)<<21))>>21)
 
 
 #define   CNTC_offseti       ((( int)((Op.Raw)<<18))>>27)
@@ -170,17 +202,17 @@
 #define   BFLD_Lu_(x)   (((uint)((x)<<31))>>31)
 
 
-#define   BCmp_Shifti       ((( int)((Op.Raw)<<23))>>26)
-#define   BCmp_Shifti_(x)   ((( int)((x)<<23))>>26)
+#define   CmpB_Shifti       ((( int)((Op.Raw)<<23))>>26)
+#define   CmpB_Shifti_(x)   ((( int)((x)<<23))>>26)
 
-#define   BCmp_Shiftu       (((uint)((Op.Raw)<<23))>>26)
-#define   BCmp_Shiftu_(x)   (((uint)((x)<<23))>>26)
+#define   CmpB_Shiftu       (((uint)((Op.Raw)<<23))>>26)
+#define   CmpB_Shiftu_(x)   (((uint)((x)<<23))>>26)
 
-#define   BCmp_Invi       ((( int)((Op.Raw)<<29))>>29)
-#define   BCmp_Invi_(x)   ((( int)((x)<<29))>>29)
+#define   CmpB_Invi       ((( int)((Op.Raw)<<29))>>29)
+#define   CmpB_Invi_(x)   ((( int)((x)<<29))>>29)
 
-#define   BCmp_Invu       (((uint)((Op.Raw)<<29))>>29)
-#define   BCmp_Invu_(x)   (((uint)((x)<<29))>>29)
+#define   CmpB_Invu       (((uint)((Op.Raw)<<29))>>29)
+#define   CmpB_Invu_(x)   (((uint)((x)<<29))>>29)
 
 
 #define   BClear_Shift1i       ((( int)((Op.Raw)<<18))>>26)
@@ -315,4 +347,39 @@
 
 #define   ConstStretchy_Prm1u       (((uint)((Op.Raw)<<31))>>31)
 #define   ConstStretchy_Prm1u_(x)   (((uint)((x)<<31))>>31)
+
+
+#define   AddK_Ki       ((( int)((Op.Raw)<<18))>>18)
+#define   AddK_Ki_(x)   ((( int)((x)<<18))>>18)
+
+#define   AddK_Ku       (((uint)((Op.Raw)<<18))>>18)
+#define   AddK_Ku_(x)   (((uint)((x)<<18))>>18)
+
+
+#define   Shift_Shi       ((( int)((Op.Raw)<<23))>>23)
+#define   Shift_Shi_(x)   ((( int)((x)<<23))>>23)
+
+#define   Shift_Shu       (((uint)((Op.Raw)<<23))>>23)
+#define   Shift_Shu_(x)   (((uint)((x)<<23))>>23)
+
+
+#define   Loop_Jumpi       ((( int)((Op.Raw)<<18))>>18)
+#define   Loop_Jumpi_(x)   ((( int)((x)<<18))>>18)
+
+#define   Loop_Jumpu       (((uint)((Op.Raw)<<18))>>18)
+#define   Loop_Jumpu_(x)   (((uint)((x)<<18))>>18)
+
+
+#define   Swap_Li       ((( int)((Op.Raw)<<28))>>28)
+#define   Swap_Li_(x)   ((( int)((x)<<28))>>28)
+
+#define   Swap_Lu       (((uint)((Op.Raw)<<28))>>28)
+#define   Swap_Lu_(x)   (((uint)((x)<<28))>>28)
+
+
+#define   RefSet_Li       ((( int)((Op.Raw)<<28))>>28)
+#define   RefSet_Li_(x)   ((( int)((x)<<28))>>28)
+
+#define   RefSet_Lu       (((uint)((Op.Raw)<<28))>>28)
+#define   RefSet_Lu_(x)   (((uint)((x)<<28))>>28)
 

@@ -48,7 +48,7 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max, |int|)
 		|| f0 = f.name[]
 		if f0 == 'x' and bit_pos == 32
 			return bit_pos
-		if f0 == 'r'
+		if f0 == 'r' or 'R'
 			.FillTypePrm(line.name, pname)
 			return 5+bit_pos
 		if f0.isint
@@ -86,7 +86,7 @@ function string.ASMNormalise (|string|)
 	|| n = 0
 	for c in self
 		c = c.lowercase
-		if c == 'r' or 'n'	
+		if c == 'r' or 'n' or 'R'
 			n++
 		  elseif c == 'l' or 's' or 'j'
 			0
@@ -109,7 +109,7 @@ function DataTypeCreate (|message| form,  |int| fnum,  |message|)
 		compiler <~ sigh.first
 
 
-function GenerateForms (|message| forms, |bool| Rest)
+function GenerateForms (|message| forms, |bool| DoMore)
 	opt norefcounts
 	|| f = 0
 	for form_msg in forms[@arg]
@@ -117,7 +117,7 @@ function GenerateForms (|message| forms, |bool| Rest)
 			using form_msg
 			.AddForm(form_msg)
 			++f
-			if rest
+			if DoMore
 				.GenerateOne(form_msg, f)
 
 
@@ -280,7 +280,7 @@ function VMDecl (|message| tmp, |[message]?| ActuallyMakeTheVM)
 	|| P1 = prms.first
 	|| Counts = p1.next
 	
-	|| name = p1.name.ASMNormalise
+	|| name = p1.name//.ASMNormalise
 	|| form = µform.forms.valuelower(name)			#require
 	|| FormEnc = asm.Forms[form.Index]
 	name = "ASM_" + name
@@ -311,15 +311,6 @@ function MakeMsgCreator (|string| name, |µform| form)
 	|| prm = arg.prev!
 	|| fatdecl = prm.last!
 	
-	/*
-		* lu/li needs to be counted in the params!
-			* Or remove throughout? Having a "maybe param" just seems wierd.
-		* all regs used must be explicitly marked!
-			* remove u4/u1/etc?
-		* 'x' shouldn't be considered a register!
-			* 'n' also
-	*/
-	
 	for (p in form) (i)
 		|| ty = ("asmreg", "int")(p.isreg)
 		|| pname = ('a' + i)|byte|.render
@@ -331,6 +322,7 @@ function MakeMsgCreator (|string| name, |µform| form)
 
 || icecream = `function message._0 (|&fatasm|) {
 	pragma inline
+	visible
 	rz = asmstate.sh.syntaxappend(asm._0, self)
 }`.macro
 

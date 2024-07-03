@@ -164,8 +164,8 @@ AlwaysInline uint bitstats32(Register* r, ASM Op) {
 #define setref(t, a, b)		{if (t) JB_SetRef(a,b); else incr(b);}  
 #define table(b)			((u64)(((void**)(&vm.Env))[b])+L2)  
 
-#define mem(t)				((t*)u2)[u3+Mem_Lu]
-#define mem2(t)				(u2 = (u64)((t*)u2 + Mem_moveu-1))
+#define mem(t)				((t*)u2)[u3+Read_Lu]
+#define mem2(t)				(u2 = (u64)((t*)u2 + Read_moveu-1))
 
 AlwaysInline JB_Object* alloc(void* o) {
 	// we need a class table, and look it up from there.
@@ -312,9 +312,9 @@ AlwaysInline void CompF (Register* r, ASM Op) {
 
 
 AlwaysInline uint64 BitComp (Register* r, ASM Op) {
-	auto i = BCmp_Invu;
-	auto A = u2 << BCmp_Shiftu;
-	auto B = u3 << BCmp_Shiftu;
+	auto i = CmpB_Invu;
+	auto A = u2 << CmpB_Shiftu;
+	auto B = u3 << CmpB_Shiftu;
 	if (i&2)
 		A = ~A;
 	if (i&4)
@@ -341,14 +341,14 @@ AlwaysInline void BitClear (Register* r, ASM Op) {
 AlwaysInline ASM* CompEq (Register* r, ASM Op, ASM* Code) {
 	if (u1 == u2)
 		return Code;
-	return Code + CmpEq_Jmpi;
+	return Code + JCmpEq_Jmpi;
 }
 
 
 AlwaysInline ASM* CompNeq (Register* r, ASM Op, ASM* Code) {
 	if (u1 != u2)
 		return Code;
-	return Code + CmpEq_Jmpi;
+	return Code + JCmpEq_Jmpi;
 }
 
 

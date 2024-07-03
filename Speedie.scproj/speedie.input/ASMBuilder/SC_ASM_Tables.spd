@@ -78,8 +78,8 @@ constants
 	IncrAfter = 2
 	IncrBefore = 0
 	
-|asm_mem[10]| ReadASM
-|asm_mem[5]| WriteASM
+|asm_Read[10]| ReadASM
+|asm_Write[5]| WriteASM
 
 function InitAccess
 	|| R = &ASMtmp.ReadASM[0]
@@ -304,6 +304,21 @@ function SetReg (|&ASMState| self=asmstate.sh, |message| exp, |AsmReg| Dest, |As
 	return .Assign(dest, r2, asmreg(), exp)
 
 
+/*
+// we wanna do this per-instruction actually.
+// HOW? Well... any instruction that sets anything... should just update the regfile
+// right? 
+// just to say where the last fat came from.
+// I guess I need to update the instruction gen code.
+// so it does this automatically?
+// how to do that?
+
+function UpdateRegFile (|&ASMState| self=asmstate.sh, |asmreg| r, |scdecl| dcl, |AsmReg|)
+	if dcl is local
+		.registers[r.reg] = r.fat					// not sure how this works with nesting?
+	return r
+*/
+
 function Arg   (fn_asm)
 	opt norefcounts
 	|| decls = .VDecls
@@ -360,12 +375,6 @@ function SetRel	(fn_asm)
 			return nil // done!
 	check (r.reg) (self, exp, "SetRel failed")
 	
-	// So what should this do? What *can* it do?
-	// a.b = r
-	// r = a.b // should already be caught?
-	// g = a.b
-	// v[x] = a.b
-	// no funcs are possible! its either memory, or register.
 	return setreg(self, exp, r)
 
 
@@ -394,6 +403,17 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |as
 		if (reg.reg-1)|uint| >= 31					// what?
 		if !reg.fatindex
 			// this reg doesn't have the fat. it should always have the fat
+			// how should this be found? Through registers or via decls?
+			// we are finding constants via registers... Why not this too?
+			// lets see.
+			
+			// We could give the decl a fat index... (not a bad idea)
+			// or we could store the value in the register
+			// or both.
+			// maybe both is best? At least... it should be in the registers...
+			// I think so. We have vdecl and vtmps... so it should be OK.
+			// so anytime a var is altered... we just alter all the info, right?
+			// so thats just... setrel, decl, and &prm
 		return reg
 
 	if d is const

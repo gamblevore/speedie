@@ -83,7 +83,7 @@
 	i1 = JB_u64_RotR(u2, u3 + L3);
 ı BCLR: _
 	BitClear(r, Op);
-ı BCMP: _
+ı CMPB: _
 	u1 = BitComp(r, Op);
 ı TERN: _
 	if (u2) 
@@ -140,18 +140,11 @@
 	Code -= U2_Lu
 ;
 	___;
-ı RSDE: 
-	__;
-	Code += U3_Li;
-	___;
-	decr(o3);
-	decr(o2);
-	safedecr(o1);
-	// jump too? for branches...
-
 ı RSET: _
 	setref(n1, o1, o2);
 	setref(n3, o3, o4);
+ı RMEM: _
+	0;
 ı RALO: _
 	o1 = alloc(o2);
 	// should call constructor too.
@@ -203,7 +196,7 @@
 	CountConst(r, Op, 1);
 ı CNTD: _
 	CountConst(r, Op, 0);
-ı MEMM: _
+ı MEMU: _
 	//  copy/fill/endian/xor
 
 	MemStuff((u32 *) u1, (u32 *) u2, n3, L3);

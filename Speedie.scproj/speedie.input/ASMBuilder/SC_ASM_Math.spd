@@ -51,7 +51,7 @@ extend ASMState
 		if (dest is condrequest) and (badness >= 0)
 			if badness > 0
 				dest = .TempMe(exp, dest)
-				.AddASM(asm.BCMP, exp, dest, L, R, badness, Negate|int|)
+				.AddASM(asm.CMPB, exp, dest, L, R, badness, Negate|int|)
 				r = dest
 				l = 0.asm
 			if !l.reg
@@ -60,7 +60,7 @@ extend ASMState
 
 		
 		if badness > 0
-			return .AddASM(asm.BCMP, exp, dest, L, R, badness, negate|int|) * Dest
+			return .AddASM(asm.CMPB, exp, dest, L, R, badness, negate|int|) * Dest
 
 		if badness == -1
 			|| gl = l.GapBits

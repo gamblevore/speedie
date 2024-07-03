@@ -59,6 +59,8 @@ struct ASMState
 	function AddConstantAndReturnOld (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
 		|| reg = .TempMe(exp, dest)
 		if togrow.isint and value.CanStoreAsIntImmediate
+			if 0
+				exp.parent!.adpk(reg, togrow, togrow)
 			return .AddASM(asm.ADPK, exp.parent!, reg, ToGrow, Value) * reg
 		.Assign(reg, ToGrow, asmreg(), exp)
 		rz = .AddConstant(exp, togrow, ToGrow, value)

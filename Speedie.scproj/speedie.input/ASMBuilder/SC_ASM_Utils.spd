@@ -9,6 +9,10 @@ datatype FailableInt (int) // useful when you want most numbers, even negatives,
 		return self != fail
 
 
+function message.ThgDecl (|SCDecl?|)
+	if .func == @thg
+		return .fastdecl
+
 function message.ASMDecl (|SCDecl!|)
 	opt norefcounts
 	rz = .fastdecl

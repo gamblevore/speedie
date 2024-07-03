@@ -11,12 +11,13 @@ class µForm
 	|int|			Index
 	
 	flags
-		Jump			= 32
-		Num				= 64
-		Signed			= 128
-//		Remainder		= 256
-		NoExpect		= 256
-		PositionBits	= 512  // no space left...
+		(32)		// starting point
+		Jump
+		Num
+		Signed
+		NoExpect
+		PositionBits
+		Output
 	
 	
 	render
@@ -30,18 +31,18 @@ class µForm
 		.name = tmp.name
 		for i in 6
 			.params[i] = 0
-		if tmp
-			for line in tmp.last(@arg)
-				|| f = line.needfirst
-				.loadparam(f.name, f)
-		  else
-			for param in data
-				.loadparam( string.byte(param), nil )
+		for line in tmp.last(@arg)
+			|| f = line.needfirst
+			.loadparam(f.name, f, line.IsLast)
+//		  else
+//			debugat // remove this? I think we don't do this anymore.
+//			for param in data
+//				.loadparam( string.byte(param), nil )
 		
 		.index = ++µform.count
 
 
-	function AddP (|int| Size, |µParam| P)
+	function AddP (|int| Size, |µParam| P=0)
 		if size <= 0 or size > 32 // hmm??
 		|| i = .count++
 		.totalbits += size
@@ -70,7 +71,7 @@ class µForm
 	function AddRemainder (|int| U)
 		.addp( 32 - .TotalBits, µform.num ||| U)
 	
-	function LoadParam (|string| pl, |message| place)
+	function LoadParam (|string| pl, |message| place, |bool| IsLast)
 		if (pl.isint)
 			|| i = pl.int
 			check (i > 0 and i <= 24) (place, "Number out of range (1-24)")
@@ -79,11 +80,13 @@ class µForm
 		expect (pl == 1) (self)
 		|| p = pl[]
 		if  p == 'r'
-			.addp(5, 0)
-		  elseif p == 'x'
-			.addp(32, 0)
+			.AddP(5)
+		  elseif p == 'R'
+			.AddP(5, µform.Output)
+		  elseif p == 'x' // for 64/96/128 sized instructions
+			.AddP(32)
 		  elseif p == 'n'
-			.addp(5, µform.num)
+			.AddP(5, µform.num)
 		  elseif p == 'l'
 			.addremainder(0)
 		  elseif p == 'L'
@@ -103,6 +106,9 @@ class µForm
 	module
 		|dictionary of µForm|				Forms = dictionary()
 		|int| Count
-		function Needform (|string| Form, |µform|)
+		function NeedForm (|string| Form, |µform|)
 			opt norefcounts
-			return forms.valuelower(form) init µform(form, nil)
+			rz = forms.valuelower(form)
+			if !rz
+				error "Missing form: " + form
+				rz = µform(form, nil)

@@ -4,81 +4,94 @@
 // vm.box
 forms
 	U0:
-	U1:		r1 r
-	U2:		r1 r,  r2 r
-	U3:		r1 r,  r2 r,  r3 r
-	U4:		r1 r,  r2 r,  r3 r,  r4 r
+	U1:		r1 R
+	U2:		r1 R,  r2 r
+	U3:		r1 R,  r2 r,  r3 r
+	U4:		r1 R,  r2 r,  r3 r,  r4 r
 
 
 	Func	// func: fnc:
-		SaveRegs	5
-		JUMP		j
-		Prm1		x
-		Prm2		x
+		SaveRegs 5 // should this be R?
+		JUMP	j
+		Prm1	x
+		Prm2	x
 	
 	Tail
-		JUMP		j
-		Prm1		x
+		JUMP	j
+		Prm1	x
 	
 	Cmp		// cmp:
-		r1		r
+		r1		R
 		r2		r
 		Cmp		4
-
-	CmpD	// cmpd:
-		r1		r
-		r2		r
-		r3		r
 	
-	CmpEq	// cmpeq:
+	Const	// const:
+		r1		R
+		Rot		6
+		Inv		1
+		Value	12
+
+	JCmpEq	// cmpeq:
 		r1		r
 		r2		r
 		Jmp		j
 
-	Const	// const:
+	JCmp	// cmp:
 		r1		r
-		Rot		6
-		Inv		1
-		Value	12
+		r2		r
+		Cmp		4
 
 	Bra		// bra:
 		r1		r
 		c1		2
 		jmp		j
 	
-	Mem		// mem:
-		r1		r	// dest
+	Read			// mem:
+		r1		R	// dest
 		r2		r	// Base
 		r3		r	// VarAdd
 		L		7	// Const A
 		move	2
+
+	Write		// mem:
+		r1		r	// Src
+		r2		r	// Base
+		r3		r	// VarAdd
+		L		7	// Const A
+		move	2
+	
+	MemUtil
+		r1		R
+		r2		r
+		Op		3
+		N		l
 		
 		
 	CNTC
-		r1		r
-		r2		r
+		r1		R
+		r2		R
 		offset	5
 		cnst	7
 		size	2 // 1, 2, 4, 8
 		// *p1[offset] += cnst
 	
 	BFLD
-		r1		r
+		r1		R
 		r2		r
 		up		6
 		down	6
 		sign	1
 	
-	BCmp	// bcmp:
+	CmpB	// cmpb:
 		r1		r
 		r2		r
 		r3		r
 		Shift	6
 		Inv		3
 
-	BClear	// bcmp:
-		r1		r
-		r2		r
+	BClear
+		r1		R
+		r2		R
 		Shift1	6
 		Shift2	6
 		Sign	2
@@ -90,8 +103,8 @@ forms
 		Exists	1
 	
 	Div
-		r1		r
-		r2		r
+		r1		R
+		r2		R
 		r3		r
 		r4		r
 		Kind	2
@@ -101,19 +114,23 @@ forms
 		Continue 1		// trap or halt
 		Mode	 2		// 1 = trap on function-count,  2 = trap-always
 
-	Float:		r1 r,  r2 r,  r3 r,  r4 r,  D  1
+	Float
+		r1		R
+		r2		r
+		r3		r
+		r4		r
+		D		1
 
 	FloatConst
-		r1		r
+		r1		R
 		r2		r
 		High	14
 
 
-// Can (should?) we reduce this down to 5 values?
-// I could merge cond/inv. 		// as for floataddexp... perhaps merge shifts?
-
 	FloatAddExp
-		r1		r
+// Can (should?) we reduce this down to 5 lines?
+// I could merge cond/inv. 		// as for floataddexp... perhaps merge shifts?
+		r1		R
 		r2		r
 		r3		r
 		Sh2		4
@@ -121,12 +138,40 @@ forms
 		D		1
 	
 	ConstStretchy
-		r1		r
+		r1		R
 		Cond	1	// 0 == always, 1 = only if dest == 0
 		Inv		1
 		Value	16
 		Prm1	x
 		Prm2	x
+		
+	AddK
+		r1		R
+		r2		r
+		K		l
+	
+	Shift
+		r1		R
+		r2		r
+		r3		r
+		Sh		l
+	
+	Loop
+		r1		r
+		r2		r
+		Jump	j
+	
+	Swap
+		r1		R
+		r2		R
+		r3		R
+		r4		R
+
+	RefSet
+		r1		R
+		r2		r
+		r3		R
+		r4		r
 
 
 // this file:
@@ -181,7 +226,7 @@ forms
 
 #!						 (((((Utils)))))
 
-/**/ SWAP ("rrrr")
+/**/ SWAP (Swap)
 		std_swap(r[n1], r[n2])
 		std_swap(r[n3], r[n4])
 
@@ -204,9 +249,9 @@ forms
 
 
 #!						 (((((Math)))))
-/**/ ADDK ("rrl")
+/**/ ADDK (AddK)
 		i1 = i2 + U2_Li
-/**/ ADPK ("rrnl")
+/**/ ADPK (AddK)
 		i1 = i2
 		i2 = i2 + U2_Li
 /**/ ADD  (U3)
@@ -221,13 +266,13 @@ forms
 
 
 #!						 (((((Bitops)))))
-/**/ BRUS  ("rrrn")
+/**/ BRUS  (Shift)
 		i1 = (i2 >> i3+U3_Lu)
-/**/ BRUU  ("rrrn")
+/**/ BRUU  (Shift)
 		u1 = (u2 >> u3+U3_Lu)
-/**/ BLUE  (U3) 
+/**/ BLUE  (Shift) 
 		u1 = (u2 << u3+U3_Lu)
-/**/ BAND  (U3)
+/**/ BAND  (Shift)
 		u1 = u2 &  (u3|||L3)
 /**/ BOAR  (U4) // maybe << k is better? idk that bfls is very useful...
 		u1  = (u2|||u3)&~u4
@@ -255,7 +300,7 @@ forms
 
 
 #!						 (((((MiniCompare)))))
-/**/ BCMP  (BCmp)
+/**/ CMPB  (CmpB)
 		u1 = BitComp(r, Op)
 
 /**/ TERN  (U4)
@@ -277,19 +322,19 @@ forms
 /**/ JUMP (U0)
 		Code += l0
 
-/**/ JMPI  (Cmp)
+/**/ JMPI  (JCmp)
 		__
 		Code = JompI(r, Op, Code)
 		___
-/**/ JMPF  (Cmp)
+/**/ JMPF  (JCmp)
 		__
 		Code = JompF(r, Op, Code)
 		___
-/**/ JMPE  (CmpEq)
+/**/ JMPE  (JCmpEq)
 		__
 		Code = CompEq(r, Op, Code)
 		___
-/**/ JMPN  (CmpEq)
+/**/ JMPN  (JCmpEq)
 		__
 		Code = CompNeq(r, Op, Code)
 		___
@@ -307,13 +352,13 @@ forms
 		___
 		i1 += Bra_c1u-1
 
-/**/ LUPD  ("rrj")			 	// same
+/**/ LUPD  (Loop)			 	// same
 		__
 		if (i1-- > i2)
 			Code -= U2_Lu
 		___
 
-/**/ LUPU  ("rrj")				// assume uint64
+/**/ LUPU  (Loop)				// assume uint64
 		__
 		if (i1++ < i2)
 			Code -= U2_Lu
@@ -322,18 +367,21 @@ forms
 
 
 #!						 (((((Refs)))))
-/**/ RSDE  ("rrrj")
-		__
-		Code += U3_Li
-		___
-		decr(o3)
-		decr(o2)
-		safedecr(o1)
-		#!jump too? for branches...
+///**/ RSDE  (`rrrj`) // do this later... too much work for now.
+//		__
+//		Code += U3_Li
+//		___
+//		decr(o3)
+//		decr(o2)
+//		safedecr(o1)
+//		#!jump too? for branches...
 
-/**/ RSET  (U4) // we need some way to also refcount objs in memory! not just in registers
+/**/ RSET  (refset)
 		setref(n1, o1, o2)
 		setref(n3, o3, o4)
+/**/ RMEM  (U4)		// we need some way to also refcount objs in memory! not just in registers
+		0
+//		setref(n1, o1, o2)
 
 /**/ RALO  (U2)
 		o1 = alloc(o2)
@@ -344,44 +392,44 @@ forms
 #!						(((((Memory)))))
 /**/ TABL  (U2)
 		u1 = table(n2)
-/**/ RD1U  (mem)
+/**/ RD1U  (Read)
 		u1 = mem(uint8)
 		mem2(uint8)
-/**/ RD1S  (mem)
+/**/ RD1S  (Read)
 		u1 = mem(char)
 		mem2(char)
-/**/ RD2U  (mem)
+/**/ RD2U  (Read)
 		u1 = mem(u16)
 		mem2(u16)
-/**/ RD2S  (mem)
+/**/ RD2S  (Read)
 		u1 = mem(s16)
 		mem2(s16)
-/**/ RD4U  (mem)
+/**/ RD4U  (Read)
 		u1 = mem(u32)
 		mem2(u32)
-/**/ RD4S  (mem)
+/**/ RD4S  (Read)
 		u1 = mem(int)
 		mem2(int)
-/**/ RD8U  (mem)
+/**/ RD8U  (Read)
 		u1 = mem(u64)
 		mem2(u64)
-/**/ RD16  (mem)
+/**/ RD16  (Read)
 		((ivec4*)r)[n1] = mem(ivec4)
 		mem2(ivec4)
-/**/ WR1U  (mem)
+/**/ WR1U  (Write)
 		mem(uint8) = u1
 		mem2(uint8)
-/**/ WR2U  (mem)
+/**/ WR2U  (Write)
 		mem(u16) = u1
 		mem2(u16)
-/**/ WR4U  (mem)
+/**/ WR4U  (Write)
 		#! xcode only complains about this one? ?
 		mem(u32) = (u32)u1
 		mem2(u32)
-/**/ WR8U  (mem)
+/**/ WR8U  (Write)
 		mem(u64) = u1
 		mem2(u64)
-/**/ WR16  (mem)
+/**/ WR16  (Write)
 		mem(ivec4) = (ivec4)(((ivec4*)r)[n1])
 		mem2(ivec4)
 
@@ -391,7 +439,7 @@ forms
 /**/ CNTD  (CNTC)
 		CountConst(r, Op, 0)
 
-/**/ MEMM  ("rrnl")
+/**/ MEMU  (MemUtil)
 		#! copy/fill/endian/xor
 		MemStuff((u32*)u1, (u32*)u2, n3, L3)
 
