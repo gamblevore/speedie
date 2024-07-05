@@ -232,7 +232,7 @@ struct MessagePosition
 		parser.using = self[0]
 	    .Layer.use 
 	
-	function CopyFrom (|&MessagePosition| x)
+	function CopyFrom (|MessagePosition| x)
 		self[0] = x[0]
 	
 	function SyntaxUsingComplete (|object| idk=nil)

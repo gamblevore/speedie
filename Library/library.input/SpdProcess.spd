@@ -13,7 +13,7 @@ class SpdProcess (Process)
 	|bool|						AlreadyWarnedDied
 	|ProcessMode|				Mode
 
-	constructor	(|string| path, |?SpdMainFn| fn, |&pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.AutoPrintErrors)
+	constructor	(|string| path, |?SpdMainFn| fn, |pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.AutoPrintErrors)
 		super.constructor(path) // <-- mode should be passed here
 		
 		.deathlimit = 12
@@ -127,7 +127,7 @@ class SpdProcess (Process)
 		.pico!.close(Why)
 
 
-	helper StartProcess (|string| path, |[string]| Args=nil, |&pico| C = nil, |bool| CaptureStdOut, |bool|)
+	helper StartProcess (|string| path, |[string]| Args=nil, |pico| C = nil, |bool| CaptureStdOut, |bool|)
 		cpp_Wrapper JB_Sh_StartProcess
 
 	

@@ -66,7 +66,7 @@ struct Pico
 	function Send (|?&char| msg, |int| Length, |bool| Wait=false, |bool|)
 		cpp_wrapper PicoSend
 
-	function Send (|&picomessage| A, |bool| Wait=false, |bool|)
+	function Send (|picomessage| A, |bool| Wait=false, |bool|)
 		cpp_Part SendMsg
 		return .send(A.data, a.length, wait)
 		

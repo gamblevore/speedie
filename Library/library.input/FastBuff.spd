@@ -15,7 +15,7 @@ struct FastBuff
 	function TmpStr (|string|)
 		return string.FromPtr(.Start, .Length)
 	
-	function Divide (|&fastbuff| buff, |int| length)
+	function Divide (|fastbuff| buff, |int| length)
 		length = length min .Remaining
 		require length > 0
 		|| c = .curr

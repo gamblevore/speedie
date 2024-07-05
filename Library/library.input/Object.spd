@@ -37,7 +37,7 @@ class Object
 		cpp_wrapper JB_ObjDestroy
 
 
-	operator isa (|&ClassData| cls, |bool|)
+	operator isa (|ClassData| cls, |bool|)
 		cpp_part Isa
 		if (self)
 			|| P = .Class
@@ -47,36 +47,36 @@ class Object
 				P = P.Parent
 	
 	
-	operator MustBe (|&ClassData| x, |bool|)  // perhaps mustbe should just be isa.
+	operator MustBe (|ClassData| x, |bool|)  // perhaps mustbe should just be isa.
 		nil checker
 		return self.mustbe(x)
 	
-	helper MustBe (|&ClassData| x, |Message|ErrNode=nil, |bool|)
+	helper MustBe (|ClassData| x, |Message|ErrNode=nil, |bool|)
 		nil checker
 		if self isa x
 			return true
 		if self
 			.TypeFailed(x, errnode)
 
-	operator fast_isa (|&ClassData| x, |bool|)
+	operator fast_isa (|ClassData| x, |bool|)
 		cpp_part FastIsa
 		return (self) and (.Class == x)
 
-	operator as (|&ClassData| x, |object|)
+	operator as (|ClassData| x, |object|)
 		cpp_name JB_Object_As
 		if self isa x
 			return self
 		if self
 			return .TypeFailed(x, nil)
 		
-	operator fast_as (|&ClassData| x, |object|)
+	operator fast_as (|ClassData| x, |object|)
 		cpp_part FastAs
 		if self
 			if .class == x
 				return self
 			return .TypeFailed(x, nil)
 	
-	helper TypeFailed (|&ClassData| Cls, |message?| where,  |object|)
+	helper TypeFailed (|ClassData| Cls, |message?| where,  |object|)
 		|| name = .Class.name.str
 		error (where, name + " (object) is not a: " + cls.name )
 		platform.log "TypeFail"
@@ -132,7 +132,7 @@ struct ClassData
 	|int|					Size
 	|&&nil|					SpdTable
 	
-	function Init (|&MemoryWorld| World, |int| Size)
+	function Init (|MemoryWorld| World, |int| Size)
 		// don't call this... unless you create one yourself.
 		cpp_wrapper JB_Class_Init
 	
@@ -185,10 +185,10 @@ cpp_nothing JB_Ternary				(|Object| Obj,			|int|) // weird, only 1 param?
 cpp_nothing JB_Swap					(|Object| A,			|Object| B)
 cpp_wrapper JB_Delete				(|object| Obj)
 cpp_wrapper JB_Str3					(|Object| Data,			|int| N, |string|)
-cpp_nothing JB_New					(|&ClassData|  Class,	|Object|)
-cpp_nothing JB_NewClass				(|&ClassData|  Class,	|Object|)
-cpp_nothing JB_LayerNew				(|MemoryLayer| L,		|&ClassData| Class, |Object|)
-cpp_nothing JB_LayerNewClass		(|MemoryLayer| L,		|&ClassData| Class, |Object|)
+cpp_nothing JB_New					(|ClassData|  Class,	|Object|)
+cpp_nothing JB_NewClass				(|ClassData|  Class,	|Object|)
+cpp_nothing JB_LayerNew				(|MemoryLayer| L,		|ClassData| Class, |Object|)
+cpp_nothing JB_LayerNewClass		(|MemoryLayer| L,		|ClassData| Class, |Object|)
 
 
 
