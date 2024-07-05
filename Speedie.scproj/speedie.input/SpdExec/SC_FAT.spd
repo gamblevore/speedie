@@ -109,7 +109,7 @@ struct FatASM
 														// if y
 														//     x = 2
 	
-	function Dest (|int| a, assigns:|asmreg| info)
+	function Dest (|int| a, |asmreg| info, |bool|)
 		|| dest = info.reg
 		.r[a] = dest
 		if dest
@@ -118,6 +118,7 @@ struct FatASM
 			oldwhere[0] = self
 			if oldreg
 				.linkin(oldreg)
+			return true
 	
 	
 	function File (|string|)

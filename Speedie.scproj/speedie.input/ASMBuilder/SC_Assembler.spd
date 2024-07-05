@@ -62,7 +62,7 @@ module SpdAssembler
 
 	function Guard
 		opt norefcounts
-		ASMState.sh.AddASM(ASM.EROR, compiler.InternalFile.ast!)
+		(compiler.InternalFile.ast!).EROR(asmreg())
 	
 	
 	function VacGenerate (|scfunction| fn, |bool|)

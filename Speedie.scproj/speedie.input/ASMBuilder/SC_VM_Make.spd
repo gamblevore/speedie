@@ -78,21 +78,21 @@ function DataTypeModule
 
 function AddForm (|message| form, |µform|)
 	opt norefcounts 
-	rz = µform("", form)
+	rz = µform(form)
 	µform.forms.ValueLower(form.name) = rz 
 
 
-function string.ASMNormalise (|string|)
-	|| n = 0
-	for c in self
-		c = c.lowercase
-		if c == 'r' or 'n' or 'R'
-			n++
-		  elseif c == 'l' or 's' or 'j'
-			0
-		  else
-			return self
-	return "U" + ('0' + n)
+//function string.ASMNormalise (|string|)
+//	|| n = 0
+//	for c in self
+//		c = c.lowercase
+//		if c == 'r' or 'n' or 'R'
+//			n++
+//		  elseif c == 'l' or 's' or 'j'
+//			0
+//		  else
+//			return self
+//	return "U" + ('0' + n)
 
 
 function DataTypeCreate (|message| form,  |int| fnum,  |message|)
@@ -303,25 +303,44 @@ function VMDecl (|message| tmp, |[message]?| ActuallyMakeTheVM)
 		counts = counts.next #loop
 
 
+helper message.VMMsgArgName (|int| i, |string|)
+	if self
+		return .name
+	return string.byte('a' + i)
+
 
 function MakeMsgCreator (|string| name, |µform| form)
+	opt norefcounts
 	|| fn = icecream.run(@thg+name)
 	Compiler.ExtendList <~ fn
 	|| arg = fn.Last!
 	|| prm = arg.prev!
-	|| fatdecl = prm.last!
+	|| FatDecl = prm.last!
+	|| r = macro.TmpPrms_
+	r.Clear
+	r <~ (arg, 2)
+	|| f = form.src.first.first
 	
 	for (p in form) (i)
 		|| ty = ("asmreg", "int")(p.isreg)
-		|| pname = ('a' + i)|byte|.render
+		|| pname = f.VMMsgArgName(i)
 		|| dcl = NewDecl(ty, pname)
 		fatdecl.prev = dcl
-		|| r = [i.msg, @thg + pname]
+		r[0] = i.msg
+		r[1] = @thg + pname
 		arg <~ p.which.run(r)
+		f++
+	
+	r.Clear
+	
+	|| x = form.Outputs + 1
+	if x > 1
+		arg <~ ohio.run(@num+(x>>1))
+
 		
 
 function µparam.Which (|macro!--|)
-	if .isnumber
+	if self is number
 		return VM_Builder.legs
 	if self is output
 		return vm_builder.skibidy
@@ -329,15 +348,16 @@ function µparam.Which (|macro!--|)
 	
 
 || icecream = `function message._0 (|&fatasm|) {
-	pragma inline
 	visible
+	|| outputs = 0
 	rz = asmstate.sh.syntaxappend(asm._0, self)
 }`.macro
 
 
-|| legs = "rz.numinput(_0) = _1".macro
-|| arms = "rz.reginput(_0) = _1".macro
-|| skibidy = "rz.dest(_0) = _1".macro
+|| legs    = "rz.numinput(_0) = _1".macro
+|| arms    = "rz.reginput(_0) = _1".macro
+|| skibidy = "if rz.dest(_0, _1): outputs++".macro
+|| ohio    = "if outputs < _0: error (self, `No inputs given!`)".macro
 	
 	
 

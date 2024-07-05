@@ -54,6 +54,13 @@
 #define   Tail_JUMPu_(x)   (((uint)((x)<<8))>>8)
 
 
+#define   Jump_l0i       ((( int)((Op.Raw)<<8))>>8)
+#define   Jump_l0i_(x)   ((( int)((x)<<8))>>8)
+
+#define   Jump_l0u       (((uint)((Op.Raw)<<8))>>8)
+#define   Jump_l0u_(x)   (((uint)((x)<<8))>>8)
+
+
 #define   Cmp_Cmpi       ((( int)((Op.Raw)<<18))>>28)
 #define   Cmp_Cmpi_(x)   ((( int)((x)<<18))>>28)
 

@@ -54,9 +54,13 @@ extend ASMState
 				.AddASM(asm.CMPB, exp, dest, L, R, badness, Negate|int|)
 				r = dest
 				l = 0.asm
-			if !l.reg
-				return .AddASM(asm.JBRA • negate, exp, R, 1) * Dest
-			return .AddASM(asm.JMPE • Negate, exp, L, R) * Dest
+			|&fatasm| fat
+			if l.reg
+				fat = exp.JMPE(r,l,r)
+			  else
+				fat = exp.jbra(r,1,0)
+			fat.op+=negate
+			return fat * Dest
 
 		
 		if badness > 0
@@ -415,7 +419,7 @@ extend ASMState
 	// BITS
 	function BitNot (fn_opasm)
 		if r.reg // what?
-		|| fat = .AddASM(asm.BNOT, exp, dest, l)
+		|| fat = exp.BNOT(dest,l)//.AddASM(asm.BNOT, exp, dest, l)
 		if l is ConstAny
 			fat.const = ~l.const
 		return fat*Dest

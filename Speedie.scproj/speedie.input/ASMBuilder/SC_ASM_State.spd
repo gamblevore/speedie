@@ -122,20 +122,20 @@ struct ASMState
 		rz.r[1] = b
 		rz.r[2] = c
 
-	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |&FatASM|)
-		pragma inline,  opt norefcounts,  cpp_part AddASM2
-		rz = self <~ (sm, dbg)
-		rz.r[0] = a
-		rz.r[1] = b
+//	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |&FatASM|)
+//		pragma inline,  opt norefcounts,  cpp_part AddASM2
+//		rz = self <~ (sm, dbg)
+//		rz.r[0] = a
+//		rz.r[1] = b
 
-	function AddASM (|int| SM, |message| dbg, |int| a, |&FatASM|)
-		pragma inline,  opt norefcounts,  cpp_part AddASM1
-		rz = self <~ (sm, dbg)
-		rz.r[0] = a
-	
-	function AddASM (|int| SM, |message| dbg, |&FatASM|)
-		pragma inline,  opt norefcounts,  cpp_part AddASM0
-		return self <~ (sm, dbg)
+//	function AddASM (|int| SM, |message| dbg, |int| a, |&FatASM|)
+//		pragma inline,  opt norefcounts,  cpp_part AddASM1
+//		rz = self <~ (sm, dbg)
+//		rz.r[0] = a
+//	
+//	function AddASM (|int| SM, |message| dbg, |&FatASM|)
+//		pragma inline,  opt norefcounts,  cpp_part AddASM0
+//		return self <~ (sm, dbg)
 
 	syntax append (|int| code, |message| dbg, |&FatASM|)
 		cpp_part RequestOp

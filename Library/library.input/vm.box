@@ -20,6 +20,10 @@ forms
 		JUMP	j
 		Prm1	x
 	
+	Jump
+		l0		l
+		
+	
 	Cmp		// cmp:
 		r1		R
 		r2		r
@@ -319,7 +323,7 @@ forms
 
 
 #!						 (((((Branches)))))
-/**/ JUMP (U0)
+/**/ JUMP (jump)
 		Code += l0
 
 /**/ JMPI  (JCmp)

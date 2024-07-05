@@ -179,6 +179,8 @@ typedef ASM ASM_JCmp;
 
 typedef ASM ASM_JCmpEq;
 
+typedef ASM ASM_Jump;
+
 typedef ASM ASM_Loop;
 
 typedef ASM ASM_MemUtil;
@@ -1058,7 +1060,9 @@ JBClass ( xC2xB5Form , JB_Object ,
 	int Count;
 	ASMParam Params[6];
 	JB_String* Name;
+	Message* src;
 	int TotalBits;
+	int Outputs;
 	int Index;
 );
 
@@ -1637,6 +1641,7 @@ extern Macro* SC__VM_Builder_legs;
 extern Message* SC__VM_Builder_ModuleArg;
 extern Array* SC__VM_Builder_NameList;
 extern byte SC__VM_Builder_NormalPos;
+extern Macro* SC__VM_Builder_ohio;
 extern JB_String* SC__VM_Builder_parent;
 extern Macro* SC__VM_Builder_skibidy;
 extern int SC__VM_Builder_Total;
@@ -1836,10 +1841,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp 32784
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down (JB_LUB[2099])
-#define kJB__zalgo_mid (JB_LUB[2098])
+#define kJB__zalgo_down (JB_LUB[1436])
+#define kJB__zalgo_mid (JB_LUB[1028])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up (JB_LUB[2097])
+#define kJB__zalgo_up (JB_LUB[1027])
 #define kJB__byte_max 255
 #define kJB__byte_min (0)
 #define kJB__char_max 127
@@ -2298,7 +2303,7 @@ extern int JB__Syx_CurrFuncID_;
 #define kSC__TM_MOUSEMOTION 1024
 #define kSC__xC2xB5Param_Jump 32
 #define kSC__xC2xB5Param_NoExpect 256
-#define kSC__xC2xB5Param_Num 64
+#define kSC__xC2xB5Param_Number 64
 #define kSC__xC2xB5Param_Output 1024
 #define kSC__xC2xB5Param_PositionBits 512
 #define kSC__xC2xB5Param_Signed 128
@@ -4401,6 +4406,8 @@ ASM SC_ASM_JCmp_LSet(ASM Self, int Value);
 
 ASM SC_ASM_JCmpEq_JmpSet(ASM Self, int Value);
 
+ASM SC_ASM_Jump_l0Set(ASM Self, int Value);
+
 ASM SC_ASM_Loop_JumpSet(ASM Self, int Value);
 
 ASM SC_ASM_MemUtil_NSet(ASM Self, int Value);
@@ -4599,9 +4606,9 @@ bool SC_Reg_OperatorIsa(AsmReg Self, DataTypeCode M);
 
 AsmReg SC_Reg_OperatorxE2x80xA2(AsmReg Self, AsmReg Dest);
 
-ASM SC_Reg_Read(AsmReg Self, Message* M);
+FatASM* SC_Reg_ReadOrWriteWithMsgRegInt(AsmReg Self, Message* M, AsmReg Ptr, int Index);
 
-ASM SC_Reg_ReadOrWrite(AsmReg Self, Message* M);
+FatASM* SC_Reg_ReadOrWriteWithMsgRegIntBool(AsmReg Self, Message* M, AsmReg Ptr, int Index, bool DoRead);
 
 int SC_Reg_Reg(AsmReg Self);
 
@@ -4616,8 +4623,6 @@ AsmReg SC_Reg_SyntaxAppend(AsmReg Self, AsmReg M);
 bool SC_Reg_SyntaxIs(AsmReg Self, AsmReg R);
 
 AsmReg SC_Reg_SyntaxIsSet(AsmReg Self, AsmReg R, bool Value);
-
-ASM SC_Reg_Write(AsmReg Self, Message* M);
 
 DataTypeCode SC_Reg_xC2xB5Type(AsmReg Self);
 
@@ -4969,8 +4974,6 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, 
 // µParam
 int SC_xC2xB5Param_BitSize(ASMParam Self);
 
-bool SC_xC2xB5Param_IsNumber(ASMParam Self);
-
 bool SC_xC2xB5Param_IsReg(ASMParam Self);
 
 bool SC_xC2xB5Param_SyntaxIs(ASMParam Self, ASMParam P);
@@ -5056,6 +5059,11 @@ ASM JB_ASM_JCmp__Encode(FatASM* Self);
 
 // ASM_JCmpEq
 ASM JB_ASM_JCmpEq__Encode(FatASM* Self);
+
+
+
+// ASM_Jump
+ASM JB_ASM_Jump__Encode(FatASM* Self);
 
 
 
@@ -5493,7 +5501,7 @@ void SC_FatASM_dSet(FatASM* Self, uint Value);
 
 void SC_FatASM_DebugSet(FatASM* Self, Message* Value);
 
-void SC_FatASM_DestSet(FatASM* Self, int A, AsmReg Info);
+bool SC_FatASM_Dest(FatASM* Self, int A, AsmReg Info);
 
 ASM SC_FatASM_Encode(FatASM* Self);
 
@@ -7282,7 +7290,7 @@ void SC_xC2xB5Form_AddP(xC2xB5Form* Self, int Size, ASMParam P);
 
 void SC_xC2xB5Form_AddRemainder(xC2xB5Form* Self, int U);
 
-xC2xB5Form* SC_xC2xB5Form_Constructor(xC2xB5Form* Self, JB_String* Data, Message* Tmp);
+xC2xB5Form* SC_xC2xB5Form_Constructor(xC2xB5Form* Self, Message* Tmp);
 
 void SC_xC2xB5Form_Destructor(xC2xB5Form* Self);
 
@@ -8447,6 +8455,8 @@ bool SC_Msg_visible(Message* Self);
 void SC_Msg_visibleSet(Message* Self, bool Value);
 
 MaybeBool SC_Msg_visible2(Message* Self);
+
+JB_String* SC_Msg_VMMsgArgName(Message* Self, int I);
 
 Message* SC_Msg_LayerWipeCopy(Message* Self, Message* Oof);
 
@@ -9965,15 +9975,15 @@ inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
 
 inline NilRecord SC_nil__Value();
 
-inline FatASM* JB_Msg_FNCX(Message* Self, int A, int B, int C, int D);
+inline FatASM* JB_Msg_FNCX(Message* Self, int SaveRegs, int JUMP, int Prm1, int Prm2);
 
-inline FatASM* JB_Msg_FUNC(Message* Self, int A, int B, int C, int D);
+inline FatASM* JB_Msg_FUNC(Message* Self, int SaveRegs, int JUMP, int Prm1, int Prm2);
 
-inline FatASM* JB_Msg_JUMP(Message* Self);
+inline FatASM* JB_Msg_JUMP(Message* Self, int L0);
 
 inline FatASM* JB_Msg_NOOP(Message* Self);
 
-inline FatASM* JB_Msg_TAIL(Message* Self, int A, int B);
+inline FatASM* JB_Msg_TAIL(Message* Self, int JUMP, int Prm1);
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
 
@@ -9982,10 +9992,6 @@ inline bool SC_Decl_IsUnknownParam(SCDecl* Self);
 inline FatASM* SC_FatASM_Next(FatASM* Self);
 
 inline FatASM* SC_FatASM_Prev(FatASM* Self);
-
-inline FatASM* SC_Pac_AddASM0(ASMState* Self, int SM, Message* Dbg);
-
-inline FatASM* SC_Pac_AddASM2(ASMState* Self, int SM, Message* Dbg, int A, int B);
 
 inline FatASM* SC_Pac_AddASM3(ASMState* Self, int SM, Message* Dbg, int A, int B, int C);
 
@@ -10003,141 +10009,145 @@ inline int SC_Reg_ToInt(AsmReg Self);
 
 inline NilRecord SC_nil__EndBlock();
 
-inline FatASM* JB_Msg_CMPB(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E);
+inline FatASM* JB_Msg_CMPB(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Shift, int Inv);
 
-inline FatASM* JB_Msg_JBRA(Message* Self, AsmReg A, int B, int C);
+inline FatASM* JB_Msg_JBRA(Message* Self, AsmReg R1, int C1, int Jmp);
 
-inline FatASM* JB_Msg_JBRN(Message* Self, AsmReg A, int B, int C);
+inline FatASM* JB_Msg_JBRN(Message* Self, AsmReg R1, int C1, int Jmp);
 
-inline FatASM* JB_Msg_JMPE(Message* Self, AsmReg A, AsmReg B, int C);
+inline FatASM* JB_Msg_JMPE(Message* Self, AsmReg R1, AsmReg R2, int Jmp);
 
-inline FatASM* JB_Msg_JMPF(Message* Self, AsmReg A, AsmReg B, int C);
+inline FatASM* JB_Msg_JMPF(Message* Self, AsmReg R1, AsmReg R2, int Cmp);
 
-inline FatASM* JB_Msg_JMPI(Message* Self, AsmReg A, AsmReg B, int C);
+inline FatASM* JB_Msg_JMPI(Message* Self, AsmReg R1, AsmReg R2, int Cmp);
 
-inline FatASM* JB_Msg_JMPN(Message* Self, AsmReg A, AsmReg B, int C);
+inline FatASM* JB_Msg_JMPN(Message* Self, AsmReg R1, AsmReg R2, int Jmp);
 
-inline FatASM* JB_Msg_LUPD(Message* Self, AsmReg A, AsmReg B, int C);
+inline FatASM* JB_Msg_LUPD(Message* Self, AsmReg R1, AsmReg R2, int Jump);
 
-inline FatASM* JB_Msg_LUPU(Message* Self, AsmReg A, AsmReg B, int C);
+inline FatASM* JB_Msg_LUPU(Message* Self, AsmReg R1, AsmReg R2, int Jump);
 
-inline FatASM* JB_Msg_RET(Message* Self, AsmReg A, AsmReg B, int C, int D);
+inline FatASM* JB_Msg_RET(Message* Self, AsmReg R1, AsmReg R2, int Count, int Exists);
 
-inline FatASM* JB_Msg_TRAP(Message* Self, AsmReg A, int B, int C);
+inline FatASM* JB_Msg_TRAP(Message* Self, AsmReg R1, int Continue, int Mode);
 
-inline FatASM* JB_Msg_WR16(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E);
+inline FatASM* JB_Msg_WR16(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move);
 
-inline FatASM* JB_Msg_WR1U(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E);
+inline FatASM* JB_Msg_WR1U(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move);
 
-inline FatASM* JB_Msg_WR2U(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E);
+inline FatASM* JB_Msg_WR2U(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move);
 
-inline FatASM* JB_Msg_WR4U(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E);
+inline FatASM* JB_Msg_WR4U(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move);
 
-inline FatASM* JB_Msg_WR8U(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E);
+inline FatASM* JB_Msg_WR8U(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move);
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
 inline void SC_Reg_Expect(AsmReg Self, Message* Where);
 
-inline FatASM* JB_Msg_ADD(Message* Self, AsmReg A, AsmReg B, AsmReg C);
+inline FatASM* JB_Msg_ADD(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3);
 
-inline FatASM* JB_Msg_ADDK(Message* Self, AsmReg A, AsmReg B, int C);
+inline FatASM* JB_Msg_ADDK(Message* Self, AsmReg R1, AsmReg R2, int K);
 
-inline FatASM* JB_Msg_ADPK(Message* Self, AsmReg A, AsmReg B, int C);
+inline FatASM* JB_Msg_ADPK(Message* Self, AsmReg R1, AsmReg R2, int K);
 
-inline FatASM* JB_Msg_BAND(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D);
+inline FatASM* JB_Msg_BAND(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh);
 
-inline FatASM* JB_Msg_BCLR(Message* Self, AsmReg A, AsmReg B, int C, int D, int E);
+inline FatASM* JB_Msg_BCLR(Message* Self, AsmReg R1, AsmReg R2, int Shift1, int Shift2, int Sign);
 
-inline FatASM* JB_Msg_BFLG(Message* Self, AsmReg A, AsmReg B, int C, int D, int E);
+inline FatASM* JB_Msg_BFLG(Message* Self, AsmReg R1, AsmReg R2, int Up, int Down, int Sign);
 
-inline FatASM* JB_Msg_BFLS(Message* Self, AsmReg A, AsmReg B, int C, int D, int E);
+inline FatASM* JB_Msg_BFLS(Message* Self, AsmReg R1, AsmReg R2, int Up, int Down, int Sign);
 
-inline FatASM* JB_Msg_BLUE(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D);
+inline FatASM* JB_Msg_BLUE(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh);
 
-inline FatASM* JB_Msg_BNOT(Message* Self, AsmReg A, AsmReg B);
+inline FatASM* JB_Msg_BNOT(Message* Self, AsmReg R1, AsmReg R2);
 
-inline FatASM* JB_Msg_BOAR(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D);
+inline FatASM* JB_Msg_BOAR(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4);
 
-inline FatASM* JB_Msg_BROL(Message* Self, AsmReg A, AsmReg B, AsmReg C);
+inline FatASM* JB_Msg_BROL(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3);
 
-inline FatASM* JB_Msg_BROR(Message* Self, AsmReg A, AsmReg B, AsmReg C);
+inline FatASM* JB_Msg_BROR(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3);
 
-inline FatASM* JB_Msg_BRUS(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D);
+inline FatASM* JB_Msg_BRUS(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh);
 
-inline FatASM* JB_Msg_BRUU(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D);
+inline FatASM* JB_Msg_BRUU(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh);
 
-inline FatASM* JB_Msg_BXOR(Message* Self, AsmReg A, AsmReg B, AsmReg C);
+inline FatASM* JB_Msg_BXOR(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3);
 
-inline FatASM* JB_Msg_CMPF(Message* Self, AsmReg A, AsmReg B, int C);
+inline FatASM* JB_Msg_CMPF(Message* Self, AsmReg R1, AsmReg R2, int Cmp);
 
-inline FatASM* JB_Msg_CMPI(Message* Self, AsmReg A, AsmReg B, int C);
+inline FatASM* JB_Msg_CMPI(Message* Self, AsmReg R1, AsmReg R2, int Cmp);
 
-inline FatASM* JB_Msg_CNTC(Message* Self, AsmReg A, AsmReg B, int C, int D, int E);
+inline FatASM* JB_Msg_CNTC(Message* Self, AsmReg R1, AsmReg R2, int Offset, int Cnst, int Size);
 
-inline FatASM* JB_Msg_CNTD(Message* Self, AsmReg A, AsmReg B, int C, int D, int E);
+inline FatASM* JB_Msg_CNTD(Message* Self, AsmReg R1, AsmReg R2, int Offset, int Cnst, int Size);
 
-inline FatASM* JB_Msg_CONV(Message* Self, AsmReg A, AsmReg B, AsmReg C);
+inline FatASM* JB_Msg_CONV(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3);
 
-inline FatASM* JB_Msg_DIVV(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D, int E);
+inline FatASM* JB_Msg_DIVV(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4, int Kind);
 
-inline FatASM* JB_Msg_EROR(Message* Self, AsmReg A);
+inline FatASM* JB_Msg_EROR(Message* Self, AsmReg R1);
 
-inline FatASM* JB_Msg_FADD(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D, int E);
+inline FatASM* JB_Msg_FADD(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4, int D);
 
-inline FatASM* JB_Msg_FADK(Message* Self, AsmReg A, AsmReg B, int C);
+inline FatASM* JB_Msg_FADK(Message* Self, AsmReg R1, AsmReg R2, int High);
 
-inline FatASM* JB_Msg_FDIV(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D, int E);
+inline FatASM* JB_Msg_FDIV(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4, int D);
 
-inline FatASM* JB_Msg_FEXK(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E, int F);
+inline FatASM* JB_Msg_FEXK(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh2, int Sh3, int D);
 
-inline FatASM* JB_Msg_FFRC(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D, int E);
+inline FatASM* JB_Msg_FFRC(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4, int D);
 
-inline FatASM* JB_Msg_FMLK(Message* Self, AsmReg A, AsmReg B, int C);
+inline FatASM* JB_Msg_FMLK(Message* Self, AsmReg R1, AsmReg R2, int High);
 
-inline FatASM* JB_Msg_FMUL(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D, int E);
+inline FatASM* JB_Msg_FMUL(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4, int D);
 
-inline FatASM* JB_Msg_KNST(Message* Self, AsmReg A, int B, int C, int D, int E, int F);
+inline FatASM* JB_Msg_KNST(Message* Self, AsmReg R1, int Cond, int Inv, int Value, int Prm1, int Prm2);
 
-inline FatASM* JB_Msg_KSTR(Message* Self, AsmReg A, int B, int C, int D);
+inline FatASM* JB_Msg_KSTR(Message* Self, AsmReg R1, int Rot, int Inv, int Value);
 
-inline FatASM* JB_Msg_MEMU(Message* Self, AsmReg A, AsmReg B, int C, int D);
+inline FatASM* JB_Msg_MEMU(Message* Self, AsmReg R1, AsmReg R2, int Op, int N);
 
-inline FatASM* JB_Msg_MULT(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D);
+inline FatASM* JB_Msg_MULT(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4);
 
-inline FatASM* JB_Msg_PRNT(Message* Self, AsmReg A);
+inline FatASM* JB_Msg_PRNT(Message* Self, AsmReg R1);
 
-inline FatASM* JB_Msg_RALO(Message* Self, AsmReg A, AsmReg B);
+inline FatASM* JB_Msg_RALO(Message* Self, AsmReg R1, AsmReg R2);
 
-inline FatASM* JB_Msg_RARE(Message* Self, AsmReg A, AsmReg B);
+inline FatASM* JB_Msg_RARE(Message* Self, AsmReg R1, AsmReg R2);
 
-inline FatASM* JB_Msg_RD16(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E);
+inline FatASM* JB_Msg_RD16(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move);
 
-inline FatASM* JB_Msg_RD1S(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E);
+inline FatASM* JB_Msg_RD1S(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move);
 
-inline FatASM* JB_Msg_RD1U(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E);
+inline FatASM* JB_Msg_RD1U(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move);
 
-inline FatASM* JB_Msg_RD2S(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E);
+inline FatASM* JB_Msg_RD2S(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move);
 
-inline FatASM* JB_Msg_RD2U(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E);
+inline FatASM* JB_Msg_RD2U(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move);
 
-inline FatASM* JB_Msg_RD4S(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E);
+inline FatASM* JB_Msg_RD4S(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move);
 
-inline FatASM* JB_Msg_RD4U(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E);
+inline FatASM* JB_Msg_RD4U(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move);
 
-inline FatASM* JB_Msg_RD8U(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E);
+inline FatASM* JB_Msg_RD8U(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move);
 
-inline FatASM* JB_Msg_RMEM(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D);
+inline FatASM* JB_Msg_RMEM(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4);
 
-inline FatASM* JB_Msg_RSET(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D);
+inline FatASM* JB_Msg_RSET(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4);
 
-inline FatASM* JB_Msg_SUBB(Message* Self, AsmReg A, AsmReg B, AsmReg C);
+inline FatASM* JB_Msg_SUBB(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3);
 
-inline FatASM* JB_Msg_SWAP(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D);
+inline FatASM* JB_Msg_SWAP(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4);
 
-inline FatASM* JB_Msg_TABL(Message* Self, AsmReg A, AsmReg B);
+inline FatASM* JB_Msg_TABL(Message* Self, AsmReg R1, AsmReg R2);
 
-inline FatASM* JB_Msg_TERN(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D);
+inline FatASM* JB_Msg_TERN(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4);
+
+inline FatASM* SC_Reg_Read(AsmReg Self, Message* M, AsmReg Ptr, int Index);
+
+inline FatASM* SC_Reg_Write(AsmReg Self, Message* M, AsmReg Ptr, int Index);
 
 inline SCDecl* SC_TypeOfSwiz(Message* Exp, SCNode* Name_space, Message* Side, SCDecl* class_Space);
 
@@ -10333,48 +10343,54 @@ inline NilRecord SC_nil__Value() {
 	return SC_nil_Value((&SC__nil_T));
 }
 
-inline FatASM* JB_Msg_FNCX(Message* Self, int A, int B, int C, int D) {
+inline FatASM* JB_Msg_FNCX(Message* Self, int SaveRegs, int JUMP, int Prm1, int Prm2) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_FNCX, Self);
-	(SC_FatASM_NumInputSet(Rz, 0, A));
-	(SC_FatASM_NumInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
+	(SC_FatASM_NumInputSet(Rz, 0, SaveRegs));
+	(SC_FatASM_NumInputSet(Rz, 1, JUMP));
+	(SC_FatASM_NumInputSet(Rz, 2, Prm1));
+	(SC_FatASM_NumInputSet(Rz, 3, Prm2));
 	return Rz;
 }
 
-inline FatASM* JB_Msg_FUNC(Message* Self, int A, int B, int C, int D) {
+inline FatASM* JB_Msg_FUNC(Message* Self, int SaveRegs, int JUMP, int Prm1, int Prm2) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_FUNC, Self);
-	(SC_FatASM_NumInputSet(Rz, 0, A));
-	(SC_FatASM_NumInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
+	(SC_FatASM_NumInputSet(Rz, 0, SaveRegs));
+	(SC_FatASM_NumInputSet(Rz, 1, JUMP));
+	(SC_FatASM_NumInputSet(Rz, 2, Prm1));
+	(SC_FatASM_NumInputSet(Rz, 3, Prm2));
 	return Rz;
 }
 
-inline FatASM* JB_Msg_JUMP(Message* Self) {
+inline FatASM* JB_Msg_JUMP(Message* Self, int L0) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_JUMP, Self);
+	(SC_FatASM_NumInputSet(Rz, 0, L0));
 	return Rz;
 }
 
 inline FatASM* JB_Msg_NOOP(Message* Self) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_NOOP, Self);
 	return Rz;
 }
 
-inline FatASM* JB_Msg_TAIL(Message* Self, int A, int B) {
+inline FatASM* JB_Msg_TAIL(Message* Self, int JUMP, int Prm1) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_TAIL, Self);
-	(SC_FatASM_NumInputSet(Rz, 0, A));
-	(SC_FatASM_NumInputSet(Rz, 1, B));
+	(SC_FatASM_NumInputSet(Rz, 0, JUMP));
+	(SC_FatASM_NumInputSet(Rz, 1, Prm1));
 	return Rz;
 }
 
@@ -10392,18 +10408,6 @@ inline FatASM* SC_FatASM_Next(FatASM* Self) {
 
 inline FatASM* SC_FatASM_Prev(FatASM* Self) {
 	return SC_FatASM_Step(Self, -1);
-}
-
-inline FatASM* SC_Pac_AddASM0(ASMState* Self, int SM, Message* Dbg) {
-	return SC_Pac_RequestOp(Self, SM, Dbg);
-}
-
-inline FatASM* SC_Pac_AddASM2(ASMState* Self, int SM, Message* Dbg, int A, int B) {
-	FatASM* Rz = nil;
-	Rz = SC_Pac_RequestOp(Self, SM, Dbg);
-	Rz->R[0] = A;
-	Rz->R[1] = B;
-	return Rz;
 }
 
 inline FatASM* SC_Pac_AddASM3(ASMState* Self, int SM, Message* Dbg, int A, int B, int C) {
@@ -10473,176 +10477,192 @@ inline NilRecord SC_nil__EndBlock() {
 	return Rz;
 }
 
-inline FatASM* JB_Msg_CMPB(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E) {
+inline FatASM* JB_Msg_CMPB(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Shift, int Inv) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_CMPB, Self);
-	(SC_FatASM_RegInputSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	(SC_FatASM_RegInputSet(Rz, 0, R1));
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_NumInputSet(Rz, 3, Shift));
+	(SC_FatASM_NumInputSet(Rz, 4, Inv));
 	return Rz;
 }
 
-inline FatASM* JB_Msg_JBRA(Message* Self, AsmReg A, int B, int C) {
+inline FatASM* JB_Msg_JBRA(Message* Self, AsmReg R1, int C1, int Jmp) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_JBRA, Self);
-	(SC_FatASM_RegInputSet(Rz, 0, A));
-	(SC_FatASM_NumInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
+	(SC_FatASM_RegInputSet(Rz, 0, R1));
+	(SC_FatASM_NumInputSet(Rz, 1, C1));
+	(SC_FatASM_NumInputSet(Rz, 2, Jmp));
 	return Rz;
 }
 
-inline FatASM* JB_Msg_JBRN(Message* Self, AsmReg A, int B, int C) {
+inline FatASM* JB_Msg_JBRN(Message* Self, AsmReg R1, int C1, int Jmp) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_JBRN, Self);
-	(SC_FatASM_RegInputSet(Rz, 0, A));
-	(SC_FatASM_NumInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
+	(SC_FatASM_RegInputSet(Rz, 0, R1));
+	(SC_FatASM_NumInputSet(Rz, 1, C1));
+	(SC_FatASM_NumInputSet(Rz, 2, Jmp));
 	return Rz;
 }
 
-inline FatASM* JB_Msg_JMPE(Message* Self, AsmReg A, AsmReg B, int C) {
+inline FatASM* JB_Msg_JMPE(Message* Self, AsmReg R1, AsmReg R2, int Jmp) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_JMPE, Self);
-	(SC_FatASM_RegInputSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
+	(SC_FatASM_RegInputSet(Rz, 0, R1));
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_NumInputSet(Rz, 2, Jmp));
 	return Rz;
 }
 
-inline FatASM* JB_Msg_JMPF(Message* Self, AsmReg A, AsmReg B, int C) {
+inline FatASM* JB_Msg_JMPF(Message* Self, AsmReg R1, AsmReg R2, int Cmp) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_JMPF, Self);
-	(SC_FatASM_RegInputSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
+	(SC_FatASM_RegInputSet(Rz, 0, R1));
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_NumInputSet(Rz, 2, Cmp));
 	return Rz;
 }
 
-inline FatASM* JB_Msg_JMPI(Message* Self, AsmReg A, AsmReg B, int C) {
+inline FatASM* JB_Msg_JMPI(Message* Self, AsmReg R1, AsmReg R2, int Cmp) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_JMPI, Self);
-	(SC_FatASM_RegInputSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
+	(SC_FatASM_RegInputSet(Rz, 0, R1));
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_NumInputSet(Rz, 2, Cmp));
 	return Rz;
 }
 
-inline FatASM* JB_Msg_JMPN(Message* Self, AsmReg A, AsmReg B, int C) {
+inline FatASM* JB_Msg_JMPN(Message* Self, AsmReg R1, AsmReg R2, int Jmp) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_JMPN, Self);
-	(SC_FatASM_RegInputSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
+	(SC_FatASM_RegInputSet(Rz, 0, R1));
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_NumInputSet(Rz, 2, Jmp));
 	return Rz;
 }
 
-inline FatASM* JB_Msg_LUPD(Message* Self, AsmReg A, AsmReg B, int C) {
+inline FatASM* JB_Msg_LUPD(Message* Self, AsmReg R1, AsmReg R2, int Jump) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_LUPD, Self);
-	(SC_FatASM_RegInputSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
+	(SC_FatASM_RegInputSet(Rz, 0, R1));
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_NumInputSet(Rz, 2, Jump));
 	return Rz;
 }
 
-inline FatASM* JB_Msg_LUPU(Message* Self, AsmReg A, AsmReg B, int C) {
+inline FatASM* JB_Msg_LUPU(Message* Self, AsmReg R1, AsmReg R2, int Jump) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_LUPU, Self);
-	(SC_FatASM_RegInputSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
+	(SC_FatASM_RegInputSet(Rz, 0, R1));
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_NumInputSet(Rz, 2, Jump));
 	return Rz;
 }
 
-inline FatASM* JB_Msg_RET(Message* Self, AsmReg A, AsmReg B, int C, int D) {
+inline FatASM* JB_Msg_RET(Message* Self, AsmReg R1, AsmReg R2, int Count, int Exists) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_RET, Self);
-	(SC_FatASM_RegInputSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
+	(SC_FatASM_RegInputSet(Rz, 0, R1));
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_NumInputSet(Rz, 2, Count));
+	(SC_FatASM_NumInputSet(Rz, 3, Exists));
 	return Rz;
 }
 
-inline FatASM* JB_Msg_TRAP(Message* Self, AsmReg A, int B, int C) {
+inline FatASM* JB_Msg_TRAP(Message* Self, AsmReg R1, int Continue, int Mode) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_TRAP, Self);
-	(SC_FatASM_RegInputSet(Rz, 0, A));
-	(SC_FatASM_NumInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
+	(SC_FatASM_RegInputSet(Rz, 0, R1));
+	(SC_FatASM_NumInputSet(Rz, 1, Continue));
+	(SC_FatASM_NumInputSet(Rz, 2, Mode));
 	return Rz;
 }
 
-inline FatASM* JB_Msg_WR16(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E) {
+inline FatASM* JB_Msg_WR16(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_WR16, Self);
-	(SC_FatASM_RegInputSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	(SC_FatASM_RegInputSet(Rz, 0, R1));
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_NumInputSet(Rz, 3, L));
+	(SC_FatASM_NumInputSet(Rz, 4, Move));
 	return Rz;
 }
 
-inline FatASM* JB_Msg_WR1U(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E) {
+inline FatASM* JB_Msg_WR1U(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_WR1U, Self);
-	(SC_FatASM_RegInputSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	(SC_FatASM_RegInputSet(Rz, 0, R1));
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_NumInputSet(Rz, 3, L));
+	(SC_FatASM_NumInputSet(Rz, 4, Move));
 	return Rz;
 }
 
-inline FatASM* JB_Msg_WR2U(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E) {
+inline FatASM* JB_Msg_WR2U(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_WR2U, Self);
-	(SC_FatASM_RegInputSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	(SC_FatASM_RegInputSet(Rz, 0, R1));
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_NumInputSet(Rz, 3, L));
+	(SC_FatASM_NumInputSet(Rz, 4, Move));
 	return Rz;
 }
 
-inline FatASM* JB_Msg_WR4U(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E) {
+inline FatASM* JB_Msg_WR4U(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_WR4U, Self);
-	(SC_FatASM_RegInputSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	(SC_FatASM_RegInputSet(Rz, 0, R1));
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_NumInputSet(Rz, 3, L));
+	(SC_FatASM_NumInputSet(Rz, 4, Move));
 	return Rz;
 }
 
-inline FatASM* JB_Msg_WR8U(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E) {
+inline FatASM* JB_Msg_WR8U(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_WR8U, Self);
-	(SC_FatASM_RegInputSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	(SC_FatASM_RegInputSet(Rz, 0, R1));
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_NumInputSet(Rz, 3, L));
+	(SC_FatASM_NumInputSet(Rz, 4, Move));
 	return Rz;
 }
 
@@ -10665,550 +10685,974 @@ inline void SC_Reg_Expect(AsmReg Self, Message* Where) {
 	}
 }
 
-inline FatASM* JB_Msg_ADD(Message* Self, AsmReg A, AsmReg B, AsmReg C) {
+inline FatASM* JB_Msg_ADD(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_ADD, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_ADDK(Message* Self, AsmReg A, AsmReg B, int C) {
+inline FatASM* JB_Msg_ADDK(Message* Self, AsmReg R1, AsmReg R2, int K) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_ADDK, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_NumInputSet(Rz, 2, K));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_ADPK(Message* Self, AsmReg A, AsmReg B, int C) {
+inline FatASM* JB_Msg_ADPK(Message* Self, AsmReg R1, AsmReg R2, int K) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_ADPK, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_NumInputSet(Rz, 2, K));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_BAND(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D) {
+inline FatASM* JB_Msg_BAND(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_BAND, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_NumInputSet(Rz, 3, Sh));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_BCLR(Message* Self, AsmReg A, AsmReg B, int C, int D, int E) {
+inline FatASM* JB_Msg_BCLR(Message* Self, AsmReg R1, AsmReg R2, int Shift1, int Shift2, int Sign) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_BCLR, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_DestSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	if (SC_FatASM_Dest(Rz, 1, R2)) {
+		(++Outputs);
+	}
+	(SC_FatASM_NumInputSet(Rz, 2, Shift1));
+	(SC_FatASM_NumInputSet(Rz, 3, Shift2));
+	(SC_FatASM_NumInputSet(Rz, 4, Sign));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_BFLG(Message* Self, AsmReg A, AsmReg B, int C, int D, int E) {
+inline FatASM* JB_Msg_BFLG(Message* Self, AsmReg R1, AsmReg R2, int Up, int Down, int Sign) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_BFLG, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_NumInputSet(Rz, 2, Up));
+	(SC_FatASM_NumInputSet(Rz, 3, Down));
+	(SC_FatASM_NumInputSet(Rz, 4, Sign));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_BFLS(Message* Self, AsmReg A, AsmReg B, int C, int D, int E) {
+inline FatASM* JB_Msg_BFLS(Message* Self, AsmReg R1, AsmReg R2, int Up, int Down, int Sign) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_BFLS, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_NumInputSet(Rz, 2, Up));
+	(SC_FatASM_NumInputSet(Rz, 3, Down));
+	(SC_FatASM_NumInputSet(Rz, 4, Sign));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_BLUE(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D) {
+inline FatASM* JB_Msg_BLUE(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_BLUE, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_NumInputSet(Rz, 3, Sh));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_BNOT(Message* Self, AsmReg A, AsmReg B) {
+inline FatASM* JB_Msg_BNOT(Message* Self, AsmReg R1, AsmReg R2) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_BNOT, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_BOAR(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D) {
+inline FatASM* JB_Msg_BOAR(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_BOAR, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_RegInputSet(Rz, 3, D));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_RegInputSet(Rz, 3, R4));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_BROL(Message* Self, AsmReg A, AsmReg B, AsmReg C) {
+inline FatASM* JB_Msg_BROL(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_BROL, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_BROR(Message* Self, AsmReg A, AsmReg B, AsmReg C) {
+inline FatASM* JB_Msg_BROR(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_BROR, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_BRUS(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D) {
+inline FatASM* JB_Msg_BRUS(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_BRUS, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_NumInputSet(Rz, 3, Sh));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_BRUU(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D) {
+inline FatASM* JB_Msg_BRUU(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_BRUU, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_NumInputSet(Rz, 3, Sh));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_BXOR(Message* Self, AsmReg A, AsmReg B, AsmReg C) {
+inline FatASM* JB_Msg_BXOR(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_BXOR, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_CMPF(Message* Self, AsmReg A, AsmReg B, int C) {
+inline FatASM* JB_Msg_CMPF(Message* Self, AsmReg R1, AsmReg R2, int Cmp) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_CMPF, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_NumInputSet(Rz, 2, Cmp));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_CMPI(Message* Self, AsmReg A, AsmReg B, int C) {
+inline FatASM* JB_Msg_CMPI(Message* Self, AsmReg R1, AsmReg R2, int Cmp) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_CMPI, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_NumInputSet(Rz, 2, Cmp));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_CNTC(Message* Self, AsmReg A, AsmReg B, int C, int D, int E) {
+inline FatASM* JB_Msg_CNTC(Message* Self, AsmReg R1, AsmReg R2, int Offset, int Cnst, int Size) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_CNTC, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_DestSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	if (SC_FatASM_Dest(Rz, 1, R2)) {
+		(++Outputs);
+	}
+	(SC_FatASM_NumInputSet(Rz, 2, Offset));
+	(SC_FatASM_NumInputSet(Rz, 3, Cnst));
+	(SC_FatASM_NumInputSet(Rz, 4, Size));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_CNTD(Message* Self, AsmReg A, AsmReg B, int C, int D, int E) {
+inline FatASM* JB_Msg_CNTD(Message* Self, AsmReg R1, AsmReg R2, int Offset, int Cnst, int Size) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_CNTD, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_DestSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	if (SC_FatASM_Dest(Rz, 1, R2)) {
+		(++Outputs);
+	}
+	(SC_FatASM_NumInputSet(Rz, 2, Offset));
+	(SC_FatASM_NumInputSet(Rz, 3, Cnst));
+	(SC_FatASM_NumInputSet(Rz, 4, Size));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_CONV(Message* Self, AsmReg A, AsmReg B, AsmReg C) {
+inline FatASM* JB_Msg_CONV(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_CONV, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_DIVV(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D, int E) {
+inline FatASM* JB_Msg_DIVV(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4, int Kind) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_DIVV, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_DestSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_RegInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	if (SC_FatASM_Dest(Rz, 1, R2)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_RegInputSet(Rz, 3, R4));
+	(SC_FatASM_NumInputSet(Rz, 4, Kind));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_EROR(Message* Self, AsmReg A) {
+inline FatASM* JB_Msg_EROR(Message* Self, AsmReg R1) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_EROR, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_FADD(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D, int E) {
+inline FatASM* JB_Msg_FADD(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4, int D) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_FADD, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_RegInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_RegInputSet(Rz, 3, R4));
+	(SC_FatASM_NumInputSet(Rz, 4, D));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_FADK(Message* Self, AsmReg A, AsmReg B, int C) {
+inline FatASM* JB_Msg_FADK(Message* Self, AsmReg R1, AsmReg R2, int High) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_FADK, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_NumInputSet(Rz, 2, High));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_FDIV(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D, int E) {
+inline FatASM* JB_Msg_FDIV(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4, int D) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_FDIV, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_RegInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_RegInputSet(Rz, 3, R4));
+	(SC_FatASM_NumInputSet(Rz, 4, D));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_FEXK(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E, int F) {
+inline FatASM* JB_Msg_FEXK(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh2, int Sh3, int D) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_FEXK, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
-	(SC_FatASM_NumInputSet(Rz, 5, F));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_NumInputSet(Rz, 3, Sh2));
+	(SC_FatASM_NumInputSet(Rz, 4, Sh3));
+	(SC_FatASM_NumInputSet(Rz, 5, D));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_FFRC(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D, int E) {
+inline FatASM* JB_Msg_FFRC(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4, int D) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_FFRC, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_RegInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_RegInputSet(Rz, 3, R4));
+	(SC_FatASM_NumInputSet(Rz, 4, D));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_FMLK(Message* Self, AsmReg A, AsmReg B, int C) {
+inline FatASM* JB_Msg_FMLK(Message* Self, AsmReg R1, AsmReg R2, int High) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_FMLK, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_NumInputSet(Rz, 2, High));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_FMUL(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D, int E) {
+inline FatASM* JB_Msg_FMUL(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4, int D) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_FMUL, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_RegInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_RegInputSet(Rz, 3, R4));
+	(SC_FatASM_NumInputSet(Rz, 4, D));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_KNST(Message* Self, AsmReg A, int B, int C, int D, int E, int F) {
+inline FatASM* JB_Msg_KNST(Message* Self, AsmReg R1, int Cond, int Inv, int Value, int Prm1, int Prm2) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_KNST, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_NumInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
-	(SC_FatASM_NumInputSet(Rz, 5, F));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_NumInputSet(Rz, 1, Cond));
+	(SC_FatASM_NumInputSet(Rz, 2, Inv));
+	(SC_FatASM_NumInputSet(Rz, 3, Value));
+	(SC_FatASM_NumInputSet(Rz, 4, Prm1));
+	(SC_FatASM_NumInputSet(Rz, 5, Prm2));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_KSTR(Message* Self, AsmReg A, int B, int C, int D) {
+inline FatASM* JB_Msg_KSTR(Message* Self, AsmReg R1, int Rot, int Inv, int Value) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_KSTR, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_NumInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_NumInputSet(Rz, 1, Rot));
+	(SC_FatASM_NumInputSet(Rz, 2, Inv));
+	(SC_FatASM_NumInputSet(Rz, 3, Value));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_MEMU(Message* Self, AsmReg A, AsmReg B, int C, int D) {
+inline FatASM* JB_Msg_MEMU(Message* Self, AsmReg R1, AsmReg R2, int Op, int N) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_MEMU, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_NumInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_NumInputSet(Rz, 2, Op));
+	(SC_FatASM_NumInputSet(Rz, 3, N));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_MULT(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D) {
+inline FatASM* JB_Msg_MULT(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_MULT, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_RegInputSet(Rz, 3, D));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_RegInputSet(Rz, 3, R4));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_PRNT(Message* Self, AsmReg A) {
+inline FatASM* JB_Msg_PRNT(Message* Self, AsmReg R1) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_PRNT, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_RALO(Message* Self, AsmReg A, AsmReg B) {
+inline FatASM* JB_Msg_RALO(Message* Self, AsmReg R1, AsmReg R2) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_RALO, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_RARE(Message* Self, AsmReg A, AsmReg B) {
+inline FatASM* JB_Msg_RARE(Message* Self, AsmReg R1, AsmReg R2) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_RARE, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_RD16(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E) {
+inline FatASM* JB_Msg_RD16(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_RD16, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_NumInputSet(Rz, 3, L));
+	(SC_FatASM_NumInputSet(Rz, 4, Move));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_RD1S(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E) {
+inline FatASM* JB_Msg_RD1S(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_RD1S, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_NumInputSet(Rz, 3, L));
+	(SC_FatASM_NumInputSet(Rz, 4, Move));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_RD1U(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E) {
+inline FatASM* JB_Msg_RD1U(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_RD1U, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_NumInputSet(Rz, 3, L));
+	(SC_FatASM_NumInputSet(Rz, 4, Move));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_RD2S(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E) {
+inline FatASM* JB_Msg_RD2S(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_RD2S, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_NumInputSet(Rz, 3, L));
+	(SC_FatASM_NumInputSet(Rz, 4, Move));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_RD2U(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E) {
+inline FatASM* JB_Msg_RD2U(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_RD2U, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_NumInputSet(Rz, 3, L));
+	(SC_FatASM_NumInputSet(Rz, 4, Move));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_RD4S(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E) {
+inline FatASM* JB_Msg_RD4S(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_RD4S, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_NumInputSet(Rz, 3, L));
+	(SC_FatASM_NumInputSet(Rz, 4, Move));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_RD4U(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E) {
+inline FatASM* JB_Msg_RD4U(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_RD4U, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_NumInputSet(Rz, 3, L));
+	(SC_FatASM_NumInputSet(Rz, 4, Move));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_RD8U(Message* Self, AsmReg A, AsmReg B, AsmReg C, int D, int E) {
+inline FatASM* JB_Msg_RD8U(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int Move) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_RD8U, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_NumInputSet(Rz, 3, D));
-	(SC_FatASM_NumInputSet(Rz, 4, E));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_NumInputSet(Rz, 3, L));
+	(SC_FatASM_NumInputSet(Rz, 4, Move));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_RMEM(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D) {
+inline FatASM* JB_Msg_RMEM(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_RMEM, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_RegInputSet(Rz, 3, D));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_RegInputSet(Rz, 3, R4));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_RSET(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D) {
+inline FatASM* JB_Msg_RSET(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_RSET, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_DestSet(Rz, 2, C));
-	(SC_FatASM_RegInputSet(Rz, 3, D));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	if (SC_FatASM_Dest(Rz, 2, R3)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 3, R4));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_SUBB(Message* Self, AsmReg A, AsmReg B, AsmReg C) {
+inline FatASM* JB_Msg_SUBB(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_SUBB, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_SWAP(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D) {
+inline FatASM* JB_Msg_SWAP(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_SWAP, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_DestSet(Rz, 1, B));
-	(SC_FatASM_DestSet(Rz, 2, C));
-	(SC_FatASM_DestSet(Rz, 3, D));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	if (SC_FatASM_Dest(Rz, 1, R2)) {
+		(++Outputs);
+	}
+	if (SC_FatASM_Dest(Rz, 2, R3)) {
+		(++Outputs);
+	}
+	if (SC_FatASM_Dest(Rz, 3, R4)) {
+		(++Outputs);
+	}
+	if (Outputs < 2) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_TABL(Message* Self, AsmReg A, AsmReg B) {
+inline FatASM* JB_Msg_TABL(Message* Self, AsmReg R1, AsmReg R2) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_TABL, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
 }
 
-inline FatASM* JB_Msg_TERN(Message* Self, AsmReg A, AsmReg B, AsmReg C, AsmReg D) {
+inline FatASM* JB_Msg_TERN(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4) {
 	FatASM* Rz = nil;
 	//visible;
+	int Outputs = 0;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_TERN, Self);
-	(SC_FatASM_DestSet(Rz, 0, A));
-	(SC_FatASM_RegInputSet(Rz, 1, B));
-	(SC_FatASM_RegInputSet(Rz, 2, C));
-	(SC_FatASM_RegInputSet(Rz, 3, D));
+	if (SC_FatASM_Dest(Rz, 0, R1)) {
+		(++Outputs);
+	}
+	(SC_FatASM_RegInputSet(Rz, 1, R2));
+	(SC_FatASM_RegInputSet(Rz, 2, R3));
+	(SC_FatASM_RegInputSet(Rz, 3, R4));
+	if (Outputs < 1) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self, JB_LUB[2098]);
+		}
+	}
 	return Rz;
+}
+
+inline FatASM* SC_Reg_Read(AsmReg Self, Message* M, AsmReg Ptr, int Index) {
+	return SC_Reg_ReadOrWriteWithMsgRegIntBool(Self, M, Ptr, Index, true);
+}
+
+inline FatASM* SC_Reg_Write(AsmReg Self, Message* M, AsmReg Ptr, int Index) {
+	return SC_Reg_ReadOrWriteWithMsgRegIntBool(Self, M, Ptr, Index, false);
 }
 
 inline SCDecl* SC_TypeOfSwiz(Message* Exp, SCNode* Name_space, Message* Side, SCDecl* class_Space) {

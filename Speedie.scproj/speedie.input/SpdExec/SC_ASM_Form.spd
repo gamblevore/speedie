@@ -7,7 +7,9 @@ class µForm
 	|int|			Count
 	|string|		Name
 	|µParam[6]|		Params
+	|message| 		src
 	|int|			TotalBits
+	|int| 			Outputs
 	|int|			Index
 	
 	
@@ -17,18 +19,16 @@ class µForm
 			fs <~ " "
 			fs <~ .params[i].BitSize
 		
-	constructor (|string| data, |message?| tmp)
+	
+	constructor (|message!| tmp)
 		opt norefcounts
+		.src = tmp
 		.name = tmp.name
 		for i in 6
 			.params[i] = 0
 		for line in tmp.last(@arg)
-			|| f = line.needfirst
+			|| f = line.NeedFirst
 			.loadparam(f.name, f, line.IsLast)
-//		  else
-//			debugat // remove this? I think we don't do this anymore.
-//			for param in data
-//				.loadparam( string.byte(param), nil )
 		
 		.index = ++µform.count
 
@@ -38,19 +38,19 @@ class µForm
 		|| i = .count++
 		.totalbits += size
 		expect (i < 6) ("Too many params.")
-		p |= size-1
+		p |= size - 1
 		.params[i] = p
 			
 
-	function LastField (|µParam|)
-		return self[.Count-1]
+//	function LastField (|µParam|)
+//		return self[.Count-1]
 	
 	syntax Access (|int| i, |µParam|)
 		cpp_part AccessInt
 		return .params[i]
 	
-	syntax Access (|int| i, assigns: |µParam|)
-		.params[i] = Value
+//	syntax Access (|int| i, assigns: |µParam|)
+//		.params[i] = Value
 	
 	
 	iterator
@@ -60,13 +60,13 @@ class µForm
 			++i
 
 	function AddRemainder (|int| U)
-		.addp( 32 - .TotalBits, µparam.num ||| U)
+		.addp( 32 - .TotalBits, µparam.Number ||| U)
 	
 	function LoadParam (|string| pl, |message| place, |bool| IsLast)
 		if (pl.isint)
 			|| i = pl.int
 			check (i > 0 and i <= 24) (place, "Number out of range (1-24)")
-			.addp(i, µparam.num)
+			.addp(i, µparam.Number)
 			return
 		expect (pl == 1) (self)
 		|| p = pl[]
@@ -74,10 +74,11 @@ class µForm
 			.AddP(5)
 		  elseif p == 'R'
 			.AddP(5, µparam.Output)
+			.Outputs++
 		  elseif p == 'x' // for 64/96/128 sized instructions
-			.AddP(32, µparam.num)
+			.AddP(32, µparam.Number)
 		  elseif p == 'n'
-			.AddP(5, µparam.num)
+			.AddP(5, µparam.Number)
 		  elseif p == 'l'
 			.addremainder(0)
 		  elseif p == 'L'
@@ -102,4 +103,4 @@ class µForm
 			rz = forms.valuelower(form)
 			if !rz
 				error "Missing form: " + form
-				rz = µform(form, nil)
+				rz = µform(@arg.msg)

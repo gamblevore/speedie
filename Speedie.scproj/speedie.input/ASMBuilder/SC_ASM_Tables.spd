@@ -98,10 +98,7 @@ function InitAccess
 
 function Debugger		(fn_asm)
 	if Options.targetdebug
-		.addasm(asm.TRAP, exp) // nice!
-
-//	* make typecast a mathopp
-//		* typecast consts
+		exp.TRAP(asmreg(),0,0) // nice!
 
 
 // abc(), if (x) return, def()   -->   abc(), if !x {def()}, return
@@ -128,7 +125,7 @@ function If				(fn_asm)
 
 	|| Start = .Branch(cond, Flip)
 	rz = .µ(arg1)
-	|| AfterFirst = .AddASM(asm.jump, arg1) // marks as ended... to prevent opts. can be removed later during optimisation
+	|| AfterFirst = arg1.jump(0) // marks as ended... to prevent opts. can be removed later during optimisation
 	if ElseIfCond or arg2.HasAny
 		if ElseIfCond
 			|| a = asmreg()
@@ -143,7 +140,7 @@ function If				(fn_asm)
 function While			(fn_asm)
 	opt norefcounts
 //	.AddASM(asm.NOOP, exp)							// allow for lupu/lupd?
-	|| Jumper = .AddASM(asm.JUMP, exp)				// jump to end... THEN EMIT arg and jump back.
+	|| Jumper = exp.JUMP(0)							// jump to end... THEN EMIT arg and jump back.
 	.WhileStart = jumper
 	ASMTmp.arg(self, exp.second)					// arg
 	|| CondStart = .curr							// right?
@@ -196,7 +193,7 @@ function Ternary		(fn_asm)
 	dest = .TempMe(exp, dest)
 	|| FailToSecond = .Branch(cond)
 	.µ(A, dest)
-	|| Exit = .AddASM(asm.jump, exp)
+	|| Exit = exp.jump(0)
 
 	FailToSecond.r[3] = .curr - FailToSecond
 
@@ -282,9 +279,7 @@ function Pointer		(fn_asm)
 	if dest is AddrRequest // hmmm?
 	dest = .TempMe(exp, dest)
 	|| Ptr = .µ(exp.first!, dest)
-	|| A = Dest.ReadOrWrite(exp)
-	|| fat = .AddASM(A, exp, dest,  Ptr).BitCorrect
-	return fat*dest
+	return Dest.ReadOrWrite(exp,ptr) * Dest
 
 
 function Decl (fn_asm)
@@ -322,10 +317,7 @@ function Access		(fn_asm)						// a[b], struct.mem[b], func()[func2()]
 	if (dest is addrrequest)
 		return .plus(dest.HaveAddr, ptr, ind, exp)
 	
-	|| A = Dest.ReadOrWrite(exp)
-	|| fat = .AddASM(A, exp, dest, Ptr, ind).BitCorrect
-	fat.info = fat.info asnt asmreg.containsaddr
-	return fat * dest
+	return Dest.ReadOrWrite(exp, ptr, ind) * dest
 
 
 function Dot		(fn_asm)						// a.b
@@ -337,7 +329,6 @@ function Dot		(fn_asm)						// a.b
 	dest.µtype = T
 	debugger
 	
-	|| A = Dest.ReadOrWrite(exp)
 	|| B = t.ByteCount.log2
 	|| Pos = prop.exportposition >> B
 	if !pos // what?
@@ -347,7 +338,8 @@ function Dot		(fn_asm)						// a.b
 			return addk.haveaddr*dest
 		pos = 0
 	
-	return .AddASM(A, exp, dest: dest,  ptr: Obj,  index: 0, Pos) * Dest
+	return Dest.ReadOrWrite(exp, obj, pos) * Dest
+//	return .AddASM(A, exp, dest: dest,  ptr: Obj,  index: 0, Pos) * Dest
 		
 
 function SetRel	(fn_asm)
@@ -450,7 +442,7 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 	debugger 
 	#!This used to return ADDR not DEST. so we we returnign addr.bitcorrect. is this faulse?
 	#!probably ok aksuually
-	return .AddASM(dest.ReadOrWrite(Exp), exp, dest, addr, iRead).BitCorrect * dest
+	return dest.ReadOrWrite(Exp, addr, iread) * Dest	//, exp, dest, addr, iRead).BitCorrect * dest
 
 	
 
@@ -473,14 +465,14 @@ function SlowCountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mo
 	opt	NoRefCounts
 	// need to read... also save old value
 	|| x = .VTmps
-	.AddASM(Dest.Read(F), f, dest, addr)
+	Dest.Read(F, dest, addr)
 
 	// we have read... now we need to add		
 	|| NewValue = (.TempMe(f), dest)(mode & IncrAfter)
 	.AddConstant(f, NewValue, dest, amount)
 
 	// now we have the new value... lets write it back again
-	|| fat = .AddASM(Dest.write(F), f, NewValue, addr)
+	|| fat = dest.write(f, newvalue, addr)//.AddASM(Dest.write(F), f, NewValue, addr)
 
 	// we wrote back the old value... the new value should exist!
 	.VTmps = x
@@ -613,26 +605,45 @@ function Unexpected		(fn_asm)
 
 
 
-function ASMReg.ReadOrWrite (|message| m,  |asm|)
-	if self is set
-		return .Write(m)
-	return .Read(m)
+function ASMReg.ReadOrWrite (|message| m, |asmreg| ptr, |int| index=0, |&fatasm|)
+	return .ReadOrWrite(m, ptr, index, self is set)
+
+
+function ASMReg.ReadOrWrite (|message| m, |asmreg| ptr, |int| index, |bool| DoRead, |&fatasm|)
+	self = self asnt asmreg.containsaddr
+	debugger 
+	|| T = .µtype
+	|| BC = t.ByteCount
+	|| bytes = BC.log2
+	check  (bytes <= 4)  (m, "Object to large to access")
+		
+	|asm| A
+	if DoRead
+		|| B = (bytes<<1) + t.issigned
+		A = ASMtmp.ReadASM[b]
+	  else
+		A = ASMTmp.WriteASM[bytes]
+	isnt set
+	rz = m.RD4U(self, ptr, asmreg(), index, 0).BitCorrect
+//		r1		R	// dest
+//		r2		r	// Base
+//		r3		r	// VarAdd
+//		L		7	// Const A
+//		move	2
+
+//	rz = rz.BitCorrect
+//	fat.reginput(2) = index
 	
 
-function ASMReg.Read (|message| m,  |asm|)
-	|| T = .µtype
-	|| bytes = t.ByteCount.log2
-	|| B = (bytes<<1) + t.issigned
-	if b <= 9
-		return ASMtmp.ReadASM[b]
-	error (m, "Object to large to read")
+
+function ASMReg.Read  (|message| m,  |asmreg| ptr,  |int| index=0,  |&fatasm|)
+	pragma inline
+	return .ReadOrWrite(m, ptr, index, true)
 	
-	
-function ASMReg.Write (|message| m,  |asm|)
-	|| bytes = .µtype.ByteCount.log2
-	if bytes <= 4
-		return ASMtmp.WriteASM[bytes]
-	error (m, "Object to large to write")
+
+function ASMReg.Write (|message| m,  |asmreg| ptr,  |int| index=0,  |&fatasm|)
+	pragma inline
+	return .ReadOrWrite(m, ptr, index, false)
 
 
 function asmstate.ExistingVar (|message| m, |asmreg|)
