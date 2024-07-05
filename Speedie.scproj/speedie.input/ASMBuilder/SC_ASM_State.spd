@@ -79,8 +79,8 @@ struct ASMState
 		|| reg = .TempMe(exp, dest)
 		if togrow.isint and value.CanStoreAsIntImmediate
 			if 0
-				exp.parent!.adpk(reg, togrow, togrow)
-			return exp.parent!.ADPK(reg, ToGrow, Value) * reg
+				exp.adpk(reg, togrow, togrow)
+			return exp.ADPK(reg, ToGrow, Value) * reg
 		.Assign(reg, ToGrow, asmreg(), exp)
 		rz = .AddConstant(exp, togrow, ToGrow, value)
 	
@@ -88,54 +88,15 @@ struct ASMState
 	function AddConstant (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
 		if dest.isint
 			if Value.CanStoreAsIntImmediate
-				return exp.parent!.ADDK(dest, src, Value) * dest
+				return exp.ADDK(dest, src, Value) * dest
 		  elseif dest.FourBytes
 			if value|uint64|.CanStoreAsfloatImmediate
-				return exp.parent!.FADK(dest, src, value) * dest
+				return exp.FADK(dest, src, value) * dest
 			debugger // how is this possible? we are adding a 64 bit float to a 32-bit?
 		debugat
 		|| where = .NumToReg(value, exp)
 		return .Plus(dest, src, where, exp)
 		
-		
-	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |int| c, |int| d, |int| e, |&FatASM|)
-		pragma inline,  opt norefcounts,  cpp_part AddASM5
-		rz = self <~ (sm, dbg)
-		rz.r[0] = a
-		rz.r[1] = b
-		rz.r[2] = c
-		rz.r[3] = d
-		rz.r[4] = e
-		
-	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |int| c, |int| d, |&FatASM|)
-		pragma inline,  opt norefcounts,  cpp_part AddASM4
-		rz = self <~ (sm, dbg)
-		rz.r[0] = a
-		rz.r[1] = b
-		rz.r[2] = c
-		rz.r[3] = d
-
-//	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |int| c, |&FatASM|)
-//		pragma inline,  opt norefcounts,  cpp_part AddASM3
-//		rz = self <~ (sm, dbg)
-//		rz.r[0] = a
-//		rz.r[1] = b
-//		rz.r[2] = c
-
-//	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |&FatASM|)
-//		pragma inline,  opt norefcounts,  cpp_part AddASM2
-//		rz = self <~ (sm, dbg)
-//		rz.r[0] = a
-//		rz.r[1] = b
-
-//	function AddASM (|int| SM, |message| dbg, |int| a, |&FatASM|)
-//		pragma inline,  opt norefcounts,  cpp_part AddASM1
-//		rz = self <~ (sm, dbg)
-//		rz.r[0] = a
-//	
-//	function AddASM (|int| SM, |message| dbg, |&FatASM|)
-//		pragma inline,  opt norefcounts,  cpp_part AddASM0
-//		return self <~ (sm, dbg)
 
 	syntax append (|int| code, |message| dbg, |&FatASM|)
 		cpp_part RequestOp
@@ -291,12 +252,16 @@ function @ASMTmp.DoFunc (fn_Asm)
 		sh += 5
 	.VTmps = (OV)
 	
+
+	|| SaveAmount = .vdecls * (dest isnt forreturn)
+	|| fat = exp.fncx(save: SaveAmount,  jump: fn.TableId,  reg2,  reg3)
+
 	|| OP = (asm.func2, asm.func3)(sh <= 25)
 	if fn is Wrapper
 		op = (asm.fncx2, asm.fncx3)(sh <= 25)
+	fat.op = op
 
-	|| SaveAmount = .vdecls * (dest isnt forreturn)
-	return .AddASM(OP,  prms.parent!,  save: SaveAmount,  jump: fn.TableId,  reg2,  reg3) * dest
+	return fat * dest
 
 
 function ASMState.PackMakerInit (|bool|)

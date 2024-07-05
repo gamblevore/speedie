@@ -51,7 +51,7 @@ extend ASMState
 		if (dest is condrequest) and (badness >= 0)
 			if badness > 0
 				dest = .TempMe(exp, dest)
-				.AddASM(asm.CMPB, exp, dest, L, R, badness, Negate|int|)
+				exp.CMPB(dest, L, R, badness, Negate|int|)
 				r = dest
 				l = 0.asm
 			|&fatasm| fat
@@ -59,17 +59,18 @@ extend ASMState
 				fat = exp.JMPE(r,l,r)
 			  else
 				fat = exp.jbra(r,1,0)
-			fat.op+=negate
+			if negate
+				fat.op+=1<<24 // sigh
 			return fat * Dest
 
 		
 		if badness > 0
-			return .AddASM(asm.CMPB, exp, dest, L, R, badness, negate|int|) * Dest
+			return exp.CMPB(dest, L, R, badness, negate|int|) * Dest
 
 		if badness == -1
 			|| gl = l.GapBits
 			|| gr = r.GapBits
-			.AddASM(asm.BCLR, exp, L, R, gl, gr, (l.signed|int|) + (r.signed|int|<<1))
+			exp.BCLR(L, R, gl, gr, (l.signed|int|) + (r.signed|int|<<1))
 		|| fat2 = exp.JMPE(L, R, dest)
 		fat2.op += Negate
 		return fat2 * Dest
@@ -108,17 +109,21 @@ extend ASMState
 		if l.BadBits(r) 
 			|| gl = l.GapBits
 			|| gr = r.GapBits
-			.AddASM(asm.BCLR, exp, L, R, gl, gr, (l.signed|int|) + (r.signed|int|<<1))
+			exp.BCLR(L, R, gl, gr, (l.signed|int|) + (r.signed|int|<<1))
 
-		|| OPP = (asm.JMPI, asm.CMPI)(dest is condrequest)
-		return .AddASM(OPP, exp, L, R, mode, dest) * Dest
+		if dest is CondRequest
+			return exp.jmpi(L, R, mode, 0)*AsmReg()
+
+		return exp.cmpi(dest, L, R, mode)*dest
+		
 
 
 	function CompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
 		mode += 8 * l.IsBig
 		mode += 4 * r.IsBig
-		|| OPP = (asm.JMPF, asm.CMPF)(dest is condrequest)
-		return .AddASM(OPP, exp, L, R, Mode, dest) * Dest
+		if dest isnt CondRequest
+			return exp.cmpf(dest, L, R, Mode)*dest
+		exp.JMPF(L, R, Mode, dest)
 
 
 	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |int| Mode,  |asmreg|)
@@ -178,7 +183,7 @@ extend ASMState
 			ex = f4.exponent
 		
 		if ex.y == 1
-			return .AddASM(asm.FEXK, exp, dest, L, 0, ex.x, l.IsBig|int|) * Dest
+			return exp.FEXK(dest, L, asmreg(), ex.x, 0, l.IsBig|int|) * Dest
 
 
 	// from 1 to -1
@@ -247,7 +252,7 @@ extend ASMState
 
 		|| ss = (l is alternate)
 		|| rr = r.reg
-		|| fat = .AddASM(asm.fADD, exp, dest, l, rr*!ss, rr*ss, 1-IsF32)
+		|| fat = exp.fADD(dest, l, r*!ss, r*ss, 1-IsF32)
 		ifn dest is ConstAny
 			0 //
 		  elseif IsF32
@@ -347,7 +352,7 @@ extend ASMState
 	function DivFloat    (fn_opasm)
 		rz = .QuickFloatDiv(dest, R, L, exp)
 		rz := .QuickFloatDiv(dest, L, R, exp)
-		rz := .AddASM(asm.FDIV,  exp,  dest,  dest.isbig|int|,  L,  R) * dest
+		rz := exp.FDIV(dest,  L,  R,  asmreg(), dest.isbig|int|) * dest
 		if dest is ConstAny
 			|| fat = rz.needfat
 			if dest.FourBytes
@@ -421,7 +426,7 @@ extend ASMState
 	// BITS
 	function BitNot (fn_opasm)
 		if r.reg // what?
-		|| fat = exp.BNOT(dest,l)//.AddASM(asm.BNOT, exp, dest, l)
+		|| fat = exp.BNOT(dest,l)
 		if l is ConstAny
 			fat.const = ~l.const
 		return fat*Dest
@@ -485,7 +490,9 @@ extend ASMState
 //		else
 //			return exp.bruu(dest, l, r, 0)
 		
-		return .AddASM(asm.BRUS • !l.signed, exp, dest, L, R, up*l.signed)*dest
+		|| fat = exp.BRUS(dest, L, R, up*l.signed)
+		fat.op = asm.BRUS • !l.signed
+		return fat*dest
 
 	
 	function SHL    (fn_opasm)

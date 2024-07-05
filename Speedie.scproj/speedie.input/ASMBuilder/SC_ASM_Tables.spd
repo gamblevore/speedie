@@ -139,7 +139,6 @@ function If				(fn_asm)
 	
 function While			(fn_asm)
 	opt norefcounts
-//	.AddASM(asm.NOOP, exp)							// allow for lupu/lupd?
 	|| Jumper = exp.JUMP(0)							// jump to end... THEN EMIT arg and jump back.
 	.WhileStart = jumper
 	ASMTmp.arg(self, exp.second)					// arg
@@ -264,7 +263,7 @@ function TypeCast		(fn_asm)
 				fat.FloatIntConvConst(srf, oldtype, newtype)
 	  else
 		|| sh = 64 - oc
-		fat = .AddASM(asm.BFLG, exp, dest, sr, sh, sh, sr.signed|int|).bitcorrect
+		fat = exp.BFLG(dest, sr, sh, sh, sr.signed|int|).bitcorrect
 		if UponConst
 			|| oof = fat.Const << sh
 			fat.Const = (oof|int64| >> sh, oof|uint64| >> sh)(sr.Signed) // shift up and down
@@ -339,7 +338,6 @@ function Dot		(fn_asm)						// a.b
 		pos = 0
 	
 	return Dest.ReadOrWrite(exp, obj, pos)
-//	return .AddASM(A, exp, dest: dest,  ptr: Obj,  index: 0, Pos) * Dest
 		
 
 function SetRel	(fn_asm)
@@ -472,7 +470,7 @@ function SlowCountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mo
 	.AddConstant(f, NewValue, dest, amount)
 
 	// now we have the new value... lets write it back again
-	|| fat = dest.write(f, newvalue, addr)//.AddASM(Dest.write(F), f, NewValue, addr)
+	|| fat = dest.write(f, newvalue, addr)
 
 	// we wrote back the old value... the new value should exist!
 	.VTmps = x
@@ -482,11 +480,14 @@ function SlowCountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mo
 function CountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |asmreg|)
 	ifn  dest.isint  and  amount <= 63  and  amount >= -64
 		return SlowCountOnAddr(self, f, dest, mode, Addr, amount)
-	|| opp = (ASM.CNTC, ASM.CNTD)(mode & IncrAfter)	
+//	|| opp = (ASM.CNTC, ASM.CNTD)(mode & IncrAfter)	
 	|| bc  = dest.µtype.ByteCount
 	|| log = bc.Log2
 	if dest.BitCount * (1<<log) != bc // hmm? maths bug?
-	return .AddASM(opp, f, Addr, dest, 0, amount, log) * dest
+	|| fat = f.cntc(Addr, dest, 0, amount, log)
+	if mode & IncrAfter
+		fat.op = asm.cntd
+	return fat*dest
 
 
 function IncrAmount (|asmreg| dest, |int| mode, |scdecl| D,  |int64|)

@@ -10,7 +10,6 @@ extend asmstate
 //		Prm1	x
 //		Prm2	x
 		|| fat = exp.KNST(reg, 0, 0, 0, (V << 32) >> 32, V>>32)
-//		|| fat = .AddASM(asm.KNST, exp, reg, (V << 32) >> 32, V>>32, -1, -1)
 		fat.Const = v
 		return fat * reg
 

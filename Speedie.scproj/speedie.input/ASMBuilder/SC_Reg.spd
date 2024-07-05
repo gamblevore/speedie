@@ -152,6 +152,9 @@ datatype AsmReg (uint64)
 		.µType = t
 		return self
 	
+	operator mul (|bool| b, |asmreg|)
+		return (self, nil)(b)
+	
 	syntax cast (|bool|)
 		return .reg
 	

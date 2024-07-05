@@ -4410,7 +4410,7 @@ ASM SC_ASM_Func_SaveRegsSet(ASM Self, int Value);
 
 ASM SC_ASM_JCmp_CmpSet(ASM Self, int Value);
 
-ASM SC_ASM_JCmp_LSet(ASM Self, int Value);
+ASM SC_ASM_JCmp_JmpSet(ASM Self, int Value);
 
 ASM SC_ASM_JCmpEq_JmpSet(ASM Self, int Value);
 
@@ -4615,6 +4615,8 @@ AsmReg SC_Reg_OperatorAsnt(AsmReg Self, AsmReg A);
 AsmReg SC_Reg_OperatorBitand(AsmReg Self, AsmReg A);
 
 bool SC_Reg_OperatorIsa(AsmReg Self, DataTypeCode M);
+
+AsmReg SC_Reg_OperatorMul(AsmReg Self, bool B);
 
 AsmReg SC_Reg_OperatorxE2x80xA2(AsmReg Self, AsmReg Dest);
 
@@ -7806,9 +7808,9 @@ Message* SC_Msg_CmdImprove(Message* Self);
 
 FatASM* JB_Msg_CMPB(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Shift, int Inv);
 
-FatASM* JB_Msg_CMPF(Message* Self, AsmReg R1, AsmReg R2, int Cmp);
+FatASM* JB_Msg_CMPF(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Cmp);
 
-FatASM* JB_Msg_CMPI(Message* Self, AsmReg R1, AsmReg R2, int Cmp);
+FatASM* JB_Msg_CMPI(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Cmp);
 
 void JB_Msg_Cnj__(Message* Self, FastString* Fs);
 
@@ -8158,9 +8160,9 @@ JB_String* JB_Msg_JDB_(Message* Self, FastString* Fs_in, int Flags);
 
 FatASM* JB_Msg_JMPE(Message* Self, AsmReg R1, AsmReg R2, int Jmp);
 
-FatASM* JB_Msg_JMPF(Message* Self, AsmReg R1, AsmReg R2, int Cmp);
+FatASM* JB_Msg_JMPF(Message* Self, AsmReg R1, AsmReg R2, int Cmp, int Jmp);
 
-FatASM* JB_Msg_JMPI(Message* Self, AsmReg R1, AsmReg R2, int Cmp);
+FatASM* JB_Msg_JMPI(Message* Self, AsmReg R1, AsmReg R2, int Cmp, int Jmp);
 
 FatASM* JB_Msg_JMPN(Message* Self, AsmReg R1, AsmReg R2, int Jmp);
 
@@ -10147,12 +10149,6 @@ inline FatASM* SC_FatASM_Next(FatASM* Self);
 
 inline FatASM* SC_FatASM_Prev(FatASM* Self);
 
-inline FatASM* SC_Pac_AddASM3(ASMState* Self, int SM, Message* Dbg, int A, int B, int C);
-
-inline FatASM* SC_Pac_AddASM4(ASMState* Self, int SM, Message* Dbg, int A, int B, int C, int D);
-
-inline FatASM* SC_Pac_AddASM5(ASMState* Self, int SM, Message* Dbg, int A, int B, int C, int D, int E);
-
 inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest);
 
 inline uint64* SC_Pac_GetConst(ASMState* Self, int A);
@@ -10379,36 +10375,6 @@ inline FatASM* SC_FatASM_Next(FatASM* Self) {
 
 inline FatASM* SC_FatASM_Prev(FatASM* Self) {
 	return SC_FatASM_Step(Self, -1);
-}
-
-inline FatASM* SC_Pac_AddASM3(ASMState* Self, int SM, Message* Dbg, int A, int B, int C) {
-	FatASM* Rz = nil;
-	Rz = SC_Pac_RequestOp(Self, SM, Dbg);
-	Rz->R[0] = A;
-	Rz->R[1] = B;
-	Rz->R[2] = C;
-	return Rz;
-}
-
-inline FatASM* SC_Pac_AddASM4(ASMState* Self, int SM, Message* Dbg, int A, int B, int C, int D) {
-	FatASM* Rz = nil;
-	Rz = SC_Pac_RequestOp(Self, SM, Dbg);
-	Rz->R[0] = A;
-	Rz->R[1] = B;
-	Rz->R[2] = C;
-	Rz->R[3] = D;
-	return Rz;
-}
-
-inline FatASM* SC_Pac_AddASM5(ASMState* Self, int SM, Message* Dbg, int A, int B, int C, int D, int E) {
-	FatASM* Rz = nil;
-	Rz = SC_Pac_RequestOp(Self, SM, Dbg);
-	Rz->R[0] = A;
-	Rz->R[1] = B;
-	Rz->R[2] = C;
-	Rz->R[3] = D;
-	Rz->R[4] = E;
-	return Rz;
 }
 
 inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {

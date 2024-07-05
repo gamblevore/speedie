@@ -61,17 +61,17 @@
 #define   Jump_l0u_(x)   (((uint)((x)<<8))>>8)
 
 
-#define   Cmp_Cmpi       ((( int)((Op.Raw)<<18))>>28)
-#define   Cmp_Cmpi_(x)   ((( int)((x)<<18))>>28)
+#define   Cmp_Cmpi       ((( int)((Op.Raw)<<23))>>28)
+#define   Cmp_Cmpi_(x)   ((( int)((x)<<23))>>28)
 
-#define   Cmp_Cmpu       (((uint)((Op.Raw)<<18))>>28)
-#define   Cmp_Cmpu_(x)   (((uint)((x)<<18))>>28)
+#define   Cmp_Cmpu       (((uint)((Op.Raw)<<23))>>28)
+#define   Cmp_Cmpu_(x)   (((uint)((x)<<23))>>28)
 
-#define   Cmp_Li       ((( int)((Op.Raw)<<22))>>22)
-#define   Cmp_Li_(x)   ((( int)((x)<<22))>>22)
+#define   Cmp_Li       ((( int)((Op.Raw)<<27))>>27)
+#define   Cmp_Li_(x)   ((( int)((x)<<27))>>27)
 
-#define   Cmp_Lu       (((uint)((Op.Raw)<<22))>>22)
-#define   Cmp_Lu_(x)   (((uint)((x)<<22))>>22)
+#define   Cmp_Lu       (((uint)((Op.Raw)<<27))>>27)
+#define   Cmp_Lu_(x)   (((uint)((x)<<27))>>27)
 
 
 #define   Const_Roti       ((( int)((Op.Raw)<<13))>>26)
@@ -106,11 +106,11 @@
 #define   JCmp_Cmpu       (((uint)((Op.Raw)<<18))>>28)
 #define   JCmp_Cmpu_(x)   (((uint)((x)<<18))>>28)
 
-#define   JCmp_Li       ((( int)((Op.Raw)<<22))>>22)
-#define   JCmp_Li_(x)   ((( int)((x)<<22))>>22)
+#define   JCmp_Jmpi       ((( int)((Op.Raw)<<22))>>22)
+#define   JCmp_Jmpi_(x)   ((( int)((x)<<22))>>22)
 
-#define   JCmp_Lu       (((uint)((Op.Raw)<<22))>>22)
-#define   JCmp_Lu_(x)   (((uint)((x)<<22))>>22)
+#define   JCmp_Jmpu       (((uint)((Op.Raw)<<22))>>22)
+#define   JCmp_Jmpu_(x)   (((uint)((x)<<22))>>22)
 
 
 #define   Bra_c1i       ((( int)((Op.Raw)<<13))>>30)

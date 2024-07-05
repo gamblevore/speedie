@@ -27,6 +27,7 @@ forms
 	Cmp		// cmp:
 		r1		R
 		r2		r
+		r3		r
 		Cmp		4
 	
 	Const	// const:
@@ -44,6 +45,7 @@ forms
 		r1		r
 		r2		r
 		Cmp		4
+		Jmp		j
 
 	Bra		// bra:
 		r1		r
@@ -448,8 +450,8 @@ forms
 		mem(ivec4) = (ivec4)(((ivec4*)r)[n1])
 		mem2(ivec4)
 
-/**/ CNTC  (CNTC)
-		CountConst(r, Op, 1)
+/**/ CNTC  (CNTC) // negation bound CNTC and CNTD. CNTD must always be following.
+		CountConst(r, Op, 1) // same with a few others actually
 
 /**/ CNTD  (CNTC)
 		CountConst(r, Op, 0)
@@ -487,7 +489,7 @@ forms
 /**/ FMLK  (FloatConst)
 		f1 = f2 * FloatIncr1(Op)
 
-/**/ FDIV  (Float)
+/**/ FDIV  (float)
 		if (Float_Du)
 			d1 = d2 / d3
 		else
