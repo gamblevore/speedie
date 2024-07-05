@@ -254,7 +254,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 	
 
 	|| SaveAmount = .vdecls * (dest isnt forreturn)
-	|| fat = exp.fncx(save: SaveAmount,  jump: fn.TableId,  reg2,  reg3)
+	|| fat = exp.fncx(SaveAmount,  fn.TableId,  reg2,  reg3)
 
 	|| OP = (asm.func2, asm.func3)(sh <= 25)
 	if fn is Wrapper
