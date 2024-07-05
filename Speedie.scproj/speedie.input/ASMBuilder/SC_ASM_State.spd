@@ -33,8 +33,27 @@ struct ASMState
 	function Last (|&FatASM|)
 		return .curr-1
 	
-	syntax access (|int| a, |&uint64|)
-		cpp_part GetConst, pragma inline
+	function AskReg (|int| a, |?&fatasm|)
+		return .RegPlace(A)[0]
+
+	function ExpectReg (|int| a, |&fatasm|)
+		|| b2 = .RegPlace(A)[0]
+			return b2
+		error (self, errorreceiver.NonFatal + ": Register was nil")
+		return .zero
+
+	function RegPlace (|int| a, |&(?&fatasm)|)
+		if a|uint| <= 31
+			if a <= .vdecls
+				return &.registers[a]
+			if a >= (32 - .vtmps)
+				return &.registers[a]
+		error (self, errorreceiver.NonFatal + ": Out of bounds register")
+		return &.Registers[0]
+			
+		
+	function GetConst (|int| a, |&uint64|)
+		pragma inline
 		if a|uint| > 31
 			debugger // sigh
 			a = 0
@@ -47,7 +66,7 @@ struct ASMState
 		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
 		// this is used for multiplication mostly. like x*-1, or x*0, or x*1
 		if r is ConstAny
-			|| v = self[r][]
+			|| v = .GetConst(r)[]
 			if v == -1
 				return v
 			if v.IsPow2
@@ -162,24 +181,26 @@ struct ASMState
 			return t
 		error (where, "No free local variables.")
 
+	
+	function FoundCode (|int| i, |int64| code, |scdecl| d, |asmreg|)
+		|| rp = .askreg(i)
+		if rp and rp.const == code
+			|| dest = d.asmreg
+			dest.reg = i
+			(Dest is constany)
+			return dest
 
 	function FindConst (|scdecl| d, |asmreg|)
-		|uint64| Code = d.exportposition
-		|| dest = d.asmreg 
-		if !Code
-			dest.reg = 0
-			(Dest is constany) // why is the orig not const any?
-			return dest
-		
-		// it should be within the current block only! So what is the current block?
-		|int| i = 31 - .VTmps
-		while i > .VDecls
-			|| r = .Registers[i]!
-			if r.const == code
-				dest.reg = i
-				(Dest is constany)
-				return dest
-			--i
+		|uint64| Code = d.exportposition			
+		for i in .vdecls+1
+			|| f = .FoundCode(i,Code, d)
+			if f != nil
+				return f
+				
+		for i in .vtmps+0
+			|| f = .FoundCode(31-i,Code, d)
+			if f != nil
+				return f
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -283,7 +304,7 @@ function ASMState.PackMakerInit (|bool|)
 	if sh.Inited
 		return true
 	sh.inited = true
-	VM_Builder.JustMakeMyBread
+	VM_Builder.JustDefineInstructions
 	SpdAssembler.InitAss
 	return .alloc(ASMState.JSMSpace)
 
@@ -312,7 +333,8 @@ function ASMState.StartFunc (|scfunction| fn)
 	  else
 		.out = µfunc(fn, .curr)
 	for i in 32
-		.Registers[i] = .zero
+		.Registers[i] = nil // i think its ok.
+	.registers[0] = .zero
 	.zero = nil
 	.zero.info = AsmReg()
 	.FuncStart = .curr

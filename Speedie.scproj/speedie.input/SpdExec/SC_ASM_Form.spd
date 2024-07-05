@@ -10,15 +10,6 @@ class µForm
 	|int|			TotalBits
 	|int|			Index
 	
-	flags
-		(32)		// starting point
-		Jump
-		Num
-		Signed
-		NoExpect
-		PositionBits
-		Output
-	
 	
 	render
 		fs <~ .name
@@ -69,34 +60,34 @@ class µForm
 			++i
 
 	function AddRemainder (|int| U)
-		.addp( 32 - .TotalBits, µform.num ||| U)
+		.addp( 32 - .TotalBits, µparam.num ||| U)
 	
 	function LoadParam (|string| pl, |message| place, |bool| IsLast)
 		if (pl.isint)
 			|| i = pl.int
 			check (i > 0 and i <= 24) (place, "Number out of range (1-24)")
-			.addp(i, µform.num)
+			.addp(i, µparam.num)
 			return
 		expect (pl == 1) (self)
 		|| p = pl[]
 		if  p == 'r'
 			.AddP(5)
 		  elseif p == 'R'
-			.AddP(5, µform.Output)
+			.AddP(5, µparam.Output)
 		  elseif p == 'x' // for 64/96/128 sized instructions
-			.AddP(32)
+			.AddP(32, µparam.num)
 		  elseif p == 'n'
-			.AddP(5, µform.num)
+			.AddP(5, µparam.num)
 		  elseif p == 'l'
 			.addremainder(0)
 		  elseif p == 'L'
-			.addremainder( µform.NoExpect )
+			.addremainder( µparam.NoExpect )
 		  elseif p == 's'
-			.addremainder( µform.signed )
+			.addremainder( µparam.signed )
 		  elseif p == 'S'
-			.addremainder( µform.signed + µform.NoExpect )
+			.addremainder( µparam.signed + µparam.NoExpect )
 		  elseif p == 'j'
-			.addremainder( µform.signed + µform.jump )
+			.addremainder( µparam.signed + µparam.jump )
 		  elseif place
 			error (place)
 		  else

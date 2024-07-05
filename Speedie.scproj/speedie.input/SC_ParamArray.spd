@@ -4,7 +4,6 @@
 
 
 
-|| iii = 0
 class SCParamArray
 	linkage
 		cpp_part		PA

@@ -145,7 +145,7 @@ extend ASMState
 			return l.fat
 		
 		if r.fourbytes
-			|| k = self[r][]
+			|| k = .GetConst(r)[]
 			if (k >> 18) << 18 != k
 				debugger, #!hmmm. const-optimiser/renderer will handle it, but lets check to make sure
 			rz = .AddASM(asm.fadk, exp, dest, l, k)
@@ -160,7 +160,7 @@ extend ASMState
 		if !v or v.abs == 1.0
 			return .Quick1Or1Sub(dest, l, v|int|, exp)
 
-		|| p = self[r]
+		|| p = .GetConst(r)
 		|ivec2| ex
 		if l.IsBig
 			|| f8 = p|&f64|[]
@@ -202,14 +202,14 @@ extend ASMState
 			return .plus(dest, l, l, exp)
 		
 		if r.Fourbytes
-			|| x = self[r][]
+			|| x = .GetConst(r)[]
 			|| y = x >> 18
 			if x == y << 18
 				return .AddASM(asm.FMLK, exp, dest, l, x) * Dest
 
 	
 	function PlusInt     (fn_opasm)
-		|| LL = self[L][],		|| RR = self[R][]
+		|| LL = .GetConst(L)[],		|| RR = .GetConst(R)[]
 		//		a - 1,		a + 1
 		//		1 - a,		1 + a
 		|| subtract = l is alternate
@@ -449,7 +449,7 @@ extend ASMState
 	
 	function ConstForShift (|asmreg| r, |int| btc, |message| exp,  |int64|)
 		// shl/shl used to use this
-		rz = self[r][] #debug_require
+		rz = .GetConst(r)[] #debug_require
 		if rz < 0
 			error (exp, "Can't negative shift")
 		  elseif rz >= btc

@@ -3,13 +3,19 @@
 extend asmstate
 	function NumToReg (|int64| V, |message| exp, |asmreg| Reg=asmreg(), |asmreg|)
 		Reg = .TempMe(exp, Reg)	
-		|| fat = .AddASM(asm.KNST, exp, reg, (V << 32) >> 32, V>>32, -1, -1)
-		.Registers[reg.reg] = fat
+//		r1		R
+//		Cond	1	// 0 == always, 1 = only if dest == 0
+//		Inv		1	// bit inversion
+//		Value	16  // shouldnt this be 17?
+//		Prm1	x
+//		Prm2	x
+		|| fat = exp.KNST(reg, 0, 0, 0, (V << 32) >> 32, V>>32)
+//		|| fat = .AddASM(asm.KNST, exp, reg, (V << 32) >> 32, V>>32, -1, -1)
 		fat.Const = v
 		return fat * reg
 
 	function f (|asmreg| r, |f64|)
-		|| p = self[r]
+		|| p = .GetConst(r)
 		if r.fourbytes
 			return p|&float|[]
 		return p|&f64|[]

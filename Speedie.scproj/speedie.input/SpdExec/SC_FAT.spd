@@ -94,17 +94,53 @@ struct FatASM
 	function BitCorrect (|&FATASM|)
 		.info = .info <~ AsmReg.BitCorrect
 		return self
+	
 		
-		
-	function prm (|int| a, assigns:|asmreg| r)
-		cpp_part SetReg
-		.r[a] = r.reg
-		|| f = r.fat
+	function LinkIn (|fatasm| old)
+		if old.BlockNum == .BlockNum					// add it's backlink
+			.BackLink = old.BackLink
+		  elseif .ParentBlock == old.parentblock		// if x {a=b} else {a=c}
+			.BackLink = old								// what about while loops or combinations?
+														// what about nested ifs?
+														// if a {if b {x=1}} else {x=2}
+
+														// what about this?
+														// || x = 1
+														// if y
+														//     x = 2
+	
+	function Dest (|int| a, assigns:|asmreg| info)
+		|| dest = info.reg
+		.r[a] = dest
+		if dest
+			|| oldwhere = asmstate.sh.regplace(dest)
+			|| oldreg = oldwhere[0]
+			oldwhere[0] = self
+			if oldreg
+				.linkin(oldreg)
+	
+	
+	function File (|string|)
+		opt norefcounts
+		|| s = scimport.allfiles[.filenum]
+			return s
+	
+	
+	function SyntaxExpect (|string| Error)
+		|| err = Error(nil, error, ErrorSeverity.Error, .file)
+		err.position = .BytePos
+		stderr <~ err
+
+
+	
+	function RegInput (|int| a, assigns:|asmreg| info, |int|)
+		rz = info.reg
+		.r[a] = rz
+		|| f = info.fat
 			if !a // why?
 			f.refcount++
 		
-	function prm (|int| a, assigns:|int| v)
-		cpp_part SetNum
+	function NumInput (|int| a, assigns:|int| v)
 		.r[a] = v
 		
 

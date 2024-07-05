@@ -304,21 +304,6 @@ function SetReg (|&ASMState| self=asmstate.sh, |message| exp, |AsmReg| Dest, |As
 	return .Assign(dest, r2, asmreg(), exp)
 
 
-/*
-// we wanna do this per-instruction actually.
-// HOW? Well... any instruction that sets anything... should just update the regfile
-// right? 
-// just to say where the last fat came from.
-// I guess I need to update the instruction gen code.
-// so it does this automatically?
-// how to do that?
-
-function UpdateRegFile (|&ASMState| self=asmstate.sh, |asmreg| r, |scdecl| dcl, |AsmReg|)
-	if dcl is local
-		.registers[r.reg] = r.fat					// not sure how this works with nesting?
-	return r
-*/
-
 function Arg   (fn_asm)
 	opt norefcounts
 	|| decls = .VDecls

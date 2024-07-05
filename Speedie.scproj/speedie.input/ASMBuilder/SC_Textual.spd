@@ -72,18 +72,6 @@ extend ASMState
 		return true
 	
 	
-	function FatASM.File (|string|)
-		opt norefcounts
-		|| s = scimport.allfiles[.filenum]
-			return s
-	
-	
-	function FatASM.SyntaxExpect (|string| Error)
-		|| err = Error(nil, error, ErrorSeverity.Error, .file)
-		err.position = .BytePos
-		stderr <~ err
-
-
 	function FindLabel (|&FatASM| dbg, |&FatASM|)
 		opt norefcounts
 		|| num = dbg.r[0]
@@ -104,6 +92,7 @@ extend ASMState
 
 	function TextFuncSub (|message| m, |bool|)
 		opt NoRefCounts
+		.vdecls = 31 // no other choice. Register requester will fail... otherwise.
 		for ch in .LoadTitle(m)
 			if ch == @name
 				.addlabel(ch)

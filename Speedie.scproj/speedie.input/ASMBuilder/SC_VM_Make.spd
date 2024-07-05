@@ -150,7 +150,7 @@ function VMBox (|message|)
 		error "Can't find vm.box"
 
 
-function JustMakeMyBread (|bool|)
+function JustDefineInstructions (|bool|)
 	description "Shorter version that just makes the stuff we need, rather than generate the entire VM."
 	require !ModuleArg
 	|| vmdef = .VMBox
@@ -316,8 +316,16 @@ function MakeMsgCreator (|string| name, |µform| form)
 		|| pname = ('a' + i)|byte|.render
 		|| dcl = NewDecl(ty, pname)
 		fatdecl.prev = dcl
-		arg <~ legs.run([i.msg, @thg + pname])		
-	
+		|| r = [i.msg, @thg + pname]
+		arg <~ p.which.run(r)
+		
+
+function µparam.Which (|macro!--|)
+	if .isnumber
+		return VM_Builder.legs
+	if self is output
+		return vm_builder.skibidy
+	return vm_builder.arms
 	
 
 || icecream = `function message._0 (|&fatasm|) {
@@ -327,7 +335,9 @@ function MakeMsgCreator (|string| name, |µform| form)
 }`.macro
 
 
-|| legs = "rz.prm(_0) = _1".macro
+|| legs = "rz.numinput(_0) = _1".macro
+|| arms = "rz.reginput(_0) = _1".macro
+|| skibidy = "rz.dest(_0) = _1".macro
 	
 	
 
