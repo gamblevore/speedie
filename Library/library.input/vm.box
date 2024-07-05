@@ -50,6 +50,11 @@ forms
 		c1		2
 		jmp		j
 	
+	Table
+		r1		R
+		Mode	2
+		Add		l
+	
 	Read			// mem:
 		r1		R	// dest
 		r2		r	// Base
@@ -87,7 +92,7 @@ forms
 		sign	1
 	
 	CmpB	// cmpb:
-		r1		r
+		r1		R
 		r2		r
 		r3		r
 		Shift	6
@@ -99,6 +104,12 @@ forms
 		Shift1	6
 		Shift2	6
 		Sign	2
+	
+	Convert
+		r1		R
+		r2		r
+		Mode	4
+		
 		
 	RET
 		r1		r
@@ -239,8 +250,8 @@ forms
 		#!better to print this also as float/double/signed/unsigned...
 /**/ RARE (U2)
 		if_rare (Rare(r, Op)) return n3
-/**/ CONV (U3)
-		Conv(r, n2, Op)
+/**/ CONV (Convert)
+		Conv(r, Convert_Modeu, Op)
 
 
 
@@ -394,7 +405,7 @@ forms
 
 
 #!						(((((Memory)))))
-/**/ TABL  (U2)
+/**/ TABL  (table)
 		u1 = table(n2)
 /**/ RD1U  (Read)
 		u1 = mem(uint8)

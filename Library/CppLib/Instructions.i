@@ -38,7 +38,7 @@
 ı RARE: _
 	if_rare (Rare(r, Op)) return n3;
 ı CONV: _
-	Conv(r, n2, Op);
+	Conv(r, Convert_Modeu, Op);
 ı KSTR: _
 	RotateConst(r, Op);
 ı ADDK: _

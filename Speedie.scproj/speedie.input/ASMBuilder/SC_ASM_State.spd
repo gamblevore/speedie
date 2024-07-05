@@ -80,7 +80,7 @@ struct ASMState
 		if togrow.isint and value.CanStoreAsIntImmediate
 			if 0
 				exp.parent!.adpk(reg, togrow, togrow)
-			return .AddASM(asm.ADPK, exp.parent!, reg, ToGrow, Value) * reg
+			return exp.parent!.ADPK(reg, ToGrow, Value) * reg
 		.Assign(reg, ToGrow, asmreg(), exp)
 		rz = .AddConstant(exp, togrow, ToGrow, value)
 	
@@ -88,10 +88,10 @@ struct ASMState
 	function AddConstant (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
 		if dest.isint
 			if Value.CanStoreAsIntImmediate
-				return .AddASM(asm.ADDK, exp.parent!, dest, src, Value) * dest
+				return exp.parent!.ADDK(dest, src, Value) * dest
 		  elseif dest.FourBytes
 			if value|uint64|.CanStoreAsfloatImmediate
-				return .AddASM(asm.FADK, exp.parent!, dest, src, value) * dest
+				return exp.parent!.FADK(dest, src, value) * dest
 			debugger // how is this possible? we are adding a 64 bit float to a 32-bit?
 		debugat
 		|| where = .NumToReg(value, exp)
@@ -115,12 +115,12 @@ struct ASMState
 		rz.r[2] = c
 		rz.r[3] = d
 
-	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |int| c, |&FatASM|)
-		pragma inline,  opt norefcounts,  cpp_part AddASM3
-		rz = self <~ (sm, dbg)
-		rz.r[0] = a
-		rz.r[1] = b
-		rz.r[2] = c
+//	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |int| c, |&FatASM|)
+//		pragma inline,  opt norefcounts,  cpp_part AddASM3
+//		rz = self <~ (sm, dbg)
+//		rz.r[0] = a
+//		rz.r[1] = b
+//		rz.r[2] = c
 
 //	function AddASM (|int| SM, |message| dbg, |int| a, |int| b, |&FatASM|)
 //		pragma inline,  opt norefcounts,  cpp_part AddASM2

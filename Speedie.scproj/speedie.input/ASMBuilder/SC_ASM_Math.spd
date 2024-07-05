@@ -70,7 +70,9 @@ extend ASMState
 			|| gl = l.GapBits
 			|| gr = r.GapBits
 			.AddASM(asm.BCLR, exp, L, R, gl, gr, (l.signed|int|) + (r.signed|int|<<1))
-		return .AddASM(asm.JMPE • Negate, exp, L, R, dest) * Dest
+		|| fat2 = exp.JMPE(L, R, dest)
+		fat2.op += Negate
+		return fat2 * Dest
 				
 	
 	
@@ -152,7 +154,7 @@ extend ASMState
 			|| k = .GetConst(r)[]
 			if (k >> 18) << 18 != k
 				debugger, #!hmmm. const-optimiser/renderer will handle it, but lets check to make sure
-			rz = .AddASM(asm.fadk, exp, dest, l, k)
+			rz = exp.fadk(dest, l, k)
 			rz.info = Dest
 
 
@@ -209,7 +211,7 @@ extend ASMState
 			|| x = .GetConst(r)[]
 			|| y = x >> 18
 			if x == y << 18
-				return .AddASM(asm.FMLK, exp, dest, l, x) * Dest
+				return exp.FMLK(dest, l, x) * Dest
 
 	
 	function PlusInt     (fn_opasm)
@@ -221,17 +223,17 @@ extend ASMState
 
 		|&fatasm| fat
 		if !subtract and l.CanAddK(LL)					// 1 + a
-			fat = .AddASM(asm.ADDK, exp, dest, R, LL)
+			fat = exp.ADDK(dest, R, LL)
 //			exp.addk(dest, R, LL)
 
 		  elseif r.CanAddK(RR)							// a - 1,  a + 1
-			fat = .AddASM(asm.ADDK, exp, dest, L, RR)
+			fat = exp.ADDK(dest, L, RR)
 
 		  elseif subtract
-			fat = .AddASM(asm.SUBB, exp, dest, L, R)
+			fat = exp.SUBB(dest, L, R)
 
 		  else
-			fat = .AddASM(asm.ADD, exp, dest, L, R)
+			fat = exp.ADD(dest, L, R)
 
 		if dest is constany
 			fat.const = ll + rr
@@ -282,7 +284,7 @@ extend ASMState
 
 
 	function BoolMul (|asmreg| dest, |asmreg| Boo, |asmreg| V, |message| exp, |asmreg|)
-		|| fat = .addasm(asm.TERN, exp, dest, boo, V)
+		|| fat = exp.TERN(dest, boo, V, asmreg())
 		if dest is ConstAny
 			fat.const = boo.const * v.const
 		return fat * Dest
@@ -428,7 +430,7 @@ extend ASMState
 	function BitXor (fn_opasm)
 		if (l.reg == r.reg)
 			return .BitOr(dest, asmreg(), asmreg(), exp)
-		|| fat = .AddASM(asm.BXOR, exp, dest, L, R)
+		|| fat = exp.BXOR(dest, L, R)
 		if dest is ConstAny
 			fat.const = l.Const xor r.const
 		return fat*Dest
@@ -445,7 +447,7 @@ extend ASMState
 	
 	
 	function BitAnd (fn_opasm)		
-		|| fat = .AddASM(asm.BAND, exp, dest, L, R)
+		|| fat = exp.BAND(dest, L, R, 0)
 		if dest is ConstAny
 			fat.const = l.const & r.const
 		return fat*Dest
@@ -489,7 +491,7 @@ extend ASMState
 	function SHL    (fn_opasm)
 		if r is ConstAny
 			return .BFLG_Const(exp, dest, l,  r.const, 0)
-		return .AddASM(asm.BLUE, exp, dest, L, R)*Dest
+		return exp.BLUE(dest, L, R, 0) * Dest
 	
 	
 	function Assign (fn_opasm)

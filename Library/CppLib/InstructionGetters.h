@@ -126,6 +126,19 @@
 #define   Bra_jmpu_(x)   (((uint)((x)<<15))>>15)
 
 
+#define   Table_Modei       ((( int)((Op.Raw)<<13))>>30)
+#define   Table_Modei_(x)   ((( int)((x)<<13))>>30)
+
+#define   Table_Modeu       (((uint)((Op.Raw)<<13))>>30)
+#define   Table_Modeu_(x)   (((uint)((x)<<13))>>30)
+
+#define   Table_Addi       ((( int)((Op.Raw)<<15))>>15)
+#define   Table_Addi_(x)   ((( int)((x)<<15))>>15)
+
+#define   Table_Addu       (((uint)((Op.Raw)<<15))>>15)
+#define   Table_Addu_(x)   (((uint)((x)<<15))>>15)
+
+
 #define   Read_Li       ((( int)((Op.Raw)<<23))>>25)
 #define   Read_Li_(x)   ((( int)((x)<<23))>>25)
 
@@ -239,6 +252,19 @@
 
 #define   BClear_Signu       (((uint)((Op.Raw)<<30))>>30)
 #define   BClear_Signu_(x)   (((uint)((x)<<30))>>30)
+
+
+#define   Convert_Modei       ((( int)((Op.Raw)<<18))>>28)
+#define   Convert_Modei_(x)   ((( int)((x)<<18))>>28)
+
+#define   Convert_Modeu       (((uint)((Op.Raw)<<18))>>28)
+#define   Convert_Modeu_(x)   (((uint)((x)<<18))>>28)
+
+#define   Convert_Li       ((( int)((Op.Raw)<<22))>>22)
+#define   Convert_Li_(x)   ((( int)((x)<<22))>>22)
+
+#define   Convert_Lu       (((uint)((Op.Raw)<<22))>>22)
+#define   Convert_Lu_(x)   (((uint)((x)<<22))>>22)
 
 
 #define   RET_Counti       ((( int)((Op.Raw)<<18))>>29)

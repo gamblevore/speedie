@@ -209,13 +209,13 @@ function First			(fn_asm)
 
 function Return			(fn_asm)
 	opt norefcounts
-	|| reg = 0
+	|| reg = asmreg()
 	|| f = exp.first
 		|| Where = asmreg.ForReturn
 		where.reg = 1
 		where.µtype = asmstate.sh.ReturnType
 		reg = .µ(f, Where)
-	.AddASM(asm.RET, exp, reg, asmreg(), 1)
+	exp.RET(reg, asmreg(), 1, 0)
 
 
 
@@ -254,7 +254,7 @@ function TypeCast		(fn_asm)
 	|&fatasm| fat
 	if oldtype.isfloat or newtype.isfloat
 		debugat,   #!put in actual numbers later
-		fat = .AddASM(asm.CONV, exp, dest, sr, 3-(floatdiff<<1)).BitCorrect
+		fat = exp.CONV(dest, sr, 3-(floatdiff<<1)).BitCorrect
 		if UponConst
 			(fat.info as= asmreg.ConstAny)
 			|| srf = sr.needfat
@@ -279,7 +279,7 @@ function Pointer		(fn_asm)
 	if dest is AddrRequest // hmmm?
 	dest = .TempMe(exp, dest)
 	|| Ptr = .µ(exp.first!, dest)
-	return Dest.ReadOrWrite(exp,ptr) * Dest
+	return Dest.ReadOrWrite(exp,ptr)
 
 
 function Decl (fn_asm)
@@ -317,7 +317,7 @@ function Access		(fn_asm)						// a[b], struct.mem[b], func()[func2()]
 	if (dest is addrrequest)
 		return .plus(dest.HaveAddr, ptr, ind, exp)
 	
-	return Dest.ReadOrWrite(exp, ptr, ind) * dest
+	return Dest.ReadOrWrite(exp, ptr, ind)
 
 
 function Dot		(fn_asm)						// a.b
@@ -333,12 +333,12 @@ function Dot		(fn_asm)						// a.b
 	|| Pos = prop.exportposition >> B
 	if !pos // what?
 	if (dest is addrrequest) or (pos >= 128)						// read/write only allows up to 127
-		|| addk = .AddASM(asm.ADDK, exp, dest, obj, pos)
+		|| addk = exp.ADDK(dest, obj, pos)
 		if dest is addrrequest
 			return addk.haveaddr*dest
 		pos = 0
 	
-	return Dest.ReadOrWrite(exp, obj, pos) * Dest
+	return Dest.ReadOrWrite(exp, obj, pos)
 //	return .AddASM(A, exp, dest: dest,  ptr: Obj,  index: 0, Pos) * Dest
 		
 
@@ -423,7 +423,7 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 		if itable >= 16K
 			debugger // does this ever happen?
 			itable &= 16K-1
-		|| a = .AddASM(asm.tabl,  exp,  addr,  (!d.IsLib)|int|,  itable)
+		|| a = exp.TABL(addr,  (!d.IsLib)|int|, iTable)
 		return .addtoreg(a, iadd-itable, exp).haveaddr
 
 	|| iRead = iTable
@@ -436,13 +436,13 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 		itable = 0		// Make this optimisable.
 		iRead = 0
 
-	|| tabl = .AddASM(asm.TABL,  exp,  addr,  (!d.IsLib)|int|, iTable)
+	|| tabl = exp.TABL(addr,  (!d.IsLib)|int|, iTable)
 	if !itable and !iread
 		.addtoreg(tabl, iold, exp)
 	debugger 
 	#!This used to return ADDR not DEST. so we we returnign addr.bitcorrect. is this faulse?
 	#!probably ok aksuually
-	return dest.ReadOrWrite(Exp, addr, iread) * Dest	//, exp, dest, addr, iRead).BitCorrect * dest
+	return dest.ReadOrWrite(Exp, addr, iread)	//, exp, dest, addr, iRead).BitCorrect * dest
 
 	
 
@@ -605,8 +605,8 @@ function Unexpected		(fn_asm)
 
 
 
-function ASMReg.ReadOrWrite (|message| m, |asmreg| ptr, |int| index=0, |&fatasm|)
-	return .ReadOrWrite(m, ptr, index, self is set)
+function ASMReg.ReadOrWrite (|message| m, |asmreg| ptr, |int| index=0, |asmreg|)
+	return .ReadOrWrite(m, ptr, index, self is set) * self
 
 
 function ASMReg.ReadOrWrite (|message| m, |asmreg| ptr, |int| index, |bool| DoRead, |&fatasm|)
@@ -624,7 +624,7 @@ function ASMReg.ReadOrWrite (|message| m, |asmreg| ptr, |int| index, |bool| DoRe
 	  else
 		A = ASMTmp.WriteASM[bytes]
 	isnt set
-	rz = m.RD4U(self, ptr, asmreg(), index, 0).BitCorrect
+	return m.RD4U(self, ptr, asmreg(), index, 0).BitCorrect
 //		r1		R	// dest
 //		r2		r	// Base
 //		r3		r	// VarAdd
@@ -632,7 +632,6 @@ function ASMReg.ReadOrWrite (|message| m, |asmreg| ptr, |int| index, |bool| DoRe
 //		move	2
 
 //	rz = rz.BitCorrect
-//	fat.reginput(2) = index
 	
 
 
