@@ -418,7 +418,7 @@ datatype float
 		return self|bool|
 	
 	function Exponent (|ivec2|)
-		cpp_wrapper JB_F_Exponent
+		cpp_wrapper JB_f_Exponent
 			
 	function f64.Exponent (|ivec2|)
 		cpp_wrapper JB_F64_Exponent

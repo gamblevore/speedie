@@ -183,9 +183,10 @@ class File (String)
 	function Parent (|File|)
 		return File.new( super.Parent )
 	
+	target !minilib {
 	function Touch (|errorint2|)
 		return "/usr/bin/touch".SilentExecute([self])
-
+	}
 	
 	function CompareFile (|File| A, |string| Error="", |bool|)
 		cpp_part FileCompare

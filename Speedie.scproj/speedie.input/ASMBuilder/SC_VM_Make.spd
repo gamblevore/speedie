@@ -310,15 +310,14 @@ helper message.VMMsgArgName (|int| i, |string|)
 
 
 function MakeMsgCreator (|string| name, |µform| form)
-	opt norefcounts
 	|| fn = icecream.run(@thg+name)
 	Compiler.ExtendList <~ fn
 	|| arg = fn.Last!
 	|| prm = arg.prev!
 	|| FatDecl = prm.last!
-	|| r = macro.TmpPrms_
-	r.Clear
-	r <~ (arg, 2)
+	|| r = [arg,arg]
+//	r.Clear
+//	r <~ (arg, 2)
 	|| f = form.src.first.first
 	
 	for (p in form) (i)
@@ -331,11 +330,11 @@ function MakeMsgCreator (|string| name, |µform| form)
 		arg <~ p.which.run(r)
 		f++
 	
-	r.Clear
+//	r.Clear
 	
-	|| x = form.Outputs + 1
-	if x > 1
-		arg <~ ohio.run(@num+(x>>1))
+//	|| x = form.Outputs + 1
+//	if x > 1
+//		arg <~ ohio.run(@num+(x>>1))
 
 		
 

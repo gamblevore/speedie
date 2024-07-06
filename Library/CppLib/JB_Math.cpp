@@ -8,22 +8,31 @@
 #include <math.h>
 
 extern "C" {
-    double JB_Dlb_Max(double A, double B) {
-        return fmax(A, B);
-    }
-    
-    float fclampf (float d, float min, float max) {
+	bool JB_dbl_IsNan (double x) {
+		return std::isnan(x);
+	}
+	bool JB_dbl_IsInf (double x) {
+		return std::isinf(x);
+	}
+	bool JB_f_IsNan (float x) {
+		return std::isnan(x);
+	}
+	bool JB_f_IsInf (float x) {
+		return std::isinf(x);
+	}
+	
+    float JB_f_Clamp (float d, float min, float max) {
         const float t = d < min ? min : d;
         return t > max ? max : t;
     }
 
-    float JB_fCluster (float x) {
+    float JB_f_Cluster (float x) {
         float im = 2.0*x-1.0; // y = (2x-1)^3+0.5
         float y = ((im*im*im)/2.0) + 0.5;
         return y;
     }
 
-    float JB_PowInt(float x, u32 n) {
+    float JB_f_IntPow(float x, u32 n) {
         float z = 1;
         float base = x;
 
@@ -87,7 +96,7 @@ extern "C" {
 		return rz;
 	}
     
-	ivec2 JB_F_Exponent(float f) {
+	ivec2 JB_f_Exponent(float f) {
 		uint i = reinterpret_cast<uint&>(f);
 		uint x = (i<<1) >> 24;
 		int x2 = x - 127;
@@ -131,12 +140,6 @@ extern "C" {
         return rand();
     }
     #endif
-    
-    int JB_Rand() {
-        static int Value = 123;
-        Value = JB_uint_hash(Value);
-        return Value;
-    }
 }
 
 

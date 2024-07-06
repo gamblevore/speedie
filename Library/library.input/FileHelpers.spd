@@ -315,6 +315,7 @@ extend String
 		cpp_Part ChildFile
 		return self.Child(ch).file
 	
+	target !minilib {
 	function OpenFile (|errorint2|)
 		|| p = .pathfix
 			return "/usr/bin/open".SilentExecute([p], NIL, nil)
@@ -328,6 +329,7 @@ extend String
 				r.remove(0)
 			"/usr/bin/open".SilentExecute(R)
 			return true
+	}
 
 	function TypeContains (|string| s, |bool|)
 		for field in StringFields( self, ',' )
@@ -344,6 +346,10 @@ helper @file.OSXMaxCaseWarnings (|&int|)
 //	cpp_wrapper
 		
 
+function string.ShellPath (|string|)
+	return .replaceall(" ", `\ `)
+
+target !minilib {
 extend file
 	function UploadTo (|string| url, |errorint2|) // move to the network module
 		return "/usr/bin/curl".silentexecute([
@@ -358,9 +364,6 @@ extend file
 		|| name = p[dir.length...]
 		rz = "cd $dir; zip  -r  $zip  $name".system
 	
-	function string.ShellPath (|string|)
-		return .replaceall(" ", `\ `)
-		
 	function ZipTmp (|file|)
 		require self
 		|| zip = "/tmp/${.name}.zip"
@@ -369,6 +372,7 @@ extend file
 		
 	function ZipUpload (|string| url, |errorint2|)
 		return .ZipTmp$.uploadto(url)
+}
 
 
 

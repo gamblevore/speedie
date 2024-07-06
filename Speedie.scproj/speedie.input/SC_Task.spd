@@ -195,3 +195,10 @@ task LessThan3 (|string| a, |int| b, |string| c)
 		return i < .b
 
 
+
+function compiler.TestDict
+	|| d = Dictionary()
+	d["_void"] = "x"
+	if (d["_void"] as string) == "x"
+		return 
+	error "TestDict failed"

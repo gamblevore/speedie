@@ -1,4 +1,6 @@
 
+target !minilib {
+
 datatype TerminalColor (int)
 	
 class TerminalCell
@@ -112,4 +114,5 @@ module Terminal
 	syntax access (|ind|)
 		cpp_wrapper JB_App__GetChar
 
+}
 

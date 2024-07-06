@@ -45,6 +45,7 @@ datatype ErrorInt2 (ivec2)
 
 
 
+target !minilib {
 extend string	
 	function Execute       (|[string]?| Args = [],  |faststring?| Out = nil, |faststring?| Errs = nil, |bool| StdOutFlowsThroughUs=true, |date| timeout=0, |ErrorInt2|)
 		cpp_wrapper JB_Str_Execute
@@ -59,4 +60,4 @@ extend string
 
 	function System (|int|)
 		cpp_wrapper	// bad? execute is better?
-
+}

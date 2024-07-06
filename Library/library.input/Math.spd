@@ -88,13 +88,13 @@ module Math
 		return factor / (π * v).sqrt
 	
 	function float.Clamp (|float|L, |float|H, |float|)
-		cpp_wrapper (fclampf)
+		cpp_wrapper JB_f_Clamp
 	
 	function float.Clamp (|float|H=1.0, |float|)
 		return .clamp(0,h)
 		
 	function float.Cluster (|float|)
-		cpp_Wrapper JB_fCluster
+		cpp_Wrapper JB_f_Cluster
 
 	function int64.Hash (|uint64|)
 		return self|uint64|.hash 

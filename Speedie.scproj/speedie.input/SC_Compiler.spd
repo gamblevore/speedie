@@ -407,11 +407,14 @@ function ImportAll
 
 	for c in .ClassList
 		c.CreateBehaviour	// creates new classes, put before loadsuperclass
+	require .Stage( "Loading Supers" )
 	
 	.LoadSuperClasses
 	
+	require .Stage( "Sorting" )
 	require .SortModulesAndClasses
 
+	require .Stage( "Loading DataTypes" )
 	for c in .ClassList
 		c.DataTypePostLoad
 	

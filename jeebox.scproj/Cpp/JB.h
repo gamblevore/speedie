@@ -99,8 +99,6 @@ typedef byte Syntax;
 
 typedef byte TaskState;
 
-typedef int TerminalColor;
-
 typedef int jbinLeaver;
 
 typedef vec4 mat2;
@@ -181,8 +179,6 @@ struct String_Behaviour;
 
 struct SyntaxObj_Behaviour;
 
-struct TerminalCell_Behaviour;
-
 struct TokenHandler_Behaviour;
 
 struct Array_Behaviour;
@@ -238,8 +234,6 @@ struct StringFields;
 struct StringReader;
 
 struct SyntaxObj;
-
-struct TerminalCell;
 
 struct FastString;
 
@@ -529,14 +523,6 @@ JBClass ( SyntaxObj , JB_Object ,
 	FP_fpMsgRender RenderAddr;
 );
 
-struct TerminalCell_Behaviour: Object_Behaviour {
-};
-
-JBClass ( TerminalCell , JB_Object , 
-	int Color;
-	JB_String* Text;
-);
-
 struct TokenHandler_Behaviour: Object_Behaviour {
 };
 
@@ -642,19 +628,6 @@ extern CharSet* JB__Constants_XMLWordMiddle;
 #define kJB__Math_E (2.7182818284590452353602874713526f)
 #define kJB__Math_iTau (0.15915494309f)
 extern JB_File* JB__Platform_Logger_;
-#define kJB__Terminal_Black 30
-#define kJB__Terminal_Blue 34
-#define kJB__Terminal_Cyan 36
-extern FastString* JB__Terminal_fs;
-#define kJB__Terminal_Green 32
-#define kJB__Terminal_h 35
-extern Date JB__Terminal_LastDisplay;
-#define kJB__Terminal_Magenta 35
-#define kJB__Terminal_Red 31
-extern Array* JB__Terminal_TermScreen;
-#define kJB__Terminal_w 80
-#define kJB__Terminal_White 37
-#define kJB__Terminal_Yellow 33
 extern SyntaxObj* JB__FuncArray_[64];
 extern JB_String* JB__JbinHeader;
 extern JB_String* JB__jBinNotJbin;
@@ -761,7 +734,7 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp 32784
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down (JB_LUB[575])
+#define kJB__zalgo_down (JB_LUB[102])
 #define kJB__zalgo_mid (JB_LUB[574])
 extern Random JB__zalgo_R;
 #define kJB__zalgo_up (JB_LUB[573])
@@ -973,8 +946,6 @@ JB_String* JB_App__OrigPath();
 
 void JB_PrintStackTrace();
 
-ErrorInt2 JB_App__Say(JB_String* S, bool Print);
-
 JB_String* JB_App__StackTrace(int Skip, FastString* Fs_in);
 
 
@@ -1034,29 +1005,6 @@ JB_File* JB_Platform__OpenLog();
 
 
 // RingTree
-
-
-// Terminal
-void JB_Terminal__Display();
-
-void JB_Terminal__DrawRect(ivec4 Rect, JB_String* Inside, TerminalColor Colors);
-
-JB_String* JB_Terminal__Flat();
-
-void JB_Terminal__FrameText(JB_String* S, ivec4 Frame, TerminalColor FrameCol, TerminalColor TextCol);
-
-void JB_Terminal__init();
-
-int JB_Terminal__Init_();
-
-int JB_Terminal__InitCode_();
-
-ivec2 JB_Terminal__Size();
-
-void JB_Terminal__SyntaxAppend(JB_String* Text, ivec2 V, TerminalColor Colors);
-
-void JB_Terminal__SyntaxExpect(JB_String* Msg);
-
 
 
 // __classes__
@@ -1417,8 +1365,6 @@ JB_String* JB_int_operatorof(int Self, JB_String* Type, JB_String* Nothing);
 
 IntRange JB_int_OperatorTo(int Self, int Other);
 
-int JB_int_TabsWidth(int Self);
-
 int JB_int__Max();
 
 
@@ -1434,20 +1380,12 @@ JB_String* JB_int64_Render(int64 Self, FastString* Fs_in);
 
 
 // ivec2
-bool JB_ivec2_OperatorContains(ivec2 Self, int X);
-
-bool JB_ivec2_OperatorInrange(ivec2 Self, ivec2 P);
-
 
 
 // ivec3
 
 
 // ivec4
-ivec4 JB_ivec4_Shrink(ivec4 Self, int I);
-
-int JB_ivec4_Width(ivec4 Self);
-
 
 
 // uint
@@ -1613,9 +1551,6 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, 
 
 
 // TaskState
-
-
-// TerminalColor
 
 
 // int8
@@ -1935,9 +1870,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 
 
 // JB_SyntaxObj_Behaviour
-
-
-// JB_TerminalCell_Behaviour
 
 
 // JB_TokenHandler_Behaviour
@@ -2290,8 +2222,6 @@ JB_String* JB_Str_Squeeze(JB_String* Self);
 
 StringReader* JB_Str_Stream(JB_String* Self);
 
-int JB_Str_CompareInt(JB_String* Self, int Other, bool Aware);
-
 void JB_Str_SyntaxExpect(JB_String* Self);
 
 int JB_Str_TrimLastSub(JB_String* Self, byte B);
@@ -2305,10 +2235,6 @@ CharSet* JB_Str_UniCS(JB_String* Self);
 int JB_Str_UnPrintable(JB_String* Self);
 
 Array* JB_Str_Words(JB_String* Self);
-
-JB_String* JB_Str_Wrap(JB_String* Self, int MaxWidth, FastString* Fs_in);
-
-int JB_Str_WrapSub(JB_String* Self, int MaxWidth, bool IsInline, int P);
 
 JB_StringC* JB_Str__Wrap(_cstring Addr);
 
@@ -2388,13 +2314,6 @@ SyntaxObj* JB_Fn_Constructor(SyntaxObj* Self, FP_fpMsgRender Msg, JB_String* Nam
 void JB_Fn_Destructor(SyntaxObj* Self);
 
 JB_String* JB_Fn_Render(SyntaxObj* Self, FastString* Fs_in);
-
-
-
-// JB_TerminalCell
-TerminalCell* JB_TerminalCell_ConstructorAuto(TerminalCell* Self, int Color, JB_String* Text);
-
-void JB_TerminalCell_Destructor(TerminalCell* Self);
 
 
 
@@ -2857,11 +2776,7 @@ inline int JB_Sel_ID(Selector* Self);
 
 inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F);
 
-inline bool JB_int_OperatorInRange(int Self, int D);
-
 inline bool JB_Array_SyntaxCast(Array* Self);
-
-inline JB_String* JB_CP_SyntaxCast(Codepoint Self);
 
 inline JB_String* JB_FS_SyntaxCast(FastString* Self);
 
@@ -3034,19 +2949,8 @@ inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F) {
 	return (JB__Tk_Splitter)(S, E, F);
 }
 
-inline bool JB_int_OperatorInRange(int Self, int D) {
-	if (D > 0) {
-		return (((uint)Self) < ((uint)D));
-	}
-	return false;
-}
-
 inline bool JB_Array_SyntaxCast(Array* Self) {
 	return JB_Array_Size(Self) > 0;
-}
-
-inline JB_String* JB_CP_SyntaxCast(Codepoint Self) {
-	return JB_Str_ChrUTF8(Self);
 }
 
 inline JB_String* JB_FS_SyntaxCast(FastString* Self) {

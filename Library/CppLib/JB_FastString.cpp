@@ -373,7 +373,7 @@ bool HasDot (uint8* self, int Used) {
 
 void JB_FS_AppendDoubleAsText(FastString* self, double D, int dp, bool CanExp, bool Dot) {
 // need a "mode" really... what about if we want no exp but DO want the full length?
-    if_rare (__isnand(D) or __isinfd(D))
+    if_rare (std::isinf(D) or std::isinf(D))
 		return JB_FS_AppendCString(self, "nan");
 	// -+inf would freeze us otherwise
 	

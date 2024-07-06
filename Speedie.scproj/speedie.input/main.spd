@@ -42,6 +42,7 @@ function Compiler.PrintResults
 function Compiler.MiniTests
 	.testdate
 	.testTask
+	.testdict
 
 
 function compiler.ClearEnvs

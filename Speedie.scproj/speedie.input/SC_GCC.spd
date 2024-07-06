@@ -197,7 +197,7 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 			f.relax
 
 
-	|| cmode = "-std=gnu++17 "
+	|| cmode = "-std=gnu++20 "
 	if Type == "m" or "o" or "mm"
 		if type == "mm"
 			cmode += " -x objective-c++ "
@@ -253,12 +253,14 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 		rz.appendwords( "-g")
 	if (opt < 0)
 		rz.AppendWords( " -O0  " )
-	  elseif (opt >= 1)
-		rz.AppendWords( " -Os " )
-		if options.arch ~= "intel"
-			rz.AppendWords( "-mtune=native" )
-		if (opt >= 2)
-			rz.AppendWords( " -flto " )
+	  else
+		if Options.SelfReplacement or opt >= 1
+			rz.AppendWords( " -Os " )
+		if (opt >= 1)
+			if options.arch ~= "intel"
+				rz.AppendWords( "-mtune=native" )
+			if (opt >= 2)
+				rz.AppendWords( " -flto " )
 
 	if options.ProjectIsMiniLib
 		rz.appendwords( "-D AS_LIBRARY=1" )

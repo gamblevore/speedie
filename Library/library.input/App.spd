@@ -295,8 +295,9 @@ function IsQuarantined (|bool|)
 	return .path contains "/AppTranslocation/"
 
 
+target !minilib {
 function Say (|string| s, |bool| print=true,  |errorint2|)
-	visible
+//	visible // then libjeebox won't compile.
 	if print
 		printline s
 	return "/usr/bin/say".execute([s])
@@ -304,9 +305,9 @@ function Say (|string| s, |bool| print=true,  |errorint2|)
 function AppleScript (|string| str, |ErrorInt2|)
 	return "/usr/bin/osascript".execute(["-e",str], nil)
 
-
 function Sudo (|string| p, |ErrorInt2|)
 	return .applescript("do shell script \"$p\" with administrator privileges")
+}
 
 
 function Configure (assigns:|string|)

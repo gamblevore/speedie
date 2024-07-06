@@ -1914,6 +1914,7 @@ function NeuLibrary (CollectFunc)
 	error (node, "Can’t use this")
 	Options.ProjectisLibrary = true // better than omitting main. more... specific.
 									// but what if someone includes a library?
+//	SC_Targets["library"] = true // "minilib" already exists
 	return NeuMain(node, name_space, errplace)
 	// library {} -->
 
