@@ -5,7 +5,7 @@
 
 
 extend message
-	function TViewCH (|message|)
+	function TextViewChild (|message|)
 		opt norefcounts
 		if self != @tmp
 			return self
@@ -26,13 +26,13 @@ extend message
 	virtual Text		(|int| i=0, |string|)
 		opt norefcounts
 		if i == 0
-			return .tviewch.name
+			return .TextViewChild.name
 
 
 	virtual TextSet		(|int| i=0, |string| v, |bool|)
 		opt norefcounts
 		if i == 0
-			.tviewch.name = v
+			.TextViewChild.name = v
 			return true
 
 

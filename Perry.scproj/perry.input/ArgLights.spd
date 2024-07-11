@@ -1,9 +1,7 @@
 
 
 /*
-"Why have a GUI when you can turn a textView INTO a GUI?"  !!Deleted this idea!!
-
-Instead we want a jeebox DTD, that auto-generates a GUI. Like:	
+We want a jeebox DTD, that auto-generates a GUI. Like:	
  	unordered {
 		args	{"*"++}
 		notes	{"*"}++
@@ -14,56 +12,3 @@ Instead we want a jeebox DTD, that auto-generates a GUI. Like:
 	so would be validating Jeebox for data-files only... not the generalised jeebox.
 
 */
-//
-//
-//function textview.EnvValidation (|message| msg)
-//	require msg.ExpectLast and msg.Expect(@arg)
-//	for rel in msg
-//		if rel == @rel
-//			|| ch1 = rel[@thg, 0]
-//				(ch1 is Editable)
-//			|| opp = rel[@opp, 1]
-//				opp.expect(@opp, "=")
-//				(opp is Editable)
-//			|| ch2 = rel[@nil, 2]
-//				ch2.goodname
-//				(ch2 is Editable)
-//		  else
-//			rel.expect(@rel)
-//
-//
-//function ArgValidation (guitextevent)
-//	using errorreceiver()	
-//		|| msg = .text.parse // really we should be able to use textview.parse, but it seems one state behind for this.
-//			.ArgValidationSub(msg)
-//		while (|| err = StdErr.Pop)
-//			beep
-//			.LoadOneError(err)
-//
-//	
-//function textview.ArgValidationSub (|message| msg)
-//	msg.Expect(@arg)
-//	for s in msg
-//		if (msg != @arg) or !s.Expect(@tmp)
-//			0
-//		  elseif s == "flags"
-//			0
-//		  elseif s == "args"
-//			for a in s.Arg
-//				a.GoodName(true)
-//				(a is Editable)
-//		  elseif s == "notes"
-//			for f.flat in s
-//				if f != s and @arg
-//					(f is Editable)
-//		  elseif s == "env"
-//			|| arg = s.first
-//				.EnvValidation(arg)
-//		  elseif s == "pwd"
-//			|| ch = s[@nil]
-//				ch.ExpectString
-//				(ch is Editable)
-//		  else
-//			error s
-//	
-//	

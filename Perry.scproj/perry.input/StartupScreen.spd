@@ -12,9 +12,6 @@ class StartupWindow (window) // splashscreen, startupscreen, startwindow
 	module
 		|StartupWindow|			_win
 
-//		function ClickedOpen (guimenuevent)
-//			startupwindow.Show
-
 		function Open (guiaction)
 			startupwindow.Show
 
