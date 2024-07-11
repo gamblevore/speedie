@@ -3050,10 +3050,10 @@ void JB_MzSt_Clear(CompressionStats* Self) {
 void JB_MzSt_end(CompressionStats* Self) {
 }
 
-void JB_MzSt_liveupdate(CompressionStats* Self, int S, int Outt) {
+void JB_MzSt_liveupdate(CompressionStats* Self, int S, int Outt, bool Compress) {
 }
 
-void JB_MzSt_Print(CompressionStats* Self) {
+void JB_MzSt_Print(CompressionStats* Self, bool Compress) {
 }
 
 CompressionStats* JB_MzSt_start(CompressionStats* Self) {
@@ -3995,7 +3995,7 @@ void JB_Flow_Destructor(FlowControl* Self) {
 	if (Self->ReadInput != nil) {
 		JB_PrintLine(JB_LUB[239]);
 	}
-	JB_MzSt_Print((&JB__Flow_Stats));
+	JB_MzSt_Print((&JB__Flow_Stats), true);
 	JB_MzSt_Clear((&JB__Flow_Stats));
 	JB_Clear(Self->ReadInput);
 	JB_Clear(Self->Write);
@@ -4905,7 +4905,7 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 		int Place = JB_bin_OpenSection(J);
 		JB_Str_CompressChunk(J, Str);
 		JB_bin_CloseSection(J, Place);
-		JB_MzSt_liveupdate(St, JB_Str_Length(Str), J->Length - Place);
+		JB_MzSt_liveupdate(St, JB_Str_Length(Str), J->Length - Place, true);
 		JB_Decr(Str);
 		if (!JB_SS_NoMoreChunks(Self)) {
 			JB_FS_Flush(J);
@@ -4992,7 +4992,7 @@ bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, Compress
 			}
 			Remaining = (Remaining - Expected);
 			JB_FS_Flush(Fs);
-			JB_MzSt_liveupdate(St, JB_Msg_Length(C), Expected);
+			JB_MzSt_liveupdate(St, JB_Msg_Length(C), Expected, false);
 			JB_Tree_Remove(C);
 			JB_Decr(C);
 		};
@@ -7872,7 +7872,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024070612);
+	return (2024071113);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -7884,4 +7884,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 -2248820743400682138 922363380773641877
+// 7796578953066441599 -5426040127568151992 922363380773641877

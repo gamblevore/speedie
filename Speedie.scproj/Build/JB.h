@@ -5446,11 +5446,11 @@ float JB_MzSt_Durr(CompressionStats* Self);
 
 void JB_MzSt_End(CompressionStats* Self);
 
-void JB_MzSt_LiveUpdate(CompressionStats* Self, int Inn, int Outt);
+void JB_MzSt_LiveUpdate(CompressionStats* Self, int Inn, int Outt, bool Compress);
 
-void JB_MzSt_Print(CompressionStats* Self);
+void JB_MzSt_Print(CompressionStats* Self, bool Compression);
 
-JB_String* JB_MzSt_Render(CompressionStats* Self, FastString* Fs_in);
+JB_String* JB_MzSt_Report(CompressionStats* Self, bool Compression, FastString* Fs_in);
 
 CompressionStats* JB_MzSt_Start(CompressionStats* Self);
 

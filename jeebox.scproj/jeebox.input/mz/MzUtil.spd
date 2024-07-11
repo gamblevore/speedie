@@ -131,11 +131,11 @@ struct CompressionStats
 		return self
 	function end
 	function len (|int| n)
-	function liveupdate (|int| s, |int| outt)
+	function liveupdate (|int| s, |int| outt, |bool| compress=true)
 	function durr (|float|)
 	function render (|string|)
 	function Clear
-	function Print
+	function Print (|bool| Compress=true)
 	module
 		|CompressionStats| all
 		function New (|compressionstats|)

@@ -1637,9 +1637,9 @@ void JB_MzSt_Clear(CompressionStats* Self);
 
 void JB_MzSt_end(CompressionStats* Self);
 
-void JB_MzSt_liveupdate(CompressionStats* Self, int S, int Outt);
+void JB_MzSt_liveupdate(CompressionStats* Self, int S, int Outt, bool Compress);
 
-void JB_MzSt_Print(CompressionStats* Self);
+void JB_MzSt_Print(CompressionStats* Self, bool Compress);
 
 CompressionStats* JB_MzSt_start(CompressionStats* Self);
 

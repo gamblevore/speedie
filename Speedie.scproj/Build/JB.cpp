@@ -1959,7 +1959,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112739230810112));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112767783927808));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -2463,7 +2463,6 @@ bool SC_Comp__Stage(JB_String* Name) {
 		JB_Decr(_tmPf1);
 	}
 	(++SC__Comp_CurrStage);
-	SC_Comp__MiniTests();
 	return true;
 }
 
@@ -3296,7 +3295,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1927]);
-	JB_FS_AppendInt32(_fsf0, (2024070612));
+	JB_FS_AppendInt32(_fsf0, (2024071113));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8369,7 +8368,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024070612));
+	JB_FS_AppendInt32(_fsf0, (2024071113));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -19558,23 +19557,25 @@ void JB_MzSt_End(CompressionStats* Self) {
 	Self->Duration = (Self->Duration + JB_Date__New0());
 }
 
-void JB_MzSt_LiveUpdate(CompressionStats* Self, int Inn, int Outt) {
+void JB_MzSt_LiveUpdate(CompressionStats* Self, int Inn, int Outt, bool Compress) {
 	Self->In = (Self->In + Inn);
 	Self->Out = (Self->Out + Outt);
 	if (Self->Live) {
-		JB_MzSt_Print(Self);
+		JB_MzSt_Print(Self, Compress);
 	}
 }
 
-void JB_MzSt_Print(CompressionStats* Self) {
-	JB_String* _tmPf0 = JB_Incr(JB_MzSt_Render(Self, nil));
+void JB_MzSt_Print(CompressionStats* Self, bool Compression) {
+	JB_String* _tmPf0 = JB_Incr(JB_MzSt_Report(Self, Compression, nil));
 	JB_PrintLine(_tmPf0);
 	JB_Decr(_tmPf0);
 }
 
-JB_String* JB_MzSt_Render(CompressionStats* Self, FastString* Fs_in) {
+JB_String* JB_MzSt_Report(CompressionStats* Self, bool Compression, FastString* Fs_in) {
 	FastString* Fs = JB_Incr(JB_FS__FastNew(Fs_in));
-	JB_FS_RenderSpeed(Fs, JB_MzSt_Durr(Self), Self->In, Self->Out, JB_LUB[0]);
+	int A = JB_Ternary(Compression, Self->In, ((int)Self->Out));
+	int B = JB_Ternary((!Compression), Self->In, ((int)Self->Out));
+	JB_FS_RenderSpeed(Fs, JB_MzSt_Durr(Self), A, B, JB_LUB[0]);
 	JB_String* _tmPf0 = JB_Incr(JB_FS_SmartResult(Fs, Fs_in));
 	JB_Decr(Fs);
 	JB_SafeDecr(_tmPf0);
@@ -24985,7 +24986,7 @@ void JB_Flow_Destructor(FlowControl* Self) {
 	if (Self->ReadInput != nil) {
 		JB_PrintLine(JB_LUB[794]);
 	}
-	JB_MzSt_Print((&JB__Flow_Stats));
+	JB_MzSt_Print((&JB__Flow_Stats), true);
 	JB_MzSt_Clear((&JB__Flow_Stats));
 	JB_Clear(Self->ReadInput);
 	JB_Clear(Self->Write);
@@ -27460,7 +27461,7 @@ bool JB_Str_CompressTestSub(JB_String* Self, int Strength, bool Report) {
 	CompressionStats Stats = ((CompressionStats){});
 	JB_String* C = JB_Incr(JB_Str_Compress(Self, Strength, (&Stats)));
 	if (Report) {
-		JB_MzSt_Print((&Stats));
+		JB_MzSt_Print((&Stats), true);
 	}
 	Stats = ((CompressionStats){});
 	JB_String* Decomp = JB_Incr(JB_Str_Decompress(C, JB_int__Max(), (&Stats)));
@@ -27474,9 +27475,7 @@ bool JB_Str_CompressTestSub(JB_String* Self, int Strength, bool Report) {
 		JB_SetRef(Decomp, JB_Str_Decompress(C, JB_int__Max(), nil));
 	}
 	 else if (Report) {
-		JB_String* _tmPf1 = JB_Incr(JB_MzSt_Render((&Stats), nil));
-		JB_PrintLine(_tmPf1);
-		JB_Decr(_tmPf1);
+		JB_MzSt_Print((&Stats), false);
 	}
 	JB_Decr(C);
 	JB_Decr(Decomp);
@@ -28815,7 +28814,7 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 		int Place = JB_bin_OpenSection(J);
 		JB_Str_CompressChunk(J, Str);
 		JB_bin_CloseSection(J, Place);
-		JB_MzSt_LiveUpdate(St, JB_Str_Length(Str), J->Length - Place);
+		JB_MzSt_LiveUpdate(St, JB_Str_Length(Str), J->Length - Place, true);
 		JB_Decr(Str);
 		if (!JB_SS_NoMoreChunks(Self)) {
 			JB_FS_Flush(J);
@@ -28902,7 +28901,7 @@ bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, Compress
 			}
 			Remaining = (Remaining - Expected);
 			JB_FS_Flush(Fs);
-			JB_MzSt_LiveUpdate(St, JB_Msg_Length(C), Expected);
+			JB_MzSt_LiveUpdate(St, JB_Msg_Length(C), Expected, false);
 			JB_Tree_Remove(C);
 			JB_Decr(C);
 		};
@@ -52725,4 +52724,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 5807515854743145038 -7285260856669914840
+// 2525165535505904197 -7285260856669914840

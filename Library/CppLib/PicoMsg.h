@@ -893,6 +893,13 @@ extern "C" void PicoGet (PicoComms* M, PicoMessage* Out, float Time=0) _pico_cod
 		*Out = M->Get(Time);
 )
 
+extern "C" PicoMessage PicoGet2 (PicoComms* M, float Time=0) _pico_code_ (
+/// Just a wrapper around PicoGet. In case you want something a bit fancier.
+	PicoMessage Rz = {};
+	PicoGet(M, &Rz, Time);
+	return Rz;
+)
+
 
 /// **Utilities** ///
 
