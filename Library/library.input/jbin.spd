@@ -69,7 +69,7 @@ role JBin (Faststring)
 			.CloseSection(Place)
 		  else
 			.add(@str, fs)
-			CompressionStats.all.LiveUpdate(fs.length, fs.length)
+			CompressionStats.all.LiveUpdate(fs.length, fs.length, true)
 
 		
 	function Sheb		(|string| name)

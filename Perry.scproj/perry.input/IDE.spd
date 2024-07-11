@@ -633,9 +633,7 @@ class PerryIDE (Window)
 		if .IsProj
 			return true
 		if .isSource
-			|| m = .parse
-			if m.Find(@tmp, "main")
-				return true
+			rz = .parse.Find(@tmp, "main")
 
 
 	function OpenDoc (GUIPasteEvent)
@@ -933,7 +931,14 @@ function perryide.IDECommand (|bool|)
 	if cmd ~= "beep"
 		for 2s
 			beep
-      elseif cmd ~= "show"
-		beep sherlocdict.render
+      elseif cmd ~= "cr_fix"
+		.editme.beep = .EditMe.Text.ReplaceAll("\r\n", "\r").ReplaceAll("\r", "\n")
+	  elseif cmd ~= "cr_use"
+		.editme.beep = .EditMe.Text.ReplaceAll("\n", "\r\n")
 	  else
-		beep "unrecognised"
+		beep "unrecognised: " + cmd
+
+
+function textview.beep (assigns:|string| s)
+	expect (.text != s) (beep)
+	.text = s

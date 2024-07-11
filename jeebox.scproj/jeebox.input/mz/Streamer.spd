@@ -13,7 +13,7 @@ function StringReader.CompressInto (|object| dest, |int| Strength=mzlab.default,
 		|| Place = j.OpenSection
 		j.CompressChunk(str)
 		j.CloseSection(Place)
-		st.LiveUpdate(str.length, j.length - place)
+		st.LiveUpdate(str.length, j.length - place, true)
 		if !.NoMoreChunks
 			j.flush // we are calling it after anyhow	
 	j.exit(2)
@@ -42,7 +42,7 @@ helper StringReader.DecompressInto (|object| dest,  |int| lim=int.max,  |&compre
 			loop fs.DecompressChunk(c.name, Expected)
 			Remaining -= Expected
 			fs.Flush
-			st.LiveUpdate(c.length, Expected)
+			st.LiveUpdate(c.length, Expected, false)
 			c.remove
 		st.end
 	return !.Data.WentBad

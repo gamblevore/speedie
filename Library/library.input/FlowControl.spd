@@ -65,7 +65,7 @@ class FlowControl
 		.flush
 		if .ReadInput!=nil
 			"Flow: Occurred equally."
-		stats.Print
+		stats.Print(true) // wiat is this compression or decomp?
 		stats.clear
 
 	

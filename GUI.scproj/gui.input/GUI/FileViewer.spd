@@ -386,16 +386,21 @@ class FileViewer (ListView)
 		return true
 
 
-	function OpenQuickRelist (|string| path)
-		.QuickOpen.text = path
+	function OpenQuickRelist (|string| path, |bool| Improve=false)
+		|| b = .OpenQuickRelistsub(path, improve)
+			path = b
+		.QuickOpen.text = b
+		
+	helper OpenQuickRelistSub (|string| path,  |bool| Improve,  |string|)
+		rz = path
 		if path < 2
 			.listopen.clear
-			return
+			return rz
 		
 		ifn path[0, "/"] or path[0, "~/"]
 			|| r = .FindPaths(path, nil, true)
 			.ListOpen.QuickOpenFill(r)
-			return
+			return rz
 		
 		|| f = path.before(":").file
 		|| filter = ""
@@ -404,8 +409,10 @@ class FileViewer (ListView)
 			if !f.exists
 				Notifications <~ f + " doesn't exist"
 				beep
-				return 
+				return rz
 			filter = path.name
+		  elseif Improve
+			rz = path.PathDir
 		.OpenQuickRelistDir(f, filter)
 
 
@@ -549,7 +556,7 @@ class FileViewer (ListView)
 
 			|| loc = r.location
 			if loc.file.isdir
-				V.OpenQuickRelist(loc)
+				V.OpenQuickRelist(loc, true)
 				return true
 			v.OpenQuick(loc)
 			V.HideOpenList

@@ -2150,5 +2150,3 @@ datatype TextViewJumpMode (int)
 		return self|int| & m|int|
 
 
-
-|dictionary| sherlocdict = dictionary()

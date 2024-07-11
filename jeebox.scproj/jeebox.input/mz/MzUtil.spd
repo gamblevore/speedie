@@ -68,7 +68,7 @@ Module MZLab
 		|compressionstats| stats
 		|| c = .compress(Strength, stats)
 		if report
-			stats.Print
+			stats.Print(true)
 		stats = nil
 		|| decomp = c.Decompress(int.max, stats)
 		rz = self == decomp
@@ -76,7 +76,7 @@ Module MZLab
 			error "Decompression failed on: " + self
 			decomp = c.Decompress(int.max)
 		  elseif report
-			printline stats.Render
+			stats.Print(false)
 		
 	
 	helper TestSub (|[string]| items, |FastString| FS, |int|i) 
@@ -162,14 +162,14 @@ struct CompressionStats
 	function End
 		.Duration += date()
 
-	function Print
-		printline .render
+	function Print (|bool| Compression)
+		printline .Report(Compression)
 		
-	function LiveUpdate (|int| inn, |int| outt)
+	function LiveUpdate (|int| inn, |int| outt, |bool| Compress)
 		.in += inn
 		.out += outt
 		if .live
-			.print
+			.print(compress)
 	
 	function Durr (|float|)
 		|| d = .duration
@@ -177,8 +177,10 @@ struct CompressionStats
 			d += date()
 		return d.seconds
 	
-	render
-		fs.RenderSpeed(.durr, .in, .out, "")
+	render Report (|bool| Compression)
+		|| a = (.in, .out)(Compression)
+		|| b = (.in, .out)(!Compression)
+		fs.RenderSpeed(.durr, A, b, "")
 	
 	module
 		|CompressionStats| All // noice

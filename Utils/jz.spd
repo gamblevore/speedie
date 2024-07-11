@@ -222,7 +222,7 @@ module Conv
 			|| s = .Start.ago.seconds
 			conv.speed.RenderSpeed(s, size|int|, 0, name)
 		  else
-			CompressionStats.all.Render(conv.speed)
+			CompressionStats.all.report(compress, conv.speed)
 			CompressionStats.all.Clear
 		conv.speed <~ '\n'
 
@@ -399,6 +399,7 @@ module Conv
 		|| mz = str.ParseJbin(3)
 		if !mz
 			printline StdErr.pop
+			0
 		ifn mz == @tmp and "µz"
 			.Detected |= type.jbin
 			return ""
