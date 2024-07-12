@@ -194,7 +194,6 @@ struct FatASM
 			
 	
 	function µRenderInto (|!&ASM| Where, |!&asm| After, |!&asm|)
-		debugat
 		pragma inline
 		return (ASM.encoders[.op]!)(self, where, after)
 	

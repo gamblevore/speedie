@@ -324,7 +324,9 @@ module Feedback
 			Explain(Purpose, "")$
 			options.SingleCppOutput = value.optionbool
 		
-		
+		+"elf"
+			app.say "theres no elves in here"
+			
 		+"self" 
 			Explain(Purpose, "Compiles and installs new Speedie, after self-test.")$
 			if app.no("nocompile")
@@ -424,7 +426,6 @@ module Feedback
 		+"dosign"
 			Explain( Purpose, "Code signs an app." )
 			return true
-
 		
 		+"clean"
 			Explain(Purpose, "Remove temp files.")$
@@ -434,7 +435,7 @@ module Feedback
 		
 		+"version" (AppVersionNumber)
 		
-		+"v"		(AppVersionNumber)
+		+"v"	   (AppVersionNumber)
 		
 		+"help"
 			Explain(Purpose, "This.")$

@@ -93,7 +93,7 @@ double FloatSh2 (uint64 u, int S) {
 
 AlwaysInline ASM* LoadConst (Register* r, ASM Op, ASM* Code) {
 	uint64 Value = ConstStretchy_Valueu;
-	int Remain = Op&3;
+	int Remain = (Op>>24)&3;
 	if (Remain) {
 		if (Remain == 1)
 			Value <<= 32; 

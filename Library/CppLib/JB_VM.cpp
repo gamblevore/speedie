@@ -26,7 +26,7 @@ extern "C" {
 #define ı         goto *Next;
 #define ___       Op2 = *Code++;  Next = JumpTable[Op2>>24];
 #define __      ; Op  = Op2;      ASMPrint(Op);
-#define _         __   ___
+#define _         __   ___ // this needs reworking.... sigh. can't handle consts
 #define JumpLeaf(Addr)         LeafCode = Code;     Code = (Addr);
 
 

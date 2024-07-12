@@ -2743,6 +2743,8 @@ bool SC_FB__AppOptions_directtest(JB_String* Name, JB_String* Value, FastString*
 
 bool SC_FB__AppOptions_dosign(JB_String* Name, JB_String* Value, FastString* Purpose);
 
+bool SC_FB__AppOptions_elf(JB_String* Name, JB_String* Value, FastString* Purpose);
+
 bool SC_FB__AppOptions_env(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_errortest(JB_String* Name, JB_String* Value, FastString* Purpose);
@@ -3552,15 +3554,15 @@ int SC_VM_Builder__NextIDWithCounts(Message* Counts);
 
 void SC_VM_Builder__SafeWrite(JB_String* Name, FastString* Data);
 
+void SC_VM_Builder__VM_MakeInstructionSub(Message* Tmp, bool Multiple, Array* ActuallyMakeTheVM);
+
+void SC_VM_Builder__VM_NewInstruction(Message* Tmp, bool Multiple, Array* ActuallyMakeTheVM);
+
 Message* SC_VM_Builder__VMBox();
 
 void SC_VM_Builder__VMCpp(FastString* Vm, FastString* Jump);
 
-void SC_VM_Builder__VMDecl(Message* Tmp, Array* ActuallyMakeTheVM);
-
 void SC_VM_Builder__VMLine(Message* Line, FastString* Vm);
-
-void SC_VM_Builder__VMTmp(Message* Tmp, Array* ActuallyMakeTheVM);
 
 
 
@@ -7605,9 +7607,13 @@ JB_String* JB_List_Render(JB_List* Self, FastString* Fs_in);
 
 JB_List* JB_Tree_Second(JB_List* Self);
 
+int JB_Tree_SlowCount(JB_List* Self);
+
 JB_List* JB_Tree_Get(JB_List* Self, int N);
 
 void JB_Tree_SyntaxAppend(JB_List* Self, JB_List* Last);
+
+int JB_Tree_SyntaxCompare(JB_List* Self, int N, bool Aware);
 
 bool JB_Tree_SyntaxEquals(JB_List* Self, int N, bool Aware);
 
@@ -10092,6 +10098,8 @@ inline bool SC_FailableInt_SyntaxCast(FailableInt Self);
 
 inline AsmReg SC_FatASM_Info(FatASM* Self);
 
+inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After);
+
 inline JB_String* SC_Named_Name(SCNamed* Self);
 
 inline bool SC_PA_SyntaxCast(SCParamArray* Self);
@@ -10121,8 +10129,6 @@ inline JB_StringC* JB_Str_CastZero(JB_String* Self);
 inline _cstring JB_Str_SyntaxCast(JB_StringC* Self);
 
 inline int JB_uint64_LELength(uint64 Self);
-
-inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After);
 
 inline bool SC_NilTest_SyntaxCast(NilTest* Self);
 
@@ -10248,6 +10254,10 @@ inline AsmReg SC_FatASM_Info(FatASM* Self) {
 	return SC_FatASM_Info(Self);
 }
 
+inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After) {
+	return (SC__ASM_Encoders[Self->Op])(Self, Where, After);
+}
+
 inline JB_String* SC_Named_Name(SCNamed* Self) {
 	if (Self) {
 		return Self->Name;
@@ -10313,11 +10323,6 @@ inline _cstring JB_Str_SyntaxCast(JB_StringC* Self) {
 
 inline int JB_uint64_LELength(uint64 Self) {
 	return (JB_int_OperatorMax(JB_Int_Log2(((int)Self)), 0)) >> 3;
-}
-
-inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After) {
-	JB_DoAt(1);
-	return (SC__ASM_Encoders[Self->Op])(Self, Where, After);
 }
 
 inline bool SC_NilTest_SyntaxCast(NilTest* Self) {

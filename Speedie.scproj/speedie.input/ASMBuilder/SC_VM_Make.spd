@@ -233,7 +233,9 @@ function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true, |[messag
 	  else
 		m = nil
 	for ch in list
-		.VMTmp(ch, rz)
+		.VM_NewInstruction(ch, true, rz)
+	for ch in list
+		.VM_NewInstruction(ch, false, rz)
 	for i in 256
 		asm.encoders[i] := badencoder
 
@@ -267,19 +269,21 @@ function MakeVM (|message| tmp, |faststring| vm)
 		.VMLine(line, vm)
 
 
-function VMDecl (|message| tmp, |[message]?| ActuallyMakeTheVM)
+function VM_MakeInstructionSub (|message| tmp, |bool| Multiple, |[message]?| ActuallyMakeTheVM)
 	opt norefcounts
 	|| arg = tmp.last
 	|| prms = tmp.first
+	if (prms > 1) != multiple
+		return
 	|| P1 = prms.first
 	|| Counts = p1.next
 	
-	|| name = p1.name  //  .ASMNormalise
+	|| name = p1.name					//  .ASMNormalise
 	|| form = µform.forms.valuelower(name)			#require
 	|| FormEnc = asm.Forms[form.Index]
 	name = "ASM_" + name
 	using tmp
-	if ActuallyMakeTheVM!=nil		// otherwise speedie is just using the encoders.
+	if ActuallyMakeTheVM != nil			// otherwise speedie is just using the encoders.
 		.ModuleArg <~ NewDecl(name)
 	|| tn = tmp.name
 	++.Total
@@ -288,7 +292,7 @@ function VMDecl (|message| tmp, |[message]?| ActuallyMakeTheVM)
 	while
 		|| id = .NextID(counts)
 		asm.Encoders[id] = FormEnc
-		if ActuallyMakeTheVM!=nil
+		if ActuallyMakeTheVM != nil
 			ActuallyMakeTheVM[id] = tmp
 			if !counts or counts == p1.next
 				.AddµOp(tn, id)
@@ -385,9 +389,9 @@ function NextID (|message?| counts, |int|)
 		.normalpos = 16
 
 
-function VMTmp (|message| tmp, |[message]?| ActuallyMakeTheVM)		
+function VM_NewInstruction (|message| tmp, |bool| multiple, |[message]?| ActuallyMakeTheVM)		
 	if (tmp == @tmp) and (tmp != "forms" and "ignore")
-		.VMDecl(tmp, ActuallyMakeTheVM)
+		.VM_MakeInstructionSub(tmp, multiple, ActuallyMakeTheVM)
 
 
 function VMLine (|message| line, |faststring| vm)

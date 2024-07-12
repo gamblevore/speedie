@@ -4,6 +4,8 @@ typedef const void* Goto;
 
 // // // // // // // // // // // //  
 
+// we really need to make this a simple32 bit number
+// no special wierdness!!!!! ARGH
 struct ASM {
 	union {
 		u32				Raw;

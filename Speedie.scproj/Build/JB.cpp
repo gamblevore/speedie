@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2089];
+extern JB_StringC* JB_LUB[2091];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -1959,7 +1959,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112774776763116));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112775591165952));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -2879,6 +2879,11 @@ bool SC_FB__AppOptions_dosign(JB_String* Name, JB_String* Value, FastString* Pur
 	return true;
 }
 
+bool SC_FB__AppOptions_elf(JB_String* Name, JB_String* Value, FastString* Purpose) {
+	JB_App__Say(JB_LUB[2089], true);
+	return false;
+}
+
 bool SC_FB__AppOptions_env(JB_String* Name, JB_String* Value, FastString* Purpose) {
 	if (!SC_FB__Explain(Purpose, JB_LUB[1075])) {
 		return nil;
@@ -3273,7 +3278,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[179]);
-	JB_FS_AppendInt32(_fsf0, (2024071218));
+	JB_FS_AppendInt32(_fsf0, (2024071222));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -3435,69 +3440,72 @@ int SC_FB__Init_() {
 		DTWrap* _tmPf25 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_single))));
 		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1340], _tmPf25));
 		JB_Decr(_tmPf25);
-		DTWrap* _tmPf26 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_self))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[176], _tmPf26));
+		DTWrap* _tmPf26 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_elf))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[2090], _tmPf26));
 		JB_Decr(_tmPf26);
-		DTWrap* _tmPf27 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_nil))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[4], _tmPf27));
+		DTWrap* _tmPf27 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_self))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[176], _tmPf27));
 		JB_Decr(_tmPf27);
-		DTWrap* _tmPf28 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_crash))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1533], _tmPf28));
+		DTWrap* _tmPf28 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_nil))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[4], _tmPf28));
 		JB_Decr(_tmPf28);
-		DTWrap* _tmPf29 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_pack))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[247], _tmPf29));
+		DTWrap* _tmPf29 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_crash))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1533], _tmPf29));
 		JB_Decr(_tmPf29);
-		DTWrap* _tmPf30 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_targetdebug))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1341], _tmPf30));
+		DTWrap* _tmPf30 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_pack))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[247], _tmPf30));
 		JB_Decr(_tmPf30);
-		DTWrap* _tmPf31 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_target))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1342], _tmPf31));
+		DTWrap* _tmPf31 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_targetdebug))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1341], _tmPf31));
 		JB_Decr(_tmPf31);
-		DTWrap* _tmPf32 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_funccount))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1343], _tmPf32));
+		DTWrap* _tmPf32 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_target))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1342], _tmPf32));
 		JB_Decr(_tmPf32);
-		DTWrap* _tmPf33 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_warn))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[199], _tmPf33));
+		DTWrap* _tmPf33 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_funccount))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1343], _tmPf33));
 		JB_Decr(_tmPf33);
-		DTWrap* _tmPf34 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_maxvars))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1345], _tmPf34));
+		DTWrap* _tmPf34 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_warn))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[199], _tmPf34));
 		JB_Decr(_tmPf34);
-		DTWrap* _tmPf35 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_nocolor))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1348], _tmPf35));
+		DTWrap* _tmPf35 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_maxvars))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1345], _tmPf35));
 		JB_Decr(_tmPf35);
-		DTWrap* _tmPf36 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_optimise))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1350], _tmPf36));
+		DTWrap* _tmPf36 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_nocolor))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1348], _tmPf36));
 		JB_Decr(_tmPf36);
-		DTWrap* _tmPf37 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_cpp))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1523], _tmPf37));
+		DTWrap* _tmPf37 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_optimise))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1350], _tmPf37));
 		JB_Decr(_tmPf37);
-		DTWrap* _tmPf38 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_output_path))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1351], _tmPf38));
+		DTWrap* _tmPf38 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_cpp))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1523], _tmPf38));
 		JB_Decr(_tmPf38);
-		DTWrap* _tmPf39 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_force))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1352], _tmPf39));
+		DTWrap* _tmPf39 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_output_path))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1351], _tmPf39));
 		JB_Decr(_tmPf39);
-		DTWrap* _tmPf40 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_variant))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1353], _tmPf40));
+		DTWrap* _tmPf40 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_force))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1352], _tmPf40));
 		JB_Decr(_tmPf40);
-		DTWrap* _tmPf41 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_codesign))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1505], _tmPf41));
+		DTWrap* _tmPf41 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_variant))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1353], _tmPf41));
 		JB_Decr(_tmPf41);
-		DTWrap* _tmPf42 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_dosign))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1574], _tmPf42));
+		DTWrap* _tmPf42 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_codesign))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1505], _tmPf42));
 		JB_Decr(_tmPf42);
-		DTWrap* _tmPf43 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_clean))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1498], _tmPf43));
+		DTWrap* _tmPf43 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_dosign))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1574], _tmPf43));
 		JB_Decr(_tmPf43);
-		DTWrap* _tmPf44 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_FB__AppVersionNumber)))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1354], _tmPf44));
+		DTWrap* _tmPf44 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_clean))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1498], _tmPf44));
 		JB_Decr(_tmPf44);
 		DTWrap* _tmPf45 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_FB__AppVersionNumber)))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1355], _tmPf45));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1354], _tmPf45));
 		JB_Decr(_tmPf45);
-		DTWrap* _tmPf46 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_help))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1356], _tmPf46));
+		DTWrap* _tmPf46 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_FB__AppVersionNumber)))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1355], _tmPf46));
 		JB_Decr(_tmPf46);
+		DTWrap* _tmPf47 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_help))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1356], _tmPf47));
+		JB_Decr(_tmPf47);
 	}
 	;
 	return 0;
@@ -8345,7 +8353,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024071218));
+	JB_FS_AppendInt32(_fsf0, (2024071222));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -9025,8 +9033,18 @@ Array* SC_VM_Builder__FillEncoders(Message* List, bool ActuallyMakeTheVM) {
 		Message* Ch = ((Message*)JB_Ring_First(List));
 		while (Ch) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(Ch));
-			SC_VM_Builder__VMTmp(Ch, Rz);
+			SC_VM_Builder__VM_NewInstruction(Ch, true, Rz);
 			Ch = _Nf1;
+		};
+		;
+	}
+	;
+	{
+		Message* Ch = ((Message*)JB_Ring_First(List));
+		while (Ch) {
+			Message* _Nf3 = ((Message*)JB_Ring_NextSib(Ch));
+			SC_VM_Builder__VM_NewInstruction(Ch, false, Rz);
+			Ch = _Nf3;
 		};
 		;
 	}
@@ -9338,44 +9356,12 @@ void SC_VM_Builder__SafeWrite(JB_String* Name, FastString* Data) {
 	}
 }
 
-Message* SC_VM_Builder__VMBox() {
-	Message* Rz = nil;
-	JB_File* V = JB_Incr(SC_Comp__InputFile(nil, JB_LUB[1217], nil));
-	if (JB_File_SyntaxCast(V)) {
-		JB_SetRef(SC__VM_Builder_vm_file, V);
-		JB_SetRef(Rz, JB_File_Parse(V, 16777216, false));
-	}
-	 else {
-		if (true) {
-			JB_Str_SyntaxExpect(JB_LUB[607]);
-		}
-	}
-	JB_Decr(V);
-	JB_SafeDecr(Rz);
-	return Rz;
-}
-
-void SC_VM_Builder__VMCpp(FastString* Vm, FastString* Jump) {
-	{
-		Array* _LoopSrcf2 = SC__VM_Builder_NameList;
-		int _if0 = 0;
-		while (true) {
-			Message* Tmp = ((Message*)JB_Array_Value(_LoopSrcf2, _if0));
-			if (Tmp == nil) {
-				break;
-			}
-			SC_VM_Builder__MakeVM(Tmp, Vm);
-			SC_VM_Builder__MakeJump(Tmp, Jump);
-			(++_if0);
-		};
-	}
-	;
-	JB_FS_AppendString(Vm, JB_LUB[321]);
-}
-
-void SC_VM_Builder__VMDecl(Message* Tmp, Array* ActuallyMakeTheVM) {
+void SC_VM_Builder__VM_MakeInstructionSub(Message* Tmp, bool Multiple, Array* ActuallyMakeTheVM) {
 	Message* Arg = ((Message*)JB_Ring_Last(Tmp));
 	Message* Prms = ((Message*)JB_Ring_First(Tmp));
+	if ((JB_Tree_SyntaxCompare(Prms, 1, false) >= 1) != Multiple) {
+		return;
+	}
 	Message* P1 = ((Message*)JB_Ring_First(Prms));
 	Message* Counts = ((Message*)JB_Ring_NextSib(P1));
 	JB_String* Name = JB_Msg_Name(P1);
@@ -9416,6 +9402,47 @@ void SC_VM_Builder__VMDecl(Message* Tmp, Array* ActuallyMakeTheVM) {
 	JB_MsgPos_Destructor((&_usingf1));
 }
 
+void SC_VM_Builder__VM_NewInstruction(Message* Tmp, bool Multiple, Array* ActuallyMakeTheVM) {
+	if (((JB_Msg_EqualsSyx(Tmp, kJB_SyxTmp, false))) and ((!JB_Msg_SyntaxEquals(Tmp, JB_LUB[1360], false)) and (!JB_Msg_SyntaxEquals(Tmp, JB_LUB[251], false)))) {
+		SC_VM_Builder__VM_MakeInstructionSub(Tmp, Multiple, ActuallyMakeTheVM);
+	}
+}
+
+Message* SC_VM_Builder__VMBox() {
+	Message* Rz = nil;
+	JB_File* V = JB_Incr(SC_Comp__InputFile(nil, JB_LUB[1217], nil));
+	if (JB_File_SyntaxCast(V)) {
+		JB_SetRef(SC__VM_Builder_vm_file, V);
+		JB_SetRef(Rz, JB_File_Parse(V, 16777216, false));
+	}
+	 else {
+		if (true) {
+			JB_Str_SyntaxExpect(JB_LUB[607]);
+		}
+	}
+	JB_Decr(V);
+	JB_SafeDecr(Rz);
+	return Rz;
+}
+
+void SC_VM_Builder__VMCpp(FastString* Vm, FastString* Jump) {
+	{
+		Array* _LoopSrcf2 = SC__VM_Builder_NameList;
+		int _if0 = 0;
+		while (true) {
+			Message* Tmp = ((Message*)JB_Array_Value(_LoopSrcf2, _if0));
+			if (Tmp == nil) {
+				break;
+			}
+			SC_VM_Builder__MakeVM(Tmp, Vm);
+			SC_VM_Builder__MakeJump(Tmp, Jump);
+			(++_if0);
+		};
+	}
+	;
+	JB_FS_AppendString(Vm, JB_LUB[321]);
+}
+
 void SC_VM_Builder__VMLine(Message* Line, FastString* Vm) {
 	if (JB_Msg_EqualsSyx(Line, kJB_SyxSheb, false)) {
 		//;
@@ -9430,12 +9457,6 @@ void SC_VM_Builder__VMLine(Message* Line, FastString* Vm) {
 		JB_FS_AppendByte(Vm, ';');
 	}
 	JB_FS_AppendByte(Vm, '\n');
-}
-
-void SC_VM_Builder__VMTmp(Message* Tmp, Array* ActuallyMakeTheVM) {
-	if (((JB_Msg_EqualsSyx(Tmp, kJB_SyxTmp, false))) and ((!JB_Msg_SyntaxEquals(Tmp, JB_LUB[1360], false)) and (!JB_Msg_SyntaxEquals(Tmp, JB_LUB[251], false)))) {
-		SC_VM_Builder__VMDecl(Tmp, ActuallyMakeTheVM);
-	}
 }
 
 
@@ -19956,6 +19977,7 @@ ASM* SC_FatASM_KNST_Encoder(FatASM* Self, ASM* Curr, ASM* After) {
 		return nil;
 	}
 	int Sh = 0;
+	JB_DoAt(1);
 	if (K >= (((uint64)1) << 17)) {
 		if (K < (((uint64)1) << 49)) {
 			Sh = 32;
@@ -19969,7 +19991,9 @@ ASM* SC_FatASM_KNST_Encoder(FatASM* Self, ASM* Curr, ASM* After) {
 	ASM Rz = O << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_ConstStretchy_InvSet(Rz, Inv);
-	Rz = SC_ASM_ConstStretchy_ValueSet(Rz, K << Sh);
+	if (Sh < 64) {
+		Rz = SC_ASM_ConstStretchy_ValueSet(Rz, K << Sh);
+	}
 	Curr++[0] = Rz;
 	if (Sh >= 32) {
 		if (Sh == 64) {
@@ -30870,6 +30894,21 @@ JB_List* JB_Tree_Second(JB_List* Self) {
 	return nil;
 }
 
+int JB_Tree_SlowCount(JB_List* Self) {
+	int Rz = 0;
+	{
+		JB_List* C = JB_Ring_First(Self);
+		while (C) {
+			JB_List* _Nf1 = (JB_Ring_NextSib(C));
+			(++Rz);
+			C = _Nf1;
+		};
+		;
+	}
+	;
+	return Rz;
+}
+
 JB_List* JB_Tree_Get(JB_List* Self, int N) {
 	JB_List* Rz = nil;
 	if (Self) {
@@ -30891,6 +30930,10 @@ JB_List* JB_Tree_Get(JB_List* Self, int N) {
 
 void JB_Tree_SyntaxAppend(JB_List* Self, JB_List* Last) {
 	(JB_Ring_LastSet(Self, Last));
+}
+
+int JB_Tree_SyntaxCompare(JB_List* Self, int N, bool Aware) {
+	return JB_Tree_SlowCount(Self) - N;
 }
 
 bool JB_Tree_SyntaxEquals(JB_List* Self, int N, bool Aware) {
@@ -52832,4 +52875,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 7183193761993726368 -537552053630566726
+// 2612979546841740427 -6421795740243139212
