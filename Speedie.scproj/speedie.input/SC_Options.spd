@@ -326,6 +326,8 @@ module Feedback
 		
 		+"elf"
 			app.say "theres no elves in here"
+			error "Missing race requested"
+			return true
 			
 		+"self" 
 			Explain(Purpose, "Compiles and installs new Speedie, after self-test.")$

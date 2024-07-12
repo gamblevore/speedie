@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2091];
+extern JB_StringC* JB_LUB[2092];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -1959,7 +1959,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112775591165952));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112775616856064));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -2881,7 +2881,10 @@ bool SC_FB__AppOptions_dosign(JB_String* Name, JB_String* Value, FastString* Pur
 
 bool SC_FB__AppOptions_elf(JB_String* Name, JB_String* Value, FastString* Purpose) {
 	JB_App__Say(JB_LUB[2089], true);
-	return false;
+	if (true) {
+		JB_Str_SyntaxExpect(JB_LUB[2091]);
+	}
+	return true;
 }
 
 bool SC_FB__AppOptions_env(JB_String* Name, JB_String* Value, FastString* Purpose) {
@@ -52875,4 +52878,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 2612979546841740427 -6421795740243139212
+// 2612979546841740427 6181497930667281519
