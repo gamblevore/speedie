@@ -1,11 +1,15 @@
 
 
 datatype ASM (uint)
+//	function IsOK (|bool|)
+//		 return self
+	
 	function Print
 		visible
 		cpp_name ASMPrint
 
 	function Op (|int|)
+		disabled "hmmm? but the consts are already downshifted"
 		return self >> 24
 	function R1 (assigns:|uint|, |asm|)
 		return self ||| (value << 27) >> 8
@@ -23,9 +27,9 @@ datatype ASM (uint)
 
 	module
 		|byte|					NoisyASM = 1
-		|asm_encoder2[32]|		Forms
+		|asm_encoder2[128]|		Forms
 		|asm_encoder2[256]| 	Encoders
 
 
-prototype ASM_Encoder2  (|&FatASM| self, |&asm| Curr=nil, |&asm| After=nil, |asm|)
+prototype ASM_Encoder2  (|&FatASM| self, |&asm| Curr=nil, |&asm| After=nil, |&asm|)
 

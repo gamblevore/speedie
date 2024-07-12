@@ -15,7 +15,7 @@ function Tran_OptPath (tranfunc)
 
 
 function SpdAssembler.MarkBlocks (|&FatASM| curr, |int| length)
-	|| first = asm.JUMP.op,  || last = asm.LUPU.op
+	|| first = asm.JUMP,  || last = asm.LUPU
 	|| B = 1
 	for i in length
 		curr.BlockNum = b

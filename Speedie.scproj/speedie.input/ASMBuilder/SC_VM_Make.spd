@@ -344,7 +344,7 @@ function µparam.Which (|macro!--|)
 || rizzler = "
 if (curr and curr < after) // remove the test for curr!=nil...
 	curr++[] = rz 
-return rz
+return curr
 ".macro
 
 || ASM_Datatype = "datatype _0 (ASM) 

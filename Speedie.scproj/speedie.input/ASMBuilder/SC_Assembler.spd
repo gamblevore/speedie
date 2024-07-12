@@ -36,6 +36,7 @@ module SpdAssembler
 		asmtmp.InitAccess
 		Instruction[asm.KSTR].Const
 		Instruction[asm.KNST].Const
+		asm.encoders[asm.knst] = fatasm.KNST_Encoder
 		return 
 		TextAssembler.Requests		:= dictionary()
 		TextAssembler.RequestTable	:= array()

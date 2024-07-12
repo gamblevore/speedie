@@ -1,15 +1,53 @@
 
 
+function fatasm.KNST_Encoder (Asm_encoder2)
+/*  // put the longestbitstretch into it. As an optional approach. Do this later!
+	function FatASM.FixConst
+		|| V = .r[1]|uint64| << 32
+		V |= 0
+		|| Inv = V|uint64|.countbits > 32 
+			V = ~V
+		|| R = (~V|uint64|).LongestBitStretch	// longest false-stretch
+		if r.x >= 50		// OK so we have the longest stretch in r.x
+			V = V rotl 63-r.y
+			.r[2] = inv|int|
+			.r[3] = V|int|
+			return
+*/
+
+//	debugger
+// numbas coming out wrong...
+
+	|asm| o = .op
+	|| k = .const
+	|| inv = k>>63
+		k = ~k
+	require curr and curr < after+2
+	|| sh = 0
+	if k >= 1|uint64|<<17
+		if k < (1|uint64|<<49)
+			sh = 32
+			o = asm.knst2  // 1 extra
+		  else
+			sh = 64 // obliterate
+			o = asm.knst3  // 2 extra
+	|| rz = o << 24
+	rz.R1 = .R[0]
+	rz.ConstStretchy_Inv = inv
+	rz.ConstStretchy_Value = k<<sh
+	Curr++[] = Rz
+	if sh >= 32
+		if sh == 64
+			curr++[] = k>>32
+		curr++[] = k
+			
+	return Curr
+
+
 extend asmstate
 	function NumToReg (|int64| V, |message| exp, |asmreg| Reg=asmreg(), |asmreg|)
 		Reg = .TempMe(exp, Reg)	
-//		r1		R
-//		Cond	1	// 0 == always, 1 = only if dest == 0
-//		Inv		1	// bit inversion
-//		Value	16  // shouldnt this be 17?
-//		Prm1	x
-//		Prm2	x
-		|| fat = exp.KNST(reg, 0, 0, 0, (V << 32) >> 32, V>>32)
+		|| fat = exp.KNST(reg, 0, 0, 0, 0, 0)
 		fat.Const = v
 		return fat * reg
 
@@ -18,7 +56,10 @@ extend asmstate
 		if r.fourbytes
 			return p|&float|[]
 		return p|&f64|[]
-	
+
+
+/*  // we don't do it this way. we could put the longestbitstretch into it, though?
+	// as an optional approach. Do this later!
 	function FatASM.FixConst
 		|| V = .r[1]|uint64| << 32
 		V |= 0
@@ -49,7 +90,7 @@ extend asmstate
 				.r[3] = 0
 				.R[4] = v >> 32
 				.R[5] = v & 0xFFFFffff
-				
+*/
 			
 	function SetConst (|Message| List,  |message| Orig,  |bool|)
 		opt norefcounts								// set1: r1, 123

@@ -193,10 +193,10 @@ struct FatASM
 		return reg == .b
 			
 	
-	function RenderInto (|!&ASM| Where, |!&asm| After, |!&asm|)
-		if where >= After
-		// so now what?
-		return where
+	function µRenderInto (|!&ASM| Where, |!&asm| After, |!&asm|)
+		debugat
+		pragma inline
+		return (ASM.encoders[.op]!)(self, where, after)
 	
 	
 	function Renda (|FastString| fs)

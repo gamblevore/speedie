@@ -118,7 +118,9 @@ class Memory
 			return true // right?
 		|| Mem = Memory.realloc(._ptr, New)
 			._ptr = mem
-			.Capacity = Value 
+			.Capacity = Value
+			if value < .length
+				.length = value
 			if New > Old
 				memory.Zero((mem+old), New-Old)
 			return true

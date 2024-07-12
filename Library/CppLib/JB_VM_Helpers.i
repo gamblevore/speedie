@@ -99,7 +99,7 @@ AlwaysInline ASM* LoadConst (Register* r, ASM Op, ASM* Code) {
 			Value <<= 32; 
 		  else
 			// these 16-bits arent really needed. Even for SIMD!
-			// we need like... loading 4 small values
+			// simd needs like... loading 4 small values
 			// or 4 same values. Or loading one value into a specific field.
 			Value = (uint64)(*Code++) << 32;
 		Value |= *Code++;

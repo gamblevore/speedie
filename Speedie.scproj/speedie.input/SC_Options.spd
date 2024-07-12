@@ -40,7 +40,6 @@ module Options
 	||		Warnings				= false
 	||		UseFuncCallCount		= false
 	||		ExternalCompile			= false
-//	||		Final					= false // won't call gcc.
 //	||		Products				= native
 	|byte|	Optimise				= 1
 	|bool|	SelfReplacement			= 0
@@ -226,7 +225,7 @@ module Feedback
 		+"x" (AppTransCompile)
 		
 		+"arch"
-			|| str = "intel/arm/ppc/spd"
+			|| str = "intel/arm/ppc/spd" // don't we just want a bitfield?
 			explain(Purpose, "Set to "+str)
 			for v in str / '/'
 				if v~=value
@@ -424,7 +423,6 @@ module Feedback
 		
 		+"dosign"
 			Explain( Purpose, "Code signs an app." )
-			
 			return true
 
 		

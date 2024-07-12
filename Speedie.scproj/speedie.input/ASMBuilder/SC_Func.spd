@@ -21,12 +21,14 @@ class µFunc
 		description "Generate some code (only for testing)."
 		rz = asm[.length*3]$
 		rz.length = rz.capacity
-		.RenderInto(rz.ptr, rz.ptr+rz.length)
+		|| p = rz.ptr
+		|| after = .µRender(P, P+rz.length)
+		rz.capacity = after-p
 	
 	
-	function RenderInto (|!&ASM| Where, |!&asm| After, |!&asm|)
+	function µRender (|!&ASM| Where, |!&asm| After, |!&asm|)
 		for i in self
-			where = i.renderinto(where, after)
+			where = i.µrenderinto(where, after)
 		return where
 
 
@@ -49,10 +51,10 @@ class µFunc
 			fs <~ '\n'
 
 	iterator
-		|| CurrInst = 0
-		|| Addr = .IR
-		while currinst < .length
-			yield Addr+currinst
+		|| CurrInst = .IR
+		|| AfterInst = Currinst + .length
+		while currinst < Afterinst
+			yield currinst
 			++currinst
 
 

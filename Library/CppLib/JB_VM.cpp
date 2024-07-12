@@ -24,7 +24,7 @@ extern "C" {
 
 
 #define ı         goto *Next;
-#define ___       Op2 = *Code++;  Next = JumpTable[Op2>>25];
+#define ___       Op2 = *Code++;  Next = JumpTable[Op2>>24];
 #define __      ; Op  = Op2;      ASMPrint(Op);
 #define _         __   ___
 #define JumpLeaf(Addr)         LeafCode = Code;     Code = (Addr);
@@ -60,7 +60,7 @@ ivec4* JB_ASM_Registers(jb_vm* V, bool Clear) {
 
 
 #ifndef VMExitReturn
-	#define VMExitReturn 2<<25
+	#define VMExitReturn 2<<24
 #endif
 
 jb_vm* JB_ASM_VM() {
@@ -73,7 +73,7 @@ jb_vm* JB_ASM_VM() {
 	if (!vm)
 		return 0;
 	vm->GuardValue = 1234567890;
-	vm->EXIT[0] = VMExitReturn;
+	vm->EXIT[0] = VMExitReturn; // thats not the right code!
 	vm->EXIT[1] = 1; // halt
 //	vm->Stack.ResultRegister = 1;		// Remove this? the calling instruction should specify the result.
 	vm->StackSize  = (StackSize - sizeof(jb_vm))/sizeof(u64);

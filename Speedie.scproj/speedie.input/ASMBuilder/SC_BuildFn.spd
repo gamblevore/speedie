@@ -36,5 +36,5 @@ function message.GetASMFunc (|message|)
 
 
 function FatASM.Encode (|ASM|)
-	return (ASM.encoders[.op]!)(self)		
+	//return (ASM.encoders[.op]!)(self)		
 
