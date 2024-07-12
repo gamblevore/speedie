@@ -158,7 +158,7 @@ forms
 		r1		R
 		Cond	1	// 0 == always, 1 = only if dest == 0
 		Inv		1
-		Value	16  // should be 17 bits, right?
+		Value	17
 		Prm1	x
 		Prm2	x
 		

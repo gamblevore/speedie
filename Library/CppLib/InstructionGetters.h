@@ -369,17 +369,11 @@
 #define   ConstStretchy_Invu       (((uint)((Op.Raw)<<14))>>31)
 #define   ConstStretchy_Invu_(x)   (((uint)((x)<<14))>>31)
 
-#define   ConstStretchy_Valuei       ((( int)((Op.Raw)<<15))>>16)
-#define   ConstStretchy_Valuei_(x)   ((( int)((x)<<15))>>16)
+#define   ConstStretchy_Valuei       ((( int)((Op.Raw)<<15))>>15)
+#define   ConstStretchy_Valuei_(x)   ((( int)((x)<<15))>>15)
 
-#define   ConstStretchy_Valueu       (((uint)((Op.Raw)<<15))>>16)
-#define   ConstStretchy_Valueu_(x)   (((uint)((x)<<15))>>16)
-
-#define   ConstStretchy_Prm1i       ((( int)((Op.Raw)<<31))>>31)
-#define   ConstStretchy_Prm1i_(x)   ((( int)((x)<<31))>>31)
-
-#define   ConstStretchy_Prm1u       (((uint)((Op.Raw)<<31))>>31)
-#define   ConstStretchy_Prm1u_(x)   (((uint)((x)<<31))>>31)
+#define   ConstStretchy_Valueu       (((uint)((Op.Raw)<<15))>>15)
+#define   ConstStretchy_Valueu_(x)   (((uint)((x)<<15))>>15)
 
 
 #define   AddK_Ki       ((( int)((Op.Raw)<<18))>>18)

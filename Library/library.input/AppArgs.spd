@@ -110,8 +110,6 @@ helper @FileSizeInt.MainArg (|int| Pos, |string| name,  |FileSizeInt|)
 	|| size = string.MainArgSub(Pos, name, "file-size")$
 	|f64| Mul = 1.0
 	|| T = size.length-2
-	|| x = 1.0KB
-	|| x2 = 1KB
 	if size endswith "kb"
 		mul = 1.0KB
 	  elseif size endswith "mb"

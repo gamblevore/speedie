@@ -1633,13 +1633,13 @@ void JB_ClassData_Restore(JB_Class* Self);
 // JB_CompressionStats
 void JB_MzSt_Clear(CompressionStats* Self);
 
-void JB_MzSt_end(CompressionStats* Self);
+void JB_MzSt_End(CompressionStats* Self);
 
-void JB_MzSt_liveupdate(CompressionStats* Self, int S, int Outt, bool Compress);
+void JB_MzSt_LiveUpdate(CompressionStats* Self, int S, int Outt, bool Compress);
 
 void JB_MzSt_Print(CompressionStats* Self, bool Compress);
 
-CompressionStats* JB_MzSt_start(CompressionStats* Self);
+CompressionStats* JB_MzSt_Start(CompressionStats* Self);
 
 int JB_MzSt__Init_();
 

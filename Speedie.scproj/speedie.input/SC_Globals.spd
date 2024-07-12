@@ -56,7 +56,7 @@ function TypeOfType (ExprResolver) // typeoftypecast, typeofcast
 		if exp0.isint and new.TypeSuffers
 			if exp0.iszero or Old.IsNil
 				new = new.MakeNewNil
-			  else   // || x = 1234|&byte| // Its only used to force a crash, basically.
+			  else   // || xx = 1234|&byte| // Its only used to force a crash, basically.
 				new = new.MakeNewReal
 		new.NoBlindCasts(old, exp, name_Space)
 	return New

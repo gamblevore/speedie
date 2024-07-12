@@ -98,5 +98,6 @@ extend ASMState
 				.addlabel(ch)
 			  else
 				.TextInstruction(ch)
+		.SetLength
 		return .LoadLabelJumps
 

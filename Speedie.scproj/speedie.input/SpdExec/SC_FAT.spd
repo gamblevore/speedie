@@ -105,7 +105,7 @@ struct FatASM
 														// if a {if b {x=1}} else {x=2}
 
 														// what about this?
-														// || x = 1
+														// || xx = 1
 														// if y
 														//     x = 2
 	
@@ -126,14 +126,11 @@ struct FatASM
 		|| s = scimport.allfiles[.filenum]
 			return s
 	
-	
 	function SyntaxExpect (|string| Error)
 		|| err = Error(nil, error, ErrorSeverity.Error, .file)
 		err.position = .BytePos
 		stderr <~ err
 
-
-	
 	function RegInput (|int| a, assigns:|asmreg| info, |int|)
 		rz = info.reg
 		.r[a] = rz
@@ -171,7 +168,6 @@ struct FatASM
 		|| o = other|&ivec4|
 		swap (s++[]) (o++[])
 		swap (s[])   (o[])
-		
 	
 	helper Step (|int| dir, |&FatASM|)
 		real self
@@ -196,6 +192,12 @@ struct FatASM
 			return true
 		return reg == .b
 			
+	
+	function RenderInto (|!&ASM| Where, |!&asm| After, |!&asm|)
+		if where >= After
+		// so now what?
+		return where
+	
 	
 	function Renda (|FastString| fs)
 		opt norefcounts
@@ -224,20 +226,3 @@ struct FatASM
 			printline fs
 
  
- 
-role µFunc1 (memory)
-	linkage
-		cpp_class ASMFunc2
-		cpp_part  ASMFunc2
-	contains ASM
-	visible
-
-	function Run (|&ivec4| Args = nil, |int| ArgCount=nil, |int64|)
-		cpp_part RunArgs
-		|| r = jb_vm.vm.Registers(true)
-		if args
-			for i in argcount
-				r[i] = args[i] 
-		
-		return jb_vm.Run(.ptr, .length)
-

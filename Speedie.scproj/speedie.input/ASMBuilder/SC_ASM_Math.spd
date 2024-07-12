@@ -347,8 +347,8 @@ extend ASMState
 		if dest.isint
 			return .DivInt(dest, l, r, exp)
 		return .DivFloat(dest, l, r, exp)
-	
-	
+
+
 	function DivFloat    (fn_opasm)
 		rz = .QuickFloatDiv(dest, R, L, exp)
 		rz := .QuickFloatDiv(dest, L, R, exp)
@@ -449,15 +449,15 @@ extend ASMState
 		if dest is ConstAny
 			fat.Const = l.const ||| r.const
 		return fat * Dest
-	
-	
+
+
 	function BitAnd (fn_opasm)		
 		|| fat = exp.BAND(dest, L, R, 0)
 		if dest is ConstAny
 			fat.const = l.const & r.const
 		return fat*Dest
-	
-	
+
+
 	function ConstForShift (|asmreg| r, |int| btc, |message| exp,  |int64|)
 		// shl/shl used to use this
 		rz = .GetConst(r)[] #debug_require

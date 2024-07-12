@@ -133,11 +133,13 @@ module PackMaker
 		return g
 
 	
-	function MiniTest (|scfunction| fn1)
-		|| args = {8725l, 1l, 275l, 1l}
-		|| mu   = fn1.asm
-			|| Result = mu.finish.run( (&args[0])|&ivec4|, –count args )
-			if result != 9000
+	function MiniTest (|SCFunction| fn1)
+		|ivec4[4]| Args
+		Args[0].x = 8725,  Args[1].x = 1,  Args[2].x = 275,  Args[3].x = 1
+		|| mu = fn1.asm
+			|| mu2 = mu.µTest
+				|| Result = mu2.run( &Args[0], –count args )
+				if result != 9000
 	
 
 	function ListPackFuncs (|jbin| j)
@@ -156,7 +158,6 @@ module PackMaker
 		for s in StringCorrector.list
 			j.add(@str, s)
 		j.exit(2)
-
 
 
 	function PackClass (|jbin| j)

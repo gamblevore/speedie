@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2092];
+extern JB_StringC* JB_LUB[2090];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -1959,7 +1959,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112772938006528));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112774257403378));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -2497,20 +2497,6 @@ void SC_Comp__TestDate() {
 }
 
 void SC_Comp__TestDict() {
-	Dictionary* D = JB_Incr(JB_Dict_Constructor(nil));
-	(JB_Dict_ValueSet(D, JB_LUB[1408], JB_LUB[2038]));
-	JB_Object* _tmPf1 = JB_Incr(JB_Dict_Value0(D, JB_LUB[1408]));
-	JB_Decr(D);
-	JB_String* _tmPf0 = JB_Incr(((JB_String*)JB_Object_As(_tmPf1, &JB_StringData)));
-	JB_Decr(_tmPf1);
-	if (JB_Str_Equals((_tmPf0), JB_LUB[2038], false)) {
-		JB_Decr(_tmPf0);
-		return;
-	}
-	JB_Decr(_tmPf0);
-	if (true) {
-		JB_Str_SyntaxExpect(JB_LUB[1212]);
-	}
 }
 
 void SC_Comp__TestTask() {
@@ -3295,7 +3281,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1927]);
-	JB_FS_AppendInt32(_fsf0, (2024071211));
+	JB_FS_AppendInt32(_fsf0, (2024071216));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -5202,7 +5188,6 @@ int SC_Macros__Init_() {
 		JB_SetRef(SC__Macros_MainArgDefault, JB_Macro_ConstructorStr(nil, (JB_LUB[5])));
 		JB_SetRef(SC__Macros_MainArgArray, JB_Macro_ConstructorStr(nil, (JB_LUB[8])));
 		JB_SetRef(SC__Macros_MainArgNoNE, JB_Macro_ConstructorStr(nil, (JB_LUB[12])));
-		JB_SetRef(SC__Macros_ASM_Datatype, JB_Macro_ConstructorStr(nil, (JB_LUB[13])));
 		JB_SetRef(SC__Macros_ASMCopier, JB_Macro_ConstructorStr(nil, (JB_LUB[33])));
 		JB_SetRef(SC__Macros_ASMSetter, JB_Macro_ConstructorStr(nil, (JB_LUB[23])));
 	}
@@ -5462,19 +5447,21 @@ void SC_PackMaker__MakePack() {
 }
 
 void SC_PackMaker__MiniTest(SCFunction* Fn1) {
-	int64 Args[4];
-	Args[0] = (8725);
-	Args[1] = (1);
-	Args[2] = (275);
-	Args[3] = (1);
-	//;
+	ivec4 Args[4] = {
+	};
+	Args[0][0] = 8725;
+	Args[1][0] = 1;
+	Args[2][0] = 275;
+	Args[3][0] = 1;
 	ASMFunc* Mu = JB_Incr(Fn1->ASM);
 	if (Mu) {
-		MWrap* _tmPf0 = JB_Incr(SC_ASMFunc_Finish(Mu));
-		int64 Result = SC_ASMFunc2_RunArgs(_tmPf0, ((ivec4*)((&Args[0]))), (4));
-		if (Result != 9000) {
+		MWrap* Mu2 = JB_Incr(SC_ASMFunc_xC2xB5Test(Mu));
+		if (Mu2) {
+			int64 Result = SC_Mrap_RunArgs(Mu2, (&Args[0]), (4));
+			if (Result != 9000) {
+			}
 		}
-		JB_Decr(_tmPf0);
+		JB_Decr(Mu2);
 	}
 	JB_Decr(Mu);
 }
@@ -8368,7 +8355,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024071211));
+	JB_FS_AppendInt32(_fsf0, (2024071216));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8880,7 +8867,7 @@ void SC_VM_Builder__AddxC2xB5Op(JB_String* Name, int Id) {
 	JB_Tree_SyntaxAppend(SC__VM_Builder_ModuleArg, SC_NewEqRelWithMsgMsg(Thg, Msg));
 }
 
-ASM SC_VM_Builder__BadEncoder(FatASM* Self) {
+ASM SC_VM_Builder__BadEncoder(FatASM* Self, ASM* Curr, ASM* After) {
 	return 0;
 }
 
@@ -8976,7 +8963,7 @@ JB_File* SC_VM_Builder__CppLibFile(JB_String* Ch) {
 Message* SC_VM_Builder__DataTypeCreate(Message* Form, int Fnum) {
 	Message* Rz = nil;
 	JB_String* Name = JB_Str_OperatorPlus(JB_LUB[508], Form->Name);
-	Message* Sigh = JB_Macro_CallFast(SC__Macros_ASM_Datatype, JB_Syx_OperatorPlus(kJB_SyxThg, Name), JB_int_Msg(Fnum));
+	Message* Sigh = JB_Macro_CallFast(SC__VM_Builder_ASM_Datatype, JB_Syx_OperatorPlus(kJB_SyxThg, Name), JB_int_Msg(Fnum));
 	Rz = JB_Msg_FindNested(Sigh, kJB_SyxList, nil, false);
 	Rz = ((Message*)JB_Ring_NextSib(Rz));
 	//"This would be better if speedie grouped these, rather than spamming JB_InitCode_";
@@ -9077,6 +9064,13 @@ void SC_VM_Builder__FillTypePrm(JB_String* Fname, int Pname) {
 	JB_Decr(_tmPf0);
 }
 
+void SC_VM_Builder__FinishAcc() {
+	Message* S = SC__VM_Builder_dt_prm;
+	if (S) {
+		JB_Msg_AppendMacro(S, SC__VM_Builder_rizzler, nil);
+	}
+}
+
 int SC_VM_Builder__GenAcc(Message* Line, int Bit_pos, int Pname, int Max) {
 	int N = Max - Bit_pos;
 	JB_String* Lname = JB_LUB[1384];
@@ -9170,6 +9164,7 @@ void SC_VM_Builder__GenerateOne(Message* Form_msg, int F) {
 	if ((Bit_pos < Max) and (P < 5)) {
 		SC_VM_Builder__GenAcc(nil, Bit_pos, 5, Max);
 	}
+	SC_VM_Builder__FinishAcc();
 	JB_FS_AppendByte(SC__VM_Builder_form_h, '\n');
 }
 
@@ -9182,7 +9177,8 @@ int SC_VM_Builder__Init_() {
 		JB_SetRef(SC__VM_Builder_legs, JB_Macro_ConstructorStr(nil, (JB_LUB[34])));
 		JB_SetRef(SC__VM_Builder_arms, JB_Macro_ConstructorStr(nil, (JB_LUB[35])));
 		JB_SetRef(SC__VM_Builder_skibidy, JB_Macro_ConstructorStr(nil, (JB_LUB[16])));
-		JB_SetRef(SC__VM_Builder_ohio, JB_Macro_ConstructorStr(nil, (JB_LUB[20])));
+		JB_SetRef(SC__VM_Builder_rizzler, JB_Macro_ConstructorStr(nil, (JB_LUB[20])));
+		JB_SetRef(SC__VM_Builder_ASM_Datatype, JB_Macro_ConstructorStr(nil, (JB_LUB[13])));
 	}
 	;
 	return 0;
@@ -9384,7 +9380,7 @@ void SC_VM_Builder__VMCpp(FastString* Vm, FastString* Jump) {
 		};
 	}
 	;
-	JB_FS_AppendString(Vm, JB_LUB[2090]);
+	JB_FS_AppendString(Vm, JB_LUB[321]);
 }
 
 void SC_VM_Builder__VMDecl(Message* Tmp, Array* ActuallyMakeTheVM) {
@@ -16072,12 +16068,8 @@ ASM SC_ASM_ConstStretchy_InvSet(ASM Self, int Value) {
 	return Self | ((Value << 31) >> 14);
 }
 
-ASM SC_ASM_ConstStretchy_Prm1Set(ASM Self, int Value) {
-	return Self | ((Value << 31) >> 31);
-}
-
 ASM SC_ASM_ConstStretchy_ValueSet(ASM Self, int Value) {
-	return Self | ((Value << 16) >> 15);
+	return Self | ((Value << 15) >> 15);
 }
 
 ASM SC_ASM_Convert_LSet(ASM Self, int Value) {
@@ -16364,7 +16356,10 @@ void SC_ASM__TestASMSub(Message* Tests) {
 	SC_TextAssembler__Assemble(List);
 	ASMFunc* Fn = SC_SpdAssembler__AccessStr(Testname);
 	if (Fn) {
-		int64 Ff = SC_ASMFunc2_RunArgs(SC_ASMFunc_Finish(Fn), nil, nil);
+		MWrap* Ff = SC_ASMFunc_xC2xB5Test(Fn);
+		if (Ff) {
+			SC_Mrap_RunArgs(Ff, nil, 0);
+		}
 	}
 }
 
@@ -17986,409 +17981,476 @@ Macro* SC_xC2xB5Param_Which(ASMParam Self) {
 }
 
 
-ASM JB_ASM_AddK__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_AddK__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_AddK_KSet(Rz, Self->R[2]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_BClear__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_BClear__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_BClear_Shift1Set(Rz, Self->R[2]);
 	Rz = SC_ASM_BClear_Shift2Set(Rz, Self->R[3]);
 	Rz = SC_ASM_BClear_SignSet(Rz, Self->R[4]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_BFLD__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_BFLD__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_BFLD_upSet(Rz, Self->R[2]);
 	Rz = SC_ASM_BFLD_downSet(Rz, Self->R[3]);
 	Rz = SC_ASM_BFLD_signSet(Rz, Self->R[4]);
 	Rz = SC_ASM_BFLD_LSet(Rz, Self->R[5]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_Bra__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_Bra__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_Bra_c1Set(Rz, Self->R[1]);
 	Rz = SC_ASM_Bra_jmpSet(Rz, Self->R[2]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_CNTC__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_CNTC__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_CNTC_offsetSet(Rz, Self->R[2]);
 	Rz = SC_ASM_CNTC_cnstSet(Rz, Self->R[3]);
 	Rz = SC_ASM_CNTC_sizeSet(Rz, Self->R[4]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_Cmp__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_Cmp__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_R3Set(Rz, Self->R[2]);
 	Rz = SC_ASM_Cmp_CmpSet(Rz, Self->R[3]);
 	Rz = SC_ASM_Cmp_LSet(Rz, Self->R[5]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_CmpB__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_CmpB__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_R3Set(Rz, Self->R[2]);
 	Rz = SC_ASM_CmpB_ShiftSet(Rz, Self->R[3]);
 	Rz = SC_ASM_CmpB_InvSet(Rz, Self->R[4]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_Const__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_Const__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_Const_RotSet(Rz, Self->R[1]);
 	Rz = SC_ASM_Const_InvSet(Rz, Self->R[2]);
 	Rz = SC_ASM_Const_ValueSet(Rz, Self->R[3]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_ConstStretchy__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_ConstStretchy__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_ConstStretchy_CondSet(Rz, Self->R[1]);
 	Rz = SC_ASM_ConstStretchy_InvSet(Rz, Self->R[2]);
 	Rz = SC_ASM_ConstStretchy_ValueSet(Rz, Self->R[3]);
-	Rz = SC_ASM_ConstStretchy_Prm1Set(Rz, Self->R[4]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_Convert__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_Convert__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_Convert_ModeSet(Rz, Self->R[2]);
 	Rz = SC_ASM_Convert_LSet(Rz, Self->R[5]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_Div__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_Div__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_R3Set(Rz, Self->R[2]);
 	Rz = SC_ASM_R4Set(Rz, Self->R[3]);
 	Rz = SC_ASM_Div_KindSet(Rz, Self->R[4]);
 	Rz = SC_ASM_Div_LSet(Rz, Self->R[5]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_Float__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_Float__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_R3Set(Rz, Self->R[2]);
 	Rz = SC_ASM_R4Set(Rz, Self->R[3]);
 	Rz = SC_ASM_Float_DSet(Rz, Self->R[4]);
 	Rz = SC_ASM_Float_LSet(Rz, Self->R[5]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_FloatAddExp__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_FloatAddExp__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_R3Set(Rz, Self->R[2]);
 	Rz = SC_ASM_FloatAddExp_Sh2Set(Rz, Self->R[3]);
 	Rz = SC_ASM_FloatAddExp_Sh3Set(Rz, Self->R[4]);
 	Rz = SC_ASM_FloatAddExp_DSet(Rz, Self->R[5]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_FloatConst__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_FloatConst__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_FloatConst_HighSet(Rz, Self->R[2]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_Func__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_Func__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_Func_SaveRegsSet(Rz, Self->R[0]);
 	Rz = SC_ASM_Func_JUMPSet(Rz, Self->R[1]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_JCmp__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_JCmp__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_JCmp_CmpSet(Rz, Self->R[2]);
 	Rz = SC_ASM_JCmp_JmpSet(Rz, Self->R[3]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_JCmpEq__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_JCmpEq__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_JCmpEq_JmpSet(Rz, Self->R[2]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_Jump__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_Jump__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_Jump_l0Set(Rz, Self->R[0]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_Loop__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_Loop__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_Loop_JumpSet(Rz, Self->R[2]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_MemUtil__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_MemUtil__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_MemUtil_OpSet(Rz, Self->R[2]);
 	Rz = SC_ASM_MemUtil_NSet(Rz, Self->R[3]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_RET__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_RET__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_RET_CountSet(Rz, Self->R[2]);
 	Rz = SC_ASM_RET_ExistsSet(Rz, Self->R[3]);
 	Rz = SC_ASM_RET_LSet(Rz, Self->R[5]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_Read__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_Read__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_R3Set(Rz, Self->R[2]);
 	Rz = SC_ASM_Read_LSet(Rz, Self->R[3]);
 	Rz = SC_ASM_Read_moveSet(Rz, Self->R[4]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_RefSet__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_RefSet__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_R3Set(Rz, Self->R[2]);
 	Rz = SC_ASM_R4Set(Rz, Self->R[3]);
 	Rz = SC_ASM_RefSet_LSet(Rz, Self->R[5]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_Shift__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_Shift__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_R3Set(Rz, Self->R[2]);
 	Rz = SC_ASM_Shift_ShSet(Rz, Self->R[3]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_Swap__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_Swap__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_R3Set(Rz, Self->R[2]);
 	Rz = SC_ASM_R4Set(Rz, Self->R[3]);
 	Rz = SC_ASM_Swap_LSet(Rz, Self->R[5]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_Table__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_Table__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_Table_ModeSet(Rz, Self->R[1]);
 	Rz = SC_ASM_Table_AddSet(Rz, Self->R[2]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_Tail__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_Tail__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_Tail_JUMPSet(Rz, Self->R[0]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_Trap__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_Trap__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_Trap_ContinueSet(Rz, Self->R[1]);
 	Rz = SC_ASM_Trap_ModeSet(Rz, Self->R[2]);
 	Rz = SC_ASM_Trap_LSet(Rz, Self->R[5]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_U0__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_U0__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_U0_LSet(Rz, Self->R[5]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_U1__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_U1__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_U1_LSet(Rz, Self->R[5]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_U2__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_U2__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_U2_LSet(Rz, Self->R[5]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_U3__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_U3__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_R3Set(Rz, Self->R[2]);
 	Rz = SC_ASM_U3_LSet(Rz, Self->R[5]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_U4__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_U4__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_R3Set(Rz, Self->R[2]);
 	Rz = SC_ASM_R4Set(Rz, Self->R[3]);
 	Rz = SC_ASM_U4_LSet(Rz, Self->R[5]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
 
-ASM JB_ASM_Write__Encode(FatASM* Self) {
-	ASM Rz = 0;
+ASM JB_ASM_Write__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	Rz = (Self->Op << 24);
+	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
 	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
 	Rz = SC_ASM_R3Set(Rz, Self->R[2]);
 	Rz = SC_ASM_Write_LSet(Rz, Self->R[3]);
 	Rz = SC_ASM_Write_moveSet(Rz, Self->R[4]);
+	if (((bool)Curr) and (Curr < After)) {
+		Curr++[0] = Rz;
+	}
 	return Rz;
 }
 
@@ -19793,7 +19855,7 @@ bool SC_FatASM_Dest(FatASM* Self, int A, AsmReg Info) {
 }
 
 ASM SC_FatASM_Encode(FatASM* Self) {
-	return (SC__ASM_Encoders[Self->Op])(Self);
+	return (SC__ASM_Encoders[Self->Op])(Self, nil, nil);
 }
 
 void SC_FatASM_F32Set(FatASM* Self, float Value) {
@@ -19991,6 +20053,12 @@ void SC_FatASM_Renda(FatASM* Self, FastString* Fs) {
 			(++I);
 		};
 	};
+}
+
+ASM* SC_FatASM_RenderInto(FatASM* Self, ASM* Where, ASM* After) {
+	if (Where >= After) {
+	}
+	return Where;
 }
 
 FatASM* SC_FatASM_Step(FatASM* Self, int Dir) {
@@ -20442,9 +20510,9 @@ bool JB_Pico_SendMsg(PicoComms* Self, PicoMessage* A, bool Wait) {
 
 bool JB_Pico_SendFS(PicoComms* Self, FastString* Fs, bool Wait) {
 	bool Rz = false;
-	PicoMessage Msg = ((PicoMessage){});
-	JB_Pico__FromFS(Fs, (&Msg));
-	Rz = JB_Pico_SendMsg(Self, (&Msg), Wait);
+	PicoMessage _tmPf0 = ((PicoMessage){});
+	JB_Pico__FromFS(Fs, (&_tmPf0));
+	Rz = JB_Pico_SendMsg(Self, (&_tmPf0), Wait);
 	(JB_FS_LengthSet(Fs, 0));
 	return Rz;
 }
@@ -21027,7 +21095,7 @@ void SC_Pac_FinishASM(ASMState* Self) {
 	FatASM* L = SC_Pac_Last(Self);
 	if (!((SC_FatASM_OperatorIsa(L, kSC__ASM_RET)) or (SC_FatASM_OperatorIsa(L, kSC__ASM_TRAP)))) {
 	}
-	Self->Out->Length = (Self->Curr - Self->Out->IR);
+	SC_Pac_SetLength(Self);
 }
 
 AsmReg SC_Pac_FloatMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp) {
@@ -21466,9 +21534,6 @@ FatASM** SC_Pac_RegPlace(ASMState* Self, int A) {
 
 bool SC_Pac_SetConst(ASMState* Self, Message* List, Message* Orig) {
 	Message* RegMsg = JB_Msg_NeedSyx(List, kJB_SyxThg);
-	if (!RegMsg) {
-		return nil;
-	}
 	Message* ValMsg = ((Message*)JB_Ring_NextSib(RegMsg));
 	if (!ValMsg) {
 		return nil;
@@ -21476,6 +21541,10 @@ bool SC_Pac_SetConst(ASMState* Self, Message* List, Message* Orig) {
 	uint64 Value = SC_Msg_ASMConst(ValMsg);
 	SC_Pac_NumToReg(Self, Value, Orig, SC_int_ToASM(SC_Msg_Reg(RegMsg)));
 	return true;
+}
+
+void SC_Pac_SetLength(ASMState* Self) {
+	Self->Out->Length = (Self->Curr - Self->Out->IR);
 }
 
 AsmReg SC_Pac_SHL(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp) {
@@ -21600,6 +21669,7 @@ bool SC_Pac_TextFuncSub(ASMState* Self, Message* M) {
 		;
 	}
 	;
+	SC_Pac_SetLength(Self);
 	return SC_Pac_LoadLabelJumps(Self);
 }
 
@@ -25483,8 +25553,32 @@ void JB_Mrap_Destructor(MWrap* Self) {
 	}
 }
 
+void JB_Mrap_LengthSet(MWrap* Self, int Value) {
+	if (Value > Self->Capacity) {
+		Self->Capacity = Value;
+	}
+	 else if (Value == 0) {
+		Self->Capacity = 0;
+	}
+	Self->Length = Value;
+}
+
 byte* JB_Mrap_Ptr(MWrap* Self) {
 	return ((byte*)Self->_Ptr);
+}
+
+int64 SC_Mrap_RunArgs(MWrap* Self, ivec4* Args, int ArgCount) {
+	ivec4* R = JB_ASM_Registers(JB_ASM_VM(), true);
+	if (Args) {
+		{
+			int I = 0;
+			while (I < ArgCount) {
+				R[I] = Args[I];
+				(++I);
+			};
+		};
+	}
+	return JB_ASM_Run(((ASM*)JB_Mrap_Ptr(Self)), Self->Length);
 }
 
 bool JB_Mrap_SetCap(MWrap* Self, int Value) {
@@ -29420,10 +29514,6 @@ void SC_ASMFunc_Destructor(ASMFunc* Self) {
 	JB_Clear(Self->Fn);
 }
 
-MWrap* SC_ASMFunc_Finish(ASMFunc* Self) {
-	return JB_Mrap_ConstructorPtr(nil, Self->Length, 4, ((byte*)Self->IR), 0);
-}
-
 JB_String* SC_ASMFunc_Render(ASMFunc* Self, FastString* Fs_in) {
 	FastString* Fs = JB_Incr(JB_FS__FastNew(Fs_in));
 	//;
@@ -29449,11 +29539,38 @@ JB_String* SC_ASMFunc_Render(ASMFunc* Self, FastString* Fs_in) {
 	return _tmPf4;
 }
 
+ASM* SC_ASMFunc_RenderInto(ASMFunc* Self, ASM* Where, ASM* After) {
+	{
+		int _CurrInstf0 = 0;
+		FatASM* _Addrf1 = Self->IR;
+		while (_CurrInstf0 < Self->Length) {
+			FatASM* I = _Addrf1 + _CurrInstf0;
+			Where = SC_FatASM_RenderInto(I, Where, After);
+			(++_CurrInstf0);
+		};
+	}
+	;
+	return Where;
+}
+
 void SC_ASMFunc_Sanity(ASMFunc* Self) {
 	FatASM* Curr = Self->IR;
 	int Length = Self->Length;
 	if (((bool)Curr[-1].Op) or ((bool)Curr[Length - 1].Op)) {
 	}
+}
+
+MWrap* SC_ASMFunc_xC2xB5Test(ASMFunc* Self) {
+	MWrap* Rz = JB_Incr(((MWrap*)nil));
+	JB_SetRef(Rz, JB_Mrap__Object(Self->Length * 3, 4));
+	if (!Rz) {
+		JB_Decr(Rz);
+		return nil;
+	}
+	(JB_Mrap_LengthSet(Rz, Rz->Capacity));
+	SC_ASMFunc_RenderInto(Self, ((ASM*)JB_Mrap_Ptr(Rz)), ((ASM*)JB_Mrap_Ptr(Rz)) + Rz->Length);
+	JB_SafeDecr(Rz);
+	return Rz;
 }
 
 
@@ -30203,9 +30320,6 @@ bool SC_File_TestSpeedie(JB_File* Self, JB_String* V) {
 	JB_Array_SyntaxAppend(Cmd_args, JB_LUB[327]);
 	JB_Array_SyntaxAppend(Cmd_args, JB_LUB[323]);
 	JB_Array_SyntaxAppend(Cmd_args, Variant);
-	if (JB_Str_Equals(Variant, JB_LUB[448], false)) {
-		JB_Array_SyntaxAppend(Cmd_args, JB_LUB[321]);
-	}
 	if (SC__Options_PrintCompileString) {
 		JB_Array_SyntaxAppend(Cmd_args, JB_LUB[325]);
 	}
@@ -30785,21 +30899,6 @@ JB_List* JB_Tree_WrapWith(JB_List* Self, JB_List* W) {
 	(JB_Ring_PrevSibSet(Self, W));
 	(JB_Ring_FirstSet(W, Self));
 	return W;
-}
-
-
-int64 SC_ASMFunc2_RunArgs(MWrap* Self, ivec4* Args, int ArgCount) {
-	ivec4* R = JB_ASM_Registers(JB_ASM_VM(), true);
-	if (Args) {
-		{
-			int I = 0;
-			while (I < ArgCount) {
-				R[I] = Args[I];
-				(++I);
-			};
-		};
-	}
-	return JB_ASM_Run(((ASM*)JB_Mrap_Ptr(Self)), Self->Length);
 }
 
 
@@ -52714,4 +52813,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -5719698180818169881 -5150571951002883939
+// -7127375186202106867 4696597651101951714

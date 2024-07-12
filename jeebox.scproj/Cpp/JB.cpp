@@ -3047,16 +3047,16 @@ void JB_ClassData_Restore(JB_Class* Self) {
 void JB_MzSt_Clear(CompressionStats* Self) {
 }
 
-void JB_MzSt_end(CompressionStats* Self) {
+void JB_MzSt_End(CompressionStats* Self) {
 }
 
-void JB_MzSt_liveupdate(CompressionStats* Self, int S, int Outt, bool Compress) {
+void JB_MzSt_LiveUpdate(CompressionStats* Self, int S, int Outt, bool Compress) {
 }
 
 void JB_MzSt_Print(CompressionStats* Self, bool Compress) {
 }
 
-CompressionStats* JB_MzSt_start(CompressionStats* Self) {
+CompressionStats* JB_MzSt_Start(CompressionStats* Self) {
 	if (!Self) {
 		return (&JB__MzSt_all);
 	}
@@ -4894,7 +4894,7 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 		JB_Decr(J);
 		return;
 	}
-	St = JB_MzSt_start(St);
+	St = JB_MzSt_Start(St);
 	JB_FS_AppendString(J, JB__JbinHeader);
 	JB_bin_Enter(J, kJB_SyxTmp, JB_LUB[141]);
 	JB_bin_AddInt(J, Self->Length);
@@ -4904,7 +4904,7 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 		int Place = JB_bin_OpenSection(J);
 		JB_Str_CompressChunk(J, Str);
 		JB_bin_CloseSection(J, Place);
-		JB_MzSt_liveupdate(St, JB_Str_Length(Str), J->Length - Place, true);
+		JB_MzSt_LiveUpdate(St, JB_Str_Length(Str), J->Length - Place, true);
 		JB_Decr(Str);
 		if (!JB_SS_NoMoreChunks(Self)) {
 			JB_FS_Flush(J);
@@ -4914,7 +4914,7 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 	JB_FS_Flush(J);
 	JB_Str_CompressChunk(J, nil);
 	JB_Decr(J);
-	JB_MzSt_end(St);
+	JB_MzSt_End(St);
 }
 
 StringReader* JB_SS_Constructor(StringReader* Self, JB_String* Data) {
@@ -4977,7 +4977,7 @@ bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, Compress
 		}
 	}
 	 else {
-		St = JB_MzSt_start(St);
+		St = JB_MzSt_Start(St);
 		while (true) {
 			Message* C = JB_Incr(JB_SS_NextMsgExpect(Self, Arg, kJB_SyxBin, nil));
 			if ((!C)) {
@@ -4991,11 +4991,11 @@ bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, Compress
 			}
 			Remaining = (Remaining - Expected);
 			JB_FS_Flush(Fs);
-			JB_MzSt_liveupdate(St, JB_Msg_Length(C), Expected, false);
+			JB_MzSt_LiveUpdate(St, JB_Msg_Length(C), Expected, false);
 			JB_Tree_Remove(C);
 			JB_Decr(C);
 		};
-		JB_MzSt_end(St);
+		JB_MzSt_End(St);
 	}
 	JB_Decr(Fs);
 	JB_Decr(Arg);
@@ -7871,7 +7871,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024071122);
+	return (2024071211);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -7883,4 +7883,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 -6874192126073489826 8474535368898615780
+// 7796578953066441599 -4459141212384929561 8474535368898615780

@@ -53,7 +53,7 @@ extend asmstate
 			
 	function SetConst (|Message| List,  |message| Orig,  |bool|)
 		opt norefcounts								// set1: r1, 123
-		|| RegMsg = list[@thg]				#require
+		|| RegMsg = list[@thg]
 		|| ValMsg = regmsg.Next				#require
 		|| Value  = ValMsg.ASMConst
 		

@@ -318,6 +318,10 @@ function ASMState.FinishASM
 	|| l = .last
 	ifn (l isa asm.ret) or (l isa asm.trap) 
 		debugger
+	.SetLength
+
+
+function ASMState.SetLength
 	.out.length = .curr - .out.IR
 
 

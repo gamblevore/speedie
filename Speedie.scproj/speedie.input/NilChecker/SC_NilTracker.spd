@@ -31,8 +31,8 @@ struct LoopInfo
 	
 	function FinishLoop (|message| msg)
 		/*
-			|| x = 1
-			while x
+			|| xx = 1
+			while xx
 				0
 			// we should also check for these kind of loops.
 			// not really a nil-operation though is it?

@@ -39,6 +39,12 @@ function FillTypePrm (|string| fname, |int| pname)
 	.dt_prm <~ macros.ASMcopier.run(prop, pname.msg)
 
 
+function FinishAcc 
+	opt norefcounts
+	|| s = .dt_prm
+		s.AppendMacro(vm_builder.rizzler)
+
+
 function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max, |int|)
 	opt norefcounts
 	|| n = Max - bit_pos
@@ -82,27 +88,14 @@ function AddForm (|message| form, |µform|)
 	µform.forms.ValueLower(form.name) = rz 
 
 
-//function string.ASMNormalise (|string|)
-//	|| n = 0
-//	for c in self
-//		c = c.lowercase
-//		if c == 'r' or 'n' or 'R'
-//			n++
-//		  elseif c == 'l' or 's' or 'j'
-//			0
-//		  else
-//			return self
-//	return "U" + ('0' + n)
-
-
 function DataTypeCreate (|message| form,  |int| fnum,  |message|)
 	opt norefcounts
 	|| name = "ASM_" + form.name
-	|| sigh = Macros.ASM_Datatype.run(
+	|| sigh = vm_builder.ASM_Datatype.run(
 		@thg + name
 		fnum.msg
 	)
-	rz = sigh.findnested(@list)
+	rz = sigh.FindNested(@list)
 	rz++
 	#!"This would be better if speedie grouped these, rather than spamming JB_InitCode_"
 	while sigh.hasany
@@ -135,6 +128,7 @@ function GenerateOne (|message| form_msg, |int| f)
 	
 	if bit_pos < max and p < 5
 		.GenAcc(nil, bit_pos, 5, max)
+	.FinishAcc
 	.form_h <~ '\n'
 
 	
@@ -280,7 +274,7 @@ function VMDecl (|message| tmp, |[message]?| ActuallyMakeTheVM)
 	|| P1 = prms.first
 	|| Counts = p1.next
 	
-	|| name = p1.name//.ASMNormalise
+	|| name = p1.name  //  .ASMNormalise
 	|| form = µform.forms.valuelower(name)			#require
 	|| FormEnc = asm.Forms[form.Index]
 	name = "ASM_" + name
@@ -316,8 +310,6 @@ function MakeMsgCreator (|string| name, |µform| form)
 	|| prm = arg.prev!
 	|| FatDecl = prm.last!
 	|| r = [arg,arg]
-//	r.Clear
-//	r <~ (arg, 2)
 	|| f = form.src.first.first
 	
 	for (p in form) (i)
@@ -329,13 +321,6 @@ function MakeMsgCreator (|string| name, |µform| form)
 		r[1] = @thg + pname
 		arg <~ p.which.run(r)
 		f++
-	
-//	r.Clear
-	
-//	|| x = form.Outputs + 1
-//	if x > 1
-//		arg <~ ohio.run(@num+(x>>1))
-
 		
 
 function µparam.Which (|macro!--|)
@@ -356,8 +341,21 @@ function µparam.Which (|macro!--|)
 || legs    = "rz.numinput(_0) = _1".macro
 || arms    = "rz.reginput(_0) = _1".macro
 || skibidy = "if rz.dest(_0, _1): outputs++".macro
-|| ohio    = "if outputs < _0: error (self, `No inputs given!`)".macro
-	
+|| rizzler = "
+if (curr and curr < after) // remove the test for curr!=nil...
+	curr++[] = rz 
+return rz
+".macro
+
+|| ASM_Datatype = "datatype _0 (ASM) 
+	module
+		function Encode (ASM_Encoder2,)
+			visible true
+			|asm| rz = .op << 24
+		
+ASM.Forms[_1] = &_0.Encode // for now
+".macro
+
 	
 
 function AddµOp (|string| name, |int| id) 

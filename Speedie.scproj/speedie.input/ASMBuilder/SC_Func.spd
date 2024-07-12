@@ -17,9 +17,28 @@ class µFunc
 	function Name (|string|)
 		return .fn.ExportName
 
-	function Finish (|µFunc1|)
-		return µFunc1(.length, 4, .IR|&byte|, 0)
+	function µTest (|memory of asm|)
+		description "Generate some code (only for testing)."
+		rz = asm[.length*3]$
+		rz.length = rz.capacity
+		.RenderInto(rz.ptr, rz.ptr+rz.length)
+	
+	
+	function RenderInto (|!&ASM| Where, |!&asm| After, |!&asm|)
+		for i in self
+			where = i.renderinto(where, after)
+		return where
+
+
+	function memory.Run (|memory of asm| self, |&ivec4| Args = nil, |int| ArgCount=0, |int64|)
+		cpp_part RunArgs
+		|| r = jb_vm.vm.Registers(true)
+		if args
+			for i in argcount
+				r[i] = args[i] 
 		
+		return jb_vm.Run(.ptr, .length)
+
 
 /// TEXTUAL STUFF		
 	render

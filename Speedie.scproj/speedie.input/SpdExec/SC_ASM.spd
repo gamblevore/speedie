@@ -1,9 +1,6 @@
 
 
 datatype ASM (uint)
-//	function IsOK (|bool|)
-//		 return self
-	
 	function Print
 		visible
 		cpp_name ASMPrint
@@ -30,5 +27,5 @@ datatype ASM (uint)
 		|asm_encoder2[256]| 	Encoders
 
 
-prototype ASM_Encoder2  (|&FatASM| self, |asm|)
+prototype ASM_Encoder2  (|&FatASM| self, |&asm| Curr=nil, |&asm| After=nil, |asm|)
 
