@@ -124,16 +124,16 @@ target minilib {
 struct CompressionStats 
 	|bool| Live
 	linkage:cpp_part MzSt
-	function start (|&compressionstats|)
+	function Start (|&compressionstats|)
 		nil self
 		if !self
 			return all
 		return self
-	function end
-	function len (|int| n)
-	function liveupdate (|int| s, |int| outt, |bool| compress=true)
-	function durr (|float|)
-	function render (|string|)
+	function End
+	function Len (|int| n)
+	function LiveUpdate (|int| s, |int| outt, |bool| compress=true)
+	function Durr (|float|)
+	render Report (|bool| Compression)
 	function Clear
 	function Print (|bool| Compress=true)
 	module

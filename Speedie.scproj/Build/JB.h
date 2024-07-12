@@ -271,8 +271,6 @@ struct StringLengthSplit;
 
 struct StructSaveTest;
 
-struct xD1x9B;
-
 struct ASMState;
 
 struct ByteMap_Behaviour;
@@ -1845,8 +1843,8 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp 32784
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down (JB_LUB[2093])
-#define kJB__zalgo_mid (JB_LUB[2092])
+#define kJB__zalgo_down (JB_LUB[1981])
+#define kJB__zalgo_mid (JB_LUB[1979])
 extern Random JB__zalgo_R;
 #define kJB__zalgo_up (JB_LUB[2091])
 #define kJB__byte_max 255
@@ -5805,9 +5803,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 // JB_jb_vm
 
 
-// JB_ћ
-
-
 // JB_ASMState
 AsmReg SC_Pac_AddConstant(ASMState* Self, Message* Exp, AsmReg Dest, AsmReg Src, int64 Value);
 
@@ -7451,6 +7446,8 @@ bool JB_File_NewerThanFile(JB_File* Self, JB_File* F);
 
 bool JB_File_OperatorIsNewerThan(JB_File* Self, Date F);
 
+JB_File* JB_File_OperatorPlus(JB_File* Self, JB_String* S);
+
 JB_File* JB_File_Parent(JB_File* Self);
 
 Message* JB_File_Parse(JB_File* Self, int Lim, bool AllowMissing);
@@ -8548,6 +8545,8 @@ JB_String* JB_Msg_Text(Message* Self, int I);
 
 bool JB_Msg_TextSet(Message* Self, int I, JB_String* V);
 
+Message* JB_Msg_TextViewChild(Message* Self);
+
 void JB_Msg_Thg__(Message* Self, FastString* Fs);
 
 void JB_Msg_Tmp__(Message* Self, FastString* Fs);
@@ -8575,8 +8574,6 @@ void JB_Msg_Tril__(Message* Self, FastString* Fs);
 MaybeBool SC_Msg_Trueness(Message* Self, NilState Found);
 
 bool SC_Msg_TrueOrFalse(Message* Self);
-
-Message* JB_Msg_TViewCH(Message* Self);
 
 void JB_Msg_Type__(Message* Self, FastString* Fs);
 

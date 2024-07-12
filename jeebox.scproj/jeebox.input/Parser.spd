@@ -994,6 +994,13 @@ ive been~running #since morning
 
 
 	function NextLineAndIndent (|message| parent, |ParserLineAndIndent|)
+/*
+	ParserLineAndIndent
+		|int|			Lines 
+		|int|			Indent
+		|int|			Pos
+		|bool|			IsDebug
+*/
 		Opt NoRefCounts
 
 		|| first		= .nextstart // should ind??

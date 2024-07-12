@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[575];
+extern JB_StringC* JB_LUB[563];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -1412,7 +1412,7 @@ Message* JB_Tk__fMsgList(int Start, Message* Parent) {
 			JB_Decr(Item);
 			break;
 		}
-		if (JB_Str_OperatorEndsWith(Item->Name, JB_LUB[572])) {
+		if (JB_Str_OperatorEndsWith(Item->Name, JB_LUB[139])) {
 			Message* _tmPf0 = JB_Incr(JB_Tk__ErrorAdd(JB_LUB[268], Item->Position));
 			JB_Decr(Item);
 			JB_Decr(Result);
@@ -1422,7 +1422,7 @@ Message* JB_Tk__fMsgList(int Start, Message* Parent) {
 		JB_Tree_SyntaxAppend(Result, Item);
 		JB_Decr(Item);
 	};
-	JB_Tk__ExpectEndChar(Start, JB_LUB[572], true);
+	JB_Tk__ExpectEndChar(Start, JB_LUB[139], true);
 	(JB_Msg_AfterSet(Result, JB_Tk__NextStart()));
 	JB_SafeDecr(Result);
 	return Result;
@@ -1901,7 +1901,7 @@ void JB_Tk__Init() {
 	(JB_Tk__TokenSet(JB_LUB[342], _tmPf11));
 	JB_Decr(_tmPf11);
 	TokHan* _tmPf13 = JB_Incr(JB_Tk__Handler(kJB__Tk_kThingSyx, ((TokenHandler_fp)JB_Tk__fMsgList)));
-	(JB_Tk__TokenSet(JB_LUB[568], _tmPf13));
+	(JB_Tk__TokenSet(JB_LUB[138], _tmPf13));
 	JB_Decr(_tmPf13);
 	TokHan* _tmPf15 = JB_Incr(JB_Tk__Handler(kJB__Tk_kFuncAfterNoSpace, ((TokenHandler_fp)JB_Tk__fDot)));
 	TokHan* _tmPf14 = JB_Incr(JB_TH_Link(_tmPf15, kJB__Tk_kThingSyx, ((TokenHandler_fp)JB_Tk__fSDot)));
@@ -1973,7 +1973,7 @@ void JB_Tk__Init() {
 	(JB_Tk__TokenSet(JB_LUB[65], _tmPf29));
 	JB_Decr(_tmPf29);
 	JB_Tk__TokenzFn(JB_LUB[172], kJB__Tk_kThingSyx, JB_Tk__fInnerNiceAdj);
-	JB_Tk__TokenzFn(JB_LUB[569], kJB__Tk_kThingSyx, JB_Tk__fYoda);
+	JB_Tk__TokenzFn(JB_LUB[142], kJB__Tk_kThingSyx, JB_Tk__fYoda);
 	JB_Tk__TokenzFn(JB_LUB[22], kJB__Tk_kThingSyx, JB_Tk__fQuoteLang);
 	JB_Tk__TokenzFn(JB_LUB[21], kJB__Tk_kThingSyx, JB_Tk__fQuestion);
 	JB_Tk__TokenzFn(JB_LUB[23], kJB__Tk_kThingSyx, JB_Tk__fAsk);
@@ -3439,7 +3439,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver) {
 
 
 
-
 __lib__ void jdb(JB_Object* Self) {
 	//visible;
 	if (Self) {
@@ -4812,7 +4811,7 @@ JB_String* JB_Str_Unescape(JB_String* Self) {
 }
 
 CharSet* JB_Str_UniCS(JB_String* Self) {
-	JB_String* _tmPf0 = JB_Incr(JB_Str_OperatorPlus(Self, JB_LUB[567]));
+	JB_String* _tmPf0 = JB_Incr(JB_Str_OperatorPlus(Self, JB_LUB[120]));
 	CharSet* _tmPf1 = JB_Incr(JB_Str_CharSetWithBool((_tmPf0), true));
 	JB_Decr(_tmPf0);
 	JB_SafeDecr(_tmPf1);
@@ -4897,7 +4896,7 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 	}
 	St = JB_MzSt_start(St);
 	JB_FS_AppendString(J, JB__JbinHeader);
-	JB_bin_Enter(J, kJB_SyxTmp, JB_LUB[571]);
+	JB_bin_Enter(J, kJB_SyxTmp, JB_LUB[141]);
 	JB_bin_AddInt(J, Self->Length);
 	JB_bin_Enter(J, kJB_SyxArg, JB_LUB[0]);
 	while (JB_SS_HasAny(Self)) {
@@ -6322,7 +6321,7 @@ bool JB_Msg_jbinTest(Message* Self) {
 JB_String* JB_Msg_JDB2_(Message* Self, int Flags, FastString* Fs_in) {
 	FastString* Fs = JB_Incr(JB_FS__FastNew(Fs_in));
 	if (((bool)(Flags & 1))) {
-		JB_FS_AppendString(Fs, JB_LUB[568]);
+		JB_FS_AppendString(Fs, JB_LUB[138]);
 	}
 	JB_String* _tmPf2 = JB_Incr(JB_Syx_Name(Self->Func));
 	JB_FS_AppendString(Fs, _tmPf2);
@@ -6354,7 +6353,7 @@ JB_String* JB_Msg_JDB2_(Message* Self, int Flags, FastString* Fs_in) {
 		}
 	}
 	if (((bool)(Flags & 1))) {
-		JB_FS_AppendString(Fs, JB_LUB[572]);
+		JB_FS_AppendString(Fs, JB_LUB[139]);
 	}
 	JB_String* _tmPf4 = JB_Incr(JB_FS_SmartResult(Fs, Fs_in));
 	JB_Decr(Fs);
@@ -6471,7 +6470,7 @@ Message* JB_Msg_Msg(Message* Self, Syntax Fn, JB_String* Name) {
 }
 
 void JB_Msg_Msg__(Message* Self, FastString* Fs) {
-	JB_FS_AppendString(Fs, JB_LUB[568]);
+	JB_FS_AppendString(Fs, JB_LUB[138]);
 	JB_Msg_FSListSep(Self, Fs, JB_LUB[98]);
 	JB_FS_AppendString(Fs, JB_LUB[58]);
 }
@@ -6966,17 +6965,34 @@ bool JB_Msg_TestSub(Message* Self, JB_String* New_render, JB_String* Name) {
 
 JB_String* JB_Msg_Text(Message* Self, int I) {
 	if (I == 0) {
-		return JB_Msg_TViewCH(Self)->Name;
+		return JB_Msg_TextViewChild(Self)->Name;
 	}
 	return JB_LUB[0];
 }
 
 bool JB_Msg_TextSet(Message* Self, int I, JB_String* V) {
 	if (I == 0) {
-		JB_SetRef(JB_Msg_TViewCH(Self)->Name, V);
+		JB_SetRef(JB_Msg_TextViewChild(Self)->Name, V);
 		return true;
 	}
 	return false;
+}
+
+Message* JB_Msg_TextViewChild(Message* Self) {
+	if (!JB_Msg_EqualsSyx(Self, kJB_SyxTmp, false)) {
+		return Self;
+	}
+	Message* Ch = ((Message*)JB_Ring_First(Self));
+	if (Ch) {
+		Message* Ch2 = ((Message*)JB_Ring_NextSib(Ch));
+		if (JB_Msg_ListViewable(Ch2)) {
+			return Ch2;
+		}
+		if (JB_Msg_ListViewable(Ch)) {
+			return Ch;
+		}
+	}
+	return Self;
 }
 
 void JB_Msg_Thg__(Message* Self, FastString* Fs) {
@@ -7037,23 +7053,6 @@ void JB_Msg_Tril__(Message* Self, FastString* Fs) {
 	}
 	JB_FS_AppendByte(Fs, ' ');
 	JB_FS_SyntaxAppend(Fs, L);
-}
-
-Message* JB_Msg_TViewCH(Message* Self) {
-	if (!JB_Msg_EqualsSyx(Self, kJB_SyxTmp, false)) {
-		return Self;
-	}
-	Message* Ch = ((Message*)JB_Ring_First(Self));
-	if (Ch) {
-		Message* Ch2 = ((Message*)JB_Ring_NextSib(Ch));
-		if (JB_Msg_ListViewable(Ch2)) {
-			return Ch2;
-		}
-		if (JB_Msg_ListViewable(Ch)) {
-			return Ch;
-		}
-	}
-	return Self;
 }
 
 void JB_Msg_Type__(Message* Self, FastString* Fs) {
@@ -7192,7 +7191,7 @@ void JB_Msg_Yoda__(Message* Self, FastString* Fs) {
 	Message* F = ((Message*)JB_Ring_First(Self));
 	Message* S = ((Message*)JB_Ring_NextSib(F));
 	Message* L = ((Message*)JB_Ring_NextSib(S));
-	JB_FS_AppendString(Fs, JB_LUB[570]);
+	JB_FS_AppendString(Fs, JB_LUB[140]);
 	JB_FS_SyntaxAppend(Fs, L);
 	JB_FS_AppendByte(Fs, ' ');
 	JB_FS_SyntaxAppend(Fs, F);
@@ -7872,7 +7871,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024071113);
+	return (2024071122);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -7884,4 +7883,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 -5426040127568151992 922363380773641877
+// 7796578953066441599 -6874192126073489826 8474535368898615780

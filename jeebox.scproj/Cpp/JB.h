@@ -139,8 +139,6 @@ struct StringLengthSplit;
 
 struct StructSaveTest;
 
-struct xD1x9B;
-
 struct ByteMap_Behaviour;
 
 struct Charset_Behaviour;
@@ -735,9 +733,9 @@ extern JB_String* JB__Tk_Data;
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
 #define kJB__zalgo_down (JB_LUB[102])
-#define kJB__zalgo_mid (JB_LUB[574])
+#define kJB__zalgo_mid (JB_LUB[414])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up (JB_LUB[573])
+#define kJB__zalgo_up (JB_LUB[401])
 #define kJB__byte_max 255
 #define kJB__byte_min (0)
 #define kJB__char_max 127
@@ -1812,9 +1810,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 // JB_jb_vm
 
 
-// JB_ћ
-
-
 // JB_ByteMap_Behaviour
 
 
@@ -2644,6 +2639,8 @@ JB_String* JB_Msg_Text(Message* Self, int I);
 
 bool JB_Msg_TextSet(Message* Self, int I, JB_String* V);
 
+Message* JB_Msg_TextViewChild(Message* Self);
+
 void JB_Msg_Thg__(Message* Self, FastString* Fs);
 
 void JB_Msg_Tmp__(Message* Self, FastString* Fs);
@@ -2653,8 +2650,6 @@ void JB_Msg_Todo__(Message* Self, FastString* Fs);
 void JB_Msg_TRel__(Message* Self, FastString* Fs);
 
 void JB_Msg_Tril__(Message* Self, FastString* Fs);
-
-Message* JB_Msg_TViewCH(Message* Self);
 
 void JB_Msg_Type__(Message* Self, FastString* Fs);
 

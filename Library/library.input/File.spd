@@ -345,6 +345,7 @@ class File (String)
 		error (self, "Unable to find unique child name.")
 			
 	function Relax (|bool| NeedsMode=true, |errorint|)
+		description "Does something with file permissions. If we are sudo, it makes this file not need sudo" 
 		cpp_Wrapper JB_File_RelaxPath
 	
 	function DeleteAll (|ErrorInt|)

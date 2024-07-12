@@ -221,7 +221,8 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 		if SC_Targets..gui or linkage.interpreter
 			rz.appendwords("-rpath @executable_path/../Frameworks")
 		rz.appendwords("-rpath ~/Library/Frameworks  -rpath $spdroot/Library  -rpath /Library/Frameworks")
-		
+	// god c++ is so crappy. you gotta do all this shit just to make anything work?
+	// why the fuck? is c++ so bad?
 	rz.AppendWords( "-w  -Wno-return-type-c-linkage")
 	rz.AppendWords( "-finput-charset=UTF-8 -fextended-identifiers" )
 	rz.AppendWords( " -fno-strict-aliasing  -fvisibility=hidden  -fvisibility-inlines-hidden" )
@@ -430,14 +431,16 @@ function TransCompile (|[File]| Files, |String| Dest, |string| Type, |bool|)
 
 
 function SayTest (|string| n)
-	"\n()   Test$n   ()"
+	print "\n()   Test"
+	print n
+	printline "   ()"
 
 
 function TestNewCompiler (|bool|) // self_test, selftest, testself, test_self, testcompiler
 	|| S = compiler.ProductFile
 	|| Test1 = S
-	|| Test2 = "${S}2".File
-	|| Test3 = "${S}3".File
+	|| Test2 = S+"2"
+	|| Test3 = S+"3"
 
 	|| Cpp1 = Cpp_Export.CppProduct
 	|| Cpp2 = Cpp1.Path.ReplacePathComponent(-2, "BuildTest2").File
