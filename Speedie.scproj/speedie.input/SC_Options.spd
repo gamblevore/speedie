@@ -40,7 +40,7 @@ module Options
 	||		Warnings				= false
 	||		UseFuncCallCount		= false
 	||		ExternalCompile			= false
-	||		Final					= false // won't call gcc.
+//	||		Final					= false // won't call gcc.
 //	||		Products				= native
 	|byte|	Optimise				= 1
 	|bool|	SelfReplacement			= 0
@@ -404,10 +404,10 @@ module Feedback
 			Options.Color = false
 			if options.optimise < 0
 				options.optimise = 1
-
-		+"final"
-			Explain(Purpose)$
-			Options.Final = true
+//
+//		+"final"
+//			Explain(Purpose)$
+//			Options.Final = true
 		
 		+"codesign"
 			Explain(Purpose, "Gets/Sets the codesign certificate")$

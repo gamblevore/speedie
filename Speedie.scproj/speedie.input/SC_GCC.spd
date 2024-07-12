@@ -401,7 +401,7 @@ function LinkOK (|file| p, |file|) // or just not a link
 function ShouldTransComp (|bool|)
 	if options.Scripting
 		return true // if were here... its cos the scripting code wants it
-	require !options.final and Options.Compile  
+	require Options.Compile  
 
 	if options.ForceRecompile
 		return true
@@ -579,8 +579,7 @@ function File.TestSpeedie (|string| v, |bool|)
 	if Options.arch
 		cmd_args <~ "--arch="+options.arch
 	
-	|| p = .path
-	p.execute(cmd_args, 0)
+	.path.execute(cmd_args, 0)
 	|| TestProd = compiler.SpeedieDir("Terminal/SpeedieTest" + v)
 	testprod.mustexist("Compile Speedie")	
 	print TransCompiler.TmpOut(v).ReadFile
