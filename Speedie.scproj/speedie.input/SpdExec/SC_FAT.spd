@@ -195,8 +195,12 @@ struct FatASM
 	
 	function µRenderInto (|!&ASM| Where, |!&asm| After, |!&asm|)
 		pragma inline
-		return (ASM.encoders[.op]!)(self, where, after)
-	
+		rz = (ASM.encoders[.op]!)(self, where, after)
+		target debug
+			if where.DecodeBaseOp != .op // AAARGHHH
+				"AARGHHH"
+				debugger
+				rz = (ASM.encoders[.op]!)(self, where, after)
 	
 	function Renda (|FastString| fs)
 		opt norefcounts

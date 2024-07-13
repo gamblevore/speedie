@@ -27,9 +27,12 @@ class µFunc
 	
 	
 	function µRender (|!&ASM| Where, |!&asm| After, |!&asm|)
+		rz = where
 		for i in self
-			where = i.µrenderinto(where, after)
-		return where
+			rz = i.µrenderinto(rz, after)
+		while where < after
+			where.DebugPrint
+			where += where.length
 
 
 	function memory.Run (|memory of asm| self, |&ivec4| Args = nil, |int| ArgCount=0, |int64|)

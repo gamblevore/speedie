@@ -287,7 +287,6 @@ function message.VMBits (|int|)
 function VM_MakeInstructionSub (|message| tmp, |int| Ask, |[message]?| ActuallyMakeTheVM)
 	opt norefcounts
 	|| prms = tmp.first
-	debugat 141
 	|| FoundBits = prms.VMBits
 	require FoundBits & Ask
 

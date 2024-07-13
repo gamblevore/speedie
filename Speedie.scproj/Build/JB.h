@@ -4336,89 +4336,95 @@ bool SC_uint64_CanStoreAsFloatImmediate(uint64 Self);
 
 
 // ASM
-ASM SC_ASM_AddK_KSet(ASM Self, int Value);
+ASM SC_ASM_AddK_KSet(ASM Self, uint Value);
 
-ASM SC_ASM_BClear_Shift1Set(ASM Self, int Value);
+ASM SC_ASM_BClear_Shift1Set(ASM Self, uint Value);
 
-ASM SC_ASM_BClear_Shift2Set(ASM Self, int Value);
+ASM SC_ASM_BClear_Shift2Set(ASM Self, uint Value);
 
-ASM SC_ASM_BClear_SignSet(ASM Self, int Value);
+ASM SC_ASM_BClear_SignSet(ASM Self, uint Value);
 
-ASM SC_ASM_BFLD_downSet(ASM Self, int Value);
+ASM SC_ASM_BFLD_downSet(ASM Self, uint Value);
 
-ASM SC_ASM_BFLD_LSet(ASM Self, int Value);
+ASM SC_ASM_BFLD_LSet(ASM Self, uint Value);
 
-ASM SC_ASM_BFLD_signSet(ASM Self, int Value);
+ASM SC_ASM_BFLD_signSet(ASM Self, uint Value);
 
-ASM SC_ASM_BFLD_upSet(ASM Self, int Value);
+ASM SC_ASM_BFLD_upSet(ASM Self, uint Value);
 
-ASM SC_ASM_Bra_c1Set(ASM Self, int Value);
+ASM SC_ASM_Bra_c1Set(ASM Self, uint Value);
 
-ASM SC_ASM_Bra_jmpSet(ASM Self, int Value);
+ASM SC_ASM_Bra_jmpSet(ASM Self, uint Value);
 
-ASM SC_ASM_Cmp_CmpSet(ASM Self, int Value);
+ASM SC_ASM_Cmp_CmpSet(ASM Self, uint Value);
 
-ASM SC_ASM_Cmp_LSet(ASM Self, int Value);
+ASM SC_ASM_Cmp_LSet(ASM Self, uint Value);
 
-ASM SC_ASM_CmpB_InvSet(ASM Self, int Value);
+ASM SC_ASM_CmpB_InvSet(ASM Self, uint Value);
 
-ASM SC_ASM_CmpB_ShiftSet(ASM Self, int Value);
+ASM SC_ASM_CmpB_ShiftSet(ASM Self, uint Value);
 
-ASM SC_ASM_CNTC_cnstSet(ASM Self, int Value);
+ASM SC_ASM_CNTC_cnstSet(ASM Self, uint Value);
 
-ASM SC_ASM_CNTC_offsetSet(ASM Self, int Value);
+ASM SC_ASM_CNTC_offsetSet(ASM Self, uint Value);
 
-ASM SC_ASM_CNTC_sizeSet(ASM Self, int Value);
+ASM SC_ASM_CNTC_sizeSet(ASM Self, uint Value);
 
-ASM SC_ASM_Const_InvSet(ASM Self, int Value);
+ASM SC_ASM_Const_InvSet(ASM Self, uint Value);
 
-ASM SC_ASM_Const_RotSet(ASM Self, int Value);
+ASM SC_ASM_Const_RotSet(ASM Self, uint Value);
 
-ASM SC_ASM_Const_ValueSet(ASM Self, int Value);
+ASM SC_ASM_Const_ValueSet(ASM Self, uint Value);
 
-ASM SC_ASM_ConstStretchy_CondSet(ASM Self, int Value);
+ASM SC_ASM_ConstStretchy_CondSet(ASM Self, uint Value);
 
-ASM SC_ASM_ConstStretchy_InvSet(ASM Self, int Value);
+ASM SC_ASM_ConstStretchy_InvSet(ASM Self, uint Value);
 
-ASM SC_ASM_ConstStretchy_ValueSet(ASM Self, int Value);
+ASM SC_ASM_ConstStretchy_ValueSet(ASM Self, uint Value);
 
-ASM SC_ASM_Convert_LSet(ASM Self, int Value);
+ASM SC_ASM_Convert_LSet(ASM Self, uint Value);
 
-ASM SC_ASM_Convert_ModeSet(ASM Self, int Value);
+ASM SC_ASM_Convert_ModeSet(ASM Self, uint Value);
 
-ASM SC_ASM_Div_KindSet(ASM Self, int Value);
+void SC_ASM_DebugPrint(ASM Self);
 
-ASM SC_ASM_Div_LSet(ASM Self, int Value);
+int SC_ASM_DecodeOp(ASM Self);
 
-ASM SC_ASM_Float_DSet(ASM Self, int Value);
+ASM SC_ASM_Div_KindSet(ASM Self, uint Value);
 
-ASM SC_ASM_Float_LSet(ASM Self, int Value);
+ASM SC_ASM_Div_LSet(ASM Self, uint Value);
 
-ASM SC_ASM_FloatAddExp_DSet(ASM Self, int Value);
+ASM SC_ASM_Float_DSet(ASM Self, uint Value);
 
-ASM SC_ASM_FloatAddExp_Sh2Set(ASM Self, int Value);
+ASM SC_ASM_Float_LSet(ASM Self, uint Value);
 
-ASM SC_ASM_FloatAddExp_Sh3Set(ASM Self, int Value);
+ASM SC_ASM_FloatAddExp_DSet(ASM Self, uint Value);
 
-ASM SC_ASM_FloatConst_HighSet(ASM Self, int Value);
+ASM SC_ASM_FloatAddExp_Sh2Set(ASM Self, uint Value);
 
-ASM SC_ASM_Func_JUMPSet(ASM Self, int Value);
+ASM SC_ASM_FloatAddExp_Sh3Set(ASM Self, uint Value);
 
-ASM SC_ASM_Func_SaveRegsSet(ASM Self, int Value);
+ASM SC_ASM_FloatConst_HighSet(ASM Self, uint Value);
 
-ASM SC_ASM_JCmp_CmpSet(ASM Self, int Value);
+ASM SC_ASM_Func_JUMPSet(ASM Self, uint Value);
 
-ASM SC_ASM_JCmp_JmpSet(ASM Self, int Value);
+ASM SC_ASM_Func_SaveRegsSet(ASM Self, uint Value);
 
-ASM SC_ASM_JCmpEq_JmpSet(ASM Self, int Value);
+ASM SC_ASM_JCmp_CmpSet(ASM Self, uint Value);
 
-ASM SC_ASM_Jump_l0Set(ASM Self, int Value);
+ASM SC_ASM_JCmp_JmpSet(ASM Self, uint Value);
 
-ASM SC_ASM_Loop_JumpSet(ASM Self, int Value);
+ASM SC_ASM_JCmpEq_JmpSet(ASM Self, uint Value);
 
-ASM SC_ASM_MemUtil_NSet(ASM Self, int Value);
+ASM SC_ASM_Jump_l0Set(ASM Self, uint Value);
 
-ASM SC_ASM_MemUtil_OpSet(ASM Self, int Value);
+int SC_ASM_Length(ASM Self);
+
+ASM SC_ASM_Loop_JumpSet(ASM Self, uint Value);
+
+ASM SC_ASM_MemUtil_NSet(ASM Self, uint Value);
+
+ASM SC_ASM_MemUtil_OpSet(ASM Self, uint Value);
 
 ASM SC_ASM_OperatorxE2x80xA2(ASM Self, bool B);
 
@@ -4432,47 +4438,47 @@ ASM SC_ASM_R3Set(ASM Self, uint Value);
 
 ASM SC_ASM_R4Set(ASM Self, uint Value);
 
-ASM SC_ASM_Read_LSet(ASM Self, int Value);
+ASM SC_ASM_Read_LSet(ASM Self, uint Value);
 
-ASM SC_ASM_Read_moveSet(ASM Self, int Value);
+ASM SC_ASM_Read_moveSet(ASM Self, uint Value);
 
-ASM SC_ASM_RefSet_LSet(ASM Self, int Value);
+ASM SC_ASM_RefSet_LSet(ASM Self, uint Value);
 
-ASM SC_ASM_RET_CountSet(ASM Self, int Value);
+ASM SC_ASM_RET_CountSet(ASM Self, uint Value);
 
-ASM SC_ASM_RET_ExistsSet(ASM Self, int Value);
+ASM SC_ASM_RET_ExistsSet(ASM Self, uint Value);
 
-ASM SC_ASM_RET_LSet(ASM Self, int Value);
+ASM SC_ASM_RET_LSet(ASM Self, uint Value);
 
-ASM SC_ASM_Shift_ShSet(ASM Self, int Value);
+ASM SC_ASM_Shift_ShSet(ASM Self, uint Value);
 
-ASM SC_ASM_Swap_LSet(ASM Self, int Value);
+ASM SC_ASM_Swap_LSet(ASM Self, uint Value);
 
-ASM SC_ASM_Table_AddSet(ASM Self, int Value);
+ASM SC_ASM_Table_AddSet(ASM Self, uint Value);
 
-ASM SC_ASM_Table_ModeSet(ASM Self, int Value);
+ASM SC_ASM_Table_ModeSet(ASM Self, uint Value);
 
-ASM SC_ASM_Tail_JUMPSet(ASM Self, int Value);
+ASM SC_ASM_Tail_JUMPSet(ASM Self, uint Value);
 
-ASM SC_ASM_Trap_ContinueSet(ASM Self, int Value);
+ASM SC_ASM_Trap_ContinueSet(ASM Self, uint Value);
 
-ASM SC_ASM_Trap_LSet(ASM Self, int Value);
+ASM SC_ASM_Trap_LSet(ASM Self, uint Value);
 
-ASM SC_ASM_Trap_ModeSet(ASM Self, int Value);
+ASM SC_ASM_Trap_ModeSet(ASM Self, uint Value);
 
-ASM SC_ASM_U0_LSet(ASM Self, int Value);
+ASM SC_ASM_U0_LSet(ASM Self, uint Value);
 
-ASM SC_ASM_U1_LSet(ASM Self, int Value);
+ASM SC_ASM_U1_LSet(ASM Self, uint Value);
 
-ASM SC_ASM_U2_LSet(ASM Self, int Value);
+ASM SC_ASM_U2_LSet(ASM Self, uint Value);
 
-ASM SC_ASM_U3_LSet(ASM Self, int Value);
+ASM SC_ASM_U3_LSet(ASM Self, uint Value);
 
-ASM SC_ASM_U4_LSet(ASM Self, int Value);
+ASM SC_ASM_U4_LSet(ASM Self, uint Value);
 
-ASM SC_ASM_Write_LSet(ASM Self, int Value);
+ASM SC_ASM_Write_LSet(ASM Self, uint Value);
 
-ASM SC_ASM_Write_moveSet(ASM Self, int Value);
+ASM SC_ASM_Write_moveSet(ASM Self, uint Value);
 
 int SC_ASM__Init_();
 
@@ -10254,7 +10260,9 @@ inline AsmReg SC_FatASM_Info(FatASM* Self) {
 }
 
 inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After) {
-	return (SC__ASM_Encoders[Self->Op])(Self, Where, After);
+	ASM* Rz = nil;
+	Rz = (SC__ASM_Encoders[Self->Op])(Self, Where, After);
+	return Rz;
 }
 
 inline JB_String* SC_Named_Name(SCNamed* Self) {

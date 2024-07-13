@@ -41,12 +41,12 @@ s64 RunVM (jb_vm& vm) {		// vm_run, vm__run, vmrun, run_vm
         #include "InstructionList.h"
     };
 
-    ASM  Op;
-//    ASM  Op2;
     ASM* Code	  = vm.Env.Code;
-    Goto Next     = 0;
+//    Goto Next     = 0;
     Register* r	 = vm.Stack.Registers;
 
+    ASM  Op=-1;
+//    ASM  Op2;
 //	START:
 	ı;
 	#include "Instructions.i"

@@ -19,10 +19,10 @@ function fatasm.KNST_Encoder (Asm_encoder2)
 	|| k = .const
 	|| inv = k>>63
 		k = ~k
-	require curr and curr < after+2
+	ifn curr and curr < after+2
+		return curr
 
 	|| sh = 0
-	debugat
 	if k >= 1|uint64|<<17
 		if k < (1|uint64|<<49)
 			sh = 32
