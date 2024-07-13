@@ -1635,6 +1635,7 @@ extern Macro* SC__VM_Builder_arms;
 extern Macro* SC__VM_Builder_ASM_Datatype;
 extern Message* SC__VM_Builder_dt_prm;
 extern FastString* SC__VM_Builder_form_h;
+extern uint SC__VM_Builder_FreeMultiASM;
 extern Macro* SC__VM_Builder_icecream;
 extern Macro* SC__VM_Builder_legs;
 extern Message* SC__VM_Builder_ModuleArg;
@@ -3522,11 +3523,13 @@ Message* SC_VM_Builder__DefineGet(JB_String* Fname, int Up, int Down, bool Last)
 
 void SC_VM_Builder__DefineGetSub(JB_String* Fname, int Up, int Down, byte C, byte C2);
 
-Array* SC_VM_Builder__FillEncoders(Message* List, bool ActuallyMakeTheVM);
+void SC_VM_Builder__FillEncoders(Message* List, bool ActuallyMakeTheVM);
 
 void SC_VM_Builder__FillTypePrm(JB_String* Fname, int Pname);
 
 void SC_VM_Builder__FinishAcc();
+
+int SC_VM_Builder__FreeID(Message* M, int Ask);
 
 int SC_VM_Builder__GenAcc(Message* Line, int Bit_pos, int Pname, int Max);
 
@@ -3548,15 +3551,13 @@ void SC_VM_Builder__MakeTheVM();
 
 void SC_VM_Builder__MakeVM(Message* Tmp, FastString* Vm);
 
-int SC_VM_Builder__NextID(Message* Counts);
-
-int SC_VM_Builder__NextIDWithCounts(Message* Counts);
-
 void SC_VM_Builder__SafeWrite(JB_String* Name, FastString* Data);
 
-void SC_VM_Builder__VM_MakeInstructionSub(Message* Tmp, bool Multiple, Array* ActuallyMakeTheVM);
+void SC_VM_Builder__VM_MakeInstructionSub(Message* Tmp, int Ask, Array* ActuallyMakeTheVM);
 
-void SC_VM_Builder__VM_NewInstruction(Message* Tmp, bool Multiple, Array* ActuallyMakeTheVM);
+void SC_VM_Builder__VM_NewInstruction(Message* Tmp, int Multiple, Array* ActuallyMakeTheVM);
+
+void SC_VM_Builder__VM_NewInstructions(Message* List, int Amount, Array* Rz);
 
 Message* SC_VM_Builder__VMBox();
 
@@ -7330,7 +7331,7 @@ int SC_xC2xB5Form__Init_();
 
 int SC_xC2xB5Form__InitCode_();
 
-xC2xB5Form* SC_xC2xB5Form__NeedForm(JB_String* Form);
+xC2xB5Form* SC_xC2xB5Form__NeedForm(JB_String* Form, Message* M);
 
 
 
@@ -7607,13 +7608,9 @@ JB_String* JB_List_Render(JB_List* Self, FastString* Fs_in);
 
 JB_List* JB_Tree_Second(JB_List* Self);
 
-int JB_Tree_SlowCount(JB_List* Self);
-
 JB_List* JB_Tree_Get(JB_List* Self, int N);
 
 void JB_Tree_SyntaxAppend(JB_List* Self, JB_List* Last);
-
-int JB_Tree_SyntaxCompare(JB_List* Self, int N, bool Aware);
 
 bool JB_Tree_SyntaxEquals(JB_List* Self, int N, bool Aware);
 
@@ -8616,6 +8613,8 @@ bool SC_Msg_visible(Message* Self);
 void SC_Msg_visibleSet(Message* Self, bool Value);
 
 MaybeBool SC_Msg_visible2(Message* Self);
+
+int SC_Msg_VMBits(Message* Self);
 
 JB_String* SC_Msg_VMMsgArgName(Message* Self, int I);
 

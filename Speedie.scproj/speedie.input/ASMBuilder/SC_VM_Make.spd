@@ -14,11 +14,12 @@ module VM_Builder {
 |string|		parent
 |int| 			Total
 |byte|			NormalPos = 0
+|uint|			FreeMultiASM = ~1
 
 
 function DefineGetSub (|string| fname,  |int| up,  |int| down, |byte| c, |byte| c2)
 	.form_h <~ "
-#define   ${fname}${c}       (((${c2}int)((Op.Raw)<<$down))>>$Up)
+#define   ${fname}${c}       (((${c2}int)((Op)<<$down))>>$Up)
 #define   ${fname}${c}_(x)   (((${c2}int)((x)<<$down))>>$Up)
 "
 
@@ -164,7 +165,7 @@ function BuildFiles (|bool|)
 	.Clean(vmdef)
 	.DataTypeModule
 	.GenerateForms(forms, true)
-	.NameList = .FillEncoders(vmdef)
+	.FillEncoders(vmdef)
 	.VMCpp(code, jump)
 
 	.SafeWrite("InstructionGetters.h", form_h)
@@ -192,6 +193,7 @@ function BuildInstructions (TranFunc) // __instructionlist__
 	expect !node.hasany (node.first)
 
 	|| after = node
+	debugger
 	for (tmp in .namelist) (pos)
 		|| form = tmp[0][0].name
 			|| fnc = @sdot + "add" 
@@ -225,17 +227,22 @@ function BadEncoder (ASM_Encoder2)
 	debugger
 
 
-function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true, |[message]|)
+function VM_NewInstructions (|message| list, |int| Amount, |[message]| rz)
 	opt norefcounts
-	|| m = rz
+	for ch in list
+		.VM_NewInstruction(ch, Amount, rz)
+
+
+function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true)
+	opt norefcounts
+	|[message]| R = nil
 	if ActuallyMakeTheVM
-		rz <~ (@thg+"EROR",  256)
-	  else
-		m = nil
-	for ch in list
-		.VM_NewInstruction(ch, true, rz)
-	for ch in list
-		.VM_NewInstruction(ch, false, rz)
+		R = []
+		.NameList = r
+		R <~ (@thg+"EROR",  256)
+	.VM_NewInstructions(list, 3, R)
+	.VM_NewInstructions(list, 2, R)
+	.VM_NewInstructions(list, 1, R)
 	for i in 256
 		asm.encoders[i] := badencoder
 
@@ -269,17 +276,27 @@ function MakeVM (|message| tmp, |faststring| vm)
 		.VMLine(line, vm)
 
 
-function VM_MakeInstructionSub (|message| tmp, |bool| Multiple, |[message]?| ActuallyMakeTheVM)
+function message.VMBits (|int|)
 	opt norefcounts
-	|| arg = tmp.last
+	for s in self
+		if s == @num
+			rz |= 1<<(s.int(0, 1, 4)-1)
+	rz:=1
+
+
+function VM_MakeInstructionSub (|message| tmp, |int| Ask, |[message]?| ActuallyMakeTheVM)
+	opt norefcounts
 	|| prms = tmp.first
-	if (prms > 1) != multiple
-		return
+	debugat 141
+	|| FoundBits = prms.VMBits
+	require FoundBits & Ask
+
+	tmp.flags |= 32K
+	|| arg = tmp.last
 	|| P1 = prms.first
-	|| Counts = p1.next
 	
 	|| name = p1.name					//  .ASMNormalise
-	|| form = µform.forms.valuelower(name)			#require
+	|| form = µform.NeedForm(name, p1)
 	|| FormEnc = asm.Forms[form.Index]
 	name = "ASM_" + name
 	using tmp
@@ -289,16 +306,19 @@ function VM_MakeInstructionSub (|message| tmp, |bool| Multiple, |[message]?| Act
 	++.Total
 	
 	.MakeMsgCreator(tn, form)
-	while
-		|| id = .NextID(counts)
-		asm.Encoders[id] = FormEnc
+	|| id = .FreeID(tmp, foundbits)
+	|| Done = false
+	for (b.bits in foundbits) (extra)
+		|| x = id + extra
+		check (!asm.encoders[x]) (tmp, "ASM clash?") 
+		asm.Encoders[x] = FormEnc
 		if ActuallyMakeTheVM != nil
-			ActuallyMakeTheVM[id] = tmp
-			if !counts or counts == p1.next
-				.AddµOp(tn, id)
-			if counts
-				.AddµOp(tn+counts.render, id)
-		counts = counts.next #loop
+			ActuallyMakeTheVM[x] = tmp
+			if !done
+				.AddµOp(tn, X)
+				done = true
+			if ask > 1
+				.AddµOp(tn+(extra+1).render, X)
 
 
 helper message.VMMsgArgName (|int| i, |string|)
@@ -368,30 +388,28 @@ function AddµOp (|string| name, |int| id)
 	|| thg = @thg + name
 	.ModuleArg <~ NewEqRel(thg, msg)
 
-
-function NextIDWithCounts (|message!| counts, |int|)
-	|| i = counts.int(0, 1, 4)
-		--i
-		while i < 16
-			if i and !asm.Encoders[i]
-				return i
-			i += 4
-	error (counts, "Can't find free ID for ASM")
-
 	
-function NextID (|message?| counts, |int|)
-	if counts
-		return .NextIDWithCounts(counts)
-	rz = .normalpos
-	if rz
-		.normalpos = rz+1
-	  else
-		.normalpos = 16
+function FreeID (|message| m, |int| ask, |int|)
+	if ask <= 1
+		|int| n = .normalpos ?? 32
+		.normalpos = n+1
+		expect (n < 256) (m, "Too many ASM")
+		return n
+	
+	|| f = .FreeMultiASM
+	for i in 8
+		if f&ask == ask
+			.freemultiasm = f&~ask
+			return i<<2
+		ask <<= 4
+	error (m, "Can't find free ID for ASM")
 
 
-function VM_NewInstruction (|message| tmp, |bool| multiple, |[message]?| ActuallyMakeTheVM)		
-	if (tmp == @tmp) and (tmp != "forms" and "ignore")
-		.VM_MakeInstructionSub(tmp, multiple, ActuallyMakeTheVM)
+function VM_NewInstruction (|message| tmp, |int| multiple, |[message]?| ActuallyMakeTheVM)		
+	if (tmp == @tmp) and !(tmp.flags&32K) 
+		if (tmp != "forms" and "ignore")
+			.VM_MakeInstructionSub(tmp, 1<<(multiple-1), ActuallyMakeTheVM)
+	
 
 
 function VMLine (|message| line, |faststring| vm)

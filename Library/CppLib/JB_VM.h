@@ -6,20 +6,22 @@ typedef const void* Goto;
 
 // we really need to make this a simple32 bit number
 // no special wierdness!!!!! ARGH
-struct ASM {
-	union {
-		u32				Raw;
-    };
-    ASM() {
-		Raw = 0;
-    }
-    ASM(u32 Op) {
-		Raw = Op<<24;
-    }
- 	operator u32() {
-		return Raw;
-	}
-};
+#ifndef ASM
+	#define ASM u32
+#endif
+//	union {
+//		u32				Raw;
+//    };
+//    ASM() {
+//		Raw = 0;
+//    }
+//    ASM(u32 Op) {
+//		Raw = Op<<24;
+//    }
+// 	operator u32() {
+//		return Raw;
+//	}
+//};
 
 
 struct RegInfo {

@@ -94,20 +94,19 @@ double FloatSh2 (uint64 u, int S) {
 AlwaysInline ASM* LoadConst (Register* r, ASM Op, ASM* Code) {
 	uint64 Value = ConstStretchy_Valueu;
 	int Remain = (Op>>24)&3;
+	r+=n1;
 	if (Remain) {
 		if (Remain == 1)
 			Value <<= 32; 
 		  else
-			// these 16-bits arent really needed. Even for SIMD!
-			// simd needs like... loading 4 small values
-			// or 4 same values. Or loading one value into a specific field.
+			// we already just read 64-bits now. so just discard the previous 16 bits
 			Value = (uint64)(*Code++) << 32;
 		Value |= *Code++;
 	}
 	if (!ConstStretchy_Condu or !r->Int) {
 		if (ConstStretchy_Invu)
 			Value = ~Value;
-		r->Int = Value; 
+		r->Int = Value;
 	}
 	return Code; 
 }

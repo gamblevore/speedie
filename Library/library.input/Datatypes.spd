@@ -20,8 +20,8 @@ datatype int
 	operator In (|ivec2| i, |bool|)
 		return self >= i.x and self <= i.y
 		
-	operator Bits (|int| n, |int|)
-		return self & n.bits
+//	operator Bits (|int| n, |int|)
+//		return self & n.bits
 
 	operator DTF (|int| belf, |bool|)
 		return self and ((self&belf) == belf)
@@ -40,8 +40,8 @@ datatype int
 		pragma inline
 		return (self & (self - 1)) == 0
 
-	function Bits (|int|)
-		return (1<<self)-1
+//	function Bits (|int|)
+//		return (1<<self)-1
 
 	function AlignDown (|int| To, |int64|)
 		return self - (self mod to) // ???
@@ -161,12 +161,12 @@ datatype int
 			yield i (i)
 			--i
 	
-	iterator bit		// Get 1 bit of the original per loop
+	iterator bits		// Get 1 bit of the original per loop
 		|| curr = self|int|
 		while curr
-			|| Highest = 1 << curr.log2
-			yield highest
-			curr = curr &~ Highest
+			|| lowest = curr.lowestbit
+			yield Lowest (Lowest.log2)
+			curr = curr &~ Lowest
 	
 	
 	operator to (|int| other, |IntRange|)
@@ -278,11 +278,11 @@ datatype uint
 	operator rotr (|int| Amount, |uint64|)
 		cpp_wrapper JB_u32_RotR
 
-	operator bits (|uint| n, |uint|)
-		return self & ((1<<n)-1)
-
-	operator nobits (|uint| n, |uint|)
-		return self &~ ((1<<n)-1)
+//	operator bits (|uint| n, |uint|)
+//		return self & ((1<<n)-1)
+//
+//	operator nobits (|uint| n, |uint|)
+//		return self &~ ((1<<n)-1)
 
 	function IsPow2 (|bool|)
 		cpp_wrapper JB_uint_IsPow2
@@ -648,9 +648,9 @@ datatype int64
 	function LowestBit (|uint64|)
 		return self & -self
 
-	operator bits (|int64| n, |int|)
-		|int64| one = 1
-		return self & ((one<<n)-one)
+//	operator bits (|int64| n, |int|)
+//		|int64| one = 1
+//		return self & ((one<<n)-one)
 
 	operator nobits (|int64| n, |int|)
 		|int64| one = 1
@@ -765,9 +765,9 @@ datatype uint64
 	iterator bits				// Get 1 bit of the original per loop
 		|| curr = self|uint64|
 		while curr
-			|uint64| Highest = 1 << curr.log2
-			yield highest
-			curr = curr &~ Highest
+			|uint64| Lowest = curr.lowestbit
+			yield Lowest (lowest.log2)
+			curr = curr &~ Lowest
 	
 	iterator flags
 		|| curr = self|uint64|

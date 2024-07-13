@@ -98,9 +98,9 @@ class µForm
 	module
 		|dictionary of µForm|				Forms = dictionary()
 		|int| Count
-		function NeedForm (|string| Form, |µform|)
+		function NeedForm (|string| Form, |message| m=nil, |µform|)
 			opt norefcounts
 			rz = forms.valuelower(form)
 			if !rz
-				error "Missing form: " + form
+				error (m, "Missing form: " + form)
 				rz = µform(@arg.msg)

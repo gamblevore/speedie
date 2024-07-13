@@ -24,7 +24,7 @@ class Instruction
 		.formname = formname
 		.opcode = pos
 		.name = name
-		.sizes = µform.NeedForm(.FormName)
+		.sizes = µform.NeedForm(.FormName, nil)
 		.PCount = .sizes.count
 	
 	render

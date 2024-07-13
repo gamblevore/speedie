@@ -1,22 +1,24 @@
-ı EROR: _
-	return u1 + U1_Lu;
 ı FUNC: 
 	__;
 	Code = BumpStack(r, Code, Op);
 	___;
-ı KNST: _
-	LoadConst(r, Op, Code);
 ı FNCX: 
 	__;
 	vm.CurrStack = r;
 	ForeignFuncSimple(r, Code, Op);
 	___;
+ı KNST: _
+	Code = LoadConst(r, Op, Code);
 ı TAIL: 
 	__;
 	Code = TailStack(r, Code, Op);
 	___;
+ı EROR: _
+	return u1 + U1_Lu;
 ı NOOP: _
-	0;
+	i1 = i1;
+	// NOOP
+
 ı TRAP: _
 	if (Trap_Continueu) 
 	JB_App__SelfSignal(Trap_Lu)
@@ -55,11 +57,11 @@
 ı DIVV: _
 	DivMath(r, Op);
 ı BRUS: _
-	i1 = (i2 >> i3 + U3_Lu);
+	i1 = (i2 >> (i3 + U3_Lu));
 ı BRUU: _
-	u1 = (u2 >> u3 + U3_Lu);
+	u1 = (u2 >> (u3 + U3_Lu));
 ı BLUE: _
-	u1 = (u2 << u3 + U3_Lu);
+	u1 = (u2 << (u3 + U3_Lu));
 ı BAND: _
 	u1 = u2 & (u3 | L3);
 ı BOAR: _
@@ -144,7 +146,9 @@
 	setref(n1, o1, o2);
 	setref(n3, o3, o4);
 ı RMEM: _
-	0;
+	i1 = i1;
+	// Do later
+
 ı RALO: _
 	o1 = alloc(o2);
 	// should call constructor too.

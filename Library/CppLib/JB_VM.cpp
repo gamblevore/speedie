@@ -23,10 +23,16 @@ extern "C" {
 #include "JB_VM_Helpers.i"
 
 
-#define ı         goto *Next;
-#define ___       Op2 = *Code++;  Next = JumpTable[Op2>>24];
-#define __      ; Op  = Op2;      ASMPrint(Op);
-#define _         __   ___ // this needs reworking.... sigh. can't handle consts
+#define ı         Op = *Code++;   goto *JumpTable[Op>>24]; // goto *Next;
+#define ___     ; // Op = *Code++;   goto *JumpTable[Op>>24];
+#define __      ; // Op  = Op2;      ASMPrint(Op);
+#define _       ;  __   ___
+
+// more optimised system... but needs debugging for multi-asm instructions
+//#define ı         goto *Next;
+//#define ___       Op2 = *Code++;  Next = JumpTable[Op2>>24];
+//#define __      ; Op  = Op2;      ASMPrint(Op);
+//#define _         __   ___
 #define JumpLeaf(Addr)         LeafCode = Code;     Code = (Addr);
 
 
@@ -36,12 +42,13 @@ s64 RunVM (jb_vm& vm) {		// vm_run, vm__run, vmrun, run_vm
     };
 
     ASM  Op;
-    ASM  Op2;
+//    ASM  Op2;
     ASM* Code	  = vm.Env.Code;
     Goto Next     = 0;
     Register* r	 = vm.Stack.Registers;
 
-	START: ___;
+//	START:
+	ı;
 	#include "Instructions.i"
 	ı 
 

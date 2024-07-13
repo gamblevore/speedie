@@ -202,7 +202,11 @@ forms
 /**/ EROR (U1)
 		return u1+U1_Lu
 
-/**/ NOOP (U0): 0	// does nothing
+/**/ NOOP (U0):
+		i1 = i1
+		#!NOOP
+
+	// does nothing
 
 
 /**/ TRAP (Trap)
@@ -260,8 +264,8 @@ forms
 #!						 (((((Consts)))))
 /**/ KSTR (Const)
 		RotateConst(r, Op)
-/**/ KNST (ConstStretchy, 1, 2, 3)			// OK
-		LoadConst(r, Op, Code)
+/**/ KNST (ConstStretchy, 1, 2, 3)
+		Code = LoadConst(r, Op, Code)
 
 
 
@@ -284,11 +288,11 @@ forms
 
 #!						 (((((Bitops)))))
 /**/ BRUS  (Shift)
-		i1 = (i2 >> i3+U3_Lu)
+		i1 = (i2 >> (i3+U3_Lu))
 /**/ BRUU  (Shift)
-		u1 = (u2 >> u3+U3_Lu)
+		u1 = (u2 >> (u3+U3_Lu))
 /**/ BLUE  (Shift) 
-		u1 = (u2 << u3+U3_Lu)
+		u1 = (u2 << (u3+U3_Lu))
 /**/ BAND  (Shift)
 		u1 = u2 &  (u3|||L3)
 /**/ BOAR  (U4) // maybe << k is better? idk that bfls is very useful...
@@ -397,7 +401,8 @@ forms
 		setref(n1, o1, o2)
 		setref(n3, o3, o4)
 /**/ RMEM  (U4)		// we need some way to also refcount objs in memory! not just in registers
-		0
+		i1 = i1
+		#!Do later
 //		setref(n1, o1, o2)
 
 /**/ RALO  (U2)
