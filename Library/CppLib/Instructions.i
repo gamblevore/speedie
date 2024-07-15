@@ -56,6 +56,10 @@
 	i1 = (i2 * i3) + i4;
 ı DIVV: _
 	DivMath(r, Op);
+ı MAX: _
+	i1 = std_max(i2, i3);
+ı MIN: _
+	i1 = std_min(i2, i3);
 ı BRUS: _
 	i1 = (i2 >> (i3 + U3_Lu));
 ı BRUU: _
@@ -242,6 +246,20 @@
 ;
 	else 
 	f1 = (f2 - floor(f2)) * f3
+;
+ı FMAX: _
+	if (Float_Du) 
+	d1 = std_max(d2, d3)
+;
+	else 
+	f1 = std_max(f2, f3)
+;
+ı FMIN: _
+	if (Float_Du) 
+	d1 = std_min(d2, d3)
+;
+	else 
+	f1 = std_min(f2, f3)
 ;
 ı 
 

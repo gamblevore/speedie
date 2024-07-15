@@ -283,6 +283,16 @@ forms
 		i1 = (i2 * i3) + i4
 /**/ DIVV (Div)
 		DivMath(r, Op)
+/**/ MAX (Cmp)
+		if Cmp_Cmpu
+			i1 = std_max(i2, i3)
+		else
+			u1 = std_max(u2, u3)
+/**/ MIN (Cmp)
+		if Cmp_Cmpu
+			i1 = std_min(i2, i3)
+		else
+			u1 = std_min(u2, u3)
 
 
 
@@ -505,3 +515,15 @@ forms
 			d1 = (d2 - floor(d2)) * d3
 		else
 			f1 = (f2 - floor(f2)) * f3
+
+/**/ FMAX  (Float)
+		if (Float_Du)
+			d1 = std_max(d2, d3)
+		else
+			f1 = std_max(f2, f3)
+
+/**/ FMIN  (Float)
+		if (Float_Du)
+			d1 = std_min(d2, d3)
+		else
+			f1 = std_min(f2, f3)

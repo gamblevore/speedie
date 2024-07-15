@@ -40,3 +40,6 @@
 #define o3      (r[n3].Obj)
 #define o4      (r[n4].Obj)
 
+#define std_max std::max
+#define std_min std::min
+
