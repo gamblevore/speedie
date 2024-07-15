@@ -148,7 +148,7 @@ module Math
 			return self + d
 		
 	function int.Reduce2 (|int| d, |&int| Zeros, |int|)
-		pragma inline
+		opt inline
 		if ( self > d )
 			return self - d
 		  elseif (self < -d)

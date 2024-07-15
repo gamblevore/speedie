@@ -1215,7 +1215,7 @@ ive been~running #since morning
 		cpp_Wrapper JB_Tk__Byte
 
 	Syntax Access (|int| s, |int| e, |syntax| f, |string|)
-		pragma inline
+		opt inline
 		return (parser.Splitter)(s,e,f)
 
 	function Range (fnidgenerator)

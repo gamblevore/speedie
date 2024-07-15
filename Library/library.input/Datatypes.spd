@@ -33,11 +33,11 @@ datatype int
 		cpp_wrapper
 
 	function IsKnown (|bool|)
-		pragma inline
+		opt inline
 		return (self & (self - 1)) == 0
 
 	function IsPow2 (|bool|)
-		pragma inline
+		opt inline
 		return (self & (self - 1)) == 0
 
 //	function Bits (|int|)
@@ -138,7 +138,7 @@ datatype int
 	
 	
 	operator InRange (|int| d, |bool|)
-		pragma inline
+		opt inline
 		if d > 0 // can fail otherwise
 			return (self|uint| < d|uint|)
 
@@ -240,7 +240,7 @@ struct FloatRange   /// :3
 	|float| Step
 	
 	helper float.LoopOK (|float| Final, |float| Dir, |bool|)
-		pragma inline
+		opt inline
 		// could speed this up using copysign one day
 		if dir >= 0.0
 			return self < final
@@ -612,7 +612,7 @@ datatype int64
 		return self + (-self|uint64| mod to) // ???
 
 	operator InRange (|int64| d, |bool|)
-		pragma inline
+		opt inline
 		return (self|uint64| < d|uint64|)
 
 	operator isa (|uint| n, |bool|)
@@ -685,7 +685,7 @@ datatype int64
 	
 	
 	function IsPow2 (|bool|)
-		pragma inline // as above
+		opt inline // as above
 		return (self & (self - 1)) == 0
 	
 

@@ -6,7 +6,7 @@ struct ASMState
 	linkage: cpp_part Pac
 	|uint16| 					BlockNum
 	|uint16| 					ParentBlock
-	|datatypecode|				ReturnType
+	|datatypecode|				ReturnASM
 	|bool|						OK    
 	|bool|						Inited   
 	|byte|						LabelCount
@@ -53,7 +53,7 @@ struct ASMState
 			
 		
 	function GetConst (|int| a, |&uint64|)
-		pragma inline
+		opt inline
 		if a|uint| > 31
 			debugger // sigh
 			a = 0
@@ -179,7 +179,7 @@ struct ASMState
 
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		opt norefcounts
-		pragma inline
+		opt inline
 		cpp_part Get
 		|| T = exp.ASMType
 		|| fn = fn_asm_table[T]!
@@ -305,7 +305,7 @@ function ASMState.StartFunc (|scfunction| fn)
 	.FuncStart = .curr
 	.LabelCount = 0
 	.fn = fn
-	.ReturnType = fn.ReturnType.regtype
+	.ReturnASM = fn.ReturnType.regtype
 	.OK = true
 	.VDecls = 0
 	.VTmps = 0

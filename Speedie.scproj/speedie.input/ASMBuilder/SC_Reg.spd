@@ -65,7 +65,7 @@ datatype AsmReg (uint64)
 		return self
 	
 	function Expect (|message| where)
-		pragma inline
+		opt inline
 		check (.reg) (asmstate.sh, where, "Internal ASM Error: Setting to register 0")
 	
 	function BitCount (|int|)
@@ -91,19 +91,19 @@ datatype AsmReg (uint64)
 		return .µtype == M
 
 	function FourBytes (|bool|)
-		pragma inline
+		opt inline
 		return self|datatypecode|._shift == 2
 
 	function IsBig (|bool|)
-		pragma inline
+		opt inline
 		return self|datatypecode|._shift == 3
 
 	function IsFloat (|bool|)
-		pragma inline
+		opt inline
 		return self|datatypecode|.isfloat
 
 	function IsInt (|bool|)
-		pragma inline
+		opt inline
 		return self|datatypecode|.isfloat
 
 	function IntDivType (|int|)

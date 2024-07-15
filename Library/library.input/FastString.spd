@@ -95,7 +95,7 @@ class FastString {
 			.lint(N)
 
 	function uint64.LELength (|int|)    // could remove this also
-		pragma inline
+		opt inline
 		return (self|int|.log2 max 0) >> 3
 		
 	render

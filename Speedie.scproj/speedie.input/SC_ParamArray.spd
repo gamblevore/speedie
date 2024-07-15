@@ -14,7 +14,7 @@ class SCParamArray
 	|SCClass--?|		Cls
 	|int16|				Size
 	|int16|				ErrCount
-	|bool|				IsAssigns
+	|bool|				HasSide
 	|bool|				HasProperParams
 	|bool|				IsDot
 	|bool|				IsAddress
@@ -161,13 +161,13 @@ class SCParamArray
 
 
 	function MacroSize (|int|)
-		return .size - .isassigns
+		return .size - .HasSide
 
 
 	function Side (assigns:|Message|)
 		if Value
 			.addsub(Value)
-			.IsAssigns = true
+			.HasSide = true
 	
 	
 	function StructExtract (|scdecl| type)

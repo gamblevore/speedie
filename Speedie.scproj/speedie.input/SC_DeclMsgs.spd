@@ -88,12 +88,12 @@ function scfunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 
 	|| ns = .nilself
 		.WantAs(ns)
+	if self ~= "JB_Msg_SyntaxUsing"
 	|| r = .returntype
 		if r.isbarestruct
 			(r is returnedstruct)
 		if self is HidesProperties
-			r = r.makereal
-			.ReturnType = r
+			.ReturnType = r.makereal
 			
 			
 
@@ -237,7 +237,7 @@ function CollectDeclsFuncBody (|Message| arg, |SCNode| scarg)
 function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |scclass| cls=nil, |scfunction| FuncPrmz=nil,  |scdecl|)
 	|| Type = .first!
 	|| Name = type.Next
-
+	
 	expect (FuncPrmz or Name)  (self, "No name found.")
 	|| Default = DeclsDefault( name )
 	|| Sdcl = ExtractDecl( Type, P, mode )
@@ -361,7 +361,7 @@ function scdecl.DownGrade (|scdecl|)
 	
 function message.AddValue (|scfunction| f)
 	opt norefcounts
-	pragma inline
+	opt inline
 	if !.HasChildCount(2)
 		using f.source!
 			self <~ «thg "Value"»

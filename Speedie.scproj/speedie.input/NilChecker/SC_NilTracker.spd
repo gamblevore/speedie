@@ -152,7 +152,7 @@ struct ArchonPurger
 	
 	
 	function SetNilness (|SCDecl| d, |NilState| New, |NilState|)
-		pragma inline
+		opt inline
 		|| P = (.Neel)|&nilrecorder|
 		(P)(d.NilReg) = new
 		target debugnil
@@ -210,7 +210,7 @@ struct ArchonPurger
 
 
 	function Value (|nilrecord|)
-		pragma inline
+		opt inline
 		return .Neel[]
 	
 	
@@ -231,7 +231,7 @@ struct ArchonPurger
 					d.nilprint("change")
 	} else {
 		function SetAllNil (|NilRecord| Dest)
-			pragma inline
+			opt inline
 			.neel[] = dest & .Realnesses
 	}
 
@@ -243,18 +243,18 @@ struct ArchonPurger
 
 
 		function Value (|NilRecord|)
-			pragma inline
+			opt inline
 			return t.value
 
 
 		function EndBlock (|nilrecord|)
-			pragma inline
+			opt inline
 			rz = .value
 			t.SetAllNil(nilstate.basic)
 
 
 		function DeclKill
-			pragma inline
+			opt inline
 			if !t.nestdepth
 				t.RootReturned = true
 			t.SetAllNil(nilstate.Basic)

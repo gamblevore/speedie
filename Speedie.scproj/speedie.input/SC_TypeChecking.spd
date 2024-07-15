@@ -97,7 +97,7 @@ function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil, |i
 function scdecl.SafelyWrappable (|bool|)
 	opt norefcounts
 	|| n = .isnumeric
-	if (n <= 1) or (self == typebool!.typenormal)
+	if (n <= 1) or (.isbool)
 		return true
 	
 	|| fns = TypeWrapper!.modul["new"]|scfunction|
@@ -162,7 +162,7 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 		// we do bool casting after, as its usually a sign of a bug.
 		for (b.Upwards in Ot)
 			for (C in b.Casts)
-				ifn NoBools and (C.returnType == typebool!.typenormal)
+				ifn NoBools and (C.returnType.isbool)
 					if .TypeMatch( C.ReturnType, 0 ).IsNormalMatch
 						return C.CreateTypeCast( O, exp )
 		

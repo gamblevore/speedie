@@ -10,7 +10,7 @@ cpp_part AC
 |bool|				CompiledOK
 |bool|				Cleaned
 |bool|				WillExit 
-||					func_tmp_src   = <(`return, require, "log <string>", while, linkage, for, if, else, elseif, expect, warn, error, disabled, cpp_refs, debugger, debugat, deprecate, `description "<describe this function>"`, print, printline, zalgoline, printerror, beep, continue, cpp_part, cpp_name, cpp_wrapper, `self.`, `super.`, "visible", "exit", "opt norefcounts", "pragma inline"
+||					func_tmp_src   = <(`return, require, "log <string>", while, linkage, for, if, else, elseif, expect, warn, error, disabled, cpp_refs, debugger, debugat, deprecate, `description "<describe this function>"`, print, printline, zalgoline, printerror, beep, continue, cpp_part, cpp_name, cpp_wrapper, `self.`, `super.`, "visible", "exit", "opt norefcounts", "opt inline"
  `)>.macro
  
 ||					all_tmp_src	= <(`

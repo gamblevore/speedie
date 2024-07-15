@@ -761,7 +761,7 @@ struct StructSaveTest {
 struct ASMState {
 	u16 BlockNum;
 	u16 ParentBlock;
-	DataTypeCode ReturnType;
+	DataTypeCode ReturnASM;
 	bool OK;
 	bool Inited;
 	byte LabelCount;
@@ -968,7 +968,7 @@ JBClass ( SCParamArray , JB_Object ,
 	SCClass* Cls;
 	s16 Size;
 	s16 ErrCount;
-	bool IsAssigns;
+	bool HasSide;
 	bool HasProperParams;
 	bool IsDot;
 	bool IsAddress;
@@ -1467,6 +1467,7 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_NotCustom (0)
 #define kSC__CustomOps_OnlyLeftIsVector 65
 #define kSC__CustomOps_OnlyRightIsVector 66
+#define kSC__CustomOps_RecheckType 4
 #define kSC__CustomOps_TypeCastFromBool 16
 #define kSC__CustomOps_TypeCastToBetter 32
 #define kJB__ErrorColors_bold (JB_LUB[2085])
@@ -2377,6 +2378,7 @@ extern SCOperator* SC__Opp_Assigns;
 extern SCOperator* SC__Opp_Bnot;
 extern int SC__Opp_CustomOperatorScore;
 extern Dictionary* SC__Opp_Dict;
+extern SCOperator* SC__Opp_LeftShift;
 extern SCOperator* SC__Opp_Minus;
 extern Array* SC__PA_FixMe;
 extern int SC__xC2xB5Form_Count;
@@ -3624,8 +3626,6 @@ void SC_ClassLinkageTable_wrapper(SCFunction* Fn, Message* Node, SCNode* Name_sp
 
 SCClass* SC_ClassOfObjForC(Message* Curr);
 
-SCNode* SC_ClsCollectTable_pragma(Message* Node, SCNode* Name_space, Message* ErrPlace);
-
 void SC_CollectDeclsFuncBody(Message* Arg, SCNode* Scarg);
 
 void SC_CollectDeclsFuncBodyJustWhatWeNewlyMade(Message* Arg, SCNode* Scarg);
@@ -3689,8 +3689,6 @@ bool SC_FuncPreReader_nil(SCFunction* Self, Message* Msg);
 bool SC_FuncPreReader_numeric(SCFunction* Self, Message* Msg);
 
 bool SC_FuncPreReader_opt(SCFunction* Self, Message* Msg);
-
-bool SC_FuncPreReader_pragma(SCFunction* Self, Message* Msg);
 
 bool SC_FuncPreReader_real(SCFunction* Self, Message* Msg);
 
@@ -3868,7 +3866,7 @@ SCDecl* SC_TypeOfVecAccess(Message* Index, SCDecl* Ty0, int W);
 
 JB_String* SC_UniqueTmpVar(SCNode* Base, JB_String* Name);
 
-int SC_UseCustomOperators(SCDecl* LC, SCDecl* RC, SCOperator* Comp, Message* ErrPlace);
+int SC_UseCustomOperators(SCDecl* LC, SCDecl* RC, SCOperator* Comp, Message* MsgRel);
 
 SCClass* SC_VecType(bool Isfloat, int Count);
 
@@ -5373,8 +5371,6 @@ NilState SC_nil__Number(Message* Msg, NilCheckMode Test);
 
 NilState SC_nil__Pointer(Message* Msg, NilCheckMode Test);
 
-NilState SC_nil__ProcessNormalRel(Message* Msg, NilCheckMode Test);
-
 NilState SC_nil__Property(Message* Msg, NilCheckMode Test);
 
 NilState SC_nil__PropertyToFunc(Message* Dot, SCFunction* Fn);
@@ -6561,8 +6557,6 @@ void JB_FS_AppendInt32(FastString* Self, int Data);
 
 void JB_FS_AppendFloatAsText(FastString* Self, float F);
 
-void JB_FS_AppendBool(FastString* Self, bool B);
-
 void JB_FS_SyntaxAppend(FastString* Self, Message* Msg);
 
 FastString* JB_FS__Use(JB_Object* Other);
@@ -6849,7 +6843,7 @@ OpMode SC_Opp_SyntaxIs(SCOperator* Self, OpMode X);
 
 void SC_Opp__AddAssign();
 
-void SC_Opp__AddBit(JB_String* S, JB_String* FuncName, fn_OpASM ASM, OpMode Mode);
+SCOperator* SC_Opp__AddBit(JB_String* S, JB_String* FuncName, fn_OpASM ASM, OpMode Mode);
 
 void SC_Opp__AddComp(JB_String* S, fn_OpASM ASM, OpMode Mode);
 
@@ -8584,6 +8578,8 @@ MaybeBool SC_Msg_Trueness(Message* Self, NilState Found);
 
 bool SC_Msg_TrueOrFalse(Message* Self);
 
+int SC_Msg_TryImproveShiftConstants(Message* Self, SCDecl* LC, SCDecl* RC);
+
 void JB_Msg_Type__(Message* Self, FastString* Fs);
 
 void SC_Msg_TypeExpect(Message* Self, DataTypeCode* Ty, DataTypeCode In);
@@ -8806,6 +8802,8 @@ SCDecl* SC_Decl_HighestMatch(SCDecl* Self, SCDecl* Other, Message* Exp);
 bool SC_Decl_IntsOnly(SCDecl* Self, Message* Exp);
 
 bool SC_Decl_IsBareStruct(SCDecl* Self);
+
+bool SC_Decl_IsBool(SCDecl* Self);
 
 void SC_Decl_IsCarray(SCDecl* Self, int Size, SCDecl* Of);
 
@@ -10107,6 +10105,8 @@ inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After);
 
 inline JB_String* SC_Named_Name(SCNamed* Self);
 
+inline bool SC_OpMode_SyntaxCast(OpMode Self);
+
 inline bool SC_PA_SyntaxCast(SCParamArray* Self);
 
 inline void SC_nil_SetAllNil(ArchonPurger* Self, NilRecord Dest);
@@ -10270,6 +10270,10 @@ inline JB_String* SC_Named_Name(SCNamed* Self) {
 		return Self->Name;
 	}
 	return JB_LUB[283];
+}
+
+inline bool SC_OpMode_SyntaxCast(OpMode Self) {
+	return Self != 0;
 }
 
 inline bool SC_PA_SyntaxCast(SCParamArray* Self) {

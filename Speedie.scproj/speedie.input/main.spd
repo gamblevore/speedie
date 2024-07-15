@@ -1,6 +1,10 @@
 
 
 main // speedie main {
+//	if 0
+//		|| m = Message()
+//		|| x = m.GoodName("x")
+
 	Compiler.Compile
 	
 	

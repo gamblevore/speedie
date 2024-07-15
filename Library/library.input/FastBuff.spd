@@ -40,19 +40,19 @@ struct FastBuff
 	
 	syntax Append (|byte| v, |bool|)
 		cpp_part AppendU8
-		pragma inline
+		opt inline
 		.curr++[] = v
 		return .curr >= .end
 
 	syntax Append (|uint16| v, |bool|)
 		cpp_part AppendU16
-		pragma inline
+		opt inline
 		|| c = .curr|&uint16|,  c++[] = v,  .curr = c|&byte|
 		return c|&byte| >= .end
 
 	syntax Append (|uint| v, |bool|)
 		cpp_part AppendU32
-		pragma inline
+		opt inline
 		|| c = .curr|&uint|,  c++[] = v,  .curr = c|&byte|
 		return c|&byte| >= .end
 	

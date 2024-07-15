@@ -73,7 +73,7 @@ function JumpNoPosts (niltrackerfn)
 
 
 function Jump (NilTrackerFn)
-	pragma inline
+	opt inline
 //	"bug".trap(msg)
 	|| t = msg.ASMType
 		return (NilTable[t]!)(msg, test)
@@ -134,7 +134,27 @@ function UseAsRealSub (|message| ch, |nilcheckmode| test, |nilreason| reason, |s
 
 
 function Rel (NilTrackerFn)									// x = y
-	return ProcessNormalRel(msg, test)
+	opt norefcounts
+	|| ll = msg.first!
+	|| op = ll.next!
+	|| scop = op.obj!|SCOperator|
+	|| rr = op.next!
+
+	if scop Is Compare
+		return .CompareObjs(ll, rr, test, scop)
+	
+	|| AndOr = scop is AndOr
+		(test is AND) = (andor == opmode.AND)
+		return .BooleanLogic(msg, test.activate)
+
+	|| L = .Jump(ll) & NilState.Either		// (ptr+1) or (1+ptr) still needs nilness check
+	|| R = .Jump(rr) & NilState.Either
+	|| D = msg.FastDecl
+	if !D.TypeSuffers						// (ptr-ptr) is actually a number... so thats OK.
+		return nilstate.real
+	if NilState.Nilish == l or r
+		return nilstate.nilish
+	return l ||| r
 
 
 function List (NilTrackerFn)
@@ -386,7 +406,7 @@ function SuperSmartMagicCompare (|message| ll, |message| rr, |nilcheckmode| test
 	|| todo = 3
 	
 	if  ll.func == @thg and rr.func == @thg and test is Active
-		if (scop Is EqualOrNot) and (test is positive) == (scop is ExactlyEquals)|bool|
+		if (scop Is EqualOrNot) and ((test is positive) == (scop is ExactlyEquals)|bool|)
 		//	if real == x
 		//		x becomes real
 		// if real != x
@@ -440,31 +460,6 @@ function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperat
 		return .jump(side, test)
 	
 	error (ll.next, "Nil can't accept this operator. Use != or ==.")
-
-
-function ProcessNormalRel (NilTrackerfn)
-	opt norefcounts
-	|| ll = msg.first!
-	|| op = ll.next!
-	|| scop = op.obj!|SCOperator|
-	|| rr = op.next!
-
-	if scop Is Compare
-		return .CompareObjs(ll, rr, test, scop)
-	
-	|| AndOr = scop is AndOr
-		(test is AND) = (andor == opmode.AND)
-		return .BooleanLogic(msg, test.activate)
-
-	|| L = .Jump(ll) & NilState.Either		// (ptr+1) or (1+ptr) still needs nilness check
-	|| R = .Jump(rr) & NilState.Either
-	|| D = msg.FastDecl
-	if !D.TypeSuffers						// (ptr-ptr) is actually a number... so thats OK.
-		return nilstate.real
-	if NilState.Nilish == l or r
-		return nilstate.nilish
-	return l ||| r
-
 
 
 function Thing (NilTrackerFn)
@@ -715,7 +710,7 @@ function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nils
 
 
 function scdecl.IsUnknownParam (|bool|)
-	pragma inline
+	opt inline
 	return (!.nilstated) and (self is param)
 
 

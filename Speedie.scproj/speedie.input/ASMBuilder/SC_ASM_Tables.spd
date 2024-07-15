@@ -210,9 +210,9 @@ function Return			(fn_asm)
 	opt norefcounts
 	|| reg = asmreg()
 	|| f = exp.first
-		|| Where = asmreg.ForReturn
+		|| Where = AsmReg.ForReturn
 		where.reg = 1
-		where.µtype = asmstate.sh.ReturnType
+		where.µtype = asmstate.sh.ReturnASM
 		reg = .µ(f, Where)
 	exp.RET(reg, asmreg(), 1, 0)
 
@@ -637,12 +637,12 @@ function ASMReg.ReadOrWrite (|message| m, |asmreg| ptr, |int| index, |bool| DoRe
 
 
 function ASMReg.Read  (|message| m,  |asmreg| ptr,  |int| index=0,  |&fatasm|)
-	pragma inline
+	opt inline
 	return .ReadOrWrite(m, ptr, index, true)
 	
 
 function ASMReg.Write (|message| m,  |asmreg| ptr,  |int| index=0,  |&fatasm|)
-	pragma inline
+	opt inline
 	return .ReadOrWrite(m, ptr, index, false)
 
 

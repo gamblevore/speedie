@@ -437,7 +437,7 @@ extend PerryIDE
 	
 	
 	function listviewrow.Next (|guicontrol| obj, |Message!|)
-		pragma inline
+		opt inline
 		rz = .next!
 		rz.obj = obj
 		obj.tag = rz

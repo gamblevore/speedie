@@ -32,6 +32,9 @@ datatype OpMode (int)
 		
 	syntax is (|OpMode| x, |bool|)
 		return (self & x) == x
+		
+	syntax cast (|bool|)
+		return self != 0
 
 
 
@@ -123,6 +126,7 @@ module {
 	|scoperator|						Assigns
 	|scoperator| 						Minus		= SCOperator.new(&asmstate.subtract)
 	|scoperator| 						Bnot		= SCOperator.new(&asmstate.BitNot)
+	|scoperator|						LeftShift
 //	|scoperator| 						TypeCast	= SCOperator.new(&asmstate.TypeCast)
 	
 	function Lookup ( |Message| opch, |SCOperator| )
@@ -173,7 +177,7 @@ module {
 //		.AddBit( "",	"RotateLeft",	&asmstate.ROL,		asmmath.ROL,	opmode.shift)
 //		.AddBit( "",	"RotateRight",	&asmstate.ROR,		asmmath.ROR,	opmode.shift)
 		.addbit( ">>",	"ShiftRight",	&asmstate.SHR,		/*.shru*/	opmode.shift)
-		.addbit( "<<",	"ShiftLeft",	&asmstate.SHL,		/*.shl*/	opmode.shiftonly) // can add bits
+		LeftShift = .addbit( "<<",	"ShiftLeft",	&asmstate.SHL,		/*.shl*/	opmode.shiftonly) // can add bits
 		.AddBit( "(|)",	"BitOr",		&asmstate.BitOr,	/*.bor*/)
 		.AddBit( "&",	"BitAnd",		&asmstate.BitAnd,	/*.ban*/	opmode.SameOrLessBits)
 		.AddBit( "^",	"Xor",			&asmstate.bitxor,	/*.xor*/	opmode.noextrabits)
@@ -228,10 +232,10 @@ module {
 		return opp
 
 
-	function AddBit (|string| s, |String| FuncName,	|fn_opasm?| ASM, /*|asmmath| code,*/ |OpMode| Mode=0)
+	function AddBit (|string| s, |String| FuncName,	|fn_opasm?| ASM, |OpMode| Mode=0, |scoperator|)
 		|| opp = SCOperator.new(s, asm, mode ||| opmode.Bit)
-//		opp.code = code
 		opp.SetFuncName = FuncName
+		return opp
 	
 	
 	function BuildOrder // reordering here
@@ -401,11 +405,13 @@ function CustomFuncOp (|Message| exp, |SCOperator| comp, |SCNode|name_space, |Me
 module CustomOps
 	constants
 		NotCustom = 0
+		RecheckType = 4
 		TypeCastFromBool = 16
 		TypeCastToBetter = 32
 		Needed = 64
 		OnlyLeftIsVector = 65
 		OnlyRightIsVector = 66
+
 
 
 function scdecl.CompareUnclear (|scdecl| d, |bool| MakesSenseVsZero, |bool|)
@@ -421,7 +427,7 @@ function scdecl.CompareUnclear (|scdecl| d, |bool| MakesSenseVsZero, |bool|)
 		return true
 
 
-function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |message| ErrPlace, |int|)
+function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |message| MsgRel, |int|)
 	opt norefcounts
 	if (comp is Custom or CaseAware)
 		return CustomOps.Needed
@@ -434,8 +440,8 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 
 	if (comp is Comparison) and (lnt.issigned != rnt.issigned)
 		//   What are we comparing?   byte vs int is ok.   uint vs int NOT OK
-		if lc.CompareUnclear(rc, comp is less) or rc.CompareUnclear(lc, comp is more)
-			error (errplace, "Unclear signed vs unsigned comparison.")
+		if lc.CompareUnclear(rc, (comp is less)|bool|) or rc.CompareUnclear(lc, (comp is more)|bool|)
+			error (MsgRel, "Unclear signed vs unsigned comparison.")
 
 
 	ifn LN and LN == RN	   		// not both same numbers
@@ -443,7 +449,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 			if (CompOrSet)
 				return CustomOps.Needed
 			
-			expect (LNT.SameBasicType(RNT)) (errplace, "Vector type mismatch.")
+			expect (LNT.SameBasicType(RNT)) (MsgRel, "Vector type mismatch.")
 			if LN > RN
 				return CustomOps.OnlyLeftIsVector
 			  else
@@ -455,7 +461,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 	if LN and RN
 		|| GotABool = (DataTypeCode.bool == lnt or rnt)
 		if lnt != rnt
-			expect !(GotABool and comp is compare) (ErrPlace, "Cant compare bools to non-bools")
+			expect !(GotABool and comp is compare) (MsgRel, "Cant compare bools to non-bools")
 			if (comp is mathlike) and (comp isnt NoExtraBits)
 				if (comp is ShiftOnly) and (lnt.isfloat) and (rnt.isint)
 					extra = CustomOps.Needed
@@ -478,8 +484,37 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 		if t.super and t.hasOperator(comp.funcname)
 			return CustomOps.Needed
 
+	if comp == scoperator.LeftShift	   // we need to check for something
+		extra |= MsgRel.TryImproveShiftConstants(lc, rc)
+
 	return extra
 
+
+function message.TryImproveShiftConstants (|scdecl| LC, |scdecl| RC, |int|)
+	opt norefcounts
+	require lc is const and rc is const
+	|| lk = lc.exportposition
+	|| rk = rc.exportposition
+
+	require lk and rk
+	|| nk = lk << rk
+	|| size = nk.log2|int|
+	require size >= lc.typeinfo.bitcount
+
+	|| ty = (typeint64!, typeint!)(size >= 32)
+	|| ty2 = ty.typenormal.copydecl
+	(ty2 is const)
+	ty2.exportposition = nk
+	.obj = ty2
+	.become(@num, nk|int64|.render)
+	.clear
+	return customops.RecheckType
+		
+	// what about more complex things? like (1) << (2)
+	// or (1+1) << (3) ?
+	// just report an error in my ASMifier
+	// seems OK
+	
 
 function scclass.HasOperator (|string| op, |bool|)
 	opt norefcounts

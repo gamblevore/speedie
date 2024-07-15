@@ -178,11 +178,11 @@ struct FatASM
 				return (self, nil)(b == .BlockNum)
 		
 	function Prev (|&FatASM|)
-		pragma inline
+		opt inline
 		return .step(-1)
 		
 	function Next (|&FatASM|)
-		pragma inline
+		opt inline
 		return .step(1)
 
 	function match3_2 (|int| reg, |bool|)
@@ -194,7 +194,7 @@ struct FatASM
 			
 	
 	function µRenderInto (|!&ASM| Where, |!&asm| After, |!&asm|)
-		pragma inline
+		opt inline
 		rz = (ASM.encoders[.op]!)(self, where, after)
 		target debug
 			if where.DecodeBaseOp != .op // AAARGHHH

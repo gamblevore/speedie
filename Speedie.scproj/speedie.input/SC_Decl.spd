@@ -168,11 +168,11 @@ class SCDecl (SCNamed) {
 
 
 	function CopyDeclsStructFixer (|message| src, |declmode| mode, |SCDecl|)
-		if (mode is funcparam)
+		if mode is funcparam
 			check (!.iscarray) (src, "No c-arrays in function parameters")
-			if (.isbarestruct)
+			if .isbarestruct
 				return .getaddress
-		if .refcount == 1
+		if (.refcount == 1)
 			return self // nice
 		return .copydecl
 	
@@ -488,6 +488,9 @@ class SCDecl (SCNamed) {
 	function MiniMatch (|SCDecl| O, |int| TypeCast = 0, |bool|)
 		Return .TypeMatch( o, TypeCast, nil )
 
+	function IsBool (|bool|)
+		if self and .isnormal
+			return .type == typebool
 	
 	function CanWrap (|bool|)
 		if (.pointercount or .type.funcproto)
@@ -580,7 +583,7 @@ class SCDecl (SCNamed) {
 	function ExpectMatch (|SCDecl| O, |int| TypeCast, |Message?| exp, |Message?| ErrNode = nil, |Message|)
 		if exp and exp.IsSmallInt(O)
 			typecast |= kTypeCastFromZero
-
+		
 		|| Matched = .TypeMatch(O, TypeCast, exp)
 		if (Matched == kCastedMatch or kLossyCastedMatch)
 			return exp!.CastedParent

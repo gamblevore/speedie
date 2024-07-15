@@ -261,7 +261,7 @@ class SCBehaviour (SCNode)
 			|| FuncName = Intername.InterfaceToBehaviour
 			|| FNStr = "
 function $InterName (,$InterName)
-	pragma inline
+	opt inline
 	|| Table = .ClassBehaviours|&$Type|
 	return (Table.$FuncName)(...)
 "

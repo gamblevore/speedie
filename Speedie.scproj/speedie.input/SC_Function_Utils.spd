@@ -35,15 +35,6 @@ dispatch FuncPreReader (fnPreReader)
 		compiler.TodoList <~ msg
 	
 	
-	+"pragma"
-		opt norefcounts
-		|| f = msg[@thg]
-			f.expectlast
-			if f ~= "inline"
-				Is Inline
-			  else
-				error f
-				
 	+"numeric"
 		opt norefcounts
 		|| f = msg.first
@@ -54,13 +45,17 @@ dispatch FuncPreReader (fnPreReader)
 	+"opt"
 		opt norefcounts
 		|| f = msg[@thg]
-		if f ~= "NoRefCounts"
-			is NotRefCounted
-		  elseif f ~= "min"
-			|| Min = f.next(@num)
-				.minopt = min.int
-		  else
-			error f
+			if f ~= "min"
+				|| Min = f.next(@num)
+					.minopt = min.int
+			  else
+				f.expectlast
+				if f ~= "NoRefCounts"
+					is NotRefCounted
+				  elseif f ~= "inline"
+					is inline
+				  else
+					error f
 	
 	
 	+"nil"

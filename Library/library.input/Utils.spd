@@ -62,7 +62,7 @@ function ivec4.List (|message|)
 
 
 function message.DictLower (|bool| DoCount=false,  |dictionary of message|)
-	pragma inline
+	opt inline
 	return .dict(docount, true)
 
 	

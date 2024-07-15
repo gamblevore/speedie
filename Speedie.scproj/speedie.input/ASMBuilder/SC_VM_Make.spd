@@ -193,7 +193,6 @@ function BuildInstructions (TranFunc) // __instructionlist__
 	expect !node.hasany (node.first)
 
 	|| after = node
-	debugger
 	for (tmp in .namelist) (pos)
 		|| form = tmp[0][0].name
 			|| fnc = @sdot + "add" 

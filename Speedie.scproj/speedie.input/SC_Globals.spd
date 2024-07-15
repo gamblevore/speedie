@@ -1130,7 +1130,7 @@ function message.DotSpace (|SCNode| name_space, |SCObject|)
 
 
 function TypeOfSwiz (|message| exp, |SCNode| name_space, |message| side, |scdecl| class_Space, |scdecl|)
-	pragma inline
+	opt inline
 	opt norefcounts
 	|| W = Class_Space.type.NumericCount 
 	if (W > 1) and !exp.last.hasany
@@ -1288,7 +1288,10 @@ function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name
 
 function CanOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |bool| )
 	opt norefcounts
-	return (exp.Parent != @Arg) and (LC.Type.CanCompare(RC, Comp Is EqualOrNot))
+	ifn exp in @arg
+		|| eq = (Comp Is EqualOrNot)|bool|
+		if LC.Type.CanCompare(RC, eq)
+			return true
 
 
 function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |SCNode| name_space, |scdecl|) {
@@ -1460,7 +1463,7 @@ function TypeOfRel (ExprResolver)
 	if (RC != TypeNil)
 		|| IPM = IsPointerMath(LC, RC, comp, exp)
 			return ipm.CheckMath(exp)
-			
+	
 	Custom = UseCustomOperators(LC, RC, comp, exp) 
 	if Custom == CustomOps.needed
 		if (!comp.IsCompset)
@@ -1472,33 +1475,33 @@ function TypeOfRel (ExprResolver)
 	  elseif (comp is Bit)
 		require RC.IntsOnly(RN) and LC.IntsOnly(LN)
 	
-	if (custom & CustomOps.TypeCastFromBool) and !side
+	if !side and (custom & CustomOps.TypeCastFromBool) 
 		lc = typeint!.typenormal
-		rc = lc
-	
-	if Custom <= CustomOps.needed
-		if lc is intendedasreturn
-			ln = ln.MakeAccess0
-			lc = lc.internal!
-			ln.obj = lc // put inside MakeAccess0?
-			// rz --> rz[]
-		
-		LC.ExpectRelMatch( RC, RN, side, exp )
-	  elseif Custom == CustomOps.OnlyLeftIsVector
-		return LC.NotLocal		// LC is bigger (vec3 vs float)
-	  else
-		return RC.NotLocal		// RC is bigger (float vs vec3)
+		rc = lc	
 
+	if Custom > CustomOps.needed
+		return ((LC, RC)(Custom == CustomOps.OnlyLeftIsVector)).NotLocal	// return bigger
+
+	if lc is IntendedAsReturn
+		ln = ln.MakeAccess0
+		lc = lc.internal!
+		ln.obj = lc // put inside MakeAccess0?
+		// rz --> rz[]
+	
+	LC.ExpectRelMatch( RC, RN, side, exp )
 	
 	if !side and (comp Is Compare)
 		Return TypeBool!.typenormal
 
-	if custom & CustomOps.TypeCastToBetter
+
+	if custom & customops.RecheckType
+		lc = exp.obj|scdecl|!
+	// we can't do 1 << (a,b,c) ?
+
+	  elseif custom & CustomOps.TypeCastToBetter
 		return lc.better_numeric(rc, comp.Kind, opch).NotLocal
 	
 	Return LC.NotLocal
-	
-	
 	// s =  "abc"   ->   s.eq("abc", false)
 	// s ~= "abc"   ->   s.eq("abc", true )
 
@@ -1871,4 +1874,5 @@ function Tran_ArgArray (|Message| Exp, |SCNode| name_space, |scdecl| decl)
 		|| c = counter.max+1
 		check (c < 16K) (exp, "Too many items in C-array.")
 		decl.C_Array = c
+
 

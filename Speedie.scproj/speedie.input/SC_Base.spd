@@ -470,7 +470,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 			exit								// Stop SCFunction.Byte looking up Main.Byte...
 		
 		if o isa SCDecl
-			if o.Hiderfunc.Hidermatch(paramsarray.isassigns) and (owning_cls != curr)
+			if o.Hiderfunc.Hidermatch(paramsarray.HasSide) and (owning_cls != curr)
 				o = o.hiderfunc|scdecl|
 			  else
 				if o.Type.FuncProto
@@ -974,7 +974,6 @@ dispatch ClsCollectTable (CollectFunc)
 	+"processas"			SCClass.ProcessAs
 	+"cpp_refs"				cpprefs.ReadIntoCppRefs
 	+"linkage"				CppRefs.Linkage
-	+"pragma"				{ error (node) }
 
 	+"class"				SCClass.NewInnerClass
 	+"role"					SCClass.NewInnerClass
