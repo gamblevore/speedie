@@ -4,12 +4,13 @@ tests oofit
 	asm oofit (0)
 		KNST  (r1, 3458764513820540931) //test
 		KNST  (r1, 123)
+		KNST  (r4, 2)
 		@test
 		KNST  (r3, 18874368)
 		KNST  (r3, -234)
 		ADD   (r1, r1, r3)
 		PRNT  (r1,)			// -111
-		BRA   (r4, 1, @test)
+		BRA   (r4, @test)
 		HALT  (r0,0,0)
 
 

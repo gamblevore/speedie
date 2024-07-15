@@ -17,16 +17,17 @@ datatype ASM (uint)
 	function DebugPrint
 		|| op = .decodeop
 		|| ins = instruction.TypeList[op]
-			"$op $ins"
+			"$op ${ins.name} (${ins.formname})"
 		  else
 			"$op ???"
 		
 	function DecodeOp (|int|)
 		return self >> 24
-	function DecodeBaseOp (|int|)
-		rz = .decodeop
-		if rz < 32
-			rz &= ~3
+	target debug
+		function DecodeBaseOp (|int|)
+			rz = .decodeop
+			if rz < 32
+				rz &= ~3
 	function R1 (assigns:|uint|, |asm|)
 		return self ||| (value << 27) >> 8
 	function R2 (assigns:|uint|, |asm|)
@@ -47,5 +48,7 @@ datatype ASM (uint)
 		|asm_encoder2[256]| 	Encoders
 
 
-prototype ASM_Encoder2  (|&FatASM| self, |&asm| Curr=nil, |&asm| After=nil, |&asm|)
+
+	
+prototype ASM_Encoder2  (|&FatASM| self, |!&asm| Curr, |!&asm| After,  |int64| ExtraInfo=0,  |&asm|)
 

@@ -27,12 +27,26 @@ class µFunc
 	
 	
 	function µRender (|!&ASM| Where, |!&asm| After, |!&asm|)
+		|| HasLabel = false
 		rz = where
-		for i in self
-			rz = i.µrenderinto(rz, after)
+
+		for i in .length
+			|| fat = .ir+i
+			if fat is labelrequest
+				haslabel = true
+			fat.ASMIndex = i
+			rz = fat.µrenderinto(rz, after)
+
+		if haslabel // i think we need something similar anyway... for jumps
+			for i in self
+				if i is labelrequest
+					(i isnt labelrequest)
+					i.rerender(where, rz)
+			
 		while where < after
 			where.DebugPrint
 			where += where.length
+
 
 
 	function memory.Run (|memory of asm| self, |&ivec4| Args = nil, |int| ArgCount=0, |int64|)

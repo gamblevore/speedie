@@ -21,18 +21,19 @@
 */
 	
 
-struct FatASM
-	|ASMReg| 			Info	// only needs 32-bits of this. Could we make a smaller asmreg?
+struct FatASM 
+	|ASMReg| 			Info		// only needs 32-bits of this. Could we make a smaller asmreg?
 	|message--| 		Msg
 	|uint64| 			Const
-	|&FatASM| 			BackLink // for multiple instructions setting the same register.
+	|&FatASM| 			BackLink	// for multiple instructions setting the same register.
 
-	|uint[6]|			R	
+	|uint[5]|			R
+	|uint|				ASMIndex	
 	|uint16| 			BlockNum
 	|uint16| 			ParentBlock
 	|uint16|			RefCount
 	|byte|				Op
-	|byte|				Label	// 255 labels per function
+	|byte|				Label		// 254 labels per function
 	
 	
 	function AsReg (|asmreg|)
@@ -41,7 +42,7 @@ struct FatASM
 
 	operator mul (|asmreg| info, |asmreg|)
 		cpp_part AsReg
-		info.FatIndex = 1 + (self - ASMState.Sh.FuncStart)
+		info.FatIndex = .index
 		.info = info
 		return info
 	
@@ -72,6 +73,14 @@ struct FatASM
 		nil safe
 		return .info
 	
+	function Index (|uint|)
+		opt inline
+		return 1 + self - asmstate.sh.funcstart
+
+	function uint.FAT (|&FATASM|)
+		opt inline
+		return asmstate.sh.funcstart + (self - 1)
+	
 	function FileNum (|int|)
 		return .msg.filenum & 0x4095
 	
@@ -90,6 +99,12 @@ struct FatASM
 	syntax is (|asmreg| flags, |bool|)
 		if self
 			return .info & flags
+
+	syntax is (|asmreg| flags, assigns:|bool|)
+		if value
+			(.info as= flags)
+		  else
+			(.info asnt= flags)
 	
 	function BitCorrect (|&FATASM|)
 		.info = .info <~ AsmReg.BitCorrect
@@ -188,12 +203,32 @@ struct FatASM
 	function match3_2 (|int| reg, |bool|)
 		// prefers the value to be at 3.
 		if reg == .a
-			.swap(2,3)
+			.swap(2, 3)
 			return true
 		return reg == .b
-			
 	
-	function µRenderInto (|!&ASM| Where, |!&asm| After, |!&asm|)
+	
+		// what  if it got rendered into multiple asms?
+		// like: if x==y: jump(10000)
+		// how do we deal with this?
+	function ReRender (|!&asm| Start, |!&asm| After)
+		|| where = start+.ASMIndex
+		|| reg = .info.reg
+
+		debug_require  where >= start  and  where < after
+		debug_require reg < 5
+		|| dest_index = .r[reg]
+		|| mask = dest_index & asmreg.FatRef
+		debug_require mask
+		dest_index &=~ mask
+		|| dest = start + dest_index
+
+		debug_Require dest >= start and dest <= after
+		.r[reg] = where - dest 
+		.µrenderinto(where, where+1)
+	
+	
+	function µRenderInto (|!&asm| Where, |!&asm| After, |!&asm|)
 		opt inline
 		rz = (ASM.encoders[.op]!)(self, where, after)
 		target debug
@@ -201,6 +236,12 @@ struct FatASM
 				"AARGHHH"
 				debugger
 				rz = (ASM.encoders[.op]!)(self, where, after)
+
+		// OK so... now what? how do we re-render anything?
+		// we could store the length and the addr... so we don't really
+		// need a re-render.
+
+
 	
 	function Renda (|FastString| fs)
 		opt norefcounts
@@ -220,6 +261,7 @@ struct FatASM
 					fs <~ 'r'
 				fs <~ .r[i]
 				remain += bs
+
 
 	function Print
 		visible

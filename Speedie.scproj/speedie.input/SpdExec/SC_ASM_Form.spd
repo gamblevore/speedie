@@ -6,7 +6,7 @@
 class µForm 
 	|int|			Count
 	|string|		Name
-	|µParam[6]|		Params
+	|µParam[5]|		Params
 	|message| 		src
 	|int|			TotalBits
 	|int| 			Outputs
@@ -24,7 +24,7 @@ class µForm
 		opt norefcounts
 		.src = tmp
 		.name = tmp.name
-		for i in 6
+		for i in –count .params
 			.params[i] = 0
 		for line in tmp.last(@arg)
 			|| f = line.NeedFirst
@@ -37,20 +37,14 @@ class µForm
 		if size <= 0 or size > 32 // hmm??
 		|| i = .count++
 		.totalbits += size
-		expect (i < 6) ("Too many params.")
+		expect (i < –count .params) ("Too many params.")
 		p |= size - 1
 		.params[i] = p
 			
 
-//	function LastField (|µParam|)
-//		return self[.Count-1]
-	
 	syntax Access (|int| i, |µParam|)
 		cpp_part AccessInt
 		return .params[i]
-	
-//	syntax Access (|int| i, assigns: |µParam|)
-//		.params[i] = Value
 	
 	
 	iterator

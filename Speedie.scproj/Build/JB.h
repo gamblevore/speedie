@@ -171,8 +171,6 @@ typedef ASM ASM_Div;
 
 typedef ASM ASM_Float;
 
-typedef ASM ASM_FloatAddExp;
-
 typedef ASM ASM_FloatConst;
 
 typedef ASM ASM_Func;
@@ -521,7 +519,7 @@ struct JB_Task;
 
 struct LessThan3;
 
-typedef ASM* (*ASM_Encoder2)(FatASM* self, ASM* Curr, ASM* After);
+typedef ASM* (*ASM_Encoder2)(FatASM* self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 typedef SCNode* (*FP_CollectFunc)(Message* node, SCNode* name_space, Message* ErrPlace);
 
@@ -688,7 +686,8 @@ struct FatASM {
 	Message* Msg;
 	uint64 Const;
 	FatASM* BackLink;
-	uint R[6];
+	uint R[5];
+	uint ASMIndex;
 	u16 BlockNum;
 	u16 ParentBlock;
 	u16 RefCount;
@@ -1058,7 +1057,7 @@ struct xC2xB5Form_Behaviour: Object_Behaviour {
 
 JBClass ( xC2xB5Form , JB_Object , 
 	int Count;
-	ASMParam Params[6];
+	ASMParam Params[5];
 	JB_String* Name;
 	Message* src;
 	int TotalBits;
@@ -1626,7 +1625,6 @@ extern Array* JB__Terminal_TermScreen;
 #define kJB__Terminal_w 80
 #define kJB__Terminal_White 37
 #define kJB__Terminal_Yellow 33
-extern Dictionary* SC__TextAssembler_LabelsToDo;
 extern Array* SC__Ext_Cleanup;
 extern int SC__Ext_CompilingLibFiles;
 extern JB_String* SC__Ext_CppCompilerPath;
@@ -1862,34 +1860,35 @@ extern Random JB__zalgo_R;
 #define kSC__ASM_ADD 43
 #define kSC__ASM_ADDK 41
 #define kSC__ASM_ADPK 42
-#define kSC__ASM_BAND 50
-#define kSC__ASM_BCLR 58
-#define kSC__ASM_BFLG 54
-#define kSC__ASM_BFLS 55
-#define kSC__ASM_BLUE 49
-#define kSC__ASM_BNOT 53
-#define kSC__ASM_BOAR 51
-#define kSC__ASM_BROL 56
-#define kSC__ASM_BROR 57
-#define kSC__ASM_BRUS 47
-#define kSC__ASM_BRUU 48
-#define kSC__ASM_BXOR 52
-#define kSC__ASM_CMPB 59
-#define kSC__ASM_CMPF 62
-#define kSC__ASM_CMPI 61
-#define kSC__ASM_CNTC 89
-#define kSC__ASM_CNTD 90
+#define kSC__ASM_BAND 52
+#define kSC__ASM_BCLR 60
+#define kSC__ASM_BFLG 56
+#define kSC__ASM_BFLS 57
+#define kSC__ASM_BLUE 51
+#define kSC__ASM_BNOT 55
+#define kSC__ASM_BOAR 53
+#define kSC__ASM_BROL 58
+#define kSC__ASM_BROR 59
+#define kSC__ASM_BRUS 49
+#define kSC__ASM_BRUU 50
+#define kSC__ASM_BXOR 54
+#define kSC__ASM_CMPB 61
+#define kSC__ASM_CMPF 64
+#define kSC__ASM_CMPI 63
+#define kSC__ASM_CNTC 91
+#define kSC__ASM_CNTD 92
 #define kSC__ASM_CONV 39
 #define kSC__ASM_DIVV 46
 extern ASM_Encoder2 SC__ASM_Encoders[256];
 #define kSC__ASM_EROR 32
-#define kSC__ASM_FADD 93
-#define kSC__ASM_FADK 94
-#define kSC__ASM_FDIV 97
-#define kSC__ASM_FEXK 92
-#define kSC__ASM_FFRC 98
-#define kSC__ASM_FMLK 96
-#define kSC__ASM_FMUL 95
+#define kSC__ASM_FADD 94
+#define kSC__ASM_FADK 95
+#define kSC__ASM_FDIV 98
+#define kSC__ASM_FFRC 99
+#define kSC__ASM_FMAX 100
+#define kSC__ASM_FMIN 101
+#define kSC__ASM_FMLK 97
+#define kSC__ASM_FMUL 96
 #define kSC__ASM_FNCX 5
 #define kSC__ASM_FNCX2 5
 #define kSC__ASM_FNCX3 6
@@ -1897,50 +1896,52 @@ extern ASM_Encoder2 SC__ASM_Forms[128];
 #define kSC__ASM_FUNC 1
 #define kSC__ASM_FUNC2 1
 #define kSC__ASM_FUNC3 2
-#define kSC__ASM_JBRA 68
-#define kSC__ASM_JBRN 69
-#define kSC__ASM_JMPE 66
-#define kSC__ASM_JMPF 65
-#define kSC__ASM_JMPI 64
-#define kSC__ASM_JMPN 67
-#define kSC__ASM_JUMP 63
+#define kSC__ASM_JBRA 70
+#define kSC__ASM_JBRN 71
+#define kSC__ASM_JMPE 68
+#define kSC__ASM_JMPF 67
+#define kSC__ASM_JMPI 66
+#define kSC__ASM_JMPN 69
+#define kSC__ASM_JUMP 65
+#define kSC__ASM_KNSR 40
 #define kSC__ASM_KNST 8
 #define kSC__ASM_KNST1 8
 #define kSC__ASM_KNST2 9
 #define kSC__ASM_KNST3 10
-#define kSC__ASM_KSTR 40
-#define kSC__ASM_LUPD 70
-#define kSC__ASM_LUPU 71
-#define kSC__ASM_MEMU 91
+#define kSC__ASM_LUPD 72
+#define kSC__ASM_LUPU 73
+#define kSC__ASM_MAX 47
+#define kSC__ASM_MEMU 93
+#define kSC__ASM_MIN 48
 #define kSC__ASM_MULT 45
 extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_NOOP 33
 #define kSC__ASM_PRNT 37
-#define kSC__ASM_RALO 74
+#define kSC__ASM_RALO 76
 #define kSC__ASM_RARE 38
-#define kSC__ASM_RD16 83
-#define kSC__ASM_RD1S 77
-#define kSC__ASM_RD1U 76
-#define kSC__ASM_RD2S 79
-#define kSC__ASM_RD2U 78
-#define kSC__ASM_RD4S 81
-#define kSC__ASM_RD4U 80
-#define kSC__ASM_RD8U 82
+#define kSC__ASM_RD16 85
+#define kSC__ASM_RD1S 79
+#define kSC__ASM_RD1U 78
+#define kSC__ASM_RD2S 81
+#define kSC__ASM_RD2U 80
+#define kSC__ASM_RD4S 83
+#define kSC__ASM_RD4U 82
+#define kSC__ASM_RD8U 84
 #define kSC__ASM_RET 35
-#define kSC__ASM_RMEM 73
-#define kSC__ASM_RSET 72
+#define kSC__ASM_RMEM 75
+#define kSC__ASM_RSET 74
 #define kSC__ASM_SUBB 44
 #define kSC__ASM_SWAP 36
-#define kSC__ASM_TABL 75
+#define kSC__ASM_TABL 77
 #define kSC__ASM_TAIL 13
 #define kSC__ASM_TAIL2 13
-#define kSC__ASM_TERN 60
+#define kSC__ASM_TERN 62
 #define kSC__ASM_TRAP 34
-#define kSC__ASM_WR16 88
-#define kSC__ASM_WR1U 84
-#define kSC__ASM_WR2U 85
-#define kSC__ASM_WR4U 86
-#define kSC__ASM_WR8U 87
+#define kSC__ASM_WR16 90
+#define kSC__ASM_WR1U 86
+#define kSC__ASM_WR2U 87
+#define kSC__ASM_WR4U 88
+#define kSC__ASM_WR8U 89
 #define kSC__ASMtmp_IncrAfter 2
 #define kSC__ASMtmp_IncrBefore (0)
 #define kSC__ASMtmp_kContinue 51
@@ -1971,8 +1972,10 @@ extern ASM_Write SC__ASMtmp_WriteASM[5];
 #define kSC__Reg_ContainsAddr 1073741824
 #define kSC__Reg_CorrectAddr 5368709120
 #define kSC__Reg_Discard 8388608
+#define kSC__Reg_FatRef 1073741824
 #define kSC__Reg_ForReturn 33554432
 #define kSC__Reg_FromMath 131072
+#define kSC__Reg_LabelRequest 8589934592
 #define kSC__Reg_MathConst 537001984
 #define kSC__Reg_Negate 4194304
 #define kSC__Reg_NewCondRequest 268435456
@@ -3399,10 +3402,6 @@ void JB_Terminal__SyntaxExpect(JB_String* Msg);
 // TextAssembler
 void SC_TextAssembler__Assemble(Message* Msg);
 
-int SC_TextAssembler__Init_();
-
-int SC_TextAssembler__InitCode_();
-
 void SC_TextAssembler__TextData(Message* Msg);
 
 bool SC_TextAssembler__TextFunc(Message* Msg);
@@ -3507,7 +3506,7 @@ xC2xB5Form* SC_VM_Builder__AddForm(Message* Form);
 
 void SC_VM_Builder__AddxC2xB5Op(JB_String* Name, int Id);
 
-ASM* SC_VM_Builder__BadEncoder(FatASM* Self, ASM* Curr, ASM* After);
+ASM* SC_VM_Builder__BadEncoder(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 bool SC_VM_Builder__BuildFiles();
 
@@ -4350,8 +4349,6 @@ ASM SC_ASM_BFLD_signSet(ASM Self, uint Value);
 
 ASM SC_ASM_BFLD_upSet(ASM Self, uint Value);
 
-ASM SC_ASM_Bra_c1Set(ASM Self, uint Value);
-
 ASM SC_ASM_Bra_jmpSet(ASM Self, uint Value);
 
 ASM SC_ASM_Cmp_CmpSet(ASM Self, uint Value);
@@ -4395,12 +4392,6 @@ ASM SC_ASM_Div_LSet(ASM Self, uint Value);
 ASM SC_ASM_Float_DSet(ASM Self, uint Value);
 
 ASM SC_ASM_Float_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_FloatAddExp_DSet(ASM Self, uint Value);
-
-ASM SC_ASM_FloatAddExp_Sh2Set(ASM Self, uint Value);
-
-ASM SC_ASM_FloatAddExp_Sh3Set(ASM Self, uint Value);
 
 ASM SC_ASM_FloatConst_HighSet(ASM Self, uint Value);
 
@@ -4481,8 +4472,6 @@ ASM SC_ASM_Write_moveSet(ASM Self, uint Value);
 int SC_ASM__Init_();
 
 int SC_ASM__InitCode_();
-
-void SC_ASM__ListInstructions();
 
 bool SC_ASM__Needed();
 
@@ -4997,172 +4986,167 @@ Macro* SC_xC2xB5Param_Which(ASMParam Self);
 
 
 // ASM_AddK
-ASM* JB_ASM_AddK__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_AddK__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_BClear
-ASM* JB_ASM_BClear__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_BClear__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_BFLD
-ASM* JB_ASM_BFLD__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_BFLD__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_Bra
-ASM* JB_ASM_Bra__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_Bra__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_CNTC
-ASM* JB_ASM_CNTC__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_CNTC__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_Cmp
-ASM* JB_ASM_Cmp__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_Cmp__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_CmpB
-ASM* JB_ASM_CmpB__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_CmpB__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_Const
-ASM* JB_ASM_Const__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_Const__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_ConstStretchy
-ASM* JB_ASM_ConstStretchy__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_ConstStretchy__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_Convert
-ASM* JB_ASM_Convert__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_Convert__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_Div
-ASM* JB_ASM_Div__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_Div__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_Float
-ASM* JB_ASM_Float__Encode(FatASM* Self, ASM* Curr, ASM* After);
-
-
-
-// ASM_FloatAddExp
-ASM* JB_ASM_FloatAddExp__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_Float__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_FloatConst
-ASM* JB_ASM_FloatConst__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_FloatConst__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_Func
-ASM* JB_ASM_Func__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_Func__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_JCmp
-ASM* JB_ASM_JCmp__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_JCmp__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_JCmpEq
-ASM* JB_ASM_JCmpEq__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_JCmpEq__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_Jump
-ASM* JB_ASM_Jump__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_Jump__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_Loop
-ASM* JB_ASM_Loop__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_Loop__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_MemUtil
-ASM* JB_ASM_MemUtil__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_MemUtil__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_RET
-ASM* JB_ASM_RET__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_RET__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_Read
-ASM* JB_ASM_Read__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_Read__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_RefSet
-ASM* JB_ASM_RefSet__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_RefSet__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_Shift
-ASM* JB_ASM_Shift__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_Shift__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_Swap
-ASM* JB_ASM_Swap__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_Swap__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_Table
-ASM* JB_ASM_Table__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_Table__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_Tail
-ASM* JB_ASM_Tail__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_Tail__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_Trap
-ASM* JB_ASM_Trap__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_Trap__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_U0
-ASM* JB_ASM_U0__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_U0__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_U1
-ASM* JB_ASM_U1__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_U1__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_U2
-ASM* JB_ASM_U2__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_U2__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_U3
-ASM* JB_ASM_U3__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_U3__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_U4
-ASM* JB_ASM_U4__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_U4__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
 // ASM_Write
-ASM* JB_ASM_Write__Encode(FatASM* Self, ASM* Curr, ASM* After);
+ASM* JB_ASM_Write__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
@@ -5501,6 +5485,8 @@ uint SC_FatASM_a(FatASM* Self);
 
 void SC_FatASM_aSet(FatASM* Self, uint Value);
 
+int SC_FatASM_AddLabelRequest(FatASM* Self, Message* P, int Pos);
+
 void SC_FatASM_AddRegNum(FatASM* Self, Message* Src, int Write, int Num);
 
 void SC_FatASM_AddRegParam(FatASM* Self, Message* Src, int Write);
@@ -5547,7 +5533,7 @@ bool SC_FatASM_has(FatASM* Self, int A, int B);
 
 FatASM* SC_FatASM_HaveAddr(FatASM* Self);
 
-ASM* SC_FatASM_KNST_Encoder(FatASM* Self, ASM* Curr, ASM* After);
+ASM* SC_FatASM_KNST_Encoder(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 void SC_FatASM_LinkIn(FatASM* Self, FatASM* Old);
 
@@ -5569,11 +5555,17 @@ int SC_FatASM_RegInputSet(FatASM* Self, int A, AsmReg Info);
 
 void SC_FatASM_Renda(FatASM* Self, FastString* Fs);
 
+void SC_FatASM_ReRender(FatASM* Self, ASM* Start, ASM* After);
+
 FatASM* SC_FatASM_Step(FatASM* Self, int Dir);
 
 void SC_FatASM_SwapWithIntInt(FatASM* Self, int A, int B);
 
 void SC_FatASM_SyntaxExpect(FatASM* Self, JB_String* Error);
+
+bool SC_FatASM_SyntaxIs(FatASM* Self, AsmReg Flags);
+
+void SC_FatASM_SyntaxIsSet(FatASM* Self, AsmReg Flags, bool Value);
 
 
 
@@ -5860,15 +5852,13 @@ double SC_Pac_f(ASMState* Self, AsmReg R);
 
 AsmReg SC_Pac_FindConst(ASMState* Self, SCDecl* D);
 
-FatASM* SC_Pac_FindLabel(ASMState* Self, FatASM* Dbg);
-
 void SC_Pac_FinishASM(ASMState* Self);
 
 AsmReg SC_Pac_FloatMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
 AsmReg SC_Pac_FoundCode(ASMState* Self, int I, int64 Code, SCDecl* D);
 
-int SC_Pac_GetLabelJump(ASMState* Self, Message* P);
+bool SC_Pac_GetLabel(ASMState* Self, FatASM* Jumper);
 
 AsmReg SC_Pac_IntMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
@@ -7960,8 +7950,6 @@ SCDecl* SC_Msg_FastDecl(Message* Self);
 
 FatASM* JB_Msg_FDIV(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4, int D);
 
-FatASM* JB_Msg_FEXK(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh2, int Sh3, int D);
-
 FatASM* JB_Msg_FFRC(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4, int D);
 
 SCFile* SC_Msg_File(Message* Self);
@@ -8015,6 +8003,10 @@ void SC_Msg_FixMultiArr(Message* Self);
 double JB_Msg_Float(Message* Self);
 
 float JB_Msg_Float32(Message* Self);
+
+FatASM* JB_Msg_FMAX(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4, int D);
+
+FatASM* JB_Msg_FMIN(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4, int D);
 
 FatASM* JB_Msg_FMLK(Message* Self, AsmReg R1, AsmReg R2, int High);
 
@@ -8148,9 +8140,9 @@ void JB_Msg_Item__(Message* Self, FastString* Fs);
 
 bool JB_Msg_jbinTest(Message* Self);
 
-FatASM* JB_Msg_JBRA(Message* Self, AsmReg R1, int C1, int Jmp);
+FatASM* JB_Msg_JBRA(Message* Self, AsmReg R1, int Jmp);
 
-FatASM* JB_Msg_JBRN(Message* Self, AsmReg R1, int C1, int Jmp);
+FatASM* JB_Msg_JBRN(Message* Self, AsmReg R1, int Jmp);
 
 JB_String* JB_Msg_JDB2_(Message* Self, int Flags, FastString* Fs_in);
 
@@ -8172,9 +8164,9 @@ FatASM* JB_Msg_JUMP(Message* Self, int L0);
 
 void SC_Msg_KinderRemoveAfter(Message* Self);
 
-FatASM* JB_Msg_KNST(Message* Self, AsmReg R1, int Cond, int Inv, int Value, int Prm1, int Prm2);
+FatASM* JB_Msg_KNSR(Message* Self, AsmReg R1, int Rot, int Inv, int Value);
 
-FatASM* JB_Msg_KSTR(Message* Self, AsmReg R1, int Rot, int Inv, int Value);
+FatASM* JB_Msg_KNST(Message* Self, AsmReg R1, int Cond, int Inv, int Value);
 
 Message* JB_Msg_Last(Message* Self, Syntax Need);
 
@@ -8228,9 +8220,13 @@ int SC_Msg_MakeDereference(Message* Self, SCDecl* Type);
 
 void SC_Msg_MakeTaskVar(Message* Self, Message* Con, Message* Before, bool First);
 
+FatASM* JB_Msg_MAX(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Cmp);
+
 void JB_Msg_max__(Message* Self, FastString* Fs);
 
 FatASM* JB_Msg_MEMU(Message* Self, AsmReg R1, AsmReg R2, int Op, int N);
+
+FatASM* JB_Msg_MIN(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Cmp);
 
 void SC_Msg_MiniArgCpp(Message* Self, FastString* Fs);
 
@@ -9903,7 +9899,7 @@ Message* SC_Func__TypedTempMoveOut(Message* Msg, JB_String* Name, SCDecl* Type);
 
 Message* SC_Func__TempMoveOut(Message* Msg, Message* Place);
 
-SCDecl* SC_Func__Tran_AfterRel(Message* Msg, SCNode* Name_space, Message* Side, bool After);
+SCDecl* SC_Func__Tran_AfterRel(Message* Msg, SCNode* Name_space, Message* Side);
 
 void SC_Func__Tran_All(SCFunction* Fn, Message* S, SCNode* P);
 
@@ -10099,6 +10095,8 @@ inline bool JB_int_OperatorInRange(int Self, int D);
 
 inline bool SC_FailableInt_SyntaxCast(FailableInt Self);
 
+inline uint SC_FatASM_Index(FatASM* Self);
+
 inline AsmReg SC_FatASM_Info(FatASM* Self);
 
 inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After);
@@ -10112,6 +10110,8 @@ inline bool SC_PA_SyntaxCast(SCParamArray* Self);
 inline void SC_nil_SetAllNil(ArchonPurger* Self, NilRecord Dest);
 
 inline NilRecord SC_nil_Value(ArchonPurger* Self);
+
+inline FatASM* SC_uint_FAT(uint Self);
 
 inline bool JB_Array_SyntaxCast(Array* Self);
 
@@ -10255,13 +10255,17 @@ inline bool SC_FailableInt_SyntaxCast(FailableInt Self) {
 	return Self != kSC__FailableInt_Fail;
 }
 
+inline uint SC_FatASM_Index(FatASM* Self) {
+	return 1 + (Self - SC__Pac_Sh.FuncStart);
+}
+
 inline AsmReg SC_FatASM_Info(FatASM* Self) {
 	return SC_FatASM_Info(Self);
 }
 
 inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After) {
 	ASM* Rz = nil;
-	Rz = (SC__ASM_Encoders[Self->Op])(Self, Where, After);
+	Rz = (SC__ASM_Encoders[Self->Op])(Self, Where, After, 0);
 	return Rz;
 }
 
@@ -10286,6 +10290,10 @@ inline void SC_nil_SetAllNil(ArchonPurger* Self, NilRecord Dest) {
 
 inline NilRecord SC_nil_Value(ArchonPurger* Self) {
 	return Self->Neel[0];
+}
+
+inline FatASM* SC_uint_FAT(uint Self) {
+	return SC__Pac_Sh.FuncStart + (Self - 1);
 }
 
 inline bool JB_Array_SyntaxCast(Array* Self) {

@@ -19,7 +19,7 @@ function fatasm.KNST_Encoder (Asm_encoder2)
 	|| k = .const
 	|| inv = k>>63
 		k = ~k
-	ifn curr and curr < after+2
+	if curr >= after-2
 		return curr
 
 	|| sh = 0
@@ -35,6 +35,7 @@ function fatasm.KNST_Encoder (Asm_encoder2)
 	rz.ConstStretchy_Inv = inv
 	if sh < 64
 		rz.ConstStretchy_Value = k<<sh
+
 	Curr++[] = Rz
 	if sh >= 32
 		if sh == 64
@@ -44,10 +45,10 @@ function fatasm.KNST_Encoder (Asm_encoder2)
 	return Curr
 
 
-extend asmstate
+extend ASMState
 	function NumToReg (|int64| V, |message| exp, |asmreg| Reg=asmreg(), |asmreg|)
 		Reg = .TempMe(exp, Reg)	
-		|| fat = exp.KNST(reg, 0, 0, 0, 0, 0)
+		|| fat = exp.KNST(reg, 0, 0, 0)
 		fat.Const = v
 		return fat * reg
 
@@ -71,25 +72,6 @@ extend asmstate
 			.r[2] = inv|int|
 			.r[3] = V|int|
 			return
-
-		debugat
-		|| signed = (v|int64| < 0)|int|
-			v = ~v
-
-		.op = asm.KNST
-		.r[1] = 0
-		.r[2] = signed
-		.r[3] = v|int|
-		if v >= (1 << 48)
-			if v >= 64K
-				//.op = asm.setn2
-				.r[3] = v >> 32
-				.R[4] = v & 0xFFFFffff
-			  else
-				//.op = asm.setn3
-				.r[3] = 0
-				.R[4] = v >> 32
-				.R[5] = v & 0xFFFFffff
 */
 			
 	function SetConst (|Message| List,  |message| Orig,  |bool|)

@@ -17,9 +17,10 @@ datatype AsmReg (uint64)
 		numeric false
 	
 	Flags
+		FatRef			= 1<<30
 		|asmreg|
 		(1<<16)		// starting point
-//		SrcConst   // what does this do? remove it?
+//		SrcConst    // what does this do? remove it?
 		NotYetUsed	// for   || y = a + b,   y is (currently) unused.
 		FromMath
 		StayOpen
@@ -37,9 +38,10 @@ datatype AsmReg (uint64)
 		ContainsAddr
 		AddrRequest
 		BitCorrect
+		LabelRequest
 		CorrectAddr		= ContainsAddr ||| bitcorrect
-		Arg				= Discard// ||| SrcConst
-		CondRequest		= NewCondRequest// ||| SrcConst
+		Arg				= Discard         // ||| SrcConst
+		CondRequest		= NewCondRequest  // ||| SrcConst
 		MathConst		= ConstAny ||| FromMath
 		Zero			= ConstAny ||| BitCorrect
 	
@@ -79,11 +81,11 @@ datatype AsmReg (uint64)
 	
 	function FAT (|&fatasm|)
 		|| i = .FatIndex
-			return asmstate.sh.FuncStart + i - 1
+			return i.fat
 
 	function NeedFAT (|&fatasm|)
 		|| i = .FatIndex
-			return asmstate.sh.FuncStart + i - 1
+			return i.fat
 		error "reg is too skinny"
 		return asmstate.sh.zero
 

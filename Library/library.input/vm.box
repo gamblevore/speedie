@@ -13,12 +13,13 @@ forms
 	Func	// func: fnc:
 		SaveRegs 5 // should this be R?
 		JUMP	j
-		Prm1	x
-		Prm2	x
+		Prm1	x // use const instead?
+		Prm2	x // maybe just leave it for now...
+				  // besides fncx might need some types.
 	
 	Tail
 		JUMP	j
-		Prm1	x
+		Prm1	x // also
 	
 	Jump
 		l0		l
@@ -49,7 +50,6 @@ forms
 
 	Bra		// bra:
 		r1		r
-		c1		2
 		jmp		j
 	
 	Table
@@ -143,24 +143,24 @@ forms
 		r2		r
 		High	14
 
-
+/*
 	FloatAddExp
-// Can (should?) we reduce this down to 5 lines?
-// I could merge cond/inv. 		// as for floataddexp... perhaps merge shifts?
+// Can (should?) we reduce this down to 5 lines? // perhaps merge shifts?
 		r1		R
 		r2		r
 		r3		r
 		Sh2		4
 		Sh3		4
 		D		1
-	
+*/
+
 	ConstStretchy
 		r1		R
 		Cond	1	// 0 == always, 1 = only if dest == 0
 		Inv		1
 		Value	17
-		Prm1	x
-		Prm2	x
+//		Prm1	x  // unused!
+//		Prm2	x
 		
 	AddK
 		r1		R
@@ -262,7 +262,7 @@ forms
 
 
 #!						 (((((Consts)))))
-/**/ KSTR (Const)
+/**/ KNSR (Const)
 		RotateConst(r, Op)
 /**/ KNST (ConstStretchy, 1, 2, 3)
 		Code = LoadConst(r, Op, Code)
@@ -363,36 +363,34 @@ forms
 		___
 /**/ JMPE  (JCmpEq)
 		__
-		Code = CompEq(r, Op, Code)
+		Code = JompEq(r, Op, Code)
 		___
 /**/ JMPN  (JCmpEq)
 		__
-		Code = CompNeq(r, Op, Code)
+		Code = JompNeq(r, Op, Code)
 		___
 /**/ JBRA  (Bra)
-		__
-		if (!i1)
-			Code += Bra_jmpi
-		___
-		i1 += Bra_c1u-1
-
-/**/ JBRN  (Bra)					
 		__
 		if (i1)
 			Code += Bra_jmpi
 		___
-		i1 += Bra_c1u-1
+
+/**/ JBRN  (Bra)					
+		__
+		if (!i1)
+			Code += Bra_jmpi
+		___
 
 /**/ LUPD  (Loop)			 	// same
 		__
 		if (i1-- > i2)
-			Code -= U2_Lu
+			Code -= Loop_Jumpu
 		___
 
 /**/ LUPU  (Loop)				// assume uint64
 		__
 		if (i1++ < i2)
-			Code -= U2_Lu
+			Code -= Loop_Jumpu
 		___
 
 
@@ -478,12 +476,13 @@ forms
 
 #!						(((((Float)))))
 
+/*
 /**/ FEXK  (FloatAddExp)
 		if FloatAddExp_Du
 			f1 = FloatSh2(u2, FloatAddExp_Sh2i) + FloatSh2(u3, FloatAddExp_Sh3i)
 		else
 			f1 = FloatSh1(u2, FloatAddExp_Sh2i) + FloatSh1(u3, FloatAddExp_Sh3i)
-		
+*/		
 
 /**/ FADD  (Float)
 		if (Float_Du)

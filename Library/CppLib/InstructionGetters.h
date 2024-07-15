@@ -113,17 +113,11 @@
 #define   JCmp_Jmpu_(x)   (((uint)((x)<<22))>>22)
 
 
-#define   Bra_c1i       ((( int)((Op)<<13))>>30)
-#define   Bra_c1i_(x)   ((( int)((x)<<13))>>30)
+#define   Bra_jmpi       ((( int)((Op)<<13))>>13)
+#define   Bra_jmpi_(x)   ((( int)((x)<<13))>>13)
 
-#define   Bra_c1u       (((uint)((Op)<<13))>>30)
-#define   Bra_c1u_(x)   (((uint)((x)<<13))>>30)
-
-#define   Bra_jmpi       ((( int)((Op)<<15))>>15)
-#define   Bra_jmpi_(x)   ((( int)((x)<<15))>>15)
-
-#define   Bra_jmpu       (((uint)((Op)<<15))>>15)
-#define   Bra_jmpu_(x)   (((uint)((x)<<15))>>15)
+#define   Bra_jmpu       (((uint)((Op)<<13))>>13)
+#define   Bra_jmpu_(x)   (((uint)((x)<<13))>>13)
 
 
 #define   Table_Modei       ((( int)((Op)<<13))>>30)
@@ -336,25 +330,6 @@
 
 #define   FloatConst_Highu       (((uint)((Op)<<18))>>18)
 #define   FloatConst_Highu_(x)   (((uint)((x)<<18))>>18)
-
-
-#define   FloatAddExp_Sh2i       ((( int)((Op)<<23))>>28)
-#define   FloatAddExp_Sh2i_(x)   ((( int)((x)<<23))>>28)
-
-#define   FloatAddExp_Sh2u       (((uint)((Op)<<23))>>28)
-#define   FloatAddExp_Sh2u_(x)   (((uint)((x)<<23))>>28)
-
-#define   FloatAddExp_Sh3i       ((( int)((Op)<<27))>>28)
-#define   FloatAddExp_Sh3i_(x)   ((( int)((x)<<27))>>28)
-
-#define   FloatAddExp_Sh3u       (((uint)((Op)<<27))>>28)
-#define   FloatAddExp_Sh3u_(x)   (((uint)((x)<<27))>>28)
-
-#define   FloatAddExp_Di       ((( int)((Op)<<31))>>31)
-#define   FloatAddExp_Di_(x)   ((( int)((x)<<31))>>31)
-
-#define   FloatAddExp_Du       (((uint)((Op)<<31))>>31)
-#define   FloatAddExp_Du_(x)   (((uint)((x)<<31))>>31)
 
 
 #define   ConstStretchy_Condi       ((( int)((Op)<<13))>>31)

@@ -41,7 +41,7 @@
 	if_rare (Rare(r, Op)) return n3;
 ı CONV: _
 	Conv(r, Convert_Modeu, Op);
-ı KSTR: _
+ı KNSR: _
 	RotateConst(r, Op);
 ı ADDK: _
 	i1 = i2 + U2_Li;
@@ -57,9 +57,19 @@
 ı DIVV: _
 	DivMath(r, Op);
 ı MAX: _
-	i1 = std_max(i2, i3);
+	if Cmp_Cmpu 
+	i1 = std_max(i2, i3)
+;
+	else 
+	u1 = std_max(u2, u3)
+;
 ı MIN: _
-	i1 = std_min(i2, i3);
+	if Cmp_Cmpu 
+	i1 = std_min(i2, i3)
+;
+	else 
+	u1 = std_min(u2, u3)
+;
 ı BRUS: _
 	i1 = (i2 >> (i3 + U3_Lu));
 ı BRUU: _
@@ -114,36 +124,34 @@
 	___;
 ı JMPE: 
 	__;
-	Code = CompEq(r, Op, Code);
+	Code = JompEq(r, Op, Code);
 	___;
 ı JMPN: 
 	__;
-	Code = CompNeq(r, Op, Code);
+	Code = JompNeq(r, Op, Code);
 	___;
 ı JBRA: 
-	__;
-	if (!i1) 
-	Code += Bra_jmpi
-;
-	___;
-	i1 += Bra_c1u - 1;
-ı JBRN: 
 	__;
 	if (i1) 
 	Code += Bra_jmpi
 ;
 	___;
-	i1 += Bra_c1u - 1;
+ı JBRN: 
+	__;
+	if (!i1) 
+	Code += Bra_jmpi
+;
+	___;
 ı LUPD: 
 	__;
 	if (i1-- > i2) 
-	Code -= U2_Lu
+	Code -= Loop_Jumpu
 ;
 	___;
 ı LUPU: 
 	__;
 	if (i1++ < i2) 
-	Code -= U2_Lu
+	Code -= Loop_Jumpu
 ;
 	___;
 ı RSET: _
@@ -208,13 +216,6 @@
 	//  copy/fill/endian/xor
 
 	MemStuff((u32 *) u1, (u32 *) u2, n3, L3);
-ı FEXK: _
-	if FloatAddExp_Du 
-	f1 = FloatSh2(u2, FloatAddExp_Sh2i) + FloatSh2(u3, FloatAddExp_Sh3i)
-;
-	else 
-	f1 = FloatSh1(u2, FloatAddExp_Sh2i) + FloatSh1(u3, FloatAddExp_Sh3i)
-;
 ı FADD: _
 	if (Float_Du) 
 	d1 = d2 + d3 - d4

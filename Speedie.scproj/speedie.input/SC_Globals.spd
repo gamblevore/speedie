@@ -94,7 +94,7 @@ function TypeOfARel (ExprResolver)
 		return TypeOfDotDotDot(exp, name_Space)
 	|| Brel = exp.niceparent == @arg
 		exp.func = @brel
-	return SCFunction.Tran_AfterRel(exp, name_space, side, false)// for now//!brel)
+	return SCFunction.Tran_AfterRel(exp, name_space, side)// for now//!brel)
 
 
 function TypeOfFunc (ExprResolver)
@@ -227,7 +227,7 @@ function TypeOfBRel (ExprResolver)
 		check (subtype.IsInteger) (exp, "Expected an integer.") 
 		Return subtype
 		
-	SCFunction.Tran_AfterRel( exp, name_space, side, false )
+	SCFunction.Tran_AfterRel( exp, name_space, side )
 	Return SubType
 
 
@@ -528,8 +528,6 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 		if C == "~"
 			return R.MakeDataObject(name_space, purpose)
 		if (C == "&")											// pointer
-//			if (purpose is FuncParam) and (depth == 1) and (r.PointerCount == 0) and r.IsBareStruct
-//				"No need to use & here, structs are always passed by pointer anyhow.   ${c.filepath}:${c.position.render}" // not so simple to get working
 			return r.GetAddress(purpose)
 		if (C == "?")
 			return R.MakeNewOptional

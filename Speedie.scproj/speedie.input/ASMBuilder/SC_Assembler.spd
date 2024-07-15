@@ -1,17 +1,18 @@
 
 
 module TextAssembler
-	|dictionary of uint|			LabelsToDo
+//	|dictionary of message|			LabelMessages
 		
 	
 	function TextFunc (|message| msg, |bool|) // assemble a function from text
 		|| fn = SCFunction.new
 		fn.source = msg
 		ASmState.Sh.startfunc(fn)
+//		.LabelMessages := dictionary()
 		|| arg = ASmState.Sh.TextFuncSub(msg)
 			compiler.exportnames[fn.exportname] = fn
 		ASmState.Sh.FinishASM
-		.LabelsToDo.dispose
+//		.LabelMessages.dispose
 
 
 	function TextData (|message| msg) // assemble a function from text
@@ -34,9 +35,9 @@ module SpdAssembler
 	function InitAss
 		instruction.InstructionInit
 		asmtmp.InitAccess
-		Instruction[asm.KSTR].Const
+		Instruction[asm.KNSR].Const
 		Instruction[asm.KNST].Const
-		asm.encoders[asm.knst] = fatasm.KNST_Encoder
+		asm.encoders[asm.KNST] = fatasm.KNST_Encoder
 		return 
 		TextAssembler.Requests		:= dictionary()
 		TextAssembler.RequestTable	:= array()

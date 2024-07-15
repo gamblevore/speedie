@@ -35,32 +35,11 @@ datatype µParam (uint16)
 		PositionBits
 		Output
 
-//	function Form2 (|byte|)
-//		return .bitsize ||| ((self is signed) << 7)
-//	function Max (|int|)
-//		|| oof = (self is signed)|int|
-//		return (1 << ((.bitsize|int|)-oof))|int|
-//
-//	function IsLast (|bool|)
-//		return self & 256
-//	function NoExpect (|bool|)
-//		return (self & 512)
-//	function Min (|int|)
-//		if (self is signed)
-//			return -.max
 	function BitSize (|int|)
 		return (self & 31) + 1
 	function IsReg (|bool|)
 		return self isnt Number
 
-
-//	function InRange (|int64| num, |message| src, |bool|)
-//		|int64| H = .Max
-//		|int64| L = .Min
-//		if (num > h)
-//		expect (num <  H)   (src, "Number too high.")
-//		expect (num >= L)   (src, "Number too low.")
-//		return true
 
 
 function message.Reg (|int|)

@@ -47,3 +47,5 @@ function scdecl.ASMReg (|asmreg|)
 		expect (b is datatype) ("Hello kitty")
 	
 	return t.typeinfo|asmreg|
+
+

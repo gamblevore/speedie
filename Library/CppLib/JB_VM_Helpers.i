@@ -337,14 +337,14 @@ AlwaysInline void BitClear (Register* r, ASM Op) {
 }
 
 
-AlwaysInline ASM* CompEq (Register* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* JompEq (Register* r, ASM Op, ASM* Code) {
 	if (u1 == u2)
 		return Code;
 	return Code + JCmpEq_Jmpi;
 }
 
 
-AlwaysInline ASM* CompNeq (Register* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* JompNeq (Register* r, ASM Op, ASM* Code) {
 	if (u1 != u2)
 		return Code;
 	return Code + JCmpEq_Jmpi;

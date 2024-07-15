@@ -1246,7 +1246,7 @@ function NeuSyx (CollectFunc)
 
 
 
-function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side, |bool| After,  |SCDecl|)
+function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side,  |SCDecl|)
 	|| exp = msg.first!
 	if msg == "!"
 		|| ty = TypeOfExpr( exp, name_space, side )				#require
@@ -1263,16 +1263,16 @@ function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side, |boo
 
 	|| Type = TypeOfExpr( exp, name_space )					#require
 	if type.PointerCount > 0
-		if after
-			problem msg
+//		if IsARel
+//			problem msg
 		check (!side) (msg, "Not assignable.")
 		return type.CheckMath(msg)
 
 
 	|| numc = Type.type.NumericCount
 	if !Type.type.IsObject  and  !type.hiderfunc  and  numc <= 1
-		if After
-			problem msg
+//		if IsARel
+//			problem msg
 		check (!side) (msg, "Not assignable.")
 		return type
 

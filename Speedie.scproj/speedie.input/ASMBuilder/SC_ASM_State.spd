@@ -322,7 +322,7 @@ function ASMState.FinishASM
 
 
 function ASMState.SetLength
-	.out.length = .curr - .out.IR
+	.out.length = .curr.Index
 
 
 function int64.CanInt32 (|bool|)

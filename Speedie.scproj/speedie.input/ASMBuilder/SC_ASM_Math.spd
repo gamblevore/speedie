@@ -56,11 +56,18 @@ extend ASMState
 				l = 0.asm
 			|&fatasm| fat
 			if l.reg
-				fat = exp.JMPE(r,l,r)
+				fat = exp.JMPE(r,l,0)
 			  else
-				fat = exp.jbra(r,1,0)
+				// how do I know which of these is the actual
+				// param that needs alteration? store in the fatasm?
+				// how? doesnt the const want to store the address
+				// of the instruction generated?
+				// it could even store the param that needs altering?
+				// or we could just pass a param... the address
+				// of the thingy.
+				fat = exp.jbra(r,0)
 			if negate
-				fat.op+=1<<24 // sigh
+				fat.op += 1<<24 // sigh
 			return fat * Dest
 
 		
@@ -71,7 +78,7 @@ extend ASMState
 			|| gl = l.GapBits
 			|| gr = r.GapBits
 			exp.BCLR(L, R, gl, gr, (l.signed|int|) + (r.signed|int|<<1))
-		|| fat2 = exp.JMPE(L, R, dest)
+		|| fat2 = exp.JMPE(L, R, 0)
 		fat2.op += Negate
 		return fat2 * Dest
 				
@@ -182,8 +189,8 @@ extend ASMState
 			require f4 > 0
 			ex = f4.exponent
 		
-		if ex.y == 1
-			return exp.FEXK(dest, L, asmreg(), ex.x, 0, l.IsBig|int|) * Dest
+		//if ex.y == 1
+			//return exp.FEXK(dest, L, asmreg(), ex.x, 0, l.IsBig|int|) * Dest
 
 
 	// from 1 to -1

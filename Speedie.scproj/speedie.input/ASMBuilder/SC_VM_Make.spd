@@ -364,7 +364,7 @@ function µparam.Which (|macro!--|)
 || arms    = "rz.reginput(_0) = _1".macro
 || skibidy = "if rz.dest(_0, _1): outputs++".macro
 || rizzler = "
-if (curr and curr < after) // remove the test for curr!=nil...
+if (curr < after) // remove the test for curr!=nil...
 	curr++[] = rz 
 return curr
 ".macro

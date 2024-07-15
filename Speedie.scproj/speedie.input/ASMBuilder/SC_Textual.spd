@@ -42,57 +42,65 @@ extend ASMState
 			return .SetConst(list, m)
 		
 		|| A = self <~ (op.opcode, m)
-		|| write = 0
+		m.RangeLength = a.Index // each message now knows its fat thingy.
+		|| pos = 0
 		for p in list
 			if p != @name
-				a.AddRegParam(p, write)
+				a.AddRegParam(p, pos)
 			  else
-				a.AddRegNum(p, write, .GetLabelJump(p))
-			expect (++write <= op.pcount) (list, "Too many params")
+				a.AddLabelRequest(p, pos)
+			expect (++pos <= op.pcount) (list, "Too many params")
 
-		return (op.pcount == write) #expect (list, "Too few params")
-
-	
-	function GetLabelJump (|message| P, |int|)
-		opt NoRefCounts
-		|| val = textassembler.LabelsToDo.valuelower(p.name)
-			return val[]
-		error (P, "Label not found")
+		return (op.pcount == pos) #expect (list, "Too few params")
 
 	
+	function fatasm.AddLabelRequest (|message| P, |int| Pos, |int|)
+		|| x = .info as asmreg.labelrequest
+		x.reg = pos
+		.info = x
+
+
 	function LoadLabelJumps (|bool|)
 		opt norefcounts
-		require textassembler.LabelsToDo
-		for A in .out
-			if a.label == 255
-				|| Found = .findlabel(a)
-				if !found
-					debugger, .findlabel(a), return false
-				A.r[0] = Found-A
+		if ASMState.sh.labelcount
+			for A in .out
+				if a is labelrequest
+					require .GetLabel(a)
 		return true
 	
 	
-	function FindLabel (|&FatASM| dbg, |&FatASM|)
+	function GetLabel (|&FatASM| Jumper, |bool|)
 		opt norefcounts
-		|| num = dbg.r[0]
-		for A in .out
-			if a.label == num
-				return a
-		error (dbg, "No label found")
+
+		|| list = jumper.msg.first
+		|| i = 0
+		|| found = false
+		for s in list
+			if s == @name
+				for A in .out
+					|| m = a.msg
+					if m.name ~= s.name
+						|| fat = m.rangelength|uint| #expect (m, "Label has no address")
+						jumper.r[i] = fat ||| asmreg.FatRef
+						found = true
+			i++
+		
+		
+		return found #expect (jumper, "No label found")
 	
 	
 	function AddLabel (|message| ch)
 		opt norefcounts
-		|| T = textassembler.LabelsToDo init dictionary()
-		.last.label = ++.labelcount			#expect (ch, "Too many labels")
-		expect (!T.valuelower(ch.name))		        (ch, "Label already used" )
-		#!debugger
-		T.valuelower(ch.name) = dataobject(.out.length)
+		|| l = .labelcount+1
+		expect l <= 254 (ch, "Too many labels")
+		.labelcount = l
+		ch.rangelength = .curr.index
 
 
 	function TextFuncSub (|message| m, |bool|)
 		opt NoRefCounts
 		.vdecls = 31 // no other choice. Register requester will fail... otherwise.
+					 // i forgot how this helps. I should link to the affected code?
 		for ch in .LoadTitle(m)
 			if ch == @name
 				.addlabel(ch)
