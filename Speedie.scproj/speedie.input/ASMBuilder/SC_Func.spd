@@ -34,7 +34,7 @@ class µFunc
 			|| fat = .ir+i
 			if fat is labelrequest
 				haslabel = true
-			fat.ASMIndex = i
+			fat.ASMIndex = rz - where
 			rz = fat.µrenderinto(rz, after)
 
 		if haslabel // i think we need something similar anyway... for jumps
