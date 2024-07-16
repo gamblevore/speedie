@@ -1,0 +1,73 @@
+
+
+
+So... I was thinking of some hypercard-like system that could be implemented in the future.
+
+(REVIEW... its a good idea but probably unbalanced towards tech and not towards art/games/fun/spirituality/magic... as I described at the end of the document. Could be very stressful to work on for that reason?)
+
+...
+
+Hypercard was quite liked by beginners and kids and people who didnt know how to code... it was a very friendly system. It was also really bad as a programming language... super-slow and didn't teach you anything about programming... and despite that people liked it...
+
+The problem always came because it limited you... so you had to give up eventually.
+
+Welll... what if we made something similar, but in speedie? Imagine a simple app that lets you draw out GUIs, just a few textfields or buttons... arrange them and use them. Its quite easy just to add a window that can let you move guicontrols around! I like the idea.
+
+We'd also keep the "memory storage" feature of hypercard... that was really nice. So you don't need to load or save documents. In fact documents WOULD be loaded and saved for you, just in a separate file within the project.
+
+One question is... the guicreator. Isnt that useful for more normal (non hypercard) apps? I think so. I wonder if that could be segmented off into its own thing or made part of perry? who knows. It still seems useful. Perhaps it would have two build modes... like a standalone build mode.
+
+So... people like receiving single files... like a stack, so we'd need some way to run these "Stacks" with various files inside of them as one file. Like an archive. So speedie/perry/hyper-whatever all would need to read these archives.
+
+We'd want to modify the hypercard metaphor a bit. Probably not like card/background... and then you can put buttons on the card or background. Maybe a tree-system... like cards that can subclass other cards. But don't have to, so we could JUST have the background... Instead of cards we'd have "records"... so each record describes all the stuff in the card. Like the textfield states I guess. We'd have listviews too obviously. All stored in jeebox. In fact we could make jeebox editors... anyhow!
+
+The records would be stored in some jeebox datafile... like my songlibrary.box file. But also you'd have the ability to save/load records or groups of records separately yourself! Or send them across the internet, whatever.
+
+Ideally we can style it nicely... so it looks like a roblox game user-interface. Not some crappy thing.
+
+ALSO! finally... perhaps the most important thing. Is we'd add hyperlinks. So you can jump around inside of your "Card" system... to cards in your "stack" or other "Stacks" on your computer... or even stacks on other computers. now thats where it gets interesting.
+
+We could start to replace the WWW or other online systems. We'd do all our communication with jeebox and message-passing. Having a simple message-passing interface means the same comms system can let cards on your own computer talk to each other very simply.
+
+So people can make "web pages" which are basically just programs... (They already are! so much javascript floating around just about every webpage.)
+
+Being like my "hypercard"-like system... this could make it a lot more fun to share documents! You can put pictures or arrange text around... put buttons to move to other cards... it could be quite nice! Show people your work or whatever. and because its all in speedie, you can animate stuff or add effects very easily.
+
+Now... heres the tricky part. How do they interact?
+
+We'd need some kind of "Browser-like" system. With URLS. We have programs that send programs. The (Server program) sends you a document, which is jsut another program. a "stack" sure but its another program. In fact it should be able to just send you a normal simple program too... like jz.spd
+
+What would that look like if you viewed jz.spd online? Not sure? It wants to get filepaths... Is that a security violation? How do we sandbox everything?
+
+Sandboxing will become super-important.
+
+Each stack needs its own process... and have no file/net access. It can just request files, but get blocked too. Net access could be allowed back to its own server only, but even then... its risky. They could ask for your password, for example. so that might be disabled.
+
+Also... we need to draw these processes onscreen within the browser. We don't want separate apps floating around. (Or do we???) Maybe we do? Perhaps the browser interface is overdue for a removal? Either way the browser should know about them... adn be able to close them.
+
+Clicking hyperlinks within the same stack should be very fast, unlike within the web which needs to reload all the gui and javascript... flashing a crappy white background at your eyes. We could even add some nice transitions like hypercard did!
+
+If we shared the browsers interface, that does add more complexity. It needs to now use shared memory and read the subprocess's graphics, then activate them with SDL textures.
+
+I guess also the stacks running on your computer COULD talk to each other with message-passing, but again thats... risky. but we might want it, who knows. Assuming they are both sandboxes and have no network access, its ok??
+
+Also stacks can write local files into a "localstorage" and read those same files back, just fine. I guess they should exist somewhere the user can find easily in case of stupid apps dumping stuff on your stupid PC. or at least the "Browser" should display stupid apps that bloat you with crap.
+
+at this point, whts the different between a browser and an OS at this point? Should the interface be tweaked to not really be like a browser?
+
+or perhaps have two modes... a "Document browser" mode and a separate app mode?
+
+
+...
+
+
+So... heres why i dont like the idea. Its just replacing what we have now. where the concept of FUN in this. or art? its tooo much code.
+
+Or spirituality or magic....!!! which we need.
+
+Wheres a mention of the temporal-system? Or maybe making a stable gameworld with its own wierd funny rules?
+
+It might just be unbalanced, and we do want to make things more balanced. Thats why it feels so stressful. I think I should put all this aside for now.
+
+I just wanted to write this down to get it out of my head.
+
