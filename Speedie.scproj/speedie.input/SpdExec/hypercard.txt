@@ -71,3 +71,12 @@ It might just be unbalanced, and we do want to make things more balanced. Thats 
 
 I just wanted to write this down to get it out of my head.
 
+...
+
+thinking about it more... it might be just a waste of time... the world already has a system. hypercard was a "nice start" to get into... but guess what. it also lead down the wrong direction. Perhaps we can start a new direction?
+
+WorldBuilder was another cool app. looked really nice. easy to draw with. Perhaps thats a better thing? It had rooms... which are like cards...
+
+The whole idea of going down this "mass document system" feels really draining... if we want to make the world feel more magical.
+
+Maybe just like an art-gallery system?
