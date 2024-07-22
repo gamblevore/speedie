@@ -230,19 +230,16 @@ extend ASMState
 		//		1 - a,		1 + a		//
 		if  (l is ConstAny) and (r isnt constany)
 			if l isnt alternate
-				target debug
-					if !l.µtype.IsPointer // WHAAAAAT
-				
 				swap (l) (r) // a-b != b-a
-				
-			// ptr - 1  !=  1-ptr
-			// a-b
+			  else
+				target debug
+					if r.µtype.IsPointer // 1 - ptr??? we blocked this already.
 
 		if r is ConstAny
 			|| RR = .GetConst(R)[]
 			|| subtract = l is alternate
 				RR = -RR
-			if l isnt ConstAny
+			if l.µtype.ispointer
 				rr *= l.PointerMul
 			if r.CanAddK(RR)								// a - 1,  a + 1
 				|| fat2 = exp.ADDK(dest, L, RR)
