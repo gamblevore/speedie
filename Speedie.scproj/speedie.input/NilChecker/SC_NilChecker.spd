@@ -502,7 +502,7 @@ function Argument (Niltrackerfn)
 	opt norefcounts
 	|| v = .value.depthofvars + 1
 	for s.fast in msg
-		|| t = test&-s.islast
+		|| t = test & -s.islast
 		if (rz is borked) and !stderr.ok
 			exit // needs a clean space for borking
 		|| prev = rz

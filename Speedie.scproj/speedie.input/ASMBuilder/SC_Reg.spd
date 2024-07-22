@@ -142,9 +142,6 @@ datatype AsmReg (uint64)
 		return self
 		
 	function HaveAddr (|asmreg|)
-		|&int| x
-		|| y = 1-x
-		|| z = -x
 		rz = self asnt AsmReg.AddrRequest
 		rz = rz as AsmReg.CorrectAddr
 		

@@ -211,6 +211,7 @@ function TypeOfBRel (ExprResolver)
 		return SubType.Dereference(exp, name_space, false)
 	
 	if n == '-' and name == 1 // minus
+		expect (subtype.isnormalnumber or subtype.isbool) (exp, "Expected a number.") 
 		Return subtype
 		
 	if n == '&'
