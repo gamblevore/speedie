@@ -229,11 +229,11 @@ extend ASMState
 		//		a - 1,		a + 1		//
 		//		1 - a,		1 + a		//
 		if  (l is ConstAny) and (r isnt constany)
-			if l isnt alternate
-				swap (l) (r) // a-b != b-a
-			  else
+			if l is alternate
 				target debug
 					if r.µtype.IsPointer // 1 - ptr??? we blocked this already.
+			  else
+				swap (l) (r)
 
 		if r is ConstAny
 			|| RR = .GetConst(R)[]

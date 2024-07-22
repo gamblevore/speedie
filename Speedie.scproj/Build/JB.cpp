@@ -1959,7 +1959,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112831261577541));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112831287459840));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -12109,7 +12109,7 @@ SCObject* SC_TypeOfBRel(Message* Exp, SCNode* Name_space, Message* Side) {
 		return SC_Decl_DeReference(SubType, Exp, Name_space, false);
 	}
 	if ((N == '-') and (JB_Str_EqualsInt(Name, 1, false))) {
-		if (!(SC_Decl_IsNormalNumber(SubType) or SC_Decl_IsBool(SubType))) {
+		if (!(SC_Decl_IsNearlyNormalNumber(SubType) or SC_Decl_IsBool(SubType))) {
 			JB_Msg_SyntaxExpect(Exp, JB_LUB[2100]);
 			return nil;
 		}
@@ -21448,10 +21448,10 @@ AsmReg SC_Pac_PlusFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message
 
 AsmReg SC_Pac_PlusInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp) {
 	if ((SC_Reg_SyntaxIs(L, kSC__Reg_ConstAny)) and ((!SC_Reg_SyntaxIs(R, kSC__Reg_ConstAny)))) {
-		if (!SC_Reg_SyntaxIs(L, kSC__Reg_Alternate)) {
-			JB_Swap((L), (R));
+		if (SC_Reg_SyntaxIs(L, kSC__Reg_Alternate)) {
 		}
 		 else {
+			JB_Swap((L), (R));
 		}
 	}
 	if (SC_Reg_SyntaxIs(R, kSC__Reg_ConstAny)) {
@@ -40051,6 +40051,13 @@ bool SC_Decl_IsMostlyNormal(SCDecl* Self) {
 	return false;
 }
 
+bool SC_Decl_IsNearlyNormalNumber(SCDecl* Self) {
+	if (!(((!SC_Decl_IsCArray(Self))) and ((!Self->PointerCount)))) {
+		return nil;
+	}
+	return SC_Class_NumericCount(Self->Type) > 0;
+}
+
 bool SC_Decl_IsNil(SCDecl* Self) {
 	return Self == SC_TypeNil;
 }
@@ -53024,4 +53031,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -4814852088182919848 6168894514502167585
+// -2914168496740664578 6168894514502167585

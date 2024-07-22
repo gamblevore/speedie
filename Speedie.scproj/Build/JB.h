@@ -8853,6 +8853,8 @@ bool SC_Decl_IsLib(SCDecl* Self);
 
 bool SC_Decl_IsMostlyNormal(SCDecl* Self);
 
+bool SC_Decl_IsNearlyNormalNumber(SCDecl* Self);
+
 bool SC_Decl_IsNil(SCDecl* Self);
 
 bool SC_Decl_IsNormal(SCDecl* Self);
