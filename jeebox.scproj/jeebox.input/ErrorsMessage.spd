@@ -41,10 +41,13 @@ function Message.OriginalParseData (|string|)
 
 
 extend_module Error
-	function CantParseNum (|Message| Where, |string| num, |int| Pos)
+	function CantParseNum (|Message| Where, |string| num, |int| Pos, |bool| Overflow)
 		visible // for lib
-		|| str = "Can’t parse number '${num.preview}' (found '${num[pos]}')."
+		|| str = "Numeric overflow parsing number" 
+		if !Overflow
+			Str = "Can’t parse number. Found: " + num[pos].render
 		stderr <~ error(where, str)
+
 
 	function From (|message?| self, |error|)
 		opt norefcounts
