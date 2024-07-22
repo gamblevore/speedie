@@ -2980,8 +2980,6 @@ void JB_Constants__InitConstants();
 
 JB_String* JB_Constants__TestJB();
 
-bool JB_Constants__TestCasting();
-
 
 
 // LinkMap
@@ -4398,8 +4396,6 @@ ASM SC_ASM_Convert_ModeSet(ASM Self, uint Value);
 
 void SC_ASM_DebugPrint(ASM Self);
 
-int SC_ASM_DecodeBaseOp(ASM Self);
-
 int SC_ASM_DecodeOp(ASM Self);
 
 ASM SC_ASM_Div_KindSet(ASM Self, uint Value);
@@ -4958,8 +4954,6 @@ Message* JB_Syx_Msg(Syntax Self, JB_String* Name);
 Message* JB_Syx_IntMsg(Syntax Self, int64 Name);
 
 JB_String* JB_Syx_Name(Syntax Self);
-
-bool JB_Syx_NoChildren(Syntax Self);
 
 SyntaxObj* JB_Syx_Obj(Syntax Self);
 
@@ -8733,8 +8727,6 @@ SCDecl* SC_Decl_AsLocal(SCDecl* Self);
 
 AsmReg SC_Decl_ASMReg(SCDecl* Self);
 
-void SC_Decl_ASMSanity(SCDecl* Self);
-
 bool SC_Decl_AssignabilityCheck(SCDecl* Self, Message* Ln, Message* RN, SCDecl* Rc);
 
 JB_String* SC_Decl_AutoCompleteName(SCDecl* Self);
@@ -10141,6 +10133,8 @@ inline uint SC_FatASM_Index(FatASM* Self);
 
 inline AsmReg SC_FatASM_Info(FatASM* Self);
 
+inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After);
+
 inline JB_String* SC_Named_Name(SCNamed* Self);
 
 inline bool SC_OpMode_SyntaxCast(OpMode Self);
@@ -10189,6 +10183,8 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, NilState New);
 
 inline void SC_nil__DeclKill();
 
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
+
 inline NilRecord SC_nil__Value();
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
@@ -10199,7 +10195,7 @@ inline FatASM* SC_FatASM_Next(FatASM* Self);
 
 inline FatASM* SC_FatASM_Prev(FatASM* Self);
 
-inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After);
+inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest);
 
 inline bool SC_Reg_SyntaxCast(AsmReg Self);
 
@@ -10207,13 +10203,9 @@ inline int SC_Reg_ToInt(AsmReg Self);
 
 inline NilRecord SC_nil__EndBlock();
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
-
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
 inline void SC_Reg_Expect(AsmReg Self, Message* Where);
-
-inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest);
 
 inline uint64* SC_Pac_GetConst(ASMState* Self, int K);
 
@@ -10303,6 +10295,12 @@ inline uint SC_FatASM_Index(FatASM* Self) {
 
 inline AsmReg SC_FatASM_Info(FatASM* Self) {
 	return SC_FatASM_Info(Self);
+}
+
+inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After) {
+	ASM* Rz = nil;
+	Rz = (SC__ASM_Encoders[Self->Op])(Self, Where, After, 0);
+	return Rz;
 }
 
 inline JB_String* SC_Named_Name(SCNamed* Self) {
@@ -10413,6 +10411,16 @@ inline void SC_nil__DeclKill() {
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 }
 
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
+	ASMtmp T = SC_Msg_ASMType(Msg);
+	if (T) {
+		return (SC__nil_NilTable[T])(Msg, Test);
+	}
+	T = ((ASMtmp)Msg->Func);
+	(SC_Msg_ASMTypeSet(Msg, T));
+	return (SC__nil_NilTable[T])(Msg, Test);
+}
+
 inline NilRecord SC_nil__Value() {
 	return SC_nil_Value((&SC__nil_T));
 }
@@ -10433,13 +10441,14 @@ inline FatASM* SC_FatASM_Prev(FatASM* Self) {
 	return SC_FatASM_Step(Self, -1);
 }
 
-inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After) {
-	ASM* Rz = nil;
-	Rz = (SC__ASM_Encoders[Self->Op])(Self, Where, After, 0);
-	if (SC_ASM_DecodeBaseOp(Where[0]) != Self->Op) {
-		JB_PrintLine(JB_LUB[2101]);
-		debugger;
-		Rz = (SC__ASM_Encoders[Self->Op])(Self, Where, After, 0);
+inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
+	AsmReg Rz = ((AsmReg)0);
+	ASMtmp T = SC_Msg_ASMType(Exp);
+	fn_asm Fn = SC_fn_asm_table[T];
+	byte TmpCloser = Self->VTmps;
+	Rz = (Fn)(Self, Exp, Dest, 0);
+	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen)) {
+		SC_Pac_CloseVTmps(Self, TmpCloser);
 	}
 	return Rz;
 }
@@ -10457,16 +10466,6 @@ inline NilRecord SC_nil__EndBlock() {
 	Rz = SC_nil__Value();
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 	return Rz;
-}
-
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
-	ASMtmp T = SC_Msg_ASMType(Msg);
-	if (T) {
-		return (SC__nil_NilTable[T])(Msg, Test);
-	}
-	T = ((ASMtmp)Msg->Func);
-	(SC_Msg_ASMTypeSet(Msg, T));
-	return (SC__nil_NilTable[T])(Msg, Test);
 }
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
@@ -10488,36 +10487,6 @@ inline void SC_Reg_Expect(AsmReg Self, Message* Where) {
 	}
 }
 
-inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
-	AsmReg Rz = ((AsmReg)0);
-	ASMtmp T = SC_Msg_ASMType(Exp);
-	fn_asm Fn = SC_fn_asm_table[T];
-	if (!T) {
-		Fn = SC_fn_asm_table[((int)Exp->Func)];
-		debugger;
-	}
-	byte TmpCloser = Self->VTmps;
-	Rz = (Fn)(Self, Exp, Dest, 0);
-	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen)) {
-		SC_Pac_CloseVTmps(Self, TmpCloser);
-	}
-	if (!SC_Reg_FatIndex(Rz)) {
-		if (((!SC_Reg_SyntaxIs(Rz, kSC__Reg_ConstAny))) or ((bool)SC_Reg_Const(Rz))) {
-			if (true) {
-				SC_Pac_SyntaxExpect(Self, nil, JB_LUB[2103]);
-			}
-			Rz = (Fn)(Self, Exp, Dest, 0);
-		}
-	}
-	 else if ((!JB_TC_IsNumeric(SC_Reg_xC2xB5Type(Rz))) and JB_TC_SyntaxIs(SC_Reg_xC2xB5Type(Rz), kJB__TC_bool)) {
-		if (true) {
-			SC_Pac_SyntaxExpect(Self, nil, JB_LUB[2104]);
-		}
-		Rz = (Fn)(Self, Exp, Dest, 0);
-	}
-	return Rz;
-}
-
 inline uint64* SC_Pac_GetConst(ASMState* Self, int K) {
 	FatASM* R = SC_Pac_RegPlace(Self, K)->Creator;
 	if (R) {
@@ -10525,7 +10494,6 @@ inline uint64* SC_Pac_GetConst(ASMState* Self, int K) {
 			return (&R->Const);
 		}
 	}
-	debugger;
 	return (&Self->Zero.Const);
 }
 
