@@ -70,14 +70,18 @@
 	else 
 	u1 = std_min(u2, u3)
 ;
+ı PADD: _
+	i1 = i2 + (i3 << Shift_Shu);
+ı PSUB: _
+	i1 = (i2 - i3) >> Shift_Shu;
 ı BRUS: _
-	i1 = (i2 >> (i3 + U3_Lu));
+	i1 = (((i2 << Shift_Shu) >> Shift_Shu) >> i3);
 ı BRUU: _
-	u1 = (u2 >> (u3 + U3_Lu));
+	u1 = (u2 >> (u3 + Shift_Shu));
 ı BLUE: _
-	u1 = (u2 << (u3 + U3_Lu));
+	u1 = (u2 << (u3 + Shift_Shu));
 ı BAND: _
-	u1 = u2 & (u3 | L3);
+	u1 = u2 & (u3 | Shift_Shu);
 ı BOAR: _
 	u1 = (u2 | u3) & ~u4;
 ı BXOR: _

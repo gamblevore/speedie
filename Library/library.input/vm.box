@@ -293,18 +293,22 @@ forms
 			i1 = std_min(i2, i3)
 		else
 			u1 = std_min(u2, u3)
+/**/ PADD (Shift)	// ptr1 = ptr2 + int3
+		i1 = i2 + (i3<<Shift_Shu)
+/**/ PSUB (Shift)	// int1 = ptr2 - ptr3
+		i1 = (i2 - i3)>>Shift_Shu
 
 
 
 #!						 (((((Bitops)))))
-/**/ BRUS  (Shift)
-		i1 = (i2 >> (i3+U3_Lu))
+/**/ BRUS  (Shift) // technically we could only use 6 bits for the shift, and keep the last 3 for adding
+		i1 = (((i2<<Shift_Shu)>>Shift_Shu) >> i3) // its too fiddly though.
 /**/ BRUU  (Shift)
-		u1 = (u2 >> (u3+U3_Lu))
+		u1 = (u2 >> (u3+Shift_Shu))
 /**/ BLUE  (Shift) 
-		u1 = (u2 << (u3+U3_Lu))
+		u1 = (u2 << (u3+Shift_Shu))
 /**/ BAND  (Shift)
-		u1 = u2 &  (u3|||L3)
+		u1 = u2 &  (u3|||Shift_Shu)
 /**/ BOAR  (U4) // maybe << k is better? idk that bfls is very useful...
 		u1  = (u2|||u3)&~u4
 /**/ BXOR  (U3)
