@@ -20,6 +20,7 @@ datatype OpMode (int)
 		More  			// >				// if unsigned > 0
 		Less  			// <				// if 0 < unsigned
 		NilTest			// not the same as EqualOrNot... because those include customops
+		Subtraction = (makessigned + Addition)
 		SameOrLessBits = [NoExtraBits, LoseBits]
 		Shift = ShiftOnly + NoExtraBits
 		AndOr = [OR, AND]
@@ -124,10 +125,10 @@ module {
 	|Dictionary of SCOperator|			Dict = dictionary()
 	|int|								CustomOperatorScore
 	|scoperator|						Assigns
-	|scoperator| 						Minus		= SCOperator.new(&asmstate.subtract)
-	|scoperator| 						Bnot		= SCOperator.new(&asmstate.BitNot)
+	|scoperator| 						Negative= SCOperator.new(&asmstate.minus, opmode.Subtraction)	// -b... not a-b!
+	|scoperator| 						Subtract														// a-b!!
+	|scoperator| 						Bnot	= SCOperator.new(&asmstate.BitNot, opmode.Bit)
 	|scoperator|						LeftShift
-//	|scoperator| 						TypeCast	= SCOperator.new(&asmstate.TypeCast)
 	
 	function Lookup ( |Message| opch, |SCOperator| )
 		opt norefcounts
@@ -156,6 +157,9 @@ module {
 
 	function Init 
 		opt norefcounts
+		Negative.name = "-"
+		Bnot.name = "~"
+
 		.AddComp("==",					&asmstate.Equals,	OpMode.ExactEquals)
 		.AddComp( "<",					&asmstate.Less,		opmode.Comparison + opmode.less)
 		.AddComp( ">",					&asmstate.More,		opmode.Comparison + opmode.more)
@@ -170,20 +174,17 @@ module {
 
 		.AddMath( "mod",	"mod",		&asmstate.Mod,		/*.Mod*/	opmode.NeedsCppFuncOnFloats)
 		.AddMath( "+",		"Plus",		&asmstate.Plus,		/*.Add*/	opmode.Addition)
-		.AddMath( "-",		"Minus",	&asmstate.Subtract,	/*.sub*/	opmode.makessigned + opmode.Addition)
+		.AddMath( "-",		"Minus",	&asmstate.Subtract,	/*.sub*/	opmode.subtraction)
 		.AddMath( "*",		"Mul",		&asmstate.Mul,		/*.mul*/)
 		.AddMath( "/",		"Divide",	&asmstate.Div,		/*.div*/)
 
-//		.AddBit( "",	"RotateLeft",	&asmstate.ROL,		asmmath.ROL,	opmode.shift)
-//		.AddBit( "",	"RotateRight",	&asmstate.ROR,		asmmath.ROR,	opmode.shift)
 		.addbit( ">>",	"ShiftRight",	&asmstate.SHR,		/*.shru*/	opmode.shift)
 		LeftShift = .addbit( "<<",	"ShiftLeft",	&asmstate.SHL,		/*.shl*/	opmode.shiftonly) // can add bits
 		.AddBit( "(|)",	"BitOr",		&asmstate.BitOr,	/*.bor*/)
 		.AddBit( "&",	"BitAnd",		&asmstate.BitAnd,	/*.ban*/	opmode.SameOrLessBits)
 		.AddBit( "^",	"Xor",			&asmstate.bitxor,	/*.xor*/	opmode.noextrabits)
 
-		Minus.name = "-"
-		Bnot.name = "~"
+		Subtract = dict["-"]
 
 		|| BitOr = dict[ "(|)" ]
 		dict["|"]         = bitor // for: a |= b
@@ -219,10 +220,9 @@ module {
 		.assigns = SCOperator.new("=", &asmstate.Assign, OpMode.assigns)
 
 		
-	function AddMath (|string| s,  |string| FuncName, |fn_opasm| ASM, /*|asmmath| Code,*/ |OpMode| Mode=0)
+	function AddMath (|string| s,  |string| FuncName, |fn_opasm| ASM, |OpMode| Mode=0)
 		|| opp = SCOperator.new(s, asm, mode ||| opmode.math)
 		opp.SetFuncName = funcname
-//		opp.Code = code
 	
 
 	function AddCustom (|string| s, |SCOperator|)

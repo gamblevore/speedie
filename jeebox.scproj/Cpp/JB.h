@@ -2738,7 +2738,7 @@ void JB_Err_SyntaxIsSet(JB_Error* Self, ErrorFlags F, bool Value);
 
 void JB_Err_UpgradeWithNode(JB_Error* Self);
 
-void JB_Err__CantParseNum(Message* Where, JB_String* Num, int Pos);
+void JB_Err__CantParseNum(Message* Where, JB_String* Num, int Pos, bool Overflow);
 
 int JB_Err__Init_();
 

@@ -107,7 +107,7 @@ struct FatASM
 			(.info asnt= flags)
 	
 	function BitCorrect (|&FATASM|)
-		.info = .info <~ AsmReg.BitCorrect
+		.info = .info as AsmReg.BitCorrect
 		return self
 	
 		

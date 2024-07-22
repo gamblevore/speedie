@@ -228,20 +228,19 @@ extend ASMState
 	function PlusInt     (fn_opasm)
 		//		a - 1,		a + 1		//
 		//		1 - a,		1 + a		//
-		if (l is ConstAny) and (r isnt constany)
-			swap (l) (r)
+		if  (l is ConstAny) and (r isnt constany)
+			if l isnt alternate
+				swap (l) (r) // a-b != b-a
+				
+			// ptr - 1  !=  1-ptr
+			// a-b
 
 		if r is ConstAny
 			|| RR = .GetConst(R)[]
 			|| subtract = l is alternate
 				RR = -RR
 			if l isnt ConstAny
-			// so how does l know how big it is? do we have an exp?
-			// we come to here via many routes
-			// in fact we even have a swap above.
-			// we normally get the type from the exp... which... we don't have anymore!
-			// we do need the msg for both sides... right?
-//				rr = l.PointerMul(rr)
+				rr *= l.PointerMul
 			if r.CanAddK(RR)								// a - 1,  a + 1
 				|| fat2 = exp.ADDK(dest, L, RR)
 				if dest is ConstAny
@@ -314,8 +313,13 @@ extend ASMState
 		return .PlusFloat(dest, l, r, exp)
 
 
-	function Subtract  (fn_opasm)
+	function Subtract  (fn_opasm)	// x = a - b
 		(l is alternate) // the logic ismostly shared...
+		return .plus(dest, l, r, exp)
+
+
+	function Minus  (fn_opasm)		// x = -b
+		(l is alternate)
 		return .plus(dest, l, r, exp)
 
 

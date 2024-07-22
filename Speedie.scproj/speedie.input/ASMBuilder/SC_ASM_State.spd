@@ -31,8 +31,16 @@ struct ASMState
 
 	
 	function CloseVDecls (|int| i)
-		while .VDecls > i
-			.CloseReg .vdecls--
+		|| v = .VDecls
+		while v > i
+			.CloseReg(v--)
+		.VDecls = v
+
+	function CloseVTmps (|int| i)
+		|| v = .VTmps
+		while v < i
+			.CloseReg(v++)
+		.VTmps = v
 	
 	function CloseReg (|int| i)
 		|| r = &.Registers[i]
@@ -123,19 +131,20 @@ struct ASMState
 		.OK = false
 		return .start
 	
+	
 	syntax expect (|message?| where=nil, |string| msg)
 		|| f = .fn.asm
 			f.length = .curr - .funcstart
 			printline f.render
 		debugger
 		error (where, msg)
-		
+	
+	
 	function DeclareMe (|Message| where,  |scdecl| Type,  |asmreg|)
 		|| d = .VDecls|int| + 1
-		if (d + .vtmps <= 31)
+		if (d < .vtmps)
 			|| t = Type.ASMReg
 			t.reg = d
-			// target debug: dest.ASMSanity		// probably set to datatypecode.UnusedType (112) by default
 			Type.DType = t|datatypecode|   		// right?
 			.vdecls = d
 			.Registers[d].Type = Type
@@ -146,34 +155,36 @@ struct ASMState
 	
 	function TempMe (|Message| where, |asmreg| T=asmreg.Temp,  |asmreg|) // .needreg
 		|| r = t.reg
-		if !r
-			r = 31 - .vtmps
+		if r
+			if .Registers[r].Type != where.ASMDecl // hmmmm.... well now what?
+		  else
+			r = .vtmps - 1
 			check (r > .vdecls) (where, "No free local variables.")
 			t.reg = r
-			.vtmps = 32 - r
-		.Registers[r].Type = where.ASMDecl
+			.vtmps = r
+			.Registers[r].Type = where.ASMDecl
 		return t
 
 	
-	function FoundCode (|int| i, |int64| code, |scdecl| d, |asmreg|)
+	function FoundCode (|int| i, |scdecl| d, |asmreg|)
 		|| place = .regplace(i)
 		|| fat = place.Creator
-		if fat and fat.const == code
+		if fat and fat.const == d.exportposition
 			|| dest = d.asmreg
 			dest.reg = i
-			(Dest is constany)
+			(Dest is ConstAny)
 			return dest
 
+
+	function RegMap (|int|)
+		|| dcls = (1<<.VDecls+1)-1
+		|| tmps = ~(1<<.vtmps)
+		return dcls ||| tmps
+	
+	
 	function FindConst (|scdecl| d, |asmreg|)
-		|uint64| Code = d.exportposition			
-		for i in .vdecls+1
-			|| f = .FoundCode(i,Code, d)
-			if f != nil
-				return f
-				
-		for i in .vtmps+0
-			|| f = .FoundCode(31-i,Code, d)
-			if f != nil
+		for (b.bits in .regmap) (i)
+			|| f = .FoundCode(i, d)
 				return f
 
 
@@ -201,10 +212,10 @@ struct ASMState
 				fn = fn_asm_table[exp.func|int|]!
 				debugger
 
-		|| OV = .VTmps
+		|| TmpCloser = .VTmps
 		rz = (fn)(self, exp, dest)
 		if dest isnt StayOpen
-			.VTmps = (ov)
+			.CloseVTmps(TmpCloser)
 		
 		target debug
 			if !rz.fatindex
@@ -254,7 +265,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 	|int| Reg2
 	|int| Reg3
 	|| sh = 0
-	|| OV = .VTmps
+	|| TmpCloser = .VTmps
 
 	for p.fast in prms
 		|| v = .prm(p).reg
@@ -263,7 +274,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 		  else
 			reg3 |= (v << (sh-30))
 		sh += 5
-	.VTmps = (OV)
+	.closeVTmps(TmpCloser)
 	
 
 	|| SaveAmount = .vdecls * (dest isnt forreturn)
@@ -320,7 +331,7 @@ function ASMState.StartFunc (|scfunction| fn)
 	.ReturnASM = fn.ReturnType.regtype
 	.OK = true
 	.VDecls = 0
-	.VTmps = 0
+	.VTmps = 31
 	.AddFuncParams(fn)
 
 

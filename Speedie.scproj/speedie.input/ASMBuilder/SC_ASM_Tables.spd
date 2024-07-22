@@ -300,10 +300,10 @@ function SetReg (|&ASMState| self=asmstate.sh, |message| exp, |AsmReg| Dest, |As
 
 function Arg   (fn_asm)
 	opt norefcounts
-	|| decls = .VDecls
+	|| DclCloser = .VDecls // dcl ooffer
 	for ch.fast in exp
 		.µ(ch, asmreg.Arg)
-	.VDecls = decls
+	.CloseVDecls(dclCloser)
 
 
 function Access		(fn_asm)						// a[b], struct.mem[b], func()[func2()]
@@ -453,16 +453,16 @@ function Not		(fn_asm)
 	return .Equals(dest, asmreg(), src, exp)
 	
 
-function Minus			(fn_asm)					// -a
+function Negative			(fn_asm)					// -a
 	opt	NoRefCounts
-	return ASMTmp.DoSingleMath(self, exp, dest, scoperator.minus.asm!)
+	return ASMTmp.DoSingleMath(self, exp, dest, scoperator.Negative!.asm!)
 
 
 function SlowCountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |asmreg|)
 //	    *a, x = *(a.b) 
 	opt	NoRefCounts
 	// need to read... also save old value
-	|| x = .VTmps
+	|| TmpCloser = .VTmps
 	Dest.Read(F, dest, addr)
 
 	// we have read... now we need to add		
@@ -472,8 +472,8 @@ function SlowCountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mo
 	// now we have the new value... lets write it back again
 	|| fat = dest.write(f, newvalue, addr)
 
-	// we wrote back the old value... the new value should exist!
-	.VTmps = x
+	// the new value should exist! now lets close
+	.CloseVTmps(TmpCloser)
 	return fat * Dest
 
 
@@ -508,16 +508,15 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 	opt	NoRefCounts
 	|| f = exp.first!
 	|| Src = .µ(f, dest.RequestPos)
-	|| sr = src
-	|| Amount = IncrAmount(sr, mode, f.ASMDecl)
+	|| Amount = IncrAmount(src, mode, f.ASMDecl)
 	if src is ContainsAddr
 		return CountOnAddr(self, f, dest, mode, src, amount)
 	
-	check (sr isnt temp) (exp, "Can't increment temporary value.")
+	check (src isnt temp) (exp, "Can't increment temporary value.")
 	ifn mode & IncrAfter
-		return .AddConstant(exp, sr, sr, Amount)							// ++x,	 y = ++x
+		return .AddConstant(exp, src, src, Amount)							// ++x,	 y = ++x
 
-	return .AddConstantAndReturnOld(f, dest, sr, amount)					// x++,	 y = x++
+	return .AddConstantAndReturnOld(f, dest, src, amount)					// x++,	 y = x++
 
 
 
@@ -542,16 +541,16 @@ function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 		return Not(self, F, dest)
 
 	if exp.name == 1								// -a
-		return Minus(Self, f, dest)
+		return Negative(Self, f, dest)
 	
-	|| PlusPlus = n == '+'
-	return Incrementatulatorifier(self, F, dest, PlusPlus|int|)
+	|| IsPlusPlus = n == '+'						// ++a, --a
+	return Incrementatulatorifier(self, F, dest, IsPlusPlus|int|)
 
 
 
 function DoSingleMath (|&ASMState| self, |message| exp, |AsmReg| Dest, |fn_opasm| fn, |asmreg|)
 	|| Src = .µ(exp, dest)
-	src = src <~ asmreg.SingleExpr
+	src = src as asmreg.SingleExpr
 	return DoMathSub(self, exp, dest, src, fn)
 
 
@@ -573,12 +572,12 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr
 	
 	|| ml = AsmReg()
 	if mr isnt SingleExpr
-		|| OV = .VTmps
+		|| TmpCloser = .VTmps
 		|| D1 = (dest & asmreg.discard) as asmreg.stayopen
 		debugat 
 		ml = .µ(F, D1) asnt asmreg.stayopen
 		mr = .µ(exp.last!, dest & asmreg.discard)
-		.VTmps = OV
+		.closeVTmps(TmpCloser)
 	
 	if dest is Discard
 		return asmreg() // no need to do anything. {a()+b()}

@@ -1127,20 +1127,20 @@ class SCDecl (SCNamed) {
 			rz = .type.size
 		if .IsCArray
 			rz *= .C_Array
-		
-
 }
 
 
-function IsPointerMath (|SCDecl|L, |SCDecl|R, |SCOperator| opp, |Message|exp, |SCDecl|)
-	require (opp is Addition)
-	if (L.PointerCount) and (R.IsNumeric == 1)
-		return L
-	if (R.PointerCount) and (L.IsNumeric == 1)
-		return R
-	if (R.PointerCount) and (L.PointerCount) and (opp.name == "-")
-		L.ExpectMatch(R, 0, exp)
-		return TypeInt!.TypeNormal
+function IsPointerMath (|SCDecl| L, |SCDecl| R, |SCOperator| opp, |Message| exp, |SCDecl|)
+	require (opp isnt custom)
+	if (opp is addition)  
+		if (L.PointerCount) and (R.IsNumeric == 1) // ptr - a,  ptr + a
+			return L
+		if (R.PointerCount) and (L.IsNumeric == 1) // a - ptr,  a + ptr
+			expect (opp isnt MakesSigned) (exp, "Can't do that. Perhaps you mean to swap sides? IDK otherwise.")
+			return R
+		if (R.PointerCount) and (L.PointerCount) and (opp == scoperator.subtract)
+			L.ExpectMatch(R, 0, exp)
+			return TypeInt!.TypeNormal
 
 
 function scdecl.CheckMath (|message| exp, |scdecl|)
