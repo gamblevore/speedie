@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[563];
+extern JB_StringC* JB_LUB[562];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -7505,22 +7505,18 @@ void JB_Err_UpgradeWithNode(JB_Error* Self) {
 	JB_SetRef(Self->OriginalData, JB_Msg_OriginalParseData(Node));
 }
 
-void JB_Err__CantParseNum(Message* Where, JB_String* Num, int Pos) {
+void JB_Err__CantParseNum(Message* Where, JB_String* Num, int Pos, bool Overflow) {
 	//visible;
-	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
-	JB_FS_AppendString(_fsf0, JB_LUB[207]);
-	JB_String* _tmPf1 = JB_Incr(JB_Str_Preview(Num, 100));
-	JB_FS_AppendString(_fsf0, _tmPf1);
-	JB_Decr(_tmPf1);
-	JB_FS_AppendString(_fsf0, JB_LUB[83]);
-	JB_FS_AppendByte(_fsf0, JB_Str_ByteValue(Num, Pos));
-	JB_FS_AppendString(_fsf0, JB_LUB[85]);
-	JB_String* Str = JB_Incr(JB_FS_GetResult(_fsf0));
-	JB_Decr(_fsf0);
-	JB_Error* _tmPf2 = JB_Incr(JB_Err_Constructor(nil, Where, Str, kJB__ErrorSeverity_Error, JB_LUB[0]));
+	JB_String* Str = JB_Incr(JB_LUB[85]);
+	if (!Overflow) {
+		JB_String* _tmPf0 = JB_Incr(JB_byte_Render(JB_Str_ByteValue(Num, Pos), nil));
+		JB_SetRef(Str, JB_Str_OperatorPlus(JB_LUB[207], _tmPf0));
+		JB_Decr(_tmPf0);
+	}
+	JB_Error* _tmPf1 = JB_Incr(JB_Err_Constructor(nil, Where, Str, kJB__ErrorSeverity_Error, JB_LUB[0]));
 	JB_Decr(Str);
-	JB_Rec_AppendErr(JB_StdErr, _tmPf2);
-	JB_Decr(_tmPf2);
+	JB_Rec_AppendErr(JB_StdErr, _tmPf1);
+	JB_Decr(_tmPf1);
 }
 
 int JB_Err__Init_() {
@@ -7871,7 +7867,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024071211);
+	return (2024072212);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -7883,4 +7879,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 -4459141212384929561 8474535368898615780
+// 7796578953066441599 -8017683064692277884 -7594621806673183671
