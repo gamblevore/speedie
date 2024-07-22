@@ -6,7 +6,7 @@
 // i think... returning both is better.
 // we can return it in a struct... which is fine i guess
 // its just done via pointers always.
-// couldnt an asmreg refer to a fat? like... it could, right? we have some spare bits?
+// couldnt an ASMReg refer to a fat? like... it could, right? we have some spare bits?
 prototype fn_asm (|&ASMState| self=asmstate.sh, |message| exp, |AsmReg| Dest=asmreg(), |int| Mode = 0, |AsmReg|)
 
 
@@ -193,3 +193,7 @@ datatype AsmReg (uint64)
 function int.asm (|asmreg|)
 	cpp_part ToASM
 	rz.reg = self // (self - 1)&31 // would be better?
+
+
+/*  function IncrAmount (|asmreg| dest, |scdecl| D, |int64|)  */
+//			LL = LL.VarMul(subtract)

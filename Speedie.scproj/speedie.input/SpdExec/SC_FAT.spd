@@ -128,11 +128,11 @@ struct FatASM
 		|| dest = info.reg
 		.r[a] = dest
 		if dest
-			|| oldwhere = asmstate.sh.regplace(dest)
-			|| oldreg = oldwhere[0]
-			oldwhere[0] = self
-			if oldreg
-				.linkin(oldreg)
+			|| place = asmstate.sh.RegPlace(dest)
+			|| oldfat = place.Creator
+			place.Creator = self
+			if oldfat
+				.linkin(oldfat)
 			return true
 	
 	

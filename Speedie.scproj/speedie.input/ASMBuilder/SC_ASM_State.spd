@@ -2,6 +2,11 @@
 
 // ADDK? optimise stages... OR special-case it specifically. 
 
+struct RegState
+	|?&fatasm|			Creator
+	|?scdecl--| 		Type
+
+
 struct ASMState
 	linkage: cpp_part Pac
 	|uint16| 					BlockNum
@@ -21,10 +26,20 @@ struct ASMState
 	|&FatASM|					Curr    
 	|&FatASM|					End    
 	|&FatASM|					WhileStart
-	|(&FATASM)[32]|				Registers
+	|RegState[32]|				Registers
 	|FATASM| 					Zero
 
-
+	
+	function CloseVDecls (|int| i)
+		while .VDecls > i
+			.CloseReg .vdecls--
+	
+	function CloseReg (|int| i)
+		|| r = &.Registers[i]
+		r.type = nil		// i think its ok.
+		r.Creator = nil
+	
+			
 	function AddFuncParams (|SCFunction| fn)
 		opt norefcounts
 		for a in fn.Args
@@ -32,34 +47,31 @@ struct ASMState
 
 	function Last (|&FatASM|)
 		return .curr-1
-	
-	function AskReg (|int| a, |?&fatasm|)
-		return .RegPlace(A)[0]
 
-	function ExpectReg (|int| a, |&fatasm|)
-		|| b2 = .RegPlace(A)[0]
-			return b2
-		error (self, errorreceiver.NonFatal + ": Register was nil")
-		return .zero
+//	function ExpectReg (|int| a, |&fatasm|)
+//		|| b2 = .RegPlace(A)[0]
+//			return b2
+//		error (self, errorreceiver.NonFatal + ": Register was nil")
+//		return .zero
 
-	function RegPlace (|int| a, |&(?&fatasm)|)
-		if a|uint| <= 31
-			if a <= .vdecls
-				return &.registers[a]
-			if a >= (32 - .vtmps)
-				return &.registers[a]
-		error (self, errorreceiver.NonFatal + ": Out of bounds register")
-		return &.Registers[0]
+	function RegPlace (|int| a, |&regstate|)
+		opt norefcounts
+		|| InBounds = a|uint| <= 31
+			if a <= .vdecls or a >= .vtmps
+				return .registers[a]
+		
+		|| msg = (": Unassigned register",  ": Out of bounds register")(InBounds)
+		error (self, errorreceiver.NonFatal + msg)
+		return .Registers[0]
 			
 		
-	function GetConst (|int| a, |&uint64|)
+	function GetConst (|int| k, |&uint64|)
 		opt inline
-		if a|uint| > 31
-			debugger // sigh
-			a = 0
-		|| r = .registers[a]!
-		if r == .zero or r.info isnt ConstAny // now what?
-		return r.Const
+		|| r = .RegPlace(k).Creator
+			if r == .zero or r isnt ConstAny // now what?
+				return r.Const
+		debugger 
+		return .zero.const
 
 	
 	function IntPowerOfTwo (|asmreg| r,  |FailableInt|)
@@ -118,34 +130,35 @@ struct ASMState
 		debugger
 		error (where, msg)
 		
-	function DeclareMe (|Message| where,  |scdecl| Dest,  |asmreg|)
+	function DeclareMe (|Message| where,  |scdecl| Type,  |asmreg|)
 		|| d = .VDecls|int| + 1
 		if (d + .vtmps <= 31)
-			|| t = dest.ASMReg
+			|| t = Type.ASMReg
 			t.reg = d
 			// target debug: dest.ASMSanity		// probably set to datatypecode.UnusedType (112) by default
-			dest.DType = t|datatypecode|   		// right?
-			target debug: dest.ASMSanity
+			Type.DType = t|datatypecode|   		// right?
 			.vdecls = d
+			.Registers[d].Type = Type
+			target debug: Type.ASMSanity
 			return t
 		error (self, where, "No free local variables.")			
 	
 	
-	function TempMe (|Message| where,  |asmreg| T=asmreg.Temp,  |asmreg|) // .needreg
-		if t.reg
-			return t
-		
-		|| d = .vtmps|int| + 1
-		if (d + .vtmps <= 31)
-			t.reg = 32-d
-			.vtmps = d
-			return t
-		error (where, "No free local variables.")
+	function TempMe (|Message| where, |asmreg| T=asmreg.Temp,  |asmreg|) // .needreg
+		|| r = t.reg
+		if !r
+			r = 31 - .vtmps
+			check (r > .vdecls) (where, "No free local variables.")
+			t.reg = r
+			.vtmps = 32 - r
+		.Registers[r].Type = where.ASMDecl
+		return t
 
 	
 	function FoundCode (|int| i, |int64| code, |scdecl| d, |asmreg|)
-		|| rp = .askreg(i)
-		if rp and rp.const == code
+		|| place = .regplace(i)
+		|| fat = place.Creator
+		if fat and fat.const == code
 			|| dest = d.asmreg
 			dest.reg = i
 			(Dest is constany)
@@ -297,11 +310,10 @@ function ASMState.StartFunc (|scfunction| fn)
 		.out = fn.asm!
 	  else
 		.out = µfunc(fn, .curr)
-	for i in 32
-		.Registers[i] = nil // i think its ok.
-	.registers[0] = .zero
 	.zero = nil
 	.zero.info = AsmReg()
+	for i in 32
+		.CloseReg(i)
 	.FuncStart = .curr
 	.LabelCount = 0
 	.fn = fn
@@ -325,10 +337,10 @@ function ASMState.SetLength
 	.out.length = .curr.Index
 
 
-function int64.CanInt32 (|bool|)
-	return  (self <<32)>>32 == self
-	
-
-function int64.CanFloat32 (|bool|)
-	return  (self|uint64|>>32)<<32 == self
-	
+//function int64.CanInt32 (|bool|)
+//	return  (self <<32)>>32 == self
+//	
+//
+//function int64.CanFloat32 (|bool|)
+//	return  (self|uint64|>>32)<<32 == self
+//	

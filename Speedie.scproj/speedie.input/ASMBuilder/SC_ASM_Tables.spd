@@ -65,7 +65,7 @@ function asmstate.SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |messa
 
 
 
-function asmstate.AddToReg (|&FATASM| addr, |int| add, |message| exp, |asmreg|)
+function asmstate.AddToReg (|&FATASM| addr, |int| add, |message| exp, |scdecl| upon=nil,   |asmreg|)
 	|| reg = addr.info
 	if add
 		return .plus(reg, reg, .NumToReg(add, exp), exp)
@@ -490,11 +490,11 @@ function CountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, 
 	return fat*dest
 
 
-function IncrAmount (|asmreg| dest, |int| mode, |scdecl| D,  |int64|)
+function IncrAmount (|asmreg| upon, |int| IsSubtract, |scdecl| D,  |int64|)
 	opt norefcounts
-	rz = (1,-1)(mode & 1)
-	if dest.isfloat
-		if dest.FourBytes
+	rz = (1,-1)(IsSubtract & 1)
+	if upon.isfloat
+		if upon.FourBytes
 			rz = rz|float|.asint
 		  else
 			rz = rz|f64|.asint

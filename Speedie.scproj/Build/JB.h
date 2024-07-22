@@ -259,6 +259,8 @@ struct Random;
 
 struct RangeCoderItem;
 
+struct RegState;
+
 struct RetroFloat;
 
 struct SpeedTester;
@@ -751,6 +753,11 @@ struct Random {
 	uint64 State;
 };
 
+struct RegState {
+	FatASM* Creator;
+	SCDecl* Type;
+};
+
 struct StructSaveTest {
 	Saveable* Sav;
 	int64 Intt;
@@ -774,7 +781,7 @@ struct ASMState {
 	FatASM* Curr;
 	FatASM* End;
 	FatASM* WhileStart;
-	FatASM* Registers[32];
+	RegState Registers[32];
 	FatASM Zero;
 };
 
@@ -4417,6 +4424,8 @@ ASM SC_ASM_MemUtil_NSet(ASM Self, uint Value);
 
 ASM SC_ASM_MemUtil_OpSet(ASM Self, uint Value);
 
+ASM SC_ASM_OperatorxE2x80xA2(ASM Self, bool B);
+
 void ASMPrint(ASM Self);
 
 ASM SC_ASM_R1Set(ASM Self, uint Value);
@@ -4520,7 +4529,7 @@ AsmReg SC_ASMtmp__If(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
 AsmReg SC_ASMtmp__Ignore(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-int64 SC_ASMtmp__IncrAmount(AsmReg Dest, int Mode, SCDecl* D);
+int64 SC_ASMtmp__IncrAmount(AsmReg Upon, int IsSubtract, SCDecl* D);
 
 AsmReg SC_ASMtmp__Incrementatulatorifier(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
@@ -5771,6 +5780,9 @@ int JB_Rnd__InitCode_();
 // JB_RangeCoderItem
 
 
+// JB_RegState
+
+
 // JB_RetroFloat
 
 
@@ -5804,11 +5816,9 @@ void SC_Pac_AddFuncParams(ASMState* Self, SCFunction* Fn);
 
 void SC_Pac_AddLabel(ASMState* Self, Message* Ch);
 
-AsmReg SC_Pac_AddToReg(ASMState* Self, FatASM* Addr, int Add, Message* Exp);
+AsmReg SC_Pac_AddToReg(ASMState* Self, FatASM* Addr, int Add, Message* Exp, SCDecl* Upon);
 
 bool SC_Pac_Alloc(ASMState* Self, MWrap* J);
-
-FatASM* SC_Pac_AskReg(ASMState* Self, int A);
 
 AsmReg SC_Pac_Assign(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
@@ -5826,13 +5836,15 @@ AsmReg SC_Pac_BoolMul(ASMState* Self, AsmReg Dest, AsmReg Boo, AsmReg V, Message
 
 FatASM* SC_Pac_Branch(ASMState* Self, Message* Cond, bool Neg);
 
+void SC_Pac_CloseReg(ASMState* Self, int I);
+
 AsmReg SC_Pac_Compare(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode);
 
 AsmReg SC_Pac_CompareFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode);
 
 AsmReg SC_Pac_CompareInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp, int Mode);
 
-AsmReg SC_Pac_DeclareMe(ASMState* Self, Message* Where, SCDecl* Dest);
+AsmReg SC_Pac_DeclareMe(ASMState* Self, Message* Where, SCDecl* Type);
 
 void SC_Pac_Destructor(ASMState* Self);
 
@@ -5910,7 +5922,7 @@ FatASM* SC_Pac_QuickFloatPlus(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, M
 
 AsmReg SC_Pac_QuickIntMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-FatASM** SC_Pac_RegPlace(ASMState* Self, int A);
+RegState* SC_Pac_RegPlace(ASMState* Self, int A);
 
 bool SC_Pac_SetConst(ASMState* Self, Message* List, Message* Orig);
 
@@ -9299,7 +9311,7 @@ void JB_Err_SyntaxIsSet(JB_Error* Self, ErrorFlags F, bool Value);
 
 void JB_Err_UpgradeWithNode(JB_Error* Self);
 
-void JB_Err__CantParseNum(Message* Where, JB_String* Num, int Pos);
+void JB_Err__CantParseNum(Message* Where, JB_String* Num, int Pos, bool Overflow);
 
 int JB_Err__Init_();
 
@@ -10167,8 +10179,6 @@ inline FatASM* SC_FatASM_Prev(FatASM* Self);
 
 inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest);
 
-inline uint64* SC_Pac_GetConst(ASMState* Self, int A);
-
 inline bool SC_Reg_SyntaxCast(AsmReg Self);
 
 inline int SC_Reg_ToInt(AsmReg Self);
@@ -10178,6 +10188,8 @@ inline NilRecord SC_nil__EndBlock();
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
 inline void SC_Reg_Expect(AsmReg Self, Message* Where);
+
+inline uint64* SC_Pac_GetConst(ASMState* Self, int K);
 
 inline FatASM* SC_Reg_Read(AsmReg Self, Message* M, AsmReg Ptr, int Index);
 
@@ -10423,16 +10435,6 @@ inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 	return Rz;
 }
 
-inline uint64* SC_Pac_GetConst(ASMState* Self, int A) {
-	if (((uint)A) > 31) {
-		A = 0;
-	}
-	FatASM* R = Self->Registers[A];
-	if ((R == (&Self->Zero)) or (!SC_Reg_SyntaxIs(R->Info, kSC__Reg_ConstAny))) {
-	}
-	return (&R->Const);
-}
-
 inline bool SC_Reg_SyntaxCast(AsmReg Self) {
 	return ((bool)SC_Reg_Reg(Self));
 }
@@ -10465,6 +10467,16 @@ inline void SC_Reg_Expect(AsmReg Self, Message* Where) {
 	if (!SC_Reg_Reg(Self)) {
 		SC_Pac_SyntaxExpect((&SC__Pac_Sh), Where, JB_LUB[842]);
 	}
+}
+
+inline uint64* SC_Pac_GetConst(ASMState* Self, int K) {
+	FatASM* R = SC_Pac_RegPlace(Self, K)->Creator;
+	if (R) {
+		if ((R == (&Self->Zero)) or (!SC_FatASM_SyntaxIs(R, kSC__Reg_ConstAny))) {
+			return (&R->Const);
+		}
+	}
+	return (&Self->Zero.Const);
 }
 
 inline FatASM* SC_Reg_Read(AsmReg Self, Message* M, AsmReg Ptr, int Index) {

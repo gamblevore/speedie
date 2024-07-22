@@ -1,9 +1,8 @@
 
 
 main // speedie main {
-//	if 0
-//		|| m = Message()
-//		|| x = m.GoodName("x")
+	target debug2
+		|| x = 1<<63
 
 	Compiler.Compile
 	

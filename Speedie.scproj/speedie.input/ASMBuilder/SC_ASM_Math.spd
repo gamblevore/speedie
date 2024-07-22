@@ -48,7 +48,7 @@ extend ASMState
 		|| negate = dest is negate
 		|| badness = l.BadBits(r) 
 
-		if (dest is condrequest) and (badness >= 0)
+		if (dest is CondRequest) and (badness >= 0)
 			if badness > 0
 				dest = .TempMe(exp, dest)
 				exp.CMPB(dest, L, R, badness, Negate|int|)
@@ -226,29 +226,32 @@ extend ASMState
 
 	
 	function PlusInt     (fn_opasm)
-		|| LL = .GetConst(L)[],		|| RR = .GetConst(R)[]
-		//		a - 1,		a + 1
-		//		1 - a,		1 + a
-		|| subtract = l is alternate
-			RR = -RR
+		//		a - 1,		a + 1		//
+		//		1 - a,		1 + a		//
+		if (l is ConstAny) and (r isnt constany)
+			swap (l) (r)
 
-		|&fatasm| fat
-		if !subtract and l.CanAddK(LL)					// 1 + a
-			fat = exp.ADDK(dest, R, LL)
-//			exp.addk(dest, R, LL)
-
-		  elseif r.CanAddK(RR)							// a - 1,  a + 1
-			fat = exp.ADDK(dest, L, RR)
-
-		  elseif subtract
-			fat = exp.SUBB(dest, L, R)
-
-		  else
-			fat = exp.ADD(dest, L, R)
-
-		if dest is constany
-			fat.const = ll + rr
-		return fat*Dest
+		if r is ConstAny
+			|| RR = .GetConst(R)[]
+			|| subtract = l is alternate
+				RR = -RR
+			if l isnt ConstAny
+			// so how does l know how big it is? do we have an exp?
+			// we come to here via many routes
+			// in fact we even have a swap above.
+			// we normally get the type from the exp... which... we don't have anymore!
+			// we do need the msg for both sides... right?
+//				rr = l.PointerMul(rr)
+			if r.CanAddK(RR)								// a - 1,  a + 1
+				|| fat2 = exp.ADDK(dest, L, RR)
+				if dest is ConstAny
+					|| LL = .GetConst(L)[]
+					fat2.const = ll + rr
+				return fat2 * dest
+		
+		|| fat = exp.ADD(dest, L, R)
+		fat.op = asm.add • (l is alternate)
+		return fat * Dest
 	
 	
 	function PlusFloat   (fn_opasm)
