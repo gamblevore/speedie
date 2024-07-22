@@ -1091,10 +1091,10 @@ int JB_Str_ByteValue(JB_String* self, int offset) {
 #define kParseEnd_E 2
 #define kParseEnd_Both 3
 
-void JB_Err__CantParseNum(Message* Where, JB_String* self, int Pos);
-void ParseNumErr_( JB_String* self, uint8* BadPos, Message*& Where ) {
+void JB_Err__CantParseNum(Message* Where, JB_String* self, int Pos, bool Overflow);
+void ParseNumErr_( JB_String* self, uint8* BadPos, Message*& Where, bool OverFlow ) {
     int CharPos = (int)(BadPos - self->Addr - 1);
-    JB_Err__CantParseNum(Where, self, CharPos);
+    JB_Err__CantParseNum(Where, self, CharPos, OverFlow);
     
     Where = nil;
 }
@@ -1122,7 +1122,7 @@ static double ParseDouble_(JB_String* Str, uint8** ReadPlaceOut, uint8* ReadEnd,
                 } else if (ch == '.' and Endable&kParseEnd_Dot) {
                     ; //
                 } else {
-                    ParseNumErr_( Str, Read, Where );
+                    ParseNumErr_( Str, Read, Where, false );
                 }
                 break;
             }
@@ -1133,7 +1133,7 @@ static double ParseDouble_(JB_String* Str, uint8** ReadPlaceOut, uint8* ReadEnd,
                 Mul = Mul * Mul0;
             } else {
 				if (Value > Max) {
-					ParseNumErr_( Str, Read, Where );
+					ParseNumErr_( Str, Read, Where, true );
 					break;
 				}
                 Value = Value*Mul + num;
@@ -1184,7 +1184,6 @@ double JB_Str_TextDouble(JB_String* self, Message* Where) {
 
 
 static int64 ParseNumbers__( JB_String* self, int Mode, Message* Where, MiniStr S ) {
-	// assumes valid input
 	bool IsMinus = (S.Curr() == '-');
 	if (IsMinus)
 		S.Next();
@@ -1208,7 +1207,8 @@ static int64 ParseNumbers__( JB_String* self, int Mode, Message* Where, MiniStr 
 	}
 		
 
-	int64 Value = 0;
+	uint64 Value = 0;
+	bool Overflow = false;
 
 	while ( S ) {
 		uint c = S.Next();
@@ -1224,12 +1224,10 @@ static int64 ParseNumbers__( JB_String* self, int Mode, Message* Where, MiniStr 
 		} else {
 			goto BadPos;
 		}
-		if (__builtin_mul_overflow(Value, Mul, &Value)) {
-			goto BadPos;
-		}
-		if (__builtin_add_overflow(Value, c, &Value)) {
+		if (__builtin_mul_overflow(Value, Mul, &Value) or __builtin_add_overflow(Value, c, &Value)) {
+			Overflow = true;
 			BadPos:;
-			ParseNumErr_(self, S.Addr, Where);
+			ParseNumErr_(self, S.Addr, Where, Overflow);
 			break;
 		}
 	}
