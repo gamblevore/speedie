@@ -258,12 +258,13 @@ extend float
 		
 		
 	function Sanity (|bool|)
-		debug_Require !(.isnan or .isinf)
-		return true
+		ifn .isnan or .isinf
+			return true
+		debugger 
 	
 	function MakeSane (|float|)
-		debug_require !(.isnan or .isinf)
-		return self
+		if .Sanity
+			return self
 	
 	function IsInf (|bool|)
 		cpp_wrapper (__isinff)

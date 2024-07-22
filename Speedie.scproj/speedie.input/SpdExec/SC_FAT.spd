@@ -124,15 +124,17 @@ struct FatASM
 														// if y
 														//     x = 2
 	
-	function Dest (|int| a, |asmreg| info, |bool|)
+	function Dest (|uint| a, |asmreg| info, |bool|)
 		|| dest = info.reg
 		.r[a] = dest
 		if dest
+			if a > 1 // what?
+			(.Info as= (asmreg.Dest0|uint64| << a)|asmreg|)
 			|| place = asmstate.sh.RegPlace(dest)
 			|| oldfat = place.Creator
 			place.Creator = self
 			if oldfat
-				.linkin(oldfat)
+				.LinkIn(oldfat)
 			return true
 	
 	
@@ -211,19 +213,20 @@ struct FatASM
 		// what  if it got rendered into multiple asms?
 		// like: if x==y: jump(10000)
 		// how do we deal with this?
-	function ReRender (|!&asm| Start, |!&asm| After)
+	function FillLabelRequest (|!&asm| Start, |!&asm| After)
 		|| where = start+.ASMIndex
-		|| reg = .info.reg
-
-		debug_require  where >= start  and  where < after
-		debug_require reg < 5
+		debugat
+		|| reg = .info.reg	 // this isn't the reg? at least not if we are doing .r[reg]
+							 // isnt this just .r[0]?
+		DEBUG_REQUIRE  where >= start  and  where < after 
+		DEBUG_REQUIRE  reg < 5
 		|| dest_index = .r[reg]
 		|| mask = dest_index & asmreg.FatRef
-		debug_require mask
+		DEBUG_REQUIRE mask
 		dest_index &=~ mask
 		|| dest = start + dest_index
 
-		debug_Require dest >= start and dest <= after
+		DEBUG_REQUIRE dest >= start and dest <= after
 		.r[reg] = where - dest 
 		.µrenderinto(where, where+1)
 	
@@ -245,7 +248,10 @@ struct FatASM
 	
 	function Renda (|FastString| fs)
 		opt norefcounts
-		|| op = instruction.typelist[.op]		#debug_require
+		|| op = instruction.typelist[.op]
+		if !op
+			debugger
+			return
 		fs <~ op.name
 		fs <~ ':'
 		fs <~ (' ', 5-op.name.length)

@@ -232,7 +232,7 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 	if self == typeobject
 		count = 4 // refcount
 	|| s = .super
-		Count = s.CalculateSizeRaw				#debug_require
+		Count = s.CalculateSizeRaw					#DEBUG_REQUIRE
 	|| bits = 0
 	for p in .properties
 		|| curr = platform.PointerBytes
@@ -555,7 +555,7 @@ function FindContainedClass (|scclass|)
 
 function scfunction.DontWantSameReturnType (|scfunction| f)
 	require self
-	|| r = f.ReturnType					#debug_require
+	|| r = f.ReturnType					#DEBUG_REQUIRE
 	if r.MiniMatch(.returntype, 0)
 		error (.source,  "Multiple casts found [1]")
 		error (f.source, "Multiple casts found [2]")

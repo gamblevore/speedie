@@ -39,6 +39,8 @@ datatype AsmReg (uint64)
 		AddrRequest
 		BitCorrect
 		LabelRequest
+		Dest0
+		Dest1
 		CorrectAddr		= ContainsAddr ||| bitcorrect
 		Arg				= Discard         // ||| SrcConst
 		CondRequest		= NewCondRequest  // ||| SrcConst

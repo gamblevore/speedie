@@ -609,7 +609,9 @@ function Message.RefDisappears (|bool|)
 	for (P.up in self)
 		|| f = p.func
 		if (f == @Type)
-			|| D = P.AsDecl #debug_require
+			|| D = P.AsDecl
+			if !D
+				debugger, return nil
 			if !D.IsNormalObject
 				return true
 		  elseif p.RefTransparent

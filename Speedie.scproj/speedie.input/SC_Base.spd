@@ -478,7 +478,8 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |S
 					Return o
 
 				if (!side and paramsarray.isdot and o.type.processas)
-					debug_require exp
+					if !exp
+						debugger, return nil
 					return o.ProcessAs(exp)
 
 		

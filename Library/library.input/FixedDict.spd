@@ -131,7 +131,9 @@ class FixedDict
 				curr	= curr[B&15]				#require
 				|| T	= curr.typeof(B>>4)
 				curr	= curr[B>>4]
-				if i >= n: debug_require curr, return curr.valueobj(t) // can curr be nil or not? perhaps just require is needed
+				if i >= n
+					DEBUG_REQUIRE curr
+					return curr.valueobj(t) // can curr be nil or not? perhaps just require is needed
 				require T == typedict
 
 

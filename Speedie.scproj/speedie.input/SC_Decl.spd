@@ -1102,7 +1102,7 @@ class SCDecl (SCNamed) {
 		opt norefcounts
 		if self
 			|| Ty = .type
-			debug_require !(.c_array ||| ty.IsStruct)
+			DEBUG_REQUIRE !(.c_array ||| ty.IsStruct)
 			
 			if ty.IsObject
 				return datatypecode.cstring

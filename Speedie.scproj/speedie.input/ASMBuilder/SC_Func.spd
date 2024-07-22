@@ -37,11 +37,11 @@ class µFunc
 			fat.ASMIndex = rz - where
 			rz = fat.µrenderinto(rz, after)
 
-		if haslabel // i think we need something similar anyway... for jumps
+		if haslabel // could we do this in a bit smarter way? like a fat knows what points to it?
 			for i in self
 				if i is labelrequest
 					(i isnt labelrequest)
-					i.rerender(where, rz)
+					i.FillLabelRequest(where, rz)
 			
 		while where < after
 			where.DebugPrint

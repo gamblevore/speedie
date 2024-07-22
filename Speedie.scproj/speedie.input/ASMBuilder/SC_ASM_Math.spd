@@ -230,6 +230,9 @@ extend ASMState
 		//		1 - a,		1 + a		//
 		if  (l is ConstAny) and (r isnt constany)
 			if l isnt alternate
+				target debug
+					if !l.µtype.IsPointer // WHAAAAAT
+				
 				swap (l) (r) // a-b != b-a
 				
 			// ptr - 1  !=  1-ptr
@@ -473,7 +476,7 @@ extend ASMState
 
 	function ConstForShift (|asmreg| r, |int| btc, |message| exp,  |int64|)
 		// shl/shl used to use this
-		rz = .GetConst(r)[] #debug_require
+		rz = .GetConst(r)[]
 		if rz < 0
 			error (exp, "Can't negative shift")
 		  elseif rz >= btc

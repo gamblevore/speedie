@@ -89,7 +89,10 @@ class FlowControl
 
 	function Fail (|string| found, |string| expected, |string| InputName)
 		opt norefcounts, flow off
-		|| fs = .Excuse									#debug_require
+		|| fs = .Excuse
+		if !fs
+			debugger 
+			return nil
 		if InputName 
 			fs <~ "Different input for: ${InputName}. "			
 		if !.readinput.HasAny

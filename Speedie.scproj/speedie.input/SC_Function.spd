@@ -318,12 +318,14 @@ function message.MacroFixSub (|SCDecl?| contains)
 
 
 function MacroFix (|SCDecl?| contains, |SCNode| name_space, |SCParamArray| Incoming, |scdecl|)
-	|| Orig = incoming.exp				#debug_require
-	|| R = incoming.CopyArgs
-	orig.BecomeMacro(.ismacro!, r)
-	orig.MacroFixSub(contains) 
-	rz = TypeOfExpr(orig, name_space) 
-	rz := typevoid!
+	|| Orig = incoming.exp
+		|| R = incoming.CopyArgs
+		orig.BecomeMacro(.ismacro!, r)
+		orig.MacroFixSub(contains) 
+		rz = TypeOfExpr(orig, name_space) 
+		rz := typevoid!
+	  else
+		debugger 
 
 
 function message.FailOrCopy (|message| p, |message|)

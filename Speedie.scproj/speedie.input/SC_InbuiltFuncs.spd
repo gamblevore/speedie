@@ -7,7 +7,10 @@
 
 function scclass.Falsify (|message| ques, |message|)
 	opt norefcounts
-	|| f = .false		#debug_require // not sure if this is possible to be nil
+	|| f = .false
+	if !f
+		debugger
+		return nil
 	if f.hasany
 		return f.copy
 	ques.func = f.func
