@@ -146,14 +146,13 @@ datatype AsmReg (uint64)
 	function HaveAddr (|asmreg|)
 		rz = self asnt AsmReg.AddrRequest
 		rz = rz as AsmReg.CorrectAddr
-		
+	
 	function Reg (|int|)
-		return .µType.Register
+		return (self|uint64| >> 11)&31
 	
 	function Reg (assigns:|int|, |AsmReg|)
-		|| t = .µType
-		t.Register = Value
-		.µType = t
+		self &= ~(31<<11)|asmreg|
+		(self as= (value << 11)|asmreg|)
 		return self
 	
 	operator mul (|bool| b, |asmreg|)

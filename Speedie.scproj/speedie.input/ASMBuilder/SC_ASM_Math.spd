@@ -233,13 +233,16 @@ extend ASMState
 				target debug
 					if r.µtype.IsPointer // 1 - ptr??? we blocked this already.
 			  else
-				swap (l) (r)
+				swap (l) (r) // a+b == b+a
 
+		|| Ty = l.µtype
+		|| IsPtr = ty.ispointer
+			if ty
 		if r is ConstAny
 			|| RR = .GetConst(R)[]
-			|| subtract = l is alternate
+			if l is alternate
 				RR = -RR
-			if l.µtype.ispointer
+			if isptr
 				rr *= l.PointerMul
 			if r.CanAddK(RR)								// a - 1,  a + 1
 				|| fat2 = exp.ADDK(dest, L, RR)
@@ -248,6 +251,7 @@ extend ASMState
 					fat2.const = ll + rr
 				return fat2 * dest
 		
+		if isptr
 		|| fat = exp.ADD(dest, L, R)
 		fat.op = asm.add • (l is alternate)
 		return fat * Dest

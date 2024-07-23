@@ -36,9 +36,9 @@ struct FatASM
 	|byte|				Label		// 254 labels per function
 	
 	
-	function AsReg (|asmreg|)
-		cpp_part AsReg0
-		return self * .info
+//	function AsReg (|asmreg|)
+//		cpp_part AsReg0
+//		return self * .info
 
 	operator mul (|asmreg| info, |asmreg|)
 		cpp_part AsReg
@@ -92,9 +92,9 @@ struct FatASM
 		if self
 			return m == .op
 	
-	syntax append (|asmreg| flags)
-		real self
-		.info = .info as flags
+//	syntax append (|asmreg| flags)
+//		real self
+//		.info = .info as flags
 
 	syntax is (|asmreg| flags, |bool|)
 		if self
@@ -149,10 +149,12 @@ struct FatASM
 		stderr <~ err
 
 	function RegInput (|int| a, assigns:|asmreg| info, |int|)
+		cpp_part Prm
 		rz = info.reg
 		.r[a] = rz
 		|| f = info.fat
 			if !a // why?
+			f.LinkIn(self) // what?
 			f.refcount++
 		
 	function NumInput (|int| a, assigns:|int| v)
@@ -160,7 +162,7 @@ struct FatASM
 		
 
 	function out (|uint|): return .r[0]
-	function out (assigns:|uint|): .r[0] = value
+//	function out (assigns:|uint|): .r[0] = value
 	
 	// easier to do maths ad figure stuff out if its expressed like abcd
 	function a (|uint|): return .r[1]
@@ -171,20 +173,20 @@ struct FatASM
 	function c (assigns:|uint|): .r[3] = value
 	function d (|uint|): return .r[4]
 	function d (assigns:|uint|): .r[4] = value
-
-	function fa (|&FATASM|): return ASMState.Sh.Zero
-	function fb (|&FATASM|): return ASMState.Sh.Zero
-	function fc (|&FATASM|): return ASMState.Sh.Zero
-	function fd (|&FATASM|): return ASMState.Sh.Zero
+//
+//	function fa (|&FATASM|): return ASMState.Sh.Zero
+//	function fb (|&FATASM|): return ASMState.Sh.Zero
+//	function fc (|&FATASM|): return ASMState.Sh.Zero
+//	function fd (|&FATASM|): return ASMState.Sh.Zero
 
 	function Swap (|int| a, |int| b)
 		swap (.r[a-1]) (.r[b-1])
 
-	function Swap (|&FatASM| other, |bool|)
-		|| s = self|&ivec4|
-		|| o = other|&ivec4|
-		swap (s++[]) (o++[])
-		swap (s[])   (o[])
+//	function Swap (|&FatASM| other, |bool|)
+//		|| s = self|&ivec4|
+//		|| o = other|&ivec4|
+//		swap (s++[]) (o++[])
+//		swap (s[])   (o[])
 	
 	helper Step (|int| dir, |&FatASM|)
 		real self

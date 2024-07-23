@@ -228,7 +228,7 @@ struct ASMState
 				rz = (fn)(self, exp, dest)
 
 
-	function Prm (|message| prm, |asmreg|)
+	function FuncPrm (|message| prm, |asmreg|)
 		|| r = .ExistingVar(prm)
 		if r != nil
 			return r
@@ -268,7 +268,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 	|| TmpCloser = .VTmps
 
 	for p.fast in prms
-		|| v = .prm(p).reg
+		|| v = .funcprm(p).reg
 		if sh <= 25
 			reg2 |= (v << sh)
 		  else
