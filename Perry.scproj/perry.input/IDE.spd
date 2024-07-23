@@ -927,18 +927,20 @@ function string.GetSpeedieProj (|string|)
 
 
 function perryide.IDECommand (|bool|)
+	// this should be a window really!
 	|| cmd = "Enter Command".ask $
 	if cmd ~= "beep"
 		for 2s
 			beep
       elseif cmd ~= "cr_fix"
-		.editme.beep = .EditMe.Text.ReplaceAll("\r\n", "\r").ReplaceAll("\r", "\n")
+		.editme.beep = .EditMe.seltext.ReplaceAll("\r\n", "\r").ReplaceAll("\r", "\n")
 	  elseif cmd ~= "cr_use"
-		.editme.beep = .EditMe.Text.ReplaceAll("\n", "\r\n")
+		.editme.beep = .EditMe.seltext.ReplaceAll("\n", "\r\n")
 	  else
 		beep "unrecognised: " + cmd
 
 
 function textview.beep (assigns:|string| s)
 	expect (.text != s) (beep)
-	.text = s
+	.SelText = s
+

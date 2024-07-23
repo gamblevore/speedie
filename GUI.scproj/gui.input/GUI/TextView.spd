@@ -1221,6 +1221,9 @@ class TextView (GUIControl)
 
 	function SelText (|string|)
 		return self[.selrange]
+		
+	function SelText (assigns:|string|)
+		.Insert(value, true)
 
 	
 	behaviour TypedString
@@ -1250,7 +1253,7 @@ class TextView (GUIControl)
 		return 1
 
 	
-	function Insert (|string| s, |bool|selnew=false, |int|)
+	function Insert (|string| s, |bool| selnew = false, |int|)
 		return .InsertSub(s, .selrange, selnew)
 
 
