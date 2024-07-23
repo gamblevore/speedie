@@ -36,9 +36,11 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 				if (msg0 in @decl) and msg0.isfirst
 					msg0 = msg0.parent
 				if msg0 == @decl
+					if msg0 in @arg
+						return nil // right?
 					inrange[] = true
 					state[] = 4
-					return msg0				// 4: function a.b (|*|)
+					return msg0					// 4: function a.b (|*|)
 		if  msg0 == @thg  and  msg0 in @decl  and  msg0.prev == @emb
 			State[] = -2
 			return nil
@@ -64,7 +66,7 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 	|message| prms
 	if ConstructorLike and (func_name == @bra or @list)
 		prms = func_name
-		func_name = nil						// 0: constructor (|int| x)
+		func_name = nil							// 0: constructor (|int| x)
 		inrange[] = .RangeCheck(s_end[], msg, prms)
 	  else
 		if !func_name or func_name == @arg
@@ -101,12 +103,12 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 			return nil
 		if !name
 			state[] = 4
-			return decl						// 4: function a.b (|*|)
+			return decl							// 4: function a.b (|*|)
 		decl = decl.next
 	
 	if Name
 		state[] = 5
-		return name							// 5:function a.b (|type| name*)
+		return name								// 5:function a.b (|type| name*)
 	
 	state[] = 3
 	return prms
@@ -308,14 +310,18 @@ function textview.PerryDeclKey (|bool|)
 		require .parsedmessage
 	
 	|| clearback = .IsClearBackLine(s.x-1)
-	|| endofline = self.FindEndOfLineIgnoringWhite(s.x)
+	|| endofline = .FindEndOfLineIgnoringWhite(s.x)
 	|| inclass = .IsInClass(d) 
 	if clearback and !inclass
 		return .insert("|| ")
 	
 	if endofline or inclass
-		if d.BackHasIgnoringSpaces("||", s.x)
-			.insert(" ") // whatever
+		|| Before = .BackHasIgnoringSpaces("||", s.x) 
+		if before
+			if before == '\n' or '\r' 
+				.insert(" ")
+			else
+				.insert("|")
 			return true
 		.insert("||")
 		.sel = .sel0-1 // :)

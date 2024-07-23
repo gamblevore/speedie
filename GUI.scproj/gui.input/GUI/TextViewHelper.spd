@@ -55,12 +55,17 @@ class TextViewLine (list)
 			fs.appendescape(.text)
 			fs <~ '"'
 
-	helper BackHasIgnoringSpaces (|string| name, |int| pos, |bool|)
-		pos = pos-.Position
+
+	helper textview.BackHasIgnoringSpaces (|string| name, |int| pos, |codepoint|)
 		while --pos >= 0
 			|| t = .text[pos]
-			ifn t == ' ' or '\t'
-				return .Text[pos-(name.length-1), name]
+			if t != ' ' and '\t'
+				if rz
+					return t
+				pos -= name.length - 1
+				require .Text[pos, name]
+				rz = '\n'
+				
 		
 	function DrawRange (|ivec2|)
 		|| p = .position
