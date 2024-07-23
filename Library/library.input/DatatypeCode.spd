@@ -55,40 +55,35 @@ datatype DataTypeCode (uint16)
 		_void = 0
 		_voidptr = 48
 		cstring = 48
-		Failed = 0x8000
-		numeric = 8
+		Failed = 1<<10
+		PossibleBits = 2047
+		Numeric = 8
 		
 		
 		UnusedType = int64 &~ 8
 	
 	
 	syntax is (|datatypecode| M, |bool|)
-		return self == M
-
-	function ExistsButBadlyNamedOrDesigned (|bool|)
-		// not sure what this is meant to do. Only used in one place anyhow.
-		// used to be called "Exists", but all of them exist even bytes?
-		// so why check ._shift?
-		return (._shift or !.isfloat)
+		return self&PossibleBits == M&PossibleBits
 	
 	function IsFloat (|bool|)
 		return (self >> 7) & 1
-
+	
 	function IsPointer (|bool|)
 		return !.isnumeric // for now
-
+	
 	function IsInt (|bool|)
 		return !.IsFloat
-
+	
 	function IsSigned (|bool|)
 		return (self >> 6) & 1
-
+	
 	function IsNumeric (|bool|)
 		return (self & numeric)
-
+	
 	function IsAtomic (|bool|)
 		return (self & 4)
-
+	
 	function NumericCount (|int|)
 		if (self & numeric)
 			return .count
@@ -116,10 +111,4 @@ datatype DataTypeCode (uint16)
 	
 	function SameBasicType (|datatypecode| b, |bool|)
 		return (.isfloat == b.isfloat) // this will do for now.
-	
-	function Register (|int|)
-		return self >> 8
-	
-	function Register (assigns:|int|, |Datatypecode|)
-		return (self &~ (31<<11)) ||| (value << 8)
 	
