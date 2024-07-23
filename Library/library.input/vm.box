@@ -275,10 +275,10 @@ forms
 /**/ ADPK (AddK)
 		i1 = i2
 		i2 = i2 + U2_Li
-/**/ ADD  (U3)
-		i1 = i2 + (i3 << L3) // only need 6 bits for shift! can we save 3 conditional add?
-/**/ SUBB  (U3)              // must come after ADD
-		i1 = i2 - (i3 << L3)
+/**/ ADD  (Shift)
+		i1 = i2 + (i3 << Shift_Shu) // only need 6 bits for shift! can we save 3 conditional add?
+/**/ SUBB  (Shift)              	// must come after ADD
+		i1 = (i2 - i3) >> Shift_Shu
 /**/ MULT  (U4)
 		i1 = (i2 * i3) + i4
 /**/ DIVV (Div)
@@ -293,10 +293,6 @@ forms
 			i1 = std_min(i2, i3)
 		else
 			u1 = std_min(u2, u3)
-/**/ PADD (Shift)	// ptr1 = ptr2 + int3
-		i1 = i2 + (i3<<Shift_Shu)
-/**/ PSUB (Shift)	// int1 = ptr2 - ptr3
-		i1 = (i2 - i3)>>Shift_Shu
 
 
 

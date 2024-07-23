@@ -182,12 +182,17 @@ datatype AsmReg (uint64)
 	function Decl (|scdecl--|)
 		return ASMState.sh.Registers[.reg].Type
 	
-	function PointerMul (|uint64|)
-		|| r = .decl
-			return r.AllocatedSize
-		error "aaargh"
+
+	function PointerMul (|int|)
+		|| Ty = .µtype
+		|| IsPtr = ty.ispointer
+			if ty is bool // what?
+			|| r = .decl
+				return r.AllocatedSize
+			error "aaargh"
 		return 1
-		
+	
+			
 	module
 		function New (|asmreg|)
 			return Zero

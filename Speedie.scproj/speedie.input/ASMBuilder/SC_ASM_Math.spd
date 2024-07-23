@@ -225,36 +225,52 @@ extend ASMState
 				return exp.FMLK(dest, l, x) * Dest
 
 	
+	function ASMReg.LeftScore (|int|) // we want pointers on the left... ints on the left, and consts on the right
+		return (.µtype.ispointer<<1) + (self isnt constany)
+	
+	
 	function PlusInt     (fn_opasm)
 		//		a - 1,		a + 1		//
 		//		1 - a,		1 + a		//
-		if  (l is ConstAny) and (r isnt constany)
+		if  l.LeftScore < r.leftscore
 			if l is alternate
 				target debug
 					if r.µtype.IsPointer // 1 - ptr??? we blocked this already.
 			  else
 				swap (l) (r) // a+b == b+a
 
-		|| Ty = l.µtype
-		|| IsPtr = ty.ispointer
-			if ty
+		|| lmul = l.pointermul
+		|&fatasm| fat
 		if r is ConstAny
 			|| RR = .GetConst(R)[]
 			if l is alternate
 				RR = -RR
-			if isptr
-				rr *= l.PointerMul
+			rr *= lmul
 			if r.CanAddK(RR)								// a - 1,  a + 1
-				|| fat2 = exp.ADDK(dest, L, RR)
+				fat = exp.ADDK(dest, L, RR)
 				if dest is ConstAny
 					|| LL = .GetConst(L)[]
-					fat2.const = ll + rr
-				return fat2 * dest
-		
-		if isptr
-		|| fat = exp.ADD(dest, L, R)
-		fat.op = asm.add • (l is alternate)
+					fat.const = ll + rr
+
+		if fat
+			0
+		  elseif lmul.ispow2  							// x = int1 + int2
+			fat = exp.ADD(dest, L, R, lmul.log2)		// x = lptr + r<<3
+			fat.op += l is alternate
+		  else
+			|| v = .GenericNumFinder(exp, lmul)
+			if l isnt alternate							// x = lptr + r*12
+				exp.MULT(V, R, V, asmreg())
+				fat = exp.ADD(dest, L, V, asmreg())
+			  else										// x = (lptr - rptr)/12
+				exp.SUBB(dest, L, R, asmreg())
+				|| uint64type = 0, debugger
+				fat = exp.DIVV(dest, asmreg(), dest, V, uint64type)  
+			  
 		return fat * Dest
+		
+		
+
 	
 	
 	function PlusFloat   (fn_opasm)

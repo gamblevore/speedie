@@ -68,7 +68,7 @@ function asmstate.SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |messa
 function asmstate.AddToReg (|&FATASM| addr, |int| add, |message| exp, |scdecl| upon=nil,   |asmreg|)
 	|| reg = addr.info
 	if add
-		return .plus(reg, reg, .NumToReg(add, exp), exp)
+		return .plus(reg, reg, .NumToReg(exp, add), exp)
 	return reg
 
 
@@ -356,10 +356,7 @@ function SetRel	(fn_asm)
 function Num (fn_asm)
 	opt norefcounts
 	|| d = exp.ASMDecl
-	|| r = asmstate.sh.FindConst(d)
-	if r != nil
-		return r
-	return .NumToReg(d.exportposition, exp, Dest)
+	return .GenericNumFinder(exp, d.exportposition, dest) 
 
 
 function Thg (fn_asm)
@@ -397,7 +394,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |as
 		|| val = d.exportposition
 			require !mode
 			(dest is constany)
-			return .NumToReg(val, exp, dest)
+			return .NumToReg(exp, val, dest)
 		return AsmReg()
 
 	if mode

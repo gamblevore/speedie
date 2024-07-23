@@ -49,9 +49,9 @@
 	i1 = i2;
 	i2 = i2 + U2_Li;
 ı ADD: _
-	i1 = i2 + (i3 << L3);
+	i1 = i2 + (i3 << Shift_Shu);
 ı SUBB: _
-	i1 = i2 - (i3 << L3);
+	i1 = (i2 - i3) >> Shift_Shu;
 ı MULT: _
 	i1 = (i2 * i3) + i4;
 ı DIVV: _
@@ -70,10 +70,6 @@
 	else 
 	u1 = std_min(u2, u3)
 ;
-ı PADD: _
-	i1 = i2 + (i3 << Shift_Shu);
-ı PSUB: _
-	i1 = (i2 - i3) >> Shift_Shu;
 ı BRUS: _
 	i1 = (((i2 << Shift_Shu) >> Shift_Shu) >> i3);
 ı BRUU: _

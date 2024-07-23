@@ -114,7 +114,7 @@ struct ASMState
 				return exp.FADK(dest, src, value) * dest
 			debugger // how is this possible? we are adding a 64 bit float to a 32-bit?
 		debugat
-		|| where = .NumToReg(value, exp)
+		|| where = .NumToReg(exp, value)
 		return .Plus(dest, src, where, exp)
 		
 
@@ -166,14 +166,13 @@ struct ASMState
 		return t
 
 	
-	function FoundCode (|int| i, |scdecl| d, |asmreg|)
+	helper FoundCode (|int| i, |uint64| Value, |asmreg| typeinfo, |asmreg|)
 		|| place = .regplace(i)
 		|| fat = place.Creator
-		if fat and fat.const == d.exportposition
-			|| dest = d.asmreg
-			dest.reg = i
-			(Dest is ConstAny)
-			return dest
+		if fat and fat.const == Value
+			typeinfo.reg = i
+			(typeinfo is ConstAny)
+			return typeinfo
 
 
 	function RegMap (|int|)
@@ -183,8 +182,11 @@ struct ASMState
 	
 	
 	function FindConst (|scdecl| d, |asmreg|)
+		return .findconst(d.exportposition, d.asmreg)
+
+	function FindConst (|uint64| Value, |asmreg| typeinfo, |asmreg|)
 		for (b.bits in .regmap) (i)
-			|| f = .FoundCode(i, d)
+			|| f = .FoundCode(i, value, typeinfo)
 				return f
 
 

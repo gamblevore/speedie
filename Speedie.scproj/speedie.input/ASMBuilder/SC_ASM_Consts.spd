@@ -45,8 +45,16 @@ function fatasm.KNST_Encoder (Asm_encoder2)
 	return Curr
 
 
+
 extend ASMState
-	function NumToReg (|int64| V, |message| exp, |asmreg| Reg=asmreg(), |asmreg|)
+	function asmstate.GenericNumFinder (|message| exp, |uint64| Value, |asmreg| TypeInfo=asmreg(), |asmreg|)
+		opt norefcounts
+		|| r = .FindConst(value, typeinfo)
+		if r != nil
+			return r
+		return .NumToReg(exp, Value, TypeInfo)
+
+	function NumToReg (|message| exp, |int64| V, |asmreg| Reg=asmreg(), |asmreg|)
 		Reg = .TempMe(exp, Reg)	
 		|| fat = exp.KNST(reg, 0, 0, 0)
 		fat.Const = v
@@ -73,14 +81,14 @@ extend ASMState
 			.r[3] = V|int|
 			return
 */
-			
+
 	function SetConst (|Message| List,  |message| Orig,  |bool|)
 		opt norefcounts								// set1: r1, 123
 		|| RegMsg = list[@thg]
 		|| ValMsg = regmsg.Next				#require
 		|| Value  = ValMsg.ASMConst
 		
-		.NumToReg(value, orig, RegMsg.Reg.asm)
+		.NumToReg(orig, value, RegMsg.Reg.asm)
 		return true
 	
 	
