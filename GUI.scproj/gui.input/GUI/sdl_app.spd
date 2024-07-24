@@ -934,6 +934,9 @@ module SDLApp
 			return .MousewheelEvent(ev,	w)
 
 		|| b = ev.button
+		if (b.button >= 4) and (t is mousedown) // what about holding it?
+			return w.DoListViewNext(b.button == 4)|int| // assumes SDLActivity.activity == 1
+	
 		if t is MOUSEDOWN
 			return .mousedownevent(w, b)
 
@@ -959,9 +962,9 @@ module SDLApp
 			.NewSize = (wev.data1, wev.data2)
 			return SDLActivity.activity
 		if (wt is FOCUS_GAINED)
-			return .appisbackground(false)
+			return .AppIsBackground(false)
 		if (wt is FOCUS_LOST)
-			return .appisbackground(true)
+			return .AppIsBackground(true)
 		return SDLActivity.nothing
 
 
@@ -1083,13 +1086,11 @@ module SDLApp
 			return SDLActivity.nothing
 		
 		.candrag = nil
-//		if .inResizeCorner(xy)
-//			return SDLActivity.activity
 
 		|| foc = w.realFocus
-		if foc and foc.ClickOutsideCloses and !(foc contains xy)
-			w.setfocus(nil)
-			return SDLActivity.activity
+			if foc.ClickOutsideCloses and !(foc contains xy)
+				w.setfocus(nil)
+				return SDLActivity.activity
 
 		if w.MouseDownEvent(b.button, b.clicks, xy)
 			.Touch
