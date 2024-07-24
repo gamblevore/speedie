@@ -25,7 +25,7 @@ struct FatASM
 	|ASMReg| 			Info		// only needs 32-bits of this. Could we make a smaller asmreg?
 	|message--| 		Msg
 	|uint64| 			Const
-	|&FatASM| 			BackLink	// for multiple instructions setting the same register.
+//	|&FatASM| 			BackLink	// for multiple instructions setting the same register.
 
 	|uint[5]|			R
 	|uint|				ASMIndex	
@@ -111,11 +111,12 @@ struct FatASM
 		return self
 	
 		
-	function LinkIn (|fatasm| old)
-		if old.BlockNum == .BlockNum					// add it's backlink
-			.BackLink = old.BackLink
-		  elseif .ParentBlock == old.parentblock		// if x {a=b} else {a=c}
-			.BackLink = old								// what about while loops or combinations?
+	function LinkedFrom (|fatasm| New)
+		.refcount++
+//		if New.BlockNum == .BlockNum					// add it's backlink
+//			.BackLink = New.BackLink
+//		  elseif .ParentBlock == New.parentblock		// if x {a=b} else {a=c}
+//			.BackLink = New								// what about while loops or combinations?
 														// what about nested ifs?
 														// if a {if b {x=1}} else {x=2}
 
@@ -124,17 +125,40 @@ struct FatASM
 														// if y
 														//     x = 2
 	
+	// REFCOUNTMADNESS
+	// || X = 1,  || Y = 2,  || Z = 3
+	// || B = X + Y
+	// || C = X << Z
+	// seems like B and C both refer to 2 fats each. So... how can that be done?
+	// Z/A can have a list of things that they own...?
+	// but it won't be independant.
+	// seems we should remove the backlink... and just say that each register input...
+	// refers to a FAT.
+	// its a lot of info to keep track of! and theres so many ways of doing it
+	// we COULD... just... NOT keep track of who owns what
+	// if something is unused... we remove it... then rescan the entire thing
+	// after all... it won't be refering to anything else?
+	
+	function RegInput (|int| a, assigns:|asmreg| info, |int|)
+		cpp_part Prm
+		rz = info.reg
+		.r[a] = rz
+		|| Src = info.fat
+			if !a // why?
+			Src.LinkedFrom(self) // what?
+		
+
 	function Dest (|uint| a, |asmreg| info, |bool|)
 		|| dest = info.reg
 		.r[a] = dest
 		if dest
 			if a > 1 // what?
-			(.Info as= (asmreg.Dest0|uint64| << a)|asmreg|)
+//			(.Info as= (asmreg.Dest0|uint64| << a)|asmreg|)
 			|| place = asmstate.sh.RegPlace(dest)
-			|| oldfat = place.Creator
+//			|| oldfat = place.Creator					// this needs understanding of phi-nodes?
 			place.Creator = self
-			if oldfat
-				.LinkIn(oldfat)
+//			if oldfat
+//				.LinkIn(oldfat)
 			return true
 	
 	
@@ -148,15 +172,6 @@ struct FatASM
 		err.position = .BytePos
 		stderr <~ err
 
-	function RegInput (|int| a, assigns:|asmreg| info, |int|)
-		cpp_part Prm
-		rz = info.reg
-		.r[a] = rz
-		|| f = info.fat
-			if !a // why?
-			f.LinkIn(self) // what?
-			f.refcount++
-		
 	function NumInput (|int| a, assigns:|int| v)
 		.r[a] = v
 		

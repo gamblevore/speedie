@@ -687,7 +687,6 @@ struct FatASM {
 	AsmReg Info;
 	Message* Msg;
 	uint64 Const;
-	FatASM* BackLink;
 	uint R[5];
 	uint ASMIndex;
 	u16 BlockNum;
@@ -5549,7 +5548,7 @@ FatASM* SC_FatASM_HaveAddr(FatASM* Self);
 
 ASM* SC_FatASM_KNST_Encoder(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
-void SC_FatASM_LinkIn(FatASM* Self, FatASM* Old);
+void SC_FatASM_LinkedFrom(FatASM* Self, FatASM* New);
 
 bool SC_FatASM_match3_2(FatASM* Self, int Reg);
 

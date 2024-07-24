@@ -1959,7 +1959,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112836356865119));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112842694131712));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3281,7 +3281,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[179]);
-	JB_FS_AppendInt32(_fsf0, (2024072315));
+	JB_FS_AppendInt32(_fsf0, (2024072418));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -5417,7 +5417,7 @@ void SC_PackMaker__ListPackFuncs(FastString* J) {
 }
 
 void SC_PackMaker__MakePack() {
-	int Sz = (64);
+	int Sz = (56);
 	int Diff = Sz - 64;
 	if (Diff) {
 	}
@@ -8344,7 +8344,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024072315));
+	JB_FS_AppendInt32(_fsf0, (2024072418));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -19814,13 +19814,8 @@ bool SC_FatASM_Dest(FatASM* Self, uint A, AsmReg Info) {
 	if (Dest) {
 		if (A > 1) {
 		}
-		Self->Info = SC_Reg_OperatorAs(Self->Info, ((AsmReg)(((uint64)kSC__Reg_Dest0) << A)));
 		RegState* Place = SC_Pac_RegPlace((&SC__Pac_Sh), Dest);
-		FatASM* Oldfat = Place->Creator;
 		Place->Creator = Self;
-		if (Oldfat) {
-			SC_FatASM_LinkIn(Self, Oldfat);
-		}
 		return true;
 	}
 	return false;
@@ -19992,13 +19987,8 @@ ASM* SC_FatASM_KNST_Encoder(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo
 	return Curr;
 }
 
-void SC_FatASM_LinkIn(FatASM* Self, FatASM* Old) {
-	if (Old->BlockNum == Self->BlockNum) {
-		Self->BackLink = Old->BackLink;
-	}
-	 else if (Self->ParentBlock == Old->ParentBlock) {
-		Self->BackLink = Old;
-	}
+void SC_FatASM_LinkedFrom(FatASM* Self, FatASM* New) {
+	(++Self->RefCount);
 }
 
 bool SC_FatASM_match3_2(FatASM* Self, int Reg) {
@@ -20049,12 +20039,11 @@ int SC_FatASM_Prm(FatASM* Self, int A, AsmReg Info) {
 	int Rz = 0;
 	Rz = SC_Reg_Reg(Info);
 	Self->R[A] = Rz;
-	FatASM* F = SC_Reg_FAT(Info);
-	if (F) {
+	FatASM* Src = SC_Reg_FAT(Info);
+	if (Src) {
 		if (!A) {
 		}
-		SC_FatASM_LinkIn(F, Self);
-		(++F->RefCount);
+		SC_FatASM_LinkedFrom(Src, Self);
 	}
 	return Rz;
 }
@@ -21488,8 +21477,7 @@ AsmReg SC_Pac_PlusInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* 
 	 else {
 		AsmReg V = SC_Pac_GenericNumFinder(Self, Exp, Lmul, SC_Reg__New());
 		if (!SC_Reg_SyntaxIs(L, kSC__Reg_Alternate)) {
-			JB_Msg_MULT(Exp, V, R, V, SC_Reg__New());
-			Fat = JB_Msg_ADD(Exp, Dest, L, V, SC_Reg_ToInt(SC_Reg__New()));
+			Fat = JB_Msg_MULT(Exp, Dest, R, V, L);
 		}
 		 else {
 			JB_Msg_SUBB(Exp, Dest, L, R, SC_Reg_ToInt(SC_Reg__New()));
@@ -21826,7 +21814,7 @@ bool SC_Pac__ExpandJSM() {
 	if (JB_Array_SyntaxCompare(SC__Pac_Ancients, 16, false) >= 0) {
 		return nil;
 	}
-	MWrap* J = JB_Incr(JB_Mrap__Object(4194304, 64));
+	MWrap* J = JB_Incr(JB_Mrap__Object(4194304, 56));
 	if (J) {
 		JB_Array_SyntaxAppend(SC__Pac_Ancients, SC__Pac_JSMSpace);
 		JB_SetRef(SC__Pac_JSMSpace, J);
@@ -21840,7 +21828,7 @@ bool SC_Pac__ExpandJSM() {
 
 int SC_Pac__Init_() {
 	{
-		JB_SetRef(SC__Pac_JSMSpace, JB_Mrap__Object(0, 64));
+		JB_SetRef(SC__Pac_JSMSpace, JB_Mrap__Object(0, 56));
 		JB_SetRef(SC__Pac_Ancients, JB_Array_Constructor0(nil));
 		SC__Pac_Sh = ((ASMState){});
 	}
@@ -53017,4 +53005,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -8076337494416388032 -4729075405355514717
+// 7829838127156258179 -4729075405355514717

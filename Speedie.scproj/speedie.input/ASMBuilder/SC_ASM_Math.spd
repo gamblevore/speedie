@@ -260,8 +260,7 @@ extend ASMState
 		  else
 			|| v = .GenericNumFinder(exp, lmul)
 			if l isnt alternate							// x = lptr + r*12
-				exp.MULT(V, R, V, asmreg())
-				fat = exp.ADD(dest, L, V, asmreg())
+				fat = exp.MULT(dest, R, V, L)
 			  else										// x = (lptr - rptr)/12
 				exp.SUBB(dest, L, R, asmreg())
 				|| uint64type = 0, debugger
