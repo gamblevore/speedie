@@ -223,16 +223,17 @@ struct FatASM
 	
 	function FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 		|| where = start+.ASMIndex
-		DEBUG_REQUIRE  where >= start  and  where < after 
-
-		debugat
-		|| dest_fat = .r[reg]
-		|| fat = dest_fat.fat
+		target debug: debug_require  where >= start  and  where < after 
+	
+		debugger // has issues when an ASM takes multiple slots?
+		// AAAAAAAAA. my freaking ASMIndex was meant to solve that.
+		|int| dest_fat = .r[reg]
+		|| fat = self + dest_fat
 		|| dest_asm = fat.asmindex
 		|| dest = start + dest_asm
 
-		DEBUG_REQUIRE dest >= start and dest <= after
-		.r[reg] = where - dest
+		target debug: debug_require dest >= start and dest <= after
+		.r[reg] = dest - where
 		.µrenderinto(where, where+1) // rerender
 	
 	
