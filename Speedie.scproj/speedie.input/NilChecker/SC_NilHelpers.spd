@@ -59,9 +59,7 @@ function Compiler.GetTypeVoid (|scdecl!|)
 	TypeVoid_ = vc
 	
 	if !vc
-		if 1
-			app.Quit("_void failiure", -1)
-		return rz!
+		app.Quit("_void failiure", -1)
 	
 	rz = vc.TypeNormal
 	typevoid = rz
