@@ -295,6 +295,15 @@ function IsQuarantined (|bool|)
 	return .path contains "/AppTranslocation/"
 
 
+function Configure (assigns:|string|)
+	|error| err
+	._conf  = Value.parsewitherror(err)
+	if err
+		printline err.render
+	._conf := message()
+
+
+
 target !minilib {
 function Say (|string| s, |bool| print=true,  |errorint2|)
 //	visible // then libjeebox won't compile.
@@ -307,17 +316,6 @@ function AppleScript (|string| str, |ErrorInt2|)
 
 function Sudo (|string| p, |ErrorInt2|)
 	return .applescript("do shell script \"$p\" with administrator privileges")
-}
-
-
-function Configure (assigns:|string|)
-	|error| err
-	._conf  = Value.parsewitherror(err)
-	if err
-		printline err.render
-	._conf := message()
-
-
 
 function Icon (assigns:|string| path)
 	|| ico = path.Resolve
@@ -332,6 +330,8 @@ function ShowURL (|string| path)
 
 function ShowURLC (|cstring| path)
 	cpp_wrapper JB_App__ShowURL
+}
+
 }
 
 
