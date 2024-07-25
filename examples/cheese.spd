@@ -4,7 +4,7 @@ class CheeseShop
 	|string| ClerkName
 
 	constructor (|message| cfg)
-		.inventory = cfg["cheeses"].DictLower
+		.inventory = cfg["cheeses"]
 		.clerkName = cfg["clerk"]
 
 	syntax access (|string| cheeseName, |string|)
