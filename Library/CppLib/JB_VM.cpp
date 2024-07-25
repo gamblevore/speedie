@@ -43,7 +43,7 @@ s64 RunVM (jb_vm& vm) {		// vm_run, vm__run, vmrun, run_vm
 
     ASM* Code	  = vm.Env.Code;
 //    Goto Next     = 0;
-    Register* r	 = vm.Stack.Registers;
+    Register* r	 = vm.Registers;
 
     ASM  Op=-1;
 //    ASM  Op2;
@@ -59,7 +59,7 @@ s64 RunVM (jb_vm& vm) {		// vm_run, vm__run, vmrun, run_vm
 
 jb_vm* vm;
 ivec4* JB_ASM_Registers(jb_vm* V, bool Clear) {
-	Register* Ret = V->Stack.Registers;
+	Register* Ret = V->Registers;
 	if (Clear)
 		memset(Ret, 0, sizeof(vec4)*32);
 	return (ivec4*)(Ret+1);

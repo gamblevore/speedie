@@ -4,31 +4,10 @@ typedef const void* Goto;
 
 // // // // // // // // // // // //  
 
-// we really need to make this a simple32 bit number
-// no special wierdness!!!!! ARGH
 #ifndef ASM
 	#define ASM u32
 #endif
-//	union {
-//		u32				Raw;
-//    };
-//    ASM() {
-//		Raw = 0;
-//    }
-//    ASM(u32 Op) {
-//		Raw = Op<<24;
-//    }
-// 	operator u32() {
-//		return Raw;
-//	}
-//};
 
-
-struct RegInfo {
-//	uint8			ResultRegister;
-	uint8			CallerRegCount;
-	Register		Registers[];
-};
 
 
 struct Function {
@@ -50,11 +29,12 @@ struct vm_globs {
 
 struct jb_vm {
 	vm_globs		Env;
-    Register*		CurrStack;
+    Register*		CurrRegs;
     int             StackSize;
     ASM				EXIT[2];
     int             GuardValue;
-    RegInfo			Stack;
+    byte*			StructAllocator;
+	Register		Registers[];
 };
 
 

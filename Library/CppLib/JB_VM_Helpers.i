@@ -489,6 +489,24 @@ AlwaysInline ASM* BumpStack (Register*& rp, ASM* Code, ASM Op) { // jumpstack
 }
 
 
+AlwaysInline void AllocStack (jb_vm& vm, Register* r, ASM Op) {
+	debugger; // do this later. We we need a separate stack for these?
+	uint BEEETS = Alloc_Alignu;
+	uint Align = 1 << BEEETS;
+	int Amount = Alloc_Amounti << BEEETS;
+	auto B = vm.StructAllocator;
+	r[n1].Int = (uint64)(B);
+	if (Amount > 0) {
+		auto Up = (-((uint64)B) & (Align-1));
+		B += Up+Amount;
+	} else {
+		debugger; // We need to de-align after
+		B -= Amount;
+		B -= (-((uint64)B) & (Align-1));
+	}
+	vm.StructAllocator = B;
+}
+
 AlwaysInline ASM* TailStack (Register* r, ASM* Code, ASM Op) {
 	ASM Code2 = Code[0];
 	// What if this overwrites params that we mean to read from?

@@ -20,6 +20,11 @@ forms
 	Tail
 		JUMP	j
 		Prm1	x // also
+		
+	Alloc
+		r1		R
+		Align	3 // 1 << align
+		Amount	l
 	
 	Jump
 		l0		l
@@ -234,7 +239,7 @@ forms
 
 /**/ FNCX (Func, 2,3)
 		__
-		vm.CurrStack = r // to make this recursive
+		vm.CurrRegs = r // to make this recursive
 		ForeignFuncSimple(r, Code, Op)
 		___
 
@@ -242,6 +247,9 @@ forms
 		__
 		Code = TailStack(r, Code, Op)
 		___
+
+/**/ ALLO (Alloc)
+		AllocStack(vm, r, Op)
 	
 
 

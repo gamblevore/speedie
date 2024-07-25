@@ -3,7 +3,7 @@
 tests oofit
 	asm oofit (0)
 		KNST  (r1, 3458764513820540931) //test
-		KNST  (r1, 123)
+		KNST  (r1, 702)
 		KNST  (r4, 2)
 		@test
 		KNST  (r3, 18874368)

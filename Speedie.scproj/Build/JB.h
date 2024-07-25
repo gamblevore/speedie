@@ -149,6 +149,8 @@ typedef u16 ASMParam;
 
 typedef ASM ASM_AddK;
 
+typedef ASM ASM_Alloc;
+
 typedef ASM ASM_BClear;
 
 typedef ASM ASM_BFLD;
@@ -1863,38 +1865,39 @@ extern Random JB__zalgo_R;
 #define kJB__uint16_max 65535
 #define kJB__uint16_min (0)
 #define kJB__uint64_max -1
-#define kSC__ASM_ADD 43
-#define kSC__ASM_ADDK 41
-#define kSC__ASM_ADPK 42
-#define kSC__ASM_BAND 52
-#define kSC__ASM_BCLR 60
-#define kSC__ASM_BFLG 56
-#define kSC__ASM_BFLS 57
-#define kSC__ASM_BLUE 51
-#define kSC__ASM_BNOT 55
-#define kSC__ASM_BOAR 53
-#define kSC__ASM_BROL 58
-#define kSC__ASM_BROR 59
-#define kSC__ASM_BRUS 49
-#define kSC__ASM_BRUU 50
-#define kSC__ASM_BXOR 54
-#define kSC__ASM_CMPB 61
-#define kSC__ASM_CMPF 64
-#define kSC__ASM_CMPI 63
-#define kSC__ASM_CNTC 91
-#define kSC__ASM_CNTD 92
-#define kSC__ASM_CONV 39
-#define kSC__ASM_DIVV 46
+#define kSC__ASM_ADD 44
+#define kSC__ASM_ADDK 42
+#define kSC__ASM_ADPK 43
+#define kSC__ASM_ALLO 36
+#define kSC__ASM_BAND 53
+#define kSC__ASM_BCLR 61
+#define kSC__ASM_BFLG 57
+#define kSC__ASM_BFLS 58
+#define kSC__ASM_BLUE 52
+#define kSC__ASM_BNOT 56
+#define kSC__ASM_BOAR 54
+#define kSC__ASM_BROL 59
+#define kSC__ASM_BROR 60
+#define kSC__ASM_BRUS 50
+#define kSC__ASM_BRUU 51
+#define kSC__ASM_BXOR 55
+#define kSC__ASM_CMPB 62
+#define kSC__ASM_CMPF 65
+#define kSC__ASM_CMPI 64
+#define kSC__ASM_CNTC 92
+#define kSC__ASM_CNTD 93
+#define kSC__ASM_CONV 40
+#define kSC__ASM_DIVV 47
 extern ASM_Encoder2 SC__ASM_Encoders[256];
 #define kSC__ASM_EROR 32
-#define kSC__ASM_FADD 94
-#define kSC__ASM_FADK 95
-#define kSC__ASM_FDIV 98
-#define kSC__ASM_FFRC 99
-#define kSC__ASM_FMAX 100
-#define kSC__ASM_FMIN 101
-#define kSC__ASM_FMLK 97
-#define kSC__ASM_FMUL 96
+#define kSC__ASM_FADD 95
+#define kSC__ASM_FADK 96
+#define kSC__ASM_FDIV 99
+#define kSC__ASM_FFRC 100
+#define kSC__ASM_FMAX 101
+#define kSC__ASM_FMIN 102
+#define kSC__ASM_FMLK 98
+#define kSC__ASM_FMUL 97
 #define kSC__ASM_FNCX 5
 #define kSC__ASM_FNCX2 5
 #define kSC__ASM_FNCX3 6
@@ -1902,52 +1905,52 @@ extern ASM_Encoder2 SC__ASM_Forms[128];
 #define kSC__ASM_FUNC 1
 #define kSC__ASM_FUNC2 1
 #define kSC__ASM_FUNC3 2
-#define kSC__ASM_JBRA 70
-#define kSC__ASM_JBRN 71
-#define kSC__ASM_JMPE 68
-#define kSC__ASM_JMPF 67
-#define kSC__ASM_JMPI 66
-#define kSC__ASM_JMPN 69
-#define kSC__ASM_JUMP 65
-#define kSC__ASM_KNSR 40
+#define kSC__ASM_JBRA 71
+#define kSC__ASM_JBRN 72
+#define kSC__ASM_JMPE 69
+#define kSC__ASM_JMPF 68
+#define kSC__ASM_JMPI 67
+#define kSC__ASM_JMPN 70
+#define kSC__ASM_JUMP 66
+#define kSC__ASM_KNSR 41
 #define kSC__ASM_KNST 8
 #define kSC__ASM_KNST1 8
 #define kSC__ASM_KNST2 9
 #define kSC__ASM_KNST3 10
-#define kSC__ASM_LUPD 72
-#define kSC__ASM_LUPU 73
-#define kSC__ASM_MAX 47
-#define kSC__ASM_MEMU 93
-#define kSC__ASM_MIN 48
-#define kSC__ASM_MULT 45
+#define kSC__ASM_LUPD 73
+#define kSC__ASM_LUPU 74
+#define kSC__ASM_MAX 48
+#define kSC__ASM_MEMU 94
+#define kSC__ASM_MIN 49
+#define kSC__ASM_MULT 46
 extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_NOOP 33
-#define kSC__ASM_PRNT 37
-#define kSC__ASM_RALO 76
-#define kSC__ASM_RARE 38
-#define kSC__ASM_RD16 85
-#define kSC__ASM_RD1S 79
-#define kSC__ASM_RD1U 78
-#define kSC__ASM_RD2S 81
-#define kSC__ASM_RD2U 80
-#define kSC__ASM_RD4S 83
-#define kSC__ASM_RD4U 82
-#define kSC__ASM_RD8U 84
+#define kSC__ASM_PRNT 38
+#define kSC__ASM_RALO 77
+#define kSC__ASM_RARE 39
+#define kSC__ASM_RD16 86
+#define kSC__ASM_RD1S 80
+#define kSC__ASM_RD1U 79
+#define kSC__ASM_RD2S 82
+#define kSC__ASM_RD2U 81
+#define kSC__ASM_RD4S 84
+#define kSC__ASM_RD4U 83
+#define kSC__ASM_RD8U 85
 #define kSC__ASM_RET 35
-#define kSC__ASM_RMEM 75
-#define kSC__ASM_RSET 74
-#define kSC__ASM_SUBB 44
-#define kSC__ASM_SWAP 36
-#define kSC__ASM_TABL 77
+#define kSC__ASM_RMEM 76
+#define kSC__ASM_RSET 75
+#define kSC__ASM_SUBB 45
+#define kSC__ASM_SWAP 37
+#define kSC__ASM_TABL 78
 #define kSC__ASM_TAIL 13
 #define kSC__ASM_TAIL2 13
-#define kSC__ASM_TERN 62
+#define kSC__ASM_TERN 63
 #define kSC__ASM_TRAP 34
-#define kSC__ASM_WR16 90
-#define kSC__ASM_WR1U 86
-#define kSC__ASM_WR2U 87
-#define kSC__ASM_WR4U 88
-#define kSC__ASM_WR8U 89
+#define kSC__ASM_WR16 91
+#define kSC__ASM_WR1U 87
+#define kSC__ASM_WR2U 88
+#define kSC__ASM_WR4U 89
+#define kSC__ASM_WR8U 90
 #define kSC__ASMtmp_IncrAfter 2
 #define kSC__ASMtmp_IncrBefore (0)
 #define kSC__ASMtmp_kContinue 51
@@ -4351,6 +4354,10 @@ bool SC_uint64_CanStoreAsFloatImmediate(uint64 Self);
 // ASM
 ASM SC_ASM_AddK_KSet(ASM Self, uint Value);
 
+ASM SC_ASM_Alloc_AlignSet(ASM Self, uint Value);
+
+ASM SC_ASM_Alloc_AmountSet(ASM Self, uint Value);
+
 ASM SC_ASM_BClear_Shift1Set(ASM Self, uint Value);
 
 ASM SC_ASM_BClear_Shift2Set(ASM Self, uint Value);
@@ -5007,6 +5014,11 @@ Macro* SC_xC2xB5Param_Which(ASMParam Self);
 
 // ASM_AddK
 ASM* JB_ASM_AddK__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+
+
+
+// ASM_Alloc
+ASM* JB_ASM_Alloc__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
@@ -5969,9 +5981,9 @@ AsmReg SC_Pac_TempMe(ASMState* Self, Message* Where, AsmReg T);
 
 bool SC_Pac_TextFuncSub(ASMState* Self, Message* M);
 
-void SC_Pac_TextInstruction(ASMState* Self, Message* M);
+void SC_Pac_TextOp(ASMState* Self, Message* M);
 
-bool SC_Pac_TextOp(ASMState* Self, Message* M);
+bool SC_Pac_TextOpSub(ASMState* Self, Message* M);
 
 bool SC_Pac__ExpandJSM();
 
@@ -7676,6 +7688,8 @@ FatASM* JB_Msg_ADPK(Message* Self, AsmReg R1, AsmReg R2, int K);
 int JB_Msg_After(Message* Self);
 
 void JB_Msg_AfterSet(Message* Self, int Value);
+
+FatASM* JB_Msg_ALLO(Message* Self, AsmReg R1, int Align, int Amount);
 
 bool SC_Msg_AllowedMoveToInit(Message* Self);
 
@@ -10446,7 +10460,7 @@ inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After) {
 	ASM* Rz = nil;
 	Rz = (SC__ASM_Encoders[Self->Op])(Self, Where, After, 0);
 	if (SC_ASM_DecodeBaseOp(Where[0]) != Self->Op) {
-		JB_PrintLine(JB_LUB[2099]);
+		JB_PrintLine(JB_LUB[2101]);
 		debugger;
 		Rz = (SC__ASM_Encoders[Self->Op])(Self, Where, After, 0);
 	}
@@ -10505,14 +10519,14 @@ inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 	if (!SC_Reg_FatIndex(Rz)) {
 		if (((!SC_Reg_SyntaxIs(Rz, kSC__Reg_ConstAny))) or ((bool)SC_Reg_Const(Rz))) {
 			if (true) {
-				SC_Pac_SyntaxExpect(Self, nil, JB_LUB[2101]);
+				SC_Pac_SyntaxExpect(Self, nil, JB_LUB[2103]);
 			}
 			Rz = (Fn)(Self, Exp, Dest, 0);
 		}
 	}
 	 else if ((!JB_TC_IsNumeric(SC_Reg_xC2xB5Type(Rz))) and JB_TC_SyntaxIs(SC_Reg_xC2xB5Type(Rz), kJB__TC_bool)) {
 		if (true) {
-			SC_Pac_SyntaxExpect(Self, nil, JB_LUB[2102]);
+			SC_Pac_SyntaxExpect(Self, nil, JB_LUB[2104]);
 		}
 		Rz = (Fn)(Self, Exp, Dest, 0);
 	}

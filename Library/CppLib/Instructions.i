@@ -4,7 +4,7 @@
 	___;
 ı FNCX: 
 	__;
-	vm.CurrStack = r;
+	vm.CurrRegs = r;
 	ForeignFuncSimple(r, Code, Op);
 	___;
 ı KNST: _
@@ -30,6 +30,8 @@
 	__;
 	Code = Return(r, Code, Op);
 	___;
+ı ALLO: _
+	AllocStack(vm, r, Op);
 ı SWAP: _
 	std_swap(r[n1], r[n2]);
 	std_swap(r[n3], r[n4]);

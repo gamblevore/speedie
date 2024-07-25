@@ -25,6 +25,7 @@ class µFunc
 		|| after = .µRender(P, P+rz.length)
 		rz.capacity = after-p
 	
+	// cosmic lore unfold... into tales untold
 	
 	function µRender (|!&ASM| Where, |!&asm| After, |!&asm|)
 		|| HasLabel = false

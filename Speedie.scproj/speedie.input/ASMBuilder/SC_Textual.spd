@@ -18,14 +18,14 @@ extend ASMState
 
 		
 
-	function TextInstruction (|message| m)
-		if !.TextOp(m)
+	function TextOp (|message| m)
+		if !.TextOpSub(m)
 			debugat // retry
-			.TextOp(m)
+			.TextOpSub(m)
 		// we also need to go into the if/while things
 
 
-	function TextOp (|message| m, |bool|)
+	function TextOpSub (|message| m, |bool|)
 		opt norefcounts
 		
 		if m == @rel
@@ -108,7 +108,7 @@ extend ASMState
 			if ch == @name
 				.addlabel(ch)
 			  else
-				.TextInstruction(ch)
+				.TextOp(ch)
 		.SetLength
 		return .LoadLabelJumps
 
