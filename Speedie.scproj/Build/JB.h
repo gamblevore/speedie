@@ -1475,13 +1475,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RecheckType 4
 #define kSC__CustomOps_TypeCastFromBool 16
 #define kSC__CustomOps_TypeCastToBetter 32
-#define kJB__ErrorColors_bold (JB_LUB[2085])
+#define kJB__ErrorColors_bold (JB_LUB[2096])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[2086])
-#define kJB__ErrorColors_good (JB_LUB[2087])
-#define kJB__ErrorColors_normal (JB_LUB[2084])
-#define kJB__ErrorColors_underline (JB_LUB[2087])
-#define kJB__ErrorColors_warn (JB_LUB[2088])
+#define kJB__ErrorColors_error (JB_LUB[2097])
+#define kJB__ErrorColors_good (JB_LUB[2098])
+#define kJB__ErrorColors_normal (JB_LUB[2095])
+#define kJB__ErrorColors_underline (JB_LUB[2098])
+#define kJB__ErrorColors_warn (JB_LUB[1673])
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
 extern int SC__FastStringOpts_StrRemoved;
@@ -1846,10 +1846,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp 32784
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down (JB_LUB[1916])
-#define kJB__zalgo_mid (JB_LUB[1915])
+#define kJB__zalgo_down (JB_LUB[1927])
+#define kJB__zalgo_mid (JB_LUB[1926])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up (JB_LUB[1891])
+#define kJB__zalgo_up (JB_LUB[1902])
 #define kJB__byte_max 255
 #define kJB__byte_min (0)
 #define kJB__char_max 127
@@ -2354,7 +2354,7 @@ extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_kDelete 2
 #define kJB__Wrap_kFree 1
 #define kJB__Wrap_kNothing (0)
-#define kJB__Rec_NonFatal (JB_LUB[2083])
+#define kJB__Rec_NonFatal (JB_LUB[2094])
 extern double JB__Rec_Progress;
 #define kJB__fix_TypeDict 3
 #define kJB__fix_TypeObj 1
@@ -2589,6 +2589,8 @@ JB_File* SC_Comp__FindProjectSub(JB_String* Base, JB_String* Path);
 JB_String* SC_Comp__FindProjNoSuffix(JB_String* Path);
 
 JB_File* SC_Comp__GeneratedCppsFolder();
+
+SCDecl* SC_Comp__GetTypeVoid();
 
 JB_String* SC_Comp__IdealName();
 
@@ -3559,7 +3561,7 @@ void SC_VM_Builder__MakeJump(Message* Msg, FastString* Jump);
 
 void SC_VM_Builder__MakeMsgCreator(JB_String* Name, xC2xB5Form* Form);
 
-void SC_VM_Builder__MakeTheVM();
+bool SC_VM_Builder__MakeTheVM();
 
 void SC_VM_Builder__MakeVM(Message* Tmp, FastString* Vm);
 
