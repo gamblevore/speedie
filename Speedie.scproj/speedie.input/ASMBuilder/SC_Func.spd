@@ -30,7 +30,10 @@ class µFunc
 	function µRender (|!&ASM| Where, |!&asm| After, |!&asm|)
 		|| HasLabel = 0
 		rz = where
-
+		// could use a 64bit jump-map... so just mark each instruction as needing
+		// labels or not...
+		// if theres only 1 or 2... we can jump directly. if more than 64 we just
+		// check da right bits
 		for i in .length
 			|| fat = .ir+i
 			haslabel |= fat.jumpreg

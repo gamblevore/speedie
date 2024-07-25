@@ -8,7 +8,6 @@ module TextAssembler
 		|| fn = SCFunction.new
 		fn.source = msg
 		ASmState.Sh.startfunc(fn)
-		.Labels := dictionary()
 		|| arg = ASmState.Sh.TextFuncSub(msg)
 			compiler.exportnames[fn.exportname] = fn
 		ASmState.Sh.FinishASM

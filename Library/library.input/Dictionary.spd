@@ -55,7 +55,10 @@ class Dictionary (saveable)
 			return self[s]
 		return self[s.lowercase]
 	function ValueLower (|string| s, assigns:||)
-		self[s.lowercase] = value
+		if s.IsLower
+			self[s] = value
+		  else
+			self[s.lowercase] = value
 
 
 	function Dispose									{ cpp_wrapper }
