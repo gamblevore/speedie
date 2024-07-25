@@ -7500,11 +7500,9 @@ int JB_File__InitCode_();
 
 JB_File* JB_File__Logs();
 
-JB_String* JB_File__PreferencesPath();
+JB_String* JB_File__PrefPath();
 
-JB_String* JB_File__Prefs(JB_String* Name);
-
-JB_File* JB_File__PrefsFolder();
+JB_File* JB_File__Prefs(JB_String* Name);
 
 JB_String* JB_File__Speedie();
 
