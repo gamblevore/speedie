@@ -46,7 +46,7 @@ function OpenSaveRequest (|string| types,  |string| base,  |string| Accept,  |bo
 	f.ListFilesUp(base, types, save)
 	f.SelectFirst
 	if last
-		f.select(OpenSaveDialog.FindFileName(f, last.name))
+		f.select(filerow.FindFileName(f, last.name))
 	
 	if save and w.name.text contains '.'
 		w.name.selrange = (0, 8) // only works on the second time we run this func? annoying.
@@ -91,6 +91,7 @@ class OpenSaveDialog (Window)
 		.size			= 500 by 225
 		.id				= "opensave"
 		isnt visible
+		.path.onpaste = nil// nice
 		.AddButton(.accept, "Open", true)
 		.AddButton(.Cancel,	"Cancel", false)
 		.init
@@ -191,12 +192,6 @@ class OpenSaveDialog (Window)
 				if f != @tmp
 					f.remove
 			
-		function FindFileName (|listview| s, |string| name, |filerow|)
-			for r.all in s
-				if r isa filerow
-					if r.location.name ~= name
-						return r
-		
 
 		function RelistKey (guitextevent)
 			opt NoRefCounts

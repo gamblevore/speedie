@@ -52,6 +52,8 @@ class TextView (GUIControl)
 		.SetsDebugLines = 10
 		.ExpectsParse = TextView.allowjeebox
 		.CopyPaste = CopyPasteFlags.CopyText ||| CopyPasteFlags.PasteText
+		.onpaste = textPaste|GUIPasteEvent|
+		.oncopy = textCopy|GUICopyEvent|
 		.init
 
 	function Document (|document|)

@@ -299,6 +299,14 @@ class FileRow (ListViewRow)
 			  else
 				rz = rz max r.name(nameonly).FileViewMatch(path)
 
+	module
+		function FindFileName (|listview| s, |string| name, |filerow|)
+			for r.all in s
+				if r isa filerow
+					if r.location.name ~= name
+						return r
+		
+	
 
 helper string.FindExistingPath (|string|)
 	while (self > 1) and !.fileexists
@@ -312,7 +320,7 @@ helper ListView.ListFilesUp (|string| InPath, |string| types, |bool| Save, |int|
 	|| r = filerow(path.parent, "..", ".nothing")
 	.listsource.first = r
 	|| f = path.file
-	|| r2 = .listsource[path.name] as filerow
+	|| r2 = filerow.FindFileName(self, path.name) as filerow
 	if f.exists and !f.isdir and r2
 		.show(r2)
 		r = r2

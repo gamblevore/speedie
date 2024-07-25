@@ -19,8 +19,6 @@ class Window (GUIControl)
 	|guicontrol?|						FocusAttempt
 	|guicontrol?|						InnerLostFocus
 	|InlineEditor|						InlineEditorPlace
-	|GUIPasteEvent?|					OnPaste
-	|GUICopyEvent?|						OnCopy
 	|GUIMouseMoveEvent?|				OnMouseMove
 	|list of TaskGUI|					Tasks
 	|object?|							ReturnValue

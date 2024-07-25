@@ -13,6 +13,8 @@ class GUIControl (list)
 	|Drawstyle|  				GNormal
 	|GUIAction?|				OnClicked
 	|GUIAction?|				OnFocus
+	|GUIPasteEvent?|			OnPaste
+	|GUICopyEvent?|				OnCopy
 	|TimeFader|					Declutterer
 	|uint|						_ScrollDrawTimer
 	|ControlSize|				Sizer
@@ -284,21 +286,13 @@ class GUIControl (list)
 	
 	
 	helper PasteEvent (|GUIPasteEvent|)
-		if self isa window
-			return .onpaste
-		if self isa ListView
-			return .onpaste
-		if self isa textview and self is editable
-			return (&TextView.textPaste)|GUIPasteEvent|
+		if self isa textview and self isnt editable
+			return nil
+		return .onpaste
 
 
 	helper CopyEvent (|GUICopyEvent|)
-		if self isa window
-			return .onCopy
-		if self isa ListView
-			return .onCopy
-		if self isa textview
-			return (&TextView.textCopy)|GUICopyEvent|
+		return .oncopy
 
 	
 	helper CopyList (|array|)

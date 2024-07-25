@@ -41,8 +41,6 @@ class ListView (GUIControl) {
 	|GUIListEvent?|					OnReturn
 	|GUIListEvent?|					CalculateColumnWidths
 	|GUIListEvent?|					OnRightClick
-	|GUIPasteEvent?|				OnPaste
-	|GUICopyEvent?|					OnCopy
 	|GUIListDragEvent?|				OnDragRow
 	|ListViewRowDraw?|				OnDrawRow
 	|textview?| 					TypingFilter
