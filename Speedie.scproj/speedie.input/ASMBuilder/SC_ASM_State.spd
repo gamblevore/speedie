@@ -155,13 +155,14 @@ struct ASMState
 	
 	function TempMe (|Message| where, |asmreg| T=asmreg.Temp,  |asmreg|) // .needreg
 		|| r = t.reg
-		if r
-			if .Registers[r].Type != where.ASMDecl // hmmmm.... well now what?
-		  else
+		if !r
+//			if .Registers[r].Type != where.ASMDecl // hmmmm.... well now what?
+//		  else
 			r = .vtmps - 1
 			check (r > .vdecls) (where, "No free local variables.")
 			t.reg = r
 			.vtmps = r
+		if t isnt textual
 			.Registers[r].Type = where.ASMDecl
 		return t
 
@@ -347,7 +348,7 @@ function ASMState.FinishASM
 
 
 function ASMState.SetLength
-	.out.length = .curr.Index
+	.out.length = .curr - .FuncStart
 
 
 //function int64.CanInt32 (|bool|)

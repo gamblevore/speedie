@@ -39,8 +39,9 @@ datatype AsmReg (uint64)
 		AddrRequest
 		BitCorrect
 		LabelRequest
-		Dest0
-		Dest1
+		Textual
+//		Dest0
+//		Dest1
 		CorrectAddr		= ContainsAddr ||| bitcorrect
 		Arg				= Discard         // ||| SrcConst
 		CondRequest		= NewCondRequest  // ||| SrcConst
@@ -205,4 +206,8 @@ datatype AsmReg (uint64)
 function int.asm (|asmreg|)
 	cpp_part ToASM
 	rz.reg = self // (self - 1)&31 // would be better?
+
+function int.TextASM (|asmreg|)
+	rz.reg = self // (self - 1)&31 // would be better?
+	(rz is textual)
 

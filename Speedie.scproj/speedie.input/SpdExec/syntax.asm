@@ -8,7 +8,7 @@ tests oofit
 		@test
 		KNST  (r3, 18874368)
 		KNST  (r3, -234)
-		ADD   (r1, r1, r3)
+		ADD   (r1, r1, r3, 0)
 		PRNT  (r1,)			// -111
 		BRA   (r4, @test)
 		HALT  (r0,0,0)

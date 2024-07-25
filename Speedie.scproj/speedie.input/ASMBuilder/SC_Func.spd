@@ -42,10 +42,11 @@ class µFunc
 				if i is labelrequest
 					(i isnt labelrequest)
 					i.FillLabelRequest(where, rz)
-			
-		while where < after
-			where.DebugPrint
-			where += where.length
+		
+		target debug
+			while where < rz
+				where.DebugPrint
+				where += where.length
 
 
 

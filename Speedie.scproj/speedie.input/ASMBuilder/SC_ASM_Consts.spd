@@ -88,7 +88,7 @@ extend ASMState
 		|| ValMsg = regmsg.Next				#require
 		|| Value  = ValMsg.ASMConst
 		
-		.NumToReg(orig, value, RegMsg.Reg.asm)
+		.NumToReg(orig, value, RegMsg.Reg.textasm)
 		return true
 	
 	
