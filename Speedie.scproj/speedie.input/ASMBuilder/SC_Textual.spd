@@ -22,7 +22,6 @@ extend ASMState
 		if !.TextOpSub(m)
 			debugat // retry
 			.TextOpSub(m)
-		// we also need to go into the if/while things
 
 
 	function TextOpSub (|message| m, |bool|)
@@ -56,47 +55,44 @@ extend ASMState
 		return (op.pcount == pos) #expect (list, "Too few params")
 
 	
-	function fatasm.AddLabelRequest (|message| P, |int| Pos, |int|)
-		|| x = .info as asmreg.labelrequest
+	function fatasm.AddLabelRequest (|message| P, |int| Pos)
+		opt norefcounts
+		|| x = .info
 		x.reg = pos
 		.info = x
+		|| f = .form
+			|| j = f.jumpreg // remove jumpreg and use forms count
+				if j != pos + 1 // what?
+			.jumpreg = j
+		
 
 
 	function LoadLabelJumps (|bool|)
 		opt norefcounts
-		if ASMState.sh.labelcount
-			for A in .out
-				if a is labelrequest
-					require .GetLabel(a)
+		for A in .out
+			require textassembler.GetLabel(a)
 		return true
 	
 	
-	function GetLabel (|&FatASM| Jumper, |bool|)
+	function textassembler.GetLabel (|&FatASM| Jumper, |bool|)
 		opt norefcounts
 
-		|| list = jumper.msg.first
-		|| i = 0
-		|| found = false
-		for s in list
-			if s == @name
-				for A in .out
-					|| m = a.msg
-					if m.name ~= s.name
-						|| fat = m.rangelength|uint| #expect (m, "Label has no address")
-						jumper.r[i] = fat ||| asmreg.FatRef
-						found = true
-			i++
-		
-		
-		return found #expect (jumper, "No label found")
+		|| i = jumper.JumpReg
+		if !i
+			return true
+		i--
+		|| name = jumper.msg.first[i]
+			|| dest_index = textassembler.Labels.valuelower(name.name) #expect (name, "arg")
+			jumper.r[i] = dest_index[] - jumper.index
+			return true
+				
+		error (jumper, "No label found")
 	
 	
 	function AddLabel (|message| ch)
 		opt norefcounts
-		|| l = .labelcount+1
-		expect l <= 254 (ch, "Too many labels")
-		.labelcount = l
-		ch.rangelength = .curr.index
+		|| d = textassembler.labels init dictionary()
+		d.valuelower(ch.name) = .curr.index
 
 
 	function TextFuncSub (|message| m, |bool|)
@@ -104,7 +100,6 @@ extend ASMState
 		.vdecls = 31 // no other choice. Register requester will fail... otherwise.
 					 // i forgot how this helps. WHAT GOES WRONGGG????
 		for ch in .LoadTitle(m)
-			|| ARHJAKLsd = .curr.index
 			if ch == @name
 				.addlabel(ch)
 			  else

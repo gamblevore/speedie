@@ -3,7 +3,7 @@
 // vm.box
 
 
-class µForm 
+class µForm
 	|int|			Count
 	|string|		Name
 	|µParam[5]|		Params
@@ -11,6 +11,7 @@ class µForm
 	|int|			TotalBits
 	|int| 			Outputs
 	|int|			Index
+	|int|			JumpReg // remove jumpreg and use forms count
 	
 	
 	render
@@ -40,6 +41,9 @@ class µForm
 		expect (i < –count .params) ("Too many params.")
 		p |= size - 1
 		.params[i] = p
+		if p is jump
+			if .jumpreg // what?
+			.jumpreg = i+1
 			
 
 	syntax Access (|int| i, |µParam|)

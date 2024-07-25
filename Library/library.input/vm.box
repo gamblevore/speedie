@@ -280,11 +280,11 @@ forms
 #!						 (((((Math)))))
 /**/ ADDK (AddK)
 		i1 = i2 + U2_Li
-/**/ ADPK (AddK)
+/**/ ADPK (AddK) // post-increment
 		i1 = i2
 		i2 = i2 + U2_Li
 /**/ ADD  (Shift)
-		i1 = i2 + (i3 << Shift_Shu) // only need 6 bits for shift! can we save 3 conditional add?
+		i1 = i2 + (i3 << Shift_Shu)
 /**/ SUBB  (Shift)              	// must come after ADD
 		i1 = (i2 - i3) >> Shift_Shu
 /**/ MULT  (U4)
@@ -348,13 +348,12 @@ forms
 	else
 		u1 = u4
 
-
 /**/ CMPI  (Cmp)
 	CompI(r, Op)
 
-
 /**/ CMPF  (Cmp)
 	CompF(r, Op)
+
 
 
 #!						 (((((Branches)))))
@@ -416,7 +415,7 @@ forms
 /**/ RSET  (refset)
 		setref(n1, o1, o2)
 		setref(n3, o3, o4)
-/**/ RMEM  (U4)		// we need some way to also refcount objs in memory! not just in registers
+/**/ RMEM  (U4)		// refcount objs in memory
 		i1 = i1
 		#!Do later
 //		setref(n1, o1, o2)

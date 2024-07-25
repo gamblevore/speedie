@@ -14,7 +14,6 @@ struct ASMState
 	|datatypecode|				ReturnASM
 	|bool|						OK    
 	|bool|						Inited   
-	|byte|						LabelCount
 	|byte|						VDecls
 	|byte|						VTmps
 	|byte|						WithinBranch
@@ -329,7 +328,6 @@ function ASMState.StartFunc (|scfunction| fn)
 	for i in 32
 		.CloseReg(i)
 	.FuncStart = .curr
-	.LabelCount = 0
 	.fn = fn
 	.ReturnASM = fn.ReturnType.regtype
 	.OK = true

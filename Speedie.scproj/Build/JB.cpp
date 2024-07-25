@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2101];
+extern JB_StringC* JB_LUB[2099];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -1977,7 +1977,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112847468140719));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112848090274132));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3297,7 +3297,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[179]);
-	JB_FS_AppendInt32(_fsf0, (2024072514));
+	JB_FS_AppendInt32(_fsf0, (2024072517));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7914,6 +7914,39 @@ void SC_TextAssembler__Assemble(Message* Msg) {
 	};
 }
 
+bool SC_TextAssembler__GetLabel(FatASM* Jumper) {
+	byte I = Jumper->JumpReg;
+	if (!I) {
+		return true;
+	}
+	(--I);
+	Message* Name = ((Message*)JB_Tree_Get(((Message*)JB_Ring_First(Jumper->Msg)), I));
+	if (Name) {
+		DTWrap* Dest_index = ((DTWrap*)JB_Dict_ValueLower(SC__TextAssembler_Labels, Name->Name));
+		if (!Dest_index) {
+			JB_Msg_SyntaxExpect(Name, JB_LUB[1998]);
+			return nil;
+		}
+		Jumper->R[I] = (((uint64)JB_Wrap_SyntaxAccess(Dest_index)) - SC_FatASM_Index(Jumper));
+		return true;
+	}
+	if (true) {
+		SC_FatASM_SyntaxExpect(Jumper, JB_LUB[1258]);
+	}
+	return false;
+}
+
+int SC_TextAssembler__Init_() {
+	{
+	}
+	;
+	return 0;
+}
+
+int SC_TextAssembler__InitCode_() {
+	return 0;
+}
+
 void SC_TextAssembler__TextData(Message* Msg) {
 }
 
@@ -7921,12 +7954,16 @@ bool SC_TextAssembler__TextFunc(Message* Msg) {
 	SCFunction* Fn = JB_Incr(SC_Func_Constructor(nil, nil));
 	JB_SetRef(Fn->Source, Msg);
 	SC_Pac_StartFunc((&SC__Pac_Sh), Fn);
+	if (!SC__TextAssembler_Labels) {
+		JB_SetRef(SC__TextAssembler_Labels, JB_Dict_Constructor(nil));
+	}
 	bool Arg = SC_Pac_TextFuncSub((&SC__Pac_Sh), Msg);
 	if (Arg) {
 		(JB_Dict_ValueSet(SC__Comp_ExportNames, Fn->ExportName, Fn));
 	}
 	JB_Decr(Fn);
 	SC_Pac_FinishASM((&SC__Pac_Sh));
+	JB_Dict_Dispose(SC__TextAssembler_Labels);
 	return false;
 }
 
@@ -8360,7 +8397,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024072514));
+	JB_FS_AppendInt32(_fsf0, (2024072517));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -16295,7 +16332,7 @@ void SC_ASM__TestASM() {
 	//using;
 	ErrorSeverity __varf1 = kJB__ErrorSeverity_Warning;
 	ErrorSeverity _usingf0 = JB_ErrorSeverity_SyntaxUsing(__varf1);
-	Message* _tmPf2 = JB_Incr(JB_Str_Parse((JB_LUB[404]), kJB_SyxArg, true));
+	Message* _tmPf2 = JB_Incr(JB_Str_Parse((JB_LUB[1009]), kJB_SyxArg, true));
 	Message* T = JB_Incr(JB_Msg_NeedSyxName(_tmPf2, kJB_SyxTmp, JB_LUB[1481]));
 	if (T) {
 		SC_ASM__TestASMSub(T);
@@ -19757,11 +19794,19 @@ void SC_FatASM_aSet(FatASM* Self, uint Value) {
 	Self->R[1] = Value;
 }
 
-int SC_FatASM_AddLabelRequest(FatASM* Self, Message* P, int Pos) {
-	AsmReg X = SC_Reg_OperatorAs(Self->Info, kSC__Reg_LabelRequest);
+void SC_FatASM_AddLabelRequest(FatASM* Self, Message* P, int Pos) {
+	AsmReg X = Self->Info;
 	X = SC_Reg_RegSet(X, Pos);
 	Self->Info = X;
-	return 0;
+	xC2xB5Form* F = SC_FatASM_Form(Self);
+	if (F) {
+		int J = F->JumpReg;
+		if (J) {
+			if (J != (Pos + 1)) {
+			}
+		}
+		Self->JumpReg = J;
+	}
 }
 
 void SC_FatASM_AddRegNum(FatASM* Self, Message* Src, int Write, int Num) {
@@ -19858,23 +19903,16 @@ int SC_FatASM_FileNum(FatASM* Self) {
 	return SC_Msg_FileNum(Self->Msg) & 16533;
 }
 
-void SC_FatASM_FillLabelRequest(FatASM* Self, ASM* Start, ASM* After) {
+void SC_FatASM_FillLabelRequest(FatASM* Self, ASM* Start, ASM* After, int Reg) {
 	ASM* Where = Start + Self->ASMIndex;
-	JB_DoAt(1);
-	int Reg = SC_Reg_Reg(Self->Info);
 	if (!((Where >= Start) and (Where < After))) {
 		return;
 	}
-	if (Reg >= 5) {
-		return;
-	}
-	uint Dest_index = Self->R[Reg];
-	uint Mask = Dest_index & kSC__Reg_FatRef;
-	if (!Mask) {
-		return;
-	}
-	Dest_index = (Dest_index & (~Mask));
-	ASM* Dest = Start + Dest_index;
+	JB_DoAt(1);
+	uint Dest_fat = Self->R[Reg];
+	FatASM* Fat = SC_uint_FAT(Dest_fat);
+	uint Dest_asm = Fat->ASMIndex;
+	ASM* Dest = Start + Dest_asm;
 	if (!((Dest >= Start) and (Dest <= After))) {
 		return;
 	}
@@ -19943,6 +19981,18 @@ void SC_FatASM_FloatIntConvConst(FatASM* Self, FatASM* Fat, DataTypeCode Src, Da
 			}
 		}
 	}
+}
+
+xC2xB5Form* SC_FatASM_Form(FatASM* Self) {
+	Instruction* I = JB_Incr(SC__Instruction_TypeList[Self->Op]);
+	if (I) {
+		xC2xB5Form* _tmPf0 = JB_Incr(I->Sizes);
+		JB_Decr(I);
+		JB_SafeDecr(_tmPf0);
+		return _tmPf0;
+	}
+	JB_Decr(I);
+	return nil;
 }
 
 bool SC_FatASM_has(FatASM* Self, int A, int B) {
@@ -20108,18 +20158,9 @@ void SC_FatASM_SyntaxExpect(FatASM* Self, JB_String* Error) {
 
 bool SC_FatASM_SyntaxIs(FatASM* Self, AsmReg Flags) {
 	if (Self) {
-		return SC_Reg_SyntaxCast(SC_Reg_OperatorBitand(Self->Info, Flags));
+		return ((uint64)(SC_Reg_OperatorBitand(Self->Info, Flags))) != 0;
 	}
 	return false;
-}
-
-void SC_FatASM_SyntaxIsSet(FatASM* Self, AsmReg Flags, bool Value) {
-	if (Value) {
-		Self->Info = SC_Reg_OperatorAs(Self->Info, Flags);
-	}
-	 else {
-		Self->Info = SC_Reg_OperatorAsnt(Self->Info, Flags);
-	}
 }
 
 
@@ -20745,13 +20786,15 @@ void SC_Pac_AddFuncParams(ASMState* Self, SCFunction* Fn) {
 }
 
 void SC_Pac_AddLabel(ASMState* Self, Message* Ch) {
-	int L = Self->LabelCount + 1;
-	if (L > 254) {
-		JB_Msg_SyntaxExpect(Ch, JB_LUB[1258]);
-		return;
-	}
-	Self->LabelCount = L;
-	Ch->RangeLength = SC_FatASM_Index(Self->Curr);
+	Dictionary* D = ({
+		Dictionary* _X = SC__TextAssembler_Labels;
+		if (!_X) {
+			_X = JB_Dict_Constructor(nil);
+			JB_SetRef(SC__TextAssembler_Labels, _X);
+		}
+		 _X;
+	});
+	(JB_Dict_ValueLowerSet(D, Ch->Name, JB_Wrap_ConstructorInt(nil, SC_FatASM_Index(Self->Curr))));
 }
 
 AsmReg SC_Pac_AddToReg(ASMState* Self, FatASM* Addr, int Add, Message* Exp, SCDecl* Upon) {
@@ -21164,47 +21207,6 @@ AsmReg SC_Pac_GenericNumFinder(ASMState* Self, Message* Exp, uint64 Value, AsmRe
 	return SC_Pac_NumToReg(Self, Exp, Value, TypeInfo);
 }
 
-bool SC_Pac_GetLabel(ASMState* Self, FatASM* Jumper) {
-	Message* List = ((Message*)JB_Ring_First(Jumper->Msg));
-	int I = 0;
-	bool Found = false;
-	{
-		Message* S = ((Message*)JB_Ring_First(List));
-		while (S) {
-			Message* _Nf1 = ((Message*)JB_Ring_NextSib(S));
-			if (JB_Msg_EqualsSyx(S, kJB_SyxName, false)) {
-				{
-					ASMFunc* _LoopSrcf4 = Self->Out;
-					FatASM* A = _LoopSrcf4->IR;
-					FatASM* _AfterInstf3 = A + _LoopSrcf4->Length;
-					while (A < _AfterInstf3) {
-						Message* M = A->Msg;
-						if (JB_Str_Equals(M->Name, S->Name, true)) {
-							uint Fat = ((uint)M->RangeLength);
-							if (!Fat) {
-								JB_Msg_SyntaxExpect(M, JB_LUB[776]);
-								return nil;
-							}
-							Jumper->R[I] = (Fat | kSC__Reg_FatRef);
-							Found = true;
-						}
-						(++A);
-					};
-				};
-			}
-			(++I);
-			S = _Nf1;
-		};
-		;
-	}
-	;
-	if (!Found) {
-		SC_FatASM_SyntaxExpect(Jumper, JB_LUB[1009]);
-		return nil;
-	}
-	return Found;
-}
-
 AsmReg SC_Pac_IntMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp) {
 	AsmReg Rz = ((AsmReg)0);
 	Rz = SC_Pac_QuickIntMul(Self, Dest, R, L, Exp);
@@ -21248,21 +21250,18 @@ AsmReg SC_Pac_LessEq(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* E
 }
 
 bool SC_Pac_LoadLabelJumps(ASMState* Self) {
-	if (SC__Pac_Sh.LabelCount) {
-		{
-			ASMFunc* _LoopSrcf2 = Self->Out;
-			FatASM* A = _LoopSrcf2->IR;
-			FatASM* _AfterInstf1 = A + _LoopSrcf2->Length;
-			while (A < _AfterInstf1) {
-				if (SC_FatASM_SyntaxIs(A, kSC__Reg_LabelRequest)) {
-					if (!SC_Pac_GetLabel(Self, A)) {
-						return nil;
-					}
-				}
-				(++A);
-			};
+	{
+		ASMFunc* _LoopSrcf2 = Self->Out;
+		FatASM* A = _LoopSrcf2->IR;
+		FatASM* _AfterInstf1 = A + _LoopSrcf2->Length;
+		while (A < _AfterInstf1) {
+			if (!SC_TextAssembler__GetLabel(A)) {
+				return nil;
+			}
+			(++A);
 		};
 	}
+	;
 	return true;
 }
 
@@ -21670,7 +21669,6 @@ void SC_Pac_StartFunc(ASMState* Self, SCFunction* Fn) {
 	}
 	;
 	Self->FuncStart = Self->Curr;
-	Self->LabelCount = 0;
 	Self->fn = Fn;
 	Self->ReturnASM = SC_Decl_RegType(Fn->ReturnType);
 	Self->OK = true;
@@ -21735,7 +21733,6 @@ bool SC_Pac_TextFuncSub(ASMState* Self, Message* M) {
 		Message* Ch = ((Message*)JB_Ring_First(_LoopSrcf2));
 		while (Ch) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(Ch));
-			uint ARHJAKLsd = SC_FatASM_Index(Self->Curr);
 			if (JB_Msg_EqualsSyx(Ch, kJB_SyxName, false)) {
 				SC_Pac_AddLabel(Self, Ch);
 			}
@@ -25350,17 +25347,17 @@ JB_String* SC_Instruction_Render(Instruction* Self, FastString* Fs_in) {
 }
 
 void SC_Instruction__Add(JB_String* FormName, JB_String* Name, int Pos) {
-	Instruction* Ins = ((Instruction*)JB_Dict_ValueLower(SC__Instruction_TypeDict, Name));
+	Instruction* Ins = ((Instruction*)JB_Dict_ValueLower(SC__Instruction_OpDict, Name));
 	if (!Ins) {
 		Ins = SC_Instruction_Constructor(nil, FormName, Name, Pos);
-		(JB_Dict_ValueLowerSet(SC__Instruction_TypeDict, Name, Ins));
+		(JB_Dict_ValueLowerSet(SC__Instruction_OpDict, Name, Ins));
 	}
 	JB_SetRef(SC__Instruction_TypeList[Pos], Ins);
 }
 
 int SC_Instruction__Init_() {
 	{
-		JB_SetRef(SC__Instruction_TypeDict, JB_Dict_Constructor(nil));
+		JB_SetRef(SC__Instruction_OpDict, JB_Dict_Constructor(nil));
 	}
 	;
 	return 0;
@@ -25384,7 +25381,7 @@ void SC_Instruction__InstructionInit() {
 	SC_Instruction__Add(JB_LUB[853], JB_LUB[975], 33);
 	SC_Instruction__Add(JB_LUB[899], JB_LUB[1199], 34);
 	SC_Instruction__Add(JB_LUB[900], JB_LUB[1100], 35);
-	SC_Instruction__Add(JB_LUB[2099], JB_LUB[2100], 36);
+	SC_Instruction__Add(JB_LUB[404], JB_LUB[776], 36);
 	SC_Instruction__Add(JB_LUB[315], JB_LUB[1125], 37);
 	SC_Instruction__Add(JB_LUB[831], JB_LUB[1058], 38);
 	SC_Instruction__Add(JB_LUB[914], JB_LUB[1091], 39);
@@ -25463,16 +25460,16 @@ void SC_Instruction__InstructionInit() {
 	}
 	;
 	JB_Decr(ERR);
-	Instruction* _tmPf1 = JB_Incr(((Instruction*)JB_Dict_Value0(SC__Instruction_TypeDict, JB_LUB[1023])));
-	(JB_Dict_ValueSet(SC__Instruction_TypeDict, JB_LUB[1474], _tmPf1));
+	Instruction* _tmPf1 = JB_Incr(((Instruction*)JB_Dict_Value0(SC__Instruction_OpDict, JB_LUB[1023])));
+	(JB_Dict_ValueSet(SC__Instruction_OpDict, JB_LUB[1474], _tmPf1));
 	JB_Decr(_tmPf1);
-	Instruction* _tmPf2 = JB_Incr(((Instruction*)JB_Dict_Value0(SC__Instruction_TypeDict, JB_LUB[899])));
-	(JB_Dict_ValueSet(SC__Instruction_TypeDict, JB_LUB[1029], _tmPf2));
+	Instruction* _tmPf2 = JB_Incr(((Instruction*)JB_Dict_Value0(SC__Instruction_OpDict, JB_LUB[899])));
+	(JB_Dict_ValueSet(SC__Instruction_OpDict, JB_LUB[1029], _tmPf2));
 	JB_Decr(_tmPf2);
 }
 
 Instruction* SC_Instruction__SyntaxAccessWithMsg(Message* M) {
-	Instruction* _tmPf0 = ((Instruction*)JB_Dict_ValueLower(SC__Instruction_TypeDict, M->Name));
+	Instruction* _tmPf0 = ((Instruction*)JB_Dict_ValueLower(SC__Instruction_OpDict, M->Name));
 	if (!_tmPf0) {
 		JB_Msg_SyntaxExpect(M, JB_LUB[855]);
 		return nil;
@@ -29437,6 +29434,11 @@ void SC_xC2xB5Form_AddP(xC2xB5Form* Self, int Size, ASMParam P) {
 	}
 	P = (P | (Size - 1));
 	Self->Params[I] = P;
+	if (SC_xC2xB5Param_SyntaxIs(P, kSC__xC2xB5Param_Jump)) {
+		if (Self->JumpReg) {
+		}
+		Self->JumpReg = (I + 1);
+	}
 }
 
 void SC_xC2xB5Form_AddRemainder(xC2xB5Form* Self, int U) {
@@ -29450,6 +29452,7 @@ xC2xB5Form* SC_xC2xB5Form_Constructor(xC2xB5Form* Self, Message* Tmp) {
 	Self->Count = 0;
 	Self->TotalBits = 0;
 	Self->Outputs = 0;
+	Self->JumpReg = 0;
 	Self->src = JB_Incr(Tmp);
 	JB_String* _tmPf4 = Tmp->Name;
 	Self->Name = JB_Incr(_tmPf4);
@@ -29633,16 +29636,14 @@ void SC_ASMFunc_Sanity(ASMFunc* Self) {
 
 ASM* SC_ASMFunc_xC2xB5Render(ASMFunc* Self, ASM* Where, ASM* After) {
 	ASM* Rz = nil;
-	bool HasLabel = false;
+	int HasLabel = 0;
 	Rz = Where;
 	{
 		int _LoopSrcf1 = Self->Length;
 		int I = 0;
 		while (I < _LoopSrcf1) {
 			FatASM* Fat = Self->IR + I;
-			if (SC_FatASM_SyntaxIs(Fat, kSC__Reg_LabelRequest)) {
-				HasLabel = true;
-			}
+			HasLabel = (HasLabel | Fat->JumpReg);
 			Fat->ASMIndex = (Rz - Where);
 			Rz = SC_FatASM_xC2xB5RenderInto(Fat, Rz, After);
 			(++I);
@@ -29654,9 +29655,9 @@ ASM* SC_ASMFunc_xC2xB5Render(ASMFunc* Self, ASM* Where, ASM* After) {
 			FatASM* I = Self->IR;
 			FatASM* _AfterInstf3 = I + Self->Length;
 			while (I < _AfterInstf3) {
-				if (SC_FatASM_SyntaxIs(I, kSC__Reg_LabelRequest)) {
-					(SC_FatASM_SyntaxIsSet(I, kSC__Reg_LabelRequest, (!true)));
-					SC_FatASM_FillLabelRequest(I, Where, Rz);
+				byte R = I->JumpReg;
+				if (R) {
+					SC_FatASM_FillLabelRequest(I, Where, Rz, R - 1);
 				}
 				(++I);
 			};
@@ -53009,4 +53010,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 55366243235183486 1048856076812982403
+// 4641937809869500045 9111454872270203148

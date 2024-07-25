@@ -1,18 +1,18 @@
 
 
 module TextAssembler
-//	|dictionary of message|			LabelMessages
+	|dictionary of uint64|			Labels
 		
 	
 	function TextFunc (|message| msg, |bool|) // assemble a function from text
 		|| fn = SCFunction.new
 		fn.source = msg
 		ASmState.Sh.startfunc(fn)
-//		.LabelMessages := dictionary()
+		.Labels := dictionary()
 		|| arg = ASmState.Sh.TextFuncSub(msg)
 			compiler.exportnames[fn.exportname] = fn
 		ASmState.Sh.FinishASM
-//		.LabelMessages.dispose
+		.Labels.dispose
 
 
 	function TextData (|message| msg) // assemble a function from text

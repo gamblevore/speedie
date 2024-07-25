@@ -28,21 +28,19 @@ class µFunc
 	// cosmic lore unfold... into tales untold
 	
 	function µRender (|!&ASM| Where, |!&asm| After, |!&asm|)
-		|| HasLabel = false
+		|| HasLabel = 0
 		rz = where
 
 		for i in .length
 			|| fat = .ir+i
-			if fat is labelrequest
-				haslabel = true
+			haslabel |= fat.jumpreg
 			fat.ASMIndex = rz - where
 			rz = fat.µrenderinto(rz, after)
 
 		if haslabel // could we do this in a bit smarter way? like a fat knows what points to it?
 			for i in self
-				if i is labelrequest
-					(i isnt labelrequest)
-					i.FillLabelRequest(where, rz)
+				|| r = i.jumpreg
+					i.FillLabelRequest(where, rz, r-1)
 		
 		target debug
 			while where < rz

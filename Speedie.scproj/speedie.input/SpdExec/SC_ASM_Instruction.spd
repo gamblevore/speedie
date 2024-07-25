@@ -50,22 +50,22 @@ class Instruction
 			//.NoExpect // shouldnt have removed this?
 
 	module
-		|dictionary of instruction|			TypeDict = dictionary()
+		|dictionary of instruction|			OpDict = dictionary()
 		|instruction[256]|					TypeList
 
 		syntax access (|message| m, |instruction|)
 			opt norefcounts
-			return TypeDict.valuelower(m.name)			#expect (m, "Isn't a valid instruction.")
+			return OpDict.valuelower(m.name)			#expect (m, "Isn't a valid instruction.")
 
 		syntax Access (|int| pos, |instruction|)
 			return .TypeList[pos]!
 		
 		function Add (|string| FormName, |string| name, |int| pos)
 			opt norefcounts
-			|| ins = .typedict.valuelower(name) // can occur multiply
+			|| ins = .OpDict.valuelower(name) // can occur multiply
 			if !ins
 				ins = instruction(formname, name, pos)
-				.typedict.valuelower(name) = ins
+				.OpDict.valuelower(name) = ins
 			.typelist[pos] = ins
 	
 		function InstructionInit
@@ -73,6 +73,6 @@ class Instruction
 			|| ERR = .typelist[0]
 			for i in 256
 				.typelist[i] := ERR 
-			.TypeDict["bra"] = .TypeDict["jbra"]
-			.TypeDict["halt"] = .TypeDict["trap"]
+			.OpDict["bra"] = .OpDict["jbra"]
+			.OpDict["halt"] = .OpDict["trap"]
 

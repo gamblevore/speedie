@@ -1,12 +1,5 @@
 
 
-
-// we need to return both a type, and a fat.
-// or perhaps even an asmreg and a fat.
-// i think... returning both is better.
-// we can return it in a struct... which is fine i guess
-// its just done via pointers always.
-// couldnt an ASMReg refer to a fat? like... it could, right? we have some spare bits?
 prototype fn_asm (|&ASMState| self=asmstate.sh, |message| exp, |AsmReg| Dest=asmreg(), |int| Mode = 0, |AsmReg|)
 
 
@@ -38,10 +31,7 @@ datatype AsmReg (uint64)
 		ContainsAddr
 		AddrRequest
 		BitCorrect
-		LabelRequest
 		Textual
-//		Dest0
-//		Dest1
 		CorrectAddr		= ContainsAddr ||| bitcorrect
 		Arg				= Discard         // ||| SrcConst
 		CondRequest		= NewCondRequest  // ||| SrcConst
@@ -200,9 +190,10 @@ datatype AsmReg (uint64)
 		
 	
 
-// we could do this instead
+// we could do this instead (ON RENDER?)
 // (self-1)&31!!
 // this will "rotate" 0 back to 31 and 1 to 0.
+
 function int.asm (|asmreg|)
 	cpp_part ToASM
 	rz.reg = self // (self - 1)&31 // would be better?

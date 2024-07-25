@@ -695,7 +695,7 @@ struct FatASM {
 	u16 ParentBlock;
 	u16 RefCount;
 	byte Op;
-	byte Label;
+	byte JumpReg;
 };
 
 struct IsaTester {
@@ -771,7 +771,6 @@ struct ASMState {
 	DataTypeCode ReturnASM;
 	bool OK;
 	bool Inited;
-	byte LabelCount;
 	byte VDecls;
 	byte VTmps;
 	byte WithinBranch;
@@ -1071,6 +1070,7 @@ JBClass ( xC2xB5Form , JB_Object ,
 	int TotalBits;
 	int Outputs;
 	int Index;
+	int JumpReg;
 );
 
 struct xC2xB5Func_Behaviour: Object_Behaviour {
@@ -1633,6 +1633,7 @@ extern Array* JB__Terminal_TermScreen;
 #define kJB__Terminal_w 80
 #define kJB__Terminal_White 37
 #define kJB__Terminal_Yellow 33
+extern Dictionary* SC__TextAssembler_Labels;
 extern Array* SC__Ext_Cleanup;
 extern int SC__Ext_CompilingLibFiles;
 extern JB_String* SC__Ext_CppCompilerPath;
@@ -1984,7 +1985,6 @@ extern ASM_Write SC__ASMtmp_WriteASM[5];
 #define kSC__Reg_FatRef 1073741824
 #define kSC__Reg_ForReturn 33554432
 #define kSC__Reg_FromMath 131072
-#define kSC__Reg_LabelRequest 8589934592
 #define kSC__Reg_MathConst 537001984
 #define kSC__Reg_Negate 4194304
 #define kSC__Reg_NewCondRequest 268435456
@@ -1993,7 +1993,7 @@ extern ASM_Write SC__ASMtmp_WriteASM[5];
 #define kSC__Reg_SingleExpr 134217728
 #define kSC__Reg_StayOpen 262144
 #define kSC__Reg_Temp 67108864
-#define kSC__Reg_Textual 17179869184
+#define kSC__Reg_Textual 8589934592
 #define kSC__Reg_Zero 4831838208
 #define kJB__CharProp_AlmostLetter 6
 #define kJB__CharProp_Letters 7
@@ -2373,7 +2373,7 @@ extern CompressionStats JB__Flow_Stats;
 #define kJB__Flow_Validate 2
 #define kSC__Instruction_kTypeConst 2
 #define kSC__Instruction_kTypeFunc 1
-extern Dictionary* SC__Instruction_TypeDict;
+extern Dictionary* SC__Instruction_OpDict;
 extern Instruction* SC__Instruction_TypeList[256];
 extern Array* JB__Macro_TmpPrms_;
 extern uint64 JB__Mrap_MDummy_[2];
@@ -3416,6 +3416,12 @@ void JB_Terminal__SyntaxExpect(JB_String* Msg);
 
 // TextAssembler
 void SC_TextAssembler__Assemble(Message* Msg);
+
+bool SC_TextAssembler__GetLabel(FatASM* Jumper);
+
+int SC_TextAssembler__Init_();
+
+int SC_TextAssembler__InitCode_();
 
 void SC_TextAssembler__TextData(Message* Msg);
 
@@ -5505,7 +5511,7 @@ uint SC_FatASM_a(FatASM* Self);
 
 void SC_FatASM_aSet(FatASM* Self, uint Value);
 
-int SC_FatASM_AddLabelRequest(FatASM* Self, Message* P, int Pos);
+void SC_FatASM_AddLabelRequest(FatASM* Self, Message* P, int Pos);
 
 void SC_FatASM_AddRegNum(FatASM* Self, Message* Src, int Write, int Num);
 
@@ -5545,11 +5551,13 @@ JB_String* SC_FatASM_File(FatASM* Self);
 
 int SC_FatASM_FileNum(FatASM* Self);
 
-void SC_FatASM_FillLabelRequest(FatASM* Self, ASM* Start, ASM* After);
+void SC_FatASM_FillLabelRequest(FatASM* Self, ASM* Start, ASM* After, int Reg);
 
 void SC_FatASM_FloatConvConst(FatASM* Self, FatASM* Src, int DestBitSize);
 
 void SC_FatASM_FloatIntConvConst(FatASM* Self, FatASM* Fat, DataTypeCode Src, DataTypeCode Dest);
+
+xC2xB5Form* SC_FatASM_Form(FatASM* Self);
 
 bool SC_FatASM_has(FatASM* Self, int A, int B);
 
@@ -5584,8 +5592,6 @@ void SC_FatASM_Swap(FatASM* Self, int A, int B);
 void SC_FatASM_SyntaxExpect(FatASM* Self, JB_String* Error);
 
 bool SC_FatASM_SyntaxIs(FatASM* Self, AsmReg Flags);
-
-void SC_FatASM_SyntaxIsSet(FatASM* Self, AsmReg Flags, bool Value);
 
 
 
@@ -5890,8 +5896,6 @@ AsmReg SC_Pac_FoundCode(ASMState* Self, int I, uint64 Value, AsmReg Typeinfo);
 AsmReg SC_Pac_FuncPrm(ASMState* Self, Message* Prm);
 
 AsmReg SC_Pac_GenericNumFinder(ASMState* Self, Message* Exp, uint64 Value, AsmReg TypeInfo);
-
-bool SC_Pac_GetLabel(ASMState* Self, FatASM* Jumper);
 
 AsmReg SC_Pac_IntMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 

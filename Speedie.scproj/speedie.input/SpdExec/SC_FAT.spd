@@ -33,8 +33,13 @@ struct FatASM
 	|uint16| 			ParentBlock
 	|uint16|			RefCount
 	|byte|				Op
-	|byte|				Label		// 254 labels per function
+	|byte|				JumpReg
 	
+	
+	function Form (|µform|)
+		|| i = instruction.typelist[.op]
+			return i.Sizes
+		debugger
 	
 //	function AsReg (|asmreg|)
 //		cpp_part AsReg0
@@ -98,7 +103,7 @@ struct FatASM
 
 	syntax is (|asmreg| flags, |bool|)
 		if self
-			return .info & flags
+			return (.info & flags)|uint64| != 0
 
 	syntax is (|asmreg| flags, assigns:|bool|)
 		if value
@@ -188,20 +193,9 @@ struct FatASM
 	function c (assigns:|uint|): .r[3] = value
 	function d (|uint|): return .r[4]
 	function d (assigns:|uint|): .r[4] = value
-//
-//	function fa (|&FATASM|): return ASMState.Sh.Zero
-//	function fb (|&FATASM|): return ASMState.Sh.Zero
-//	function fc (|&FATASM|): return ASMState.Sh.Zero
-//	function fd (|&FATASM|): return ASMState.Sh.Zero
 
 	function Swap (|int| a, |int| b)
 		swap (.r[a-1]) (.r[b-1])
-
-//	function Swap (|&FatASM| other, |bool|)
-//		|| s = self|&ivec4|
-//		|| o = other|&ivec4|
-//		swap (s++[]) (o++[])
-//		swap (s[])   (o[])
 	
 	helper Step (|int| dir, |&FatASM|)
 		real self
@@ -227,25 +221,19 @@ struct FatASM
 		return reg == .b
 	
 	
-		// what  if it got rendered into multiple asms?
-		// like: if x==y: jump(10000)
-		// how do we deal with this?
-	function FillLabelRequest (|!&asm| Start, |!&asm| After)
+	function FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 		|| where = start+.ASMIndex
-		debugat
-		|| reg = .info.reg	 // this isn't the reg? at least not if we are doing .r[reg]
-							 // isnt this just .r[0]?
 		DEBUG_REQUIRE  where >= start  and  where < after 
-		DEBUG_REQUIRE  reg < 5
-		|| dest_index = .r[reg]
-		|| mask = dest_index & asmreg.FatRef
-		DEBUG_REQUIRE mask
-		dest_index &=~ mask
-		|| dest = start + dest_index
+
+		debugat
+		|| dest_fat = .r[reg]
+		|| fat = dest_fat.fat
+		|| dest_asm = fat.asmindex
+		|| dest = start + dest_asm
 
 		DEBUG_REQUIRE dest >= start and dest <= after
-		.r[reg] = where - dest 
-		.µrenderinto(where, where+1)
+		.r[reg] = where - dest
+		.µrenderinto(where, where+1) // rerender
 	
 	
 	function µRenderInto (|!&asm| Where, |!&asm| After, |!&asm|)
