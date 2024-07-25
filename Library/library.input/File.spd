@@ -473,7 +473,7 @@ class File (String)
 				return "~" + self[file.HomePath.length ...]
 
 		function string.IdealApp (|string|)
-			if platform.OSX
+			target OSX
 				return ("/Applications/" + .name)
 
 		function file.IdealApp (|file|)
@@ -485,11 +485,11 @@ class File (String)
 		
 // can rename these from path into files :)
 		function TrashPath (|string|)
-			if platform.OSX
+			target OSX
 				return "~/.Trash/"
-			if platform.win
+			target win
 				return `C:\$Recycle.Bin`
-			if platform.lin
+			target lin
 				return "~/.local/share/Trash"
 		function SystemDrive (|string|)
 			target win
@@ -504,27 +504,9 @@ class File (String)
 			target lin
 				return "~/.local/share/Trash"
 
-		function Prefs (|string|name = "", |string|)
-			if !name
-				name = app.FileName.lowercase
-				name := app.conf("name")
-				name += ".pref"
-			return .preferencespath.child(name)
-
-		function PreferencesFolder (|file|)
-			return .PreferencesPath.resolve.file 
-		
 		function HomePath (|string|)
 			cpp_wrapper JB_File__Home
 
-		helper PreferencesPath (|string|)
-			if platform.osx
-				return "~/Library/Preferences"
-			if platform.win
-				return "~\AppData\Roaming" // whatever
-			if platform.lin
-				return "~/.config"
-			
 		function Trash (|string|name="", |file|)
 			rz = .TrashPath.Resolve.file
 			if name
@@ -533,17 +515,32 @@ class File (String)
 		function ReadCPath (|cstring| path, |bool| AllowMissingFile, |int| MaxSize = 100000000, |string|)
 			cpp_wrapper JB_CPath_ReadAll
 
-		function DocumentsFolder (|file|)
+		function Documents (|file|)
 			return "~/Documents/".file			// .file calls pathfix already
  
-		function PrefsFolder (|file|)
-			target osx
-				return "~/Library/Preferences".file
-			target lin
-				return "~/.config/".file
+		function Desktop (|file|)
+			return "~/Desktop/".file
 
 		function Logs (|file|)
 			return "/tmp/logs/".file
+
+		function Prefs (|string|name = "", |file|)
+			if !name
+				name = app.FileName.lowercase
+				name := app.conf("name")
+				name += ".pref"
+			return .prefpath.child(name).file
+
+		function Preferences (|file|)
+			return .PrefPath.file 
+		
+		helper PrefPath (|string|)
+			target osx
+				return "~/Library/Preferences"
+			target win
+				return "~\AppData\Roaming" // whatever
+			target lin
+				return "~/.config"
 
 	function AnyDate (|date|)
 		return .created ?? .modified

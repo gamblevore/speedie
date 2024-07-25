@@ -19,4 +19,4 @@ function perryide.DebugArgsFile (|file|)
 
 	
 function Perryide.PrefsFolder (|file|)
-	return file.PrefsFolder.Child("perry.klinkerhoppen")
+	return file.Prefs("perry.klinkerhoppen")

@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2100];
+extern JB_StringC* JB_LUB[2097];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -1959,7 +1959,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112843746508800));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112846876377088));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3091,9 +3091,7 @@ bool SC_FB__AppOptions_perry(JB_String* Name, JB_String* Value, FastString* Purp
 	SC__Options_PerryOutput = 1;
 	bool RealPerry = (JB_Str_Equals(Value, JB_LUB[1466], true));
 	SC__Options_PerryOutput = (SC__Options_PerryOutput + RealPerry);
-	JB_File* _tmPf2 = JB_Incr(JB_File__PrefsFolder());
-	JB_File* _tmPf1 = JB_Incr(JB_File_SyntaxAccess(_tmPf2, JB_LUB[468]));
-	JB_Decr(_tmPf2);
+	JB_File* _tmPf1 = JB_Incr(JB_File__Prefs(JB_LUB[468]));
 	JB_String* _tmPf0 = JB_Incr(JB_File_ReadAll(_tmPf1, 134217728, true));
 	JB_Decr(_tmPf1);
 	JB_SetRef(SC__Comp_InsecureWords, JB_Str_Dict(_tmPf0, '\n'));
@@ -3281,7 +3279,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[179]);
-	JB_FS_AppendInt32(_fsf0, (2024072423));
+	JB_FS_AppendInt32(_fsf0, (2024072512));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8344,7 +8342,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024072423));
+	JB_FS_AppendInt32(_fsf0, (2024072512));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -11082,7 +11080,7 @@ SCDecl* SC_IsPointerMath(SCDecl* L, SCDecl* R, SCOperator* Opp, Message* Exp) {
 		}
 		if (((bool)R->PointerCount) and (SC_Decl_IsNumeric(L) == 1)) {
 			if (!(!SC_OpMode_SyntaxCast(((bool)SC_Opp_SyntaxIs(Opp, kSC__OpMode_MakesSigned))))) {
-				JB_Msg_SyntaxExpect(Exp, JB_LUB[2099]);
+				JB_Msg_SyntaxExpect(Exp, JB_LUB[1618]);
 				return nil;
 			}
 			return R;
@@ -17107,7 +17105,7 @@ int SC_Reg_PointerMul(AsmReg Self) {
 		}
 		JB_Decr(R);
 		if (true) {
-			JB_Str_SyntaxExpect(JB_LUB[2098]);
+			JB_Str_SyntaxExpect(JB_LUB[1615]);
 		}
 	}
 	return 1;
@@ -21593,7 +21591,7 @@ RegState* SC_Pac_RegPlace(ASMState* Self, int A) {
 			return (&Self->Registers[A]);
 		}
 	}
-	JB_String* Msg = ((JB_StringC*)JB_Ternary(InBounds, JB_LUB[2097], JB_LUB[456]));
+	JB_String* Msg = ((JB_StringC*)JB_Ternary(InBounds, JB_LUB[1617], JB_LUB[456]));
 	if (true) {
 		SC_Pac_SyntaxExpect(Self, nil, JB_Str_OperatorPlus(kJB__Rec_NonFatal, Msg));
 	}
@@ -30488,20 +30486,11 @@ JB_File* JB_File__Logs() {
 	return JB_Str_AsFile(JB_LUB[1704]);
 }
 
-JB_String* JB_File__PreferencesPath() {
-	if (JB_Platform__OSX()) {
-		return JB_LUB[1613];
-	}
-	if (JB_Platform__Win()) {
-		return JB_LUB[1614];
-	}
-	if (JB_Platform__Lin()) {
-		return JB_LUB[1615];
-	}
-	return JB_LUB[0];
+JB_String* JB_File__PrefPath() {
+	return JB_LUB[1613];
 }
 
-JB_String* JB_File__Prefs(JB_String* Name) {
+JB_File* JB_File__Prefs(JB_String* Name) {
 	JB_Incr(Name);
 	if (!JB_Str_Exists(Name)) {
 		JB_String* _tmPf0 = JB_Incr(JB_App__FileName());
@@ -30512,16 +30501,14 @@ JB_String* JB_File__Prefs(JB_String* Name) {
 		}
 		JB_SetRef(Name, JB_Str_OperatorPlus(Name, JB_LUB[1910]));
 	}
-	JB_String* _tmPf1 = JB_Incr(JB_File__PreferencesPath());
-	JB_String* _tmPf2 = JB_Incr(JB_Str_Child(_tmPf1, Name));
-	JB_Decr(_tmPf1);
+	JB_String* _tmPf2 = JB_Incr(JB_File__PrefPath());
+	JB_String* _tmPf1 = JB_Incr(JB_Str_Child(_tmPf2, Name));
+	JB_Decr(_tmPf2);
 	JB_Decr(Name);
-	JB_SafeDecr(_tmPf2);
-	return _tmPf2;
-}
-
-JB_File* JB_File__PrefsFolder() {
-	return JB_Str_AsFile(JB_LUB[1613]);
+	JB_File* _tmPf3 = JB_Incr(JB_Str_AsFile(_tmPf1));
+	JB_Decr(_tmPf1);
+	JB_SafeDecr(_tmPf3);
+	return _tmPf3;
 }
 
 JB_String* JB_File__Speedie() {
@@ -53005,4 +52992,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 7829838127156258179 -4729075405355514717
+// -4050900074387192887 9001423816273498099

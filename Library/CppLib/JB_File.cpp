@@ -1210,10 +1210,7 @@ bool JB_File_IsPipe(JB_File* f) {
 
 
 JB_File* JB_Str_File( JB_String* Path ) {
-//	if (Path != JB_Str__Error()) {
 	return JB_File_Constructor( 0, Path );
-//	}
-//	return 0;
 }
 
 
