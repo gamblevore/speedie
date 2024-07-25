@@ -6,7 +6,7 @@ I just call them 'isms'. The more 'isms' you know, the better your code will loo
 
 As long as you write generally good code in the first place, your code in Speedie will be also good. These "isms" just make code shorter, which is useful in large projects. With the **exception of error-handling**, that actually **is quite important** to know how to write properly.
 
-Error-handling is described in it's own file.
+[Error-handling](Errors.md) is described in it's own file.
 
 ---
 ### 'Syntax' Functions
@@ -157,6 +157,22 @@ Strings can be divided and multiplied. Dividing just calls `.split`.
     // prints: ["hello", "goodbye", "away"]
     Printline "abc"*4
     // prints: "abcabcabcabc"
+
+
+For GUI dialogs or human-readable messages in games or in logs... you sometimes might want to display the number of items of a thing. For example "3 dogs" or "2 dogs" or "1 dog". For example you might want to say:
+
+    "The folder $fol has $n files"
+
+But what if `n` is 1? `"the folder /path/ has 1 files"`? That doesnt read right?! Speedie has the solution.
+
+    "The folder $fol has ${n of `file`}"
+    
+Or more simply:
+
+    || substr = n of "file"
+    "The folder $fol has $substr"
+
+Its not a hard thing for anyone to code without the '`of`' operator. But its so awkward that people normally don't bother. The real trick is that I made it simple and convenient.
     
 
     
@@ -275,7 +291,7 @@ Quite often you have some kind of config file, and you want to access it as if i
 
 You should find this example in `/usr/local/speedie/examples/config_reader.spd`
 
-Treating `message` class as a config, is done by accessing it with `msg[string]`. Config files probably need their own file to explain how they work, as there some details, but mostly its just there to enable short-simple code.
+Treating `message` class as a config, is done by accessing it with `msg[string]`. Config files probably need their own documentation file, as there some details, but mostly its just there to enable short-simple code.
 
 
 
