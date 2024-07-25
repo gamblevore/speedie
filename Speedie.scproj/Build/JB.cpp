@@ -1977,7 +1977,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112848090274132));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112849703054072));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3297,7 +3297,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[179]);
-	JB_FS_AppendInt32(_fsf0, (2024072517));
+	JB_FS_AppendInt32(_fsf0, (2024072600));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7954,9 +7954,6 @@ bool SC_TextAssembler__TextFunc(Message* Msg) {
 	SCFunction* Fn = JB_Incr(SC_Func_Constructor(nil, nil));
 	JB_SetRef(Fn->Source, Msg);
 	SC_Pac_StartFunc((&SC__Pac_Sh), Fn);
-	if (!SC__TextAssembler_Labels) {
-		JB_SetRef(SC__TextAssembler_Labels, JB_Dict_Constructor(nil));
-	}
 	bool Arg = SC_Pac_TextFuncSub((&SC__Pac_Sh), Msg);
 	if (Arg) {
 		(JB_Dict_ValueSet(SC__Comp_ExportNames, Fn->ExportName, Fn));
@@ -8397,7 +8394,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024072517));
+	JB_FS_AppendInt32(_fsf0, (2024072600));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -19905,18 +19902,11 @@ int SC_FatASM_FileNum(FatASM* Self) {
 
 void SC_FatASM_FillLabelRequest(FatASM* Self, ASM* Start, ASM* After, int Reg) {
 	ASM* Where = Start + Self->ASMIndex;
-	if (!((Where >= Start) and (Where < After))) {
-		return;
-	}
-	JB_DoAt(1);
-	uint Dest_fat = Self->R[Reg];
-	FatASM* Fat = SC_uint_FAT(Dest_fat);
+	int Dest_fat = Self->R[Reg];
+	FatASM* Fat = Self + Dest_fat;
 	uint Dest_asm = Fat->ASMIndex;
 	ASM* Dest = Start + Dest_asm;
-	if (!((Dest >= Start) and (Dest <= After))) {
-		return;
-	}
-	Self->R[Reg] = (Where - Dest);
+	Self->R[Reg] = (Dest - Where);
 	SC_FatASM_xC2xB5RenderInto(Self, Where, Where + 1);
 }
 
@@ -29909,9 +29899,14 @@ JB_Object* JB_Dict_ValueLower(Dictionary* Self, JB_String* S) {
 }
 
 void JB_Dict_ValueLowerSet(Dictionary* Self, JB_String* S, JB_Object* Value) {
-	JB_String* _tmPf0 = JB_Incr(JB_Str_LowerCase(S));
-	(JB_Dict_ValueSet(Self, _tmPf0, Value));
-	JB_Decr(_tmPf0);
+	if (JB_Str_IsLower(S)) {
+		(JB_Dict_ValueSet(Self, S, Value));
+	}
+	 else {
+		JB_String* _tmPf0 = JB_Incr(JB_Str_LowerCase(S));
+		(JB_Dict_ValueSet(Self, _tmPf0, Value));
+		JB_Decr(_tmPf0);
+	}
 }
 
 Dictionary* JB_Dict__Copy(Dictionary* Dict) {
@@ -53010,4 +53005,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 4641937809869500045 9111454872270203148
+// 4641937809869500045 6148806184072401625
