@@ -60,13 +60,9 @@ function ivec4.List (|message|)
 	for i in 4
 		rz <~ self[i]
 
-
-function message.DictLower (|bool| DoCount=false,  |dictionary of message|)
-	opt inline
-	return .dict(docount, true)
-
 	
 function message.Dict (|bool| DoCount=false,  |bool| DoLower=false,  |dictionary of message|)
+	// cheese.spd uses this
 	opt norefcounts
 	rz = Dictionary()
 	|| i = 0
