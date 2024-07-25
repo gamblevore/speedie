@@ -57,9 +57,9 @@ I find Perry takes surprisingly little RAM. When I open Perry I see I have 6 pro
 
 ## Comparisons
 
-#### BBEdit + Xcode
+#### BBEdit & Xcode
 
-When opening large files, Perry will run much much faster.
+When opening large files, Perry will run much much faster than BBEdit and Xcode's editors.
 
 #### Xcode
 
@@ -109,7 +109,6 @@ I'll probably allow rounded buttons with pictures for backgrounds later, perhaps
 I still prefer Xcode sometimes. I'm actually going to continue to improve Perry, until I prefer Perry in all areas, but right now here are some areas that Xcode is better (for me).
 
 * Smooth fonts are nice in Xcode. Perry has a low-res pixel-art font thats great on a low-res screen. But not ideal on high-DPI monitors. Smooth fonts would fix this.
-* Perry's text-editor still needs a few tweaks.
 * Needs a debugger and VM
 * Needs skinning and themes
 * Maybe we could animate the text or add explosions or animations into Perry. That would be cool.
