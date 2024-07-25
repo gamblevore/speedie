@@ -15,6 +15,7 @@ function message.ThgDecl (|SCDecl?|)
 
 function message.ASMDecl (|SCDecl!|)
 	opt norefcounts
+	debugat 0
 	rz = .fastdecl
 	if rz.dtype == datatypecode.unusedtype
 		rz.dtype = rz.asmreg|datatypecode|

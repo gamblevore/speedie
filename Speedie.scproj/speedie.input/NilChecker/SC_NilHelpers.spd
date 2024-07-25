@@ -21,7 +21,7 @@ function RedundantVar (|scdecl| dcl,  |nilcheckmode| Test,  |nilstate|)
 		return Test & nilstate.either
 
 	if ArchonPurger.loops.NestDepth == 0
-		|| str = .origrender + " redundantly tested. Currently is: " + dcl.nilcurr.rawname 
+		|| str = .OrigRender + " redundantly tested. Currently is: " + dcl.nilcurr.RawName
 		error (self, str)
 	return Test & nilstate.either
 
@@ -36,7 +36,37 @@ function FastDecl (|SCDecl!|)
 			return l
 		return obj
 	error (self, "No decl found.".internal)
-	return typevoid!
+	return Compiler.GetTypeVoid
+
+
+function Compiler.GetTypeVoid (|scdecl!|)
+	opt norefcounts
+	rz = typevoid
+	if rz
+		return rz
+	
+	|| msg = `datatype _void {
+	linkage
+		cpp_class void
+		noauto				// dont want them to see this.
+	size 0
+	syntax cast (|bool|)
+		disabled "Can't cast void to a bool."
+}` ~ Parse
+
+	compiler.program.CollectOne(msg)
+	|| vc = Compiler["_void"]
+	TypeVoid_ = vc
+	
+	if !vc
+		if 1
+			app.Quit("_void failiure", -1)
+		return rz!
+	
+	rz = vc.TypeNormal
+	typevoid = rz
+	vc.LinkedFrom = int.max
+	TypeVoidPtr = rz.GetAddress
 
 
 function SCBlockage.BlockCombine (|SCBlockage| B, |int|)

@@ -503,17 +503,16 @@ function IncrAmount (|asmreg| upon, |int| IsSubtract, |scdecl| D,  |int64|)
 function Incrementatulatorifier		(fn_asm)				// --a++
 	visible
 	opt	NoRefCounts
-	|| f = exp.first!
-	|| Src = .µ(f, dest.RequestPos)
-	|| Amount = IncrAmount(src, mode, f.ASMDecl)
+	|| Src = .µ(exp, dest.RequestPos)
+	|| Amount = IncrAmount(src, mode, exp.ASMDecl)
 	if src is ContainsAddr
-		return CountOnAddr(self, f, dest, mode, src, amount)
+		return CountOnAddr(self, exp, dest, mode, src, amount)
 	
 	check (src isnt temp) (exp, "Can't increment temporary value.")
 	ifn mode & IncrAfter
 		return .AddConstant(exp, src, src, Amount)							// ++x,	 y = ++x
 
-	return .AddConstantAndReturnOld(f, dest, src, amount)					// x++,	 y = x++
+	return .AddConstantAndReturnOld(exp, dest, src, amount)					// x++,	 y = x++
 
 
 

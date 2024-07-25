@@ -235,7 +235,7 @@ extend ASMState
 		if  l.LeftScore < r.leftscore
 			if l is alternate
 				target debug
-					if r.µtype.IsPointer // 1 - ptr??? we blocked this already.
+					if r.µtype.IsPointer				// 1 - ptr??? we blocked this already.
 			  else
 				swap (l) (r) // a+b == b+a
 
@@ -246,7 +246,7 @@ extend ASMState
 			if l is alternate
 				RR = -RR
 			rr *= lmul
-			if r.CanAddK(RR)								// a - 1,  a + 1
+			if r.CanAddK(RR)							// a - 1,  a + 1
 				fat = exp.ADDK(dest, L, RR)
 				if dest is ConstAny
 					|| LL = .GetConst(L)[]

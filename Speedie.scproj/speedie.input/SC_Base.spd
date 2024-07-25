@@ -742,7 +742,7 @@ function OwningFunc (|SCFunction|)
 	if self isa scarg:		Return .ParentFunc
 
 
-function CollectOne (|Message| c, |bool| Visible, |bool|)
+function CollectOne (|Message| c, |bool| Visible=false, |bool|)
 	if c IsTmp "visible"
 		visible = .LoadVisibility( c )
 		c.remove

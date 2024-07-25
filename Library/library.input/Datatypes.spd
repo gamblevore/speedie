@@ -340,18 +340,6 @@ datatype uint
 
 
 
-
-datatype _void
-	linkage
-		cpp_class void
-		noauto				// dont want them to see this.
-	size 0
-	syntax cast (|bool|)
-		disabled "Can't cast void to a bool."
-
-
-
-
 datatype uint16
 	linkage
 		cpp_class u16

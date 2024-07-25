@@ -182,10 +182,11 @@ function SafeWrite (|string| name, |faststring| data)
 		.CppLibFile(name)!.SmartData = data
 
 
-function MakeTheVM
+function MakeTheVM (|bool|)
 	compiler.Project.use
 	if .BuildFiles	
 		asm.TestASM
+	return stderr.ok
 
 
 function BuildInstructions (TranFunc) // __instructionlist__
