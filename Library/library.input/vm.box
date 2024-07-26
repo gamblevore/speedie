@@ -55,7 +55,12 @@ forms
 
 	Bra		// bra:
 		r1		r
-		jmp		j
+		Jmp		j
+	
+	Loop
+		r1		R
+		r2		r
+		Jmp	j
 	
 	Table
 		r1		R
@@ -177,11 +182,6 @@ forms
 		r2		r
 		r3		r
 		Sh		l
-	
-	Loop
-		r1		r
-		r2		r
-		Jump	j
 	
 	Swap
 		r1		R
@@ -379,25 +379,25 @@ forms
 /**/ JBRA  (Bra)
 		__
 		if (i1)
-			Code += Bra_jmpi
+			Code += Bra_Jmpi
 		___
 
 /**/ JBRN  (Bra)					
 		__
 		if (!i1)
-			Code += Bra_jmpi
+			Code += Bra_Jmpi
 		___
 
 /**/ LUPD  (Loop)			 	// same
 		__
 		if (i1-- > i2)
-			Code -= Loop_Jumpu
+			Code += Loop_Jmpi
 		___
 
 /**/ LUPU  (Loop)				// assume uint64
 		__
 		if (i1++ < i2)
-			Code -= Loop_Jumpu
+			Code += Loop_Jmpi
 		___
 
 

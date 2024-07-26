@@ -54,8 +54,8 @@ module SpdAssembler
 		|| fp = fn_asm_table[@arg]!
 		|| R = asmreg()
 		|| A = fn.SourceArg!
-		(fp)(ASmState.Sh, A, R)
 		debugger
+		(fp)(ASmState.Sh, A, R)
 		ASMState.Sh.FinishASM
 		.Guard
 		return ASMState.Sh.ok

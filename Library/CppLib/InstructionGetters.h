@@ -126,11 +126,18 @@
 #define   JCmp_Jmpu_(x)   (((uint)((x)<<22))>>22)
 
 
-#define   Bra_jmpi       ((( int)((Op)<<13))>>13)
-#define   Bra_jmpi_(x)   ((( int)((x)<<13))>>13)
+#define   Bra_Jmpi       ((( int)((Op)<<13))>>13)
+#define   Bra_Jmpi_(x)   ((( int)((x)<<13))>>13)
 
-#define   Bra_jmpu       (((uint)((Op)<<13))>>13)
-#define   Bra_jmpu_(x)   (((uint)((x)<<13))>>13)
+#define   Bra_Jmpu       (((uint)((Op)<<13))>>13)
+#define   Bra_Jmpu_(x)   (((uint)((x)<<13))>>13)
+
+
+#define   Loop_Jmpi       ((( int)((Op)<<18))>>18)
+#define   Loop_Jmpi_(x)   ((( int)((x)<<18))>>18)
+
+#define   Loop_Jmpu       (((uint)((Op)<<18))>>18)
+#define   Loop_Jmpu_(x)   (((uint)((x)<<18))>>18)
 
 
 #define   Table_Modei       ((( int)((Op)<<13))>>30)
@@ -376,13 +383,6 @@
 
 #define   Shift_Shu       (((uint)((Op)<<23))>>23)
 #define   Shift_Shu_(x)   (((uint)((x)<<23))>>23)
-
-
-#define   Loop_Jumpi       ((( int)((Op)<<18))>>18)
-#define   Loop_Jumpi_(x)   ((( int)((x)<<18))>>18)
-
-#define   Loop_Jumpu       (((uint)((Op)<<18))>>18)
-#define   Loop_Jumpu_(x)   (((uint)((x)<<18))>>18)
 
 
 #define   Swap_Li       ((( int)((Op)<<28))>>28)

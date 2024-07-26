@@ -1,7 +1,7 @@
 
 
 /*
-	we need a very simple exmaple... where we set some regs... and all the everything else is done automatically.
+	we need a very simple example... where we set some regs... and all the everything else is done automatically.
 	all the refcounting... etc etc etc.
 	
 	does that mean something like this?
@@ -16,7 +16,7 @@
 	
 	we could do the refcounting later? like during the block-checking pass?
 	
-	what about closing of if/elsees... how can it know about that. seems like we should do the 
+	what about closing of if/elses... how can it know about that. seems like we should do the 
 	refcounting then. anyhow... lets assume its immediate. We can also make all of these inlined
 */
 	
@@ -25,12 +25,12 @@ struct FatASM
 	|ASMReg| 			Info		// only needs 32-bits of this. Could we make a smaller asmreg?
 	|message--| 		Msg
 	|uint64| 			Const
-//	|&FatASM| 			BackLink	// for multiple instructions setting the same register.
+	|uint64| 			dummy
 
 	|uint[5]|			R
 	|uint|				ASMIndex	
-	|uint16| 			BlockNum
-	|uint16| 			ParentBlock
+	|uint16| 			BlockNum		// remove?
+	|uint16| 			ParentBlock		// remove?
 	|uint16|			RefCount
 	|byte|				Op
 	|byte|				JumpReg
@@ -112,7 +112,7 @@ struct FatASM
 			(.info asnt= flags)
 	
 	function BitCorrect (|&FATASM|)
-		.info = .info as AsmReg.BitCorrect
+		is BitCorrect
 		return self
 	
 		
@@ -225,15 +225,16 @@ struct FatASM
 		|| where = start+.ASMIndex
 		target debug: debug_require  where >= start  and  where < after 
 	
-		debugger // has issues when an ASM takes multiple slots?
-		// AAAAAAAAA. my freaking ASMIndex was meant to solve that.
 		|int| dest_fat = .r[reg]
 		|| fat = self + dest_fat
 		|| dest_asm = fat.asmindex
 		|| dest = start + dest_asm
 
 		target debug: debug_require dest >= start and dest <= after
-		.r[reg] = dest - where
+		|| amount = dest - where
+			.r[reg] = amount - 1
+		  else // WHAT?
+			error (self, "Invalid ASM generated (infinite loop)")
 		.µrenderinto(where, where+1) // rerender
 	
 	
@@ -245,11 +246,6 @@ struct FatASM
 				"AARGHHH"
 				debugger
 				rz = (ASM.encoders[.op]!)(self, where, after)
-
-		// OK so... now what? how do we re-render anything?
-		// we could store the length and the addr... so we don't really
-		// need a re-render.
-
 
 	
 	function Renda (|FastString| fs)

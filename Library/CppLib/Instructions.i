@@ -135,25 +135,25 @@
 ı JBRA: 
 	__;
 	if (i1) 
-	Code += Bra_jmpi
+	Code += Bra_Jmpi
 ;
 	___;
 ı JBRN: 
 	__;
 	if (!i1) 
-	Code += Bra_jmpi
+	Code += Bra_Jmpi
 ;
 	___;
 ı LUPD: 
 	__;
 	if (i1-- > i2) 
-	Code -= Loop_Jumpu
+	Code += Loop_Jmpi
 ;
 	___;
 ı LUPU: 
 	__;
 	if (i1++ < i2) 
-	Code -= Loop_Jumpu
+	Code += Loop_Jmpi
 ;
 	___;
 ı RSET: _
