@@ -20,8 +20,7 @@ main
 // speedie doesn't have exceptions, but 'ErrorList' instead.   The $ symbol means:
 // "get the result of this expression (ConfigData.parse here) and if it doesn't exist, return false"
 // A simple way to make code-flow still explicit, but 'get it out of the way'.
-// The original C++ has a function 'toml::parse' that raises an exception... causing all
-// sorts of issues.
+// The original C++ uses 'toml::parse' that raises an exception... causing all sorts of issues.
 	|| shop = CheeseShop(ConfigData.parse$)
 	"Red Leicester? ${shop[`red leicester`]}"
 	"Tilsit?        ${shop[`tilsit`]}"
