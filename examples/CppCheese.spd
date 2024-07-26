@@ -1,7 +1,6 @@
 
-
 // Just a comparison to show how terrible c++ is. And how natural code can be, in speedie.
-// original article at https://pboyd.io/posts/one-c++-footgun/
+https://pboyd.io/posts/one-c++-footgun     // original article
 
 class CheeseShop
 	|dictionarylower of message| inventory
@@ -14,17 +13,21 @@ class CheeseShop
 	syntax access (|string| cheeseName, |string|)
 		if (cheeseName ~= .clerkName)
 			return "Sir?"
-		
 		return ("Yes", "No")(.inventory[cheeseName])
 
 
 main
+// speedie doesn't have exceptions, but 'ErrorList' instead.   The $ symbol means:
+// "get the result of this expression (string.parse here) and if it doesn't exist, return false"
+// A simple way to make code-flow still explicit, but 'get it out of the way'.
+// The original C++ has a function 'toml::parse' that raises an exception... causing all
+// sorts of issues.
 	|| shop = CheeseShop(configData.parse$)
 	"Red Leicester? ${shop[`red leicester`]}"
-	"Tilsit? ${shop[`tilsit`]}"
-	"Wenslydale? ${shop[`wenslydale`]}"
-	"Cheddar? ${shop[`cheddar`]}"
-	"Joke ${shop[`barris`]}"
+	"Tilsit?        ${shop[`tilsit`]}"
+	"Wenslydale?    ${shop[`wenslydale`]}"
+	"Cheddar?       ${shop[`cheddar`]}"
+	"Barris?        ${shop[`barris`]}"
 
 
 || ConfigData = `
@@ -38,8 +41,7 @@ clerk
 `
 
 
-/*
-original C++
+/* original C++
 
 class CheeseShop {
 	public:
