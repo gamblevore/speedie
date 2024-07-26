@@ -1,4 +1,8 @@
 
+
+// Just a comparison to show how terrible c++ is. And how natural code can be, in speedie.
+// original article at https://pboyd.io/posts/one-c++-footgun/
+
 class CheeseShop
 	|dictionarylower of message| inventory
 	|string| ClerkName
@@ -36,7 +40,6 @@ clerk
 
 /*
 original C++
-// just a comparison to show how terrible c++ is.
 
 class CheeseShop {
 	public:
