@@ -97,7 +97,7 @@ constructor (|Message| node, |SCNode| parent, |bool| HasPtrs, |scmodule| m)
 	.SelfDecl = T
 	T.Name = "self"
 	(T is SelfImplicit)
-	(T isnt altered)
+	(T isnt altered) // decls default as being altered... for some odd reason. no idea why.
 
 
 syntax is (|classinfo| cls, |bool|) 

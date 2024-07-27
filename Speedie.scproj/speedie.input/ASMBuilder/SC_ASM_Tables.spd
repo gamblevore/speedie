@@ -212,7 +212,7 @@ function Return			(fn_asm)
 	|| f = exp.first
 		|| Where = AsmReg.ForReturn
 		where.reg = 1
-		where.µtype = asmstate.sh.ReturnASM
+		where.µtype = .ReturnASM
 		reg = .µ(f, Where)
 	exp.RET(reg, asmreg(), 1, 0)
 
@@ -252,10 +252,9 @@ function TypeCast		(fn_asm)
 	|| UponConst = sr is ConstAny
 	|&fatasm| fat
 	if oldtype.isfloat or newtype.isfloat
-		debugat,   #!put in actual numbers later
-		fat = exp.CONV(dest, sr, 3-(floatdiff<<1)).BitCorrect
+		fat = exp.CONV(dest, sr, oldtype.asmconv(newtype)).BitCorrect
 		if UponConst
-			(fat.info as= asmreg.ConstAny)
+			(fat is ConstAny)
 			|| srf = sr.needfat
 			if NewType.IsFloat and !FloatDiff
 				fat.FloatConvConst(srf, NC)
@@ -267,7 +266,7 @@ function TypeCast		(fn_asm)
 		if UponConst
 			|| oof = fat.Const << sh
 			fat.Const = (oof|int64| >> sh, oof|uint64| >> sh)(sr.Signed) // shift up and down
-			(fat.info as= asmreg.ConstAny)
+			(fat is ConstAny)
 	rz = fat*dest
 
 
@@ -286,11 +285,11 @@ function Decl (fn_asm)
 	opt norefcounts
 	|| rel = exp.last!
 	|| ty = rel.first!.fastdecl
-	|| dcl = .DeclareMe(Exp, ty)
-	return SetReg(self, rel.last!, dcl)
+	|| dest2 = .DeclareMe(Exp, ty)
+	return SetReg(self, rel.last!, dest2)
 
 
-function SetReg (|&ASMState| self=asmstate.sh, |message| exp, |AsmReg| Dest, |AsmReg|)
+function SetReg (|&ASMState| self, |message| exp, |AsmReg| Dest, |AsmReg|)
 	|| r2 = .µ(exp, dest as AsmReg.set)
 	r2 = r2 asnt asmreg.set
 	if r2.reg == dest.reg
@@ -347,9 +346,9 @@ function SetRel	(fn_asm)
 	|| R = .µ(exp.last!, var)
 	|| vr = var.reg
 		if r.reg == vr
-			return nil // done!
+			return r // done!
+
 	check (r.reg) (self, exp, "SetRel failed")
-	
 	return setreg(self, exp, r)
 
 
@@ -556,7 +555,7 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr
 	if mr isnt SingleExpr
 		|| TmpCloser = .VTmps
 		|| D1 = (dest & asmreg.discard) as asmreg.stayopen
-		debugat 
+		debugat  0
 		ml = .µ(F, D1) asnt asmreg.stayopen
 		mr = .µ(exp.last!, dest & asmreg.discard)
 		.closeVTmps(TmpCloser)
@@ -564,7 +563,13 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr
 	if dest is Discard
 		return asmreg() // no need to do anything. {a()+b()}
 
-	dest = .TempMe(exp, dest) 
+	if dest isnt condrequest
+		dest = .TempMe(exp, dest)
+		// if its a condrequest... then what?
+		// how do we know the thing we will do... is actually GOING to be a condition??
+		// like:   if a > 0   thats a cond... but what about this?   if a+b    /// now what?
+		// we either ask within every mathop... OR... undo the temp? (might well undo it?)
+	debugger
 	dest.µtype = ml.µtype				// assignment conversion needs doing?	
 	(dest is frommath)
 
@@ -635,13 +640,9 @@ function asmstate.ExistingVar (|message| m, |asmreg|)
 		m = m.first!
 		fn = m.func
 	if fn == @thg
-		|| found = asmtmp.thgsub(asmstate.sh, m, asmreg(), 2)
-		if found != nil
-			return found
-	  elseif fn == @num
-		|| reg = asmstate.sh.FindConstDecl(m.ASMDecl)
-		if reg!=nil
-			return reg
+		return asmtmp.thgsub(self, m, asmreg(), 2)
+	if fn == @num
+		return .FindConstDecl(m.ASMDecl)
 	return nil
 
 
@@ -696,3 +697,33 @@ function FatASM.FloatIntConvConst (|&FatASM| fat, |datatypecode| src, |datatypec
 				u[] = f64[]|uint64|						// f64 to u
 
 
+function DataTypecode.ASMConv (|Datatypecode| To, |int|)
+	return to.ASMPart<<2 ||| .asmpart
+
+
+function DataTypecode.ASMPart (|int|)
+	if .isfloat
+		return 0+(.bitcount > 32)
+	return 2 + .issigned
+
+/*
+        case 0 : d.Float = s.Float;  break;
+        case 1 : d.Float = s.Double; break;
+        case 2 : d.Float = s.Uint;   break;
+        case 3 : d.Float = s.Int;    break;
+        
+        case 4 : d.Double = s.Float;  break;
+        case 5 : d.Double = s.Double; break;
+        case 6 : d.Double = s.Uint;   break;
+        case 7 : d.Double = s.Int;    break;
+        
+        case 8 : d.Uint = s.Float;  break;
+        case 9 : d.Uint = s.Double; break;
+        case 10: d.Uint = s.Uint;   break;
+        case 11: d.Uint = s.Int;    break;
+        
+        case 12: d.Int = s.Float;  break;
+        case 13: d.Int = s.Double; break;
+        case 14: d.Int = s.Uint;   break;
+        case 15: d.Int = s.Int;    break;
+*/

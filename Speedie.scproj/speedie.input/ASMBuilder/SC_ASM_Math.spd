@@ -15,86 +15,71 @@ extend asmreg
 		return self 
 		
 		
-	function BitsAreCorrect (|int| gap, |bool|)
-		return  gap == 0  or   self is bitcorrect  or   .reg == 0  or  .µtype is bool
+	function BitsAreCorrect (|int|)
+		|| gap = .GapBits
+			if  (self is bitcorrect)  or  (.reg == 0)  or  (.µtype is bool)
+				return 0
+		return gap
 
 
-	function BadBits (|asmreg| r, |errorint|)
-		|| gl = .GapBits
-		|| gr = r.GapBits
-		|| cl =  .BitsAreCorrect(gl)
-		|| cr = r.BitsAreCorrect(gr)
-		if (cl and cr)
-			return 0
-		if (gl == gr)
-			return gl
-		if (gl < gr) and cr
-			return gl
-		if (gl > gr) and cl
-			return gr
-		
-		return -1
-			
-		// if the smaller one is bit-correct... its ok? lets see:
-		// byte GB vs int  OK	// needs correct
-		// int  OK vs byte GB 	// needs correct
-		// byte OK vs int  GB 	// can CMPI
-		// int  GB vs byte OK	// can CMPI
+	function BadBits (|asmreg| r, |int|)
+		return .BitsAreCorrect max r.BitsAreCorrect
 
 
 
 extend ASMState
 	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asmreg|)
-		|| negate = dest is negate
+		|| negate = (dest is negate)|int|
 		|| badness = l.BadBits(r) 
+		if (dest isnt CondRequest)
+			return exp.CMPB(dest, L, R, badness, negate) * Dest
 
-		if (dest is CondRequest) and (badness >= 0)
-			if badness > 0
-				dest = .TempMe(exp, dest)
-				exp.CMPB(dest, L, R, badness, Negate|int|)
-				r = dest
-				l = 0.asm
-			|&fatasm| fat
-			if l.reg
-				fat = exp.JMPE(r,l,0)
-			  else
-				// how do I know which of these is the actual
-				// param that needs alteration? store in the fatasm?
-				// how? doesnt the const want to store the address
-				// of the instruction generated?
-				// it could even store the param that needs altering?
-				// or we could just pass a param... the address
-				// of the thingy.
-				fat = exp.jbra(r,0)
-			if negate
-				fat.op += 1<<24 // sigh
-			return fat * Dest
+		if badness and l.reg
+			exp.ClearTwo(l, r)
+			badness = 0
 
+		|&fatasm| fat
+		if l.reg
+			fat = exp.JMPE(r,l,0)
+		  elseif !badness
+			fat = exp.jBRA(r,0)
+		  else
+			|| ugh = badness.asmbitclearmode
+			fat = exp.JBYE(r, ugh, 0)
+		fat.op += negate<<24
+		return fat * Dest
+
+	
+	function int.ASMBitClearMode (|int|)
+		|| ok = 64-self
+		if ok <= 8
+			return 0
+		if ok <= 16
+			return 1
+		if ok <= 32
+			return 2
+		if ok <= 64
+			return 3
+		debugger // what?
 		
-		if badness > 0
-			return exp.CMPB(dest, L, R, badness, negate|int|) * Dest
-
-		if badness == -1
-			|| gl = l.GapBits
-			|| gr = r.GapBits
-			exp.BCLR(L, R, gl, gr, (l.signed|int|) + (r.signed|int|<<1))
-		|| fat2 = exp.JMPE(L, R, 0)
-		fat2.op += Negate
-		return fat2 * Dest
-				
+	
+	function Message.ClearTwo (|asmreg| l, |asmreg| r)
+		|| gl = l.GapBits
+		|| gr = r.GapBits
+		.BCLR(L, R, gl, gr, (l.signed|int|) + (r.signed|int|<<1))
 	
 	
 	function Equals (fn_opasm)
 		if r.reg == 0  and  l.reg != 0
 			swap (l) (r) // put reg 0 into the left... more convenient.
 
-		if dest.IsInt
-			rz = .equalsint(dest, l, r, exp)
-			if dest is ConstAny
-				rz.const = (l.const == r.const)|int64|
-		  else
+		if dest.Isfloat
 			|| Mode = 2+(dest is negate)
-			rz = .Compare(dest, l, r, exp, mode) // can't really be bothered to do this const comparison
+			return .Compare(dest, l, r, exp, mode) // can't really be bothered to do this const comparison
+
+		rz = .equalsint(dest, l, r, exp)
+		if dest is ConstAny
+			rz.const = (l.const == r.const)|int64|
 		rz = rz.boolasm
 	
 		
@@ -162,7 +147,7 @@ extend ASMState
 			return l.fat
 		
 		if r.fourbytes
-			|| k = .GetConst(r)[]
+			|| k = .GetConst(r)[]|uint|
 			if (k >> 18) << 18 != k
 				debugger, #!hmmm. const-optimiser/renderer will handle it, but lets check to make sure
 			rz = exp.fadk(dest, l, k)

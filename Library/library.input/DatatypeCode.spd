@@ -59,7 +59,6 @@ datatype DataTypeCode (uint16)
 		PossibleBits = 2047
 		Numeric = 8
 		
-		
 		UnusedType = int64 &~ 8
 	
 	
@@ -109,6 +108,6 @@ datatype DataTypeCode (uint16)
 	function Count (|int|)
 		return (self & 0x03) + 1
 	
-	function SameBasicType (|datatypecode| b, |bool|)
+	function SameBasicType (|DataTypeCode| b, |bool|)
 		return (.isfloat == b.isfloat) // this will do for now.
 	

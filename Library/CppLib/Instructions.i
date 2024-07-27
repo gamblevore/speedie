@@ -138,6 +138,18 @@
 	Code += Bra_Jmpi
 ;
 	___;
+ı JBYE: 
+	__;
+	if ((i1 & (1 << (1 << (3 + BraBytes_Bytesu))) - 1)) 
+	Code += Bra_Jmpi
+;
+	___;
+ı JBYN: 
+	__;
+	if (!(i1 & (1 << (1 << (3 + BraBytes_Bytesu))) - 1)) 
+	Code += Bra_Jmpi
+;
+	___;
 ı JBRN: 
 	__;
 	if (!i1) 

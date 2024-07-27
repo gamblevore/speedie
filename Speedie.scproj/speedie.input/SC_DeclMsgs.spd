@@ -126,9 +126,9 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 	(dcl isnt NumberConst)
 	if dcl.name
 		(dcl is Param)
-		(dcl isnt Altered)
+		(dcl isnt Altered) // scDecl defaults as being altered... not sure why.
 	  else
-		(dcl is return)
+		(dcl is return)		// why not say both are not altered? does it matter that it has no name?
 	return true
 
 

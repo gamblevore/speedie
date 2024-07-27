@@ -126,6 +126,19 @@
 #define   JCmp_Jmpu_(x)   (((uint)((x)<<22))>>22)
 
 
+#define   BraBytes_Bytesi       ((( int)((Op)<<13))>>30)
+#define   BraBytes_Bytesi_(x)   ((( int)((x)<<13))>>30)
+
+#define   BraBytes_Bytesu       (((uint)((Op)<<13))>>30)
+#define   BraBytes_Bytesu_(x)   (((uint)((x)<<13))>>30)
+
+#define   BraBytes_Jmpi       ((( int)((Op)<<15))>>15)
+#define   BraBytes_Jmpi_(x)   ((( int)((x)<<15))>>15)
+
+#define   BraBytes_Jmpu       (((uint)((Op)<<15))>>15)
+#define   BraBytes_Jmpu_(x)   (((uint)((x)<<15))>>15)
+
+
 #define   Bra_Jmpi       ((( int)((Op)<<13))>>13)
 #define   Bra_Jmpi_(x)   ((( int)((x)<<13))>>13)
 

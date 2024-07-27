@@ -149,21 +149,16 @@ struct FatASM
 		rz = info.reg
 		.r[a] = rz
 		|| Src = info.fat
-			if !a // why?
 			Src.LinkedFrom(self) // what?
 		
 
 	function Dest (|uint| a, |asmreg| info, |bool|)
 		|| dest = info.reg
 		.r[a] = dest
+		if a > 1 // what?
 		if dest
-			if a > 1 // what?
-//			(.Info as= (asmreg.Dest0|uint64| << a)|asmreg|)
 			|| place = asmstate.sh.RegPlace(dest)
-//			|| oldfat = place.Creator					// this needs understanding of phi-nodes?
 			place.Creator = self
-//			if oldfat
-//				.LinkIn(oldfat)
 			return true
 	
 	

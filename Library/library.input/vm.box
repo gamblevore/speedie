@@ -53,6 +53,11 @@ forms
 		Cmp		4
 		Jmp		j
 
+	BraBytes	// brabytes:
+		r1		r
+		Bytes	2
+		Jmp		j
+
 	Bra		// bra:
 		r1		r
 		Jmp		j
@@ -379,6 +384,18 @@ forms
 /**/ JBRA  (Bra)
 		__
 		if (i1)
+			Code += Bra_Jmpi
+		___
+
+/**/ JBYE  (BraBytes)
+		__
+		if ( (i1 & (1<<(1<<(3+BraBytes_Bytesu)))-1 ))
+			Code += Bra_Jmpi
+		___
+
+/**/ JBYN  (BraBytes)
+		__
+		if (!(i1 & (1<<(1<<(3+BraBytes_Bytesu)))-1 ))
 			Code += Bra_Jmpi
 		___
 

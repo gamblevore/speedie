@@ -16,7 +16,7 @@ struct ASMState
 	|bool|						Inited   
 	|byte|						VDecls
 	|byte|						VTmps
-	|byte|						WithinBranch
+//	|byte|						WithinBranch // remove?
 
 	|SCFunction--|				fn       
 	|µFunc|						Out      
@@ -35,11 +35,12 @@ struct ASMState
 			.CloseReg(v--)
 		.VDecls = v
 
-	function CloseVTmps (|int| i)
-		|| v = .VTmps
-		while v < i
-			.CloseReg(v++)
-		.VTmps = v
+	function CloseVTmps (|int| i, |asmreg| dest=asmreg())
+		if dest isnt StayOpen
+			|| v = .VTmps
+			while v < i
+				.CloseReg(v++)
+			.VTmps = v
 	
 	function CloseReg (|int| i)
 		|| r = &.Registers[i]
@@ -167,9 +168,14 @@ struct ASMState
 
 	
 	helper FoundCode (|int| i, |uint64| Value, |asmreg| typeinfo, |asmreg|)
+		opt norefcounts
 		|| place = .regplace(i)
 		|| fat = place.Creator
 		if fat and fat.const == Value
+			|| ty = place.Type
+			if ty is Altered
+				#!hmmm. now what? need to understand blocks and if/while things?
+				debugger 
 			typeinfo.reg = i
 			(typeinfo is ConstAny)
 			return typeinfo
@@ -204,41 +210,39 @@ struct ASMState
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	function Branch (|message| cond,  |bool| neg=false,  |!&fatasm|)
-		|| dest = asmreg.newCondRequest
-		.WithinBranch++
-		|| cmu = .µ(cond, dest)
-		.WithinBranch--
-		if cmu isnt cond
-			(dest is negate) = (cmu isnt AlreadyNegated)
-			cmu = .equals(dest, dest, cmu, cond)
+		|| cmu = .µ(cond, asmreg.CondRequest)
+		if cmu is cond
+			return cmu.needfat
+		|| req = asmreg.CondRequest
+		if cmu isnt alreadynegated
+			(Req is negate)
+		debugger
+		cmu = .equals(req, asmreg(), cmu, cond)
 		return cmu.needfat
 
 
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		opt norefcounts
-		opt inline
+		target !debug
+			opt inline
 		cpp_part Get
-		|| T = exp.ASMType
-		|| fn = fn_asm_table[T]!
+		|| fn = fn_asm_table[exp.ASMType]!
 		target debug
-			if !T
+			debugat 14
+			if !exp.ASMType
 				fn = fn_asm_table[exp.func|int|]!
 				debugger
 
 		|| TmpCloser = .VTmps
-		rz = (fn)(self, exp, dest)
-		if dest isnt StayOpen
-			.CloseVTmps(TmpCloser)
+		|| ss = (fn)(self, exp, dest)
+		.CloseVTmps(TmpCloser, dest)
 		
-		target debug
-			if !rz.fatindex
-				if (rz isnt constany) or rz.const
-					error (self, "No asmgen!")
-					rz = (fn)(self, exp, dest)
-				
-			  elseif !rz.µtype.isnumeric and rz.µtype is bool
+		target debug // we expect our bools to be numeric bools
+			if !ss.µtype.isnumeric and ss.µtype is bool
+				debugger
+				ss = (fn)(self, exp, dest)
 				error (self, "No valid type on FAT info")
-				rz = (fn)(self, exp, dest)
+		return ss
 
 
 	function FuncPrm (|message| prm, |asmreg|)
@@ -303,9 +307,9 @@ function @ASMTmp.DoFunc (fn_Asm)
 
 function ASMState.PackMakerInit (|bool|)
 	opt norefcounts
-	if sh.Inited
+	if .Inited
 		return true
-	sh.inited = true
+	.inited = true
 	VM_Builder.JustDefineInstructions
 	SpdAssembler.InitAss
 	return .alloc(ASMState.JSMSpace)

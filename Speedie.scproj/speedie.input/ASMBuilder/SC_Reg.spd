@@ -26,7 +26,6 @@ datatype AsmReg (uint64)
 		ForReturn
 		Temp
 		SingleExpr
-		NewCondRequest
 		ConstAny
 		ContainsAddr
 		AddrRequest
@@ -34,9 +33,9 @@ datatype AsmReg (uint64)
 		Textual
 		CorrectAddr		= ContainsAddr ||| bitcorrect
 		Arg				= Discard         // ||| SrcConst
-		CondRequest		= NewCondRequest  // ||| SrcConst
+		CondRequest
 		MathConst		= ConstAny ||| FromMath
-		Zero			= ConstAny ||| BitCorrect
+		Zero			= ConstAny ||| BitCorrect ||| 56 // 56 == datatypecode.uint64
 	
 	
 
@@ -56,8 +55,7 @@ datatype AsmReg (uint64)
 		.needfat.const = value
 
 	function Negate (|asmreg|)
-		(self is negate) = (Self isnt negate)
-		return self
+		return (self|uint64| xor negate|uint64|)|asmreg|
 	
 	function Expect (|message| where)
 		opt inline
@@ -99,7 +97,7 @@ datatype AsmReg (uint64)
 
 	function IsInt (|bool|)
 		opt inline
-		return self|datatypecode|.isfloat
+		return self|datatypecode|.isint
 
 	function IntDivType (|int|)
 		|| FourBytes = .µtype._shift == 2
@@ -116,7 +114,8 @@ datatype AsmReg (uint64)
 		return self|DataTypeCode|
 	
 	function µType (assigns:|DataTypeCode|, |asmreg|)
-		return ((self|int64| &~ 0xFFFF) ||| value)|asmreg|
+		|| Clear = ~(DataTypeCode.PossibleBits|uint64|)
+		return ((self|uint64| & Clear) ||| value)|asmreg|
 	
 	syntax is (|AsmReg| R, |bool|)
 		return (self & R) == r

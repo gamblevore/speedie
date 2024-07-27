@@ -65,6 +65,7 @@ datatype SCDeclInfo (int)
 		Return
 		AlteredViaPointer
 		Altered
+		UsedButAlteredBySomethingAheadInLoop
 		GameFlyingMem
 		Task
 		Atomic
@@ -115,7 +116,7 @@ class SCDecl (SCNamed) {
 	constructor (|scclass| type)
 		.type = type
 		.NilDeclared = NilState.Either
-		.info = scdeclinfo.altered
+		.info = scdeclinfo.altered // why? surely it should only be if its ACTUALLY altered??? sigh.
 
 	setter Name (|string|)
 		super.exportname = value
@@ -1025,9 +1026,7 @@ class SCDecl (SCNamed) {
 		opt norefcounts
 		// Just like ExpectMatch, except always does type-casting. and returns nothing.
 		
-		|| Cast = kTypeCastTrue
-		if !side
-			Cast |= kTypeCastBothWays
+		|| Cast = kTypeCastTrue + (kTypeCastBothWays * !side)
 		
 		.ExpectMatch( O, Cast, exp, ErrNode )
 				
