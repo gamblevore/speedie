@@ -8,11 +8,21 @@ function dictionary.Sort (|SorterComparer| fn, |int| count, |[...]|)
 	rz.Length = count
 
 
-role DictionaryLower (Dictionary)
+role MessageTable (Dictionary)
+	contains Message
 	syntax Access (|string| Key, assigns:||)
 		super.valuelower(key) = value
 	syntax Access (|string| Key, ||)
 		return super.valuelower(key)
+	syntax Access (|message| Key, assigns:||)
+		cpp_part GetMsg
+		super.valuelower(key.name) = value
+	syntax Access (|message| Key, ||)
+		cpp_part SetMsg
+		return super.valuelower(key.name)
+	syntax append (|message| Msg)
+		cpp_part AppendMsg
+		super.valuelower(msg.name) = msg
 		
 	
 function message.AllNames (|[string]|)
@@ -61,7 +71,7 @@ function ivec4.List (|message|)
 		rz <~ self[i]
 
 	
-function message.Dict (|bool| DoCount=false,  |bool| DoLower=false,  |dictionary of message|)
+function message.Dict (|bool| DoLower=false, |bool| DoCount=false,   |dictionary of message|)
 	// cheese.spd uses this
 	opt norefcounts
 	rz = Dictionary()
