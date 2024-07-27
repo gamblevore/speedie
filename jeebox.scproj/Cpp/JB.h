@@ -239,8 +239,6 @@ struct FastString;
 
 struct JB_String;
 
-struct Dictionary;
-
 struct JB_File;
 
 struct JB_File;
@@ -248,6 +246,8 @@ struct JB_File;
 struct Message;
 
 struct MessageID;
+
+struct Dictionary;
 
 struct RangeCoder;
 
@@ -787,7 +787,7 @@ extern Random JB__zalgo_R;
 #define kJB__TC_Double 248
 #define kJB__TC_f16 216
 #define kJB__TC_f64 248
-#define kJB__TC_Failed 32768
+#define kJB__TC_Failed 1024
 #define kJB__TC_Float 232
 #define kJB__TC_HFloat 216
 #define kJB__TC_Int 104
@@ -797,7 +797,8 @@ extern Random JB__zalgo_R;
 #define kJB__TC_iVec2 105
 #define kJB__TC_iVec3 106
 #define kJB__TC_iVec4 107
-#define kJB__TC_numeric 8
+#define kJB__TC_Numeric 8
+#define kJB__TC_PossibleBits 2047
 #define kJB__TC_s16 88
 #define kJB__TC_s16x2 89
 #define kJB__TC_s16x3 90
@@ -2427,9 +2428,6 @@ JB_List* JB_Tree_Upward(JB_List* Self, int N);
 
 
 
-// JB_DictionaryLower
-
-
 // JB_ExistingFile
 
 
@@ -2680,6 +2678,9 @@ void JB_Msg__TreeComparePrint(Message* Orig);
 
 
 // JB_MessageID
+
+
+// JB_MessageTable
 
 
 // JB_RangeCoder

@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[562];
+extern JB_StringC* JB_LUB[560];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -1935,7 +1935,7 @@ void JB_Tk__Init() {
 	TokHan* _tmPf26 = JB_Incr(JB_Tk__Handler(kJB__Tk_kFuncAfterNormal, ((TokenHandler_fp)JB_Tk__fAdjectiveThing)));
 	TokHan* _tmPf25 = JB_Incr(JB_TH_Link(_tmPf26, kJB__Tk_kAdjectiveOp, ((TokenHandler_fp)JB_Tk__fAdjectiveOp)));
 	JB_Decr(_tmPf26);
-	(JB_Tk__TokenSet(JB_LUB[560], _tmPf25));
+	(JB_Tk__TokenSet(JB_LUB[107], _tmPf25));
 	JB_Decr(_tmPf25);
 	JB_Tk__TokenzFn(JB_LUB[103], kJB__Tk_kThingSyx, JB_Tk__fBeforeRelMinus);
 	JB_Tk__TokenzFn(PFix, kJB__Tk_kThingSyx, JB_Tk__fBeforeRel);
@@ -5673,7 +5673,6 @@ JB_List* JB_Tree_Upward(JB_List* Self, int N) {
 
 
 
-
 void JB_Msg_Acc__(Message* Self, FastString* Fs) {
 	Message* F = JB_Incr(((Message*)JB_Ring_First(Self)));
 	if (F) {
@@ -7237,6 +7236,7 @@ void JB_Msg__TreeComparePrint(Message* Orig) {
 
 
 
+
 void JB_sci_Destructor(SaverClassInfo* Self) {
 	JB_Clear(Self->NextInfo);
 	JB_Array_Destructor(Self);
@@ -7867,7 +7867,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024072212);
+	return (2024072615);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -7879,4 +7879,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 -8017683064692277884 -7594621806673183671
+// 7796578953066441599 663554371086766011 5581415826478320135
