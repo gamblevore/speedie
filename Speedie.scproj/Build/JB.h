@@ -473,8 +473,6 @@ struct SavingTest;
 
 struct JB_String;
 
-struct Dictionary;
-
 struct JB_File;
 
 struct JB_File;
@@ -482,6 +480,8 @@ struct JB_File;
 struct Message;
 
 struct MessageID;
+
+struct Dictionary;
 
 struct RangeCoder;
 
@@ -1478,13 +1478,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_RecheckType 4
 #define kSC__CustomOps_TypeCastFromBool 16
 #define kSC__CustomOps_TypeCastToBetter 32
-#define kJB__ErrorColors_bold (JB_LUB[2093])
+#define kJB__ErrorColors_bold (JB_LUB[2101])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[2094])
-#define kJB__ErrorColors_good (JB_LUB[2095])
-#define kJB__ErrorColors_normal (JB_LUB[2092])
-#define kJB__ErrorColors_underline (JB_LUB[2095])
-#define kJB__ErrorColors_warn (JB_LUB[2096])
+#define kJB__ErrorColors_error (JB_LUB[2102])
+#define kJB__ErrorColors_good (JB_LUB[2103])
+#define kJB__ErrorColors_normal (JB_LUB[2100])
+#define kJB__ErrorColors_underline (JB_LUB[2103])
+#define kJB__ErrorColors_warn (JB_LUB[1678])
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
 extern int SC__FastStringOpts_StrRemoved;
@@ -1645,11 +1645,13 @@ extern Macro* SC__VM_Builder_ASM_Datatype;
 extern Message* SC__VM_Builder_dt_prm;
 extern FastString* SC__VM_Builder_form_h;
 extern uint SC__VM_Builder_FreeMultiASM;
+extern Macro* SC__VM_Builder_gyatt;
 extern Macro* SC__VM_Builder_icecream;
 extern Macro* SC__VM_Builder_legs;
 extern Message* SC__VM_Builder_ModuleArg;
 extern Array* SC__VM_Builder_NameList;
 extern byte SC__VM_Builder_NormalPos;
+extern Macro* SC__VM_Builder_ohio;
 extern JB_String* SC__VM_Builder_parent;
 extern Macro* SC__VM_Builder_rizzler;
 extern Macro* SC__VM_Builder_skibidy;
@@ -1850,10 +1852,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp 32784
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down (JB_LUB[2099])
-#define kJB__zalgo_mid (JB_LUB[2098])
+#define kJB__zalgo_down (JB_LUB[1933])
+#define kJB__zalgo_mid (JB_LUB[1932])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up (JB_LUB[2097])
+#define kJB__zalgo_up (JB_LUB[1908])
 #define kJB__byte_max 255
 #define kJB__byte_min (0)
 #define kJB__char_max 127
@@ -2357,7 +2359,7 @@ extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_kDelete 2
 #define kJB__Wrap_kFree 1
 #define kJB__Wrap_kNothing (0)
-#define kJB__Rec_NonFatal (JB_LUB[2091])
+#define kJB__Rec_NonFatal (JB_LUB[2099])
 extern double JB__Rec_Progress;
 #define kJB__fix_TypeDict 3
 #define kJB__fix_TypeObj 1
@@ -5564,6 +5566,8 @@ bool SC_FatASM_has(FatASM* Self, int A, int B);
 
 FatASM* SC_FatASM_HaveAddr(FatASM* Self);
 
+void SC_FatASM_JumpInputSet(FatASM* Self, int A, int V);
+
 ASM* SC_FatASM_KNST_Encoder(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 void SC_FatASM_LinkedFrom(FatASM* Self, FatASM* New);
@@ -5886,9 +5890,9 @@ AsmReg SC_Pac_ExistingVar(ASMState* Self, Message* M);
 
 double SC_Pac_f(ASMState* Self, AsmReg R);
 
-AsmReg SC_Pac_FindConstWithDecl(ASMState* Self, SCDecl* D);
+AsmReg SC_Pac_FindConst(ASMState* Self, uint64 Value, AsmReg Typeinfo);
 
-AsmReg SC_Pac_FindConstWithUint64Reg(ASMState* Self, uint64 Value, AsmReg Typeinfo);
+AsmReg SC_Pac_FindConstDecl(ASMState* Self, SCDecl* D);
 
 void SC_Pac_FinishASM(ASMState* Self);
 
@@ -7652,9 +7656,6 @@ JB_List* JB_Tree_WrapWith(JB_List* Self, JB_List* W);
 
 
 
-// JB_DictionaryLower
-
-
 // JB_ExistingFile
 
 
@@ -7934,7 +7935,7 @@ int SC_Msg_DeprecatedClassOption(Message* Self, JB_String* Name, JB_String* Kind
 
 void JB_Msg_Destructor(Message* Self);
 
-Dictionary* JB_Msg_Dict(Message* Self, bool DoCount, bool DoLower);
+Dictionary* JB_Msg_Dict(Message* Self, bool DoLower, bool DoCount);
 
 FatASM* JB_Msg_DIVV(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4, int Kind);
 
@@ -8723,6 +8724,9 @@ bool JB_ID__ByID(JB_Object* A, JB_Object* B);
 
 
 
+// JB_MessageTable
+
+
 // JB_RangeCoder
 
 
@@ -8733,8 +8737,6 @@ bool SC_Decl_AlreadyContains(SCDecl* Self);
 
 SCDecl* SC_Decl_AsLocal(SCDecl* Self);
 
-AsmReg SC_Decl_ASMReg(SCDecl* Self);
-
 bool SC_Decl_AssignabilityCheck(SCDecl* Self, Message* Ln, Message* RN, SCDecl* Rc);
 
 JB_String* SC_Decl_AutoCompleteName(SCDecl* Self);
@@ -8742,6 +8744,8 @@ JB_String* SC_Decl_AutoCompleteName(SCDecl* Self);
 void SC_Decl_BecomeReal(SCDecl* Self);
 
 SCDecl* SC_Decl_Better_Numeric(SCDecl* Self, SCDecl* O, OpMode Mode, Message* Where);
+
+AsmReg SC_Decl_CalculateASMType(SCDecl* Self);
 
 bool SC_Decl_CanNilCheck(SCDecl* Self);
 
