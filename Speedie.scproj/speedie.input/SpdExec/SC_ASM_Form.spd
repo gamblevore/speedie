@@ -58,7 +58,7 @@ class µForm
 			++i
 
 	function AddRemainder (|int| U)
-		.addp( 32 - .TotalBits, µparam.Number ||| U)
+		.addp( 24 - .TotalBits, µparam.Number ||| U)
 	
 	function LoadParam (|string| pl, |message| place, |bool| IsLast)
 		if (pl.isint)

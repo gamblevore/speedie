@@ -15,10 +15,9 @@ function message.ThgDecl (|SCDecl?|)
 
 function message.ASMDecl (|SCDecl!|)
 	opt norefcounts
-	debugat 0
 	rz = .fastdecl
 	if rz.dtype == datatypecode.unusedtype
-		rz.dtype = rz.asmreg|datatypecode|
+		rz.dtype = rz.CalculateASMType|datatypecode|
 	target debug: rz.ASMSanity
 
 
@@ -33,7 +32,7 @@ function scdecl.ASMSanity
 	// make sure it adds up.
 
 
-function scdecl.ASMReg (|asmreg|)
+function scdecl.CalculateASMType (|asmreg|)
 	opt norefcounts
 	if .pointercount or .iscarray
 		// carrays must be allocated. So this reg will store a pointer to the carray.

@@ -179,6 +179,10 @@ struct FatASM
 
 	function NumInput (|int| a, assigns:|int| v)
 		.r[a] = v
+
+	function JumpInput (|int| a, assigns:|int| v)
+		.r[a] = v
+		.jumpreg = a + 1
 		
 
 	function out (|uint|): return .r[0]

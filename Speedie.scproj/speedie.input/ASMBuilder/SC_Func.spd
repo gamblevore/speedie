@@ -30,10 +30,8 @@ class µFunc
 	function µRender (|!&ASM| Where, |!&asm| After, |!&asm|)
 		|| HasLabel = 0
 		rz = where
-		// could use a 64bit jump-map... so just mark each instruction as needing
-		// labels or not...
-		// if theres only 1 or 2... we can jump directly. if more than 64 we just
-		// check da right bits
+		// Could use a 64bit jump-map... so just mark each instruction as needing labels or not...
+		// If theres only 1 or 2... we can jump directly. if more than 64 we just check da right bits.
 		for i in .length
 			|| fat = .ir+i
 			haslabel |= fat.jumpreg
@@ -45,10 +43,10 @@ class µFunc
 				|| r = i.jumpreg
 					i.FillLabelRequest(where, rz, r-1)
 		
-		target debug
-			while where < rz
-				where.DebugPrint
-				where += where.length
+//		target debug
+//			while where < rz
+//				where.DebugPrint
+//				where += where.length
 
 
 

@@ -142,7 +142,7 @@ struct ASMState
 	function DeclareMe (|Message| where,  |scdecl| Type,  |asmreg|)
 		|| d = .VDecls|int| + 1
 		if (d < .vtmps)
-			|| t = Type.ASMReg
+			|| t = Type.CalculateASMType
 			t.reg = d
 			Type.DType = t|datatypecode|   		// right?
 			.vdecls = d
@@ -177,15 +177,26 @@ struct ASMState
 
 	function RegMap (|int|)
 		|| dcls = (1<<.VDecls+1)-1
-		|| tmps = ~(1<<.vtmps)
+		if .vtmps >= 32
+			return dcls
+		|| tmps = (1 << .vtmps)-1
+		tmps = ~tmps
 		return dcls ||| tmps
 	
 	
-	function FindConst (|scdecl| d, |asmreg|)
-		return .findconst(d.exportposition, d.asmreg)
+	function FindConstDecl (|scdecl| d, |asmreg|)
+		return .findconst(d.exportposition, d.CalculateASMType)
 
 	function FindConst (|uint64| Value, |asmreg| typeinfo, |asmreg|)
-		for (b.bits in .regmap) (i)
+		// our vars will need checking by the nil-checker...
+		// to see if loops/ifs harm this thing.
+		// technically... the asm thing can handle the ifs...
+		// but loops must be pre-checked!
+		
+		if !value
+			return asmreg()
+		|| R = .regmap &~ 1
+		for (b.bits in R) (i)
 			|| f = .FoundCode(i, value, typeinfo)
 				return f
 
@@ -332,7 +343,7 @@ function ASMState.StartFunc (|scfunction| fn)
 	.ReturnASM = fn.ReturnType.regtype
 	.OK = true
 	.VDecls = 0
-	.VTmps = 31
+	.VTmps = 32
 	.AddFuncParams(fn)
 
 

@@ -343,10 +343,17 @@ function MakeMsgCreator (|string| name, |µform| form)
 		r[0] = i.msg
 		r[1] = @thg + pname
 		arg <~ p.which.run(r)
+		if p is jump
+			r[0] = @thg+pname
+			|| size = 32 - p.bitsize
+			r[1] = @num+size
+			arg <~ ohio.run(r)
 		f++
 		
 
 function µparam.Which (|macro!--|)
+	if self is jump
+		return vm_Builder.gyatt
 	if self is number
 		return VM_Builder.legs
 	if self is output
@@ -356,19 +363,22 @@ function µparam.Which (|macro!--|)
 
 || icecream = `function message._0 (|&fatasm|) {
 	visible
-	|| outputs = 0
+//	|| outputs = 0
 	rz = asmstate.sh.syntaxappend(asm._0, self)
 }`.macro
 
 
+|| gyatt   = "rz.jumpinput(_0) = _1".macro
+|| ohio    = "if (((_0<<_1)>>_1) != _0): error (self, `Jumped too far`)".macro
 || legs    = "rz.numinput(_0) = _1".macro
 || arms    = "rz.reginput(_0) = _1".macro
-|| skibidy = "if rz.dest(_0, _1): outputs++".macro
+|| skibidy = "rz.dest(_0, _1)".macro
 || rizzler = "
 if (curr < after) // remove the test for curr!=nil...
 	curr++[] = rz 
 return curr
 ".macro
+
 
 || ASM_Datatype = "datatype _0 (ASM) 
 	module

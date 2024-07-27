@@ -546,7 +546,7 @@ module StringCorrector
 		|| HasAnything = false 
 		|| m = where.parse(4MB, true)
 			HasAnything = m.HasAny
-			.MergeTable(m, m.Dict(true))
+			.MergeTable(m, m.Dict(false, true))
 		
 		.IDsort(HasAnything)
 		

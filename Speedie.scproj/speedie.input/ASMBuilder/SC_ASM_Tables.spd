@@ -361,9 +361,10 @@ function Num (fn_asm)
 
 function Thg (fn_asm)
 	|| thg = ThgSub(self, exp, dest, mode)
-	if thg != nil
+	|| reg = thg.reg
+	if (reg-1)|uint| < 31					// what?
 		return thg
-	error (exp)
+	error (exp, "Register out of bounds")
 
 
 function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |asmreg|)
@@ -371,22 +372,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |as
 													// what if this is a constant?
 	|| d = exp.ASMDecl
 	if d is local
-		|| reg = d.reg
-		if (reg.reg-1)|uint| >= 31					// what?
-		if !reg.fatindex
-			// this reg doesn't have the fat. it should always have the fat
-			// how should this be found? Through registers or via decls?
-			// we are finding constants via registers... Why not this too?
-			// lets see.
-			
-			// We could give the decl a fat index... (not a bad idea)
-			// or we could store the value in the register
-			// or both.
-			// maybe both is best? At least... it should be in the registers...
-			// I think so. We have vdecl and vtmps... so it should be OK.
-			// so anytime a var is altered... we just alter all the info, right?
-			// so thats just... setrel, decl, and &prm
-		return reg
+		return d.reg
 
 	if d is const
 		|| R = dest.reg
@@ -653,7 +639,7 @@ function asmstate.ExistingVar (|message| m, |asmreg|)
 		if found != nil
 			return found
 	  elseif fn == @num
-		|| reg = asmstate.sh.findconst(m.ASMDecl)
+		|| reg = asmstate.sh.FindConstDecl(m.ASMDecl)
 		if reg!=nil
 			return reg
 	return nil
