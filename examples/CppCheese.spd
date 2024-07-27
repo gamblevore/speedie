@@ -3,7 +3,7 @@
 https://pboyd.io/posts/one-c++-footgun     // original article
 
 class CheeseShop
-	|dictionarylower of message| inventory
+	|messagetable| inventory
 	|string| ClerkName
 
 	constructor (|message| cfg)

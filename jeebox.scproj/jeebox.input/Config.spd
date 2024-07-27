@@ -21,9 +21,9 @@ role config (message)
 		if self
 			return .Value
 	
-	syntax cast (|dictionarylower of message|)
+	syntax cast (|messagetable|)
 		cpp_part AsTable
-		return .Dict(false, true)
+		return .Dict(true)
 	
 	function Save (|bool|)
 		|| f = .obj as file
