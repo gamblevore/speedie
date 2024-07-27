@@ -1,19 +1,4 @@
 
-/*
-	we have a file
-	
-	we want a snapshot of what we created during the loading of that file.
-	
-	how?
-	
-	I want to set a checkbox? or just only test it if its a certain file?
-	
-
-	if its not that file... i wanna know that all the objects are being destroyed.
-	
-*/
-
-
 
 datatype TextLineFlags (uint16)
 	flags
@@ -432,11 +417,6 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 		|| col = ¥.GetColor(state.msg, usecol, pos)
 		if d.LineError and c == 9 and prev == 32 
 			c = -c
-//		  elseif c.istextline
-//			0
-//		  else
-//			if state.msg.canilluminate(pos)
-//				.DrawIlluminated(where, (x,y-2))
 		state.font.DrawChar(c, Where, (x, y), col, 1)
 		prev = c
 	
@@ -444,18 +424,6 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 		if d.islast // last line draw too early with autocomplete
 			x += font.width // but we shouldn't need this!
 		.DrawAuto(Where, d, x, y)
-
-
-//function message.CanIlluminate (|ind| p, |bool|)
-//	if self is Editable
-//		|| r = .range // + .rangetrim
-//		return r.x <= p and r.x2 > p 
-
-	
-//helper TextView.DrawIlluminated (|image| where, |ivec2| P)
-//	|| r	= (p, p+(font.width, .lineheight))
-//	|| col	= (1.0, 1.0, 1.0, 0.2).px
-//	where.RectBasic(r, col)
 
 
 helper TextView.AutoLim (|textviewline| d, |bool|)
@@ -470,9 +438,6 @@ helper TextView.AutoLim (|textviewline| d, |bool|)
 helper TextView.FakeAutoComplete (|int|)
 	|| n = .autocompleteback
 	if .autocompletestring=="" or .autocompletestring.length == n
-		// if the length is equal, we don't want to do it.
-		// cos we got the entire thing already. no point.
-		// why replace abc with abc. is that what this does?
 		return -1
 	return n
 
