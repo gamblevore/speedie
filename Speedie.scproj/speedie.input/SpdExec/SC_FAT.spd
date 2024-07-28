@@ -253,6 +253,7 @@ struct FatASM
 	
 	function Renda (|FastString| fs)
 		opt norefcounts
+		debugat
 		|| op = instruction.typelist[.op]
 		if !op
 			debugger
@@ -263,6 +264,7 @@ struct FatASM
 		|| GotAny = ""
 		|| Remain = 24
 		|| f = op.sizes
+		|| knst = (.op == asm.knst)
 		for i in f.count
 			|| bs = f[i].bitsize
 			if bs and (remain > 0)
@@ -272,6 +274,22 @@ struct FatASM
 					fs <~ 'r'
 				fs <~ .r[i]|int|
 				remain += bs
+			if knst
+				exit
+		if knst
+			.RendaKnst(fs)
+	
+	
+	function RendaKnst (|faststring| fs)
+		|| ty = .info.µType
+		fs <~ "  /# "
+		if ty.IsInt
+			fs <~ .const|int64|
+		  elseif ty.ByteCount == 4
+			fs <~ .F32()
+		  else
+			fs <~ .f64()
+		fs <~ " #/"
 
 
 	function Print
