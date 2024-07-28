@@ -7,7 +7,6 @@
 
 prototype CollectFunc (|Message| node, |SCNode| name_space, |Message?| ErrPlace, |SCNode?|)
 
-
 class SCNode (SCNamed) {
 linkage
 	cpp_part		Base

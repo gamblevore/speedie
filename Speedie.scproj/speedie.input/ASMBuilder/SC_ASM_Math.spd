@@ -44,9 +44,8 @@ extend ASMState
 			rz = exp.jBRA(r,0)
 		  else
 			|| ugh = badness.asmbitclearmode
-			rz = exp.JBYE(r, ugh, 0)
+			rz = exp.JZRO(r, ugh, 0)
 		rz.op += negate<<24
-		debugger
 
 	
 	function int.ASMBitClearMode (|int|)

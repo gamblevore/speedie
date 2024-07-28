@@ -1911,13 +1911,13 @@ extern ASM_Encoder2 SC__ASM_Forms[128];
 #define kSC__ASM_FUNC3 2
 #define kSC__ASM_JBRA 70
 #define kSC__ASM_JBRN 73
-#define kSC__ASM_JBYE 71
-#define kSC__ASM_JBYN 72
 #define kSC__ASM_JMPE 68
 #define kSC__ASM_JMPF 67
 #define kSC__ASM_JMPI 66
 #define kSC__ASM_JMPN 69
 #define kSC__ASM_JUMP 65
+#define kSC__ASM_JZRN 72
+#define kSC__ASM_JZRO 71
 #define kSC__ASM_KNSR 40
 #define kSC__ASM_KNST 8
 #define kSC__ASM_KNST1 8
@@ -8202,10 +8202,6 @@ FatASM* JB_Msg_JBRA(Message* Self, AsmReg R1, int Jmp);
 
 FatASM* JB_Msg_JBRN(Message* Self, AsmReg R1, int Jmp);
 
-FatASM* JB_Msg_JBYE(Message* Self, AsmReg R1, int Bytes, int Jmp);
-
-FatASM* JB_Msg_JBYN(Message* Self, AsmReg R1, int Bytes, int Jmp);
-
 JB_String* JB_Msg_JDB2_(Message* Self, int Flags, FastString* Fs_in);
 
 JB_String* jdb4(Message* Self);
@@ -8223,6 +8219,10 @@ FatASM* JB_Msg_JMPI(Message* Self, AsmReg R1, AsmReg R2, int Cmp, int Jmp);
 FatASM* JB_Msg_JMPN(Message* Self, AsmReg R1, AsmReg R2, int Jmp);
 
 FatASM* JB_Msg_JUMP(Message* Self, int JUMP);
+
+FatASM* JB_Msg_JZRN(Message* Self, AsmReg R1, int Bytes, int Jmp);
+
+FatASM* JB_Msg_JZRO(Message* Self, AsmReg R1, int Bytes, int Jmp);
 
 void SC_Msg_KinderRemoveAfter(Message* Self);
 

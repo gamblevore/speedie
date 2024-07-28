@@ -387,13 +387,13 @@ forms
 			Code += Bra_Jmpi
 		___
 
-/**/ JBYE  (BraBytes)
+/**/ JZRO  (BraBytes)
 		__
 		if ( (i1 & (1<<(1<<(3+BraBytes_Bytesu)))-1 ))
 			Code += Bra_Jmpi
 		___
 
-/**/ JBYN  (BraBytes)
+/**/ JZRN  (BraBytes)
 		__
 		if (!(i1 & (1<<(1<<(3+BraBytes_Bytesu)))-1 ))
 			Code += Bra_Jmpi
