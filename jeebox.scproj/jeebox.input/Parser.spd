@@ -1076,7 +1076,7 @@ ive been~running #since morning
 		if (!ch)
 			|| item = .ProcessThingparent(output)
 			if !item or item == Output
-				return item // {^"oof"}
+				return item
 			TmpoFlags &= kTemporal&~kTemporalWord		// for consistancy with ftmp
 			ch = .ParseItem(Item, TmpoFlags, kopp)		// or else...
 														// a:b, (a):b ... will parse differently!

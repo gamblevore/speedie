@@ -229,8 +229,11 @@ function BadEncoder (ASM_Encoder2)
 
 function VM_NewInstructions (|message| list, |int| Amount, |[message]| rz)
 	opt norefcounts
+	|| ask = 0
+	if amount
+		ask = 1<<(Amount-1)
 	for ch in list
-		.VM_NewInstruction(ch, Amount, rz)
+		require .VM_NewIns(ch, ask, rz)
 
 
 function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true)
@@ -240,6 +243,7 @@ function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true)
 		R = []
 		.NameList = r
 		R <~ (@thg+"EROR",  256)
+	.VM_NewInstructions(list, 0, R)
 	.VM_NewInstructions(list, 3, R)
 	.VM_NewInstructions(list, 2, R)
 	.VM_NewInstructions(list, 1, R)
@@ -284,11 +288,11 @@ function message.VMBits (|int|)
 	rz:=1
 
 
-function VM_MakeInstructionSub (|message| tmp, |int| Ask, |[message]?| ActuallyMakeTheVM)
+function VM_MakeInstructionSub (|message| tmp,  |int| Ask,  |[message]?| ActuallyMakeTheVM)
 	opt norefcounts
 	|| prms = tmp.first
 	|| FoundBits = prms.VMBits
-	require FoundBits & Ask
+	require (FoundBits & Ask) or !ask
 
 	tmp.flags |= 32K
 	|| arg = tmp.last
@@ -305,7 +309,9 @@ function VM_MakeInstructionSub (|message| tmp, |int| Ask, |[message]?| ActuallyM
 	++.Total
 	
 	.MakeMsgCreator(tn, form)
-	|| id = .FreeID(tmp, foundbits)
+	|| id = 0
+	if ask
+		id = .FreeID(tmp, foundbits)
 	|| Done = false
 	for (b.bits in foundbits) (extra)
 		|| x = id + extra
@@ -414,11 +420,12 @@ function FreeID (|message| m, |int| ask, |int|)
 	error (m, "Can't find free ID for ASM")
 
 
-function VM_NewInstruction (|message| tmp, |int| multiple, |[message]?| ActuallyMakeTheVM)		
+function VM_NewIns (|message| tmp, |int| ask, |[message]?| ActuallyMakeTheVM, |bool|)
 	if (tmp == @tmp) and !(tmp.flags&32K) 
 		if (tmp != "forms" and "ignore")
-			.VM_MakeInstructionSub(tmp, 1<<(multiple-1), ActuallyMakeTheVM)
-	
+			.VM_MakeInstructionSub(tmp, ask, ActuallyMakeTheVM)
+			require ask
+	return true
 
 
 function VMLine (|message| line, |faststring| vm)

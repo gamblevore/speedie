@@ -52,16 +52,20 @@ struct FatASM
 		return info
 	
 	function F32 (assigns:|float|)
+		if !value: value = 0			// rationalise
 		((&.const)|&float|)[] = Value
 
 	function F64 (assigns:|f64|)
+		if !value: value = 0			// rationalise
 		((&.const)|&f64|)[] = Value
 		
 	function F32 (|float|)
-		return ((&.const)|&float|)[]
+		rz = ((&.const)|&float|)[]
+		if !rz: rz = 0					// rationalise
 
 	function F64 (|f64|)
-		return ((&.const)|&f64|)[]
+		rz = ((&.const)|&f64|)[]
+		if !rz: rz = 0					// rationalise
 		
 	setter Debug (|message|)
 		.msg = Value
@@ -97,10 +101,6 @@ struct FatASM
 		if self
 			return m == .op
 	
-//	syntax append (|asmreg| flags)
-//		real self
-//		.info = .info as flags
-
 	syntax is (|asmreg| flags, |bool|)
 		if self
 			return (.info & flags)|uint64| != 0
@@ -179,7 +179,11 @@ struct FatASM
 		.r[a] = v
 		.jumpreg = a + 1
 		
-
+	function JumpTo (assigns:|&fatasm|)
+		|| j = .jumpreg
+			.r[j-1] = value - self
+		  else
+			debugger
 	function out (|uint|): return .r[0]
 //	function out (assigns:|uint|): .r[0] = value
 	
@@ -261,12 +265,12 @@ struct FatASM
 		|| f = op.sizes
 		for i in f.count
 			|| bs = f[i].bitsize
-			if remain > 0 and bs
+			if bs and (remain > 0)
 				fs <~ gotany
 				gotany = ", "
 				if f[i].isreg
 					fs <~ 'r'
-				fs <~ .r[i]
+				fs <~ .r[i]|int|
 				remain += bs
 
 

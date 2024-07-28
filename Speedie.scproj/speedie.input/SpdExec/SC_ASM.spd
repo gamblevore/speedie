@@ -1,9 +1,6 @@
 
 
 datatype ASM (uint)
-//	function IsOK (|bool|)
-//		 return self
-	
 	function Print
 		visible
 		cpp_name ASMPrint
@@ -23,11 +20,18 @@ datatype ASM (uint)
 		
 	function DecodeOp (|int|)
 		return self >> 24
+	
 	target debug
 		function DecodeBaseOp (|int|)
 			rz = .decodeop
 			if rz < 32
 				rz &= ~3
+		
+	operator • (|bool| b, |asm|)
+		if b
+			return self + (1<<24)
+		return self
+	
 	function R1 (assigns:|uint|, |asm|)
 		return self ||| (value << 27) >> 8
 	function R2 (assigns:|uint|, |asm|)
@@ -36,17 +40,11 @@ datatype ASM (uint)
 		return self ||| (value << 27) >> 18
 	function R4 (assigns:|uint|, |asm|)
 		return self ||| (value << 27) >> 23
-		
-	operator • (|bool| b, |asm|)
-		if b
-			return self + (1<<24)
-		return self
 
 	module
 		|byte|					NoisyASM = 1
 		|asm_encoder2[128]|		Forms
 		|asm_encoder2[256]| 	Encoders
-
 
 
 	

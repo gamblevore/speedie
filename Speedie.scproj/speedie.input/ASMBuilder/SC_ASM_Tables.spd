@@ -125,36 +125,40 @@ function If				(fn_asm)
 
 	|| Start = .Branch(cond, Flip)
 	rz = .µ(arg1)
-	|| AfterFirst = arg1.jump(0) // marks as ended... to prevent opts. can be removed later during optimisation
+	Start.jumpto = .curr
 	if ElseIfCond or arg2.HasAny
+		|| AfterFirst = arg1.jump(0) // marks as ended... to prevent opts. can be removed later during optimisation
 		if ElseIfCond
 			|| a = asmreg()
 			rz = IF(self, elseifcond, a)
 		  else
 			rz = ARG(self, arg2)
-		AfterFirst.r[3] = .curr - afterfirst
-	Start.r[3] = .curr - Start
+		AfterFirst.jumpto = .curr
 
 	
 	
 function While			(fn_asm)
 	opt norefcounts
-	|| Jumper = exp.JUMP(0)							// jump to end... THEN EMIT arg and jump back.
-	.WhileStart = jumper
-	ASMTmp.arg(self, exp.second)					// arg
-	|| CondStart = .curr							// right?
-	debugger
-	|| ExitPlace = .branch(exp.first!)				// cond
-	ExitPlace.r[3] = .curr - Jumper
+	|| BEGIN = exp.JUMP(0)								// jump to end... THEN EMIT arg and jump back.
+	ASMTmp.arg(self, exp.second)						// arg
 
-	while Jumper < ExitPlace
+	|| CONTINUE = .curr
+	BEGIN.jumpto = CONTINUE
+	|| GOBACK = .branch(exp.first!)					// cond
+	|| EXIT = .curr
+	GOBACK.jumpto = BEGIN+1
+	|| C = BEGIN
+
+	while C < CONTINUE
 		#!ClearExits
-		|| op = Jumper.Op
-		if op >= 254								// exit/continue
-			Jumper.op = ASM.Jump
-			|| oof = (condstart, exitplace)(op==254)
-			Jumper.r[0] = oof - Jumper
-		Jumper++
+		|| op = C.Op
+		if op >= 254
+			C.op = ASM.Jump
+			if op == 254 // continue
+				C.jumpto = CONTINUE
+			  else       // exit
+				C.jumpto = EXIT
+		C++
 	
 
 
@@ -194,7 +198,7 @@ function Ternary		(fn_asm)
 	.µ(A, dest)
 	|| Exit = exp.jump(0)
 
-	FailToSecond.r[3] = .curr - FailToSecond
+	FailToSecond.jumpto = .curr
 
 	rz = .µ(B, dest)
 	Exit.r[3] = .curr - Exit
@@ -563,17 +567,11 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr
 	if dest is Discard
 		return asmreg() // no need to do anything. {a()+b()}
 
-	if dest isnt condrequest
-		dest = .TempMe(exp, dest)
-		// if its a condrequest... then what?
-		// how do we know the thing we will do... is actually GOING to be a condition??
-		// like:   if a > 0   thats a cond... but what about this?   if a+b    /// now what?
-		// we either ask within every mathop... OR... undo the temp? (might well undo it?)
-	debugger
+	dest = .TempMe(exp, dest)
 	dest.µtype = ml.µtype				// assignment conversion needs doing?	
 	(dest is frommath)
 
-	if ml isnt ConstAny or mr isnt ConstAny
+	if  ml isnt ConstAny  or  mr isnt ConstAny
 		return (fn)(self, dest, ml, mr, op)
 	(Dest is MathConst)
 	rz = (fn)(self, dest, ml, mr, op)

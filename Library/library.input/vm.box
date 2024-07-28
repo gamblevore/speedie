@@ -27,7 +27,7 @@ forms
 		Amount	l
 	
 	Jump
-		l0		l
+		JUMP	j
 		
 	
 	Cmp		// cmp:

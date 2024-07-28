@@ -67,11 +67,11 @@
 #define   Alloc_Amountu_(x)   (((uint)((x)<<16))>>16)
 
 
-#define   Jump_l0i       ((( int)((Op)<<8))>>8)
-#define   Jump_l0i_(x)   ((( int)((x)<<8))>>8)
+#define   Jump_JUMPi       ((( int)((Op)<<8))>>8)
+#define   Jump_JUMPi_(x)   ((( int)((x)<<8))>>8)
 
-#define   Jump_l0u       (((uint)((Op)<<8))>>8)
-#define   Jump_l0u_(x)   (((uint)((x)<<8))>>8)
+#define   Jump_JUMPu       (((uint)((Op)<<8))>>8)
+#define   Jump_JUMPu_(x)   (((uint)((x)<<8))>>8)
 
 
 #define   Cmp_Cmpi       ((( int)((Op)<<23))>>28)

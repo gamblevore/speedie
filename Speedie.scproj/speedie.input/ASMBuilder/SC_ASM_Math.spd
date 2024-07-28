@@ -11,7 +11,7 @@ extend asmreg
 		is AlreadyNegated			// speedie crashing somehow but it is used OK elsewhere?
 		if self is CondRequest
 			isnt condrequest
-			is cond
+			is CondAnswer
 		return self 
 		
 		
@@ -28,26 +28,25 @@ extend asmreg
 
 
 extend ASMState
-	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asmreg|)
+	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |&fatasm|)
 		|| negate = (dest is negate)|int|
 		|| badness = l.BadBits(r) 
-		if (dest isnt CondRequest)
-			return exp.CMPB(dest, L, R, badness, negate) * Dest
+		if dest isnt CondRequest
+			return exp.CMPB(dest, L, R, badness, negate)
 
 		if badness and l.reg
 			exp.ClearTwo(l, r)
 			badness = 0
 
-		|&fatasm| fat
 		if l.reg
-			fat = exp.JMPE(r,l,0)
+			rz = exp.JMPE(r,l,0)
 		  elseif !badness
-			fat = exp.jBRA(r,0)
+			rz = exp.jBRA(r,0)
 		  else
 			|| ugh = badness.asmbitclearmode
-			fat = exp.JBYE(r, ugh, 0)
-		fat.op += negate<<24
-		return fat * Dest
+			rz = exp.JBYE(r, ugh, 0)
+		rz.op += negate<<24
+		debugger
 
 	
 	function int.ASMBitClearMode (|int|)
@@ -77,9 +76,12 @@ extend ASMState
 			|| Mode = 2+(dest is negate)
 			return .Compare(dest, l, r, exp, mode) // can't really be bothered to do this const comparison
 
-		rz = .equalsint(dest, l, r, exp)
+		|| fat = .equalsint(dest, l, r, exp)
+		rz = fat * Dest
 		if dest is ConstAny
-			rz.const = (l.const == r.const)|int64|
+			// this isn't true... what about floats? we could just... rationalise floats?
+			// so where do we set floats even?
+			rz.const = ((l.const == r.const) != (dest is negate))|int|
 		rz = rz.boolasm
 	
 		

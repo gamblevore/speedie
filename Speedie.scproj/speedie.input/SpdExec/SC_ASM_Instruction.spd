@@ -71,8 +71,10 @@ class Instruction
 		function InstructionInit
 			__instructionlist__
 			|| ERR = .typelist[0]
-			for i in 256
-				.typelist[i] := ERR 
+				for i in 256
+					.typelist[i] := ERR 
+			  else
+				debugger 
 			.OpDict["bra"] = .OpDict["jbra"]
 			.OpDict["halt"] = .OpDict["trap"]
 

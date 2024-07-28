@@ -5,7 +5,6 @@
 
 
 extend_module ASM
-		
 	function ListInstructions
 		|| fs = faststring()
 		fs <~ "Opcodes:\n"

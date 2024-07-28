@@ -1,3 +1,5 @@
+ı EROR: _
+	return u1 + U1_Lu;
 ı FUNC: 
 	__;
 	Code = BumpStack(r, Code, Op);
@@ -13,8 +15,6 @@
 	__;
 	Code = TailStack(r, Code, Op);
 	___;
-ı EROR: _
-	return u1 + U1_Lu;
 ı NOOP: _
 	i1 = i1;
 	// NOOP

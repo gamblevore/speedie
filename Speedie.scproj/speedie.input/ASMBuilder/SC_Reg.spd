@@ -19,7 +19,7 @@ datatype AsmReg (uint64)
 		StayOpen
 		AlreadyNegated
 		Alternate
-		Cond
+//		Cond
 		Negate
 		Discard
 		Set
@@ -34,6 +34,7 @@ datatype AsmReg (uint64)
 		CorrectAddr		= ContainsAddr ||| bitcorrect
 		Arg				= Discard         // ||| SrcConst
 		CondRequest
+		CondAnswer
 		MathConst		= ConstAny ||| FromMath
 		Zero			= ConstAny ||| BitCorrect ||| 56 // 56 == datatypecode.uint64
 	
