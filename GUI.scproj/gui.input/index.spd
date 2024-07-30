@@ -9,7 +9,7 @@ targets
 
 
 import "Image"
-import "temporal"
+//import "temporal"
 // don't import "network" or else perry won't compile easily.
 
 
