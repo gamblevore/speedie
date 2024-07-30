@@ -345,7 +345,7 @@ image `The earth above the lake: The image of APPROACH. Thus the superior man is
 
 gram Kuan (WIND upon EARTH) {
 ID 20
-Meaning "Contemplation (View)"
+Meaning "Contemplation [View]"
 
 form `A slight variation of tonal stress gives the Chinese name for this hexagram a double meaning. It means both contemplating and being seen, in the sense of being an example. These ideas are suggested by the fact that the hexagram can be understood as picturing a type of tower characteristic of ancient China.
 
@@ -408,7 +408,7 @@ image `The mountain rests on the earth: The image of SPLITTING APART. Thus those
 
 gram Fu (EARTH upon THUNDER) {
 ID 24
-Meaning "Return (The Turning Point)"
+Meaning "Return [The Turning Point]"
 
 form `The idea of a turning point arises from the fact that after the dark lines have pushed all of the light lines upward and out of the hexagram, another light line enters the hexagram from below. The time of darkness is past. The winter solstice brings the victory of light. This hexagram is linked with the eleventh month, the month of the solstice (December-January).`
 
@@ -423,7 +423,7 @@ At the time of solstice. Merchants and strangers did not go about, And the ruler
 
 gram `Wu Wang` (HEAVEN upon THUNDER) {
 ID 25
-Meaning "Innocence (The Unexpected)"
+Meaning "Innocence [The Unexpected]"
 
 form `Ch'ien, heaven is above; Chên, movement, is below. The lower trigram Chên is under the influence of the strong line it has received form above, from heaven. When, in accord with this, movement follows the law of heaven, man is innocent and without guile. His mind is natural and true, unshadowed by reflection or ulterior designs. For wherever conscious purpose is to be seen, there the truth and innocence of nature have been lost. Nature that is not directed by the spirit is not true but degenerate nature. Starting out with the idea of the natural, the train of thought in part goes somewhat further and thus the hexagram includes also the idea of the fundamental or unexpected.`
 
@@ -452,7 +452,7 @@ image `Heaven within the mountain: The image of THE TAMING POWER OF THE GREAT. T
 
 gram I (MOUNTAIN upon THUNDER) {
 ID 27
-Meaning "Corners of the Mouth (Providing Nourishment)"
+Meaning "Corners of the Mouth [Providing Nourishment]"
 form `This hexagram is a picture of an open mouth; above and below are firm lines of the lips, and between them the opening. Starting with the mouth, through which we take food for nourishment, the thought leads to nourishment itself. Nourishment of oneself, specifically of the body, is represented in the three lower lines, while the three upper lines represent nourishment and care of others, in a higher, spiritual sense.`
 
 judgement `THE CORNERS OF THE MOUTH. Perseverance brings good fortune. Pay heed to the providing of nourishment. And to what a man seeks to fill his own mouth with.`
@@ -618,6 +618,7 @@ Such a man's power does not show externally, yet it can move heavy loads, like a
 }
 
 gram Chin (fire upon earth) {
+ID 35
 meaning "Progress"
 form `The hexagram represents the sun rising over the earth. It is therefore the symbol of rapid, easy progress, which at the same time means ever widening expansion and clarity.`
 
@@ -652,92 +653,40 @@ markedlines
 
 }
 
+gram `Ming I` (earth upon fire) { 
+
+ID 36
+meaning `Darkening of the light`
+
+form `Here the sun has sunk under the earth and is therefore darkened. The name of the hexagram means literally "wounding of the bright"; hence the individual lines contain frequent references to wounding. The situation is the exact opposite of that in the foregoing hexagram. In the latter a wise man at the head of affairs has able helpers, and in company with them makes progress; here a man of dark nature is in a position of authority and brings harm to the wise and able man.`
+
+judgement `DARKENING OF THE LIGHT. In adversity it furthers one to be persevering.`
+	`One must not unresistingly let himself be swept along by unfavorable circumstances, nor permit his steadfastness to be shaken. He can avoid this by maintaining his inner light, while remaining outwardly yielding and tractable. With this attitude he can overcome even the greatest adversities. In some situations indeed a man must hide his light, in order to make his will prevail inspite of difficulties in his immediate environment. Perseverance must dwell in inmost consciousness and should not be discernible from without. Only thus is a man able to maintain his will in the face of difficulties.`
+	
+image `The light has sunk into the earth: The image of DARKENING OF THE LIGHT. Thus does the superior man live with the great mass: He veils his light, yet still shines.`
+	`In a time of darkness it is essential to be cautious and reserved. One should not needlessly awaken overwhelming enmity by inconsiderate behavior. In such times one ought not to fall in with the practices of others; neither should one drag them censoriously into the light. In social intercourse one should not try to be all-knowing. One should let many things pass, without being duped.`
+	
+markedlines 
+	line 9 `Darkening of the light during flight. He lowers his wings. The superior man does not eat for three days On his wanderings. But he has somewhere to go. The host has occasion to gossip about him.`
+		`With grandiose resolve a man endeavors to soar above all obstacles, but thus encounters a hostile fate. He retreats and evades the issue. The time is difficult. Without rest, he must hurry along, with no permanent abiding place. If he does not want to make compromises within himself, but insists on remaining true to his principles, he suffers deprivation. Never the less he has a fixed goal to strive for even though the people with whom he lives do not understand him and speak ill of him.`
+	line 6 `Darkening of the light injures him in the left thigh. He gives aid with the strength of a horse. Good fortune.`
+		`Here the Lord of Light is in a subordinate place and is wounded by the Lord of Darkness. But the injury is not fatal; it is only a hindrance. Rescue is still possible. The wounded man gives no thought to himself; he thinks only of saving the others who are also in danger. Therefore he tries with all his strength to save all that can be saved. There is good fortune in thus acting according to duty.`
+	line 9 `Darkening of the light during the hunt in the south. Their great leader is captured. One must not expect perseverance too soon.`
+		`It seems as if chance were at work. While the strong, loyal man is striving eagerly and in good faith to create order, he meets the ringleader of the disorder, as if by accident, and seizes him. Thus victory is achieved. But in abolishing abuses one must not be too hasty. This would turn out badly because the abuses have been in existence so long.`
+	line 6 `He penetrates the left side of the belly. One gets at the very heart of the darkening of the light.`
+		`We find ourselves close to the commander of darkness and so discover his mot secret thoughts. In this way we realize that there is no longer any hope of improvement, and thus we are enabled to leave the scene of disaster before the storm breaks.`
+	line 6 `Darkening of the light as with Prince Chi. Perseverance furthers.`
+		`Prince Chi lived at the court of the evil tyrant Chou Hsin, who, although not mentioned by name, furnished the historical example on which this whole situation is based. Prince Chi was a relative of the tyrant and could not withdraw from the court; therefore he concealed his true sentiments and feigned insanity. Although he was held a slave, he did not allow external misery to deflect him from his convictions. This provides a teaching for those who cannot leave their posts in times of darkness. In order to escape danger, they need invincible perseverance of spirit and redoubled caution in their dealings with the world.`
+	line 6 `Not light but darkness. First he climbed up to heaven, Then plunged into the depths of the earth.`
+		`Here the climax of the darkening is reached. The dark power at first held so high a place that it could wound all who were on the side of good and of the light. But in the end it perishes of its own darkness, for evil must itself fall at the very moment when it has wholly overcome the good, and thus consumed the energy to which it owed its duration.`
+
+}
+
+
+
+gram `Chia Jên` 
+meaning  "The Family [The Clan]"
 `
-index
-
-
-36. Ming I / Darkening of the light
-
-above K'UN THE RECEPTIVE, EARTH
-below LI THE CLINGING, FIRE
-
-Here the sun has sunk under the earth and is therefore darkened. The name of the hexagram means literally "wounding of the bright"; hence the individual lines contain frequent references to wounding. The situation is the exact opposite of that in the foregoing hexagram. In the latter a wise man at the head of affairs has able helpers, and in company with them makes progress; here a man of dark nature is in a position of authority and brings harm to the wise and able man.
-
-THE JUDGMENT
-
-DARKENING OF THE LIGHT. In adversity
-It furthers one to be persevering.
-
-One must not unresistingly let himself be swept along by unfavorable circumstances, nor permit his steadfastness to be shaken. He can avoid this by maintaining his inner light, while remaining outwardly yielding and tractable. With this attitude he can overcome even the greatest adversities. In some situations indeed a man must hide his light, in order to make his will prevail inspite of difficulties in his immediate environment. Perseverance must dwell in inmost consciousness and should not be discernible from without. Only thus is a man able to maintain his will in the face of difficulties.
-
-THE IMAGE
-
-The light has sunk into the earth:
-
-The image of DARKENING OF THE LIGHT.
-
-Thus does the superior man live with the great mass:
-He veils his light, yet still shines.
-
-In a time of darkness it is essential to be cautious and reserved. One should not needlessly awaken overwhelming enmity by inconsiderate behavior. In such times one ought not to fall in with the practices of others; neither should one drag them censoriously into the light. In social intercourse one should not try to be all-knowing. One should let many things pass, without being duped.
-
-THE LINES
-
-Nine at the beginning means:
-
-Darkening of the light during flight.
-He lowers his wings.
-
-The superior man does not eat for three days
-On his wanderings.
-But he has somewhere to go.
-
-The host has occasion to gossip about him.
-
-With grandiose resolve a man endeavors to soar above all obstacles, but thus encounters a hostile fate. He retreats and evades the issue. The time is difficult. Without rest, he must hurry along, with no permanent abiding place. If he does not want to make compromises within himself, but insists on remaining true to his principles, he suffers deprivation. Never the less he has a fixed goal to strive for even though the people with whom he lives do not understand him and speak ill of him.
-Six in the second place means:
-
-Darkening of the light injures him in the left thigh.
-He gives aid with the strength of a horse.
-Good fortune.
-
-Here the Lord of Light is in a subordinate place and is wounded by the Lord of Darkness. But the injury is not fatal; it is only a hindrance. Rescue is still possible. The wounded man gives no thought to himself; he thinks only of saving the others who are also in danger. Therefore he tries with all his strength to save all that can be saved. There is good fortune in thus acting according to duty.
-
-Nine in the third place means:
-
-Darkening of the light during the hunt in the south.
-
-Their great leader is captured.
-One must not expect perseverance too soon.
-
-It seems as if chance were at work. While the strong, loyal man is striving eagerly and in good faith to create order, he meets the ringleader of the disorder, as if by accident, and seizes him. Thus victory is achieved. But in abolishing abuses one must not be too hasty. This would turn out badly because the abuses have been in existence so long.
-
-Six in the fourth place means:
-
-He penetrates the left side of the belly.
-One gets at the very heart of the darkening of the light.
-
-We find ourselves close to the commander of darkness and so discover his mot secret thoughts. In this way we realize that there is no longer any hope of improvement, and thus we are enabled to leave the scene of disaster before the storm breaks.
-Six in the fifth place means:
-
-Darkening of the light as with Prince Chi.
-Perseverance furthers.
-
-Prince Chi lived at the court of the evil tyrant Chou Hsin, who, although not mentioned by name, furnished the historical example on which this whole situation is based. Prince Chi was a relative of the tyrant and could not withdraw from the court; therefore he concealed his true sentiments and feigned insanity. Although he was held a slave, he did not allow external misery to deflect him from his convictions. This provides a teaching for those who cannot leave their posts in times of darkness. In order to escape danger, they need invincible perseverance of spirit and redoubled caution in their dealings with the world.
-
-Six at the top means:
-
-Not light but darkness.
-First he climbed up to heaven,
-
-Then plunged into the depths of the earth.
-
-Here the climax of the darkening is reached. The dark power at first held so high a place that it could wound all who were on the side of good and of the light. But in the end it perishes of its own darkness, for evil must itself fall at the very moment when it has wholly overcome the good, and thus consumed the energy to which it owed its duration.
-
-index
-
-
-37. Chia Jên / The Family [The Clan]
 
 above SUN THE GENTLE, WIND
 below LI THE CLINGING, FIRE
