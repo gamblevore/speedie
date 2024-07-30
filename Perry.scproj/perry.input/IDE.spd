@@ -821,11 +821,11 @@ So anything not 0 means "its OK"`
 		if e.Document == doc
 			return -1
 		
-		|| Loaded = E.LoadDocument(doc) #require
-		if .FileIsSpeedieCode
+		if doc.location.pathiscode
 			e.ExpectsParse = TextView.AlwaysJeebox
 		  else
 			e.ExpectsParse = TextView.AllowJeebox
+		|| Loaded = E.LoadDocument(doc) #require
 		|| m = .FunctionMenu.SubControl as menu
 			m.StopFilter
 		|| spd = r.location.PathIsCode
