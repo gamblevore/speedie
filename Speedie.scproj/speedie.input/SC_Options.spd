@@ -325,6 +325,7 @@ module Feedback
 			options.SingleCppOutput = value.optionbool
 		
 		+"elf"
+			Explain(Purpose, "Search for any elves")$
 			app.say "theres no elves in here"
 			error "Missing race requested"
 			return true
