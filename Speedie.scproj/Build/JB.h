@@ -1502,6 +1502,7 @@ extern JB_String* SC__AC_TestCrash;
 extern int SC__AC_total;
 extern bool SC__AC_WillExit;
 extern u16 JB__API_NilHappened_;
+extern CharSet* JB__Constants_CSAfterDot;
 extern CharSet* JB__Constants_CSAfterStatement;
 extern CharSet* JB__Constants_CSLettersOnly;
 extern CharSet* JB__Constants_CSLine;
@@ -3905,6 +3906,8 @@ void JB_Tk__AddXMLText(Message* XML, JB_String* S, int Start, int I);
 Message* JB_Tk__BarThings(int Start, Syntax Syx);
 
 Message* JB_Tk__BeforeRelSub(int Start, bool Mode);
+
+bool JB_Tk__CanDot();
 
 bool JB_Tk__CanStatement();
 

@@ -211,7 +211,7 @@ extend Parser
 			.Params( rz, After )
 		  else
 			|| prms = parser.newEmpty(rz, @emb, After, After)
-			if (parent == @arg) and .CanStatement
+			if (parent == @arg) and .CanDot
 				|| p = .ProcessThingParent(prms)
 					prms <~ p
 					prms.func = @prm
@@ -743,6 +743,9 @@ extend Parser
 
 	function CanStatement (|bool|)
 		return  Jeebox.CSAfterStatement[parser.NextByte]
+
+	function CanDot (|bool|)
+		return  Jeebox.CSAfterDot[parser.NextByte]
 	
 	function fTmpSub (|message!| result, |int| OpFlags, |int| ThingFlags, |message|)
 		if .WillEnd
