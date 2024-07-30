@@ -695,13 +695,17 @@ function RC_HandleDisappearing (|SCFunction| fn, |Message| msg, |int| Basis)
 function scfunction.CallSuperMem (|SCFunction| fn)
 	opt norefcounts
 	|| root = .sourcearg $
+	|| fnargs = fn.args
+	expect ((fnargs == 1) or .cls.istask) (root, "Unable to auto-call super-class constructor.")
+	
 	using root
 	|| PCon = NewFnc(fn.exportName)
 	|| lst = PCon.last!
 	lst.obj = fn
-
-	for (a in fn.args) (i)
-		lst.msg(@thg, a.name).obj = .args[i]
+	
+	for (a in fnargs) (i)
+		|| msg = lst.msg(@thg, a.name) 
+		msg.obj = .args[i]
 
 	if (self is Constructor)
 		PCon.obj = fn.ReturnType
@@ -712,6 +716,7 @@ function scfunction.CallSuperMem (|SCFunction| fn)
 	  else 
 		PCon.obj = typevoid
 		root <~ PCon
+
 
 
 	
