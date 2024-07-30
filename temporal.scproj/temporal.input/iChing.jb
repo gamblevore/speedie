@@ -1,6 +1,7 @@
 
 /*
 	progressed to gram 31. Extra "lines meaning" data is not entered yet. 
+	check a few things. names, meanings, over/under. some mistakes might filter through.
 */
 // author info at end of file.
 
@@ -560,171 +561,63 @@ markedlines
 }
 
 
-gram ChineseName (X upon X) {
+gram TUN (HEAVEN upon MOUNTAIN) {
 ID 33
-`33. TUN / Retreat
+meaning `retreat`
 
-above CH'IEN THE CREATIVE, HEAVEN
-below KêN KEEPING STILL, MOUNTAIN
+form `The power of the dark is ascending. The light retreats to security, so that the dark cannot encroach upon it. This retreat is a matter not of man's will but of natural law. Therefore in this case withdrawal is proper; it is the correct way to behave in order not to exhaust one's forces. In the calendar this hexagram is linked with the sixth month (July-August), in which the forces of winter are already showing their influence.`
 
-The power of the dark is ascending. The light retreats to security, so that the dark cannot encroach upon it. This retreat is a matter not of man's will but of natural law. Therefore in this case withdrawal is proper; it is the correct way to behave in order not to exhaust one's forces. In the calendar this hexagram is linked with the sixth month (July-August), in which the forces of winter are already showing their influence.
+judgement `RETREAT. Success. In what is small, perseverance furthers.`
+	`Conditions are such that the hostile forces favored by the time are advancing. In this case retreat is the right course, and it is not to be confused with flight. Flight means saving oneself under any circumstances, whereas retreat is a sign of strength. We must be careful not to miss the right moment while we are in full possession of power and position. Then we shall be able to interpret the signs of the time before it is too late and to prepare for provisional retreat instead of being drawn into a desperate life-and-death struggle. Thus we do not simple abandon the field to the opponent; we make it difficult for him to advance by showing perseverance in single acts of resistance. In this way we prepare, while retreating, for the counter-movement. Understanding the laws of a constructive retreat of this sort is not easy. The meaning that lies hidden in such a time is important.`
+	
+image `Mountain under heaven: the image of RETREAT. Thus the superior man keeps the inferior man at a distance, Not angrily but with reserve.`
+	`The mountain rises up under heaven, but owing to its nature it finally comes to a stop. Heaven on the other hand retreats upward before it into the distance and remains out of reach. This symbolizes the behavior of the superior man toward a climbing inferior; he retreats into his own thoughts as the inferior man comes forward. He does not hate him, for hatred is a form of subjective involvement by which we are bound to the hated object. The superior man shows strength (heaven) in that he brings the inferior man to a standstill (mountain) by his dignified reserve.`
 
-THE JUDGMENT
 
-RETREAT. Success.
-In what is small, perseverance furthers.
+markedlines
+	line 6 `At the tail in retreat. This is dangerous. One must not wish to undertake anything.` --> `Since the hexagram is the picture of something that is retreating, the lowest line represents the tail and the top line the head. In a retreat it is advantageous to be at the front. Here one is at the back, in immediate contact with the pursuing enemy. This is dangerous, and under such circumstances it is not advisable to undertake anything. Keeping still is the easiest way of escaping from the threatening danger.`
 
-Conditions are such that the hostile forces favored by the time are advancing. In this case retreat is the right course, and it is not to be confused with flight. Flight means saving oneself under any circumstances, whereas retreat is a sign of strength. We must be careful not to miss the right moment while we are in full possession of power and position. Then we shall be able to interpret the signs of the time before it is too late and to prepare for provisional retreat instead of being drawn into a desperate life-and-death struggle. Thus we do not simple abandon the field to the opponent; we make it difficult for him to advance by showing perseverance in single acts of resistance. In this way we prepare, while retreating, for the counter-movement. Understanding the laws of a constructive retreat of this sort is not easy. The meaning that lies hidden in such a time is important.
+	line 6 `he holds him fast with yellow oxen-hide. No one can tear him loose.` --> `Yellow is the color of the middle. It indicates that which is correct and in line with duty. Oxhide is strong and not to be torn. While the superior men retreat and the inferior press after them, the inferior man represented here holds on so firmly and tightly to the superior man that the latter cannot shake him off. And because he is in quest of what is right an so strong in purpose, he reaches his goal. Thus the line confirms what is said in the Judgment: "In what is small" --here equivalent to "in the inferior man" -- "perseverance furthers."`
 
-THE IMAGE
-
-Mountain under heaven: the image of RETREAT.
-
-Thus the superior man keeps the inferior man at a distance,
-
-Not angrily but with reserve.
-
-The mountain rises up under heaven, but owing to its nature it finally comes to a stop. Heaven on the other hand retreats upward before it into the distance and remains out of reach. This symbolizes the behavior of the superior man toward a climbing inferior; he retreats into his own thoughts as the inferior man comes forward. He does not hate him, for hatred is a form of subjective involvement by which we are bound to the hated object. The superior man shows strength (heaven) in that he brings the inferior man to a standstill (mountain) by his dignified reserve.
-
-THE LINES
-
-Six at the beginning means:
-
-At the tail in retreat. This is dangerous.
-One must not wish to undertake anything.
-
-Since the hexagram is the picture of something that is retreating, the lowest line represents the tail and the top line the head. In a retreat it is advantageous to be at the front. Here one is at the back, in immediate contact with the pursuing enemy. This is dangerous, and under such circumstances it is not advisable to undertake anything. Keeping still is the easiest way of escaping from the threatening danger.
-
-Six in the second place means:
-
-he holds him fast with yellow oxhide.
-
-No one can tear him loose.
-
-Yellow is the color of the middle. It indicates that which is correct and in line with duty. Oxhide is strong and not to be torn. While the superior men retreat and the inferior press after them, the inferior man represented here holds on so firmly and tightly to the superior man that the latter cannot shake him off. And because he is in quest of what is right an so strong in purpose, he reaches his goal. Thus the line confirms what is said in the Judgment: "In what is small" --here equivalent to "in the inferior man" -- "perseverance furthers."
-
-Nine in the third place means:
-
-A halted retreat 
-Is nerve-wracking and dangerous.
-
-To retain people as men- and maidservants
-Brings good fortune.
-
-When it is time to retreat it is both unpleasant and dangerous to be held back, because then one no longer has freedom of action. In such a case the only expedient is to take into one's service, so to speak, those who refuse to let one go, so that one may at least keep one's initiative and not fall helplessly under their domination. But even with this expedient the situation is far from satisfactory--for what can one hope to accomplish with such servants?
-
-Nine in the fourth place means:
-
-Voluntary retreat brings good fortune to the superior man
-And downfall to the inferior man.
-
-In retreating the superior man is intent on taking his departure willingly and in all friendliness. He easily adjusts his mind to retreat, because in retreating he does not have to do violence to his convictions. The only one who suffers is the inferior man from whom he retreats, who will degenerate when deprived of the guidance of the superior man.
-Nine in the fifth place means:
-
-Friendly retreat. Perseverance brings good fortune.
-
-It is the business of the superior man to recognize in time that the moment for retreat has come. If the right moment is chosen, the retreat can be carried out within the forms of perfect friendliness, without the necessity of disagreeable discussions. Yet, for all the observance of amenities, absolute firmness of decision is necessary if one is not to be led astray by irrelevant considerations.
-
-Nine at the top means:
-
-Cheerful retreat. Everything serves to further.
-
-The situation is unequivocal. Inner detachment has become an established fact, and we are at liberty to depart. When one sees the way ahead thus clearly, free of all doubt, a cheerful mood sets in, and one chooses what is right without further thought. Such a clear path ahead always leads to the good.`
+	line 9 `A halted retreat Is nerve-wracking and dangerous. To retain people as men and maidservants, Brings good fortune.` --> `When it is time to retreat it is both unpleasant and dangerous to be held back, because then one no longer has freedom of action. In such a case the only expedient is to take into one's service, so to speak, those who refuse to let one go, so that one may at least keep one's initiative and not fall helplessly under their domination. But even with this expedient the situation is far from satisfactory--for what can one hope to accomplish with such servants?`
+	
+	line 9 `Voluntary retreat brings good fortune to the superior man And downfall to the inferior man.` --> `In retreating the superior man is intent on taking his departure willingly and in all friendliness. He easily adjusts his mind to retreat, because in retreating he does not have to do violence to his convictions. The only one who suffers is the inferior man from whom he retreats, who will degenerate when deprived of the guidance of the superior man.`
+	line 9 `Friendly retreat. Perseverance brings good fortune.` --> `It is the business of the superior man to recognize in time that the moment for retreat has come. If the right moment is chosen, the retreat can be carried out within the forms of perfect friendliness, without the necessity of disagreeable discussions. Yet, for all the observance of amenities, absolute firmness of decision is necessary if one is not to be led astray by irrelevant considerations.`
+	
+	line 9 `Cheerful retreat. Everything serves to further.` --> `The situation is unequivocal. Inner detachment has become an established fact, and we are at liberty to depart. When one sees the way ahead thus clearly, free of all doubt, a cheerful mood sets in, and one chooses what is right without further thought. Such a clear path ahead always leads to the good.`
 }
 
 
-gram ChineseName (X upon X) {
+gram Ta Chuang (THUNDER upon HEAVEN) {
 ID 34
+meaning `The Power of the Great`
+
+form `The great lines, that is, the light, strong lines, are powerful. Four light lines have entered the hexagram from below and are about to ascend higher. The upper trigram is Chên, the Arousing; the lower is ch'ien, the Creative. Ch'ien is strong, Chên produces movement. The union of movement and strength gives the meaning of THE POWER OF THE GREAT. The hexagram is linked with the second month (March-April).`
+
+judgement `THE POWER OF THE GREAT. Perseverance furthers.`
+	`The hexagram points to a time when inner worth mounts with great force and comes to power. But its strength has already passed beyond the median line, hence there is danger that one may rely entirely on one's own power and forget to ask what is right. There is danger too that, being intent on movement, we may not wait for the right time. Therefore the added statement that perseverance furthers. For that is truly great power which does not degenerate into mere force but remains inwardly united with the fundamental principles of right and of justice. When we understand this point--namely, that greatness and justice must be indissolubly united--we understand the true meaning of all that happens in heaven and on earth.`
+
+image `Thunder in heaven above: The image of THE POWER OF THE GREAT. Thus the superior man does not tread upon paths that do not accord with established order.`
+	`Thunder--electrical energy--mounts upward in the spring. The direction of this movement is in harmony with that of the movement of heaven. It is therefore a movement in accord with heaven, producing great power. However, true greatness depends on being in harmony with what is right. Therefore in times of great power the superior man avoids doing anything that is not in harmony with the established order.`
+
+markedlines
+	line 9 `Power in the toes. Continuing brings misfortune.` --> `This is certainly true. The toes are in the lowest place and are ready to advance. So likewise great power in lowly station is inclined to effect advance by force. This, if carried further, would certainly lead to misfortune, and therefore by way of advice a warning is added.`
+
+	line 9 `Perseverance brings good fortune.` --> `The premise here is that the gates to success are beginning to open. Resistance gives way and we forge ahead. This is the point at which, only too easily, we become the prey of exuberant self-confidence. This is why the oracle says that perseverance (i.e., perseverance in inner equilibrium, without excessive use of power) brings good fortune.`
+
+	line 9 `The inferior man works through power. The superior man does not act thus. To continue is dangerous. A goat butts against a hedge and gets its horns entangled.` --> `Making a boast of power leads to entanglements, just as a goat entangles its horns when it butts against a hedge. Whereas an inferior man revels in power when he comes into possession of it, the superior man never makes this mistake. He is conscious at all times of the danger of pushing ahead regardless of circumstances, and therefore renounces in good time the empty display of force.`
+	
+	line 9 `Perseverance brings good fortune. Remorse disappears. The hedge opens; there is no entanglement. Power depends upon the axle of a big cart.` --> `If a man goes on quietly and perseveringly working at the removal of resistances, success comes in the end. The obstructions give way and all occasion for remorse arising from excessive use of power disappears.
+	
+Such a man's power does not show externally, yet it can move heavy loads, like a big cart whose real strength lies in its axle. The less that power is applied outwardly, the greater its effect.`
+
+	line 6 `Loses the goat with ease. No remorse.` --> `The goat is noted for hardness outwardly and weakness within. Now the situation is such that everything is easy; there is no more resistance. One can give up a belligerent, stubborn way of acting and will not have to regret it.`
+
+	line 6 `A goat butts against a hedge. It cannot go backward, it cannot go forward. Nothing serves to further. If one notes the difficulty, this brings good fortune.` --> `If we venture too far we come to a deadlock, unable either to advance or to retreat and whatever we do merely serves to complicate thing further. Such obstinacy leads to insuperable difficulties. But if, realizing the situation, we compose ourselves and decide not to continue, everything will right itself in time.`
 
 }
 
-`34. Ta Chuang / The Power of the Great
-
-above CHêN THE AROUSING, THUNDER
-
-above CH'IEN THE CREATIVE, HEAVEN
-
-The great lines, that is, the light, strong lines, are powerful. Four light lines have entered the hexagram from below and are about to ascend higher. The upper trigram is Chên, the Arousing; the lower is ch'ien, the Creative. Ch'ien is strong, Chên produces movement. The union of movement and strength gives the meaning of THE POWER OF THE GREAT. The hexagram is linked with the second month (March-April).
-
-THE JUDGMENT
-
-THE POWER OF THE GREAT. Perseverance furthers.
-
-The hexagram points to a time when inner worth mounts with great force and comes to power. But its strength has already passed beyond the median line, hence there is danger that one may rely entirely on one's own power and forget to ask what is right. There is danger too that, being intent on movement, we may not wait for the right time. Therefore the added statement that perseverance furthers. For that is truly great power which does not degenerate into mere force but remains inwardly united with the fundamental principles of right and of justice. When we understand this point--namely, that greatness and justice must be indissolubly united--we understand the true meaning of all that happens in heaven and on earth.
-
-THE IMAGE
-
-Thunder in heaven above:
-
-The image of THE POWER OF THE GREAT.
-
-Thus the superior man does not tread upon paths
-
-That do not accord with established order.
-
-Thunder--electrical energy--mounts upward in the spring. The direction of this movement is in harmony with that of the movement of heaven. It is therefore a movement in accord with heaven, producing great power. However, true greatness depends on being in harmony with what is right. Therefore in times of great power the superior man avoids doing anything that is not in harmony with the established order.
-
-THE LINES
-
-Nine at the beginning means:
-
-Power in the toes.
-Continuing brings misfortune.
-
-This is certainly true.
-
-The toes are in the lowest place and are ready to advance. So likewise great power in lowly station is inclined to effect advance by force. This, if carried further, would certainly lead to misfortune, and therefore by way of advice a warning is added.
-
-Nine in the second place means:
-
-Perseverance brings good fortune.
-
-The premise here is that the gates to success are beginning to open. Resistance gives way and we forge ahead. This is the point at which, only too easily, we become the prey of exuberant self-confidence. This is why the oracle says that perseverance (i.e., perseverance in inner equilibrium, without excessive use of power) brings good fortune.
-
-Nine in the third place means:
-
-The inferior man works through power.
-
-The superior man does not act thus.
-
-To continue is dangerous.
-A goat butts against a hedge
-And gets its horns entangled.
-
-Making a boast of power leads to entanglements, just as a goat entangles its horns when it butts against a hedge. Whereas an inferior man revels in power when he comes into possession of it, the superior man never makes this mistake. He is conscious at all times of the danger of pushing ahead regardless of circumstances, and therefore renounces in good time the empty display of force.
-Nine in the fourth place means:
-
-Perseverance brings good fortune.
-Remorse disappears.
-
-The hedge opens; there is no entanglement.
-Power depends upon the axle of a big cart.
-
-If a man goes on quietly and perseveringly working at the removal of resistances, success comes in the end. The obstructions give way and all occasion for remorse arising from excessive use of power disappears.
-
-Such a man's power does not show externally, yet it can move heavy loads, like a big cart whose real strength lies in its axle. The less that power is applied outwardly, the greater its effect.
-
-Six in the fifth place means:
-
-Loses the goat with ease.
-
-No remorse.
-
-The goat is noted for hardness outwardly and weakness within. Now the situation is such that everything is easy; there is no more resistance. One can give up a belligerent, stubborn way of acting and will not have to regret it.
-
-Six at the top means:
-
-A goat butts against a hedge.
-It cannot go backward, it cannot go forward.
-
-Nothing serves to further.
-If one notes the difficulty, this brings good fortune.
-
-If we venture too far we come to a deadlock, unable either to advance or to retreat and whatever we do merely serves to complicate thing further. Such obstinacy leads to insuperable difficulties. But if, realizing the situation, we compose ourselves and decide not to continue, everything will right itself in time.
-
-index
-
-
+`
 35. Chin / Progress
 
 above LI THE CLINGING, FIRE
