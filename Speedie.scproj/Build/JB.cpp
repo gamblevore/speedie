@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2110];
+extern JB_StringC* JB_LUB[2111];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -1977,7 +1977,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112876762365952));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112877250452287));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3300,7 +3300,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[179]);
-	JB_FS_AppendInt32(_fsf0, (2024073019));
+	JB_FS_AppendInt32(_fsf0, (2024073021));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8356,7 +8356,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024073019));
+	JB_FS_AppendInt32(_fsf0, (2024073021));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -25382,7 +25382,7 @@ bool JB_Flow__Cond(bool Value) {
 		return Value;
 	}
 	JB__Flow_Disabled = 1;
-	JB_Flow_Cond((JB__Flow_Flow), ((byte)JB_Ternary(Value, 'T', 'F')));
+	JB_Flow_Cond(JB__Flow_Flow, ((byte)JB_Ternary(Value, 'T', 'F')));
 	JB__Flow_Disabled = 0;
 	return Value;
 }
@@ -47581,6 +47581,11 @@ void SC_Func_CallSuperMem(SCFunction* Self, SCFunction* Fn) {
 	if (!Root) {
 		return;
 	}
+	Array* Fnargs = Fn->Args;
+	if (!(((JB_Array_SyntaxEquals(Fnargs, 1, false))) or SC_Class_IsTask(Self->Cls))) {
+		JB_Msg_SyntaxExpect(Root, JB_LUB[2110]);
+		return;
+	}
 	//using;
 	MessagePosition _usingf0 = ((MessagePosition){});
 	JB_Msg_SyntaxUsing(Root, (&_usingf0));
@@ -47588,15 +47593,15 @@ void SC_Func_CallSuperMem(SCFunction* Self, SCFunction* Fn) {
 	Message* Lst = ((Message*)JB_Ring_Last(PCon));
 	JB_SetRef(Lst->Obj, Fn);
 	{
-		Array* _LoopSrcf3 = Fn->Args;
 		int _if1 = 0;
 		while (true) {
-			SCDecl* A = ((SCDecl*)JB_Array_Value(_LoopSrcf3, _if1));
+			SCDecl* A = ((SCDecl*)JB_Array_Value(Fnargs, _if1));
 			if (A == nil) {
 				break;
 			}
 			int I = _if1;
-			JB_SetRef(JB_Msg_Msg(Lst, kJB_SyxThg, A->Name)->Obj, ((SCDecl*)JB_Array_Value(Self->Args, I)));
+			Message* Msg = JB_Msg_Msg(Lst, kJB_SyxThg, A->Name);
+			JB_SetRef(Msg->Obj, ((SCDecl*)JB_Array_Value(Self->Args, I)));
 			(++_if1);
 		};
 	}
@@ -52997,4 +53002,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -4740861064432452315 675491356744718179
+// -4740861064432452315 2062262619870089119

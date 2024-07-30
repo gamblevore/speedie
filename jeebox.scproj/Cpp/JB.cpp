@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[560];
+extern JB_StringC* JB_LUB[561];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -269,7 +269,8 @@ int JB_Constants__Init_() {
 		JB_SetRef(JB__Constants_XMLWordMiddle, JB_Str_UniCS(JB_LUB[180]));
 		JB_SetRef(JB__Constants_CSNum, JB__Constants_CSWordMiddle);
 		JB_SetRef(JB__Constants_CSLine, JB_Str_CharSetWithBool(JB_LUB[9], false));
-		JB_SetRef(JB__Constants_CSAfterStatement, JB_Str_CharSetWithBool(JB_LUB[32], false));
+		JB_SetRef(JB__Constants_CSAfterDot, JB_Str_CharSetWithBool(JB_LUB[32], false));
+		JB_SetRef(JB__Constants_CSAfterStatement, JB_Str_CharSetWithBool(JB_LUB[560], false));
 		JB_SetRef(JB__Constants_CSLineBlack, JB_Str_CharSetWithBool(JB_LUB[10], false));
 		JB_SetRef(JB__Constants_CSWrapSplit, JB_Str_CharSetWithBool(JB_LUB[25], false));
 		JB_SetRef(JB__Constants_FFUUU, JB_LUB[176]);
@@ -685,6 +686,10 @@ Message* JB_Tk__BeforeRelSub(int Start, bool Mode) {
 	return Rz;
 }
 
+bool JB_Tk__CanDot() {
+	return JB_CS_HasChar(JB__Constants_CSAfterDot, JB_Tk__NextByte());
+}
+
 bool JB_Tk__CanStatement() {
 	return JB_CS_HasChar(JB__Constants_CSAfterStatement, JB_Tk__NextByte());
 }
@@ -817,7 +822,7 @@ Message* JB_Tk__DotSub(Syntax Fn, int Start, Message* Parent) {
 	}
 	 else {
 		Message* Prms = JB_Tk__NewEmpty(Rz, kJB_SyxEmb, After, After);
-		if (((JB_Msg_EqualsSyx(Parent, kJB_SyxArg, false))) and JB_Tk__CanStatement()) {
+		if (((JB_Msg_EqualsSyx(Parent, kJB_SyxArg, false))) and JB_Tk__CanDot()) {
 			Message* P = JB_Tk__ProcessThingParent(Prms, kJB__Tk_kOpp, kJB__Tk_kThing);
 			if (P) {
 				JB_Tree_SyntaxAppend(Prms, P);
@@ -7867,7 +7872,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024072817);
+	return (2024073019);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -7879,4 +7884,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 663554371086766011 5581415826478320135
+// 7796578953066441599 5011465747026563491 2693454884128758522
