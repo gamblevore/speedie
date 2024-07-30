@@ -13,10 +13,10 @@ struct TemporalGenerator
 			return SteveMachine(reps, self, buff)
 		
 	module
-		function Pseudo (|?&temporalgenerator|)
+		function Pseudo (|?&TemporalGenerator|)
 			return .list(0)
 		
-		function Find (|string| s, |?&temporalgenerator|)
+		function Find (|string| s, |?&TemporalGenerator|)
 			if s.IsInt
 				return .list(s.int)
 			for i in 256
@@ -36,7 +36,7 @@ struct TemporalGenerator
 
 
 
-class SteveMachine // (memory) // fails
+class SteveMachine
 	|int| 					Reps
 	|bool|					Feedback
 	|&TemporalGenerator|	Create
@@ -51,18 +51,14 @@ class SteveMachine // (memory) // fails
 	
 	function Refresh
 		require self
-//		.say "StartRefresh"
 		|| p = .Samples.ptr
 		|| a = p + .Samples.Capacity
 		.Samples.Length = 0
 		(.Create.Steve)(p, a, 0, .reps)
-//		.say "FinishRefresh"
-
-	helper Say (|string| s)
-		print .Create.Name.Str
-		print ": "
-		printline s
-	
+//	helper Say (|string| s)
+//		print .Create.Name.Str
+//		print ": "
+//		printline s
 	function Bit (|bool|)
 		return .BitCount & 1
 	
@@ -90,10 +86,10 @@ class SteveMachine // (memory) // fails
 					return n<0
 			if Toolate.fired
 				exit
-		return n<0
+		return n < 0
 
-	function Majority (|int| bytes=4K, |bool|)
-		|| Total = 0
+	function Majority (|uint| bytes=4K, |bool|)
+		|uint| Total = 0
 		for bytes
 			total += .BitCount
 		return Total+.Bit > bytes*4
