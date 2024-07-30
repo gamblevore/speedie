@@ -2,28 +2,24 @@
 
 
 module Temporal	
-
-	function InputBit (|uint64| x=temporal.inputbyte,  |bool|)
-		return x.CountBits & 1
-			
-	function InputByte (|byte|)
-		return  -1	// want a thread that creates a buffer of data... ideally chooseable via temporal inputs
-
-	function Input8 (|int|)
-		return .Inputbyte|int|.countbits
+	|temporal.EngineState|	Desired
+	|SteveMachine|			Generator
 	
-	function Walk (|int| required=141, |date| Delay = 10s, |int|)
-		|| n = 0
-		|| Timeout = Delay + date.now
-		while !timeout.fired
-			for 256
-				n -= 8 - .input8<<1 	 // group-walk
-				if (n.abs >= required)
-					return n.Sign
+	function Start (|&temporalgenerator| T, |int| size=16KB)
+		.generator = T.Create(5, size)
+		// needs a thread... just look at whatever jb_pipe.cpp does
+		// i think it just... doesnt need to do memory management
+		// we could make our thread just copy stuff... that way
+		// the user can work with the length/capacity properties?
 
-	function Majority (|int| bytes=4K, |bool|)
-		|| Total = 0
-		for bytes
-			total += .input8
-		return Total+.InputBit > bytes*4
-
+	function Refresh
+		.Generator.refresh
+	
+	datatype EngineState (int)
+		constants
+			|temporal.EngineState| 
+			Stopped = 0
+			Active = 1
+			Paused = 2
+	
+	

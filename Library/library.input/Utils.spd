@@ -201,7 +201,7 @@ function message.date (|humanDate|)
 
 
 insertion
-	parse (–digest _0).ParseJbin!
+	parse (–digest _0).ParseJbin! // could possibly compress large files too?
 
 
 // seems not worth it

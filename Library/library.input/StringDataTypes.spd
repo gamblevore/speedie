@@ -85,6 +85,7 @@ datatype byte
 	
 	module
 		function ZAlloc (|int| n, |?&byte|)
+			description "Returns allocated memory, and zeros it. Creates an error() if fails."
 			cpp_wrapper JB_zalloc
 
 

@@ -112,6 +112,12 @@
 		AC528F122961F9B4005EFB9D /* JB_Tokeniser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528ED82961F9B4005EFB9D /* JB_Tokeniser.cpp */; };
 		AC528F152961FB2E005EFB9D /* libSDL2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC528F142961FA8C005EFB9D /* libSDL2.dylib */; };
 		AC528F172961FB32005EFB9D /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC528F132961F9F0005EFB9D /* AVFoundation.framework */; };
+		AC534D772C592A2900F0D6C5 /* JB_Temporal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC534D762C592A2900F0D6C5 /* JB_Temporal.cpp */; };
+		AC534D782C592A2900F0D6C5 /* JB_Temporal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC534D762C592A2900F0D6C5 /* JB_Temporal.cpp */; };
+		AC534D792C592A2900F0D6C5 /* JB_Temporal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC534D762C592A2900F0D6C5 /* JB_Temporal.cpp */; };
+		AC534D7B2C592A3400F0D6C5 /* JB_Temporal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC534D7A2C592A3400F0D6C5 /* JB_Temporal.cpp */; };
+		AC534D7C2C592A3400F0D6C5 /* JB_Temporal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC534D7A2C592A3400F0D6C5 /* JB_Temporal.cpp */; };
+		AC534D7D2C592A3400F0D6C5 /* JB_Temporal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC534D7A2C592A3400F0D6C5 /* JB_Temporal.cpp */; };
 		ACB2D24F29BCCAB70070E60F /* JB_Vectors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528EBF2961F9B2005EFB9D /* JB_Vectors.cpp */; };
 		ACB2D25029BCCAB70070E60F /* JB_Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528E7D2961F946005EFB9D /* JB_Globals.cpp */; };
 		ACB2D25129BCCAB70070E60F /* JB_OSX.m in Sources */ = {isa = PBXBuildFile; fileRef = AC528ED32961F9B3005EFB9D /* JB_OSX.m */; };
@@ -310,6 +316,8 @@
 		AC528ED82961F9B4005EFB9D /* JB_Tokeniser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Tokeniser.cpp; path = ../Library/CppLib/JB_Tokeniser.cpp; sourceTree = "<group>"; };
 		AC528F132961F9F0005EFB9D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		AC528F142961FA8C005EFB9D /* libSDL2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSDL2.dylib; path = Build/Release/Perry.app/Contents/Frameworks/libSDL2.dylib; sourceTree = "<group>"; };
+		AC534D762C592A2900F0D6C5 /* JB_Temporal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Temporal.cpp; path = ../Library/CppLib/JB_Temporal.cpp; sourceTree = "<group>"; };
+		AC534D7A2C592A3400F0D6C5 /* JB_Temporal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Temporal.cpp; path = ../Library/CppLib/JB_Temporal.cpp; sourceTree = "<group>"; };
 		AC61010E2798768C00278BEF /* libSpeedie.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libSpeedie.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC78080D256C065000ED647E /* library.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = library.input; path = ../Library/library.input; sourceTree = "<group>"; };
 		ACB2D27929BCCAB70070E60F /* PerryDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PerryDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -397,6 +405,7 @@
 				AC528EC92961F9B3005EFB9D /* JB_Run.cpp */,
 				AC528ED62961F9B4005EFB9D /* JB_Saveable.cpp */,
 				AC528EC82961F9B3005EFB9D /* JB_String.cpp */,
+				AC534D762C592A2900F0D6C5 /* JB_Temporal.cpp */,
 				AC528ED82961F9B4005EFB9D /* JB_Tokeniser.cpp */,
 				AC528ED52961F9B3005EFB9D /* JB_Utils.cpp */,
 				AC528EBF2961F9B2005EFB9D /* JB_Vectors.cpp */,
@@ -437,6 +446,7 @@
 				AC528E8F2961F99E005EFB9D /* JB_Run.cpp */,
 				AC528E9E2961F99F005EFB9D /* JB_Saveable.cpp */,
 				AC528E872961F99E005EFB9D /* JB_String.cpp */,
+				AC534D7A2C592A3400F0D6C5 /* JB_Temporal.cpp */,
 				AC528E972961F99F005EFB9D /* JB_Tokeniser.cpp */,
 				AC528E982961F99F005EFB9D /* JB_Utils.cpp */,
 				AC528E882961F99E005EFB9D /* JB_Vectors.cpp */,
@@ -743,10 +753,12 @@
 				AC310BE82A5188FE00837DCB /* JB_ByteMap.cpp in Sources */,
 				AC310BE92A5188FE00837DCB /* JB_DirReaderWin32.cpp in Sources */,
 				AC310BEA2A5188FE00837DCB /* JB_File.cpp in Sources */,
+				AC534D7C2C592A3400F0D6C5 /* JB_Temporal.cpp in Sources */,
 				AC310BEB2A5188FE00837DCB /* JB_ObjArray.cpp in Sources */,
 				AC310BEC2A5188FE00837DCB /* JB_ListOld.cpp in Sources */,
 				AC310BED2A5188FE00837DCB /* JB_FastString.cpp in Sources */,
 				AC310BEE2A5188FE00837DCB /* JB_String.cpp in Sources */,
+				AC534D782C592A2900F0D6C5 /* JB_Temporal.cpp in Sources */,
 				AC310BEF2A5188FE00837DCB /* JB_Dictionary.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -810,9 +822,11 @@
 				ACB2D25929BCCAB70070E60F /* JB_Utils.cpp in Sources */,
 				ACB2D25A29BCCAB70070E60F /* JB_Saveable.cpp in Sources */,
 				ACB2D25B29BCCAB70070E60F /* JB_Errors.cpp in Sources */,
+				AC534D772C592A2900F0D6C5 /* JB_Temporal.cpp in Sources */,
 				ACB2D25C29BCCAB70070E60F /* JB_Main.cpp in Sources */,
 				ACB2D25D29BCCAB70070E60F /* JB_VM.cpp in Sources */,
 				ACB2D25E29BCCAB70070E60F /* JB_Pipe.cpp in Sources */,
+				AC534D7B2C592A3400F0D6C5 /* JB_Temporal.cpp in Sources */,
 				ACB2D25F29BCCAB70070E60F /* JB_Child.cpp in Sources */,
 				ACB2D26029BCCAB70070E60F /* JB_Alloc.cpp in Sources */,
 				ACB2D26129BCCAB70070E60F /* JB_PNG.cpp in Sources */,
@@ -851,9 +865,11 @@
 				AC528F0C2961F9B4005EFB9D /* JB_Utils.cpp in Sources */,
 				AC528F0E2961F9B4005EFB9D /* JB_Saveable.cpp in Sources */,
 				AC528F0A2961F9B4005EFB9D /* JB_Errors.cpp in Sources */,
+				AC534D792C592A2900F0D6C5 /* JB_Temporal.cpp in Sources */,
 				AC528EE42961F9B4005EFB9D /* JB_Main.cpp in Sources */,
 				AC528EEE2961F9B4005EFB9D /* JB_VM.cpp in Sources */,
 				AC528F022961F9B4005EFB9D /* JB_Pipe.cpp in Sources */,
+				AC534D7D2C592A3400F0D6C5 /* JB_Temporal.cpp in Sources */,
 				AC528EFC2961F9B4005EFB9D /* JB_Child.cpp in Sources */,
 				AC528EDC2961F9B4005EFB9D /* JB_Alloc.cpp in Sources */,
 				AC528F062961F9B4005EFB9D /* JB_PNG.cpp in Sources */,

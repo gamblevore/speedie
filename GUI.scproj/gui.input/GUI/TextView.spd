@@ -2036,10 +2036,10 @@ class TextView (GUIControl)
 		if (self is editable) and (purpose is PasteTextLike)
 			if data > 1
 				.UndoChecker = -1
-			if .ExpectsParse >= textview.currentlyjeebox
+			if .ExpectsParse >= textview.AlwaysJeebox
 				data = data.AddTabs
 				if (data contains ";") and !data.parse
-					|| Q = "The text below contains ';'. Would you like me to strip it?\n\n" + data.Preview(200)
+					|| Q = "The text below contains ';'. Would you like to strip it?\n\n" + data.Preview(200)
 					if Q.Confirm
 						data = data.ReplaceAll(";", "")
 			.Insert(data)
@@ -2051,12 +2051,12 @@ class TextView (GUIControl)
 			.ShowLineNumbers = true
 		if .text.HasWord("//linesoff")
 			.ShowLineNumbers = false
-		if .ExpectsParse
-			if .ExpectsParse >= AlwaysJeebox
-				return .ExpectsParse
+		|| x = .ExpectsParse
+			if x >= AlwaysJeebox
+				return x
 			if .text.HasWord("<?jb?>") or .text.hasword("//jb")
 				return CurrentlyJeebox
-			return .ExpectsParse
+			return x
 
 
 	helper IsJeeboxMode (|bool|)

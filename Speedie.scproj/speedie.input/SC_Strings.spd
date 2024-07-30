@@ -123,6 +123,8 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 	
 	if InbuiltFunc(msg, "digest")
 		msg.name = msg.name.digest
+//	  elseif InBuiltFunc(msg, "compress")
+//		msg.name = msg.name.Compress
 	  elseif P == @arg
 		msg.wrapwith(@tmp, "printline")
 		

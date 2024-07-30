@@ -14,7 +14,7 @@ extend PerryIDE
 	function ForceRecheck
 		.ModifiedForCompile = false
 		.Feedback = nil
-		if .IsSpeedieCode and !.UsingSpdLib
+		if .projIsSpeedieCode and !.UsingSpdLib
 			.AskCheck
 	
 	function AskCheck

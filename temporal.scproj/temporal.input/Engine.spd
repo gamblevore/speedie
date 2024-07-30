@@ -1,12 +1,99 @@
 
 
-class SteveMachine
-	|string|	Name
-	|int| 		ID
-	|int| 		Reps
-	|fpSteve|	Steve
-	
-	syntax call (|memory| data, |bool|)
-		(.steve)(data, .reps)
+struct TemporalGenerator
+	linkage
+		wrapper
+		cpp_class JB_TemporalGenerator
+	|fpTemporal|		Steve
+	|cstring|			Name
+	|byte|				Slowness
+
+	function Create (|int| reps, |int| Samples=16K,  |stevemachine|)
+		|| buff = uint[Samples]
+			return SteveMachine(reps, self, buff)
 		
-prototype fpSteve (|memory| Data, |int| Reps)
+	module
+		function Pseudo (|?&temporalgenerator|)
+			return .list(0)
+		
+		function Find (|string| s, |?&temporalgenerator|)
+			if s.IsInt
+				return .list(s.int)
+			for i in 256
+				|| l = .list(i) #require
+				if l.name.str ~= s
+					return l
+			
+		function List (|int| i, |?&TemporalGenerator|)
+			cpp_wrapper JB_Tmp__Gen
+
+		prototype fpTemporal (|&uint| Data, |&uint| DataEnd, |uint| Input, |int| Reps, |uint64|)
+		
+		function List (|[string]|)
+			for i in 256
+				|| l = .list(i) #loop
+				rz <~ l.name.Str
+
+
+
+class SteveMachine // (memory) // fails
+	|int| 					Reps
+	|bool|					Feedback
+	|&TemporalGenerator|	Create
+	|uint[]|				Samples
+	
+	constructor (|int| reps, |&TemporalGenerator| T, |uint[]| buff)
+		.reps = reps, .create = t, .samples = buff, .Feedback = true
+		.Refresh
+	
+	function Name (|string|)
+		return .Create.name.str
+	
+	function Refresh
+		require self
+//		.say "StartRefresh"
+		|| p = .Samples.ptr
+		|| a = p + .Samples.Capacity
+		.Samples.Length = 0
+		(.Create.Steve)(p, a, 0, .reps)
+//		.say "FinishRefresh"
+
+	helper Say (|string| s)
+		print .Create.Name.Str
+		print ": "
+		printline s
+	
+	function Bit (|bool|)
+		return .BitCount & 1
+	
+	function Byte (|byte|)
+		if !.Samples.HasSpare
+			.Refresh
+							// OK so... this isn't possible just yet.
+							// the original temporal engine did A LOT MORE. Including...
+							// looking for multiples of small numbers (3/5/7)
+							// bitshifting down (multiples of 2/4/8/16)
+							// xoring multiple runs, and von-neuman and other cleanups.
+							// but... the chaotic generator is quite good. lets just use that for now :D
+		return .Samples.Next
+		
+	function BitCount (|int|)
+		return .byte|int|.countbits
+	
+	function Walk (|int| required=141, |bool|)
+		|| n = 0
+		|| TooLate = date.now + 0.01s
+		while
+			for 256
+				n += .BitCount-4 	 // group-walk
+				if (n.abs >= required)
+					return n<0
+			if Toolate.fired
+				exit
+		return n<0
+
+	function Majority (|int| bytes=4K, |bool|)
+		|| Total = 0
+		for bytes
+			total += .BitCount
+		return Total+.Bit > bytes*4

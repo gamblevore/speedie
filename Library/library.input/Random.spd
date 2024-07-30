@@ -100,6 +100,7 @@ struct Random
 		
 
 	function Temporal (|Memory| mem)
+		description "seems not temporal... needs upgrade."
 		|| p = mem.ptr|&uint64|
 		|| after = (mem.ptr + mem.ByteCapacity - 7)|&uint64|
 		while p < after

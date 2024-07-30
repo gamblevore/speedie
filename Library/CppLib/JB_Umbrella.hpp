@@ -34,6 +34,7 @@
 #include "JB_Date.h"
 #include "JB_FileLister.h"
 #include "JB_Linkage.h"
+#include "JB_Temporal.h"
 
 
 // game stuff...

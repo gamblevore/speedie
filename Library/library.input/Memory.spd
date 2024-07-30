@@ -45,9 +45,9 @@ class Memory
 		
 	setter Length (|int|)
 		if Value > .Capacity
-			.Capacity = Value
-		  elseif Value == 0
-			.Capacity = 0
+			value = .Capacity
+		  elseif Value < 0
+			value = 0
 		.length = Value
 	
 	operator plus (|int|n, |&...|)
@@ -126,6 +126,8 @@ class Memory
 			return true
 		error (self, "Can't allocate enough bytes: " + new.render)
 
+	function HasSpare (|bool|)
+		return .Length < .Capacity
 	
 	function ByteCapacity (|int|)
 		return .ItemSize|int|*.Capacity|int|
@@ -145,7 +147,7 @@ class Memory
 
 	render Dump (|int| row, |int| cn=4)
 		|| p = ._ptr
-		|| p2 = p + .length*.itemsize 
+		|| p2 = p + .ByteCapacity 
 		|| i = 0
 		|| com = 0
 		fs <~ "dumping memory:\n"
@@ -182,7 +184,13 @@ class Memory
 			yield Curr[0] (curr - FFFirst)
 			++Curr
 
-		
+	
+	function NextIndex (|int|)
+		rz = .Length
+		.Length = rz+1
+
+	macro Next
+		(_0.ptr|&...|)[_0.NextIndex]
 	macro SyntaxAccess
 		(_0.ptr|&...|)[_1]
 	
@@ -198,6 +206,7 @@ class Memory
 			visible 
 			|| p = byte.zalloc(Count * ItemSize)
 				return .new(Count, ItemSize, p)
+			description "Returns a memory of object size requested. Creates an error() if fails."
 
 		function Random  (|int| n, |memory|)
 			rz = byte[n]

@@ -1,6 +1,7 @@
 	
 
 extend_module Jeebox
+	visible false
 	|| FFUUU = "@*%^|&$?"				// swearing increases code quality :D
 
 

@@ -585,7 +585,7 @@ extend PerryIDE
 		f.addroot(.project, true)
 		f.FocusOn( .root! )
 		
-		if !conf and .IsSpeedieCode
+		if !conf and .projIsSpeedieCode
 			conf = defaultfiles.Roots.parse
 		
 		.LostFunks = conf["unused_lib_funcs"]

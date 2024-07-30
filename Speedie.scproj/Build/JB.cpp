@@ -1977,7 +1977,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112866026455040));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112875748917248));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3297,7 +3297,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[179]);
-	JB_FS_AppendInt32(_fsf0, (2024072821));
+	JB_FS_AppendInt32(_fsf0, (2024073014));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8352,7 +8352,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024072821));
+	JB_FS_AppendInt32(_fsf0, (2024073014));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -25713,10 +25713,10 @@ void JB_Mrap_Destructor(MWrap* Self) {
 
 void JB_Mrap_LengthSet(MWrap* Self, int Value) {
 	if (Value > Self->Capacity) {
-		Self->Capacity = Value;
+		Value = Self->Capacity;
 	}
-	 else if (Value == 0) {
-		Self->Capacity = 0;
+	 else if (Value < 0) {
+		Value = 0;
 	}
 	Self->Length = Value;
 }

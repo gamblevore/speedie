@@ -1,25 +1,22 @@
 
 
-datatype TemporalEngineState (int)
-	constants
-		Stopped = 0
-		Active = 1
-		Paused = 2
 
-
-extend_module Temporal
-	|TemporalEngineState|	Desired
-	|int|					Size	
-	function Start
-		expect .Size  "No size specified"
-		// needs a thread... just look at whatever jb_pipe.cpp does
-		// i think it just... doesnt need to do memory management
-
-	function Stop
-		.Desired = 0
-	
-	function Paused (assigns:|bool|)
-	
-
-
-		
+// chaotic used to be better than this? try to figure out why? is it getting bad input or something?
+// like it doesnt like the number 0?
+target !imported
+	main (|string| ID, |int| infos, |int| reps)
+		printline TemporalGenerator.List
+		|| b = iChing.DataBank.parse					#expect ("Can't load databank")
+		|| T = TemporalGenerator.find(ID)				#expect ("Cant find generator $ID")
+		for i in 1 to 100
+	//		for i in infos
+	//			printline b[i]
+			T = TemporalGenerator.list(i)				#require
+			|| gen = T.Create(reps, 2K)					#require
+			printline gen.name
+	//		printline gen.Samples.Dump(32, 4)
+			for 1000
+				print gen.Byte|int|.Render
+				print ", "
+			for 2
+				printline 

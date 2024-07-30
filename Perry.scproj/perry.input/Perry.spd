@@ -165,8 +165,12 @@ function SetTab2Name (|message| old)
 			ii.name = f.name + "[]"
 
 
-function IsSpeedieCode (|bool|)
+function FileIsSpeedieCode (|bool|)
+	return .path.PathIsCode
+
+function ProjIsSpeedieCode (|bool|)
 	opt norefcounts
+	// why not just use .project?
 	|| r = .filelist.listsource.First as filerow
 		return r.location.PathIsCode
 	

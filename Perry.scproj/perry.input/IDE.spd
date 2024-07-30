@@ -821,7 +821,11 @@ So anything not 0 means "its OK"`
 		if e.Document == doc
 			return -1
 		
-		|| Loaded =  E.LoadDocument(doc) #require
+		|| Loaded = E.LoadDocument(doc) #require
+		if .FileIsSpeedieCode
+			e.ExpectsParse = TextView.AlwaysJeebox
+		  else
+			e.ExpectsParse = TextView.AllowJeebox
 		|| m = .FunctionMenu.SubControl as menu
 			m.StopFilter
 		|| spd = r.location.PathIsCode
@@ -905,7 +909,7 @@ So anything not 0 means "its OK"`
 			require e is modified
 		// otherwise resave anyhow.
 		
-		if (!keys.shift and .IsSpeedieCode)
+		if (!keys.shift and .projIsSpeedieCode)
 			.filelist.saveall(Purpose)
 		  elseif e.WasEverAltered
 			require e.Save

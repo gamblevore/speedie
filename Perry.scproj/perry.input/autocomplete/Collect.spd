@@ -11,12 +11,21 @@ function PerryIDE.MaybeSendMessage (|string| cmd,  |message| where,  |string| na
 	if (fn == @thg) and (where in @decl) and !where.isfirst
 		return false
 	.SetAutoPoint(where.Position)
-	|| isString = (fn == @str or @sstr or @back or @bin)
-		ifn cmd starts "autocomplete_sel"
-			return .DisplayStr(where)
+	|| isString = fn.IsString
+		if where.ShouldDisplayString
+			ifn cmd starts "autocomplete_sel"
+				return .DisplayStr(where)
 	  else
 		return .SendFeedbackRequest(cmd, where, name, reason)
 
+
+function message.ShouldDisplayString (|bool|)
+	if self == @bin
+		return true
+	require self == @str
+	require .name.LengthUTF8 < 350
+	return .name.Escape != .name
+	
 
 function PerryIDE.CanSend (|string| cmd, |bool|)
 	if .LastCmdStr != cmd
@@ -37,7 +46,7 @@ function PerryIDE.SendFeedbackRequest (|string| cmd,  |message| where,  |string|
 
 
 function PerryIDE.SendFeedbackStr (|string| op)
-	if .IsSpeedieCode
+	if .projIsSpeedieCode
 		.SendFeedbackMsg(.checkmsg(op, false))
 	
 
@@ -51,7 +60,7 @@ function PerryIDE.DateWrap (|message| msg, |message|)
 
 
 function PerryIDE.SendFeedbackMsg (|message| msg)
-	require msg and .IsSpeedieCode
+	require msg and .projIsSpeedieCode
 	|| fb = .FeedbackInit(.feedback)			#require
 	.feedback = fb
 	|| record = .DateWrap(msg)
