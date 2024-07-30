@@ -1801,7 +1801,8 @@ class TextView (GUIControl)
 		if !rz
 			rz = textviewline(p)
 			place.next = rz
-
+		  else
+			rz.ClearForPrepare
 		rz.vline = place.vline + 1
 
 
@@ -1938,7 +1939,7 @@ class TextView (GUIControl)
 		while
 			p = d.FindWhereLineBreaks(.text,  CharW,  .singleline,  p)
 			t = d.InitDefaults(self, t)
-			if expect >= 2
+			if expect >= CurrentlyJeebox
 				msg = d.colorise(msg, ParsedOK)
 			loop p >= 0
 			|| n = d.next
@@ -1950,12 +1951,6 @@ class TextView (GUIControl)
 				d = d.ReclaimEnd(t, ._reclaim[2])
 				exit
 
-/* // not sure where this leak is coming from
-		if (self ~= "Editme") and .path contains "window.spd"
-			WhoLeakedme = ._Lines.last
-			debugger
-			beep "Added: " + wholeakedme.render
-*/		
 
 		.EndPrepare(d, StayAtEnd, pos)
 
@@ -2014,6 +2009,7 @@ class TextView (GUIControl)
 		if old <= 1
 			old.clear
 		.document = nil
+		.MyError = nil
 
 
 	function LoadDocument (|document| D, |bool|)

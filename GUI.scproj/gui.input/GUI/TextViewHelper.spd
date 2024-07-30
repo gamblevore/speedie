@@ -40,6 +40,11 @@ class TextViewLine (list)
 			fs.appendescape(.text)
 			fs <~ '"'
 
+	helper ClearForPrepare
+		.message = nil
+		.state = nil
+		.lineerror = nil
+		.text = ""
 
 	helper textview.BackHasIgnoringSpaces (|string| name, |int| pos, |codepoint|)
 		while --pos >= 0
@@ -378,7 +383,7 @@ helper TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,  |im
 
 helper TextView.UseColorAnyway (|int|)
 	ifn .isinline
-		if .ParsedMessage or .myerror
+		if .ParsedMessage// or .myerror
 			return 2
 		return 3
 
