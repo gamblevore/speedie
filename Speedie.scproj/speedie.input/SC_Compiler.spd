@@ -364,7 +364,7 @@ function ImportAll
 	
 	.ImportLibs
 	.ImportProj
-	SCImport.AllFiles.sort(&string.sorter) // or else file-dates can mess things up.
+	SCImport.AllFiles.sort(&scimport.sorter) // or else file-dates can mess things up.
 	.PrepareAST
 	if options.SelfReplacement
 		require VM_Builder.MakeTheVM

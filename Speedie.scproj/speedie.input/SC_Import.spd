@@ -22,7 +22,7 @@ class SCImport
 	
 
 	constructor ( |File?| F, |bool| Builtin )
-		.IsSTDLib = SCImport.STDLibTime
+		.IsSTDLib = SCImport.STDLibTime or f==nil
 		.WarnUnusedFuncs = !.IsSTDLib 
 		.Resources = Dictionary()
 		.BlindCast = (0, errorseverity.error)(builtin)
@@ -229,7 +229,19 @@ class SCImport
 		|bool|				STDLibTime
 		|byte|				CurrIsManuallyImported
 		
-			
+		
+		function Sorter (SorterComparer)
+			opt norefcounts
+			|| aa = a|SCFile|
+			|| bb = b|SCFile|
+//			|| aastd = aa.Proj.IsSTDLib
+//			|| bbstd = bb.Proj.IsSTDLib
+//			if aa.isinternal or bb.isinternal
+			|| lib = aa.Proj.IsSTDLib - bb.Proj.IsSTDLib
+				return lib > 0
+//			|| intr = aa.isinternal - bb.isinternal
+//				return intr < 0 
+			return aa|string| < bb|string|
 		
 		function FindImport (|string| s, |scimport|)
 			opt norefcounts
