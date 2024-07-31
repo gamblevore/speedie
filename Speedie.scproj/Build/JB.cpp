@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2113];
+extern JB_StringC* JB_LUB[2112];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -1977,7 +1977,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112880988389376));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112880993894943));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3300,7 +3300,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[179]);
-	JB_FS_AppendInt32(_fsf0, (2024073112));
+	JB_FS_AppendInt32(_fsf0, (2024073113));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7447,7 +7447,6 @@ bool SC_SpdAssembler__VacGenerate(SCFunction* Fn) {
 ErrorInt JB_Main() {
 	(JB_App__ConfigureSet(SC___AppConfString));
 	//visible;
-	int64 X = -9223372036854775808;
 	SC_Comp__Compile();
 	return 0;
 }
@@ -8357,7 +8356,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024073112));
+	JB_FS_AppendInt32(_fsf0, (2024073113));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -20682,9 +20681,9 @@ bool JB_Pico_SendMsg(PicoComms* Self, PicoMessage* A, bool Wait) {
 
 bool JB_Pico_SendFS(PicoComms* Self, FastString* Fs, bool Wait) {
 	bool Rz = false;
-	PicoMessage _tmPf0 = ((PicoMessage){});
-	JB_Pico__FromFS(Fs, (&_tmPf0));
-	Rz = JB_Pico_SendMsg(Self, (&_tmPf0), Wait);
+	PicoMessage Msg = ((PicoMessage){});
+	JB_Pico__FromFS(Fs, (&Msg));
+	Rz = JB_Pico_SendMsg(Self, (&Msg), Wait);
 	(JB_FS_LengthSet(Fs, 0));
 	return Rz;
 }
@@ -28745,16 +28744,6 @@ JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in) {
 	JB_Decr(Fs);
 	JB_SafeDecr(_tmPf2);
 	return _tmPf2;
-}
-
-bool SC_Str_trap(JB_String* Self, Message* Msg) {
-	if (SC_Func_SyntaxEquals(SC__Func_CurrFunc, Self, true)) {
-		if (Msg) {
-			JB_Obj_PrintLine(Msg);
-		}
-		return true;
-	}
-	return false;
 }
 
 JB_String* JB_Str_Shorten(JB_String* Self, int N) {
@@ -39203,8 +39192,6 @@ bool JB_ID__ByID(JB_Object* A, JB_Object* B) {
 
 
 SCDecl* SC_Decl_ActualReplace(SCDecl* Self, SCDecl* New) {
-	if (SC_Str_trap(JB_LUB[2112], nil)) {
-	}
 	JB_SetRef(Self->Type, New->Type);
 	JB_SetRef(Self->Contains, New->Contains);
 	byte P = Self->PointerCount;
@@ -53047,4 +53034,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -13561557561005726 1264545738719267563
+// 147249381637827265 4070603587794798198

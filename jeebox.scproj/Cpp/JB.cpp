@@ -516,6 +516,8 @@ int JB_Init_() {
 	JB_Flow__Init_();
 	//// Macro;
 	JB_Macro__Init_();
+	//// File;
+	JB_File__Init_();
 	//// Error;
 	JB_Err__Init_();
 	JB_InitCode_();
@@ -5485,6 +5487,7 @@ void JB_File_Fail(JB_File* Self, JB_String* Error) {
 
 int JB_File__Init_() {
 	{
+		JB_SetRef(JB__File__Speedie, JB_LUB[0]);
 	}
 	;
 	return 0;
@@ -7872,7 +7875,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024073019);
+	return (2024073111);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -7884,4 +7887,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 5011465747026563491 2693454884128758522
+// 7796578953066441599 1328385994768260655 920410641272458315

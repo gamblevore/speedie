@@ -916,6 +916,7 @@ extern CompressionStats JB__Flow_Stats;
 #define kJB__Flow_Validate 2
 extern Array* JB__Macro_TmpPrms_;
 extern uint64 JB__Mrap_MDummy_[2];
+extern JB_String* JB__File__Speedie;
 extern bool JB__File_DebugExecute;
 #define kJB__File_IgnoreErrors 1
 #define kJB__File_O_APPEND 8
