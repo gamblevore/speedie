@@ -429,7 +429,10 @@ function TypeOfNum (ExprResolver)
 	|| y = p[]
 		return y|scdecl|
 	rz = TypeOfNumSub(exp, name_space, side)!
-	p[] = rz
+	if rz isa SCDecl
+		p[] = rz
+	  else
+		debugger // hmmm
 
 
 function TypeOfNumSub (ExprResolver)

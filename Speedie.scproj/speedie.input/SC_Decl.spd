@@ -623,6 +623,32 @@ class SCDecl (SCNamed) {
 	function MatchC (|SCDecl?| O, |bool|)
 		Return .TypeMatch( o, kTypeCastTrue, nil )
 
+
+	function ActualReplace (|scdecl| New, |scdecl!|)
+		opt norefcounts
+		
+		.type = new.type
+		.contains = new.contains
+		
+		|| p = .pointercount
+		if !p
+			return self
+		
+		if p != 1
+			debugat
+
+		if new.pointercount
+			error (.source, errorreceiver.NonFatal + ": Not sure what to do about this?")
+		  else
+			|| last = self
+			while --p > 0
+				|| nl = last.copydecl
+				last.internal = nl
+				last = nl
+			
+			last.internal = new
+		Return self
+	
 		
 	function ContainedReplace (|SCDecl| contains, |bool| NeedsName,  |SCDecl|)
 		opt NoRefCounts
@@ -633,19 +659,13 @@ class SCDecl (SCNamed) {
 			if  (!needsname or !.name) and .SameForReplace(contains)
 				return contains				// we are missing UpgradeableContained?
 			
-			|| CType = contains.type
-			|| SameType = CType == .type
+			|| SameType = contains.type == .type
 				if .SameForReplace(contains) 
 					return self
 			
 			|| C = .copydecl
-			c.type = ctype
-			c.contains = contains.contains
-			//ifn c.pointercount == contains.pointercount
-			//ifn c.c_array == contains.c_array // why cant we just return contains? i tried but it doesnt work
 			(C is UpgradeableContained) = !sameType
-			
-			Return C
+			return C.ActualReplace(contains)
 
 		|| inside = .contains
 		if inside  and  inside != contains  and  inside Is UpgradeableContained

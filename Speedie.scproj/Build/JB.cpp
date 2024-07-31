@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2111];
+extern JB_StringC* JB_LUB[2113];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -1977,7 +1977,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112877250452287));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112880988389376));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3300,7 +3300,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[179]);
-	JB_FS_AppendInt32(_fsf0, (2024073021));
+	JB_FS_AppendInt32(_fsf0, (2024073112));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7447,6 +7447,7 @@ bool SC_SpdAssembler__VacGenerate(SCFunction* Fn) {
 ErrorInt JB_Main() {
 	(JB_App__ConfigureSet(SC___AppConfString));
 	//visible;
+	int64 X = -9223372036854775808;
 	SC_Comp__Compile();
 	return 0;
 }
@@ -8356,7 +8357,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024073021));
+	JB_FS_AppendInt32(_fsf0, (2024073112));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -10989,6 +10990,8 @@ int JB_Init_() {
 	SC_PA__Init_();
 	//// µForm;
 	SC_xC2xB5Form__Init_();
+	//// File;
+	JB_File__Init_();
 	//// SCNode;
 	SC_Base__Init_();
 	//// Error;
@@ -12669,12 +12672,16 @@ SCObject* SC_TypeOfNothing(Message* Exp, SCNode* Name_space, Message* Side) {
 SCObject* SC_TypeOfNum(Message* Exp, SCNode* Name_space, Message* Side) {
 	SCObject* Rz = nil;
 	SCDecl** P = ((SCDecl**)JB_Dict_MakePlace(SC__Comp_Numbers, Exp->Name));
-	JB_Object* Y = P[0];
+	SCDecl* Y = P[0];
 	if (Y) {
 		return ((SCDecl*)Y);
 	}
 	Rz = SC_TypeOfNumSub(Exp, Name_space, Side);
-	JB_SetRef(P[0], Rz);
+	if (JB_Object_FastIsa(Rz, &SCDeclData)) {
+		JB_SetRef(P[0], Rz);
+	}
+	 else {
+	}
 	return Rz;
 }
 
@@ -20675,9 +20682,9 @@ bool JB_Pico_SendMsg(PicoComms* Self, PicoMessage* A, bool Wait) {
 
 bool JB_Pico_SendFS(PicoComms* Self, FastString* Fs, bool Wait) {
 	bool Rz = false;
-	PicoMessage Msg = ((PicoMessage){});
-	JB_Pico__FromFS(Fs, (&Msg));
-	Rz = JB_Pico_SendMsg(Self, (&Msg), Wait);
+	PicoMessage _tmPf0 = ((PicoMessage){});
+	JB_Pico__FromFS(Fs, (&_tmPf0));
+	Rz = JB_Pico_SendMsg(Self, (&_tmPf0), Wait);
 	(JB_FS_LengthSet(Fs, 0));
 	return Rz;
 }
@@ -28740,6 +28747,16 @@ JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in) {
 	return _tmPf2;
 }
 
+bool SC_Str_trap(JB_String* Self, Message* Msg) {
+	if (SC_Func_SyntaxEquals(SC__Func_CurrFunc, Self, true)) {
+		if (Msg) {
+			JB_Obj_PrintLine(Msg);
+		}
+		return true;
+	}
+	return false;
+}
+
 JB_String* JB_Str_Shorten(JB_String* Self, int N) {
 	return JB_Str_Range(Self, 0, JB_Str_Length(Self) - N);
 }
@@ -30573,6 +30590,7 @@ JB_String* JB_File__Applications() {
 
 int JB_File__Init_() {
 	{
+		JB_SetRef(JB__File__Speedie, JB_LUB[0]);
 	}
 	;
 	return 0;
@@ -30612,23 +30630,24 @@ JB_File* JB_File__Prefs(JB_String* Name) {
 }
 
 JB_String* JB_File__Speedie() {
-	JB_String* _tmPf1 = JB_Incr(JB_App__Path());
-	JB_String* _tmPf0 = JB_Incr(JB_Str_ResolvePath(_tmPf1, false));
-	JB_Decr(_tmPf1);
-	JB_String* Paths = JB_Incr(JB_Str_Parent(_tmPf0));
-	JB_Decr(_tmPf0);
-	JB_String* Srch = JB_Incr(JB_LUB[1801]);
-	Ind Found = JB_Str_InStr(Paths, Srch, 0, JB_int__Max(), true);
-	if (JB_Ind_SyntaxCast(Found)) {
-		JB_String* _tmPf2 = JB_Incr(JB_Str_Range(Paths, 0, Found + JB_Str_Length(Srch)));
-		JB_Decr(Srch);
+	if (!JB_Str_Exists(JB__File__Speedie)) {
+		JB_String* _tmPf1 = JB_Incr(JB_App__Path());
+		JB_String* _tmPf0 = JB_Incr(JB_Str_ResolvePath(_tmPf1, false));
+		JB_Decr(_tmPf1);
+		JB_String* Paths = JB_Incr(JB_Str_Parent(_tmPf0));
+		JB_Decr(_tmPf0);
+		JB_String* Srch = JB_Incr(JB_LUB[1801]);
+		Ind Found = JB_Str_InStr(Paths, Srch, 0, JB_int__Max(), true);
+		if (JB_Ind_SyntaxCast(Found)) {
+			JB_SetRef(JB__File__Speedie, JB_Str_Range(Paths, 0, Found + JB_Str_Length(Srch)));
+		}
+		 else {
+			JB_SetRef(JB__File__Speedie, JB_Str_ResolvePath(JB_LUB[1802], false));
+		}
 		JB_Decr(Paths);
-		JB_SafeDecr(_tmPf2);
-		return _tmPf2;
+		JB_Decr(Srch);
 	}
-	JB_Decr(Paths);
-	JB_Decr(Srch);
-	return JB_LUB[1802];
+	return JB__File__Speedie;
 }
 
 
@@ -39183,6 +39202,35 @@ bool JB_ID__ByID(JB_Object* A, JB_Object* B) {
 
 
 
+SCDecl* SC_Decl_ActualReplace(SCDecl* Self, SCDecl* New) {
+	if (SC_Str_trap(JB_LUB[2112], nil)) {
+	}
+	JB_SetRef(Self->Type, New->Type);
+	JB_SetRef(Self->Contains, New->Contains);
+	byte P = Self->PointerCount;
+	if (!P) {
+		return Self;
+	}
+	if (P != 1) {
+		JB_DoAt(1);
+	}
+	if (New->PointerCount) {
+		if (true) {
+			JB_Msg_SyntaxExpect(Self->Source, JB_Str_OperatorPlus(kJB__Rec_NonFatal, JB_LUB[2111]));
+		}
+	}
+	 else {
+		SCDecl* Last = Self;
+		while ((--P) > 0) {
+			SCDecl* Nl = SC_Decl_CopyDecl(Last, false);
+			JB_SetRef(Last->Internal, Nl);
+			Last = Nl;
+		};
+		JB_SetRef(Last->Internal, New);
+	}
+	return Self;
+}
+
 int SC_Decl_AllocatedSize(SCDecl* Self) {
 	return SC_Decl_VarSizeSub(Self, false);
 }
@@ -39467,18 +39515,15 @@ SCDecl* SC_Decl_ContainedReplace(SCDecl* Self, SCDecl* Contains, bool NeedsName)
 		if (((!NeedsName) or (!JB_Str_Exists(Self->Name))) and SC_Decl_SameForReplace(Self, Contains)) {
 			return Contains;
 		}
-		SCClass* CType = Contains->Type;
-		bool SameType = CType == Self->Type;
+		bool SameType = Contains->Type == Self->Type;
 		if (SameType) {
 			if (SC_Decl_SameForReplace(Self, Contains)) {
 				return Self;
 			}
 		}
 		SCDecl* C = SC_Decl_CopyDecl(Self, false);
-		JB_SetRef(C->Type, CType);
-		JB_SetRef(C->Contains, Contains->Contains);
 		((SC_Decl_SyntaxIsSet(C, kSC__SCDeclInfo_UpgradeableContained, (!SameType))));
-		return C;
+		return SC_Decl_ActualReplace(C, Contains);
 	}
 	SCDecl* Inside = Self->Contains;
 	if (((bool)Inside) and ((Inside != Contains) and SC_Decl_SyntaxIs(Inside, kSC__SCDeclInfo_UpgradeableContained))) {
@@ -53002,4 +53047,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -4740861064432452315 2062262619870089119
+// -13561557561005726 1264545738719267563

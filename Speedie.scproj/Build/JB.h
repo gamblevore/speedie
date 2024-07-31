@@ -2405,6 +2405,7 @@ extern SCOperator* SC__Opp_Subtract;
 extern Array* SC__PA_FixMe;
 extern int SC__xC2xB5Form_Count;
 extern Dictionary* SC__xC2xB5Form_Forms;
+extern JB_String* JB__File__Speedie;
 extern bool JB__File_DebugExecute;
 #define kJB__File_IgnoreErrors 1
 #define kJB__File_O_APPEND 8
@@ -7225,6 +7226,8 @@ void JB_Str_SyntaxExpect(JB_String* Self);
 
 JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in);
 
+bool SC_Str_trap(JB_String* Self, Message* Msg);
+
 JB_String* JB_Str_Shorten(JB_String* Self, int N);
 
 JB_String* JB_Str_TrimExtAndPath(JB_String* Self, bool KeepPath);
@@ -8755,6 +8758,8 @@ bool JB_ID__ByID(JB_Object* A, JB_Object* B);
 
 
 // JB_SCDecl
+SCDecl* SC_Decl_ActualReplace(SCDecl* Self, SCDecl* New);
+
 int SC_Decl_AllocatedSize(SCDecl* Self);
 
 bool SC_Decl_AlreadyContains(SCDecl* Self);
