@@ -6,10 +6,9 @@
 
 module Perry
     |ListViewRow|					Projects
-    |string|						_SpeedieDir
+	|Dictionary of String|			PathDict
     |bool|							Checked	
     |byte| 							FindID
-	|Dictionary of String|			PathDict
 	
 	constants
 		arc_newer	= 2
