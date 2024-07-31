@@ -16,13 +16,13 @@ module ScrollInfo
 			.InDrag_ = -1	
 
 
-function ListView.SLH (|vec3|)
+helper ListView.SLH (|vec3|)
 	|| D = .distto(._Scroll)
 	|| r = 1 + d.x - .visiblerows
 	return (d.y,  (r max 0),  .rowheight).vec3
 
 
-function textview.SLH (|vec3|)
+helper textview.SLH (|vec3|)
 	opt norefcounts
 	// whats the total number of lines? sigh... seems like we always need the entire thing?
 	|| s = .StartLine

@@ -359,7 +359,7 @@ function JumpToDefinition (GUIAction)
 	|| cmd = state == -2
 	require (cmd or rightclick)
 	|| ide = .ide
-	|| msg = ide.EditMe.ClickedMsg
+	|| msg = ide.EditMe.MessageAtSel
 		if msg in @url
 			msg = msg.parent!
 		if msg == @url

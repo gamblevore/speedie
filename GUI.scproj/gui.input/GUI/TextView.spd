@@ -145,8 +145,8 @@ class TextView (GUIControl)
 	
 	helper ExpandToAntiWords (|intrange| t, |intrange|)
 		opt norefcounts
-		|| M = .clickedmsg(t.x1)
-		|| M2 = .clickedmsg(t.x2)
+		|| M = .MessageAt(t.x1)
+		|| M2 = .MessageAt(t.x2)
 		if false and m != nil and m == m2
 			if m in @decl
 				m = m.parent
@@ -1013,12 +1013,11 @@ class TextView (GUIControl)
 		return a
 	
 	
-	function ClickedMsg (|message|)
-		cpp_Part ClickedMsg0
-		return .ClickedMsg(.sel0)
+	function MessageAtSel (|message|)
+		return .MessageAt(.sel0)
 	
 	
-	function ClickedMsg (|int| pos, |bool| named=false, |message|)
+	function MessageAt (|int| pos, |bool| named=false, |message|)
 		opt NoRefCounts
 		|| d   = .findDrawInfo(pos)
 		require d isnt fakemsg
@@ -1398,7 +1397,7 @@ class TextView (GUIControl)
 			return r
 	
 		if  (self[x-1] == '(')  and  (self[x] == ')')
-			|| c = .ClickedMsg(x)
+			|| c = .MessageAt(x)
 				if c == @prm or @bra or @list
 					return (x-1,x+1)
 		
@@ -1707,7 +1706,7 @@ class TextView (GUIControl)
 		opt NoRefCounts
 		|| fp = .OnShowExtraInfo
 			|| xy = (0, 0)
-			|| M = .ClickedMsg(B)
+			|| M = .MessageAt(B)
 				xy = .XYOfChar(M.position)
 			(fp)(self, XY, M, err, reason, false)
 	
@@ -2043,19 +2042,19 @@ class TextView (GUIControl)
 
 
 	helper FindExpectsParse (|int|)
-		if .text.HasWord("//lineson")
+		opt norefcounts
+		|| t = .text
+		if t.HasWord("//lineson")
 			.ShowLineNumbers = true
-		if .text.HasWord("//linesoff")
+		if t.HasWord("//linesoff")
 			.ShowLineNumbers = false
-		|| d = .Document
-			|| j = d.ExpectJeebox
-				return j
+		|| dj = .document.ExpectJeebox?
 		|| x = .ExpectsParse
 			if x >= AlwaysJeebox
 				return x
-			if .text.HasWord("<?jb?>") or .text.hasword("//jb")
-				return CurrentlyJeebox
-			return x
+			if t.HasWord("<?jb?>") or t.hasword("//jb")
+				x = CurrentlyJeebox
+		return x|int| max dj
 
 
 	helper IsJeeboxMode (|bool|)

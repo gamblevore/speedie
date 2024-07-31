@@ -533,6 +533,8 @@ class PerryIDE (Window)
 			  else
 				clickedCreateproj(self)
 			return true
+		if key is m
+			return .markup()
 		if key is l // l = file list
 			if keys.option or keys.Shift
 				RightClickNext(.goprev)

@@ -551,3 +551,38 @@ function FileViewerCountCode (GuiMenuEvent)
 	app.alert "${Cloc[]} lines of code and ${Cloc[1]} nodes in ${size.strsize} text ($r bytes per line)\n\n$fstr at: ${row.location}"
 
 
+function PerryIDE.Markup (|bool|)
+	opt norefcounts
+	|| e = .editme 
+// ok so we wanna fix some text up.
+	|| b = '`'
+	|| m = e.MessageAtSel
+		|| fn = m.func
+		expect (fn==@str or @char or @back) (beep)
+		if m == @str
+			b = '"'
+		  elseif m == @char
+			b = '\''
+
+	|| p = e.Sel0+3
+	|| fs = faststring()
+	fs <~ b
+	fs <~ ("\n", 2)
+	fs <~ "name" // replace this later
+	fs <~ ' '
+	fs <~ b
+	e.SelText = fs
+	e.SelRange = (p, p+4)
+	
+	return true
+	
+	`asdasdasd
+	asd asd as
+	d a
+	sd
+	asd 
+	asd
+	 as`
+	
+	
+	

@@ -1,6 +1,6 @@
 
 
-function textview.RangeCheck (|int| r, |message| func_name, |message| prms, |bool|)
+helper textview.RangeCheck (|int| r, |message| func_name, |message| prms, |bool|)
 	|| l = func_name.position
 	|| a = func_name.after 
 	if prms and prms != @arg
@@ -141,7 +141,7 @@ function TextView.ParamDisplayPlace (|message| msg, |int| x, |message|)
 function TextView.DoTheParamDisplayThing (|int| x, |bool| Force, |bool|) // paramthing
 	opt norefcounts
 	|| i = .ide
-	|| msg = .ClickedMsg(x, true)
+	|| msg = .MessageAt(x, true)
 	|| type = ("displayallforced", "displayall")(force)
 	|| msg2 = .ParamDisplayPlace(msg, x)
 		i.MaybeSendMessage(type, msg2, msg2.name, "Sel")
@@ -170,7 +170,7 @@ function TextView.PerryTryAutoComplete (|int| x, |string| type, |string| Reason,
 	
 	|| ok2 = false
 	|| i = .ide
-	|| msg = .ClickedMsg(x, true)
+	|| msg = .MessageAt(x, true)
 		i.editme.CanAutoComplete = true
 		ok2 = i.MaybeSendMessage(type, msg, msg.name, reason)
 		rz = true
