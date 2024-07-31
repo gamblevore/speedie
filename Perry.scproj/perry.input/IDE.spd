@@ -96,10 +96,11 @@ class PerryIDE (Window)
 
 
 	function ExpandStr (|string| path, |string|)
-		|| d = perry.pathdict init [ "spd"  :  perry.SpeedieDir ]
+		|| d = perry.pathdict init [ "spd" : file.speedie ]
 
-		rz = path.path_expand(perry.PathDict) #expect ("Unrecognised @ in: " + path)
-		rz = rz.resolve(fileResolveMode.allowmissing)
+		rz = path.Path_Expand(perry.PathDict) #expect ("Unrecognised @ in: " + path)
+		rz = rz.resolve(FileResolveMode.AllowMissing)
+	
 	
 	function PerryError (|error?|) 
 		opt norefcounts
@@ -210,7 +211,7 @@ class PerryIDE (Window)
 		|| fs = .stats init FastString()
 		|| i = .MyStatsMode
 		if i == 0
-			fs <~ "  --" // :)
+			fs <~ "  --"
 		
 		  elseif i == 1
 			|| e = .editme
@@ -822,14 +823,14 @@ So anything not 0 means "its OK"`
 			return -1
 		
 		if doc.location.pathiscode
-			e.ExpectsParse = TextView.AlwaysJeebox
+			doc.ExpectJeebox = TextView.AlwaysJeebox
 		  else
-			e.ExpectsParse = TextView.AllowJeebox
-		|| Loaded = E.LoadDocument(doc) #require
+			doc.ExpectJeebox = TextView.AllowJeebox
+
+		|| Loaded = E.LoadDocument(doc)					#require
 		|| m = .FunctionMenu.SubControl as menu
 			m.StopFilter
-		|| spd = r.location.PathIsCode
-		doc.CompareTreesOnSave = spd
+		doc.CompareTreesOnSave = doc.ExpectJeebox
 		.ListAllFuncs
 		.CheckScrollErrors(0, date.now + 0.25s)		
 		|| it = .ProjMsg

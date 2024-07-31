@@ -447,14 +447,6 @@ function ErrorListPaste (guipasteevent)
 			L <~ error.from(e)
 	i.UpdateErrorCount
 	i.noneed
-
-/*
-error
-	"Passing optional: JB_Dict_ValueLower(self.items, name) to Yes"
-	pos 169
-	file "/usr/local/speedie/Speedie.scproj/speedie.input/SC_Targets.spd"
-*/	
-	
 	
 	
 function ClickedError (GUIListEvent)

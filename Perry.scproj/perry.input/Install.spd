@@ -52,7 +52,7 @@ extend_module perry
 		|| monthly = .monthly_name(now)
 		|| daily_fol = "~/Backups/perry".file
 		|| monthly_fol = "~/Backups/perry_monthly".file
-		|| latest_local = perry.speediedir["Terminal/Backup"][latest.name]
+		|| latest_local = file.speedie["Terminal/Backup"][latest.name]
 		
 		rz = latest_local.file
 		zip.copyto(rz)
@@ -116,14 +116,14 @@ extend_module perry
 		|| paths = in.parent
 		|| srch = "/speedie/"
 		|| found = paths.find(srch, 0, int.max, true)
-		expect (found > 0) ("speedie needs to be contained in a folder named 'Speedie'.")
+		expect (found > 0) ("speedie needs to be contained in a folder named 'speedie'.")
 		return paths[0, found+srch.length]
 
 
 	function MakeSpeedieDir (|string|)
 		|| dest_path = speedie.LinksTo
 		if speedie.exists and dest_path
-			|| result = dest_path.executestr(["--alive"]).trim
+			|| result = dest_path.ExecuteStr(["--alive"]).trim
 			if result contains "seems alive"
 				rz = .FindSpeedieRoot(dest_path)
 
@@ -134,7 +134,7 @@ extend_module perry
 		
 		
 	function TestInstall (|string|)
-		|| where = .SpeedieDir.file
+		|| where = file.speedie.file
 		if !where.exists
 			return " * Install Speedie (compiler and libs).\n\n"
 		|| items = "GUI.scproj Image.scproj jeebox.scproj Library network.scproj Speedie.scproj Terminal" / ' '
@@ -210,7 +210,7 @@ extend_module perry
 			
 	helper GenerateArchiveSub (|bool|)
 		|| outpath = .install_path
-		|| p = .SpeedieDir
+		|| p = file.speedie
 		|| f = p.FileThatExists("generate archive")
 		require f and outpath
 		
@@ -304,7 +304,7 @@ extend_module perry
 	function Install (|bool| DoInstall, |bool| DoLinks, |bool|)
 		stderr.clear
 		|| msg = ""
-		|| f   = "/usr/local/speedie/".file
+		|| f   = file.speedie.file
 		if doinstall
 			msg += .install_files(f)
 		if dolinks
@@ -317,7 +317,7 @@ extend_module perry
 	function UnInstall
 		|| fs = FastString()
 		|| per = app.Idealpath
-		|| fol = .SpeedieDir
+		|| fol = file.speedie
 		if speedie.exists and speedie.delete
 			fs <~ "Deleted Link at: $speedie"
 		if per.FileExists and per.MoveToTrash

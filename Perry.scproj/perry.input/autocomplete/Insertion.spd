@@ -428,7 +428,7 @@ function perryide.IsEditingSource (|bool|)
 		return f.location.issource// or "jb" or "jbin"
 
 	
-function string.isSource (|bool|)
+function string.IsSource (|bool|)
 	return self isa "uwu" or "spd"
 
 

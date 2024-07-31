@@ -16,6 +16,7 @@ class Document (list)
 	|byte|					MaxUndos
 	|bool|					WasCompressed
 	|bool|					WasJbin
+	|byte|					ExpectJeebox
 	|bool| 					CompareTreesOnSave
 	|bool|					LoadedFromFile
 	|bool|					ShouldntSave	

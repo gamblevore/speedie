@@ -1,6 +1,8 @@
 
 
 main // main { 
+	if app.Yes("crash")
+		app.Crash
 	SDLApp.init
 	Perry.Startup
 	notifications.ShowTip( file://tips.box )

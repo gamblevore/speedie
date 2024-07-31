@@ -198,11 +198,15 @@ class OpenSaveDialog (Window)
 			|| w = .window as OpenSaveDialog
 				|| p = w.path
 				|| t = p.text
-				if (t[0] != '/' and '~')
+				|| f = t[0]
+				if (f == '/' or '~')
+					w.RelistFiles(t, false)
+				  elseif f == '@' or 0
+					p.text = file.Speedie
+					w.RelistFiles(p.text, false)
+				  else
 					beep
 					p.text = w.LastGoodPath init "/"
-				  else
-					w.RelistFiles(t, false)
 
 
 
@@ -258,15 +262,15 @@ function OpenSaveDialog.GoIntoFolder (|bool|)
 function OnAskSaveName (GUIKeyEvent)
 	opt norefcounts
 	if key.isaccept
-		|| w = .window as OpenSaveDialog #require
-		|| s = .text #expect Beep
+		|| w = .window as OpenSaveDialog		#require
+		|| s = .text							#expect Beep
 		w.ReturnValue = w.path.text.child(s)
 		return true
 
 
 function OnAskSaveReveal (GUIAction)
 	opt NoRefCounts
-	|| w = .window as OpenSaveDialog #require
+	|| w = .window as OpenSaveDialog			#require
 	|| f = w.files.FirstSelected
 	if f isa filerow
 		|| p = (w.path.text, f.location)(f.name == "..")

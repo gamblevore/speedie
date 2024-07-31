@@ -15,18 +15,6 @@ module Perry
 		arc_newer	= 2
 		arc_older	= 1
 	
-	function SpeedieDir (|string|)
-		opt norefcounts
-		if ._SpeedieDir
-			return ._SpeedieDir
-		._SpeedieDir = .MakeSpeedieDir
-		if ._SpeedieDir
-			return ._SpeedieDir
-		._SpeedieDir = "/usr/local/speedie"
-		if !._SpeedieDir.resolve
-			"/usr/local/speedie didn't resolve?"
-		return ._SpeedieDir
-	
 	
 	function LoadWindowsFromArgs (|bool|)
 		require app.args > 0
@@ -165,8 +153,8 @@ function SetTab2Name (|message| old)
 			ii.name = f.name + "[]"
 
 
-function FileIsSpeedieCode (|bool|)
-	return .path.PathIsCode
+//function FileIsSpeedieCode (|bool|)
+//	return .path.PathIsCode
 
 function ProjIsSpeedieCode (|bool|)
 	opt norefcounts

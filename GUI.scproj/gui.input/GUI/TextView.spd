@@ -2047,6 +2047,9 @@ class TextView (GUIControl)
 			.ShowLineNumbers = true
 		if .text.HasWord("//linesoff")
 			.ShowLineNumbers = false
+		|| d = .Document
+			|| j = d.ExpectJeebox
+				return j
 		|| x = .ExpectsParse
 			if x >= AlwaysJeebox
 				return x
@@ -2057,21 +2060,9 @@ class TextView (GUIControl)
 
 	helper IsJeeboxMode (|bool|)
 		return .FindExpectsParse >= ProbablyJeebox
-
-
-
-	helper string.PathJeeboxness (|byte|)
-		|| ext = .ext
-		rz = textview.allowjeebox
-		if ext ~= "spd" or "box" or "jbin" or "xml" or "jb" // i wanna debug my xml code
-			rz = textview.CurrentlyJeebox
-		  elseif ext ~!= "todo" and "txt"
-			rz = textview.ProbablyJeebox // this seems wrong
 	
 	
 	function GuessExpectsParse
-		opt norefcounts
-
 		|| mode = .expectsparse
 		require mode > 0 and mode < alwaysjeebox
 
@@ -2079,7 +2070,7 @@ class TextView (GUIControl)
 		|| d = .document
 			|| l = d.Location
 				|| ext = l.ext
-				if ext ~= "spd" or "box" or "jbin" or "xml" or "jb" // i wanna debug my xml code
+				if ext ~= "spd" or "box" or "jbin" or "xml" or "jb"
 					mode = CurrentlyJeebox
 				  elseif ext ~!= "todo" and "txt"
 					mode = ProbablyJeebox // this seems wrong

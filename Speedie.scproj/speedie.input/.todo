@@ -17,11 +17,10 @@ additions:
 	* add \123 numeric type (mostly for jbin). use a float/int format, that is signed. 2 exponent bits per byte.
 		* first byte (if float) can also store the sign of the exponent.
 		* could be an interesting type to have generally... like perhaps as a string subclass?
-	* refcount optimiser
 	* –container @ques ability... for macros. This returns the syntax that contained us. Useful for (all~files).delete
 	* unify macros? or just modernise. Why pass an array? why not a message~list? Arrays suck. list sexy.
 	* nicer lookups: fn x (|int| n), .x(max) --> .x(int.max) // assuming max doesn't exist locally.
-   * just set a global var... somewhere, and do set .obj or whatever it is that we lookup from in lookupsub, to that var if we can't find anything... it should happen in priority to globals, though.
+		* just set a global var... somewhere, and do set .obj or whatever it is that we lookup from in lookupsub, to that var if we can't find anything... it should happen in priority to globals, though.
 	* do we need lowercase in lookupsub??? all dots/funcs got lowered in parseclean?
 		* perhaps parseclean should use an ID system...
 	*  msg <~ {

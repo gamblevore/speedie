@@ -455,13 +455,17 @@ class File (String)
 
 	module
 		|| DebugExecute = false
+		|string| _Speedie
 				
 		function Speedie (|string|)
-			|| paths = app.exepath.resolve.parent
-			|| srch = "/speedie/"
-			|| found = paths.find(srch, 0, int.max, true)
-				return paths[0, found + srch.length]
-			return "/usr/local/speedie/"
+			if !_speedie
+				|| paths = app.exepath.resolve(false).parent
+				|| srch = "/speedie/"
+				|| found = paths.find(srch, 0, int.max, true)
+					_speedie = paths[0, found + srch.length]
+				  else
+					_speedie = "/usr/local/speedie/".Resolve(False)
+			return _speedie
 		
 		function SizeSorter (SorterComparer)
 			|| aa = a|file|.size
@@ -491,11 +495,13 @@ class File (String)
 				return `C:\$Recycle.Bin`
 			target lin
 				return "~/.local/share/Trash"
+		
 		function SystemDrive (|string|)
 			target win
 				return getenv("%ProgramFiles%")
 			  else
 				return "/"
+		
 		function Applications (|string|)
 			target OSX
 				return "/Applications/"

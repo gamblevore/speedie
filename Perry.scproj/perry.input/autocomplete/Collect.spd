@@ -105,7 +105,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 	if !spd?
 		|| proc = speedie.resolve
 		target debug
-			proc = "/usr/local/speedie/Speedie.scproj/Build/Products/Debug/Speedie"
+			proc = file.speedie.child("Speedie.scproj/Build/Products/Debug/Speedie")
 		if proc
 			|| Mode = ProcessMode.CaptureAll * !noisy
 			spd = SpdProcess.spawn(Proc, p, .project.name, mode)
