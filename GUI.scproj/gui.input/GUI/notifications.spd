@@ -109,7 +109,7 @@ module Notifications
 	
 	
 	function ShowTip (|string| data, |string| prefix = "Tip:  ")
-		|| p = data.parse[0]
+		|| p = data.parse.Rand
 			Notifications.silentappend(prefix + p.name)
 
 
