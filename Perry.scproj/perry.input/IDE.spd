@@ -96,11 +96,10 @@ class PerryIDE (Window)
 
 
 	function ExpandStr (|string| path, |string|)
-		|| d = perry.pathdict init [ "spd" : file.speedie ]
+		|| d = perry.pathdict init [ "spd"  :  file.speedie ]
 
 		rz = path.Path_Expand(perry.PathDict) #expect ("Unrecognised @ in: " + path)
 		rz = rz.resolve(FileResolveMode.AllowMissing)
-	
 	
 	function PerryError (|error?|) 
 		opt norefcounts
@@ -211,7 +210,7 @@ class PerryIDE (Window)
 		|| fs = .stats init FastString()
 		|| i = .MyStatsMode
 		if i == 0
-			fs <~ "  --"
+			fs <~ "  --" // :)
 		
 		  elseif i == 1
 			|| e = .editme
