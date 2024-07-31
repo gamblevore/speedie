@@ -70,6 +70,7 @@ class SteveMachine
 							// looking for multiples of small numbers (3/5/7)
 							// bitshifting down (multiples of 2/4/8/16)
 							// xoring multiple runs, and von-neuman and other cleanups.
+							// or just initialising a large data-set to use for seeding
 							// but... the chaotic generator is quite good. lets just use that for now :D
 		return .Samples.Next
 		
@@ -93,3 +94,4 @@ class SteveMachine
 		for bytes
 			total += .BitCount
 		return Total+.Bit > bytes*4
+
