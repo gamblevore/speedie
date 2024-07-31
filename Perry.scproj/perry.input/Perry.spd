@@ -152,9 +152,6 @@ function SetTab2Name (|message| old)
 			ii.name = f.name + "[]"
 
 
-//function FileIsSpeedieCode (|bool|)
-//	return .path.PathIsCode
-
 function ProjIsSpeedieCode (|bool|)
 	opt norefcounts
 	// why not just use .project?

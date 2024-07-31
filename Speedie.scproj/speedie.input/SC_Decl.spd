@@ -633,9 +633,6 @@ class SCDecl (SCNamed) {
 		|| p = .pointercount
 		if !p
 			return self
-		
-		if p != 1
-			debugat
 
 		if new.pointercount
 			error (.source, errorreceiver.NonFatal + ": Not sure what to do about this?")

@@ -1977,7 +1977,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112880993894943));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112881667204268));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3300,7 +3300,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[179]);
-	JB_FS_AppendInt32(_fsf0, (2024073113));
+	JB_FS_AppendInt32(_fsf0, (2024073115));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8356,7 +8356,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024073113));
+	JB_FS_AppendInt32(_fsf0, (2024073115));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -27138,21 +27138,6 @@ SCParamArray* SC_PA_Constructor(SCParamArray* Self, Message* Exp) {
 	return Self;
 }
 
-Array* SC_PA_CopyArgs(SCParamArray* Self) {
-	Array* Rz = ((Array*)JB_Array_Constructor0(nil));
-	{
-		int _nf0 = Self->Size;
-		int _if1 = 0;
-		while (_if1 < _nf0) {
-			Message* S = Self->Items[_if1];
-			JB_Array_SyntaxAppend(Rz, S);
-			(++_if1);
-		};
-	}
-	;
-	return Rz;
-}
-
 SCNode* SC_PA_DetectDotSuper(SCParamArray* Self, SCNode* Curr, SCNode* Arg_space) {
 	Self->IsNotModule = (!SC_Base_IsModuleFunc(Curr));
 	if (Self->IsDot) {
@@ -27198,6 +27183,28 @@ bool SC_PA_IsModule(SCParamArray* Self) {
 
 bool SC_PA_IsSelfCon(SCParamArray* Self) {
 	return (Self->IsSelf or Self->IsSuper) and (SC_Func_SyntaxIs(SC__Func_CurrFunc, kSC__FunctionType_Constructor));
+}
+
+Array* SC_PA_MacroCopyArgs(SCParamArray* Self) {
+	Array* Rz = ((Array*)JB_Array_Constructor0(nil));
+	int N2 = Self->Size - 1;
+	{
+		int _nf0 = Self->Size;
+		int _if1 = 0;
+		while (_if1 < _nf0) {
+			int I = _if1;
+			Message* S = Self->Items[_if1];
+			if ((I == N2) and Self->HasSide) {
+				0;
+			}
+			 else {
+				JB_Array_SyntaxAppend(Rz, S);
+			}
+			(++_if1);
+		};
+	}
+	;
+	return Rz;
 }
 
 int SC_PA_MacroSize(SCParamArray* Self) {
@@ -39198,9 +39205,6 @@ SCDecl* SC_Decl_ActualReplace(SCDecl* Self, SCDecl* New) {
 	if (!P) {
 		return Self;
 	}
-	if (P != 1) {
-		JB_DoAt(1);
-	}
 	if (New->PointerCount) {
 		if (true) {
 			JB_Msg_SyntaxExpect(Self->Source, JB_Str_OperatorPlus(kJB__Rec_NonFatal, JB_LUB[2111]));
@@ -49219,7 +49223,7 @@ SCDecl* SC_Func_MacroFix(SCFunction* Self, SCDecl* Contains, SCNode* Name_space,
 	SCDecl* Rz = nil;
 	Message* Orig = JB_Incr(Incoming->Exp);
 	if (Orig) {
-		Array* R = JB_Incr(SC_PA_CopyArgs(Incoming));
+		Array* R = JB_Incr(SC_PA_MacroCopyArgs(Incoming));
 		JB_Msg_BecomeMacro(Orig, Self->IsMacro, R);
 		JB_Decr(R);
 		SC_Msg_MacroFixSub(Orig, Contains);
@@ -53034,4 +53038,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 147249381637827265 4070603587794798198
+// 706333897990473202 4070603587794798198

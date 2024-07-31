@@ -6931,8 +6931,6 @@ Message* SC_PA_AddTestedParam(SCParamArray* Self, Message* Item, SCNode* Name_sp
 
 SCParamArray* SC_PA_Constructor(SCParamArray* Self, Message* Exp);
 
-Array* SC_PA_CopyArgs(SCParamArray* Self);
-
 SCNode* SC_PA_DetectDotSuper(SCParamArray* Self, SCNode* Curr, SCNode* Arg_space);
 
 int SC_PA_IgnoreSelfContain(SCParamArray* Self);
@@ -6940,6 +6938,8 @@ int SC_PA_IgnoreSelfContain(SCParamArray* Self);
 bool SC_PA_IsModule(SCParamArray* Self);
 
 bool SC_PA_IsSelfCon(SCParamArray* Self);
+
+Array* SC_PA_MacroCopyArgs(SCParamArray* Self);
 
 int SC_PA_MacroSize(SCParamArray* Self);
 

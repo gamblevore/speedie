@@ -9,12 +9,9 @@ target !imported
 		|| b = iChing.DataBank.parse					#expect ("Can't load databank")
 		|| T = TemporalGenerator.find(ID)				#expect ("Cant find generator $ID")
 		for i in 1 to 100
-	//		for i in infos
-	//			printline b[i]
 			T = TemporalGenerator.list(i)				#require
 			|| gen = T.Create(reps, 2K)					#require
 			printline gen.name
-	//		printline gen.Samples.Dump(32, 4)
 			for 1000
 				print gen.Byte|int|.Render
 				print ", "

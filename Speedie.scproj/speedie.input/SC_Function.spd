@@ -319,7 +319,7 @@ function message.MacroFixSub (|SCDecl?| contains)
 
 function MacroFix (|SCDecl?| contains, |SCNode| name_space, |SCParamArray| Incoming, |scdecl|)
 	|| Orig = incoming.exp
-		|| R = incoming.CopyArgs
+		|| R = incoming.MacroCopyArgs
 		orig.BecomeMacro(.ismacro!, r)
 		orig.MacroFixSub(contains) 
 		rz = TypeOfExpr(orig, name_space) 

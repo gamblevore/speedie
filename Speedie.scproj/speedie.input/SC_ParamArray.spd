@@ -52,10 +52,14 @@ class SCParamArray
 			|| ty = typeofexpr(obj, nil)
 				ty.render(fs)
 	
-	function CopyArgs (|[message]|)
+	function MacroCopyArgs (|[message]|)
 		opt norefcounts
-		for s in self
-			rz <~ s
+		|| n2 = .size-1
+		for (s in self) (i)
+			if (i == n2) and .hasside
+				0 // do nothing
+			  else
+				rz <~ s
 	
 	function IsModule (|bool|)
 		return !.IsNotModule
@@ -268,5 +272,5 @@ class SCParamArray
 		|int| n = .size
 		|int| i = 0
 		while i < n
-			yield .items[i]
+			yield .items[i] (i)
 			++i
