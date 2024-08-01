@@ -3,9 +3,6 @@
 function PerryIDE.MaybeSendMessage (|string| cmd,  |message| where,  |string| name="", |string| reason="", |bool|)
 	#!sendmsg, msgsend, sendcmd, cmdsend
 	|| fn = where.Func
-	if fn == @char or @num
-		.PopupHide
-		return false
 	if (fn == @name) and cmd[0, "autocomplete"]
 		return false
 	if (fn == @thg) and (where in @decl) and !where.isfirst
@@ -15,14 +12,19 @@ function PerryIDE.MaybeSendMessage (|string| cmd,  |message| where,  |string| na
 		if where.ShouldDisplayString
 			ifn cmd starts "autocomplete_sel"
 				return .DisplayStr(where)
-	  else
+
+	if fn == @char or @num
+		.PopupHide
+		return false
+
+	if !fn.isstring		
 		return .SendFeedbackRequest(cmd, where, name, reason)
 
 
 function message.ShouldDisplayString (|bool|)
 	if self == @bin
 		return true
-	require self == @str
+	require self == @str or @char
 	require .name.LengthUTF8 < 350
 	return .name.Escape != .name
 	
