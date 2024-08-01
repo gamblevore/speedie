@@ -26,7 +26,7 @@ These are special functions. They work like any other function, but are called v
 + `syntax compare` - Used for comparing if one object is more or less than the other.
 + `syntax access`  - Used for accessing an object as if it were an array. Can take params of any kind, strings or messages even. Can even take multiple parameters.
 + `syntax expect`  - Used for error-handling.
-+ `syntax cast`    - Allows (sometimes but not always) a type to be implicitly casted into another type. Mostly used for turning a object into a bool, which is used for `"if"` tests. For example string has a `syntax cast`  that is true if the string is not nil and has a positive length. My `FastString` class has a cast to a `string`. Using `syntax cast` outside of converting to `bool`... is **generally dangerous and bad**. I've had issues myself even where I wrote syntax casts that broke stuff all over. But converting to a bool is almost always safe. So just restrict yourself to that and you'll be fine.
++ `syntax cast`    - Allows a type to be implicitly casted into another type. Mostly used for turning a object into a bool, which is used for `"if"` tests. For example string has a `syntax cast` to `bool`, which returns true for strings with .length > 0. My `FastString` class has a cast to a `string`. Using `syntax cast` outside of converting to `bool`... is **generally dangerous and bad**. I've had issues myself even where I wrote syntax casts that broke stuff all over. But converting to a bool is almost always safe. So just restrict yourself to that and you'll be fine.
 + `syntax is`      - See below.
 
 ---
