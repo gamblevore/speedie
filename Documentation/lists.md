@@ -20,9 +20,9 @@ ___
 
 ### Internals
 
-The list class is what is an "intrusive list", you have to subclass it to use it as a list.
+The list class an "intrusive list". You have to subclass it to use it as a list.
 
-This makes it super-fast and more RAM efficient, and just more natural... for operations where our nodes are already meant to be a list.
+This makes it [much faster, more RAM efficient](https://www.google.com/search?q=intrusive+list+speed), and more natural to use! Especially for operations where our nodes are already meant to be a list. _<small>(In fact... I wouldn't call it "intrusive" as its basically "just a list". Intrusive is more of a C++ thing because of C++ wierdness where the list might be a property of a class rather than the super-class.)</small>_
 
 Looking at some online C++ tests (Speedie is about as fast as C++), you can see that "intrusive lists" are 2-4x faster than non-intrusive lists. And simpler to use! Its just better.
 

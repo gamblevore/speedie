@@ -26,7 +26,7 @@ These are special functions. They work like any other function, but are called v
 + `syntax compare` - Used for comparing if one object is more or less than the other.
 + `syntax access`  - Used for accessing an object as if it were an array. Can take params of any kind, strings or messages even. Can even take multiple parameters.
 + `syntax expect`  - Used for error-handling.
-+ `syntax cast`    - Decides how an object gets turned into a bool. Useful for `"if"` tests. Also used so you can return a `faststring` object from a function that expects a `string`... because the `faststring` has a cast to a `string`.
++ `syntax cast`    - Allows (sometimes but not always) a type to be implicitly casted into another type. Mostly used for turning a object into a bool, which is used for `"if"` tests. For example string has a `syntax cast`  that is true if the string is not nil and has a positive length. My `FastString` class has a cast to a `string`. Using `syntax cast` outside of converting to `bool`... is **generally dangerous and bad**. I've had issues myself even where I wrote syntax casts that broke stuff all over. But converting to a bool is almost always safe. So just restrict yourself to that and you'll be fine.
 + `syntax is`      - See below.
 
 ---
@@ -40,7 +40,7 @@ Sometimes its nice to have constants work for you, rather than you work for them
             .ProcessRow(row)
             return true
     
-Where are the names ("modified/disabled") defined? How are they found? They are found via the "`syntax is`"  function on `listviewrow`.
+Where are the names ("modified/disabled") defined? How are they found? They are found via the "`syntax is`" function!
 
     syntax is (|ListViewState| s, |bool|)
         if self
@@ -59,7 +59,7 @@ The `isnt` operator is automatically defined as being the opposite of `is`. So a
 
 So these two versions are equivalent:
 
-    require row isnt Disabled                    // version one
+    require row isnt Disabled                     // version one
     if !row.syntaxis(listviewstate.disabled)      // version two
         return nil
     
