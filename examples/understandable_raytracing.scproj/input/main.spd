@@ -1,7 +1,6 @@
 
-// simple raytracing demo...
-// based on code from
-https://www.scratchapixel.com
+https://www.scratchapixel.com // simple raytracing demo... based on code from here
+
 
 main
 	sdlapp.Rescale(3)
