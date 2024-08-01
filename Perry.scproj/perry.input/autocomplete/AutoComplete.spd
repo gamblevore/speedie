@@ -461,7 +461,7 @@ function perryide.DescribeWhere (|message| rz, |message| where)
 
 
 function message.IsUsefulTypeOfDecl (|bool|)
-	return (self == @thg) and .name and .istypeofdecl
+	return (self == @thg) and .name and .IsTypeOfDecl
 
 
 function message.SimpleComplete (|message| pp, |message| where, |bool|)
