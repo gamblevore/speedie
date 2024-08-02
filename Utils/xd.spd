@@ -1,0 +1,48 @@
+#!/usr/local/bin/spd
+https://www.youtube.com/watch?v=pnnx1bkFXng // as you can tell... my version is a lot better than zig version.
+
+
+helper string.ColumnFinish (|int| lastout, |int| i, |faststring| fs, |int|)
+	fs <~ "   //  "
+	while lastout <= i
+		|| c2 = self[lastout++]
+		if c2.IsWhite
+			c2 = ' '
+		fs <~ c2
+	fs <~ "\n"
+	return lastout
+
+
+function string.ColumnHex (|int| linelen = 16, |int| chunklen = 2, |string|)
+	|| chunkpos = 0
+	|| linepos = 0
+	|| lastout = 0
+	|| Sigh = 0
+	|| FSLen = 0
+	|| fs = FastString()
+	
+	for (c in self) (i)
+		chunkpos++
+		linepos++
+		if linepos > linelen
+			if !Sigh
+				sigh = fs.Length
+			lastout = .ColumnFinish(lastout, i-1, fs)
+			linepos = 1
+			chunkpos = 1
+			FSLen = fs.Length
+		  elseif chunkpos > chunklen
+			fs <~ " "
+			chunkpos = 1
+		fs.AppendHex(c)
+		fs.Mark
+	
+	fs <~ (' ', sigh - (fs.length - fslen))
+	.ColumnFinish(lastout, .length, fs)
+	return fs
+
+
+main (|existingfile| file)
+	|| data = file.readall
+		printline data.ColumnHex
+	
