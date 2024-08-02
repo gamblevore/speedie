@@ -44,7 +44,7 @@ extend ASMState
 			rz = exp.jBRA(r,0)
 		  else
 			|| ugh = badness.asmbitclearmode
-			rz = exp.JZRO(r, ugh, 0)
+			rz = exp.JZRA(r, ugh, 0)
 		rz.op += negate<<24
 
 	
@@ -444,7 +444,7 @@ extend ASMState
 	// BITS
 	function BitNot (fn_opasm)
 		if r.reg // what?
-		|| fat = exp.BNOT(dest,l)
+		|| fat = exp.BNOT(dest,l,asmreg(),0)
 		if l is ConstAny
 			fat.const = ~l.const
 		return fat*Dest
@@ -453,7 +453,7 @@ extend ASMState
 	function BitXor (fn_opasm)
 		if (l.reg == r.reg)
 			return .BitOr(dest, asmreg(), asmreg(), exp)
-		|| fat = exp.BXOR(dest, L, R)
+		|| fat = exp.BXOR(dest, L, R, 0)
 		if dest is ConstAny
 			fat.const = l.Const xor r.const
 		return fat*Dest
@@ -505,9 +505,9 @@ extend ASMState
 		
 		|&Fatasm| fat
 		if l.Signed
-			fat = exp.BRUS(dest, L, R, up)
+			fat = exp.BSHS(dest, L, R, up)
 		  else
-			fat = exp.BRUU(dest, L, R, 0)
+			fat = exp.BSHR(dest, L, R, 0)
 			
 		return fat*dest
 
@@ -515,7 +515,7 @@ extend ASMState
 	function SHL    (fn_opasm)
 		if r is ConstAny
 			return .BFLG_Const(exp, dest, l,  r.const, 0)
-		return exp.BLUE(dest, L, R, 0) * Dest
+		return exp.BSHL(dest, L, R, 0) * Dest
 	
 	
 	function Assign (fn_opasm)

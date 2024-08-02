@@ -12,6 +12,10 @@
 		<data>
 		B4N85mKcqIqZqK7G7i+DMo7aeJw=
 		</data>
+		<key>Resources/speedie_install.txt</key>
+		<data>
+		SFpcEkgEcV2RlQSw0wWlR9CB0yI=
+		</data>
 	</dict>
 	<key>files2</key>
 	<dict>
@@ -36,6 +40,13 @@
 			<key>hash2</key>
 			<data>
 			v2iS4qR5TDOhVX4U654/zW75gktm6+YFw+nLDSuYm+I=
+			</data>
+		</dict>
+		<key>Resources/speedie_install.txt</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			CrQdH6Itif0hUPaPQ1OV04ARIy8kBgqysXA++M/HeWI=
 			</data>
 		</dict>
 	</dict>

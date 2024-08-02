@@ -450,7 +450,8 @@ extend Parser
 		if result and !parser.WillEnd
 			|| Curr = parser.ProcessThing(kOppSyx (|) kOppTemporal)
 				result <~ curr
-		return Result // decland typecast are neighbours :)
+		return Result
+	// decl and typecast are neighbours :)
 	function fTypeCast (ParseHandler)
 		return parser.BarThings( Start, @Type ) #require
 

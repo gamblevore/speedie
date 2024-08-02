@@ -1875,34 +1875,31 @@ extern Random JB__zalgo_R;
 #define kSC__ASM_ADPK 42
 #define kSC__ASM_ALLO 35
 #define kSC__ASM_BAND 52
-#define kSC__ASM_BCLR 60
+#define kSC__ASM_BCLR 57
 #define kSC__ASM_BFLG 56
-#define kSC__ASM_BFLS 57
-#define kSC__ASM_BLUE 51
 #define kSC__ASM_BNOT 55
 #define kSC__ASM_BOAR 53
-#define kSC__ASM_BROL 58
-#define kSC__ASM_BROR 59
-#define kSC__ASM_BRUS 49
-#define kSC__ASM_BRUU 50
+#define kSC__ASM_BSHL 51
+#define kSC__ASM_BSHR 50
+#define kSC__ASM_BSHS 49
 #define kSC__ASM_BXOR 54
-#define kSC__ASM_CMPB 61
-#define kSC__ASM_CMPF 64
-#define kSC__ASM_CMPI 63
-#define kSC__ASM_CNTC 93
-#define kSC__ASM_CNTD 94
+#define kSC__ASM_CMPB 58
+#define kSC__ASM_CMPF 61
+#define kSC__ASM_CMPI 60
+#define kSC__ASM_CNTC 90
+#define kSC__ASM_CNTD 91
 #define kSC__ASM_CONV 39
 #define kSC__ASM_DIVV 46
 extern ASM_Encoder2 SC__ASM_Encoders[256];
 #define kSC__ASM_EROR (0)
-#define kSC__ASM_FADD 96
-#define kSC__ASM_FADK 97
-#define kSC__ASM_FDIV 100
-#define kSC__ASM_FFRC 101
-#define kSC__ASM_FMAX 102
-#define kSC__ASM_FMIN 103
-#define kSC__ASM_FMLK 99
-#define kSC__ASM_FMUL 98
+#define kSC__ASM_FADD 93
+#define kSC__ASM_FADK 94
+#define kSC__ASM_FDIV 97
+#define kSC__ASM_FFRC 98
+#define kSC__ASM_FMAX 99
+#define kSC__ASM_FMIN 100
+#define kSC__ASM_FMLK 96
+#define kSC__ASM_FMUL 95
 #define kSC__ASM_FNCX 5
 #define kSC__ASM_FNCX2 5
 #define kSC__ASM_FNCX3 6
@@ -1910,54 +1907,54 @@ extern ASM_Encoder2 SC__ASM_Forms[128];
 #define kSC__ASM_FUNC 1
 #define kSC__ASM_FUNC2 1
 #define kSC__ASM_FUNC3 2
-#define kSC__ASM_JBRA 70
-#define kSC__ASM_JBRN 73
-#define kSC__ASM_JMPE 68
-#define kSC__ASM_JMPF 67
-#define kSC__ASM_JMPI 66
-#define kSC__ASM_JMPN 69
-#define kSC__ASM_JUMP 65
-#define kSC__ASM_JZRN 72
-#define kSC__ASM_JZRO 71
+#define kSC__ASM_JBRA 67
+#define kSC__ASM_JBRN 68
+#define kSC__ASM_JMPE 65
+#define kSC__ASM_JMPF 64
+#define kSC__ASM_JMPI 63
+#define kSC__ASM_JMPN 66
+#define kSC__ASM_JUMP 62
+#define kSC__ASM_JZRA 69
+#define kSC__ASM_JZRN 70
 #define kSC__ASM_KNSR 40
 #define kSC__ASM_KNST 8
 #define kSC__ASM_KNST1 8
 #define kSC__ASM_KNST2 9
 #define kSC__ASM_KNST3 10
-#define kSC__ASM_LUPD 74
-#define kSC__ASM_LUPU 75
+#define kSC__ASM_LUPD 71
+#define kSC__ASM_LUPU 72
 #define kSC__ASM_MAX 47
-#define kSC__ASM_MEMU 95
+#define kSC__ASM_MEMU 92
 #define kSC__ASM_MIN 48
 #define kSC__ASM_MULT 45
 extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_NOOP 32
 #define kSC__ASM_PRNT 37
-#define kSC__ASM_RALO 78
+#define kSC__ASM_RALO 75
 #define kSC__ASM_RARE 38
-#define kSC__ASM_RD16 87
-#define kSC__ASM_RD1S 81
-#define kSC__ASM_RD1U 80
-#define kSC__ASM_RD2S 83
-#define kSC__ASM_RD2U 82
-#define kSC__ASM_RD4S 85
-#define kSC__ASM_RD4U 84
-#define kSC__ASM_RD8U 86
+#define kSC__ASM_RD16 84
+#define kSC__ASM_RD1S 78
+#define kSC__ASM_RD1U 77
+#define kSC__ASM_RD2S 80
+#define kSC__ASM_RD2U 79
+#define kSC__ASM_RD4S 82
+#define kSC__ASM_RD4U 81
+#define kSC__ASM_RD8U 83
 #define kSC__ASM_RET 34
-#define kSC__ASM_RMEM 77
-#define kSC__ASM_RSET 76
+#define kSC__ASM_RMEM 74
+#define kSC__ASM_RSET 73
 #define kSC__ASM_SUBB 44
 #define kSC__ASM_SWAP 36
-#define kSC__ASM_TABL 79
+#define kSC__ASM_TABL 76
 #define kSC__ASM_TAIL 13
 #define kSC__ASM_TAIL2 13
-#define kSC__ASM_TERN 62
+#define kSC__ASM_TERN 59
 #define kSC__ASM_TRAP 33
-#define kSC__ASM_WR16 92
-#define kSC__ASM_WR1U 88
-#define kSC__ASM_WR2U 89
-#define kSC__ASM_WR4U 90
-#define kSC__ASM_WR8U 91
+#define kSC__ASM_WR16 89
+#define kSC__ASM_WR1U 85
+#define kSC__ASM_WR2U 86
+#define kSC__ASM_WR4U 87
+#define kSC__ASM_WR8U 88
 #define kSC__ASMtmp_IncrAfter 2
 #define kSC__ASMtmp_IncrBefore (0)
 #define kSC__ASMtmp_kContinue 51
@@ -4249,6 +4246,8 @@ AsmReg SC_int_ToASM(int Self);
 
 int SC_int_ASMBitClearMode(int Self);
 
+int SC_int_ConvShift(int Self);
+
 bool SC_int_IsNormalMatch(int Self);
 
 bool SC_int_IsSimpleOrPointerCast(int Self);
@@ -4415,6 +4414,8 @@ ASM SC_ASM_ConstStretchy_InvSet(ASM Self, uint Value);
 
 ASM SC_ASM_ConstStretchy_ValueSet(ASM Self, uint Value);
 
+ASM SC_ASM_Convert_ClearSet(ASM Self, uint Value);
+
 ASM SC_ASM_Convert_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_Convert_ModeSet(ASM Self, uint Value);
@@ -4468,6 +4469,8 @@ ASM SC_ASM_RET_CountSet(ASM Self, uint Value);
 ASM SC_ASM_RET_ExistsSet(ASM Self, uint Value);
 
 ASM SC_ASM_RET_LSet(ASM Self, uint Value);
+
+ASM SC_ASM_Shift_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_Shift_ShSet(ASM Self, uint Value);
 
@@ -4585,6 +4588,8 @@ AsmReg SC_ASMtmp__Thg(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 AsmReg SC_ASMtmp__ThgSub(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
 AsmReg SC_ASMtmp__TypeCast(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
+
+AsmReg SC_ASMtmp__TypeCastSub(ASMState* Self, Message* Exp, AsmReg Dest, AsmReg Sr);
 
 AsmReg SC_ASMtmp__Unexpected(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
@@ -5905,7 +5910,7 @@ AsmReg SC_Pac_Equals(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* E
 
 FatASM* SC_Pac_EqualsInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-AsmReg SC_Pac_ExistingVar(ASMState* Self, Message* M);
+AsmReg SC_Pac_ExistingVar(ASMState* Self, Message* M, DataTypeCode destType);
 
 double SC_Pac_f(ASMState* Self, AsmReg R);
 
@@ -5917,9 +5922,11 @@ void SC_Pac_FinishASM(ASMState* Self);
 
 AsmReg SC_Pac_FloatMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
+AsmReg SC_Pac_ForceType(ASMState* Self, Message* Exp, DataTypeCode Expected, AsmReg PSent, int OldTmps);
+
 AsmReg SC_Pac_FoundCode(ASMState* Self, int I, uint64 Value, AsmReg Typeinfo);
 
-AsmReg SC_Pac_FuncPrm(ASMState* Self, Message* Prm);
+AsmReg SC_Pac_FuncPrm(ASMState* Self, Message* Prm, SCDecl* DestType);
 
 AsmReg SC_Pac_GenericNumFinder(ASMState* Self, Message* Exp, uint64 Value, AsmReg TypeInfo);
 
@@ -6002,6 +6009,8 @@ bool SC_Pac_TextFuncSub(ASMState* Self, Message* M);
 void SC_Pac_TextOp(ASMState* Self, Message* M);
 
 bool SC_Pac_TextOpSub(ASMState* Self, Message* M);
+
+AsmReg SC_Pac_TryReuseThisTmp(ASMState* Self, Message* Exp, AsmReg V, int PrevTmps);
 
 bool SC_Pac__ExpandJSM();
 
@@ -7786,8 +7795,6 @@ void SC_Msg_BecomeSetRel(Message* Self);
 
 FatASM* JB_Msg_BFLG(Message* Self, AsmReg R1, AsmReg R2, int Up, int Down, int Sign);
 
-FatASM* JB_Msg_BFLS(Message* Self, AsmReg R1, AsmReg R2, int Up, int Down, int Sign);
-
 void JB_Msg_Bin__(Message* Self, FastString* Fs);
 
 void JB_Msg_binn__(Message* Self, FastString* Fs);
@@ -7800,11 +7807,9 @@ SCBlockage SC_Msg_Blocks(Message* Self);
 
 void SC_Msg_BlocksSet(Message* Self, int Value);
 
-FatASM* JB_Msg_BLUE(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh);
+FatASM* JB_Msg_BNOT(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh);
 
-FatASM* JB_Msg_BNOT(Message* Self, AsmReg R1, AsmReg R2);
-
-FatASM* JB_Msg_BOAR(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, AsmReg R4);
+FatASM* JB_Msg_BOAR(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh);
 
 void JB_Msg_Bra__(Message* Self, FastString* Fs);
 
@@ -7812,13 +7817,11 @@ SCDecl* SC_Msg_BraDeclfind(Message* Self);
 
 void JB_Msg_BRel__(Message* Self, FastString* Fs);
 
-FatASM* JB_Msg_BROL(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3);
+FatASM* JB_Msg_BSHL(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh);
 
-FatASM* JB_Msg_BROR(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3);
+FatASM* JB_Msg_BSHR(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh);
 
-FatASM* JB_Msg_BRUS(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh);
-
-FatASM* JB_Msg_BRUU(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh);
+FatASM* JB_Msg_BSHS(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh);
 
 bool SC_Msg_BuildRunTask(Message* Self, Message* Fields, int Level);
 
@@ -7830,7 +7833,7 @@ void SC_Msg_BunchFixSub(Message* Self, Message* Subject, Message* Stuff);
 
 void SC_Msg_BunchlessFix(Message* Self);
 
-FatASM* JB_Msg_BXOR(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3);
+FatASM* JB_Msg_BXOR(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int Sh);
 
 bool SC_Msg_CanGetAddress(Message* Self, SCNode* Name_space);
 
@@ -7912,7 +7915,7 @@ void SC_Msg_ConstructorAddNil(Message* Self, bool Isdot);
 
 bool JB_Msg_ContainsInd(Message* Self, Ind P, bool AllowJustAfter);
 
-FatASM* JB_Msg_CONV(Message* Self, AsmReg R1, AsmReg R2, int Mode);
+FatASM* JB_Msg_CONV(Message* Self, AsmReg R1, AsmReg R2, int Mode, int Clear);
 
 Message* JB_Msg_Copy(Message* Self, Message* Pos_msg);
 
@@ -8226,9 +8229,9 @@ FatASM* JB_Msg_JMPN(Message* Self, AsmReg R1, AsmReg R2, int Jmp);
 
 FatASM* JB_Msg_JUMP(Message* Self, int JUMP);
 
-FatASM* JB_Msg_JZRN(Message* Self, AsmReg R1, int Bytes, int Jmp);
+FatASM* JB_Msg_JZRA(Message* Self, AsmReg R1, int Bytes, int Jmp);
 
-FatASM* JB_Msg_JZRO(Message* Self, AsmReg R1, int Bytes, int Jmp);
+FatASM* JB_Msg_JZRN(Message* Self, AsmReg R1, int Bytes, int Jmp);
 
 void SC_Msg_KinderRemoveAfter(Message* Self);
 
@@ -8645,6 +8648,8 @@ bool SC_Msg_TrueOrFalse(Message* Self);
 int SC_Msg_TryImproveShiftConstants(Message* Self, SCDecl* LC, SCDecl* RC);
 
 void JB_Msg_Type__(Message* Self, FastString* Fs);
+
+bool SC_Msg_TypeCastDoesNothing(Message* Self, DataTypeCode Expected);
 
 void SC_Msg_TypeExpect(Message* Self, DataTypeCode* Ty, DataTypeCode In);
 
@@ -10505,7 +10510,8 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 }
 
 inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
-	fn_asm Fn = SC_fn_asm_table[SC_Msg_ASMType(Exp)];
+	ASMtmp Expasm = SC_Msg_ASMType(Exp);
+	fn_asm Fn = SC_fn_asm_table[Expasm];
 	byte TmpCloser = Self->VTmps;
 	AsmReg Ss = (Fn)(Self, Exp, Dest, 0);
 	SC_Pac_CloseVTmps(Self, TmpCloser, Dest);

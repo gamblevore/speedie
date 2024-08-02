@@ -287,11 +287,17 @@
 #define   Convert_Modeu       (((uint)((Op)<<18))>>28)
 #define   Convert_Modeu_(x)   (((uint)((x)<<18))>>28)
 
-#define   Convert_Li       ((( int)((Op)<<22))>>22)
-#define   Convert_Li_(x)   ((( int)((x)<<22))>>22)
+#define   Convert_Cleari       ((( int)((Op)<<22))>>26)
+#define   Convert_Cleari_(x)   ((( int)((x)<<22))>>26)
 
-#define   Convert_Lu       (((uint)((Op)<<22))>>22)
-#define   Convert_Lu_(x)   (((uint)((x)<<22))>>22)
+#define   Convert_Clearu       (((uint)((Op)<<22))>>26)
+#define   Convert_Clearu_(x)   (((uint)((x)<<22))>>26)
+
+#define   Convert_Li       ((( int)((Op)<<28))>>28)
+#define   Convert_Li_(x)   ((( int)((x)<<28))>>28)
+
+#define   Convert_Lu       (((uint)((Op)<<28))>>28)
+#define   Convert_Lu_(x)   (((uint)((x)<<28))>>28)
 
 
 #define   RET_Counti       ((( int)((Op)<<18))>>29)
@@ -391,11 +397,17 @@
 #define   AddK_Ku_(x)   (((uint)((x)<<18))>>18)
 
 
-#define   Shift_Shi       ((( int)((Op)<<23))>>23)
-#define   Shift_Shi_(x)   ((( int)((x)<<23))>>23)
+#define   Shift_Shi       ((( int)((Op)<<23))>>26)
+#define   Shift_Shi_(x)   ((( int)((x)<<23))>>26)
 
-#define   Shift_Shu       (((uint)((Op)<<23))>>23)
-#define   Shift_Shu_(x)   (((uint)((x)<<23))>>23)
+#define   Shift_Shu       (((uint)((Op)<<23))>>26)
+#define   Shift_Shu_(x)   (((uint)((x)<<23))>>26)
+
+#define   Shift_Li       ((( int)((Op)<<29))>>29)
+#define   Shift_Li_(x)   ((( int)((x)<<29))>>29)
+
+#define   Shift_Lu       (((uint)((Op)<<29))>>29)
+#define   Shift_Lu_(x)   (((uint)((x)<<29))>>29)
 
 
 #define   Swap_Li       ((( int)((Op)<<28))>>28)

@@ -90,7 +90,6 @@ double FloatSh2 (uint64 u, int S) {
 }
 
 
-
 AlwaysInline ASM* LoadConst (Register* r, ASM Op, ASM* Code) {
 	uint64 Value = ConstStretchy_Valueu;
 	int Remain = (Op>>24)&3;
@@ -173,31 +172,35 @@ AlwaysInline JB_Object* alloc(void* o) {
 }
 
 
-AlwaysInline void Conv (Register* r, int Conv, int Op) {
+AlwaysInline void RegConv (Register* r, int Conv, int Op) {
 	// float, double, u64, s64. 12 conversions possible (and 4 pointless ones)
-
-	Register& d = *(r + n1);  
-	Register& s = *(r + n3);  
+	// also can clear bits before conversion (for int-->float)
+	Register* s = r + n3;
+	Register* d = r + n1;
+	int Clear = Convert_Clearu;
+	if (Clear) {	// Store in dest
+		*d = *s;
+		d->Uint = ((d->Uint)<<Clear)>>Clear;
+		s = d;
+	}
+		
     switch (Conv) {
-        case 0 : d.Float = s.Float;  break;
-        case 1 : d.Float = s.Double; break;
-        case 2 : d.Float = s.Uint;   break;
-        case 3 : d.Float = s.Int;    break;
-        
-        case 4 : d.Double = s.Float;  break;
-        case 5 : d.Double = s.Double; break;
-        case 6 : d.Double = s.Uint;   break;
-        case 7 : d.Double = s.Int;    break;
-        
-        case 8 : d.Uint = s.Float;  break;
-        case 9 : d.Uint = s.Double; break;
-        case 10: d.Uint = s.Uint;   break;
-        case 11: d.Uint = s.Int;    break;
-        
-        case 12: d.Int = s.Float;  break;
-        case 13: d.Int = s.Double; break;
-        case 14: d.Int = s.Uint;   break;
-        case 15: d.Int = s.Int;    break;
+        case 0 : d->Float  = s->Float; 		break; // just copies
+        case 1 : d->Float  = s->Double;		break;
+        case 2 : d->Float  = s->Uint;  		break;
+/**/    case 3 : d->Float  = s->Int;   		break;
+		case 4 : d->Double = s->Float; 		break;
+        case 5 : d->Double = s->Double;		break; // just copies
+        case 6 : d->Double = s->Uint;  		break;
+/**/    case 7 : d->Double = s->Int;   		break;
+	    case 8 : d->Uint   = s->Float; 		break;
+        case 9 : d->Uint   = s->Double;		break;
+        case 10: d->Uint   = s->Uint;  		break; // just copies
+/**/    case 11: d->Uint   = s->Int;   		break;
+        case 12: d->Int    = s->Float; 		break;
+        case 13: d->Int    = s->Double;		break;
+        case 14: d->Int    = s->Uint;  		break;
+/**/    case 15: d->Int    = s->Int;   		break; // just copies
     }
 }
 
@@ -351,6 +354,7 @@ AlwaysInline ASM* JompNeq (Register* r, ASM Op, ASM* Code) {
 	return Code + JCmpEq_Jmpi;
 }
 
+#define shu(x) ((((x)<<Shift_Shu))>>Shift_Shu)
 
 void bswap32 (u32* Start, uint Count) {
 	for_(Count) {

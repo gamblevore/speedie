@@ -42,7 +42,7 @@
 ı RARE: _
 	if_rare (Rare(r, Op)) return n3;
 ı CONV: _
-	Conv(r, Convert_Modeu, Op);
+	RegConv(r, Convert_Modeu, Op);
 ı KNSR: _
 	RotateConst(r, Op);
 ı ADDK: _
@@ -72,20 +72,20 @@
 	else 
 	u1 = std_min(u2, u3)
 ;
-ı BRUS: _
-	i1 = (((i2 << Shift_Shu) >> Shift_Shu) >> i3);
-ı BRUU: _
-	u1 = (u2 >> (u3 + Shift_Shu));
-ı BLUE: _
-	u1 = (u2 << (u3 + Shift_Shu));
+ı BSHS: _
+	i1 = shu(i2) >> u3;
+ı BSHR: _
+	u1 = shu(u2) >> u3;
+ı BSHL: _
+	u1 = shu(u2) << u3;
 ı BAND: _
 	u1 = u2 & (u3 | Shift_Shu);
 ı BOAR: _
-	u1 = (u2 | u3) & ~u4;
+	u1 = shu(u2) | u3;
 ı BXOR: _
-	u1 = u2 ^ u3;
+	u1 = shu(u2 ^ u3);
 ı BNOT: _
-	u1 = ~u2 & ~u3;
+	u1 = shu(~u2 & ~u3);
 ı BFLG: _
 	if (BFLD_signu) 
 	i1 = ((i2 << BFLD_upu) >> BFLD_downu)
@@ -93,12 +93,6 @@
 	else 
 	u1 = ((u2 << BFLD_upu) >> BFLD_downu)
 ;
-ı BFLS: _
-	BFLS(r, Op);
-ı BROL: _
-	i1 = JB_u64_RotL(u2, u3 + L3);
-ı BROR: _
-	i1 = JB_u64_RotR(u2, u3 + L3);
 ı BCLR: _
 	BitClear(r, Op);
 ı CMPB: _
@@ -138,7 +132,13 @@
 	Code += Bra_Jmpi
 ;
 	___;
-ı JZRO: 
+ı JBRN: 
+	__;
+	if (!i1) 
+	Code += Bra_Jmpi
+;
+	___;
+ı JZRA: 
 	__;
 	if ((i1 & (1 << (1 << (3 + BraBytes_Bytesu))) - 1)) 
 	Code += Bra_Jmpi
@@ -147,12 +147,6 @@
 ı JZRN: 
 	__;
 	if (!(i1 & (1 << (1 << (3 + BraBytes_Bytesu))) - 1)) 
-	Code += Bra_Jmpi
-;
-	___;
-ı JBRN: 
-	__;
-	if (!i1) 
 	Code += Bra_Jmpi
 ;
 	___;

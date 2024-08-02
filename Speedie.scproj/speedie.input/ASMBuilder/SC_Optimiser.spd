@@ -71,9 +71,9 @@ dispatch µOpt (|&fatasm| self, |?&fatasm| P, |?&fatasm| N, |bool|)
 	(ASM.RET):    OptRet
 	(ASM.TERN):   OptTern
 	(ASM.BFLG):   OptBFLG
-	(ASM.BRUU):   OptShifting
-	(ASM.BRUS):   OptShifting
-	(ASM.BLUE):   OptShifting
+	(ASM.BSHR):   OptShifting
+	(ASM.BSHS):   OptShifting
+	(ASM.BSHL):   OptShifting
 	(ASM.BAND):   OptBitAnd
 	(ASM.BOAR):   OptBitOr
 	(ASM.BNOT):	  OptBitNot
@@ -201,15 +201,15 @@ function OptShifting (fn_µopt)   // can't really opt this unless registers cont
 	|| l = v.log2
 	if l >= 63
 		|| o = .op
-		if o == asm.blue		// left
-			OptPath "blue"
+		if o == asm.BSHL		// left
+			OptPath "BSHL"
 			.b = 0
 			.c = l
 		  else
-			OptPath "bru"
+			OptPath "BSHR"
 			.b = l
 			.c = 0
-		.d = (o == asm.brus)|int|
+		.d = (o == asm.BSHS)|int|
 		.op = asm.BFLG
 		return true
 

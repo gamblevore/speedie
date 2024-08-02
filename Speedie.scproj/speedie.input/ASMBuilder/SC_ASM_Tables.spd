@@ -188,8 +188,9 @@ function Ternary		(fn_asm)
 	|| A = cond.next!
 	|| B = A.next!
 	
-	|| mA = .ExistingVar(a)
-	|| mB = .ExistingVar(b)
+	|| destType = exp.ASMDecl.DType
+	|| mA = .ExistingVar(a, desttype)
+	|| mB = .ExistingVar(b, desttype)
 	if ma!=nil and mb!=nil
 		return .SimpleTernary(dest, ma, mb, cond)
 
@@ -210,6 +211,7 @@ function First			(fn_asm)
 	return .µ(exp.first!, dest)
 
 
+
 function Return			(fn_asm)
 	opt norefcounts
 	|| reg = asmreg()
@@ -225,38 +227,39 @@ function Return			(fn_asm)
 function TypeCast		(fn_asm)
 	opt norefcounts
 	|| sr = .µ(exp.first!, dest)
+	return TypeCastSub(self, exp, dest, sr)
+
+
+
+function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| sr, |asmreg|)
 	|| NewDecl = exp.ASMDecl
 	|| NewType = newdecl.regtype
-	if newtype is bool
-		debugat
-		return .NotEq(dest, asmreg(), sr, exp)
+	if !sr.reg								// x = 0|float|
+		sr.µtype = newtype
+		return sr
 
 	|| OldDecl = exp.first!.ASMDecl
 	|| OldType = olddecl.regtype
+	if NewType.count != OldType.count
+	
+	if newtype is bool
+		if OldType is bool					// x = true|bool| // why?
+			return sr
+		return .NotEq(dest, asmreg(), sr, exp)
+
 	|| OC = oldtype.BitCount
 	|| NC = newtype.BitCount
 
 	|| FloatDiff = newtype.isfloat != oldtype.isfloat
-	if !FloatDiff and (nc == oc)
+	if !FloatDiff and (nc == oc)			// same bittype!
 		return sr
 	
-	if !sr.reg // x = 0|float|
-		sr.µtype = newtype
-		return sr
 	dest = .TempMe(exp, dest)
 	dest.µType = NewType
-	
-	// why can't i move this into a const collector?
-	// cos i don't know what the original input types were?
-	// not even from the original fats output?
-	// sighhh...... perhaps?
-	// its too much structure. its like the messgeid. good idea but NO WAY. leave it for now!
-	// old idea is good enough!
-	
 	|| UponConst = sr is ConstAny
 	|&fatasm| fat
 	if oldtype.isfloat or newtype.isfloat
-		fat = exp.CONV(dest, sr, oldtype.asmconv(newtype)).BitCorrect
+		fat = exp.CONV(dest, sr, oldtype.asmconv(newtype), oc.convshift).BitCorrect
 		if UponConst
 			(fat is ConstAny)
 			|| srf = sr.needfat
@@ -271,7 +274,7 @@ function TypeCast		(fn_asm)
 			|| oof = fat.Const << sh
 			fat.Const = (oof|int64| >> sh, oof|uint64| >> sh)(sr.Signed) // shift up and down
 			(fat is ConstAny)
-	rz = fat*dest
+	return fat*dest
 
 
 
@@ -284,6 +287,7 @@ function Pointer		(fn_asm)
 	return Dest.ReadOrWrite(exp,ptr)
 
 
+
 function Decl (fn_asm)
 // yay
 	opt norefcounts
@@ -291,6 +295,7 @@ function Decl (fn_asm)
 	|| ty = rel.first!.fastdecl
 	|| dest2 = .DeclareMe(Exp, ty)
 	return SetReg(self, rel.last!, dest2)
+
 
 
 function SetReg (|&ASMState| self, |message| exp, |AsmReg| Dest, |AsmReg|)
@@ -301,12 +306,14 @@ function SetReg (|&ASMState| self, |message| exp, |AsmReg| Dest, |AsmReg|)
 	return .Assign(dest, r2, asmreg(), exp)
 
 
+
 function Arg   (fn_asm)
 	opt norefcounts
 	|| DclCloser = .VDecls // dcl ooffer
 	for ch.fast in exp
 		.µ(ch, asmreg.Arg)
 	.CloseVDecls(dclCloser)
+
 
 
 function Access		(fn_asm)						// a[b], struct.mem[b], func()[func2()]
@@ -344,7 +351,7 @@ function Dot		(fn_asm)						// a.b
 		
 
 function SetRel	(fn_asm)
-	opt	norefcounts					//   x[func()] = y++
+	opt	norefcounts									//   x[func()] = y++
 	|| L = exp.first!
 	|| Var = .ExistingVar(L)
 	|| R = .µ(exp.last!, var)
@@ -365,7 +372,7 @@ function Num (fn_asm)
 function Thg (fn_asm)
 	|| thg = ThgSub(self, exp, dest, mode)
 	|| reg = thg.reg
-	if (reg-1)|uint| < 31					// what?
+	if (reg-1)|uint| < 31							// what?
 		return thg
 	error (exp, "Register out of bounds")
 
@@ -630,18 +637,17 @@ function ASMReg.Write (|message| m,  |asmreg| ptr,  |int| index=0,  |&fatasm|)
 	return .ReadOrWrite(m, ptr, index, false)
 
 
-function asmstate.ExistingVar (|message| m, |asmreg|)
+function asmstate.ExistingVar (|message| m, |datatypecode| destType=datatypecode.UnusedType,  |asmreg|)
 	opt	norefcounts
 	real self
 	|| fn = m.func 
-	while fn == @bra or @type
+	while (fn == @bra) or ((fn == @type) and m.TypeCastDoesNothing(DestType))
 		m = m.first!
 		fn = m.func
 	if fn == @thg
-		return asmtmp.thgsub(self, m, asmreg(), 2)
+		return asmtmp.ThgSub(self, m, asmreg(), 2)
 	if fn == @num
 		return .FindConstDecl(m.ASMDecl)
-	return nil
 
 
 function message.HasAsmStuff (|bool|)
@@ -701,7 +707,7 @@ function DataTypecode.ASMConv (|Datatypecode| To, |int|)
 
 function DataTypecode.ASMPart (|int|)
 	if .isfloat
-		return 0+(.bitcount > 32)
+		return 0 + (.bitcount > 32)
 	return 2 + .issigned
 
 /*
@@ -725,3 +731,24 @@ function DataTypecode.ASMPart (|int|)
         case 14: d.Int = s.Uint;   break;
         case 15: d.Int = s.Int;    break;
 */
+
+
+
+function Message.TypeCastDoesNothing (|Datatypecode| Expected, |bool|)
+	opt norefcounts
+//	if Expected == DataTypeCode.UnusedType
+	Expected = .second!.ASMDecl.DType
+	|| Src = .first!.ASMDecl.DType
+	|| XC = Expected.ByteCount
+	|| SC = Src.ByteCount
+	if  (Expected.IsFloat != Src.isfloat)  or  (src.Count != Expected.Count)
+		return false
+	if SC == XC
+		return true
+	return Expected.isint and (XC < SC)
+
+
+
+function int.ConvShift (|int|)
+	return (64 - self)>>3
+	

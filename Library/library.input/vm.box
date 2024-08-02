@@ -126,6 +126,7 @@ forms
 		r1		R
 		r2		r
 		Mode	4
+		Clear	6
 		
 		
 	RET
@@ -186,7 +187,7 @@ forms
 		r1		R
 		r2		r
 		r3		r
-		Sh		l
+		Sh		6
 	
 	Swap
 		r1		R
@@ -270,7 +271,7 @@ forms
 /**/ RARE (U2)
 		if_rare (Rare(r, Op)) return n3
 /**/ CONV (Convert)
-		Conv(r, Convert_Modeu, Op)
+		RegConv(r, Convert_Modeu, Op)
 
 
 
@@ -310,35 +311,35 @@ forms
 
 
 #!						 (((((Bitops)))))
-/**/ BRUS  (Shift) // technically we could only use 6 bits for the shift, and keep the last 3 for adding
-		i1 = (((i2<<Shift_Shu)>>Shift_Shu) >> i3) // its too fiddly though.
-/**/ BRUU  (Shift)
-		u1 = (u2 >> (u3+Shift_Shu))
-/**/ BLUE  (Shift) 
-		u1 = (u2 << (u3+Shift_Shu))
+/**/ BSHS  (Shift)
+		i1 = shu(i2) >> u3 // its too fiddly though.
+/**/ BSHR  (Shift)
+		u1 = shu(u2) >> u3
+/**/ BSHL  (Shift) 
+		u1 = shu(u2) << u3
 /**/ BAND  (Shift)
-		u1 = u2 &  (u3|||Shift_Shu)
-/**/ BOAR  (U4) // maybe << k is better? idk that bfls is very useful...
-		u1  = (u2|||u3)&~u4
-/**/ BXOR  (U3)
-		u1 = u2 ^ u3
-/**/ BNOT  (U2)
-		u1 = ~u2 & ~u3
+		u1 = u2 & (u3|||Shift_Shu)
+/**/ BOAR  (Shift)
+		u1  = shu(u2)|||u3
+/**/ BXOR  (Shift)
+		u1 = shu(u2 ^ u3)
+/**/ BNOT  (Shift)
+		u1 = shu(~u2 & ~u3)
 /**/ BFLG  (BFLD) // perhaps sign can allow for SIMD opts?
 		if (BFLD_signu)
 			i1 = ((i2 << BFLD_upu) >> BFLD_downu)
 		else
 			u1 = ((u2 << BFLD_upu) >> BFLD_downu)
-/**/ BFLS  (BFLD)
-		BFLS(r, Op)
+///**/ BFLS  (BFLD) // seems useless?
+//		BFLS(r, Op)
 
 	
 ///**/ BSTT  (U4)
 //		i1 = 0//bitstats(u2, u3, u4)
-/**/ BROL  (U3)
-		i1 = JB_u64_RotL(u2, u3 + L3)
-/**/ BROR  (U3)
-		i1 = JB_u64_RotR(u2, u3 + L3)
+///**/ BROL  (U3) // just make these functions or rare instructions?
+//		i1 = JB_u64_RotL(u2, u3 + L3)
+///**/ BROR  (U3)
+//		i1 = JB_u64_RotR(u2, u3 + L3)
 /**/ BCLR  (BClear)
 		BitClear(r, Op)
 
@@ -387,7 +388,13 @@ forms
 			Code += Bra_Jmpi
 		___
 
-/**/ JZRO  (BraBytes)
+/**/ JBRN  (Bra)					
+		__
+		if (!i1)
+			Code += Bra_Jmpi
+		___
+
+/**/ JZRA  (BraBytes)
 		__
 		if ( (i1 & (1<<(1<<(3+BraBytes_Bytesu)))-1 ))
 			Code += Bra_Jmpi
@@ -396,12 +403,6 @@ forms
 /**/ JZRN  (BraBytes)
 		__
 		if (!(i1 & (1<<(1<<(3+BraBytes_Bytesu)))-1 ))
-			Code += Bra_Jmpi
-		___
-
-/**/ JBRN  (Bra)					
-		__
-		if (!i1)
 			Code += Bra_Jmpi
 		___
 

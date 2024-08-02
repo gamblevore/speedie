@@ -1,12 +1,8 @@
 
 
 main // speedie main {
-	target debug2
-		|| x = 1<<63
-
 	Compiler.Compile
-	
-	
+
 
 function compiler.Compile
 	.SetupEnv	

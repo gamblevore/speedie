@@ -225,34 +225,54 @@ struct ASMState
 		target !debug
 			opt inline
 		cpp_part Get
-		|| fn = fn_asm_table[exp.ASMType]!
+		|| expasm = exp.ASMType
+		|| fn = fn_asm_table[expasm]!
 		target debug
-			if !exp.ASMType
+			if !expasm
 				fn = fn_asm_table[exp.func|int|]!
 				debugger
 
 		|| TmpCloser = .VTmps
 		|| ss = (fn)(self, exp, dest)
 		.CloseVTmps(TmpCloser, dest)
-		
-// 		this would make comparing harder...
-//		target debug
-//			if !ss.µtype.isnumeric and ss.µtype is bool
-//				#! we expect our bools to be numeric bools
-//				debugger
-//				ss = (fn)(self, exp, dest)
-//				error (self, "No valid type on FAT info")
+		target debug
+			|| ty = exp.ASMDecl
+			if ty.DType != ss.µType
+				debugger
+				(fn)(self, exp, dest)
 		return ss
 
 
-	function FuncPrm (|message| prm, |asmreg|)
+	function FuncPrm (|message| prm, |scdecl| DestType,  |asmreg|)
 		|| r = .ExistingVar(prm)
-		if r != nil
-			return r
-		// why not use tmps? won't these interfere with the function-passing??
-		|| Where = .tempme(prm, asmreg())
-		return .µ(prm, where)
+		|| OldTmps = .VTmps
+		if r == nil
+			r = .µ(prm, r)
+		return .ForceType(prm, desttype.dtype, r, oldtmps)
 
+
+	function TryReuseThisTmp (|message| Exp, |asmreg| V, |int| PrevTmps, |asmreg|)
+		|| r = v.reg
+		|| vt = .vtmps
+		if r >= vt and r < PrevTmps
+			return v
+		return .TempMe(exp)
+		
+	
+	function ForceType (|message| exp, |DataTypeCode| Expected, |asmreg| PSent, |int| OldTmps, |asmreg|)
+		|| PT = Psent.µType
+		target debug: if expected.count != PT.Count // now what?
+		
+		expect (Expected.isfloat != pt.isfloat) (exp, ErrorReceiver.nonfatal)
+
+		|| XC = Expected.BitCount
+		|| PC = PT.BitCount
+		if (PC == XC) or ((Expected.isint) and (XC < PC))
+			return PSent
+
+		|| dest = .TryReuseThisTmp(exp, psent, OldTmps)
+		return asmtmp.TypeCastSub(self, exp, dest, psent)
+		
 
 	module
 		|FatASM[]|					JSMSpace = FatASM[0]!
@@ -284,13 +304,16 @@ function @ASMTmp.DoFunc (fn_Asm)
 	|| sh = 0
 	|| TmpCloser = .VTmps
 
-	for p.fast in prms
-		|| v = .funcprm(p).reg
+	|| p = prms.first
+	for fnarg in fn.args
+		expect (p) (exp, "Compiler did not fully type this function.") 
+		|| v = .funcprm(p, fnarg).reg
 		if sh <= 25
 			reg2 |= (v << sh)
 		  else
 			reg3 |= (v << (sh-30))
 		sh += 5
+		p++
 	.closeVTmps(TmpCloser)
 	
 
