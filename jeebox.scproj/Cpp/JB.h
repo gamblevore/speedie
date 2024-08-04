@@ -778,7 +778,7 @@ extern Random JB__zalgo_R;
 #define kJB__TC_atomic_int64 124
 #define kJB__TC_atomic_uint 44
 #define kJB__TC_atomic_uint64 60
-#define kJB__TC_bool (0)
+#define kJB__TC_bool 256
 #define kJB__TC_byte 8
 #define kJB__TC_Byte2 9
 #define kJB__TC_Byte3 10
@@ -1444,7 +1444,9 @@ bool JB_CP_IsWhite(Codepoint Self);
 
 
 // DataTypeCode
-bool JB_TC_IsFloat(DataTypeCode Self);
+bool JB_TC_IsFloat(uint /*DataTypeCode*/ Self);
+
+bool JB_TC_SyntaxIs(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ M);
 
 
 
@@ -1670,13 +1672,13 @@ bool JB_FastBuff_HasAny(FastBuff* Self);
 
 int JB_FastBuff_Length(FastBuff* Self);
 
-int64 JB_FastBuff_Position(FastBuff* Self);
+int JB_FastBuff_Position(FastBuff* Self);
 
-void JB_FastBuff_PositionSet(FastBuff* Self, int64 Value);
+void JB_FastBuff_PositionSet(FastBuff* Self, int Value);
 
 void JB_FastBuff_ReadFromSet(FastBuff* Self, JB_String* Value);
 
-int64 JB_FastBuff_Remaining(FastBuff* Self);
+int JB_FastBuff_Remaining(FastBuff* Self);
 
 int JB_FastBuff_Size(FastBuff* Self);
 
@@ -2625,9 +2627,9 @@ bool JB_Msg_EqualsSyx(Message* Self, Syntax X, bool Aware);
 
 void JB_Msg_SyntaxExpect(Message* Self, JB_String* Error);
 
-bool JB_Msg_SyntaxIs(Message* Self, MsgParseFlags F);
+bool JB_Msg_SyntaxIs(Message* Self, uint /*MsgParseFlags*/ F);
 
-void JB_Msg_SyntaxIsSet(Message* Self, MsgParseFlags F, bool Value);
+void JB_Msg_SyntaxIsSet(Message* Self, uint /*MsgParseFlags*/ F, bool Value);
 
 void JB_Msg_SyntaxUsing(Message* Self, MessagePosition* Rz);
 

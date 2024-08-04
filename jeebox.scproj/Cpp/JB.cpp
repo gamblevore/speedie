@@ -1839,7 +1839,7 @@ Message* JB_Tk__fYoda(int Start, Message* Parent) {
 Message* JB_Tk__GetFuncAfter(Message* Result) {
 	JB_Incr(Result);
 	while (true) {
-		int ThisAfter = kJB__Tk_kFuncAfterAny & (~JB__Tk__StopBars);
+		uint ThisAfter = kJB__Tk_kFuncAfterAny & (~JB__Tk__StopBars);
 		if (JB_Tk__NoFuncAfter(JB_Tk__NextByte())) {
 			ThisAfter = (ThisAfter & (~kJB__Tk_kFuncAfterNoSpace));
 		}
@@ -2842,8 +2842,12 @@ bool JB_CP_IsWhite(Codepoint Self) {
 
 
 
-bool JB_TC_IsFloat(DataTypeCode Self) {
+bool JB_TC_IsFloat(uint /*DataTypeCode*/ Self) {
 	return ((bool)((Self >> 7) & 1));
+}
+
+bool JB_TC_SyntaxIs(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ M) {
+	return (Self & kJB__TC_PossibleBits) == (M & kJB__TC_PossibleBits);
 }
 
 
@@ -3129,16 +3133,16 @@ bool JB_FastBuff_HasAny(FastBuff* Self) {
 
 int JB_FastBuff_Length(FastBuff* Self) {
 	if (Self) {
-		return Self->Curr - Self->Start;
+		return JB_FastBuff_Position(Self);
 	}
 	return 0;
 }
 
-int64 JB_FastBuff_Position(FastBuff* Self) {
-	return Self->Curr - Self->Start;
+int JB_FastBuff_Position(FastBuff* Self) {
+	return ((int)(Self->Curr - Self->Start));
 }
 
-void JB_FastBuff_PositionSet(FastBuff* Self, int64 Value) {
+void JB_FastBuff_PositionSet(FastBuff* Self, int Value) {
 	byte* C = Self->Start + Value;
 	if ((C < Self->Start) or (C > Self->End)) {
 		if (true) {
@@ -3156,8 +3160,8 @@ void JB_FastBuff_ReadFromSet(FastBuff* Self, JB_String* Value) {
 	Self->Curr = Self->Start;
 }
 
-int64 JB_FastBuff_Remaining(FastBuff* Self) {
-	return Self->End - Self->Curr;
+int JB_FastBuff_Remaining(FastBuff* Self) {
+	return ((int)(Self->End - Self->Curr));
 }
 
 int JB_FastBuff_Size(FastBuff* Self) {
@@ -3562,7 +3566,7 @@ JB_String* JB_Wrap_Render(DTWrap* Self, FastString* Fs_in) {
 	if (JB_TC_IsFloat(Self->DataType)) {
 		JB_FS_AppendDoubleAsText0(Fs, JB_Wrap_FloatValue(Self));
 	}
-	 else if (Self->DataType == kJB__TC_UnusedType) {
+	 else if (!JB_TC_SyntaxIs(Self->DataType, kJB__TC_Numeric)) {
 		JB_FS_AppendString(Fs, JB_LUB[148]);
 		JB_FS_AppendHex(Fs, Self->PrivValue, 2);
 	}
@@ -5215,7 +5219,7 @@ JB_String* JB_SS_Str(StringReader* Self, int N, int Skip) {
 	}
 	if ((JB_FastBuff_Has((&Self->Data), N)) or (JB_SS_NoMoreChunks(Self))) {
 		N = JB_int_OperatorMin(N, JB_SS_Remaining(Self));
-		int64 Pos = JB_FastBuff_Position((&Self->Data));
+		int Pos = JB_FastBuff_Position((&Self->Data));
 		(JB_FastBuff_PositionSet((&Self->Data), N + Pos));
 		return JB_FastBuff_AccessStr((&Self->Data), Pos + Skip, JB_FastBuff_Position((&Self->Data)));
 	}
@@ -5227,7 +5231,7 @@ JB_String* JB_SS_Str(StringReader* Self, int N, int Skip) {
 	}
 	byte* Dest = R->Addr;
 	while (true) {
-		int Copied = JB_FastBuff_CopyTo((&Self->Data), Dest, JB_int64_OperatorMin(JB_FastBuff_Remaining((&Self->Data)), Remaining));
+		int Copied = JB_FastBuff_CopyTo((&Self->Data), Dest, JB_int_OperatorMin(JB_FastBuff_Remaining((&Self->Data)), Remaining));
 		Remaining = (Remaining - Copied);
 		Dest = (Dest + Copied);
 		if (Remaining <= 0) {
@@ -6862,14 +6866,14 @@ void JB_Msg_SyntaxExpect(Message* Self, JB_String* Error) {
 	JB_Rec__NewErrorWithNode(Self, Error, nil);
 }
 
-bool JB_Msg_SyntaxIs(Message* Self, MsgParseFlags F) {
+bool JB_Msg_SyntaxIs(Message* Self, uint /*MsgParseFlags*/ F) {
 	if (Self) {
 		return ((bool)(Self->Flags & F));
 	}
 	return false;
 }
 
-void JB_Msg_SyntaxIsSet(Message* Self, MsgParseFlags F, bool Value) {
+void JB_Msg_SyntaxIsSet(Message* Self, uint /*MsgParseFlags*/ F, bool Value) {
 	if (Self) {
 		if (Value) {
 			Self->Flags = (Self->Flags | F);
@@ -7875,7 +7879,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024080222);
+	return (2024080423);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -7887,4 +7891,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 2256267814529388254 920410641272458315
+// 7796578953066441599 8873106697153073716 920410641272458315
