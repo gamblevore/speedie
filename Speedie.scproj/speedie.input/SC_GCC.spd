@@ -425,7 +425,7 @@ function TransCompile (|[File]| Files, |String| Dest, |string| Type, |bool|)
 		print	 "\n ${cppcompilerpath} "
 		printline CompileString.Join(" ")
 	
-//	app.sleep(0.125s)
+	app.sleep(0.125s)
 	return .ExecuteGCC( CompileString )
 
 

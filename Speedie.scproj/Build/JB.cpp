@@ -1977,7 +1977,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112906053957875));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112906131668992));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -8825,6 +8825,7 @@ bool SC_Ext__TransCompile(Array* Files, JB_String* Dest, JB_String* Type) {
 		JB_PrintLine(_tmPf2);
 		JB_Decr(_tmPf2);
 	}
+	JB_Date__Sleep(8192);
 	bool _tmPf3 = SC_Ext__ExecuteGCC(CompileString);
 	JB_Decr(CompileString);
 	return _tmPf3;
