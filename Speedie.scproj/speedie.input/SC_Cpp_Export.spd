@@ -791,7 +791,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			t <~ "void"
 			Return
 		
-		if d.iscarray
+		if d.IsCarray
 			.WriteDeclNoName( d.internal!, T )
 		  else
 			.WriteDeclNoName( d, T )
@@ -906,15 +906,6 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			fs <~ c.CStructName
 		
 		fs <~ ";\n"
-
-
-	function WriteClass (|SCClass| C, |FastStringCpp| T)
-		if (.writeapi)
-			T <~ C.APIStructName
-		  else
-			T <~ C.CStructName
-		if (C.IsObject)
-			T <~ '*'
 
 
 	function Init
@@ -1349,8 +1340,39 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function WriteDeclNoName (|SCDecl| D, |FastStringCpp| T)
-		WriteClass( d.Type, T )
-		T <~ ( '*', D.PointerCount )
+		opt norefcounts
+		|| c = d.Type
+		|| ptrs = C.IsObject + D.PointerCount
+				
+		if (.WriteAPI)
+			T <~ C.APIStructName
+		  elseif !ptrs and d is Local
+			C.SimplerDataTypes(t, d)
+		  else
+			T <~ C.CStructName
+		T <~ ( '*', ptrs )
+
+
+	function SCClass.SimplerDataTypes (|faststring| fs, |scdecl| d)
+		if .IsDataTypeOnly
+			|| t = .TypeInfo
+			if (t.Count <= 1) and (t is Numeric)
+				if t.IsSigned
+					if t.ByteCount > 4
+						fs <~ "int64"
+					  else
+						fs <~ "int"
+				  else
+					if t.ByteCount > 4
+						fs <~ "uint64"
+					  else
+						fs <~ "uint"
+				if d is Param
+					fs <~ " /*"
+					fs <~ .cstructname
+					fs <~ "*/"
+				return 
+		fs <~ .CStructName
 
 
 	function C_RenderNum (fpMsgRenderCpp)
@@ -1361,11 +1383,10 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			// no point converting it ourselves...
 			fs <~ .name
 			fs <~ 'f'
+		  elseif num
+			fs <~ num
 		  else
-			if num
-				fs <~ num
-			  else
-				fs <~ .name
+			fs <~ .name
 
 
 	function C_RenderBra (fpMsgRenderCpp)
