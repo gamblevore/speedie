@@ -325,7 +325,9 @@ module SDLApp
 	
 	
 	function Scaling (assigns:|float| scale)
-		|| bigPx = (.SizeOrig.vec2/scale).ivec2
+		|| v1 = .SizeOrig.vec2
+		|| v2 = v1 / scale
+		|| bigPx = v2.ivec2
 		.Screen.sizeinfo = bigPx
 		|| r = .Renderer
 			.Raw = SDL_CreateTexture(r, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, bigPx.x, bigPx.y)

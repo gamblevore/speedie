@@ -1977,7 +1977,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112905269323369));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112906047532503));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3305,7 +3305,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[179]);
-	JB_FS_AppendInt32(_fsf0, (2024080419));
+	JB_FS_AppendInt32(_fsf0, (2024080423));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -5112,7 +5112,7 @@ void SC_LinkMap__CollectFromSource(SCFunction* Self, Message* Src, bool InBranch
 			}
 			if (JB_Ring_HasChildren(Msg)) {
 				if (!InBranch) {
-					ASMtmp T = SC_Msg_ASMType(Msg);
+					uint T = SC_Msg_ASMType(Msg);
 					InBranch = ((T == kSC__ASMtmp_kIf) or ((T == kSC__ASMtmp_kWhile) or (T == kSC__ASMtmp_kTern)));
 				}
 				SC_LinkMap__CollectFromSource(Self, Msg, InBranch);
@@ -8409,7 +8409,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024080419));
+	JB_FS_AppendInt32(_fsf0, (2024080423));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -9309,7 +9309,7 @@ void SC_VM_Builder__MakeMsgCreator(JB_String* Name, xC2xB5Form* Form) {
 		int _if0 = 0;
 		while (_if0 < Form->Count) {
 			int I = _if0;
-			ASMParam P = SC_xC2xB5Form_AccessInt(Form, _if0);
+			uint P = SC_xC2xB5Form_AccessInt(Form, _if0);
 			JB_String* Ty = JB_Incr(((JB_StringC*)JB_Ternary(SC_xC2xB5Param_IsReg(P), JB_LUB[1445], JB_LUB[232])));
 			JB_String* Pname = JB_Incr(SC_Msg_VMMsgArgName(F, I));
 			Message* Dcl = JB_Incr(SC_NewDeclWithStrStr(Ty, Pname));
@@ -12624,7 +12624,7 @@ SCObject* SC_TypeOfList(Message* Exp, SCNode* Name_space, Message* Side) {
 					HasBig = true;
 				}
 				if (JB_Object_MustBe(Typ, &SCDeclData, S)) {
-					DataTypeCode T = ((SCDecl*)Typ)->Type->TypeInfo;
+					uint T = ((SCDecl*)Typ)->Type->TypeInfo;
 					if (SC_Msg_IsZero(S)) {
 						AllowType = SC_TC_FloatIntMerge(T, AllowType, S);
 					}
@@ -13495,8 +13495,8 @@ int SC_UseCustomOperators(SCDecl* LC, SCDecl* RC, SCOperator* Comp, Message* Msg
 		return kSC__CustomOps_Needed;
 	}
 	bool CompOrSet = SC_Opp_IsCompSet(Comp);
-	DataTypeCode LNT = SC_Decl_TypeInfo(LC);
-	DataTypeCode RNT = SC_Decl_TypeInfo(RC);
+	uint LNT = SC_Decl_TypeInfo(LC);
+	uint RNT = SC_Decl_TypeInfo(RC);
 	int LN = SC_TC_NumericCountBoolsToo(LNT, LC);
 	int RN = SC_TC_NumericCountBoolsToo(RNT, RC);
 	if ((((OpMode)SC_OpMode_SyntaxCast(SC_Opp_SyntaxIs(Comp, kSC__OpMode_Comparison)))) and (JB_TC_IsSigned(LNT) != JB_TC_IsSigned(RNT))) {
@@ -13511,7 +13511,7 @@ int SC_UseCustomOperators(SCDecl* LC, SCDecl* RC, SCOperator* Comp, Message* Msg
 			if (CompOrSet) {
 				return kSC__CustomOps_Needed;
 			}
-			if (!JB_TC_SameBasicType(LNT, RNT)) {
+			if (JB_TC_Basictype(LNT) != JB_TC_Basictype(RNT)) {
 				JB_Msg_SyntaxExpect(MsgRel, JB_LUB[1314]);
 				return 0;
 			}
@@ -14843,7 +14843,7 @@ Message* JB_Tk__fYoda(int Start, Message* Parent) {
 Message* JB_Tk__GetFuncAfter(Message* Result) {
 	JB_Incr(Result);
 	while (true) {
-		int ThisAfter = kJB__Tk_kFuncAfterAny & (~JB__Tk__StopBars);
+		uint ThisAfter = kJB__Tk_kFuncAfterAny & (~JB__Tk__StopBars);
 		if (JB_Tk__NoFuncAfter(JB_Tk__NextByte())) {
 			ThisAfter = (ThisAfter & (~kJB__Tk_kFuncAfterNoSpace));
 		}
@@ -16500,7 +16500,7 @@ void SC_ASM__TestASMSub(Message* Tests) {
 }
 
 
-bool SC_ASMtmp_SyntaxIs(ASMtmp Self, ASMtmp T) {
+bool SC_ASMtmp_SyntaxIs(uint /*ASMtmp*/ Self, uint /*ASMtmp*/ T) {
 	return Self == T;
 }
 
@@ -16753,7 +16753,7 @@ AsmReg SC_ASMtmp__Dot(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 	Dest = SC_Pac_TempMe(Self, Exp, Dest);
 	AsmReg Obj = SC_Pac_Get(Self, ((Message*)JB_Ring_First(Exp)), Dest);
 	SCDecl* Prop = SC_Msg_ASMDecl(Exp);
-	DataTypeCode T = SC_Decl_TypeInfo(Prop);
+	uint T = SC_Decl_TypeInfo(Prop);
 	Dest = SC_Reg_xC2xB5TypeSet(Dest, T);
 	debugger;
 	int B = JB_Int_Log2(JB_TC_ByteCount(T));
@@ -16988,7 +16988,7 @@ AsmReg SC_ASMtmp__Ternary(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 	Message* Cond = ((Message*)JB_Ring_First(Prms));
 	Message* A = ((Message*)JB_Ring_NextSib(Cond));
 	Message* B = ((Message*)JB_Ring_NextSib(A));
-	DataTypeCode destType = SC_Msg_ASMDecl(Exp)->DType;
+	uint destType = SC_Msg_ASMDecl(Exp)->DType;
 	AsmReg mA = SC_Pac_ExistingVar(Self, A, destType);
 	AsmReg mB = SC_Pac_ExistingVar(Self, B, destType);
 	if ((mA != nil) and (mB != nil)) {
@@ -17052,7 +17052,7 @@ AsmReg SC_ASMtmp__TypeCast(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) 
 
 AsmReg SC_ASMtmp__TypeCastSub(ASMState* Self, Message* Exp, AsmReg Dest, AsmReg Sr) {
 	SCDecl* NewDecl = JB_Incr(SC_Msg_ASMDecl(Exp));
-	DataTypeCode NewType = SC_Decl_RegType(NewDecl);
+	uint NewType = SC_Decl_RegType(NewDecl);
 	JB_Decr(NewDecl);
 	if (!SC_Reg_Reg(Sr)) {
 		Sr = SC_Reg_xC2xB5TypeSet(Sr, NewType);
@@ -17061,7 +17061,7 @@ AsmReg SC_ASMtmp__TypeCastSub(ASMState* Self, Message* Exp, AsmReg Dest, AsmReg 
 	Message* _tmPf0 = JB_Incr(((Message*)JB_Ring_First(Exp)));
 	SCDecl* OldDecl = JB_Incr(SC_Msg_ASMDecl(_tmPf0));
 	JB_Decr(_tmPf0);
-	DataTypeCode OldType = SC_Decl_RegType(OldDecl);
+	uint OldType = SC_Decl_RegType(OldDecl);
 	JB_Decr(OldDecl);
 	if (JB_TC_Count(NewType) != JB_TC_Count(OldType)) {
 		debugger;
@@ -17266,7 +17266,7 @@ AsmReg SC_Reg_OperatorBitand(AsmReg Self, AsmReg A) {
 	return ((AsmReg)(((int64)Self) & ((int64)A)));
 }
 
-bool SC_Reg_OperatorIsa(AsmReg Self, DataTypeCode M) {
+bool SC_Reg_OperatorIsa(AsmReg Self, uint /*DataTypeCode*/ M) {
 	return SC_Reg_xC2xB5Type(Self) == M;
 }
 
@@ -17282,7 +17282,7 @@ AsmReg SC_Reg_OperatorxE2x80xA2(AsmReg Self, AsmReg Dest) {
 }
 
 int SC_Reg_PointerMul(AsmReg Self) {
-	DataTypeCode Ty = SC_Reg_xC2xB5Type(Self);
+	uint Ty = SC_Reg_xC2xB5Type(Self);
 	bool IsPtr = JB_TC_IsPointer(Ty);
 	if (IsPtr) {
 		if (JB_TC_SyntaxIs(Ty, kJB__TC_bool)) {
@@ -17309,7 +17309,7 @@ AsmReg SC_Reg_ReadOrWriteWithMsgRegInt(AsmReg Self, Message* M, AsmReg Ptr, int 
 FatASM* SC_Reg_ReadOrWriteWithMsgRegIntBool(AsmReg Self, Message* M, AsmReg Ptr, int Index, bool DoRead) {
 	Self = SC_Reg_OperatorAsnt(Self, kSC__Reg_ContainsAddr);
 	debugger;
-	DataTypeCode T = SC_Reg_xC2xB5Type(Self);
+	uint T = SC_Reg_xC2xB5Type(Self);
 	int BC = JB_TC_ByteCount(T);
 	int Bytes = JB_Int_Log2(BC);
 	if (Bytes > 4) {
@@ -17362,7 +17362,7 @@ DataTypeCode SC_Reg_xC2xB5Type(AsmReg Self) {
 	return ((DataTypeCode)Self);
 }
 
-AsmReg SC_Reg_xC2xB5TypeSet(AsmReg Self, DataTypeCode Value) {
+AsmReg SC_Reg_xC2xB5TypeSet(AsmReg Self, uint /*DataTypeCode*/ Value) {
 	uint64 Clear = (~((uint64)kJB__TC_PossibleBits));
 	return ((AsmReg)((((uint64)Self) & Clear) | Value));
 }
@@ -17414,26 +17414,26 @@ bool JB_CP_IsWhite(Codepoint Self) {
 
 
 
-int JB_TC__Shift(DataTypeCode Self) {
+int JB_TC__Shift(uint /*DataTypeCode*/ Self) {
 	return (Self >> 4) & 3;
 }
 
-int SC_TC_ASMConv(DataTypeCode Self, DataTypeCode To) {
+int SC_TC_ASMConv(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ To) {
 	return (SC_TC_ASMPart(To) << 2) | SC_TC_ASMPart(Self);
 }
 
-int SC_TC_ASMPart(DataTypeCode Self) {
+int SC_TC_ASMPart(uint /*DataTypeCode*/ Self) {
 	if (JB_TC_IsFloat(Self)) {
 		return 0 + (JB_TC_BitCount(Self) > 32);
 	}
 	return 2 + JB_TC_IsSigned(Self);
 }
 
-DataTypeCode JB_TC_Basictype(DataTypeCode Self) {
+DataTypeCode JB_TC_Basictype(uint /*DataTypeCode*/ Self) {
 	return Self & (128 + (8 + 3));
 }
 
-SCClass* SC_TC_Better_Numeric_Sub(DataTypeCode Self, DataTypeCode T, OpMode Op, Message* Where) {
+SCClass* SC_TC_Better_Numeric_Sub(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ T, OpMode Op, Message* Where) {
 	int Bme = JB_TC_ItemBitCount(Self);
 	int Bt = JB_TC_ItemBitCount(T);
 	int Bits = JB_int_OperatorMax(Bme, Bt);
@@ -17486,19 +17486,19 @@ SCClass* SC_TC_Better_Numeric_Sub(DataTypeCode Self, DataTypeCode T, OpMode Op, 
 	return SC_TypeByte;
 }
 
-int JB_TC_BitCount(DataTypeCode Self) {
+int JB_TC_BitCount(uint /*DataTypeCode*/ Self) {
 	return (JB_TC_Count(Self) << JB_TC__Shift(Self)) << 3;
 }
 
-int JB_TC_ByteCount(DataTypeCode Self) {
+int JB_TC_ByteCount(uint /*DataTypeCode*/ Self) {
 	return JB_TC_Count(Self) << JB_TC__Shift(Self);
 }
 
-int JB_TC_Count(DataTypeCode Self) {
+int JB_TC_Count(uint /*DataTypeCode*/ Self) {
 	return (Self & 3) + 1;
 }
 
-int SC_TC_FloatIntMerge(DataTypeCode Self, int Old, Message* S) {
+int SC_TC_FloatIntMerge(uint /*DataTypeCode*/ Self, int Old, Message* S) {
 	if (JB_TC_IsFloat(Self)) {
 		Old = (Old | 2);
 	}
@@ -17512,38 +17512,38 @@ int SC_TC_FloatIntMerge(DataTypeCode Self, int Old, Message* S) {
 	return Old;
 }
 
-bool JB_TC_IsFloat(DataTypeCode Self) {
+bool JB_TC_IsFloat(uint /*DataTypeCode*/ Self) {
 	return ((bool)((Self >> 7) & 1));
 }
 
-bool JB_TC_IsInt(DataTypeCode Self) {
+bool JB_TC_IsInt(uint /*DataTypeCode*/ Self) {
 	return (!JB_TC_IsFloat(Self));
 }
 
-bool JB_TC_IsNumeric(DataTypeCode Self) {
+bool JB_TC_IsNumeric(uint /*DataTypeCode*/ Self) {
 	return (((bool)(Self & kJB__TC_Numeric)));
 }
 
-bool JB_TC_IsPointer(DataTypeCode Self) {
+bool JB_TC_IsPointer(uint /*DataTypeCode*/ Self) {
 	return (!JB_TC_IsNumeric(Self));
 }
 
-bool JB_TC_IsSigned(DataTypeCode Self) {
+bool JB_TC_IsSigned(uint /*DataTypeCode*/ Self) {
 	return ((bool)((Self >> 6) & 1));
 }
 
-int JB_TC_ItemBitCount(DataTypeCode Self) {
+int JB_TC_ItemBitCount(uint /*DataTypeCode*/ Self) {
 	return 8 << JB_TC__Shift(Self);
 }
 
-int JB_TC_NumericCount(DataTypeCode Self) {
+int JB_TC_NumericCount(uint /*DataTypeCode*/ Self) {
 	if (((bool)(Self & kJB__TC_Numeric))) {
 		return JB_TC_Count(Self);
 	}
 	return 0;
 }
 
-int SC_TC_NumericCountBoolsToo(DataTypeCode Self, SCDecl* D) {
+int SC_TC_NumericCountBoolsToo(uint /*DataTypeCode*/ Self, SCDecl* D) {
 	if (((bool)(Self & kJB__TC_Numeric))) {
 		return JB_TC_Count(Self);
 	}
@@ -17556,11 +17556,7 @@ int SC_TC_NumericCountBoolsToo(DataTypeCode Self, SCDecl* D) {
 	return 0;
 }
 
-bool JB_TC_SameBasicType(DataTypeCode Self, DataTypeCode B) {
-	return (JB_TC_IsFloat(Self) == JB_TC_IsFloat(B));
-}
-
-DataTypeCode JB_TC_SetSigned(DataTypeCode Self, bool B) {
+DataTypeCode JB_TC_SetSigned(uint /*DataTypeCode*/ Self, bool B) {
 	if (B) {
 		return (Self) | (1 << 6);
 	}
@@ -17569,8 +17565,8 @@ DataTypeCode JB_TC_SetSigned(DataTypeCode Self, bool B) {
 	}
 }
 
-SCClass* SC_TC_SignedStuffClass(DataTypeCode Self) {
-	DataTypeCode S = JB_TC_SetSigned(Self, (!JB_TC_IsSigned(Self)));
+SCClass* SC_TC_SignedStuffClass(uint /*DataTypeCode*/ Self) {
+	uint S = JB_TC_SetSigned(Self, (!JB_TC_IsSigned(Self)));
 	Message* Keymsg = JB_Msg_ConstructorNormal(nil, kJB_SyxThg, JB_LUB[0]);
 	{
 		Dictionary* _LoopSrcf2 = JB_TC__Types();
@@ -17591,7 +17587,7 @@ SCClass* SC_TC_SignedStuffClass(DataTypeCode Self) {
 	return nil;
 }
 
-bool JB_TC_SyntaxIs(DataTypeCode Self, DataTypeCode M) {
+bool JB_TC_SyntaxIs(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ M) {
 	return (Self & kJB__TC_PossibleBits) == (M & kJB__TC_PossibleBits);
 }
 
@@ -18153,19 +18149,19 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, 
 
 
 
-int SC_xC2xB5Param_BitSize(ASMParam Self) {
+int SC_xC2xB5Param_BitSize(uint /*ASMParam*/ Self) {
 	return (Self & 31) + 1;
 }
 
-bool SC_xC2xB5Param_IsReg(ASMParam Self) {
+bool SC_xC2xB5Param_IsReg(uint /*ASMParam*/ Self) {
 	return (!SC_xC2xB5Param_SyntaxIs(Self, kSC__xC2xB5Param_Number));
 }
 
-bool SC_xC2xB5Param_SyntaxIs(ASMParam Self, ASMParam P) {
+bool SC_xC2xB5Param_SyntaxIs(uint /*ASMParam*/ Self, uint /*ASMParam*/ P) {
 	return (((bool)(Self & P)));
 }
 
-Macro* SC_xC2xB5Param_Which(ASMParam Self) {
+Macro* SC_xC2xB5Param_Which(uint /*ASMParam*/ Self) {
 	if (SC_xC2xB5Param_SyntaxIs(Self, kSC__xC2xB5Param_Jump)) {
 		return SC__VM_Builder_gyatt;
 	}
@@ -18895,7 +18891,7 @@ NilState SC_nil__Argument(Message* Msg, NilCheckMode Test) {
 	{
 		Message* S = ((Message*)JB_Ring_First(Msg));
 		while (S) {
-			NilCheckMode T = Test & (-JB_Tree_IsLast(S));
+			uint T = Test & (-JB_Tree_IsLast(S));
 			if ((SC_NilState_SyntaxIs(Rz, kSC__NilState_Borked)) and (!JB_Rec_OK(JB_StdErr))) {
 				break;
 			}
@@ -20183,7 +20179,7 @@ void SC_FatASM_FloatConvConst(FatASM* Self, FatASM* Src, int DestBitSize) {
 	}
 }
 
-void SC_FatASM_FloatIntConvConst(FatASM* Self, FatASM* Fat, DataTypeCode Src, DataTypeCode Dest) {
+void SC_FatASM_FloatIntConvConst(FatASM* Self, FatASM* Fat, uint /*DataTypeCode*/ Src, uint /*DataTypeCode*/ Dest) {
 	int Dbc = JB_TC_ByteCount(Dest);
 	void* F = ((void*)((&Fat->Const)));
 	void* D = ((void*)((&Self->Const)));
@@ -20405,7 +20401,7 @@ void SC_FatASM_Renda(FatASM* Self, FastString* Fs) {
 }
 
 void SC_FatASM_RendaKnst(FatASM* Self, FastString* Fs) {
-	DataTypeCode Ty = SC_Reg_xC2xB5Type(Self->Info);
+	uint Ty = SC_Reg_xC2xB5Type(Self->Info);
 	JB_FS_AppendString(Fs, JB_LUB[1631]);
 	if (JB_TC_IsInt(Ty)) {
 		JB_FS_AppendInt64(Fs, ((int64)Self->Const));
@@ -21382,7 +21378,7 @@ FatASM* SC_Pac_EqualsInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Messag
 	return Rz;
 }
 
-AsmReg SC_Pac_ExistingVar(ASMState* Self, Message* M, DataTypeCode destType) {
+AsmReg SC_Pac_ExistingVar(ASMState* Self, Message* M, uint /*DataTypeCode*/ destType) {
 	Syntax Fn = M->Func;
 	while ((Fn == kJB_SyxBra) or ((Fn == kJB_SyxType) and SC_Msg_TypeCastDoesNothing(M, destType))) {
 		M = ((Message*)JB_Ring_First(M));
@@ -21462,8 +21458,8 @@ AsmReg SC_Pac_FloatMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message*
 	return Rz;
 }
 
-AsmReg SC_Pac_ForceType(ASMState* Self, Message* Exp, DataTypeCode Expected, AsmReg PSent, int OldTmps) {
-	DataTypeCode PT = SC_Reg_xC2xB5Type(PSent);
+AsmReg SC_Pac_ForceType(ASMState* Self, Message* Exp, uint /*DataTypeCode*/ Expected, AsmReg PSent, int OldTmps) {
+	uint PT = SC_Reg_xC2xB5Type(PSent);
 	if (JB_TC_Count(Expected) != JB_TC_Count(PT)) {
 		debugger;
 	}
@@ -22138,7 +22134,7 @@ AsmReg SC_Pac_TryReuseThisTmp(ASMState* Self, Message* Exp, AsmReg V, int PrevTm
 }
 
 AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
-	ASMtmp Expasm = SC_Msg_ASMType(Exp);
+	uint Expasm = SC_Msg_ASMType(Exp);
 	fn_asm Fn = SC_fn_asm_table[Expasm];
 	if (!Expasm) {
 		Fn = SC_fn_asm_table[((int)Exp->Func)];
@@ -27351,7 +27347,7 @@ void SC_PA_AddSub(SCParamArray* Self, Message* M) {
 		JB_Msg_SyntaxExpect(M, JB_LUB[1260]);
 		return;
 	}
-	s16 I = Self->Size++;
+	int I = Self->Size++;
 	Self->Items[I] = M;
 }
 
@@ -29792,7 +29788,7 @@ bool SC_autoitem_OKBy(autoitem* Self, autoitem* Prev) {
 }
 
 
-void SC_xC2xB5Form_AddP(xC2xB5Form* Self, int Size, ASMParam P) {
+void SC_xC2xB5Form_AddP(xC2xB5Form* Self, int Size, uint /*ASMParam*/ P) {
 	if ((Size <= 0) or (Size > 32)) {
 		debugger;
 	}
@@ -31812,12 +31808,12 @@ SCDecl* SC_Msg_ASMDecl(Message* Self) {
 }
 
 ASMtmp SC_Msg_ASMType(Message* Self) {
-	ASMtmp Rz = 0;
+	uint Rz = 0;
 	Rz = (Self->Flags & 63);
 	return Rz;
 }
 
-void SC_Msg_ASMTypeSet(Message* Self, ASMtmp Value) {
+void SC_Msg_ASMTypeSet(Message* Self, uint /*ASMtmp*/ Value) {
 	if (JB_ObjectID(Self) == 0) {
 		debugger;
 	}
@@ -32562,7 +32558,7 @@ void SC_Msg_CheckSuperDotSave(Message* Self, JB_String* Name, bool ShouldBe) {
 void SC_Msg_Clean(Message* Self, bool Erl) {
 	int Pos = JB__Tk_Using.Position;
 	int Len = JB__Tk_Using.Length;
-	u16 Tag = JB__Tk_Using.Tag;
+	uint Tag = JB__Tk_Using.Tag;
 	Message* QEscape = nil;
 	Message* IgnoreArg = nil;
 	if (JB_FreeIfDead(JB_Class_Layer((&MessageData))) == JB_FreeIfDead(JB_Class_DefaultLayer((&MessageData)))) {
@@ -33860,7 +33856,7 @@ void SC_Msg_ExpectEmpty(Message* Self) {
 }
 
 bool SC_Msg_ExpectInt(Message* Self, SCDecl* Type) {
-	DataTypeCode Ty = Type->Type->TypeInfo;
+	uint Ty = Type->Type->TypeInfo;
 	if (JB_TC_ByteCount(Ty) > 4) {
 		JB_Msg_SyntaxExpect(Self, JB_LUB[2112]);
 		return nil;
@@ -34411,7 +34407,7 @@ Message* JB_Msg_FindTightest(Message* Self, int Pos, bool Named, bool SamePositi
 		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(Self));
 		while (((bool)Ch) and (Ch != _afterf1)) {
 			Message* _N_f2 = (((Message*)JB_Ring_FlatNext0(Ch)));
-			u16 R = Ch->RangeLength;
+			uint R = Ch->RangeLength;
 			if (!R) {
 				0;
 			}
@@ -38061,14 +38057,14 @@ void JB_Msg_SyntaxExpect(Message* Self, JB_String* Error) {
 	JB_Rec__NewErrorWithNode(Self, Error, nil);
 }
 
-bool JB_Msg_SyntaxIs(Message* Self, MsgParseFlags F) {
+bool JB_Msg_SyntaxIs(Message* Self, uint /*MsgParseFlags*/ F) {
 	if (Self) {
 		return ((bool)(Self->Flags & F));
 	}
 	return false;
 }
 
-void JB_Msg_SyntaxIsSet(Message* Self, MsgParseFlags F, bool Value) {
+void JB_Msg_SyntaxIsSet(Message* Self, uint /*MsgParseFlags*/ F, bool Value) {
 	if (Self) {
 		if (Value) {
 			Self->Flags = (Self->Flags | F);
@@ -38823,9 +38819,9 @@ void JB_Msg_Type__(Message* Self, FastString* Fs) {
 	JB_FS_AppendByte(Fs, '|');
 }
 
-bool SC_Msg_TypeCastDoesNothing(Message* Self, DataTypeCode Expected) {
+bool SC_Msg_TypeCastDoesNothing(Message* Self, uint /*DataTypeCode*/ Expected) {
 	Expected = SC_Msg_ASMDecl(((Message*)JB_Tree_Second(Self)))->DType;
-	DataTypeCode Src = SC_Msg_ASMDecl(((Message*)JB_Ring_First(Self)))->DType;
+	uint Src = SC_Msg_ASMDecl(((Message*)JB_Ring_First(Self)))->DType;
 	int XC = JB_TC_ByteCount(Expected);
 	int SC = JB_TC_ByteCount(Src);
 	if ((JB_TC_IsFloat(Expected) != JB_TC_IsFloat(Src)) or (JB_TC_Count(Src) != JB_TC_Count(Expected))) {
@@ -38837,8 +38833,8 @@ bool SC_Msg_TypeCastDoesNothing(Message* Self, DataTypeCode Expected) {
 	return JB_TC_IsInt(Expected) and (XC < SC);
 }
 
-void SC_Msg_TypeExpect(Message* Self, DataTypeCode* Ty, DataTypeCode In) {
-	DataTypeCode V = Ty[0];
+void SC_Msg_TypeExpect(Message* Self, DataTypeCode* Ty, uint /*DataTypeCode*/ In) {
+	uint V = Ty[0];
 	if (V) {
 		if ((V != In) and (!JB_TC_SyntaxIs(V, kJB__TC_Failed))) {
 			Ty[0] = kJB__TC_Failed;
@@ -39238,7 +39234,7 @@ int SC_Msg_WrapExpr(Message* Self, SCDecl* Src) {
 	return kJB_kCastedMatch;
 }
 
-void SC_Msg_WrapFloatOrInt(Message* Self, DataTypeCode T, int N, SCDecl* D) {
+void SC_Msg_WrapFloatOrInt(Message* Self, uint /*DataTypeCode*/ T, int N, SCDecl* D) {
 	if (!((!JB_TC_SyntaxIs(T, kJB__TC_Float)) and (!JB_TC_SyntaxIs(T, kJB__TC_Int)))) {
 		return;
 	}
@@ -39529,7 +39525,7 @@ SCDecl* SC_Decl_AsLocal(SCDecl* Self) {
 
 void SC_Decl_ASMSanity(SCDecl* Self) {
 	if (!(SC_Decl_IsCArray(Self) or (((bool)Self->PointerCount) or SC_Decl_IsObject(Self)))) {
-		u16 Size = Self->Type->Size;
+		uint Size = Self->Type->Size;
 		if (Size != JB_TC_ByteCount(Self->DType)) {
 			//"Should we have set the dtype when the decl was created? or at least verified in the nil-checker?";
 			//"We could change it if it is only 112.";
@@ -39595,11 +39591,10 @@ void SC_Decl_BecomeReal(SCDecl* Self) {
 }
 
 SCDecl* SC_Decl_Better_Numeric(SCDecl* Self, SCDecl* O, OpMode Mode, Message* Where) {
-	DataTypeCode S = Self->Type->TypeInfo;
-	DataTypeCode T = O->Type->TypeInfo;
+	uint S = Self->Type->TypeInfo;
+	uint T = O->Type->TypeInfo;
 	if (!SC_OpMode_SyntaxIs(Mode, kSC__OpMode_MakesSigned)) {
 		if (SC_OpMode_SyntaxIs(Mode, kSC__OpMode_LoseBits)) {
-			JB_DoAt(1);
 			if (JB_TC_Basictype(S) == JB_TC_Basictype(T)) {
 				if (JB_TC_ByteCount(S) < JB_TC_ByteCount(T)) {
 					return Self;
@@ -39709,8 +39704,8 @@ SCDecl* SC_Decl_CheckMath(SCDecl* Self, Message* Exp) {
 }
 
 bool SC_Decl_CompareUnclear(SCDecl* Self, SCDecl* D, bool MakesSenseVsZero) {
-	DataTypeCode L = SC_Decl_TypeInfo(Self);
-	DataTypeCode R = SC_Decl_TypeInfo(D);
+	uint L = SC_Decl_TypeInfo(Self);
+	uint R = SC_Decl_TypeInfo(D);
 	int Bitdiff = JB_TC_BitCount(L) - JB_TC_BitCount(R);
 	if (JB_TC_IsSigned(L) and (Bitdiff <= 0)) {
 		if (SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_DirectNumber)) {
@@ -39738,7 +39733,7 @@ bool SC_Decl_ConstInRange(SCDecl* Self, Message* RN, SCDecl* Rt) {
 }
 
 bool SC_Decl_ConstInRangeSub(SCDecl* Self, int64 Value) {
-	DataTypeCode T = Self->Type->TypeInfo;
+	uint T = Self->Type->TypeInfo;
 	int S = JB_TC_ByteCount(T);
 	if (S == 8) {
 		return true;
@@ -40158,7 +40153,7 @@ DataTypeCode SC_Decl_GameType(SCDecl* Self) {
 		return 0;
 	}
 	SCClass* T = JB_Incr(Self->Type);
-	DataTypeCode Ti = T->TypeInfo;
+	uint Ti = T->TypeInfo;
 	if (!JB_TC_IsNumeric(Ti)) {
 		FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 		JB_FS_AppendString(_fsf0, JB_LUB[1120]);
@@ -40270,7 +40265,7 @@ SCDecl* SC_Decl_HighestMatch(SCDecl* Self, SCDecl* Other, Message* Exp) {
 }
 
 bool SC_Decl_IntsOnly(SCDecl* Self, Message* Exp) {
-	DataTypeCode T = Self->Type->TypeInfo;
+	uint T = Self->Type->TypeInfo;
 	if (SC_Decl_IsNormalNumber(Self) and JB_TC_IsInt(T)) {
 		return true;
 	}
@@ -40451,7 +40446,7 @@ void SC_Decl_IsTypeImproveSet(SCDecl* Self, bool Value) {
 }
 
 bool SC_Decl_IsUintLike(SCDecl* Self) {
-	DataTypeCode T = Self->Type->TypeInfo;
+	uint T = Self->Type->TypeInfo;
 	if (SC_Decl_IsNormal(Self) and JB_TC_IsInt(T)) {
 		return (!JB_TC_IsSigned(T));
 	}
@@ -40976,7 +40971,7 @@ AsmReg SC_Decl_Reg(SCDecl* Self) {
 }
 
 DataTypeCode SC_Decl_RegType(SCDecl* Self) {
-	DataTypeCode Rz = kJB__TC_UnusedType;
+	uint Rz = kJB__TC_UnusedType;
 	if (Self) {
 		SCClass* Ty = Self->Type;
 		if ((((bool)(Self->C_Array | SC_Class_IsStruct(Ty))))) {
@@ -44973,7 +44968,7 @@ int SC_Class_CalculateSize(SCClass* Self, int Depth) {
 }
 
 int SC_Class_CalculateSizeRaw(SCClass* Self, int Depth) {
-	u16 Si = Self->Size;
+	uint Si = Self->Size;
 	if (Si) {
 		return Si;
 	}
@@ -45535,7 +45530,7 @@ void SC_Class_DataTypePostLoad(SCClass* Self) {
 	JB_Decr(N);
 	JB_Decr(_tmPf0);
 	if (Td) {
-		DataTypeCode T = ((DataTypeCode)JB_Wrap_SyntaxAccess(Td));
+		uint T = ((DataTypeCode)JB_Wrap_SyntaxAccess(Td));
 		if (T != 255) {
 			Self->Size = JB_TC_ByteCount(T);
 			if ((T == kJB__TC_Vec3) or (T == kJB__TC_iVec3)) {
@@ -46360,7 +46355,7 @@ JB_String* SC_Class_LoadSaverSub(SCClass* Self) {
 		}
 	}
 	 else if ((bool)SC_Class_NumericCount(Self)) {
-		DataTypeCode D = Self->TypeInfo;
+		uint D = Self->TypeInfo;
 		if (JB_TC_IsFloat(D)) {
 			if (JB_TC_ItemBitCount(D) == 32) {
 				return JB_LUB[231];
@@ -46939,8 +46934,11 @@ bool SC_Class_RenderSaveableSub(SCClass* Self, FastString* Fs) {
 
 void SC_Class_SimplerDataTypes(SCClass* Self, FastString* Fs, SCDecl* D) {
 	if (SC_Class_IsDataTypeOnly(Self)) {
-		DataTypeCode T = Self->TypeInfo;
-		if ((JB_TC_Count(T) <= 1) and (JB_TC_IsNumeric(T))) {
+		uint T = Self->TypeInfo;
+		if ((JB_TC_Count(T) <= 1) and ((JB_TC_IsNumeric(T)) and (JB_TC_ByteCount(T) < 4))) {
+			if (JB_TC_IsFloat(T)) {
+				debugger;
+			}
 			if (JB_TC_IsSigned(T)) {
 				if (JB_TC_ByteCount(T) > 4) {
 					JB_FS_AppendString(Fs, JB_LUB[554]);
@@ -48993,7 +48991,7 @@ void SC_Func_FillInSaver(SCFunction* Self, JB_String* Name) {
 			}
 			JB_FS_AppendString(Fs, JB_LUB[49]);
 			int Count = Item->C_Array;
-			DataTypeCode T = Item->Type->TypeInfo;
+			uint T = Item->Type->TypeInfo;
 			bool AppendAsData = (((bool)JB_TC__Shift(T)) and JB_TC_IsFloat(T));
 			if ((!AppendAsData) and ((bool)Count)) {
 				//;
@@ -53390,4 +53388,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -6925131730253645308 2807647358008745034
+// 324715645857365049 2807647358008745034

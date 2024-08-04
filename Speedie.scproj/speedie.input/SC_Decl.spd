@@ -199,7 +199,6 @@ class SCDecl (SCNamed) {
 		|| T = o.type.typeinfo
 		if mode isnt MakesSigned
 			if (mode is losebits)
-				debugat
 				if (s.basictype == t.basictype)
 					if s.bytecount < T.bytecount
 						return self

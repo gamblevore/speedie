@@ -4529,7 +4529,7 @@ void SC_ASM__TestASMSub(Message* Tests);
 
 
 // ASMtmp
-bool SC_ASMtmp_SyntaxIs(ASMtmp Self, ASMtmp T);
+bool SC_ASMtmp_SyntaxIs(uint /*ASMtmp*/ Self, uint /*ASMtmp*/ T);
 
 AsmReg SC_ASMtmp__Access(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
@@ -4656,7 +4656,7 @@ AsmReg SC_Reg_OperatorAsnt(AsmReg Self, AsmReg A);
 
 AsmReg SC_Reg_OperatorBitand(AsmReg Self, AsmReg A);
 
-bool SC_Reg_OperatorIsa(AsmReg Self, DataTypeCode M);
+bool SC_Reg_OperatorIsa(AsmReg Self, uint /*DataTypeCode*/ M);
 
 AsmReg SC_Reg_OperatorMul(AsmReg Self, bool B);
 
@@ -4682,7 +4682,7 @@ AsmReg SC_Reg_SyntaxIsSet(AsmReg Self, AsmReg R, bool Value);
 
 DataTypeCode SC_Reg_xC2xB5Type(AsmReg Self);
 
-AsmReg SC_Reg_xC2xB5TypeSet(AsmReg Self, DataTypeCode Value);
+AsmReg SC_Reg_xC2xB5TypeSet(AsmReg Self, uint /*DataTypeCode*/ Value);
 
 AsmReg SC_Reg__New();
 
@@ -4726,47 +4726,45 @@ bool JB_CP_IsWhite(Codepoint Self);
 
 
 // DataTypeCode
-int JB_TC__Shift(DataTypeCode Self);
+int JB_TC__Shift(uint /*DataTypeCode*/ Self);
 
-int SC_TC_ASMConv(DataTypeCode Self, DataTypeCode To);
+int SC_TC_ASMConv(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ To);
 
-int SC_TC_ASMPart(DataTypeCode Self);
+int SC_TC_ASMPart(uint /*DataTypeCode*/ Self);
 
-DataTypeCode JB_TC_Basictype(DataTypeCode Self);
+DataTypeCode JB_TC_Basictype(uint /*DataTypeCode*/ Self);
 
-SCClass* SC_TC_Better_Numeric_Sub(DataTypeCode Self, DataTypeCode T, OpMode Op, Message* Where);
+SCClass* SC_TC_Better_Numeric_Sub(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ T, OpMode Op, Message* Where);
 
-int JB_TC_BitCount(DataTypeCode Self);
+int JB_TC_BitCount(uint /*DataTypeCode*/ Self);
 
-int JB_TC_ByteCount(DataTypeCode Self);
+int JB_TC_ByteCount(uint /*DataTypeCode*/ Self);
 
-int JB_TC_Count(DataTypeCode Self);
+int JB_TC_Count(uint /*DataTypeCode*/ Self);
 
-int SC_TC_FloatIntMerge(DataTypeCode Self, int Old, Message* S);
+int SC_TC_FloatIntMerge(uint /*DataTypeCode*/ Self, int Old, Message* S);
 
-bool JB_TC_IsFloat(DataTypeCode Self);
+bool JB_TC_IsFloat(uint /*DataTypeCode*/ Self);
 
-bool JB_TC_IsInt(DataTypeCode Self);
+bool JB_TC_IsInt(uint /*DataTypeCode*/ Self);
 
-bool JB_TC_IsNumeric(DataTypeCode Self);
+bool JB_TC_IsNumeric(uint /*DataTypeCode*/ Self);
 
-bool JB_TC_IsPointer(DataTypeCode Self);
+bool JB_TC_IsPointer(uint /*DataTypeCode*/ Self);
 
-bool JB_TC_IsSigned(DataTypeCode Self);
+bool JB_TC_IsSigned(uint /*DataTypeCode*/ Self);
 
-int JB_TC_ItemBitCount(DataTypeCode Self);
+int JB_TC_ItemBitCount(uint /*DataTypeCode*/ Self);
 
-int JB_TC_NumericCount(DataTypeCode Self);
+int JB_TC_NumericCount(uint /*DataTypeCode*/ Self);
 
-int SC_TC_NumericCountBoolsToo(DataTypeCode Self, SCDecl* D);
+int SC_TC_NumericCountBoolsToo(uint /*DataTypeCode*/ Self, SCDecl* D);
 
-bool JB_TC_SameBasicType(DataTypeCode Self, DataTypeCode B);
+DataTypeCode JB_TC_SetSigned(uint /*DataTypeCode*/ Self, bool B);
 
-DataTypeCode JB_TC_SetSigned(DataTypeCode Self, bool B);
+SCClass* SC_TC_SignedStuffClass(uint /*DataTypeCode*/ Self);
 
-SCClass* SC_TC_SignedStuffClass(DataTypeCode Self);
-
-bool JB_TC_SyntaxIs(DataTypeCode Self, DataTypeCode M);
+bool JB_TC_SyntaxIs(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ M);
 
 Dictionary* JB_TC__Types();
 
@@ -5034,13 +5032,13 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, 
 
 
 // µParam
-int SC_xC2xB5Param_BitSize(ASMParam Self);
+int SC_xC2xB5Param_BitSize(uint /*ASMParam*/ Self);
 
-bool SC_xC2xB5Param_IsReg(ASMParam Self);
+bool SC_xC2xB5Param_IsReg(uint /*ASMParam*/ Self);
 
-bool SC_xC2xB5Param_SyntaxIs(ASMParam Self, ASMParam P);
+bool SC_xC2xB5Param_SyntaxIs(uint /*ASMParam*/ Self, uint /*ASMParam*/ P);
 
-Macro* SC_xC2xB5Param_Which(ASMParam Self);
+Macro* SC_xC2xB5Param_Which(uint /*ASMParam*/ Self);
 
 
 
@@ -5603,7 +5601,7 @@ void SC_FatASM_FillLabelRequest(FatASM* Self, ASM* Start, ASM* After, int Reg);
 
 void SC_FatASM_FloatConvConst(FatASM* Self, FatASM* Src, int DestBitSize);
 
-void SC_FatASM_FloatIntConvConst(FatASM* Self, FatASM* Fat, DataTypeCode Src, DataTypeCode Dest);
+void SC_FatASM_FloatIntConvConst(FatASM* Self, FatASM* Fat, uint /*DataTypeCode*/ Src, uint /*DataTypeCode*/ Dest);
 
 xC2xB5Form* SC_FatASM_Form(FatASM* Self);
 
@@ -5933,7 +5931,7 @@ AsmReg SC_Pac_Equals(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* E
 
 FatASM* SC_Pac_EqualsInt(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-AsmReg SC_Pac_ExistingVar(ASMState* Self, Message* M, DataTypeCode destType);
+AsmReg SC_Pac_ExistingVar(ASMState* Self, Message* M, uint /*DataTypeCode*/ destType);
 
 double SC_Pac_f(ASMState* Self, AsmReg R);
 
@@ -5945,7 +5943,7 @@ void SC_Pac_FinishASM(ASMState* Self);
 
 AsmReg SC_Pac_FloatMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-AsmReg SC_Pac_ForceType(ASMState* Self, Message* Exp, DataTypeCode Expected, AsmReg PSent, int OldTmps);
+AsmReg SC_Pac_ForceType(ASMState* Self, Message* Exp, uint /*DataTypeCode*/ Expected, AsmReg PSent, int OldTmps);
 
 AsmReg SC_Pac_FoundCode(ASMState* Self, int I, uint64 Value, AsmReg Typeinfo);
 
@@ -7402,7 +7400,7 @@ bool SC_autoitem_OKBy(autoitem* Self, autoitem* Prev);
 
 
 // JB_µForm
-void SC_xC2xB5Form_AddP(xC2xB5Form* Self, int Size, ASMParam P);
+void SC_xC2xB5Form_AddP(xC2xB5Form* Self, int Size, uint /*ASMParam*/ P);
 
 void SC_xC2xB5Form_AddRemainder(xC2xB5Form* Self, int U);
 
@@ -7778,7 +7776,7 @@ SCDecl* SC_Msg_ASMDecl(Message* Self);
 
 ASMtmp SC_Msg_ASMType(Message* Self);
 
-void SC_Msg_ASMTypeSet(Message* Self, ASMtmp Value);
+void SC_Msg_ASMTypeSet(Message* Self, uint /*ASMtmp*/ Value);
 
 void SC_Msg_AssignsFix(Message* Self, SCFunction* F);
 
@@ -8604,9 +8602,9 @@ bool JB_Msg_EqualsSyx(Message* Self, Syntax X, bool Aware);
 
 void JB_Msg_SyntaxExpect(Message* Self, JB_String* Error);
 
-bool JB_Msg_SyntaxIs(Message* Self, MsgParseFlags F);
+bool JB_Msg_SyntaxIs(Message* Self, uint /*MsgParseFlags*/ F);
 
-void JB_Msg_SyntaxIsSet(Message* Self, MsgParseFlags F, bool Value);
+void JB_Msg_SyntaxIsSet(Message* Self, uint /*MsgParseFlags*/ F, bool Value);
 
 void JB_Msg_SyntaxProblem(Message* Self, JB_String* Error);
 
@@ -8674,9 +8672,9 @@ int SC_Msg_TryImproveShiftConstants(Message* Self, SCDecl* LC, SCDecl* RC);
 
 void JB_Msg_Type__(Message* Self, FastString* Fs);
 
-bool SC_Msg_TypeCastDoesNothing(Message* Self, DataTypeCode Expected);
+bool SC_Msg_TypeCastDoesNothing(Message* Self, uint /*DataTypeCode*/ Expected);
 
-void SC_Msg_TypeExpect(Message* Self, DataTypeCode* Ty, DataTypeCode In);
+void SC_Msg_TypeExpect(Message* Self, DataTypeCode* Ty, uint /*DataTypeCode*/ In);
 
 Message* SC_Msg_TypeOfArrItem(Message* Self);
 
@@ -8738,7 +8736,7 @@ FatASM* JB_Msg_WR8U(Message* Self, AsmReg R1, AsmReg R2, AsmReg R3, int L, int M
 
 int SC_Msg_WrapExpr(Message* Self, SCDecl* Src);
 
-void SC_Msg_WrapFloatOrInt(Message* Self, DataTypeCode T, int N, SCDecl* D);
+void SC_Msg_WrapFloatOrInt(Message* Self, uint /*DataTypeCode*/ T, int N, SCDecl* D);
 
 Message* SC_Msg_WrapWith(Message* Self, Syntax F, JB_String* S);
 
@@ -10517,7 +10515,7 @@ inline NilRecord SC_nil__EndBlock() {
 }
 
 inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
-	ASMtmp T = SC_Msg_ASMType(Msg);
+	uint T = SC_Msg_ASMType(Msg);
 	if (T) {
 		return (SC__nil_NilTable[T])(Msg, Test);
 	}

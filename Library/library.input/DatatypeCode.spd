@@ -61,8 +61,8 @@ datatype DataTypeCode (uint16)
 		
 		UnusedType = int64 &~ 8
 	
-	function Basictype (|datatypecode|) // for comparing most stuff but not all
-		return self & (128 + 8 + 3)
+	function Basictype (|datatypecode|) // compares floatness, vector-size, and "isnumericness"
+		return self & (128 + 8 + 3)		// ignores bit-size and signedness.
 	
 	syntax is (|datatypecode| M, |bool|)
 		return self&PossibleBits == M&PossibleBits
