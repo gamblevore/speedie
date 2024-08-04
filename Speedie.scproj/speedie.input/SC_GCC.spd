@@ -413,7 +413,6 @@ function ShouldTransComp (|bool|)
 		"Already up to date"
 
 
-
 function TransCompile (|[File]| Files, |String| Dest, |string| Type, |bool|)
 	if !Files
 		return true // awesome
@@ -426,7 +425,7 @@ function TransCompile (|[File]| Files, |String| Dest, |string| Type, |bool|)
 		print	 "\n ${cppcompilerpath} "
 		printline CompileString.Join(" ")
 	
-	app.sleep(0.125s)
+//	app.sleep(0.125s)
 	return .ExecuteGCC( CompileString )
 
 
@@ -599,11 +598,6 @@ function array.AddCStr (|array of string| self, |string| s)
 function array.AppendWords (|array of string| self, |string| R)
 	for S in R / ' '
 		.AddCStr(s)
-
-
-//function array.testadd (|array of string| self, |string| s)
-//	opt norefcounts
-//	self <~ s
 
 
 function string.MakeAndGoInto (|File|)

@@ -78,8 +78,8 @@ function SCNode.CalculateConstRel (|message!| value, |&datatypecode| Ty, |uint64
 	
 
 function SCNode.CalculateConst (|message!| value, |uint64|)
-	|datatypecode| Ty = 0
-	return .CalculateConst(value, ty)
+	|datatypecode[1]| Ty
+	return .CalculateConst(value, &ty[0])
 
 
 function message.TypeExpect (|&datatypecode| Ty, |datatypecode| In)
@@ -345,9 +345,9 @@ function compiler.CollectConstants
 
 
 function datatypecode.NumericCountBoolsToo (|scdecl| D, |int|)
-	if (Self & numeric)
+	if Self & numeric
 		return .count
-	if !self
+	if self & bool
 		return 1
 	if scnode.ConstantsLoadingOverride and d is const
 		return .count

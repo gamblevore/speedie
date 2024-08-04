@@ -61,6 +61,8 @@ struct Register {
 		double			Double;
 		ivec4			Ivec;
 		vec4			Vec;
+		int				Int32;
+		uint			Uint32;
 	};
 };
 

@@ -934,40 +934,35 @@ module
 	
 
 	function SCClass.DataTypePostLoad
-		require .IsDataTypeOnly
-//		"A"
+		require .IsDataTypeOnly and self ~!= "_void"
+
 		|| node = .Source
 		|| sup = .super
 			.Size = sup.Size
-			if !.NumericReduction
-//				"A2"
-				.TypeInfo = sup.TypeInfo
+			.TypeInfo = sup.TypeInfo
+			|| nr = .NumericReduction
+				if nr & classinfo.symbol
+					.typeinfo = .typeinfo &~ datatypecode.numeric
+			  else
 				.defawlt := sup.defawlt
-//		"B"
-		|| N		= .name.lowercase
-//		printline N
-//		"B1"
-		|| Td		= DataTypeCode.Types[n]
-//			"B2"
+		
+		|| N = .name.lowercase
+		|| Td = DataTypeCode.Types[n]
 			|| t = td[]
-//			"B3"
 			if T != 255
-//				"B4"
 				.size = T.ByteCount
-//				"C"
 				if t == datatypecode.Vec3 or datatypecode.iVec3
 					.size = 16 // sigh 
 				.TypeInfo	= T
 				is Builtin
-//				"D"
 				require T.isint and !.Signed
 				|| s2		= t.SignedStuffClass
-//					"E"
 					.Signed		= s2.typenormal
 					s2.Signed	= .typenormal
-//		"F"
-		expect (sup or .HasGameType) (node, "Datatypes must subclass off another type")
-//		"G"
+			  else
+				debugger // what?
+		  else
+			check  (sup)  (node, "Datatypes must subclass off another type")
 	
 	
 	function datatypecode.SignedStuffClass (|scclass|)

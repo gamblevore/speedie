@@ -935,13 +935,21 @@ function string.GetSpeedieProj (|string|)
 function perryide.IDECommand (|bool|)
 	// this should be a window really!
 	|| cmd = "Enter Command".ask $
+	|| s = .editme.SelText
 	if cmd ~= "beep"
 		for 2s
 			beep
-      elseif cmd ~= "cr_fix"
-		.editme.beep = .EditMe.seltext.ReplaceAll("\r\n", "\r").ReplaceAll("\r", "\n")
+      elseif cmd ~= "cr_fix" // "line_fix"
+		.editme.beep = s.ReplaceAll("\r\n", "\r").ReplaceAll("\r", "\n")
 	  elseif cmd ~= "cr_use"
-		.editme.beep = .EditMe.seltext.ReplaceAll("\n", "\r\n")
+		.editme.beep = s.ReplaceAll("\n", "\r\n")
+	  elseif cmd ~= "str"
+		|| s2 = s.parse
+		if s2 == @arg
+			s2 = s2.first
+		.editme.beep = s2.name
+	  elseif cmd ~= "render"
+		.editme.beep = s.parse.Render
 	  else
 		beep "unrecognised: " + cmd
 
@@ -950,3 +958,122 @@ function textview.beep (assigns:|string| s)
 	expect (.text != s) (beep)
 	.SelText = s
 
+/*
+
+/tmp/Speedie/Perry/JB.cpp:631:41: error: non-constant-expression cannot be narrowed from type 'int' to 'float' in initializer list [-Wc++11-narrowing]
+        return ((FloatRangeConverterBasic)vec2{(-Lfrom), 1.0f / (Hfrom - Lfrom)});
+                                               ^~~~~~~~
+/tmp/Speedie/Perry/JB.cpp:631:41: note: insert an explicit cast to silence this issue
+        return ((FloatRangeConverterBasic)vec2{(-Lfrom), 1.0f / (Hfrom - Lfrom)});
+                                               ^~~~~~~~
+                                               static_cast<float>( )
+/tmp/Speedie/Perry/JB.cpp:2763:66: error: cannot convert between scalar type 'int' and vector type 'vec2' (vector of 2 'float' values) as implicit conversion would cause truncation
+        ivec2 bigPx = JB_vec2_iVec2((JB_ivec2_Vec2(GUI_App__SizeOrig()) / Scale));
+                                                                        ^
+/tmp/Speedie/Perry/JB.cpp:4537:31: error: cannot convert between scalar type 'int' and vector type 'vec4' (vector of 4 'float' values) as implicit conversion would cause truncation
+        return (A * (1.0f - F)) + (B * F);
+                                     ^
+/tmp/Speedie/Perry/JB.cpp:5044:32: error: non-constant-expression cannot be narrowed from type 'int' to 'float' in initializer list [-Wc++11-narrowing]
+        return vec4{A[0], A[1], A[2], B};
+                                      ^
+/tmp/Speedie/Perry/JB.cpp:5044:32: note: insert an explicit cast to silence this issue
+        return vec4{A[0], A[1], A[2], B};
+                                      ^
+                                      static_cast<float>( )
+/tmp/Speedie/Perry/JB.cpp:7463:52: error: cannot convert between scalar type 'int' and vector type 'vec2' (vector of 2 'float' values) as implicit conversion would cause truncation
+        return vec2{((float)(H >> 32)), ((float)(H & M))} * S;
+                                                          ^
+/tmp/Speedie/Perry/JB.cpp:8014:14: error: non-constant-expression cannot be narrowed from type 'int' to 'float' in initializer list [-Wc++11-narrowing]
+        return vec4{F, F, F, F};
+                    ^
+/tmp/Speedie/Perry/JB.cpp:8014:14: note: insert an explicit cast to silence this issue
+        return vec4{F, F, F, F};
+                    ^
+                    static_cast<float>( )
+/tmp/Speedie/Perry/JB.cpp:8014:17: error: non-constant-expression cannot be narrowed from type 'int' to 'float' in initializer list [-Wc++11-narrowing]
+        return vec4{F, F, F, F};
+                       ^
+/tmp/Speedie/Perry/JB.cpp:8014:17: note: insert an explicit cast to silence this issue
+        return vec4{F, F, F, F};
+                       ^
+                       static_cast<float>( )
+/tmp/Speedie/Perry/JB.cpp:8014:20: error: non-constant-expression cannot be narrowed from type 'int' to 'float' in initializer list [-Wc++11-narrowing]
+        return vec4{F, F, F, F};
+                          ^
+/tmp/Speedie/Perry/JB.cpp:8014:20: note: insert an explicit cast to silence this issue
+        return vec4{F, F, F, F};
+                          ^
+                          static_cast<float>( )
+/tmp/Speedie/Perry/JB.cpp:8014:23: error: non-constant-expression cannot be narrowed from type 'int' to 'float' in initializer list [-Wc++11-narrowing]
+        return vec4{F, F, F, F};
+                             ^
+/tmp/Speedie/Perry/JB.cpp:8014:23: note: insert an explicit cast to silence this issue
+        return vec4{F, F, F, F};
+                             ^
+                             static_cast<float>( )
+/tmp/Speedie/Perry/JB.cpp:8018:14: error: non-constant-expression cannot be narrowed from type 'int' to 'float' in initializer list [-Wc++11-narrowing]
+        return vec4{G, G, G, A};
+                    ^
+/tmp/Speedie/Perry/JB.cpp:8018:14: note: insert an explicit cast to silence this issue
+        return vec4{G, G, G, A};
+                    ^
+                    static_cast<float>( )
+/tmp/Speedie/Perry/JB.cpp:8018:17: error: non-constant-expression cannot be narrowed from type 'int' to 'float' in initializer list [-Wc++11-narrowing]
+        return vec4{G, G, G, A};
+                       ^
+/tmp/Speedie/Perry/JB.cpp:8018:17: note: insert an explicit cast to silence this issue
+        return vec4{G, G, G, A};
+                       ^
+                       static_cast<float>( )
+/tmp/Speedie/Perry/JB.cpp:8018:20: error: non-constant-expression cannot be narrowed from type 'int' to 'float' in initializer list [-Wc++11-narrowing]
+        return vec4{G, G, G, A};
+                          ^
+/tmp/Speedie/Perry/JB.cpp:8018:20: note: insert an explicit cast to silence this issue
+        return vec4{G, G, G, A};
+                          ^
+                          static_cast<float>( )
+/tmp/Speedie/Perry/JB.cpp:8018:23: error: non-constant-expression cannot be narrowed from type 'int' to 'float' in initializer list [-Wc++11-narrowing]
+        return vec4{G, G, G, A};
+                             ^
+/tmp/Speedie/Perry/JB.cpp:8018:23: note: insert an explicit cast to silence this issue
+        return vec4{G, G, G, A};
+                             ^
+                             static_cast<float>( )
+/tmp/Speedie/Perry/JB.cpp:8022:14: error: non-constant-expression cannot be narrowed from type 'int' to 'float' in initializer list [-Wc++11-narrowing]
+        return vec4{A, B, C, D};
+                    ^
+/tmp/Speedie/Perry/JB.cpp:8022:14: note: insert an explicit cast to silence this issue
+        return vec4{A, B, C, D};
+                    ^
+                    static_cast<float>( )
+/tmp/Speedie/Perry/JB.cpp:8022:17: error: non-constant-expression cannot be narrowed from type 'int' to 'float' in initializer list [-Wc++11-narrowing]
+        return vec4{A, B, C, D};
+                       ^
+/tmp/Speedie/Perry/JB.cpp:8022:17: note: insert an explicit cast to silence this issue
+        return vec4{A, B, C, D};
+                       ^
+                       static_cast<float>( )
+/tmp/Speedie/Perry/JB.cpp:8022:20: error: non-constant-expression cannot be narrowed from type 'int' to 'float' in initializer list [-Wc++11-narrowing]
+        return vec4{A, B, C, D};
+                          ^
+/tmp/Speedie/Perry/JB.cpp:8022:20: note: insert an explicit cast to silence this issue
+        return vec4{A, B, C, D};
+                          ^
+                          static_cast<float>( )
+/tmp/Speedie/Perry/JB.cpp:8022:23: error: non-constant-expression cannot be narrowed from type 'int' to 'float' in initializer list [-Wc++11-narrowing]
+        return vec4{A, B, C, D};
+                             ^
+/tmp/Speedie/Perry/JB.cpp:8022:23: note: insert an explicit cast to silence this issue
+        return vec4{A, B, C, D};
+                             ^
+                             static_cast<float>( )
+/tmp/Speedie/Perry/JB.cpp:10665:62: error: cannot convert between scalar type 'int' and vector type 'vec4' (vector of 4 'float' values) as implicit conversion would cause truncation
+                GUI_pix_AppendVec((&Self->BG), (GUI_pix_Color((&Self->BG)) * S));
+                                                                           ^
+/tmp/Speedie/Perry/JB.cpp:15007:14: error: cannot convert between scalar type 'int' and vector type 'vec4' (vector of 4 'float' values) as implicit conversion would cause truncation
+        vec4 C2 = C * Fade;
+                    ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+
+*/

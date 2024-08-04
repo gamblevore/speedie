@@ -54,10 +54,10 @@ class DataObject
 
 
 	render
-		visible //hmmm
+		visible // hmmm
 		if .datatype.isfloat
 			fs <~ .FloatValue
-		  elseif .datatype == datatypecode.unusedtype
+		  elseif .datatype isnt numeric
 			fs <~ "0x"
 			fs.appendhex(.privvalue)
 		  elseif .datatype == datatypecode.bool	

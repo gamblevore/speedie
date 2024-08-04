@@ -27,9 +27,10 @@ struct JeeboxEffects
 
 	helper MakeSubBoxes (|image| img, |int| Size, |float| opacity=1.0)
 		opt norefcounts
+		|| ccc = .cols[.rnd.int & 7]
 		|| a = (opacity * 255.0)|int|
 		for r in img.tile((size, size))
-			|| c = .cols[.rnd.int&7]
+			|| c = .cols[.rnd.int & 7]
 			c.a = a
 			img.RectBasic(r, c)
 			

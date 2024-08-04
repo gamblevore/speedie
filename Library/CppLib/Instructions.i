@@ -59,14 +59,14 @@
 ı DIVV: _
 	DivMath(r, Op);
 ı MAX: _
-	if Cmp_Cmpu 
+	if (MinMax_Signu) 
 	i1 = std_max(i2, i3)
 ;
 	else 
 	u1 = std_max(u2, u3)
 ;
 ı MIN: _
-	if Cmp_Cmpu 
+	if (MinMax_Signu) 
 	i1 = std_min(i2, i3)
 ;
 	else 
@@ -93,6 +93,8 @@
 	else 
 	u1 = ((u2 << BFLD_upu) >> BFLD_downu)
 ;
+ı BSTT: _
+	i1 = 0;
 ı BCLR: _
 	BitClear(r, Op);
 ı CMPB: _

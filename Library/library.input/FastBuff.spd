@@ -87,19 +87,6 @@ struct FastBuff
 		.curr = b
 		Memory.Copy(Dest, A, rz)
 		
-	function Remaining (|int64|)
-		return .end - .curr
-
-	function Position (|int64|)
-		return .curr - .start
-		
-	setter Position (|int64|)
-		|| c = .start + value
-		if c < .start or c > .end
-			error (self, "Stream read too far")
-			c = .end
-		.curr = c
-		
 	function Byte (|byte|)
 		return .curr++[]
 	
@@ -149,13 +136,27 @@ struct FastBuff
 	function Length (|int|)
 		description "Returns the actual filled length of the data." 
 		if self
-			return .curr - .start
+			return .position // hmmm
 	
 	function Size (|int|)
 		description "Returns the buffer-size including both used and unused data." 
 		if self
 			return .end - .start
+
+	function Remaining (|int|)
+		return (.end - .curr)|int|
+
+	function Position (|int|)
+		return (.curr - .start)|int|
 	
+	setter Position (|int|)
+		|| c = .start + value
+		if c < .start or c > .end
+			error (self, "Stream read too far")
+			c = .end
+		.curr = c
+
+
 	iterator
 		|| c = .start
 		|| e = .curr
@@ -165,7 +166,7 @@ struct FastBuff
 
 
 
-function jbin.Add		(|syntax| type, |&FastBuff| data, |bool|into = false)
+function jbin.Add		(|syntax| type, |&FastBuff| data, |bool| into = false)
 	cpp_part AddBuff
 	|| L = data.length
 	|| addr = (data.start, nil)(L)

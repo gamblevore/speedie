@@ -408,9 +408,10 @@ module CustomOps
 		RecheckType = 4
 		TypeCastFromBool = 16
 		TypeCastToBetter = 32
-		Needed = 64
-		OnlyLeftIsVector = 65
-		OnlyRightIsVector = 66
+		TypeCastToSmaller = 64
+		Needed = 256
+		OnlyLeftIsVector = Needed+1
+		OnlyRightIsVector = Needed+2
 
 
 
@@ -462,11 +463,15 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 		|| GotABool = (DataTypeCode.bool == lnt or rnt)
 		if lnt != rnt
 			expect !(GotABool and comp is compare) (MsgRel, "Cant compare bools to non-bools")
-			if (comp is mathlike) and (comp isnt NoExtraBits)
-				if (comp is ShiftOnly) and (lnt.isfloat) and (rnt.isint)
+			if (comp is mathlike)
+				if (comp is NoExtraBits)
+					if comp is losebits // nice
+						extra = customops.TypeCastToSmaller
+				  elseif (comp is ShiftOnly) and (lnt.isfloat) and (rnt.isint)
 					extra = CustomOps.Needed
 				  else
 					extra = CustomOps.TypeCastToBetter
+					
 			
 		  else
 			if GotABool and comp isnt Compare

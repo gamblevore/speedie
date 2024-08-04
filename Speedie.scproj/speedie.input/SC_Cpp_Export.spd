@@ -114,7 +114,8 @@ function CppFunc (|FastStringCpp| fs, |SCFunction| F)
 	|| FuncHeader = .FuncHeader(f)$
 	.SetupFlow(F)
 
-	.funcStart(fs, f, funcheader)
+	.FuncStart(fs, f, FuncHeader)
+	if f ~= "TransCompile2"
 	f.Sourcearg!.Export( fs )
 
 	.OptEnd(fs, f.minopt)
@@ -1356,7 +1357,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function SCClass.SimplerDataTypes (|faststring| fs, |scdecl| d)
 		if .IsDataTypeOnly
 			|| t = .TypeInfo
-			if (t.Count <= 1) and (t is Numeric)
+			if (t.Count <= 1) and (t.isnumeric)
 				if t.IsSigned
 					if t.ByteCount > 4
 						fs <~ "int64"

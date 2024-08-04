@@ -725,7 +725,9 @@ function TypeOfVecAccess (|message| index, |scdecl| ty0, |int| w, |scdecl|)
 
 
 function Message.ExpectInt (|scdecl| type, |bool|)
-	expect type.Type.TypeInfo.IsInt (self, "Expected integer")
+	|| ty = type.Type.TypeInfo
+	expect ty.ByteCount <= 4 (self, "Can't use 64-bit index upon pointer (32-bit max)")
+	expect ty.IsInt (self, "Expected integer")
 	return true
 
 
@@ -1470,7 +1472,7 @@ function TypeOfRel (ExprResolver)
 	if Custom == CustomOps.needed
 		if (!comp.IsCompset)
 			return CustomFuncOp( exp, comp, name_space, RN )
-		  elseif RC == TypeNil
+		 if (RC == TypeNil)
 			0 //
 		  elseif (comp is caseaware) or CanOpCompare(exp, lc, rc, comp)
 			return DoOpCompare(exp, lc, rc, comp, name_space)
@@ -1500,7 +1502,7 @@ function TypeOfRel (ExprResolver)
 		lc = exp.obj|scdecl|!
 	// we can't do 1 << (a,b,c) ?
 
-	  elseif custom & CustomOps.TypeCastToBetter
+	  elseif custom & (CustomOps.TypeCastToBetter|||customops.TypeCastToSmaller) 
 		return lc.better_numeric(rc, comp.Kind, opch).NotLocal
 	
 	Return LC.NotLocal

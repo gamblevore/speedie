@@ -40,7 +40,7 @@ struct Random
 	
 	
 	function Data (|int| n, |string|)
-		|| m = n|int64|.alignUp(8)
+		|| m = n.alignUp(8)
 		|| s = string(m)
 			|| addr = s.addr|&int64|
 			for i in m>>3

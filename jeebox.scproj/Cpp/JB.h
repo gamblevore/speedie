@@ -976,7 +976,7 @@ Message* JB_API__Parse(JB_String* S, JB_String* Path);
 
 
 // Constants
-void JB_Constants__AddEscape(byte I, FastString* Fs);
+void JB_Constants__AddEscape(uint /*byte*/ I, FastString* Fs);
 
 int JB_Constants__Init_();
 
@@ -1049,7 +1049,7 @@ bool JB_Tk__CanStatement();
 
 Message* JB_Tk__ChainTemporalRels(Message* FirstThing, Message* Opp);
 
-JB_String* JB_Tk__CharName(int Start, byte Find);
+JB_String* JB_Tk__CharName(int Start, uint /*byte*/ Find);
 
 Message* JB_Tk__CloseXML(Message* XML, int I, JB_String* S);
 
@@ -1109,7 +1109,7 @@ Message* JB_Tk__fBracket(int Start, Message* Parent);
 
 Message* JB_Tk__fChar(int Start, Message* Parent);
 
-Message* JB_Tk__fCharSub(int Pos, int Start, byte Find);
+Message* JB_Tk__fCharSub(int Pos, int Start, uint /*byte*/ Find);
 
 Message* JB_Tk__fComment(int Start, Message* Parent);
 
@@ -1233,7 +1233,7 @@ Message* JB_Tk__NewWord(Message* P, Syntax F, int Start, int SearchFrom);
 
 ParserLineAndIndent JB_Tk__NextLineAndIndent(Message* Parent);
 
-bool JB_Tk__NoFuncAfter(byte B);
+bool JB_Tk__NoFuncAfter(uint /*byte*/ B);
 
 Message* JB_Tk__NumberSub(int Start, int RealStart);
 
@@ -1318,21 +1318,21 @@ int JB_zalgo__InitCode_();
 
 
 // byte
-bool JB_byte_CanPrintAsNormalChar(byte Self);
+bool JB_byte_CanPrintAsNormalChar(uint /*byte*/ Self);
 
-bool JB_byte_IsInt(byte Self);
+bool JB_byte_IsInt(uint /*byte*/ Self);
 
-bool JB_byte_IsLetter(byte Self);
+bool JB_byte_IsLetter(uint /*byte*/ Self);
 
-bool JB_byte_IsTextLine(byte Self);
+bool JB_byte_IsTextLine(uint /*byte*/ Self);
 
-bool JB_byte_IsUpper(byte Self);
+bool JB_byte_IsUpper(uint /*byte*/ Self);
 
-bool JB_byte_IsWhite(byte Self);
+bool JB_byte_IsWhite(uint /*byte*/ Self);
 
-byte JB_byte_LowerCase(byte Self);
+byte JB_byte_LowerCase(uint /*byte*/ Self);
 
-JB_String* JB_byte_Render(byte Self, FastString* Fs_in);
+JB_String* JB_byte_Render(uint /*byte*/ Self, FastString* Fs_in);
 
 
 
@@ -1466,7 +1466,7 @@ Date JB_Date__New0();
 
 
 // ErrorSeverity
-JB_String* JB_ErrorSeverity_Render(ErrorSeverity Self, FastString* Fs_in);
+JB_String* JB_ErrorSeverity_Render(uint /*ErrorSeverity*/ Self, FastString* Fs_in);
 
 int JB_ErrorSeverity__Init_();
 
@@ -1967,7 +1967,7 @@ JB_Object* JB_DictionaryReader_NextValue(DictionaryReader* Self);
 // JB_ErrorReceiver
 int JB_Rec_BadCount(JB_ErrorReceiver* Self);
 
-bool JB_Rec_CanAddMore(JB_ErrorReceiver* Self, ErrorSeverity Level);
+bool JB_Rec_CanAddMore(JB_ErrorReceiver* Self, uint /*ErrorSeverity*/ Level);
 
 void JB_Rec_Clear(JB_ErrorReceiver* Self);
 
@@ -1985,11 +1985,11 @@ ErrorMarker JB_Rec_Mark(JB_ErrorReceiver* Self);
 
 bool JB_Rec_OK(JB_ErrorReceiver* Self);
 
-int JB_Rec_PrintErrorsMain(JB_ErrorReceiver* Self, ErrorSeverity Level, bool PrintCount, bool Shell);
+int JB_Rec_PrintErrorsMain(JB_ErrorReceiver* Self, uint /*ErrorSeverity*/ Level, bool PrintCount, bool Shell);
 
 JB_String* JB_Rec_Render(JB_ErrorReceiver* Self, FastString* Fs_in);
 
-int JB_Rec_RenderErrors(JB_ErrorReceiver* Self, FastString* Fs, ErrorSeverity Level, bool Shell);
+int JB_Rec_RenderErrors(JB_ErrorReceiver* Self, FastString* Fs, uint /*ErrorSeverity*/ Level, bool Shell);
 
 int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* Self);
 
@@ -2050,9 +2050,9 @@ FastString* JB_FS__Use(JB_Object* Other);
 
 
 // JB_FlowControl
-void JB_Flow_AddByte(FlowControl* Self, byte Value);
+void JB_Flow_AddByte(FlowControl* Self, uint /*byte*/ Value);
 
-bool JB_Flow_Cond(FlowControl* Self, byte Value);
+bool JB_Flow_Cond(FlowControl* Self, uint /*byte*/ Value);
 
 void JB_Flow_Destructor(FlowControl* Self);
 
@@ -2089,7 +2089,7 @@ int JB_Macro__InitCode_();
 
 
 // JB_Memory
-MWrap* JB_Mrap_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Ptr, byte DeathAction);
+MWrap* JB_Mrap_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Ptr, uint /*byte*/ DeathAction);
 
 void JB_Mrap_Destructor(MWrap* Self);
 
@@ -2132,11 +2132,11 @@ void JB_Sel_Destructor(Selector* Self);
 
 
 // JB_String
-JB_String* JB_Str_AfterByte(JB_String* Self, byte B, int Last);
+JB_String* JB_Str_AfterByte(JB_String* Self, uint /*byte*/ B, int Last);
 
 JB_String* JB_Str_BackToApp(JB_String* Self);
 
-JB_String* JB_Str_BeforeLastByte(JB_String* Self, byte B, int Fudge);
+JB_String* JB_Str_BeforeLastByte(JB_String* Self, uint /*byte*/ B, int Fudge);
 
 Array* JB_Str_ByteSplit(JB_String* Self);
 
@@ -2148,7 +2148,7 @@ JB_String* JB_Str_Compress(JB_String* Self, int Strength, CompressionStats* St);
 
 void JB_Str_CompressInto(JB_String* Self, JB_Object* Fs, int Strength, CompressionStats* St);
 
-int JB_Str_Count(JB_String* Self, byte B);
+int JB_Str_Count(JB_String* Self, uint /*byte*/ B);
 
 JB_String* JB_Str_Decompress(JB_String* Self, int Lim, CompressionStats* St);
 
@@ -2162,7 +2162,7 @@ bool JB_Str_EscapeTest(JB_String* Self);
 
 JB_File* JB_Str_AsFile(JB_String* Self);
 
-Ind JB_Str_FindByte(JB_String* Self, byte Find, int Start, int After);
+Ind JB_Str_FindByte(JB_String* Self, uint /*byte*/ Find, int Start, int After);
 
 Ind JB_Str_Find(JB_String* Self, CharSet* Cs, int Start, int After);
 
@@ -2182,7 +2182,7 @@ bool JB_Str_IsOK(JB_String* Self);
 
 bool JB_Str_IsStatementName(JB_String* Self);
 
-Ind JB_Str_JBFind(JB_String* Self, byte Find, int Off, int After);
+Ind JB_Str_JBFind(JB_String* Self, uint /*byte*/ Find, int Off, int After);
 
 byte JB_Str_Last(JB_String* Self, int Minus);
 
@@ -2216,7 +2216,7 @@ JB_String* JB_Str_Pluralize(JB_String* Self, int Amount, JB_String* Nothing);
 
 JB_String* JB_Str_Preview(JB_String* Self, int N);
 
-Array* JB_Str_Split(JB_String* Self, byte Sep);
+Array* JB_Str_Split(JB_String* Self, uint /*byte*/ Sep);
 
 JB_String* JB_Str_Squeeze(JB_String* Self);
 
@@ -2224,7 +2224,7 @@ StringReader* JB_Str_Stream(JB_String* Self);
 
 void JB_Str_SyntaxExpect(JB_String* Self);
 
-int JB_Str_TrimLastSub(JB_String* Self, byte B);
+int JB_Str_TrimLastSub(JB_String* Self, uint /*byte*/ B);
 
 JB_String* JB_Str_TrimSlashes(JB_String* Self, bool Pathfix);
 
@@ -2241,7 +2241,7 @@ JB_StringC* JB_Str__Wrap(_cstring Addr);
 
 
 // JB_StringFields
-StringFields* JB_FI_Constructor(StringFields* Self, JB_String* Source, byte Sep);
+StringFields* JB_FI_Constructor(StringFields* Self, JB_String* Source, uint /*byte*/ Sep);
 
 void JB_FI_Destructor(StringFields* Self);
 
@@ -2601,7 +2601,7 @@ JB_String* JB_Msg_RenderAST(Message* Self, int Flags, FastString* Fs_in);
 
 JB_String* JB_Msg_RenderJbin(Message* Self, JB_String* Shell_path, FastString* Fs_in);
 
-void JB_Msg_RenderPrm(Message* Self, FastString* Fs, byte B1, byte B2);
+void JB_Msg_RenderPrm(Message* Self, FastString* Fs, uint /*byte*/ B1, uint /*byte*/ B2);
 
 void JB_Msg_RenderWithSpaces(Message* Self, FastString* Fs, Message* Ch);
 
@@ -2711,7 +2711,7 @@ void JB_Task_Destructor(JB_Task* Self);
 
 
 // JB_Error
-JB_Error* JB_Err_Constructor(JB_Error* Self, Message* Node, JB_String* Desc, ErrorSeverity Level, JB_String* Path);
+JB_Error* JB_Err_Constructor(JB_Error* Self, Message* Node, JB_String* Desc, uint /*ErrorSeverity*/ Level, JB_String* Path);
 
 JB_Error* JB_Err_ConstructorNothing(JB_Error* Self);
 
@@ -2737,9 +2737,9 @@ JB_String* JB_Err_Render(JB_Error* Self, FastString* Fs_in);
 
 JB_String* JB_Err_RenderClang(JB_Error* Self, FastString* Fs_in);
 
-bool JB_Err_SyntaxIs(JB_Error* Self, ErrorFlags F);
+bool JB_Err_SyntaxIs(JB_Error* Self, uint /*ErrorFlags*/ F);
 
-void JB_Err_SyntaxIsSet(JB_Error* Self, ErrorFlags F, bool Value);
+void JB_Err_SyntaxIsSet(JB_Error* Self, uint /*ErrorFlags*/ F, bool Value);
 
 void JB_Err_UpgradeWithNode(JB_Error* Self);
 
@@ -2760,7 +2760,7 @@ int JB_Err__InitCode_();
 // JB_config
 inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self);
 
-inline bool JB_FastBuff_AppendU8(FastBuff* Self, byte V);
+inline bool JB_FastBuff_AppendU8(FastBuff* Self, uint /*byte*/ V);
 
 inline bool JB_File_SyntaxCast(JB_File* Self);
 
@@ -2904,7 +2904,7 @@ inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self) {
 	return JB_StdErr->ErrorCount == Self;
 }
 
-inline bool JB_FastBuff_AppendU8(FastBuff* Self, byte V) {
+inline bool JB_FastBuff_AppendU8(FastBuff* Self, uint /*byte*/ V) {
 	Self->Curr++[0] = V;
 	return Self->Curr >= Self->End;
 }

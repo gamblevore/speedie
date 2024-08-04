@@ -198,6 +198,13 @@ class SCDecl (SCNamed) {
 		|| S =  .type.typeinfo
 		|| T = o.type.typeinfo
 		if mode isnt MakesSigned
+			if (mode is losebits)
+				debugat
+				if (s.basictype == t.basictype)
+					if s.bytecount < T.bytecount
+						return self
+					return o // seems simple?
+				
 			if (s &~ datatypecode.sign) == (t &~ datatypecode.sign)
 				return self
 		|| cls = s.better_numeric_sub(t, Mode, where)!
@@ -254,6 +261,7 @@ class SCDecl (SCNamed) {
 					return typeint64
 				return typeint
 			if Op is LoseBits					// &
+				debugat 
 				bits = bme min bt
 			  elseif Op is ShiftOnly			// >>, rotr, rotl
 				bits = bme

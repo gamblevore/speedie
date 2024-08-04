@@ -1625,7 +1625,7 @@ function message.StructReturnCleanup (|scfunction| fn, |scnode| name_space)
 		r.remove
 	  else
 		using self
-			|| rel = neweqrel(arg!.MakeAccess0, r)
+			|| rel = NewEqRel(arg!.MakeAccess0, r)
 			.prev = rel
 			typeofexpr(rel, name_space)
 

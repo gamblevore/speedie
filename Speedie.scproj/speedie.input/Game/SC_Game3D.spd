@@ -64,9 +64,6 @@ extend SCClass
 		|| M = .GetFlyingMemClass
 			.NewDeclInClassModule("_AllocDraw", M)
 	
-	function HasGameType (|bool|)
-		return (.TypeInfo != DataTypeCode.UnusedType)
-
 
 function FastString.CArrayAdd (|string| s)
 	for (B in s)
@@ -175,8 +172,9 @@ extend SCDecl
 		expect !(.PointerCount) (.source, "Can’t be a pointer")
 
 		|| T = .type
-		expect (T.HasGameType) ( .source, "SC_GameTypes.box doesn't contain type '${.Type.Name}'." )
-		return T.TypeInfo
+		|| ti = t.typeinfo
+		check (ti.isnumeric) ( .source, "Unrecognised type '${T.Name}'." )
+		return ti
 
 
 	function MakeGameFlying (|scclass| oof, |message| m)

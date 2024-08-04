@@ -39,6 +39,10 @@
 #define o2      (r[n2].Obj)
 #define o3      (r[n3].Obj)
 #define o4      (r[n4].Obj)
+#define I1      (r[n1].Int32)
+#define I2      (r[n2].Int32)
+#define I3      (r[n3].Int32)
+#define I4      (r[n4].Int32)
 
 #define std_max std::max
 #define std_min std::min

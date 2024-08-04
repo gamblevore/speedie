@@ -36,7 +36,7 @@ datatype DataTypeCode (uint16)
 		// Mat4	// make it a struct? mat3 also?
 		Int		= 0 + 32 + 64 + 0   + 8
 		UInt	= 0 + 32 + 0  + 0   + 8
-		bool	= 0
+		bool	= 256
 		u32	 = uint
 		s64	 = int64
 		u64	 = uint64
@@ -61,6 +61,8 @@ datatype DataTypeCode (uint16)
 		
 		UnusedType = int64 &~ 8
 	
+	function Basictype (|datatypecode|) // for comparing most stuff but not all
+		return self & (128 + 8 + 3)
 	
 	syntax is (|datatypecode| M, |bool|)
 		return self&PossibleBits == M&PossibleBits

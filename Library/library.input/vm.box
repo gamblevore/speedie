@@ -36,6 +36,14 @@ forms
 		r3		r
 		Cmp		4
 	
+	MinMax		// max:
+		r1		R
+		r2		r
+		r3		r
+		Sign	1
+		// So... we need to compare
+		// but how? We want the biggest item
+	
 	Const	// const:
 		r1		R
 		Rot		6
@@ -159,24 +167,11 @@ forms
 		r2		r
 		High	14
 
-/*
-	FloatAddExp
-// Can (should?) we reduce this down to 5 lines? // perhaps merge shifts?
-		r1		R
-		r2		r
-		r3		r
-		Sh2		4
-		Sh3		4
-		D		1
-*/
-
 	ConstStretchy
 		r1		R
 		Cond	1	// 0 == always, 1 = only if dest == 0
 		Inv		1
 		Value	17
-//		Prm1	x  // unused!
-//		Prm2	x
 		
 	AddK
 		r1		R
@@ -238,12 +233,12 @@ forms
 		Code = Return(r, Code, Op)
 		___
 
-/**/ FUNC (Func, 2,3) // func: 
+/**/ FUNC (Func, 2, 3) // func: 
 		__
 		Code = BumpStack(r, Code, Op)
 		___
 
-/**/ FNCX (Func, 2,3)
+/**/ FNCX (Func, 2, 3)
 		__
 		vm.CurrRegs = r // to make this recursive
 		ForeignFuncSimple(r, Code, Op)
@@ -297,13 +292,13 @@ forms
 		i1 = (i2 * i3) + i4
 /**/ DIVV (Div)
 		DivMath(r, Op)
-/**/ MAX (Cmp)
-		if Cmp_Cmpu
+/**/ MAX (MinMax)
+		if (MinMax_Signu)
 			i1 = std_max(i2, i3)
 		else
 			u1 = std_max(u2, u3)
-/**/ MIN (Cmp)
-		if Cmp_Cmpu
+/**/ MIN (MinMax)
+		if (MinMax_Signu)
 			i1 = std_min(i2, i3)
 		else
 			u1 = std_min(u2, u3)
@@ -330,18 +325,18 @@ forms
 			i1 = ((i2 << BFLD_upu) >> BFLD_downu)
 		else
 			u1 = ((u2 << BFLD_upu) >> BFLD_downu)
+	
+/**/ BSTT  (U4)
+		i1 = 0//bitstats(u2, u3, u4)
+/**/ BCLR  (BClear)
+		BitClear(r, Op)
+
 ///**/ BFLS  (BFLD) // seems useless?
 //		BFLS(r, Op)
-
-	
-///**/ BSTT  (U4)
-//		i1 = 0//bitstats(u2, u3, u4)
 ///**/ BROL  (U3) // just make these functions or rare instructions?
 //		i1 = JB_u64_RotL(u2, u3 + L3)
 ///**/ BROR  (U3)
 //		i1 = JB_u64_RotR(u2, u3 + L3)
-/**/ BCLR  (BClear)
-		BitClear(r, Op)
 
 
 #!						 (((((MiniCompare)))))

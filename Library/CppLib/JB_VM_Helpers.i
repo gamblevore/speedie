@@ -162,7 +162,7 @@ AlwaysInline uint bitstats32(Register* r, ASM Op) {
 #define setref(t, a, b)		{if (t) JB_SetRef(a,b); else incr(b);}  
 #define table(b)			((u64)(((void**)(&vm.Env))[b])+L2)  
 
-#define mem(t)				((t*)u2)[u3+Read_Lu]
+#define mem(t)				((t*)u2)[I3+Read_Lu]
 #define mem2(t)				(u2 = (u64)((t*)u2 + Read_moveu-1))
 
 AlwaysInline JB_Object* alloc(void* o) {
