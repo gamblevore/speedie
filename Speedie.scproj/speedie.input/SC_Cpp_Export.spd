@@ -1360,15 +1360,9 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			if (t.Count <= 1) and (t.isnumeric) and (t.bytecount < 4)
 				if t.isfloat // what?
 				if t.IsSigned
-					if t.ByteCount > 4
-						fs <~ "int64"
-					  else
-						fs <~ "int"
+					fs <~ "int"
 				  else
-					if t.ByteCount > 4
-						fs <~ "uint64"
-					  else
-						fs <~ "uint"
+					fs <~ "uint"
 				if d is Param
 					fs <~ " /*"
 					fs <~ .cstructname
