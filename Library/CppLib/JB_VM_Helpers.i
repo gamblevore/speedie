@@ -317,9 +317,9 @@ AlwaysInline uint64 BitComp (Register* r, ASM Op) {
 	auto i = CmpB_Invu;
 	auto A = u2 << CmpB_Shiftu;
 	auto B = u3 << CmpB_Shiftu;
-	if (i&2) // do we even need these? just remove?
+	if (i&2)	// do we even need these? just remove?
 		A = ~A;
-	if (i&4) // seems like we should remove these...
+	if (i&4)	// seems like we should remove these...
 		B = ~B;
 	return (A==B) xor (i&1); // keep this though...
 	// the first two could be "future upgrades"...?
