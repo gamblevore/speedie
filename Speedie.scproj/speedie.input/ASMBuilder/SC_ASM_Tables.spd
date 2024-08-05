@@ -259,7 +259,7 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 	|| UponConst = sr is ConstAny
 	|&fatasm| fat
 	if oldtype.isfloat or newtype.isfloat
-		fat = exp.CONV(dest, sr, oldtype.asmconv(newtype), oc.convshift).BitCorrect
+		fat = exp.CONV(dest, sr, oldtype.asmconv(newtype)).BitCorrect
 		if UponConst
 			(fat is ConstAny)
 			|| srf = sr.needfat
@@ -747,8 +747,3 @@ function Message.TypeCastDoesNothing (|Datatypecode| Expected, |bool|)
 		return true
 	return Expected.isint and (XC < SC)
 
-
-
-function int.ConvShift (|int|)
-	return (64 - self)>>3
-	

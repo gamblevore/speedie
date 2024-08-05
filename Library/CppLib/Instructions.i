@@ -73,19 +73,19 @@
 	u1 = std_min(u2, u3)
 ;
 ı BSHS: _
-	i1 = shu(i2) >> u3;
+	i1 = i2 >> u3;
 ı BSHR: _
-	u1 = shu(u2) >> u3;
+	u1 = u2 >> u3;
 ı BSHL: _
-	u1 = shu(u2) << u3;
+	u1 = u2 << u3;
 ı BAND: _
 	u1 = u2 & (u3 | Shift_Shu);
 ı BOAR: _
-	u1 = shu(u2) | u3;
+	u1 = u2 | u3;
 ı BXOR: _
-	u1 = shu(u2 ^ u3);
+	u1 = u2 ^ u3;
 ı BNOT: _
-	u1 = shu(~u2 & ~u3);
+	u1 = ~u2 & ~u3;
 ı BFLG: _
 	if (BFLD_signu) 
 	i1 = ((i2 << BFLD_upu) >> BFLD_downu)
@@ -137,18 +137,6 @@
 ı JBRN: 
 	__;
 	if (!i1) 
-	Code += Bra_Jmpi
-;
-	___;
-ı JZRA: 
-	__;
-	if ((i1 & (1 << (1 << (3 + BraBytes_Bytesu))) - 1)) 
-	Code += Bra_Jmpi
-;
-	___;
-ı JZRN: 
-	__;
-	if (!(i1 & (1 << (1 << (3 + BraBytes_Bytesu))) - 1)) 
 	Code += Bra_Jmpi
 ;
 	___;

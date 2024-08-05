@@ -15,57 +15,49 @@ extend asmreg
 		return self 
 		
 		
-	function BitsAreCorrect (|int|)
-		|| gap = .GapBits
-			if  (self is bitcorrect)  or  (.reg == 0)  or  (.µtype is bool)
-				return 0
-		return gap
+//	function BitsAreCorrect (|int|)
+//		|| gap = .GapBits
+//			if  (self is bitcorrect)  or  (.reg == 0)  or  (.µtype is bool)
+//				return 0
+//		return gap
 
 
-	function BadBits (|asmreg| r, |int|)
-		return .BitsAreCorrect max r.BitsAreCorrect
+//	function BadBits (|asmreg| r, |int|)
+//		return .BitsAreCorrect max r.BitsAreCorrect
 
 
 
 extend ASMState
 	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |&fatasm|)
 		|| negate = (dest is negate)|int|
-		|| badness = l.BadBits(r) 
 		if dest isnt CondRequest
-			return exp.CMPB(dest, L, R, badness, negate)
-
-		if badness and l.reg
-			exp.ClearTwo(l, r)
-			badness = 0
+			return exp.CMPB(dest, L, R, negate)
 
 		if l.reg
 			rz = exp.JMPE(r,l,0)
-		  elseif !badness
-			rz = exp.jBRA(r,0)
 		  else
-			|| ugh = badness.asmbitclearmode
-			rz = exp.JZRA(r, ugh, 0)
+			rz = exp.jBRA(r,0)
 		rz.op += negate<<24
 
 	
-	function int.ASMBitClearMode (|int|)
-		|| ok = 64-self
-		if ok <= 8
-			return 0
-		if ok <= 16
-			return 1
-		if ok <= 32
-			return 2
-		if ok <= 64
-			return 3
-		debugger // what?
+//	function int.ASMBitClearMode (|int|)
+//		|| ok = 64-self
+//		if ok <= 8
+//			return 0
+//		if ok <= 16
+//			return 1
+//		if ok <= 32
+//			return 2
+//		if ok <= 64
+//			return 3
+//		debugger // what?
 		
 	
-	function Message.ClearTwo (|asmreg| l, |asmreg| r)
-		|| gl = l.GapBits
-		|| gr = r.GapBits
-		.BCLR(L, R, gl, gr, (l.signed|int|) + (r.signed|int|<<1))
-	
+//	function Message.ClearTwo (|asmreg| l, |asmreg| r)
+//		|| gl = l.GapBits
+//		|| gr = r.GapBits
+//		.BCLR(L, R, gl, gr, (l.signed|int|) + (r.signed|int|<<1))
+//	
 	
 	function Equals (fn_opasm)
 		if r.reg == 0  and  l.reg != 0
@@ -99,11 +91,6 @@ extend ASMState
 		|| bigness = (bb.log2-3)<<1
 		mode += bigness
 		
-		if l.BadBits(r) 
-			|| gl = l.GapBits
-			|| gr = r.GapBits
-			exp.BCLR(L, R, gl, gr, (l.signed|int|) + (r.signed|int|<<1))
-
 		if dest is CondRequest
 			return exp.jmpi(L, R, mode, 0)*AsmReg()
 
@@ -124,7 +111,6 @@ extend ASMState
 		  else
 			rz = .comparefloat(dest, l, r, exp, mode)
 		rz = rz.BoolASM
-//		if rz.Reg.µType != des
 	
 	function Less   (fn_opasm)
 		return .compare(dest, l, r, exp, 1)
@@ -406,7 +392,7 @@ extend ASMState
 	function ModFloat    (fn_opasm)
 		|| d = dest.Reg #check (Exp)
 		|| big = dest.IsBig|int|
-		exp.fdiv(     dest, asmreg(), L,    R, big)
+		exp.fdiv( dest, asmreg(), L, R, big)
 		|| fat = exp.FFRC(dest, asmreg(), dest, R, big)
 		if dest is ConstAny
 			if dest.FourBytes
@@ -422,14 +408,14 @@ extend ASMState
 			|int64| C
 			if dest.FourBytes
 				if dest.Signed
-					C = l.const|int| mod r.const|int|
+					C = l.const|int   |  mod  r.const|int|
 				  else
-					C = l.const|uint| mod r.const|uint|
+					C = l.const|uint  |  mod  r.const|uint|
 			  else
 				if dest.Signed
-					C = l.const|int64| mod r.const|int64|
+					C = l.const|int64 |  mod  r.const|int64|
 				  else
-					C = l.const|uint64| mod r.const|uint64|
+					C = l.const|uint64|  mod  r.const|uint64|
 			fat.Const = C
 		return fat*Dest
 	
@@ -444,7 +430,7 @@ extend ASMState
 	// BITS
 	function BitNot (fn_opasm)
 		if r.reg // what?
-		|| fat = exp.BNOT(dest,l,asmreg(),0)
+		|| fat = exp.BNOT(dest, l, asmreg())
 		if l is ConstAny
 			fat.const = ~l.const
 		return fat*Dest
@@ -453,7 +439,7 @@ extend ASMState
 	function BitXor (fn_opasm)
 		if (l.reg == r.reg)
 			return .BitOr(dest, asmreg(), asmreg(), exp)
-		|| fat = exp.BXOR(dest, L, R, 0)
+		|| fat = exp.BXOR(dest, L, R)
 		if dest is ConstAny
 			fat.const = l.Const xor r.const
 		return fat*Dest
@@ -463,7 +449,7 @@ extend ASMState
 		if l is ConstAny
 			swap (l) (r)
 		dest.Expect(exp)
-		|| fat = exp.BOAR(dest, L, R, asmreg())
+		|| fat = exp.BOAR(dest, L, R)
 		if dest is ConstAny
 			fat.Const = l.const ||| r.const
 		return fat * Dest
@@ -476,13 +462,13 @@ extend ASMState
 		return fat*Dest
 
 
-	function ConstForShift (|asmreg| r, |int| btc, |message| exp,  |int64|)
-		// shl/shl used to use this
-		rz = .GetConst(r)[]
-		if rz < 0
-			error (exp, "Can't negative shift")
-		  elseif rz >= btc
-			error (exp, "Shift too large for type")
+//	function ConstForShift (|asmreg| r, |int| btc, |message| exp,  |int64|)
+//		// shl/shl used to use this
+//		rz = .GetConst(r)[]
+//		if rz < 0
+//			error (exp, "Can't negative shift")
+//		  elseif rz >= btc
+//			error (exp, "Shift too large for type")
 		
 
 	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| l, |int| up, |int| down, |asmreg|)
@@ -497,17 +483,14 @@ extend ASMState
 	
 		
 	function SHR  (fn_opasm)
-		|| up = 64 - l.bitcount
 		if r is ConstAny
-			if !l.signed
-				up = 0
-			return .BFLG_Const(exp, dest, l, up, r.const+up)
+			return .BFLG_Const(exp, dest, l, 0, r.const)
 		
 		|&Fatasm| fat
 		if l.Signed
-			fat = exp.BSHS(dest, L, R, up)
+			fat = exp.BSHS(dest, L, R)
 		  else
-			fat = exp.BSHR(dest, L, R, 0)
+			fat = exp.BSHR(dest, L, R)
 			
 		return fat*dest
 
@@ -515,9 +498,11 @@ extend ASMState
 	function SHL    (fn_opasm)
 		if r is ConstAny
 			return .BFLG_Const(exp, dest, l,  r.const, 0)
-		return exp.BSHL(dest, L, R, 0) * Dest
+		return exp.BSHL(dest, L, R) * Dest
 	
 	
 	function Assign (fn_opasm)
-		return .BitOr(dest, l, asmreg(), exp)
+		if dest.µType isnt bool
+			return .BitOr(dest, l, asmreg(), exp)
+		return exp.CMPB(dest, L, asmreg(), 1)*dest
 

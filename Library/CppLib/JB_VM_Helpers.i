@@ -177,12 +177,6 @@ AlwaysInline void RegConv (Register* r, int Conv, int Op) {
 	// also can clear bits before conversion (for int-->float)
 	Register* s = r + n3;
 	Register* d = r + n1;
-	int Clear = Convert_Clearu;
-	if (Clear) {	// Store in dest
-		*d = *s;
-		d->Uint = ((d->Uint)<<Clear)>>Clear;
-		s = d;
-	}
 		
     switch (Conv) {
         case 0 : d->Float  = s->Float; 		break; // just copies
@@ -231,15 +225,6 @@ AlwaysInline bool Rare (Register* r, ASM Op) {
 #define  uA  *((uint*)A)
 #define  uB  *((uint*)B)
 
-#define  zA  *((u16*)A)
-#define  zB  *((u16*)B)
-#define  bA  *((byte*)A)
-#define  bB  *((byte*)B)
-#define  sA  *((s16*)A)
-#define  sB  *((s16*)B)
-#define  cA  *((char*)A)
-#define  cB  *((char*)B)
-
 #define CmpSub(Mode, Cmp) case Mode: return (Cmp);
 
 
@@ -247,23 +232,15 @@ bool CompI_ (Register* r, ASM Op) {
 	auto A = &i1;
 	auto B = &i2;
 	switch (Cmp_Cmpu) {
-		CmpSub(0 , cA > cB);
-		CmpSub(1 , cA < cB);
-		CmpSub(2 , sA > sB);
-		CmpSub(3 , sA < sB);
-		CmpSub(4 , iA > iB);
-		CmpSub(5 , iA < iB);
-		CmpSub(6 ,  A >  B);
-		CmpSub(7 ,  A <  B);
+		CmpSub(0 , iA > iB);
+		CmpSub(1 , iA < iB);
+		CmpSub(2 ,  A >  B);
+		CmpSub(3 ,  A <  B);
 
-		CmpSub(8 , bA >  bB); // a lot of string processing will be comparing bA >= bB
-		CmpSub(9 , bA <  bB); // or other byte ops.
-		CmpSub(10, zA >  zB);
-		CmpSub(11, zA <  zB);
-		CmpSub(12, uA >  uB);
-		CmpSub(13, uA <  uB);
-		CmpSub(14, UA >  UB); default:;
-		CmpSub(15, UA <  UB);
+		CmpSub(4, uA >  uB);
+		CmpSub(5, uA <  uB);
+		CmpSub(6, UA >  UB); default:;
+		CmpSub(7, UA <  UB);
 	};
 }
 
@@ -313,10 +290,10 @@ AlwaysInline void CompF (Register* r, ASM Op) {
 }
 
 
-AlwaysInline uint64 BitComp (Register* r, ASM Op) {
+AlwaysInline uint64 BitComp (Register* r, ASM Op) { // cmpb
 	auto i = CmpB_Invu;
-	auto A = u2 << CmpB_Shiftu;
-	auto B = u3 << CmpB_Shiftu;
+	auto A = u2;
+	auto B = u3;
 	if (i&2)	// do we even need these? just remove?
 		A = ~A;
 	if (i&4)	// seems like we should remove these...

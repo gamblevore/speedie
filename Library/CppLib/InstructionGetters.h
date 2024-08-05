@@ -262,17 +262,17 @@
 #define   BFLD_Lu_(x)   (((uint)((x)<<31))>>31)
 
 
-#define   CmpB_Shifti       ((( int)((Op)<<23))>>26)
-#define   CmpB_Shifti_(x)   ((( int)((x)<<23))>>26)
+#define   CmpB_Invi       ((( int)((Op)<<23))>>29)
+#define   CmpB_Invi_(x)   ((( int)((x)<<23))>>29)
 
-#define   CmpB_Shiftu       (((uint)((Op)<<23))>>26)
-#define   CmpB_Shiftu_(x)   (((uint)((x)<<23))>>26)
+#define   CmpB_Invu       (((uint)((Op)<<23))>>29)
+#define   CmpB_Invu_(x)   (((uint)((x)<<23))>>29)
 
-#define   CmpB_Invi       ((( int)((Op)<<29))>>29)
-#define   CmpB_Invi_(x)   ((( int)((x)<<29))>>29)
+#define   CmpB_Li       ((( int)((Op)<<26))>>26)
+#define   CmpB_Li_(x)   ((( int)((x)<<26))>>26)
 
-#define   CmpB_Invu       (((uint)((Op)<<29))>>29)
-#define   CmpB_Invu_(x)   (((uint)((x)<<29))>>29)
+#define   CmpB_Lu       (((uint)((Op)<<26))>>26)
+#define   CmpB_Lu_(x)   (((uint)((x)<<26))>>26)
 
 
 #define   BClear_Shift1i       ((( int)((Op)<<18))>>26)
@@ -300,17 +300,11 @@
 #define   Convert_Modeu       (((uint)((Op)<<18))>>28)
 #define   Convert_Modeu_(x)   (((uint)((x)<<18))>>28)
 
-#define   Convert_Cleari       ((( int)((Op)<<22))>>26)
-#define   Convert_Cleari_(x)   ((( int)((x)<<22))>>26)
+#define   Convert_Li       ((( int)((Op)<<22))>>22)
+#define   Convert_Li_(x)   ((( int)((x)<<22))>>22)
 
-#define   Convert_Clearu       (((uint)((Op)<<22))>>26)
-#define   Convert_Clearu_(x)   (((uint)((x)<<22))>>26)
-
-#define   Convert_Li       ((( int)((Op)<<28))>>28)
-#define   Convert_Li_(x)   ((( int)((x)<<28))>>28)
-
-#define   Convert_Lu       (((uint)((Op)<<28))>>28)
-#define   Convert_Lu_(x)   (((uint)((x)<<28))>>28)
+#define   Convert_Lu       (((uint)((Op)<<22))>>22)
+#define   Convert_Lu_(x)   (((uint)((x)<<22))>>22)
 
 
 #define   RET_Counti       ((( int)((Op)<<18))>>29)

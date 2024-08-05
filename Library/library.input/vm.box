@@ -119,7 +119,6 @@ forms
 		r1		R
 		r2		r
 		r3		r
-		Shift	6
 		Inv		3
 
 	BClear
@@ -133,7 +132,6 @@ forms
 		r1		R
 		r2		r
 		Mode	4
-		Clear	6
 		
 		
 	RET
@@ -305,28 +303,27 @@ forms
 
 
 #!						 (((((Bitops)))))
-/**/ BSHS  (Shift)
-		i1 = shu(i2) >> u3 // its too fiddly though.
-/**/ BSHR  (Shift)
-		u1 = shu(u2) >> u3
-/**/ BSHL  (Shift) 
-		u1 = shu(u2) << u3
+/**/ BSHS  (U3)
+		i1 = i2 >> u3
+/**/ BSHR  (U3)
+		u1 = u2 >> u3
+/**/ BSHL  (U3) 
+		u1 = u2 << u3
 /**/ BAND  (Shift)
 		u1 = u2 & (u3|||Shift_Shu)
-/**/ BOAR  (Shift)
-		u1  = shu(u2)|||u3
-/**/ BXOR  (Shift)
-		u1 = shu(u2 ^ u3)
-/**/ BNOT  (Shift)
-		u1 = shu(~u2 & ~u3)
+/**/ BOAR  (U3)
+		u1  = u2|||u3
+/**/ BXOR  (U3)
+		u1 = u2 ^ u3
+/**/ BNOT  (U3)
+		u1 = ~u2 & ~u3
 /**/ BFLG  (BFLD) // perhaps sign can allow for SIMD opts?
 		if (BFLD_signu)
 			i1 = ((i2 << BFLD_upu) >> BFLD_downu)
 		else
-			u1 = ((u2 << BFLD_upu) >> BFLD_downu)
-	
+			u1 = ((u2 << BFLD_upu) >> BFLD_downu)	
 /**/ BSTT  (U4)
-		i1 = 0//bitstats(u2, u3, u4)
+		i1 = 0 // bitstats(u2, u3, u4)
 /**/ BCLR  (BClear)
 		BitClear(r, Op)
 
