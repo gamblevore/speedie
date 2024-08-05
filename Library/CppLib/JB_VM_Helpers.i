@@ -235,13 +235,13 @@ bool CompI_ (Register* r, ASM Op) {
 	switch (Cmp_Cmpu) {
 		CmpSub(0 , iA > iB);
 		CmpSub(1 , iA < iB);
-		CmpSub(2 ,  A >  B);
-		CmpSub(3 ,  A <  B);
+		CmpSub(2,  uA > uB);
+		CmpSub(3,  uA < uB);
 
-		CmpSub(4, uA >  uB);
-		CmpSub(5, uA <  uB);
-		CmpSub(6, UA >  UB); default:;
-		CmpSub(7, UA <  UB);
+		CmpSub(4 ,  A >  B);
+		CmpSub(5 ,  A <  B);
+		CmpSub(6,  UA > UB); default:;
+		CmpSub(7,  UA < UB);
 	};
 }
 

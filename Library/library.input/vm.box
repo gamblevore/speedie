@@ -34,7 +34,7 @@ forms
 		r1		R
 		r2		r
 		r3		r
-		Cmp		4
+		Cmp		3
 	
 	MinMax		// max:
 		r1		R
@@ -58,7 +58,7 @@ forms
 	JCmp	// cmp:
 		r1		r
 		r2		r
-		Cmp		4
+		Cmp		3
 		Jmp		j
 
 	BraBytes	// brabytes:
