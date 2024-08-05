@@ -100,7 +100,6 @@ forms
 		Op		3
 		N		l
 		
-		
 	CNTC
 		r1		R
 		r2		R
@@ -389,17 +388,17 @@ forms
 			Code += Bra_Jmpi
 		___
 
-/**/ JZRA  (BraBytes)
-		__
-		if ( (i1 & (1<<(1<<(3+BraBytes_Bytesu)))-1 ))
-			Code += Bra_Jmpi
-		___
-
-/**/ JZRN  (BraBytes)
-		__
-		if (!(i1 & (1<<(1<<(3+BraBytes_Bytesu)))-1 ))
-			Code += Bra_Jmpi
-		___
+///**/ JZRA  (BraBytes)
+//		__
+//		if ( (i1 & (1<<(1<<(3+BraBytes_Bytesu)))-1 ))
+//			Code += Bra_Jmpi
+//		___
+//
+///**/ JZRN  (BraBytes)
+//		__
+//		if (!(i1 & (1<<(1<<(3+BraBytes_Bytesu)))-1 ))
+//			Code += Bra_Jmpi
+//		___
 
 /**/ LUPD  (Loop)			 	// same
 		__
