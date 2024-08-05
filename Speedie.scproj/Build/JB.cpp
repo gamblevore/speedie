@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2114];
+extern JB_StringC* JB_LUB[2115];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -1977,7 +1977,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112906131668992));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112908366643200));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3300,7 +3300,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[179]);
-	JB_FS_AppendInt32(_fsf0, (2024080423));
+	JB_FS_AppendInt32(_fsf0, (2024080509));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8356,7 +8356,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024080423));
+	JB_FS_AppendInt32(_fsf0, (2024080509));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -46728,20 +46728,10 @@ void SC_Class_SimplerDataTypes(SCClass* Self, FastString* Fs, SCDecl* D) {
 			if (JB_TC_IsFloat(T)) {
 			}
 			if (JB_TC_IsSigned(T)) {
-				if (JB_TC_ByteCount(T) > 4) {
-					JB_FS_AppendString(Fs, JB_LUB[554]);
-				}
-				 else {
-					JB_FS_AppendString(Fs, JB_LUB[232]);
-				}
+				JB_FS_AppendString(Fs, JB_LUB[232]);
 			}
 			 else {
-				if (JB_TC_ByteCount(T) > 4) {
-					JB_FS_AppendString(Fs, JB_LUB[563]);
-				}
-				 else {
-					JB_FS_AppendString(Fs, JB_LUB[556]);
-				}
+				JB_FS_AppendString(Fs, JB_LUB[556]);
 			}
 			if (SC_Decl_SyntaxIs(D, kSC__SCDeclInfo_Param)) {
 				JB_FS_AppendString(Fs, JB_LUB[2108]);
@@ -50926,6 +50916,9 @@ SCDecl* SC_Func__Tran_AfterRel(Message* Msg, SCNode* Name_space, Message* Side) 
 		JB_Decr(Exp);
 		return _tmPf3;
 	}
+	if ((SC_Decl_IsBool(Type))) {
+		JB_Msg_SyntaxExpect(Msg, JB_LUB[2114]);
+	}
 	int Numc = SC_Class_NumericCount(Type->Type);
 	if ((!SC_Class_IsObject(Type->Type)) and ((!Type->HiderFunc) and (Numc <= 1))) {
 		if ((Side)) {
@@ -53172,4 +53165,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -9163060706480512774 6249528267767544541
+// -9163060706480512774 8373052656404998164
