@@ -3,7 +3,7 @@ https://www.youtube.com/watch?v=pnnx1bkFXng // as you can tell... my version is 
 
 
 helper string.ColumnFinish (|int| lastout, |int| i, |faststring| fs, |int|)
-	fs <~ "   //  "
+	fs <~ "      "
 	while lastout <= i
 		|| c2 = self[lastout++]
 		if c2.IsWhite
@@ -43,6 +43,6 @@ function string.ColumnHex (|int| linelen = 16, |int| chunklen = 2, |string|)
 
 
 main (|existingfile| file)
-	|| data = file.readall
+	|| data = file.ReadAll
 		printline data.ColumnHex
 	
