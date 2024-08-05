@@ -19,32 +19,33 @@ typedef u64 (*Fn8)(u64, u64, u64, u64, u64, u64, u64, u64);
 #define AlwaysInline static inline __attribute__((__always_inline__))
 
 
+Register DummyReg;
 AlwaysInline void DivMath(Register* r, ASM Op) {
 	auto R3 = i3;
 	auto R4 = i4;
 	uint A = n1;
 	uint B = n2;
-	if (!A) A = 32; // dump it safely
-	if (!B) B = 32; // dump it safely
-	auto pA = &(r[A].Int);
-	auto pB = &(r[B].Int);
-
+	auto& pA = r[A].Int;
+	auto& pB = r[B].Int;
+	if (!A) pA = DummyReg.Int;
+	if (!B) pB = DummyReg.Int;
+	
 	switch (Div_Kindu & 3) { // so there are 4 possible divisions we can do
 	  case 0:
-		*pA = R3 % R4;
-		*pB = R3 / R4;
+		pA = R3 % R4;
+		pB = R3 / R4;
 		return;
 	  case 1:
-		*pA = (u64)R3 % (u64)R4;
-		*pB = (u64)R3 / (u64)R4;
+		pA = (u64)R3 % (u64)R4;
+		pB = (u64)R3 / (u64)R4;
 		return;
 	  case 2:
-		*pA = (int)R3 % (int)R4;
-		*pB = (int)R3 / (int)R4;
+		pA = (int64)((int)R3 % (int)R4);
+		pB = (int64)((int)R3 / (int)R4);
 		return;
 	  case 3:
-		*pA = (uint)R3 %(uint)R4;
-		*pB = (uint)R3 /(uint)R4;
+		pA = (uint)R3 %(uint)R4;
+		pB = (uint)R3 /(uint)R4;
 		return;
 	}
 }
