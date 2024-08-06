@@ -5922,8 +5922,6 @@ void SC_Pac_FinishASM(ASMState* Self);
 
 AsmReg SC_Pac_FloatMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
-AsmReg SC_Pac_ForceType(ASMState* Self, Message* Exp, uint /*DataTypeCode*/ Expected, AsmReg PSent, int OldTmps);
-
 AsmReg SC_Pac_FoundCode(ASMState* Self, int I, uint64 Value, AsmReg Typeinfo);
 
 AsmReg SC_Pac_FuncPrm(ASMState* Self, Message* Prm, SCDecl* DestType);
@@ -6009,8 +6007,6 @@ bool SC_Pac_TextFuncSub(ASMState* Self, Message* M);
 void SC_Pac_TextOp(ASMState* Self, Message* M);
 
 bool SC_Pac_TextOpSub(ASMState* Self, Message* M);
-
-AsmReg SC_Pac_TryReuseThisTmp(ASMState* Self, Message* Exp, AsmReg V, int PrevTmps);
 
 bool SC_Pac__ExpandJSM();
 
@@ -7232,8 +7228,6 @@ bool JB_Str_EqualsInt(JB_String* Self, int Other, bool Aware);
 void JB_Str_SyntaxExpect(JB_String* Self);
 
 JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in);
-
-bool SC_Str_trap(JB_String* Self, Message* Msg);
 
 JB_String* JB_Str_Shorten(JB_String* Self, int N);
 
@@ -10223,8 +10217,6 @@ inline bool SC_Reg_IsBig(AsmReg Self);
 
 inline bool SC_Reg_IsFloat(AsmReg Self);
 
-inline bool SC_Reg_SyntaxCast(AsmReg Self);
-
 inline int SC_Reg_ToInt(AsmReg Self);
 
 inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState*/ New);
@@ -10442,10 +10434,6 @@ inline bool SC_Reg_IsBig(AsmReg Self) {
 
 inline bool SC_Reg_IsFloat(AsmReg Self) {
 	return JB_TC_IsFloat(((DataTypeCode)Self));
-}
-
-inline bool SC_Reg_SyntaxCast(AsmReg Self) {
-	return ((bool)SC_Reg_Reg(Self));
 }
 
 inline int SC_Reg_ToInt(AsmReg Self) {

@@ -203,6 +203,7 @@ struct ASMState
 		|| R = .regmap &~ 1
 		for (b.bits in R) (i)
 			|| f = .FoundCode(i, value, typeinfo)
+			if f != nil
 				return f
 
 
@@ -246,33 +247,10 @@ struct ASMState
 	function FuncPrm (|message| prm, |scdecl| DestType,  |asmreg|)
 		|| r = .ExistingVar(prm)
 		|| OldTmps = .VTmps
-		if r == nil
-			r = .µ(prm, r)
-		return .ForceType(prm, desttype.dtype, r, oldtmps)
+		if r != nil
+			return r
+		return .µ(prm, r)
 
-
-	function TryReuseThisTmp (|message| Exp, |asmreg| V, |int| PrevTmps, |asmreg|)
-		|| r = v.reg
-		|| vt = .vtmps
-		if r >= vt and r < PrevTmps
-			return v
-		return .TempMe(exp)
-		
-	
-	function ForceType (|message| exp, |DataTypeCode| Expected, |asmreg| PSent, |int| OldTmps, |asmreg|)
-		|| PT = Psent.µType
-		target debug: if expected.count != PT.Count // now what?
-		
-		expect (Expected.isfloat != pt.isfloat) (exp, ErrorReceiver.nonfatal)
-
-		|| XC = Expected.BitCount
-		|| PC = PT.BitCount
-		if (PC == XC) or ((Expected.isint) and (XC < PC))
-			return PSent
-
-		|| dest = .TryReuseThisTmp(exp, psent, OldTmps)
-		return asmtmp.TypeCastSub(self, exp, dest, psent)
-		
 
 	module
 		|FatASM[]|					JSMSpace = FatASM[0]!
@@ -293,7 +271,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 	// speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:3, 8:1
 	// there are only 4 above 6!, only 14 above 5
 
-	if !dest
+	if dest.reg == 0
 		dest = asmreg()
 	  else
 		dest = .TempMe(prms, dest)
@@ -318,7 +296,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 	
 
 	|| SaveAmount = .vdecls * (dest isnt forreturn)
-	|| fat = exp.fncx(SaveAmount,  fn.TableId,  reg2,  reg3)
+	|| fat = exp.fncx(SaveAmount,  fn.TableId,  reg2,  reg3) // exp.func2, exp.func3
 
 	|| OP = (asm.func2, asm.func3)(sh <= 25)
 	if fn is Wrapper

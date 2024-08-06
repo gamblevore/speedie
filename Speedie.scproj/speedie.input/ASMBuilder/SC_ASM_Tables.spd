@@ -514,7 +514,7 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 function ARel		(fn_asm)
 	opt	NoRefCounts
 	|| M = (exp.name[] == '+')|int|
-	if dest
+	if dest.reg
 		M += IncrAfter
 	return Incrementatulatorifier(self, exp.first!, dest, M)
 

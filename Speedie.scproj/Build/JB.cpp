@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2111];
+extern JB_StringC* JB_LUB[2110];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -1977,7 +1977,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112916044578816));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112916126302208));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -16405,7 +16405,7 @@ AsmReg SC_ASMtmp__Access(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 
 AsmReg SC_ASMtmp__ARel(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 	int M = ((int)(JB_Str_First(Exp->Name) == '+'));
-	if (SC_Reg_SyntaxCast(Dest)) {
+	if (SC_Reg_Reg(Dest)) {
 		M = (M + kSC__ASMtmp_IncrAfter);
 	}
 	return SC_ASMtmp__Incrementatulatorifier(Self, ((Message*)JB_Ring_First(Exp)), Dest, M);
@@ -16492,7 +16492,7 @@ AsmReg SC_ASMtmp__DoFunc(ASMState* Self, Message* Exp, AsmReg Dest, int Mode) {
 		}
 		return SC_Reg__New();
 	}
-	if (!SC_Reg_SyntaxCast(Dest)) {
+	if (SC_Reg_Reg(Dest) == 0) {
 		Dest = SC_Reg__New();
 	}
 	 else {
@@ -21103,11 +21103,11 @@ AsmReg SC_Pac_Div(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp)
 AsmReg SC_Pac_DivFloat(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp) {
 	AsmReg Rz = ((AsmReg)0);
 	Rz = SC_Pac_QuickFloatDiv(Self, Dest, R, L, Exp);
-	if (!SC_Reg_SyntaxCast(Rz)) {
+	if (Rz == nil) {
 		Rz = SC_Pac_QuickFloatDiv(Self, Dest, L, R, Exp);
-	}
-	if (!SC_Reg_SyntaxCast(Rz)) {
-		Rz = SC_FatASM_AsReg(JB_Msg_FDIV(Exp, Dest, L, R, SC_Reg__New(), ((int)SC_Reg_IsBig(Dest))), Dest);
+		if (Rz == nil) {
+			Rz = SC_FatASM_AsReg(JB_Msg_FDIV(Exp, Dest, L, R, SC_Reg__New(), ((int)SC_Reg_IsBig(Dest))), Dest);
+		}
 	}
 	if (SC_Reg_SyntaxIs(Dest, kSC__Reg_ConstAny)) {
 		FatASM* Fat = SC_Reg_NeedFAT(Rz);
@@ -21224,7 +21224,7 @@ AsmReg SC_Pac_FindConst(ASMState* Self, uint64 Value, AsmReg Typeinfo) {
 			int B = JB_int_LowestBit(_currf0);
 			int I = JB_Int_Log2(B);
 			AsmReg F = SC_Pac_FoundCode(Self, I, Value, Typeinfo);
-			if (SC_Reg_SyntaxCast(F)) {
+			if (F != nil) {
 				return F;
 			}
 			_currf0 = (_currf0 & (~B));
@@ -21250,11 +21250,11 @@ void SC_Pac_FinishASM(ASMState* Self) {
 AsmReg SC_Pac_FloatMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp) {
 	AsmReg Rz = ((AsmReg)0);
 	Rz = SC_Pac_QuickFloatMul(Self, Dest, R, L, Exp);
-	if (!SC_Reg_SyntaxCast(Rz)) {
+	if (Rz == nil) {
 		Rz = SC_Pac_QuickFloatMul(Self, Dest, L, R, Exp);
-	}
-	if (!SC_Reg_SyntaxCast(Rz)) {
-		Rz = SC_FatASM_AsReg(JB_Msg_FMUL(Exp, Dest, L, R, SC_Reg__New(), ((int)SC_Reg_IsBig(L))), Dest);
+		if (Rz == nil) {
+			Rz = SC_FatASM_AsReg(JB_Msg_FMUL(Exp, Dest, L, R, SC_Reg__New(), ((int)SC_Reg_IsBig(L))), Dest);
+		}
 	}
 	if (SC_Reg_SyntaxIs(Dest, kSC__Reg_ConstAny)) {
 		FatASM* Fat = SC_Reg_NeedFAT(Rz);
@@ -21266,21 +21266,6 @@ AsmReg SC_Pac_FloatMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message*
 		}
 	}
 	return Rz;
-}
-
-AsmReg SC_Pac_ForceType(ASMState* Self, Message* Exp, uint /*DataTypeCode*/ Expected, AsmReg PSent, int OldTmps) {
-	uint PT = SC_Reg_xC2xB5Type(PSent);
-	if (JB_TC_IsFloat(Expected) == JB_TC_IsFloat(PT)) {
-		JB_Msg_SyntaxExpect(Exp, kJB__Rec_NonFatal);
-		return nil;
-	}
-	int XC = JB_TC_BitCount(Expected);
-	int PC = JB_TC_BitCount(PT);
-	if ((PC == XC) or ((JB_TC_IsInt(Expected)) and (XC < PC))) {
-		return PSent;
-	}
-	AsmReg Dest = SC_Pac_TryReuseThisTmp(Self, Exp, PSent, OldTmps);
-	return SC_ASMtmp__TypeCastSub(Self, Exp, Dest, PSent);
 }
 
 AsmReg SC_Pac_FoundCode(ASMState* Self, int I, uint64 Value, AsmReg Typeinfo) {
@@ -21301,10 +21286,10 @@ AsmReg SC_Pac_FoundCode(ASMState* Self, int I, uint64 Value, AsmReg Typeinfo) {
 AsmReg SC_Pac_FuncPrm(ASMState* Self, Message* Prm, SCDecl* DestType) {
 	AsmReg R = SC_Pac_ExistingVar(Self, Prm, kJB__TC_UnusedType);
 	uint OldTmps = Self->VTmps;
-	if (R == nil) {
-		R = SC_Pac_Get(Self, Prm, R);
+	if (R != nil) {
+		return R;
 	}
-	return SC_Pac_ForceType(Self, Prm, DestType->DType, R, OldTmps);
+	return SC_Pac_Get(Self, Prm, R);
 }
 
 AsmReg SC_Pac_GenericNumFinder(ASMState* Self, Message* Exp, uint64 Value, AsmReg TypeInfo) {
@@ -21318,11 +21303,11 @@ AsmReg SC_Pac_GenericNumFinder(ASMState* Self, Message* Exp, uint64 Value, AsmRe
 AsmReg SC_Pac_IntMul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp) {
 	AsmReg Rz = ((AsmReg)0);
 	Rz = SC_Pac_QuickIntMul(Self, Dest, R, L, Exp);
-	if (!SC_Reg_SyntaxCast(Rz)) {
+	if (Rz == nil) {
 		Rz = SC_Pac_QuickIntMul(Self, Dest, L, R, Exp);
-	}
-	if (!SC_Reg_SyntaxCast(Rz)) {
-		Rz = SC_FatASM_AsReg(JB_Msg_MULT(Exp, Dest, L, R, SC_Reg__New()), Dest);
+		if (Rz == nil) {
+			Rz = SC_FatASM_AsReg(JB_Msg_MULT(Exp, Dest, L, R, SC_Reg__New()), Dest);
+		}
 	}
 	if (SC_Reg_SyntaxIs(Dest, kSC__Reg_ConstAny)) {
 		SC_Reg_NeedFAT(Rz)->Const = (SC_Reg_Const(L) * SC_Reg_Const(R));
@@ -21917,15 +21902,6 @@ bool SC_Pac_TextOpSub(ASMState* Self, Message* M) {
 		return nil;
 	}
 	return _tmPf0;
-}
-
-AsmReg SC_Pac_TryReuseThisTmp(ASMState* Self, Message* Exp, AsmReg V, int PrevTmps) {
-	int R = SC_Reg_Reg(V);
-	uint Vt = Self->VTmps;
-	if ((R >= Vt) and (R < PrevTmps)) {
-		return V;
-	}
-	return SC_Pac_TempMe(Self, Exp, kSC__Reg_Temp);
 }
 
 bool SC_Pac__ExpandJSM() {
@@ -28768,16 +28744,6 @@ JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in) {
 	JB_Decr(Fs);
 	JB_SafeDecr(_tmPf2);
 	return _tmPf2;
-}
-
-bool SC_Str_trap(JB_String* Self, Message* Msg) {
-	if (SC_Func_SyntaxEquals(SC__Func_CurrFunc, Self, true)) {
-		if (Msg) {
-			JB_Obj_PrintLine(Msg);
-		}
-		return true;
-	}
-	return false;
 }
 
 JB_String* JB_Str_Shorten(JB_String* Self, int N) {
@@ -51817,8 +51783,6 @@ void SC_Func__Tran_Ifn(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 }
 
 void SC_Func__Tran_IfSub(Message* Node, SCNode* Name_space) {
-	if (SC_Str_trap(JB_LUB[2110], nil)) {
-	}
 	Message* Cond = JB_Msg_NeedFirst(Node);
 	if (!Cond) {
 		return;
@@ -53084,4 +53048,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 9097320485978103199 -6133284275933654349
+// -3615625896845680697 -1857286232243607851

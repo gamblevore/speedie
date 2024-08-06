@@ -150,7 +150,8 @@ datatype AsmReg (uint64)
 		return (self, nil)(b)
 	
 	syntax cast (|bool|)
-		return .reg
+		disabled "are we checking .reg or if the entire thing is 0"
+//		return .reg
 	
 	syntax cast (|int|)
 		cpp_part ToInt

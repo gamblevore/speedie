@@ -3806,7 +3806,10 @@ void JB_Rec__NewErrorWithNode(Message* Node, JB_String* Desc, JB_String* Path) {
 }
 
 void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, int Sev) {
-	Sev = JB_int_OperatorMin(JB_StdErr->LowerErrorsTo, Sev);
+	int Lower = JB_StdErr->LowerErrorsTo;
+	if (Lower) {
+		Sev = JB_int_OperatorMin(Lower, Sev);
+	}
 	if (JB_Rec_CanAddMore(JB_StdErr, Sev)) {
 		if (Desc == nil) {
 			Desc = JB_Msg_MiniName(Node, JB_LUB[324]);

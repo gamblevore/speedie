@@ -98,6 +98,8 @@ Do when it's fun...
 
 							Actually already good:
 
+* int outputs ALWAYS 64bit-correct  (allows compare/add 64/32 bit without typecasts)	
+
 * obj.property().func --> obj.property.func... the () is superfluous, ignored.
 
 * "a:b" I need to change language?

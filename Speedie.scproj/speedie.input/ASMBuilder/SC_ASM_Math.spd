@@ -283,16 +283,20 @@ extend ASMState
 
 	function IntMul (fn_opasm)
 		rz = .QuickIntMul(dest, R, L, exp)
-		rz := .QuickIntMul(dest, L, R, exp)
-		rz := exp.MULT(dest, L, R, asmreg()) * Dest
+		if rz == nil
+			rz = .QuickIntMul(dest, L, R, exp)
+			if rz==nil
+				rz = exp.MULT(dest, L, R, asmreg()) * Dest
 		if dest is ConstAny
 			rz.needfat.const = l.const * r.const
 
 
 	function FloatMul (fn_opasm)
 		rz = .QuickFloatMul(dest, R, L, exp)
-		rz := .QuickFloatMul(dest, L, R, exp)
-		rz := exp.FMUL(dest, L, R, asmreg(), l.IsBig|int|) * Dest
+		if rz == nil
+			rz = .QuickFloatMul(dest, L, R, exp)
+			if rz == nil
+				rz = exp.FMUL(dest, L, R, asmreg(), l.IsBig|int|) * Dest
 		if dest is ConstAny
 			|| fat = rz.needfat
 			if dest.FourBytes
@@ -322,8 +326,10 @@ extend ASMState
 
 	function DivFloat    (fn_opasm)
 		rz = .QuickFloatDiv(dest, R, L, exp)
-		rz := .QuickFloatDiv(dest, L, R, exp)
-		rz := exp.FDIV(dest,  L,  R,  asmreg(), dest.isbig|int|) * dest
+		if rz == nil
+			rz = .QuickFloatDiv(dest, L, R, exp)
+			if rz == nil
+				rz = exp.FDIV(dest,  L,  R,  asmreg(), dest.isbig|int|) * dest
 		if dest is ConstAny
 			|| fat = rz.needfat
 			if dest.FourBytes
