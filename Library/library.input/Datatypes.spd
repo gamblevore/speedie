@@ -793,8 +793,6 @@ datatype MaybeBool (byte) // could just put these on int? do we need a whole new
 			return (8+default)|Maybebool|
 		function Known (|bool| As, |Maybebool|)
 			return (as)|Maybebool|
-			"/usr/local/speedie/Speedie.scproj/BuildTest/JB.cpp:41778:9: error: no matching function for call to 'SC_Base_CalculateConstWithMsgTc'\n        return SC_Base_CalculateConstWithMsgTc(Self, Value, (&Ty));\n               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n/usr/local/speedie/Speedie.scproj/BuildTest/JB.h:9153:8: note: candidate function not viable: no known conversion from 'uint *' (aka 'unsigned int *') to 'DataTypeCode *' (aka 'unsigned short *') for 3rd argument\nuint64 SC_Base_CalculateConstWithMsgTc(SCNode* Self, Message* Value, DataTypeCode* Ty);\n       ^\n1 error generated.\n"
-
 	
 
 
