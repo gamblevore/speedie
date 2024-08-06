@@ -200,6 +200,8 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 				|| R = o.typeinfo
 				if (L.ByteCount == R.ByteCount)
 					return kNumericMatch
+				if (typecast&kTypeCastSetToMemory)
+					return knumericmatch
 				if (self is const) or (o is const)
 					return kNumericMatch // Just do this at ASM time. makes no sense otherwise.
  

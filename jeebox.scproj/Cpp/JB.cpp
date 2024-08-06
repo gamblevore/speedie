@@ -6287,13 +6287,13 @@ int64 JB_Msg_Int(Message* Self, int StrStart) {
 		}
 		double Mul = JB_Str_TextDouble(F->Name, nil);
 		if (JB_Tree_SyntaxEquals(Self, 'K', false)) {
-			Mul = (Mul * ((float)1024));
+			Mul = (Mul * ((double)1024));
 		}
 		 else if (JB_Msg_SyntaxEquals(Self, JB_LUB[258], false)) {
-			Mul = (Mul * ((float)1048576));
+			Mul = (Mul * ((double)1048576));
 		}
 		 else if (JB_Msg_SyntaxEquals(Self, JB_LUB[242], false)) {
-			Mul = (Mul * ((float)1073741824));
+			Mul = (Mul * ((double)1073741824));
 		}
 		 else {
 			if (true) {
@@ -7879,7 +7879,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024080423);
+	return (2024080614);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {

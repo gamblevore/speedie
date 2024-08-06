@@ -148,7 +148,7 @@ class SCImport
 		
 		|| Nil = arg["nil"]
 			if !nil.yes
-				options.nilstrength = 0
+				options.nilstrength = errorseverity.warning
 	
 	// * Needs better types: "contains (a,b,c)". (|0| a, |1| b, |2| c).
 	// scdecl would use linked-list to other decls... fileviewer has GUIcontrols+filerows

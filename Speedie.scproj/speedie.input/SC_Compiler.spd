@@ -160,7 +160,7 @@ function CompileAll (|bool|)
 	if .Stage( "Stripping dead code" )
 		.DeadStrip
 	
-	if (options.NilStrength > 0) and .Stage( "NilChecking" )
+	if .Stage( "NilChecking" )
 		.Timer( "NilChecking" )
 		ArchonPurger.FixArchons
 	

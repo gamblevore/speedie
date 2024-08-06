@@ -29,12 +29,13 @@ constants
 	kTypeCastIgnoreContained	= 4
 	kTypeCastIgnoreAddressOf	= 8
 	kTypeCastBothWays			= 16
-	kTypeCastTrue				= kTypeCastMost ||| kTypeCastNumbers   // to replace whatever we used to do when we passed "true"
+	kTypeCastTrue				= kTypeCastMost ||| kTypeCastNumbers   // replace whatever we used to do when we passed "true"
 	kNoBoolTypeCast				= 32
 	kTypeCastAssigns			= 64
 	kTypeCastWantSuperDistance	= 128
 	kTypeCastDescribeErrors		= 256
 	kTypeCastFromZero			= 512
+	kTypeCastSetToMemory		= 1024
 	kActualTypecasts			= ~(kTypeCastWantSuperDistance ||| kNoBoolTypeCast)  
 	kTypeCastFalse				= 0
 
@@ -1049,7 +1050,9 @@ class SCDecl (SCNamed) {
 		opt norefcounts
 		// Just like ExpectMatch, except always does type-casting. and returns nothing.
 		
-		|| Cast = kTypeCastTrue + (kTypeCastBothWays * !side)
+		|| Cast = kTypeCastTrue
+		cast |= kTypeCastBothWays * !side
+		cast |= kTypeCastSetToMemory * (self isnt local)
 		
 		.ExpectMatch( O, Cast, exp, ErrNode )
 				

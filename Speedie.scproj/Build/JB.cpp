@@ -27,10 +27,16 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2110];
+extern JB_StringC* JB_LUB[2111];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
+
+JB_String* JB_App__APath2() {
+	//visible;
+	JB_String* P = ((JB_String*)JB_Dict_Value0(JB_App__Env(), JB_LUB[1053]));
+	return JB_LUB[0];
+}
 
 JB_String* JB_App__AppName() {
 	JB_String* _tmPf0 = JB_Incr(JB_App__AppPath());
@@ -668,7 +674,7 @@ bool SC_Comp__CompileAll() {
 	if (SC_Comp__Stage(JB_LUB[1174])) {
 		SC_Comp__DeadStrip();
 	}
-	if ((SC__Options_NilStrength > 0) and SC_Comp__Stage(JB_LUB[993])) {
+	if (SC_Comp__Stage(JB_LUB[993])) {
 		SC_Comp__Timer(JB_LUB[993]);
 		SC_nil__FixArchons();
 	}
@@ -1977,7 +1983,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112915356188672));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112915816572749));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3300,7 +3306,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[179]);
-	JB_FS_AppendInt32(_fsf0, (2024080614));
+	JB_FS_AppendInt32(_fsf0, (2024080616));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8356,7 +8362,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024080614));
+	JB_FS_AppendInt32(_fsf0, (2024080616));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -20697,9 +20703,9 @@ bool JB_Pico_SendMsg(PicoComms* Self, PicoMessage* A, bool Wait) {
 
 bool JB_Pico_SendFS(PicoComms* Self, FastString* Fs, bool Wait) {
 	bool Rz = false;
-	PicoMessage _tmPf0 = ((PicoMessage){});
-	JB_Pico__FromFS(Fs, (&_tmPf0));
-	Rz = JB_Pico_SendMsg(Self, (&_tmPf0), Wait);
+	PicoMessage Msg = ((PicoMessage){});
+	JB_Pico__FromFS(Fs, (&Msg));
+	Rz = JB_Pico_SendMsg(Self, (&Msg), Wait);
 	(JB_FS_LengthSet(Fs, 0));
 	return Rz;
 }
@@ -26161,7 +26167,7 @@ void SC_Imp_IndexLinkage(SCImport* Self, Message* Link, SCFile* Scf) {
 	JB_Decr(Arg);
 	if (Nil) {
 		if (!JB_Msg_Yes(Nil, false)) {
-			SC__Options_NilStrength = 0;
+			SC__Options_NilStrength = kJB__ErrorSeverity_Warning;
 		}
 	}
 	JB_Tree_Remove(Link);
@@ -28764,6 +28770,16 @@ JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in) {
 	JB_Decr(Fs);
 	JB_SafeDecr(_tmPf2);
 	return _tmPf2;
+}
+
+bool SC_Str_trap(JB_String* Self, Message* Msg) {
+	if (SC_Func_SyntaxEquals(SC__Func_CurrFunc, Self, true)) {
+		if (Msg) {
+			JB_Obj_PrintLine(Msg);
+		}
+		return true;
+	}
+	return false;
 }
 
 JB_String* JB_Str_Shorten(JB_String* Self, int N) {
@@ -39752,7 +39768,9 @@ Message* SC_Decl_ExpectMatch(SCDecl* Self, SCDecl* O, int TypeCast, Message* Exp
 }
 
 void SC_Decl_ExpectRelMatch(SCDecl* Self, SCDecl* O, Message* Exp, Message* Side, Message* ErrNode) {
-	int Cast = kJB_kTypeCastTrue + (kJB_kTypeCastBothWays * (!Side));
+	int Cast = kJB_kTypeCastTrue;
+	Cast = (Cast | (kJB_kTypeCastBothWays * (!Side)));
+	Cast = (Cast | (kJB_kTypeCastSetToMemory * ((!SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Local)))));
 	JB_FreeIfDead(SC_Decl_ExpectMatch(Self, O, Cast, Exp, ErrNode));
 	if ((SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Self)) and (SC_Func_SyntaxIs(SC__Func_CurrFunc, kSC__FunctionType_Destructor))) {
 		if (true) {
@@ -40883,6 +40901,9 @@ int SC_Decl_TryTypeCast(SCDecl* Self, SCDecl* O, Message* Exp, int TypeCast) {
 				uint L = SC_Decl_TypeInfo(Self);
 				uint R = SC_Decl_TypeInfo(O);
 				if (JB_TC_ByteCount(L) == JB_TC_ByteCount(R)) {
+					return kJB_kNumericMatch;
+				}
+				if (((bool)(TypeCast & kJB_kTypeCastSetToMemory))) {
 					return kJB_kNumericMatch;
 				}
 				if ((SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Const)) or (SC_Decl_SyntaxIs(O, kSC__SCDeclInfo_Const))) {
@@ -53063,4 +53084,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -3707179958577468821 -1857286232243607851
+// 911888868161784790 -4382539110874363592
