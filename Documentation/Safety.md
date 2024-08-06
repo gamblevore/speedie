@@ -61,6 +61,8 @@ Speedie has a little numeric safety. Mostly on constants, so you can't define a 
 
 Also Speedie won't allow `int` / `float` conversions, to happen silently. You need to explicitly convert them. We allow a small leeway when it comes to integer constants, for example adding `2` to a float variable, is OK, as `2` is exactly representable as a float anyhow. We don't allow this for ints that are too big and would lose precision as a float!
 
+In fact, we don't even allow implict floating point conversions between say 32-bit and 64-bit floats (or other sizes). This is because... float-32 and float-64 are basically incompatible formats, meaning you would get a hidden slowdown in your code (if I hadn't added this feature). Work should be explicit.
+
 Also Speedie won't allow passing objects or numbers to a boolean parameter... because this is very dangerous, almost everything is convertible to boolean which means you can easily pass the wrong param!
 
 Also speedie doesn't allow comparing signed and unsigned numbers in an "unclear" way. For example:
