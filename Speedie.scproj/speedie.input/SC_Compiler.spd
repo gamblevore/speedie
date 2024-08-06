@@ -276,16 +276,16 @@ function InitBasicStuff (|int|) // compiler.init
 	if !.InitTypes
 		Compiler.InitedOK = false
 	
-	TypeNil   = .AddGlobalConst( "nil",   TypeObject!,   NilState.ActuallyNil )
-	TrueBool  = .AddGlobalConst( "true",  TypeBool!,     NilState.real ||| NilState.trueValue )
-	FalseBool = .AddGlobalConst( "false", TypeBool!,     NilState.real ||| NilState.falseValue )
+	TypeNil   = .AddGlobalConst( "nil",		TypeObject!,	NilState.ActuallyNil )
+	TrueBool  = .AddGlobalConst( "true",	TypeBool!,  	NilState.real ||| NilState.trueValue )
+	FalseBool = .AddGlobalConst( "false",	TypeBool!,  	NilState.real ||| NilState.falseValue )
 	
 	TrueBool!.numberconst = 1
-	.AddGlobalConstNum( "__time_id__",  typeint!,  scimport.recent.timeid )
-	.AddGlobalConstNum( "__now__",      typedate!, date.now )
-	.AddGlobalConstNum( "__modified__", typedate!, scimport.recent)
-	.AddGlobalConstFloat( "π",            typef64! , "3.1415926535897932")
-	.AddGlobalConstFloat( "τ",            typef64! , "6.2831853071795864")
+	.AddGlobalConstNum( "__time_id__", 		typeint! , 		scimport.recent.timeid )
+	.AddGlobalConstNum( "__now__",     		typedate!,		date.now )
+	.AddGlobalConstNum( "__modified__",		typedate!,		scimport.recent)
+	.AddGlobalConstFloat( "π",				typef64! ,		"3.1415926535897932")
+	.AddGlobalConstFloat( "τ",				typef64! ,		"6.2831853071795864")
 	if stderr.ErrorCount > rz
 		compiler.InitedOK = false
 		

@@ -2452,8 +2452,6 @@ extern SCModule* SC__Mod_Curr;
 
 
 // App
-JB_String* JB_App__APath2();
-
 JB_String* JB_App__AppName();
 
 JB_String* JB_App__AppPath();
@@ -7235,8 +7233,6 @@ void JB_Str_SyntaxExpect(JB_String* Self);
 
 JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in);
 
-bool SC_Str_trap(JB_String* Self, Message* Msg);
-
 JB_String* JB_Str_Shorten(JB_String* Self, int N);
 
 JB_String* JB_Str_TrimExtAndPath(JB_String* Self, bool KeepPath);
@@ -10233,6 +10229,8 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState
 
 inline void SC_nil__DeclKill();
 
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
+
 inline NilRecord SC_nil__Value();
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
@@ -10246,8 +10244,6 @@ inline NilRecord SC_nil__EndBlock();
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
 inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest);
-
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
 
 inline void SC_Reg_Expect(AsmReg Self, Message* Where);
 
@@ -10467,6 +10463,16 @@ inline void SC_nil__DeclKill() {
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 }
 
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
+	uint T = SC_Msg_ASMType(Msg);
+	if (T) {
+		return (SC__nil_NilTable[T])(Msg, Test);
+	}
+	T = ((ASMtmp)Msg->Func);
+	(SC_Msg_ASMTypeSet(Msg, T));
+	return (SC__nil_NilTable[T])(Msg, Test);
+}
+
 inline NilRecord SC_nil__Value() {
 	return SC_nil_Value((&SC__nil_T));
 }
@@ -10510,17 +10516,6 @@ inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
 	AsmReg Ss = (Fn)(Self, Exp, Dest, 0);
 	SC_Pac_CloseVTmps(Self, TmpCloser, Dest);
 	return Ss;
-}
-
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
-	SC_Str_trap(JB_LUB[2110], Msg);
-	uint T = SC_Msg_ASMType(Msg);
-	if (T) {
-		return (SC__nil_NilTable[T])(Msg, Test);
-	}
-	T = ((ASMtmp)Msg->Func);
-	(SC_Msg_ASMTypeSet(Msg, T));
-	return (SC__nil_NilTable[T])(Msg, Test);
 }
 
 inline void SC_Reg_Expect(AsmReg Self, Message* Where) {

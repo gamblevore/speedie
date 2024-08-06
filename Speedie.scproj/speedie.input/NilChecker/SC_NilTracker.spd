@@ -271,10 +271,10 @@ struct ArchonPurger
 		
 		function FixArchons
 			opt norefcounts
-			using options.NilStrength	
 			|| Old = stderr
 			|| Rec = ErrorReceiver()
 			using rec
+				using options.NilStrength	
 				for (xoxo in compiler.funclist) (i)
 					.ExterminateZergBugs(xoxo)
 					rec.ReturnErrors(old)

@@ -29,7 +29,7 @@ constants
 	kTypeCastIgnoreContained	= 4
 	kTypeCastIgnoreAddressOf	= 8
 	kTypeCastBothWays			= 16
-	kTypeCastTrue				= kTypeCastMost ||| kTypeCastNumbers   // replace whatever we used to do when we passed "true"
+	kTypeCastTrue				= kTypeCastMost ||| kTypeCastNumbers   // the default case
 	kNoBoolTypeCast				= 32
 	kTypeCastAssigns			= 64
 	kTypeCastWantSuperDistance	= 128

@@ -2,18 +2,18 @@
 
 extend_module ErrorReceiver
 	function NewWarning (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
-		.NewErrorSub(node, desc, path, errorseverity.warning)
+		.NewErrorSub(node, desc, path, ErrorSeverity.warning)
 	
 	function NewProblem (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
-		.NewErrorSub(node, desc, path, errorseverity.problem)
+		.NewErrorSub(node, desc, path, ErrorSeverity.problem)
 
 	function NewError (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
 		cpp_part NewErrorWithNode
-		|| sev = stderr.LowerErrorsTo ?? ErrorSeverity.Error
-		.NewErrorSub(node, desc, path, sev)
+		.NewErrorSub(node, desc, path, ErrorSeverity.Error)
 
 	helper NewErrorSub (|Message| node, |string?| Desc, |string?| path, |int| sev)
 		opt norefcounts
+		sev = stderr.LowerErrorsTo min sev
 		if stderr.CanAddMore(sev)
 			if desc == nil
 				desc = node.MiniName("Unexpected ")

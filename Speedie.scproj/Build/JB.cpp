@@ -27,16 +27,10 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2111];
+extern JB_StringC* JB_LUB[2110];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
-
-JB_String* JB_App__APath2() {
-	//visible;
-	JB_String* P = ((JB_String*)JB_Dict_Value0(JB_App__Env(), JB_LUB[1053]));
-	return JB_LUB[0];
-}
 
 JB_String* JB_App__AppName() {
 	JB_String* _tmPf0 = JB_Incr(JB_App__AppPath());
@@ -1983,7 +1977,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112915816572749));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112915961020416));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3038,7 +3032,7 @@ bool SC_FB__AppOptions_nil(JB_String* Name, JB_String* Value, FastString* Purpos
 		SC__Options_NilStrength = kJB__ErrorSeverity_Error;
 	}
 	 else {
-		SC__Options_NilStrength = 0;
+		SC__Options_NilStrength = kJB__ErrorSeverity_Warning;
 	}
 	return false;
 }
@@ -3306,7 +3300,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[179]);
-	JB_FS_AppendInt32(_fsf0, (2024080616));
+	JB_FS_AppendInt32(_fsf0, (2024080617));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8362,7 +8356,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024080616));
+	JB_FS_AppendInt32(_fsf0, (2024080617));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -18976,13 +18970,13 @@ NilState SC_nil__FailedReal(SCFunction* To, Message* Where, uint /*NilReason*/ R
 }
 
 void SC_nil__FixArchons() {
-	//using;
-	uint __varf1 = SC__Options_NilStrength;
-	uint _usingf0 = JB_ErrorSeverity_SyntaxUsing(__varf1);
 	JB_ErrorReceiver* Old = JB_StdErr;
 	JB_ErrorReceiver* Rec = JB_Rec_Constructor(nil);
 	if (true) {
-		JB_ErrorReceiver* _usingf2 = JB_Rec_SyntaxUsing(Rec);
+		JB_ErrorReceiver* _usingf0 = JB_Rec_SyntaxUsing(Rec);
+		//using;
+		uint __varf2 = SC__Options_NilStrength;
+		uint _usingf1 = JB_ErrorSeverity_SyntaxUsing(__varf2);
 		{
 			Array* _LoopSrcf5 = SC__Comp_FuncList;
 			int _if3 = 0;
@@ -18998,10 +18992,10 @@ void SC_nil__FixArchons() {
 			};
 		}
 		;
-		JB_Rec_SyntaxUsingComplete(_usingf2, Rec);
+		JB_Rec_SyntaxUsingComplete(_usingf0, Rec);
+		JB_ErrorSeverity_SyntaxUsingComplete(_usingf1, JB_Wrap_ConstructorInt(nil, __varf2));
 	}
 	JB_SetRef(SC__Func_CurrFunc, nil);
-	JB_ErrorSeverity_SyntaxUsingComplete(_usingf0, JB_Wrap_ConstructorInt(nil, __varf1));
 }
 
 NilState SC_nil__Function(Message* Msg, NilCheckMode Test) {
@@ -24776,14 +24770,11 @@ int JB_Rec__InitCode_() {
 }
 
 void JB_Rec__NewErrorWithNode(Message* Node, JB_String* Desc, JB_String* Path) {
-	int Sev = JB_StdErr->LowerErrorsTo;
-	if (!Sev) {
-		Sev = kJB__ErrorSeverity_Error;
-	}
-	JB_Rec__NewErrorSub(Node, Desc, Path, Sev);
+	JB_Rec__NewErrorSub(Node, Desc, Path, kJB__ErrorSeverity_Error);
 }
 
 void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, int Sev) {
+	Sev = JB_int_OperatorMin(JB_StdErr->LowerErrorsTo, Sev);
 	if (JB_Rec_CanAddMore(JB_StdErr, Sev)) {
 		if (Desc == nil) {
 			Desc = JB_Msg_MiniName(Node, JB_LUB[1834]);
@@ -28770,16 +28761,6 @@ JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in) {
 	JB_Decr(Fs);
 	JB_SafeDecr(_tmPf2);
 	return _tmPf2;
-}
-
-bool SC_Str_trap(JB_String* Self, Message* Msg) {
-	if (SC_Func_SyntaxEquals(SC__Func_CurrFunc, Self, true)) {
-		if (Msg) {
-			JB_Obj_PrintLine(Msg);
-		}
-		return true;
-	}
-	return false;
 }
 
 JB_String* JB_Str_Shorten(JB_String* Self, int N) {
@@ -53084,4 +53065,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 911888868161784790 -4382539110874363592
+// 6097734411926646758 -1857286232243607851
