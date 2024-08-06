@@ -963,7 +963,7 @@ class TextView (GUIControl)
 		opt NoRefCounts
 		|| w = .window
 			for i in 3
-				.SoftExplode(5s, date.now + 0.25s*i, (-3.0, 0), D, strength)
+				.SoftExplode(5s, date.now + 0.25s*i, (-7.0, 0), D, strength)
 
 
 	task SoftExplode (taskgui, |vec2| V, |TextViewLine| D, |float| Strength)
@@ -973,14 +973,15 @@ class TextView (GUIControl)
 		run
 			require .d.parent == .upon._Lines
 			|| start = .upon.XY(.d)
-			|| Particles = 24 
-			|| S = .starttime + .d.position
+			|| Particles = 48 
+			|| S = .StartTime + .d.position
 			for p in particles
 				|| V2 = (S + p).RandomVec2 - 0.5
+				v2.x *= 2
 				|| A  = (S - p).RandomVec2 - 0.5
 				A.y *= 4.0
 				V2 = (V2 * 25.0) + .V * 250.0
-				.DrawParticle(V2, A, Progress, p|float|, start)
+				.DrawParticle(V2, A, Progress, p|float|*0.4, start)
 
 
 		function DrawParticle (|vec2| V, |vec2| A, |float| T, |float| p, |ivec2| start)
