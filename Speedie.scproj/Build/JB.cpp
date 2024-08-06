@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2110];
+extern JB_StringC* JB_LUB[2111];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -1977,7 +1977,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112915961020416));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112916044578816));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -19103,6 +19103,10 @@ NilState SC_nil__Function(Message* Msg, NilCheckMode Test) {
 NilState SC_nil__If(Message* Msg, NilCheckMode Test) {
 	Message* Cond = ((Message*)JB_Ring_First(Msg));
 	Message* Arg1 = ((Message*)JB_Ring_NextSib(Cond));
+	if ((!Arg1)) {
+		JB_Msg_SyntaxExpect(Msg, nil);
+		return 0;
+	}
 	Message* Else = ((Message*)JB_Ring_NextSib(Arg1));
 	Message* Arg2 = ((Message*)JB_Ring_First(Else));
 	Message* ElseIfCond = nil;
@@ -20697,9 +20701,9 @@ bool JB_Pico_SendMsg(PicoComms* Self, PicoMessage* A, bool Wait) {
 
 bool JB_Pico_SendFS(PicoComms* Self, FastString* Fs, bool Wait) {
 	bool Rz = false;
-	PicoMessage Msg = ((PicoMessage){});
-	JB_Pico__FromFS(Fs, (&Msg));
-	Rz = JB_Pico_SendMsg(Self, (&Msg), Wait);
+	PicoMessage _tmPf0 = ((PicoMessage){});
+	JB_Pico__FromFS(Fs, (&_tmPf0));
+	Rz = JB_Pico_SendMsg(Self, (&_tmPf0), Wait);
 	(JB_FS_LengthSet(Fs, 0));
 	return Rz;
 }
@@ -24774,7 +24778,10 @@ void JB_Rec__NewErrorWithNode(Message* Node, JB_String* Desc, JB_String* Path) {
 }
 
 void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, int Sev) {
-	Sev = JB_int_OperatorMin(JB_StdErr->LowerErrorsTo, Sev);
+	int Lower = JB_StdErr->LowerErrorsTo;
+	if (Lower) {
+		Sev = JB_int_OperatorMin(Lower, Sev);
+	}
 	if (JB_Rec_CanAddMore(JB_StdErr, Sev)) {
 		if (Desc == nil) {
 			Desc = JB_Msg_MiniName(Node, JB_LUB[1834]);
@@ -28761,6 +28768,16 @@ JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in) {
 	JB_Decr(Fs);
 	JB_SafeDecr(_tmPf2);
 	return _tmPf2;
+}
+
+bool SC_Str_trap(JB_String* Self, Message* Msg) {
+	if (SC_Func_SyntaxEquals(SC__Func_CurrFunc, Self, true)) {
+		if (Msg) {
+			JB_Obj_PrintLine(Msg);
+		}
+		return true;
+	}
+	return false;
 }
 
 JB_String* JB_Str_Shorten(JB_String* Self, int N) {
@@ -51800,6 +51817,8 @@ void SC_Func__Tran_Ifn(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 }
 
 void SC_Func__Tran_IfSub(Message* Node, SCNode* Name_space) {
+	if (SC_Str_trap(JB_LUB[2110], nil)) {
+	}
 	Message* Cond = JB_Msg_NeedFirst(Node);
 	if (!Cond) {
 		return;
@@ -53065,4 +53084,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 6097734411926646758 -1857286232243607851
+// 9097320485978103199 -6133284275933654349

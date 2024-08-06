@@ -190,7 +190,7 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 		|| OIsNum = O.IsNormalNumber
 		|| SIsNum =  .IsNormalNumber
 		if Oisnum and sisNum
-			if typecast & kTypeCastFromZero
+			if TypeCast & kTypeCastFromZero
 				return kNumericMatch
 			|| ff = o.IsFloat + .IsFloat
 			if ff == 0
@@ -205,7 +205,7 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 				if (self is const) or (o is const)
 					return kNumericMatch // Just do this at ASM time. makes no sense otherwise.
  
-				
+		
 		if TypeCast&kTypeCastBothWays
 			if Oisnum and  .IsNormalBool
 				return kNumericMatch

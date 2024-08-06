@@ -329,8 +329,9 @@ function While (NilTrackerFn)
 
 function If (NilTrackerFn)
 	opt norefcounts
-	|| cond = msg.first!,  || arg1 = cond.next!
-	|| Else = arg1.next!,  || arg2 = else.first
+	|| cond = msg.first!,  || arg1 = cond.next
+	expect (arg1) (msg)
+	|| Else = arg1.next,   || arg2 = else.first
 	|message| ElseIfCond
 	if arg2 and arg2 != @arg
 		ElseIfCond = arg2

@@ -13,7 +13,8 @@ extend_module ErrorReceiver
 
 	helper NewErrorSub (|Message| node, |string?| Desc, |string?| path, |int| sev)
 		opt norefcounts
-		sev = stderr.LowerErrorsTo min sev
+		|| Lower = stderr.LowerErrorsTo
+			sev = lower min sev
 		if stderr.CanAddMore(sev)
 			if desc == nil
 				desc = node.MiniName("Unexpected ")

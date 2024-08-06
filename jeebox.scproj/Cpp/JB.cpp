@@ -3802,14 +3802,11 @@ int JB_Rec__InitCode_() {
 }
 
 void JB_Rec__NewErrorWithNode(Message* Node, JB_String* Desc, JB_String* Path) {
-	int Sev = JB_StdErr->LowerErrorsTo;
-	if (!Sev) {
-		Sev = kJB__ErrorSeverity_Error;
-	}
-	JB_Rec__NewErrorSub(Node, Desc, Path, Sev);
+	JB_Rec__NewErrorSub(Node, Desc, Path, kJB__ErrorSeverity_Error);
 }
 
 void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, int Sev) {
+	Sev = JB_int_OperatorMin(JB_StdErr->LowerErrorsTo, Sev);
 	if (JB_Rec_CanAddMore(JB_StdErr, Sev)) {
 		if (Desc == nil) {
 			Desc = JB_Msg_MiniName(Node, JB_LUB[324]);
@@ -7879,7 +7876,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024080614);
+	return (2024080617);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
