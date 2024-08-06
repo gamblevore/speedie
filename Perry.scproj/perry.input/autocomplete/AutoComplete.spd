@@ -211,7 +211,7 @@ function PerryIDE.PopupDisplayFadeIn
 
 function PerryIDE.PopupDisplayFadeInSub (|bool|)
 	require .PopupDisplay.text
-	|| ago = .PopupDateOn.ago.seconds|float|
+	|| ago = .PopupDateOn.ago.Float
 	|| alpha = (ago*2.0).clamp
 	if (alpha < 0.5) and !keys.cmd and .PopupReason == 1
 		.PopupDateOn = 0

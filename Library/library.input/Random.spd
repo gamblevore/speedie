@@ -55,15 +55,15 @@ struct Random
 		rz /= 18446744073709551616.0 
 
 	function Float (|float|) 
-		return .double
+		return .double|float|
 	
 	function Float (|float| From, |float| To, |float|) 
 		cpp_part FloatRange
-		return (.double * (To - From)) + From
+		return (.float * (To - From)) + From
 	
 	function Float (|float| To, |float|) 
 		cpp_part FloatScale
-		return .double * To
+		return .float * To
 
 	function Float (|float| From, |float| To, |float| step, |float|)
 		cpp_part FloatStep
@@ -125,7 +125,7 @@ function ivec2.syntaxcall (|int| n, |string|)
 	return random.shared.Text(n, .x, .y)
 
 function float.syntaxcall (|float|)
-	return random.shared.double * self
+	return random.shared.float * self
 
 function int.syntaxcall (|int|)
 	return (random.shared.double * self|f64|)|int|

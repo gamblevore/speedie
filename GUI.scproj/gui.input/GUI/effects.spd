@@ -128,7 +128,7 @@ struct JeeboxEffects
 		.MakeBoxes(d, seed)
 		d.Blur(20.0, t)
 		
-		.RunOutline(d, t, LineStr, v)
+		.RunOutline(d, t, LineStr|float|, v)
 		.Duration += date.now - start
 		return true
 

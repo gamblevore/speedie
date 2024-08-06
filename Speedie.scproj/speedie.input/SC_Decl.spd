@@ -260,7 +260,6 @@ class SCDecl (SCNamed) {
 					return typeint64
 				return typeint
 			if Op is LoseBits					// &
-				debugat 
 				bits = bme min bt
 			  elseif Op is ShiftOnly			// >>, rotr, rotl
 				bits = bme

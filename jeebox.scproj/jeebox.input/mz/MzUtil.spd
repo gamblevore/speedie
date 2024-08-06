@@ -175,7 +175,7 @@ struct CompressionStats
 		|| d = .duration
 		if d < 0
 			d += date()
-		return d.seconds
+		return d.Float
 	
 	render Report (|bool| Compression)
 		|| a = (.in, .out)(Compression)

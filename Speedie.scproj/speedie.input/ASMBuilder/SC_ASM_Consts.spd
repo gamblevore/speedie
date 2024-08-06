@@ -63,7 +63,7 @@ extend ASMState
 	function f (|asmreg| r, |f64|)
 		|| p = .GetConst(r)
 		if r.fourbytes
-			return p|&float|[]
+			return p|&float|[]|f64|
 		return p|&f64|[]
 
 

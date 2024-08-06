@@ -11,7 +11,7 @@ function compiler.PrintCompileTime (|date| durr)
 	fs <~ "${stringcorrector.list.length} / "	
 	stringcorrector.TotalSize.strsize(fs)
 	fs <~ " // (avg "
-	fs.appenddouble(avg, 1)
+	fs.appendfloat(avg, 1)
 	fs <~ ")"
 	if VM_Builder.Total
 		fs.normal  "µCodes",			fs <~ VM_Builder.Total

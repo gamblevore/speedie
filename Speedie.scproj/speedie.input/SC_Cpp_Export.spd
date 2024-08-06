@@ -107,7 +107,7 @@ function FuncHeader (|SCFunction| F, |string|)
 		rz = ""
 
 
-function CppFunc (|FastStringCpp| fs, |SCFunction| F)
+function CppFunc (|FastStringCpp| fs, |SCFunction| F) // function func (
 	opt norefcounts	
 	scfunction.currfunc = f
 	(f is AlreadyExported)
@@ -115,7 +115,6 @@ function CppFunc (|FastStringCpp| fs, |SCFunction| F)
 	.SetupFlow(F)
 
 	.FuncStart(fs, f, FuncHeader)
-	if f ~= "TransCompile2"
 	f.Sourcearg!.Export( fs )
 
 	.OptEnd(fs, f.minopt)

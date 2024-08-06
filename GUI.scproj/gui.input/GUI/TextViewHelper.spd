@@ -330,7 +330,7 @@ helper textview.DrawError (|image| Where, |int| y, |TextViewLine| D)
 	if d contains .sel1
 		.myerror = e
 	if e is parse
-		|| Alpa = (e.when.ago.seconds - 1.0) * lm
+		|| Alpa = (e.when.ago.float - 1.0) * lm
 		if (Alpa <= lm)
 			sdlapp.touch(Self)
 		v.a = alpa min lm

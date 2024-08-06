@@ -274,16 +274,17 @@ function faststring.RenderSpeed (|float| seconds, |int64| BytesIn, |int64| Bytes
 		Bytesout.strsize(self)
 		self <~ " ("
 		|| ratio = ((Bytesout|float| / Bytesin|float|)*100.0)
-		self.appenddouble(ratio)
+		self.appendfloat(ratio)
 		self <~ "%)"
 
 	self <~ " in "
 
-	if seconds < 0.01
-		.appenddouble(seconds*1000.0, 2)
+	|| small = seconds < 0.01
+		seconds *= 1000.0
+
+	.appendfloat(seconds, 2)
+	if small
 		self <~ 'm'
-	  else
-		.appenddouble(seconds, 2)
 	self <~ 's'
 		
 	require seconds
@@ -298,7 +299,7 @@ function faststring.RenderSpeed (|float| seconds, |int64| BytesIn, |int64| Bytes
 		unit = 'K'
 	|| dp = (5,2)(rate <= 0.01)
 	self <~ "  ("
-	self.appenddouble(rate, dp)
+	self.appendfloat(rate, dp)
 	self <~ unit
 	self <~ 'B'
 	self <~ "/s)"

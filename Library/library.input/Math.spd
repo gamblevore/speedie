@@ -85,7 +85,9 @@ module Math
 	function float.Gaussian (|float| v, |float|)
 		|| exp = self*self / v
 		|| factor = math.e pow -exp
-		return factor / (π * v).sqrt
+		|| mul = π|float| * v
+		|| sq = mul.Sqrt
+		return factor / sq
 	
 	function float.Clamp (|float|L, |float|H, |float|)
 		cpp_wrapper JB_f_Clamp

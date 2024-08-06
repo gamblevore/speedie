@@ -1086,11 +1086,11 @@ class Message (list)
 				return F.name.ParseHex(StrStart, F)
 			|| mul = f.name.ParseFloat
 			if self == 'K'
-				mul *= 1K|float|
+				mul *= 1K|f64|
 			  elseif self == "M"
-				mul *= 1M|float|
+				mul *= 1M|f64|
 			  elseif self == "G"
-				mul *= 1G|float|
+				mul *= 1G|f64|
 			  else
 				error (self, "Invalid unit")
 				mul = 0.0
@@ -1106,7 +1106,7 @@ class Message (list)
 //			return .name.ParseInt(self)
 
 	function Float32 (|float|)
-		|| d = .float
+		|| d = .float|float|
 		expect (d.abs <= float.max) ("Float64 got clipped in a float32")
 		return d
 

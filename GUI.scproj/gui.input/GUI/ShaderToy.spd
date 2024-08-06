@@ -30,7 +30,7 @@ class ShaderToy (window)
 		.LastDraw = date.now
 		.LastFPSChange := .LastDraw
 		if .LastFPSChange.ago > 0.5s
-			.fps.text = (1.0/ago.seconds).Render(1) + "fps"
+			.fps.text = (1.0/ago.f64).Render(1) + "fps"
 			printline .fps.text
 			.LastFPSChange = .LastDraw
 		
@@ -38,7 +38,7 @@ class ShaderToy (window)
 		|| scale = 1.0/size.xx
 		|| adjust = size*-0.5	
 		for (c in where) (p)
-			.time = (.LastDraw - .CreatedDate).Seconds
+			.time = (.LastDraw - .CreatedDate).Float
 			|| pv = p.vec2
 			|| XY = (pv + adjust) * scale
 			|| Col = (.Shader)(self, size, pv, XY)

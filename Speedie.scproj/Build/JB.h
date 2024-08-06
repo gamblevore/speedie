@@ -4573,8 +4573,6 @@ AsmReg SC_ASMtmp__Pointer(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
 AsmReg SC_ASMtmp__Return(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
-AsmReg SC_ASMtmp__SetReg(ASMState* Self, Message* Exp, AsmReg Dest);
-
 AsmReg SC_ASMtmp__SetRel(ASMState* Self, Message* Exp, AsmReg Dest, int Mode);
 
 AsmReg SC_ASMtmp__SlowCountOnAddr(ASMState* Self, Message* F, AsmReg Dest, int Mode, AsmReg Addr, int64 Amount);
@@ -4612,7 +4610,7 @@ SCDecl* SC_Reg_Decl(AsmReg Self);
 
 float SC_Reg_F32(AsmReg Self);
 
-float SC_Reg_F64(AsmReg Self);
+double SC_Reg_F64(AsmReg Self);
 
 FatASM* SC_Reg_FAT(AsmReg Self);
 
@@ -4759,11 +4757,11 @@ int JB_Date_DayOfWeek(Date Self);
 
 int64 JB_Date_Days(Date Self);
 
+float JB_Date_Float(Date Self);
+
 JB_String* JB_Date_RenderDurr(Date Self, FastString* Fs_in);
 
 JB_String* JB_Date_RenderInt(Date Self, FastString* Fs_in);
-
-double JB_Date_Seconds(Date Self);
 
 int64 JB_Date_WholeSeconds(Date Self);
 
@@ -10196,6 +10194,8 @@ inline JB_String* JB_CP_SyntaxCast(Codepoint Self);
 
 inline bool JB_Err2_SyntaxCast(ErrorInt2 Self);
 
+inline void JB_FS_AppendFloat(FastString* Self, float D, int Dp, bool CanExp, bool Dot);
+
 inline JB_String* JB_FS_SyntaxCast(FastString* Self);
 
 inline JB_String* JB_Object___Render__(JB_Object* Self, FastString* Fs_in);
@@ -10383,6 +10383,10 @@ inline JB_String* JB_CP_SyntaxCast(Codepoint Self) {
 
 inline bool JB_Err2_SyntaxCast(ErrorInt2 Self) {
 	return (JB_ivec2_Equals2(Self, ivec2{0, 0}, false));
+}
+
+inline void JB_FS_AppendFloat(FastString* Self, float D, int Dp, bool CanExp, bool Dot) {
+	JB_FS_AppendDoubleAsText(Self, ((double)D), Dp, CanExp, Dot);
 }
 
 inline JB_String* JB_FS_SyntaxCast(FastString* Self) {

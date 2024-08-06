@@ -34,9 +34,9 @@ extend ObjectLoader {
 		return .int|bool|
 
 	function Float (|float|)
-		return .f64
+		return .f64|float|
 	
-	function F64 (|float|)
+	function F64 (|f64|)
 		opt norefcounts
 		return .Next$.float
 	

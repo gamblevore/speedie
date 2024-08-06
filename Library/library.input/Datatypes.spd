@@ -550,7 +550,6 @@ datatype f64
 	function Floor (|f64|)
 		cpp_wrapper (floor)
 	
-		
 	function Fract (|f64|)
 		return self - .floor
 	

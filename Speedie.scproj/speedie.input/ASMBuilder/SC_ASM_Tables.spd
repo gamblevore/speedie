@@ -289,22 +289,14 @@ function Pointer		(fn_asm)
 
 
 function Decl (fn_asm)
-// yay
 	opt norefcounts
-	|| rel = exp.last!
-	|| ty = rel.first!.fastdecl
-	|| dest2 = .DeclareMe(Exp, ty)
-	return SetReg(self, rel.last!, dest2)
-
-
-
-function SetReg (|&ASMState| self, |message| exp, |AsmReg| Dest, |AsmReg|)
-	|| r2 = .µ(exp, dest as AsmReg.set)
-	r2 = r2 asnt asmreg.set
-	if r2.reg == dest.reg
-		return r2
-	return .Assign(dest, r2, asmreg(), exp)
-
+	exp = exp.last!
+	|| ty = exp.first!.fastdecl
+	dest = .DeclareMe(Exp, ty) 
+	|| Value = .µ(exp.last!, dest as AsmReg.set)
+	if Value.reg == dest.reg
+		return Value
+	return .Assign(dest, Value, asmreg(), exp)
 
 
 function Arg   (fn_asm)
@@ -352,15 +344,22 @@ function Dot		(fn_asm)						// a.b
 
 function SetRel	(fn_asm)
 	opt	norefcounts									//   x[func()] = y++
-	|| L = exp.first!
-	|| Var = .ExistingVar(L)
-	|| R = .µ(exp.last!, var)
-	|| vr = var.reg
-		if r.reg == vr
-			return r // done!
+	|| Var = .ExistingVar(exp.first!)
+	Dest = .µ(exp.last!, var)
+	check (dest.reg) (self, exp, "SetRel failed")
+	if var!=nil and dest.reg == var.reg
+		return dest // done!
 
-	check (r.reg) (self, exp, "SetRel failed")
-	return setreg(self, exp, r)
+//	// This must be a memory set!  L must be accepting memory... from a register.
+//	// what about bools? // they already get casted? its just float/double thats the issuenow.
+//	// mybool = MyFloat
+//	|| mybool = false
+//	|| myfloat = 1.0
+//	|f64| mydouble
+//	mybool = 1.0
+//	mybool = myfloat
+//	mydouble = myfloat
+	.µ(exp.first!, dest as AsmReg.set)
 
 
 function Num (fn_asm)
@@ -661,9 +660,9 @@ function FatASM.FloatConvConst (|&FatASM| src, |int| DestBitSize)
 	|| f = (&src.Const)|&nil|
 	|| d = (&.Const)|&nil|
 	if DestBitSize == 64			// f32 to f64
-		d|&f64|[]   = f|&float|[]
+		d|&f64|[]   = f|&float|[]|f64|
 	  elseif DestBitSize == 32		// f64 to f32
-		d|&float|[] = f|&f64|[]
+		d|&float|[] = f|&f64|[]|float|
 	  else
 		error (src.msg)
 

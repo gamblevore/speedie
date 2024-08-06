@@ -10,12 +10,13 @@ datatype Date (int64)
 		return self|bool|
 
 	syntax cast (|float|)
+		// are these bad? remove them??
 		cpp_Part CastFloat
-		return (self|float| * kOneStep)
+		return .Float
 	
 	syntax cast (|f64|)
 		cpp_Part CastDouble
-		return .seconds
+		return .F64
 	
 	
 	constants
@@ -37,13 +38,16 @@ datatype Date (int64)
 		return self >> 16
 	
 //	function Rate (|f64|) // per what, though? per-second is common, but if we are talking about per-day its another thing.
-//		return 1.0 / .Seconds
+//		return 1.0 / .Seconds 
 	
-	function Seconds (|f64|)
+	function Float (|float|)
+		return self|float| * kOneStep
+	
+	function F64 (|f64|)
 		return self|f64| * kOneStep
 	
 	function ReportAgo (|string|)
-		|| s = .seconds
+		|| s = .F64
 		|| unit = "s"
 		if s < 0.01
 			s *= 1000.0
@@ -92,7 +96,7 @@ datatype Date (int64)
 	function Weeks (|int64|)
 		return (.wholeSeconds / kSecondsPerWeek)
 
-	function int64.Seconds (|date|)
+	function int64.ToSeconds (|date|)
 		return self << 16
 	
 	iterator
@@ -100,7 +104,7 @@ datatype Date (int64)
 		|| EndDate = StartDate + self
 		|date| CurrTime
 		while date.now2(CurrTime) < EndDate
-			yield (CurrTime - StartDate).seconds|float|
+			yield (CurrTime - StartDate).float
 
 	module
 		function TimeID (|uint64|)
@@ -126,4 +130,5 @@ datatype Date (int64)
 			
 		function Hash  (|uint64|)
 			return .timestamp.hash
+
 

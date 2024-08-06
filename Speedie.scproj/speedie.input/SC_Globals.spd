@@ -351,7 +351,7 @@ function TypeOfUnit (ExprResolver)
 		Mul = 0
 	  else
 		type = typedate!
-		|| s4 = 64.0*1024.0
+		|f64| s4 = 64.0*1024.0
 		if unit == "s"
 			mul = s4
 		  elseif unit == "ms"

@@ -190,15 +190,28 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 		|| OIsNum = O.IsNormalNumber
 		|| SIsNum =  .IsNormalNumber
 		if Oisnum and sisNum
-			if typecast & kTypeCastFromZero  or  o.IsFloat == .IsFloat			
+			if typecast & kTypeCastFromZero
 				return kNumericMatch
+			|| ff = o.IsFloat + .IsFloat
+			if ff == 0
+				return kNumericMatch
+			if (ff == 2)
+				|| L = .typeinfo
+				|| R = o.typeinfo
+				if (L.ByteCount == R.ByteCount)
+					return kNumericMatch
+				if (self is const) or (o is const)
+					return kNumericMatch // Just do this at ASM time. makes no sense otherwise.
+ 
+				
 		if TypeCast&kTypeCastBothWays
 			if Oisnum and  .IsNormalBool
-				return knumericMatch
+				return kNumericMatch
 			if sisnum and o.IsNormalBool
-				return knumericMatch
-				// i guess???
+				return kNumericMatch
 
 	// so much nicer!
 	if ot.FuncProto.EqualOrMoreSpecific(t.FuncProto) and .PointeryMatch(O)
 		return exp.CastToClass(t, nil)
+
+

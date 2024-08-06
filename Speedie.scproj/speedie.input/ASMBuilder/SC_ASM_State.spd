@@ -307,7 +307,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 	|| p = prms.first
 	for fnarg in fn.args
 		expect (p) (exp, "Compiler did not fully type this function.") 
-		|| v = .funcprm(p, fnarg).reg
+		|| v = .FuncPrm(p, fnarg).reg
 		if sh <= 25
 			reg2 |= (v << sh)
 		  else

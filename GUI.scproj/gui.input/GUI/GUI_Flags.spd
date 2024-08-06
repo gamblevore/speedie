@@ -73,7 +73,7 @@ struct TimeFader
 			return 1.0
 		|| remy = f - now
 		if remy > 0
-			|float| str = remy.seconds * .Scale
+			|| str = remy.float * .Scale
 			if touch
 				sdlapp.touch
 			rz = str.clamp

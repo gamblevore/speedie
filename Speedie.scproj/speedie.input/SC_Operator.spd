@@ -496,6 +496,8 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 
 
 function message.TryImproveShiftConstants (|scdecl| LC, |scdecl| RC, |int|)
+	// we need this to avoid some issues elsewhere with consts getting out of range or something
+	// maybe its just for perry? idk. could be both. either way its easier to process.
 	opt norefcounts
 	require lc is const and rc is const
 	|| lk = lc.exportposition

@@ -44,7 +44,7 @@ datatype AsmReg (uint64)
 	function F32 (|float|)
 		return .needfat.F32
 		
-	function F64 (|float|)
+	function F64 (|f64|)
 		return .needfat.F64
 
 	function Const (|int64|)
