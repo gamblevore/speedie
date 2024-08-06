@@ -306,14 +306,25 @@ function TypeOfSString (ExprResolver)
 	return TypeStringZero!.TypeReal
 
 
+|dictionary of scdecl| CodePointTable
 function TypeOfChar (ExprResolver)
 	if exp.length == 1
 		return TypeByte!.typenormal
-	|ind| cp = exp.name.codepoint|ind| 		#expect (exp, "Invalid codepoint")
+	|| cp = exp.name.codepoint|ind| 		#expect (exp, "Invalid codepoint")
 	
+	|| d = CodePointTable init Dictionary()
+	|| str = cp.Render
+	|| place = d.MakePlace(str)
+	|| char_decl = place[]				// now what? we have an old char?
+	if !char_decl
+		char_decl = TypeCodePoint!.typenormal.CopyDecl
+		place[] = char_decl
+		(char_decl is const)			//	compiler.NewConst(char_decl) // no!
+		char_decl.ExportPosition = cp	// nice!
 	exp.Func = @num
-	exp.name = cp.render
-	return typecodepoint!.typenormal
+	exp.name = str	
+	exp.obj = char_decl
+	return char_decl
 
 
 
