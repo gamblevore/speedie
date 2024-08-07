@@ -15,6 +15,8 @@ app.usage = "Usage: cloc path [...]
 
 
 main  (|[existingfile]| files)
+	if !files
+		Quit app.Usage
 	counts.Init(app["types"])
 	for dir in files
 		dir.CountAll(true)
@@ -128,7 +130,7 @@ function file.CLOC
 		msg.RenderAST(app.stdout.out)
 		printline
 	  elseif counts.ParseSpeed
-		app.stdout.out!.RenderSpeed(durr.seconds, data.length, 0, "Parsed")
+		app.stdout.out!.RenderSpeed(durr.float, data.length, 0, "Parsed")
 		printline
 	(msg)
 		
