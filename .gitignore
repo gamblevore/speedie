@@ -5,6 +5,7 @@ cpp.hidden
 xcuserdata/
 *nogit
 *.mz
+*(ignored)*
 
 /Library/*.jbin
 **/*.input/garbage.jb
