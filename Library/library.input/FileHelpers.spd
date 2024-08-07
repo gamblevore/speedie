@@ -103,9 +103,8 @@ extend String
 
 	Syntax Append (|messageroot!| msg, |bool|)
 		cpp_Part WriteMsg
-		|| fs = .out
-			msg.render(fs)
-			return true
+		msg.render(.out)
+		return true
 
 
 	function Sibling (|string| name, |string|)
