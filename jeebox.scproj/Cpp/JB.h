@@ -1448,7 +1448,7 @@ bool JB_CP_IsWhite(Codepoint Self);
 // DataTypeCode
 bool JB_TC_IsFloat(uint /*DataTypeCode*/ Self);
 
-bool JB_TC_SyntaxIs(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ M);
+bool JB_TC_IsNumeric(uint /*DataTypeCode*/ Self);
 
 
 

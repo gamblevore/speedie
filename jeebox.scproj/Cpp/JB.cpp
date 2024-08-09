@@ -2846,8 +2846,8 @@ bool JB_TC_IsFloat(uint /*DataTypeCode*/ Self) {
 	return ((bool)((Self >> 7) & 1));
 }
 
-bool JB_TC_SyntaxIs(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ M) {
-	return (Self & kJB__TC_PossibleBits) == (M & kJB__TC_PossibleBits);
+bool JB_TC_IsNumeric(uint /*DataTypeCode*/ Self) {
+	return (((bool)(Self & kJB__TC_Numeric)));
 }
 
 
@@ -3567,7 +3567,7 @@ JB_String* JB_Wrap_Render(DTWrap* Self, FastString* Fs_in) {
 	if (JB_TC_IsFloat(Self->DataType)) {
 		JB_FS_AppendDoubleAsText0(Fs, JB_Wrap_FloatValue(Self));
 	}
-	 else if (!JB_TC_SyntaxIs(Self->DataType, kJB__TC_Numeric)) {
+	 else if (!JB_TC_IsNumeric(Self->DataType)) {
 		JB_FS_AppendString(Fs, JB_LUB[148]);
 		JB_FS_AppendHex(Fs, Self->PrivValue, 2);
 	}
@@ -7876,7 +7876,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024080915);
+	return (2024080922);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -7888,4 +7888,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 -1368809419104512699 920410641272458315
+// 7796578953066441599 -6167232841316557568 920410641272458315

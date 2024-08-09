@@ -785,9 +785,9 @@ datatype bool
 	size 1
 	default false
 	
-	operator bitor (|bool| b, |bool|)
-		return self or b
-	
+//	operator bitor (|bool| b, |bool|)
+//		return self or b
+//	
 	operator sign (|int| i, |int|)
 		return (i, -i)(self)
 	function Bool (|int| i, |int|)

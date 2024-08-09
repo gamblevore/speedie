@@ -997,6 +997,8 @@ class TextView (GUIControl)
 			Alpha *= str * .Strength
 			|| C1 = (1.0, 1.0, 2.0, alpha)
 			|| Rect = (s-2.5, s+2.5)
+			rect.y1-=2
+			rect.y2-=2
 			sdlapp.Screen.DrawCircle2( Rect,  C1 )
 
 
