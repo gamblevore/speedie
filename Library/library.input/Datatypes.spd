@@ -4,6 +4,9 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
+insertion
+	bits	((1<<_0)-1)
+
 		
 datatype int
 	default 0
@@ -40,9 +43,6 @@ datatype int
 		opt inline
 		return (self & (self - 1)) == 0
 
-//	function Bits (|int|)
-//		return (1<<self)-1
-
 	function AlignUp (|int| To, |int|)
 		return self + (-self|uint| mod to) // ???
 
@@ -65,10 +65,6 @@ datatype int
 
 	function Clz (|int|)
 		cpp_inbuilt __builtin_clz
-	
-
-	operator nobits (|int| n, |int|)
-		return self &~ ((1<<n)-1)
 
 	operator isa (|uint| n, |bool|)
 		return !(self mod n)
@@ -280,12 +276,6 @@ datatype uint
 	
 	operator rotr (|int| Amount, |uint64|)
 		cpp_wrapper JB_u32_RotR
-
-//	operator bits (|uint| n, |uint|)
-//		return self & ((1<<n)-1)
-//
-//	operator nobits (|uint| n, |uint|)
-//		return self &~ ((1<<n)-1)
 
 	function IsPow2 (|bool|)
 		cpp_wrapper JB_uint_IsPow2
@@ -575,6 +565,9 @@ datatype f64
 		return (self * 64.0K)|date|
 
 
+datatype Float64 (f64) // should be the proper name...
+
+
 datatype hfloat
 	processas float
 	default 0.0
@@ -637,14 +630,6 @@ datatype int64
 
 	function LowestBit (|uint64|)
 		return self & -self
-
-//	operator bits (|int64| n, |int|)
-//		|int64| one = 1
-//		return self & ((one<<n)-one)
-
-	operator nobits (|int64| n, |int|)
-		|int64| one = 1
-		return self & ((one<<n)-one)
 
 	function AsFloat (|f64|)
 		cpp_wrapper
@@ -881,3 +866,4 @@ datatype MoveCode (byte)
 		|| m = 0b01010101
 		|| m2 = m << 1
 		return ((self & m) << 1) ||| ((self & m2) >> 1)
+
