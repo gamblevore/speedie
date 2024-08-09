@@ -181,10 +181,10 @@ struct ASMState
 
 
 	function RegMap (|int|)
-		|| dcls = (1<<.VDecls+1)-1
+		|| dcls = (.VDecls+1)~bits
 		if .vtmps >= 32
 			return dcls
-		|| tmps = (1 << .vtmps)-1
+		|| tmps = .vtmps~bits
 		tmps = ~tmps
 		return dcls ||| tmps
 	
