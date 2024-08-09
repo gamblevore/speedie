@@ -2913,6 +2913,7 @@ Array* JB_ErrorSeverity__InitNames() {
 
 
 
+
 int JB_Rg_Width(IntRange Self) {
 	return Self[1] - Self[0];
 }
@@ -3942,10 +3943,6 @@ JB_String* JB_FS_Render(FastString* Self, FastString* Fs_in) {
 
 void JB_FS_AppendFastString(FastString* Self, FastString* Fs) {
 	JB_FS_AppendMem_(Self, Fs->ResultPtr, Fs->Length);
-}
-
-void JB_FS_AppendInt64(FastString* Self, int64 Data) {
-	JB_FS_AppendIntegerAsText(Self, Data, 1);
 }
 
 void JB_FS_AppendInt32(FastString* Self, int Data) {
@@ -7879,7 +7876,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024080618);
+	return (2024080915);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -7891,4 +7888,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 8873106697153073716 920410641272458315
+// 7796578953066441599 -1368809419104512699 920410641272458315

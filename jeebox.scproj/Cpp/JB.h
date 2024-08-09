@@ -71,6 +71,8 @@ typedef bool FileResolveMode;
 
 typedef int64 FileSizeInt;
 
+typedef double Float64;
+
 typedef vec4 FloatRangeConverter;
 
 typedef vec2 FloatRangeConverterBasic;
@@ -1490,6 +1492,9 @@ Array* JB_ErrorSeverity__InitNames();
 // FileSizeInt
 
 
+// Float64
+
+
 // FloatRangeConverter
 
 
@@ -2037,8 +2042,6 @@ void JB_FS_ProblemsFound(FastString* Self, int Count);
 JB_String* JB_FS_Render(FastString* Self, FastString* Fs_in);
 
 void JB_FS_AppendFastString(FastString* Self, FastString* Fs);
-
-void JB_FS_AppendInt64(FastString* Self, int64 Data);
 
 void JB_FS_AppendInt32(FastString* Self, int Data);
 
@@ -2780,6 +2783,8 @@ inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F);
 
 inline bool JB_Array_SyntaxCast(Array* Self);
 
+inline void JB_FS_AppendInt64(FastString* Self, int64 Data);
+
 inline JB_String* JB_FS_SyntaxCast(FastString* Self);
 
 inline JB_String* JB_Object___Render__(JB_Object* Self, FastString* Fs_in);
@@ -2953,6 +2958,10 @@ inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F) {
 
 inline bool JB_Array_SyntaxCast(Array* Self) {
 	return JB_Array_Size(Self) > 0;
+}
+
+inline void JB_FS_AppendInt64(FastString* Self, int64 Data) {
+	JB_FS_AppendIntegerAsText(Self, Data, 1);
 }
 
 inline JB_String* JB_FS_SyntaxCast(FastString* Self) {

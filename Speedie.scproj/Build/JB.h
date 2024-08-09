@@ -1908,13 +1908,15 @@ extern ASM_Encoder2 SC__ASM_Encoders[256];
 #define kSC__ASM_FMIN 99
 #define kSC__ASM_FMLK 95
 #define kSC__ASM_FMUL 94
-#define kSC__ASM_FNCX 5
-#define kSC__ASM_FNCX2 5
-#define kSC__ASM_FNCX3 6
+#define kSC__ASM_FNCX 8
+#define kSC__ASM_FNCX1 8
+#define kSC__ASM_FNCX2 9
+#define kSC__ASM_FNCX3 10
 extern ASM_Encoder2 SC__ASM_Forms[128];
-#define kSC__ASM_FUNC 1
-#define kSC__ASM_FUNC2 1
-#define kSC__ASM_FUNC3 2
+#define kSC__ASM_FUNC 4
+#define kSC__ASM_FUNC1 4
+#define kSC__ASM_FUNC2 5
+#define kSC__ASM_FUNC3 6
 #define kSC__ASM_JBRA 68
 #define kSC__ASM_JBRN 69
 #define kSC__ASM_JMPE 66
@@ -1923,10 +1925,10 @@ extern ASM_Encoder2 SC__ASM_Forms[128];
 #define kSC__ASM_JMPN 67
 #define kSC__ASM_JUMP 63
 #define kSC__ASM_KNSR 40
-#define kSC__ASM_KNST 8
-#define kSC__ASM_KNST1 8
-#define kSC__ASM_KNST2 9
-#define kSC__ASM_KNST3 10
+#define kSC__ASM_KNST 12
+#define kSC__ASM_KNST1 12
+#define kSC__ASM_KNST2 13
+#define kSC__ASM_KNST3 14
 #define kSC__ASM_LUPD 70
 #define kSC__ASM_LUPU 71
 #define kSC__ASM_MAX 47
@@ -1952,8 +1954,9 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_SUBB 44
 #define kSC__ASM_SWAP 36
 #define kSC__ASM_TABL 75
-#define kSC__ASM_TAIL 13
-#define kSC__ASM_TAIL2 13
+#define kSC__ASM_TAIL 16
+#define kSC__ASM_TAIL1 16
+#define kSC__ASM_TAIL2 17
 #define kSC__ASM_TERN 60
 #define kSC__ASM_TRAP 33
 #define kSC__ASM_WR16 88
@@ -3722,6 +3725,8 @@ bool SC_FuncPreReader_real(SCFunction* Self, Message* Msg);
 
 bool SC_FuncPreReader_todo(SCFunction* Self, Message* Msg);
 
+void SC_iiiiiooo();
+
 int JB_Init_();
 
 int JB_InitCode_();
@@ -4227,8 +4232,6 @@ void JB_cstring_temp(_cstring Self, FakeJBString* Rz);
 
 
 // f64
-JB_String* JB_dbl_Render(double Self, int Dp, FastString* Fs_in);
-
 JB_String* JB_dbl_RenderFloat(double Self, FastString* Fs_in);
 
 
@@ -7244,6 +7247,8 @@ bool JB_Str_EqualsInt(JB_String* Self, int Other, bool Aware);
 void JB_Str_SyntaxExpect(JB_String* Self);
 
 JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in);
+
+bool SC_Str_trap(JB_String* Self, Message* Msg);
 
 JB_String* JB_Str_Shorten(JB_String* Self, int N);
 
@@ -10485,7 +10490,7 @@ inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After) {
 	ASM* Rz = nil;
 	Rz = (SC__ASM_Encoders[Self->Op])(Self, Where, After, 0);
 	if (SC_ASM_DecodeBaseOp(Where[0]) != Self->Op) {
-		JB_PrintLine(JB_LUB[2110]);
+		JB_PrintLine(JB_LUB[2111]);
 		debugger;
 		Rz = (SC__ASM_Encoders[Self->Op])(Self, Where, After, 0);
 	}

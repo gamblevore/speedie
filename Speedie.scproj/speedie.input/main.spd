@@ -1,8 +1,18 @@
 
 
 main // speedie main {
+	debugat 
+	printline 123
+	iiiiiooo()
 	Compiler.Compile
 
+
+function iiiiiooo
+	|| A = 11~bits    << 52
+	|| B = 1~bits     << 52
+	|| C = ((1<<1)-1) << 52
+	|| D = ((1<<1)-1) << 30
+	
 
 function compiler.Compile
 	.SetupEnv	

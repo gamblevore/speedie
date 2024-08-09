@@ -496,7 +496,15 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 
 
 function message.TryImproveShiftConstants (|scdecl| LC, |scdecl| RC, |int|)
-	// we need this to avoid some issues elsewhere with consts getting out of range or something
+	// this is breaking some things...
+	// basically... LC and RC might not be correct. Their exportposition could be wrong
+	// if it belongs to a different node... because typeofrel returns LC...
+	// rather than a new const for the overall thing.
+	// perhaps typesofrel shouldn't return a const? i mean TECHNICALLY it is
+	// but we just did some ops on it, so its more like a temporary const
+	
+	
+	// We need this mostly for the constant loader. (Or only?)
 	// maybe its just for perry? idk. could be both. either way its easier to process.
 	opt norefcounts
 	require lc is const and rc is const

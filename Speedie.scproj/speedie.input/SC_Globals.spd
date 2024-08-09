@@ -1427,6 +1427,7 @@ function message.AndOrExpansionTest (|int|)
 
 
 function TypeOfRel (ExprResolver)
+	if "iiiiiooo".trap
 	|| LN = exp.first!
 	|| opch = ln.Next!
 	|| Comp = SCOperator.Lookup( opch )

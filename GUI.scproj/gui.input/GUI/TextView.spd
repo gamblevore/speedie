@@ -977,7 +977,7 @@ class TextView (GUIControl)
 			|| S = .StartTime + .d.position
 			for p in particles
 				|| V2 = (S + p).RandomVec2 - 0.5
-				v2.x *= 2
+				v2.x *= 5
 				|| A  = (S - p).RandomVec2 - 0.5
 				A.y *= 4.0
 				V2 = (V2 * 25.0) + .V * 250.0
@@ -990,7 +990,10 @@ class TextView (GUIControl)
 				str = 0.5
 			|| T2 = T - p * 0.0125
 			|| s = start.vec2 + (V*T2 + A)
-			|| Alpha = (1.0-(T2*1.5)) * (1.0-T)
+			|| FadeSpeed = 2.43 // what about * (1.0-T)? what does that do?
+			// this isnt RAELLY the fade speed. Just imagine these are just numbers and i dont know 
+			// what im doing and just renaming stuff for you to fix later.
+			|| Alpha = (1.0-(T2*FadeSpeed)) * (1.0-T)
 			Alpha *= str * .Strength
 			|| C1 = (1.0, 1.0, 2.0, alpha)
 			|| Rect = (s-2.5, s+2.5)
@@ -1875,8 +1878,8 @@ class TextView (GUIControl)
 		return p
 
 
-	helper ColoriseRoot (|message| p)
-		opt norefcounts
+//	helper ColoriseRoot (|message| p)
+//		opt norefcounts
 //		for m in p	// do this directly in the actual coloriser!!
 //					// uncool to do this here
 //			if (m == @tmp) and .coloriseasroot.ValueLower(m.name)
