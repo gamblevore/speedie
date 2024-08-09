@@ -1977,7 +1977,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112934267475340));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112934409076736));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -2158,11 +2158,13 @@ void SC_Comp__PrintResults() {
 	SC_Comp__PrintStats();
 	SC_Comp__PrintCompileErrors();
 	if (JB__Proc_Parent != nil) {
-		JB_String* _tmPf1 = JB_Incr(JB_int_RenderFS(JB_App__ID(), nil));
-		JB_String* _tmPf0 = JB_Incr(JB_Str_OperatorPlus(JB_LUB[753], _tmPf1));
+		FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
+		JB_FS_AppendString(_fsf0, JB_LUB[753]);
+		JB_FS_AppendInt32(_fsf0, JB_App__ID());
+		JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
+		JB_Decr(_fsf0);
+		JB_PrintLine(_tmPf1);
 		JB_Decr(_tmPf1);
-		JB_PrintLine(_tmPf0);
-		JB_Decr(_tmPf0);
 	}
 	if (SC__Options_SelfReplacement and JB_IsTerminal(kJB__FileDes_StdOut)) {
 		JB_String* _tmPf2 = JB_Incr(SC_Comp__VariantSuffix());
@@ -3300,7 +3302,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[179]);
-	JB_FS_AppendInt32(_fsf0, (2024080922));
+	JB_FS_AppendInt32(_fsf0, (2024080923));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -7447,10 +7449,6 @@ bool SC_SpdAssembler__VacGenerate(SCFunction* Fn) {
 ErrorInt JB_Main() {
 	(JB_App__ConfigureSet(SC___AppConfString));
 	//visible;
-	JB_DoAt(1);
-	DTWrap* _tmPf0 = JB_Incr(JB_Wrap_ConstructorInt(nil, 123));
-	JB_Obj_PrintLine(_tmPf0);
-	JB_Decr(_tmPf0);
 	SC_iiiiiooo();
 	SC_Comp__Compile();
 	return 0;
@@ -8361,7 +8359,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024080922));
+	JB_FS_AppendInt32(_fsf0, (2024080923));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -10519,6 +10517,7 @@ bool SC_FuncPreReader_todo(SCFunction* Self, Message* Msg) {
 }
 
 void SC_iiiiiooo() {
+	JB_DoAt(1);
 	int64 A = 4503599627370496;
 	int64 B = 4503599627370496;
 	int64 C = 4503599627370496;

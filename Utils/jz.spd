@@ -328,7 +328,7 @@ module Conv
 
 		
 	function Transform
-		|| FmtSame    = Detected.format == Dest.format
+		|| FmtSame  = Detected.format == Dest.format
 		|| PathSame = .in.path == .out.path
 		if (FmtSame and PathSame)
 			"Nothing to do for: $.out"
@@ -398,7 +398,7 @@ module Conv
 		|| mz = str.ParseJbin(3)
 		if !mz
 			printline StdErr.pop
-			0
+
 		ifn mz == @tmp and "µz"
 			.Detected |= type.jbin
 			return ""

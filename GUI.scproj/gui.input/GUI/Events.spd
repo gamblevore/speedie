@@ -112,6 +112,7 @@ struct SDL_TouchFingerEvent
 		cpp_wrapper SDL_GetNumTouchFingers (|int| touchid, |int|)
 
 
+
 datatype MouseButton (uint)
 	linkage
 		cpp_part MB
