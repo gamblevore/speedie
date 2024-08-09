@@ -48,14 +48,21 @@ struct Random
 			return s[0,n]
 	
 	function Int (|f64| n, |int64|) 
-		return (.Double * n)|int64|
+		return (.Float64 * n)|int64|
 
-	function Double (|f64|)
-		rz = (.int|uint64|)|f64|
-		rz /= 18446744073709551616.0 
+	function Float64 (|Float64|) // Double (
+		|| i = .int|uint64|
+		|uint64[1]| C
+		|| F = (&C[0])|&f64|
+		c[0] = (i >> 12) ||| 4_607_182_418_800_017_408
+		return F[] - 1.0
 
-	function Float (|float|) 
-		return .double|float|
+	function Float (|float|)
+		|| i = .int|uint|
+		|uint[1]| C
+		|| F = (&C[0])|&float|
+		c[0] = (i >> 9) ||| 7~bits<<23
+		return F[] - 1.0
 	
 	function Float (|float| From, |float| To, |float|) 
 		cpp_part FloatRange
@@ -96,7 +103,7 @@ struct Random
 		return .float(From,to,step, pow)
 
 	syntax access (|f64|)
-		return .double
+		return .Float64
 		
 
 	function Temporal (|Memory| mem)
@@ -124,11 +131,14 @@ struct Random
 function ivec2.syntaxcall (|int| n, |string|)
 	return random.shared.Text(n, .x, .y)
 
-function float.syntaxcall (|float|)
-	return random.shared.float * self
+function float.syntaxcall (|float|)		// can this even be accessed anymore? seems no?
+	return random.shared.float * self	// 1.0() doesnt work anymore? neither 1.0[]
+
+function float64.syntaxcall (|float64|)
+	return random.shared.float64 * self
 
 function int.syntaxcall (|int|)
-	return (random.shared.double * self|f64|)|int|
+	return (random.shared.Float64 * self|f64|)|int|
 
 function int.Rand (|int|)
 	disabled "use 'num()'"
