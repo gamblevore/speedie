@@ -87,6 +87,8 @@ typedef bool FileResolveMode;
 
 typedef int64 FileSizeInt;
 
+typedef double Float64;
+
 typedef vec4 FloatRangeConverter;
 
 typedef vec2 FloatRangeConverterBasic;
@@ -1675,6 +1677,7 @@ extern Dictionary* JB__SyxDict_;
 extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
+extern Dictionary* SC_CodePointTable;
 #define kJB_codesign_native (JB_LUB[1506])
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
@@ -2989,6 +2992,8 @@ void JB_Constants__InitConstants();
 
 JB_String* JB_Constants__TestJB();
 
+bool JB_Constants__TestCasting();
+
 
 
 // LinkMap
@@ -4222,6 +4227,8 @@ void JB_cstring_temp(_cstring Self, FakeJBString* Rz);
 
 
 // f64
+JB_String* JB_dbl_Render(double Self, int Dp, FastString* Fs_in);
+
 JB_String* JB_dbl_RenderFloat(double Self, FastString* Fs_in);
 
 
@@ -4416,6 +4423,10 @@ ASM SC_ASM_ConstStretchy_ValueSet(ASM Self, uint Value);
 ASM SC_ASM_Convert_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_Convert_ModeSet(ASM Self, uint Value);
+
+int SC_ASM_DecodeBaseOp(ASM Self);
+
+int SC_ASM_DecodeOp(ASM Self);
 
 ASM SC_ASM_Div_KindSet(ASM Self, uint Value);
 
@@ -4826,6 +4837,9 @@ Array* JB_ErrorSeverity__InitNames();
 // FileSizeInt
 
 
+// Float64
+
+
 // FloatRangeConverter
 
 
@@ -4971,6 +4985,8 @@ Message* JB_Syx_Msg(Syntax Self, JB_String* Name);
 Message* JB_Syx_IntMsg(Syntax Self, int64 Name);
 
 JB_String* JB_Syx_Name(Syntax Self);
+
+bool JB_Syx_NoChildren(Syntax Self);
 
 SyntaxObj* JB_Syx_Obj(Syntax Self);
 
@@ -5803,9 +5819,9 @@ void JB_Pico__FromFS(FastString* Fs, PicoMessage* Rz);
 
 
 // JB_Random
-double JB_Rnd_Double(Random* Self);
-
 float JB_Rnd_Float(Random* Self);
+
+Float64 JB_Rnd_Float64(Random* Self);
 
 int64 JB_Rnd_RndInt(Random* Self);
 
@@ -6007,6 +6023,8 @@ bool SC_Pac_TextFuncSub(ASMState* Self, Message* M);
 void SC_Pac_TextOp(ASMState* Self, Message* M);
 
 bool SC_Pac_TextOpSub(ASMState* Self, Message* M);
+
+AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest);
 
 bool SC_Pac__ExpandJSM();
 
@@ -6606,8 +6624,6 @@ void JB_FS_RenderSpeed(FastString* Self, float Seconds, int64 BytesIn, int64 Byt
 void JB_FS_AppendMultiStr(FastString* Self, JB_String* Data, int Count);
 
 void JB_FS_AppendFastString(FastString* Self, FastString* Fs);
-
-void JB_FS_AppendInt64(FastString* Self, int64 Data);
 
 void JB_FS_AppendUint(FastString* Self, uint Data);
 
@@ -8759,6 +8775,8 @@ bool SC_Decl_AlreadyContains(SCDecl* Self);
 
 SCDecl* SC_Decl_AsLocal(SCDecl* Self);
 
+void SC_Decl_ASMSanity(SCDecl* Self);
+
 bool SC_Decl_AssignabilityCheck(SCDecl* Self, Message* Ln, Message* RN, SCDecl* Rc);
 
 JB_String* SC_Decl_AutoCompleteName(SCDecl* Self);
@@ -10171,8 +10189,6 @@ inline uint SC_FatASM_Index(FatASM* Self);
 
 inline AsmReg SC_FatASM_Info(FatASM* Self);
 
-inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After);
-
 inline JB_String* SC_Named_Name(SCNamed* Self);
 
 inline bool SC_OpMode_SyntaxCast(OpMode Self);
@@ -10192,6 +10208,8 @@ inline JB_String* JB_CP_SyntaxCast(Codepoint Self);
 inline bool JB_Err2_SyntaxCast(ErrorInt2 Self);
 
 inline void JB_FS_AppendFloat(FastString* Self, float D, int Dp, bool CanExp, bool Dot);
+
+inline void JB_FS_AppendInt64(FastString* Self, int64 Data);
 
 inline JB_String* JB_FS_SyntaxCast(FastString* Self);
 
@@ -10223,21 +10241,21 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState
 
 inline void SC_nil__DeclKill();
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
-
 inline NilRecord SC_nil__Value();
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
 
 inline bool SC_Decl_IsUnknownParam(SCDecl* Self);
 
+inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After);
+
 inline bool SC_Reg_IsInt(AsmReg Self);
 
 inline NilRecord SC_nil__EndBlock();
 
-inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
 
-inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest);
+inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
 inline void SC_Reg_Expect(AsmReg Self, Message* Where);
 
@@ -10335,12 +10353,6 @@ inline AsmReg SC_FatASM_Info(FatASM* Self) {
 	return SC_FatASM_Info(Self);
 }
 
-inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After) {
-	ASM* Rz = nil;
-	Rz = (SC__ASM_Encoders[Self->Op])(Self, Where, After, 0);
-	return Rz;
-}
-
 inline JB_String* SC_Named_Name(SCNamed* Self) {
 	if (Self) {
 		return Self->Name;
@@ -10382,6 +10394,10 @@ inline bool JB_Err2_SyntaxCast(ErrorInt2 Self) {
 
 inline void JB_FS_AppendFloat(FastString* Self, float D, int Dp, bool CanExp, bool Dot) {
 	JB_FS_AppendDoubleAsText(Self, ((double)D), Dp, CanExp, Dot);
+}
+
+inline void JB_FS_AppendInt64(FastString* Self, int64 Data) {
+	JB_FS_AppendIntegerAsText(Self, Data, 1);
 }
 
 inline JB_String* JB_FS_SyntaxCast(FastString* Self) {
@@ -10453,16 +10469,6 @@ inline void SC_nil__DeclKill() {
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 }
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
-	uint T = SC_Msg_ASMType(Msg);
-	if (T) {
-		return (SC__nil_NilTable[T])(Msg, Test);
-	}
-	T = ((ASMtmp)Msg->Func);
-	(SC_Msg_ASMTypeSet(Msg, T));
-	return (SC__nil_NilTable[T])(Msg, Test);
-}
-
 inline NilRecord SC_nil__Value() {
 	return SC_nil_Value((&SC__nil_T));
 }
@@ -10475,6 +10481,17 @@ inline bool SC_Decl_IsUnknownParam(SCDecl* Self) {
 	return ((!SC_Decl_NilStated(Self))) and (SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Param));
 }
 
+inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After) {
+	ASM* Rz = nil;
+	Rz = (SC__ASM_Encoders[Self->Op])(Self, Where, After, 0);
+	if (SC_ASM_DecodeBaseOp(Where[0]) != Self->Op) {
+		JB_PrintLine(JB_LUB[2110]);
+		debugger;
+		Rz = (SC__ASM_Encoders[Self->Op])(Self, Where, After, 0);
+	}
+	return Rz;
+}
+
 inline bool SC_Reg_IsInt(AsmReg Self) {
 	return JB_TC_IsInt(((DataTypeCode)Self));
 }
@@ -10484,6 +10501,16 @@ inline NilRecord SC_nil__EndBlock() {
 	Rz = SC_nil__Value();
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 	return Rz;
+}
+
+inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
+	uint T = SC_Msg_ASMType(Msg);
+	if (T) {
+		return (SC__nil_NilTable[T])(Msg, Test);
+	}
+	T = ((ASMtmp)Msg->Func);
+	(SC_Msg_ASMTypeSet(Msg, T));
+	return (SC__nil_NilTable[T])(Msg, Test);
 }
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
@@ -10499,15 +10526,6 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 	}
 }
 
-inline AsmReg SC_Pac_Get(ASMState* Self, Message* Exp, AsmReg Dest) {
-	uint Expasm = SC_Msg_ASMType(Exp);
-	fn_asm Fn = SC_fn_asm_table[Expasm];
-	uint TmpCloser = Self->VTmps;
-	AsmReg Ss = (Fn)(Self, Exp, Dest, 0);
-	SC_Pac_CloseVTmps(Self, TmpCloser, Dest);
-	return Ss;
-}
-
 inline void SC_Reg_Expect(AsmReg Self, Message* Where) {
 	if (!SC_Reg_Reg(Self)) {
 		SC_Pac_SyntaxExpect((&SC__Pac_Sh), Where, JB_LUB[842]);
@@ -10521,6 +10539,7 @@ inline uint64* SC_Pac_GetConst(ASMState* Self, int K) {
 			return (&R->Const);
 		}
 	}
+	debugger;
 	return (&Self->Zero.Const);
 }
 
