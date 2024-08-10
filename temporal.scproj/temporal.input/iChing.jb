@@ -140,12 +140,12 @@ Image "Clouds rise up to heaven: The image of Waiting. Thus the superior man eat
 	"When clouds rise in the sky, it is a sign that it will rain. There is nothing to do but to wait until after the rain falls. It is the same in life when destiny is at work. We should not worry and seek to shape the future by interfering in things before the time is ripe. We should quietly fortify the body with food and drink and the mind with gladness and good cheer. Fate comes when it will, and thus we are ready."
 
 MarkedLines
-	line "Waiting in the meadow. It furthers one to abide in what endures. No blame." --> "The danger is not yet close. One is still waiting on the open plain. Conditions are still simple, yet there is a feeling of something impending. One must continue to lead a regular life as long as possible. Only in this way does one guard against a premature waste of strength, keep free of blame and error that would become a source of weakness later on."
-	line "Waiting on the sand. There is some gossip. The end brings good fortune." --> "The danger gradually comes closer. Sand is near the bank of the river, and the water means danger. Disagreements crop up. General unrest can easily develop in such times, and we lay the blame on one another. He who stays calm will succeed in making things go well in the end. Slander will be silenced if we do not gratify it with injured retorts."
-	line "Waiting in the mud. Brings about the arrival of the enemy." --> "Mud is no place for waiting, since it is already being washed by the water of the stream. Instead of having gathered strength to cross the stream at one try, one has made a premature start that has got him no farther than the muddy bank. Such an unfavorable position invites enemies from without, who naturally take advantage of it. Caution and a sense of the seriousness of the situation are all that can keep one from injury."
-	line "Waiting in blood. Get out of the pit." --> "The situation is extremely dangerous. IT is of utmost gravity now--a matter of life and death. Bloodshed seems imminent. There is no going forward or backward; we are cut off as if in a pit. Now we must simply stand fast and let fate take its course. This composure, which keeps us from aggravating the trouble by anything we might do, is the only way of getting out of the dangerous pit."
-	line "Waiting at meat and drink. Perseverance brings good fortune." --> "Even in the midst of danger there come intervals of peace when things go relatively well. If we possess enough inner strength, we shall take advantage of these intervals to fortify ourselves for renewed struggle. We must know how to enjoy the moment without being deflected from the goal, for perseverance is needed to remain victorious. This is true in public life as well; it is not possible to achieve everything all at once. The height of wisdom is to allow people enough recreation to quicken pleasure in their work until the task is completed. Herein lies the secret of the whole hexagram. It differs from Chin/OBSTRUCTION (39), in the fact that in this instance, while waiting, we are sure of our cause and therefore do not lose the serenity born of inner cheerfulness."
-	line "One falls into the pit. Three uninvited guests arrive. Honor them, and in the end there will be good fortune." --> "The waiting is over; the danger can no longer be averted. One falls into the pit and must yield to the inevitable. Everything seems to have been in vain. But precisely in this extremity things take an unforeseen turn. Without a move on one's own part, there is outside intervention. At first one cannot be sure of its meaning: is it rescue or is it destruction? A person in this situation must keep his mind alert and not withdraw into himself with a sulky gesture of refusal, but must greet the new turn with respect. Thus he ultimately escapes the danger, and all goes well. Even happy turns of fortune often come in a form that at first seems strange to us."
+	line "Waiting in the meadow. It furthers one to abide in what endures. No blame."
+	line "Waiting on the sand. There is some gossip. The end brings good fortune."
+	line "Waiting in the mud. Brings about the arrival of the enemy."
+	line "Waiting in blood. Get out of the pit."
+	line "Waiting at meat and drink. Perseverance brings good fortune."
+	line "One falls into the pit. Three uninvited guests arrive. Honor them, and in the end there will be good fortune."
 }
 
 
@@ -163,12 +163,12 @@ Image "Heaven and water go their opposite ways: The image of CONFLICT. Thus in a
 	"The image indicates that the causes of conflict are latent in the opposing tendencies of the two trig rams. Once these opposing tendencies appear, conflict is inevitable. To avoid it, therefore, everything must be taken carefully into consideration in the very beginning. If rights and duties are exactly defined, or if, in a group, the spiritual trends of the individuals harmonize, the cause of conflict is removed in advance."
 
 MarkedLines
-	line 6 "If one does not perpetuate the affair, There is a little gossip. In the end, good fortune comes." --> "While a conflict is in the incipient stage, the best thing To do is to drop the issue. Especially when the adversary is stronger, it is not advisable to risk pushing the conflict to a decision. It may come to a slight dispute, but in the end all goes well."
-	line 9 "One cannot engage in conflict; One returns home, gives way. The people of his town, Three hundred households, Remain free of guilt." --> "In a struggle with an enemy of superior strength, retreat is no disgrace. Timely withdrawal prevents bad consequences. If, out of a false sense of honor, a man allowed himself to be tempted into an unequal conflict, he would be drawing down disaster upon himself. In such a case a wise and conciliatory attitude benefits the whole community, which will then not be drawn into the conflict."
-	line 6 "To nourish oneself on ancient virtue induces perseverance. Danger. In the end, good fortune comes. If by chance you are in the service of a king, Seek not works." --> "This is a warning of the danger that goes with an expansive disposition. Only that which has been honestly acquired through merit remains a permanent possession. It can happen that such a possession may be contested, but since it is really one's own, one cannot be robbed of it. Whatever a man possesses through the strength of his own nature cannot be lost. If one enters the service of a superior, one can avoid conflict only by not seeking works for the sake of prestige. It is enough if the work is done: let the honor go to the other."
-	line 9 "One cannot engage in conflict. One turns back and submits to fate, Changes one's attitude, And finds peace in perseverance. Good fortune." --> "This refers to a person whose inner attitude at first lacks peace. He does not feel content with his situation and would like to improve it through conflict. In contrast tot the situation of the nine in the second place, he is dealing with a weaker opponent and might therefore succeed. But he cannot carry on the fight, because, since right is not on his side, he cannot justify the conflict to his conscience. Therefore he turns back and accepts his fate. He changes his mind and finds lasting peace in being at one with eternal law. This brings good fortune."
-	line 9 "To contend before him brings supreme good fortune." --> "This refers to an arbiter in a conflict who is powerful and just, and strong enough to lend weight to the right side. A dispute can be turned over to him with confidence. If one is in the right, one attains great good fortune."
-	line 9 "Even if by chance a leather belt is bestowed on one, By the end of a morning It will have been snatched away three times." --> "Here we have someone who has carried a conflict to the bitter end and has triumphed. He is granted a decoration, but his happiness does not last. He is attacked again and again, and the result is conflict without end"
+	line 6 "If one does not perpetuate the affair, There is a little gossip. In the end, good fortune comes."
+	line 9 "One cannot engage in conflict; One returns home, gives way. The people of his town, Three hundred households, Remain free of guilt."
+	line 6 "To nourish oneself on ancient virtue induces perseverance. Danger. In the end, good fortune comes. If by chance you are in the service of a king, Seek not works."
+	line 9 "One cannot engage in conflict. One turns back and submits to fate, Changes one's attitude, And finds peace in perseverance. Good fortune."
+	line 9 "To contend before him brings supreme good fortune."
+	line 9 "Even if by chance a leather belt is bestowed on one, By the end of a morning It will have been snatched away three times."
 }
 
 
@@ -529,12 +529,12 @@ image `A lake on the mountain: The image of influence. Thus the superior man enc
 	`A mountain with a lake on its summit is stimulated by the moisture from the lake. It has this advantage because its summit does not jut out as a peak but is sunken. The image counsels that the mind should be kept humble and free, so that it may remain receptive to good advice. People soon give up counseling a man who thinks that he knows everything better than anyone else.`
 	
 markedlines
-	line 6 `The influence shows itself in the big toe.` --> `A movement, before it is actually carried out, shows itself first in the toes. The idea of an influence is already present, but is not immediately apparent to others. As long as the intention has no visible effect, it is of no importance to the outside world and leads neither to good nor to evil.`
-	line 6 `The influence shows itself in the calves of the legs. Misfortune. Tarrying brings good fortune.` --> `In movement, the calf of the leg follows the foot; by itself it can neither go forward nor stand still. Since the movement is not self-governed, it bodes ill. One should wait quietly until one is impelled to action by a real influence. Then one remains uninjured.`
-	line 9 `The influence shows itself in the thighs. Holds to that which follows it. To continue is humiliating.` --> `Every mood of the heart influences us to movement. What the heart desires, the thighs run after without a moment's hesitation; they hold to the heart, which they follow. In the life of man, however, acting on the spur of every caprice is wrong and if continued leads to humiliation. Three considerations suggest themselves here. First, a man should not run precipitately after all the persons whom he would like to influence, but must be able to hold back under certain circumstances. As little should he yield immediately to every whim of those in whose service he stands. Finally, where the moods of his own heart are concerned, he should never ignore the possibility of inhibition, for this is the basis of human freedom.`
-	line 9 `Perseverance brings good fortune. Remorse disappears. If a man is agitated in mind, And his thoughts go hither and thither, Only those friends On whom he fixes his conscious thoughts Will follow.` --> `Here the place of the heart is reached. The impulse that springs from this source is the most important of all. It is of particular concern that this influence be constant and good; then, in spite of the danger arising from the great susceptibility of the human heart, there will be no cause for remorse. When the quiet power of a man's own character is at work, the effects produced are right. All those who are receptive to the vibrations of such a spirit will then be influenced. Influence over others should not express itself as a conscious and willed effort to manipulate them. Through practicing such conscious incitement, one becomes wrought up and is exhausted by the eternal stress and strain. Moreover, the effects produced are then limited to those on whom one's thoughts are consciously fixed.`
-	line 9 `The influence shows itself in the back of the neck. No remorse.` --> `The back of the neck is the most rigid part of the body. When the influence shows itself there, the will remains firm and the influence does not lead to confusion. Hence remorse does not enter into consideration here. What takes place in the depths of one's being, in the unconscious mind. It is true that if we cannot be influenced ourselves, we cannot influence the outside world.`
-	line 6 `The influence shows itself in the jaws, cheeks, and tongue.` --> `The most superficial way of trying to influence others is through talk that has nothing real behind it. The influence produced by such mere tongue wagging must necessarily remain insignificant. Hence no indication is added regarding good or bad fortune.`
+	line 6 `The influence shows itself in the big toe.`
+	line 6 `The influence shows itself in the calves of the legs. Misfortune. Tarrying brings good fortune.`
+	line 9 `The influence shows itself in the thighs. Holds to that which follows it. To continue is humiliating.`
+	line 9 `Perseverance brings good fortune. Remorse disappears. If a man is agitated in mind, And his thoughts go hither and thither, Only those friends On whom he fixes his conscious thoughts Will follow.`
+	line 9 `The influence shows itself in the back of the neck. No remorse.`
+	line 6 `The influence shows itself in the jaws, cheeks, and tongue.`
 }
 
 
@@ -549,15 +549,13 @@ judgement `DURATION. Success. No blame. Perseverance furthers. It furthers one t
 image `Thunder and wind: the image of DURATION. Thus the superior man stands firm and does not change has direction.`
 	`Thunder rolls, and the wind blows; both are examples of extreme mobility and so are seemingly the very opposite of duration, but the laws governing their appearance and subsidence, their coming and going, endure. In the same way the independence of the superior man is not based on rigidity and immobility of character. He always keeps abreast of the time and changes with it. What endures is the unswerving directive, the inner law of his being, which determines all his actions.`
 
-
 markedlines
-	line 6 `Seeking duration too hastily brings misfortune persistently. Nothing that would further.` --> `Whatever endures can be created only gradually by long-continued work and careful reflection. In the same sense Lao-tse says: "If we wish to compress something, we must first let it fully expand." He who demands too much at once is acting precipitately, and because he attempts too much, he ends by succeeding in nothing.`
-	line 9 `Remorse disappears.` --> `The situation is abnormal. A man's force of character is greater than the available material power. Thus he might be afraid of allowing himself to attempt something beyond his strength. However, since it is the time of DURATION, it is possible for him to control his inner strength and so to avoid excess. Cause for remorse then disappears.`
-	line 9 `He who does not give duration to his character meets with disgrace. Persistent humiliation.` --> `If a man remains at the mercy of moods of hope or fear aroused by the outer world, he loses his inner consistency of character. Such inconsistency invariably leads to distressing experiences. These humiliations often come from an unforeseen quarter. Such experiences are not merely effects produced by the external world, but logical consequences evoked by his own nature.`
-
-	line 9 `No game in the field.` --> `If we are in pursuit of game and want to get a shot at a quarry, we must set about it in the right way. A man who persists in stalking game in a place where there is none may wait forever without finding any. Persistence in search is not enough. What is not sought in the right way is not found.`
-	line 6 `Giving duration to one's character through perseverance. This is good fortune for a woman, misfortune for a man.` --> `A woman should follow a man her whole life long, but a man should at all times hold to what is his duty at the given moment. Should he persistently seek to conform to the woman, it would be a mistake for him. Accordingly it is altogether right for a woman to hold conservatively to tradition, but a man must always be flexible and adaptable and allow himself to be guided solely by what his duty requires of him at the moment.`
-	line 6 `Restlessness as an enduring condition brings misfortune.` --> `There are people who live in a state of perpetual hurry without ever attaininginner composure. Restlessness not only prevents all thoroughness but actuallybecomes a danger if it is dominant in places of authority.`
+	line 6 `Seeking duration too hastily brings misfortune persistently. Nothing that would further.`
+	line 9 `Remorse disappears.`
+	line 9 `He who does not give duration to his character meets with disgrace. Persistent humiliation.`
+	line 9 `No game in the field.`
+	line 6 `Giving duration to one's character through perseverance.`
+	line 6 `Restlessness as an enduring condition brings misfortune.`
 }
 
 
@@ -575,16 +573,12 @@ image `Mountain under heaven: the image of RETREAT. Thus the superior man keeps 
 
 
 markedlines
-	line 6 `At the tail in retreat. This is dangerous. One must not wish to undertake anything.` --> `Since the hexagram is the picture of something that is retreating, the lowest line represents the tail and the top line the head. In a retreat it is advantageous to be at the front. Here one is at the back, in immediate contact with the pursuing enemy. This is dangerous, and under such circumstances it is not advisable to undertake anything. Keeping still is the easiest way of escaping from the threatening danger.`
-
-	line 6 `he holds him fast with yellow oxen-hide. No one can tear him loose.` --> `Yellow is the color of the middle. It indicates that which is correct and in line with duty. Oxhide is strong and not to be torn. While the superior men retreat and the inferior press after them, the inferior man represented here holds on so firmly and tightly to the superior man that the latter cannot shake him off. And because he is in quest of what is right an so strong in purpose, he reaches his goal. Thus the line confirms what is said in the Judgment: "In what is small" --here equivalent to "in the inferior man" -- "perseverance furthers."`
-
-	line 9 `A halted retreat Is nerve-wracking and dangerous. To retain people as men and maidservants, Brings good fortune.` --> `When it is time to retreat it is both unpleasant and dangerous to be held back, because then one no longer has freedom of action. In such a case the only expedient is to take into one's service, so to speak, those who refuse to let one go, so that one may at least keep one's initiative and not fall helplessly under their domination. But even with this expedient the situation is far from satisfactory--for what can one hope to accomplish with such servants?`
-	
-	line 9 `Voluntary retreat brings good fortune to the superior man And downfall to the inferior man.` --> `In retreating the superior man is intent on taking his departure willingly and in all friendliness. He easily adjusts his mind to retreat, because in retreating he does not have to do violence to his convictions. The only one who suffers is the inferior man from whom he retreats, who will degenerate when deprived of the guidance of the superior man.`
-	line 9 `Friendly retreat. Perseverance brings good fortune.` --> `It is the business of the superior man to recognize in time that the moment for retreat has come. If the right moment is chosen, the retreat can be carried out within the forms of perfect friendliness, without the necessity of disagreeable discussions. Yet, for all the observance of amenities, absolute firmness of decision is necessary if one is not to be led astray by irrelevant considerations.`
-	
-	line 9 `Cheerful retreat. Everything serves to further.` --> `The situation is unequivocal. Inner detachment has become an established fact, and we are at liberty to depart. When one sees the way ahead thus clearly, free of all doubt, a cheerful mood sets in, and one chooses what is right without further thought. Such a clear path ahead always leads to the good.`
+	line 6 `At the tail in retreat. This is dangerous. One must not wish to undertake anything.`
+	line 6 `he holds him fast with yellow oxen-hide. No one can tear him loose.`
+	line 9 `A halted retreat Is nerve-wracking and dangerous. To retain people as men and maidservants, Brings good fortune.`
+	line 9 `Voluntary retreat brings good fortune to the superior man And downfall to the inferior man.`
+	line 9 `Friendly retreat. Perseverance brings good fortune.`	
+	line 9 `Cheerful retreat. Everything serves to further.`
 }
 
 
@@ -601,20 +595,12 @@ image `Thunder in heaven above: The image of THE POWER OF THE GREAT. Thus the su
 	`Thunder--electrical energy--mounts upward in the spring. The direction of this movement is in harmony with that of the movement of heaven. It is therefore a movement in accord with heaven, producing great power. However, true greatness depends on being in harmony with what is right. Therefore in times of great power the superior man avoids doing anything that is not in harmony with the established order.`
 
 markedlines
-	line 9 `Power in the toes. Continuing brings misfortune.` --> `This is certainly true. The toes are in the lowest place and are ready to advance. So likewise great power in lowly station is inclined to effect advance by force. This, if carried further, would certainly lead to misfortune, and therefore by way of advice a warning is added.`
-
-	line 9 `Perseverance brings good fortune.` --> `The premise here is that the gates to success are beginning to open. Resistance gives way and we forge ahead. This is the point at which, only too easily, we become the prey of exuberant self-confidence. This is why the oracle says that perseverance (i.e., perseverance in inner equilibrium, without excessive use of power) brings good fortune.`
-
-	line 9 `The inferior man works through power. The superior man does not act thus. To continue is dangerous. A goat butts against a hedge and gets its horns entangled.` --> `Making a boast of power leads to entanglements, just as a goat entangles its horns when it butts against a hedge. Whereas an inferior man revels in power when he comes into possession of it, the superior man never makes this mistake. He is conscious at all times of the danger of pushing ahead regardless of circumstances, and therefore renounces in good time the empty display of force.`
-	
-	line 9 `Perseverance brings good fortune. Remorse disappears. The hedge opens; there is no entanglement. Power depends upon the axle of a big cart.` --> `If a man goes on quietly and perseveringly working at the removal of resistances, success comes in the end. The obstructions give way and all occasion for remorse arising from excessive use of power disappears.
-	
-Such a man's power does not show externally, yet it can move heavy loads, like a big cart whose real strength lies in its axle. The less that power is applied outwardly, the greater its effect.`
-
-	line 6 `Loses the goat with ease. No remorse.` --> `The goat is noted for hardness outwardly and weakness within. Now the situation is such that everything is easy; there is no more resistance. One can give up a belligerent, stubborn way of acting and will not have to regret it.`
-
-	line 6 `A goat butts against a hedge. It cannot go backward, it cannot go forward. Nothing serves to further. If one notes the difficulty, this brings good fortune.` --> `If we venture too far we come to a deadlock, unable either to advance or to retreat and whatever we do merely serves to complicate thing further. Such obstinacy leads to insuperable difficulties. But if, realizing the situation, we compose ourselves and decide not to continue, everything will right itself in time.`
-
+	line 9 `Power in the toes. Continuing brings misfortune.`
+	line 9 `Perseverance brings good fortune.`
+	line 9 `The inferior man works through power. The superior man does not act thus. To continue is dangerous. A goat butts against a hedge and gets its horns entangled.`	
+	line 9 `Perseverance brings good fortune. Remorse disappears. The hedge opens; there is no entanglement. Power depends upon the axle of a big cart.`
+	line 6 `Loses the goat with ease. No remorse.`
+	line 6 `A goat butts against a hedge. It cannot go backward, it cannot go forward. Nothing serves to further. If one notes the difficulty, this brings good fortune.`
 }
 
 gram Chin (fire upon earth) {
@@ -632,25 +618,11 @@ image `The sun rises over the earth: The image of PROGRESS. Thus the superior ma
 
 markedlines
 	line 6 `Progressing, but turned back. Perseverance brings good fortune. If one meets with no confidence, one should remain calm. No mistake.`
-
-	`At a time when all elements are pressing for progress, we are still uncertain whether in the course of advance we may not meet with a rebuff. Then the thing to do is simply continue in what is right; in the end this will bring good fortune. It may be that we meet with no confidence. In this case we ought not to try to win confidence regardless of the situation, but should remain calm and cheerful and refuse to be roused to anger. Thus we remain free of mistakes.`
-
 	line 6 `Progressing, but in sorrow. Perseverance brings good fortune. Then one obtains great happiness from one's ancestress.`
-		`Progress is halted; an individual is kept from getting in touch with the man in authority with whom he has a connection. When this happens, he must remain persevering, although he is grieved; then with a maternal gentleness the man in question will bestow great happiness upon him. This happiness comes to him-and is well deserved-because in this case mutual attraction does not rest on selfish or partisan motives but on firm and correct principles.`
-	
 	line 6 `All are in accord. Remorse disappears.`
-		`A man strives onward, in association with others whose backing encourages him. This dispels any cause for regret over the fact that he does not have enough independence to triumph unaided over every hostile turn of fate.`
-	
 	line 9 `Progress like a hamster. Perseverance brings danger.`
-		`In times of progress it is easy for strong men in the wrong places to amass great possessions. But such conduct shuns the light. And since times of progress are inevitably brought to the light, perseverance in such action always leads to danger.`
-	
 	line 6 `Remorse disappears. Take not gain and loss to heart. Undertakings bring good fortune. Everything serves to further.`
-	
-		`The situation described here is that of one who, finding himself in an influential position in a time of progress, remains gentle and reserved. He might reproach himself for lack of energy in making the most of the propitiousness of the time and obtaining all possible advantage. However, this regret passes away. He must not take either loss or gain to heart; they are minor considerations. What matters much more is the fact that in this way he has assured himself of opportunities for successful and beneficent influence.`
-	
 	line 9 `Making progress with the horns is permissible, only for the purpose of punishing one's own city. To be conscious of danger brings good fortune. No blame. Perseverance brings humiliation.`
-		`Making progress with lowered horns (acting on the offensive) is permissible, in times like those referred to here, only in dealing with the mistakes of one's own people. Even then we must bear in mind that proceeding on the offensive may always be dangerous. In this way we avoid the mistakes that otherwise threaten, and succeed in what we set out to do. On the other hand, perseverance in such over energetic behavior, especially toward persons with whom there is no close connection, will lead to humiliation.`
-
 }
 
 gram `Ming I` (earth upon fire) { 
@@ -668,18 +640,11 @@ image `The light has sunk into the earth: The image of DARKENING OF THE LIGHT. T
 	
 markedlines 
 	line 9 `Darkening of the light during flight. He lowers his wings. The superior man does not eat for three days On his wanderings. But he has somewhere to go. The host has occasion to gossip about him.`
-		`With grandiose resolve a man endeavors to soar above all obstacles, but thus encounters a hostile fate. He retreats and evades the issue. The time is difficult. Without rest, he must hurry along, with no permanent abiding place. If he does not want to make compromises within himself, but insists on remaining true to his principles, he suffers deprivation. Never the less he has a fixed goal to strive for even though the people with whom he lives do not understand him and speak ill of him.`
 	line 6 `Darkening of the light injures him in the left thigh. He gives aid with the strength of a horse. Good fortune.`
-		`Here the Lord of Light is in a subordinate place and is wounded by the Lord of Darkness. But the injury is not fatal; it is only a hindrance. Rescue is still possible. The wounded man gives no thought to himself; he thinks only of saving the others who are also in danger. Therefore he tries with all his strength to save all that can be saved. There is good fortune in thus acting according to duty.`
 	line 9 `Darkening of the light during the hunt in the south. Their great leader is captured. One must not expect perseverance too soon.`
-		`It seems as if chance were at work. While the strong, loyal man is striving eagerly and in good faith to create order, he meets the ringleader of the disorder, as if by accident, and seizes him. Thus victory is achieved. But in abolishing abuses one must not be too hasty. This would turn out badly because the abuses have been in existence so long.`
 	line 6 `He penetrates the left side of the belly. One gets at the very heart of the darkening of the light.`
-		`We find ourselves close to the commander of darkness and so discover his mot secret thoughts. In this way we realize that there is no longer any hope of improvement, and thus we are enabled to leave the scene of disaster before the storm breaks.`
 	line 6 `Darkening of the light as with Prince Chi. Perseverance furthers.`
-		`Prince Chi lived at the court of the evil tyrant Chou Hsin, who, although not mentioned by name, furnished the historical example on which this whole situation is based. Prince Chi was a relative of the tyrant and could not withdraw from the court; therefore he concealed his true sentiments and feigned insanity. Although he was held a slave, he did not allow external misery to deflect him from his convictions. This provides a teaching for those who cannot leave their posts in times of darkness. In order to escape danger, they need invincible perseverance of spirit and redoubled caution in their dealings with the world.`
 	line 6 `Not light but darkness. First he climbed up to heaven, Then plunged into the depths of the earth.`
-		`Here the climax of the darkening is reached. The dark power at first held so high a place that it could wound all who were on the side of good and of the light. But in the end it perishes of its own darkness, for evil must itself fall at the very moment when it has wholly overcome the good, and thus consumed the energy to which it owed its duration.`
-
 }
 
 
@@ -698,22 +663,11 @@ image `Wind comes forth from fire: The image of THE FAMILY.Thus the superior man
 
 markedlines 
 	line 9 `Firm seclusion within the family. Remorse disappears.`
-		`The family must form a well-defined unit within which each member knows his place. From the beginning each child must be accustomed to firmly established rules of order, before ever its will is directed to other things. If we begin too late to enforce order, when the will of the child has already been overindulged, the whims and passions, grown stronger with the years, offer resistance and give cause for remorse. If we insist on order from the outset, occasions for remorse may arise-in general social life these are unavoidable-but the remorse always disappears again, and everything rights itself. For there is nothing easily avoided and more difficult to carry through than "breaking a child's will."`
-
 	line 6 `She should not follow her whims. She must attend within to the food. Perseverance brings good fortune.`
-		`The wife must always be guided by the will of the master of the house, be he father, husband, or grown son. There, without having to look for them, she has great and important duties. She must attend to the nourishment of her family and to the food for the sacrifice. In this way she becomes the center of the social and religious life of the family, and her perseverance in this position brings good fortune to the whole house. In relation to general conditions, the counsel here is to seek nothing by means of force, but quietly to confine oneself to the duties at hand.`
-
 	line 9 `When tempers flare up in the family, Too great severity brings remorse. Good fortune nonetheless. When woman and chiled ally and laugh It leads in the end to humiliation.`
-		`In the family the proper mean between severity and indulgence ought to prevail. Too great severity toward one's own flesh and blood leads to remorse. The wise thing is to build strong dikes within which complete freedom of movement is allowed each individual. But in doubtful instances too great severity, despite occasional mistakes, is preferable, because it preserves discipline in the family, whereas too great weakness leads to disgrace.`
-
 	line 6 `She is the treasure of the house. Great good fortune.`
-		`It is upon the woman of the house that the well-being of the family depends. Well-being prevails when expenditures and income are soundly balanced. This leads to great good fortune. In the sphere of public life, this line refers to the faithful steward whose measures further the general welfare.`
-
 	line 9 `As a king he approaches his family. Fear not. Good fortune.`
-		`A king is the symbol of a fatherly man who is richly endowed in mind. He does nothing to make himself feared; on the contrary, the whole family can trust him, because love governs their intercourse. His character of itself exercises the right influence.`
-
 	line 9 `His work commands respect. In the end good fortune comes.`
-		`In the last analysis, order within the family depends on the character of the master of the house. If he cultivates his personality so that it works impressively through the force of inner truth, all goes well with the family. In a ruling position one must of his own accord assume responsibility.`
 }
 
 
@@ -732,182 +686,65 @@ image `Above, fire; below. The lake. Thus amid all fellowship. The superior man 
 
 markedlines 
 	line 9 `Remorse disappears. If you lose your horse, do not run after it; It will come back of its own accord. When you see evil people, guard yourself against mistakes.`
-		`Even in times when oppositions prevail, mistakes can be avoided, so that remorse disappears. When opposition begins to manifest itself, a man must not try to bring about unity by force, for by so doing he would only achieve the contrary, just as a horse goes farther and farther away if one runs after it. It it is one's won horse, one can safely let it go; it will come back of its own accord. So too when someone who belongs with us is momentarily estranged because of a misunderstanding, he will return of his own accord if we leave matters to him. One the other hand, it is well to be cautious when evil men who do not belong with us force themselves upon us, again as the result of a misunderstanding. Here the important thing is to avoid mistakes. We must not try to shake off these evil men by force; this would give rise to real hostility. We must simply endure them. They will eventually withdraw of their own accord.`
-
 	line 9 `One meets his lord in a narrow street. No blame.`
-		`As a result of misunderstandings, it has become impossible for people who by nature belong together to meet in the correct way. This being so, an accidental meeting under informal circumstances may serve the purpose, provided there is an inner affinity between them.`
-
 	line 6 `One sees the wagon dragged back, The oxen halted, A man's hair and nose cut off.`
-		`Not a good beginning, but a good end. Often it seems tot a man as though everything were conspiring against him. He sees himself checked and hindered in his progress, insulted and dishonored. However, he must not let himself be misled; despite this opposition, he must cleave to the man with whom he knows he belongs. Thus, notwithstanding the bad beginning, the matter will end well.`
-
 	line 9 `Isolated through opposition, One meets a like-minded man with whom one can associate in good faith. Despite the danger, no blame.`
-		`If a man finds himself in a company of people from whom he is separated by an inner opposition, he becomes isolated. But if in such a situation a man meets someone who fundamentally by the very law of his being, is kin to him, and whom he can trust completely, he overcomes all the dangers of isolation. His will achieves its aim, and he becomes free of faults.`
-
 	line 6 `Remorse disappears. The companion bits his way through the wrappings. If one goes to him, How could it be a mistake?`
-		`Coming upon a sincere man, one fails to recognize him at first because of the general estrangement. However, he bites his way through the wrappings that are causing the separation. When such a companion thus reveals himself in his true character, it is one's duty to go to meet him and to work with him.`
-
 	line 9 `Isolated through opposition, One sees one's companion as a pig covered with dirt, As a wagon full of devils.
 First one draws a bow against him, Then one lays the bow aside. He is not a robber; he will woo at the right time. As one goes, rain falls; then good fortune comes.`
-		`Here the isolation is due to misunderstanding; it is brought about not by outer circumstances but by inner conditions. A man misjudges his best friends, taking them to be as unclean as a dirty pig in and as dangerous as a wagon full of devils. He adopts an attitude of defense. But in the end, realizing his mistake, he lays aside the bow, perceiving that the other is approaching with the best intentions for the purpose of close union. Thus the tension is relieved. The union resolves the tension, just as falling rain relieves the sultriness preceding a thunderstorm. All goes well, for just when opposition reaches its climax it changes over to its antithesis.`
 }
 
 index
 
 
-`39. Chien / Obstruction
+gram "Chien" (WATER UPON MOUNTAIN)
 
-above K'AN THE ABYSMAL, WATER
-below KêN KEEPING STILL, MOUNTAIN
+ID 39
+meaning `Obstruction`
 
-The hexagram pictures a dangerous abyss lying before us and a steep, inaccessible mountain rising behind us. We are surrounded by obstacles; at the same time, since the mountain has the attribute of keeping still, there is implicit a hint as to how we can extricate ourselves. The hexagram represents obstructions that appear in the course of time but that can and should be overcome. Therefore all the instruction given is directed to overcoming them.
-
-THE JUDGMENT
-
-OBSTRUCTION. The southwest furthers.
-
-The northeast does not further.
-It furthers one to see the great man.
-Perseverance brings good fortune.
-
-The southwest is the region of retreat, the northeast that of advance. Here an individual is confronted by obstacles that cannot be overcome directly. In such a situation it is wise to pause in view of the danger and to retreat. However, this is merely a preparation for overcoming the obstructions. One must join forces with friends of like mind and put himself under the leadership of a man equal to the situation: then one will succeed in removing the obstacles. This requires the will to persevere just when one apparently must do something that leads away from his goal. This unswerving inner purpose brings good fortune in the end. An obstruction that lasts only for a time is useful for self-development. This is the value of adversity.
-
-THE IMAGE
-
-Water on the mountain:
-
-The image of OBSTRUCTION.
-
-Thus the superior man turns his attention to himself
-And molds his character.
-
-Difficulties and obstructions throw a man back upon himself. While the inferior man seeks to put the blame on other persons, bewailing his fate, the superior man seeks the error within himself, and through this introspection the external obstacle becomes for him an occasion for inner enrichment and education.
-
-THE LINES
-
-Six at the beginning means:
-
-Going leads to obstructions,
-Coming meets with praise.
-
-When one encounters an obstruction, the important thing is to reflect on how best to deal with it. When threatened with danger, one should not strive blindly to go ahead, for this only leads to complications. The correct thing is, on the contrary, to retreat for the time being, not in order to give up the struggle but to await the right moment for action.
-
-Six in the second place means:
-
-The King's servant is beset by obstruction upon obstruction,
-But it is not his own fault.
-
-Ordinarily it is best to go around an obstacle and try to overcome it along the line of least resistance. But there is one instance in which a man must go out to meet the trouble, even though difficulty piles upon difficulty: this is when the path of duty leads directly to it-in other words, when he cannot act of his own volition but is duty bound to go and seek out danger in the service of a higher cause. Then he may do it without compunction, because it is not through any fault of his that he is putting himself in this difficult situation.
-
-Nine in the third place means:
-
-Going leads to obstructions;
-Hence he comes back.
-
-While the preceding line shows the official compelled by duty to follow the way of danger, this line shows the man who must act as father of a family or as head of his kin. If he were to plunge recklessly in to danger, it would be a useless act, because those entrusted to his care cannot get along by themselves. But if he withdraws and turns back to his own, they welcome him with great joy.
-
-Six in the fourth place means:
-
-Going leads to obstructions,
-Coming leads to union.
-
-This too describes a situation that cannot be managed single-handed. In such a case the direct way is not the shortest. If a person were to forge ahead on his own strength and without the necessary preparations, he would not find the support he needs and would realize too late that he has been mistaken in his calculations, inasmuch as the conditions on which he hoped he could rely would prove to be inadequate. In this case it is better, therefore, to hold back for the time being and to gather together trustworthy companions who can be counted upon for help in overcoming the obstructions.
-Nine in the fifth place means:
-
-In the midst of the greatest obstructions,
-Friends come.
-
-Here we see a man who is called to help in an emergency. He should not seek to evade the obstructions, no matter how dangerously they pile up before him. But because he is really called to the task, the power of his spirit is strong enough to attract helpers whom he can effectively organize, so that through the well-directed co-operation of all participants the obstruction is overcome.
-
-Six at the top means:
-
-Going leads to obstructions,
-Coming leads to great good fortune.
-It furthers one to see the great man.
-
-This refers to a man who has already left the world and its tumult behind him. When the time of obstructions arrives, it might seem that the simplest thing for him to do would be to turn his back upon the world and take refuge in the beyond. But this road is barred to him. He must not seek his own salvation and abandon the world to its adversity. Duty calls him back once more into the turmoil of life. Precisely because of his experience and inner freedom, he is able to create something both great and complete that brings good fortune. And it is favorable to see the great man in alliance with whom one can achieve the work of rescue.
-`
+form `The hexagram pictures a dangerous abyss lying before us and a steep, inaccessible mountain rising behind us. We are surrounded by obstacles; at the same time, since the mountain has the attribute of keeping still, there is implicit a hint as to how we can extricate ourselves. The hexagram represents obstructions that appear in the course of time but that can and should be overcome. Therefore all the instruction given is directed to overcoming them.
 
 `
-40. Hsieh / Deliverance
 
-above CHêN THE AROUSING, THUNDER
-below K'AN THE ABYSMAL, WATER
+judgement `OBSTRUCTION. The southwest furthers.
 
-Here the movement goes out of the sphere of danger. The obstacle has been removed, the difficulties are being resolved. Deliverance is not yet achieved; it is just in its beginning, and the hexagram represents its various stages.
+The northeast does not further. It furthers one to see the great man. Perseverance brings good fortune. `
 
-THE JUDGMENT
+	`The southwest is the region of retreat, the northeast that of advance. Here an individual is confronted by obstacles that cannot be overcome directly. In such a situation it is wise to pause in view of the danger and to retreat. However, this is merely a preparation for overcoming the obstructions. One must join forces with friends of like mind and put himself under the leadership of a man equal to the situation: then one will succeed in removing the obstacles. This requires the will to persevere just when one apparently must do something that leads away from his goal. This unswerving inner purpose brings good fortune in the end. An obstruction that lasts only for a time is useful for self-development. This is the value of adversity.`
 
-DELIVERANCE. The southwest furthers.
-If there is no longer anything where one has to go,
-Return brings good fortune.
-If there is still something where one has to go,
-Hastening brings good fortune.
+image `The image of OBSTRUCTION. Thus the superior man turns his attention to himself and molds his character.`
 
-This refers to a time in which tensions and complications begin to be eased. At such times we ought to make our way back to ordinary conditions as soon as possible; this is the meaning of "the southwest." These periods of sudden change have great importance. Just as rain relieves atmospheric tension, making all the buds burst open, so a time of deliverance from burdensome pressure has a liberating and stimulating effect on life. One thing is important, however: in such times we must not overdo our triumph. The point is not to push on farther than is necessary. Returning to the regular order of life as soon as deliverance is achieved brings good fortune. If there are any residual matters that ought to be attended to, it should be done as quickly as possible, so that a clean sweep is made and no retardations occur.
+	`Difficulties and obstructions throw a man back upon himself. While the inferior man seeks to put the blame on other persons, bewailing his fate, the superior man seeks the error within himself, and through this introspection the external obstacle becomes for him an occasion for inner enrichment and education.`
 
-THE IMAGE
+MarkedLines
+	line 6 `Going leads to obstructions, Coming meets with praise.`
+	line 6 `The King's servant is beset by obstruction upon obstruction, But it is not his own fault.`
+	line 9 `Going leads to obstructions; Hence he comes back.`
+	line 6 `Going leads to obstructions, Coming leads to union.`
+	line 9 `In the midst of the greatest obstructions, Friends come.`
+	line 6 `Going leads to obstructions, Coming leads to great good fortune. It furthers one to see the great man.`
 
-Thunder and rain set in:
+gram Hsieh (THUNDER UPON WATER)
+meaning Deliverance
+ID 40
 
-The image of DELIVERANCE.
 
-Thus the superior man pardons mistakes 
-And forgives misdeeds.
+form `Here the movement goes out of the sphere of danger. The obstacle has been removed, the difficulties are being resolved. Deliverance is not yet achieved; it is just in its beginning, and the hexagram represents its various stages.`
 
-A thunderstorm has the effect of clearing the air; the superior man produces a similar effect when dealing with mistakes and sins of men that induce a condition of tension. Through clarity he brings deliverance. However, when failings come to light, he does not dwell on them; he simply passes over mistakes, the unintentional transgressions, just as thunder dies away. He forgives misdeeds, the intentional transgressions, just as water washes everything clean.
+judgement `DELIVERANCE. The southwest furthers. If there is no longer anything where one has to go, Return brings good fortune. If there is still something where one has to go, Hastening brings good fortune.`
 
-THE LINES
+	`This refers to a time in which tensions and complications begin to be eased. At such times we ought to make our way back to ordinary conditions as soon as possible; this is the meaning of "the southwest." These periods of sudden change have great importance. Just as rain relieves atmospheric tension, making all the buds burst open, so a time of deliverance from burdensome pressure has a liberating and stimulating effect on life. One thing is important, however: in such times we must not overdo our triumph. The point is not to push on farther than is necessary. Returning to the regular order of life as soon as deliverance is achieved brings good fortune. If there are any residual matters that ought to be attended to, it should be done as quickly as possible, so that a clean sweep is made and no retardations occur.`
 
-Six at the beginning means:
+image `Thus the superior man pardons mistakes  And forgives misdeeds.`
+	`A thunderstorm has the effect of clearing the air; the superior man produces a similar effect when dealing with mistakes and sins of men that induce a condition of tension. Through clarity he brings deliverance. However, when failings come to light, he does not dwell on them; he simply passes over mistakes, the unintentional transgressions, just as thunder dies away. He forgives misdeeds, the intentional transgressions, just as water washes everything clean.`
 
-Without blame.
-
-In keeping with the situation, few words are needed. The hindrance is past, deliverance has come. One recuperates in peace and keeps still. This is the right thing to do in times when difficulties have been overcome.
-Nine in the second place means:
-
-One kills three foxes in the field
-And receives a yellow arrow.
-Perseverance brings good fortune.
-
-The image is taken from the hunt. The hunter catches three cunning foxes and receives a yellow arrow as a reward. The obstacles in public life are the designing foxes who try to influence the ruler through flattery. They must be removed before there can be any deliverance. But the struggle must not be carried on with the wrong weapons. The yellow color points to measure and mean in proceeding against the enemy; the arrow signifies the straight course. If one devotes himself wholeheartedly to the task of deliverance, he develops so much inner strength from his rectitude that it acts as a weapon against all that is false and low.
-
-Six in the third place means:
-
-If a man carries a burden on his back
-And nonetheless rides in a carriage,
-He thereby encourages robbers to draw near.
-Perseverance leads to humiliation.
-
-This refers to a man who has come out of needy circumstances in to comfort and freedom from want. If now, in the manner of an upstart, he tries to take his ease in comfortable surroundings that do not suit his nature, he thereby attracts robbers. If he goes on thus he is sure to bring disgrace upon himself. Confucius says about this line:
-
-Carrying a burden on the back is the business of common man; a carriage is the appurtenance of a man of rank. Now, when a common man uses the appurtenance of man of rank, robbers plot to take it away from him. If a man is insolent toward those above him and hard toward those below him, robbers plot to attack him. Carelessness in guarding things tempts thieves to steal. Sumptuous ornaments worn by a maiden are an enticement to rob her of her virtue.
-
-Nine in the fourth place means:
-
-Deliver yourself from your great toe.
-
-Then the companion comes,
-And him you can trust.
-
-In times of standstill it will happen that inferior people attach themselves to a superior man, and through force of daily habit they may grow very close to him and become indispensable, just as the big toe is indispensable to the foot because it makes walking easier. But when the time of deliverance draws near, with its call to deeds, a man must free himself from such chance acquaintances with whim he has no inner connection. For otherwise the friends who share his views, on whom he could really rely and together with whom he could accomplish something, mistrust him and stay away.
-Six in the fifth place means:
-
-If only the superior man can deliver himself,
-It brings good fortune.
-
-Thus he proves to inferior men that he is in earnest.
-
-Times of deliverance demand inner resolve. Inferior people cannot be driven off by prohibitions or any external means. If one desires to be rid of them, he must first break completely with them in his own mind; they will see for themselves that he is in earnest and will withdraw.
-
-Six at the top means:
-
-The prince shoots at a hawk on a high wall.
-He kills it. Everything serves to further.
-
-The hawk on a high wall is the symbol of a powerful inferior in a high position who is hindering the deliverance. He withstands the force of inner influences, because he is hardened in his wickedness. He must be forcibly removed, and this requires appropriate means. Confucius says about this line:
-
-The hawk is the object of the hunt; bow and arrow are the tools and means. The marksman is man (who must make proper use of the means to his end). The superior man contains the means in his own person. He bides his time and then acts. Why then should not everything go well? He acts and is free. Therefore all he has to do is to go forth, and he takes his quarry. This is how a man fares who acts after he has made ready the means.
-`
+MarkedLines
+	Line 6 `Without blame.`
+	Line 9 `One kills three foxes in the field And receives a yellow arrow. Perseverance brings good fortune.`
+	Line 6 `If a man carries a burden on his back And nonetheless rides in a carriage, He thereby encourages robbers to draw near. Perseverance leads to humiliation.`
+	Line 9 `Deliver yourself from your great toe. Then the companion comes, And him you can trust.`
+	Line 6 `If only the superior man can deliver himself, It brings good fortune. Thus he proves to inferior men that he is in earnest.`
+	line 6 `The prince shoots at a hawk on a high wall. He kills it. Everything serves to further.`
 
 `
 41. Sun / Decrease
