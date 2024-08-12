@@ -625,6 +625,7 @@ markedlines
 	line 9 `Making progress with the horns is permissible, only for the purpose of punishing one's own city. To be conscious of danger brings good fortune. No blame. Perseverance brings humiliation.`
 }
 
+
 gram `Ming I` (earth upon fire) { 
 
 ID 36
@@ -694,17 +695,13 @@ markedlines
 First one draws a bow against him, Then one lays the bow aside. He is not a robber; he will woo at the right time. As one goes, rain falls; then good fortune comes.`
 }
 
-index
 
 
-gram "Chien" (WATER UPON MOUNTAIN)
-
+gram "Chien" (WATER UPON MOUNTAIN) {
 ID 39
 meaning `Obstruction`
 
-form `The hexagram pictures a dangerous abyss lying before us and a steep, inaccessible mountain rising behind us. We are surrounded by obstacles; at the same time, since the mountain has the attribute of keeping still, there is implicit a hint as to how we can extricate ourselves. The hexagram represents obstructions that appear in the course of time but that can and should be overcome. Therefore all the instruction given is directed to overcoming them.
-
-`
+form `The hexagram pictures a dangerous abyss lying before us and a steep, inaccessible mountain rising behind us. We are surrounded by obstacles; at the same time, since the mountain has the attribute of keeping still, there is implicit a hint as to how we can extricate ourselves. The hexagram represents obstructions that appear in the course of time but that can and should be overcome. Therefore all the instruction given is directed to overcoming them.`
 
 judgement `OBSTRUCTION. The southwest furthers.
 
@@ -723,8 +720,10 @@ MarkedLines
 	line 6 `Going leads to obstructions, Coming leads to union.`
 	line 9 `In the midst of the greatest obstructions, Friends come.`
 	line 6 `Going leads to obstructions, Coming leads to great good fortune. It furthers one to see the great man.`
+}
 
-gram Hsieh (THUNDER UPON WATER)
+
+gram Hsieh (THUNDER UPON WATER) {
 meaning Deliverance
 ID 40
 
@@ -745,363 +744,108 @@ MarkedLines
 	Line 9 `Deliver yourself from your great toe. Then the companion comes, And him you can trust.`
 	Line 6 `If only the superior man can deliver himself, It brings good fortune. Thus he proves to inferior men that he is in earnest.`
 	line 6 `The prince shoots at a hawk on a high wall. He kills it. Everything serves to further.`
+}
 
-`
-41. Sun / Decrease
 
-above KêN KEEPING STILL, MOUNTAIN
-below TUI THE JOYOUS, LAKE
 
-This hexagram represents a decrease of the lower trigram in favor of the upper, because the third line, originally strong, has moved up to the top, and the top line, originally weak, has replaced it. What is below is decreased to the benefit of what is above. This is out-and-out decrease. If the foundations of a building are decreased in strength and the upper walls are strengthened, the whole structure loves its stability. Likewise, a decrease in the prosperity of the people in favor of the government is out-and-out decrease. And the entire theme of the hexagram is directed to showing how this shift of wealth can take place without causing the sources of wealth can take place without causing the sources of wealth in the nation and its lower classes to fail.
+gram KêN (MOUNTAIN upon LAKE) {
+ID 41
+meaning `Sun / Decrease`
 
-THE JUDGMENT
+form `This hexagram represents a decrease of the lower trigram in favor of the upper, because the third line, originally strong, has moved up to the top, and the top line, originally weak, has replaced it. What is below is decreased to the benefit of what is above. This is out-and-out decrease. If the foundations of a building are decreased in strength and the upper walls are strengthened, the whole structure loves its stability. Likewise, a decrease in the prosperity of the people in favor of the government is out-and-out decrease. And the entire theme of the hexagram is directed to showing how this shift of wealth can take place without causing the sources of wealth can take place without causing the sources of wealth in the nation and its lower classes to fail.`
 
-DECREASE combined with sincerity
-Brings about supreme good fortune
-Without blame.
-One may be persevering in this.
-It furthers one to undertake something.
-How is this to be carried out?
-One may use two small bowls for the sacrifice.
+judgement `DECREASE combined with sincerity Brings about supreme good fortune Without blame. One may be persevering in this. It furthers one to undertake something. How is this to be carried out? One may use two small bowls for the sacrifice.`
 
-Decrease does not under all circumstances mean something bad. Increase and decrease come in their own time. What matters here is to understand the time and not to try to cover up poverty with empty pretense. If a time of scanty resources brings out an inner truth, one must not feel ashamed of simplicity. For simplicity is then the very thing needed to provide inner strength for further undertakings. Indeed, there need by no concern if the outward beauty of the civilization, even the elaboration of religious forms, should have to suffer because of simplicity. One must draw on the strength of the inner attitude to compensate for what is lacking in externals; then the power of the content makes up for the simplicity of form. There is no need of presenting false appearances to God. Even with slender means, the sentiment of the heart can be expressed.
+	`Decrease does not under all circumstances mean something bad. Increase and decrease come in their own time. What matters here is to understand the time and not to try to cover up poverty with empty pretense. If a time of scanty resources brings out an inner truth, one must not feel ashamed of simplicity. For simplicity is then the very thing needed to provide inner strength for further undertakings. Indeed, there need by no concern if the outward beauty of the civilization, even the elaboration of religious forms, should have to suffer because of simplicity. One must draw on the strength of the inner attitude to compensate for what is lacking in externals; then the power of the content makes up for the simplicity of form. There is no need of presenting false appearances to God. Even with slender means, the sentiment of the heart can be expressed.`
 
-THE IMAGE
+image `At the foot of the mountain, the lake: The image of DECREASE. Thus the superior man controls his anger And restrains his instincts.`
 
-At the foot of the mountain, the lake:
+	`The lake at the foot of the mountain evaporates. In this way it decreases to the benefit of the mountain, which is enriched by its moisture. The mountain stands as the symbol of stubborn strength that can harden into anger. The lake is the symbol of unchecked gaiety that can develop into passionate drives at the expense of the life forces. Therefore decrease is necessary; anger must be decreased by keeping still, the instincts must be curbed by restriction. By this decrease of the lower powers of the psyche, the higher aspects of the soul are enriched.`
 
-The image of DECREASE.
+MarkedLines 
+	line 9 `Going quickly when one's tasks are finished Is without blame. But one must reflect on how much one may decrease others.`
+	line 9 `Perseverance furthers.`
+	line 6 `When three people journey together, Their number increases by one. When one man journeys alone, He finds a companion. When there are three people together, jealousy arises. One of them will have to go. Avery close bond is possible only between two people. But when one man is lonely, he is certain to find a companion who complements him.`
+	line 6 `If a man deceases his faults, It makes the other hasten to come and rejoice. No blame.`
+	line 6 `Someone does indeed increase him. Ten pairs of tortoises cannot oppose it. Supreme good fortune.`
+	line 9 `If one is increased without depriving other, There is no blame. Perseverance brings good fortune. It furthers one to undertake something. One obtains servants But no longer has a separate home.`
+}
 
-Thus the superior man controls his anger
-And restrains his instincts.
 
-The lake at the foot of the mountain evaporates. In this way it decreases to the benefit of the mountain, which is enriched by its moisture. The mountain stands as the symbol of stubborn strength that can harden into anger. The lake is the symbol of unchecked gaiety that can develop into passionate drives at the expense of the life forces. Therefore decrease is necessary; anger must be decreased by keeping still, the instincts must be curbed by restriction. By this decrease of the lower powers of the psyche, the higher aspects of the soul are enriched/
+gram I (WIND upon THUNDER) {
+ID 42
+meaning Increase
 
-THE LINES
+form `The idea of increase is expressed in the fact that the strong lowest line of the upper trigram has sunk down and taken its place under the lower trigram. This conception also expresses the fundamental idea on which the Book of Changes is based. To rule truly is to serve. A sacrifice of the higher element that produces an increase of the lower is called an out-and-out increase: it indicates the spirit that alone has power to help the world.`
 
-Nine at the beginning means:
+judgement `INCREASE. It furthers one To undertake something. It furthers one to cross the great water.`
+	`Sacrifice on the part of those above for the increase of those below fills the people with a sense of joy and gratitude that is extremely valuable for the flowering of the commonwealth. When people are thus devoted to their leaders, undertakings are possible, and even difficult and dangerous enterprises will succeed. Therefore in such times of progress and successful development it is necessary to work and make the best use of time. This time resembles that of the marriage of heaven and earth, when the earth partakes of the creative power of heaven, forming and bringing forth living beings. The time of INCREASE does not endure, therefore it must be utilized while it lasts.`
 
-Going quickly when one's tasks are finished
-Is without blame.
-But one must reflect on how much one may decrease others.
+image `Wind and thunder: the image of INCREASE. Thus the superior man: If he sees good, he imitates it; If he has faults, he rids himself of them.`
+	`While observing how thunder and wind increase and strengthen each other, a man can not the way to self-increase and self-improvement. When he discovers good in others, he should imitate it and thus make everything on earth his own. If he perceives something bad in himself, let him rid himself of it. In this way he becomes free of evil. This ethical change represents the most important increase of personality.`
 
-It is unselfish and good when a man, after completing his own urgent tasks, uses his strength in the service of others, and without bragging or making much of it, helps quickly where help is needed. But the man in a superior position who is thus aided must weigh carefully how much he can accept without doing the helpful servant or friend real harm. Only where such delicacy of feeling exists can one give oneself unconditionally and without hesitation.
+MarkedLines
+	line 9 `It furthers one to accomplish great deeds. Supreme good fortune. No blame.`
+	line 6 `Someone does indeed increase him; Ten pairs of tortoises cannot oppose it. Constant perseverance brings good fortune. The king presents him before God. Good fortune.`
+	line 6 `One is enriched through unfortunate events. No blame, if you are sincere And walk in the middle, And report with a seal to the prince.`
+	line 6 `If you walk in the middle And report the prince, He will follow. It furthers one to be used In the removal of the capital.`
+	line 9 `If in truth you have a kind heart, ask not. Supreme good fortune. Truly, kindness will be recognized as your virtue.`
+	line 9 `He brings increase to no one. Indeed, someone even strikes him. He does not keep his heart constantly steady.
+Misfortune.`
+}
 
-Nine in the second place means:
 
-Perseverance furthers.
 
-To undertake something brings misfortune.
-Without decreasing oneself,
-One is able to bring increase to others.
+gram Kuai (LAKE upon HEAVEN) {
+ID 43
+meaning `Break-through (Resoluteness)`
 
-A high-minded self-awareness and a consistent seriousness with no forfeit of dignity are necessary if a man wants to be of service to others. He who throw himself away in order to do the bidding of a superior diminishes his own position without thereby giving lasting benefit to the other. This is wrong. To render true service of lasting value to another, one must serve him without relinquishing oneself.
+form `This hexagram signifies on the one hand a break-through after a long accumulation of tension, as a swollen river breaks through its dikes, or in the manner of a cloudburst. On the other hand, applied to human conditions, it refers to the time when inferior people gradually begin to disappear. Their influence is on the wane; as a result of resolute action, a change in conditions occurs, a break-through. The hexagram is linked with the third month [April-May].`
 
-Six in the third place means:
+judgement `BREAK-THROUGH. One must resolutely make the matter known At the court of the king. It must be announced truthfully. Danger. It is necessary to notify one's own city. It does not further to resort to arms. It furthers one to undertake something.`
 
-When three people journey together,
+	`Even if only one inferior man is occupying a ruling position in a city, he is able to oppress superior men. Even a single passion still lurking in the heart has power to obscure reason. Passion and reason cannot exist side by side-therefore fight without quarter is necessary if the good is to prevail. In a resolute struggle of the good against evil, there are, however, definite rules that must not be disregarded, if it is to succeed. First, resolution must be based on a union of strength and friendliness. Second, a compromise with evil is not possible; evil must under all circumstances be openly discredited. Nor must our own passions and shortcomings be glossed over. Third, the struggle must not be carried on directly by force. If evil is branded, it thinks of weapons, and if we do it the favor of fighting against it blow for blow, we lose in the end because thus we ourselves get entangled in hatred and passion. Therefore it is important to begin at home, to be on guard in our own persons against the faults we have branded. In this way, finding no opponent, the sharp edges of the weapons of evil becomes dulled. For the same reasons we should not combat our own faults directly. As long as we wrestle with them, they continue victorious. Finally, the best way to fight evil is to make energetic progress in the good.`
 
-Their number increases by one.
-When one man journeys alone,
-He finds a companion.
+image `The lake has risen up to heaven: The image of BREAK-THROUGH. Thus the superior man Dispenses riches downward And refrains from resting on his virtue.`
 
-When there are three people together, jealousy arises. One of them will have to go. Avery close bond is possible only between two people. But when one man is lonely, he is certain to find a companion who complements him.
+	`When the water of a lake has risen up to heaven, there is reason to fear a cloudburst. Taking this as a warning, the superior man forestalls a violent collapse. If a man were to pile up riches for himself alone, without considering others, he would certainly experience a collapse. If a man were to pile up riches for himself alone, without considering others, he would certainly experience a collapse. For all gathering is followed by dispersion. Therefore the superior man begins to distribute while he is accumulating. In the same way, in developing his character he takes care not to become hardened in obstinacy but to remain receptive to impressions by help of strict and continuous self-examination.`
 
-Six in the fourth place means:
+MarkedLines 
+	line 9 `Mighty in the forward-striding toes. When one goes and is not equal to the task, One makes a mistake.`
+	line 9 `A cry of alarm. Arms at evening and at night. Fear nothing.`
+	line 9 `To be powerful in the cheekbones Brings misfortune. The superior man is firmly resolved. He walks alone and is caught in the rain. He is bespattered, And people murmur against him. No blame.`
+	line 9 `There is no skin on his thighs, And walking comes hard. If a man were to let himself be led like a sheep, Remorse would disappear. But if these words are heard. They will not be believed.`
+	line 9 `In dealing with weeds, Firm resolution is necessary. Walking in the middle Remains free of blame.`
+	line 6 `No cry. In the end misfortune comes.`
+}
 
-If a man deceases his faults,
-It makes the other hasten to come and rejoice.
 
-No blame.
 
-A man's faults often prevent even well-disposed people from coming closer to him. His faults are sometimes reinforced by the environment in which he lives. But if in humility he can bring himself to the point of giving them up, he frees his well-disposed friends from an inner pressure and causes them to approach the more quickly, and there is mutual joy.
-Six in the fifth place means:
+gram Kou  (HEAVEN upon WIND) {
+ID 44
+meaning `Coming to Meet`
+	`This hexagram indicates a situation in which the principle of darkness, after having been eliminated, furtively and unexpectedly obtrudes again from within and below. Of its own accord the female principle comes to meet the male. It is an unfavorable and dangerous situation, and we must understand and promptly prevent the possible consequences. The hexagram is linked with the fifth month [June-July], because at the summer solstice the principle of darkness gradually becomes ascendant again.`
 
-Someone does indeed increase him.
+judgement `COMING TO MEET. The maiden is powerful. One should not marry such a maiden.`
+	`The rise of the inferior element is pictured here in the image of a bold girl who lightly surrenders herself and thus seizes power. This would not be possible if the strong and light-giving element had not in turn come halfway. The inferior thing seems so harmless and inviting that a man delights in it; it looks so small and weak that he imagines he may dally with it and come to no harm. The inferior man rises only because the superior man does not regard him as dangerous and so lends him power. If he were resisted from the fist, he could never gain influence. The time of COMING TO MEET is important in still another way. Although as a general rule the weak should not come to meet the strong, there are times when this has great significance. When heaven and earth come to meet each other, all creatures prosper; when a prince and his official come to meet each other, the world is put in order. It is necessary for elements predestined to be joined and mutually dependent to come to meet one another halfway. But the coming together must be free of dishonest ulterior motives, otherwise harm will result.`
 
-Ten pairs of tortoises cannot oppose it.
+image `Under heaven, wind: The image of COMING TO MEET. Thus does the prince act when disseminating his commands And proclaiming them to the four quarters of heaven.`
+	`The situation here resembles that in hexagram 20, Kuan, CONTEMPLATION ( VIEW). In the latter the wind blows over the earth, here it blows under heaven; in both cases it goes everywhere. There the wind is on the earth and symbolizes the ruler taking note of the conditions in his kingdom; here the wind blows from above and symbolizes the influence exercised by the ruler through his commands. Heaven is far from the things of earth, but it sets them in motion by means of the wind. The ruler is far form his people, but he sets them in motion by means of his commands and decrees.`
 
-Supreme good fortune.
+MarkedLines 
+	line 6 `It must be checked with a brake of bronze. Perseverance brings good fortune. If one lets it take its course, one experiences misfortune. Even a lean pig has it in him to rage around.`
 
-If someone is marked out by fate for good fortune, it comes without fail. All oracles-as for instance those that are read from the shells of tortoises-are bound to concur in giving him favorable signs. He need fear nothing, because his luck is ordained from on high.
+	Line 9 `There is a fish in the tank. No blame. Does not further guests. The inferior element is not overcome by violence but is kept under gentle control. Then nothing evil is to be feared. But care must be taken not to let it come in contact with those further away, because once free it would unfold its evil aspects unchecked.`
 
-Nine at the top means:
+	line 9 `There is no skin on his thighs, And walking comes hard. If one is mindful of the danger, No great mistake is made.`
 
-If one is increased without depriving other,
+	line 9 `No fish in the tank. This leads to misfortune.`
+	line 9 `A melon covered with willow leaves. Hidden lines. Then it drops down to one from heave. The melon, like the fish, is a symbol of the principle of darkness.`
 
-There is no blame.
-Perseverance brings good fortune.
-It furthers one to undertake something.
-One obtains servants
-But no longer has a separate home.
+	line 9 `He comes to meet with his horns. Humiliation. No blame.`
+}
 
-There are people who dispense blessings to the whole world. Every increase in power that comes to them benefits the whole of mankind and therefore does not bring decrease to others. Through perseverance and zealous work a man wins success and finds helpers as they are needed. But what he accomplishes is not a limited private advantage; it is a public good and available to everyone.
-
-index
-
-`
-
-`
-42. I / Increase
-
-above SUN THE GENTLE, WIND
-below CHêN THE AROUSING, THUNDER
-
-The idea of increase is expressed in the fact that the strong lowest line of the upper trigram has sunk down and taken its place under the lower trigram. This conception also expresses the fundamental idea on which the Book of Changes is based. To rule truly is to serve. A sacrifice of the higher element that produces an increase of the lower is called an out-and-out increase: it indicates the spirit that alone has power to help the world.
-
-THE JUDGMENT
-
-INCREASE. It furthers one
-
-To undertake something.
-It furthers one to cross the great water.
-
-Sacrifice on the part of those above for the increase of those below fills the people with a sense of joy and gratitude that is extremely valuable for the flowering of the commonwealth. When people are thus devoted to their leaders, undertakings are possible, and even difficult and dangerous enterprises will succeed. Therefore in such times of progress and successful development it is necessary to work and make the best use of time. This time resembles that of the marriage of heaven and earth, when the earth partakes of the creative power of heaven, forming and bringing forth living beings. The time of INCREASE does not endure, therefore it must be utilized while it lasts.
-
-THE IMAGE
-
-Wind and thunder: the image of INCREASE.
-
-Thus the superior man:
-If he sees good, he imitates it;
-If he has faults, he rids himself of them.
-
-While observing how thunder and wind increase and strengthen each other, a man can not the way to self-increase and self-improvement. When he discovers good in others, he should imitate it and thus make everything on earth his own. If he perceives something bad in himself, let him rid himself of it. In this way he becomes free of evil. This ethical change represents the most important increase of personality.
-
-THE LINES
-
-Nine at the beginning means:
-
-It furthers one to accomplish great deeds.
-
-Supreme good fortune. No blame.
-
-If great help comes to a man from on high, this increased strength must be used to achieve something great for which he might otherwise never have found energy, or readiness to take responsibility. Great good fortune is produced by selflessness, and in bringing about great good fortune, he remains free of reproach.
-Six in the second place means:
-
-Someone does indeed increase him;
-
-Ten pairs of tortoises cannot oppose it.
-Constant perseverance brings good fortune.
-
-The king presents him before God.
-Good fortune.
-
-A man brings about real increase by producing in himself the conditions for it, that it, through receptivity to and love of the good. Thus the thing for which he strives comes of itself, with the inevitability of natural law. Where increase is thus in harmony with the highest laws of the universe, it cannot be prevented by any constellation of accidents. But everything depends on his not letting unexpected good fortune make him heedless; he must make it his own through inner strength an steadfastness. Then he acquires meaning before God and man, and can accomplish something for the good of the world.
-
-Six in the third place means:
-
-One is enriched through unfortunate events.
-
-No blame, if you are sincere
-And walk in the middle,
-And report with a seal to the prince.
-
-A time of blessing and enrichment has such powerful effects that even events ordinarily unfortunate must turn out to the advantage of those affected by them. These persons become free of error, and by acting in harmony with truth they gain such inner authority that they exert influence as if sanctioned by the letter and seal.
-
-Six in the fourth place means:
-
-If you walk in the middle 
-And report the prince,
-He will follow.
-It furthers one to be used
-In the removal of the capital.
-
-It is important that there should be men who mediate between leaders and followers. These should be disinterested people, especially in times of increase, since the benefit is to spread from the leader to the people. Nothing of this benefit should be held back in a selfish way; it should really reach those for whom it is intended. This sort of intermediary, who also exercises a good influence on the leader, is especially important in times when it is a matter of great undertakings, decisive for the future and requiring the inner assent of all concerned.
-Nine in the fifth place means:
-
-If in truth you have a kind heart, ask not.
-
-Supreme good fortune.
-
-Truly, kindness will be recognized as your virtue.
-
-True kindness does not count upon nor ask about merit and gratitude but acts from inner necessity. And such a truly kind heart finds itself rewarded in being recognized, and thus the beneficent influence will spread unhindered.
-
-Nine at the top means:
-
-He brings increase to no one.
-Indeed, someone even strikes him.
-He does not keep his heart constantly steady.
-Misfortune.
-
-The meaning here is that through renunciation those in high place should bring increase to those below. By neglecting this duty and helping no one, they in turn lose the furhtering influence of others and soon find themselves alone. In this way they invite attacks. An attitude not permanently in harmony with the demands of the time will necessarily bring misfortune with it. Confucius says about this line:
-
-The superior man sets his person at rest before he moves; he composes his mind before he speaks; he makes his relations firm before he asks for something. By attending to these three matters, the superior man gains complete security. But if a man is brusque in his movements, others will not cooperate. If he is agitated in his word, they awaken no echo in others. If he asks for something without having fist established relations, it will not be given to him. If no one is with him, those who would harm him draw near.
-
-index
-`
-
-`
-
-43. Kuai / Break-through (Resoluteness)
-
-above TUI THE JOYOUS, LAKE
-below CH'IEN THE CREATIVE, HEAVEN
-
-This hexagram signifies on the one hand a break-through after a long accumulation of tension, as a swollen river breaks through its dikes, or in the manner of a cloudburst. On the other hand, applied to human conditions, it refers to the time when inferior people gradually begin to disappear. Their influence is on the wane; as a result of resolute action, a change in conditions occurs, a break-through. The hexagram is linked with the third month [April-May].
-
-THE JUDGMENT
-
-BREAK-THROUGH. One must resolutely make the matter known
-At the court of the king.
-It must be announced truthfully. Danger.
-It is necessary to notify one's own city.
-It does not further to resort to arms.
-It furthers one to undertake something.
-
-Even if only one inferior man is occupying a ruling position in a city, he is able to oppress superior men. Even a single passion still lurking in the heart has power to obscure reason. Passion and reason cannot exist side by side-therefore fight without quarter is necessary if the good is to prevail. In a resolute struggle of the good against evil, there are, however, definite rules that must not be disregarded, if it is to succeed. First, resolution must be based on a union of strength and friendliness. Second, a compromise with evil is not possible; evil must under all circumstances be openly discredited. Nor must our own passions and shortcomings be glossed over. Third, the struggle must not be carried on directly by force. If evil is branded, it thinks of weapons, and if we do it the favor of fighting against it blow for blow, we lose in the end because thus we ourselves get entangled in hatred and passion. Therefore it is important to begin at home, to be on guard in our own persons against the faults we have branded. In this way, finding no opponent, the sharp edges of the weapons of evil becomes dulled. For the same reasons we should not combat our own faults directly. As long as we wrestle with them, they continue victorious. Finally, the best way to fight evil is to make energetic progress in the good.
-
-THE IMAGE
-
-The lake has risen up to heaven:
-
-The image of BREAK-THROUGH.
-
-Thus the superior man
-Dispenses riches downward
-And refrains from resting on his virtue.
-
-When the water of a lake has risen up to heaven, there is reason to fear a cloudburst. Taking this as a warning, the superior man forestalls a violent collapse. If a man were to pile up riches for himself alone, without considering others, he would certainly experience a collapse. If a man were to pile up riches for himself alone, without considering others, he would certainly experience a collapse. For all gathering is followed by dispersion. Therefore the superior man begins to distribute while he is accumulating. In the same way, in developing his character he takes care not to become hardened in obstinacy but to remain receptive to impressions by help of strict and continuous self-examination.
-
-THE LINES
-
-Nine at the beginning means:
-
-Mighty in the forward-striding toes.
-When one goes and is not equal to the task,
-One makes a mistake.
-
-In times of resolute advance, the beginning is especially difficult. We feel inspired to press forward but resistance is still strong; therefore we ought to gauge our own strength and venture only so far as we can go with certainty of success. To plunge blindly ahead is wrong, because it is precisely at the beginning that an unexpected setback can have the most disastrous results.
-
-Nine in the second place means:
-
-A cry of alarm. Arms at evening and at night.
-Fear nothing.
-
-Readiness is everything. Resolution is indissolubly bound up with caution. If an individual is careful and keeps his wits about him, he need not become excited or alarmed. If he is watchful at all times, even before danger is present, he is armed when danger approaches and need not be afraid. The superior man is on his guard against what is not yet in sight and on the alert for what is not yet within hearing; therefore he dwells in the midst of difficulties as thought hey did not exist. If a man develops his character, people submit to him of their own accord. If reason triumphs, the passions withdraw of themselves. To be circumspect and not to forget one's armor is the right way to security.
-
-Nine in the third place means:
-
-To be powerful in the cheekbones 
-Brings misfortune.
-
-The superior man is firmly resolved.
-He walks alone and is caught in the rain.
-He is bespattered,
-And people murmur against him.
-
-No blame.
-
-Here we have a man in an ambiguous situation. While all others are engaged in a resolute fight against all that is inferior, he alone has a certain relationship with an inferior man. If he were to show strength outwardly and turn against this man before the time is ripe, he would only endanger the entire situation, because the inferior man would too quickly have recourse to countermeasures. The task of the superior man becomes extremely difficult here. He must be firmly resolved within himself and, while maintaining association with the inferior man, avoid any participation in his evilness. He will of course be misjudged. It will be thought that he belong to the party of the inferior man. He will be lonely because no one will understand him. His relations with the inferior man will sully him in the eyes of the multitude, and they will turn against him, grumbling. But he can endure this lack of appreciation and makes no mistake, because he remains true to himself.
-
-Nine in the fourth place means:
-
-There is no skin on his thighs,
-And walking comes hard.
-If a man were to let himself be led like a sheep,
-Remorse would disappear.
-But if these words are heard
-
-They will not be believed.
-
-Here a man is suffering from inner restlessness and cannot abide in his place. He would like to push forward under any circumstances, but encounters insuperable obstacles. Thus his situation entails an inner conflict. This is due to the obstinacy with which he seeks to enforce his will. If he would desist from this obstinacy, everything would go well. But this advice, like so much other good counsel, will be ignored. For obstinacy makes a man unable to hear, for all that he has ears.
-Nine in the fifth place means:
-
-In dealing with weeds,
-Firm resolution is necessary.
-Walking in the middle
-Remains free of blame.
-
-Weeds always grow back again and are difficult to exterminate. So too the struggle against an inferior man in a high position demands firm resolution. One has certain relations with him, hence there is danger that one may give up the struggle as hopeless. But this must not be. One must go on resolutely and not allow himself to be deflected from him course. Only in this way does one remain free of blame.
-
-Six at the top means:
-
-No cry.
-In the end misfortune comes.
-
-Victory seems to have been achieved. There remains merely a remnant of the evil resolutely to be eradicated as the time demands. Everything looks easy. Just there, however, lies the danger. If we are not on guard, evil will succeed in escaping by means of concealment, and when it has eluded us new misfortunes will develop from the remaining seeds, for evil does not die easily. So too in dealing with the evil in own's own character, one must go to work with thoroughness. If out of carelessness anything were to be overlooked, new evil would arise from it.
-
-index
-
-
-44. Kou / Coming to Meet
-
-above CH'IEN THE CREATIVE, HEAVEN
-below SUN THE GENTLE, WIND
-
-This hexagram indicates a situation in which the principle of darkness, after having been eliminated, furtively and unexpectedly obtrudes again from within and below. Of its own accord the female principle comes to meet the male. It is an unfavorable and dangerous situation, and we must understand and promptly prevent the possible consequences. The hexagram is linked with the fifth month [June-July], because at the summer solstice the principle of darkness gradually becomes ascendant again.
-
-THE JUDGMENT
-
-COMING TO MEET. The maiden is powerful.
-One should not marry such a maiden.
-
-The rise of the inferior element is pictured here in the image of a bold girl who lightly surrenders herself and thus seizes power. This would not be possible if the strong and light-giving element had not in turn come halfway. The inferior thing seems so harmless and inviting that a man delights in it; it looks so small and weak that he imagines he may dally with it and come to no harm. The inferior man rises only because the superior man does not regard him as dangerous and so lends him power. If he were resisted from the fist, he could never gain influence. The time of COMING TO MEET is important in still another way. Although as a general rule the weak should not come to meet the strong, there are times when this has great significance. When heaven and earth come to meet each other, all creatures prosper; when a prince and his official come to meet each other, the world is put in order. It is necessary for elements predestined to be joined and mutually dependent to come to meet one another halfway. But the coming together must be free of dishonest ulterior motives, otherwise harm will result.
-
-THE IMAGE
-
-Under heaven, wind:
-
-The image of COMING TO MEET.
-
-Thus does the prince act when disseminating his commands
-And proclaiming them to the four quarters of heaven.
-
-The situation here resembles that in hexagram 20, Kuan, CONTEMPLATION ( VIEW). In the latter the wind blows over the earth, here it blows under heaven; in both cases it goes everywhere. There the wind is on the earth and symbolizes the ruler taking note of the conditions in his kingdom; here the wind blows from above and symbolizes the influence exercised by the ruler through his commands. Heaven is far from the things of earth, but it sets them in motion by means of the wind. The ruler is far form his people, but he sets them in motion by means of his commands and decrees.
-
-THE LINES
-
-Six at the beginning means:
-
-It must be checked with a brake of bronze.
-Perseverance brings good fortune.
-If one lets it take its course, one experiences misfortune.
-Even a lean pig has it in him to rage around.
-
-If an inferior element has wormed its way in, it must be energetically checked at once. By consistently checking it, bad effects can be avoided. If it is allowed to take its course, misfortune is bound to result; the insignificance of that which creeps in should not be a temptation to underrate it. A pig that is still young and lean cannot rage around much, but after it has eaten its fill and become strong, its true nature comes out if it has not previously been curbed.
-Nine in the second place means:
-
-There is a fish in the tank. No blame.
-Does not further guests.
-
-The inferior element is not overcome by violence but is kept under gentle control. Then nothing evil is to be feared. But care must be taken not to let it come in contact with those further away, because once free it would unfold its evil aspects unchecked.
-
-Nine in the third place means: There is no skin on his thighs,
-And walking comes hard.
-If one is mindful of the danger,
-
-No great mistake is made.
-
-There is a temptation to fall in with the evil element offering itself-a very dangerous situation. Fortunately circumstances prevent this; one would like to do it, but cannot. This leads to painful indecision in behavior. But if we gain clear insight into the danger of the situation, we shall at least avoid more serious mistakes.
-
-Nine in the fourth place means:
-
-No fish in the tank.
-
-This leads to misfortune.
-
-Insignificant people must be tolerated in order to keep them well disposed. Then we can make use of them if we should need them. If we become alienated from them and do not meet them halfway, they turn their backs on us and are not at our disposal when we need them. But this is our own fault.
-Nine in the fifth place means:
-
-A melon covered with willow leaves.
-Hidden lines.
-
-Then it drops down to one from heave.
-
-The melon, like the fish, is a symbol of the principle of darkness. It is sweet but spoils easily and for this reason is protected with a cover of willow leaves. This is a situation in which a strong, superior, well-poised man tolerates and protects the inferiors in his charge. He has the firm lines of order an beauty within himself but he does not lay stress upon them. He does not bother his subordinates with outward show or tiresome admonitions but leaves them quite free, putting his trust in the transforming power of a strong and upright personality. And behold! Fate is favorable. His inferiors respond to his influence and fall to his disposition like ripe fruit.
-
-Nine at the top means:
-
-He comes to meet with his horns.
-Humiliation. No blame.
-
-When a man has withdrawn from the world, its tumult often becomes unbearable to him. There are many people who in a noble pride hold themselves aloof from all that is low and rebuff it brusquely wherever it comes to meet them. Such persons are reproached for being proud and distant, but since active duties no longer hold them to the world, this does not greatly matter. They know how to bear the dislike of the masses with composure.
-
-index
-
-
-45. Ts'ui / Gathering Together [Massing]
+`45. Ts'ui / Gathering Together [Massing]
 
 above TUI THE JOYOUS, LAKE
 below K'UN THE RECEPTIVE, EARTH
