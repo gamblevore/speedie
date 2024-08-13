@@ -10,8 +10,8 @@ ignore
 	x = (1) (a or B) (2) // fails with || x = ...
 	–how ∆can someone fall so~far
 	–how  someone can~fall so~far
-	–how  ∆ are you slow			// how are you slow?
-	(–how slow) are you				// how SLOW are you?
+	–how  ∆ are you slow				// how are you slow?
+	(–how slow) are you					// how SLOW are you?
 	¬ how ~ slow  you are				// how slow you are! (its @thg, cos meaning is different)
 	(you are  –how  slow)				// you are HOW slow?
 	
