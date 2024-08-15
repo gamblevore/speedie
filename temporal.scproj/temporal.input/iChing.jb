@@ -2,8 +2,9 @@
 // author info at end of file.
 
 // to do:
-	// what to do with multiple names per thing?
-	// Missing lines in some places.
+	// Check X upon X. (WOOD isn't a real element?)
+	// Missing line or numbers (6/9)
+	// Check theres no mistakes in the X upon X
 	// check all have IDs, meaning, form, etc.
 
 trigrams
@@ -1043,6 +1044,7 @@ image `Thunder over the lake: The image of THE MARRYING MAIDEN. Thus the superio
 
 markedlines
 	// ;_; who wrote this originally even? ;_;
+	// apparantly Kari Hohne has some more modern line interpretations... ill try to get those instead.
 	line 9 `The marrying maiden as a concubine. A lame man who is able to tread. Undertakings bring good fortune.`
 	line 9 `A one-eyed man who is able to see. The perseverance of a solitary man furthers.`
 	line 6 `The marrying maiden as a slave. She marries as a concubine.`
