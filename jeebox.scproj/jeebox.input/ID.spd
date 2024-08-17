@@ -61,7 +61,7 @@ class MessageID (stringshared)
 		return Message(parent, .func, -1, .name, .name.length)
 
 	module
-		function ByID (SorterComparer)
+		function ByID (SorterComparerBool)
 			opt norefcounts
 			|| aa = a|MessageID|,   || bb = b|MessageID| 
 			|| diff = bb.ID  -  aa.ID
@@ -69,7 +69,7 @@ class MessageID (stringshared)
 				
 			return aa|uint64| < bb|uint64|
 		
-		function ByFreq (SorterComparer)
+		function ByFreq (SorterComparerBool)
 			opt norefcounts
 			|| aa = a|MessageID|,   || bb = b|MessageID| 
 			return bb.Frequency  <  aa.Frequency

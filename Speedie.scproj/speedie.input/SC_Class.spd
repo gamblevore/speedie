@@ -280,7 +280,7 @@ function SortPropHelper (|scdecl|)
 function SortProperties
 	if (self is SortsProperties) and (!.iswrapper) and !.isrole
 		|| Aligner = .SortPropHelper
-		.Properties.sort(DeclSizeSorter, true)
+		.Properties.sort(DeclSizeSorterRev)
 		if Aligner
 			(Aligner isnt biggest)
 

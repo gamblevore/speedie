@@ -16,9 +16,9 @@ JBClass( Array, Saveable,
 	int					Capacity;
 	int					Length;
 );
-typedef bool (*SorterComparer)(JB_Object* a, JB_Object* b);
+typedef int (*ArraySorterComparerInt)(JB_Object* a, JB_Object* b);
 
-void JB_Array_Sort( Array* self, SorterComparer fp, bool down );
+void JB_Array_Sort( Array* self, ArraySorterComparerInt fp );
 void JB_Array_Remove( Array* self, int Pos );
 void JB_Array_Reverse( Array* self );
 JB_String* JB_Array_Render(Array* self, FastString* fs);

@@ -467,7 +467,7 @@ class File (String)
 					_speedie = "/usr/local/speedie/".Resolve(False)
 			return _speedie
 		
-		function SizeSorter (SorterComparer)
+		function SizeSorter (SorterComparerBool)
 			|| aa = a|file|.size
 			|| bb = b|file|.size
 			return aa > bb

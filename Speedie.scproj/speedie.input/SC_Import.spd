@@ -230,7 +230,7 @@ class SCImport
 		|byte|				CurrIsManuallyImported
 		
 		
-		function Sorter (SorterComparer)
+		function Sorter (SorterComparerbool)
 			opt norefcounts
 			|| aa = a|SCFile|
 			|| bb = b|SCFile|

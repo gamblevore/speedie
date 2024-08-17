@@ -2,7 +2,7 @@
 // allow the short sort of one-liners that other languages have...
 // good for demos and language-tests
 
-function dictionary.Sort (|SorterComparer| fn, |int| count, |[...]|)
+function dictionary.Sort (|SorterComparerbool| fn, |int| count, |[...]|)
 	rz = .values // a more efficient sorter could extract only needed
 	rz.sort(fn)
 	rz.Length = count

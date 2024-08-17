@@ -249,7 +249,6 @@ void JB_FillInts(int* Start, int N, int Value) {
 	std::fill(Start, Start+N, Value);
 }
 
-#define obj JB_Object*
 
 #ifndef AS_LIBRARY
 void JB_Array_Shuffle( Array* self ) {
@@ -258,7 +257,7 @@ void JB_Array_Shuffle( Array* self ) {
 	uint64 Hash = ~1234567;
 
 	for_(n) {
-		obj ai = Array[i];
+		auto ai = Array[i];
 		Hash = JB_uint64_hash(RDTSC() xor (~(uint64)ai) xor Hash);
 		int i2 = Hash % n;
 		Array[i] = Array[i2];
@@ -268,40 +267,15 @@ void JB_Array_Shuffle( Array* self ) {
 #endif
 
 
+#define __spdsort_type__ JB_Object*
+#define __spdsort_func__(fp,b,c)  (((ArraySorterComparerInt)fp)(b, c))
 
-static int SortABit(obj* array, int j, int high, SorterComparer fp, bool Up) {
-    auto pivot = array[high];
-    while ((fp)(array[j++], pivot)==Up) // no need swap
-		if (j >= high)
-			return j;
-	int i = j-2;
-    while (j < high) {
-        if ((fp)(array[j], pivot)==Up)
-            std::swap(array[++i], array[j]);
-		j++;
-	}
-	std::swap(array[++i], array[high]);
-	return i;
-}
+#include "spdsort/spdsort.h"
 
-
-static void QuickSort(obj* array, int start, int end, SorterComparer fp, bool Up) {
-    require0 (start < end);
-    /// todo: this could be a lot faster if we used alloca and a depth and stored p
-    /// vars there... I got a stack depth of over 100 on just storing modules. strange!
-    /// could also be used for my compression code also... perhaps with a macro.
-    int p = SortABit(	 array, start, end,   fp, Up);
-    QuickSort(			 array, start, p - 1, fp, Up);
-    QuickSort(			 array, p + 1, end,   fp, Up);
-}
-
-
-void JB_Array_Sort ( Array* self, SorterComparer fp, bool down ) {
+void JB_Array_Sort ( Array* self, ArraySorterComparerInt fp) {
 	int N = JB_Array_Size(self);
-	require0 (fp and N>1);
-	
-	obj* J = self->_Ptr;
-	QuickSort(J, 0, N-1, fp, !down); // oop?
+	if (fp and N >= 2) // remove the check for fp? nilchecker should find it.
+		SpdSort((void*)fp, self->_Ptr, self->_Ptr+N-1);
 }
 
 

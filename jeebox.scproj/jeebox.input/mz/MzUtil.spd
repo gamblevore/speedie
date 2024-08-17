@@ -148,6 +148,9 @@ struct CompressionStats
 	|int|  Out
 	|bool| Live
 	
+	constructor
+		.live = true
+	
 	function Clear
 		.Duration = nil
 		.in = nil
@@ -184,7 +187,5 @@ struct CompressionStats
 	
 	module
 		|CompressionStats| All // noice
-		function New (|compressionstats|)
-			rz.live = true
 }
 

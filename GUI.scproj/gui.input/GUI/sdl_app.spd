@@ -550,7 +550,7 @@ module SDLApp
 
 	function PutDialogsInFront
 		opt norefcounts
-		window.all.sort(DialogSorter|sortercomparer2|)
+		window.all.sort(DialogSorter|sortercomparer|)
 
 
 	function DrawWinFrom (|window|)

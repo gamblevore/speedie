@@ -19,6 +19,8 @@ helper NodeSorter (SorterComparerFn)
 	return a.ExportName < b.ExportName
 
 
+helper DeclSizeSorterRev (sortercomparerdecl)
+	return !DeclSizeSorter(a,b)
 helper DeclSizeSorter (sortercomparerdecl)
 	return a.DeclSizeSort < b.DeclSizeSort
 

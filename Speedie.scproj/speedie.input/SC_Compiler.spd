@@ -734,11 +734,11 @@ function SortModulesAndClasses (|bool|)
 	return stderr.ok
 	
 
-function ClassSorter (SorterComparer)
+function ClassSorter (SorterComparerBool)
 	return ModulesSorter(a|scclass|.modul, b|scclass|.modul)
 
 
-function ModulesSorter (SorterComparer)
+function ModulesSorter (SorterComparerbool)
 	opt norefcounts
 	|| aa = a|scmodule|
 	|| bb = b|scmodule|

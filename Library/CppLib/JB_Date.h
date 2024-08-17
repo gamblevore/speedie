@@ -35,5 +35,17 @@ inline u64 RDTSC() {
 }
 #endif
 
+/* // could this work?
+// SPDX-License-Identifier: GPL-2.0
+u64 rdtsc(void)
+{
+    u64 val;
+
+    asm volatile("mrs %0, cntvct_el0" : "=r" (val));
+
+    return val;
+}
+*/
+
 #endif
 

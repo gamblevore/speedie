@@ -36,3 +36,6 @@ examples/prototest
 Speedie.scproj/BuildTest/strings.txt
 examples/encoding_test(ignore).spd
 *.hol
+Library/CppLib/spdsort/spdsort.xcodeproj/project.pbxproj
+Library/CppLib/spdsort/spdsort.cpp
+Library/CppLib/spdsort/spdsort.xcodeproj/project.xcworkspace/contents.xcworkspacedata

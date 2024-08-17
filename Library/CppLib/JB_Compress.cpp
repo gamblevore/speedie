@@ -1,9 +1,9 @@
 
 #include "JB_Compress.h"
-#include "divsufsort.h"
+#include "divsufsort.h" // Runs 5x (!!) faster than a plain quicksort or even my spdsort
+
 
 #define kExtend 0x70
-
 
 struct CompState : FastBuff {
 	int					LastOut;
@@ -62,29 +62,40 @@ struct CompState : FastBuff {
 	}
 
 
+//	int* GetSuffix () {
+//		ivec4* Suffix = (ivec4*)Suffixes;
+//		ivec4 Items = {0,1,2,3};
+//		int n = (Expected + 3) / 4;
+//		for (int i = 0; i < n; i++) {
+//			Suffix[i] = Items;
+//			Items += 4;
+//		}
+//		return (int*)Suffix;
+//	}
+	
 	u8* Detect () {
 		int n		= Expected;
-		int* R0		= Suffixes; 
 		int* SP		= SortPositionAtByte;
+		int* R0		= Suffixes;
 		divsufsort(Read, R0, n);
 		for_(n)	{				// code is simple, but concept is confusing.
 			SP[R0[i]] = i;
 			R0[i] = n - R0[i];
 		}
 
-		bool print_sorted_array = 0; // debug it
-		if (print_sorted_array) for_(n) {
-			auto pos = (Read+n)-R0[i];
-			for (int j = 0; j < 32; j++) {
-				char c = pos[j]; 
-				if (!c)
-					break;
-				if (c <= 32)
-					c = 32;
-				printf("%c", c);
-			}
-			puts("");
-		}
+//		bool print_sorted_array = 1; // debug it
+//		if (print_sorted_array and n < 2000) for_(n) {
+//			auto pos = (Read+n)-R0[i];
+//			for (int j = 0; j < 32; j++) {
+//				char c = pos[j]; 
+//				if (!c)
+//					break;
+//				if (c <= 32)
+//					c = 32;
+//				printf("%c", c);
+//			}
+//			puts("");
+//		}
 		
 		return n + Read;
 	}
@@ -179,7 +190,7 @@ static CompState& alloc_compress(JB_String* self, FastString* fs) {
 
 	if (CB > C.B) {
 		C.B = CB;
-		C.Suffixes				= (int*)JB_realloc(C.Suffixes,	2*ChunkLength*sizeof(int));
+		C.Suffixes				= (int*)JB_realloc(C.Suffixes,	2*ChunkLength*sizeof(int)+16);
 		C.SortPositionAtByte	= (int*)JB_realloc(C.SortPositionAtByte,	ChunkLength*sizeof(int));
 	}
 
