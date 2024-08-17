@@ -33,9 +33,8 @@ extern "C" void SpdSort(void* dat__, __spdsort_type__* low, __spdsort_type__* hi
 #endif
 
 static __spdsort_type__* SortABit(void* dat__, __spdsort_type__* low, __spdsort_type__* high) {
-// This design might seem strange, but it avoids bugs with invalid compare-funcs
-// which is important for someone making a programming language (me).
-// its also faster for non-pathological data, or slower compare-funcs.
+// Future upgrade for pathalogical data: Swap a random element for the high element
+// We'd need to only do that if our stack depth gets too high.
     auto pivot = *high;
     while (__spdsort_func__(dat__, pivot, *low++) <= 0)
 		if (low >= high)
