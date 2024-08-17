@@ -904,6 +904,21 @@ module {
 
 
 
+class SCBetterNode (SCNode)
+	|string|	Description
+	constructor
+		//
+	constructor (|message| msg)
+		Super.Constructor( msg )
+		
+	function ReadDescription (|message| msg)
+		|| str = msg[@str]
+			check !.description (msg, "Multiple descriptions.")
+			.Description = str.name
+
+
+
+
 function DontRemove (CollectFunc)
 	return Compiler.Program // OK
 
@@ -974,6 +989,9 @@ dispatch ClsCollectTable (CollectFunc)
 	+"processas"			SCClass.ProcessAs
 	+"cpp_refs"				cpprefs.ReadIntoCppRefs
 	+"linkage"				CppRefs.Linkage
+	+"description"
+		if name_space isa scbetternode
+			name_space.ReadDescription(node)
 
 	+"class"				SCClass.NewInnerClass
 	+"role"					SCClass.NewInnerClass
@@ -1000,6 +1018,7 @@ datatype SCNodeInfo (int)
 	constants
 		ExplicitExport
 		Visible
+		
 
 
 datatype SCNodeFindMode (int)

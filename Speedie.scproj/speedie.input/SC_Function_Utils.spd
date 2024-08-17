@@ -85,12 +85,8 @@ dispatch FuncPreReader (fnPreReader)
 	
 
 	+"description"
-		|| str = msg[@str]
-			if (self Is Disabled)
-				error (msg, "Already disabled")
-			  else
-				check !.description (msg, "Multiple descriptions.")
-				.Description = str.name
+		expect (self isnt disabled) (msg, "Already disabled")
+		.ReadDescription(msg)
 	
 
 

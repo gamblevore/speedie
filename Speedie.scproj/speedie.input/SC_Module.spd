@@ -5,7 +5,7 @@
 
 
 
-class SCModule (SCNode) {
+class SCModule (SCBetterNode) {
 linkage
 	cpp_part		Mod
 

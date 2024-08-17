@@ -52,14 +52,13 @@ datatype FunctionType (int)
 
 
 
-class SCFunction (SCNode) {
+class SCFunction (SCBetterNode) {
 linkage
 	cpp_part		Func
 
 |array? of SCNode|		LinkTo
 |[SCDecl]|				Args
 |SCClass?|				Cls
-|String|				Description
 |CppRefs?|				Refs
 |object?|				CounterPart
 |SCFunction?|			NextFunc

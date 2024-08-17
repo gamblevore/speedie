@@ -28,7 +28,7 @@ datatype ClassInfo (int)
 		ASM
 		
 
-class SCClass (SCNode) {
+class SCClass (SCBetterNode) {
 linkage
 	cpp_part		Class
 
