@@ -12,3 +12,7 @@
 "Press the section-key (underneath esc) to open a CMM!"
 
 "\1FD opens the quick file-finder! Just type a file name!"
+
+"\1F; or \1F' moves next or prev thru a side-list (errors, found text, files)"
+
+"\1F, or \1F. moves next or prev through the file history."
