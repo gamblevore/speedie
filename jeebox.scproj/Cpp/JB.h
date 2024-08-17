@@ -71,6 +71,8 @@ typedef bool FileResolveMode;
 
 typedef int64 FileSizeInt;
 
+typedef __fp16 Float16;
+
 typedef double Float64;
 
 typedef vec4 FloatRangeConverter;
@@ -584,7 +586,7 @@ JBClass ( JB_Error , Message ,
 	JB_String* OriginalData;
 	JB_String* StackTrace;
 	Message* Node;
-	double Progress;
+	Float64 Progress;
 	ErrorFlags ErrorFlags;
 	ErrorSeverity Severity;
 );
@@ -602,6 +604,8 @@ extern bool JB__ErrorColors_Enabled;
 #define kJB__ErrorColors_underline (JB_LUB[17])
 #define kJB__ErrorColors_warn (JB_LUB[18])
 extern u16 JB__API_NilHappened_;
+extern SyntaxObj* JB__Constants__FuncArray[64];
+extern Dictionary* JB__Constants__SyxDict;
 extern CharSet* JB__Constants_CSAfterDot;
 extern CharSet* JB__Constants_CSAfterStatement;
 extern CharSet* JB__Constants_CSLettersOnly;
@@ -629,10 +633,8 @@ extern CharSet* JB__Constants_XMLWordMiddle;
 #define kJB__Math_E (2.7182818284590452353602874713526f)
 #define kJB__Math_iTau (0.15915494309f)
 extern JB_File* JB__Platform_Logger_;
-extern SyntaxObj* JB__FuncArray_[64];
 extern JB_String* JB__JbinHeader;
 extern JB_String* JB__jBinNotJbin;
-extern Dictionary* JB__SyxDict_;
 #define kJB_kSaverEnd (JB_LUB[0])
 #define kJB_kSaverStart1 (JB_LUB[177])
 extern JB_ErrorReceiver* JB_StdErr;
@@ -792,6 +794,7 @@ extern Random JB__zalgo_R;
 #define kJB__TC_f64 248
 #define kJB__TC_Failed 1024
 #define kJB__TC_Float 232
+#define kJB__TC_Float16 216
 #define kJB__TC_HFloat 216
 #define kJB__TC_Int 104
 #define kJB__TC_int16 88
@@ -902,7 +905,7 @@ extern Random JB__Rnd_Shared;
 #define kJB__Wrap_kFree 1
 #define kJB__Wrap_kNothing (0)
 #define kJB__Rec_NonFatal (JB_LUB[275])
-extern double JB__Rec_Progress;
+extern Float64 JB__Rec_Progress;
 #define kJB__fix_TypeDict 3
 #define kJB__fix_TypeObj 1
 #define kJB__fix_TypeStem 2
@@ -1492,6 +1495,9 @@ Array* JB_ErrorSeverity__InitNames();
 // FileSizeInt
 
 
+// Float16
+
+
 // Float64
 
 
@@ -1960,7 +1966,7 @@ DTWrap* JB_Wrap_ConstructorInt(DTWrap* Self, int64 V);
 
 void JB_Wrap_Destructor(DTWrap* Self);
 
-double JB_Wrap_FloatValue(DTWrap* Self);
+Float64 JB_Wrap_FloatValue(DTWrap* Self);
 
 JB_String* JB_Wrap_Render(DTWrap* Self, FastString* Fs_in);
 
@@ -2027,7 +2033,7 @@ void JB_FS_AppendInfo(FastString* Self, JB_String* Name, JB_String* Data);
 
 void JB_FS_AppendInfoNum(FastString* Self, JB_String* Name, int64 Data);
 
-void JB_FS_AppendInfoFloat(FastString* Self, JB_String* Name, double Data);
+void JB_FS_AppendInfoFloat(FastString* Self, JB_String* Name, Float64 Data);
 
 void JB_FS_FieldStart(FastString* Self, JB_String* Name);
 
@@ -2881,7 +2887,7 @@ void jb_string_printline(JB_String* Self);
 
 int64 jb_string_int(JB_String* Self, Message* M);
 
-double jb_string_float(JB_String* Self, Message* M);
+Float64 jb_string_float(JB_String* Self, Message* M);
 
 Syntax jb_syntax(JB_String* Name);
 

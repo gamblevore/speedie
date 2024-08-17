@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[561];
+extern JB_StringC* JB_LUB[562];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -240,6 +240,7 @@ void JB_Constants__AddEscape(uint /*byte*/ I, FastString* Fs) {
 
 int JB_Constants__Init_() {
 	{
+		JB_SetRef(JB__Constants__SyxDict, JB_Dict_Constructor(nil));
 		JB_SetRef(JB__Constants_EscapeStr, (JB_Dict_Constructor(nil)));
 		(JB_Dict_ValueSet(JB__Constants_EscapeStr, JB_LUB[2], JB_LUB[350]));
 		(JB_Dict_ValueSet(JB__Constants_EscapeStr, JB_LUB[8], JB_LUB[354]));
@@ -495,7 +496,6 @@ int JB_Init_() {
 		JB_SetRef(JB_StdErr, JB_Rec_Constructor(nil));
 		JB_SetRef(JB__JbinHeader, JB_LUB[4]);
 		JB_SetRef(JB__jBinNotJbin, JB_LUB[279]);
-		JB_SetRef(JB__SyxDict_, JB_Dict_Constructor(nil));
 	}
 	;
 	//// App;
@@ -2914,6 +2914,7 @@ Array* JB_ErrorSeverity__InitNames() {
 
 
 
+
 int JB_Rg_Width(IntRange Self) {
 	return Self[1] - Self[0];
 }
@@ -2959,7 +2960,7 @@ JB_String* JB_Syx_Name(Syntax Self) {
 }
 
 SyntaxObj* JB_Syx_Obj(Syntax Self) {
-	return JB__FuncArray_[((int)Self)];
+	return JB__Constants__FuncArray[((int)Self)];
 }
 
 FP_fpMsgRender JB_Syx_RenderAddr(Syntax Self) {
@@ -2973,7 +2974,7 @@ bool JB_Syx_Translateable(Syntax Self) {
 Syntax JB_Syx__Func(JB_String* Name, Message* Where) {
 	//visible;
 	if (Name != nil) {
-		SyntaxObj* Obj = JB_Incr(((SyntaxObj*)JB_Dict_ValueLower(JB__SyxDict_, Name)));
+		SyntaxObj* Obj = JB_Incr(((SyntaxObj*)JB_Dict_ValueLower(JB__Constants__SyxDict, Name)));
 		if (!Obj) {
 			JB_String* _tmPf0 = JB_Incr(JB_Str_OperatorPlus(JB_LUB[327], Name));
 			JB_Msg_SyntaxExpect(Where, _tmPf0);
@@ -3001,10 +3002,10 @@ int JB_Syx__InitCode_() {
 
 Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, int ID) {
 	SyntaxObj* Result = JB_Incr(JB_Fn_Constructor(nil, Msg, Name, ID));
-	(JB_Dict_ValueSet(JB__SyxDict_, Name, Result));
-	JB_SetRef(JB__FuncArray_[ID], Result);
+	(JB_Dict_ValueSet(JB__Constants__SyxDict, Name, Result));
+	JB_SetRef(JB__Constants__FuncArray[ID], Result);
 	if (((JB_String*)JB_Str_Exists(LongName))) {
-		(JB_Dict_ValueSet(JB__SyxDict_, LongName, Result));
+		(JB_Dict_ValueSet(JB__Constants__SyxDict, LongName, Result));
 		JB_SetRef(Result->LongName, LongName);
 	}
 	 else {
@@ -3554,7 +3555,7 @@ void JB_Wrap_Destructor(DTWrap* Self) {
 	}
 }
 
-double JB_Wrap_FloatValue(DTWrap* Self) {
+Float64 JB_Wrap_FloatValue(DTWrap* Self) {
 	if (Self) {
 		return JB_int64_AsFloat(Self->PrivValue);
 	}
@@ -3872,7 +3873,7 @@ void JB_FS_AppendInfoNum(FastString* Self, JB_String* Name, int64 Data) {
 	}
 }
 
-void JB_FS_AppendInfoFloat(FastString* Self, JB_String* Name, double Data) {
+void JB_FS_AppendInfoFloat(FastString* Self, JB_String* Name, Float64 Data) {
 	if (Data) {
 		JB_FS_FieldStart(Self, Name);
 		JB_FS_AppendDoubleAsText0(Self, Data);
@@ -6282,15 +6283,15 @@ int64 JB_Msg_Int(Message* Self, int StrStart) {
 		if (JB_Tree_SyntaxEquals(Self, 'x', false)) {
 			return JB_Str_HexIntegerSection(F->Name, StrStart, F);
 		}
-		double Mul = JB_Str_TextDouble(F->Name, nil);
+		Float64 Mul = JB_Str_TextDouble(F->Name, nil);
 		if (JB_Tree_SyntaxEquals(Self, 'K', false)) {
-			Mul = (Mul * ((double)1024));
+			Mul = (Mul * ((Float64)1024));
 		}
 		 else if (JB_Msg_SyntaxEquals(Self, JB_LUB[258], false)) {
-			Mul = (Mul * ((double)1048576));
+			Mul = (Mul * ((Float64)1048576));
 		}
 		 else if (JB_Msg_SyntaxEquals(Self, JB_LUB[242], false)) {
-			Mul = (Mul * ((double)1073741824));
+			Mul = (Mul * ((Float64)1073741824));
 		}
 		 else {
 			if (true) {
@@ -7314,7 +7315,7 @@ JB_Error* JB_Err_ConstructorNothing(JB_Error* Self) {
 	JB_StringC* _tmPf0 = JB_LUB[0];
 	Self->StackTrace = JB_Incr(_tmPf0);
 	Self->Node = nil;
-	Self->Progress = 0.0f;
+	Self->Progress = ((Float64)0.0f);
 	Self->ErrorFlags = 0;
 	Self->Position = -1;
 	Self->Severity = kJB__ErrorSeverity_OK;
@@ -7825,7 +7826,7 @@ __lib__ int64 jb_string_int(JB_String* Self, Message* M) {
 	return JB_Str_TextIntegerValid(Self, M);
 }
 
-__lib__ double jb_string_float(JB_String* Self, Message* M) {
+__lib__ Float64 jb_string_float(JB_String* Self, Message* M) {
 	return JB_Str_TextDouble(Self, M);
 }
 
@@ -7876,7 +7877,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024081714);
+	return (2024081720);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -7888,4 +7889,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 -5421009571475176541 920410641272458315
+// 4176728081899335792 -1787605039486348837 977729488611953341

@@ -110,7 +110,7 @@ jbstring* jb_string_escape(jbstring* Self); /* Turns a string like "${}" into a 
 void jb_string_print(jbstring* Self); /* Prints this string to console. Useful for debugging. */
 void jb_string_printline(jbstring* Self); /* Same as jb_string_print except it ends with a \n. */
 int64 jb_string_int(jbstring* Self, jbmessage* M); /* Parses this string into an integer. Allows hex also, like '0xffff'. If you pass a 'message' into this, then invalid strings will get reported into jb_errors()  */
-double jb_string_float(jbstring* Self, jbmessage* M); /* Parses this string into a double-precision float. If you pass a 'message' into this, then invalid strings will get reported into jb_errors()  */
+jbfloat64 jb_string_float(jbstring* Self, jbmessage* M); /* Parses this string into a double-precision float. If you pass a 'message' into this, then invalid strings will get reported into jb_errors()  */
 
 
 		// Global functions
