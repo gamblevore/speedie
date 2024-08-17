@@ -71,8 +71,6 @@ typedef bool FileResolveMode;
 
 typedef int64 FileSizeInt;
 
-typedef __fp16 Float16;
-
 typedef double Float64;
 
 typedef vec4 FloatRangeConverter;

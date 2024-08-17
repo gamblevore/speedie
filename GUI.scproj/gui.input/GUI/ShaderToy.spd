@@ -30,7 +30,7 @@ class ShaderToy (window)
 		.LastDraw = date.now
 		.LastFPSChange := .LastDraw
 		if .LastFPSChange.ago > 0.5s
-			.fps.text = (1.0/ago.f64).Render(1) + "fps"
+			.fps.text = (1.0/ago.float64).Render(1) + "fps"
 			printline .fps.text
 			.LastFPSChange = .LastDraw
 		

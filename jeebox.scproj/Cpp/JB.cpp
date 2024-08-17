@@ -6297,7 +6297,7 @@ int64 JB_Msg_Int(Message* Self, int StrStart) {
 			if (true) {
 				JB_Msg_SyntaxExpect(Self, JB_LUB[252]);
 			}
-			Mul = 0.0f;
+			Mul = ((Float64)0.0f);
 		}
 		return ((int64)Mul);
 	}
@@ -7889,4 +7889,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 4176728081899335792 -1787605039486348837 977729488611953341
+// 4176728081899335792 7781400892569297791 977729488611953341
