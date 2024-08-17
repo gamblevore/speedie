@@ -9,7 +9,7 @@ struct TemporalGenerator
 	|byte|				Slowness
 
 	function Create (|int| reps, |int| Samples=16K,  |stevemachine|)
-		|| buff = uint[Samples]
+		|| buff = byte[Samples]
 			return SteveMachine(reps, self, buff)
 		
 	module
@@ -27,7 +27,7 @@ struct TemporalGenerator
 		function List (|int| i, |?&TemporalGenerator|)
 			cpp_wrapper JB_Tmp__Gen
 
-		prototype fpTemporal (|&uint| Data, |&uint| DataEnd, |uint| Input, |int| Reps, |uint64|)
+		prototype fpTemporal (|&byte| Data, |&byte| DataEnd, |uint| Input, |int| Reps, |uint64|)
 		
 		function List (|[string]|)
 			for i in 256
@@ -40,9 +40,9 @@ class SteveMachine
 	|int| 					Reps
 	|bool|					Feedback
 	|&TemporalGenerator|	Create
-	|uint[]|				Samples
+	|byte[]|				Samples
 	
-	constructor (|int| reps, |&TemporalGenerator| T, |uint[]| buff)
+	constructor (|int| reps, |&TemporalGenerator| T, |byte[]| buff)
 		.reps = reps, .create = t, .samples = buff, .Feedback = true
 		.Refresh
 	
@@ -53,12 +53,21 @@ class SteveMachine
 		require self
 		|| p = .Samples.ptr
 		|| a = p + .Samples.Capacity
-		.Samples.Length = 0
+		.Samples.Length = 0 // So that .samples.next works properly.
 		(.Create.Steve)(p, a, 0, .reps)
-//	helper Say (|string| s)
-//		print .Create.Name.Str
-//		print ": "
-//		printline s
+		
+	function Hash
+		|uint64| H
+		|| p = .Samples.ptr
+		|| n = .Samples.Capacity
+		for i in n
+			H = (H xor i).Hash
+		
+		for i in n
+			p[i] = H.xorbyte
+			H = h.Hash
+		// take all the data and just hash it... ooff...
+
 	function Bit (|bool|)
 		return .BitCount & 1
 	
@@ -77,13 +86,17 @@ class SteveMachine
 	function BitCount (|int|)
 		return .byte|int|.countbits
 	
-	function Walk (|int| required=141, |bool|)
+	function Walk (|int| bits, |int| deviance, |uint64|)
+		for i in bits
+			rz[i] = .step(Deviance)
+		
+	function Step (|int| deviance=141, |bool|)
 		|| n = 0
-		|| TooLate = date.now + 0.01s
+		|| TooLate = date.now + 0.1s
 		while
 			for 256
 				n += .BitCount-4 	 // group-walk
-				if (n.abs >= required)
+				if (n.abs >= deviance)
 					return n<0
 			if Toolate.fired
 				exit
@@ -95,3 +108,11 @@ class SteveMachine
 			total += .BitCount
 		return Total+.Bit > bytes*4
 
+
+	module
+		function Create (|int| reps, |int| Samples=16K, |stevemachine?|)
+			|| tmp = TemporalGenerator.Find("chaotic")
+			if !tmp
+				tmp = TemporalGenerator.find("1")$
+			return tmp.Create(9, 64K)
+		

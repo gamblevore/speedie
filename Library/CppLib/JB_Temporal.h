@@ -3,7 +3,7 @@
 
 #ifndef __TEMPORAL__
 #define __TEMPORAL__
-typedef u64 (*fpTemporal) (uint* Data, uint* DataEnd, uint Input, int Reps);
+typedef u64 (*fpTemporal) (u8* Data, u8* DataEnd, uint Input, int Reps);
 
 struct JB_TemporalGenerator {
 	fpTemporal		Steve;

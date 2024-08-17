@@ -145,7 +145,12 @@ class Memory
 		zero(._ptr, .length * .itemsize)
 	
 
-	render Dump (|int| row, |int| cn=4)
+	function DebugPrint
+		|| fs = FastString()
+		.dump(fs)
+		printline fs
+	
+	render Dump (|int| BytesOnRow=16, |int| TabsAfterBytes=4)
 		|| p = ._ptr
 		|| p2 = p + .ByteCapacity 
 		|| i = 0
@@ -155,11 +160,11 @@ class Memory
 		while (p < p2)
 			|| c = p++[]
 			fs.appendhex(c, 2)
-			if (++i >= row)
+			if (++i >= BytesOnRow)
 				i = 0
 				com = 0
 				fs <~ "\n"
-			  elseif ++com >= cn
+			  elseif ++com >= TabsAfterBytes
 				com = 0
 				fs <~ ", "
 

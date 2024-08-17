@@ -1,6 +1,7 @@
 
 
 bugs:
+	* function (|object!| x = nil) // which is it? should complain. Currently it becomes optional.
 	* unify numeric types a lot. Many functions want to work on uint, int, etc... and one func is good enough for all!
 		* datatype byte: inherit int // anything you can do on an int... can be done on a byte!
 	* vector constants

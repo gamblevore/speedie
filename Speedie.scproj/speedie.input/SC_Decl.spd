@@ -1052,7 +1052,7 @@ class SCDecl (SCNamed) {
 		
 		|| Cast = kTypeCastTrue
 		cast |= kTypeCastBothWays * !side
-		cast |= kTypeCastSetToMemory * (self isnt local)
+		cast |= kTypeCastSetToMemory * (self isnt local) // float conversion...
 		
 		.ExpectMatch( O, Cast, exp, ErrNode )
 				
@@ -1201,6 +1201,4 @@ function int64.MsgForConst (|bool| AllowShift, |message|)
 	|| op = rz.msg(@opp, "<<")
 	op.obj = scoperator.lookup(op) 
 	rz <~ newdeclnum(nil, .Log2)
-
-
 

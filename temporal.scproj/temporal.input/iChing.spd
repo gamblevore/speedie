@@ -1,6 +1,6 @@
 
 
-class YingYang
+class YingYang // could make this a role on message.
 	|string| Name
 	|string| Opposite
 	constructor (|message| line)
@@ -19,28 +19,35 @@ class YingYang
 		|| DataBank = –digest file://yingyang.jb
 
 
+
+
 module iChing
-	|| DataBank = –digest file://iching.jb // what about compress? D:
-	
-	|| Items = "Creative/Receptive/Difficulty/Folly/Waiting/Conflict/Army/Union/Taming/Treading/Peace/Standstill/Fellowship/Possession/Modesty/Enthusiasm/Following/Decay/Approach/View/Biting/Grace/Splitting/Return/Innocence/Taming/Mouth/Preponderance/Abysmal/Clinging/Influence/Duration/Retreat/Power/Progress/Darkening/Family/Opposition/Obstruction/Deliverance/Decrease/Increase/Resoluteness/Coming/Gathering/Pushing/Oppression/Well/Revolution/Cauldron/Arousing/Still/Development/Marrying/Abundance/Wanderer/Gentle/Joyous/Dispersion/Limitation/Truth/Small/After Completion/Before Completion".split('/')
-
-
-	function Byte.iching (|string|)
-		return iching.items[self&63]!
+	|message| _DatabankMsg
+	function Tome (|message!|)
+		|| d = ._DatabankMsg
+			return d
+		d = ( –digest file://iching.jb ).parse // what about compress? D:
+		if d
+			d = d["hexagrams"]
 		
-	render Name (|string| self)
-		for c in self
-			fs <~ c.iching
-
-
-		
+		d := StdErr.LastError
+		d := Message(@str, "Tome remains closed.")
+		._DatabankMsg = d
+		return d
 		
 
-
-// notes:
-// don't some things come in 3? Like 'being' 'doing' 'having'?
-// creation movement destruction... negative balanced positive
-// i wonder if there's an iChing which comes in 3 states?
-// for now... just leave it. No worth disrupting the entire thing just to fix it.
-// if we try that we'll never get anywhere. we can look into it some other year.
+	function DivineHexa (|stevemachine| maker=nil, |message|)
+		maker := SteveMachine.create(9,64K)$
+		
+		maker.Hash // fixes weak output, Still suffers SAME output! what on earth? is it even a time-function?
+		maker.Samples.DebugPrint
+		|| HexaCoins = maker.Walk(6, 9*9)
+		|| msg = .Tome[hexacoins]
+			msg = msg.copy
+			msg.arg.first.remove
+			|| Marks = ~maker.Walk(6, 9*9) // ~, in case bad function gives 111111
+			|| lines = msg["markedlines"]
+			for (i.highbits in marks) (x)
+				lines[x].Remove
+			return msg
 

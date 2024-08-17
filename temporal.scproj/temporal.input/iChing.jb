@@ -7,6 +7,7 @@
 	// Check theres no mistakes in the X upon X
 	// check all have IDs, meaning, form, etc.
 
+
 trigrams
 	qian 111
 		乾 ☰
@@ -43,7 +44,8 @@ trigrams
 
 
 
-hexagram Ch_ien (Heaven upon Heaven) {
+hexagrams {
+Ch_ien (Heaven upon Heaven) {
 ID 1
 meaning "The Creative"
 	"The first hexagram is made up of six unbroken lines. These unbroken lines stand for the primal power, which is light-giving, active, strong, and of the spirit. The hexagram is consistently strong in character, and since it is without weakness, its essence is power or energy. Its image is heaven. Its energy is represented as unrestricted by any fixed conditions in space and is therefore conceived of as motion. Time is regarded as the basis of this motion. Thus the hexagram includes also the power of time and the power of persisting in time, that is, duration. The power represented by the hexagram is to be interpreted in a dual sense in terms of its action on the universe and of its action on the world of men. In relation to the universe, the hexagram expresses the strong, creative action of the Deity. In relation to the human world, it denotes the creative action of the holy man or sage, of the ruler or leader of men, who through his power awakens and develops their higher nature."
@@ -79,7 +81,7 @@ markedlines
 }
 
 
-hexagram K_un (Earth upon Earth) {
+K_un (Earth upon Earth) {
 ID 2
 meaning "Waiting/Nourishment"
 	"This hexagram is made up of broken lines only. The broken lines represents the dark, yielding, receptive primal power of yin. The attribute of the hexagram is devotion; its image is the earth. It is the perfect complement of THE CREATIVE--the complement, not the opposite, for the Receptive does not combat the Creative but completes it.
@@ -109,8 +111,7 @@ markedlines
 	all "Lasting perseverance furthers."
 }
 
-
-hexagram Chun (Water upon Thunder) {
+Chun (Water upon Thunder) {
 ID 3
 meaning "Difficulty at the Beginning"
 	`The name of the hexagram, Chun, really connotes a blade of grass pushing against an obstacle as it sprouts out of the earth--hence the meaning, "difficulty at the beginning." The hexagram indicates the way in which heaven and earth bring forth individual beings. It is their first meeting, which is beset with difficulties. The lower trigram Chên is the Arousing; its motion is upward and its image is thunder.
@@ -136,8 +137,7 @@ markedlines
 	line "Horse and wagon apart. Bloody tears flow."
 }
 
-
-hexagram Mêng (Mountain upon Water) {
+Mêng (Mountain upon Water) {
 ID 4
 meaning "Youthful Folly"
 	"In this hexagram we are reminded of youth and folly in two different ways. The image of the upper trigram, Kên, is the mountain, that of the lower, K'an, is water; the spring rising at the foot of the mountain is the image of inexperienced youth. Keeping still is the attribute of the upper trigram; that of the lower is the abyss, danger. Stopping in perplexity on the brink of a dangerous abyss is a symbol of the folly of youth. However, the two trigrams also show the way of overcoming the follies of youth. Water is something that of necessity flows on. When the spring gushes forth, it does not know at first where it will go. But its steady flow fills up the deep place blocking its progress, and success is attained."
@@ -162,8 +162,7 @@ markedlines
 	line "The top line marked means: In punishing folly it does not further one to commit transgressions. The only thing that furthers is to prevent transgressions."
 }
 
-
-hexagram Hsu (Water upon Heaven) {
+Hsu (Water upon Heaven) {
 ID 5
 meaning "Waiting/Nourishment"
 	"All beings have need of nourishment from above. But the gift of food comes in its own time, and for this one must wait. This hexagram shows the clouds in the heavens, giving rain to refresh all that grows and to provide mankind with food and drink. The rain will come in its own time. We cannot make it come; we have to wait for it. The idea of waiting is further suggested by the attributes of the two trigrams--strength within, danger in from. Strength in the face of danger does not plunge ahead but bides its time, whereas weakness in the face of danger grows agitated and has not the patience to wait."
@@ -183,8 +182,7 @@ markedlines
 	line "One falls into the pit. Three uninvited guests arrive. Honor them, and in the end there will be good fortune."
 }
 
-
-hexagram Sung (HEAVEN upon WATER) {
+Sung (HEAVEN upon WATER) {
 ID 6
 meaning "Conflict"
 	"The upper trigram, whose image is heaven, has an upward movement; the lower trigram, water, in accordance with its nature tends downward. Thus the two halves move away from each other, giving rise to the idea of conflict. The attribute of the Creative is strength, that of the Abysmal is danger, guile. Where cunning has force before it, there is conflict. A third indication of conflict, in terms of character, is presented by the combination of deep cunning within and fixed determination outwardly. A person of this character will certainly be quarrelsome."
@@ -198,16 +196,15 @@ image "Heaven and water go their opposite ways: The image of CONFLICT. Thus in a
 	"The image indicates that the causes of conflict are latent in the opposing tendencies of the two trig rams. Once these opposing tendencies appear, conflict is inevitable. To avoid it, therefore, everything must be taken carefully into consideration in the very beginning. If rights and duties are exactly defined, or if, in a group, the spiritual trends of the individuals harmonize, the cause of conflict is removed in advance."
 
 markedlines
-	line 6 "If one does not perpetuate the affair, There is a little gossip. In the end, good fortune comes."
-	line 9 "One cannot engage in conflict; One returns home, gives way. The people of his town, Three hundred households, Remain free of guilt."
-	line 6 "To nourish oneself on ancient virtue induces perseverance. Danger. In the end, good fortune comes. If by chance you are in the service of a king, Seek not works."
-	line 9 "One cannot engage in conflict. One turns back and submits to fate, Changes one's attitude, And finds peace in perseverance. Good fortune."
-	line 9 "To contend before him brings supreme good fortune."
-	line 9 "Even if by chance a leather belt is bestowed on one, By the end of a morning It will have been snatched away three times."
+	line "If one does not perpetuate the affair, There is a little gossip. In the end, good fortune comes."
+	line "One cannot engage in conflict; One returns home, gives way. The people of his town, Three hundred households, Remain free of guilt."
+	line "To nourish oneself on ancient virtue induces perseverance. Danger. In the end, good fortune comes. If by chance you are in the service of a king, Seek not works."
+	line "One cannot engage in conflict. One turns back and submits to fate, Changes one's attitude, And finds peace in perseverance. Good fortune."
+	line "To contend before him brings supreme good fortune."
+	line "Even if by chance a leather belt is bestowed on one, By the end of a morning It will have been snatched away three times."
 }
 
-
-hexagram Shih (EARTH upon WATER) {
+Shih (EARTH upon WATER) {
 ID 7
 meaning "The Army"
 	"This hexagram is made up of the trigrams K'an, water, and K'un, earth, and thus it symbolizes the ground water stored up in the earth. In the same way military strength is stored up in the mass of the people--invisible in times of peace but always ready for use as a source of power. The attributes of the two trig rams are danger inside and obedience must prevail outside. Of the individual lines, the one that controls the hexagram is the strong nine in the second place, to which the other lines, all yielding, are subordinate. This line indicates a commander, because it stands in the middle of one of the two trigrams. But since it is in the lower rather than the upper trigram, it represents not the ruler but the efficient general, who maintains obedience in the army by his authority."
@@ -219,8 +216,7 @@ image "In the middle of the earth is water: The image of THE ARMY. Thus the supe
 	"Ground water is invisibly present within the earth. In the same way the military power of a people is invisibly present in the masses. When danger threatens, every peasant becomes present in the masses. When danger threatens, every peasant becomes a soldier; when the war ends, he goes back to his plow. He who is generous toward the people wins their love, and a people living under a mild rule becomes strong and powerful. Only a people economically strong can be important in military power. Such power must therefore be cultivated by improving the economic condition of the people and by humane government. Only when there is this invisible bond between government and people, so that the people are sheltered by their government as ground water is sheltered by the earth, is it possible to wage a victorious war."
 }
 
-
-hexagram Pi (WATER upon EARTH) {
+Pi (WATER upon EARTH) {
 ID 8
 meaning "Holding Together [union]"
 	"The waters on the surface of the earth flow together wherever they can, as for example in the ocean, where all the rivers come together. Symbolically this connotes holding together and the laws that regulate it. The same idea is suggested by the fact that all the lines of the hexagram except the fifth, the place of the ruler, are yielding. The yielding lines hold together because they are influenced by a man of strong will in the leading position, a man who is their center of union. Moreover, this strong and guiding personality in turn holds together with the others, finding in them the complement of his own nature."
@@ -231,8 +227,7 @@ image "On the earth is water: The image of HOLDING TOGETHER. Thus the kings of a
 	"Water fills up all the empty places on the earth and clings fast to it. The social organization of ancient China was based on this principle of the holding together of dependents and rulers. Water flows to unite with water, because all parts of it are subject to the same laws. So too should human society hold together through a community of interests that allows each individual to feel himself a member of a whole. The central power of a social organization must see to it that every member finds that his true interest lies in holding together with it, as was the case in the paternal relationship between king and vassals in ancient China"
 }
 
-
-hexagram `Hsiao Ch'u` (WIND upon HEAVEN) {
++"Hsiao Ch'u" (WIND upon HEAVEN) {
 ID 9
 meaning "The Taming Power of the Small"
 	"This hexagram means the force of the small--the power of the shadowy--that restrains, tames, impedes. A weak line in the fourth place, that of the minister, holds the five strong lines in check. In the Image it is the wind blowing across the sky. The wind restrains the clouds, the rising breath of the Creative, and makes them grow dense, but as yet is not strong enough to turn them to rain. The hexagram presents a configuration of circumstances in which a strong element is temporarily held in leash by a weak element. It is only through gentleness that this can have a successful outcome."
@@ -245,8 +240,7 @@ image "The wind drives across heaven: The image of THE TAMING POWER OF THE SMALL
 }
 
 
-
-hexagram Lu (HEAVEN upon LAKE) {
+Lu (HEAVEN upon LAKE) {
 ID 10
 meaning "Treading [conduct]"
 	"The name of the hexagram means on the one hand the right way of conducting oneself. Heaven, the father, is above, and the lake, the youngest daughter, is below. This shows the difference between high and low, upon which composure correct social conduct, depends. On the other hand the word for the name of the hexagram, TREADING, means literally treading upon something. The small and cheerful [Tui] treads upon the large and strong [Ch'ien]. The direction of movement of the two primary trigrams is upward. The fact that the strong treads on the weak is not mentioned in the Book of Changes, because it is taken for granted. For the weak to take a stand against the strong is not dangerous here, because it happened in good humor [Tui] and without presumption, so that the strong man is not irritated but takes it all in good part."
@@ -258,8 +252,8 @@ image "The image of TREADING. Thus the superior man discriminates between high a
 	"Heaven and the lake show a difference of elevation that inheres in the natures of the two, hence no envy arises. Among mankind also there are necessarily differences of elevation; it is impossible to bring about universal equality. But it is important that differences in social rank should not be arbitrary and unjust, for if this occurs, envy and class struggle are the inevitable consequences. If, on the other hand, external differences in rank correspond with differences in inner worth, and if inner worth forms the criterion of external rank, people acquiesce and order reigns in society."
 }
 
-
-hexagram `T'ai` (EARTH upon HEAVEN) {
++"T'ai" (EARTH upon HEAVEN) {
+ID 11
 meaning "Peace"
 	"The Receptive, which moves downward, stands above; the Creative, which moves upward, is below. Hence their influences meet and are in harmony, so that all living things bloom and prosper. This hexagram belongs to the first month (February-March), at which time the forces of nature prepare the new spring."
 
@@ -270,8 +264,7 @@ image "Thus the ruler divides and completes the course of heaven and earth, And 
 	"Heaven and earth are in contact and combine their influences, producing a time of universal flowering and prosperity. This stream of energy must be regulated by the ruler of men. It is done by a process of division. Thus men divide the uniform flow of time into the seasons, according to the succession of natural phenomena, and mark off infinite space by the points of the compass. In this way nature in its overwhelming profusion of phenomena is bounded and controlled. One the other hand, nature must be furthered in her productiveness. This is done by adjusting the products to the right time and the right place, which increases the natural yield. This controlling and furthering activity of man in his relation to nature is the work on nature that rewards him."
 }
 
-
-hexagram `P'i` (HEAVEN upon EARTH) {
+"P'i" (HEAVEN upon EARTH) {
 ID 12
 meaning "Standstill [Stagnation]"
 	"This hexagram is the opposite of the preceding one. Heaven is above, drawing farther and farther away, while the earth below sinks farther into the depths. The creative powers are not in relation. It is a time of standstill and decline. This hexagram is linked with the seventh month (August-September), when the year has passed its zenith and autumnal decay is setting in."
@@ -283,8 +276,7 @@ image "Heaven and earth do not unite: The image of STANDSTILL. Thus the superior
 }
 
 
-
-hexagram `T'ung Jên` (HEAVEN upon FLAME) {
++"T'ung Jên" (HEAVEN upon FLAME) {
 ID 13
 meaning "Fellowship with Men"
 	`The image of the upper trigram Ch'ien is heaven, and that of the lower, Li, is flame. It is the nature of fire to flame up to the heaven. This gives the idea of fellowship. IT is the second line that, by virtue of its central character, unites the five strong lines around it. This hexagram forms a complement to Shih (THE ARMY, 7). In the latter, danger is within and obedience without--the character of a warlike army, which, in order to hold together, needs one strong man among the many who are weak. Here, clarity is within and strength without--the character of a peaceful union of men, which, in order to hold together, needs one yielding nature among many firm persons.`
@@ -295,8 +287,7 @@ image "Heaven together with fire: The image of FELLOWSHIP WITH MEN. Thus the sup
 	"Heaven has the same direction of movement as fire, yet it is different from fire. Just as the luminaries in the sky serve for the systematic division and arrangement of time, so human society and all things that really belong together must be organically arranged. Fellowship should not be a mere mingling of individuals or of things--that would be chaos, not fellowship. If fellowship is to lead to order, there must be organization within diversity."
 }
 
-
-hexagram `Ta Yu` (FLAME upon HEAVEN) {
++"Ta Yu" (FLAME upon HEAVEN) {
 ID 14
 meaning "Possession in Great Measure"
 	`The fire in heaven above shines far, and all things stand out in the light and become manifest. The weak fifth line occupies the place of honor and all the strong lines are in accord with it.All things come to the man who is modest and kind in a high position.`
@@ -307,8 +298,7 @@ image "Fire in heaven above: The image of POSSESSION IN GREAT MEASURE. Thus the 
 	"The sun in heaven above, shedding light over everything one earth, is the image of possession on a grand scale. But a possession of this sort must be administered properly. The sun brings both evil and good into the light of day. Man must combat and curb the evil, and must favor and promote the good. Only in this way does he fulfill the benevolent will of God, who desires only good and not evil."
 }
 
-
-hexagram `Ch'ien` (EARTH upon MOUNTAIN) {
++"Ch'ien" (EARTH upon MOUNTAIN) {
 ID 15
 meaning "Modesty"
 	`This hexagram is made up of the trigrams Kên, Keeping Still, mountain, and K'un. The mountain is the youngest son of the Creative, the representative of heaven and earth. It dispenses the blessings of heaven, the clouds and rain that gather round its summit, and thereafter shines forth radiant with heavenly light. This shows what modesty is and how it functions in great and strong men. K'un, the earth, stands above. Lowliness is a quality of the earth: this is the very reason why it appears in this hexagram as exalted, by being placed above the mountain. This shows how modesty functions in lowly, simple people: they are lifted up by it.`
@@ -320,8 +310,7 @@ image "Within the earth, a mountain: The image of MODESTY. Thus the superior man
 	"The wealth of the earth in which a mountain is hidden is not visible to the eye, because the depths are offset by the height of the mountain. Thus high and low competent each other and the result is the plain. Here an effect that it took a long time to achieve, but that in the end seems easy of accomplishment and self-evident, is used as the image of modesty. The superior man does the same thing when he establishes order in the world; he equalizes the extremes that are the source of social discontent and thereby creates just and equable conditions."
 }
 
-
-hexagram `Yu` (THUNDER upon Earth) {
+Yu (THUNDER upon Earth) {
 ID 16
 meaning "Enthusiasm"
 	`The strong line in the fourth place, that of the leading official, meets with response and obedience from all the other lines, which are all weak. The attribute of the upper trigram, Chên, is movement; the attributes of K'un, the lower, are obedience and devotion. This begins a movement that meets with devotion and therefore inspires enthusiasm, carrying all with it. Of great importance, furthermore, is the law of movement along the line of least resistance, which in this hexagram is enunciated as the law for natural events and for human life.`
@@ -333,8 +322,7 @@ image "Thunder comes resounding out of the earth: The image of ENTHUSIASM. Thus 
 	`When, at the beginning of summer, thunder--electrical energy--comes rushing forth from the earth again, and the first thunderstorm refreshes nature, a prolonged state of tension is resolved. Joy and relief make themselves felt. So too, music has power to ease tension within the heart and to loosen the grip of obscure emotions. The enthusiasm of the heart expresses itself involuntarily in a burst of song, in dance and rhythmic movement of the body. From immemorial times the inspiring effect of the invisible sound that moves all hearts, and draws them together, has mystified mankind. Rulers have made use of this natural taste for music; they elevated and regulated it. Music was looked upon as something serious and holy, designed to purify the feelings of men. It fell to music to glorify the virtues of heroes and thus to construct a bridge to the world of the unseen. In the temple men drew near to God with music and pantomimes (out of this later the theater developed). Religious feeling for the Creator of the world was united with the most sacred of human feelings, that of reverence for the ancestors. The ancestors were invited to these divine services as guests of the Ruler of Heaven and as representatives of humanity in the higher regions. This uniting of the human past with the Divinity in solemn moments of religious inspiration established the bond between God and man. The ruler who revered the Divinity in revering his ancestors became thereby the Son of Heaven, in whom the heavenly and the earthly world met in mystical contact. These ideas are the final summation of Chinese culture. Confucius has said of the great sacrifice at which these rites were performed: "He who could wholly comprehend this sacrifice could rule the world as though it were spinning on his hand.`
 }
 
-
-hexagram Sui (LAKE upon THUNDER) {
+Sui (LAKE upon THUNDER) {
 ID 17
 meaning "Following"
 	`The trigram Tui, the Joyous, whose attribute is gladness, is above; Chên, the Arousing, which has the attribute of movement, is below. Joy in movement induces following. The Joyous is the youngest daughter, while the Arousing is the eldest son. An older man defers to a young girl and shows her consideration. By this he moves her to follow him.`
@@ -347,8 +335,7 @@ image `Thunder in the middle of the lake: Thus the superior man at nightfall goe
 
 }
 
-
-hexagram Ku (MOUNTAIN upon WIND) {
+Ku (MOUNTAIN upon WIND) {
 ID 18
 meaning "Work on what has been spoiled [ Decay ]"
 	`The Chinese character ku represents a bowl in whose contents worms are breeding. This means decay. It is come about because the gentle indifference in the lower trigram has come together with the rigid inertia of the upper, and the result is stagnation. Since this implies guilt, the conditions embody a demand for removal of the cause. Hence the meaning of the hexagram is not simply "what has been spoiled" but "work on what has been spoiled".`
@@ -360,8 +347,7 @@ image `The wind blows low on the mountain: The image of DECAY. Thus the superior
 	`When the wind blows slow on the mountain, it is thrown back and spoils the vegetation. This contains a challenge to improvement. It is the same with debasing attitudes and fashions; they corrupt human society. His methods likewise must be derived from the two trigrams, but in such a way that their effects unfold in orderly sequence. The superior must first remove stagnation by stirring up public opinion, as the wind stirs up everything, and must strengthen and tranquilize the character of the people, as the mountain gives tranquillity and nourishment to all that grows in its vicinity.`
 }
 
-
-hexagram Lin (EARTH upon LAKE) {
+Lin (EARTH upon LAKE) {
 ID 19
 meaning "Approach"
 	`The Chinese word lin has a range of meanings that is not exhausted by any single word of another language. The ancient explanations in the Book of Changes give as its first meaning, "becoming great." What becomes great are the two strong lines growing into the hexagram from below; the light-giving power expands with them. The meaning is then further extended to include the concept of approach, especially the approach of what is lower. Finally the meaning includes the attitude of condescension of a man in high position toward the people, and in general the setting to work on affairs. This hexagram is linked with the twelfth month (January-February), when after the winter solstice, the light power begins to ascend again.`
@@ -373,8 +359,7 @@ image `The earth above the lake: The image of APPROACH. Thus the superior man is
 	`The earth borders upon the lake from above. This symbolizes the approach and condescension of the man of higher position to those beneath him. The two parts of the image indicate what his attitude toward these people will be. Just as the lake is inexhaustible in depth, so the sage is inexhaustible in his readiness to teach mankind, and just as the earth is boundlessly wide, sustaining and caring for all creatures on it, so the sage sustains and cares for all people and excludes no part of humanity.`
 }
 
-
-hexagram Kuan (WIND upon EARTH) {
+Kuan (WIND upon EARTH) {
 ID 20
 meaning "Contemplation [View]"
 	`A slight variation of tonal stress gives the Chinese name for this hexagram a double meaning. It means both contemplating and being seen, in the sense of being an example. These ideas are suggested by the fact that the hexagram can be understood as picturing a type of tower characteristic of ancient China.
@@ -388,8 +373,7 @@ image `The wind blows over the earth: The image of CONTEMPLATION. Thus the kings
 	`When the wind blows over the earth it goes far and wide, and the grass must bend to its power. These two occurrences find confirmation in the hexagram. The two images are used to symbolize a practice of the kings of old; in making regular journeys the ruler could, in the first place, survey his realm and make certain that none of the existing usages of the people escaped notice; in the second, he could exert influence through which such customs as were unsuitable could be changed. All of this points to the power possessed by a superior personality. On the one hand, such a man will have a view of the real sentiments of the great mass of humanity and therefore cannot be deceived; on the other, he will impress the people so profoundly, by his mere existence and by the impact of his personality, that they will be swayed by him as the grass by the wind.`
 }
 
-
-hexagram `Shih Ho` (FIRE upon THUNDER) {
++"Shih Ho" (FIRE upon THUNDER) {
 ID 21
 meaning "Biting Through"
 	`This hexagram represents an open mouth (cf. hexagram 27) with an obstruction (in the fourth place) between the teeth. As a result the lips cannot meet. To bring them together one must bite energetically through the obstacle. Since the hexagram is made up of the trigrams for thunder and for lightning, it indicates how obstacles are forcibly removed in nature.
@@ -403,8 +387,7 @@ image `Thunder and lighting: The image of BITING THROUGH. Thus the kings of form
 
 }
 
-
-hexagram Pi (MOUNTAIN upon FIRE) {
+Pi (MOUNTAIN upon FIRE) {
 ID 22
 meaning "Grace"
 	`This hexagram shows a fire that breaks out of the secret depths of the earth and, blazing up, illuminates and beautifies the mountain, the heavenly heights. Grace-beauty of form-is necessary in any union if it is to be well ordered and pleasing rather than disordered and chaotic.`
@@ -417,8 +400,7 @@ image `Fire at the foot of the mountain: The image of GRACE. Thus does the super
 
 }
 
-
-hexagram Po (MOUNTAIN upon FIRE) {
+Po (MOUNTAIN upon FIRE) {
 ID 23
 meaning "Splitting Apart"
 	`The dark lines are about to mount upward and overthrow the last firm, light line by exerting a disintegrating influence on it. The inferior, dark forces overcome what is superior and strong, not by direct means, but by undermining it gradually and imperceptibly, so that it finally collapses. The lines of the hexagram present the image of a house, the top line being the roof, and because the roof is being shattered the house collapses. The hexagram belongs to the ninth month (October-November). The yin power pushes up ever more powerfully and is about to supplant the yang power altogether.`
@@ -430,8 +412,7 @@ image `The mountain rests on the earth: The image of SPLITTING APART. Thus those
 	`The mountain rests on the earth. When it is steep and narrow, lacking a broad base, it must topple over. Its position is strong only when it rises out of the earth broad and great, not proud and steep. So likewise those who rule rest on the broad foundation of the people. They too should be generous and benevolent, like the earth that carries all. Then they will make their position as secure as a mountain is in its tranquillity.`
 }
 
-
-hexagram Fu (EARTH upon THUNDER) {
+Fu (EARTH upon THUNDER) {
 ID 24
 meaning "Return [The Turning Point]"
 	`The idea of a turning point arises from the fact that after the dark lines have pushed all of the light lines upward and out of the hexagram, another light line enters the hexagram from below. The time of darkness is past. The winter solstice brings the victory of light. This hexagram is linked with the eleventh month, the month of the solstice (December-January).`
@@ -444,8 +425,7 @@ At the time of solstice. Merchants and strangers did not go about, And the ruler
 	`The winter solstice has always been celebrated in China as the resting time of the year--a custom that survives in the time of rest observed at the new year. In winter the life energy, symbolized by thunder, the Arousing, is still underground. Movement is just at its beginning; therefore it must be strengthened by rest so that it will not be dissipated by being used prematurely. This principle, i.e., of allowing energy that is renewing itself to be reinforced by rest, applies to all similar situations. The return of health after illness, the return of understanding after an estrangement: everything must be treated tenderly and with care at the beginning, so that the return may lead to a flowering.`
 }
 
-
-hexagram `Wu Wang` (HEAVEN upon THUNDER) {
++"Wu Wang" (HEAVEN upon THUNDER) {
 ID 25
 meaning "Innocence [The Unexpected]"
 	`Ch'ien, heaven is above; Chên, movement, is below. The lower trigram Chên is under the influence of the strong line it has received form above, from heaven. When, in accord with this, movement follows the law of heaven, man is innocent and without guile. His mind is natural and true, unshadowed by reflection or ulterior designs. For wherever conscious purpose is to be seen, there the truth and innocence of nature have been lost. Nature that is not directed by the spirit is not true but degenerate nature. Starting out with the idea of the natural, the train of thought in part goes somewhat further and thus the hexagram includes also the idea of the fundamental or unexpected.`
@@ -457,8 +437,7 @@ image `Under heaven thunder rolls: All things attain the natural state of innoce
 	`In springtime when thunder, life energy, begins to move again under the heavens, everything sprouts and grows, and all beings receive for the creative activity of nature the childlike innocence of their original state. So it is with the good rulers of mankind: drawing on the spiritual wealth at their command, they take care of all forms of life and all forms of culture and do everything to further them, and at the proper time. `
 }
 
-
-hexagram `Ta Ch'u` (MOUNTAIN upon HEAVEN) {
++"Ta Ch'u" (MOUNTAIN upon HEAVEN) {
 ID 26
 meaning `The Taming Power of the Great`
 	`The Creative is tamed by Kên, Keeping Still. This produces great power, a situation in contrast to that of the ninth hexagram, Hsiao Ch'u, THE TAMING POWER OF THE SMALL, in which the Creative is tamed by the Gentle alone. There one weak line must tame five strong lines, but here four strong lines are restrained by two weak lines; in addition to a minister, there is a prince, and the restraining power therefore is afar stronger. The hexagram has a threefold meaning, expressing different aspects of the concept "Holding firm." Heaven within the mountain gives the idea of holding firm in the sense of holding together; the trigram Kên which holds the trigram ch'ien still, gives the idea of holding firm in the sense of holding back; the third idea is that of holding firm in the sense of caring for and nourishing. This last is suggested by the fact that a strong line at the top, which is the ruler of the hexagram, is honored and tended as a sage. The third of these meanings also attaches specifically to this strong line at the top, which represents the sage.`
@@ -471,8 +450,7 @@ image `Heaven within the mountain: The image of THE TAMING POWER OF THE GREAT. T
 }
 
 
-
-hexagram I (MOUNTAIN upon THUNDER) {
+I (MOUNTAIN upon THUNDER) {
 ID 27
 meaning "Corners of the Mouth [Providing Nourishment]"
 	`This hexagram is a picture of an open mouth; above and below are firm lines of the lips, and between them the opening. Starting with the mouth, through which we take food for nourishment, the thought leads to nourishment itself. Nourishment of oneself, specifically of the body, is represented in the three lower lines, while the three upper lines represent nourishment and care of others, in a higher, spiritual sense.`
@@ -488,8 +466,7 @@ image `At the foot of the mountain, thunder: The image of PROVIDING NOURISHMENT.
 	`God comes forth in the sign of the Arousing: When in the spring the life forces stir again, all things comes into being anew. "He brings to perfection in the sign of Keeping Still": thus in the early spring, when the seeds fall to earth, all things are made ready. This is an image of providing nourishment through movement and tranquillity. The superior man takes it as a pattern for the nourishment and cultivation of his character. Words are a movement going form within outward. Eating and drinking are movements from without inward. Both kinds of movement can be modified by tranquillity. For tranquillity keeps the words that come out of the mouth from exceeding proper measure, and keeps the food that goes into the mouth from exceeding its proper measure. Thus character is cultivated.`
 }
 
-
-hexagram `Ta Kuo` (LAKE upon WOOD) {
++"Ta Kuo" (LAKE upon WOOD) {
 ID 28
 meaning `Preponderance of the Great`
 	`This hexagram consists of four strong lines inside and two weak lines outside. When the strong are outside and the weak inside, all is well and there is nothing out of balance, nothing extraordinary in the situation. Here, however, the opposite is the case. The hexagram represents a beam that is thick and heavy in the middle but too weak at the ends. This is a condition that cannot last; it must be changed, must pass, or misfortune will result.`
@@ -502,8 +479,7 @@ Is unconcerned, And if he has to renounce the world, He is undaunted.`
 	`Extraordinary times when the great preponderates are like flood times when the lake rises over the treetops. But such conditions are temporary. The two trigrams indicate the attitude proper to such exceptional times: the symbol of the trigram Sun is the tree, which stands firm even though it stands alone, and the attribute of Tui is joyousness, which remains undaunted even if it must renounce the world. `
 }
 
-
-hexagram `K'an` (WATER upon WATER) {
++"K'an" (WATER upon WATER) {
 ID 29
 meaning `The Abysmal (Water)`
 	`This hexagram consists of a doubling of the trigram K'an. It is one of the eight hexagrams in which doubling occurs. The trigram K'an means a plunging in. A yang line has plunged in between two yin lines and is closed in by them like water in a ravine. The trigram K'an is also the middle son. The Receptive has obtained the middle line of the Creative, and thus K'an develops. As an image it represents water, the water that comes from above and is in motion on earth in streams and rivers, giving rise to all life on earth. In man's world K'an represents the heart, the soul locked up within the body, the principle of light inclosed in the dark--that is, reason. The name of the hexagram, because the trigram is doubled, has the additional meaning, "repetition of danger." Thus the hexagram is intended to designate an objective situation to which one must become accustomed, not a subjective attitude. For danger due to a subjective attitude means either foolhardiness or guile. Hence too a ravine is used to symbolize danger; it is a situation in which a man is in the same pass as the water in a ravine, and, like the water, he can escape if he behaves correctly.`
@@ -515,8 +491,7 @@ image `Water flows on uninterruptedly and reaches its foal: The image of the Aby
 	`Water reaches its goal by flowing continually. It fills up every depression before it flows on. The superior man follows its example; he is concerned that goodness should be an established attribute of character rather than an accidental and isolated occurrence. So likewise in teaching others everything depends on consistency, for it is only through repetition that the pupil makes the material his own.`
 }
 
-
-hexagram Li (FIRE upon FIRE) {
+Li (FIRE upon FIRE) {
 ID 30
 meaning "The Clinging"
 	`This hexagram is another double sign. The trigram Li means "to cling to something," and also "brightness." A dark line clings to two light lines, one above and one below--the image of an empty space between two strong lines, whereby the two strong lines are made bright. The trigram represents the middle daughter. The Creative has incorporated the central line of the Receptive, and thus Li develops. As an image, it is fire. Fire has no definite form but clings to the burning object and thus is bright. As water pours down from heaven, so fire flames up from the earth. While K'an means the soul shut within the body, Li stands for nature in its radiance.`
@@ -531,8 +506,7 @@ image `That which is bright rises twice: The image of FIRE. Thus the great man, 
 	`Each of the two trigrams represents the sun in the course of a day. The two together represent the repeated movement of the sun, the function of light with respect to time. The great man continues the work of nature in the human world. Through the clarity of his nature he causes the light to spread farther and farther and to penetrate the nature of man ever more deeply.`
 }
 
-
-hexagram Hsien (LAKE upon MOUNTAIN) {
+Hsien (LAKE upon MOUNTAIN) {
 ID 31
 meaning `Influence (Wooing)`
 	`The name of the hexagram means "universal," "general," and in a figurative sense "to influence," "to stimulate." The upper trigram is Tui, the Joyous; the lower is Kên, Keeping still. By its persistent, quiet influence, the lower, rigid trigram stimulates the upper, weak trigram, which responds to this stimulation cheerfully and joyously. Kên, the lower trigram, is the youngest son; the upper, Tui, is the youngest daughter. Thus the universal mutual attraction between the sexes is represented. In courtship, the masculine principle must seize the initiative and place itself below the feminine principle. Just as the first part of book 1 begins with the hexagrams of heaven and earth, the foundations of all that exists, the second part begins with the hexagrams of courtship and marriage, the foundations of all social relationships.`
@@ -544,16 +518,15 @@ image `A lake on the mountain: The image of influence. Thus the superior man enc
 	`A mountain with a lake on its summit is stimulated by the moisture from the lake. It has this advantage because its summit does not jut out as a peak but is sunken. The image counsels that the mind should be kept humble and free, so that it may remain receptive to good advice. People soon give up counseling a man who thinks that he knows everything better than anyone else.`
 	
 markedlines
-	line 6 `The influence shows itself in the big toe.`
-	line 6 `The influence shows itself in the calves of the legs. Misfortune. Tarrying brings good fortune.`
-	line 9 `The influence shows itself in the thighs. Holds to that which follows it. To continue is humiliating.`
-	line 9 `Perseverance brings good fortune. Remorse disappears. If a man is agitated in mind, And his thoughts go hither and thither, Only those friends On whom he fixes his conscious thoughts Will follow.`
-	line 9 `The influence shows itself in the back of the neck. No remorse.`
-	line 6 `The influence shows itself in the jaws, cheeks, and tongue.`
+	line `The influence shows itself in the big toe.`
+	line `The influence shows itself in the calves of the legs. Misfortune. Tarrying brings good fortune.`
+	line `The influence shows itself in the thighs. Holds to that which follows it. To continue is humiliating.`
+	line `Perseverance brings good fortune. Remorse disappears. If a man is agitated in mind, And his thoughts go hither and thither, Only those friends On whom he fixes his conscious thoughts Will follow.`
+	line `The influence shows itself in the back of the neck. No remorse.`
+	line `The influence shows itself in the jaws, cheeks, and tongue.`
 }
 
-
-hexagram Hêng (THUNDER upon WIND) {
+Hêng (THUNDER upon WIND) {
 ID 32
 	`The strong trigram Chên is above, the weak trigram Sun below. This hexagram is the inverse of the preceding one. In the latter we have influence, here we have union as an enduring condition. The two images are thunder and wind, which are likewise constantly paired phenomena. The lower trigram indicates gentleness within; the upper, movement without. In the sphere of social relationships, the hexagram represents the institution of marriage as the enduring union of the sexes. During courtship the young man subordinates himself to the girl, but in marriage, which is represented by the coming together of the eldest son and the eldest daughter, the husband is the directing and moving force outside, while the wife, inside, is gentle and submissive.`
 
@@ -564,16 +537,15 @@ image `Thunder and wind: the image of DURATION. Thus the superior man stands fir
 	`Thunder rolls, and the wind blows; both are examples of extreme mobility and so are seemingly the very opposite of duration, but the laws governing their appearance and subsidence, their coming and going, endure. In the same way the independence of the superior man is not based on rigidity and immobility of character. He always keeps abreast of the time and changes with it. What endures is the unswerving directive, the inner law of his being, which determines all his actions.`
 
 markedlines
-	line 6 `Seeking duration too hastily brings misfortune persistently. Nothing that would further.`
-	line 9 `Remorse disappears.`
-	line 9 `He who does not give duration to his character meets with disgrace. Persistent humiliation.`
-	line 9 `No game in the field.`
-	line 6 `Giving duration to one's character through perseverance.`
-	line 6 `Restlessness as an enduring condition brings misfortune.`
+	line `Seeking duration too hastily brings misfortune persistently. Nothing that would further.`
+	line `Remorse disappears.`
+	line `He who does not give duration to his character meets with disgrace. Persistent humiliation.`
+	line `No game in the field.`
+	line `Giving duration to one's character through perseverance.`
+	line `Restlessness as an enduring condition brings misfortune.`
 }
 
-
-hexagram TUN (HEAVEN upon MOUNTAIN) {
+TUN (HEAVEN upon MOUNTAIN) {
 ID 33
 meaning `retreat`
 	`The power of the dark is ascending. The light retreats to security, so that the dark cannot encroach upon it. This retreat is a matter not of man's will but of natural law. Therefore in this case withdrawal is proper; it is the correct way to behave in order not to exhaust one's forces. In the calendar this hexagram is linked with the sixth month (July-August), in which the forces of winter are already showing their influence.`
@@ -586,16 +558,15 @@ image `Mountain under heaven: the image of RETREAT. Thus the superior man keeps 
 
 
 markedlines
-	line 6 `At the tail in retreat. This is dangerous. One must not wish to undertake anything.`
-	line 6 `he holds him fast with yellow oxen-hide. No one can tear him loose.`
-	line 9 `A halted retreat Is nerve-wracking and dangerous. To retain people as men and maidservants, Brings good fortune.`
-	line 9 `Voluntary retreat brings good fortune to the superior man And downfall to the inferior man.`
-	line 9 `Friendly retreat. Perseverance brings good fortune.`	
-	line 9 `Cheerful retreat. Everything serves to further.`
+	line `At the tail in retreat. This is dangerous. One must not wish to undertake anything.`
+	line `he holds him fast with yellow oxen-hide. No one can tear him loose.`
+	line `A halted retreat Is nerve-wracking and dangerous. To retain people as men and maidservants, Brings good fortune.`
+	line `Voluntary retreat brings good fortune to the superior man And downfall to the inferior man.`
+	line `Friendly retreat. Perseverance brings good fortune.`	
+	line `Cheerful retreat. Everything serves to further.`
 }
 
-
-hexagram `Ta Chuang` (THUNDER upon HEAVEN) {
++"Ta Chuang" (THUNDER upon HEAVEN) {
 ID 34
 meaning `The Power of the Great`
 	`The great lines, that is, the light, strong lines, are powerful. Four light lines have entered the hexagram from below and are about to ascend higher. The upper trigram is Chên, the Arousing; the lower is ch'ien, the Creative. Ch'ien is strong, Chên produces movement. The union of movement and strength gives the meaning of THE POWER OF THE GREAT. The hexagram is linked with the second month (March-April).`
@@ -607,15 +578,14 @@ image `Thunder in heaven above: The image of THE POWER OF THE GREAT. Thus the su
 	`Thunder--electrical energy--mounts upward in the spring. The direction of this movement is in harmony with that of the movement of heaven. It is therefore a movement in accord with heaven, producing great power. However, true greatness depends on being in harmony with what is right. Therefore in times of great power the superior man avoids doing anything that is not in harmony with the established order.`
 
 markedlines
-	line 9 `Power in the toes. Continuing brings misfortune.`
-	line 9 `Perseverance brings good fortune.`
-	line 9 `The inferior man works through power. The superior man does not act thus. To continue is dangerous. A goat butts against a hedge and gets its horns entangled.`	
-	line 9 `Perseverance brings good fortune. Remorse disappears. The hedge opens; there is no entanglement. Power depends upon the axle of a big cart.`
-	line 6 `Loses the goat with ease. No remorse.`
-	line 6 `A goat butts against a hedge. It cannot go backward, it cannot go forward. Nothing serves to further. If one notes the difficulty, this brings good fortune.`
+	line `Power in the toes. Continuing brings misfortune.`
+	line `Perseverance brings good fortune.`
+	line `The inferior man works through power. The superior man does not act thus. To continue is dangerous. A goat butts against a hedge and gets its horns entangled.`	
+	line `Perseverance brings good fortune. Remorse disappears. The hedge opens; there is no entanglement. Power depends upon the axle of a big cart.`
+	line `Loses the goat with ease. No remorse.`
+	line `A goat butts against a hedge. It cannot go backward, it cannot go forward. Nothing serves to further. If one notes the difficulty, this brings good fortune.`
 }
-
-hexagram Chin (fire upon earth) {
+Chin (fire upon earth) {
 ID 35
 meaning "Progress"
 	`The hexagram represents the sun rising over the earth. It is therefore the symbol of rapid, easy progress, which at the same time means ever widening expansion and clarity.`
@@ -629,16 +599,16 @@ image `The sun rises over the earth: The image of PROGRESS. Thus the superior ma
 	`The light of the sun rises over the earth is by nature clear. The higher the sun rises, the more it emerges from the dark mists, spreading the pristine purity of its rays over an ever widening area. The real nature of man is likewise originally good, but it becomes clouded by contact with earthly things and therefore needs purification before it can shine forth in its native clarity.`
 
 markedlines
-	line 6 `Progressing, but turned back. Perseverance brings good fortune. If one meets with no confidence, one should remain calm. No mistake.`
-	line 6 `Progressing, but in sorrow. Perseverance brings good fortune. Then one obtains great happiness from one's ancestress.`
-	line 6 `All are in accord. Remorse disappears.`
-	line 9 `Progress like a hamster. Perseverance brings danger.`
-	line 6 `Remorse disappears. Take not gain and loss to heart. Undertakings bring good fortune. Everything serves to further.`
-	line 9 `Making progress with the horns is permissible, only for the purpose of punishing one's own city. To be conscious of danger brings good fortune. No blame. Perseverance brings humiliation.`
+	line `Progressing, but turned back. Perseverance brings good fortune. If one meets with no confidence, one should remain calm. No mistake.`
+	line `Progressing, but in sorrow. Perseverance brings good fortune. Then one obtains great happiness from one's ancestress.`
+	line `All are in accord. Remorse disappears.`
+	line `Progress like a hamster. Perseverance brings danger.`
+	line `Remorse disappears. Take not gain and loss to heart. Undertakings bring good fortune. Everything serves to further.`
+	line `Making progress with the horns is permissible, only for the purpose of punishing one's own city. To be conscious of danger brings good fortune. No blame. Perseverance brings humiliation.`
 }
 
 
-hexagram `Ming I` (earth upon fire) { 
++"Ming I" (earth upon fire) { 
 ID 36
 meaning `Darkening of the light`
 	`Here the sun has sunk under the earth and is therefore darkened. The name of the hexagram means literally "wounding of the bright"; hence the individual lines contain frequent references to wounding. The situation is the exact opposite of that in the foregoing hexagram. In the latter a wise man at the head of affairs has able helpers, and in company with them makes progress; here a man of dark nature is in a position of authority and brings harm to the wise and able man.`
@@ -650,16 +620,16 @@ image `The light has sunk into the earth: The image of DARKENING OF THE LIGHT. T
 	`In a time of darkness it is essential to be cautious and reserved. One should not needlessly awaken overwhelming enmity by inconsiderate behavior. In such times one ought not to fall in with the practices of others; neither should one drag them censoriously into the light. In social intercourse one should not try to be all-knowing. One should let many things pass, without being duped.`
 	
 markedlines 
-	line 9 `Darkening of the light during flight. He lowers his wings. The superior man does not eat for three days On his wanderings. But he has somewhere to go. The host has occasion to gossip about him.`
-	line 6 `Darkening of the light injures him in the left thigh. He gives aid with the strength of a horse. Good fortune.`
-	line 9 `Darkening of the light during the hunt in the south. Their great leader is captured. One must not expect perseverance too soon.`
-	line 6 `He penetrates the left side of the belly. One gets at the very heart of the darkening of the light.`
-	line 6 `Darkening of the light as with Prince Chi. Perseverance furthers.`
-	line 6 `Not light but darkness. First he climbed up to heaven, Then plunged into the depths of the earth.`
+	line `Darkening of the light during flight. He lowers his wings. The superior man does not eat for three days On his wanderings. But he has somewhere to go. The host has occasion to gossip about him.`
+	line `Darkening of the light injures him in the left thigh. He gives aid with the strength of a horse. Good fortune.`
+	line `Darkening of the light during the hunt in the south. Their great leader is captured. One must not expect perseverance too soon.`
+	line `He penetrates the left side of the belly. One gets at the very heart of the darkening of the light.`
+	line `Darkening of the light as with Prince Chi. Perseverance furthers.`
+	line `Not light but darkness. First he climbed up to heaven, Then plunged into the depths of the earth.`
 }
 
 
-hexagram `Chia Jên` (WIND upon FIRE) {
++"Chia Jên" (WIND upon FIRE) {
 ID 37
 meaning "The Family [The Clan]"
 	`The hexagram represents the laws obtaining within the family. The strong line at the top represents the father, the lowest the son. The strong line in the fifth place represents the husband, the yielding second line the wife. On the other hand, the two strong lines in the fifth and the third place represent two brothers, and the two weak lines correlated with them in the fourth and the second place stand for their respective wives. Thus all the connections and relationships within the family find their appropriate expression. Each individual line has the character according with its place. The fact that a strong line occupies the sixth place-where a weak line might be expected-indicates very clearly the strong leadership that must come from the head of the family. The line is to be considered here not in its quality as the sixth but in its quality as the top line. THE FAMILY shows the laws operative within the household that, transferred to outside life, keep the state and the world in order. The influence that goes out from within the family is represented by the symbol of the wind created by fire.`
@@ -673,16 +643,15 @@ image `Wind comes forth from fire: The image of THE FAMILY.Thus the superior man
 	`Heat creates energy: this is signified by the wind stirred up by the fire and issuing forth form it. This represents influence working from within outward. The same thing is needed in the regulation of the family. Here too the influence on others must proceed form one's own person. In order to be capable of producing such an influence, one's words must have power, and this they can have only if they are based on something real, just as flame depends on its fuel Words have influence only when they are pertinent and clearly related to definite circumstances. General discourses and admonitions have no effect whatsoever. Furthermore, the words must be supported by one's entire conduct, just as the wind is made effective by am impression on others that they can adapt and conform to it. If words and conduct are not in accord and consistent, they will have no effect.`
 
 markedlines 
-	line 9 `Firm seclusion within the family. Remorse disappears.`
-	line 6 `She should not follow her whims. She must attend within to the food. Perseverance brings good fortune.`
-	line 9 `When tempers flare up in the family, Too great severity brings remorse. Good fortune nonetheless. When woman and chiled ally and laugh It leads in the end to humiliation.`
-	line 6 `She is the treasure of the house. Great good fortune.`
-	line 9 `As a king he approaches his family. Fear not. Good fortune.`
-	line 9 `His work commands respect. In the end good fortune comes.`
+	line `Firm seclusion within the family. Remorse disappears.`
+	line `She should not follow her whims. She must attend within to the food. Perseverance brings good fortune.`
+	line `When tempers flare up in the family, Too great severity brings remorse. Good fortune nonetheless. When woman and chiled ally and laugh It leads in the end to humiliation.`
+	line `She is the treasure of the house. Great good fortune.`
+	line `As a king he approaches his family. Fear not. Good fortune.`
+	line `His work commands respect. In the end good fortune comes.`
 }
 
-
-hexagram "K'uei" (FLAME upon LAKE) {
++"K'uei" (FLAME upon LAKE) {
 ID 38
 meaning "Opposition"
 	`This hexagram is composed of the trigram Li above, i.e., flame, which burns upward, and Tui below, i.e., the lake, which seeps downward. These two movements are indirect contrast. Furthermore, LI is the second daughter and Tui the youngest daughter, and although they live in the same house they belong to different men; hence their wills are not the same but are divergently directed.`
@@ -696,18 +665,17 @@ image `Above, fire; below. The lake. Thus amid all fellowship. The superior man 
 	`The two elements, fire and water, never mingle but even when in contact retain their own natures. So the sutured man is never led into baseness or vulgarity through intercourse or community of interests with persons of another sort; regardless of all commingling, he will always preserve his individuality.`
 
 markedlines 
-	line 9 `Remorse disappears. If you lose your horse, do not run after it; It will come back of its own accord. When you see evil people, guard yourself against mistakes.`
-	line 9 `One meets his lord in a narrow street. No blame.`
-	line 6 `One sees the wagon dragged back, The oxen halted, A man's hair and nose cut off.`
-	line 9 `Isolated through opposition, One meets a like-minded man with whom one can associate in good faith. Despite the danger, no blame.`
-	line 6 `Remorse disappears. The companion bits his way through the wrappings. If one goes to him, How could it be a mistake?`
-	line 9 `Isolated through opposition, One sees one's companion as a pig covered with dirt, As a wagon full of devils.
+	line `Remorse disappears. If you lose your horse, do not run after it; It will come back of its own accord. When you see evil people, guard yourself against mistakes.`
+	line `One meets his lord in a narrow street. No blame.`
+	line `One sees the wagon dragged back, The oxen halted, A man's hair and nose cut off.`
+	line `Isolated through opposition, One meets a like-minded man with whom one can associate in good faith. Despite the danger, no blame.`
+	line `Remorse disappears. The companion bits his way through the wrappings. If one goes to him, How could it be a mistake?`
+	line `Isolated through opposition, One sees one's companion as a pig covered with dirt, As a wagon full of devils.
 First one draws a bow against him, Then one lays the bow aside. He is not a robber; he will woo at the right time. As one goes, rain falls; then good fortune comes.`
 }
 
 
-
-hexagram "Chien" (WATER UPON MOUNTAIN) {
++"Chien" (WATER UPON MOUNTAIN) {
 ID 39
 meaning `Obstruction`
 	`The hexagram pictures a dangerous abyss lying before us and a steep, inaccessible mountain rising behind us. We are surrounded by obstacles; at the same time, since the mountain has the attribute of keeping still, there is implicit a hint as to how we can extricate ourselves. The hexagram represents obstructions that appear in the course of time but that can and should be overcome. Therefore all the instruction given is directed to overcoming them.`
@@ -719,16 +687,15 @@ image `The image of OBSTRUCTION. Thus the superior man turns his attention to hi
 	`Difficulties and obstructions throw a man back upon himself. While the inferior man seeks to put the blame on other persons, bewailing his fate, the superior man seeks the error within himself, and through this introspection the external obstacle becomes for him an occasion for inner enrichment and education.`
 
 markedlines
-	line 6 `Going leads to obstructions, Coming meets with praise.`
-	line 6 `The King's servant is beset by obstruction upon obstruction, But it is not his own fault.`
-	line 9 `Going leads to obstructions; Hence he comes back.`
-	line 6 `Going leads to obstructions, Coming leads to union.`
-	line 9 `In the midst of the greatest obstructions, Friends come.`
-	line 6 `Going leads to obstructions, Coming leads to great good fortune. It furthers one to see the great man.`
+	line `Going leads to obstructions, Coming meets with praise.`
+	line `The King's servant is beset by obstruction upon obstruction, But it is not his own fault.`
+	line `Going leads to obstructions; Hence he comes back.`
+	line `Going leads to obstructions, Coming leads to union.`
+	line `In the midst of the greatest obstructions, Friends come.`
+	line `Going leads to obstructions, Coming leads to great good fortune. It furthers one to see the great man.`
 }
 
-
-hexagram Hsieh (THUNDER UPON WATER) {
+Hsieh (THUNDER UPON WATER) {
 ID 40
 meaning Deliverance
 	`Here the movement goes out of the sphere of danger. The obstacle has been removed, the difficulties are being resolved. Deliverance is not yet achieved; it is just in its beginning, and the hexagram represents its various stages.`
@@ -740,17 +707,16 @@ image `Thus the superior man pardons mistakes  And forgives misdeeds.`
 	`A thunderstorm has the effect of clearing the air; the superior man produces a similar effect when dealing with mistakes and sins of men that induce a condition of tension. Through clarity he brings deliverance. However, when failings come to light, he does not dwell on them; he simply passes over mistakes, the unintentional transgressions, just as thunder dies away. He forgives misdeeds, the intentional transgressions, just as water washes everything clean.`
 
 markedlines
-	line 6 `Without blame.`
-	line 9 `One kills three foxes in the field And receives a yellow arrow. Perseverance brings good fortune.`
-	line 6 `If a man carries a burden on his back And nonetheless rides in a carriage, He thereby encourages robbers to draw near. Perseverance leads to humiliation.`
-	line 9 `Deliver yourself from your great toe. Then the companion comes, And him you can trust.`
-	line 6 `If only the superior man can deliver himself, It brings good fortune. Thus he proves to inferior men that he is in earnest.`
-	line 6 `The prince shoots at a hawk on a high wall. He kills it. Everything serves to further.`
+	line `Without blame.`
+	line `One kills three foxes in the field And receives a yellow arrow. Perseverance brings good fortune.`
+	line `If a man carries a burden on his back And nonetheless rides in a carriage, He thereby encourages robbers to draw near. Perseverance leads to humiliation.`
+	line `Deliver yourself from your great toe. Then the companion comes, And him you can trust.`
+	line `If only the superior man can deliver himself, It brings good fortune. Thus he proves to inferior men that he is in earnest.`
+	line `The prince shoots at a hawk on a high wall. He kills it. Everything serves to further.`
 }
 
 
-
-hexagram KêN (MOUNTAIN upon LAKE) {
+KêN (MOUNTAIN upon LAKE) {
 ID 41
 meaning `Sun / Decrease`
 	`This hexagram represents a decrease of the lower trigram in favor of the upper, because the third line, originally strong, has moved up to the top, and the top line, originally weak, has replaced it. What is below is decreased to the benefit of what is above. This is out-and-out decrease. If the foundations of a building are decreased in strength and the upper walls are strengthened, the whole structure loves its stability. Likewise, a decrease in the prosperity of the people in favor of the government is out-and-out decrease. And the entire theme of the hexagram is directed to showing how this shift of wealth can take place without causing the sources of wealth can take place without causing the sources of wealth in the nation and its lower classes to fail.`
@@ -762,16 +728,15 @@ image `At the foot of the mountain, the lake: The image of DECREASE. Thus the su
 	`The lake at the foot of the mountain evaporates. In this way it decreases to the benefit of the mountain, which is enriched by its moisture. The mountain stands as the symbol of stubborn strength that can harden into anger. The lake is the symbol of unchecked gaiety that can develop into passionate drives at the expense of the life forces. Therefore decrease is necessary; anger must be decreased by keeping still, the instincts must be curbed by restriction. By this decrease of the lower powers of the psyche, the higher aspects of the soul are enriched.`
 
 markedlines 
-	line 9 `Going quickly when one's tasks are finished Is without blame. But one must reflect on how much one may decrease others.`
-	line 9 `Perseverance furthers.`
-	line 6 `When three people journey together, Their number increases by one. When one man journeys alone, He finds a companion. When there are three people together, jealousy arises. One of them will have to go. Avery close bond is possible only between two people. But when one man is lonely, he is certain to find a companion who complements him.`
-	line 6 `If a man deceases his faults, It makes the other hasten to come and rejoice. No blame.`
-	line 6 `Someone does indeed increase him. Ten pairs of tortoises cannot oppose it. Supreme good fortune.`
-	line 9 `If one is increased without depriving other, There is no blame. Perseverance brings good fortune. It furthers one to undertake something. One obtains servants But no longer has a separate home.`
+	line `Going quickly when one's tasks are finished Is without blame. But one must reflect on how much one may decrease others.`
+	line `Perseverance furthers.`
+	line `When three people journey together, Their number increases by one. When one man journeys alone, He finds a companion. When there are three people together, jealousy arises. One of them will have to go. Avery close bond is possible only between two people. But when one man is lonely, he is certain to find a companion who complements him.`
+	line `If a man deceases his faults, It makes the other hasten to come and rejoice. No blame.`
+	line `Someone does indeed increase him. Ten pairs of tortoises cannot oppose it. Supreme good fortune.`
+	line `If one is increased without depriving other, There is no blame. Perseverance brings good fortune. It furthers one to undertake something. One obtains servants But no longer has a separate home.`
 }
 
-
-hexagram I (WIND upon THUNDER) {
++"I" (WIND upon THUNDER) {
 ID 42
 meaning Increase
 	`The idea of increase is expressed in the fact that the strong lowest line of the upper trigram has sunk down and taken its place under the lower trigram. This conception also expresses the fundamental idea on which the Book of Changes is based. To rule truly is to serve. A sacrifice of the higher element that produces an increase of the lower is called an out-and-out increase: it indicates the spirit that alone has power to help the world.`
@@ -783,17 +748,16 @@ image `Wind and thunder: the image of INCREASE. Thus the superior man: If he see
 	`While observing how thunder and wind increase and strengthen each other, a man can not the way to self-increase and self-improvement. When he discovers good in others, he should imitate it and thus make everything on earth his own. If he perceives something bad in himself, let him rid himself of it. In this way he becomes free of evil. This ethical change represents the most important increase of personality.`
 
 markedlines
-	line 9 `It furthers one to accomplish great deeds. Supreme good fortune. No blame.`
-	line 6 `Someone does indeed increase him; Ten pairs of tortoises cannot oppose it. Constant perseverance brings good fortune. The king presents him before God. Good fortune.`
-	line 6 `One is enriched through unfortunate events. No blame, if you are sincere And walk in the middle, And report with a seal to the prince.`
-	line 6 `If you walk in the middle And report the prince, He will follow. It furthers one to be used In the removal of the capital.`
-	line 9 `If in truth you have a kind heart, ask not. Supreme good fortune. Truly, kindness will be recognized as your virtue.`
-	line 9 `He brings increase to no one. Indeed, someone even strikes him. He does not keep his heart constantly steady. Misfortune.`
+	line `It furthers one to accomplish great deeds. Supreme good fortune. No blame.`
+	line `Someone does indeed increase him; Ten pairs of tortoises cannot oppose it. Constant perseverance brings good fortune. The king presents him before God. Good fortune.`
+	line `One is enriched through unfortunate events. No blame, if you are sincere And walk in the middle, And report with a seal to the prince.`
+	line `If you walk in the middle And report the prince, He will follow. It furthers one to be used In the removal of the capital.`
+	line `If in truth you have a kind heart, ask not. Supreme good fortune. Truly, kindness will be recognized as your virtue.`
+	line `He brings increase to no one. Indeed, someone even strikes him. He does not keep his heart constantly steady. Misfortune.`
 }
 
 
-
-hexagram Kuai (LAKE upon HEAVEN) {
+Kuai (LAKE upon HEAVEN) {
 ID 43
 meaning `Break-through (Resoluteness)`
 	`This hexagram signifies on the one hand a break-through after a long accumulation of tension, as a swollen river breaks through its dikes, or in the manner of a cloudburst. On the other hand, applied to human conditions, it refers to the time when inferior people gradually begin to disappear. Their influence is on the wane; as a result of resolute action, a change in conditions occurs, a break-through. The hexagram is linked with the third month [April-May].`
@@ -805,17 +769,16 @@ image `The lake has risen up to heaven: The image of BREAK-THROUGH. Thus the sup
 	`When the water of a lake has risen up to heaven, there is reason to fear a cloudburst. Taking this as a warning, the superior man forestalls a violent collapse. If a man were to pile up riches for himself alone, without considering others, he would certainly experience a collapse. If a man were to pile up riches for himself alone, without considering others, he would certainly experience a collapse. For all gathering is followed by dispersion. Therefore the superior man begins to distribute while he is accumulating. In the same way, in developing his character he takes care not to become hardened in obstinacy but to remain receptive to impressions by help of strict and continuous self-examination.`
 
 markedlines 
-	line 9 `Mighty in the forward-striding toes. When one goes and is not equal to the task, One makes a mistake.`
-	line 9 `A cry of alarm. Arms at evening and at night. Fear nothing.`
-	line 9 `To be powerful in the cheekbones Brings misfortune. The superior man is firmly resolved. He walks alone and is caught in the rain. He is bespattered, And people murmur against him. No blame.`
-	line 9 `There is no skin on his thighs, And walking comes hard. If a man were to let himself be led like a sheep, Remorse would disappear. But if these words are heard. They will not be believed.`
-	line 9 `In dealing with weeds, Firm resolution is necessary. Walking in the middle Remains free of blame.`
-	line 6 `No cry. In the end misfortune comes.`
+	line `Mighty in the forward-striding toes. When one goes and is not equal to the task, One makes a mistake.`
+	line `A cry of alarm. Arms at evening and at night. Fear nothing.`
+	line `To be powerful in the cheekbones Brings misfortune. The superior man is firmly resolved. He walks alone and is caught in the rain. He is bespattered, And people murmur against him. No blame.`
+	line `There is no skin on his thighs, And walking comes hard. If a man were to let himself be led like a sheep, Remorse would disappear. But if these words are heard. They will not be believed.`
+	line `In dealing with weeds, Firm resolution is necessary. Walking in the middle Remains free of blame.`
+	line `No cry. In the end misfortune comes.`
 }
 
 
-
-hexagram Kou  (HEAVEN upon WIND) {
+Kou  (HEAVEN upon WIND) {
 ID 44
 meaning `Coming to Meet`
 	`This hexagram indicates a situation in which the principle of darkness, after having been eliminated, furtively and unexpectedly obtrudes again from within and below. Of its own accord the female principle comes to meet the male. It is an unfavorable and dangerous situation, and we must understand and promptly prevent the possible consequences. The hexagram is linked with the fifth month [June-July], because at the summer solstice the principle of darkness gradually becomes ascendant again.`
@@ -827,16 +790,15 @@ image `Under heaven, wind: The image of COMING TO MEET. Thus does the prince act
 	`The situation here resembles that in hexagram 20, Kuan, CONTEMPLATION ( VIEW). In the latter the wind blows over the earth, here it blows under heaven; in both cases it goes everywhere. There the wind is on the earth and symbolizes the ruler taking note of the conditions in his kingdom; here the wind blows from above and symbolizes the influence exercised by the ruler through his commands. Heaven is far from the things of earth, but it sets them in motion by means of the wind. The ruler is far form his people, but he sets them in motion by means of his commands and decrees.`
 
 markedlines 
-	line 6 `It must be checked with a brake of bronze. Perseverance brings good fortune. If one lets it take its course, one experiences misfortune. Even a lean pig has it in him to rage around.`
-	line 9 `There is a fish in the tank. No blame. Does not further guests. The inferior element is not overcome by violence but is kept under gentle control. Then nothing evil is to be feared. But care must be taken not to let it come in contact with those further away, because once free it would unfold its evil aspects unchecked.`
-	line 9 `There is no skin on his thighs, And walking comes hard. If one is mindful of the danger, No great mistake is made.`
-	line 9 `No fish in the tank. This leads to misfortune.`
-	line 9 `A melon covered with willow leaves. Hidden lines. Then it drops down to one from heave. The melon, like the fish, is a symbol of the principle of darkness.`
-	line 9 `He comes to meet with his horns. Humiliation. No blame.`
+	line `It must be checked with a brake of bronze. Perseverance brings good fortune. If one lets it take its course, one experiences misfortune. Even a lean pig has it in him to rage around.`
+	line `There is a fish in the tank. No blame. Does not further guests. The inferior element is not overcome by violence but is kept under gentle control. Then nothing evil is to be feared. But care must be taken not to let it come in contact with those further away, because once free it would unfold its evil aspects unchecked.`
+	line `There is no skin on his thighs, And walking comes hard. If one is mindful of the danger, No great mistake is made.`
+	line `No fish in the tank. This leads to misfortune.`
+	line `A melon covered with willow leaves. Hidden lines. Then it drops down to one from heave. The melon, like the fish, is a symbol of the principle of darkness.`
+	line `He comes to meet with his horns. Humiliation. No blame.`
 }
 
-
-hexagram "Ts'ui" (LAKE upon EARTH) {
++"Ts'ui" (LAKE upon EARTH) {
 ID 45
 meaning `Gathering Together [Massing]`
 	`This hexagram is related in form and meaning to Pi, HOLDING TOGETHER. In the latter, water is over the earth; here a lake is over the earth. But since the lake is a place where water collects, the idea of gathering together is even more strongly expressed here than in the other hexagram. The same idea also arises from the fact that in the present case it is two strong lines (the fourth and the fifth) that bring about the gather together, whereas in the former case one strong line (the fifth) stands in the midst of weak lines.`
@@ -849,17 +811,16 @@ image `Over the earth, the lake: The image of GATHERING TOGETHER. Thus the super
 	`If the water in the lake gathers until it rises above the earth, there is danger of a break-through. Precautions must be taken to prevent this. Similarly where men gather together in great numbers, strife is likely to arise; where possessions are collected, robbery is likely to occur. Thus in the time of GATHERING TOGETHER we must arm promptly to ward off the unexpected. Human woes usually come as a result of unexpected events against which we are not forearmed. If we are prepared, they can be prevented.`
 
 markedlines
-	line 6 `If you are sincere, but not to the end, There will sometimes be confusion, sometimes gathering together.
+	line `If you are sincere, but not to the end, There will sometimes be confusion, sometimes gathering together.
 If you call out, Then after one grasp of the hand you can laugh again. Regret not. Going is without blame.`
-	line 6 `Letting oneself be drawn, Brings good fortune and remains blameless. If one is sincere, It furthers one to bring even a small offering.`
-	line 6 `Gathering together amid sighs. Nothing that would further. Going is without blame. Slight humiliation.`
-	line 9 `Great good fortune. No blame. This describes a man who gathers people around him in the name of his ruler. Since he is not striving for any special advantages for himself but is working unselfishly to bring about general unity, his work is crowned with success, and everything becomes as it should be.`
-	line 9 `If in gathering together one has position, This brings no blame. If there are some who are not yet sincerely in the work, Sublime and enduring perseverance is needed. Then remorse disappears.`
-	line 6 `Lamenting and sighing, floods of tears. No blame.`
+	line `Letting oneself be drawn, Brings good fortune and remains blameless. If one is sincere, It furthers one to bring even a small offering.`
+	line `Gathering together amid sighs. Nothing that would further. Going is without blame. Slight humiliation.`
+	line `Great good fortune. No blame. This describes a man who gathers people around him in the name of his ruler. Since he is not striving for any special advantages for himself but is working unselfishly to bring about general unity, his work is crowned with success, and everything becomes as it should be.`
+	line `If in gathering together one has position, This brings no blame. If there are some who are not yet sincerely in the work, Sublime and enduring perseverance is needed. Then remorse disappears.`
+	line `Lamenting and sighing, floods of tears. No blame.`
 }
 
-
-hexagram "Shêng" (EARTH upon WOOD) {
++"Shêng" (EARTH upon WOOD) {
 ID 46
 meaning "Pushing Upward"
 	`The lower trigram, Sun, represents wood, and the upper, K'un, means the earth. Linked with this is the idea that wood in the earth grows upward. In contrast to the meaning of Chin (PROGRESS, 35), this pushing upward is associated with effort, just as a plant needs energy for pushing upward through the earth. That is why this hexagram, although it is connected with success, is associated with effort of the will. In PROGRESS the emphasis is on expansion; PUSHING UPWARD indicates rather a vertical ascent-direct rise from obscurity and lowliness to power and influence.`
@@ -871,16 +832,15 @@ image `Within the earth, wood grows: The image of PUSHING UPWARD. Thus the super
 
 
 markedlines
-	line 6 `Pushing upward that meets with confidence Brings great good fortune.`
-	line 9 `If one is sincere, It furthers one to bring even a small offering. No blame.`
-	line 9 `One pushes upward into an empty city.`
-	line 6 `The king offers him Mount Ch'i. Good fortune. No blame.`
-	line 6 `Perseverance brings good fortune. One pushes upward by steps.`
-	line 6 `Pushing upward in darkness. It furthers one to be unremittingly persevering.`
+	line `Pushing upward that meets with confidence Brings great good fortune.`
+	line `If one is sincere, It furthers one to bring even a small offering. No blame.`
+	line `One pushes upward into an empty city.`
+	line `The king offers him Mount Ch'i. Good fortune. No blame.`
+	line `Perseverance brings good fortune. One pushes upward by steps.`
+	line `Pushing upward in darkness. It furthers one to be unremittingly persevering.`
 }
 
-
-hexagram "K'un" (LAKE upon WATER) {
++"K'un" (LAKE upon WATER) {
 ID 47
 meaning "Oppression (Exhaustion)"
 	`The lake is above, water below; the lake is empty, dried up. Exhaustion is expressed in yet another way: at the top, a dark line is holding down two light line; below, a light line is hemmed in between two dark ones. The upper trigram belongs to the principle of darkness, the lower to the principle of light. Thus everywhere superior men are oppressed and held in restraint by inferior men.`
@@ -892,16 +852,15 @@ image `There is not water in the lake: The image of EXHAUSTION. Thus the superio
 	`When the water has flowed out below, the lake must dry up and become exhausted. That is fate. This symbolizes an adverse fate in human life. In such times there is nothing a man can do but acquiesce in his fate and remain true to himself. This concerns the deepest stratum of his being, for this alone is superior to all external fate.`
 
 markedlines
-	line 6 `One sits oppressed under a bare tree And strays into a gloomy valley. For three years one sees nothing.`
-	line 9 `One is oppressed while at meat and drink. The man with the scarlet knee bands is just coming. It furthers one to offer sacrifice. To set forth brings misfortune. No blame.`
-	line 6 `A man permits himself to be oppressed by stone, And leans on thorns and thistles. He enters the house and does not see his wife. Misfortune.`
-	line 9 `He comes very quietly, oppressed in a golden carriage. Humiliation, but the end is reached.`
-	line 9 `His nose and feet are cut off. Oppression at the hands of the man with the purple knee bands. Joy comes softly. It furthers one to make offerings and libations.`
-	line 6 `He is oppressed by creeping vines. He moves uncertainly and says, "Movement brings remorse." If one feels remorse over this and makes a start, Good fortune comes.`
+	line `One sits oppressed under a bare tree And strays into a gloomy valley. For three years one sees nothing.`
+	line `One is oppressed while at meat and drink. The man with the scarlet knee bands is just coming. It furthers one to offer sacrifice. To set forth brings misfortune. No blame.`
+	line `A man permits himself to be oppressed by stone, And leans on thorns and thistles. He enters the house and does not see his wife. Misfortune.`
+	line `He comes very quietly, oppressed in a golden carriage. Humiliation, but the end is reached.`
+	line `His nose and feet are cut off. Oppression at the hands of the man with the purple knee bands. Joy comes softly. It furthers one to make offerings and libations.`
+	line `He is oppressed by creeping vines. He moves uncertainly and says, "Movement brings remorse." If one feels remorse over this and makes a start, Good fortune comes.`
 }
 
-
-hexagram Ching (WATER upon WOOD) {
+Ching (WATER upon WOOD) {
 ID 48 
 meaning "The Well"
 	`Wood is below, water above. The wood goes down into the earth to bring up water. The image derives from the pole-and-bucket well of ancient China. The wood represents not the buckets, which in ancient times were made of clay, but rather the wooden poles by which the water is hauled up from the well. The image also refers to the world of plants, which lift water out of the earth by means of their fibers. The well from which water is drawn conveys the further idea of an inexhaustible dispensing of nourishment.`
@@ -915,16 +874,15 @@ image `Water over wood: the image of THE WELL. Thus the superior man encourages 
 	`The trigram Sun, wood, is below, and the trigram K'an, water, is above it. Wood sucks water upward. Just as wood as an organism imitates the action of the well, which benefits all parts of the plant, the superior man organizes human society, so that, as in a plant organism, its parts co-operate for the benefit of the whole.`
 
 markedlines
-	line 6 `One does not drink the mud of the well. No animals come to an old well.`
-	line 9 `At the well hole one shoots fishes. The jug is broken and leaks.`
-	line 9 `The well is cleaned, but no one drinks from it. This is my heart's sorrow, For one might draw from it. If the king were clear-minded, Good fortune might be enjoyed in common.`
-	line 6 `The well is being lined. No blame.`
-	line 9 `In the well there is a clear, cold spring From which one can drink.`
-	line 6 `One draws from the well Without hindrance. It is dependable. Supreme good fortune.`
+	line `One does not drink the mud of the well. No animals come to an old well.`
+	line `At the well hole one shoots fishes. The jug is broken and leaks.`
+	line `The well is cleaned, but no one drinks from it. This is my heart's sorrow, For one might draw from it. If the king were clear-minded, Good fortune might be enjoyed in common.`
+	line `The well is being lined. No blame.`
+	line `In the well there is a clear, cold spring From which one can drink.`
+	line `One draws from the well Without hindrance. It is dependable. Supreme good fortune.`
 }
 
-
-hexagram Ko (LAKE upon FIRE) {
+Ko (LAKE upon FIRE) {
 ID 49 
 meaning `Revolution (Molting)`
 name `The Chinese character for this hexagram means in its original sense an animal's pelt, which is changed in the course of the year by molting. From this word is carried over to apply to the "moltings" in political life, the great revolutions connected with changes of governments. The two trigrams making up the hexagram are the same two that appear in K'uei (OPPOSITION, 38), that is, the two younger daughters, Li and Tui. But while there the elder of the two daughters is above, and what results is essentially only an opposition of tendencies, here the younger daughter is above. The influences are in actual conflict, and the forces combat each other like fire and water (lake), each trying to destroy the other. Hence the idea of revolution.`
@@ -937,16 +895,15 @@ image `Fire in the lake: the image of REVOLUTION. Thus the superior man sets the
 	`Fire below and the lake above combat and destroy each other. So too in the course of the year a combat takes place between the forces of light and the forces of darkness, eventuating in the revolution of the seasons, and man is able to adjust himself in advance to the demands of the different times.`
 
 markedlines 
-	line 9 `Wrapped in the hide of a yellow cow.`
-	line 6 `When one's own day comes, one may create revolution. Starting brings good fortune. No blame.`
-	line 9 `Starting brings misfortune. Perseverance brings danger. When talk of revolution has gone the rounds three times, One may commit himself, And men will believe him.`
-	line 9 `Remorse disappears. Men believe him. Changing the form of government brings good fortune.`
-	line 9 `The great man changes like a tiger. Even before he questions the oracle He is believed.`
-	line 6 `The superior man changes like a panther. The inferior man molts in the face. Starting brings misfortune. To remain persevering brings good fortune.`
+	line `Wrapped in the hide of a yellow cow.`
+	line `When one's own day comes, one may create revolution. Starting brings good fortune. No blame.`
+	line `Starting brings misfortune. Perseverance brings danger. When talk of revolution has gone the rounds three times, One may commit himself, And men will believe him.`
+	line `Remorse disappears. Men believe him. Changing the form of government brings good fortune.`
+	line `The great man changes like a tiger. Even before he questions the oracle He is believed.`
+	line `The superior man changes like a panther. The inferior man molts in the face. Starting brings misfortune. To remain persevering brings good fortune.`
 }
 
-
-hexagram Ting (FIRE upon WOOD) {
+Ting (FIRE upon WOOD) {
 ID 50
 meaning "The Caldron"
 	`The six lines construct the image of Ting, THE CALDRON; at the bottom are the legs, over them the belly, then come the ears (handles), and at the top the carrying rings. At the same time, the image suggests the idea of nourishment. The ting, cast of bronze, was the vessel that held the cooked viands in the temple of the ancestors and at banquets. The heads of the family served the food from the ting into the bowls of the guests. THE WELL (48), likewise has the secondary meaning of giving nourishment, but rather more in relation to the people. The ting, as a utensil pertaining to a refined civilization, suggests the fostering and nourishing of able men, which redounded to the benefit of the state. This hexagram and THE WELL are the only two in the Book of Changes that represent concrete, men-made objects. Yet here too the thought has its abstract connotation. Sun, below, is wood and wind; Li, above, is flame. Thus together they stand for the flame kindled by wood and wind, which likewise suggests the idea of preparing food.
@@ -959,16 +916,15 @@ image `Fire over wood: The image of THE CALDRON. Thus the superior man consolida
 	`The fate of fire depends on wood; as long as there is wood below, the fire burns above. It is the same in human life; there is in man likewise a fate that lends power to his life. And if he succeeds in assigning the right place to life and to fate, thus bringing the two into harmony, he puts his fate on a firm footing. These words contain hints about fostering of life as handed on by oral tradition in the secret teachings of Chinese yoga.`
 
 markedlines
-	line 6 `A ting with legs upturned. Furthers removal of stagnating stuff. One takes a concubine for the sake of her son. No blame.`
-	line 9 `There is food in the ting. My comrades are envious, But they cannot harm me. Good fortune.`
-	line 9 `The handle of the ting is altered. One is impeded in his way of life. The fat of the pheasant is not eaten. Once rain falls, remorse is spent. Good fortune comes in the end.`
-	line 9 `The legs of the ting are broken. The prince's meal is spilled and his person is soiled. Misfortune.`
-	line 6 `The ting has yellow handles, golden carrying rings. Perseverance furthers.`
-	line 9 `The ting has rings of jade. Great good fortune. Nothing that would not act to further.`
+	line `A ting with legs upturned. Furthers removal of stagnating stuff. One takes a concubine for the sake of her son. No blame.`
+	line `There is food in the ting. My comrades are envious, But they cannot harm me. Good fortune.`
+	line `The handle of the ting is altered. One is impeded in his way of life. The fat of the pheasant is not eaten. Once rain falls, remorse is spent. Good fortune comes in the end.`
+	line `The legs of the ting are broken. The prince's meal is spilled and his person is soiled. Misfortune.`
+	line `The ting has yellow handles, golden carrying rings. Perseverance furthers.`
+	line `The ting has rings of jade. Great good fortune. Nothing that would not act to further.`
 }
 
-
-hexagram "Chên" (THUNDER upon THUNDER) {
++"Chên" (THUNDER upon THUNDER) {
 ID 51
 meaning "The Arousing (Shock, Thunder)"
 	`The hexagram Chên represents the eldest son, who seizes rule with energy and power. A yang line develops below two yin lines and presses upward forcibly. This movement is so violent that it arouses terror. It is symbolized by thunder, which bursts forth from the earth and by its shock causes fear and trembling.`
@@ -980,16 +936,15 @@ image `Thunder repeated: the image of SHOCK. Thus in fear and trembling The supe
 	`The shock of continuing thunder brings fear and trembling. The superior man is always filled with reverence at the manifestation of God; he sets his life in order and searches his heart, lest it harbor any secret opposition to the will of God. Thus reverence is the foundation of true culture.`
 
 markedlines
-	line 9 `Shock comes-oh, oh! Then follow laughing words-ha, ha! Good fortune.`
-	line 6 `Shock comes bringing danger. A hundred thousand times You lose your treasures And must climb the nine hills. Do not go in pursuit of them. After seven days you will get them back again.`
-	line 6 `Shock comes and makes one distraught. If shock spurs to action One remains free of misfortune.`
-	line 9 `Shock is mired. Movement within the mind depends for its success partly on circumstances. If there is neither a resistance that might be vigorously combated, nor yet a yielding that permits of victory-if, instead, everything is tough and inert like mire-movement is crippled.`
-	line 6 `Shock goes hither and thither. Danger. However, nothing at all is lost. Yet there are things to be done.`
-	line 6 `Shock brings ruin and terrified gazing around. Going ahead brings misfortune. If it has not yet touched one's own body But has reached one's neighbor first, There is no blame. One's comrades have something to talk about.`
+	line `Shock comes-oh, oh! Then follow laughing words-ha, ha! Good fortune.`
+	line `Shock comes bringing danger. A hundred thousand times You lose your treasures And must climb the nine hills. Do not go in pursuit of them. After seven days you will get them back again.`
+	line `Shock comes and makes one distraught. If shock spurs to action One remains free of misfortune.`
+	line `Shock is mired. Movement within the mind depends for its success partly on circumstances. If there is neither a resistance that might be vigorously combated, nor yet a yielding that permits of victory-if, instead, everything is tough and inert like mire-movement is crippled.`
+	line `Shock goes hither and thither. Danger. However, nothing at all is lost. Yet there are things to be done.`
+	line `Shock brings ruin and terrified gazing around. Going ahead brings misfortune. If it has not yet touched one's own body But has reached one's neighbor first, There is no blame. One's comrades have something to talk about.`
 }
 
-
-hexagram "Kên" (MOUNTAIN upon MOUNTAIN) {
++"Kên" (MOUNTAIN upon MOUNTAIN) {
 ID 52
 meaning "Keeping Still, Mountain"
 	`The image of this hexagram is the mountain, the youngest son of heaven and earth. The male principle is at the top because it strives upward by nature; the female principle is below, since the direction of its movement has come to its normal end. In its application to man, the hexagram turns upon the problem of achieving a quiet heart. It is very difficult to bring quiet to the heart. While Buddhism strives for rest through an ebbing away of all movement in nirvana, the Book of Changes holds that rest is merely a state of polarity that always posits movement as its complement. Possibly the words of the text embody directions for the practice of yoga.`
@@ -1000,17 +955,16 @@ judgement `KEEPING STILL. Keeping his back still So that he no longer feels his 
 image `Mountains standing close together: The image of KEEPING STILL. Thus the superior man Does not permit his thoughts To go beyond his situation. The heart thinks constantly. This cannot be changed, but the movements of the heart-that is, a man's thoughts-should restrict themselves to the immediate situation. All thinking that goes beyond this only makes the heart sore.`
 
 markedlines
-	line 6 `Keeping his toes still. No blame. Continued perseverance furthers.`
-	line 6 `Keeping his calves still. He cannot rescue him whom he follows. His heart is not glad.`
-	line 9 `Keeping his hips still. Making his sacrum stiff. Dangerous. The heart suffocates.`
-	line 6 `Keeping his trunk still. No blame.`
-	line 6 `Keeping his jaws still. The words have order. Remorse disappears.`
-	line 9 `Noblehearted keeping still. Good fortune.`
+	line `Keeping his toes still. No blame. Continued perseverance furthers.`
+	line `Keeping his calves still. He cannot rescue him whom he follows. His heart is not glad.`
+	line `Keeping his hips still. Making his sacrum stiff. Dangerous. The heart suffocates.`
+	line `Keeping his trunk still. No blame.`
+	line `Keeping his jaws still. The words have order. Remorse disappears.`
+	line `Noblehearted keeping still. Good fortune.`
 }
 
 
-
-hexagram Chien (WOOD upon MOUNTAIN) {
+Chien (WOOD upon MOUNTAIN) {
 ID 53 
 meaning "Development (Gradual Progress)"
 	`This hexagram is made up of Sun (wood, penetration) above, i.e., without, and Kên (mountain, stillness) below, i.e., within. A tree on a mountain develops slowly according to the law of its being and consequently stands firmly rooted. This gives the idea of a development that proceeds gradually, step by step. The attributes of the trigrams also point to this: within is tranquillity, which guards against precipitate actions, and without is penetration, which makes development and progress possible.`
@@ -1022,16 +976,16 @@ image `On the mountain, a tree: The image of DEVELOPMENT. Thus the superior man 
 	`The tree on the mountain is visible from afar, and its development influences the landscape of the entire region. It does not shoot up like a swamp plant; its growth proceeds gradually. Thus also the work of influencing people can be only gradual. No sudden influence or awakening is of lasting effect. Progress must be quite gradual, and in order to obtain such progress in public opinion and in the mores of the people, it is necessary for the personality to acquire influence and weight. This comes about through careful and constant work on one's own moral development.`
 
 markedlines 
-	line 6 `The wild goose gradually draws near the shore. The young son is in danger. There is talk. No blame.`
-	line 6 `The wild goose gradually draws near the cliff. Eating and drinking in peace and concord. Good fortune.`
-	line 9 `The wild goose gradually draws near the plateau. The man goes forth and does not return. The woman carries a child but does not bring it forth. Misfortune. It furthers one to fight off robbers.`
-	line 6 `The wild goose goes gradually draws near the tree. Perhaps it will find a flat branch. No blame.`
-	line 9 `The wild goose gradually draws near the summit. For three years the woman has no child. In the end nothing can hinder her. Good fortune.`
-	line 9 `The wild goose gradually draws near the clouds heights. Its feathers can be used for the sacred dance. Good fortune.`
+	line `The wild goose gradually draws near the shore. The young son is in danger. There is talk. No blame.`
+	line `The wild goose gradually draws near the cliff. Eating and drinking in peace and concord. Good fortune.`
+	line `The wild goose gradually draws near the plateau. The man goes forth and does not return. The woman carries a child but does not bring it forth. Misfortune. It furthers one to fight off robbers.`
+	line `The wild goose goes gradually draws near the tree. Perhaps it will find a flat branch. No blame.`
+	line `The wild goose gradually draws near the summit. For three years the woman has no child. In the end nothing can hinder her. Good fortune.`
+	line `The wild goose gradually draws near the clouds heights. Its feathers can be used for the sacred dance. Good fortune.`
 }
 
 
-hexagram "Kuei Mei" (THUNDER upon LAKE) {
++"Kuei Mei" (THUNDER upon LAKE) {
 ID 54
 meaning "The Marrying Maiden"
 	`Above we have Chên, the eldest son, and below, Tui, the youngest daughter. The man leads and the girl follows him in gladness. The picture is that of the entrance of the girl into her husband's house. In all, there are four hexagrams depicting the relationship between husband and wife. Hsien, (INFLUENCE, 31), describes the attraction that a young couple have for each other; Hêng (DURATION, 32) portrays the permanent relationships of marriage; Chien (DEVELOPMENT 53), reflects the protracted, ceremonious procedures attending THE MARRYING MAIDEN, shows a young girl under the guidance of an older man who marries her.`
@@ -1045,17 +999,16 @@ image `Thunder over the lake: The image of THE MARRYING MAIDEN. Thus the superio
 markedlines
 	// ;_; who wrote this originally even? ;_;
 	// apparantly Kari Hohne has some more modern line interpretations... ill try to get those instead.
-	line 9 `The marrying maiden as a concubine. A lame man who is able to tread. Undertakings bring good fortune.`
-	line 9 `A one-eyed man who is able to see. The perseverance of a solitary man furthers.`
-	line 6 `The marrying maiden as a slave. She marries as a concubine.`
-	line 9 `The marrying maiden draws out the allotted time. A late marriage comes in due course.`
-	line 6 `The sovereign I gave his daughter in marriage. The embroidered garments of the princess Were not as gorgeous As those of the serving maid. The moon that is nearly full Brings good fortune. The sovereign I is T'ang the Completer. This ruler decreed that the imperial princesses should be subordinated to their husbands in the same manner as other women`
-	line 6 `The woman holds the basket, but there are no fruits in it. The man stabs the sheep, but no blood flows. Nothing that acts to further.`
+	line `The marrying maiden as a concubine. A lame man who is able to tread. Undertakings bring good fortune.`
+	line `A one-eyed man who is able to see. The perseverance of a solitary man furthers.`
+	line `The marrying maiden as a slave. She marries as a concubine.`
+	line `The marrying maiden draws out the allotted time. A late marriage comes in due course.`
+	line `The sovereign I gave his daughter in marriage. The embroidered garments of the princess Were not as gorgeous As those of the serving maid. The moon that is nearly full Brings good fortune. The sovereign I is T'ang the Completer. This ruler decreed that the imperial princesses should be subordinated to their husbands in the same manner as other women`
+	line `The woman holds the basket, but there are no fruits in it. The man stabs the sheep, but no blood flows. Nothing that acts to further.`
 }
 
 
-
-hexagram Fêng (THUNDER upon FIRE) {
+Fêng (THUNDER upon FIRE) {
 ID 55
 meaning "Abundance [Fullness]"
 	`Chên is movement; Li is flame, whose attribute is clarity. Clarity within, movement without-this produces greatness and abundance. The hexagram pictures a period of advanced civilization. However, the fact that development has reached a peak suggests that this extraordinary condition of abundance cannot be maintained permanently.`
@@ -1067,17 +1020,16 @@ image `Both thunder and lightning come: The image of ABUNDANCE. Thus the superio
 	`This hexagram has a certain connection with Shih Ho (BITING THROUGH 21), in which thunder and lightning similarly appear together, but in the reverse order. In BITING THROUGH, laws are laid down; here they are applied and enforced. Clarity [Li] within makes it possible to investigate the facts exactly, and shock [Chên] without ensures a strict and precise carrying out of punishments.`
 
 markedlines
-	line 9 `When a man meets his destined ruler, They can be together ten days, And it is not a mistake. Going meets with recognition.`
-	line 6 `The curtain is of such fullness That the polestars can be seen at noon. Through going one meets with mistrust and hate. If one rouses him through truth, Good fortune comes.`
-	line 9 `The underbrush is of such abundance That the small stars can be seen at noon. He breaks his right arm. No blame.`
-	line 9 `The curtain is of such fullness That the polestars can be seen at noon. He meets his ruler, who is of like kind.
+	line `When a man meets his destined ruler, They can be together ten days, And it is not a mistake. Going meets with recognition.`
+	line `The curtain is of such fullness That the polestars can be seen at noon. Through going one meets with mistrust and hate. If one rouses him through truth, Good fortune comes.`
+	line `The underbrush is of such abundance That the small stars can be seen at noon. He breaks his right arm. No blame.`
+	line `The curtain is of such fullness That the polestars can be seen at noon. He meets his ruler, who is of like kind.
 Good fortune.`
-	line 6 `Lines are coming, Blessing and fame draw near. Good fortune.`
-	line 6 `His house is in a state of abundance. He screens off his family. He peers through the gate And no longer perceives anyone. For three years he sees nothing. Misfortune.`}
+	line `Lines are coming, Blessing and fame draw near. Good fortune.`
+	line `His house is in a state of abundance. He screens off his family. He peers through the gate And no longer perceives anyone. For three years he sees nothing. Misfortune.`}
 
 
-
-hexagram Lü (FIRE upon MOUNTAIN) {
+Lü (FIRE upon MOUNTAIN) {
 ID 56 
 meaning "The Wanderer"
 	`The mountain, Kên, stands still; above it fire, Li, flames up and does not tarry. Therefore the two trigrams do not stay together. Strange lands and separation are the wanderer's lot. When a man is a wanderer and stranger, he should not be gruff nor overbearing. He has no large circle of acquaintances, therefore he should not give himself airs. He must be cautious and reserved; in this way he protects himself from evil. If he is obliging toward others, he wins success. A wanderer has no fixed abode; his home is the road. Therefore he must take care to remain upright and steadfast, so that he sojourns only in the proper places, associating only with good people. Then he has good fortune and can go his way unmolested.`
@@ -1086,17 +1038,16 @@ image `Fire on the mountain: The image of THE WANDERER. Thus the superior man Is
 	`When grass on a mountain takes fire, there is bright light. However, the fire does not linger in one place, but travels on to new fuel. It is a phenomenon of short duration. This is what penalties and lawsuits should be like. They should be a quickly passing matter, and must not be dragged out indefinitely. Prisons ought to be places where people are lodged only temporarily, as guests are. They must not become dwelling places.`
 
 markedlines
-	line 6 `If the wanderer busies himself with trivial things, He draws down misfortune upon himself.`
-	line 6 `The wanderer comes to an inn. He has his property with him. He wins the steadfastness of a young servant.`
-	line 9 `The wanderer's inn burns down. He loses the steadfastness of his young servant. Danger.`
-	line 9 `The wanderer rests in a shelter. He obtains his property and an ax. My heart is not glad.`
-	line 6 `He shoots a pheasant. It drops with the first arrow. In the end this brings both praise and office.`
-	line 9 `The bird's nest burns up. The wanderer laughs at first, Then must needs lament and weep. Through carelessness he loses his cow. Misfortune.`
+	line `If the wanderer busies himself with trivial things, He draws down misfortune upon himself.`
+	line `The wanderer comes to an inn. He has his property with him. He wins the steadfastness of a young servant.`
+	line `The wanderer's inn burns down. He loses the steadfastness of his young servant. Danger.`
+	line `The wanderer rests in a shelter. He obtains his property and an ax. My heart is not glad.`
+	line `He shoots a pheasant. It drops with the first arrow. In the end this brings both praise and office.`
+	line `The bird's nest burns up. The wanderer laughs at first, Then must needs lament and weep. Through carelessness he loses his cow. Misfortune.`
 }
 
 
-
-hexagram Sun (WIND upon WIND) {
+Sun (WIND upon WIND) {
 ID 57 
 meaning `The Gentle (The Penetrating, Wind)`
 	`Sun is one of the eight doubled trigrams. It is the eldest daughter and symbolizes wind or wood; it has for its attribute gentleness, which nonetheless penetrates like the wind or like growing wood with its roots. The dark principle, in itself rigid and immovable, is dissolved by the penetrating light principle, to which it subordinates itself in gentleness. In nature, it is the wind that disperses the gathered clouds, leaving the sky clear and serene. In human life it is penetrating clarity of judgment that thwarts all dark hidden motives. In the life of the community it is the powerful influence of a great personality that uncovers and breaks up those intrigues which shun the light of day.`
@@ -1108,17 +1059,16 @@ image `Winds following one upon the other: The image of THE GENTLY PENETRATING. 
 	`The penetrating quality of the wind depends upon its ceaselessness. This is what makes it so powerful; time is its instrument. In the same way the ruler's thought should penetrate the soul of the people. This too requires a lasting influence brought about by enlightenment and command. Only when the command has been assimilated by the people is action in accordance with it possible. Action without preparation of the ground only frightens and repels.`
 
 markedlines
-	line 6 `In advancing and in retreating, The perseverance of a warrior furthers.`
-	line 9 `Penetration under the bed. Priests and magicians are used in great number. Good fortune. No blame.`
-	line 9 `Repeated penetration. Humiliation.`
-	line 6 `Remorse vanishes. During the hunt Three kinds of game are caught.`
-	line 9 `Perseverance brings good fortune. Remorse vanishes. Nothing that does not further. No beginning, but an end. Before the change, three days. After the change, three days. Good fortune.`
-	line 9 `Penetration under the bed. He loses his property and his ax. Perseverance brings misfortune.`
+	line `In advancing and in retreating, The perseverance of a warrior furthers.`
+	line `Penetration under the bed. Priests and magicians are used in great number. Good fortune. No blame.`
+	line `Repeated penetration. Humiliation.`
+	line `Remorse vanishes. During the hunt Three kinds of game are caught.`
+	line `Perseverance brings good fortune. Remorse vanishes. Nothing that does not further. No beginning, but an end. Before the change, three days. After the change, three days. Good fortune.`
+	line `Penetration under the bed. He loses his property and his ax. Perseverance brings misfortune.`
 }
 
 
-
-hexagram Tui (LAKE upon LAKE) {
+Tui (LAKE upon LAKE) {
 ID 58
 meaning "The Joyous, Lake"
 	`This hexagram, like sun, is one of the eight formed by doubling of a trigram. The trigram Tui denotes the youngest daughter; it is symbolized by the smiling lake, and its attribute is joyousness. Contrary to appearances, it is not the yielding quality of the top line that accounts for joy here. The attribute of the yielding or dark principle is not joy but melancholy. However, joy is indicated by the fact that there are two strong lines within, expressing themselves through the medium of gentleness. True joy, therefore, rests on firmness and strength within, manifesting itself outwardly as yielding and gentle.`
@@ -1130,16 +1080,15 @@ image `Lakes resting one on the other: The image of THE JOYOUS. Thus the superio
 	`A lake evaporates upward and thus gradually dries up; but when two lakes are joined they do not dry up so readily, for one replenishes the other. It is the same in the field of knowledge. Knowledge should be a refreshing and vitalizing force. It becomes so only through stimulating intercourse with congenial friends with whom one holds discussion and practices application of the truths of life. In this way learning becomes many-sided and takes on a cheerful lightness, whereas there is always something ponderous and one-sided about the learning of the self-taught.`
 
 markedlines 
-	line 9 `Contented joyousness. Good fortune.`
-	line 9 `Sincere joyousness. Good fortune. Remorse disappears.`
-	line 6 `Coming joyousness. Misfortune.`
-	line 9 `Joyousness that is weighed is not at peace. After ridding himself of mistakes a man has joy.`
-	line 9 `Sincerity toward disintegrating influences is dangerous.`
-	line 6 `Seductive joyousness.`
+	line `Contented joyousness. Good fortune.`
+	line `Sincere joyousness. Good fortune. Remorse disappears.`
+	line `Coming joyousness. Misfortune.`
+	line `Joyousness that is weighed is not at peace. After ridding himself of mistakes a man has joy.`
+	line `Sincerity toward disintegrating influences is dangerous.`
+	line `Seductive joyousness.`
 }
 
-
-hexagram Huan (WIND upon WATER) { 
+Huan (WIND upon WATER) { 
 ID 59
 meaning "Dispersion [Dissolution]"
 	`Wind blowing over water disperses it, dissolving it into foam and mist. This suggests that when a man's vital energy is dammed up within him (indicated as a danger by the attribute of the lower trigram), gentleness serves to break up and dissolve the blockage.`
@@ -1151,16 +1100,15 @@ image `The wind drives over the water: The image of DISPERSION. Thus the kings o
 	`In the autumn and winter, water begins to freeze into ice. When the warm breezes of spring come, the rigidity is dissolved, and the elements that have been dispersed in ice floes are reunited. It is the same with the minds of the people. Through hardness and selfishness the heart grows rigid, and this rigidity leads to separation from all others. Egotism and cupidity isolate men. Therefore the hearts of men must be seized by a devout emotion. They must be shaken by a religious awe in face of eternity-stirred with an intuition of the One Creator of all living beings, and united through the strong feeling of fellowship experienced in the ritual of divine worship.`
 
 markedlines 
-	line 6 `He brings help with the strength of a horse. Good fortune.`
-	line 9 `At the dissolution He hurries to that which supports him. Remorse disappears.`
-	line 6 `He dissolves his self. No remorse.`
-	line 6 `He dissolves his bond with his group. Supreme good fortune. Dispersion leads in turn to accumulation. This is something that ordinary men do not think of.`
-	line 9 `His loud cries are as dissolving as sweat. Dissolution! A king abides without blame.`
-	line 9 `He dissolves his blood. Departing, keeping at a distance, going out, Is without blame.`
+	line `He brings help with the strength of a horse. Good fortune.`
+	line `At the dissolution He hurries to that which supports him. Remorse disappears.`
+	line `He dissolves his self. No remorse.`
+	line `He dissolves his bond with his group. Supreme good fortune. Dispersion leads in turn to accumulation. This is something that ordinary men do not think of.`
+	line `His loud cries are as dissolving as sweat. Dissolution! A king abides without blame.`
+	line `He dissolves his blood. Departing, keeping at a distance, going out, Is without blame.`
 }
 
-
-hexagram Chieh (WATER upon LAKE) {
+Chieh (WATER upon LAKE) {
 ID 60
 meaning "Limitation"
 	`A lake occupies a limited space. When more water comes into it, it overflows. Therefore limits must be set for the water. The image shows water below and water above, with the firmament between them as a limit. The Chinese word for limitation really denotes the joints that divide a bamboo stalk. In relation to ordinary life it means the thrift that sets fixed limits upon expenditures. In relation to the moral sphere it means the fixed limits that the superior man sets upon his actions-the limits of loyalty and disinterestedness.`
@@ -1172,16 +1120,15 @@ image `Water over lake: the image of LIMITATION. Thus the superior man Creates n
 	`A lake is something limited. Water is inexhaustible. A lake can contain only a definite amount of the infinite quantity of water; this is its peculiarity. In human life too the individual achieves significance through discrimination and the setting of limits. Therefore what concerns us here is the problem of clearly defining these discriminations, which are, so to speak, the backbone of morality. Unlimited possibilities are not suited to man; if they existed, his life would only dissolve in the boundless. To become strong, a man's life needs the limitations ordained by duty and voluntarily accepted. The individual attains significance as a free spirit only by surrounding himself with these limitations and by determining for himself what his duty is.`
 
 markedlines
-	line 9 `Not going out of the door and the courtyard Is without blame.`
-	line 9 `Not going out of the gate and the courtyard Brings misfortune.`
-	line 6 `He who knows limitation Will have cause to lament. No blame.`
-	line 6 `Contented limitation. Success.`
-	line 9 `Sweet limitation brings good fortune. Going brings esteem.`
-	line 6 `Galling limitation. Perseverance brings misfortune. Remorse disappears.`
+	line `Not going out of the door and the courtyard Is without blame.`
+	line `Not going out of the gate and the courtyard Brings misfortune.`
+	line `He who knows limitation Will have cause to lament. No blame.`
+	line `Contented limitation. Success.`
+	line `Sweet limitation brings good fortune. Going brings esteem.`
+	line `Galling limitation. Perseverance brings misfortune. Remorse disappears.`
 }
 
-
-hexagram "Chung Fu" (WIND upon LAKE) {
++"Chung Fu" (WIND upon LAKE) {
 ID 61
 meaning "Inner Truth"
 	`The wind blows over the lake and stirs the surface of the water. Thus visible effects of the invisible manifest themselves. The hexagram consists of firm lines above and below, while it is open in the center. This indicates a heart free of prejudices and therefore open to truth. On the other hand, each of the two trigrams has a firm line in the middle; this indicates the force of inner truth in the influences they present. The attributes of the two trigrams are: above, gentleness, forbearance toward inferiors; below, joyousness in obeying superiors. Such conditions create the basis of a mutual confidence that makes achievements possible. The character of fu ("truth") is actually the picture of a bird's foot over a fledgling. It suggests the idea of brooding. An egg is hollow. The light-giving power must work to quicken it from outside, but there must be a germ of life within, if life is to be awakened. Far-reaching speculations can be linked with these ideas.`
@@ -1193,16 +1140,15 @@ image `Wind over lake: the image of INNER TRUTH. Thus the superior man discusses
 	`Wind stirs water by penetrating it. Thus the superior man, when obliged to judge the mistakes of men, tries to penetrate their minds with understanding, in order to gain a sympathetic appreciation of the circumstances. In ancient China, the entire administration of justice was guided by this principle. A deep understanding that knows how to pardon was considered the highest form of justice. This system was not without success, for its aim was to make so strong a moral impression that there was no reason to fear abuse of such mildness. For it sprang not from weakness but from a superior clarity.`
 
 markedlines
-	line 9 `Being prepared brings good fortune. If there are secret designs, it is disquieting.`
-	line 9 `A crane calling in the shade. Its young answers it. I have a good goblet. I will share it with you.`
-	line 6 `He finds a comrade. Now he beats the drum, now he stops. Now he sobs, now he sings.`
-	line 6 `The moon nearly at the full. The team horse goes astray. No blame.`
-	line 9 `He possesses truth, which links together. No blame.`
-	line 9 `Cockcrow penetrating to heaven. Perseverance brings misfortune.`
+	line `Being prepared brings good fortune. If there are secret designs, it is disquieting.`
+	line `A crane calling in the shade. Its young answers it. I have a good goblet. I will share it with you.`
+	line `He finds a comrade. Now he beats the drum, now he stops. Now he sobs, now he sings.`
+	line `The moon nearly at the full. The team horse goes astray. No blame.`
+	line `He possesses truth, which links together. No blame.`
+	line `Cockcrow penetrating to heaven. Perseverance brings misfortune.`
 }
 
-
-hexagram "Hsiao Kuo" (THUNDER upon MOUNTAIN) {
+"Hsiao Kuo" (THUNDER upon MOUNTAIN) {
 ID 62
 meaning "Preponderance of the Small"
 	`While in the hexagram Ta Kuo (PREPONDERANCE OF THE GREAT 28), the strong lines preponderate and are within, inclosed between weak lines at the top and bottom, the present hexagram has weak lines preponderating, though here again they are on the outside, the strong lines being within. This indeed is the basis of the exceptional situation indicated by the hexagram. When strong lines are outside, we have the hexagram I (PROVIDING NOURISHMENT 27), or Chung Fu (INNER TRUTH, 61); neither represents and exceptional state. When strong elements within preponderate, they necessarily enforce their will. This creates struggle and exceptional conditions in general. But in the present hexagram it is the weak element that perforce must mediate with the outside world. If a man occupies a position of authority for which he is by nature really inadequate, extraordinary prudence is necessary.`
@@ -1214,16 +1160,15 @@ image `Thunder on the mountain: The image of PREPONDERANCE OF THE SMALL. Thus in
 	`Thunder on the mountain is different from thunder on the plain. In the mountains, thunder seems much nearer; outside the mountains, it is less audible than the thunder of an ordinary storm. Thus the superior man derives an imperative from this image: he must always fix his eyes more closely and more directly on duty than does the ordinary man, even though this might make his behavior seem petty to the outside world. He is exceptionally conscientious in his actions. In bereavement emotion means more to him than ceremoniousness. In all his personal expenditures he is extremely simple and unpretentious. In comparison with the man of the masses, all this makes him stand out as exceptional. But the essential significance of his attitude lies in the fact that in external matters he is on the side of the lowly.`
 
 markedlines 
-	line 6 `The bird meets with misfortune through flying.`
-	line 6 `She passes by her ancestor And meets her ancestress. He does not reach his prince And meets the official. No blame.`
-	line 9 `If one is not extremely careful, Somebody may come up from behind and strike him. Misfortune.`
-	line 9 `No blame. He meets him without passing by. Going brings danger. One must be on guard. Do not act. Be constantly persevering.`
-	line 6 `Dense clouds, No rain from our western territory. The prince shoots and hits him who is in the cave.`
-	line 6 `He passes him by, not meeting him. The flying bird leaves him. Misfortune. This means bad luck and injury.`
+	line `The bird meets with misfortune through flying.`
+	line `She passes by her ancestor And meets her ancestress. He does not reach his prince And meets the official. No blame.`
+	line `If one is not extremely careful, Somebody may come up from behind and strike him. Misfortune.`
+	line `No blame. He meets him without passing by. Going brings danger. One must be on guard. Do not act. Be constantly persevering.`
+	line `Dense clouds, No rain from our western territory. The prince shoots and hits him who is in the cave.`
+	line `He passes him by, not meeting him. The flying bird leaves him. Misfortune. This means bad luck and injury.`
 }
 
-
-hexagram "Chi Chi" (WATER upon FIRE) {
++"Chi Chi" (WATER upon FIRE) {
 ID 63
 meaning "After Completion"
 	`This hexagram is the evolution of T'ai (PEACE 11). The transition from confusion to order is completed, and everything is in its proper place even in particulars. The strong lines are in the strong places, the weak lines in the weak places. This is a very favorable outlook, yet it gives reason for thought. For it is just when perfect equilibrium has been reached that any movement may cause order to revert to disorder. The one strong line that has moved to the top, thus effecting complete order in details, is followed by the other lines. Each moving according to its nature, and thus suddenly there arises again the hexagram P'i (STANDSTILL 12). Hence the present hexagram indicates the conditions of a time of climax, which necessitate the utmost caution.`
@@ -1235,17 +1180,16 @@ image `Water over fire: the image of the condition In AFTER COMPLETION. Thus the
 	`When water in a kettle hangs over fire, the two elements stand in relation and thus generate energy (cf. the production of steam). But the resulting tension demands caution. If the water boils over, the fire is extinguished an its energy is lost. If the heat is too great, the water evaporates into the air. These elements here brought in to relation and thus generating energy are by nature hostile to each other. Only the most extreme caution can prevent damage. In life too there are junctures when all forces are in balance and work in harmony, so that everything seems to be in the best of order. In such times only the sage recognizes the moments that bode danger and knows how to banish it by means of timely precautions.`
 
 markedlines
-	line 9 `He breaks his wheels. He gets his tail in the water. No blame.`
-	line 6 `The woman loses the curtain of her carriage. Do not run after it; On the seventh day you will get it.`
-	line 9 `The Illustrious Ancestor Disciplines the Devil's Country. After three years he conquers it. Inferior people must not be employed.`
-	line 6 `The finest clothes turn to rags. Be careful all day long.`
-	line 9 `The neighbor in the east who slaughters an ox Does not attain as much real happiness As the neighbor in the west With his small offering.`
-	line 6 `He gets his head in the water. Danger.`
+	line `He breaks his wheels. He gets his tail in the water. No blame.`
+	line `The woman loses the curtain of her carriage. Do not run after it; On the seventh day you will get it.`
+	line `The Illustrious Ancestor Disciplines the Devil's Country. After three years he conquers it. Inferior people must not be employed.`
+	line `The finest clothes turn to rags. Be careful all day long.`
+	line `The neighbor in the east who slaughters an ox Does not attain as much real happiness As the neighbor in the west With his small offering.`
+	line `He gets his head in the water. Danger.`
 }
 
 
-
-hexagram "Wei Chi" (FLAME upon WATER) {
++"Wei Chi" (FLAME upon WATER) {
 ID 64
 meaning "Before Completion"
 	`This hexagram indicates a time when the transition from disorder to order is not yet completed. The change is indeed prepared for, since all the lines in the upper trigram are in relation to those in the lower. However, they are not yet in their places. While the preceding hexagram offers an analogy to autumn, which forms the transition from summer to winter, this hexagram presents a parallel to spring, which leads out of winter's stagnation into the fruitful time of summer. With this hopeful outlook the Book of Changes come to its close.`
@@ -1257,14 +1201,14 @@ image `Fire over water: The image of the condition before transition. Thus the s
 	`When fire, which by nature flames upward, is above, and water, which flows downward, is below, their effects take opposite directions and remain unrelated. If we wish to achieve an effect, we must first investigate the nature of the forces in question and ascertain their proper place. If we can bring these forces to bear in the right place, they will have the desired effect and completion will be achieved. But in order to handle external forces properly, we must above all arrive at the correct standpoint ourselves, for only from this vantage can we work correctly.`
 
 markedlines
-	line 6 `He gets his tail in the water. Humiliating.`
-	line 9 `He brakes his wheels. Perseverance brings good fortune.`
-	line 6 `Before completion, attack brings misfortune. It furthers one to cross the great water.`
-	line 9 `Perseverance brings good fortune. Remorse disappears. Shock, thus to discipline the Devil's Country. For three years, great realms are rewarded.`
-	line 6 `Perseverance brings good fortune. No remorse. The light of the superior man is true. Good fortune.`
-	line 9 `There is drinking of wine In genuine confidence. No blame. But if one wets his head, He loses it, in truth.`
+	line `He gets his tail in the water. Humiliating.`
+	line `He brakes his wheels. Perseverance brings good fortune.`
+	line `Before completion, attack brings misfortune. It furthers one to cross the great water.`
+	line `Perseverance brings good fortune. Remorse disappears. Shock, thus to discipline the Devil's Country. For three years, great realms are rewarded.`
+	line `Perseverance brings good fortune. No remorse. The light of the superior man is true. Good fortune.`
+	line `There is drinking of wine In genuine confidence. No blame. But if one wets his head, He loses it, in truth.`
 }
-
+}
 
 document
 	source_material: "iChing"

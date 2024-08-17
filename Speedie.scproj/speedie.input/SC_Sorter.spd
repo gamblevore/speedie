@@ -21,6 +21,7 @@ helper NodeSorter (SorterComparerFn)
 
 helper DeclSizeSorterRev (sortercomparerdecl)
 	return !DeclSizeSorter(a,b)
+
 helper DeclSizeSorter (sortercomparerdecl)
 	return a.DeclSizeSort < b.DeclSizeSort
 

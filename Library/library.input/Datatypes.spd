@@ -35,10 +35,6 @@ datatype int
 	function AsFloat (|float|)
 		cpp_wrapper
 
-	function IsKnown (|bool|)
-		opt inline
-		return (self & (self - 1)) == 0
-
 	function IsPow2 (|bool|)
 		opt inline
 		return (self & (self - 1)) == 0
@@ -278,11 +274,8 @@ datatype uint
 		cpp_wrapper JB_u32_RotR
 
 	function IsPow2 (|bool|)
-		cpp_wrapper JB_uint_IsPow2
-	
-	function IsKnown (|bool|)
-		return .ispow2
-
+		cpp_wrapper JB_uint_IsPow2		
+		
 	function Hash (|uint|)
 		cpp_wrapper JB_uint_hash
 	function Unhash (|uint|)
@@ -290,13 +283,6 @@ datatype uint
 	
 	function SwapEndian (|uint|)
 		cpp_Wrapper (__builtin_bswap32)
-	
-	operator tdt (|uint| belf, |bool|)
-		|| xelf = self xor belf
-		return (self&xelf) and (belf&xelf) 
-
-	operator dtf (|uint| belf, |bool|)
-		return self and ((self&belf) == belf)
 
 	operator max (|uint| other, |uint|)
 		if (self > other) { return self }
@@ -709,33 +695,41 @@ datatype uint64
 		if self < s: return self
 		return s
 	
-	function Log2 (|uint64|) // highestbit, highbit
+	function Log2 (|int64|)
 		cpp_wrapper JB_u64_Log2
 
 	function CountBits (|int|)
 		cpp_Wrapper (__builtin_popcountll)
 
-	operator rol (|uint| bits, |uint64|)
-		bits &= 63
-		return ((self << bits) ||| (self >> (64 - bits)))
+//	operator rol (|uint| bits, |uint64|)
+//		bits &= 63
+//		return ((self << bits) ||| (self >> (64 - bits)))
+//
+//	operator ror (|uint| bits, |uint64|)
+//		bits &= 63
+//		return ((self >> bits) ||| (self << (64 - bits)))
 
-	operator ror (|uint| bits, |uint64|)
-		bits &= 63
-		return ((self >> bits) ||| (self << (64 - bits)))
-
-	operator dtf (|uint64| belf, |bool|)
-		|| xelf = self xor belf
-		return (self&belf) and (!(xelf&belf))
-			
-	operator tdt (|uint64| belf, |bool|)
-		|| xelf = self xor belf
-		return (self&xelf) and (belf&xelf) 
+	function XorByte (|byte|)
+		|uint| x = (self >> 32) xor self
+		x = (x >> 16) xor x
+		x = (x >> 8) xor x
+		return x
 
 	function IsPow2 (|bool|)
 		cpp_wrapper JB_u64_IsPow2
 
-	function IsKnown (|bool|)
-		return .ispow2
+	function HighestBit (|uint64|)
+		|| l = .log2
+		if l >= 0
+			return 1<<l
+		
+	syntax access (|int| bit, |bool|)
+		return self&(1<<bit)
+
+	syntax access (|int| bit, assigns:|bool|, |uint64|)
+		|| mask = 1|uint64|<<bit
+		return (self &~ mask) ||| (value|uint64| << bit) 
+		
 	
 	iterator bits				// Get 1 bit of the original per loop
 		|| curr = self|uint64|
@@ -744,11 +738,11 @@ datatype uint64
 			yield Lowest (lowest.log2)
 			curr = curr &~ Lowest
 	
-	iterator flags
+	iterator highbits
 		|| curr = self|uint64|
 		while curr
-			|| value = curr.lowestbit
-			yield value
+			|| value = curr.highestbit
+			yield value (value.log2)
 			curr = curr &~ value
 
 	iterator

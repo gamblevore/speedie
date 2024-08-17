@@ -13,7 +13,7 @@
 #endif
 
 #define for_(count)			for (int i = 0; i < (count); i++)
-typedef u32					uSample;
+typedef u8					uSample;
 
 #define Time_(R)			TimeInit(); u32 Finish = 0; while (Data < DataEnd) { u32 Start = Time32(); for_(R)
 #define TimeEnd 			; Finish = Time32(); *Data++ = TimeDiff(Start,Finish);} TimeFinish();
@@ -75,36 +75,6 @@ extern "C" {
 #else
 	#define TIMING_IS_POOR 0
 #endif
-
-
-static bool HasTimer() {
-#if TSC==TSC_MRC  // V6 is the earliest arch that has a standard cyclecount
-	u32 pmccntr;
-	u32 pmuseren;
-	u32 pmcntenset;
-	// Read the user mode perf monitor counter access permissions.
-	asm volatile("mrc p15, 0, %0, c9, c14, 0" : "=r"(pmuseren));
-	require (pmuseren & 1);  // Allows reading perfmon counters for user mode code.
-	asm volatile("mrc p15, 0, %0, c9, c12, 1" : "=r"(pmcntenset));
-	bool Result = pmcntenset & 0x80000000ul; 
-	__asm__ __volatile__ ("mcr p15, 0, %0, c9, c12, 2" :: "r"(1<<31)); /* stop the cc */
-	return Result;  // Is it counting?
-#endif
-	return true;
-}
-
-
-bool bh_is_timer_available() {
-	// minor change.
-	if (HasTimer())
-		return true;
-	static bool UnavailMsg;
-	if (!UnavailMsg) {
-		UnavailMsg = true;
-		puts("Temporal info is not available on this device.");
-	}
-	return false;
-}
 
 
 static inline u32 Time32 () {
