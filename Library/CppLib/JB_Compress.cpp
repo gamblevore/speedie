@@ -1,7 +1,9 @@
 
 #include "JB_Compress.h"
 #include "divsufsort.h" // Runs 5x (!!) faster than a plain quicksort or even my spdsort
-
+// perhaps this is already "ready" to add my new system in?
+// I just need to put the offset writer in...
+// and the cost-detector.
 
 #define kExtend 0x70
 
@@ -101,7 +103,7 @@ struct CompState : FastBuff {
 	}
 	
 
-////////////////////////////////////////////////////// COMPRESSION ////////////////////////////////////////////////////////////
+//////////////////////////////////////////////// COMPRESSION //////////////////////////////////////////////////////
 	int AllocWrite (int Length, int MaxBits) {
 		int Over = Length >> MaxBits;
 		if (Over) {
@@ -134,9 +136,6 @@ struct CompState : FastBuff {
 	inline void WriteByte (u8 B) {
 		*Write++ = B;
 	}
-
-	// (escapelength),(offsetcount), (escapedata), (offsets), (lengths)
-	// (3)((3,4) (7, 10) (99, 4)) (abcd) (5)((3,4) (7, 10) (99, 4)) (7, 10) (99, 4)
 	
 	void EscapeOld (int NeedUpTo) {
 		int L		= LastOut;
