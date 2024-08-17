@@ -6,6 +6,7 @@ xcuserdata/
 *nogit
 *.mz
 *(ignored)*
+**/.gitignore
 
 /Library/*.jbin
 **/*.input/garbage.jb
