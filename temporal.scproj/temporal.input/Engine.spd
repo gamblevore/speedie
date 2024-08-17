@@ -87,7 +87,7 @@ class SteveMachine
 		return .byte|int|.countbits
 	
 	function Walk (|int| bits, |int| deviance, |uint64|)
-		for i in bits
+		for i in bits min 64
 			rz[i] = .step(Deviance)
 		
 	function Step (|int| deviance=141, |bool|)
