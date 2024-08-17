@@ -29,13 +29,6 @@ role Hexagram (message)
 		fs <~ self["image"].name
 		fs <~ "\n"
 		return fs	
-/*
-Sung (HEAVEN upon WATER)
-	meaning "Conflict"
-	judgement "You are sincere And are being obstructed. A cautious halt halfway brings good fortune. Going through to the end brings misfortune. It furthers one to see the great man. It does not further one to cross the great water."
-
-	image "Heaven and water go their opposite ways: The image of CONFLICT. Thus in all his transactions the superior man carefully considers the beginning."		
-*/
 
 	function LongDescription (|string|)
 		

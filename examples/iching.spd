@@ -1,0 +1,7 @@
+#!/usr/local/bin/spd
+
+import "temporal"
+main (|int| hexagrams=1)
+	for hexagrams
+		printline iChing.Divination.ShortDescription
+		printline 

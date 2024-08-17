@@ -2,11 +2,6 @@
 
 
 // we should also "ask a question" for the hexagram and use that as input!
-target !imported {
-
-main (|int| hexagrams, |string| ID="")
-	for hexagrams
+target !imported
+	main
 		printline iChing.Divination.ShortDescription
-		printline 
-
-}
