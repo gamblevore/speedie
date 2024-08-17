@@ -1,29 +1,48 @@
 
 
-class YingYang // could make this a role on message.
-	|string| Name
-	|string| Opposite
-	constructor (|message| line)
-		.name = line.name
-		.Opposite = line.firstName
+role YingYang (message)
+	function Opposite (|string|)
+		return .firstName
 	
 	module
-		|[yingyang]| _Items
+		|[yingyang]| _Items = nil
 		function States (|[yingyang]|)
-			if ._Items: return ._Items
-			._Items = rz
-			for line in DataBank.parse
-				rz <~ YingYang(line)
-	
-	
-		|| DataBank = –digest file://yingyang.jb
+			if ._Items!=nil: return ._Items
+			|| databank = –digest file://yingyang.jb
+			._Items = DataBank.parse.list
+			return ._Items	
 
 
 
+role Hexagram (message)
+	function ShortDescription (|string|)
+		|| fs = faststring()
+		fs <~ "\t\t --- "
+		fs <~ .name
+		fs <~ " ("
+		fs <~ self["meaning"].name
+		fs <~ ", "
+		.first.first.render(fs)
+		fs <~ ") ---\n"
+		fs <~ self["judgement"].name
+		fs <~ "\n\n"
+		fs <~ self["image"].name
+		fs <~ "\n"
+		return fs	
+/*
+Sung (HEAVEN upon WATER)
+	meaning "Conflict"
+	judgement "You are sincere And are being obstructed. A cautious halt halfway brings good fortune. Going through to the end brings misfortune. It furthers one to see the great man. It does not further one to cross the great water."
 
+	image "Heaven and water go their opposite ways: The image of CONFLICT. Thus in all his transactions the superior man carefully considers the beginning."		
+*/
+
+	function LongDescription (|string|)
+		
+		
 module iChing
 	|message| _DatabankMsg
-	function Tome (|message!|)
+	function Tome (|message of hexagram|)
 		|| d = ._DatabankMsg
 			return d
 		d = ( –digest file://iching.jb ).parse // what about compress? D:
@@ -31,23 +50,27 @@ module iChing
 			d = d["hexagrams"]
 		
 		d := StdErr.LastError
-		d := Message(@str, "Tome remains closed.")
+		d := .ClosedBook
 		._DatabankMsg = d
 		return d
 		
+	function ClosedBook (|message|)
+		return Message(@str, "Tome remains closed.")
+	
+	
+	function Divination (|stevemachine| machine=nil, |Hexagram|)
+		machine := SteveMachine.create(9,64K)
+		if !machine
+			return .ClosedBook
+		machine.Hash
+		|| Coins = machine.Walk(6, 9*9)
+		|| hex = .Tome[coins]
+		if !hex
+			return .ClosedBook
 
-	function DivineHexa (|stevemachine| maker=nil, |message|)
-		maker := SteveMachine.create(9,64K)$
-		
-		maker.Hash // fixes weak output, Still suffers SAME output! what on earth? is it even a time-function?
-		maker.Samples.DebugPrint
-		|| HexaCoins = maker.Walk(6, 9*9)
-		|| msg = .Tome[hexacoins]
-			msg = msg.copy
-			msg.arg.first.remove
-			|| Marks = ~maker.Walk(6, 9*9) // ~, in case bad function gives 111111
-			|| lines = msg["markedlines"]
-			for (i.highbits in marks) (x)
-				lines[x].Remove
-			return msg
-
+		rz = hex.copy
+		rz.arg.first.remove
+		|| Marks = machine.Walk(6, 9*9)
+		|| lines = rz["markedlines"]
+		for (i.highbits in marks) (x)
+			lines[x].Remove

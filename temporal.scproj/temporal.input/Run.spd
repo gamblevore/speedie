@@ -1,10 +1,12 @@
 
 
 
-// chaotic used to be better than this? try to figure out why? is it getting bad input or something?
-// like it doesnt like the number 0?
-target !imported
-	main (|int| hexagrams, |string| ID="")
-		for hexagrams
-			printline iChing.DivineHexa
-			return 0
+// we should also "ask a question" for the hexagram and use that as input!
+target !imported {
+
+main (|int| hexagrams, |string| ID="")
+	for hexagrams
+		printline iChing.Divination.ShortDescription
+		printline 
+
+}

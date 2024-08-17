@@ -34,89 +34,12 @@ typedef u8					uSample;
 
 extern "C" {
 
-#define ARM_ASM // disable ARM_ASM if its not working on android!
-//#define BAD_TIMER_EMULATION 1
-#define TSC_RD			1
-#define TSC_mach		2
-#define TSC_MRC			3
-#define TSC_MRS			4
-#define TSC_timespec	5
-
-//#define TSC TSC_timespec	// force clock_gettime
-
-#if defined(TSC)
-	// don't redefine!
-#elif defined(__i386__) || defined(__x86_64__) || defined(__amd64__)
-	#define TSC TSC_RD        	// rdtsc
-	#define TMP_IS_IOS false
-#elif defined(__APPLE__)
-	#define TSC TSC_mach		// mach_absolute_time
-#elif defined(ARM_ASM) && (__ARM_ARCH >= 6)
-	#if ( __WORDSIZE == 32 )
-		#define TSC TSC_MRC		// arm32 asm
-	#else
-		#define TSC TSC_MRS		// arm64 asm
-	#endif
-#else
-	#define TSC TSC_timespec	// clock_gettime
-#endif
+#define Time32() (u32)(RDTSC())
 
 
-#if !defined(TMP_IS_IOS)
-	#if defined(TARGET_OS_IPHONE)
-		#define TMP_IS_IOS true
-	#else
-		#define TMP_IS_IOS false
-	#endif
-#endif
-
-#if (TSC == TSC_timespec) || (TSC == TSC_MRC) || (TSC == TSC_MRS) || TMP_IS_IOS || BAD_TIMER_EMULATION
-	#define TIMING_IS_POOR 1
-#else
-	#define TIMING_IS_POOR 0
-#endif
-
-
-static inline u32 Time32 () {
-#if TSC == TSC_RD
-	u64 rax;
-	asm volatile ( "rdtscp\n" : "=a" (rax));
-	#if BAD_TIMER_EMULATION
-		return ((u32)rax)&~(511);
-	#endif
-	return (u32)rax;
-#elif TSC == TSC_mach
-	return (u32)mach_absolute_time(); // poor on iOS
-#elif TSC == TSC_MRC
-	volatile u32 cc;
-	__asm__ __volatile__ ("mrc p15, 0, %0, c9, c13, 0" : "=r"(cc));
-	return cc;
-#elif TSC == TSC_MRS
-	int64_t virtual_timer_value;
-	asm volatile("mrs %0, cntvct_el0" : "=r"(virtual_timer_value));
-	return (u32)virtual_timer_value;
-#else
-	// GIVES POOR TIMINGS! I DON't KNOW WHY.
-	// But... the graphical view looks bad using clock_gettime.
-	struct timespec TimeData;
-	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &TimeData);
-	return (u32)(TimeData.tv_nsec);
-#endif
-}
-
-
-static inline void TimeFinish () {
-#if (TSC == TSC_MRC)
-	__asm__ __volatile__ ("mcr p15, 0, %0, c9, c12, 2" :: "r"(1<<31)); /* stop the cc */
-#endif
-}
+static inline void TimeFinish () {}
 
 static inline int TimeInit () {
-#if (TSC == TSC_MRC)
-	__asm__ __volatile__ ("mcr p15, 0, %0, c9, c12, 2" :: "r"(1<<31)); /* stop the cc */
-	__asm__ __volatile__ ("mcr p15, 0, %0, c9, c12, 0" :: "r"(5));     /* initialize */
-	__asm__ __volatile__ ("mcr p15, 0, %0, c9, c12, 1" :: "r"(1<<31)); /* start the cc */
-#endif
 	auto A = Time32();
 	while (1) {
 		auto B = Time32();
@@ -129,10 +52,6 @@ static inline int TimeInit () {
 static int TimeDiff (s64 A, s64 B) {
 	s64 D = B - A;
 	return (int)D;
-}
-
-bool TimingIsPoor() {
-	return TIMING_IS_POOR;
 }
 
 
@@ -232,71 +151,6 @@ Gen(Memory) {
 }
 
 
-
-Gen(SlowFloatSame) {
-	const float x0 = Input + 1;
-	const float y0 = Input + 1;
-	float x = 0;
-	float y = 0;
-	SlowTime_ (Reps)
-		y = y0 + 1000.5;
-		x = x0 / 2.0;
-		x += y;
-	SlowTimeEnd
-	
-	return x;
-}
-
-
-Gen(SlowTime) {
-	u32 x = Input;
-	SlowTime_ (Reps)
-		x = x xor Time32();
-	SlowTimeEnd
-
-	return x;
-}
-
-
-Gen(SlowBool) {
-	bool f = (Input == 0);
-	bool t = (((int)Input) < 1);
-	
-	SlowTime_ (Reps)
-		f = f and t;
-		t = t or f;
-	SlowTimeEnd
-	
-	return f;
-}
-
-
-Gen(SlowBitOps) {
-	u64 x = Input + 1;
-	u64 y = Input + 1;
-	SlowTime_ (Reps)
-		y = y + 981723981723;
-		x = x xor (y << 63);
-	SlowTimeEnd
-	
-	return x;
-}
-
-
-
-Gen(SlowAtomic) {
-	ax = Input + 1;
-	ay = Input + 1;
-	SlowTime_ (Reps) {
-		ay = ay + 981723981723;
-		ax = ax xor (ay << 63);
-	} SlowTimeEnd
-	
-	return ax;
-}
-
-
-
 Gen(SlowPlus) {
 	int x = Input + 1;
 	SlowTime_ (Reps) {
@@ -304,26 +158,6 @@ Gen(SlowPlus) {
 	} SlowTimeEnd
 	
 	return x;
-}
-
-
-Gen(SlowXOR) {
-	int x = Input + 1;
-	SlowTime_ (Reps) {
-		x = x ^ (int)981723981723;
-	} SlowTimeEnd
-	
-	return x;
-}
-
-
-Gen(SlowFmin) {
-	float f = -(Input + 1);
-	SlowTime_ (Reps) {
-		f = fminf(f, 0);
-	} SlowTimeEnd
-	
-	return f;
 }
 
 
@@ -450,15 +284,6 @@ JB_TemporalGenerator TmpGenList[] = {
 	{	MemoryGenerator,		"memory",	10	},
 	{	TimeGenerator,			"time",		10	},
 	{	ChaoticGenerator,		"chaotic",	10	},
-#if TIMING_IS_POOR
-	{	SlowFloatSameGenerator,	"floatARM",	0	},
-	{	SlowXORGenerator,		"xorARM",	0	},
-	{	SlowFminGenerator,		"fminARM",	0	},
-	{	SlowBoolGenerator,		"boolARM",	0	},
-	{	SlowAtomicGenerator,	"atomicARM",0	}, // not slower!
-	{	SlowTimeGenerator,		"timeARM",	0	},
-	{	SlowBitOpsGenerator,	"bitopsARM",0	},
-#endif
 	{	SlowPlusGenerator,		"plusARM",	0	},
 	{	SlowMemoryGenerator,	"memoryARM",0	},
 };

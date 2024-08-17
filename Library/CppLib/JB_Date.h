@@ -27,25 +27,20 @@ inline u64 RDTSC() {
 	__asm__ volatile ("rdtsc" : "=A" (x));
 	return x;
 }
+#elif (__ARM_ARCH >= 6) && ( __WORDSIZE == 64 )
+inline u64 RDTSC(void) {
+    u64 val;
+    asm volatile("mrs %0, cntvct_el0" : "=r" (val));
+    return val;
+}
 #else
+
 #include <chrono>
-inline u64 RDTSC() {
+inline u64 RDTSC() { // this can't be good!
 	return static_cast<int64>(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
 
 }
 #endif
-
-/* // could this work?
-// SPDX-License-Identifier: GPL-2.0
-u64 rdtsc(void)
-{
-    u64 val;
-
-    asm volatile("mrs %0, cntvct_el0" : "=r" (val));
-
-    return val;
-}
-*/
 
 #endif
 

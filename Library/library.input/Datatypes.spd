@@ -564,6 +564,7 @@ datatype hfloat
 
 datatype Float64 (f64)		// should be the proper name...
 datatype Float16 (hfloat)	// also.
+	processas float			// should be inherited!
 
 
 datatype int64

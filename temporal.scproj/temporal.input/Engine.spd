@@ -61,7 +61,7 @@ class SteveMachine
 		|| p = .Samples.ptr
 		|| n = .Samples.Capacity
 		for i in n
-			H = (H xor i).Hash
+			H = (H xor p[i]).Hash
 		
 		for i in n
 			p[i] = H.xorbyte
