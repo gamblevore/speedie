@@ -281,7 +281,7 @@ function message.ConstIntValueSub (|SCNode| name_space, |&int64| v, |bool|)
 		v[] = s.int
 		return true
 	if (s == @thg) and s.name[0,"syx"]
-		|| find = _syxdict_.valuelower(s.name[3...])
+		|| find = jeebox._syxdict.valuelower(s.name[3...])
 			v[] = find.id|int64|
 			s.become(@num, v[].render)
 			return true

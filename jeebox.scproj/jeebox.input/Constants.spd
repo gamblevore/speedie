@@ -6,8 +6,9 @@
 
 
 
-
 Module Jeebox
+	|SyntaxObj[64]|             _FuncArray
+	|Dictionary of SyntaxObj|	_SyxDict = Dictionary.New
 	linkage
 		cpp_part Constants
 	

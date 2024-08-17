@@ -64,7 +64,7 @@ datatype Syntax (Byte)
 		return "child"
 	
 	function Obj (|syntaxobj|) 
-		return _FuncArray_[self|int|]
+		return jeebox._FuncArray[self|int|]
 	
 	
 	function Msg ( |string| name="", |Message| ) 
@@ -103,15 +103,15 @@ datatype Syntax (Byte)
 		function Func (|string?| name, |message| where=nil, |syntax|)
 			visible
 			if name!=nil
-				|| obj = _syxdict_.valuelower(name) #expect (where, "Unknown syntax " + name)
+				|| obj = jeebox._syxdict.valuelower(name) #expect (where, "Unknown syntax " + name)
 				return obj.id
 			
 		function StdNew (|fpMsgRender| msg, |string|name, |String| LongName, |int| ID,  |Syntax|) 
 			|| result = Syntaxobj.new(msg, name, ID)
-			_syxdict_[name] = result
-			_Funcarray_[ID] = result
+			jeebox._syxdict[name] = result
+			jeebox._Funcarray[ID] = result
 			if (LongName)
-				_syxdict_[LongName] = result
+				jeebox._syxdict[LongName] = result
 				result.LongName = LongName
 			  else
 				result.LongName = Name

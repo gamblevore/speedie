@@ -278,7 +278,7 @@ struct jbobject {int RefCount;};
 		fs <~ "\n\n\t\t// Jeebox Syntax\n\n"
 		for (s in Compiler.SyxArray)
 			|| slower = s.lowercase
-			|| id = _syxdict_[slower]!.id|int|
+			|| id = jeebox._syxdict[slower]!.id|int|
 			fs <~ "#define JB_Syx$s $id;\n"
 			fs <~ "#define \$$slower $id\n"
 	

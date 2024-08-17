@@ -4,16 +4,16 @@
 */
 
 
-|Dictionary of SyntaxObj|	_SyxDict_ = Dictionary.New  // must be at root. compiler init order.
-|SyntaxObj[64]|             _FuncArray_					// what if these were moved into jeebox module? seems good?
-
-
 
 class Message (list)
 	linkage
 		cpp_part Msg
 		visible true
 
+	description "The Message class is used like this: First you parse a string to create a tree of nodes.
+
+After that, you now have a tree-data-structure that represents your data. The Message class is similar to XML or JSON or even a sourcecode-AST. But superior to all of them.
+	"
 ////////////////////////////////
 	contains Message
 	|string|				Name
@@ -1183,7 +1183,7 @@ class Message (list)
 
 
 		function GetFunc (|Message| msg, |Syntaxobj|)
-			return _syxdict_.Syntax( msg.name )   #expect (msg, "Can’t find syntax: ${msg.name}")
+			return jeebox._syxdict.Syntax( msg.name )   #expect (msg, "Can’t find syntax: ${msg.name}")
 
 
 
