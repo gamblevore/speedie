@@ -276,6 +276,8 @@ function SortProperties
 		// we could just sort this... a plain simple sort by size... then grab whatever
 		// sized parts that canfind from what we need. like first get all the smallest ones...
 		// unless it leads to unaligned stuff. etc etc.
+		// only necessary for objects over 128 values big (defined in my ASM via Read_Lu)
+		// so... 128 bytes, 128 u16s, 128 uint32s etc...
 		if Aligner
 			(Aligner isnt biggest)
 

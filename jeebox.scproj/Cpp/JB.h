@@ -412,8 +412,8 @@ struct DataObject_Behaviour: Object_Behaviour {
 };
 
 JBClass ( DTWrap , JB_Object , 
-	int64 PrivValue;
 	DataTypeCode DataType;
+	int64 PrivValue;
 	byte DeathAction;
 );
 
@@ -495,8 +495,8 @@ struct StringFields_Behaviour: Object_Behaviour {
 };
 
 JBClass ( StringFields , JB_Object , 
-	JB_String* Data;
 	byte Sep;
+	JB_String* Data;
 );
 
 struct StringReader_Behaviour: Object_Behaviour {
@@ -516,11 +516,11 @@ struct SyntaxObj_Behaviour: Object_Behaviour {
 };
 
 JBClass ( SyntaxObj , JB_Object , 
+	Syntax ID;
 	JB_String* Name;
 	JB_String* LongName;
-	Syntax ID;
-	FP_fpMsgRender ExportAddr;
 	FP_fpMsgRender RenderAddr;
+	FP_fpMsgRender ExportAddr;
 );
 
 struct TokenHandler_Behaviour: Object_Behaviour {

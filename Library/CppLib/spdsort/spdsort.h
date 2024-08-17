@@ -1,5 +1,5 @@
 
-// spdsort.cpp  http://gamblevore.org, by theodore h. smith, public domain software
+// spdsort.h  http://gamblevore.org, by theodore h. smith, public domain software
 // basically... just testing some sorting algorithms...
 
 // my spdsort is like a normal quicksort, but it has better characteristics:
@@ -9,9 +9,9 @@
 	// 4) Code is available and not too big. (unlike C++ sort)
 	// 5) Only calls the compare function once... this is important for very slow compare functions. C++ sort calls it twice per-pair of items.
 	// 6) It doesn't use a garbage design for the return value. It uses an int, which can store equal, less or more. C++'s sort uses a BOOL. Which... its just not right. If you are depth-sorting some objects, it can lead to flicker as equally distant objects will flicker onscreen.
+	// 7) Actually you are free to return a bool or int! My sorter checks if your return value is <= 0. This is true for 0, but not for 1.
 
-// you'll have to modify this yourself to be useful, of course.
-// How to test this on suffix arrays... not sure how?
+// You'll have to modify this yourself to be useful, of course.
 
 
 #ifndef __spdsort_type__
