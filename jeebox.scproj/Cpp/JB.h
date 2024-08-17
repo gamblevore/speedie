@@ -425,14 +425,14 @@ struct ErrorReceiver_Behaviour: Object_Behaviour {
 
 JBClass ( JB_ErrorReceiver , JB_Object , 
 	int MaxErrors;
+	JB_String* Source;
 	JB_Object* _LogObj;
 	JB_Error* Errors;
-	JB_String* Source;
+	int LowerErrorsTo;
 	int MaxProblems;
 	int ErrorCount;
-	int ProblemCount;
 	int WarnCount;
-	int LowerErrorsTo;
+	int ProblemCount;
 	bool BlockErrors;
 	FP_fnErrorLogger _LogFunc;
 );
@@ -444,9 +444,9 @@ struct FlowControl_Behaviour: Object_Behaviour {
 };
 
 JBClass ( FlowControl , JB_Object , 
+	FastString* Excuse;
 	StringReader* ReadInput;
 	FastString* Write;
-	FastString* Excuse;
 	FastBuff Buff;
 );
 
@@ -465,8 +465,8 @@ JBClass ( MWrap , JB_Object ,
 	int Capacity;
 	byte* _Ptr;
 	int Length;
-	u16 ItemSize;
 	DataTypeCode DataType;
+	u16 ItemSize;
 	byte DeathAction;
 );
 
@@ -484,8 +484,8 @@ struct Selector_Behaviour: Object_Behaviour {
 
 JBClass ( Selector , JB_Object , 
 	int ID;
-	JB_String* Name;
 	Selector* Next;
+	JB_String* Name;
 );
 
 struct String_Behaviour: Object_Behaviour {
@@ -504,10 +504,10 @@ struct StringReader_Behaviour: Object_Behaviour {
 
 JBClass ( StringReader , JB_Object , 
 	int Length;
-	JB_File* File;
 	JB_Object* UserObj;
-	int ChunkSize;
+	JB_File* File;
 	int StartFrom;
+	int ChunkSize;
 	bool _NoMoreChunks;
 	FastBuff Data;
 );
@@ -550,20 +550,20 @@ struct Message_Behaviour: list_Behaviour {
 JBClass ( Message , JB_List , 
 	JB_String* Name;
 	JB_Object* Obj;
+	u16 Tag;
 	u16 RangeLength;
 	MsgParseFlags Flags;
-	u16 Tag;
-	byte Indent;
 	Syntax Func;
+	byte Indent;
 );
 
 struct SaverClassInfo_Behaviour: Array_Behaviour {
 };
 
 JBClass ( SaverClassInfo , Array , 
-	JB_Class* Cls;
-	SaverClassInfo* NextInfo;
 	char* Data;
+	SaverClassInfo* NextInfo;
+	JB_Class* Cls;
 );
 
 struct Task_Behaviour: list_Behaviour {
@@ -579,14 +579,14 @@ struct Error_Behaviour: Message_Behaviour {
 };
 
 JBClass ( JB_Error , Message , 
+	Date When;
 	JB_String* Path;
 	JB_String* OriginalData;
 	JB_String* StackTrace;
-	double Progress;
 	Message* Node;
-	Date When;
-	ErrorSeverity Severity;
+	double Progress;
 	ErrorFlags ErrorFlags;
+	ErrorSeverity Severity;
 );
 extern Message* JB__App__Conf;
 extern Array* JB__App__OldArgs;
@@ -1587,7 +1587,7 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, 
 // SorterComparer
 
 
-// SorterComparer2
+// SorterComparerBool
 
 
 // SorterComparerMsg

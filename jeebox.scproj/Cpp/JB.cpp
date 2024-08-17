@@ -3623,13 +3623,13 @@ JB_ErrorReceiver* JB_Rec_Constructor(JB_ErrorReceiver* Self) {
 	if (Self == nil) {
 		Self = ((JB_ErrorReceiver*)JB_NewClass(&JB_ErrorReceiverData));
 	}
-	Self->_LogObj = nil;
 	JB_StringC* _tmPf1 = JB_LUB[0];
 	Self->Source = JB_Incr(_tmPf1);
-	Self->ErrorCount = 0;
-	Self->ProblemCount = 0;
-	Self->WarnCount = 0;
+	Self->_LogObj = nil;
 	Self->LowerErrorsTo = 0;
+	Self->ErrorCount = 0;
+	Self->WarnCount = 0;
+	Self->ProblemCount = 0;
 	Self->BlockErrors = false;
 	Self->_LogFunc = nil;
 	JB_Error* _tmPf0 = JB_Err_ConstructorNothing(nil);
@@ -3641,9 +3641,9 @@ JB_ErrorReceiver* JB_Rec_Constructor(JB_ErrorReceiver* Self) {
 }
 
 void JB_Rec_Destructor(JB_ErrorReceiver* Self) {
+	JB_Clear(Self->Source);
 	JB_Clear(Self->_LogObj);
 	JB_Clear(Self->Errors);
-	JB_Clear(Self->Source);
 }
 
 void JB_Rec_Incr(JB_ErrorReceiver* Self, JB_Error* Err, bool Add) {
@@ -4004,9 +4004,9 @@ void JB_Flow_Destructor(FlowControl* Self) {
 	}
 	JB_MzSt_Print((&JB__Flow_Stats), true);
 	JB_MzSt_Clear((&JB__Flow_Stats));
+	JB_Clear(Self->Excuse);
 	JB_Clear(Self->ReadInput);
 	JB_Clear(Self->Write);
-	JB_Clear(Self->Excuse);
 	JB_FastBuff_Destructor((&Self->Buff));
 }
 
@@ -4267,8 +4267,8 @@ void JB_Sav_SaveWrite(Saveable* Self, ObjectSaver* Saver) {
 
 
 void JB_Sel_Destructor(Selector* Self) {
-	JB_Clear(Self->Name);
 	JB_Clear(Self->Next);
+	JB_Clear(Self->Name);
 }
 
 
@@ -4930,10 +4930,10 @@ StringReader* JB_SS_Constructor(StringReader* Self, JB_String* Data) {
 		Self = ((StringReader*)JB_NewClass(&StringReaderData));
 	}
 	Self->Length = 0;
-	Self->File = nil;
 	Self->UserObj = nil;
-	Self->ChunkSize = 0;
+	Self->File = nil;
 	Self->StartFrom = 0;
+	Self->ChunkSize = 0;
 	Self->_NoMoreChunks = false;
 	Self->Data = ((FastBuff){});
 	JB_SS_Reset(Self, Data);
@@ -7313,8 +7313,8 @@ JB_Error* JB_Err_ConstructorNothing(JB_Error* Self) {
 	Self->OriginalData = JB_Incr(_tmPf1);
 	JB_StringC* _tmPf0 = JB_LUB[0];
 	Self->StackTrace = JB_Incr(_tmPf0);
-	Self->Progress = 0.0f;
 	Self->Node = nil;
+	Self->Progress = 0.0f;
 	Self->ErrorFlags = 0;
 	Self->Position = -1;
 	Self->Severity = kJB__ErrorSeverity_OK;
@@ -7876,7 +7876,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024080923);
+	return (2024081712);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -7888,4 +7888,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 7796578953066441599 -6167232841316557568 920410641272458315
+// 7796578953066441599 8496877497591036092 920410641272458315

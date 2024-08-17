@@ -707,6 +707,11 @@ struct FatASM {
 	byte JumpReg;
 };
 
+struct IntDownRange {
+	int From;
+	int To;
+};
+
 struct IsaTester {
 	Message* Items[4];
 	int Count;
@@ -804,8 +809,8 @@ struct CppRefs_Behaviour: Object_Behaviour {
 };
 
 JBClass ( CppRefs , JB_Object , 
-	Array* Disturbs;
 	u16 DisturbParams;
+	Array* Disturbs;
 	bool Owned;
 );
 
@@ -828,8 +833,8 @@ struct DataObject_Behaviour: Object_Behaviour {
 };
 
 JBClass ( DTWrap , JB_Object , 
-	int64 PrivValue;
 	DataTypeCode DataType;
+	int64 PrivValue;
 	byte DeathAction;
 );
 
@@ -870,12 +875,12 @@ struct Instruction_Behaviour: Object_Behaviour {
 };
 
 JBClass ( Instruction , JB_Object , 
+	byte aType;
 	JB_String* Name;
 	xC2xB5Form* Sizes;
 	JB_String* FormName;
-	byte aType;
-	byte OpCode;
 	byte PCount;
+	byte OpCode;
 );
 
 struct LeakTester_Behaviour: Object_Behaviour {
@@ -890,9 +895,9 @@ struct Macro_Behaviour: Object_Behaviour {
 };
 
 JBClass ( Macro , JB_Object , 
+	bool Cleaned;
 	Message* _Parsed;
 	JB_String* Input;
-	bool Cleaned;
 );
 
 struct Memory_Behaviour: Object_Behaviour {
@@ -977,10 +982,10 @@ struct SCParamArray_Behaviour: Object_Behaviour {
 };
 
 JBClass ( SCParamArray , JB_Object , 
-	Message* Exp;
-	SCClass* Cls;
-	s16 ErrCount;
 	s16 Size;
+	SCClass* Cls;
+	Message* Exp;
+	s16 ErrCount;
 	bool AllowSelfToConstructor;
 	bool Found;
 	bool HasSide;
@@ -1015,8 +1020,8 @@ struct StringFields_Behaviour: Object_Behaviour {
 };
 
 JBClass ( StringFields , JB_Object , 
-	JB_String* Data;
 	byte Sep;
+	JB_String* Data;
 );
 
 struct StringReader_Behaviour: Object_Behaviour {
@@ -1036,11 +1041,11 @@ struct SyntaxObj_Behaviour: Object_Behaviour {
 };
 
 JBClass ( SyntaxObj , JB_Object , 
+	Syntax ID;
 	JB_String* Name;
 	JB_String* LongName;
-	Syntax ID;
-	FP_fpMsgRender ExportAddr;
 	FP_fpMsgRender RenderAddr;
+	FP_fpMsgRender ExportAddr;
 );
 
 struct TerminalCell_Behaviour: Object_Behaviour {
@@ -4269,6 +4274,8 @@ Message* JB_int_Msg(int Self);
 
 int JB_int_OperatorAlign(int Self, int To);
 
+void JB_int_OperatorDownto(int Self, int Other, IntDownRange* Rz);
+
 bool JB_int_OperatorIsa(int Self, uint N);
 
 int JB_int_OperatorMax(int Self, int Other);
@@ -7280,7 +7287,7 @@ bool JB_Str_Yes(JB_String* Self, Message* Where);
 
 JB_String* JB_Str__FromPico(PicoMessage* M);
 
-bool JB_Str__Sorter(JB_Object* A, JB_Object* B);
+int JB_Str__Sorter(JB_Object* A, JB_Object* B);
 
 JB_StringC* JB_Str__Wrap(_cstring Addr);
 

@@ -190,12 +190,17 @@ class Array (saveable)
 
 
 prototype SorterComparerBool (|object| a, |object| b, |bool|)
+	description "This prototype is deprecated. Use sorterComparer instead." 
 	function sort (|array| a)
 		a.sort(self)
 
-prototype SorterComparer (|object| a, |object| b, |int|) // we have two list sort funcs... need to remove one
+
+prototype SorterComparer (|object| a, |object| b, |int|)
+	function sort (|array| a)
+		a.sort(self)
 	
-function @string.Sorter (SorterComparerBool)
-	return a|string|  <  b|string|
+
+function @string.Sorter (SorterComparer)
+	return b|string|.syntaxcompare(a|string|, false)
 	
 

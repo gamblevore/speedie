@@ -255,32 +255,27 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 
 function SortPropHelper (|scdecl|)
 	opt norefcounts
-	require .isobject
-	|| s = .Super
-//	|| Align = 4
-	if s != TypeObject
-		return nil
-//		Align = s.Size mod 8
-//	require Align
-//	|| Missing = 8 - Align
-//
-//	|[scdecl]| New = Array()
-// OK so... if its off by 1... we still want to "make up" the missing properties
-// honestly it seems like what we really want is just a plain simple "Grabber"
-// meaning we need to make a new array! how else to grab items?
-// even then... its not so simple. we need to mark the new array... items as removed
-// and sort them after.
-
-	for p in .Properties
-		if p.declsize == 4
-			(p is biggest)
-			return p
+	require .isobject and .Super == TypeObject
+		
+	for i in 4 downto 1
+		for p in .Properties
+			if p.declsize == i
+				(p is biggest)
+				return p
 
 
 function SortProperties
 	if (self is SortsProperties) and (!.iswrapper) and !.isrole
 		|| Aligner = .SortPropHelper
 		.Properties.sort(DeclSizeSorterRev)
+		// in theory its better the other way around, with smaller ones first
+		// however, it can introduce gaps. For big objects where the properties
+		// are harder to reach, it would make code smaller if we put the smaller
+		// items first, however. We could put smaller ones first as long as
+		// it doesn't introduce gaps... its also a possibility.
+		// we could just sort this... a plain simple sort by size... then grab whatever
+		// sized parts that canfind from what we need. like first get all the smallest ones...
+		// unless it leads to unaligned stuff. etc etc.
 		if Aligner
 			(Aligner isnt biggest)
 
