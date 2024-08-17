@@ -14,7 +14,7 @@ class Error (Message)
 	|String|				Path
 	|String|				OriginalData
 	|String|				StackTrace
-	|f64|					Progress // for long operations where you want to know how far you have gone before getting an error.
+	|Float64|				Progress // for long operations where you want to know how far you have gone before getting an error.
 	|message?|				Node
 	|date|					When
 	|ErrorSeverity|			Severity

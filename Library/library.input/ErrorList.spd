@@ -212,7 +212,7 @@ class ErrorReceiver
 
 
 	module
-		|f64|		Progress
+		|Float64|		Progress
 		function OutOfMemory (|bool|)
 			cpp_Wrapper JB_OutOfMemoryOccurred
 			

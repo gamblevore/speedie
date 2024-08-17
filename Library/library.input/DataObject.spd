@@ -45,7 +45,7 @@ class DataObject
 		if (self) {return .privvalue}
 	
 	
-	function FloatValue (|f64|)
+	function FloatValue (|Float64|)
 		if (self) {return .privvalue.asfloat}
 
 
@@ -66,7 +66,7 @@ class DataObject
 			fs <~ .PrivValue
 
 	module
-		function NewFloat (|f64| v, |Dataobject|)
+		function NewFloat (|Float64| v, |Dataobject|)
 			rz = DataObject(true) 
 			rz.datatype = datatypecode.f64
 			rz.PrivValue = v.AsInt

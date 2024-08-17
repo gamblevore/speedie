@@ -355,7 +355,7 @@ function SetRel	(fn_asm)
 //	// mybool = MyFloat
 //	|| mybool = false
 //	|| myfloat = 1.0
-//	|f64| mydouble
+//	|Float64| mydouble
 //	mybool = 1.0
 //	mybool = myfloat
 //	mydouble = myfloat
@@ -489,7 +489,7 @@ function IncrAmount (|asmreg| upon, |int| IsSubtract, |scdecl| D,  |int64|)
 		if upon.FourBytes
 			rz = rz|float|.asint
 		  else
-			rz = rz|f64|.asint
+			rz = rz|Float64|.asint
 	  elseif D.TypeSuffers
 		rz *= D.PointerIncrement
 
@@ -660,7 +660,7 @@ function FatASM.FloatConvConst (|&FatASM| src, |int| DestBitSize)
 	|| f = (&src.Const)|&nil|
 	|| d = (&.Const)|&nil|
 	if DestBitSize == 64			// f32 to f64
-		d|&f64|[]   = f|&float|[]|f64|
+		d|&f64|[]   = f|&float|[]|Float64|
 	  elseif DestBitSize == 32		// f64 to f32
 		d|&float|[] = f|&f64|[]|float|
 	  else
@@ -677,12 +677,12 @@ function FatASM.FloatIntConvConst (|&FatASM| fat, |datatypecode| src, |datatypec
 			if dbc == 4
 				(d|&float|)[] = v|float|				// i to f32
 			  else
-				(d|&f64|)[] = v|f64|					// i to f64
+				(d|&f64|)[] = v|Float64|					// i to f64
 		  else
 			if dbc == 4
 				(d|&float|)[] = v|uint64||float|		// u to f32
 			  else
-				(d|&f64|)[] = v|uint64||f64|			// u to f64
+				(d|&f64|)[] = v|uint64||Float64|			// u to f64
 	  else
 		|| i = d|&int64|
 		|| u = d|&uint64|

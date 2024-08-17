@@ -65,7 +65,7 @@ helper @string.MainArg      (|int| Pos, |string| name, |string|)
 helper @message.MainArg     (|int| Pos, |string| name, |message|)
 	return string.MainArgSub(Pos, name, "jeebox")$.parse
 
-helper @float.MainArg       (|int| Pos, |string| name, |f64|)
+helper @float.MainArg       (|int| Pos, |string| name, |Float64|)
 	return string.MainArgSub(Pos, name, "float")$.float
 
 helper @file.MainArg		(|int| Pos, |string| name, |file|)
@@ -108,7 +108,7 @@ helper @string.MainArgSub (|int| Pos,  |string| name,  |string| type,  |stringth
 
 helper @FileSizeInt.MainArg (|int| Pos, |string| name,  |FileSizeInt|)
 	|| size = string.MainArgSub(Pos, name, "file-size")$
-	|f64| Mul = 1.0
+	|Float64| Mul = 1.0
 	|| T = size.length-2
 	if size endswith "kb"
 		mul = 1.0KB

@@ -1052,7 +1052,8 @@ class SCDecl (SCNamed) {
 		
 		|| Cast = kTypeCastTrue
 		cast |= kTypeCastBothWays * !side
-		cast |= kTypeCastSetToMemory * (self isnt local) // float conversion...
+		if  self isnt local  or  o isnt local
+			cast |= kTypeCastSetToMemory // float conversion...
 		
 		.ExpectMatch( O, Cast, exp, ErrNode )
 				

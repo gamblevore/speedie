@@ -77,9 +77,9 @@ module Math
 		cpp_wrapper (abs)
 	
 	function int.Sqrt (|int|)
-		return (self|f64|.sqrt)|int|
+		return (self|Float64|.sqrt)|int|
 	
-	function f64.Sqrt (|f64|)
+	function f64.Sqrt (|Float64|)
 		cpp_wrapper (sqrt)
 	
 	function float.Gaussian (|float| v, |float|)
@@ -215,7 +215,7 @@ extend ivec2
 
 
 extend f64
-	function Negate (|bool| b, |f64|)
+	function Negate (|bool| b, |Float64|)
 		if (b)
 			return -self
 		return self

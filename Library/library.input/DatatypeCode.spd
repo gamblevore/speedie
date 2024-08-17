@@ -27,7 +27,7 @@ datatype DataTypeCode (uint16)
 		iVec2   = 1 + 32 + 64 + 0   + 8
 		iVec3   = 2 + 32 + 64 + 0   + 8
 		iVec4   = 3 + 32 + 64 + 0   + 8
-		HFloat  = 0 + 16 + 64 + 128 + 8
+		Float16  = 0 + 16 + 64 + 128 + 8
 		Float   = 0 + 32 + 64 + 128 + 8
 		Double  = 0 + 48 + 64 + 128 + 8
 		Vec2	= 1 + 32 + 64 + 128 + 8
@@ -38,6 +38,8 @@ datatype DataTypeCode (uint16)
 		UInt	= 0 + 32 + 0  + 0   + 8
 		bool	= 256
 		u32	 = uint
+
+		HFloat = Float16
 		s64	 = int64
 		u64	 = uint64
 		f64	 = double

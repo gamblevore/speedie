@@ -1086,18 +1086,18 @@ After that, you now have a tree-data-structure that represents your data. The Me
 				return F.name.ParseHex(StrStart, F)
 			|| mul = f.name.ParseFloat
 			if self == 'K'
-				mul *= 1K|f64|
+				mul *= 1K|Float64|
 			  elseif self == "M"
-				mul *= 1M|f64|
+				mul *= 1M|Float64|
 			  elseif self == "G"
-				mul *= 1G|f64|
+				mul *= 1G|Float64|
 			  else
 				error (self, "Invalid unit")
 				mul = 0.0
 			return mul|int64|
 			
 
-	function Float (|f64|)
+	function Float (|Float64|)
 		if self
 			return .name.ParseFloat(self)
 

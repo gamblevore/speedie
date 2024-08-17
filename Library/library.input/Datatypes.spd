@@ -523,22 +523,22 @@ datatype f64
 	function AsInt (|int64|)
 		cpp_wrapper
 
-	function Floor (|f64|)
+	function Floor (|Float64|)
 		cpp_wrapper (floor)
 	
-	function Fract (|f64|)
+	function Fract (|Float64|)
 		return self - .floor
 	
-	operator pow (|f64| other, |f64|)
+	operator pow (|Float64| other, |Float64|)
 		cpp_wrapper (pow)
 
-	function Abs (|f64|)
+	function Abs (|Float64|)
 		cpp_wrapper (fabs)
 
-	operator max (|f64| other, |f64|)
+	operator max (|Float64| other, |Float64|)
 		cpp_wrapper (fmax)
 
-	operator min (|f64| other, |f64|)
+	operator min (|Float64| other, |Float64|)
 		cpp_wrapper (fmin)
 
 	render (|int|dp=6)
@@ -551,7 +551,6 @@ datatype f64
 		return (self * 64.0K)|date|
 
 
-datatype Float64 (f64) // should be the proper name...
 
 
 datatype hfloat
@@ -562,6 +561,9 @@ datatype hfloat
 		cpp_class __fp16
 		cpp_part f16
 
+
+datatype Float64 (f64)		// should be the proper name...
+datatype Float16 (hfloat)	// also.
 
 
 datatype int64
@@ -617,7 +619,7 @@ datatype int64
 	function LowestBit (|uint64|)
 		return self & -self
 
-	function AsFloat (|f64|)
+	function AsFloat (|Float64|)
 		cpp_wrapper
 	
 	render Hex

@@ -199,11 +199,11 @@ class String
 	function Int (|int64|)
 		return .parseint
 	
-	function Float (|f64|)
+	function Float (|Float64|)
 		nil checker
 		return .parsefloat(nil)
 	
-	function ParseFloat (|Message| Where=nil, |f64|)
+	function ParseFloat (|Message| Where=nil, |Float64|)
 		nil checker
 		cpp_Wrapper JB_Str_TextDouble
 	

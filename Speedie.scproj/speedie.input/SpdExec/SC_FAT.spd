@@ -55,7 +55,7 @@ struct FatASM
 		if !value: value = 0			// rationalise
 		((&.const)|&float|)[] = Value
 
-	function F64 (assigns:|f64|)
+	function F64 (assigns:|Float64|)
 		if !value: value = 0			// rationalise
 		((&.const)|&f64|)[] = Value
 		
@@ -63,7 +63,7 @@ struct FatASM
 		rz = ((&.const)|&float|)[]
 		if !rz: rz = 0					// rationalise
 
-	function F64 (|f64|)
+	function F64 (|Float64|)
 		rz = ((&.const)|&f64|)[]
 		if !rz: rz = 0					// rationalise
 		

@@ -201,7 +201,7 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 				if (L.ByteCount == R.ByteCount)
 					return kNumericMatch
 				if (typecast&kTypeCastSetToMemory)
-					return knumericmatch
+					return .FloatCast(o, exp)
 				if (self is const) or (o is const)
 					return kNumericMatch // Just do this at ASM time. makes no sense otherwise.
  
@@ -216,4 +216,27 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 	if ot.FuncProto.EqualOrMoreSpecific(t.FuncProto) and .PointeryMatch(O)
 		return exp.CastToClass(t, nil)
 
+
+
+function scdecl.FloatCast (|scdecl| orig, |message| exp, |int|)
+	/* floats suck :D thats why I prefer Posits
+	 ideally... heres my plan
+	 
+	 1) Remove floats. Just relegate them to "IEEFloat" name. This way, its still available.
+	 2) Float and float64 just become posits. I think hfloat can become Float16 (posit16)
+	 3) We can also have a "FastFloat" type, which is EITHER. Depending on your hardware. (floats only for now.)
+	*/
+	if .IsNormal
+		exp.CastToClass(.type, nil)
+		return knumericmatch
+	.ExpectFail(orig, exp, nil)
+	target debug2
+		|float64| f
+		|| f2 = asdasd()
+		f2.fff = f
+		//f = f2.fff 
+
+
+class asdasd
+	|Float| fff
 

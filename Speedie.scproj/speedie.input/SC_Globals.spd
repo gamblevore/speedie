@@ -347,22 +347,22 @@ function TypeOfUnit (ExprResolver)
 		it.func = @num
 		return typeofnum(it, name_space, exp)
 
-	|f64| Mul = 0.0
+	|Float64| Mul = 0.0
 	|scclass--| Type = TypeInt!
 	|string--| unit = exp.name
 	if unit == "KB" or "K"
-		Mul = (1<<10)|f64|
+		Mul = (1<<10)|Float64|
 	  elseif unit == "MB" or "M"
-		Mul = (1<<20)|f64|
+		Mul = (1<<20)|Float64|
 	  elseif unit == "GB" or "G"
-		Mul = (1<<30)|f64|
+		Mul = (1<<30)|Float64|
 	  elseif unit == "TB" or "T"
-		Mul = (1|int64|<<40|int64|)|f64| // goddamn c++ complaining
+		Mul = (1|int64|<<40|int64|)|Float64| // goddamn c++ complaining
 	  elseif unit == "th"
 		Mul = 0
 	  else
 		type = typedate!
-		|f64| s4 = 64.0*1024.0
+		|Float64| s4 = 64.0*1024.0
 		if unit == "s"
 			mul = s4
 		  elseif unit == "ms"
@@ -404,7 +404,7 @@ function TypeOfUnit (ExprResolver)
 		
 	  elseif CanFloat
 		str = val.renderfloat
-		|f64| big = 16.0*1024.0*1024.0
+		|Float64| big = 16.0*1024.0*1024.0
 		if val >= big  or val < -big
 			D.type = TypeF64!
 			X = val.asint
@@ -414,7 +414,7 @@ function TypeOfUnit (ExprResolver)
 		// So... then what should I do?
 	  else
 		str = val|int64|.render
-		|f64| big = (1|int64| << 31|int64|)|f64|
+		|Float64| big = (1|int64| << 31|int64|)|Float64|
 		if val >= big  or val < -big
 			D.type = TypeInt64!
 		if mul == 1

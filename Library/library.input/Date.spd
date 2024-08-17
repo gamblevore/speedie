@@ -14,9 +14,9 @@ datatype Date (int64)
 		cpp_Part CastFloat
 		return .Float
 	
-	syntax cast (|f64|)
+	syntax cast (|Float64|)
 		cpp_Part CastDouble
-		return .F64
+		return .Float64
 	
 	
 	constants
@@ -37,17 +37,17 @@ datatype Date (int64)
 	function WholeSeconds (|int64|) // needs 48 bits!
 		return self >> 16
 	
-//	function Rate (|f64|) // per what, though? per-second is common, but if we are talking about per-day its another thing.
+//	function Rate (|Float64|) // per what, though? per-second is common, but if we are talking about per-day its another thing.
 //		return 1.0 / .Seconds 
 	
 	function Float (|float|)
 		return self|float| * kOneStep
 	
-	function F64 (|f64|)
-		return self|f64| * kOneStep
+	function Float64 (|Float64|)
+		return self|Float64| * kOneStep
 	
 	function ReportAgo (|string|)
-		|| s = .F64
+		|| s = .Float64
 		|| unit = "s"
 		if s < 0.01
 			s *= 1000.0

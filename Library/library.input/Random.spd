@@ -47,7 +47,7 @@ struct Random
 				addr[i] = .int
 			return s[0,n]
 	
-	function Int (|f64| n, |int64|) 
+	function Int (|Float64| n, |int64|) 
 		return (.Float64 * n)|int64|
 
 	function Float64 (|Float64|) // Double (
@@ -102,7 +102,7 @@ struct Random
 		cpp_part AccessPow
 		return .float(From,to,step, pow)
 
-	syntax access (|f64|)
+	syntax access (|Float64|)
 		return .Float64
 		
 
@@ -138,7 +138,7 @@ function float64.syntaxcall (|float64|)
 	return random.shared.float64 * self
 
 function int.syntaxcall (|int|)
-	return (random.shared.Float64 * self|f64|)|int|
+	return (random.shared.Float64 * self|Float64|)|int|
 
 function int.Rand (|int|)
 	disabled "use 'num()'"

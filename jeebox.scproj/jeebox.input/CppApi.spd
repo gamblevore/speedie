@@ -250,7 +250,7 @@ The optional path is not used for anything except generating better error messag
 		return .ParseInt(m)
 		description "Parses this string into an integer. Allows hex also, like '0xffff'. If you pass a 'message' into this, then invalid strings will get reported into jb_errors() "
 		
-	api float (|message|m, |f64|)
+	api float (|message|m, |Float64|)
 		return .Parsefloat(m)
 		description "Parses this string into a double-precision float. If you pass a 'message' into this, then invalid strings will get reported into jb_errors() "
 
