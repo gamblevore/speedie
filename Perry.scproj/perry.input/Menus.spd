@@ -92,13 +92,6 @@ function perryide.SortedPrevious (|string| StrFilter = "", |message|)
 			rz <~ cpy
 
 
-//function ProjectCMMShow (GuiMenuEvent)
-//	|| row = clicked!.row as error
-//		|| i = .ide
-//		i.clickederror(row)
-//		i.view(i.viewfiles)
-
-
 function PressingTabs (guiaction)
 	if self isa ButtonView
 		|| p = .submenu|listview|
@@ -106,12 +99,12 @@ function PressingTabs (guiaction)
 		if p and ide
 			p.ListSource.clear
 			p <~ ( "Copy " + ide.name, MenuCopyProject, ide)
-			|| file = ide.path
+			|| file = ide.path|string|
+			if file and file != ide.Project|string|
 				p <~ ( "Copy " + file.name, MenuCopyFile, ide)
 			p <~ ( "Show In Desktop", MenuShowProject, ide)
 			p <~ ( "Close", MenuCloseProject, ide)
-
-			.OpenMenu(row) // "Yes" "no"
+			.OpenMenu(row)
 
 
 function message.IDE (|perryide|)
