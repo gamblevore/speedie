@@ -212,7 +212,7 @@ extend PerryIDE
 			is   visible
 			isnt drawsfocus
 			.tooltip		= self.SearchArea.Tooltip			
-			.SingleLine		= true
+			.SingleLine		= TextView.SingleLine
 			.ID				= "mass"
 			.size 			= 3~inside  by  2~down back 15
 			.takesfocus		= takesfocusflag.On
@@ -288,7 +288,7 @@ extend PerryIDE
 		with .ProjectInfo 
 			.ID				= "ProjectInfo"
 			.alignment		= MoveCode.MiddleLeft
-			.SingleLine		= true
+			.SingleLine		= TextView.SingleLine
 			isnt editable 
 			.takesfocus		= 0
 			.size 			= the~left for 300  by  0 to 13
@@ -298,7 +298,7 @@ extend PerryIDE
 		with .SelInfo 
 			.ID				= "SelInfo"
 			.alignment		= MoveCode.MiddleRight
-			.SingleLine		= true
+			.SingleLine		= TextView.singleline
 			isnt editable
 			.takesfocus		= 0
 			.size 			= the~right back 180  by  0 to 13

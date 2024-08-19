@@ -15,7 +15,7 @@ struct InlineEditor
 			//.clipmode		= controlclipmode.debug
 			.id				= "inline_editor"
 			.visible		= false
-			.SingleLine		= true
+			.SingleLine		= TextView.SingleLine
 			(self.editor! is editable)
 			&.gnormal.bg	<~ (0, 0, 0, 255)
 	

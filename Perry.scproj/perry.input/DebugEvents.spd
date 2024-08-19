@@ -48,7 +48,6 @@ function Window.Confirm (|string| Q, |fnConfirmCanceller| fn, |bool|)
 function perryide.MakeNothingRunning (|string| reason, |bool|)
 	|| prod = .runcompiledapp
 		if .confirm("Kill running product " + .Name + Reason, fnStillRunning)
-			prod.TryKillingChildren()
 			prod.kill
 			.UpdateDebuggedApp(true)
 			prod = nil
@@ -99,7 +98,7 @@ function perryide.DebugActual (|file| f, |[string]| args) // actuallyruncompiled
 	|| out = .DebugActualStr(F, args)
 	.LogOneAction(@emb + out.Copy)
 	out <~ ("\n", 2)
-	|| r = Process.stream(f, args, out)
+	|| r = Process.stream(f, args, out, nil, processownermode.OwnGroup)
 	.RunCompiledApp = r
 	if r and r.PID
 		.RunButton.text = "\07"
@@ -191,13 +190,4 @@ function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 	
 	return !kill
 		
-
-function Process.TryKillingChildren
-//	|| fs = faststring()
-//	|| args = ["-A", "-o", "'ppid pid'"]
-//	|| result = "/bin/ps".Execute(args, fs)
-//	debugger
-//	printline fs
-// just doesnt work
-
 

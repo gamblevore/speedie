@@ -232,7 +232,7 @@ ErrorInt2 JB_App__Say(JB_String* S, bool Print) {
 	}
 	Array* _tmPf0 = JB_Incr((JB_Array_Constructor0(nil)));
 	JB_Array_SyntaxAppend(_tmPf0, S);
-	ErrorInt2 _tmPf1 = JB_Str_Execute(JB_LUB[1656], _tmPf0, nil, nil, true, 0);
+	ErrorInt2 _tmPf1 = JB_Str_Execute(JB_LUB[1656], _tmPf0, nil, nil, kJB__PIDM_StdOutFlowsThroughUs, 0);
 	JB_Decr(_tmPf0);
 	return _tmPf1;
 }
@@ -1977,7 +1977,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112988461203456));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (112989795385344));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3302,7 +3302,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[179]);
-	JB_FS_AppendInt32(_fsf0, (2024081912));
+	JB_FS_AppendInt32(_fsf0, (2024081918));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8252,7 +8252,7 @@ Array* SC_Ext__CreateCompileString(Array* FileList, JB_String* Product, JB_Strin
 }
 
 bool SC_Ext__ExecuteGCC(Array* Commands) {
-	if (JB_Err2_SyntaxCast(JB_Str_Execute(SC__Ext_CppCompilerPath, Commands, nil, nil, true, 0))) {
+	if (JB_Err2_SyntaxCast(JB_Str_Execute(SC__Ext_CppCompilerPath, Commands, nil, nil, kJB__PIDM_StdOutFlowsThroughUs, 0))) {
 		return true;
 	}
 	if (true) {
@@ -8262,7 +8262,7 @@ bool SC_Ext__ExecuteGCC(Array* Commands) {
 		JB_Str_SyntaxExpect(_tmPf0);
 		JB_Decr(_tmPf0);
 	}
-	JB_Str_Execute(SC__Ext_CppCompilerPath, Commands, nil, nil, true, 0);
+	JB_Str_Execute(SC__Ext_CppCompilerPath, Commands, nil, nil, kJB__PIDM_StdOutFlowsThroughUs, 0);
 	return false;
 }
 
@@ -8359,7 +8359,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024081912));
+	JB_FS_AppendInt32(_fsf0, (2024081918));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -17877,6 +17877,7 @@ bool SC_OpMode_SyntaxIs(OpMode Self, OpMode X) {
 bool JB_ProcessMode_SyntaxIs(uint /*ProcessMode*/ Self, uint /*ProcessMode*/ M) {
 	return ((bool)(Self & M));
 }
+
 
 
 int SC_SCBlockage_BlockCombine(SCBlockage Self, SCBlockage B) {
@@ -27837,7 +27838,7 @@ ErrorInt2 SC_Str_DebugExecute(JB_String* Self, Array* Args, FastString* Out, Fas
 		JB_PrintLine(_tmPf0);
 		JB_Decr(_tmPf0);
 	}
-	return JB_Str_Execute(Self, Args, Out, Errs, false, 0);
+	return JB_Str_Execute(Self, Args, Out, Errs, kJB__PIDM_StdOutFlowsThroughUs, 0);
 }
 
 JB_String* JB_Str_Decompress(JB_String* Self, int Lim, CompressionStats* St) {
@@ -28680,7 +28681,7 @@ JB_String* JB_Str_Sibling(JB_String* Self, JB_String* Name) {
 }
 
 ErrorInt2 JB_Str_SilentExecute(JB_String* Self, Array* Args, FastString* Out, FastString* Errs, Date Timeout) {
-	return JB_Str_Execute(Self, Args, Out, Errs, false, 0);
+	return JB_Str_Execute(Self, Args, Out, Errs, nil, Timeout);
 }
 
 JB_String* SC_Str_SpdScriptName(JB_String* Self) {
@@ -30586,7 +30587,7 @@ bool SC_File_TestSpeedie(JB_File* Self, JB_String* V) {
 		JB_Decr(_tmPf3);
 	}
 	JB_String* _tmPf4 = JB_Incr(JB_File_Path(Self));
-	JB_Str_Execute(_tmPf4, Cmd_args, nil, nil, true, 0);
+	JB_Str_Execute(_tmPf4, Cmd_args, nil, nil, kJB__PIDM_StdOutFlowsThroughUs, 0);
 	JB_Decr(Cmd_args);
 	JB_Decr(_tmPf4);
 	JB_String* _tmPf5 = JB_Incr(JB_Str_OperatorPlus(JB_LUB[1208], V));
@@ -53157,4 +53158,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 9137797484436308406 312990333583179244
+// -3193945232018877786 312990333583179244

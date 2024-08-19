@@ -20,7 +20,7 @@ ProcessOwner* JB_PID_Constructor(ProcessOwner* self);
 void JB_PID_UnRegister(ProcessOwner* self);
 void JB_PID_Destructor(ProcessOwner* self);
 void JB_PID_Register(ProcessOwner* self);
-void JB_PID_Kill (ProcessOwner* F);
+int JB_PID_Kill (ProcessOwner* F);
 void JB_KillChildrenOnExit();
 int JB_PID_Exit (ProcessOwner* F);
 int JB_PID_Status (ProcessOwner* F);
@@ -50,11 +50,11 @@ JBClass( ShellStream, ProcessOwner,
 
 void JB_Sh_Destructor(ShellStream* self);
 ShellStream* JB_Sh_Constructor(ShellStream* self, JB_String* Path);
-ShellStream* JB_Sh__Stream(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn);
+ShellStream* JB_Sh__Stream(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, int Mode);
 bool JB_Sh_Step(ShellStream* self);
-ivec2 JB_Str_Execute(JB_String* self, Array* R, FastString* Out, FastString* Errs, bool StdOutFlowThru, Date Timeout);
+ivec2 JB_Str_Execute(JB_String* self, Array* R, FastString* Out, FastString* Errs, int Mode, Date Timeout);
 const char** JB_Proc__CreateArgs(JB_String* self, Array* R);
-bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, bool capture);
+bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, int Mode);
 int JB_Sh_UpdatePipes(ShellStream* self);
 void JB_Sh_ClosePipes(ShellStream* self);
 void JB_App__TurnInto(JB_String* self, Array* R); 

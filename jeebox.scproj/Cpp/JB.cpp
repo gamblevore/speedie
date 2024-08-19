@@ -3057,16 +3057,10 @@ void JB_ClassData_Restore(JB_Class* Self) {
 }
 
 
-void JB_MzSt_Clear(CompressionStats* Self) {
-}
-
 void JB_MzSt_End(CompressionStats* Self) {
 }
 
 void JB_MzSt_LiveUpdate(CompressionStats* Self, int S, int Outt, bool Compress) {
-}
-
-void JB_MzSt_Print(CompressionStats* Self, bool Compress) {
 }
 
 CompressionStats* JB_MzSt_Start(CompressionStats* Self) {
@@ -4003,8 +3997,6 @@ void JB_Flow_Destructor(FlowControl* Self) {
 	if (Self->ReadInput != nil) {
 		JB_PrintLine(JB_LUB[239]);
 	}
-	JB_MzSt_Print((&JB__Flow_Stats), true);
-	JB_MzSt_Clear((&JB__Flow_Stats));
 	JB_Clear(Self->Excuse);
 	JB_Clear(Self->ReadInput);
 	JB_Clear(Self->Write);
@@ -7877,7 +7869,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024081720);
+	return (2024081917);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -7889,4 +7881,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 4176728081899335792 7781400892569297791 977729488611953341
+// 4176728081899335792 352292619579747094 977729488611953341

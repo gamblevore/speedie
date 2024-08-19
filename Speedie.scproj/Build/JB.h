@@ -123,6 +123,8 @@ typedef ivec4 ParserLineAndIndent;
 
 typedef byte ProcessMode;
 
+typedef byte ProcessOwnerMode;
+
 typedef int SCBlockage;
 
 typedef int SCDeclInfo;
@@ -2281,6 +2283,9 @@ extern Array* SC__NilReason_values;
 #define kJB__ProcessMode_CaptureErrors 2
 #define kJB__ProcessMode_CaptureOrPrintErrors 6
 #define kJB__ProcessMode_CaptureStdOut 1
+#define kJB__PIDM_Default (0)
+#define kJB__PIDM_OwnGroup 2
+#define kJB__PIDM_StdOutFlowsThroughUs 1
 #define kSC__SCBlockage_Bits 480
 #define kSC__SCBlockage_Continue 64
 #define kSC__SCBlockage_Exit 128
@@ -4959,6 +4964,9 @@ bool SC_OpMode_SyntaxIs(OpMode Self, OpMode X);
 // ProcessMode
 bool JB_ProcessMode_SyntaxIs(uint /*ProcessMode*/ Self, uint /*ProcessMode*/ M);
 
+
+
+// ProcessOwnerMode
 
 
 // SCBlockage

@@ -151,7 +151,7 @@ function string.DebugExecute (|[string]?| Args=nil, |faststring|Out=nil, |fastst
 		print self
 		print " "
 		printline args.Render
-	return .Execute(args, out, errs, false)
+	return .Execute(args, out, errs)
 	
 
 module image

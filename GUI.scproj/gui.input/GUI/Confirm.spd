@@ -162,7 +162,7 @@ class ConfirmWindow_ (Window)
 			is editable
 			isnt drawsfocus
 			.id			= "response"
-			.singleline = true
+			.singleline = TextView.SingleLineWithTabs
 			.gnormal	= self.question.gnormal
 			.size		= 6~inside  by  2~above for 15
 

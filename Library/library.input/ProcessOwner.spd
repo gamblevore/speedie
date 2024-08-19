@@ -41,4 +41,16 @@ class ProcessOwner
 		function First (|ProcessOwner|)
 			cpp_wrapper JB_PID__First
 
+
+datatype ProcessOwnerMode (byte)
+	linkage
+		cpp_part PIDM
+		numeric false // disallow implicit (syntax <--> int) conversion
+	
+	flags
+		|ProcessOwnerMode| 
+		Default=0
+		StdOutFlowsThroughUs=1
+		OwnGroup=2
+	
 // the signal constants are different per-platform

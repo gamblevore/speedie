@@ -178,12 +178,13 @@ static void CheckStillAlive (ShellStream* Sh) {
 }
 
 
-bool StartProcessSub(ShellStream& Sh, JB_String* path, Array* Args, PicoComms* C, bool CaptureStdOut) {
+// Mode was "bool CaptureStdOut"
+bool StartProcessSub(ShellStream& Sh, JB_String* path, Array* Args, PicoComms* C, int Mode) {
 // fcntl,Fork,execvp,Pipe,Dup2,Waitid,Errno,Close,Eintr,_exit // far too much stuff in unix.
 	auto argv = JB_Proc__CreateArgs(path, Args);
 	if (!argv) return false;
 	
-	if (CaptureStdOut or Sh.Output)
+	if (!(Mode&1) or Sh.Output)
 		pipe(Sh.CaptureOut);
 	pipe(Sh.CaptureErr);
 	Unblock(Sh.CaptureErr[RD]); // should never block
@@ -192,6 +193,8 @@ bool StartProcessSub(ShellStream& Sh, JB_String* path, Array* Args, PicoComms* C
 	int PID = PicoStartFork(C, true);
 
 	if (PID == 0) { // CHILD
+		if (Mode&2)
+			setpgid(getpid(), getpid());
 		JB_Dup2( Sh.CaptureOut[WR], STDOUT_FILENO );
 		pipe_close(Sh.CaptureOut[WR]);
 		pipe_close(Sh.CaptureOut[RD]);
@@ -224,8 +227,9 @@ bool StartProcessSub(ShellStream& Sh, JB_String* path, Array* Args, PicoComms* C
 }
 
 
-bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, bool CaptureStdOut) {
-	return StartProcessSub(*self, path, Args, C, CaptureStdOut);
+// Mode was bool CaptureStdOut
+bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, int Mode) {
+	return StartProcessSub(*self, path, Args, C, Mode);
 }
 
 
@@ -263,12 +267,15 @@ void JB_FEPDWEE_Finish(ShellStream& Sh) {
 }
 
 
-ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastString* FSErrIn, bool StdOutFlowThru) {
+// Mode was bool StdOutFlowThru
+ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastString* FSErrIn, int Mode) {
 	auto rz = JB_Sh_Constructor(0, self);
+	if (FSOut and !(Mode & 1)) // why would there be no mode?
+		Mode &= ~1;
 	rz->Output = JB_Incr(FSOut);
 	rz->ErrorOutput = JB_Incr(JB_FS__FastNew(FSErrIn));
 	rz->Params = JB_Incr(Args);
-	bool OK = JB_Sh_StartProcess(rz, self, Args, 0, !StdOutFlowThru);
+	bool OK = JB_Sh_StartProcess(rz, self, Args, 0, Mode);
 	if (!OK) {
 		JB_SetRef(rz, 0);
 	}
@@ -276,8 +283,9 @@ ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastStr
 }
 
 
-ivec2 JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, bool StdOutFlowThru, Date TimeOut) {
-	auto Sh = ShellStart(self, R, FSOut, FSErrIn, StdOutFlowThru);
+// mode was bool StdOutFlowThru
+ivec2 JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, int Mode, Date TimeOut) {
+	auto Sh = ShellStart(self, R, FSOut, FSErrIn, Mode);
 	if (!Sh) return ivec2{1, 0};
 	
 	Date ExitAfter = 0;
@@ -315,8 +323,8 @@ ivec2 JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* 
 }
 
 
-ShellStream* JB_Sh__Stream(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn) {
-	return ShellStart(self, R, FSOut, FSErrIn, FSOut==nil);
+ShellStream* JB_Sh__Stream(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, int Mode) {
+	return ShellStart(self, R, FSOut, FSErrIn, Mode);
 }
 
 

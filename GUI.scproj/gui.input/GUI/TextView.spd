@@ -4,11 +4,11 @@
 class TextView (GUIControl)
 	linkage
 		cpp_part Text
-	|bool|						SingleLine
+	|byte|						SingleLine
 	|bool|						PreferStayAtEnd
 	|bool| 						ShowLineNumbers
 	|bool|						CanSeeAllLines
-	|bool|						CanTypeTab
+//	|bool|						CanTypeTab
 	|bool|						GroupSaveAll
 	|bool| 						FastAppend
 	|bool|						CanAutoComplete
@@ -49,7 +49,6 @@ class TextView (GUIControl)
 		.TakesFocus = TakesFocusFlag.On
 		.OnClicked	= Clicked
 		.OnKeyDown	= keys
-		.CanTypeTab = true
 		.LineHeight = font.Height + 4	// whatever
 		.SetsDebugLines = 10
 		.ExpectsParse = TextView.allowjeebox
@@ -864,13 +863,15 @@ class TextView (GUIControl)
 		
 	helper TypeTab (|bool|)
 		|| sr = .SelRange
-		if !sr.width and .isjeeboxmode
+		if !sr.width and .IsJeeboxMode
 			|| i = sr.x
 			|| bs = .backspaces(i)
 				.selrange = (bs, i)
 		return .typed("\t")
 
-
+	helper CanTypeTab (|bool|)
+		return !(.SingleLine & 1)
+	
 	helper TryTab (|bool|)
 		require .CanTypeTab
 		|| sh = keys.shift
@@ -1947,7 +1948,7 @@ class TextView (GUIControl)
 		|| p = d.position
 		
 		while
-			p = d.FindWhereLineBreaks(.text,  CharW,  .singleline,  p)
+			p = d.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  p)
 			t = d.InitDefaults(self, t)
 			if expect >= CurrentlyJeebox
 				msg = d.colorise(msg, ParsedOK)
@@ -2096,6 +2097,8 @@ class TextView (GUIControl)
 		ProbablyJeebox
 		CurrentlyJeebox
 		AlwaysJeebox
+		SingleLine = 1
+		SingleLineWithTabs = 2
 	
 	module
 		|| csAntiWords		= makeanti()

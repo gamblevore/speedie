@@ -48,7 +48,7 @@ class FileViewer (ListView)
 			.OnTextChanged	= QuickOpenModified
 			.takesfocus		= takesfocusflag.On
 			.onfocus		= QuickOpenFocus
-			.SingleLine		= true
+			.SingleLine		= TextView.SingleLine
 			.gnormal.solid	= (0.0, 0.1, 0.0, 0.90)
 
 		|| l = .listsource as filerow

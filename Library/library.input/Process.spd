@@ -42,5 +42,5 @@ class Process (ProcessOwner)
 			return .Output
 		
 	module
-		function Stream (|String| app, |[string]| R=[], |FastString| FSOut=faststring(), |FastString| FSErrIn=nil, |Process?|)
+		function Stream (|String| app, |[string]| R=[], |FastString| FSOut=faststring(), |FastString| FSErrIn=nil, |processownermode| Mode = nil, |Process?|)
 			cpp_wrapper JB_Sh__Stream
