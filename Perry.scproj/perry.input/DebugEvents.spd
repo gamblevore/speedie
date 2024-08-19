@@ -71,8 +71,11 @@ function ClickedDebug (GUIAction)
 
 function PressingDebug (GUIAction)
 	opt norefcounts
-	|| i = .ide
-	i.DebugArgsList.setfocus
+	|| db = .ide.DebugArgsList
+	if db.HasAnyFocus
+		db.ClearFocus
+	else
+		db.setfocus
 
 
 function PerryIDE.DebugEnvs (|message| env)
