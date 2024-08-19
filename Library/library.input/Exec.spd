@@ -18,6 +18,7 @@ datatype FileDes (int)
 
 
 datatype PID_Int (int)
+	description "This is the process ID of a process."
 	syntax cast (|bool|)
 		return self > 0
 	function Kill (|ErrorInt|)
@@ -28,11 +29,7 @@ datatype PID_Int (int)
 
 
 datatype ErrorInt2 (ivec2)
-// just a clever class to deal with the fact that many many things really want TWO error ints, not just one.
-// or else we'd need to wrap the one int, in a struct, cos unix ExitCodes are not ints, they are bitfield...
-// and we'd accidentally treat the exit-code as an int when its really not, its a bitfield.
-// basically processes can exit with two different kinds of error codes... one being a crash
-// the other being that it completed normally but the program itself said something is wrong.
+	description "Some unix process operations, need to describe both a signal (crash number) and an exit code."
 
 	linkage
 		cpp_part Err2
