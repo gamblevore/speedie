@@ -69,13 +69,14 @@ void JB_KillChildrenOnExit() {
 }
 
  
+#ifndef AS_LIBRARY // shouldn't this be around more??
 int JB_PID_Kill (ProcessOwner* F) {
 	if (F->_Exit == -1)
 		F->_Exit = 1;
 	
 	return JB_Kill(F->PID);
 }
-
+#endif
 
 ////*&(^!@^*& ^^^^^^^ PiD ^^^^^^^^
 //// BATCHES LOST CONTROL
