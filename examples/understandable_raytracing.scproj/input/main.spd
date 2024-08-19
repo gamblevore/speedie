@@ -43,7 +43,7 @@ class RayScene (window)
 		.LastDraw = date.now
 		.LastFPSChange := .LastDraw
 		if .LastFPSChange.ago > 0.5s
-			|| fps = (1.0/ago.seconds).Render(1) + "fps"
+			|| fps = (1.0/ago.Float64).Render(1) + "fps"
 			.fps.text = fps
 			printline fps
 			.LastFPSChange = .LastDraw
