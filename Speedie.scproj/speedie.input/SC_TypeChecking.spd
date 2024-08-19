@@ -230,13 +230,3 @@ function scdecl.FloatCast (|scdecl| orig, |message| exp, |int|)
 		exp.CastToClass(.type, nil)
 		return knumericmatch
 	.ExpectFail(orig, exp, nil)
-	target debug2
-		|float64| f
-		|| f2 = asdasd()
-		f2.fff = f
-		//f = f2.fff 
-
-
-class asdasd
-	|Float| fff
-
