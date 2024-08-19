@@ -68,7 +68,7 @@ extend message
 						dest <~ p.MacroAvoidCopy
 				return nil
 				// (first, secnd, A, B, C, D, E)
-			
+		
 		if (c == '_'  and  n > 1) and n.IsInt(1) 
 			|| oop = prms[n.int|int|]		#expect (root, "Not enough params.")
 			|| f = .func
@@ -76,6 +76,7 @@ extend message
 				return .MacroSame(oop)
 			return oop.MacroAvoidCopy
 		rz = Message(self)
+		rz.position = root.position
 		.MacroCopy(root, prms, rz)
 
 
