@@ -1,6 +1,15 @@
 #!/usr/local/bin/spd
 
-main 
-	for i in 1000
+
+// Just a tool to help me debug the ability to quit a speedie program
+// AND all of it's children in one go... from perry.
+
+main (|string| Mode="")
+	if Mode ~= "SelfExecute"
+		"STARTING"
+		app.Path.Execute()
+		"FINISHING"
+		return 0
+	for i in 10
 		app.say "hello $i"
 		app.Sleep(2s)
