@@ -142,7 +142,7 @@ int JB_Kill(int PID) { // don't you normally want to kill an entire group?
 }
 
 
-extern "C" bool JB_Dup2(int from, int to) { // so this kinda does what dup2 should do.
+bool Dup2_(int from, int to) { // so this kinda does what dup2 should do.
 	while (from > 0 and dup2(from, to) == -1) {
 		int err = errno;
 		if (err != EINTR and err != EBUSY)	
@@ -199,11 +199,11 @@ bool StartProcessSub(ShellStream& Sh, JB_String* path, Array* Args, PicoComms* C
 	if (PID == 0) { // CHILD
 		if (Mode&2)
 			setpgid(getpid(), getpid());
-		JB_Dup2( Sh.CaptureOut[WR], STDOUT_FILENO );
+		Dup2_( Sh.CaptureOut[WR], STDOUT_FILENO );
 		pipe_close(Sh.CaptureOut[WR]);
 		pipe_close(Sh.CaptureOut[RD]);
 		
-		JB_Dup2( Sh.CaptureErr[WR], STDERR_FILENO );
+		Dup2_( Sh.CaptureErr[WR], STDERR_FILENO );
 		pipe_close(Sh.CaptureErr[WR]);
 		pipe_close(Sh.CaptureErr[RD]);
 		execvp(argv[0], (char* const*)argv);
