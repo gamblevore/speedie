@@ -1,9 +1,21 @@
 
+
+
 target pack { target debug2 {
 module ASMExamples {
 
+// case 0
+
+function Consts
+	|| f1 = 0.0 + 1						// f32 + int
+	|| f2 = 3.4567|f64| + f1			// f64 + f32
+	|| f3 = 1234.5|f64| + 5678.9|f64|	// f64 + f64
+	|f64| f4 = 1.0						// f32 as f64
+	|f64| f5 = 2						// int as f64
+	|float| f6 = 2						// int as f32
 
 // case 1
+	
 function No1 (|int| a, |int| b, |int| c, |int|)
 	if a
 		b = 1
