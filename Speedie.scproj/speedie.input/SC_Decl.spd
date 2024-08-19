@@ -48,6 +48,7 @@ datatype SCDeclInfo (int)
 		StayBorrowed
 		DirectNumber						// 7
 		Const
+		UnknownConst
 		NumberConst = DirectNumber + Const	// const: x = 7
 		Static
 		UpgradeableContained
@@ -58,7 +59,6 @@ datatype SCDeclInfo (int)
 		ClassObj
 		CompilerCreated
 		PropertyWasConstructed
-		Disabled
 		Param
 		Body
 		Property

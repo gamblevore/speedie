@@ -51,7 +51,6 @@ linkage
 |string|		FuncName
 |fn_OpASM?|		ASM
 |OpMode|		Kind
-//|ASMMath|		Code
 |SCOperator--?|	Opposite 
 
 
@@ -496,33 +495,28 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 
 
 function message.TryImproveShiftConstants (|scdecl| LC, |scdecl| RC, |int|)
-	// this is breaking some things...
-	// basically... LC and RC might not be correct. Their exportposition could be wrong
-	// if it belongs to a different node... because typeofrel returns LC...
-	// rather than a new const for the overall thing.
-	// perhaps typesofrel shouldn't return a const? i mean TECHNICALLY it is
-	// but we just did some ops on it, so its more like a temporary const
-	
-	
-	// We need this mostly for the constant loader. (Or only?)
-	// maybe its just for perry? idk. could be both. either way its easier to process.
 	opt norefcounts
 	require lc is const and rc is const
 	|| lk = lc.exportposition
+	|| uk = lc is unknownconst
 	|| rk = rc.exportposition
-
-	require lk and rk
+	require (lk ||| rk) or uk
 	|| nk = lk << rk
 	|| size = nk.log2|int|
-	require size >= lc.typeinfo.bitcount
+	require uk or size >= lc.typeinfo.bitcount
 
 	|| ty = (typeint64!, typeint!)(size >= 32)
+	if uk and rk >= 32
+		ty = typeint64!
 	|| ty2 = ty.typenormal.copydecl
-	(ty2 is const)
-	ty2.exportposition = nk
 	.obj = ty2
-	.become(@num, nk|int64|.render)
-	.clear
+	(ty2 is const)
+	if uk
+		(ty2 is unknownconst)
+	  else
+		ty2.exportposition = nk
+		.become(@num, nk|int64|.render)
+		.clear
 	return customops.RecheckType
 		
 	// what about more complex things? like (1) << (2)

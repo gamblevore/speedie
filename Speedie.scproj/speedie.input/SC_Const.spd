@@ -16,7 +16,7 @@ function SCNode.CollectOneConstants (|Message| ch)
 function SCNode.CalculateConstRel (|message!| value, |&datatypecode| Ty, |uint64|)
 	opt norefcounts
 	|| A = value.first!
-	|| L = .CalculateConst(A, Ty)
+	|| L = .CalculateConstSub(A, Ty)
 	require ty[] isnt failed
 	
 	|| B = A.next!
@@ -26,8 +26,7 @@ function SCNode.CalculateConstRel (|message!| value, |&datatypecode| Ty, |uint64
 		return ~L
 		
 	|| op = scoperator.lookup(B)
-	#!SSSSS
-	|| R = .CalculateConst(C, Ty)
+	|| R = .CalculateConstSub(C, Ty)
 	expect (op is MathLike) (B)
 	|| N = B.name[]
 	|| Lg = b.name.length
@@ -79,7 +78,7 @@ function SCNode.CalculateConstRel (|message!| value, |&datatypecode| Ty, |uint64
 
 function SCNode.CalculateConst (|message!| value, |uint64|)
 	|datatypecode[1]| Ty
-	return .CalculateConst(value, &ty[0])
+	return .CalculateConstSub(value, &ty[0])
 
 
 function message.TypeExpect (|&datatypecode| Ty, |datatypecode| In)
@@ -91,7 +90,19 @@ function message.TypeExpect (|&datatypecode| Ty, |datatypecode| In)
 		ty[] = In
 
 
-function SCNode.CalculateConst (|message!| value, |&datatypecode| Ty, |uint64|)
+function scdecl.AsConst (|message| value, |&datatypecode| Ty, |uint64| )
+	expect (self is const) (value, "Not a constant")
+	if .isfloat
+		value.typeexpect(ty, datatypecode.float)
+	  elseif .isint
+		value.typeexpect(ty, datatypecode.int)
+	  else
+		error (value, "Not a number")
+		
+	return .exportposition
+
+
+function SCNode.CalculateConstSub (|message!| value, |&datatypecode| Ty, |uint64|)
 	opt norefcounts
 	|| f = value.func
 	if f == @num
@@ -102,7 +113,7 @@ function SCNode.CalculateConst (|message!| value, |&datatypecode| Ty, |uint64|)
 		return value.int
 
 	if f == @bra
-		return .calculateconst(Value.first!, ty)
+		return .CalculateConstSub(Value.first!, ty)
 	
 	if f == @thg
 		if value ~= "true"
@@ -111,19 +122,11 @@ function SCNode.CalculateConst (|message!| value, |&datatypecode| Ty, |uint64|)
 		if value ~= "false"
 			value.TypeExpect(ty, datatypecode.bool)
 			return 0
+		
 		|| d = self[value]
-		if d isa scdecl 
-			expect (d is const) (value, "Not a constant")
-			if d.isfloat
-				value.typeexpect(ty, datatypecode.float)
-			  elseif d.isint
-				value.typeexpect(ty, datatypecode.int)
-			  else
-				error (value, "Not a number")
-				
-			return d.exportposition
-		  else
-			error (value)
+		if d isa scdecl
+			return d.AsConst(value, ty)
+		error (value)
 		return 0
 	
 	if f == @rel
@@ -134,6 +137,10 @@ function SCNode.CalculateConst (|message!| value, |&datatypecode| Ty, |uint64|)
 	
 	if value isbrel "~"
 		return .CalculateConstRel(value, ty)
+	/*if (value == @dot) // remove
+		|| d = value.obj
+		if d isa scdecl
+			return d.asconst(value, ty)*/
 	
 	error value
 	return 0

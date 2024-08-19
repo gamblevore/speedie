@@ -1427,7 +1427,6 @@ function message.AndOrExpansionTest (|int|)
 
 
 function TypeOfRel (ExprResolver)
-	if "iiiiiooo".trap
 	|| LN = exp.first!
 	|| opch = ln.Next!
 	|| Comp = SCOperator.Lookup( opch )
@@ -1460,7 +1459,6 @@ function TypeOfRel (ExprResolver)
 	  else 
 		LC = TypeOfExpr( LN, name_space )
 		RC = TypeOfExprNeeded( RN, name_space ) #require 
-
 
 	require (exp == @rel) // has exp changed?
 	expect  (LC)  (LN, "Can’t find the type of this.")
@@ -1514,8 +1512,21 @@ function TypeOfRel (ExprResolver)
 		lc = exp.obj|scdecl|!
 	// we can't do 1 << (a,b,c) ?
 
-	  elseif custom & (CustomOps.TypeCastToBetter|||customops.TypeCastToSmaller) 
-		return lc.better_numeric(rc, comp.Kind, opch).NotLocal
+	  else
+		if custom & (CustomOps.TypeCastToBetter|||customops.TypeCastToSmaller) 
+			|| pc = lc.better_numeric(rc, comp.Kind, opch)
+			if  pc is const  and  lc isnt const // sigh... we got rc instead of lc
+				lc = pc.type.typenormal
+			  else
+				lc = pc
+
+		if lc is const
+			if (rc is const) and (comp is mathlike)
+				lc = lc.copydecl
+				(lc is const)
+				(lc is UnknownConst)
+			  else
+				lc = lc.type.typenormal
 	
 	Return LC.NotLocal
 	// s =  "abc"   ->   s.eq("abc", false)
