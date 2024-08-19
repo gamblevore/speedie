@@ -43,11 +43,22 @@ function Window.Confirm (|string| Q, |fnConfirmCanceller| fn, |bool|)
 	|| can = ConfirmCanceller(self, fn)
 	if q.confirm(can)
 		return true
+
+
+function perryide.MakeNothingRunning (|string| reason, |bool|)
+	|| prod = .runcompiledapp
+		if .confirm("Kill running product " + .Name + Reason, fnStillRunning)
+			prod.kill
+			.UpdateDebuggedApp(true)
+			prod = nil
+	return !prod
 	
+
 
 function ClickedDebug (GUIAction)
 	|| i = .ide
 	if .text == "\02"		// play
+		require i.MakeNothingRunning(" before debugging?")
 		i.DebugIsWaitingForCompile = true
 		i.compile("debug")
 		i.ShowText(i.ProductOut, "", false)
@@ -55,10 +66,7 @@ function ClickedDebug (GUIAction)
 			(itm is hidden)
 		i.ProductErrors.text = ""
 	  elseif .text == "\07" // stop
-		|| prod = i.runcompiledapp
-		if prod and i.confirm("Kill running product " + i.Name + "?", fnStillRunning)
-			prod.kill
-			i.UpdateDebuggedApp(true)
+		require i.MakeNothingRunning("?")
 
 
 function PressingDebug (GUIAction)

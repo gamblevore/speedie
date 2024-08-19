@@ -159,7 +159,7 @@ class PerryIDE (Window)
 		
 		if !.filelist.AskSaveall
 			return true // failed
-		if !ClickedCancel(self)
+		if !ClickedCancel(self) or !.MakeNothingRunning(" for closing the project?")
 			return true
 		
 		|| n = proj.parent.slowcount
