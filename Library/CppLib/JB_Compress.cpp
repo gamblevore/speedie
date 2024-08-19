@@ -4,6 +4,8 @@
 // perhaps this is already "ready" to add my new system in?
 // I just need to put the offset writer in...
 // and the cost-detector.
+// * i should also add a "next item differs at" thing to the suffixes...
+// * and maybe a "strength" that allows further checking of suffixes?
 
 #define kExtend 0x70
 
