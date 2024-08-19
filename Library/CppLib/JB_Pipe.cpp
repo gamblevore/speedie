@@ -133,8 +133,12 @@ const char** JB_Proc__CreateArgs(JB_String* self, Array* R) {
 }
 
 
-int JB_Kill(int PID) {
-	return kill(PID, SIGKILL);
+int JB_Kill(int PID) { // don't you normally want to kill an entire group?
+	if (PID <= 0)
+		return -1;
+	if (killpg(PID, SIGKILL)==0)
+		return 0;
+	return errno;
 }
 
 

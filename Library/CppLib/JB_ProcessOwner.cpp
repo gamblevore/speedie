@@ -72,12 +72,8 @@ void JB_KillChildrenOnExit() {
 int JB_PID_Kill (ProcessOwner* F) {
 	if (F->_Exit == -1)
 		F->_Exit = 1;
-	int PID = F->PID;
-	if (PID <= 0)
-		return -1;
-	if (kill(PID, SIGKILL)==0)
-		return 0;
-	return errno;
+	
+	return JB_Kill(F->PID);
 }
 
 
