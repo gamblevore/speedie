@@ -336,7 +336,7 @@ class PerryIDE (Window)
 			sdlapp.LastSearch = t
 			if other.text != t
 				other.text = t
-				other.Sel = 0
+				other.Selrange = 0
 
 
 	function HideStuff 

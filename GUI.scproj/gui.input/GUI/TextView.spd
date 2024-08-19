@@ -8,6 +8,7 @@ class TextView (GUIControl)
 	|bool|						PreferStayAtEnd
 	|bool| 						ShowLineNumbers
 	|bool|						CanSeeAllLines
+	|bool|						CanTypeTab
 	|bool|						GroupSaveAll
 	|bool| 						FastAppend
 	|bool|						CanAutoComplete
@@ -48,6 +49,7 @@ class TextView (GUIControl)
 		.TakesFocus = TakesFocusFlag.On
 		.OnClicked	= Clicked
 		.OnKeyDown	= keys
+		.CanTypeTab = true
 		.LineHeight = font.Height + 4	// whatever
 		.SetsDebugLines = 10
 		.ExpectsParse = TextView.allowjeebox
@@ -121,8 +123,8 @@ class TextView (GUIControl)
 
 
 	behaviour GotFocus
-		if .isinline or .singleline
-			.sel = .text.length
+		if (.isinline or .singleline) and !.selrange.width
+			.selrange = .text.length
 		sdlapp.SelChanged
 		super.gotfocus
 
@@ -253,6 +255,16 @@ class TextView (GUIControl)
 		.SendSpecialClick(p, true)
 
 
+	function Sel (assigns:|int|)
+		disabled "Use selrange"
+		
+	function SelRange (assigns: |int| r)
+		cpp_part TypingPlaceInt
+		.selrange = (r, r)
+		
+	function SelRange (assigns:|intrange|)
+		.TypingPlaceTry(value, false, nil)
+
 	function SelRange (|intrange|)
 		return ._typingplace.resolve
 		
@@ -261,16 +273,10 @@ class TextView (GUIControl)
 	function Sel1 (|int|)
 		return .selrange.y
 
-	function SelRange (assigns:|intrange|)
-		.TypingPlaceTry(value, false, nil)
 
 	helper SelDirect (|IntRange| value, |TextViewLine| d)
 		.TypingPlaceTry(value, false, d)
 
-	function Sel (assigns: |int| r)
-		cpp_part TypingPlaceInt
-		.selrange = (r, r)
-		
 	helper SelectedLine (|textviewline|)
 		return .FindDrawInfo(.sel0)
 
@@ -289,7 +295,6 @@ class TextView (GUIControl)
 		if .TypingPlaceDirect(result)
 			.TypingPlaceChanged(insert, d)
 
-
 	helper TypingPlaceChanged (|bool| insert, |textviewline| d)
 		if .hasfocus
 			sdlapp.selchanged
@@ -298,7 +303,6 @@ class TextView (GUIControl)
 		d := .FindDrawInfo(.sel0)
 
 		while
-//			(d is selected)
 			.TryShowLineError(d)
 			d++
 			if  !d  or  d.Position > .sel1
@@ -740,7 +744,7 @@ class TextView (GUIControl)
 			return true //eat it
 		|| extra = 0
 		if ((.onkeydown)(self, -10)?) and !keys.shift
-			.sel = .ExtendToLineEnd(.sel1-1) // move sel to end of line
+			.selrange = .ExtendToLineEnd(.sel1-1) // move sel to end of line
 			extra = 4
 		.NewLineSub(Extra)
 		return true
@@ -868,6 +872,7 @@ class TextView (GUIControl)
 
 
 	helper TryTab (|bool|)
+		require .CanTypeTab
 		|| sh = keys.shift
 		ifn .seltext contains jeebox.CSLine
 			if .InsertAutoComplete
@@ -1202,7 +1207,7 @@ class TextView (GUIControl)
 		if !c
 			c = CounterParts2.find(s)
 			if c and after.equals(s)
-				.sel = sel2+1
+				.selrange = sel2+1
 				return true				// sigh could simplify this. cant be bothered
 			return false
 
@@ -1211,7 +1216,7 @@ class TextView (GUIControl)
 			
 		|| Other = CounterParts2[c]
 		if other.equals(s) and other==after
-			.sel = sel2+1
+			.selrange = sel2+1
 			return true
 
 		require .SelMsgValid(sel) // we want to avoid this after comments. how do we know if something is commented?

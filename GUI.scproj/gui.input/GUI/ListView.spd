@@ -1417,7 +1417,7 @@ class ListView (GUIControl) {
 		|| c2 = c.step(i)
 			inl.Edit(c2, nil)
 			if i < 0
-				.sel = 0
+				.selrange = 0
 		return true
 
 

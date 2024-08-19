@@ -250,13 +250,13 @@ function PerryInsert6 (|textview| self, |intrange| a, |bool|)
 		toInsert += ", "
 		
 	.InsertSub(toinsert , a)
-	.sel = sel
+	.selrange = sel
 	return true								// f* --> fn *
 
 function PerryInsert5 (|textview| self, |message| where, |intrange| A, |bool|)
 	.undochecker = -1
 	.insertsub(", ||", A)
-	.sel = A.x+3
+	.selrange = A.x+3
 	return true								// fn X (|type| name*) --> fn X (|type| name, |*|) 
 function PerryInsert34 (|textview| self, |message| where, |intrange| A, |bool|)
 	.UndoChecker = -1
@@ -271,7 +271,7 @@ function PerryInsert2 (|textview| self, |message| where, |intrange| A, |bool|)
 		A += (1,1)
 		
 	.insertsub(decl, A)
-	.sel = .sel0-2
+	.selrange = .sel0-2
 	return true								// fn X* --> fn X (|*|)
 function PerryInsert1 (|textview| self, |message| where, |intrange| a, |bool|)
 	.undochecker = -1
@@ -324,7 +324,7 @@ function textview.PerryDeclKey (|bool|)
 				.insert("|")
 			return true
 		.insert("||")
-		.sel = .sel0-1 // :)
+		.selrange = .sel0-1 // :)
 		return true
 
 

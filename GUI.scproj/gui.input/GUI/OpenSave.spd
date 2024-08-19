@@ -91,6 +91,9 @@ class OpenSaveDialog (Window)
 		.size			= 500 by 225
 		.id				= "opensave"
 		isnt visible
+		.path.cantypetab = false
+		.question.cantypetab = false
+		.Name.cantypetab = false
 		.path.onpaste = nil// nice
 		.AddButton(.accept, "Open", true)
 		.AddButton(.Cancel,	"Cancel", false)
