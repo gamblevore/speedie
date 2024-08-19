@@ -306,7 +306,7 @@ function Configure (assigns:|string|)
 
 target !minilib {
 function Say (|string| s, |bool| print=true,  |errorint2|)
-//	visible // then libjeebox won't compile.
+	// what if we don't want to wait. pass -1 for the timeout?
 	if print
 		printline s
 	return "/usr/bin/say".execute([s])

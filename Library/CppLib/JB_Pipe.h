@@ -12,6 +12,7 @@ extern "C" {
 JBClass( ProcessOwner, JB_RingList,
 	volatile int		_Exit; // turn these into an ErrorInt2?
 	volatile int		_Status;
+	bool				KillOnExit;
 );
 
 void JB_PID_Start();
@@ -20,6 +21,7 @@ void JB_PID_UnRegister(ProcessOwner* self);
 void JB_PID_Destructor(ProcessOwner* self);
 void JB_PID_Register(ProcessOwner* self);
 void JB_PID_Kill (ProcessOwner* F);
+void JB_KillChildrenOnExit();
 int JB_PID_Exit (ProcessOwner* F);
 int JB_PID_Status (ProcessOwner* F);
 JB_StringC* JB_Err_SignalName (int Sig);

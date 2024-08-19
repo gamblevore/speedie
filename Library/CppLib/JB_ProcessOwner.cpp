@@ -11,12 +11,12 @@
 
 extern "C" {
 
-ProcessOwner		Root;
+ProcessOwner		PSRoot;
 
 
 static void AddLostChild_(int PID, int C) {
-	ProcessOwner* F = JB_PID_Next(&Root);
-	while (F) {
+	ProcessOwner* F = &PSRoot;
+	while ((F = JB_PID_Next(F))) {
 		if (F->PID == PID) {
 			int Ex = 255; 	int Sig = 0;
 			if (WIFEXITED(C))   Ex = WEXITSTATUS(C);
@@ -27,8 +27,6 @@ static void AddLostChild_(int PID, int C) {
 			F->_Status = Sig;
 			return;
 		}
-
-		F = JB_PID_Next(F);
 	}
 }
 
@@ -62,11 +60,21 @@ int JB_PID_Exit (ProcessOwner* F) {
 	return F->_Exit;
 }
 
+
+void JB_KillChildrenOnExit() {
+	ProcessOwner* F = &PSRoot;
+	while ((F = JB_PID_Next(F)))
+		if (F->PID > 0 and F->KillOnExit)
+			kill(F->PID, SIGKILL);
+}
+
+ 
 void JB_PID_Kill (ProcessOwner* F) {
 	if (F->_Exit == -1)
 		F->_Exit = 1;
-	if (F->PID > 0)
-		kill(F->PID, SIGKILL);
+	int PID = F->PID;
+	if (PID > 0)
+		kill(PID, SIGKILL);
 }
 
 
@@ -75,7 +83,7 @@ void JB_PID_Kill (ProcessOwner* F) {
 
 
 void JB_PID_Start() {
-	JB_PID_Constructor(&Root);
+	JB_PID_Constructor(&PSRoot);
 }
 
 void JB_Helper_SelfLink(JB_RingList* New) {
@@ -90,6 +98,7 @@ ProcessOwner* JB_PID_Constructor(ProcessOwner* self) {
 	JB_Helper_SelfLink((JB_RingList*)self);
 	self->_Status = 0;
 	self->_Exit = -2;
+	self->KillOnExit = true;
 	return self;
 }
 
@@ -106,7 +115,7 @@ JB_StringC* JB_Err_Name (int Err) {
 
 
 void JB_PID_Register(ProcessOwner* self) {
-	JB_Helper_PutAfter((JB_RingList*)(&Root), (JB_RingList*)self);
+	JB_Helper_PutAfter((JB_RingList*)(&PSRoot), (JB_RingList*)self);
 }
 
 
@@ -120,14 +129,14 @@ void JB_PID_UnRegister(ProcessOwner* self) {
 
 ProcessOwner* JB_PID_Next(ProcessOwner* self) {
 	auto Result = (ProcessOwner*)(self->Next);
-	if (Result != &Root) {
+	if (Result != &PSRoot) {
 		return Result;
 	}
 	return 0;
 }
 
 ProcessOwner* JB_PID__First() {
-	return JB_PID_Next((ProcessOwner*)&Root);
+	return JB_PID_Next((ProcessOwner*)&PSRoot);
 }
 
 int JB_PID_Signal(int PID, int sig) {

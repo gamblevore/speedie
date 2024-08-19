@@ -108,8 +108,8 @@ void JB_CrashHandler(int Sig) {
 
 				// print normal-errors
 	JB_Rec_ShellPrintErrors(nil);
-	
-				// we should crash now... that we removed this crash handler.
+	JB_KillChildrenOnExit();
+	exit(-1);	// we should crash now... that we removed this crash handler.
 }
 
 
@@ -132,8 +132,9 @@ void JB_App__CrashInstall() {
 			if (i != SIGINT or !isatty(STDIN_FILENO)) // allow ^C to kill speedie from terminal
 				signal(i, SIG_IGN);					  // but don't allow breakpoints to kill it!!
 		}
-		if (CrashList & (1<<i) and signal(i, JB_CrashHandler) == SIG_IGN)
-			signal(i, SIG_IGN); // restore the old ignore signal... make speedie more unix-friendly.
+		if (CrashList & (1<<i))
+			if (signal(i, JB_CrashHandler) == SIG_IGN)
+				signal(i, SIG_IGN); // restore the old ignore signal... make speedie more unix-friendly.
 		if (WakeList & (1<<i))
 			signal(i, JB_Wake);
 	}

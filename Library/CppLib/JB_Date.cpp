@@ -51,7 +51,6 @@ static timespec DateToTimeSpec(Date Durr) {
 }
 
 void JB_Date__Sleep(Date Durr) {
-//	printf("sleeping for: %lli\n", Durr);
     auto ts = DateToTimeSpec(Durr);
     while ((nanosleep(&ts, &ts) == -1 and errno == EINTR)) {
 		;
@@ -65,10 +64,6 @@ bool JB_Date__TrySleep (Date Durr) {
     return nanosleep(&ts, 0) == 0;
 }
 
-
-//uint64 JB_Date__TimeID () {
-//	return JB_Date_TimeID(JB_Date__Now());
-//}
 
 uint64 JB_Date_TimeID (Date Dt) {
 // 2017y02m13d05h10m --> 2017021305

@@ -178,9 +178,8 @@ static void CheckStillAlive (ShellStream* Sh) {
 }
 
 
-bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, bool CaptureStdOut) {
+bool StartProcessSub(ShellStream& Sh, JB_String* path, Array* Args, PicoComms* C, bool CaptureStdOut) {
 // fcntl,Fork,execvp,Pipe,Dup2,Waitid,Errno,Close,Eintr,_exit // far too much stuff in unix.
-	auto& Sh = *self; auto sh = self;
 	auto argv = JB_Proc__CreateArgs(path, Args);
 	if (!argv) return false;
 	
@@ -190,11 +189,9 @@ bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoCom
 	Unblock(Sh.CaptureErr[RD]); // should never block
 	Unblock(Sh.CaptureOut[RD]); // even this blocking at all is kinda sus...
 	
-	JB_PID_Register(&Sh);
 	int PID = PicoStartFork(C, true);
-	bool OK = true;
 
-	if (PID == 0) {
+	if (PID == 0) { // CHILD
 		JB_Dup2( Sh.CaptureOut[WR], STDOUT_FILENO );
 		pipe_close(Sh.CaptureOut[WR]);
 		pipe_close(Sh.CaptureOut[RD]);
@@ -205,13 +202,17 @@ bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoCom
 		execvp(argv[0], (char* const*)argv);
 		_exit(errno-!errno); // in case execvp fails
 		return false;
-	} else if (PID > 0) {
-		sh->_Exit = -1;
-		sh->_Status = 0;
+	}
+
+	bool OK = true;
+	if (PID > 0) {
+		JB_PID_Register(&Sh);
+		Sh._Exit = -1;
+		Sh._Status = 0;
 		Sh.PID = PID;
 		pipe_close(Sh.CaptureOut[WR]);
 		pipe_close(Sh.CaptureErr[WR]);
-		CheckStillAlive(sh);
+		CheckStillAlive(&Sh);
 	} else {
 		OK = false;
 		JB_ErrorHandleFile(path, nil, errno, nil, "run");
@@ -220,6 +221,11 @@ bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoCom
 	JB_FreeIfDead(path);
 	free(argv);
 	return OK;
+}
+
+
+bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, bool CaptureStdOut) {
+	return StartProcessSub(*self, path, Args, C, CaptureStdOut);
 }
 
 
@@ -278,7 +284,7 @@ ivec2 JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* 
 	if (TimeOut > 0)
 		ExitAfter = JB_Date__Now() + TimeOut;
 
-	while (true) {
+	while (TimeOut >= 0) { // allow -1 time out which instantly exits...
 		bool DidAnything = JB_Sh_UpdatePipes(Sh) & 2;
 		if (JB_PID_Exit(Sh) != -1  or  JB_PID_Status(Sh) != 0)
 			break;

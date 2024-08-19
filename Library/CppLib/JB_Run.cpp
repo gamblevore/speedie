@@ -166,6 +166,7 @@ void JB_FinalEvents() {
 	AddError(JB_Rec_ShellPrintErrors(nil),	"jb.stderr");
 	JB_LibShutdown();
 	JB_RemoveHandlers(); // some wierd systems call signals after we exit??
+	JB_KillChildrenOnExit();
 }
 
 Array*	JB_App__Args()						{ return App_Args; }
@@ -195,6 +196,8 @@ int JB_LibInit (_cstring* R, bool IsThread) {
 					PicoGlobalConf()->SuicideIfParentDies = true;
 				// default Pico to suicide, if run. SDLapp.init will reset this.
 			}
+			atexit(JB_KillChildrenOnExit);
+			
 		#endif
 	}
 	App_Args = JB_Incr(JB_Str_ArgV(R));	// allow caller to remove their c-string data.
