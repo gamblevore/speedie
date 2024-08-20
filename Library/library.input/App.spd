@@ -285,13 +285,13 @@ helper _chdir (|string| path, |ErrorInt|)
 	cpp_wrapper JB_File__chdir
 
 
-function LeakMarkMemory
+helper LeakMarkMemory
 	cpp_wrapper JB_Mem_Mark
 
-function LeakUnMarkMemory
+helper LeakUnMarkMemory
 	cpp_wrapper JB_Mem_Unmark
 	
-function IsQuarantined (|bool|)	
+helper IsQuarantined (|bool|)	
 	return .path contains "/AppTranslocation/"
 
 
