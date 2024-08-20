@@ -142,7 +142,7 @@ int JB_Kill(int PID) { // don't you normally want to kill an entire group?
 }
 
 
-bool Dup2_(int from, int to) { // so this kinda does what dup2 should do.
+static bool Dup2_(int from, int to) { // so this kinda does what dup2 should do.
 	while (from > 0 and dup2(from, to) == -1) {
 		int err = errno;
 		if (err != EINTR and err != EBUSY)	
