@@ -1194,7 +1194,7 @@ JBClass ( SCDecl , SCNamed ,
 	SCDecl* Contains;
 	SCDeclInfo Info;
 	int C_Array;
-	DataTypeCode DType;
+	DataTypeCode xC2xB5Type2;
 	byte NilAllocDepth;
 	byte PointerCount;
 	byte NilReg;
@@ -1697,7 +1697,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native (JB_LUB[1506])
+#define kJB_codesign_native (JB_LUB[2109])
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
 extern CharSet* SC_CSNum;
@@ -1722,7 +1722,7 @@ extern JB_String* SC_kNameConf;
 #define kJB_kNoMatch (0)
 #define kJB_kNumericMatch 8388608
 #define kJB_kSaverEnd (JB_LUB[0])
-#define kJB_kSaverStart1 (JB_LUB[496])
+#define kJB_kSaverStart1 (JB_LUB[2105])
 #define kJB_kSimpleMatch 4194304
 #define kJB_kSuperClassMatch 16777216
 #define kJB_kTypeCastAssigns 64
@@ -1738,7 +1738,7 @@ extern JB_String* SC_kNameConf;
 #define kJB_kTypeCastTrue 3
 #define kJB_kTypeCastWantSuperDistance 128
 #define kJB_kUseDefaultParams 33554432
-#define kJB_kUsingStr (JB_LUB[803])
+#define kJB_kUsingStr (JB_LUB[2110])
 #define kJB_kVoidPtrMatch 20971520
 extern JB_File* SC_PerryLogFile;
 extern Message* SC_ReturnSelfEqNil;
@@ -1879,10 +1879,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp 32784
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down (JB_LUB[2107])
-#define kJB__zalgo_mid (JB_LUB[2106])
+#define kJB__zalgo_down (JB_LUB[2108])
+#define kJB__zalgo_mid (JB_LUB[2107])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up (JB_LUB[2105])
+#define kJB__zalgo_up (JB_LUB[2106])
 #define kJB__byte_max 255
 #define kJB__byte_min (0)
 #define kJB__char_max 127
@@ -2006,12 +2006,11 @@ extern ASM_Write SC__ASMtmp_WriteASM[5];
 #define kSC__Reg_AlreadyNegated 524288
 #define kSC__Reg_Alternate 1048576
 #define kSC__Reg_Arg 4194304
-#define kSC__Reg_BitCorrect 1073741824
-#define kSC__Reg_CondAnswer 8589934592
-#define kSC__Reg_CondRequest 4294967296
+#define kSC__Reg_CondAnswer 4294967296
+#define kSC__Reg_CondRequest 2147483648
 #define kSC__Reg_ConstAny 134217728
 #define kSC__Reg_ContainsAddr 268435456
-#define kSC__Reg_CorrectAddr 1342177280
+#define kSC__Reg_CorrectAddr 268435456
 #define kSC__Reg_Discard 4194304
 #define kSC__Reg_FatRef 1073741824
 #define kSC__Reg_ForReturn 16777216
@@ -2023,8 +2022,8 @@ extern ASM_Write SC__ASMtmp_WriteASM[5];
 #define kSC__Reg_SingleExpr 67108864
 #define kSC__Reg_StayOpen 262144
 #define kSC__Reg_Temp 33554432
-#define kSC__Reg_Textual 2147483648
-#define kSC__Reg_Zero 1207959608
+#define kSC__Reg_Textual 1073741824
+#define kSC__Reg_Zero 134217784
 #define kJB__CharProp_AlmostLetter 6
 #define kJB__CharProp_Letters 7
 #define kJB__CharProp_Lower 9
@@ -4654,6 +4653,8 @@ uint SC_Reg_FatIndex(AsmReg Self);
 
 AsmReg SC_Reg_FatIndexSet(AsmReg Self, uint Value);
 
+int SC_Reg_Floatness(AsmReg Self);
+
 AsmReg SC_Reg_HaveAddr(AsmReg Self);
 
 int SC_Reg_IntDivType(AsmReg Self);
@@ -5587,8 +5588,6 @@ void SC_FatASM_AddRegParam(FatASM* Self, Message* Src, int Write);
 uint SC_FatASM_b(FatASM* Self);
 
 void SC_FatASM_bSet(FatASM* Self, uint Value);
-
-FatASM* SC_FatASM_BitCorrect(FatASM* Self);
 
 int SC_FatASM_BytePos(FatASM* Self);
 
@@ -9115,6 +9114,10 @@ Message* SC_Decl_WriteType(SCDecl* Self, int Minimal);
 Message* SC_Decl_WriteTypeCast(SCDecl* Self, Message* Msg);
 
 Message* SC_Decl_WriteVerySimpleType(SCDecl* Self);
+
+void SC_Decl_xC2xB5TypeSet(SCDecl* Self, uint /*DataTypeCode*/ Value);
+
+DataTypeCode SC_Decl_xC2xB5Type(SCDecl* Self);
 
 
 
