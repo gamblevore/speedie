@@ -70,7 +70,12 @@ datatype DataTypeCode (uint16)
 									     // we need to be clear about what we are doing!
 		return self&PossibleBits == M&PossibleBits
 	
-	function IsFloat (|bool|)
+	function Floatness (|int|)
+		if .isint
+			return 0
+		return .bytecount // makes sense
+
+	function IsFloat (|bool|) // turn this into floatness?
 		return (self >> 7) & 1
 	
 	function IsPointer (|bool|)

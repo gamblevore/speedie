@@ -3,9 +3,9 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-|SCClass|	Typef64
+|SCClass|	TypeFloat64
 |SCClass|	Typefloat
-|scclass|	Typehfloat
+|scclass|	TypeFloat16
 |SCClass|	TypeSaveable
 |SCClass|	TypeInt
 |SCClass|	TypeInt16
@@ -19,6 +19,7 @@
 |SCClass|	TypeSyntax
 |SCClass|	TypeBool
 |SCClass|	TypeCharSet
+|SCClass|	TypeChar
 |SCClass|	TypeByte
 |scclass|	TypeCodePoint
 |SCClass|	TypeObject
@@ -231,13 +232,14 @@ function InitTypes (|bool|)
 	TypeuInt			= compiler["uint"]
 	TypeuInt16			= compiler["uint16"]
 	TypeuInt64			= compiler["uint64"]
-	Typef64				= compiler["f64"]
-	Typehfloat			= compiler["hfloat"]
+	Typefloat64			= compiler["f64"]
+	Typefloat16			= compiler["hfloat"]
 	Typefloat			= compiler["float"] 
 	TypeBool			= compiler["bool"]
 	TypeString			= compiler["string"]
 	TypeStringZero		= compiler["stringzeroterminated"]	
 	TypeByte			= compiler["byte"]
+	TypeChar			= Compiler["int8"] // int8 would be a better name
 	TypeCodePoint		= compiler["codepoint"]
 	TypeCharSet			= compiler["charset"]
 	Typevec2			= compiler["vec2"]
@@ -284,8 +286,8 @@ function InitBasicStuff (|int|) // compiler.init
 	.AddGlobalConstNum( "__time_id__", 		typeint! , 		scimport.recent.timeid )
 	.AddGlobalConstNum( "__now__",     		typedate!,		date.now )
 	.AddGlobalConstNum( "__modified__",		typedate!,		scimport.recent)
-	.AddGlobalConstFloat( "π",				typef64! ,		"3.1415926535897932")
-	.AddGlobalConstFloat( "τ",				typef64! ,		"6.2831853071795864")
+	.AddGlobalConstFloat( "π",				typefloat64!,	"3.1415926535897932")
+	.AddGlobalConstFloat( "τ",				typefloat64!,	"6.2831853071795864")
 	if stderr.ErrorCount > rz
 		compiler.InitedOK = false
 		

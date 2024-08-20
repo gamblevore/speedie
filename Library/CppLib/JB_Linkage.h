@@ -70,7 +70,7 @@ struct Register {
 	struct jb_vm;
 	ivec4* JB_ASM_Registers(jb_vm* V, bool Clear);
 	jb_vm* JB_ASM_VM();
-	typedef void (*SaverLoadClass)(JB_Class* cls, char* Data);
+	typedef void (*SaverLoadClass)(JB_Class* cls, int8* Data);
 	void JB_InitClassList(SaverLoadClass fn);
 
 } // ExternCEnd

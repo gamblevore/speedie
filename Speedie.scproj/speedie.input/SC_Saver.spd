@@ -174,7 +174,7 @@ module SC_Saver {
 		  elseif .NumericCount == 1
 			if .isa(typefloat)
 				return "float"
-			  elseif .isa(typef64)
+			  elseif .isa(typefloat64)
 				return "f64"
 			  else
 				return "int"

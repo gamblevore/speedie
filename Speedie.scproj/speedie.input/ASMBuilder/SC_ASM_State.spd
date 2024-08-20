@@ -227,7 +227,7 @@ struct ASMState
 		target !debug
 			opt inline
 		cpp_part Get
-		|| expasm = exp.ASMType
+		|| ExpASM = exp.ASMType
 		|| fn = fn_asm_table[expasm]!
 		target debug
 			if !expasm
@@ -276,7 +276,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 		dest = asmreg()
 	  else
 		dest = .TempMe(prms, dest)
-		dest.µtype = fn.RegType
+	dest.µtype = fn.RegType
 
 	|int| Reg2
 	|int| Reg3

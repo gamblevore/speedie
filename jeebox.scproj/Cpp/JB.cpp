@@ -2927,6 +2927,7 @@ int JB_Rg_Width(IntRange Self) {
 
 
 
+
 bool JB_Syx_IsString(Syntax Self) {
 	return (Self >= kJB_SyxSStr) and (Self <= kJB_SyxStr);
 }
@@ -7869,7 +7870,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024081917);
+	return (2024082010);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -7881,4 +7882,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 4176728081899335792 352292619579747094 977729488611953341
+// 4176728081899335792 -6791302266922216693 977729488611953341

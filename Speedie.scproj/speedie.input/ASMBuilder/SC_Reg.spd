@@ -40,9 +40,7 @@ datatype AsmReg (uint64)
 	
 
 	function Floatness (|int|)
-		if .isint
-			return 0
-		return .µtype.bytecount // makes sense
+		return .µtype.floatness
 	
 	function F32 (|float|)
 		return .needfat.F32

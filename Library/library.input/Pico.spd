@@ -7,7 +7,7 @@ prototype PicoThreadFn (|pico| Comms, |&nil| Obj, |&cstring| Args=nil, |bool|)
 struct PicoMessage
 	linkage: wrapper, cpp_part Pico
 	|int|			Length
-	|?&char|		Data
+	|?&int8|		Data
 	
 	syntax cast (|bool|)
 		if self
@@ -16,10 +16,10 @@ struct PicoMessage
 	module
 		function From (|string| s, |PicoMessage|)
 			rz.length = s.length
-			rz.data = s.addr|&char|
+			rz.data = s.addr|&int8|
 		function FromFS (|faststring| fs, |PicoMessage|)
 			rz.length = fs.length
-			rz.data = fs.ResultPtr|&char|
+			rz.data = fs.ResultPtr|&int8|
 
 
 function @string.FromPico (|picomessage| M, |string|)
@@ -59,7 +59,7 @@ struct Pico
 		rz = .send(picomessage.Fromfs(fs), wait)
 		fs.length = 0
 		
-	function Send (|?&char| msg, |int| Length, |bool| Wait=false, |bool|)
+	function Send (|?&int8| msg, |int| Length, |bool| Wait=false, |bool|)
 		cpp_wrapper PicoSend
 
 	function Send (|picomessage| A, |bool| Wait=false, |bool|)

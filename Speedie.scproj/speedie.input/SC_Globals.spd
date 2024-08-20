@@ -369,10 +369,10 @@ function TypeOfUnit (ExprResolver)
 			mul = 64.0
 		  elseif unit == "π"
 			mul = π
-			type = typef64!
+			type = typefloat64!
 		  elseif unit == "τ"
 			mul = τ
-			type = typef64!
+			type = typefloat64!
 		  elseif exp.UnitMatch("days", "day")
 			mul = 86400.0 * s4
 		  elseif exp.UnitMatch("weeks", "week")
@@ -406,7 +406,7 @@ function TypeOfUnit (ExprResolver)
 		str = val.renderfloat
 		|Float64| big = 16.0*1024.0*1024.0
 		if val >= big  or val < -big
-			D.type = TypeF64!
+			D.type = typefloat64!
 			X = val.asint
 		  else
 			D.type = TypeFloat!
@@ -902,7 +902,7 @@ function SameTypeSub (|message| first,  |message| second,  |SCNode| name_space, 
 	if Obj1 and Obj2
 		0
 	  elseif !Obj1 and !Obj2
-		rz = t1.better_numeric(t2) // oof
+		rz = t1.better_numeric(t2, first, second) // oof
 	  elseif Obj1
 		t2 = t2.newwrapper(t2)
 	  else
@@ -1358,7 +1358,7 @@ function scdecl.ConstInRangeSub (|int64| Value, |bool|)
 				return (value >= -1) and (value <= 0xFFFF)
 		  elseif S == 1
 			if ign
-				return (value >= char.min) and (value <= char.max)
+				return (value >= int8.min) and (value <= int8.max)
 			  else
 				return (value >= -1) and (value <= 0xFF)
 	return true
@@ -1387,6 +1387,8 @@ function SCDecl.AssignabilityCheck (|message?| ln, |message!| RN, |scdecl| rc, |
 	if ln
 		expect ((LN.IsAssignable) and (self isnt const)) (LN, "Not assignable.")
 
+	if rc.isnil
+		return true
 	if  .IsCArray  or  rc.IsCArray
 		expect  (.c_array == rc.c_Array) (rn, "Sizes don't match")
 		if rn in @sheb
@@ -1502,7 +1504,15 @@ function TypeOfRel (ExprResolver)
 		ln.obj = lc // put inside MakeAccess0?
 		// rz --> rz[]
 	
-	LC.ExpectRelMatch( RC, RN, side, exp )
+
+	if LC.ExpectRelMatch( RC, RN, side, exp ) // RN/LN have changed... and their types too!
+		debugat
+		if "PackTestConsts".trap
+		ln = exp.first!
+		rn = exp.last!
+		rc = rn.fastdecl
+		lc = ln.fastdecl
+	
 	
 	if !side and (comp Is Compare)
 		Return TypeBool!.typenormal
@@ -1514,7 +1524,7 @@ function TypeOfRel (ExprResolver)
 
 	  else
 		if custom & (CustomOps.TypeCastToBetter|||customops.TypeCastToSmaller) 
-			|| pc = lc.better_numeric(rc, comp.Kind, opch)
+			|| pc = lc.better_numeric(rc, comp.Kind, ln, rn)
 			if  pc is const  and  lc isnt const // sigh... we got rc instead of lc
 				lc = pc.type.typenormal
 			  else

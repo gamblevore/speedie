@@ -225,7 +225,7 @@ helper Object.SaveTryCollect (|&ObjectSaver| Saver)
 
 
 
-prototype SaverLoadClass (|&ClassData| cls, |&char| Data)
+prototype SaverLoadClass (|&ClassData| cls, |&int8| Data)
 
 class SaverClassInfo (array)
 	default nil
@@ -237,7 +237,7 @@ class SaverClassInfo (array)
 	
 	|&ClassData|		Cls
 	|SaverClassInfo?|	NextInfo
-	|&char|				Data
+	|&int8|				Data
 	
 
 //	function AdFub (|faststring| fs)
@@ -248,7 +248,7 @@ class SaverClassInfo (array)
 //			fs.AppendObjectID(obj)
 
 
-	constructor ( |&ClassData| Cls, |&char| Data )
+	constructor ( |&ClassData| Cls, |&int8| Data )
 		.cls  = cls
 		.data = data
 

@@ -95,6 +95,8 @@ typedef ivec4 ParserLineAndIndent;
 
 typedef byte ProcessMode;
 
+typedef byte ProcessOwnerMode;
+
 typedef int SizeInt;
 
 typedef byte Syntax;
@@ -886,6 +888,9 @@ extern Array* JB__ErrorSeverity__names;
 #define kJB__ProcessMode_CaptureErrors 2
 #define kJB__ProcessMode_CaptureOrPrintErrors 6
 #define kJB__ProcessMode_CaptureStdOut 1
+#define kJB__PIDM_Default (0)
+#define kJB__PIDM_OwnGroup 2
+#define kJB__PIDM_StdOutFlowsThroughUs 1
 extern int JB__Syx_CurrFuncID_;
 #define kJB__TaskState_Animation 16
 #define kJB__TaskState_Finished 64
@@ -1532,6 +1537,9 @@ int JB_Rg_Width(IntRange Self);
 
 
 // ProcessMode
+
+
+// ProcessOwnerMode
 
 
 // SizeInt

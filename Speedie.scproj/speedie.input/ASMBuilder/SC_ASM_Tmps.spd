@@ -3,7 +3,7 @@
 // for some reason, replacing this will cause speedie to generate bad code
 // I guess I am setting the Flags somewhere, or testing them? but I can't see where.
 function Message.ASMType (|ASMTmp|)
-	rz = .FLAGS & 63
+	return .FLAGS & 63
 	
 	
 // if we can fix this... we can get a bigger ASMtmp table!

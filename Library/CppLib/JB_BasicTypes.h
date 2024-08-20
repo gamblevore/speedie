@@ -56,8 +56,7 @@
     typedef unsigned char       u8;
 #endif
 #ifndef int8
-    typedef signed char         int8;
-    typedef signed char         s8;
+    typedef char         		int8;
 #endif
 
 typedef unsigned char			byte;

@@ -5,18 +5,20 @@
 */
 
 
-datatype int8 (char) 
 
 
-datatype char
+datatype int8
 	default 0
 	
 	constants
-		|char|
+		|int8|
 		max = 127
 		min = -128
 	syntax cast (|bool|)
 		return self|bool|
+
+
+datatype char (int8) 
 
 
 

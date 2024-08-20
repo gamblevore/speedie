@@ -40,10 +40,6 @@ struct FatASM
 		|| i = instruction.typelist[.op]
 			return i.Sizes
 		debugger
-	
-//	function AsReg (|asmreg|)
-//		cpp_part AsReg0
-//		return self * .info
 
 	operator mul (|asmreg| info, |asmreg|)
 		cpp_part AsReg

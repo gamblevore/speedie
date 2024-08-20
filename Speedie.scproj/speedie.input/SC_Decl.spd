@@ -198,7 +198,7 @@ class SCDecl (SCNamed) {
 		Return dcl
 
 	
-	function Better_Numeric (|scdecl| o, |opmode| Mode=0, |message| where = nil, |scdecl|)
+	function Better_Numeric (|SCDecl| o, |opmode| Mode=0, |message| Left, |message| Right, |scdecl|)
 		opt norefcounts
 										// int+float-->float
 										// int+double-->double
@@ -213,7 +213,7 @@ class SCDecl (SCNamed) {
 				
 			if (s &~ datatypecode.sign) == (t &~ datatypecode.sign)
 				return self
-		|| cls = s.better_numeric_sub(t, Mode, where)!
+		|| cls = s.better_numeric_sub(t, Mode, left, right)!
 		if cls.typeinfo == s
 			return self					// in case of: || x = (date(), 0)(test)
 		if cls.typeinfo == t
@@ -226,39 +226,22 @@ class SCDecl (SCNamed) {
 	function SCDecl.IsInt (|bool|)
 		return .type.typeinfo.isint
 
-//	function asdasd_bad
-//		|int|  x
-//		|uint| y
-//		if x > y
-//		
-//	function asdasd_bad
-//		|char| x
-//		|uint| y
-//		if x > y
 
-	function asdasd_bad
-		|uint64| V
-		|| signed2 = (v < 1)|int|
-//		|| signed  = (v < 0)|int|
-//			v = ~v
-		
-	function asdasd_OK
-		|int|  x
-		|byte| y
-		if x > y
-
-
-	function datatypecode.Better_Numeric_Sub (|datatypecode| t, |opmode| Op, |message| where, |SCClass|)
+	function datatypecode.Better_Numeric_Sub (|datatypecode| t, |opmode| Op, |message!| Left, |message!| Right, |SCClass|)
+		opt norefcounts
 		|| bme = .itembitcount
 		|| bt = t.itembitcount
-		|| bits	= bme max bt
-		// what about a float + an int? f64 right?
+		|| bits	= bme max bt		// what about a float + an int? f64 right?
 		if .isfloat or t.isfloat
-			if bits > 32
-				return typef64
-			if bits >= 16
-				return typefloat
-			return typehfloat
+			if bits == 16 // now what?
+			|| FF = (datatypecode.double.floatness, datatypecode.float.floatness)(bits > 32)
+			|| dest = (TypeFloat64!, TypeFloat!)(bits > 32)
+			if .floatness != FF
+				left.CastToClass(dest)
+			if t.floatness != FF
+				right.CastToClass(dest)
+			// now what? we need to check which is which?
+			return dest
 		
 		if Op
 			if Op is MakesSigned				// -
@@ -284,7 +267,7 @@ class SCDecl (SCNamed) {
 			return (typeint  , typeuint  )(signed)
 		if bits >  8
 			return (typeint16, typeuint16)(signed)
-		return TypeByte
+		return (typechar, TypeByte)(signed)
 
 
 	function PointeryMatch (|scdecl| O, |bool|)
@@ -583,7 +566,7 @@ class SCDecl (SCNamed) {
 
 
 	function Message.ExpectClass (|SCDecl| slf, |SCClass| Cls, |bool|)
-		return slf.expectmatch(cls.typenormal, 0, self, self) 
+		return slf.expectmatch(cls.TypeNormal, 0, self, self) 
 	
 
 	function SCDecl.ExpectFail  (|scdecl| o, |message?| errnode, |message?| backup)
@@ -598,6 +581,13 @@ class SCDecl (SCNamed) {
 
 		
 	function ExpectMatch (|SCDecl| O, |int| TypeCast, |Message?| exp, |Message?| ErrNode = nil, |Message|)
+		opt norefcounts
+		rz = .ExpectMatchSub(o, typecast, exp, errnode)
+		if !rz
+			rz = exp
+	
+	
+	function ExpectMatchSub (|SCDecl| O, |int| TypeCast, |Message?| exp, |Message?| ErrNode = nil, |Message|)
 		if exp and exp.IsSmallInt(O)
 			typecast |= kTypeCastFromZero
 		
@@ -608,8 +598,6 @@ class SCDecl (SCNamed) {
 		if (Matched == kNoMatch)
 			.ExpectFail(o, ErrNode, exp)
 			.TypeMatch(O, TypeCast, exp)
-
-		return exp
 
 	
 	operator matches (|SCDecl!| O, |bool|)
@@ -969,17 +957,17 @@ class SCDecl (SCNamed) {
 		return kCastedmatch
 		
 	
-	function Message.CastToBool (|SCNode|name_space=nil, |int|)
-		return .castToType("bool", TypeBool!, name_space, kLossycastedmatch)
+	function Message.CastToBool (|SCNode| name_space = nil, |int|)
+		return .castToType("bool", TypeBool!, name_space, kLossyCastedMatch)
 
 
 	function Message.CastFPToVoidPtr (|int|)
 		|| cst = @type + ":)"
 		.prev = cst
 		cst <~ self
-		cst.msg(@emb).obj = typevoidptr
+		cst.msg(@emb).obj = TypeVoidPtr
 		
-		cst.obj = typevoidptr	 // hmmm.... why not do it anyhow?
+		cst.obj = TypeVoidPtr	 // hmmm.... why not do it anyhow?
 		return kCastedMatch
 
 
@@ -1052,16 +1040,16 @@ class SCDecl (SCNamed) {
 		rz.msg(@arr) <~ 0
 	
 	
-	function ExpectRelMatch (|SCDecl| O,  |Message| exp,  |Message?| side,  |Message?| ErrNode = nil)
+	function ExpectRelMatch (|SCDecl| O,  |Message| exp,  |Message?| side,  |Message?| ErrNode = nil, |bool|)
 		opt norefcounts
-		// Just like ExpectMatch, except always does type-casting. and returns nothing.
+		// Just like ExpectMatch, except always does type-casting.
 		
 		|| Cast = kTypeCastTrue
 		cast |= kTypeCastBothWays * !side
 		if  self isnt local  or  o isnt local
 			cast |= kTypeCastSetToMemory // float conversion...
 		
-		.ExpectMatch( O, Cast, exp, ErrNode )
+		rz = .ExpectMatchSub( O, Cast, exp, ErrNode )
 				
 		if (self is self) and (scfunction.currfunc is Destructor) 
 			error (exp, "You can’t modify 'self' in a constructor or destructor.")

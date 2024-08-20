@@ -555,9 +555,9 @@ function DoMath (fn_asm)
 	debugger // what?
 		
 
+
 helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr,  |fn_opasm!| fn, |asmreg|)
 	opt norefcounts
-
 	|| F = exp.first!
 	|| op = f.next!
 	
@@ -570,18 +570,19 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr
 		.closeVTmps(TmpCloser)
 	
 	if dest is Discard
-		return asmreg() // no need to do anything. {a()+b()}
+		return asmreg() // no need to do anything:   {a() + b(),  c()}
 
 	dest = .TempMe(exp, dest)
-	dest.µtype = ml.µtype				// assignment conversion needs doing?	
-	(dest is frommath)
-
+	(dest is FromMath)
 	if  ml is ConstAny  and  mr is ConstAny
 		(Dest is MathConst)
-	if ml.floatness != mr.floatness // ugh
+	
+	
+	if ml.floatness != mr.floatness					// Shouldn't happen.
 	rz = (fn)(self, dest, ml, mr, op)
-	if dest is mathconst and rz isnt mathconst // hmm?
+	if dest is mathconst and rz isnt mathconst		// hmm?
 		debugger, (fn)(self, dest, ml, mr, op)
+
 
 
 function Ignore			(fn_asm)
