@@ -7,7 +7,7 @@
 
 
 
-datatype int8
+datatype int8 // aka char
 	default 0
 	
 	constants
@@ -18,7 +18,7 @@ datatype int8
 		return self|bool|
 
 
-datatype char (int8) 
+//datatype char (int8) // no need
 
 
 
