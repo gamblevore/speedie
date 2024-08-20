@@ -12,6 +12,8 @@ Speedie has a lot of safety features built in, including:
 * A Safe Library
 * Managed-Memory
 
+### Memory Safety
+
 Speedie's memory-manager is a form of safety... its what you expect from most OOP systems, but its worth mentioning as C/C++ doesn't have it.
 
 
