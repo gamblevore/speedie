@@ -107,7 +107,7 @@ class SCDecl (SCNamed) {
 	|Message?|			Default
 	|SCClass|			Type
 	|SCDeclInfo|		Info
-	|Datatypecode|		DType
+	|Datatypecode|		µType2
 	|Byte|				PointerCount
 	|NilState|			NilDeclared
 	|byte| 				NilReg
@@ -127,8 +127,14 @@ class SCDecl (SCNamed) {
 		opt norefcounts
 		return (.MemoryLayer.obj as SCImport)!
 	
+	setter µType (|datatypecode|)
+		.µType2 = value& DataTypeCode.PossibleBits 
+	
+	function µType (|datatypecode|)
+		return .µType2
+	
 	function Reg (|asmreg|)
-		return .DType|asmreg|
+		return .µType|asmreg|
 	
 	syntax append (|SCDeclInfo| d)
 		.info |= d

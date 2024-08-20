@@ -110,11 +110,7 @@ struct FatASM
 			(.info as= flags)
 		  else
 			(.info asnt= flags)
-	
-	function BitCorrect (|&FATASM|)
-		is BitCorrect
-		return self
-	
+		
 		
 	function LinkedFrom (|fatasm| New)
 		.refcount++

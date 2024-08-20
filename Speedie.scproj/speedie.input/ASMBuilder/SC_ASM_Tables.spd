@@ -188,7 +188,7 @@ function Ternary		(fn_asm)
 	|| A = cond.next!
 	|| B = A.next!
 	
-	|| destType = exp.ASMDecl.DType
+	|| destType = exp.ASMDecl.µType
 	|| mA = .ExistingVar(a, desttype)
 	|| mB = .ExistingVar(b, desttype)
 	if ma!=nil and mb!=nil
@@ -259,7 +259,7 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 	|| UponConst = sr is ConstAny
 	|&fatasm| fat
 	if oldtype.isfloat or newtype.isfloat
-		fat = exp.CONV(dest, sr, oldtype.asmconv(newtype)).BitCorrect
+		fat = exp.CONV(dest, sr, oldtype.asmconv(newtype))
 		if UponConst
 			(fat is ConstAny)
 			|| srf = sr.needfat
@@ -269,7 +269,7 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 				fat.FloatIntConvConst(srf, oldtype, newtype)
 	  else
 		|| sh = 64 - oc
-		fat = exp.BFLG(dest, sr, sh, sh, sr.signed|int|).bitcorrect
+		fat = exp.BFLG(dest, sr, sh, sh, sr.signed|int|)
 		if UponConst
 			|| oof = fat.Const << sh
 			fat.Const = (oof|int64| >> sh, oof|uint64| >> sh)(sr.Signed) // shift up and down
@@ -565,7 +565,6 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr
 	if mr isnt SingleExpr
 		|| TmpCloser = .VTmps
 		|| D1 = (dest & asmreg.discard) as asmreg.stayopen
-		debugat  0
 		ml = .µ(F, D1) asnt asmreg.stayopen
 		mr = .µ(exp.last!, dest & asmreg.discard)
 		.closeVTmps(TmpCloser)
@@ -577,11 +576,11 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr
 	dest.µtype = ml.µtype				// assignment conversion needs doing?	
 	(dest is frommath)
 
-	if  ml isnt ConstAny  or  mr isnt ConstAny
-		return (fn)(self, dest, ml, mr, op)
-	(Dest is MathConst)
+	if  ml is ConstAny  and  mr is ConstAny
+		(Dest is MathConst)
+	if ml.floatness != mr.floatness // ugh
 	rz = (fn)(self, dest, ml, mr, op)
-	if rz isnt mathconst // hmm?
+	if dest is mathconst and rz isnt mathconst // hmm?
 		debugger, (fn)(self, dest, ml, mr, op)
 
 
@@ -615,7 +614,7 @@ function ASMReg.ReadOrWrite (|message| m, |asmreg| ptr, |int| index, |bool| DoRe
 	  else
 		A = ASMTmp.WriteASM[bytes]
 	isnt set
-	return m.RD4U(self, ptr, asmreg(), index, 0).BitCorrect
+	return m.RD4U(self, ptr, asmreg(), index, 0)
 //		r1		R	// dest
 //		r2		r	// Base
 //		r3		r	// VarAdd
@@ -736,8 +735,8 @@ function DataTypecode.ASMPart (|int|)
 function Message.TypeCastDoesNothing (|Datatypecode| Expected, |bool|)
 	opt norefcounts
 //	if Expected == DataTypeCode.UnusedType
-	Expected = .second!.ASMDecl.DType
-	|| Src = .first!.ASMDecl.DType
+	Expected = .second!.ASMDecl.µType
+	|| Src = .first!.ASMDecl.µType
 	|| XC = Expected.ByteCount
 	|| SC = Src.ByteCount
 	if  (Expected.IsFloat != Src.isfloat)  or  (src.Count != Expected.Count)

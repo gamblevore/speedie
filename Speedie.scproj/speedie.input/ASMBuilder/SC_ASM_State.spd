@@ -144,28 +144,29 @@ struct ASMState
 		if (d < .vtmps)
 			|| t = Type.CalculateASMType
 			t.reg = d
-			Type.DType = t|datatypecode|   		// right?
+			Type.µType = t|datatypecode|   		// right?
 			.vdecls = d
 			.Registers[d].Type = Type
 			target debug: Type.ASMSanity
 			return t
 		error (self, where, "No free local variables.")			
-	
-	
-	function TempMe (|Message| where, |asmreg| T=asmreg.Temp,  |asmreg|) // .needreg
+
+
+	function TempMe (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)				// .needreg
+		opt norefcounts
 		|| r = t.reg
 		if !r
-//			if .Registers[r].Type != where.ASMDecl // hmmmm.... well now what?
-//		  else
 			r = .vtmps - 1
 			check (r > .vdecls) (where, "No free local variables.")
 			t.reg = r
 			.vtmps = r
 		if t isnt textual
-			.Registers[r].Type = where.ASMDecl
+			|| d = where.asmdecl
+			.Registers[r].Type = d
+			t.µtype = d.µtype
 		return t
 
-	
+
 	helper FoundCode (|int| i, |uint64| Value, |asmreg| typeinfo, |asmreg|)
 		opt norefcounts
 		|| place = .regplace(i)
@@ -238,7 +239,7 @@ struct ASMState
 		.CloseVTmps(TmpCloser, dest)
 		target debug
 			|| ty = exp.ASMDecl
-			if ty.DType != ss.µType
+			if ty.µType != ss.µType
 				debugger
 				(fn)(self, exp, dest)
 		return ss

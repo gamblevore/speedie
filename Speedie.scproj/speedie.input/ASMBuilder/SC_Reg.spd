@@ -29,17 +29,20 @@ datatype AsmReg (uint64)
 		ConstAny
 		ContainsAddr
 		AddrRequest
-		BitCorrect
 		Textual
-		CorrectAddr		= ContainsAddr ||| bitcorrect
+		CorrectAddr		= ContainsAddr // remove?
 		Arg				= Discard         // ||| SrcConst
 		CondRequest
 		CondAnswer
 		MathConst		= ConstAny ||| FromMath
-		Zero			= ConstAny ||| BitCorrect ||| 56 // 56 == datatypecode.uint64
+		Zero			= ConstAny ||| 56 // 56 == datatypecode.uint64
 	
 	
 
+	function Floatness (|int|)
+		if .isint
+			return 0
+		return .µtype.bytecount // makes sense
 	
 	function F32 (|float|)
 		return .needfat.F32
@@ -112,7 +115,7 @@ datatype AsmReg (uint64)
 		return 64 - .bitcount
 	
 	function µType (|DataTypeCode|)
-		return self|DataTypeCode|
+		return self|DataTypeCode| & DataTypeCode.PossibleBits
 	
 	function µType (assigns:|DataTypeCode|, |asmreg|)
 		|| Clear = ~(DataTypeCode.PossibleBits|uint64|)

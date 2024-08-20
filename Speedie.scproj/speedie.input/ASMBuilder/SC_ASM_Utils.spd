@@ -16,8 +16,8 @@ function message.ThgDecl (|SCDecl?|)
 function message.ASMDecl (|SCDecl!|)
 	opt norefcounts
 	rz = .fastdecl
-	if rz.dtype == datatypecode.unusedtype
-		rz.dtype = rz.CalculateASMType|datatypecode|
+	if rz.µtype == datatypecode.unusedtype
+		rz.µtype = rz.CalculateASMType|datatypecode|
 	target debug: rz.ASMSanity
 
 
@@ -25,7 +25,7 @@ function scdecl.ASMSanity
 	target debug
 		ifn .iscarray or .pointercount or .isobject
 			|| size = .type.Size
-			if size != .dtype.bytecount // sigh. what?
+			if size != .µtype.bytecount // sigh. what?
 				#!"Should we have set the dtype when the decl was created? or at least verified in the nil-checker?"
 				#!"We could change it if it is only 112."
 				debugger
