@@ -405,7 +405,7 @@ class Window (GUIControl)
 	function guicontrol.ControlAt (|ivec4| P, |int| pad, |bool| clicks=false, |Guicontrol?|)
 		opt norefcounts
 		for R.reverse in self
-			if r is visible and enabled
+			if (r is visible and enabled) and !r.decluttering
 				|| rr = r.lastrect ± -pad 
 				if rr overlaps p
 					if r > 0

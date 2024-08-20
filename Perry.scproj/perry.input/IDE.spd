@@ -362,7 +362,10 @@ class PerryIDE (Window)
 		
 		require !.CurrMouseDown 
 		if HideTabs == VisTabs
-			.ProjectTabs.declutter = HideTabs
+//			if hidetabs	// we don't have the ability to fade in... actually.
+//				.ProjectTabs.declutternow = HideTabs
+//			  else
+				.ProjectTabs.declutter = HideTabs
 			
 		if (hidetop == vistop)
 			.StartScreen.declutter = hidetop

@@ -672,7 +672,7 @@ module SDLApp
 			rz = true
 
 
-	function CheckQuarantine
+	helper CheckQuarantine
 		if platform.osx and app.isQuarantined
 			sdlapp.alert("Please drag this app to the /Applications/ folder to stop MacOSX quarantining it.", "Quarantine Warning" )
 

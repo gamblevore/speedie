@@ -85,6 +85,16 @@ struct TimeFader
 		|| f = .final
 			return now >= f
 
+	function Value (assigns:|bool|)
+		sdlapp.touch
+		if value
+			.final = date.now
+			.scale = 1.0
+		  else
+			.final = 0
+			.scale = 0 
+		
+
 	function Fire (|float| Seconds, |float| Delay = 0.0,  assigns:|bool|)
 		sdlapp.touch
 		if value

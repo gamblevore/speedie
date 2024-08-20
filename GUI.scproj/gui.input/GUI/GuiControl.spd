@@ -200,6 +200,9 @@ class GUIControl (list)
 	
 	setter Declutter (|bool|) 
 		.declutterer.fire(0.334, 0.5) = value
+
+	setter DeclutterNow (|bool|) 
+		.declutterer.value = value
 		
 	function Decluttered (|bool|)
 		return .Declutterer.Finished
