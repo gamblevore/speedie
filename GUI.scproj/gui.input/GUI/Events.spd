@@ -61,7 +61,7 @@ struct SDL_TextEditingEvent
 	|uint|			type								// SDL_TEXTEDITING
 	|uint|			timestamp							// In milliseconds, populated using SDL_GetTicks()
 	|uint|			windowID							// The window with keyboard focus, if any
-	|char[32]|		text								// The editing text
+	|int8[32]|		text								// The editing text
 	|uint|			start								// The start cursor of selected editing text
     |uint|			length								// The length of selected editing text
     
