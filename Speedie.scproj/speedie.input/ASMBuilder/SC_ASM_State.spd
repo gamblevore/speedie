@@ -34,7 +34,7 @@ struct ASMState
 			.CloseReg(v--)
 		.VDecls = v
 
-	function CloseVTmps (|int| i, |asmreg| dest=asmreg())
+	function CloseVTmps (|int| i, |asmreg| dest=ASMReg())
 		if dest isnt StayOpen
 			|| v = .VTmps
 			while v < i
@@ -200,7 +200,8 @@ struct ASMState
 		// but loops must be pre-checked!
 		
 		if !value
-			return asmreg()
+			typeinfo.reg = 0
+			return typeinfo
 		|| R = .regmap &~ 1
 		for (b.bits in R) (i)
 			|| f = .FoundCode(i, value, typeinfo)
@@ -227,21 +228,17 @@ struct ASMState
 		target !debug
 			opt inline
 		cpp_part Get
-		|| ExpASM = exp.ASMType
-		|| fn = fn_asm_table[expasm]!
-		target debug
-			if !expasm
-				fn = fn_asm_table[exp.func|int|]!
-				debugger
-
+		|| fn = fn_asm_table[exp.ASMType]!
 		|| TmpCloser = .VTmps
 		|| ss = (fn)(self, exp, dest)
 		.CloseVTmps(TmpCloser, dest)
+
 		target debug
-			|| ty = exp.ASMDecl
-			if ty.µType != ss.µType
-				debugger
-				(fn)(self, exp, dest)
+			if exp != @sheb
+				|| ty = exp.ASMDecl
+				if ty.µType != ss.µType
+					debugger
+					(fn)(self, exp, dest)
 		return ss
 
 

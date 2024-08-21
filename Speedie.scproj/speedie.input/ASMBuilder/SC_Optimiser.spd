@@ -386,3 +386,5 @@ function OptFADK (Fn_µOpt)
 // a = b
 
 
+///// And/OR can be optimised also... many tricks. Including terns, BAND, BOR, etc.
+/////

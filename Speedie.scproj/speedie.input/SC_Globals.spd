@@ -1506,8 +1506,6 @@ function TypeOfRel (ExprResolver)
 	
 
 	if LC.ExpectRelMatch( RC, RN, side, exp ) // RN/LN have changed... and their types too!
-		debugat
-		if "PackTestConsts".trap
 		ln = exp.first!
 		rn = exp.last!
 		rc = rn.fastdecl

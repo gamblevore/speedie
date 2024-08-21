@@ -66,6 +66,9 @@ module SpdAssembler
 	
 	
 	function VacGenerate (|scfunction| fn, |bool|)
+		if fn ~!= "PackTestConsts"
+			return true
+		printline fn
 		expect (.GenerateASM(fn) or (ASMState.ExpandJSM and .GenerateASM(fn))) "ASM is out of memory." 
 
 		printline fn.asm!.render

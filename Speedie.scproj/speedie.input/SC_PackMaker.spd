@@ -89,6 +89,7 @@ module PackMaker
 		#!Actually Pack ThEsE!?
 		opt norefcounts
 		for fn in Compiler.FuncList
+			if fn ~= "PackTestConsts"
 			if fn.tableid
 				require SpdAssembler.VacGenerate(fn)
 		return true

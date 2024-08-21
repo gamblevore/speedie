@@ -561,17 +561,25 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr
 	|| F = exp.first!
 	|| op = f.next!
 	
-	|| ml = AsmReg()
+	|| ml = ASMReg()
 	if mr isnt SingleExpr
 		|| TmpCloser = .VTmps
 		|| D1 = (dest & asmreg.discard) as asmreg.stayopen
 		ml = .µ(F, D1) asnt asmreg.stayopen
 		mr = .µ(exp.last!, dest & asmreg.discard)
-		.closeVTmps(TmpCloser)
+
+		// OK... so when we close the vtemps...
+		// What do we do? 
+		// if we close it ahead of time...
+		/// but later we call getconst... which fails at doing this.
+		// it thinks these registers are closed. So we can't read from them
+		// besides, getconst has no understanding of blocks. tht needs to be fixed.
+		.CloseVTmps(TmpCloser)
 	
 	if dest is Discard
-		return asmreg() // no need to do anything:   {a() + b(),  c()}
+		return ASMReg() // no need to do anything:   {a() + b(),  c()}
 
+	
 	dest = .TempMe(exp, dest)
 	(dest is FromMath)
 	if  ml is ConstAny  and  mr is ConstAny
@@ -580,8 +588,9 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr
 	
 	if ml.floatness != mr.floatness					// Shouldn't happen.
 	rz = (fn)(self, dest, ml, mr, op)
-	if dest is mathconst and rz isnt mathconst		// hmm?
-		debugger, (fn)(self, dest, ml, mr, op)
+	target debug
+		if dest is mathconst and rz isnt mathconst		// hmm?
+			debugger, (fn)(self, dest, ml, mr, op)
 
 
 
