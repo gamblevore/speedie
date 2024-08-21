@@ -123,6 +123,8 @@ function InitComp (|string| name_)
 module {
 	|Dictionary of SCOperator|			Dict = dictionary()
 	|int|								CustomOperatorScore
+	|scoperator|						And
+	|scoperator|						Or
 	|scoperator|						Assigns
 	|scoperator| 						Negative= SCOperator.new(&asmstate.minus, opmode.Subtraction)	// -b... not a-b!
 	|scoperator| 						Subtract														// a-b!!
@@ -146,11 +148,6 @@ module {
 			if (result isnt custom)
 				opch.name = result.name
 		
-		if op == "or"
-			result.kind |= opmode.OR
-		  elseif op == "and"
-			result.kind |= opmode.and
-		// why aren't 'if "" > nil' here? I think... cos no one would do that?
 		return Result
 
 
@@ -169,15 +166,15 @@ module {
 		.OppositeComp("<", ">=")
 		.OppositeComp(">", "<=")
 
-		.AddAssign
-
+		.AddBasic
+		
 		.AddMath( "mod",	"mod",		&asmstate.Mod,		/*.Mod*/	opmode.NeedsCppFuncOnFloats)
 		.AddMath( "+",		"Plus",		&asmstate.Plus,		/*.Add*/	opmode.Addition)
 		.AddMath( "-",		"Minus",	&asmstate.Subtract,	/*.sub*/	opmode.subtraction)
 		.AddMath( "*",		"Mul",		&asmstate.Mul,		/*.mul*/)
 		.AddMath( "/",		"Divide",	&asmstate.Div,		/*.div*/)
 
-		.addbit( ">>",	"ShiftRight",	&asmstate.SHR,		/*.shru*/	opmode.shift)
+		.AddBit( ">>",	"ShiftRight",	&asmstate.SHR,		/*.shru*/	opmode.shift)
 		LeftShift = .addbit( "<<",	"ShiftLeft",	&asmstate.SHL,		/*.shl*/	opmode.shiftonly) // can add bits
 		.AddBit( "(|)",	"BitOr",		&asmstate.BitOr,	/*.bor*/)
 		.AddBit( "&",	"BitAnd",		&asmstate.BitAnd,	/*.ban*/	opmode.SameOrLessBits)
@@ -215,8 +212,10 @@ module {
 		SCOperator.new(newname, nil, mode ||| OpMode.custom).InitComp( newname )
 	
 		
-	function AddAssign
+	function AddBasic
 		.assigns = SCOperator.new("=", &asmstate.Assign, OpMode.assigns)
+		.and = SCOperator.new("and", &asmstate.And, OpMode.AND)
+		.or = SCOperator.new("or", &asmstate.OR, OpMode.OR)
 
 		
 	function AddMath (|string| s,  |string| FuncName, |fn_opasm| ASM, |OpMode| Mode=0)

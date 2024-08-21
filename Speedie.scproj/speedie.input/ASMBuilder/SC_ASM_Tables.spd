@@ -350,15 +350,6 @@ function SetRel	(fn_asm)
 	if var!=nil and dest.reg == var.reg
 		return dest // done!
 
-//	// This must be a memory set!  L must be accepting memory... from a register.
-//	// what about bools? // they already get casted? its just float/double thats the issuenow.
-//	// mybool = MyFloat
-//	|| mybool = false
-//	|| myfloat = 1.0
-//	|Float64| mydouble
-//	mybool = 1.0
-//	mybool = myfloat
-//	mydouble = myfloat
 	.µ(exp.first!, dest as AsmReg.set)
 
 
@@ -574,6 +565,8 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr
 		/// but later we call getconst... which fails at doing this.
 		// it thinks these registers are closed. So we can't read from them
 		// besides, getconst has no understanding of blocks. tht needs to be fixed.
+		// could we store this in... an scarg?
+		// well... no. and/or also create blocks. Terns too.
 		.CloseVTmps(TmpCloser)
 	
 	if dest is Discard
@@ -585,7 +578,7 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr
 	if  ml is ConstAny  and  mr is ConstAny
 		(Dest is MathConst)
 	
-	
+	// what if the operator is and/or?
 	if ml.floatness != mr.floatness					// Shouldn't happen.
 	rz = (fn)(self, dest, ml, mr, op)
 	target debug
@@ -717,29 +710,6 @@ function DataTypecode.ASMPart (|int|)
 	if .isfloat
 		return 0 + (.bitcount > 32)
 	return 2 + .issigned
-
-/*
-        case 0 : d.Float = s.Float;  break;
-        case 1 : d.Float = s.Double; break;
-        case 2 : d.Float = s.Uint;   break;
-        case 3 : d.Float = s.Int;    break;
-        
-        case 4 : d.Double = s.Float;  break;
-        case 5 : d.Double = s.Double; break;
-        case 6 : d.Double = s.Uint;   break;
-        case 7 : d.Double = s.Int;    break;
-        
-        case 8 : d.Uint = s.Float;  break;
-        case 9 : d.Uint = s.Double; break;
-        case 10: d.Uint = s.Uint;   break;
-        case 11: d.Uint = s.Int;    break;
-        
-        case 12: d.Int = s.Float;  break;
-        case 13: d.Int = s.Double; break;
-        case 14: d.Int = s.Uint;   break;
-        case 15: d.Int = s.Int;    break;
-*/
-
 
 
 function Message.TypeCastDoesNothing (|Datatypecode| Expected, |bool|)

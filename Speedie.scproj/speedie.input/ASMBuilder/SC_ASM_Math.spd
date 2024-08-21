@@ -481,3 +481,12 @@ extend ASMState
 			error (Exp) // i mean i can use cmpf?
 		return exp.CMPB(dest, L, asmreg(), 1)*dest
 
+
+	function AND (fn_opasm)
+		#!finish this off
+		debugger
+
+	function OR (fn_opasm)
+		#!finish this off
+		debugger
+

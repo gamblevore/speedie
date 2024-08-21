@@ -16,8 +16,7 @@ struct ASMState
 	|bool|						Inited   
 	|byte|						VDecls
 	|byte|						VTmps
-//	|byte|						WithinBranch // remove?
-
+	
 	|SCFunction--|				fn       
 	|µFunc|						Out      
 	|&FatASM|					FuncStart
@@ -54,12 +53,6 @@ struct ASMState
 
 	function Last (|&FatASM|)
 		return .curr-1
-
-//	function ExpectReg (|int| a, |&fatasm|)
-//		|| b2 = .RegPlace(A)[0]
-//			return b2
-//		error (self, errorreceiver.NonFatal + ": Register was nil")
-//		return .zero
 
 	function RegPlace (|int| a, |&regstate|)
 		opt norefcounts
@@ -102,8 +95,8 @@ struct ASMState
 			return exp.ADPK(reg, ToGrow, Value) * reg
 		.Assign(reg, ToGrow, asmreg(), exp)
 		rz = .AddConstant(exp, togrow, ToGrow, value)
-	
-	
+
+
 	function AddConstant (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
 		if dest.isint
 			if Value.CanStoreAsIntImmediate
@@ -115,7 +108,7 @@ struct ASMState
 		debugat
 		|| where = .NumToReg(exp, value)
 		return .Plus(dest, src, where, exp)
-		
+
 
 	syntax append (|int| code, |message| dbg, |&FatASM|)
 		cpp_part RequestOp
@@ -129,16 +122,16 @@ struct ASMState
 			return p
 		.OK = false
 		return .start
-	
-	
+
+
 	syntax expect (|message?| where=nil, |string| msg)
 		|| f = .fn.asm
 			f.length = .curr - .funcstart
 			printline f.render
 		debugger
 		error (where, msg)
-	
-	
+
+
 	function DeclareMe (|Message| where,  |scdecl| Type,  |asmreg|)
 		|| d = .VDecls|int| + 1
 		if (d < .vtmps)
@@ -149,7 +142,7 @@ struct ASMState
 			.Registers[d].Type = Type
 			target debug: Type.ASMSanity
 			return t
-		error (self, where, "No free local variables.")			
+		error (self, where, "No free local variables.")
 
 
 	function TempMe (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)				// .needreg
@@ -188,8 +181,8 @@ struct ASMState
 		|| tmps = .vtmps~bits
 		tmps = ~tmps
 		return dcls ||| tmps
-	
-	
+
+
 	function FindConstDecl (|scdecl| d, |asmreg|)
 		return .findconst(d.exportposition, d.CalculateASMType)
 
