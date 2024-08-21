@@ -81,7 +81,7 @@ class PerryIDE (Window)
 	|bool| 						StillJumping
 	|bool|						CanAskingAboutMissing
 	|bool|						DuringMsgFB  // canloadfile, canupdate, .disable 
-	|char|						DuringNextPrev
+	|int8|						DuringNextPrev
 	|bool|						IsTextOnly
 	|bool|						UsingSpdLib
 	|bool| 						DebugIsWaitingForCompile
