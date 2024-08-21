@@ -494,12 +494,14 @@ SCObject_Behaviour InitTableSCObject_() { // Behaviour
 SCObject_Behaviour SCObject_FuncTable_ = InitTableSCObject_();
 JBClassPlace4(SCObject, JB_AsClass(JB_Object), SCObject_FuncTable_);
 
+SCOperator* SC__Opp_And;
 SCOperator* SC__Opp_Assigns;
 SCOperator* SC__Opp_Bnot;
 int SC__Opp_CustomOperatorScore;
 Dictionary* SC__Opp_Dict;
 SCOperator* SC__Opp_LeftShift;
 SCOperator* SC__Opp_Negative;
+SCOperator* SC__Opp_Or;
 SCOperator* SC__Opp_Subtract;
 SCOperator_Behaviour InitTableSCOperator_() { // Behaviour 
 	SCOperator_Behaviour Result;

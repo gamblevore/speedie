@@ -1989,7 +1989,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (113001352494772));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (113001625680017));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3314,7 +3314,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[179]);
-	JB_FS_AppendInt32(_fsf0, (2024082119));
+	JB_FS_AppendInt32(_fsf0, (2024082120));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8377,7 +8377,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024082119));
+	JB_FS_AppendInt32(_fsf0, (2024082120));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -21001,6 +21001,11 @@ bool SC_Pac_Alloc(ASMState* Self, MWrap* J) {
 	return false;
 }
 
+AsmReg SC_Pac_AND(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp) {
+	//finish this off;
+	return ((AsmReg)0);
+}
+
 AsmReg SC_Pac_Assign(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp) {
 	if (!JB_TC_SyntaxIs(SC_Reg_xC2xB5Type(Dest), kJB__TC_bool)) {
 		return SC_Pac_BitOr(Self, Dest, L, SC_Reg__New(), Exp);
@@ -21551,6 +21556,11 @@ AsmReg SC_Pac_NumToReg(ASMState* Self, Message* Exp, int64 V, AsmReg Reg) {
 	FatASM* Fat = JB_Msg_KNST(Exp, Reg, 0, 0, 0);
 	Fat->Const = V;
 	return SC_FatASM_AsReg(Fat, Reg);
+}
+
+AsmReg SC_Pac_OR(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp) {
+	//finish this off;
+	return ((AsmReg)0);
 }
 
 bool SC_Pac_PackMakerInit(ASMState* Self) {
@@ -26980,8 +26990,10 @@ OpMode SC_Opp_SyntaxIs(SCOperator* Self, OpMode X) {
 	return Self->Kind & X;
 }
 
-void SC_Opp__AddAssign() {
+void SC_Opp__AddBasic() {
 	JB_SetRef(SC__Opp_Assigns, SC_Opp_Constructor(nil, JB_LUB[480], (&SC_Pac_Assign), kSC__OpMode_Assigns));
+	JB_SetRef(SC__Opp_And, SC_Opp_Constructor(nil, JB_LUB[1429], (&SC_Pac_AND), kSC__OpMode_AND));
+	JB_SetRef(SC__Opp_Or, SC_Opp_Constructor(nil, JB_LUB[210], (&SC_Pac_OR), kSC__OpMode_OR));
 }
 
 SCOperator* SC_Opp__AddBit(JB_String* S, JB_String* FuncName, fn_OpASM ASM, OpMode Mode) {
@@ -27079,7 +27091,7 @@ void SC_Opp__Init() {
 	SC_Opp__OppositeComp(JB_LUB[484], JB_LUB[224]);
 	SC_Opp__OppositeComp(JB_LUB[467], JB_LUB[487]);
 	SC_Opp__OppositeComp(JB_LUB[485], JB_LUB[475]);
-	SC_Opp__AddAssign();
+	SC_Opp__AddBasic();
 	SC_Opp__AddMath(JB_LUB[97], JB_LUB[97], (&SC_Pac_Mod), kSC__OpMode_NeedsCppFuncOnFloats);
 	SC_Opp__AddMath(JB_LUB[305], JB_LUB[1073], (&SC_Pac_Plus), kSC__OpMode_Addition);
 	SC_Opp__AddMath(JB_LUB[314], JB_LUB[938], (&SC_Pac_Subtract), kSC__OpMode_Subtraction);
@@ -27131,12 +27143,6 @@ SCOperator* SC_Opp__Lookup(Message* Opch) {
 		if ((!SC_OpMode_SyntaxCast(((bool)SC_Opp_SyntaxIs(Result, kSC__OpMode_Custom))))) {
 			JB_SetRef(Opch->Name, Result->Name);
 		}
-	}
-	if (JB_Str_Equals(Op, JB_LUB[210], false)) {
-		Result->Kind = (Result->Kind | kSC__OpMode_OR);
-	}
-	 else if (JB_Str_Equals(Op, JB_LUB[1429], false)) {
-		Result->Kind = (Result->Kind | kSC__OpMode_AND);
 	}
 	return Result;
 }
@@ -53205,4 +53211,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -511935096072727048 -9012497123790221653
+// -5997763915291613423 979373963838576193

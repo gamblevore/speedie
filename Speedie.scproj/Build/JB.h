@@ -2424,12 +2424,14 @@ extern byte SC__Imp_CurrIsManuallyImported;
 extern Date SC__Imp_Recent;
 extern Dictionary* SC__Imp_Shaders;
 extern bool SC__Imp_STDLibTime;
+extern SCOperator* SC__Opp_And;
 extern SCOperator* SC__Opp_Assigns;
 extern SCOperator* SC__Opp_Bnot;
 extern int SC__Opp_CustomOperatorScore;
 extern Dictionary* SC__Opp_Dict;
 extern SCOperator* SC__Opp_LeftShift;
 extern SCOperator* SC__Opp_Negative;
+extern SCOperator* SC__Opp_Or;
 extern SCOperator* SC__Opp_Subtract;
 extern Array* SC__PA_FixMe;
 extern int SC__xC2xB5Form_Count;
@@ -5914,6 +5916,8 @@ AsmReg SC_Pac_AddToReg(ASMState* Self, FatASM* Addr, int Add, Message* Exp, SCDe
 
 bool SC_Pac_Alloc(ASMState* Self, MWrap* J);
 
+AsmReg SC_Pac_AND(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
+
 AsmReg SC_Pac_Assign(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
 AsmReg SC_Pac_BFLG_Const(ASMState* Self, Message* Exp, AsmReg Dest, AsmReg L, int Up, int Down);
@@ -6005,6 +6009,8 @@ AsmReg SC_Pac_Mul(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp)
 AsmReg SC_Pac_NotEq(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
 AsmReg SC_Pac_NumToReg(ASMState* Self, Message* Exp, int64 V, AsmReg Reg);
+
+AsmReg SC_Pac_OR(ASMState* Self, AsmReg Dest, AsmReg L, AsmReg R, Message* Exp);
 
 bool SC_Pac_PackMakerInit(ASMState* Self);
 
@@ -6948,7 +6954,7 @@ bool SC_Opp_SyntaxEquals(SCOperator* Self, JB_String* S, bool Aware);
 
 OpMode SC_Opp_SyntaxIs(SCOperator* Self, OpMode X);
 
-void SC_Opp__AddAssign();
+void SC_Opp__AddBasic();
 
 SCOperator* SC_Opp__AddBit(JB_String* S, JB_String* FuncName, fn_OpASM ASM, OpMode Mode);
 
