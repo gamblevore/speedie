@@ -96,10 +96,6 @@ struct ASMState
 		|| place = .regplace(i)$
 		|| K = place[]
 		if K == Value
-//			|| ty = place.Type
-//			if ty is Altered
-//				#!hmmm. now what? need to understand blocks and if/while things?
-//				debugger 
 			typeinfo.reg = i
 			(typeinfo is ConstAny)
 			return typeinfo

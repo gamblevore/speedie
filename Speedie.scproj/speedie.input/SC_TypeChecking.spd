@@ -227,6 +227,5 @@ function scdecl.FloatCast (|scdecl| orig, |message| exp, |int|)
 	 3) We can also have a "FastFloat" type, which is EITHER. Depending on your hardware. (floats only for now.)
 	*/
 	if .IsNormal
-		exp.CastToClass(.type, nil)
-		return knumericmatch
+		return exp.CastToClass(.type, nil)
 	.ExpectFail(orig, exp, nil)

@@ -13,14 +13,13 @@ datatype ASMReg (uint64)
 		FatRef			= 1<<30
 		|asmreg|
 		(1<<16)		// starting point
-		NotYetUsed	// for   || y = a + b,   y is (currently) unused.
 		FromMath
 		StayOpen
 		AlreadyNegated
 		Alternate
 		Negate
 		Discard
-		Set
+		Decl = [Set, NotYetUsed]
 		ForReturn
 		Temp
 		NeverAltered

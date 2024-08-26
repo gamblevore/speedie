@@ -1,14 +1,10 @@
 
 
 main // speedie main {
-	Compiler.Compile
-
-
-function compiler.Compile
-	.SetupEnv	
-	.MiniTests
-	.Main
-	.PrintResults
+	Compiler.SetupEnv	
+	Compiler.MiniTests
+	Compiler.Main
+	Compiler.PrintResults
 
 
 function Compiler.Main
@@ -55,7 +51,7 @@ function compiler.ClearEnvs
 function compiler.SetupEnv
 	opt norefcounts
 	FlowControl.FlowMode = FlowControl.Off // can enable via "log"
-	.Clearenvs
+	.ClearEnvs
 	app.PrefsInit(-1)
 	
 	options.dev = app.pref("dev").int

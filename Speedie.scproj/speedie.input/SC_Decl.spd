@@ -984,8 +984,8 @@ class SCDecl (SCNamed) {
 				expect FoundType.PointerCount (self, "Can't typecast a struct!")
 			
 			if (self == @type) and (FoundType.isnormal and foundtype.type == type)
-				return loss // done.
-
+				return kSimpleMatch // done.
+	
 		|| cst = «type ":)" »
 		.prev = cst
 		cst <~ self

@@ -94,16 +94,26 @@ extend ASMState
 
 	// MATH 
 	function QuickFloatPlus    (fn_OpASM)
-		require r is ConstAny
+		if r is constany
+			|| QQ = .QuickFloatPlusSub(dest, l, r, exp)
+			if qq != nil
+				return qq
+		if l is constany
+			|| QQ = .QuickFloatPlusSub(dest, r, l, exp)
+			if qq != nil
+				return qq
+	
+			
+	function QuickFloatPlusSub    (fn_OpASM)
 		|| v = .f(r)
-		if v == 0.0
-			return l
+		|| k = .GetConst(r)[]|uint|
+		if (k >> 18) << 18 != k
+			debugger, #!hmmm. const-optimiser/renderer will handle it, but lets check to make sure
+		|| fat = exp.FADK(dest, l, k)
+		if dest is constany
+			fat.ConstifyPlus(l,r)
 		
-		if r.FourBytes
-			|| k = .GetConst(r)[]|uint|
-			if (k >> 18) << 18 != k
-				debugger, #!hmmm. const-optimiser/renderer will handle it, but lets check to make sure
-			return exp.FADK(dest, l, k) * Dest
+		return fat * Dest
 
 
 	function QuickFloatDiv    (fn_OpASM)
@@ -236,35 +246,35 @@ extend ASMState
 		return fat * Dest
 		
 
+	function fatasm.ConstifyPlus (|asmreg| l, |asmreg| r)
+		if l.fourbytes
+			|| rf = r.F32
+			|| lf = l.F32
+			if l is alternate
+				lf += rf
+			  else
+				lf -= rf
+			.F32 = lf
+		  else
+			|| rf = r.F64
+			|| lf = l.F64
+			if l is alternate
+				lf += rf
+			  else
+				lf -= rf
+			.F64 = lf
 	
 	function PlusFloat   (fn_opasm)
 		|| IsF32 = dest.FourBytes
-			if .QuickFloatPlus(dest, l, r, exp) != nil
-				return dest
-			if .QuickFloatPlus(dest, r, l, exp) != nil
-				return dest
+			|| qq = .QuickFloatPlus(dest, l, r, exp)
+			if qq != nil
+				return qq
 
 		|| ss = (l is alternate)
 		|| rr = r.reg
 		|| fat = exp.fADD(dest, l, r*!ss, r*ss, 1-IsF32)
-		ifn dest is ConstAny
-			0 //
-		  elseif IsF32
-			|| rf = r.F32
-			|| lf = l.F32
-			if ss
-				lf += rf
-			  else
-				lf -= rf
-			fat.F32 = lf
-		  else
-			|| rf = r.F64
-			|| lf = l.F64
-			if ss
-				lf += rf
-			  else
-				lf -= rf
-			fat.F64 = lf
+		if dest is constany
+			fat.ConstifyPlus(l,r)
 		return fat * Dest
 
 

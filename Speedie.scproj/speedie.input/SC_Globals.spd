@@ -1506,7 +1506,7 @@ function TypeOfRel (ExprResolver)
 	
 
 	if LC.ExpectRelMatch( RC, RN, side, exp ) // RN/LN have changed... and their types too!
-		ln = exp.first!
+		ln = exp.first! // wouldn't only RN change? Like: |float| x = f64
 		rn = exp.last!
 		rc = rn.fastdecl
 		lc = ln.fastdecl

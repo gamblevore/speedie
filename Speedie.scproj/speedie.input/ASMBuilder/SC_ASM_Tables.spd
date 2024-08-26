@@ -244,7 +244,6 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 				fat.FloatConvConst(srf, NC)
 			  else
 				fat.FloatIntConvConst(srf, oldtype, newtype)
-			.Makeconst(fat)
 				
 	  else
 		|| sh = 64 - oc
@@ -252,11 +251,9 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 		if sr is ConstAny
 			|| oof = fat.Const << sh
 			fat.Const = (oof|int64| >> sh, oof|uint64| >> sh)(sr.Signed) // shift up and down
-			.Makeconst(fat)
 
-	target debug
-		if sr is constany
-			if dest isnt constany // sigh.
+	if sr is constany
+		return .Makeconst(fat, dest)
 
 	return fat*dest
 
@@ -277,10 +274,10 @@ function Decl (fn_asm)
 	exp = exp.last!
 	|| ty = exp.first!.fastdecl
 	dest = .DeclareMe(Exp, ty) 
-	|| Value = .µ(exp.last!, dest as AsmReg.set)
+	|| Value = .µ(exp.last!, dest as AsmReg.decl)
 	|| VR = value.reg
 	if (ty isnt altered)
-		|| f = .regconsts[vr]
+		|| f = .RegConsts[vr]
 			(f is NeverAltered)
 		  else // remove these tests over time
 			debugger // what?
