@@ -1378,6 +1378,7 @@ class ListView (GUIControl) {
 		
 		rect.y2 += .ScrollSlide
 		|| End = .End
+		.CanSeeAllLines = (.start == ._scroll) and .end
 		
 		
 		for r.visible in self
@@ -1385,7 +1386,8 @@ class ListView (GUIControl) {
 			|| D = (r.depth(self), 0)(.IsTree)
 			r.ListRowDraw(Where, rect, self, D)
 			rect.y2 = rect.y
-			.CanSeeAllLines = (r == end and .start == ._scroll)
+			if (r == end) and .CanSeeAllLines
+				.CanSeeAllLines = (rect.y >= .lastrect.y)
 
 		where.controlclip = clip
 		where.horz = .lastrect.h // redundant?
