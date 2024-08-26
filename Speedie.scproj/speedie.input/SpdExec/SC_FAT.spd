@@ -1,26 +1,4 @@
 
-
-/*
-	we need a very simple example... where we set some regs... and all the everything else is done automatically.
-	all the refcounting... etc etc etc.
-	
-	does that mean something like this?
-	
-	asm.TERN(exp,1,2,3,4)
-	asm.TERN(1,2,3,4,exp)
-	exp.TERN(1,2,3,4)
-	exp <~ asm.TERN(1,2,3,4)
-	asm.TERN(1,2,3,4) <~ exp
-	
-	exp.TERN(1,2,3,4)
-	
-	we could do the refcounting later? like during the block-checking pass?
-	
-	what about closing of if/elses... how can it know about that. seems like we should do the 
-	refcounting then. anyhow... lets assume its immediate. We can also make all of these inlined
-*/
-	
-
 struct FatASM 
 	|ASMReg| 			Info		// only needs 32-bits of this. Could we make a smaller asmreg?
 	|message--| 		Msg
