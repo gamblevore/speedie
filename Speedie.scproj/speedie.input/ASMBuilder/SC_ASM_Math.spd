@@ -100,11 +100,11 @@ extend ASMState
 		if v == 0.0
 			return l.fat
 		
-		if r.fourbytes
+		if r.FourBytes
 			|| k = .GetConst(r)[]|uint|
 			if (k >> 18) << 18 != k
 				debugger, #!hmmm. const-optimiser/renderer will handle it, but lets check to make sure
-			rz = exp.fadk(dest, l, k)
+			rz = exp.FADK(dest, l, k)
 			rz.info = Dest
 
 

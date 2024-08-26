@@ -2,28 +2,39 @@
 
 // ADDK? optimise stages... OR special-case it specifically. 
 
-struct RegState
+/*
+struct RegState // seems we only use this for consts? lets... just keep it that way
+				// then we don't need to go back to stuff.
 	|?&fatasm|			Creator
 	|?scdecl--| 		Type
+	|int|				NilCount
+	|int|				WriteCount
+*/
 
 
 struct ASMState
 	linkage: cpp_part Pac
 	|uint16| 					BlockNum
 	|uint16| 					ParentBlock
+
+	|uint|						VAvail
+	|byte|						VDecls
+	|byte|						VTmps
+// OK, can we do this... just remove it and... make it work. We just need to be able 
+// to add and remove. We also need some way to say that a regs exists, as a returned reg.
+// So we can overwrite it even. But not written to. Basically a returned result.
+// how to write that a reg is "Returned"? in closetmps?
 	|datatypecode|				ReturnASM
 	|bool|						OK    
 	|bool|						Inited   
-	|byte|						VDecls
-	|byte|						VTmps
-	
+
 	|SCFunction--|				fn       
 	|µFunc|						Out      
 	|&FatASM|					FuncStart
 	|&FatASM|					Start		// a "slice" feature would be nice    
 	|&FatASM|					Curr    
 	|&FatASM|					End    
-	|RegState[32]|				Registers
+	|uint64[32]|				RegConsts
 	|FATASM| 					Zero
 
 	
@@ -39,11 +50,15 @@ struct ASMState
 			while v < i
 				.CloseReg(v++)
 			.VTmps = v
+
+	function MarkAvailableValues
+		.vAvail  = (2<<.vdecls)-1
+		|| sh = .vtmps
+		if sh < 32
+			.vAvail |= -1<<sh
 	
 	function CloseReg (|int| i)
-		|| r = &.Registers[i]
-		r.type = nil		// i think its ok.
-		r.Creator = nil
+		.RegConsts[i] = 0
 	
 			
 	function AddFuncParams (|SCFunction| fn)
@@ -54,24 +69,41 @@ struct ASMState
 	function Last (|&FatASM|)
 		return .curr-1
 
-	function RegPlace (|int| a, |&regstate|)
+	function RegPlace (|int| a, |&uint64|)
 		opt norefcounts
 		|| InBounds = a|uint| <= 31
-			if a <= .vdecls or a >= .vtmps
-				return .registers[a]
+			if (1<<a) & .vavail
+				return .RegConsts[a]
 		
 		|| msg = (": Unassigned register",  ": Out of bounds register")(InBounds)
 		error (self, errorreceiver.NonFatal + msg)
-		return .Registers[0]
+		return .RegConsts[0]
 			
 		
-	function GetConst (|int| k, |&uint64|)
+	function GetConst (|int| RegNum, |&uint64|)
+		// How do i say that some regs are "closed for write, but still readable".
+		// Then each reg needs two bits. not just 1!
+		// We can do this by using 64-bits per thingy. Or two 32-bits.
 		opt inline
-		|| r = .RegPlace(k).Creator
-			if r == .zero or r isnt ConstAny // now what?
-				return r.Const
+		|| r = .regplace(RegNum)
+		if  !r[]  ==  !regnum
+			return r
 		debugger 
 		return .zero.const
+
+
+	helper FoundCode (|int| i, |uint64| Value, |asmreg| typeinfo, |asmreg|)
+		opt norefcounts
+		|| place = .regplace(i)
+		|| K = place[]
+		if K == Value
+//			|| ty = place.Type
+//			if ty is Altered
+//				#!hmmm. now what? need to understand blocks and if/while things?
+//				debugger 
+			typeinfo.reg = i
+			(typeinfo is ConstAny)
+			return typeinfo
 
 	
 	function IntPowerOfTwo (|asmreg| r,  |FailableInt|)
@@ -137,9 +169,9 @@ struct ASMState
 		if (d < .vtmps)
 			|| t = Type.CalculateASMType
 			t.reg = d
-			Type.µType = t|datatypecode|   		// right?
+			Type.µType = t|DataTypeCode|   		// right?
+			.VAvail	|= 1 << d
 			.vdecls = d
-			.Registers[d].Type = Type
 			target debug: Type.ASMSanity
 			return t
 		error (self, where, "No free local variables.")
@@ -153,25 +185,10 @@ struct ASMState
 			check (r > .vdecls) (where, "No free local variables.")
 			t.reg = r
 			.vtmps = r
+			.VAvail	|= 1 << r
 		if t isnt textual
-			|| d = where.asmdecl
-			.Registers[r].Type = d
-			t.µtype = d.µtype
+			t.µtype = where.asmdecl.µtype
 		return t
-
-
-	helper FoundCode (|int| i, |uint64| Value, |asmreg| typeinfo, |asmreg|)
-		opt norefcounts
-		|| place = .regplace(i)
-		|| fat = place.Creator
-		if fat and fat.const == Value
-			|| ty = place.Type
-			if ty is Altered
-				#!hmmm. now what? need to understand blocks and if/while things?
-				debugger 
-			typeinfo.reg = i
-			(typeinfo is ConstAny)
-			return typeinfo
 
 
 	function RegMap (|int|)
@@ -225,6 +242,7 @@ struct ASMState
 		|| TmpCloser = .VTmps
 		|| ss = (fn)(self, exp, dest)
 		.CloseVTmps(TmpCloser, dest)
+		.MarkAvailableValues
 
 		target debug
 			if exp != @sheb
@@ -263,7 +281,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 	// there are only 4 above 6!, only 14 above 5
 
 	if dest.reg == 0
-		dest = asmreg()
+		dest = AsmReg()
 	  else
 		dest = .TempMe(prms, dest)
 	dest.µtype = fn.RegType
@@ -276,22 +294,24 @@ function @ASMTmp.DoFunc (fn_Asm)
 	|| p = prms.first
 	for fnarg in fn.args
 		expect (p) (exp, "Compiler did not fully type this function.") 
-		|| v = .FuncPrm(p, fnarg).reg
+		|| v = .FuncPrm(p, FnArg).reg
 		if sh <= 25
 			reg2 |= (v << sh)
 		  else
 			reg3 |= (v << (sh-30))
 		sh += 5
 		p++
-	.closeVTmps(TmpCloser)
+	.CloseVTmps(TmpCloser)
+	// we still need to clear variables passed by address
+	// like x = 12345, f(&x), if y == 12345 // can't reuse x as a const
 	
 
 	|| SaveAmount = .vdecls * (dest isnt forreturn)
-	|| fat = exp.fncx(SaveAmount,  fn.TableId,  reg2,  reg3) // exp.func2, exp.func3
+	|| fat = exp.FNCX(SaveAmount,  fn.TableId,  reg2,  reg3) // exp.func2, exp.func3
 
-	|| OP = (asm.func2, asm.func3)(sh <= 25)
+	|| OP = (asm.FUNC2, asm.FUNC3)(sh <= 25)
 	if fn is Wrapper
-		op = (asm.fncx2, asm.fncx3)(sh <= 25)
+		op = (asm.FNCX2, asm.FNCX3)(sh <= 25)
 	fat.op = op
 
 	return fat * dest
@@ -334,6 +354,7 @@ function ASMState.StartFunc (|scfunction| fn)
 	.zero.info = AsmReg()
 	for i in 32
 		.CloseReg(i)
+	.VAvail = 1
 	.FuncStart = .curr
 	.fn = fn
 	.ReturnASM = fn.ReturnType.regtype

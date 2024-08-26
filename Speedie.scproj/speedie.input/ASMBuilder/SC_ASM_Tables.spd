@@ -3,35 +3,20 @@
 
 dispatch fn_asm_table (fn_asm)
 	@arg: ASMTmp.Arg
-
 	@decl: asmtmp.decl
-
 	@num:  ASMTmp.num
-
 	@rel:  ASMTmp.DoMath
-
 	@thg:  ASMTmp.Thg
-
 	@bra:  ASMTmp.First
-
 	@sheb: ASMtmp.Ignore
-		
 	@list: // vectors
 		debugger
-		
-
 	@func: asmtmp.DoFunc
-
 	@dot:  ASMTmp.Dot
-	
 	@acc:  ASMTmp.Access
-
 	@brel: asmtmp.Brel		// ++, --, -, &
-
 	@arel: asmtmp.arel      // ++, --, 
-
 	@type:					asmtmp.TypeCast
-
 	@tmp:					asmtmp.unexpected
 
 	(ASMtmp.kDebugger):		ASMtmp.Debugger
@@ -441,21 +426,18 @@ function Negative			(fn_asm)					// -a
 	return ASMTmp.DoSingleMath(self, exp, dest, scoperator.Negative!.asm!)
 
 
-function SlowCountOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |asmreg|)
-//	    *a, x = *(a.b) 
-	opt	NoRefCounts
-	// need to read... also save old value
+function SlowCountOnAddr (|&ASMState| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |ASMReg|)	
+	opt	NoRefCounts					//	    *a, x = *(a.b)
 	|| TmpCloser = .VTmps
-	Dest.Read(F, dest, addr)
+	Dest.Read(F, dest, addr)				// READ
 
-	// we have read... now we need to add		
 	|| NewValue = (.TempMe(f), dest)(mode & IncrAfter)
-	.AddConstant(f, NewValue, dest, amount)
+	.AddConstant(f, NewValue, dest, amount) // ADD
 
-	// now we have the new value... lets write it back again
-	|| fat = dest.write(f, newvalue, addr)
+	|| fat = dest.write(f, newvalue, addr)	// WRITE BACK
 
 	// the new value should exist! now lets close
+	.MarkAvailableValues
 	.CloseVTmps(TmpCloser)
 	return fat * Dest
 
@@ -547,7 +529,7 @@ function DoMath (fn_asm)
 		
 
 
-helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr,  |fn_opasm!| fn, |asmreg|)
+helper DoMathSub (|&ASMState| self,  |message| exp,  |ASMReg| Dest,  |asmreg| mr,  |fn_opasm!| fn, |ASMReg|)
 	opt norefcounts
 	|| F = exp.first!
 	|| op = f.next!
@@ -555,23 +537,13 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr
 	|| ml = ASMReg()
 	if mr isnt SingleExpr
 		|| TmpCloser = .VTmps
-		|| D1 = (dest & asmreg.discard) as asmreg.stayopen
-		ml = .µ(F, D1) asnt asmreg.stayopen
-		mr = .µ(exp.last!, dest & asmreg.discard)
-
-		// OK... so when we close the vtemps...
-		// What do we do? 
-		// if we close it ahead of time...
-		/// but later we call getconst... which fails at doing this.
-		// it thinks these registers are closed. So we can't read from them
-		// besides, getconst has no understanding of blocks. tht needs to be fixed.
-		// could we store this in... an scarg?
-		// well... no. and/or also create blocks. Terns too.
+		|| D1 = (dest & AsmReg.Discard) as AsmReg.StayOpen
+		ml = .µ(F, D1) asnt AsmReg.stayopen
+		mr = .µ(exp.last!, dest & AsmReg.Discard)
 		.CloseVTmps(TmpCloser)
 	
 	if dest is Discard
 		return ASMReg() // no need to do anything:   {a() + b(),  c()}
-
 	
 	dest = .TempMe(exp, dest)
 	(dest is FromMath)
@@ -582,7 +554,7 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |AsmReg| Dest,  |asmreg| mr
 	if ml.floatness != mr.floatness					// Shouldn't happen.
 	rz = (fn)(self, dest, ml, mr, op)
 	target debug
-		if dest is mathconst and rz isnt mathconst		// hmm?
+		if dest is MathConst  and  rz isnt MathConst		// hmm?
 			debugger, (fn)(self, dest, ml, mr, op)
 
 

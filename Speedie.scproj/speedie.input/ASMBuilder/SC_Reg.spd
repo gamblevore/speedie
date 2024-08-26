@@ -172,16 +172,16 @@ datatype AsmReg (uint64)
 			return asmreg()
 		return dest
 	
-	function Decl (|scdecl--|)
-		return ASMState.sh.Registers[.reg].Type
-	
 
 	function PointerMul (|int|)
+		disabled "use decl.allocatedsize"
 		|| Ty = .µtype
 		|| IsPtr = ty.ispointer
 			if ty is bool // what?
-			|| r = .decl
-				return r.AllocatedSize
+			// can we just store the alloc-size?
+			// perhaps on the fat? or just remove?
+			//|| r = .decl
+			//	return r.AllocatedSize
 			error "aaargh"
 		return 1
 	

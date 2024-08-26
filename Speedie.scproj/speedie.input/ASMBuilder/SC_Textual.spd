@@ -99,6 +99,7 @@ extend ASMState
 		opt NoRefCounts
 		.vdecls = 31 // no other choice. Register requester will fail... otherwise.
 					 // i forgot how this helps. WHAT GOES WRONGGG????
+		.vAvail = -1
 		for ch in .LoadTitle(m)
 			if ch == @name
 				.addlabel(ch)

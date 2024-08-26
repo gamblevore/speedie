@@ -147,11 +147,6 @@ struct FatASM
 	function Dest (|uint| a, |asmreg| info, |bool|)
 		|| dest = info.reg
 		.r[a] = dest
-		if a > 1 // what?
-		if dest
-			|| place = asmstate.sh.RegPlace(dest)
-			place.Creator = self
-			return true
 	
 	
 	function File (|string|)

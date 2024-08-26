@@ -58,6 +58,7 @@ extend ASMState
 		Reg = .TempMe(exp, Reg)
 		(reg is constany)
 		|| fat = exp.KNST(reg, 0, 0, 0)
+		debugger
 		fat.Const = v
 		return fat * reg
 
