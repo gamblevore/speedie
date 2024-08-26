@@ -54,12 +54,15 @@ extend ASMState
 			return r
 		return .NumToReg(exp, Value, TypeInfo)
 
-	function NumToReg (|message| exp, |int64| V, |asmreg| Reg=asmreg(), |asmreg|)
+	function MakeConst (|&fatasm| fat)
+		(fat is ConstAny)
+		.regconsts[fat.info.reg] = fat
+	
+	function NumToReg (|message| exp, |int64| V, |asmreg| Reg=ASMReg(), |asmreg|)
 		Reg = .TempMe(exp, Reg)
-		(reg is constany)
 		|| fat = exp.KNST(reg, 0, 0, 0)
-		debugger
 		fat.Const = v
+		.Makeconst(fat)
 		return fat * reg
 
 	function f (|asmreg| r, |Float64|)

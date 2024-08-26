@@ -1,7 +1,6 @@
 
 
 prototype fn_OpASM  (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asmreg|)
-prototype fn_OpASM2 (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |&fatasm|)
 
 
 extend asmreg
@@ -94,18 +93,17 @@ extend ASMState
 
 
 	// MATH 
-	function QuickFloatPlus    (fn_OpASM2)
+	function QuickFloatPlus    (fn_OpASM)
 		require r is ConstAny
 		|| v = .f(r)
 		if v == 0.0
-			return l.fat
+			return l
 		
 		if r.FourBytes
 			|| k = .GetConst(r)[]|uint|
 			if (k >> 18) << 18 != k
 				debugger, #!hmmm. const-optimiser/renderer will handle it, but lets check to make sure
-			rz = exp.FADK(dest, l, k)
-			rz.info = Dest
+			return exp.FADK(dest, l, k) * Dest
 
 
 	function QuickFloatDiv    (fn_OpASM)
@@ -168,17 +166,47 @@ extend ASMState
 		return (.µtype.ispointer<<1) + (self isnt constany)
 	
 	
+	function asmreg.PointerMul (|message| exp, |int| swapped, |int|)
+		if !.µtype.ispointer
+			return 1
+		
+		|| fn = exp.Func
+		if fn == @opp
+			debugger 
+			exp = exp.parent
+			if swapped
+				exp = exp.last
+			else
+				exp = exp.first
+			
+		  elseif fn == @arel or @brel
+			debugger
+			exp = exp.first
+		
+		  elseif fn == @acc
+			debugger 
+			exp = exp.first
+			
+		  else
+			// should never happen. Even @thg shouldn't.
+			error "aaargh"
+			debugger 
+		return 1
+	
+
 	function PlusInt     (fn_opasm)
 		//		a - 1,		a + 1		//
 		//		1 - a,		1 + a		//
+		|| swapped = 0
 		if  l.LeftScore < r.leftscore
 			if l is alternate
 				target debug
 					if r.µtype.IsPointer				// 1 - ptr??? we blocked this already.
-			  else
+			  else // what about the exp?
+				swapped = 1
 				swap (l) (r) // a+b == b+a
 
-		|| lmul = l.pointermul
+		|| lmul = l.PointerMul(exp, swapped)
 		|&fatasm| fat
 		if r is ConstAny
 			|| RR = .GetConst(R)[]
@@ -201,19 +229,19 @@ extend ASMState
 			if l isnt alternate							// x = lptr + r*12
 				fat = exp.MULT(dest, R, V, L)
 			  else										// x = (lptr - rptr)/12
-				exp.SUBB(dest, L, R, asmreg())
+				exp.SUBB(dest, L, R, ASMReg())
 				|| uint64type = 0, debugger
-				fat = exp.DIVV(dest, asmreg(), dest, V, uint64type)  
+				fat = exp.DIVV(dest, ASMReg(), dest, V, uint64type)  
 			  
 		return fat * Dest
 		
-		
 
-	
 	
 	function PlusFloat   (fn_opasm)
 		|| IsF32 = dest.FourBytes
-			if  .QuickFloatPlus(dest, r, l, exp)  or  .QuickFloatPlus(dest, l, r, exp)
+			if .QuickFloatPlus(dest, l, r, exp) != nil
+				return dest
+			if .QuickFloatPlus(dest, r, l, exp) != nil
 				return dest
 
 		|| ss = (l is alternate)
@@ -277,6 +305,8 @@ extend ASMState
 
 
 	function Minus  (fn_opasm)		// x = -b
+		// not the same as negative, which is an fn_asm... that means it works on the exp
+		// where as fn_opasms work on the op.
 		(l is alternate)
 		return .plus(dest, l, r, exp)
 

@@ -3,7 +3,7 @@
 prototype fn_asm (|&ASMState| self=asmstate.sh, |message| exp, |AsmReg| Dest=asmreg(), |int| Mode = 0, |AsmReg|)
 
 
-datatype AsmReg (uint64)
+datatype ASMReg (uint64)
 	default 0|AsmReg|
 	linkage
 		cpp_part Reg
@@ -13,29 +13,28 @@ datatype AsmReg (uint64)
 		FatRef			= 1<<30
 		|asmreg|
 		(1<<16)		// starting point
-//		SrcConst    // what does this do? remove it?
 		NotYetUsed	// for   || y = a + b,   y is (currently) unused.
 		FromMath
 		StayOpen
 		AlreadyNegated
 		Alternate
-//		Cond
 		Negate
 		Discard
 		Set
 		ForReturn
 		Temp
+		NeverAltered
 		SingleExpr
 		ConstAny
 		ContainsAddr
 		AddrRequest
 		Textual
-		CorrectAddr		= ContainsAddr // remove?
-		Arg				= Discard         // ||| SrcConst
+		CorrectAddr		= ContainsAddr			// remove?
+		Arg				= Discard				// ||| SrcConst
 		CondRequest
 		CondAnswer
 		MathConst		= ConstAny ||| FromMath
-		Zero			= ConstAny ||| 56 // 56 == datatypecode.uint64
+		Zero			= ConstAny ||| 56		// 56 == datatypecode.uint64
 	
 	
 
@@ -152,7 +151,6 @@ datatype AsmReg (uint64)
 	
 	syntax cast (|bool|)
 		disabled "are we checking .reg or if the entire thing is 0"
-//		return .reg
 	
 	syntax cast (|int|)
 		cpp_part ToInt
@@ -169,21 +167,8 @@ datatype AsmReg (uint64)
 
 	operator • (|asmreg| dest, |asmreg|)
 		if .reg == dest.reg
-			return asmreg()
+			return ASMReg()
 		return dest
-	
-
-	function PointerMul (|int|)
-		disabled "use decl.allocatedsize"
-		|| Ty = .µtype
-		|| IsPtr = ty.ispointer
-			if ty is bool // what?
-			// can we just store the alloc-size?
-			// perhaps on the fat? or just remove?
-			//|| r = .decl
-			//	return r.AllocatedSize
-			error "aaargh"
-		return 1
 	
 			
 	module

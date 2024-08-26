@@ -2,14 +2,11 @@
 
 // ADDK? optimise stages... OR special-case it specifically. 
 
-/*
-struct RegState // seems we only use this for consts? lets... just keep it that way
-				// then we don't need to go back to stuff.
-	|?&fatasm|			Creator
-	|?scdecl--| 		Type
-	|int|				NilCount
-	|int|				WriteCount
-*/
+//struct RegConstInfo
+//	|?scdecl--| 		Type	// we only need this to check if the const is altered
+								// so we only need 1 bit. Shouldn't we just store the fat anyhow?
+								// we need the fat... because thats where the const lives.
+//	|&FATASM|			Fat
 
 
 struct ASMState
@@ -34,7 +31,7 @@ struct ASMState
 	|&FatASM|					Start		// a "slice" feature would be nice    
 	|&FatASM|					Curr    
 	|&FatASM|					End    
-	|uint64[32]|				RegConsts
+	|(&FATASM)[32]|				RegConsts
 	|FATASM| 					Zero
 
 	
@@ -44,21 +41,23 @@ struct ASMState
 			.CloseReg(v--)
 		.VDecls = v
 
-	function CloseVTmps (|int| i, |asmreg| dest=ASMReg())
-		if dest isnt StayOpen
-			|| v = .VTmps
-			while v < i
-				.CloseReg(v++)
-			.VTmps = v
+	function CloseVTmps (|int| i)
+		target debug: if i < .vtmps // what?
+		.VTmps = i
 
 	function MarkAvailableValues
-		.vAvail  = (2<<.vdecls)-1
+		|| NewV = (2<<.vdecls)-1
 		|| sh = .vtmps
 		if sh < 32
-			.vAvail |= -1<<sh
+			NewV |= -1<<sh
+		|| ToClose = .vavail &~ NewV
+		.vAvail = NewV
+		for (v.bits in ToClose) (i)
+			.CloseReg(i)
+		
 	
 	function CloseReg (|int| i)
-		.RegConsts[i] = 0
+		.RegConsts[i] = nil
 	
 			
 	function AddFuncParams (|SCFunction| fn)
@@ -69,15 +68,15 @@ struct ASMState
 	function Last (|&FatASM|)
 		return .curr-1
 
-	function RegPlace (|int| a, |&uint64|)
+	function RegPlace (|int| a, |?&uint64|)
 		opt norefcounts
 		|| InBounds = a|uint| <= 31
-			if (1<<a) & .vavail
-				return .RegConsts[a]
-		
+			|| fat = .RegConsts[a]
+				return fat.const
+			return nil
+
 		|| msg = (": Unassigned register",  ": Out of bounds register")(InBounds)
 		error (self, errorreceiver.NonFatal + msg)
-		return .RegConsts[0]
 			
 		
 	function GetConst (|int| RegNum, |&uint64|)
@@ -86,15 +85,15 @@ struct ASMState
 		// We can do this by using 64-bits per thingy. Or two 32-bits.
 		opt inline
 		|| r = .regplace(RegNum)
-		if  !r[]  ==  !regnum
-			return r
+			if  !r[]  ==  !regnum
+				return r
 		debugger 
 		return .zero.const
 
 
 	helper FoundCode (|int| i, |uint64| Value, |asmreg| typeinfo, |asmreg|)
 		opt norefcounts
-		|| place = .regplace(i)
+		|| place = .regplace(i)$
 		|| K = place[]
 		if K == Value
 //			|| ty = place.Type
@@ -119,17 +118,29 @@ struct ASMState
 		if (!r.reg) // what?
 
 
-	function AddConstantAndReturnOld (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
+	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
 		|| reg = .TempMe(exp, dest)
 		if togrow.isint and value.CanStoreAsIntImmediate
-			if 0
-				exp.adpk(reg, togrow, togrow)
 			return exp.ADPK(reg, ToGrow, Value) * reg
 		.Assign(reg, ToGrow, asmreg(), exp)
-		rz = .AddConstant(exp, togrow, ToGrow, value)
+		rz = .IncrPre(exp, togrow, ToGrow, value)
 
+// a++, a + 1
+// how to do this? In a magical fun beautiful adventure way
+// well... Incrementatulatorifier creates the "Size", which is "Value" here.
+// for &ptruint++, value is 4. But what about ptruint = ptruint + 1?
+// This is tricky. We need to incrementatulatorify it. But by what? and where?
+// we lost track of everything. Perhaps... we can do the work in the caller?
+// it would work. Or assume that the thing we want to work on, is the left side
+// but what about 1+ptruint? then once again... we lost it.
+// we could make a special "Findifier" thing? Simply... if its a rel... then use correct side
+// if not... use the first item. this relies on us passing in the correct exp message
+// I think thats actually the cleanest.
+// the next question is... "who passes in what". How can I RELY on the values passed in, being correct?
+// i think for maths... it is clear. It is correct. Like a+1 or 1+a
+// then lets check the others... then do a findifier.
 
-	function AddConstant (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
+	function IncrPre (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
 		if dest.isint
 			if Value.CanStoreAsIntImmediate
 				return exp.ADDK(dest, src, Value) * dest
@@ -241,15 +252,15 @@ struct ASMState
 		|| fn = fn_asm_table[exp.ASMType]!
 		|| TmpCloser = .VTmps
 		|| ss = (fn)(self, exp, dest)
-		.CloseVTmps(TmpCloser, dest)
-		.MarkAvailableValues
+		if dest isnt StayOpen
+			.CloseVTmps(TmpCloser)
+			.MarkAvailableValues
 
 		target debug
-			if exp != @sheb
-				|| ty = exp.ASMDecl
-				if ty.µType != ss.µType
-					debugger
-					(fn)(self, exp, dest)
+			|| ty = exp.ASMDecl
+			if ty.µType != ss.µType
+				debugger
+				(fn)(self, exp, dest)
 		return ss
 
 
@@ -352,6 +363,7 @@ function ASMState.StartFunc (|scfunction| fn)
 		.out = µfunc(fn, .curr)
 	.zero = nil
 	.zero.info = AsmReg()
+	(.zero is NeverAltered)
 	for i in 32
 		.CloseReg(i)
 	.VAvail = 1

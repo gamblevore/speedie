@@ -8,7 +8,7 @@ module TextAssembler
 		|| fn = SCFunction.new
 		fn.source = msg
 		ASmState.Sh.startfunc(fn)
-		|| arg = ASmState.Sh.TextFuncSub(msg)
+		|| arg = ASMState.Sh.TextFuncSub(msg)
 			compiler.exportnames[fn.exportname] = fn
 		ASmState.Sh.FinishASM
 		.Labels.dispose

@@ -95,9 +95,7 @@ module PackMaker
 	
 	
 	function MakePack 
-		|| sz = –sizeof FatASM
-		|| diff = sz - 64
-		if diff
+		if (–sizeof FatASM) != 64
 		require ASMState.Sh.PackMakerInit // and fn_asm_table[@arg]
 		.RevUpTheHoover("ASMExamples")
 		require .ActualRealCompileAkaPackIt
