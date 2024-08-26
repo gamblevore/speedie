@@ -71,6 +71,7 @@ linkage
 |uint16|				LinkDepth
 |uint16|				TmpCounter
 |uint16|				TableId
+|uint16|				AltersParams
 |functiontype|			FuncInfo
 |Byte|					MinOpt
 |Byte|					IsAssigns
@@ -371,6 +372,13 @@ function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming,
 	if Failed and !incoming.MadeError // backup
 		error ( incoming.exp, "Wrong params to " + .RenderTitle )
 	  elseif rz
+		|| altered = rz.altersparams|int|
+			for (b.bits in altered) (i)
+				|| m = incoming.items[i]
+					|| d = m.obj as scdecl
+					if d is local
+						d.markasaltered 
+			
 		|| ft = rz.StructReturned
 			incoming.StructLover(ft.aslocal, self)
 		  elseif rz.returntype is returnedstruct // remove this? its always the prev?
@@ -1137,7 +1145,7 @@ function RegType (|datatypecode|)
 		return .returntype.regtype
 
 
-function scdecl.MarkAsRefAltered 
+function scdecl.MarkAsAltered 
 	opt norefcounts
 	(self is altered)
 	if self is typeimprove

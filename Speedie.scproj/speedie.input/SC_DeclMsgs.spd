@@ -88,7 +88,7 @@ function scfunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 
 	|| ns = .nilself
 		.WantAs(ns)
-	if self ~= "JB_Msg_SyntaxUsing"
+
 	|| r = .returntype
 		if r.isbarestruct
 			(r is returnedstruct)
@@ -121,7 +121,9 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 	|| dcl = .CollectDecl(func, recv, declmode.FuncParam, cls, func) #require
 	if dcl.default isthing "nil"
 		dcl.NilDeclared = nilstate.optional
-		
+	
+	if dcl.PointerCount
+		func.altersparams |= 1<<func.args.length
 	func.args <~ dcl
 	(dcl isnt NumberConst)
 	if dcl.name
