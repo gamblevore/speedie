@@ -102,9 +102,11 @@ datatype Date (int64)
 	iterator
 		|| StartDate = date.now()
 		|| EndDate = StartDate + self
-		|date| CurrTime
-		while date.now2(CurrTime) < EndDate
-			yield (CurrTime - StartDate).float
+		while
+			|| Currtime = date.now
+			if Currtime >= EndDate
+				exit
+			yield ((CurrTime - StartDate).float) (CurrTime-StartDate) // why a float at all?
 
 	module
 		function TimeID (|uint64|)
@@ -115,11 +117,6 @@ datatype Date (int64)
 
 		function Now (|Date|)
 			cpp_wrapper JB_Date__Now
-
-		helper Now2 (|&Date| out, |Date|)
-			cpp_part KindaNow
-			rz = .now()
-			out[] = rz
 
 		function New (|Date|)
 			cpp_part New0
