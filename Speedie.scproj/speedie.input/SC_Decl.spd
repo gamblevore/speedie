@@ -177,12 +177,12 @@ class SCDecl (SCNamed) {
 
 	function CopyDeclsStructFixer (|message| src, |declmode| mode, |SCDecl|)
 		if mode is funcparam
-			check (!.iscarray) (src, "No c-arrays in function parameters")
-			if .isbarestruct
-				return .getaddress
-		if (.refcount == 1)
+			check (!.IsCarray) (Src, "No c-arrays in function parameters")
+			if .IsBareStruct
+				return .GetAddress
+		if .RefCount == 1
 			return self // nice
-		return .copydecl
+		return .CopyDecl
 	
 	
 	function CopyDecl (|bool| ForNewVariable = false, |SCDecl|)
@@ -977,16 +977,14 @@ class SCDecl (SCNamed) {
 
 	function Message.CastToType (|string| TypeName, |SCClass| type, |SCNode| name_space, |int| loss = kCastedMatch, |int|)
 		if (!self)
-			// its not "loss" here? or else we get kcastedmatch on things that
-			// aren't casted.
 			Return kNeedsTypeCast ||| loss
-
-		if (name_Space)
-			TypeOfExpr(self, name_space)
-		  elseif (.obj)
-			|| FoundType = TypeOfExpr(self, name_Space)
-			if FoundType and FoundType.type.isstruct
+		
+		|| FoundType = TypeOfExpr(self, name_space)
+			if FoundType.type.isstruct
 				expect FoundType.PointerCount (self, "Can't typecast a struct!")
+			
+			if (self == @type) and (FoundType.isnormal and foundtype.type == type)
+				return loss // done.
 
 		|| cst = «type ":)" »
 		.prev = cst
@@ -1054,7 +1052,7 @@ class SCDecl (SCNamed) {
 		if (self is self) and (scfunction.currfunc is Destructor) 
 			error (exp, "You can’t modify 'self' in a constructor or destructor.")
 		  elseif side and (self is local)
-			.MarkAsRefAltered
+			.MarkAsAltered
 						
 
 	function WriteNilRel (|Message|)
