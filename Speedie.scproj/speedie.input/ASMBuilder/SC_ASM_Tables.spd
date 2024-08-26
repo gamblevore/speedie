@@ -706,7 +706,7 @@ function Message.TypeCastDoesNothing (|Datatypecode| Expected, |bool|)
 	return Expected.isint and (XC < SC)
 
 
-function asmstate.LoopClearUnreliableConsts
+function asmstate.LoopClearUnreliableConsts // we need to clear vtmps on function calls too.
 	|| v = .vdecls|int|
 	for i in v
 		|| r = .RegConsts[i]
