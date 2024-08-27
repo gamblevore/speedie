@@ -1496,13 +1496,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool 16
 #define kSC__CustomOps_TypeCastToBetter 32
 #define kSC__CustomOps_TypeCastToSmaller 64
-#define kJB__ErrorColors_bold (JB_LUB[2102])
+#define kJB__ErrorColors_bold (JB_LUB[2101])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error (JB_LUB[2103])
-#define kJB__ErrorColors_good (JB_LUB[2104])
-#define kJB__ErrorColors_normal (JB_LUB[2101])
-#define kJB__ErrorColors_underline (JB_LUB[2104])
-#define kJB__ErrorColors_warn (JB_LUB[2105])
+#define kJB__ErrorColors_error (JB_LUB[2102])
+#define kJB__ErrorColors_good (JB_LUB[2103])
+#define kJB__ErrorColors_normal (JB_LUB[2100])
+#define kJB__ErrorColors_underline (JB_LUB[2103])
+#define kJB__ErrorColors_warn (JB_LUB[2104])
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
 extern int SC__FastStringOpts_StrRemoved;
@@ -1691,7 +1691,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native (JB_LUB[2110])
+#define kJB_codesign_native (JB_LUB[2109])
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
 extern CharSet* SC_CSNum;
@@ -1716,7 +1716,7 @@ extern JB_String* SC_kNameConf;
 #define kJB_kNoMatch (0)
 #define kJB_kNumericMatch 8388608
 #define kJB_kSaverEnd (JB_LUB[0])
-#define kJB_kSaverStart1 (JB_LUB[2106])
+#define kJB_kSaverStart1 (JB_LUB[2105])
 #define kJB_kSimpleMatch 4194304
 #define kJB_kSuperClassMatch 16777216
 #define kJB_kTypeCastAssigns 64
@@ -1734,7 +1734,7 @@ extern JB_String* SC_kNameConf;
 #define kJB_kTypeCastTrue 3
 #define kJB_kTypeCastWantSuperDistance 128
 #define kJB_kUseDefaultParams 33554432
-#define kJB_kUsingStr (JB_LUB[1610])
+#define kJB_kUsingStr (JB_LUB[2110])
 #define kJB_kVoidPtrMatch 20971520
 extern JB_File* SC_PerryLogFile;
 extern Message* SC_ReturnSelfEqNil;
@@ -1876,10 +1876,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp 32784
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down (JB_LUB[2109])
-#define kJB__zalgo_mid (JB_LUB[2108])
+#define kJB__zalgo_down (JB_LUB[2108])
+#define kJB__zalgo_mid (JB_LUB[2107])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up (JB_LUB[2107])
+#define kJB__zalgo_up (JB_LUB[2106])
 #define kJB__byte_max 255
 #define kJB__byte_min (0)
 #define kJB__int16_max 32767
@@ -1980,30 +1980,31 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_WR2U 85
 #define kSC__ASM_WR4U 86
 #define kSC__ASM_WR8U 87
-#define kSC__Reg_AddrRequest 1073741824
+#define kSC__Reg_AddrRequest 2147483648
 #define kSC__Reg_AlreadyNegated 262144
 #define kSC__Reg_Alternate 524288
 #define kSC__Reg_Arg 2097152
-#define kSC__Reg_CondAnswer 8589934592
-#define kSC__Reg_CondRequest 4294967296
-#define kSC__Reg_ConstAny 268435456
-#define kSC__Reg_ContainsAddr 536870912
-#define kSC__Reg_CorrectAddr 536870912
+#define kSC__Reg_CondAnswer 17179869184
+#define kSC__Reg_CondRequest 8589934592
+#define kSC__Reg_ConstAny 536870912
+#define kSC__Reg_ContainsAddr 1073741824
+#define kSC__Reg_CorrectAddr 1073741824
 #define kSC__Reg_Decl 12582912
 #define kSC__Reg_Discard 2097152
 #define kSC__Reg_FatRef 1073741824
+#define kSC__Reg_ForCast 33554432
 #define kSC__Reg_ForReturn 16777216
 #define kSC__Reg_FromMath 65536
-#define kSC__Reg_MathConst 268500992
+#define kSC__Reg_MathConst 536936448
 #define kSC__Reg_Negate 1048576
-#define kSC__Reg_NeverAltered 67108864
+#define kSC__Reg_NeverAltered 134217728
 #define kSC__Reg_NotYetUsed 8388608
 #define kSC__Reg_Set 4194304
-#define kSC__Reg_SingleExpr 134217728
+#define kSC__Reg_SingleExpr 268435456
 #define kSC__Reg_StayOpen 131072
-#define kSC__Reg_Temp 33554432
-#define kSC__Reg_Textual 2147483648
-#define kSC__Reg_Zero 268435512
+#define kSC__Reg_Temp 67108864
+#define kSC__Reg_Textual 4294967296
+#define kSC__Reg_Zero 536870968
 #define kSC__ASMtmp_IncrAfter 2
 #define kSC__ASMtmp_IncrBefore (0)
 #define kSC__ASMtmp_kContinue 51
@@ -2384,7 +2385,7 @@ extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_kDelete 2
 #define kJB__Wrap_kFree 1
 #define kJB__Wrap_kNothing (0)
-#define kJB__Rec_NonFatal (JB_LUB[2100])
+#define kJB__Rec_NonFatal (JB_LUB[2099])
 extern Float64 JB__Rec_Progress;
 #define kJB__fix_TypeDict 3
 #define kJB__fix_TypeObj 1
@@ -5592,6 +5593,8 @@ uint SC_FatASM_c(FatASM* Self);
 void SC_FatASM_cSet(FatASM* Self, uint Value);
 
 void SC_FatASM_ConstifyPlus(FatASM* Self, ASMReg L, ASMReg R);
+
+void SC_FatASM_ConvertConst(FatASM* Self, uint /*DataTypeCode*/ Oldtype, uint /*DataTypeCode*/ Newtype);
 
 uint SC_FatASM_d(FatASM* Self);
 
@@ -10547,7 +10550,7 @@ inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After) {
 	ASM* Rz = nil;
 	Rz = (SC__ASM_Encoders[Self->Op])(Self, Where, After, 0);
 	if (SC_ASM_DecodeBaseOp(Where[0]) != Self->Op) {
-		JB_PrintLine(JB_LUB[1664]);
+		JB_PrintLine(JB_LUB[1663]);
 		debugger;
 		Rz = (SC__ASM_Encoders[Self->Op])(Self, Where, After, 0);
 	}

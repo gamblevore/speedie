@@ -60,15 +60,15 @@ extend ASMState
 		return fat*reg
 	
 	function NumToReg (|message| exp, |int64| V, |asmreg| Reg=ASMReg(), |asmreg|)
-		|| OldType = Reg.µtype
+		|| DestType = Reg.µtype
 		// compare to reg...
 		Reg = .TempMe(exp, Reg)
 		|| fat = exp.KNST(reg, 0, 0, 0)
-		if oldtype!=reg.µtype // ooop
-	//		if "packtestconsts".trap // we need to do the conversion here! or else...
-				debugat
-			//  						 // we marked it as one type but its really another
 		fat.Const = v
+		|| SrcType = reg.µtype
+		if  srctype!=desttype  and (reg is ForCast) // ooop
+			fat.ConvertConst(srctype, desttype)
+			reg.µtype = desttype
 		
 		return .Makeconst(fat, reg)
 

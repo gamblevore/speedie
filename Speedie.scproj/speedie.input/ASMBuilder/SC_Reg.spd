@@ -21,6 +21,7 @@ datatype ASMReg (uint64)
 		Discard
 		Decl = [Set, NotYetUsed]
 		ForReturn
+		ForCast
 		Temp
 		NeverAltered
 		SingleExpr

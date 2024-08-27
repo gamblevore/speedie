@@ -218,7 +218,7 @@ struct FatASM
 	
 	function Renda (|FastString| fs)
 		opt norefcounts
-		debugat
+//		debugat
 		|| op = instruction.typelist[.op]
 		if !op
 			debugger

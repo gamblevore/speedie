@@ -204,7 +204,12 @@ function Return			(fn_asm)
 
 function TypeCast		(fn_asm)
 	opt norefcounts
-	|| sr = .µ(exp.first!, dest)
+	|| f = exp.first!
+	|| req = dest as asmreg.ForCast
+	req.µtype = exp.asmdecl.datatype
+	|| sr = .µ(F, req)
+	if sr.µtype == req.µtype
+		return sr // already done!
 	return TypeCastSub(self, exp, dest, sr)
 
 
@@ -217,9 +222,10 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 		sr.µtype = newtype
 		return sr
 
-	|| OldDecl = exp.first!.ASMDecl
-	|| OldType = olddecl.regtype
-	if NewType.count != OldType.count
+//	|| OldDecl = exp.first!.ASMDecl
+	|| OldType = sr.µtype
+	target debug
+		if NewType.count != OldType.count
 	
 	if NewType is bool
 		if OldType is bool					// x = true|bool| // why?
@@ -231,6 +237,7 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 
 	|| FloatDiff = newtype.isfloat != oldtype.isfloat
 	if !FloatDiff and (nc == oc)			// same bittype!
+		debugger // should never happen!
 		return sr
 	
 	dest = .TempMe(exp, dest)
@@ -238,8 +245,8 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 	|&fatasm| fat
 	if oldtype.isfloat or newtype.isfloat
 		fat = exp.CONV(dest, sr, oldtype.asmconv(newtype))
-		if sr is ConstAny
-			|| srf = sr.needfat
+		if sr is ConstAny			// shouldn't this just place the old fat?
+			|| srf = sr.needfat		// no, because it could be used twice.
 			if NewType.IsFloat and !FloatDiff
 				fat.FloatConvConst(srf, NC)
 			  else
@@ -538,6 +545,7 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |ASMReg| Dest,  |fn_opasm!|
 	|| mr = ASMReg()
 	|| TmpCloser = .VTmps
 	|| SubMode = (dest & AsmReg.Discard) as AsmReg.StayOpen
+	debugat 2
 	if mr isnt SingleExpr
 		|| L = exp.last!
 		ml = .µ(F, SubMode)
@@ -634,6 +642,15 @@ function message.HasAsmStuff (|bool|)
 	for ch in self
 		if ch.func != @sheb
 			return true
+
+
+function FatASM.ConvertConst (|datatypecode| Oldtype, |datatypecode| Newtype)
+//	if "packtestconsts".trap // we need to do the conversion here! or else...
+//		debugat
+	if NewType.IsFloat and Oldtype.IsFloat
+		.FloatConvConst(self, newtype.BitCount)
+	  else
+		.FloatIntConvConst(self, oldtype, newtype)
 
 
 function FatASM.FloatConvConst (|&FatASM| src, |int| DestBitSize)

@@ -108,7 +108,8 @@ extend ASMState
 		|| v = .f(r)
 		|| k = .GetConst(r)[]|uint|
 		if (k >> 18) << 18 != k
-			debugger, #!hmmm. const-optimiser/renderer will handle it, but lets check to make sure
+			debugat
+			return nil
 		|| fat = exp.FADK(dest, l, k)
 		if dest is constany
 			fat.ConstifyPlus(l,r)

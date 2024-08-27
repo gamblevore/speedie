@@ -254,7 +254,8 @@ struct ASMState
 
 		target debug
 			|| ty = exp.ASMDecl
-			if ty.typeonly != ss.µType
+			|| sst = ss.µtype
+			if sst != dest.µtype and ty.typeonly
 				printline exp
 				debugger
 				(fn)(self, exp, dest)
