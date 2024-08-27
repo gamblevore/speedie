@@ -48,11 +48,11 @@ datatype DataTypeCode (uint16)
 		uint8 = byte
 		u16	 = uint16
 		s16	 = int16
-		atomic_int64	= 0 + 48 + 64 + 0   + 8 + 4
-		atomic_uint64	= 0 + 48 + 0  + 0   + 8 + 4
-		atomic_int		= 0 + 32 + 64 + 0   + 8 + 4
-		atomic_uint		= 0 + 32 + 0  + 0   + 8 + 4
-		atomic_byte		=               0   + 8 + 4
+//		atomic_int64	= 0 + 48 + 64 + 0   + 8 + 4
+//		atomic_uint64	= 0 + 48 + 0  + 0   + 8 + 4
+//		atomic_int		= 0 + 32 + 64 + 0   + 8 + 4
+//		atomic_uint		= 0 + 32 + 0  + 0   + 8 + 4
+//		atomic_byte		=               0   + 8 + 4
 		
 		_void = 0
 		_voidptr = 48
@@ -63,8 +63,35 @@ datatype DataTypeCode (uint16)
 		
 		UnusedType = int64 &~ 8
 	
+	function DebugPrint
+		printline .Render
 	
-	function Basictype (|datatypecode|) // compares floatness, vector-size, and "isnumericness"
+	render
+		self = self&PossibleBits
+		if !.IsNumeric
+			fs <~ "non-numeric"
+		  elseif self == byte
+			fs <~ "byte"
+		  else
+			if !.IsSigned
+				fs <~ "u"
+			|| b = .ByteCount
+			if .IsInt
+				if b == 1
+					fs <~ "char"
+				  elseif b == 2
+					fs <~ "short"
+				  elseif b == 4
+					fs <~ "int"
+				  elseif b == 8
+					fs <~ "int64"
+			  else
+				fs <~ "float"
+				if b != 4
+					fs <~ b*8
+					
+		
+	function Basictype (|DataTypeCode|) // compares floatness, vector-size, and "isnumericness"
 		return self & (128 + 8 + 3)		// ignores bit-size and signedness.
 	
 	syntax is (|datatypecode| M, |bool|) // this seems buggered. just remove it?
@@ -91,8 +118,8 @@ datatype DataTypeCode (uint16)
 	function IsNumeric (|bool|)
 		return (self & numeric)
 	
-	function IsAtomic (|bool|)
-		return (self & 4)
+//	function IsAtomic (|bool|)
+//		return (self & 4)
 	
 	function NumericCount (|int|)
 		if (self & numeric)

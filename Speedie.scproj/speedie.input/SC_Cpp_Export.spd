@@ -1452,8 +1452,10 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			fs <~ ID
 			fs <~ "]"
 
+
 	function string.internal (|string|)
 		return "InternalError: " + self
+
 
 	function C_RenderStr (fpMsgRenderCpp)
 		fs.AppendCpp(.name)

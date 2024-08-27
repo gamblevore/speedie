@@ -25,7 +25,7 @@ struct ASMState
 	|bool|						OK    
 	|bool|						Inited   
 
-	|SCFunction--|				fn       
+//	|SCFunction--|				fn     		// use scfunction.currfunc!
 	|µFunc|						Out      
 	|&FatASM|					FuncStart
 	|&FatASM|					Start		// a "slice" feature would be nice    
@@ -164,7 +164,7 @@ struct ASMState
 
 
 	syntax expect (|message?| where=nil, |string| msg)
-		|| f = .fn.asm
+		|| f = scfunction.currfunc!.asm
 			f.length = .curr - .funcstart
 			printline f.render
 		debugger
@@ -365,7 +365,7 @@ function ASMState.StartFunc (|scfunction| fn)
 		.CloseReg(i)
 	.VAvail = 1
 	.FuncStart = .curr
-	.fn = fn
+	scfunction.currfunc = fn
 	.ReturnASM = fn.ReturnType.regtype
 	.OK = true
 	.VDecls = 0
@@ -377,8 +377,10 @@ function ASMState.FinishASM
 	opt norefcounts
 	if .zero.Const // what?
 	|| l = .last
-	ifn (l isa asm.ret) or (l isa asm.trap) 
-		debugger
+	ifn (l isa asm.ret) or (l isa asm.trap)
+		|| fn = scfunction.currfunc!
+		expect (!fn.returntype) ("ASMReturn".internal) // why?
+		fn.sourcearg!.RET(asmreg(), asmreg(), 1, 0)
 	.SetLength
 
 

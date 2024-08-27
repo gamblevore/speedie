@@ -1504,6 +1504,10 @@ function TypeOfRel (ExprResolver)
 		ln.obj = lc // put inside MakeAccess0?
 		// rz --> rz[]
 	
+	// !!!relegate to only do the right side...!!!
+	// !!AND only if side!=nil, right?
+	// if we say "needs numeric type-cast"... we can allow it
+	// use our shit bwlow. can return an int
 	if LC.ExpectRelMatch( RC, RN, side, exp ) // RN/LN have changed... and their types too!
 		ln = exp.first! // wouldn't only RN change? Like: |float| x = f64
 		rn = exp.last!

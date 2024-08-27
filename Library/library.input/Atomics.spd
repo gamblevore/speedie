@@ -5,24 +5,25 @@
 */
 
 
-
-datatype atomic_byte
-	// should be a subclass of uint...
-	// speedie will define it in JB.h. How to block that?
-	default 0
-	syntax cast (|bool|)
-		return self|bool|
-
-
-datatype atomic_uint
-	default 0
-	syntax cast (|bool|)
-		return self|bool|
-
-
-datatype atomic_int
-	default 0
-	syntax cast (|bool|)
-		return self|bool|
-
-
+// I guess not?
+//datatype atomic_byte
+//	// should be a subclass of uint...
+//	// speedie will define it in JB.h. How to block that?
+//	default 0
+//	syntax cast (|bool|)
+//		return self|bool|
+//
+//
+//datatype atomic_uint
+//	default 0
+//	syntax cast (|bool|)
+//		return self|bool|
+//
+//
+//datatype atomic_int
+//	default 0
+//	syntax cast (|bool|)
+//		return self|bool|
+//
+//
+//

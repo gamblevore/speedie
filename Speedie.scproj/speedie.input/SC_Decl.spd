@@ -597,7 +597,6 @@ class SCDecl (SCNamed) {
 	
 	
 	function ExpectMatchSub (|SCDecl| O, |int| TypeCast, |Message?| exp, |Message?| ErrNode = nil, |Message|)
-		//debugat 4488
 		typecast |= exp.IntSmallness(O)
 		
 		|| Matched = .TypeMatch(O, TypeCast, exp)
