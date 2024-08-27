@@ -267,9 +267,9 @@ class TextView (GUIControl)
 	function SelRange (|intrange|)
 		return ._typingplace.resolve
 		
-	function Sel0 (|int|)
+	helper Sel0 (|int|)
 		return .selrange.x
-	function Sel1 (|int|)
+	helper Sel1 (|int|)
 		return .selrange.y
 
 

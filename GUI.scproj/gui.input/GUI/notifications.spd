@@ -1,4 +1,5 @@
 
+
 module Notifications
 	linkage: cpp_part Note 
 	|list of window|	Alerts = list()
@@ -111,7 +112,7 @@ module Notifications
 	
 	function ShowTip (|string| data, |string| prefix = "Tip:  ")
 		|| p = data.parse.Rand
-			Notifications.silentappend(prefix + p.name)
+			Notifications.SilentAppend(prefix + p.name)
 
 
 

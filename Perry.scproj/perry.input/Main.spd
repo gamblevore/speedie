@@ -1,9 +1,10 @@
 
 
 main // main { 
+	|| x = 1.0 / 2.0|float64|
 	if app.Yes("crash")
 		app.Crash
-	SDLApp.init
+	SDLApp.Init
 	Perry.Startup
 	notifications.ShowTip( file://tips.box )
 	return SDLApp.Run

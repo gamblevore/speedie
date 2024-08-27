@@ -58,7 +58,7 @@ void JB_SDL_SetModified(void* w, bool b) {
 	window.documentEdited = b;
 }
 
-void JB_SDL_FullScreen (void* w, bool On) {
+void JB_SDL_FullScreenToggle (void* w) {
 	NSWindow* window = (__bridge NSWindow*)w;
 	[window toggleFullScreen:nil];
 }

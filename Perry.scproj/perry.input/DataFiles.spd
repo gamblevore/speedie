@@ -39,4 +39,27 @@ env
 */
 `
 
+	function EmptyGuiFile (|string| name, |string|)
+		return "#!/usr/local/bin/spd
+
+// basic empty GUI
+import \"GUI\"
+
+
+class StartWindow (window)
+	|textview| MainText
+	constructor (|controlrect| rect)
+		super.constructor(Rect)
+		.maintext = TextView(self)
+		.MainText.Size = 120~wide by 17~high
+		(.MainText is editable)
+		.MainText.text = \"hello $name\"
+		.MainText.SetFocus
+
+main
+	SDLApp.init(-1)
+	|| w = StartWindow(414 by 400)
+	return sdlapp.Run
+"
+		
 

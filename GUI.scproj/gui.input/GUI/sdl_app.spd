@@ -82,10 +82,15 @@ module SDLApp
 	cpp_wrapper SDL_StopTextInput		()
 	cpp_wrapper SDL_ShowSimpleMessageBox		(|int| Flags, |cstring| title, |cstring| msg, |?&SDL_Window| window)
 	cpp_Wrapper JB_SDL_RemoveWindowBorder (|&nil| window)
-	cpp_Wrapper JB_SDL_SetModified (|&nil| window, |bool| b)
-	cpp_wrapper JB_SDL_FullScreen (|&nil| w, |bool| On=true)
+	cpp_Wrapper JB_SDL_SetModified		(|&nil| window, |bool| b)
+	cpp_wrapper JB_SDL_FullScreenToggle	(|&nil| w)
 	cpp_Wrapper SDL_GetCurrentDisplayMode (|int| displayIndex, |&SDL_DisplayMode| mode, |errorint|)
 
+	helper SDL_FullScreen (|&nil| w, |int| Mode=1)
+		|| full = .isfullscreen
+		if (mode == 0) or (!full and mode>0) or (full and mode<0)
+			.JB_SDL_FullScreenToggle(w) // toggle is just for MacOSX
+										// linux wants the real sdl_setfullscreen!!
 		
 	function DocumentOpened  (|bool|Clear=true, |String|)
 		cpp_Wrapper JB_App__DocumentOpened
@@ -118,19 +123,19 @@ module SDLApp
 		.ChangeSelFlash = 1
 
 
-	function ScreenOrig (|ivec4|)
+	helper ScreenOrig (|ivec4|)
 		|| P = .ScreenPosOrig
 		return (p, p + .SizeOrig)
 
 
-	function SizeOrig (|ivec2|)
+	helper SizeOrig (|ivec2|)
 		|int[2]| place
 		|| s = .ScreenWindow
 			.SDL_GetWindowSize(s,  &place[0],  place[1])
 			return (place[0], place[1])
 
 
-	function SizeOrig (assigns:|ivec2|)
+	helper SizeOrig (assigns:|ivec2|)
 		|| p = .ScreenPosOrig
 		|| r = (p, p + value)
 		.screenorig(r)
@@ -146,7 +151,7 @@ module SDLApp
 			SDL_SetWindowTitle(s, value.cstr)
 
 
-	function ScreenPosOrig (|ivec2|)
+	helper ScreenPosOrig (|ivec2|)
 		|int[2]| place
 		|| s = .ScreenWindow
 			.SDL_GetWindowPosition(s,  place[0],  place[1])
@@ -161,11 +166,11 @@ module SDLApp
 		return SDL_ShowCursor()
 
 
-	function ScreenOrig (assigns:|ivec4| result, |bool|)
+	helper ScreenOrig (assigns:|ivec4| result, |bool|)
 		require .ScreenWindow
 		if (result.x <= 0) and (result.y <= 0)
 			|| n = .nativewindow
-				.JB_SDL_FullScreen(n) // SDL2 had a bug in it... probably still exists
+				.SDL_FullScreen(n)
 			return true
 		|| Old = .SizeOrig
 		|| aligned = .scale * (1.0+.IsHighDPI)
@@ -252,7 +257,7 @@ module SDLApp
 		SDL_WINDOW_ALLOW_HIGHDPI =	0x00002000
 
 
-	helper InitWindow (|ivec2| s, |string|name)
+	helper InitWindow (|ivec2| s, |string| name)
 		SDL_Init(SDL_INIT_AUDIO ||| SDL_INIT_VIDEO ||| SDL_INIT_EVENTS ||| SDL_INIT_HAPTIC)
 
 		.screenwindow = SDL_CreateWindow(name.cstr,
@@ -266,11 +271,6 @@ module SDLApp
 		.renderer = SDL_CreateRenderer(.screenwindow!, -1, 0)
 		if !.Renderer
 			app.Quit("Can't init renderer", -1)
-
-		|| scr = .CurrDisplaySize
-		if (s.x >= scr.x) and (s.y >= scr.y)
-			|| n = .NativeWindow
-				.JB_SDL_FullScreen(n)
 
 
 	helper vsync (assigns:|bool|)
@@ -309,19 +309,22 @@ module SDLApp
 			return s > b
 	
 	
+	function IsFullScreen (assigns:|bool|)
+		|| n = sdlapp.NativeWindow
+			.SDL_FullScreen(n, (value<<1)-1)
+		
 	function IsFullScreen (|bool|)
-		|| scr = .CurrDisplaySize
-		return scr.x >= .ScreenOrig.x
+		return .CurrDisplaySize.y <= .ScreenOrig.size.y
 		
 		
 	helper BumpSize
 		description "Fixes a MacOSX bug. Not my fault!" 
 		.FixScreenBug = 0
-		|| was = .IsFullScreen
-		|| n = sdlapp.nativewindow$
-		.JB_SDL_FullScreen(n, false)
-		if was
-			.JB_SDL_FullScreen(n, true)
+		|| n = sdlapp.NativeWindow
+			|| was = .IsFullScreen
+			.SDL_FullScreen(n, -1)
+			if was
+				.SDL_FullScreen(n, 1)
 	
 	
 	function Scaling (assigns:|float| scale)
@@ -351,7 +354,7 @@ module SDLApp
 		return app.appname
 	
 	
-	function Init (|ivec2| s=(414,256)) // startup
+	function Init (|ivec2| s=(414,256), |int| FullScreen=0) // startup
 		pico.GlobalConfig.SuicideIfParentDies = false
 		pico.start
 		target !gui
@@ -372,17 +375,22 @@ module SDLApp
 			app.quit
 		.FastToolTipDate = 1
 
-		.InitWindow(s, .niceappname)
-		.scaling = 2.0 - (0.5*.ishighdpi)
+		.InitWindow(s, .NiceAppName)
+		.scaling = 2.0 - (0.5*.IsHighDPI)
 		
 		.CheckQuarantine
 		¥.LoadDefaults
 
-		appmenu.GetAppMenu
+		AppMenu.GetAppMenu
 		.InitDelegates
-		|| n = .nativewindow
-		if !PrevSize and n
-			.JB_SDL_FullScreen(n)
+		|| n = .nativewindow$
+		|| PP = PrevSize.size
+		|| CDS = .CurrDisplaySize
+		if FullScreen
+			.SDL_FullScreen(n, FullScreen)
+		  elseif !PP or PP.y >= CDS.y
+			.SDL_FullScreen(n)
+			
 		.StartedProperly = true
 		
 	
@@ -794,7 +802,7 @@ module SDLApp
 				return .Rescale(.scale-0.5)
 			if (key is f) and keys.option
 				|| n = .nativewindow
-					.JB_SDL_FullScreen(n, false)
+					.SDL_FullScreen(n)
 				return true
 			if (key is l) and keys.shift
 				JB_Mem_ClassLeakCounter()
