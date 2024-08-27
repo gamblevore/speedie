@@ -78,7 +78,7 @@ function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil, |i
 	if O.PointeryMatch(self)
 		|| ooop = .PointeryMatchSub(o, typecast)
 		if !ooop and (TypeCast & kTypeCastBothways) and o.IsNormalObject and .IsNormalObject
-			ooop = o.pointerymatchsub(self, typecast)
+			ooop = o.PointeryMatchSub(self, typecast)
 		if (ooop)
 			return ooop
 
@@ -128,32 +128,32 @@ function scdecl.TryTypeCastAccess (|SCDecl| O, |Message| exp, |int| TypeCast, |i
 		return exp.makedereference(i)
 
 
-function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
+function scdecl.TryTypeCast (|SCDecl| O, |Message| OExp, |int| TypeCast, |int|)
 	opt norefcounts
 
 	|| t = .type
 	|| ot = o.type
 	if (.PointerCount == O.PointerCount + 1)
-		|| found = .TryTypeCastPointer(o, exp, typecast, false)
+		|| found = .TryTypeCastPointer(o, oexp, typecast, false)
 			return found
 
 	if (o.IsCArray) and (.pointercount == 1)
-		|| found = .TryTypeCastPointer(o, exp, typecast, true)
+		|| found = .TryTypeCastPointer(o, oexp, typecast, true)
 			return found
 	
 	
 	/// hmmmm... need to test it... without the c-array? how?
 	ifn typecast & knobooltypecast
 		if (t == TypeBool) and (.IsNormal) and (o.pointercount)
-			return exp.CastToBool(nil)
+			return oexp.CastToBool(nil)
 	
 	if (.PointerCount + 1 == O.PointerCount)
-		|| found = .TryTypeCastAccess(o, exp, typecast)
+		|| found = .TryTypeCastAccess(o, oexp, typecast)
 			return found
 
 	if TypeCast & (kTypeCastMost|||kTypeCastNumbers)
 		|| CounterPart = t.Signed				// int vs uint
-			if (CounterPart.type == ot) and (CounterPart.TypeMatch(o, typecast, exp).isnormalmatch)
+			if (CounterPart.type == ot) and (CounterPart.TypeMatch(o, typecast, oexp).isnormalmatch)
 				return ksimplematch
 
 
@@ -164,12 +164,12 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 			for (C in b.Casts)
 				ifn NoBools and (C.returnType.isbool)
 					if .TypeMatch( C.ReturnType, 0 ).IsNormalMatch
-						return C.CreateTypeCast( O, exp )
+						return C.CreateTypeCast( O, oexp )
 		
 		
 		|| IsaBool = (t == TypeBool) and (.IsNormal)
 		if (!NoBools) and isabool
-			return exp.CastToBool(nil)
+			return oexp.CastToBool(nil)
 
 	
 		if (!isabool or !NoBools) and O.canwrap
@@ -177,21 +177,20 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 				// Already have all the type info! So check the contained type is correct!
 				|| it = .contains
 					require it.TypeMatch(O, kTypeCastNumbers)
-					return exp.WrapExpr(O)
+					return oexp.WrapExpr(O)
 
 			if .TypeMatch( Typewrapper!.typenormal, 0 ).isNormalMatch and O.SafelyWrappable 
-				return exp.WrapExpr(o)  // only OK to turn to a bool if O is a bool.
+				return oexp.WrapExpr(o)  // only OK to turn to a bool if O is a bool.
 
 	
 	if TypeCast & kTypeCastNumbers
-		if o.isnil and .isnumeric
-			Return kNumericMatch
-		
 		|| OIsNum = O.IsNormalNumber
 		|| SIsNum =  .IsNormalNumber
+		if sisnum and (o.isnil or TypeCast & kTypeCastFromzero)
+			Return kNumericMatch
+		
+		//beepw()
 		if Oisnum and sisNum
-			if TypeCast & kTypeCastFromZero
-				return kNumericMatch
 			|| ff = o.IsFloat + .IsFloat
 			if ff == 0
 				return kNumericMatch
@@ -201,9 +200,15 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 				if (L.ByteCount == R.ByteCount)
 					return kNumericMatch
 				if (typecast&kTypeCastSetToMemory)
-					return .FloatCast(o, exp)
+					return .FloatCast(o, oexp)
+				if (o is const) and Typecast&kTypeCastForSetRel
+					return oexp.CastToClass(.type)
 				if (self is const) or (o is const)
+					if Typecast&kTypeCastForSetRel
+						return oexp.CastToClass(.type)
 					return kNumericMatch // Just do this at ASM time. makes no sense otherwise.
+			  elseif TypeCast & kTypeCastFromSmallInt // int to float
+				return oexp.CastToClass(.type)
  
 		
 		if TypeCast&kTypeCastBothWays
@@ -214,7 +219,7 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
 
 	// so much nicer!
 	if ot.FuncProto.EqualOrMoreSpecific(t.FuncProto) and .PointeryMatch(O)
-		return exp.CastToClass(t, nil)
+		return oexp.CastToClass(t, nil)
 
 
 
@@ -229,3 +234,4 @@ function scdecl.FloatCast (|scdecl| orig, |message| exp, |int|)
 	if .IsNormal
 		return exp.CastToClass(.type, nil)
 	.ExpectFail(orig, exp, nil)
+

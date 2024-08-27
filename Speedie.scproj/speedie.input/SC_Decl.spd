@@ -36,6 +36,8 @@ constants
 	kTypeCastDescribeErrors		= 256
 	kTypeCastFromZero			= 512
 	kTypeCastSetToMemory		= 1024
+	kTypeCastForSetRel			= 2048
+	kTypeCastFromSmallInt		= 4096
 	kActualTypecasts			= ~(kTypeCastWantSuperDistance ||| kNoBoolTypeCast)  
 	kTypeCastFalse				= 0
 
@@ -107,7 +109,7 @@ class SCDecl (SCNamed) {
 	|Message?|			Default
 	|SCClass|			Type
 	|SCDeclInfo|		Info
-	|Datatypecode|		µType2
+	|Datatypecode|		DataType
 	|Byte|				PointerCount
 	|NilState|			NilDeclared
 	|byte| 				NilReg
@@ -127,14 +129,14 @@ class SCDecl (SCNamed) {
 		opt norefcounts
 		return (.MemoryLayer.obj as SCImport)!
 	
-	setter µType (|datatypecode|)
-		.µType2 = value& DataTypeCode.PossibleBits 
+	function TypeOnly (|datatypecode|)
+		return .DataType & datatypecode.possiblebits
 	
-	function µType (|datatypecode|)
-		return .µType2
+	setter WholeType (|datatypecode|)
+		.DataType = value 
 	
-	function Reg (|asmreg|)
-		return .µType|asmreg|
+	function WholeType (|asmreg|)
+		return .DataType|asmreg|
 	
 	syntax append (|SCDeclInfo| d)
 		.info |= d
@@ -147,7 +149,7 @@ class SCDecl (SCNamed) {
 			return .info & d
 
 	syntax is (|SCDeclInfo| d, assigns:|bool|)
-		.info = .info.set(d, Value)
+		.info = .info.set(d, Value)			
 
 
 	function IsNil (|bool|)
@@ -579,6 +581,13 @@ class SCDecl (SCNamed) {
 		ErrNode := backup
 		error ( ErrNode, fs )
 
+
+//ExpectMatch( DefaultDcl, kTypeCastTrue, default )		
+	function ExpectMatchForDecl (|SCDecl| O, |Message?| exp, |Message|)
+		opt norefcounts
+		rz = .ExpectMatchSub(o, ktypecasttrue|||kTypeCastForSetRel, exp, nil)
+		if !rz
+			rz = exp
 		
 	function ExpectMatch (|SCDecl| O, |int| TypeCast, |Message?| exp, |Message?| ErrNode = nil, |Message|)
 		opt norefcounts
@@ -588,8 +597,8 @@ class SCDecl (SCNamed) {
 	
 	
 	function ExpectMatchSub (|SCDecl| O, |int| TypeCast, |Message?| exp, |Message?| ErrNode = nil, |Message|)
-		if exp and exp.IsSmallInt(O)
-			typecast |= kTypeCastFromZero
+		//debugat 4488
+		typecast |= exp.IntSmallness(O)
 		
 		|| Matched = .TypeMatch(O, TypeCast, exp)
 		if (Matched == kCastedMatch or kLossyCastedMatch)

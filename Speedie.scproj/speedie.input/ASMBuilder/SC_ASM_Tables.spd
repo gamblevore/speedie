@@ -166,7 +166,7 @@ function Ternary		(fn_asm)
 	|| A = cond.next!
 	|| B = A.next!
 	
-	|| destType = exp.ASMDecl.µType
+	|| destType = exp.ASMDecl.typeonly
 	|| mA = .ExistingVar(a, desttype)
 	|| mB = .ExistingVar(b, desttype)
 	if ma!=nil and mb!=nil
@@ -275,13 +275,10 @@ function Decl (fn_asm)
 	|| ty = exp.first!.fastdecl
 	dest = .DeclareMe(Exp, ty) 
 	|| Value = .µ(exp.last!, dest as AsmReg.decl)
-	|| VR = value.reg
 	if (ty isnt altered)
-		|| f = .RegConsts[vr]
+		|| f = .RegConsts[value.reg]
 			(f is NeverAltered)
-		  else // remove these tests over time
-			debugger // what?
-	if VR == dest.reg
+	if value.reg == dest.reg
 		return Value
 	return .Assign(dest, Value, asmreg(), exp)
 
@@ -360,7 +357,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |as
 													// what if this is a constant?
 	|| d = exp.ASMDecl
 	if d is local
-		return d.reg
+		return d.wholetype
 
 	if d is const
 		|| R = dest.reg
@@ -695,8 +692,8 @@ function DataTypecode.ASMPart (|int|)
 
 function Message.TypeCastDoesNothing (|Datatypecode| Expected, |bool|)
 	opt norefcounts
-	Expected = .second!.ASMDecl.µType
-	|| Src = .first!.ASMDecl.µType
+	Expected = .second!.ASMDecl.typeonly
+	|| Src = .first!.ASMDecl.typeonly
 	|| XC = Expected.ByteCount
 	|| SC = Src.ByteCount
 	if  (Expected.IsFloat != Src.isfloat)  or  (src.Count != Expected.Count)

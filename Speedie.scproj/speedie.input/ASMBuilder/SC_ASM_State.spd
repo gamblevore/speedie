@@ -176,7 +176,7 @@ struct ASMState
 		if (d < .vtmps)
 			|| t = Type.CalculateASMType
 			t.reg = d
-			Type.µType = t|DataTypeCode|   		// right?
+			Type.wholetype = t|DataTypeCode|   		// right?
 			.VAvail	|= 1 << d
 			.vdecls = d
 			target debug: Type.ASMSanity
@@ -187,14 +187,14 @@ struct ASMState
 	function TempMe (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)				// .needreg
 		opt norefcounts
 		|| r = t.reg
+		if t isnt textual
+			t.µtype = where.asmdecl.typeonly
 		if !r
 			r = .vtmps - 1
 			check (r > .vdecls) (where, "No free local variables.")
 			t.reg = r
 			.vtmps = r
 			.VAvail	|= 1 << r
-		if t isnt textual
-			t.µtype = where.asmdecl.µtype
 		return t
 
 
@@ -254,7 +254,8 @@ struct ASMState
 
 		target debug
 			|| ty = exp.ASMDecl
-			if ty.µType != ss.µType
+			if ty.typeonly != ss.µType
+				printline exp
 				debugger
 				(fn)(self, exp, dest)
 		return ss

@@ -112,6 +112,7 @@ extend ASMState
 		|| fat = exp.FADK(dest, l, k)
 		if dest is constany
 			fat.ConstifyPlus(l,r)
+			return .makeconst(fat,dest)
 		
 		return fat * Dest
 
@@ -264,6 +265,7 @@ extend ASMState
 				lf -= rf
 			.F64 = lf
 	
+	
 	function PlusFloat   (fn_opasm)
 		|| IsF32 = dest.FourBytes
 			|| qq = .QuickFloatPlus(dest, l, r, exp)
@@ -275,6 +277,7 @@ extend ASMState
 		|| fat = exp.fADD(dest, l, r*!ss, r*ss, 1-IsF32)
 		if dest is constany
 			fat.ConstifyPlus(l,r)
+			return .makeconst(Fat,dest)
 		return fat * Dest
 
 

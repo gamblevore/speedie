@@ -220,6 +220,7 @@ function Message.CollectFromBody (|SCNode| scarg)
 		return
 	|| dcl = .CollectDecl(scarg, scarg, declmode.FunctionBody)
 		(dcl is body)
+//		(dcl isnt altered) // whatever
 		(dcl isnt NumberConst)
 		scparamarray.PostStructFix
 		|| def = dcl.Default
@@ -253,8 +254,8 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 	  elseif (Default and mode isnt Properties)
 		DefaultDcl = TypeOfExprNeeded( Default, P ) #require
 		DefaultDcl = DefaultDcl.Downgrade
-		if (sdcl)   // make sure it matches.
-			default = sdcl.ExpectMatch( DefaultDcl, kTypeCastTrue, default )
+		if (sdcl)
+			default = sdcl.ExpectMatchForDecl( DefaultDcl, default )
 		
 	  elseif (!cls) and (sdcl) and (sdcl.CanUseDefault)
 		Default = sdcl.CreateDefault(type, mode >= 4)
