@@ -249,6 +249,7 @@ helper String.TabsToSpacesSub (|faststring| fs)
 			|| remain = 4 - (i mod 4)
 			fs <~ (' ', remain)
 			i += remain
+	// what about line-endings?
 		  else
 			fs <~ c
 			i++
