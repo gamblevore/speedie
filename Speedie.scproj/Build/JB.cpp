@@ -34,13 +34,13 @@ void JB_InitClassList(SaverLoadClass fn);
 
 void JB_ASMExamples__PackTestConsts() {
 	//visible;
-	double F5 = ((double)2);
-	float fxC6x92 = (1.0f / ((float)F5));
-	float F1 = 0.1f + ((float)1);
-	double F2 = ((double)3.4567f) + ((double)F1);
-	double F3 = ((double)1234.5f) + ((double)5678.9f);
-	float F6 = ((float)2);
-	double F4 = ((double)1.0f);
+	double R1 = ((double)2);
+	float R2 = (1.0f / ((float)R1));
+	float R3 = 0.1f + ((float)1);
+	double R4 = ((double)3.4567f) + R1;
+	double R5 = ((double)1234.5f) + ((double)5678.9f);
+	float R6 = ((float)2);
+	double R7 = ((double)1.0f);
 }
 
 
@@ -1983,7 +1983,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (113035545908557));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1154], (113039670045331));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3308,7 +3308,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[179]);
-	JB_FS_AppendInt32(_fsf0, (2024082720));
+	JB_FS_AppendInt32(_fsf0, (2024082813));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -4309,7 +4309,9 @@ Message* SC_AC__FuncTmps() {
 			if (!JB_Msg_EqualsSyx(Ch, kJB_SyxStr, false)) {
 				Message* F = JB_Incr(((Message*)JB_Ring_First(Ch)));
 				if (F) {
-					JB_SetRef(F->Name, JB_Str_OperatorPlus(F->Name, JB_LUB[107]));
+					if (JB_Str_Last(F->Name, 0) != '.') {
+						JB_SetRef(F->Name, JB_Str_OperatorPlus(F->Name, JB_LUB[107]));
+					}
 				}
 				JB_Decr(F);
 			}
@@ -8371,7 +8373,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[836]);
-	JB_FS_AppendInt32(_fsf0, (2024082720));
+	JB_FS_AppendInt32(_fsf0, (2024082813));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -12992,12 +12994,6 @@ SCObject* SC_TypeOfRel(Message* Exp, SCNode* Name_space, Message* Side) {
 		JB_SetRef(LC, LC->Internal);
 		JB_SetRef(LN->Obj, LC);
 	}
-	if (SC_Decl_ExpectRelMatch(LC, RC, RN, Side, Exp)) {
-		JB_SetRef(LN, ((Message*)JB_Ring_First(Exp)));
-		JB_SetRef(RN, ((Message*)JB_Ring_Last(Exp)));
-		JB_SetRef(RC, SC_Msg_FastDecl(RN));
-		JB_SetRef(LC, SC_Msg_FastDecl(LN));
-	}
 	if ((!Side) and (((OpMode)SC_OpMode_SyntaxCast(SC_Opp_SyntaxIs(Comp, kSC__OpMode_Compare))))) {
 		JB_Decr(Side);
 		JB_Decr(LC);
@@ -16489,10 +16485,6 @@ ASMReg SC_Reg_FatIndexSet(ASMReg Self, uint Value) {
 	return ((ASMReg)(((((uint64)Self) << 16) >> 16) | (((uint64)Value) << 48)));
 }
 
-int SC_Reg_Floatness(ASMReg Self) {
-	return JB_TC_Floatness(SC_Reg_xC2xB5Type(Self));
-}
-
 ASMReg SC_Reg_HaveAddr(ASMReg Self) {
 	ASMReg Rz = ((ASMReg)0);
 	Rz = SC_Reg_OperatorAsnt(Self, kSC__Reg_AddrRequest);
@@ -16886,10 +16878,15 @@ ASMReg SC_ASMtmp__DoMathSub(ASMState* Self, Message* Exp, ASMReg Dest, fn_OpASM 
 	ASMReg Mr = SC_Reg__New();
 	uint TmpCloser = Self->VTmps;
 	ASMReg SubMode = SC_Reg_OperatorAs((SC_Reg_OperatorBitand(Dest, kSC__Reg_Discard)), kSC__Reg_StayOpen);
-	JB_DoAt(2);
 	if (!SC_Reg_SyntaxIs(Mr, kSC__Reg_SingleExpr)) {
 		Message* L = ((Message*)JB_Ring_Last(Exp));
+		if (SC_Reg_SyntaxIs(Dest, kSC__Reg_NotYetUsed)) {
+			SubMode = SC_Reg_RegSet(SubMode, SC_Reg_Reg(Dest));
+		}
 		Ml = SC_Pac_Get(Self, F, SubMode);
+		if (SC_Reg_Reg(Ml) == SC_Reg_Reg(Dest)) {
+			SubMode = SC_Reg_RegSet(SubMode, 0);
+		}
 		Mr = SC_Pac_Get(Self, L, SubMode);
 		Ml = SC_Reg_OperatorAsnt(Ml, kSC__Reg_StayOpen);
 	}
@@ -16905,8 +16902,6 @@ ASMReg SC_ASMtmp__DoMathSub(ASMState* Self, Message* Exp, ASMReg Dest, fn_OpASM 
 	Dest = SC_Reg_SyntaxIsSet(Dest, kSC__Reg_FromMath, true);
 	if (SC_Reg_SyntaxIs(Ml, kSC__Reg_ConstAny) and SC_Reg_SyntaxIs(Mr, kSC__Reg_ConstAny)) {
 		Dest = SC_Reg_SyntaxIsSet(Dest, kSC__Reg_MathConst, true);
-	}
-	if (SC_Reg_Floatness(Ml) != SC_Reg_Floatness(Mr)) {
 	}
 	Rz = (Fn)(Self, Dest, Ml, Mr, Op);
 	return Rz;
@@ -20028,10 +20023,10 @@ void SC_FatASM_ConstifyPlus(FatASM* Self, ASMReg L, ASMReg R) {
 		float Rf = SC_Reg_F32(R);
 		float Lf = SC_Reg_F32(L);
 		if (SC_Reg_SyntaxIs(L, kSC__Reg_Alternate)) {
-			Lf = (Lf + Rf);
+			Lf = (Lf - Rf);
 		}
 		 else {
-			Lf = (Lf - Rf);
+			Lf = (Lf + Rf);
 		}
 		(SC_FatASM_F32Set(Self, Lf));
 	}
@@ -20039,10 +20034,10 @@ void SC_FatASM_ConstifyPlus(FatASM* Self, ASMReg L, ASMReg R) {
 		Float64 Rf = SC_Reg_F64(R);
 		Float64 Lf = SC_Reg_F64(L);
 		if (SC_Reg_SyntaxIs(L, kSC__Reg_Alternate)) {
-			Lf = (Lf + Rf);
+			Lf = (Lf - Rf);
 		}
 		 else {
-			Lf = (Lf - Rf);
+			Lf = (Lf + Rf);
 		}
 		(SC_FatASM_F64Set(Self, Lf));
 	}
@@ -20341,6 +20336,7 @@ void SC_FatASM_Renda(FatASM* Self, FastString* Fs) {
 	if (!Op) {
 		return;
 	}
+	int M = JB_FS_Mark(Fs);
 	JB_FS_AppendString(Fs, Op->Name);
 	JB_FS_AppendByte(Fs, ':');
 	JB_FS_AppendMultiByte(Fs, ' ', 5 - JB_Str_Length(Op->Name));
@@ -20370,21 +20366,32 @@ void SC_FatASM_Renda(FatASM* Self, FastString* Fs) {
 	}
 	;
 	if (Knst) {
-		SC_FatASM_RendaKnst(Self, Fs);
+		SC_FatASM_RendaKnst(Self, Fs, JB_FS_Mark(Fs) - M);
 	}
 }
 
-void SC_FatASM_RendaKnst(FatASM* Self, FastString* Fs) {
+void SC_FatASM_RendaKnst(FatASM* Self, FastString* Fs, int Sofar) {
 	uint Ty = SC_Reg_xC2xB5Type(Self->Info);
+	JB_FS_AppendMultiByte(Fs, ' ', 21 - Sofar);
 	JB_FS_AppendString(Fs, JB_LUB[444]);
 	if (JB_TC_IsInt(Ty)) {
 		JB_FS_AppendInt64(Fs, ((int64)Self->Const));
 	}
-	 else if (JB_TC_ByteCount(Ty) == 4) {
-		JB_FS_AppendFloatAsText(Fs, SC_FatASM_F32(Self));
-	}
 	 else {
-		JB_FS_AppendDoubleAsText0(Fs, SC_FatASM_F64(Self));
+		double Num = 0.0f;
+		if (JB_TC_ByteCount(Ty) == 4) {
+			Num = ((double)SC_FatASM_F32(Self));
+		}
+		 else {
+			Num = SC_FatASM_F64(Self);
+		}
+		JB_FS_AppendDoubleAsText(Fs, Num, 9, true, true);
+		if (JB_TC_ByteCount(Ty) == 4) {
+			JB_FS_AppendByte(Fs, 'f');
+		}
+		 else {
+			JB_FS_AppendByte(Fs, 'd');
+		}
 	}
 	JB_FS_AppendString(Fs, JB_LUB[496]);
 }
@@ -21210,12 +21217,9 @@ ASMReg SC_Pac_Div(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp)
 
 ASMReg SC_Pac_DivFloat(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp) {
 	ASMReg Rz = ((ASMReg)0);
-	Rz = SC_Pac_QuickFloatDiv(Self, Dest, R, L, Exp);
+	Rz = SC_Pac_QuickFloatDiv(Self, Dest, L, R, Exp);
 	if (Rz == nil) {
-		Rz = SC_Pac_QuickFloatDiv(Self, Dest, L, R, Exp);
-		if (Rz == nil) {
-			Rz = SC_FatASM_AsReg(JB_Msg_FDIV(Exp, Dest, L, R, SC_Reg__New(), ((int)SC_Reg_IsBig(Dest))), Dest);
-		}
+		Rz = SC_FatASM_AsReg(JB_Msg_FDIV(Exp, Dest, L, R, SC_Reg__New(), ((int)SC_Reg_IsBig(Dest))), Dest);
 	}
 	if (SC_Reg_SyntaxIs(Dest, kSC__Reg_ConstAny)) {
 		FatASM* Fat = SC_Reg_NeedFAT(Rz);
@@ -21653,7 +21657,7 @@ ASMReg SC_Pac_NotEq(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Ex
 	return SC_Pac_Equals(Self, SC_Reg_Negate(Dest), L, R, Exp);
 }
 
-ASMReg SC_Pac_NumToReg(ASMState* Self, Message* Exp, int64 V, ASMReg Reg) {
+FatASM* SC_Pac_NumToFat(ASMState* Self, Message* Exp, int64 V, ASMReg Reg) {
 	uint DestType = SC_Reg_xC2xB5Type(Reg);
 	Reg = SC_Pac_TempMe(Self, Exp, Reg);
 	FatASM* Fat = JB_Msg_KNST(Exp, Reg, 0, 0, 0);
@@ -21663,7 +21667,12 @@ ASMReg SC_Pac_NumToReg(ASMState* Self, Message* Exp, int64 V, ASMReg Reg) {
 		SC_FatASM_ConvertConst(Fat, SrcType, DestType);
 		Reg = SC_Reg_xC2xB5TypeSet(Reg, DestType);
 	}
-	return SC_Pac_MakeConst(Self, Fat, Reg);
+	SC_Pac_MakeConst(Self, Fat, Reg);
+	return Fat;
+}
+
+ASMReg SC_Pac_NumToReg(ASMState* Self, Message* Exp, int64 V, ASMReg Reg) {
+	return SC_Pac_NumToFat(Self, Exp, V, Reg)->Info;
 }
 
 ASMReg SC_Pac_OR(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp) {
@@ -21702,13 +21711,14 @@ ASMReg SC_Pac_PlusFloat(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message
 			return Qq;
 		}
 	}
+	if (SC_Reg_SyntaxIs(Dest, kSC__Reg_ConstAny)) {
+		FatASM* Knst = SC_Pac_NumToFat(Self, Exp, 0, SC_Reg_OperatorAs(Dest, kSC__Reg_Textual));
+		SC_FatASM_ConstifyPlus(Knst, L, R);
+		return SC_Pac_MakeConst(Self, Knst, Dest);
+	}
 	bool Ss = (SC_Reg_SyntaxIs(L, kSC__Reg_Alternate));
 	int Rr = SC_Reg_Reg(R);
 	FatASM* Fat = JB_Msg_FADD(Exp, Dest, L, SC_Reg_OperatorMul(R, (!Ss)), SC_Reg_OperatorMul(R, Ss), 1 - IsF32);
-	if (SC_Reg_SyntaxIs(Dest, kSC__Reg_ConstAny)) {
-		SC_FatASM_ConstifyPlus(Fat, L, R);
-		return SC_Pac_MakeConst(Self, Fat, Dest);
-	}
 	return SC_FatASM_AsReg(Fat, Dest);
 }
 
@@ -21827,8 +21837,8 @@ ASMReg SC_Pac_QuickFloatPlus(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Me
 			return QQ;
 		}
 	}
-	if (SC_Reg_SyntaxIs(L, kSC__Reg_ConstAny)) {
-		ASMReg QQ = SC_Pac_QuickFloatPlusSub(Self, Dest, R, L, Exp);
+	if (SC_Reg_SyntaxIs(L, kSC__Reg_ConstAny) and (!SC_Reg_SyntaxIs(L, kSC__Reg_Alternate))) {
+		ASMReg QQ = SC_Pac_QuickFloatPlusSub(Self, Dest, SC_Reg_OperatorAsnt(R, kSC__Reg_Alternate), L, Exp);
 		if (QQ != nil) {
 			return QQ;
 		}
@@ -21839,6 +21849,7 @@ ASMReg SC_Pac_QuickFloatPlus(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Me
 ASMReg SC_Pac_QuickFloatPlusSub(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp) {
 	Float64 V = SC_Pac_f(Self, R);
 	uint K = ((uint)SC_Pac_GetConst(Self, SC_Reg_ToInt(R))[0]);
+	K = (K ^ ((SC_Reg_SyntaxIs(L, kSC__Reg_Alternate)) << 31));
 	if (((K >> 18) << 18) != K) {
 		JB_DoAt(1);
 		return nil;
@@ -44232,7 +44243,7 @@ JB_String* JB_Err_RenderClang(JB_Error* Self, FastString* Fs_in) {
 		JB_FreeIfDead(JB_Msg_Render(Self->Node, Fs));
 	}
 	JB_Decr(P);
-	if (JB_FS_Grew(Fs, M)) {
+	if (JB_FS_Mark(Fs) > M) {
 		JB_FS_AppendByte(Fs, ' ');
 	}
 	JB_FreeIfDead(JB_ErrorSeverity_Render(Self->Severity, Fs));
@@ -48672,6 +48683,9 @@ void SC_Func_DescribeParamFail(SCFunction* Self, SCParamArray* Params, int Bad) 
 	}
 	 else {
 		int Num = Bad - IsSelf;
+		(--Bad);
+		if (Bad <= 0) {
+		}
 		if (true) {
 			FastString* _fsf1 = JB_Incr(JB_FS_Constructor(nil));
 			JB_FS_AppendString(_fsf1, JB_LUB[947]);
@@ -53358,4 +53372,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -6111145706197570459 1127417948526971801
+// 9101573982597706472 -231252846933398410

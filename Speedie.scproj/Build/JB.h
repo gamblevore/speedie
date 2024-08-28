@@ -4559,8 +4559,6 @@ uint SC_Reg_FatIndex(ASMReg Self);
 
 ASMReg SC_Reg_FatIndexSet(ASMReg Self, uint Value);
 
-int SC_Reg_Floatness(ASMReg Self);
-
 ASMReg SC_Reg_HaveAddr(ASMReg Self);
 
 int SC_Reg_IntDivType(ASMReg Self);
@@ -5648,7 +5646,7 @@ int SC_FatASM_Prm(FatASM* Self, int A, ASMReg Info);
 
 void SC_FatASM_Renda(FatASM* Self, FastString* Fs);
 
-void SC_FatASM_RendaKnst(FatASM* Self, FastString* Fs);
+void SC_FatASM_RendaKnst(FatASM* Self, FastString* Fs, int Sofar);
 
 void SC_FatASM_Swap(FatASM* Self, int A, int B);
 
@@ -5994,6 +5992,8 @@ ASMReg SC_Pac_MoreEq(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* E
 ASMReg SC_Pac_Mul(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
 ASMReg SC_Pac_NotEq(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
+
+FatASM* SC_Pac_NumToFat(ASMState* Self, Message* Exp, int64 V, ASMReg Reg);
 
 ASMReg SC_Pac_NumToReg(ASMState* Self, Message* Exp, int64 V, ASMReg Reg);
 
