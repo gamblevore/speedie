@@ -93,7 +93,20 @@ class SCParamArray
 		if p
 			rz = p.RenderType.nicerclassname
 
-
+	function String.ArgsMatchError (|bool| TypeCast, |string|)
+		if !TypeCast
+			return self
+	// Useful hint
+		return self + " (But none matched exactly. All needed a type-cast.)"
+	
+	
+	function MultipleMatchingFunctions (|int| TypeCast, |SCFunction| f, |SCFunction| R, |SCFunction|)
+		if !.madeerror
+			error   (.Exp, "Multiple matching functions.".ArgsMatchError(TypeCast!=0) )
+			error   (f.Source, "Candidate 1")
+			error   (R.Source, "Candidate 2")
+	
+	
 	function string.NicerClassName (|string|)
 		if self ~= "StringZeroTerminated"
 			return "string"

@@ -510,11 +510,12 @@ function HiderMatch (|bool| IsAssigns, |bool|)
 
 
 function DescribeParamFail (|SCParamArray| params, |int| bad)
+	// if bad == 0, then its good. so bad == 1 means the first arg.
 	require !params.MadeError
-	|| IsSelf = params.isdot and params.IsNotModule
-	|| P = params[bad]
-		bad++
-		|| str = ("Wrong self: ",  "Wrong param ($bad): ")(IsSelf)
+	|| UsesSelf = params.isdot and params.IsNotModule
+	|| Num = bad - UsesSelf
+	|| P = params[bad-1]
+		|| str = ("Wrong self: ",  "Wrong param ($num): ")(UsesSelf and bad==1)
 		|| Type = TypeOfExpr(P, nil)
 			str += Type.RenderTypeName
 			str += " "
@@ -523,26 +524,8 @@ function DescribeParamFail (|SCParamArray| params, |int| bad)
 			str += "(Unknown Type)"
 		error ( P, str )
 	  else
-		|| Num = bad - isself
-		bad--
-		if bad <= 0
-			// :[
-		error ( params.exp, "Missing param $num: ${.args[bad]}" )
+		error ( params.exp, "Missing param $num: ${.args[bad-1]}" )
 	problem ( .Source, "to " + .RenderTitle )
-
-
-function String.ArgsMatchError (|bool| TypeCast, |string|)
-	if !TypeCast
-		return self
-// Useful hint
-	return self + " (But none matched exactly. All needed a type-cast.)"
-
-
-function SCParamArray.MultipleMatchingFunctions (|int| TypeCast, |SCFunction| f, |SCFunction| R, |SCFunction|)
-	if !.madeerror
-		error   (.Exp, "Multiple matching functions.".ArgsMatchError(TypeCast!=0) )
-		error   (f.Source, "Candidate 1")
-		error   (R.Source, "Candidate 2")
 
 
 function int.IsSimpleOrPointerCast (|bool|)
