@@ -2,18 +2,110 @@
 import "GUI"
 
 
+function PressedSquare (guiaction)
+	|| w = .Window as StartWindow	#require
+	w.Add(self as buttonview		#require)
+
+
 class StartWindow (window)
-	|textview| MainText
-	constructor (|controlrect| rect)
-		super.constructor(Rect)
-		.maintext = TextView(self)
-		.MainText.Size = 120~wide by 17~high
-		(.MainText is editable)
-		.MainText.text = "hello world"
-		.MainText.SetFocus
+	|int|			XGot
+	|int|			OGot
+	|[buttonview]|	Buttons
+	
+	constructor
+		super.constructor(414 by 400)
+		for V in (3, 3)
+			|| btn = ButtonView(self, PressedSquare)
+			.Buttons <~ btn
+			|| x = (v.x*100)~right for 100
+			|| y = (v.y*100)~up for 100
+			//the~left+4 for 360  by  15~down back 150
+			btn.size = x by y
+			btn.ID = btn.text
+			btn.GNormal.bg = vec4(0.5, 0.5)
+			btn.Position = v • (1,3)
+//		.Buttons[0]!.ClipMode |= ControlClipMode.debug
+//		not sure why this isn't drawing properly. I'll fix it before release.
+		
+	syntax access (|int| x, |int| y, |int|)
+		|| v = x+y*3
+		return .XGot[v] - .OGot[v]
+	
+	syntax access (|ivec2| v, |buttonview|)
+		|| b = .Buttons[v.x+v.y*3]
+			return b
+		return .Buttons[0]!
+	
+	function Add (|buttonview| c)
+		|| pos = c.Position
+		if .XGot[pos]
+			.xgot = .xgot[pos,false] // .xgot[pos]=false would be better!
+		  elseif .ogot[pos]
+			.ogot = .ogot[pos,false]
+		  elseif .OGot.CountBits > .xgot.CountBits
+			.xgot = .xgot[pos,true]
+		  else
+			.ogot = .ogot[pos,true]
+		
+		.settext
+		.recheck
+	
+	function SetText
+		for (b in .Buttons) (i)
+			b.text = ""
+			if .XGot[i]
+				b.Text += "x"
+			if .OGot[i]
+				b.text += "o"
+		
+	function Win (|int| who, |ivec2| From, |ivec2| To)
+		beep "$from -> $to"
+		|| name = ("crosses", "noughts")(who>0)
+		self[from].text += "!"
+		self[(from+to)/2].text += "!"
+		self[to].text += "!"
+		.reset "The winner is $name!"
+
+	function Reset (|string| s)
+		beep s
+		.XGot = 0
+		.OGot = 0
+		.SetText
+		
+	function CheckRow (|int| y, |int| t)
+		for x in 3
+			require self[x, y] == t
+		.Win(t, (0,y), (2,y))
+		
+	function CheckCol (|int| x, |int| t)
+		for y in 3
+			require self[x, y] == t
+		.Win(t, (x,0), (x,2))
+		
+	function CheckDiagonal (|int| i, |int| t)
+		|| x = (0, 2)(i>0)
+		for y in 3
+			require self[x, y] == t
+			x += i
+		x -= i
+		.Win(t, (2-x, 0), (x, 2))
+			
+	function Recheck
+		.Check(1)
+		.Check(-1)
+		if (.XGot ||| .OGot).CountBits >= 9
+			.Reset "A draw!"
+	
+	function Check (|int| t)
+		for i in 3
+			.CheckRow(i, t)
+			.CheckCol(i, t)
+			if i != 1
+				.CheckDiagonal(i-1, t)
+
 
 main
 	SDLApp.init(-1)
-	|| w = StartWindow(414 by 400)
+	|| w = StartWindow()
 	return sdlapp.Run
 
