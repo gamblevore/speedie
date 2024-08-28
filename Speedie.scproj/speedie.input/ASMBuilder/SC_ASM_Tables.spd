@@ -283,7 +283,7 @@ function Decl (fn_asm)
 	dest = .DeclareMe(Exp, ty) 
 	|| Value = .µ(exp.last!, dest as AsmReg.decl)
 	if (ty isnt altered)
-		|| f = .RegConsts[value.reg]
+		|| f = value.fat//.RegConsts[value.reg]
 			(f is NeverAltered)
 	if value.reg == dest.reg
 		return Value
@@ -724,6 +724,7 @@ function Message.TypeCastDoesNothing (|Datatypecode| Expected, |bool|)
 
 
 function asmstate.LoopClearUnreliableConsts // we need to clear vtmps on function calls too.
+	return
 	|| v = .vdecls|int|
 	for i in v
 		|| r = .RegConsts[i]

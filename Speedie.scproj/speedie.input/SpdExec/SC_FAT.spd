@@ -218,11 +218,7 @@ struct FatASM
 	
 	function Renda (|FastString| fs)
 		opt norefcounts
-//		debugat
-		|| op = instruction.typelist[.op]
-		if !op
-			debugger
-			return
+		|| op = instruction.typelist[.op] #debug_require
 		|| M = fs.mark
 		fs <~ op.name
 		fs <~ ':'

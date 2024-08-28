@@ -4,7 +4,8 @@ module ASMExamples {
 function PackTestConsts
 	visible
 	|f64| r1 = 2						// int as f64
-	|| r2 = (1.0/r1)
+	|| r2 = (1.0/2|f64|)
+	r2 = (1.0/r1)
 	|| r3 = 0.1 + 1						// f32 + int
 	|| r4 = 3.4567|f64| + r1			// f64 + f32
 	|| r5 = 1234.5|f64| + 5678.9|f64|	// f64 + f64

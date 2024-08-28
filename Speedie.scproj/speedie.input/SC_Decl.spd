@@ -1051,16 +1051,18 @@ class SCDecl (SCNamed) {
 		// Just like ExpectMatch, except always does type-casting.
 		
 		|| Cast = kTypeCastTrue
-		cast |= kTypeCastBothWays * !side
-		if  self isnt local  or  o isnt local
+		if !side
+			cast |= kTypeCastBothWays
+		  elseif  self isnt local  or  o isnt local
 			cast |= kTypeCastSetToMemory // float conversion...
 		
 		rz = .ExpectMatchSub( O, Cast, exp, ErrNode )
-				
-		if (self is self) and (scfunction.currfunc is Destructor) 
-			error (exp, "You can’t modify 'self' in a constructor or destructor.")
-		  elseif side and (self is local)
-			.MarkAsAltered
+		
+		if side
+			if (self is local)
+				.MarkAsAltered
+			if (self is self) and (scfunction.currfunc is Destructor) 
+				error (exp, "You can’t modify 'self' in a constructor or destructor.")
 						
 
 	function WriteNilRel (|Message|)

@@ -113,7 +113,7 @@ extend ASMState
 			return nil
 		|| fat = exp.FADK(dest, l, k)
 		if dest is constany
-			fat.ConstifyPlus(l,r)
+			fat.ConstifyFloatPlus(l,r)
 			return .makeconst(fat,dest)
 		
 		return fat * Dest
@@ -249,7 +249,7 @@ extend ASMState
 		return fat * Dest
 		
 
-	function fatasm.ConstifyPlus (|asmreg| l, |asmreg| r)
+	function fatasm.ConstifyFloatPlus (|asmreg| l, |asmreg| r)
 		if l.fourbytes
 			|| rf = r.F32
 			|| lf = l.F32
@@ -257,7 +257,7 @@ extend ASMState
 				lf -= rf
 			  else
 				lf += rf
-			.F32 = lf
+			.f32 = lf
 		  else
 			|| rf = r.F64
 			|| lf = l.F64
@@ -265,19 +265,31 @@ extend ASMState
 				lf -= rf
 			  else
 				lf += rf
-			.F64 = lf
-	
-	
-	function PlusFloat   (fn_opasm)
+			.f64 = lf
+
+	function fatasm.ConstifyFloatDiv (|asmreg| l, |asmreg| r)
+		if l.FourBytes
+			.f32 = l.f32 / r.f32
+		  else
+			.f64 = l.f64 / r.f64
+
+	function fatasm.ConstifyFloatMul (|asmreg| l, |asmreg| r)
+		if l.FourBytes
+			.f32 = l.f32 * r.f32
+		  else
+			.f64 = l.f64 * r.f64
+
+	function FloatPlus   (fn_opasm)
+		if dest is constany
+			|| knst = .NumToFat(exp, 0, dest as asmreg.Textual)
+			knst.ConstifyFloatPlus(l,r)
+			return .makeconst(knst, dest)
+
 		|| IsF32 = dest.FourBytes
 			|| qq = .QuickFloatPlus(dest, l, r, exp)
 			if qq != nil
 				return qq
 
-		if dest is constany
-			|| knst = .NumToFat(exp, 0, dest as asmreg.Textual)
-			knst.ConstifyPlus(l,r)
-			return .makeconst(knst, dest)
 		|| ss = (l is alternate)
 		|| rr = r.reg
 		|| fat = exp.fADD(dest, l, r*!ss, r*ss, 1-IsF32)
@@ -312,7 +324,7 @@ extend ASMState
 			return r
 		if l.isint
 			return .PlusInt(dest, l, r, exp)
-		return .PlusFloat(dest, l, r, exp)
+		return .FloatPlus(dest, l, r, exp)
 
 
 	function Subtract  (fn_opasm)	// x = a - b
@@ -338,17 +350,15 @@ extend ASMState
 
 
 	function FloatMul (fn_opasm)
+		if dest is constany
+			|| knst = .NumToFat(exp, 0, dest as asmreg.Textual)
+			knst.ConstifyFloatmul(l,r)
+			return .makeconst(knst, dest)
 		rz = .QuickFloatMul(dest, R, L, exp)
 		if rz == nil
 			rz = .QuickFloatMul(dest, L, R, exp)
 			if rz == nil
 				rz = exp.FMUL(dest, L, R, asmreg(), l.IsBig|int|) * Dest
-		if dest is ConstAny
-			|| fat = rz.needfat
-			if dest.FourBytes
-				fat.F32 = l.F32 * r.F32
-			  else
-				fat.F64 = l.F64 * r.F64
 
 
 	function Mul    (fn_opasm)
@@ -367,19 +377,17 @@ extend ASMState
 	function Div    (fn_opasm)
 		if dest.isint
 			return .DivInt(dest, l, r, exp)
-		return .DivFloat(dest, l, r, exp)
+		return .FloatDiv(dest, l, r, exp)
 
 
-	function DivFloat    (fn_opasm)
+	function FloatDiv    (fn_opasm)
+		if (dest is constany) and (l isnt alternate)
+			|| knst = .NumToFat(exp, 0, dest as asmreg.Textual)
+			knst.ConstifyFloatDiv(l,r)
+			return .makeconst(knst, dest)
 		rz = .QuickFloatDiv(dest, L, R, exp)
 		if rz == nil
 			rz = exp.FDIV(dest,  L,  R,  asmreg(), dest.isbig|int|) * dest
-		if dest is ConstAny
-			|| fat = rz.needfat
-			if dest.FourBytes
-				fat.f32 = l.f32 / r.f32
-			  else
-				fat.f64 = l.f64 / r.f64
 
 
 	function DivInt    (fn_opasm)

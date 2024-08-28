@@ -1,20 +1,10 @@
 
 
-// ADDK? optimise stages... OR special-case it specifically. 
-
-//struct RegConstInfo
-//	|?scdecl--| 		Type	// we only need this to check if the const is altered
-								// so we only need 1 bit. Shouldn't we just store the fat anyhow?
-								// we need the fat... because thats where the const lives.
-//	|&FATASM|			Fat
-
-
 struct ASMState
 	linkage: cpp_part Pac
 	|uint16| 					BlockNum
 	|uint16| 					ParentBlock
 
-	|uint|						VAvail
 	|byte|						VDecls
 	|byte|						VTmps
 // OK, can we do this... just remove it and... make it work. We just need to be able 
@@ -25,21 +15,24 @@ struct ASMState
 	|bool|						OK    
 	|bool|						Inited   
 
-//	|SCFunction--|				fn     		// use scfunction.currfunc!
 	|µFunc|						Out      
 	|&FatASM|					FuncStart
 	|&FatASM|					Start		// a "slice" feature would be nice    
 	|&FatASM|					Curr    
 	|&FatASM|					End    
-	|(&FATASM)[32]|				RegConsts
 	|FATASM| 					Zero
+
+// constants...
+//	|uint|						VAvail
+//	|(&FATASM)[32]|				RegConsts  // its more complex than that
+// for example, a loop that calls a func... then the temps are wiped out.
+// we can't rely on a temp that was called earlier.
+// what if we did all the const optimisation in the optimiser?
+// makes sense, right? 
 
 	
 	function CloseVDecls (|int| i)
-		|| v = .VDecls
-		while v > i
-			.CloseReg(v--)
-		.VDecls = v
+		.VDecls = i
 
 	function CloseVTmps (|int| i)
 		target debug: if i < .vtmps // what?
@@ -50,14 +43,7 @@ struct ASMState
 		|| sh = .vtmps
 		if sh < 32
 			NewV |= -1<<sh
-		|| ToClose = .vavail &~ NewV
-		.vAvail = NewV
-		for (v.bits in ToClose) (i)
-			.CloseReg(i)
 		
-	
-	function CloseReg (|int| i)
-		.RegConsts[i] = nil
 	
 			
 	function AddFuncParams (|SCFunction| fn)
@@ -71,8 +57,8 @@ struct ASMState
 	function RegPlace (|int| a, |?&uint64|)
 		opt norefcounts
 		|| InBounds = a|uint| <= 31
-			|| fat = .RegConsts[a]
-				return fat.const
+//			|| fat = .RegConsts[a]
+//				return fat.const
 			return nil
 
 		|| msg = (": Unassigned register",  ": Out of bounds register")(InBounds)
@@ -177,7 +163,6 @@ struct ASMState
 			|| t = Type.CalculateASMType
 			t.reg = d
 			Type.wholetype = t|DataTypeCode|   		// right?
-			.VAvail	|= 1 << d
 			.vdecls = d
 			target debug: Type.ASMSanity
 			return t
@@ -194,7 +179,6 @@ struct ASMState
 			check (r > .vdecls) (where, "No free local variables.")
 			t.reg = r
 			.vtmps = r
-			.VAvail	|= 1 << r
 		return t
 
 
@@ -362,9 +346,6 @@ function ASMState.StartFunc (|scfunction| fn)
 	.zero = nil
 	.zero.info = AsmReg()
 	(.zero is NeverAltered)
-	for i in 32
-		.CloseReg(i)
-	.VAvail = 1
 	.FuncStart = .curr
 	scfunction.currfunc = fn
 	.ReturnASM = fn.ReturnType.regtype

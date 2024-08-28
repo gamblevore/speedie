@@ -220,7 +220,7 @@ function Message.CollectFromBody (|SCNode| scarg)
 		return
 	|| dcl = .CollectDecl(scarg, scarg, declmode.FunctionBody)
 		(dcl is body)
-//		(dcl isnt altered) // whatever
+//		(dcl isnt altered) // why??? does this not compile
 		(dcl isnt NumberConst)
 		scparamarray.PostStructFix
 		|| def = dcl.Default

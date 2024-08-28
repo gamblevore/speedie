@@ -372,13 +372,13 @@ function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming,
 	if Failed and !incoming.MadeError // backup
 		error ( incoming.exp, "Wrong params to " + .RenderTitle )
 	  elseif rz
-		|| altered = rz.altersparams|int| & incoming.size|int|~bits
+		|| altered = rz.AltersParams|int| & incoming.size|int|~bits
 			for (b.bits in altered) (i)
 				|| m = incoming.items[i]
 					|| d = m.obj as scdecl
 					if d is local
-						d.markasaltered 
-			
+						d.markasaltered
+		
 		|| ft = rz.StructReturned
 			incoming.StructLover(ft.aslocal, self)
 		  elseif rz.returntype is returnedstruct // remove this? its always the prev?
@@ -1138,8 +1138,8 @@ function RegType (|datatypecode|)
 function scdecl.MarkAsAltered 
 	opt norefcounts
 	(self is altered)
-	if self is typeimprove
-		|| orig = .islookuponly
+	if self is TypeImprove
+		|| orig = .IsLookupOnly
 		if orig isa scdecl
 			(orig is altered)
 
@@ -1147,7 +1147,7 @@ function scdecl.MarkAsAltered
 
 function Self (|scdecl|)
 	opt norefcounts
-	return .args[0]
+	return .args[]
 
 
 

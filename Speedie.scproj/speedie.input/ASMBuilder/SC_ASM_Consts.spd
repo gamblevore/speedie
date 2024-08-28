@@ -56,7 +56,7 @@ extend ASMState
 
 	function MakeConst (|&fatasm| fat, |asmreg| reg, |asmreg|)
 		(reg is ConstAny)
-		.regconsts[reg.reg] = fat
+//		.regconsts[reg.reg] = fat // look at the regconsts definition (still remains ;_;)
 		return fat*reg
 	
 	function NumToFat (|message| exp, |int64| V, |asmreg| Reg, |&fatasm|)
