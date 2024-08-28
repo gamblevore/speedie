@@ -586,7 +586,7 @@ extend PerryIDE
 		f.FocusOn( .root! )
 		
 		if !conf and .projIsSpeedieCode
-			conf = defaultfiles.Roots.parse
+			conf = templates.Roots.parse
 		
 		.LostFunks = conf["unused_lib_funcs"]
 		for lib in .LostFunks

@@ -40,7 +40,7 @@ function string.TrimCodeExt (|string|)
 
 function Perry.CreateProj (|string| path)
 	|| proj = path.file
-	|| Main = defaultfiles.EmptyMainFile(proj.trimextandpath)
+	|| Main = templates.EmptyMainFile(proj.trimextandpath)
 		
 	ifn path isa "scproj"
 		require path.file.CreateEmpty
@@ -51,8 +51,8 @@ function Perry.CreateProj (|string| path)
 
 		proj.child("input/main.spd").data(Main) #require
 
-		|| R = defaultfiles.Roots
-		|| T = defaultfiles.Todo
+		|| R = templates.Roots
+		|| T = templates.Todo
 		proj.child(".perry").data = R
 		proj.child("input/.todo").data = T
 	IdeAddProj(path)

@@ -1,5 +1,5 @@
 
-module DefaultFiles	
+module Templates	
 	
 	|| Todo = "
 		 			*** Todo file ***
@@ -16,7 +16,7 @@ roots 	// Extra roots for the IDE to display. This doesn't affect compilation.
 
 `
 
-	function EmptyMainFile (|string| name, |string|)
+	function EmptyMainFile (|string| name, |string|) // replace with "newprojects" folder
 		return "#!/usr/local/bin/spd
 
 // Basic empty file
@@ -38,28 +38,5 @@ env
 	setting="value"
 */
 `
-
-	function EmptyGuiFile (|string| name, |string|)
-		return "#!/usr/local/bin/spd
-
-// basic empty GUI
-import \"GUI\"
-
-
-class StartWindow (window)
-	|textview| MainText
-	constructor
-		super.constructor(414 by 256)
-		.maintext = TextView(self)
-		.MainText.Size = 120~wide by 17~high
-		(.MainText is editable)
-		.MainText.text = \"hello $name\"
-		.MainText.SetFocus
-
-main
-	SDLApp.init(-1)
-	|| w = StartWindow()
-	return sdlapp.Run
-"
 		
 
