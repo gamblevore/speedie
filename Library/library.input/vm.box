@@ -1,5 +1,8 @@
 
 
+//	* add an integer divide by power of 2 instruction?
+//  || y = x|int| / 4 // should work for all values of x
+//  probably just add a const then bitshift
 
 // vm.box
 forms
@@ -175,6 +178,12 @@ forms
 		r2		r
 		K		l
 	
+	DivK
+		r1		R
+		r2		r
+		Sh		7 // could be used to add other numbers...
+		Add		7 // in case we don't JUST wanna div by a power of 2
+	
 	Shift
 		r1		R
 		r2		r
@@ -289,6 +298,8 @@ forms
 		i1 = (i2 * i3) + i4
 /**/ DIVV (Div)
 		DivMath(r, Op)
+/**/ DIVK (DivK)
+		i1 = (i2+((1<<DivK_Add)-1)) >> DivK_Sh // quick divide by power of 2
 /**/ MAX (MinMax)
 		if (MinMax_Signu)
 			i1 = std_max(i2, i3)

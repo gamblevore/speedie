@@ -12,6 +12,24 @@ function PackTestConsts
 	|float| r6 = 2						// int as f32
 	|f64| r7 = 1.0						// f32 as f64
 
+
+function PackTestAndOr (|int| a, |int| b, |int|)
+	visible
+	if a
+		rz = 1
+	if a and b
+		rz = 2
+	if !a and b > 3
+		rz = 3
+	if a or b
+		rz = 4
+	if b < -1 or b > 5
+		rz = 5
+
+	|| y = 2.0
+	|| y2 = ((a + b) / 2) - ((a / b) * 2)
+		
+
 target pack { target debug2 {
 
 

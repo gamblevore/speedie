@@ -648,8 +648,6 @@ function message.HasAsmStuff (|bool|)
 
 
 function FatASM.ConvertConst (|datatypecode| Oldtype, |datatypecode| Newtype)
-//	if "packtestconsts".trap // we need to do the conversion here! or else...
-//		debugat
 	if NewType.IsFloat and Oldtype.IsFloat
 		.FloatConvConst(self, newtype.BitCount)
 	  else

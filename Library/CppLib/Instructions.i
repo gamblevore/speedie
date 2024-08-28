@@ -58,6 +58,8 @@
 	i1 = (i2 * i3) + i4;
 ı DIVV: _
 	DivMath(r, Op);
+ı DIVK: _
+	i1 = (i2 + ((1 << DivK_Add) - 1)) >> DivK_Sh;
 ı MAX: _
 	if (MinMax_Signu) 
 	i1 = std_max(i2, i3)
