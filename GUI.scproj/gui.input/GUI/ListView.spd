@@ -1378,7 +1378,7 @@ class ListView (GUIControl) {
 		
 		rect.y2 += .ScrollSlide
 		|| End = .End
-		.CanSeeAllLines = (.start == ._scroll) and .end
+		.CanSeeAllLines = false
 		
 		
 		for r.visible in self
@@ -1386,7 +1386,7 @@ class ListView (GUIControl) {
 			|| D = (r.depth(self), 0)(.IsTree)
 			r.ListRowDraw(Where, rect, self, D)
 			rect.y2 = rect.y
-			if (r == end) and .CanSeeAllLines
+			if (r == end) and .start == ._scroll
 				.CanSeeAllLines = (rect.y >= .lastrect.y)
 
 		where.controlclip = clip
