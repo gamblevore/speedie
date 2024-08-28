@@ -1508,11 +1508,11 @@ function TypeOfRel (ExprResolver)
 	// !!AND only if side!=nil, right?
 	// if we say "needs numeric type-cast"... we can allow it
 	// use our shit bwlow. can return an int
-//	if LC.ExpectRelMatch( RC, RN, side, exp ) // RN/LN have changed... and their types too!
-//		ln = exp.first! // wouldn't only RN change? Like: |float| x = f64
-//		rn = exp.last!
-//		rc = rn.fastdecl
-//		lc = ln.fastdecl
+	if LC.ExpectRelMatch( RC, RN, side, exp ) // RN/LN have changed... and their types too!
+		ln = exp.first! // wouldn't only RN change? Like: |float| x = f64
+		rn = exp.last!
+		rc = rn.fastdecl
+		lc = ln.fastdecl
 	
 	
 	if !side and (comp Is Compare)
