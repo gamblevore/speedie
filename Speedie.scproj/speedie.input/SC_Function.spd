@@ -524,6 +524,9 @@ function DescribeParamFail (|SCParamArray| params, |int| bad)
 		error ( P, str )
 	  else
 		|| Num = bad - isself
+		bad--
+		if bad <= 0
+			// :[
 		error ( params.exp, "Missing param $num: ${.args[bad]}" )
 	problem ( .Source, "to " + .RenderTitle )
 
