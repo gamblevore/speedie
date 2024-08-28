@@ -462,6 +462,10 @@ datatype IntRange (ivec2)
 
 
 datatype ivec2
+	operator • (|ivec2| other, |int|)
+		cpp_part Dot
+		return (self * other).sum
+
 	function LengthSq (|float|)
 		return (.x * .x)|float| + (.y * .y)|float| 
 
