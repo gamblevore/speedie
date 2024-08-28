@@ -658,7 +658,8 @@ function FuncTmps (|message|)
 			ch <~ (@str, ch.name)
 		if ch != @str
 			|| f = ch.first
-				f.name += " "
+				if f.name.last!='.'
+					f.name += " "
 		ch.func = @dot
 
 
