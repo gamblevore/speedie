@@ -511,7 +511,7 @@ function HiderMatch (|bool| IsAssigns, |bool|)
 
 function DescribeParamFail (|SCParamArray| params, |int| bad)
 	require !params.MadeError
-	|| IsSelf = (bad==0) and params.isdot and params.IsNotModule
+	|| IsSelf = params.isdot and params.IsNotModule
 	|| P = params[bad]
 		bad++
 		|| str = ("Wrong self: ",  "Wrong param ($bad): ")(IsSelf)
