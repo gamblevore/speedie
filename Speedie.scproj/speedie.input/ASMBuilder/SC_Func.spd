@@ -14,8 +14,8 @@ class µFunc
 		.IR = ir
 		fn.asm = self
 
-	function Name (|string|)
-		return .fn.ExportName
+//	function Name (|string|)
+//		return .fn.ExportName
 
 	function µTest (|memory of asm|)
 		description "Generate some code (only for testing)."
@@ -42,12 +42,6 @@ class µFunc
 			for i in self
 				|| r = i.jumpreg
 					i.FillLabelRequest(where, rz, r-1)
-		
-//		target debug
-//			while where < rz
-//				where.DebugPrint
-//				where += where.length
-
 
 
 	function memory.Run (|memory of asm| self, |&ivec4| Args = nil, |int| ArgCount=0, |int64|)
@@ -64,9 +58,12 @@ class µFunc
 	render
 		fs <~ "asm ${.fn.name}\n"
 		for µ in self
-			fs <~ '\t'
-			µ.Renda(fs)
-			fs <~ '\n'
+			if µ.op != asm.NOOP
+				fs <~ '\t'
+				µ.Renda(fs)
+				fs <~ '\n'
+
+/// NIBBLER NIBBler nIBBLerr
 
 	iterator
 		|| CurrInst = .IR
