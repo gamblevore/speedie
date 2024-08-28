@@ -1983,7 +1983,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1161], (113039722676224));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1161], (113039768551424));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -48660,15 +48660,15 @@ void SC_Func_DescribeParamFail(SCFunction* Self, SCParamArray* Params, int Bad) 
 	if (SC_PA_MadeError(Params)) {
 		return;
 	}
-	bool IsSelf = Params->IsDot and Params->IsNotModule;
-	Message* P = JB_Incr(SC_PA_SyntaxAccess(Params, Bad));
+	bool UsesSelf = Params->IsDot and Params->IsNotModule;
+	int Num = Bad - UsesSelf;
+	Message* P = JB_Incr(SC_PA_SyntaxAccess(Params, Bad - 1));
 	if (P) {
-		(++Bad);
 		FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 		JB_FS_AppendString(_fsf0, JB_LUB[1341]);
-		JB_FS_AppendInt32(_fsf0, Bad);
+		JB_FS_AppendInt32(_fsf0, Num);
 		JB_FS_AppendString(_fsf0, JB_LUB[302]);
-		JB_String* Str = JB_Incr(((JB_String*)JB_Ternary(IsSelf, ((JB_String*)JB_LUB[1343]), ((JB_String*)JB_FS_GetResult(_fsf0)))));
+		JB_String* Str = JB_Incr(((JB_String*)JB_Ternary(UsesSelf and (Bad == 1), ((JB_String*)JB_LUB[1343]), ((JB_String*)JB_FS_GetResult(_fsf0)))));
 		JB_Decr(_fsf0);
 		SCDecl* Type = JB_Incr(SC_TypeOfExpr(P, nil, nil));
 		if (Type) {
@@ -48688,16 +48688,12 @@ void SC_Func_DescribeParamFail(SCFunction* Self, SCParamArray* Params, int Bad) 
 		JB_Decr(Str);
 	}
 	 else {
-		int Num = Bad - IsSelf;
-		(--Bad);
-		if (Bad <= 0) {
-		}
 		if (true) {
 			FastString* _fsf1 = JB_Incr(JB_FS_Constructor(nil));
 			JB_FS_AppendString(_fsf1, JB_LUB[952]);
 			JB_FS_AppendInt32(_fsf1, Num);
 			JB_FS_AppendString(_fsf1, JB_LUB[456]);
-			SCDecl* _tmPf3 = JB_Incr(((SCDecl*)JB_Array_Value(Self->Args, Bad)));
+			SCDecl* _tmPf3 = JB_Incr(((SCDecl*)JB_Array_Value(Self->Args, Bad - 1)));
 			JB_FreeIfDead(SC_Decl_Render(_tmPf3, _fsf1));
 			JB_Decr(_tmPf3);
 			JB_String* _tmPf4 = JB_Incr(JB_FS_GetResult(_fsf1));
