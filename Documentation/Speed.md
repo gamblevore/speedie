@@ -19,7 +19,7 @@ Well... first, lets ask something: **Are we are talking about C++ or C-- ??**.
 
 And so all you are left with is, is a subset of `C`, doing work on pointers and doing math-operations. In that case, Speedie is the same speed as `C--`.
 
-Many popular libraries are written in `C--`, especially sound/graphics/compression libs. But probably most popular libs are written in `C/C++`, for example XML libs, database libs, etc. And so Speedie won't be faster than `C++` for those sound/graphics libs... as they are already `C--`.
+Many popular libraries are written in `C--`, especially sound/graphics/compression libs. But probably most popular libs are written in `C/C++`, for example XML libs, database libs, etc. And so Speedie won't be faster than those sound/graphics libs... as they are already `C--`.
 
 In fact, if you look at Speedie's internals... its pretty much written in `C--`, so we are building on a very fast basis.
 
