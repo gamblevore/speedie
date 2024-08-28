@@ -196,7 +196,7 @@ class Error (Message)
 		if (!.LineIdentifiers(fs, P) and .node)
 			.node.render(fs)
 		
-		if fs.grew(m)
+		if fs.mark > m
 			fs <~ " "
 		.severity.render(fs)
 		fs <~ ": "

@@ -280,9 +280,9 @@ class FastString {
 		description "Returns 'The Mark'. Like a sea-level-marker, this is the amount that something has risen by. This is the-written-to-disk-length + the-length-current in the faststring. If the faststring did not flush anything to disk (maybe it has no file), then .mark == .length"
 		cpp_wrapper
 	
-	function Grew (|int| m, |bool|)
-		description "Returns if we grew since the last 'Mark' was read." 
-		cpp_wrapper
+//	function Grew (|int| m, |bool|)
+//		description "Returns if we grew since the last 'Mark' was read." 
+//		cpp_wrapper
 
 	macro SyntaxAppend
 		_1.render(_0)

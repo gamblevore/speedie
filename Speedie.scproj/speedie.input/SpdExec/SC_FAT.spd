@@ -223,6 +223,7 @@ struct FatASM
 		if !op
 			debugger
 			return
+		|| M = fs.mark
 		fs <~ op.name
 		fs <~ ':'
 		fs <~ (' ', 5-op.name.length)
@@ -242,18 +243,27 @@ struct FatASM
 			if knst
 				exit
 		if knst
-			.RendaKnst(fs)
+			.RendaKnst(fs, fs.mark-m)
 	
 	
-	function RendaKnst (|faststring| fs)
+	function RendaKnst (|faststring| fs, |int| sofar)
 		|| ty = .info.µType
-		fs <~ "  /# "
+		fs <~ (' ', 21-sofar)
+		fs <~ "/# "
 		if ty.IsInt
 			fs <~ .const|int64|
-		  elseif ty.ByteCount == 4
-			fs <~ .F32()
 		  else
-			fs <~ .f64()
+			|f64| num
+			if ty.ByteCount == 4
+				num = .F32
+			  else
+				num = .f64
+			fs.AppendDouble(num, 9, true, true)
+			if ty.ByteCount == 4
+				fs <~ "f"
+			  else
+				fs <~ "d"
+			
 		fs <~ " #/"
 
 

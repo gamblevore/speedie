@@ -545,10 +545,13 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |ASMReg| Dest,  |fn_opasm!|
 	|| mr = ASMReg()
 	|| TmpCloser = .VTmps
 	|| SubMode = (dest & AsmReg.Discard) as AsmReg.StayOpen
-	debugat 2
 	if mr isnt SingleExpr
 		|| L = exp.last!
+		if dest is notyetused
+			submode.reg = dest.reg
 		ml = .µ(F, SubMode)
+		if ml.reg == dest.reg // we used it!
+			submode.reg = 0
 		mr = .µ(L, SubMode)
 		(ml asnt= asmreg.stayopen)
 	  else
@@ -565,7 +568,7 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |ASMReg| Dest,  |fn_opasm!|
 		(Dest is MathConst)
 	
 	// what if the operator is and/or?
-	if ml.floatness != mr.floatness							// Shouldn't happen.
+	target debug:if ml.floatness != mr.floatness							// Shouldn't happen.
 	rz = (fn)(self, dest, ml, mr, op)
 	target debug
 		if dest is MathConst  and  rz isnt MathConst		// hmm?
@@ -577,7 +580,7 @@ function Ignore			(fn_asm)
 
 
 function Unexpected		(fn_asm)
-	"Bad asmtmp"
+	"bad asmtmp"
 	debugger
 
 }
