@@ -48,8 +48,8 @@ import \"GUI\"
 
 class StartWindow (window)
 	|textview| MainText
-	constructor (|controlrect| rect)
-		super.constructor(Rect)
+	constructor
+		super.constructor(414 by 256)
 		.maintext = TextView(self)
 		.MainText.Size = 120~wide by 17~high
 		(.MainText is editable)
@@ -58,7 +58,7 @@ class StartWindow (window)
 
 main
 	SDLApp.init(-1)
-	|| w = StartWindow(414 by 400)
+	|| w = StartWindow()
 	return sdlapp.Run
 "
 		
