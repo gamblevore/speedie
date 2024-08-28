@@ -177,6 +177,8 @@ typedef ASM ASM_Convert;
 
 typedef ASM ASM_Div;
 
+typedef ASM ASM_DivK;
+
 typedef ASM ASM_Float;
 
 typedef ASM ASM_FloatConst;
@@ -1895,33 +1897,34 @@ extern Random JB__zalgo_R;
 #define kSC__ASM_ADDK 41
 #define kSC__ASM_ADPK 42
 #define kSC__ASM_ALLO 35
-#define kSC__ASM_BAND 52
-#define kSC__ASM_BCLR 58
-#define kSC__ASM_BFLG 56
-#define kSC__ASM_BNOT 55
-#define kSC__ASM_BOAR 53
-#define kSC__ASM_BSHL 51
-#define kSC__ASM_BSHR 50
-#define kSC__ASM_BSHS 49
-#define kSC__ASM_BSTT 57
-#define kSC__ASM_BXOR 54
-#define kSC__ASM_CMPB 59
-#define kSC__ASM_CMPF 62
-#define kSC__ASM_CMPI 61
-#define kSC__ASM_CNTC 89
-#define kSC__ASM_CNTD 90
+#define kSC__ASM_BAND 53
+#define kSC__ASM_BCLR 59
+#define kSC__ASM_BFLG 57
+#define kSC__ASM_BNOT 56
+#define kSC__ASM_BOAR 54
+#define kSC__ASM_BSHL 52
+#define kSC__ASM_BSHR 51
+#define kSC__ASM_BSHS 50
+#define kSC__ASM_BSTT 58
+#define kSC__ASM_BXOR 55
+#define kSC__ASM_CMPB 60
+#define kSC__ASM_CMPF 63
+#define kSC__ASM_CMPI 62
+#define kSC__ASM_CNTC 90
+#define kSC__ASM_CNTD 91
 #define kSC__ASM_CONV 39
+#define kSC__ASM_DIVK 47
 #define kSC__ASM_DIVV 46
 extern ASM_Encoder2 SC__ASM_Encoders[256];
 #define kSC__ASM_EROR (0)
-#define kSC__ASM_FADD 92
-#define kSC__ASM_FADK 93
-#define kSC__ASM_FDIV 96
-#define kSC__ASM_FFRC 97
-#define kSC__ASM_FMAX 98
-#define kSC__ASM_FMIN 99
-#define kSC__ASM_FMLK 95
-#define kSC__ASM_FMUL 94
+#define kSC__ASM_FADD 93
+#define kSC__ASM_FADK 94
+#define kSC__ASM_FDIV 97
+#define kSC__ASM_FFRC 98
+#define kSC__ASM_FMAX 99
+#define kSC__ASM_FMIN 100
+#define kSC__ASM_FMLK 96
+#define kSC__ASM_FMUL 95
 #define kSC__ASM_FNCX 8
 #define kSC__ASM_FNCX1 8
 #define kSC__ASM_FNCX2 9
@@ -1931,53 +1934,53 @@ extern ASM_Encoder2 SC__ASM_Forms[128];
 #define kSC__ASM_FUNC1 4
 #define kSC__ASM_FUNC2 5
 #define kSC__ASM_FUNC3 6
-#define kSC__ASM_JBRA 68
-#define kSC__ASM_JBRN 69
-#define kSC__ASM_JMPE 66
-#define kSC__ASM_JMPF 65
-#define kSC__ASM_JMPI 64
-#define kSC__ASM_JMPN 67
-#define kSC__ASM_JUMP 63
+#define kSC__ASM_JBRA 69
+#define kSC__ASM_JBRN 70
+#define kSC__ASM_JMPE 67
+#define kSC__ASM_JMPF 66
+#define kSC__ASM_JMPI 65
+#define kSC__ASM_JMPN 68
+#define kSC__ASM_JUMP 64
 #define kSC__ASM_KNSR 40
 #define kSC__ASM_KNST 12
 #define kSC__ASM_KNST1 12
 #define kSC__ASM_KNST2 13
 #define kSC__ASM_KNST3 14
-#define kSC__ASM_LUPD 70
-#define kSC__ASM_LUPU 71
-#define kSC__ASM_MAX 47
-#define kSC__ASM_MEMU 91
-#define kSC__ASM_MIN 48
+#define kSC__ASM_LUPD 71
+#define kSC__ASM_LUPU 72
+#define kSC__ASM_MAX 48
+#define kSC__ASM_MEMU 92
+#define kSC__ASM_MIN 49
 #define kSC__ASM_MULT 45
 extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_NOOP 32
 #define kSC__ASM_PRNT 37
-#define kSC__ASM_RALO 74
+#define kSC__ASM_RALO 75
 #define kSC__ASM_RARE 38
-#define kSC__ASM_RD16 83
-#define kSC__ASM_RD1S 77
-#define kSC__ASM_RD1U 76
-#define kSC__ASM_RD2S 79
-#define kSC__ASM_RD2U 78
-#define kSC__ASM_RD4S 81
-#define kSC__ASM_RD4U 80
-#define kSC__ASM_RD8U 82
+#define kSC__ASM_RD16 84
+#define kSC__ASM_RD1S 78
+#define kSC__ASM_RD1U 77
+#define kSC__ASM_RD2S 80
+#define kSC__ASM_RD2U 79
+#define kSC__ASM_RD4S 82
+#define kSC__ASM_RD4U 81
+#define kSC__ASM_RD8U 83
 #define kSC__ASM_RET 34
-#define kSC__ASM_RMEM 73
-#define kSC__ASM_RSET 72
+#define kSC__ASM_RMEM 74
+#define kSC__ASM_RSET 73
 #define kSC__ASM_SUBB 44
 #define kSC__ASM_SWAP 36
-#define kSC__ASM_TABL 75
+#define kSC__ASM_TABL 76
 #define kSC__ASM_TAIL 16
 #define kSC__ASM_TAIL1 16
 #define kSC__ASM_TAIL2 17
-#define kSC__ASM_TERN 60
+#define kSC__ASM_TERN 61
 #define kSC__ASM_TRAP 33
-#define kSC__ASM_WR16 88
-#define kSC__ASM_WR1U 84
-#define kSC__ASM_WR2U 85
-#define kSC__ASM_WR4U 86
-#define kSC__ASM_WR8U 87
+#define kSC__ASM_WR16 89
+#define kSC__ASM_WR1U 85
+#define kSC__ASM_WR2U 86
+#define kSC__ASM_WR4U 87
+#define kSC__ASM_WR8U 88
 #define kSC__Reg_AddrRequest 2147483648
 #define kSC__Reg_AlreadyNegated 262144
 #define kSC__Reg_Alternate 524288
@@ -2475,6 +2478,8 @@ extern SCModule* SC__Mod_Curr;
 
 
 // ASMExamples
+int JB_ASMExamples__PackTestAndOr(int A, int B);
+
 void JB_ASMExamples__PackTestConsts();
 
 
@@ -4442,6 +4447,10 @@ ASM SC_ASM_Div_KindSet(ASM Self, uint Value);
 
 ASM SC_ASM_Div_LSet(ASM Self, uint Value);
 
+ASM SC_ASM_DivK_AddSet(ASM Self, uint Value);
+
+ASM SC_ASM_DivK_ShSet(ASM Self, uint Value);
+
 ASM SC_ASM_Float_DSet(ASM Self, uint Value);
 
 ASM SC_ASM_Float_LSet(ASM Self, uint Value);
@@ -5116,6 +5125,11 @@ ASM* JB_ASM_Convert__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo
 
 // ASM_Div
 ASM* JB_ASM_Div__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+
+
+
+// ASM_DivK
+ASM* JB_ASM_DivK__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
@@ -7994,6 +8008,8 @@ int SC_Msg_DeprecatedClassOption(Message* Self, JB_String* Name, JB_String* Kind
 void JB_Msg_Destructor(Message* Self);
 
 Dictionary* JB_Msg_Dict(Message* Self, bool DoLower, bool DoCount);
+
+FatASM* JB_Msg_DIVK(Message* Self, ASMReg R1, ASMReg R2, int Sh, int Add);
 
 FatASM* JB_Msg_DIVV(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int Kind);
 
