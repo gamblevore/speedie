@@ -14,6 +14,7 @@ class SCParamArray
 	|SCClass--?|		Cls
 	|int16|				Size
 	|int16|				ErrCount
+	|int8|				FailedAt
 	|bool|				HasSide
 	|bool|				HasProperParams
 	|bool|				IsDot
@@ -81,9 +82,11 @@ class SCParamArray
 					rz |= kTypeCastIgnoreContained
 
 	function RenderKind (|string|)
-		if (.IsNotModule)
-			return "class"
-		return "module"
+		if (!.IsNotModule)
+			return "module"
+		|| c = .cls
+			return c.AutoCompleteKind
+		return "class"
 	
 	function ModuleName (|string|)
 		|| p = self[0] 
