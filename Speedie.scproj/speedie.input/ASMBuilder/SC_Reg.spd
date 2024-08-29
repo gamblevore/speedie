@@ -46,6 +46,10 @@ datatype ASMReg (uint64)
 		
 	function F64 (|Float64|)
 		return .needfat.F64
+	
+	function NOP
+		|| f = .fat
+			f.op = asm.noop
 
 	function Const (|int64|)
 		if .reg == 0
@@ -54,9 +58,9 @@ datatype ASMReg (uint64)
 
 	function Const (assigns:|int64|)
 		.needfat.const = value
-
-	function Negate (|asmreg|)
-		return (self|uint64| xor negate|uint64|)|asmreg|
+	
+	function Flip (|asmreg| bits, |asmreg|)
+		return (self|uint64| xor bits|uint64|)|asmreg|
 	
 	function Expect (|message| where)
 		opt inline
@@ -150,7 +154,7 @@ datatype ASMReg (uint64)
 		return (self, nil)(b)
 	
 	syntax cast (|bool|)
-		disabled "are we checking .reg or if the entire thing is 0"
+		return self != nil
 	
 	syntax cast (|int|)
 		cpp_part ToInt

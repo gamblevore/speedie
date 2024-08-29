@@ -66,7 +66,7 @@ module SpdAssembler
 	
 	
 	function VacGenerate (|scfunction| fn, |bool|)
-		if fn ~!= "PackTestAndOr"
+		ifn fn.Source contains " RUN!!"
 			return true
 		printline fn
 		expect (.GenerateASM(fn) or (ASMState.ExpandJSM and .GenerateASM(fn))) "ASM is out of memory." 
@@ -75,6 +75,7 @@ module SpdAssembler
 //		while .Optimise(fn.asm!)
 //			loop ++fn.OptCounts <= 16
 		.FlowControl
+		return true
 
 
 extend_module ASM

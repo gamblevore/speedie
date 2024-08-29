@@ -30,6 +30,9 @@ struct ASMState
 // what if we did all the const optimisation in the optimiser?
 // makes sense, right? 
 
+	constants
+		kContinue = 254
+		kExit = 255
 	
 	function CloseVDecls (|int| i)
 		.VDecls = i
@@ -101,7 +104,7 @@ struct ASMState
 
 
 	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
-		|| reg = .TempMe(exp, dest)
+		|| reg = .Temptyped(exp, dest)
 		if togrow.isint and value.CanStoreAsIntImmediate
 			return exp.ADPK(reg, ToGrow, Value) * reg
 		.Assign(reg, ToGrow, asmreg(), exp)
@@ -169,16 +172,22 @@ struct ASMState
 		error (self, where, "No free local variables.")
 
 
-	function TempMe (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)				// .needreg
+	function TempTyped (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)				// .needreg
 		opt norefcounts
-		|| r = t.reg
 		if t isnt textual
-			t.µtype = where.asmdecl.typeonly
-		if !r
-			r = .vtmps - 1
-			check (r > .vdecls) (where, "No free local variables.")
-			t.reg = r
-			.vtmps = r
+			// what if there is a type and its different?
+			// and if its NEVER different... why add it?
+			t.µtype = where.asmdecl.typeonly // probably needs changing.
+		return .TempOnly(where, t)
+
+	function TempOnly (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)				// .needreg
+		opt norefcounts
+		if t.reg
+			return t
+		|| r = .vtmps - 1
+		check (r > .vdecls) (where, "No free local variables.")
+		t.reg = r
+		.vtmps = r
 		return t
 
 
@@ -206,22 +215,10 @@ struct ASMState
 		|| R = .regmap &~ 1
 		for (b.bits in R) (i)
 			|| f = .FoundCode(i, value, typeinfo)
-			if f != nil
 				return f
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	function Branch (|message| cond,  |bool| neg=false,  |!&fatasm|)
-		|| cmu = .µ(cond, asmreg.CondRequest)
-		if cmu is CondAnswer
-			return cmu.needfat
-		|| req = asmreg.CondRequest
-		if cmu isnt alreadynegated
-			(Req is negate)
-		debugger
-		cmu = .equals(req, asmreg(), cmu, cond)
-		return cmu.needfat
 
 
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
@@ -247,9 +244,7 @@ struct ASMState
 
 
 	function FuncPrm (|message| prm, |scdecl| DestType,  |asmreg|)
-		|| r = .ExistingVar(prm)
-		|| OldTmps = .VTmps
-		if r != nil
+		|| r = .ExistingVar(prm) // seems unfinished? what about desttype?
 			return r
 		return .µ(prm, r)
 
@@ -273,11 +268,11 @@ function @ASMTmp.DoFunc (fn_Asm)
 	// speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:3, 8:1
 	// there are only 4 above 6!, only 14 above 5
 
-	if dest.reg == 0
+	if !fn.ReturnType
 		dest = AsmReg()
 	  else
-		dest = .TempMe(prms, dest)
-	dest.µtype = fn.RegType
+		dest = .TempOnly(prms, dest)
+		dest.µtype = fn.RegType
 
 	|int| Reg2
 	|int| Reg3

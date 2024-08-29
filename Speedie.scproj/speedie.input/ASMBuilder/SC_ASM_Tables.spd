@@ -19,15 +19,15 @@ dispatch fn_asm_table (fn_asm)
 	@type:					asmtmp.TypeCast
 	@tmp:					asmtmp.unexpected
 
+	(ASMtmp.kif):			ASMstate.If
+	(ASMtmp.kwhile):		ASMstate.While
+	(asmtmp.kTern):			ASMstate.Ternary
+	(asmtmp.kContinue):		ASMstate.Continue
+	(asmtmp.kExit):			ASMstate.Exit
+
 	(ASMtmp.kDebugger):		ASMtmp.Debugger
-	(ASMtmp.kif):			ASMtmp.If
 	(ASMtmp.krejoin):		ASMtmp.First
 	(ASMtmp.kreturn):		ASMtmp.return
-	(ASMtmp.kwhile):		ASMtmp.While
-	(asmtmp.kTern):			ASMtmp.Ternary
-
-	(asmtmp.kContinue):		ASMtmp.Continue
-	(asmtmp.kExit):			ASMtmp.Exit
 
 	(asmtmp.kSetRel):		ASMtmp.SetRel
 	(asmtmp.kStatExpr): 	ASMtmp.StatExpr
@@ -77,77 +77,6 @@ function Debugger		(fn_asm)
 	if Options.targetdebug
 		exp.TRAP(asmreg(),0,0) // nice!
 
-
-// abc(), if (x) return, def()   -->   abc(), if !x {def()}, return
-function If				(fn_asm)
-	opt norefcounts
-	debugger
-	
-	|| cond = exp.first!,  || arg1 = cond.next!
-	|| Else = arg1.next!,  || arg2 = else.first
-	|message| ElseIfCond
-	if arg2 and arg2 != @arg
-		ElseIfCond = arg2
-		arg2 = arg2.next
-	
-	|| Flip = !arg1.HasAsmStuff
-		if ElseIfCond		// if (x) {} elseif (y) {yy} else {zz} --> if (!x) {if (y) {yy} else {zz}}
-			arg1 = ElseIfCond
-		  elseif arg2		// if (x) {} else {y()}                --> if (!x) {y()}...
-			arg1 = arg2
-		  else				// if (X) --> {x} // with discard
-			return .µ(cond, asmreg.arg)
-		ElseIfCond = nil
-		arg2 = nil
-
-	|| Start = .Branch(cond, Flip)
-	rz = .µ(arg1)
-	Start.jumpto = .curr
-	if ElseIfCond or arg2.HasAny
-		|| AfterFirst = arg1.jump(0) // marks as ended... to prevent opts. can be removed later during optimisation
-		if ElseIfCond
-			|| a = asmreg()
-			rz = IF(self, elseifcond, a)
-		  else
-			rz = ARG(self, arg2)
-		AfterFirst.jumpto = .curr
-
-	
-
-function While			(fn_asm)
-	opt norefcounts
-	.LoopClearUnreliableConsts
-	|| BEGIN = exp.JUMP(0)								// jump to end... THEN EMIT arg and jump back.
-	ASMTmp.arg(self, exp.second)						// arg
-
-	|| CONTINUE = .curr
-	BEGIN.jumpto = CONTINUE
-	|| GOBACK = .branch(exp.first!)						// cond
-	|| EXIT = .curr
-	GOBACK.jumpto = BEGIN+1
-	|| C = BEGIN
-
-	while C < CONTINUE
-		#!ClearExits
-		|| op = C.Op
-		if op >= 254
-			C.op = ASM.Jump
-			if op == 254 // continue
-				C.jumpto = CONTINUE
-			  else       // exit
-				C.jumpto = EXIT
-		C++
-	
-
-
-function Exit			(fn_asm)
-	opt norefcounts
-	self <~ (255, exp)											// request jump fwd
-
-
-function Continue		(fn_asm)
-	opt norefcounts
-	self <~ (254, exp)											// request jump fwd a little less
 	
 
 function StatExpr		(fn_asm)
@@ -156,32 +85,6 @@ function StatExpr		(fn_asm)
 		if ch.islast
 			return .µ(ch, dest)
 		.µ(ch, asmreg.Arg)
-
-
-function Ternary		(fn_asm)
-	opt norefcounts
-	
-	|| prms = exp.second
-	|| cond = prms.first!
-	|| A = cond.next!
-	|| B = A.next!
-	
-	|| destType = exp.ASMDecl.typeonly
-	|| mA = .ExistingVar(a, desttype)
-	|| mB = .ExistingVar(b, desttype)
-	if ma!=nil and mb!=nil
-		return .SimpleTernary(dest, ma, mb, cond)
-
-	dest = .TempMe(exp, dest)
-	|| FailToSecond = .Branch(cond)
-	.µ(A, dest)
-	|| Exit = exp.jump(0)
-
-	FailToSecond.jumpto = .curr
-
-	rz = .µ(B, dest)
-	Exit.r[3] = .curr - Exit
-	
 
 	
 function First			(fn_asm)
@@ -240,7 +143,7 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 		debugger // should never happen!
 		return sr
 	
-	dest = .TempMe(exp, dest)
+	dest = .TempOnly(exp, dest)
 	dest.µType = NewType
 	|&fatasm| fat
 	if oldtype.isfloat or newtype.isfloat
@@ -270,7 +173,7 @@ function Pointer		(fn_asm)
 	// *a, x = *(a.b) 
 	opt	NoRefCounts
 	if dest is AddrRequest // hmmm?
-	dest = .TempMe(exp, dest)
+	dest = .TempTyped(exp, dest)
 	|| Ptr = .µ(exp.first!, dest)
 	return Dest.ReadOrWrite(exp,ptr)
 
@@ -302,7 +205,7 @@ function Arg   (fn_asm)
 
 function Access		(fn_asm)						// a[b], struct.mem[b]
 	opt	NoRefCounts
-	dest = .tempme(exp, dest)
+	dest = .TempTyped(exp, dest)
 
 	|| Ptr = .µ(exp.first!, dest.RequestPos)		// x = a.b[0]
 	check (ptr is ContainsAddr) (exp)
@@ -315,7 +218,7 @@ function Access		(fn_asm)						// a[b], struct.mem[b]
 
 function Dot		(fn_asm)						// a.b
 	opt	NoRefCounts
-	dest = .tempme(exp, dest)
+	dest = .TempTyped(exp, dest)
 	|| Obj = .µ(exp.first!, dest)
 	|| prop = exp.ASMDecl
 	|| T = prop.typeinfo
@@ -361,7 +264,6 @@ function Thg (fn_asm)
 
 function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |asmreg|)
 	opt norefcounts
-													// what if this is a constant?
 	|| d = exp.ASMDecl
 	if d is local
 		return d.wholetype
@@ -391,7 +293,7 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 	opt	NoRefCounts
 	|| addr = dest
 	if dest isnt set								// a = glob
-		addr = .tempme(exp, dest)
+		addr = .TempTyped(exp, dest)
 
 	|int64| iTable = d.ExportPosition
 	expect (iTable > 0)      (exp, "No global address".internal)
@@ -424,7 +326,7 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 
 function BoolNot		(fn_asm)						// !a
 	opt	NoRefCounts
-	dest = dest.negate
+	dest = dest.flip(asmreg.negate)
 	|| src = .µ(exp.first!, dest)
 	if src is AlreadyNegated
 		return src
@@ -432,11 +334,11 @@ function BoolNot		(fn_asm)						// !a
 	
 
 function BitNot				(fn_asm)					// ~a
-	return DoMathSub(self, exp, dest as asmreg.singleexpr, scoperator.bnot.asm!)
+	return .DoMathSub(exp, dest as asmreg.singleexpr, scoperator.bnot.asm!)
 
 
 function Negative			(fn_asm)					// -a
-	return DoMathSub(self, exp, dest as asmreg.singleexpr, scoperator.Negative!.asm!)
+	return .DoMathSub(exp, dest as asmreg.singleexpr, scoperator.Negative!.asm!)
 
 
 function IncrSlowOnAddr (|&ASMState| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |ASMReg|)	
@@ -444,7 +346,7 @@ function IncrSlowOnAddr (|&ASMState| self, |message| f, |ASMReg| Dest, |int| Mod
 	|| TmpCloser = .VTmps
 	Dest.Read(F, dest, addr)						// READ
 
-	|| NewValue = (.TempMe(f), dest)(mode & IncrAfter)
+	|| NewValue = (.Temptyped(f), dest)(mode & IncrAfter)
 	.IncrPre(f, NewValue, dest, amount)				// ADD
 
 	|| fat = dest.write(f, newvalue, addr)			// WRITE BACK
@@ -529,14 +431,28 @@ function DoMath (fn_asm)
 	opt norefcounts
 	|| op = exp.second!
 	|| scop = op.obj|scoperator|
+		if scop is AndOr
+			return .DoAndOr(exp, dest, scop.Kind)
 		|| fn = scop.asm
-			return DoMathSub(self, exp, dest, fn)
+			return .DoMathSub(exp, dest, fn)
 	error (op, "No ASM for this operator?")
 	debugger // what?
 		
 
 
-helper DoMathSub (|&ASMState| self,  |message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
+
+
+function Ignore			(fn_asm)
+
+
+function Unexpected		(fn_asm)
+	"bad asmtmp"
+	debugger
+
+}
+
+
+helper ASMState.DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	opt norefcounts
 	|| F = exp.first!
 	|| op = f.next!
@@ -562,7 +478,7 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |ASMReg| Dest,  |fn_opasm!|
 	if dest is Discard
 		return dest & ASMReg.discard // no need to do anything:   {a() + b(),  c()}
 	
-	dest = .TempMe(exp, dest)
+	dest = .TempTyped(exp, dest)
 	(dest is FromMath)
 	if  ml is ConstAny  and  mr is ConstAny
 		(Dest is MathConst)
@@ -573,17 +489,6 @@ helper DoMathSub (|&ASMState| self,  |message| exp,  |ASMReg| Dest,  |fn_opasm!|
 	target debug
 		if dest is MathConst  and  rz isnt MathConst		// hmm?
 			debugger, (fn)(self, dest, ml, mr, op)
-
-
-
-function Ignore			(fn_asm)
-
-
-function Unexpected		(fn_asm)
-	"bad asmtmp"
-	debugger
-
-}
 
 
 

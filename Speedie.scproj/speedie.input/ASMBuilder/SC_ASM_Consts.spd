@@ -50,18 +50,25 @@ extend ASMState
 	function asmstate.GenericNumFinder (|message| exp, |uint64| Value, |asmreg| TypeInfo=asmreg(), |asmreg|)
 		opt norefcounts
 		|| r = .FindConst(value, typeinfo)
-		if r != nil
 			return r
 		return .NumToReg(exp, Value, TypeInfo)
 
+
+	function MakeConst2 (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |fn_ASMConstifier| fn,  |asmreg|)
+		|| knst = .NumToFat(exp, 0, dest as asmreg.Textual)
+		(fn)(knst,l,r)
+		l.nop
+		r.nop
+		return .makeconst(knst, dest)
+
+
 	function MakeConst (|&fatasm| fat, |asmreg| reg, |asmreg|)
 		(reg is ConstAny)
-//		.regconsts[reg.reg] = fat // look at the regconsts definition (still remains ;_;)
 		return fat*reg
 	
 	function NumToFat (|message| exp, |int64| V, |asmreg| Reg, |&fatasm|)
 		|| DestType = Reg.µtype
-		Reg = .TempMe(exp, Reg)
+		Reg = .TempTyped(exp, Reg) // could we do this without typing?
 		|| fat = exp.KNST(reg, 0, 0, 0)
 		fat.Const = v
 		|| SrcType = reg.µtype
@@ -80,22 +87,6 @@ extend ASMState
 		if r.FourBytes
 			return p|&float|[]|Float64|
 		return p|&f64|[]
-
-
-/*  // we don't do it this way. we could put the longestbitstretch into it, though?
-	// as an optional approach. Do this later!
-	function FatASM.FixConst
-		|| V = .r[1]|uint64| << 32
-		V |= 0
-		|| Inv = V|uint64|.countbits > 32 
-			V = ~V
-		|| R = (~V|uint64|).LongestBitStretch	// longest false-stretch
-		if r.x >= 50		// OK so we have the longest stretch in r.x
-			V = V rotl 63-r.y
-			.r[2] = inv|int|
-			.r[3] = V|int|
-			return
-*/
 
 	function SetConst (|Message| List,  |message| Orig,  |bool|)
 		opt norefcounts								// set1: r1, 123
