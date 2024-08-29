@@ -181,8 +181,9 @@ forms
 	DivK
 		r1		R
 		r2		r
-		Sh		7 // could be used to add other numbers...
-		Add		7 // in case we don't JUST wanna div by a power of 2
+		Space	2
+		Sh		6 // could be used to add other numbers...
+		Add		6 // in case we don't JUST wanna div by a power of 2
 	
 	Shift
 		r1		R
