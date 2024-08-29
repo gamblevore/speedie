@@ -299,7 +299,7 @@ forms
 /**/ DIVV (Div)
 		DivMath(r, Op)
 /**/ DIVK (DivK)
-		i1 = (i2+((1<<DivK_Add)-1)) >> DivK_Sh // quick divide by power of 2
+		i1 = (i2+((1<<DivK_Addu)-1)) >> DivK_Shu // quick divide by power of 2
 /**/ MAX (MinMax)
 		if (MinMax_Signu)
 			i1 = std_max(i2, i3)

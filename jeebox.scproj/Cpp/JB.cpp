@@ -27,9 +27,45 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[562];
+extern JB_StringC* JB_LUB[559];
 
 extern Object_Behaviour JB_Object_FuncTable_;
+
+int JB_ASMExamples__PackTestAndOr(int A, int B) {
+	int Rz = 0;
+	//visible;
+	if (A) {
+		Rz = 1;
+	}
+	if (((bool)A) and ((bool)B)) {
+		Rz = 2;
+	}
+	if ((!A) and (B > 3)) {
+		Rz = 3;
+	}
+	if (((bool)A) or ((bool)B)) {
+		Rz = 4;
+	}
+	if ((B < -1) or (B > 5)) {
+		Rz = 5;
+	}
+	float Y = 2.0f;
+	int Y2 = ((A + B) / 2) - ((A / B) * 2);
+	return Rz;
+}
+
+void JB_ASMExamples__PackTestConsts() {
+	//visible;
+	double R1 = ((double)2);
+	double R2 = (((double)1.0f) / ((double)2));
+	R2 = (((double)1.0f) / R1);
+	float R3 = 0.1f + ((float)1);
+	double R4 = ((double)3.4567f) + R1;
+	double R5 = ((double)1234.5f) + ((double)5678.9f);
+	float R6 = ((float)2);
+	double R7 = ((double)1.0f);
+}
+
 
 JB_String* JB_App__AppName() {
 	JB_String* _tmPf0 = JB_Incr(JB_App__AppPath());
@@ -271,7 +307,7 @@ int JB_Constants__Init_() {
 		JB_SetRef(JB__Constants_CSNum, JB__Constants_CSWordMiddle);
 		JB_SetRef(JB__Constants_CSLine, JB_Str_CharSetWithBool(JB_LUB[9], false));
 		JB_SetRef(JB__Constants_CSAfterDot, JB_Str_CharSetWithBool(JB_LUB[32], false));
-		JB_SetRef(JB__Constants_CSAfterStatement, JB_Str_CharSetWithBool(JB_LUB[560], false));
+		JB_SetRef(JB__Constants_CSAfterStatement, JB_Str_CharSetWithBool(JB_LUB[385], false));
 		JB_SetRef(JB__Constants_CSLineBlack, JB_Str_CharSetWithBool(JB_LUB[10], false));
 		JB_SetRef(JB__Constants_CSWrapSplit, JB_Str_CharSetWithBool(JB_LUB[25], false));
 		JB_SetRef(JB__Constants_FFUUU, JB_LUB[176]);
@@ -1046,7 +1082,7 @@ Message* JB_Tk__fArgName(int Start, Message* Parent) {
 Message* JB_Tk__fArgOpen(int Start, Message* Parent) {
 	Message* Rz = nil;
 	JB_SetRef(Rz, JB_Tk__NewParentName(nil, kJB_SyxArg, Start, JB_LUB[0]));
-	JB_Tk__ParseLoopFlags(Rz, JB_LUB[559], kJB__Tk_kTemporal);
+	JB_Tk__ParseLoopFlags(Rz, JB_LUB[387], kJB__Tk_kTemporal);
 	JB_SafeDecr(Rz);
 	return Rz;
 }
@@ -1578,7 +1614,7 @@ Message* JB_Tk__fString(int Start, Message* Parent) {
 		NewStrPos = (NewStrPos + (C0 == '{'));
 		(JB_Tk__NextStartSet(NewStrPos));
 		if (C0 == '{') {
-			StrPos = JB_Tk__EmbeddedCode(JB_LUB[559], Result, kJB__Tk_kTemporalSyx);
+			StrPos = JB_Tk__EmbeddedCode(JB_LUB[387], Result, kJB__Tk_kTemporalSyx);
 		}
 		 else {
 			Syntax Type = kJB_SyxThg;
@@ -2668,9 +2704,6 @@ int JB_zalgo__InitCode_() {
 
 
 
-
-
-
 bool JB_byte_CanPrintAsNormalChar(uint /*byte*/ Self) {
 	return ((Self < 127) and (Self >= 32));
 }
@@ -2709,7 +2742,6 @@ JB_String* JB_byte_Render(uint /*byte*/ Self, FastString* Fs_in) {
 	JB_FS_AppendByte(Fs_in, ((byte)Self));
 	return JB_LUB[0];
 }
-
 
 
 
@@ -2790,6 +2822,7 @@ JB_String* JB_int64_Render(int64 Self, FastString* Fs_in) {
 	JB_SafeDecr(_tmPf0);
 	return _tmPf0;
 }
+
 
 
 
@@ -3015,7 +3048,6 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, 
 	JB_Decr(Result);
 	return ((Syntax)ID);
 }
-
 
 
 
@@ -3313,7 +3345,7 @@ void JB_Saver_AppendString(ObjectSaver* Self, JB_String* S) {
 }
 
 void JB_Saver_Destructor(ObjectSaver* Self) {
-	if (((bool)Self->CantSaveThis)) {
+	if (Self->CantSaveThis) {
 		JB_Object_Fail(Self->CantSaveThis, JB_LUB[315]);
 	}
 	JB_Clear(Self->Dest);
@@ -6290,7 +6322,7 @@ int64 JB_Msg_Int(Message* Self, int StrStart) {
 			if (true) {
 				JB_Msg_SyntaxExpect(Self, JB_LUB[252]);
 			}
-			Mul = ((Float64)0.0f);
+			Mul = 0.0f;
 		}
 		return ((int64)Mul);
 	}
@@ -7308,7 +7340,7 @@ JB_Error* JB_Err_ConstructorNothing(JB_Error* Self) {
 	JB_StringC* _tmPf0 = JB_LUB[0];
 	Self->StackTrace = JB_Incr(_tmPf0);
 	Self->Node = nil;
-	Self->Progress = ((Float64)0.0f);
+	Self->Progress = 0.0f;
 	Self->ErrorFlags = 0;
 	Self->Position = -1;
 	Self->Severity = kJB__ErrorSeverity_OK;
@@ -7466,7 +7498,7 @@ JB_String* JB_Err_RenderClang(JB_Error* Self, FastString* Fs_in) {
 		JB_FreeIfDead(JB_Msg_Render(Self->Node, Fs));
 	}
 	JB_Decr(P);
-	if (JB_FS_Grew(Fs, M)) {
+	if (JB_FS_Mark(Fs) > M) {
 		JB_FS_AppendByte(Fs, ' ');
 	}
 	JB_FreeIfDead(JB_ErrorSeverity_Render(Self->Severity, Fs));
@@ -7870,7 +7902,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024082010);
+	return (2024082816);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -7882,4 +7914,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 4176728081899335792 -6791302266922216693 977729488611953341
+// 4176728081899335792 -8149426801479827255 9067030407373507916
