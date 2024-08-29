@@ -128,9 +128,9 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 	(dcl isnt NumberConst)
 	if dcl.name
 		(dcl is Param)
-		(dcl isnt Altered) // scDecl defaults as being altered... not sure why.
 	  else
-		(dcl is return)		// why not say both are not altered? does it matter that it has no name?
+		(dcl is return)
+	(dcl isnt Altered) // SCDecl defaults as being altered... not sure why.
 	return true
 
 
@@ -220,7 +220,7 @@ function Message.CollectFromBody (|SCNode| scarg)
 		return
 	|| dcl = .CollectDecl(scarg, scarg, declmode.FunctionBody)
 		(dcl is body)
-//		(dcl isnt altered) // why??? does this not compile
+		(dcl isnt altered)
 		(dcl isnt NumberConst)
 		scparamarray.PostStructFix
 		|| def = dcl.Default
