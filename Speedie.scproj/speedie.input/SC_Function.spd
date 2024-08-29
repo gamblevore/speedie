@@ -417,6 +417,7 @@ function int.IsNormalMatch (|bool|)
 
 function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode| name_space,  |SCParamArray| Incoming,  |int|)
 
+//	debugat 10
 	if  .IsAssigns  and  .ReturnType
 		|| a = .args[0]
 		|| i = typeofexpr(incoming[0], name_space)
@@ -425,7 +426,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		require  (typecast & kTypeCastassigns) or (!a.pointercount and i is local) // allow for tighter code
 		// Local.b = c --> local = local.breturn(c)...  structptr.b = c --> structptr.bset(C)
 	
-	ifn (.IsAssigns!=0) == Incoming.HasSide
+	if (.IsAssigns!=0) != Incoming.HasSide
 		require (TypeCast & kTypeCastassigns) and (!Incoming.HasSide)
 	
 	|| Pos = 0
@@ -466,10 +467,10 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 				result = matched
 				// don't replace better matches with worse ones.
 			pos++
-			
+			Incoming.FailedAt = 0
 		  elseif (!FuncArg.Default)
 			if TypeCast & kTypeCastDescribeErrors
-				.DescribeParamFail(incoming, fi)
+				.DescribeParamFail(incoming, fi)			
 
 			Return kNoMatch
 			
@@ -479,6 +480,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 			TypeOfExpr( def, Name_Space )
 
 		  else
+			Incoming.FailedAt := fi		
 			Result = kUseDefaultParams
 		fi += (fi+1 == .structreturnpos)
 	
@@ -486,8 +488,11 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		Return result
 
 	if (typecast & ktypeCastDescribeErrors) and !incoming.MadeError
-		error (incoming.exp, "Too many params to " + .rendertitle)
-		problem (self.source,  kusingstr)
+		|| first = Incoming.FailedAt
+			.DescribeParamFail(incoming, first)
+		  else
+			error (incoming.exp, "Too many params to " + .rendertitle)
+			problem (self.source,  kusingstr)
 
 
 
