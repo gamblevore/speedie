@@ -214,8 +214,8 @@ module {
 		
 	function AddBasic
 		.assigns = SCOperator.new("=", &asmstate.Assign, OpMode.assigns)
-		.and = SCOperator.new("and", &asmstate.And, OpMode.AND)
-		.or = SCOperator.new("or", &asmstate.OR, OpMode.OR)
+		.and = SCOperator.new("and", nil, OpMode.AND)
+		.or = SCOperator.new("or", nil, OpMode.OR)
 
 		
 	function AddMath (|string| s,  |string| FuncName, |fn_opasm| ASM, |OpMode| Mode=0)
