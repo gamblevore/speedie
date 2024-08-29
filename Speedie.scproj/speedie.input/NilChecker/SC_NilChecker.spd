@@ -329,6 +329,8 @@ function While (NilTrackerFn)
 
 function If (NilTrackerFn)
 	opt norefcounts
+	todo "we could store numbers on the "if" tmp... to check what decls have been altered"
+	
 	|| cond = msg.first!,  || arg1 = cond.next
 	expect (arg1) (msg)
 	|| Else = arg1.next,   || arg2 = else.first

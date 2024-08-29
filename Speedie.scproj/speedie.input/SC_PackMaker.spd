@@ -60,7 +60,7 @@ module PackMaker
 	
 	function WriteLibFuncs (|jbin!| j)
 		opt norefcounts
-		todo "Write the libfuncs via c++ structs, instead of jbin, like array of name/ptr pairs"
+		todo "Write the LibFuncs via c++ structs, instead of jbin, like array of name/ptr pairs"
 		
 		j.Enter(@prm)
 		for f in .libfuncs

@@ -414,7 +414,6 @@ module CustomOps
 
 
 function scdecl.CompareUnclear (|scdecl| d, |bool| MakesSenseVsZero, |bool|)
-	todo "Reject a==b if the signs are different and neither are constants"
 	|| L = .typeinfo, || R = d.typeinfo
 	|| bitdiff = l.bitcount - r.bitcount
 	

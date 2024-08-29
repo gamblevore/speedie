@@ -290,13 +290,13 @@ module ErrorColors
 		underline	= "\1b[0;1;32m"
 	
 	
-	function string.PrintlineColor (|string| color)
+	function String.PrintlineColor (|string| color)
 		if (errorcolors.enabled): print color
 		printline self
 		if (errorcolors.enabled): print ErrorColors.normal
 	
 		
-	function faststring.Normal (|string| s)
+	function FastString.Normal (|string| s)
 		if (errorcolors.enabled):  self <~ ErrorColors.normal
 		self <~ "\n"
 		self <~ s
