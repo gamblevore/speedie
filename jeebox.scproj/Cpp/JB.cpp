@@ -31,7 +31,7 @@ extern JB_StringC* JB_LUB[559];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
-int JB_ASMExamples__PackTestAndOr(int A, int B) {
+int JB_ASMExamples__PackTestAndOr(int A, int B, bool C, bool D) {
 	int Rz = 0;
 	//visible;
 	if (A) {
@@ -49,18 +49,38 @@ int JB_ASMExamples__PackTestAndOr(int A, int B) {
 	if ((B < -1) or (B > 5)) {
 		Rz = 5;
 	}
-	float Y = 2.0f;
-	int Y2 = ((A + B) / 2) - ((A / B) * 2);
+	return Rz;
+}
+
+int JB_ASMExamples__PackTestAndOr2(bool C, bool D) {
+	int Rz = 0;
+	//visible;
+	if (C or D) {
+		Rz = 6;
+	}
+	if (D and C) {
+		Rz = 7;
+	}
+	if (!(C or D)) {
+		Rz = 6;
+	}
+	if (!(D and C)) {
+		Rz = 7;
+	}
+	if (!(D and (!C))) {
+		Rz = 8;
+	}
 	return Rz;
 }
 
 void JB_ASMExamples__PackTestConsts() {
+	// RUN!!;
 	//visible;
 	double R1 = ((double)2);
 	double R2 = (((double)1.0f) / ((double)2));
 	R2 = (((double)1.0f) / R1);
 	float R3 = 0.1f + ((float)1);
-	double R4 = ((double)3.4567f) + R1;
+	float R4 = 3.4567f + ((float)R1);
 	double R5 = ((double)1234.5f) + ((double)5678.9f);
 	float R6 = ((float)2);
 	double R7 = ((double)1.0f);
@@ -4571,7 +4591,7 @@ int JB_Str_LineCount(JB_String* Self) {
 ErrorInt JB_Str_MakeEntirePath(JB_String* Self, bool Last) {
 	ErrorInt Rz = 0;
 	//visible;
-	JB_String* P = ((JB_String*)JB_Ternary(Last, Self, JB_Str_Parent(Self)));
+	JB_String* P = JB_Incr(((JB_String*)JB_Ternary(Last, Self, JB_Str_Parent(Self))));
 	{
 		JB_String* _Pf0 = JB_Incr(JB_Str_TrimSlashes(P, true));
 		Ind _if1 = JB_Str_FindSlash(_Pf0, 1);
@@ -4588,6 +4608,7 @@ ErrorInt JB_Str_MakeEntirePath(JB_String* Self, bool Last) {
 		JB_Decr(_Pf0);
 	}
 	;
+	JB_Decr(P);
 	return Rz;
 }
 
@@ -5917,10 +5938,12 @@ Message* JB_Msg_ConstructorCopy(Message* Self, Message* Other) {
 	}
 	JB_Ring_Constructor0(Self);
 	Self->Position = Other->Position;
-	JB_String* _tmPf0 = Other->Name;
-	Self->Name = JB_Incr(_tmPf0);
+	JB_String* _tmPf1 = Other->Name;
+	Self->Name = JB_Incr(_tmPf1);
 	Self->Func = Other->Func;
-	Self->Obj = Other->Obj;
+	JB_Object* _tmPf0 = JB_Incr(JB_Tree_Obj(Other));
+	(JB_Tree_ObjSet(Self, _tmPf0));
+	JB_Decr(_tmPf0);
 	Self->Indent = Other->Indent;
 	Self->Flags = (Other->Flags | JB__Tk_Using.Flags);
 	Self->RangeLength = Other->RangeLength;
@@ -5935,7 +5958,6 @@ Message* JB_Msg_ConstructorEmpty(Message* Self) {
 	JB_Ring_Constructor0(Self);
 	JB_StringC* _tmPf0 = JB_LUB[0];
 	Self->Name = JB_Incr(_tmPf0);
-	Self->Obj = nil;
 	Self->Indent = 0;
 	Self->Func = kJB_SyxArg;
 	Self->Position = JB__Tk_Using.Position;
@@ -5950,7 +5972,6 @@ Message* JB_Msg_ConstructorNormal(Message* Self, Syntax Func, JB_String* Name) {
 		Self = ((Message*)JB_NewClass(&MessageData));
 	}
 	JB_Ring_Constructor0(Self);
-	Self->Obj = nil;
 	Self->Indent = 0;
 	Self->Name = JB_Incr(Name);
 	Self->Func = Func;
@@ -5966,7 +5987,6 @@ Message* JB_Msg_ConstructorRange(Message* Self, Message* Parent, Syntax Func, in
 		Self = ((Message*)JB_NewClass(&MessageData));
 	}
 	JB_Ring_Constructor(Self, Parent);
-	Self->Obj = nil;
 	Self->Indent = 0;
 	Self->Name = JB_Incr(Name);
 	Self->Position = BytePos;
@@ -6456,7 +6476,7 @@ JB_String* JB_Msg_Locate(Message* Self) {
 		JB_FS_AppendString(Fs, JB_LUB[39]);
 		JB_FS_AppendInt32(Fs, Self->Position);
 		Message* _tmPf0 = JB_Incr(((Message*)JB_Ring_Root(Self)));
-		JB_Object* R = JB_Incr(_tmPf0->Obj);
+		JB_Object* R = JB_Incr(JB_Tree_Obj(_tmPf0));
 		JB_Decr(_tmPf0);
 		if (JB_Object_Isa(R, &JB_StringData)) {
 			if (JB_Str_Length(((JB_String*)R))) {
@@ -7599,7 +7619,7 @@ __lib__ void* jb_msg_tag(Message* Self) {
 	if (!JB_Msg_NilCheck(Self)) {
 		return nil;
 	}
-	return ((void*)Self->Obj);
+	return ((void*)JB_FreeIfDead(JB_Tree_Obj(Self)));
 }
 
 __lib__ void jb_msg_nameset(Message* Self, JB_String* Result) {
@@ -7627,7 +7647,7 @@ __lib__ void jb_msg_tagset(Message* Self, void* Result) {
 	if (!JB_Msg_NilCheck(Self)) {
 		return;
 	}
-	Self->Obj = ((JB_Object*)Result);
+	(JB_Tree_ObjSet(Self, ((JB_Object*)Result)));
 }
 
 __lib__ void jb_msg_firstset(Message* Self, Message* Result) {
@@ -7902,7 +7922,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024082816);
+	return (2024082921);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -7914,4 +7934,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// 4176728081899335792 -8149426801479827255 9067030407373507916
+// -2934619186805667969 -1375419547894361413 9067030407373507916

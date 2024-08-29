@@ -551,7 +551,6 @@ struct Message_Behaviour: list_Behaviour {
 
 JBClass ( Message , JB_List , 
 	JB_String* Name;
-	JB_Object* Obj;
 	u16 Tag;
 	u16 RangeLength;
 	MsgParseFlags Flags;
@@ -563,7 +562,7 @@ struct SaverClassInfo_Behaviour: Array_Behaviour {
 };
 
 JBClass ( SaverClassInfo , Array , 
-	char* Data;
+	int8* Data;
 	SaverClassInfo* NextInfo;
 	JB_Class* Cls;
 );
@@ -743,12 +742,12 @@ extern Random JB__zalgo_R;
 #define kJB__zalgo_up (JB_LUB[401])
 #define kJB__byte_max 255
 #define kJB__byte_min (0)
-#define kJB__char_max 127
-#define kJB__char_min -128
 #define kJB__int16_max 32767
 #define kJB__int16_min -32768
 #define kJB__int64_max 9223372036854775807
 #define kJB__int64_min -9223372036854775808
+#define kJB__int8_max 127
+#define kJB__int8_min -128
 #define kJB__uint_max 4294967295
 #define kJB__uint_min (0)
 #define kJB__uint16_max 65535
@@ -777,11 +776,6 @@ extern Random JB__zalgo_R;
 #define kJB__CL1_Percent 8
 #define kJB__TC__void (0)
 #define kJB__TC__voidptr 48
-#define kJB__TC_atomic_byte 12
-#define kJB__TC_atomic_int 108
-#define kJB__TC_atomic_int64 124
-#define kJB__TC_atomic_uint 44
-#define kJB__TC_atomic_uint64 60
 #define kJB__TC_bool 256
 #define kJB__TC_byte 8
 #define kJB__TC_Byte2 9
@@ -939,6 +933,15 @@ extern Array* JB__Err_CurrSource_;
 extern bool JB__Err_KeepStackTrace;
 
 //// HEADER JB.h
+
+
+
+// ASMExamples
+int JB_ASMExamples__PackTestAndOr(int A, int B, bool C, bool D);
+
+int JB_ASMExamples__PackTestAndOr2(bool C, bool D);
+
+void JB_ASMExamples__PackTestConsts();
 
 
 
@@ -1313,15 +1316,6 @@ int JB_zalgo__InitCode_();
 // _void
 
 
-// atomic_byte
-
-
-// atomic_int
-
-
-// atomic_uint
-
-
 // bool
 
 
@@ -1342,9 +1336,6 @@ byte JB_byte_LowerCase(uint /*byte*/ Self);
 
 JB_String* JB_byte_Render(uint /*byte*/ Self, FastString* Fs_in);
 
-
-
-// char
 
 
 // cstring
@@ -1388,6 +1379,9 @@ int64 JB_int64_OperatorMin(int64 Self, int64 D);
 
 JB_String* JB_int64_Render(int64 Self, FastString* Fs_in);
 
+
+
+// int8
 
 
 // ivec2
@@ -1573,9 +1567,6 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, 
 
 
 // TaskState
-
-
-// int8
 
 
 // jbinLeaver
