@@ -2,6 +2,7 @@
 
 module ASMExamples {
 function PackTestConsts
+	#! RUN!!
 	visible
 	|f64| r1 = 2						// int as f64
 	|| r2 = (1.0/2|f64|)
@@ -13,7 +14,11 @@ function PackTestConsts
 	|f64| r7 = 1.0						// f32 as f64
 
 
-function PackTestAndOr (|int| a, |int| b, |int|)
+function PackTestMath (|int| a, |int| b, |int|)
+	#! RUN!!
+	return ((a + b) / 2) - ((a / b) * 2)
+
+function PackTestAndOr (|int| a, |int| b, |bool| c, |bool| d, |int|)
 	visible
 	if a
 		rz = 1
@@ -25,9 +30,19 @@ function PackTestAndOr (|int| a, |int| b, |int|)
 		rz = 4
 	if b < -1 or b > 5
 		rz = 5
-
-	|| y = 2.0
-	|| y2 = ((a + b) / 2) - ((a / b) * 2)
+		
+function PackTestAndOr2 (|bool| c, |bool| d, |int|)
+	visible
+	if (c or d)
+		rz = 6
+	if (d and c)
+		rz = 7
+	if !(c or d)
+		rz = 6
+	if !(d and c)
+		rz = 7
+	if !(d and !c)
+		rz = 8
 		
 
 target pack { target debug2 {
