@@ -717,6 +717,7 @@ function scdecl.IsUnknownParam (|bool|)
 
 function message.Trueness (|nilstate| found, |maybebool|)
 	opt norefcounts
+	real self
 	|| d = .FastDecl
 	|| ret = ArchonPurger.t.Return$
 	if d.FastMatch(ret)
