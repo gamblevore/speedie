@@ -13,15 +13,26 @@
 extern "C" {
 
 JBClass( JB_List, Saveable,
-	int		  Position;
-	JB_List* Parent;
-	JB_List* Prev;
-	JB_List* Next;
-	JB_List* Child;
+	int				Position;
+	int64			Number;
+	JB_List*		Parent;
+	JB_List*		Prev;
+	JB_List*		Next;
+	JB_List*		Child;
 );
 
 
-
+inline JB_Object* JB_Tree_Obj( JB_List* self ) {
+	auto V = self->Number;
+	if (!(V>>63))
+		return (JB_Object*)V;
+	return 0;
+}
+inline int64 JB_Tree_Number( JB_List* self ) {
+	return (int64)self->Number;
+}
+void JB_Tree_ObjSet( JB_List* self, JB_Object* Obj );
+void JB_Tree_NumberSet( JB_List* self, int64 N );
 JB_List* JB_Ring_FlatPrev0( JB_List* self );
 JB_List* JB_Ring_FlatPrev( JB_List* self, bool Down );
 JB_List* JB_Ring_FlatNextDepth( JB_List* self, int* Depth, bool Down );

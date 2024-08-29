@@ -447,9 +447,26 @@ bool JB_Ring_FirstSet( JB_List* self, JB_List* Mover ) {
 }
 
 
+void JB_Tree_ObjSet( JB_List* self, JB_Object* Obj ) {
+	auto V = self->Number;
+	if (V>>63)
+		self->Number = 0;
+	JB_SetRef(self->Number, (IntPtr)Obj &~ (1ll<<63));
+}
+
+
+void JB_Tree_NumberSet( JB_List* self, int64 N ) {
+	auto V = self->Number;
+	self->Number = N|(1ll<<63);
+	if (!(V>>63))
+		JB_Decr((JB_Object*)V);
+}
+
+
 JB_List* JB_Ring_Constructor0( JB_List* self ) {
 	JB_New2(JB_List);
     self->Position = 0;
+    self->Number = 1ll<<63;
     self->Parent = 0;
     self->Next = 0;
     self->Prev = 0;
@@ -461,6 +478,7 @@ JB_List* JB_Ring_Constructor0( JB_List* self ) {
 JB_List* JB_Ring_Constructor( JB_List* self, JB_List* Parent ) {
 	JB_New2(JB_List);
     self->Position = 0;
+    self->Number = 1ll<<63;
     self->Next = 0;
     self->Child = 0;
     self->Parent = Parent;
@@ -503,6 +521,9 @@ void JB_Ring_Destructor( JB_List* self ) {
 		RingOwnForDeref_( self );
 		JB_SafeDecr( self );
 	}
+	auto V = self->Number;
+	if (V and !(((int64)V)>>63))
+		JB_SetRef(self->Number, 0);
 }
 
 }

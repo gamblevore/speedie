@@ -4,7 +4,7 @@
 */
 
 class list (Saveable)
-	size 40
+	size 48
 	|ind| 	Position
 	linkage
 		wrapper
@@ -24,6 +24,10 @@ class list (Saveable)
 	constructor (|| Parent)				{ cpp_wrapper JB_Ring_Constructor }
 	destructor							{ cpp_wrapper JB_Ring_Destructor }
 	
+	function Obj (|object?|):			cpp_wrapper
+	setter   Obj (|object?|):			cpp_wrapper 
+	function Number (|int64|):			cpp_wrapper
+	setter   Number (|int64|):			cpp_wrapper 
 	function Parent (||)				{ cpp_wrapper JB_Ring_Parent, nil checker }
 	function Parent (assigns:|...?|)
 		nil self // for .remove

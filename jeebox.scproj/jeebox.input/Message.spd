@@ -17,7 +17,6 @@ After that, you now have a tree-data-structure that represents your data. The Me
 ////////////////////////////////
 	contains Message
 	|string|				Name
-	|Object(tag)?|			Obj					// Obj:   Allow users to attach interesting information.
 	|Syntax|				Func
 	|Byte|					Indent
 	|uint16|				RangeLength
