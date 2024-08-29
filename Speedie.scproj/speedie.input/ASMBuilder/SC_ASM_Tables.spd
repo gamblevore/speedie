@@ -393,7 +393,7 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 	
 	check (src isnt temp) (exp, "Can't increment temporary value.")
 	ifn mode & IncrAfter
-		return .IncrPre(exp, src, src, Amount)				// ++x,	 y = ++x
+		return .IncrPre(exp, dest, src, Amount)				// ++x,	 y = ++x
 
 	return .IncrPost(exp, dest, src, amount)				// x++,	 y = x++
 

@@ -110,6 +110,7 @@ extend ASMState
 		if (k >> 18) << 18 != k
 			debugat
 			return nil
+		l.nop
 		|| fat = exp.FADK(dest, l, k)
 		if dest is constany
 			fat.ConstifyFloatPlus(l,r)

@@ -126,16 +126,16 @@ struct ASMState
 // then lets check the others... then do a findifier.
 
 	function IncrPre (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
-		if dest.isint
-			if Value.CanStoreAsIntImmediate
-				return exp.ADDK(dest, src, Value) * dest
-		  elseif dest.FourBytes
-			if value|uint64|.CanStoreAsfloatImmediate
-				return exp.FADK(dest, src, value) * dest
-			debugger // how is this possible? we are adding a 64 bit float to a 32-bit?
-		debugat
-		|| where = .NumToReg(exp, value)
-		return .Plus(dest, src, where, exp)
+		#! what if dest.reg != src.reg? like y = ++x
+		if dest.isint and Value.CanStoreAsIntImmediate
+			rz = exp.ADDK(src, src, Value) * dest
+		  elseif dest.isfloat and dest.FourBytes and value|uint64|.CanStoreAsfloatImmediate
+			rz = exp.FADK(src, src, value) * dest
+		  else
+			|| where = .NumToReg(exp, value)
+			rz = .Plus(src, src, where, exp)
+		if dest.reg!=src.reg
+			rz = .Assign(dest, src, src, exp)
 
 
 	syntax append (|int| code, |message| dbg, |&FatASM|)
