@@ -239,6 +239,9 @@ typedef void* _voidptr;
 #ifndef uint64
 	typedef unsigned long long  uint64; 
 #endif
+#ifndef jbfloat64
+	typedef double  jbfloat64; // i really apologise for this! 
+#endif // i can't be bothered to fix it now. its late and I just want this compiling.
 
 struct jbobject {int RefCount;};
 `
