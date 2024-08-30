@@ -25,9 +25,12 @@ function If				(fn_asm)
 		ElseIfCond = nil
 		arg2 = nil
 
-	|| Start = .Branch(cond, Flip)
+	|| Start = .Branch2(cond, Flip)
 	rz = .µ(arg1)
-	Start.jumpto = .curr
+	for s in start
+		if s is CondRequest
+			(s isnt condrequest)
+			s.jumpto = .curr
 	if ElseIfCond or arg2.HasAny
 		|| AfterFirst = arg1.jump(0) // marks as ended... to prevent opts. can be removed later during optimisation
 		if ElseIfCond
@@ -100,6 +103,8 @@ function Ternary		(fn_asm)
 	Exit.r[3] = .curr - Exit
 	
 
+//FatRange
+function Branch2 (|message| cond,  |bool| neg=false,  |fatrange|)
 function Branch (|message| cond,  |bool| neg=false,  |!&fatasm|)
 	|| req = asmreg.CondRequest
 	if neg
@@ -131,7 +136,7 @@ helper DoAndOr (|message| exp,  |ASMReg| Dest,  |opmode| Opp,    |ASMReg|)
 				return ml
 			return .Equals(dest as asmreg.negate, ml, asmreg(), A)
 		if (ml.µtype is bool) and (mr.µType is bool)
-			dest = .Temponly(exp, dest)
+			dest = .TempOnly(exp, dest)
 			dest.µType = DataTypeCode.bool
 			|| fat = exp.BAND(dest, ml, mr, 0)
 			if (opp is or)
@@ -139,11 +144,9 @@ helper DoAndOr (|message| exp,  |ASMReg| Dest,  |opmode| Opp,    |ASMReg|)
 			return fat*dest
 	
 	
-	|| TmpCloser = .VTmps
 	if dest isnt CondRequest				// AAARGH
 		dest = .NumToReg(exp, 1-negate, dest)
 		(dest is alreadynegated)
-		(dest isnt negate)
 		#! this works for CONDTIONALS. What about values?
 		#! values... we could clear it first... run the first conditionally,
 		#! the second branch could just set the value? like a cmp?
@@ -153,7 +156,6 @@ helper DoAndOr (|message| exp,  |ASMReg| Dest,  |opmode| Opp,    |ASMReg|)
 		(dest isnt negate)
 		(dest is alreadynegated)
 
-	// now what?
 	if OPP is OR
 		.Branch(A, negate).JumpTo = .curr
 		negate = !negate
@@ -161,15 +163,14 @@ helper DoAndOr (|message| exp,  |ASMReg| Dest,  |opmode| Opp,    |ASMReg|)
 		|| BA = .Branch(A, negate)
 		(ba is CondRequest)
 	
-	|| BB = .Branch(B, negate)  // opposite jumpyness
-	(bb is CondRequest)		
-	.CloseVTmps(TmpCloser)
-	
 	if dest isnt CondRequest
-		.NumToReg(exp, 0+negate, dest)
-//		return .FillConds(Dest)
+		return .Equals(dest, .µ(b), asmreg(), exp)
 
+	|| BB = .Branch(B, negate)  // opposite jumpyness
+	(bb is CondRequest)
 	return bb.info
+	
+//		return .FillConds(Dest)
 
 
 }

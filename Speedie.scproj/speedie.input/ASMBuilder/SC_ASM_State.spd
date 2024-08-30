@@ -57,6 +57,7 @@ struct ASMState
 	function Last (|&FatASM|)
 		return .curr-1
 
+/*
 	function RegPlace (|int| a, |?&uint64|)
 		opt norefcounts
 		|| InBounds = a|uint| <= 31
@@ -67,19 +68,7 @@ struct ASMState
 		|| msg = (": Unassigned register",  ": Out of bounds register")(InBounds)
 		error (self, errorreceiver.NonFatal + msg)
 			
-		
-	function GetConst (|int| RegNum, |&uint64|)
-		// How do i say that some regs are "closed for write, but still readable".
-		// Then each reg needs two bits. not just 1!
-		// We can do this by using 64-bits per thingy. Or two 32-bits.
-		opt inline
-		|| r = .regplace(RegNum)
-			if  !r[]  ==  !regnum
-				return r
-		debugger 
-		return .zero.const
-
-
+	
 	helper FoundCode (|int| i, |uint64| Value, |asmreg| typeinfo, |asmreg|)
 		opt norefcounts
 		|| place = .regplace(i)$
@@ -88,13 +77,13 @@ struct ASMState
 			typeinfo.reg = i
 			(typeinfo is ConstAny)
 			return typeinfo
-
+*/
 	
 	function IntPowerOfTwo (|asmreg| r,  |FailableInt|)
 		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
 		// this is used for multiplication mostly. like x*-1, or x*0, or x*1
 		if r is ConstAny
-			|| v = .GetConst(r)[]
+			|| v = r.const
 			if v == -1
 				return v
 			if v.IsPow2
@@ -199,7 +188,7 @@ struct ASMState
 		tmps = ~tmps
 		return dcls ||| tmps
 
-
+/*
 	function FindConstDecl (|scdecl| d, |asmreg|)
 		return .findconst(d.exportposition, d.CalculateASMType)
 
@@ -216,7 +205,7 @@ struct ASMState
 		for (b.bits in R) (i)
 			|| f = .FoundCode(i, value, typeinfo)
 				return f
-
+*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -42,11 +42,20 @@ datatype ASMReg (uint64)
 		return .µtype.floatness
 	
 	function F32 (|float|)
-		return .needfat.F32
+		if .reg
+			return .needfat.F32
 		
 	function F64 (|Float64|)
-		return .needfat.F64
+		if .reg
+			return .needfat.F64
 	
+	function float (|Float64|)
+		if .reg
+			|| f = .needfat
+			if .isbig
+				return f.f64
+			return f.f32|float64|
+
 	function NOP
 		|| f = .fat
 			f.op = asm.noop

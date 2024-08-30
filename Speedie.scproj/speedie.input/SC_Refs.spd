@@ -129,7 +129,6 @@ function RC_CheckNoObjPms (|message| msg)
 		for i in fn.args
 			if i.PointerCount
 				expect (!i.Type.IsObject) (msg, "Can't pass address of object while using 'opt norefcounts'")
-		// now what? check the arg is OK?
 
 	
 function RC_IgnoreReturn (|Message| msg, |bool| DoRefs)

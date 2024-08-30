@@ -94,22 +94,19 @@ extend ASMState
 
 
 	// MATH 
-	function QuickFloatPlus    (fn_OpASM)
+	function QuickFloat32Plus    (fn_OpASM)
 		if r is constany // a + 1,   a - 1
-			|| QQ = .QuickFloatPlusSub(dest, l, r, exp)
+			|| QQ = .QuickFloatPlus32Sub(dest, l, r, exp)
 				return qq
 		if l is constany  and  l isnt Alternate   // 1 + a --> a + 1
-			|| QQ = .QuickFloatPlusSub(dest, r asnt asmreg.alternate, l, exp)
+			|| QQ = .QuickFloatPlus32Sub(dest, r asnt asmreg.alternate, l, exp)
 				return qq
 	
 			
-	function QuickFloatPlusSub    (fn_OpASM)
-		|| v = .f(r)
-		|| k = .GetConst(r)[]|uint|
+	function QuickFloatPlus32Sub    (fn_OpASM)
+		|| k = r.Const|uint|
 		k ^= (l is Alternate)<<31
-		if (k >> 18) << 18 != k
-			debugat
-			return nil
+		require (k >> 18) << 18 == k
 		l.nop
 		|| fat = exp.FADK(dest, l, k)
 		if dest is constany
@@ -120,26 +117,12 @@ extend ASMState
 
 
 	function QuickFloatDiv    (fn_OpASM)
-		require r is ConstAny // OPT: We should be able to look in regconsts
-		|| v = .f(r)
+		require r is ConstAny
+		|| v = r.float
 		if v == 0.0
 			problem (Exp, "Divide by zero???")
 		if !v or v.abs == 1.0
 			return .Quick1Or1Sub(dest, l, v|int|, exp)
-
-		|| p = .GetConst(r)
-		|ivec2| ex
-		if l.IsBig
-			|| f8 = p|&f64|[]
-			require f8 > 0
-			ex = f8.exponent
-		  else
-			|| f4 = p|&float|[]
-			require f4 > 0
-			ex = f4.exponent
-		
-		//if ex.y == 1
-			//return exp.FEXK(dest, L, asmreg(), ex.x, 0, l.IsBig|int|) * Dest
 
 
 	// from 1 to -1
@@ -162,14 +145,14 @@ extend ASMState
 
 	function QuickFloatMul    (fn_OpASM)
 		require r is ConstAny	
-		|| v = .f(r)		
+		|| v = r.float
 		if  v == 1.0 or 0.0 or -1.0
 			return .Quick1Or1Sub(dest, l, v|int|, exp)
 		if  v == 2.0
 			return .plus(dest, l, l, exp)
 		
 		if r.Fourbytes
-			|| x = .GetConst(r)[]
+			|| x = r.const
 			|| y = x >> 18
 			if x == y << 18
 				return exp.FMLK(dest, l, x) * Dest
@@ -222,14 +205,14 @@ extend ASMState
 		|| lmul = l.PointerMul(exp, swapped)
 		|&fatasm| fat
 		if r is ConstAny
-			|| RR = .GetConst(R)[]
+			|| RR = r.const
 			if l is alternate
 				RR = -RR
 			rr *= lmul
 			if r.CanAddK(RR)							// a - 1,  a + 1
 				fat = exp.ADDK(dest, L, RR)
 				if dest is ConstAny
-					|| LL = .GetConst(L)[]
+					|| LL = l.const
 					fat.const = ll + rr
 
 		if fat
@@ -254,7 +237,7 @@ extend ASMState
 			return .makeconst2(dest, l, r, exp, &fatasm.ConstifyFloatPlus)
 
 		|| IsF32 = dest.FourBytes
-			|| qq = .QuickFloatPlus(dest, l, r, exp)
+			|| qq = .QuickFloat32Plus(dest, l, r, exp)
 				return qq
 
 		|| ss = (l is alternate)
@@ -449,15 +432,6 @@ extend ASMState
 			fat.const = l.const & r.const
 		return fat*Dest
 
-
-//	function ConstForShift (|asmreg| r, |int| btc, |message| exp,  |int64|)
-//		// shl/shl used to use this
-//		rz = .GetConst(r)[]
-//		if rz < 0
-//			error (exp, "Can't negative shift")
-//		  elseif rz >= btc
-//			error (exp, "Shift too large for type")
-		
 
 	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| l, |int| up, |int| down, |asmreg|)
 		|| fat = exp.BFLG(dest,  l,  up,  down,  l.signed|int|)

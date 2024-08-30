@@ -541,8 +541,8 @@ function asmstate.ExistingVar (|message| m, |datatypecode| destType=datatypecode
 		fn = m.func
 	if fn == @thg
 		return asmtmp.ThgSub(self, m, asmreg(), 2)
-	if fn == @num
-		return .FindConstDecl(m.ASMDecl)
+	//if fn == @num
+	//	return .FindConstDecl(m.ASMDecl)
 
 
 function message.HasAsmStuff (|bool|)

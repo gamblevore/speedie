@@ -49,8 +49,10 @@ function fatasm.KNST_Encoder (Asm_encoder2)
 extend ASMState
 	function asmstate.GenericNumFinder (|message| exp, |uint64| Value, |asmreg| TypeInfo=asmreg(), |asmreg|)
 		opt norefcounts
-		|| r = .FindConst(value, typeinfo)
-			return r
+// doesn't find anymore 😭
+// optimiser will do this. (one day)
+//		|| r = .FindConst(value, typeinfo)
+//			return r
 		return .NumToReg(exp, Value, TypeInfo)
 
 
@@ -81,12 +83,6 @@ extend ASMState
 	
 	function NumToReg (|message| exp, |int64| V, |asmreg| Reg=ASMReg(), |asmreg|)
 		return .NumToFat(exp, v, reg).info
-
-	function f (|ASMReg| r, |Float64|)
-		|| p = .GetConst(r.reg)
-		if r.FourBytes
-			return p|&float|[]|Float64|
-		return p|&f64|[]
 
 	function SetConst (|Message| List,  |message| Orig,  |bool|)
 		opt norefcounts								// set1: r1, 123

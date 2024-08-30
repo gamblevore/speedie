@@ -9,20 +9,20 @@ constants
 	// worse errors are higher numbers
 	// don't go to 1024 << 22 ! even 512 risks negative ints.
 	kNeedsAddressOfButAlsoNeedsSuperMatch  = 64 << 22
-	kNeedsAddressOf     = 32 << 22
-	kNeedsTypeCast		= 16 << 22
-	kNeeds				= kNeedsTypeCast ||| kNeedsAddressOf ||| kNeedsAddressOfButAlsoNeedsSuperMatch 
+	kNeedsAddressOf				= 32 << 22
+	kNeedsTypeCast				= 16 << 22
+	kNeeds						= kNeedsTypeCast ||| kNeedsAddressOf ||| kNeedsAddressOfButAlsoNeedsSuperMatch 
 
-	kUseDefaultParams   = 8 << 22
-	kLossyCastedMatch	= 7 << 22
-	kCastedMatch		= 6 << 22
-	kVoidPtrMatch		= 5 << 22
-	kSuperClassMatch	= 4 << 22
-	kAddressOfMatch     = 3 << 22
-	kNumericMatch		= 2 << 22
-	kSimpleMatch		= 1 << 22
-	kMultipleErrors		= 1 << 21
-	kNoMatch			= 0
+	kUseDefaultParams  			= 8 << 22
+	kLossyCastedMatch			= 7 << 22
+	kCastedMatch				= 6 << 22
+	kVoidPtrMatch				= 5 << 22
+	kSuperClassMatch			= 4 << 22
+	kAddressOfMatch				= 3 << 22
+	kNumericMatch				= 2 << 22
+	kSimpleMatch				= 1 << 22
+	kMultipleErrors				= 1 << 21
+	kNoMatch					= 0
 
 	kTypeCastMost				= 1
 	kTypeCastNumbers			= 2
@@ -34,9 +34,9 @@ constants
 	kTypeCastAssigns			= 64
 	kTypeCastWantSuperDistance	= 128
 	kTypeCastDescribeErrors		= 256
-	kTypeCastFromZero			= 512
+	kTypeCastForSetRel			= 512
 	kTypeCastSetToMemory		= 1024
-	kTypeCastForSetRel			= 2048
+	kTypeCastFromZero			= 2048
 	kTypeCastFromSmallInt		= 4096
 	kActualTypecasts			= ~(kTypeCastWantSuperDistance ||| kNoBoolTypeCast)  
 	kTypeCastFalse				= 0
@@ -235,14 +235,12 @@ class SCDecl (SCNamed) {
 		|| bt = t.itembitcount
 		|| bits	= bme max bt		// what about a float + an int? f64 right?
 		if .isfloat or t.isfloat
-			if bits == 16 // now what?
 			|| FF = (datatypecode.double.floatness, datatypecode.float.floatness)(bits > 32)
 			|| dest = (TypeFloat64!, TypeFloat!)(bits > 32)
 			if .floatness != FF
 				left.CastToClass(dest)
 			if t.floatness != FF
 				right.CastToClass(dest)
-			// now what? we need to check which is which?
 			return dest
 		
 		if Op
@@ -534,7 +532,7 @@ class SCDecl (SCNamed) {
 		return .NewWrapper(self)
 	
 	
-	function SCClass.GoUpTo (|int|d, |SCClass|)
+	function SCClass.GoUpTo (|int| d, |SCClass|)
 		opt norefcounts
 		|| s = self
 		while (s and s.depth > d)

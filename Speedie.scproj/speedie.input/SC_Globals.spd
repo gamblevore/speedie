@@ -315,7 +315,7 @@ function TypeOfChar (ExprResolver)
 	|| d = CodePointTable init Dictionary()
 	|| str = cp.Render
 	|| place = d.MakePlace(str)
-	|| char_decl = place[]				// now what? we have an old char?
+	|| char_decl = place[]
 	if !char_decl
 		char_decl = TypeCodePoint!.typenormal.CopyDecl
 		place[] = char_decl
