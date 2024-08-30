@@ -15,7 +15,7 @@ function PackTestConsts
 
 
 function PackTestMath (|int| a, |int| b, |int|)
-	//#! RUN!!
+	#! RUN!!
 	return ((a + b) / 2) - ((a / b) * 2)
 
 function PackTestAndOr (|int| a, |int| b, |bool| c, |bool| d, |int|)
