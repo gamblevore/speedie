@@ -1695,7 +1695,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native (JB_LUB[2109])
+#define kJB_codesign_native (JB_LUB[1663])
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
 extern CharSet* SC_CSNum;
@@ -1727,9 +1727,9 @@ extern JB_String* SC_kNameConf;
 #define kJB_kTypeCastBothWays 16
 #define kJB_kTypeCastDescribeErrors 256
 #define kJB_kTypeCastFalse (0)
-#define kJB_kTypeCastForSetRel 2048
+#define kJB_kTypeCastForSetRel 512
 #define kJB_kTypeCastFromSmallInt 4096
-#define kJB_kTypeCastFromZero 512
+#define kJB_kTypeCastFromZero 2048
 #define kJB_kTypeCastIgnoreAddressOf 8
 #define kJB_kTypeCastIgnoreContained 4
 #define kJB_kTypeCastMost 1
@@ -1738,7 +1738,7 @@ extern JB_String* SC_kNameConf;
 #define kJB_kTypeCastTrue 3
 #define kJB_kTypeCastWantSuperDistance 128
 #define kJB_kUseDefaultParams 33554432
-#define kJB_kUsingStr (JB_LUB[2110])
+#define kJB_kUsingStr (JB_LUB[1888])
 #define kJB_kVoidPtrMatch 20971520
 extern JB_File* SC_PerryLogFile;
 extern Message* SC_ReturnSelfEqNil;
@@ -1972,7 +1972,7 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_RET 34
 #define kSC__ASM_RMEM 74
 #define kSC__ASM_RSET 73
-#define kSC__ASM_SUBB 44
+#define kSC__ASM_SUB 44
 #define kSC__ASM_SWAP 36
 #define kSC__ASM_TABL 76
 #define kSC__ASM_TAIL 16
@@ -4253,6 +4253,8 @@ void JB_cstring_temp(_cstring Self, FakeJBString* Rz);
 
 
 // f64
+Float64 JB_dbl_Fract(double Self);
+
 JB_String* JB_dbl_RenderFloat(double Self, FastString* Fs_in);
 
 
@@ -4457,9 +4459,9 @@ ASM SC_ASM_Div_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_DivK_AddSet(ASM Self, uint Value);
 
-ASM SC_ASM_DivK_ShSet(ASM Self, uint Value);
+ASM SC_ASM_DivK_LSet(ASM Self, uint Value);
 
-ASM SC_ASM_DivK_SpaceSet(ASM Self, uint Value);
+ASM SC_ASM_DivK_ShSet(ASM Self, uint Value);
 
 ASM SC_ASM_Float_DSet(ASM Self, uint Value);
 
@@ -4577,6 +4579,8 @@ uint SC_Reg_FatIndex(ASMReg Self);
 ASMReg SC_Reg_FatIndexSet(ASMReg Self, uint Value);
 
 ASMReg SC_Reg_Flip(ASMReg Self, ASMReg Bits);
+
+Float64 SC_Reg_float(ASMReg Self);
 
 ASMReg SC_Reg_HaveAddr(ASMReg Self);
 
@@ -4783,6 +4787,8 @@ SCClass* SC_TC_SignedStuffClass(uint /*DataTypeCode*/ Self);
 
 bool JB_TC_SyntaxIs(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ M);
 
+ASMReg SC_TC_zero(uint /*DataTypeCode*/ Self);
+
 Dictionary* JB_TC__Types();
 
 
@@ -4851,6 +4857,10 @@ Array* JB_ErrorSeverity__InitNames();
 
 
 // FatRange
+void SC_FatRange_Fill(FatRange Self, FatASM* Curr);
+
+void SC_FatRange__FillConds(FatASM* S, FatASM* A, FatASM* Curr);
+
 
 
 // FileDes
@@ -5606,6 +5616,10 @@ void SC_FatASM_ConstifyFloatMul(FatASM* Self, ASMReg L, ASMReg R);
 
 void SC_FatASM_ConstifyFloatPlus(FatASM* Self, ASMReg L, ASMReg R);
 
+void SC_FatASM_ConstifyIntMul(FatASM* Self, ASMReg L, ASMReg R);
+
+void SC_FatASM_ConstifyIntPlus(FatASM* Self, ASMReg L, ASMReg R);
+
 void SC_FatASM_ConvertConst(FatASM* Self, uint /*DataTypeCode*/ Oldtype, uint /*DataTypeCode*/ Newtype);
 
 uint SC_FatASM_d(FatASM* Self);
@@ -5673,6 +5687,8 @@ void SC_FatASM_RendaKnst(FatASM* Self, FastString* Fs, int Sofar);
 void SC_FatASM_Swap(FatASM* Self, int A, int B);
 
 void SC_FatASM_SyntaxExpect(FatASM* Self, JB_String* Error);
+
+bool SC_FatASM_SyntaxIs(FatASM* Self, ASMReg Flags);
 
 void SC_FatASM_SyntaxIsSet(FatASM* Self, ASMReg Flags, bool Value);
 
@@ -5925,7 +5941,9 @@ ASMReg SC_Pac_BitXor(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* E
 
 ASMReg SC_Pac_BoolMul(ASMState* Self, ASMReg Dest, ASMReg Boo, ASMReg V, Message* Exp);
 
-FatASM* SC_Pac_Branch(ASMState* Self, Message* Cond, bool Neg);
+FatRange SC_Pac_Branch(ASMState* Self, Message* Cond, bool Neg);
+
+FatRange SC_Pac_BranchSub(ASMState* Self, Message* Cond, ASMReg Mode);
 
 void SC_Pac_CloseVDecls(ASMState* Self, int I);
 
@@ -5949,6 +5967,8 @@ ASMReg SC_Pac_DivInt(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* E
 
 ASMReg SC_Pac_DoAndOr(ASMState* Self, Message* Exp, ASMReg Dest, OpMode Opp);
 
+ASMReg SC_Pac_DoAndPart(ASMState* Self, Message* Exp, ASMReg Dest, Message* B, bool Negate);
+
 ASMReg SC_Pac_DoMathSub(ASMState* Self, Message* Exp, ASMReg Dest, fn_OpASM Fn);
 
 ASMReg SC_Pac_Equals(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
@@ -5959,12 +5979,6 @@ ASMReg SC_Pac_ExistingVar(ASMState* Self, Message* M, uint /*DataTypeCode*/ dest
 
 ASMReg SC_Pac_Exit(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
-Float64 SC_Pac_f(ASMState* Self, ASMReg R);
-
-ASMReg SC_Pac_FindConst(ASMState* Self, uint64 Value, ASMReg Typeinfo);
-
-ASMReg SC_Pac_FindConstDecl(ASMState* Self, SCDecl* D);
-
 void SC_Pac_FinishASM(ASMState* Self);
 
 ASMReg SC_Pac_FloatDiv(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
@@ -5972,8 +5986,6 @@ ASMReg SC_Pac_FloatDiv(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message*
 ASMReg SC_Pac_FloatMul(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
 ASMReg SC_Pac_FloatPlus(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
-
-ASMReg SC_Pac_FoundCode(ASMState* Self, int I, uint64 Value, ASMReg Typeinfo);
 
 ASMReg SC_Pac_FuncPrm(ASMState* Self, Message* Prm, SCDecl* DestType);
 
@@ -6035,19 +6047,17 @@ ASMReg SC_Pac_PlusInt(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* 
 
 ASMReg SC_Pac_Quick1Or1Sub(ASMState* Self, ASMReg Dest, ASMReg L, int Ptoi, Message* Exp);
 
+ASMReg SC_Pac_QuickDivInt(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
+
+ASMReg SC_Pac_QuickFloat32Plus(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
+
 ASMReg SC_Pac_QuickFloatDiv(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
 ASMReg SC_Pac_QuickFloatMul(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
-ASMReg SC_Pac_QuickFloatPlus(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
-
-ASMReg SC_Pac_QuickFloatPlusSub(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
+ASMReg SC_Pac_QuickFloatPlus32Sub(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
 ASMReg SC_Pac_QuickIntMul(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
-
-int SC_Pac_RegMap(ASMState* Self);
-
-uint64* SC_Pac_RegPlace(ASMState* Self, int A);
 
 bool SC_Pac_SetConst(ASMState* Self, Message* List, Message* Orig);
 
@@ -8029,7 +8039,9 @@ void JB_Msg_Destructor(Message* Self);
 
 Dictionary* JB_Msg_Dict(Message* Self, bool DoLower, bool DoCount);
 
-FatASM* JB_Msg_DIVK(Message* Self, ASMReg R1, ASMReg R2, int Space, int Sh, int Add);
+void SC_Msg_DivByZero(Message* Self);
+
+FatASM* JB_Msg_DIVK(Message* Self, ASMReg R1, ASMReg R2, int Sh, int Add);
 
 FatASM* JB_Msg_DIVV(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int Kind);
 
@@ -8615,7 +8627,7 @@ void JB_Msg_Str__(Message* Self, FastString* Fs);
 
 void SC_Msg_StructReturnCleanup(Message* Self, SCFunction* Fn, SCNode* Name_space);
 
-FatASM* JB_Msg_SUBB(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Sh);
+FatASM* JB_Msg_SUB(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Sh);
 
 FatASM* JB_Msg_SWAP(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4);
 
@@ -10336,7 +10348,7 @@ inline bool JB_Safe_SyntaxCast(JB_String* Self);
 
 inline bool SC_Decl_IsUnknownParam(SCDecl* Self);
 
-inline ASMReg SC_Pac_Get(ASMState* Self, Message* Exp, ASMReg Dest);
+inline ASMReg SC_Pac_GetASM(ASMState* Self, Message* Exp, ASMReg Dest);
 
 inline bool SC_Reg_IsInt(ASMReg Self);
 
@@ -10349,8 +10361,6 @@ inline void SC_Reg_Expect(ASMReg Self, Message* Where);
 inline FatASM* SC_Reg_Read(ASMReg Self, Message* M, ASMReg Ptr, int Index);
 
 inline FatASM* SC_Reg_Write(ASMReg Self, Message* M, ASMReg Ptr, int Index);
-
-inline uint64* SC_Pac_GetConst(ASMState* Self, int RegNum);
 
 inline SCDecl* SC_TypeOfSwiz(Message* Exp, SCNode* Name_space, Message* Side, SCDecl* class_Space);
 
@@ -10429,7 +10439,7 @@ inline bool JB_int_OperatorInRange(int Self, int D) {
 }
 
 inline bool SC_FailableInt_SyntaxCast(FailableInt Self) {
-	return Self != kSC__FailableInt_Fail;
+	return Self != ((int)kSC__FailableInt_Fail);
 }
 
 inline uint SC_FatASM_Index(FatASM* Self) {
@@ -10592,7 +10602,7 @@ inline bool SC_Decl_IsUnknownParam(SCDecl* Self) {
 	return ((!SC_Decl_NilStated(Self))) and (SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Param));
 }
 
-inline ASMReg SC_Pac_Get(ASMState* Self, Message* Exp, ASMReg Dest) {
+inline ASMReg SC_Pac_GetASM(ASMState* Self, Message* Exp, ASMReg Dest) {
 	fn_asm Fn = SC_fn_asm_table[SC_Msg_ASMType(Exp)];
 	uint TmpCloser = Self->VTmps;
 	ASMReg Ss = (Fn)(Self, Exp, Dest, 0);
@@ -10639,16 +10649,6 @@ inline FatASM* SC_Reg_Read(ASMReg Self, Message* M, ASMReg Ptr, int Index) {
 
 inline FatASM* SC_Reg_Write(ASMReg Self, Message* M, ASMReg Ptr, int Index) {
 	return SC_Reg_ReadOrWriteWithMsgRegIntBool(Self, M, Ptr, Index, false);
-}
-
-inline uint64* SC_Pac_GetConst(ASMState* Self, int RegNum) {
-	uint64* R = SC_Pac_RegPlace(Self, RegNum);
-	if (R) {
-		if ((!R[0]) == (!RegNum)) {
-			return R;
-		}
-	}
-	return (&Self->Zero.Const);
 }
 
 inline SCDecl* SC_TypeOfSwiz(Message* Exp, SCNode* Name_space, Message* Side, SCDecl* class_Space) {
