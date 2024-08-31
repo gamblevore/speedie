@@ -55,7 +55,7 @@ module LinkMap
 			if msg.HasAny
 				if !inbranch
 					|| T = msg.ASMType
-					inbranch = (t == asmtmp.kIf or asmtmp.kwhile or asmtmp.ktern)
+					inbranch = (t == ASMType.kIf or ASMType.kwhile or ASMType.ktern)
 								// how do we check that this isnt recursive?
 								// seems to do this, we need to go over the entire program
 								// anytime we wanna add a function! like if we call .parse

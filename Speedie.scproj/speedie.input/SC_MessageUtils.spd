@@ -43,7 +43,7 @@ function Message.MsgOwningFunc (|SCFunction|)
 
 
 function message.MakeComment // ignorenode ()  makeignored ()
-	.ASMType = asmtmp.kIgnore
+	.ASMType = ASMType.kIgnore
 	.func = @Sheb
 	.clear
 
@@ -422,7 +422,7 @@ function NewEqRel (|Message| L, |Message| R, |Message|)
 	op.obj = scoperator.assigns
 	rz <~ R
 
-	rz.ASMType = ASMtmp.kSetRel
+	rz.ASMType = ASMType.kSetRel
 
 
 function NewEqRel (|string| L, |String| R, |Message|)
@@ -433,7 +433,7 @@ function NewEqRel (|string| L, |String| R, |Message|)
 
 function NewRejoin (|message|)
 	rz = @tmp + "rejoin"
-	rz.ASMType = asmtmp.kRejoin
+	rz.ASMType = ASMType.kRejoin
 
 
 function NewDecl (|string| type, |string| name="", |message|)

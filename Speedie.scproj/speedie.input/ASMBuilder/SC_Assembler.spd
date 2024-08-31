@@ -33,7 +33,7 @@ module SpdAssembler
 	
 	function InitAss
 		instruction.InstructionInit
-		asmtmp.InitAccess
+		ASMType.InitAccess
 		Instruction[asm.KNSR].Const
 		Instruction[asm.KNST].Const
 		asm.encoders[asm.KNST] = fatasm.KNST_Encoder

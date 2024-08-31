@@ -5,10 +5,11 @@ prototype fn_ASMConstifier  (|&fatasm| self, |asmreg| L, |asmreg| R)
 
 
 extend asmreg
-	function BoolASM (|asmreg|)
+	function BoolAnswer (|asmreg|)
 		.µtype = DataTypeCode.bool
 		
-		is AlreadyNegated
+		if self is negate
+			is AlreadyNegated
 		if self is CondRequest
 			isnt condrequest
 			is CondAnswer
@@ -16,17 +17,22 @@ extend asmreg
 
 
 extend ASMState
-	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |&fatasm|)
+	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asmreg|)
 		|| negate = (dest is negate)|int|
 		if dest isnt CondRequest
-			return exp.CMPB(dest, L, R, negate)
+			if dest is constany
+				l.nop
+				r.nop
+				return .numtoreg(exp, ((l.const==r.const)==!negate)|int|, dest)
+			return exp.CMPB(dest, L, R, negate)*Dest
 
+		|&fatasm| fat 
 		if l.reg
-			rz = exp.JMPE(r,l,0)
+			fat = exp.JMPE(r,l,0)
 		  else
-			rz = exp.jBRA(r,0)
-		rz.op += negate
-		dest = rz*asmreg.condanswer
+			fat = exp.jBRA(r,0)
+		fat.op += negate
+		return fat*dest.boolanswer
 
 	
 	function Equals (fn_opasm)
@@ -37,13 +43,7 @@ extend ASMState
 			|| Mode = 2+(dest is negate)
 			return .Compare(dest, l, r, exp, mode) // can't really be bothered to do this const comparison
 
-		|| fat = .equalsint(dest, l, r, exp)
-		rz = fat * Dest
-		if dest is ConstAny
-			// this isn't true... what about floats? we could just... rationalise floats?
-			// so where do we set floats even?
-			rz.const = ((l.const == r.const) != (dest is negate))|int|
-		rz = rz.boolasm
+		return .equalsint(dest, l, r, exp)
 	
 		
 	function NotEq  (fn_opasm)
@@ -51,7 +51,11 @@ extend ASMState
 
 
 	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
-		if l.Signed!=r.Signed // hmmm??
+		if dest is constany
+			//l.nop
+			//r.nop
+			#! theres so many comparse... do this later.
+			//return .numtoreg(exp, ((l.const==r.const)==!negate)|int|, dest)
 
 		mode += l.signed<<1
 		if l.IsBig ||| r.IsBig
@@ -60,7 +64,7 @@ extend ASMState
 		if dest isnt CondRequest
 			return exp.CMPI(dest, L, R, mode)*dest
 
-		return exp.JMPI(L, R, mode, 0) * asmreg.CondAnswer
+		return exp.JMPI(L, R, mode, 0) * dest.BoolAnswer
 
 
 	function CompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
@@ -76,7 +80,6 @@ extend ASMState
 			rz = .compareint(dest, l, r, exp, mode)
 		  else
 			rz = .comparefloat(dest, l, r, exp, mode)
-		rz = rz.BoolASM
 	
 	
 	function Less   (fn_opasm)

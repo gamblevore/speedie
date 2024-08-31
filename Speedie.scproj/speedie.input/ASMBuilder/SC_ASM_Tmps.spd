@@ -2,26 +2,28 @@
 
 // for some reason, replacing this will cause speedie to generate bad code
 // I guess I am setting the Flags somewhere, or testing them? but I can't see where.
-function Message.ASMType (|ASMTmp|)
+function Message.ASMType (|ASMType|)
 	return .FLAGS & 63
 	
 	
-// if we can fix this... we can get a bigger ASMtmp table!
-function Message.ASMType (assigns:|ASMTmp|)
+// if we can fix this... we can get a bigger ASMType table!
+function Message.ASMType (assigns:|ASMType|)
 	target debug: if .objectid == 0
 	value = (.FLAGS &~ 63) ||| value
 	.FLAGS = value 
 
 
-datatype ASMtmp (uint16)
-	syntax is (|asmtmp| t, |bool|)
+datatype ASMType (uint16)
+	syntax is (|ASMType| t, |bool|)
 		return self == t
 
 	constants
-//		ImmediatesOnly = 2
-
-		|asmtmp| 
-		kElseIf = 48 // align this to line 48...
+		|ASMType|
+		kUnusedFirst = 47 // other values come after 
+		kPointer
+		kTern
+		kStatExpr
+		kElseIf
 		kIf
 		kWhile
 		kContinue
@@ -29,10 +31,7 @@ datatype ASMtmp (uint16)
 		kReturn
 		kRejoin
 		kSwap
-		kTern
-		kStatExpr
 		kSetRel
-		kPointer
 		kIgnore
 		kDebugger // so yeah... alomst no space left. just 1 last slot possible.
 		kFail = 63

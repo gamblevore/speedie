@@ -6,7 +6,6 @@ extend ASMState {
 // abc(), if (x) return, def()   -->   abc(), if !x {def()}, return
 function If				(fn_asm)
 	opt norefcounts
-	debugger
 	
 	|| cond = exp.first!,  || arg1 = cond.next!
 	|| Else = arg1.next!,  || arg2 = else.first
@@ -26,7 +25,7 @@ function If				(fn_asm)
 		arg2 = nil
 
 	|| B = .Branch(cond, Flip)
-	rz = .µ(arg1)
+	rz = ASMType.arg(self, arg1)
 	B.fill(.curr)
 	
 	if ElseIfCond or arg2.HasAny
@@ -35,7 +34,7 @@ function If				(fn_asm)
 			|| a = asmreg()
 			rz = .IF(ElseIfCond, a)
 		  else
-			rz = asmtmp.ARG(self, arg2)
+			rz = ASMType.ARG(self, arg2)
 		AfterFirst.jumpto = .curr
 
 
@@ -43,7 +42,7 @@ function While			(fn_asm)
 	opt norefcounts
 	.LoopClearUnreliableConsts
 	|| BEGIN = exp.JUMP(0)								// jump to end... THEN EMIT arg and jump back.
-	ASMTmp.arg(self, exp.second)						// arg
+	ASMType.arg(self, exp.second)						// arg
 
 	|| CONTINUE = .curr
 	BEGIN.jumpto = CONTINUE
@@ -107,7 +106,8 @@ function Branch (|message| cond,  |bool| neg=false,  |fatrange|)
 
 function Branch (|message| cond,  |asmreg| mode,  |fatrange|)
 	cpp_Part BranchSub
-	rz.x = .curr.index
+	rz.start = .curr
+	debugat
 	(mode as= asmreg.CondRequest)
 	|| answer = .µ(cond, mode)
 	if answer isnt CondAnswer
@@ -115,9 +115,7 @@ function Branch (|message| cond,  |asmreg| mode,  |fatrange|)
 		if answer isnt alreadynegated
 			mode = mode.flip(asmreg.negate)
 		answer = .equals(mode, asmreg(), answer, cond)
-	rz.y = .last.index
-
-
+	rz.after = .curr
 
 	// if a or b
 		// c
@@ -132,8 +130,6 @@ function Branch (|message| cond,  |asmreg| mode,  |fatrange|)
 
 helper DoAndOr (|message| exp,  |ASMReg| Dest,  |opmode| Opp,    |ASMReg|)
 	opt norefcounts
-	// if a and b
-		// c()
 	|| A = exp.first!
 	|| B = exp.last!
 	|| ml = .ExistingVar(A)
@@ -155,30 +151,32 @@ helper DoAndOr (|message| exp,  |ASMReg| Dest,  |opmode| Opp,    |ASMReg|)
 	
 	if dest isnt CondRequest					// AAARGH
 		dest = .NumToReg(exp, 1-negate, dest)
-		(dest is alreadynegated)
 		#! this works for CONDITIONALS. What about values?
 		#! values... we could clear it first... run the first conditionally,
 		#! the second branch could just set the value? like a cmp?
 	
 	  elseif negate								// simplify logic a little.
 		(opp xor= OpMode.AndOr)
+
+	if negate
 		(dest isnt negate)
 		(dest is alreadynegated)
-
+	
 	if OPP is AND // did I get negate correct?
-		.Branch(A, negate)
-		return .DoAndPart(Exp, dest, B, negate)
+		|| ANDs = .Branch(A, negate)
+		return .DoSecondPart(Exp, dest, B, negate)
 
-	|| OrBranch = .Branch(A, !negate)
-	rz = .DoAndPart(Exp, dest, B, negate)
-	orbranch.fill(.curr)	
+	|| Ors = .Branch(A, !negate)
+	rz = .DoSecondPart(Exp, dest, B, negate)
+	ors.fill(.curr)	
 	
 
 
-function DoAndPart (|message| exp,  |ASMReg| Dest,  |message|  B,  |bool| Negate,  |ASMReg|)
+function DoSecondPart (|message| exp,  |ASMReg| Dest,  |message|  B,  |bool| Negate,  |ASMReg|)
 	if dest isnt CondRequest
 		return .Equals(dest, .µ(b), asmreg(), exp)
-	.Branch(B, negate)							// opposite jumpyness
+	|| tmp = .Branch(B, negate)							// opposite jumpyness
+	return dest
 	// hmmm?
 
 }
@@ -186,25 +184,22 @@ function DoAndPart (|message| exp,  |ASMReg| Dest,  |message|  B,  |bool| Negate
 
 
 
-datatype FatRange (ivec2)
+Struct FatRange
+	|&FatASM| Start
+	|&FatASM| After
 	iterator
-		|| curr = asmstate.sh.funcstart
-		|| final = curr + .y
-		curr += .x
-		while (curr < final)
+		|| curr = .start
+		while (curr < .after)
 			yield curr
+			curr++
 			
 	function Fill (|&fatasm| curr)
-		fatrange.fillconds(.x|uint|.fat, .y|uint|.fat, curr)
+		|| any = false
+		for s in self
+			if s is condanswer
+				(s isnt condanswer)
+				s.jumpto = curr
+				any = true
+		if !any // what?
 
-	module
-		function New (|&fatasm| a, |&fatasm| b, |fatrange|)
-			return (a.index, b.index)|fatrange|
-
-		function FillConds (|&fatasm| s, |&fatasm| a, |&fatasm| curr)
-			while s <= a
-				if s is condanswer
-					(s isnt condanswer)
-					s.jumpto = curr
-				s++
 

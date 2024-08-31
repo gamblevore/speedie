@@ -2,41 +2,41 @@
 
 
 dispatch fn_asm_table (fn_asm)
-	@arg: ASMTmp.Arg
-	@decl: asmtmp.decl
-	@num:  ASMTmp.num
-	@rel:  ASMTmp.DoMath
-	@thg:  ASMTmp.Thg
-	@bra:  ASMTmp.First
-	@sheb: ASMtmp.Ignore
+	@arg: ASMType.Arg
+	@decl: ASMType.decl
+	@num:  ASMType.num
+	@rel:  ASMType.DoMath
+	@thg:  ASMType.Thg
+	@bra:  ASMType.First
+	@sheb: ASMType.Ignore
 	@list: // vectors
 		debugger
-	@func: asmtmp.DoFunc
-	@dot:  ASMTmp.Dot
-	@acc:  ASMTmp.Access
-	@brel: asmtmp.Brel		// ++, --, -, &
-	@arel: asmtmp.arel      // ++, --, 
-	@type:					asmtmp.TypeCast
-	@tmp:					asmtmp.unexpected
+	@func: ASMType.DoFunc
+	@dot:  ASMType.Dot
+	@acc:  ASMType.Access
+	@brel: ASMType.Brel		// ++, --, -, &
+	@arel: ASMType.arel      // ++, --, 
+	@type:					ASMType.TypeCast
+	@tmp:					ASMType.unexpected
 
-	(ASMtmp.kif):			ASMstate.If
-	(ASMtmp.kwhile):		ASMstate.While
-	(asmtmp.kTern):			ASMstate.Ternary
-	(asmtmp.kContinue):		ASMstate.Continue
-	(asmtmp.kExit):			ASMstate.Exit
+	(ASMType.kif):			ASMstate.If
+	(ASMType.kwhile):		ASMstate.While
+	(ASMType.kTern):			ASMstate.Ternary
+	(ASMType.kContinue):		ASMstate.Continue
+	(ASMType.kExit):			ASMstate.Exit
 
-	(ASMtmp.kDebugger):		ASMtmp.Debugger
-	(ASMtmp.krejoin):		ASMtmp.First
-	(ASMtmp.kreturn):		ASMtmp.return
+	(ASMType.kDebugger):		ASMType.Debugger
+	(ASMType.krejoin):		ASMType.First
+	(ASMType.kreturn):		ASMType.return
 
-	(asmtmp.kSetRel):		ASMtmp.SetRel
-	(asmtmp.kStatExpr): 	ASMtmp.StatExpr
-	(asmtmp.kPointer):		asmtmp.Pointer
+	(ASMType.kSetRel):		ASMType.SetRel
+	(ASMType.kStatExpr): 	ASMType.StatExpr
+	(ASMType.kPointer):		ASMType.Pointer
 
-	(asmtmp.kIgnore):		ASMtmp.Ignore
-	(asmtmp.kFail):			ASMtmp.Ignore
+	(ASMType.kIgnore):		ASMType.Ignore
+	(ASMType.kFail):			ASMType.Ignore
 
-	63:						ASMtmp.unexpected
+	63:						ASMType.unexpected
 
 
 
@@ -50,7 +50,7 @@ function asmstate.SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |messa
 
 
 
-extend_module ASMTmp {
+extend_module ASMType {
 constants
 	IncrAfter = 2
 	IncrBefore = 0
@@ -59,8 +59,8 @@ constants
 |asm_Write[5]| WriteASM
 
 function InitAccess
-	|| R = &ASMtmp.ReadASM[0]
-	|| W = &ASMtmp.WriteASM[0]
+	|| R = &ASMType.ReadASM[0]
+	|| W = &ASMType.WriteASM[0]
 	R++[] = ASM.RD1U, W++[] = ASM.WR1U
 	R++[] = ASM.RD1S, W++[] = ASM.WR2U
 	R++[] = ASM.RD2U, W++[] = ASM.WR4U
@@ -446,7 +446,7 @@ function Ignore			(fn_asm)
 
 
 function Unexpected		(fn_asm)
-	"bad asmtmp"
+	"bad ASMType"
 	debugger
 
 }
@@ -509,9 +509,9 @@ function ASMReg.ReadOrWrite (|message| m, |asmreg| ptr, |int| index, |bool| DoRe
 	|asm| A
 	if DoRead
 		|| B = (bytes<<1) + t.issigned
-		A = ASMtmp.ReadASM[b]
+		A = ASMType.ReadASM[b]
 	  else
-		A = ASMTmp.WriteASM[bytes]
+		A = ASMType.WriteASM[bytes]
 	isnt set
 	return m.RD4U(self, ptr, asmreg(), index, 0)
 //		r1		R	// dest
@@ -542,7 +542,7 @@ function asmstate.ExistingVar (|message| m, |datatypecode| destType=datatypecode
 		m = m.first!
 		fn = m.func
 	if fn == @thg
-		return asmtmp.ThgSub(self, m, asmreg(), 2)
+		return ASMType.ThgSub(self, m, asmreg(), 2)
 	//if fn == @num
 	//	return .FindConstDecl(m.ASMDecl)
 

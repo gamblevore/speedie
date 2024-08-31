@@ -328,7 +328,7 @@ function Message.SetType (|DotUseType|)
 	if .func == @acc
 		return DotUseType.memory
 	if self isbrel "*"
-		if .ASMType!=ASMtmp.kPointer // what?
+		if .ASMType!=ASMType.kPointer // what?
 		return DotUseType.memory
 
 
@@ -630,7 +630,7 @@ function Message.RefDisappears (|bool|)
 
 function message.IsStatementExpr (|bool|)
 	opt norefcounts
-	return .ASMType == ASMtmp.kStatExpr
+	return .ASMType == ASMType.kStatExpr
 
 
 function message.RC_HasTemporary (|int|)

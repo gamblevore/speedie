@@ -1,6 +1,7 @@
 
 
 module ASMExamples {
+target pack { 
 function PackTestConsts
 //	#! RUN!!
 	visible
@@ -47,7 +48,7 @@ function PackTestAndOr2 (|bool| c, |bool| d, |int|)
 		rz = 8
 		
 
-target pack { target debug2 {
+target debug2 {
 
 
 // case 1
@@ -313,32 +314,6 @@ helper asm_test_flow (|int| a, |int| b, |int|)
 		b = 0
 	if 1.CountBits == 2.CountBits
 		|| x = 2
-	
-	
-
-
-ignore {
-
-function asm_test_add (|int| a, |int| b, |int|)
-	|| y = 2.0
-	return ((a + b) / 2) - ((a / b) * 2)
--->
-asm asm_test_add
-	SETK: r3, 29, 1				// 2.0
-	ADD:  r31, r1, r2			// a+b
-	SETK: r30, 0, 1				// const 2
-	DIV:  r0, r31, r31, r30, 0	// (a+b)/ 2
-	DIV:  r0, r30, r1, r2, 0	// (a/b)
-	SETK: r29, 0, 1				// load const 2 (could be optimised)
-	MUL:  r30, r30, r29, r0		// (a/b) * 2
-	SUB:  r1, r31, r30			// -
-	RET:  r1, r0, 1, 0			// return
-// Seems to be ok actually? Just the const can be removed...
-// also values that are written but never used.
-// we could store the regs in ONE value that is a 64-bit value... so each 2 bits gives us a type of 0-3
-// awkward to be honest... but maybe ok. we could store two versions? like a condensed version?
-}
-
 }}}
 
 // im not sure what other tests need doing? We'll think of some... over time!!

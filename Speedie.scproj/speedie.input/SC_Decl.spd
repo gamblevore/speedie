@@ -360,7 +360,7 @@ class SCDecl (SCNamed) {
 			return i
 		
 		if .PointerCount > 0
-			brel.ASMType = ASMtmp.kPointer
+			brel.ASMType = ASMType.kPointer
 			return .internal
 		
 		if !isaccess and .isnormalobject

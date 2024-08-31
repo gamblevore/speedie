@@ -226,7 +226,7 @@ function Tran_BlindCasts (tranfunc)
 
 function Tran_Swap (TranFunc)
 	opt norefcounts
-	node.ASMType = asmtmp.kSwap	
+	node.ASMType = ASMType.kSwap	
 	expect (node == 2) (node, "Just swap two items.")
 	node.name = "JB_Swap" 
 	|| ln = node.first!
@@ -240,15 +240,15 @@ function Tran_Swap (TranFunc)
 		Tran_PrintSub(fn, node, name_space)
 		node.last!.obj = compiler.swapfunc
 		node.obj = typevoidptr
-		node.ASMType = asmtmp.kSwap	
+		node.ASMType = ASMType.kSwap	
 
 
 function Tran_While (TranFunc)
-	if node.ASMType == asmtmp.kwhile
+	if node.ASMType == ASMType.kwhile
 		return
 
 	node.name = "while"
-	node.ASMType = asmtmp.kWhile
+	node.ASMType = ASMType.kWhile
 	|| Cond	= node.needfirst					#require
 	|| arg	= cond.next
 
@@ -389,7 +389,7 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |SCNode| space)
 
 	ifn (src.blocks is return) or (src.last istmp "return") 
 		|| ret = src.msg(@tmp, "return")
-		ret.ASMType = asmtmp.kreturn 
+		ret.ASMType = ASMType.kreturn 
 		if used
 			ret.msg(@thg, "rz").obj = d 
 		  else
@@ -931,11 +931,11 @@ function message.CheckContinuesAndExits
 
 
 function message.LoopExit
-	.LoopExitter(ASMtmp.kExit, SCBlockage.Exit)
+	.LoopExitter(ASMType.kExit, SCBlockage.Exit)
 
 
 function message.LoopContinue
-	.LoopExitter(ASMtmp.kContinue, SCBlockage.Continue)
+	.LoopExitter(ASMType.kContinue, SCBlockage.Continue)
 
 
 function message.LoopExitter (|int| ASMType, |SCBlockage| ExitCode)

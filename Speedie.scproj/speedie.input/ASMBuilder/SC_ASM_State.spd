@@ -223,12 +223,13 @@ struct ASMState
 			.MarkAvailableValues
 
 		target debug
-			|| ty = exp.ASMDecl
-			|| sst = ss.µtype
-			if sst != dest.µtype and ty.typeonly
-				printline exp
-				debugger
-				(fn)(self, exp, dest)
+			if exp.asmtype < ASMType.kElseIf
+				|| ty = exp.ASMDecl
+				|| sst = ss.µtype
+				if sst != dest.µtype and ty.typeonly
+					printline exp
+					debugger
+					(fn)(self, exp, dest)
 		return ss
 
 
@@ -246,7 +247,7 @@ struct ASMState
 
 
 		
-function @ASMTmp.DoFunc (fn_Asm)
+function @ASMType.DoFunc (fn_Asm)
 	opt norefcounts
 	|| prms = exp.last!
 	|| fn = prms.asfunc

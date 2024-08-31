@@ -21,27 +21,27 @@ extend_module ArchonPurger {
 		@str:	String
 		@num:	Number
 		@char:	Char
-		(asmtmp.kif):			If
-		(asmtmp.kdebugger):		ignore
-		(asmtmp.kWhile):		While
-		(asmtmp.kContinue):		Continue
-		(asmtmp.kExit):			Exit
-		(asmtmp.kSetRel):		SetRel
-		(asmtmp.kSwap):			Swap
-		(asmtmp.kStatExpr): 	StatExpr
-		(asmtmp.kReturn):		Return
-		(asmtmp.kTern):			Tern
-		(asmtmp.kPointer):		Pointer
-		(asmtmp.kIgnore):		Ignore
-		(asmtmp.krejoin):		Rejoin
-		(asmtmp.kFail):			Fail
+		(ASMType.kif):			If
+		(ASMType.kdebugger):		ignore
+		(ASMType.kWhile):		While
+		(ASMType.kContinue):		Continue
+		(ASMType.kExit):			Exit
+		(ASMType.kSetRel):		SetRel
+		(ASMType.kSwap):			Swap
+		(ASMType.kReturn):		Return
+		(ASMType.kTern):			Tern
+		(ASMType.kStatExpr): 	StatExpr
+		(ASMType.kPointer):		Pointer
+		(ASMType.kIgnore):		Ignore
+		(ASMType.krejoin):		Rejoin
+		(ASMType.kFail):			Fail
 
 	
 	TrackerDummies()
 	function TrackerDummies
 		for i in 64
 			NilTable[i]     := &Dummy
-			fn_asm_table[i] := &asmtmp.unexpected
+			fn_asm_table[i] := &ASMType.unexpected
 
 
 
@@ -77,7 +77,7 @@ function Jump (NilTrackerFn)
 //	"bug".trap(msg)
 	|| t = msg.ASMType
 		return (NilTable[t]!)(msg, test)
-	t = msg.func|asmtmp|
+	t = msg.func|ASMType|
 	msg.ASMType = t
 	return (NilTable[t]!)(msg, test)
 
@@ -88,7 +88,7 @@ function PropertyToFunc (|message!| dot, |scfunction!| fn, |nilstate|)
 	// b(a, c)
 	
 	dot.func = @func
-	dot.ASMType = (@func)|asmtmp|
+	dot.ASMType = (@func)|ASMType|
 	|| upon = dot.First!
 	|| Prms = dot.Last!
 	Prms.obj = fn

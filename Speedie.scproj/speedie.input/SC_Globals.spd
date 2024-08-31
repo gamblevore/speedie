@@ -940,7 +940,7 @@ function TypeOfTernary (ExprResolver)
 		list.become(@thg, "JB_Ternary")
 		params.obj = compiler.TernaryFunc
 		params <~ list.first
-		exp.ASMType = ASMtmp.ktern
+		exp.ASMType = ASMType.ktern
 		return result
 
 
@@ -1226,7 +1226,7 @@ function TypeOfExprNeeded ( |message| exp, |SCNode| name_space, |SCDecl| )
 
 function message.BecomeSetRel
 	.func = @rel
-	.asmtype = asmtmp.kSetRel
+	.asmtype = ASMType.kSetRel
 
 
 function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name_space, |message| side, |scdecl|) {
@@ -1445,7 +1445,7 @@ function TypeOfRel (ExprResolver)
 			error (opch, "Can't use this operator here.")
 	  elseif (ShouldBeSet)
 		side = rn
-		exp.ASMType = asmtmp.kSetRel // for the ASM
+		exp.ASMType = ASMType.kSetRel // for the ASM
 	  else
 		error (opch, "Did you mean '=='?")
 
@@ -1887,7 +1887,7 @@ function Tran_ArgArray (|Message| Exp, |SCNode| name_space, |scdecl| decl)
 		d.default = nil
 
 	rel.func = @sheb			// comment
-	rel.ASMType = asmtmp.kIgnore
+	rel.ASMType = ASMType.kIgnore
 	if place == rel
 		rel.next = thg
 		Place = thg
