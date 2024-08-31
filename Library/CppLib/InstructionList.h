@@ -42,7 +42,7 @@
 &&ADDK,
 &&ADPK,
 &&ADD,
-&&SUBB,
+&&SUB,
 &&MULT,
 &&DIVV,
 &&DIVK,

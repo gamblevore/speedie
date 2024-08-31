@@ -25,22 +25,19 @@ function If				(fn_asm)
 		ElseIfCond = nil
 		arg2 = nil
 
-	|| Start = .Branch2(cond, Flip)
+	|| B = .Branch(cond, Flip)
 	rz = .µ(arg1)
-	for s in start
-		if s is CondRequest
-			(s isnt condrequest)
-			s.jumpto = .curr
+	B.fill(.curr)
+	
 	if ElseIfCond or arg2.HasAny
 		|| AfterFirst = arg1.jump(0) // marks as ended... to prevent opts. can be removed later during optimisation
 		if ElseIfCond
 			|| a = asmreg()
-			rz = .IF(elseifcond, a)
+			rz = .IF(ElseIfCond, a)
 		  else
 			rz = asmtmp.ARG(self, arg2)
 		AfterFirst.jumpto = .curr
 
-	
 
 function While			(fn_asm)
 	opt norefcounts
@@ -52,7 +49,7 @@ function While			(fn_asm)
 	BEGIN.jumpto = CONTINUE
 	|| GOBACK = .branch(exp.first!)						// cond
 	|| EXIT = .curr
-	GOBACK.jumpto = BEGIN+1
+	GOBACK.fill(BEGIN+1)
 	|| C = BEGIN
 
 	while C < CONTINUE
@@ -75,7 +72,7 @@ function Exit			(fn_asm)
 
 function Continue		(fn_asm)
 	opt norefcounts
-	self <~ (kcontinue, exp)											// request jump fwd a little less
+	self <~ (kcontinue, exp)										// request jump fwd a little less
 
 
 function Ternary		(fn_asm)
@@ -97,27 +94,40 @@ function Ternary		(fn_asm)
 	.µ(A, dest)
 	|| Exit = exp.jump(0)
 
-	FailToSecond.jumpto = .curr
+	FailToSecond.fill(.curr)
 
 	rz = .µ(B, dest)
 	Exit.r[3] = .curr - Exit
 	
 
-//FatRange
-function Branch2 (|message| cond,  |bool| neg=false,  |fatrange|)
-function Branch (|message| cond,  |bool| neg=false,  |!&fatasm|)
-	|| req = asmreg.CondRequest
-	if neg
-		req = req as asmreg.negate
-	|| answer = .µ(cond, req)
-	if answer is CondAnswer
-		return answer.needfat
-	
-	// if a + b, so we got (a+b), now we compare it to 0
-	if answer isnt alreadynegated
-		Req = req.flip(asmreg.negate)
-	debugat
-	return .equals(req, asmreg(), answer, cond).NeedFAT
+
+function Branch (|message| cond,  |bool| neg=false,  |fatrange|)
+	return .branch(cond, ASMReg.negate * neg)
+
+
+function Branch (|message| cond,  |asmreg| mode,  |fatrange|)
+	cpp_Part BranchSub
+	rz.x = .curr.index
+	(mode as= asmreg.CondRequest)
+	|| answer = .µ(cond, mode)
+	if answer isnt CondAnswer
+		debugat
+		if answer isnt alreadynegated
+			mode = mode.flip(asmreg.negate)
+		answer = .equals(mode, asmreg(), answer, cond)
+	rz.y = .last.index
+
+
+
+	// if a or b
+		// c
+	// if TRUE1                --> jump after (b)
+	// if false1 and FALSE2    --> leave to owner, on reverse condition
+
+	// if a and b
+		// c
+	// if false1 --> leave to owner
+	// if false2 --> leave to owner
 
 
 helper DoAndOr (|message| exp,  |ASMReg| Dest,  |opmode| Opp,    |ASMReg|)
@@ -129,9 +139,9 @@ helper DoAndOr (|message| exp,  |ASMReg| Dest,  |opmode| Opp,    |ASMReg|)
 	|| ml = .ExistingVar(A)
 	|| mr = .ExistingVar(B)
 
-	|| negate = dest is negate				//  !(a and b) === !a or !b
+	|| negate = dest is negate					//  !(a and b) === !a or !b
 	if (ml and mr) and !negate
-		if ml.reg == mr.reg					// x = a or a --> x = a|bool|
+		if ml.reg == mr.reg						// x = a or a --> x = a|bool|
 			if ml.µType is bool
 				return ml
 			return .Equals(dest as asmreg.negate, ml, asmreg(), A)
@@ -143,37 +153,36 @@ helper DoAndOr (|message| exp,  |ASMReg| Dest,  |opmode| Opp,    |ASMReg|)
 				fat.op = asm.BOAR
 			return fat*dest
 	
-	
-	if dest isnt CondRequest				// AAARGH
+	if dest isnt CondRequest					// AAARGH
 		dest = .NumToReg(exp, 1-negate, dest)
 		(dest is alreadynegated)
-		#! this works for CONDTIONALS. What about values?
+		#! this works for CONDITIONALS. What about values?
 		#! values... we could clear it first... run the first conditionally,
 		#! the second branch could just set the value? like a cmp?
 	
-	  elseif negate // simplify logic a little.
+	  elseif negate								// simplify logic a little.
 		(opp xor= OpMode.AndOr)
 		(dest isnt negate)
 		(dest is alreadynegated)
 
-	if OPP is OR
-		.Branch(A, negate).JumpTo = .curr
-		negate = !negate
-	  else
-		|| BA = .Branch(A, negate)
-		(ba is CondRequest)
+	if OPP is AND // did I get negate correct?
+		.Branch(A, negate)
+		return .DoAndPart(Exp, dest, B, negate)
+
+	|| OrBranch = .Branch(A, !negate)
+	rz = .DoAndPart(Exp, dest, B, negate)
+	orbranch.fill(.curr)	
 	
+
+
+function DoAndPart (|message| exp,  |ASMReg| Dest,  |message|  B,  |bool| Negate,  |ASMReg|)
 	if dest isnt CondRequest
 		return .Equals(dest, .µ(b), asmreg(), exp)
-
-	|| BB = .Branch(B, negate)  // opposite jumpyness
-	(bb is CondRequest)
-	return bb.info
-	
-//		return .FillConds(Dest)
-
+	.Branch(B, negate)							// opposite jumpyness
+	// hmmm?
 
 }
+
 
 
 
@@ -184,4 +193,18 @@ datatype FatRange (ivec2)
 		curr += .x
 		while (curr < final)
 			yield curr
+			
+	function Fill (|&fatasm| curr)
+		fatrange.fillconds(.x|uint|.fat, .y|uint|.fat, curr)
+
+	module
+		function New (|&fatasm| a, |&fatasm| b, |fatrange|)
+			return (a.index, b.index)|fatrange|
+
+		function FillConds (|&fatasm| s, |&fatasm| a, |&fatasm| curr)
+			while s <= a
+				if s is condanswer
+					(s isnt condanswer)
+					s.jumpto = curr
+				s++
 

@@ -214,7 +214,7 @@ struct ASMState
 		opt norefcounts
 		target !debug
 			opt inline
-		cpp_part Get
+		cpp_part GetASM
 		|| fn = fn_asm_table[exp.ASMType]!
 		|| TmpCloser = .VTmps
 		|| ss = (fn)(self, exp, dest)
@@ -250,9 +250,7 @@ function @ASMTmp.DoFunc (fn_Asm)
 	opt norefcounts
 	|| prms = exp.last!
 	|| fn = prms.asfunc
-	ifn  fn and fn.args <= 10
-		error (prms, "Too many parameters")
-		return AsmReg()
+	expect  (fn and fn.args <= 10) (prms, "Too many parameters")
 
 	// speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:3, 8:1
 	// there are only 4 above 6!, only 14 above 5

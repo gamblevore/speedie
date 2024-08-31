@@ -145,9 +145,10 @@ module PackMaker
 		j.tmp("fncs")
 		for f in compiler.funclist
 			if f.tableid
-				j.Add(@tmp, f.ExportName, true)
-				j.add(f.ASM #expect)
-				j.exit
+				if f.Source contains " RUN!!"
+					j.Add(@tmp, f.ExportName, true)
+					j.add(f.ASM #expect)
+					j.exit
 		j.Exit(2)
 		
 	

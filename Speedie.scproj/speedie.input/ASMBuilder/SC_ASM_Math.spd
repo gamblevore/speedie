@@ -26,7 +26,7 @@ extend ASMState
 		  else
 			rz = exp.jBRA(r,0)
 		rz.op += negate
-		|| dummy = rz*asmreg.condanswer
+		dest = rz*asmreg.condanswer
 
 	
 	function Equals (fn_opasm)
@@ -115,13 +115,16 @@ extend ASMState
 		
 		return fat * Dest
 
+	function message.DivByZero
+		problem (self, "Divide by zero???")	
 
 	function QuickFloatDiv    (fn_OpASM)
 		require r is ConstAny
 		|| v = r.float
 		if v == 0.0
-			problem (Exp, "Divide by zero???")
-		if !v or v.abs == 1.0
+			Exp.DivByZero
+		if !v.fract
+			r.nop
 			return .Quick1Or1Sub(dest, l, v|int|, exp)
 
 
@@ -131,30 +134,34 @@ extend ASMState
 			return .subtract(dest, asmreg(), l, exp)
 		if ptoi == 1										//   x * 1   -->  x 
 			return l
-		return asmreg.zero									//   x * 0   -->  0
+		return dest.µtype.zero								//   x * 0   -->  0
 		
 
 	function QuickIntMul    (fn_OpASM)
 		|| PToi = .IntPowerOftwo(r)$
 
+		r.nop
 		if ptoi <= 1
 			return .Quick1Or1Sub(dest, l, ptoi, exp)
 	
-		return .BFLG_Const(exp, dest, l,  ptoi-1, 0)	// y = x * 4 --> y = x << 2
+		return exp.BFLG(dest, l,  ptoi-1, 0, 0)*Dest	// y = x * 4 --> y = x << 2
 
 
 	function QuickFloatMul    (fn_OpASM)
 		require r is ConstAny	
 		|| v = r.float
 		if  v == 1.0 or 0.0 or -1.0
+			r.nop
 			return .Quick1Or1Sub(dest, l, v|int|, exp)
 		if  v == 2.0
+			r.nop
 			return .plus(dest, l, l, exp)
 		
 		if r.Fourbytes
 			|| x = r.const
 			|| y = x >> 18
 			if x == y << 18
+				r.nop
 				return exp.FMLK(dest, l, x) * Dest
 
 	
@@ -193,8 +200,10 @@ extend ASMState
 	function PlusInt     (fn_opasm)
 		//		a - 1,		a + 1		//
 		//		1 - a,		1 + a		//
+		if dest is ConstAny // perhaps we can do this in domathsub?
+			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyIntPlus)
 		|| swapped = 0
-		if  l.LeftScore < r.leftscore
+		if  l.LeftScore < r.LeftScore
 			if l is alternate
 				target debug
 					if r.µtype.IsPointer				// 1 - ptr??? we blocked this already.
@@ -203,29 +212,26 @@ extend ASMState
 				swap (l) (r) // a+b == b+a
 
 		|| lmul = l.PointerMul(exp, swapped)
-		|&fatasm| fat
 		if r is ConstAny
 			|| RR = r.const
 			if l is alternate
 				RR = -RR
 			rr *= lmul
 			if r.CanAddK(RR)							// a - 1,  a + 1
-				fat = exp.ADDK(dest, L, RR)
-				if dest is ConstAny
-					|| LL = l.const
-					fat.const = ll + rr
+				r.nop
+				return exp.ADDK(dest, L, RR) * dest
 
-		if fat
-			0
-		  elseif lmul.ispow2  							// x = int1 + int2
+		|&fatasm| fat
+		if lmul.ispow2		  							// x = int1 + int2
 			fat = exp.ADD(dest, L, R, lmul.log2)		// x = lptr + r<<3
-			fat.op += l is alternate
+			if l is alternate
+				fat.op ++
 		  else
 			|| v = .GenericNumFinder(exp, lmul)
 			if l isnt alternate							// x = lptr + r*12
 				fat = exp.MULT(dest, R, V, L)
 			  else										// x = (lptr - rptr)/12
-				exp.SUBB(dest, L, R, ASMReg())
+				exp.SUB(dest, L, R, ASMReg())
 				|| uint64type = 0, debugger
 				fat = exp.DIVV(dest, ASMReg(), dest, V, uint64type)  
 			  
@@ -290,13 +296,13 @@ extend ASMState
 
 
 	function IntMul (fn_opasm)
+		if dest is ConstAny
+			.makeconst2(dest, l, r, exp, &fatasm.ConstifyIntMul)
 		rz = .QuickIntMul(dest, R, L, exp)
 		if rz == nil
 			rz = .QuickIntMul(dest, L, R, exp)
 			if rz==nil
 				rz = exp.MULT(dest, L, R, asmreg()) * Dest
-		if dest is ConstAny
-			rz.needfat.const = l.const * r.const
 
 
 	function FloatMul (fn_opasm)
@@ -336,28 +342,23 @@ extend ASMState
 			rz = exp.FDIV(dest,  L,  R,  asmreg(), dest.isbig|int|) * dest
 
 
-	function DivInt    (fn_opasm)
+	function QuickDivInt    (fn_opasm)
 		|| PToi = .IntPowerOftwo(r)
+			r.nop
 			if ptoi <= 1   //   x/1  x/0  x/-1
+				if ptoi == 0
+					exp.DivByZero
 				return .Quick1Or1Sub(dest, l, ptoi, exp)
 			if !l.Signed
-				return .BFLG_Const(exp, dest, l, 0, ptoi) // u / 2 --> u >> 1
-		
-		|| fat = exp.DIVV(dest, asmreg(), l, r, dest.IntDivType)
-		if dest is ConstAny
-			|int64| C
-			if dest.FourBytes
-				if dest.Signed
-					C = l.const|int| / r.const|int|
-				  else
-					C = l.const|uint| / r.const|uint|
+				return exp.BFLG(dest, l, 0, ptoi-1, 0)*Dest		// u / 2 --> u >> 1
 			  else
-				if dest.Signed
-					C = l.const|int64| / r.const|int64|
-				  else
-					C = l.const|uint64| / r.const|uint64|
-			fat.Const = C
-		return fat * Dest
+				return exp.DIVK(dest, l, ptoi-1, ptoi-1)*Dest	// nice
+	
+	
+	function DivInt    (fn_opasm)
+		|| q = .QuickDivInt(dest, l, r, exp)
+			return q
+		return exp.DIVV(dest, ASMReg(), l, r, dest.IntDivType) * dest
 	
 	
 	function ModFloat    (fn_opasm)
@@ -471,34 +472,3 @@ extend ASMState
 		return exp.CMPB(dest, L, asmreg(), 1)*dest
 
 
-
-
-function fatasm.ConstifyFloatPlus (fn_ASMConstifier)
-	if l.fourbytes
-		|| rf = r.F32
-		|| lf = l.F32
-		if l is alternate
-			lf -= rf
-		  else
-			lf += rf
-		.f32 = lf
-	  else
-		|| rf = r.F64
-		|| lf = l.F64
-		if l is alternate
-			lf -= rf
-		  else
-			lf += rf
-		.f64 = lf
-
-function fatasm.ConstifyFloatDiv (fn_ASMConstifier)
-	if l.FourBytes
-		.f32 = l.f32 / r.f32
-	  else
-		.f64 = l.f64 / r.f64
-
-function fatasm.ConstifyFloatMul (fn_ASMConstifier)
-	if l.FourBytes
-		.f32 = l.f32 * r.f32
-	  else
-		.f64 = l.f64 * r.f64

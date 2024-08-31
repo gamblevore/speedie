@@ -6,7 +6,7 @@ datatype FailableInt (int) // useful when you want most numbers, even negatives,
 	default FailableInt.fail
 	false FailableInt.fail
 	syntax cast (|bool|)
-		return self != fail
+		return self != fail|int|
 
 
 function message.ThgDecl (|SCDecl?|)

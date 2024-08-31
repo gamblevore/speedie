@@ -143,6 +143,9 @@ datatype ASMReg (uint64)
 	function RequestPos (|asmreg|)
 		return self as addrrequest
 	
+	function datatypecode.zero (|asmreg|)
+		rz.µtype = self
+	
 	function Fatasm.HaveAddr (|&fatasm|)
 		.info = .info.HaveAddr
 		return self
@@ -180,7 +183,7 @@ datatype ASMReg (uint64)
 
 	operator • (|asmreg| dest, |asmreg|)
 		if .reg == dest.reg
-			return ASMReg()
+			return dest.µtype.zero
 		return dest
 	
 			

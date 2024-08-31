@@ -404,23 +404,23 @@
 #define   AddK_Ku_(x)   (((uint)((x)<<18))>>18)
 
 
-#define   DivK_Spacei       ((( int)((Op)<<18))>>30)
-#define   DivK_Spacei_(x)   ((( int)((x)<<18))>>30)
+#define   DivK_Shi       ((( int)((Op)<<18))>>26)
+#define   DivK_Shi_(x)   ((( int)((x)<<18))>>26)
 
-#define   DivK_Spaceu       (((uint)((Op)<<18))>>30)
-#define   DivK_Spaceu_(x)   (((uint)((x)<<18))>>30)
+#define   DivK_Shu       (((uint)((Op)<<18))>>26)
+#define   DivK_Shu_(x)   (((uint)((x)<<18))>>26)
 
-#define   DivK_Shi       ((( int)((Op)<<20))>>26)
-#define   DivK_Shi_(x)   ((( int)((x)<<20))>>26)
+#define   DivK_Addi       ((( int)((Op)<<24))>>26)
+#define   DivK_Addi_(x)   ((( int)((x)<<24))>>26)
 
-#define   DivK_Shu       (((uint)((Op)<<20))>>26)
-#define   DivK_Shu_(x)   (((uint)((x)<<20))>>26)
+#define   DivK_Addu       (((uint)((Op)<<24))>>26)
+#define   DivK_Addu_(x)   (((uint)((x)<<24))>>26)
 
-#define   DivK_Addi       ((( int)((Op)<<26))>>26)
-#define   DivK_Addi_(x)   ((( int)((x)<<26))>>26)
+#define   DivK_Li       ((( int)((Op)<<30))>>30)
+#define   DivK_Li_(x)   ((( int)((x)<<30))>>30)
 
-#define   DivK_Addu       (((uint)((Op)<<26))>>26)
-#define   DivK_Addu_(x)   (((uint)((x)<<26))>>26)
+#define   DivK_Lu       (((uint)((Op)<<30))>>30)
+#define   DivK_Lu_(x)   (((uint)((x)<<30))>>30)
 
 
 #define   Shift_Shi       ((( int)((Op)<<23))>>26)

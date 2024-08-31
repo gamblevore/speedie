@@ -135,3 +135,66 @@ function asmreg.CanAddK (|int64| T, |bool|) // used to be used from .plus()... w
 	if (self is constany) and .isint
 		return t.CanStoreAsIntImmediate
 
+
+
+
+function fatasm.ConstifyIntDiv (fn_ASMConstifier)
+	|int64| C
+	if l.FourBytes
+		if l.Signed
+			C = l.const|int| / r.const|int|
+		  else
+			C = l.const|uint| / r.const|uint|
+	  else
+		if l.Signed
+			C = l.const|int64| / r.const|int64|
+		  else
+			C = l.const|uint64| / r.const|uint64|
+	.Const = C
+
+
+function fatasm.ConstifyIntMul (fn_ASMConstifier)
+	if l.FourBytes
+		.const = l.const|int| * r.const|int|
+	  else
+		.const = l.const|int64| * r.const|int64|
+
+
+function fatasm.ConstifyIntPlus (fn_ASMConstifier)
+	if l is alternate
+		.const = l.const - r.const
+	  else
+		.const = l.const + r.const
+
+
+function fatasm.ConstifyFloatPlus (fn_ASMConstifier)
+	if l.fourbytes
+		|| rf = r.F32
+		|| lf = l.F32
+		if l is alternate
+			lf -= rf
+		  else
+			lf += rf
+		.f32 = lf
+	  else
+		|| rf = r.F64
+		|| lf = l.F64
+		if l is alternate
+			lf -= rf
+		  else
+			lf += rf
+		.f64 = lf
+
+
+function fatasm.ConstifyFloatDiv (fn_ASMConstifier)
+	if l.FourBytes
+		.f32 = l.f32 / r.f32
+	  else
+		.f64 = l.f64 / r.f64
+
+
+function fatasm.ConstifyFloatMul (fn_ASMConstifier)
+	if l.FourBytes
+		.f32 = l.f32 * r.f32
+	  else
+		.f64 = l.f64 * r.f64

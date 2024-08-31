@@ -1598,8 +1598,9 @@ function Tran_Visible (TranFunc)
 function Tran_Return (TranFunc)  // exitter
 	require node.ASMType != asmtmp.kreturn
 	node.ASMType = asmtmp.kreturn
-
+	
 	expect (fn) (node, "Only use this on functions")
+	node.obj = fn.returntype
 	if !node.islast
 		expect (fn isnt ConOrDes)   (node, "You can’t return in a constructor or destructor")
 

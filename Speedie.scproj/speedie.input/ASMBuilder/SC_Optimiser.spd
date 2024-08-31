@@ -63,7 +63,7 @@ dispatch µOpt (|&fatasm| self, |?&fatasm| P, |?&fatasm| N, |bool|)
 	(ASM.CNTC):   OptCount
 	(ASM.TABL):   OptTabl
 
-	(ASM.SUBB):   OptSubI
+	(ASM.SUB):   OptSubI
 	(ASM.ADD):    OptAddI
 	(ASM.FADD):   OptAddF
 	(ASM.FADK):   OptFADK
@@ -107,7 +107,7 @@ function OptFunc (Fn_µOpt)
 function OptSubI (Fn_µOpt)
 	if p 
 		|| op = p.op
-		if op == asm.bflg or asm.SUBB or asm.ADD
+		if op == asm.bflg or asm.SUB or asm.ADD
 			return OptAddI(self, p, n)
 
 

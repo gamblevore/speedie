@@ -2,7 +2,7 @@
 
 module ASMExamples {
 function PackTestConsts
-	#! RUN!!
+//	#! RUN!!
 	visible
 	|f64| r1 = 2						// int as f64
 	|| r2 = (1.0/2|f64|)
@@ -19,6 +19,7 @@ function PackTestMath (|int| a, |int| b, |int|)
 	return ((a + b) / 2) - ((a / b) * 2)
 
 function PackTestAndOr (|int| a, |int| b, |bool| c, |bool| d, |int|)
+	#! RUN!!
 	visible
 	if a
 		rz = 1
@@ -32,6 +33,7 @@ function PackTestAndOr (|int| a, |int| b, |bool| c, |bool| d, |int|)
 		rz = 5
 		
 function PackTestAndOr2 (|bool| c, |bool| d, |int|)
+	#! RUN!!
 	visible
 	if (c or d)
 		rz = 6

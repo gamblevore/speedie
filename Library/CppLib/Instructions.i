@@ -52,14 +52,19 @@
 	i2 = i2 + U2_Li;
 ı ADD: _
 	i1 = i2 + (i3 << Shift_Shu);
-ı SUBB: _
+ı SUB: _
 	i1 = (i2 - i3) >> Shift_Shu;
 ı MULT: _
 	i1 = (i2 * i3) + i4;
 ı DIVV: _
 	DivMath(r, Op);
 ı DIVK: _
-	i1 = (i2 + ((1 << DivK_Addu) - 1)) >> DivK_Shu;
+	if (i2 < 0) 
+	i1 = (i2 + ((1 << DivK_Addu) - 1)) >> DivK_Shu
+;
+	else 
+	i1 = i2 >> DivK_Shu
+;
 ı MAX: _
 	if (MinMax_Signu) 
 	i1 = std_max(i2, i3)

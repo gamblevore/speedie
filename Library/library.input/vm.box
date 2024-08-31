@@ -181,7 +181,6 @@ forms
 	DivK
 		r1		R
 		r2		r
-		Space	2
 		Sh		6 // could be used to add other numbers...
 		Add		6 // in case we don't JUST wanna div by a power of 2
 	
@@ -293,14 +292,17 @@ forms
 		i2 = i2 + U2_Li
 /**/ ADD  (Shift)
 		i1 = i2 + (i3 << Shift_Shu)
-/**/ SUBB  (Shift)              	// must come after ADD
+/**/ SUB  (Shift)              					// must come after ADD
 		i1 = (i2 - i3) >> Shift_Shu
 /**/ MULT  (U4)
 		i1 = (i2 * i3) + i4
 /**/ DIVV (Div)
 		DivMath(r, Op)
 /**/ DIVK (DivK)
-		i1 = (i2+((1<<DivK_Addu)-1)) >> DivK_Shu // quick divide by power of 2
+	if (i2 < 0)
+		i1 = (i2+((1<<DivK_Addu)-1)) >> DivK_Shu	// quick divide by power of 2
+	else
+		i1 = i2 >> DivK_Shu
 /**/ MAX (MinMax)
 		if (MinMax_Signu)
 			i1 = std_max(i2, i3)

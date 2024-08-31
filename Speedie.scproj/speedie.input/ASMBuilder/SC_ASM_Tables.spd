@@ -267,6 +267,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |as
 	|| d = exp.ASMDecl
 	if d is local
 		return d.wholetype
+	rz = d.typeonly.zero
 
 	if d is const
 		|| R = dest.reg
@@ -275,12 +276,11 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |as
 			require !mode
 			(dest is constany)
 			return .NumToReg(exp, val, dest)
-		return AsmReg()
-
-	if mode
-		return nil
-	check (d is global) (Exp)
-	return DoGlobal(self, exp, dest, d)
+	  else
+		if mode
+			return nil
+		check (d is global) (Exp)
+		DoGlobal(self, exp, dest, d)
  
 
 helper DoGlobalSub (|&FATASM| addr, |int| add, |message| exp,  |asmreg|)
@@ -465,9 +465,11 @@ helper ASMState.DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMR
 		|| L = exp.last!
 		if dest is notyetused
 			submode.reg = dest.reg
+		submode.µtype = F.asmdecl.typeonly // unnecessary?
 		ml = .µ(F, SubMode)
 		if ml.reg == dest.reg // we used it!
 			submode.reg = 0
+		submode.µtype = L.asmdecl.typeonly // unnecessary?
 		mr = .µ(L, SubMode)
 		(ml asnt= asmreg.stayopen)
 	  else
