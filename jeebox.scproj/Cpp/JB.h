@@ -936,15 +936,6 @@ extern bool JB__Err_KeepStackTrace;
 
 
 
-// ASMExamples
-int JB_ASMExamples__PackTestAndOr(int A, int B, bool C, bool D);
-
-int JB_ASMExamples__PackTestAndOr2(bool C, bool D);
-
-void JB_ASMExamples__PackTestConsts();
-
-
-
 // App
 JB_String* JB_App__AppName();
 

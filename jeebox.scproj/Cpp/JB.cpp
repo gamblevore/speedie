@@ -31,62 +31,6 @@ extern JB_StringC* JB_LUB[559];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
-int JB_ASMExamples__PackTestAndOr(int A, int B, bool C, bool D) {
-	int Rz = 0;
-	//visible;
-	if (A) {
-		Rz = 1;
-	}
-	if (((bool)A) and ((bool)B)) {
-		Rz = 2;
-	}
-	if ((!A) and (B > 3)) {
-		Rz = 3;
-	}
-	if (((bool)A) or ((bool)B)) {
-		Rz = 4;
-	}
-	if ((B < -1) or (B > 5)) {
-		Rz = 5;
-	}
-	return Rz;
-}
-
-int JB_ASMExamples__PackTestAndOr2(bool C, bool D) {
-	int Rz = 0;
-	//visible;
-	if (C or D) {
-		Rz = 6;
-	}
-	if (D and C) {
-		Rz = 7;
-	}
-	if (!(C or D)) {
-		Rz = 6;
-	}
-	if (!(D and C)) {
-		Rz = 7;
-	}
-	if (!(D and (!C))) {
-		Rz = 8;
-	}
-	return Rz;
-}
-
-void JB_ASMExamples__PackTestConsts() {
-	// RUN!!;
-	//visible;
-	double R1 = ((double)2);
-	double R2 = (((double)1.0f) / ((double)2));
-	R2 = (((double)1.0f) / R1);
-	float R3 = 0.1f + ((float)1);
-	float R4 = 3.4567f + ((float)R1);
-	double R5 = ((double)1234.5f) + ((double)5678.9f);
-	float R6 = ((float)2);
-	double R7 = ((double)1.0f);
-}
-
-
 JB_String* JB_App__AppName() {
 	JB_String* _tmPf0 = JB_Incr(JB_App__AppPath());
 	JB_String* _tmPf1 = JB_Incr(JB_Str_Name(_tmPf0));
@@ -7922,7 +7866,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024082921);
+	return (2024083118);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -7934,4 +7878,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 -1375419547894361413 9067030407373507916
+// -2934619186805667969 3921176843287677216 9067030407373507916
