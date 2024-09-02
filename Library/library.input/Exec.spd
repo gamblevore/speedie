@@ -44,7 +44,7 @@ datatype ErrorInt2 (ivec2)
 
 target !minilib {
 extend string	
-	function Execute       (|[string]?| Args = [],  |faststring?| Out = nil, |faststring?| Errs = nil, |ProcessOwnerMode| Mode=ProcessOwnerMode.StdOutFlowsThroughUs, |date| timeout=0, |ErrorInt2|)
+	function Execute (|[string]?| Args = [],  |faststring?| Out = nil, |faststring?| Errs = nil, |ProcessOwnerMode| Mode=ProcessOwnerMode.StdOutFlowsThroughUs, |date| timeout=0, |ErrorInt2|)
 		cpp_wrapper JB_Str_Execute
 
 	function SilentExecute (|[string]?| Args = [],  |faststring?| Out = nil, |faststring?| Errs = nil, |date| timeout=0,  |ErrorInt2|)
