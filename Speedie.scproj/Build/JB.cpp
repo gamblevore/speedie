@@ -1971,7 +1971,7 @@ SCFunction* SC_Comp__LoadTypeTest(JB_String* S) {
 void SC_Comp__Main() {
 	if (SC_Comp__EnterCompile()) {
 		if (true) {
-			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1162], (113066892394496));
+			FlowControlStopper __varf1 = JB_Flow__FlowAllow(JB_LUB[1162], (113067868901401));
 			FlowControlStopper _usingf0 = JB_FlowControlStopper_SyntaxUsing(__varf1);
 			SC_Comp__CompileTime();
 			DTWrap* _tmPf2 = JB_Incr(JB_Wrap_ConstructorInt(nil, __varf1));
@@ -3296,7 +3296,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[185]);
-	JB_FS_AppendInt32(_fsf0, (2024090208));
+	JB_FS_AppendInt32(_fsf0, (2024090213));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8359,7 +8359,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[840]);
-	JB_FS_AppendInt32(_fsf0, (2024090208));
+	JB_FS_AppendInt32(_fsf0, (2024090213));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -30771,31 +30771,35 @@ bool SC_File_TestSpeedie(JB_File* Self, JB_String* V) {
 	JB_Array_SyntaxAppend(Cmd_args, JB_LUB[327]);
 	JB_Array_SyntaxAppend(Cmd_args, Variant);
 	JB_Decr(Variant);
-	if (SC__Options_PrintCompileString) {
-		JB_Array_SyntaxAppend(Cmd_args, JB_LUB[329]);
-	}
 	if (JB_Str_Exists(SC__Options_Arch)) {
 		JB_String* _tmPf3 = JB_Incr(JB_Str_OperatorPlus(JB_LUB[324], SC__Options_Arch));
 		JB_Array_SyntaxAppend(Cmd_args, _tmPf3);
 		JB_Decr(_tmPf3);
 	}
-	JB_String* _tmPf4 = JB_Incr(JB_File_Path(Self));
-	JB_Str_Execute(_tmPf4, Cmd_args, nil, nil, kJB__PIDM_StdOutFlowsThroughUs, 0);
+	if (SC__Options_PrintCompileString) {
+		JB_Array_SyntaxAppend(Cmd_args, JB_LUB[329]);
+		JB_String* _tmPf4 = JB_Incr(JB_File_Path(Self));
+		JB_PrintLine(_tmPf4);
+		JB_Decr(_tmPf4);
+		JB_Obj_PrintLine(Cmd_args);
+	}
+	JB_String* _tmPf5 = JB_Incr(JB_File_Path(Self));
+	JB_Str_Execute(_tmPf5, Cmd_args, nil, nil, kJB__PIDM_StdOutFlowsThroughUs, 0);
 	JB_Decr(Cmd_args);
-	JB_Decr(_tmPf4);
-	JB_String* _tmPf5 = JB_Incr(JB_Str_OperatorPlus(JB_LUB[1217], V));
-	JB_File* TestProd = JB_Incr(SC_Comp__SpeedieDir(_tmPf5));
 	JB_Decr(_tmPf5);
+	JB_String* _tmPf6 = JB_Incr(JB_Str_OperatorPlus(JB_LUB[1217], V));
+	JB_File* TestProd = JB_Incr(SC_Comp__SpeedieDir(_tmPf6));
+	JB_Decr(_tmPf6);
 	JB_File_MustExist(TestProd, JB_LUB[690]);
 	JB_Decr(TestProd);
-	JB_String* _tmPf7 = JB_Incr(SC_Ext__TmpOut(V));
-	JB_String* _tmPf6 = JB_Incr(JB_Str_ReadFile(_tmPf7, 1073741824, true));
-	JB_Decr(_tmPf7);
-	JB_Str_Print(_tmPf6);
-	JB_Decr(_tmPf6);
-	JB_String* _tmPf8 = JB_Incr(SC_Ext__TmpErr(V));
-	JB_String* Test_err = JB_Incr(JB_Str_ReadFile(_tmPf8, 1073741824, true));
+	JB_String* _tmPf8 = JB_Incr(SC_Ext__TmpOut(V));
+	JB_String* _tmPf7 = JB_Incr(JB_Str_ReadFile(_tmPf8, 1073741824, true));
 	JB_Decr(_tmPf8);
+	JB_Str_Print(_tmPf7);
+	JB_Decr(_tmPf7);
+	JB_String* _tmPf9 = JB_Incr(SC_Ext__TmpErr(V));
+	JB_String* Test_err = JB_Incr(JB_Str_ReadFile(_tmPf9, 1073741824, true));
+	JB_Decr(_tmPf9);
 	if (JB_Str_Length(Test_err)) {
 		if (true) {
 			JB_Str_SyntaxExpect(Test_err);
