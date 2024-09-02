@@ -10,6 +10,7 @@
 
 #include "JB_Umbrella.hpp"
 #include <time.h>
+#include <cfloat>
 
 extern "C" {
 
@@ -371,9 +372,13 @@ bool HasDot (uint8* self, int Used) {
 
 
 
+static bool DoubleIsNormal(double D){
+	return (D <= DBL_MAX && D >= -DBL_MAX) and (D == D);
+}
+
 void JB_FS_AppendDoubleAsText(FastString* self, double D, int dp, bool CanExp, bool Dot) {
 // need a "mode" really... what about if we want no exp but DO want the full length?
-    if_rare (std::isinf(D) or std::isinf(D))
+    if_rare (!(DoubleIsNormal(D)))
 		return JB_FS_AppendCString(self, "nan");
 	// -+inf would freeze us otherwise
 	

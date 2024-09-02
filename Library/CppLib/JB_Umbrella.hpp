@@ -10,6 +10,7 @@
 
 #include "JB_LibTypes.h"
 #include <math.h>
+#include <cmath> // somehow both are needed for OSX ARM vs OSX Intel. Sigh.
 #include "StringFunctions.h"
 #include "StringFunctionsLib.h"
 
