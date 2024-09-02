@@ -372,8 +372,8 @@ bool HasDot (uint8* self, int Used) {
 
 
 
-static bool DoubleIsNormal(double D){
-	return (D <= DBL_MAX && D >= -DBL_MAX) and (D == D);
+static bool DoubleIsNormal (double D){
+	return  D <= DBL_MAX  &&  D >= -DBL_MAX ;
 }
 
 void JB_FS_AppendDoubleAsText(FastString* self, double D, int dp, bool CanExp, bool Dot) {
