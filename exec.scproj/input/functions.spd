@@ -60,6 +60,7 @@ class function
 	render:					fs <~ .name
 
 	constants
+		|int| 
 		bear = 0xB0B0BA14
 
 	module

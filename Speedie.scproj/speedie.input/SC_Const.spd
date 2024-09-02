@@ -65,11 +65,11 @@ function SCNode.CalculateConstRel (|message!| value, |&datatypecode| Ty, |uint64
 	if lg == 2
 		if n == '<'
 			|| T = L << R
-			expect ((T >> R) == L) (value, "Loses numeric info.")
+			expect ((T >> R) == L) (value, "Loses numeric info. [3]")
 			return T
 		if n == '>'
 			|| T = L >> R
-			expect ((T << R) == L) (value, "Loses numeric info.")
+			expect ((T << R) == L) (value, "Loses numeric info. [2]")
 			return T
 	
 	error (value)
@@ -224,8 +224,11 @@ function SCNode.CollectConstantsSub (|Message| ch)
 				ValueNode.obj = TypeString!.typenormal
 				
 			  elseif (valuenode.isint) or (valuenode == @unit)
-				NewType.AssignabilityCheck(nil, ValueNode, OMGType)  
+				|| WasHex = ValueNode.Name[0, "0x"] or ValueNode.Name[0, "0b"]
+				NewType.AssignabilityCheck(nil, ValueNode, OMGType, washex)
 				nextnum = valuenode.int
+				if WasHex and (nextnum >= 0x8000_0000 and nextnum <= 0xFFFF_FFFF) and !currtype// hmmm lets see.
+					error (ValueNode, "Unclear what type to use here. Use |int| or |int64| to specify")
 				newitem.NumberConst = nextnum
 				nextnum++
 			  else

@@ -1338,7 +1338,7 @@ function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| c
 }
 
 
-function scdecl.ConstInRangeSub (|int64| Value, |bool|)
+function scdecl.ConstInRangeSub (|int64| Value, |bool| WasHex, |bool|)
 	|| T = .type.typeinfo
 	|| S = t.ByteCount
 	if S == 8
@@ -1346,32 +1346,32 @@ function scdecl.ConstInRangeSub (|int64| Value, |bool|)
 	if t.isint
 		|| ign = t.issigned
 		if S == 4
-			if ign
+			if ign and !WasHex
 				return (value >= int.min) and (value <= int.max)
 			  else
 				return (value >= -1) and (value <= 0xFFFFffff)
 				
 		  elseif S == 2
-			if ign
+			if ign and !WasHex
 				return value >= int16.min and value <= int16.max
 			  else
 				return (value >= -1) and (value <= 0xFFFF)
 		  elseif S == 1
-			if ign
+			if ign and !WasHex
 				return (value >= int8.min) and (value <= int8.max)
 			  else
 				return (value >= -1) and (value <= 0xFF)
 	return true
 
 
-function scdecl.ConstInRange (|message| RN, |scdecl| rt, |bool|)
+function scdecl.ConstInRange (|message| RN, |scdecl| rt, |bool| WasHex,  |bool|)
 	opt norefcounts
 	if RN == @num	
 		if rn.isint 
-			return .ConstInRangeSub(rn.int)
+			return .ConstInRangeSub(rn.int, washex)
 	
 	  elseif (rn == @thg) and (rt is NumberConst) and rt.isnormalnumber and rt.isinteger
-		return .ConstInRangeSub(rt.exportposition)
+		return .ConstInRangeSub(rt.exportposition, washex)
 
 	// if RN == @num... check the type of self big enough
 	// if RN == @thg and is a const... check the type of self big enough
@@ -1379,7 +1379,7 @@ function scdecl.ConstInRange (|message| RN, |scdecl| rt, |bool|)
 	return true
 
 
-function SCDecl.AssignabilityCheck (|message?| ln, |message!| RN, |scdecl| rc, |bool|)
+function SCDecl.AssignabilityCheck (|message?| ln, |message!| RN, |scdecl| rc, |bool| WasHex=false,  |bool|)
 	opt norefcounts
 	nil checker
 	require self and rc
@@ -1396,7 +1396,7 @@ function SCDecl.AssignabilityCheck (|message?| ln, |message!| RN, |scdecl| rc, |
 		error (rn, "Not assignable.")
 
 	if rc is const
-		return (.ConstInRange(RN, rc))		#expect (RN, "Loses numeric info.") 
+		return (.ConstInRange(RN, rc, washex))		#expect (RN, "Loses numeric info [1]") 
 	return true
 
 

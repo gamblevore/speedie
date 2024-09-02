@@ -2,9 +2,10 @@
 
 datatype FailableInt (int) // useful when you want most numbers, even negatives, and zero but still want AN error code
 	constants
+		|int| 
 		Fail = 0x8000_0000
 	default FailableInt.fail
-	false FailableInt.fail
+	false   FailableInt.fail
 	syntax cast (|bool|)
 		return self != fail|int|
 
@@ -12,6 +13,7 @@ datatype FailableInt (int) // useful when you want most numbers, even negatives,
 function message.ThgDecl (|SCDecl?|)
 	if .func == @thg
 		return .fastdecl
+
 
 function message.ASMDecl (|SCDecl!|)
 	opt norefcounts
@@ -29,22 +31,18 @@ function scdecl.ASMSanity
 				#!"Should we have set the dtype when the decl was created? or at least verified in the nil-checker?"
 				#!"We could change it if it is only 112."
 				debugger
-	// make sure it adds up.
 
 
 function scdecl.CalculateASMType (|asmreg|)
 	opt norefcounts
 	if .pointercount or .iscarray
 		// carrays must be allocated. So this reg will store a pointer to the carray.
-		return datatypecode._voidptr|asmreg|
+		return datatypecode._voidptr|ASMReg|
 
 	|| t = .type
 	|| b = t.BaseType
 	if b > scnodetype.datatype
-		return datatypecode._voidptr|asmreg|
-
-	target debug
-		expect (b is datatype) ("Hello kitty")
+		return datatypecode._voidptr|ASMReg|
 	
 	return t.typeinfo|asmreg|
 
