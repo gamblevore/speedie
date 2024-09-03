@@ -1505,13 +1505,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool ((int)16)
 #define kSC__CustomOps_TypeCastToBetter ((int)32)
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2099])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2104])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2100])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2101])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2098])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2101])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2102])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2105])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2106])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2103])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2106])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2107])
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
 extern int SC__FastStringOpts_StrRemoved;
@@ -1700,7 +1700,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2107])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2112])
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
 extern CharSet* SC_CSNum;
@@ -1725,7 +1725,7 @@ extern JB_String* SC_kNameConf;
 #define kJB_kNoMatch ((int)0)
 #define kJB_kNumericMatch ((int)8388608)
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2103])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2108])
 #define kJB_kSimpleMatch ((int)4194304)
 #define kJB_kSuperClassMatch ((int)16777216)
 #define kJB_kTypeCastAssigns ((int)64)
@@ -1743,7 +1743,7 @@ extern JB_String* SC_kNameConf;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2108])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[1667])
 #define kJB_kVoidPtrMatch ((int)20971520)
 extern JB_File* SC_PerryLogFile;
 extern Message* SC_ReturnSelfEqNil;
@@ -1885,10 +1885,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp ((int)32784)
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2106])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2105])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2111])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2110])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2104])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2109])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int16_max ((s16)32767)
@@ -2398,7 +2398,7 @@ extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_kDelete ((int)2)
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2097])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2102])
 extern Float64 JB__Rec_Progress;
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -2408,10 +2408,12 @@ extern bool JB__Flow_AlwaysMove;
 extern bool JB__Flow_BreakOnFail;
 extern int JB__Flow_Disabled;
 extern FlowControl* JB__Flow_Flow;
+#define kJB__Flow_FlowEnabled ((bool)false)
 extern byte JB__Flow_FlowMode;
 #define kJB__Flow_Log ((int)1)
 #define kJB__Flow_Off ((int)0)
 extern CompressionStats JB__Flow_Stats;
+extern bool JB__Flow_SuggestSwitch;
 #define kJB__Flow_Validate ((int)2)
 #define kSC__Instruction_kTypeConst ((int)2)
 #define kSC__Instruction_kTypeFunc ((int)1)
@@ -2815,6 +2817,8 @@ bool SC_FB__AppOptions_errortest(JB_String* Name, JB_String* Value, FastString* 
 
 bool SC_FB__AppOptions_flow(JB_String* Name, JB_String* Value, FastString* Purpose);
 
+bool SC_FB__AppOptions_flowmode(JB_String* Name, JB_String* Value, FastString* Purpose);
+
 bool SC_FB__AppOptions_force(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_funccount(JB_String* Name, JB_String* Value, FastString* Purpose);
@@ -2826,8 +2830,6 @@ bool SC_FB__AppOptions_help(JB_String* Name, JB_String* Value, FastString* Purpo
 bool SC_FB__AppOptions_ignorecantsave(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_keepallerrors(JB_String* Name, JB_String* Value, FastString* Purpose);
-
-bool SC_FB__AppOptions_log(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_maxvars(JB_String* Name, JB_String* Value, FastString* Purpose);
 
@@ -2896,6 +2898,8 @@ bool SC_FB__ParseArgs();
 bool SC_FB__ParseArgsSub(Array* Args);
 
 void SC_FB__ParseOption(JB_Object* Obj);
+
+void SC_FB__SetFlow();
 
 void SC_FB__StopStripping();
 
@@ -4213,6 +4217,8 @@ int JB_zalgo__InitCode_();
 // bool
 JB_String* JB_bool_Render0(bool Self);
 
+JB_String* JB_bool_Render(bool Self, FastString* Fs_in);
+
 
 
 // byte
@@ -4324,8 +4330,6 @@ int JB_int__Min();
 int64 JB_int64_Abs(int64 Self);
 
 bool SC_int64_CanStoreAsIntImmediate(int64 Self);
-
-JB_String* JB_int64_Hex(int64 Self, FastString* Fs_in);
 
 int64 JB_int64_Log2(int64 Self);
 
@@ -5541,8 +5545,6 @@ int JB_MzSt__InitCode_();
 
 
 // JB_FastBuff
-bool JB_FastBuff_Alloc(FastBuff* Self, int N);
-
 byte JB_FastBuff_Byte(FastBuff* Self);
 
 byte* JB_FastBuff_Clip(FastBuff* Self, int V, int Reduce);
@@ -5556,8 +5558,6 @@ bool JB_FastBuff_Has(FastBuff* Self, int N);
 bool JB_FastBuff_HasAny(FastBuff* Self);
 
 int JB_FastBuff_Length(FastBuff* Self);
-
-bool JB_FastBuff_NeedAlloc(FastBuff* Self, int N);
 
 int JB_FastBuff_Position(FastBuff* Self);
 
@@ -6692,6 +6692,8 @@ void JB_FS_AppendInt32(FastString* Self, int Data);
 
 void JB_FS_AppendFloatAsText(FastString* Self, float F);
 
+void JB_FS_AppendBool(FastString* Self, bool B);
+
 void JB_FS_SyntaxAppend(FastString* Self, Message* Msg);
 
 FastString* JB_FS__Use(JB_Object* Other);
@@ -6709,19 +6711,11 @@ void JB_Flow_AddByte(FlowControl* Self, uint /*byte*/ Value);
 
 bool JB_Flow_Cond(FlowControl* Self, uint /*byte*/ Value);
 
-FlowControl* JB_Flow_Constructor(FlowControl* Self);
-
 void JB_Flow_Destructor(FlowControl* Self);
 
 void JB_Flow_Fail(FlowControl* Self, JB_String* Found, JB_String* Expected, JB_String* InputName);
 
 void JB_Flow_Flush(FlowControl* Self);
-
-void JB_Flow_Init(FlowControl* Self, JB_String* Path, JB_String* DateStr);
-
-bool JB_Flow_LoadPath(FlowControl* Self, JB_String* Path, bool IsPrev);
-
-FlowControlStopper JB_Flow__FlowAllow(JB_String* Name, uint64 StartCode);
 
 int JB_Flow__Init_();
 
@@ -6730,6 +6724,8 @@ int JB_Flow__InitCode_();
 bool JB_Flow__InputStrings(Array* Lines, JB_String* Name);
 
 void JB_Flow__Input(JB_String* Data, JB_String* Name);
+
+FlowControlStopper JB_Flow__SilentAllow(JB_String* Name, bool IsOfficial, uint64 StartCode);
 
 void JB_Flow__Stop();
 
@@ -6818,8 +6814,6 @@ int JB_Mrap__InitCode_();
 MWrap* JB_Mrap__Object(int Count, int ItemSize);
 
 void jbl(JB_Object* Self);
-
-byte* JB_Mrap__Zalloc(int N);
 
 
 
@@ -7082,8 +7076,6 @@ void JB_Sel_GiveIDs(Selector* Self);
 
 
 // JB_String
-JB_String* JB_Str_AddExt(JB_String* Self, JB_String* Ext);
-
 JB_String* JB_Str_AfterByte(JB_String* Self, uint /*byte*/ B, int Last);
 
 JB_String* JB_Str_ArgName(JB_String* Self);
@@ -7143,8 +7135,6 @@ JB_File* JB_Str_AsFile(JB_String* Self);
 JB_File* JB_Str_ChildFile(JB_String* Self, JB_String* Ch);
 
 bool JB_Str_FileExists(JB_String* Self);
-
-int64 JB_Str_FileSize(JB_String* Self);
 
 JB_File* JB_Str_FileThatExists(JB_String* Self, JB_String* Operation);
 
@@ -7863,6 +7853,8 @@ void JB_Msg_BecomeMacro(Message* Self, Macro* M, Array* Prms);
 void SC_Msg_BecomeNil(Message* Self);
 
 void SC_Msg_BecomeSetRel(Message* Self);
+
+void SC_Msg_BecomeTarget(Message* Self);
 
 FatASM* JB_Msg_BFLG(Message* Self, ASMReg R1, ASMReg R2, int Up, int Down, int Sign);
 
