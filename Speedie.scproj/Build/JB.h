@@ -1505,13 +1505,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool ((int)16)
 #define kSC__CustomOps_TypeCastToBetter ((int)32)
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2104])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[93])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2105])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2106])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2103])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2106])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2107])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[90])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[91])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[94])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[91])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[92])
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
 extern int SC__FastStringOpts_StrRemoved;
@@ -1700,7 +1700,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2112])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[1460])
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
 extern CharSet* SC_CSNum;
@@ -1725,7 +1725,7 @@ extern JB_String* SC_kNameConf;
 #define kJB_kNoMatch ((int)0)
 #define kJB_kNumericMatch ((int)8388608)
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2108])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[491])
 #define kJB_kSimpleMatch ((int)4194304)
 #define kJB_kSuperClassMatch ((int)16777216)
 #define kJB_kTypeCastAssigns ((int)64)
@@ -1743,7 +1743,7 @@ extern JB_String* SC_kNameConf;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[1667])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[785])
 #define kJB_kVoidPtrMatch ((int)20971520)
 extern JB_File* SC_PerryLogFile;
 extern Message* SC_ReturnSelfEqNil;
@@ -1885,10 +1885,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp ((int)32784)
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2111])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2110])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2021])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2020])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2109])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2019])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int16_max ((s16)32767)
@@ -2398,7 +2398,7 @@ extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_kDelete ((int)2)
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2102])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[984])
 extern Float64 JB__Rec_Progress;
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -2407,13 +2407,13 @@ extern Float64 JB__Rec_Progress;
 extern bool JB__Flow_AlwaysMove;
 extern bool JB__Flow_BreakOnFail;
 extern int JB__Flow_Disabled;
+extern bool JB__Flow_DoSuggest;
 extern FlowControl* JB__Flow_Flow;
-#define kJB__Flow_FlowEnabled ((bool)false)
+#define kJB__Flow_FlowEnabled ((bool)1)
 extern byte JB__Flow_FlowMode;
 #define kJB__Flow_Log ((int)1)
 #define kJB__Flow_Off ((int)0)
 extern CompressionStats JB__Flow_Stats;
-extern bool JB__Flow_SuggestSwitch;
 #define kJB__Flow_Validate ((int)2)
 #define kSC__Instruction_kTypeConst ((int)2)
 #define kSC__Instruction_kTypeFunc ((int)1)
@@ -4215,9 +4215,9 @@ int JB_zalgo__InitCode_();
 
 
 // bool
-JB_String* JB_bool_Render0(bool Self);
+void JB_bool_Append(bool Self, FastString* Fs_in);
 
-JB_String* JB_bool_Render(bool Self, FastString* Fs_in);
+JB_String* JB_bool_Render0(bool Self);
 
 
 
@@ -5545,6 +5545,8 @@ int JB_MzSt__InitCode_();
 
 
 // JB_FastBuff
+bool JB_FastBuff_Alloc(FastBuff* Self, int N);
+
 byte JB_FastBuff_Byte(FastBuff* Self);
 
 byte* JB_FastBuff_Clip(FastBuff* Self, int V, int Reduce);
@@ -5558,6 +5560,8 @@ bool JB_FastBuff_Has(FastBuff* Self, int N);
 bool JB_FastBuff_HasAny(FastBuff* Self);
 
 int JB_FastBuff_Length(FastBuff* Self);
+
+bool JB_FastBuff_NeedAlloc(FastBuff* Self, int N);
 
 int JB_FastBuff_Position(FastBuff* Self);
 
@@ -6545,6 +6549,8 @@ void SC_Cpp__WriteType(SCClass* C, FastStringCpp* Fs, bool Always);
 // JB_DataObject
 DTWrap* JB_Wrap_ConstructorInt(DTWrap* Self, int64 V);
 
+DTWrap* JB_Wrap_ConstructorBool(DTWrap* Self, bool B);
+
 DTWrap* JB_Wrap_ConstructorVoidPtr(DTWrap* Self, void* P);
 
 void JB_Wrap_Destructor(DTWrap* Self);
@@ -6711,11 +6717,19 @@ void JB_Flow_AddByte(FlowControl* Self, uint /*byte*/ Value);
 
 bool JB_Flow_Cond(FlowControl* Self, uint /*byte*/ Value);
 
+FlowControl* JB_Flow_Constructor(FlowControl* Self, JB_String* Path);
+
 void JB_Flow_Destructor(FlowControl* Self);
 
 void JB_Flow_Fail(FlowControl* Self, JB_String* Found, JB_String* Expected, JB_String* InputName);
 
 void JB_Flow_Flush(FlowControl* Self);
+
+bool JB_Flow_LoadPath(FlowControl* Self, JB_String* Path);
+
+FlowControlStopper JB_Flow__FlowAllow(JB_String* Name);
+
+FlowControlStopper JB_Flow__Attempt(JB_String* Name);
 
 int JB_Flow__Init_();
 
@@ -6724,8 +6738,6 @@ int JB_Flow__InitCode_();
 bool JB_Flow__InputStrings(Array* Lines, JB_String* Name);
 
 void JB_Flow__Input(JB_String* Data, JB_String* Name);
-
-FlowControlStopper JB_Flow__SilentAllow(JB_String* Name, bool IsOfficial, uint64 StartCode);
 
 void JB_Flow__Stop();
 
@@ -6814,6 +6826,8 @@ int JB_Mrap__InitCode_();
 MWrap* JB_Mrap__Object(int Count, int ItemSize);
 
 void jbl(JB_Object* Self);
+
+byte* JB_Mrap__Zalloc(int N);
 
 
 
@@ -7135,6 +7149,8 @@ JB_File* JB_Str_AsFile(JB_String* Self);
 JB_File* JB_Str_ChildFile(JB_String* Self, JB_String* Ch);
 
 bool JB_Str_FileExists(JB_String* Self);
+
+int64 JB_Str_FileSize(JB_String* Self);
 
 JB_File* JB_Str_FileThatExists(JB_String* Self, JB_String* Operation);
 
@@ -9428,7 +9444,7 @@ JB_String* JB_Err_Render(JB_Error* Self, FastString* Fs_in);
 
 JB_String* SC_Err_Render_Unix(JB_Error* Self, FastString* Fs_in);
 
-JB_String* JB_Err_RenderClang(JB_Error* Self, FastString* Fs_in);
+JB_String* JB_Err_RenderUnix(JB_Error* Self, FastString* Fs_in);
 
 void SC_Err_SCGrabLine(JB_Error* Self, FastString* Fs, bool Usecolor);
 
@@ -10373,28 +10389,28 @@ inline bool JB_Ind_SyntaxCast(Ind Self) {
 }
 
 inline Syntax JB_Msg_Func(Message* Self) {
-	if (Self) {
+	iif (Self) {
 		return Self->Func;
 	}
 	return nil;
 }
 
 inline JB_String* JB_Msg_Name(Message* Self) {
-	if (Self) {
+	iif (Self) {
 		return Self->Name;
 	}
 	return JB_LUB[0];
 }
 
 inline JB_String* JB_Msg_Name_(Message* Self) {
-	if (Self) {
+	iif (Self) {
 		return Self->Name;
 	}
 	return JB_LUB[0];
 }
 
 inline int JB_Sel_ID(Selector* Self) {
-	if (Self) {
+	iif (Self) {
 		return Self->ID;
 	}
 	return 0;
@@ -10417,7 +10433,7 @@ inline bool JB_int_IsPow2(int Self) {
 }
 
 inline bool JB_int_OperatorInRange(int Self, int D) {
-	if (D > 0) {
+	iif (D > 0) {
 		return (((uint)Self) < ((uint)D));
 	}
 	return false;
@@ -10442,10 +10458,10 @@ inline ASM* SC_FatASM_xC2xB5RenderInto(FatASM* Self, ASM* Where, ASM* After) {
 }
 
 inline JB_String* SC_Named_Name(SCNamed* Self) {
-	if (Self) {
+	iif (Self) {
 		return Self->Name;
 	}
-	return JB_LUB[287];
+	return JB_LUB[273];
 }
 
 inline bool SC_OpMode_SyntaxCast(OpMode Self) {
@@ -10559,7 +10575,7 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState
 }
 
 inline void SC_nil__DeclKill() {
-	if (!SC_nil_NestDepth((&SC__nil_T))) {
+	iif (!SC_nil_NestDepth((&SC__nil_T))) {
 		SC__nil_T.RootReturned = true;
 	}
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
@@ -10567,7 +10583,7 @@ inline void SC_nil__DeclKill() {
 
 inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
 	uint T = SC_Msg_ASMType(Msg);
-	if (T) {
+	iif (T) {
 		return (SC__nil_NilTable[T])(Msg, Test);
 	}
 	T = ((ASMType)Msg->Func);
@@ -10591,7 +10607,7 @@ inline ASMReg SC_Pac_GetASM(ASMState* Self, Message* Exp, ASMReg Dest) {
 	fn_asm Fn = SC_fn_asm_table[SC_Msg_ASMType(Exp)];
 	uint TmpCloser = Self->VTmps;
 	ASMReg Ss = (Fn)(Self, Exp, Dest, 0);
-	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen)) {
+	iif (!SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen)) {
 		SC_Pac_CloseVTmps(Self, TmpCloser);
 		SC_Pac_MarkAvailableValues(Self);
 	}
@@ -10610,12 +10626,12 @@ inline NilRecord SC_nil__EndBlock() {
 }
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
-	if (!JB_Ring_HasChildCount(Self, 2)) {
-		if (true) {
+	iif (!JB_Ring_HasChildCount(Self, 2)) {
+		iif (true) {
 			Message* __varf1 = F->Source;
 			MessagePosition _usingf0 = ((MessagePosition){});
 			JB_Msg_SyntaxUsing(__varf1, (&_usingf0));
-			JB_Tree_SyntaxAppend(Self, (JB_Syx_Msg(kJB_SyxThg, JB_LUB[1319])));
+			JB_Tree_SyntaxAppend(Self, (JB_Syx_Msg(kJB_SyxThg, JB_LUB[1268])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0), __varf1);
 			JB_MsgPos_Destructor((&_usingf0));
 		}
@@ -10623,8 +10639,8 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 }
 
 inline void SC_Reg_Expect(ASMReg Self, Message* Where) {
-	if (!SC_Reg_Reg(Self)) {
-		SC_Pac_SyntaxExpect((&SC__Pac_Sh), Where, JB_LUB[846]);
+	iif (!SC_Reg_Reg(Self)) {
+		SC_Pac_SyntaxExpect((&SC__Pac_Sh), Where, JB_LUB[1217]);
 	}
 }
 
@@ -10638,9 +10654,9 @@ inline FatASM* SC_Reg_Write(ASMReg Self, Message* M, ASMReg Ptr, int Index) {
 
 inline SCDecl* SC_TypeOfSwiz(Message* Exp, SCNode* Name_space, Message* Side, SCDecl* class_Space) {
 	int W = SC_Class_NumericCount(class_Space->Type);
-	if ((W > 1) and (!JB_Ring_HasChildren(((Message*)JB_Ring_Last(Exp))))) {
+	iif ((W > 1) and (!JB_Ring_HasChildren(((Message*)JB_Ring_Last(Exp))))) {
 		int Swz = SC_Str_IsSwizzle(Exp->Name, W);
-		if (Swz) {
+		iif (Swz) {
 			return SC_TypeOfSwizzle(Exp, class_Space, Name_space, Side, Swz);
 		}
 	}
