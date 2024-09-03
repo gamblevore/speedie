@@ -12,6 +12,7 @@ function Tran_Flow (TranFunc)
 insertion
 	quietly	({flowcontrol.disabled++, (_0), flowcontrol.disabled--, rejoin 0})
 
+
 function string.trap (|message| msg=nil, |bool|)
 	if scfunction.currfunc ~= self
 		if msg

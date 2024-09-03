@@ -72,14 +72,24 @@ function JumpNoPosts (niltrackerfn)
 	t.InsideBoolLogic--
 
 
-function Jump (NilTrackerFn)
+function JumpSub (NilTrackerFn)
 	opt inline
-//	"bug".trap(msg)
 	|| t = msg.ASMType
 		return (NilTable[t]!)(msg, test)
 	t = msg.func|ASMType|
 	msg.ASMType = t
 	return (NilTable[t]!)(msg, test)
+
+function Jump (NilTrackerFn)
+	cpp_part FlowJump
+	target flow
+		if FlowControl.Active
+			FlowControl <~ msg.func|byte|
+			FlowControl.input("", msg.name)
+	rz = .JumpSub(msg, test)
+	target flow
+		if FlowControl.Active
+			FlowControl <~ rz|byte|
 
 
 function PropertyToFunc (|message!| dot, |scfunction!| fn, |nilstate|)

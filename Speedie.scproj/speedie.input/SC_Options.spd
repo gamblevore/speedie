@@ -292,7 +292,7 @@ module Feedback
 
 		+"flowmode"
 			explain(Purpose, "Modifies flow logging")$
-			FlowControl.FlowMode = (FlowControl.log, value.int)(value == "true")
+			FlowControl.Active = (FlowControl.log, value.int)(value == "true")
 		
 		+"noisy"
 			Explain(Purpose, "Prints more stuff.")$
@@ -490,7 +490,7 @@ module Feedback
 		fs <~ " /path/to/project\n"
 		fs <~ "Installation: ${compiler.SpeedieProj.parent}"
 		fs <~ "  Platform: ${platform.Name}+${platform.cpu_name}"
-		fs <~ "  SelfFlow: ${flowcontrol.FlowEnabled}"
+		fs <~ "  SelfFlow: ${target~flow}"
 		fs <~ "  @Syx: ${@max|int|}"
 		for (v in AppOptions) (k) 
 			(v[])("", "", fs_tester)

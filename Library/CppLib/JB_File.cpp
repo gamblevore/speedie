@@ -137,7 +137,7 @@ extern const char* JB_CrashLogFileName;
 int JB_ErrorHandleFileC(const char* Path, int err, const char* Operation);
 extern uint JB__Flow_Disabled;
 
-void JB_Flow__ReportAddr(u8* Addr, int Length, u8* Name, int NameLen) {
+void JB_Flow__ReportStringData(u8* Addr, int Length, u8* Name, int NameLen) {
 #ifndef AS_LIBRARY
 	if (!JB__Flow_Disabled) {
 		uint64 Hash = JB_CRC(Addr, Length, 0);
@@ -156,7 +156,7 @@ void JB_Flow__ReportAddr(u8* Addr, int Length, u8* Name, int NameLen) {
 inline void JB_Flow__Report(JB_String* data, JB_String* name) {
 #ifndef AS_LIBRARY
 	if (!JB__Flow_Disabled)
-		JB_Flow__ReportAddr(data->Addr, data->Length, name->Addr, name->Length);
+		JB_Flow__ReportStringData(data->Addr, data->Length, name->Addr, name->Length);
 #endif
 }
 
@@ -490,7 +490,7 @@ static int InterPipe(FastString* self, int Desired, int fd, int Mode) {
 		JB_FS_AdjustLength_(self, Desired, N);
 	}
 #ifndef AS_LIBRARY
-	JB_Flow__ReportAddr(Buffer, N, (u8*)"pipe", 4);
+	JB_Flow__ReportStringData(Buffer, N, (u8*)"pipe", 4);
 #endif
 	return Error;
 }

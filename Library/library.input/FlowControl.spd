@@ -10,25 +10,31 @@ class FlowControl
 	|FastBuff|				Buff
 	|StringReader?|			ReadInput
 	|faststring?| 			Write
-	|Faststring?| 			Excuse
+	|bool| 					CanDoErrors
 
 	constructor (|string| path)
 		flow off
+		.CanDoErrors = true
 		.buff.needAlloc(1MB)
-		.Excuse = FastString()
 		.write = nil
 		if .LoadPath(path)
-			printline path
 			flowcontrol.Disabled = 0
+		  else
+			print "Cant load flow "
+		printline path
 
 
 	helper LoadPath	(|string| path, |bool|)
 		flow off
-		require (FlowControl.FlowMode >= FlowControl.Validate) and (path.FileSize)
-		.write = path.out
-		|| S = path.ReadFile
-			.ReadInput = S.Decompress.stream
-			rz = .ReadInput.HasAny	
+		if (FlowControl.Active < FlowControl.Validate)
+			print "Logging flow to "
+			.write = path.out
+			return true
+
+		.ReadInput = path.ReadFile(16MB, false).Decompress.stream
+		if .ReadInput.HasAny
+			print "Validating flow against "
+			return true
 	
 	
 	helper Flush
@@ -45,8 +51,6 @@ class FlowControl
 		.flush
 		if .ReadInput!=nil
 			"Flow: Occurred equally."
-		// stats.Print(true) // wiat is this compression or decomp?
-		// stats.clear
 
 	
 	helper AddByte (|byte| value)
@@ -54,7 +58,7 @@ class FlowControl
 		if .buff <~ value
 			.Flush
 		
-	helper Cond (|byte| value, |bool|)
+	helper TestByte (|byte| value, |bool|)
 		flow off, opt norefcounts, visible
 
 		.AddByte(value)
@@ -68,14 +72,13 @@ class FlowControl
 
 
 	function Fail (|string| found, |string| expected, |string| InputName)
-		opt norefcounts, flow off
-		|| fs = .Excuse
-		if !fs
-			debugger 
-			return nil
+		flow off
+		.readinput = .readinput
+		require .CanDoErrors
+		|| fs = FastString()
 		if InputName 
 			fs <~ "Different input for: ${InputName}. "			
-		if !.readinput.HasAny
+		if !.ReadInput.HasAny
 			fs <~ "New-stream longer than old-stream."
 		  else
 			fs <~ "Expected: "
@@ -84,12 +87,11 @@ class FlowControl
 			fs.printnicely(found)
 		fs <~ "\n"
 		
-		if !InputName
-			app.StackTrace(3, fs)
-			printline fs.GetResult
-			.Excuse = nil
-			.ReadInput = nil
-		if flowcontrol.BreakOnFail
+		app.StackTrace(3, fs)
+		printline fs.GetResult
+		.CanDoErrors = false
+		.ReadInput = nil
+		if FlowControl.BreakOnFail
 			debugger
 
 
@@ -105,10 +107,9 @@ class FlowControl
 	
 	module
 		|flowcontrol|			Flow			// DONT directly alter this 
-
 		|CompressionStats| 		Stats
 		|int| 					Disabled		= int.max
-		|byte|					FlowMode		= FlowControl.Validate
+		|byte|					Active			= FlowControl.Validate
 		|bool|					AlwaysMove		= true
 		|bool|					DoSuggest		= true
 		|bool|					BreakOnFail
@@ -117,22 +118,18 @@ class FlowControl
 			Validate			= 2
 			Log					= 1
 			Off					= 0
-			
-		target flow
-			constants
-				FlowEnabled = true
-		  else
-			constants
-				FlowEnabled = false
-				
+							
 		syntax append (|bool| value, |bool|)
-			visible,  flow off,  cpp_name JB_Flow__Cond
-			if .disabled
-				return value
-			.disabled = 1
-			.flow!.cond(('T', 'F')(value))
-			.disabled = 0
+			cpp_name JB_Flow__Cond,  visible,  flow off
+			self <~ ('T', 'F')(value)
 			return value
+		
+		syntax append (|byte| value)
+			visible,  flow off
+			if !.disabled
+				.disabled = 1
+				.flow!.TestByte(('T', 'F')(value))
+				.disabled = 0
 
 		function Input (|[string]| lines, |string| name,  |bool|)
 			cpp_part InputStrings
@@ -162,11 +159,15 @@ class FlowControl
 			.Flow = nil
 
 		function Activate (|string| name,  |FlowControlStopper|)
-			cpp_part FlowAllow
 			flow off
 			|| path = "/tmp/Speedie/FlowControl/".child( name + ".txt.mz" )
-			if !.flowmode
-				print "#!FlowControl would have been at: "
+			if !.Active
+				print "#!FlowControl "
+				if .Active >= Validate
+					print "validation"
+				  else
+					print "logging"
+				print " would have been at: "
 				printline path
 				if .DoSuggest
 					"#!Pass --flowmode=1 (log) or --flowmode=2 (log+validate)."

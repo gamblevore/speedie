@@ -1,8 +1,6 @@
 
 
 main // speedie main {
-	debugger
-	printline true
 	Compiler.SetupEnv	
 	Compiler.MiniTests
 	Compiler.Main
@@ -50,7 +48,7 @@ function compiler.ClearEnvs
 
 function compiler.SetupEnv
 	opt norefcounts
-	FlowControl.FlowMode = (target~ViaBuilder) |int| // can enable via "log"
+	FlowControl.Active = (target~ViaBuilder) |int| // can enable via "log"
 	if !Options.Variant
 		FlowControl.DoSuggest = false
 

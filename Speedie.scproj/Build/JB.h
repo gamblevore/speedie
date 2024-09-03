@@ -873,7 +873,7 @@ struct FlowControl_Behaviour: Object_Behaviour {
 };
 
 JBClass ( FlowControl , JB_Object , 
-	FastString* Excuse;
+	bool CanDoErrors;
 	StringReader* ReadInput;
 	FastString* Write;
 	FastBuff Buff;
@@ -1505,13 +1505,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool ((int)16)
 #define kSC__CustomOps_TypeCastToBetter ((int)32)
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[93])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2101])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[90])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[91])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[94])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[91])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[92])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2102])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2103])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2100])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2103])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2104])
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
 extern int SC__FastStringOpts_StrRemoved;
@@ -1700,7 +1700,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[1460])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2109])
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
 extern CharSet* SC_CSNum;
@@ -1725,7 +1725,7 @@ extern JB_String* SC_kNameConf;
 #define kJB_kNoMatch ((int)0)
 #define kJB_kNumericMatch ((int)8388608)
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[491])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2105])
 #define kJB_kSimpleMatch ((int)4194304)
 #define kJB_kSuperClassMatch ((int)16777216)
 #define kJB_kTypeCastAssigns ((int)64)
@@ -1743,7 +1743,7 @@ extern JB_String* SC_kNameConf;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[785])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2110])
 #define kJB_kVoidPtrMatch ((int)20971520)
 extern JB_File* SC_PerryLogFile;
 extern Message* SC_ReturnSelfEqNil;
@@ -1885,10 +1885,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp ((int)32784)
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2021])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2020])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2108])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2107])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2019])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2106])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int16_max ((s16)32767)
@@ -2398,19 +2398,18 @@ extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_kDelete ((int)2)
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[984])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2099])
 extern Float64 JB__Rec_Progress;
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
 #define kJB__fix_TypeStem ((int)2)
 #define kJB__fix_TypeValue ((int)0)
+extern byte JB__Flow_Active;
 extern bool JB__Flow_AlwaysMove;
 extern bool JB__Flow_BreakOnFail;
 extern int JB__Flow_Disabled;
 extern bool JB__Flow_DoSuggest;
 extern FlowControl* JB__Flow_Flow;
-#define kJB__Flow_FlowEnabled ((bool)1)
-extern byte JB__Flow_FlowMode;
 #define kJB__Flow_Log ((int)1)
 #define kJB__Flow_Off ((int)0)
 extern CompressionStats JB__Flow_Stats;
@@ -3342,8 +3341,6 @@ void SC_SC_Targets__SyntaxAccessSet(JB_String* Name, bool Value);
 
 
 // SpdAssembler
-bool SC_SpdAssembler__FlowControl();
-
 bool SC_SpdAssembler__GenerateASM(SCFunction* Fn);
 
 void SC_SpdAssembler__Guard();
@@ -5444,6 +5441,8 @@ int SC_nil__InitCode_();
 
 NilState SC_nil__Item(Message* Msg, NilCheckMode Test);
 
+NilState SC_nil__FlowJump(Message* Msg, NilCheckMode Test);
+
 NilState SC_nil__JumpNoPosts(Message* Msg, NilCheckMode Test);
 
 NilState SC_nil__List(Message* Msg, NilCheckMode Test);
@@ -6549,8 +6548,6 @@ void SC_Cpp__WriteType(SCClass* C, FastStringCpp* Fs, bool Always);
 // JB_DataObject
 DTWrap* JB_Wrap_ConstructorInt(DTWrap* Self, int64 V);
 
-DTWrap* JB_Wrap_ConstructorBool(DTWrap* Self, bool B);
-
 DTWrap* JB_Wrap_ConstructorVoidPtr(DTWrap* Self, void* P);
 
 void JB_Wrap_Destructor(DTWrap* Self);
@@ -6715,8 +6712,6 @@ FastString* JB_FS__Use(JB_Object* Other);
 // JB_FlowControl
 void JB_Flow_AddByte(FlowControl* Self, uint /*byte*/ Value);
 
-bool JB_Flow_Cond(FlowControl* Self, uint /*byte*/ Value);
-
 FlowControl* JB_Flow_Constructor(FlowControl* Self, JB_String* Path);
 
 void JB_Flow_Destructor(FlowControl* Self);
@@ -6727,7 +6722,9 @@ void JB_Flow_Flush(FlowControl* Self);
 
 bool JB_Flow_LoadPath(FlowControl* Self, JB_String* Path);
 
-FlowControlStopper JB_Flow__FlowAllow(JB_String* Name);
+bool JB_Flow_TestByte(FlowControl* Self, uint /*byte*/ Value);
+
+FlowControlStopper JB_Flow__Activate(JB_String* Name);
 
 FlowControlStopper JB_Flow__Attempt(JB_String* Name);
 
@@ -6742,6 +6739,8 @@ void JB_Flow__Input(JB_String* Data, JB_String* Name);
 void JB_Flow__Stop();
 
 bool JB_Flow__Cond(bool Value);
+
+void JB_Flow__SyntaxAppend(uint /*byte*/ Value);
 
 
 
@@ -7149,8 +7148,6 @@ JB_File* JB_Str_AsFile(JB_String* Self);
 JB_File* JB_Str_ChildFile(JB_String* Self, JB_String* Ch);
 
 bool JB_Str_FileExists(JB_String* Self);
-
-int64 JB_Str_FileSize(JB_String* Self);
 
 JB_File* JB_Str_FileThatExists(JB_String* Self, JB_String* Operation);
 
@@ -10341,7 +10338,7 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState
 
 inline void SC_nil__DeclKill();
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test);
+inline NilState SC_nil__JumpSub(Message* Msg, NilCheckMode Test);
 
 inline NilRecord SC_nil__Value();
 
@@ -10581,7 +10578,7 @@ inline void SC_nil__DeclKill() {
 	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
 }
 
-inline NilState SC_nil__Jump(Message* Msg, NilCheckMode Test) {
+inline NilState SC_nil__JumpSub(Message* Msg, NilCheckMode Test) {
 	uint T = SC_Msg_ASMType(Msg);
 	iif (T) {
 		return (SC__nil_NilTable[T])(Msg, Test);

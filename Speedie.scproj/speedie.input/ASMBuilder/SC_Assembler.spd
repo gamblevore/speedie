@@ -74,7 +74,7 @@ module SpdAssembler
 		printline fn.asm!.render
 //		while .Optimise(fn.asm!)
 //			loop ++fn.OptCounts <= 16
-		.FlowControl
+//		.FlowControl
 		return true
 
 
