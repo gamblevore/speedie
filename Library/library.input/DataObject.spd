@@ -57,11 +57,11 @@ class DataObject
 		visible // hmmm
 		if .datatype.isfloat
 			fs <~ .FloatValue
+		  elseif .datatype == datatypecode.bool	
+			.privvalue|bool|.render(fs)
 		  elseif !.datatype.isnumeric // oop
 			fs <~ "0x"
 			fs.appendhex(.privvalue)
-		  elseif .datatype == datatypecode.bool	
-			.privvalue|bool|.render(fs)
 		  else
 			fs <~ .PrivValue
 

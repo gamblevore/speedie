@@ -66,7 +66,7 @@ syntax is (|OpMode| x, |opmode|)
 	
 
 function CaseAwareStr (|String|)
-	return (self is caseaware)|bool|.render
+	return (self is caseaware)|bool|.string
 
 
 syntax equals (|string| s, |bool| aware, |bool|)

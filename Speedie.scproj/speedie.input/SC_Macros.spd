@@ -113,7 +113,7 @@ function message.Tran_TargetSub
 function message.BecomeTarget
 	opt norefcounts
 	|| s = self[@nil,1]$
-	|| b = s.TargetTest.Render
+	|| b = s.TargetTest.string
 	.become(@thg, b)
 		
 	

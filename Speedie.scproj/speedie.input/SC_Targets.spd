@@ -10,4 +10,4 @@ module SC_Targets
 		return .items.valuelower(name).yes
 
 	syntax Access (|string| name, assigns:|bool|)
-		.items.valuelower(name) = value.Render
+		.items.valuelower(name) = value.string

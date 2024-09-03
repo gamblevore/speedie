@@ -62,7 +62,7 @@ module Feedback
 	
 	function SetFlow
 		if app["flow"] 	// options.GenFlowControlCode specified by --flow
-			|| v = options.GenFlowControlCode.render
+			|| v = options.GenFlowControlCode.string
 			if app.pref("self_flow") != v
 				// update current self_flow pref
 				app.pref("self_flow") = v
@@ -291,11 +291,8 @@ module Feedback
 			SC_Targets["flow"] = b
 
 		+"flowmode"
-			explain(Purpose, "Modifies the control-flow logging:  0 = off,  1 =  log,  2 = log+validate")$
-			if value != "true"
-				FlowControl.FlowMode = value.int
-			  else
-				FlowControl.FlowMode = FlowControl.Validate
+			explain(Purpose, "Modifies flow logging")$
+			FlowControl.FlowMode = (FlowControl.log, value.int)(value == "true")
 		
 		+"noisy"
 			Explain(Purpose, "Prints more stuff.")$
@@ -357,7 +354,7 @@ module Feedback
 		+"self" 
 			Explain(Purpose, "Compiles and installs new Speedie, after self-test.")$
 			if app.no("nocompile")
-				options.perryoutput = 1
+				options.perryoutput = 1 // can't remember why. maybe just for copy/paste into perry.
 			feedback.TryUseProject( Compiler.SpeedieProj )
 			return true // does something, counts towards operationCount
 		

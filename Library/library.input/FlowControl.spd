@@ -12,45 +12,25 @@ class FlowControl
 	|faststring?| 			Write
 	|Faststring?| 			Excuse
 
-	constructor
+	constructor (|string| path)
 		flow off
 		.buff.needAlloc(1MB)
 		.Excuse = FastString()
+		.write = nil
+		if .LoadPath(path)
+			printline path
+			flowcontrol.Disabled = 0
 
-	helper Init (|string| path, |string| DateStr)
+
+	helper LoadPath	(|string| path, |bool|)
 		flow off
-		if .LoadPath(path, false) or .LoadPath(path, true)
-			print " vs new: "
-		  else
-			print "Capturing flow: "
-		printline path
+		require (FlowControl.FlowMode >= FlowControl.Validate) and (path.FileSize)
 		.write = path.out
-		flowcontrol.Disabled = 0
-		if FlowControl.flowmode >= FlowControl.Validate
-			FlowControl.Input(DateStr, "App Creation Date")
-
-
-
-	helper LoadPath	(|string| path, |bool| IsPrev,   |bool|)
-		flow off
-		require FlowControl.FlowMode >= FlowControl.Validate
-		|| name = (".expected", ".prev")(!IsPrev)
-		|| CmpFile = path.AddExt(name)
-		if IsPrev
-			if AlwaysMove or (!CmpFile.filesize and path.filesize)
-				|| f = path.file
-				if f.exists
-					require f.MoveTo(CmpFile)
-		
-		if CmpFile.FileSize
-			|| S = CmpFile.ReadFile
-				.ReadInput = S.decompress.stream
-				rz = .readinput.hasany
-				if rz
-					print "Old: "
-					print CmpFile
-		
-		
+		|| S = path.ReadFile
+			.ReadInput = S.Decompress.stream
+			rz = .ReadInput.HasAny	
+	
+	
 	helper Flush
 		flow off
 		if .write
@@ -130,7 +110,7 @@ class FlowControl
 		|int| 					Disabled		= int.max
 		|byte|					FlowMode		= FlowControl.Validate
 		|bool|					AlwaysMove		= true
-		|bool|					SuggestSwitch	= true
+		|bool|					DoSuggest		= true
 		|bool|					BreakOnFail
 		
 		constants
@@ -181,40 +161,25 @@ class FlowControl
 			.Disabled = int.max
 			.Flow = nil
 
-		function Allow (|string| name,  |bool| IsOfficial,  |uint64| StartCode = __modified__,  |FlowControlStopper|)
+		function Activate (|string| name,  |FlowControlStopper|)
 			cpp_part FlowAllow
 			flow off
-			|| path = "/tmp/Speedie/"
-			if IsOfficial
-				path = path.Child("FlowOfficial")
-			  else
-				path = path.child("FlowDebug")
-			path = path.child( name + ".txt.mz" )
+			|| path = "/tmp/Speedie/FlowControl/".child( name + ".txt.mz" )
 			if !.flowmode
 				print "#!FlowControl would have been at: "
 				printline path
-				rz = nil
-				if .SuggestSwitch
+				if .DoSuggest
 					"#!Pass --flowmode=1 (log) or --flowmode=2 (log+validate)."
-			  else
-				.Disabled = int.max			// in case its set badly
-				|| f = FlowControl()
-				.flow = f
-				f.init(path, StartCode|int64|.Hex)
+				return nil
 
-		function SilentAllow (|string| name,  |bool| IsOfficial,  |uint64| StartCode = __modified__,  |FlowControlStopper|)
+			.Disabled = int.max			// in case its set badly
+			.flow = FlowControl(path)
+
+
+		function Attempt (|string| name,  |FlowControlStopper|)
 			flow off
 			target flow
-				return .allow(name, isofficial, StartCode)
-
-		function New (|string| name,  |bool| IsOfficial,  |uint64| StartCode = __modified__,  |FlowControlStopper|)
-			cpp_part FlowStarter
-			flow off
-			target flow
-				return .allow(name, isofficial, StartCode)
-			  else
-				disabled "Either: Enable flow-control by calling 'flowcontrol.allow', or enable flow-control first."
-
+				return .Activate(name)
 
 
 

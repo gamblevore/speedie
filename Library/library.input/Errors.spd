@@ -186,7 +186,7 @@ class Error (Message)
 		--fs.indent
 
 
-	render RenderClang
+	render RenderUnix
 		|| M = fs.mark
 		|| p = .path
 		if ((self isnt PreferNoRenderPath) and P)

@@ -133,14 +133,14 @@ class ErrorReceiver
 		.rendererrors(fs, 0, false)
 
 
-	function RenderErrors (|faststring| fs, |errorseverity| Level, |bool|shell, |int|)
+	function RenderErrors (|faststring| fs, |errorseverity| Level, |bool| shell, |int|)
 		opt norefcounts
 		require self
 		for err in self
 			if err.severity >= level
 				++RZ
 				if shell
-					err.renderclang(Fs)
+					err.renderunix(Fs)
 				  else
 					err.render(fs)
 				fs <~ "\n"

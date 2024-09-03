@@ -730,7 +730,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		fs <~ "static const char* JB_LUBSrc2 = "
 		fs.AppendCppAll(blob)
 		fs <~ ";\n"
-		|| FlowStr = Options.GenFlowControlCode.Render
+		|| FlowStr = Options.GenFlowControlCode.string
 		fs <~ .FindGlobalsCpp.ReplaceAll("@flow", FlowStr)
 
 

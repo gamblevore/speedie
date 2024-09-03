@@ -273,7 +273,7 @@ class FastString {
 
 	syntax Append (|bool| B)
 		cpp_name JB_FS_AppendBool
-		b.render(self)
+		self <~ b.string
 
 	
 	function Mark (|int|)

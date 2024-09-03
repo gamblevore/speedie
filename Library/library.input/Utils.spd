@@ -186,7 +186,7 @@ function int64.Msg (|message|)
 	return @num + .Render
 
 function bool.Msg (|message|)
-	return @thg + .Render
+	return @thg + .string
 
 
 datatype HumanDate (date)

@@ -782,9 +782,6 @@ datatype bool
 	size 1
 	default false
 	
-//	operator bitor (|bool| b, |bool|)
-//		return self or b
-//	
 	operator sign (|int| i, |int|)
 		return (i, -i)(self)
 	function Bool (|int| i, |int|)
@@ -804,15 +801,18 @@ datatype bool
 	function Dir (|int|)
 		return (self|int|<<1)-1
 	
-	function Render (|string|)
+	function String (|string|)
 		cpp_part Render0
 		return ("true", "false")(self)
 
-	function Render (|faststring| fs_in, |string|)
+	function Render (|string|)
 		opt norefcounts
-		if !fs_in
-			return .render
-		fs_in <~ .render
+		return .string
+	
+	function Render (|faststring!| fs_in)
+		cpp_Part Append
+		opt norefcounts
+		fs_in <~ .string
 	
 	iterator
 		|| num = 1

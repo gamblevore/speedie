@@ -1,16 +1,8 @@
 
 
 main // speedie main {
-	target debug
-		|| debug = 1
-	  else
-		|| notdebug = true
-	
-	target viabuilder
-		|| builder = 2
-	  else
-		|| notbuilder = true
-	
+	debugger
+	printline true
 	Compiler.SetupEnv	
 	Compiler.MiniTests
 	Compiler.Main
@@ -19,7 +11,7 @@ main // speedie main {
 
 function Compiler.Main
 	if .EnterCompile
-		using FlowControl.SilentAllow("Speedie"+options.variant, target~ViaBuilder)
+		using FlowControl.attempt("Speedie"+options.variant)
 			.CompileTime
 
 
@@ -36,10 +28,8 @@ function Compiler.PrintResults
 
 	if options.selfreplacement and filedes.stdout.isterminal
 		if .variantsuffix ~= "Test"
-			if ok
-				app.say("Speedie Success", false)
-			  else
-				app.say("Failed", false)
+			|| msg = ("Success", "Failed")(ok)
+			app.say(msg, false)
 	if Options.Beep
 		"\07"
 
@@ -60,9 +50,9 @@ function compiler.ClearEnvs
 
 function compiler.SetupEnv
 	opt norefcounts
-	FlowControl.FlowMode = FlowControl.Off // can enable via "log"
+	FlowControl.FlowMode = (target~ViaBuilder) |int| // can enable via "log"
 	if !Options.Variant
-		FlowControl.SuggestSwitch = false
+		FlowControl.DoSuggest = false
 
 	.ClearEnvs
 	app.PrefsInit(-1)
