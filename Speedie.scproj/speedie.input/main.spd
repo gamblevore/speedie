@@ -1,6 +1,16 @@
 
 
 main // speedie main {
+	target debug
+		|| debug = 1
+	  else
+		|| notdebug = true
+	
+	target viabuilder
+		|| builder = 2
+	  else
+		|| notbuilder = true
+	
 	Compiler.SetupEnv	
 	Compiler.MiniTests
 	Compiler.Main
@@ -9,7 +19,7 @@ main // speedie main {
 
 function Compiler.Main
 	if .EnterCompile
-		using FlowControl.allow("Speedie")
+		using FlowControl.SilentAllow("Speedie"+options.variant, target~ViaBuilder)
 			.CompileTime
 
 
@@ -51,6 +61,9 @@ function compiler.ClearEnvs
 function compiler.SetupEnv
 	opt norefcounts
 	FlowControl.FlowMode = FlowControl.Off // can enable via "log"
+	if !Options.Variant
+		FlowControl.SuggestSwitch = false
+
 	.ClearEnvs
 	app.PrefsInit(-1)
 	

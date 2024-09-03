@@ -1087,7 +1087,10 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			needbra = true	
 
 		  elseif (name == "while") 
-			fs <~ Cpp_Export.WhileName
+			if .first!.unbra isthing "true"
+				fs <~ "while"
+			  else
+				fs <~ Cpp_Export.WhileName
 			needbra = true	
 
 		  elseif (name == "elseif")

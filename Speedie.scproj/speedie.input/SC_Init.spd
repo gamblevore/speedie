@@ -185,7 +185,6 @@ function message.IsNilOrZero (|bool|)
 	if f == @thg
 		if .obj == typenil or FalseBool
 			return true
-		//target debug
 		if n == "nil" or "false" // what?
 	if f == @num
 		return .iszero

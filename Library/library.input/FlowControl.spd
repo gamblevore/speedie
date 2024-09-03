@@ -130,6 +130,7 @@ class FlowControl
 		|int| 					Disabled		= int.max
 		|byte|					FlowMode		= FlowControl.Validate
 		|bool|					AlwaysMove		= true
+		|bool|					SuggestSwitch	= true
 		|bool|					BreakOnFail
 		
 		constants
@@ -137,6 +138,13 @@ class FlowControl
 			Log					= 1
 			Off					= 0
 			
+		target flow
+			constants
+				FlowEnabled = true
+		  else
+			constants
+				FlowEnabled = false
+				
 		syntax append (|bool| value, |bool|)
 			visible,  flow off,  cpp_name JB_Flow__Cond
 			if .disabled
@@ -173,22 +181,39 @@ class FlowControl
 			.Disabled = int.max
 			.Flow = nil
 
-		function Allow (|string| name, |uint64| StartCode = __modified__,  |FlowControlStopper|)
+		function Allow (|string| name,  |bool| IsOfficial,  |uint64| StartCode = __modified__,  |FlowControlStopper|)
 			cpp_part FlowAllow
 			flow off
-			require FlowMode
-			.Disabled = int.max			// in case its set badly
-			|| f = FlowControl()
-			.flow = f
-			f.init("/tmp/FlowControl/" + name + ".txt.mz", StartCode|int64|.Hex)
+			|| path = "/tmp/Speedie/"
+			if IsOfficial
+				path = path.Child("FlowOfficial")
+			  else
+				path = path.child("FlowDebug")
+			path = path.child( name + ".txt.mz" )
+			if !.flowmode
+				print "#!FlowControl would have been at: "
+				printline path
+				rz = nil
+				if .SuggestSwitch
+					"#!Pass --flowmode=1 (log) or --flowmode=2 (log+validate)."
+			  else
+				.Disabled = int.max			// in case its set badly
+				|| f = FlowControl()
+				.flow = f
+				f.init(path, StartCode|int64|.Hex)
 
-		function New (|string| name, |uint64| StartCode = __modified__,  |FlowControlStopper|)
+		function SilentAllow (|string| name,  |bool| IsOfficial,  |uint64| StartCode = __modified__,  |FlowControlStopper|)
+			flow off
+			target flow
+				return .allow(name, isofficial, StartCode)
+
+		function New (|string| name,  |bool| IsOfficial,  |uint64| StartCode = __modified__,  |FlowControlStopper|)
 			cpp_part FlowStarter
 			flow off
 			target flow
-				return .allow(name, StartCode)
+				return .allow(name, isofficial, StartCode)
 			  else
-				disabled "Either: Enable flow-control via 'targets: flow'... OR use 'flowcontrol.allow'"
+				disabled "Either: Enable flow-control by calling 'flowcontrol.allow', or enable flow-control first."
 
 
 

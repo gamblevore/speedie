@@ -61,7 +61,7 @@ class DataObject
 			fs <~ "0x"
 			fs.appendhex(.privvalue)
 		  elseif .datatype == datatypecode.bool	
-			fs <~ ("true", "false")(.privvalue)
+			.privvalue|bool|.render(fs)
 		  else
 			fs <~ .PrivValue
 

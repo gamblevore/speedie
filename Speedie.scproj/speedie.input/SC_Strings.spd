@@ -258,7 +258,11 @@ function Message.Clean (|bool| erl = false)
 				0 // 
 			  elseif jeebox.CSWordStart[curr.name[]]
 				curr.name = curr.name.Lowercase
-		
+
+		  elseif (f == @adj)
+			if curr.first ~= "target"
+				curr.BecomeTarget
+			
 		  elseif (f == @tmp)
 			if curr.parent != IgnoreArg
 				|| s  = curr.name.Lowercase
