@@ -2408,7 +2408,6 @@ extern byte JB__Flow_Active;
 extern bool JB__Flow_AlwaysMove;
 extern bool JB__Flow_BreakOnFail;
 extern int JB__Flow_Disabled;
-extern bool JB__Flow_DoSuggest;
 extern FlowControl* JB__Flow_Flow;
 #define kJB__Flow_Log ((int)1)
 #define kJB__Flow_Off ((int)0)
@@ -2851,8 +2850,6 @@ bool SC_FB__AppOptions_path(JB_String* Name, JB_String* Value, FastString* Purpo
 bool SC_FB__AppOptions_perry(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_print(JB_String* Name, JB_String* Value, FastString* Purpose);
-
-bool SC_FB__AppOptions_products(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_quiet(JB_String* Name, JB_String* Value, FastString* Purpose);
 
@@ -4879,7 +4876,7 @@ Array* JB_ErrorSeverity__InitNames();
 // FlowControlStopper
 FlowControlStopper JB_FlowControlStopper_SyntaxUsing(FlowControlStopper Self);
 
-void JB_FlowControlStopper_SyntaxUsingComplete(FlowControlStopper Self, JB_Object* Idk);
+void JB_FlowControlStopper_SyntaxUsingComplete(FlowControlStopper Self, JB_Object* Dummy);
 
 
 
@@ -6727,6 +6724,8 @@ bool JB_Flow_TestByte(FlowControl* Self, uint /*byte*/ Value);
 FlowControlStopper JB_Flow__Activate(JB_String* Name);
 
 FlowControlStopper JB_Flow__Attempt(JB_String* Name);
+
+void JB_Flow__GetActiveFlow();
 
 int JB_Flow__Init_();
 

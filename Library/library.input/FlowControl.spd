@@ -1,7 +1,9 @@
 
 
 /*
-	API to check if something different happened to the flow control from one platform to another
+	FlowControl system.
+	Makes sure your code is rock solid, and works identical when porting from one system to another!
+	Smash all bugs!
 */
 
 		
@@ -109,16 +111,23 @@ class FlowControl
 		|flowcontrol|			Flow			// DONT directly alter this 
 		|CompressionStats| 		Stats
 		|int| 					Disabled		= int.max
-		|byte|					Active			= FlowControl.Validate
 		|bool|					AlwaysMove		= true
-		|bool|					DoSuggest		= true
 		|bool|					BreakOnFail
+		|byte|					Active
+		.GetActiveFlow
 		
 		constants
 			Validate			= 2
 			Log					= 1
 			Off					= 0
-							
+		
+		function GetActiveFlow
+			|| str = app["flowmode"]
+			if str ~= "validate"
+				.Active = Validate
+			  elseif str ~= "log"
+				.Active = log
+			
 		syntax append (|bool| value, |bool|)
 			cpp_name JB_Flow__Cond,  visible,  flow off
 			self <~ ('T', 'F')(value)
@@ -160,19 +169,17 @@ class FlowControl
 
 		function Activate (|string| name,  |FlowControlStopper|)
 			flow off
-			|| path = "/tmp/Speedie/FlowControl/".child( name + ".txt.mz" )
 			if !.Active
-				print "#!FlowControl "
-				if .Active >= Validate
-					print "validation"
-				  else
-					print "logging"
-				print " would have been at: "
-				printline path
-				if .DoSuggest
-					"#!Pass --flowmode=1 (log) or --flowmode=2 (log+validate)."
+				"#!Use --flowmode=log or --flowmode=validate to activate FlowControl"
 				return nil
 
+			|| path = "/tmp/Speedie/FlowControl/".child( name + ".txt.mz" )
+			print "#!FlowControl "
+			if .Active >= Validate
+				print "validationat: "
+			  else
+				print "logging at: "
+			printline path
 			.Disabled = int.max			// in case its set badly
 			.flow = FlowControl(path)
 
@@ -185,7 +192,7 @@ class FlowControl
 
 
 datatype FlowControlStopper (int)
-	syntax UsingComplete (|object| idk=nil)
+	syntax UsingComplete (|object| dummy=nil)
 		flow off
 		flowcontrol.stop
 	

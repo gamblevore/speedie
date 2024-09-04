@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2117];
+extern JB_StringC* JB_LUB[2115];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -2372,10 +2372,6 @@ bool SC_Comp__ScriptRecompile(JB_File* F, JB_File* Script_build) {
 }
 
 void SC_Comp__SetupEnv() {
-	JB__Flow_Active = ((int)(false));
-	iif (!JB_Str_Exists(SC__Options_Variant)) {
-		JB__Flow_DoSuggest = false;
-	}
 	SC_Comp__ClearEnvs();
 	JB_FreeIfDead(JB_App__PrefsInit(-1));
 	SC__Options_Dev = JB_Str_Int(JB_App__GetPref(JB_LUB[1508]));
@@ -2954,10 +2950,7 @@ bool SC_FB__AppOptions_flow(JB_String* Name, JB_String* Value, FastString* Purpo
 }
 
 bool SC_FB__AppOptions_flowmode(JB_String* Name, JB_String* Value, FastString* Purpose) {
-	iif (!SC_FB__Explain(Purpose, JB_LUB[183])) {
-		return nil;
-	}
-	JB__Flow_Active = ((int64)JB_Ternaryy((JB_Str_Equals(Value, JB_LUB[112], false)), ((int64)kJB__Flow_Log), JB_Str_Int(Value)));
+	0;
 	return false;
 }
 
@@ -3119,11 +3112,6 @@ bool SC_FB__AppOptions_print(JB_String* Name, JB_String* Value, FastString* Purp
 	}
 	JB_Str_Print(Value);
 	return true;
-}
-
-bool SC_FB__AppOptions_products(JB_String* Name, JB_String* Value, FastString* Purpose) {
-	0;
-	return false;
 }
 
 bool SC_FB__AppOptions_quiet(JB_String* Name, JB_String* Value, FastString* Purpose) {
@@ -3290,7 +3278,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[164]);
-	JB_FS_AppendInt32(_fsf0, (2024090320));
+	JB_FS_AppendInt32(_fsf0, (2024090409));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -3416,11 +3404,11 @@ int SC_FB__Init_() {
 		DTWrap* _tmPf13 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_argstats))));
 		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1392], _tmPf13));
 		JB_Decr(_tmPf13);
-		DTWrap* _tmPf14 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_flow))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1571], _tmPf14));
+		DTWrap* _tmPf14 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_flowmode))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1949], _tmPf14));
 		JB_Decr(_tmPf14);
-		DTWrap* _tmPf15 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_flowmode))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1371], _tmPf15));
+		DTWrap* _tmPf15 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_flow))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1571], _tmPf15));
 		JB_Decr(_tmPf15);
 		DTWrap* _tmPf16 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_noisy))));
 		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1374], _tmPf16));
@@ -3428,96 +3416,93 @@ int SC_FB__Init_() {
 		DTWrap* _tmPf17 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_alive))));
 		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1383], _tmPf17));
 		JB_Decr(_tmPf17);
-		DTWrap* _tmPf18 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_products))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1375], _tmPf18));
+		DTWrap* _tmPf18 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_ignorecantsave))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1613], _tmPf18));
 		JB_Decr(_tmPf18);
-		DTWrap* _tmPf19 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_ignorecantsave))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1613], _tmPf19));
+		DTWrap* _tmPf19 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_quiet))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1376], _tmPf19));
 		JB_Decr(_tmPf19);
-		DTWrap* _tmPf20 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_quiet))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1376], _tmPf20));
+		DTWrap* _tmPf20 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_silent))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1380], _tmPf20));
 		JB_Decr(_tmPf20);
-		DTWrap* _tmPf21 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_silent))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1380], _tmPf21));
+		DTWrap* _tmPf21 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_stages))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1381], _tmPf21));
 		JB_Decr(_tmPf21);
-		DTWrap* _tmPf22 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_stages))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1381], _tmPf22));
+		DTWrap* _tmPf22 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_print))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1389], _tmPf22));
 		JB_Decr(_tmPf22);
-		DTWrap* _tmPf23 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_print))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1389], _tmPf23));
+		DTWrap* _tmPf23 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_directtest))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1513], _tmPf23));
 		JB_Decr(_tmPf23);
-		DTWrap* _tmPf24 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_directtest))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1513], _tmPf24));
+		DTWrap* _tmPf24 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_single))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1390], _tmPf24));
 		JB_Decr(_tmPf24);
-		DTWrap* _tmPf25 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_single))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1390], _tmPf25));
+		DTWrap* _tmPf25 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_elf))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1393], _tmPf25));
 		JB_Decr(_tmPf25);
-		DTWrap* _tmPf26 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_elf))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1393], _tmPf26));
+		DTWrap* _tmPf26 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_self))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[155], _tmPf26));
 		JB_Decr(_tmPf26);
-		DTWrap* _tmPf27 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_self))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[155], _tmPf27));
+		DTWrap* _tmPf27 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_nil))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[3], _tmPf27));
 		JB_Decr(_tmPf27);
-		DTWrap* _tmPf28 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_nil))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[3], _tmPf28));
+		DTWrap* _tmPf28 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_crash))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1484], _tmPf28));
 		JB_Decr(_tmPf28);
-		DTWrap* _tmPf29 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_crash))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1484], _tmPf29));
+		DTWrap* _tmPf29 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_pack))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[294], _tmPf29));
 		JB_Decr(_tmPf29);
-		DTWrap* _tmPf30 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_pack))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[294], _tmPf30));
+		DTWrap* _tmPf30 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_targetdebug))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1394], _tmPf30));
 		JB_Decr(_tmPf30);
-		DTWrap* _tmPf31 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_targetdebug))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1394], _tmPf31));
+		DTWrap* _tmPf31 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_target))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1325], _tmPf31));
 		JB_Decr(_tmPf31);
-		DTWrap* _tmPf32 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_target))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1325], _tmPf32));
+		DTWrap* _tmPf32 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_funccount))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1585], _tmPf32));
 		JB_Decr(_tmPf32);
-		DTWrap* _tmPf33 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_funccount))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1585], _tmPf33));
+		DTWrap* _tmPf33 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_warn))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[182], _tmPf33));
 		JB_Decr(_tmPf33);
-		DTWrap* _tmPf34 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_warn))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[182], _tmPf34));
+		DTWrap* _tmPf34 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_maxvars))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1397], _tmPf34));
 		JB_Decr(_tmPf34);
-		DTWrap* _tmPf35 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_maxvars))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1397], _tmPf35));
+		DTWrap* _tmPf35 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_nocolor))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1409], _tmPf35));
 		JB_Decr(_tmPf35);
-		DTWrap* _tmPf36 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_nocolor))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1409], _tmPf36));
+		DTWrap* _tmPf36 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_optimise))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1412], _tmPf36));
 		JB_Decr(_tmPf36);
-		DTWrap* _tmPf37 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_optimise))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1412], _tmPf37));
+		DTWrap* _tmPf37 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_cpp))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1474], _tmPf37));
 		JB_Decr(_tmPf37);
-		DTWrap* _tmPf38 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_cpp))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1474], _tmPf38));
+		DTWrap* _tmPf38 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_output_path))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1415], _tmPf38));
 		JB_Decr(_tmPf38);
-		DTWrap* _tmPf39 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_output_path))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1415], _tmPf39));
+		DTWrap* _tmPf39 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_force))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1576], _tmPf39));
 		JB_Decr(_tmPf39);
-		DTWrap* _tmPf40 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_force))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1576], _tmPf40));
+		DTWrap* _tmPf40 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_variant))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1421], _tmPf40));
 		JB_Decr(_tmPf40);
-		DTWrap* _tmPf41 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_variant))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1421], _tmPf41));
+		DTWrap* _tmPf41 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_codesign))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1459], _tmPf41));
 		JB_Decr(_tmPf41);
-		DTWrap* _tmPf42 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_codesign))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1459], _tmPf42));
+		DTWrap* _tmPf42 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_dosign))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1524], _tmPf42));
 		JB_Decr(_tmPf42);
-		DTWrap* _tmPf43 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_dosign))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1524], _tmPf43));
+		DTWrap* _tmPf43 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_clean))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1452], _tmPf43));
 		JB_Decr(_tmPf43);
-		DTWrap* _tmPf44 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_clean))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1452], _tmPf44));
+		DTWrap* _tmPf44 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_FB__AppVersionNumber)))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1426], _tmPf44));
 		JB_Decr(_tmPf44);
 		DTWrap* _tmPf45 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_FB__AppVersionNumber)))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1426], _tmPf45));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1431], _tmPf45));
 		JB_Decr(_tmPf45);
-		DTWrap* _tmPf46 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_FB__AppVersionNumber)))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1431], _tmPf46));
+		DTWrap* _tmPf46 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_help))));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1603], _tmPf46));
 		JB_Decr(_tmPf46);
-		DTWrap* _tmPf47 = JB_Incr(JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_help))));
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1603], _tmPf47));
-		JB_Decr(_tmPf47);
 	}
 	;
 	return 0;
@@ -8386,7 +8371,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2024090320));
+	JB_FS_AppendInt32(_fsf0, (2024090409));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -11140,6 +11125,8 @@ int JB_InitCode_() {
 	SC_nil__InitCode_();
 	//// Random;
 	JB_Rnd__InitCode_();
+	//// FlowControl;
+	JB_Flow__InitCode_();
 	//// MaterialsLol;
 	SC_MaterialsLol__InitCode_();
 	//// SCIterator;
@@ -17705,7 +17692,7 @@ FlowControlStopper JB_FlowControlStopper_SyntaxUsing(FlowControlStopper Self) {
 	return 0;
 }
 
-void JB_FlowControlStopper_SyntaxUsingComplete(FlowControlStopper Self, JB_Object* Idk) {
+void JB_FlowControlStopper_SyntaxUsingComplete(FlowControlStopper Self, JB_Object* Dummy) {
 	//;
 	JB_Flow__Stop();
 }
@@ -25505,7 +25492,7 @@ void JB_Flow_Flush(FlowControl* Self) {
 bool JB_Flow_LoadPath(FlowControl* Self, JB_String* Path) {
 	//;
 	if (JB__Flow_Active < kJB__Flow_Validate) {
-		JB_Str_Print(JB_LUB[2115]);
+		JB_Str_Print(JB_LUB[183]);
 		JB_SetRef(Self->Write, JB_Str_Out(Path, true));
 		return true;
 	}
@@ -25515,7 +25502,7 @@ bool JB_Flow_LoadPath(FlowControl* Self, JB_String* Path) {
 	JB_SetRef(Self->ReadInput, JB_Str_Stream(_tmPf0));
 	JB_Decr(_tmPf0);
 	if (JB_SS_HasAny(Self->ReadInput)) {
-		JB_Str_Print(JB_LUB[2116]);
+		JB_Str_Print(JB_LUB[1371]);
 		return true;
 	}
 	return false;
@@ -25539,25 +25526,21 @@ bool JB_Flow_TestByte(FlowControl* Self, uint /*byte*/ Value) {
 
 FlowControlStopper JB_Flow__Activate(JB_String* Name) {
 	//;
+	if (!JB__Flow_Active) {
+		JB_PrintLine(JB_LUB[2111]);
+		return nil;
+	}
 	JB_String* _tmPf0 = JB_Incr(JB_Str_OperatorPlus(Name, JB_LUB[1947]));
 	JB_String* Path = JB_Incr(JB_Str_Child(JB_LUB[1946], _tmPf0));
 	JB_Decr(_tmPf0);
-	if (!JB__Flow_Active) {
-		JB_Str_Print(JB_LUB[1948]);
-		if (JB__Flow_Active >= kJB__Flow_Validate) {
-			JB_Str_Print(JB_LUB[2111]);
-		}
-		 else {
-			JB_Str_Print(JB_LUB[2112]);
-		}
-		JB_Str_Print(JB_LUB[2113]);
-		JB_PrintLine(Path);
-		if (JB__Flow_DoSuggest) {
-			JB_PrintLine(JB_LUB[1949]);
-		}
-		JB_Decr(Path);
-		return nil;
+	JB_Str_Print(JB_LUB[1948]);
+	if (JB__Flow_Active >= kJB__Flow_Validate) {
+		JB_Str_Print(JB_LUB[2112]);
 	}
+	 else {
+		JB_Str_Print(JB_LUB[2113]);
+	}
+	JB_PrintLine(Path);
 	JB__Flow_Disabled = JB_int__Max();
 	JB_SetRef(JB__Flow_Flow, JB_Flow_Constructor(nil, Path));
 	JB_Decr(Path);
@@ -25569,19 +25552,32 @@ FlowControlStopper JB_Flow__Attempt(JB_String* Name) {
 	return JB_Flow__Activate(Name);
 }
 
+void JB_Flow__GetActiveFlow() {
+	JB_String* Str = JB_Incr(JB_App__SyntaxAccess(JB_LUB[1949]));
+	iif (JB_Str_Equals(Str, JB_LUB[1375], true)) {
+		JB__Flow_Active = kJB__Flow_Validate;
+	}
+	 else iif (JB_Str_Equals(Str, JB_LUB[1535], true)) {
+		JB__Flow_Active = kJB__Flow_Log;
+	}
+	JB_Decr(Str);
+}
+
 int JB_Flow__Init_() {
 	{
 		JB__Flow_Stats = ((CompressionStats){});
 		JB__Flow_Disabled = JB_int__Max();
-		JB__Flow_Active = kJB__Flow_Validate;
 		JB__Flow_AlwaysMove = true;
-		JB__Flow_DoSuggest = true;
 	}
 	;
 	return 0;
 }
 
 int JB_Flow__InitCode_() {
+	{
+	}
+	;
+	JB_Flow__GetActiveFlow();
 	return 0;
 }
 
@@ -53492,4 +53488,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 5786713894253124652 1456206135548172264
+// -8326903054464992622 -5275289969736859841

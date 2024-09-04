@@ -48,10 +48,6 @@ function compiler.ClearEnvs
 
 function compiler.SetupEnv
 	opt norefcounts
-	FlowControl.Active = (target~ViaBuilder) |int| // can enable via "log"
-	if !Options.Variant
-		FlowControl.DoSuggest = false
-
 	.ClearEnvs
 	app.PrefsInit(-1)
 	

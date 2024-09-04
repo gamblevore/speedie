@@ -222,7 +222,6 @@ module Feedback
 		+"nocompile" // remove this later
 			Explain(Purpose, "Will not compile any .cpp generated.")$
 			Options.Compile = false
-//			options.products &=~ (options.pack+options.native)
 			
 		+"breakonerr" 
 			Explain(Purpose, "")$
@@ -284,16 +283,15 @@ module Feedback
 			Explain(Purpose, "")$
 			options.argstats = true
 		
+		+"flowmode"
+			0 // placeholder
+			
 		+"flow"
 			explain(Purpose, "Adds control-flow logging to generated compiles")$
 			|| b = value.optionbool
 			Options.GenFlowControlCode = b 
 			SC_Targets["flow"] = b
 
-		+"flowmode"
-			explain(Purpose, "Modifies flow logging")$
-			FlowControl.Active = (FlowControl.log, value.int)(value == "true")
-		
 		+"noisy"
 			Explain(Purpose, "Prints more stuff.")$
 			"NoiseActivated"
@@ -305,9 +303,6 @@ module Feedback
 			Explain(purpose)$
 			"We seems alive :)" // used by perry
 			return true
-		
-		+"products"
-			0 // does nothing
 
 		+"ignorecantsave" 
 			Explain(Purpose)$
@@ -429,10 +424,6 @@ module Feedback
 			Options.Color = false
 			if options.optimise < 0
 				options.optimise = 1
-//
-//		+"final"
-//			Explain(Purpose)$
-//			Options.Final = true
 		
 		+"codesign"
 			Explain(Purpose, "Gets/Sets the codesign certificate")$
