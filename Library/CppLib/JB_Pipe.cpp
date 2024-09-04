@@ -100,6 +100,7 @@ bool JB_Str__Terminate(Array* strs) {
 }
 
 
+void JB_Flow__ReportStringData(u8* Addr, int Length, u8* Name, int NameLen);
 const char** JB_Proc__CreateArgs(JB_String* self, Array* R) {
 	int N = JB_Array_Size(R);
 	int Strs = JB_Str_Length(self) + 1;
@@ -126,6 +127,9 @@ const char** JB_Proc__CreateArgs(JB_String* self, Array* R) {
 		self = (JB_String*)JB_Array_Value(R, i);
 	}
 	PtrSpace++;
+#ifndef AS_LIBRARY
+	JB_Flow__ReportStringData((u8*)Orig2, (int)(ByteSpace-Orig2), (u8*)"pipe", 4);
+#endif
 	
 	if ((char*)PtrSpace != Orig2) // ouch
 		debugger;

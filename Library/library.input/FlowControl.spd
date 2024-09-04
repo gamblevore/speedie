@@ -173,10 +173,10 @@ class FlowControl
 				"#!Use --flowmode=log or --flowmode=validate to activate FlowControl"
 				return nil
 
-			|| path = "/tmp/Speedie/FlowControl/".child( name + ".txt.mz" )
+			|| path = "/tmp/Speedie/FlowControl".child( name + ".txt.mz" )
 			print "#!FlowControl "
 			if .Active >= Validate
-				print "validationat: "
+				print "validation at: "
 			  else
 				print "logging at: "
 			printline path

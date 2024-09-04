@@ -489,9 +489,6 @@ static int InterPipe(FastString* self, int Desired, int fd, int Mode) {
 		N = InterRead(fd, Buffer, Desired, 0, Error, Mode);
 		JB_FS_AdjustLength_(self, Desired, N);
 	}
-#ifndef AS_LIBRARY
-	JB_Flow__ReportStringData(Buffer, N, (u8*)"pipe", 4);
-#endif
 	return Error;
 }
 
