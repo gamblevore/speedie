@@ -352,7 +352,7 @@ class File (String)
 		if super == "/" or ""
 			return -1
 		if .IsDir
-			for C.Files in self
+			for C in self.ListFiles(true)
 				|| tmp = C.DeleteAll
 				if rz == 0
 					rz = tmp
@@ -408,19 +408,25 @@ class File (String)
 		if !.isdir
 			return .copyto(dest.file, AttrOnly)
 
-		for f in self
+		for f in .list
 			rz = .child(f).copyall(dest[f]) 
 			if !rz
 				exit
 	
-	function List (|bool| invis = false, |[string]|)
+	function List (|bool| invis = false, |bool| AsFile=false, |[string]|)
 		flow off
 		for name in self
 			if (invis) or (name[] != '.')
-				rz <~ name
+				if AsFile
+					rz <~ .child(name)
+				  else
+					rz <~ name
 		rz.sort(&string.sorter)
 		if !flowcontrol.disabled
 			flowcontrol.input(rz, self)
+		
+	function ListFiles (|bool| invis = false, |[file]|)
+		return .list(invis, true)|[file]|		
 	
 	function MoveTo (|string| Path, |ErrorInt|)
 		cpp_wrapper JB_File_MoveTo

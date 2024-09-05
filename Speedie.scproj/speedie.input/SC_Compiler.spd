@@ -133,6 +133,7 @@ linkage
 |int|						stTotalFileCount
 |int|						stParseTimeTotal
 |int|						CurrStage
+|string|					StageName
 |SCFunction|				ClassListInitFunc
 
 
@@ -895,6 +896,7 @@ function Stage (|string| name, |bool|)
 		|| space = " "*(Compiler.CurrStage <= 9)
 		" ${.CurrStage}$space  :: $name ::  "
 	.CurrStage++
+	.Stagename = name
 	return true
 
 

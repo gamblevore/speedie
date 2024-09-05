@@ -14,35 +14,26 @@ class FlowControl
 	|faststring?| 			Write
 	|bool| 					CanDoErrors
 
-	constructor (|string| path)
+	constructor (|string| OutPath, |string| InPath)
 		flow off
 		.CanDoErrors = true
 		.buff.needAlloc(1MB)
-		.write = nil
-		if .LoadPath(path)
-			flowcontrol.Disabled = 0
-		  else
-			print "Cant load flow "
-		printline path
-
-
-	helper LoadPath	(|string| path, |bool|)
-		flow off
-		if (FlowControl.Active < FlowControl.Validate)
-			print "Logging flow to "
-			.write = path.out
-			return true
-
-		.ReadInput = path.ReadFile(16MB, false).Decompress.stream
-		if .ReadInput.HasAny
+		.write = outpath.out
+		print "Logging flow to "
+		printline OutPath
+		|stringreader| s
+		if inpath
 			print "Validating flow against "
-			return true
-	
+			printline InPath
+			s = inpath.stream
+		.ReadInput = s
+		disabled = 0
+
 	
 	helper Flush
 		flow off
-		if .write
-			.buff.tmpstr.CompressInto(.write, stats)
+		|| w = .Write
+			w <~ .buff
 		.buff.Curr = .buff.start
 			 
 
@@ -70,6 +61,7 @@ class FlowControl
 		|| b = r.byte
 		if b == value
 			return true
+		debugger
 		.fail(string.byte(value), string.byte(b), "")
 
 
@@ -109,7 +101,6 @@ class FlowControl
 	
 	module
 		|flowcontrol|			Flow			// DONT directly alter this 
-		|CompressionStats| 		Stats
 		|int| 					Disabled		= int.max
 		|bool|					AlwaysMove		= true
 		|bool|					BreakOnFail
@@ -128,23 +119,33 @@ class FlowControl
 			  elseif str ~= "log"
 				.Active = log
 			
-		syntax append (|bool| value, |bool|)
+		helper Bool (|bool| value, |bool|)
 			cpp_name JB_Flow__Cond,  visible,  flow off
-			self <~ ('T', 'F')(value)
+			self <~ ('A'+value)|byte|
 			return value
+		
+		helper While (|bool| value, |bool|)
+			cpp_name JB_Flow__Cond2,  visible,  flow off
+			if value
+				return true
+			self <~ 'W'
 		
 		syntax append (|byte| value)
 			visible,  flow off
 			if !.disabled
 				.disabled = 1
-				.flow!.TestByte(('T', 'F')(value))
+				.flow!.TestByte(value)
 				.disabled = 0
 
 		function Input (|[string]| lines, |string| name,  |bool|)
 			cpp_part InputStrings
 			flow off
-			.Input(lines.join("\n"), name)
+			.InputLine(lines.join("\n"), name)
 
+		function InputLine (|string| data, |string| name)
+			.Input(data, name)
+			self <~ '\n'
+		
 		function Input (|string| data, |string| name)
 			visible
 			flow off
@@ -167,21 +168,26 @@ class FlowControl
 			.Disabled = int.max
 			.Flow = nil
 
+		helper AskPath (|string| name, |bool| WantValidate, |string|)
+			if WantValidate
+				require .Active >= Validate
+				print "validation at: "
+			  else //
+				if .Active >= Validate
+					name += "Debug"
+				print "logging at: "
+			rz = "/tmp/Speedie/FlowControl".child( name + ".txt" )
+			printline 
+
 		function Activate (|string| name,  |FlowControlStopper|)
 			flow off
 			if !.Active
 				"#!Use --flowmode=log or --flowmode=validate to activate FlowControl"
 				return nil
 
-			|| path = "/tmp/Speedie/FlowControl".child( name + ".txt.mz" )
 			print "#!FlowControl "
-			if .Active >= Validate
-				print "validation at: "
-			  else
-				print "logging at: "
-			printline path
 			.Disabled = int.max			// in case its set badly
-			.flow = FlowControl(path)
+			.flow = FlowControl(.askpath(name,false), .askpath(name,true))
 
 
 		function Attempt (|string| name,  |FlowControlStopper|)

@@ -155,6 +155,10 @@ struct FastBuff
 			error (self, "Stream read too far")
 			c = .end
 		.curr = c
+	
+	function Faststring.SyntaxAppend (|&fastbuff| b)
+		cpp_part AppendBuff
+		.AppendMemory(b.start, b.length)
 
 
 	iterator

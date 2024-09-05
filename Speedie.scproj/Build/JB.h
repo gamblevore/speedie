@@ -1480,6 +1480,7 @@ extern SCFunction* SC__Comp_RefIncr;
 extern SCFunction* SC__Comp_RefSafeDecr;
 extern SCFunction* SC__Comp_RefSetRef;
 extern JB_String* SC__Comp_ReportedName;
+extern JB_String* SC__Comp_StageName;
 extern int SC__Comp_stClasses;
 extern int SC__Comp_stFuncs;
 extern int SC__Comp_stParseTime;
@@ -1505,13 +1506,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool ((int)16)
 #define kSC__CustomOps_TypeCastToBetter ((int)32)
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2101])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[105])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2102])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2103])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2100])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2103])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2104])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[102])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[103])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[106])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[103])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[104])
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
 extern int SC__FastStringOpts_StrRemoved;
@@ -1700,7 +1701,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2109])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[1514])
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
 extern CharSet* SC_CSNum;
@@ -1725,7 +1726,7 @@ extern JB_String* SC_kNameConf;
 #define kJB_kNoMatch ((int)0)
 #define kJB_kNumericMatch ((int)8388608)
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2105])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[499])
 #define kJB_kSimpleMatch ((int)4194304)
 #define kJB_kSuperClassMatch ((int)16777216)
 #define kJB_kTypeCastAssigns ((int)64)
@@ -1743,7 +1744,7 @@ extern JB_String* SC_kNameConf;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2110])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[806])
 #define kJB_kVoidPtrMatch ((int)20971520)
 extern JB_File* SC_PerryLogFile;
 extern Message* SC_ReturnSelfEqNil;
@@ -1885,10 +1886,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp ((int)32784)
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2108])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2107])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2107])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2106])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2106])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2105])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int16_max ((s16)32767)
@@ -2398,7 +2399,7 @@ extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_kDelete ((int)2)
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2099])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[1029])
 extern Float64 JB__Rec_Progress;
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -2411,7 +2412,6 @@ extern int JB__Flow_Disabled;
 extern FlowControl* JB__Flow_Flow;
 #define kJB__Flow_Log ((int)1)
 #define kJB__Flow_Off ((int)0)
-extern CompressionStats JB__Flow_Stats;
 #define kJB__Flow_Validate ((int)2)
 #define kSC__Instruction_kTypeConst ((int)2)
 #define kSC__Instruction_kTypeFunc ((int)1)
@@ -2477,7 +2477,7 @@ extern bool JB__Err_KeepStackTrace;
 #define kSC__Beh_kBehaviourProto ((int)2)
 #define kSC__Beh_kBehaviourProtoRequired ((int)6)
 #define kSC__Beh_kBehaviourTable ((int)1)
-extern SCFunction* SC__Func_CurrFunc;
+extern SCFunction* SC__Func__CurrFunc;
 extern int SC__Func_DisabledPoints;
 extern int SC__Func_FuncStats[12];
 extern int SC__Func_OnceCount;
@@ -5573,8 +5573,6 @@ JB_String* JB_FastBuff_AccessStr(FastBuff* Self, int Pos, int After);
 
 void JB_FastBuff_SyntaxExpect(FastBuff* Self, JB_String* S);
 
-JB_String* JB_FastBuff_TmpStr(FastBuff* Self);
-
 
 
 // JB_FatASM
@@ -6694,6 +6692,8 @@ void JB_FS_AppendFloatAsText(FastString* Self, float F);
 
 void JB_FS_AppendBool(FastString* Self, bool B);
 
+void JB_FS_AppendBuff(FastString* Self, FastBuff* B);
+
 void JB_FS_SyntaxAppend(FastString* Self, Message* Msg);
 
 FastString* JB_FS__Use(JB_Object* Other);
@@ -6709,7 +6709,7 @@ FastString* JB_FS__Use(JB_Object* Other);
 // JB_FlowControl
 void JB_Flow_AddByte(FlowControl* Self, uint /*byte*/ Value);
 
-FlowControl* JB_Flow_Constructor(FlowControl* Self, JB_String* Path);
+FlowControl* JB_Flow_Constructor(FlowControl* Self, JB_String* OutPath, JB_String* InPath);
 
 void JB_Flow_Destructor(FlowControl* Self);
 
@@ -6717,13 +6717,15 @@ void JB_Flow_Fail(FlowControl* Self, JB_String* Found, JB_String* Expected, JB_S
 
 void JB_Flow_Flush(FlowControl* Self);
 
-bool JB_Flow_LoadPath(FlowControl* Self, JB_String* Path);
-
 bool JB_Flow_TestByte(FlowControl* Self, uint /*byte*/ Value);
 
 FlowControlStopper JB_Flow__Activate(JB_String* Name);
 
+JB_String* JB_Flow__AskPath(JB_String* Name, bool WantValidate);
+
 FlowControlStopper JB_Flow__Attempt(JB_String* Name);
+
+bool JB_Flow__Cond(bool Value);
 
 void JB_Flow__GetActiveFlow();
 
@@ -6735,11 +6737,13 @@ bool JB_Flow__InputStrings(Array* Lines, JB_String* Name);
 
 void JB_Flow__Input(JB_String* Data, JB_String* Name);
 
+void JB_Flow__InputLine(JB_String* Data, JB_String* Name);
+
 void JB_Flow__Stop();
 
-bool JB_Flow__Cond(bool Value);
-
 void JB_Flow__SyntaxAppend(uint /*byte*/ Value);
+
+bool JB_Flow__Cond2(bool Value);
 
 
 
@@ -7579,7 +7583,9 @@ bool JB_File_DirectoryContains(JB_File* Self, JB_String* Path);
 
 ErrorInt JB_File_LinkToSet(JB_File* Self, JB_String* Value);
 
-Array* JB_File_List(JB_File* Self, bool Invis);
+Array* JB_File_List(JB_File* Self, bool Invis, bool AsFile);
+
+Array* JB_File_ListFiles(JB_File* Self, bool Invis);
 
 bool JB_File_MustExist(JB_File* Self, JB_String* Operation);
 
@@ -10046,6 +10052,10 @@ bool SC_Func__CanKeepAsSource(Message* List, Message* Arg, SCDecl* D);
 
 bool SC_Func__CanKeepAsValue(SCIterator* Iter, Message* Arg, SCDecl* Dcl, Message* Value);
 
+void SC_Func__CurrFuncSet(SCFunction* Value);
+
+SCFunction* SC_Func__CurrFunc();
+
 void SC_Func__FastStringOpt(Message* S, SCNode* Name_space);
 
 Message* SC_Func__GetFileString(Message* Msg, JB_String* Name);
@@ -10457,7 +10467,7 @@ inline JB_String* SC_Named_Name(SCNamed* Self) {
 	iif (Self) {
 		return Self->Name;
 	}
-	return JB_LUB[273];
+	return JB_LUB[289];
 }
 
 inline bool SC_OpMode_SyntaxCast(OpMode Self) {
@@ -10627,7 +10637,7 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 			Message* __varf1 = F->Source;
 			MessagePosition _usingf0 = ((MessagePosition){});
 			JB_Msg_SyntaxUsing(__varf1, (&_usingf0));
-			JB_Tree_SyntaxAppend(Self, (JB_Syx_Msg(kJB_SyxThg, JB_LUB[1268])));
+			JB_Tree_SyntaxAppend(Self, (JB_Syx_Msg(kJB_SyxThg, JB_LUB[1319])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0), __varf1);
 			JB_MsgPos_Destructor((&_usingf0));
 		}
@@ -10636,7 +10646,7 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 
 inline void SC_Reg_Expect(ASMReg Self, Message* Where) {
 	iif (!SC_Reg_Reg(Self)) {
-		SC_Pac_SyntaxExpect((&SC__Pac_Sh), Where, JB_LUB[1217]);
+		SC_Pac_SyntaxExpect((&SC__Pac_Sh), Where, JB_LUB[844]);
 	}
 }
 

@@ -684,6 +684,7 @@ function array.Remove (|array of string| self, |string| item, |bool| CaseAware=t
 
 
 function array.join (|array of string| self, |string| sep = "", |string|)
+	flow off
 	|| sl = sep.Length
 	|| n = -sl
 	for s in self

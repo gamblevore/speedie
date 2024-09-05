@@ -305,7 +305,7 @@ function Transform ()
 			.BuildConstructorDestructor
 			Tran_All( self, n, space )
 
-	CurrFunc = nil
+	scfunction.CurrFunc = nil
 	scmodule.curr = nil
 
 
@@ -1175,8 +1175,17 @@ iterator
 
 module {
 ||				DisabledPoints = 0
-|SCFunction|	CurrFunc
+|SCFunction|	_CurrFunc
 |int[12]|		FuncStats
+
+function CurrFunc (assigns:|scfunction?|)
+	._currfunc = value
+	if flowcontrol.active
+		FlowControl.inputline("function: ", value.name)
+		FlowControl.inputline("stage: ", compiler.stagename)
+	
+function CurrFunc (|scfunction|)
+	return _currfunc
 
 
 function NewMacro (CollectFunc)

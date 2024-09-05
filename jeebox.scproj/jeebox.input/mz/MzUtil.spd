@@ -103,7 +103,7 @@ Module MZLab
 		|| d = file.speedie.child("Speedie.scproj/speedie.input/ASMBuilder/").file
 		require d.exists
 		|[string]| Inputs
-		for ch.files in d
+		for ch in d.ListFiles
 			if ch.visible
 				inputs <~ ch.ReadAll
 	

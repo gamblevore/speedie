@@ -22,7 +22,7 @@
 #define if_usual(x)				if (likely(x))
 
 #define iif(x)					if (JB_Flow__Cond(x))
-#define wwhile(x)				while (JB_Flow__Cond(x)) 
+#define wwhile(x)				while (JB_Flow__Cond2(x)) 
 #define JB_Ternary(cond,a,b)	((cond)?(a):(b))
 #define JB_Ternaryy(cond,a,b)	(JB_Flow__Cond(cond)?(a):(b))
 
@@ -36,6 +36,7 @@
 extern "C" {
 
 bool JB_Flow__Cond(bool b);
+bool JB_Flow__Cond2(bool b);
 bool JB_Plat__HasFlow();
 void JB_Flow__PrintStats();
 

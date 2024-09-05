@@ -160,7 +160,7 @@ class SCImport
 		return ErrorSeverity.find(.name, self)
 
 	function IncludeCHeaders (|file| f, |[string]| output)
-		for c.files in f
+		for c in f.ListFiles
 			if (!c.isDir) and (c isa "h")
 				output <~ c
 	
@@ -260,7 +260,7 @@ class SCImport
 
 		function FindInputFolder (|file| f, |file|)
 			|| FirstName = ""
-			for name in f
+			for name in f.list
 				if IsInputName(name)
 					if !FirstName
 						FirstName = name

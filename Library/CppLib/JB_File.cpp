@@ -141,6 +141,7 @@ void JB_Flow__ReportStringData(u8* Addr, int Length, u8* Name, int NameLen) {
 #ifndef AS_LIBRARY
 	if (!JB__Flow_Disabled) {
 		uint64 Hash = JB_CRC(Addr, Length, 0);
+		Hash = Hash xor (Hash >> 32);
 		JB_String A;
 		JB_String B;
 		A.Addr = (u8*)(&Hash);
@@ -148,6 +149,12 @@ void JB_Flow__ReportStringData(u8* Addr, int Length, u8* Name, int NameLen) {
 		B.Addr = Name;
 		B.Length = NameLen;
 		void JB_Flow__Input(JB_String* data, JB_String* name);
+		int p = 8;
+		for (int i = 0; i < 4; i++) {
+			auto C = A.Addr[i];
+			A.Addr[--p] = '@' + (C&16);
+			A.Addr[--p] = '@' + (C>>4);
+		}
 		JB_Flow__Input(&A, &B);
 	}
 #endif

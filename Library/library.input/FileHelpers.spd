@@ -26,7 +26,7 @@ extend String
 			|| newpath = (.child(p), "/")(self or p) 
 			newpath.fileglobsub2(parts, result, i)
 			return 
-		for ch in .file
+		for ch in .file.list
 			if p globs ch
 				.child(ch).fileglobsub2(parts, result, i)
 	

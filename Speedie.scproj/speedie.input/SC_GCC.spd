@@ -350,7 +350,7 @@ function CollectPico (|string| lib)
 
 function TestNewestLib (|file| cpplib)
 	LatestLibDate = 0
-	for s.files in cpplib
+	for s in cpplib.listfiles
 		if s.visible and !s.IsDir
 			(LatestLibDate max= s.Modified)
 //	printline LatestLibDate.LocalTime
@@ -473,7 +473,7 @@ function TestNewCompiler (|bool|) // self_test, selftest, testself, test_self, t
 function ReplaceOld (|file| input, |File| Backs)
 	|file| oldest
 	|| score = 0
-	for f.files in Backs
+	for f in Backs.listfiles
 		|| name = f.name
 		if (name endswith "Speedie") and (name[].isletter)
 			|| s = f.modified.ago.days
@@ -546,7 +546,7 @@ function file.TestBatch (|bool|)
 	|| batch = compiler.BaseProjectPath!["Batch"]!
 	|| Printed = false
 	print "Tested: " 
-	for c.files in batch
+	for c in batch.ListFiles
 		if c.visible and c isa "spd"
 			if printed
 				print ", "
@@ -555,7 +555,7 @@ function file.TestBatch (|bool|)
 			.SilentExecute([c, "--nocompile", "--perry"])
 	printline
 	
-	for c.files in batch
+	for c in batch.ListFiles
 		if c isa "cpp" or "h"
 			print "This file should really not be here: "
 			printline c
