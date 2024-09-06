@@ -1,11 +1,9 @@
 
 #include "JB_Compress.h"
-#include "divsufsort.h" // Runs 5x (!!) faster than a plain quicksort or even my spdsort
-// * i should also add a "next item differs at" thing to the suffixes...
+#include "divsufsort.h" // Runs 5x (!!) faster than even my spdsort
+// * I should also add a "next item differs at" thing to the suffixes...
 // * and maybe a "strength" that allows further checking of suffixes?
 
-
-#define kExtend 0x70
 
 struct CompState : FastBuff {
 	int					LastOut;
@@ -13,9 +11,9 @@ struct CompState : FastBuff {
 	int					StatsDetector;
 	int					BitCount;
 	uint64_t			BitBuff;
+	int					SearchStrength;
 	int*				Suffixes;
 	int*				SortPositionAtByte;	
-	
 
 	uint32_t ReadUInt() {
 		auto C = (uint32_t*)Read;
@@ -77,35 +75,7 @@ struct CompState : FastBuff {
 		BitCount = C-Zeros;
 		return Zeros;
 	}
-
-	inline int GetOffset() {
-		uint Z = ZeroBits();
-		uint Bits = (Z << 2) + 4;
-		uint b = 0b00010001000100010001000100010001;
-		Z = ((1<<Bits)-1) & b;
-		uint F = GetBits(Bits);
-		return F + Z;
-	}
 	
-	inline void PutOffset (uint X) {
-		uint b = 0b00010001000100010001000100010000;
-		for (int i = 5; i < 32; i+=4) {
-			uint mask = (1<<i)-1; // could opt this to start at the correct bit-range... using log2
-			if (X > (b&mask)) continue;
-			PutBits(i>>2,   1);
-			PutBits(i-1, X-(mask>>4));
-			return;
-		}
-		__builtin_trap(); // aaaa?????
-	}
-
-	inline int GetLength() {
-// Lengths:	 1=(1),  3=(2-3),  5=(4-7),  7=(8-15),  9=(16-31),  11=(32-63)
-		uint Z = ZeroBits();
-		uint F = GetBits(Z);
-		return F + (1<<Z) + 1;
-	}
-
 	inline void PutLength (uint X) {
 		if (X <= 1)
 			return PutBits(1,  1);
@@ -116,32 +86,52 @@ struct CompState : FastBuff {
 		PutBits(L, X-(1<<L));
 	}
 
+	inline void PutOffset (uint X) {
+		uint b = 0b00010001000100010001000100010000;
+		for (int i = 5; i < 32; i+=4) {
+			uint mask = (1<<i)-1;	// could opt this to start at the correct bit-range... using log2
+			if (X > (b&mask)) continue;
+			PutBits(i>>2,   1);
+			PutBits(i-1, X-(mask>>4));
+			return;
+		}
+		__builtin_trap(); // aaaa?????
+	}
 	
-	bool TestOneCost (u8* Find,  u8* E,  int G,  MatchFound& Best, int Esc) {
-		int N		= Suffixes[G];
-		u8* Text	= E - N;
-		N			= (Text < Find) ? (int)(E-Find) : 2; // we just want to know if any good ones remain.
-		int i		= 0;
+	inline int GetOffset() {
+		uint Z = ZeroBits();
+		uint Bits = (Z << 2) + 4;
+		uint b = 0b00010001000100010001000100010001;
+		Z = ((1<<Bits)-1) & b;
+		uint F = GetBits(Bits);
+		return F + Z;
+	}
+
+	inline int GetLength() {		// Lengths:	 1=(1),  3=(2-3),  5=(4-7),  7=(8-15),  9=(16-31),  11=(32-63)
+		uint Z = ZeroBits();
+		uint F = GetBits(Z);
+		return F + (1<<Z) + 1;
+	}
+	
+	bool TestOneCost (u8* Find,  u8* E,  int G,  MatchFound& Best) {
+		int N = Suffixes[G];
+		u8* Text = E - N;
+		N = (Text < Find) ? (int)(E-Find) : 1; // we just want to know if any good ones remain.
+											   // fix this?
+		int i = 0;
 		for (; i < N; i++)
 			if (Find[i] != Text[i]) break;
 		
-		if (i < 2)
-			return false; // only gonna get worse. Better checking will make this faster.
-		int Back	= (int)(Find - Text);
+		int Back = (int)(Find - Text);
 		if (Back <= 0)
 			return true;
 		
-		int FixCost		= (Esc!=0) + 1 - i;
-		int VaryCost	= (i > 9) + (Back >= 4096) + (Back >= 64_K);
-		int Cost = FixCost + VaryCost;
-		int BestCost = Best.Cost();
-		if (Cost < BestCost) {
-			Best = {Back, i, FixCost, VaryCost};
+		int Score = i; // for now
+		if (Score > Best.Score) {
+			Best = {Back, i, Score};
 			return true; // continue
 		}
-		if (Cost == BestCost or Best.Length <= i)
-			return true; // continue
-		return false; // stop
+		return (Score == Best.Score or Best.Length <= i);
 	}
 
 
@@ -151,16 +141,15 @@ struct CompState : FastBuff {
 		int L		= Self - 1;
 		int H		= Self + 1;
 		int B		= 0;
-		B			= max(0, L-250);		// Actually lowers compresion! seem like we are reading A LOT.
-		Last		= min(Last, H+250);		// the "next/prev endgaps.changesat[i]" opt would help!
-		int Esc		= (R != LastOut)*0x20;
+		B			= max(0, L-SearchStrength);
+		Last		= min(Last, H+SearchStrength);	// the "next/prev endgaps.changesat[i]" opt would help!
 		u8* SelfTest= Read + R;
 		
-		MatchFound Best = {};
+		MatchFound Best = {R+1+E[R], 1, 0};
 		while (L >= B or H <= Last) {
-			if (L >= B    and TestOneCost(SelfTest, E, L--, Best, Esc)==false)
+			if (L >= B    and !TestOneCost(SelfTest, E, L--, Best))
 				L = -1;
-			if (H <= Last and TestOneCost(SelfTest, E, H++, Best, Esc)==false)
+			if (H <= Last and !TestOneCost(SelfTest, E, H++, Best))
 				H = Last+1;
 		}
 		return Best;
@@ -179,35 +168,7 @@ struct CompState : FastBuff {
 	}
 	
 
-//////////////////////////////////////////////// COMPRESSION //////////////////////////////////////////////////////
-	int AllocWrite (int Length, int MaxBits) {
-		int Over = Length >> MaxBits;
-		if (Over) {
-			// 0 = 0bytes,  1-15 = 1byte,  16-255 = 2bytes
-			int Loop = (JB_Int_Log2(Over) &~ 0x3) + 4;
-			while (Loop > 0) {
-				Loop -= 4;
-				*Write++ = ((Over >> Loop)&15) | kExtend;
-			}
-		}
-		
-		return Length & ((1<<MaxBits)-1);
-	}
-
-
-	int Process (int i, u8* TextAfter) {
-		auto Found = BestPos(i, TextAfter);
-		require (Found);
-		EscapeOld(i);
-		WriteOffset(Found.Back, Found.Length);
-		dbgexpect2 (LastOut <= Expected);
-		return Found.Length - 1;
-	}
-
-	inline void WriteStr (const void* B, int N) {
-		(CopyBytes(B, Write, N));
-		Write+=N;
-	}
+//////////////////////////////////////////////// COMPRESSION ////////////////////////////////////////////////
 
 	void WriteOffset (int Offset, int Length) {
 		dbgexpect(Length >= 0 and Offset >= 1);
@@ -220,6 +181,7 @@ static CompState	sigh;
 static FastBuff		FB;
 static CompState& alloc_compress(JB_String* self, FastString* fs) {
 	CompState& C		= sigh;
+	C.SearchStrength	= 250; // can increase/decrease
 
 	int Total			= self->Length;
 	int CB				= max(ChunkLen_(Total), 12);
@@ -227,8 +189,7 @@ static CompState& alloc_compress(JB_String* self, FastString* fs) {
 
 	C.Write = JB_FS_NeedSpare(fs, ChunkLength+1024);
 	C.WriteStart = C.Write;
-	C.WriteEnd = C.Write + ChunkLength;
-//	C.WriteByte(CB-12);
+	C.WriteEnd = C.Write + ChunkLength;	// C.PutOffset(Total); // no need
 
 	if (CB > C.B) {
 		C.B = CB;
@@ -254,19 +215,22 @@ extern "C" void JB_Str_CompressChunk (FastString* fs, JB_String* self) {
 	auto& C		= alloc_compress(self, fs);
 	if (Total >= 16) {
 		auto TextAfter = C.Detect();
-		for (int i = 2;  i < Total - 15;  i++)
-			i += C.Process(i, TextAfter);
+		for (int i = 2;  i < Total - 15; ) {
+			auto Found = C.BestPos(i, TextAfter);
+			C.WriteOffset(Found.Back, Found.Length);
+			dbgexpect (C.LastOut <= C.Expected);
+			i += Found.Length;
+		}
 	}
 
-	C.EscapeOld(C.Expected);
 	dbgexpect (C.LastOut == C.Expected);
 	fs->Length += C.Length();
 }
 
 
-//////////////////////////////////////////////////// DECOMP //////////////////////////////////////////////////////////////
+//////////////////////////////////////////////// DECOMP ////////////////////////////////////////////////
 
-u8* DeOffset_(u8* Addr, FastBuff& fb, u32 Length) {
+static u8* DecompOneMz(u8* Addr, FastBuff& fb, u32 Length) {
 	int Offset = 0;
 	u8* Write	= fb.Write;
 	u8* Src		= Write - Offset;
@@ -285,7 +249,7 @@ u8* DeOffset_(u8* Addr, FastBuff& fb, u32 Length) {
 	return Addr;
 }
 
-  
+
 extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int Expected) {
 	FastBuff& fb = FB;
 	require (arr_reserve(fb, self, Expected, fs));
@@ -293,7 +257,7 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int Ex
 
 	while (Addr < AddrEnd) {
 		u8 Code = *Addr++;
-		Addr = DeOffset_(Addr, fb, Code &~ 0x80);
+		Addr = DecompOneMz(Addr, fb, Code &~ 0x80);
 	}
 	
 	require (Addr != ErrP);

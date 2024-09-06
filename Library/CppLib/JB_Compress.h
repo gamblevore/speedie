@@ -27,10 +27,8 @@ static void ReportEscape_(int Length, int C);
 struct MatchFound {
 	int Back;
 	int Length;
-	int Fixed;
-	int Varying;
+	int Score;
     operator bool() { return Length; }
-    int Cost() { return Fixed+Varying; }
 };
 
 
@@ -68,10 +66,6 @@ inline bool DErr(bool Cond, const char* Err) {
 static bool arr_reserve(FastBuff& B,  JB_String* self,  int Expected,  FastString* fs) {
 	auto Addr	= self->Addr;
 	auto End	= Addr + self->Length;
-
-	int C		= (*Addr++ & 15) + 12;
-	int Chunk	= 1 << C;
-	DReq(Chunk <= 1<<22, "Chunk size too large", 0);
 
 	B.Read		= Addr;
 	B.ReadEnd	= End;
