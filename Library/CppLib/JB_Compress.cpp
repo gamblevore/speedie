@@ -4,17 +4,36 @@
 // * I should also add a "next item differs at" thing to the suffixes...
 // * and maybe a "strength" that allows further checking of suffixes?
 
+#include <string>
+#include <iostream>
+#define ErrP ((u8*)(-1))
+#define UnitSize 8
+#define mUnitSize (UnitSize-1)
 
-struct CompState : FastBuff {
-	int					LastOut;
-	int					B;
-	int					StatsDetector;
+using namespace std;  using std::min;  using std::max;
+
+struct MatchFound {
+	int Back;
+	int Length;
+	int Score;
+    operator bool() { return Length; }
+};
+
+
+struct FastBuff {
+	u8*					Write;
+	u8*					WriteStart;
+	u8*					WriteEnd;
+	u8*					Read;
+	u8*					ReadEnd;
+	int					Expected;
 	int					BitCount;
 	uint64_t			BitBuff;
-	int					SearchStrength;
-	int*				Suffixes;
-	int*				SortPositionAtByte;	
-
+	
+	inline int Length() {
+		return (int)(Write - WriteStart);
+	}
+	
 	uint32_t ReadUInt() {
 		auto C = (uint32_t*)Read;
 		auto R = *C++;
@@ -22,6 +41,98 @@ struct CompState : FastBuff {
 		return R;
 	}
 	
+	inline int ZeroBits() {
+		int C = BitCount;
+		uint64_t B = BitBuff;
+		if (C < 32) {
+			auto R = ((uint64_t)ReadUInt())<<(32-C);
+			B |= R;
+			C += 32;
+			BitBuff = B;
+		}
+		int Zeros = __builtin_clzll(B);
+		
+		BitBuff  = B<<Zeros;
+		BitCount = C-Zeros;
+		return Zeros;
+	}
+	
+	inline uint GetBits (uint n) {
+		if (n) {
+			int C = BitCount;
+			uint64_t B = BitBuff;
+			if (C < n) {
+				auto R = ((uint64_t)ReadUInt())<<(32-C);
+				B |= R;
+				C += 32;
+			}
+
+			int X = (int)(B>>(64-n));
+			BitBuff  = B<<n;
+			BitCount = C-n;
+			return X;
+		}
+		return 0;
+	}
+	
+	inline int GetOffset() {
+		uint Z = ZeroBits();
+		uint Bits = (Z << 2) + 4;
+		uint b = 0b00010001000100010001000100010001;
+		Z = ((1<<Bits)-1) & b;
+		uint F = GetBits(Bits);
+		return F + Z;
+	}
+
+	inline int GetLength() {		// Lengths:	 1=(1),  3=(2-3),  5=(4-7),  7=(8-15),  9=(16-31),  11=(32-63)
+		uint Z = ZeroBits();
+		uint F = GetBits(Z);
+		return F + (1<<Z) + 1;
+	}
+};
+
+
+int ChunkLen_(int x) { 	// ((Total*9)/8)+12;
+	int y	= JB_Int_Log2(x);
+	int x2	= 1<<y;
+	return y + (x2 < x);
+}
+
+
+#define DExpect(a,b) if (DErr(a,b)) return ErrP;
+#define DReq(a,b,c) if (DErr(a,b)) return c;
+bool DErr(bool Cond, const char* Err) {
+	if (Cond) return false;
+	puts(Err); debugger;
+	JB_ErrorHandleC(Err, 0, false);
+	return true;
+}
+
+
+static bool arr_reserve(FastBuff& B,  JB_String* self,  int Expected,  FastString* fs) {
+	auto Addr	= self->Addr;
+	auto End	= Addr + self->Length;
+
+	B.Read		= Addr;
+	B.ReadEnd	= End;
+
+	B.Expected = Expected;
+	B.Write = JB_FS_NeedSpare(fs, B.Expected);
+	DReq (B.Write, "Out of memory", 0);
+	B.WriteStart = fs->ResultPtr + fs->Length; // always the same as B.Write? 
+	B.WriteEnd = B.Write + B.Expected;
+	return true;
+}
+
+
+struct CompState : FastBuff {
+	int					LastOut;
+	int					B;
+	int					StatsDetector;
+	int					SearchStrength;
+	int*				Suffixes;
+	int*				SortPositionAtByte;	
+
 	void WriteUint(uint32_t X) {
 		auto C = Write;
 		*((int*)C) = X;
@@ -42,40 +153,6 @@ struct CompState : FastBuff {
 		}
 	}
 
-	inline uint GetBits (uint n) {
-		if (n) {
-			int C = BitCount;
-			uint64_t B = BitBuff;
-			if (C < n) {
-				auto R = ((uint64_t)ReadUInt())<<(32-C);
-				B |= R;
-				C += 32;
-			}
-
-			int X = (int)(B>>(64-n));
-			BitBuff  = B<<n;
-			BitCount = C-n;
-			return X;
-		}
-		return 0;
-	}
-	
-	inline int ZeroBits() {
-		int C = BitCount;
-		uint64_t B = BitBuff;
-		if (C < 32) {
-			auto R = ((uint64_t)ReadUInt())<<(32-C);
-			B |= R;
-			C += 32;
-			BitBuff = B;
-		}
-		int Zeros = __builtin_clzll(B);
-		
-		BitBuff  = B<<Zeros;
-		BitCount = C-Zeros;
-		return Zeros;
-	}
-	
 	inline void PutLength (uint X) {
 		if (X <= 1)
 			return PutBits(1,  1);
@@ -96,21 +173,6 @@ struct CompState : FastBuff {
 			return;
 		}
 		__builtin_trap(); // aaaa?????
-	}
-	
-	inline int GetOffset() {
-		uint Z = ZeroBits();
-		uint Bits = (Z << 2) + 4;
-		uint b = 0b00010001000100010001000100010001;
-		Z = ((1<<Bits)-1) & b;
-		uint F = GetBits(Bits);
-		return F + Z;
-	}
-
-	inline int GetLength() {		// Lengths:	 1=(1),  3=(2-3),  5=(4-7),  7=(8-15),  9=(16-31),  11=(32-63)
-		uint Z = ZeroBits();
-		uint F = GetBits(Z);
-		return F + (1<<Z) + 1;
 	}
 	
 	bool TestOneCost (u8* Find,  u8* E,  int G,  MatchFound& Best) {
@@ -135,7 +197,7 @@ struct CompState : FastBuff {
 	}
 
 
-	MatchFound BestPos (int R, u8* E) {
+	int CompressOne (int R, u8* E) {
 		int Self	= SortPositionAtByte[R];		// pos of OUR value.
 		int Last	= Expected - mUnitSize;
 		int L		= Self - 1;
@@ -152,7 +214,10 @@ struct CompState : FastBuff {
 			if (H <= Last and !TestOneCost(SelfTest, E, H++, Best))
 				H = Last+1;
 		}
-		return Best;
+		
+		PutOffset(Best.Back);
+		PutLength(Best.Length);
+		return R + Best.Length;
 	}
 	
 	u8* Detect () {
@@ -166,19 +231,11 @@ struct CompState : FastBuff {
 		}
 		return n + Read;
 	}
-	
-
-//////////////////////////////////////////////// COMPRESSION ////////////////////////////////////////////////
-
-	void WriteOffset (int Offset, int Length) {
-		dbgexpect(Length >= 0 and Offset >= 1);
-	}
 };
 
 
 
 static CompState	sigh;
-static FastBuff		FB;
 static CompState& alloc_compress(JB_String* self, FastString* fs) {
 	CompState& C		= sigh;
 	C.SearchStrength	= 250; // can increase/decrease
@@ -189,7 +246,7 @@ static CompState& alloc_compress(JB_String* self, FastString* fs) {
 
 	C.Write = JB_FS_NeedSpare(fs, ChunkLength+1024);
 	C.WriteStart = C.Write;
-	C.WriteEnd = C.Write + ChunkLength;	// C.PutOffset(Total); // no need
+	C.WriteEnd = C.Write + ChunkLength;
 
 	if (CB > C.B) {
 		C.B = CB;
@@ -206,21 +263,16 @@ static CompState& alloc_compress(JB_String* self, FastString* fs) {
 
 
 extern "C" void JB_Str_CompressChunk (FastString* fs, JB_String* self) {
-	if (!fs or !self)
+	int Total = JB_Str_Length(self);
+	if (!fs or !Total)
 		return;
 	
-	int Total	= JB_Str_Length(self);
-	require0 (Total);
-	DReq(Total <= 2_M, "Chunk size too large",);
+	DReq(Total <= 16_M, "Chunk size too large",);
 	auto& C		= alloc_compress(self, fs);
-	if (Total >= 16) {
-		auto TextAfter = C.Detect();
-		for (int i = 2;  i < Total - 15; ) {
-			auto Found = C.BestPos(i, TextAfter);
-			C.WriteOffset(Found.Back, Found.Length);
-			dbgexpect (C.LastOut <= C.Expected);
-			i += Found.Length;
-		}
+	auto TextAfter = C.Detect();
+	for (int i = 0;  i < Total; ) {
+		i = C.CompressOne(i, TextAfter);
+		dbgexpect (C.LastOut <= C.Expected);
 	}
 
 	dbgexpect (C.LastOut == C.Expected);
@@ -230,15 +282,17 @@ extern "C" void JB_Str_CompressChunk (FastString* fs, JB_String* self) {
 
 //////////////////////////////////////////////// DECOMP ////////////////////////////////////////////////
 
-static u8* DecompOneMz(u8* Addr, FastBuff& fb, u32 Length) {
-	int Offset = 0;
+static u8* DecompOneMz(u8* Addr, FastBuff& fb) {
+	int Offset = fb.GetOffset();
+	int Length = fb.GetLength();
 	u8* Write	= fb.Write;
 	u8* Src		= Write - Offset;
 	fb.Write	= Write + Length;
 	DExpect(Src >= fb.WriteStart and fb.Write <= fb.WriteEnd,	"Offset too far/too much data");
 	u8* SrcEnd = Src+Length;
 	auto W8 = (int64*)Write;  auto S8 = (int64*)Src; 
-	*W8++ = *S8++; *W8++ = *S8++;
+	*W8++ = *S8++; *W8++ = *S8++; // we can't just blindly do this anymore.
+								  // need to check its in range.
 	if (SrcEnd <= Write) {
 		if (Length <= 16)
 			return Addr;
@@ -251,14 +305,12 @@ static u8* DecompOneMz(u8* Addr, FastBuff& fb, u32 Length) {
 
 
 extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int Expected) {
-	FastBuff& fb = FB;
+	FastBuff fb = {};
 	require (arr_reserve(fb, self, Expected, fs));
 	u8* Addr = fb.Read; u8* AddrEnd = fb.ReadEnd;
 
-	while (Addr < AddrEnd) {
-		u8 Code = *Addr++;
-		Addr = DecompOneMz(Addr, fb, Code &~ 0x80);
-	}
+	while (Addr < AddrEnd)
+		Addr = DecompOneMz(Addr, fb);
 	
 	require (Addr != ErrP);
 	DReq(Addr == AddrEnd,						"Chunk read overflow",		0);
@@ -275,6 +327,4 @@ extern "C" void JB_App__ClearCaches(int which) {
 		JB_unalloc((void**)&sigh.SortPositionAtByte);
 	}
 }
-
-// was 295 lines.
 
