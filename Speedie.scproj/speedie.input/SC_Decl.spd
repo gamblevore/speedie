@@ -724,7 +724,7 @@ class SCDecl (SCNamed) {
 		if .TypeSuffers and .nilstated
 			if .StatedOptional
 				rz = rz.wrapwith(@brel, "?")  // «brel "?", rz »
-			  elseif .StatedReal and platform.isdebug
+			  elseif .StatedReal //and platform.isdebug
 				rz = rz.wrapwith(@brel, "!")  // «brel "!", rz »
 
 

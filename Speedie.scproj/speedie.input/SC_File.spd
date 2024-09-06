@@ -15,14 +15,16 @@ class SCFile (file)
 
 
 	constructor (|File| f, |scimport| p, |int| n)
+		flow off // dates shouldn't matter ///
+		flowcontrol.disabled++
 		super.constructor((f.path, "")(f != nil))
-		flow off
 		.Proj = p
 		.filenum = scimport.allfiles.length
 		.IsInternal = f == nil
 		.LiveAST = .start_ast
 		Compiler.stTotalFileCount += .isinternal
 		(SCImport.Recent max= f.modified) 
+		flowcontrol.disabled--
 		
 	
 	
@@ -84,7 +86,11 @@ class SCFile (file)
 	function ASTSub (|bool| Orig, |Message|)
 		FlowControl.input(self, "AST")
 		
-		|| str = .Readall(true).decompress
+		flowcontrol.disabled++ // i want it a bit less sensitive to random file-cleanups
+		|| str = .Readall(true).decompress // like: x() --> x() // comment
+		flowcontrol.disabled-- // also... parse/parseclean will find REAL differences.
+		
+		if str
 			|| Layer = (Message).CreateUseLayer(self, str)
 			layer.num3 = .filenum
 			.fData = str

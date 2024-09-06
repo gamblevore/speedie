@@ -544,6 +544,7 @@ function ImportAll
 
 	.Timer( "Transform" )
 	.Stage( "Transforming Functions" )
+	flowcontrol.InputLine(scfunction.NameList, "Funcs: ")
 	scfunction.TransformAll
 
 	.Stage( "Building Function Link Map" )

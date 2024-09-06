@@ -25,7 +25,7 @@ class FlowControl
 		if inpath
 			print "Validating flow against "
 			printline InPath
-			s = inpath.stream
+			s = inpath.in
 		.ReadInput = s
 		disabled = 0
 
@@ -136,8 +136,11 @@ class FlowControl
 				.disabled = 1
 				.flow!.TestByte(value)
 				.disabled = 0
+				
+		function HashData  (|string| Data, |string| name)
+			cpp_wrapper JB_Flow__Report
 
-		function Input (|[string]| lines, |string| name,  |bool|)
+		function Input (|[string]| lines, |string| name)
 			cpp_part InputStrings
 			flow off
 			.InputLine(lines.join("\n"), name)
@@ -172,7 +175,7 @@ class FlowControl
 			if WantValidate
 				require .Active >= Validate
 				print "validation at: "
-			  else //
+			  else
 				if .Active >= Validate
 					name += "Debug"
 				print "logging at: "

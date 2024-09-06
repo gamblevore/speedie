@@ -323,10 +323,11 @@ function IsCompilerAndNeedsInstall (|bool|)
 	flowcontrol.disabled--
 
 
-function ExportAndInstall (|bool| CanInstall)
-	if .ShouldTransComp and (options.ModeCpp)
+function ExportAndInstall (|date| elapsed)
+	if .ShouldTransComp and options.ModeCpp
 		if Options.ModeCpp
 			.RunCppCompile~quietly
+			|| CanInstall = compiler.TimeTest(elapsed)
 			if CanInstall and .IsCompilerAndNeedsInstall
 				.InstallCompiler
 		.ClearThis~quietly

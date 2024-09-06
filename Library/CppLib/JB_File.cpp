@@ -151,8 +151,8 @@ void JB_Flow__ReportStringData(u8* Addr, int Length, u8* Name, int NameLen) {
 		void JB_Flow__Input(JB_String* data, JB_String* name);
 		int p = 8;
 		for (int i = 0; i < 4; i++) {
-			auto C = A.Addr[i];
-			A.Addr[--p] = '@' + (C&16);
+			auto C = (Hash >> i*8)&255;
+			A.Addr[--p] = '@' + (C&15);
 			A.Addr[--p] = '@' + (C>>4);
 		}
 		JB_Flow__Input(&A, &B);

@@ -182,10 +182,13 @@ function String.ParseCleanWipe (|Message|)
 function String.ParseClean (|Message|)
 	Compiler.stTotalSourceSize += .Length
 	|| P1		= Date.Now
-	rz			= .Parse									#require
-	Compiler.stParseTime += (Date.Now - P1)|int|
-	rz.clean(True)
-	rz.PrepareAST
+	flowcontrol.disabled++ // the system parse less sensitive.
+	rz			= .Parse   // clean already will detect real differences
+	flowcontrol.disabled--
+	if rz
+		Compiler.stParseTime += (Date.Now - P1)|int|
+		rz.clean(True)
+		rz.PrepareAST
 
 
 

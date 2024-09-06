@@ -2745,6 +2745,8 @@ void SC_Comp__Timer(JB_String* Name);
 
 void SC_Comp__TimerSub(JB_String* S, int Durr);
 
+bool SC_Comp__TimeTest(Date Elapsed);
+
 bool SC_Comp__TryVariousStartModes();
 
 JB_File* SC_Comp__UsingScript(JB_File* F);
@@ -3491,7 +3493,7 @@ Array* SC_Ext__CreateCompileString(Array* FileList, JB_String* Product, JB_Strin
 
 bool SC_Ext__ExecuteGCC(Array* Commands);
 
-void SC_Ext__ExportAndInstall(bool CanInstall);
+void SC_Ext__ExportAndInstall(Date Elapsed);
 
 Array* SC_Ext__FilterCppsIfAlreadyDone(Array* List, JB_File* Objects);
 
@@ -6733,7 +6735,7 @@ int JB_Flow__Init_();
 
 int JB_Flow__InitCode_();
 
-bool JB_Flow__InputStrings(Array* Lines, JB_String* Name);
+void JB_Flow__InputStrings(Array* Lines, JB_String* Name);
 
 void JB_Flow__Input(JB_String* Data, JB_String* Name);
 
@@ -7164,6 +7166,8 @@ int JB_Str_FindTrailingSlashes(JB_String* Self);
 
 Float64 JB_Str_Float(JB_String* Self);
 
+StringReader* JB_Str_In(JB_String* Self, JB_String* Header, int ChunkSize);
+
 int64 JB_Str_Int(JB_String* Self);
 
 JB_String* SC_Str_InterfaceToBehaviour(JB_String* Self);
@@ -7372,6 +7376,8 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 
 StringReader* JB_SS_Constructor(StringReader* Self, JB_String* Data);
 
+StringReader* JB_SS_ConstructorFile(StringReader* Self, JB_File* File, int ChunkSize);
+
 JB_String* JB_SS_Decompress(StringReader* Self, int Lim, CompressionStats* St, bool Multi);
 
 bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, CompressionStats* St);
@@ -7419,6 +7425,8 @@ JB_String* JB_SS_Str(StringReader* Self, int N, int Skip);
 JB_String* JB_SS_StrNoAdvance(StringReader* Self, int N, int Skip);
 
 void JB_SS_SyntaxExpect(StringReader* Self, JB_String* Error);
+
+bool JB_SS_Test(StringReader* Self, JB_String* Header);
 
 
 
@@ -10067,6 +10075,8 @@ int SC_Func__Init_();
 int SC_Func__InitCode_();
 
 bool SC_Func__InType(uint /*SCNodeType*/ Ty);
+
+JB_String* SC_Func__NameList();
 
 SCNode* SC_Func__NeuLibrary(Message* Node, SCNode* Name_space, Message* ErrPlace);
 

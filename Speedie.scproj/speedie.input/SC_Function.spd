@@ -267,6 +267,13 @@ function FuncDecls
 			r.AllocSource = .FuncInfo
 	
 
+function @scfunction.NameList (|string|) 
+	|| fs = faststring()
+	for fn in compiler.FuncList
+		fs <~ fn.exportname
+		fs <~ '\n'
+	return fs
+
 
 function @scfunction.TransformAll 
 	opt norefcounts

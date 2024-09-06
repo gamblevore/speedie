@@ -186,7 +186,8 @@ class SCImport
 	
 	
 	function ImportDir (|File| f,  |SCFile?|)
-		for cName in f.list
+		|| flist = f.list
+		for cName in flist
 			|| c		= f[cName]!
 			|| ext		= cName.ext
 

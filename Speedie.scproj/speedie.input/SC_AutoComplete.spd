@@ -923,8 +923,8 @@ function Define (|message| msg,  |string| purpose,  |object| found=nil,  |messag
 		found = nil
 	|| s = .LocateDefinition(msg, found|SCObject|, IsDisplay)	
 		return .RespondDefine(msg, s, purpose)
-	if platform.isdebug
-		.LocateDefinition(msg, found|SCObject|, IsDisplay)
+//	if platform.isdebug
+//		.LocateDefinition(msg, found|SCObject|, IsDisplay)
 	error "nosource"
 
 

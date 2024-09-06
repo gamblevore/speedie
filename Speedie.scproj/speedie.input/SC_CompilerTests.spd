@@ -17,7 +17,7 @@ function Compiler.FileSanityTests
 helper Compiler.FileTestsSub (|file| Dest, |file| Src, |string| A, |string| B)
 	Dest.DeleteAll
 	Src.DeleteAll
-	|| q = –SELF_TEST_NATURAL
+	|| q = –SELF_TEST_NATURAL // // //
 	expect (!Dest.Exists and !Src.Exists) (q)
 	
 	// So we have a few paths... and they don't exist, lets create them.

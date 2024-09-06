@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2115];
+extern JB_StringC* JB_LUB[2116];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -712,18 +712,9 @@ void SC_Comp__CompileTime() {
 		 (JB_Date_Ago(Starttime));
 	});
 	SC_Comp__PrintCompileTime(Elapsed);
-	iif (!JB_Rec_OK(JB_StdErr)) {
-		return;
+	iif (JB_Rec_OK(JB_StdErr)) {
+		SC_Ext__ExportAndInstall(Elapsed);
 	}
-	bool CanInstall = true;
-	iif ((SC__Options_SelfReplacement) and (((JB_Str_Equals(SC__Options_Variant, JB_LUB[1216], true))) and (JB_Platform__Release()))) {
-		int ReliableTime = ((int)(64.0f * (1024.0f * 2.5f)));
-		CanInstall = (Elapsed < ReliableTime);
-		iif ((!CanInstall)) {
-			JB_Str_SyntaxExpect(JB_LUB[1040]);
-		}
-	}
-	SC_Ext__ExportAndInstall(CanInstall);
 }
 
 void SC_Comp__CreateDisambiguation() {
@@ -1608,6 +1599,9 @@ void SC_Comp__ImportAll() {
 	;
 	SC_Comp__Timer(JB_LUB[1273]);
 	SC_Comp__Stage(JB_LUB[1274]);
+	JB_String* _tmPf72 = JB_Incr(SC_Func__NameList());
+	JB_Flow__InputLine(_tmPf72, JB_LUB[2115]);
+	JB_Decr(_tmPf72);
 	SC_Func__TransformAll();
 	SC_Comp__Stage(JB_LUB[575]);
 	SC_LinkMap__CollectAll();
@@ -2538,6 +2532,21 @@ void SC_Comp__TimerSub(JB_String* S, int Durr) {
 	SC_Comp__AppendCompilerTime(S, Durr);
 }
 
+bool SC_Comp__TimeTest(Date Elapsed) {
+	//;
+	bool CanInstall = true;
+	(++JB__Flow_Disabled);
+	if ((SC__Options_SelfReplacement) and (((JB_Str_Equals(SC__Options_Variant, JB_LUB[1216], true))) and (JB_Platform__Release()))) {
+		int ReliableTime = ((int)(64.0f * (1024.0f * 2.5f)));
+		CanInstall = (Elapsed < ReliableTime);
+		if ((!CanInstall)) {
+			JB_Str_SyntaxExpect(JB_LUB[1040]);
+		}
+	}
+	(--JB__Flow_Disabled);
+	return CanInstall;
+}
+
 bool SC_Comp__TryVariousStartModes() {
 	iif (JB__Proc_Parent) {
 		return nil;
@@ -3280,7 +3289,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1941]);
-	JB_FS_AppendInt32(_fsf0, (2024090523));
+	JB_FS_AppendInt32(_fsf0, (2024090613));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -4058,18 +4067,14 @@ Message* SC_AC__Define(Message* Msg, JB_String* Purpose, JB_Object* Found) {
 		JB_SetRef(Found, nil);
 	}
 	Message* S = JB_Incr(SC_AC__LocateDefinition(Msg, ((SCObject*)Found), IsDisplay));
+	JB_Decr(Found);
 	iif (S) {
-		JB_Decr(Found);
 		Message* _tmPf0 = JB_Incr(SC_AC__RespondDefine(Msg, S, Purpose));
 		JB_Decr(S);
 		JB_SafeDecr(_tmPf0);
 		return _tmPf0;
 	}
 	JB_Decr(S);
-	iif (JB_IsDebug()) {
-		JB_FreeIfDead(SC_AC__LocateDefinition(Msg, ((SCObject*)Found), IsDisplay));
-	}
-	JB_Decr(Found);
 	iif (true) {
 		JB_Str_SyntaxExpect(JB_LUB[1812]);
 	}
@@ -8280,8 +8285,8 @@ bool SC_Ext__ExecuteGCC(Array* Commands) {
 	return false;
 }
 
-void SC_Ext__ExportAndInstall(bool CanInstall) {
-	iif (SC_Ext__ShouldTransComp() and (SC__Options_ModeCpp)) {
+void SC_Ext__ExportAndInstall(Date Elapsed) {
+	iif (SC_Ext__ShouldTransComp() and SC__Options_ModeCpp) {
 		iif (SC__Options_ModeCpp) {
 			({
 				(++JB__Flow_Disabled);
@@ -8289,6 +8294,7 @@ void SC_Ext__ExportAndInstall(bool CanInstall) {
 				(--JB__Flow_Disabled);
 				 0;
 			});
+			bool CanInstall = SC_Comp__TimeTest(Elapsed);
 			iif (CanInstall and SC_Ext__IsCompilerAndNeedsInstall()) {
 				SC_Ext__InstallCompiler();
 			}
@@ -8373,7 +8379,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[838]);
-	JB_FS_AppendInt32(_fsf0, (2024090523));
+	JB_FS_AppendInt32(_fsf0, (2024090613));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -23454,7 +23460,7 @@ void SC_Cpp_Run(Cpp_Export* Self) {
 
 void SC_Cpp_SetupFlow(Cpp_Export* Self, SCFunction* F) {
 	(SC_Func__CurrFuncSet(F));
-	iif (SC__Options_GenFlowControlCode and (!SC_Func_SyntaxIs(F, kSC__FunctionType_FlowDisabled))) {
+	iif (SC__Options_GenFlowControlCode and ((!SC_Func_SyntaxIs(F, kSC__FunctionType_FlowDisabled)))) {
 		JB_SetRef(SC__Cpp_IfName, JB_LUB[1680]);
 		JB_SetRef(SC__Cpp_WhileName, JB_LUB[2053]);
 		JB_SetRef(SC__Comp_TernaryFunc->ExportName, JB_LUB[894]);
@@ -25442,7 +25448,7 @@ FlowControl* JB_Flow_Constructor(FlowControl* Self, JB_String* OutPath, JB_Strin
 	if (JB_Str_Exists(InPath)) {
 		JB_Str_Print(JB_LUB[1318]);
 		JB_PrintLine(InPath);
-		JB_SetRef(S, JB_Str_Stream(InPath));
+		JB_SetRef(S, JB_Str_In(InPath, JB_LUB[0], 4194304));
 	}
 	Self->ReadInput = JB_Incr(S);
 	JB_Decr(S);
@@ -25605,12 +25611,11 @@ int JB_Flow__InitCode_() {
 	return 0;
 }
 
-bool JB_Flow__InputStrings(Array* Lines, JB_String* Name) {
+void JB_Flow__InputStrings(Array* Lines, JB_String* Name) {
 	//;
 	JB_String* _tmPf0 = JB_Incr(JB_Array_join(Lines, JB_LUB[51]));
 	JB_Flow__InputLine(_tmPf0, Name);
 	JB_Decr(_tmPf0);
-	return false;
 }
 
 void JB_Flow__Input(JB_String* Data, JB_String* Name) {
@@ -26244,11 +26249,11 @@ void SC_Imp_Destructor(SCImport* Self) {
 
 SCFile* SC_Imp_ImportDir(SCImport* Self, JB_File* F) {
 	SCFile* Rz = nil;
+	Array* Flist = JB_Incr(JB_File_List(F, false, false));
 	{
-		Array* _LoopSrcf2 = JB_Incr(JB_File_List(F, false, false));
 		int _if0 = 0;
 		while (true) {
-			JB_String* cName = JB_Incr(((JB_String*)JB_Array_Value(_LoopSrcf2, _if0)));
+			JB_String* cName = JB_Incr(((JB_String*)JB_Array_Value(Flist, _if0)));
 			iif (cName == nil) {
 				JB_Decr(cName);
 				break;
@@ -26275,9 +26280,9 @@ SCFile* SC_Imp_ImportDir(SCImport* Self, JB_File* F) {
 				(JB_Dict_ValueSet(SC__Imp_Shaders, cName, C));
 			}
 			 else iif (SC_Str_isCLike(Ext)) {
-				JB_String* _tmPf3 = JB_Incr(JB_File_Path(C));
-				JB_Array_SyntaxAppend(SC__Cpp_Cpp_Input, _tmPf3);
-				JB_Decr(_tmPf3);
+				JB_String* _tmPf2 = JB_Incr(JB_File_Path(C));
+				JB_Array_SyntaxAppend(SC__Cpp_Cpp_Input, _tmPf2);
+				JB_Decr(_tmPf2);
 			}
 			 else {
 				(JB_Dict_ValueLowerSet(Self->Resources, cName, C));
@@ -26287,9 +26292,9 @@ SCFile* SC_Imp_ImportDir(SCImport* Self, JB_File* F) {
 			JB_Decr(Ext);
 			(++_if0);
 		};
-		JB_Decr(_LoopSrcf2);
 	}
 	;
+	JB_Decr(Flist);
 	JB_SafeDecr(Rz);
 	return Rz;
 }
@@ -28258,6 +28263,20 @@ Float64 JB_Str_Float(JB_String* Self) {
 	return JB_Str_TextDouble(Self, nil);
 }
 
+StringReader* JB_Str_In(JB_String* Self, JB_String* Header, int ChunkSize) {
+	StringReader* Rz = nil;
+	JB_File* F = JB_Incr(JB_Str_AsFile(Self));
+	iif (JB_File_MustExist(F, JB_LUB[1956])) {
+		JB_SetRef(Rz, JB_SS_ConstructorFile(nil, F, ChunkSize));
+		iif (!JB_SS_Test(Rz, Header)) {
+			JB_SetRef(Rz, nil);
+		}
+	}
+	JB_Decr(F);
+	JB_SafeDecr(Rz);
+	return Rz;
+}
+
 int64 JB_Str_Int(JB_String* Self) {
 	return JB_Str_TextIntegerValid(Self, nil);
 }
@@ -28711,14 +28730,14 @@ Message* SC_Str_ParseClean(JB_String* Self) {
 	Message* Rz = nil;
 	SC__Comp_stTotalSourceSize = (SC__Comp_stTotalSourceSize + JB_Str_Length(Self));
 	Date P1 = JB_Date__Now();
+	(++JB__Flow_Disabled);
 	JB_SetRef(Rz, JB_Str_Parse(Self, kJB_SyxArg, true));
-	iif (!Rz) {
-		JB_Decr(Rz);
-		return nil;
+	(--JB__Flow_Disabled);
+	iif (Rz) {
+		SC__Comp_stParseTime = (SC__Comp_stParseTime + ((int)(JB_Date__Now() - P1)));
+		SC_Msg_Clean(Rz, true);
+		SC_Msg_PrepareAST(Rz, JB_LUB[0]);
 	}
-	SC__Comp_stParseTime = (SC__Comp_stParseTime + ((int)(JB_Date__Now() - P1)));
-	SC_Msg_Clean(Rz, true);
-	SC_Msg_PrepareAST(Rz, JB_LUB[0]);
 	JB_SafeDecr(Rz);
 	return Rz;
 }
@@ -29399,6 +29418,22 @@ StringReader* JB_SS_Constructor(StringReader* Self, JB_String* Data) {
 	return Self;
 }
 
+StringReader* JB_SS_ConstructorFile(StringReader* Self, JB_File* File, int ChunkSize) {
+	iif (Self == nil) {
+		Self = ((StringReader*)JB_NewClass(&StringReaderData));
+	}
+	Self->UserObj = nil;
+	Self->StartFrom = 0;
+	Self->_NoMoreChunks = false;
+	Self->Data = ((FastBuff){});
+	JB_File_Close(File);
+	Self->File = JB_Incr(File);
+	Self->ChunkSize = ChunkSize;
+	Self->Length = JB_File_Size(File);
+	JB_SS_ReadChunk(Self, File);
+	return Self;
+}
+
 JB_String* JB_SS_Decompress(StringReader* Self, int Lim, CompressionStats* St, bool Multi) {
 	FastString* Fs = JB_Incr(JB_FS_Constructor(nil));
 	wwhile (JB_SS_HasAny(Self)) {
@@ -29728,6 +29763,16 @@ void JB_SS_SyntaxExpect(StringReader* Self, JB_String* Error) {
 		}
 	}
 	JB_Rec__NewErrorWithNode(nil, Error, Self->File);
+}
+
+bool JB_SS_Test(StringReader* Self, JB_String* Header) {
+	iif (!JB_Str_Exists(Header)) {
+		return true;
+	}
+	JB_String* _tmPf0 = JB_Incr(JB_SS_Str(Self, JB_Str_Length(Header), 0));
+	bool _tmPf1 = (JB_Str_Equals(Header, _tmPf0, false));
+	JB_Decr(_tmPf0);
+	return _tmPf1;
 }
 
 
@@ -41666,7 +41711,7 @@ Message* SC_Decl_WriteSimpleType(SCDecl* Self) {
 		iif (SC_Decl_StatedOptional(Self)) {
 			Rz = SC_Msg_WrapWith(Rz, kJB_SyxBRel, JB_LUB[494]);
 		}
-		 else iif (((bool)SC_Decl_StatedReal(Self)) and JB_IsDebug()) {
+		 else iif (((bool)SC_Decl_StatedReal(Self))) {
 			Rz = SC_Msg_WrapWith(Rz, kJB_SyxBRel, JB_LUB[229]);
 		}
 	}
@@ -41735,9 +41780,11 @@ Message* SC_SCFile_AST(SCFile* Self) {
 Message* SC_SCFile_ASTSub(SCFile* Self, bool Orig) {
 	Message* Rz = nil;
 	JB_Flow__Input(Self, JB_LUB[515]);
+	(++JB__Flow_Disabled);
 	JB_String* _tmPf0 = JB_Incr(JB_File_ReadAll(Self, 134217728, true));
 	JB_String* Str = JB_Incr(JB_Str_Decompress(_tmPf0, 268435456, nil));
 	JB_Decr(_tmPf0);
+	(--JB__Flow_Disabled);
 	iif (JB_Safe_SyntaxCast(Str)) {
 		JB_MemoryLayer* Layer = JB_Incr(JB_ClassData_CreateUseLayer((&MessageData), Self, Str));
 		Layer->Num3 = Self->FileNum;
@@ -41775,6 +41822,8 @@ SCFile* SC_SCFile_Constructor(SCFile* Self, JB_File* F, SCImport* P, int N) {
 	if (Self == nil) {
 		Self = ((SCFile*)JB_NewClass(&SCFileData));
 	}
+	//;
+	(++JB__Flow_Disabled);
 	JB_String* _tmPf0 = JB_Incr(((JB_String*)JB_Ternary(F != nil, ((JB_String*)JB_File_Path(F)), ((JB_String*)JB_LUB[0]))));
 	JB_File_Constructor(Self, _tmPf0);
 	JB_Decr(_tmPf0);
@@ -41783,7 +41832,6 @@ SCFile* SC_SCFile_Constructor(SCFile* Self, JB_File* F, SCImport* P, int N) {
 	Self->ExportName = JB_Incr(_tmPf3);
 	JB_StringC* _tmPf2 = JB_LUB[0];
 	Self->FData = JB_Incr(_tmPf2);
-	//;
 	Self->Proj = JB_Incr(P);
 	Self->FileNum = JB_Array_Size(SC__Imp_AllFiles);
 	Self->IsInternal = (F == nil);
@@ -41791,6 +41839,7 @@ SCFile* SC_SCFile_Constructor(SCFile* Self, JB_File* F, SCImport* P, int N) {
 	Self->LiveAST = JB_Incr(_tmPf1);
 	SC__Comp_stTotalFileCount = (SC__Comp_stTotalFileCount + Self->IsInternal);
 	SC__Imp_Recent = JB_int64_OperatorMax(SC__Imp_Recent, JB_File_Modified(F));
+	(--JB__Flow_Disabled);
 	return Self;
 }
 
@@ -50867,6 +50916,31 @@ bool SC_Func__InType(uint /*SCNodeType*/ Ty) {
 	return false;
 }
 
+JB_String* SC_Func__NameList() {
+	FastString* Fs = JB_Incr(JB_FS_Constructor(nil));
+	{
+		Array* _LoopSrcf2 = JB_Incr(SC__Comp_FuncList);
+		int _if0 = 0;
+		while (true) {
+			SCFunction* Fn = JB_Incr(((SCFunction*)JB_Array_Value(_LoopSrcf2, _if0)));
+			iif (Fn == nil) {
+				JB_Decr(Fn);
+				break;
+			}
+			JB_FS_AppendString(Fs, Fn->ExportName);
+			JB_Decr(Fn);
+			JB_FS_AppendByte(Fs, '\n');
+			(++_if0);
+		};
+		JB_Decr(_LoopSrcf2);
+	}
+	;
+	JB_String* _tmPf3 = JB_Incr(JB_FS_SyntaxCast(Fs));
+	JB_Decr(Fs);
+	JB_SafeDecr(_tmPf3);
+	return _tmPf3;
+}
+
 SCNode* SC_Func__NeuLibrary(Message* Node, SCNode* Name_space, Message* ErrPlace) {
 	iif (true) {
 		JB_Msg_SyntaxExpect(Node, JB_LUB[668]);
@@ -53591,4 +53665,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 7308228611362540112 -8311220218945463359
+// 5311772487205299420 -4806419341862674008
