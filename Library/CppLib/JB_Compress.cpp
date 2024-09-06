@@ -305,28 +305,6 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int Ex
 }
 
 
-/* 
-
-  Length	Values					Meaning
-	1		00-0F					Escape
-	1		10-1F					bigoff/minidict (can't minidict these after an offset)
-	1		20-6F					MiniDict			
-	1		70-7f					Extend
-	2		80-FF, 00-FF (10-1F)	Offset
-	
-// new
-  Length	Values					Meaning
-	1		00-0F					Escape
-	1		10-1F					Extend
-	2		20-EF, 00-FF (F0-FF)	Offset
-	1		F0-FF, 00-FF			bigoff
-
-	12x chunk-size for compress, 1MB-->12MB
-	2x  chunk-size for decomp,   1MB-->2MB
-*/
-
-
-
 extern "C" void JB_App__ClearCaches(int which) {
 	if (sigh.B) {
 		sigh.B = 0;
