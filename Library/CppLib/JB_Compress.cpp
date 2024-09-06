@@ -1,20 +1,121 @@
 
 #include "JB_Compress.h"
 #include "divsufsort.h" // Runs 5x (!!) faster than a plain quicksort or even my spdsort
-// perhaps this is already "ready" to add my new system in?
-// I just need to put the offset writer in...
-// and the cost-detector.
 // * i should also add a "next item differs at" thing to the suffixes...
 // * and maybe a "strength" that allows further checking of suffixes?
+
 
 #define kExtend 0x70
 
 struct CompState : FastBuff {
 	int					LastOut;
+	int					B;
+	int					StatsDetector;
+	int					BitCount;
+	uint64_t			BitBuff;
 	int*				Suffixes;
 	int*				SortPositionAtByte;	
-	int					B;
 	
+
+	uint32_t ReadUInt() {
+		auto C = (uint32_t*)Read;
+		auto R = *C++;
+		Read = (u8*)C;
+		return R;
+	}
+	
+	void WriteUint(uint32_t X) {
+		auto C = Write;
+		*((int*)C) = X;
+		Write = C + 4;
+	}
+	
+	inline void PutBits (int n, uint64_t x) {
+		StatsDetector += n;
+		n += BitCount;
+		auto B = BitBuff | (x<<(64-n));
+		if (n >= 32) {
+			BitCount = n - 32;
+			BitBuff = B << 32;
+			WriteUint(B>>32);
+		} else {
+			BitBuff = B;
+			BitCount = n;
+		}
+	}
+
+	inline uint GetBits (uint n) {
+		if (n) {
+			int C = BitCount;
+			uint64_t B = BitBuff;
+			if (C < n) {
+				auto R = ((uint64_t)ReadUInt())<<(32-C);
+				B |= R;
+				C += 32;
+			}
+
+			int X = (int)(B>>(64-n));
+			BitBuff  = B<<n;
+			BitCount = C-n;
+			return X;
+		}
+		return 0;
+	}
+	
+	inline int ZeroBits() {
+		int C = BitCount;
+		uint64_t B = BitBuff;
+		if (C < 32) {
+			auto R = ((uint64_t)ReadUInt())<<(32-C);
+			B |= R;
+			C += 32;
+			BitBuff = B;
+		}
+		int Zeros = __builtin_clzll(B);
+		
+		BitBuff  = B<<Zeros;
+		BitCount = C-Zeros;
+		return Zeros;
+	}
+
+	inline int GetOffset() {
+		uint Z = ZeroBits();
+		uint Bits = (Z << 2) + 4;
+		uint b = 0b00010001000100010001000100010001;
+		Z = ((1<<Bits)-1) & b;
+		uint F = GetBits(Bits);
+		return F + Z;
+	}
+	
+	inline void PutOffset (uint X) {
+		uint b = 0b00010001000100010001000100010000;
+		for (int i = 5; i < 32; i+=4) {
+			uint mask = (1<<i)-1; // could opt this to start at the correct bit-range... using log2
+			if (X > (b&mask)) continue;
+			PutBits(i>>2,   1);
+			PutBits(i-1, X-(mask>>4));
+			return;
+		}
+		__builtin_trap(); // aaaa?????
+	}
+
+	inline int GetLength() {
+// Lengths:	 1=(1),  3=(2-3),  5=(4-7),  7=(8-15),  9=(16-31),  11=(32-63)
+		uint Z = ZeroBits();
+		uint F = GetBits(Z);
+		return F + (1<<Z) + 1;
+	}
+
+	inline void PutLength (uint X) {
+		if (X <= 1)
+			return PutBits(1,  1);
+			
+		uint L = JB_Int_Log2(X>>1);
+		PutBits(L+1,  1);
+		X -= 1<<L;
+		PutBits(L, X-(1<<L));
+	}
+
 	
 	bool TestOneCost (u8* Find,  u8* E,  int G,  MatchFound& Best, int Esc) {
 		int N		= Suffixes[G];
@@ -25,10 +126,10 @@ struct CompState : FastBuff {
 			if (Find[i] != Text[i]) break;
 		
 		if (i < 2)
-			return STOP; // only gonna get worse. Better checking will make this faster.
+			return false; // only gonna get worse. Better checking will make this faster.
 		int Back	= (int)(Find - Text);
 		if (Back <= 0)
-			return CONT;
+			return true;
 		
 		int FixCost		= (Esc!=0) + 1 - i;
 		int VaryCost	= (i > 9) + (Back >= 4096) + (Back >= 64_K);
@@ -36,11 +137,11 @@ struct CompState : FastBuff {
 		int BestCost = Best.Cost();
 		if (Cost < BestCost) {
 			Best = {Back, i, FixCost, VaryCost};
-			return CONT;
+			return true; // continue
 		}
 		if (Cost == BestCost or Best.Length <= i)
-			return CONT;
-		return STOP;
+			return true; // continue
+		return false; // stop
 	}
 
 
@@ -57,25 +158,13 @@ struct CompState : FastBuff {
 		
 		MatchFound Best = {};
 		while (L >= B or H <= Last) {
-			if (L >= B    and TestOneCost(SelfTest, E, L--, Best, Esc)==STOP)
+			if (L >= B    and TestOneCost(SelfTest, E, L--, Best, Esc)==false)
 				L = -1;
-			if (H <= Last and TestOneCost(SelfTest, E, H++, Best, Esc)==STOP)
+			if (H <= Last and TestOneCost(SelfTest, E, H++, Best, Esc)==false)
 				H = Last+1;
 		}
 		return Best;
 	}
-
-
-//	int* GetSuffix () {
-//		ivec4* Suffix = (ivec4*)Suffixes;
-//		ivec4 Items = {0,1,2,3};
-//		int n = (Expected + 3) / 4;
-//		for (int i = 0; i < n; i++) {
-//			Suffix[i] = Items;
-//			Items += 4;
-//		}
-//		return (int*)Suffix;
-//	}
 	
 	u8* Detect () {
 		int n		= Expected;
@@ -86,21 +175,6 @@ struct CompState : FastBuff {
 			SP[R0[i]] = i;
 			R0[i] = n - R0[i];
 		}
-
-//		bool print_sorted_array = 1; // debug it
-//		if (print_sorted_array and n < 2000) for_(n) {
-//			auto pos = (Read+n)-R0[i];
-//			for (int j = 0; j < 32; j++) {
-//				char c = pos[j]; 
-//				if (!c)
-//					break;
-//				if (c <= 32)
-//					c = 32;
-//				printf("%c", c);
-//			}
-//			puts("");
-//		}
-		
 		return n + Read;
 	}
 	
@@ -113,7 +187,7 @@ struct CompState : FastBuff {
 			int Loop = (JB_Int_Log2(Over) &~ 0x3) + 4;
 			while (Loop > 0) {
 				Loop -= 4;
-				WriteByte( ((Over >> Loop)&15) | kExtend );
+				*Write++ = ((Over >> Loop)&15) | kExtend;
 			}
 		}
 		
@@ -135,41 +209,8 @@ struct CompState : FastBuff {
 		Write+=N;
 	}
 
-	inline void WriteByte (u8 B) {
-		*Write++ = B;
-	}
-	
-	void EscapeOld (int NeedUpTo) {
-		int L		= LastOut;
-		int Length	= NeedUpTo - L;
-		require0 (Length > 0);
-		LastOut		= NeedUpTo;
-		int ToWrite = AllocWrite(Length - 1, 4);
-		WriteByte(ToWrite);
-		WriteStr(Read+L, Length);
-	}
-
-
 	void WriteOffset (int Offset, int Length) {
 		dbgexpect(Length >= 0 and Offset >= 1);
-		LastOut		   += Length;
-		Length			= AllocWrite(Length - 2, 3);			// 0x80 x 1, Length x 3, Offset x 4
-
-		int Orig		= Offset;
-		int ShiftCount	= 0;
-		while (Offset >= 4096) {
-			ShiftCount += 4;
-			Offset >>= 4;
-		}		
-		
-		WriteByte( 0x80 | (Length << 4) | (Offset >> 8) );
-		WriteByte( Offset & 255 );
-
-		while (ShiftCount > 0) {
-			ShiftCount -= 4;
-			int Sigh = (Orig >> ShiftCount) & 0xF;
-			WriteByte( Sigh | 0x10 );
-		}
 	}
 };
 
@@ -181,13 +222,13 @@ static CompState& alloc_compress(JB_String* self, FastString* fs) {
 	CompState& C		= sigh;
 
 	int Total			= self->Length;
-	int CB				= max(ChunkLen_(Total),12);
+	int CB				= max(ChunkLen_(Total), 12);
 	int ChunkLength		= 1<<CB;
 
 	C.Write = JB_FS_NeedSpare(fs, ChunkLength+1024);
 	C.WriteStart = C.Write;
 	C.WriteEnd = C.Write + ChunkLength;
-	C.WriteByte(CB-12);
+//	C.WriteByte(CB-12);
 
 	if (CB > C.B) {
 		C.B = CB;
@@ -218,14 +259,15 @@ extern "C" void JB_Str_CompressChunk (FastString* fs, JB_String* self) {
 	}
 
 	C.EscapeOld(C.Expected);
-	C.WriteByte(kExtend); // end-marker
 	dbgexpect (C.LastOut == C.Expected);
 	fs->Length += C.Length();
 }
 
 
 //////////////////////////////////////////////////// DECOMP //////////////////////////////////////////////////////////////
-u8* Copy_(u8* Addr, FastBuff& fb, int Offset, int Length) {
+
+u8* DeOffset_(u8* Addr, FastBuff& fb, u32 Length) {
+	int Offset = 0;
 	u8* Write	= fb.Write;
 	u8* Src		= Write - Offset;
 	fb.Write	= Write + Length;
@@ -243,42 +285,6 @@ u8* Copy_(u8* Addr, FastBuff& fb, int Offset, int Length) {
 	return Addr;
 }
 
-u8* DeOffset_(u8* Addr, FastBuff& fb, u32 Value) {
-	u32 Info	= (Value << 8) | *Addr++;
-	int Length	= (Info >> 12) + 2;
-	int Offset	= Info & 4095;
-	u8  Next	= *Addr;
-	while ( (Next&0xF0) == 0x10 ) { // offset extend.  //update
-		Offset = (Offset << 4) | (Next & 0x0F);
-		Next = *++Addr;
-	}
-	
-	return Copy_(Addr, fb, Offset, Length); 
-}
-
-
-u8* DeEscape_(u8* Addr, FastBuff& fb, int Dist) {
-	auto OldWrite = fb.Write;
-	fb.Write = ++Dist + OldWrite;
-
-	DReq(fb.Write <= fb.WriteEnd,		"Chunk output too large",0);
-	memcpy(OldWrite, Addr, Dist);
-	return Addr + Dist;
-}
-
-
-u8* DeBig_(u8* Addr, FastBuff& fb, u32 Code, u8* End) {
-	u32 Value = 0;			// 0x80 x 1, Length x 3, Offset x 4 
-	while ((Code&0xF0) == kExtend and Addr < End) {
-		Value = (Value << 4) | (Code & 15);
-		Code = *Addr++;
-	}
-	
-	if (Code >= 0x80)
-		return DeOffset_(Addr, fb, (Value << 7) | (Code &~ 0x80));
-	return DeEscape_(Addr, fb, (Value << 4) | Code);
-}
-
   
 extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int Expected) {
 	FastBuff& fb = FB;
@@ -287,14 +293,7 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int Ex
 
 	while (Addr < AddrEnd) {
 		u8 Code = *Addr++;
-		if (Code >= 0x80)
-			Addr = DeOffset_(Addr, fb, Code &~ 0x80);
-		  else if (Code <= 0x0f)
-			Addr = DeEscape_(Addr, fb, Code);
-		  else if (Code > kExtend)		//UPDATE
-			Addr = DeBig_(Addr, fb, Code, AddrEnd);
-		  else
-			break; // finished!
+		Addr = DeOffset_(Addr, fb, Code &~ 0x80);
 	}
 	
 	require (Addr != ErrP);
@@ -313,5 +312,5 @@ extern "C" void JB_App__ClearCaches(int which) {
 	}
 }
 
-
+// was 295 lines.
 

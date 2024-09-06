@@ -7,8 +7,6 @@ using namespace std;
 #define u8 unsigned char
 #define ErrP ((u8*)(-1))
 #define UnitSize 8
-#define CONT true
-#define STOP false
 #define mUnitSize (UnitSize-1)
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
