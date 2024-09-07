@@ -45,7 +45,7 @@ struct FastBuff {
 			auto R = ((uint64_t)ReadUInt())<<(32-C);
 			B |= R;
 			C += 32;
-			BitBuff = B;
+//			BitBuff = B;
 		}
 		int Zeros = __builtin_clzll(B)+1;
 		
@@ -72,7 +72,7 @@ struct FastBuff {
 	inline int GetOffset() {
 		uint Z = HeaderBits();
 		uint Bits = Z << 2;
-		uint b = 0b00010001000100010001000100010000;
+		uint b = 0b00100001000010000100001000010000;
 		Z = ((1<<Bits)-1) & b;
 		uint F = GetBits(Bits);
 		return F + Z;
@@ -104,9 +104,9 @@ struct FastBuff {
 		// the fastest way to do this is with explicit if-chains... avoid all the calculation
 		// just use the hard-coded values. this will do for now :)
 		// I could make it generate a C++ array of values?
-		for (int i = Size; i < 32; i+=Size+1) {
+		for (int i = Size; i < 32; i+=Size) {
 			uint mask = b;
-			b |= (1<<i);
+			b = (b << 5) | 16;
 			header++;
 			if (X >= b)
 				continue;
@@ -249,7 +249,7 @@ struct CompState : FastBuff {
 
 //////////////////////////////////////////////// DECOMP ////////////////////////////////////////////////
 
-static u8* DecompOneMz(FastBuff& fb, u8* Write) {
+static u8* DecompOneMz(FastBuff& fb, u8* Write, u8* WriteEnd) {
 	int Offset = fb.GetOffset()+1;
 	int Length = fb.GetLength();
 	printf("// -%i +%i\n", Offset, Length);
@@ -258,6 +258,7 @@ static u8* DecompOneMz(FastBuff& fb, u8* Write) {
 	u8* Src	= Write - Offset;
 	u8* Start = fb.WriteStart;
 	if (Src >= Start) {
+		DReq (Write+Length <= WriteEnd, "oversized decomp", (u8*)(-1ll))
 //		auto W8 = (int64*)Write;  
 //		Write += Length;
 		u8* SrcEnd = Src+Length;
@@ -282,10 +283,14 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int Ex
 	FastBuff fb = {};
 	require (arr_reserve(fb, self, Expected, fs));
 
-	u8* Addr = fb.Write;
-	while (Addr = DecompOneMz(fb, Addr));
+	u8* Curr = fb.Write;
+	u8* After = Curr + Expected;
+	while (Curr < After)
+		Curr = DecompOneMz(fb, Curr, After);
 	//	DReq(Addr == AddrEnd,						"Chunk read overflow",		0);
-	//	DReq(fb.Expected == fb.Length(),			"Chunk write-length error",	0);
+	if (Curr == (u8*)(-1ll))
+		return 0;
+	DReq(Curr >= After,			"Chunk missing data",	0);
 	
 	fs->Length += fb.Expected;
 	return fb.Expected;
