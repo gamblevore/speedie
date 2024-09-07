@@ -4,9 +4,6 @@
 // * I should also add a "next item differs at" thing to the suffixes...
 // * and maybe a "strength" that allows further checking of suffixes?
 
-#include <string>
-#include <iostream>
-#define ErrP		((u8*)(-1))
 #define UnitSize	8
 #define mUnitSize	(UnitSize-1)
 
@@ -41,16 +38,16 @@ struct FastBuff {
 		return R;
 	}
 	
-	inline int ZeroBits() {
+	inline int HeaderBits() {
 		int C = BitCount;
 		uint64_t B = BitBuff;
-		if (C < 32) {
+		if (C < 32) { // might read non-existant bits... needs to be fixed.
 			auto R = ((uint64_t)ReadUInt())<<(32-C);
 			B |= R;
 			C += 32;
 			BitBuff = B;
 		}
-		int Zeros = __builtin_clzll(B);
+		int Zeros = __builtin_clzll(B)+1;
 		
 		BitBuff  = B<<Zeros;
 		BitCount = C-Zeros;
@@ -73,31 +70,82 @@ struct FastBuff {
 	}
 	
 	inline int GetOffset() {
-		uint Z = ZeroBits();
-		uint Bits = (Z << 2) + 4;
-		uint b = 0b00010001000100010001000100010001;
+		uint Z = HeaderBits();
+		uint Bits = Z << 2;
+		uint b = 0b00010001000100010001000100010000;
 		Z = ((1<<Bits)-1) & b;
 		uint F = GetBits(Bits);
 		return F + Z;
 	}
 
+	void WriteUint(uint32_t X) {
+		auto C = Write;
+		*((int*)C) = X;
+		Write = C + 4;
+	}
+	
+	inline void PutBits (int n, uint64_t x) {
+		n += BitCount;
+		auto B = BitBuff | (x<<(64-n));
+		if (n >= 32) {
+			BitCount = n - 32;
+			BitBuff = B << 32;
+			WriteUint(B>>32);
+		} else {
+			BitBuff = B;
+			BitCount = n;
+		}
+	}
+
+	inline void PutOffset (uint X, int Size=4) {
+		///  Size=4:  16-16,  256-272,  4096-4368,  65536-69904  ///
+		uint b = 0;
+		uint header = 0;
+		// the fastest way to do this is with explicit if-chains... avoid all the calculation
+		// just use the hard-coded values. this will do for now :)
+		// I could make it generate a C++ array of values?
+		for (int i = Size; i < 32; i+=Size+1) {
+			uint mask = b;
+			b |= (1<<i);
+			header++;
+			if (X >= b)
+				continue;
+			PutBits(header, 1);
+			mask = (mask << (32-i))>>(32-i);
+			PutBits(i, X-mask);
+			return;
+		}
+		__builtin_trap(); // aaaa?????
+	}
+
 	inline int GetLength() {		// Lengths:	 1=(1),  3=(2-3),  5=(4-7),  7=(8-15),  9=(16-31),  11=(32-63)
-		uint Z = ZeroBits();
-		uint F = GetBits(Z);
+		uint Z = HeaderBits();
+		if (Z <= 1)
+			return 1;
+		uint F = GetBits(--Z);
 		return F + (1<<Z) + 1;
+	}
+	
+	inline void PutLength (uint X) {
+		if (X <= 1)
+			return PutBits(1,  1);
+			
+		uint L = JB_Int_Log2(X);
+		uint X2 = X&((1<<L)-1);
+		PutBits(L+1,  1);
+		PutBits(L,   X2);
 	}
 };
 
 
 
-int ChunkLen_(int x) { 	// ((Total*9)/8)+12;
+int ChunkLen_(int x) {
 	int y	= JB_Int_Log2(x);
 	int x2	= 1<<y;
 	return y + (x2 < x);
 }
 
 
-#define DExpect(a,b) if (DErr(a,b)) return ErrP;
 #define DReq(a,b,c)  if (DErr(a,b)) return c;
 bool DErr(bool Cond, const char* Err) {
 	if (Cond) return false;
@@ -125,57 +173,6 @@ struct CompState : FastBuff {
 	int					SearchStrength;
 	uint*				Suffixes;
 	uint*				SortPositionAtByte;	
-
-	void WriteUint(uint32_t X) {
-		auto C = Write;
-		*((int*)C) = X;
-		Write = C + 4;
-	}
-	
-	inline void PutBits (int n, uint64_t x) {
-		n += BitCount;
-		auto B = BitBuff | (x<<(64-n));
-		if (n >= 32) {
-			BitCount = n - 32;
-			BitBuff = B << 32;
-			WriteUint(B>>32);
-		} else {
-			BitBuff = B;
-			BitCount = n;
-		}
-	}
-
-	inline void PutLength (uint X) {
-		if (X <= 1)
-			return PutBits(1,  1);
-			
-		uint L = JB_Int_Log2(X);
-		uint X2 = X&((1<<L)-1);
-		PutBits(L,  1);
-		PutBits(L, X2);
-	}
-
-	inline void PutOffset (uint X, int Size=4) {
-		///  Size=4:  16-16,  256-272,  4096-4368,  65536-69904  ///
-		uint b = 0;
-		uint zeros = 0;
-		// the fastest way to do this is with explicit if-chains... avoid all the calculation
-		// just use the hard-coded values. this will do for now :)
-		// I could make it generate a C++ array of values?
-		for (int i = Size; i < 32; i+=Size) {
-			uint mask = b;
-			b |= (1<<i);
-			zeros++;
-			if (X >= b)
-				continue;
-			PutBits(zeros, 1);
-			mask = (mask << (32-i))>>(32-i);
-			PutBits(i, X-mask);
-			return;
-		}
-		__builtin_trap(); // aaaa?????
-	}
-	
 	
 	int GetDiff (u8* E, int G) {
 		uint SG = Suffixes[G];
@@ -228,8 +225,8 @@ struct CompState : FastBuff {
 				BAK = TestOneCost(SelfTest, E, Best-Count, 0, BAK, Match);
 		}
 		
-		printf("-%i +%i\n", Match.Back, Match.Length);
-		PutOffset(Match.Back);
+		printf(":: -%i +%i\n", Match.Back, Match.Length);
+		PutOffset(Match.Back-1);
 		PutLength(Match.Length);
 
 		return R + Match.Length;
@@ -252,32 +249,32 @@ struct CompState : FastBuff {
 
 //////////////////////////////////////////////// DECOMP ////////////////////////////////////////////////
 
-static bool DecompOneMz(FastBuff& fb) {
-	int Offset = fb.GetOffset();
+static u8* DecompOneMz(FastBuff& fb, u8* Write) {
+	int Offset = fb.GetOffset()+1;
 	int Length = fb.GetLength();
-	printf("%i %i\n", Offset, Length);
+	printf("// -%i +%i\n", Offset, Length);
 	
-	return fb.Read < fb.ReadEnd;
-	u8* Write	= fb.Write;
-	u8* Addr    = Write;
-	u8* Src		= Write - Offset;
-	fb.Write	= Write + Length;
-	DExpect(Src >= fb.WriteStart and fb.Write <= fb.WriteEnd,	"Offset too far/too much data");
-	u8* SrcEnd = Src+Length;
-	auto W8 = (int64*)Write;  auto S8 = (int64*)Src; 
-	*W8++ = *S8++; *W8++ = *S8++; // we can't just blindly do this anymore.
-								  // need to check its in range.
-	if (SrcEnd <= Write) {
-		if (Length <= 16)
-			return Addr;
-		memcpy(W8, S8, Length-16);
-	} else {
-		while (Src < SrcEnd) *Write++ = *Src++;	// RLE
+//	require (Read < fb.ReadEnd); // read protect have to be handled in getbits
+	u8* Src	= Write - Offset;
+	u8* Start = fb.WriteStart;
+	if (Src >= Start) {
+//		auto W8 = (int64*)Write;  
+//		Write += Length;
+		u8* SrcEnd = Src+Length;
+//		auto S8 = (int64*)Src; 
+//		*W8++ = *S8++; *W8++ = *S8++; // we can't just blindly do this anymore.
+									  // need to check its in range.
+//		if (SrcEnd <= Write) {
+//			if (Length <= 16)
+//				return Write;
+//			memcpy(W8, S8, Length-16);
+//		} else {
+			while (Src < SrcEnd) *Write++ = *Src++;	// RLE
+//		}
+		return Write;
 	}
-//	require (Addr != ErrP);
-//	DReq(Addr == AddrEnd,						"Chunk read overflow",		0);
-//	DReq(fb.Expected == fb.Length(),			"Chunk write-length error",	0);
-	return Addr;
+	*Write++ = (Start - Src)-1;
+	return Write;
 }
 
 
@@ -285,7 +282,10 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int Ex
 	FastBuff fb = {};
 	require (arr_reserve(fb, self, Expected, fs));
 
-	while (DecompOneMz(fb));
+	u8* Addr = fb.Write;
+	while (Addr = DecompOneMz(fb, Addr));
+	//	DReq(Addr == AddrEnd,						"Chunk read overflow",		0);
+	//	DReq(fb.Expected == fb.Length(),			"Chunk write-length error",	0);
 	
 	fs->Length += fb.Expected;
 	return fb.Expected;
