@@ -121,8 +121,8 @@ datatype int
 	function Ctz (|int|)
 		cpp_wrapper JB_Int_CTZ
 		
-	function Tri (|int|)
-		return (self*(self+1))/2
+//	function Tri (|int|) // silly
+//		return (self*(self+1))/2
 
 	operator ± (|int|i, |int|)
 		cpp_part Shrink

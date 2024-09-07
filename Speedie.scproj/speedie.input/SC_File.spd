@@ -175,6 +175,6 @@ module image
 		|| img = .loadpng( p.addr, p.length, &x, &y, &comp, 4 )
 			|| n = 0
 			|| qoi = .writeqoi(img, x, y, n)
-				rz = string.Own(qoi, n).compress(mzlab.Fast)
+				rz = string.Own(qoi, n).compress(mzlab.strong)
 		memory.free(img)
 

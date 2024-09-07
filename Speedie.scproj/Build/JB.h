@@ -1553,12 +1553,9 @@ extern CharSet* JB__Constants_XMLWordMiddle;
 extern int SC__LinkMap_CurrID;
 extern Message* SC__Linkage_Flagz;
 extern Message* SC__Linkage_OSXFrameworks;
-#define kJB__MZLab_Default ((int)3)
-#define kJB__MZLab_Fast ((int)2)
+#define kJB__MZLab_Default ((int)5)
 #define kJB__MZLab_Fastest ((int)1)
-#define kJB__MZLab_None ((int)0)
-#define kJB__MZLab_Strong ((int)3)
-#define kJB__MZLab_Strongest ((int)4)
+#define kJB__MZLab_Strong ((int)10)
 extern Macro* SC__Macros_ASMCopier;
 extern Macro* SC__Macros_ASMSetter;
 extern Macro* SC__Macros_ConstructorNew;
@@ -7120,9 +7117,7 @@ JB_String* JB_Str_Compress(JB_String* Self, int Strength, CompressionStats* St);
 
 void JB_Str_CompressInto(JB_String* Self, JB_Object* Fs, int Strength, CompressionStats* St);
 
-bool JB_Str_CompressTest(JB_String* Self, bool Report, int Which);
-
-bool JB_Str_CompressTestSub(JB_String* Self, int Strength, bool Report);
+bool JB_Str_CompressTest(JB_String* Self, int Strength, bool Report);
 
 JB_String* SC_Str_ContainerName(JB_String* Self, JB_String* Ext);
 

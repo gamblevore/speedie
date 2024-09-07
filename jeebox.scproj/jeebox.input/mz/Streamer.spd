@@ -11,14 +11,14 @@ function StringReader.CompressInto (|object| dest, |int| Strength=mzlab.default,
 	while .hasany
 		|| str = .str(1MB)
 		|| Place = j.OpenSection
-		j.CompressChunk(str)
+		j.CompressChunk(str, 50*Strength)
 		j.CloseSection(Place)
 		st.LiveUpdate(str.length, j.length - place, true)
 		if !.NoMoreChunks
 			j.flush // we are calling it after anyhow	
 	j.exit(2)
 	j.flush			// we definitely need to flush it.  Im serious!
-	j.CompressChunk(nil)						// cleanup
+	j.CompressChunk(nil, 0)						// cleanup
 	st.end
 
 
@@ -48,7 +48,7 @@ helper StringReader.DecompressInto (|object| dest,  |int| lim=int.max,  |&compre
 	return !.Data.WentBad
 
 		
-helper faststring.CompressChunk (|string?| str) 
+helper faststring.CompressChunk (|string?| str, |int| Strength=250) 
 	description "Passing nil will free the internal buffers" 
 	cpp_wrapper JB_Str_CompressChunk
 

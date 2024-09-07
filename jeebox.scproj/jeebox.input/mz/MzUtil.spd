@@ -44,27 +44,19 @@ function FastString.CompressInto (|object| fs, |int|Strength=mzlab.default, |?&c
 
 Module MZLab 
 	constants
-		None      = 0			// none
-		Fastest   = 1			// lz
-		Fast      = 2			// lz harder
-		Strong    = 3			// rolz
-		Strongest = 4			// rolz harder
-		Default   = strong		// its good enough!
+		Fastest   = 1
+		Default   = 5
+		Strong    = 10
+		// you can go above 10.
+		
 		
 	function TestMz (|string| path, |bool|)
 		if path
 			|| f = path.ReadFile.decompress(int.max)
 			return f.CompressTest(true) and .ManyTests
 		
-	helper string.CompressTest (|bool| report, |int| which=3, |bool|)
-		if which & 1
-			require .CompressTestSub(mzlab.strong, report)
-		if which & 2
-			require .CompressTestSub(mzlab.fast, report)
-		return true
-	
-	
-	helper string.CompressTestSub (|int| Strength, |bool| report, |bool|)
+
+	helper string.CompressTest (|int| Strength = mzlab.default, |bool| report, |bool|)
 		|compressionstats| stats
 		|| c = .compress(Strength, stats)
 		if report
@@ -94,7 +86,7 @@ Module MZLab
 			for sh in 0 to 4
 				.TestSub(items, fs, i>>(sh*4))
 			|| str = fs.getresult
-			require str.CompressTest(false, (i&1)+1)
+			require str.CompressTest(false)
 		"Compression Test: OK"
 		return true
 

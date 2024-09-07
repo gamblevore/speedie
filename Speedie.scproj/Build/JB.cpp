@@ -2646,7 +2646,7 @@ void SC_Comp__VariousSelfTests() {
 	iif ((SC__Options_PerryOutput < 2) and ((!SC__Options_Scripting) and (!JB__Proc_Parent))) {
 		iif (({
 			JB_String* _tmPf1 = JB_Incr((JB_Str_OperatorMul(SC__Cpp_FindGlobalsCpp, 12)));
-			bool _tmPf0 = JB_Str_CompressTest(_tmPf1, false, 3);
+			bool _tmPf0 = JB_Str_CompressTest(_tmPf1, kJB__MZLab_Default, false);
 			JB_Decr(_tmPf1);
 			 _tmPf0;
 		}) and SC__Options_PrintLibraries) {
@@ -3289,7 +3289,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[1941]);
-	JB_FS_AppendInt32(_fsf0, (2024090613));
+	JB_FS_AppendInt32(_fsf0, (2024090709));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8379,7 +8379,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[838]);
-	JB_FS_AppendInt32(_fsf0, (2024090613));
+	JB_FS_AppendInt32(_fsf0, (2024090709));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -9573,7 +9573,7 @@ JB_String* SC_image__ConvertPNGToVOI(JB_String* P) {
 		byte* Qoi = JB_Img__WriteQOI(Img, X, Y, (&N));
 		iif (Qoi) {
 			JB_String* _tmPf0 = JB_Incr(JB_Str__Freeable(Qoi, N));
-			JB_SetRef(Rz, JB_Str_Compress(_tmPf0, kJB__MZLab_Fast, nil));
+			JB_SetRef(Rz, JB_Str_Compress(_tmPf0, kJB__MZLab_Strong, nil));
 			JB_Decr(_tmPf0);
 		}
 	}
@@ -28010,21 +28010,7 @@ void JB_Str_CompressInto(JB_String* Self, JB_Object* Fs, int Strength, Compressi
 	JB_Decr(_tmPf0);
 }
 
-bool JB_Str_CompressTest(JB_String* Self, bool Report, int Which) {
-	iif (((bool)(Which & 1))) {
-		iif (!JB_Str_CompressTestSub(Self, kJB__MZLab_Strong, Report)) {
-			return nil;
-		}
-	}
-	iif (((bool)(Which & 2))) {
-		iif (!JB_Str_CompressTestSub(Self, kJB__MZLab_Fast, Report)) {
-			return nil;
-		}
-	}
-	return true;
-}
-
-bool JB_Str_CompressTestSub(JB_String* Self, int Strength, bool Report) {
+bool JB_Str_CompressTest(JB_String* Self, int Strength, bool Report) {
 	bool Rz = false;
 	CompressionStats Stats = ((CompressionStats){});
 	JB_String* C = JB_Incr(JB_Str_Compress(Self, Strength, (&Stats)));
@@ -29388,7 +29374,7 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 	wwhile (JB_SS_HasAny(Self)) {
 		JB_String* Str = JB_Incr(JB_SS_Str(Self, 1048576, 0));
 		int Place = JB_bin_OpenSection(J);
-		JB_Str_CompressChunk(J, Str);
+		JB_Str_CompressChunk(J, Str, 50 * Strength);
 		JB_bin_CloseSection(J, Place);
 		JB_MzSt_LiveUpdate(St, JB_Str_Length(Str), J->Length - Place, true);
 		JB_Decr(Str);
@@ -29398,7 +29384,7 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 	};
 	JB_bin_Exit(J, 2);
 	JB_FS_Flush(J);
-	JB_Str_CompressChunk(J, nil);
+	JB_Str_CompressChunk(J, nil, 0);
 	JB_Decr(J);
 	JB_MzSt_End(St);
 }
@@ -53665,4 +53651,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 5311772487205299420 -4806419341862674008
+// 576325668250801479 -4806419341862674008

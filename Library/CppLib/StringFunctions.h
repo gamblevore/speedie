@@ -119,7 +119,7 @@ JB_String* JB_Str_Trim(JB_String* self, CharSet* CS);
 JB_String* JB_ASCII();
 JB_String* JB_Upper();
 JB_String* JB_Lower();
-void JB_Str_CompressChunk (FastString* fs, JB_String* self);
+void JB_Str_CompressChunk (FastString* fs, JB_String* self, int Strength);
 int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int Expected);
 
 
