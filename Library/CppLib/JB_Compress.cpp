@@ -121,11 +121,10 @@ static bool arr_reserve(FastBuff& B,  JB_String* self,  int Expected,  FastStrin
 
 
 struct CompState : FastBuff {
-	int					LastOut;
 	int					B;
 	int					SearchStrength;
-	int*				Suffixes;
-	int*				SortPositionAtByte;	
+	uint*				Suffixes;
+	uint*				SortPositionAtByte;	
 
 	void WriteUint(uint32_t X) {
 		auto C = Write;
@@ -177,54 +176,73 @@ struct CompState : FastBuff {
 		__builtin_trap(); // aaaa?????
 	}
 	
-	bool TestOneCost (u8* Find,  u8* E,  int G,  MatchFound& Best) {
-		u8* Text = E - Suffixes[G];
-		if (Text >= Find)
-			return true;
-
-		int i = 1;
-		int N = (int)(E-Find);
-		for (; i < N; i++) {
-			if (Find[i] != Text[i]) break;
-		}
+	
+	int GetDiff (u8* E, int G) {
+		uint SG = Suffixes[G];
+		if (SG&255)
+			return SG&255;
+		u8* A = E - (SG>>8);
+		u8* B = E - (Suffixes[G+1]>>8);
 		
-		int Back = (int)(Find - Text);
-		int Score = i; // for now
-		if (Score > Best.Score) {
-			Best = {Back, i, Score};
-			return true; // continue
-		}
-		return (Score == Best.Score or Best.Length <= i);
+		if (A > B) // B is bigger now
+			std::swap(A,B);
+		u8* B0 = B;
+		E = std::min(E, B+255);
+		while (B < E)
+			if (*A++ != *B++) break;
+		int Dist = (int)(B-B0);
+		if (Dist > 255) debugger; // what?
+		Suffixes[G] = SG | std::min(Dist, 255);
+		return Dist;
 	}
+	
+	int TestOneCost (u8* Find,  u8* E,  int G,  int Prev,  int PrevLength,  MatchFound& Best) {
+		if ((uint)G > Expected) return 0;
+		u8* Text = E - (Suffixes[G]>>8);
+		int Length = GetDiff(E, G-Prev) - 1;
+		Length = std::min(Length, PrevLength);
 
+		if (Length <= 0 or Length < Best.Length)
+			return 0;
+		if (Text < Find) {
+			int Back = (int)(Find - Text);
+			int Score = (Length<<10)-Back;
+			if (Score > Best.Score)
+				Best = {Back, Length, Score};
+		}
+		return Length;
+	}
+	
 	int CompressOne (int R, u8* E) {
-		int Self = SortPositionAtByte[R];		// pos of OUR value.
-		int Out	= 1;
-		int	Mode = 3;
-		u8* SelfTest = Read + R;
+		int Best = SortPositionAtByte[R];		// pos of OUR value.
 		
-		MatchFound Best = {R + 1 + *SelfTest, 1, 0};
-		while (Mode) {
-			if (Mode&1    and !TestOneCost(SelfTest, E, Self-Out, Best))
-				Mode&=~1;
-			if (Mode&2 and !TestOneCost(SelfTest, E, Self+Out, Best))
-				Mode&=~2;
+		u8* SelfTest = Read + R;
+		int FWD = INT_MAX; int BAK = INT_MAX;
+		int Count = 1;
+		MatchFound Match = {R + 1 + *SelfTest, 1};
+		
+		for (;FWD or BAK; Count++) {
+			if (FWD)
+				FWD = TestOneCost(SelfTest, E, Best+Count, 1, FWD, Match);
+			if (BAK)
+				BAK = TestOneCost(SelfTest, E, Best-Count, 0, BAK, Match);
 		}
 		
-		PutOffset(Best.Back);
-		PutLength(Best.Length);
+		printf("-%i +%i\n", Match.Back, Match.Length);
+		PutOffset(Match.Back);
+		PutLength(Match.Length);
 
-		return R + Best.Length;
+		return R + Match.Length;
 	}
 	
 	u8* Detect () {
-		int n		= Expected;
-		int* SP		= SortPositionAtByte;
-		int* R0		= Suffixes;
-		divsufsort(Read, R0, n);
+		int n = Expected;
+		uint* SP = SortPositionAtByte;
+		uint* R0 = Suffixes;
+		divsufsort(Read, (int*)R0, n);
 		for_(n)	{				// code is simple, but concept is confusing.
 			SP[R0[i]] = i;
-			R0[i] = n - R0[i];
+			R0[i] = (n - R0[i]) << 8;
 		}
 		return n + Read;
 	}
@@ -293,12 +311,11 @@ static bool alloc_compress(FastString* fs, JB_String* self, int Strength) {
 
 	if (CB > C.B) {
 		C.B = CB;
-		C.Suffixes				= (int*)JB_realloc(C.Suffixes,	ChunkLength*sizeof(int));
-		C.SortPositionAtByte	= (int*)JB_realloc(C.SortPositionAtByte,	ChunkLength*sizeof(int));
+		C.Suffixes				= (uint*)JB_realloc(C.Suffixes,	ChunkLength*sizeof(int));
+		C.SortPositionAtByte	= (uint*)JB_realloc(C.SortPositionAtByte,	ChunkLength*sizeof(int));
 	}
 
 	C.Expected			= Total;
-	C.LastOut			= 0;
 	C.Read				= JB_Str_Address(self);
 	
 	return true;
@@ -309,10 +326,11 @@ extern "C" void JB_Str_CompressChunk (FastString* fs, JB_String* self, int Stren
 	require0(alloc_compress(fs, self, Strength));
 	auto & C = Reuseable;
 	auto TextAfter = C.Detect();
-	for (int i = 0;  i < C.Expected;)
+	int i = 0;
+	while (i < C.Expected)
 		i = C.CompressOne(i, TextAfter);
 
-	dbgexpect (C.LastOut == C.Expected);
+	dbgexpect (i == C.Expected);
 	fs->Length += C.Length();
 }
 

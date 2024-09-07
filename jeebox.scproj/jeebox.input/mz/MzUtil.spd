@@ -45,8 +45,11 @@ function FastString.CompressInto (|object| fs, |int|Strength=mzlab.default, |?&c
 Module MZLab 
 	constants
 		Fastest   = 1
+		Fast	  = 3
 		Default   = 5
 		Strong    = 10
+		ReallyStrong = 50
+		SuperStrong = 100
 		// you can go above 10.
 		
 		
