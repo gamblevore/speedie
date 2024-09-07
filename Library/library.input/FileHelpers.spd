@@ -179,7 +179,7 @@ extend String
 			slash = 0
 		return self[slash, dot]
 	
-	function ReadFile (|int|lim=1024MB, |bool|AllowMissing=true, |stringthatwasreadsafely|)
+	function ReadFile (|int|lim=16MB, |bool|AllowMissing=true, |stringthatwasreadsafely|)
 		return .file.readall(lim, AllowMissing)
 
 	function Write (assigns:|string|, |bool|)
