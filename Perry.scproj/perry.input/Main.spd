@@ -1,7 +1,10 @@
 
 
 main // main { 
-	|| x = 1.0 / 2.0|float64|
+	|| x = file://tips.box
+	|| y = x.compress
+	|| z = y.decompress
+	if x!=z
 	if app.Yes("crash")
 		app.Crash
 	SDLApp.Init
