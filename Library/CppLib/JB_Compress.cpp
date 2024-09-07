@@ -198,21 +198,17 @@ struct CompState : FastBuff {
 	}
 
 	int CompressOne (int R, u8* E) {
-		int Self	= SortPositionAtByte[R];		// pos of OUR value.
-		int Last	= Expected - mUnitSize;
-		int L		= Self - 1;
-		int H		= Self + 1;
-		int B		= 0;
-		B			= max(0, L-SearchStrength);
-		Last		= min(Last, H+SearchStrength);	// the "next/prev endgaps.changesat[i]" opt would help!
-		u8* SelfTest= Read + R;
+		int Self = SortPositionAtByte[R];		// pos of OUR value.
+		int Out	= 1;
+		int	Mode = 3;
+		u8* SelfTest = Read + R;
 		
 		MatchFound Best = {R + 1 + *SelfTest, 1, 0};
-		while (L >= B or H <= Last) {
-			if (L >= B    and !TestOneCost(SelfTest, E, L--, Best))
-				L = -1;
-			if (H <= Last and !TestOneCost(SelfTest, E, H++, Best))
-				H = Last+1;
+		while (Mode) {
+			if (Mode&1    and !TestOneCost(SelfTest, E, Self-Out, Best))
+				Mode&=~1;
+			if (Mode&2 and !TestOneCost(SelfTest, E, Self+Out, Best))
+				Mode&=~2;
 		}
 		
 		PutOffset(Best.Back);
