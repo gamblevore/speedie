@@ -571,7 +571,7 @@ JB_String* JB_File_ReadAll ( JB_File* self, int lim, bool AllowMissing ) {
 			}
 		}
 	}
-	JB_Flow__Report(Result, self);
+//	JB_Flow__Report(Result, self); JB_File_Read already does this
 	return Result;
 }
 
