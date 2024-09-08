@@ -6,6 +6,8 @@
 
 #define UnitSize	8
 #define mUnitSize	(UnitSize-1)
+#define MZ_PRINT 1
+int CountPrint = 0;
 
 using namespace std;  using std::min;  using std::max;
 
@@ -15,7 +17,6 @@ struct MatchFound {
 	int Score;
     operator bool() { return Length; }
 };
-
 
 struct FastBuff {
 	u8*					Write;
@@ -69,13 +70,19 @@ struct FastBuff {
 		return X;
 	}
 	
-	inline int GetOffset() {
+	inline uint GetOffset() {
+		JB_DoAt(1332);
 		uint Z = HeaderBits();
 		uint Bits = Z << 2;
 		uint b = 0b00010001000100010001000100010000;
 		Z = ((1<<Bits)-1) & b;
 		uint F = GetBits(Bits);
-		return F + Z;
+		int Rz = F + Z;
+		#if DEBUG
+		if (Rz < 0)
+			debugger;
+		#endif
+		return Rz;
 	}
 
 	void WriteUint(uint32_t X) {
@@ -117,12 +124,17 @@ struct FastBuff {
 		__builtin_trap(); // aaaa?????
 	}
 
-	inline int GetLength() {		// Lengths:	 1=(1),  3=(2-3),  5=(4-7),  7=(8-15),  9=(16-31),  11=(32-63)
+	inline uint GetLength() {		// Lengths:	 1=(1),  3=(2-3),  5=(4-7),  7=(8-15),  9=(16-31),  11=(32-63)
 		uint Z = HeaderBits();
 		if (Z <= 1)
 			return 1;
 		uint F = GetBits(--Z);
-		return F + (1<<Z);
+		uint Rz = F + (1<<Z);
+		#if DEBUG
+		if (Rz < 1)
+			debugger;
+		#endif
+		return Rz;
 	}
 	
 	inline void PutLength (uint X) {
@@ -223,8 +235,10 @@ struct CompState : FastBuff {
 			if (BAK)
 				BAK = TestOneCost(SelfTest, E, Best-Count, 0, BAK, Match);
 		}
-		
-		printf(":: -%i +%i:  <%.*s>\n", Match.Back, Match.Length, Match.Length, SelfTest);
+
+#if	MZ_PRINT
+		printf("%i** -%i +%i:  <%.*s>\n", ++CountPrint, Match.Back, Match.Length, Match.Length, SelfTest);
+#endif
 		PutOffset(Match.Back-1);
 		PutLength(Match.Length);
 
@@ -249,10 +263,11 @@ struct CompState : FastBuff {
 //////////////////////////////////////////////// DECOMP ////////////////////////////////////////////////
 
 static u8* DecompOneMz(FastBuff& fb, u8* Write, u8* WriteEnd) {
-	int Offset = fb.GetOffset()+1;
+	uint Offset = fb.GetOffset()+1;
 	int Length = fb.GetLength();
-	printf("// -%i +%i\n", Offset, Length);
-	
+#if	MZ_PRINT
+	printf("%i// -%i +%i\n", ++CountPrint, Offset, Length);
+#endif	
 //	require (Read < fb.ReadEnd); // read protect have to be handled in getbits
 	u8* Src	= Write - Offset;
 	u8* Start = fb.WriteStart;
@@ -282,6 +297,7 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int Ex
 	FastBuff C = {};
 	require (arr_reserve(C, self, Expected, fs));
 
+	CountPrint = 0;
 	u8* Curr = C.Write;
 	u8* After = Curr + Expected;
 	while (Curr < After)
@@ -329,11 +345,13 @@ static bool alloc_compress(FastString* fs, JB_String* self, int Strength) {
 extern "C" void JB_Str_CompressChunk (FastString* fs, JB_String* self, int Strength) {
 	require0(alloc_compress(fs, self, Strength));
 	auto & C = Reuseable;
+	CountPrint = 0;
 	auto TextAfter = C.Detect();
 	int i = 0;
 	while (i < C.Expected)
 		i = C.CompressOne(i, TextAfter);
 
+	C.PutBits(31, 0);
 	dbgexpect (i == C.Expected);
 	fs->Length += C.Length();
 }

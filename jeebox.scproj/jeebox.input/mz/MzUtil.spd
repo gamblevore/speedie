@@ -94,7 +94,7 @@ Module MZLab
 		return true
 
 
-	function TestCompression
+	function TestCompression // compressiontest
 		|| d = file.speedie.child("Speedie.scproj/speedie.input/ASMBuilder/").file
 		require d.exists
 		|[string]| Inputs

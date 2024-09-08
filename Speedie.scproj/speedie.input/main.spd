@@ -1,6 +1,7 @@
 
 
 main // speedie main {
+	MZLab.TestCompression
 	Compiler.SetupEnv	
 	Compiler.MiniTests
 	Compiler.Main

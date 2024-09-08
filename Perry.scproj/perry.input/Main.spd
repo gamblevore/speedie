@@ -1,7 +1,7 @@
 
 
 main // main { 
-	|| x = file://tips.box
+	|| x = "file://tips.box"
 	|| y = x.compress
 	|| z = y.decompress
 	if x != z

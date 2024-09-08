@@ -9,7 +9,7 @@ function StringReader.CompressInto (|object| dest, |int| Strength=mzlab.default,
 	j.addint(.length)
 	j.enter(@arg)
 	while .hasany
-		|| str = .str(1MB)
+		|| str = .str(4MB)
 		|| Place = j.OpenSection
 		j.CompressChunk(str, 50*Strength)
 		j.CloseSection(Place)
