@@ -4,7 +4,9 @@ main // main {
 	|| x = file://tips.box
 	|| y = x.compress
 	|| z = y.decompress
-	if x!=z
+	if x != z
+		debugger
+		|| zz = x==z
 	if app.Yes("crash")
 		app.Crash
 	SDLApp.Init

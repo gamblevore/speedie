@@ -72,7 +72,7 @@ struct FastBuff {
 	inline int GetOffset() {
 		uint Z = HeaderBits();
 		uint Bits = Z << 2;
-		uint b = 0b00100001000010000100001000010000;
+		uint b = 0b00010001000100010001000100010000;
 		Z = ((1<<Bits)-1) & b;
 		uint F = GetBits(Bits);
 		return F + Z;
@@ -104,16 +104,15 @@ struct FastBuff {
 		// the fastest way to do this is with explicit if-chains... avoid all the calculation
 		// just use the hard-coded values. this will do for now :)
 		// I could make it generate a C++ array of values?
-		for (int i = Size; i < 32; i+=Size) {
-			uint mask = b;
-			b = (b << 5) | 16;
+		for (int i = Size; i < 32; i+= Size) {
 			header++;
-			if (X >= b)
-				continue;
-			PutBits(header, 1);
-			mask = (mask << (32-i))>>(32-i);
-			PutBits(i, X-mask);
-			return;
+			int ii = 1<<i;
+			if (X < ii) {
+				PutBits(header, 1);
+				PutBits(i, X);
+				return;
+			}
+			X -= ii;
 		}
 		__builtin_trap(); // aaaa?????
 	}
@@ -123,7 +122,7 @@ struct FastBuff {
 		if (Z <= 1)
 			return 1;
 		uint F = GetBits(--Z);
-		return F + (1<<Z) + 1;
+		return F + (1<<Z);
 	}
 	
 	inline void PutLength (uint X) {
@@ -203,7 +202,7 @@ struct CompState : FastBuff {
 			return 0;
 		if (Text < Find) {
 			int Back = (int)(Find - Text);
-			int Score = (Length<<10)-Back;
+			int Score = (Length<<6)-JB_Int_Log2(Back);
 			if (Score > Best.Score)
 				Best = {Back, Length, Score};
 		}
@@ -216,16 +215,16 @@ struct CompState : FastBuff {
 		u8* SelfTest = Read + R;
 		int FWD = INT_MAX; int BAK = INT_MAX;
 		int Count = 1;
-		MatchFound Match = {R + 1 + *SelfTest, 1};
+		MatchFound Match = {R + 1 + *SelfTest, 1, INT_MIN};
 		
-		for (;FWD or BAK; Count++) {
+		for ( /*;;__;;*/ ; FWD or BAK; Count++) {
 			if (FWD)
 				FWD = TestOneCost(SelfTest, E, Best+Count, 1, FWD, Match);
 			if (BAK)
 				BAK = TestOneCost(SelfTest, E, Best-Count, 0, BAK, Match);
 		}
 		
-		printf(":: -%i +%i\n", Match.Back, Match.Length);
+		printf(":: -%i +%i:  <%.*s>\n", Match.Back, Match.Length, Match.Length, SelfTest);
 		PutOffset(Match.Back-1);
 		PutLength(Match.Length);
 
@@ -280,20 +279,20 @@ static u8* DecompOneMz(FastBuff& fb, u8* Write, u8* WriteEnd) {
 
 
 extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int Expected) {
-	FastBuff fb = {};
-	require (arr_reserve(fb, self, Expected, fs));
+	FastBuff C = {};
+	require (arr_reserve(C, self, Expected, fs));
 
-	u8* Curr = fb.Write;
+	u8* Curr = C.Write;
 	u8* After = Curr + Expected;
 	while (Curr < After)
-		Curr = DecompOneMz(fb, Curr, After);
+		Curr = DecompOneMz(C, Curr, After);
 	//	DReq(Addr == AddrEnd,						"Chunk read overflow",		0);
 	if (Curr == (u8*)(-1ll))
 		return 0;
 	DReq(Curr >= After,			"Chunk missing data",	0);
 	
-	fs->Length += fb.Expected;
-	return fb.Expected;
+	fs->Length += C.Expected;
+	return C.Expected;
 }
 
 
