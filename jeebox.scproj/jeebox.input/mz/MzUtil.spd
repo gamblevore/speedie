@@ -22,7 +22,9 @@ extend string
 
 function StringReader.Decompress (|int|lim=256MB, |?&compressionstats| st=nil, |bool| Multi=true,  |StringThatWasReadSafely|)
 	|| fs = faststring()
+	|| i = 0
 	while .HasAny
+		i++
 		if !.Decompressinto(fs, lim, st)
 			return string.error
 		if !multi
