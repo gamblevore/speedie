@@ -255,7 +255,7 @@ function Num (fn_asm)
 
 
 function Thg (fn_asm)
-	|| thg = ThgSub(self, exp, dest, mode)
+	|| thg = asmtype.ThgSub(self, exp, dest, mode)
 	|| reg = thg.reg
 	if (reg-1)|uint| < 31							// what?
 		return thg
@@ -267,15 +267,17 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |as
 	|| d = exp.ASMDecl
 	if d is local
 		return d.wholetype
+		if (dest isnt requiretype) or (dest isa existing.µtype) // the ternary requires this.
+			return existing				// why doesnt it do the testing itself?
+		return nil
+		
 	rz = d.typeonly.zero
 
 	if d is const
-		|| R = dest.reg
-		check (R and dest isnt set) (exp)
-		|| val = d.exportposition
-			require !mode
-			(dest is constany)
-			return .NumToReg(exp, val, dest)
+		check (dest.reg and dest isnt set) (exp)
+		require !mode
+		(dest is constany)
+		return .NumToReg(exp, d.exportposition, dest)
 	  else
 		if mode
 			return nil
@@ -352,7 +354,6 @@ function IncrSlowOnAddr (|&ASMState| self, |message| f, |ASMReg| Dest, |int| Mod
 	|| fat = dest.write(f, newvalue, addr)			// WRITE BACK
 
 	// the new value should exist! now lets close
-	.MarkAvailableValues
 	.CloseVTmps(TmpCloser)
 	return fat * Dest
 
@@ -534,17 +535,16 @@ function ASMReg.Write (|message| m,  |asmreg| ptr,  |int| index=0,  |&fatasm|)
 	return .ReadOrWrite(m, ptr, index, false)
 
 
-function asmstate.ExistingVar (|message| m, |datatypecode| destType=datatypecode.UnusedType,  |asmreg|)
+function asmstate.ExistingVar (|message| m,  |asmreg|)
 	opt	norefcounts
 	real self
 	|| fn = m.func 
-	while (fn == @bra) or ((fn == @type) and m.TypeCastDoesNothing(DestType))
+	while (fn == @bra) or ((fn == @type) and m.TypeCastDoesnothing)
 		m = m.first!
 		fn = m.func
 	if fn == @thg
-		return ASMType.ThgSub(self, m, asmreg(), 2)
-	//if fn == @num
-	//	return .FindConstDecl(m.ASMDecl)
+		|| dest = asmreg()
+		return ASMType.ThgSub(self, m, dest, 2)
 
 
 function message.HasAsmStuff (|bool|)
@@ -615,17 +615,16 @@ function DataTypecode.ASMPart (|int|)
 	return 2 + .issigned
 
 
-function Message.TypeCastDoesNothing (|Datatypecode| Expected, |bool|)
+function Message.TypeCastDoesNothing (|bool|)
 	opt norefcounts
-	Expected = .second!.ASMDecl.typeonly
-	|| Src = .first!.ASMDecl.typeonly
-	|| XC = Expected.ByteCount
-	|| SC = Src.ByteCount
-	if  (Expected.IsFloat != Src.isfloat)  or  (src.Count != Expected.Count)
-		return false
-	if SC == XC
+	|| Output = .ASMDecl.typeonly
+	|| Input = .first!.ASMDecl.typeonly
+	require (Output is bool) == (Input is bool)		// boolness
+	require  Output.Count    == Input.Count			// vectors
+	require  Output.IsFloat  == Input.isfloat		// floatness
+	if output.isfloat
 		return true
-	return Expected.isint and (XC < SC)
+	return Output.ByteCount >= Input.ByteCount
 
 
 function asmstate.LoopClearUnreliableConsts // we need to clear vtmps on function calls too.

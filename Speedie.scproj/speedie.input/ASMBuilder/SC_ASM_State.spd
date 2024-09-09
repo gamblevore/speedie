@@ -41,13 +41,6 @@ struct ASMState
 		target debug: if i < .vtmps // what?
 		.VTmps = i
 
-	function MarkAvailableValues
-		|| NewV = (2<<.vdecls)-1
-		|| sh = .vtmps
-		if sh < 32
-			NewV |= -1<<sh
-		
-	
 			
 	function AddFuncParams (|SCFunction| fn)
 		opt norefcounts
@@ -220,7 +213,6 @@ struct ASMState
 		|| ss = (fn)(self, exp, dest)
 		if dest isnt StayOpen
 			.CloseVTmps(TmpCloser)
-			.MarkAvailableValues
 
 		target debug
 			if exp.asmtype < ASMType.kElseIf
