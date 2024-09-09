@@ -7,7 +7,7 @@ Convert files between jbin, box, xml formats. Additionally can compress or decom
 
 	-box -b			Convert to jeebox
 	-bin -n			Convert to jbin
-	-c				Compress (c=0 to c=6)
+	-c				Compress (c=0 to c=10)
 	-d				Decompress (even if not a .mz file)
 	-s				Replace file in-place
 	-json			Source is json
@@ -127,9 +127,9 @@ function App.GetActions (|Type|)
 			conv.Detected |= type.compressed
 		  elseif name ~= "c"
 			rz |= type.compressed
-			if v!="true"
+			if v != "true"
 				conv.DefaultStrength = v.int|int| max MZLab.Fastest
-				v="true"
+				v = "true"
 		  elseif name ~= "json"
 			conv.detected |= type.json
 		  elseif name ~= "o"
