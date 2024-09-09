@@ -6,7 +6,7 @@
 
 #define UnitSize	8
 #define mUnitSize	(UnitSize-1)
-#define MZ_PRINT 1
+#define MZ_PRINT 0
 int CountPrint = 0;
 
 using namespace std;  using std::min;  using std::max;
@@ -193,7 +193,7 @@ struct CompState : FastBuff {
 		u8* A = E - (SG>>8);
 		u8* B = E - (Suffixes[G+1]>>8);
 		
-		int N = std::min((int)std::min(E-A, E-B),255);
+		int N = std::min((int)std::min(E-A, E-B), 254);
 		int Dist = 0;
 		for ( ; Dist < N; Dist++)
 			if (A[Dist] != B[Dist]) break;
