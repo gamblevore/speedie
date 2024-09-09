@@ -6,7 +6,7 @@ extend string
 		.CompressInto(j, strength, st)
 		return j
 		
-	function CompressInto (|object| fs, |int| Strength = mzlab.default, |?&compressionstats| st = nil, |string|)
+	function CompressInto (|object| fs, |int| Strength = mzlab.default, |?&compressionstats| st = nil)
 		.stream.CompressInto(fs, strength, st)
 		
 	function IsCompressed (|bool|)
