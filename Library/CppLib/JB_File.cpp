@@ -1111,6 +1111,8 @@ int CopyStats_(JB_File* self, JB_File* To) {
 }
 
 
+// wait... JB_FS_AppendPipe is already called from faststring.AppendFile
+// is that one good enough already? is this better? sigh.
 int JB_FS_AppendFile(FastString* self, JB_File* F, int Length) {
 	int FD = F->Descriptor;
 	if (FD <= 0) return 0;

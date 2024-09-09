@@ -2,12 +2,12 @@
 #include "JB_Compress.h"
 #include "divsufsort.h" // Runs 5x (!!) faster than even my spdsort
 // * I should also add a "next item differs at" thing to the suffixes...
-// * and maybe a "strength" that allows further checking of suffixes?
+// * And maybe a "strength" that allows further checking of suffixes?
 
 #define UnitSize	8
 #define mUnitSize	(UnitSize-1)
-#define MZ_PRINT 0
-int CountPrint = 0;
+#define MZ_PRINT 1
+
 
 using namespace std;  using std::min;  using std::max;
 
@@ -18,7 +18,14 @@ struct MatchFound {
     operator bool() { return Length; }
 };
 
+
 struct FastBuff {
+#if MZ_PRINT
+	int CountPrint = 0;
+	int ReportLengths[33];
+	int ReportOffsetBits[8];
+	int ReportLengthBits[33];
+#endif
 	u8*					Write;
 	u8*					WriteStart;
 	u8*					WriteEnd;
@@ -105,7 +112,6 @@ struct FastBuff {
 
 	inline void PutOffset (uint X, int Size=4) {
 		///  Size=4:  16-16,  256-272,  4096-4368,  65536-69904  ///
-		uint b = 0;
 		uint header = 0;
 		// the fastest way to do this is with explicit if-chains... avoid all the calculation
 		// just use the hard-coded values. this will do for now :)
@@ -116,6 +122,12 @@ struct FastBuff {
 			if (X < ii) {
 				PutBits(header, 1);
 				PutBits(i, X);
+#if MZ_PRINT
+				X = header+i;
+				if (X > 32)
+					X = 0;
+				ReportOffsetBits[(X/5)-1]++;
+#endif
 				return;
 			}
 			X -= ii;
@@ -129,21 +141,35 @@ struct FastBuff {
 			return 1;
 		uint F = GetBits(--Z);
 		uint Rz = F + (1<<Z);
-		#if DEBUG
+	#if DEBUG
 		if (Rz < 1)
 			debugger;
-		#endif
+	#endif
 		return Rz;
 	}
 	
 	inline void PutLength (uint X) {
-		if (X <= 1)
+		if (X <= 1) {
+	#if MZ_PRINT
+			ReportLengths[1]++;
+			ReportLengthBits[1]++;
+	#endif
 			return PutBits(1,  1);
+		}
 			
 		uint L = JB_Int_Log2(X);
 		uint X2 = X&((1<<L)-1);
 		PutBits(L+1,  1);
 		PutBits(L,   X2);
+	#if MZ_PRINT
+		if (X > 32)
+			X = 0;
+		ReportLengths[X]++;
+		X = L+L+1;
+		if (X > 32)
+			X = 0;
+		ReportLengthBits[X]++;
+	#endif
 	}
 };
 
@@ -228,16 +254,16 @@ struct CompState : FastBuff {
 		int Count = 1;
 		MatchFound Match = {R + 1 + *SelfTest, 1, INT_MIN};
 		
-		for ( /*;;__;;*/ ; FWD or BAK; Count++) {
+		for ( /*;;__;;*/ ; (FWD or BAK) and Count <= SearchStrength; Count++) {
 			if (FWD)
 				FWD = TestOneCost(SelfTest, E, Best+Count, 1, FWD, Match);
 			if (BAK)
 				BAK = TestOneCost(SelfTest, E, Best-Count, 0, BAK, Match);
 		}
 
-#if	MZ_PRINT
-		printf("%i** -%i +%i:  <%.*s>\n", ++CountPrint, Match.Back, Match.Length, Match.Length, SelfTest);
-#endif
+//#if	MZ_PRINT
+//		printf("%i** -%i +%i:  <%.*s>\n", ++CountPrint, Match.Back, Match.Length, Match.Length, SelfTest);
+//#endif
 		PutOffset(Match.Back-1);
 		PutLength(Match.Length);
 
@@ -261,15 +287,15 @@ struct CompState : FastBuff {
 
 //////////////////////////////////////////////// DECOMP ////////////////////////////////////////////////
 
-static u8* DecompOneMz(FastBuff& fb, u8* Write, u8* WriteEnd) {
-	uint Offset = fb.GetOffset()+1;
-	int Length = fb.GetLength();
-#if	MZ_PRINT
-	printf("%i// -%i +%i\n", ++CountPrint, Offset, Length);
-#endif	
+static u8* DecompOneMz(FastBuff& C, u8* Write, u8* WriteEnd) {
+	uint Offset = C.GetOffset()+1;
+	int Length = C.GetLength();
+//#if	MZ_PRINT
+//	printf("%i// -%i +%i\n", ++C.CountPrint, Offset, Length);
+//#endif	
 //	require (Read < fb.ReadEnd); // read protect have to be handled in getbits
 	u8* Src	= Write - Offset;
-	u8* Start = fb.WriteStart;
+	u8* Start = C.WriteStart;
 	if (Src >= Start) {
 		DReq (Write+Length <= WriteEnd, "oversized decomp", (u8*)(-1ll))
 //		auto W8 = (int64*)Write;  
@@ -296,7 +322,9 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int Ex
 	FastBuff C = {};
 	require (arr_reserve(C, self, Expected, fs));
 
-	CountPrint = 0;
+#if MZ_PRINT
+	C.CountPrint = 0;
+#endif
 	u8* Curr = C.Write;
 	u8* After = Curr + Expected;
 	while (Curr < After)
@@ -313,14 +341,14 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int Ex
 
 //////////////////////////////////////////////// COMPRESS ////////////////////////////////////////////////
 
-static CompState	Reuseable;
+static CompState Reuseable;
 static bool alloc_compress(FastString* fs, JB_String* self, int Strength) {
 	int Total = JB_Str_Length(self);
 	require (fs and Total and Total < 16_M)
 	
 	CompState& C		= Reuseable;
 	C.SearchStrength	= min(max(Strength,50), 10000);
-	int CB				= max(ChunkLen_(Total), 24);
+	int CB				= max(ChunkLen_(Total), 16);
 	int ChunkLength		= 1<<CB;
 	int RealMin			= (Total * 9 + 32)/8;
 
@@ -346,7 +374,9 @@ static bool alloc_compress(FastString* fs, JB_String* self, int Strength) {
 extern "C" void JB_Str_CompressChunk (FastString* fs, JB_String* self, int Strength) {
 	require0(alloc_compress(fs, self, Strength));
 	auto & C = Reuseable;
-	CountPrint = 0;
+#if MZ_PRINT
+	C.CountPrint = 0;
+#endif
 	auto TextAfter = C.Detect();
 	int i = 0;
 	while (i < C.Expected)

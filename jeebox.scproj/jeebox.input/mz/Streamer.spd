@@ -10,7 +10,7 @@ function StringReader.CompressInto (|object| dest, |int| Strength=mzlab.default,
 	j.addint(.length)
 	j.enter(@arg)
 	while .hasany
-		|| str = .str(4MB)
+		|| str = .str(mzlab._BlockSize)
 		|| Place = j.OpenSection
 		j.CompressChunk(str, 50*Strength)
 		j.CloseSection(Place)
@@ -26,7 +26,7 @@ function StringReader.CompressInto (|object| dest, |int| Strength=mzlab.default,
 helper StringReader.DecompressInto (|object| dest,  |int| lim=int.max,  |&compressionstats| st=nil,  |bool|)
 	|| fs = faststring.use(dest)				#require
 	if !.IsCompressed
-		fs <~ .readall
+		fs <~ .readall // we have an unused appendfile function. use that instead?
 		return true
 
 	.ExpectJbin
@@ -40,7 +40,7 @@ helper StringReader.DecompressInto (|object| dest,  |int| lim=int.max,  |&compre
 		st = st.start
 		while
 			|| c = .NextMsg(arg, @bin)
-			|| Expected = Remaining min 1MB
+			|| Expected = Remaining min mzlab._BlockSize
 			if !c or !fs.DecompressChunk(c.name, Expected)
 				exit
 			Remaining -= Expected

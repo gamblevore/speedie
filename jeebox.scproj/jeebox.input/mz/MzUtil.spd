@@ -51,7 +51,8 @@ Module MZLab
 		ReallyStrong = 50
 		SuperStrong = 100
 		// you can go above 10.
-		
+
+		_BlockSize = 16MB
 		
 	function TestMz (|string| path, |bool|)
 		if path
