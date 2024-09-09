@@ -1,7 +1,9 @@
 
 
 main // speedie main {
-	MZLab.TestCompression
+	debugger
+	"ijklmnopijkl".compresstest(false)
+	mzlab.ManyTests
 	Compiler.SetupEnv	
 	Compiler.MiniTests
 	Compiler.Main
