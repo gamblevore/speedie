@@ -488,6 +488,7 @@ int JB_App__GetChar() {
 	return c;
 }
 
+
 static int InterPipe(FastString* self, int Desired, int fd, int Mode) {
 	uint8* Buffer = JB_FS_WriteAlloc_(self, Desired);
 	int Error = -1;
@@ -1108,6 +1109,27 @@ int CopyStats_(JB_File* self, JB_File* To) {
 	}
 	return 0;
 }
+
+
+int JB_FS_AppendFile(FastString* self, JB_File* F, int Length) {
+	int FD = F->Descriptor;
+	if (FD <= 0) return 0;
+
+	// Ideally we'd like to find the remaining length.
+	int SoFar = 0;
+	while (Length > SoFar) {
+		int Req = std::min(Length, 64*1024);
+		if (uint8* Buffer = JB_FS_WriteAlloc_(self, Req); Buffer) { 
+			int Error; int N = InterRead(FD, Buffer, Req, F, Error, 0);
+			SoFar += N;
+			JB_FS_AdjustLength_(self, Req, N);
+			if (N<=0 or Error) break;
+		}
+	}
+	
+	return SoFar;
+}
+
 
 int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 	if (!self or !To)

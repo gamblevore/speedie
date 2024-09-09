@@ -174,6 +174,8 @@ static bool arr_reserve(FastBuff& B,  JB_String* self,  int Expected,  FastStrin
 	B.WriteStart = B.Write = JB_FS_NeedSpare(fs, Expected+15);
 	DReq (B.Write, "Out of memory", 0);
 	B.WriteEnd = B.Write + Expected+15;
+	B.BitCount = 0;
+	B.BitBuff = 0;
 	return true;
 }
 
@@ -191,20 +193,18 @@ struct CompState : FastBuff {
 		u8* A = E - (SG>>8);
 		u8* B = E - (Suffixes[G+1]>>8);
 		
-		if (A > B) // B is bigger now
-			std::swap(A,B);
-		u8* B0 = B;
-		E = std::min(E, B+255);
-		while (B < E)
-			if (*A++ != *B++) break;
-		int Dist = (int)(B-B0);
+		int N = std::min((int)std::min(E-A, E-B),255);
+		int Dist = 0;
+		for ( ; Dist < N; Dist++)
+			if (A[Dist] != B[Dist]) break;
+		Dist++;
 		if (Dist > 255) debugger; // what?
 		Suffixes[G] = SG | std::min(Dist, 255);
 		return Dist;
 	}
 	
 	int TestOneCost (u8* Find,  u8* E,  int G,  int Prev,  int PrevLength,  MatchFound& Best) {
-		if ((uint)G > Expected) return 0;
+		if ((uint)G >= Expected) return 0;
 		u8* Text = E - (Suffixes[G]>>8);
 		int Length = GetDiff(E, G-Prev) - 1;
 		Length = std::min(Length, PrevLength);

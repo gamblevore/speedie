@@ -2,6 +2,7 @@
 	
 function StringReader.CompressInto (|object| dest, |int| Strength=mzlab.default, |?&compressionstats| st=nil) 
 	expect (self!=nil) ("Nil object given to CompressInto")
+	require .hasany // hmmm
 	|jbin| j = faststring.use(dest)				#require
 	st = st.start
 	j <~ _JbinHeader
@@ -37,9 +38,11 @@ helper StringReader.DecompressInto (|object| dest,  |int| lim=int.max,  |&compre
 		error (self, ("mz would decompress too large", "Invalid mz header")(Remaining > lim))
 	  else
 		st = st.start
-		while (|| c = .NextMsg(arg, @bin))
+		while
+			|| c = .NextMsg(arg, @bin)
 			|| Expected = Remaining min 1MB
-			loop fs.DecompressChunk(c.name, Expected)
+			if !c or !fs.DecompressChunk(c.name, Expected)
+				exit
 			Remaining -= Expected
 			fs.Flush
 			st.LiveUpdate(c.length, Expected, false)

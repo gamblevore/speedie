@@ -1,14 +1,11 @@
 
 
 extend string
-	function Compress (|int|Strength=mzlab.default, |?&compressionstats| st = nil, |string|) 
+	function Compress (|int| Strength = mzlab.default, |?&compressionstats| st = nil, |string|) 
 		|| j = jbin(0)
-		.CompressInto(j, Strength, st)
+		.Stream.CompressInto(j, strength, st)
 		return j
 		
-	function CompressInto (|object| fs, |int| Strength = mzlab.default, |?&compressionstats| st=nil) 
-		.Stream.CompressInto(fs, strength, st)
-	
 	function IsCompressed (|bool|)
 		return .isjbin and self[_jbinheader.length, "\0B\03µz"]
 	
@@ -37,7 +34,7 @@ function StringReader.IsCompressed (|bool|)
 
 function FastString.CompressInto (|object| fs, |int|Strength=mzlab.default, |?&compressionstats| st=nil)
 	|| str = string.fromptr(.resultptr, .length)
-	str.CompressInto(fs, Strength, st)
+	str.stream.CompressInto(fs, Strength, st)
 
 
 	
@@ -106,7 +103,7 @@ Module MZLab
 		|| fs = FastString()
 		for str in inputs
 			total += str.length
-			str.CompressInto(fs)
+			str.stream.CompressInto(fs)
 		
 		|| back = fs.GetResult.stream
 		for orig in inputs
