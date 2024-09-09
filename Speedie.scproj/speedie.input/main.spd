@@ -1,10 +1,16 @@
 
 
 main // speedie main {
-	debugger
-	"ijklmnopijkl".compresstest(false)
-	mzlab.ManyTests
-	Compiler.SetupEnv	
+	|| O = "/tmp/Speedie/FlowControl/Speedie.txt".readfile
+	|| S = O.compress
+	|| D = S.decompress
+	printline "Compressed to: " + S.length
+	if D != O
+		"oh no"
+	  else
+		"OK!"
+	
+	Compiler.SetupEnv
 	Compiler.MiniTests
 	Compiler.Main
 	Compiler.PrintResults
