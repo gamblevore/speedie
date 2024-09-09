@@ -71,7 +71,6 @@ struct FastBuff {
 	}
 	
 	inline uint GetOffset() {
-		JB_DoAt(1332);
 		uint Z = HeaderBits();
 		uint Bits = Z << 2;
 		uint b = 0b00010001000100010001000100010000;
@@ -328,11 +327,13 @@ static bool alloc_compress(FastString* fs, JB_String* self, int Strength) {
 	C.Write = JB_FS_NeedSpare(fs, max(ChunkLength,RealMin));
 	C.WriteStart = C.Write;
 	C.WriteEnd = C.Write + ChunkLength;
+	C.BitBuff = 0;
+	C.BitCount = 0;
 
 	if (CB > C.B) {
 		C.B = CB;
-		C.Suffixes				= (uint*)JB_realloc(C.Suffixes,	ChunkLength*sizeof(int));
-		C.SortPositionAtByte	= (uint*)JB_realloc(C.SortPositionAtByte,	ChunkLength*sizeof(int));
+		C.Suffixes = (uint*)JB_realloc(C.Suffixes,	2*ChunkLength*sizeof(int));
+		C.SortPositionAtByte = C.Suffixes + ChunkLength;
 	}
 
 	C.Expected			= Total;
@@ -361,7 +362,6 @@ extern "C" void JB_App__ClearCaches(int which) {
 	if (Reuseable.B) {
 		Reuseable.B = 0;
 		JB_unalloc((void**)&Reuseable.Suffixes);
-		JB_unalloc((void**)&Reuseable.SortPositionAtByte);
 	}
 }
 
