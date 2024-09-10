@@ -22,12 +22,12 @@ function PackTestMath (|int| a, |int| b, |int|)
 function PackTestAndOr (|int| a, |int| b, |bool| c, |bool| d, |int|)
 	#! RUN!!
 	visible
-	if a
-		rz = 1
 	if a and b
 		rz = 2
-	if !a and b > 3
+	if !a and b
 		rz = 3
+	if a
+		rz = 1
 	if a or b
 		rz = 4
 	if b < -1 or b > 5

@@ -34,12 +34,6 @@
 #define   U4_Lu_(x)   (((uint)((x)<<28))>>28)
 
 
-#define   Func_SaveRegsi       ((( int)((Op)<<8))>>27)
-#define   Func_SaveRegsi_(x)   ((( int)((x)<<8))>>27)
-
-#define   Func_SaveRegsu       (((uint)((Op)<<8))>>27)
-#define   Func_SaveRegsu_(x)   (((uint)((x)<<8))>>27)
-
 #define   Func_JUMPi       ((( int)((Op)<<13))>>13)
 #define   Func_JUMPi_(x)   ((( int)((x)<<13))>>13)
 

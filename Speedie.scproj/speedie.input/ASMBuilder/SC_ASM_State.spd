@@ -254,8 +254,8 @@ function @ASMType.DoFunc (fn_Asm)
 		dest = .TempOnly(prms, dest)
 		dest.µtype = fn.RegType
 
-	|int| Reg2
-	|int| Reg3
+	|int| ASM2 //  8-byte ASM
+	|int| ASM3 // 12-byte ASM
 	|| sh = 0
 	|| TmpCloser = .VTmps
 
@@ -264,18 +264,17 @@ function @ASMType.DoFunc (fn_Asm)
 		expect (p) (exp, "Compiler did not fully type this function.") 
 		|| v = .FuncPrm(p, FnArg).reg
 		if sh <= 25
-			reg2 |= (v << sh)
+			ASM2  |=  v << sh
 		  else
-			reg3 |= (v << (sh-30))
+			ASM3  |=  v << (sh-30)
 		sh += 5
 		p++
 	.CloseVTmps(TmpCloser)
-	// we still need to clear variables passed by address
-	// like x = 12345, f(&x), if y == 12345 // can't reuse x as a const
 	
-
-	|| SaveAmount = .vdecls * (dest isnt forreturn)
-	|| fat = exp.FNCX(SaveAmount,  fn.TableId,  reg2,  reg3) // exp.func2, exp.func3
+	|| SaveAmount = 0
+	if dest isnt forreturn
+		saveamount = .VDecls
+	|| fat = exp.FNCX(SaveAmount.asm,  fn.TableId,  ASM2,  ASM3)       // exp.func2, exp.func3
 
 	|| OP = (asm.FUNC2, asm.FUNC3)(sh <= 25)
 	if fn is Wrapper
@@ -283,6 +282,7 @@ function @ASMType.DoFunc (fn_Asm)
 	fat.op = op
 
 	return fat * dest
+
 
 
 function ASMState.PackMakerInit (|bool|)
@@ -293,6 +293,7 @@ function ASMState.PackMakerInit (|bool|)
 	VM_Builder.JustDefineInstructions
 	SpdAssembler.InitAss
 	return .alloc(ASMState.JSMSpace)
+
 
 
 function ASMState.Alloc (|memory of fatasm| j, |bool|)

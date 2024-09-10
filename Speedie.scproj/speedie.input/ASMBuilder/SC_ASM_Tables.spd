@@ -2,7 +2,7 @@
 
 
 dispatch fn_asm_table (fn_asm)
-	@arg: ASMType.Arg
+	@arg:  ASMType.Arg
 	@decl: ASMType.decl
 	@num:  ASMType.num
 	@rel:  ASMType.DoMath
@@ -15,17 +15,17 @@ dispatch fn_asm_table (fn_asm)
 	@dot:  ASMType.Dot
 	@acc:  ASMType.Access
 	@brel: ASMType.Brel		// ++, --, -, &
-	@arel: ASMType.arel      // ++, --, 
+	@arel: ASMType.arel     // ++, --, 
 	@type:					ASMType.TypeCast
 	@tmp:					ASMType.unexpected
 
 	(ASMType.kif):			ASMstate.If
 	(ASMType.kwhile):		ASMstate.While
-	(ASMType.kTern):			ASMstate.Ternary
-	(ASMType.kContinue):		ASMstate.Continue
-	(ASMType.kExit):			ASMstate.Exit
+	(ASMType.kTern):		ASMstate.Ternary
+	(ASMType.kContinue):	ASMstate.Continue
+	(ASMType.kExit):		ASMstate.Exit
 
-	(ASMType.kDebugger):		ASMType.Debugger
+	(ASMType.kDebugger):	ASMType.Debugger
 	(ASMType.krejoin):		ASMType.First
 	(ASMType.kreturn):		ASMType.return
 
@@ -34,7 +34,7 @@ dispatch fn_asm_table (fn_asm)
 	(ASMType.kPointer):		ASMType.Pointer
 
 	(ASMType.kIgnore):		ASMType.Ignore
-	(ASMType.kFail):			ASMType.Ignore
+	(ASMType.kFail):		ASMType.Ignore
 
 	63:						ASMType.unexpected
 
@@ -328,9 +328,9 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 
 function BoolNot		(fn_asm)						// !a
 	opt	NoRefCounts
-	dest = dest.flip(asmreg.negate)
-	|| src = .µ(exp.first!, dest)
+	|| src = .µ(exp.first!, dest.flip(asmreg.negate))
 	if src is AlreadyNegated
+		if dest is negate // why did we get here? we just flipped it above to not negated.
 		return src
 	return .Equals(dest, asmreg(), src, exp)
 	
@@ -626,14 +626,3 @@ function Message.TypeCastDoesNothing (|bool|)
 		return true
 	return Output.ByteCount >= Input.ByteCount
 
-
-function asmstate.LoopClearUnreliableConsts // we need to clear vtmps on function calls too.
-	return
-	|| v = .vdecls|int|
-	for i in v
-		|| r = .RegConsts[i]
-		if r isnt NeverAltered
-			.regconsts[i] = nil
-		
-		
-		

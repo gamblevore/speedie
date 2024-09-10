@@ -53,7 +53,7 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max, |int|)
 	if line
 		|| f = line.NeedFirst$
 		|| f0 = f.name[]
-		if f0 == 'x' and bit_pos == 32
+		if f0 == 'x' and bit_pos == 32 // x means an extra 4 bytes of values. like 8-byte ASM.
 			return bit_pos
 		if f0 == 'r' or 'R'
 			.FillTypePrm(line.name, pname)

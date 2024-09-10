@@ -1,9 +1,5 @@
 
 
-//	* add an integer divide by power of 2 instruction?
-//  || y = x|int| / 4 // should work for all values of x
-//  probably just add a const then bitshift
-
 // vm.box
 forms
 	U0:
@@ -14,11 +10,10 @@ forms
 
 
 	Func	// func: fnc:
-		SaveRegs 5 // should this be R?
+		r1		R
 		JUMP	j
-		Prm1	x // use const instead?
-		Prm2	x // maybe just leave it for now...
-				  // besides fncx might need some types.
+		Prm1	x
+		Prm2	x
 	
 	Tail
 		JUMP	j
@@ -392,20 +387,16 @@ forms
 		if (i1)
 			Code += Bra_Jmpi
 		___
-
 /**/ JBRN  (Bra)					
 		__
 		if (!i1)
 			Code += Bra_Jmpi
 		___
-
-
 /**/ LUPD  (Loop)			 	// same
 		__
 		if (i1-- > i2)
 			Code += Loop_Jmpi
 		___
-
 /**/ LUPU  (Loop)				// assume uint64
 		__
 		if (i1++ < i2)

@@ -2,7 +2,6 @@
 
 extend ASMState {
 
-
 // abc(), if (x) return, def()   -->   abc(), if !x {def()}, return
 function If				(fn_asm)
 	opt norefcounts
@@ -40,7 +39,6 @@ function If				(fn_asm)
 
 function While			(fn_asm)
 	opt norefcounts
-	.LoopClearUnreliableConsts
 	|| BEGIN = exp.JUMP(0)								// jump to end... THEN EMIT arg and jump back.
 	ASMType.arg(self, exp.second)						// arg
 
@@ -119,7 +117,7 @@ function Branch (|message| cond,  |asmreg| mode,  |&fatrange| range)
 		answer = .equals(mode, asmreg(), answer, cond)
 	if range
 		range.after = .curr
-
+	
 	// if a or b
 		// c
 	// if TRUE1                --> jump after (b)
@@ -199,6 +197,7 @@ Struct FatRange
 			
 	function Fill (|&fatasm| curr)
 		|| any = false
+		curr--
 		for s in self
 			if s is condanswer
 				(s isnt condanswer)
