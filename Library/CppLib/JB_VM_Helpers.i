@@ -441,7 +441,7 @@ AlwaysInline ASM* BumpStack (Register*& rp, ASM* Code, ASM Op) { // jumpstack
 	ASM  Code2 = Code[0];
 	ASM  Code3 = Code[1];
 	int RemainCodes = Op&3;
-	int Save = Func_SaveRegsu;
+	int Save = (int)u1;
 	Register* ENTR = r+Save+1;
 	ENTR->Stack.Addr = Code+RemainCodes;
 	ENTR->Stack.Regs = Save;
@@ -508,7 +508,11 @@ AlwaysInline ASM* TailStack (Register* r, ASM* Code, ASM Op) {
 #define FFISub(Mode, FP)	case 11-Mode:	return ((Fn##Mode)Fn)FP;
 AlwaysInline u64 ForeignFuncSimple(Register* r, ASM*& Code, ASM Op) {
 	// use libffi later
-	// Op.Raw |= *Code++;
+//	Func	// func: fnc:
+//		r1		R
+//		JUMP	j
+
+//	 Op.Raw |= *Code++;
 //	auto Oof = (BasicRegs3*)Code;
 //	auto j = *Oof;
 //	Code = (ASM*)Oof;
