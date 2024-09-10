@@ -5,15 +5,6 @@ void ASMPrint(ASM oof);
 #define TSC 1
 #define TSC_RD TSC
 
-typedef u64 (*Fn0)();
-typedef u64 (*Fn1)(u64);
-typedef u64 (*Fn2)(u64, u64);
-typedef u64 (*Fn3)(u64, u64, u64);
-typedef u64 (*Fn4)(u64, u64, u64, u64);
-typedef u64 (*Fn5)(u64, u64, u64, u64, u64);
-typedef u64 (*Fn6)(u64, u64, u64, u64, u64, u64);
-typedef u64 (*Fn7)(u64, u64, u64, u64, u64, u64, u64);
-typedef u64 (*Fn8)(u64, u64, u64, u64, u64, u64, u64, u64);
 
 
 #define AlwaysInline static inline __attribute__((__always_inline__))
@@ -441,7 +432,7 @@ AlwaysInline ASM* BumpStack (Register*& rp, ASM* Code, ASM Op) { // jumpstack
 	ASM  Code2 = Code[0];
 	ASM  Code3 = Code[1];
 	int RemainCodes = Op&3;
-	int Save = (int)u1;
+	int Save = n1;
 	Register* ENTR = r+Save+1;
 	ENTR->Stack.Addr = Code+RemainCodes;
 	ENTR->Stack.Regs = Save;
@@ -505,30 +496,51 @@ AlwaysInline ASM* TailStack (Register* r, ASM* Code, ASM Op) {
 }
 
 
+#define q1  r[(a<< 5)>>27].Uint
+#define q2  r[(a<<10)>>22].Uint
+#define q3  r[(a<<15)>>17].Uint
+#define q4  r[(a<<20)>>12].Uint
+#define q5  r[(a<<25)>> 7].Uint
+#define q6  r[(b<< 0)>>27].Uint
+#define q7  r[(b<< 5)>>22].Uint
+#define q8  r[(b<<10)>>17].Uint
+#define q9  r[(b<<15)>>12].Uint
+#define q10 r[(b<<20)>> 7].Uint
+#define q11 r[(b<<25)>> 2].Uint
 #define FFISub(Mode, FP)	case 11-Mode:	return ((Fn##Mode)Fn)FP;
-AlwaysInline u64 ForeignFuncSimple(Register* r, ASM*& Code, ASM Op) {
-	// use libffi later
-//	Func	// func: fnc:
-//		r1		R
-//		JUMP	j
 
-//	 Op.Raw |= *Code++;
-//	auto Oof = (BasicRegs3*)Code;
-//	auto j = *Oof;
-//	Code = (ASM*)Oof;
-//	Goto Fn = (Goto*)r[0]; // it was the register pointer... but needs fix now
-//	switch (8/*Func_RegsToSendu*/) {
-//	default:
-//		FFISub(8 , (r[j.R1], r[j.R2], r[j.R3], r[j.R4], r[j.R5], r[j.R6], r[j.R7], r[j.R8]));
-//		FFISub(7 , (r[j.R1], r[j.R2], r[j.R3], r[j.R4], r[j.R5], r[j.R6], r[j.R7]));
-//		FFISub(6 , (r[j.R1], r[j.R2], r[j.R3], r[j.R4], r[j.R5], r[j.R6]));
-//		FFISub(5 , (r[j.R1], r[j.R2], r[j.R3], r[j.R4], r[j.R5]));
-//		FFISub(4 , (r[j.R1], r[j.R2], r[j.R3], r[j.R4]));
-//		FFISub(3 , (r[j.R1], r[j.R2], r[j.R3]));
-//		FFISub(2 , (r[j.R1], r[j.R1]));
-//		FFISub(1 , (r[j.R1]));
-//		FFISub(0 , ());
-//	};
+
+	// use libffi later
+AlwaysInline uint64 ForeignFuncSimple (jb_vm& vm, ASM* Code, ASM Op, ASM a, ASM b) {
+	auto &r = vm.Registers;
+	ASM PrmCount = (Op&15);
+	auto Fn = vm.Env.Cpp[Func_JUMPi];
+	switch (PrmCount) {
+	default:
+		// hopefully this just becomes a jump-table... :3
+		FFISub(11, (q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11));
+		FFISub(10, (q1, q2, q3, q4, q5, q6, q7, q8, q9, q10));
+		FFISub(9 , (q1, q2, q3, q4, q5, q6, q7, q8, q9));
+		FFISub(8 , (q1, q2, q3, q4, q5, q6, q7, q8));
+		FFISub(7 , (q1, q2, q3, q4, q5, q6, q7));
+		FFISub(6 , (q1, q2, q3, q4, q5, q6));
+		FFISub(5 , (q1, q2, q3, q4, q5));
+		FFISub(4 , (q1, q2, q3, q4));
+		FFISub(3 , (q1, q2, q3));
+		FFISub(2 , (q1, q2));
+		FFISub(1 , (q1));
+		FFISub(0 , ());
+	};
 	return 0;
 }
+
+
+AlwaysInline ASM* ForeignFunc (jb_vm& vm, ASM* Code, ASM Op) {
+	ASM a = *Code++;
+	ASM b = (Op&3) ? *Code++ : 0;
+	uint64 V = ForeignFuncSimple(vm, Code, Op, a, b);
+	vm.Registers[n1].Int = V;
+	return Code;
+}
+
 

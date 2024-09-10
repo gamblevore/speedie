@@ -57,8 +57,8 @@ extend SpdAssembler {
 
 
 dispatch µOpt (|&fatasm| self, |?&fatasm| P, |?&fatasm| N, |bool|)
-	(ASM.FUNC2):  OptFunc
-	(ASM.FUNC3):  OptFunc
+	(ASM.FUNK2):  OptFunc
+	(ASM.FUNK3):  OptFunc
 		
 	(ASM.CNTC):   OptCount
 	(ASM.TABL):   OptTabl

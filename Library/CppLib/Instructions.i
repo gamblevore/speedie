@@ -1,13 +1,13 @@
 ı EROR: _
 	return u1 + U1_Lu;
-ı FUNC: 
+ı FUNK: 
 	__;
 	Code = BumpStack(r, Code, Op);
 	___;
-ı FNCX: 
+ı FFNC: 
 	__;
 	vm.CurrRegs = r;
-	ForeignFuncSimple(r, Code, Op);
+	Code = ForeignFunc(vm, Code, Op);
 	___;
 ı KNST: _
 	Code = LoadConst(r, Op, Code);

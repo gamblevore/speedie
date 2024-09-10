@@ -7,10 +7,6 @@ struct ASMState
 
 	|byte|						VDecls
 	|byte|						VTmps
-// OK, can we do this... just remove it and... make it work. We just need to be able 
-// to add and remove. We also need some way to say that a regs exists, as a returned reg.
-// So we can overwrite it even. But not written to. Basically a returned result.
-// how to write that a reg is "Returned"? in closetmps?
 	|datatypecode|				ReturnASM
 	|bool|						OK    
 	|bool|						Inited   
@@ -49,28 +45,6 @@ struct ASMState
 
 	function Last (|&FatASM|)
 		return .curr-1
-
-/*
-	function RegPlace (|int| a, |?&uint64|)
-		opt norefcounts
-		|| InBounds = a|uint| <= 31
-//			|| fat = .RegConsts[a]
-//				return fat.const
-			return nil
-
-		|| msg = (": Unassigned register",  ": Out of bounds register")(InBounds)
-		error (self, errorreceiver.NonFatal + msg)
-			
-	
-	helper FoundCode (|int| i, |uint64| Value, |asmreg| typeinfo, |asmreg|)
-		opt norefcounts
-		|| place = .regplace(i)$
-		|| K = place[]
-		if K == Value
-			typeinfo.reg = i
-			(typeinfo is ConstAny)
-			return typeinfo
-*/
 	
 	function IntPowerOfTwo (|asmreg| r,  |FailableInt|)
 		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
@@ -92,20 +66,6 @@ struct ASMState
 		.Assign(reg, ToGrow, asmreg(), exp)
 		rz = .IncrPre(exp, togrow, ToGrow, value)
 
-// a++, a + 1
-// how to do this? In a magical fun beautiful adventure way
-// well... Incrementatulatorifier creates the "Size", which is "Value" here.
-// for &ptruint++, value is 4. But what about ptruint = ptruint + 1?
-// This is tricky. We need to incrementatulatorify it. But by what? and where?
-// we lost track of everything. Perhaps... we can do the work in the caller?
-// it would work. Or assume that the thing we want to work on, is the left side
-// but what about 1+ptruint? then once again... we lost it.
-// we could make a special "Findifier" thing? Simply... if its a rel... then use correct side
-// if not... use the first item. this relies on us passing in the correct exp message
-// I think thats actually the cleanest.
-// the next question is... "who passes in what". How can I RELY on the values passed in, being correct?
-// i think for maths... it is clear. It is correct. Like a+1 or 1+a
-// then lets check the others... then do a findifier.
 
 	function IncrPre (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
 		#! what if dest.reg != src.reg? like y = ++x
@@ -181,25 +141,6 @@ struct ASMState
 		tmps = ~tmps
 		return dcls ||| tmps
 
-/*
-	function FindConstDecl (|scdecl| d, |asmreg|)
-		return .findconst(d.exportposition, d.CalculateASMType)
-
-	function FindConst (|uint64| Value, |asmreg| typeinfo, |asmreg|)
-		// our vars will need checking by the nil-checker...
-		// to see if loops/ifs harm this thing.
-		// technically... the asm thing can handle the ifs...
-		// but loops must be pre-checked!
-		
-		if !value
-			typeinfo.reg = 0
-			return typeinfo
-		|| R = .regmap &~ 1
-		for (b.bits in R) (i)
-			|| f = .FoundCode(i, value, typeinfo)
-				return f
-*/
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -245,8 +186,8 @@ function @ASMType.DoFunc (fn_Asm)
 	|| fn = prms.asfunc
 	expect  (fn and fn.args <= 10) (prms, "Too many parameters")
 
-	// speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:3, 8:1
-	// there are only 4 above 6!, only 14 above 5
+	// Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:3, 8:1
+	// There are only 4 above 6!, only 14 above 5
 
 	if !fn.ReturnType
 		dest = AsmReg()
@@ -254,34 +195,43 @@ function @ASMType.DoFunc (fn_Asm)
 		dest = .TempOnly(prms, dest)
 		dest.µtype = fn.RegType
 
-	|int| ASM2 //  8-byte ASM
-	|int| ASM3 // 12-byte ASM
-	|| sh = 0
+	|uint64| ASMP
+	|| sh = 5
 	|| TmpCloser = .VTmps
 
 	|| p = prms.first
 	for fnarg in fn.args
-		expect (p) (exp, "Compiler did not fully type this function.") 
+		expect (p) (exp)
 		|| v = .FuncPrm(p, FnArg).reg
-		if sh <= 25
-			ASM2  |=  v << sh
-		  else
-			ASM3  |=  v << (sh-30)
+		ASMP  |=  v << sh
 		sh += 5
 		p++
+		ASMP++
+	
+	ASMP |= (fn is Wrapper)<<4
 	.CloseVTmps(TmpCloser)
 	
 	|| SaveAmount = 0
-	if dest isnt forreturn
-		saveamount = .VDecls
-	|| fat = exp.FNCX(SaveAmount.asm,  fn.TableId,  ASM2,  ASM3)       // exp.func2, exp.func3
-
-	|| OP = (asm.FUNC2, asm.FUNC3)(sh <= 25)
-	if fn is Wrapper
-		op = (asm.FNCX2, asm.FNCX3)(sh <= 25)
-	fat.op = op
+	if dest isnt ForReturn
+		SaveAmount = .VDecls
+	|| fat = exp.FUNK(SaveAmount.ASM,  fn.TableId,  ASMP,  ASMP>>32)       // exp.func2,   exp.func3
+	fat.op += (fn.args > 5)
 
 	return fat * dest
+
+
+/*
+	Cpp/SPD : 1
+	SendAmount : 1
+	How to do this? theres a few approaches...
+	
+	* FuncX/Func vs func Prm1 stores a bit.
+		* FuncX seems faster. Also saves a bit?
+			* maybe easier to debug.
+		* having only 1 func seems cleaner... for the future.
+	
+	* just count the numbers...
+*/
 
 
 

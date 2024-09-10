@@ -8,20 +8,34 @@ typedef const void* Goto;
 	#define ASM u32
 #endif
 
+typedef u64 (*Fn0 )();
+typedef u64 (*Fn1 )(u64);
+typedef u64 (*Fn2 )(u64, u64);
+typedef u64 (*Fn3 )(u64, u64, u64);
+typedef u64 (*Fn4 )(u64, u64, u64, u64);
+typedef u64 (*Fn5 )(u64, u64, u64, u64, u64);
+typedef u64 (*Fn6 )(u64, u64, u64, u64, u64, u64);
+typedef u64 (*Fn7 )(u64, u64, u64, u64, u64, u64, u64);
+typedef u64 (*Fn8 )(u64, u64, u64, u64, u64, u64, u64, u64);
+typedef u64 (*Fn9 )(u64, u64, u64, u64, u64, u64, u64, u64, u64);
+typedef u64 (*Fn10)(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64);
+typedef u64 (*Fn11)(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64, u64);
+typedef u64 (*Fn12)(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64, u64, u64);
 
 
 struct Function {
+	u16				NameLength;			// can we use jbin names instead? where to store names even?				
+	u16				InstructionCount;	// after the code?
 	uint			CallCount;
-	u16				NameLength;				
-	u16				DataLength;				
-	byte			Data[];
+	byte			Code[];
 };
 
 
 struct vm_globs {
     byte*			LibGlobs;
     byte*			PackGlobs;
-    Function*		DebugFuncTable;
+    Fn0*			Cpp;
+    Function**		DebugFuncTable;
     ASM*            Code;
     int             CodeLength;
 };

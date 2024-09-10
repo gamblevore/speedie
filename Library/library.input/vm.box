@@ -234,15 +234,15 @@ forms
 		Code = Return(r, Code, Op)
 		___
 
-/**/ FUNC (Func, 2, 3) // func: 
+/**/ FUNK (Func, 2, 3) // func: 
 		__
 		Code = BumpStack(r, Code, Op)
 		___
 
-/**/ FNCX (Func, 2, 3)
+/**/ FFNC (Func, 2, 3)
 		__
 		vm.CurrRegs = r // to make this recursive
-		ForeignFuncSimple(r, Code, Op)
+		Code = ForeignFunc(vm, Code, Op) 
 		___
 
 /**/ TAIL (Tail, 2)

@@ -229,11 +229,8 @@ function BadEncoder (ASM_Encoder2)
 
 function VM_NewInstructions (|message| list, |int| Amount, |[message]| rz)
 	opt norefcounts
-	|| ask = 0
-	if amount
-		ask = 1<<(Amount-1)
 	for ch in list
-		require .VM_NewIns(ch, ask, rz)
+		require .VM_NewIns(ch, amount, rz)
 
 
 function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true)
