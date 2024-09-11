@@ -26,7 +26,7 @@ extend Parser
 		debugger @cnj|int| == 8 
 		debugger @max|int| <= 63  
 		
-		.Tokenz( "\r \n", kEndOfLine, fEndOfLine )
+		.Tokenz( "\r \n ;", kEndOfLine, fEndOfLine )
 		.token(",") = .handler(kComma (|) kEndOfline, fEndOfLine) 
 		.token(":") = .handler(kColon, fEndOfLine).link(kColonArg, fArgColon)
 
