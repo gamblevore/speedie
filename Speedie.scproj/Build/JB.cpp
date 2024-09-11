@@ -15215,7 +15215,7 @@ ParserLineAndIndent JB_Tk__NextLineAndIndent(Message* Parent) {
 			}
 		}
 		 else {
-			iif (!((C == '\n') or (C == '\x0D'))) {
+			iif (!((C == '\n') or ((C == '\x0D') or (C == ';')))) {
 				(--N);
 				break;
 			}

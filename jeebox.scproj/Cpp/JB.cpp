@@ -7960,7 +7960,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024091113);
+	return (2024091123);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -7972,4 +7972,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 -8242602030361934645 -3286763307915734039
+// -2934619186805667969 -8242602030361934645 -2650631559806097130

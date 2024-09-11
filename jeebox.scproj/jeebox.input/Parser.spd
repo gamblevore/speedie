@@ -1039,6 +1039,7 @@ ive been~running #since morning
 			  elseif (c == '/')
 				|| c2 = d[n]
 				if (c2 != '/' and '*')
+					// the idea is to make / at the start of a line just mean its a debugger breakpoint
 					if state&2 // not quite working yet! but soon!
 						rz.a = 1
 					n--
@@ -1057,7 +1058,7 @@ ive been~running #since morning
 					exit
 
 			  else
-				ifn (c == '\n' or '\r')
+				ifn (c == '\n' or '\r' or ';')
 					n--
 					exit
 				rz.r++
