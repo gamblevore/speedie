@@ -3274,7 +3274,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[184]);
-	JB_FS_AppendInt32(_fsf0, (2024091116));
+	JB_FS_AppendInt32(_fsf0, (2024091123));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8361,7 +8361,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[839]);
-	JB_FS_AppendInt32(_fsf0, (2024091116));
+	JB_FS_AppendInt32(_fsf0, (2024091123));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -33115,8 +33115,8 @@ bool SC_Msg_CollectOneParam(Message* Self, SCFunction* Func, SCNode* Recv, SCCla
 	iif (Dcl->PointerCount) {
 		Func->AltersParams = (Func->AltersParams | (1 << JB_Array_Size(Func->Args)));
 	}
-	(SC_Decl_SyntaxIsSet(Dcl, kSC__SCDeclInfo_NumberConst, (!true)));
-	SC_Func_AddArg(Func, Dcl);
+	SC_Func_SetTypeInfo(Func, Dcl);
+	JB_Array_SyntaxAppend(Func->Args, Dcl);
 	iif (JB_Str_Exists(Dcl->Name)) {
 		(SC_Decl_SyntaxIsSet(Dcl, kSC__SCDeclInfo_Param, true));
 	}
@@ -33124,6 +33124,7 @@ bool SC_Msg_CollectOneParam(Message* Self, SCFunction* Func, SCNode* Recv, SCCla
 		(SC_Decl_SyntaxIsSet(Dcl, kSC__SCDeclInfo_Return, true));
 	}
 	(SC_Decl_SyntaxIsSet(Dcl, kSC__SCDeclInfo_Altered, (!true)));
+	(SC_Decl_SyntaxIsSet(Dcl, kSC__SCDeclInfo_NumberConst, (!true)));
 	return true;
 }
 
@@ -47702,11 +47703,6 @@ SCNode* SC_Class__StoreExtendModule(Message* Node, SCNode* Name_space, Message* 
 }
 
 
-void SC_Func_AddArg(SCFunction* Self, SCDecl* Dcl) {
-	SC_Func_SetTypeInfo(Self, Dcl);
-	JB_Array_SyntaxAppend(Self->Args, Dcl);
-}
-
 void SC_Func_AddConstructorReturn(SCFunction* Self, Message* Prms) {
 	SCClass* C = Self->Cls;
 	iif (!C) {
@@ -53670,4 +53666,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 6850151409208967643 2669051915173469737
+// -3779037838007584007 -2971602034402978600

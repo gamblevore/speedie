@@ -9816,8 +9816,6 @@ SCNode* SC_Class__StoreExtendModule(Message* Node, SCNode* Name_space, Message* 
 
 
 // JB_SCFunction
-void SC_Func_AddArg(SCFunction* Self, SCDecl* Dcl);
-
 void SC_Func_AddConstructorReturn(SCFunction* Self, Message* Prms);
 
 void SC_Func_AddConstructorReturn2(SCFunction* Self);

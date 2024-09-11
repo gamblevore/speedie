@@ -446,7 +446,7 @@ struct FlowControl_Behaviour: Object_Behaviour {
 };
 
 JBClass ( FlowControl , JB_Object , 
-	FastString* Excuse;
+	bool CanDoErrors;
 	StringReader* ReadInput;
 	FastString* Write;
 	FastBuff Buff;
@@ -907,14 +907,13 @@ extern Float64 JB__Rec_Progress;
 #define kJB__fix_TypeObj ((int)1)
 #define kJB__fix_TypeStem ((int)2)
 #define kJB__fix_TypeValue ((int)0)
+extern byte JB__Flow_Active;
 extern bool JB__Flow_AlwaysMove;
 extern bool JB__Flow_BreakOnFail;
 extern int JB__Flow_Disabled;
 extern FlowControl* JB__Flow_Flow;
-extern byte JB__Flow_FlowMode;
 #define kJB__Flow_Log ((int)1)
 #define kJB__Flow_Off ((int)0)
-extern CompressionStats JB__Flow_Stats;
 #define kJB__Flow_Validate ((int)2)
 extern Array* JB__Macro_TmpPrms_;
 extern uint64 JB__Mrap_MDummy_[2];
@@ -950,6 +949,8 @@ JB_String* JB_App__OrigPath();
 void JB_PrintStackTrace();
 
 JB_String* JB_App__StackTrace(int Skip, FastString* Fs_in);
+
+JB_String* JB_App__SyntaxAccess(JB_String* Name);
 
 
 
@@ -1308,6 +1309,10 @@ int JB_zalgo__InitCode_();
 
 
 // bool
+void JB_bool_Append(bool Self, FastString* Fs_in);
+
+JB_String* JB_bool_Render0(bool Self);
+
 
 
 // byte
@@ -1681,8 +1686,6 @@ JB_String* JB_FastBuff_AccessStr(FastBuff* Self, int Pos, int After);
 
 void JB_FastBuff_SyntaxExpect(FastBuff* Self, JB_String* S);
 
-JB_String* JB_FastBuff_TmpStr(FastBuff* Self);
-
 
 
 // JB_FloatRange
@@ -2035,6 +2038,8 @@ void JB_FS_AppendFastString(FastString* Self, FastString* Fs);
 
 void JB_FS_AppendInt32(FastString* Self, int Data);
 
+void JB_FS_AppendBuff(FastString* Self, FastBuff* B);
+
 void JB_FS_SyntaxAppend(FastString* Self, Message* Msg);
 
 FastString* JB_FS__Use(JB_Object* Other);
@@ -2047,13 +2052,17 @@ FastString* JB_FS__Use(JB_Object* Other);
 // JB_FlowControl
 void JB_Flow_AddByte(FlowControl* Self, uint /*byte*/ Value);
 
-bool JB_Flow_Cond(FlowControl* Self, uint /*byte*/ Value);
-
 void JB_Flow_Destructor(FlowControl* Self);
 
 void JB_Flow_Fail(FlowControl* Self, JB_String* Found, JB_String* Expected, JB_String* InputName);
 
 void JB_Flow_Flush(FlowControl* Self);
+
+bool JB_Flow_TestByte(FlowControl* Self, uint /*byte*/ Value);
+
+bool JB_Flow__Cond(bool Value);
+
+void JB_Flow__GetActiveFlow();
 
 int JB_Flow__Init_();
 
@@ -2061,7 +2070,9 @@ int JB_Flow__InitCode_();
 
 void JB_Flow__Input(JB_String* Data, JB_String* Name);
 
-bool JB_Flow__Cond(bool Value);
+void JB_Flow__SyntaxAppend(uint /*byte*/ Value);
+
+bool JB_Flow__Cond2(bool Value);
 
 
 
@@ -2129,6 +2140,10 @@ void JB_Sel_Destructor(Selector* Self);
 // JB_String
 JB_String* JB_Str_AfterByte(JB_String* Self, uint /*byte*/ B, int Last);
 
+JB_String* JB_Str_ArgName(JB_String* Self);
+
+JB_String* JB_Str_ArgValue(JB_String* Self);
+
 JB_String* JB_Str_BackToApp(JB_String* Self);
 
 JB_String* JB_Str_BeforeLastByte(JB_String* Self, uint /*byte*/ B, int Fudge);
@@ -2195,6 +2210,8 @@ int JB_Str_OperatorMinus(JB_String* Self, JB_String* S);
 
 FastString* JB_Str_Out(JB_String* Self, bool Clear);
 
+Ind JB_Str_OutByteWithByteIntInt(JB_String* Self, uint /*byte*/ Find, int Start, int After);
+
 Ind JB_Str_OutCharSet(JB_String* Self, CharSet* Cs, int Start, int After);
 
 Ind JB_Str_OutWhite(JB_String* Self, int Start, int After);
@@ -2218,6 +2235,8 @@ JB_String* JB_Str_Squeeze(JB_String* Self);
 StringReader* JB_Str_Stream(JB_String* Self);
 
 void JB_Str_SyntaxExpect(JB_String* Self);
+
+JB_String* JB_Str_TrimFirst(JB_String* Self, uint /*byte*/ B);
 
 int JB_Str_TrimLastSub(JB_String* Self, uint /*byte*/ B);
 
@@ -2730,7 +2749,7 @@ int JB_Err_LinePos(JB_Error* Self, JB_String* Data);
 
 JB_String* JB_Err_Render(JB_Error* Self, FastString* Fs_in);
 
-JB_String* JB_Err_RenderClang(JB_Error* Self, FastString* Fs_in);
+JB_String* JB_Err_RenderUnix(JB_Error* Self, FastString* Fs_in);
 
 bool JB_Err_SyntaxIs(JB_Error* Self, uint /*ErrorFlags*/ F);
 
