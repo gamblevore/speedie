@@ -240,6 +240,14 @@ forms
 		___
 
 /**/ FFNC (Func, 3) // this needs to use libffi, and also describe the typeinfo. Probably needs 3 ASM min.
+/*
+	int			4579 // almost entirely int
+	float 		122  // we could make a pure float version
+	float/int	35   // only 35 float/ints need ffiing
+	vector		98   // simd we will look at later. Are they considered structs? or just not supported?
+	vector/int	74
+	vector/float 28
+*/
 		__
 		vm.CurrRegs = r // to make this recursive
 		Code = ForeignFunc(vm, Code, Op) 
