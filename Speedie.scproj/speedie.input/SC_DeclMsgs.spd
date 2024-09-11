@@ -125,13 +125,14 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 	if dcl.PointerCount
 		func.altersparams |= 1<<func.args.length
 
-	(dcl isnt NumberConst)
-	func.AddArg(dcl)
+	func.SetTypeInfo(dcl)
+	func.args <~ dcl
 	if dcl.name
 		(dcl is Param)
 	  else
 		(dcl is return)		// This is for struct returns, right? which are always params.
 	(dcl isnt Altered)		// SCDecl defaults as being altered... not sure why.
+	(dcl isnt NumberConst)
 	return true
 
 

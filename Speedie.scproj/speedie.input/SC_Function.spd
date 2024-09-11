@@ -740,10 +740,6 @@ function SetTypeInfo (|scdecl| dcl)
 			is hasint
 
 
-function AddArg (|scdecl| dcl)
-	.SetTypeInfo(dcl)
-	.args <~ dcl
-
 
 
 setter IsCppInBuilt (|int|)
