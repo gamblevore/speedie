@@ -28,16 +28,13 @@ function compiler.PrintStats
 	require options.argstats
 	|| fs = faststring()
 	fs <~ "FuncStats: "
-	|| n = 0
-	for i in 12
-		n += scfunction.FuncStats[i]
 	for i in 12
 		|| c = scfunction.FuncStats[i]
 			if i
 				fs <~ ", "
 			fs <~ i
 			fs <~ ":"
-			fs.pc(i|float|, n|float|)
+			fs <~ c
 	printline fs
 
 

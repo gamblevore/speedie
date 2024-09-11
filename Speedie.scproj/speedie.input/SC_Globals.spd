@@ -1769,7 +1769,7 @@ function TypeOfFuncSub (|Message| exp, |SCNode| name_space, |Message| side, |SCO
 
 	|scdecl| thgdecl 
 	if ch == @Thg
-		thgdecl = name_space.LookUpFunc( ch.name, exp, params )|scdecl|
+		thgdecl = name_space.LookUpFunc( ch.name, exp )|scdecl|
 		ifn thgdecl isa scdecl
 			return thgdecl
 	  else

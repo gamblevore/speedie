@@ -222,8 +222,8 @@ function ParseName (|Message| node, |bool|)
 
 function ApparantArgCount (|int|)
 	|| a = .args.length
-	a = a - (.cls|bool|)
-	a = a - (.isassigns)
+	a -= .cls|bool|
+	a -= .isassigns
 	return a
 
 
@@ -251,6 +251,7 @@ function FuncDecls
 		p.Func = @prm
 		.CollectDeclsParams( P, space )
 			
+	if .args.length >= 8
 	FuncStats[.args.length min 11]++ 
 
 	if space and !.cls

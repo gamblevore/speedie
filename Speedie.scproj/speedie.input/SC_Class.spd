@@ -610,7 +610,7 @@ function AfterFuncsDecled
 	
 	|| d = .DestructorFunc
 		check (!d.NextFunc)						( d.Source, "Can’t have multiple destructors" )
-		check (d.args.length == 1)				( d.Source, "Destructor can’t have parameters" )
+		check (d.args == 1)						( d.Source, "Destructor can’t have parameters" )
 		check (!d.ReturnType)					( d.Source, "Destructor can’t have a return type" )
 		.CheckAllocVsWrapper( d, false )
 	

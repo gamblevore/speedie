@@ -432,8 +432,8 @@ function TryAddBase (|Message| c, |SCNode| neu)
 	.TryAdd( c, neu, neu.Name )
 
 
-function LookUpFunc (|String| name, |Message| exp, |Message| ParamsHere, |scobject|)
-	return .LookUpSub( name, exp, ParamsHere, self, nil, nil, kPurposeFunc )
+function LookUpFunc (|String| name, |Message| exp, |scobject|)
+	return .LookUpSub( name, exp, self, nil, nil, kPurposeFunc )
 
 
 function ProjectFix (|SCNode|)
@@ -444,11 +444,12 @@ function ProjectFix (|SCNode|)
 	return self
 
 
-function LookUpSub (|String| OrigName, |Message?| Exp, |Message?| ParamsHere, |SCNode| Arg_Space, |SCDecl?| contains, |Message?| side, |int| Purpose, |SCObject|)
+function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDecl?| contains, |Message?| side, |int| Purpose, |SCObject|)
 // nil "exp" means "Not considered an error if not found", because we need exp to report errors!
 	
 	|| ParamsArray	= SCParamArray.new(exp)
 	|| Curr			= ParamsArray.DetectDotSuper(self, arg_space)
+	|| paramshere = exp.last
 	ParamsArray.PreReadTypes(Arg_Space, ParamsHere, side)
 	|| CanFunction	= (ParamsHere) and  (!ParamsArray.IsAddress)
 	|SCFunction| Missing
@@ -578,7 +579,7 @@ constants (
 
 function LookUpDot (|String| name, |Message| exp, |SCNode| arg_space, |SCDecl| contains, |Message| side, |Object|)
 	opt norefcounts
-	return .LookUpSub( name, exp, exp.Last, arg_space, contains, side, kPurposeDot )
+	return .LookUpSub( name, exp, arg_space, contains, side, kPurposeDot )
 
 
 function LookUpVar (|String| name, |Message| exp, |message| side, |SCObject|)
@@ -586,7 +587,7 @@ function LookUpVar (|String| name, |Message| exp, |message| side, |SCObject|)
 	if name ~= "super"
 		name = "self"
 	
-	rz = .LookUpSub( name, exp, nil, self, nil, side, kPurposeVar )
+	rz = .LookUpSub( name, exp, self, nil, side, kPurposeVar )
 	if rz isa scdecl
 		(rz is UsedByCode)
 
@@ -594,11 +595,11 @@ function LookUpVar (|String| name, |Message| exp, |message| side, |SCObject|)
 
 function LookUpVarRootDecl (|String| name, |Message| exp, |SCObject|)
 // misdesigned... but so is initrootdecl :(
-	return .LookUpSub( name, exp, nil, self, nil, nil, kPurposeVarDecl ) 
+	return .LookUpSub( name, exp, self, nil, nil, kPurposeVarDecl ) 
 
 
 function LookUpVarDecl (|String| name, |SCDecl|)
-	|| result = .LookUpSub( name, nil, nil, self, nil, nil, kPurposeVarDecl )
+	|| result = .LookUpSub( name, nil, self, nil, nil, kPurposeVarDecl )
 	if result isa SCDecl
 		Return result
 

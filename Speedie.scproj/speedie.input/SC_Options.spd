@@ -279,10 +279,6 @@ module Feedback
 			PrintError "Errors print successefully\n"
 			return true // does something, counts towards operationCount
 		
-		+"argstats"
-			Explain(Purpose, "")$
-			options.argstats = true
-		
 		+"flowmode"
 			0 // placeholder
 			
@@ -298,6 +294,7 @@ module Feedback
 			Options.PrintCompileString = true
 			file.DebugExecute = true
 			options.PrintLibraries = true
+			options.argstats = true
 		
 		+"alive"
 			Explain(purpose)$
