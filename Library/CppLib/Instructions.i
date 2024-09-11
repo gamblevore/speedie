@@ -4,6 +4,10 @@
 	__;
 	Code = BumpStack(r, Code, Op);
 	___;
+ı TAIL: 
+	__;
+	Code = TailStack(r, Code, Op);
+	___;
 ı FFNC: 
 	__;
 	vm.CurrRegs = r;
@@ -11,10 +15,6 @@
 	___;
 ı KNST: _
 	Code = LoadConst(r, Op, Code);
-ı TAIL: 
-	__;
-	Code = TailStack(r, Code, Op);
-	___;
 ı NOOP: _
 	i1 = i1;
 	// NOOP

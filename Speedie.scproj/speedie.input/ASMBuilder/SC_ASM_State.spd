@@ -206,7 +206,7 @@ function @ASMType.DoFunc (fn_Asm)
 		ASMP  |=  v << sh
 		sh += 5
 		p++
-		ASMP++
+		ASMP++ // count params
 	
 	ASMP |= (fn is Wrapper)<<4
 	.CloseVTmps(TmpCloser)

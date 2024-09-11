@@ -281,14 +281,17 @@ function message.VMBits (|int|)
 	opt norefcounts
 	for s in self
 		if s == @num
-			rz |= s.int(0, 1, 4)~bits
+			rz |= 1<<(s.int(0, 1, 4)-1)
 	rz:=1
 
 
 function VM_MakeInstructionSub (|message| tmp,  |int| Ask,  |[message]?| ActuallyMakeTheVM)
 	opt norefcounts
+	if tmp ~= "FFNC"
 	|| prms = tmp.first
 	|| FoundBits = prms.VMBits
+	if ask
+		ask = 1<<(ask-1)
 	require (FoundBits & Ask) or !ask
 
 	tmp.flags |= 32K

@@ -239,7 +239,7 @@ forms
 		Code = BumpStack(r, Code, Op)
 		___
 
-/**/ FFNC (Func, 2, 3)
+/**/ FFNC (Func, 3) // this needs to use libffi, and also describe the typeinfo. Probably needs 3 ASM min.
 		__
 		vm.CurrRegs = r // to make this recursive
 		Code = ForeignFunc(vm, Code, Op) 

@@ -7,7 +7,7 @@
 /*
 todo:
 	* FFI
-Limits:
+Design:
 	* 256 OpCodes, including a few variable length opcodes
 	* r0 = 0
 	* can recursive vm->c->vm! 
@@ -21,6 +21,7 @@ extern "C" {
 #include "BitFields.h"
 #include "JB_VM.h"
 #include "JB_VM_Helpers.i"
+#include "ffi.h"
 
 
 #define ı         Op = *Code++;   goto *JumpTable[Op>>24]; // goto *Next;
@@ -42,12 +43,9 @@ s64 RunVM (jb_vm& vm) {		// vm_run, vm__run, vmrun, run_vm
     };
 
     ASM* Code	  = vm.Env.Code;
-//    Goto Next     = 0;
     Register* r	 = vm.Registers;
 
     ASM  Op=-1;
-//    ASM  Op2;
-//	START:
 	ı;
 	#include "Instructions.i"
 	ı 
