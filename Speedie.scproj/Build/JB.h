@@ -1744,7 +1744,7 @@ extern JB_String* SC_kNameConf;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2115])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[1449])
 #define kJB_kVoidPtrMatch ((int)20971520)
 extern JB_File* SC_PerryLogFile;
 extern Message* SC_ReturnSelfEqNil;
@@ -2175,6 +2175,11 @@ extern Array* JB__ErrorSeverity__names;
 #define kSC__FunctionType_ExpectsRealVars ((FunctionType)8192)
 #define kSC__FunctionType_ExternalLib ((FunctionType)131072)
 #define kSC__FunctionType_FlowDisabled ((FunctionType)65536)
+#define kSC__FunctionType_HasFloat ((FunctionType)134217728)
+#define kSC__FunctionType_HasInt ((FunctionType)268435456)
+#define kSC__FunctionType_HasVector ((FunctionType)1610612736)
+#define kSC__FunctionType_HasVFloat ((FunctionType)536870912)
+#define kSC__FunctionType_HasVInt ((FunctionType)1073741824)
 #define kSC__FunctionType_HidesProperties ((FunctionType)33554432)
 #define kSC__FunctionType_InitFunc ((FunctionType)128)
 #define kSC__FunctionType_Inline ((FunctionType)524288)
@@ -2475,6 +2480,7 @@ extern bool JB__Err_KeepStackTrace;
 #define kSC__Beh_kBehaviourTable ((int)1)
 extern SCFunction* SC__Func__CurrFunc;
 extern int SC__Func_DisabledPoints;
+extern int SC__Func_FuncArgAndReturnTypes[8];
 extern int SC__Func_FuncStats[12];
 extern int SC__Func_OnceCount;
 extern int SC__Func_SyxID;
@@ -2784,8 +2790,6 @@ void SC_FastStringOpts__String(Message* Exp, Message* Str);
 bool SC_FB__AppOptions_alive(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_arch(JB_String* Name, JB_String* Value, FastString* Purpose);
-
-bool SC_FB__AppOptions_argstats(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_beep(JB_String* Name, JB_String* Value, FastString* Purpose);
 
@@ -4258,8 +4262,6 @@ JB_String* JB_dbl_RenderFloat(double Self, FastString* Fs_in);
 float JB_f_RoundTo(float Self, int To);
 
 float JB_f_Fract(float Self);
-
-JB_String* JB_f_PC(float Self, FastString* Fs_in);
 
 float JB_f_Pow(float Self, int N);
 
@@ -6664,9 +6666,9 @@ void JB_FS_MsgErrorName(FastString* Self, JB_String* Name);
 
 void JB_FS_Normal(FastString* Self, JB_String* S);
 
-void SC_FS_pc(FastString* Self, float Amount, float Over);
-
 void JB_FS_PrintNicely(FastString* Self, JB_String* S);
+
+void SC_FS_PrintStatType(FastString* Self, JB_String* Name, int Count);
 
 void JB_FS_ProblemsFound(FastString* Self, int Count);
 
@@ -6681,8 +6683,6 @@ void JB_FS_AppendFastString(FastString* Self, FastString* Fs);
 void JB_FS_AppendUint(FastString* Self, uint Data);
 
 void JB_FS_AppendInt32(FastString* Self, int Data);
-
-void JB_FS_AppendFloatAsText(FastString* Self, float F);
 
 void JB_FS_AppendBool(FastString* Self, bool B);
 
@@ -9016,6 +9016,8 @@ void SC_Decl_IsTypeImproveSet(SCDecl* Self, bool Value);
 
 bool SC_Decl_IsUintLike(SCDecl* Self);
 
+bool SC_Decl_IsVeryNormal(SCDecl* Self);
+
 bool SC_Decl_IsVoidPtr(SCDecl* Self);
 
 bool SC_Decl_LoadContained(SCDecl* Self, Message* Contained, Message* Wrap, SCNode* Name_Space, DeclMode Purpose);
@@ -9299,9 +9301,9 @@ bool SC_Base_LoadVisibility(SCNode* Self, Message* P);
 
 JB_Object* SC_Base_LookUpDot(SCNode* Self, JB_String* Name, Message* Exp, SCNode* Arg_space, SCDecl* Contains, Message* Side);
 
-SCObject* SC_Base_LookUpFunc(SCNode* Self, JB_String* Name, Message* Exp, Message* ParamsHere);
+SCObject* SC_Base_LookUpFunc(SCNode* Self, JB_String* Name, Message* Exp);
 
-SCObject* SC_Base_LookUpSub(SCNode* Self, JB_String* OrigName, Message* Exp, Message* ParamsHere, SCNode* Arg_Space, SCDecl* Contains, Message* Side, int Purpose);
+SCObject* SC_Base_LookUpSub(SCNode* Self, JB_String* OrigName, Message* Exp, SCNode* Arg_Space, SCDecl* Contains, Message* Side, int Purpose);
 
 SCObject* SC_Base_LookUpVar(SCNode* Self, JB_String* Name, Message* Exp, Message* Side);
 
@@ -9814,6 +9816,8 @@ SCNode* SC_Class__StoreExtendModule(Message* Node, SCNode* Name_space, Message* 
 
 
 // JB_SCFunction
+void SC_Func_AddArg(SCFunction* Self, SCDecl* Dcl);
+
 void SC_Func_AddConstructorReturn(SCFunction* Self, Message* Prms);
 
 void SC_Func_AddConstructorReturn2(SCFunction* Self);
@@ -9865,6 +9869,8 @@ void SC_Func_CollectDeclsParams(SCFunction* Self, Message* Prms, SCNode* AddToSp
 void SC_Func_CollectLinks(SCFunction* Self, JB_Object* Obj, bool InBranch);
 
 bool SC_Func_CollectReturnAsReal(SCFunction* Self);
+
+void SC_Func_CollectStats(SCFunction* Self);
 
 SCFunction* SC_Func_ConOrDesForCall(SCFunction* Self, SCClass* C, bool IsConstructor, int Task);
 
@@ -10010,6 +10016,8 @@ SCDecl* SC_Func_Self(SCFunction* Self);
 
 void SC_Func_SetBlindCasts(SCFunction* Self, SCNode* Name_space);
 
+void SC_Func_SetTypeInfo(SCFunction* Self, SCDecl* Dcl);
+
 Message* SC_Func_SourceArg(SCFunction* Self);
 
 SCDecl* SC_Func_StructReturned(SCFunction* Self);
@@ -10099,6 +10107,8 @@ SCModule* SC_Func__NewProtoTypeSub(Message* Node, SCNode* Parent, Message* ErrPl
 SCNode* SC_Func__NewRender(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
 void SC_Func__ObjectifyString(Message* Msg);
+
+void SC_Func__PrintStats(FastString* Fs);
 
 void SC_Func__String_Expand(Message* Msg, SCFunction* Fn);
 
