@@ -699,11 +699,6 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	return JB_LUB;
 }
 `)
-	
-	function compiler.Reachedfuncs (|int|)
-		opt norefcounts
-		for f in compiler.funclist
-			rz += f.MyReacher!=nil
 
 
 	function GenLub (|faststring| fs)

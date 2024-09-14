@@ -41,6 +41,7 @@ struct vm_globs {
 };
 
 
+
 struct jb_vm {
 	vm_globs		Env;
     Register*		CurrRegs;
@@ -52,3 +53,4 @@ struct jb_vm {
 };
 
 
+#define AlwaysInline static inline __attribute__((__always_inline__))

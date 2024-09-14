@@ -15,13 +15,15 @@ Design:
 
 
 #include "JB_Umbrella.hpp"
+#include "FPTest.i"
 
 extern "C" {
 #if __VM__
+
+
 #include "BitFields.h"
 #include "JB_VM.h"
 #include "JB_VM_Helpers.i"
-#include "ffi.h"
 
 
 #define ı         Op = *Code++;   goto *JumpTable[Op>>24]; // goto *Next;
@@ -88,6 +90,7 @@ jb_vm* JB_ASM_VM() {
 
 s64 JB_ASM_Run(u32* Code, u32 CodeLength) {
 	auto V = JB_ASM_VM();
+	
 	if (V) {
 		V->Env.Code       = (ASM*)Code;
 		V->Env.CodeLength = CodeLength;

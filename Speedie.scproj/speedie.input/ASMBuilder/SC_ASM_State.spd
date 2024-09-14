@@ -179,14 +179,37 @@ struct ASMState
 		
 
 
-		
+	
+function SCFunction.HasCVersion (|bool|)
+ // what about SPD lib-funcs, they should have both? but won't be a wrapper?
+ // what about cpp_nothing / cpp_inbuilt / cpp_libwrapper ?
+	
+	if .isstdlib
+		return true
+	
+	require self is wrapper
+
+	if .IsCppInBuilt == 1
+		debugat
+		return true
+		// cpp_inbuilt		  // inline functions and compiler builtins. These normally have no address? but perhaps we made a wrapper for it in the exec? we should check if it still exists.
+	if .IsCppInBuilt == 2 // cpp_spd might sound better than cpp_nothing
+		debugat
+		return false // need to be replaced with ASM intrinsics.
+	if self Is ExternalLib	// cpp_libwrapper ?   // Speedie_Main in perry, counts as one!
+		debugat
+		return false  // i think only perry used this and only in debug mode within Xcode
+	return true
+	
+
+
 function @ASMType.DoFunc (fn_Asm)
 	opt norefcounts
 	|| prms = exp.last!
 	|| fn = prms.asfunc
 	expect  (fn and fn.args <= 10) (prms, "Too many parameters")
 
-	// Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:3, 8:1
+	// Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:4
 	// There are only 4 above 6!, only 14 above 5
 
 	if !fn.ReturnType
@@ -208,7 +231,7 @@ function @ASMType.DoFunc (fn_Asm)
 		p++
 		ASMP++ // count params
 	
-	ASMP |= (fn is Wrapper)<<4
+	ASMP |= fn.HasCVersion << 4
 	.CloseVTmps(TmpCloser)
 	
 	|| SaveAmount = 0

@@ -36,7 +36,6 @@ datatype ASMReg (uint64)
 		MathConst		= ConstAny ||| FromMath
 		Zero			= ConstAny ||| 56		// 56 == datatypecode.uint64
 	
-	
 
 	function Floatness (|int|)
 		return .µtype.floatness

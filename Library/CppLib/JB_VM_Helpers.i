@@ -1,13 +1,7 @@
 
+#include "ffi.h"
+typedef void (*FFI_Fn)(void);
 
-void ASMPrint(ASM oof);
-
-#define TSC 1
-#define TSC_RD TSC
-
-
-
-#define AlwaysInline static inline __attribute__((__always_inline__))
 
 
 Register DummyReg;
@@ -102,18 +96,6 @@ AlwaysInline ASM* LoadConst (Register* r, ASM Op, ASM* Code) {
 	return Code; 
 }
 
-
-// #define Const_roti(x)  ((( int)((x)<<13))>>26)
-// #define Const_rotu(x)  (((uint)((x)<<13))>>26)
-
-// So we have i1, i2, i3
-// i literally don't know what this does.
-// is it... "a bunch of stuff".
-// if it is... we should use the most suitable for anyting.
-// that is... they all take the same form.
-// this looks like a U4, we can branch on L.
-// ROT can be it's own instruction.
-
 AlwaysInline u64 bitstats(u64 R2, u64 R3, u64 Mode) { // rotate
 	if (Mode == 0)							// popcount
 		return __builtin_popcountll(R2); 
@@ -166,7 +148,6 @@ AlwaysInline JB_Object* alloc(void* o) {
 
 AlwaysInline void RegConv (Register* r, int Conv, int Op) {
 	// float, double, u64, s64. 12 conversions possible (and 4 pointless ones)
-	// also can clear bits before conversion (for int-->float)
 	Register* s = r + n3;
 	Register* d = r + n1;
 		
@@ -418,49 +399,8 @@ AlwaysInline ASM* Return (Register*& rp, ASM* Code, ASM Op) {
 }
 
 
-/*
-var transfers:
-	1) Variable width in memory: Complex. Slow. Can't be simultaneous.
-	2) Copy them by half: 		 Requires very long param lists. 7.5 simds max.
-	3) Bigger registers:		 Double the size. Slower to save/restore. Simpler and faster to call functions and SIMD.
- */
-
-
-#define Transfer(Input,Shift)  (r[(Input>>(Shift*5))&31])
-AlwaysInline ASM* BumpStack (Register*& rp, ASM* Code, ASM Op) { // jumpstack
-	Register* r = rp;
-	ASM  Code2 = Code[0];
-	ASM  Code3 = Code[1];
-	int RemainCodes = Op&3;
-	int Save = n1;
-	Register* ENTR = r+Save+1;
-	ENTR->Stack.Addr = Code+RemainCodes;
-	ENTR->Stack.Regs = Save;
-//	ENTR->Stack.Incr = Func_Incru;
-
-	r = ++ENTR; rp = r;
-	ENTR[0] = {};
-	ENTR[1] = Transfer(Code2, 0);
-	ENTR[2] = Transfer(Code2, 1);
-	ENTR[3] = Transfer(Code2, 2);
-	ENTR[4] = Transfer(Code2, 3);
-	ENTR[5] = Transfer(Code2, 4);
-	ENTR[6] = Transfer(Code2, 5);
-	if (RemainCodes>1) {					// transfer more regs.
-		debugger; 
-		ENTR[ 6] = Transfer(Code3, 0);
-		ENTR[ 7] = Transfer(Code3, 1);
-		ENTR[ 8] = Transfer(Code3, 2);
-		ENTR[ 9] = Transfer(Code3, 3);
-		ENTR[10] = Transfer(Code3, 4);
-		ENTR[11] = Transfer(Code3, 5);
-	}
-	// we can take 31 values off the lower end. like 0x8000 is -32K 
-	// read from registers instead.
-
-	int j = Func_JUMPi;
-	return Code + j;
-}
+#define Transfer(Input,Shift)  (r[((Input)>>((Shift)*5))&31])
+#define Transfer3(num)         case num: ENTR[num] = Transfer(Code, num)
 
 
 AlwaysInline void AllocStack (jb_vm& vm, Register* r, ASM Op) {
@@ -481,6 +421,7 @@ AlwaysInline void AllocStack (jb_vm& vm, Register* r, ASM Op) {
 	vm.StructAllocator = B;
 }
 
+
 AlwaysInline ASM* TailStack (Register* r, ASM* Code, ASM Op) {
 	ASM Code2 = Code[0];
 	// What if this overwrites params that we mean to read from?
@@ -496,6 +437,53 @@ AlwaysInline ASM* TailStack (Register* r, ASM* Code, ASM Op) {
 }
 
 
+// The linker can do the conversions or deciding which functions to upgrade, not the ASM!
+// ideally the compiler should, right? I mean... with one compiler and one distribution
+// theres one answer.
+
+AlwaysInline ASM* BumpStack (Register*& rp, ASM* CodePtr, ASM Op, ASM Code2) { // jumpstack
+	Register* r = rp;
+	u64 Code = *CodePtr++;
+	int Save = n1;
+	Register* ENTR = r+Save+1;
+	ENTR->Stack.Addr = CodePtr;
+	ENTR->Stack.Regs = Save;
+//	ENTR->Stack.Incr = Func_Incru;
+
+	rp = r = ++ENTR;
+	switch (Code&15) {
+	Transfer3(11);
+	Transfer3(10);
+	Transfer3( 9);
+	Transfer3( 8);
+	Transfer3( 7);
+	Transfer3( 6);
+	Transfer3( 5);
+	Transfer3( 4);
+	Transfer3( 3);
+	Transfer3( 2);
+	Transfer3( 1);
+	default:
+	case  0: ENTR[ 0] = {};
+	debugger; 
+	}
+	
+	int j = Func_JUMPi;
+	return CodePtr + j;
+}
+
+/*
+	int				4579	// Almost entirely int
+	float			122 	// We could make a pure float version
+	float/int		35		// Only 35 float/ints need ffiing
+	vector			98		// SIMD we will look at later. Are they considered structs? or just not supported?
+	vector/in		74
+	vector/float	28
+                               0:410   1:2066,  2:3530,  3:4243,  4:4410,  5:4471,  6:4481,  7:4485
+Speedie's function histogram:  0:410,  1:1656,  2:1464,  3: 713,  4: 167,  5:  61,  6:  10,  7:   4
+*/
+
+
 #define q1  r[(a<< 5)>>27].Uint
 #define q2  r[(a<<10)>>22].Uint
 #define q3  r[(a<<15)>>17].Uint
@@ -507,40 +495,72 @@ AlwaysInline ASM* TailStack (Register* r, ASM* Code, ASM Op) {
 #define q9  r[(b<<15)>>12].Uint
 #define q10 r[(b<<20)>> 7].Uint
 #define q11 r[(b<<25)>> 2].Uint
-#define FFISub(Mode, FP)	case 11-Mode:	return ((Fn##Mode)Fn)FP;
+#define FFISub(Mode, FP)	case 11-Mode:	V = ((Fn##Mode)Fn)FP; break
 
 
-	// use libffi later
-AlwaysInline uint64 ForeignFuncSimple (jb_vm& vm, ASM* Code, ASM Op, ASM a, ASM b) {
+AlwaysInline ASM* ForeignFunc (jb_vm& vm, ASM* CodePtr, ASM Op) {
+	ASM a = CodePtr[0];
+	ASM b = CodePtr[1];
+	auto Mode = ForeignFunc_Fastu;
+	ASM PrmCount = Op&15;
+	auto T = ForeignFunc_Tableu;
 	auto &r = vm.Registers;
-	ASM PrmCount = (Op&15);
-	auto Fn = vm.Env.Cpp[Func_JUMPi];
-	switch (PrmCount) {
-	default:
-		// hopefully this just becomes a jump-table... :3
-		FFISub(11, (q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11));
-		FFISub(10, (q1, q2, q3, q4, q5, q6, q7, q8, q9, q10));
-		FFISub(9 , (q1, q2, q3, q4, q5, q6, q7, q8, q9));
-		FFISub(8 , (q1, q2, q3, q4, q5, q6, q7, q8));
-		FFISub(7 , (q1, q2, q3, q4, q5, q6, q7));
-		FFISub(6 , (q1, q2, q3, q4, q5, q6));
-		FFISub(5 , (q1, q2, q3, q4, q5));
-		FFISub(4 , (q1, q2, q3, q4));
-		FFISub(3 , (q1, q2, q3));
-		FFISub(2 , (q1, q2));
-		FFISub(1 , (q1));
-		FFISub(0 , ());
-	};
-	return 0;
+	auto Fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vm.Env.Cpp[T]) ;
+
+	if (!Mode) {
+//
+//		ffi_cif cif;
+//		ffi_type *args[1];
+//		void *values[1];
+//		char *s;
+//		ffi_arg rc;
+//		/* Initialize the argument info vectors */
+//		args[0] = &ffi_type_pointer;
+//		values[0] = &s;
+//		/* Initialize the cif */
+//		if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, 1,
+//						 &ffi_type_sint, args) == FFI_OK)
+//		{
+//			s = "Hello World!";
+//			ffi_call(&cif, (FFI_Fn)puts, &rc, values);
+//			/* rc now holds the result of the call to puts */
+//			/* values holds a pointer to the function’s arg, so to
+//			 call puts() again all we need to do is change the
+//			 value of s */
+//			s = "This is cool!";
+//			ffi_call(&cif, (FFI_Fn)puts, &rc, values);
+//		}
+//		;
+	}
+	// our format is unnecessary if they are all the same type! otherwise we need format info.
+	// how do we cache the ffi type info? Arbitrarily? we need to collect it somewhere in the ASM.
+	if (Mode == 1) {
+		uint64 V; //     Could do float, double, vec4, ivec4, etc... too
+		switch (PrmCount) {
+		default:
+			// hopefully this just becomes a jump-table... :3
+			FFISub(11, (q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11));
+			FFISub(10, (q1, q2, q3, q4, q5, q6, q7, q8, q9, q10));
+			FFISub(9 , (q1, q2, q3, q4, q5, q6, q7, q8, q9));
+			FFISub(8 , (q1, q2, q3, q4, q5, q6, q7, q8));
+			FFISub(7 , (q1, q2, q3, q4, q5, q6, q7));
+			FFISub(6 , (q1, q2, q3, q4, q5, q6));
+			FFISub(5 , (q1, q2, q3, q4, q5));
+			FFISub(4 , (q1, q2, q3, q4));
+			FFISub(3 , (q1, q2, q3));
+			FFISub(2 , (q1, q2));
+			FFISub(1 , (q1));
+			FFISub(0 , ());
+		};
+	
+		vm.Registers[n1].Int = V;
+	}
+
+	return CodePtr;
 }
 
 
-AlwaysInline ASM* ForeignFunc (jb_vm& vm, ASM* Code, ASM Op) {
-	ASM a = *Code++;
-	ASM b = (Op&3) ? *Code++ : 0;
-	uint64 V = ForeignFuncSimple(vm, Code, Op, a, b);
-	vm.Registers[n1].Int = V;
-	return Code;
-}
-
-
+	// I think calling the VM should be a simple-task. So instead of calling a function-pointer...
+	// we test the function pointer, to see if its SPD or C. If C... we call it. Otherwise we call the VM.
+	// this has to be done at every call-site. What about for passing to C++ libs? We'd have to generate
+	// some native ASM for that. I think C++ has lambdas. It could be done.

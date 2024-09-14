@@ -127,6 +127,8 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 
 	func.SetTypeInfo(dcl)
 	func.args <~ dcl
+	check (func.args <= 8) (self, "Too many parameters. (8 max)")
+		
 	if dcl.name
 		(dcl is Param)
 	  else

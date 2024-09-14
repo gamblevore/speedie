@@ -8,6 +8,24 @@
 // 												easy way to list all blocks in the world!
 // * also... can put worlds together. Like sound/map/graphics/obj
 
+/*
+What about this idea? Pointer compression:
+
+    void* addr = mmap(
+        NULL, // address hint
+        1<<MemoryManager.SuperSize, // size
+        PROT_READ | PROT_WRITE, // permissions
+        MAP_32BIT | MAP_PRIVATE | MAP_ANONYMOUS, // flags
+        -1, // file descriptor
+        0 // offset
+    );
+
+    All our super-blocks can be allocated that way.
+    
+    We also need -pagezero_size,0x1000 linker flag. Or else OSX will flip out.
+
+	We'll need some way to make sure our pointers only take 32-bits. Not sure if theres a built in way in C for that.
+ */
 
 #include "JB_Alloc.h"
 

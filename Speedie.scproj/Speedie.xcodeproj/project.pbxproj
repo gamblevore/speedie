@@ -145,11 +145,12 @@
 		ACB3785E29A5026400795F00 /* JB_DivSufSort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACB3785C29A5026400795F00 /* JB_DivSufSort.cpp */; };
 		ACB3785F29A5026400795F00 /* JB_DivSufSort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACB3785C29A5026400795F00 /* JB_DivSufSort.cpp */; };
 		ACB3786029A5026400795F00 /* JB_DivSufSort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACB3785C29A5026400795F00 /* JB_DivSufSort.cpp */; };
+		ACC8F9F32C960FD000A549D7 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = ACC8F9F22C960FD000A549D7 /* libcurl.tbd */; };
+		ACC8F9F52C960FE500A549D7 /* libffi.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = ACC8F9F42C960FE500A549D7 /* libffi.dylib */; };
 		ACE7CA432ACAE471005244E2 /* JB_ProcessOwner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE7CA422ACAE471005244E2 /* JB_ProcessOwner.cpp */; };
 		ACE7CA442ACAE471005244E2 /* JB_ProcessOwner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE7CA422ACAE471005244E2 /* JB_ProcessOwner.cpp */; };
 		ACE7CA452ACAE471005244E2 /* JB_ProcessOwner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE7CA422ACAE471005244E2 /* JB_ProcessOwner.cpp */; };
 		ACE7CA462ACAE471005244E2 /* JB_ProcessOwner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE7CA422ACAE471005244E2 /* JB_ProcessOwner.cpp */; };
-		ACF8AA932B23400C009A9B45 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = ACF8AA922B23400C009A9B45 /* libcurl.tbd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -332,8 +333,9 @@
 		AC7D3E4C29A284EA00148ADB /* library.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = library.input; path = ../Library/library.input; sourceTree = "<group>"; };
 		ACABE81B2BCFD1A3005A6291 /* libSDL2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSDL2.dylib; path = ../../lib/libSDL2.dylib; sourceTree = "<group>"; };
 		ACB3785C29A5026400795F00 /* JB_DivSufSort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_DivSufSort.cpp; path = ../Library/CppLib/JB_DivSufSort.cpp; sourceTree = "<group>"; };
+		ACC8F9F22C960FD000A549D7 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libcurl.tbd; sourceTree = DEVELOPER_DIR; };
+		ACC8F9F42C960FE500A549D7 /* libffi.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libffi.dylib; path = ../../lib/libffi.dylib; sourceTree = "<group>"; };
 		ACE7CA422ACAE471005244E2 /* JB_ProcessOwner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_ProcessOwner.cpp; path = ../Library/CppLib/JB_ProcessOwner.cpp; sourceTree = "<group>"; };
-		ACF8AA922B23400C009A9B45 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = usr/lib/libcurl.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -341,7 +343,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ACF8AA932B23400C009A9B45 /* libcurl.tbd in Frameworks */,
+				ACC8F9F52C960FE500A549D7 /* libffi.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -356,6 +358,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ACC8F9F32C960FD000A549D7 /* libcurl.tbd in Frameworks */,
 				ACABE81C2BCFD1A3005A6291 /* libSDL2.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -523,7 +526,8 @@
 			isa = PBXGroup;
 			children = (
 				ACABE81B2BCFD1A3005A6291 /* libSDL2.dylib */,
-				ACF8AA922B23400C009A9B45 /* libcurl.tbd */,
+				ACC8F9F22C960FD000A549D7 /* libcurl.tbd */,
+				ACC8F9F42C960FE500A549D7 /* libffi.dylib */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

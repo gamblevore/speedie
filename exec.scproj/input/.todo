@@ -2,6 +2,7 @@
 
 * (Debugger)
 
+* could upgrade some spd funcs into ffncs... if desired, on load? (or is this bad?)
 * debugger_info finish
 * cpp global changes invalidate entire interpreter.
 	* otherwise, we know the addr of each global vs the base

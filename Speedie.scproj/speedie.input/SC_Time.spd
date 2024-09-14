@@ -5,7 +5,7 @@ function compiler.PrintCompileTime (|date| durr)
 	|| fs = faststring()
 	fs.normal  "Stages",		fs <~ Compiler.CurrStage
 	fs.normal  "Classes",		fs <~ compiler.ReachedClassCount
-	fs.normal  "Funcs",			fs <~ "${compiler.reachedfuncs} / ${compiler.funclist.length}"
+	fs.normal  "Funcs",			fs <~ "${compiler.streachedfunc} / ${compiler.funclist.length}  // (${compiler.stLibFuncs} lib)"
 	fs.normal  "Strings"
 	|| avg = stringcorrector.TotalSize|float| / stringcorrector.list.length|float|
 	fs <~ "${stringcorrector.list.length} / "	

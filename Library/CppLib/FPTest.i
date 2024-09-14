@@ -85,13 +85,13 @@ double fpTestMix1 (int64 A) {
 }
 
 typedef int64  (*fpTestInts)   (int, int64, char, byte, short, u16);
-typedef double (*fpTestFloats) (float, double, float, double, float, double);
+typedef double (*fpTestFloats) (double, double, double, double, double, double);
 typedef int64  (*fpMixed)      (int64, double, int64, double, int64, double);
 
 
-void FPTest() {
+int FPTest() {
 	fpTestInts FP[7] = {fpTestInt6, (fpTestInts)fpTestInt5, (fpTestInts)fpTestInt4, (fpTestInts)fpTestInt3, (fpTestInts)fpTestInt2, (fpTestInts)fpTestInt1, (fpTestInts)fpTestInt0, };
-	fpTestFloats FFP[7] = {fpTestFloat6, (fpTestFloats)fpTestFloat5, (fpTestFloats)fpTestFloat4, (fpTestFloats)fpTestFloat3, (fpTestFloats)fpTestFloat2, (fpTestFloats)fpTestFloat1, (fpTestFloats)fpTestFloat0, };
+	fpTestFloats FFP[7] = {(fpTestFloats)fpTestFloat6, (fpTestFloats)fpTestFloat5, (fpTestFloats)fpTestFloat4, (fpTestFloats)fpTestFloat3, (fpTestFloats)fpTestFloat2, (fpTestFloats)fpTestFloat1, (fpTestFloats)fpTestFloat0, };
 	
 	fpMixed MFP[7] = {fpTestMix6, (fpMixed)fpTestMix5, (fpMixed)fpTestMix4, (fpMixed)fpTestMix3, (fpMixed)fpTestMix2, (fpMixed)fpTestMix1, (fpMixed)fpTestInt0};
 	
@@ -108,11 +108,15 @@ void FPTest() {
 		printf("%llX\n", E);
 	}
 
+	Register Regs[6] = {};
+	Regs[0].Float = 0.12345; Regs[1].Double = 999888777666.5; Regs[2].Float = 50000000000000; Regs[3].Double = 0.00025; Regs[4].Float = 0.0000000001; Regs[5].Double = 1.5;
 	for (int i = 0; i < 7; i++) { // and this!
 		auto D = FFP[i];
-		auto E = (D)(0.12345, 999888777666.5, 50000000000000, 0.00025, 0.0000000001, 1.5);
+		auto E = (D)(Regs[0].Double, Regs[1].Double, Regs[2].Double, Regs[3].Double, Regs[4].Double, Regs[5].Double);
 		printf("%f\n", E);
 	}
 
 	exit(0);
+	return 0;
 }
+//int fptest = FPTest();

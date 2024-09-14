@@ -14,6 +14,33 @@ forms
 		JUMP	j
 		Prm1	x
 		Prm2	x
+
+	ForeignFunc
+
+/*
+	OK, so this is how we will do it.
+	The VM will store all it's info. Register state, code-position, etc. (maybe just those 2 are needed.)
+	We then just jump to the dest via ARM/x86 ASM. 
+	
+	A loop that uses a 64-bit value might do it.
+	
+	So... each register will be described with 8 bits. 5 for the reg, and 3 for the type. With 64-bits
+	we get 8 regs. Lets assume 1-8, so 64-bits. 0 reg funcs, we just pass an extra int, whatever. 
+	
+	The VM is now "Stateless", because it stores all it's own state. It will just have to set the return
+	register on the stack somewhere. That makes it very easy to return to, or reenter from any place!
+	We don't even need to pass the VM anymore. We just load it from a global var.
+	
+	The only issue now is that "where do we put the return reg". We can just drop down to 7 regs. I doubt
+	there are any C funcs that take 7 regs! not within my libs! and all the ASM can take 8.
+*/
+
+		r1		R
+		Fast	3  // FFI, int, float, double, vec2, ivec2, vec4, ivec4
+		Table	16 // 4K table         // functions in registers use the first 32 values...
+		// use some custom written ASM
+		Prm1	x
+		Prm2	x
 	
 	Tail
 		JUMP	j
@@ -234,20 +261,17 @@ forms
 		Code = Return(r, Code, Op)
 		___
 
-/**/ FUNK (Func, 2, 3) // func: 
+/**/ FUNK (Func, 2) // func: 
 		__
-		Code = BumpStack(r, Code, Op)
+		Code = BumpStack(r, Code, Op, 0)
 		___
 
-/**/ FFNC (Func, 3) // this needs to use libffi, and also describe the typeinfo. Probably needs 3 ASM min.
-/*
-	int			4579 // almost entirely int
-	float 		122  // we could make a pure float version
-	float/int	35   // only 35 float/ints need ffiing
-	vector		98   // simd we will look at later. Are they considered structs? or just not supported?
-	vector/int	74
-	vector/float 28
-*/
+/**/ FUMK2 (Func, 3) // i prefer two have two separate codes, I should be able to call it Func3?
+		__
+		Code = BumpStack(r, Code+1, Op, *Code)
+		___
+
+/**/ FFNC (ForeignFunc, 2, 3)
 		__
 		vm.CurrRegs = r // to make this recursive
 		Code = ForeignFunc(vm, Code, Op) 

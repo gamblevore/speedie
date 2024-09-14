@@ -126,6 +126,7 @@ linkage
 |bool| 						InitedOK = true
 |int|						stClasses
 |int|						stFuncs
+|int|						stLibFuncs
 |int|						stReachedFunc
 |int|						stReachedClass
 |int|						stParseTime

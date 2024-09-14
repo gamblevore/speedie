@@ -2,11 +2,11 @@
 	return u1 + U1_Lu;
 ı FUNK: 
 	__;
-	Code = BumpStack(r, Code, Op);
+	Code = BumpStack(r, Code, Op, 0);
 	___;
-ı TAIL: 
+ı FUMK2: 
 	__;
-	Code = TailStack(r, Code, Op);
+	Code = BumpStack(r, Code + 1, Op, *Code);
 	___;
 ı FFNC: 
 	__;
@@ -15,6 +15,10 @@
 	___;
 ı KNST: _
 	Code = LoadConst(r, Op, Code);
+ı TAIL: 
+	__;
+	Code = TailStack(r, Code, Op);
+	___;
 ı NOOP: _
 	i1 = i1;
 	// NOOP
