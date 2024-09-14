@@ -31,7 +31,7 @@ module SCThe
 			|| value = line.NeedFirst
 			value.expectlast
 			|| old = d[line.name] // old is a dict...
-				error (line, kNameConf)
+				error (line, "Macro name conflict")
 			  else
 				d[line.name] = macro(value) 
 		node.remove

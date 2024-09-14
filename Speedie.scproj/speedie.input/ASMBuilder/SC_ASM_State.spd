@@ -206,8 +206,7 @@ function SCFunction.HasCVersion (|bool|)
 function @ASMType.DoFunc (fn_Asm)
 	opt norefcounts
 	|| prms = exp.last!
-	|| fn = prms.asfunc
-	expect  (fn and fn.args <= 10) (prms, "Too many parameters")
+	|| fn = prms.asfunc #require
 
 	// Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:4
 	// There are only 4 above 6!, only 14 above 5

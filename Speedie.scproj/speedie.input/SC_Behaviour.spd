@@ -23,12 +23,8 @@ class SCBehaviour (SCNode)
 	
 	function Add (|SCNode| fn)
 		opt norefcounts
-		require (fn)
-		|| Old = self[fn.name]|SCNode|
-			error (fn.source,	kNameConf) 
-			error (old.source,	kNameConf)
-		  else
-			.TryAdd(fn.source, fn, fn.name) // Link... later.
+		if fn
+			.TryAdd(fn.source, fn, fn.name)
 	
 	
 	function Upwards (|SCBehaviour|)
@@ -51,11 +47,10 @@ class SCBehaviour (SCNode)
 		  else
 			b.add(m)
 	
-	
-	function SCModule.OneOrOther (|SCModule| B, |SCModule|)
+		
+	function SCModule.OneOrOther (|SCModule| B, |string| name,  |SCModule|)
 		if (self and b)
-			error ( .source, kNameConf)
-			error (b.source, kNameConf)
+			.NameConflict(b, name)
 		return B
 
 
@@ -77,7 +72,7 @@ class SCBehaviour (SCNode)
 		for (C.upwards in self)
 			|| B = C.behaviour
 				|| I = B.interfaces[name]
-					Result = Result.OneOrOther(I)
+					Result = Result.OneOrOther(I, name)
 
 		expect result (ErrPlace, "No interface found for this behaviour")
 		return Result.cls
@@ -355,6 +350,3 @@ function SCClass.RenameInterfaces
 	for (f in b.interfaces)
 		|| it = f.cls
 			it.name = it.CppClass + it.name
-
-
-|| kNameConf = "Name conflict"

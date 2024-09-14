@@ -22,6 +22,7 @@ function IsSTDLib (|bool|) // .islib, .isprojlib, .isproject, .isntproject, .isn
 	return .Project.IsSTDLib?
 
 
+
 function CollectFromNode (|Message| AST, |bool| Visible, |message| dest=nil)
 	.Source := AST // not good! Considering that one "project" module covers multiple files!
 	|| r = ast.ListAll
@@ -210,11 +211,7 @@ function TryAddSub (|Message| ErrPlace, |SCObject| IncObj, |String| name)
 	if (name == "self") and scfunction.intype(scnodetype.object)
 		error ( ErrPlace, "Can't use 'self' here." )
 	  else
-		error ( ErrPlace, kNameConf )
-		if old isa SCObject
-			error (old.AnySource, kNameConf)
-		  else
-			error (old.render, kNameConf)
+		.nameconflict(old, name)
 
 
 function scfunction.IsConstructorOnModule (|scfunction| old, |bool|)
@@ -692,6 +689,11 @@ function RehomeExport (|bool|)
 	return true
 
 			
+function scobject.NameConflict (|scobject| Old, |string| name)
+	|| msg = "Name conflict: " + name
+	error ( .source,   msg)
+	error (old.source, msg)
+	
 
 function TestExportName (|String| s, |bool| Explicit, |string|) {
 	|| o = Compiler.ExportNames[ s ]
