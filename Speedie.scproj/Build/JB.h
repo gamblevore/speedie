@@ -183,6 +183,8 @@ typedef ASM ASM_Float;
 
 typedef ASM ASM_FloatConst;
 
+typedef ASM ASM_ForeignFunc;
+
 typedef ASM ASM_Func;
 
 typedef ASM ASM_JCmp;
@@ -1483,6 +1485,7 @@ extern JB_String* SC__Comp_ReportedName;
 extern JB_String* SC__Comp_StageName;
 extern int SC__Comp_stClasses;
 extern int SC__Comp_stFuncs;
+extern int SC__Comp_stLibFuncs;
 extern int SC__Comp_stParseTime;
 extern int SC__Comp_stParseTimeTotal;
 extern int SC__Comp_stReachedClass;
@@ -1930,17 +1933,19 @@ extern ASM_Encoder2 SC__ASM_Encoders[256];
 #define kSC__ASM_FADD ((ASM_Float)93)
 #define kSC__ASM_FADK ((ASM_FloatConst)94)
 #define kSC__ASM_FDIV ((ASM_Float)97)
-#define kSC__ASM_FFNC ((ASM_Func)6)
-#define kSC__ASM_FFNC3 ((ASM_Func)6)
+#define kSC__ASM_FFNC ((ASM_ForeignFunc)5)
+#define kSC__ASM_FFNC2 ((ASM_ForeignFunc)5)
+#define kSC__ASM_FFNC3 ((ASM_ForeignFunc)6)
 #define kSC__ASM_FFRC ((ASM_Float)98)
 #define kSC__ASM_FMAX ((ASM_Float)99)
 #define kSC__ASM_FMIN ((ASM_Float)100)
 #define kSC__ASM_FMLK ((ASM_FloatConst)96)
 #define kSC__ASM_FMUL ((ASM_Float)95)
 extern ASM_Encoder2 SC__ASM_Forms[128];
+#define kSC__ASM_FUMK2 ((ASM_Func)2)
+#define kSC__ASM_FUMK23 ((ASM_Func)2)
 #define kSC__ASM_FUNK ((ASM_Func)1)
 #define kSC__ASM_FUNK2 ((ASM_Func)1)
-#define kSC__ASM_FUNK3 ((ASM_Func)2)
 #define kSC__ASM_JBRA ((ASM_Bra)69)
 #define kSC__ASM_JBRN ((ASM_Bra)70)
 #define kSC__ASM_JMPE ((ASM_JCmpEq)67)
@@ -1978,8 +1983,8 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_SUB ((ASM_Shift)44)
 #define kSC__ASM_SWAP ((ASM_Swap)36)
 #define kSC__ASM_TABL ((ASM_Table)76)
-#define kSC__ASM_TAIL ((ASM_Tail)5)
-#define kSC__ASM_TAIL2 ((ASM_Tail)5)
+#define kSC__ASM_TAIL ((ASM_Tail)13)
+#define kSC__ASM_TAIL2 ((ASM_Tail)13)
 #define kSC__ASM_TERN ((ASM_U4)61)
 #define kSC__ASM_TRAP ((ASM_Trap)33)
 #define kSC__ASM_WR16 ((ASM_Write)89)
@@ -2708,8 +2713,6 @@ JB_String* SC_Comp__Projects();
 bool SC_Comp__Reached(JB_String* S);
 
 int SC_Comp__ReachedClassCount();
-
-int SC_Comp__Reachedfuncs();
 
 JB_String* SC_Comp__RenderErrors(JB_ErrorReceiver* Stderr, uint /*ErrorSeverity*/ MinSev);
 
@@ -4466,6 +4469,10 @@ ASM SC_ASM_Float_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_FloatConst_HighSet(ASM Self, uint Value);
 
+ASM SC_ASM_ForeignFunc_FastSet(ASM Self, uint Value);
+
+ASM SC_ASM_ForeignFunc_TableSet(ASM Self, uint Value);
+
 ASM SC_ASM_Func_JUMPSet(ASM Self, uint Value);
 
 ASM SC_ASM_JCmp_CmpSet(ASM Self, uint Value);
@@ -5139,6 +5146,11 @@ ASM* JB_ASM_Float__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 // ASM_FloatConst
 ASM* JB_ASM_FloatConst__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+
+
+
+// ASM_ForeignFunc
+ASM* JB_ASM_ForeignFunc__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
@@ -8102,7 +8114,7 @@ SCDecl* SC_Msg_FastDecl(Message* Self);
 
 FatASM* JB_Msg_FDIV(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
 
-FatASM* JB_Msg_FFNC(Message* Self, ASMReg R1, int JUMP, int Prm1, int Prm2);
+FatASM* JB_Msg_FFNC(Message* Self, ASMReg R1, int Fast, int Table, int Prm1, int Prm2);
 
 FatASM* JB_Msg_FFRC(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
 
@@ -8171,6 +8183,8 @@ void JB_Msg_FSListArg(Message* Self, FastString* Fs, bool AddLine);
 void JB_Msg_FSListSep(Message* Self, FastString* Fs, JB_String* Sep);
 
 Message* SC_Msg_FullAfter(Message* Self);
+
+FatASM* JB_Msg_FUMK2(Message* Self, ASMReg R1, int JUMP, int Prm1, int Prm2);
 
 void JB_Msg_Func__(Message* Self, FastString* Fs);
 
@@ -9933,6 +9947,8 @@ void SC_Func_FLookupSet(SCFunction* Self, SCNode* Value);
 bool SC_Func_FoundOneCpp(SCFunction* Self, JB_String* N);
 
 void SC_Func_FuncDecls(SCFunction* Self);
+
+bool SC_Func_HasCVersion(SCFunction* Self);
 
 bool SC_Func_HiderMatch(SCFunction* Self, bool IsAssigns);
 
