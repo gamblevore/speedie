@@ -30,19 +30,19 @@ int64 fpTestInt0 () {
 
 
 double fpTestFloat6 (float A, double B, float C, double D, float E, double F) {
-	printf("%f, %f, %f, %f, %f, %f\n", A, B, C, D, E, F);
+	printf("%f, %f, %e, %f, %e, %f\n", A, B, C, D, E, F);
 	return A;
 }
 double fpTestFloat5 (float A, double B, float C, double D, float E) {
-	printf("%f, %f, %f, %f, %f\n", A, B, C, D, E);
+	printf("%f, %f, %e, %f, %e\n", A, B, C, D, E);
 	return A;
 }
 double fpTestFloat4 (float A, double B, float C, double D) {
-	printf("%f, %f, %f, %f\n", A, B, C, D);
+	printf("%f, %f, %e, %f\n", A, B, C, D);
 	return A;
 }
 double fpTestFloat3 (float A, double B, float C) {
-	printf("%f, %f, %f\n", A, B, C);
+	printf("%f, %f, %e\n", A, B, C);
 	return A;
 }
 double fpTestFloat2 (float A, double B) {
@@ -91,22 +91,24 @@ typedef int64  (*fpMixed)      (int64, double, int64, double, int64, double);
 
 int FPTest() {
 	fpTestInts FP[7] = {fpTestInt6, (fpTestInts)fpTestInt5, (fpTestInts)fpTestInt4, (fpTestInts)fpTestInt3, (fpTestInts)fpTestInt2, (fpTestInts)fpTestInt1, (fpTestInts)fpTestInt0, };
-	fpTestFloats FFP[7] = {(fpTestFloats)fpTestFloat6, (fpTestFloats)fpTestFloat5, (fpTestFloats)fpTestFloat4, (fpTestFloats)fpTestFloat3, (fpTestFloats)fpTestFloat2, (fpTestFloats)fpTestFloat1, (fpTestFloats)fpTestFloat0, };
-	
-	fpMixed MFP[7] = {fpTestMix6, (fpMixed)fpTestMix5, (fpMixed)fpTestMix4, (fpMixed)fpTestMix3, (fpMixed)fpTestMix2, (fpMixed)fpTestMix1, (fpMixed)fpTestInt0};
-	
-
-	for (int i = 0; i < 7; i++) { // mixed doesn't seem to play nice. At least, the return doesn't.
-		auto D = MFP[i];
-		auto E = (D)(0xFACEB00B, 999888777666.5, (0xB16B00B5ll<<32) + 1, 0.00025, 0x7355BEA2, 1.5);
-		printf("%llX\n", E);
-	}
 
 	for (int i = 0; i < 7; i++) { // this does tho
 		auto D = FP[i];
 		auto E = (D)(0xFACEB00B, (0xB16B00B5ll<<32) + 1, 127, 98, -1000, 20000);
 		printf("%llX\n", E);
 	}
+
+	fpMixed MFP[7] = {fpTestMix6, (fpMixed)fpTestMix5, (fpMixed)fpTestMix4, (fpMixed)fpTestMix3, (fpMixed)fpTestMix2, (fpMixed)fpTestMix1, (fpMixed)fpTestInt0};
+	for (int i = 0; i < 7; i++) { // mixed doesn't seem to play nice. At least, the return doesn't.
+		auto D = MFP[i];
+		auto E = (D)(0xFACEB00B, 999888777666.5, (0xB16B00B5ll<<32) + 1, 0.00025, 0x7355BEA2, 1.5);
+		printf("%llX\n", E);
+	}
+
+	fpTestFloats FFP[7] = {(fpTestFloats)fpTestFloat6, (fpTestFloats)fpTestFloat5, (fpTestFloats)fpTestFloat4, (fpTestFloats)fpTestFloat3, (fpTestFloats)fpTestFloat2, (fpTestFloats)fpTestFloat1, (fpTestFloats)fpTestFloat0, };
+	
+	
+
 
 	Register Regs[6] = {};
 	Regs[0].Float = 0.12345; Regs[1].Double = 999888777666.5; Regs[2].Float = 50000000000000; Regs[3].Double = 0.00025; Regs[4].Float = 0.0000000001; Regs[5].Double = 1.5;
@@ -119,4 +121,4 @@ int FPTest() {
 	exit(0);
 	return 0;
 }
-//int fptest = FPTest();
+int fptest = FPTest();
