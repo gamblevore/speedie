@@ -135,6 +135,10 @@ class File (String)
 			(message).restore
 
 	
+	function Accessed (|Date|)
+		nil checker
+		cpp_wrapper JB_File_Accessed
+
 	function Modified (|Date|)
 		nil checker
 		cpp_wrapper JB_File_Modified

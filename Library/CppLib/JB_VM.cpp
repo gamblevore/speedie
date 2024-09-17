@@ -15,12 +15,13 @@ Design:
 
 
 #include "JB_Umbrella.hpp"
-#include "FPTest.i"
+//#include "FPTest.i"
 
 extern "C" {
 #if __VM__
 
 
+jb_vm* vm;
 #include "BitFields.h"
 #include "JB_VM.h"
 #include "JB_VM_Helpers.i"
@@ -44,8 +45,8 @@ s64 RunVM (jb_vm& vm) {		// vm_run, vm__run, vmrun, run_vm
         #include "InstructionList.h"
     };
 
-    ASM* Code	  = vm.Env.Code;
-    Register* r	 = vm.Registers;
+    ASM* Code = vm.Env.CodeBase;
+    auto r = vm.Registers;
 
     ASM  Op=-1;
 	ı;
@@ -57,9 +58,8 @@ s64 RunVM (jb_vm& vm) {		// vm_run, vm__run, vmrun, run_vm
 
 
 
-jb_vm* vm;
 ivec4* JB_ASM_Registers(jb_vm* V, bool Clear) {
-	Register* Ret = V->Registers;
+	auto Ret = V->Registers;
 	if (Clear)
 		memset(Ret, 0, sizeof(vec4)*32);
 	return (ivec4*)(Ret+1);
@@ -83,7 +83,7 @@ jb_vm* JB_ASM_VM() {
 	vm->EXIT[0] = VMExitReturn; // thats not the right code!
 	vm->EXIT[1] = 1; // halt
 //	vm->Stack.ResultRegister = 1;		// Remove this? the calling instruction should specify the result.
-	vm->StackSize  = (StackSize - sizeof(jb_vm))/sizeof(u64);
+	vm->StackSize  = (StackSize - sizeof(jb_vm))/sizeof(VMRegister);
 	return vm;
 }
 
@@ -92,7 +92,7 @@ s64 JB_ASM_Run(u32* Code, u32 CodeLength) {
 	auto V = JB_ASM_VM();
 	
 	if (V) {
-		V->Env.Code       = (ASM*)Code;
+		V->Env.CodeBase = (ASM*)Code;
 		V->Env.CodeLength = CodeLength;
 		return RunVM(*V);
 	}

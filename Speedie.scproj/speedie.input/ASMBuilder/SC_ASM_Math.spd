@@ -468,7 +468,7 @@ extend ASMState
 	
 	
 	function Assign (fn_opasm)
-		if dest.µType isnt bool
+		if dest.µType isnt bool  or  l.µType is bool
 			return .BitOr(dest, l, asmreg(), exp)
 		if l.IsFloat // sigh can this even happen?
 			error (Exp) // i mean i can use cmpf?

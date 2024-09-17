@@ -20,7 +20,7 @@ JBClass( JB_File, JB_StringShared,
 int JB_File__RelaxSudo(int Active);
 JB_String* JB_File__FileData( JB_String* Path );
 int JB_File_WritePng(void* file, int w, int h, const void *data);
-unsigned char* JB_Img__LoadPNG(unsigned char* data, int len, int* x, int* y, int* comp, int req_comp);
+unsigned char* JB_Img__LoadPNG(unsigned char* data, int len, int* x, int* y, int* comp);
 uint8* JB_Img__LoadQOI(uint8* data, int len, int* Size);
 uint8* JB_Img__WriteQOI(uint8* data, int w, int h, int* len);
 JB_String* JB_File_CurrChild (JB_File* self);
@@ -63,6 +63,7 @@ bool JB_File_IsPipe(JB_File* self);
 int JB_File_MoveTo(JB_File* self, JB_String* New);
 
 bool JB_File_Exists( JB_String* self, bool LinkExists );
+Date JB_File_Accessed( JB_File* self );
 Date JB_File_Modified( JB_File* self );
 void JB_File_ModifiedSet( JB_File* self, Date when );
 Date JB_File_Created( JB_File* self );

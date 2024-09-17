@@ -26,8 +26,7 @@ extend ASMState
 
 
 	function TextOpSub (|message| m, |bool|)
-		opt norefcounts
-		
+		opt norefcounts		
 		if m == @rel
 	//    r1 = jb_str_length(r2)~5    // save 5 regs on the stack
 			|| Dest = m[@thg]$
@@ -49,7 +48,7 @@ extend ASMState
 				a.AddRegParam(p, pos)
 			  else
 				a.AddLabelRequest(p, pos)
-			expect (++pos <= op.pcount) (list, "Too many params")
+			expect (++pos <= op.pcount) (list, "Passed too many ASM args")
 
 		// we can consider 0 to be optional? for example... add + shift?
 		// do it later!

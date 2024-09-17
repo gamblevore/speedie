@@ -9,7 +9,7 @@ class SCParamArray
 		cpp_part		PA
 	contains message
 
-	|Message--?[11]|	Items
+	|Message--?[8]|	Items
 	|Message--?|		Exp
 	|SCClass--?|		Cls
 	|int16|				Size
@@ -35,7 +35,7 @@ class SCParamArray
 
 
 	function AddSub (|| m)
-		expect (.size < 11) (m, "Too many parameters")
+		require .size < 8
 		|| i = .size++
 		.items[i] = m
 	

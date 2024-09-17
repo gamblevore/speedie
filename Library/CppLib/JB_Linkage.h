@@ -45,15 +45,16 @@ extern "C" {
 	
 // VM 
 
-struct PrevStack {
-	void*		Addr;
-	int			Regs;			
-//	int			Incr;			
+struct VMStack {
+	u32*		Code;
+	uint		Reg;			
+	uint		Alloc;			
 };
 
-struct Register {
+
+struct VMRegister {
 	union {
-		PrevStack		Stack;
+		VMStack			Stack;
 		JB_Object*		Obj;
 		s64				Int;
 		u64				Uint;

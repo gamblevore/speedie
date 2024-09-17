@@ -4,39 +4,43 @@ typedef void (*FFI_Fn)(void);
 
 
 
-Register DummyReg;
-AlwaysInline void DivMath(Register* r, ASM Op) {
+AlwaysInline void DivMath(VMRegister* r, ASM Op) {
 	auto R3 = i3;
 	auto R4 = i4;
 	uint A = n1;
 	uint B = n2;
-	auto& pA = r[A].Int;
-	auto& pB = r[B].Int;
-	if (!A) pA = DummyReg.Int;
-	if (!B) pB = DummyReg.Int;
 	
 	switch (Div_Kindu & 3) { // so there are 4 possible divisions we can do
 	  case 0:
-		pA = R3 % R4;
-		pB = R3 / R4;
+		if (A) // on ARM, % does not come for free along with  /
+			   // so its better not to do % unless we explicitly need it.
+			r[A].Int = R3 % R4;
+		if (B)
+			r[B].Int = R3 / R4;
 		return;
 	  case 1:
-		pA = (u64)R3 % (u64)R4;
-		pB = (u64)R3 / (u64)R4;
+		if (A)
+			r[A].Int = (u64)R3 % (u64)R4;
+		if (B)
+			r[B].Int = (u64)R3 / (u64)R4;
 		return;
 	  case 2:
-		pA = (int64)((int)R3 % (int)R4);
-		pB = (int64)((int)R3 / (int)R4);
+		if (A)
+			r[A].Int = (int64)((int)R3 % (int)R4);
+		if (B)
+			r[B].Int = (int64)((int)R3 / (int)R4);
 		return;
 	  case 3:
-		pA = (uint)R3 %(uint)R4;
-		pB = (uint)R3 /(uint)R4;
+		if (A)
+			r[A].Int = (uint)R3 %(uint)R4;
+		if (B)
+			r[B].Int = (uint)R3 /(uint)R4;
 		return;
 	}
 }
 
 
-AlwaysInline void BFLS (Register* r, ASM Op) { // rrxxbbb --> rr00bbb
+AlwaysInline void BFLS (VMRegister* r, ASM Op) { // rrxxbbb --> rr00bbb
 	auto o = i2; // we want to clear those middle bits
 	int up = BFLD_upu;
 	int down = BFLD_downu;
@@ -52,7 +56,7 @@ AlwaysInline void BFLS (Register* r, ASM Op) { // rrxxbbb --> rr00bbb
 }
 
 
-AlwaysInline void RotateConst (Register* r, ASM Op) {
+AlwaysInline void RotateConst (VMRegister* r, ASM Op) {
 	int64 A = JB_u64_RotL(Const_Valueu, Const_Rotu);
 	if (Const_Invu)
 		A = ~A;
@@ -76,7 +80,7 @@ double FloatSh2 (uint64 u, int S) {
 }
 
 
-AlwaysInline ASM* LoadConst (Register* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* LoadConst (VMRegister* r, ASM Op, ASM* Code) {
 	uint64 Value = ConstStretchy_Valueu;
 	int Remain = (Op>>24)&3;
 	r+=n1;
@@ -112,7 +116,7 @@ AlwaysInline u64 bitstats(u64 R2, u64 R3, u64 Mode) { // rotate
 	return 0;
 }
 
-AlwaysInline uint bitstats32(Register* r, ASM Op) {
+AlwaysInline uint bitstats32(VMRegister* r, ASM Op) {
 	int L = Const_Valuei;
 	u64 R2 = u2;
 	if (L == 0) {							// popcount
@@ -146,10 +150,10 @@ AlwaysInline JB_Object* alloc(void* o) {
 }
 
 
-AlwaysInline void RegConv (Register* r, int Conv, int Op) {
+AlwaysInline void RegConv (VMRegister* r, int Conv, int Op) {
 	// float, double, u64, s64. 12 conversions possible (and 4 pointless ones)
-	Register* s = r + n3;
-	Register* d = r + n1;
+	auto s = r + n3;
+	auto d = r + n1;
 		
     switch (Conv) {
         case 0 : d->Float  = s->Float; 		break; // just copies
@@ -172,7 +176,7 @@ AlwaysInline void RegConv (Register* r, int Conv, int Op) {
 }
 
 
-AlwaysInline bool Rare (Register* r, ASM Op) {
+AlwaysInline bool Rare (VMRegister* r, ASM Op) {
 	auto r1 = i1;
 	auto r2 = i2;
 	if (!r1 and !r2) return true;	// HALT	
@@ -201,7 +205,7 @@ AlwaysInline bool Rare (Register* r, ASM Op) {
 #define CmpSub(Mode, Cmp) case Mode: return (Cmp);
 
 
-bool CompI_ (Register* r, ASM Op) {
+bool CompI_ (VMRegister* r, ASM Op) {
 	auto A = &i1;
 	auto B = &i2;
 	switch (Cmp_Cmpu) {
@@ -217,7 +221,7 @@ bool CompI_ (Register* r, ASM Op) {
 	};
 }
 
-bool CompF_ (Register* r, ASM Op) {
+bool CompF_ (VMRegister* r, ASM Op) {
 	auto A = &i1;
 	auto B = &i2;
 
@@ -246,24 +250,24 @@ bool CompF_ (Register* r, ASM Op) {
 
 
 
-AlwaysInline ASM* JompI (Register* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* JompI (VMRegister* r, ASM Op, ASM* Code) {
 	return Code + Cmp_Lu*CompI_(r, Op);
 }
 
-AlwaysInline ASM* JompF (Register* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* JompF (VMRegister* r, ASM Op, ASM* Code) {
 	return Code + Cmp_Lu*CompF_(r, Op);
 }
 		
-AlwaysInline void CompI (Register* r, ASM Op) {
+AlwaysInline void CompI (VMRegister* r, ASM Op) {
 	r[Cmp_Lu].Int = CompI_(r, Op);
 }
 
-AlwaysInline void CompF (Register* r, ASM Op) {
+AlwaysInline void CompF (VMRegister* r, ASM Op) {
 	r[Cmp_Lu].Int = CompF_(r, Op);
 }
 
 
-AlwaysInline uint64 BitComp (Register* r, ASM Op) { // cmpb
+AlwaysInline uint64 BitComp (VMRegister* r, ASM Op) { // cmpb
 	auto i = CmpB_Invu;
 	auto A = u2;
 	auto B = u3;
@@ -276,7 +280,7 @@ AlwaysInline uint64 BitComp (Register* r, ASM Op) { // cmpb
 }
 
 
-AlwaysInline void BitClear (Register* r, ASM Op) {
+AlwaysInline void BitClear (VMRegister* r, ASM Op) {
 	auto i = BClear_Signu;
 	uint S1 = BClear_Shift1u;
 	uint S2 = BClear_Shift2u;
@@ -291,14 +295,14 @@ AlwaysInline void BitClear (Register* r, ASM Op) {
 }
 
 
-AlwaysInline ASM* JompEq (Register* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* JompEq (VMRegister* r, ASM Op, ASM* Code) {
 	if (u1 == u2)
 		return Code;
 	return Code + JCmpEq_Jmpi;
 }
 
 
-AlwaysInline ASM* JompNeq (Register* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* JompNeq (VMRegister* r, ASM Op, ASM* Code) {
 	if (u1 != u2)
 		return Code;
 	return Code + JCmpEq_Jmpi;
@@ -335,7 +339,7 @@ void MemStuff(u32* A, u32* B, u32 Operation, u32 L) {
 }
 
 			
-AlwaysInline void CountConst (Register* r, ASM Op, bool UseOld) {
+AlwaysInline void CountConst (VMRegister* r, ASM Op, bool UseOld) {
 	int Size = CNTC_sizeu;
 	int Off  = CNTC_offsetu;
 	int Add  = CNTC_cnsti;
@@ -375,13 +379,13 @@ AlwaysInline void CountConst (Register* r, ASM Op, bool UseOld) {
 
 
 // BasicASMFunc
-AlwaysInline ASM* Return (Register*& rp, ASM* Code, ASM Op) {
-	Register* r		= rp;
+AlwaysInline ASM* Return (VMRegister*& rp, ASM* Code, ASM Op) {
+	VMRegister* r		= rp;
 	if ((u2 == 0) != RET_Existsu)
 		return Code; // skip
 	auto S			= r[-1].Stack;
-	Code			= (ASM*)S.Addr + 2;
-	auto To			= r - (S.Regs + 2);
+	Code			= (ASM*)S.Code + 2;
+	auto To			= r - (S.Reg + 2);
 	auto From		= r+u1;
 	auto Result		= *From++;
 	rp = To;
@@ -391,7 +395,7 @@ AlwaysInline ASM* Return (Register*& rp, ASM* Code, ASM Op) {
 //		incr(Result.Obj);
 	int More = RET_Countu;
 	while (More -->= 0) {
-		To[++S.Regs] = Result;
+		To[++S.Reg] = Result;
 		Result = *From++;
 	}
 		
@@ -403,12 +407,12 @@ AlwaysInline ASM* Return (Register*& rp, ASM* Code, ASM Op) {
 #define Transfer3(num)         case num: ENTR[num] = Transfer(Code, num)
 
 
-AlwaysInline void AllocStack (jb_vm& vm, Register* r, ASM Op) {
+AlwaysInline void AllocStack (jb_vm& vm, VMRegister* r, ASM Op) {
 	debugger; // do this later. We we need a separate stack for these?
 	uint BEEETS = Alloc_Alignu;
 	uint Align = 1 << BEEETS;
 	int Amount = Alloc_Amounti << BEEETS;
-	auto B = vm.StructAllocator;
+	auto B = vm.Env.AllocBase;
 	r[n1].Int = (uint64)(B);
 	if (Amount > 0) {
 		auto Up = (-((uint64)B) & (Align-1));
@@ -418,11 +422,11 @@ AlwaysInline void AllocStack (jb_vm& vm, Register* r, ASM Op) {
 		B -= Amount;
 		B -= (-((uint64)B) & (Align-1));
 	}
-	vm.StructAllocator = B;
+	vm.Env.AllocBase = B;
 }
 
 
-AlwaysInline ASM* TailStack (Register* r, ASM* Code, ASM Op) {
+AlwaysInline ASM* TailStack (VMRegister* r, ASM* Code, ASM Op) {
 	ASM Code2 = Code[0];
 	// What if this overwrites params that we mean to read from?
 	
@@ -441,33 +445,33 @@ AlwaysInline ASM* TailStack (Register* r, ASM* Code, ASM Op) {
 // ideally the compiler should, right? I mean... with one compiler and one distribution
 // theres one answer.
 
-AlwaysInline ASM* BumpStack (Register*& rp, ASM* CodePtr, ASM Op, ASM Code2) { // jumpstack
-	Register* r = rp;
-	u64 Code = *CodePtr++;
-	int Save = n1;
-	Register* ENTR = r+Save+1;
-	ENTR->Stack.Addr = CodePtr;
-	ENTR->Stack.Regs = Save;
-//	ENTR->Stack.Incr = Func_Incru;
+AlwaysInline VMRegister* SaveVMState (jb_vm& vm, VMRegister* r, ASM* CodePtr, int Save) { // jumpstack
+	VMRegister* ENTR = r+Save+1;
+	ENTR->Stack.Code = CodePtr;
+	ENTR->Stack.Reg = (int)(r-vm.Registers);
+	ENTR->Stack.Alloc = vm.Env.AllocCurr;
+	return ENTR;
+}
 
-	rp = r = ++ENTR;
-	switch (Code&15) {
-	Transfer3(11);
-	Transfer3(10);
-	Transfer3( 9);
-	Transfer3( 8);
-	Transfer3( 7);
-	Transfer3( 6);
-	Transfer3( 5);
-	Transfer3( 4);
-	Transfer3( 3);
-	Transfer3( 2);
-	Transfer3( 1);
-	default:
-	case  0: ENTR[ 0] = {};
-	debugger; 
+
+AlwaysInline ASM* BumpStack (jb_vm& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, u64 Code) { // jumpstack
+	auto r = rp;
+	auto ENTR = SaveVMState(vm, r, CodePtr, n1)+1;
+	rp = ENTR;
+
+	switch ((1+Code&7)) {
+		Transfer3( 8);
+		Transfer3( 7);
+		Transfer3( 6);
+		Transfer3( 5);
+		Transfer3( 4);
+		Transfer3( 3);
+		Transfer3( 2);
+		Transfer3( 1);
+		debugger; 
 	}
-	
+
+	ENTR[ 0] = {};
 	int j = Func_JUMPi;
 	return CodePtr + j;
 }
@@ -495,66 +499,66 @@ Speedie's function histogram:  0:410,  1:1656,  2:1464,  3: 713,  4: 167,  5:  6
 #define q9  r[(b<<15)>>12].Uint
 #define q10 r[(b<<20)>> 7].Uint
 #define q11 r[(b<<25)>> 2].Uint
-#define FFISub(Mode, FP)	case 11-Mode:	V = ((Fn##Mode)Fn)FP; break
+#define FFISub(Mode, FP)	case 8-Mode:	V = ((Fn##Mode)Fn)FP; break
 
+#define Code64 (*(u64*)Code)
 
-AlwaysInline ASM* ForeignFunc (jb_vm& vm, ASM* CodePtr, ASM Op) {
-	ASM a = CodePtr[0];
-	ASM b = CodePtr[1];
-	auto Mode = ForeignFunc_Fastu;
-	ASM PrmCount = Op&15;
-	auto T = ForeignFunc_Tableu;
-	auto &r = vm.Registers;
-	auto Fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vm.Env.Cpp[T]) ;
+// http://www.ethernut.de/en/documents/arm-inline-asm.html
+// https://modexp.wordpress.com/2018/10/30/arm64-assembly/
+// x17 is the highest register I can freely alter
 
-	if (!Mode) {
-//
-//		ffi_cif cif;
-//		ffi_type *args[1];
-//		void *values[1];
-//		char *s;
-//		ffi_arg rc;
-//		/* Initialize the argument info vectors */
-//		args[0] = &ffi_type_pointer;
-//		values[0] = &s;
-//		/* Initialize the cif */
-//		if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, 1,
-//						 &ffi_type_sint, args) == FFI_OK)
-//		{
-//			s = "Hello World!";
-//			ffi_call(&cif, (FFI_Fn)puts, &rc, values);
-//			/* rc now holds the result of the call to puts */
-//			/* values holds a pointer to the function’s arg, so to
-//			 call puts() again all we need to do is change the
-//			 value of s */
-//			s = "This is cool!";
-//			ffi_call(&cif, (FFI_Fn)puts, &rc, values);
-//		}
-//		;
-	}
-	// our format is unnecessary if they are all the same type! otherwise we need format info.
-	// how do we cache the ffi type info? Arbitrarily? we need to collect it somewhere in the ASM.
-	if (Mode == 1) {
-		uint64 V; //     Could do float, double, vec4, ivec4, etc... too
-		switch (PrmCount) {
-		default:
-			// hopefully this just becomes a jump-table... :3
-			FFISub(11, (q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11));
-			FFISub(10, (q1, q2, q3, q4, q5, q6, q7, q8, q9, q10));
-			FFISub(9 , (q1, q2, q3, q4, q5, q6, q7, q8, q9));
-			FFISub(8 , (q1, q2, q3, q4, q5, q6, q7, q8));
-			FFISub(7 , (q1, q2, q3, q4, q5, q6, q7));
-			FFISub(6 , (q1, q2, q3, q4, q5, q6));
-			FFISub(5 , (q1, q2, q3, q4, q5));
-			FFISub(4 , (q1, q2, q3, q4));
-			FFISub(3 , (q1, q2, q3));
-			FFISub(2 , (q1, q2));
-			FFISub(1 , (q1));
-			FFISub(0 , ());
-		};
+/*
+	OK, what about saving the register state?
+	We need to know how many regs to save. Thats not the same as where we place the result!
+	Even if it were, we still need two counts. The send-count, and the save-count.
 	
-		vm.Registers[n1].Int = V;
-	}
+	The send-count is typed.
+	
+	The save-count has no type.
+	
+*/
+
+
+
+#define NextRegI(r,r2) 										\
+	"ubfiz  x8,			%[code],	"#r2",		5	\n" 	\
+	"ldr    x"#r",		[%[r],		x8, lsl 3]		\n"
+
+
+AlwaysInline ASM* ForeignFunc (jb_vm& vv, ASM* CodePtr, VMRegister* r, ASM Op, u64 Code) {
+	auto T = ForeignFunc_Tableu;
+	auto Fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.Env.Cpp[T]);
+	int n = n1;
+	SaveVMState(vv, r, CodePtr, n); // maybe unnecessary? only alloc needs saving?
+
+#if __CPU_TYPE__ == __CPU_ARM__
+	__asm__(
+	NextRegI(7, 47)
+	NextRegI(6, 42)
+	NextRegI(5, 37)
+	NextRegI(4, 32)
+	NextRegI(3, 27)
+	NextRegI(2, 22)
+	NextRegI(1, 17)
+	NextRegI(0, 12)
+	 : /*output */ // x0 will be the output
+	 : /*input  */  [r] "r" (r), [code] "r" (Code)  
+	 : /*clobber*/  "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8" );
+#else
+	//#error "unimplemented"
+#endif
+
+
+/*
+	The only issue now is that "where do we put the return reg". We can just drop down to 7 regs.
+	So... before doing this, we need to save the code and register in the vm, right?
+*/
+
+
+//	vv = *vm;
+	n &= 31;
+	if (n)
+		r[n].Int = 0;
 
 	return CodePtr;
 }

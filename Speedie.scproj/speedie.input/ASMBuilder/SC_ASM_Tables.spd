@@ -163,7 +163,7 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 			fat.Const = (oof|int64| >> sh, oof|uint64| >> sh)(sr.Signed) // shift up and down
 
 	if sr is constany
-		return .Makeconst(fat, dest)
+		return .MakeConst(fat, dest)
 
 	return fat*dest
 
@@ -184,13 +184,14 @@ function Decl (fn_asm)
 	exp = exp.last!
 	|| ty = exp.first!.fastdecl
 	dest = .DeclareMe(Exp, ty) 
-	|| Value = .µ(exp.last!, dest as AsmReg.decl)
-	if (ty isnt altered)
-		|| f = value.fat//.RegConsts[value.reg]
-			(f is NeverAltered)
-	if value.reg == dest.reg
-		return Value
-	return .Assign(dest, Value, asmreg(), exp)
+	dest = dest as ASMReg.decl
+	exp = exp.last!
+	if ty isnt altered
+		return .µinto(exp, dest)
+	rz = .µinto(exp, dest)
+	|| f = rz.fat
+		(f is NeverAltered)
+
 
 
 function Arg   (fn_asm)
@@ -239,13 +240,17 @@ function Dot		(fn_asm)						// a.b
 
 function SetRel	(fn_asm)
 	opt	norefcounts									//   x[func()] = y++
-	|| Var = .ExistingVar(exp.first!)
-	Dest = .µ(exp.last!, var)
-	check (dest.reg) (self, exp, "SetRel failed")
-	if var!=nil and dest.reg == var.reg
-		return dest // done!
+	|| f = exp.first!
+	|| l = exp.last!
+	|| Var = .ExistingVar(f)
+	if var.reg
+		Dest = .µinto(L, var)
+		if dest.reg == var.reg
+			return dest // for a = 1: by the time we ran L, a == 1 already!
+	  else
+		dest = .µ(l, var)
 
-	.µ(exp.first!, dest as AsmReg.set)
+	.µ(f, dest as AsmReg.set)
 
 
 function Num (fn_asm)

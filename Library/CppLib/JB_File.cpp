@@ -1033,11 +1033,21 @@ u64 JB_File_Size( JB_File* self ) {
 }
 
 
+Date JB_File_Accessed( JB_File* self ) {
+    struct _stat st = {};
+    require (Stat_(self, &st))
+	#if __linux__
+		return JB_Date__Create(st.st_atime, 0);//st.st_mtime_nsec);
+	#else
+		return JB_Date__Create(st.st_atimespec.tv_sec, st.st_atimespec.tv_nsec);
+	#endif
+}
+
+
+Date JB_File_Modified( JB_File* self ) {
 // IT MAKES NO SENSE!!!
 // I got two files... the newer one is coming out with an OLDER DATE.
 // it seemse USELESS. Whats the point of a date that can't be used.
-
-Date JB_File_Modified( JB_File* self ) {
     struct _stat st = {};
     require (Stat_(self, &st))
 	#if __linux__

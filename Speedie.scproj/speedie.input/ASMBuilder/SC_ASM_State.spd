@@ -144,6 +144,17 @@ struct ASMState
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
+		|| rz = .µ(Exp, dest)
+		check (rz) (self, exp, "µInto failed")
+		|| dr = dest.reg
+		if !dr // what?
+		
+		if rz.reg == dr
+			return rz
+		return .Assign(Dest, rz, asmreg(), exp)
+	
+			
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		opt norefcounts
 		target !debug
@@ -200,7 +211,18 @@ function SCFunction.HasCVersion (|bool|)
 		debugat
 		return false  // i think only perry used this and only in debug mode within Xcode
 	return true
-	
+
+
+function asmstate.ASMPrmCollect (|message| prms, |scfunction| fn,   |uint64|)
+	opt norefcounts
+	|| p = prms.first
+	|| sh = 12
+	for fnarg in fn.args
+		if p
+			|| v = .FuncPrm(p, FnArg).reg
+			rz  |=  v << sh
+			sh += 5
+			p++
 
 
 function @ASMType.DoFunc (fn_Asm)
@@ -209,35 +231,44 @@ function @ASMType.DoFunc (fn_Asm)
 	|| fn = prms.asfunc #require
 
 	// Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:4
-	// There are only 4 above 6!, only 14 above 5
+	// There are only 4 above 6!, only 14 above 5, 75 above 4
+	// almost all lib functions have 4 or less. 5 is for proj funcs.
 
-	if !fn.ReturnType
-		dest = AsmReg()
-	  else
-		dest = .TempOnly(prms, dest)
-		dest.µtype = fn.RegType
+	dest.µtype = fn.RegType
+	dest.reg = .VDecls
 
-	|uint64| ASMP
-	|| sh = 5
+	|| sh = 12
 	|| TmpCloser = .VTmps
 
-	|| p = prms.first
-	for fnarg in fn.args
-		expect (p) (exp)
-		|| v = .FuncPrm(p, FnArg).reg
-		ASMP  |=  v << sh
-		sh += 5
-		p++
-		ASMP++ // count params
+	// How can we do this? We use 4 values, at 20 bits.
+	// we need a send-count (3 bits)
+
+	// We put the save into FUNK's first instruction.
+	// Those 5 save-bits are shared for the dest.
+	// Requires extra copy instruction sometimes.
+	// The setrel function handles this already.
+
+	// what about tmps? They do get "accumulated" nicely.
+	// this is essentially a TMP. But in the wrong place?
+	// in theory it could get overwritten, by another tmp?
+	// I mean its not taken into account properly
+	// I think we'll leave it for now... see if it creates an issue
+	// otherwise we need to redesign
 	
-	ASMP |= fn.HasCVersion << 4
+	
+	|| ASMP = .ASMPrmCollect(prms, fn)
+	
+	|| n = fn.args.Length
+	asmp += n - 1 max 0 // send-count (3 bits)
 	.CloseVTmps(TmpCloser)
 	
-	|| SaveAmount = 0
-	if dest isnt ForReturn
-		SaveAmount = .VDecls
-	|| fat = exp.FUNK(SaveAmount.ASM,  fn.TableId,  ASMP,  ASMP>>32)       // exp.func2,   exp.func3
-	fat.op += (fn.args > 5)
+	|| fat = exp.FUNK(dest,  fn.TableId,  ASMP,  ASMP>>32)       // exp.func2,   exp.func3
+	fat.op += n>>2
+//	Dest.reg = SaveAmount.asm // we don't wanna use this... makes the VM more complex.
+//  Quite often I'm doing:  || x = msg.function(),  (which uses the correct position.)
+
+	if !fn.ReturnType
+		dest.reg = 0
 
 	return fat * dest
 
@@ -318,10 +349,3 @@ function ASMState.SetLength
 	.out.length = .curr - .FuncStart
 
 
-//function int64.CanInt32 (|bool|)
-//	return  (self <<32)>>32 == self
-//	
-//
-//function int64.CanFloat32 (|bool|)
-//	return  (self|uint64|>>32)<<32 == self
-//	

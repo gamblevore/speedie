@@ -2,22 +2,25 @@
 	return u1 + U1_Lu;
 ı FUNK: 
 	__;
-	Code = BumpStack(r, Code, Op, 0);
+	Code = BumpStack(vm, r, Code + 1, Op, *Code);
 	___;
-ı FUMK2: 
+ı FUNK3: 
 	__;
-	Code = BumpStack(r, Code + 1, Op, *Code);
+	Code = BumpStack(vm, r, Code + 2, Op, Code64);
 	___;
 ı FFNC: 
 	__;
-	vm.CurrRegs = r;
-	Code = ForeignFunc(vm, Code, Op);
+	ForeignFunc(vm, Code, r, Op, *Code);
+	___;
+ı FFNC3: 
+	__;
+	ForeignFunc(vm, Code, r, Op, Code64);
 	___;
 ı KNST: _
 	Code = LoadConst(r, Op, Code);
 ı TAIL: 
 	__;
-	Code = TailStack(r, Code, Op);
+	TailStack(r, Code, Op);
 	___;
 ı NOOP: _
 	i1 = i1;
@@ -121,6 +124,8 @@
 	CompI(r, Op);
 ı CMPF: _
 	CompF(r, Op);
+ı JSWI: _
+	Code += n1 + n2 + JCmpEq_Jmpi;
 ı JUMP: _
 	Code += l0;
 ı JMPI: 

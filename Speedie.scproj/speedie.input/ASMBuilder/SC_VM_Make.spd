@@ -141,6 +141,8 @@ function VMBox (|message|)
 	|| v = Compiler.InputFile( nil, "vm.box", nil )
 		.vm_file = v
 		rz = v.parse
+		if rz
+			rz.TranAllTargets
 	  else
 		error "Can't find vm.box"
 
@@ -409,7 +411,7 @@ function FreeID (|message| m, |int| ask, |int|)
 	if ask <= 1
 		|int| n = .normalpos ?? 32
 		.normalpos = n+1
-		expect (n < 256) (m, "Too many ASM")
+		expect (n < 256) (m, "Too many opcodes")
 		return n
 	
 	|| f = .FreeMultiASM

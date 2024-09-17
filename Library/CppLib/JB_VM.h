@@ -36,20 +36,20 @@ struct vm_globs {
     byte*			PackGlobs;
     Fn0*			Cpp;
     Function**		DebugFuncTable;
-    ASM*            Code;
-    int             CodeLength;
+    byte*			AllocBase;
+    int				AllocCurr;
+    ASM* 			CodeBase;
+    int				CodeLength;
 };
 
 
 
 struct jb_vm {
 	vm_globs		Env;
-    Register*		CurrRegs;
-    int             StackSize;
+    int				StackSize;
     ASM				EXIT[2];
-    int             GuardValue;
-    byte*			StructAllocator;
-	Register		Registers[];
+    ASM				GuardValue;
+	VMRegister		Registers[];
 };
 
 

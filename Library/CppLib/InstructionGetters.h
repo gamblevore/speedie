@@ -41,17 +41,23 @@
 #define   Func_JUMPu_(x)   (((uint)((x)<<13))>>13)
 
 
-#define   ForeignFunc_Fasti       ((( int)((Op)<<13))>>29)
-#define   ForeignFunc_Fasti_(x)   ((( int)((x)<<13))>>29)
+#define   ForeignFunc_r1i       ((( int)((Op)<<8))>>25)
+#define   ForeignFunc_r1i_(x)   ((( int)((x)<<8))>>25)
 
-#define   ForeignFunc_Fastu       (((uint)((Op)<<13))>>29)
-#define   ForeignFunc_Fastu_(x)   (((uint)((x)<<13))>>29)
+#define   ForeignFunc_r1u       (((uint)((Op)<<8))>>25)
+#define   ForeignFunc_r1u_(x)   (((uint)((x)<<8))>>25)
 
-#define   ForeignFunc_Tablei       ((( int)((Op)<<16))>>16)
-#define   ForeignFunc_Tablei_(x)   ((( int)((x)<<16))>>16)
+#define   ForeignFunc_Tablei       ((( int)((Op)<<15))>>18)
+#define   ForeignFunc_Tablei_(x)   ((( int)((x)<<15))>>18)
 
-#define   ForeignFunc_Tableu       (((uint)((Op)<<16))>>16)
-#define   ForeignFunc_Tableu_(x)   (((uint)((x)<<16))>>16)
+#define   ForeignFunc_Tableu       (((uint)((Op)<<15))>>18)
+#define   ForeignFunc_Tableu_(x)   (((uint)((x)<<15))>>18)
+
+#define   ForeignFunc_Prm1i       ((( int)((Op)<<29))>>29)
+#define   ForeignFunc_Prm1i_(x)   ((( int)((x)<<29))>>29)
+
+#define   ForeignFunc_Prm1u       (((uint)((Op)<<29))>>29)
+#define   ForeignFunc_Prm1u_(x)   (((uint)((x)<<29))>>29)
 
 
 #define   Tail_JUMPi       ((( int)((Op)<<8))>>8)

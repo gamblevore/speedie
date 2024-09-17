@@ -6,7 +6,7 @@
 class µForm
 	|int|			Count
 	|string|		Name
-	|µParam[5]|		Params
+	|µParam[7]|		Params
 	|message| 		src
 	|int|			TotalBits
 	|int| 			Outputs
@@ -38,7 +38,7 @@ class µForm
 		if size <= 0 or size > 32 // hmm??
 		|| i = .count++
 		.totalbits += size
-		expect (i < –count .params) ("Too many params.")
+		expect (i < –count .params) ("Defined too many ASM params")
 		p |= size - 1
 		.params[i] = p
 		if p is jump

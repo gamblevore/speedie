@@ -33,7 +33,6 @@ uint8* JB_Img__LoadQOI(uint8* data, int len, int* Size) {
 		JB_ErrorHandleC("qoi could not decode", false);
 	Size[0] = desc.width;
 	Size[1] = desc.height;
-//	Size[2] = desc.colorspace;
 	return pixels;
 }
 
@@ -44,18 +43,21 @@ uint8* JB_Img__WriteQOI(uint8* data, int w, int h, int* len) {
 	desc.channels = 4;
 	desc.colorspace = QOI_SRGB;
 	auto qoi = (uint8*)qoi_encode(data, &desc, len);
-	if (!qoi)
-		JB_ErrorHandleC("qoi could not encode", false);
-	return qoi;
+	if (qoi)
+		return qoi;
+		
+	JB_ErrorHandleC("qoi could not encode", false);
+	return 0;
 }
 
 
 
-uint8* JB_Img__LoadPNG(stbi_uc* data, int len, int* x, int* y, int* comp, int req_comp) {
-	uint8* img = stbi_load_from_memory(data, len, x, y, comp, req_comp);
-	if (!img)
-		JB_ErrorHandleC(stbi__g_failure_reason, false);
-	return img;
+uint8* JB_Img__LoadPNG(uint8* data, int len, int* x, int* y, int* comp) {
+	uint8* img = stbi_load_from_memory(data, len, x, y, comp, 4);
+	if (img)
+		return img;
+	JB_ErrorHandleC(stbi__g_failure_reason, false);
+	return 0;
 }
 
 }

@@ -90,12 +90,12 @@ function Ternary		(fn_asm)
 
 	dest = .TempTyped(exp, dest)
 	|| FailToSecond = .Branch(cond)
-	.µ(A, dest)
+	.µInto(A, dest)
 	|| Exit = exp.jump(0)
 
 	FailToSecond.fill(.curr)
 
-	rz = .µ(B, dest)
+	rz = .µInto(B, dest)
 	Exit.r[3] = .curr - Exit
 	
 

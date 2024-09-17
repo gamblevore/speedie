@@ -110,7 +110,7 @@ int FPTest() {
 	
 
 
-	Register Regs[6] = {};
+	VMRegister Regs[6] = {};
 	Regs[0].Float = 0.12345; Regs[1].Double = 999888777666.5; Regs[2].Float = 50000000000000; Regs[3].Double = 0.00025; Regs[4].Float = 0.0000000001; Regs[5].Double = 1.5;
 	for (int i = 0; i < 7; i++) { // and this!
 		auto D = FFP[i];

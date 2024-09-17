@@ -94,6 +94,13 @@ function message.Tran_Target (|message|)
 	.Remove
 
 
+function message.TranAllTargets
+	opt norefcounts
+	for s.flat in self
+		if s == "target"
+			continue_with s.tran_target
+
+
 function message.Tran_TargetSub
 	opt norefcounts
 	|| value = self.needfirst					#require

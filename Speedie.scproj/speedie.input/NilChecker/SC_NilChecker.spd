@@ -66,7 +66,7 @@ function SyncJump (NilTrackerFn)
 	PostIncrementNil.Clear
 
 
-function JumpNoPosts (niltrackerfn)
+function JumpWithinBool (niltrackerfn)
 	t.InsideBoolLogic++
 	rz = .jump(msg, test)
 	t.InsideBoolLogic--
@@ -376,12 +376,12 @@ function Tern (Niltrackerfn)
 
 	#!"First Branch"
 	.jump(tC, NilCheckMode.positive)
-	rz = .JumpNoPosts(tA, test)
+	rz = .JumpWithinBool(tA, test)
 	|| First = T.BranchSwap(Orig)
 
 	#!"Second Branch"
 	.jump(tC, nilcheckmode.negative)
-	rz |= .JumpNoPosts(tB, test)
+	rz |= .JumpWithinBool(tB, test)
 	t.BranchExit(First)
 	rz &= ~nilstate.FnBecomesNilCh	// in theory if BOTH were nil-testers... its OK
 									// but thats sooo awkward to even think of a real-case
@@ -397,7 +397,7 @@ function BooleanLogic (niltrackerfn)
 	(test is AND) = false 
 	if IsAnd == (test is positive)
 		|| NC = .Jump(AA, test)						// x = (!a or !a.y)
-		NC   |= .JumpNoPosts(BB, test)
+		NC   |= .JumpWithinBool(BB, test)
 		return nilstate.real ||| (NC & nilstate.FnBecomesNilCh)
 
 	|| Orig = T.BranchEnter(AA)				#require
@@ -408,7 +408,7 @@ function BooleanLogic (niltrackerfn)
 
 	#!"test A-B+"
 	.Jump(AA, test.negate)
-	.JumpNoPosts(BB, test)
+	.JumpWithinBool(BB, test)
 
 	return t.BranchExit(First)
 

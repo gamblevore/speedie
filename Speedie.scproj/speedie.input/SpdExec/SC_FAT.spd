@@ -3,9 +3,7 @@ struct FatASM
 	|ASMReg| 			Info		// only needs 32-bits of this. Could we make a smaller asmreg?
 	|message--| 		Msg
 	|uint64| 			Const
-	|uint64| 			dummy
-
-	|uint[5]|			R
+	|uint[7]|			R
 	|uint|				ASMIndex	
 	|uint16| 			BlockNum		// remove?
 	|uint16| 			ParentBlock		// remove?

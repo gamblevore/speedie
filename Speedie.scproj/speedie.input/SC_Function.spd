@@ -510,7 +510,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 		|| first = Incoming.FailedAt
 			.DescribeParamFail(incoming, first)
 		  else
-			error (incoming.exp, "Too many params to " + .rendertitle)
+			error (incoming.exp, "Too many params sent to " + .rendertitle)
 			problem (self.source,  kusingstr)
 
 

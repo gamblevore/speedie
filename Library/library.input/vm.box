@@ -24,21 +24,14 @@ forms
 	
 	A loop that uses a 64-bit value might do it.
 	
-	So... each register will be described with 8 bits. 5 for the reg, and 3 for the type. With 64-bits
+	So... each register will be described with 8 bits. 5 for the reg, and 2 for the type. With 64-bits
 	we get 8 regs. Lets assume 1-8, so 64-bits. 0 reg funcs, we just pass an extra int, whatever. 
-	
-	The VM is now "Stateless", because it stores all it's own state. It will just have to set the return
-	register on the stack somewhere. That makes it very easy to return to, or reenter from any place!
-	We don't even need to pass the VM anymore. We just load it from a global var.
-	
-	The only issue now is that "where do we put the return reg". We can just drop down to 7 regs. I doubt
-	there are any C funcs that take 7 regs! not within my libs! and all the ASM can take 8.
 */
 
-		r1		R
-		Fast	3  // FFI, int, float, double, vec2, ivec2, vec4, ivec4
-		Table	16 // 4K table         // functions in registers use the first 32 values...
-		// use some custom written ASM
+		r1		7
+//		Count	1
+//		Count2	1
+		Table	14		// 16K         // functions in registers use the first 32 values...
 		Prm1	x
 		Prm2	x
 	
@@ -256,30 +249,34 @@ forms
 
 #!						 (((((FUNC)))))
 
-/**/ RET (Ret)	// ret: 
+/**/ RET (Ret)			// ret: 
 		__ 
 		Code = Return(r, Code, Op)
 		___
 
-/**/ FUNK (Func, 2) // func: 
+/**/ FUNK (Func, 2)		// func: 
 		__
-		Code = BumpStack(r, Code, Op, 0)
+		Code = BumpStack(vm, r, Code+1, Op, *Code)
 		___
 
-/**/ FUMK2 (Func, 3) // i prefer two have two separate codes, I should be able to call it Func3?
+/**/ FUNK3 (Func, 3)	// I prefer two have two separate codes, I should be able to call it Func3?
 		__
-		Code = BumpStack(r, Code+1, Op, *Code)
+		Code = BumpStack(vm, r, Code+2, Op, Code64)
 		___
 
-/**/ FFNC (ForeignFunc, 2, 3)
+/**/ FFNC (ForeignFunc, 2)
 		__
-		vm.CurrRegs = r // to make this recursive
-		Code = ForeignFunc(vm, Code, Op) 
+		ForeignFunc(vm, Code, r, Op, *Code) 
+		___
+
+/**/ FFNC3 (ForeignFunc, 3)
+		__
+		ForeignFunc(vm, Code, r, Op, Code64) 
 		___
 
 /**/ TAIL (Tail, 2)
 		__
-		Code = TailStack(r, Code, Op)
+		TailStack(r, Code, Op)
 		___
 
 /**/ ALLO (Alloc)
@@ -395,6 +392,9 @@ forms
 
 
 #!						 (((((Branches)))))
+/**/ JSWI (jcmpeq)
+		Code += n1+n2+JCmpEq_Jmpi
+
 /**/ JUMP (jump)
 		Code += l0
 
