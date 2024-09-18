@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2127];
+extern JB_StringC* JB_LUB[2129];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -3259,7 +3259,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[184]);
-	JB_FS_AppendInt32(_fsf0, (2024091719));
+	JB_FS_AppendInt32(_fsf0, (2024091811));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8168,19 +8168,20 @@ Array* SC_Ext__CreateCompileString(Array* FileList, JB_String* Product, JB_Strin
 		SC_Array_AppendWords(Rz, JB_LUB[157]);
 	}
 	SC_Array_AppendWords(Rz, JB_LUB[352]);
-	iif (!JB_Platform__OSX()) {
-		SC_Array_AppendWords(Rz, JB_LUB[358]);
-	}
-	 else iif (((bool)SC__Ext_CompilingLibFiles)) {
-		SC_Ext__MacBothArch(Rz);
-	}
-	 else iif ((JB_Str_Equals(SC__Options_Arch, JB_LUB[602], true))) {
+	iif (JB_Str_Equals(SC__Options_Arch, JB_LUB[602], true)) {
+		SC_Array_AppendWords(Rz, JB_LUB[348]);
 		iif (SC__Options_Optimise >= 3) {
 			SC_Array_AppendWords(Rz, JB_LUB[158]);
 		}
 	}
-	 else iif (!JB_Platform__CPU_Intel()) {
-		SC_Ext__MacBothArch(Rz);
+	 else {
+		SC_Array_AppendWords(Rz, JB_LUB[2128]);
+	}
+	iif (JB_Platform__OSX()) {
+		SC_Array_AppendWords(Rz, JB_LUB[2127]);
+	}
+	 else {
+		SC_Array_AppendWords(Rz, JB_LUB[358]);
 	}
 	SC_Array_AppendWords(Rz, JB_LUB[351]);
 	uint Opt = SC__Options_Optimise;
@@ -8345,7 +8346,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[839]);
-	JB_FS_AppendInt32(_fsf0, (2024091719));
+	JB_FS_AppendInt32(_fsf0, (2024091811));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -8447,10 +8448,6 @@ JB_File* SC_Ext__LinkOK(JB_File* P) {
 	JB_File_Delete(Tof);
 	JB_Decr(Tof);
 	return nil;
-}
-
-void SC_Ext__MacBothArch(Array* R) {
-	SC_Array_AppendWords(R, JB_LUB[348]);
 }
 
 JB_String* SC_Ext__MakeDailyProductPath(JB_File* B) {
@@ -16187,8 +16184,16 @@ ASM SC_ASM_FloatConst_HighSet(ASM Self, uint Value) {
 	return Self | ((Value << 18) >> 18);
 }
 
+ASM SC_ASM_ForeignFunc_CountSet(ASM Self, uint Value) {
+	return Self | ((Value << 31) >> 15);
+}
+
+ASM SC_ASM_ForeignFunc_Count2Set(ASM Self, uint Value) {
+	return Self | ((Value << 31) >> 16);
+}
+
 ASM SC_ASM_ForeignFunc_Prm1Set(ASM Self, uint Value) {
-	return Self | ((Value << 29) >> 29);
+	return Self | ((Value << 31) >> 31);
 }
 
 ASM SC_ASM_ForeignFunc_r1Set(ASM Self, uint Value) {
@@ -16196,7 +16201,7 @@ ASM SC_ASM_ForeignFunc_r1Set(ASM Self, uint Value) {
 }
 
 ASM SC_ASM_ForeignFunc_TableSet(ASM Self, uint Value) {
-	return Self | ((Value << 18) >> 15);
+	return Self | ((Value << 18) >> 17);
 }
 
 ASM SC_ASM_Func_JUMPSet(ASM Self, uint Value) {
@@ -18222,8 +18227,10 @@ ASM* JB_ASM_ForeignFunc__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 Extra
 	//visible;
 	ASM Rz = Self->Op << 24;
 	Rz = SC_ASM_ForeignFunc_r1Set(Rz, Self->R[0]);
-	Rz = SC_ASM_ForeignFunc_TableSet(Rz, Self->R[1]);
-	Rz = SC_ASM_ForeignFunc_Prm1Set(Rz, Self->R[2]);
+	Rz = SC_ASM_ForeignFunc_CountSet(Rz, Self->R[1]);
+	Rz = SC_ASM_ForeignFunc_Count2Set(Rz, Self->R[2]);
+	Rz = SC_ASM_ForeignFunc_TableSet(Rz, Self->R[3]);
+	Rz = SC_ASM_ForeignFunc_Prm1Set(Rz, Self->R[4]);
 	iif (Curr < After) {
 		Curr++[0] = Rz;
 	}
@@ -34129,25 +34136,29 @@ FatASM* JB_Msg_FDIV(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, i
 	return Rz;
 }
 
-FatASM* JB_Msg_FFNC(Message* Self, int R1, int Table, int Prm1, int Prm2) {
+FatASM* JB_Msg_FFNC(Message* Self, int R1, int Count, int Count2, int Table, int Prm1, int Prm2) {
 	FatASM* Rz = nil;
 	//visible;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_FFNC, Self);
 	(SC_FatASM_NumInputSet(Rz, 0, R1));
-	(SC_FatASM_NumInputSet(Rz, 1, Table));
-	(SC_FatASM_NumInputSet(Rz, 2, Prm1));
-	(SC_FatASM_NumInputSet(Rz, 3, Prm2));
+	(SC_FatASM_NumInputSet(Rz, 1, Count));
+	(SC_FatASM_NumInputSet(Rz, 2, Count2));
+	(SC_FatASM_NumInputSet(Rz, 3, Table));
+	(SC_FatASM_NumInputSet(Rz, 4, Prm1));
+	(SC_FatASM_NumInputSet(Rz, 5, Prm2));
 	return Rz;
 }
 
-FatASM* JB_Msg_FFNC3(Message* Self, int R1, int Table, int Prm1, int Prm2) {
+FatASM* JB_Msg_FFNC3(Message* Self, int R1, int Count, int Count2, int Table, int Prm1, int Prm2) {
 	FatASM* Rz = nil;
 	//visible;
 	Rz = SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_FFNC3, Self);
 	(SC_FatASM_NumInputSet(Rz, 0, R1));
-	(SC_FatASM_NumInputSet(Rz, 1, Table));
-	(SC_FatASM_NumInputSet(Rz, 2, Prm1));
-	(SC_FatASM_NumInputSet(Rz, 3, Prm2));
+	(SC_FatASM_NumInputSet(Rz, 1, Count));
+	(SC_FatASM_NumInputSet(Rz, 2, Count2));
+	(SC_FatASM_NumInputSet(Rz, 3, Table));
+	(SC_FatASM_NumInputSet(Rz, 4, Prm1));
+	(SC_FatASM_NumInputSet(Rz, 5, Prm2));
 	return Rz;
 }
 
@@ -53716,4 +53727,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -8248972360532110383 3879689466703182582
+// 4519833507598768615 1931886982279276335

@@ -3518,8 +3518,6 @@ JB_String* SC_Ext__LibTmpPath();
 
 JB_File* SC_Ext__LinkOK(JB_File* P);
 
-void SC_Ext__MacBothArch(Array* R);
-
 JB_String* SC_Ext__MakeDailyProductPath(JB_File* B);
 
 void SC_Ext__MakeLib();
@@ -4466,6 +4464,10 @@ ASM SC_ASM_Float_DSet(ASM Self, uint Value);
 ASM SC_ASM_Float_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_FloatConst_HighSet(ASM Self, uint Value);
+
+ASM SC_ASM_ForeignFunc_CountSet(ASM Self, uint Value);
+
+ASM SC_ASM_ForeignFunc_Count2Set(ASM Self, uint Value);
 
 ASM SC_ASM_ForeignFunc_Prm1Set(ASM Self, uint Value);
 
@@ -8118,9 +8120,9 @@ SCDecl* SC_Msg_FastDecl(Message* Self);
 
 FatASM* JB_Msg_FDIV(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
 
-FatASM* JB_Msg_FFNC(Message* Self, int R1, int Table, int Prm1, int Prm2);
+FatASM* JB_Msg_FFNC(Message* Self, int R1, int Count, int Count2, int Table, int Prm1, int Prm2);
 
-FatASM* JB_Msg_FFNC3(Message* Self, int R1, int Table, int Prm1, int Prm2);
+FatASM* JB_Msg_FFNC3(Message* Self, int R1, int Count, int Count2, int Table, int Prm1, int Prm2);
 
 FatASM* JB_Msg_FFRC(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
 
