@@ -29,8 +29,8 @@ forms
 */
 
 		r1		7
-//		Count	1
-//		Count2	1
+		Count	1
+		Count2	1
 		Table	14		// 16K         // functions in registers use the first 32 values...
 		Prm1	x
 		Prm2	x

@@ -545,7 +545,7 @@ AlwaysInline ASM* ForeignFunc (jb_vm& vv, ASM* CodePtr, VMRegister* r, ASM Op, u
 	 : /*input  */  [r] "r" (r), [code] "r" (Code)  
 	 : /*clobber*/  "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8" );
 #else
-	//#error "unimplemented"
+	#warning "unimplemented VM"
 #endif
 
 

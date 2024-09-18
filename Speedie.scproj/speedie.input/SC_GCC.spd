@@ -170,15 +170,6 @@ function Clean (|bool|)
 	return stderr.ok
 
 
-function MacBothArch (|[string]| r)
-// not sure how you specify that these only apply to x86???
-// clang seems too stupid to understand, anyhow... and refuses to compile :(
-// (only when compiling for both arm64 and x86... )
-// how to do a fat-compile with all the fastest version on both cpus?
-// just be slow for now i guess?
-// we need some way to specify core2 at least... + all the extensions
-	r.appendwords( "-arch x86_64 -arch arm64 -mmacosx-version-min=11.0" )
-
 
 function HasType (|[File]| CppList, |string| Type, |bool|)
 	opt norefcounts
@@ -233,16 +224,18 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	// Gaming64Bit
 	rz.AppendWords("-ffast-math -fno-math-errno")
 	
-	ifn platform.OSX
-		rz.appendwords( "-pthread -g" )
-	  elseif .CompilingLibFiles
-		.MacBothArch(rz)
-	  elseif (options.arch ~= "intel")
+	if options.arch ~= "intel"
+		rz.appendwords( "-arch x86_64" )
 		if options.optimise >= 3 // sigh
 			rz.AppendWords( " -march=core2  -mfpmath=sse  -mmmx  -msse  -msse2  -msse4.1  -msse4.2 " )
-	  elseif !Platform.CPU_Intel // kinda bloated and slow...
-		.MacBothArch(rz)
-	
+	  else
+		rz.appendwords( "-arch arm64" )
+
+	if platform.OSX
+		rz.appendwords( "-mmacosx-version-min=11.0" )
+	  else
+		rz.appendwords( "-pthread -g" )
+
 	// stripping
 	rz.appendwords( "-fdata-sections -ffunction-sections")
 	
