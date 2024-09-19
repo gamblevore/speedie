@@ -89,14 +89,13 @@ DESIGN FLAWS JUST LEAVE FOR NOW
 Do when it's fun...
 
 * markdown
-* ';' scom!
-	* or perhaps a string to translate into jb?
-* Basically... file should be a string subclass.. of strshared
  
 ................................................................................
 
 
 							Actually already good:
+
+* Disable implicit bools object params? (but we wanna keep 1, 2, 3, etc? makes no sense. just allow all or none.)
 
 * int outputs ALWAYS 64bit-correct  (allows compare/add 64/32 bit without typecasts)	
 
