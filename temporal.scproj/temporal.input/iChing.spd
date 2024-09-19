@@ -50,31 +50,6 @@ role Hexagram (message)
 			fs <~ "(nil)"
 		fs <~ "\n"
 
-	render LongDescription
-
-/*
-
-Hsieh (THUNDER UPON WATER) {
-	meaning Deliverance {
-		`Here the movement goes out of the sphere of danger. The obstacle has been removed, the difficulties are being resolved. Deliverance is not yet achieved; it is just in its beginning, and the hexagram represents its various stages.`
-	}
-
-	judgement `DELIVERANCE. The southwest furthers. If there is no longer anything where one has to go, Return brings good fortune. If there is still something where one has to go, Hastening brings good fortune.` {
-		`This refers to a time in which tensions and complications begin to be eased. At such times we ought to make our way back to ordinary conditions as soon as possible; this is the meaning of "the southwest." These periods of sudden change have great importance. Just as rain relieves atmospheric tension, making all the buds burst open, so a time of deliverance from burdensome pressure has a liberating and stimulating effect on life. One thing is important, however: in such times we must not overdo our triumph. The point is not to push on farther than is necessary. Returning to the regular order of life as soon as deliverance is achieved brings good fortune. If there are any residual matters that ought to be attended to, it should be done as quickly as possible, so that a clean sweep is made and no retardations occur.`
-	}
-
-	image `Thus the superior man pardons mistakes  And forgives misdeeds.` {
-		`A thunderstorm has the effect of clearing the air; the superior man produces a similar effect when dealing with mistakes and sins of men that induce a condition of tension. Through clarity he brings deliverance. However, when failings come to light, he does not dwell on them; he simply passes over mistakes, the unintentional transgressions, just as thunder dies away. He forgives misdeeds, the intentional transgressions, just as water washes everything clean.`
-	}
-
-	markedlines {
-		line `One kills three foxes in the field And receives a yellow arrow. Perseverance brings good fortune.`
-		line `If a man carries a burden on his back And nonetheless rides in a carriage, He thereby encourages robbers to draw near. Perseverance leads to humiliation.`
-		line `Deliver yourself from your great toe. Then the companion comes, And him you can trust.`
-	}
-}
-*/
-	
 	function Render (|FastString| fs=nil, |string|)
 		return .describe(fs)
 	
@@ -120,6 +95,7 @@ module iChing
 		cpp_part Select
 		|| t = .Tome[num-1]
 			return t.Clean
+		return .ClosedBook
 	
 	function New (|stevemachine| machine=nil, |Hexagram|)
 		return .Divination(machine)
