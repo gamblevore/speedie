@@ -382,7 +382,7 @@ class Image (memory)
 			|| qoi = image.WriteQOI(.ptr, .Width, .Height, l)
 				return string.FromPtr(qoi, l)
 
-		function LoadPNG (|&byte| data, |int| len, |&int| x, |&int| y, |&int| comp, |int| req_comp, |?&byte|)
+		function LoadPNG (|&byte| data, |int| len, |&int| x, |&int| y, |&int| comp, |?&byte|)
 			cpp_wrapper JB_Img__LoadPNG
 
 		function ConvertPNGToVOI (|string| p, |string|)
@@ -390,7 +390,7 @@ class Image (memory)
 			|| x	= 0
 			|| y	= 0
 			|| comp	= 0
-			|| img = .loadpng( p.addr, p.length, &x, &y, &comp, 4 )
+			|| img = .loadpng( p.addr, p.length, &x, &y, &comp )
 				|| n = 0
 				|| qoi = .writeqoi(img, x, y, n)
 					rz = string.Own(qoi, n).compress(mzlab.Fast)
