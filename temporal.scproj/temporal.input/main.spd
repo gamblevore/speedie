@@ -4,4 +4,4 @@
 // we should also "ask a question" for the hexagram and use that as input!
 target !imported
 	main
-		printline iChing.Divination.ShortDescription
+		printline iChing().Describe
