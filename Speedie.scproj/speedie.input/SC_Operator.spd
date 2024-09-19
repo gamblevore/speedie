@@ -171,8 +171,8 @@ module {
 		.AddMath( "mod",	"mod",		&asmstate.Mod,		/*.Mod*/	opmode.NeedsCppFuncOnFloats)
 		.AddMath( "+",		"Plus",		&asmstate.Plus,		/*.Add*/	opmode.Addition)
 		.AddMath( "-",		"Minus",	&asmstate.Subtract,	/*.sub*/	opmode.subtraction)
-		.AddMath( "*",		"Mul",		&asmstate.Mul,		/*.mul*/)
-		.AddMath( "/",		"Divide",	&asmstate.Div,		/*.div*/)
+		.AddMath( "*",		"Mul",		&asmstate.Multiply,	/*.mul*/)
+		.AddMath( "/",		"Divide",	&asmstate.Divide,	/*.div*/)
 
 		.AddBit( ">>",	"ShiftRight",	&asmstate.SHR,		/*.shru*/	opmode.shift)
 		LeftShift = .addbit( "<<",	"ShiftLeft",	&asmstate.SHL,		/*.shl*/	opmode.shiftonly) // can add bits
@@ -183,9 +183,9 @@ module {
 		Subtract = dict["-"]
 
 		|| BitOr = dict[ "(|)" ]
-		dict["|"]         = bitor // for: a |= b
-		dict["|||"]       = bitor
-		dict["operatorsub"]       = dict["operatorminus"]
+		dict["|"] = bitor // for: a |= b
+		dict["|||"] = bitor
+		dict["operatorsub"]= dict["operatorminus"]
 		
 		// these two arent bits???
 		.AddBit( "is",		"is", nil, 0 )					// if obj is flag

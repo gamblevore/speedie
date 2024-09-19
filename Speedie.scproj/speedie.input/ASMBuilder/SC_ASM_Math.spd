@@ -242,7 +242,7 @@ extend ASMState
 		
 
 	function FloatPlus   (fn_opasm)
-		if dest is constany
+		if dest is ConstAny
 			return .makeconst2(dest, l, r, exp, &fatasm.ConstifyFloatPlus)
 
 		|| IsF32 = dest.FourBytes
@@ -300,11 +300,11 @@ extend ASMState
 
 	function IntMul (fn_opasm)
 		if dest is ConstAny
-			.makeconst2(dest, l, r, exp, &fatasm.ConstifyIntMul)
+			.MakeConst2(dest, l, r, exp, &fatasm.ConstifyIntMul)
 		rz = .QuickIntMul(dest, R, L, exp)
 		if rz == nil
 			rz = .QuickIntMul(dest, L, R, exp)
-			if rz==nil
+			if rz == nil
 				rz = exp.MULT(dest, L, R, asmreg()) * Dest
 
 
@@ -318,7 +318,7 @@ extend ASMState
 				rz = exp.FMUL(dest, L, R, asmreg(), l.IsBig|int|) * Dest
 
 
-	function Mul    (fn_opasm)
+	function Multiply (fn_opasm)
 		if l isa DataTypeCode.bool
 			return .BoolMul(dest, l, r, exp)
 		if r isa DataTypeCode.bool
@@ -331,7 +331,7 @@ extend ASMState
 		return .floatmul(Dest, l, r, exp)
 	
 
-	function Div    (fn_opasm)
+	function Divide (fn_opasm)
 		if dest.isint
 			return .DivInt(dest, l, r, exp)
 		return .FloatDiv(dest, l, r, exp)
@@ -355,7 +355,7 @@ extend ASMState
 			if !l.Signed
 				return exp.BFLG(dest, l, 0, ptoi-1, 0)*Dest		// u / 2 --> u >> 1
 			  else
-				return exp.DIVK(dest, l, ptoi-1, ptoi-1)*Dest	// nice
+				return exp.DIV2(dest, l, ptoi-1, ptoi-1)*Dest	// nice
 	
 	
 	function DivInt    (fn_opasm)
@@ -392,7 +392,7 @@ extend ASMState
 				  else
 					C = l.const|uint64|  mod  r.const|uint64|
 			fat.Const = C
-		return fat*Dest
+		return fat * Dest
 	
 	
 	function Mod    (fn_opasm)
@@ -434,7 +434,7 @@ extend ASMState
 		|| fat = exp.BAND(dest, L, R, 0)
 		if dest is ConstAny
 			fat.const = l.const & r.const
-		return fat*Dest
+		return fat * Dest
 
 
 	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| l, |int| up, |int| down, |asmreg|)

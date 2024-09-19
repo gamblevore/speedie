@@ -11,7 +11,7 @@ dispatch fn_asm_table (fn_asm)
 	@sheb: ASMType.Ignore
 	@list: // vectors
 		debugger
-	@func: ASMType.DoFunc
+	@func: ASMType.DoFunction
 	@dot:  ASMType.Dot
 	@acc:  ASMType.Access
 	@brel: ASMType.Brel		// ++, --, -, &
@@ -525,9 +525,6 @@ function ASMReg.ReadOrWrite (|message| m, |asmreg| ptr, |int| index, |bool| DoRe
 //		r3		r	// VarAdd
 //		L		7	// Const A
 //		move	2
-
-//	rz = rz.BitCorrect
-	
 
 
 function ASMReg.Read  (|message| m,  |asmreg| ptr,  |int| index=0,  |&fatasm|)

@@ -133,13 +133,13 @@ struct ASMState
 		return t
 
 
-	function RegMap (|int|)
-		|| dcls = (.VDecls+1)~bits
-		if .vtmps >= 32
-			return dcls
-		|| tmps = .vtmps~bits
-		tmps = ~tmps
-		return dcls ||| tmps
+//	function RegMap (|int|)
+//		|| dcls = (.VDecls+1)~bits
+//		if .vtmps >= 32
+//			return dcls
+//		|| tmps = .vtmps~bits
+//		tmps = ~tmps
+//		return dcls ||| tmps
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -192,40 +192,62 @@ struct ASMState
 
 	
 function SCFunction.HasCVersion (|bool|)
- // what about SPD lib-funcs, they should have both? but won't be a wrapper?
- // what about cpp_nothing / cpp_inbuilt / cpp_libwrapper ?
-	
 	if .isstdlib
 		return true
 	
 	require self is wrapper
 
-	if .IsCppInBuilt == 1
+	if .IsCppInBuilt == 1	// cpp_inbuilt. These normally have no address? but perhaps we made a wrapper for it in the exec? we should check if it still exists.
 		debugat
 		return true
-		// cpp_inbuilt		  // inline functions and compiler builtins. These normally have no address? but perhaps we made a wrapper for it in the exec? we should check if it still exists.
-	if .IsCppInBuilt == 2 // cpp_spd might sound better than cpp_nothing
+
+	if .IsCppInBuilt == 2	// cpp_nothing: cpp_spd might sound better?
 		debugat
 		return false // need to be replaced with ASM intrinsics.
+
 	if self Is ExternalLib	// cpp_libwrapper ?   // Speedie_Main in perry, counts as one!
 		debugat
 		return false  // i think only perry used this and only in debug mode within Xcode
+
 	return true
 
 
-function asmstate.ASMPrmCollect (|message| prms, |scfunction| fn,   |uint64|)
+function asmstate.ASMPrmCollectNative (|message| prms, |SCFunction| fn, |uint64|)
 	opt norefcounts
-	|| p = prms.first
 	|| sh = 12
-	for fnarg in fn.args
-		if p
-			|| v = .FuncPrm(p, FnArg).reg
-			rz  |=  v << sh
-			sh += 5
+	for Float in 2
+		|| p = prms.first
+		for FnArg in fn.args
+			if FnArg.ASMUseSpecialRegs|int| == Float
+				|| v = .FuncPrm(p!, FnArg).reg
+				sh += 5
+				rz  |=  v << sh
+				rz += 1<<(Float<<2)				// Send-count (4 + 4 bits)
 			p++
+										// 32 - (5*4 + 4 + 4) = 4 . Still 4 bits left
+
+function asmstate.ASMPrmCollect (|message| prms, |scfunction| fn, |bool| native,  |uint64|)
+	opt norefcounts
+	if native
+		return .ASMPrmCollectNative(prms, fn)
+	
+	|| sh = 7
+	|| p = prms.first
+	for FnArg in fn.args
+		|| v = .FuncPrm(p!, FnArg).reg
+		sh += 5
+		rz  |=  v << sh
+		rz++								// Send-count (4 bits max)
+		p++
+											// 32 - (5*5 + 4) = 3 . Still 3 bits left	
+
+function asmreg.CallFunc (|int| v, |int|)
+	if (.reg == v)
+		v -= self is Set //NOICE
+	return v
 
 
-function @ASMType.DoFunc (fn_Asm)
+function @ASMType.DoFunction (fn_Asm)
 	opt norefcounts
 	|| prms = exp.last!
 	|| fn = prms.asfunc #require
@@ -235,56 +257,25 @@ function @ASMType.DoFunc (fn_Asm)
 	// almost all lib functions have 4 or less. 5 is for proj funcs.
 
 	dest.µtype = fn.RegType
-	dest.reg = .VDecls
+	dest.reg = dest.CallFunc(.VDecls)
 
-	|| sh = 12
 	|| TmpCloser = .VTmps
-
-	// How can we do this? We use 4 values, at 20 bits.
-	// we need a send-count (3 bits)
-
-	// We put the save into FUNK's first instruction.
-	// Those 5 save-bits are shared for the dest.
-	// Requires extra copy instruction sometimes.
-	// The setrel function handles this already.
-
-	// what about tmps? They do get "accumulated" nicely.
-	// this is essentially a TMP. But in the wrong place?
-	// in theory it could get overwritten, by another tmp?
-	// I mean its not taken into account properly
-	// I think we'll leave it for now... see if it creates an issue
-	// otherwise we need to redesign
-	
-	
-	|| ASMP = .ASMPrmCollect(prms, fn)
-	
-	|| n = fn.args.Length
-	asmp += n - 1 max 0 // send-count (3 bits)
+	|| IsC = fn.HasCVersion
+	|| P = .ASMPrmCollect(prms, fn, IsC)
 	.CloseVTmps(TmpCloser)
 	
-	|| fat = exp.FUNK(dest,  fn.TableId,  ASMP,  ASMP>>32)       // exp.func2,   exp.func3
-	fat.op += n>>2
+	|| P3 = P >> 32
+	|| fat = exp.FUNK(dest,  fn.TableId,  P,  P3)
+	if isc
+		fat.op = ASM.FFNC
+	fat.op += P3>0
 //	Dest.reg = SaveAmount.asm // we don't wanna use this... makes the VM more complex.
-//  Quite often I'm doing:  || x = msg.function(),  (which uses the correct position.)
-
+//  Mostly I'm doing:  || x = msg.function(),  (which uses the correct position.)
+	
 	if !fn.ReturnType
 		dest.reg = 0
 
 	return fat * dest
-
-
-/*
-	Cpp/SPD : 1
-	SendAmount : 1
-	How to do this? theres a few approaches...
-	
-	* FuncX/Func vs func Prm1 stores a bit.
-		* FuncX seems faster. Also saves a bit?
-			* maybe easier to debug.
-		* having only 1 func seems cleaner... for the future.
-	
-	* just count the numbers...
-*/
 
 
 

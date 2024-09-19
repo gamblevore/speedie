@@ -125,7 +125,6 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 	if dcl.PointerCount
 		func.altersparams |= 1<<func.args.length
 
-	func.SetTypeInfo(dcl)
 	func.args <~ dcl
 	check (func.args <= 8) (self, "Too many parameters defined. (8 max)")
 		
@@ -135,6 +134,7 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 		(dcl is return)		// This is for struct returns, right? which are always params.
 	(dcl isnt Altered)		// SCDecl defaults as being altered... not sure why.
 	(dcl isnt NumberConst)
+	func.AddTypeInfo(dcl)
 	return true
 
 
@@ -292,7 +292,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 		check !dcl.IsCArray (self, "Can't return c-arrays")
 		FuncPrmz.ReturnType = dcl // we need the copy
 		if !dcl.isbarestruct or funcprmz is constructor
-			funcprmz.SetTypeInfo(dcl)
+			funcprmz.AddTypeInfo(dcl)
 			return nil
 
 

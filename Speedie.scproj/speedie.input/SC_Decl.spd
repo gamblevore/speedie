@@ -175,7 +175,15 @@ class SCDecl (SCNamed) {
 
 	function IsRegister (|bool|)
 		return (self is local) and !(.IsBareStruct or .IsCArray)
-
+	
+	function ASMUseSpecialRegs (|bool|)
+		return !.ASMUseIntRegs
+	function ASMUseIntRegs (|bool|)
+		if !.isverynormal // pointers, bascially, are ints
+			return true
+		if .isint and .typeinfo.count <= 1
+			return true
+		
 
 	function CopyDeclsStructFixer (|message| src, |declmode| mode, |SCDecl|)
 		if mode is funcparam
