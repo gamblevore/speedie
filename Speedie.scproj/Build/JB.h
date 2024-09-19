@@ -177,7 +177,7 @@ typedef ASM ASM_Convert;
 
 typedef ASM ASM_Div;
 
-typedef ASM ASM_DivK;
+typedef ASM ASM_Div2;
 
 typedef ASM ASM_Float;
 
@@ -1386,15 +1386,16 @@ JBClass ( SCFunction , SCBetterNode ,
 	u16 TmpCounter;
 	u16 AltersParams;
 	u16 TableId;
-	byte OptCounts;
+	byte IntPrmCount;
 	byte MinOpt;
 	byte IsAssigns;
 	byte IsCppInBuilt;
 	ErrorSeverity BlindCasts;
 	byte IsNilChecker;
 	NilState NilSelf;
-	byte StructReturnPos;
 	byte Badness;
+	byte OptCounts;
+	byte StructReturnPos;
 );
 
 struct SCModule_Behaviour: SCBetterNode_Behaviour {
@@ -1924,7 +1925,7 @@ extern Random JB__zalgo_R;
 #define kSC__ASM_CNTC ((ASM_CNTC)91)
 #define kSC__ASM_CNTD ((ASM_CNTC)92)
 #define kSC__ASM_CONV ((ASM_Convert)39)
-#define kSC__ASM_DIVK ((ASM_DivK)47)
+#define kSC__ASM_DIV2 ((ASM_Div2)47)
 #define kSC__ASM_DIVV ((ASM_Div)46)
 extern ASM_Encoder2 SC__ASM_Encoders[256];
 #define kSC__ASM_EROR ((ASM_U1)0)
@@ -2180,11 +2181,6 @@ extern Array* JB__ErrorSeverity__names;
 #define kSC__FunctionType_ExpectsRealVars ((FunctionType)8192)
 #define kSC__FunctionType_ExternalLib ((FunctionType)131072)
 #define kSC__FunctionType_FlowDisabled ((FunctionType)65536)
-#define kSC__FunctionType_HasFloat ((FunctionType)134217728)
-#define kSC__FunctionType_HasInt ((FunctionType)268435456)
-#define kSC__FunctionType_HasVector ((FunctionType)1610612736)
-#define kSC__FunctionType_HasVFloat ((FunctionType)536870912)
-#define kSC__FunctionType_HasVInt ((FunctionType)1073741824)
 #define kSC__FunctionType_HidesProperties ((FunctionType)33554432)
 #define kSC__FunctionType_InitFunc ((FunctionType)128)
 #define kSC__FunctionType_Inline ((FunctionType)524288)
@@ -2197,6 +2193,7 @@ extern Array* JB__ErrorSeverity__names;
 #define kSC__FunctionType_Recursive ((FunctionType)256)
 #define kSC__FunctionType_Reffer ((FunctionType)8)
 #define kSC__FunctionType_Render ((FunctionType)32768)
+#define kSC__FunctionType_ReturnASMFloats ((FunctionType)134217728)
 #define kSC__FunctionType_TypeTest ((FunctionType)64)
 #define kSC__FunctionType_VirtualCaller ((FunctionType)1024)
 #define kSC__FunctionType_Wrapper ((FunctionType)262144)
@@ -4449,15 +4446,15 @@ ASM SC_ASM_Convert_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_Convert_ModeSet(ASM Self, uint Value);
 
+ASM SC_ASM_Div2_AddSet(ASM Self, uint Value);
+
+ASM SC_ASM_Div2_LSet(ASM Self, uint Value);
+
+ASM SC_ASM_Div2_ShSet(ASM Self, uint Value);
+
 ASM SC_ASM_Div_KindSet(ASM Self, uint Value);
 
 ASM SC_ASM_Div_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_DivK_AddSet(ASM Self, uint Value);
-
-ASM SC_ASM_DivK_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_DivK_ShSet(ASM Self, uint Value);
 
 ASM SC_ASM_Float_DSet(ASM Self, uint Value);
 
@@ -4465,15 +4462,11 @@ ASM SC_ASM_Float_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_FloatConst_HighSet(ASM Self, uint Value);
 
-ASM SC_ASM_ForeignFunc_CountSet(ASM Self, uint Value);
-
-ASM SC_ASM_ForeignFunc_Count2Set(ASM Self, uint Value);
-
 ASM SC_ASM_ForeignFunc_Prm1Set(ASM Self, uint Value);
 
-ASM SC_ASM_ForeignFunc_r1Set(ASM Self, uint Value);
-
 ASM SC_ASM_ForeignFunc_TableSet(ASM Self, uint Value);
+
+ASM SC_ASM_ForeignFunc_V0Set(ASM Self, uint Value);
 
 ASM SC_ASM_Func_JUMPSet(ASM Self, uint Value);
 
@@ -4566,6 +4559,8 @@ int SC_Reg_BitCount(ASMReg Self);
 
 ASMReg SC_Reg_BoolAnswer(ASMReg Self);
 
+int SC_Reg_CallFunc(ASMReg Self, int V);
+
 bool SC_Reg_CanAddK(ASMReg Self, int64 T);
 
 int64 SC_Reg_Const(ASMReg Self);
@@ -4651,7 +4646,7 @@ ASMReg SC_ASMType__Debugger(ASMState* Self, Message* Exp, ASMReg Dest, int Mode)
 
 ASMReg SC_ASMType__Decl(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
-ASMReg SC_ASMType__DoFunc(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
+ASMReg SC_ASMType__DoFunction(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
 ASMReg SC_ASMType__DoGlobal(ASMState* Self, Message* Exp, ASMReg Dest, SCDecl* D);
 
@@ -5136,8 +5131,8 @@ ASM* JB_ASM_Div__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
-// ASM_DivK
-ASM* JB_ASM_DivK__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+// ASM_Div2
+ASM* JB_ASM_Div2__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
@@ -5932,7 +5927,9 @@ void SC_Pac_AddLabel(ASMState* Self, Message* Ch);
 
 bool SC_Pac_Alloc(ASMState* Self, MWrap* J);
 
-uint64 SC_Pac_ASMPrmCollect(ASMState* Self, Message* Prms, SCFunction* Fn);
+uint64 SC_Pac_ASMPrmCollect(ASMState* Self, Message* Prms, SCFunction* Fn, bool Native);
+
+uint64 SC_Pac_ASMPrmCollectNative(ASMState* Self, Message* Prms, SCFunction* Fn);
 
 ASMReg SC_Pac_Assign(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
@@ -5968,7 +5965,7 @@ ASMReg SC_Pac_DeclareMe(ASMState* Self, Message* Where, SCDecl* Type);
 
 void SC_Pac_Destructor(ASMState* Self);
 
-ASMReg SC_Pac_Div(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
+ASMReg SC_Pac_Divide(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
 ASMReg SC_Pac_DivInt(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
@@ -6034,7 +6031,7 @@ ASMReg SC_Pac_More(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp
 
 ASMReg SC_Pac_MoreEq(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
-ASMReg SC_Pac_Mul(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
+ASMReg SC_Pac_Multiply(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
 ASMReg SC_Pac_NotEq(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
@@ -8060,9 +8057,9 @@ void JB_Msg_Destructor(Message* Self);
 
 Dictionary* JB_Msg_Dict(Message* Self, bool DoLower, bool DoCount);
 
-void SC_Msg_DivByZero(Message* Self);
+FatASM* JB_Msg_DIV2(Message* Self, ASMReg R1, ASMReg R2, int Sh, int Add);
 
-FatASM* JB_Msg_DIVK(Message* Self, ASMReg R1, ASMReg R2, int Sh, int Add);
+void SC_Msg_DivByZero(Message* Self);
 
 FatASM* JB_Msg_DIVV(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int Kind);
 
@@ -8120,9 +8117,9 @@ SCDecl* SC_Msg_FastDecl(Message* Self);
 
 FatASM* JB_Msg_FDIV(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
 
-FatASM* JB_Msg_FFNC(Message* Self, int R1, int Count, int Count2, int Table, int Prm1, int Prm2);
+FatASM* JB_Msg_FFNC(Message* Self, ASMReg R1, int V0, int Table, int Prm1, int Prm2);
 
-FatASM* JB_Msg_FFNC3(Message* Self, int R1, int Count, int Count2, int Table, int Prm1, int Prm2);
+FatASM* JB_Msg_FFNC3(Message* Self, ASMReg R1, int V0, int Table, int Prm1, int Prm2);
 
 FatASM* JB_Msg_FFRC(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
 
@@ -8877,6 +8874,10 @@ bool SC_Decl_AlreadyContains(SCDecl* Self);
 uint64 SC_Decl_AsConst(SCDecl* Self, Message* Value, DataTypeCode* Ty);
 
 SCDecl* SC_Decl_AsLocal(SCDecl* Self);
+
+bool SC_Decl_ASMUseIntRegs(SCDecl* Self);
+
+bool SC_Decl_ASMUseSpecialRegs(SCDecl* Self);
 
 bool SC_Decl_AssignabilityCheck(SCDecl* Self, Message* Ln, Message* RN, SCDecl* Rc, bool WasHex);
 
@@ -9850,6 +9851,8 @@ void SC_Func_AddSelfPrm(SCFunction* Self, SCClass* Cls);
 
 void SC_Func_AddSelfToFunc(SCFunction* Self, SCClass* Cls, SCNode* Space);
 
+void SC_Func_AddTypeInfo(SCFunction* Self, SCDecl* Dcl);
+
 void SC_Func_AnalyseRefs(SCFunction* Self, Array* List);
 
 int SC_Func_ApparantArgCount(SCFunction* Self);
@@ -9960,6 +9963,8 @@ bool SC_Func_FoundOneCpp(SCFunction* Self, JB_String* N);
 
 void SC_Func_FuncDecls(SCFunction* Self);
 
+bool SC_Func_HasCVersion(SCFunction* Self);
+
 bool SC_Func_HiderMatch(SCFunction* Self, bool IsAssigns);
 
 void SC_Func_Init_Sub(SCFunction* Self, Message* Node, SCNode* Name_space);
@@ -10039,8 +10044,6 @@ bool SC_Func_ReturnsObject(SCFunction* Self);
 SCDecl* SC_Func_Self(SCFunction* Self);
 
 void SC_Func_SetBlindCasts(SCFunction* Self, SCNode* Name_space);
-
-void SC_Func_SetTypeInfo(SCFunction* Self, SCDecl* Dcl);
 
 Message* SC_Func_SourceArg(SCFunction* Self);
 
