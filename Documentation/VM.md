@@ -15,19 +15,49 @@ So that is the main reason that a VM is necessary, to make debugging possible, e
 * Make debugging possible, easy and fun.
 * Some "[temporal](#user-content-temporal)" magic and mystery. (optional)
 
-Some nice things to know:
 
-* RefCounting could take 1 instruction per 2-objects... but in ARM the same refcounts could take 32-instructions. So it should be a lot faster and smaller.
-* Function-calls are way better expressed. Tighter & smaller.
-* Many useful instructions for doing low-level maths. The compiler will automatically insert them, obviously, you don't need to know them. The point is, maths should express itself tightly.
-* Tight loops too. We have two instructions specifically for expressing loops tightly.
-* Has SIMD instructions... useful for 3D graphics, audio, etc.
-* All builds are fully optimised, even debug-builds. The only difference is that release-builds will remove debug-only code from your code-base.
+### Small and fast
+Speedie ASM should be 2x/3x smaller than ARM, on average. <small>(This is just a wild guess, as its not finished yet! But this is my hope!)</small>
+
+*If I say (2 v 13), that means Speedie takes 2 instructions to do something, and ARM would take 13 to do the same.*
+
+* RefCounting instructions (1 vs 16-32).
+* Function-calls are expressed cleanly. Tighter, smaller, faster. Far superior design. (2 vs 2-20, typically 2 vs 10)
+* Many low-level math instructions, the compiler will automatically insert them. These include:
+    * Div2 (fast divide by power of 2, on signed ints)  (1 vs 2)
+    * Integer Min / Max  (1 vs 3)
+    * Multiply or add by a immediate constant, on both ints and floats (1 vs 2)
+    * Increment/decrement  objects and globals (1 vs 3)
+* 64-bit direct constants (and 48-bit and 16-bit versions) without needing to load from a separate location.
+* Branching (1 vs 2)
+* Loop specific instructions do in (1 vs 3-4).
+
+**Only needs approx-100 instructions (once finished). I have 77 so far but SIMD is missing. ARM needs over 1000!**
+
+
+### Other nice things to know abou:
+
+• Within 1.5 years of community acceptance, an ARM-JIT will be created. This will run speedie apps on ARM-CPUs at full native speed.
+
+• The ASM works on any platform. It will be a great way to learn ASM! Even better, is that once the JIT is made, your hand-written Speedie-ASM runs at full-native speed.
+
+• The VM has SIMD instructions... useful for 3D graphics, audio, etc.
+
+• All builds are fully optimised, even debug-builds. The only difference is that release-builds will remove debug-only code from your code-base. This is code that YOU marked as debug. For example:
+
+
+    function Example (|string| name)
+        target debug
+            expect (name != "") ("Empty name passed")
+            // programmer expects this never to happen in release due to other checks earlier
+        
+        printline name
+
+This makes debugging your apps much simpler, as you are less likely to get a difference between your "release" and "Debug" version. Usually, they can just be the same program!
 
 
 ### Future Possibilities
 
-Hopefully within 1.5 years of release, an ARM-JIT will be created for Speedie. This will mean that even your speedie-VM based code, should run at full speed using native instructions. (At least on ARM CPUs.)
 
 
 ### Temporal
