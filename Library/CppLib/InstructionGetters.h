@@ -41,35 +41,23 @@
 #define   Func_JUMPu_(x)   (((uint)((x)<<13))>>13)
 
 
-#define   ForeignFunc_r1i       ((( int)((Op)<<8))>>25)
-#define   ForeignFunc_r1i_(x)   ((( int)((x)<<8))>>25)
+#define   ForeignFunc_V0i       ((( int)((Op)<<13))>>31)
+#define   ForeignFunc_V0i_(x)   ((( int)((x)<<13))>>31)
 
-#define   ForeignFunc_r1u       (((uint)((Op)<<8))>>25)
-#define   ForeignFunc_r1u_(x)   (((uint)((x)<<8))>>25)
+#define   ForeignFunc_V0u       (((uint)((Op)<<13))>>31)
+#define   ForeignFunc_V0u_(x)   (((uint)((x)<<13))>>31)
 
-#define   ForeignFunc_Counti       ((( int)((Op)<<15))>>31)
-#define   ForeignFunc_Counti_(x)   ((( int)((x)<<15))>>31)
+#define   ForeignFunc_Tablei       ((( int)((Op)<<14))>>18)
+#define   ForeignFunc_Tablei_(x)   ((( int)((x)<<14))>>18)
 
-#define   ForeignFunc_Countu       (((uint)((Op)<<15))>>31)
-#define   ForeignFunc_Countu_(x)   (((uint)((x)<<15))>>31)
+#define   ForeignFunc_Tableu       (((uint)((Op)<<14))>>18)
+#define   ForeignFunc_Tableu_(x)   (((uint)((x)<<14))>>18)
 
-#define   ForeignFunc_Count2i       ((( int)((Op)<<16))>>31)
-#define   ForeignFunc_Count2i_(x)   ((( int)((x)<<16))>>31)
+#define   ForeignFunc_Prm1i       ((( int)((Op)<<28))>>28)
+#define   ForeignFunc_Prm1i_(x)   ((( int)((x)<<28))>>28)
 
-#define   ForeignFunc_Count2u       (((uint)((Op)<<16))>>31)
-#define   ForeignFunc_Count2u_(x)   (((uint)((x)<<16))>>31)
-
-#define   ForeignFunc_Tablei       ((( int)((Op)<<17))>>18)
-#define   ForeignFunc_Tablei_(x)   ((( int)((x)<<17))>>18)
-
-#define   ForeignFunc_Tableu       (((uint)((Op)<<17))>>18)
-#define   ForeignFunc_Tableu_(x)   (((uint)((x)<<17))>>18)
-
-#define   ForeignFunc_Prm1i       ((( int)((Op)<<31))>>31)
-#define   ForeignFunc_Prm1i_(x)   ((( int)((x)<<31))>>31)
-
-#define   ForeignFunc_Prm1u       (((uint)((Op)<<31))>>31)
-#define   ForeignFunc_Prm1u_(x)   (((uint)((x)<<31))>>31)
+#define   ForeignFunc_Prm1u       (((uint)((Op)<<28))>>28)
+#define   ForeignFunc_Prm1u_(x)   (((uint)((x)<<28))>>28)
 
 
 #define   Tail_JUMPi       ((( int)((Op)<<8))>>8)
@@ -429,23 +417,23 @@
 #define   AddK_Ku_(x)   (((uint)((x)<<18))>>18)
 
 
-#define   DivK_Shi       ((( int)((Op)<<18))>>26)
-#define   DivK_Shi_(x)   ((( int)((x)<<18))>>26)
+#define   Div2_Shi       ((( int)((Op)<<18))>>26)
+#define   Div2_Shi_(x)   ((( int)((x)<<18))>>26)
 
-#define   DivK_Shu       (((uint)((Op)<<18))>>26)
-#define   DivK_Shu_(x)   (((uint)((x)<<18))>>26)
+#define   Div2_Shu       (((uint)((Op)<<18))>>26)
+#define   Div2_Shu_(x)   (((uint)((x)<<18))>>26)
 
-#define   DivK_Addi       ((( int)((Op)<<24))>>26)
-#define   DivK_Addi_(x)   ((( int)((x)<<24))>>26)
+#define   Div2_Addi       ((( int)((Op)<<24))>>26)
+#define   Div2_Addi_(x)   ((( int)((x)<<24))>>26)
 
-#define   DivK_Addu       (((uint)((Op)<<24))>>26)
-#define   DivK_Addu_(x)   (((uint)((x)<<24))>>26)
+#define   Div2_Addu       (((uint)((Op)<<24))>>26)
+#define   Div2_Addu_(x)   (((uint)((x)<<24))>>26)
 
-#define   DivK_Li       ((( int)((Op)<<30))>>30)
-#define   DivK_Li_(x)   ((( int)((x)<<30))>>30)
+#define   Div2_Li       ((( int)((Op)<<30))>>30)
+#define   Div2_Li_(x)   ((( int)((x)<<30))>>30)
 
-#define   DivK_Lu       (((uint)((Op)<<30))>>30)
-#define   DivK_Lu_(x)   (((uint)((x)<<30))>>30)
+#define   Div2_Lu       (((uint)((Op)<<30))>>30)
+#define   Div2_Lu_(x)   (((uint)((x)<<30))>>30)
 
 
 #define   Shift_Shi       ((( int)((Op)<<23))>>26)

@@ -1,5 +1,8 @@
 
-#include "ffi.h"
+
+// need to allow vectorcall on windows. to allow vectors to be passed using the
+// SIMD registers.
+//#include "ffi.h"
 typedef void (*FFI_Fn)(void);
 
 
@@ -176,10 +179,10 @@ AlwaysInline void RegConv (VMRegister* r, int Conv, int Op) {
 }
 
 
-AlwaysInline bool Rare (VMRegister* r, ASM Op) {
+AlwaysInline bool Rare_ (VMRegister* r, ASM Op) {
 	auto r1 = i1;
 	auto r2 = i2;
-	if (!r1 and !r2) return true;	// HALT	
+	if (!r1 and !r2) {u1 = u3; return true;};	// HALT	
 	if (r2 == 1) {		// time
 		r[r1].Uint = RDTSC();
 	} else if (r2 == 2) {
@@ -339,7 +342,7 @@ void MemStuff(u32* A, u32* B, u32 Operation, u32 L) {
 }
 
 			
-AlwaysInline void CountConst (VMRegister* r, ASM Op, bool UseOld) {
+AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 	int Size = CNTC_sizeu;
 	int Off  = CNTC_offsetu;
 	int Add  = CNTC_cnsti;
@@ -378,7 +381,6 @@ AlwaysInline void CountConst (VMRegister* r, ASM Op, bool UseOld) {
 
 
 
-// BasicASMFunc
 AlwaysInline ASM* Return (VMRegister*& rp, ASM* Code, ASM Op) {
 	VMRegister* r		= rp;
 	if ((u2 == 0) != RET_Existsu)
@@ -391,8 +393,6 @@ AlwaysInline ASM* Return (VMRegister*& rp, ASM* Code, ASM Op) {
 	rp = To;
 
 	// could use RET_Li to return true?
-//	if (S.Incr)
-//		incr(Result.Obj);
 	int More = RET_Countu;
 	while (More -->= 0) {
 		To[++S.Reg] = Result;
@@ -441,10 +441,6 @@ AlwaysInline ASM* TailStack (VMRegister* r, ASM* Code, ASM Op) {
 }
 
 
-// The linker can do the conversions or deciding which functions to upgrade, not the ASM!
-// ideally the compiler should, right? I mean... with one compiler and one distribution
-// theres one answer.
-
 AlwaysInline VMRegister* SaveVMState (jb_vm& vm, VMRegister* r, ASM* CodePtr, int Save) { // jumpstack
 	VMRegister* ENTR = r+Save+1;
 	ENTR->Stack.Code = CodePtr;
@@ -459,7 +455,8 @@ AlwaysInline ASM* BumpStack (jb_vm& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, u
 	auto ENTR = SaveVMState(vm, r, CodePtr, n1)+1;
 	rp = ENTR;
 
-	switch ((1+Code&7)) {
+	switch ( Code&15 ) {
+	default:
 		Transfer3( 8);
 		Transfer3( 7);
 		Transfer3( 6);
@@ -487,7 +484,6 @@ AlwaysInline ASM* BumpStack (jb_vm& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, u
 Speedie's function histogram:  0:410,  1:1656,  2:1464,  3: 713,  4: 167,  5:  61,  6:  10,  7:   4
 */
 
-
 #define q1  r[(a<< 5)>>27].Uint
 #define q2  r[(a<<10)>>22].Uint
 #define q3  r[(a<<15)>>17].Uint
@@ -503,9 +499,96 @@ Speedie's function histogram:  0:410,  1:1656,  2:1464,  3: 713,  4: 167,  5:  6
 
 #define Code64 (*(u64*)Code)
 
-// http://www.ethernut.de/en/documents/arm-inline-asm.html
-// https://modexp.wordpress.com/2018/10/30/arm64-assembly/
-// x17 is the highest register I can freely alter
+
+ 
+ Fn0 VMDummyTable[] = {(Fn0)JB_Str_Length, (Fn0)JB_Str_Address, (Fn0)JB_Str_WhiteSpace, (Fn0)JB_Str_OperatorPlus, (Fn0)JB_Str_BOM, (Fn0)JB_Str_ChrUTF8, (Fn0)0}; 
+
+
+#define NextRegI(r,r2) 											\
+	"ubfiz  x"#r",		%[CODE],	"#r2",		5		\n" 	\
+	"ldr    x"#r",		[%[R],		x"#r", lsl 3]		\n" // needs to be 4 but can't do this directly????
+
+#define NextRegF(r,r2) 											\
+	"ubfiz  x"#r",		%[CODE],	"#r2",		5		\n" 	\
+	"ldr    d"#r",		[%[R],		x"#r", lsl 3]		\n" // needs to be 4 but can't do this directly???
+
+
+
+AlwaysInline void ForeignFunc (jb_vm& vv, ASM* CodePtr, VMRegister* r, ASM Op, u64 funcdata) {
+// Only OP needs saving...
+	auto T = ForeignFunc_Tableu;
+	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.Env.Cpp[T]);
+	u64 iresult; // need a simd... also
+	ivec4 vresult;
+	
+#if __CPU_TYPE__ == __CPU_ARM__
+	__asm__ volatile ( // we used to have ints first, but floats first makes more sense.
+	"and     x1, %[CODE], 15		\n\t"		// x1 = code&15
+	"add     x8, x1, x1, lsl 2		\n\t"		// x8 = x1*5
+	"lsr     x8, %[CODE], x8		\n\t"		// x8 = code>>x8 // x8 = code>>(x1*5)
+
+//	::[CODE] "r" (funcdata) // in case we wanna make this a lil more optimised.
+//	);
+//	__asm__ volatile (
+
+	"adr x0, 1f						\n\t"		
+	"add x0, x0, x1, lsl 1			\n\t"		// x0 += x1 << 1
+	"br  x0							\n\t"		// smart-jump
+	"1:\n\t"
+	// Float / SIMD
+	NextRegF(8, 52) // not perfect yet... we need to pass the entire SIMD, not just a double!
+	NextRegF(7, 47)
+	NextRegF(6, 42)
+	NextRegF(5, 37)
+	NextRegF(4, 32)
+	NextRegF(3, 27)
+	NextRegF(2, 22)
+	NextRegF(1, 17)
+	NextRegF(0, 12)
+
+	"ubfiz   x1, %[CODE], 4, 4		\n\t"		// x1 = (code>>4)&15 // still needs << 1
+	"adr x0, 2f						\n\t"		// ADR + ADD can merge? SHOULD allow pc instead of x0 
+	"add x0, x0, x1					\n\t"		// but doesnt... (make the first part non-volatile)?
+	"br  x0							\n\t"		// smart-jump
+	"2:\n\t"
+	// ints
+	NextRegI(8, 52)
+	NextRegI(7, 47)
+	NextRegI(6, 42)
+	NextRegI(5, 37)
+	NextRegI(4, 32)
+	NextRegI(3, 27)
+	NextRegI(2, 22)
+	NextRegI(1, 17)
+	NextRegI(0, 12)
+
+	"stp     x29, x30, [sp, -16]!	\n\t"		// copy and alloc
+	"mov     x29, sp				\n\t"		// update some shit
+        
+	"blr     %[FN]					\n\t"		// call some shit
+    "ldp     x29, x30, [sp], 16		\n\t"		// restore some shit
+	""
+	 : [x0] "=&r" (iresult),   [q0] "=&w" (vresult)
+	 : /*  input  */  [R] "r" (r),  [CODE] "r" (funcdata),  [FN] "r" (fn),  [OP] "r" (Op) 
+	 : /* clobber */  "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17" );
+	 
+	r+=n1;
+	if (Op&32)
+		r->Int = iresult;
+	  else
+		r->Ivec = vresult;
+	// i think that's it.
+		
+#else
+	#warning "unimplemented VM"
+#endif
+}
+
+
+
+// http://ethernut.de/en/documents/arm-inline-asm.html
+// http://modexp.wordpress.com/2018/10/30/arm64-assembly/
+// http://wolchok.org/posts/how-to-read-arm64-assembly-language/
 
 /*
 	OK, what about saving the register state?
@@ -515,53 +598,21 @@ Speedie's function histogram:  0:410,  1:1656,  2:1464,  3: 713,  4: 167,  5:  6
 	The send-count is typed.
 	
 	The save-count has no type.
-	
 */
-
-
-
-#define NextRegI(r,r2) 										\
-	"ubfiz  x8,			%[code],	"#r2",		5	\n" 	\
-	"ldr    x"#r",		[%[r],		x8, lsl 3]		\n"
-
-
-AlwaysInline ASM* ForeignFunc (jb_vm& vv, ASM* CodePtr, VMRegister* r, ASM Op, u64 Code) {
-	auto T = ForeignFunc_Tableu;
-	auto Fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.Env.Cpp[T]);
-	int n = n1;
-	SaveVMState(vv, r, CodePtr, n); // maybe unnecessary? only alloc needs saving?
-
-#if __CPU_TYPE__ == __CPU_ARM__
-	__asm__(
-	NextRegI(7, 47)
-	NextRegI(6, 42)
-	NextRegI(5, 37)
-	NextRegI(4, 32)
-	NextRegI(3, 27)
-	NextRegI(2, 22)
-	NextRegI(1, 17)
-	NextRegI(0, 12)
-	 : /*output */ // x0 will be the output
-	 : /*input  */  [r] "r" (r), [code] "r" (Code)  
-	 : /*clobber*/  "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8" );
-#else
-	#warning "unimplemented VM"
-#endif
-
-
 /*
-	The only issue now is that "where do we put the return reg". We can just drop down to 7 regs.
-	So... before doing this, we need to save the code and register in the vm, right?
+
+Observations so far:
+ 	* Use godbolt.org... its simpler than understanding the documentation. (The docs seem wrong too)
+	* ARM x17 is the highest register I can freely alter
+ 	* Both ARM and x86 only have two register files! Despite what the docs say.
+		* Both do it the same way. General/int in one place, and SIMD+FP in another.
+		* x87/MMX is unused on x86.
+	* x86 has 6 regs for passing ints, the other two have to be done on the stack
+	* the FP/SIMD are also just done in order
+		* we have enough regs on ARM&X86
+	* You can't specify registers in C++, except when they are observed by ASM.
 */
 
-
-//	vv = *vm;
-	n &= 31;
-	if (n)
-		r[n].Int = 0;
-
-	return CodePtr;
-}
 
 
 	// I think calling the VM should be a simple-task. So instead of calling a function-pointer...

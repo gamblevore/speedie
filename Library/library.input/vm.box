@@ -16,22 +16,9 @@ forms
 		Prm2	x
 
 	ForeignFunc
-
-/*
-	OK, so this is how we will do it.
-	The VM will store all it's info. Register state, code-position, etc. (maybe just those 2 are needed.)
-	We then just jump to the dest via ARM/x86 ASM. 
-	
-	A loop that uses a 64-bit value might do it.
-	
-	So... each register will be described with 8 bits. 5 for the reg, and 2 for the type. With 64-bits
-	we get 8 regs. Lets assume 1-8, so 64-bits. 0 reg funcs, we just pass an extra int, whatever. 
-*/
-
-		r1		7
-		Count	1
-		Count2	1
-		Table	14		// 16K         // functions in registers use the first 32 values...
+		r1		R
+		V0		1			// Result is FP/SIMD 
+		Table	14			// functions in registers use the first 32 values...
 		Prm1	x
 		Prm2	x
 	
@@ -46,7 +33,6 @@ forms
 	
 	Jump
 		JUMP	j
-		
 	
 	Cmp		// cmp:
 		r1		R
@@ -79,7 +65,7 @@ forms
 		Cmp		3
 		Jmp		j
 
-	BraBytes	// brabytes:
+	BraBytes	// BraBytes:
 		r1		r
 		Bytes	2
 		Jmp		j
@@ -151,7 +137,6 @@ forms
 		r2		r
 		Mode	4
 		
-		
 	RET
 		r1		r
 		r2		r
@@ -193,7 +178,7 @@ forms
 		r2		r
 		K		l
 	
-	DivK
+	Div2
 		r1		R
 		r2		r
 		Sh		6 // could be used to add other numbers...
@@ -227,7 +212,8 @@ forms
 
 #!						 (((((STOP)))))
 /**/ EROR (U1)
-		return u1+U1_Lu
+		u1 += U1_Lu
+		goto EXIT
 
 /**/ NOOP (U0):
 		i1 = i1
@@ -240,7 +226,7 @@ forms
 		if (Trap_Continueu)
 			JB_App__SelfSignal(Trap_Lu)
 		else
-			return u1
+			goto EXIT
 
 
 // needs ASM-text: rare, RSDE, RALO, RSET, MEMM
@@ -264,7 +250,7 @@ forms
 		Code = BumpStack(vm, r, Code+2, Op, Code64)
 		___
 
-/**/ FFNC (ForeignFunc, 2)
+/**/ FFNC (ForeignFunc, 2) // rename to nativefunc?
 		__
 		ForeignFunc(vm, Code, r, Op, *Code) 
 		___
@@ -294,7 +280,7 @@ forms
 		printf("%lli\n", i1)
 		#!better to print this also as float/double/signed/unsigned...
 /**/ RARE (U2)
-		if_rare (Rare(r, Op)) return n3
+		if_rare (Rare_(r, Op)) goto EXIT
 /**/ CONV (Convert)
 		RegConv(r, Convert_Modeu, Op)
 
@@ -322,11 +308,11 @@ forms
 		i1 = (i2 * i3) + i4
 /**/ DIVV (Div)
 		DivMath(r, Op)
-/**/ DIVK (DivK)
+/**/ DIV2 (Div2)
 	if (i2 < 0)
-		i1 = (i2+((1<<DivK_Addu)-1)) >> DivK_Shu	// quick divide by power of 2
+		i1 = (i2+((1<<Div2_Addu)-1)) >> Div2_Shu	// quick divide by power of 2
 	else
-		i1 = i2 >> DivK_Shu
+		i1 = i2 >> Div2_Shu
 /**/ MAX (MinMax)
 		if (MinMax_Signu)
 			i1 = std_max(i2, i3)
@@ -506,10 +492,10 @@ forms
 		mem2(ivec4)
 
 /**/ CNTC  (CNTC) // negation bound CNTC and CNTD. CNTD must always be following.
-		CountConst(r, Op, 1) // same with a few others actually
+		IncrementAddr(r, Op, 1) // same with a few others actually
 
 /**/ CNTD  (CNTC)
-		CountConst(r, Op, 0)
+		IncrementAddr(r, Op, 0)
 
 /**/ MEMU  (MemUtil)
 		#! copy/fill/endian/xor

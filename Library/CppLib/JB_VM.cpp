@@ -24,6 +24,8 @@ extern "C" {
 jb_vm* vm;
 #include "BitFields.h"
 #include "JB_VM.h"
+
+#pragma GCC optimize ("Os")
 #include "JB_VM_Helpers.i"
 
 
@@ -38,20 +40,22 @@ jb_vm* vm;
 //#define __      ; Op  = Op2;      ASMPrint(Op);
 //#define _         __   ___
 #define JumpLeaf(Addr)         LeafCode = Code;     Code = (Addr);
+#define RegVar(x,n) register auto x asm (#n)
 
-
-s64 RunVM (jb_vm& vm) {		// vm_run, vm__run, vmrun, run_vm
+s64 RunVM (jb_vm& pvm) {		// vm_run, vm__run, vmrun, run_vm
+//	add_Test(123123);
     const static Goto JumpTable[] = {
         #include "InstructionList.h"
     };
+	RegVar(&vm, r19) = pvm;
+    RegVar(Code,r20) = vm.Env.CodeBase;
+    RegVar(r,   r21) = vm.Registers;
+    RegVar(Op,  r22) = (ASM)-1;
 
-    ASM* Code = vm.Env.CodeBase;
-    auto r = vm.Registers;
-
-    ASM  Op=-1;
 	ı;
 	#include "Instructions.i"
 	ı 
+	EXIT:;
 
     return 0;
 }
@@ -71,19 +75,19 @@ ivec4* JB_ASM_Registers(jb_vm* V, bool Clear) {
 #endif
 
 jb_vm* JB_ASM_VM() {
-	int N = sizeof(ASM);
-	dbgexpect2 (N==4);
+	dbgexpect2 (sizeof(ASM)==4);
 	if (vm) return vm;
 	
-	int StackSize  = (10*8)*400; // 400 levels deep on average.
+	int StackSize  = 64*1024;			// Over 400 ~fns deep. 
 	vm             = (jb_vm*)calloc(StackSize, 1);
 	if (!vm)
 		return 0;
 	vm->GuardValue = 1234567890;
-	vm->EXIT[0] = VMExitReturn; // thats not the right code!
-	vm->EXIT[1] = 1; // halt
+	vm->EXIT[0] = VMExitReturn; 		// thats not the right code!
+	vm->EXIT[1] = 1;					// halt
 //	vm->Stack.ResultRegister = 1;		// Remove this? the calling instruction should specify the result.
 	vm->StackSize  = (StackSize - sizeof(jb_vm))/sizeof(VMRegister);
+	vm->Env.Cpp = VMDummyTable; // for now!
 	return vm;
 }
 

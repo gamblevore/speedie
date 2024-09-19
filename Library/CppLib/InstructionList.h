@@ -45,7 +45,7 @@
 &&SUB,
 &&MULT,
 &&DIVV,
-&&DIVK,
+&&DIV2,
 &&MAX,
 &&MIN,
 &&BSHS,

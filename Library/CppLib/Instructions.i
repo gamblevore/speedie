@@ -1,5 +1,6 @@
 ı EROR: _
-	return u1 + U1_Lu;
+	u1 += U1_Lu;
+	goto EXIT;
 ı FUNK: 
 	__;
 	Code = BumpStack(vm, r, Code + 1, Op, *Code);
@@ -31,7 +32,7 @@
 	JB_App__SelfSignal(Trap_Lu)
 ;
 	else 
-	return u1
+	goto EXIT
 ;
 ı RET: 
 	__;
@@ -47,7 +48,7 @@
 	// better to print this also as float/double/signed/unsigned...
 
 ı RARE: _
-	if_rare (Rare(r, Op)) return n3;
+	if_rare (Rare_(r, Op)) goto EXIT;
 ı CONV: _
 	RegConv(r, Convert_Modeu, Op);
 ı KNSR: _
@@ -65,12 +66,12 @@
 	i1 = (i2 * i3) + i4;
 ı DIVV: _
 	DivMath(r, Op);
-ı DIVK: _
+ı DIV2: _
 	if (i2 < 0) 
-	i1 = (i2 + ((1 << DivK_Addu) - 1)) >> DivK_Shu
+	i1 = (i2 + ((1 << Div2_Addu) - 1)) >> Div2_Shu
 ;
 	else 
-	i1 = i2 >> DivK_Shu
+	i1 = i2 >> Div2_Shu
 ;
 ı MAX: _
 	if (MinMax_Signu) 
@@ -223,9 +224,9 @@
 	mem(ivec4) = (ivec4)(((ivec4 *) r)[n1]);
 	mem2(ivec4);
 ı CNTC: _
-	CountConst(r, Op, 1);
+	IncrementAddr(r, Op, 1);
 ı CNTD: _
-	CountConst(r, Op, 0);
+	IncrementAddr(r, Op, 0);
 ı MEMU: _
 	//  copy/fill/endian/xor
 
