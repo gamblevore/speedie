@@ -38,12 +38,14 @@ struct Pico
 		cpp_wrapper PicoIsParent
 		
 	function CanGet (|bool|)
+		nil self
 		cpp_wrapper PicoCanGet
 		
-	helper StartFork (|bool| Exec=false, |PID_Int|)
+	helper SpawnFork (|bool| Exec=false, |PID_Int|)
+		nil self
 		cpp_wrapper PicoStartFork
 
-	function StartThread (|PicoThreadFn| fn, |&nil| Obj, |?&cstring| Args = nil, |bool|)
+	function SpawnThread (|PicoThreadFn| fn, |&nil| Obj, |?&cstring| Args = nil, |bool|)
 		cpp_wrapper PicoStartThread
 
 	function CompleteExec (|bool|)
@@ -59,12 +61,12 @@ struct Pico
 		rz = .send(picomessage.Fromfs(fs), wait)
 		fs.length = 0
 		
-	function Send (|?&int8| msg, |int| Length, |bool| Wait=false, |bool|)
+	helper _Send (|?&int8| msg, |int| Length, |bool| Wait=false, |bool|)
 		cpp_wrapper PicoSend
 
-	function Send (|picomessage| A, |bool| Wait=false, |bool|)
+	helper Send (|picomessage| A, |bool| Wait=false, |bool|)
 		cpp_Part SendMsg
-		return .send(A.data, a.length, wait)
+		return ._send(A.data, a.length, wait)
 		
 	function Tickle
 		|| msg = PicoMessage.from("")
@@ -80,9 +82,10 @@ struct Pico
 
 	function Get (|float| T, |string|)
 		nil checker
-		|picomessage| msg
-		.__get(msg, T)
-		return string.FromPico(msg)
+		if .canget
+			|picomessage| msg
+			.__get(msg, T)
+			return string.FromPico(msg)
 		
 	function Close (|cstring| Why)
 		cpp_wrapper PicoClose
@@ -137,19 +140,39 @@ struct Pico
 		function Create (|?&pico|)
 			cpp_wrapper PicoCreate
 
-		function New  (|stringzeroterminated| name="", |int| bits=16, |&pico|)
+		function Fork (|stringzeroterminated| name="", |int| Noise=0,   |&pico|)
+			|| p = .new(name, noise)
+				|| pid = p.spawnfork
+				if pid >= 0
+					return p
+				p.close(nil)
+		
+		function New  (|stringzeroterminated| name="", |int| Noise=0,   |&pico|)
 			|| p = pico.Create
 				|| c = p.config
 				c.name = name
-				c.bits = bits
+				c.bits = 16
+				c.Noise = noise
 				return p
 			|PicoGlobalStats| St
 			St.Read
 			error ("Couldn't create a pico object. Too many picos: " + St.OpenPicos)
 	
 
+module PicoNoise
+	constants
+		DebugChild	= 1
+		DebugParent	= 2
+		Debug		= 3
+		EventsChild	= 4
+		EventsParent= 8
+		Events		= 12
+		All			= 15
+
+
 struct PicoConfig
 	linkage: wrapper
+	constants
 	|cstring|					Name
 	|Date|						LastRead
 	|Date|						LastSend
