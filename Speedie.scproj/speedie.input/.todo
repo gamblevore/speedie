@@ -14,6 +14,7 @@ bugs:
 
 
 additions:
+	* rename "flags" to something else. I wanna use "flags" for somekinda default Info and Syntax is
 	* class descriptions!
 	* add \123 numeric type (mostly for jbin). use a float/int format, that is signed. 2 exponent bits per byte.
 		* first byte (if float) can also store the sign of the exponent.
