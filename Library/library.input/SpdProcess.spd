@@ -213,7 +213,7 @@ class SpdProcess (Process)
 
 		function SpawnFork (|ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
 			|| p = pico.new$
-			|| id = p.startfork
+			|| id = p.spawnfork
 			if id < 0
 				pico.destroy(p, "fork failed")
 				return nil
@@ -241,14 +241,18 @@ prototype SpdMainFn	(|&nil| Obj, |&cstring| args, |&pico| Comms, |bool|)
 		|| c_args = SpdProcess.CreateArgs("", r)
 		|| pico_fn = pico.new("SpdMainFn()")
 			rz = SpdProcess("SpdMainFn()", self, pico_fn, r)
-			if !rz.pico.startthread(self|picothreadfn|, 7|&nil|, c_args)
+			if !rz.pico.SpawnThread(self|picothreadfn|, 7|&nil|, c_args)
 				rz = nil
 
 
 
 function app.fork (|PID_Int|)
 	cpp_wrapper fork
-	description "Forks the process normally using `fork()`. To fork with message-passing, use spdprocess.spawnfork()"
+	description "Calls unix's `fork()`. Does nothing else.
+
+To fork and communicate with speedie apps using messages, use spdprocess.spawnfork()
+
+To fork and talk to PicoMsg-based apps that aren't speedie, use pico.spawnfork()"
 
 
 prototype SpdDeathActionFn
