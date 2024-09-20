@@ -1624,6 +1624,13 @@ extern Array* SC__PackMaker_LibFuncs;
 extern Array* SC__PackMaker_LibGlobs;
 extern Array* SC__PackMaker_PackFuncs;
 extern Array* SC__PackMaker_PackGlobs;
+#define kJB__PicoNoise_All ((int)15)
+#define kJB__PicoNoise_Debug ((int)3)
+#define kJB__PicoNoise_DebugChild ((int)1)
+#define kJB__PicoNoise_DebugParent ((int)2)
+#define kJB__PicoNoise_Events ((int)12)
+#define kJB__PicoNoise_EventsChild ((int)4)
+#define kJB__PicoNoise_EventsParent ((int)8)
 extern JB_File* JB__Platform_Logger_;
 extern Message* SC__PostIncrementNil_Msgs[32];
 extern int SC__PostIncrementNil_Size;
@@ -3133,6 +3140,9 @@ void SC_PackMaker__SortSub(Array* List);
 
 void SC_PackMaker__WriteLibFuncs(FastString* J);
 
+
+
+// PicoNoise
 
 
 // Platform
@@ -5850,7 +5860,7 @@ int JB_Pico__Init_();
 
 int JB_Pico__InitCode_();
 
-PicoComms* JB_Pico__New(JB_StringC* Name, int Bits);
+PicoComms* JB_Pico__New(JB_StringC* Name, int Noise);
 
 PicoComms* JB_Pico__Parent();
 

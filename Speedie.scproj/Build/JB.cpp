@@ -3259,7 +3259,7 @@ int SC_FB__CheckSelfModifying2() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[184]);
-	JB_FS_AppendInt32(_fsf0, (2024091917));
+	JB_FS_AppendInt32(_fsf0, (2024092010));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -5580,6 +5580,7 @@ void SC_PackMaker__WriteLibFuncs(FastString* J) {
 	;
 	JB_bin_Exit(J, 1);
 }
+
 
 
 bool JB_Platform__CPU_ARM() {
@@ -8346,7 +8347,7 @@ int SC_Ext__InitCode_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
 	JB_FS_AppendString(_fsf0, JB_LUB[839]);
-	JB_FS_AppendInt32(_fsf0, (2024091917));
+	JB_FS_AppendInt32(_fsf0, (2024092010));
 	JB_String* _tmPf1 = JB_Incr(JB_FS_GetResult(_fsf0));
 	JB_Decr(_fsf0);
 	JB_PrintLine(_tmPf1);
@@ -20788,9 +20789,12 @@ void JB_Saver__LoadOne(JB_Class* Cls, int8* Data) {
 
 
 JB_String* JB_Pico_Get(PicoComms* Self, float T) {
-	PicoMessage Msg = ((PicoMessage){});
-	PicoGet(Self, (&Msg), T);
-	return JB_Str__FromPico((&Msg));
+	iif (PicoCanGet(Self)) {
+		PicoMessage Msg = ((PicoMessage){});
+		PicoGet(Self, (&Msg), T);
+		return JB_Str__FromPico((&Msg));
+	}
+	return JB_LUB[0];
 }
 
 bool JB_Pico_SendMsg(PicoComms* Self, PicoMessage* A, bool Wait) {
@@ -20817,12 +20821,13 @@ int JB_Pico__InitCode_() {
 	return 0;
 }
 
-PicoComms* JB_Pico__New(JB_StringC* Name, int Bits) {
+PicoComms* JB_Pico__New(JB_StringC* Name, int Noise) {
 	PicoComms* P = PicoCreate();
 	iif (P) {
 		PicoConfig* C = PicoCommsConf(P);
 		C->Name = JB_Str_SyntaxCast(Name);
-		C->Bits = Bits;
+		C->Bits = 16;
+		C->Noise = Noise;
 		return P;
 	}
 	PicoGlobalStats St = ((PicoGlobalStats){});
@@ -20844,7 +20849,7 @@ PicoComms* JB_Pico__Parent() {
 	iif (!PicoHasParentSocket()) {
 		return nil;
 	}
-	Rz = JB_Pico__New(JB_LUB[0], 16);
+	Rz = JB_Pico__New(JB_LUB[0], 0);
 	JB__Pico_Parent_ = Rz;
 	iif (Rz) {
 		PicoCompleteExec(Rz);
@@ -53782,4 +53787,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 4301595491739238359 1188142385235445953
+// -81844053190552139 1188142385235445953
