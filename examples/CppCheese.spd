@@ -1,8 +1,7 @@
 
-// Just a comparison to show how terrible c++ is. And how natural code can be, in speedie.
 https://pboyd.io/posts/one-c++-footgun     // original article
 
-class CheeseShop
+class CheeseShop // An example to show how bad c++ is compared to speedie.
 	|messagetable| inventory
 	|string| ClerkName
 
@@ -17,19 +16,20 @@ class CheeseShop
 
 
 main
-// Speedie doesn't have exceptions, but 'ErrorList' instead.   The $ symbol means:
-// "get the result of this expression (ConfigData.parse) and if it doesn't exist, return false"
-// A simple way to make code-flow still explicit, but 'get it out of the way'.
-// The original C++ uses 'toml::parse' that raises an exception... causing all sorts of issues.
-// Also... unlike C++, Speedie is refcounted by default, making code just work naturally.
-// No wierd "copy the whole class... calling constructors and destructors all over the place"
-// when all you want to do is set a variable.
 	|| shop = CheeseShop(ConfigData.parse$)
 	"Red Leicester? ${shop[`red leicester`]}"
 	"Tilsit?        ${shop[`tilsit`]}"
 	"Wenslydale?    ${shop[`wenslydale`]}"
 	"Cheddar?       ${shop[`cheddar`]}"
 	"Barris?        ${shop[`barris`]}"
+	
+// Speedie doesn't have exceptions, but 'ErrorList' instead.   The $ symbol means:
+// "get the result of this expression (ConfigData.parse) and if it doesn't exist, return false-like value"
+// A simple way to make code-flow still explicit, but 'get it out of the way'.
+// The original C++ uses 'toml::parse' that raises an exception... causing all sorts of issues.
+// Also... unlike C++, Speedie is refcounted by default, making code just work naturally.
+// No wierd "copy the whole class... calling constructors and destructors all over the place"
+// when all you want to do is set a variable.
 
 
 || ConfigData = `
