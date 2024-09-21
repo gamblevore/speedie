@@ -642,7 +642,7 @@ function RightClickFileList (GUIListEvent)
 				m <~ ("Remove From Project",	FileViewerRemove)
 
 		m.AddSep
-		m <~ ("Create File",		FileViewerCreateFile)
+		m <~ ("Create New File",	FileViewerCreateFile)
 		m <~ ("Delete File",		FileViewerTrash)
 	return true
 
