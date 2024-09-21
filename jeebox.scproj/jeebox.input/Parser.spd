@@ -820,7 +820,7 @@ ive been~running #since morning
 		return parser.EmbeddedCode( close, arg, Flags )
 
 	
-	function EmbeddedCode (|String| close, |Message| dest, |int| TmpoFlags, |int|)
+	function EmbeddedCode (|String| close, |Message| dest, |int| TmpFlags, |int|)
 		// should this... make sure we get at least one?
 		
 		|| result = .Data.find( close, parser.NextStart )
@@ -828,7 +828,7 @@ ive been~running #since morning
 			parser.ErrorAdd( "Missing close $close" )
 			return result
 		
-		parser.ParseLoop( dest, TmpoFlags )
+		parser.ParseLoop( dest, TmpFlags )
 		
 		if .NextStart > result
 			parser.ErrorAdd( "Nested '$close' not allowed.", result )
@@ -884,9 +884,9 @@ ive been~running #since morning
 		return Rel
 	
 
-	function ParseLoopFlags (|Message| Output, |string| Ender, |int| TmpoFlags, |bool|)
+	function ParseLoopFlags (|Message| Output, |string| Ender, |int| TmpFlags, |bool|)
 		|ind| err = parser.nextstart
-		rz = .ParseLoop( Output, TmpoFlags &~ parser._StopBars )
+		rz = .ParseLoop( Output, TmpFlags &~ parser._StopBars )
 		// Remove stopbars!!! BarThings doesn't need parseloop!
 		if Ender
 			parser.ExpectEndChar(err, Ender)
@@ -950,7 +950,7 @@ ive been~running #since morning
 			(last is style2)
 			return last
 	
-		rz = parser.new( tmp, @Arg, tmp.position)
+		rz = parser.new(tmp, @Arg, tmp.position)
 		(rz is style2)
 
 
@@ -981,15 +981,18 @@ ive been~running #since morning
 	function LoweredIndent (|message| output, |message| curr, |message|)
 		Opt NoRefCounts
 	
+		|| BackPos = parser.data.find( Jeebox.CSLine, curr.position, 0 )
 		|| chin = curr.CleanIndent
 		while output.indentScore > chin
+			if backpos > 0
+				output.after = backpos
 			if  output == @arg  and  output isnt style2
 				return parser.indentbug(curr)
 			output = output.parent
 			if !output
 				return parser.indentbug(curr)
 			if output == @decl
-				output = output.parent
+				output = output.parent!
 		
 		output <~ curr
 		if curr.CleanIndent mod 4				// ifElseStyle
@@ -1093,6 +1096,17 @@ ive been~running #since morning
 		return ch
 
 
+	function ElseIfAdder (|Message| prev,  |message| curr, |message|)
+		|| cf = curr.func
+		if (prev.func != @tmp) or (cf != @tmp and @bra)
+			return parser.UnexpectedSyntax(curr)
+		if curr.indent & 1
+			return .ErrorAdd("Indent is odd", curr.position)
+		parser.new(prev, @arg, curr.position)
+		prev <~ curr
+		return prev
+	 
+	 
 	function AddToOutput (|Message| Output,  |message| curr,  |message| prev,  |int| pos, |message|)
 		Opt NoRefCounts
 		if (prev)
@@ -1101,38 +1115,53 @@ ive been~running #since morning
 				return parser.LoweredIndent(output, curr)
 			if Extra > 0
 				if (extra == 2) and (prev.indent|int| isa 4)
-					|| cf = curr.func
-					if (prev.func != @tmp) or (cf != @tmp and @bra)
-						return parser.UnexpectedSyntax(curr)
-					if curr.indent & 1
-						return .erroradd("Indent is odd", curr.position)
-					parser.new(prev, @arg, curr.position)
-					prev <~ curr
-					return prev
+					return .elseifadder(prev, curr)
 				return curr.GoIntoInvisArg(prev, pos)
 		output <~ curr
 		return output
 	
 
+	helper FinishParseLoop (|int| lines, |message| output, |int| After, |int|)
+		opt norefcounts
+		if output.func == @arg and output is style2
+			output.after = after
+			while
+				output = output.parent
+				loop output
+				if output.func == @arg
+					loop output is style2
+					output.after = after
+		
+		return lines
+		
+		
 	function ParseLoop (|Message| Output, |int| TmpoFlags, |int|)
 		Opt NoRefCounts
 		|message| prev
+		|| LC = 0
 		
 		while output
 			|| Info = .NextLineAndIndent(output)
-			RZ += info.r
+			LC += info.r
 
-			if .WillEnd or (prev and !info.r)
-				exit
+			if .WillEnd
+				return .finishparseloop(lc, output, parser.data.length)
+			if (prev and !info.r)
+				return .finishparseloop(lc, output, .nextstart-1)
 			
-			|| ch = .ParseLoopItem(output, TmpoFlags, prev, info.b)		#loop
+			|| ch = .ParseLoopItem(output, TmpoFlags, prev, info.b)
+			if !ch
+				return .finishparseloop(lc, output, .nextstart-1)
 			if ch != output // haha
-				RZ += (ch == @item)
+				LC += (ch == @item)
 				if info.a
 					ch.flags |= MsgParseFlags.breakpoint
 				output = .AddToOutput(output, ch, prev, info.g)
 				prev = ch
 
+		return lc
+
+		
 	
 	function DecorateThing (|message!| R, |int| Ops, |Message!|)
 		R = .GetFuncAfter( R )

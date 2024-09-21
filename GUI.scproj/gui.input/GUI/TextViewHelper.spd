@@ -155,6 +155,7 @@ class TextViewLine (list)
 			while r
 				r = r.parent
 				if (r == @arg) and r.StartsBefore(.range)
+					rz:=r
 					exit
 		
 		if r and !r.startsafter(.range)
@@ -397,8 +398,7 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 			.drawerror(where, y+GoUp, d)
 		  else
 			d.LineError = nil // sigh. crappy bug fix
-//	if d is found
-//		.drawfound(where, y+GoUp, d)
+
 	if .CanDrawLight(d)				// linelight
 		lc.r += 80
 		lc.g += 80

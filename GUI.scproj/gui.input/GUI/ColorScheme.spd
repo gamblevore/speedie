@@ -152,7 +152,7 @@ function FixupColor (|message| self, |ind| pos, |message|)
 	if self == @prm or self in @url
 		return .Parent // NICE
 	if .IsContainer
-		require !(self == @arg and "\t")
+		return self // just see what happens
 		if (pos == .position) or pos == (.after-1)
 			return self
 		return nil
@@ -175,10 +175,10 @@ function colorscheme.GetColor (|message| msg, |int| HasColor, |int| pos, |imagep
 	if !HasColor
 		return imagepixel.clear
 	if msg
-		|| col = FixupColor(msg, pos)
-			if col.UseRootTmpColor
+		|| fixed_msg = FixupColor(msg, pos)
+			if fixed_msg.UseRootTmpColor
 				return .RootTmp
-			return .SyxCol[col.func|uint| & 63]
+			return .SyxCol[fixed_msg.func|uint| & 63]
 	if HasColor == 3
 		return .None
 	return .SyxCol[0]

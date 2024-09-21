@@ -86,8 +86,11 @@ helper String.ParseSub (|syntax| owner, |bool| AllowDecomp,  |MessageRoot|)
 	|| OK		= StdErr.mark
 	|| Flags	= parser.kTemporal
 	|| into		= message.new(nil, owner, 0, "", 0)
-	|| lines	= parser.ParseLoopFlags( into, "", Flags )
-	if !Lines and into.hasChildCount(1)
+	if owner == @arg
+		(into is style2)
+	|| lines	= parser.ParseLoopFlags(into, "", Flags)
+	
+	if !Lines and into.HasChildCount(1)
 		into = into.first // nice
 
 	parser.CleanSpaces

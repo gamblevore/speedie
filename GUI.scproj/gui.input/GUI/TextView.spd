@@ -1943,7 +1943,7 @@ class TextView (GUIControl)
 			charw = 4KB
 	
 		// d = d.ReclaimStart(._reclaim[0])
-		|| ARGH = 0		// .reclaimrestart(d) // disabled for now.
+		|| ARGH = 0		// .ReclaimRestart(d) // disabled for now.
 		|| t = d.tline
 		|| p = d.position
 		
@@ -1951,6 +1951,7 @@ class TextView (GUIControl)
 			p = d.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  p)
 			t = d.InitDefaults(self, t)
 			if expect >= CurrentlyJeebox
+//				if (self ~= "editme") and d.text contains ";" 
 				msg = d.colorise(msg, ParsedOK)
 			loop p >= 0
 			|| n = d.next
@@ -1961,7 +1962,6 @@ class TextView (GUIControl)
 			  else
 				d = d.ReclaimEnd(t, ._reclaim[2])
 				exit
-
 
 		.EndPrepare(d, StayAtEnd, pos)
 
