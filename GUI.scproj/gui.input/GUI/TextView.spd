@@ -1935,7 +1935,7 @@ class TextView (GUIControl)
 		.TextAlteredForDraw = 0
 		|| expect	  = .FindExpectsParse
 		|| msg   	  = .Parse(changed >= 2, expect)
-		|| ParsedOK   = msg!=nil
+		|| ParsedOK   = (msg!=nil) or (.ExpectsParse <= AllowJeebox)
 		|| Pos	 	  = .StartPos
 		|| d		  = .NeedFirst
 		|| StayAtEnd  = .EndGap
