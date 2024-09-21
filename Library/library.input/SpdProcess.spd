@@ -2,6 +2,14 @@
 class SpdProcess (Process)
 	linkage
 		cpp_part Proc
+	description "SpdProcess is a process, that happens to be made by Speedie. Speedie processes come with a pico (message-passer), so they can be talked to, if you want.
+
+We also make it easier to send and receive message objects, instead of pure strings.
+
+SpdProcess handles your subprocess dying, or needing resetting.
+
+The DebugName is normally a file-path, but might not be, for example you are in fact running a function in a thread and using that function as a subprocess. (This is possible! If the function is an entire speedie program, complete with 'main', loaded from a library.)
+"
 	contains SpdProcess
 	|jbin|						Writer
 	|&pico|						Pico
@@ -9,8 +17,8 @@ class SpdProcess (Process)
 	|?SpdMainFn|				SubProcess
 	|int| 						DeathLimit
 	|int|						DiedCount
-	|bool|						WeAreParent
 	|bool|						AlreadyWarnedDied
+	|bool|						WeAreParent
 	|ProcessMode|				Mode
 
 	constructor	(|string| path, |?SpdMainFn| fn, |pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.AutoPrintErrors)
