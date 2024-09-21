@@ -140,7 +140,7 @@ extend PerryIDE
 			.takesfocus		= takesfocusflag.On
 			.gnormal.solid	= vec4(0.1, 0.974)
 			.OnSelChanged   = EditMeSelChange
-			.onselerror		= EditMeSelError
+			.OnSelError		= EditMeSelError
 //			.ColoriseAsRoot = autocomplete.functions
 
 

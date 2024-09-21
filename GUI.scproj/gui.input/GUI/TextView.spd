@@ -110,7 +110,7 @@ class TextView (GUIControl)
 	helper ClickedScroll (|ivec2| P, |int| Clicks, |bool|)
 		return .ClickedScrollbar(P, Clicks, .slh, ._ScrollDrawTimer)
 	
-	setter expectsparse (|byte|)
+	setter ExpectsParse (|byte|)
 		.expectsparse = value
 		
 	behaviour LostFocus
@@ -1271,10 +1271,13 @@ class TextView (GUIControl)
 
 
 	helper ValidateNewText (|message|)
-		if .MyError is parse
-			.MyError = nil
-		|| msg = .text.ParseWithError(.myerror)
+		|error| ParseErr 
+		|| msg = .text.ParseWithError(ParseErr)
 			msg.obj = .path
+			if .MyError is parse
+				.MyError = nil
+		  elseif .expectsparse >= currentlyjeebox
+			.myerror = ParseErr
 
 		|| v = ._Viewing
 			v.ShouldntSave = false
@@ -1950,8 +1953,7 @@ class TextView (GUIControl)
 		while
 			p = d.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  p)
 			t = d.InitDefaults(self, t)
-			if expect >= CurrentlyJeebox
-//				if (self ~= "editme") and d.text contains ";" 
+			if expect >= allowJeebox // didn't I use to have it on allowjeebox?
 				msg = d.colorise(msg, ParsedOK)
 			loop p >= 0
 			|| n = d.next

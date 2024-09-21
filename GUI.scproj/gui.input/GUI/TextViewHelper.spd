@@ -166,7 +166,7 @@ class TextViewLine (list)
 			isnt breakpoint
 			
 		
-	function ColoriseSub2 (|message| srch, |message|)
+	helper ColoriseSub2 (|message| srch, |message|)
 		opt norefcounts
 		|| r	= .range
 		while srch.EndsBefore(r)
@@ -185,7 +185,6 @@ class TextViewLine (list)
 				exit
 			srch = nxt									// what about...
 		
-		(self is breakpoint) = srch is breakpoint
 		return srch
 
 

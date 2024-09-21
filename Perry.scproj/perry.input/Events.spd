@@ -491,16 +491,6 @@ function SelectedFile (GuiListevent)
 		return .ide.EditFile(row)
 
 
-//function RightClickErrorList (GUIListEvent)
-//	opt NoRefCounts
-//	if self isa FileViewer
-//		|| m = .newcmm
-//		m <~ ("Copy File Path",			FileViewerCopyPath)
-//		m <~ ("Show In Finder",			FileViewerCMMShow)
-//		m <~ ("Show In Project",		ProjectCMMShow)
-//	return true
-
-
 function perry.FindElseWhere (|perryide| ignore, |string| find, |byte| FindID)
 	for w in perry.OpenProj
 		if (w != ignore) and w.BatchPhind(find, FindID)
@@ -576,37 +566,3 @@ function PerryIDE.Markup (|bool|)
 	
 	return true
 	
-
-/*
-error
-	"to RunOutline (|image| r, |image| w, |float| scale, |float| def)"
-	pos 2314
-	file "/usr/local/speedie/GUI.scproj/gui.input/GUI/effects.spd"
-	severity 3
-error
-	"Type mismatch, expected 'f64' but found 'float'."
-	pos 347
-	file "/usr/local/speedie/GUI.scproj/gui.input/GUI/notifications.spd"
-	severity 4
-error
-	"Type mismatch, expected 'f64' but found 'float'."
-	pos 485
-	file "/usr/local/speedie/GUI.scproj/gui.input/GUI/notifications.spd"
-	severity 4
-error
-	"Type mismatch, expected 'f64' but found 'float'."
-	pos 15394
-	file "/usr/local/speedie/GUI.scproj/gui.input/GUI/sdl_app.spd"
-	severity 4
-error
-	"Type mismatch, expected 'f64' but found 'float'."
-	pos 6549
-	file "/usr/local/speedie/GUI.scproj/gui.input/GUI/TextViewHelper.spd"
-	severity 4
-error
-	"to OperatorMin (|f64| other)"
-	pos 9990
-	file "/usr/local/speedie/Library/library.input/Datatypes.spd"
-	severity 3
-*/
-
