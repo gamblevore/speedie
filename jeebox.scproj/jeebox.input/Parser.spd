@@ -984,10 +984,11 @@ ive been~running #since morning
 		|| BackPos = parser.data.find( Jeebox.CSLine, curr.position, 0 )
 		|| chin = curr.CleanIndent
 		while output.indentScore > chin
-			if backpos > 0
-				output.after = backpos
-			if  output == @arg  and  output isnt style2
-				return parser.indentbug(curr)
+			if output == @arg
+				if  output isnt style2
+					return parser.indentbug(curr)
+				if backpos > 0
+					output.after = backpos
 			output = output.parent
 			if !output
 				return parser.indentbug(curr)
@@ -1021,6 +1022,7 @@ ive been~running #since morning
 		while (n < end)
 			|| c = addr[n++]
 			if (c == '\t')
+//				state &=~ 2
 				if !commas
 					rz.b += 4
 				if ((State&1) and rz.r)
@@ -1036,15 +1038,18 @@ ive been~running #since morning
 
 			  elseif (c == ' ')
 				State |= 1
+//				state &=~ 2
 				if !commas
 					rz.b++
 
 			  elseif (c == '/')
 				|| c2 = d[n]
 				if (c2 != '/' and '*')
-					// the idea is to make / at the start of a line just mean its a debugger breakpoint
-					if state&2 // not quite working yet! but soon!
-						rz.a = 1
+					if state&2
+						if rz.a > 1
+							.ErrorAdd("Invalid breakpoint", n-1)
+						rz.a = 2
+						exit
 					n--
 					exit
 				State = 2
@@ -1061,20 +1066,21 @@ ive been~running #since morning
 					exit
 
 			  else
-				ifn (c == '\n' or '\r' or ';')
+				if c != '\n' and '\r' and ';'
 					n--
 					exit
 				rz.r++
-				rz.a=0
+				if rz.a
+					rz.a = 1 // lower it
 				rz.b = 0
 				commas = 0 // right?
-				rz.g    = n-1 // sigh
+				rz.g   = n-1 // sigh
 				State = 2
 				if parent.func == @list
 					(parent is style2)
 
 		rz.r += commas
-		.nextstart = n
+		.NextStart = n
 		if ((first > 0) and !rz.r) or (rz.b < 0)
 			rz.b = -1
 		
@@ -1155,7 +1161,7 @@ ive been~running #since morning
 			if ch != output // haha
 				LC += (ch == @item)
 				if info.a
-					ch.flags |= MsgParseFlags.breakpoint
+					(ch is breakpoint)
 				output = .AddToOutput(output, ch, prev, info.g)
 				prev = ch
 
@@ -1230,7 +1236,7 @@ ive been~running #since morning
 	
 	function WordAfter (|int| Start, |int|)
 		Opt NoRefCounts
-		return .wordaftersub(start, Jeebox.CSWordMiddle)
+		return .WordAfterSub(start, Jeebox.CSWordMiddle)
 	
 	
 	helper WordAfterSub (|int| Start, |charset| cs, |int|)
