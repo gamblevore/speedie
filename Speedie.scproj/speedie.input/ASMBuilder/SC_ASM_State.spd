@@ -46,13 +46,14 @@ struct ASMState
 	function Last (|&FatASM|)
 		return .curr-1
 	
-	function IntPowerOfTwo (|asmreg| r,  |FailableInt|)
+	function IntPowerOfTwo (|asmreg| r, |int| Sub=0,   |FailableInt|)
 		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
 		// this is used for multiplication mostly. like x*-1, or x*0, or x*1
 		if r is ConstAny
 			|| v = r.const
 			if v == -1
 				return v
+			v -= Sub
 			if v.IsPow2
 				return v.Log2+1
 

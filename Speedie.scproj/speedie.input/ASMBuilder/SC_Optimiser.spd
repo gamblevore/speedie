@@ -75,7 +75,7 @@ dispatch µOpt (|&fatasm| self, |?&fatasm| P, |?&fatasm| N, |bool|)
 	(ASM.BSHS):   OptShifting
 	(ASM.BSHL):   OptShifting
 	(ASM.BAND):   OptBitAnd
-	(ASM.BOAR):   OptBitOr
+	(ASM.BOOR):   OptBitOr
 	(ASM.BNOT):	  OptBitNot
 	(ASM.CMPF):	  OptCompare
 	(ASM.CMPI):   OptCompare
@@ -120,7 +120,7 @@ function OptAddI (Fn_µOpt)
 		
 		// a = b + 0
 		OptPath "add->boar"
-		.op = asm.boar // u1 = (u2|||u3)&~u4
+		.op = asm.boor // u1 = (u2|||u3)&~u4
 		.c = 0 // nice
 		return true
 	
@@ -158,7 +158,7 @@ function OptAddF (Fn_µOpt)
 		
 		// a = b + 0
 		OptPath "fadd+0"
-		.op = asm.boar // u1 = (u2|||u3)&~u4
+		.op = asm.boor // u1 = (u2|||u3)&~u4
 		.c = 0 // nice
 		return true
 
@@ -215,7 +215,7 @@ function OptShifting (fn_µopt)   // can't really opt this unless registers cont
 
 
 function OptBitNot (fn_µopt)
-	require (p isa asm.bnot) and (n isa asm.band) and !n.c
+	require (p isa ASM.bnot) and (n isa asm.band) and !n.c
 	require !(.b ||| p.b)
 
 	// this is such a pain... actually. to do at all.
@@ -232,7 +232,7 @@ function OptBitNot (fn_µopt)
 		if x == a and y == b
 			//  x = ~y,  y = ~x		-->		z = ~y & ~~y	-->		z = 0
 			OptPath "bitnot_0"
-			n.op = asm.boar
+			n.op = asm.boor
 			n.a = 0
 			n.b = 0
 			return true
@@ -247,7 +247,7 @@ function OptBitNot (fn_µopt)
 		if x != y  and  y == a and b
 			//  x = ~y,  y = ~y		-->		z = ~~y & ~~y		-->		z = y
 			OptPath "bitnot_set"
-			n.op = asm.boar
+			n.op = asm.boor
 			n.a = y
 			n.b = 0
 			return true

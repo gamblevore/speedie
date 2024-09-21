@@ -141,13 +141,15 @@ extend ASMState
 		
 
 	function QuickIntMul    (fn_OpASM)
-		|| PToi = .IntPowerOftwo(r)$
+		|| Pow2 = .IntPowerOfTwo(r)
+			r.nop
+			if Pow2 <= 1
+				return .Quick1Or1Sub(dest, l, Pow2, exp)
+			return exp.BFLG(dest, l,  Pow2-1, 0, 0) * Dest	// y = x * 4  -->  y = x << 2
 
-		r.nop
-		if ptoi <= 1
-			return .Quick1Or1Sub(dest, l, ptoi, exp)
-	
-		return exp.BFLG(dest, l,  ptoi-1, 0, 0)*Dest	// y = x * 4 --> y = x << 2
+		|| five = .IntPowerOfTwo(r, 1) // 5 or 9 or 17 or 33, etc
+			r.nop
+			return exp.ADD(dest, l, l, five-1) * dest
 
 
 	function QuickFloatMul    (fn_OpASM)
@@ -214,6 +216,7 @@ extend ASMState
 				swapped = 1
 				swap (l) (r) // a+b == b+a
 
+	
 		|| lmul = l.PointerMul(exp, swapped)
 		if r is ConstAny
 			|| RR = r.const
@@ -345,7 +348,7 @@ extend ASMState
 			rz = exp.FDIV(dest,  L,  R,  asmreg(), dest.isbig|int|) * dest
 
 
-	function QuickDivInt    (fn_opasm)
+	function QuickIntDiv    (fn_opasm)
 		|| PToi = .IntPowerOftwo(r)
 			r.nop
 			if ptoi <= 1   //   x/1  x/0  x/-1
@@ -359,7 +362,7 @@ extend ASMState
 	
 	
 	function DivInt    (fn_opasm)
-		|| q = .QuickDivInt(dest, l, r, exp)
+		|| q = .QuickIntDiv(dest, l, r, exp)
 			return q
 		return exp.DIVV(dest, ASMReg(), l, r, dest.IntDivType) * dest
 	
@@ -405,7 +408,7 @@ extend ASMState
 	// BITS
 	function BitNot (fn_opasm)
 		if r.reg // what?
-		|| fat = exp.BNOT(dest, l, asmreg())
+		|| fat = exp.BNOT(dest, l, asmreg(), 0)
 		if l is ConstAny
 			fat.const = ~l.const
 		return fat*Dest
@@ -414,7 +417,7 @@ extend ASMState
 	function BitXor (fn_opasm)
 		if (l.reg == r.reg)
 			return .BitOr(dest, asmreg(), asmreg(), exp)
-		|| fat = exp.BXOR(dest, L, R)
+		|| fat = exp.BXOR(dest, L, R, 0)
 		if dest is ConstAny
 			fat.const = l.Const xor r.const
 		return fat*Dest
@@ -424,7 +427,7 @@ extend ASMState
 		if l is ConstAny
 			swap (l) (r)
 		dest.Expect(exp)
-		|| fat = exp.BOAR(dest, L, R)
+		|| fat = exp.BOOR(dest, L, R, 0)
 		if dest is ConstAny
 			fat.Const = l.const ||| r.const
 		return fat * Dest
@@ -452,19 +455,15 @@ extend ASMState
 		if r is ConstAny
 			return .BFLG_Const(exp, dest, l, 0, r.const)
 		
-		|&Fatasm| fat
-		if l.Signed
-			fat = exp.BSHS(dest, L, R)
-		  else
-			fat = exp.BSHR(dest, L, R)
-			
-		return fat*dest
+		|| fat = exp.BSHS(dest, L, R, 0)
+		fat.op += !l.Signed
+		return fat * dest
 
 	
-	function SHL    (fn_opasm)
+	function SHL  (fn_opasm)
 		if r is ConstAny
 			return .BFLG_Const(exp, dest, l,  r.const, 0)
-		return exp.BSHL(dest, L, R) * Dest
+		return exp.BSHL(dest, L, R, 0) * Dest
 	
 	
 	function Assign (fn_opasm)

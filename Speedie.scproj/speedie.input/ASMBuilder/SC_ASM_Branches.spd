@@ -147,7 +147,7 @@ helper DoAndOr (|message| exp,  |ASMReg| Dest,  |opmode| Opp,    |ASMReg|)
 			dest.µType = DataTypeCode.bool
 			|| fat = exp.BAND(dest, ml, mr, 0)
 			if (opp is or)
-				fat.op = asm.BOAR
+				fat.op = asm.BOOR
 			return fat*dest
 	
 	if dest isnt CondRequest					// AAARGH
