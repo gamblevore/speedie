@@ -1,0 +1,21 @@
+#!/usr/local/bin/spd
+
+// this tests pico by itself.
+
+main
+	|| p = pico.fork #require
+	if p.IsParent
+		p <~ ".lufsseccus eviecer dna dneS"			// 1) send encoded data to child.
+		printline p.Get(2.0)						// 4) get result (or timeout after 2s)
+	  else
+		|| decoded = p.get(1.0).Reverse				// 2) decode (just reverse)
+		p <~ "Child says: " + decoded				// 3) send back
+
+
+
+
+
+// note:
+// normally, you do not want to use pico by itself,
+// but instead use SpdProcess, which is a process made by Speedie
+
