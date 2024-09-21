@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[563];
+extern JB_StringC* JB_LUB[564];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -2074,11 +2074,13 @@ Message* JB_Tk__LoweredIndent(Message* Output, Message* Curr) {
 	Ind BackPos = JB_Str_Find(JB__Tk_Data, JB__Constants_CSLine, Curr->Position, 0);
 	int Chin = JB_Msg_CleanIndent(Curr);
 	while (JB_Msg_IndentScore(Output) > Chin) {
-		if (BackPos > 0) {
-			(JB_Msg_AfterSet(Output, BackPos));
-		}
-		if ((JB_Msg_EqualsSyx(Output, kJB_SyxArg, false)) and (!JB_Msg_SyntaxIs(Output, kJB__MsgParseFlags_Style2))) {
-			return JB_Tk__IndentBug(Curr);
+		if (JB_Msg_EqualsSyx(Output, kJB_SyxArg, false)) {
+			if (!JB_Msg_SyntaxIs(Output, kJB__MsgParseFlags_Style2)) {
+				return JB_Tk__IndentBug(Curr);
+			}
+			if (BackPos > 0) {
+				(JB_Msg_AfterSet(Output, BackPos));
+			}
 		}
 		Output = ((Message*)JB_Ring_Parent(Output));
 		if (!Output) {
@@ -2256,7 +2258,11 @@ ParserLineAndIndent JB_Tk__NextLineAndIndent(Message* Parent) {
 			uint C2 = JB_Str_ByteValue(D, N);
 			if ((C2 != '/') and (C2 != '*')) {
 				if (((bool)(State & 2))) {
-					Rz[3] = 1;
+					if (Rz[3] > 1) {
+						JB_FreeIfDead(JB_Tk__ErrorAdd(JB_LUB[563], N - 1));
+					}
+					Rz[3] = 2;
+					break;
 				}
 				(--N);
 				break;
@@ -2276,12 +2282,14 @@ ParserLineAndIndent JB_Tk__NextLineAndIndent(Message* Parent) {
 			}
 		}
 		 else {
-			if (!((C == '\n') or ((C == '\x0D') or (C == ';')))) {
+			if ((C != '\n') and ((C != '\x0D') and (C != ';'))) {
 				(--N);
 				break;
 			}
 			(++Rz[0]);
-			Rz[3] = 0;
+			if (Rz[3]) {
+				Rz[3] = 1;
+			}
 			Rz[2] = 0;
 			Commas = 0;
 			Rz[1] = (N - 1);
@@ -2417,7 +2425,7 @@ int JB_Tk__ParseLoop(Message* Output, int TmpoFlags) {
 		if (Ch != Output) {
 			LC = (LC + ((JB_Msg_EqualsSyx(Ch, kJB_SyxItem, false))));
 			if (Info[3]) {
-				Ch->Flags = (Ch->Flags | kJB__MsgParseFlags_BreakPoint);
+				(JB_Msg_SyntaxIsSet(Ch, kJB__MsgParseFlags_BreakPoint, true));
 			}
 			Output = JB_Tk__AddToOutput(Output, Ch, Prev, Info[1]);
 			Prev = Ch;
@@ -7994,7 +8002,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024092112);
+	return (2024092116);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8006,4 +8014,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 6464246577374740407 -2650631559806097130
+// -2934619186805667969 6464246577374740407 -4350689744046079234
