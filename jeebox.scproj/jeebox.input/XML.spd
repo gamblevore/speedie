@@ -76,7 +76,7 @@ function Parser.FillXML (|message| XML, |ind| i, |message|)
 		|| Prev = .nextstart
 		i = s.find('<', prev)
 		ifn i
-			return .erroradd("Element didn't close", xml.position)
+			return .ErrorAdd("Element didn't close", xml.position)
 		.addXMLText(xml, s, prev, i) 
 		.nextstart = i
 		|| next = s[i+1] 
