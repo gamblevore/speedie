@@ -7,6 +7,10 @@
 // * i should also add a "next item differs at" thing to the suffixes...
 // * and maybe a "strength" that allows further checking of suffixes?
 
+// merge my two branches into one? So there is just the mz compressor
+// and the offsets can be stored in different approaches?
+// Like just start with an offsetbyte, to switch modes.
+
 #define kExtend 0x70
 
 struct CompState : FastBuff {
@@ -65,17 +69,6 @@ struct CompState : FastBuff {
 		return Best;
 	}
 
-
-//	int* GetSuffix () {
-//		ivec4* Suffix = (ivec4*)Suffixes;
-//		ivec4 Items = {0,1,2,3};
-//		int n = (Expected + 3) / 4;
-//		for (int i = 0; i < n; i++) {
-//			Suffix[i] = Items;
-//			Items += 4;
-//		}
-//		return (int*)Suffix;
-//	}
 	
 	u8* Detect () {
 		int n		= Expected;
@@ -86,20 +79,6 @@ struct CompState : FastBuff {
 			SP[R0[i]] = i;
 			R0[i] = n - R0[i];
 		}
-
-//		bool print_sorted_array = 1; // debug it
-//		if (print_sorted_array and n < 2000) for_(n) {
-//			auto pos = (Read+n)-R0[i];
-//			for (int j = 0; j < 32; j++) {
-//				char c = pos[j]; 
-//				if (!c)
-//					break;
-//				if (c <= 32)
-//					c = 32;
-//				printf("%c", c);
-//			}
-//			puts("");
-//		}
 		
 		return n + Read;
 	}
