@@ -86,7 +86,7 @@ function PerryIDE.DebugEnvs (|message| env)
 			app.ChildEnv(rel.first!.name) = ch2.name
 
 
-function PerryIDE.DebugActualStr (|file| f, |[string]| args, |faststring|)
+function PerryIDE.DebugAppCallArgsDisplay (|file| f, |[string]| args, |faststring|)
 	rz = FastString()
 	rz <~ f.name
 	rz <~ ":"
@@ -98,12 +98,13 @@ function PerryIDE.DebugActualStr (|file| f, |[string]| args, |faststring|)
 
 
 function perryide.DebugActual (|file| f, |[string]| args) // actuallyruncompiledapp, runproduct, actualdebug, debugproduct
-	|| out = .DebugActualStr(F, args)
+	|| out = .DebugAppCallArgsDisplay(F, args)
 	.LogOneAction(@emb + out.Copy)
 	out <~ ("\n", 2)
 	|| r = Process.stream(f, args, out, nil, ProcessOwnerMode.OwnGroup)
 	.RunCompiledApp = r
 	if r and r.PID
+		.ShowProductIfMoreOutput = out.Length
 		.RunButton.text = "\07"
 
 
@@ -123,7 +124,7 @@ function PerryIDE.StartDebugging (|file!| f)
 	require f.MustExist and StdErr.ok
 
 	.DebugArgsList.InitDebugArgs
-	|| debugargs = .DebugArgslist.text.parse		#require
+	|| DebugArgs = .DebugArgslist.text.parse		#require
 	|| ArgMsg = DebugArgs["args"]					#require
 	ArgMsg = ArgMsg.Copy
 	for a in ArgMsg
@@ -133,7 +134,7 @@ function PerryIDE.StartDebugging (|file!| f)
 			a.Become(@str, str)
 			a.clear
 				
-	|| args = argmsg.AllNames
+	|| args = ArgMsg.AllNames
 	if debugargs["flags"]["open"].yes
 		check (!args) (ArgMsg, "You can't pass arguments, when using open-flags")
 		args = [f]
@@ -166,20 +167,29 @@ function PerryIDE.AddProductErr (|string| err)
 		(t isnt hidden)
 
 
+function PerryIDE.UpdateProductText (|process| r)
+	|| rout = r.Output
+	if rout and rout.length
+		.ProductOut <~ rout
+		if !(r.userflags&1)
+			.ShowCompileTab(.productout)
+			r.userflags |= 1 // remove userflags next time and use OutputShouldOpenWithinDebug?/??
+		if .ShowProductIfMoreOutput < .ProductOut.Length
+			.ShowProductIfMoreOutput = int.max // no more updates
+			.CompileTabSelect(.ProductOut)
+			.ProductSep.Show
+	
+	
 function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 	|| r = .RunCompiledApp						#require
 
-	|| rout = r.Output
-	if !(r.userflags&1) and rout and rout.length
-		.ShowCompileTab(.productout, true)
-		r.userflags |= 1
-	
 	r.step
+	.UpdateProductText(r)
+	
 	if kill or !r.IsRunning
 		.RunCompiledApp = nil
 		.RunButton.text = "\02"
 	
-	.ProductOut <~ rout
 	.AddProductErr(r.ErrorOutput)
 	
 	if kill

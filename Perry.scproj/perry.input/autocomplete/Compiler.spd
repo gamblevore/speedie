@@ -100,7 +100,7 @@ extend PerryIDE
 
 	function ExpandCompileSep (|bool|)
 		|| coll = .ProductSep.div.Collapsed
-			.ShowCompileTab(.SpeedieText, true)
+			.ShowCompileTab(.SpeedieText)
 			// doent seem to work all the time... ? strange.
 		|| coll2 = .ProductSep.div.Collapsed
 		

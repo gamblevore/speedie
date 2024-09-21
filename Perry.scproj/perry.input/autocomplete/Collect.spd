@@ -138,7 +138,7 @@ function PerryIDE.ActualCompile (|string| operation)
 	(.Progress is visible)
 
 	is active
-	.ShowCompileTab(.speedietext, IsSCProj)
+	.ShowCompileTab(.speedietext)//, IsSCProj)
 	.ViewAsCurr
 
 

@@ -102,7 +102,7 @@ function ClickedCompileTabs (Guiaction)
 	.ide.CompileTabSelect(row)
 
 
-function PerryIDE.CompileTabSelect (|object| Desired, |bool| select=false)	
+function PerryIDE.CompileTabSelect (|object| Desired)	
 	opt norefcounts
 	for i in .CompileTabs.Items
 		|| obj = i.obj as textview

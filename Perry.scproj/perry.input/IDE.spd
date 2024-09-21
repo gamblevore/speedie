@@ -75,6 +75,7 @@ class PerryIDE (Window)
 	|date|						PopupDateOn
 	|uint[3]| 					LastMemory
 	|int|						EditMeTabRetryThing
+	|int|						ShowProductIfMoreOutput
 	|byte|						DuringLoad
 	|byte| 						DuringTempView
 	|bool|						AlreadyExpandedCompileTab
