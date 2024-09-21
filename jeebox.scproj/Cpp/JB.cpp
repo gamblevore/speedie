@@ -402,6 +402,7 @@ JB_String* JB_Constants__TestJB() {
 
 
 
+
 int JB_Platform__Init_() {
 	{
 	}
@@ -637,16 +638,7 @@ Message* JB_Tk__AddToOutput(Message* Output, Message* Curr, Message* Prev, int P
 		}
 		if (Extra > 0) {
 			if ((Extra == 2) and (JB_int_OperatorIsa(((int)Prev->Indent), 4))) {
-				Syntax Cf = Curr->Func;
-				if ((Prev->Func != kJB_SyxTmp) or ((Cf != kJB_SyxTmp) and (Cf != kJB_SyxBra))) {
-					return JB_Tk__UnexpectedSyntax(Curr);
-				}
-				if (((bool)(Curr->Indent & 1))) {
-					return JB_Tk__ErrorAdd(JB_LUB[245], Curr->Position);
-				}
-				JB_FreeIfDead(JB_Tk__NewParentName(Prev, kJB_SyxArg, Curr->Position, JB_LUB[0]));
-				JB_Tree_SyntaxAppend(Prev, Curr);
-				return Prev;
+				return JB_Tk__ElseIfAdder(Prev, Curr);
 			}
 			return JB_Msg_GoIntoInvisArg(Curr, Prev, Pos);
 		}
@@ -858,7 +850,20 @@ Message* JB_Tk__DotSub(Syntax Fn, int Start, Message* Parent) {
 	return Rz;
 }
 
-int JB_Tk__EmbeddedCode(JB_String* Close, Message* Dest, int TmpoFlags) {
+Message* JB_Tk__ElseIfAdder(Message* Prev, Message* Curr) {
+	Syntax Cf = Curr->Func;
+	if ((Prev->Func != kJB_SyxTmp) or ((Cf != kJB_SyxTmp) and (Cf != kJB_SyxBra))) {
+		return JB_Tk__UnexpectedSyntax(Curr);
+	}
+	if (((bool)(Curr->Indent & 1))) {
+		return JB_Tk__ErrorAdd(JB_LUB[245], Curr->Position);
+	}
+	JB_FreeIfDead(JB_Tk__NewParentName(Prev, kJB_SyxArg, Curr->Position, JB_LUB[0]));
+	JB_Tree_SyntaxAppend(Prev, Curr);
+	return Prev;
+}
+
+int JB_Tk__EmbeddedCode(JB_String* Close, Message* Dest, int TmpFlags) {
 	Ind Result = JB_Str_InStr(JB__Tk_Data, Close, JB_Tk__NextStart(), JB_int__Max(), false);
 	if (!JB_Ind_SyntaxCast(Result)) {
 		FastString* _fsf0 = JB_Incr(JB_FS_Constructor(nil));
@@ -870,7 +875,7 @@ int JB_Tk__EmbeddedCode(JB_String* Close, Message* Dest, int TmpoFlags) {
 		JB_Decr(_tmPf2);
 		return Result;
 	}
-	JB_Tk__ParseLoop(Dest, TmpoFlags);
+	JB_Tk__ParseLoop(Dest, TmpFlags);
 	if (JB_Tk__NextStart() > Result) {
 		FastString* _fsf1 = JB_Incr(JB_FS_Constructor(nil));
 		JB_FS_AppendString(_fsf1, JB_LUB[269]);
@@ -1394,6 +1399,25 @@ int JB_Tk__FindError(int Num) {
 	}
 	;
 	return 0;
+}
+
+int JB_Tk__FinishParseLoop(int Lines, Message* Output, int After) {
+	if ((Output->Func == kJB_SyxArg) and JB_Msg_SyntaxIs(Output, kJB__MsgParseFlags_Style2)) {
+		(JB_Msg_AfterSet(Output, After));
+		while (true) {
+			Output = ((Message*)JB_Ring_Parent(Output));
+			if (!Output) {
+				break;
+			}
+			if (Output->Func == kJB_SyxArg) {
+				if (!JB_Msg_SyntaxIs(Output, kJB__MsgParseFlags_Style2)) {
+					break;
+				}
+				(JB_Msg_AfterSet(Output, After));
+			}
+		};
+	}
+	return Lines;
 }
 
 Message* JB_Tk__fInnerNiceAdj(int Start, Message* Parent) {
@@ -2047,8 +2071,12 @@ int JB_Tk__InitCode_() {
 }
 
 Message* JB_Tk__LoweredIndent(Message* Output, Message* Curr) {
+	Ind BackPos = JB_Str_Find(JB__Tk_Data, JB__Constants_CSLine, Curr->Position, 0);
 	int Chin = JB_Msg_CleanIndent(Curr);
 	while (JB_Msg_IndentScore(Output) > Chin) {
+		if (BackPos > 0) {
+			(JB_Msg_AfterSet(Output, BackPos));
+		}
 		if ((JB_Msg_EqualsSyx(Output, kJB_SyxArg, false)) and (!JB_Msg_SyntaxIs(Output, kJB__MsgParseFlags_Style2))) {
 			return JB_Tk__IndentBug(Curr);
 		}
@@ -2371,20 +2399,23 @@ Message* JB_Tk__ParseItem(Message* Ch, int TemporalFlags, int Ops) {
 }
 
 int JB_Tk__ParseLoop(Message* Output, int TmpoFlags) {
-	int Rz = 0;
 	Message* Prev = nil;
+	int LC = 0;
 	while (Output) {
 		ParserLineAndIndent Info = JB_Tk__NextLineAndIndent(Output);
-		Rz = (Rz + Info[0]);
-		if (JB_Tk__WillEnd() or (((bool)Prev) and (!Info[0]))) {
-			break;
+		LC = (LC + Info[0]);
+		if (JB_Tk__WillEnd()) {
+			return JB_Tk__FinishParseLoop(LC, Output, JB_Str_Length(JB__Tk_Data));
+		}
+		if (((bool)Prev) and (!Info[0])) {
+			return JB_Tk__FinishParseLoop(LC, Output, JB_Tk__NextStart() - 1);
 		}
 		Message* Ch = JB_Tk__ParseLoopItem(Output, TmpoFlags, Prev, Info[2]);
 		if (!Ch) {
-			break;
+			return JB_Tk__FinishParseLoop(LC, Output, JB_Tk__NextStart() - 1);
 		}
 		if (Ch != Output) {
-			Rz = (Rz + ((JB_Msg_EqualsSyx(Ch, kJB_SyxItem, false))));
+			LC = (LC + ((JB_Msg_EqualsSyx(Ch, kJB_SyxItem, false))));
 			if (Info[3]) {
 				Ch->Flags = (Ch->Flags | kJB__MsgParseFlags_BreakPoint);
 			}
@@ -2392,13 +2423,13 @@ int JB_Tk__ParseLoop(Message* Output, int TmpoFlags) {
 			Prev = Ch;
 		}
 	};
-	return Rz;
+	return LC;
 }
 
-bool JB_Tk__ParseLoopFlags(Message* Output, JB_String* Ender, int TmpoFlags) {
+bool JB_Tk__ParseLoopFlags(Message* Output, JB_String* Ender, int TmpFlags) {
 	bool Rz = false;
 	Ind Err = JB_Tk__NextStart();
-	Rz = ((bool)JB_Tk__ParseLoop(Output, TmpoFlags & (~JB__Tk__StopBars)));
+	Rz = ((bool)JB_Tk__ParseLoop(Output, TmpFlags & (~JB__Tk__StopBars)));
 	if (JB_Str_Exists(Ender)) {
 		JB_Tk__ExpectEndChar(Err, Ender, true);
 		(JB_Msg_AfterSet(Output, JB_Tk__NextStart()));
@@ -4735,6 +4766,9 @@ Message* JB_Str_ParseSub(JB_String* Self, Syntax Owner, bool AllowDecomp) {
 	ErrorMarker OK = JB_Rec_Mark(JB_StdErr);
 	int Flags = kJB__Tk_kTemporal;
 	Message* Into = JB_Incr(JB_Msg_ConstructorRange(nil, nil, Owner, 0, JB_LUB[0], 0));
+	if (Owner == kJB_SyxArg) {
+		(JB_Msg_SyntaxIsSet(Into, kJB__MsgParseFlags_Style2, true));
+	}
 	bool Lines = JB_Tk__ParseLoopFlags(Into, JB_LUB[0], Flags);
 	if ((!Lines) and JB_Ring_HasChildCount(Into, 1)) {
 		JB_SetRef(Into, ((Message*)JB_Ring_First(Into)));
@@ -7960,7 +7994,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024091123);
+	return (2024092112);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -7972,4 +8006,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 -8242602030361934645 -2650631559806097130
+// -2934619186805667969 6464246577374740407 -2650631559806097130

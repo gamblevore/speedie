@@ -631,6 +631,13 @@ extern CharSet* JB__Constants_XMLWordMiddle;
 #define kJB__MZLab_Strongest ((int)4)
 #define kJB__Math_E (2.7182818284590452353602874713526f)
 #define kJB__Math_iTau (0.15915494309f)
+#define kJB__PicoNoise_All ((int)15)
+#define kJB__PicoNoise_Debug ((int)3)
+#define kJB__PicoNoise_DebugChild ((int)1)
+#define kJB__PicoNoise_DebugParent ((int)2)
+#define kJB__PicoNoise_Events ((int)12)
+#define kJB__PicoNoise_EventsChild ((int)4)
+#define kJB__PicoNoise_EventsParent ((int)8)
 extern JB_File* JB__Platform_Logger_;
 extern JB_String* JB__JbinHeader;
 extern JB_String* JB__jBinNotJbin;
@@ -997,6 +1004,9 @@ JB_String* JB_Constants__TestJB();
 // Math
 
 
+// PicoNoise
+
+
 // Platform
 int JB_Platform__Init_();
 
@@ -1060,7 +1070,9 @@ Message* JB_Tk__DecorateThing(Message* R, int Ops);
 
 Message* JB_Tk__DotSub(Syntax Fn, int Start, Message* Parent);
 
-int JB_Tk__EmbeddedCode(JB_String* Close, Message* Dest, int TmpoFlags);
+Message* JB_Tk__ElseIfAdder(Message* Prev, Message* Curr);
+
+int JB_Tk__EmbeddedCode(JB_String* Close, Message* Dest, int TmpFlags);
 
 Message* JB_Tk__ErrorAdd(JB_String* S, Ind Start);
 
@@ -1135,6 +1147,8 @@ Message* JB_Tk__fFuncCall(int Start, Message* Parent);
 Message* JB_Tk__FillXML(Message* XML, Ind I);
 
 int JB_Tk__FindError(int Num);
+
+int JB_Tk__FinishParseLoop(int Lines, Message* Output, int After);
 
 Message* JB_Tk__fInnerNiceAdj(int Start, Message* Parent);
 
@@ -1252,7 +1266,7 @@ Message* JB_Tk__ParseItem(Message* Ch, int TemporalFlags, int Ops);
 
 int JB_Tk__ParseLoop(Message* Output, int TmpoFlags);
 
-bool JB_Tk__ParseLoopFlags(Message* Output, JB_String* Ender, int TmpoFlags);
+bool JB_Tk__ParseLoopFlags(Message* Output, JB_String* Ender, int TmpFlags);
 
 Message* JB_Tk__ParseLoopItem(Message* Output, int TmpoFlags, Message* Prev, int Indent);
 
