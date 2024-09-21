@@ -1263,8 +1263,8 @@ JBClass ( SpdProcess , ShellStream ,
 	int DiedCount;
 	int DeathLimit;
 	ProcessMode Mode;
-	bool WeAreParent;
 	bool AlreadyWarnedDied;
+	bool WeAreParent;
 	FP_SpdMainFn SubProcess;
 );
 
@@ -3970,7 +3970,9 @@ Message* JB_Tk__DecorateThing(Message* R, int Ops);
 
 Message* JB_Tk__DotSub(Syntax Fn, int Start, Message* Parent);
 
-int JB_Tk__EmbeddedCode(JB_String* Close, Message* Dest, int TmpoFlags);
+Message* JB_Tk__ElseIfAdder(Message* Prev, Message* Curr);
+
+int JB_Tk__EmbeddedCode(JB_String* Close, Message* Dest, int TmpFlags);
 
 Message* JB_Tk__ErrorAdd(JB_String* S, Ind Start);
 
@@ -4045,6 +4047,8 @@ Message* JB_Tk__fFuncCall(int Start, Message* Parent);
 Message* JB_Tk__FillXML(Message* XML, Ind I);
 
 int JB_Tk__FindError(int Num);
+
+int JB_Tk__FinishParseLoop(int Lines, Message* Output, int After);
 
 Message* JB_Tk__fInnerNiceAdj(int Start, Message* Parent);
 
@@ -4162,7 +4166,7 @@ Message* JB_Tk__ParseItem(Message* Ch, int TemporalFlags, int Ops);
 
 int JB_Tk__ParseLoop(Message* Output, int TmpoFlags);
 
-bool JB_Tk__ParseLoopFlags(Message* Output, JB_String* Ender, int TmpoFlags);
+bool JB_Tk__ParseLoopFlags(Message* Output, JB_String* Ender, int TmpFlags);
 
 Message* JB_Tk__ParseLoopItem(Message* Output, int TmpoFlags, Message* Prev, int Indent);
 
