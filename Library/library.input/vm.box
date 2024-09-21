@@ -275,7 +275,6 @@ forms
 /**/ SWAP (Swap)
 		std_swap(r[n1], r[n2])
 		std_swap(r[n3], r[n4])
-
 /**/ PRNT (U1)
 		printf("%lli\n", i1)
 		#!better to print this also as float/double/signed/unsigned...
@@ -327,20 +326,24 @@ forms
 
 
 #!						 (((((Bitops)))))
-/**/ BSHS  (U3)
-		i1 = i2 >> u3
-/**/ BSHR  (U3)
-		u1 = u2 >> u3
-/**/ BSHL  (U3) 
-		u1 = u2 << u3
+/**/ BXOR  (Shift)
+		u1 = u2 ^   (u3|||Shift_Shu)
+/**/ BSHS  (Shift)
+		i1 = i2 >>  (u3+Shift_Shu)
+/**/ BSHR  (Shift)
+		u1 = u2 >>  (u3+Shift_Shu)
+/**/ BSHL  (Shift) 
+		u1 = u2 <<  (u3+Shift_Shu)
 /**/ BAND  (Shift)
-		u1 = u2 & (u3|||Shift_Shu)
-/**/ BOAR  (U3)
-		u1  = u2|||u3
-/**/ BXOR  (U3)
-		u1 = u2 ^ u3
-/**/ BNOT  (U3)
-		u1 = ~u2 & ~u3
+		u1 = u2 &   (u3|||Shift_Shu)
+/**/ BNAN  (Shift)
+		u1 = u2 &  ~(u3|||Shift_Shu)
+/**/ BOOR  (Shift)
+		u1  = u2||| (u3|||Shift_Shu)
+/**/ BNOR  (Shift)
+		u1  = u2|||~(u3|||Shift_Shu)
+/**/ BNOT  (Shift)
+		u1 = ~u2 & ~(u3|||Shift_Shu)
 /**/ BFLG  (BFLD) // perhaps sign can allow for SIMD opts?
 		if (BFLD_signu)
 			i1 = ((i2 << BFLD_upu) >> BFLD_downu)
