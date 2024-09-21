@@ -87,20 +87,24 @@
 	else 
 	u1 = std_min(u2, u3)
 ;
+ı BXOR: _
+	u1 = u2 ^ (u3 | Shift_Shu);
 ı BSHS: _
-	i1 = i2 >> u3;
+	i1 = i2 >> (u3 + Shift_Shu);
 ı BSHR: _
-	u1 = u2 >> u3;
+	u1 = u2 >> (u3 + Shift_Shu);
 ı BSHL: _
-	u1 = u2 << u3;
+	u1 = u2 << (u3 + Shift_Shu);
 ı BAND: _
 	u1 = u2 & (u3 | Shift_Shu);
-ı BOAR: _
-	u1 = u2 | u3;
-ı BXOR: _
-	u1 = u2 ^ u3;
+ı BNAN: _
+	u1 = u2 & ~(u3 | Shift_Shu);
+ı BOOR: _
+	u1 = u2 | (u3 | Shift_Shu);
+ı BNOR: _
+	u1 = u2 | ~(u3 | Shift_Shu);
 ı BNOT: _
-	u1 = ~u2 & ~u3;
+	u1 = ~u2 & ~(u3 | Shift_Shu);
 ı BFLG: _
 	if (BFLD_signu) 
 	i1 = ((i2 << BFLD_upu) >> BFLD_downu)
