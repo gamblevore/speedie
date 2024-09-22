@@ -62,6 +62,7 @@ class PerryIDE (Window)
 	|Buttonview|				GoPrev
 	|Buttonview|				StartScreen
 	|Buttonview|				BuildButton
+	|Buttonview|				RecentButton
 	|Buttonview|				RunButton
 	|Process?| 					Talker
 	|message|					RecentFiles
@@ -304,6 +305,8 @@ class PerryIDE (Window)
 		debug_require self // what?
 		|| p = .Project
 		app.pref("currproj") = p
+		|| rec = Perry.RecentProjects.Find(@tmp, p)
+			rec.Parent.first = rec
 		if FromClick
 			if .islast
 				.ClickedTodo
@@ -376,6 +379,7 @@ class PerryIDE (Window)
 			|| HideBuilders = !ShowBuilders
 			.runbutton.declutter		= HideBuilders
 			.buildbutton.declutter		= HideBuilders
+			.recentbutton.declutter		= HideBuilders
 			.Progress.Declutter			= HideBuilders
 		
 		if (hideside == visside)
@@ -642,24 +646,6 @@ class PerryIDE (Window)
 			rz = .parse.Find(@tmp, "main")
 
 
-	function OpenDoc (GUIPasteEvent)
-		require self
-		|| p   = data
-		|| ext = p.ext
-		|| f   = p.file
-		if f.isdir
-			p = p.pathdir
-		if .GotoIncludedFile(p)
-			rz = self
-		  elseif f.NeedsOwnWindow
-			rz = IdeAddProj(p)							// add as project
-		  else
-			.filelist.addextra(p)						// add root
-			rz = self
-		startupwindow.hide
-		.showide
-
-
 	Syntax UsingComplete (|object| idk)
 		.StillJumping = false
 		.AddToJumpHistory
@@ -707,8 +693,27 @@ class PerryIDE (Window)
 				require data.fileexists
 			  else
 				i = perry.ProjContaining(data)
-				i := IdeAddProj(data, nil)
-			return i.OpenDoc(after, data, purpose)
+				i := perry.IdeAddProj(data, nil)
+			return i.OpenDoc(data)
+
+
+	function OpenDoc (|string| Path, |object|)
+		require self
+		|| p   = path
+		|| ext = p.ext
+		|| f   = p.file
+		if f.isdir
+			p = p.pathdir
+		|| ide = self
+		if .GotoIncludedFile(p)
+			//
+		  elseif f.NeedsOwnWindow
+			ide = perry.IdeAddProj(p)							// add as project
+		  else
+			.filelist.addextra(p)						// add root
+		startupwindow.hide
+		ide.ShowIDE
+		return ide
 
 		
 	function LoadErrors (|bool| jump, |bool| actual_compile) 
@@ -745,7 +750,7 @@ class PerryIDE (Window)
 				lst.select(src.first)
 		(self is broken) = ActualErrors > 0
 		.RelistStartupErrors
-		.CommsLogList.listsource.keep(144)
+		.CommsLogList.listsource.trim(144)
 
 
 	function EditRow (|listviewrow| r, |int|)
@@ -876,6 +881,7 @@ So anything not 0 means "its OK"`
 		  else
 			.notify("Prefs are corrupted")
 			app._prefs = oldPrefs
+		perry.LoadRecents
 		¥.LoadFromPrefs
 
 

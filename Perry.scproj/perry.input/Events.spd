@@ -21,7 +21,7 @@ function perryide.unused_hope (|message| tmp, |string| where)
 	.editme.LineErrorAdd(err)
 
 
-function IdeAddProj (|string| Path, |PerryIDE| ide = nil, |PerryIDE!|) // initide
+function perry.IdeAddProj (|string| Path, |PerryIDE| ide = nil, |PerryIDE!|) // initide
 	|| old = perry.FindProj(path)
 		ClickedTabs(nil, old)
 		|| o = old.ide
@@ -62,9 +62,9 @@ function ClickedOpenProj (GUIaction)
 	|| start		= "~/".resolve
 	|| path			= app.AskOpen("spd,scproj/,input/", start, "Open Project", "Open", "OpenProj")	#require
 	|| better_path	= path.GetSpeedieProj
-		IdeAddProj(better_path)
+		perry.IdeAddProj(better_path)
 	  else
-		IdeAddProj(path)
+		perry.IdeAddProj(path)
 	perry.HideStartIfNeeded
 
 
@@ -76,7 +76,7 @@ function ClickedCreateProj (GUIAction)
 
 function ClickedOpenFile (GUIaction)
 	|| file = app.AskOpen("",  "",  "Open File", "Open", "OpenProj")
-		IdeAddProj(file)
+		perry.IdeAddProj(file)
 	perry.HideStartIfNeeded
 
 
@@ -200,6 +200,10 @@ function PerryRecheckEvent (guilistevent)
 function ReturnProjectPath (GUIListEvent)
 	if row isa filerow
 		row.location.reveal
+	return true
+	
+function ReturnRecents (GUIListEvent)
+	perry.IdeAddProj(row.name)
 	return true
 
 

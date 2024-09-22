@@ -285,7 +285,7 @@ module SDLApp
 
 	function SavePrefs
 		if app._prefs
-			app.pref("screen") = sdlapp.ScreenOrig.List
+			app.prefmsg("screen") = sdlapp.ScreenOrig.List
 			app.SavePrefs
 
 

@@ -7,6 +7,7 @@
 module Perry
     |ListViewRow|					Projects
 	|Dictionary of String|			PathDict
+	|listviewrow|					RecentProjects=message()
     |bool|							Checked	
     |byte| 							FindID
 	
@@ -51,7 +52,7 @@ module Perry
 	
 	function Save
 		visible
-		app.pref("colors") = ¥.savecolors.parse
+		app.prefmsg("colors") = ¥.savecolors.parse
 
 		
 	helper LoadWindowsSub (|bool|)
@@ -82,13 +83,21 @@ module Perry
 		appmenu <~ ("Install",  		ClickedInstallMenu)
 
 
+	function LoadRecents
+		Perry.RecentProjects = app.PrefList("Recents")
+		for s in Perry.RecentProjects
+			if !s.name.FileExists
+				s.Remove // ooof
+
+	
 	function Startup (GUIApplicationInit)
 		target lin: sdlapp.removeborder // doesnt seem to work in Windows WSL?
-		sdlapp.AppDocumentOpen = &perryide.PerryOpenDoc
+		sdlapp.AppDocumentOpen = &PerryIDE.PerryOpenDoc
 		stderr.LogFile = "PerryErrors.txt"
 		app.InitColors
 		¥.LoadDefaults
 		.BuildAppMenu
+		.LoadRecents
 	
 		|| old = app.Pref("currproj")
 		.Projects = app.prefmsg("lastproj")

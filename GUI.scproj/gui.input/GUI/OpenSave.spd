@@ -187,7 +187,7 @@ class OpenSaveDialog (Window)
 		
 		function LastDir (|message|)
 			rz = (app.prefsinit)("opensave")
-			rz.keep(20)
+			rz.trim(20)
 			for f in rz
 				if f != @tmp
 					f.remove

@@ -41,7 +41,7 @@ function perryide.AddToJumpHistory
 		if old
 			old.remove
 		.RecentFiles.msg(@str, p.name).msg(@str, p)
-		.RecentFiles.Keep(60, false)
+		.RecentFiles.trim(60, false)
 	.EnablePrevNext
 	
 
@@ -116,6 +116,13 @@ function message.IDE (|perryide|)
 			if w isa PerryIDE
 				if .name ~= w.Project
 					return w
+
+
+function ClickedOpenRecent (GUIaction)
+	if self isa ButtonView
+		|| s = .SubMenu
+			s.ListSource = Perry.RecentProjects
+			.OpenMenu
 
 
 function string.NotifyCopy

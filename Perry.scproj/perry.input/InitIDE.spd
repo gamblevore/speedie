@@ -13,9 +13,10 @@ extend PerryIDE
 		.ViewButtons		= guicontrol(self) 
 		.RBorder			= guicontrol(self)
 		.StdOutBorder		= guicontrol(self)
-		.Toolbar			= buttonview(self,		ClickedToolBar,			nil)
+		.Toolbar			= buttonview(self,		ClickedToolBar)
 		.RunButton			= buttonview(.Toolbar,	ClickedDebug,			PressingDebug, nil, PressingDebug)
-		.BuildButton		= buttonview(.Toolbar,	Clickedcompile,			nil)
+		.BuildButton		= buttonview(.Toolbar,	Clickedcompile)
+		.RecentButton		= buttonview(.Toolbar,	ClickedOpenRecent, ClickedOpenRecent,  ReturnRecents)
 		.ProjectTabs		= ButtonView(.Toolbar,	ClickedTabs,    PressingTabs,  ReturnProjectPath,  RightClickedTabs) 
 		.StartScreen		= ButtonView(.Toolbar,	&StartupWindow.open)
 		.Progress			= ProgressBar(.Toolbar,	ClickedCancel)
@@ -31,15 +32,15 @@ extend PerryIDE
 		.EditMe				= TextView(self,		JumpToDefinition,		PressedEditKeys)
 		.DrawMe				= GraphicsEditor(self)
 		.FileList			= FileViewer(self,		SelectedFile,			nil, .editme) 
-		.EditStatus			= TextView(self,		ClickedStatus,			nil)
-		.ProjectInfo		= TextView(self,		ClickedProjectInfo,		nil)
-		.SelInfo			= TextView(self,		PressedSelInfo,			nil)
-		.JeeboxText			= TextView(self,		nil,					nil)
-		.SpeedieText		= TextView(self,		nil,					nil)
-		.ProductOut			= TextView(self,		nil,					nil)
-		.ProductErrors		= TextView(self,		nil,					nil)
+		.EditStatus			= TextView(self,		ClickedStatus)
+		.ProjectInfo		= TextView(self,		ClickedProjectInfo)
+		.SelInfo			= TextView(self,		PressedSelInfo)
+		.JeeboxText			= TextView(self)
+		.SpeedieText		= TextView(self)
+		.ProductOut			= TextView(self)
+		.ProductErrors		= TextView(self)
 		.CompileTabs		= ButtonView(.StdOutBorder,		ClickedCompileTabs) 
-		.NoNeeder			= TextView(self,		ClickedNoNeed,			nil)
+		.NoNeeder			= TextView(self,		ClickedNoNeed)
 		.AutoComplete		= menu(self, 			nil,					AutoCompleteInsertText)
 		.ViewFiles			= ButtonView(.ViewButtons,		ClickedAView)
 		.ViewSearch			= ButtonView(.ViewButtons,		ClickedAView)
@@ -54,7 +55,19 @@ extend PerryIDE
 		.AttachedProgram	= ""
 		
 		.init
+		.AddRecent(project)
 		.InConstructor = false
+	
+	
+	function AddRecent (|file| project)
+		for s in Perry.RecentProjects
+			|| f = s.first
+				if f ~= project
+					f.name = project // fix case
+					return 
+		Perry.RecentProjects.msg(@tmp, project).msg(@str, project.name)
+		Perry.RecentProjects.trim(12)
+		app.SavePrefs
 	
 	
 	function Init // perryide.init
@@ -341,10 +354,13 @@ extend PerryIDE
 
 		.AddIDEButton(.RunButton,	"\02", "Debug Project", "debug")
 		.AddIDEButton(.buildbutton, "\1C", "Build Project", "compile")
-		.buildbutton.next = .progress // better
+		.AddIDEButton(.recentbutton, "\11", "Recents", "recent")
+		.buildbutton.next = .Progress
+		.progress.next = .RecentButton
 		.AddIDEButton(.progress,	"", "", "progress")
 		.runbutton.size =   5~after for 22  by  3~inside
 		.buildbutton.size = 5~after for 22  by  3~inside
+		.RecentButton.size = 5~after for 22  by  3~inside
 		.progress.size =    0~before for 60  by  3~inside
 		
 		.RunButton.ExpandOnMouseOver = 1
@@ -425,6 +441,10 @@ extend PerryIDE
 			.ID = "AllFuncsMenu"
 			.OnSelected = PerryFuncMenuSelected
 			.OnTypingFilter = PerryFuncListFilter
+
+		with .RecentButton.submenu
+			isnt drawsfocus
+			.ID = "RecentList"
 
 		with .CurrFileName.submenu
 			isnt drawsfocus

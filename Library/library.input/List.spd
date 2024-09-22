@@ -369,7 +369,7 @@ class list (Saveable)
 			x.remove
 
 
-	function Keep (|int| n, |bool| First = true)
+	function Trim (|int| n, |bool| First = true)
 		opt norefcounts
 		if n <= 0
 			.clear

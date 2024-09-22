@@ -1845,7 +1845,7 @@ class TextView (GUIControl)
 		(rz.x max= w)
 
 
-	function TextSize (|string|s, |ivec2|)
+	function TextSize (|string| s, |ivec2|)
 		|| mul = (font.width, .lineheight)
 		|| bd  = s.bounds
 		|| add = (6, 0)
@@ -1853,10 +1853,13 @@ class TextView (GUIControl)
 
 
 	helper WillAttemptParse (|int| Expect, |bool|)
-		require (expect >= 2)
+		require (expect >= ProbablyJeebox)
 		require !.singleline
-// Just segment for longer files. No one needs 10000KB file word-wrapped.
-		return .text.length < 512K	// my largest jb file is 60k! 
+		|| L = .text.Length
+		if Expect == allowJeebox
+			return L < 64K
+		return L < 4MB	// my largest jb file is 60k! 
+// todo: Just segment longer files into "chapters". No one needs 10000KB file word-wrapped.
 
 
 	function ParsedMessage (|message|)
@@ -1945,7 +1948,6 @@ class TextView (GUIControl)
 		if .SingleLine
 			charw = 4KB
 	
-		// d = d.ReclaimStart(._reclaim[0])
 		|| ARGH = 0		// .ReclaimRestart(d) // disabled for now.
 		|| t = d.tline
 		|| p = d.position

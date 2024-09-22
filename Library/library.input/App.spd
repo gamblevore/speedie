@@ -43,6 +43,16 @@ function Conf (|string| name, |string|)
 function Conf (|string| name, assigns:|string|)
 	disabled "Set conf values in the original app.configure..."
 
+
+function Pref (|string| s, assigns:|string|)
+	opt norefcounts
+	.PrefsInit()[s] = Value
+
+function PrefMsg (|string| s, assigns:|message|)
+	opt norefcounts
+	cpp_part SetPrefMsg
+	.prefsinit()[s] = Value
+
 function Pref (|string| s, |string|)
 	cpp_part GetPref
 	return ._prefs[s].value
@@ -50,20 +60,17 @@ function Pref (|string| s, |string|)
 function PrefMsg (|string| s, |message|)
 	return ._prefs[s]
 
+function PrefList (|string| s, |message|)
+	rz = ._prefs[s]
+	if !rz
+		rz = ._Prefs.msg(@tmp, s).msg(@arg)
+
+
 function Created (|date|)
 	return __now__|date|
 	
 function TimeID (|uint64|)
 	return __time_id__
-
-function Pref (|string| s, assigns:|string|)
-	opt norefcounts
-	.PrefsInit()[s] = Value
-
-function Pref (|string| s, assigns:|message|)
-	opt norefcounts
-	cpp_part SetPrefMsg
-	.prefsinit()[s] = Value
 
 function AllowInteruptCrash (assigns:|bool|)
 	cpp_wrapper JB_App__CrashOnInterupt
