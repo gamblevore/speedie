@@ -256,7 +256,7 @@ function SetRel	(fn_asm)
 function Num (fn_asm)
 	opt norefcounts
 	|| d = exp.ASMDecl
-	return .GenericNumFinder(exp, d.exportposition, dest) 
+	return .numtoreg(exp, d.exportposition, dest) 
 
 
 function Thg (fn_asm)

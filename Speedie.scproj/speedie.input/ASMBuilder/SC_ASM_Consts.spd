@@ -47,15 +47,6 @@ function fatasm.KNST_Encoder (Asm_encoder2)
 
 
 extend ASMState
-	function asmstate.GenericNumFinder (|message| exp, |uint64| Value, |asmreg| TypeInfo=asmreg(), |asmreg|)
-		opt norefcounts
-// doesn't find anymore 😭
-// optimiser will do this. (one day)
-//		|| r = .FindConst(value, typeinfo)
-//			return r
-		return .NumToReg(exp, Value, TypeInfo)
-
-
 	function MakeConst2 (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |fn_ASMConstifier| fn,  |asmreg|)
 		|| knst = .NumToFat(exp, 0, dest as asmreg.Textual)
 		(fn)(knst,l,r)

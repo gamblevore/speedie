@@ -233,7 +233,7 @@ extend ASMState
 			if l is alternate
 				fat.op ++
 		  else
-			|| v = .GenericNumFinder(exp, lmul)
+			|| v = .numtoreg(exp, lmul)
 			if l isnt alternate							// x = lptr + r*12
 				fat = exp.MULT(dest, R, V, L)
 			  else										// x = (lptr - rptr)/12
