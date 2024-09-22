@@ -501,7 +501,7 @@ Speedie's function histogram:  0:410,  1:1656,  2:1464,  3: 713,  4: 167,  5:  6
 
 
  
- Fn0 VMDummyTable[] = {(Fn0)JB_Str_Length, (Fn0)JB_Str_Address, (Fn0)JB_Str_WhiteSpace, (Fn0)JB_Str_OperatorPlus, (Fn0)JB_Str_BOM, (Fn0)JB_Str_ChrUTF8, (Fn0)0}; 
+ Fn0 VMDummyTable[] = {(Fn0)JB_Str_Length, (Fn0)JB_Str_Address, (Fn0)JB_Str_WhiteSpace, (Fn0)JB_Str_OperatorPlus, (Fn0)JB_Str_ChrUTF8, (Fn0)0}; 
 
 
 #define NextRegI(r,r2) 											\

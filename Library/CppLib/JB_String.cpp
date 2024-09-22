@@ -1715,7 +1715,7 @@ JB_String* JB_Str_UnicodeSync(JB_String* Str) {
 }
 
 
-JB_String* JB_Str_BOM(JB_String* self, int Encoding, bool IsBigEndian) {
+JB_String* JB_Str_BOM (int Encoding, bool IsBigEndian) {
 	uint8 Write[4];
 	int Len = 0;
 
