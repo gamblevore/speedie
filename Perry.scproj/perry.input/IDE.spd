@@ -62,7 +62,7 @@ class PerryIDE (Window)
 	|Buttonview|				GoPrev
 	|Buttonview|				StartScreen
 	|Buttonview|				BuildButton
-	|Buttonview|				RecentButton
+//	|Buttonview|				RecentButton
 	|Buttonview|				RunButton
 	|Process?| 					Talker
 	|message|					RecentFiles
@@ -379,7 +379,7 @@ class PerryIDE (Window)
 			|| HideBuilders = !ShowBuilders
 			.runbutton.declutter		= HideBuilders
 			.buildbutton.declutter		= HideBuilders
-			.recentbutton.declutter		= HideBuilders
+//			.recentbutton.declutter		= HideBuilders
 			.Progress.Declutter			= HideBuilders
 		
 		if (hideside == visside)

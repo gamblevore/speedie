@@ -16,9 +16,9 @@ extend PerryIDE
 		.Toolbar			= buttonview(self,		ClickedToolBar)
 		.RunButton			= buttonview(.Toolbar,	ClickedDebug,			PressingDebug, nil, PressingDebug)
 		.BuildButton		= buttonview(.Toolbar,	Clickedcompile)
-		.RecentButton		= buttonview(.Toolbar,	ClickedOpenRecent, ClickedOpenRecent,  ReturnRecents)
-		.ProjectTabs		= ButtonView(.Toolbar,	ClickedTabs,    PressingTabs,  ReturnProjectPath,  RightClickedTabs) 
-		.StartScreen		= ButtonView(.Toolbar,	&StartupWindow.open)
+		.ProjectTabs		= ButtonView(.Toolbar,	ClickedTabs,    	 PressingTabs, 	ReturnProjectPath,  RightClickedTabs) 
+		.StartScreen		= ButtonView(.Toolbar,	&StartupWindow.open, ClickedOpenRecent, ReturnRecents)
+//		.RecentButton		= buttonview(.Toolbar,	ClickedOpenRecent, ClickedOpenRecent,  ReturnRecents)
 		.Progress			= ProgressBar(.Toolbar,	ClickedCancel)
 		.GoPrev				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
 		.GoNext				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
@@ -352,15 +352,18 @@ extend PerryIDE
 		.ProductErrors.SetupOut("errors")
 		
 
-		.AddIDEButton(.RunButton,	"\02", "Debug Project", "debug")
-		.AddIDEButton(.buildbutton, "\1C", "Build Project", "compile")
-		.AddIDEButton(.recentbutton, "\11", "Recents", "recent")
+		.AddIDEButton(.RunButton,		"\02", "Debug Project", "debug")
+		.AddIDEButton(.buildbutton,		"\1C", "Build Project", "compile")
+//		.AddIDEButton(.recentbutton,	"\11", "Recents", "recent")
 		.buildbutton.next = .Progress
-		.progress.next = .RecentButton
 		.AddIDEButton(.progress,	"", "", "progress")
 		.runbutton.size =   5~after for 22  by  3~inside
 		.buildbutton.size = 5~after for 22  by  3~inside
-		.RecentButton.size = 5~after for 22  by  3~inside
+		.StartScreen.size = 7~left back 22  by  3~down back 14
+//		.RecentButton.size = 33~left back 22  by  3~down back 14
+//		.StartScreen.next = .RecentButton
+//		.RecentButton.size = 5~before back 22  by  3~down back 14
+		
 		.progress.size =    0~before for 60  by  3~inside
 		
 		.RunButton.ExpandOnMouseOver = 1
@@ -406,8 +409,6 @@ extend PerryIDE
 			
 
 		.AddIDEButton(.StartScreen,	"\1a", "Startup screen", "startup")
-		.StartScreen.size = 7~left back 22  by  3~down back 14
-
 		.AddViewButton(.Viewfiles,		"\10",	.filelist)
 		.AddViewButton(.viewsearch,		"\16",	.searcharea)
 		.AddViewButton(.viewerrors,		"\17",	.errorlist)
@@ -442,7 +443,7 @@ extend PerryIDE
 			.OnSelected = PerryFuncMenuSelected
 			.OnTypingFilter = PerryFuncListFilter
 
-		with .RecentButton.submenu
+		with .startscreen.submenu
 			isnt drawsfocus
 			.ID = "RecentList"
 
