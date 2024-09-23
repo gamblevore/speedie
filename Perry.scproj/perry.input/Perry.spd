@@ -86,6 +86,8 @@ module Perry
 	function LoadRecents
 		Perry.RecentProjects = app.PrefList("Recents")
 		for s in Perry.RecentProjects
+			|| second = .FindRecent(s.name, s.next)
+				second.remove
 			if !s.name.FileExists
 				s.Remove // ooof
 

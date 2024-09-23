@@ -55,19 +55,26 @@ extend PerryIDE
 		.AttachedProgram	= ""
 		
 		.init
-		.AddRecent(project)
+		perry.AddRecent(project)
 		.InConstructor = false
 	
 	
-	function AddRecent (|file| project)
-		for s in Perry.RecentProjects
-			|| f = s.first
-				if f ~= project
-					f.name = project // fix case
-					return 
+	function perry.FindRecent (|string| p, |message| curr = nil, |message|)
+		opt norefcounts
+		if !curr
+			curr = Perry.RecentProjects.first
+		while curr
+			if curr ~= p
+				return curr
+			curr++
+	
+	
+	function perry.AddRecent (|file| project)
+		|| f = .Findrecent(project)
+			f.name = project // fix case
+			return 
 		Perry.RecentProjects.msg(@tmp, project).msg(@str, project.name)
 		Perry.RecentProjects.trim(12)
-		app.SavePrefs
 	
 	
 	function Init // perryide.init
