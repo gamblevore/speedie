@@ -75,6 +75,8 @@ module SpdAssembler
 //		while .Optimise(fn.asm!)
 //			loop ++fn.OptCounts <= 16
 //		.FlowControl
+		
+		PackMaker.MiniTest(fn)
 		return true
 
 

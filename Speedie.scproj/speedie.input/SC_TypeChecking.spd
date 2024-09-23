@@ -3,14 +3,12 @@
 
 function Message.ExpandToBool (|SCNode| name_space, |Message|)
 	opt norefcounts
-	|| decl = TypeOfExpr( self, name_space )$
-
-	|| upon = .unbra
-
-	rz = TypeBool!.TypeNormal.ExpectMatch( decl, kTypeCastTrue, upon )
-
-	While (rz == @bra) and (rz.first == @bra)
-		rz = rz.ReplaceWithChild
+	|| decl = TypeOfExpr( self, name_space )	
+		|| upon = .unbra
+		rz = TypeBool!.TypeNormal.ExpectMatch( decl, kTypeCastTrue, upon )
+	
+		while (rz == @bra) and (rz.first == @bra)
+			rz = rz.ReplaceWithChild
 
 
 function RelSetOrExpansion (|Message| exp)
@@ -32,8 +30,8 @@ function RelSetOrExpansion (|Message| exp)
 
 
 function Or_And_Expansion (|SCDecl| LC, |SCDecl| RC, |Message| exp, |SCNode| name_space, |SCDecl|)
-	|| LBool = LC.Minimatch( TypeBool!.TypeNormal, kTypecastFalse )
-	|| RBool = RC.Minimatch( TypeBool!.TypeNormal, kTypecastFalse )
+	|| LBool = LC.Minimatch( TypeBool!.TypeNormal )
+	|| RBool = RC.Minimatch( TypeBool!.TypeNormal )
 		
 	if RBool and LBool
 		Return LC // easy

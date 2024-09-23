@@ -5,13 +5,14 @@ extend_module ASM
 		opt norefcounts
 		asmstate.sh.PackMakerInit
 		|| list = tests.last(@arg)
-		|| testname = tests[@thg]
+		|| TestName = tests[@thg]
 		require list and testname
 
 		textassembler.assemble(list)
 		|| fn = SpdAssembler[testname]
 			|| ff = fn.µTest
-				ff.run
+				jb_vm.vm.Registers(true)
+				|| result = jb_vm.Run(ff.ptr, ff.length)
 
 
 	function TestASM 

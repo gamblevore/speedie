@@ -34,12 +34,6 @@ forms
 	Jump
 		JUMP	j
 	
-	Cmp		// cmp:
-		r1		R
-		r2		r
-		r3		r
-		Cmp		3
-	
 	MinMax		// max:
 		r1		R
 		r2		r
@@ -59,7 +53,13 @@ forms
 		r2		r
 		Jmp		j
 
-	JCmp	// cmp:
+	JCmpF	// cmp:
+		r1		r
+		r2		r
+		Cmp		4
+		Jmp		j
+
+	JCmpI	// cmp:
 		r1		r
 		r2		r
 		Cmp		3
@@ -372,10 +372,10 @@ forms
 	else
 		u1 = u4
 
-/**/ CMPI  (Cmp)
+/**/ CMPI  (JCmpI)
 	CompI(r, Op)
 
-/**/ CMPF  (Cmp)
+/**/ CMPF  (JCmpF)
 	CompF(r, Op)
 
 
@@ -387,11 +387,11 @@ forms
 /**/ JUMP (jump)
 		Code += l0
 
-/**/ JMPI  (JCmp)
+/**/ JMPI  (JCmpI)
 		__
 		Code = JompI(r, Op, Code)
 		___
-/**/ JMPF  (JCmp)
+/**/ JMPF  (JCmpF)
 		__
 		Code = JompF(r, Op, Code)
 		___

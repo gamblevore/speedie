@@ -87,19 +87,6 @@
 #define   Jump_JUMPu_(x)   (((uint)((x)<<8))>>8)
 
 
-#define   Cmp_Cmpi       ((( int)((Op)<<23))>>29)
-#define   Cmp_Cmpi_(x)   ((( int)((x)<<23))>>29)
-
-#define   Cmp_Cmpu       (((uint)((Op)<<23))>>29)
-#define   Cmp_Cmpu_(x)   (((uint)((x)<<23))>>29)
-
-#define   Cmp_Li       ((( int)((Op)<<26))>>26)
-#define   Cmp_Li_(x)   ((( int)((x)<<26))>>26)
-
-#define   Cmp_Lu       (((uint)((Op)<<26))>>26)
-#define   Cmp_Lu_(x)   (((uint)((x)<<26))>>26)
-
-
 #define   MinMax_Signi       ((( int)((Op)<<23))>>31)
 #define   MinMax_Signi_(x)   ((( int)((x)<<23))>>31)
 
@@ -139,17 +126,30 @@
 #define   JCmpEq_Jmpu_(x)   (((uint)((x)<<18))>>18)
 
 
-#define   JCmp_Cmpi       ((( int)((Op)<<18))>>29)
-#define   JCmp_Cmpi_(x)   ((( int)((x)<<18))>>29)
+#define   JCmpF_Cmpi       ((( int)((Op)<<18))>>28)
+#define   JCmpF_Cmpi_(x)   ((( int)((x)<<18))>>28)
 
-#define   JCmp_Cmpu       (((uint)((Op)<<18))>>29)
-#define   JCmp_Cmpu_(x)   (((uint)((x)<<18))>>29)
+#define   JCmpF_Cmpu       (((uint)((Op)<<18))>>28)
+#define   JCmpF_Cmpu_(x)   (((uint)((x)<<18))>>28)
 
-#define   JCmp_Jmpi       ((( int)((Op)<<21))>>21)
-#define   JCmp_Jmpi_(x)   ((( int)((x)<<21))>>21)
+#define   JCmpF_Jmpi       ((( int)((Op)<<22))>>22)
+#define   JCmpF_Jmpi_(x)   ((( int)((x)<<22))>>22)
 
-#define   JCmp_Jmpu       (((uint)((Op)<<21))>>21)
-#define   JCmp_Jmpu_(x)   (((uint)((x)<<21))>>21)
+#define   JCmpF_Jmpu       (((uint)((Op)<<22))>>22)
+#define   JCmpF_Jmpu_(x)   (((uint)((x)<<22))>>22)
+
+
+#define   JCmpI_Cmpi       ((( int)((Op)<<18))>>29)
+#define   JCmpI_Cmpi_(x)   ((( int)((x)<<18))>>29)
+
+#define   JCmpI_Cmpu       (((uint)((Op)<<18))>>29)
+#define   JCmpI_Cmpu_(x)   (((uint)((x)<<18))>>29)
+
+#define   JCmpI_Jmpi       ((( int)((Op)<<21))>>21)
+#define   JCmpI_Jmpi_(x)   ((( int)((x)<<21))>>21)
+
+#define   JCmpI_Jmpu       (((uint)((Op)<<21))>>21)
+#define   JCmpI_Jmpu_(x)   (((uint)((x)<<21))>>21)
 
 
 #define   BraBytes_Bytesi       ((( int)((Op)<<13))>>30)

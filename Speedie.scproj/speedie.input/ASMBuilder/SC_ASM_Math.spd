@@ -51,18 +51,13 @@ extend ASMState
 
 
 	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
-		if dest is constany
-			//l.nop
-			//r.nop
-			#! theres so many comparse... do this later.
-			//return .numtoreg(exp, ((l.const==r.const)==!negate)|int|, dest)
+/*
+			A > B,    A >= B,    UA > UB,    UA >= UB
+*/
 
-		mode += l.signed<<1
-		if l.IsBig ||| r.IsBig
-			mode += 4 // i guess it just is faster? its not needed. we COULD remove this!!
-		
+		mode += l.signed * 2
 		if dest isnt CondRequest
-			return exp.CMPI(dest, L, R, mode)*dest
+			return exp.CMPI(dest, L, R, mode) * dest
 
 		return exp.JMPI(L, R, mode, 0) * dest.BoolAnswer
 
@@ -71,29 +66,21 @@ extend ASMState
 		mode += 8 * l.IsBig
 		mode += 4 * r.IsBig
 		if dest isnt CondRequest
-			return exp.CMPF(dest, L, R, Mode)*dest
-		return exp.JMPF(L, R, Mode, dest)*asmreg.CondAnswer
+			return exp.CMPF(dest, L, R, Mode) * dest
+		return exp.JMPF(L, R, Mode, dest) * asmreg.CondAnswer
 
 
 	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |int| Mode,  |asmreg|)
 		if dest.IsInt
-			rz = .compareint(dest, l, r, exp, mode)
-		  else
-			rz = .comparefloat(dest, l, r, exp, mode)
+			return .CompareInt(dest, l, r, exp, mode)
+		return .CompareFloat(dest, l, r, exp, mode)
 	
+	function LessEq (fn_opasm): return .compare(dest, r, l, exp, 1)
+	function Less   (fn_opasm): return .compare(dest, r, l, exp, 0)
 	
-	function Less   (fn_opasm)
-		return .compare(dest, l, r, exp, 1)
+	function MoreEq (fn_opasm): return .compare(dest, l, r, exp, 1)
+	function More   (fn_opasm): return .compare(dest, l, r, exp, 0)
 
-	function MoreEq (fn_opasm)
-		return .compare(Dest, r, l, exp, 1)
-
-	function More   (fn_opasm)
-		return .compare(dest, l, r, exp, 0)
-
-	function LessEq (fn_opasm)
-		return .compare(Dest, r, l, exp, 0)
-	
 
 
 	// MATH 

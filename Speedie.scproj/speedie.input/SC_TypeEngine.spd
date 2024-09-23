@@ -1309,7 +1309,7 @@ function CanOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| 
 			return true
 
 
-function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |SCNode| name_space, |scdecl|) {
+function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |SCNode| name_space, |scdecl|)
 	using (exp)
 	|| dot = «dot
 		exp.first
@@ -1335,32 +1335,28 @@ function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| c
 
 	TypeOfExpr( dot, name_space )
 	Return TypeBool!.TypeNormal
-}
 
 
 function scdecl.ConstInRangeSub (|int64| Value, |bool| WasHex, |bool|)
 	|| T = .type.typeinfo
 	|| S = t.ByteCount
-	if S == 8
+	if (S == 8) or !t.IsInt
 		return true
-	if t.isint
-		|| ign = t.issigned
-		if S == 4
-			if ign and !WasHex
-				return (value >= int.min) and (value <= int.max)
-			  else
-				return (value >= -1) and (value <= 0xFFFFffff)
-				
-		  elseif S == 2
-			if ign and !WasHex
-				return value >= int16.min and value <= int16.max
-			  else
-				return (value >= -1) and (value <= 0xFFFF)
-		  elseif S == 1
-			if ign and !WasHex
-				return (value >= int8.min) and (value <= int8.max)
-			  else
-				return (value >= -1) and (value <= 0xFF)
+	|| ign = t.issigned
+	if S == 4
+		if ign and !WasHex
+			return (value >= int.min) and (value <= int.max)
+		return (value >= -1) and (value <= 0xFFFFffff)
+			
+	if S == 2
+		if ign and !WasHex
+			return value >= int16.min and value <= int16.max
+		return (value >= -1) and (value <= 0xFFFF)
+
+	if S == 1
+		if ign and !WasHex
+			return (value >= int8.min) and (value <= int8.max)
+		return (value >= -1) and (value <= 0xFF)
 	return true
 
 
@@ -1540,7 +1536,7 @@ function TypeOfRel (ExprResolver)
 	// s ~= "abc"   ->   s.eq("abc", true )
 
 
-function VecType (|bool| isfloat, |int| count, |SCClass|) {
+function VecType (|bool| isfloat, |int| count, |SCClass|)
 	if (isfloat)
 		if (count==2): return typevec2!
 		if (count==3): return typevec3!
@@ -1551,11 +1547,9 @@ function VecType (|bool| isfloat, |int| count, |SCClass|) {
 	if (count==3): return typeivec3!
 	if (count==4): return typeivec4!
 	return typeint!
-}
 
 
-
-function scclass.NotConst (|scdecl|)
+function SCClass.NotConst (|scdecl|)
 // da egg didnt make it... :(
 	opt norefcounts
 	require self
@@ -1583,6 +1577,7 @@ function string.IsZero (|bool|)
 	for c in self
 		require  (c == '.' or '0')
 	return true
+
 
 function string.Isnull (|bool|)
 	for c in self

@@ -14,9 +14,6 @@ class µFunc
 		.IR = ir
 		fn.asm = self
 
-//	function Name (|string|)
-//		return .fn.ExportName
-
 	function µTest (|memory of asm|)
 		description "Generate some code (only for testing)."
 		rz = asm[.length*3]$
@@ -45,6 +42,7 @@ class µFunc
 
 
 	function memory.Run (|memory of asm| self, |&ivec4| Args = nil, |int| ArgCount=0, |int64|)
+		disabled
 		cpp_part RunArgs
 		|| r = jb_vm.vm.Registers(true)
 		if args

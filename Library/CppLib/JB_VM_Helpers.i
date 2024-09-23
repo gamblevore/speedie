@@ -103,6 +103,7 @@ AlwaysInline ASM* LoadConst (VMRegister* r, ASM Op, ASM* Code) {
 	return Code; 
 }
 
+
 AlwaysInline u64 bitstats(u64 R2, u64 R3, u64 Mode) { // rotate
 	if (Mode == 0)							// popcount
 		return __builtin_popcountll(R2); 
@@ -116,22 +117,6 @@ AlwaysInline u64 bitstats(u64 R2, u64 R3, u64 Mode) { // rotate
 		return JB_u64_Log2(R2);
 	if (Mode == 5)							// msb
 		return (uint)JB_u32_Log2(R2);
-	return 0;
-}
-
-AlwaysInline uint bitstats32(VMRegister* r, ASM Op) {
-	int L = Const_Valuei;
-	u64 R2 = u2;
-	if (L == 0) {							// popcount
-		return __builtin_popcount((u32)R2); 
-	} else if (L == 1) {					// lsb
-		return (uint)JB_u32_Log2(R2 & -R2);
-	} else if (L == 2) {					// msb
-		return (uint)JB_u32_Log2(R2);
-	} else if (L == 3) {
-		s64 R3 = u3 + Const_Rotu;
-		return JB_u32_RotL((u32)R2, (u32)R3);
-	}
 	return 0;
 }
 
@@ -211,41 +196,41 @@ AlwaysInline bool Rare_ (VMRegister* r, ASM Op) {
 bool CompI_ (VMRegister* r, ASM Op) {
 	auto A = &i1;
 	auto B = &i2;
-	switch (Cmp_Cmpu) {
-		CmpSub(0 , iA > iB);
-		CmpSub(1 , iA < iB);
-		CmpSub(2,  uA > uB);
-		CmpSub(3,  uA < uB);
-
-		CmpSub(4 ,  A >  B);
-		CmpSub(5 ,  A <  B);
-		CmpSub(6,  UA > UB); default:;
-		CmpSub(7,  UA < UB);
+	switch (JCmpI_Cmpu) {
+		CmpSub(0,  A >   B);
+		CmpSub(1,  A >=  B);
+		CmpSub(2,  A ==  B);
+		CmpSub(3,  A !=  B);
+		CmpSub(4, UA >  UB);
+		CmpSub(5, UA >= UB);
+		CmpSub(6, UA == UB); default:;
+		CmpSub(7, UA != UB);
 	};
 }
+
 
 bool CompF_ (VMRegister* r, ASM Op) {
 	auto A = &i1;
 	auto B = &i2;
 
-	switch (Cmp_Cmpu) {
+	switch (JCmpF_Cmpu) {
 		CmpSub(0 , FA >  FB);
-		CmpSub(1 , FA <  FB);
+		CmpSub(1 , FA >= FB);
 		CmpSub(2 , FA == FB);
 		CmpSub(3 , FA != FB);
 		
 		CmpSub(4 , FA >  DB);
-		CmpSub(5 , FA <  DB);
+		CmpSub(5 , FA >= DB);
 		CmpSub(6 , FA == DB);
 		CmpSub(7 , FA != DB);
 		
 		CmpSub(8 , DA >  FB);
-		CmpSub(9 , DA <  FB);
+		CmpSub(9 , DA >= FB);
 		CmpSub(10, DA == FB);
 		CmpSub(11, DA != FB);
 		
 		CmpSub(12, DA >  DB);
-		CmpSub(13, DA <  DB);
+		CmpSub(13, DA >= DB);
 		CmpSub(14, DA == DB); default:
 		CmpSub(15, DA != DB);
 	};
@@ -254,21 +239,20 @@ bool CompF_ (VMRegister* r, ASM Op) {
 
 
 AlwaysInline ASM* JompI (VMRegister* r, ASM Op, ASM* Code) {
-	return Code + Cmp_Lu*CompI_(r, Op);
-}
-
-AlwaysInline ASM* JompF (VMRegister* r, ASM Op, ASM* Code) {
-	return Code + Cmp_Lu*CompF_(r, Op);
+	return Code + JCmpI_Jmpu*CompI_(r, Op);
 }
 		
 AlwaysInline void CompI (VMRegister* r, ASM Op) {
-	r[Cmp_Lu].Int = CompI_(r, Op);
+	r[JCmpI_Jmpu].Int = CompI_(r, Op);
+}
+
+AlwaysInline ASM* JompF (VMRegister* r, ASM Op, ASM* Code) {
+	return Code + JCmpF_Jmpu*CompF_(r, Op);
 }
 
 AlwaysInline void CompF (VMRegister* r, ASM Op) {
-	r[Cmp_Lu].Int = CompF_(r, Op);
+	r[JCmpF_Jmpu].Int = CompF_(r, Op);
 }
-
 
 AlwaysInline uint64 BitComp (VMRegister* r, ASM Op) { // cmpb
 	auto i = CmpB_Invu;
@@ -281,7 +265,6 @@ AlwaysInline uint64 BitComp (VMRegister* r, ASM Op) { // cmpb
 	return (A==B) xor (i&1); // keep this though...
 	// the first two could be "future upgrades"...?
 }
-
 
 AlwaysInline void BitClear (VMRegister* r, ASM Op) {
 	auto i = BClear_Signu;
@@ -296,7 +279,6 @@ AlwaysInline void BitClear (VMRegister* r, ASM Op) {
 	  else
 		u2 = (u2 << S2)>>S2;
 }
-
 
 AlwaysInline ASM* JompEq (VMRegister* r, ASM Op, ASM* Code) {
 	if (u1 == u2)

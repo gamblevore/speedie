@@ -78,8 +78,6 @@ module PackMaker
 		|| id = 0
 		for fn in Compiler.FuncList
 			if fn in filter
-				if id == 0
-					.MiniTest(fn)
 				fn.tableid = ++id
 			  else
 				fn.tableid = 0
@@ -89,14 +87,14 @@ module PackMaker
 		#!Actually Pack ThEsE!?
 		opt norefcounts
 		for fn in Compiler.FuncList
-			if fn.tableid
+			if fn.tableid and fn.parent.name ~= "ASMExamples"
 				require SpdAssembler.VacGenerate(fn)
 		return true
 	
 	
 	function MakePack 
 		if (–sizeof FatASM) != 64
-		require ASMState.Sh.PackMakerInit // and fn_asm_table[@arg]
+		require ASMState.Sh.PackMakerInit			// fn_asm_table[@arg]
 		.RevUpTheHoover("ASMExamples")
 		require .ActualRealCompileAkaPackIt
 
@@ -132,12 +130,17 @@ module PackMaker
 
 	
 	function MiniTest (|SCFunction| fn1)
-		|ivec4[4]| Args
-		Args[0].x = 8725,  Args[1].x = 1,  Args[2].x = 275,  Args[3].x = 1
-		|| mu = fn1.asm
-			|| mu2 = mu.µTest
-				|| Result = mu2.run( &Args[0], –count args )
-				if result != 9000
+		opt norefcounts
+		|| mu = fn1.asm$
+		|| mu2 = mu.µTest$
+		|| r = jb_vm.vm.Registers(true)
+		r[0].x = 8725 
+		r[1].x = 1
+		r[2].x = 275
+		r[3].x = 1
+		
+		|| result = jb_vm.Run(mu2.ptr, mu2.length)
+		if result != 9000
 	
 
 	function ListPackFuncs (|jbin| j)
