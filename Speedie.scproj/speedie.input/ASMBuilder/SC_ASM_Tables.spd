@@ -32,6 +32,7 @@ dispatch fn_asm_table (fn_asm)
 	(ASMType.kSetRel):		ASMType.SetRel
 	(ASMType.kStatExpr): 	ASMType.StatExpr
 	(ASMType.kPointer):		ASMType.Pointer
+	(asmtype.kRefCount):	ASMType.RefCount
 
 	(ASMType.kIgnore):		ASMType.Ignore
 	(ASMType.kFail):		ASMType.Ignore
@@ -333,7 +334,7 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 
 function BoolNot		(fn_asm)						// !a
 	opt	NoRefCounts
-	|| src = .µ(exp.first!, dest.flip(asmreg.negate))
+	|| src = .µ(exp, dest.flip(asmreg.negate))
 	if src is AlreadyNegated
 		if dest is negate // why did we get here? we just flipped it above to not negated.
 		return src

@@ -39,7 +39,7 @@ function Message.LastUsedFix (|Message|)
 	if (self == @Decl)
 		|| Ch = .second.first
 		expect (Ch == @thg)
-		if (SCRefs.RefBasis(ch, true) == SCRefs.kBasisObj)
+		if SCRefs.RefBasis(ch, true) == SCRefs.kBasisObj
 			// we returning an object. need to scan for the first incr of that object...
 			|| it = .FindRef(Compiler.RefIncr, Ch.name)
 				return it.Next
@@ -114,11 +114,10 @@ function RC_Rel (|Message| rel)
 	|| First = rel.first!
 	require RelNeedsRef( rel, first )
 	
-	|| result = NewFnc( "JB_SetRef" )
+	|| result = RefMsg0( "JB_SetRef", Compiler.RefSetRef! )
 	|| lst = result.Last!
 	lst <~ first
 	lst <~ rel.Last
-	lst.obj = Compiler.RefSetRef
 
 	rel.ReplaceWith( result )
 
@@ -140,7 +139,7 @@ function RC_IgnoreReturn (|Message| msg, |bool| DoRefs)
 			|| fn = dcl.obj!|scfunction|
 			require fn isnt constructor
 	
-	|| free_if_dead = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead )
+	|| free_if_dead = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead! )
 	msg.FuncWrap( free_if_dead )
 
 
@@ -168,6 +167,7 @@ function DecrMulti (|scdecl| d, |message| m, |message|)
 	|| Int = d.c_array.msg
 	int.obj = typeint!.typenormal // nice
 	rz = macros.MultiDecr.run(m, Int)
+	rz.ASMType = ASMType.kRefCount
 	|| prm = rz.second
 		prm.obj = Compiler.RefDecrmulti
 		rz.obj = typevoid
@@ -184,26 +184,17 @@ function RefClearMsg (|Message| msg, |Message|)
 
 function RefMsg (|Message| msg, |String| name, |SCFunction| func, |Message|)
 	opt norefcounts
-	rz = NewFnc( name )
-	|| lst = rz.Last!
-	lst <~ msg.Copy // shouldn't copy always... sometimes we want it directly, like .FillInDestructor!
-	lst.obj = func
-	rz.position = -1
+	rz = SCRefs.RefMsg0(name, func)
+	rz.Last! <~ msg.Copy
 	rz.obj = func.returntype ?? typevoid
 
 
-// RefMsg/reffunc are almost the same... sigh.
-function scfunction.RefFunc (|message| prm, |message| after)
+function SCFunction.RefFunc (|message| prm, |message!| after)
 	opt norefcounts
-	parser.using.position = -1
-	|| rz = «func »
+	|| rz = SCRefs.RefMsg0(.ExportName, Compiler.RefIncr!)
 	after.next = rz
-	rz <~ (@thg, .exportname)
+	rz.last <~ prm
 	rz.obj = prm.obj
-
-	|| lst = rz.msg(@prm) 
-	lst.obj = Compiler.RefIncr
-	lst <~ prm
 
 
 function RefIncr (|Message| msg, |Message| Place, |bool| IsJustAnArg=false)
@@ -466,6 +457,8 @@ function RefMsg0 (|String| name, |SCFunction| func, |Message|)
 	rz = NewFnc( name )
 	rz.position = -1
 	rz.second!.obj = func
+	rz.obj = func.ReturnType
+	rz.ASMType = ASMType.kRefCount
 
 
 function Message.IsProperty (|bool|)
@@ -670,9 +663,7 @@ function RC_HandleDisappearing (|SCFunction| fn, |Message| msg, |int| Basis)
 	require  (Parent != @Arg)  and  !(parent.IsReturnOrRejoin and ch.IsOnlyChild)  and  !ch.IsSetIntoPlace
 	
 	if ch.RefDisappears
-		|| fnc = NewFnc( "JB_FreeIfDead" )
-		fnc.last!.obj = Compiler.RefFreeIfDead
-		fnc.obj = Compiler.RefFreeIfDead!.returntype
+		|| fnc = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead! )
 		msg.ReplaceWith( fnc )
 		fnc.Last <~ msg
 		return

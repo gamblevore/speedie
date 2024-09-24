@@ -40,7 +40,6 @@ jb_vm* vm;
 //#define __      ; Op  = Op2;      ASMPrint(Op);
 //#define _         __   ___
 #define JumpLeaf(Addr)         LeafCode = Code;     Code = (Addr);
-#define RegVar(x,n) register auto x asm (#n)
 
 s64 RunVM (jb_vm& pvm) {		// vm_run, vm__run, vmrun, run_vm
 //	add_Test(123123);

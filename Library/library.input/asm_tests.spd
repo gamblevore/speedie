@@ -15,7 +15,7 @@ function PackTestConsts
 	|float| r6 = 2						// int as f32
 	|f64| r7 = 1.0						// f32 as f64
 
-function ForeignFuncTests (|string?| x, |string?| y, |string|)
+function PackTestForeignFuncs (|string?| x, |string?| y, |string|)
 	#! RUN!!
 	|| a = x.Length
 	|| b = x.Addr

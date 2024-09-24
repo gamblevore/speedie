@@ -72,11 +72,12 @@ module SpdAssembler
 		expect (.GenerateASM(fn) or (ASMState.ExpandJSM and .GenerateASM(fn))) "ASM is out of memory." 
 
 		printline fn.asm!.render
+
+// I think we just need inlining, flow-control, and...
 //		while .Optimise(fn.asm!)
 //			loop ++fn.OptCounts <= 16
 //		.FlowControl
-		
-		PackMaker.MiniTest(fn)
+
 		return true
 
 

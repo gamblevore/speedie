@@ -94,7 +94,7 @@ function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil, |i
 
 function scdecl.SafelyWrappable (|bool|)
 	opt norefcounts
-	|| n = .isnumeric
+	|| n = .IsNumeric
 	if (n <= 1) or (.isbool)
 		return true
 	
@@ -112,7 +112,7 @@ function scdecl.TryTypeCastPointer (|SCDecl| O, |Message| exp, |int| TypeCast, |
 	|| i = .Internal
 	if i and i.MiniMatch(O)	
 		|| OAddr = O.GetAddress
-		if carray
+		if CArray
 			oaddr.C_Array = 0
 		
 		if .MiniMatch( OAddr, TypeCast ) and (!exp or exp.CanGetAddress(nil))
@@ -123,7 +123,7 @@ function scdecl.TryTypeCastAccess (|SCDecl| O, |Message| exp, |int| TypeCast, |i
 	opt norefcounts
 	|| i = o.Internal
 	if i and .MiniMatch(i, typecast)
-		return exp.makedereference(i)
+		return exp.MakeDereference(i)
 
 
 function scdecl.TryTypeCast (|SCDecl| O, |Message| OExp, |int| TypeCast, |int|)

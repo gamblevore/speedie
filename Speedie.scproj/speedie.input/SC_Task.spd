@@ -34,7 +34,7 @@ function NewTaskActual (|Message| node, |SCNode| name_space)
 	
 	|| Supper = fields.first
 	while (|| L = fields.Last)
-		(l is Editable) // not actually editable
+		(l is Special) // not actually editable
 		tmp.First = L
 	
 	
@@ -99,7 +99,7 @@ function scclass.FillTaskConstructorSub (|message| con, |message| before, |int| 
 	
 	for p in .properties
 		|| S = p.source
-			if s is Editable
+			if s is Special
 				S.MakeTaskVar(con, before, depth==0)
 
 

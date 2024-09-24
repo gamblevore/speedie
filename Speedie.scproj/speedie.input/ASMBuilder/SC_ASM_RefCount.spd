@@ -1,0 +1,54 @@
+
+
+
+extend_module ASMType
+	function RefCountSub (fn_fatasm)	// JB_SetRef(a,b)
+		opt	NoRefCounts
+		debugger 
+		|| prms = exp.last
+		|| fn = prms.obj|scfunction|!
+		|| A = .µ(prms.first!, dest)
+
+		if fn == Compiler.RefClear
+			return exp.WRRF(A, asmreg())
+
+		if fn == Compiler.RefIncr
+			if A is containsaddr
+				// return smthgin
+			// return somethg
+			
+		if fn == Compiler.RefSetRef
+			|| B = .µ(prms.second!)
+			if a is containsaddr
+				if b is containsaddr
+					return exp.RSET(A, B)
+				return exp.WRRF(A, B)
+			  else
+				if b is containsaddr
+					// return exp.loadsome(🤩)
+				return exp.rset(A,B)
+					// set a reg from an addr. but is this reg got a value or not? we don't need to decr nothing!
+			// a few cases:
+				// * setting a reg (set reg FIRST... then incr)
+				// * setting memory (want a special load instruction!)
+		
+		// can i unify some of these? like incr reg, dest reg, etc etc
+		if fn == Compiler.RefDecr
+		if fn == Compiler.RefDecrMulti
+		if fn == Compiler.RefFreeIfDead
+		if fn == Compiler.RefSafeDecr
+			exp.cntc(A, asmreg(), 0, 1, 1) // this writes into the wrong place! we need a proper refcount instruction!
+//	CNTC
+//		r1		R
+//		r2		R
+//		offset	5
+//		cnst	7
+//		size	2 // 1, 2, 4, 8
+//		// *p1[offset] += cnst
+			// call a incr instruction...
+		
+		
+
+	function RefCount (fn_asm)	// JB_SetRef(a,b)
+		|| fat = refcountsub(self, exp, dest)!
+		return fat*dest

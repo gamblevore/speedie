@@ -121,11 +121,26 @@ AlwaysInline u64 bitstats(u64 R2, u64 R3, u64 Mode) { // rotate
 }
 
 
-#define incr(o)				JB_Incr((JB_Object*)o)
-#define freeifdead(o)		JB_FreeIfDead((JB_Object*)o)
-#define decr(o)				JB_Decr((JB_Object*)o)
-#define safedecr(o)			JB_SafeDecr((JB_Object*)o)
-#define setref(t, a, b)		{if (t) JB_SetRef(a,b); else incr(b);}  
+#define incr(o)					JB_Incr((JB_Object*)o)
+#define freeifdead(o)			JB_FreeIfDead((JB_Object*)o)
+#define decr(o)					JB_Decr((JB_Object*)o)
+#define safedecr(o)				JB_SafeDecr((JB_Object*)o)
+#define setmemregref(t, a, b)	{if (t) JB_SetRef(a,b); else incr(b);}  
+
+inline void setmemref(uint64 P, JB_Object* O) {
+	JB_Incr(O);
+	auto X = (JB_Object**)P;
+	JB_Decr(*X);
+	*X = O;
+}
+//inline JB_Object* setregref(uint64 n, JB_Object* O) {
+//	JB_Incr(O);
+//	auto X = (JB_Object**)P;
+//	JB_Decr(*X);
+//	*X = O;
+//}
+
+
 #define table(b)			((u64)(((void**)(&vm.Env))[b])+L2)  
 
 #define mem(t)				((t*)u2)[I3+Read_Lu]
@@ -330,8 +345,8 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 	int Add  = CNTC_cnsti;
 	auto PP = p1(u8);
 	PP += Off << Size;
-	uint64 Old = 0;
-	uint64 New = 0;
+	uint64 Old;
+	uint64 New;
 	auto ni = n2;
 	if (!ni) ni = 32; // just write past the end.
 	auto Where = &(r[ni].Uint);

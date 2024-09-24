@@ -22,19 +22,20 @@ extend_module ArchonPurger {
 		@num:	Number
 		@char:	Char
 		(ASMType.kif):			If
-		(ASMType.kdebugger):		ignore
+		(ASMType.kdebugger):	ignore
 		(ASMType.kWhile):		While
-		(ASMType.kContinue):		Continue
-		(ASMType.kExit):			Exit
+		(ASMType.kContinue):	Continue
+		(ASMType.kExit):		Exit
 		(ASMType.kSetRel):		SetRel
-		(ASMType.kSwap):			Swap
+		(ASMType.kSwap):		Swap
 		(ASMType.kReturn):		Return
-		(ASMType.kTern):			Tern
+		(ASMType.kTern):		Tern
 		(ASMType.kStatExpr): 	StatExpr
 		(ASMType.kPointer):		Pointer
 		(ASMType.kIgnore):		Ignore
 		(ASMType.krejoin):		Rejoin
-		(ASMType.kFail):			Fail
+		(ASMType.kFail):		Fail
+		(ASMType.kRefCount):	Function // sigh
 
 	
 	TrackerDummies()

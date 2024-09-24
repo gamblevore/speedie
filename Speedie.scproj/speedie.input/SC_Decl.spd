@@ -1149,7 +1149,8 @@ class SCDecl (SCNamed) {
 				return datatypecode.cstring
 			rz = ty.typeinfo
 			if .pointercount
-				rz &=~ datatypecode.numeric
+				rz = datatypecode._voidptr // what about carrays?
+
 
 	function VarSizeSub (|bool| TheVarItself, |int|)
 		opt norefcounts

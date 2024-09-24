@@ -42,11 +42,11 @@ function While			(fn_asm)
 	|| BEGIN = exp.JUMP(0)								// jump to end... THEN EMIT arg and jump back.
 	ASMType.arg(self, exp.second)						// arg
 
-	|| CONTINUE = .curr
+	|| CONTINUE = .Curr
 	BEGIN.jumpto = CONTINUE
-	|| GOBACK = .branch(exp.first!)						// cond
-	|| EXIT = .curr
-	GOBACK.fill(BEGIN+1)
+	|| GOBACK = .Branch(exp.first!)						// cond
+	|| EXIT = .Curr
+	GOBACK.Fill(BEGIN+1)
 	|| C = BEGIN
 
 	while C < CONTINUE
@@ -55,9 +55,9 @@ function While			(fn_asm)
 		if op >= kContinue
 			C.op = ASM.Jump
 			if op == kContinue // continue
-				C.jumpto = CONTINUE
+				C.JumpTo = CONTINUE
 			  else       // exit
-				C.jumpto = EXIT
+				C.JumpTo = EXIT
 		C++
 	
 

@@ -456,9 +456,9 @@
 #define   Swap_Lu_(x)   (((uint)((x)<<28))>>28)
 
 
-#define   RefSet_Li       ((( int)((Op)<<28))>>28)
-#define   RefSet_Li_(x)   ((( int)((x)<<28))>>28)
+#define   RefSet_Li       ((( int)((Op)<<23))>>23)
+#define   RefSet_Li_(x)   ((( int)((x)<<23))>>23)
 
-#define   RefSet_Lu       (((uint)((Op)<<28))>>28)
-#define   RefSet_Lu_(x)   (((uint)((x)<<28))>>28)
+#define   RefSet_Lu       (((uint)((Op)<<23))>>23)
+#define   RefSet_Lu_(x)   (((uint)((x)<<23))>>23)
 

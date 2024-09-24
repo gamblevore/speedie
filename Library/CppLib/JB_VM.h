@@ -1,6 +1,7 @@
 
 typedef const void* Goto;
 #define std_swap std::swap
+#define RegVar(x,n) register auto x asm (#n)
 
 // // // // // // // // // // // //  
 

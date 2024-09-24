@@ -500,6 +500,7 @@ function message.IsAlwaysBool (|maybebool|)
 function message.IsAlwaysTrue (|bool|)
 	return .IsAlwaysBool.istrue
 
+
 function message.IsAlwaysFalse (|bool|)
 	return .IsAlwaysBool.isfalse
 

@@ -174,12 +174,11 @@
 ;
 	___;
 ı RSET: _
-	setref(n1, o1, o2);
-	setref(n3, o3, o4);
-ı RMEM: _
-	i1 = i1;
-	// Do later
-
+	setmemregref(n1, o1, o2);
+ı REFC: _
+	JB_SetRef(o1, o2);
+ı WRRF: _
+	setmemref(u1, o2);
 ı RALO: _
 	o1 = alloc(o2);
 	// should call constructor too.

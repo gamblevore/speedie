@@ -266,8 +266,8 @@ function MakeVM (|message| tmp, |faststring| vm)
 	if P == @sheb
 		vm <~ "	// ${P.name}\n"
 
-	require tmp isnt editable
-	(tmp is editable)
+	require tmp isnt Special
+	(tmp is Special)
 	|| arg = tmp.last
 
 	vm <~ "ı ${tmp.name}: "

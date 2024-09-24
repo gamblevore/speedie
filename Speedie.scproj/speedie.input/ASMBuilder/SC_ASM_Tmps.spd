@@ -33,7 +33,8 @@ datatype ASMType (uint16)
 		kSwap
 		kSetRel
 		kIgnore
-		kDebugger // so yeah... alomst no space left. just 1 last slot possible.
+		kDebugger
+		kRefCount // 62
 		kFail = 63
 	
 	
