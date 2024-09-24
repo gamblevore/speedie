@@ -85,14 +85,14 @@ forms
 		Add		l
 	
 	Read			// mem:
-		r1		R	// dest
+		r1		R	// dest (big r!)
 		r2		r	// Base
 		r3		r	// VarAdd
 		L		7	// Const A
 		move	2
 
 	Write		// mem:
-		r1		r	// Src
+		r1		r	// Src (small r!)
 		r2		r	// Base
 		r3		r	// VarAdd
 		L		7	// Const A
@@ -199,8 +199,7 @@ forms
 	RefSet
 		r1		R
 		r2		r
-		r3		R
-		r4		r
+		r3		r
 
 
 // this file:
@@ -229,9 +228,7 @@ forms
 			goto EXIT
 
 
-// needs ASM-text: rare, RSDE, RALO, RSET, MEMM
-
-
+// needs ASM-text: rare, MEMM
 
 #!						 (((((FUNC)))))
 
@@ -427,22 +424,12 @@ forms
 
 
 #!						 (((((Refs)))))
-///**/ RSDE  (`rrrj`) // do this later... too much work for now.
-//		__
-//		Code += U3_Li
-//		___
-//		decr(o3)
-//		decr(o2)
-//		safedecr(o1)
-//		#!jump too? for branches...
-
-/**/ RSET  (refset)
-		setref(n1, o1, o2)
-		setref(n3, o3, o4)
-/**/ RMEM  (U4)		// refcount objs in memory
-		i1 = i1
-		#!Do later
-//		setref(n1, o1, o2)
+/**/ RSET  (U2)
+		setmemregref(n1, o1, o2)
+/**/ REFC  (U2)
+		JB_SetRef(o1, o2)
+/**/ WRRF  (U2)		// refcount reg into dest
+		setmemref(u1, o2)
 
 /**/ RALO  (U2)
 		o1 = alloc(o2)
