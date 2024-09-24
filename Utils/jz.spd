@@ -235,7 +235,7 @@ module Conv
 		if Decomp
 			.size = d.File.size|float|
 			src.DecompressInto(d)
-			.time("Decompress(streamed )", true)
+			.Time("Decompress(streamed )", true)
 		  else 
 			|| typ = ("µz", "ro")(.defaultstrength < mzlab.strong)
 			.size = .in!.size|float|
@@ -288,7 +288,7 @@ module Conv
 		.AST = .data.Parse
 		if .AST
 			.time("Parse")
-		  elseif (dest is box or jbin) or  .data.IsJbin
+		  elseif (dest is box or jbin) or .data.IsJbin
 			|| err = StdErr.Errors.Last
 				err.name += "\nUnable to parse input file for conversion to jeebox"
 		  else
@@ -371,11 +371,11 @@ module Conv
 			return app.StdOut
 		if DestPath
 			return destpath.file
-		if dest is selfreplace
+		if dest is SelfReplace
 			return .in!
 		|| str = .in!.path
 		if str isa "mz"
-			str = str.trimext
+			str = str.TrimExt
 		
 		|| x = .ext
 			if str isa "box" or "jbin" or "xml"			
