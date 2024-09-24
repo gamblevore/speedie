@@ -3,7 +3,8 @@
 datatype DataTypeCode (uint16)
 	linkage
 		cpp_part TC
-	default UnusedType
+
+	default UnusedType	
 	constants Types
 		|DataTypeCode|
 	// 8 = "is a number" bit...
@@ -63,8 +64,10 @@ datatype DataTypeCode (uint16)
 		
 		UnusedType = int64 &~ 8
 	
+	
 	function DebugPrint
 		printline .Render
+	
 	
 	render
 		self = self&PossibleBits
