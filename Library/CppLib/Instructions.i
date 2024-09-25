@@ -173,12 +173,14 @@
 	Code += Loop_Jmpi
 ;
 	___;
-ı RSET: _
-	setmemregref(n1, o1, o2);
-ı REFC: _
-	JB_SetRef(o1, o2);
-ı WRRF: _
-	setmemref(u1, o2);
+ı RFRG: _
+	SetRefRegToReg(r, n1, n2, U2_Lu);
+ı RFWR: _
+	SetRefRegToMem(r, Op);
+ı RFRD: _
+	SetRefMemToReg(r, Op);
+ı RFDC: _
+	SetRefDecrMem(r, Op);
 ı RALO: _
 	o1 = alloc(o2);
 	// should call constructor too.

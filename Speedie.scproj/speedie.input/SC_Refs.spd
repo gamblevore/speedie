@@ -143,6 +143,10 @@ function RC_IgnoreReturn (|Message| msg, |bool| DoRefs)
 	msg.FuncWrap( free_if_dead )
 
 
+function decrTest
+	|message[4]| Test // seems to not be working yet!
+
+
 function RefDecr (|Message| msg, |Message| place, |int| Basis)
 	// a = nil   ->   JB_decr(a),  a = nil 
 	opt norefcounts

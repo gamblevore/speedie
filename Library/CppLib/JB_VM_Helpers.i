@@ -125,24 +125,56 @@ AlwaysInline u64 bitstats(u64 R2, u64 R3, u64 Mode) { // rotate
 #define freeifdead(o)			JB_FreeIfDead((JB_Object*)o)
 #define decr(o)					JB_Decr((JB_Object*)o)
 #define safedecr(o)				JB_SafeDecr((JB_Object*)o)
-#define setmemregref(t, a, b)	{if (t) JB_SetRef(a,b); else incr(b);}  
 
-inline void setmemref(uint64 P, JB_Object* O) {
-	JB_Incr(O);
-	auto X = (JB_Object**)P;
-	JB_Decr(*X);
-	*X = O;
+
+
+inline void SetRefRegToMem(VMRegister* r, ASM Op) {
+	auto New = o2;				 						// reg
+	auto pOld = ((JB_Object**)(u1))+RefSet2_Offsetu;	// mem
+	auto Old = *pOld;
+	
+	*pOld = JB_Incr(New);
+	if (RefSet2_Decru)
+		JB_Decr(Old);
 }
-//inline JB_Object* setregref(uint64 n, JB_Object* O) {
-//	JB_Incr(O);
-//	auto X = (JB_Object**)P;
-//	JB_Decr(*X);
-//	*X = O;
-//}
 
 
-#define table(b)			((u64)(((void**)(&vm.Env))[b])+L2)  
+inline void SetRefMemToReg(VMRegister* r, ASM Op) {
+	auto pNew = ((JB_Object**)(u2))+RefSet2_Offsetu;
+	auto New = *pNew;									// mem
+	auto Old = o1;				 						// reg
+	
+	o1 = JB_Incr(New);
+	if (RefSet2_Decru)
+		JB_Decr(Old);
+}
 
+
+inline void SetRefDecrMem(VMRegister* r, ASM Op) {
+	auto Where = ((JB_Object**)(u1))+RefDecrMem_Offsetu;	// mem
+	int n = RefDecrMem_Countu;
+	for (int i = 0;  i <= n;  i++) {
+		JB_Decr(*Where++);
+	} 
+}
+
+
+inline void SetRefRegToReg(VMRegister* r, uint64 na, uint64 nb, uint64 Mode) {
+	auto A = r[na].Obj;
+	auto B = r[nb].Obj;
+	if (Mode&8)
+		JB_Incr(B);
+	if (Mode&1)
+		r[na].Obj = B;
+	if (Mode&4)
+		JB_SafeDecr_(A);
+	if (Mode&2)
+		JB_FreeIfDead(A);
+}
+
+
+
+#define table(b)			((u64)(((void**)(&vm.Env))[b])+L2)
 #define mem(t)				((t*)u2)[I3+Read_Lu]
 #define mem2(t)				(u2 = (u64)((t*)u2 + Read_moveu-1))
 

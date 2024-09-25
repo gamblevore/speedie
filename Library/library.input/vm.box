@@ -199,7 +199,21 @@ forms
 	RefSet
 		r1		R
 		r2		r
-		r3		r
+		Mode	l
+	RefSet2
+		r1		r		// Small R
+		r2		r
+		Decr	1
+		Offset	l
+	RefSet3
+		r1		R		// Big r
+		r2		r
+		Decr	1
+		Offset	l
+	RefDecrMem
+		r1		r
+		Count	7
+		Offset	l
 
 
 // this file:
@@ -424,12 +438,17 @@ forms
 
 
 #!						 (((((Refs)))))
-/**/ RSET  (U2)
-		setmemregref(n1, o1, o2)
-/**/ REFC  (U2)
-		JB_SetRef(o1, o2)
-/**/ WRRF  (U2)		// refcount reg into dest
-		setmemref(u1, o2)
+/**/ RFRG  (RefSet)
+		SetRefRegToReg(r, n1, n2, U2_Lu)		
+
+/**/ RFWR  (RefSet2)							// refcount reg to mem
+		SetRefRegToMem(r, Op)
+
+/**/ RFRD  (RefSet3)							// refcount mem to reg
+		SetRefMemToReg(r, Op)
+/**/ RFDC  (RefDecrMem)							// for destructors/closers.
+		SetRefDecrMem(r, Op)
+
 
 /**/ RALO  (U2)
 		o1 = alloc(o2)

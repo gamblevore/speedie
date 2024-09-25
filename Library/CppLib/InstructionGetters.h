@@ -456,9 +456,48 @@
 #define   Swap_Lu_(x)   (((uint)((x)<<28))>>28)
 
 
-#define   RefSet_Li       ((( int)((Op)<<23))>>23)
-#define   RefSet_Li_(x)   ((( int)((x)<<23))>>23)
+#define   RefSet_Modei       ((( int)((Op)<<18))>>18)
+#define   RefSet_Modei_(x)   ((( int)((x)<<18))>>18)
 
-#define   RefSet_Lu       (((uint)((Op)<<23))>>23)
-#define   RefSet_Lu_(x)   (((uint)((x)<<23))>>23)
+#define   RefSet_Modeu       (((uint)((Op)<<18))>>18)
+#define   RefSet_Modeu_(x)   (((uint)((x)<<18))>>18)
+
+
+#define   RefSet2_Decri       ((( int)((Op)<<18))>>31)
+#define   RefSet2_Decri_(x)   ((( int)((x)<<18))>>31)
+
+#define   RefSet2_Decru       (((uint)((Op)<<18))>>31)
+#define   RefSet2_Decru_(x)   (((uint)((x)<<18))>>31)
+
+#define   RefSet2_Offseti       ((( int)((Op)<<19))>>19)
+#define   RefSet2_Offseti_(x)   ((( int)((x)<<19))>>19)
+
+#define   RefSet2_Offsetu       (((uint)((Op)<<19))>>19)
+#define   RefSet2_Offsetu_(x)   (((uint)((x)<<19))>>19)
+
+
+#define   RefSet3_Decri       ((( int)((Op)<<18))>>31)
+#define   RefSet3_Decri_(x)   ((( int)((x)<<18))>>31)
+
+#define   RefSet3_Decru       (((uint)((Op)<<18))>>31)
+#define   RefSet3_Decru_(x)   (((uint)((x)<<18))>>31)
+
+#define   RefSet3_Offseti       ((( int)((Op)<<19))>>19)
+#define   RefSet3_Offseti_(x)   ((( int)((x)<<19))>>19)
+
+#define   RefSet3_Offsetu       (((uint)((Op)<<19))>>19)
+#define   RefSet3_Offsetu_(x)   (((uint)((x)<<19))>>19)
+
+
+#define   RefDecrMem_Counti       ((( int)((Op)<<13))>>25)
+#define   RefDecrMem_Counti_(x)   ((( int)((x)<<13))>>25)
+
+#define   RefDecrMem_Countu       (((uint)((Op)<<13))>>25)
+#define   RefDecrMem_Countu_(x)   (((uint)((x)<<13))>>25)
+
+#define   RefDecrMem_Offseti       ((( int)((Op)<<20))>>20)
+#define   RefDecrMem_Offseti_(x)   ((( int)((x)<<20))>>20)
+
+#define   RefDecrMem_Offsetu       (((uint)((Op)<<20))>>20)
+#define   RefDecrMem_Offsetu_(x)   (((uint)((x)<<20))>>20)
 
