@@ -25,9 +25,15 @@ class String
 	function Length (|int|)
 		nil checker
 		cpp_wrapper JB_Str_Length
+
 	function Addr (|&byte|)
 		nil safe	 // never returns nil, even for a nil-self
+		return ._Addr
+
+	function _Addr (|&byte|)
+		nil safe	 // never returns nil, even for a nil-self
 		cpp_wrapper JB_Str_Address
+
 	function LengthUTF8 (|int|)
 		nil checker
 		cpp_wrapper JB_Str_LengthUTF8
@@ -485,11 +491,13 @@ class String
 			s.sort(&.sorter)
 
 
-	syntax cast ( |bool| )							{ cpp_wrapper JB_Str_Exists }
+	syntax cast ( |bool| )
+		cpp_wrapper JB_Str_Exists
 
 	syntax cast ( |&byte| )
 		cpp_part CastByte
-		return .addr|&byte|
+		return ._addr|&byte|
+	
 	syntax cast (|StringZeroTerminated|)
 		cpp_part CastZero
 		return .cstr
@@ -634,7 +642,7 @@ class String
 
 
 	iterator
-		|| Start = .Addr
+		|| Start = ._Addr
 		|| End = Start + .Length
 		while (Start < End)
 			yield Start[0] (Start - .Addr)
