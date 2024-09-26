@@ -883,6 +883,7 @@ extern Array* JB__ErrorSeverity__names;
 #define kJB__MsgParseFlags_MacroInserted ((int)12288)
 #define kJB__MsgParseFlags_MacroMade ((int)8192)
 #define kJB__MsgParseFlags_NicelyPositioned ((int)1024)
+#define kJB__MsgParseFlags_Special ((int)2048)
 #define kJB__MsgParseFlags_Style2 ((int)16384)
 #define kJB__ProcessMode_AutoPrintErrors ((int)4)
 #define kJB__ProcessMode_CaptureAll ((int)5)
@@ -2814,6 +2815,8 @@ inline JB_String* JB_Object___Render__(JB_Object* Self, FastString* Fs_in);
 
 inline void JB_Sav___SaveCollect__(Saveable* Self, ObjectSaver* Saver);
 
+inline byte* JB_Str_Addr(JB_String* Self);
+
 inline JB_StringC* JB_Str_CastZero(JB_String* Self);
 
 inline bool JB_Safe_SyntaxCast(JB_String* Self);
@@ -2999,6 +3002,10 @@ inline JB_String* JB_Object___Render__(JB_Object* Self, FastString* Fs_in) {
 inline void JB_Sav___SaveCollect__(Saveable* Self, ObjectSaver* Saver) {
 	Saveable_Behaviour* Table = ((Saveable_Behaviour*)JB_ObjClassBehaviours(Self));
 	return (Table->savecollect)(Self, Saver);
+}
+
+inline byte* JB_Str_Addr(JB_String* Self) {
+	return JB_Str_Address(Self);
 }
 
 inline JB_StringC* JB_Str_CastZero(JB_String* Self) {
