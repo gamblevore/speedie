@@ -64,7 +64,11 @@ function DeclInit (|Message| dcl, |SCFunction| fn, |bool| IsJustAnArg)
 	|| Blocker = arg.CausesUnReachable( arg, dcl, LastPlace )
 	
 	if (Basis == kBasisObj)								// we want == not & here
-		RefIncr( name, dcl, IsJustAnArg )
+		if IsJustAnArg // not sure what this does?
+			RefIncr( name, dcl, IsJustAnArg )
+		  else
+			RealRefIncr(name, dcl)
+
 	Blocker := LastPlace
 	ReturnHandle( Blocker, arg, name, basis )
 	
@@ -102,7 +106,7 @@ function RefBasisStruct (|Message| msg, |bool| SetOnly, |int|)
 	if type.HasStruct and type isnt returnedstruct // doesnt that just disable struct destructors?
 		|| fn = type.type.destructorfunc
 			return kBasisDestructable
-		|| p = msg.niceparent
+		|| p = msg.NiceParent
 		if p isbrel "&"
 			return kBasisTempStruct
 
@@ -195,8 +199,7 @@ function RefMsg (|Message| msg, |String| name, |SCFunction| func, |Message|)
 
 function SCFunction.RefFunc (|message| prm, |message!| after)
 	opt norefcounts
-	if "JB_App__AppName".trap// or "SC_RefTest_Constructor".trap
-		debugat
+	//if "JB_App__AppName".trap and self == Compiler.RefIncr
 	|| rz = SCRefs.RefMsg0(.ExportName, Compiler.RefIncr!)
 	after.next = rz
 	rz.last <~ prm
@@ -217,8 +220,6 @@ function RefIncr (|Message| msg, |Message| Place, |bool| IsJustAnArg=false)
 		require !(msg.unbra isthing "nil")
 		Place = msg
 
-	if "JB_App__AppName".trap// or "SC_RefTest_Constructor".trap
-		debugat
 	Compiler.RefIncr!.RefFunc(msg, place)
 
 
@@ -368,7 +369,7 @@ function ExprNeedsTemping (|Message| child, |Message| name, |bool|)
 	require RefBasis( name, false ) == kBasisObj
 	
 	for s.flat in child
-		if s isthing name.name
+		if (s isthing name.name)// and !(s in @dot) 
 			Return true
 
 
@@ -389,13 +390,20 @@ function Destructable (|Message| Blocker, |Message| arg, |Message| name)
 
 
 function ReturnTempMoveOut (|Message| Child, |Message| blocker)
+	// debugat 173
 	|| Temp = SCFunction.TempMoveOut( child, blocker ) // still need to ref it.
 	ReturnTempMoveOutSub(child, blocker, temp)
 
 
+function RealRefIncr (|message| name, |message| dcl)
+	opt norefcounts
+	Compiler.RefIncr!.RefFunc(name.copy, dcl)
+
+
 function ReturnTempMoveOutSub (|Message| Child, |Message| blocker, |message| temp)
-	if RefBasis(child, false) == kBasisObj
-		RefIncr( child, temp.ParentPoint! )
+	if RefBasis(child, false) == kBasisObj	
+		|| dcl = child.parent.parent!
+		Compiler.RefIncr!.RefFunc(temp.copy, dcl)
 		RefSafeDecr( temp, blocker )
 
 
@@ -434,13 +442,23 @@ function ReturnHandle (|Message| Blocker, |Message?| arg, |Message| name, |int| 
 			RefSafeDecr( name, blocker ) // needs to come after any decr!
 			return
 		if IsReturn and ExprNeedsTemping( Child, name )
+			//debugat
+			//ExprNeedsTemping( Child, name )
 			ReturnTempMoveOut(Child, blocker)
 	RefDecr( name, blocker, basis )
 
 
+function RC_RelInit (|Message| rel)
+	opt norefcounts
+	|| func = rel.WrapWith(@func)
+	func.first = @thg + compiler.refincr2!.exportname
+	rel.second.remove
+	rel.func = @prm
+	func.become(compiler.RefIncr2!)
+
+
 function RC_RelConstructor (|Message| rel)
 	// a = b.c   -->   jb_incr2(a, b.c)
-	//opt norefcounts
 	require RelNeedsRef( rel, rel.first! )
 	
 	|| Last = rel.last!
@@ -449,13 +467,7 @@ function RC_RelConstructor (|Message| rel)
 		if fn != @Thg and @str and @sstr and @num
 			Last = SCFunction.TempMoveOut( Last, rel )
 		
-		|| func = rel.WrapWith(@func)
-		func.first = @thg + compiler.refincr2!.exportname
-		last.prev.remove
-		rel.func = @prm
-		func.become(compiler.RefIncr2!)
-		
-		//RefIncr( Last, rel )
+		.RC_RelInit(rel)
 
 
 
