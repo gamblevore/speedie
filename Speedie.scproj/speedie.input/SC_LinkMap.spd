@@ -44,7 +44,7 @@ module LinkMap
 		|| r = .returntype
 			.CollectLinks( r )
 	
-		collectfromsource(self, .sourcearg, false)
+		CollectFromSource(self, .sourcearg, false)
 	
 	
 	function CollectFromSource (|scfunction| self, |message| src, |bool| InBranch)
@@ -55,13 +55,13 @@ module LinkMap
 			if msg.HasAny
 				if !inbranch
 					|| T = msg.ASMType
-					inbranch = (t == ASMType.kIf or ASMType.kwhile or ASMType.ktern)
+					InBranch = (t == ASMType.kIf or ASMType.kwhile or ASMType.ktern)
 								// how do we check that this isnt recursive?
 								// seems to do this, we need to go over the entire program
 								// anytime we wanna add a function! like if we call .parse
 								// now we gotta test every other function... its not so simple is it.
 								// We could just do it 1 level deep? 
-				collectfromsource(Self, msg, inbranch)
+				CollectFromSource(Self, msg, inbranch)
 		
 
 
@@ -82,6 +82,10 @@ function CollectLinks (|object!| obj, |bool| InBranch=false)
 			obj = obj.IsLookupOnly|scdecl| #require
 		  else
 			return
+
+
+function Reach (|bool|)
+	return .ReachFunc(Compiler.VisibleFuncs!)
 
 
 function ReachFunc (|SCNode| from, |bool|)
@@ -160,9 +164,6 @@ function scclass.ReachBehaviours
 
 function compiler.DeadStrip
 	opt norefcounts
-	Compiler.VisibleFuncs = SCNode("Visible",	  false)
-	Compiler.Interpreter  = SCNode("Interpreter", false)
-
 	compiler.MainFunc.ReachedDetect?
 	
 	for f in .FuncList

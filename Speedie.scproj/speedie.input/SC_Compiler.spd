@@ -52,9 +52,8 @@ module Compiler {
 linkage
 	cpp_part Comp
 
-|SCNode|					VisibleFuncs
-|SCNode|					Interpreter
-
+|SCNode|					VisibleFuncs = SCNode("Visible",	  false)
+|SCNode|					Interpreter = SCNode("Interpreter", false)
 |File|						BaseProjectPath
 |string|					OriginalInputPath
 |File|						_BuildFolder
@@ -89,6 +88,7 @@ linkage
 
 |SCFunction|				PrivateProperty
 |SCFunction|				RefIncr
+|SCFunction|				RefIncr2
 |SCFunction|				RefDecr
 |SCFunction|				RefClear
 |SCFunction|				RefDecrMulti
@@ -297,7 +297,7 @@ function InitBasicStuff (|int|) // compiler.init
 function LoadTypeTest (|string| s, |scfunction|)
 	opt norefcounts
 	|| f = TypeObject![ s ]
-	if f isa scfunction
+	if f isa SCFunction
 		(f is TypeTest)
 		return f
 
@@ -305,6 +305,7 @@ function LoadTypeTest (|string| s, |scfunction|)
 function InitBasicFuncs (|bool|)
 	.RefSetRef		= .LoadRefFunc( "JB_SetRef" )
 	.RefIncr		= .LoadRefFunc( "JB_Incr" )
+	.RefIncr2		= .LoadRefFunc( "JB_Incr2" )
 	.RefDecr		= .LoadRefFunc( "JB_Decr" )
 	.RefClear		= .LoadRefFunc( "JB_Clear" )
 	.RefDecrMulti	= .LoadRefFunc( "JB_DecrMulti" )
@@ -318,8 +319,8 @@ function InitBasicFuncs (|bool|)
 	.fnFastAs		= .LoadTypeTest( "operatorfast_as" )
 	.fnFastIsa		= .LoadTypeTest( "operatorfast_isa" )
 	.fnIsa			= .LoadTypeTest( "operatorisa" )
-	.fnmustbe		= .LoadTypeTest( "mustbe" )
-	.fnopmustbe		= .LoadTypeTest( "operatormustbe" )
+	.fnMustbe		= .LoadTypeTest( "mustbe" )
+	.fnOpMustBe		= .LoadTypeTest( "operatormustbe" )
 	.PrivateProperty = .CreateFuncFromSource("function Private () {disabled `This property is private.`}")
 	return StdErr.OK
 
@@ -691,6 +692,7 @@ function FindFunction (|string| Name, |SCFunction|)
 	opt norefcounts
 	|| o = compiler.program[ name ]
 	if o isa SCFunction
+		o.Reach
 		Return o
 	
 	error ( nil, "Can’t find function: " + name )

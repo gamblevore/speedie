@@ -195,6 +195,8 @@ function RefMsg (|Message| msg, |String| name, |SCFunction| func, |Message|)
 
 function SCFunction.RefFunc (|message| prm, |message!| after)
 	opt norefcounts
+	if "JB_App__AppName".trap// or "SC_RefTest_Constructor".trap
+		debugat
 	|| rz = SCRefs.RefMsg0(.ExportName, Compiler.RefIncr!)
 	after.next = rz
 	rz.last <~ prm
@@ -215,6 +217,8 @@ function RefIncr (|Message| msg, |Message| Place, |bool| IsJustAnArg=false)
 		require !(msg.unbra isthing "nil")
 		Place = msg
 
+	if "JB_App__AppName".trap// or "SC_RefTest_Constructor".trap
+		debugat
 	Compiler.RefIncr!.RefFunc(msg, place)
 
 
@@ -435,18 +439,23 @@ function ReturnHandle (|Message| Blocker, |Message?| arg, |Message| name, |int| 
 
 
 function RC_RelConstructor (|Message| rel)
-	// a = b.c   -->   || a = b.c, jb_incr(a)
+	// a = b.c   -->   jb_incr2(a, b.c)
+	//opt norefcounts
+	require RelNeedsRef( rel, rel.first! )
 	
-	|| First = rel.first!
-	require RelNeedsRef( rel, first )
-	
-	|| Last = rel[ 2 ]!
-	require !(last IsThing "nil")
-	
-	if Last != @Thg
-		Last = SCFunction.TempMoveOut( Last, rel )
-	
-	RefIncr( Last, rel )
+	|| Last = rel.last!
+	ifn last IsThing "nil"
+		|| fn = last.func
+		if fn != @Thg and @str and @sstr and @num
+			Last = SCFunction.TempMoveOut( Last, rel )
+		
+		|| func = rel.WrapWith(@func)
+		func.first = @thg + compiler.refincr2!.exportname
+		last.prev.remove
+		rel.func = @prm
+		func.become(compiler.RefIncr2!)
+		
+		//RefIncr( Last, rel )
 
 
 
@@ -459,10 +468,14 @@ function Message.FuncWrap (|Message| fnc)
 function RefMsg0 (|String| name, |SCFunction| func, |Message|)
 	opt norefcounts
 	rz = NewFnc( name )
-	rz.position = -1
-	rz.second!.obj = func
-	rz.obj = func.ReturnType
-	rz.ASMType = ASMType.kRefCount
+	rz.become(func)
+
+
+function message.Become (|scfunction| func)
+	.position = -1
+	.second!.obj = func
+	.obj = func.ReturnType
+	.ASMType = ASMType.kRefCount
 
 
 function Message.IsProperty (|bool|)
@@ -767,7 +780,6 @@ function SCClass.ConOrDesForCall (|bool| IsConstructor, |int| Task, |scfunction|
 	if task <= 1
 		return .ConstructorFunc!.ParamlessConstructor
 	return .ConstructorFunc
-
 
 
 function SCFunction.BuildConstructorDestructor
