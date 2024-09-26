@@ -199,7 +199,6 @@ function RefMsg (|Message| msg, |String| name, |SCFunction| func, |Message|)
 
 function SCFunction.RefFunc (|message| prm, |message!| after)
 	opt norefcounts
-	//if "JB_App__AppName".trap and self == Compiler.RefIncr
 	|| rz = SCRefs.RefMsg0(.ExportName, Compiler.RefIncr!)
 	after.next = rz
 	rz.last <~ prm
@@ -451,7 +450,7 @@ function ReturnHandle (|Message| Blocker, |Message?| arg, |Message| name, |int| 
 function RC_RelInit (|Message| rel)
 	opt norefcounts
 	|| func = rel.WrapWith(@func)
-	func.first = @thg + compiler.refincr2!.exportname
+	func.first = @thg + "JB_Incr2"
 	rel.second.remove
 	rel.func = @prm
 	func.become(compiler.RefIncr2!)
@@ -459,15 +458,9 @@ function RC_RelInit (|Message| rel)
 
 function RC_RelConstructor (|Message| rel)
 	// a = b.c   -->   jb_incr2(a, b.c)
-	require RelNeedsRef( rel, rel.first! )
-	
-	|| Last = rel.last!
-	ifn last IsThing "nil"
-		|| fn = last.func
-		if fn != @Thg and @str and @sstr and @num
-			Last = SCFunction.TempMoveOut( Last, rel )
-		
-		.RC_RelInit(rel)
+	if RelNeedsRef( rel, rel.first! )
+		ifn  rel.last! IsThing "nil"
+			.RC_RelInit(rel)
 
 
 

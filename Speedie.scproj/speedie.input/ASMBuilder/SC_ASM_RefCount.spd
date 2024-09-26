@@ -45,12 +45,9 @@ extend_module ASMType
 			if bd isnt const						// always const!!
 			return exp.RFDC(a, bd.ExportPosition, offset)
 
-		if fn == Compiler.RefIncr
-			if dest.reg
-				if dest is containsaddr
-					// write
-				  else
-					// read?
+		if fn == Compiler.RefIncr2
+
+		if fn == Compiler.RefIncr // never returns anything
 			if A is ContainsAddr // we might wanna set a memory address from a register...
 				// return smthgin
 			return exp.RFRG(a, a, 6)				// (but doesnt just yet)
