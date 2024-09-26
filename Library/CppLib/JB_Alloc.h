@@ -321,6 +321,7 @@ u32 JB_ObjCount();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define JB_Incr(Obj)			({ auto _tMp_ = Obj; JB_Incr_(_tMp_); (_tMp_);})
+#define JB_Incr2(a,b)			JB_Incr2_((JB_Object**)(&a), (JB_Object*)(b))
 #define JB_SafeDecr(Obj)		JB_SafeDecr_((JB_Object*)(Obj))
 #define JB_SetRef(a,b)			JB_SetRef_((JB_Object**)(&a), (JB_Object*)(b))
 #define JB_Clear(a)				JB_Clear_((JB_Object**)(&a))
@@ -397,9 +398,15 @@ inline JB_Object* JB_FreeIfDead(JB_Object* self) {
 
 inline void JB_SetRef_(JB_Object** Place, JB_Object* New) {
 	JB_Incr(New);
-    JB_Object* Old = *Place; // Decr MUST come last, or else
-	*Place = New; // a destructor can set a var into Place and we overwrite it.
-	JB_Decr(Old);
+    JB_Object* Old = *Place;
+	*Place = New;
+	JB_Decr(Old); // Decr MUST come last.
+}
+
+inline void JB_Incr2_(JB_Object** Place, JB_Object* New) {
+	JB_Incr(New);
+    JB_Object* Old = *Place;
+	*Place = New;
 }
 
 

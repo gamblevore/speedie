@@ -13,11 +13,13 @@ extend_module ASMType
 	if (Mode&8)		JB_Incr(B)
 	if (Mode&1)		r[na].Obj = B
 	if (Mode&4)		JB_SafeDecr_(A)
-	if (Mode&2)		JB_FreeIfDead(A) */
-	// RefRR(a, b)  // can do anything
-	// RefMM(a, b)  // Is Read + RefMR
-	// RefMR(a, b)  // Always fully refs
-	// RefRM(a, b)  // always incr+return, MAY decr the reg
+	if (Mode&2)		JB_FreeIfDead(A)
+
+	RefRR(a, b)  // can do anything
+	RefMM(a, b)  // Is Read + RefMR
+	RefMR(a, b)  // Always fully refs
+	RefRM(a, b)  // always incr+return, MAY decr the reg
+ */
 
 		|| offset = 0
 		if fn == Compiler.RefClear
@@ -63,9 +65,17 @@ extend_module ASMType
 			if b is containsaddr
 				// return exp.loadsome(🤩)
 //			return exp.rset(A,B)		
-		
-		
+
 
 	function RefCount (fn_asm)	// JB_SetRef(a,b)
-		|| fat = refcountsub(self, exp, dest)!
+		|| fat = RefCountSub(self, exp, dest)!
 		return fat*dest
+
+
+
+class RefTest
+	|string| s
+	Constructor
+		visible
+		.s = "4"
+

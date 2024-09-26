@@ -115,17 +115,6 @@ JB_String* JB_Str_Copy( JB_String* self ) {
     return 0;
 }
 
-JB_String* JB_Str3(const char* c, int N) {
-	if (N > 0) {
-		JB_StringC* S = JB_New( JB_StringC );
-		S->Addr = (uint8*)c;
-		S->Length = N;
-		return S;
-	}
-	return JB_Str__Empty();
-}
-
-
 JB_String* JB_StrFromPtr(void* c, int N, void* Free, void* Obj) {
 	if (N > 0) {
 		JB_StringExternal* S = JB_New( JB_StringExternal );
@@ -140,11 +129,17 @@ JB_String* JB_StrFromPtr(void* c, int N, void* Free, void* Obj) {
 
 JB_StringC* JB_StrC( const char* c ) {
 	int n = c ? (int)strlen(c) : 0;
-	return (JB_StringC*)(JB_Str3(c, n));
+	return JB_StrCN(c, n);
 }
 
-JB_StringC* JB_StrCN( const void* c, int n ) {
-	return (JB_StringC*)JB_Str3((const char*)c, n);
+JB_StringC* JB_StrCN( const void* c, int N ) {
+	if (N > 0) {
+		JB_StringC* S = JB_New( JB_StringC );
+		S->Addr = (uint8*)c;
+		S->Length = N;
+		return S;
+	}
+	return (JB_StringC*)JB_Str__Empty();
 }
 
 

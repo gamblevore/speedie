@@ -83,24 +83,14 @@ double FloatSh2 (uint64 u, int S) {
 }
 
 
-AlwaysInline ASM* LoadConst (VMRegister* r, ASM Op, ASM* Code) {
-	uint64 Value = ConstStretchy_Valueu;
-	int Remain = (Op>>24)&3;
-	r+=n1;
-	if (Remain) {
-		if (Remain == 1)
-			Value <<= 32; 
-		  else
-			// we already just read 64-bits now. so just discard the previous 16 bits
-			Value = (uint64)(*Code++) << 32;
-		Value |= *Code++;
-	}
-	if (!ConstStretchy_Condu or !r->Int) {
+AlwaysInline void LoadConst (VMRegister* r, ASM Op, uint64 Value) {
+	int N = n1;
+	if (!ConstStretchy_Condu or !r[N].Int) {
+		Value |= ((uint64)ConstStretchy_Valueu)<<32;
 		if (ConstStretchy_Invu)
 			Value = ~Value;
-		r->Int = Value;
+		r[N].Int = Value;
 	}
-	return Code; 
 }
 
 

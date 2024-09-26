@@ -299,8 +299,13 @@ forms
 #!						 (((((Consts)))))
 /**/ KNSR (Const)
 		RotateConst(r, Op)
-/**/ KNST (ConstStretchy, 1, 2, 3)
-		Code = LoadConst(r, Op, Code)
+/**/ KNST (ConstStretchy, 1)
+		LoadConst(r, Op, *Code)
+/**/ KNST2 (ConstStretchy, 2)
+		LoadConst(r, Op, *Code++)
+/**/ KNST3 (ConstStretchy, 3)
+		LoadConst(r, Op, (Code[0]<<32) ||| Code[1])
+		Code+=2
 
 
 

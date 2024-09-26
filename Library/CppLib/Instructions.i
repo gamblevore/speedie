@@ -17,12 +17,15 @@
 	__;
 	ForeignFunc(vm, Code, r, Op, Code64);
 	___;
-ı KNST: _
-	Code = LoadConst(r, Op, Code);
 ı TAIL: 
 	__;
 	TailStack(r, Code, Op);
 	___;
+ı KNST3: _
+	LoadConst(r, Op, (Code[0] << 32) | Code[1]);
+	Code += 2;
+ı KNST2: _
+	LoadConst(r, Op, *Code++);
 ı NOOP: _
 	i1 = i1;
 	// NOOP
@@ -53,6 +56,8 @@
 	RegConv(r, Convert_Modeu, Op);
 ı KNSR: _
 	RotateConst(r, Op);
+ı KNST: _
+	LoadConst(r, Op, *Code);
 ı ADDK: _
 	i1 = i2 + U2_Li;
 ı ADPK: _

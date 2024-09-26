@@ -68,7 +68,7 @@ module PackMaker
 		j.Exit
 
 
-	function scfunction.operatorin (|scmodule| f, |bool|)
+	function scfunction.OperatorIn (|scmodule| f, |bool|)
 		return !f or .parent == f
 	
 	
@@ -84,7 +84,6 @@ module PackMaker
 	
 	
 	function ActualRealCompileAkaPackIt (|bool|)
-		#!Actually Pack ThEsE!?
 		opt norefcounts
 		for fn in Compiler.FuncList
 			if fn.tableid and fn.parent.name ~= "ASMExamples"
