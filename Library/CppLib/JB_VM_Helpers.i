@@ -360,7 +360,7 @@ void MemStuff(u32* A, u32* B, u32 Operation, u32 L) {
 		bswap64((u64*)A, 1+L);
 }
 
-			
+
 AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 	int Size = CNTC_sizeu;
 	int Off  = CNTC_offsetu;
@@ -392,10 +392,7 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 		*((u64*)PP) = New;
 		break;
 	}
-	if (UseOld)
-		*Where = Old;
-	  else
-		*Where = New;
+	*Where = UseOld?Old:New;
 }
 
 
