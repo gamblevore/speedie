@@ -299,14 +299,17 @@ forms
 #!						 (((((Consts)))))
 /**/ KNSR (Const)
 		RotateConst(r, Op)
-/**/ KNST (ConstStretchy, 1)
+
+POS 4 // force position
+	KNST (ConstStretchy, 1)
 		LoadConst(r, Op, *Code)
-/**/ KNST2 (ConstStretchy, 2)
+POS 5
+	KNST2 (ConstStretchy, 2)
 		LoadConst(r, Op, *Code++)
-/**/ KNST3 (ConstStretchy, 3)
+POS 6
+	KNST3 (ConstStretchy, 3)
 		LoadConst(r, Op, (Code[0]<<32) ||| Code[1])
 		Code+=2
-
 
 
 #!						 (((((Math)))))

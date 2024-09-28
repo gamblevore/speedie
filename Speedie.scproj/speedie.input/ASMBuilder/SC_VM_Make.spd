@@ -1,9 +1,8 @@
 
 
-// i think the order of whats happening is wrong?
-// it can't find the instructions or something?
-// just step through the instruction lister thing and find out what is wrong
-// 
+// I think the order of whats happening is wrong?
+// It can't find the instructions or something?
+// Just step through the instruction lister thing and find out what is wrong.
 
 module VM_Builder {
 |[message]| 	NameList
@@ -235,6 +234,19 @@ function VM_NewInstructions (|message| list, |int| Amount, |[message]| rz)
 		require .VM_NewIns(ch, amount, rz)
 
 
+function VM_FillPos (|message| list, |[message]| rz)
+	opt norefcounts
+	for ch in list
+		if ch ~= "POS"
+			|| f = ch.first
+			if f == @num
+				ch.flags |= 32K
+				|| i = f.int
+				|| arg = ch.last(@arg) // now what?
+				|| item = arg.first
+					.VM_MakeInstructionSub(item, 0, rz, i)				
+
+
 function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true)
 	opt norefcounts
 	|[message]| R = nil
@@ -242,6 +254,7 @@ function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true)
 		R = []
 		.NameList = r
 		R <~ (@thg+"EROR",  256)
+	.vm_FillPos(list, r)
 	.VM_NewInstructions(list, 0, R)
 	.VM_NewInstructions(list, 3, R)
 	.VM_NewInstructions(list, 2, R)
@@ -287,16 +300,15 @@ function message.VMBits (|int|)
 	rz := 1
 
 
-function VM_MakeInstructionSub (|message| tmp,  |int| Ask,  |[message]?| ActuallyMakeTheVM)
+function VM_MakeInstructionSub (|message| tmp,  |int| Ask,  |[message]?| ActuallyMakeTheVM, |int| ForceID)
 	opt norefcounts
 	|| prms = tmp.first
 	|| FoundBits = prms.VMBits
 	if ask
 		ask = 1<<(ask-1)
 		require FoundBits & Ask
-
+	
 	tmp.flags |= 32K
-	|| arg = tmp.last
 	|| P1 = prms.first
 	
 	|| name = p1.name					//  .ASMNormalise
@@ -306,25 +318,35 @@ function VM_MakeInstructionSub (|message| tmp,  |int| Ask,  |[message]?| Actuall
 	using tmp
 	if ActuallyMakeTheVM != nil			// otherwise speedie is just using the encoders.
 		.ModuleArg <~ NewDecl(name)
-	|| tn = tmp.name
 	++.Total
 	
-	.MakeMsgCreator(tn, form)
+	.MakeMsgCreator(tmp.name, form)
+	if forceid
+		.FreeMultiASM &=~ (1<<forceid)
+		if .OKBoomer(tmp, forceid, formenc, ActuallyMakeTheVM)
+			.AddµOp(tmp.name, forceid)
+		return 
+	
 	|| id = 0
 	if ask
 		id = .FreeID(tmp, foundbits)
 	|| Done = false
 	for (b.bits in foundbits) (extra)
 		|| x = id + extra
-		check (!asm.encoders[x]) (tmp, "ASM clash?") 
-		asm.Encoders[x] = FormEnc
-		if ActuallyMakeTheVM != nil
-			ActuallyMakeTheVM[x] = tmp
+		if .OKBoomer(tmp, x, formenc, ActuallyMakeTheVM)
 			if !done
-				.AddµOp(tn, X)
+				.AddµOp(tmp.name, X)
 				done = true
 			if ask > 1
-				.AddµOp(tn+(extra+1).render, X)
+				.AddµOp(tmp.name+(extra+1).render, X)
+
+
+function OKBoomer (|message| tmp,  |int| x,  |asm_encoder2| formenc,  |array?| R,  |bool|)
+	check (!asm.encoders[x]) (tmp, "ASM clash?") 
+	asm.Encoders[x] = FormEnc
+	if R != nil
+		R[x] = tmp
+		return true
 
 
 helper message.VMMsgArgName (|int| i, |string|)
@@ -426,7 +448,7 @@ function FreeID (|message| m, |int| ask, |int|)
 function VM_NewIns (|message| tmp, |int| ask, |[message]?| ActuallyMakeTheVM, |bool|)
 	if (tmp == @tmp) and !(tmp.flags&32K) 
 		if (tmp != "forms" and "ignore")
-			.VM_MakeInstructionSub(tmp, ask, ActuallyMakeTheVM)
+			.VM_MakeInstructionSub(tmp, ask, ActuallyMakeTheVM, 0)
 			require ask
 	return true
 
