@@ -239,19 +239,16 @@ function Dot		(fn_asm)						// a.b
 	return Dest.ReadOrWrite(exp, obj, pos)
 		
 
-function SetRel	(fn_asm)
+function SetRel	(fn_asm)	// function relset (
 	opt	norefcounts									//   x[func()] = y++
-	|| f = exp.first!
-	|| l = exp.last!
-	|| Var = .ExistingVar(f)
-	if var.reg
-		Dest = .µinto(L, var)
-		if dest.reg == var.reg
-			return dest // for a = 1: by the time we ran L, a == 1 already!
-	  else
-		dest = .µ(l, var)
+	|| A = exp.first!
+	|| B = exp.last!
+	|| X = .ExistingVar(A)
+	if X.reg
+		return .µinto(B, X)
 
-	.µ(f, dest as AsmReg.set)
+	dest = .µ(B, X)
+	.µ(A, dest as AsmReg.set)
 
 
 function Num (fn_asm)
@@ -505,37 +502,36 @@ function ASMReg.ReadOrWrite (|message| m, |asmreg| ptr, |int| index=0, |asmreg|)
 	return .ReadOrWrite(m, ptr, index, self is set) * self
 
 
-function ASMReg.ReadOrWrite (|message| m, |asmreg| ptr, |int| index, |bool| DoRead, |&fatasm|)
-	self = self asnt asmreg.containsaddr
-	debugger 
+function ASMReg.ReadOrWrite (|message| m, |asmreg| ptr, |int| index, |bool| DoWrite, |&fatasm|)
+	if self is containsaddr
+		#!wait?? this is meant to be an addrrequest? not a response.
+		debugger
+	
+	self = self asnt asmreg.AddrRequest
+	debugat
 	|| T = .µtype
 	|| BC = t.ByteCount
 	|| bytes = BC.log2
-	check  (bytes <= 4)  (m, "Object to large to access")
+	check  (bytes <= 4)   (m, "Object to large to access")
+	check  (index < 512)  (m, "Index too large (compiler limitation)")
 		
 	|asm| A
-	if DoRead
+	if DoWrite
+		A = ASMType.WriteASM[bytes]
+	  else
 		|| B = (bytes<<1) + t.issigned
 		A = ASMType.ReadASM[b]
-	  else
-		A = ASMType.WriteASM[bytes]
-	isnt set
 	return m.RD4U(self, ptr, asmreg(), index, 0)
-//		r1		R	// dest
-//		r2		r	// Base
-//		r3		r	// VarAdd
-//		L		7	// Const A
-//		move	2
 
 
 function ASMReg.Read  (|message| m,  |asmreg| ptr,  |int| index=0,  |&fatasm|)
 	opt inline
-	return .ReadOrWrite(m, ptr, index, true)
+	return .ReadOrWrite(m, ptr, index, false)
 	
 
 function ASMReg.Write (|message| m,  |asmreg| ptr,  |int| index=0,  |&fatasm|)
 	opt inline
-	return .ReadOrWrite(m, ptr, index, false)
+	return .ReadOrWrite(m, ptr, index, true)
 
 
 function asmstate.ExistingVar (|message| m,  |asmreg|)
