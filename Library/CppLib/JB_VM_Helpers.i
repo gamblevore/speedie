@@ -86,7 +86,7 @@ double FloatSh2 (uint64 u, int S) {
 AlwaysInline void LoadConst (VMRegister* r, ASM Op, uint64 Value) {
 	int N = n1;
 	if (!ConstStretchy_Condu or !r[N].Int) {
-		Value |= ((uint64)ConstStretchy_Valueu)<<32;
+//		Value |= ((uint64)ConstStretchy_Valueu)<<32;
 		if (ConstStretchy_Invu)
 			Value = ~Value;
 		r[N].Int = Value;

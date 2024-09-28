@@ -301,14 +301,15 @@ forms
 		RotateConst(r, Op)
 
 POS 4 // force position
+	// @4 would be better!
 	KNST (ConstStretchy, 1)
-		LoadConst(r, Op, *Code)
+		LoadConst(r, Op, ConstStretchy_Valueu)
 POS 5
 	KNST2 (ConstStretchy, 2)
 		LoadConst(r, Op, *Code++)
 POS 6
 	KNST3 (ConstStretchy, 3)
-		LoadConst(r, Op, (Code[0]<<32) ||| Code[1])
+		LoadConst(r, Op, ((uint64)(Code[0]))<<32 ||| (uint64)(Code[1]))
 		Code+=2
 
 
