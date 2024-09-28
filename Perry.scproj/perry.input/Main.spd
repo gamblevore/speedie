@@ -2,8 +2,7 @@
 
 main // main { 
 	|| x = file://tips.box
-	|| y = x.compress
-	|| z = y.decompress
+	|| z = x.compress.decompress
 	if x!=z
 	if app.Yes("crash")
 		app.Crash
