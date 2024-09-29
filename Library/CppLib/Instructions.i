@@ -10,11 +10,11 @@
 	Code = BumpStack(vm, r, Code + 2, Op, Code64);
 	___;
 ı KNST: _
-	LoadConst(r, Op, ConstStretchy_Valueu);
+	LoadConst(r, Op, 0);
 ı KNST2: _
 	LoadConst(r, Op, *Code++);
 ı KNST3: _
-	LoadConst(r, Op, ((uint64)(Code[0])) << 32 | (uint64)(Code[1]));
+	LoadConst(r, Op, *((uint64 *)(Code)));
 	Code += 2;
 ı FFNC: 
 	__;

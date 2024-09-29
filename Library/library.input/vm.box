@@ -303,13 +303,17 @@ forms
 POS 4 // force position
 	// @4 would be better!
 	KNST (ConstStretchy, 1)
-		LoadConst(r, Op, ConstStretchy_Valueu)
+		LoadConst(r, Op, 0)
 POS 5
 	KNST2 (ConstStretchy, 2)
-		LoadConst(r, Op, *Code++)
+		LoadConst(r, Op, *Code++)   // would be better to do:   (uint64)(*Code++) << 17
+									// thats 49 bits at least!
+									// LoadConst(r, Op, ConstStretchy_Valueu) --> LoadConst(r, Op, 0)
 POS 6
-	KNST3 (ConstStretchy, 3)
-		LoadConst(r, Op, ((uint64)(Code[0]))<<32 ||| (uint64)(Code[1]))
+	KNST3 (ConstStretchy, 3)		// this would lose 17 bits? but they are already lost...
+									// more like 17 bits become spare and more easy to reuse.
+									// perhas to set simd values!
+		LoadConst(r, Op, *((uint64*)(Code)))
 		Code+=2
 
 

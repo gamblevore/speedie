@@ -1,46 +1,41 @@
 
 
 function fatasm.KNST_Encoder (Asm_encoder2)
-/*  // put the longestbitstretch into it. As an optional approach. Do this later!
-	function FatASM.FixConst
-		|| V = .r[1]|uint64| << 32
-		V |= 0
-		|| Inv = V|uint64|.countbits > 32 
-			V = ~V
-		|| R = (~V|uint64|).LongestBitStretch	// longest false-stretch
-		if r.x >= 50		// OK so we have the longest stretch in r.x
-			V = V rotl 63-r.y
-			.r[2] = inv|int|
-			.r[3] = V|int|
-			return
-*/
-
-	|asm| o = .op
-	|| k = .const
-	|| inv = k>>63
-		k = ~k
 	if curr >= after-2
 		return curr
 
-	|| sh = 0
-	if k >= 1|uint64|<<17
-		if k < (1|uint64|<<49)
-			sh = 32
-			o = asm.knst2  // 1 extra
-		  else
-			sh = 64 // obliterate
-			o = asm.knst3  // 2 extra
-	|| rz = o << 24
-	rz.R1 = .R[0]
-	rz.ConstStretchy_Inv = inv
-	if sh < 64
-		rz.ConstStretchy_Value = k<<sh
+// Put the LongestBitStretch into it. As an optional approach. Do this later!
+/*
+	|| V = .r[1]|uint64| << 32
+	V |= 0
+	|| Inv = V|uint64|.countbits > 32 
+		V = ~V
+	|| R = (~V|uint64|).LongestBitStretch	// longest false-stretch
+	if r.x >= 50		// OK so we have the longest stretch in r.x
+		V = V rotl 63-r.y
+		.r[2] = inv|int|
+		.r[3] = V|int|
+*/
 
-	Curr++[] = Rz
-	if sh >= 32
-		if sh == 64
-			curr++[] = k>>32
-		curr++[] = k
+	debugat
+	|| v = .const
+	|| inv = v>>63					// We only need to store 63 bits then? if the top is always false.
+		v = ~v	  					// Opportunity to reclaim the top bit. I'll do it later.
+	|asm| knst = .op << 24
+	knst.R1 = .R[0]
+	knst.ConstStretchy_Inv = inv
+	knst.ConstStretchy_Value = v
+	v >>= 17
+
+	|| Orig = curr++
+	if v
+		curr++[] = v
+		knst += 1<<24
+		v >>= 32
+		if v
+			knst += 1<<24
+			curr++[] = v
+	orig[] = knst
 			
 	return Curr
 
