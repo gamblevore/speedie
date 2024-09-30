@@ -37,11 +37,11 @@ Hopefully the comments explain this function well.
 
 The statements `require` / `expect` / `check` / `error` are used for control-flow and error-handling. They remove the messy control-flow, so you can see your code clearly.
 
-Each can be used after an expression, or before:
+Error checking can be used in two ways:
 
-        || A = "a,a,a".parse            #require
+        || A = "a,a,a".parse            #require // one way
         || B = "b,b,b".parse
-        require B
+        require B                                // the second
 
 both `A` and `B` are tested in the same way. But the first looks better to me, in this case. Its more "out of the way".
 
