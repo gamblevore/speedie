@@ -498,9 +498,11 @@ function message.RefTransparent (|bool|)
 		return true
 	if f == @type
 		return true
-	if f == @arel or @brel
+	if f == @arel
 		|| n = .name[]
 		return n == '?' or '!'
+	if f == @brel
+		return .name[] == '?'
 
 
 function Message.Unwrap (|Message!|)

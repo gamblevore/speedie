@@ -1265,10 +1265,16 @@ function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name
 			
 	
 	exp.SpdFunc = @dot		// i don't like this... harder to keep in sync
-	|| OpchIsnt = opch == "isnt"
+	|| Negate = exp.niceparent
+	ifn negate isbrel "!"
+		negate = nil
+		
+	|| OpchIsnt = (opch == "is") == (Negate!=nil)
 		exp.name = "syntaxisnt"
 	  else
 		exp.name = "syntaxis"
+	if negate
+		negate.become(@bra) // seems a lil wasteful... we remove something then create it.
 	opch.become(@prm)
 	opch.obj = nil		// needed
 	rn.func = @dot
