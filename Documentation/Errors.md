@@ -39,9 +39,9 @@ The statements `require` / `expect` / `check` / `error` are used for control-flo
 
 Error checking can be used in two ways:
 
-        || A = "a,a,a".parse            #require // one way
+        || A = "a,a,a".parse            #require        // one way
         || B = "b,b,b".parse
-        require B                                // the second 
+        require B                                       // the other
 
 both `A` and `B` are tested in the same way. But the first looks better to me, in this case. Its more "out of the way".
 
