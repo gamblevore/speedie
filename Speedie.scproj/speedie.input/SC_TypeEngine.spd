@@ -1273,8 +1273,6 @@ function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name
 		exp.name = "syntaxisnt"
 	  else
 		exp.name = "syntaxis"
-	if negate
-		negate.become(@bra) // seems a lil wasteful... we remove something then create it.
 	opch.become(@prm)
 	opch.obj = nil		// needed
 	rn.func = @dot
@@ -1289,17 +1287,27 @@ function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name
 	// if a isnt b --> if !a.is(B)
 	
 	if OpchIsnt
-		|| NOT = @brel + "!"
 		exp.name = "syntaxis"
 		if !side
-			exp.next = not // replacewith
-			not <~ exp
-			exp = not
+			if !negate
+				|| NOT = @brel + "!"
+				exp.next = not			// replacewith
+				not <~ exp
+				exp = not
+			  else
+				exp = negate
 		  else
-			side.next = not
-			not <~ side
-			side = not
+			if ! negate 
+				|| NOT = @brel + "!"
+				side.next = not
+				not <~ side
+				side = not
+			  else
+				side = negate
 			TypeOfExpr(side, name_space)
+	  else
+		if negate
+			negate.become(@bra)
 			
 	return TypeOfExpr(exp, name_Space, side)
 }
