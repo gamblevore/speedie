@@ -31,15 +31,15 @@ If you'd like to support the ongoing development of Speedie, consider [sponsorin
 
 
 # Read More #
-* [Language Guide](Documentation/LanguageGuide.md) <small>(learn how to use Speedie)</small>
+* [Language Guide](Documentation/LanguageGuide.md) <small>_(learn how to use Speedie)_</small>
 * [Speedie-isms](Documentation/isms.md) _(Conventions)_
 * [XML vs Jeebox](Documentation/xml.md) <small>_(Jeebox wins)_</small>
-* [Message (Jeebox)](Documentation/Message.md) (How to use Jeebox)
-* [Strings](Documentation/Strings.md) (Good string support is important)
-* [Error Handling](Documentation/Errors.md) (the best error-handling in any language!)
-* [Perry](Documentation/Perry.md) (An IDE made specially for Speedie)
-* [Safety in Speedie](Documentation/Safety.md) (What Speedie does for you)
-* [Speedie Is Fast](Documentation/Speed.md) (Why use a lang if its not fast?)
+* [Message (Jeebox)](Documentation/Message.md) <small>_(How to use Jeebox)_</small>
+* [Strings](Documentation/Strings.md) <small>_(Good string support is important)_</small>
+* [Error Handling](Documentation/Errors.md) <small>_(the best error-handling in any language!)_</small>
+* [Perry](Documentation/Perry.md) (<small>_An IDE made specially for Speedie)_</small>
+* [Safety in Speedie](Documentation/Safety.md) <small>_(What Speedie does for you)_</small>
+* [Speedie Is Fast](Documentation/Speed.md) <small>_(Why use a lang if its not fast?)_</small>
 
 
 
