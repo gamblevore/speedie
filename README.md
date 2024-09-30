@@ -32,7 +32,7 @@ If you'd like to support the ongoing development of Speedie, consider [sponsorin
 
 # Read More #
 * [Language Guide](Documentation/LanguageGuide.md) <small>_(learn how to use Speedie)_</small>
-* [Speedie-isms](Documentation/isms.md) _(Conventions)_
+* [Speedie-isms](Documentation/isms.md) _(Fun conventions)_
 * [XML vs Jeebox](Documentation/xml.md) <small>_(Jeebox wins)_</small>
 * [Message (Jeebox)](Documentation/Message.md) <small>_(How to use Jeebox)_</small>
 * [Strings](Documentation/Strings.md) <small>_(Good string support is important)_</small>
