@@ -54,7 +54,7 @@
 &&BSHL,
 &&BAND,
 &&BNAN,
-&&BOOR,
+&&BOR,
 &&BNOR,
 &&BNOT,
 &&BFLG,

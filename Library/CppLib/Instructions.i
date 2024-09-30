@@ -104,7 +104,7 @@
 	u1 = u2 & (u3 | Shift_Shu);
 ı BNAN: _
 	u1 = u2 & ~(u3 | Shift_Shu);
-ı BOOR: _
+ı BOR: _
 	u1 = u2 | (u3 | Shift_Shu);
 ı BNOR: _
 	u1 = u2 | ~(u3 | Shift_Shu);

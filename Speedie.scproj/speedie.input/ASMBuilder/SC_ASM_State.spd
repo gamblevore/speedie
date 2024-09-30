@@ -61,15 +61,19 @@ struct ASMState
 
 
 	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
-		|| reg = .Temptyped(exp, dest)
+		if dest isnt discard
+			dest = .TempTyped(exp, dest)
 		if togrow.isint and value.CanStoreAsIntImmediate
-			return exp.ADPK(reg, ToGrow, Value) * reg
-		.Assign(reg, ToGrow, asmreg(), exp)
+			return exp.ADPK(dest, ToGrow, Value) * Dest
+		.Assign(dest, ToGrow, asmreg(), exp)
 		rz = .IncrPre(exp, togrow, ToGrow, value)
 
 
 	function IncrPre (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
 		#! what if dest.reg != src.reg? like y = ++x
+		if !src.reg // what?
+		if (dest isnt discard) and !dest.reg
+			dest = src
 		if dest.isint and Value.CanStoreAsIntImmediate
 			rz = exp.ADDK(src, src, Value) * dest
 		  elseif dest.isfloat and dest.FourBytes and value|uint64|.CanStoreAsfloatImmediate
@@ -265,11 +269,14 @@ function @ASMType.DoFunction (fn_Asm)
 	|| P = .ASMPrmCollect(prms, fn, IsC)
 	.CloseVTmps(TmpCloser)
 	
-	|| P3 = P >> 32
-	|| fat = exp.FUNK(dest,  fn.TableId,  P,  P3)
+	|| PExt = P >> 32
+	|&fatasm| fat
+	
 	if isc
-		fat.op = ASM.FFNC
-	fat.op += P3>0
+		fat = exp.FFNC(dest, fn.TableId,  fn.returntype.ASMUseSpecialRegs|int|, P,  PExt)
+	  else
+		fat = exp.FUNK(dest,  fn.TableId,  P,  PExt)
+	fat.op += PExt!=0
 //	Dest.reg = SaveAmount.asm // we don't wanna use this... makes the VM more complex.
 //  Mostly I'm doing:  || x = msg.function(),  (which uses the correct position.)
 	

@@ -17,7 +17,6 @@ function fatasm.KNST_Encoder (Asm_encoder2)
 		.r[3] = V|int|
 */
 
-	debugat
 	|| v = .const
 	|| inv = v>>63					// We only need to store 63 bits then? if the top is always false.
 		v = ~v	  					// Opportunity to reclaim the top bit. I'll do it later.

@@ -17,8 +17,8 @@ forms
 
 	ForeignFunc
 		r1		R
-		V0		1			// Result is FP/SIMD 
 		Table	14			// functions in registers use the first 32 values...
+		V0		1			// Result is FP/SIMD 
 		Prm1	x
 		Prm2	x
 	
@@ -362,7 +362,7 @@ POS 6
 		u1 = u2 &   (u3|||Shift_Shu)
 /**/ BNAN  (Shift)
 		u1 = u2 &  ~(u3|||Shift_Shu)
-/**/ BOOR  (Shift)
+/**/ BOR   (Shift)
 		u1  = u2||| (u3|||Shift_Shu)
 /**/ BNOR  (Shift)
 		u1  = u2|||~(u3|||Shift_Shu)

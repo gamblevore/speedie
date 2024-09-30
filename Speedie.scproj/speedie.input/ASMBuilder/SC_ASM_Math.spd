@@ -414,7 +414,7 @@ extend ASMState
 		if l is ConstAny
 			swap (l) (r)
 		dest.Expect(exp)
-		|| fat = exp.BOOR(dest, L, R, 0)
+		|| fat = exp.BOR(dest, L, R, 0)
 		if dest is ConstAny
 			fat.Const = l.const ||| r.const
 		return fat * Dest

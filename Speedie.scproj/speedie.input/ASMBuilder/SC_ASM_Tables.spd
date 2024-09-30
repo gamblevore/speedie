@@ -405,8 +405,11 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 
 function ARel		(fn_asm)
 	opt	NoRefCounts
-	|| M = (exp.name[] == '+')|int|
-	if dest.reg
+	|| F = exp.name[]
+	if F == '?' or '!'
+		return .µ(exp.first!, dest)
+	|| M = (F == '+')|int|
+	if dest isnt discard
 		M += IncrAfter
 	return Incrementatulatorifier(self, exp.first!, dest, M)
 
