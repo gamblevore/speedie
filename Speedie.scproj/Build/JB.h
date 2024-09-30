@@ -1527,13 +1527,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool ((int)16)
 #define kSC__CustomOps_TypeCastToBetter ((int)32)
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2128])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2137])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2129])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2130])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2127])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2130])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2131])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2138])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2139])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2136])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2139])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2140])
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
 extern int SC__FastStringOpts_StrRemoved;
@@ -1729,7 +1729,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[185])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2145])
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
 extern CharSet* SC_CSNum;
@@ -1753,7 +1753,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kNoMatch ((int)0)
 #define kJB_kNumericMatch ((int)8388608)
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2132])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2141])
 #define kJB_kSimpleMatch ((int)4194304)
 #define kJB_kSuperClassMatch ((int)16777216)
 #define kJB_kTypeCastAssigns ((int)64)
@@ -1771,7 +1771,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[1108])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2146])
 #define kJB_kVoidPtrMatch ((int)20971520)
 extern JB_File* SC_PerryLogFile;
 extern Message* SC_ReturnSelfEqNil;
@@ -1913,10 +1913,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp ((int)32784)
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2135])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2134])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2144])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2143])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2133])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2142])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int16_max ((s16)32767)
@@ -1940,7 +1940,7 @@ extern Random JB__zalgo_R;
 #define kSC__ASM_BNAN ((ASM_Shift)55)
 #define kSC__ASM_BNOR ((ASM_Shift)57)
 #define kSC__ASM_BNOT ((ASM_Shift)58)
-#define kSC__ASM_BOOR ((ASM_Shift)56)
+#define kSC__ASM_BOR ((ASM_Shift)56)
 #define kSC__ASM_BSHL ((ASM_Shift)53)
 #define kSC__ASM_BSHR ((ASM_Shift)52)
 #define kSC__ASM_BSHS ((ASM_Shift)51)
@@ -2431,7 +2431,7 @@ extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_kDelete ((int)2)
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2126])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2135])
 extern Float64 JB__Rec_Progress;
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -7999,7 +7999,7 @@ FatASM* JB_Msg_BNOR(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Sh);
 
 FatASM* JB_Msg_BNOT(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Sh);
 
-FatASM* JB_Msg_BOOR(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Sh);
+FatASM* JB_Msg_BOR(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Sh);
 
 void JB_Msg_Bra__(Message* Self, FastString* Fs);
 
@@ -8211,9 +8211,9 @@ SCDecl* SC_Msg_FastDecl(Message* Self);
 
 FatASM* JB_Msg_FDIV(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
 
-FatASM* JB_Msg_FFNC(Message* Self, ASMReg R1, int V0, int Table, int Prm1, int Prm2);
+FatASM* JB_Msg_FFNC(Message* Self, ASMReg R1, int Table, int V0, int Prm1, int Prm2);
 
-FatASM* JB_Msg_FFNC3(Message* Self, ASMReg R1, int V0, int Table, int Prm1, int Prm2);
+FatASM* JB_Msg_FFNC3(Message* Self, ASMReg R1, int Table, int V0, int Prm1, int Prm2);
 
 FatASM* JB_Msg_FFRC(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
 
