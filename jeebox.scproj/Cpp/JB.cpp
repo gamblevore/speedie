@@ -521,7 +521,7 @@ bool JB_CompareError(Message* Expected, Message* Found) {
 	}
 	JB_Obj_PrintLine(Fs);
 	JB_Decr(Fs);
-	JB_Msg_SyntaxExpect(Found, nil);
+	JB_Msg_Fail(Found, nil);
 	JB_Decr(Found);
 	return false;
 }
@@ -3277,7 +3277,7 @@ Syntax JB_Syx__Func(JB_String* Name, Message* Where) {
 		if (!Obj) {
 			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[327], Name);
 			JB_Incr(_tmPf0);
-			JB_Msg_SyntaxExpect(Where, _tmPf0);
+			JB_Msg_Fail(Where, _tmPf0);
 			JB_Decr(_tmPf0);
 			JB_Decr(Obj);
 			return nil;
@@ -3485,7 +3485,7 @@ JB_String* JB_FastBuff_AccessStr(FastBuff* Self, int Pos, int After) {
 void JB_FastBuff_SyntaxExpect(FastBuff* Self, JB_String* S) {
 	if (!Self->WentBad) {
 		if (true) {
-			JB_Str_SyntaxExpect(S);
+			JB_Str_Fail(S);
 		}
 	}
 	Self->WentBad = true;
@@ -3611,7 +3611,7 @@ void JB_Saver_AppendString(ObjectSaver* Self, JB_String* S) {
 
 void JB_Saver_Destructor(ObjectSaver* Self) {
 	if (Self->CantSaveThis) {
-		JB_Object_Fail(Self->CantSaveThis, JB_LUB[315]);
+		JB_Object_FailStr(Self->CantSaveThis, JB_LUB[315]);
 	}
 	JB_Clear(Self->Dest);
 }
@@ -3791,7 +3791,7 @@ void JB_Object_SaveTryCollect(JB_Object* Self, ObjectSaver* Saver) {
 	}
 }
 
-void JB_Object_Fail(JB_Object* Self, JB_String* Error) {
+void JB_Object_FailStr(JB_Object* Self, JB_String* Error) {
 	//visible;
 	if (JB_Object_Isa(Self, &MessageData)) {
 		JB_Rec__NewErrorWithNode(((Message*)Self), Error, nil);
@@ -4273,7 +4273,7 @@ FastString* JB_FS__Use(JB_Object* Other) {
 	}
 	if (Other) {
 		if (true) {
-			JB_Object_Fail(Other, JB_LUB[235]);
+			JB_Object_FailStr(Other, JB_LUB[235]);
 		}
 	}
 	return nil;
@@ -5187,7 +5187,7 @@ StringReader* JB_Str_Stream(JB_String* Self) {
 	return JB_SS_Constructor(nil, Self);
 }
 
-void JB_Str_SyntaxExpect(JB_String* Self) {
+void JB_Str_Fail(JB_String* Self) {
 	//visible;
 	JB_Rec__NewErrorWithNode(nil, Self, nil);
 }
@@ -5326,7 +5326,7 @@ int JB_SS_Byte(StringReader* Self) {
 
 void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, CompressionStats* St) {
 	if (Self == nil) {
-		JB_Str_SyntaxExpect(JB_LUB[271]);
+		JB_Str_Fail(JB_LUB[271]);
 		return;
 	}
 	FastString* J = JB_FS__Use(Dest);
@@ -5422,7 +5422,7 @@ bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, Compress
 		if (true) {
 			JB_StringC* _tmPf2 = ((JB_StringC*)JB_Ternary(Remaining > Lim, JB_LUB[468], JB_LUB[251]));
 			JB_Incr(_tmPf2);
-			JB_SS_SyntaxExpect(Self, _tmPf2);
+			JB_SS_Fail(Self, _tmPf2);
 			JB_Decr(_tmPf2);
 		}
 	}
@@ -5463,7 +5463,7 @@ bool JB_SS_ExpectJbin(StringReader* Self) {
 		return true;
 	}
 	if (true) {
-		JB_SS_SyntaxExpect(Self, JB__jBinNotJbin);
+		JB_SS_Fail(Self, JB__jBinNotJbin);
 	}
 	return false;
 }
@@ -5492,7 +5492,7 @@ int64 JB_SS_hInt(StringReader* Self) {
 		}
 		Sh = (Sh + 7);
 		if (Sh > 57) {
-			JB_SS_SyntaxExpect(Self, JB_LUB[215]);
+			JB_SS_Fail(Self, JB_LUB[215]);
 			return 0;
 		}
 	};
@@ -5534,7 +5534,7 @@ Message* JB_SS_NextMsgExpect(StringReader* Self, Message* Parent, Syntax Fn, JB_
 		return nil;
 	}
 	if (!(JB_Msg_Expect(Rz, Fn, Name) and (JB_Msg_InMsg(Rz, Parent)))) {
-		JB_Msg_SyntaxExpect(Rz, nil);
+		JB_Msg_Fail(Rz, nil);
 		return nil;
 	}
 	return Rz;
@@ -5569,11 +5569,11 @@ uint64 JB_SS_NextMsgInfo(StringReader* Self) {
 	Self->UserObj = nil;
 	if (Info >= 0) {
 		if (T <= kJB_SyxNil) {
-			JB_SS_SyntaxExpect(Self, JB_LUB[302]);
+			JB_SS_Fail(Self, JB_LUB[302]);
 			return 0;
 		}
 		if (true) {
-			JB_SS_SyntaxExpect(Self, JB_LUB[216]);
+			JB_SS_Fail(Self, JB_LUB[216]);
 		}
 	}
 	return 0;
@@ -5704,7 +5704,7 @@ JB_String* JB_SS_StrNoAdvance(StringReader* Self, int N, int Skip) {
 	return Rz;
 }
 
-void JB_SS_SyntaxExpect(StringReader* Self, JB_String* Error) {
+void JB_SS_Fail(StringReader* Self, JB_String* Error) {
 	Self->UserObj = nil;
 	if (Self->Data.WentBad) {
 		return;
@@ -5990,7 +5990,7 @@ jbinLeaver JB_bin_AddMemory(FastString* Self, Syntax Type, uint64 L, bool GoIn, 
 void JB_bin_CloseSection(FastString* Self, int C) {
 	int CurrLen = Self->Length;
 	if (CurrLen < C) {
-		JB_Object_Fail(Self, JB_LUB[322]);
+		JB_Object_FailStr(Self, JB_LUB[322]);
 		return;
 	}
 	Self->Length = (C - 6);
@@ -6571,7 +6571,7 @@ bool JB_Msg_Expect(Message* Self, Syntax Type, JB_String* Name) {
 	if (true) {
 		JB_String* _tmPf2 = JB_FS_SyntaxCast(Fs);
 		JB_Incr(_tmPf2);
-		JB_Msg_SyntaxExpect(Self, _tmPf2);
+		JB_Msg_Fail(Self, _tmPf2);
 		JB_Decr(_tmPf2);
 	}
 	JB_Decr(Fs);
@@ -6582,7 +6582,7 @@ bool JB_Msg_ExpectLast(Message* Self, JB_String* Err) {
 	if (Self) {
 		Message* N = ((Message*)JB_Ring_NextSib(Self));
 		if (N) {
-			JB_Msg_SyntaxExpect(N, Err);
+			JB_Msg_Fail(N, Err);
 		}
 		 else {
 			return true;
@@ -6784,7 +6784,7 @@ int64 JB_Msg_Int(Message* Self, int StrStart) {
 		}
 		 else {
 			if (true) {
-				JB_Msg_SyntaxExpect(Self, JB_LUB[252]);
+				JB_Msg_Fail(Self, JB_LUB[252]);
 			}
 			Mul = 0.0f;
 		}
@@ -7393,7 +7393,7 @@ bool JB_Msg_EqualsSyx(Message* Self, Syntax X, bool Aware) {
 	return ((bool)Self) and (Self->Func == X);
 }
 
-void JB_Msg_SyntaxExpect(Message* Self, JB_String* Error) {
+void JB_Msg_Fail(Message* Self, JB_String* Error) {
 	JB_Rec__NewErrorWithNode(Self, Error, nil);
 }
 
@@ -8436,7 +8436,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024093013);
+	return (2024100113);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8448,4 +8448,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 7276739854444081810 -4350689744046079234
+// -2934619186805667969 -3836267876743177575 -4350689744046079234

@@ -1944,7 +1944,7 @@ bool JB_Object_Isa(JB_Object* Self, JB_Class* Cls);
 
 void JB_Object_SaveTryCollect(JB_Object* Self, ObjectSaver* Saver);
 
-void JB_Object_Fail(JB_Object* Self, JB_String* Error);
+void JB_Object_FailStr(JB_Object* Self, JB_String* Error);
 
 
 
@@ -2249,7 +2249,7 @@ JB_String* JB_Str_Squeeze(JB_String* Self);
 
 StringReader* JB_Str_Stream(JB_String* Self);
 
-void JB_Str_SyntaxExpect(JB_String* Self);
+void JB_Str_Fail(JB_String* Self);
 
 JB_String* JB_Str_TrimFirst(JB_String* Self, uint /*byte*/ B);
 
@@ -2333,7 +2333,7 @@ JB_String* JB_SS_Str(StringReader* Self, int N, int Skip);
 
 JB_String* JB_SS_StrNoAdvance(StringReader* Self, int N, int Skip);
 
-void JB_SS_SyntaxExpect(StringReader* Self, JB_String* Error);
+void JB_SS_Fail(StringReader* Self, JB_String* Error);
 
 
 
@@ -2652,7 +2652,7 @@ bool JB_Msg_SyntaxEquals(Message* Self, JB_String* Name, bool Aware);
 
 bool JB_Msg_EqualsSyx(Message* Self, Syntax X, bool Aware);
 
-void JB_Msg_SyntaxExpect(Message* Self, JB_String* Error);
+void JB_Msg_Fail(Message* Self, JB_String* Error);
 
 bool JB_Msg_SyntaxIs(Message* Self, uint /*MsgParseFlags*/ F);
 
