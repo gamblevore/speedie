@@ -93,12 +93,13 @@ jb_vm* JB_ASM_VM() {
 
 s64 JB_ASM_Run(u32* Code, u32 CodeLength) {
 	auto V = JB_ASM_VM();
-	
 	if (V) {
 		V->Env.CodeBase = (ASM*)Code;
 		V->Env.CodeLength = CodeLength;
 		return RunVM(*V);
 	}
+
+	JB_ErrorHandleC("Can't allocate VM", JB_Str__Empty(), false);
 	return -1;
 }
 

@@ -93,37 +93,43 @@ module PackMaker
 		return true
 	
 
+	function TestFn (|string| s, |scfunction|)
+		opt norefcounts
+		|| mod = compiler.program.FindModule("ASMExamples")
+			return mod.Findfunction(s)
+	
+	
 	function RunAFewTests
 		opt norefcounts
 		
 		|int64| Result = 0
-		|| fn = Compiler.FindFunction("PackTestConsts")
+		|| fn = .testfn("PackTestConsts")
 			self[0] = 8725, self[1] = 1, self[2] = 275, self[0] = 1		
-			result = fn.Run
+			result = fn.Test
 			if result != 9000
 		
-		fn = Compiler.FindFunction("PackTestForeignFuncs")
+		fn = .testfn("PackTestForeignFuncs")
 		if fn
 			self[0] = "hello", self[1] = "abc"
-			result = fn.run
+			result = fn.Test
 			debugger 
 			
-		fn = Compiler.FindFunction("PackTestMath")
+		fn = .testfn("PackTestMath")
 		if fn
 			for i in 5
 				self[0] = 12, self[1] = 6
-				result = fn.run
+				result = fn.Test
 			
-		fn = Compiler.FindFunction("PackTestAndOr")
+		fn = .testfn("PackTestAndOr")
 		if fn
 			self[0] = 0,   self[1] = 6,   self[2] = 1,   self[3] = 0
-			result = fn.run
+			result = fn.Test
 			
-		fn = Compiler.FindFunction("PackTestAndOr2")
+		fn = .testfn("PackTestAndOr2")
 		if fn
 			for i in 4
 				self[0] = i&1,   self[1] = (i&2)>>1
-				result = fn.run
+				result = fn.Test
 			
 	
 	
@@ -164,11 +170,14 @@ module PackMaker
 		return g
 
 	
-	function scfunction.Run (|int64|)
+	function scfunction.Test (|int64|)
 		opt norefcounts
 		|| mu = .asm
 			|| mu2 = mu.µTest
-				return jb_vm.Run(mu2.ptr, mu2.length)
+				|| P = mu2.ptr
+				printline mu.render
+				debugger
+				return jb_vm.Run(p, mu2.length)
 	
 	
 	syntax access (|int| v, assigns:|int|)
@@ -178,7 +187,7 @@ module PackMaker
 	
 	syntax access (|int| v, assigns:|object|)
 		|| r = jb_vm.vm.Registers(false)+v
-		r|&object|[] = value
+		r|&object--|[] = value
 	
 
 	function ListPackFuncs (|jbin| j)

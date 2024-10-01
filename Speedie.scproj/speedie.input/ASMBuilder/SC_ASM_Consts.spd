@@ -1,32 +1,22 @@
 
 
+function fatasm.NOOP_Encoder (Asm_encoder2)
+	curr[] = asm.noop << 24
+	return curr
+
 function fatasm.KNST_Encoder (Asm_encoder2)
 	if curr >= after-2
 		return curr
-
-// Put the LongestBitStretch into it. As an optional approach. Do this later!
-/*
-	|| V = .r[1]|uint64| << 32
-	V |= 0
-	|| Inv = V|uint64|.countbits > 32 
-		V = ~V
-	|| R = (~V|uint64|).LongestBitStretch	// longest false-stretch
-	if r.x >= 50		// OK so we have the longest stretch in r.x
-		V = V rotl 63-r.y
-		.r[2] = inv|int|
-		.r[3] = V|int|
-*/
-
 	|| v = .const
+	|| Orig = curr++
 	|| inv = v>>63					// We only need to store 63 bits then? if the top is always false.
 		v = ~v	  					// Opportunity to reclaim the top bit. I'll do it later.
-	|asm| knst = .op << 24
+	|asm| knst = asm.knst << 24
 	knst.R1 = .R[0]
 	knst.ConstStretchy_Inv = inv
 	knst.ConstStretchy_Value = v
 	v >>= 17
 
-	|| Orig = curr++
 	if v
 		curr++[] = v
 		knst += 1<<24
@@ -50,12 +40,37 @@ extend ASMState
 
 
 	function MakeConst (|&fatasm| fat, |asmreg| reg, |asmreg|)
+		Fat.TryRotateConst
 		(reg is ConstAny)
 		return fat*reg
+
+	
+	function fatasm.TryRotateConst
+		|| v = .const
+		|| OtherInv = (~v, v)(v>>63)
+		require otherinv >> 17
+		
+		|| Inv = V.CountBits > 32 
+			V = ~V
+		|| LBS = (~V).LongestBitStretch			// longest false-stretch
+		require LBS.x >= 50						// OK so we have the longest stretch in r.x
+		
+		|| ramount = 63-LBS.y 
+		V = V rotl ramount
+		.op = asm.knsr							// easier to debug
+		.r[1] = ramount
+		.r[2] = inv|int|
+		.r[3] = v
+		target debug
+			|| back = .r[3]|uint64| rotr .r[1]|uint64|
+			if .r[2]
+				back = ~back
+			if back!=.const // oof
+	
 	
 	function NumToFat (|message| exp, |int64| V, |asmreg| Reg, |&fatasm|)
 		|| DestType = Reg.µtype
-		Reg = .TempTyped(exp, Reg) // could we do this without typing?
+		Reg = .TempTyped(exp, Reg)				// could we do this without typing?
 		|| fat = exp.KNST(reg, 0, 0, 0)
 		fat.Const = v
 		|| SrcType = reg.µtype
@@ -66,9 +81,11 @@ extend ASMState
 		.Makeconst(fat, reg)
 		return fat
 	
+	
 	function NumToReg (|message| exp, |int64| V, |asmreg| Reg=ASMReg(), |asmreg|)
 		return .NumToFat(exp, v, reg).info
-
+	
+	
 	function SetConst (|Message| List,  |message| Orig,  |bool|)
 		opt norefcounts								// set1: r1, 123
 		|| RegMsg = list[@thg]
@@ -103,10 +120,11 @@ function uint64.LongestBitStretch (|ivec2|)
 
 // needs refcount upgrade.
 function uint.isconst (|bool|)
+	debugger
 
 
 function uint.ConstValue (|int64|)
-
+	debugger
 
 function int64.CanStoreAsIntImmediate (|bool|)
 	return ((self << 50)>>50) == self
@@ -119,8 +137,6 @@ function uint64.CanStoreAsFloatImmediate (|bool|)
 function asmreg.CanAddK (|int64| T, |bool|) // used to be used from .plus()... works now from render
 	if (self is constany) and .isint
 		return t.CanStoreAsIntImmediate
-
-
 
 
 function fatasm.ConstifyIntDiv (fn_ASMConstifier)

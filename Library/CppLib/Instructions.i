@@ -179,7 +179,7 @@
 ;
 	___;
 ı RFRG: _
-	SetRefRegToReg(r, n1, n2, U2_Lu);
+	SetRefRegToReg(r, Op);
 ı RFWR: _
 	SetRefRegToMem(r, Op);
 ı RFRD: _

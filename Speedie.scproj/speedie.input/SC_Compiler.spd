@@ -234,9 +234,9 @@ function InitTypes (|bool|)
 	TypeuInt			= compiler["uint"]
 	TypeuInt16			= compiler["uint16"]
 	TypeuInt64			= compiler["uint64"]
-	Typefloat64			= compiler["f64"]
-	Typefloat16			= compiler["hfloat"]
+	Typefloat16			= compiler["float16"]
 	Typefloat			= compiler["float"] 
+	Typefloat64			= compiler["float64"]
 	TypeBool			= compiler["bool"]
 	TypeString			= compiler["string"]
 	TypeStringZero		= compiler["stringzeroterminated"]	
@@ -690,12 +690,7 @@ function XFunc (|string| name, |message| m=nil, |SCFunction|)
 
 function FindFunction (|string| Name, |SCFunction|)
 	opt norefcounts
-	|| o = compiler.program[ name ]
-	if o isa SCFunction
-		o.Reach
-		Return o
-	
-	error ( nil, "Can’t find function: " + name )
+	return Compiler.program.findfunction(name)
 
 
 function scfunction.IsAllocOrNew (|bool|)

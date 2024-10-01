@@ -3,17 +3,18 @@
 module ASMExamples {
 
 target pack { 
-function PackTestConsts
-//	#! RUN!!
+function PackTestConsts (|float64|)
+	#! RUN!!
 	visible
-	|f64| r1 = 2						// int as f64
-	|| r2 = (1.0/2|f64|)
+	|float64| r1 = 2						// int as f64
+	|| r2 = (1.0/2|float64|)
 	r2 = (1.0/r1)
 	|| r3 = 0.1 + 1						// f32 + int
 	|| r4 = 3.4567 + r1|float|			// f64 + f32
-	|| r5 = 1234.5|f64| + 5678.9|f64|	// f64 + f64
+	|| r5 = 1234.5|float64| + 5678.9|float64|	// f64 + f64
 	|float| r6 = 2						// int as f32
-	|f64| r7 = 1.0						// f32 as f64
+	|float64| r7 = 1.0						// f32 as f64
+	return r2 + r5
 
 function PackTestIncr (|int| x, |int| y, |int|)
 	#! RUN!!

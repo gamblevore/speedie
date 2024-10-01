@@ -381,6 +381,7 @@ function Destructable (|Message| Blocker, |Message| arg, |Message| name)
 	|| FnMsg	= RefMsg0(fn.exportname, fn)
 	|| brel = fnmsg.last.msg(@brel, "&")
 	|| NewThg = brel.msg(@thg, name.name)
+	newthg.restoreasm
 	newthg.obj = name.obj // needed
 	if (Blocker)
 		Blocker.Prev = Fnmsg
@@ -719,6 +720,7 @@ function scfunction.CallSuperMem (|SCFunction| fn)
 	
 	for (a in fnargs) (i)
 		|| msg = lst.msg(@thg, a.name) 
+		msg.restoreasm
 		msg.obj = .args[i]
 
 	if (self is Constructor)
@@ -894,12 +896,16 @@ function scdecl.DeclToAddr (|SCDecl| P0, |Message|)
 function scdecl.DeclToDot (|SCDecl| P0, |Message|)
 	opt norefcounts
 	rz = @dot + .Name
-	rz.msg(@thg, "self").obj = p0
+	|| thg = rz.msg(@thg, "self")
+	thg.restoreasm
+	thg.obj = p0
 	rz <~ @emb
 	rz.obj = self
-
 }
 
+
+function message.restoreasm
+	.asmtype = .func|int|
 
 function scdecl.RefDestructor (|message|)
 	opt norefcounts

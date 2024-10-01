@@ -42,7 +42,7 @@ forms
 		// So... we need to compare
 		// but how? We want the biggest item
 	
-	Const	// const:
+	RotateConst	// RotateConst:
 		r1		R
 		Rot		6
 		Inv		1
@@ -199,7 +199,11 @@ forms
 	RefSet
 		r1		R
 		r2		r
-		Mode	l
+		Incr	1
+		Move	1
+		Free	1
+		Decr	1
+
 	RefSet2
 		r1		r		// Small R
 		r2		r
@@ -297,7 +301,7 @@ forms
 
 
 #!						 (((((Consts)))))
-/**/ KNSR (Const)
+/**/ KNSR (RotateConst)
 		RotateConst(r, Op)
 
 POS 4 // force position
@@ -452,12 +456,12 @@ POS 6
 
 #!						 (((((Refs)))))
 /**/ RFRG  (RefSet)
-		SetRefRegToReg(r, n1, n2, U2_Lu)		
+		SetRefRegToReg(r, Op)		
 
-/**/ RFWR  (RefSet2)							// refcount reg to mem
+/**/ RFWR  (RefSet2)							// RefCount reg to mem
 		SetRefRegToMem(r, Op)
 
-/**/ RFRD  (RefSet3)							// refcount mem to reg
+/**/ RFRD  (RefSet3)							// RefCount mem to reg
 		SetRefMemToReg(r, Op)
 /**/ RFDC  (RefDecrMem)							// for destructors/closers.
 		SetRefDecrMem(r, Op)

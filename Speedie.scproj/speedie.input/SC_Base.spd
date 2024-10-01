@@ -89,7 +89,7 @@ function FindModuleMsg (|Message| where, |SCNodeFindMode| Mode=0, |SCModule?|)
 	return .findmodule(where.name, where, Mode)
 
 
-function scnode.FindClassMsg (|Message| where, |SCNodeFindMode| Mode=scnodefindmode.WantAType,  |SCClass|)
+function FindClassMsg (|Message| where, |SCNodeFindMode| Mode=scnodefindmode.WantAType,  |SCClass|)
 	opt norefcounts
 	|| mod = .FindModuleMsg(where, Mode ||| SCNodeFindMode.ForClass)
 		|| C = mod.cls
@@ -97,6 +97,16 @@ function scnode.FindClassMsg (|Message| where, |SCNodeFindMode| Mode=scnodefindm
 		if mode isnt noerrors
 			error (where, "Expected a class but found module.")
 
+
+function FindFunction (|string| Name, |SCFunction|)
+	opt norefcounts
+	|| o = self[ name ]
+	if o isa SCFunction
+		o.Reach
+		Return o
+	
+	error ( nil, "Can’t find function: " + name )
+	
 
 function FindClass (|String| name, |Message| where=nil, |SCNodeFindMode| Mode=0,  |SCClass|)
 	opt norefcounts
@@ -122,7 +132,7 @@ function FindModuleParent (|SCNodeFindMode| Mode, |SCnode|)
 	return .parent
 
 
-function FindModule (|String| name, |Message| where, |SCNodeFindMode| Mode=0, |SCModule|)
+function FindModule (|String| name, |Message| where=nil, |SCNodeFindMode| Mode=0, |SCModule|)
 	opt norefcounts
 
 	|| Upon = self

@@ -96,13 +96,11 @@ function First			(fn_asm)
 
 function Return			(fn_asm)
 	opt norefcounts
-	|| reg = asmreg()
+	|| reg = ASMReg()
 	|| f = exp.first
-		|| Where = AsmReg.ForReturn
-		where.reg = 1
-		where.µtype = .ReturnASM
+		|| Where = .ReturnASM|asmreg| as AsmReg.ForReturn
 		reg = .µ(f, Where)
-	exp.RET(reg, asmreg(), 1, 0)
+	exp.RET(reg, ASMReg(), 1, 0)
 
 
 

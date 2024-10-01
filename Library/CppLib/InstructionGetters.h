@@ -100,23 +100,23 @@
 #define   MinMax_Lu_(x)   (((uint)((x)<<24))>>24)
 
 
-#define   Const_Roti       ((( int)((Op)<<13))>>26)
-#define   Const_Roti_(x)   ((( int)((x)<<13))>>26)
+#define   RotateConst_Roti       ((( int)((Op)<<13))>>26)
+#define   RotateConst_Roti_(x)   ((( int)((x)<<13))>>26)
 
-#define   Const_Rotu       (((uint)((Op)<<13))>>26)
-#define   Const_Rotu_(x)   (((uint)((x)<<13))>>26)
+#define   RotateConst_Rotu       (((uint)((Op)<<13))>>26)
+#define   RotateConst_Rotu_(x)   (((uint)((x)<<13))>>26)
 
-#define   Const_Invi       ((( int)((Op)<<19))>>31)
-#define   Const_Invi_(x)   ((( int)((x)<<19))>>31)
+#define   RotateConst_Invi       ((( int)((Op)<<19))>>31)
+#define   RotateConst_Invi_(x)   ((( int)((x)<<19))>>31)
 
-#define   Const_Invu       (((uint)((Op)<<19))>>31)
-#define   Const_Invu_(x)   (((uint)((x)<<19))>>31)
+#define   RotateConst_Invu       (((uint)((Op)<<19))>>31)
+#define   RotateConst_Invu_(x)   (((uint)((x)<<19))>>31)
 
-#define   Const_Valuei       ((( int)((Op)<<20))>>20)
-#define   Const_Valuei_(x)   ((( int)((x)<<20))>>20)
+#define   RotateConst_Valuei       ((( int)((Op)<<20))>>20)
+#define   RotateConst_Valuei_(x)   ((( int)((x)<<20))>>20)
 
-#define   Const_Valueu       (((uint)((Op)<<20))>>20)
-#define   Const_Valueu_(x)   (((uint)((x)<<20))>>20)
+#define   RotateConst_Valueu       (((uint)((Op)<<20))>>20)
+#define   RotateConst_Valueu_(x)   (((uint)((x)<<20))>>20)
 
 
 #define   JCmpEq_Jmpi       ((( int)((Op)<<18))>>18)
@@ -456,11 +456,29 @@
 #define   Swap_Lu_(x)   (((uint)((x)<<28))>>28)
 
 
-#define   RefSet_Modei       ((( int)((Op)<<18))>>18)
-#define   RefSet_Modei_(x)   ((( int)((x)<<18))>>18)
+#define   RefSet_Incri       ((( int)((Op)<<18))>>31)
+#define   RefSet_Incri_(x)   ((( int)((x)<<18))>>31)
 
-#define   RefSet_Modeu       (((uint)((Op)<<18))>>18)
-#define   RefSet_Modeu_(x)   (((uint)((x)<<18))>>18)
+#define   RefSet_Incru       (((uint)((Op)<<18))>>31)
+#define   RefSet_Incru_(x)   (((uint)((x)<<18))>>31)
+
+#define   RefSet_Movei       ((( int)((Op)<<19))>>31)
+#define   RefSet_Movei_(x)   ((( int)((x)<<19))>>31)
+
+#define   RefSet_Moveu       (((uint)((Op)<<19))>>31)
+#define   RefSet_Moveu_(x)   (((uint)((x)<<19))>>31)
+
+#define   RefSet_Freei       ((( int)((Op)<<20))>>31)
+#define   RefSet_Freei_(x)   ((( int)((x)<<20))>>31)
+
+#define   RefSet_Freeu       (((uint)((Op)<<20))>>31)
+#define   RefSet_Freeu_(x)   (((uint)((x)<<20))>>31)
+
+#define   RefSet_Decri       ((( int)((Op)<<21))>>31)
+#define   RefSet_Decri_(x)   ((( int)((x)<<21))>>31)
+
+#define   RefSet_Decru       (((uint)((Op)<<21))>>31)
+#define   RefSet_Decru_(x)   (((uint)((x)<<21))>>31)
 
 
 #define   RefSet2_Decri       ((( int)((Op)<<18))>>31)

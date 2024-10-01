@@ -78,7 +78,7 @@ function JumpSub (NilTrackerFn)
 	|| t = msg.ASMType
 		return (NilTable[t]!)(msg, test)
 	t = msg.func|ASMType|
-	msg.ASMType = t
+	msg.ASMType = t						// main setter here.
 	return (NilTable[t]!)(msg, test)
 
 function Jump (NilTrackerFn)
@@ -295,13 +295,13 @@ function Return (NilTrackerFn)
 	.DeclKill
 	t.anyreturns = true
 	|| ret = t.return
-	if ret and ret.typesuffers
-		if ret.StatedReal
-			expect (v isnt nilish) (msg, "Declaration does not allow returning " + v.rawname)
-		
-		ret.NilDeclared = ret.nildeclared ||| (v&nilstate.either)					// assume real, unless it becomes optional??
-		target debugnil
-			ret.NilPrint("return")
+	require ret and ret.typesuffers
+
+	if ret.StatedReal
+		expect (v isnt nilish) (msg, "Declaration does not allow returning " + v.rawname)
+	ret.NilDeclared = ret.nildeclared ||| (v&nilstate.either)				// assume real, unless it becomes optional??
+	target debugnil
+		ret.NilPrint("return")
 
 
 function Exit (NilTrackerFn)
@@ -599,11 +599,13 @@ function arel (Niltrackerfn)
 function Declaration (niltrackerfn) // function decl 
 	opt norefcounts
 	|| rel = msg.last
-	if rel != @thg
-		|| d = rel.first!.FastDecl
-		|| J = .Jump(rel.last!)
-		if d.IsReg
-			return T.Declare(D, J)
+	target debug: if rel!=@rel
+	|| thg = rel.first!
+	thg.restoreasm
+	|| d = thg.FastDecl
+	|| J = .Jump(rel.last!)
+	if d.IsReg
+		return T.Declare(D, J)
 
 
 

@@ -2,8 +2,8 @@
 
 class µFunc 
 	linkage
-		cpp_class ASMFunc
-		cpp_part ASMFunc 
+		cpp_class FuncInASM
+		cpp_part FuncInASM 
 	|scfunction|			Fn
 	|&FatASM|				IR
 	|int|					Length

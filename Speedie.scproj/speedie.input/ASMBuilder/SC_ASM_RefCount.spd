@@ -4,28 +4,27 @@
 extend_module ASMType
 	function RefCountSub (fn_fatasm)	// JB_SetRef(a,b)
 		opt	NoRefCounts
-		debugger 
-		|| prms = exp.last
+		|| prms = exp.last!
 		|| fn = prms.obj|SCFunction|!
 		|| A = .µ(prms.first!, dest)
 
 		|| offset = 0
 		if fn == Compiler.RefIncr
 			target debug: if A is ContainsAddr				// always a reg!
-			return exp.RFRG(a, a, 8)
+			return exp.RFRG(a, a, 1, 0, 0, 0)
 
 		if fn == Compiler.RefDecr
 			if a is ContainsAddr // do we need addrrequest?
 				return exp.RFDC(a, 1, offset)				// SHOULD do decrmulti in destructors/carrays.
-			return exp.RFRG(a, a, 6)						// (but refcounter doesnt do it yet)
+			return exp.RFRG(a, a, 0, 0, 1, 1)				// (but refcounter doesnt do it yet)
 
 		if fn == Compiler.RefSafeDecr
 			target debug: if a is ContainsAddr				// always a reg!
-			return exp.RFRG(a, a, 4)
+			return exp.RFRG(a, a, 0, 0, 0, 1)
 
 		if fn == Compiler.RefFreeIfDead
 			target debug: if a is ContainsAddr				// always a reg!
-			return exp.RFRG(a, a, 2)
+			return exp.RFRG(a, a, 0, 0, 1, 0)
 
 		if fn == Compiler.RefIncr2
 			|| B = .µ(prms.second!)
@@ -55,7 +54,7 @@ extend_module ASMType
 			if b is ContainsAddr							// mem to reg
 				return exp.RFRD(a, b, 1, offset)
 
-			return exp.RFRG(a, a, 15)						// reg to reg
+			return exp.RFRG(a, a, 1, 1, 1, 1)						// reg to reg
 
 
 

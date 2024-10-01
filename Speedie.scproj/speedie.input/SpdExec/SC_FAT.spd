@@ -1,5 +1,8 @@
 
+
 struct FatASM 
+	linkage
+		cpp_part FAT
 	|ASMReg| 			Info		// only needs 32-bits of this. Could we make a smaller asmreg?
 	|message--| 		Msg
 	|uint64| 			Const
@@ -224,7 +227,7 @@ struct FatASM
 		|| GotAny = ""
 		|| Remain = 24
 		|| f = op.sizes
-		|| knst = (.op == asm.knst)
+
 		for i in f.count
 			|| bs = f[i].bitsize
 			if bs and (remain > 0)
@@ -234,20 +237,20 @@ struct FatASM
 					fs <~ 'r'
 				fs <~ .r[i]|int|
 				remain += bs
-			if knst
+			if .op == asm.knst
 				exit
-		if knst
+		if (.op == asm.knst or asm.knsr)
 			.RendaKnst(fs, fs.mark-m)
 	
 	
 	function RendaKnst (|faststring| fs, |int| sofar)
 		|| ty = .info.µType
-		fs <~ (' ', 21-sofar)
+		fs <~ (' ', 26-sofar)
 		fs <~ "/# "
 		if ty.IsInt
 			fs <~ .const|int64|
 		  else
-			|f64| num
+			|float64| num
 			if ty.ByteCount == 4
 				num = .F32
 			  else
@@ -257,7 +260,6 @@ struct FatASM
 				fs <~ "f"
 			  else
 				fs <~ "d"
-			
 		fs <~ " #/"
 
 

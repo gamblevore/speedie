@@ -70,9 +70,8 @@ struct ASMState
 
 
 	function IncrPre (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
-		#! what if dest.reg != src.reg? like y = ++x
 		if !src.reg // what?
-		if (dest isnt discard) and !dest.reg
+		if !dest.reg
 			dest = src
 		if dest.isint and Value.CanStoreAsIntImmediate
 			rz = exp.ADDK(src, src, Value) * dest
@@ -100,6 +99,7 @@ struct ASMState
 
 
 	syntax expect (|message?| where=nil, |string| msg)
+		cpp_part Fail
 		|| f = scfunction.currfunc!.asm
 			f.length = .curr - .funcstart
 			printline f.render
@@ -185,7 +185,7 @@ struct ASMState
 	function FuncPrm (|message| prm, |scdecl| DestType,  |asmreg|)
 		|| r = .ExistingVar(prm) // seems unfinished? what about desttype?
 			return r
-		return .µ(prm, r)
+		return .µ(prm, asmreg.stayopen)
 
 
 	module
@@ -262,7 +262,9 @@ function @ASMType.DoFunction (fn_Asm)
 	// almost all lib functions have 4 or less. 5 is for proj funcs.
 
 	dest.µtype = fn.RegType
-	dest.reg = dest.CallFunc(.VDecls)
+	|| vd = dest.CallFunc(.VDecls) + 1
+	check (vd < 32) (exp, "Too many registers in use. No space for result.")
+	dest.reg = vd
 
 	|| TmpCloser = .VTmps
 	|| IsC = fn.HasCVersion
@@ -275,7 +277,7 @@ function @ASMType.DoFunction (fn_Asm)
 	if isc
 		fat = exp.FFNC(dest, fn.TableId,  fn.returntype.ASMUseSpecialRegs|int|, P,  PExt)
 	  else
-		fat = exp.FUNK(dest,  fn.TableId,  P,  PExt)
+		fat = exp.FUNK(dest, fn.TableId,  P,  PExt)
 	fat.op += PExt!=0
 //	Dest.reg = SaveAmount.asm // we don't wanna use this... makes the VM more complex.
 //  Mostly I'm doing:  || x = msg.function(),  (which uses the correct position.)

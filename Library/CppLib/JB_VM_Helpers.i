@@ -60,10 +60,11 @@ AlwaysInline void BFLS (VMRegister* r, ASM Op) { // rrxxbbb --> rr00bbb
 
 
 AlwaysInline void RotateConst (VMRegister* r, ASM Op) {
-	int64 A = JB_u64_RotL(Const_Valueu, Const_Rotu);
-	if (Const_Invu)
+	auto V = RotateConst_Valueu; auto R = RotateConst_Rotu;
+	uint64 A = JB_u64_RotR(V, R);
+	if (RotateConst_Invu)
 		A = ~A;
-	i1 = A;
+	u1 = A;
 }
 
 
@@ -119,7 +120,7 @@ AlwaysInline u64 bitstats(u64 R2, u64 R3, u64 Mode) { // rotate
 
 
 
-inline void SetRefRegToMem(VMRegister* r, ASM Op) {
+AlwaysInline void SetRefRegToMem(VMRegister* r, ASM Op) {
 	auto New = o2;				 						// reg
 	auto pOld = ((JB_Object**)(u1))+RefSet2_Offsetu;	// mem
 	auto Old = *pOld;
@@ -130,7 +131,7 @@ inline void SetRefRegToMem(VMRegister* r, ASM Op) {
 }
 
 
-inline void SetRefMemToReg(VMRegister* r, ASM Op) {
+AlwaysInline void SetRefMemToReg(VMRegister* r, ASM Op) {
 	auto pNew = ((JB_Object**)(u2))+RefSet2_Offsetu;
 	auto New = *pNew;									// mem
 	auto Old = o1;				 						// reg
@@ -141,7 +142,7 @@ inline void SetRefMemToReg(VMRegister* r, ASM Op) {
 }
 
 
-inline void SetRefDecrMem(VMRegister* r, ASM Op) {
+AlwaysInline void SetRefDecrMem(VMRegister* r, ASM Op) {
 	auto Where = ((JB_Object**)(u1))+RefDecrMem_Offsetu;	// mem
 	int n = RefDecrMem_Countu;
 	for (int i = 0;  i <= n;  i++) {
@@ -150,16 +151,16 @@ inline void SetRefDecrMem(VMRegister* r, ASM Op) {
 }
 
 
-inline void SetRefRegToReg(VMRegister* r, uint64 na, uint64 nb, uint64 Mode) {
-	auto A = r[na].Obj;
-	auto B = r[nb].Obj;
-	if (Mode&8)
+AlwaysInline void SetRefRegToReg(VMRegister* r, ASM Op) {
+	auto A = r[n1].Obj;
+	auto B = r[n2].Obj;
+	if (RefSet_Incru)
 		JB_Incr(B);
-	if (Mode&1)
-		r[na].Obj = B;
-	if (Mode&4)
+	if (RefSet_Moveu)
+		r[n1].Obj = B;
+	if (RefSet_Decru)
 		JB_SafeDecr_(A);
-	if (Mode&2)
+	if (RefSet_Freeu)
 		JB_FreeIfDead(A);
 }
 
@@ -176,9 +177,9 @@ AlwaysInline JB_Object* alloc(void* o) {
 }
 
 
-AlwaysInline void RegConv (VMRegister* r, int Conv, int Op) {
+AlwaysInline void RegConv (VMRegister* r, int Conv, ASM Op) {
 	// float, double, u64, s64. 12 conversions possible (and 4 pointless ones)
-	auto s = r + n3;
+	auto s = r + n2;
 	auto d = r + n1;
 		
     switch (Conv) {
@@ -199,6 +200,8 @@ AlwaysInline void RegConv (VMRegister* r, int Conv, int Op) {
         case 14: d->Int    = s->Uint;  		break;
 /**/    case 15: d->Int    = s->Int;   		break; // just copies
     }
+    d = d;
+    s = s;
 }
 
 
