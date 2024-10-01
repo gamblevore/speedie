@@ -50,10 +50,31 @@ Both `A` and `B` are tested in the same way. But the first looks better to me. I
 
 Lets make a list of the statements:
 
-+ `expect` - If the expression is false, this will create an error, then the function will return nil.
-+ `require` - If the expression is false, the function will return nil. No error.
-+ `check` - This will create an error if the expression is false. But the code will continue to flow.
-+ `error` - This will create an error. Same as `check false`
++ `expect X`  - If X is false, this will create an error, then the function will return nil.
++ `require X` - If X is false, the function will return nil. No error.
++ `check X`   - If X is false, this will create an error. But the code will continue to flow.
++ `error`     - This will create an error. Same as `check false`
+
+`expect`, `check` and `error` usually are used by passing an "Error identifier", as well as the object to test. For example:
+
+    function Rename (|string| NewName)
+        expect (NewName) ("No name found! Can't rename thingy.")
+        if (NewName.length > 50)
+            error "Name is too long!"
+            newname = newname[0, 50]    // trim name, but continue
+        // Actually do the rename.
+        
+The identifier could simply be a string, like above, but that might not tell you enough. Normally, the best way to make errors, is... with jeebox! Like this:
+
+    function ProcessFile (|file| f)
+        || s = f.parse  #require
+        for ch.flat in s
+            expect (ch.name!="dog") (ch, "No dogs in the pool.")
+
+Here, `expect` will correctly report an error, report the error position in the file, as well as the file-path, and your nice error message ("No dogs in the pool."), all bundled up into one little `error` object containing all that info. Its quite powerful if done properly.
+
+This means that anytime you are processing structured data, saved in files or typed by a user, it just makes sense to store that data in jeebox, as it will make error-reporting feel natural.
+        
 
 ---
 ### Good Error Handling
