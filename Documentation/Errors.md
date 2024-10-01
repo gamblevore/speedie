@@ -37,13 +37,16 @@ Hopefully the comments explain this function well.
 
 The statements `require` / `expect` / `check` / `error` are used for control-flow and error-handling. They remove the messy control-flow, so you can see your code clearly.
 
-Error checking can be used in two ways:
+The same error checking, can be written in two ways:
 
         || A = "a,a,a".parse            #require        // one way
         || B = "b,b,b".parse
         require B                                       // the other
 
-both `A` and `B` are tested in the same way. But the first looks better to me, in this case. Its more "out of the way".
+Both `A` and `B` are tested in the same way. But the first looks better to me. Its more "out of the way". There might be a reason you can't use the `#require` shorthand, for example:
+
+    || S = "abc".parse
+    require S.name == "abc"             // can't be shortened into #require
 
 Lets make a list of the statements:
 
