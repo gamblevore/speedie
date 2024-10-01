@@ -83,7 +83,7 @@ This means that anytime you are processing structured data, saved in files or ty
 
 Error handling is a skill to get right. Lets show some speedie code and then convert it to simpler code, to see how much worse the simple way is.
     
-    main (|file| F)
+    main (|ExistingFile| F)
         || jobs = f.parse                  #require
         || list = jobs[@tmp, "jobs"][@arg] #require
         for job in list
@@ -128,15 +128,14 @@ As you can tell, this is a mess. A disaster actually. Doing it the non-speedie w
 Why is it so much worse?
 
 + We need to print often, to replicate how Speedie prints `stderr` on exit.
-+ Many functions (like `string.ExistingFile`) create errors if something goes wrong... so we need to replicate that too.
++ Many functions (like `list[@tmp, "jobs"]`) create errors if something goes wrong... so we need to replicate that too.
 + We have to `return -1` often, to replace the inbuilt `return -1` you get when your program exits but `stderr.ok==false`.
-* The same above two problems apply for accessing child nodes of `message`, which happens **all over the place**.
 + We need "`StillOK`" booleans in many places, to replicate how `stderr` previously was catching errors generated in subfunctions.
++ As a bonus, I showed the main arguments feature: `main (|ExistingFile| F)`. This actually does error-checking! It requires that we pass a file that exists, if not, the app will exit before running the first line of code. "main arguments" allows you to specify the inputs of your program, clearly and cleanly. It is very useful for demos, but utils and even big apps can use it.
 
-Take a look again at the first example. Its just SOOO much better. Everything does what it is meant to do. Its simple, readable, works better.
+Take a look again at the first example. Its just **sooo** much better. Everything does what it is meant to do. It is simple, readable... and works better.
 
-    main
-        || F = app.args[0].ExistingFile    #require
+    main (|ExistingFile| F)
         || jobs = f.parse                  #require
         || list = jobs[@tmp, "jobs"][@arg] #require
         for job in list
@@ -292,7 +291,7 @@ Speedie really is remarkably expressive and well-designed.
 
 ### Python Comparison
 
-Python overall is a minimal language, much like speedie in that way. But Speedie's error handling is unmatched.
+Python overall is a minimal language, much like speedie in that way. But Speedie's error handling is unmatched. Python's version is uses exceptions, which honestly are just a terrible idea. Absolutely awful programming concept.
 
     filename = '/'
     try:
@@ -308,8 +307,11 @@ In Speedie:
 
     || filename = "/"
     || contents = filename.readfile #require
-
     print contents.lowercase
+
+    // or this one liner...
+    print ("/".readfile #require).lowercase
+            
 
 Speedie's version is simpler. In fact, here we can rely on Speedie already printing good error messages. If you run this code, you should see this:
 
