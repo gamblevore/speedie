@@ -308,6 +308,7 @@ extend String
 		return .filesub
 	
 	helper FileSub (|File|)
+		nil self
 		cpp_Wrapper JB_Str_File
 	
 	function FileCh (|string| ch, |File|)
