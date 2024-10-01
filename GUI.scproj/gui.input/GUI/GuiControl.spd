@@ -84,6 +84,8 @@ class GUIControl (list)
 		return (.OnFocus)(self, 0)?
 	virtual AppForegroundChanged (|bool| IsForeGround)
 		0
+	virtual Resized
+		0
 	
 
 	behaviour Search

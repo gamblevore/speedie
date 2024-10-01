@@ -48,7 +48,9 @@ struct ControlSize
 	helper guicontrol.ReflowDoc (|ivec4| Parent, |ivec4| Prev, |ivec4| Hard, |ivec4|) // resizecontrol, recalculatesize
 		opt norefcounts
 		rz = .sizer.Calculate(parent, prev, Hard, self)
-		.LastRect = rz
+		if .LastRect!=rz
+			.LastRect = rz
+			.__Resized__()
 		if !.hasany
 			return rz
 		|| mine = rz
