@@ -118,6 +118,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		.Disconnect(why)
 
 	syntax expect (|string| err)
+		cpp_part Fail
 		if .CommsOpen
 			printline err
 			errorreceiver.NewError(nil, err, .path)

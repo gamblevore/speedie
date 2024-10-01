@@ -114,6 +114,7 @@ class StretchDivider (GuiControl)
 		  else
 			H = the~height
 		.size = W by H
+		.InTest(sdlapp.MouseXY, true)
 		(.OnStretch)(self)?
 
 
@@ -208,7 +209,7 @@ class StretchDivider (GuiControl)
 		return mousedragging.Beyond
 
 
-	helper InTest (|ivec2|P, |bool| MightBeOut, |bool|)
+	helper InTest (|ivec2| P, |bool| MightBeOut, |bool|)
 		|| Out = MightBeOut and !(.lastrect contains P)
 		|| dateout = !.entered
 		if Out != dateout

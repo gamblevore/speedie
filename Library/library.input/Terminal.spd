@@ -107,6 +107,7 @@ module Terminal
 		return (w, h)
 	
 	syntax Expect (|string| msg="")
+		cpp_part Fail
 		"\07"
 		if msg
 			printline msg

@@ -207,6 +207,7 @@ class StringReader
 
 	syntax expect (|string| Error)
 		opt norefcounts
+		cpp_part Fail
 		.UserObj = nil
 		require !.data.WentBad
 		.data.WentBad = true

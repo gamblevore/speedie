@@ -1030,6 +1030,7 @@ After that, you now have a tree-data-structure that represents your data. The Me
 		return "$prefix$.FuncName “${.name[0,64].UnicodeSync}”"
 
 	Syntax Expect (|string?| Error = nil)
+		cpp_part Fail
 		errorreceiver.NewError( self, Error )
 
 	Syntax Deprecate ( |string| Error = "Deprecated." )

@@ -94,7 +94,7 @@ class Object
 		
 	helper SyntaxExpect ( |string| Error )
 		visible
-		cpp_part Fail
+		cpp_part FailStr
 		
 		if self isa message
 			errorreceiver.NewError( self, Error )

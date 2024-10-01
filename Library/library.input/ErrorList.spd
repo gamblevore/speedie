@@ -231,6 +231,7 @@ class ErrorReceiver
 
 extend Object
 	syntax expect
+		cpp_part Fail
 		printline errorreceiver.NonFatal
 		app.CrashPrint
 		"${app.ObjMemory.strsize} memory used"
@@ -239,6 +240,7 @@ extend Object
 
 extend string
 	syntax expect
+		cpp_part Fail
 		visible
 		errorreceiver.NewError(nil, self)
 

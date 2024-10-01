@@ -122,7 +122,7 @@ void JB_ErrorHandleC(const char* Desc, JB_String* path, bool CanFreeDesc) {
 
 
 
-void JB_Str_SyntaxExpect(JB_String* self);
+void JB_Str_Fail(JB_String* self);
 void JB_OutOfUserMemory(int64 N) {
 	if (++OutOfMemoryHappenedAlready <= 10) 
 		JB_ReportMemoryError("Jeebox: Failed to allocate ", N, nil); 
@@ -143,7 +143,7 @@ void JB_ReportMemoryError(const char* A, int64 N, const char* operation) {
 		JB_FS_AppendCString(FS, " during ");
 		JB_FS_AppendCString(FS, operation);
 	}
-	JB_Str_SyntaxExpect(JB_FS_GetResult(FS));
+	JB_Str_Fail(JB_FS_GetResult(FS));
 }
 
 }
