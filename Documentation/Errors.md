@@ -350,6 +350,6 @@ Again! Super simple! Once the program exits, you get the list of errors printed.
 
 # Conclusion:
 
-It seems that my ErrorList approach for error handling is simpler, easier to use, more reliable, and cuts down total lines of code to 1/3 quite often.
+It seems that my ErrorList approach for error handling is simpler, easier to use, more reliable, and can halve the number of lines of code!
 
 It just gets error handling "out of the way" so you can focus on your code.
