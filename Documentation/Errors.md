@@ -82,8 +82,7 @@ This means that anytime you are processing structured data, saved in files or ty
 
 Error handling is a skill to get right. Lets show some speedie code and then convert it to simpler code, to see how much worse the simple way is.
     
-    main
-        || F = app.args[0].ExistingFile    #require
+    main (|file| F)
         || jobs = f.parse                  #require
         || list = jobs[@tmp, "jobs"][@arg] #require
         for job in list
