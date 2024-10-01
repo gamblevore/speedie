@@ -66,12 +66,13 @@ Lets make a list of the statements:
         
 The identifier could simply be a string, like above, but that might not tell you enough. Normally, the best way to make errors, is... with jeebox! Like this:
 
-    function ProcessFile (|file| f)
+    main (|file| f) // your first dog checker app! 🐶
         || s = f.parse  #require
         for ch.flat in s
-            expect (ch.name!="dog") (ch, "No dogs in the pool.")
+            expect (ch.name!="dog") (ch, "No dogs 'aloud' in the pool.")
 
-Here, `expect` will correctly report an error, report the error position in the file, as well as the file-path, and your nice error message ("No dogs in the pool."), all bundled up into one little `error` object containing all that info. Its quite powerful if done properly.
+
+Here, `expect` will correctly report an error, report the error position in the file, as well as the file-path, and your nice error message 😍, all bundled up into one little `error` object containing all that info. Its quite powerful if done properly.
 
 This means that anytime you are processing structured data, saved in files or typed by a user, it just makes sense to store that data in jeebox, as it will make error-reporting feel natural.
         
