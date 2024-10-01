@@ -18,7 +18,7 @@ Let's make a simple example:
         return true
 
 
-    function CheckUserListNames (|file| usersfile)
+    main (|file| usersfile)
         || userlist = usersfile.parse            #require
         "User list parsed OK"
         
