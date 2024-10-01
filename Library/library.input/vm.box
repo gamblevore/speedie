@@ -394,11 +394,11 @@ POS 6
 /**/ CMPB  (CmpB)
 		u1 = BitComp(r, Op)
 
-/**/ TERN  (U4)
+/**/ TERN  (U4) // could give this a compare mode, like i2 >= 0, or whatever
 	if (u2)
-		u1 = u3
+		r[n1] = r[n3]
 	else
-		u1 = u4
+		r[n1] = r[n4]
 
 /**/ CMPI  (JCmpI)
 	CompI(r, Op)

@@ -125,10 +125,10 @@
 	u1 = BitComp(r, Op);
 ı TERN: _
 	if (u2) 
-	u1 = u3
+	r[n1] = r[n3]
 ;
 	else 
-	u1 = u4
+	r[n1] = r[n4]
 ;
 ı CMPI: _
 	CompI(r, Op);

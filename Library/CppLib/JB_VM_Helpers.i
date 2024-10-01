@@ -402,8 +402,8 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 
 
 AlwaysInline ASM* Return (VMRegister*& rp, ASM* Code, ASM Op) {
-	VMRegister* r		= rp;
-	if ((u2 == 0) != RET_Existsu)
+	VMRegister* r = rp;
+	if ((u2 == 0) == RET_Existsu)
 		return Code; // skip
 	auto S			= r[-1].Stack;
 	Code			= (ASM*)S.Code + 2;
