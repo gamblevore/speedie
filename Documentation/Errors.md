@@ -75,7 +75,16 @@ The identifier could simply be a string, like above, but that might not tell you
 Here, `expect` will correctly report an error, report the error position in the file, as well as the file-path, and your nice error message 😍, all bundled up into one little `error` object containing all that info. Its quite powerful if done properly.
 
 This means that anytime you are processing structured data, saved in files or typed by a user, it just makes sense to store that data in jeebox, as it will make error-reporting feel natural.
-        
+
+If you run that code above, on a jeebox file containing a "dog" node, you should see this:
+
+    error occurred (-1)
+    /path/to/file.xml:5:1: error: No dogs 'aloud' in the pool.
+    <dog hope="I hope i can swim!"/>
+    ^
+    1 issue found
+
+Jeebox can parse XML files, and JSON files too. Mostly aimed at importing and converting to jeebox. Either way, in this case I used an XML file containing a `<dog hope="I hope i can swim!"/>` node.
 
 ---
 
