@@ -23,4 +23,8 @@ You can also `import` other projects, to use them as libraries:
     main
         app.RunGUIStuff
 
-Imports are located from the Speedie directory, which  is at `/usr/local/speedie/` although I'll change that later.
+Imports like `import "GUI"` are located from Speedie's directory, which is usually at `/usr/local/speedie/`. But you can also import fullpaths, like: `import "/path/to/lib"`
+
+The nice thing about the project structure, is that it is very free-form and well-defined. This means that the native IDE "[Perry](Perry.md)" can view your projects without you doing anything extra.
+
+Other languages force you to create "project" files (Vscode, xcode, visual-studio, intellij, etc). Which gets quite frustrating and annoying... With [Perry](Perry.md), everything is easy.
