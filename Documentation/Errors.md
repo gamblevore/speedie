@@ -367,8 +367,8 @@ In Speedie:
     
     main
         || file = "test.txt".in // creates an input file-stream
-            for b in file
-    			do_something_with(b)
+        for b in file
+            do_something_with(b)
 
 Again, this handles all the error codes that could happen. Like the file not existing, being a folder, lacking permissions, or anything. The C++ version doesn't even tell you what happened, or why, or what file-path it was! **Sure** you can extend your code to do all that, but in Speedie this happens automatically.
 
