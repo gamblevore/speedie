@@ -21,7 +21,7 @@ Speedie ASM should be 2x/3x smaller than ARM, on average. <small>(This is just a
 
 *If I say (2 v 13), that means Speedie takes 2 instructions to do something, and ARM would take 13 to do the same.*
 
-* RefCounting instructions (1 vs 16-32).
+* RefCounting instructions (1-2 vs 16-32).
 * Function-calls are expressed cleanly. Tighter, smaller, faster. Far superior design. (2 vs 2-20, typically 2 vs 10)
 * Many low-level math instructions, the compiler will automatically insert them. These include:
     * Div2 (fast divide by power of 2, on signed ints)  (1 vs 2)
