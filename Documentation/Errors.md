@@ -205,6 +205,15 @@ If you hate exceptions, or think exceptions suck, or think that manually dealing
 
 The main thing is to see statements like `#expect` or `#require` like comments. You don't need to understand them in order to understand the code flow. They are almost "out of the way", like comments. So your eyes more naturally look to the code at the left. Thats the whole idea of it. And even if you were looking at them, the overall amount of code is still **much lower**.
 
+Here are a few examples why exceptions are bad:
+
+* [open-std.org/jtc1/sc22/wg21/docs/papers/2022/p2544r0.html](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2022/p2544r0.html)
+* [youtube.com/watch?v=Fn0nWij8VEU](https://www.youtube.com/watch?v=Fn0nWij8VEU)
+* [pdf.sciencedirectassets.com](https://pdf.sciencedirectassets.com/314898/1-s2.0-S1474667083X74271/1-s2.0-S1474667017626028/main.pdf)
+* [youtube.com/watch?v=Iflu9zEJipQ](https://www.youtube.com/watch?v=Iflu9zEJipQ)
+* [google.com/search?q=exceptions+considered+harmful](https://www.google.com/search?q=exceptions+considered+harmful)
+
+
 # Comparisons
 Lets compare speedie error handling, to other languages.
 
@@ -257,6 +266,7 @@ Turns out that Speedie apps do the same thing, on exit. Once the speedie app exi
 
 Speedie really is remarkably expressive and well-designed.
 
+
 ### Python Comparison
 
 Python overall is a minimal language, much like speedie in that way. But Speedie's error handling is unmatched. Python's version is uses exceptions, which honestly are just a terrible idea. Absolutely awful programming concept.
@@ -291,6 +301,7 @@ Also, there are two failiure points in the python code. `open()` and `read()`. J
 
 Things just are more convenient in speedie.
 
+
 ### Error Handling in C
 
 C's error handling... what to say about it. It makes sense from a performance perspective. But from a coder's perspective its no fun. Awkward, easy to miss errors... messy.
@@ -318,6 +329,33 @@ In Speedie:
 Again! Super simple! Once the program exits, you get the list of errors printed. With nicely informative error message:
 
     error: File doesn't exist when makedir '/tmp/a/b/c/'.
+
+
+### Rust's Result Types
+
+    import { Result, ok, err } from 'neverthrow';
+    import DB from 'my-synchronous-database';
+    
+    type DBError = string; // type alias for error message
+    
+    function getUser(id : UserID) : Result<User, DBError> {
+        const user = DB.getUserById(id);
+    
+        if (user) {
+            return ok(user); // return instance of OK
+        } else {
+            return err(`Cannot find the user by id ${id}`); // return instance of Err
+        }
+    }
+
+Now lets look at Speedie's version:
+
+    import "DB"
+    function GetUser (|int| UserID, |User|)
+        return DB.getUserById(id)        #expect ("Cannot find the user by id $id")
+
+Wow. Same code... same result, but Speedie is just clear and simple.
+
 
 # Conclusion:
 
