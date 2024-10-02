@@ -366,7 +366,7 @@ In Speedie:
     function do_something_with (|byte| b) // Process the character 
     
     main
-        || file = "test.txt".in // creates an input file-stream
+        || file = "test.txt".in   #require // creates an input file-stream, returns if not readable
         for b in file
             do_something_with(b)
 
