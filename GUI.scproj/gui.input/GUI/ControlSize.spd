@@ -50,6 +50,7 @@ struct ControlSize
 		rz = .sizer.Calculate(parent, prev, Hard, self)
 		if .LastRect!=rz
 			.LastRect = rz
+			sdlapp.NeedMouseMove = true
 			.__Resized__()
 		if !.hasany
 			return rz

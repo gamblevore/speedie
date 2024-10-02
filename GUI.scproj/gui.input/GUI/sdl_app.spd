@@ -34,6 +34,7 @@ module SDLApp
 	|bool|						IsBackground
 	|bool|						FlashSelector
 	|bool|						WantsQuit
+	|bool|						NeedMouseMove
 	|bool|						IsQuitting
 	|bool|						AControlWasResized
 	|bool|						LastWasKeyWindowClose
@@ -422,14 +423,22 @@ module SDLApp
 	function FrontDialog (|window|)
 		opt norefcounts
 		for w.reverse in window.all
-			if w.isdialog
+			if w.IsDialog
 				return w
+	
+	
+	helper DoFakeMouseMove
+		.NeedMouseMove = false // noice
+		|| w = .EventWindow
+			.MouseMoveEvent(w, .MouseXY)
 	
 	
 	helper FrameAndEvents (|sdlactivity|) // frameevents
 		while .Event.Poll
 			rz |= .CheckEvent(.event)
 			.Event.type = 0
+		if .NeedMouseMove
+			.DoFakeMouseMove
 		if .WantsQuit
 			rz |= .TryQuit
 		if .NewSize
@@ -894,8 +903,10 @@ module SDLApp
 			.keymod = new
 			.SDL_SetModState(New)
 
-
-	function CheckEvent (|&SDL_Event| ev, |int|)
+	helper EventWindow (|window|)
+		return .FrontDialog ?? __modules__.window.front
+	
+	helper CheckEvent (|&SDL_Event| ev, |int|)
 		visible
 		.CheckKeyMods
 		|| KeyW = .LastWasKeyWindowClose
@@ -914,7 +925,7 @@ module SDLApp
 		if  t is WINDOWEVENT
 			return .windowevent(ev, keyw)
 
-		|| w = .FrontDialog ?? __modules__.window.front
+		|| w = .EventWindow
 		if !w
 			return SDLActivity.nothing
 
@@ -997,12 +1008,12 @@ module SDLApp
 
 
 	helper MouseMoveEvent (|window| w, |ivec2| XY, |int|)
-		|| mxy = .MouseXY
-		require .CurrMouseXY != mxy
+//		|| mxy = .MouseXY // wait... why mxy and xy?
+		require .CurrMouseXY != xy
 		|| MB = .MouseButtons
 		require MB or !.IsBackground
 	
-		.CurrMouseXY = mxy
+		.CurrMouseXY = xy
 		.ShowCursor
 		
 		if (.CanDrag >= mousedragging.Within) and (MB is left)
