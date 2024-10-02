@@ -53,7 +53,7 @@ extend ASMState
 		|| Inv = V.CountBits > 32 
 			V = ~V
 		|| LBS = (~V).LongestBitStretch			// longest false-stretch
-		require LBS.x >= 50						// OK so we have the longest stretch in r.x
+		require LBS.x >= (64-12)				// can only store 12-bits
 		
 		|| ramount = 63-LBS.y 
 		V = V rotl ramount
