@@ -59,10 +59,13 @@ extend PerryIDE
 		.InConstructor = false
 	
 	
-	function perry.FindRecent (|string| p, |message| curr = nil, |message|)
+	function perry.FindRecent (|string| p, |message|)
 		opt norefcounts
-		if !curr
-			curr = Perry.RecentProjects.first
+		|| c = Perry.RecentProjects.first
+			return .FindRecent(p, c)
+
+	function perry.FindRecent (|string| p, |message!| curr, |message|)
+		opt norefcounts
 		while curr
 			if curr ~= p
 				return curr
@@ -176,7 +179,7 @@ extend PerryIDE
 			isnt visible
 
 
-		with .errorlist
+		with .ErrorList
 			.Headers = ListViewRow("", listviewstate.aligncenter)
 			.IsMainListView = true
 			.tooltip = "Displays Compile Errors. Press \1f< or \1f> to step in list."
