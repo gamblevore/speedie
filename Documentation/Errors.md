@@ -333,6 +333,44 @@ In Speedie:
 Again! Super simple! Once the program exits, you get the list of errors printed. With nicely informative error message:
 
     error: File doesn't exist when makedir '/tmp/a/b/c/'.
+    
+
+### C++ Exceptions
+    // ios::exceptions
+    #include <iostream>
+    #include <fstream>
+    using namespace std;
+    
+    void do_something_with(char ch) {} // Process the character 
+    
+    int main () {
+      ifstream file;
+      file.exceptions ( ifstream::badbit ); // No need to check failbit
+      try {
+        file.open ("test.txt");
+        char ch;
+        while (file.get(ch)) do_something_with(ch);
+        // for line-oriented input use file.getline(s)
+      }
+      catch (const ifstream::failure& e) {
+        cout << "Exception opening/reading file";
+      }
+    
+      file.close();
+    
+      return 0;
+    }
+
+In Speedie:
+
+    function do_something_with (|byte| b) // Process the character 
+    
+    main
+        || file = "test.txt".in // creates an input file-stream
+            for b in file
+    			do_something_with(b)
+
+Again, this handles all the error codes that could happen. Like the file not existing, being a folder, lacking permissions, or anything. The C++ version doesn't even tell you what happened, or why, or what file-path it was! **Sure** you can extend your code to do all that, but in Speedie this happens automatically.
 
 
 ### Rust's Result Types

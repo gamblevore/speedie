@@ -205,6 +205,12 @@ class StringReader
 	function UInt16 (|uint16|)
 		disabled "use .uint(2)"
 
+	iterator
+        while
+		    || _b = .byte
+			if (_b < 0): exit
+			yield _b
+		
 	syntax expect (|string| Error)
 		opt norefcounts
 		cpp_part Fail
