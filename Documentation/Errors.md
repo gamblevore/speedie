@@ -192,47 +192,6 @@ Errors are actually automatically sent to the notification area, in GUI-apps, on
 
 For long-lived shelltools, you need to decide the behaviour for yourself. Print them? Log them? Send them to another process? Choice is yours.
 
-### Containing Errors
-
-Another thing you can do is "fail gracefully". For example, lets say you are doing a long complex operation. Like converting some database tables, and an error occurs deep within the code. Lets say this is a GUI-app.
-
-    
-    using errorlist.new
-        .startconversion
-        .doconversion
-        .finishconversion
-        if !stderr.ok
-            beep "An error occured during conversion:\n\n" + stderr.render
-
-This command "`beep`" would open up an alert-window and beep with the message passed. The "`using errorlist.new`" thing, would "contain" any errors from contaminating the rest of the program, which in this example we don't want. It does this by:
-
-* creating a new clean `stderr`, which has no errors inside, so you can be sure stderr.ok is true
-* saving the old stderr
-* putting the old `stderr` back, after our job is done
-
-You could do it manually but thats messy.
-
-    || old = stderr
-    stderr = errorlist.new
-    .startconversion
-    .doconversion
-    .finishconversion
-    if !stderr.ok
-        beep "An error occured during conversion:\n\n" + stderr.render
-    stderr = old
-
-This does the same thing but I prefer the first, don't you think? Also, the "using" syntax can handle early returns:
-
-    using errorlist.new
-        if !.startconversion
-            return
-        .doconversion
-        .finishconversion
-        if !stderr.ok
-            beep "An error occured during conversion:\n\n" + stderr.render
-
-This would actually make sure `stderr` is reset to its original value no matter how we exit the `using` block.
-
 If you hate exceptions, or think exceptions suck, or think that manually dealing with errors all over the place like Go does... is awkward and just irritating... then Speedie is probably the language for you! It just does everything in a very clean way.
 
 The main thing is to see statements like `#expect` or `#require` like comments. You don't need to understand them in order to understand the code flow. They are almost "out of the way", like comments. So your eyes more naturally look to the code at the left. Thats the whole idea of it. And even if you were looking at them, the overall amount of code is still **much lower**.
