@@ -1,5 +1,7 @@
 
 
+// unfinished.
+
 class MessageView (ListView)
 	linkage
 		cpp_part JBV
