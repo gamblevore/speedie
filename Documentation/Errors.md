@@ -201,18 +201,22 @@ Errors are actually automatically sent to the notification area, in GUI-apps, on
 
 For long-lived shelltools, you need to decide the behaviour for yourself. Print them? Log them? Send them to another process? Choice is yours.
 
-If you hate exceptions, or think exceptions suck, or think that manually dealing with errors all over the place like Go does... is awkward and just irritating... then Speedie is probably the language for you! It just does everything in a very clean way.
-
 The main thing is to see statements like `#expect` or `#require` like comments. You don't need to understand them in order to understand the code flow. They are almost "out of the way", like comments. So your eyes more naturally look to the code at the left. Thats the whole idea of it. And even if you were looking at them, the overall amount of code is still **much lower**.
+
+
+### Exceptions Are Bad
+
+If you hate exceptions, or think exceptions suck, or think that manually dealing with errors all over the place like Go does... is awkward and just irritating... then Speedie is probably the language for you! It just does everything in a very clean way.
 
 Here are a few examples why exceptions are bad:
 
 * [open-std.org/jtc1/sc22/wg21/docs/papers/2022/p2544r0.html](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2022/p2544r0.html)
 * [youtube.com/watch?v=Fn0nWij8VEU](https://www.youtube.com/watch?v=Fn0nWij8VEU)
-* [pdf.sciencedirectassets.com](https://pdf.sciencedirectassets.com/314898/1-s2.0-S1474667083X74271/1-s2.0-S1474667017626028/main.pdf)
+* [google.github.io/styleguide/cppguide.html#Exceptions](https://google.github.io/styleguide/cppguide.html#Exceptions)
 * [youtube.com/watch?v=Iflu9zEJipQ](https://www.youtube.com/watch?v=Iflu9zEJipQ)
 * [google.com/search?q=exceptions+considered+harmful](https://www.google.com/search?q=exceptions+considered+harmful)
 
+Quite often an app will simply make a "Catch all" exception handler, and hope it never happens... which kind of defeats the purpose of exceptions in the first place but at least it lets your code survive thems.
 
 # Comparisons
 Lets compare speedie error handling, to other languages.
