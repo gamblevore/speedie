@@ -231,7 +231,7 @@ int JB_SP_Run (_cstring* C, int Mode)	{
 			AddError(JB_LibInit(C, Mode&4), "jb.init");
 		
 		if ((Mode & 1) and App_Args and !JB_ErrorNumber)
-			AddError(JB_Main(),			"occurred");
+			AddError(JB_Main(),	"occurred");
 
 		if ((Mode & 2) and App_Args)
 			JB_FinalEvents();

@@ -8,9 +8,9 @@
 class Instruction 
 	initafter (µform)
 	
+	|byte|			OpCode
 	|byte|			aType
 	|byte|			PCount
-	|byte|			OpCode
 	|µForm|			Sizes
 	|string|		FormName
 	|string|		Name
@@ -76,5 +76,5 @@ class Instruction
 			  else
 				debugger 
 			.OpDict["bra"] = .OpDict["jbra"]
-			.OpDict["halt"] = .OpDict["trap"]
+			.OpDict["halt"] = .OpDict["eror"]
 

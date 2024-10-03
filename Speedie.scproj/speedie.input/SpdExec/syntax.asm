@@ -12,7 +12,7 @@ tests oofit
 		ADD   (r1, r1, r3, 0)
 		PRNT  (r1,)				// -111
 		LUPD  (r4, r0, @test)
-		HALT  (r0,0,0)
+		HALT  (r0,r0,r0,r0,1)
 
 
 

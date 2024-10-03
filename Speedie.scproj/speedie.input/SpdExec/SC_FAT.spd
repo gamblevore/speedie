@@ -15,6 +15,13 @@ struct FatASM
 	|byte|				JumpReg
 	
 	
+	function BaseOp (|int|)
+		rz = .op
+		if rz < 32
+			rz = rz & ~3
+			if rz == (asm.FFNC-1) or (asm.FUNK-1)
+				rz++
+	
 	function Form (|µform|)
 		|| i = instruction.typelist[.op]
 			return i.Sizes
@@ -219,8 +226,8 @@ struct FatASM
 	
 	function Renda (|FastString| fs)
 		opt norefcounts
-		|| op = instruction.typelist[.op] #debug_require
 		|| M = fs.mark
+		|| op = instruction.typelist[.baseop]!
 		fs <~ op.name
 		fs <~ ':'
 		fs <~ (' ', 5-op.name.length)
@@ -229,17 +236,17 @@ struct FatASM
 		|| f = op.sizes
 
 		for i in f.count
-			|| bs = f[i].bitsize
+			|| bs = f[i].BitSize
 			if bs and (remain > 0)
-				fs <~ gotany
-				gotany = ", "
+				fs <~ GotAny
+				GotAny = ", "
 				if f[i].isreg
 					fs <~ 'r'
 				fs <~ .r[i]|int|
 				remain += bs
 			if .op == asm.knst
 				exit
-		if (.op == asm.knst or asm.knsr)
+		if (op.OpCode == asm.knst or asm.knsr)
 			.RendaKnst(fs, fs.mark-m)
 	
 	
@@ -263,7 +270,7 @@ struct FatASM
 		fs <~ " #/"
 
 
-	function Print
+	function Print 
 		visible
 		if asm.NoisyASM >= 3
 			|| fs = faststring()

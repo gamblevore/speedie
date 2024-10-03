@@ -76,8 +76,7 @@ function InitAccess
 
 function Debugger		(fn_asm)
 	if Options.targetdebug
-		exp.TRAP(asmreg(),0,0) // nice!
-
+		exp.TRAP(asmreg(), 0, 0)
 	
 
 function StatExpr		(fn_asm)
@@ -93,15 +92,22 @@ function First			(fn_asm)
 	return .µ(exp.first!, dest)
 
 
-
 function Return			(fn_asm)
 	opt norefcounts
 	|| reg = ASMReg()
 	|| f = exp.first
 		|| Where = .ReturnASM|asmreg| as AsmReg.ForReturn
 		reg = .µ(f, Where)
-	exp.RET(reg, ASMReg(), 1, 0)
 
+	|int64| K
+	if reg is constany
+		K = reg.const // return true, or -1 or whatever
+		if (k<<49)>>49 != k
+			K = 0
+		if K
+			reg.nop
+			
+	exp.RET(reg, 1, 0, K)
 
 
 function TypeCast		(fn_asm)
@@ -115,7 +121,6 @@ function TypeCast		(fn_asm)
 	return TypeCastSub(self, exp, dest, sr)
 
 
-
 function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| sr, |asmreg|)
 	opt norefcounts
 	|| NewDecl = exp.ASMDecl
@@ -124,7 +129,6 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 		sr.µtype = newtype
 		return sr
 
-//	|| OldDecl = exp.first!.ASMDecl
 	|| OldType = sr.µtype
 	target debug
 		if NewType.count != OldType.count

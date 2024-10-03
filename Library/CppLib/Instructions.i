@@ -1,6 +1,7 @@
 ı EROR: _
-	u1 += U1_Lu;
-	goto EXIT;
+	if (u2 == u1 and u3 == u4) 
+	VMFinish
+;
 ı FUNK: 
 	__;
 	Code = BumpStack(vm, r, Code + 1, Op, *Code);
@@ -33,15 +34,13 @@
 	// NOOP
 
 ı TRAP: _
-	if (Trap_Continueu) 
-	JB_App__SelfSignal(Trap_Lu)
-;
-	else 
-	goto EXIT
-;
+	JB_App__SelfSignal(Trap_Lu);
+ı ADDR: _
+	u1 = (uint64)(&u2);
+	u3 = (uint64)(&u4);
 ı RET: 
 	__;
-	Code = Return(r, Code, Op);
+	Code = Return(r, Op);
 	___;
 ı ALLO: _
 	AllocStack(vm, r, Op);
@@ -53,7 +52,7 @@
 	// better to print this also as float/double/signed/unsigned...
 
 ı RARE: _
-	if_rare (Rare_(r, Op)) goto EXIT;
+	Rare_(r, Op);
 ı CONV: _
 	RegConv(r, Convert_Modeu, Op);
 ı KNSR: _

@@ -102,34 +102,43 @@ module PackMaker
 	function RunAFewTests
 		opt norefcounts
 		
-		|int64| Result = 0
 		|| fn = .testfn("PackTestConsts")
-			self[0] = 8725, self[1] = 1, self[2] = 275, self[0] = 1		
-			result = fn.Test
-			if result != 9000
+			|| D = fn.Test|&f64|[]
+			printline d.render
 		
 		fn = .testfn("PackTestForeignFuncs")
 		if fn
 			self[0] = "hello", self[1] = "abc"
-			result = fn.Test
-			debugger 
+			debugger
+			|| str = fn.Test|&string|[]
+			printline str
 			
 		fn = .testfn("PackTestMath")
 		if fn
 			for i in 5
-				self[0] = 12, self[1] = 6
-				result = fn.Test
+				self[0] = 12+i, self[1] = 6+i
+				debugger
+				printline fn.Test|&int64|[]
+				
+		fn = .testfn("PackTestMul")
+		if fn
+			self[0] = 8725, self[1] = 1, self[2] = 275, self[0] = 1		
+			debugger
+			|| num = fn.Test|&int64|[]
+			if num != 9000
 			
 		fn = .testfn("PackTestAndOr")
 		if fn
 			self[0] = 0,   self[1] = 6,   self[2] = 1,   self[3] = 0
-			result = fn.Test
+			debugger
+			|| Andor = fn.Test|&int64|[]
 			
 		fn = .testfn("PackTestAndOr2")
 		if fn
 			for i in 4
 				self[0] = i&1,   self[1] = (i&2)>>1
-				result = fn.Test
+				debugger
+				|| AndOr2 = fn.Test|&int64|[]
 			
 	
 	
@@ -170,13 +179,12 @@ module PackMaker
 		return g
 
 	
-	function scfunction.Test (|int64|)
+	function scfunction.Test (|?&ivec4|)
 		opt norefcounts
 		|| mu = .asm
 			|| mu2 = mu.µTest
 				|| P = mu2.ptr
 				printline mu.render
-				debugger
 				return jb_vm.Run(p, mu2.length)
 	
 	

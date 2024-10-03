@@ -49,7 +49,7 @@ class µFunc
 			for i in argcount
 				r[i] = args[i] 
 		
-		return jb_vm.Run(.ptr, .length)
+		return jb_vm.Run(.ptr, .length)|&int64|[]
 
 
 /// TEXTUAL STUFF		

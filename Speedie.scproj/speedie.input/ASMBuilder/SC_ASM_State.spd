@@ -342,7 +342,7 @@ function ASMState.FinishASM
 	ifn (l isa asm.ret) or (l isa asm.trap)
 		|| fn = scfunction.currfunc!
 		expect (!fn.returntype) ("ASMReturn".internal) // why?
-		fn.sourcearg!.RET(asmreg(), asmreg(), 1, 0)
+		fn.sourcearg!.RET(asmreg(), 1, 0, 0)
 	.SetLength
 
 

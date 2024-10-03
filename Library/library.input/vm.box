@@ -53,6 +53,13 @@ forms
 		r2		r
 		Jmp		j
 
+	HALT	// cmpeq:
+		r1		r
+		r2		r
+		r3		r
+		r4		r
+		IsOK	4
+
 	JCmpF	// cmp:
 		r1		r
 		r2		r
@@ -137,11 +144,18 @@ forms
 		r2		r
 		Mode	4
 		
-	RET
-		r1		r
-		r2		r
-		Count	3
-		Exists	1
+	RET					// keep simple for speed
+		r1		r		// return reg
+		Count	3		// amount of returned registers
+		SafeDecr 1
+		Value	l
+
+	REQ
+		r1		r		// 
+		r2		r		// 
+		Mode	4		// compare mode for u1 & u2 (==, !=, >, >=, AND, |, & )
+						// AND can ! either left or right side
+		Val		10		// bitor r2 with Val. 
 	
 	Div
 		r1		R
@@ -151,9 +165,9 @@ forms
 		Kind	2
 	
 	Trap
-		r1		 r
-		Continue 1		// trap or halt
-		Mode	 2		// 1 = trap on function-count,  2 = trap-always
+		r1		r
+		Mode	2		// 1 = trap on function-count,  2 = trap-always
+		Signal	6
 
 	Float
 		r1		R
@@ -228,31 +242,30 @@ forms
 
 
 #!						 (((((STOP)))))
-/**/ EROR (U1)
-		u1 += U1_Lu
-		goto EXIT
+/**/ EROR (HALT)
+		if (u2 == u1 and u3 == u4)
+			VMFinish
 
-/**/ NOOP (U0):
+/**/ NOOP (U0)	// does nothing // (could be removed/replaced with bitor 0?)
 		i1 = i1
 		#!NOOP
 
-	// does nothing
-
-
 /**/ TRAP (Trap)
-		if (Trap_Continueu)
-			JB_App__SelfSignal(Trap_Lu)
-		else
-			goto EXIT
+		JB_App__SelfSignal(Trap_Lu)
+
 
 
 // needs ASM-text: rare, MEMM
-
 #!						 (((((FUNC)))))
+
+
+/**/ ADDR (U4) 
+		u1 = (uint64)(&u2)
+		u3 = (uint64)(&u4)
 
 /**/ RET (Ret)			// ret: 
 		__ 
-		Code = Return(r, Code, Op)
+		Code = Return(r, Op)
 		___
 
 /**/ FUNK (Func, 2)		// func: 
@@ -294,7 +307,7 @@ forms
 		printf("%lli\n", i1)
 		#!better to print this also as float/double/signed/unsigned...
 /**/ RARE (U2)
-		if_rare (Rare_(r, Op)) goto EXIT
+		Rare_(r, Op)
 /**/ CONV (Convert)
 		RegConv(r, Convert_Modeu, Op)
 

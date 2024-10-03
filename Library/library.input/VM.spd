@@ -1,1 +1,1 @@
-struct jb_vm	linkage:cpp_class jb_vm,wrapper	function Registers (|bool| Clear=true, |&ivec4|)		cpp_wrapper JB_ASM_Registers	module		function VM (|&jb_vm|)			cpp_wrapper JB_ASM_VM		function Run (|&uint| Code, |int| CodeLength, |int64|)			cpp_wrapper JB_ASM_Run
+struct jb_vm	linkage:cpp_class jb_vm,wrapper	function Registers (|bool| Clear=true, |&ivec4|)		cpp_wrapper JB_ASM_Registers	module		function VM (|&jb_vm|)			cpp_wrapper JB_ASM_VM		function Run (|&uint| Code, |int| CodeLength, |?&ivec4|)			cpp_wrapper JB_ASM_Run

@@ -49,7 +49,6 @@ struct jb_vm {
 	vm_globs		Env;
     int				StackSize;
     ASM				EXIT[2];
-    ASM				GuardValue;
 	VMRegister		Registers[];
 };
 

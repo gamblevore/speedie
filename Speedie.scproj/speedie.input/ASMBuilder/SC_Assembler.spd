@@ -63,7 +63,8 @@ module SpdAssembler
 
 	function Guard
 		opt norefcounts
-		(compiler.InternalFile.ast!).EROR(asmreg())
+		|| A = asmreg()
+		(compiler.InternalFile.ast!).EROR(A,A,A,A,0)
 	
 	
 	function VacGenerate (|scfunction| fn, |bool|)

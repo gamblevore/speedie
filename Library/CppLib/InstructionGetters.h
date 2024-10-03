@@ -126,6 +126,13 @@
 #define   JCmpEq_Jmpu_(x)   (((uint)((x)<<18))>>18)
 
 
+#define   HALT_IsOKi       ((( int)((Op)<<28))>>28)
+#define   HALT_IsOKi_(x)   ((( int)((x)<<28))>>28)
+
+#define   HALT_IsOKu       (((uint)((Op)<<28))>>28)
+#define   HALT_IsOKu_(x)   (((uint)((x)<<28))>>28)
+
+
 #define   JCmpF_Cmpi       ((( int)((Op)<<18))>>28)
 #define   JCmpF_Cmpi_(x)   ((( int)((x)<<18))>>28)
 
@@ -320,23 +327,36 @@
 #define   Convert_Lu_(x)   (((uint)((x)<<22))>>22)
 
 
-#define   RET_Counti       ((( int)((Op)<<18))>>29)
-#define   RET_Counti_(x)   ((( int)((x)<<18))>>29)
+#define   RET_Counti       ((( int)((Op)<<13))>>29)
+#define   RET_Counti_(x)   ((( int)((x)<<13))>>29)
 
-#define   RET_Countu       (((uint)((Op)<<18))>>29)
-#define   RET_Countu_(x)   (((uint)((x)<<18))>>29)
+#define   RET_Countu       (((uint)((Op)<<13))>>29)
+#define   RET_Countu_(x)   (((uint)((x)<<13))>>29)
 
-#define   RET_Existsi       ((( int)((Op)<<21))>>31)
-#define   RET_Existsi_(x)   ((( int)((x)<<21))>>31)
+#define   RET_SafeDecri       ((( int)((Op)<<16))>>31)
+#define   RET_SafeDecri_(x)   ((( int)((x)<<16))>>31)
 
-#define   RET_Existsu       (((uint)((Op)<<21))>>31)
-#define   RET_Existsu_(x)   (((uint)((x)<<21))>>31)
+#define   RET_SafeDecru       (((uint)((Op)<<16))>>31)
+#define   RET_SafeDecru_(x)   (((uint)((x)<<16))>>31)
 
-#define   RET_Li       ((( int)((Op)<<22))>>22)
-#define   RET_Li_(x)   ((( int)((x)<<22))>>22)
+#define   RET_Valuei       ((( int)((Op)<<17))>>17)
+#define   RET_Valuei_(x)   ((( int)((x)<<17))>>17)
 
-#define   RET_Lu       (((uint)((Op)<<22))>>22)
-#define   RET_Lu_(x)   (((uint)((x)<<22))>>22)
+#define   RET_Valueu       (((uint)((Op)<<17))>>17)
+#define   RET_Valueu_(x)   (((uint)((x)<<17))>>17)
+
+
+#define   REQ_Modei       ((( int)((Op)<<18))>>28)
+#define   REQ_Modei_(x)   ((( int)((x)<<18))>>28)
+
+#define   REQ_Modeu       (((uint)((Op)<<18))>>28)
+#define   REQ_Modeu_(x)   (((uint)((x)<<18))>>28)
+
+#define   REQ_Vali       ((( int)((Op)<<22))>>22)
+#define   REQ_Vali_(x)   ((( int)((x)<<22))>>22)
+
+#define   REQ_Valu       (((uint)((Op)<<22))>>22)
+#define   REQ_Valu_(x)   (((uint)((x)<<22))>>22)
 
 
 #define   Div_Kindi       ((( int)((Op)<<28))>>30)
@@ -352,23 +372,23 @@
 #define   Div_Lu_(x)   (((uint)((x)<<30))>>30)
 
 
-#define   Trap_Continuei       ((( int)((Op)<<13))>>31)
-#define   Trap_Continuei_(x)   ((( int)((x)<<13))>>31)
+#define   Trap_Modei       ((( int)((Op)<<13))>>30)
+#define   Trap_Modei_(x)   ((( int)((x)<<13))>>30)
 
-#define   Trap_Continueu       (((uint)((Op)<<13))>>31)
-#define   Trap_Continueu_(x)   (((uint)((x)<<13))>>31)
+#define   Trap_Modeu       (((uint)((Op)<<13))>>30)
+#define   Trap_Modeu_(x)   (((uint)((x)<<13))>>30)
 
-#define   Trap_Modei       ((( int)((Op)<<14))>>30)
-#define   Trap_Modei_(x)   ((( int)((x)<<14))>>30)
+#define   Trap_Signali       ((( int)((Op)<<15))>>26)
+#define   Trap_Signali_(x)   ((( int)((x)<<15))>>26)
 
-#define   Trap_Modeu       (((uint)((Op)<<14))>>30)
-#define   Trap_Modeu_(x)   (((uint)((x)<<14))>>30)
+#define   Trap_Signalu       (((uint)((Op)<<15))>>26)
+#define   Trap_Signalu_(x)   (((uint)((x)<<15))>>26)
 
-#define   Trap_Li       ((( int)((Op)<<16))>>16)
-#define   Trap_Li_(x)   ((( int)((x)<<16))>>16)
+#define   Trap_Li       ((( int)((Op)<<21))>>21)
+#define   Trap_Li_(x)   ((( int)((x)<<21))>>21)
 
-#define   Trap_Lu       (((uint)((Op)<<16))>>16)
-#define   Trap_Lu_(x)   (((uint)((x)<<16))>>16)
+#define   Trap_Lu       (((uint)((Op)<<21))>>21)
+#define   Trap_Lu_(x)   (((uint)((x)<<21))>>21)
 
 
 #define   Float_Di       ((( int)((Op)<<28))>>31)

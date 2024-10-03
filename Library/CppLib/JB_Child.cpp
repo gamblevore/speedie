@@ -31,8 +31,8 @@ int JB_App__ID() {
 	return getpid();
 }
 
-void JB_App__SelfSignal(int Sig) {
-	kill(getpid(), Sig);
+int JB_App__SelfSignal(int Sig) {
+	return kill(getpid(), Sig);
 }
 
 

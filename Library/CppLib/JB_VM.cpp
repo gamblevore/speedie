@@ -40,58 +40,67 @@ jb_vm* vm;
 //#define __      ; Op  = Op2;      ASMPrint(Op);
 //#define _         __   ___
 #define JumpLeaf(Addr)         LeafCode = Code;     Code = (Addr);
+#define VMGuardValue 1234567890
 
-s64 RunVM (jb_vm& pvm) {		// vm_run, vm__run, vmrun, run_vm
+ivec4* RunVM (jb_vm& pvm) {		// vm_run, vm__run, vmrun, run_vm
 //	add_Test(123123);
     const static Goto JumpTable[] = {
         #include "InstructionList.h"
     };
 	RegVar(&vm, r19) = pvm;
     RegVar(Code,r20) = vm.Env.CodeBase;
-    RegVar(r,   r21) = vm.Registers;
     RegVar(Op,  r22) = (ASM)-1;
+
+	VMStack& Stack = vm.Registers[0].Stack;
+	Stack.Code = &vm.EXIT[0];
+	Stack.SavedReg = 0;
+	Stack.Alloc = VMGuardValue;		   // Env.AllocCurr gets set to this on exit. // Quite harmless
+    RegVar(r,   r21) = vm.Registers+1; // space for stack + zeroreg
+    r[0] = {};
 
 	ı;
 	#include "Instructions.i"
 	ı 
 	EXIT:;
 
-    return 0;
+    return &pvm.Registers[0].Ivec;
 }
 
 
 
 ivec4* JB_ASM_Registers(jb_vm* V, bool Clear) {
 	auto Ret = V->Registers;
-	if (Clear)
-		memset(Ret, 0, sizeof(vec4)*32);
-	return (ivec4*)(Ret+1);
+	if (Clear) {
+		memset(Ret+0, 0x00, sizeof(VMRegister)*4);
+		memset(Ret+5, 0xFE, sizeof(VMRegister)*32);
+	}
+	return (ivec4*)(Ret+5);
 }
 
 
-#ifndef VMExitReturn
-	#define VMExitReturn 2<<24
-#endif
 
 jb_vm* JB_ASM_VM() {
 	dbgexpect2 (sizeof(ASM)==4);
 	if (vm) return vm;
 	
-	int StackSize  = 64*1024;			// Over 400 ~fns deep. 
+	int StackSize  = 256*1024;			// Around 1600 ~fns deep. 
 	vm             = (jb_vm*)calloc(StackSize, 1);
 	if (!vm)
 		return 0;
-	vm->GuardValue = 1234567890;
-	vm->EXIT[0] = VMExitReturn; 		// thats not the right code!
-	vm->EXIT[1] = 1;					// halt
-//	vm->Stack.ResultRegister = 1;		// Remove this? the calling instruction should specify the result.
-	vm->StackSize  = (StackSize - sizeof(jb_vm))/sizeof(VMRegister);
-	vm->Env.Cpp = VMDummyTable; // for now!
+	
+	auto& v = *vm;
+
+	v.EXIT[0] = 1;					// Halt cleanly
+//	v.Env.AllocCurr = 0;			// calloc did this already
+//	v.EXIT[1] = 0;					// Halt with error
+
+	v.StackSize  = (StackSize - sizeof(jb_vm))/sizeof(VMRegister);
+	v.Env.Cpp = VMDummyTable; // for now!
 	return vm;
 }
 
 
-s64 JB_ASM_Run(u32* Code, u32 CodeLength) {
+ivec4* JB_ASM_Run(u32* Code, u32 CodeLength) {
 	auto V = JB_ASM_VM();
 	if (V) {
 		V->Env.CodeBase = (ASM*)Code;
@@ -100,7 +109,7 @@ s64 JB_ASM_Run(u32* Code, u32 CodeLength) {
 	}
 
 	JB_ErrorHandleC("Can't allocate VM", JB_Str__Empty(), false);
-	return -1;
+	return 0;
 }
 
 #else
@@ -110,7 +119,7 @@ ivec4* JB_ASM_Registers(jb_vm* V, bool i) {
 jb_vm* JB_ASM_VM() {
 	return 0;
 }
-s64 JB_ASM_Run(u32* Code, u32 CodeSize) {
+ivec4* JB_ASM_Run(u32* Code, u32 CodeSize) {
 	return 0;
 }
 

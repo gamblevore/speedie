@@ -205,16 +205,14 @@ AlwaysInline void RegConv (VMRegister* r, int Conv, ASM Op) {
 }
 
 
-AlwaysInline bool Rare_ (VMRegister* r, ASM Op) {
+AlwaysInline void Rare_ (VMRegister* r, ASM Op) {
 	auto r1 = i1;
 	auto r2 = i2;
-	if (!r1 and !r2) {u1 = u3; return true;};	// HALT	
 	if (r2 == 1) {		// time
 		r[r1].Uint = RDTSC();
 	} else if (r2 == 2) {
 		JB_Date__Sleep(1);
 	}
-	return false;
 }
 
 
@@ -400,31 +398,30 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 }
 
 
+//  Require can be a different instruction. // keep this thing fast.
+//	VMRegister* Stack = r  +  ++Save;
+//	Stack->Stack.Code = CodePtr;
+//	Stack->Stack.SavedReg = Save;
+//	Stack->Stack.Alloc = vm.Env.AllocCurr;
+//	return Stack+1;
 
-AlwaysInline ASM* Return (VMRegister*& rp, ASM* Code, ASM Op) {
-	VMRegister* r = rp;
-	if ((u2 == 0) == RET_Existsu)
-		return Code; // skip
-	auto S			= r[-1].Stack;
-	Code			= (ASM*)S.Code + 2;
-	auto To			= r - (S.Reg + 2);
-	auto From		= r+u1;
-	auto Result		= *From++;
-	rp = To;
-
-	// could use RET_Li to return true?
-	int More = RET_Countu;
-	while (More -->= 0) {
-		To[++S.Reg] = Result;
-		Result = *From++;
-	}
-		
+AlwaysInline ASM* Return (VMRegister*& ZeroPlace, ASM Op) {
+	auto OldZero = ZeroPlace;
+	VMRegister* stck = OldZero-1;
+	auto R1 = stck - stck->Stack.SavedReg;
+	auto Code = stck->Stack.Code;
+	auto V = RET_Valuei; // get before copy!
+	auto Src = OldZero+n1;
+	memcpy(stck, Src, RET_Countu<<4);
+	if (V)
+		R1->Uint |= V;
+	ZeroPlace = R1-1; // NewZero
 	return Code;
 }
 
 
 #define Transfer(Input,Shift)  (r[((Input)>>((Shift)*5))&31])
-#define Transfer3(num)         case num: ENTR[num] = Transfer(Code, num)
+#define Transfer3(num)         case num: Zero[num] = Transfer(Code, num)
 
 
 AlwaysInline void AllocStack (jb_vm& vm, VMRegister* r, ASM Op) {
@@ -462,18 +459,21 @@ AlwaysInline ASM* TailStack (VMRegister* r, ASM* Code, ASM Op) {
 
 
 AlwaysInline VMRegister* SaveVMState (jb_vm& vm, VMRegister* r, ASM* CodePtr, int Save) { // jumpstack
-	VMRegister* ENTR = r+Save+1;
-	ENTR->Stack.Code = CodePtr;
-	ENTR->Stack.Reg = (int)(r-vm.Registers);
-	ENTR->Stack.Alloc = vm.Env.AllocCurr;
-	return ENTR;
+	VMRegister* Stack = r + Save + 1;
+	Stack->Stack.Code = CodePtr;
+	Stack->Stack.SavedReg = Save;
+	Stack->Stack.Alloc = vm.Env.AllocCurr;
+	return Stack+1;
 }
+
+
+#define VMFinish {if (!U4_Lu) JB_App__SelfSignal(SIGINT); goto EXIT;}
 
 
 AlwaysInline ASM* BumpStack (jb_vm& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, u64 Code) { // jumpstack
 	auto r = rp;
-	auto ENTR = SaveVMState(vm, r, CodePtr, n1)+1;
-	rp = ENTR;
+	auto Zero = SaveVMState(vm, r, CodePtr, n1);
+	rp = Zero;
 
 	switch ( Code&15 ) {
 	default:
@@ -488,7 +488,7 @@ AlwaysInline ASM* BumpStack (jb_vm& vm, VMRegister*& rp, ASM* CodePtr, ASM Op, u
 		debugger; 
 	}
 
-	ENTR[ 0] = {};
+	Zero[ 0] = {};
 	int j = Func_JUMPi;
 	return CodePtr + j;
 }
