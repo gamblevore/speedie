@@ -273,7 +273,7 @@ Speedie really is remarkably expressive and well-designed.
 
 ### Python Comparison
 
-Python overall is a minimal language, much like speedie in that way. But Speedie's error handling is unmatched. Python's version is uses exceptions, which honestly are just a terrible idea. Absolutely awful programming concept.
+Python overall is a minimal language, much like speedie in that way. But Speedie's error handling is unmatched. Python's uses exceptions. And honestly, exceptions are a terrible idea. Absolutely awful concept.
 
     filename = '/'
     try:
@@ -336,7 +336,9 @@ Again! Super simple! Once the program exits, you get the list of errors printed.
     
 
 ### C++ Exceptions
-    // ios::exceptions
+
+I found this C++ example, prominently on google. So perhaps hundreds of thouands of people may have read this example.
+
     #include <iostream>
     #include <fstream>
     using namespace std;
@@ -371,6 +373,10 @@ In Speedie:
             do_something_with(b)
 
 Again, this handles all the error codes that could happen. Like the file not existing, being a folder, lacking permissions, or anything. The C++ version doesn't even tell you what happened, or why, or what file-path it was! **Sure** you can extend your code to do all that, but in Speedie this happens automatically.
+
+You might be wondering _"Where is all the code?"_ and _"I'll bet the speedie version runs slower!"_. In fact, speedie if you examine the C-code generated (Speedie can compile to C), you'll see the code is well-written C that is designed to execute fast. It probably runs the same speed, or perhaps faster than the C++ version.
+
+Many of the speedie library equivalent functions are faster than their C++ counterparts. Even my `array.sort` function is faster (and safer when given bad sort comparison functions). Same with file-reading and writing, string-splitting, and much more. 
 
 
 ### Rust's Result Types
