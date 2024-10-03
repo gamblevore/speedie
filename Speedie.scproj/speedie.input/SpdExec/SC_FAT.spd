@@ -216,12 +216,7 @@ struct FatASM
 	
 	function µRenderInto (|!&asm| Where, |!&asm| After, |!&asm|)
 		opt inline
-		rz = (ASM.encoders[.op]!)(self, where, after)
-		target debug
-			if where.DecodeBaseOp != .op // AAARGHHH
-				"AARGHHH"
-				debugger
-				rz = (ASM.encoders[.op]!)(self, where, after)
+		return (ASM.encoders[.op]!)(self, where, after)
 
 	
 	function Renda (|FastString| fs)

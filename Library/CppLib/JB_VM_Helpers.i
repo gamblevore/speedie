@@ -412,10 +412,10 @@ AlwaysInline ASM* Return (VMRegister*& ZeroPlace, ASM Op) {
 	auto Code = stck->Stack.Code;
 	auto V = RET_Valuei; // get before copy!
 	auto Src = OldZero+n1;
-	memcpy(stck, Src, RET_Countu<<4);
-	if (V)
-		R1->Uint |= V;
 	ZeroPlace = R1-1; // NewZero
+	stck = (VMRegister*)memcpy(stck, Src, RET_Countu<<4);
+	if (V)
+		stck->Uint |= V;
 	return Code;
 }
 

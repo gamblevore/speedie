@@ -27,7 +27,7 @@ function PackTestForeignFuncs (|string?| x, |string?| y, |string|)
 	|| c = x.InWhite(12345, 98765)
 	|| d = x! + y!
 	|| e = string.char(0xb16b00b5)
-	return e + d
+	return e + d // fails?
 
 function PackTestMul (|int| a, |int| b, |int| c, |int| d, |int|)
 	#! RUN!!
