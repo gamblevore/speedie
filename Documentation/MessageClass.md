@@ -43,7 +43,7 @@ The quoted text (like "`a`") is the `name`, and `rel` / `opp` / `thg` are the `f
 
 ### Parse Properties:
 
-    |uint|     Position
+    |int|      Position
     |uint16|   RangeLength
     |uint8|    Indent
 
