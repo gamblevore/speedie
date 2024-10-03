@@ -1,36 +1,31 @@
 #!/usr/local/bin/spd
+file:///usr/local/speedie/Documentation/Messages.md						 // docs here
 
-https://github.com/gamblevore/speedie/blob/main/Documentation/Message.md // docs here
-file:///usr/local/speedie/Documentation/Messages.md						 // locally
+main (|ExistingFile| File)
+    || jb = File.parse
+    if file isa "xml"
+        jb.XMLToJeebox
+        || boxfile = File.SetExt("box")
+        if boxfile <~ jb.render // write file to disk
+            "Converted XML to Jeebox: $boxfile"
 
+    || Found = BookSearch(jb, app.switches) #expect  "Can't find any books using: ${app.Switches}"
+    for f in found
+        printline f
 
-main (|existingfile| input)
-	|| jb = input.parse$
-	if input isa "xml"
-		jb.XMLToJeebox
-		|| BoxFile = input.setext("box")
-		"writing to: $boxfile"
-		BoxFile <~ jb		// write to disk
-
-	|| Found = BookSearch(jb, app.Switches)
-		""
-		for bk in found
-			"$bk"
-	  else
-		"Can't find any books using: ${app.Switches}"
-		
-		
-function BookSearch (|message| BookFile, |[string]| Queries, |[message]|)
-	|| list = BookFile[@tmp, "catalog"][@arg]
-	for book in list
-		if book.Expect(@tmp, "book") 
-			rz <~ book.TestBook(Queries)
+        
+function BookSearch (|message| BookFile, |[string]| queries, |message|)
+    || catalog = BookFile[@tmp, "catalog"] #require // gets "catalog" + creates error if name is wrong
+    for book in catalog[@arg]
+        for row in book[@arg,-1]
+            if book.Expect(@tmp, "book") 
+                rz <~ book.TestBook(Queries)
 
 
 function message.TestBook (|[string]| queries, |message|)
-	for row in .last(@arg)
-		require row.Expect(@tmp)
-		for Q in queries
-			if row ~= q.ArgName
-				require Row.first.name contains q.ArgValue
-				rz = self
+    for row in .last(@arg)
+        require row.Expect(@tmp)
+        for Q in queries
+            if row ~= q.ArgName
+                require Row.first.name contains q.ArgValue
+                rz = self

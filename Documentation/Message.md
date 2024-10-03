@@ -18,9 +18,9 @@ Imagine we wanted to parse it. Lets put it in "example.box" and parse that file.
 
     || recent_list = "example.box".file.parse
     for item in recent_list["file_list"][@arg]
-        || name = item[@str,0].name.name
+        || name = item[@str,0].name
         || type = item[@bra,1][@thg].name
-        "$name is a $type"                    // "file1 is a Picture,  file2 is a Sound,  file3 is a Text"
+        "$name is a $type"                    // "/path/to/file1 is a Picture,  /path/tofile2 is a Sound,  /path/to/file3 is a Text"
     
 **Unlike** XML which has many different kinds of nodes, each `Message` returned is interchangeable, and has only two things defining it, the type and the name.
 
@@ -69,20 +69,17 @@ Let's start with an XML data-bank, the first thing we want to do is convert it t
        </book>
     ...
 
-First, lets test that we can even read a file at all. Lets take the file via command-line arguments.
+First, lets test that we can even read a file at all. Lets take the file via command-line arguments. Lets save our code with the name "`booksearch.spd`".
 
     #!/usr/local/bin/spd
-    
-    main 
-        || path = app.args[0]            #expect ("Pass a file-path")
-        || B = path.FileThatExists       #require
-        || jb = B.parse
+    main (|ExistingFile| file)
+        || jb = file.parse
         jb.xmltojeebox
         printline jb
 
 Ooops, well we converted it already. See that line `XMLToJeebox`? I guess in my enthusiasm I already converted it. Anyhow so thats great. Now lets save this file to jeebox, might as well.
 
-    path.SetExt("box") <~ jb.render
+    file.SetExt("box") <~ jb.render
 
 Now, our document is saved to the file "`books.box`" (assuming you passed in `books.xml`). The `<~` operator just means "write this string to the file at this path". Lets take a look at it:
 
@@ -102,18 +99,22 @@ We could do searching in the file, but first a few safety checks. Lets only do t
 
 Altogether that makes this:
 
-    || path = app.args[0]            #expect ("Pass a file-path")
-    || B = path.FileThatExists       #require
-    || jb = B.Parse                  #require
-    if b isa "xml"
-        jb.XMLToJeebox
-        || boxfile = path.SetExt("box")
-        if boxfile <~ jb.render // write file to disk
-            "Converted XML to Jeebox: $boxfile"
+    #!/usr/local/speedie
+    main (|ExistingFile| File)
+        || jb = File.parse
+        if file isa "xml"
+            jb.XMLToJeebox
+            || boxfile = File.SetExt("box")
+            if boxfile <~ jb.render // write file to disk
+                "Converted XML to Jeebox: $boxfile"
+        printline jb
 
 Now, lets do the searching! Let's specify some search queries via command-line arguments. We'll use `app.switches` to find arguments like "`--author=tim`", then use `.ArgName` and `.ArgValue` to get the name/value from the switch.
-    
-    ... // new code
+
+Also, let's comment out `printline jb`, no need to be so noisy.
+
+    // printline jb
+    // append this code
     for arg in app.Switches
         || Found = BookSearch(jb, arg.ArgName, arg.ArgValue)
             for f in found
@@ -125,28 +126,30 @@ Now, lets do the searching! Let's specify some search queries via command-line a
 
 Looks great! Very readable and also we got very far in our progress!
 
+
 ### Reading the Parsed Tree ###
 
-So far all we did was just parsing, or read or write files or switches, handle errors, etc. But not actually using Jeebox. So lets do that. First, we need to find `"catalog"`.
+So far all we did was just parsing, or read or write files or switches, handle errors, etc. But not actually using Jeebox. So lets do that. First, we need to find `"catalog"`. Lets add that to `BookSearch`.
 
     || catalog = BookFile[@tmp, "catalog"] #require
 
-This gives us a `@tmp` named "catalog", or creates an error if that `@tmp` can't be found. `@tmp`, `@str`, etc are just node types. `#require` here does the same as: `if catalog==nil: return nil`
+This gives us a `@tmp` named "catalog", or creates an error if that `@tmp` can't be found. `@tmp`, `@str`, etc are just node types. `#require` here does the same as: `if catalog==nil: return nil`.
 
 Now we need to list through the books, they are contained in catalog's `@arg`.
 
     for book in catalog[@arg]
         printline book.first
 
-We just put `printline` here to verify that we are getting the books. We should see this output:
+We just put `printline` here to verify that we are getting the books. If we call it like this "`booksearch.spd books.box -author=corets`", we should see this output:
 
     (id: "bk101")
     (id: "bk102")
     (id: "bk103")
     (id: "bk104")
+    Can't find: author 'corets'
     ...
 
-OK great! We are now listing over our books! Now to search each book for the search query.
+OK great! We are now listing over our books! Now to use the search query.
 
 So lets delete the printline statement and add this:
 
@@ -173,9 +176,10 @@ That will give us access to the rows like this:
     44.95
     2000-10-01*/
 
-OK, so lets do the actual comparison! We will add this
+OK, so lets do the actual comparison! We will add this:
 
     if (row ~= name) and (row.first.name contains tofind)
+        return book
 
 Here is our total search function. Great it works!
 
@@ -206,29 +210,30 @@ Will return this book:
 
 We could probably improve our code. If we search for multiple-queries, it doesn't reduce the books found but increases it. This isn't a jeebox problem anymore but just a basic logic problem. But lets fix that anyhow for completeness.
 
-Here is the final total code, with the logic bug fixed:
+I'll also clean up the code a little... just use the final code. Here is the final total code:
 
         
-    main (|existingfile| input)
-        || jb = input.parse$
-        if input isa "xml"
-            jb.XMLToJeebox
-            || BoxFile = input.setext("box")
-            BoxFile <~ jb		// write to disk
+    #!/usr/local/speedie
     
-        || Found = BookSearch(jb, app.Switches)
-            ""
-            for bk in found
-                "$bk"
-          else
-            "Can't find any books using: ${app.Switches}"
+    main (|ExistingFile| File)
+        || jb = File.parse
+        if file isa "xml"
+            jb.XMLToJeebox
+            || boxfile = File.SetExt("box")
+            if boxfile <~ jb.render // write file to disk
+                "Converted XML to Jeebox: $boxfile"
+    
+        || Found = BookSearch(jb, app.switches) #expect  "Can't find any books using: ${app.Switches}"
+        for f in found
+            printline f
+    
             
-            
-    function BookSearch (|message| BookFile, |[string]| Queries, |[message]|)
-        || list = BookFile[@tmp, "catalog"][@arg]
-        for book in list
-            if book.Expect(@tmp, "book") 
-                rz <~ book.TestBook(Queries)
+    function BookSearch (|message| BookFile, |[string]| queries, |message|)
+        || catalog = BookFile[@tmp, "catalog"] #require // gets "catalog" + creates error if name is wrong
+        for book in catalog[@arg]
+            for row in book[@arg,-1]
+                if book.Expect(@tmp, "book") 
+                    rz <~ book.TestBook(Queries)
     
     
     function message.TestBook (|[string]| queries, |message|)
@@ -247,7 +252,7 @@ This program is doing a lot more than it might seem.
 * A little file validation (via `BookFile[@tmp, "catalog"]` type functions)
 * Converts XML to Jeebox
 * Saves the Jeebox to disk
-* Optionally reads Jeebox or XML files as input, as decided by the file's extension (`B isa "xml"`)
+* Optionally reads Jeebox or XML files as input, as decided by the file's extension (`file isa "xml"`)
 * Tests for valid input arguments as well as that the input file exists.
 * Reports all errors to stdout (this is done by the framework, there isn't a specific line of code that does this.)
     
