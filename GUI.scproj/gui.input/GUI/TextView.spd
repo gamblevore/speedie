@@ -8,7 +8,6 @@ class TextView (GUIControl)
 	|bool|						PreferStayAtEnd
 	|bool| 						ShowLineNumbers
 	|bool|						CanSeeAllLines
-//	|bool|						CanTypeTab
 	|bool|						GroupSaveAll
 	|bool| 						FastAppend
 	|bool|						CanAutoComplete

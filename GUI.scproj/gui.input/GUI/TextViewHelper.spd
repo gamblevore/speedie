@@ -406,7 +406,7 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 
 	|| x	 = .DrawLineNumber(where, d, y, lc)-1
 	|| state = MsgTextDrawState(x, d)
-	if d is breakpoint
+	if self is CodeEditor and d is breakpoint
 		|| fx = x - (font.width+1)
 		state.font.DrawChar('\18', Where, (fx, y), nil)
 	

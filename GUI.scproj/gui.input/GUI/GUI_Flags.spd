@@ -49,6 +49,7 @@ datatype GuiControlFlags (uint)
 		Enabled
 		Editable
 		UnSearchable
+		CodeEditor
 		NoSearch
 		TypeThrough
 		ClickThrough
