@@ -153,6 +153,7 @@ extend PerryIDE
 		with .EditMe
 			is   enabled
 			is   editable
+			is   codeeditor
 			isnt drawsfocus
 			.ID				= "EditMe"
 			.GroupSaveAll	= true
