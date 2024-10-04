@@ -213,7 +213,7 @@ module {
 	
 		
 	function AddBasic
-		.assigns = SCOperator.new("=", &asmstate.Assign, OpMode.assigns)
+		.assigns = SCOperator.new("=", nil, OpMode.assigns)
 		.and = SCOperator.new("and", nil, OpMode.AND)
 		.or = SCOperator.new("or", nil, OpMode.OR)
 

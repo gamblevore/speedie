@@ -55,9 +55,11 @@ datatype ASMReg (uint64)
 				return f.f64
 			return f.f32|float64|
 
-	function NOP
+	function NOP (|int64|)
 		|| f = .fat
 			f.op = asm.noop
+			return f.const
+		debugger 
 
 	function Const (|int64|)
 		if .reg == 0

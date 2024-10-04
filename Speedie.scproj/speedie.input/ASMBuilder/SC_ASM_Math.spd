@@ -363,44 +363,79 @@ extend ASMState
 		if r.reg // what?
 		if dest is ConstAny
 			return .makeconst2(dest, l, asmreg(), exp, &fatasm.ConstifyBitNot)
-		|| fat = exp.BNOT(dest, l, asmreg(), 0)
-		return fat*Dest
+		return .BitMaker(dest, l, asmreg(), exp, asm.bnot)
 
 	
 	function BitXor (fn_opasm)
 		if dest is ConstAny
-			return .makeconst2(dest, l, r, exp, &fatasm.ConstifyBitXor)
+			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyBitXor)
 		if (l.reg == r.reg)
-			return .BitOr(dest, asmreg(), asmreg(), exp)
-		return exp.BXOR(dest, L, R, 0)*Dest
+			return .Zeros(dest, exp)
+		return .BitMakerSwap(dest, l, r, exp, asm.bxor)
 
 
 	function BitOr (fn_opasm)
 		if dest is ConstAny
-			return .makeconst2(dest, l, r, exp, &fatasm.ConstifyBitOr)
-		if l is ConstAny
-			swap (l) (r)
-		return exp.BOR(dest, L, R, 0) * dest
-
-
-	function BitOps (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| K, |asm| Op, |asmreg|)
+			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyBitOr)
+		if l.IsConst(-1)
+			return .Assign(dest, L, exp)
+		if r.IsConst(-1)
+			return .Assign(dest, R, exp)
+		return .BitMakerSwap(dest, l, r, exp, asm.bor)
 
 			
 	function BitAnd (fn_opasm)		
 		if dest is constany
-			return .makeconst2(dest, l, r, exp, &fatasm.ConstifyBitAnd)
+			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyBitAnd)
+		if l.IsConst(0) or r.IsConst(0)
+			return .zeros(dest, exp)
+		return .BitMakerSwap(dest, l, r, exp, asm.band)
+
+
+	function BitMakerSwap (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
 		if (l is ConstAny)
 			swap (l) (r)
-		
+		return .BitMaker(Dest, l, r, exp, op)
+	
+	
+	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
 		|| K = r.const
 		if r is ConstAny and k fits 9
+			r.nop
 			r = ASMReg()
 		  else
 			k = 0
-		return exp.BAND(dest, L, R, K) * Dest
+		|| fat = exp.BAND(dest, L, R, K)
+		fat.op = op
+		return fat * Dest
+
+
+	function SHR  (fn_opasm)
+		if dest is constany
+			return .MakeConst2(dest, l, r, exp, (&fatasm.ConstifyBitSHS, &fatasm.ConstifyBitSHR)(l.signed))
+		if r is ConstAny
+			return .BFLG_Const(exp, dest, l, 0, r.nop)
+		
+		#!What about extra bits? EG: (int32 >> x)
+		|| op = (asm.BSHS, asm.BSHR)(l.signed)
+		return .BitMaker(dest, l, r, exp, op)
+	
+
+	function SHL  (fn_opasm)
+		if dest is constany
+			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyBitSHL)
+		if r is ConstAny
+			return .BFLG_Const(exp, dest, l,  r.nop, 0)
+		
+		return .BitMaker(dest, l, r, exp, asm.bshl)
 
 
 	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| l, |int| up, |int| down, |asmreg|)
+		if !l.reg
+			return .zeros(dest, exp)
+	
+		debugger, #!What about extra bits? like unsigned-shifting down a signed 32-int
+		#! Should also just assign zero if we shift too far.
 		|| fat = exp.BFLG(dest,  l,  up,  down,  l.signed|int|)
 		debugger
 		|| lll = l.Const
@@ -409,34 +444,17 @@ extend ASMState
 		  else
 			fat.Const = (LLL|uint64| << up) >> down
 		return fat*dest
-	
-		
-	function SHR  (fn_opasm)
-		if dest is constany
-			return .MakeConst2(dest, l, r, exp, (&fatasm.ConstifyBitSHS, &fatasm.ConstifyBitSHR)(l.signed))
-		if r is ConstAny
-			r.nop
-			return .BFLG_Const(exp, dest, l, 0, r.const)
-		
-		|| fat = exp.BSHS(dest, L, R, 0)
-		fat.op += !l.Signed
-		return fat * dest
 
-	
-	function SHL  (fn_opasm)
-		if dest is constany
-			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyBitSHL)
-		if r is ConstAny
-			r.nop
-			return .BFLG_Const(exp, dest, l,  r.const, 0)
-		return exp.BSHL(dest, L, R, 0) * Dest
+
+	function Zeros (|asmreg| dest, |message| exp, |asmreg|)
+		return .BitOr(dest, asmreg(), asmreg(), exp)
 	
 	
-	function Assign (fn_opasm)
+	function Assign (|asmreg| dest, |asmreg| L, |message| exp, |asmreg|)
 		if dest.µType isnt bool  or  l.µType is bool
 			return .BitOr(dest, l, asmreg(), exp)
-		if l.IsFloat // sigh can this even happen?
-			error (Exp) // i mean i can use cmpf?
+		if l.IsFloat								// sigh can this even happen?
+			error (Exp)								// I mean i can use cmpf?
 		return exp.CMPB(dest, L, asmreg(), 1)*dest
 
 
@@ -446,3 +464,7 @@ function int64.OperatorFits (|int| amount, |bool|)
 	return ((self << sh) >> sh) == self
 
 
+function asmreg.IsConst (|int64| val, |bool|)
+	return  (self is ConstAny) and (.const == val)
+	
+	
