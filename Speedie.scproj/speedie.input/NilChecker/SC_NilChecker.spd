@@ -601,7 +601,7 @@ function Declaration (niltrackerfn) // function decl
 	|| rel = msg.last
 	target debug: if rel!=@rel
 	|| thg = rel.first!
-	thg.restoreasm
+	//thg.resetasm
 	|| d = thg.FastDecl
 	|| J = .Jump(rel.last!)
 	if d.IsReg

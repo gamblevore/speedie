@@ -12,6 +12,10 @@ function Message.ASMType (assigns:|ASMType|)
 	value = (.FLAGS &~ 63) ||| value
 	.FLAGS = value 
 
+function message.ResetASM
+	.asmtype = .func|int|
+
+
 
 datatype ASMType (uint16)
 	syntax is (|ASMType| t, |bool|)

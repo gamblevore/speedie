@@ -24,7 +24,7 @@ extend ASMState
 				l.nop
 				r.nop
 				return .numtoreg(exp, ((l.const==r.const)==!negate)|int|, dest)
-			return exp.CMPB(dest, L, R, negate)*Dest
+			return exp.CMPB(dest, L, R, negate) * Dest
 
 		|&fatasm| fat 
 		if l.reg
@@ -32,7 +32,7 @@ extend ASMState
 		  else
 			fat = exp.jBRA(r,0)
 		fat.op += negate
-		return fat*dest.boolanswer
+		return fat * dest.boolanswer
 
 	
 	function Equals (fn_opasm)
@@ -323,8 +323,8 @@ extend ASMState
 					exp.DivByZero
 				return .Quick1Or1Sub(dest, l, ptoi, exp)
 			if !l.Signed
-				return exp.BFLG(dest, l, 0, ptoi-1, 0)*Dest		// u / 2 --> u >> 1
-			return exp.DIV2(dest, l, ptoi-1, ptoi-1)*Dest		// nice
+				return exp.BFLG(dest, l, 0, ptoi-1, 0) * Dest		// u / 2 --> u >> 1
+			return exp.DIV2(dest, l, ptoi-1, ptoi-1) * Dest		// nice
 	
 	
 	function DivInt    (fn_opasm)
@@ -443,7 +443,7 @@ extend ASMState
 			fat.Const = (LLL << up)>>down
 		  else
 			fat.Const = (LLL|uint64| << up) >> down
-		return fat*dest
+		return fat * dest
 
 
 	function Zeros (|asmreg| dest, |message| exp, |asmreg|)
@@ -453,14 +453,14 @@ extend ASMState
 	function Assign (|asmreg| dest, |asmreg| L, |message| exp, |asmreg|)
 		if dest.µType isnt bool  or  l.µType is bool
 			return .BitOr(dest, l, asmreg(), exp)
-		if l.IsFloat								// sigh can this even happen?
-			error (Exp)								// I mean i can use cmpf?
-		return exp.CMPB(dest, L, asmreg(), 1)*dest
+		if l.IsFloat									// sigh can this even happen?
+			error (Exp)									// I mean i can use cmpf?
+		return exp.CMPB(dest, L, asmreg(), 1) * dest
 
 
 
 function int64.OperatorFits (|int| amount, |bool|)
-	|| sh = 64-amount
+	|| sh = 64 - amount
 	return ((self << sh) >> sh) == self
 
 

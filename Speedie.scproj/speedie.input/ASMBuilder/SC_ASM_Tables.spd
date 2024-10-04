@@ -168,7 +168,7 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 	if sr is constany
 		return .MakeConst(fat, dest)
 
-	return fat*dest
+	return fat * dest
 
 
 
@@ -373,7 +373,7 @@ function IncrOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |
 	|| fat = f.cntc(Addr, dest, 0, amount, log)
 	if mode & IncrAfter
 		fat.op = asm.cntd
-	return fat*dest
+	return fat * dest
 
 
 function IncrAmount (|asmreg| upon, |int| IsSubtract, |scdecl| D,  |int64|)
@@ -455,9 +455,11 @@ function Ignore			(fn_asm)
 
 
 function Unexpected		(fn_asm)
-	"bad ASMType"
-	debugger
-
+	if !exp.asmtype
+		|| f = exp.func|int|
+			exp.asmtype = f
+			return .µ(exp, dest)
+	error  (exp, "bad ASMType")
 }
 
 

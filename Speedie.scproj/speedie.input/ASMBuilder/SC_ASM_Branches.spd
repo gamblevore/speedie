@@ -147,7 +147,7 @@ helper DoAndOr (|message| exp,  |ASMReg| Dest,  |opmode| Opp,    |ASMReg|)
 			|| fat = exp.BAND(dest, ml, mr, 0)
 			if (opp is or)
 				fat.op = asm.BOR
-			return fat*dest
+			return fat * dest
 	
 	if dest isnt CondRequest					// AAARGH
 		dest = .NumToReg(exp, 1-negate, dest)

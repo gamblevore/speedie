@@ -10,6 +10,7 @@ function DeclsDefault (|Message| def, |Message|)
 function MakeDecl (|string| Type, |string| Name, |Message| Value, |SCDeclInfo| Purpose=0, |Message!|)
 	opt norefcounts
 	rz = «decl »
+	//rz.resetasm
 	|| f = rz.msg(@arg),    todo "this should change... I don't like @arg types."
 	
 	if (Type)
