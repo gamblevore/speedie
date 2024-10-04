@@ -463,31 +463,24 @@ function Unexpected		(fn_asm)
 
 helper ASMState.DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	opt norefcounts
-	|| F = exp.first!
-	|| op = f.next!
-	
 	|| ml = ASMReg()
 	|| mr = ASMReg()
 	|| TmpCloser = .VTmps
-	|| SubMode = (dest & AsmReg.Discard) as AsmReg.StayOpen
-	if mr isnt SingleExpr
-		|| L = exp.last!
-		if dest is notyetused
-			submode.reg = dest.reg
-		submode.µtype = F.asmdecl.typeonly // unnecessary?
-		ml = .µ(F, SubMode)
-		if ml.reg == dest.reg // we used it!
-			submode.reg = 0
-		submode.µtype = L.asmdecl.typeonly // unnecessary?
-		mr = .µ(L, SubMode)
-		(ml asnt= asmreg.stayopen)
+	|| DiscardMode = dest & AsmReg.Discard
+	if dest is SingleExpr
+		ml = .µ(exp, DiscardMode)
 	  else
-		mr = .µ(exp, submode)
-	(mr asnt= asmreg.stayopen)
+		if dest is NotYetUsed
+			DiscardMode.reg = dest.reg		// submode.µtype = F.asmdecl.typeonly
+		ml = .µ(exp.first!, DiscardMode as asmreg.stayopen)
+
+		if ml.reg == dest.reg				// we used it!
+			DiscardMode.reg = 0				// submode.µtype = L.asmdecl.typeonly
+		mr = .µ(exp.last!, DiscardMode)
 	.CloseVTmps(TmpCloser)
 	
 	if dest is Discard
-		return dest & ASMReg.discard // no need to do anything:   {a() + b(),  c()}
+		return dest & ASMReg.discard // no need to do anything:   {a() + b()}
 	
 	dest = .TempTyped(exp, dest)
 	(dest is FromMath)
@@ -496,10 +489,10 @@ helper ASMState.DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMR
 	
 	// what if the operator is and/or?
 	target debug:if ml.floatness != mr.floatness							// Shouldn't happen.
-	rz = (fn)(self, dest, ml, mr, op)
+	rz = (fn)(self, dest, ml, mr, exp.second!)
 	target debug
 		if dest is MathConst  and  rz isnt MathConst		// hmm?
-			debugger, (fn)(self, dest, ml, mr, op)
+			debugger, (fn)(self, dest, ml, mr, exp.second!)
 
 
 

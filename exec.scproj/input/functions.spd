@@ -40,7 +40,7 @@ class function
 		.speediefunc = blob
 	
 	
-	function Run (|int64|)
+	function Run (|&ivec4|)
 		jb_vm.vm.Registers 
 		return jb_vm.Run(.speediefunc!.ASM[0], .length)
 	
@@ -55,8 +55,6 @@ class function
 		// We might want a small offset, say 256 instructions inside.
 		// small offsets can't work with cpp lol.
 
-	
-	syntax call (|int|):	return .run
 	render:					fs <~ .name
 
 	constants
@@ -184,8 +182,8 @@ module AppTable
 	function RunMain (|int|)
 		opt norefcounts
 		|| main = .funcs[1]					#expect ("Missing main")
-		rz  = .funcs[0]!.Run
-		rz := main.Run	
+		rz  = .funcs[0]!.Run|&int64|[]
+		rz := main.Run|&int64|[]
 
 
 function message.CantFindFunc

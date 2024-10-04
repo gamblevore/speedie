@@ -154,12 +154,30 @@ function fatasm.ConstifyIntDiv (fn_ASMConstifier)
 	.Const = C
 
 
+function fatasm.ConstifyIntMod (fn_ASMConstifier)
+	|int64| C
+	if l.FourBytes
+		if l.Signed
+			C = l.const|int| mod r.const|int|
+		  else
+			C = l.const|uint| mod r.const|uint|
+	  else
+		if l.Signed
+			C = l.const|int64| mod r.const|int64|
+		  else
+			C = l.const|uint64| mod r.const|uint64|
+	.Const = C
+
+
 function fatasm.ConstifyIntMul (fn_ASMConstifier)
 	if l.FourBytes
 		.const = l.const|int| * r.const|int|
 	  else
 		.const = l.const|int64| * r.const|int64|
 
+
+function fatasm.ConstifyBoolMul (fn_ASMConstifier)
+	.const = l.const|uint64| * r.const|uint64|
 
 function fatasm.ConstifyIntPlus (fn_ASMConstifier)
 	if l is alternate
@@ -199,3 +217,35 @@ function fatasm.ConstifyFloatMul (fn_ASMConstifier)
 		.f32 = l.f32 * r.f32
 	  else
 		.f64 = l.f64 * r.f64
+
+
+function fatasm.ConstifyFloatMod (fn_ASMConstifier)
+	if l.FourBytes
+		.f32 = l.f32 mod r.f32
+	  else
+		.f64 = l.f64 mod r.f64
+
+
+function fatasm.ConstifyBitAnd (fn_ASMConstifier)
+	.const = l.Const & r.const
+
+function fatasm.ConstifyBitOr (fn_ASMConstifier)
+	.const = l.Const ||| r.const
+
+function fatasm.ConstifyBitNot (fn_ASMConstifier)
+	.const = ~l.Const
+
+function fatasm.ConstifyBitXor (fn_ASMConstifier)
+	.const = l.Const xor r.const
+
+function fatasm.ConstifyBitSHS (fn_ASMConstifier)
+	.const = l.const >> r.const
+
+function fatasm.ConstifyBitSHR (fn_ASMConstifier)
+	.const = l.const|uint64| >> r.const|uint64|
+
+function fatasm.ConstifyBitSHL (fn_ASMConstifier)
+	.const = l.const|uint64| << r.const|uint64|
+
+
+

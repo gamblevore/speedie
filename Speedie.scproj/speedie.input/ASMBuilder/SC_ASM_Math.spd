@@ -59,7 +59,7 @@ extend ASMState
 		if dest isnt CondRequest
 			return exp.CMPI(dest, L, R, mode) * dest
 
-		return exp.JMPI(L, R, mode, 0) * dest.BoolAnswer
+		return exp.JMPI(L, R, mode, 0) * asmreg().BoolAnswer
 
 
 	function CompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
@@ -85,25 +85,20 @@ extend ASMState
 
 	// MATH 
 	function QuickFloat32Plus    (fn_OpASM)
-		if r is constany // a + 1,   a - 1
+		if  r is constany // a + 1,   a - 1
 			|| QQ = .QuickFloatPlus32Sub(dest, l, r, exp)
 				return qq
-		if l is constany  and  l isnt Alternate   // 1 + a --> a + 1
+		if  l is constany  and  l isnt Alternate   // 1 + a --> a + 1
 			|| QQ = .QuickFloatPlus32Sub(dest, r asnt asmreg.alternate, l, exp)
 				return qq
 	
 			
 	function QuickFloatPlus32Sub    (fn_OpASM)
-		|| k = r.Const|uint|
+		|| k = r.Const|uint64|
 		k ^= (l is Alternate)<<31
 		require (k >> 18) << 18 == k
-		l.nop
-		|| fat = exp.FADK(dest, l, k)
-		if dest is constany
-			fat.ConstifyFloatPlus(l,r)
-			return .makeconst(fat,dest)
-		
-		return fat * Dest
+		r.nop
+		return exp.FADK(dest, l, k) * Dest
 
 	function message.DivByZero
 		problem (self, "Divide by zero???")	
@@ -129,13 +124,11 @@ extend ASMState
 
 	function QuickIntMul    (fn_OpASM)
 		|| Pow2 = .IntPowerOfTwo(r)
-			r.nop
 			if Pow2 <= 1
 				return .Quick1Or1Sub(dest, l, Pow2, exp)
 			return exp.BFLG(dest, l,  Pow2-1, 0, 0) * Dest	// y = x * 4  -->  y = x << 2
 
 		|| five = .IntPowerOfTwo(r, 1) // 5 or 9 or 17 or 33, etc
-			r.nop
 			return exp.ADD(dest, l, l, five-1) * dest
 
 
@@ -241,25 +234,13 @@ extend ASMState
 
 		|| ss = (l is alternate)
 		|| rr = r.reg
-		|| fat = exp.fADD(dest, l, r*!ss, r*ss, 1-IsF32)
-		return fat * Dest
+		return exp.fADD(dest, l, r*!ss, r*ss, 1-IsF32) * Dest
 
 
-// do this transform here:
-// p1 = p2 * k3,  f1 = f2 + p1  -->  f1 = f2 + (p2 << log2(k3))	
-// we need the info on double/float...
-//	if p isa ASM.FMLK
-//		|| k = p.a3|int|.asfloat.Log2
-//		require !k.Fract and !.match3_2(out)
-//		.op = asm.fexk
-//		.a3 = p.a2
-//		.a4 = k|int|
-//		return true
-// FEXK  (FloatAddExp)
-//		f1 = FloatSh1(u2, r4) + FloatSh1(u3, r5)
-
-
-	function BoolMul (|asmreg| dest, |asmreg| Boo, |asmreg| V, |message| exp, |asmreg|)
+	function BoolMul (|asmreg| dest, |asmreg| Boo, |asmreg| V, |message| exp, |asmreg|)		
+		if dest is ConstAny
+			return .MakeConst2(dest, boo, V, exp, &fatasm.ConstifyBoolMul)
+			
 		|| fat = exp.TERN(dest, boo, V, asmreg())
 		if dest is ConstAny
 			fat.const = boo.const * v.const
@@ -328,8 +309,8 @@ extend ASMState
 
 
 	function FloatDiv    (fn_opasm)
-		if (dest is constany) and (l isnt alternate)
-			return .makeconst2(dest, l, r, exp, &fatasm.ConstifyFloatDiv)
+		if (dest is ConstAny) and (l isnt alternate)
+			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyFloatDiv)
 		rz = .QuickFloatDiv(dest, L, R, exp)
 		if rz == nil
 			rz = exp.FDIV(dest,  L,  R,  asmreg(), dest.isbig|int|) * dest
@@ -337,51 +318,36 @@ extend ASMState
 
 	function QuickIntDiv    (fn_opasm)
 		|| PToi = .IntPowerOftwo(r)
-			r.nop
 			if ptoi <= 1   //   x/1  x/0  x/-1
 				if ptoi == 0
 					exp.DivByZero
 				return .Quick1Or1Sub(dest, l, ptoi, exp)
 			if !l.Signed
 				return exp.BFLG(dest, l, 0, ptoi-1, 0)*Dest		// u / 2 --> u >> 1
-			  else
-				return exp.DIV2(dest, l, ptoi-1, ptoi-1)*Dest	// nice
+			return exp.DIV2(dest, l, ptoi-1, ptoi-1)*Dest		// nice
 	
 	
 	function DivInt    (fn_opasm)
+		if dest is ConstAny
+			return .MakeConst2(dest, L, R, exp, &fatasm.ConstifyIntDiv)
 		|| q = .QuickIntDiv(dest, l, r, exp)
 			return q
 		return exp.DIVV(dest, ASMReg(), l, r, dest.IntDivType) * dest
 	
 	
 	function ModFloat    (fn_opasm)
-		|| d = dest.Reg #check (Exp)
-		|| big = dest.IsBig|int|
-		exp.fdiv( dest, asmreg(), L, R, big)
-		|| fat = exp.FFRC(dest, asmreg(), dest, R, big)
 		if dest is ConstAny
-			if dest.FourBytes
-				fat.f32 = l.f32 mod r.f32
-			  else
-				fat.f64 = l.f64 mod r.f64
+			return .MakeConst2(dest, L, R, exp, &fatasm.Constifyfloatmod)
+		|| big = dest.IsBig|int|
+		exp.fdiv(dest, asmreg(), L, R, big)
+		|| fat = exp.FFRC(dest, asmreg(), dest, R, big)
 		return fat * dest
 	
 	
 	function ModInt    (fn_opasm)
-		|| fat = exp.DIVV(asmreg(), dest, L, R, dest.IntDivType)
 		if dest is ConstAny
-			|int64| C
-			if dest.FourBytes
-				if dest.Signed
-					C = l.const|int   |  mod  r.const|int|
-				  else
-					C = l.const|uint  |  mod  r.const|uint|
-			  else
-				if dest.Signed
-					C = l.const|int64 |  mod  r.const|int64|
-				  else
-					C = l.const|uint64|  mod  r.const|uint64|
-			fat.Const = C
+			return .MakeConst2(dest, L, R, exp, &fatasm.ConstifyIntMod)
+		|| fat = exp.DIVV(asmreg(), dest, L, R, dest.IntDivType)
 		return fat * Dest
 	
 	
@@ -395,36 +361,43 @@ extend ASMState
 	// BITS
 	function BitNot (fn_opasm)
 		if r.reg // what?
+		if dest is ConstAny
+			return .makeconst2(dest, l, asmreg(), exp, &fatasm.ConstifyBitNot)
 		|| fat = exp.BNOT(dest, l, asmreg(), 0)
-		if l is ConstAny
-			fat.const = ~l.const
 		return fat*Dest
 
 	
 	function BitXor (fn_opasm)
+		if dest is ConstAny
+			return .makeconst2(dest, l, r, exp, &fatasm.ConstifyBitXor)
 		if (l.reg == r.reg)
 			return .BitOr(dest, asmreg(), asmreg(), exp)
-		|| fat = exp.BXOR(dest, L, R, 0)
+		return exp.BXOR(dest, L, R, 0)*Dest
+
+
+	function BitOr (fn_opasm)
 		if dest is ConstAny
-			fat.const = l.Const xor r.const
-		return fat*Dest
-
-
-	function BitOr  (fn_opasm)
+			return .makeconst2(dest, l, r, exp, &fatasm.ConstifyBitOr)
 		if l is ConstAny
 			swap (l) (r)
-		dest.Expect(exp)
-		|| fat = exp.BOR(dest, L, R, 0)
-		if dest is ConstAny
-			fat.Const = l.const ||| r.const
-		return fat * Dest
+		return exp.BOR(dest, L, R, 0) * dest
 
 
+	function BitOps (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| K, |asm| Op, |asmreg|)
+
+			
 	function BitAnd (fn_opasm)		
-		|| fat = exp.BAND(dest, L, R, 0)
-		if dest is ConstAny
-			fat.const = l.const & r.const
-		return fat * Dest
+		if dest is constany
+			return .makeconst2(dest, l, r, exp, &fatasm.ConstifyBitAnd)
+		if (l is ConstAny)
+			swap (l) (r)
+		
+		|| K = r.const
+		if r is ConstAny and k fits 9
+			r = ASMReg()
+		  else
+			k = 0
+		return exp.BAND(dest, L, R, K) * Dest
 
 
 	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| l, |int| up, |int| down, |asmreg|)
@@ -439,7 +412,10 @@ extend ASMState
 	
 		
 	function SHR  (fn_opasm)
+		if dest is constany
+			return .MakeConst2(dest, l, r, exp, (&fatasm.ConstifyBitSHS, &fatasm.ConstifyBitSHR)(l.signed))
 		if r is ConstAny
+			r.nop
 			return .BFLG_Const(exp, dest, l, 0, r.const)
 		
 		|| fat = exp.BSHS(dest, L, R, 0)
@@ -448,7 +424,10 @@ extend ASMState
 
 	
 	function SHL  (fn_opasm)
+		if dest is constany
+			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyBitSHL)
 		if r is ConstAny
+			r.nop
 			return .BFLG_Const(exp, dest, l,  r.const, 0)
 		return exp.BSHL(dest, L, R, 0) * Dest
 	
@@ -459,5 +438,11 @@ extend ASMState
 		if l.IsFloat // sigh can this even happen?
 			error (Exp) // i mean i can use cmpf?
 		return exp.CMPB(dest, L, asmreg(), 1)*dest
+
+
+
+function int64.OperatorFits (|int| amount, |bool|)
+	|| sh = 64-amount
+	return ((self << sh) >> sh) == self
 
 

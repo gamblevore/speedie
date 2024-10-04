@@ -456,17 +456,11 @@
 #define   Div2_Lu_(x)   (((uint)((x)<<30))>>30)
 
 
-#define   Shift_Shi       ((( int)((Op)<<23))>>26)
-#define   Shift_Shi_(x)   ((( int)((x)<<23))>>26)
+#define   Shift_Shi       ((( int)((Op)<<23))>>23)
+#define   Shift_Shi_(x)   ((( int)((x)<<23))>>23)
 
-#define   Shift_Shu       (((uint)((Op)<<23))>>26)
-#define   Shift_Shu_(x)   (((uint)((x)<<23))>>26)
-
-#define   Shift_Li       ((( int)((Op)<<29))>>29)
-#define   Shift_Li_(x)   ((( int)((x)<<29))>>29)
-
-#define   Shift_Lu       (((uint)((Op)<<29))>>29)
-#define   Shift_Lu_(x)   (((uint)((x)<<29))>>29)
+#define   Shift_Shu       (((uint)((Op)<<23))>>23)
+#define   Shift_Shu_(x)   (((uint)((x)<<23))>>23)
 
 
 #define   Swap_Li       ((( int)((Op)<<28))>>28)
