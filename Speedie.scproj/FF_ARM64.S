@@ -10,6 +10,7 @@
 #ifdef __realarm64__
 .text
 .global _FFASMTest
+.align 4
 _FFASMTest:
 	mov     x1, x0				// put in x1
 	and     x1, x1, 15			// x1 = x1&15
