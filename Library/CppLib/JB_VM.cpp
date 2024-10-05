@@ -17,19 +17,22 @@ Design:
 #include "JB_Umbrella.hpp"
 
 extern "C" {
-#if 1
 #include "BitFields.h"
 #include "JB_VM.h"
 
-jb_vm* vm;
 
 ivec4* JB_ASM_Registers(jb_vm* V, bool Clear) {
+	if (!V)
+		return 0;
 	auto Ret = V->Registers;
 	if (Clear) {
 		memset(Ret, 0xFE, sizeof(VMRegister)*34);
 	}
 	return (ivec4*)(Ret+2);
 }
+
+#if __vm__
+jb_vm* vm;
 
 
 
@@ -114,6 +117,12 @@ ivec4* JB_ASM__Run(u32* Code, u32 CodeLength) {
 }
 
 #else
+void*	JB_ASM__Load		(JB_StringC* S) {
+	return 0;
+}
+void** JB_ASM_InitTable(jb_vm* vm, int n) {
+	return 0;
+}
 ivec4* JB_ASM__Registers(jb_vm* V, bool i) {
 	return 0;
 }
