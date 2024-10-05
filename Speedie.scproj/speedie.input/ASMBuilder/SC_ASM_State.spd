@@ -276,10 +276,11 @@ function @ASMType.DoFunction (fn_Asm)
 	|| PExt = P >> 32
 	|&fatasm| fat
 	
+	|| id = fn.tableid+31
 	if isc
-		fat = exp.FFNC(dest, fn.TableId,  fn.returntype.ASMUseSpecialRegs|int|, P,  PExt)
+		fat = exp.FFNC(dest, id,  fn.returntype.ASMUseSpecialRegs|int|, P,  PExt)
 	  else
-		fat = exp.FUNK(dest, fn.TableId,  P,  PExt)
+		fat = exp.FUNK(dest, id,  P,  PExt)
 	fat.op += PExt!=0
 //	Dest.reg = SaveAmount.asm // we don't wanna use this... makes the VM more complex.
 //  Mostly I'm doing:  || x = msg.function(),  (which uses the correct position.)

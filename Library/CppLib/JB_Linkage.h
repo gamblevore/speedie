@@ -76,7 +76,7 @@ struct	jb_vm;
 jb_vm*	JB_ASM__VM();
 ivec4*	JB_ASM__Run			(u32* Code, u32 CodeSize);
 void*	JB_ASM__Load		(JB_StringC* S);
-void**	JB_ASM__InitTable	(int n);
+void**	JB_ASM_InitTable	(jb_vm* V, int n);
 ivec4*	JB_ASM_Registers	(jb_vm* V, bool Clear);
 
 } // ExternCEnd

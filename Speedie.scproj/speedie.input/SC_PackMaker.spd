@@ -13,13 +13,12 @@ module PackMaker
 		opt norefcounts
 		|| MakeExec = options.MakeInterpreter
 		for f in Compiler.FuncList
-			if f ~= "PackTestForeignFuncs"
 			if !f.CanLibLoad
 				0
 			  elseif f.IsStdLib
 				if MakeExec or f.needsexport
 					.LibFuncs <~ f
-			  elseif f.NeedsExport
+			  elseif f.NeedsExport or (f in "ASMExamples")
 				.PackFuncs <~ f
 		.SortAll
 	
@@ -39,9 +38,9 @@ module PackMaker
 		lib.exit
 
 
-	function SortAll
+	function SortAll 
 		opt norefcounts
-		|| FnInit = compiler.xfunc("JB_Init_")
+		|| FnInit = compiler.xfunc("JB_Init_") // we need app and pack inits separately
 		|| FnMain = compiler.xfunc("JB_Main")
 		require fninit and fnmain
 		
@@ -54,7 +53,7 @@ module PackMaker
 	
 	helper SortSub (|[scfunction]| list, |bool| test)
 		target debug
-			|| Table = (jb_vm.InitTable(list.length), nil)(test)
+			|| Table = (jb_vm.vm.InitTable(list.length+31), nil)(test)
 		list.sort(SCFuncSorter)
 		|| id = 0
 		while
@@ -62,7 +61,7 @@ module PackMaker
 			f.TableID = ++id
 			target debug
 				if Table
-					Table[id] = jb_vm.Load(f.exportname)
+					Table[id+31] = jb_vm.Load(f.exportname)
 
 	
 	function WriteLibFuncs (|jbin!| j)
@@ -77,9 +76,7 @@ module PackMaker
 		
 	function ActualASMCompile (|bool|)
 		opt norefcounts
-		debugat
 		for fn in .Packfuncs
-			if fn ~= "PackTestForeignFuncs"
 			if fn.tableid
 				if fn.parent.name ~= "ASMExamples"
 					require SpdAssembler.VacGenerate(fn)
@@ -104,7 +101,6 @@ module PackMaker
 		fn = .testfn("PackTestForeignFuncs")
 		if fn
 			self[0] = "hello", self[1] = "abc"
-			debugger
 			|| str = fn.Test|&string|[]
 			printline str
 			
@@ -327,4 +323,8 @@ function PrintFunc (|string| s)
 		printline fn
 */
 
+
+function scfunction.operatorin (|string| s, |bool|)
+	opt norefcounts
+	return .parent.name ~= s
 

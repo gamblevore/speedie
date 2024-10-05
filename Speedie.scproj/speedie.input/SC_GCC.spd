@@ -103,7 +103,7 @@ function CanCompile ( |string| name, |bool| )
 
 
 function string.isCLike (|bool|)
-	if self ~= "cpp"
+	if self ~= "cpp" or "s"
 		return true
 	if platform.osx
 		return (self ~= "m" or "mm") // mm gets wierd errors that cpp doesnt?
@@ -124,7 +124,6 @@ function NeedNewObjForSrc ( |string| cpp, |file| objects, |int| )
 	flowcontrol.input(cpp, "objtest")
 	|| aslib = options.makelib or options.projectislibrary
 	require ! (aslib and (cpp contains "/JB_Main.")) // .o and .cpp
-	require ! (!asm.needed and (cpp contains "/JB_VM."))  
 	require ! (!(SC_Targets..gui or linkage.interpreter) and cpp contains "/JB_OSX.")  // should be "JB_Native.o"
 
 	|| name		= cpp.name

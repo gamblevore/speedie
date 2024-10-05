@@ -17,12 +17,21 @@ Design:
 #include "JB_Umbrella.hpp"
 
 extern "C" {
-#if __VM__
-
-
-jb_vm* vm;
+#if 1
 #include "BitFields.h"
 #include "JB_VM.h"
+
+jb_vm* vm;
+
+ivec4* JB_ASM_Registers(jb_vm* V, bool Clear) {
+	auto Ret = V->Registers;
+	if (Clear) {
+		memset(Ret, 0xFE, sizeof(VMRegister)*34);
+	}
+	return (ivec4*)(Ret+2);
+}
+
+
 
 #pragma GCC optimize ("Os")
 #include "JB_VM_Helpers.i"
@@ -65,21 +74,10 @@ ivec4* RunVM (jb_vm& pvm) {		// vm_run, vm__run, vmrun, run_vm
 }
 
 
-
-ivec4* JB_ASM_Registers(jb_vm* V, bool Clear) {
-	auto Ret = V->Registers;
-	if (Clear) {
-		memset(Ret, 0xFE, sizeof(VMRegister)*34);
-	}
-	return (ivec4*)(Ret+2);
-}
-
-
-static Fn0* VMFunctionTable;
-void** JB_ASM__InitTable(int n) {
-	free(VMFunctionTable);
+void** JB_ASM_InitTable(jb_vm* vm, int n) {
+	free(vm->Env.Cpp);
 	auto Result = calloc(n, sizeof(void*));
-	VMFunctionTable = (Fn0*)Result;
+	vm->Env.Cpp = (Fn0*)Result;
 	return (void**)Result;
 }
 
@@ -99,7 +97,6 @@ jb_vm* JB_ASM__VM() {
 //	v.EXIT[1] = 0;					// Halt with error
 
 	v.StackSize  = (StackSize - sizeof(jb_vm))/sizeof(VMRegister);
-	v.Env.Cpp = VMFunctionTable;
 	return vm;
 }
 

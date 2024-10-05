@@ -8,8 +8,8 @@ prototype SorterComparerDecl	(|scdecl| a, |scdecl| b, |bool|)
 
 helper SCFuncSorter (SorterComparerFn)
 	// just to help compression. otherside will use a dictionary anyhow.
-	|| fA = (a).Tableid|int|
-	|| fB = (b).Tableid|int|
+	|| fA = a.Tableid|int|
+	|| fB = b.Tableid|int|
 	if fA != fB // we need init and main first
 		return fa < fb
 	return a.ExportName < b.ExportName

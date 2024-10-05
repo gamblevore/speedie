@@ -89,6 +89,7 @@ linkage
 
 constructor (|Message?| msg = nil)
 	Super.Constructor( msg )
+	.tableid = 0xffff
 	.linkto = nil
 	if (msg)
 		Compiler.stFuncs++
