@@ -2,8 +2,6 @@
 
 bugs:
 	* function (|object!| x = nil) // which is it? should complain. Currently it becomes optional.
-	* unify numeric types a lot. Many functions want to work on uint, int, etc... and one func is good enough for all!
-		* datatype byte: inherit int // anything you can do on an int... can be done on a byte!
 	* vector constants
 	* &uint... allow &int in c++ gen
 	* passing .hfloatvar to  func(float) causes reporting error
@@ -14,13 +12,13 @@ bugs:
 
 
 additions:
+	* do everything in terms of FATs? We need 1 fat per param...
 	* rename "flags" to something else. I wanna use "flags" for somekinda default Info and Syntax is
-	* class descriptions!
+	* autocomplete use class description 
 	* add \123 numeric type (mostly for jbin). use a float/int format, that is signed. 2 exponent bits per byte.
 		* first byte (if float) can also store the sign of the exponent.
 		* could be an interesting type to have generally... like perhaps as a string subclass?
 	* –container @ques ability... for macros. This returns the syntax that contained us. Useful for (all~files).delete
-	* unify macros? or just modernise. Why pass an array? why not a message~list? Arrays suck. list sexy.
 	* nicer lookups: fn x (|int| n), .x(max) --> .x(int.max) // assuming max doesn't exist locally.
 		* just set a global var... somewhere, and do set .obj or whatever it is that we lookup from in lookupsub, to that var if we can't find anything... it should happen in priority to globals, though.
 	* do we need lowercase in lookupsub??? all dots/funcs got lowered in parseclean?
@@ -32,7 +30,6 @@ additions:
 			thg "yep" }    -->    ok.hi(yep)
 	* new destructor! bitfield 64 for objs! no super! works for most!
 		// could be done better with ast-spawner?
-	* (node, err) = .text.parse --> |error| err, || node = .text.parse(err) // noice
 	* any object can be created with an virtual-function override table, just store before the refcount?
 		* if refcounts come in multiple of 2 (or even 4), we could store if we have a override table... per object
 	* || x = .SomeCArray // should just get the address... :)
@@ -50,7 +47,6 @@ additions:
 class-changes
 	* replace dictionary with fixeddict
 		* doesnt need datatype wrapper! We could use a dict of ints / pointers...
-* Get galaxxies compiling
 * GameFloodFill being generated despite not being used.
 	GameFloodFill_Behaviour GameFloodFill_FuncTable_ = InitTableGameFloodFill_();
 	JBClassPlace4(GameFloodFill, JB_AsClass(FastAppender), GameFloodFill_FuncTable_);
@@ -62,10 +58,7 @@ I guess it's because it's a saveable? makes sense, sorta. We can just make it no
 * Can't save GameMaterial... but we can save cell? neither are subclass of saveable.
 
 * Loop bug with moveset iterator as nested loop? NearestEmptyCell... fails if we remove "|| OurLoop = Dirs" cos dirs gets altered when it shouldn't.
-
-* CollectDecls needs to be split up and... able to only process one at a time.
-	for m in msgs 
-		.CollectOneDecl(m)
+* CollectDecls within transform shouldn't look ahead.
 
 * Saving... should work as ONE stream. Maybe 1 or 2 phases. (Collects objects + write objects, but don't separate into classes.). Allows tighter compression, simpler-saving-code, etc. Makes it easier to work into an archiving system even!!! Faster saving too, just copy entire object. Needs a "SaveProperty true/false" temporal... Just use save-marking to stop saving objects twice. Need one array to clear the save-marks. dicts can use a special value to mark "end"
     * Actually... speed isn't the issue. SIMPLICITY is. more than fast enough.

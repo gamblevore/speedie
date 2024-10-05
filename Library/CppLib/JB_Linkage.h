@@ -1,6 +1,7 @@
 
 
 extern "C" {
+
 JB_String* JB_Platform();
 bool JB_Platform__OSX();
 bool JB_Platform__Win();
@@ -68,12 +69,15 @@ struct VMRegister {
 	};
 };
 
-ivec4* JB_ASM_Run(u32* Code, u32 CodeSize);
-struct jb_vm;
-ivec4* JB_ASM_Registers(jb_vm* V, bool Clear);
-jb_vm* JB_ASM_VM();
 typedef void (*SaverLoadClass)(JB_Class* cls, int8* Data);
-void   JB_InitClassList(SaverLoadClass fn);
+void	JB_InitClassList(SaverLoadClass fn);
+
+struct	jb_vm;
+jb_vm*	JB_ASM__VM();
+ivec4*	JB_ASM__Run			(u32* Code, u32 CodeSize);
+void*	JB_ASM__Load		(JB_StringC* S);
+void**	JB_ASM__InitTable	(int n);
+ivec4*	JB_ASM_Registers	(jb_vm* V, bool Clear);
 
 } // ExternCEnd
 

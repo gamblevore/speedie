@@ -1,10 +1,23 @@
 
 
-// need to allow vectorcall on windows. to allow vectors to be passed using the
-// SIMD registers.
-//#include "ffi.h"
+#include <dlfcn.h>
+
+// need to allow vectorcall on windows. to allow vectors to be passed
+// using the SIMD registers.
 typedef void (*FFI_Fn)(void);
 
+
+// find app's own functions within itself...
+extern "C" void* JB_ASM__Load (JB_StringC* S) {
+    static void* MySelf;
+    if (!S->Length)
+		debugger;
+    if (!MySelf) {
+		MySelf = dlopen(NULL, RTLD_LAZY);
+		if (!MySelf) return 0;
+	}
+	return dlsym(MySelf, (const char*)(S->Addr));
+}
 
 
 AlwaysInline void DivMath(VMRegister* r, ASM Op) {
@@ -520,8 +533,11 @@ Speedie's function histogram:  0:410,  1:1656,  2:1464,  3: 713,  4: 167,  5:  6
 #define Code64 (*(u64*)Code)
 
 
- 
- Fn0 VMDummyTable[] = {(Fn0)JB_Str_Length, (Fn0)JB_Str_Address, (Fn0)JB_Str_WhiteSpace, (Fn0)JB_Str_OperatorPlus, (Fn0)JB_Str_ChrUTF8, (Fn0)0}; 
+/*
+	How can speedie dynamically get the address of each function? It has to have a list of
+	functions first, right? I can't see any other way. There is DLload I guess? I can TRY?
+	Just for... testing?
+*/
 
 
 #define NextRegI(r,r2) 											\

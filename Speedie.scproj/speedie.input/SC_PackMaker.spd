@@ -13,6 +13,7 @@ module PackMaker
 		opt norefcounts
 		|| MakeExec = options.MakeInterpreter
 		for f in Compiler.FuncList
+			if f ~= "PackTestForeignFuncs"
 			if !f.CanLibLoad
 				0
 			  elseif f.IsStdLib
@@ -47,15 +48,21 @@ module PackMaker
 		fninit.tableid = 1 // put init and main first!
 		fnmain.tableid = 2
 
-		.SortSub(.libfuncs)
-		.SortSub(.Packfuncs)
+		.SortSub(.libfuncs, true)
+		.SortSub(.Packfuncs, false)
 	
 	
-	helper SortSub (|[scfunction]| list)
-		opt norefcounts
+	helper SortSub (|[scfunction]| list, |bool| test)
+		target debug
+			|| Table = (jb_vm.InitTable(list.length), nil)(test)
 		list.sort(SCFuncSorter)
-		for (f in list) (i)
-			f.TableID = i+1
+		|| id = 0
+		while
+			|scfunction--| f = list[id] #loop
+			f.TableID = ++id
+			target debug
+				if Table
+					Table[id] = jb_vm.Load(f.exportname)
 
 	
 	function WriteLibFuncs (|jbin!| j)
@@ -67,27 +74,15 @@ module PackMaker
 			j.Add(@thg, f.exportname)
 		j.Exit
 
-
-	function scfunction.OperatorIn (|scmodule| f, |bool|)
-		return !f or .parent == f
-	
-	
-	function RevUpTheHoover (|string| name)
+		
+	function ActualASMCompile (|bool|)
 		opt norefcounts
-		|| filter = Compiler.program.FindModule(name, nil)
-		|| id = 0
-		for fn in Compiler.FuncList
-			if fn in filter
-				fn.tableid = ++id
-			  else
-				fn.tableid = 0
-	
-	
-	function ActualRealCompileAkaPackIt (|bool|)
-		opt norefcounts
-		for fn in Compiler.FuncList
-			if fn.tableid and fn.parent.name ~= "ASMExamples"
-				require SpdAssembler.VacGenerate(fn)
+		debugat
+		for fn in .Packfuncs
+			if fn ~= "PackTestForeignFuncs"
+			if fn.tableid
+				if fn.parent.name ~= "ASMExamples"
+					require SpdAssembler.VacGenerate(fn)
 		
 		.RunAFewTests
 		return true
@@ -145,8 +140,7 @@ module PackMaker
 	function MakePack 
 		if (–sizeof FatASM) != 64
 		require ASMState.Sh.PackMakerInit			// fn_asm_table[@arg]
-		.RevUpTheHoover("ASMExamples")
-		require .ActualRealCompileAkaPackIt
+		require .ActualASMCompile
 
 		|| j = jbin(@tmp, "xpd")
 		j.enter
@@ -322,10 +316,15 @@ struct LibEntry
 
 then we just return a LibPack* from C++.
 
-Then exec can just... use the table directly, as it is already sorted. :)    */
+Then exec can just... use the table directly, as it is already sorted. :)
+*/
 
 
-function printfunc (|string| s)
+/*
+function PrintFunc (|string| s)
 	visible
 	|| fn = compiler.xfunc(s)
 		printline fn
+*/
+
+

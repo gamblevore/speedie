@@ -15,7 +15,6 @@ Design:
 
 
 #include "JB_Umbrella.hpp"
-//#include "FPTest.i"
 
 extern "C" {
 #if __VM__
@@ -43,7 +42,6 @@ jb_vm* vm;
 #define VMGuardValue 1234567890
 
 ivec4* RunVM (jb_vm& pvm) {		// vm_run, vm__run, vmrun, run_vm
-//	add_Test(123123);
     const static Goto JumpTable[] = {
         #include "InstructionList.h"
     };
@@ -71,15 +69,21 @@ ivec4* RunVM (jb_vm& pvm) {		// vm_run, vm__run, vmrun, run_vm
 ivec4* JB_ASM_Registers(jb_vm* V, bool Clear) {
 	auto Ret = V->Registers;
 	if (Clear) {
-		memset(Ret+0, 0x00, sizeof(VMRegister)*4);
-		memset(Ret+5, 0xFE, sizeof(VMRegister)*32);
+		memset(Ret, 0xFE, sizeof(VMRegister)*34);
 	}
-	return (ivec4*)(Ret+5);
+	return (ivec4*)(Ret+2);
 }
 
 
+static Fn0* VMFunctionTable;
+void** JB_ASM__InitTable(int n) {
+	free(VMFunctionTable);
+	auto Result = calloc(n, sizeof(void*));
+	VMFunctionTable = (Fn0*)Result;
+	return (void**)Result;
+}
 
-jb_vm* JB_ASM_VM() {
+jb_vm* JB_ASM__VM() {
 	dbgexpect2 (sizeof(ASM)==4);
 	if (vm) return vm;
 	
@@ -95,13 +99,13 @@ jb_vm* JB_ASM_VM() {
 //	v.EXIT[1] = 0;					// Halt with error
 
 	v.StackSize  = (StackSize - sizeof(jb_vm))/sizeof(VMRegister);
-	v.Env.Cpp = VMDummyTable; // for now!
+	v.Env.Cpp = VMFunctionTable;
 	return vm;
 }
 
 
-ivec4* JB_ASM_Run(u32* Code, u32 CodeLength) {
-	auto V = JB_ASM_VM();
+ivec4* JB_ASM__Run(u32* Code, u32 CodeLength) {
+	auto V = JB_ASM__VM();
 	if (V) {
 		V->Env.CodeBase = (ASM*)Code;
 		V->Env.CodeLength = CodeLength;
@@ -113,13 +117,13 @@ ivec4* JB_ASM_Run(u32* Code, u32 CodeLength) {
 }
 
 #else
-ivec4* JB_ASM_Registers(jb_vm* V, bool i) {
+ivec4* JB_ASM__Registers(jb_vm* V, bool i) {
 	return 0;
 }
-jb_vm* JB_ASM_VM() {
+jb_vm* JB_ASM__VM() {
 	return 0;
 }
-ivec4* JB_ASM_Run(u32* Code, u32 CodeSize) {
+ivec4* JB_ASM__Run(u32* Code, u32 CodeSize) {
 	return 0;
 }
 
