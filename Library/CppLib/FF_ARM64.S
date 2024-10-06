@@ -1,4 +1,3 @@
-
 #ifdef __aarch64__
 	#define __realarm64__
 #endif
@@ -8,16 +7,147 @@
 
 
 #ifdef __realarm64__
+
+
+/*** StoreGreenRegs (u64* At) ***/
 .text
-.global _FFASMTest
+.global _StoreGreenRegs
 .align 4
-_FFASMTest:
-	mov     x1, x0				// put in x1
-	and     x1, x1, 15			// x1 = x1&15
-	add     x8, x1, x1, lsl 2   // x8 = x1*5
-	mov     x0, x8				// put back again
+
+_StoreGreenRegs:						// (u64 data, Fn0 fn, Register* r)
+	stp     x19, x20, [x0]
 	ret
+	
+
+
+/*** ReadGreenRegs (u64* From) ***/
+.text
+.global _ReadGreenRegs
+.align 4
+
+_ReadGreenRegs:
+	ldp     x19, x20, [x0]
+	ret
+
+
+
+/*** Nativeize(u64 data, Fn0 fn, Register* r) ***/
+.text
+.global _Nativeize
+.align 4
+
+_Nativeize:								
+	fli		.req x14
+	flj		.req x13
+	r		.req x12
+	fn		.req x11
+	data	.req x10
+	j1		.req x8
+	j2		.req x9
+	
+	//    (... prm4, prm3, prm2, prm1, prm0,) floats ints
+	lsr     data, x0, 12			// data  = DATA>>12
+	adr		flj,  floats
+	adr		fli,  ints
+	mov     fn,  x1					// fn    = FN
+	mov     r,   x2					// r     = R
+	and     j1,  x0, 15			    // j1    = DATA&15
+	ubfx    j2,  x0, 4, 4			// j2    = (DATA>>4)&15
+	add		j1,  j1, j1, lsl 1		// j1    = j1*3
+	add		j2,  j2, j2, lsl 1		// j2    = j2*3
+	add		j1,  flj, j1			// j1 adapt
+	add		j2,  fli, j2			// j2 adapt
+	br		j1 // jump
+floats:
+	
+	lsr     x7, data, 35				// float-7
+	ubfiz   x7, x7, 4, 5
+	ldr     q7, [r, x7]
+		
+	lsr     x6, data, 30				// float-6
+	ubfiz   x6, x6, 4, 5
+	ldr     q6, [r, x6]
+		
+	lsr     x5, data, 25				// float-5
+	ubfiz   x5, x5, 4, 5
+	ldr     q5, [r, x5]
+		
+	lsr     x4, data, 20				// float-4
+	ubfiz   x4, x4, 4, 5
+	ldr     q4, [r, x4]
+		
+	lsr     x3, data, 15				// float-3
+	ubfiz   x3, x3, 4, 5
+	ldr     q3, [r, x3]
+		
+	lsr     x2, data, 10				// float-2
+	ubfiz   x2, x2, 4, 5
+	ldr     q2, [r, x2]
+		
+	lsr     x1, data,  5				// float-1
+	ubfiz   x1, x2, 4, 5
+	ldr     q1, [r, x1]
+	
+	lsr     x0, data, 0					// float-0
+	ubfiz   x0, x0, 4, 5
+	ldr     q0, [r, x0]	
+
+	br j2
+
+ints:
+	
+	lsr     x7, data, 35				// int-7
+	ubfiz   x7, x7, 4, 5
+	ldr     x7, [r, x7]
+		
+	lsr     x6, data, 30				// int-6
+	ubfiz   x6, x6, 4, 5
+	ldr     x6, [r, x6]
+		
+	lsr     x5, data, 25				// int-5
+	ubfiz   x5, x5, 4, 5
+	ldr     x5, [r, x5]
+		
+	lsr     x4, data, 20				// int-4
+	ubfiz   x4, x4, 4, 5
+	ldr     x4, [r, x4]
+		
+	lsr     x3, data, 15				// int-3
+	ubfiz   x3, x3, 4, 5
+	ldr     x3, [r, x3]
+		
+	lsr     x2, data, 10				// int-2
+	ubfiz   x2, x2, 4, 5
+	ldr     x2, [r, x2]
+		
+	lsr     x1, data,  5				// int-1
+	ubfiz   x1, x2, 4, 5
+	ldr     x1, [r, x1]
+	
+	lsr     x0, data, 0					// int-0
+	ubfiz   x0, x0, 4, 5
+	ldr     x0, [r, x0]	
+	
+	// how to save funcdata
+	// we need to save r and data. Could we store a bit in r
+	stp     fp, lr, [sp, -16]!			// save fp and lr 
+	mov     fp, sp						// update fp with sp?
+       
+	blr     fn							// call fn!!
+    ldp     fp, lr, [sp], 16			// restore some shit
+    
+	tbz     data, 8, SIMDReturn
+	str     x0, [r]
+	ret
+SIMDReturn:
+	str     q0, [r]
+	ret
+	
+	
+/*** END OF CODE 😭 ***/
+
 #endif
+
 
 
 // http://ethernut.de/en/documents/arm-inline-asm.html
@@ -46,75 +176,4 @@ Observations so far:
 		* we have enough regs on ARM&X86
 	* You can't specify registers in C++, except when they are observed by ASM.
 */
-
-
-
-	// I think calling the VM should be a simple-task. So instead of calling a function-pointer...
-	// we test the function pointer, to see if its SPD or C. If C... we call it. Otherwise we call the VM.
-	// this has to be done at every call-site. What about for passing to C++ libs? We'd have to generate
-	// some native ASM for that. I think C++ has lambdas. It could be done.
-
-
-#if 0
-#define NextRegI(r,r2) 											\
-	"ubfiz  x"#r",		%[CODE],	"#r2",		5		\n" 	\
-	"ldr    x"#r",		[%[R],		x"#r", lsl 3]		\n" // needs to be 4 but can't do this directly????
-
-#define NextRegF(r,r2) 											\
-	"ubfiz  x"#r",		%[CODE],	"#r2",		5		\n" 	\
-	"ldr    d"#r",		[%[R],		x"#r", lsl 3]		\n" // needs to be 4 but can't do this directly???
-
-__asm__ volatile ( // we used to have ints first, but floats first makes more sense.
-	"and     x1, %[CODE], 15		\n\t"		// x1 = code&15
-	"add     x8, x1, x1, lsl 2		\n\t"		// x8 = x1*5
-	"lsr     x8, %[CODE], x8		\n\t"		// x8 = code>>x8 // x8 = code>>(x1*5)
-
-	"adr x0, 1f						\n\t"		
-	"add x0, x0, x1, lsl 1			\n\t"		// x0 += x1 << 1
-	"br  x0							\n\t"		// smart-jump
-	"1:\n\t"
-	// Float / SIMD
-	NextRegF(8, 52) // not perfect yet... we need to pass the entire SIMD, not just a double!
-	NextRegF(7, 47)
-	NextRegF(6, 42)
-	NextRegF(5, 37)
-	NextRegF(4, 32)
-	NextRegF(3, 27)
-	NextRegF(2, 22)
-	NextRegF(1, 17)
-	NextRegF(0, 12)
-
-	"ubfiz   x1, %[CODE], 4, 4		\n\t"		// x1 = (code>>4)&15 // still needs << 1
-	"adr x0, 2f						\n\t"		// ADR + ADD can merge? SHOULD allow pc instead of x0 
-	"add x0, x0, x1					\n\t"		// but doesnt... (make the first part non-volatile)?
-	"br  x0							\n\t"		// smart-jump
-	"2:\n\t"
-	// ints
-	NextRegI(8, 52)
-	NextRegI(7, 47)
-	NextRegI(6, 42)
-	NextRegI(5, 37)
-	NextRegI(4, 32)
-	NextRegI(3, 27)
-	NextRegI(2, 22)
-	NextRegI(1, 17)
-	NextRegI(0, 12)
-
-	"stp     x29, x30, [sp, -16]!	\n\t"		// copy and alloc
-	"mov     x29, sp				\n\t"		// update some shit
-        
-	"blr     %[FN]					\n\t"		// call some shit
-    "ldp     x29, x30, [sp], 16		\n\t"		// restore some shit
-	""
-	 : [x0] "=&r" (iresult),   [q0] "=&w" (vresult)
-	 : /*  input  */  [R] "r" (r),  [CODE] "r" (funcdata),  [FN] "r" (fn),  [OP] "r" (Op) 
-	 : /* clobber */  "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10", "x11", "x12", "x13", "x14", "x15", "x16", "x17" );
-	r+=n1; // do this first?
-	if (Op&32)
-		r->Int = iresult;
-	  else
-		r->Ivec = vresult;
-	// i think that's it.
-		
-#endif
 

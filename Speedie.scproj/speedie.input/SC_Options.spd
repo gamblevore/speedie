@@ -3,8 +3,6 @@
 module Options
 	flags: native,pack
 	
-		
-	||		NilStrength				= errorseverity.error	
 	||		BannedClasses			= nil|dictionary|
 	||		output_path				= ""
 	||		SingleFileInput			= ""
@@ -38,7 +36,6 @@ module Options
 	||		PrintFiles				= false
 	||		PrintStages				= false
 	||		Warnings				= false
-	||		UseFuncCallCount		= false
 	||		ExternalCompile			= false
 	|byte|	Optimise				= 1
 	|bool|	SelfReplacement			= 0
@@ -350,12 +347,6 @@ module Feedback
 			feedback.TryUseProject( Compiler.SpeedieProj )
 			return true // does something, counts towards operationCount
 		
-		+"nil"
-			Explain(Purpose, "Enable/disable nil-errors.")$
-			if value.yes
-				options.nilstrength = errorseverity.error
-			  else
-				options.nilstrength = errorseverity.warning
 			
 		+"crash"
 			explain(purpose, "Crashes speedie to test it's crash handlers.")$
@@ -376,10 +367,7 @@ module Feedback
 			if value == "debug"
 				error "Use 'targetdebug' instead."
 			SC_Targets[value] = true
-		
-		+"funccount"
-			Explain(Purpose, "Spams each func with a static int, to count the number of times it's called. Useful debugging feature.")$
-			options.UseFuncCallCount = value.optionbool
+
 		
 		+"warn"
 			Explain(Purpose, "Show warnings.")$

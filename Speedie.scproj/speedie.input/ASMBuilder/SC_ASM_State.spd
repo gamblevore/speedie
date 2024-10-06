@@ -222,6 +222,8 @@ function SCFunction.HasCVersion (|bool|)
 function asmstate.ASMPrmCollectNative (|message| prms, |SCFunction| fn, |uint64|)
 	opt norefcounts
 	|| sh = 12
+	|| special = fn.returntype.ASMUseSpecialRegs // bit 9
+	rz |= special << 8
 	for Float in 2
 		|| p = prms.first
 		for FnArg in fn.args
@@ -231,7 +233,7 @@ function asmstate.ASMPrmCollectNative (|message| prms, |SCFunction| fn, |uint64|
 				rz  |=  v << sh
 				rz += 1<<(Float<<2)				// Send-count (4 + 4 bits)
 			p++
-										// 32 - (5*4 + 4 + 4) = 4 . Still 4 bits left
+										// 32 - (4*5 + 4 + 4) = 4 . Still 4 bits left
 
 function asmstate.ASMPrmCollect (|message| prms, |scfunction| fn, |bool| native,  |uint64|)
 	opt norefcounts
@@ -274,15 +276,11 @@ function @ASMType.DoFunction (fn_Asm)
 	.CloseVTmps(TmpCloser)
 	
 	|| PExt = P >> 32
-	|&fatasm| fat
-	
-	|| id = fn.tableid+31
+	|| fat = exp.FUNK(dest, fn.tableid+31, P,  PExt)
 	if isc
-		fat = exp.FFNC(dest, id,  fn.returntype.ASMUseSpecialRegs|int|, P,  PExt)
-	  else
-		fat = exp.FUNK(dest, id,  P,  PExt)
-	fat.op += PExt!=0
-//	Dest.reg = SaveAmount.asm // we don't wanna use this... makes the VM more complex.
+		fat.op = asm.FFNC
+	fat.op += PExt > 0
+
 //  Mostly I'm doing:  || x = msg.function(),  (which uses the correct position.)
 	
 	if !fn.ReturnType

@@ -535,21 +535,14 @@ Speedie's function histogram:  0:410,  1:1656,  2:1464,  3: 713,  4: 167,  5:  6
 
 
 
-extern "C" u64 FFASMTest(u64);
+void Nativeize(u64 data, Fn0 fn, VMRegister* r);
+void ReadGreenRegs(u64* From);
+void StoreGreenRegs(u64* From);
+
 
 AlwaysInline void ForeignFunc (jb_vm& vv, ASM* CodePtr, VMRegister* r, ASM Op, u64 funcdata) {
-// Only OP needs saving...
 	auto T = ForeignFunc_Tableu;
 	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.Env.Cpp[T]);
-	u64 iresult = 0; // need a simd... also
-	ivec4 vresult = {};
-	uint64 xxx = 0;//FFASMTest(funcdata+3);
-	funcdata = xxx;
-	r+=n1;
-	if (Op&32)
-		r->Int = iresult;
-	  else
-		r->Ivec = vresult;
-	// i think that's it.
-		
+	Nativeize(funcdata, fn, r+n1);
 }
+

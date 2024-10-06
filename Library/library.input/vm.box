@@ -18,7 +18,6 @@ forms
 	ForeignFunc
 		r1		R
 		Table	14			// functions in registers use the first 32 values...
-		V0		1			// Result is FP/SIMD 
 		Prm1	x
 		Prm2	x
 	

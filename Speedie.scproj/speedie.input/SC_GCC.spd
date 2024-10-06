@@ -177,6 +177,7 @@ function HasType (|[File]| CppList, |string| Type, |bool|)
 			return true
 
 
+
 function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Type, |[string]|)
 	require .HasType(FileList, type)
 	rz.AppendWords( Product )
@@ -185,7 +186,6 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 		if f isa Type
 			rz <~ f
 			f.relax
-
 
 	|| cmode = "-std=gnu++20 "
 	if Type == "m" or "o" or "mm"
@@ -291,6 +291,9 @@ function UseAndCompile (|[string]| Input, |String| Output, |bool|)
 
 function TransCompileWrap (|[file]| cpps, |bool|)
 	rz = .TransCompile( Cpps, " -c ", "cpp" )
+	if rz
+		rz = .TransCompile( Cpps, " -c ", "s" )
+	
 	if platform.osx // it might not realise that it is OSX! cos of cpp file-sharing.
 		if rz
 			rz = .TransCompile( Cpps, " -c ", "m" )
@@ -549,7 +552,7 @@ function file.TestBatch (|bool|)
 	printline
 	
 	for c in batch.ListFiles
-		if c isa "cpp" or "h"
+		if c isa "cpp" or "h" or "s"
 			print "This file should really not be here: "
 			printline c
 			debugger

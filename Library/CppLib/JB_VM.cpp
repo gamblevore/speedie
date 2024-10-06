@@ -31,9 +31,8 @@ ivec4* JB_ASM_Registers(jb_vm* V, bool Clear) {
 	return (ivec4*)(Ret+2);
 }
 
-#if __vm__
+#ifdef __vm__
 jb_vm* vm;
-
 
 
 #pragma GCC optimize ("Os")
