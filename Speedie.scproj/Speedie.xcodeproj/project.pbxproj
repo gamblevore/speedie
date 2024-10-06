@@ -17,6 +17,10 @@
 		AC534D732C58F90800F0D6C5 /* JB_Temporal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC534D712C58F90800F0D6C5 /* JB_Temporal.cpp */; };
 		AC534D742C58F90800F0D6C5 /* JB_Temporal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC534D712C58F90800F0D6C5 /* JB_Temporal.cpp */; };
 		AC534D752C58F90800F0D6C5 /* JB_Temporal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC534D712C58F90800F0D6C5 /* JB_Temporal.cpp */; };
+		AC6AB9272CB1AEB800555461 /* FF_ARM64.S in Sources */ = {isa = PBXBuildFile; fileRef = AC6AB9262CB1AEB800555461 /* FF_ARM64.S */; };
+		AC6AB9282CB1AEB800555461 /* FF_ARM64.S in Sources */ = {isa = PBXBuildFile; fileRef = AC6AB9262CB1AEB800555461 /* FF_ARM64.S */; };
+		AC6AB9292CB1AEB800555461 /* FF_ARM64.S in Sources */ = {isa = PBXBuildFile; fileRef = AC6AB9262CB1AEB800555461 /* FF_ARM64.S */; };
+		AC6AB92A2CB1AEB800555461 /* FF_ARM64.S in Sources */ = {isa = PBXBuildFile; fileRef = AC6AB9262CB1AEB800555461 /* FF_ARM64.S */; };
 		AC7A83192BC29DAE00DD6590 /* JB_OSX.m in Sources */ = {isa = PBXBuildFile; fileRef = AC7A83172BC29DAE00DD6590 /* JB_OSX.m */; };
 		AC7A831A2BC29DAE00DD6590 /* JB_OSX.m in Sources */ = {isa = PBXBuildFile; fileRef = AC7A83172BC29DAE00DD6590 /* JB_OSX.m */; };
 		AC7A831B2BC29DAE00DD6590 /* JB_OSNative.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7A83182BC29DAE00DD6590 /* JB_OSNative.cpp */; };
@@ -235,6 +239,7 @@
 		AC421B352BDBDE2B00CD0216 /* JB.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB.cpp; path = BuildTest/JB.cpp; sourceTree = "<group>"; };
 		AC4C95D629B7D78400B87345 /* jeebox.scproj */ = {isa = PBXFileReference; lastKnownFileType = folder; name = jeebox.scproj; path = ../jeebox.scproj; sourceTree = "<group>"; };
 		AC534D712C58F90800F0D6C5 /* JB_Temporal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Temporal.cpp; path = ../Library/CppLib/JB_Temporal.cpp; sourceTree = "<group>"; };
+		AC6AB9262CB1AEB800555461 /* FF_ARM64.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = FF_ARM64.S; path = ../Library/CppLib/FF_ARM64.S; sourceTree = "<group>"; };
 		AC6ADAE729872AA8009CFFBB /* Speedie */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Speedie; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC7A83122BC297AE00DD6590 /* exec.scproj */ = {isa = PBXFileReference; lastKnownFileType = folder; name = exec.scproj; path = ../exec.scproj; sourceTree = "<group>"; };
 		AC7A83172BC29DAE00DD6590 /* JB_OSX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JB_OSX.m; path = ../GUI.scproj/gui.input/c_includes/JB_OSX.m; sourceTree = "<group>"; };
@@ -419,6 +424,7 @@
 				AC7D3C8429A27C1D00148ADB /* JB_Child.cpp */,
 				AC7D3C7B29A27C1D00148ADB /* JB_Compress.cpp */,
 				ACB3785C29A5026400795F00 /* JB_DivSufSort.cpp */,
+				AC6AB9262CB1AEB800555461 /* FF_ARM64.S */,
 				AC7D3C8D29A27C1D00148ADB /* JB_Date.cpp */,
 				AC7D3C8F29A27C1D00148ADB /* JB_Dictionary.cpp */,
 				AC7D3C8229A27C1D00148ADB /* JB_DirReaderUnix.cpp */,
@@ -724,6 +730,7 @@
 				ACE7CA432ACAE471005244E2 /* JB_ProcessOwner.cpp in Sources */,
 				AC534D722C58F90800F0D6C5 /* JB_Temporal.cpp in Sources */,
 				AC7D3CB529A27C7700148ADB /* JB_Compress.cpp in Sources */,
+				AC6AB9272CB1AEB800555461 /* FF_ARM64.S in Sources */,
 				AC7D3CA629A27C7700148ADB /* JB_Child.cpp in Sources */,
 				AC7D3C9A29A27C7700148ADB /* JB_Vectors.cpp in Sources */,
 				AC7D3CAB29A27C7700148ADB /* JB_Pipe.cpp in Sources */,
@@ -765,6 +772,7 @@
 				AC7D3D9E29A280A700148ADB /* JB_Compress.cpp in Sources */,
 				AC534D752C58F90800F0D6C5 /* JB_Temporal.cpp in Sources */,
 				AC7D3D9F29A280A700148ADB /* JB_Child.cpp in Sources */,
+				AC6AB92A2CB1AEB800555461 /* FF_ARM64.S in Sources */,
 				AC7D3DA029A280A700148ADB /* JB_Vectors.cpp in Sources */,
 				AC7D3DA129A280A700148ADB /* JB_Pipe.cpp in Sources */,
 				AC7D3DA329A280A700148ADB /* JB_Utils.cpp in Sources */,
@@ -779,6 +787,7 @@
 			files = (
 				AC7D3DB629A2816600148ADB /* JB_ByteMap.cpp in Sources */,
 				AC7D3DB729A2816600148ADB /* JB_String.cpp in Sources */,
+				AC6AB9282CB1AEB800555461 /* FF_ARM64.S in Sources */,
 				AC7D3DB829A2816600148ADB /* JB_Tokeniser.cpp in Sources */,
 				AC7D3DB929A2816600148ADB /* JB_BasicIO.cpp in Sources */,
 				AC7D3DBA29A2816600148ADB /* JB_ListOld.cpp in Sources */,
@@ -820,6 +829,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AC6AB9292CB1AEB800555461 /* FF_ARM64.S in Sources */,
 				AC7D3DDF29A2816700148ADB /* JB_ByteMap.cpp in Sources */,
 				AC7D3DE029A2816700148ADB /* JB_String.cpp in Sources */,
 				AC7D3DE129A2816700148ADB /* JB_Tokeniser.cpp in Sources */,
@@ -946,7 +956,10 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_CFLAGS = "-Wno-return-type-c-linkage";
+				OTHER_CFLAGS = (
+					"-Wno-return-type-c-linkage",
+					"-D__vm__",
+				);
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -1001,7 +1014,10 @@
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				OTHER_CFLAGS = "-Wno-return-type-c-linkage";
+				OTHER_CFLAGS = (
+					"-Wno-return-type-c-linkage",
+					"-D__vm__",
+				);
 				SDKROOT = macosx;
 			};
 			name = Release;
