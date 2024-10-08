@@ -371,6 +371,10 @@ extend ASMState
 			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyBitXor)
 		if (l.reg == r.reg)
 			return .Zeros(dest, exp)
+		if !l.reg
+			return .Assign(dest, r, exp)
+		if !r.reg
+			return .Assign(dest, l, exp)
 		return .BitMakerSwap(dest, l, r, exp, asm.bxor)
 
 
@@ -388,7 +392,7 @@ extend ASMState
 		if dest is constany
 			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyBitAnd)
 		if l.IsConst(0) or r.IsConst(0)
-			return .zeros(dest, exp)
+			return .Zeros(dest, exp)
 		return .BitMakerSwap(dest, l, r, exp, asm.band)
 
 
@@ -400,7 +404,7 @@ extend ASMState
 	
 	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
 		|| K = r.const
-		if r is ConstAny and k fits 9
+		if (r is ConstAny) and k.fits(9, op!=asm.bor) // we want bitor unsigned
 			r.nop
 			r = ASMReg()
 		  else
@@ -416,7 +420,6 @@ extend ASMState
 		if r is ConstAny
 			return .BFLG_Const(exp, dest, l, 0, r.nop)
 		
-		#!What about extra bits? EG: (int32 >> x)
 		|| op = (asm.BSHS, asm.BSHR)(l.signed)
 		return .BitMaker(dest, l, r, exp, op)
 	
@@ -431,37 +434,33 @@ extend ASMState
 
 
 	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| l, |int| up, |int| down, |asmreg|)
-		if !l.reg
+		|| extra = 64-l.BitCount // handle extra bits.
+		up += extra
+		down += extra
+		if !l.reg or (up >= 64) or (!l.signed and down >= 64)
 			return .zeros(dest, exp)
 	
-		debugger, #!What about extra bits? like unsigned-shifting down a signed 32-int
-		#! Should also just assign zero if we shift too far.
-		|| fat = exp.BFLG(dest,  l,  up,  down,  l.signed|int|)
-		debugger
-		|| lll = l.Const
-		if l.Signed
-			fat.Const = (LLL << up)>>down
-		  else
-			fat.Const = (LLL|uint64| << up) >> down
-		return fat * dest
+		return exp.BFLG(dest,  l,  up,  down,  l.signed|int|) * dest
 
 
 	function Zeros (|asmreg| dest, |message| exp, |asmreg|)
-		return .BitOr(dest, asmreg(), asmreg(), exp)
-	
+		return .Assign(dest, asmreg(), exp)	
 	
 	function Assign (|asmreg| dest, |asmreg| L, |message| exp, |asmreg|)
-		if dest.µType isnt bool  or  l.µType is bool
+		if l.reg != dest.reg
 			return .BitOr(dest, l, asmreg(), exp)
-		if l.IsFloat									// sigh can this even happen?
-			error (Exp)									// I mean i can use cmpf?
-		return exp.CMPB(dest, L, asmreg(), 1) * dest
+		return dest		// hmmm... we are already there
 
 
 
-function int64.OperatorFits (|int| amount, |bool|)
+function int64.Fits (|int| amount, |bool| signed,  |bool|)
 	|| sh = 64 - amount
-	return ((self << sh) >> sh) == self
+	|| x = self << sh
+	if signed
+		x >>= sh
+	  else
+		x = self|uint64| >> sh
+	return x == self
 
 
 function asmreg.IsConst (|int64| val, |bool|)

@@ -9,7 +9,7 @@ class µFunc
 	|int|					Length
 	|bool|					OK
 
-	constructor (|scfunction| fn, |&FatASM| IR)
+	constructor (|SCFunction| fn, |&FatASM| IR)
 		.fn = fn
 		.IR = ir
 		fn.asm = self
@@ -33,11 +33,13 @@ class µFunc
 			|| fat = .ir+i
 			haslabel |= fat.jumpreg
 			fat.ASMIndex = rz - where
+//			check (fat.r[0] != 0) (fat.msg) // what about branch or other instructions?
+	
 			rz = fat.µrenderinto(rz, after)
 
 		if haslabel // could we do this in a bit smarter way? like a fat knows what points to it?
 			for i in self
-				|| r = i.jumpreg
+				|| r = i.JumpReg
 					i.FillLabelRequest(where, rz, r-1)
 
 

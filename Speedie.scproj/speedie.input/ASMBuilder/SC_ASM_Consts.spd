@@ -31,6 +31,8 @@ function fatasm.KNST_Encoder (Asm_encoder2)
 
 
 extend ASMState
+	// would be better if each scop... knew it's constifier
+	// then the ops themselves don't need to call this... just DoMath can
 	function MakeConst2 (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |fn_ASMConstifier| fn,  |asmreg|)
 		|| knst = .NumToFat(exp, 0, dest as asmreg.Textual)
 		(fn)(knst,l,r)

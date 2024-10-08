@@ -128,7 +128,7 @@ function Branch (|message| cond,  |asmreg| mode,  |&fatrange| range)
 	// if false2 --> leave to owner
 
 
-helper DoAndOr (|message| exp,  |ASMReg| Dest,  |opmode| Opp,    |ASMReg|)
+helper DoAndOr (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
 	opt norefcounts
 	|| A = exp.first!
 	|| B = exp.last!
@@ -151,9 +151,6 @@ helper DoAndOr (|message| exp,  |ASMReg| Dest,  |opmode| Opp,    |ASMReg|)
 	
 	if dest isnt CondRequest					// AAARGH
 		dest = .NumToReg(exp, 1-negate, dest)
-		#! this works for CONDITIONALS. What about values?
-		#! values... we could clear it first... run the first conditionally,
-		#! the second branch could just set the value? like a cmp?
 	
 	  elseif negate								// simplify logic a little.
 		(opp xor= OpMode.AndOr)
