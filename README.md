@@ -22,7 +22,7 @@
     * Expressive: When making tools with few lines of code
     * Cross Platform: Deploy GUI or shell apps on major platforms
 * Works natively with Jeebox... Learn how to use Jeebox!
-* Compiles via C++ for full-speed, or VM byte-code for portability.
+* Compiles via C++ for full-speed, or VM byte-code for portability. _(The VM is unfinished but is the main current focus of work.)_
 * Not controlled by big-tech.
 
 Speedie has been written as a passion project with a large amount of hacker mentality. And we are proud of this. Just love it or leave it.
