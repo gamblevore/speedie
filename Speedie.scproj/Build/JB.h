@@ -4370,13 +4370,13 @@ int64 JB_int64_Abs(int64 Self);
 
 bool SC_int64_CanStoreAsIntImmediate(int64 Self);
 
+bool SC_int64_Fits(int64 Self, int Amount, bool Signed);
+
 int64 JB_int64_Log2(int64 Self);
 
 Message* JB_int64_Msg(int64 Self);
 
 Message* SC_int64_MsgForConst(int64 Self, bool AllowShift);
-
-bool SC_int64_OperatorFits(int64 Self, int Amount);
 
 int64 JB_int64_OperatorMax(int64 Self, int64 D);
 

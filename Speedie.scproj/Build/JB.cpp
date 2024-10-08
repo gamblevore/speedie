@@ -3479,7 +3479,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1969]);
-	JB_FS_AppendInt32(_fsf0, (2024100616));
+	JB_FS_AppendInt32(_fsf0, (2024100820));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8948,7 +8948,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[848]);
-	JB_FS_AppendInt32(_fsf0, (2024100616));
+	JB_FS_AppendInt32(_fsf0, (2024100820));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -17272,6 +17272,18 @@ bool SC_int64_CanStoreAsIntImmediate(int64 Self) {
 	return ((Self << 50) >> 50) == Self;
 }
 
+bool SC_int64_Fits(int64 Self, int Amount, bool Signed) {
+	int Sh = 64 - Amount;
+	int64 X = Self << Sh;
+	iif (Signed) {
+		X = (X >> Sh);
+	}
+	 else {
+		X = (((uint64)Self) >> Sh);
+	}
+	return X == Self;
+}
+
 int64 JB_int64_Log2(int64 Self) {
 	return JB_u64_Log2(((uint64)Self));
 }
@@ -17297,11 +17309,6 @@ Message* SC_int64_MsgForConst(int64 Self, bool AllowShift) {
 	(JB_Tree_ObjSet(Op, SC_Opp__Lookup(Op)));
 	JB_Tree_SyntaxAppend(Rz, SC_NewDeclNum(nil, JB_int64_Log2(Self), JB_LUB[0], false));
 	return Rz;
-}
-
-bool SC_int64_OperatorFits(int64 Self, int Amount) {
-	int Sh = 64 - Amount;
-	return ((Self << Sh) >> Sh) == Self;
 }
 
 int64 JB_int64_OperatorMax(int64 Self, int64 D) {
@@ -22786,32 +22793,20 @@ uint64 SC_Pac_ASMPrmCollectNative(ASMState* Self, Message* Prms, SCFunction* Fn)
 }
 
 ASMReg SC_Pac_Assign(ASMState* Self, ASMReg Dest, ASMReg L, Message* Exp) {
-	iif ((!JB_TC_SyntaxIs(SC_Reg_xC2xB5Type(Dest), kJB__TC_bool)) or JB_TC_SyntaxIs(SC_Reg_xC2xB5Type(L), kJB__TC_bool)) {
+	iif (SC_Reg_Reg(L) != SC_Reg_Reg(Dest)) {
 		return SC_Pac_BitOr(Self, Dest, L, SC_Reg__New(), Exp);
 	}
-	iif (SC_Reg_IsFloat(L)) {
-		iif (true) {
-			JB_Msg_Fail(Exp, nil);
-		}
-	}
-	return SC_FAT_AsReg(JB_Msg_CMPB(Exp, Dest, L, SC_Reg__New(), 1), Dest);
+	return Dest;
 }
 
 ASMReg SC_Pac_BFLG_Const(ASMState* Self, Message* Exp, ASMReg Dest, ASMReg L, int Up, int Down) {
-	iif (!SC_Reg_Reg(L)) {
+	int Extra = 64 - SC_Reg_BitCount(L);
+	Up = (Up + Extra);
+	Down = (Down + Extra);
+	iif ((!SC_Reg_Reg(L)) or ((Up >= 64) or ((!SC_Reg_Signed(L)) and (Down >= 64)))) {
 		return SC_Pac_Zeros(Self, Dest, Exp);
 	}
-	//What about extra bits? like unsigned-shifting down a signed 32-int;
-	// Should also just assign zero if we shift too far.;
-	FatASM* Fat = JB_Msg_BFLG(Exp, Dest, L, Up, Down, ((int)SC_Reg_Signed(L)));
-	int64 Lll = SC_Reg_Const(L);
-	iif (SC_Reg_Signed(L)) {
-		Fat->Const = ((Lll << Up) >> Down);
-	}
-	 else {
-		Fat->Const = ((((uint64)Lll) << Up) >> Down);
-	}
-	return SC_FAT_AsReg(Fat, Dest);
+	return SC_FAT_AsReg(JB_Msg_BFLG(Exp, Dest, L, Up, Down, ((int)SC_Reg_Signed(L))), Dest);
 }
 
 ASMReg SC_Pac_BitAnd(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp) {
@@ -22826,7 +22821,7 @@ ASMReg SC_Pac_BitAnd(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* E
 
 ASMReg SC_Pac_BitMaker(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp, ASM Op) {
 	int64 K = SC_Reg_Const(R);
-	iif (SC_Reg_SyntaxIs(R, kSC__Reg_ConstAny) and SC_int64_OperatorFits(K, 9)) {
+	iif ((SC_Reg_SyntaxIs(R, kSC__Reg_ConstAny)) and SC_int64_Fits(K, 9, Op != kSC__ASM_BOR)) {
 		SC_Reg_NOP(R);
 		R = SC_Reg__New();
 	}
@@ -22873,6 +22868,12 @@ ASMReg SC_Pac_BitXor(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* E
 	}
 	iif (SC_Reg_Reg(L) == SC_Reg_Reg(R)) {
 		return SC_Pac_Zeros(Self, Dest, Exp);
+	}
+	iif (!SC_Reg_Reg(L)) {
+		return SC_Pac_Assign(Self, Dest, R, Exp);
+	}
+	iif (!SC_Reg_Reg(R)) {
+		return SC_Pac_Assign(Self, Dest, L, Exp);
 	}
 	return SC_Pac_BitMakerSwap(Self, Dest, L, R, Exp, kSC__ASM_BXOR);
 }
@@ -23008,9 +23009,6 @@ ASMReg SC_Pac_DoAndOr(ASMState* Self, Message* Exp, ASMReg Dest, OpMode Opp) {
 	}
 	iif (!SC_Reg_SyntaxIs(Dest, kSC__Reg_CondRequest)) {
 		Dest = SC_Pac_NumToReg(Self, Exp, 1 - Negate, Dest);
-		// this works for CONDITIONALS. What about values?;
-		// values... we could clear it first... run the first conditionally,;
-		// the second branch could just set the value? like a cmp?;
 	}
 	 else iif (Negate) {
 		Opp = (Opp ^ kSC__OpMode_AndOr);
@@ -23657,7 +23655,6 @@ ASMReg SC_Pac_SHR(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp)
 	iif (SC_Reg_SyntaxIs(R, kSC__Reg_ConstAny)) {
 		return SC_Pac_BFLG_Const(Self, Exp, Dest, L, 0, SC_Reg_NOP(R));
 	}
-	//What about extra bits? EG: (int32 >> x);
 	ASM_Shift Op = ((ASM_Shift)JB_Ternaryy(SC_Reg_Signed(L), kSC__ASM_BSHS, ((ASM_Shift)kSC__ASM_BSHR)));
 	return SC_Pac_BitMaker(Self, Dest, L, R, Exp, Op);
 }
@@ -23882,7 +23879,7 @@ ASMReg SC_Pac_While(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
 }
 
 ASMReg SC_Pac_Zeros(ASMState* Self, ASMReg Dest, Message* Exp) {
-	return SC_Pac_BitOr(Self, Dest, SC_Reg__New(), SC_Reg__New(), Exp);
+	return SC_Pac_Assign(Self, Dest, SC_Reg__New(), Exp);
 }
 
 ASMReg SC_Pac_xC2xB5Into(ASMState* Self, Message* Exp, ASMReg Dest) {
@@ -57574,4 +57571,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 1010603983478338086 7728624674782275410
+// -5695296437346895744 7728624674782275410
