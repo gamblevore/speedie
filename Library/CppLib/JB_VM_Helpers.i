@@ -14,6 +14,7 @@ extern "C" void* JB_ASM__Load (JB_StringC* S) {
 		MySelf = dlopen(NULL, RTLD_LAZY);
 		if (!MySelf) return 0;
 	}
+// we can't load funcs from the same C++ file (JB.cpp). Wierdly.
 	void* R = dlsym(MySelf, (const char*)(S->Addr));
 //	if (R)
 //		printf("// fn: %s\n", S->Addr);
@@ -31,27 +32,27 @@ AlwaysInline void DivMath(VMRegister* r, ASM Op) {
 	  case 0:
 		if (A) // on ARM, % does not come for free along with  /
 			   // so its better not to do % unless we explicitly need it.
-			r[A].Int = R3 % R4;
+			r[A].Int = R3 / R4;
 		if (B)
-			r[B].Int = R3 / R4;
+			r[B].Int = R3 % R4;
 		return;
 	  case 1:
 		if (A)
-			r[A].Int = (u64)R3 % (u64)R4;
+			r[A].Int = (u64)R3 / (u64)R4;
 		if (B)
-			r[B].Int = (u64)R3 / (u64)R4;
+			r[B].Int = (u64)R3 % (u64)R4;
 		return;
 	  case 2:
 		if (A)
-			r[A].Int = (int64)((int)R3 % (int)R4);
+			r[A].Int = (int64)((int)R3 / (int)R4);
 		if (B)
-			r[B].Int = (int64)((int)R3 / (int)R4);
+			r[B].Int = (int64)((int)R3 % (int)R4);
 		return;
 	  case 3:
 		if (A)
-			r[A].Int = (uint)R3 %(uint)R4;
+			r[A].Int = (uint)R3 /(uint)R4;
 		if (B)
-			r[B].Int = (uint)R3 /(uint)R4;
+			r[B].Int = (uint)R3 %(uint)R4;
 		return;
 	}
 }
@@ -172,10 +173,12 @@ AlwaysInline void SetRefRegToReg(VMRegister* r, ASM Op) {
 		JB_Incr(B);
 	if (RefSet_Moveu)
 		r[n1].Obj = B;
-	if (RefSet_Decru)
-		JB_SafeDecr_(A);
-	if (RefSet_Freeu)
-		JB_FreeIfDead(A);
+	if (A) {
+		if (RefSet_Decru)
+			JB_SafeDecr_(A);
+		if (RefSet_Freeu)
+			JB_FreeIfDead(A);
+	}
 }
 
 
@@ -540,6 +543,10 @@ void Nativeize(u64 data, Fn0 fn, VMRegister* r, int64 n);
 AlwaysInline void ForeignFunc (jb_vm& vv, ASM* CodePtr, VMRegister* r, ASM Op, u64 funcdata) {
 	auto T = ForeignFunc_Tableu;
 	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.Env.Cpp[T]);
-	Nativeize(funcdata, fn, r, n1);
+	if (fn)
+		return Nativeize(funcdata, fn, r, n1);
+	
+	debugger;
+	r[n1] = {}; // ugh
 }
 
