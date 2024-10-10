@@ -1,9 +1,5 @@
 
 
-// I think the order of whats happening is wrong?
-// It can't find the instructions or something?
-// Just step through the instruction lister thing and find out what is wrong.
-
 module VM_Builder {
 |[message]| 	NameList
 |message|   	ModuleArg
@@ -41,13 +37,14 @@ function FillTypePrm (|string| fname, |int| pname)
 
 
 function FinishAcc 
-	opt norefcounts
+	opt NoRefCounts
 	|| s = .dt_prm
-		|int| X = .xtype
-			s.AppendMacro(vm_builder.double_rizzler, [x.msg])
-		  else
-			s.AppendMacro(vm_builder.rizzler)
-	.xtype = 0
+		|int| X = .XType
+			Macro.TmpPrms_ <~ x.msg
+		|macro--| M = (VM_Builder.double_rizzler, VM_Builder.rizzler)(x)
+		s.AppendMacro(M, macro.TmpPrms_)
+		macro.TmpPrms_.clear
+	.XType = 0
 
 
 function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max, |int|)

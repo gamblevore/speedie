@@ -457,11 +457,17 @@ extend ASMState
 		return .BitMaker(dest, l, r, exp, asm.bshl)
 
 
-	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |asmreg|)
-		|| extra = 64-src.BitCount // handle extra bits.
+	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| Src, |uint| up, |uint| down, |asmreg|)
+		|uint| srcbits = src.BitCount
+		if up > srcbits or down > srcbits			// wierd?
+			problem (exp, "Shift too far")
+		if !up and !down
+			return .assign(dest, src, exp)
+		
+		|| extra = 64 - srcBits // handle extra bits.
 		up += extra
 		down += extra
-		if !src.reg or (up >= 64) or (!src.signed and down >= 64)
+		if  !src.reg  or  (up >= 64)  or  (!src.signed and down >= 64)
 			return .zeros(dest, exp)
 	
 		return exp.BFLG(dest,  src,  up,  down,  src.signed|int|) * dest
@@ -469,6 +475,7 @@ extend ASMState
 
 	function Zeros (|asmreg| dest, |message| exp, |asmreg|)
 		return .Assign(dest, asmreg(), exp)	
+	
 	
 	function Assign (|asmreg| dest, |asmreg| L, |message| exp, |asmreg|)
 		if l.reg != dest.reg

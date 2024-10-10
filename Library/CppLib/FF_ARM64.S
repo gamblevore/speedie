@@ -7,127 +7,129 @@
 
 
 #ifdef __realarm64__
-/*** Nativeize(u64 data, Fn0 fn, Register* Dest, int n) ***/
-.text
-.global _Nativeize
-.align 4
+	/*** Nativeize(u64 DATA, void* FN, Register* R, int n) ***/
+	.text
+	.global _Nativeize
+	.align 4
 
-_Nativeize:								
-	r		.req x15
-	fli		.req x14
-	flj		.req x13
-	dest	.req x12
-	fn		.req x11
-	data	.req x10
-	j1		.req x8
-	j2		.req x9
-	// fp   .req x29 // where our stack starts from
-	// lr   .req x30 // where we go back to
-	// sp   .req x31 // (but requires refering to it as sp... I guess it takes another bit)
-	
-	
-	//    (... prm4, prm3, prm2, prm1, prm0,) floats ints
-	lsr     data, x0, 12			// data  = DATA>>12
-	adr		flj, .floats
-	adr		fli, .ints
-	mov     fn,  x1					// fn    = FN
-	mov     r, x2					// r     = R
-	add     dest, r, x3, lsl 4		// dest  = r+n 
-	ubfx    j1,  x0, 6, 5			// j2    = (DATA>>6)&31
-	and     j2,  x0, 63			    // j1    = DATA&63
-	add		j1,  j1, j1, lsl 1		// j1    = j1*3
-	add		j2,  j2, j2, lsl 1		// j2    = j2*3
-	add		j1,  flj, j1, lsl 2		// j1 adapt
-	add		j2,  fli, j2, lsl 2		// j2 adapt
-	br		j1 // jump
+	_Nativeize:								
+		r		.req x15
+		inj		.req x14
+		flj		.req x13
+		dest	.req x12
+		fn		.req x11
+		data	.req x10
+		j8		.req x8
+		j9		.req x9
 
-.floats:
-	lsr     x7, data, 35				// float-7
-	ubfiz   x7, x7, 4, 5
-	ldr     q7, [r, x7]
-		
-	lsr     x6, data, 30				// float-6
-	ubfiz   x6, x6, 4, 5
-	ldr     q6, [r, x6]
-		
-	lsr     x5, data, 25				// float-5
-	ubfiz   x5, x5, 4, 5
-	ldr     q5, [r, x5]
-		
-	lsr     x4, data, 20				// float-4
-	ubfiz   x4, x4, 4, 5
-	ldr     q4, [r, x4]
-		
-	lsr     x3, data, 15				// float-3
-	ubfiz   x3, x3, 4, 5
-	ldr     q3, [r, x3]
-		
-	lsr     x2, data, 10				// float-2
-	ubfiz   x2, x2, 4, 5
-	ldr     q2, [r, x2]
-		
-	lsr     x1, data,  5				// float-1
-	ubfiz   x1, x1, 4, 5
-	ldr     q1, [r, x1]
-	
-	lsr     x0, data, 0					// float-0
-	ubfiz   x0, x0, 4, 5
-	ldr     q0, [r, x0]	
+		lsr     data, x0, 12			// data  = DATA>>12
+		adr		flj, .floats
+		adr		inj, .ints
+		mov     fn,  x1					// fn    = FN
+		mov     r,   x2					// r     = R
+		add     dest, r, x3, lsl 4		// dest  = R+n 
+		ubfx    j8,  x0,  6,  5			// j8    = (DATA>>6)&31
+		and     j9,  x0,  63		    // j9    = DATA&63
+		add		j8,  j8,  j8, lsl 1		// j8    = j8*3
+		add		j9,  j9,  j9, lsl 1		// j9    = j9*3
+		add		j8,  flj, j8, lsl 2		// j8 adapt
+		add		j9,  inj, j9, lsl 2		// j9 adapt
+		br		j8 // jump
 
-	br j2
-	br j2
-	br j2
+	.floats:
+											// float-7
+		ubfiz   x7, data, 4, 5				// x7 = (data&31) << 4
+		lsr     data, data,  5				// data = data >> 5
+		ldr     q7,  [r, x7]				// q7 = r[x7]
 
-.ints:
-	lsr     x7, data, 35				// int-7
-	ubfiz   x7, x7, 4, 5
-	ldr     x7, [r, x7]
-		
-	lsr     x6, data, 30				// int-6
-	ubfiz   x6, x6, 4, 5
-	ldr     x6, [r, x6]
-		
-	lsr     x5, data, 25				// int-5
-	ubfiz   x5, x5, 4, 5
-	ldr     x5, [r, x5]
-		
-	lsr     x4, data, 20				// int-4
-	ubfiz   x4, x4, 4, 5
-	ldr     x4, [r, x4]
-		
-	lsr     x3, data, 15				// int-3
-	ubfiz   x3, x3, 4, 5
-	ldr     x3, [r, x3]
-		
-	lsr     x2, data, 10				// int-2
-	ubfiz   x2, x2, 4, 5
-	ldr     x2, [r, x2]
-		
-	lsr     x1, data,  5				// int-1
-	ubfiz   x1, x1, 4, 5
-	ldr     x1, [r, x1]
-	
-	lsr     x0, data, 0					// int-0
-	ubfiz   x0, x0, 4, 5
-	ldr     x0, [r, x0]	
-	
-	stp     dest, lr, [sp, -16]!		// save dest and lr 
-	mov     fp, sp						// fp = sp
+		ubfiz   x6, data, 4, 5				// float-6
+		lsr     data, data,  5	
+		ldr     q6,  [r, x6]		
 
-// branch
-	tbnz    data, 11, .SIMD_Return
+		ubfiz   x5, data, 4, 5				// float-5
+		lsr     data, data,  5	
+		ldr     q5,  [r, x5]		
 
-.Int_Return:
-	blr     fn							// call fn... so we can store in x0
-    ldp     dest, lr, [sp], 16			// restore some shit
-	str     x0, [dest]
-	ret
-	
-.SIMD_Return:
-	blr     fn							// call fn, so we can store in q0
-    ldp     dest, lr, [sp], 16			// restore some shit
-	str     q0, [dest]
-	ret
+		ubfiz   x4, data, 4, 5				// float-4
+		lsr     data, data,  5	
+		ldr     q4,  [r, x4]		
+
+		ubfiz   x3, data, 4, 5				// float-3
+		lsr     data, data,  5	
+		ldr     q3,  [r, x3]		
+
+		ubfiz   x2, data, 4, 5				// float-2
+		lsr     data, data,  5	
+		ldr     q2,  [r, x2]		
+
+		ubfiz   x1, data, 4, 5				// float-1
+		lsr     data, data,  5	
+		ldr     q1,  [r, x1]		
+
+		ubfiz   x0, data, 4, 5				// float-0
+		lsr     data, data,  5	
+		ldr     q0,  [r, x0]		
+
+		br j9
+		br j9
+		br j9
+
+	.ints:
+											// int-7
+		ubfiz   x7, data, 4, 5				// x7 = (data&31) << 4
+		lsr     data, data,  5				// data = data >> 5
+		ldr     x7,  [r, x7]				// x7 = r[x7]
+			
+		ubfiz   x6, data, 4, 5				// int-6
+		lsr     data, data,  5
+		ldr     x6,  [r, x6]
+			
+		ubfiz   x5, data, 4, 5				// int-5
+		lsr     data, data,  5
+		ldr     x5,  [r, x5]
+			
+		ubfiz   x4, data, 4, 5				// int-4
+		lsr     data, data,  5
+		ldr     x4,  [r, x4]
+			
+		ubfiz   x3, data, 4, 5				// int-3
+		lsr     data, data,  5
+		ldr     x3,  [r, x3]
+			
+		ubfiz   x2, data, 4, 5				// int-2
+		lsr     data, data,  5
+		ldr     x2,  [r, x2]
+			
+		ubfiz   x1, data, 4, 5				// int-1
+		lsr     data, data,  5
+		ldr     x1,  [r, x1]
+		
+		ubfiz   x0, data, 4, 5				// int-0
+		ldr     x0,  [r, x0]
+		
+			// **STACK MANAGEMENT HERE**
+		stp     fp, lr, [sp, -32]!			// save fp and lr 
+		mov     fp, sp						// fp = sp
+		stp     dest, xzr, [sp, 16]
+
+	// branch
+		tbnz    data, 11, .SIMD_Return
+
+	.Int_Return:
+		blr     fn							// call fn... so we can store in x0
+		ldp     dest, xzr, [sp, 16]
+		ldp     fp, lr, [sp], 32			// restore fp/lr
+
+		str     x0, [dest]
+		ret
+		
+	.SIMD_Return:
+		blr     fn							// call fn, so we can store in q0
+		ldp     dest, xzr, [sp, 16]
+		ldp     fp, lr, [sp], 32			// restore fp/lr
+		
+		str     q0, [dest]
+		ret
 
 /*** END OF CODE 😭 ***/
 

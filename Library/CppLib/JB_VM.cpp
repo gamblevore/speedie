@@ -61,7 +61,7 @@ ivec4* RunVM (jb_vm& pvm) {		// vm_run, vm__run, vmrun, run_vm
     RegVar(Op,  r22) = (ASM)-1;
     RegVar(JumpTable, r23) = jumptable;
 
-	VMStack& Stack = vm.Registers[0].Stack;
+	RegVar(& Stack, r24) = vm.Registers[0].Stack;
 	Stack.Code = &vm.EXIT[0];
 	Stack.SavedReg = 0;
 	Stack.Alloc = VMGuardValue;		  	// Env.AllocCurr gets set to this on exit. // Quite harmless

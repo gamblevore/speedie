@@ -186,7 +186,6 @@ struct ASMState
 function SCFunction.HasCVersion (|bool|)
 	if .isstdlib
 		return true
-	
 	require self is wrapper
 
 	if .IsCppInBuilt == 1	// cpp_inbuilt. These normally have no address? but perhaps we made a wrapper for it in the exec? we should check if it still exists.
@@ -204,27 +203,34 @@ function SCFunction.HasCVersion (|bool|)
 	return true
 
 
+
 function ASMState.PrmCollectNative (|message| prms, |SCFunction| fn, |uint64|)
+	// we need to do ints last, and also collect these backwards.
 	opt norefcounts
 	|| sh = 0
 	|| fc = 0
 	|| ic = 0
-	for Float in 2
+	|| n = fn.args.Length
+	for Ints in 2
 		|| p = prms.first
-		for FnArg in fn.args
-			if FnArg.SpecialRegs|int| == Float
+		for i.down in n
+			|| FnArg = fn.args[i]
+			if FnArg.SpecialRegs|int| != Ints
 				|| v = .FuncPrm(p!, FnArg).reg
 				rz  |=  v << sh
 				sh += 5
-				fc += float
-				ic += !float
+				ic += ints
+				fc += !ints
 			p++
 	
 	if fc>8 or ic>8			// hmmm
 	rz <<= 12
 	rz |= fn.ReturnType.SpecialRegs << 11
-	rz |= (8-fc) << 6
-	rz |= (8-ic) << 0
+	if fc
+		rz |= (8-fc) << 6
+		rz |= (8-ic) << 0
+	  else
+		rz |= (17-ic) << 6
 
 
 function ASMState.PrmCollect (|message| prms, |scfunction| fn, |bool| native,  |uint64|)
