@@ -2,11 +2,11 @@
 	if (u2 == u1 and u3 == u4) 
 	VMFinish
 ;
-ı FUNK: 
+ı FNC: 
 	__;
 	Code = BumpStack(vm, r, Code + 1, Op, *Code);
 	___;
-ı FUNK3: 
+ı FNC3: 
 	__;
 	Code = BumpStack(vm, r, Code + 2, Op, Code64);
 	___;

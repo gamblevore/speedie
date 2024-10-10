@@ -61,7 +61,7 @@ extend ASMState
 		x.reg = pos
 		.info = x
 		|| f = .form
-			|| j = f.jumpreg // remove jumpreg and use forms count
+			|| j = f.RegForJump // remove jumpreg and use forms count
 				if j != pos + 1 // what?
 			.jumpreg = j
 		

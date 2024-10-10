@@ -86,22 +86,23 @@ extend ASMState
 	// MATH 
 	function QuickFloat32Plus    (fn_OpASM)
 		if  r is constany // a + 1,   a - 1
-			|| QQ = .QuickFloatPlus32Sub(dest, l, r, exp)
+			|| QQ = .QuickFloatPlusConstSub(dest, l, r, exp)
 				return qq
 		if  l is constany  and  l isnt Alternate   // 1 + a --> a + 1
-			|| QQ = .QuickFloatPlus32Sub(dest, r asnt asmreg.alternate, l, exp)
-				return qq
+			return .QuickFloatPlusConstSub(dest, r asnt asmreg.alternate, l, exp)
 	
 			
-	function QuickFloatPlus32Sub    (fn_OpASM)
+	function QuickFloatPlusConstSub    (fn_OpASM)
 		|| k = r.Const|uint64|
 		k ^= (l is Alternate)<<31
 		require (k >> 18) << 18 == k
 		r.nop
 		return exp.FADK(dest, l, k) * Dest
 
+
 	function message.DivByZero
 		problem (self, "Divide by zero???")	
+
 
 	function QuickFloatDiv    (fn_OpASM)
 		require r is ConstAny
@@ -182,20 +183,30 @@ extend ASMState
 		return 1
 	
 
-	function PlusInt     (fn_opasm)
+	function AddOrSubtractInt     (fn_opasm)
 		//		a - 1,		a + 1		//
 		//		1 - a,		1 + a		//
 		if dest is ConstAny // perhaps we can do this in domathsub?
 			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyIntPlus)
+
+		if l.reg == r.reg // shift
+			if l is Alternate
+				return .zeros(dest, exp)
+			  else
+				return .BFLG_Const(exp, dest, l, 1, 0) // shift up
+
 		|| swapped = 0
-		if  l.LeftScore < r.LeftScore
+		if  l.LeftScore < r.LeftScore // put consts into R
 			if l is alternate
 				target debug
 					if r.µtype.IsPointer				// 1 - ptr??? we blocked this already.
-			  else // what about the exp?
+			  else
 				swapped = 1
 				swap (l) (r) // a+b == b+a
-
+	
+		if !r.reg // add or subtract zero
+			return .Assign(dest, l, exp)
+		
 	
 		|| lmul = l.PointerMul(exp, swapped)
 		if r is ConstAny
@@ -253,7 +264,7 @@ extend ASMState
 		if !l.reg and (l isnt alternate)
 			return r
 		if l.isint
-			return .PlusInt(dest, l, r, exp)
+			return .AddOrSubtractInt(dest, l, r, exp)
 		return .FloatPlus(dest, l, r, exp)
 
 
@@ -303,12 +314,14 @@ extend ASMState
 	
 
 	function Divide (fn_opasm)
+		if r.reg == l.reg											// return 1
+			return .SelfDivide(dest, exp)
 		if dest.isint
 			return .DivInt(dest, l, r, exp)
-		return .FloatDiv(dest, l, r, exp)
+		return .DivFloat(dest, l, r, exp)
 
 
-	function FloatDiv    (fn_opasm)
+	function DivFloat    (fn_opasm)
 		if (dest is ConstAny) and (l isnt alternate)
 			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyFloatDiv)
 		rz = .QuickFloatDiv(dest, L, R, exp)
@@ -316,15 +329,23 @@ extend ASMState
 			rz = exp.FDIV(dest,  L,  R,  asmreg(), dest.isbig|int|) * dest
 
 
+	function SelfDivide (|asmreg| dest, |message| exp, |asmreg|)
+		if dest.IsInt
+			return .NumToReg(exp, 1, dest) // x/x=1
+		if !dest.Isbig
+			return .NumToReg(exp, 0x3f800000 /*1.0*/, dest)
+		return .NumToReg(exp, 0x3ff0000000000000 /*1.0 double*/, dest)
+		
+
 	function QuickIntDiv    (fn_opasm)
 		|| PToi = .IntPowerOftwo(r)
-			if ptoi <= 1   //   x/1  x/0  x/-1
+			if ptoi <= 1											//   x/1  x/0  x/-1
 				if ptoi == 0
 					exp.DivByZero
 				return .Quick1Or1Sub(dest, l, ptoi, exp)
 			if !l.Signed
 				return exp.BFLG(dest, l, 0, ptoi-1, 0) * Dest		// u / 2 --> u >> 1
-			return exp.DIV2(dest, l, ptoi-1, ptoi-1) * Dest		// nice
+			return exp.DIV2(dest, l, ptoi-1, ptoi-1) * Dest			// nice
 	
 	
 	function DivInt    (fn_opasm)
@@ -340,8 +361,7 @@ extend ASMState
 			return .MakeConst2(dest, L, R, exp, &fatasm.Constifyfloatmod)
 		|| big = dest.IsBig|int|
 		exp.fdiv(dest, asmreg(), L, R, big)
-		|| fat = exp.FFRC(dest, asmreg(), dest, R, big)
-		return fat * dest
+		return exp.FFRC(dest, asmreg(), dest, R, big) * dest
 	
 	
 	function ModInt    (fn_opasm)
@@ -381,8 +401,8 @@ extend ASMState
 	function BitOr (fn_opasm)
 		if dest is ConstAny
 			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyBitOr)
-		if l.IsConst(-1)
-			return .Assign(dest, L, exp)
+		if (l.reg == r.reg) or l.IsConst(-1)
+			return .Assign(dest, l, exp)
 		if r.IsConst(-1)
 			return .Assign(dest, R, exp)
 		return .BitMakerSwap(dest, l, r, exp, asm.bor)
@@ -391,6 +411,10 @@ extend ASMState
 	function BitAnd (fn_opasm)		
 		if dest is constany
 			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyBitAnd)
+		if (l.reg == r.reg) or r.IsConst(-1)
+			return .Assign(dest, l, exp)
+		if l.IsConst(-1)
+			return .Assign(dest, r, exp)
 		if l.IsConst(0) or r.IsConst(0)
 			return .Zeros(dest, exp)
 		return .BitMakerSwap(dest, l, r, exp, asm.band)
@@ -433,14 +457,14 @@ extend ASMState
 		return .BitMaker(dest, l, r, exp, asm.bshl)
 
 
-	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| l, |int| up, |int| down, |asmreg|)
-		|| extra = 64-l.BitCount // handle extra bits.
+	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |asmreg|)
+		|| extra = 64-src.BitCount // handle extra bits.
 		up += extra
 		down += extra
-		if !l.reg or (up >= 64) or (!l.signed and down >= 64)
+		if !src.reg or (up >= 64) or (!src.signed and down >= 64)
 			return .zeros(dest, exp)
 	
-		return exp.BFLG(dest,  l,  up,  down,  l.signed|int|) * dest
+		return exp.BFLG(dest,  src,  up,  down,  src.signed|int|) * dest
 
 
 	function Zeros (|asmreg| dest, |message| exp, |asmreg|)

@@ -176,8 +176,9 @@ class SCDecl (SCNamed) {
 	function IsRegister (|bool|)
 		return (self is local) and !(.IsBareStruct or .IsCArray)
 	
-	function ASMUseSpecialRegs (|bool|)
+	function SpecialRegs (|bool|)
 		return self and !.ASMUseIntRegs
+	
 	function ASMUseIntRegs (|bool|)
 		if !.isverynormal // pointers, bascially, are ints
 			return true

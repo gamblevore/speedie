@@ -12,11 +12,12 @@ module VM_Builder {
 |message|		dt_prm
 |string|		parent
 |int| 			Total
+|byte| 			XType
 |byte|			NormalPos = 0
 |uint|			FreeMultiASM = ~1
 
 
-function DefineGetSub (|string| fname,  |int| up,  |int| down, |byte| c, |byte| c2)
+function DefineGetSub (|string| fname,  |int| up,  |int| down,  |byte| c,  |byte| c2)
 	.form_h <~ "
 #define   ${fname}${c}       (((${c2}int)((Op)<<$down))>>$Up)
 #define   ${fname}${c}_(x)   (((${c2}int)((x)<<$down))>>$Up)
@@ -30,19 +31,23 @@ function DefineGet (|string| fname,  |int| up,  |int| down, |bool| last, |messag
 	arr <~ @thg + fname
 	arr <~ up.msg
 	arr <~ down.msg
-	return macros.ASMSetter.run(arr)
+	return Ugh.run(arr)
 
 
 // we need to create an array of forms...
 function FillTypePrm (|string| fname, |int| pname)
 	|| prop = @thg + fname
-	.dt_prm <~ macros.ASMcopier.run(prop, pname.msg)
+	.dt_prm <~ Ooof.run(prop, pname.msg)
 
 
 function FinishAcc 
 	opt norefcounts
 	|| s = .dt_prm
-		s.AppendMacro(vm_builder.rizzler)
+		|int| X = .xtype
+			s.AppendMacro(vm_builder.double_rizzler, [x.msg])
+		  else
+			s.AppendMacro(vm_builder.rizzler)
+	.xtype = 0
 
 
 function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max, |int|)
@@ -53,7 +58,8 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max, |int|)
 		|| f = line.NeedFirst$
 		|| f0 = f.name[]
 		if f0 == 'x' and bit_pos == 32 // x means an extra 4 bytes of values. like 8-byte ASM.
-			return bit_pos
+			.XType = pname
+			return int.max
 		if f0 == 'r' or 'R'
 			.FillTypePrm(line.name, pname)
 			return 5+bit_pos
@@ -121,13 +127,14 @@ function GenerateOne (|message| form_msg, |int| f)
 	|| bit_pos = 8
 	|| p   = -1
 	|| arg = form_msg[@arg,-1]							#require
-	|| Max = 32
-	
+		
 	for l in arg
-		bit_pos = .GenAcc(l, bit_pos, ++p, max)
+		bit_pos = .GenAcc(l, bit_pos, ++p, 32)
+		if bit_pos > 32
+			exit
 	
-	if bit_pos < max and p < 5
-		.GenAcc(nil, bit_pos, 5, max)
+	if bit_pos < 32 and p < 5
+		.GenAcc(nil, bit_pos, 5, 32)
 	.FinishAcc
 	.form_h <~ '\n'
 
@@ -224,7 +231,7 @@ function Clean   (|message| msg)
 				ch.name = "|"
 
 
-function BadEncoder (ASM_Encoder2)
+function BadEncoder (ASM_Encoder)
 	debugger
 
 
@@ -341,7 +348,7 @@ function VM_MakeInstructionSub (|message| tmp,  |int| Ask,  |[message]?| Actuall
 				.AddµOp(tmp.name+(extra+1).render, X)
 
 
-function OKBoomer (|message| tmp,  |int| x,  |asm_encoder2| formenc,  |array?| R,  |bool|)
+function OKBoomer (|message| tmp,  |int| x,  |asm_encoder| formenc,  |array?| R,  |bool|)
 	check (!asm.encoders[x]) (tmp, "ASM clash?") 
 	asm.Encoders[x] = FormEnc
 	if R != nil
@@ -392,16 +399,31 @@ function µparam.Which (|macro!--|)
 
 || icecream = `function message._0 (|&fatasm|) {
 	visible
-//	|| outputs = 0
 	rz = asmstate.sh.syntaxappend(asm._0, self)
 }`.macro
 
 
 || rizzler = "
-if (curr < after) // remove the test for curr!=nil...
+if curr < after		// remove the test for curr!=nil...
 	curr++[] = rz 
 return curr
 ".macro
+
+|| double_rizzler = "
+if curr < after+2
+	curr++[] = rz 
+	curr++[] = .r[_0]
+	|| p2 = .r[_0+1]
+	if p2
+		curr++[] = p2
+	
+return curr
+".macro
+
+|macro|     Ooof  = `rz._0 = .r[_1]`.macro
+
+|macro|		Ugh = `function asm._0 (assigns:|uint|, |asm|): return self ||| ((value << _1) >> _2)`.macro
+
 || ohio    = "if (((_0<<_1)>>_1) != _0): error (self, `Jumped too far`)".macro
 
 || gyatt   = "rz.jumpinput(_0) = _1".macro
@@ -413,7 +435,7 @@ return curr
 
 || ASM_Datatype = "datatype _0 (ASM) 
 	module
-		function Encode (ASM_Encoder2,)
+		function Encode (ASM_Encoder,)
 			visible true
 			|asm| rz = .op << 24
 		

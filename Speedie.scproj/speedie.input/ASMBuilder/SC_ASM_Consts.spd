@@ -1,10 +1,10 @@
 
 
-function fatasm.NOOP_Encoder (Asm_encoder2)
+function fatasm.NOOP_Encoder (Asm_encoder)
 	curr[] = asm.noop << 24
 	return curr
 
-function fatasm.KNST_Encoder (Asm_encoder2)
+function fatasm.KNST_Encoder (Asm_encoder)
 	if curr >= after-2
 		return curr
 	|| v = .const

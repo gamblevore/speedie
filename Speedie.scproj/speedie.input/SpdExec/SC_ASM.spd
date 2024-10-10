@@ -43,10 +43,10 @@ datatype ASM (uint)
 
 	module
 		|byte|					NoisyASM = 1
-		|asm_encoder2[128]|		Forms
-		|asm_encoder2[256]| 	Encoders
+		|asm_encoder[128]|		Forms
+		|asm_encoder[256]|		Encoders
 
 
-	
-prototype ASM_Encoder2  (|&FatASM| self, |!&asm| Curr, |!&asm| After,  |int64| ExtraInfo=0,  |&asm|)
+
+prototype ASM_Encoder  (|&FatASM| self, |!&asm| Curr, |!&asm| After,  |int64| ExtraInfo=0,  |&asm|)
 

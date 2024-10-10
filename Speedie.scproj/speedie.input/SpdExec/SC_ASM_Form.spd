@@ -11,7 +11,7 @@ class µForm
 	|int|			TotalBits
 	|int| 			Outputs
 	|int|			Index
-	|int|			JumpReg // remove jumpreg and use forms count
+	|int|			RegForJump // remove jumpreg and use forms count
 	
 	
 	render
@@ -42,8 +42,8 @@ class µForm
 		p |= size - 1
 		.params[i] = p
 		if p is jump
-			if .jumpreg // what?
-			.jumpreg = i+1
+			if .RegForJump // what?
+			.RegForJump = i+1
 			
 
 	syntax Access (|int| i, |µParam|)

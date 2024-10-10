@@ -15,8 +15,8 @@ extern "C" void* JB_ASM__Load (JB_StringC* S) {
 		if (!MySelf) return 0;
 	}
 	void* R = dlsym(MySelf, (const char*)(S->Addr));
-	if (R)
-		printf("// fn: %s\n", S->Addr);
+//	if (R)
+//		printf("// fn: %s\n", S->Addr);
 	return R;
 }
 
@@ -535,14 +535,11 @@ Speedie's function histogram:  0:410,  1:1656,  2:1464,  3: 713,  4: 167,  5:  6
 
 
 
-void Nativeize(u64 data, Fn0 fn, VMRegister* r);
-void ReadGreenRegs(u64* From);
-void StoreGreenRegs(u64* From);
-
+void Nativeize(u64 data, Fn0 fn, VMRegister* r, int64 n);
 
 AlwaysInline void ForeignFunc (jb_vm& vv, ASM* CodePtr, VMRegister* r, ASM Op, u64 funcdata) {
 	auto T = ForeignFunc_Tableu;
 	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.Env.Cpp[T]);
-	Nativeize(funcdata, fn, r+n1);
+	Nativeize(funcdata, fn, r, n1);
 }
 

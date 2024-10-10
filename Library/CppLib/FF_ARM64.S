@@ -7,59 +7,41 @@
 
 
 #ifdef __realarm64__
-
-
-/*** StoreGreenRegs (u64* At) ***/
-.text
-.global _StoreGreenRegs
-.align 4
-
-_StoreGreenRegs:						// (u64 data, Fn0 fn, Register* r)
-	stp     x19, x20, [x0]
-	ret
-	
-
-
-/*** ReadGreenRegs (u64* From) ***/
-.text
-.global _ReadGreenRegs
-.align 4
-
-_ReadGreenRegs:
-	ldp     x19, x20, [x0]
-	ret
-
-
-
-/*** Nativeize(u64 data, Fn0 fn, Register* r) ***/
+/*** Nativeize(u64 data, Fn0 fn, Register* Dest, int n) ***/
 .text
 .global _Nativeize
 .align 4
 
 _Nativeize:								
+	r		.req x15
 	fli		.req x14
 	flj		.req x13
-	r		.req x12
+	dest	.req x12
 	fn		.req x11
 	data	.req x10
 	j1		.req x8
 	j2		.req x9
+	// fp   .req x29 // where our stack starts from
+	// lr   .req x30 // where we go back to
+	// sp   .req x31 // (but requires refering to it as sp... I guess it takes another bit)
+	
 	
 	//    (... prm4, prm3, prm2, prm1, prm0,) floats ints
 	lsr     data, x0, 12			// data  = DATA>>12
-	adr		flj,  floats
-	adr		fli,  ints
+	adr		flj, .floats
+	adr		fli, .ints
 	mov     fn,  x1					// fn    = FN
-	mov     r,   x2					// r     = R
-	and     j1,  x0, 15			    // j1    = DATA&15
-	ubfx    j2,  x0, 4, 4			// j2    = (DATA>>4)&15
+	mov     r, x2					// r     = R
+	add     dest, r, x3, lsl 4		// dest  = r+n 
+	ubfx    j1,  x0, 6, 5			// j2    = (DATA>>6)&31
+	and     j2,  x0, 63			    // j1    = DATA&63
 	add		j1,  j1, j1, lsl 1		// j1    = j1*3
 	add		j2,  j2, j2, lsl 1		// j2    = j2*3
-	add		j1,  flj, j1			// j1 adapt
-	add		j2,  fli, j2			// j2 adapt
+	add		j1,  flj, j1, lsl 2		// j1 adapt
+	add		j2,  fli, j2, lsl 2		// j2 adapt
 	br		j1 // jump
-floats:
-	
+
+.floats:
 	lsr     x7, data, 35				// float-7
 	ubfiz   x7, x7, 4, 5
 	ldr     q7, [r, x7]
@@ -85,7 +67,7 @@ floats:
 	ldr     q2, [r, x2]
 		
 	lsr     x1, data,  5				// float-1
-	ubfiz   x1, x2, 4, 5
+	ubfiz   x1, x1, 4, 5
 	ldr     q1, [r, x1]
 	
 	lsr     x0, data, 0					// float-0
@@ -93,9 +75,10 @@ floats:
 	ldr     q0, [r, x0]	
 
 	br j2
+	br j2
+	br j2
 
-ints:
-	
+.ints:
 	lsr     x7, data, 35				// int-7
 	ubfiz   x7, x7, 4, 5
 	ldr     x7, [r, x7]
@@ -121,30 +104,33 @@ ints:
 	ldr     x2, [r, x2]
 		
 	lsr     x1, data,  5				// int-1
-	ubfiz   x1, x2, 4, 5
+	ubfiz   x1, x1, 4, 5
 	ldr     x1, [r, x1]
 	
 	lsr     x0, data, 0					// int-0
 	ubfiz   x0, x0, 4, 5
 	ldr     x0, [r, x0]	
 	
-	// how to save funcdata
-	// we need to save r and data. Could we store a bit in r
-	stp     fp, lr, [sp, -16]!			// save fp and lr 
-	mov     fp, sp						// update fp with sp?
-       
-	blr     fn							// call fn!!
-    ldp     fp, lr, [sp], 16			// restore some shit
-    
-	tbz     data, 8, SIMDReturn
-	str     x0, [r]
-	ret
-SIMDReturn:
-	str     q0, [r]
+	stp     dest, lr, [sp, -16]!		// save dest and lr 
+	mov     fp, sp						// fp = sp
+
+// branch
+	tbnz    data, 11, .SIMD_Return
+
+.Int_Return:
+	blr     fn							// call fn... so we can store in x0
+    ldp     dest, lr, [sp], 16			// restore some shit
+	str     x0, [dest]
 	ret
 	
-	
+.SIMD_Return:
+	blr     fn							// call fn, so we can store in q0
+    ldp     dest, lr, [sp], 16			// restore some shit
+	str     q0, [dest]
+	ret
+
 /*** END OF CODE 😭 ***/
+
 
 #endif
 
@@ -163,8 +149,8 @@ SIMDReturn:
 	
 	The save-count has no type.
 */
-/*
 
+/*
 Observations so far:
  	* Use godbolt.org... its simpler than understanding the documentation. (The docs seem wrong too)
 	* ARM x17 is the highest register I can freely alter

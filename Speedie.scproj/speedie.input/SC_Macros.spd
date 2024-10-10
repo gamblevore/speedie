@@ -41,8 +41,6 @@ while __ArgCurr < __ArgCount
 || MainArgNoNE = `
 	check (__ArgCount <= _0) ("Unexpected argument: " + app.args[_0]!)
 `.macro
-|macro|     ASMCopier  = `rz._0 = .r[_1]`.macro
-|macro|		ASMSetter = `function asm._0 (assigns:|uint|, |asm|): return self ||| ((value << _1) >> _2)`.macro
 }
 
 

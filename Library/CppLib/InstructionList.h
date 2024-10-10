@@ -1,6 +1,6 @@
 &&EROR,
-&&FUNK,
-&&FUNK3,
+&&FNC,
+&&FNC3,
 &&EROR,
 &&KNST,
 &&KNST2,

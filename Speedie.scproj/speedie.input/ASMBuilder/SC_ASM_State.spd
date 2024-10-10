@@ -17,14 +17,7 @@ struct ASMState
 	|&FatASM|					Curr    
 	|&FatASM|					End    
 	|FATASM| 					Zero
-
 // constants...
-//	|uint|						VAvail
-//	|(&FATASM)[32]|				RegConsts  // its more complex than that
-// for example, a loop that calls a func... then the temps are wiped out.
-// we can't rely on a temp that was called earlier.
-// what if we did all the const optimisation in the optimiser?
-// makes sense, right? 
 
 	constants
 		kContinue = 254
@@ -140,14 +133,6 @@ struct ASMState
 		return t
 
 
-//	function RegMap (|int|)
-//		|| dcls = (.VDecls+1)~bits
-//		if .vtmps >= 32
-//			return dcls
-//		|| tmps = .vtmps~bits
-//		tmps = ~tmps
-//		return dcls ||| tmps
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -219,26 +204,33 @@ function SCFunction.HasCVersion (|bool|)
 	return true
 
 
-function asmstate.ASMPrmCollectNative (|message| prms, |SCFunction| fn, |uint64|)
+function ASMState.PrmCollectNative (|message| prms, |SCFunction| fn, |uint64|)
 	opt norefcounts
-	|| sh = 12
-	|| special = fn.returntype.ASMUseSpecialRegs // bit 9
-	rz |= special << 8
+	|| sh = 0
+	|| fc = 0
+	|| ic = 0
 	for Float in 2
 		|| p = prms.first
 		for FnArg in fn.args
-			if FnArg.ASMUseSpecialRegs|int| == Float
+			if FnArg.SpecialRegs|int| == Float
 				|| v = .FuncPrm(p!, FnArg).reg
-				sh += 5
 				rz  |=  v << sh
-				rz += 1<<(Float<<2)				// Send-count (4 + 4 bits)
+				sh += 5
+				fc += float
+				ic += !float
 			p++
-										// 32 - (4*5 + 4 + 4) = 4 . Still 4 bits left
+	
+	if fc>8 or ic>8			// hmmm
+	rz <<= 12
+	rz |= fn.ReturnType.SpecialRegs << 11
+	rz |= (8-fc) << 6
+	rz |= (8-ic) << 0
 
-function asmstate.ASMPrmCollect (|message| prms, |scfunction| fn, |bool| native,  |uint64|)
+
+function ASMState.PrmCollect (|message| prms, |scfunction| fn, |bool| native,  |uint64|)
 	opt norefcounts
 	if native
-		return .ASMPrmCollectNative(prms, fn)
+		return .PrmCollectNative(prms, fn)
 	
 	|| sh = 7
 	|| p = prms.first
@@ -252,12 +244,13 @@ function asmstate.ASMPrmCollect (|message| prms, |scfunction| fn, |bool| native,
 
 function asmreg.CallFunc (|int| v, |int|)
 	if (.reg == v)
-		v -= self is Set //NOICE
+		v -= self is Set // NOICE
 	return v
 
 
 function @ASMType.DoFunction (fn_Asm)
 	opt norefcounts
+	#! The .asint/.asfloat functions should be recognised as working on constants? Or is that just a general case of inline functions? Technically, its an inline func that does nothing, just returns the original... with a different type. 
 	|| prms = exp.last!
 	|| fn = prms.asfunc #require
 
@@ -272,11 +265,11 @@ function @ASMType.DoFunction (fn_Asm)
 
 	|| TmpCloser = .VTmps
 	|| IsC = fn.HasCVersion
-	|| P = .ASMPrmCollect(prms, fn, IsC)
+	|| P = .PrmCollect(prms, fn, IsC)
 	.CloseVTmps(TmpCloser)
 	
 	|| PExt = P >> 32
-	|| fat = exp.FUNK(dest, fn.tableid+31, P,  PExt)
+	|| fat = exp.FNC(dest, fn.tableid+31, P,  PExt)
 	if isc
 		fat.op = asm.FFNC
 	fat.op += PExt > 0
@@ -343,7 +336,7 @@ function ASMState.FinishASM
 	ifn (l isa asm.ret) or (l isa asm.trap)
 		|| fn = scfunction.currfunc!
 		expect (!fn.returntype) ("ASMReturn".internal) // why?
-		fn.sourcearg!.RET(asmreg(), 1, 0, 0)
+		fn.SourceArg!.RET(asmreg(), 1, 0, 0)
 	.SetLength
 
 

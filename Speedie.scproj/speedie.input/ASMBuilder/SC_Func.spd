@@ -25,19 +25,17 @@ class µFunc
 	// cosmic lore unfold... into tales untold
 	
 	function µRender (|!&ASM| Where, |!&asm| After, |!&asm|)
-		|| HasLabel = 0
+		|uint64| HasLabel
 		rz = where
-		// Could use a 64bit jump-map... so just mark each instruction as needing labels or not...
-		// If theres only 1 or 2... we can jump directly. if more than 64 we just check da right bits.
 		for i in .length
 			|| fat = .ir+i
-			haslabel |= fat.jumpreg
+			haslabel |= fat.jumpreg<<(i&63)
 			fat.ASMIndex = rz - where
 //			check (fat.r[0] != 0) (fat.msg) // what about branch or other instructions?
-	
+// *Code = 0x09200373 / 153092979
 			rz = fat.µrenderinto(rz, after)
 
-		if haslabel // could we do this in a bit smarter way? like a fat knows what points to it?
+		if haslabel // Use this as a jump-map??? To skip huge sections?
 			for i in self
 				|| r = i.JumpReg
 					i.FillLabelRequest(where, rz, r-1)
