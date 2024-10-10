@@ -39,25 +39,27 @@ class String
 		cpp_wrapper JB_Str_LengthUTF8
 
 // (need to reorder these func params to put find first)
-	helper InByte_ ( |int| Start, |int| After=int.max, |Byte| find, |ind| )
+	helper _InByte ( |int| Start, |int| After=int.max, |Byte| find, |ind| )
 		nil checker
 		cpp_wrapper JB_Str_InByte
 
-	function OutByte_ ( |int| Start, |int| After=int.max, |Byte| find, |ind| )
+	function _OutByte ( |int| Start, |int| After=int.max, |Byte| find, |ind| )
 		nil checker
 		cpp_wrapper JB_Str_OutByte
 
-	helper CharSet_ (|int|Start=0, |int|After=int.max, |CharSet| cs, |bool|IsIn, |ind|)
+	helper _CharSet (|int|Start=0, |int|After=int.max, |CharSet| cs, |bool|IsIn, |ind|)
 		nil checker
 		cpp_wrapper JB_Str_CharSet
 
-	helper White_ (|int|Start=0, |int|After=int.max, |bool| IsIn, |ind|)
+	helper _White (|int|Start=0, |int|After=int.max, |bool| IsIn, |ind|)
 		nil checker
 		cpp_wrapper JB_Str_WhiteSpace
 	
-	function InWhite (|int|Start=0, |int|After=int.max, |ind|) { return .white_(Start, After, true) }
+	function InWhite (|int|Start=0, |int|After=int.max, |ind|)
+		return ._white(Start, After, true)
 
-	function OutWhite (|int|Start=0, |int|After=int.max, |ind|) { return .white_(Start, After, false) }
+	function OutWhite (|int|Start=0, |int|After=int.max, |ind|)
+		return ._white(Start, After, false)
 	
 
 
@@ -68,14 +70,16 @@ class String
 
 	function Find ( |Byte| find, |int| Start=0, |int| After=int.max, |ind| )
 		cpp_part FindByte
-		return .inbyte_(start, after, find)
+		return ._inbyte(start, after, find)
 
 	function Find (|CharSet| cs, |int|Start=0, |int|After=int.max, |ind|)
-		return .CharSet_(Start, After, cs, true)
+		return ._CharSet(Start, After, cs, true)
 
-	function OutByte ( |Byte| find, |int| Start=0, |int| After=int.max, |ind| ) { return .outbyte_(Start, after, find)  }
+	function OutByte (|Byte| find, |int| Start=0, |int| After=int.max, |ind|)
+		return ._outbyte(Start, after, find)
 
-	function OutCharSet (|CharSet| cs, |int|Start=0, |int|After=int.max, |ind|) { return .CharSet_(Start, After, cs, false) }
+	function OutCharSet (|CharSet| cs, |int|Start=0, |int|After=int.max, |ind|)
+		return ._CharSet(Start, After, cs, false)
 	
 // comparing / analysing
 	function Last (|int| minus = 0, |Byte|)
