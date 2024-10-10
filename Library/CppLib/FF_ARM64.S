@@ -114,7 +114,7 @@
 
 	// branch
 		tbnz    data, 11, .SIMD_Return
-
+	
 	.Int_Return:
 		blr     fn							// call fn... so we can store in x0
 		ldp     dest, xzr, [sp, 16]
@@ -143,16 +143,6 @@
 // http://wolchok.org/posts/how-to-read-arm64-assembly-language/
 
 /*
-	OK, what about saving the register state?
-	We need to know how many regs to save. Thats not the same as where we place the result!
-	Even if it were, we still need two counts. The send-count, and the save-count.
-	
-	The send-count is typed.
-	
-	The save-count has no type.
-*/
-
-/*
 Observations so far:
  	* Use godbolt.org... its simpler than understanding the documentation. (The docs seem wrong too)
 	* ARM x17 is the highest register I can freely alter
@@ -162,6 +152,6 @@ Observations so far:
 	* x86 has 6 regs for passing ints, the other two have to be done on the stack
 	* the FP/SIMD are also just done in order
 		* we have enough regs on ARM&X86
-	* You can't specify registers in C++, except when they are observed by ASM.
+	* You can't specify registers in C++, not reliably.
 */
 
