@@ -23,8 +23,8 @@ function PackTestIncr (|int| x, |int| y, |int|)
 function PackTestForeignFuncs (|string?| x, |string?| y, |string|)
 	#! RUN!!
 	|| a = x.Length
-	|| b = x.Addr
-	|| c = x.InWhite(12345, 98765)
+	|| b = x._Addr
+	|| c = x._white(12345, 98765, true)
 	|| d = x! + y!
 	|| e = string.char(0xb16b00b5)
 	return e + d // fails?
