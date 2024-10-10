@@ -1750,15 +1750,14 @@ JB_String* JB_Str_ChrUTF8(u32 C) {
 	}
     
 	u32 N = JB_Str_UTF8Size( C );
-    if (!N) {
-        return 0;
+    if (N) {
+		JB_String* Result = JB_Str_New( N );
+		if ( Result ) {
+			u8Write_( Result->Addr, C );
+			return Result;
+		}
     }
-
-    JB_String* Result = JB_Str_New( N );
-    if ( Result ) {
-        u8Write_( Result->Addr, C );
-    }
-    return Result;
+    return JB_Str__Error();
 }
 
 
