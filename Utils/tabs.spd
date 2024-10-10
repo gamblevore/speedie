@@ -2,13 +2,12 @@
 
 app.usage = "Simple utility to convert tabs to spaces.
 
-Pass a string or a file. The file-path must not contain tabs, otherwise it is considered a string."
+Pass a string or a file-path. The file-path must not contain tabs!"
 
 main (|string| data)
 	ifn data contains '\t'
 		|| f = data.file
 		if f.Exists
-			printline f.ReadAll.TabsToSpaces
-			return 0
+			data = f.ReadAll
 	printline data.TabsToSpaces
 
