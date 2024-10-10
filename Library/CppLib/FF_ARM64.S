@@ -71,8 +71,8 @@
 		ldr     q0,  [r, x0]		
 
 		br j9
-		br j9
-		br j9
+		nop
+		nop
 
 	.ints:
 											// int-7
@@ -106,6 +106,7 @@
 		
 		ubfiz   x0, data, 4, 5				// int-0
 		ldr     x0,  [r, x0]
+		nop
 		
 			// **STACK MANAGEMENT HERE**
 		stp     fp, lr, [sp, -32]!			// save fp and lr 
