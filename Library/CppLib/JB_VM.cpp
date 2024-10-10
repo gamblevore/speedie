@@ -56,16 +56,15 @@ ivec4* RunVM (jb_vm& pvm) {		// vm_run, vm__run, vmrun, run_vm
     const static void* jumptable[] = {
         #include "InstructionList.h"
     };
-	RegVar(&vm, r19) = pvm;
-    RegVar(Code,r20) = vm.Env.CodeBase;
-    RegVar(Op,  r22) = (ASM)-1;
-    RegVar(JumpTable, r23) = jumptable;
-
-	RegVar(& Stack, r24) = vm.Registers[0].Stack;
+	RegVar(&vm,			r19) = pvm;
+    RegVar(Code,		r20) = vm.Env.CodeBase;
+    RegVar(r,			r21) = vm.Registers+1;	// space for stack + zeroreg
+    RegVar(Op,			r22) = (ASM)-1;
+    RegVar(JumpTable,	r23) = jumptable;
+	RegVar(& Stack,		r24) = vm.Registers[0].Stack;
 	Stack.Code = &vm.EXIT[0];
 	Stack.SavedReg = 0;
 	Stack.Alloc = VMGuardValue;		  	// Env.AllocCurr gets set to this on exit. // Quite harmless
-    RegVar(r,   r21) = vm.Registers+1;	// space for stack + zeroreg
     r[0] = {};							// seems these regs don't contain the values I want (during debug?)
 	ı;
 	#include "Instructions.i"
