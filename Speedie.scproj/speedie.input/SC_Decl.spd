@@ -177,13 +177,10 @@ class SCDecl (SCNamed) {
 		return (self is local) and !(.IsBareStruct or .IsCArray)
 	
 	function SpecialRegs (|bool|)
-		return self and !.ASMUseIntRegs
+		return self and !.datatype.ASMUseIntRegs
 	
-	function ASMUseIntRegs (|bool|)
-		if !.isverynormal // pointers, bascially, are ints
-			return true
-		if .isint and .typeinfo.count <= 1
-			return true
+	function IntRegs (|bool|)
+		return !.SpecialRegs 
 		
 
 	function CopyDeclsStructFixer (|message| src, |declmode| mode, |SCDecl|)

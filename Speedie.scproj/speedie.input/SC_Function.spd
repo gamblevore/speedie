@@ -705,6 +705,7 @@ function ReturnsObject (|bool|)
 	|| r = .returntype
 		return r.isobject
 
+
 function scdecl.CouldUpgradeToReal (|bool|)
 	return .typesuffers and !.nilstated
 
@@ -725,11 +726,10 @@ function CollectReturnAsReal (|bool|)
 
 
 function AddTypeInfo (|scdecl| dcl)
-	if dcl.ASMUseIntRegs
+	if dcl.IntRegs
 		.IntPrmCount += dcl isnt return
 	  elseif dcl is Return
 		is ReturnASMFloats
-
 
 
 setter IsCppInBuilt (|int|)

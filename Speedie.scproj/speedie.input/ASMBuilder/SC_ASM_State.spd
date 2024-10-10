@@ -169,8 +169,8 @@ struct ASMState
 		return ss
 
 
-	function FuncPrm (|message| prm, |scdecl| DestType,  |asmreg|)
-		|| r = .ExistingVar(prm) // seems unfinished? what about desttype?
+	function FuncPrm (|message| prm, |asmreg|)
+		|| r = .ExistingVar(prm)
 			return r
 		return .µ(prm, asmreg.stayopen)
 
@@ -212,16 +212,16 @@ function ASMState.PrmCollectNative (|message| prms, |SCFunction| fn, |uint64|)
 	|| ic = 0
 	|| n = fn.args.Length
 	for Ints in 2
-		|| p = prms.first
-		for i.down in n
-			|| FnArg = fn.args[i]
-			if FnArg.SpecialRegs|int| != Ints
-				|| v = .FuncPrm(p!, FnArg).reg
+		|| p = prms.last
+		while p
+			|| ty = p.ASMDecl
+			if ty.SpecialRegs|int| != Ints // should get .specialregs from message somehow?
+				|| v = .FuncPrm(p!).reg
 				rz  |=  v << sh
 				sh += 5
 				ic += ints
 				fc += !ints
-			p++
+			p--
 	
 	if fc>8 or ic>8			// hmmm
 	rz <<= 12
@@ -241,7 +241,7 @@ function ASMState.PrmCollect (|message| prms, |scfunction| fn, |bool| native,  |
 	|| sh = 7
 	|| p = prms.first
 	for FnArg in fn.args
-		|| v = .FuncPrm(p!, FnArg).reg
+		|| v = .FuncPrm(p!).reg
 		sh += 5
 		rz  |=  v << sh
 		rz++								// Send-count (4 bits max)

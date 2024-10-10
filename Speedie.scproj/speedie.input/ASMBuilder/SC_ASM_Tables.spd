@@ -272,20 +272,13 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |as
 	|| d = exp.ASMDecl
 	if d is local
 		return d.wholetype
-		if (dest isnt requiretype) or (dest isa existing.µtype) // the ternary requires this.
-			return existing				// why doesnt it do the testing itself?
-		return nil
 		
-	rz = d.typeonly.zero
+	if !mode
+		if d is const
+			(dest is constany)
+			return .NumToReg(exp, d.exportposition, dest)
 
-	if d is const
-		check (dest.reg and dest isnt set) (exp)
-		require !mode
-		(dest is constany)
-		return .NumToReg(exp, d.exportposition, dest)
-	  else
-		if mode
-			return nil
+		rz = d.typeonly.zero
 		check (d is global) (Exp)
 		DoGlobal(self, exp, dest, d)
  
@@ -542,8 +535,7 @@ function asmstate.ExistingVar (|message| m,  |asmreg|)
 		m = m.first!
 		fn = m.func
 	if fn == @thg
-		|| dest = asmreg()
-		return ASMType.ThgSub(self, m, dest, 2)
+		return ASMType.ThgSub(self, m, asmreg(), 2)
 
 
 function message.HasAsmStuff (|bool|)

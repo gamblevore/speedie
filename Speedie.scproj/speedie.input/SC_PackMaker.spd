@@ -108,15 +108,14 @@ module PackMaker
 		if fn
 			for i in 5
 				self[0] = 12+i, self[1] = 6+i
-				debugger
-				printline fn.Test|&int64|[]
+				|| num = fn.Test|&int64|[]
 				
 		fn = .testfn("PackTestMul")
 		if fn
-			self[0] = 8725, self[1] = 1, self[2] = 275, self[0] = 1		
+			self[0] = 8725, self[2] = 4, self[1] = 275, self[3] = 2	
 			debugger
 			|| num = fn.Test|&int64|[]
-			if num != 9000
+			if num != 18000
 			
 		fn = .testfn("PackTestAndOr")
 		if fn
@@ -174,13 +173,13 @@ module PackMaker
 		|| mu = .asm
 			|| mu2 = mu.µTest
 				|| P = mu2.ptr
-				printline mu.render
+				printline .exportname
 				return jb_vm.Run(p, mu2.length)
 	
 	
-	syntax access (|int| v, assigns:|int|)
+	syntax access (|int| v, assigns:|int64|)
 		|| r = jb_vm.vm.Registers(false)+v
-		r[].x = Value
+		r|&int64|[] = Value
 	
 	
 	syntax access (|int| v, assigns:|object|)
