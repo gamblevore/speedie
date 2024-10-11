@@ -152,7 +152,7 @@ function CmdWrap (|Message| arg, |bool|)
 	SpdProcess.parent! <~ arg
 	stderr.clear						// super-important!!!
 	
-	return !.willexit
+	return !.WillExit
 
 
 function ErrorsToPerry (|message|)
@@ -185,6 +185,7 @@ function UnusedFuncs (|message| cmd, |message|)
 			arg.msg(@tmp, fn.name + str) <~ src.position
 	
 	return cmd
+
 
 function Check (|message| cmd, |message|)
 	if .errors.HasProblems
@@ -644,6 +645,8 @@ function AutoSub (|SCNode| scope, |string| name, |[autoitem]| found, |int| Types
 function AutoCompleteSorter (autosort_fn)
 	|| type = a.type - b.type 
 		return type < 0
+	|| depth = a.depth - b.depth // doesnt seem to work just yet?
+		return depth < 0
 	return a.sort < b.sort
 
 
@@ -1097,6 +1100,13 @@ class autoitem
 	|string|		Display
 	|bool|			Exact
 	|int|			type
+	
+	function Depth (|int|)
+		opt norefcounts
+		|| v = .Value
+		if v isa SCClass
+			return v.Depth
+	
 	
 	function OKBy (|autoitem| prev, |bool|)
 		if !prev

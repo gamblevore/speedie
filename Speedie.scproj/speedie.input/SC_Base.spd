@@ -15,6 +15,7 @@ linkage
 |SCNode--?|							Parent
 |SCNode--?|							MyReacher
 |SCImport--?|						Project
+//|byte|							Depth // maybe modules should have a depth too.
 
 
 function IsSTDLib (|bool|) // .islib, .isprojlib, .isproject, .isntproject, .isntlib
