@@ -4,7 +4,8 @@
 #ifdef _M_ARM64
 	#define __realarm64__
 #endif
-
+// todo: Experiment with saving dest/lr instead of fp/lr
+// I think fp is unused?
 
 #ifdef __realarm64__
 	/*** Nativeize(u64 DATA, void* FN, Register* R, int n) ***/
@@ -22,18 +23,18 @@
 		j8		.req x8
 		j9		.req x9
 
-		lsr     data, x0, 12			// data  = DATA>>12
+		lsr     data, x0, 12				// data  = DATA>>12
 		adr		flj, .floats
 		adr		inj, .ints
-		mov     fn,  x1					// fn    = FN
-		mov     r,   x2					// r     = R
-		add     dest, r, x3, lsl 4		// dest  = R+n 
-		ubfx    j8,  x0,  6,  5			// j8    = (DATA>>6)&31
-		and     j9,  x0,  63		    // j9    = DATA&63
-		add		j8,  j8,  j8, lsl 1		// j8    = j8*3
-		add		j9,  j9,  j9, lsl 1		// j9    = j9*3
-		add		j8,  flj, j8, lsl 2		// j8 adapt
-		add		j9,  inj, j9, lsl 2		// j9 adapt
+		mov     fn,  x1						// fn    = FN
+		mov     r,   x2						// r     = R
+		add     dest, r, x3, lsl 4			// dest  = R+n 
+		ubfx    j8,  x0,  6,  5				// j8    = (DATA>>6)&31
+		and     j9,  x0,  63				// j9    = DATA&63
+		add		j8,  j8,  j8, lsl 1			// j8    = j8*3
+		add		j9,  j9,  j9, lsl 1			// j9    = j9*3
+		add		j8,  flj, j8, lsl 2			// j8 adapt
+		add		j9,  inj, j9, lsl 2			// j9 adapt
 		br		j8 // jump
 
 	.floats:
