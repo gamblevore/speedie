@@ -598,8 +598,9 @@ class String
 			require !self[i].iswhite
 		
 
-// basically we just want " " to match with  multiple spaces or tabs
+// basically we just want " " to match with multiple spaces or tabs
 // that is all. but also "  " must match with at least two.
+// also allows endofline if the search ends with a " "
 	helper StretchyFindSub (|string| find, |int| from, |int|)
 		|| i = 0
 		|| n = .length
@@ -609,19 +610,19 @@ class String
 			if f != ' '
 				require c eq f
 			  else
+				|| EndOfFind = i >= find
 				|| extra = 0
 				|| found = 0
 				while (find[i+extra] == ' ')
 					++extra
 				// so now we need to find that many extra spaces
-				while c == ' ' or '\t'
+				while (c == ' ' or '\t') or (EndOfFind and (c == '\n' or '\r'))
 					c = self[from + i + found]
 					++found
 				require found > extra
-				i+=extra
-				from+=found-(extra+1)
+				i += extra
+				from += found-(extra+1)
 		return i+from
-
 
 	function StretchyFind (|string| find, |int| from=0, |int| to=int.max, |intrange|) // findnospaces
 		|| n = self - find
