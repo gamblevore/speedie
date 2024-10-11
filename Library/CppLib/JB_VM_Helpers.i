@@ -184,7 +184,8 @@ AlwaysInline void SetRefRegToReg(VMRegister* r, ASM Op) {
 
 
 #define table(b)			((u64)(((void**)(&vm.Env))[b])+L2)
-#define mem(t)				((t*)u2)[I3+Read_Lu]
+#define mem0(t)				({ (u2) ? ((t*)u2)[u3+Read_Offsetu] : 0; }) // safely read.
+#define mem1(t)				((t*)u2)[u3+Read_Offsetu]
 #define mem2(t)				(u2 = (u64)((t*)u2 + Read_moveu-1))
 
 AlwaysInline JB_Object* alloc(void* o) {

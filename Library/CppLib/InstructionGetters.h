@@ -187,11 +187,11 @@
 #define   Table_Addu_(x)   (((uint)((x)<<15))>>15)
 
 
-#define   Read_Li       ((( int)((Op)<<23))>>25)
-#define   Read_Li_(x)   ((( int)((x)<<23))>>25)
+#define   Read_Offseti       ((( int)((Op)<<23))>>25)
+#define   Read_Offseti_(x)   ((( int)((x)<<23))>>25)
 
-#define   Read_Lu       (((uint)((Op)<<23))>>25)
-#define   Read_Lu_(x)   (((uint)((x)<<23))>>25)
+#define   Read_Offsetu       (((uint)((Op)<<23))>>25)
+#define   Read_Offsetu_(x)   (((uint)((x)<<23))>>25)
 
 #define   Read_movei       ((( int)((Op)<<30))>>30)
 #define   Read_movei_(x)   ((( int)((x)<<30))>>30)
@@ -200,11 +200,11 @@
 #define   Read_moveu_(x)   (((uint)((x)<<30))>>30)
 
 
-#define   Write_Li       ((( int)((Op)<<23))>>25)
-#define   Write_Li_(x)   ((( int)((x)<<23))>>25)
+#define   Write_Offseti       ((( int)((Op)<<23))>>25)
+#define   Write_Offseti_(x)   ((( int)((x)<<23))>>25)
 
-#define   Write_Lu       (((uint)((Op)<<23))>>25)
-#define   Write_Lu_(x)   (((uint)((x)<<23))>>25)
+#define   Write_Offsetu       (((uint)((Op)<<23))>>25)
+#define   Write_Offsetu_(x)   (((uint)((x)<<23))>>25)
 
 #define   Write_movei       ((( int)((Op)<<30))>>30)
 #define   Write_movei_(x)   ((( int)((x)<<30))>>30)

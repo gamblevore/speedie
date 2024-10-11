@@ -194,45 +194,45 @@
 ı TABL: _
 	u1 = table(n2);
 ı RD1U: _
-	u1 = mem(uint8);
+	u1 = mem1(uint8);
 	mem2(uint8);
 ı RD1S: _
-	u1 = mem(char);
+	u1 = mem1(char);
 	mem2(char);
 ı RD2U: _
-	u1 = mem(u16);
+	u1 = mem1(u16);
 	mem2(u16);
 ı RD2S: _
-	u1 = mem(s16);
+	u1 = mem1(s16);
 	mem2(s16);
 ı RD4U: _
-	u1 = mem(u32);
+	u1 = mem1(u32);
 	mem2(u32);
 ı RD4S: _
-	u1 = mem(int);
+	u1 = mem0(int);
 	mem2(int);
 ı RD8U: _
-	u1 = mem(u64);
+	u1 = mem1(u64);
 	mem2(u64);
 ı RD16: _
-	((ivec4 *) r)[n1] = mem(ivec4);
+	((ivec4 *) r)[n1] = mem1(ivec4);
 	mem2(ivec4);
 ı WR1U: _
-	mem(uint8) = u1;
+	mem1(uint8) = u1;
 	mem2(uint8);
 ı WR2U: _
-	mem(u16) = u1;
+	mem1(u16) = u1;
 	mem2(u16);
 ı WR4U: _
 	//  xcode only complains about this one? ?
 
-	mem(u32) = (u32) u1;
+	mem1(u32) = (u32) u1;
 	mem2(u32);
 ı WR8U: _
-	mem(u64) = u1;
+	mem1(u64) = u1;
 	mem2(u64);
 ı WR16: _
-	mem(ivec4) = (ivec4)(((ivec4 *) r)[n1]);
+	mem1(ivec4) = (ivec4)(((ivec4 *) r)[n1]);
 	mem2(ivec4);
 ı CNTC: _
 	IncrementAddr(r, Op, 1);
