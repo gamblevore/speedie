@@ -96,16 +96,14 @@ function Return			(fn_asm)
 	opt norefcounts
 	|| reg = ASMReg()
 	|| f = exp.first
-		|| Where = .ReturnASM|asmreg| as AsmReg.ForReturn
-		reg = .µ(f, Where)
+		reg = .µ(f, .ReturnASM|asmreg| as AsmReg.ForReturn)
 
-	|int64| K
-	if reg is constany
-		K = reg.const // return true, or -1 or whatever
-		if (k<<49)>>49 != k
-			K = 0
-		if K
+	|| K = reg.const // return true, or -1 or whatever
+		if reg isnt constany // what?
+		if k.fits(15)
 			reg.nop
+		  else
+			K = 0
 			
 	exp.RET(reg, 1, 0, K)
 

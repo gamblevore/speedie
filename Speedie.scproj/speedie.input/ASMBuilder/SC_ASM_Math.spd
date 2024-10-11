@@ -484,7 +484,7 @@ extend ASMState
 
 
 
-function int64.Fits (|int| amount, |bool| signed,  |bool|)
+function int64.Fits (|int| amount, |bool| signed=true,  |bool|)
 	|| sh = 64 - amount
 	|| x = self << sh
 	if signed

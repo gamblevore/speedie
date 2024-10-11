@@ -122,6 +122,7 @@ struct ASMState
 			t.µtype = where.asmdecl.typeonly // probably needs changing.
 		return .TempOnly(where, t)
 
+
 	function TempOnly (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)				// .needreg
 		opt norefcounts
 		if t.reg
@@ -233,7 +234,7 @@ function ASMState.PrmCollectNative (|message| prms, |SCFunction| fn, |uint64|)
 		rz |= (17-ic) << 6
 
 
-function ASMState.PrmCollect (|message| prms, |scfunction| fn, |bool| native,  |uint64|)
+function ASMState.PrmCollect (|message| prms, |scfunction| fn, |bool| native, |uint64|)
 	opt norefcounts
 	if native
 		return .PrmCollectNative(prms, fn)
@@ -246,7 +247,7 @@ function ASMState.PrmCollect (|message| prms, |scfunction| fn, |bool| native,  |
 		rz  |=  v << sh
 		rz++								// Send-count (4 bits max)
 		p++
-											// 32 - (5*5 + 4) = 3 . Still 3 bits left	
+
 
 function asmreg.CallFunc (|int| v, |int|)
 	if (.reg == v)
