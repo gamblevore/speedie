@@ -968,7 +968,7 @@ class TextView (GUIControl)
 		opt NoRefCounts
 		|| w = .window
 			for i in 3
-				.SoftExplode(5s, date.now + 0.25s*i, (-7.0, 0), D, strength)
+				.SoftExplode(5s, date.now + 0.25s*i, (-10.0, 0), D, strength)
 
 
 	task SoftExplode (taskgui, |vec2| V, |TextViewLine| D, |float| Strength)
@@ -980,13 +980,14 @@ class TextView (GUIControl)
 			|| start = .upon.XY(.d)
 			|| Particles = 48 
 			|| S = .StartTime + .d.position
-			for p in particles
-				|| V2 = (S + p).RandomVec2 - 0.5
+			|| T = (progress*1.25).pow2
+			for P in particles
+				|| V2 = (S + P).RandomVec2 - 0.5
 				v2.x *= 5
-				|| A  = (S - p).RandomVec2 - 0.5
+				|| A  = (S - P).RandomVec2 - 0.5
 				A.y *= 4.0
 				V2 = (V2 * 25.0) + .V * 250.0
-				.DrawParticle(V2, A, Progress, p|float|*0.4, start)
+				.DrawParticle(V2, A, T, p|float|*0.4, start)
 
 
 		function DrawParticle (|vec2| V, |vec2| A, |float| T, |float| p, |ivec2| start)
@@ -995,9 +996,7 @@ class TextView (GUIControl)
 				str = 0.5
 			|| T2 = T - p * 0.0125
 			|| s = start.vec2 + (V*T2 + A)
-			|| FadeSpeed = 2.43 // what about * (1.0-T)? what does that do?
-			// this isnt RAELLY the fade speed. Just imagine these are just numbers and i dont know 
-			// what im doing and just renaming stuff for you to fix later.
+			|| FadeSpeed = 2.43
 			|| Alpha = (1.0-(T2*FadeSpeed)) * (1.0-T)
 			Alpha *= str * .Strength
 			|| C1 = (1.0, 1.0, 2.0, alpha)

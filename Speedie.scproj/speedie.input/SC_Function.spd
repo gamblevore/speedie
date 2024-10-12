@@ -116,7 +116,7 @@ function DebugPrintOnce
 syntax equals (|string| name, |bool| Aware, |bool|)
 	opt norefcounts
 	require (self)	
-	if .Name.syntaxequals( name, true )		// never needs !aware.
+	if .Name.SyntaxEquals( name, true )		// never needs !aware.
 		return true
 	|| x = .ExportName
 	if x.syntaxequals( name, true )
@@ -1500,7 +1500,8 @@ function Tran_Once (TranFunc)
 	
 	using (node)
 		node.name = "if"
-		|| obj = compiler.program.lateAddTempory( "bool",  "once"+(++OnceCount).render, @thg + "false", node )
+		|| name = "once"+(++OnceCount).render
+		|| obj = compiler.program.lateAddTempory( "bool", name, @thg + "false", node )
 
 		|| rel = @rel+""
 		rel <~ (@thg, obj)
@@ -1820,7 +1821,7 @@ function scfunction.Cleanupfunc (|message| s)
 		cls.FillInterFaceIn(self, true)
 
 
-function message.mainfix2
+function message.MainFix2
 	|| m = .MainFix
 		.become(m)
 
@@ -1828,14 +1829,14 @@ function message.mainfix2
 function scfunction.UpdateSourceSub (|message| src, |bool|)
 	opt norefcounts
 	if src ~= @tmp and "main"
-		src.mainfix2
+		src.MainFix2
 
 	|| f = src.first$
 	if f == @dot
 		f.func = @thg
 		f.clear
-	rz = stderr.ok				// awesome! dont delete this!
-	.init_sub(src, nil)
+	rz = StdErr.ok				// awesome! dont delete this!
+	.Init_Sub(src, nil)
 	rz = stderr.ok 
 	if rz
 		.FuncDecls

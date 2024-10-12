@@ -77,6 +77,9 @@ linkage
 
 |SCModule|					program = InternalFile.Proj.Mod
 
+|Message|					AppInitCode = `{cpp_name JB_SP_AppInit, return initappglobals_()}`~parse
+|Message|					AppInitGlobals = `{cpp_name JB_SP_AppInitSub_}`~parse
+
 |[SCClass]|					ClassList
 |[SCModule]|				ModuleList
 |[SCFunction]|				FuncList
@@ -150,6 +153,8 @@ function BuildFolder (|file|)
 	return B!
 
 
+
+
 function CompileAll (|bool|)
 	require .stage("Compilation")
 	.InitCompiler
@@ -188,7 +193,7 @@ function CompileAll (|bool|)
 	require .Stage( "Finished" )
 	.TimerSub("Parse", .stParseTimeTotal)
 	.Timer( "" )
-	return stderr.ok
+	return StdErr.ok
 
 
 function Projects (|String|)
@@ -326,8 +331,8 @@ function InitBasicFuncs (|bool|)
 
 
 function CreateFuncFromSource (|String| Src, |SCFunction|)
-	|| msg	= src.ParseClean
-		rz		= SCFunction.NewFunc( msg, nil, msg )|SCFunction|
+	|| msg = src.ParseClean
+		rz = SCFunction.NewFunc( msg, nil, msg )|SCFunction|
 		if rz
 			rz.IsVisible = false
 
@@ -337,17 +342,20 @@ function Library (|file|)
 
 
 function Jeebox (|file|)
-	return .Projects.filech("jeebox.scproj")
+	return .Projects.FileCh("jeebox.scproj")
 
 
 function Speedie (|file|)
-	return .Projects.filech("Speedie.scproj")
+	return .Projects.FileCh("Speedie.scproj")
 
 
 function ImportLibs
 	SCImport.STDLibTime = true
-	SCImport.Importpath( "Library",		.Library,		1, true )
-	SCImport.Importpath( "jeebox",		.Jeebox,		1, true )
+	SCImport.Importpath( "Library",  .Library,	1,  true )
+	SCImport.Importpath( "jeebox",   .Jeebox,	1,  true )
+	
+	compiler.program.LoadInitFuncSub(.AppInitGlobals, "InitAppGlobals_")
+	compiler.program.LoadInitFuncSub(.AppInitCode,    "InitAppCode_")
 
 
 function ImportProj 

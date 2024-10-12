@@ -1014,8 +1014,7 @@ function Message.ModuleSrc (|message|)
 			|| c = found.cls
 				|| fp = c.funcproto
 					return fp.source
-				  else
-					return c.sourcearg
+				return c.sourcearg
 			return found.source
 
 

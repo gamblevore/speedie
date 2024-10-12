@@ -26,7 +26,6 @@ JB_String* JB_App__LibPack(void*** Funcs);
 JB_String* JB_App__LibClasses(); 
 
 // startup
-int JB_LibInit (const char** R, bool IsThread);
 void JB_LibShutdown();
 bool JB_LibIsThreaded();
 
@@ -43,6 +42,7 @@ JB_String* JB_App__DocumentOpened (bool Clear);
 // Sub process
 int* JB_SP_ErrorNumber ();
 int JB_SP_Run (const char** R, int Mode);
+int JB_SP_Init (const char** R, bool IsThread);
 
 
 

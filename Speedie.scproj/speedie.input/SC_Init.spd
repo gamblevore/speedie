@@ -27,20 +27,13 @@ module SC_Init
 		
 		if c == @Decl
 			require !c.SettingToNil
-
-		.InitCodeArg := .BuildInitArg
-
-		// this func steals the original
-		// i think stealing the original is bad... for autocompletes
-		// so... what should I do instead? redirections? maybe not the best idea
-		// i think we should have one init func per-file per-module.
-		// So modules should have an array of init funcs! (Which usually contain only 1 item)
 		
 		if c == @decl
 			.InitVarsArg := .BuildInitArg
-			.initvarsarg.first <~ c
+			.InitVarsArg.first <~ c
 		  else
-			.initcodearg <~ c
+			.InitCodeArg := .BuildInitArg
+			.InitCodeArg <~ c
 
 
 function Message.AllowedMoveToInit (|bool|)
@@ -52,12 +45,12 @@ function Message.AllowedMoveToInit (|bool|)
 		return true
 
 
+// so how do we do this?
 function SCModule.LoadInitFuncSub (|message| init, |string| name)
 	|| msg = "helper $Name (|int|)".ParseClean
 	msg <~ init
 	|| fn = .NewModuleFunc( msg )
 		(fn is InitFunc)
-		
 		|| L = init.Last
 		if !L.hasany
 			L.Remove // never called anymore?
@@ -65,30 +58,29 @@ function SCModule.LoadInitFuncSub (|message| init, |string| name)
 
 function SCModule.LoadInitFunc
 	SCNode.CurrVisibility = true
-	scmodule.curr = self
-	|| arg = .initcodeArg
+	scmodule.Curr = self
+	|| arg = .InitCodeArg
 		.LoadInitFuncSub(arg, "InitCode_")
 	
-	arg = .initVarsArg
+	arg = .InitVarsArg
 	if arg
 		.LoadInitFuncSub(arg, "Init_")
 	scmodule.curr = nil
 
 
-
-function scmodule.TryInit (|array of scmodule| req, |bool|)
+function SCModule.TryInit (|array of scmodule| req, |bool|)
 	opt norefcounts
-	for name in .initafter
+	for name in .InitAfter
 		name.expect(@thg)$
-		|| m = compiler.findmodulemsg(name)
-		require m and m.inited
+		|| m = compiler.FindModuleMsg(name)
+		require m and m.Inited
 
-	.inited = true
+	.Inited = true
 	req <~ self
 	return true
 
 
-extend_module scmodule
+extend_module SCModule
 	function DoInitAfter (CollectFunc)
 		opt norefcounts
 		|| mod = name_Space.SpaceModule(node)$
@@ -117,27 +109,43 @@ function SortInitOrder (|array of scmodule| mods, |array of scmodule|)
 		0
 
 	
-function SCModule.AddDelayedInit (|message| src, |message|dest, |string| fn_name)
+function SCModule.AddDelayedInit (|message| src, |message| dest, |string| fn_name)
 	opt norefcounts
 	if src and .HasActualCode(src) and (self != Compiler.program)
-		dest <~ «sheb "// " + .Name »
-		dest <~ «dot fn_name
-			«Thg .Name »
+		dest.almostappend  «sheb "// " + .Name »
+		dest.almostappend  «dot fn_name
+			«thg .Name »
 			«prm »
 		»
 
 
+
+function message.AlmostAppend (|message| v)
+	opt norefcounts
+	|| s = .last
+	if s == @tmp
+		s.prev = v
+	  else
+		self <~ v
+	
+
+
 function SCModule.DelayedInitFuncTransform
-	|| v = .initvarsarg
+//	if .InitVarsArg contains "RenderInsides" or .InitCodeArg contains "RenderInsides" 
+	|| v = .InitVarsArg
+	|| DestVars = (Compiler.program.InitVarsArg, compiler.appinitglobals)(.isstdlib)
+	|| DestCode = (Compiler.program.InitCodeArg, compiler.appinitcode)(.isstdlib)
+	
 	|| it = v.first
 		for (msg in it)
 			if (msg == @Decl)
 				|| name = msg.GetDclName
 					if name.InitRootDecl( msg, self )
 						msg.Remove
-		.AddDelayedInit(v, Compiler.program.initvarsarg, "Init_")
+		
+		.AddDelayedInit(v, destvars, "Init_")
 
-	.AddDelayedInit(.initcodearg, Compiler.program.initcodearg, "InitCode_")
+	.AddDelayedInit(.InitCodeArg, destcode, "InitCode_")
 
 
 function SCModule.HasActualCode (|message|arg, |bool|)

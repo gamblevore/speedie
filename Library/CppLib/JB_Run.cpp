@@ -175,9 +175,10 @@ void	JB_LibShutdown()					{ JB_MemFree(JB_MemStandardWorld()); }
 bool	JB_LibIsShutdown()					{ return JB_MemStandardWorld()->Shutdown; }
 bool	JB_LibIsThreaded()					{ return JB_Active & 4; }
 void	JB_App__CrashInstall();
+int		JB_SP_AppInit();
 
 
-int JB_LibInit (_cstring* R, bool IsThread) {
+int JB_SP_Init (_cstring* R, bool IsThread) {
 	JB_ErrorNumber = 0;
 	JB_TaskData.Size = 128;
 	JB__Flow_Disabled = 0x7fffFFFF;
@@ -227,8 +228,10 @@ int JB_SP_Run (_cstring* C, int Mode)	{
 	if (JB_LibIsShutdown()) {
 		AddError(EACCES, "jb.shutdown");
 	} else {
-		if (!App_Args and C)
-			AddError(JB_LibInit(C, Mode&4), "jb.init");
+		if (!App_Args and C) {
+			AddError(JB_SP_Init(C, Mode&4), "jb.initlib");
+			AddError(JB_SP_AppInit(), "jb.initapp");
+		}
 		
 		if ((Mode & 1) and App_Args and !JB_ErrorNumber)
 			AddError(JB_Main(),	"occurred");

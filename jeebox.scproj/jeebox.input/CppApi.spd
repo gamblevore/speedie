@@ -334,7 +334,7 @@ module JB_API
 		cpp_part API
 
 	|uint16| NilHappened_ = 0 // save 2 bytes XD
-	cpp_wrapper JB_LibInit (|&cstring| Args=nil, |bool| IsThread=false, |int|)
+	cpp_wrapper JB_SP_Init (|&cstring| Args=nil, |bool| IsThread=false, |int|)
 	cpp_wrapper JB_LibShutdown ()
 
 
@@ -358,7 +358,7 @@ module JB_API
 
 	function Init (|int| flags = 0, |int|)
 		require (stderr==nil)
-		|| ErrCode = jb_api.JB_LibInit
+		|| ErrCode = jb_api.JB_SP_Init
 			return ErrCode
 		
 		target !NoSelfTest // compile like: "speedie jeebox.scproj --target=NoSelfTest"

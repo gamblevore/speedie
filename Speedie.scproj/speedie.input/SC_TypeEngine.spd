@@ -1347,8 +1347,22 @@ function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| c
 		exp.Last!.name = comp.compOp
 		exp <~ (@num, comp.compparam)
 
-	TypeOfExpr( dot, name_space )
-	Return TypeBool!.TypeNormal
+	rz = TypeOfExpr( dot, name_space )
+	if !rz
+		if StdErr.LastError.FromSamePlace(exp)
+			stderr.pop
+		if (comp.name == "~=") and lc.MiniMatch(rc)
+			error (exp, "Perhaps use == instead of ~= ?")
+		  else
+			lc.ExpectFail(rc, exp, nil)
+
+
+function error.FromSamePlace (|message| s, |bool|)
+	opt norefcounts
+	if self
+		if s.position == .position
+			if .path == s.file|string|
+				return true
 
 
 function scdecl.ConstInRangeSub (|int64| Value, |bool| WasHex, |bool|)

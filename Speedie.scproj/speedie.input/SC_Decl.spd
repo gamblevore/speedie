@@ -491,8 +491,8 @@ class SCDecl (SCNamed) {
 			return .Type.typeinfo
 
 
-	function MiniMatch (|SCDecl| O, |int| TypeCast = 0, |bool|)
-		Return .TypeMatch( o, TypeCast, nil )
+	function MiniMatch (|SCDecl?| O, |int| TypeCast = 0, |bool|)
+		Return .TypeMatch( O, TypeCast, nil )
 
 	function IsBool (|bool|)
 		if self and .isnormal
@@ -575,7 +575,7 @@ class SCDecl (SCNamed) {
 		return slf.expectmatch(cls.TypeNormal, 0, self, self) 
 	
 
-	function SCDecl.ExpectFail  (|scdecl| o, |message?| errnode, |message?| backup)
+	function SCDecl.ExpectFail  (|scdecl| o, |message?| errnode, |message?| backup=nil)
 		|| fs = faststring()
 		fs <~ "Type mismatch, expected '"
 		.RenderTypeName(fs)
