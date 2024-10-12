@@ -950,8 +950,6 @@ JB_String* JB_App__AppPath();
 
 int JB_App__Init_();
 
-int JB_App__InitCode_();
-
 JB_String* JB_App__OrigPath();
 
 void JB_PrintStackTrace();
@@ -965,8 +963,6 @@ JB_String* JB_App__SyntaxAccess(JB_String* Name);
 // ErrorColors
 int JB_ErrorColors__Init_();
 
-int JB_ErrorColors__InitCode_();
-
 
 
 // API
@@ -975,8 +971,6 @@ Message* JB_API__Errors();
 int JB_API__Init(int Flags);
 
 int JB_API__Init_();
-
-int JB_API__InitCode_();
 
 void JB_API__NilCallBack(JB_String* ErrorMessage);
 
@@ -1011,8 +1005,6 @@ JB_String* JB_Constants__TestJB();
 // Platform
 int JB_Platform__Init_();
 
-int JB_Platform__InitCode_();
-
 void JB_Platform__Log(JB_String* S);
 
 JB_File* JB_Platform__OpenLog();
@@ -1039,6 +1031,10 @@ bool JB_CompareError(Message* Expected, Message* Found);
 JB_String* JB_EntityTest();
 
 int JB_Init_();
+
+int JB_SP_AppInit();
+
+int JB_SP_AppInitSub_();
 
 int JB_InitCode_();
 
@@ -1316,8 +1312,6 @@ Ind JB_Tk__XMLWordEnd(int From);
 // zalgo
 int JB_zalgo__Init_();
 
-int JB_zalgo__InitCode_();
-
 
 
 // _void
@@ -1425,8 +1419,6 @@ JB_String* JB_int64_Render(int64 Self, FastString* Fs_in);
 // CharProp
 int JB_CharProp__Init_();
 
-int JB_CharProp__InitCode_();
-
 
 
 // Codepoint
@@ -1484,8 +1476,6 @@ Date JB_Date__New0();
 JB_String* JB_ErrorSeverity_Render(uint /*ErrorSeverity*/ Self, FastString* Fs_in);
 
 int JB_ErrorSeverity__Init_();
-
-int JB_ErrorSeverity__InitCode_();
 
 Array* JB_ErrorSeverity__InitNames();
 
@@ -1570,8 +1560,6 @@ bool JB_Syx_Translateable(Syntax Self);
 Syntax JB_Syx__Func(JB_String* Name, Message* Where);
 
 int JB_Syx__Init_();
-
-int JB_Syx__InitCode_();
 
 Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, int ID);
 
@@ -1665,8 +1653,6 @@ CompressionStats* JB_MzSt_Start(CompressionStats* Self);
 
 int JB_MzSt__Init_();
 
-int JB_MzSt__InitCode_();
-
 
 
 // JB_FakeJBString
@@ -1747,8 +1733,6 @@ JB_String* JB_LD_String(ObjectLoader* Self);
 
 int JB_LD__Init_();
 
-int JB_LD__InitCode_();
-
 
 
 // JB_ObjectSaver
@@ -1762,8 +1746,6 @@ void JB_Saver_Destructor(ObjectSaver* Self);
 
 int JB_Saver__Init_();
 
-int JB_Saver__InitCode_();
-
 
 
 // JB_Object_Behaviour
@@ -1771,8 +1753,6 @@ int JB_Saver__InitCode_();
 
 // JB_Pico
 int JB_Pico__Init_();
-
-int JB_Pico__InitCode_();
 
 
 
@@ -2012,8 +1992,6 @@ void JB_Rec_AppendErr(JB_ErrorReceiver* Self, JB_Error* Err);
 
 int JB_Rec__Init_();
 
-int JB_Rec__InitCode_();
-
 void JB_Rec__NewErrorWithNode(Message* Node, JB_String* Desc, JB_String* Path);
 
 void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, int Sev);
@@ -2105,8 +2083,6 @@ void JB_Lk_Test2(LeakTester* Self);
 // JB_Macro
 int JB_Macro__Init_();
 
-int JB_Macro__InitCode_();
-
 
 
 // JB_Memory
@@ -2117,8 +2093,6 @@ void JB_Mrap_Destructor(MWrap* Self);
 Array* JB_Mrap__CollectLeaks_(JB_Object* Self);
 
 int JB_Mrap__Init_();
-
-int JB_Mrap__InitCode_();
 
 MWrap* JB_Mrap__Object(int Count, int ItemSize);
 
@@ -2395,8 +2369,6 @@ void JB_File_SyntaxAppend(JB_File* Self, JB_String* Data);
 void JB_File_Fail(JB_File* Self, JB_String* Error);
 
 int JB_File__Init_();
-
-int JB_File__InitCode_();
 
 JB_File* JB_File__Logs();
 
@@ -2775,8 +2747,6 @@ void JB_Err_UpgradeWithNode(JB_Error* Self);
 void JB_Err__CantParseNum(Message* Where, JB_String* Num, int Pos, bool Overflow);
 
 int JB_Err__Init_();
-
-int JB_Err__InitCode_();
 
 
 

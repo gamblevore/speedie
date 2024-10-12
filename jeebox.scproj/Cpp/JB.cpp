@@ -63,10 +63,6 @@ int JB_App__Init_() {
 	return 0;
 }
 
-int JB_App__InitCode_() {
-	return 0;
-}
-
 JB_String* JB_App__OrigPath() {
 	//visible;
 	JB_String* P = JB__App__Path;
@@ -157,10 +153,6 @@ int JB_ErrorColors__Init_() {
 	return 0;
 }
 
-int JB_ErrorColors__InitCode_() {
-	return 0;
-}
-
 
 Message* JB_API__Errors() {
 	Message* Rz = nil;
@@ -186,7 +178,7 @@ int JB_API__Init(int Flags) {
 	if (JB_StdErr != nil) {
 		return 0;
 	}
-	int ErrCode = JB_LibInit(nil, false);
+	int ErrCode = JB_SP_Init(nil, false);
 	if (ErrCode) {
 		return ErrCode;
 	}
@@ -213,10 +205,6 @@ int JB_API__Init_() {
 	{
 	}
 	;
-	return 0;
-}
-
-int JB_API__InitCode_() {
 	return 0;
 }
 
@@ -434,10 +422,6 @@ int JB_Platform__Init_() {
 	return 0;
 }
 
-int JB_Platform__InitCode_() {
-	return 0;
-}
-
 void JB_Platform__Log(JB_String* S) {
 	//visible;
 	JB_File* L = ({
@@ -582,6 +566,14 @@ int JB_Init_() {
 	//// Error;
 	JB_Err__Init_();
 	JB_InitCode_();
+	return 0;
+}
+
+int JB_SP_AppInit() {
+	return JB_SP_AppInitSub_();
+}
+
+int JB_SP_AppInitSub_() {
 	return 0;
 }
 
@@ -2949,10 +2941,6 @@ int JB_zalgo__Init_() {
 	return 0;
 }
 
-int JB_zalgo__InitCode_() {
-	return 0;
-}
-
 
 
 void JB_bool_Append(bool Self, FastString* Fs_in) {
@@ -3103,10 +3091,6 @@ int JB_CharProp__Init_() {
 	return 0;
 }
 
-int JB_CharProp__InitCode_() {
-	return 0;
-}
-
 
 bool JB_CP_In(Codepoint Self, int A, int B) {
 	return ((uint)(Self - A)) <= ((uint)(B - A));
@@ -3183,10 +3167,6 @@ int JB_ErrorSeverity__Init_() {
 		JB_SetRef(JB__ErrorSeverity__names, JB_Array_Constructor0(nil));
 	}
 	;
-	return 0;
-}
-
-int JB_ErrorSeverity__InitCode_() {
 	return 0;
 }
 
@@ -3296,10 +3276,6 @@ int JB_Syx__Init_() {
 	return 0;
 }
 
-int JB_Syx__InitCode_() {
-	return 0;
-}
-
 Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, int ID) {
 	SyntaxObj* Result = JB_Fn_Constructor(nil, Msg, Name, ID);
 	JB_Incr(Result);
@@ -3377,10 +3353,6 @@ int JB_MzSt__Init_() {
 		JB__MzSt_all = ((CompressionStats){});
 	}
 	;
-	return 0;
-}
-
-int JB_MzSt__InitCode_() {
 	return 0;
 }
 
@@ -3587,10 +3559,6 @@ int JB_LD__Init_() {
 	return 0;
 }
 
-int JB_LD__InitCode_() {
-	return 0;
-}
-
 
 void JB_Saver_AppendInt(ObjectSaver* Self, int64 I) {
 	JB_FS_AppendInt64(Self->Dest, I);
@@ -3623,20 +3591,12 @@ int JB_Saver__Init_() {
 	return 0;
 }
 
-int JB_Saver__InitCode_() {
-	return 0;
-}
-
 
 
 int JB_Pico__Init_() {
 	{
 	}
 	;
-	return 0;
-}
-
-int JB_Pico__InitCode_() {
 	return 0;
 }
 
@@ -4099,10 +4059,6 @@ int JB_Rec__Init_() {
 	return 0;
 }
 
-int JB_Rec__InitCode_() {
-	return 0;
-}
-
 void JB_Rec__NewErrorWithNode(Message* Node, JB_String* Desc, JB_String* Path) {
 	JB_Rec__NewErrorSub(Node, Desc, Path, kJB__ErrorSeverity_Error);
 }
@@ -4504,10 +4460,6 @@ int JB_Macro__Init_() {
 	return 0;
 }
 
-int JB_Macro__InitCode_() {
-	return 0;
-}
-
 
 MWrap* JB_Mrap_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Ptr, uint /*byte*/ DeathAction) {
 	if (Self == nil) {
@@ -4540,10 +4492,6 @@ int JB_Mrap__Init_() {
 	{
 	}
 	;
-	return 0;
-}
-
-int JB_Mrap__InitCode_() {
 	return 0;
 }
 
@@ -5954,10 +5902,6 @@ int JB_File__Init_() {
 		JB_SetRef(JB__File__Speedie, JB_LUB[0]);
 	}
 	;
-	return 0;
-}
-
-int JB_File__InitCode_() {
 	return 0;
 }
 
@@ -8095,10 +8039,6 @@ int JB_Err__Init_() {
 	return 0;
 }
 
-int JB_Err__InitCode_() {
-	return 0;
-}
-
 
 
 
@@ -8436,7 +8376,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024100113);
+	return (2024101210);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8448,4 +8388,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 -3836267876743177575 -4350689744046079234
+// -2934619186805667969 -544737328205168280 -4350689744046079234
