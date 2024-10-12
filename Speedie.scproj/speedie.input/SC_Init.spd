@@ -94,11 +94,12 @@ function SortInitOrderSub (|array of scmodule| mods, |array of scmodule| out, |b
 	|| GotAny = false
 	for m in mods
 		require stderr.ok
-		if !m.inited
-			if m.tryInit(out)
-				gotany = true
-			else
-				Failed = m
+		if m.inited
+			//
+		  elseif m.tryInit(out)
+			gotany = true
+		  else
+			Failed = m
 
 	expect (gotany or !failed) (Failed.source, "Modules has recursive init order")
 	return failed
