@@ -171,7 +171,7 @@ function AppPath (|string|)
 
 function CallPath (|stringzeroterminated|)
 	cpp_wrapper JB_App__CallPath
-		
+
 function TurnInto (|string| s, |[string]| R=nil)
 	cpp_Wrapper JB_App__TurnInto
 
@@ -179,10 +179,10 @@ function ObjMemory (|int64|)
 	cpp_wrapper JB_MemCount
 
 function StringMemory (|int64|)
-	return Memory.usedstring
+	cpp_wrapper JB_MemUsedString
 
 function OtherMemory (|int64|)
-	return Memory.usedOther
+	cpp_wrapper JB_MemUsedOther
 
 function ClearCaches (|int| which=0)
 	cpp_wrapper JB_App__ClearCaches

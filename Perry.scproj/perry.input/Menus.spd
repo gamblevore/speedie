@@ -65,8 +65,11 @@ function ClickedPrevNext (GUIaction)
 	|| i = .ide
 	|| m = i.FindInHistory(i.Path)
 		|| fwd = self == i.gonext
-		m = m.step(fwd)
-		i.GoToMarker(m, fwd.dir)
+		|| m2 = m.step(fwd)
+		if m2 and m != m2
+			i.GoToMarker(m2, fwd.dir)
+		  else
+			beep
 		return true
 	
 
