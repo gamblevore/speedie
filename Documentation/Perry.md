@@ -1,10 +1,10 @@
 # Perry - The IDE for Speedie
 
-Perry is the Integrated Development Environment (IDE) for Speedie. As an IDE, perry aims to help you write good code.
+Perry is the Integrated Development Environment (IDE) for Speedie. As an IDE, Perry aims to help you write good code.
 
 Perry is designed with minimalism in mind, we won't blast your eyes with all sorts of clutter and details. In fact Perry goes out of it's way to hide clutter. Hopefully this will let you focus on the code more easily. Especially if you are new!
 
-Speedie being such a good language, deserves its own IDE, as it does not want to be the second-class citizen that it would be, if it were working within vscode or some terminal editor. Also, having a good IDE meant that a good GUI system had to be developed, so now we have that too.
+Speedie deserves its own IDE. If speedie used vscode/vim, then speedie would be a second-class citizen. But Speedie, having so many good qualities, deserves only the best IDE, thats why I made Perry. Also, having a good IDE meant that a good GUI system had to be developed, so now we have that too.
 
 ![](perry.png)
 
@@ -99,7 +99,7 @@ Actually, with Perry and the GUI, I'm going for more of a retro-feel. More like 
 
 So if you like retro-gaming... this might be a good IDE for you.
 
-Regarding the color-scheme, that can and will change over time. Currently I have a green-theme, but later I will allow skins to be available.
+Regarding the color-scheme, I want to make skins available. This way you can choose different themes per project or whatever you feel like.
 
 I'll probably allow rounded buttons with pictures for backgrounds later, perhaps we can make the IDE look like something from a Civilisation Game or something :) Or a "my little IDE" kind of Hello Kitty theme, or all sorts of possibilities.
 
