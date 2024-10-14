@@ -68,6 +68,7 @@ class PerryIDE (Window)
 	|message|					RecentFiles
 	|string| 					LastCmdStr
 	|date|						LastSendTime
+	|date|						SectionKeyTime
 	|string|					AttachedProgram
 	|ProgressBar|				Progress
 	|Faststring?|				Stats

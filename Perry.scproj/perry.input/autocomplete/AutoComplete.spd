@@ -165,13 +165,14 @@ function PerryIDE.DisplayFB (|message| display, |bool|)
 
 // "" '' <(``)> ``
 
-function PerryIDE.DisplayStr (|message| f, |bool|)
+function PerryIDE.DisplayStr (|message| f, |date|)
 	|| r = f.Range // + f.rangetrim
 	|| orig = .EditMe[r]
 	if f.name != orig
 		.PopupDisplay.expectsparse = 0
 		.popupreason = 1
 		.DisplayInPopup(f.name, false)
+	return 1
 
 
 function PerryIDE.DisplayInPopup (|string| s,  |bool| instant,  |vec4| Color=vec4(),  |ivec2| Corner=.PopupDisplayCorner)
@@ -249,10 +250,15 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 		date = msg[@num]
 		msg = date.Next$
 
-	if msg == "error"
+	if msg ~= "error"
 		if msg.last == "define"
 			beep
 		.LogOneComm(msg, "\1b ")
+		if date.int == .sectionkeytime
+			debugat
+			.sectionkeytime = 0
+			.editme.insertautocomplete
+			
 		return false
 
 	.DuringMsgFB = true
@@ -368,10 +374,11 @@ function JumpToDefinition (GUIAction)
 			msg.name.Reveal
 		  else
 			|| f = msg.owningfunc
-				if msg == f or msg in f
+				if msg == f  or  msg in f
 					cmd = false
 			|| op = ("define", "callfrom")(cmd)
-			ide.MaybeSendMessage(op, msg)
+			|| d = ide.MaybeSendMessage(op, msg)
+			ide.SectionKeyTime = d * rightclick
 			
 	return true
 	
