@@ -668,25 +668,36 @@ function HasStuffToHandleInDestructor (|bool|)
 			if d.IsReffable(true):    return true
 
 
-function CanCompareSub (|string|s, |scdecl|against, |bool|)
+function CanCompareSub (|string| s, |scdecl|against, |bool|)
 	opt norefcounts
 	for (b.upwards in self)
 		|| o = b.access[ s ]
 		if (o isa SCFunction)
-			if o.cancompare(against)
+			if o.CanCompareAgainst(against)
 				Return true
+			
 	
-	
-function CanCompare (|SCDecl| Against, |bool| AsEquals, |bool|)
-	|| CanUseEquals = AsEquals and (self is hasEqualsFunc)
-	if (self isnt HasCompareFunc)  and  !CanUseEquals
+
+function scfunction.CanCompareAgainst (|SCDecl| Against, |bool|)
+	opt norefcounts
+	for (f in self)
+		|| arg = f.args[ 1 ]!
+		if arg.TypeMatch( against, kTypeCastNumbers, nil)
+			return true
+
+
+function scdecl.CanCompare (|SCDecl| Against, |bool| AsEquals, |bool|)
+	opt norefcounts
+	|| T = .type
+	|| CanUseEquals = AsEquals and (T is hasEqualsFunc)
+	if (T isnt HasCompareFunc)  and  !CanUseEquals
 		Return false
 
-	if CanUseEquals and .CanCompareSub( "syntaxequals", Against )
+	if CanUseEquals and T.CanCompareSub( "syntaxequals", against )
 		Return true
 
-	if (self is HasCompareFunc)
-		Return .CanCompareSub( "syntaxcompare", Against )
+	if (T is HasCompareFunc)
+		Return T.CanCompareSub( "syntaxcompare", Against )
 
 
 function CheckAllocVsWrapper (|SCFunction| f, |bool| IsConstructor)

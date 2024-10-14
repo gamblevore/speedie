@@ -77,7 +77,7 @@ linkage
 
 |SCModule|					program = InternalFile.Proj.Mod
 
-|Message|					AppInitCode = `{cpp_name JB_SP_AppInit, return initappglobals_()}`~parse
+|Message|					AppInitCode = `{cpp_name JB_SP_AppInit, return InitAppGlobals_()}`~parse
 |Message|					AppInitGlobals = `{cpp_name JB_SP_AppInitSub_}`~parse
 
 |[SCClass]|					ClassList

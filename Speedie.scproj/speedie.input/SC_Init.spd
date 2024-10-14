@@ -103,11 +103,11 @@ function SortInitOrderSub (|array of scmodule| mods, |array of scmodule| out, |b
 
 	expect (gotany or !failed) (Failed.source, "Modules has recursive init order")
 	return failed
-	
+
 	
 function SortInitOrder (|array of scmodule| mods, |array of scmodule|)
 	while SortInitOrderSub(mods, rz)
-		0
+		0 // this is such a wierd loop. But it works well. :)
 
 	
 function SCModule.AddDelayedInit (|message| src, |message| dest, |string| fn_name)
@@ -200,4 +200,3 @@ function message.IsNilOrZero (|bool|)
 	if f == @arg
 		return !.hasany
 		
-

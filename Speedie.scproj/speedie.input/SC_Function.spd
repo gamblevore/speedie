@@ -922,14 +922,6 @@ function ConstructorLinePlace (|message|)
 		return c.source
 
 
-function CanCompare (|SCDecl|Against, |bool|)
-	opt norefcounts
-	for (f in self)
-		|| arg = f.args[ 1 ]!
-		if (against matches arg)
-			return true
-
-
 function ParamlessConstructor (|SCFunction|)
 	opt norefcounts
 	for (f in self)

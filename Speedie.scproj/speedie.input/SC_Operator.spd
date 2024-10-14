@@ -9,7 +9,7 @@
 datatype OpMode (int)
 	flags
 		|OpMode|
-		CompSet  = [Compare, Assigns]
+		CompOrSet  = [Compare, Assigns]
 		MathLike = [Bit, Math]
 		Addition
 		ShiftOnly
@@ -64,6 +64,8 @@ constructor (|string| name="", |fn_opasm?| ASM, |OpMode| mode=0)
 syntax is (|OpMode| x, |opmode|)
 	return .kind & x
 	
+render
+	fs <~ .name
 
 function CaseAwareStr (|String|)
 	return (self is caseaware)|bool|.string
@@ -86,8 +88,11 @@ function SetFuncName (assigns:|string| s)
 	dict[ s.Lowercase ] = self
 	
 
-function IsCompSet (|bool|)
-	return self Is CompSet
+function IsCompOrSet (|bool|)
+	return self is CompOrSet
+//	|| new = (.kind & OpMode.CompSet) == OpMode.CompSet
+//	if old and !new
+//	return old
 
 
 function InitComp (|string| name_)
@@ -430,7 +435,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 	if (comp is Custom or CaseAware)
 		return CustomOps.Needed
 	
-	|| CompOrSet= comp.IsCompSet
+	|| CompOrSet= comp.IsCompOrSet
 	|| LNT		= LC.TypeInfo
 	|| RNT		= RC.TypeInfo
 	|| LN		= LNT.NumericCountBoolsToo(lc)
