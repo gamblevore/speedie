@@ -2303,7 +2303,7 @@ extern Array* SC__NilReason_values;
 #define kSC__OpMode_CaseAware ((OpMode)262144)
 #define kSC__OpMode_Compare ((OpMode)1)
 #define kSC__OpMode_Comparison ((OpMode)512)
-#define kSC__OpMode_CompSet ((OpMode)3)
+#define kSC__OpMode_CompOrSet ((OpMode)3)
 #define kSC__OpMode_Custom ((OpMode)131072)
 #define kSC__OpMode_EqualOrNot ((OpMode)256)
 #define kSC__OpMode_ExactEquals ((OpMode)4481)
@@ -3649,8 +3649,6 @@ bool SC___junktest_3__(IntRange Data);
 void SC_AddToStaticSection(Message* Arg, Message* ToAdd);
 
 int SC_ArrayInOrderCheck(int InOrder, Message* Msg);
-
-bool SC_CanOpCompare(Message* Exp, SCDecl* Lc, SCDecl* Rc, SCOperator* Comp);
 
 void SC_ClassLinkageTable_cpp_class(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
@@ -7034,6 +7032,8 @@ void SC_SCObject_SyntaxIsSet(SCObject* Self, SCNodeInfo I, bool Value);
 
 
 // JB_SCOperator
+bool SC_Opp_CanOpCompare(SCOperator* Self, SCDecl* Lc, SCDecl* Rc, Message* Exp);
+
 JB_String* SC_Opp_CaseAwareStr(SCOperator* Self);
 
 SCOperator* SC_Opp_Constructor(SCOperator* Self, JB_String* Name, fn_OpASM ASM, OpMode Mode);
@@ -7042,7 +7042,9 @@ void SC_Opp_Destructor(SCOperator* Self);
 
 void SC_Opp_InitComp(SCOperator* Self, JB_String* Name_);
 
-bool SC_Opp_IsCompSet(SCOperator* Self);
+bool SC_Opp_IsCompOrSet(SCOperator* Self);
+
+JB_String* SC_Opp_Render(SCOperator* Self, FastString* Fs_in);
 
 void SC_Opp_SetFuncNameSet(SCOperator* Self, JB_String* S);
 
@@ -7676,6 +7678,8 @@ bool JB_File_SmartDataSet(JB_File* Self, JB_String* Nieu);
 JB_File* JB_File_SyntaxAccess(JB_File* Self, JB_String* Name);
 
 void JB_File_SyntaxAppend(JB_File* Self, JB_String* Data);
+
+bool JB_File_SyntaxEquals(JB_File* Self, JB_String* S, bool Aware);
 
 void JB_File_Fail(JB_File* Self, JB_String* Error);
 
@@ -8952,6 +8956,8 @@ SCDecl* SC_Decl_Better_Numeric(SCDecl* Self, SCDecl* O, OpMode Mode, Message* Le
 
 ASMReg SC_Decl_CalculateASMType(SCDecl* Self);
 
+bool SC_Decl_CanCompare(SCDecl* Self, SCDecl* Against, bool AsEquals);
+
 bool SC_Decl_CanNilCheck(SCDecl* Self);
 
 bool SC_Decl_CanRemoveArgOnReturn(SCDecl* Self, Message* R);
@@ -9661,8 +9667,6 @@ int SC_Class_CalculateSize(SCClass* Self, int Depth);
 
 int SC_Class_CalculateSizeRaw(SCClass* Self, int Depth);
 
-bool SC_Class_CanCompare(SCClass* Self, SCDecl* Against, bool AsEquals);
-
 bool SC_Class_CanCompareSub(SCClass* Self, JB_String* S, SCDecl* Against);
 
 bool SC_Class_CanHaveEmptyConstructor(SCClass* Self);
@@ -9940,7 +9944,7 @@ void SC_Func_CallSuperMem(SCFunction* Self, SCFunction* Fn);
 
 bool SC_Func_CanBuildConstructor(SCFunction* Self);
 
-bool SC_Func_CanCompare(SCFunction* Self, SCDecl* Against);
+bool SC_Func_CanCompareAgainst(SCFunction* Self, SCDecl* Against);
 
 bool SC_Func_CanLibLoad(SCFunction* Self);
 

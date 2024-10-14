@@ -529,7 +529,7 @@ void SC_Comp__AppleBuildApp(JB_File* Project, JB_File* Product) {
 	iif (JB_ErrorInt_SyntaxCast(JB_File_MoveTo(Product, Inner))) {
 		SC_Comp__AppBuildLibs(Inner);
 		SC_Comp__CodeSign(Final_app);
-		iif (Prefered_app != Final_app) {
+		iif (!JB_File_SyntaxEquals(Prefered_app, Final_app, false)) {
 			(JB_File_LinkToSet(Prefered_app, Final_app));
 		}
 		JB_SetRef(SC__Options_output_path, Prefered_app);
@@ -3463,7 +3463,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1864]);
-	JB_FS_AppendInt32(_fsf0, (2024101215));
+	JB_FS_AppendInt32(_fsf0, (2024101417));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -5141,7 +5141,7 @@ Message* SC_AC__UnusedFuncs(Message* Cmd) {
 				break;
 			}
 			Message* Src = Fn->Source;
-			iif (((bool)Src) and ((SC_SCObject_File(Fn) == Scf) and SC_Func_IsUnused(Fn))) {
+			iif (((bool)Src) and (((JB_File_SyntaxEquals(SC_SCObject_File(Fn), Scf, false))) and SC_Func_IsUnused(Fn))) {
 				JB_String* Str = JB_LUB[266];
 				iif (Fn->LinkFrom != nil) {
 					Str = JB_LUB[267];
@@ -8850,7 +8850,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2024101215));
+	JB_FS_AppendInt32(_fsf0, (2024101417));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -10294,16 +10294,6 @@ int SC_ArrayInOrderCheck(int InOrder, Message* Msg) {
 		}
 	}
 	return -1;
-}
-
-bool SC_CanOpCompare(Message* Exp, SCDecl* Lc, SCDecl* Rc, SCOperator* Comp) {
-	iif (!JB_Msg_OperatorIn(Exp, kJB_SyxArg)) {
-		bool Eq = ((bool)(SC_Opp_SyntaxIs(Comp, kSC__OpMode_EqualOrNot)));
-		iif (SC_Class_CanCompare(Lc->Type, Rc, Eq)) {
-			return true;
-		}
-	}
-	return false;
 }
 
 void SC_ClassLinkageTable_cpp_class(SCFunction* Fn, Message* Node, SCNode* Name_space) {
@@ -12466,13 +12456,13 @@ bool SC_SortInitOrderSub(Array* Mods, Array* Out) {
 			iif (!JB_Rec_OK(JB_StdErr)) {
 				return nil;
 			}
-			iif (!M->Inited) {
-				iif (SC_Mod_TryInit(M, Out)) {
-					GotAny = true;
-				}
-				 else {
-					Failed = M;
-				}
+			iif (M->Inited) {
+			}
+			 else iif (SC_Mod_TryInit(M, Out)) {
+				GotAny = true;
+			}
+			 else {
+				Failed = M;
 			}
 			(++_if0);
 		};
@@ -13932,7 +13922,7 @@ SCObject* SC_TypeOfRel(Message* Exp, SCNode* Name_space, Message* Side) {
 	}
 	Custom = SC_UseCustomOperators(LC, RC, Comp, Exp);
 	iif (Custom == kSC__CustomOps_Needed) {
-		iif ((!SC_Opp_IsCompSet(Comp))) {
+		iif (!SC_Opp_IsCompOrSet(Comp)) {
 			JB_Decr(Side);
 			JB_Decr(LC);
 			JB_Decr(RC);
@@ -13944,20 +13934,19 @@ SCObject* SC_TypeOfRel(Message* Exp, SCNode* Name_space, Message* Side) {
 			JB_SafeDecr(_tmPf8);
 			return _tmPf8;
 		}
-		iif (RC == SC_TypeNil) {
-			0;
-		}
-		 else iif ((((OpMode)SC_OpMode_SyntaxCast(SC_Opp_SyntaxIs(Comp, kSC__OpMode_CaseAware)))) or SC_CanOpCompare(Exp, LC, RC, Comp)) {
-			JB_Decr(Side);
-			SCDecl* _tmPf7 = SC_DoOpCompare(Exp, LC, RC, Comp, Name_space);
-			JB_Incr(_tmPf7);
-			JB_Decr(LC);
-			JB_Decr(RC);
-			JB_Decr(RN);
-			JB_Decr(Comp);
-			JB_Decr(LN);
-			JB_SafeDecr(_tmPf7);
-			return _tmPf7;
+		iif (RC != SC_TypeNil) {
+			iif ((((OpMode)SC_OpMode_SyntaxCast(SC_Opp_SyntaxIs(Comp, kSC__OpMode_CaseAware)))) or SC_Opp_CanOpCompare(Comp, LC, RC, Exp)) {
+				JB_Decr(Side);
+				SCDecl* _tmPf7 = SC_DoOpCompare(Exp, LC, RC, Comp, Name_space);
+				JB_Incr(_tmPf7);
+				JB_Decr(LC);
+				JB_Decr(RC);
+				JB_Decr(RN);
+				JB_Decr(Comp);
+				JB_Decr(LN);
+				JB_SafeDecr(_tmPf7);
+				return _tmPf7;
+			}
 		}
 	}
 	 else iif (((OpMode)SC_OpMode_SyntaxCast(SC_Opp_SyntaxIs(Comp, kSC__OpMode_Bit)))) {
@@ -14516,7 +14505,7 @@ int SC_UseCustomOperators(SCDecl* LC, SCDecl* RC, SCOperator* Comp, Message* Msg
 	iif (SC_OpMode_SyntaxCast(SC_Opp_SyntaxIs(Comp, kSC__OpMode_Custom)) or SC_OpMode_SyntaxCast(SC_Opp_SyntaxIs(Comp, kSC__OpMode_CaseAware))) {
 		return kSC__CustomOps_Needed;
 	}
-	bool CompOrSet = SC_Opp_IsCompSet(Comp);
+	bool CompOrSet = SC_Opp_IsCompOrSet(Comp);
 	uint LNT = SC_Decl_TypeInfo(LC);
 	uint RNT = SC_Decl_TypeInfo(RC);
 	int LN = SC_TC_NumericCountBoolsToo(LNT, LC);
@@ -29014,6 +29003,16 @@ void SC_SCObject_SyntaxIsSet(SCObject* Self, SCNodeInfo I, bool Value) {
 }
 
 
+bool SC_Opp_CanOpCompare(SCOperator* Self, SCDecl* Lc, SCDecl* Rc, Message* Exp) {
+	iif (!JB_Msg_OperatorIn(Exp, kJB_SyxArg)) {
+		bool Eq = ((bool)(SC_Opp_SyntaxIs(Self, kSC__OpMode_EqualOrNot)));
+		iif (SC_Decl_CanCompare(Lc, Rc, Eq)) {
+			return true;
+		}
+	}
+	return false;
+}
+
 JB_String* SC_Opp_CaseAwareStr(SCOperator* Self) {
 	return JB_bool_Render0(((bool)(SC_Opp_SyntaxIs(Self, kSC__OpMode_CaseAware))));
 }
@@ -29074,8 +29073,19 @@ void SC_Opp_InitComp(SCOperator* Self, JB_String* Name_) {
 	JB_Decr(S);
 }
 
-bool SC_Opp_IsCompSet(SCOperator* Self) {
-	return SC_OpMode_SyntaxCast(SC_Opp_SyntaxIs(Self, kSC__OpMode_CompSet));
+bool SC_Opp_IsCompOrSet(SCOperator* Self) {
+	return SC_OpMode_SyntaxCast(SC_Opp_SyntaxIs(Self, kSC__OpMode_CompOrSet));
+}
+
+JB_String* SC_Opp_Render(SCOperator* Self, FastString* Fs_in) {
+	FastString* Fs = JB_FS__FastNew(Fs_in);
+	JB_Incr(Fs);
+	JB_FS_AppendString(Fs, Self->Name);
+	JB_String* _tmPf0 = JB_FS_SmartResult(Fs, Fs_in);
+	JB_Incr(_tmPf0);
+	JB_Decr(Fs);
+	JB_SafeDecr(_tmPf0);
+	return _tmPf0;
 }
 
 void SC_Opp_SetFuncNameSet(SCOperator* Self, JB_String* S) {
@@ -32966,6 +32976,13 @@ JB_File* JB_File_SyntaxAccess(JB_File* Self, JB_String* Name) {
 
 void JB_File_SyntaxAppend(JB_File* Self, JB_String* Data) {
 	JB_File_Write(Self, Data);
+}
+
+bool JB_File_SyntaxEquals(JB_File* Self, JB_String* S, bool Aware) {
+	iif (Self != nil) {
+		return JB_Str_Equals(Self, S, Aware);
+	}
+	return false;
 }
 
 void JB_File_Fail(JB_File* Self, JB_String* Error) {
@@ -42504,6 +42521,21 @@ ASMReg SC_Decl_CalculateASMType(SCDecl* Self) {
 	return ((ASMReg)T->TypeInfo);
 }
 
+bool SC_Decl_CanCompare(SCDecl* Self, SCDecl* Against, bool AsEquals) {
+	SCClass* T = Self->Type;
+	bool CanUseEquals = AsEquals and (SC_Class_SyntaxIs(T, kSC__ClassInfo_HasEqualsFunc));
+	iif (((!SC_Class_SyntaxIs(T, kSC__ClassInfo_HasCompareFunc))) and (!CanUseEquals)) {
+		return false;
+	}
+	iif (CanUseEquals and SC_Class_CanCompareSub(T, JB_LUB[1889], Against)) {
+		return true;
+	}
+	iif (SC_Class_SyntaxIs(T, kSC__ClassInfo_HasCompareFunc)) {
+		return SC_Class_CanCompareSub(T, JB_LUB[1888], Against);
+	}
+	return false;
+}
+
 bool SC_Decl_CanNilCheck(SCDecl* Self) {
 	iif (!Self) {
 		return nil;
@@ -47292,7 +47324,7 @@ void SC_Err_Improve(JB_Error* Self) {
 		iif (!JB_File_SyntaxCast(SC)) {
 			return;
 		}
-		iif (SC != SC_Msg_File(Self->Node)) {
+		iif (!JB_File_SyntaxEquals(SC, SC_Msg_File(Self->Node), false)) {
 			JB_SetRef(Self->Node, Node);
 		}
 		iif (JB_File_Exists(SC, false)) {
@@ -48347,27 +48379,13 @@ int SC_Class_CalculateSizeRaw(SCClass* Self, int Depth) {
 	return Count;
 }
 
-bool SC_Class_CanCompare(SCClass* Self, SCDecl* Against, bool AsEquals) {
-	bool CanUseEquals = AsEquals and (SC_Class_SyntaxIs(Self, kSC__ClassInfo_HasEqualsFunc));
-	iif (((!SC_Class_SyntaxIs(Self, kSC__ClassInfo_HasCompareFunc))) and (!CanUseEquals)) {
-		return false;
-	}
-	iif (CanUseEquals and SC_Class_CanCompareSub(Self, JB_LUB[1889], Against)) {
-		return true;
-	}
-	iif (SC_Class_SyntaxIs(Self, kSC__ClassInfo_HasCompareFunc)) {
-		return SC_Class_CanCompareSub(Self, JB_LUB[1888], Against);
-	}
-	return false;
-}
-
 bool SC_Class_CanCompareSub(SCClass* Self, JB_String* S, SCDecl* Against) {
 	{
 		SCClass* B = Self;
 		wwhile (B) {
 			SCObject* O = ((SCObject*)JB_Dict_Value0(B->Access, S));
 			iif (JB_Object_FastIsa(O, &SCFunctionData)) {
-				iif (SC_Func_CanCompare(((SCFunction*)O), Against)) {
+				iif (SC_Func_CanCompareAgainst(((SCFunction*)O), Against)) {
 					return true;
 				}
 			}
@@ -51521,12 +51539,12 @@ bool SC_Func_CanBuildConstructor(SCFunction* Self) {
 	return (SC_Func_SyntaxIs(Self, kSC__FunctionType_ConOrDes)) and SC_Func_IsARealSpdFunc(Self);
 }
 
-bool SC_Func_CanCompare(SCFunction* Self, SCDecl* Against) {
+bool SC_Func_CanCompareAgainst(SCFunction* Self, SCDecl* Against) {
 	{
 		SCFunction* F = Self;
 		wwhile (F) {
 			SCDecl* Arg = ((SCDecl*)JB_Array_Value(F->Args, 1));
-			iif (SC_Decl_MatchesDecl(Against, Arg)) {
+			iif (SC_Decl_TypeMatch(Arg, Against, kJB_kTypeCastNumbers, nil)) {
 				return true;
 			}
 			F = F->NextFunc;
@@ -57446,4 +57464,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 470195380551022453 8649336746060493940
+// -8318540949598186611 -462330902074060584
