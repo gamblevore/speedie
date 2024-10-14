@@ -113,7 +113,6 @@ module PackMaker
 		fn = .testfn("PackTestMul")
 		if fn
 			self[0] = 8725, self[2] = 4, self[1] = 275, self[3] = 2	
-			debugger
 			|| num = fn.Test|&int64|[]
 			if num != 18000
 			

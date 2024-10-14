@@ -98,14 +98,14 @@ function Return			(fn_asm)
 	|| f = exp.first
 		reg = .µ(f, .ReturnASM|asmreg| as AsmReg.ForReturn)
 
-	|| K = reg.const // return true, or -1 or whatever
-		if reg isnt constany // what?
-		if k.fits(15)
+	if reg is ConstAny
+		|| K = reg.const // return true, or -1 or whatever
+		if k and k.fits(15)
 			reg.nop
-		  else
-			K = 0
+			exp.RET(reg, 1, 0, K)
+			return nil
 			
-	exp.RET(reg, 1, 0, K)
+	exp.RET(reg, 1, 0, 0)
 
 
 function TypeCast		(fn_asm)
@@ -189,9 +189,9 @@ function Decl (fn_asm)
 	exp = exp.last!
 	if ty isnt altered
 		return .µinto(exp, dest)
-	rz = .µinto(exp, dest)
-	|| f = rz.fat
-		(f is NeverAltered)
+	return .µinto(exp, dest)
+//	|| f = rz.fat
+//		(f is NeverAltered)
 
 
 
