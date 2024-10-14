@@ -70,7 +70,7 @@ class File (String)
 //		cpp_part CastToStream
 //		return .out
 
-	syntax equals (|string|s, |bool| aware, |bool|)
+	syntax equals (|string?| s, |bool| aware, |bool|)
 		if self != nil
 			return super.syntaxequals(s, aware)
 			

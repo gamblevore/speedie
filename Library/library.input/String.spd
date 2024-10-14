@@ -535,7 +535,7 @@ class String
 		cpp_part CompareInt
 		return .length - other
 	
-	syntax Equals (|string?| Other, |bool|Aware, |bool|)
+	syntax Equals (|string?| Other, |bool| Aware, |bool|)
 		nil self
 		cpp_wrapper JB_Str_Equals
 	
