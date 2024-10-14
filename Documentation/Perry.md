@@ -1,6 +1,6 @@
 # Perry - The IDE for Speedie
 
-Perry is an IDE, that means it aims to do all the things that help you write good code.
+Perry is the Integrated Development Environment (IDE) for Speedie. As an IDE, perry aims to help you write good code.
 
 Perry is designed with minimalism in mind, we won't blast your eyes with all sorts of clutter and details.
 
