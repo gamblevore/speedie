@@ -71,8 +71,7 @@ class File (String)
 //		return .out
 
 	syntax equals (|string?| s, |bool| aware, |bool|)
-		if self != nil
-			return super.syntaxequals(s, aware)
+		return super.syntaxequals(s, aware)
 			
 	function Length (|int|)
 		disabled "Do you mean the file's size or the file's path length?" 
