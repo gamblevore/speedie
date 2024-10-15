@@ -106,16 +106,15 @@ function Branch (|message| cond,  |bool| neg=false,  |fatrange|)
 
 function Branch (|message| cond,  |asmreg| mode,  |&fatrange| range)
 	cpp_Part BranchSub
-	if range
-		range.start = .curr
+//	if "PackTestAndOr".trap
+	range.start = .curr
 	(mode as= asmreg.CondRequest)
 	|| answer = .µ(cond, mode)
 	if answer isnt CondAnswer
 		if answer isnt alreadynegated
 			mode = mode.flip(asmreg.negate)
 		answer = .equals(mode, asmreg(), answer, cond)
-	if range
-		range.after = .curr
+	range.after = .curr
 	
 	// if a or b
 		// c
@@ -155,9 +154,7 @@ helper DoAndOr (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
 	  elseif negate								// simplify logic a little.
 		(opp xor= OpMode.AndOr)
 
-	if negate
-		(dest isnt negate)
-		(dest is alreadynegated)
+	(dest isnt negate)
 	
 	if OPP is AND // did I get negate correct?
 		|| ANDs = .Branch(A, negate)

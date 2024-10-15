@@ -326,7 +326,6 @@ function BoolNot		(fn_asm)						// !a
 	opt	NoRefCounts
 	|| src = .µ(exp, dest.flip(asmreg.negate))
 	if src is AlreadyNegated
-		if dest is negate // why did we get here? we just flipped it above to not negated.
 		return src
 	return .Equals(dest, asmreg(), src, exp)
 	
@@ -475,8 +474,9 @@ helper ASMState.DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMR
 	if dest is Discard
 		return dest & ASMReg.discard // no need to do anything:   {a() + b()}
 	
-	dest = .TempTyped(exp, dest)
-	(dest is FromMath)
+	if dest isnt condrequest
+		dest = .TempTyped(exp, dest)
+		(dest is FromMath)
 	if  ml is ConstAny  and  mr is ConstAny
 		(Dest is MathConst)
 	

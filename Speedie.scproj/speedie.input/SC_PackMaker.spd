@@ -119,6 +119,11 @@ module PackMaker
 		fn = .testfn("PackTestAndOr")
 		if fn
 			self[0] = 0,   self[1] = 6,   self[2] = 1,   self[3] = 0
+			|| Andor = fn.Test|&int64|[]
+			if andor != 3
+			
+		fn = .testfn("PackTestAndOrConsts")
+		if fn
 			debugger
 			|| Andor = fn.Test|&int64|[]
 			

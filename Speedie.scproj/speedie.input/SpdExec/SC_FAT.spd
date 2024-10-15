@@ -154,9 +154,10 @@ struct FatASM
 		
 	function JumpTo (assigns:|&fatasm|)
 		|| j = .jumpreg
-			.r[j-1] = value - self
+			.r[j-1] = 1 + value - self
 		  else
 			debugger
+
 	function out (|uint|): return .r[0]
 //	function out (assigns:|uint|): .r[0] = value
 	

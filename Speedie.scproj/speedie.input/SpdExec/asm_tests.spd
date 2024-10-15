@@ -42,21 +42,37 @@ function PackTestAndOr (|int| a, |int| b, |bool| c, |bool| d, |int|)
 	visible
 	|| five = 5, || min = -1
 	if b < min and b > five
-		rz = 5
+		rz = 6
 	if b < min or b > five
 		rz = 5
-	if a and b
-		rz = 2
-	if !a and b
-		rz = 3
-	if a
-		rz = 1
 	if a or b
 		rz = 4
+	if !a and b
+		rz = 3
+	if a and b
+		rz = 2
+	if a
+		rz = 1
+
+
+function PackTestAndOrConsts (|int|)
+	#! RUN!!
+	visible
+
+	|| f3 = 0 and 5 // test consts
+	|| f4 = 6 and 0
+	|| f5 = 0 and 0
+	|| T6 = 7 and 8
+	|| T7 = 0 or  3
+	|| T8 = 4 or  0
+	|| f9 = 0 or  0
+	|| T10 = 9 or  2
+	return f3 + f4 + f5 + t6 + t7 + t8 + f9 + t10
 		
 function PackTestAndOr2 (|bool| c, |bool| d, |int|)
 	#! RUN!!
 	visible
+
 	if (c or d)
 		rz = 6
 	if (d and c)

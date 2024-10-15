@@ -8,8 +8,7 @@ extend asmreg
 	function BoolAnswer (|asmreg|)
 		.µtype = DataTypeCode.bool
 		
-		if self is negate
-			is AlreadyNegated
+		is AlreadyNegated
 		if self is CondRequest
 			isnt condrequest
 			is CondAnswer
@@ -40,8 +39,7 @@ extend ASMState
 			swap (l) (r) // put reg 0 into the left... more convenient.
 
 		if dest.Isfloat
-			|| Mode = 2+(dest is negate)
-			return .Compare(dest, l, r, exp, mode) // can't really be bothered to do this const comparison
+			return .CompareFloat(dest, l, r, exp, 2)
 
 		return .equalsint(dest, l, r, exp)
 	
@@ -51,35 +49,33 @@ extend ASMState
 
 
 	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
-/*
-			A > B,    A >= B,    UA > UB,    UA >= UB
-*/
-
-		mode += l.signed * 2
+		mode |= !r.signed<<2
+		mode ^= dest isnt Negate
 		if dest isnt CondRequest
 			return exp.CMPI(dest, L, R, mode) * dest
 
-		return exp.JMPI(L, R, mode, 0) * asmreg().BoolAnswer
+		return exp.JMPI(L, R, mode, 0) * dest.BoolAnswer
 
 
 	function CompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
-		mode += 8 * l.IsBig
-		mode += 4 * r.IsBig
+		mode |= l.IsBig<<3
+		mode |= r.IsBig<<2
+		mode ^= dest isnt Negate
 		if dest isnt CondRequest
 			return exp.CMPF(dest, L, R, Mode) * dest
-		return exp.JMPF(L, R, Mode, dest) * asmreg.CondAnswer
+		return exp.JMPF(L, R, Mode, 0) * dest.BoolAnswer
 
 
 	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |int| Mode,  |asmreg|)
 		if dest.IsInt
 			return .CompareInt(dest, l, r, exp, mode)
 		return .CompareFloat(dest, l, r, exp, mode)
+/*				(A >  B)    (A <= B)    (A == B)    (A != B)			*/
 	
-	function LessEq (fn_opasm): return .compare(dest, r, l, exp, 1)
-	function Less   (fn_opasm): return .compare(dest, r, l, exp, 0)
-	
-	function MoreEq (fn_opasm): return .compare(dest, l, r, exp, 1)
 	function More   (fn_opasm): return .compare(dest, l, r, exp, 0)
+	function LessEq (fn_opasm): return .compare(dest, l, r, exp, 1)
+	function Less   (fn_opasm): return .compare(dest, r, l, exp, 0)
+	function MoreEq (fn_opasm): return .compare(dest, r, l, exp, 1)
 
 
 
