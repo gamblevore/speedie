@@ -141,19 +141,19 @@
 	Code += l0;
 ı JMPI: 
 	__;
-	Code = JompI(r, Op, Code);
+	Code = JumpI(r, Op, Code);
 	___;
 ı JMPF: 
 	__;
-	Code = JompF(r, Op, Code);
+	Code = JumpF(r, Op, Code);
 	___;
 ı JMPE: 
 	__;
-	Code = JompEq(r, Op, Code);
+	Code = JumpEq(r, Op, Code);
 	___;
 ı JMPN: 
 	__;
-	Code = JompNeq(r, Op, Code);
+	Code = JumpNeq(r, Op, Code);
 	___;
 ı JBRA: 
 	__;

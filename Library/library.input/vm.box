@@ -431,19 +431,19 @@ POS 6
 
 /**/ JMPI  (JCmpI)
 		__
-		Code = JompI(r, Op, Code)
+		Code = JumpI(r, Op, Code)
 		___
 /**/ JMPF  (JCmpF)
 		__
-		Code = JompF(r, Op, Code)
+		Code = JumpF(r, Op, Code)
 		___
 /**/ JMPE  (JCmpEq)
 		__
-		Code = JompEq(r, Op, Code)
+		Code = JumpEq(r, Op, Code)
 		___
 /**/ JMPN  (JCmpEq)
 		__
-		Code = JompNeq(r, Op, Code)
+		Code = JumpNeq(r, Op, Code)
 		___
 /**/ JBRA  (Bra)
 		__

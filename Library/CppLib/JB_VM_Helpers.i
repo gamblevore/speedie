@@ -237,13 +237,13 @@ AlwaysInline void Rare_ (VMRegister* r, ASM Op) {
 
 #define  DA  *((double*)A)
 #define  DB  *((double*)B)
-#define  FA  *((float*)A)
-#define  FB  *((float*)B)
+#define  FA  *((float* )A)
+#define  FB  *((float* )B)
 
-#define  UA  *((u64*)A)
-#define  UB  *((u64*)B)
-#define  iA  *((int*)A)
-#define  iB  *((int*)B)
+#define  UA  *((u64* )A)
+#define  UB  *((u64* )B)
+#define  iA  *((int* )A)
+#define  iB  *((int* )B)
 #define  uA  *((uint*)A)
 #define  uB  *((uint*)B)
 
@@ -251,17 +251,17 @@ AlwaysInline void Rare_ (VMRegister* r, ASM Op) {
 
 
 bool CompI_ (VMRegister* r, ASM Op) {
-	auto A = &i1;
-	auto B = &i2;
+	auto A = i1;
+	auto B = i2;
 	switch (JCmpI_Cmpu) {
-		CmpSub(0,  A >   B);
-		CmpSub(1,  A >=  B);
+		CmpSub(0,  A >   B); // b >= min  -->  jump
+		CmpSub(1,  A <=  B); // min <= b  -->  jump
 		CmpSub(2,  A ==  B);
 		CmpSub(3,  A !=  B);
-		CmpSub(4, UA >  UB);
-		CmpSub(5, UA >= UB);
-		CmpSub(6, UA == UB); default:;
-		CmpSub(7, UA != UB);
+		CmpSub(4, (u64)A >  (u64)B);
+		CmpSub(5, (u64)A <= (u64)B);
+		CmpSub(6, (u64)A == (u64)B); default:;
+		CmpSub(7, (u64)A != (u64)B);
 	};
 }
 
@@ -272,22 +272,22 @@ bool CompF_ (VMRegister* r, ASM Op) {
 
 	switch (JCmpF_Cmpu) {
 		CmpSub(0 , FA >  FB);
-		CmpSub(1 , FA >= FB);
+		CmpSub(1 , FA <= FB);
 		CmpSub(2 , FA == FB);
 		CmpSub(3 , FA != FB);
 		
 		CmpSub(4 , FA >  DB);
-		CmpSub(5 , FA >= DB);
+		CmpSub(5 , FA <= DB);
 		CmpSub(6 , FA == DB);
 		CmpSub(7 , FA != DB);
 		
 		CmpSub(8 , DA >  FB);
-		CmpSub(9 , DA >= FB);
+		CmpSub(9 , DA <= FB);
 		CmpSub(10, DA == FB);
 		CmpSub(11, DA != FB);
 		
 		CmpSub(12, DA >  DB);
-		CmpSub(13, DA >= DB);
+		CmpSub(13, DA <= DB);
 		CmpSub(14, DA == DB); default:
 		CmpSub(15, DA != DB);
 	};
@@ -295,16 +295,16 @@ bool CompF_ (VMRegister* r, ASM Op) {
 
 
 
-AlwaysInline ASM* JompI (VMRegister* r, ASM Op, ASM* Code) {
-	return Code + JCmpI_Jmpu*CompI_(r, Op);
+AlwaysInline ASM* JumpI (VMRegister* r, ASM Op, ASM* Code) {
+	return Code + CompI_(r, Op)*JCmpI_Jmpu;
 }
 		
 AlwaysInline void CompI (VMRegister* r, ASM Op) {
 	r[JCmpI_Jmpu].Int = CompI_(r, Op);
 }
 
-AlwaysInline ASM* JompF (VMRegister* r, ASM Op, ASM* Code) {
-	return Code + JCmpF_Jmpu*CompF_(r, Op);
+AlwaysInline ASM* JumpF (VMRegister* r, ASM Op, ASM* Code) {
+	return Code + CompF_(r, Op)*JCmpF_Jmpu;
 }
 
 AlwaysInline void CompF (VMRegister* r, ASM Op) {
@@ -337,14 +337,14 @@ AlwaysInline void BitClear (VMRegister* r, ASM Op) {
 		u2 = (u2 << S2)>>S2;
 }
 
-AlwaysInline ASM* JompEq (VMRegister* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* JumpEq (VMRegister* r, ASM Op, ASM* Code) {
 	if (u1 == u2)
 		return Code;
 	return Code + JCmpEq_Jmpi;
 }
 
 
-AlwaysInline ASM* JompNeq (VMRegister* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* JumpNeq (VMRegister* r, ASM Op, ASM* Code) {
 	if (u1 != u2)
 		return Code;
 	return Code + JCmpEq_Jmpi;
