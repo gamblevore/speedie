@@ -41,16 +41,6 @@ dispatch fn_asm_table (fn_asm)
 
 
 
-
-function asmstate.SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond, |asmreg|)
-	opt norefcounts
-	|| dr = dest.reg
-	|| mc = (asmreg(), dest)(dr == ma.reg or mb.reg)
-	|| µ = .µ(cond, mc)
-	return cond.TERN(dest, µ, ma, mb) * dest
-
-
-
 extend_module ASMType {
 constants
 	IncrAfter = 2
@@ -184,14 +174,9 @@ function Decl (fn_asm)
 	opt norefcounts
 	exp = exp.last!
 	|| ty = exp.first!.fastdecl
-	dest = .DeclareMe(Exp, ty) 
-	dest = dest as ASMReg.decl
-	exp = exp.last!
-	if ty isnt altered
-		return .µinto(exp, dest)
-	return .µinto(exp, dest)
-//	|| f = rz.fat
-//		(f is NeverAltered)
+	dest = .DeclareMe(Exp, ty) as ASMReg.decl
+	(dest as= asmreg.neveraltered * (ty isnt altered))
+	return .µinto(exp.last!, dest)
 
 
 
@@ -324,7 +309,7 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 
 function BoolNot		(fn_asm)						// !a
 	opt	NoRefCounts
-	|| src = .µ(exp, dest.flip(asmreg.negate))
+	|| src = .µ(exp, dest.negate)
 	if src is AlreadyNegated
 		return src
 	return .Equals(dest, asmreg(), src, exp)
@@ -431,7 +416,7 @@ function DoMath (fn_asm)
 	|| op = exp.second!
 	|| scop = op.obj|scoperator|
 		if scop is AndOr
-			return .DoAndOr(exp, dest, scop.Kind)
+			return .ASMBoolBadnessMadness(exp, dest, scop.Kind)
 		|| fn = scop.asm
 			return .DoMathSub(exp, dest, fn)
 	error (op, "No ASM for this operator?")
@@ -462,13 +447,8 @@ helper ASMState.DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMR
 	if dest is SingleExpr
 		ml = .µ(exp, DiscardMode)
 	  else
-		if dest is NotYetUsed
-			DiscardMode.reg = dest.reg		// submode.µtype = F.asmdecl.typeonly
-		ml = .µ(exp.first!, DiscardMode as asmreg.stayopen)
-
-		if ml.reg == dest.reg				// we used it!
-			DiscardMode.reg = 0				// submode.µtype = L.asmdecl.typeonly
-		mr = .µ(exp.last!, DiscardMode)
+		ml = .µ(exp.first!, (DiscardMode with dest) as asmreg.stayopen)
+		mr = .µ(exp.last!, DiscardMode.with(dest, ml))
 	.CloseVTmps(TmpCloser)
 	
 	if dest is Discard
@@ -525,16 +505,16 @@ function ASMReg.Write (|message| m,  |asmreg| ptr,  |int| index=0,  |&fatasm|)
 	return .ReadOrWrite(m, ptr, index, true)
 
 
-function asmstate.ExistingVar (|message| m,  |asmreg|)
+function asmstate.ExistingVar (|message| m, |asmreg|)
 	opt	norefcounts
 	real self
 	|| fn = m.func 
-	while (fn == @bra) or ((fn == @type) and m.TypeCastDoesnothing)
+	while (fn == @bra) or ((fn == @type) and m.TypeCastDoesnothing())
 		m = m.first!
 		fn = m.func
 	if fn == @thg
 		return ASMType.ThgSub(self, m, asmreg(), 2)
-
+	
 
 function message.HasAsmStuff (|bool|)
 	opt norefcounts
@@ -608,10 +588,13 @@ function Message.TypeCastDoesNothing (|bool|)
 	opt norefcounts
 	|| Output = .ASMDecl.typeonly
 	|| Input = .first!.ASMDecl.typeonly
-	require (Output is bool) == (Input is bool)		// boolness
-	require  Output.Count    == Input.Count			// vectors
-	require  Output.IsFloat  == Input.isfloat		// floatness
+	require  Output.Count    == Input.Count				// vectors
+	require  Output.IsFloat  == Input.isfloat			// floatness
+	|| BoolOut = Output is bool
+	require (BoolOut) == (Input is bool)				// boolness
+
+	|| BytesLost = Input.ByteCount - Output.ByteCount
 	if output.isfloat
-		return true
-	return Output.ByteCount >= Input.ByteCount
+		return byteslost == 0
+	require byteslost <= 0
 

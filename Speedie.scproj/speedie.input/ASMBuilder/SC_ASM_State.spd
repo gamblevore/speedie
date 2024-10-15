@@ -155,6 +155,9 @@ struct ASMState
 		cpp_part GetASM
 		|| fn = fn_asm_table[exp.ASMType]!
 		|| TmpCloser = .VTmps
+		if "PackTestAndOrConsts".trap
+			printline exp
+			debugger
 		|| ss = (fn)(self, exp, dest)
 		if dest isnt StayOpen
 			.CloseVTmps(TmpCloser)

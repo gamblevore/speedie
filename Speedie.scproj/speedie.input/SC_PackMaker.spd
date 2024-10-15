@@ -94,7 +94,14 @@ module PackMaker
 	function RunAFewTests
 		opt norefcounts
 		
-		|| fn = .testfn("PackTestConsts")
+		|scfunction| fn	
+		fn = .testfn("PackTestAndOrConsts")
+		if fn
+			debugger
+			|| Andor = fn.Test|&int64|[]
+		
+		fn = .testfn("PackTestConsts")
+		if fn
 			|| D = fn.Test|&f64|[]
 			printline d.render
 		
@@ -121,11 +128,6 @@ module PackMaker
 			self[0] = 0,   self[1] = 6,   self[2] = 1,   self[3] = 0
 			|| Andor = fn.Test|&int64|[]
 			if andor != 3
-			
-		fn = .testfn("PackTestAndOrConsts")
-		if fn
-			debugger
-			|| Andor = fn.Test|&int64|[]
 			
 		fn = .testfn("PackTestAndOr2")
 		if fn

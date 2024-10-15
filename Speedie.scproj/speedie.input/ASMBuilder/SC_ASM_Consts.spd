@@ -85,8 +85,8 @@ extend ASMState
 	
 	
 	function NumToReg (|message| exp, |int64| V, |asmreg| Reg=ASMReg(), |asmreg|)
-		if !reg.reg and !v
-			return asmreg()
+		if !v and !reg.reg
+			return reg
 		return .NumToFat(exp, v, reg).info
 	
 	

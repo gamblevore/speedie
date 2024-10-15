@@ -14,11 +14,11 @@ datatype ASMReg (uint64)
 		FatRef			= 1<<30
 		|asmreg|
 		(1<<16)		// starting point
+		Negate
 		FromMath
 		StayOpen
 		AlreadyNegated
 		Alternate
-		Negate
 		Discard
 		Decl = [Set, NotYetUsed]
 		ForReturn
@@ -66,15 +66,15 @@ datatype ASMReg (uint64)
 			return 0
 		return .needfat.const
 
-	function Const (assigns:|int64|)
-		.needfat.const = value
+//	function Const (assigns:|int64|)
+//		.needfat.const = value
 	
-	function Flip (|asmreg| bits, |asmreg|)
-		return (self|uint64| xor bits|uint64|)|asmreg|
+	function Negate (|bool| Neg=true, |asmreg|)
+		return (self|uint64| xor (neg << 16)|uint64|)|asmreg|
 	
-	function Expect (|message| where)
-		opt inline
-		check (.reg) (asmstate.sh, where, "Internal ASM Error: Setting to register 0")
+//	function Expect (|message| where)
+//		opt inline
+//		check (.reg) (asmstate.sh, where, "Internal ASM Error: Setting to register 0")
 	
 	function BitCount (|int|)
 		return .µtype.bitcount
@@ -122,8 +122,8 @@ datatype ASMReg (uint64)
 	function Signed (|bool|)
 		return self|DataTypeCode|.issigned
 		
-	function GapBits (|int|)
-		return 64 - .bitcount
+//	function GapBits (|int|)
+//		return 64 - .bitcount
 	
 	function µType (|DataTypeCode|)
 		return self|DataTypeCode| & DataTypeCode.PossibleBits
@@ -186,6 +186,19 @@ datatype ASMReg (uint64)
 		if .reg == dest.reg
 			return dest.µtype.zero
 		return dest
+
+	operator with (|asmreg| dest, |asmreg|)
+		if dest is NotYetUsed
+			.reg = dest.reg
+		return self
+
+	function with (|asmreg| dest, |asmreg| InUse, |asmreg|)
+		if InUse.reg == dest.reg				// dest is in use!
+			.reg = 0
+		  else									// dest is free!
+			.reg = dest.reg
+		return self
+		
 	
 			
 	module
@@ -198,9 +211,9 @@ datatype ASMReg (uint64)
 // (self-1)&31!!
 // this will "rotate" 0 back to 31 and 1 to 0.
 
-function int.asm (|asmreg|)
-	cpp_part ToASM
-	rz.reg = self // (self - 1)&31 // would be better?
+//function int.asm (|asmreg|)
+//	cpp_part ToASM
+//	rz.reg = self // (self - 1)&31 // would be better?
 
 function int.TextASM (|asmreg|)
 	rz.reg = self // (self - 1)&31 // would be better?

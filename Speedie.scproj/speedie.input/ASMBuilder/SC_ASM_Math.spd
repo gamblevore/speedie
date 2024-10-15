@@ -45,7 +45,7 @@ extend ASMState
 	
 		
 	function NotEq  (fn_opasm)
-		return .Equals(dest.flip(asmreg.negate), l, r, exp)
+		return .Equals(dest.negate, l, r, exp)
 
 
 	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)

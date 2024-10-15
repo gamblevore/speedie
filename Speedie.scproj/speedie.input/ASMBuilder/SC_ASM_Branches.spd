@@ -23,28 +23,30 @@ function If				(fn_asm)
 		ElseIfCond = nil
 		arg2 = nil
 
-	|| B = .Branch(cond, Flip)
-	rz = ASMType.arg(self, arg1)
-	B.fill(.curr)
-	
-	if ElseIfCond or arg2.HasAny
-		|| AfterFirst = arg1.jump(0) // marks as ended... to prevent opts. can be removed later during optimisation
+	|| B = .Branch(cond, Flip)		// const aware
+	if !B.Never
+		ASMType.arg(self, arg1)
+		B.fill(.curr)
+		
+	if !b.always and (ElseIfCond or arg2.HasAny)
+		|| AfterFirst = (arg1.jump(0), nil)(!b.never) // skip second branch, cos first branch ran
 		if ElseIfCond
-			|| a = asmreg()
-			rz = .IF(ElseIfCond, a)
+			.IF(ElseIfCond, asmreg())
 		  else
-			rz = ASMType.ARG(self, arg2)
-		AfterFirst.jumpto = .curr
+			ASMType.ARG(self, arg2)
+		if afterfirst
+			AfterFirst.jumpto = .curr
+	return asmreg()
 
 
 function While			(fn_asm)
 	opt norefcounts
-	|| BEGIN = exp.JUMP(0)								// jump to end... THEN EMIT arg and jump back.
-	ASMType.arg(self, exp.second)						// arg
+	|| BEGIN = exp.JUMP(0)							// jump to end... THEN EMIT arg and jump back.
+	ASMType.arg(self, exp.second)					// arg
 
 	|| CONTINUE = .Curr
 	BEGIN.jumpto = CONTINUE
-	|| GOBACK = .Branch(exp.first!)						// cond
+	|| GOBACK = .Branch(exp.first!, false, false)	// no const
 	|| EXIT = .Curr
 	GOBACK.Fill(BEGIN+1)
 	|| C = BEGIN
@@ -83,96 +85,114 @@ function Ternary		(fn_asm)
 	|| destType = exp.ASMDecl.typeonly
 	|| mA = .ExistingVar(a)
 	|| mB = .ExistingVar(b)
-	if (ma isa desttype) and (mb isa desttype)
-		// OPT: make it check that both are ints (if dest is int)
-		// and bits are equal or less.
+	if (ma isa desttype) and (mb isa desttype) and !desttype.isfloat
 		return .SimpleTernary(dest, ma, mb, cond)
 
 	dest = .TempTyped(exp, dest)
-	|| FailToSecond = .Branch(cond)
+	|| FirstOK = .Branch(cond)		// const aware
+	if FirstOK.const
+		return .µInto((A,B)(FirstOK.always), dest)
 	.µInto(A, dest)
 	|| Exit = exp.jump(0)
 
-	FailToSecond.fill(.curr)
+	FirstOK.fill(.curr)
 
 	rz = .µInto(B, dest)
 	Exit.r[3] = .curr - Exit
-	
 
 
-function Branch (|message| cond,  |bool| neg=false,  |fatrange|)
-	.branch(cond, ASMReg.negate * neg, rz)
-
-
-function Branch (|message| cond,  |asmreg| mode,  |&fatrange| range)
-	cpp_Part BranchSub
-//	if "PackTestAndOr".trap
-	range.start = .curr
-	(mode as= asmreg.CondRequest)
-	|| answer = .µ(cond, mode)
-	if answer isnt CondAnswer
-		if answer isnt alreadynegated
-			mode = mode.flip(asmreg.negate)
-		answer = .equals(mode, asmreg(), answer, cond)
-	range.after = .curr
-	
-	// if a or b
-		// c
-	// if TRUE1                --> jump after (b)
-	// if false1 and FALSE2    --> leave to owner, on reverse condition
-
-	// if a and b
-		// c
-	// if false1 --> leave to owner
-	// if false2 --> leave to owner
-
-
-helper DoAndOr (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
+function SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond, |asmreg|)
 	opt norefcounts
+	|| dr = dest.reg
+	|| mc = (asmreg(), dest)(dr == ma.reg or mb.reg)
+	|| µ = .µ(cond, mc)
+	return cond.TERN(dest, µ, ma, mb) * dest
+
+
+
+
+function Branch (|message| cond,  |bool| neg=false, |bool| CanConst=true, |fatrange|)
+	cpp_Part BranchSub
+	|| mode = (ASMReg.negate * neg) as asmreg.CondRequest
+	rz.start = .curr
+	|| answer = .µ(cond, mode)
+		
+	if answer isnt CondAnswer
+// deal with these const stuff later.
+//		if (answer is constany) and canconst
+		if answer isnt alreadynegated
+			mode = mode.Negate
+		answer = .equals(mode, asmreg(), answer, cond)
+	rz.after = .curr
+	// boolean logic is very awkward
+
+
+
+helper ASMBoolShrink (|message| exp,  |ASMReg| Dest,  |ASMReg| ml,  |ASMReg|)
+	if (ml.µType is bool) and (dest isnt negate) and (dest isnt condrequest)
+		debugat
+		return ml										// x = a or a   -->  x = a
+	debugat
+	return .Equals(dest.negate, ml, asmreg(), exp)		// if  a or a   -->  if a
+
+
+helper ASMBoolifier (|message| exp, |ASMReg| Dest, |opmode| opp, |ASMReg| ml, |ASMReg| mr, |bool| negate, |ASMReg|)
+	dest = .Temptyped(exp, dest)
+	|| fat = exp.BAND(dest, ml, mr, 0)
+	fat.op += opp is OR
+	if negate  and  opp is AND
+		fat.op = asm.bnot
+		(dest is alreadynegated)
+	return fat * dest
+
+
+helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
+	opt norefcounts // 😵‍💫 // 😵‍💫 // 😵‍💫 // 😵‍💫 	// deal with consts later!!! :O
 	|| A = exp.first!
 	|| B = exp.last!
-	|| ml = .ExistingVar(A)
-	|| mr = .ExistingVar(B)
-
-	|| negate = dest is negate					//  !(a and b) === !a or !b
-	if (ml and mr) and !negate
-		if ml.reg == mr.reg						// x = a or a --> x = a|bool|
-			if ml.µType is bool
-				return ml
-			return .Equals(dest as asmreg.negate, ml, asmreg(), A)
-		if (ml.µtype is bool) and (mr.µType is bool) and (dest isnt CondRequest)
-			dest = .TempOnly(exp, dest)
-			dest.µType = DataTypeCode.bool
-			|| fat = exp.BAND(dest, ml, mr, 0)
-			if (opp is or)
-				fat.op = asm.BOR
-			return fat * dest
+	|| ml = .ExistingVar(A) // OrBoolConst(A)
+	|| mr = .ExistingVar(B) // OrBoolConst(B)
 	
-	if dest isnt CondRequest					// AAARGH
-		dest = .NumToReg(exp, 1-negate, dest)
-	
-	  elseif negate								// simplify logic a little.
-		(opp xor= OpMode.AndOr)
+	if ml and ml.reg == mr.reg
+		return .ASMBoolShrink(exp, dest, ml)
 
-	(dest isnt negate)
+	|| negate = (dest is negate)|bool|
+		(opp xor= OpMode.AndOr)		//  !(a and b)  -->  !a or !b
+		(dest isnt negate)
 	
-	if OPP is AND // did I get negate correct?
-		|| ANDs = .Branch(A, negate)
-		return .DoSecondPart(Exp, dest, B, negate).BoolAnswer
+	if dest isnt CondRequest		// 😢 😿 😢 😿 😢 😿 😢 😿 SADNESS!!
+		if (ml.µtype is bool) and (mr.µType is bool)
+			return .ASMBoolifier(exp, dest, opp, ml, mr, negate)
+		
+		ml = .µ(A, ml with dest)
+		mr = .µ(B, ml.with(dest, ml))
+		// we need to jump? or at least... convert ml to a bool... then jump!
+		// here... what if either type is bool... like the result of them.
+	
+	
+	|| Neg1 = negate != (opp is OR)
+	|| FirstPart = .Branch(A, neg1)			// const aware
+	if OPP is AND 
+		if firstpart.const
+			if firstpart.always
+				firstpart = .branch(b, negate)		// const aware
+			return asmreg().boolanswer
+			
+		return .DoSecondPart(Exp, dest, B, negate)
 
-	|| Ors = .Branch(A, !negate)
+	if FirstPart.always
+		return dest.boolanswer()
 	|| part2 = .DoSecondPart(Exp, dest, B, negate)
-	ors.fill(.curr)	
-	return part2.BoolAnswer
+	FirstPart.fill(.curr)	
+	return part2
 	
 
 
 function DoSecondPart (|message| exp,  |ASMReg| Dest,  |message|  B,  |bool| Negate,  |ASMReg|)
 	if dest isnt CondRequest
 		return .Equals(dest, .µ(b), asmreg(), exp)
-	|| tmp = .Branch(B, negate)							// opposite jumpyness
-	return dest
-	// hmmm?
+	|| tmp = .Branch(B, negate)							// const is done?
+	return dest.boolanswer
 
 }
 
@@ -181,7 +201,7 @@ function DoSecondPart (|message| exp,  |ASMReg| Dest,  |message|  B,  |bool| Neg
 
 Struct FatRange
 	|&FatASM| Start
-	|&FatASM| After
+	|?&FatASM| After
 	iterator
 		|| curr = .start
 		while (curr < .after)
@@ -197,5 +217,14 @@ Struct FatRange
 				s.jumpto = curr
 				any = true
 		if !any // what?
+	
+	function Const (|bool|)
+		return .after <= 1|&fatasm|
+	
+	function Never (|bool|)
+		return .After == 0|&fatasm|
+		
+	function Always (|bool|)
+		return .after == 1|&fatasm|
 
 
