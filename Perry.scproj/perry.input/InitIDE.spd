@@ -517,16 +517,18 @@ extend PerryIDE
 		while m.position > 300
 			m.first.remove
 			m.position--
+		if .CommsLogList.IsViewable
+			SDLApp.Touch
 	
 	
 	function LogOneComm (|message| msg, |string|type="")
 		opt norefcounts
-		.logonething(msg, type, .LogComms!)
+		.LogOneThing(msg, type, .LogComms!)
 
 
 	function LogOneAction (|message| msg, |string|type="")
 		opt norefcounts
-		.logonething(msg,type, .LogActions$)
+		.LogOneThing(msg,type, .LogActions$)
 
 
 	function ErrorLogInit (|listview| lv, |string| s)
