@@ -581,11 +581,11 @@ extend PerryIDE
 		.DuringLoad--
 		require .StartProj
 
-		startupwindow.hide
+		StartupWindow.hide
 		.viewasproject
 		.AskCheck
-		sdlapp.saveprefs // for pref-file editing
-		.showide
+		SDLApp.SavePrefs // for pref-file editing
+		.ShowIDE
 		.ViewAsbetter
 		.LoadStartupErrors
 		return true
