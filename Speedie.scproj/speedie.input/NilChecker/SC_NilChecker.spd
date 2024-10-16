@@ -218,7 +218,7 @@ function Function (NilTrackerFn)
 		fp = fp.unbra
 		require .UseAsReal(fp, 0, nilreason.accessing)					// (abc)()
 
-	expect ((fn != scfunction.currfunc) or t.anyreturns or t.nestdepth > 0) (msg, "Recursion bug. Sheesh.")
+	expect ((fn != scfunction.currfunc) or t.anyreturns or t.nestdepth > 0) (msg, "Recursion bug. !!!!!!! QUICKLY DELETE THIS.")
 	
 	if (test is active) and fn.IsNilChecker
 		if fn.isnilchecker != 3
@@ -278,7 +278,7 @@ function DetectStillChecks (|message| first, |nilstate|)
 
 	|| F = first.TrueNess(rz)
 	|| SelfNil = t.self is nilish 
-	if f.isfalse
+	if f.Knownfalse
 		if !SelfNil
 			t.FnAbleToNilCheck = false		// also require that false returns ALWAYS have self nil!
 		// optional is allowed to return false
@@ -318,16 +318,16 @@ function While (NilTrackerFn)
 	|| cond = msg.first!
 	|| CondTest = cond.IsAlwaysBool
 
-	require !CondTest.IsFalse and T.BranchEnter(msg)
+	require !CondTest.KnownFalse and T.BranchEnter(msg)
 
-	|| W = .loops.BeginLoop(!condtest.IsTrue)
+	|| W = .loops.BeginLoop(!condtest.KnownTrue)
 
 	for i in 3 
 		.SyncJump(cond, NilCheckMode.whilepos)
 		.Argument(cond.next)
 		.Loops.NextLoop
 
-	if !condtest.IsTrue
+	if !condtest.KnownTrue
 		.SyncJump(cond, NilCheckMode.whileneg)
 		.loops.exitrecord |= .value // merge this
 	

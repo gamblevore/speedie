@@ -261,7 +261,7 @@ function message.visible2 (|maybebool|)
 function message.visible (|bool|)
 	|| b = .visible2
 	if b.isknown
-		return b.istrue
+		return b.Knowntrue
 	return SCNode.CurrVisibility
 
 

@@ -503,11 +503,11 @@ function message.IsAlwaysBool (|maybebool|)
 
 
 function message.IsAlwaysTrue (|bool|)
-	return .IsAlwaysBool.istrue
+	return .IsAlwaysBool.Knowntrue
 
 
 function message.IsAlwaysFalse (|bool|)
-	return .IsAlwaysBool.isfalse
+	return .IsAlwaysBool.Knownfalse
 
 
 function Message.StartUsingAfter // for "return" debugging.
