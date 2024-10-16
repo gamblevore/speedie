@@ -2608,7 +2608,11 @@ int JB_Tk__ParseLoop(Message* Output, int TmpoFlags) {
 		ParserLineAndIndent Info = JB_Tk__NextLineAndIndent(Output);
 		LC = (LC + Info[0]);
 		if (JB_Tk__WillEnd()) {
-			return JB_Tk__FinishParseLoop(LC, Output, JB_Str_Length(JB__Tk_Data));
+			int Nxt = JB_Tk__NextStart();
+			if (!JB_Tk__Running()) {
+				Nxt = JB_Str_Length(JB__Tk_Data);
+			}
+			return JB_Tk__FinishParseLoop(LC, Output, Nxt);
 		}
 		if (((bool)Prev) and (!Info[0])) {
 			return JB_Tk__FinishParseLoop(LC, Output, JB_Tk__NextStart() - 1);
@@ -8376,7 +8380,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024101210);
+	return (2024101614);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
