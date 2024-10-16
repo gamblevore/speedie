@@ -100,6 +100,11 @@ function Message.IsAssignable (|bool|)
 	return f != @Func and @type and @num // unless... its an assigns func?
 
 
+function message.IsTern (|bool|)
+	opt norefcounts
+	return self == @func  and  .first == @list
+
+
 function message.IsInt (|bool|)
 	return (self == @num) and !.name.find('.')
 

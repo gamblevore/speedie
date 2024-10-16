@@ -153,7 +153,6 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 			ObjectifyString( item )
 	
 	check !(scmodule.curr) (errpos, "Strings with expressions, must be in proper functions. (Compiler limitation)")
-		// would need to totally redesign how I do strings... and init code. sigh. collectdecls seems to have happened already so... its too late at this point to add new vars? something like that.
 
 	for (item in msg)
 		point.Prev = «dot "SyntaxAppend", «Thg fsName », «prm, item » »

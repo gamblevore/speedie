@@ -29,16 +29,25 @@ function RelSetOrExpansion (|Message| exp)
 	((p, exp)(P == @decl)).next = tmp
 
 
-function Or_And_Expansion (|SCDecl| LC, |SCDecl| RC, |Message| exp, |SCNode| name_space, |SCDecl|)
+
+function Or_And_Expansion (|SCDecl| LC, |SCDecl| RC, |Message| exp, |SCNode| name_space, |scoperator| comp, |SCDecl|)
 	|| LBool = LC.Minimatch( TypeBool!.TypeNormal )
 	|| RBool = RC.Minimatch( TypeBool!.TypeNormal )
 		
 	if RBool and LBool
 		Return LC // easy
-	
-	// x = (mybool and myint) // convert to bool
+
+	// if  !RBool  and  !lbool  and  comp is OR
+		//return lc.highestmatch(lc)
+/*
+		We got 15 of these only in speedie. And they are all within "if" or AND
+		We COULD make this an upgrade, so you can do this:
+			strx = str1 or str2 
+*/
+
+	// x = (mybool and myint)		// convert to bool
 	|| ch0 = exp.first!
-	|| ch2 = ch0.next.next! // ch0 could change
+	|| ch2 = ch0.next.next!			// ch0 could change
 	if !LBool
 		ch0.ExpandToBool( name_space )
 	if !RBool

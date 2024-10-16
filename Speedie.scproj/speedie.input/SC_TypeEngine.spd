@@ -99,8 +99,7 @@ function TypeOfARel (ExprResolver)
 
 function TypeOfFunc (ExprResolver)
 	opt norefcounts
-	|| f = exp.first
-	if f == @list
+	if exp.istern
 		return TypeOfTernary(exp, name_space, side)
 	
 	|| fn = TypeOfFuncSub(exp, name_space, side)			#expect (exp, "Can’t use this as a function.")
@@ -909,7 +908,7 @@ function SameTypeSub (|message| first,  |message| second,  |SCNode| name_space, 
 		t1 = t1.newwrapper(t1)
 
 	if !rz
-		rz = t1.HighestMatch( t2, first )
+		rz = t1.HighestMatch( t2 )
 		if !rz
 			return t1
 // make C++ happy
@@ -988,7 +987,7 @@ function TypeOfArr (ExprResolver)
 					IsDispatch++// 
 				
 				if (result.Contains)
-					result.contains = Contained.HighestArrayContainMatch( result.contains, itm ) 
+					result.contains = Contained.HighestArrayContainMatch( result.contains ) 
 				  else
 					result.Contains = Contained
 				
@@ -1495,8 +1494,8 @@ function TypeOfRel (ExprResolver)
 	
 	opch.obj = comp // shouldn't this be higher even?
 	
-	if (comp.kind & opmode.andor) // either
-		return Or_And_Expansion( LC, RC, exp, name_Space ) // expects both sides to be booleans, right?
+	if comp is andor // either
+		return Or_And_Expansion( LC, RC, exp, name_Space, comp ) // expects both sides to be booleans, right?
 
 
 	|| Custom = 0
@@ -1882,7 +1881,7 @@ function TypeOfArgArr (ExprResolver)
 		|| Contained = TypeOfExpr( itm, name_space )
 			check (Contained.type.isdatatypeOrFP or contained.PointerCount) (itm, "Must be a datatype.")
 			if (result)
-				|| oof = contained.HighestArrayContainMatch( result.type.TypeNormal, itm )
+				|| oof = contained.HighestArrayContainMatch( result.type.TypeNormal )
 				result.type = oof.type
 			  else
 				result = SCDecl(contained.type)

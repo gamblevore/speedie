@@ -458,8 +458,8 @@ function CompareObjs (|message| ll, |message| rr, |nilcheckmode| test, |scoperat
 		|| lld = ll.FastDecl
 		if lld.NilAllocDepth >= .Loops.NestDepth
 			return ll.Redundantvar(lld, test)
-		if lnil + rnil != 3				// how super-fiddly is this?
-			return nilstate.real		// "if nil1 == nil2"... who gives a damn.
+		if lnil + rnil != 3
+			return nilstate.real
 	
 	  elseif (2 == (lnil + rnil))		// || x = (a.b.c == objThatisCurrentlyNil)
 		.jump(ll)

@@ -45,7 +45,6 @@ function Message.AllowedMoveToInit (|bool|)
 		return true
 
 
-// so how do we do this?
 function SCModule.LoadInitFuncSub (|message| init, |string| name)
 	|| msg = "helper $Name (|int|)".ParseClean
 	msg <~ init

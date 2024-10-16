@@ -447,14 +447,14 @@ helper ASMState.DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMR
 	if dest is SingleExpr
 		ml = .µ(exp, DiscardMode)
 	  else
-		ml = .µ(exp.first!, (DiscardMode with dest) as asmreg.stayopen)
-		mr = .µ(exp.last!, DiscardMode.with(dest, ml))
+		ml = .µ(exp.first!, (DiscardMode with dest) as ASMReg.StayOpen)
+		mr = .µ(exp.last!,   DiscardMode.with(dest, ml))
 	.CloseVTmps(TmpCloser)
 	
 	if dest is Discard
 		return dest & ASMReg.discard // no need to do anything:   {a() + b()}
 	
-	if dest isnt condrequest
+	if dest isnt CondRequest
 		dest = .TempTyped(exp, dest)
 		(dest is FromMath)
 	if  ml is ConstAny  and  mr is ConstAny
@@ -509,7 +509,7 @@ function asmstate.ExistingVar (|message| m, |asmreg|)
 	opt	norefcounts
 	real self
 	|| fn = m.func 
-	while (fn == @bra) or ((fn == @type) and m.TypeCastDoesnothing())
+	while (fn == @bra) or ((fn == @type) and m.TypeCastDoesnothing)
 		m = m.first!
 		fn = m.func
 	if fn == @thg

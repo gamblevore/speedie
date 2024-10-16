@@ -196,7 +196,6 @@ function Check (|message| cmd, |message|)
 
 
 function Message.SendPerryErrors (|message|)
-// how can I say its OK and that it has warnings? just append to a different section of the errorlog?
 	.clear
 	self <~ Interact.ErrorsToPerry
 	return self

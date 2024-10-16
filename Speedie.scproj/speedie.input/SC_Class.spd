@@ -161,7 +161,6 @@ function IsTask (|bool|)
 	return self and .isrole & 2
 
 
-// how can we get the size of each property?
 function TaskProperties 
 	opt norefcounts
 	for (p in .Properties) (i)

@@ -109,8 +109,6 @@ function SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond,
 	return cond.TERN(dest, µ, ma, mb) * dest
 
 
-
-
 function Branch (|message| cond,  |bool| neg=false, |bool| CanConst=true, |fatrange|)
 	cpp_Part BranchSub
 	|| mode = (ASMReg.negate * neg) as asmreg.CondRequest
@@ -118,8 +116,7 @@ function Branch (|message| cond,  |bool| neg=false, |bool| CanConst=true, |fatra
 	|| answer = .µ(cond, mode)
 		
 	if answer isnt CondAnswer
-// deal with these const stuff later.
-//		if (answer is constany) and canconst
+//		if (answer is constany) and canconst // deal with these const stuff later.
 		if answer isnt alreadynegated
 			mode = mode.Negate
 		answer = .equals(mode, asmreg(), answer, cond)
@@ -146,6 +143,7 @@ helper ASMBoolifier (|message| exp, |ASMReg| Dest, |opmode| opp, |ASMReg| ml, |A
 	return fat * dest
 
 
+
 helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
 	opt norefcounts // 😵‍💫 // 😵‍💫 // 😵‍💫 // 😵‍💫 	// deal with consts later!!! :O
 	|| A = exp.first!
@@ -164,10 +162,13 @@ helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |AS
 		if (ml.µtype is bool) and (mr.µType is bool)
 			return .ASMBoolifier(exp, dest, opp, ml, mr, negate)
 		
+		// Now what? OK lets plan this out.
+		// * we need to do branching
+		// * It would be nice to handle consts too. like x = 2 and 1
+		// * We can do the conversion to bool... after the set... assuming that either isn't bool.		
+		
 		ml = .µ(A, ml with dest)
 		mr = .µ(B, ml.with(dest, ml))
-		// we need to jump? or at least... convert ml to a bool... then jump!
-		// here... what if either type is bool... like the result of them.
 	
 	
 	|| Neg1 = negate != (opp is OR)
@@ -178,22 +179,14 @@ helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |AS
 				firstpart = .branch(b, negate)		// const aware
 			return asmreg().boolanswer
 			
-		return .DoSecondPart(Exp, dest, B, negate)
+		firstpart = .branch(B, negate)
+		return dest.BoolAnswer
 
 	if FirstPart.always
 		return dest.boolanswer()
-	|| part2 = .DoSecondPart(Exp, dest, B, negate)
+	|| part2 = .branch(B, negate)
 	FirstPart.fill(.curr)	
-	return part2
-	
-
-
-function DoSecondPart (|message| exp,  |ASMReg| Dest,  |message|  B,  |bool| Negate,  |ASMReg|)
-	if dest isnt CondRequest
-		return .Equals(dest, .µ(b), asmreg(), exp)
-	|| tmp = .Branch(B, negate)							// const is done?
-	return dest.boolanswer
-
+	return dest.BoolAnswer
 }
 
 
