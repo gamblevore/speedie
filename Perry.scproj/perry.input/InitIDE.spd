@@ -64,6 +64,7 @@ extend PerryIDE
 		|| c = Perry.RecentProjects.first
 			return .FindRecent(p, c)
 
+
 	function perry.FindRecent (|string| p, |message!| curr, |message|)
 		opt norefcounts
 		while curr
@@ -510,7 +511,7 @@ extend PerryIDE
 		(rz is aligncenter)
 
 
-	helper LogOneThing (|message| msg, |string|type, |listviewrow| m)
+	helper LogOneThing (|message| msg, |string| type, |listviewrow| m)
 		opt norefcounts
 		m <~ @emb + (type + msg.render)
 		m.position++ 
@@ -521,14 +522,14 @@ extend PerryIDE
 			SDLApp.Touch
 	
 	
-	function LogOneComm (|message| msg, |string|type="")
+	function LogOneComm (|message| msg, |string| type="")
 		opt norefcounts
 		.LogOneThing(msg, type, .LogComms!)
 
 
-	function LogOneAction (|message| msg, |string|type="")
+	function LogOneAction (|message| msg, |string| type="")
 		opt norefcounts
-		.LogOneThing(msg,type, .LogActions$)
+		.LogOneThing(msg, type, .LogActions$)
 
 
 	function ErrorLogInit (|listview| lv, |string| s)
