@@ -3780,7 +3780,7 @@ Message* SC_NewRel(Message* L, Message* R, JB_String* Op);
 
 bool SC_NodeSorter(SCFunction* A, SCFunction* B);
 
-SCDecl* SC_Or_And_Expansion(SCDecl* LC, SCDecl* RC, Message* Exp, SCNode* Name_space);
+SCDecl* SC_Or_And_Expansion(SCDecl* LC, SCDecl* RC, Message* Exp, SCNode* Name_space, SCOperator* Comp);
 
 void JB_Obj_Print(JB_Object* O);
 
@@ -4576,6 +4576,8 @@ bool SC_Reg_CanAddK(ASMReg Self, int64 T);
 
 int64 SC_Reg_Const(ASMReg Self);
 
+void SC_Reg_ConstSet(ASMReg Self, int64 Value);
+
 float SC_Reg_F32(ASMReg Self);
 
 Float64 SC_Reg_F64(ASMReg Self);
@@ -4915,11 +4917,13 @@ int JB_Rg_Width(IntRange Self);
 
 
 // MaybeBool
-bool JB_MaybeBool_IsFalse(MaybeBool Self);
+bool JB_MaybeBool_Default(MaybeBool Self);
 
 bool JB_MaybeBool_IsKnown(MaybeBool Self);
 
-bool JB_MaybeBool_IsTrue(MaybeBool Self);
+bool JB_MaybeBool_KnownFalse(MaybeBool Self);
+
+bool JB_MaybeBool_KnownTrue(MaybeBool Self);
 
 MaybeBool JB_MaybeBool__Known(bool As);
 
@@ -5757,13 +5761,11 @@ void SC_FAT_TryRotateConst(FatASM* Self);
 
 
 // JB_FatRange
-bool SC_FatRange_Always(FatRange* Self);
-
-bool SC_FatRange_Const(FatRange* Self);
+MaybeBool SC_FatRange_Constness(FatRange* Self);
 
 void SC_FatRange_Fill(FatRange* Self, FatASM* Curr);
 
-bool SC_FatRange_Never(FatRange* Self);
+void SC_FatRange_Nop(FatRange* Self);
 
 
 
@@ -5994,8 +5996,6 @@ bool SC_Pac_Alloc(ASMState* Self, MWrap* J);
 
 ASMReg SC_Pac_ASMBoolBadnessMadness(ASMState* Self, Message* Exp, ASMReg Dest, OpMode Opp);
 
-ASMReg SC_Pac_ASMBoolifier(ASMState* Self, Message* Exp, ASMReg Dest, OpMode Opp, ASMReg Ml, ASMReg Mr, bool Negate);
-
 ASMReg SC_Pac_ASMBoolShrink(ASMState* Self, Message* Exp, ASMReg Dest, ASMReg Ml);
 
 ASMReg SC_Pac_Assign(ASMState* Self, ASMReg Dest, ASMReg L, Message* Exp);
@@ -6014,7 +6014,23 @@ ASMReg SC_Pac_BitOr(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Ex
 
 ASMReg SC_Pac_BitXor(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
+ASMReg SC_Pac_BoolAnd(ASMState* Self, Message* A, Message* B, ASMReg Dest);
+
+ASMReg SC_Pac_BoolConst(ASMState* Self, Message* B, ASMReg Dest, OpMode Opp, ASMReg Ml);
+
+ASMReg SC_Pac_BoolConst2(ASMState* Self, Message* Exp, ASMReg Dest, OpMode Opp, ASMReg Ml, ASMReg Mr);
+
+ASMReg SC_Pac_Boolify(ASMState* Self, Message* Exp, ASMReg Dest, ASMReg Src);
+
 ASMReg SC_Pac_BoolMul(ASMState* Self, ASMReg Dest, ASMReg Boo, ASMReg V, Message* Exp);
+
+ASMReg SC_Pac_BoolOr(ASMState* Self, Message* A, Message* B, ASMReg Dest);
+
+ASMReg SC_Pac_BoolsFromBool(ASMState* Self, Message* Exp, ASMReg Dest, OpMode Opp, ASMReg Ml, ASMReg Mr);
+
+ASMReg SC_Pac_BoolValue(ASMState* Self, Message* A, ASMReg Dest, OpMode Opp, Message* B);
+
+void SC_Pac_BranchConstAware(ASMState* Self, Message* Cond, bool Neg, FatRange* Rz);
 
 void SC_Pac_BranchSub(ASMState* Self, Message* Cond, bool Neg, bool CanConst, FatRange* Rz);
 
@@ -6041,8 +6057,6 @@ ASMReg SC_Pac_Divide(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* E
 ASMReg SC_Pac_DivInt(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
 ASMReg SC_Pac_DoMathSub(ASMState* Self, Message* Exp, ASMReg Dest, fn_OpASM Fn);
-
-ASMReg SC_Pac_DoSecondPart(ASMState* Self, Message* Exp, ASMReg Dest, Message* B, bool Negate);
 
 ASMReg SC_Pac_Equals(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
@@ -8374,6 +8388,8 @@ bool SC_Msg_IsStatementExpr(Message* Self);
 
 bool JB_Msg_IsString(Message* Self);
 
+bool SC_Msg_IsTern(Message* Self);
+
 bool JB_Msg_IsTypeOfDecl(Message* Self);
 
 bool SC_Msg_IsVarAltered(Message* Self, JB_String* Name);
@@ -9066,9 +9082,9 @@ bool SC_Decl_HasStruct(SCDecl* Self);
 
 SCFunction* SC_Decl_HasStructDestructor(SCDecl* Self);
 
-SCDecl* SC_Decl_HighestArrayContainMatch(SCDecl* Self, SCDecl* Other, Message* Exp);
+SCDecl* SC_Decl_HighestArrayContainMatch(SCDecl* Self, SCDecl* Other);
 
-SCDecl* SC_Decl_HighestMatch(SCDecl* Self, SCDecl* Other, Message* Exp);
+SCDecl* SC_Decl_HighestMatch(SCDecl* Self, SCDecl* Other);
 
 bool SC_Decl_IntRegs(SCDecl* Self);
 
@@ -10491,6 +10507,8 @@ inline FatASM* SC_Reg_Read(ASMReg Self, Message* M, ASMReg Ptr, int Index);
 
 inline FatASM* SC_Reg_Write(ASMReg Self, Message* M, ASMReg Ptr, int Index);
 
+inline ASMReg SC_Pac_Exists(ASMState* Self, ASMReg Dest, ASMReg L, Message* Exp);
+
 inline SCDecl* SC_TypeOfSwiz(Message* Exp, SCNode* Name_space, Message* Side, SCDecl* class_Space);
 
 
@@ -10776,6 +10794,10 @@ inline FatASM* SC_Reg_Read(ASMReg Self, Message* M, ASMReg Ptr, int Index) {
 
 inline FatASM* SC_Reg_Write(ASMReg Self, Message* M, ASMReg Ptr, int Index) {
 	return SC_Reg_ReadOrWriteWithMsgRegIntBool(Self, M, Ptr, Index, true);
+}
+
+inline ASMReg SC_Pac_Exists(ASMState* Self, ASMReg Dest, ASMReg L, Message* Exp) {
+	return SC_Pac_Equals(Self, Dest, L, SC_Reg__New(), Exp);
 }
 
 inline SCDecl* SC_TypeOfSwiz(Message* Exp, SCNode* Name_space, Message* Side, SCDecl* class_Space) {
