@@ -23,13 +23,13 @@ function If				(fn_asm)
 		ElseIfCond = nil
 		arg2 = nil
 
-	|| B = .Branch(cond, Flip)		// const aware
-	if !B.Never
+	|| B = .BranchConstAware(cond, Flip)
+	if !b.Constness.KnownFalse
 		ASMType.arg(self, arg1)
 		B.fill(.curr)
 		
-	if !b.always and (ElseIfCond or arg2.HasAny)
-		|| AfterFirst = (arg1.jump(0), nil)(!b.never) // skip second branch, cos first branch ran
+	if !b.constness.KnownTrue and (ElseIfCond or arg2.HasAny)
+		|| AfterFirst = (arg1.jump(0), nil)(!b.constness.knownfalse) // skip second branch, cos first branch ran
 		if ElseIfCond
 			.IF(ElseIfCond, asmreg())
 		  else
@@ -46,7 +46,7 @@ function While			(fn_asm)
 
 	|| CONTINUE = .Curr
 	BEGIN.jumpto = CONTINUE
-	|| GOBACK = .Branch(exp.first!, false, false)	// no const
+	|| GOBACK = .BranchSub(exp.first!)
 	|| EXIT = .Curr
 	GOBACK.Fill(BEGIN+1)
 	|| C = BEGIN
@@ -89,9 +89,12 @@ function Ternary		(fn_asm)
 		return .SimpleTernary(dest, ma, mb, cond)
 
 	dest = .TempTyped(exp, dest)
-	|| FirstOK = .Branch(cond)		// const aware
-	if FirstOK.const
-		return .µInto((A,B)(FirstOK.always), dest)
+	|| FirstOK = .BranchConstAware(cond)
+	|| KK = FirstOK.Constness
+	if KK.IsKnown
+		debugat, #! what about nopping? or does the branch nop?
+		|| which = (A,B)(KK.Default)
+		return .µInto(which, dest)
 	.µInto(A, dest)
 	|| Exit = exp.jump(0)
 
@@ -109,8 +112,11 @@ function SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond,
 	return cond.TERN(dest, µ, ma, mb) * dest
 
 
-function Branch (|message| cond,  |bool| neg=false, |bool| CanConst=true, |fatrange|)
-	cpp_Part BranchSub
+function BranchConstAware (|message| cond,  |bool| neg=false, |fatrange|)
+	return .Branchsub(cond, neg, true)
+
+
+function BranchSub (|message| cond,  |bool| neg=false, |bool| CanConst=false, |fatrange|)
 	|| mode = (ASMReg.negate * neg) as asmreg.CondRequest
 	rz.start = .curr
 	|| answer = .µ(cond, mode)
@@ -119,76 +125,167 @@ function Branch (|message| cond,  |bool| neg=false, |bool| CanConst=true, |fatra
 //		if (answer is constany) and canconst // deal with these const stuff later.
 		if answer isnt alreadynegated
 			mode = mode.Negate
-		answer = .equals(mode, asmreg(), answer, cond)
+		answer = .exists(mode, answer, cond)
 	rz.after = .curr
 	// boolean logic is very awkward
-
 
 
 helper ASMBoolShrink (|message| exp,  |ASMReg| Dest,  |ASMReg| ml,  |ASMReg|)
 	if (ml.µType is bool) and (dest isnt negate) and (dest isnt condrequest)
 		debugat
-		return ml										// x = a or a   -->  x = a
+		return ml.boolanswer							// x = a or a   -->  x = a
 	debugat
-	return .Equals(dest.negate, ml, asmreg(), exp)		// if  a or a   -->  if a
+	return .Exists(dest.negate, ml, exp)				// if  a or a   -->  if a
 
 
-helper ASMBoolifier (|message| exp, |ASMReg| Dest, |opmode| opp, |ASMReg| ml, |ASMReg| mr, |bool| negate, |ASMReg|)
-	dest = .Temptyped(exp, dest)
+helper BoolsFromBool (|message| exp, |ASMReg| Dest, |opmode| opp, |ASMReg| ml, |ASMReg| mr, |ASMReg|)
+	if true: debugat
+	dest = .TempTyped(exp, dest)
 	|| fat = exp.BAND(dest, ml, mr, 0)
 	fat.op += opp is OR
-	if negate  and  opp is AND
+	if (dest is negate)  and  (opp is AND)
 		fat.op = asm.bnot
-		(dest is alreadynegated)
+		(dest is AlreadyNegated)
+	if dest isnt negate
+		(dest is AlreadyNegated)
 	return fat * dest
-
 
 
 helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
 	opt norefcounts // 😵‍💫 // 😵‍💫 // 😵‍💫 // 😵‍💫 	// deal with consts later!!! :O
 	|| A = exp.first!
 	|| B = exp.last!
-	|| ml = .ExistingVar(A) // OrBoolConst(A)
-	|| mr = .ExistingVar(B) // OrBoolConst(B)
+	|| ml = .ExistingVar(A)
+	|| mr = .ExistingVar(B)
 	
 	if ml and ml.reg == mr.reg
+		if true: debugat
 		return .ASMBoolShrink(exp, dest, ml)
 
-	|| negate = (dest is negate)|bool|
-		(opp xor= OpMode.AndOr)		//  !(a and b)  -->  !a or !b
-		(dest isnt negate)
+	if dest is negate
+		if true: debugat
+		(opp xor= OpMode.AndOr)									//  !(a and b)  -->  !a or !b
 	
-	if dest isnt CondRequest		// 😢 😿 😢 😿 😢 😿 😢 😿 SADNESS!!
+	if dest isnt CondRequest									// 😢 😿 😢 😿 😢 😿 😢 😿 SADNESS!!
 		if (ml.µtype is bool) and (mr.µType is bool)
-			return .ASMBoolifier(exp, dest, opp, ml, mr, negate)
-		
-		// Now what? OK lets plan this out.
-		// * we need to do branching
-		// * It would be nice to handle consts too. like x = 2 and 1
-		// * We can do the conversion to bool... after the set... assuming that either isn't bool.		
-		
-		ml = .µ(A, ml with dest)
-		mr = .µ(B, ml.with(dest, ml))
+			if true: debugat
+			return .BoolsFromBool(exp, dest, opp, ml, mr)		// No consts via .existingvar		
+		if true: debugat
+		return .BoolValue(A, dest, opp, b)
 	
-	
-	|| Neg1 = negate != (opp is OR)
-	|| FirstPart = .Branch(A, neg1)			// const aware
-	if OPP is AND 
-		if firstpart.const
-			if firstpart.always
-				firstpart = .branch(b, negate)		// const aware
-			return asmreg().boolanswer
-			
-		firstpart = .branch(B, negate)
-		return dest.BoolAnswer
+	if OPP is OR
+		if true: debugat
+		return .BoolOr(A, B, dest)
+	if true: debugat
+	return .BoolAnd(A, B, Dest)
 
-	if FirstPart.always
-		return dest.boolanswer()
-	|| part2 = .branch(B, negate)
-	FirstPart.fill(.curr)	
+
+function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMReg|)
+	opt norefcounts
+	|| req = asmreg() with dest
+	|| OpMsg = a.next!
+	if !req.reg
+		debugat
+		req = .TempOnly(opmsg) // we need a shared location!
+	
+	|| ml = .µinto(A, req)
+	if ml is ConstAny
+		debugat
+		return .BoolConst(b, dest, opp, ml)
+	
+	|| JUMP = .Exists(ASMReg.CondRequest.negate(opp is or), ml, opmsg).fat!
+	|| mr = .µinto(B, req)
+	if mr is ConstAny											// Wow this is frustrating!
+		debugat
+		jump.NOP
+		return .BoolConst2(opmsg, dest, opp, mr, ml)
+
+	JUMP.JumpTo = .curr
+	
+	if (ml.µType is bool and mr.µType is bool)
+		debugat
+		return ml
+
+	// boolify!
+	if true
+		debugat
+	return .Exists(req, req, opmsg)
+
+
+function BoolConst2 (|message| exp, |asmreg| dest, |opmode| Opp, |asmreg| ml,  |asmreg| mr, |asmreg|)
+	|| V = mr.const!=0
+	if v == (opp is AND)
+		if true: debugat
+		mr.nop
+		return .boolify(exp, dest, ml)
+	
+	if true: debugat
+	mr.const = v|int|
+	return mr
+
+
+function Boolify (|message| exp, |asmreg| dest,  |asmreg| Src,   |asmreg|)
+	if src.µType is bool
+		if true: debugat
+	// we don't need to negate... the caller will do that.
+	// just needs boolification
+		return src
+	if true: debugat
+	return .Exists(dest.negate, src, exp)
+	
+
+function BoolConst (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asmreg|)
+	|| V = (ml.const!=0) != (dest is negate)
+	|| expect = opp is OR
+	if v == expect
+		debugat
+		ml.Const = v|int|		// x = 5 or  2 --> x = true
+		return ml				// x = 0 and 2 --> x = false
+								
+	ml.nop						// x = 0 or y  --> x = y
+								// x = 7 and y --> x = y
+	|| mr = .µ(B, asmreg() with dest)
+	if mr is ConstAny
+		debugat
+		mr.const = (mr.const != 0)|int|
+		return mr.BoolAnswer
+	
+	if true: debugat
+	return .boolify(B, dest, mr)
+// we could delay boolification... needs a fresh mind.
+// x = a or b or c or d or e     // any could happen, not all will be bools.
+// y = a and b and c and d and e // only the last... but either way we do the conversion AFTER
+
+
+function BoolAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
+	|| FirstPart = .BranchConstAware(A, dest is negate)
+	|| KK = FirstPart.Constness
+	if KK.IsKnown
+		if KK.KnownTrue
+			debugat
+			FirstPart.nop
+			|| tmp = .BranchConstAware(b, dest is negate)
+		debugat
+		return dest.boolanswer
+		
+	debugat
+	|| tmp2 = .BranchConstAware(B, dest is negate)
 	return dest.BoolAnswer
-}
 
+
+
+function BoolOr (|message| A, |message| B, |asmreg| dest,   |asmreg|)
+	if (true)
+		debugat
+	|| FirstPart = .BranchConstAware(A, dest isnt negate)
+	|| KK = FirstPart.Constness
+	if !KK.KnownTrue
+		debugat
+		|| part2 = .BranchConstAware(B, dest is negate)
+		FirstPart.fill(.curr)	
+	return dest.BoolAnswer
+
+}
 
 
 
@@ -200,7 +297,11 @@ Struct FatRange
 		while (curr < .after)
 			yield curr
 			curr++
-			
+	
+	function Nop
+		for s in self
+			s.nop
+	
 	function Fill (|&fatasm| curr)
 		|| any = false
 		curr--
@@ -211,13 +312,8 @@ Struct FatRange
 				any = true
 		if !any // what?
 	
-	function Const (|bool|)
-		return .after <= 1|&fatasm|
-	
-	function Never (|bool|)
-		return .After == 0|&fatasm|
+	function Constness (|maybebool|)
+		|| a = .After|uint64|
+		if a <= 1
+			return a|maybebool|
 		
-	function Always (|bool|)
-		return .after == 1|&fatasm|
-
-

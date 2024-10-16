@@ -312,7 +312,7 @@ function BoolNot		(fn_asm)						// !a
 	|| src = .µ(exp, dest.negate)
 	if src is AlreadyNegated
 		return src
-	return .Equals(dest, asmreg(), src, exp)
+	return .exists(dest, src, exp)
 	
 
 function BitNot				(fn_asm)					// ~a

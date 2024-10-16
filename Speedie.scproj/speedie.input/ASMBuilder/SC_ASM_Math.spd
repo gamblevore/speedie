@@ -29,11 +29,15 @@ extend ASMState
 		if l.reg
 			fat = exp.JMPE(r,l,0)
 		  else
-			fat = exp.jBRA(r,0)
+			fat = exp.JBRA(r,0)
 		fat.op += negate
 		return fat * dest.boolanswer
 
 	
+	function Exists (|asmreg| dest, |asmreg| L, |message| exp, |asmreg|)
+		opt inline
+		return .Equals(dest, l, asmreg(), exp)
+
 	function Equals (fn_opasm)
 		if r.reg == 0  and  l.reg != 0
 			swap (l) (r) // put reg 0 into the left... more convenient.
