@@ -1151,10 +1151,10 @@ ive been~running #since morning
 			LC += info.r
 
 			if .WillEnd
-				|| nxt = .nextstart // hmmm... parser.data.length is too far. willend doesnt seem total.
+				|| nxt = .nextstart
 				if !.Running
 					nxt = parser.data.length
-				return .finishparseloop(lc, output, nxt)
+				return .FinishParseLoop(lc, output, nxt)
 			if (prev and !info.r)
 				return .finishparseloop(lc, output, .nextstart-1)
 			
