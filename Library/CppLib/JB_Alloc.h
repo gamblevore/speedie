@@ -61,7 +61,7 @@ void JB_Flow__PrintStats();
 	#endif
     #define dbgexpect(test)  if  (!(test)) {debugger; return;} // int3 works in xcode but not in releasebuilds!
     #define dbgexpect2(test) if  (!(test)) {debugger; return 0;}
-    #define JB_DoAt(count) int ldb; {static int jDB = 0; if (++jDB == count) {debugger;}; ldb = jDB; }
+    #define JB_DoAt(count) {static int jDB = 0; if (++jDB == count) debugger;}
     #define JB_FuncCallCount(count) static int _fnCallCount_ = 0; _fnCallCount_++;
     #define DEBUGONLY(x) x
 #else
