@@ -17,35 +17,38 @@ extend asmreg
 
 extend ASMState
 	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asmreg|)
-		|| negate = (dest is negate)|int|
-		if dest isnt CondRequest
-			if dest is constany
+		|| OldDest = dest
+		dest = dest.BoolAnswer
+		|| negate = (Olddest is negate)|int|
+		if Olddest isnt CondRequest
+			if Olddest is constany
 				l.nop
 				r.nop
+				// what if we get false? theres no fat? its just reg0
 				return .numtoreg(exp, ((l.const==r.const)==!negate)|int|, dest)
-			return exp.CMPB(dest, L, R, negate) * Dest
+			return exp.CMPB(dest, L, R, negate)*dest
 
-		|&fatasm| fat 
 		if l.reg
-			fat = exp.JMPE(r,l,0)
-		  else
-			fat = exp.JBRA(r,0)
-		fat.op += negate
-		return fat * dest.boolanswer
+			if negate
+				return exp.JMPN(r,l,0)*Dest
+			return exp.JMPE(r,l,0)*Dest
+		if negate
+			return exp.JBRN(r,0)*Dest
+		return exp.JBRA(r,0)*Dest
 
 	
 	function Exists (|asmreg| dest, |asmreg| L, |message| exp, |asmreg|)
 		opt inline
 		return .Equals(dest, l, asmreg(), exp)
 
+
 	function Equals (fn_opasm)
-		if r.reg == 0  and  l.reg != 0
+		if !r.reg  and  l.reg
 			swap (l) (r) // put reg 0 into the left... more convenient.
 
-		if dest.Isfloat
-			return .CompareFloat(dest, l, r, exp, 2)
-
-		return .equalsint(dest, l, r, exp)
+		if dest.IsInt
+			return .EqualsInt(dest, l, r, exp)
+		return .CompareFloat(dest, l, r, exp, 2)
 	
 		
 	function NotEq  (fn_opasm)
@@ -53,21 +56,25 @@ extend ASMState
 
 
 	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
+		|| OldDest = dest
+		dest = dest.BoolAnswer
 		mode |= !r.signed<<2
-		mode ^= dest isnt Negate
-		if dest isnt CondRequest
+		mode ^= OldDest isnt Negate
+		if OldDest isnt CondRequest
 			return exp.CMPI(dest, L, R, mode) * dest
 
-		return exp.JMPI(L, R, mode, 0) * dest.BoolAnswer
+		return exp.JMPI(L, R, mode, 0) * dest
 
 
 	function CompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
+		|| OldDest = dest
+		dest = dest.BoolAnswer
 		mode |= l.IsBig<<3
 		mode |= r.IsBig<<2
-		mode ^= dest isnt Negate
+		mode ^= OldDest isnt Negate
 		if dest isnt CondRequest
 			return exp.CMPF(dest, L, R, Mode) * dest
-		return exp.JMPF(L, R, Mode, 0) * dest.BoolAnswer
+		return exp.JMPF(L, R, Mode, 0) * dest
 
 
 	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |int| Mode,  |asmreg|)
@@ -76,10 +83,17 @@ extend ASMState
 		return .CompareFloat(dest, l, r, exp, mode)
 /*				(A >  B)    (A <= B)    (A == B)    (A != B)			*/
 	
-	function More   (fn_opasm): return .compare(dest, l, r, exp, 0)
-	function LessEq (fn_opasm): return .compare(dest, l, r, exp, 1)
-	function Less   (fn_opasm): return .compare(dest, r, l, exp, 0)
-	function MoreEq (fn_opasm): return .compare(dest, r, l, exp, 1)
+	function More   (fn_opasm)
+		return .compare(dest, l, r, exp, 0)
+
+	function LessEq (fn_opasm)
+		return .compare(dest, l, r, exp, 1)
+
+	function Less   (fn_opasm)
+		return .compare(dest, r, l, exp, 0)
+
+	function MoreEq (fn_opasm)
+		return .compare(dest, r, l, exp, 1)
 
 
 

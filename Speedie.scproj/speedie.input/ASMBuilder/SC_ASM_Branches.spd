@@ -82,18 +82,18 @@ function Ternary		(fn_asm)
 	|| A = cond.next!
 	|| B = A.next!
 	
-	|| destType = exp.ASMDecl.typeonly
+	|| DestType = exp.ASMDecl.typeonly
 	|| mA = .ExistingVar(a)
 	|| mB = .ExistingVar(b)
-	if (ma isa desttype) and (mb isa desttype) and !desttype.isfloat
+	if (ma isa DestType) and (mb isa DestType) and !DestType.isfloat
 		return .SimpleTernary(dest, ma, mb, cond)
 
 	dest = .TempTyped(exp, dest)
 	|| FirstOK = .BranchConstAware(cond)
 	|| KK = FirstOK.Constness
 	if KK.IsKnown
-		debugat, #! what about nopping? or does the branch nop?
-		|| which = (A,B)(KK.Default)
+		#! what about nopping? or does the branch nop?
+		/|| which = (A,B)(KK.Default)
 		return .µInto(which, dest)
 	.µInto(A, dest)
 	|| Exit = exp.jump(0)
@@ -117,7 +117,7 @@ function BranchConstAware (|message| cond,  |bool| neg=false, |fatrange|)
 
 
 function BranchSub (|message| cond,  |bool| neg=false, |bool| CanConst=false, |fatrange|)
-	|| mode = (ASMReg.negate * neg) as asmreg.CondRequest
+	|| mode = asmreg.CondRequest.Negate(neg)
 	rz.start = .curr
 	|| answer = .µ(cond, mode)
 		
@@ -131,16 +131,13 @@ function BranchSub (|message| cond,  |bool| neg=false, |bool| CanConst=false, |f
 
 
 helper ASMBoolShrink (|message| exp,  |ASMReg| Dest,  |ASMReg| ml,  |ASMReg|)
-	if (ml.µType is bool) and (dest isnt negate) and (dest isnt condrequest)
-		debugat
-		return ml.boolanswer							// x = a or a   -->  x = a
-	debugat
-	return .Exists(dest.negate, ml, exp)				// if  a or a   -->  if a
+	if (ml.isbool) and (dest isnt negate) and (dest isnt condrequest)
+		/return ml.boolanswer								// x = a or a   -->  x = a
+	/return .Exists(dest.negate, ml, exp)					// if  a or a   -->  if a
 
 
-helper BoolsFromBool (|message| exp, |ASMReg| Dest, |opmode| opp, |ASMReg| ml, |ASMReg| mr, |ASMReg|)
-	if true: debugat
-	dest = .TempTyped(exp, dest)
+helper BoolFromBools (|message| exp, |ASMReg| Dest, |opmode| opp, |ASMReg| ml, |ASMReg| mr, |ASMReg|)
+	/dest = .TempTyped(exp, dest)
 	|| fat = exp.BAND(dest, ml, mr, 0)
 	fat.op += opp is OR
 	if (dest is negate)  and  (opp is AND)
@@ -159,102 +156,93 @@ helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |AS
 	|| mr = .ExistingVar(B)
 	
 	if ml and ml.reg == mr.reg
-		if true: debugat
-		return .ASMBoolShrink(exp, dest, ml)
+		/return .ASMBoolShrink(exp, dest, ml)
 
 	if dest is negate
-		if true: debugat
-		(opp xor= OpMode.AndOr)									//  !(a and b)  -->  !a or !b
+		/(opp xor= OpMode.AndOr)								//  !(a and b)  -->  !a or !b
 	
 	if dest isnt CondRequest									// 😢 😿 😢 😿 😢 😿 😢 😿 SADNESS!!
-		if (ml.µtype is bool) and (mr.µType is bool)
-			if true: debugat
-			return .BoolsFromBool(exp, dest, opp, ml, mr)		// No consts via .existingvar		
-		if true: debugat
-		return .BoolValue(A, dest, opp, b)
+		ifn ml.isbool and mr.isbool
+			/return .BoolValue(A, dest, opp, b)
+		/return .BoolFromBools(exp, dest, opp, ml, mr)		// No consts via .existingvar		
 	
 	if OPP is OR
-		if true: debugat
-		return .BoolOr(A, B, dest)
-	if true: debugat
-	return .BoolAnd(A, B, Dest)
+		/return .BoolOr(A, B, dest)
+	/ return .BoolAnd(A, B, Dest)
+			
+
+function UniqueLocation (|message| opmsg, |asmreg| dest,   |asmreg|)
+	|| req = asmreg() with dest
+	if !req.reg
+		/return .TempOnly(OpMsg)
+	return req
+	
+
+function QuickBool (|message| A, |ASMReg| Dest, |ASMReg|)
+	|| ml = .ExistingVar(A)
+	if ml.isbool and (dest.reg == ml.reg)
+		return ml
+	
+
+function BoolTestAndJump (|message| exp, |asmreg| req, |opmode| opp, |&fatasm|)
+	|| mode = ASMReg.CondRequest.negate(opp is or)
+	return .Exists(mode, req, exp).fat!
 
 
 function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMReg|)
 	opt norefcounts
-	|| req = asmreg() with dest
-	|| OpMsg = a.next!
-	if !req.reg
-		debugat
-		req = .TempOnly(opmsg) // we need a shared location!
+	|| req = .QuickBool(A, dest)
 	
-	|| ml = .µinto(A, req)
-	if ml is ConstAny
-		debugat
-		return .BoolConst(b, dest, opp, ml)
+	if !req
+		req = .UniqueLocation(A, dest)	
+		req = .µInto(A, req)
+		if req is ConstAny										// x = 5 or Y() --> x = Y()
+			/return .BoolConst1(b, dest, opp, req)
 	
-	|| JUMP = .Exists(ASMReg.CondRequest.negate(opp is or), ml, opmsg).fat!
-	|| mr = .µinto(B, req)
-	if mr is ConstAny											// Wow this is frustrating!
-		debugat
-		jump.NOP
-		return .BoolConst2(opmsg, dest, opp, mr, ml)
+	|| JUMP = .BoolTestAndJump(a.next!, req, opp)
+	|| Second = .µinto(B, req)
+	if Second is ConstAny										// Wow this is frustrating!
+		/jump.NOP
+		return .BoolConst2(a.next!, dest, opp, req, Second)
 
 	JUMP.JumpTo = .curr
 	
-	if (ml.µType is bool and mr.µType is bool)
-		debugat
-		return ml
+	if req.isbool and Second.isbool
+		/return req
 
-	// boolify!
-	if true
-		debugat
-	return .Exists(req, req, opmsg)
+	/return .Exists(dest, req, a.next!)
+
+
+function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asmreg|)
+	|| V = (ml.const!=0) != (dest is negate)
+	|| expect = opp is OR
+	if v == expect
+		/ml.Const = v|int|				// x = 5 or  2	 --> x = true
+		return ml						// x = 0 and 2	 --> x = false
+	
+	/ml.nop								// x = 0 or y()  --> x = y()
+										// x = 7 and y() --> x = y()
+	|| mr = .µ(B, dest)
+	if mr is ConstAny
+		/mr.const = (mr.const != 0)|int|
+		return mr.BoolAnswer
+	
+	if mr.isbool
+		/return mr
+	/return .Exists(dest.negate, mr, B)
+
 
 
 function BoolConst2 (|message| exp, |asmreg| dest, |opmode| Opp, |asmreg| ml,  |asmreg| mr, |asmreg|)
 	|| V = mr.const!=0
 	if v == (opp is AND)
-		if true: debugat
-		mr.nop
-		return .boolify(exp, dest, ml)
+		/mr.nop
+		return ml
 	
-	if true: debugat
-	mr.const = v|int|
+	/mr.const = v|int|
 	return mr
 
-
-function Boolify (|message| exp, |asmreg| dest,  |asmreg| Src,   |asmreg|)
-	if src.µType is bool
-		if true: debugat
-	// we don't need to negate... the caller will do that.
-	// just needs boolification
-		return src
-	if true: debugat
-	return .Exists(dest.negate, src, exp)
 	
-
-function BoolConst (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asmreg|)
-	|| V = (ml.const!=0) != (dest is negate)
-	|| expect = opp is OR
-	if v == expect
-		debugat
-		ml.Const = v|int|		// x = 5 or  2 --> x = true
-		return ml				// x = 0 and 2 --> x = false
-								
-	ml.nop						// x = 0 or y  --> x = y
-								// x = 7 and y --> x = y
-	|| mr = .µ(B, asmreg() with dest)
-	if mr is ConstAny
-		debugat
-		mr.const = (mr.const != 0)|int|
-		return mr.BoolAnswer
-	
-	if true: debugat
-	return .boolify(B, dest, mr)
-// we could delay boolification... needs a fresh mind.
-// x = a or b or c or d or e     // any could happen, not all will be bools.
-// y = a and b and c and d and e // only the last... but either way we do the conversion AFTER
 
 
 function BoolAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
@@ -262,26 +250,20 @@ function BoolAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	|| KK = FirstPart.Constness
 	if KK.IsKnown
 		if KK.KnownTrue
-			debugat
-			FirstPart.nop
+			/FirstPart.nop
 			|| tmp = .BranchConstAware(b, dest is negate)
-		debugat
-		return dest.boolanswer
-		
-	debugat
-	|| tmp2 = .BranchConstAware(B, dest is negate)
+		/ return dest.boolanswer
+	
+	/ || tmp2 = .BranchConstAware(B, dest is negate)
 	return dest.BoolAnswer
 
 
 
 function BoolOr (|message| A, |message| B, |asmreg| dest,   |asmreg|)
-	if (true)
-		debugat
-	|| FirstPart = .BranchConstAware(A, dest isnt negate)
+	/|| FirstPart = .BranchConstAware(A, dest isnt negate)
 	|| KK = FirstPart.Constness
 	if !KK.KnownTrue
-		debugat
-		|| part2 = .BranchConstAware(B, dest is negate)
+		/|| part2 = .BranchConstAware(B, dest is negate)
 		FirstPart.fill(.curr)	
 	return dest.BoolAnswer
 
