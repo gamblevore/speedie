@@ -1533,13 +1533,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool ((int)16)
 #define kSC__CustomOps_TypeCastToBetter ((int)32)
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2146])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2145])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2147])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2148])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2145])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2148])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2149])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2146])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2147])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2144])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2147])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2148])
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
 extern int SC__FastStringOpts_StrRemoved;
@@ -1735,7 +1735,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2154])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2153])
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
 extern CharSet* SC_CSNum;
@@ -1759,7 +1759,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kNoMatch ((int)0)
 #define kJB_kNumericMatch ((int)8388608)
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2150])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2149])
 #define kJB_kSimpleMatch ((int)4194304)
 #define kJB_kSuperClassMatch ((int)16777216)
 #define kJB_kTypeCastAssigns ((int)64)
@@ -1777,7 +1777,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2155])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2154])
 #define kJB_kVoidPtrMatch ((int)20971520)
 extern JB_File* SC_PerryLogFile;
 extern Message* SC_ReturnSelfEqNil;
@@ -1919,10 +1919,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp ((int)32784)
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2153])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2152])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2152])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2151])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2151])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2150])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int16_max ((s16)32767)
@@ -2438,7 +2438,7 @@ extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_kDelete ((int)2)
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2144])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2143])
 extern Float64 JB__Rec_Progress;
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -4638,8 +4638,6 @@ ASMReg SC_Reg_SyntaxIsSet(ASMReg Self, ASMReg R, bool Value);
 
 ASMReg SC_Reg_with(ASMReg Self, ASMReg Dest, ASMReg InUse);
 
-DataTypeCode SC_Reg_xC2xB5Type(ASMReg Self);
-
 ASMReg SC_Reg_xC2xB5TypeSet(ASMReg Self, uint /*DataTypeCode*/ Value);
 
 ASMReg SC_Reg__New();
@@ -4802,8 +4800,6 @@ bool JB_TC_SameBasicType(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ B);
 DataTypeCode JB_TC_SetSigned(uint /*DataTypeCode*/ Self, bool B);
 
 SCClass* SC_TC_SignedStuffClass(uint /*DataTypeCode*/ Self);
-
-bool JB_TC_SyntaxIs(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ M);
 
 ASMReg SC_TC_zero(uint /*DataTypeCode*/ Self);
 
@@ -6016,17 +6012,17 @@ ASMReg SC_Pac_BitXor(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* E
 
 ASMReg SC_Pac_BoolAnd(ASMState* Self, Message* A, Message* B, ASMReg Dest);
 
-ASMReg SC_Pac_BoolConst(ASMState* Self, Message* B, ASMReg Dest, OpMode Opp, ASMReg Ml);
+ASMReg SC_Pac_BoolConst1(ASMState* Self, Message* B, ASMReg Dest, OpMode Opp, ASMReg Ml);
 
 ASMReg SC_Pac_BoolConst2(ASMState* Self, Message* Exp, ASMReg Dest, OpMode Opp, ASMReg Ml, ASMReg Mr);
 
-ASMReg SC_Pac_Boolify(ASMState* Self, Message* Exp, ASMReg Dest, ASMReg Src);
+ASMReg SC_Pac_BoolFromBools(ASMState* Self, Message* Exp, ASMReg Dest, OpMode Opp, ASMReg Ml, ASMReg Mr);
 
 ASMReg SC_Pac_BoolMul(ASMState* Self, ASMReg Dest, ASMReg Boo, ASMReg V, Message* Exp);
 
 ASMReg SC_Pac_BoolOr(ASMState* Self, Message* A, Message* B, ASMReg Dest);
 
-ASMReg SC_Pac_BoolsFromBool(ASMState* Self, Message* Exp, ASMReg Dest, OpMode Opp, ASMReg Ml, ASMReg Mr);
+FatASM* SC_Pac_BoolTestAndJump(ASMState* Self, Message* Exp, ASMReg Req, OpMode Opp);
 
 ASMReg SC_Pac_BoolValue(ASMState* Self, Message* A, ASMReg Dest, OpMode Opp, Message* B);
 
@@ -6128,6 +6124,8 @@ uint64 SC_Pac_PrmCollectNative(ASMState* Self, Message* Prms, SCFunction* Fn);
 
 ASMReg SC_Pac_Quick1Or1Sub(ASMState* Self, ASMReg Dest, ASMReg L, int Ptoi, Message* Exp);
 
+ASMReg SC_Pac_QuickBool(ASMState* Self, Message* A, ASMReg Dest);
+
 ASMReg SC_Pac_QuickFloat32Plus(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
 ASMReg SC_Pac_QuickFloatDiv(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
@@ -6171,6 +6169,8 @@ bool SC_Pac_TextFuncSub(ASMState* Self, Message* M);
 void SC_Pac_TextOp(ASMState* Self, Message* M);
 
 bool SC_Pac_TextOpSub(ASMState* Self, Message* M);
+
+ASMReg SC_Pac_UniqueLocation(ASMState* Self, Message* Opmsg, ASMReg Dest);
 
 ASMReg SC_Pac_While(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
@@ -10256,13 +10256,13 @@ void SC_Func__Tran_BlindCasts(SCFunction* Fn, Message* Node, SCNode* Name_space)
 
 void SC_Func__Tran_CppRefs(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
+void SC_Func__Tran_DebugAt(SCFunction* Fn, Message* Node, SCNode* Name_space);
+
 void SC_Func__Tran_Debugger(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
 void SC_Func__Tran_Deprecate(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
 void SC_Func__Tran_Description(SCFunction* Fn, Message* Node, SCNode* Name_space);
-
-void SC_Func__Tran_DoAt(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
 void SC_Func__Tran_Else(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
@@ -10411,6 +10411,8 @@ inline JB_String* JB_Msg_Name_(Message* Self);
 
 inline int JB_Sel_ID(Selector* Self);
 
+inline bool JB_TC_SyntaxIs(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ M);
+
 inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F);
 
 inline bool JB_int64_IsPow2(int64 Self);
@@ -10436,6 +10438,8 @@ inline bool SC_OpMode_SyntaxCast(OpMode Self);
 inline bool SC_PA_SyntaxCast(SCParamArray* Self);
 
 inline bool SC_Reg_SyntaxCast(ASMReg Self);
+
+inline DataTypeCode SC_Reg_xC2xB5Type(ASMReg Self);
 
 inline void SC_nil_SetAllNil(ArchonPurger* Self, NilRecord Dest);
 
@@ -10478,6 +10482,8 @@ inline bool SC_NilTest_SyntaxCast(NilTest* Self);
 inline bool SC_Reg_FourBytes(ASMReg Self);
 
 inline bool SC_Reg_IsBig(ASMReg Self);
+
+inline bool SC_Reg_IsBool(ASMReg Self);
 
 inline bool SC_Reg_IsFloat(ASMReg Self);
 
@@ -10562,6 +10568,10 @@ inline int JB_Sel_ID(Selector* Self) {
 	return 0;
 }
 
+inline bool JB_TC_SyntaxIs(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ M) {
+	return (Self & kJB__TC_PossibleBits) == (M & kJB__TC_PossibleBits);
+}
+
 inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F) {
 	return (JB__Tk_Splitter)(S, E, F);
 }
@@ -10618,6 +10628,10 @@ inline bool SC_PA_SyntaxCast(SCParamArray* Self) {
 
 inline bool SC_Reg_SyntaxCast(ASMReg Self) {
 	return Self != nil;
+}
+
+inline DataTypeCode SC_Reg_xC2xB5Type(ASMReg Self) {
+	return ((DataTypeCode)Self) & kJB__TC_PossibleBits;
 }
 
 inline void SC_nil_SetAllNil(ArchonPurger* Self, NilRecord Dest) {
@@ -10706,6 +10720,10 @@ inline bool SC_Reg_FourBytes(ASMReg Self) {
 
 inline bool SC_Reg_IsBig(ASMReg Self) {
 	return JB_TC__Shift(((DataTypeCode)Self)) == 3;
+}
+
+inline bool SC_Reg_IsBool(ASMReg Self) {
+	return JB_TC_SyntaxIs(SC_Reg_xC2xB5Type(Self), kJB__TC_bool);
 }
 
 inline bool SC_Reg_IsFloat(ASMReg Self) {
