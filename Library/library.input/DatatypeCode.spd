@@ -99,6 +99,7 @@ datatype DataTypeCode (uint16)
 	
 	syntax is (|datatypecode| M, |bool|) // this seems buggered. just remove it?
 									     // we need to be clear about what we are doing!
+		opt inline
 		return self&PossibleBits == M&PossibleBits
 	
 	function Floatness (|int|)

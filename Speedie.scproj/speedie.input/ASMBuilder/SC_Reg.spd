@@ -125,7 +125,12 @@ datatype ASMReg (uint64)
 //	function GapBits (|int|)
 //		return 64 - .bitcount
 	
+	function IsBool (|bool|)
+		opt inline
+		return .µType is bool
+	
 	function µType (|DataTypeCode|)
+		opt inline
 		return self|DataTypeCode| & DataTypeCode.PossibleBits
 	
 	function µType (assigns:|DataTypeCode|, |asmreg|)
