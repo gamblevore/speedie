@@ -28,8 +28,7 @@ dispatch TemporalStatements (TranFunc)
 	borks					(Tran_Fails)
 	
 	blindcasts				(Tran_BlindCasts)
-	debugat					(Tran_DoAt)
-	doat					(Tran_DoAt)
+	debugat					(Tran_DebugAt)
 	visible					(Tran_Visible)
 	flow					(Tran_Flow)
 	print					(Tran_Print)
@@ -362,6 +361,11 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCNode!| p) // transform ()
 	
 	|| ch = s.first
 	while (ch)
+		if ch is BreakPoint and ch in @arg
+			using ch
+				|| dbg = @tmp + "DebugAt"
+				ch.prev = dbg
+				Tran_DebugAt( fn, dbg, p )
 		|| n = ch.next
 		if (ch == @Arg)
 			Tran_All( fn, ch, ch.scarg(p, s)! )

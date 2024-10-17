@@ -1427,7 +1427,7 @@ function Tran_Debugger (TranFunc)
 
 
 
-function Tran_DoAt (TranFunc)
+function Tran_DebugAt (TranFunc)
 	|| ch = node.first
 	using (node)
 		node.become(@func)
