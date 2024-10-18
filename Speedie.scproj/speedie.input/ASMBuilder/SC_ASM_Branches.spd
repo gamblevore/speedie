@@ -26,7 +26,7 @@ function If				(fn_asm)
 	|| B = .BranchConstAware(cond, Flip)
 	if !b.Constness.KnownFalse
 		ASMType.arg(self, arg1)
-		B.fill(.curr)
+		B.jumpto(.curr)
 		
 	if !b.constness.KnownTrue and (ElseIfCond or arg2.HasAny)
 		|| AfterFirst = (arg1.jump(0), nil)(!b.constness.knownfalse) // skip second branch, cos first branch ran
@@ -48,7 +48,7 @@ function While			(fn_asm)
 	BEGIN.jumpto = CONTINUE
 	|| GOBACK = .BranchSub(exp.first!)
 	|| EXIT = .Curr
-	GOBACK.Fill(BEGIN+1)
+	GOBACK.jumpto(BEGIN+1)
 	|| C = BEGIN
 
 	while C < CONTINUE
@@ -98,7 +98,7 @@ function Ternary		(fn_asm)
 	.µInto(A, dest)
 	|| Exit = exp.jump(0)
 
-	FirstOK.fill(.curr)
+	FirstOK.jumpto(.curr)
 
 	rz = .µInto(B, dest)
 	Exit.r[3] = .curr - Exit
@@ -178,7 +178,7 @@ function UniqueLocation (|message| opmsg, |asmreg| dest,   |asmreg|)
 	return req
 	
 
-function QuickBool (|message| A, |ASMReg| Dest, |ASMReg|)
+function ExistingBool (|message| A, |ASMReg| Dest, |ASMReg|)
 	|| ml = .ExistingVar(A)
 	if ml.isbool and (dest.reg == ml.reg)
 		return ml
@@ -191,18 +191,17 @@ function BoolTestAndJump (|message| exp, |asmreg| req, |opmode| opp, |&fatasm|)
 
 function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMReg|)
 	opt norefcounts
-	|| req = .QuickBool(A, dest)
-	
+	|| req = .ExistingBool(A, dest)
 	if !req
 		req = .UniqueLocation(A, dest)	
 		req = .µInto(A, req)
-		if req is ConstAny										// x = 5 or Y() --> x = Y()
-			/return .BoolConst1(b, dest, opp, req)
+		if req is ConstAny
+			/return .BoolConst1(b, dest, opp, req)					// x = 5 or Y() --> x = Y()
 	
 	|| JUMP = .BoolTestAndJump(a.next!, req, opp)
 	|| Second = .µinto(B, req)
-	if Second is ConstAny										// Wow this is frustrating!
-		/jump.NOP
+	if Second is ConstAny											// Wow this is frustrating!
+		/.NOP(jump)
 		return .BoolConst2(a.next!, dest, opp, req, Second)
 
 	JUMP.JumpTo = .curr
@@ -250,7 +249,7 @@ function BoolAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	|| KK = FirstPart.Constness
 	if KK.IsKnown
 		if KK.KnownTrue
-			/FirstPart.nop
+			/.nop(firstpart)
 			|| tmp = .BranchConstAware(b, dest is negate)
 		/ return dest.boolanswer
 	
@@ -264,7 +263,7 @@ function BoolOr (|message| A, |message| B, |asmreg| dest,   |asmreg|)
 	|| KK = FirstPart.Constness
 	if !KK.KnownTrue
 		/|| part2 = .BranchConstAware(B, dest is negate)
-		FirstPart.fill(.curr)	
+		FirstPart.jumpto(.curr)	
 	return dest.BoolAnswer
 
 }
@@ -275,21 +274,21 @@ Struct FatRange
 	|&FatASM| Start
 	|?&FatASM| After
 	iterator
-		|| curr = .start
-		while (curr < .after)
+		|| curr = .after!
+		while (curr > .start)
+			curr--
 			yield curr
-			curr++
 	
-	function Nop
-		for s in self
-			s.nop
+	function asmstate.Nop (|!&fatrange| R)
+		for s in R
+			.nop(s)
 	
-	function Fill (|&fatasm| curr)
+	function JumpTo (|&fatasm| curr)
 		|| any = false
-		curr--
+		curr-- // hmmmmmm
 		for s in self
-			if s is condanswer
-				(s isnt condanswer)
+			if s is CondAnswer
+				(s isnt CondAnswer)
 				s.jumpto = curr
 				any = true
 		if !any // what?

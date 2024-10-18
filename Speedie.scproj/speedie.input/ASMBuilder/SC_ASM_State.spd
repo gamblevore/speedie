@@ -132,7 +132,11 @@ struct ASMState
 		t.reg = r
 		.vtmps = r
 		return t
-
+	
+	function Nop (|&fatasm| R)
+		r.op = asm.NOOP
+		if R == .Curr
+			.curr = R - 1 // nice
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
