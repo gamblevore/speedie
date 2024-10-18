@@ -15,6 +15,7 @@ function PackTestAndOrConsts (|int|)
 	|| T8 = 4 or  0
 	|| f9 = 0 or  0
 	|| T10 = 9 or  2
+	|| t11 = 5 or t10
 	return f3 + f4 + f5 + t6 + t7 + t8 + f9 + t10
 
 

@@ -93,7 +93,7 @@ function Ternary		(fn_asm)
 	|| KK = FirstOK.Constness
 	if KK.IsKnown
 		#! what about nopping? or does the branch nop?
-		/|| which = (A,B)(KK.Default)
+/		|| which = (A,B)(KK.Default)
 		return .µInto(which, dest)
 	.µInto(A, dest)
 	|| Exit = exp.jump(0)
@@ -132,19 +132,19 @@ function BranchSub (|message| cond,  |bool| neg=false, |bool| CanConst=false, |f
 
 helper ASMBoolShrink (|message| exp,  |ASMReg| Dest,  |ASMReg| ml,  |ASMReg|)
 	if (ml.isbool) and (dest isnt negate) and (dest isnt condrequest)
-		/return ml.boolanswer								// x = a or a   -->  x = a
+/		return ml.boolanswer								// x = a or a   -->  x = a
 	/return .Exists(dest.negate, ml, exp)					// if  a or a   -->  if a
 
 
 helper BoolFromBools (|message| exp, |ASMReg| Dest, |opmode| opp, |ASMReg| ml, |ASMReg| mr, |ASMReg|)
-	/dest = .TempTyped(exp, dest)
+/	dest = .TempTyped(exp, dest)
 	|| fat = exp.BAND(dest, ml, mr, 0)
 	fat.op += opp is OR
 	if (dest is negate)  and  (opp is AND)
-		fat.op = asm.bnot
+/		fat.op = asm.bnot
 		(dest is AlreadyNegated)
 	if dest isnt negate
-		(dest is AlreadyNegated)
+/		(dest is AlreadyNegated)
 	return fat * dest
 
 
@@ -156,19 +156,19 @@ helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |AS
 	|| mr = .ExistingVar(B)
 	
 	if ml and ml.reg == mr.reg
-		/return .ASMBoolShrink(exp, dest, ml)
+/		return .ASMBoolShrink(exp, dest, ml)
 
 	if dest is negate
-		/(opp xor= OpMode.AndOr)								//  !(a and b)  -->  !a or !b
+/		(opp xor= OpMode.AndOr)								//  !(a and b)  -->  !a or !b
 	
 	if dest isnt CondRequest									// 😢 😿 😢 😿 😢 😿 😢 😿 SADNESS!!
 		ifn ml.isbool and mr.isbool
-			/return .BoolValue(A, dest, opp, b)
-		/return .BoolFromBools(exp, dest, opp, ml, mr)		// No consts via .existingvar		
+			return .BoolValue(A, dest, opp, b)
+/		return .BoolFromBools(exp, dest, opp, ml, mr)		// No consts via .existingvar		
 	
 	if OPP is OR
-		/return .BoolOr(A, B, dest)
-	/ return .BoolAnd(A, B, Dest)
+		return .BoolOr(A, B, dest)
+	return .BoolAnd(A, B, Dest)
 			
 
 function UniqueLocation (|message| opmsg, |asmreg| dest,   |asmreg|)
@@ -196,38 +196,38 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 		req = .UniqueLocation(A, dest)	
 		req = .µInto(A, req)
 		if req is ConstAny
-			/return .BoolConst1(b, dest, opp, req)					// x = 5 or Y() --> x = Y()
+			return .BoolConst1(b, dest, opp, req)					// x = 5 or Y() --> x = Y()
 	
 	|| JUMP = .BoolTestAndJump(a.next!, req, opp)
 	|| Second = .µinto(B, req)
 	if Second is ConstAny											// Wow this is frustrating!
-		/.NOP(jump)
+/		.NOP(jump)
 		return .BoolConst2(a.next!, dest, opp, req, Second)
 
 	JUMP.JumpTo = .curr
 	
 	if req.isbool and Second.isbool
-		/return req
+/		return req
 
-	/return .Exists(dest, req, a.next!)
+/	return .Exists(dest, req, a.next!)
 
 
 function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asmreg|)
 	|| V = (ml.const!=0) != (dest is negate)
 	|| expect = opp is OR
 	if v == expect
-		/ml.Const = v|int|				// x = 5 or  2	 --> x = true
+		ml.Const = v|int|				// x = 5 or  2	 --> x = true
 		return ml						// x = 0 and 2	 --> x = false
 	
-	/ml.nop								// x = 0 or y()  --> x = y()
+	ml.nop								// x = 0 or y()  --> x = y()
 										// x = 7 and y() --> x = y()
 	|| mr = .µ(B, dest)
 	if mr is ConstAny
-		/mr.const = (mr.const != 0)|int|
+		mr.const = (mr.const != 0)|int|
 		return mr.BoolAnswer
 	
 	if mr.isbool
-		/return mr
+/		return mr
 	/return .Exists(dest.negate, mr, B)
 
 
@@ -235,10 +235,10 @@ function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asm
 function BoolConst2 (|message| exp, |asmreg| dest, |opmode| Opp, |asmreg| ml,  |asmreg| mr, |asmreg|)
 	|| V = mr.const!=0
 	if v == (opp is AND)
-		/mr.nop
+/		mr.nop
 		return ml
 	
-	/mr.const = v|int|
+/	mr.const = v|int|
 	return mr
 
 	
@@ -248,22 +248,24 @@ function BoolAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	|| FirstPart = .BranchConstAware(A, dest is negate)
 	|| KK = FirstPart.Constness
 	if KK.IsKnown
-		if KK.KnownTrue
-			/.nop(firstpart)
+/		if KK.KnownTrue
+/			.nop(firstpart)
 			|| tmp = .BranchConstAware(b, dest is negate)
 		/ return dest.boolanswer
 	
-	/ || tmp2 = .BranchConstAware(B, dest is negate)
+	|| tmp2 = .BranchConstAware(B, dest is negate)
 	return dest.BoolAnswer
 
 
 
 function BoolOr (|message| A, |message| B, |asmreg| dest,   |asmreg|)
-	/|| FirstPart = .BranchConstAware(A, dest isnt negate)
+	|| FirstPart = .BranchConstAware(A, dest isnt negate)
 	|| KK = FirstPart.Constness
 	if !KK.KnownTrue
-		/|| part2 = .BranchConstAware(B, dest is negate)
+		|| part2 = .BranchConstAware(B, dest is negate)
 		FirstPart.jumpto(.curr)	
+	else
+/		0
 	return dest.BoolAnswer
 
 }

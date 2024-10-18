@@ -93,9 +93,11 @@ function Return			(fn_asm)
 		if k and k.fits(15)
 			reg.nop
 			exp.RET(reg, 1, 0, K)
-			return nil
+			return asmreg()
 			
 	exp.RET(reg, 1, 0, 0)
+	return asmreg()
+	
 
 
 function TypeCast		(fn_asm)

@@ -170,25 +170,23 @@ extend ASMState
 	
 	
 	function asmreg.PointerMul (|message| exp, |int| swapped, |int|)
+		opt norefcounts
 		if !.µtype.ispointer
 			return 1
 		
 		|| fn = exp.Func
 		if fn == @opp
-			debugger 
-			exp = exp.parent
+/			exp = exp.parent
 			if swapped
 				exp = exp.last
-			else
+			  else
 				exp = exp.first
 			
 		  elseif fn == @arel or @brel
-			debugger
-			exp = exp.first
+/			exp = exp.first
 		
 		  elseif fn == @acc
-			debugger 
-			exp = exp.first
+/			exp = exp.first
 			
 		  else
 			// should never happen. Even @thg shouldn't.
@@ -491,9 +489,9 @@ extend ASMState
 		return .Assign(dest, asmreg(), exp)	
 	
 	
-	function Assign (|asmreg| dest, |asmreg| L, |message| exp, |asmreg|)
-		if l.reg != dest.reg
-			return .BitOr(dest, l, asmreg(), exp)
+	function Assign (|asmreg| dest, |asmreg| src, |message| exp, |asmreg|)
+		if src.reg != dest.reg
+			return .BitOr(dest, src, asmreg(), exp)
 		return dest		// hmmm... we are already there
 
 

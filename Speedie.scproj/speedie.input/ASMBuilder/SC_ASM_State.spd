@@ -143,12 +143,7 @@ struct ASMState
 
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
 		|| rz = .µ(Exp, dest)
-		check (rz) (self, exp, "µInto failed")
-		|| dr = dest.reg
-		if !dr // what?
-		
-		if rz.reg == dr
-			return rz
+		dest = rz.reg(dest)
 		return .Assign(Dest, rz, exp)
 	
 			
@@ -159,14 +154,15 @@ struct ASMState
 		cpp_part GetASM
 		|| fn = fn_asm_table[exp.ASMType]!
 		|| TmpCloser = .VTmps
-		if "PackTestAndOrConsts".trap
-			printline exp
-			debugger
+//		if "PackTestAndOrConsts".trap
+//			printline exp
+//			debugger
 		|| ss = (fn)(self, exp, dest)
 		if dest isnt StayOpen
 			.CloseVTmps(TmpCloser)
 
 		target debug
+			check (ss) (self, exp, "µInto failed")
 			if exp.asmtype < ASMType.kElseIf
 				|| ty = exp.ASMDecl
 				|| sst = ss.µtype
