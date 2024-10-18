@@ -2420,9 +2420,7 @@ ParserLineAndIndent JB_Tk__NextLineAndIndent(Message* Parent) {
 	while (N < End) {
 		uint C = Addr[N++];
 		if (C == '\t') {
-			if (!Commas) {
-				Rz[2] = (Rz[2] + 4);
-			}
+			Rz[2] = ((Rz[2] & (~3)) + (((!Commas)) << 2));
 			if ((((bool)(State & 1))) and ((bool)Rz[0])) {
 				JB_FreeIfDead(JB_Tk__ErrorAdd(JB_LUB[203], N - 1));
 			}
@@ -2440,8 +2438,14 @@ ParserLineAndIndent JB_Tk__NextLineAndIndent(Message* Parent) {
 		}
 		 else if (C == ' ') {
 			State = (State | 1);
-			if (!Commas) {
-				(++Rz[2]);
+			if (Rz[3] != 3) {
+				Rz[2] = (Rz[2] + (!Commas));
+			}
+			 else {
+				if (Rz[2] < 4) {
+					Rz[2] = (Rz[2] + (!Commas));
+				}
+				Rz[3] = 2;
 			}
 		}
 		 else if (C == '/') {
@@ -2451,8 +2455,9 @@ ParserLineAndIndent JB_Tk__NextLineAndIndent(Message* Parent) {
 					if (Rz[3] > 1) {
 						JB_FreeIfDead(JB_Tk__ErrorAdd(JB_LUB[563], N - 1));
 					}
-					Rz[3] = 2;
-					break;
+					Rz[3] = 3;
+					Rz[2] = (Rz[2] + (!Commas));
+					continue;
 				}
 				(--N);
 				break;
@@ -2477,12 +2482,12 @@ ParserLineAndIndent JB_Tk__NextLineAndIndent(Message* Parent) {
 				break;
 			}
 			(++Rz[0]);
+			Rz[1] = (N - 1);
+			Rz[2] = 0;
 			if (Rz[3]) {
 				Rz[3] = 1;
 			}
-			Rz[2] = 0;
 			Commas = 0;
-			Rz[1] = (N - 1);
 			State = 2;
 			if (Parent->Func == kJB_SyxList) {
 				(JB_Msg_SyntaxIsSet(Parent, kJB__MsgParseFlags_Style2, true));
@@ -2491,6 +2496,7 @@ ParserLineAndIndent JB_Tk__NextLineAndIndent(Message* Parent) {
 	};
 	Rz[0] = (Rz[0] + Commas);
 	(JB_Tk__NextStartSet(N));
+	Rz[2] = (Rz[2] & (~1));
 	if (((First > 0) and (!Rz[0])) or (Rz[2] < 0)) {
 		Rz[2] = -1;
 	}
@@ -8380,7 +8386,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024101614);
+	return (2024101816);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8392,4 +8398,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 -544737328205168280 -4350689744046079234
+// -2934619186805667969 1938390578855909887 5020031451421357921

@@ -641,6 +641,7 @@ extern CharSet* JB__Constants_XMLWordMiddle;
 extern JB_File* JB__Platform_Logger_;
 extern JB_String* JB__JbinHeader;
 extern JB_String* JB__jBinNotJbin;
+extern int JB_aaaaaaa;
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 #define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[177])
 extern JB_ErrorReceiver* JB_StdErr;
