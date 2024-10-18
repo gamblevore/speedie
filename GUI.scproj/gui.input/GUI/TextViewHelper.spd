@@ -406,9 +406,8 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 
 	|| x	 = .DrawLineNumber(where, d, y, lc)-1
 	|| state = MsgTextDrawState(x, d)
-	if self is CodeEditor and d is breakpoint
-		|| fx = x - (font.width+1)
-		state.font.DrawChar('\18', Where, (fx, y), nil)
+	|| NoDrawFirst = self is CodeEditor and d is breakpoint
+		state.font.DrawChar('\18', Where, (x, y), nil)
 	
 	|codepoint| Prev
 	|| xlimit = .lastrect.x2
@@ -421,10 +420,13 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 		|| col = ¥.GetColor(state.msg, usecol, pos)
 		if d.LineError and c == 9 and prev == 32 
 			c = -c
-		state.font.DrawChar(c, Where, (x, y), col, 1)
+		if NoDrawFirst and !c.IsWhite
+			NoDrawFirst = false
+		  elseif !NoDrawFirst
+			state.font.DrawChar(c, Where, (x, y), col, 1)
 		prev = c
 	
-	if .autolim(d)
+	if .AutoLim(d)
 		if d.islast // last line draw too early with autocomplete
 			x += font.width // but we shouldn't need this!
 		.DrawAuto(Where, d, x, y)
