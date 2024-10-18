@@ -5,6 +5,7 @@
 
 
 class SCFile (file)
+	linkage:cpp_part File
 	|string|		ExportName
 	|SCImport|		Proj
 	|string|		FData
