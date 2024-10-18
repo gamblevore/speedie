@@ -966,6 +966,8 @@ class TextView (GUIControl)
 
 	function DoExplode (|textviewline| D, |float| strength)
 		opt NoRefCounts
+		return // kinda annoying sometimes. can we make it nicer?
+		// or a different effect? maybe like a background warp-star-effect that only occurs within the textview?
 		|| w = .window
 			for i in 3
 				.SoftExplode(5s, date.now + 0.25s*i, (-10.0, 0), D, strength)

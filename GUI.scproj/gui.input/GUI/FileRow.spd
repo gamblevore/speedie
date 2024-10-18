@@ -228,7 +228,7 @@ class FileRow (ListViewRow)
 	function VisibleText (|bool|ignore=true, |string|)
 //		.Sanity
 		|| d = ._Document
-			if d.current
+			if d.current and !d.CheckExternalModified
 				return d.text
 		|| f = .readfrom.file
 		require !f.isdir

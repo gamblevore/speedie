@@ -115,7 +115,6 @@ class Document (list)
 		.clear
 		.AddState(s, nil)
 
-
 	function IsModified (|bool|)
 		opt norefcounts
 		|| c = .current
@@ -125,7 +124,7 @@ class Document (list)
 
 
 	function DocClose (|bool|)
-		if !.ismodified
+		if !.IsModified
 			return true
 		|| Answer = AskSaveOrCancel("Save file " + .Location.name + "?") 
 		if answer >= 1		// save
@@ -177,7 +176,7 @@ class Document (list)
 					rz = jold.deepequals(tp)  
 
 
-	helper CheckModified (|bool|)
+	helper CheckExternalModified (|bool|)
 		|| f = .Location.file
 		require .filedate
 		
