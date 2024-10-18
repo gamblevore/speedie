@@ -1035,10 +1035,14 @@ ive been~running #since morning
 				State = 0
 
 			  elseif (c == ' ')
+				//     /    
 				State |= 1
 				if rz.a != 3
 					rz.b += !commas
 				  else
+					if rz.b < 4 // do it anyhow
+						rz.b += !commas
+						
 					rz.a = 2
 
 			  elseif (c == '/')
