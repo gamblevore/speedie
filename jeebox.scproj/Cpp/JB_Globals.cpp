@@ -37,6 +37,7 @@ CharSet* JB__Constants_XMLWordMiddle;
 JB_File* JB__Platform_Logger_;
 JB_String* JB__JbinHeader;
 JB_String* JB__jBinNotJbin;
+int JB_aaaaaaa;
 JB_ErrorReceiver* JB_StdErr;
 bool JB__Tk__DotInsertAllow;
 Message* JB__Tk__EndOfLineMarker;
