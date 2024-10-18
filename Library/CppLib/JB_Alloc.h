@@ -54,10 +54,14 @@ void JB_Flow__PrintStats();
 
 #ifdef DEBUG
 	extern bool CanASMBKPT;
-	#if __CPU_TYPE__ == __CPU_INT__
-		#define debugger if (CanASMBKPT) __asm__("int3")
+	#if __has_builtin(__builtin_debugtrap)
+		#define debugger if (CanASMBKPT) __builtin_debugtrap()
 	#else
-		#define debugger if (CanASMBKPT) std::raise(SIGINT)
+		#if __CPU_TYPE__ == __CPU_INT__
+			#define debugger if (CanASMBKPT) __asm__("int3")
+		#else
+			#define debugger if (CanASMBKPT) std::raise(SIGINT)
+		#endif
 	#endif
     #define dbgexpect(test)  if  (!(test)) {debugger; return;} // int3 works in xcode but not in releasebuilds!
     #define dbgexpect2(test) if  (!(test)) {debugger; return 0;}
