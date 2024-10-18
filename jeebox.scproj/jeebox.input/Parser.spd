@@ -1016,15 +1016,13 @@ ive been~running #since morning
 		|| D			= .data
 		|| end			= D.length
 		|| addr			= D.addr
-		|| State		= 0		// 2 = line, 1 = space, 0 = neither, 3 = both
+		|| State		= 0			// 2 = line, 1 = space, 0 = neither, 3 = both
 		|| Commas		= 0
 
 		while (n < end)
 			|| c = addr[n++]
 			if (c == '\t')
-//				state &=~ 2
-				if !commas
-					rz.b += 4
+				rz.b = (rz.b&~3) + ((!commas)<<2)
 				if ((State&1) and rz.r)
 					.erroradd("Can't have tabs after spaces.", n-1)
 
@@ -1038,9 +1036,10 @@ ive been~running #since morning
 
 			  elseif (c == ' ')
 				State |= 1
-//				state &=~ 2
-				if !commas
-					rz.b++
+				if rz.a != 3
+					rz.b += !commas
+				  else
+					rz.a = 2
 
 			  elseif (c == '/')
 				|| c2 = d[n]
@@ -1048,8 +1047,9 @@ ive been~running #since morning
 					if state&2
 						if rz.a > 1
 							.ErrorAdd("Invalid breakpoint", n-1)
-						rz.a = 2
-						exit
+						rz.a = 3
+						rz.b += !commas
+						continue
 					n--
 					exit
 				State = 2
@@ -1070,21 +1070,23 @@ ive been~running #since morning
 					n--
 					exit
 				rz.r++
+				rz.g = n-1
+				rz.b = 0
 				if rz.a
 					rz.a = 1 // lower it
-				rz.b = 0
-				commas = 0 // right?
-				rz.g   = n-1 // sigh
+				commas = 0
 				State = 2
 				if parent.func == @list
 					(parent is style2)
 
 		rz.r += commas
 		.NextStart = n
+		
+		rz.b&=~1 // no need for odd indents
 		if ((first > 0) and !rz.r) or (rz.b < 0)
 			rz.b = -1
-		
-	
+
+
 	function ParseLoopItem (|Message| Output, |int| TmpoFlags, |message| Prev, |int| Indent, |message|)
 		|| ch = .Process( kTemporal&TmpoFlags, output)
 		if (!ch)
@@ -1368,3 +1370,5 @@ datatype MsgParseFlags (uint16)
 		BreakPoint			= 0x8000
 		MacroInserted		= MacroMade+Inserted
 
+
+|| aaaaaaa = 0
