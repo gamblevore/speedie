@@ -72,7 +72,10 @@ datatype DataTypeCode (uint16)
 	render
 		self = self&PossibleBits
 		if !.IsNumeric
-			fs <~ "non-numeric"
+			if self is bool
+				fs <~ "bool"
+			  else
+				fs <~ "non-numeric"
 		  elseif self == byte
 			fs <~ "byte"
 		  else
