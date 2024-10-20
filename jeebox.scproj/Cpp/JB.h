@@ -2762,8 +2762,6 @@ inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self);
 
 inline bool JB_FastBuff_AppendU8(FastBuff* Self, uint /*byte*/ V);
 
-inline bool JB_File_SyntaxCast(JB_File* Self);
-
 inline bool JB_Ind_SyntaxCast(Ind Self);
 
 inline Syntax JB_Msg_Func(Message* Self);
@@ -2913,10 +2911,6 @@ inline bool JB_FastBuff_AppendU8(FastBuff* Self, uint /*byte*/ V) {
 	return Self->Curr >= Self->End;
 }
 
-inline bool JB_File_SyntaxCast(JB_File* Self) {
-	return Self != nil;
-}
-
 inline bool JB_Ind_SyntaxCast(Ind Self) {
 	return Self >= 0;
 }
@@ -2988,11 +2982,11 @@ inline bool JB_Safe_SyntaxCast(JB_String* Self) {
 }
 
 inline bool JB_Msg_NilCheck(Message* Self) {
-	return ((bool)Self) or JB_API__NilHandler();
+	return Self or JB_API__NilHandler();
 }
 
 inline bool JB_Syx_NilCheck(Syntax Self) {
-	return ((bool)Self) or JB_API__NilHandler();
+	return Self or JB_API__NilHandler();
 }
 
 

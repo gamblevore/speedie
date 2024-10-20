@@ -4,7 +4,7 @@
 #include "JB.h"
 #pragma GCC visibility push(hidden)
 
-const char* JB_CrashLogFileName = "/tmp/logs/jeebox.crash.txt";
+const char* JB_CrashLogFileName = "/tmp/logs/jeebox.fail.txt";
 
 Message* JB__App__Conf;
 Array* JB__App__OldArgs;
