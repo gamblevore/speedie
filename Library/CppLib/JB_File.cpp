@@ -509,7 +509,7 @@ bool JB_Rec__CrashLogSub(const char* c) {
 		CrashLogFile = open(JB_CrashLogFileName, flags, kDefaultMode);
 		chmod(JB_CrashLogFileName, 777);
 		if (CrashLogFile)
-			fprintf(stderr, "CrashLogAt: %s\n", JB_CrashLogFileName);
+			fprintf(stderr, "Log At: %s\n", JB_CrashLogFileName);
 	}
 
 	fputs(c, stderr);
