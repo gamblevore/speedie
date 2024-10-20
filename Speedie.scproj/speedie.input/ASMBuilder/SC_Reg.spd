@@ -38,6 +38,13 @@ datatype ASMReg (uint64)
 		Zero			= ConstAny ||| 56		// 56 == datatypecode.uint64
 	
 
+	render
+		fs <~ "r"
+		fs <~ .reg
+		fs <~ "("
+		.µtype.render(Fs)
+		fs <~ ")"
+		
 	function Floatness (|int|)
 		return .µtype.floatness
 	
@@ -59,7 +66,7 @@ datatype ASMReg (uint64)
 	function NOP (|int64|)
 		if .reg
 			|| f = .fat
-				f.op = asm.noop
+				f.nop
 				return f.const
 			debugger 
 

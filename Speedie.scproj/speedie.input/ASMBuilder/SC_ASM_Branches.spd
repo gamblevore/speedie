@@ -188,7 +188,7 @@ function ExistingBool (|message| A, |ASMReg| Dest, |ASMReg|)
 	
 
 function BoolTestAndJump (|message| exp, |asmreg| req, |opmode| opp, |&fatasm|)
-	|| mode = ASMReg.CondRequest.negate(opp is or)
+	|| mode = ASMReg.CondRequest.negate(opp is AND)
 	return .Exists(mode, req, exp).fat!
 
 

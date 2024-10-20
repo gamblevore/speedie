@@ -4,12 +4,11 @@
 ;
 ı FNC: 
 	__;
-	Code = BumpStack(vm, r, Code + 1, Op, *Code++);
+	Code = BumpStack(vm, r, Code + 1, Op, *Code);
 	___;
 ı FNC3: 
 	__;
 	Code = BumpStack(vm, r, Code + 2, Op, Code64);
-	Code += 2;
 	___;
 ı KNST: _
 	LoadConst(r, Op, 0);
@@ -20,7 +19,8 @@
 	Code += 2;
 ı FFNC: 
 	__;
-	ForeignFunc(vm, Code, r, Op, *Code++);
+	ForeignFunc(vm, Code, r, Op, *Code);
+	Code++;
 	___;
 ı FFNC3: 
 	__;
@@ -36,7 +36,7 @@
 	// NOOP
 
 ı TRAP: _
-	JB_App__SelfSignal(Trap_Lu);
+	JB_App__SelfSignal(Trap_Signalu);
 ı ADDR: _
 	u1 = (uint64)(&u2);
 	u3 = (uint64)(&u4);

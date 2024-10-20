@@ -49,7 +49,7 @@ module SpdAssembler
 			return f.ASM					#expect (m, "This function has no ASM")
 						
 
-	function GenerateASM (|scfunction| fn, |bool|)
+	function GenerateASMSub (|scfunction| fn, |bool|)
 		opt norefcounts
 		ASMState.Sh.StartFunc(fn)
 		|| fp = fn_asm_table[@arg]!
@@ -67,11 +67,11 @@ module SpdAssembler
 		(compiler.InternalFile.ast!).EROR(A,A,A,A,0)
 	
 	
-	function VacGenerate (|scfunction| fn, |bool|)
-		ifn fn.Source contains " RUN!!"
+	function GenerateASM (|scfunction| fn, |bool|) // memory safe ASM retrier
+		ifn fn.Source contains ASM_ASK
 			return true
 		printline fn
-		expect (.GenerateASM(fn) or (ASMState.ExpandJSM and .GenerateASM(fn))) "ASM is out of memory." 
+		expect (.GenerateASMSub(fn) or (ASMState.ExpandJSM and .GenerateASMSub(fn))) "ASM is out of memory." 
 
 		printline fn.asm!.render
 
@@ -83,8 +83,9 @@ module SpdAssembler
 		return true
 
 
-extend_module ASM
-	function Needed (|bool|)
-		|| fn = compiler.XFunc("JB_ASM_Run")
-			return fn.MyReacher
-
+//extend_module ASM
+//	function Needed (|bool|)
+//		|| fn = compiler.XFunc("JB_ASM_Run")
+//			return fn.MyReacher
+//
+//

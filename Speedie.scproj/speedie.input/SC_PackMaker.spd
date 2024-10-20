@@ -79,7 +79,7 @@ module PackMaker
 		for fn in .Packfuncs
 			if fn.tableid
 				if fn.parent.name ~= "ASMExamples"
-					require SpdAssembler.VacGenerate(fn)
+					require SpdAssembler.GenerateASM(fn) // memory safe
 		
 		.RunAFewTests
 		return true
@@ -91,10 +91,17 @@ module PackMaker
 			return mod.Findfunction(s)
 	
 	
-	function RunAFewTests
+	function RunAFewTests 
 		opt norefcounts
 		
-		|scfunction| fn	
+		|scfunction| fn
+		fn = .testfn("PackTestSemiConst")
+		if fn
+			for i in 2
+				debugat
+				self[0] = i*16K
+				|| found = fn.test|&int|[]
+		
 		fn = .testfn("PackTestAndOrConsts")
 		if fn
 			|| Andor = fn.Test|&int64|[]
@@ -102,7 +109,6 @@ module PackMaker
 		fn = .testfn("PackTestConsts")
 		if fn
 			|| D = fn.Test|&f64|[]
-			printline d.render
 		
 		fn = .testfn("PackTestForeignFuncs")
 		if fn
@@ -197,10 +203,15 @@ module PackMaker
 		j.tmp("fncs")
 		for f in compiler.funclist
 			if f.tableid
-				if f.Source contains " RUN!!"
-					j.Add(@tmp, f.ExportName, true)
-					j.add(f.ASM #expect)
-					j.exit
+				if f.Source contains ASM_ASK
+					|| asm = f.ASM 
+						j.Add(@tmp, f.ExportName, true)
+						j.add(asm)
+						j.exit
+						"OK: ${f.name}"
+					  else
+						error (f, "no asm generated for: " + f.name)
+					
 		j.Exit(2)
 		
 	
@@ -332,3 +343,5 @@ function scfunction.operatorin (|string| s, |bool|)
 	opt norefcounts
 	return .parent.name ~= s
 
+
+|| ASM_ASK = " RUN!" + "!"				// remove this

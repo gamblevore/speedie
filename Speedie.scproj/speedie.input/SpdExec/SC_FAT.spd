@@ -54,6 +54,7 @@ struct FatASM
 
 	function Nop (|bool|)
 		.op = asm.noop
+		.jumpreg = 0
 		return true
 
 	function has (|int| a, |int| b, |bool|)
@@ -143,6 +144,7 @@ struct FatASM
 	function SyntaxExpect (|string| Error)
 		|| err = Error(nil, error, ErrorSeverity.Error, .file)
 		err.position = .BytePos
+		target debug: .debugprint
 		stderr <~ err
 
 	function NumInput (|int| a, assigns:|int| v)

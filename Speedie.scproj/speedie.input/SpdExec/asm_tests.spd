@@ -19,7 +19,7 @@ function PackTestAndOrConsts (|int|)
 	return f1 + f2 + f3 + t4 + t5 + t6 + (f7 + f7) + t8
 
 
-function PackTestSemiConst (|int| f1)
+function PackTestSemiConst (|int| f1, |int|)
 	#! RUN!!
 	visible
 	|| x2 = f1 or  1
@@ -31,14 +31,15 @@ function PackTestSemiConst (|int| f1)
 	|| y7 = 0 or  f1
 	|| y8 = 1 and f1
 	|| y9 = 0 and f1
-
+	
 	y6 = 1 or  f1
 	y7 = 0 or  f1
 	y8 = 1 and f1
 	y9 = 0 and f1
 	
 	y6 = y6 or y7*2
-	y8 = y8 and y9*3
+	y8 = !y8 and x2*3
+	return y6+y8
 
 
 function PackTestConsts (|float64|)

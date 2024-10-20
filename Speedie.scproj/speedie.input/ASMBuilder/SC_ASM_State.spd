@@ -134,7 +134,7 @@ struct ASMState
 		return t
 	
 	function Nop (|&fatasm| R)
-		r.op = asm.NOOP
+		r.nop
 		|| C = .curr - 1
 		if R == C
 			.curr = C // nice

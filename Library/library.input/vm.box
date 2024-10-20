@@ -250,7 +250,7 @@ forms
 		#!NOOP
 
 /**/ TRAP (Trap)
-		JB_App__SelfSignal(Trap_Lu)
+		JB_App__SelfSignal(Trap_Signalu)
 
 
 
@@ -269,18 +269,18 @@ forms
 
 /**/ FNC (Func, 2)		// func: 
 		__
-		Code = BumpStack(vm, r, Code+1, Op, *Code++)
+		Code = BumpStack(vm, r, Code+1, Op, *Code)
 		___
 
-/**/ FNC3 (Func, 3)	// I prefer two have two separate codes, I should be able to call it Func3?
+/**/ FNC3 (Func, 3)
 		__
 		Code = BumpStack(vm, r, Code+2, Op, Code64)
-		Code+=2
 		___
 
 /**/ FFNC (ForeignFunc, 2) // rename to nativefunc?
 		__
-		ForeignFunc(vm, Code, r, Op, *Code++) 
+		ForeignFunc(vm, Code, r, Op, *Code)
+		Code++ 
 		___
 
 /**/ FFNC3 (ForeignFunc, 3)

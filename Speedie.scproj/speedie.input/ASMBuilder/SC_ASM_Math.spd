@@ -26,7 +26,13 @@ extend ASMState
 				r.nop
 				// what if we get false? theres no fat? its just reg0
 				return .numtoreg(exp, ((l.const==r.const)==!negate)|int|, dest)
-			return exp.CMPB(dest, L, R, negate)*dest
+/*			if negate
+				"testing ${l.render} is not equal to ${r.render}, into ${dest.render} for: ${exp.parent}"
+			  else
+				"testing ${l.render} equals ${r.render}, into ${dest.render} for: ${exp.parent}"
+*/
+			|| fat = exp.CMPB(dest, L, R, negate xor 1)
+			return fat*dest
 
 		if l.reg
 			if negate
