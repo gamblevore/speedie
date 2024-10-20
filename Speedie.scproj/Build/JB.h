@@ -1121,8 +1121,9 @@ struct xC2xB5Func_Behaviour: Object_Behaviour {
 
 JBClass ( FuncInASM , JB_Object , 
 	int Length;
-	FatASM* IR;
 	SCFunction* Fn;
+	MWrap* Testing;
+	FatASM* IR;
 	bool OK;
 );
 
@@ -1364,6 +1365,7 @@ JBClass ( SCClass , SCBetterNode ,
 	SCDecl* _NotConst;
 	SCFunction* FuncProto;
 	SCFunction* TheIsFunc;
+	SCFunction* TheBoolFunc;
 	SCFunction* ConstructorFunc;
 	SCFunction* DestructorFunc;
 	JB_String* CppClass;
@@ -2029,30 +2031,31 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_WR2U ((ASM_Write)92)
 #define kSC__ASM_WR4U ((ASM_Write)93)
 #define kSC__ASM_WR8U ((ASM_Write)94)
-#define kSC__Reg_AddrRequest ((ASMReg)2147483648)
-#define kSC__Reg_AlreadyNegated ((ASMReg)524288)
-#define kSC__Reg_Alternate ((ASMReg)1048576)
-#define kSC__Reg_Arg ((ASMReg)2097152)
-#define kSC__Reg_CondAnswer ((ASMReg)17179869184)
-#define kSC__Reg_CondRequest ((ASMReg)8589934592)
-#define kSC__Reg_ConstAny ((ASMReg)536870912)
-#define kSC__Reg_ContainsAddr ((ASMReg)1073741824)
-#define kSC__Reg_Decl ((ASMReg)12582912)
-#define kSC__Reg_Discard ((ASMReg)2097152)
+#define kSC__Reg_AddrRequest ((ASMReg)4294967296)
+#define kSC__Reg_AlreadyNegated ((ASMReg)1048576)
+#define kSC__Reg_Alternate ((ASMReg)2097152)
+#define kSC__Reg_Arg ((ASMReg)4194304)
+#define kSC__Reg_CondAnswer ((ASMReg)34359738368)
+#define kSC__Reg_CondRequest ((ASMReg)17179869184)
+#define kSC__Reg_ConstAny ((ASMReg)1073741824)
+#define kSC__Reg_ContainsAddr ((ASMReg)2147483648)
+#define kSC__Reg_Decl ((ASMReg)25165824)
+#define kSC__Reg_Discard ((ASMReg)4194304)
 #define kSC__Reg_FatRef ((int)1073741824)
-#define kSC__Reg_ForCast ((ASMReg)33554432)
-#define kSC__Reg_ForReturn ((ASMReg)16777216)
+#define kSC__Reg_ForCast ((ASMReg)67108864)
+#define kSC__Reg_ForReturn ((ASMReg)33554432)
+#define kSC__Reg_FromExistingVar ((ASMReg)262144)
 #define kSC__Reg_FromMath ((ASMReg)131072)
-#define kSC__Reg_MathConst ((ASMReg)537001984)
+#define kSC__Reg_MathConst ((ASMReg)1073872896)
 #define kSC__Reg_Negate ((ASMReg)65536)
-#define kSC__Reg_NeverAltered ((ASMReg)134217728)
-#define kSC__Reg_NotYetUsed ((ASMReg)8388608)
-#define kSC__Reg_Set ((ASMReg)4194304)
-#define kSC__Reg_SingleExpr ((ASMReg)268435456)
-#define kSC__Reg_StayOpen ((ASMReg)262144)
-#define kSC__Reg_Temp ((ASMReg)67108864)
-#define kSC__Reg_Textual ((ASMReg)4294967296)
-#define kSC__Reg_Zero ((ASMReg)536870968)
+#define kSC__Reg_NeverAltered ((ASMReg)268435456)
+#define kSC__Reg_NotYetUsed ((ASMReg)16777216)
+#define kSC__Reg_Set ((ASMReg)8388608)
+#define kSC__Reg_SingleExpr ((ASMReg)536870912)
+#define kSC__Reg_StayOpen ((ASMReg)524288)
+#define kSC__Reg_Temp ((ASMReg)134217728)
+#define kSC__Reg_Textual ((ASMReg)8589934592)
+#define kSC__Reg_Zero ((ASMReg)1073741880)
 #define kSC__ASMType_IncrAfter ((int)2)
 #define kSC__ASMType_IncrBefore ((int)0)
 #define kSC__ASMType_kContinue ((ASMType)54)
@@ -4605,6 +4608,8 @@ ASMReg SC_Reg_Negate(ASMReg Self, bool Neg);
 
 int64 SC_Reg_NOP(ASMReg Self);
 
+bool SC_Reg_NopMinusOne(ASMReg Self);
+
 ASMReg SC_Reg_OperatorAs(ASMReg Self, ASMReg A);
 
 ASMReg SC_Reg_OperatorAsnt(ASMReg Self, ASMReg A);
@@ -4708,7 +4713,7 @@ ASMReg SC_ASMType__StatExpr(ASMState* Self, Message* Exp, ASMReg Dest, int Mode)
 
 ASMReg SC_ASMType__Thg(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
-ASMReg SC_ASMType__ThgSub(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
+ASMReg SC_ASMType__ThgSub(ASMState* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_ASMType__TypeCast(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
@@ -5687,6 +5692,8 @@ void SC_FAT_dSet(FatASM* Self, uint Value);
 
 void SC_FAT_DebugSet(FatASM* Self, Message* Value);
 
+void SC_FAT_DebugPrint(FatASM* Self);
+
 bool SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info);
 
 ASM SC_FAT_Encode(FatASM* Self);
@@ -5736,8 +5743,6 @@ bool SC_FAT_OperatorIsa(FatASM* Self, int M);
 ASMReg SC_FAT_AsReg(FatASM* Self, ASMReg Info);
 
 uint SC_FAT_out(FatASM* Self);
-
-void SC_FAT_Print(FatASM* Self);
 
 int SC_FAT_Prm(FatASM* Self, int A, ASMReg Info);
 
@@ -6017,7 +6022,7 @@ ASMReg SC_Pac_BoolConst2(ASMState* Self, Message* Exp, ASMReg Dest, OpMode Opp, 
 
 ASMReg SC_Pac_BoolFromBools(ASMState* Self, Message* Exp, ASMReg Dest, OpMode Opp, ASMReg Ml, ASMReg Mr);
 
-ASMReg SC_Pac_BoolMul(ASMState* Self, ASMReg Dest, ASMReg Boo, ASMReg V, Message* Exp);
+ASMReg SC_Pac_BoolMul(ASMState* Self, ASMReg Dest, ASMReg Bule, ASMReg V, Message* Exp);
 
 ASMReg SC_Pac_BoolOr(ASMState* Self, Message* A, Message* B, ASMReg Dest);
 
@@ -6178,6 +6183,8 @@ ASMReg SC_Pac_UniqueLocation(ASMState* Self, Message* Opmsg, ASMReg Dest);
 ASMReg SC_Pac_While(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
 ASMReg SC_Pac_Zeros(ASMState* Self, ASMReg Dest, Message* Exp);
+
+ASMReg SC_Pac_xC2xB5BoolInto(ASMState* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_Pac_xC2xB5Into(ASMState* Self, Message* Exp, ASMReg Dest);
 
@@ -10400,8 +10407,6 @@ inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self);
 
 inline bool JB_FastBuff_AppendU8(FastBuff* Self, uint /*byte*/ V);
 
-inline bool JB_File_SyntaxCast(JB_File* Self);
-
 inline bool JB_Ind_SyntaxCast(Ind Self);
 
 inline Syntax JB_Msg_Func(Message* Self);
@@ -10434,11 +10439,7 @@ inline bool SC_FailableInt_SyntaxCast(FailableInt Self);
 
 inline JB_String* SC_Named_Name(SCNamed* Self);
 
-inline bool SC_OpMode_SyntaxCast(OpMode Self);
-
 inline bool SC_PA_SyntaxCast(SCParamArray* Self);
-
-inline bool SC_Reg_SyntaxCast(ASMReg Self);
 
 inline DataTypeCode SC_Reg_xC2xB5Type(ASMReg Self);
 
@@ -10533,10 +10534,6 @@ inline bool JB_FastBuff_AppendU8(FastBuff* Self, uint /*byte*/ V) {
 	return Self->Curr >= Self->End;
 }
 
-inline bool JB_File_SyntaxCast(JB_File* Self) {
-	return Self != nil;
-}
-
 inline bool JB_Ind_SyntaxCast(Ind Self) {
 	return Self >= 0;
 }
@@ -10619,16 +10616,8 @@ inline JB_String* SC_Named_Name(SCNamed* Self) {
 	return JB_LUB[273];
 }
 
-inline bool SC_OpMode_SyntaxCast(OpMode Self) {
-	return Self != 0;
-}
-
 inline bool SC_PA_SyntaxCast(SCParamArray* Self) {
 	return (Self != nil) and Self->HasProperParams;
-}
-
-inline bool SC_Reg_SyntaxCast(ASMReg Self) {
-	return Self != nil;
 }
 
 inline DataTypeCode SC_Reg_xC2xB5Type(ASMReg Self) {
