@@ -112,6 +112,8 @@ module Feedback
 			nil|message|.jdb2
 			fdb(nil|[scfunction]|)
 			nil|DataTypeCode|.DebugPrint
+			|fatasm| X
+			X.DebugPrint
 	
 	
 	function ParseArgsSub (|[]| args, |bool|) 

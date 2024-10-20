@@ -7,38 +7,38 @@ function PackTestAndOrConsts (|int|)
 	#! RUN!!
 	visible
 
-	|| f3 = 0 and 5 // test consts
-	|| f4 = 6 and 0
-	|| f5 = 0 and 0
-	|| T6 = 7 and 8
-	|| T7 = 0 or  3
-	|| T8 = 4 or  0
-	|| f9 = 0 or  0
-	|| T10 = 9 or  2
-	|| t11 = 5 or t10
-	return f3 + f4 + f5 + t6 + t7 + t8 + f9 + t10
+	|| f1 = 0 and 5 // test consts
+	|| f2 = 6 and 0
+	|| f3 = 0 and 0
+	|| T4 = 7 and 8
+	|| T5 = 0 or  3
+	|| T6 = 4 or  0
+	|| f7 = 0 or  0
+	|| T8 = 9 or  2
+	|| X = (t8+t8)+(t8-t8)
+	return f1 + f2 + f3 + t4 + t5 + t6 + (f7 + f7) + t8
 
 
-function PackTestSemiConst (|int| f3)
+function PackTestSemiConst (|int| f1)
 	#! RUN!!
 	visible
-	|| x1 = f3 or  1
-	|| x2 = f3 or  0
-	|| x3 = f3 and 1
-	|| x4 = f3 and 0
+	|| x2 = f1 or  1
+	|| x3 = f1 or  0
+	|| x4 = f1 and 1
+	|| x5 = f1 and 0
 
-	|| y1 = 1 or  f3
-	|| y2 = 0 or  f3
-	|| y3 = 1 and f3
-	|| y4 = 0 and f3
+	|| y6 = 1 or  f1
+	|| y7 = 0 or  f1
+	|| y8 = 1 and f1
+	|| y9 = 0 and f1
 
-	y1 = 1 or  f3
-	y2 = 0 or  f3
-	y3 = 1 and f3
-	y4 = 0 and f3
+	y6 = 1 or  f1
+	y7 = 0 or  f1
+	y8 = 1 and f1
+	y9 = 0 and f1
 	
-	y1 = y1 or y2*2
-	y1 = y1 and y3*3
+	y6 = y6 or y7*2
+	y8 = y8 and y9*3
 
 
 function PackTestConsts (|float64|)

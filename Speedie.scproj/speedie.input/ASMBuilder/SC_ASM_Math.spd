@@ -185,7 +185,7 @@ extend ASMState
 		  elseif fn == @arel or @brel
 /			exp = exp.first
 		
-		  elseif fn == @acc
+		  elseif fn == @acc // merge after testing this
 /			exp = exp.first
 			
 		  else
@@ -259,16 +259,6 @@ extend ASMState
 		|| rr = r.reg
 		return exp.fADD(dest, l, r*!ss, r*ss, 1-IsF32) * Dest
 
-
-	function BoolMul (|asmreg| dest, |asmreg| Boo, |asmreg| V, |message| exp, |asmreg|)		
-		if dest is ConstAny
-			return .MakeConst2(dest, boo, V, exp, &fatasm.ConstifyBoolMul)
-			
-		|| fat = exp.TERN(dest, boo, V, asmreg())
-		if dest is ConstAny
-			fat.const = boo.const * v.const
-		return fat * Dest
-
 		
 	function Plus   (fn_opasm) // add (
 		if !r.reg
@@ -292,16 +282,6 @@ extend ASMState
 		return .plus(dest, l, r, exp)
 
 
-	function IntMul (fn_opasm)
-		if dest is ConstAny
-			.MakeConst2(dest, l, r, exp, &fatasm.ConstifyIntMul)
-		rz = .QuickIntMul(dest, R, L, exp)
-		if rz == nil
-			rz = .QuickIntMul(dest, L, R, exp)
-			if rz == nil
-				rz = exp.MULT(dest, L, R, asmreg()) * Dest
-
-
 	function FloatMul (fn_opasm)
 		if dest is constany
 			return .makeconst2(dest, l, r, exp, &fatasm.ConstifyFloatMul)
@@ -312,12 +292,30 @@ extend ASMState
 				rz = exp.FMUL(dest, L, R, asmreg(), l.IsBig|int|) * Dest
 
 
+	function IntMul (fn_opasm)
+		if dest is ConstAny
+			.MakeConst2(dest, l, r, exp, &fatasm.ConstifyIntMul)
+		rz = .QuickIntMul(dest, R, L, exp)
+		if rz == nil
+			rz = .QuickIntMul(dest, L, R, exp)
+			if rz == nil
+				rz = exp.MULT(dest, L, R, asmreg()) * Dest
+
+
+	function BoolMul (|asmreg| dest, |asmreg| Bule, |asmreg| V, |message| exp, |asmreg|)		
+		if dest is ConstAny
+			return .MakeConst2(dest, Bule, V, exp, &fatasm.ConstifyBoolMul)
+		rz = .QuickIntMul(dest, Bule, V, exp)
+		if !rz
+/			rz = exp.TERN(dest, Bule, V, asmreg()) * Dest				// TERN
+
+
 	function Multiply (fn_opasm)
 		if l isa DataTypeCode.bool
 			return .BoolMul(dest, l, r, exp)
 		if r isa DataTypeCode.bool
 			return .BoolMul(dest, r, l, exp)
-			
+
 		if l is ConstAny
 			swap (l) (r)
 		if l.isint
@@ -409,43 +407,45 @@ extend ASMState
 			return .Assign(dest, l, exp)
 		return .BitMakerSwap(dest, l, r, exp, asm.bxor)
 
-
 	function BitOr (fn_opasm)
 		if dest is ConstAny
 			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyBitOr)
-		if (l.reg == r.reg) or l.IsConst(-1)
-			return .Assign(dest, l, exp)
-		if r.IsConst(-1)
+		if l.NopMinusOne
 			return .Assign(dest, R, exp)
+		if r.NopMinusOne
+			return .Assign(dest, L, exp)
 		return .BitMakerSwap(dest, l, r, exp, asm.bor)
 
 			
 	function BitAnd (fn_opasm)		
 		if dest is constany
 			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyBitAnd)
-		if (l.reg == r.reg) or r.IsConst(-1)
+		if r.nopminusone
 			return .Assign(dest, l, exp)
-		if l.IsConst(-1)
+		if l.nopminusone
 			return .Assign(dest, r, exp)
-		if l.IsConst(0) or r.IsConst(0)
+		if l.isconst(0) or r.IsConst(0)
 			return .Zeros(dest, exp)
+		if (l.reg == r.reg)
+			return .Assign(dest, l, exp)
 		return .BitMakerSwap(dest, l, r, exp, asm.band)
 
 
 	function BitMakerSwap (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
 		if (l is ConstAny)
+			if  r.reg and (r is constany) // ??? both consts?
 			swap (l) (r)
 		return .BitMaker(Dest, l, r, exp, op)
 	
 	
 	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
-		|| K = r.const
-		if (r is ConstAny) and k.fits(9, op!=asm.bor) // we want bitor unsigned
-			r.nop
-			r = ASMReg()
-		  else
-			k = 0
-		|| fat = exp.BAND(dest, L, R, K)
+		|| fat = exp.BAND(dest, L, R, 0) 
+		if r.reg and (r is ConstAny)
+			|| k = r.const
+			if k.fits(9, op!=asm.bor) // we want bitor unsigned
+				r.nop
+				fat.r[3] = k
+				fat.r[2] = 0
 		fat.op = op
 		return fat * Dest
 
@@ -486,12 +486,15 @@ extend ASMState
 
 
 	function Zeros (|asmreg| dest, |message| exp, |asmreg|)
-		return .Assign(dest, asmreg(), exp)	
+//		if dest is frommath // just do it always?
+		dest.reg = 0
+		return dest // ???
+//		return .Assign(dest, asmreg(), exp)	
 	
 	
 	function Assign (|asmreg| dest, |asmreg| src, |message| exp, |asmreg|)
 		if src.reg != dest.reg
-			return .BitOr(dest, src, asmreg(), exp)
+			return .BitMakerSwap(dest, src, asmreg(), exp, asm.bor) //
 		return dest		// hmmm... we are already there
 
 
@@ -510,3 +513,8 @@ function asmreg.IsConst (|int64| val, |bool|)
 	return  (self is ConstAny) and (.const == val)
 	
 	
+function asmreg.NopMinusOne (|bool|)
+	if .IsConst(-1)
+		.nop
+		return true
+

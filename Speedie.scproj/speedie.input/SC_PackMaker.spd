@@ -97,7 +97,6 @@ module PackMaker
 		|scfunction| fn	
 		fn = .testfn("PackTestAndOrConsts")
 		if fn
-			debugger
 			|| Andor = fn.Test|&int64|[]
 		
 		fn = .testfn("PackTestConsts")
@@ -133,7 +132,6 @@ module PackMaker
 		if fn
 			for i in 4
 				self[0] = i&1,   self[1] = (i&2)>>1
-				debugger
 				|| AndOr2 = fn.Test|&int64|[]
 			
 	
@@ -179,7 +177,8 @@ module PackMaker
 		|| mu = .asm
 			|| mu2 = mu.µTest
 				|| P = mu2.ptr
-				printline .exportname
+				printline self
+				printline mu
 				return jb_vm.Run(p, mu2.length)
 	
 	

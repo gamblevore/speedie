@@ -16,6 +16,7 @@ datatype ASMReg (uint64)
 		(1<<16)		// starting point
 		Negate
 		FromMath
+		FromExistingVar
 		StayOpen
 		AlreadyNegated
 		Alternate
@@ -56,10 +57,11 @@ datatype ASMReg (uint64)
 			return f.f32|float64|
 
 	function NOP (|int64|)
-		|| f = .fat
-			f.op = asm.noop
-			return f.const
-		debugger 
+		if .reg
+			|| f = .fat
+				f.op = asm.noop
+				return f.const
+			debugger 
 
 	function Const (|int64|)
 		if .reg == 0
@@ -172,7 +174,7 @@ datatype ASMReg (uint64)
 		return (self, nil)(b)
 	
 	syntax cast (|bool|)
-		return self != nil
+		return self|bool|
 	
 	syntax cast (|int|)
 		cpp_part ToInt

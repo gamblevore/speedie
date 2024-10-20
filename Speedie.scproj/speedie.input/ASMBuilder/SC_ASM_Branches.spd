@@ -150,6 +150,9 @@ helper BoolFromBools (|message| exp, |ASMReg| Dest, |opmode| opp, |ASMReg| ml, |
 
 helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
 	opt norefcounts // 😵‍💫 // 😵‍💫 // 😵‍💫 // 😵‍💫 	// deal with consts later!!! :O
+	debugat 0
+	dest.µtype = datatypecode.bool
+	
 	|| A = exp.first!
 	|| B = exp.last!
 	|| ml = .ExistingVar(A)
@@ -171,12 +174,12 @@ helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |AS
 	return .BoolAnd(A, B, Dest)
 			
 
-function UniqueLocation (|message| opmsg, |asmreg| dest,   |asmreg|)
-	|| req = asmreg() with dest
-	if !req.reg
-		/return .TempOnly(OpMsg)
-	return req
-	
+function UniqueLocation (|message| opmsg, |asmreg| dest, |asmreg|)
+	if dest is NotYetUsed
+		return dest
+	rz = .temponly(opmsg)
+	rz.µtype = dest.µtype	
+
 
 function ExistingBool (|message| A, |ASMReg| Dest, |ASMReg|)
 	|| ml = .ExistingVar(A)
@@ -194,14 +197,14 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 	|| req = .ExistingBool(A, dest)
 	if !req
 		req = .UniqueLocation(A, dest)	
-		req = .µInto(A, req)
+		req = .µBoolInto(A, req)
 		if req is ConstAny
 			return .BoolConst1(b, dest, opp, req)					// x = 5 or Y() --> x = Y()
 	
 	|| JUMP = .BoolTestAndJump(a.next!, req, opp)
-	|| Second = .µinto(B, req)
+	|| Second = .µBoolInto(B, req)
 	if Second is ConstAny											// Wow this is frustrating!
-/		.NOP(jump)
+		.NOP(jump)
 		return .BoolConst2(a.next!, dest, opp, req, Second)
 
 	JUMP.JumpTo = .curr
@@ -209,13 +212,14 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 	if req.isbool and Second.isbool
 /		return req
 
-/	return .Exists(dest, req, a.next!)
+	return .Exists(dest, req, a.next!)
 
 
 function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asmreg|)
 	|| V = (ml.const!=0) != (dest is negate)
 	|| expect = opp is OR
 	if v == expect
+		ml.µtype = datatypecode.bool
 		ml.Const = v|int|				// x = 5 or  2	 --> x = true
 		return ml						// x = 0 and 2	 --> x = false
 	
@@ -223,25 +227,29 @@ function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asm
 										// x = 7 and y() --> x = y()
 	|| mr = .µ(B, dest)
 	if mr is ConstAny
+		ml.µtype = datatypecode.bool
 		mr.const = (mr.const != 0)|int|
 		return mr.BoolAnswer
 	
 	if mr.isbool
 /		return mr
-	/return .Exists(dest.negate, mr, B)
+	return .Exists(dest.negate, mr, B)
 
 
 
 function BoolConst2 (|message| exp, |asmreg| dest, |opmode| Opp, |asmreg| ml,  |asmreg| mr, |asmreg|)
 	|| V = mr.const!=0
 	if v == (opp is AND)
-/		mr.nop
+		mr.nop
+		ml.µtype = datatypecode.bool
 		return ml
 	
-/	mr.const = v|int|
+	if ml is fromexistingvar // why not?
+		ml.nop
+	mr.µtype = datatypecode.bool
+	mr.const = v|int|
 	return mr
 
-	
 
 
 function BoolAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
@@ -264,7 +272,7 @@ function BoolOr (|message| A, |message| B, |asmreg| dest,   |asmreg|)
 	if !KK.KnownTrue
 		|| part2 = .BranchConstAware(B, dest is negate)
 		FirstPart.jumpto(.curr)	
-	else
+	  else
 /		0
 	return dest.BoolAnswer
 

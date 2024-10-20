@@ -135,10 +135,17 @@ struct ASMState
 	
 	function Nop (|&fatasm| R)
 		r.op = asm.NOOP
-		if R == .Curr
-			.curr = R - 1 // nice
+		|| C = .curr - 1
+		if R == C
+			.curr = C // nice
+			debugat
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	function µBoolInto (|message| exp, |AsmReg| Dest, |asmreg|)
+		|| X = .ExistingVar(Exp)
+			return .exists(dest as (x bitand asmreg.fromexistingvar), X, exp)
+		return .µInto(exp, dest)
 
 
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
@@ -154,9 +161,6 @@ struct ASMState
 		cpp_part GetASM
 		|| fn = fn_asm_table[exp.ASMType]!
 		|| TmpCloser = .VTmps
-//		if "PackTestAndOrConsts".trap
-//			printline exp
-//			debugger
 		|| ss = (fn)(self, exp, dest)
 		if dest isnt StayOpen
 			.CloseVTmps(TmpCloser)

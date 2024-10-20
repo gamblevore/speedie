@@ -266,7 +266,7 @@ struct FatASM
 		fs <~ " #/"
 
 
-	function Print 
+	function DebugPrint 
 		visible
 		if asm.NoisyASM >= 3
 			|| fs = faststring()

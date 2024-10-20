@@ -181,7 +181,7 @@ function fatasm.ConstifyIntMul (fn_ASMConstifier)
 
 
 function fatasm.ConstifyBoolMul (fn_ASMConstifier)
-	.const = l.const|uint64| * r.const|uint64|
+	.const = l.const|bool| * r.const|uint64|
 
 function fatasm.ConstifyIntPlus (fn_ASMConstifier)
 	if l is alternate

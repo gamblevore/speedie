@@ -51,7 +51,7 @@ function PreRun
 #pragma GCC visibility push(hidden)
 
 `
-	|| str = "const char* JB_CrashLogFileName = \"/tmp/logs/${compiler.projectname}.crash.txt\";\n\n"
+	|| str = "const char* JB_CrashLogFileName = \"/tmp/logs/${compiler.projectname}.fail.txt\";\n\n"
 	.ModuleProperties <~ str
 
 

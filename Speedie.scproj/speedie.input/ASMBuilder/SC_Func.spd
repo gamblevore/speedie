@@ -6,6 +6,7 @@ class µFunc
 		cpp_part FuncInASM 
 	|scfunction|			Fn
 	|&FatASM|				IR
+	|?memory of asm|		Testing
 	|int|					Length
 	|bool|					OK
 
@@ -16,7 +17,10 @@ class µFunc
 
 	function µTest (|memory of asm|)
 		description "Generate some code (only for testing)."
+		if .testing
+			return .testing
 		rz = asm[.length*3]$
+		.testing = rz
 		rz.length = rz.capacity
 		|| p = rz.ptr
 		|| after = .µRender(P, P+rz.length)

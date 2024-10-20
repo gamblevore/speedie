@@ -47,6 +47,7 @@ linkage
 |scdecl?|					_NotConst
 |SCFunction?|				FuncProto
 |SCFunction?|				TheIsFunc
+|SCFunction?|				TheBoolFunc
 |SCFunction?|				ConstructorFunc
 |SCFunction?|				DestructorFunc
 |string|					CppClass
@@ -577,6 +578,7 @@ function OverrideSyntax
 			|| Mode = f.sourcearg!.nilcheckmode(ok)
 			f.IsNilChecker = Mode
 			is HasNilChecker
+			.TheBoolFunc = f
 	
 	(self is HasCompareFunc) = .FindSpecialFunc( "SyntaxCompare", true ) != nil
 	(self is HasEqualsFunc) = .FindSpecialFunc( "SyntaxEquals", true ) != nil

@@ -245,27 +245,26 @@ function Num (fn_asm)
 
 
 function Thg (fn_asm)
-	|| thg = asmtype.ThgSub(self, exp, dest, mode)
+	|| thg = asmtype.ThgSub(self, exp, dest)
 	|| reg = thg.reg
 	if (reg-1)|uint| < 31							// what?
 		return thg
 	error (exp, "Register out of bounds")
 
 
-function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |asmreg|)
+function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
 	|| d = exp.ASMDecl
 	if d is local
 		return d.wholetype
-		
-	if !mode
-		if d is const
-			(dest is constany)
-			return .NumToReg(exp, d.exportposition, dest)
+	
+	if d is const
+		(dest is constany)
+		return .NumToReg(exp, d.exportposition, dest)
 
-		rz = d.typeonly.zero
-		check (d is global) (Exp)
-		DoGlobal(self, exp, dest, d)
+	rz = d.typeonly.zero
+	check (d is global) (Exp)
+	DoGlobal(self, exp, dest, d)
  
 
 helper DoGlobalSub (|&FATASM| addr, |int| add, |message| exp,  |asmreg|)
@@ -507,7 +506,7 @@ function ASMReg.Write (|message| m,  |asmreg| ptr,  |int| index=0,  |&fatasm|)
 	return .ReadOrWrite(m, ptr, index, true)
 
 
-function asmstate.ExistingVar (|message| m, |asmreg|)
+function ASMState.ExistingVar (|message| m, |asmreg|)
 	opt	norefcounts
 	real self
 	|| fn = m.func 
@@ -515,7 +514,9 @@ function asmstate.ExistingVar (|message| m, |asmreg|)
 		m = m.first!
 		fn = m.func
 	if fn == @thg
-		return ASMType.ThgSub(self, m, asmreg(), 2)
+		|| d = m.ASMDecl
+		if d is local
+			return d.WholeType as ASMReg.FromExistingVar
 	
 
 function message.HasAsmStuff (|bool|)
@@ -600,3 +601,5 @@ function Message.TypeCastDoesNothing (|bool|)
 		return byteslost == 0
 	require byteslost <= 0
 
+
+ignore
