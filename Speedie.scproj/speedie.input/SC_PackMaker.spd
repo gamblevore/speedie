@@ -203,7 +203,6 @@ module PackMaker
 		j.tmp("fncs")
 		for f in compiler.funclist
 			if f.tableid
-				if f.Source contains ASM_ASK
 					|| asm = f.ASM 
 						j.Add(@tmp, f.ExportName, true)
 						j.add(asm)

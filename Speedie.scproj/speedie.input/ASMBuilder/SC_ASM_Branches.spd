@@ -62,6 +62,7 @@ function While			(fn_asm)
 				C.JumpTo = EXIT
 		C++
 	
+	return asmreg()
 
 
 function Exit			(fn_asm)

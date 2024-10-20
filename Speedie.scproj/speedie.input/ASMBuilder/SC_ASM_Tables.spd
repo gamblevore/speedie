@@ -242,6 +242,7 @@ function SetRel	(fn_asm)	// function relset (
 function Num (fn_asm)
 	opt norefcounts
 	|| d = exp.ASMDecl
+	dest.µtype = d.typeonly
 	return .numtoreg(exp, d.exportposition, dest) 
 
 
@@ -250,6 +251,8 @@ function Thg (fn_asm)
 	|| reg = thg.reg
 	if (reg-1)|uint| < 31							// what?
 		return thg
+	if reg == 0  and  thg is constany
+		return thg // its still ok.   nil/false
 	error (exp, "Register out of bounds")
 
 
