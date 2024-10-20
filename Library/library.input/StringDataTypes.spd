@@ -14,8 +14,8 @@ datatype int8 // aka char
 		|int8|
 		max = 127
 		min = -128
-	syntax cast (|bool|)
-		return self|bool|
+//	syntax cast (|bool|)
+//		return self|bool|
 
 
 //datatype char (int8) // no need
@@ -34,8 +34,8 @@ datatype byte
 		cpp_part EqualsByte
 		return b.length == 1 and b[] == self
 
-	syntax cast (|bool|)
-		return self|bool|
+//	syntax cast (|bool|)
+//		return self|bool|
 	
 	render
 		if (!fs_in)

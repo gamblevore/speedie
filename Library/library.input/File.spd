@@ -64,7 +64,7 @@ class File (String)
 	
 	syntax cast (|bool|)
 		opt norefcounts // what? why is this necessary?
-		RETURN self != nil
+		RETURN self|bool|
 
 //	syntax cast (|faststring|)
 //		cpp_part CastToStream

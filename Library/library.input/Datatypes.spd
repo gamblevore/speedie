@@ -73,10 +73,9 @@ datatype int
 		return self
 
 
-	syntax cast (|bool|)
-		return self|bool|
-		// don't put a cast to string here.
-		// bytes are for string conversion! not integers.
+//	syntax cast (|bool|)
+//		return self|bool|
+		// don't put a cast to string here. not even in 'datatype Byte'
 
 	render
 		cpp_part RenderFS
@@ -291,8 +290,8 @@ datatype uint
 	render
 		fs <~ self|int64|
 
-	syntax cast (|bool|)
-		return self|bool|
+//	syntax cast (|bool|)
+//		return self|bool|
 
 	operator rol (|uint| bits, |uint|)
 		bits &= 31
@@ -330,8 +329,8 @@ datatype uint16
 		max = 0xffff_
 		min = 0
 
-	syntax cast (|bool|)
-		return self|bool|
+//	syntax cast (|bool|)
+//		return self|bool|
 
 
 
@@ -347,8 +346,8 @@ datatype int16
 		max = 32767
 		min = -32K
 
-	syntax cast (|bool|)
-		return self|bool|
+//	syntax cast (|bool|)
+//		return self|bool|
 
 
 
@@ -380,9 +379,9 @@ datatype float
 		fs <~ "%"
 
 
-	syntax cast (|bool|)
-		cpp_part AsBool
-		return self|bool|
+//	syntax cast (|bool|)
+//		cpp_part AsBool
+//		return self|bool|
 	
 	function Exponent (|ivec2|)
 		cpp_wrapper JB_f_Exponent
@@ -517,8 +516,8 @@ datatype f64
 	
 	default 0.0
 
-	syntax cast (|bool|)
-		return self|bool|
+//	syntax cast (|bool|)
+//		return self|bool|
 	
 	function AsInt (|int64|)
 		cpp_wrapper
@@ -574,8 +573,8 @@ datatype int64
 		max = 0x7FFFffffFFFFffff_
 		min = max+1
 
-	syntax cast (|bool|)
-		return self|bool|
+//	syntax cast (|bool|)
+//		return self|bool|
 
 	render
 		fs <~ self
@@ -686,8 +685,8 @@ datatype uint64
 	function Low (|uint|)
 		return self
 	
-	syntax cast (|bool|)
-		return self|bool|
+//	syntax cast (|bool|)
+//		return self|bool|
 		
 	operator max (|uint64| s, |uint64|)
 		if self > s: return self

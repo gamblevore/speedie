@@ -34,8 +34,6 @@ datatype OpMode (int)
 	syntax is (|OpMode| x, |bool|)
 		return (self & x) == x
 		
-	syntax cast (|bool|)
-		return self != 0
 
 
 

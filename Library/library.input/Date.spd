@@ -6,8 +6,8 @@
 
 datatype Date (int64)
 	// one second is 64K (64*1024)
-	syntax cast (|bool|)
-		return self|bool|
+//	syntax cast (|bool|)
+//		return self|bool|
 
 	syntax cast (|float|)
 		// are these bad? remove them??
