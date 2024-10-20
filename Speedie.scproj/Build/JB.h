@@ -1535,13 +1535,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool ((int)16)
 #define kSC__CustomOps_TypeCastToBetter ((int)32)
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2144])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2146])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2145])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2146])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2143])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2146])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2147])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2147])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2148])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2145])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2148])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2149])
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
 extern int SC__FastStringOpts_StrRemoved;
@@ -1734,11 +1734,12 @@ extern JB_String* JB__jBinNotJbin;
 extern bool _once1;
 extern bool _once2;
 extern int JB_aaaaaaa;
+extern JB_String* SC_ASM_ASK;
 extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2152])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2154])
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
 extern CharSet* SC_CSNum;
@@ -1762,7 +1763,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kNoMatch ((int)0)
 #define kJB_kNumericMatch ((int)8388608)
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2148])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2150])
 #define kJB_kSimpleMatch ((int)4194304)
 #define kJB_kSuperClassMatch ((int)16777216)
 #define kJB_kTypeCastAssigns ((int)64)
@@ -1780,7 +1781,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2153])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2155])
 #define kJB_kVoidPtrMatch ((int)20971520)
 extern JB_File* SC_PerryLogFile;
 extern Message* SC_ReturnSelfEqNil;
@@ -1922,10 +1923,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp ((int)32784)
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2151])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2150])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2153])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2152])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2149])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2151])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int16_max ((s16)32767)
@@ -2442,7 +2443,7 @@ extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_kDelete ((int)2)
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2142])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2144])
 extern Float64 JB__Rec_Progress;
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -3345,6 +3346,8 @@ void SC_SC_Targets__SyntaxAccessSet(JB_String* Name, bool Value);
 // SpdAssembler
 bool SC_SpdAssembler__GenerateASM(SCFunction* Fn);
 
+bool SC_SpdAssembler__GenerateASMSub(SCFunction* Fn);
+
 void SC_SpdAssembler__Guard();
 
 int SC_SpdAssembler__Init_();
@@ -3392,8 +3395,6 @@ bool SC_SpdAssembler__OptTabl(FatASM* Self, FatASM* P, FatASM* N);
 bool SC_SpdAssembler__OptTern(FatASM* Self, FatASM* P, FatASM* N);
 
 FuncInASM* SC_SpdAssembler__AccessStr(Message* M);
-
-bool SC_SpdAssembler__VacGenerate(SCFunction* Fn);
 
 
 
@@ -4246,8 +4247,6 @@ void JB_cstring_temp(_cstring Self, FakeJBString* Rz);
 
 // f64
 Float64 JB_dbl_Fract(double Self);
-
-JB_String* JB_dbl_Render(double Self, int Dp, FastString* Fs_in);
 
 JB_String* JB_dbl_RenderFloat(double Self, FastString* Fs_in);
 
