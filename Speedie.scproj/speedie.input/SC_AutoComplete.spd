@@ -110,9 +110,9 @@ function WriteError (|string| name, |message|)
 	rz <~ name
 
 
-function CmdResponse (|Message| cmd, |message| arg, |message|)
+function CmdResponse (|Message| cmd, |message|)
 	if cmd != "error"
-		rz = .docmd(cmd, arg)
+		rz = .docmd(cmd)
 	
 	rz ?= .WriteError(cmd.name)
 
@@ -145,7 +145,7 @@ function CmdWrap (|Message| arg, |bool|)
 		app.crash
 	
 	|| cmd = .CmdCleanUp(arg)
-	|| response = .cmdresponse(cmd, arg) 
+	|| response = .cmdresponse(cmd) 
 
 	if cmd != response
 		cmd.ReplaceWith(response)
@@ -220,7 +220,7 @@ function ReportMemory (|Message| cmd, |message|)
 	return cmd
 	
 
-function DoCmd (|Message| cmd, |message| arg, |message|)
+function DoCmd (|Message| cmd, |message|)
 	require cmd == @tmp
 	
 	if !.InitedOK:						return cmd.SendPerryErrors
@@ -276,7 +276,7 @@ function scfunction.InsertIn (|SCNode| parent, |string| name, |SCObject|)
 	return parent[name]
 		
 
-function GetFunc2 (|message| cmd, |scfile| myfile, |int| f, |int| n,  |scfunction|)
+function GetFunc2 (|scfile| myfile, |int| f, |int| n,  |scfunction|)
 	opt norefcounts
 	|| ast = myfile.ast
 		|| src = ast.findpos(f,n)
@@ -287,7 +287,7 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 	opt norefcounts
 	|| src = cmd.last
 	if src != @dot
-		return .getfunc2(cmd, myfile, ff, n)
+		return .getfunc2(myfile, ff, n)
 	|| fn   = .anonfn init scfunction()
 	|| prm  = src.second
 	|| mpos = prm.first
@@ -306,13 +306,13 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 	|| orig = fn.InsertIn(parent, src.name)
 	|| pos = mpos.int
 	parser._dotinsertallow = true
-	if fn.update_source(pos, str.name, myfile, orig)
+	if fn.update_source(pos, str.name, orig)
 		.AnonParent = parent
 		.anontext = str.name
 		return fn
 
 
-function SCFunction.Update_Source (|int| start, |string| text, |scfile| myfile, |SCObject| orig, |bool|)
+function SCFunction.Update_Source (|int| start, |string| text, |SCObject| orig, |bool|)
 	scfunction.currfunc = self
 	parser.using.position = -1
 	parser.using.Flags = 0 // oop
@@ -792,7 +792,7 @@ function AutoComplete (|message| ff, |string| name, |string| Purpose, |message|)
 			prev = i
 
 
-function ActualDefine (|message| rz, |message| s, |string| purpose)
+function ActualDefine (|message| rz, |message| s)
 	|| f = s.filepath			#expect "nopath"
 	rz <~ (@sstr, f)
 	rz <~ s.position
@@ -863,7 +863,7 @@ function Diissplay (|message| msg, |message| s, |string| purpose, |message|)
 function RespondDefine (|message| msg, |message| s, |string| purpose, |message|)
 	rz = @tmp.msg(purpose)
 	if purpose starts "define"
-		.ActualDefine(rz, s, purpose)
+		.ActualDefine(rz, s)
 	  else
 		rz <~ .Diissplay(msg, s, purpose) // on purpose
 
@@ -898,7 +898,7 @@ function CallFromDefine (|message| msg, |scfunction| fn,  |object| found, |messa
 	arg <~ define
 
 
-function CallFrom (|message| msg,  |string| purpose,  |object| found=nil,  |message|)
+function CallFrom (|message| msg, |object| found=nil,  |message|)
 	opt norefcounts
 	
 	|| fn = msg.AutoMsgFuncFn
@@ -943,7 +943,7 @@ function Define (|message| msg,  |string| purpose,  |object| found=nil,  |messag
 
 function DefineOrCall (|message| msg,  |string| purpose,  |object| found=nil,  |message|)
 	if  purpose starts "callfrom"
-		return .Callfrom(msg, purpose, found)
+		return .Callfrom(msg, found)
 	return .define(msg, purpose, found)
 
 
@@ -1028,7 +1028,7 @@ function Message.ModuleSrc (|message|)
 			return found.source
 
 
-function FindAdj (|message| msg, |bool| DisplayOnly, |message|)
+function FindAdj (|message| msg, |message|)
 	opt norefcounts
 	|| adj = msg
 	if msg in @adj
@@ -1041,7 +1041,7 @@ function FindAdj (|message| msg, |bool| DisplayOnly, |message|)
 function LocateDefinition (|message| msg, |SCObject| already_defined, |bool| DisplayOnly, |message|)
 	opt norefcounts
 	if (msg in @adj) or (msg == @adj)
-		rz = .FindAdj(msg, displayonly)
+		rz = .FindAdj(msg)
 		if rz
 			return rz
 		
@@ -1181,12 +1181,13 @@ extend message
 
 
 
-|| PerryLogFile = file.Logs["SpeedieDebug.txt"]
+//|| PerryLogFile = file.Logs["SpeedieDebug.txt"]
 
-function Compiler.PerryLog (|string| s) // try to find where this damn error came from.
-	require compiler.InPerry
-	if !PerryLogFile.Opened
-		PerryLogFile.OpenEmpty
-	PerryLogFile <~ s
-	PerryLogFile <~ "\n"
-
+//function Compiler.PerryLog (|string| s) // try to find where this damn error came from.
+//	require compiler.InPerry
+//	if !PerryLogFile.Opened
+//		PerryLogFile.OpenEmpty
+//	PerryLogFile <~ s
+//	PerryLogFile <~ "\n"
+//
+//

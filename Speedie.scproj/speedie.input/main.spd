@@ -63,6 +63,8 @@ function compiler.SetupEnv
 		ErrorColors.enabled = false
 
 
+
+// perry uses this for debug
 api Speedie_Main (|&pico| comms, |int| Mode, |&cstring| args, |ErrorInt|)
 	cpp_name Speedie_Main 
 	pico.parent_ = comms // phew
