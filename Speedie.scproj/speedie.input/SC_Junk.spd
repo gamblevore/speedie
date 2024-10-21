@@ -56,7 +56,7 @@ module __junktest_5__
 		c
 	|| x = {a, b, c}
 
-	function Abc (|bool| g)
+	function Def (|bool| g)
 		visible
 		|| x = (0, 0|byte|)
 		

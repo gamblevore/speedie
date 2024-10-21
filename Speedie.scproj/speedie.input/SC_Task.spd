@@ -215,7 +215,7 @@ task Task2 (LessThan3, |vec2| V, |float| Strength)
 	constructor
 		is Animation
 	function Stuff
-	function ABC (|vec2| V)
+	function XXX (|vec2| V)
 		.stuff
 
 
