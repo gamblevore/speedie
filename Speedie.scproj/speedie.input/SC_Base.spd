@@ -962,7 +962,7 @@ dispatch RootCollectTable (CollectFunc)
 	+"model"				SCGame3D.NeuModel
 	+"prototype"			SCFunction.NewProtoType
 	+"render"				SCFunction.NewRender
-	+"import"				(DontRemove)
+	+"import"				(scimport.DoImport)
 	+"shell_args"			InbuiltShellArgs.collect
 	+"syntax"				SCClass.LoadSyntax
 	+"linkage"				CppRefs.Linkage

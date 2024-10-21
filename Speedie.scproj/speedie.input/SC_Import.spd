@@ -48,6 +48,12 @@ class SCImport
 		
 		
 	function ImportMsg (|Message| j)
+		error.sourceadd(j)
+		.ImportMsgSub(j)
+		error.sourceremove
+	
+	
+	function ImportMsgSub (|Message| j)
 		|| l	= J.last(@str)$
 		|| Name = l.name
 		|| P	= Compiler.FindProject(Name, true)
@@ -73,9 +79,7 @@ class SCImport
 		opt norefcounts
 		for j in index.AST
 			if J IsTmp "import"
-				error.sourceadd(j)
 				.ImportMsg(j)
-				error.sourceremove
 
 
 	function CanBan (|scfile| scf, |bool|)
@@ -226,6 +230,15 @@ class SCImport
 		|date|				Recent
 		|bool|				STDLibTime
 		|byte|				CurrIsManuallyImported
+		
+
+		
+		function DoImport (CollectFunc)
+			|| C = .curr
+				C.ImportMsg(node)
+			  else
+				error (node, "No current import")
+			return compiler.program
 		
 		
 		function Sorter (SorterComparerbool)
