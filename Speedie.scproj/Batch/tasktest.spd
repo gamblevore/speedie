@@ -29,7 +29,7 @@ module SCTasks
 			return LESSTHAN < .b
 		
 		module
-			function abc (lessthan) 
+			function ABC (lessthan) 
 				return (self)(LessThaN)
 
 
