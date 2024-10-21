@@ -173,18 +173,29 @@ function UnusedFuncs (|message| cmd, |message|)
 			
 	cmd.Clear
 	
-	if !.CompiledOK
-		return cmd
-	|| arg = cmd.GiveArg
-	for fn in Compiler.FuncList
-		|| src = fn.source
-		if src and (fn.File == scf) and fn.isunused
-			|| str = "() is unused"
-			if fn.linkfrom != nil
-				str = "()'s callers are unused"
-			arg.msg(@tmp, fn.name + str) <~ src.position
+	if .CompiledOK
+		|| arg = cmd.GiveArg
+		for fn in Compiler.FuncList
+			if fn.File == scf
+				fn.CheckUnused(arg)
 	
 	return cmd
+
+
+function scfunction.CheckUnused (|message| feedback)
+	opt norefcounts
+	if .isunused
+		|| src = .source
+			|| str = "() is unused"
+			if .linkfrom != nil
+				str = "()'s callers are unused"
+			feedback.msg(@tmp, .name + str) <~ src.position
+
+	for arg in .args
+		if arg isnt readfrom // oof
+			|| Src = arg.source
+				feedback.msg(@tmp, arg.name + " is unused") <~ Src.position
+
 
 
 function Check (|message| cmd, |message|)

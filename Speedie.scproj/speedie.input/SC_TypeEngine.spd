@@ -278,6 +278,8 @@ function TypeOfThg (ExprResolver)
 	  elseif R isa SCDecl
 		if side
 			(r is setto)
+		  else
+			(r is ReadFrom)
 		|| O = R.islookuponly
 		if O isa message
 			exp.SafeReplaceWith(o.copy(exp))

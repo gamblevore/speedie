@@ -71,14 +71,14 @@ datatype SCDeclInfo (int)
 		UsedButAlteredBySomethingAheadInLoop
 		GameFlyingMem
 		Task
-		Atomic
 		Self
+		ReadFrom
 		SetTo					// a var sets it... like: rz = obj
 		Hidden					// internal global... should not be exposed to non-lib stuff
 		Biggest
 		PostIncremented
 		ReturnedStruct
-		IntendedAsReturn
+		IntendedAsReturn // were at 32... cant add more. Speedie should also warn if theres too many. (it wasnt!)
 		Swappable	 = Param + Body + Global + Property
 		Local		 = Body + Param
 		SelfImplicit = Self + local // local is set by CollectOneParam, anyhow?
