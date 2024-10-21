@@ -264,7 +264,7 @@ api syntax (|string| name, |syntax|)
 api str (|cstring| Str, |int| Length, |&nil| Release, |&nil| Tag, |string|)
 	if !str or length < 0
 		return "" // why not?
-	Length := str.length
+	Length ?= str.length
 	return string.FromPtr(str|&nil|, Length, Release, Tag)
 
 	description "Creates a JBString from a c-string. Expects the c-string to remain unchanged until the JBString is freed. Length is optional. Can optionally pass a call-back to release your c-string, during freeing the JBString."

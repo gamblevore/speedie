@@ -29,10 +29,10 @@ module SC_Init
 			require !c.SettingToNil
 		
 		if c == @decl
-			.InitVarsArg := .BuildInitArg
+			.InitVarsArg ?= .BuildInitArg
 			.InitVarsArg.first <~ c
 		  else
-			.InitCodeArg := .BuildInitArg
+			.InitCodeArg ?= .BuildInitArg
 			.InitCodeArg <~ c
 
 

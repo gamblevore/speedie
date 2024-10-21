@@ -42,7 +42,7 @@ function Message.SCArg (|SCNode| p, |message| avoid=nil, |SCArg?|)
 		return nil
 	
 	|| R = .AsArg
-	p := .msgarg
+	p ?= .msgarg
 	if (!R and p)
 		R = SCArg.new( self )
 		if (p isa SCArg)

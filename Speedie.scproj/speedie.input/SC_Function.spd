@@ -341,7 +341,7 @@ function MacroFix (|SCDecl?| contains, |SCNode| name_space, |SCParamArray| Incom
 		orig.BecomeMacro(.ismacro!, r)
 		orig.MacroFixSub(contains) 
 		rz = TypeOfExpr(orig, name_space) 
-		rz := typevoid!
+		rz ?= typevoid!
 	  else
 		debugger 
 
@@ -385,7 +385,7 @@ function message.AssignsFix (|scfunction| f)
 function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming, |int| Failed=0, |SCFunction|)
 	opt norefcounts
 	rz = .argsmatch1(base, name_Space, incoming, Failed)
-	rz := .argsmatch1(base, name_Space, incoming, kTypeCastAssigns ||| Failed)
+	rz ?= .argsmatch1(base, name_Space, incoming, kTypeCastAssigns ||| Failed)
 
 	if Failed and !incoming.MadeError // backup
 		error ( incoming.exp, "Wrong params to " + .RenderTitle )
@@ -498,7 +498,7 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 			TypeOfExpr( def, Name_Space )
 
 		  else
-			Incoming.FailedAt := fi		
+			Incoming.FailedAt ?= fi		
 			Result = kUseDefaultParams
 		fi += (fi+1 == .structreturnpos)
 	
@@ -597,7 +597,7 @@ function ArgsMatch2 (|SCDecl| base, |int| TypeCast, |SCNode| name_space, |SCPara
 			if  Match  &  (kNeeds|||kUseDefaultParams)
 				NeedsAlter = Match
 			
-			Result := f
+			Result ?= f
 			OldMatch = Match
 
 	if (NeedsAlter)
@@ -970,7 +970,7 @@ function CountCallsToParentAlloc (|Message| root, |message|)
 		|| f = curr.IsParentConCall
 			|| fcls = f.cls
 			expect  (f.cls == c.realsuper or c.super)   (curr, "Function should belong to parent class, but doesn't.")
-			rz := curr
+			rz ?= curr
 			FoundCount++
 			expect  (FoundCount < 2)   (curr, "Multiple calls to parent constructor/destructor not allowed.")
 
@@ -1179,7 +1179,7 @@ function NewDefaultRel (|message| place, |SCDecl| d, |Message|)
 	// .bla = X
 	if !d.IsCArray				// carrays get cleared
 		|| def = d.Default
-		def := d.CreateDefault(place)
+		def ?= d.CreateDefault(place)
 		return NewEqRel( d.DeclToDot(.self), def )
 
 
@@ -1739,7 +1739,7 @@ function SCFunction.PreProcessExpects
 	
 	for ch.flat in .SourceArg
 		if ch.NeedsPreprocess
-			list := array.new
+			list ?= array.new
 			list <~ ch
 	require list!=nil
 	
@@ -1755,7 +1755,7 @@ function SCFunction.PreProcessExpects
 		if ch == "timetest"
 			ch.name = "using"
 			|| w = ch.first
-			w := ch.msg(@str, "Time")
+			w ?= ch.msg(@str, "Time")
 			w.needbra
 		  elseif ch=="using"
 			tran_using(self, ch, nil)

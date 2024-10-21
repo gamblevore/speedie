@@ -37,7 +37,7 @@ function file.Conf (|int| lim = 1MB,  |config|)
 	opt norefcounts
 	if .exists
 		rz = .parse(lim)|config|
-	rz := message()
+	rz ?= message()
 	rz.obj = self
 
 

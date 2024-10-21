@@ -41,8 +41,8 @@ extend_module ArchonPurger {
 	TrackerDummies()
 	function TrackerDummies
 		for i in 64
-			NilTable[i]     := &Dummy
-			fn_asm_table[i] := &ASMType.unexpected
+			NilTable[i]     ?= &Dummy
+			fn_asm_table[i] ?= &ASMType.unexpected
 
 
 
@@ -239,7 +239,7 @@ function Function (NilTrackerFn)
 		if rz and !(v is FnBecomesNilCh) and p!.isfirst
 			rz = 0 // can't work
 		|| sent = p!.FastDecl
-		HasAddrs := sent.CanUpgradeInternalPointer
+		HasAddrs ?= sent.CanUpgradeInternalPointer
 		if (v is nilish) // and recv.NilReg	
 			.NilParamPass(recv, sent, p!, fn, v)
 

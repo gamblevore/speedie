@@ -826,7 +826,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		if !.CppLicenceStr
 			|| f = compiler.InputFile(nil, "licence.txt", nil)
 				.Cpplicencestr = f.readall(16KB, true)
-			.CppLicenceStr := " "
+			.CppLicenceStr ?= " "
 		return .CppLicenceStr
 
 	

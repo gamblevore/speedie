@@ -59,9 +59,9 @@ class ErrorReceiver
 		
 		.incr(err)
 		
-		err.path := .source
+		err.path ?= .source
 		if Error.KeepStackTrace
-			err.StackTrace := app.StackTrace
+			err.StackTrace ?= app.StackTrace
 		
 		|| log = ._logfunc 
 			(log)(self, err.render)

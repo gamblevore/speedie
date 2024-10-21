@@ -407,7 +407,7 @@ After that, you now have a tree-data-structure that represents your data. The Me
 	
 	helper RenderWithSpaces (|FastString| fs, |Message|ch=nil)
 		Opt NoRefCounts
-		ch := .First
+		ch ?= .First
 
 		while (ch)
 			fs <~ ch

@@ -81,7 +81,7 @@ class SCBehaviour (SCNode)
 	function SCClass.CreateBehaviour
 		require .isobject and !.isrole
 		
-		.Behaviour := SCBehaviour.new(self)
+		.Behaviour ?= SCBehaviour.new(self)
 		.Behaviour!.CreateFuncTable( .sourcearg! )
 	
 	

@@ -161,7 +161,7 @@ class SCIterator (SCNamed)
 
 function SCClass.GetIteratorAny (|String| name, |message| node, |SCIterator|)
 	opt norefcounts
-	name := "DefaultIterator"
+	name ?= "DefaultIterator"
 	for c.upwards in self
 		|| R = c[name] 
 		if R isa SCIterator

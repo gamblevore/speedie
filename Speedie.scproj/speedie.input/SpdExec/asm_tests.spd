@@ -3,8 +3,7 @@
 module ASMExamples {
 
 target pack { 
-function PackTestAndOrConsts (|int|)
-	#! RUN!!
+function AndOrConsts (|int|)
 	visible
 
 	|| f1 = 0 and 5 // test consts
@@ -19,8 +18,7 @@ function PackTestAndOrConsts (|int|)
 	return f1 + f2 + f3 + t4 + t5 + t6 + (f7 + f7) + t8
 
 
-function PackTestSemiConst (|int| f1, |int|)
-	#! RUN!!
+function SemiConst (|int| f1, |int|)
 	visible
 	|| x2 = f1 or  1
 	|| x3 = f1 or  0
@@ -42,25 +40,51 @@ function PackTestSemiConst (|int| f1, |int|)
 	return y6+y8
 
 
-function PackTestConsts (|float64|)
-	#! RUN!!
+function AndOrRest (|int| a, |int| b, |int|) // stragglers
+	|| x3 = !(a or b)			// bool logic
+	|| x4 = !(a and b)			// same
+	|| x5 = (0 or x3)+1			// x5 = x3+1
+	|| x6 = x3 or x4			// no need cmpb
+	|| x7 = x3 or x4
+	|| x8 = x3 and x4
+	|| x9 = !(x3 or x4)
+	|| x10 = !(x3 and x4)
+	return x9 + x10
+
+	
+function AndOrRest2 (|int| a, |int| b) // more stragglers
+	|| x3 = (a, b)(1)
+	|| x4 = (a, b)(0)
+	if a or a
+		x3 = (b or b)|int|
+	  else
+		x4 = (a and a)|int|
+
+	if 1 or a: a = 2
+	if 0 or a: a = 3
+
+	if 0 and b: b = 4	
+	if 1 and b: b = 5
+	
+
+
+function Consts (|float64|)
 	visible
-	|float64| r1 = 2						// int as f64
+	|float64| r1 = 2							// int as f64
 	|| r2 = (1.0/2|float64|)
 	r2 = (1.0/r1)
-	|| r3 = 0.1 + 1						// f32 + int
-	|| r4 = 3.4567 + r1|float|			// f64 + f32
+	|| r3 = 0.1 + 1								// f32 + int
+	|| r4 = 3.4567 + r1|float|					// f64 + f32
 	|| r5 = 1234.5|float64| + 5678.9|float64|	// f64 + f64
-	|float| r6 = 2						// int as f32
-	|float64| r7 = 1.0						// f32 as f64
+	|float| r6 = 2								// int as f32
+	|float64| r7 = 1.0							// f32 as f64
 	return r2 + r5
 
-function PackTestIncr (|int| x, |int| y, |int|)
-	#! RUN!!
-	return .packtestmath(x++, --y)
+
+function Incr (|int| x, |int| y, |int|)
+	return .math(x++, --y)
 	
-function PackTestForeignFuncs (|string?| x, |string?| y, |string|)
-	#! RUN!!
+function ForeignFuncs (|string?| x, |string?| y, |string|)
 	|| a = x.Length
 	|| b = x._Addr
 	|| c = x._white(12345, 98765, true)
@@ -68,16 +92,13 @@ function PackTestForeignFuncs (|string?| x, |string?| y, |string|)
 	|| e = string.char(0xb16b00b5)
 	return e + d // fails?
 
-function PackTestMul (|int| a, |int| b, |int| c, |int| d, |int|)
-	#! RUN!!
+function Mul (|int| a, |int| b, |int| c, |int| d, |int|)
 	return ((a + b) * c) / d
 
-function PackTestMath (|int| a, |int| b, |int|)
-	#! RUN!!
+function Math (|int| a, |int| b, |int|)
 	return ((a + b) / 2) - ((a / b) * 2)
 
-function PackTestAndOr (|int| a, |int| b, |bool| c, |bool| d, |int|)
-	#! RUN!!
+function AndOr (|int| a, |int| b, |bool| c, |bool| d, |int|)
 	visible
 	|| five = 5, || min = -1
 	if b < min and b > five
@@ -94,8 +115,7 @@ function PackTestAndOr (|int| a, |int| b, |bool| c, |bool| d, |int|)
 		rz = 1
 
 		
-function PackTestAndOr2 (|bool| c, |bool| d, |int|)
-	#! RUN!!
+function AndOr2 (|bool| c, |bool| d, |int|)
 	visible
 
 	if (c or d)

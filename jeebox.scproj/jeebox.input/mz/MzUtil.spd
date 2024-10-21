@@ -158,7 +158,7 @@ struct CompressionStats
 
 	function Start (|&CompressionStats|)
 		nil self
-		self := CompressionStats.all
+		self ?= CompressionStats.all
 		.Duration -= date()
 		return self
 	

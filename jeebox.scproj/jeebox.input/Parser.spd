@@ -34,7 +34,7 @@ extend Parser
 
 
 		|| numb     =   "0123456789".bytesplit
-		|| op_comp  =   "= == === < > <= <== >= >== != !== <=> ~>= ~<= ~> ~< <~ ~= ~!= ~<=> := ??"
+		|| op_comp  =   "= == === < > <= <== >= >== != !== <=> ~>= ~<= ~> ~< <~ ~= ~!= ~<=> := ?? ?="
 		|| op_math  =   "* / + - ^ & >> << >>> <<< (|) |||"
 		|| PFix		=	"++ -- $ ! ? ..."
 		
@@ -502,7 +502,7 @@ extend Parser
 			return Dot
 
 		rz = NumStr.OutCharSet( Jeebox.CSNum, Dot + 1 )
-		rz := NumStr.length
+		rz ?= NumStr.length
 	
 
 	function string.IsHexLike (|int|N=0, |int|)
@@ -697,7 +697,7 @@ extend Parser
 				// I could search for "." + cswordmiddle, and subparse through that...
 				// although my parser isn't really designed for subparsing
 				// otherwise I'd need to do this manually. Its a mess.
-				strpos := after
+				strpos ?= after
 				|| rr = parser.new(result, type, NewStrPos, StrPos )
 				if (c0 == '.')
 					parser.new(rr, @emb, newstrpos-1)
@@ -920,7 +920,7 @@ ive been~running #since morning
 		Result <~ ch
 
 		|| ch2 = .Process( TemporalFlags, Result ) ?? .ProcessThing(ops)
-		ch2 := parser.new(Result, @emb, ns) // so we can do item.last
+		ch2 ?= parser.new(Result, @emb, ns) // so we can do item.last
 		result <~ ch2
 		result.after = ch2.after 
 		return Result

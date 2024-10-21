@@ -242,7 +242,8 @@ extend Error
 		
 	render SCRender
 		// probably not needed, but whatever leave it for now.
-		.path := .SCOriginalPath ?? "(string)"
+		.path ?= .SCOriginalPath
+		.path ?= "(string)"
 		if options.perryoutput
 			.render(fs)
 		  else

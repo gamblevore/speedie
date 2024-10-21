@@ -266,7 +266,7 @@ class SCDecl (SCNamed) {
 		
 		|| Signed = .issigned
 		if Op isnt ShiftOnly
-			 signed := t.issigned
+			 signed ?= t.issigned
 		if bits > 32
 			return (typeint64, typeuint64)(signed)
 		if bits > 16
@@ -381,7 +381,7 @@ class SCDecl (SCNamed) {
 
 
 	function WriteDeclFull (|String| DeclName = "", |int| minimal = 0, |Message|)
-		DeclName := .Name
+		DeclName ?= .Name
 		expect DeclName or !.default
 		
 		if DeclName
@@ -394,7 +394,7 @@ class SCDecl (SCNamed) {
 	
 	
 	function WriteDeclTypeAndName (|String| Name, |int| minimal, |Message|)
-		name := .Name
+		name ?= .Name
 		return « decl,  .WriteType(minimal),  «Thg name » »
 	
 	
@@ -404,7 +404,7 @@ class SCDecl (SCNamed) {
 		if !def and minimal >= 2
 			dcl.msg(@Thg, name)
 			return dcl
-		def := .Type.defawlt
+		def ?= .Type.defawlt
 
 		if !def or (.pointercount and minimal < 2)
 			def = «thg "nil"»
@@ -548,7 +548,7 @@ class SCDecl (SCNamed) {
 
 	function HighestArrayContainMatch (|SCDecl| Other, |SCDecl|)
 		rz = .highestmatch(other)
-		rz := self
+		rz ?= self
 	
 	
 	function HighestMatch (|SCDecl| Other, |SCDecl|)
@@ -582,7 +582,7 @@ class SCDecl (SCNamed) {
 		fs <~ "' but found '"
 		o.RenderTypeNameNicer(fs)
 		fs <~ "'."
-		ErrNode := backup
+		ErrNode ?= backup
 		error ( ErrNode, fs )
 
 

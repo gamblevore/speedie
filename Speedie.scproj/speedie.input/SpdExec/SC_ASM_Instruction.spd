@@ -72,7 +72,7 @@ class Instruction
 			__instructionlist__
 			|| ERR = .typelist[0]
 				for i in 256
-					.typelist[i] := ERR 
+					.typelist[i] ?= ERR 
 			  else
 				debugger 
 			.OpDict["bra"] = .OpDict["jbra"]

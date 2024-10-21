@@ -344,7 +344,7 @@ function Message.OppExpand (|bool|)
 function Message.InitExpand (|bool|)
 	opt norefcounts
 	|| rel = .parent!
-	.name = ":="
+	.name = "?="
 	using self
 	rel.FixErl
 	return true
@@ -362,7 +362,7 @@ function Message.RelFix (|bool| force, |bool|)
 	if force or !plus.obj
 		|| PlusScore = plus.opscore // just do it now
 		|| SubRel = Plus.next
-		if  Plus == ":="
+		if  Plus == ":=" or "?="
 			.FixErl
 		  elseif SubRel == @Rel
 			rz = subrel.relfix(true)
@@ -386,7 +386,7 @@ function Message.RelFix (|bool| force, |bool|)
 
 function CustomFuncOp (|Message| exp, |SCOperator| comp, |SCNode|name_space, |Message|RN, |SCDecl|)
 	// a + b   --> a.operator_plus(b)
-	// a ?? b  --> a.operator_oar(b,syntaxcast?)
+	// a ?? b  --> a.operator_oar(b.syntaxcast?)
 	opt norefcounts
 	exp.become(@Dot, comp.FuncName)
 	|| prm = «prm, RN » 

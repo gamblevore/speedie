@@ -208,7 +208,8 @@ function PrefsInit (|date| when=0, |config!|)
 		._prefs = Message(@arg, string.error)
 	if when
 		if when < 0: When = date.now
-		app.pref("first") := when.renderint
+		app.pref("first") ?= when.renderint
+		
 	return ._prefs!
 
 
@@ -307,7 +308,7 @@ function Configure (assigns:|string|)
 	._conf  = Value.parsewitherror(err)
 	if err
 		printline err.render
-	._conf := message()
+	._conf ?= message()
 
 
 

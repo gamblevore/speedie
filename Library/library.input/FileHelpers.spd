@@ -174,7 +174,7 @@ extend String
 		|| N	 = .FindTrailingSlashes
 		|| slash = .find('/', n-1, 0) + 1
 		|| dot	 = .find('.', n-1, slash)
-		dot := n
+		dot ?= n
 		if !KeepPath
 			slash = 0
 		return self[slash, dot]

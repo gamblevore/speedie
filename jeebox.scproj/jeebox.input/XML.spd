@@ -200,7 +200,7 @@ extend message
 
 function message.XMLToJeebox (|bool|)
 	for ch in self
-		rz := ch == @xml
+		rz ?= ch == @xml
 		ch.XMLToJeeboxSub
 	check rz (self, "No XML found.")
  
@@ -216,7 +216,7 @@ helper message.XMLToJeeboxSub
 		|message| arg
 		while 
 			|| ch = .first #loop
-			arg := @arg.msg
+			arg ?= @arg.msg
 			arg <~ ch
 			ch.XMLToJeeboxSub
 		if prms.HasAny

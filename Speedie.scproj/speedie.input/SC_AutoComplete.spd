@@ -114,7 +114,7 @@ function CmdResponse (|Message| cmd, |message| arg, |message|)
 	if cmd != "error"
 		rz = .docmd(cmd, arg)
 	
-	rz := .WriteError(cmd.name)
+	rz ?= .WriteError(cmd.name)
 
 
 function CmdCleanUp (|Message| arg, |message|) 
@@ -233,12 +233,12 @@ function compiler.FindModuleOrClass (|message| mod, |bool| retry, |SCNode|)
 	if (mod == @thg)
 		rz = module.cls
 		require rz or retry
-	rz := module
+	rz ?= module
 
 
 function Backup_Define (|SCFile| myfile,  |int| f,  |message| thg,  |string| purpose,  |message|)
 	opt norefcounts
-	thg := myfile.GetMsg(f)
+	thg ?= myfile.GetMsg(f)
 	expect thg "nomsg"
 	thg = thg.CmdImprove
 	return .DefineOrCall(thg, purpose, myfile)
@@ -729,7 +729,7 @@ function RootTmpComplete (|message| cmd, |message|)
 	flags += f.IsModuleType  <<  1
 	flags += f.IsClassType   <<  2
 	flags += f.IsLinkageType <<  3
-	flags := 1
+	flags ?= 1
 	rz = @tmp.msg(cmd.name)
 	|| arg = rz.msg(@arg, req)
 	for ch in .alltmps
@@ -875,14 +875,14 @@ function Message.AutoMsgFuncFn (|SCFunction|)
 function Message.AutoMsgFunc (|SCFunction|)
 	opt norefcounts
 	rz = .MsgFunc
-	rz:=.parent.MsgFunc
+	rz?=.parent.MsgFunc
 
 
 function CallFromDefine (|message| msg, |scfunction| fn,  |object| found, |message|)
 	rz = @tmp + "callfrom"
 	|| arg = rz.msg(@arg)
 	|| define = .define(msg, "define", found)
-	define := @tmp + "nodefine"
+	define ?= @tmp + "nodefine"
 	define <~ fn.name
 	arg <~ define
 
@@ -891,7 +891,7 @@ function CallFrom (|message| msg,  |string| purpose,  |object| found=nil,  |mess
 	opt norefcounts
 	
 	|| fn = msg.AutoMsgFuncFn
-	fn := msg.AutoMsgFunc
+	fn ?= msg.AutoMsgFunc
 	require fn
 	
 	rz = .CallFromDefine(msg, fn, found)

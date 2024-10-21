@@ -146,7 +146,7 @@ function String.ExtractPathAndLine (|&ivec2| LineAndByte, |string|)
 			while curr
 				|| pos = curr["pos"]
 				|| path = curr["file"]
-				path := curr["path"]
+				path ?= curr["path"]
 				if path and pos
 					|int| n = pos.int // make the c++ compile D:
 					LineAndByte[] = (1, n)

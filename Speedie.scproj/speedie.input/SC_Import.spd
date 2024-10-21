@@ -197,7 +197,7 @@ class SCImport
 				if cName ~= "index.spd"
 					rz = B
 			  elseif ext == "vert" or "frag" or "shad" or "sdf"
-				Shaders := dictionary.new
+				Shaders ?= dictionary.new
 				shaders![ cName ] = c
 
 			  elseif (ext.isclike)

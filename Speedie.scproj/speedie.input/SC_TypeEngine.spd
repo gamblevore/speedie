@@ -1167,7 +1167,7 @@ function TypeOfDot (ExprResolver)
 		|scclass--| ty = DotVar|scdecl|.Type
 		DotVar = ty
 		
-		contains := ty.Contained
+		contains ?= ty.Contained
 	  else
 		expect  (DotVar isa SCClass or scmodule)  ( exp, "Not a class or module." )
 	
@@ -1659,7 +1659,7 @@ function TypeOfList (ExprResolver)
 	expect Numeric      (exp, "Expected numbers in this vector.")
 	expect (count >= 2) (exp, "Under 2 items in vector.")
 
-	FoundType := Allowtype
+	FoundType ?= Allowtype
 	|| IsFloat = (Foundtype == 2)
 	|| cns = VecType(IsFloat, count).NotConst
 	if !HasBig
@@ -1729,20 +1729,23 @@ function Message.FixErl
 	|| last = opp.Next
 	|| name = opp.Name
 	
-	if (name == ":=") and (.niceparent != @arg)
+	if name == ":="
+		problem (opp, "Use ?= instead")
+	
+	if (name == ":=" or "?=") and (.niceparent != @arg) 
 		.BecomeMacro(Macros.InitExpand, [ch, .last!])
 	  else
 		using opp
 		
-		while self in @bra
-			.parent!.ReplaceWith( self )
+		//while self in @bra
+		//	.parent!.ReplaceWith( self ) // loses breakpoint info
 		
-		|| IsBitOr = (name == ":=") 
+		|| IsNilOr = (name == ":=" or "?=")
 		.Func = @rel
 		opp.Name = "="
 
 		ch = ch.copy
-		if IsBitOr
+		if IsNilOr
 			|| new_if = @tmp+"if"
 			new_if <~ ch.wrapwith(@brel, "!")
 			.Prev = new_if

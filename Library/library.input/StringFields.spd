@@ -18,7 +18,7 @@ class StringFields
 
 
 	function Field (|ind| Prev, |ind| Curr, |string|)
-		Curr := .Data.length
+		Curr ?= .Data.length
 		return .Data[Prev, Curr]
 
 ///////////////////////////////////////////////////////////////////////////

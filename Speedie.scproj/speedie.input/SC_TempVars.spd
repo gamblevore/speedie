@@ -182,7 +182,7 @@ extend_module scfunction
 		// a.b.c -> || tmp1 = a.b.c
 	
 		|| Using = msg.SyntaxUsing
-		name := UniqueTmpVar(msg.MsgOwningFunc)
+		name ?= UniqueTmpVar(msg.MsgOwningFunc)
 		|| repl = «thg name »
 		msg.ReplaceWith( repl )
 		

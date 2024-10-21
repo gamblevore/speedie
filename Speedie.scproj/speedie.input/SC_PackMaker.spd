@@ -95,14 +95,14 @@ module PackMaker
 		opt norefcounts
 		
 		|scfunction| fn
-		fn = .testfn("PackTestSemiConst")
+		fn = .testfn("SemiConst")
 		if fn
 			for i in 2
 				debugat
 				self[0] = i*16K
 				|| found = fn.test|&int|[]
 		
-		fn = .testfn("PackTestAndOrConsts")
+		fn = .testfn("AndOrConsts")
 		if fn
 			|| Andor = fn.Test|&int64|[]
 		
@@ -110,31 +110,31 @@ module PackMaker
 		if fn
 			|| D = fn.Test|&f64|[]
 		
-		fn = .testfn("PackTestForeignFuncs")
+		fn = .testfn("ForeignFuncs")
 		if fn
 			self[0] = "hello", self[1] = "abc"
 			|| str = fn.Test|&string|[]
 			printline str
 			
-		fn = .testfn("PackTestMath")
+		fn = .testfn("Math")
 		if fn
 			for i in 5
 				self[0] = 12+i, self[1] = 6+i
 				|| num = fn.Test|&int64|[]
 				
-		fn = .testfn("PackTestMul")
+		fn = .testfn("Mul")
 		if fn
 			self[0] = 8725, self[2] = 4, self[1] = 275, self[3] = 2	
 			|| num = fn.Test|&int64|[]
 			if num != 18000
 			
-		fn = .testfn("PackTestAndOr")
+		fn = .testfn("AndOr")
 		if fn
 			self[0] = 0,   self[1] = 6,   self[2] = 1,   self[3] = 0
 			|| Andor = fn.Test|&int64|[]
 			if andor != 3
 			
-		fn = .testfn("PackTestAndOr2")
+		fn = .testfn("AndOr2")
 		if fn
 			for i in 4
 				self[0] = i&1,   self[1] = (i&2)>>1

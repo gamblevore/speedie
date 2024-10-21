@@ -588,7 +588,7 @@ function InitCompiler
 	scoperator.Init
 	Cpp_Export.Init
 
-	.files := Dictionary.new
+	.files ?= Dictionary.new
 	
 	////////////////////////////////////////////////
 	.TimerOutput <~ "\n"

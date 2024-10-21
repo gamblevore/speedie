@@ -542,7 +542,7 @@ class File (String)
 		function Prefs (|string|name = "", |file|)
 			if !name
 				name = app.FileName.lowercase
-				name := app.conf("name")
+				name ?= app.conf("name")
 				name += ".pref"
 			return .prefpath.child(name).file
 

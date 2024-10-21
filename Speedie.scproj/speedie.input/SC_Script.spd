@@ -55,8 +55,8 @@ function string.ContainerName (|string|ext, |string|)
 function string.SpdScriptName (|string|)
 	// if we are in fizz.scproj... use fizz.
 	rz  = .ContainerName(".scproj")
-	rz := .ContainerName(".uwu")
-	rz := .name.trimextandpath
+	rz ?= .ContainerName(".uwu")
+	rz ?= .name.trimextandpath
 
 
 function string.ScriptContainer (|string| container = "/tmp/SpeedieApps/",  |string|)

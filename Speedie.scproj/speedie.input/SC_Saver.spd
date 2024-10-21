@@ -52,7 +52,7 @@ module SC_Saver {
 			if (AppendAsData)
 				type = "raw" // Ideally the entire thing should be appended as ONE data thing, and then just fix up the object refs...
 							// would make debugging harder though. floats are already hard so... whats the difference?
-				Count := 1   // makes sense.
+				Count ?= 1   // makes sense.
 			
 			if (IsSave)
 				// .SnakeGraphics.SaveWrite(Saver)
@@ -164,7 +164,7 @@ module SC_Saver {
 				require compiler[msg]		  // check it exists
 			msg.remove
 
-		.SaveAs := .LoadSaverSub
+		.SaveAs ?= .LoadSaverSub
 	
 	
 	function SCClass.LoadSaverSub (|string|)
@@ -262,7 +262,7 @@ module SC_Saver {
 				|| First = c.DoSaver("SaveWrite", stage)
 				|| Second = c.DoSaver("LoadProperties", stage)
 				if First|bool| != Second|bool|
-					First := Second
+					First ?= Second
 					error (first!.source, "Can’t make one save/load function but not the other. Either make both or neither.")
 	
 	

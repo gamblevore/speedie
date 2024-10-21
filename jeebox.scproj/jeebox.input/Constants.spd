@@ -74,8 +74,8 @@ Module Jeebox
 		fs <~ '\\'
 		fs.appendhex(i, 2)
 		|| t = fs.getresult
-		.EscapeStr![f] := t 
-		.Escapechr![f] := t
+		.EscapeStr![f] ?= t 
+		.Escapechr![f] ?= t
 
 
 	function InitConstants

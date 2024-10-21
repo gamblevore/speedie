@@ -258,7 +258,7 @@ function Tran_While (TranFunc)
 		arg = cond.next
 		
 	  else
-		arg := node.GiveArg
+		arg ?= node.GiveArg
 		|| decl = cond.first
 		if (decl == @decl)
 			cond.func = @bra
@@ -736,7 +736,7 @@ function Tran_OneIsa (|Message| isa_f, |Message| arg, |SCNode!| space)
 	|| it = cls.contained
 		if !oldcont or it.type.real_isa(oldcont.type)
 			newdecl.contains = it // oop
-	Space.access := Dictionary.new
+	Space.access ?= Dictionary.new
 	Space.access![ L.name.lowercase ] = NewDecl // I think?
 
 

@@ -400,7 +400,7 @@ function CreateEmptyConstructors (|scfunction|)
 	if .isobject
 		if pc >= 1 and pc <= 7
 			|| f2 = .CreateAutoConstructor
-			rz := f2
+			rz ?= f2
 
 
 function SCFunction.AddConstructorReturn2
@@ -436,7 +436,7 @@ function CreateConstructors
 		if .IsRole
 			|| s = .super! // roles always have supers
 			check (!con or s.ConstructorFunc) (con.source, "Role's super lacks a constructor.")
-			con := s.ConstructorFunc
+			con ?= s.ConstructorFunc
 			.DestructorFunc = s.DestructorFunc
 			require con
 		
@@ -508,7 +508,7 @@ function ContainedTypeLoad
 		(self is ContainsParentClass) = (sup is ContainsParentClass)
 		
 	
-	.defawlt := «thg "nil"»
+	.defawlt ?= «thg "nil"»
 	if .false
 		//
 	  elseif .NumericCount == 1 // what if its a vec4? (0,0,0,0)? sigh.
@@ -630,7 +630,7 @@ function IsObject (|bool|)
 
 function CreateEmptyFunc (|String| fname, |string| cpp_name="", |SCFunction|)
 	SCNode.CurrVisibility = .IsVisible
-	cpp_name := fname
+	cpp_name ?= fname
 	|| e	= "function $fname { cpp_part $cpp_name }"
 	|| msg	= e.ParseClean
 	rz		= SCFunction.NewFunc( msg, self, .source )|SCFunction|
@@ -953,7 +953,7 @@ module
 				if nr & classinfo.symbol
 					.typeinfo = .typeinfo &~ datatypecode.numeric
 			  else
-				.defawlt := sup.defawlt
+				.defawlt ?= sup.defawlt
 		
 		|| N = .name.lowercase
 		|| Td = DataTypeCode.Types[n]
@@ -1033,7 +1033,7 @@ module
 		|| name = Dot[@nil]							#require
 		expect (name == @thg or @name) (name)
 
-		M := Compiler.findmodulemsg(name)
+		M ?= Compiler.findmodulemsg(name)
 		require m
 		dot.clear
 		dot.func = @thg

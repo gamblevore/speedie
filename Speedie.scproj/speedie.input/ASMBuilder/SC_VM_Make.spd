@@ -264,7 +264,7 @@ function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true)
 	.VM_NewInstructions(list, 2, R)
 	.VM_NewInstructions(list, 1, R)
 	for i in 256
-		asm.encoders[i] := badencoder
+		asm.encoders[i] ?= badencoder
 
 	
 function VMCpp (|faststring| vm, |faststring| jump)
@@ -301,7 +301,7 @@ function message.VMBits (|int|)
 	for s in self
 		if s == @num
 			rz |= 1<<(s.int(0, 1, 4)-1)
-	rz := 1
+	rz ?= 1
 
 
 function VM_MakeInstructionSub (|message| tmp,  |int| Ask,  |[message]?| ActuallyMakeTheVM, |int| ForceID)

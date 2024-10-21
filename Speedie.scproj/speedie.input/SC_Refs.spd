@@ -69,7 +69,7 @@ function DeclInit (|Message| dcl, |SCFunction| fn, |bool| IsJustAnArg)
 		  else
 			RealRefIncr(name, dcl)
 
-	Blocker := LastPlace
+	Blocker ?= LastPlace
 	ReturnHandle( Blocker, arg, name, basis )
 	
 	|| Curr  = dcl
