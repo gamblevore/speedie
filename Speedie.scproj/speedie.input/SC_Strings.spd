@@ -334,8 +334,9 @@ function message.BecomeAppend (|string| s)
 
 
 function message.Tran_With 
-	|| obj = .needfirst$
-	|| arg = obj.Next(@arg)	
+	|| obj = .needfirst
+	require obj and obj != @arg 
+	|| arg = obj.Next(@arg)
 	if obj == @rel
 		error obj
 	
