@@ -195,12 +195,12 @@ AlwaysInline JB_Object* alloc(void* o) {
 }
 
 
-AlwaysInline void RegConv (VMRegister* r, int Conv, ASM Op) {
+AlwaysInline void RegConv (VMRegister* r, ASM Op) {
 	// float, double, u64, s64. 12 conversions possible (and 4 pointless ones)
 	auto s = r + n2;
 	auto d = r + n1;
-		
-    switch (Conv) {
+
+    switch (Convert_Modeu) {
         case 0 : d->Float  = s->Float; 		break; // just copies
         case 1 : d->Float  = s->Double;		break;
         case 2 : d->Float  = s->Uint;  		break;
@@ -221,7 +221,6 @@ AlwaysInline void RegConv (VMRegister* r, int Conv, ASM Op) {
     d = d;
     s = s;
 }
-
 
 AlwaysInline void Rare_ (VMRegister* r, ASM Op) {
 	auto r1 = i1;

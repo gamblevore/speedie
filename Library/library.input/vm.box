@@ -14,7 +14,10 @@ forms
 		JUMP	l
 		Prm1	x
 		Prm2	x
-
+// func needs the reg/return wierdness defined also, but as an "ignored" value
+// so it comes after the prm info. Like 3 prms takes 15 bits, then 3 more bits for wierdness
+// using 32-bits, we can fit 5 regs leaving 7 bits for the total info with 1 bit left to spare.
+// this will let us convert our ASM to ARM... without needing extra info.
 	ForeignFunc
 		r1		R
 		Table	l			// functions in registers use the first 32 values...
@@ -310,9 +313,11 @@ forms
 /**/ RARE (U2)
 		Rare_(r, Op)
 /**/ CONV (Convert)
-		RegConv(r, Convert_Modeu, Op)
-
-
+		RegConv(r, Op)
+					// for SPD~>ARM conversion
+					// we can just do:	double from double --> int64reg = F64reg 
+					//					int64  from int64  --> F64Reg = int64
+					// floats or other size ints shouldn't be affected.
 
 #!						 (((((Consts)))))
 /**/ KNSR (RotateConst)

@@ -56,7 +56,7 @@
 ı RARE: _
 	Rare_(r, Op);
 ı CONV: _
-	RegConv(r, Convert_Modeu, Op);
+	RegConv(r, Op);
 ı KNSR: _
 	RotateConst(r, Op);
 ı ADDK: _
