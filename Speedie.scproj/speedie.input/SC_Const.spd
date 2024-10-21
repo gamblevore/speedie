@@ -276,7 +276,7 @@ function SCNode.Tran_Const (|SCDecl| D, |SCNode| base)
 		  elseif curr == @unit
 			require TypeOfExpr(curr, base)
 			
-		  elseif (curr == @str) or ((curr==@num) and curr.parent!=@unit)
+		  elseif (curr == @str) or ((curr==@num) and !(curr in @unit))
 			require TypeOfExpr(curr, base)
 
 

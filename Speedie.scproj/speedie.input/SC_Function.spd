@@ -3,7 +3,6 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-
 datatype DotUseType (int)
 	flags
 		|DotUseType|
@@ -362,7 +361,7 @@ function message.FailOrCopy (|message| p, |message|)
 
 function message.AssignsFix (|scfunction| f)
 	|| RP   = .NiceParent
-	|| RightSide = rp.Last! // in case of syntax_cast
+	|| RightSide = rp.Last!
 	|| List = .last!
 	|| Upon = .first!
 	List <~ RightSide
@@ -855,7 +854,8 @@ function Message.SelfUsedForProperty (|int|)
 	require r and .func == @dot  and  r.func == @rel
 	if .first IsThing "self"
 		if .DotType
-			return 1 + (r.second.name != "=")
+			|| op = r.second
+			return 1 + !(.isfirst and op == "=")
 
 
 
@@ -863,9 +863,10 @@ function CheckConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 	opt norefcounts
 	require !.Badness
 	|| GotSuperConstructor = false
-	|| Supper = .cls$.super // will this fix it?
-		GotSuperConstructor  =  Supper == typeobject  or  (typetask == supper.parent or supper)
+	|| Sooper = .cls$.super // will this fix it?
+		GotSuperConstructor  =  Sooper == typeobject  or  (typetask == Sooper.parent or Sooper)
 	|| NoNesting = "This should be at the function root. (not nested)."
+	if self ~= "SC_badthing_Constructor"
 	
 	for dot.flat in root
 		if dot == @func
@@ -876,18 +877,21 @@ function CheckConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 					if  fn is constructor  and  pfdecl is self // super.constructor...
 						GotSuperConstructor = true
 						check (dot in root) (dot, NoNesting)
-				
+		
 		|| UsedAtAll = dot.SelfUsedForProperty
 			|| t = TypeOfExpr(dot, nil)
 				|| IsSet = UsedAtAll == 1
 				if !t.IsNormalObject
-					0
+					ifn dot.parent in root
+						continue
 				  elseif (IsConstructor)
 					check (GotSuperConstructor)				(dot, "Can't access properties before calling super.constructor")
 					ifn dot.isfirst and IsSet				// failed:  .obj = value
 						check (t is PropertyWasConstructed)	(dot, "Object property was read before set")
-					check (t isnt PropertyWasConstructed)	(dot, "Can’t set object property twice during a constructor.")
-					check (dot.parent in root)				(dot, NoNesting)
+					if isset
+						dot.SelfUsedForProperty
+						check (t isnt PropertyWasConstructed)	(dot, "Can’t set object property twice during a constructor.")
+						check (dot.parent in root)				(dot, NoNesting)
 				  else
 					check (dot.islast or !IsSet)			(dot, "Can’t set object properties during a destructor.")
 				if (IsConstructor)
@@ -895,7 +899,7 @@ function CheckConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 	
 
 function FillInMissingConstructorDefaults (|Message| root, |Message| AfterHere)
-	// fillindefaultconstructor, fillconstructordefaults, defaultconstructors, fillinconstructor
+	// FillInDefaultConstructor, fillconstructordefaults, defaultconstructors, fillinconstructor
 	opt norefcounts
 	|| cls = .cls$
 	|| oof = .ConstructorLinePlace$
@@ -1961,3 +1965,5 @@ function NeuLibrary (CollectFunc)
 
 }
 
+// did we remove the golang-like "Case affects visbiility" thing? i cant find it in the source-code?
+// it should be removed if we find it again!

@@ -99,7 +99,7 @@ extend Message		// scanning
 		|| After_ = .FlatAfter
 		
 		while (Curr_ and Curr_ != After_)
-			if (Curr_.Parent != @Arg)
+			if !(Curr_ in @Arg)
 				continue
 			yield Curr_
 			Curr_ = Curr_.FlatNext

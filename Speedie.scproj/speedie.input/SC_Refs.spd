@@ -911,9 +911,3 @@ function scdecl.RefDestructor (|message|)
 		return screfs.DecrMulti(self, m)
 	return SCRefs.RefClearMsg( m )
 
-
-function message.tEENGAGERS
-	visible
-	|| RP   = .NiceParent
-	|| RightSide = rp.Last! // in case of syntax_cast
-	|| RightSide2 = rp.Last // in case of syntax_cast

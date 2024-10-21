@@ -82,7 +82,7 @@ datatype SCDeclInfo (int)
 		Swappable	 = Param + Body + Global + Property
 		Local		 = Body + Param
 		SelfImplicit = Self + local // local is set by CollectOneParam, anyhow?
-		DclCopied    = altered + stayborrowed + static + api + UpgradeableContained + compilercreated // need more too? do later
+		DclCopied    = altered + stayborrowed + static + api + UpgradeableContained + compilercreated + body// need more too? do later
 
 
 	function Set (|SCDeclInfo| d, |bool| b, |SCDeclInfo|)
@@ -817,7 +817,7 @@ class SCDecl (SCNamed) {
 	function IsReffable (|bool| SetOnly, |bool|)
 		opt norefcounts
 		// we want to refcount all local vars...
-		require (!.PointerCount) and (self is altered or body)
+		require !.PointerCount and (self is altered or body)
 		require !(SetOnly and (self Is Borrowed))
 		return .type.IsObject
 
