@@ -257,7 +257,7 @@ class Window (GUIControl)
 			return true
 		
 		if key is tab
-			f := .first
+			f ?= .first
 			if f
 				f = f.NextFocus(!keys.shift, keys.option)
 			if f
@@ -360,7 +360,7 @@ class Window (GUIControl)
 
 
 	function DoDragAcrossControls (|ivec2| P, |guicontrol| r, |bool|)
-		sdlapp.drawdrag := r.CopyList
+		sdlapp.drawdrag ?= r.CopyList
 		if sdlapp.drawdrag
 			|| dest = r.CanPasteInto(self[p, true])
 			.DroppingInto = dest
@@ -395,7 +395,7 @@ class Window (GUIControl)
 		|| r = p.point
 		rz = .controlat(r,  0)
 		if ForDrag
-			rz := .controlat(r, 10)
+			rz ?= .controlat(r, 10)
 	
 	syntax access (|ivec4| P, |guicontrol|)
 		opt norefcounts
@@ -445,7 +445,7 @@ class Window (GUIControl)
 	function CloseDialog
 		opt norefcounts
 		isnt visible
-		.ReturnValue := self
+		.ReturnValue ?= self
 		.remove
 	
 	
