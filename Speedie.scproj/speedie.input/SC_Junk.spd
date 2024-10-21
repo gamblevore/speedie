@@ -1,7 +1,8 @@
 
 // sc_junk.spd
+// just test some stuff compiles, really
 
-
+target debug {
 helper __junktest_1__
 	visible
 	|| r = [1, 2, 3]
@@ -182,3 +183,4 @@ struct Junk_ABC
 			return junk_abc.new
 		
 
+}

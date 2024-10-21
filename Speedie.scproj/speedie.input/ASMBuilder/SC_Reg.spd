@@ -180,8 +180,8 @@ datatype ASMReg (uint64)
 	operator mul (|bool| b, |asmreg|)
 		return (self, nil)(b)
 	
-	syntax cast (|bool|)
-		return self|bool|
+//	syntax cast (|bool|)
+//		return self|bool|
 	
 	syntax cast (|int|)
 		cpp_part ToInt

@@ -36,7 +36,7 @@ class SCBehaviour (SCNode)
 				return b
 		
 	
-	function SCClass.AddBehaviourOrInterface (|SCNode| M, |Message| ErrPlace)
+	function SCClass.AddBehaviourOrInterface (|SCNode| M)
 		|| b = .behaviour
 		if (!b)
 			b = SCBehaviour.new(Self)
@@ -135,7 +135,7 @@ class SCBehaviour (SCNode)
 	
 	function SCFunction.IsBehaviour (|bool|)
 		opt norefcounts
-		return .protodecl$.Type.IsInterface
+		return .HasProto$.Type.IsInterface
 	
 	
 	function SCClass.IsInterface (|bool|)
@@ -243,7 +243,7 @@ class SCBehaviour (SCNode)
 			|| cls = name_space.ShouldBeClass(errplace)
 			if cls and Tran_Behaviour(node, cls)
 				|| fn = SCFunction.NewFunc(node, cls, node)|scfunction|
-					cls.AddBehaviourOrInterface( fn, ErrPlace )
+					cls.AddBehaviourOrInterface( fn )
 					(fn is Behaviour)
 					(fn is ExpectsRealVars)
 					Return fn
@@ -297,7 +297,7 @@ function $InterName (,$InterName)
 			
 			|| Mod = SCFunction.NewPrototypeSub(node, cls, ErrPlace, s) #require
 			Mod.IsRequiredInterface = required
-			cls.AddBehaviourOrInterface( Mod, ErrPlace )
+			cls.AddBehaviourOrInterface( Mod )
 			|| mcls = mod.cls
 				mcls.Behaviourness = kBehaviourProto
 				if required

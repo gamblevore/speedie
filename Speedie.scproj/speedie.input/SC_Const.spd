@@ -282,7 +282,7 @@ function SCNode.Tran_Const (|SCDecl| D, |SCNode| base)
 
 
 
-function message.ConstIntValueSub (|SCNode| name_space, |&int64| v, |bool|)
+function message.ConstIntValueSub (|&int64| v, |bool|)
 	opt norefcounts
 	|| s = self
 	while s == @bra
@@ -299,13 +299,13 @@ function message.ConstIntValueSub (|SCNode| name_space, |&int64| v, |bool|)
 
 function message.ConstIntValue (|SCNode| name_space, |&int64| v, |bool|)
 	opt norefcounts
-	if .ConstIntValueSub(name_space, v)
+	if .ConstIntValueSub(v)
 		return true
 
 	|| t = typeofexpr(self, name_space)
 		|| d = t.default
 			// error (d is const) (itm, "We need a constant for the index") // not neeeded
-			return d.constintvaluesub(name_space, v)
+			return d.constintvaluesub(v)
 
 
 struct ArgArrayCounter

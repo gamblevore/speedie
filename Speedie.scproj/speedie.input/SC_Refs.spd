@@ -116,7 +116,7 @@ function RC_Rel (|Message| rel)
 	opt norefcounts
 	
 	|| First = rel.first!
-	require RelNeedsRef( rel, first )
+	require RelNeedsRef( first )
 	
 	|| result = RefMsg0( "JB_SetRef", Compiler.RefSetRef! )
 	|| lst = result.Last!
@@ -134,7 +134,7 @@ function RC_CheckNoObjPms (|message| msg)
 				expect (!i.Type.IsObject) (msg, "Can't pass address of object while using 'opt norefcounts'")
 
 	
-function RC_IgnoreReturn (|Message| msg, |bool| DoRefs)
+function RC_IgnoreReturn (|Message| msg)
 	opt norefcounts
 	require RefBasis( msg, false ) == kBasisObj
 	if msg.func == @func
@@ -147,8 +147,8 @@ function RC_IgnoreReturn (|Message| msg, |bool| DoRefs)
 	msg.FuncWrap( free_if_dead )
 
 
-function decrTest
-	|message[4]| Test // seems to not be working yet!
+//function decrTest
+//	|message[4]| Test // seems to not be working yet!
 
 
 function RefDecr (|Message| msg, |Message| place, |int| Basis)
@@ -307,7 +307,7 @@ function ExitHitsOrGoesPast (|Message!| curr, |Message!| arg, |bool|)
 			return false
 
 
-function RelNeedsRef (|Message| msg, |Message| first, |bool|)
+function RelNeedsRef (|Message| first, |bool|)
 	// only objects
 	require (RefBasis( first, true ) == kBasisObj)
 	
@@ -459,7 +459,7 @@ function RC_RelInit (|Message| rel)
 
 function RC_RelConstructor (|Message| rel)
 	// a = b.c   -->   jb_incr2(a, b.c)
-	if RelNeedsRef( rel, rel.first! )
+	if RelNeedsRef( rel.first! )
 		ifn  rel.last! IsThing "nil"
 			.RC_RelInit(rel)
 
@@ -676,7 +676,7 @@ function RC_NeedsOwnBlock (|message| msg, |message| pp, |bool|)
 			exit
 
 	
-function RC_HandleDisappearing (|SCFunction| fn, |Message| msg, |int| Basis)
+function RC_HandleDisappearing (|Message| msg, |int| Basis)
 	|| ch = msg.UseNonRefChangers
 	if Basis & kBasisDestructable or kBasisTempStruct
 		ifn msg.IsSetIntoPlace or ch.parent.IsReturnOrRejoin
@@ -821,7 +821,7 @@ function SCFunction.AnalyseRefs (|[message]| list)
 	for (msg.flat in root)
 		|| it = msg.RC_HasTemporary  // need to always do this?
 			if .dorefs or (it != screfs.kBasisObj)
-				SCRefs.RC_HandleDisappearing( self, msg, it )
+				SCRefs.RC_HandleDisappearing( msg, it )
 	
 		
 	// avoid reading same thing that we alter.
@@ -844,16 +844,16 @@ function SCFunction.AnalyseRefs (|[message]| list)
 				SCRefs.RC_Rel( msg )
 			
 		  elseif (f == @Dot)
-			SCRefs.RC_IgnoreReturn( msg, .dorefs )
+			SCRefs.RC_IgnoreReturn( msg )
 			
 		  elseif (f == @Func)
 			if !.DoRefs
 				SCRefs.RC_CheckNoObjPms(msg)
 			SCRefs.RC_CheckFuncAllocOK( self, msg )
-			SCRefs.RC_IgnoreReturn( msg, .dorefs )  // func(a,b,c)
+			SCRefs.RC_IgnoreReturn( msg )  // func(a,b,c)
 			
 		  elseif (msg.IsStatementExpr)
-			SCRefs.RC_IgnoreReturn( msg, .dorefs )
+			SCRefs.RC_IgnoreReturn( msg )
 			
 		  elseif (f == @Decl)
 			SCRefs.DeclInit( msg, self, false ) // || a = b, incr(b)

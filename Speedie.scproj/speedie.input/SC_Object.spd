@@ -26,13 +26,13 @@ class SCObject
 		if self isa SCModule
 			return .cls.file?
 	
-	function AnySource (|message|)
-		opt norefcounts
-		|| s = .source
-			return s
-		if self isa scmodule
-			|| c = .cls
-				return c.sourcearg
+//	function AnySource (|message|)
+//		opt norefcounts
+//		|| s = .source
+//			return s
+//		if self isa scmodule
+//			|| c = .cls
+//				return c.sourcearg
 
 	syntax is (|SCNodeInfo| i, |bool|)
 		return .NodeInfo[i]

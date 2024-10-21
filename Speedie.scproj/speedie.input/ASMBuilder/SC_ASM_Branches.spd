@@ -123,6 +123,7 @@ function BranchSub (|message| cond,  |bool| neg=false, |bool| CanConst=false, |f
 	|| answer = .µ(cond, mode)
 		
 	if answer isnt CondAnswer
+		(canconst)
 //		if (answer is constany) and canconst // deal with these const stuff later.
 		if answer isnt alreadynegated
 			mode = mode.Negate
@@ -207,7 +208,7 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 	|| Second = .µBoolInto(B, first)
 	if Second is ConstAny											// Wow this is frustrating!
 		.NOP(jump)
-		return .BoolConst2(a.next!, dest, opp, first, Second)
+		return .BoolConst2(opp, first, Second)
 
 	JUMP.JumpTo = .curr
 	
@@ -239,7 +240,7 @@ function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asm
 
 
 
-function BoolConst2 (|message| exp, |asmreg| dest, |opmode| Opp, |asmreg| ml,  |asmreg| mr, |asmreg|)
+function BoolConst2 (|opmode| Opp, |asmreg| ml,  |asmreg| mr, |asmreg|)
 	|| V = mr.const!=0
 	if v == (opp is AND)
 		mr.nop

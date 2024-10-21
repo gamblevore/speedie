@@ -656,7 +656,7 @@ function NilParamPass (|scdecl| Recv, |scdecl| Sent, |message| where, |scfunctio
 	if recv.StatedReal
 		.BecomeRealSub(sent, where, nilreason.passing, recv, f, v)
 	  elseif !recv.nilstated and f != scfunction.currfunc  // haha
-		recv.NilPrmFail(where, f)
+		recv.NilPrmFail(f)
 	
 
 function VariableSet (|scdecl| Recv, |message| RecvMsg, |scdecl| Sent, |message| SentMsg, |nilstate| SentState, |nilstate|) // setrel, relset

@@ -52,15 +52,15 @@ module Compiler {
 linkage
 	cpp_part Comp
 
-|SCNode|					VisibleFuncs = SCNode("Visible",	  false)
-|SCNode|					Interpreter = SCNode("Interpreter", false)
+|SCNode|					VisibleFuncs = SCNode("Visible")
+|SCNode|					Interpreter = SCNode("Interpreter")
 |File|						BaseProjectPath
 |string|					OriginalInputPath
 |File|						_BuildFolder
 |String|					_Projects
 |String|					_SpeedieProj
 |File|						TempFolder
-|SCFile|					InternalFile = SCFile.new(nil, SCImport(nil, true), -1)
+|SCFile|					InternalFile = SCFile.new(nil, SCImport(nil, true))
 |string|					ProjectName
 |string|					ReportedName
 |scimport|					Project
@@ -488,7 +488,7 @@ function ImportAll
 	require .Stage( "Handling Function Prototypes" )
 	for f in .ProtoTypes
 		f.ProtoExportName
-		f.FuncDecls
+		f.FuncParamsLoad
 		f.MakeParamsReal
 	scfunction.currfunc = nil // set in funcdecls
 
@@ -500,7 +500,7 @@ function ImportAll
 	
 	require .Stage( "Parsing Function Parameters" )
 	for f in .FuncList
-		f.FuncDecls
+		f.FuncParamsLoad
 		f.LoadExportName
 		require !stderr.TooMany
 	scfunction.currfunc = nil
@@ -543,7 +543,7 @@ function ImportAll
 	
 	.Stage( "Creating Exportnames For Function Prototypes" )
 	for f in .FuncList
-		|| p = f.ProtoDecl
+		|| p = f.HasProto
 			p.Name = f.ExportName
 		  else
 			f.AddConstructorReturn2
@@ -937,7 +937,7 @@ function FindProjNoSuffix (|string| Path, |string|)
 	return path + ".scproj"
 
 
-function FindProject (|string| Path, |bool| error, |File|)
+function FindProject (|string| Path, |File|)
 	|| p = .BaseProjectPath!.parent
 	|| B = .FindProjectSub(p, path)
 		return B

@@ -238,7 +238,7 @@ constructor
 	.IsVisible = scnode.CurrVisibility	// don't do anything?
 
 
-constructor (|string| Name, |bool| Dummy)
+constructor (|string| Name)
 	cpp_part ConstructorStr
 	.Project = scimport.curr
 	.name = name
@@ -531,8 +531,8 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 					|| err = "Function must have a prototype."		// what about the side thing?
 					if side and !paramsarray.MacroSize
 						err = "Not assignable."
-					check (o|scfunction|.ProtoDecl) (exp, err)
-					Return o|scfunction|.ProtoDecl
+					check (o|scfunction|.HasProto) (exp, err)
+					Return o|scfunction|.HasProto
 
 	if missing	// the missing stuff should ENTIRELY go within argsmatch? cos its called in two places.
 		return Missing.MacroFix( contains, arg_space, paramsarray )
@@ -766,7 +766,7 @@ function CollectOne (|Message| c, |bool| Visible=false, |bool|)
 	c.Visible = Visible // save lost visibility
 	
 	if !.CollectSub( C ) and (self isa SCModule)
-		.MoveToInitFunc( C, visible )
+		.MoveToInitFunc( C )
 
 	return visible
 

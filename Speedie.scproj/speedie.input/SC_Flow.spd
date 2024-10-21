@@ -13,9 +13,10 @@ insertion
 	quietly	({flowcontrol.disabled++, (_0), flowcontrol.disabled--, rejoin 0})
 
 
-function string.trap (|message| msg=nil, |bool|)
-	if scfunction.currfunc ~= self
-		if msg
-			printline msg
-		return true
+target Debug
+	function string.trap (|message| msg=nil, |bool|)
+		if scfunction.currfunc ~= self
+			if msg
+				printline msg
+			return true
 

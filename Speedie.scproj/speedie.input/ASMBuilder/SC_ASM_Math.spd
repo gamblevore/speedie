@@ -492,6 +492,7 @@ extend ASMState
 
 
 	function Zeros (|asmreg| dest, |message| exp, |asmreg|)
+		(Exp)
 //		if dest is frommath // just do it always?
 		dest.reg = 0
 		return dest // ???

@@ -64,13 +64,13 @@ function compiler.SetupEnv
 
 
 
-// perry uses this for debug
-api Speedie_Main (|&pico| comms, |int| Mode, |&cstring| args, |ErrorInt|)
-	cpp_name Speedie_Main 
-	pico.parent_ = comms // phew
-	rz = app.sp_run(args, mode&4)
-	comms.config.name = "Speedie"
-	
-	if rz == 0
-		rz = app.sp_run(args, mode)
+target perrydbg
+	api Speedie_Main (|&pico| comms, |int| Mode, |&cstring| args, |ErrorInt|)
+		cpp_name Speedie_Main 
+		pico.parent_ = comms // phew
+		rz = app.sp_run(args, mode&4)
+		comms.config.name = "Speedie"
+		
+		if rz == 0
+			rz = app.sp_run(args, mode)
 

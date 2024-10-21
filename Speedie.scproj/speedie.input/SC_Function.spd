@@ -47,8 +47,8 @@ datatype FunctionType (int)
 		
 		ConOrDes = Constructor + Destructor
 		
-	syntax is (|FunctionType| t, |bool|)
-		return self & t
+//	syntax is (|FunctionType| t, |bool|)
+//		return self & t
 
 
 
@@ -63,7 +63,7 @@ linkage
 |object?|				CounterPart
 |SCFunction?|			NextFunc
 |µFunc?|				ASM
-|SCDecl?|				ProtoDecl
+|SCDecl?|				HasProto
 |SCClass?|				ProtoType
 |SCDecl?|				ReturnType
 |scfunction--?|			DepthFinder
@@ -106,14 +106,15 @@ syntax is (|FunctionType| k, assigns:|bool|)
 		.FuncInfo &= ~k
 
 
-function DebugPrintOnce
-	if self isnt PrintedForDebugViewing
-		is PrintedForDebugViewing
-		printline self
+//function DebugPrintOnce
+//	if self isnt PrintedForDebugViewing
+//		is PrintedForDebugViewing
+//		printline self
  
 
 syntax equals (|string| name, |bool| Aware, |bool|)
 	opt norefcounts
+	(aware) //sigh
 	require (self)	
 	if .Name.SyntaxEquals( name, true )		// never needs !aware.
 		return true
@@ -244,7 +245,7 @@ function CollectStats
 //	if (self has hasvfloat) or (self is hasvint)
 //		FuncArgAndReturnTypes[4]++
 	
-function FuncDecls 
+function FuncParamsLoad
 	scfunction.CurrFunc = self
 	|| P = .Source.second				#require
 	if self is constructor
@@ -749,7 +750,7 @@ function DeclsProtoTypeAdd (|SCClass| fpType, |scdecl|)
 	dcl.IsLookupOnly = self
 	dcl.Name = .Name
 	compiler.newconst(Dcl)					// lets kill da hoe		// kill! kill!
-	.ProtoDecl = dcl
+	.HasProto = dcl
 	if (.Cls)
 		.parent!.TryAdd( .Source, Dcl, .Name )
 	return dcl
@@ -1835,7 +1836,7 @@ function scfunction.UpdateSourceSub (|message| src, |bool|)
 	.Init_Sub(src, nil)
 	rz = stderr.ok 
 	if rz
-		.FuncDecls
+		.FuncParamsLoad
 		.Transform
 		stderr.clear			// lol
 

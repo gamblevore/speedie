@@ -1,12 +1,5 @@
 
 extend_module perry
-	function FTP_Path (|string|)  ////////
-		rz = app.pref("ftp_dest")
-		if !rz or keys.Option or app.Pref("ftp_failed")
-			|| q = "Upload Perry to what URL?\n\nEG: ftp://user:pass@ftp.domain.com/dirs/perry.zip"
-			rz = q.Ask(rz)$
-			app.pref("ftp_dest") = rz
-
 ///// abc
 	function Monthly_Name (|date| n, |string|)
 		|| fs = faststring()

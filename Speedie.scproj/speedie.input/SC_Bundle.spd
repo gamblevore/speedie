@@ -9,7 +9,7 @@ function compiler.Bundle
 	|| Pd = .productfile
 	|| Pj = .BaseProjectPath.path
 	if platform.osx
-		.AppleBuildApp(pj.file, pd)
+		.AppleBuildApp(pd)
 
 	
 function compiler.WrongConf (CollectFunc)
@@ -38,7 +38,7 @@ function compiler.AppBuildLibs (|file| inner)
 			.AppBuildOneLib(inner, lib)
 
 
-function compiler.AppleBuildApp (|file| project, |file| product)
+function compiler.AppleBuildApp (|file| product)
 	require platform.osx
 	|| dest = product.linksto
 		error (dest, "This should not be a link")

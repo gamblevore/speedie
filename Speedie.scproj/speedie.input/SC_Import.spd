@@ -56,7 +56,7 @@ class SCImport
 	function ImportMsgSub (|Message| j)
 		|| l	= J.last(@str)$
 		|| Name = l.name
-		|| P	= Compiler.FindProject(Name, true)
+		|| P	= Compiler.FindProject(Name)
 		if !P
 			if name[0] != '/'
 				P = compiler.Projects[name].FileThatExists
@@ -129,7 +129,7 @@ class SCImport
 			|| str = (arg.render, arg.renderjbin)(Options.SelfReplacement)
 			|| x = MakeDecl("", "__AppConfString", @str+str)
 			conf.become(x)
-			compiler.program.MoveToInitFunc(conf, false)
+			compiler.program.MoveToInitFunc(conf)
 
 	
 	function  IndexLinkage (|message| link, |scfile| scf)
@@ -180,7 +180,7 @@ class SCImport
 		expect (scimport.allfiles < 64K) (c, "Too many files included")
 		|| path = c.LowerCase
 		check !compiler.files[ path ] (c, "File included twice")
-		rz = SCFile( c, self, scimport.allfiles.length )
+		rz = SCFile( c, self )
 		compiler.files![ path ] = rz
 		scimport.allfiles <~ rz
 		.files <~ rz

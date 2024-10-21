@@ -58,7 +58,7 @@ function TypeOfType (ExprResolver) // typeoftypecast, typeofcast
 				new = new.MakeNewNil
 			  else   // || xx = 1234|&byte| // Its only used to force a crash, basically.
 				new = new.MakeNewReal
-		new.NoBlindCasts(old, exp, name_Space)
+		new.NoBlindCasts(old, exp)
 	return New
 
 
@@ -73,7 +73,7 @@ function SCDecl.IsntReallyCastable (|message| side = nil, |bool|)
 	return  side.Unwrap != @arg
 
 
-function scdecl.NoBlindCasts (|scdecl| old, |message| exp, |SCNode| name_space)
+function scdecl.NoBlindCasts (|scdecl| old, |message| exp)
 	opt norefcounts
 	|| fn = scfunction.CurrFunc 
 	if fn and (fn isnt constructor) and fn.blindcasts
@@ -480,12 +480,12 @@ function Message.CollectionPlace (|Message|)
 		msg = p
 
 
-function scdecl.ExtractAmount (|Message| Prms, |SCNode| name_space, |scdecl|)
-	rz = .extractamountsub(prms, name_space)
+function scdecl.ExtractAmount (|Message| Prms, |scdecl|)
+	rz = .extractamountsub(prms)
 	check (rz) ( prms, "Expected something like: |Type[10]|" )
 
 
-function scdecl.ExtractAmountSub (|Message| Prms, |SCNode| name_space, |scdecl|)
+function scdecl.ExtractAmountSub (|Message| Prms, |scdecl|)
 	|| num = prms.first
 	if num == @unit
 		typeofunit(Num, nil, nil)
@@ -525,7 +525,7 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 		|| Prms = c.second
 		if prms.HasAny
 			|| R = ExtractDecl( c.first!, name_space, purpose, depth )			#require
-			return R.ExtractAmount( Prms, name_space )
+			return R.ExtractAmount( Prms )
 			
 		f = @rel
 		c.func = f
@@ -641,11 +641,15 @@ function SCDecl.LoadContainedSub (|SCDecl| Cont, |Message| wrap, |SCNode| Name_S
 function TypeOfExprModulesOK (|Message| Exp, |SCNode| name_space, |Message| side = nil, |SCObject|)
 	// this function should be removed.
 	// classes now have .classtype which we can use!
-	if (Exp.obj)
-		return exp.obj|SCObject|
+	opt norefcounts
+	|| Obj = exp.obj
+		return obj|SCObject|
 	if (exp == @thg)
-		exp.Obj = name_space.LookUpVar( exp.name, exp, side )
-		return exp.Obj|SCObject|
+		obj = name_space.LookUpVar( exp.name, exp, side )
+		if !side and obj isa scdecl
+			(obj is readfrom)
+		exp.obj = obj
+		return obj|SCObject|
 	return TypeOfExprSub(exp, name_space, side)
 
 
@@ -683,6 +687,7 @@ function Message.File (|SCFile|)
 		if r isa SCFile
 			Return r
 		require S != @arg
+
 
 function Message.FileNum (|int|)
 	opt norefcounts
@@ -743,7 +748,7 @@ function Message.ExpectInt (|scdecl| type, |bool|)
 	return true
 
 
-function scdecl.TypeOfAccess (|scdecl| access, |message| ch, |int|)
+function scdecl.AccessType (|scdecl| access, |message| ch, |int|)
 	opt norefcounts
 	|| W = .isnumeric
 	if W > 1
@@ -765,14 +770,14 @@ function TypeOfAccess (ExprResolver)
 	|| Ty0 = TypeOfExprModulesOK( ch, name_space )
 	|| arr = ch.next!
 	|| Index = Arr.first
-
+	
 	if (ty0 isa scmodule)
 		|| cls = ty0.Cls
 		if cls and cls.IsMArray(arr) and index!.ExpectMatch(name_Space, typeint!)
 			return LowlevelArrayTransform(exp, Cls)
 	  elseif (Ty0 isa SCDecl) and !index.next
 		|| Access = TypeOfExpr(index, name_space)
-		|| oof = ty0.TypeOfAccess(access, ch)
+		|| oof = ty0.AccessType(access, ch)
 			if !index
 				using arr
 				index = arr.msg(@num, "0")
@@ -882,7 +887,7 @@ function Tran_Msg (|SCFunction| fn,  |message| Exp,  |SCNode!| name_space)
 			TypeOfExpr( Result, name_space )
 
 
-function Tran_MsgList (|scfunction| fn, |message| Exp, |SCNode| name_space)
+function Tran_MsgList (|message| Exp)
 	error (Exp, `Use «thg "name"» syntax instead!`)
 	scfunction.disabledpoints++
 
@@ -1498,7 +1503,7 @@ function TypeOfRel (ExprResolver)
 	opch.obj = comp // shouldn't this be higher even?
 	
 	if comp is andor // either
-		return Or_And_Expansion( LC, RC, exp, name_Space, comp ) // expects both sides to be booleans, right?
+		return Or_And_Expansion( LC, RC, exp, name_Space ) // expects both sides to be booleans, right?
 
 
 	|| Custom = 0
@@ -1715,7 +1720,7 @@ function errorreceiver.TooMany (|bool|)
 	return .errorCount >= 50
 
 
-function message.PrepareAST (|string| path="")
+function message.PrepareAST
 	opt NoRefCounts
 	|| After = .FlatAfter
 	|| msg = self 

@@ -17,7 +17,7 @@ module SC_Init
 				Return true
 
 
-	function SCModule.MoveToInitFunc (|Message| c, |bool| visible)	
+	function SCModule.MoveToInitFunc (|Message| c)	
 		opt norefcounts
 		if (c == @sheb or @url)
 			c.remove

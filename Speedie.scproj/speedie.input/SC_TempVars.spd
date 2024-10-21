@@ -144,37 +144,38 @@ function UniqueTmpVar (|SCNode| base=scfunction.currfunc, |string| name = "tmP",
 
 
 extend_module scfunction
-	function SafeTempMoveOut (|Message| msg, |scdecl| type, |Message!|)
-		// we should really replace the other temps with this? at least 2 of them! We have too many
-		// at least TypedTempMoveOut!
-		cpp_part SafeTypedTempMoveOut
-		// a.b.c -> || tmp1 = a.b.c
-	
-		|| Using = msg.SyntaxUsing
-		|| name = UniqueTmpVar(msg.MsgOwningFunc)
-		|| Stealer = msg.func.msg(msg.name)
-		stealer.takeallfrom  msg
-		
-		|| p = msg.ParentPoint!
-		if (msg == @rel)
-			Stealer = stealer.wrapwith(@bra)
-		msg.become(@thg, name)
-	
-		|| dcl = MakeDecl( "", name, Stealer )
-		p.Prev = dcl
-		if (msg in @arg)
-			debugger
-		
-		msg.obj = type
-		Stealer.obj = type
-		|| Dcl2 = type.copydecl // no difference, its a temp
-		Dcl2.Name = name
-		|| relname = dcl.last.first 
-			relname.obj = Dcl2
-		msg.obj = Dcl2
-		dcl.obj = Dcl2
-		
-		Return dcl
+// why is this unused? wasnt it safer? 
+//	function SafeTempMoveOut (|Message| msg, |scdecl| type, |Message!|)
+//		// we should really replace the other temps with this? at least 2 of them! We have too many
+//		// at least TypedTempMoveOut!
+//		cpp_part SafeTypedTempMoveOut
+//		// a.b.c -> || tmp1 = a.b.c
+//	
+//		|| Using = msg.SyntaxUsing
+//		|| name = UniqueTmpVar(msg.MsgOwningFunc)
+//		|| Stealer = msg.func.msg(msg.name)
+//		stealer.takeallfrom  msg
+//		
+//		|| p = msg.ParentPoint!
+//		if (msg == @rel)
+//			Stealer = stealer.wrapwith(@bra)
+//		msg.become(@thg, name)
+//	
+//		|| dcl = MakeDecl( "", name, Stealer )
+//		p.Prev = dcl
+//		if (msg in @arg)
+//			debugger
+//		
+//		msg.obj = type
+//		Stealer.obj = type
+//		|| Dcl2 = type.copydecl // no difference, its a temp
+//		Dcl2.Name = name
+//		|| relname = dcl.last.first 
+//			relname.obj = Dcl2
+//		msg.obj = Dcl2
+//		dcl.obj = Dcl2
+//		
+//		Return dcl
 
 
 	function TempMoveOut (|Message| msg, |string| name="", |scdecl| type=nil, |Message!|)

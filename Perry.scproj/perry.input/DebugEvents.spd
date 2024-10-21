@@ -108,7 +108,7 @@ function perryide.DebugActual (|file| f, |[string]| args) // actuallyruncompiled
 		.RunButton.text = "\07"
 
 
-function perryide.DebugPath (|file| f, |message| conf)
+function perryide.DebugPath (|message| conf)
 	|| p = .Project
 	if !p.isdir
 		p = p.Parent
@@ -143,7 +143,7 @@ function PerryIDE.StartDebugging (|file!| f)
 		f = f.Child("Contents/MacOS/" + f.TrimExtAndPath)!
 	
 	|| old = app.cwd
-	.DebugPath(f, debugargs)	
+	.DebugPath(debugargs)	
 	.DebugEnvs(debugargs["env"])		
 	.DebugActual(f, args)
 

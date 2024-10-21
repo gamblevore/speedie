@@ -73,7 +73,7 @@ linkage
 |SCNodetype| 				BaseType
 
 
-constructor (|Message| node, |SCNode| parent, |bool| HasPtrs, |scmodule| m)
+constructor (|Message| node, |bool| HasPtrs, |scmodule| m)
 	Compiler.stClasses++
 	
 	node.obj = self			// for autocomplete :)
@@ -878,7 +878,7 @@ module
 			require parent.ExpectModule(errplace)
 		
 		|| arg = node.GiveArg
-		|| cls = SCClass.new( node, parent, base.HasPtrs, SCModule.new )
+		|| cls = SCClass.new( node, base.HasPtrs, SCModule.new )
 		cls.BaseType = base
 		if base is Object
 			(cls is SortsProperties)

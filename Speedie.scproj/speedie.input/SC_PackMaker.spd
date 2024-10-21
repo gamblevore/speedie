@@ -54,6 +54,7 @@ module PackMaker
 	helper SortSub (|[scfunction]| list, |bool| test)
 		target debug
 			|| Table = (jb_vm.vm.InitTable(list.length+31), nil)(test)
+		(test)
 		list.sort(SCFuncSorter)
 		|| id = 0
 		while

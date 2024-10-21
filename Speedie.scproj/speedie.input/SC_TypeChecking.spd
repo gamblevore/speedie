@@ -30,7 +30,7 @@ function RelSetOrExpansion (|Message| exp)
 
 
 
-function Or_And_Expansion (|SCDecl| LC, |SCDecl| RC, |Message| exp, |SCNode| name_space, |scoperator| comp, |SCDecl|)
+function Or_And_Expansion (|SCDecl| LC, |SCDecl| RC, |Message| exp, |SCNode| name_space, |SCDecl|)
 	|| LBool = LC.Minimatch( TypeBool!.TypeNormal )
 	|| RBool = RC.Minimatch( TypeBool!.TypeNormal )
 		

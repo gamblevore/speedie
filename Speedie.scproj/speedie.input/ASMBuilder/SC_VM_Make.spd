@@ -20,7 +20,7 @@ function DefineGetSub (|string| fname,  |int| up,  |int| down,  |byte| c,  |byte
 "
 
 
-function DefineGet (|string| fname,  |int| up,  |int| down, |bool| last, |message|)
+function DefineGet (|string| fname,  |int| up,  |int| down, |message|)
 	.DefineGetSub(fname, up, down, 'i', ' ')
 	.DefineGetSub(fname, up, down, 'u', 'u')
 	|[message]| arr
@@ -67,7 +67,7 @@ function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max, |int|)
 		lname = "_" + line.name 
 	
 	lname = .Parent + lname
-	|| fnc_src = .DefineGet(lname, Max-n, bit_pos, bit_pos+n==Max)
+	|| fnc_src = .DefineGet(lname, Max-n, bit_pos)
 	
 	SCFunction.NewFunc(fnc_src, nil, line)
 	

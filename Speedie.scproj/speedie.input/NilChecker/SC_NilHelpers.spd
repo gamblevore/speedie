@@ -168,7 +168,7 @@ function scdecl.PrmStateMsg (|string| Needed, |scfunction| f=nil, |string|)
 	return fs
 
 
-function scdecl.NilPrmFail (|message| where, |scfunction| f)
+function scdecl.NilPrmFail (|scfunction| f)
 	error (f.Source, .PrmStateMsg("", f))
 /*	|| fs = faststring()
 	fs <~ .PrmStateMsg("", f)

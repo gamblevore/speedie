@@ -10,9 +10,9 @@ datatype FailableInt (int) // useful when you want most numbers, even negatives,
 		return self != fail|int|
 
 
-function message.ThgDecl (|SCDecl?|)
-	if .func == @thg
-		return .fastdecl
+//function message.ThgDecl (|SCDecl?|)
+//	if .func == @thg
+//		return .fastdecl
 
 
 function message.ASMDecl (|SCDecl!|)
@@ -23,8 +23,8 @@ function message.ASMDecl (|SCDecl!|)
 	target debug: rz.ASMSanity
 
 
-function scdecl.ASMSanity
-	target debug
+target debug
+	function scdecl.ASMSanity
 		ifn .iscarray or .pointercount or .isobject
 			|| size = .type.Size
 			if size != .typeonly.bytecount // sigh. what?

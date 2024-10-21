@@ -83,8 +83,8 @@ function InitedOK (|bool|)
 		error "Compiler did not initialise"
 	
 
-function CrashTester
-	|| __CrashSpd__ = 0
+//function CrashTester
+//	|| __CrashSpd__ = 0
 
 
 
@@ -191,10 +191,11 @@ function scfunction.CheckUnused (|message| feedback)
 				str = "()'s callers are unused"
 			feedback.msg(@tmp, .name + str) <~ src.position
 
-	for arg in .args
-		if arg isnt readfrom // oof
-			|| Src = arg.source
-				feedback.msg(@tmp, arg.name + " is unused") <~ Src.position
+	if !.HasProto and !.IsCppInBuilt
+		for arg in .args
+			if arg isnt readfrom
+				|| Src = arg.source
+					feedback.msg(@tmp, arg.name + " is unused") <~ Src.position
 
 
 
@@ -725,7 +726,7 @@ function TmpAutoComplete (|message| f, |string| name, |string| type, |message|)
 function JumpImport (|message| cmd, |message|)
 	|| f = cmd[@arg][0]
 		cmd.clear
-		|| proj = Compiler.FindProject(f.name, false)
+		|| proj = Compiler.FindProject(f.name)
 		require proj.exists
 		cmd <~ (@sstr, proj.path)
 		cmd <~ 0

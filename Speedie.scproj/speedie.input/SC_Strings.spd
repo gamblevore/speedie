@@ -420,14 +420,14 @@ function Message.BunchFixPrepare (|Message|)
 */
 
 // only has 1 caller. why not fix this to use the above macro?
-function Message.BunchFix 
-	using (self)
-	|| P			= .BunchFixPrepare
-	|| subject		= P.first!
-	|| multi_opp	= subject.Next
-		.RelFix(false)
-		P.ReplaceWith(self)
-		multi_opp.BunchFixSub(subject, self)
+//function Message.BunchFix 
+//	using (self)
+//	|| P			= .BunchFixPrepare
+//	|| subject		= P.first!
+//	|| multi_opp	= subject.Next
+//		.RelFix(false)
+//		P.ReplaceWith(self)
+//		multi_opp.BunchFixSub(subject, self)
 
 	
 function Message.BunchlessFix

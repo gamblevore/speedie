@@ -59,7 +59,7 @@ function Message.ReplaceInbuiltSub (|SCNode| name_space, |scdecl?| self_decl, |m
 		
 	  elseif (self == "sizeof")
 		expect (self_decl) (self, "Unable to get size")
-		return .InbuiltSizeOf(name_space, self_decl, self)
+		return .InbuiltSizeOf(self_decl)
 
 	  elseif (self == "SELF_TEST_JBIN" or "SELF_TEST_NATURAL")
 		Create_JeeboxTest( self )
@@ -68,7 +68,7 @@ function Message.ReplaceInbuiltSub (|SCNode| name_space, |scdecl?| self_decl, |m
 		error (self)
 
 
-function Message.InBuiltSizeOf (|SCNode| name_space, |scdecl| sulf, |message| sulf_exp, |message|)
+function Message.InBuiltSizeOf (|scdecl| sulf, |message|)
 	return NewDeclNum(scdecl(TypeInt!), sulf.allocatedsize)
 
 

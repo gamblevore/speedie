@@ -387,7 +387,7 @@ function Message.CopyAllAfter (|Message| after, |message| copylayer)
 
 
 // all these copyintos need to clear position
-function Message.CopyAllInto (|Message| j, |bool| wipe = false)
+function Message.CopyAllInto (|Message| j)
 	opt norefcounts
 	for c in self
 		j <~ c.Copy(j)			// Was .wipecopy. why did I do that?
@@ -502,8 +502,8 @@ function message.IsAlwaysBool (|maybebool|)
 			return true|maybebool|
 
 
-function message.IsAlwaysTrue (|bool|)
-	return .IsAlwaysBool.Knowntrue
+//function message.IsAlwaysTrue (|bool|)
+//	return .IsAlwaysBool.Knowntrue
 
 
 function message.IsAlwaysFalse (|bool|)

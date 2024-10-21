@@ -1,5 +1,6 @@
 
 
+target debug {
 class NilTest
 	|int|		V
 	|string|	V2
@@ -293,4 +294,6 @@ function NilRecord.ndb5
 			|| V = self[i].RawName
 			"$Name:  $V"
 
+
+}
 

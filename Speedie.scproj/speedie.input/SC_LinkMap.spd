@@ -51,7 +51,7 @@ module LinkMap
 		opt norefcounts
 		for msg in src
 			|| o = msg.obj
-				.CollectLinks( o, InBranch )
+				.CollectLinks( o )
 			if msg.HasAny
 				if !inbranch
 					|| T = msg.ASMType
@@ -67,7 +67,7 @@ module LinkMap
 
 extend scfunction {
 
-function CollectLinks (|object!| obj, |bool| InBranch=false)
+function CollectLinks (|object!| obj)
 	opt norefcounts
 	
 	while 

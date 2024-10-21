@@ -15,7 +15,7 @@ class SCFile (file)
 	|bool|			IsInternal
 
 
-	constructor (|File| f, |scimport| p, |int| n)
+	constructor (|File| f, |scimport| p)
 		flow off // dates shouldn't matter ///
 		flowcontrol.disabled++
 		super.constructor((f.path, "")(f != nil))
