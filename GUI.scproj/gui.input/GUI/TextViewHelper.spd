@@ -155,7 +155,7 @@ class TextViewLine (list)
 			while r
 				r = r.parent
 				if (r == @arg) and r.StartsBefore(.range)
-					rz:=r
+					rz?=r
 					exit
 		
 		if r and !r.startsafter(.range)

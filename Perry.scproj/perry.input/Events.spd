@@ -26,8 +26,8 @@ function perry.IdeAddProj (|string| Path, |PerryIDE| ide = nil, |PerryIDE!|) // 
 		ClickedTabs(nil, old)
 		|| o = old.ide
 			return o
-	ide := PerryIDE.EmptyBase
-	ide := PerryIDE(path.file)
+	ide ?= PerryIDE.EmptyBase
+	ide ?= PerryIDE(path.file)
 	ide.LoadProject
 	return ide
 
@@ -427,7 +427,7 @@ function PerryIDE.ClickedFind (|error| row)
 	|| f1 = row.first
 	if row.position
 		|| L = row.rangelength
-		L := L0
+		L ?= L0
 		.editme.ShowAndSel(row.position, L, true)
 		return
 

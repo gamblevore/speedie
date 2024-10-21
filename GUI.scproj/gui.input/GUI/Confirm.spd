@@ -89,7 +89,7 @@ function ConfirmIt (|string| Q,  |string| Title,  |[string]| answers,  |string| 
 			|| b  = .buttons[i]!
 			|| bw = b.textwidth+8 max 40
 			|| a = answers[i]
-			a := ""
+			a ?= ""
 			b.vistext = a
 			|| l = (3,7)(i > 0)
 			b.size    = (l)~after for bW  by 5~up  for 17

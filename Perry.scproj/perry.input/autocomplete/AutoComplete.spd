@@ -494,7 +494,7 @@ function message.OwningModclass (|bool| EndAtArg=true, |message|)
 	require self
 	rz = .owningSyntax(AutoComplete.owner, EndAtArg)
 	if .parent == nil
-		rz := @tmp+"root"
+		rz ?= @tmp+"root"
 	
 	
 function message.owningSyntax (|dictionary| find, |bool| EndAtArg, |message|)
@@ -552,7 +552,7 @@ function message.OwningFullName (|syntax| prm, |message|)
 	
 	rz = @dot.msg(name)
 	|| modname = mod_class[0].name_
-	modname := "main"
+	modname ?= "main"
 	rz.msg(fn, modname)
 	rz <~ prm
  

@@ -303,7 +303,7 @@ function ViewAsVis (|bool| AsProject)
 	for v in .ViewButtons
 		|| t = v.tag as guicontrol
 			(t is visible) = (v.gnormal.bg.hasany)
-			AnyViews := t is visible 
+			AnyViews ?= t is visible 
 	
 	if AsProject and !AnyViews
 		.viewfiles.click(nil)

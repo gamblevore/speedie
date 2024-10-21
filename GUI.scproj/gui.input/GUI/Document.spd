@@ -106,7 +106,7 @@ class Document (list)
 		self <~ latest
 		
 		.current = latest
-		.original := latest
+		.original ?= latest
 		.Trim
 		return latest
 
@@ -286,7 +286,7 @@ class Document (list)
 			cpp_part NewShared
 			if path
 				rz = .Cache_.DocumentCached(path)
-			rz := document(path, true)
+			rz ?= document(path, true)
 			
 		function AskLimit (|file| f, |int|)
 			|| n = f.size

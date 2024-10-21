@@ -39,7 +39,7 @@ function OpenSaveRequest (|string| types,  |string| base,  |string| Accept,  |bo
 	
 	|| last = OpenSaveDialog.LastDir[restoredir??types].value
 		base = last
-	base := "~/".resolve
+	base ?= "~/".resolve
 	w.path.text = base
 	
 	|| f = w.files

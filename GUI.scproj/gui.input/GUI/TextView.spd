@@ -298,7 +298,7 @@ class TextView (GUIControl)
 			sdlapp.selchanged
 		if !.IsCleared
 			(.OnSelChanged)(self, 0, insert)?
-		d := .FindDrawInfo(.sel0)
+		d ?= .FindDrawInfo(.sel0)
 
 		while
 			.TryShowLineError(d)
@@ -402,7 +402,7 @@ class TextView (GUIControl)
 				pos = s.find(textview.csantiWords!, pos...)
 				|| t2 = .FindLine(pos, orig+1)
 					pos = pos min t2
-			pos := s.length
+			pos ?= s.length
 			return pos
 	
 	
@@ -828,7 +828,7 @@ class TextView (GUIControl)
 				.tabindent(1, "//", true)
 		  elseif !.decomment
 			|| s = .SelText
-			s := "\n\n"
+			s ?= "\n\n"
 			.Insert("/*" + s + "*/", true)
 		return true
 	
@@ -959,7 +959,7 @@ class TextView (GUIControl)
 		|| r = .FindDrawInfo(p)
 
 		if r.TrySetError(e) or !.MyError
-			.MyError := e
+			.MyError ?= e
 			sdlapp.touch(Self)
 			return r
 

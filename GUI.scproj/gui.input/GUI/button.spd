@@ -184,7 +184,7 @@ class ButtonView (GUIControl)
 			return MouseDragging.handled
 
 		if D
-			.ClickedItem := d
+			.ClickedItem ?= d
 		
 		if !.Pressing
 			return (mousedragging.Beyond, mousedragging.handled)(D)
@@ -287,7 +287,7 @@ class ButtonView (GUIControl)
 		if !self
 			return default
 		rz = .text
-		rz := Default
+		rz ?= Default
 		if self is Broken
 			rz += " \17"
 		if self is dead

@@ -30,7 +30,7 @@ function textview.InitDebugArgs
 	if !.Document
 		|| f = .ide.DebugArgsFile
 		.LoadDocument(Document(f))
-	.text := templates.DebugArgs
+	.text ?= templates.DebugArgs
 		
 
 function fnStillRunning (fnConfirmCanceller)

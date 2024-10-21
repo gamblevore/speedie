@@ -83,7 +83,7 @@ struct InlineEditor
 	
 	function Edit (|ListViewCell| r, |ListView| l, |bool|)
 		opt norefcounts
-		l := .editingfor as ListView
+		l ?= .editingfor as ListView
 		
 		debug_require l and r
 		|| row = r.row
@@ -155,7 +155,7 @@ function GuiControl.OpenSearchSub (|bool|)
 	if self isa textview
 		if .isinline
 			return for$.opensearch
-		sdlapp.LastSearch := .seltext
+		sdlapp.LastSearch ?= .seltext
 	
 	|| f = e.editor!
 	e.editingfor = self

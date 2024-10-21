@@ -107,8 +107,8 @@ function FuncListSorter (SorterComparerMsg)
 	|| an = af.name
 	|| bn = bf.name
 	|| cmp = bn.SyntaxCompare(an, true)
-	cmp := (bf.func|int| - af.func|int|)
-	cmp := bb.name.SyntaxCompare(aa.name, true)
+	cmp ?= (bf.func|int| - af.func|int|)
+	cmp ?= bb.name.SyntaxCompare(aa.name, true)
 	return cmp < 0
 
 

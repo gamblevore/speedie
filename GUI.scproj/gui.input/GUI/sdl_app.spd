@@ -625,7 +625,7 @@ module SDLApp
 
 
 	function BGBlurAmount (|float|)
-		.BlurBackgroundStart := date.now
+		.BlurBackgroundStart ?= date.now
 		|| Scale = 7.0
 		|| ago = .BlurBackgroundStart.ago.Float
 		rz = ago*Scale*4.0

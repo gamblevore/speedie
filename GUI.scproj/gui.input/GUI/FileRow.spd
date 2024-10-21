@@ -269,7 +269,7 @@ class FileRow (ListViewRow)
 				if !pattern[0].iswhite
 					s = s.trim.remove(jeebox.csline)
 				|| err	= error(nil, ErrorSeverity.OK)
-				parent := .FindAllParent(found)
+				parent ?= .FindAllParent(found)
 				parent <~ err
 				
 				lim--

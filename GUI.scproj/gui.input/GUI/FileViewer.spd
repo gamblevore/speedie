@@ -119,7 +119,7 @@ class FileViewer (ListView)
 		opt norefcounts
 		|| w = .window
 		|| q = .quickopen
-		q.text := .editme.seltext.before("\n").trim
+		q.text ?= .editme.seltext.before("\n").trim
 		w <~ q
 		w <~ .listopen
 		if q is visible
@@ -299,7 +299,7 @@ class FileViewer (ListView)
 		|| NameOnly = path[0, "./"] 
 			path = path[2...]
 
-		within := .listsource
+		within ?= .listsource
 		for f.flat in within
 			if f isa filerow
 				|| it = f.match(path, NameOnly)

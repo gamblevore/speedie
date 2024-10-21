@@ -127,7 +127,7 @@ class PerryIDE (Window)
 		|| r = .projmsg
 			.projmsg = message() // for now
 			|| n = r.next
-			n := r.prev
+			n ?= r.prev
 			.ProjectTabs.selected = n
 			r.remove
 
@@ -694,7 +694,7 @@ class PerryIDE (Window)
 				require data.fileexists
 			  else
 				i = perry.ProjContaining(data)
-				i := perry.IdeAddProj(data, nil)
+				i ?= perry.IdeAddProj(data, nil)
 			return i.OpenDoc(data)
 
 

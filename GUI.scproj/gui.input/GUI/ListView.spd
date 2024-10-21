@@ -144,7 +144,7 @@ class ListView (GUIControl) {
 		|| m = .cmm	
 			m.EditingRow = r
 			y = (y+2) - .lastbottom
-			y:=1
+			y?=1
 			m.ShowCmm(self, y)
 
 
@@ -439,8 +439,8 @@ class ListView (GUIControl) {
 		|| fs = faststring()
 		for s.listsel in self
 			|| it = s.__copyid__
-			it := s.text
-			it := s.name
+			it ?= s.text
+			it ?= s.name
 			if fs.length
 				fs <~ '\n'
 			fs <~ it
@@ -527,7 +527,7 @@ class ListView (GUIControl) {
 
 
 	function ScrollSet (|ListViewrow?| s)
-		s := .start
+		s ?= .start
 		.scrollshift = 0
 		.ScrollRealigner = 0
 		debug_require s != .listsource
@@ -775,7 +775,7 @@ class ListView (GUIControl) {
 			return MouseDragging.handled
 			
 		if keys.Cmd
-			.CommandSelectRow := 1 + (L is selected)
+			.CommandSelectRow ?= 1 + (L is selected)
 			|| State = .CommandSelectRow
 			.selectadd(l, State == 1, true)
 			return MouseDragging.Within
@@ -852,7 +852,7 @@ class ListView (GUIControl) {
 		opt norefcounts
 		|| dir = !keys.shift				// can do this backwards... if we want.
 		
-		curr := .start
+		curr ?= .start
 		|| Start = curr
 		
 		while curr {

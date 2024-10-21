@@ -82,7 +82,7 @@ extend PerryIDE
 		is Broken
 		.NoNeed
 		|| newlist = error.from(MaybeOK)
-		newlist := Error()
+		newlist ?= Error()
 		.errorlist.listsource = newlist
 		.UpdateErrorCount
 		if RealCompile or .ErrorList isnt Visible
