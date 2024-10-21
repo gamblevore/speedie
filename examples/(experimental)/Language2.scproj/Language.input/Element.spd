@@ -1,6 +1,6 @@
 
 
-selector Element 
+selector Element  // speedie not handling this properly
 	contains Element
 	|uint|			SyxBits
 	|bool|			Deactivated
