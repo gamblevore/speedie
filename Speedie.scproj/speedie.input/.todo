@@ -1,15 +1,12 @@
 
 
 bugs:
-	* printline C ?? n.render // refcount bug!?
-	* random number generator bad for swearcoder.spd
 	* function (|object!| x = nil) // which is it? should complain. Currently it becomes optional.
 	* vector constants
 	* &uint... allow &int in c++ gen
 	* passing .hfloatvar to  func(float) causes reporting error
 	* render float.fn {code} // won't compile
 	* status(.CurrMousePixelColor.render) // tmp struct.
-	* The "function case affects visibility" (from GoLang) thing needs deletion.
 	* refcounter passing properties as function param, SHOULD NOT assume it won't be cleared... not without disturbance checker
 
 
