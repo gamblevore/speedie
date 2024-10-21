@@ -4,15 +4,15 @@ datatype Gram (uint64) {
 	flags List {
 		|gram|
 		// n = unknown_gender, m = male, l = genderless
-		audience	= (us,			you,		other,)
-		doer		= (actor,		viewer,		self_,)		// we replace self_ with self
-		gender		= (genderless,  male,		female,  unknown_gender,)
-		plurality	= (uncountable, single,		plural,)
-		formality	= (formal,		informal,)
-		oldness		= (modern,		ancient,)				// old-style speak. Like: "thou, whomst, one". 
-		specifics   = (temporary,	permanent,  near,		far) // "this" and "that"
-		size		= (biggest,		bigger,		medium,		smaller,	smallest,)
-		tense		= (
+		audience	= [us,			you,		other,]
+		doer		= [actor,		viewer,		self_,]		// we replace self_ with self
+		gender		= [genderless,  male,		female,  unknown_gender,]
+		plurality	= [uncountable, single,		plural,]
+		formality	= [formal,		informal,]
+		oldness		= [modern,		ancient,]				// old-style speak. Like: "thou, whomst, one". 
+		specifics   = [temporary,	permanent,  near,		far] // "this" and "that"
+		size		= [biggest,		bigger,		medium,		smaller,	smallest,]
+		tense		= [
 			present_simple					// i run, he runs 
 			present_continuous				// i am~running	
 			present_perfect					// i have~ran	
@@ -34,7 +34,7 @@ datatype Gram (uint64) {
 			present_idea					// i would~run	
 			command_yes						// run!
 			command_no						// dont~run!
-		)
+		]
 		
 
 		HighestBitMarker

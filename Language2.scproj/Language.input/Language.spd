@@ -81,7 +81,7 @@ class Language {
 			List = List[@list] #require
 		expect ((List == @list) or List.isdefaultadd) (List)
 		
-		clslist := cls.expand
+		clslist ?= cls.expand
 		for (ch in List)
 			.BuildGroupSub(ch, clslist, ch, nil, isadd)
 	
@@ -97,7 +97,7 @@ class Language {
 			expect (n == @arg) (n)
 			require n.expectlast
 
-		clslist := cls.expand
+		clslist ?= cls.expand
 		.BuildGroupSub(msg, clslist, First, n, nil)
 		
 	module {

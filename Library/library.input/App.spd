@@ -204,7 +204,7 @@ function PrefsInit (|date| when=0, |config!|)
 		return ._prefs!
 	|| pref_path = .prefpath
 		._prefs = pref_path.file.conf
-	if !._prefs
+	if !._prefs 
 		._prefs = Message(@arg, string.error)
 	if when
 		if when < 0: When = date.now

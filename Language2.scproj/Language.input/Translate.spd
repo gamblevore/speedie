@@ -24,7 +24,7 @@ class TransState {
 		|| wcat = ti.myword.eles
 		require wcat & (verb)
 		// so we have a verb
-		.GroupStats := dictionary.new
+		.GroupStats ?= dictionary.new
 		|| n = ti.myword.owner.idea.name
 		.GroupStats[n] = *.GroupStats[n] + 1
 	
@@ -90,7 +90,7 @@ class TransState {
 		|| n = msg.id
 		if w // can't use ternary... temp-expr bug
 			n = w.Groupname
-		.Complaints := dictionary.new
+		.Complaints ?= dictionary.new
 		require !.Complaints[n]
 		.Complaints[n] = msg
 		return true

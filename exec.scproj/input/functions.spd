@@ -183,7 +183,7 @@ module AppTable
 		opt norefcounts
 		|| main = .funcs[1]					#expect ("Missing main")
 		rz  = .funcs[0]!.Run|&int64|[]
-		rz := main.Run|&int64|[]
+		rz ?= main.Run|&int64|[]
 
 
 function message.CantFindFunc

@@ -54,7 +54,7 @@ module package
 	function InputPack (|messageroot|)
 		opt norefcounts
 		|| x = app.args[0]
-		x := "~/Speedie/exec.scproj/demo.xpd"
+		x ?= "~/Speedie/exec.scproj/demo.xpd"
 		|| fl = x.FileThatExists("load executable")
 			return fl.parse[@tmp, "pack"]
 

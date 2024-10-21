@@ -24,7 +24,7 @@ module Counts
 			if pt != "true"
 				MaxNodeLength = pt.int
 		ss = ss.trim 
-		ss := DefaultExt
+		ss ?= DefaultExt
 		for s in (ss / '/') 
 			exts[s] = s
 

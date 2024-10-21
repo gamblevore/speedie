@@ -12,7 +12,7 @@ main
 function MainImage (shadertoyfunc)
 	|vec3| Q
 	|| r = resolution
-	|float| itau = 1.0 / (π*2.0)
+	|| itau = 1.0 / (π*2.0)|float|
 	|| T = .Time * 0.2 + vec4(0,11,33,0)
 	|| Mat2 = mat2((T*itau).cos)
 	|| it = (.time*itau).sin*0.1

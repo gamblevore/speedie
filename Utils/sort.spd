@@ -15,7 +15,7 @@ main (|[existingfile]| files)
 		
 	for f in files
 		app.Collect(f)
-	found.sort(MySorter, true)
+	found.sort(MySorter)
 	|| remover = app.Findremover
 	if app.No("quiet")
 		for f in found
@@ -42,5 +42,5 @@ function app.Collect (|file| f)
 	
 function MySorter (SorterComparer)
 	if a isa file and b isa file
-		return a|file|.size < b|file|.size
+		return a.size - b.size
 	

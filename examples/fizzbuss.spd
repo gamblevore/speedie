@@ -2,6 +2,5 @@
 		
 main 
 	for n in 1 to 105
-		|| str = "Fizz"*(n isa 3) + "Buzz"*(n isa 5)
-		str := n.Render
-		printline str
+		|| str = "Fizz"*(n isa 3) + "Buzz"*(n isa 5)  ??  n.render
+		"$n: $str"

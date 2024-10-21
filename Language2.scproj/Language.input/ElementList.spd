@@ -26,7 +26,7 @@ datatype ElementList (uint) {
 	}
 	
 	function word.SyxBits (|uint|) {
-		._SyxBits := .eles.syxbits
+		._SyxBits ?= .eles.syxbits
 		return ._SyxBits
 	}
 	

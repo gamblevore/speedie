@@ -1123,7 +1123,7 @@ function message.IsLinkageType (|bool|)
 	return self ~= "linkage"
 
 function message.IsModuleType (|bool|)
-	return self ~= "module" or "extend_module" // don't need root. flags:=1 does it
+	return self ~= "module" or "extend_module" // don't need root. flags?=1 does it
 
 	
 function message.FindPos (|int| fr, |int| len, |message|)

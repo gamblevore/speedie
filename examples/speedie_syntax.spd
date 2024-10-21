@@ -15,7 +15,7 @@ class Person
 
 
 main
-	using flowcontrol("maybe")
+	using flowcontrol.Attempt("maybe")
 		app.TestSyntax
 
 function PrintNum (|int64| b1)

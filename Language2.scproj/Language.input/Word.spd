@@ -192,6 +192,6 @@ class Word (list) {
 datatype SpecialProperty (byte) {
 	flags List {
 		|SpecialProperty|
-		ControlFlags = (Grammar, Punctuation, DoesReverse, Reversable, Invisible, TakesAdjective)
+		ControlFlags = [Grammar, Punctuation, DoesReverse, Reversable, Invisible, TakesAdjective]
 	}
 }

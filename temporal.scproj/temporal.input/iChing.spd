@@ -64,8 +64,8 @@ module iChing
 		if d
 			d = d["hexagrams"]
 		
-		d := StdErr.LastError
-		d := .ClosedBook
+		d ?= StdErr.LastError
+		d ?= .ClosedBook
 		._DatabankMsg = d
 		return d
 		
@@ -77,7 +77,7 @@ module iChing
 		rz.arg.first.remove
 		
 	function Divination (|stevemachine| machine=nil, |Hexagram|)
-		machine := SteveMachine.create(9,64K)
+		machine ?= SteveMachine.create(9,64K)
 		if !machine
 			return .ClosedBook
 		machine.Hash

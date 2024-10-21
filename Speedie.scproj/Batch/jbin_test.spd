@@ -7,10 +7,10 @@ main
 	expect (inpath!=outpath)				("InPath = OutPath??")
 	|| b		= inpath.file.Readall(1GB, true)	#require
 	if b.isjbin
-		OutPath := inpath.Removeext("jbin").UniqueFile
+		OutPath ?= inpath.Removeext("jbin").UniqueFile
 		expect (outpath) ("Can't make a unique file path at: " + inpath)
 	  else
-		Outpath := inpath + ".jbin"
+		Outpath ?= inpath + ".jbin"
 	|| writer = outpath.out				#require
 	
 	if b.isjbin

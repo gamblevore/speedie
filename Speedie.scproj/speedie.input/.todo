@@ -1,18 +1,19 @@
 
 
 bugs:
+	* printline C ?? n.render // refcount bug!?
+	* random number generator bad for swearcoder.spd
 	* function (|object!| x = nil) // which is it? should complain. Currently it becomes optional.
 	* vector constants
 	* &uint... allow &int in c++ gen
 	* passing .hfloatvar to  func(float) causes reporting error
 	* render float.fn {code} // won't compile
-	*	status(.CurrMousePixelColor.render) // tmp struct.
+	* status(.CurrMousePixelColor.render) // tmp struct.
 	* The "function case affects visibility" (from GoLang) thing needs deletion.
 	* refcounter passing properties as function param, SHOULD NOT assume it won't be cleared... not without disturbance checker
 
 
 additions:
-	* do everything in terms of FATs? We need 1 fat per param...
 	* rename "flags" to something else. I wanna use "flags" for somekinda default Info and Syntax is
 	* autocomplete use class description 
 	* add \123 numeric type (mostly for jbin). use a float/int format, that is signed. 2 exponent bits per byte.
