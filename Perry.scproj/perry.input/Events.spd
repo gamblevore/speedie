@@ -1,4 +1,4 @@
-
+ 
  
 function FileSepClicker (guiaction)
 	opt norefcounts
@@ -12,10 +12,10 @@ function perryide.UnusedFuncsFB (|message| stuff)
 	require arg == @arg
 	|| where = stuff.firstname
 	for tmp in arg
-		.unused_hope(tmp, where)
+		.UnusedFuncsSub(tmp, where)
 
 
-function perryide.unused_hope (|message| tmp, |string| where)
+function perryide.UnusedFuncsSub (|message| tmp, |string| where)
 	|| err = error(nil, tmp.name, ErrorSeverity.warning, where )
 	err.position = tmp.first.int
 	.editme.LineErrorAdd(err)
