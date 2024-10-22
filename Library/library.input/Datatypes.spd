@@ -439,7 +439,7 @@ datatype float
 	
 	function Ceil (|float|)
 		rz = .floor
-		if rz != rz
+		if rz != self
 			++rz
 
 	helper IntegerToMod2 (|float|)

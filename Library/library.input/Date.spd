@@ -40,6 +40,9 @@ datatype Date (int64)
 //	function Rate (|Float64|) // per what, though? per-second is common, but if we are talking about per-day its another thing.
 //		return 1.0 / .Seconds 
 	
+	function Seconds (|float|)
+		disabled "Use .float or .float64"
+	
 	function Float (|float|)
 		return self|float| * kOneStep
 	

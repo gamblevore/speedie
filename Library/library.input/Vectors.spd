@@ -20,6 +20,15 @@ datatype vec4
 	function Cos (|vec4|)
 		return (.x.cos, .y.cos, .z.cos, .w.cos)
 	
+	function Size (|vec2|)
+		return (.x2 - .x, .y2 - .y)
+	
+	function Up (|float| X, |vec4|)
+		return self + (0,x,0,x)
+
+	function Right (|float| X, |vec4|)
+		return self + (x,0,x,0)
+
 	operator • (|vec4| other, |float|)
 		cpp_part Dot
 		return (self * other).sum
@@ -601,6 +610,18 @@ datatype vec2
 	
 	function Floor (|vec2|)
 		return (.x.floor, .y.floor)
+
+	function Ceil (|vec2|)
+		return (.x.ceil, .y.ceil)
+
+	function Log2 (|vec2|)
+		return (.x.log2, .y.log2)
+
+	operator Pow (|vec2| v, |vec2|)
+		return (.x pow v.x, .y pow v.y)
+		
+	function Max (|float|)
+		return .x max .y
 
 	syntax cast (|bool|)
 		cpp_part Bool
