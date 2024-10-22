@@ -184,6 +184,7 @@ function UnusedFuncs (|message| cmd, |message|)
 
 function scfunction.CheckUnused (|message| feedback)
 	opt norefcounts
+	require self isnt Disabled
 	if .isunused
 		|| src = .source
 			|| str = "() is unused"
@@ -191,19 +192,17 @@ function scfunction.CheckUnused (|message| feedback)
 				str = "()'s callers are unused"
 			feedback.msg(@tmp, .name + str) <~ src.position
 
-	if !.HasProto and self isnt cpp
-		|message| errname
-		for arg in .args
-			if arg isnt readfrom
-				|| Src = arg.source
-					if !errname	
-						errname = feedback.msg(@tmp, arg.name)
-						errname <~ Src.position
-					  else
-						errname.name += ", "
-						errname.name += arg.name
-		if errname
-			errname.Name += " is unused"
+	require !.HasProto and self isnt cpp
+	|message| ErrName
+	for arg in .args
+		if arg isnt readfrom
+			|| Src = arg.source
+			if src and src isnt Inserted
+				if ErrName
+					ErrName.name = arg.name + ", " + ErrName.name
+				  else
+					ErrName = feedback.msg(@tmp, arg.name + " is unused")
+					ErrName <~ Src.position
 
 
 function Check (|message| cmd, |message|)
