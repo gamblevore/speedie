@@ -128,15 +128,12 @@ class Frustrum
 	|Plane[6]| Planes
 	function Contains (|vec4| Sphere, |bool|)
 		for i in 6
-			require .planes[i].sphere(Sphere)
+			require .planes[i].sphere(Sphere) <= 0
 		return true
 
-datatype SignedDistance (float)
-	syntax cast (|bool|)
-		return self <= 0
 
 datatype Plane (vec4)
-	function Point (|vec4| S, |SignedDistance|)
+	function Point (|vec4| S, |float|)
 		return (s dot3 self) + .w
-	function Sphere (|vec4| S, |SignedDistance|)
+	function Sphere (|vec4| S, |float|)
 		return .Point(S) - s.w

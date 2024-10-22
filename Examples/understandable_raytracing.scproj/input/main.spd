@@ -14,7 +14,7 @@ struct RayHit
 		.Dist = float.max
 	function ok (|bool|)
 		return .dist < float.max
-	
+ 
 
 class RayScene (window)
 	|float|			G
