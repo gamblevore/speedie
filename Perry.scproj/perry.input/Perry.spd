@@ -75,12 +75,12 @@ module Perry
 
 	function BuildAppMenu
 		appmenu.addsep
-		|| extra = platform.isdebug or app.pref("dev").Yes
-			appmenu <~ ("Prepare Upload",   ClickedMakeArchiveMenu)
-			appmenu <~ ("Uninstall",   		ClickedUninstallMenu)
+//		|| extra = platform.isdebug or app.pref("dev").Yes
+//			appmenu <~ ("Prepare Upload",   ClickedMakeArchiveMenu)
+//			appmenu <~ ("Uninstall",   		ClickedUninstallMenu)
 		appmenu <~ ("Edit Preferences", ClickedEditPrefs)
 //		appmenu <~ ("Self-Test",   		ClickedTestInstallMenu)
-		appmenu <~ ("Install",  		ClickedInstallMenu)
+//		appmenu <~ ("Install",  		ClickedInstallMenu)
 
 
 	function LoadRecents

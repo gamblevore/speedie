@@ -174,18 +174,19 @@ function PerryIDE.DisplayStr (|message| f, |date|)
 		.DisplayInPopup(f.name, false)
 	return 1
 
-
+function name
 function PerryIDE.DisplayInPopup (|string| s,  |bool| instant,  |vec4| Color=vec4(),  |ivec2| Corner=.PopupDisplayCorner)
 	// using GUITask would be better... sigh.
 	|| sizer_str = s.wrap(80)
-	|| size = .PopupDisplay.TextSize(sizer_str) + (10, 2)
+	|| size = .PopupDisplay.TextSize(sizer_str) + (8, 2) // i think textsize isnt accurate. so no amount of +8 or +5
+	// will get it right, as it alters per whatever
 	(size.x max= 40)
 	if Corner.x < 0
-		Corner.x = .editme.lastrect.x2 - (size.x + 10)
+		Corner.x = .EditMe.lastrect.x2 - (size.x + 4)
 	.PopupDisplay.size = Corner.x~right for size.x   by   Corner.y~up back size.y
 	.PopupDisplay.text = s
-	|| pg = .PopupDisplay.GNormal
 	
+	|| pg = .PopupDisplay.GNormal
 	|| def = .FileList.GNormal.bg.color
 	if color
 		color = mix(def, color, 0.3)
@@ -255,10 +256,8 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 			beep
 		.LogOneComm(msg, "\1b ")
 		if date.int == .sectionkeytime
-			debugat
 			.sectionkeytime = 0
 			.editme.insertautocomplete
-			
 		return false
 
 	.DuringMsgFB = true

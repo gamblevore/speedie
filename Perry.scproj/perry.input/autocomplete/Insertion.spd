@@ -253,17 +253,17 @@ function PerryInsert6 (|textview| self, |intrange| a, |bool|)
 	.selrange = sel
 	return true								// f* --> fn *
 
-function PerryInsert5 (|textview| self, |message| where, |intrange| A, |bool|)
+function PerryInsert5 (|textview| self, |intrange| A, |bool|)
 	.undochecker = -1
 	.insertsub(", ||", A)
 	.selrange = A.x+3
 	return true								// fn X (|type| name*) --> fn X (|type| name, |*|) 
-function PerryInsert34 (|textview| self, |message| where, |intrange| A, |bool|)
+function PerryInsert34 (|textview| self, |intrange| A, |bool|)
 	.UndoChecker = -1
 	.InsertSub(" ", A)
 	.Insert("...", true)
 	return true								// fn X (|T*|) -->fn X (|T| *)
-function PerryInsert2 (|textview| self, |message| where, |intrange| A, |bool|)
+function PerryInsert2 (|textview| self, |intrange| A, |bool|)
 	.undochecker = -1
 	|| decl = " (||)"
 	if self[a.x] == ' ' or '\t'
@@ -273,7 +273,7 @@ function PerryInsert2 (|textview| self, |message| where, |intrange| A, |bool|)
 	.insertsub(decl, A)
 	.selrange = .sel0-2
 	return true								// fn X* --> fn X (|*|)
-function PerryInsert1 (|textview| self, |message| where, |intrange| a, |bool|)
+function PerryInsert1 (|textview| self, |intrange| a, |bool|)
 	.undochecker = -1
 	.InsertSub(" name ", a)
 	.selrange = (a.x2+1, a.x2+5)
@@ -398,14 +398,14 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 	|| A	= (after, after)
 	if state != 10  and  (!s.width or state == 5)
 		if state == 1
-			return PerryInsert1(self, where, a)|int|
+			return PerryInsert1(self, A)|int|
 		if state == 2
-			return PerryInsert2(self, where, A)|int|
+			return PerryInsert2(self, A)|int|
 		if inrange
 			if state == 4
-				return PerryInsert34(self, where, A)|int|
+				return PerryInsert34(self, A)|int|
 			if state == 5
-				return PerryInsert5(self, where, A)|int|
+				return PerryInsert5(self, A)|int|
 
 	|| prevchar = self[i2-1]
 	require (prevchar == '.') or jeebox.CSWordMiddle[prevchar]

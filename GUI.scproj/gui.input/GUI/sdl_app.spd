@@ -191,6 +191,7 @@ module SDLApp
 		
 	
 	function Touch (|guicontrol| modified=nil)
+		(modified)
 		if .TouchCount < 1
 			.touchcount = 1
 

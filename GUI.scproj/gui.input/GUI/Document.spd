@@ -31,11 +31,11 @@ class Document (list)
 	|CachedPath|			Ref
 	
 	
-	constructor (|string| path, |bool| Dummy)
-		.ref		= CachedPath(path, document.Cache_, self)
-		.maxundos	= 60
-		.Viewers	= DocumentViewer(nil)
+	constructor (|string| path, |int| Undos)
+		.maxundos	= Undos
 		.Location	= path
+		.ref		= CachedPath(path, document.Cache_, self)
+		.Viewers	= DocumentViewer(nil)
 
 	
 	destructor
@@ -100,7 +100,7 @@ class Document (list)
 				return c
 			c.RemoveAfter
 		
-		|| latest	= documentstate()
+		|| latest = documentstate()
 		latest.typingplace = ns
 		latest.text = nt
 		self <~ latest
@@ -224,11 +224,11 @@ class Document (list)
 
 
 	function LoadSub (|bool| ChangedExternal, |bool|)
-		|| f		= .Location.file
-		|| Lim      = document.AskLimit(f)
-		|| Data		= f.readall(lim)		#require
+		|| f = .Location.file
+		|| Lim = document.AskLimit(f)
+		|| Data	= f.readall(lim)		#require
 		
-		.viewdate	= date()
+		.viewdate = date()
 		.wascompressed = data.IsCompressed
 		if .wascompressed
 			data = data.decompress
@@ -236,7 +236,7 @@ class Document (list)
 		if .wasjbin
 			data = data.parse.render
 			
-		.filedate	= f.modified
+		.filedate = f.modified
 		|| OldPos = (0,0)
 		if ChangedExternal
 			|| c = .Current
@@ -251,7 +251,7 @@ class Document (list)
 
 
 	function Load (|bool| ChangedExternal = false, |bool|)
-		if !.LoadedFromFile or ChangedExternal
+		if ChangedExternal or !.LoadedFromFile
 			require .loadsub(ChangedExternal)
 		.UpdateViewers(DocumentState.Initialset)
 		return true
@@ -286,7 +286,7 @@ class Document (list)
 			cpp_part NewShared
 			if path
 				rz = .Cache_.DocumentCached(path)
-			rz ?= document(path, true)
+			rz ?= document(path, 60)
 			
 		function AskLimit (|file| f, |int|)
 			|| n = f.size

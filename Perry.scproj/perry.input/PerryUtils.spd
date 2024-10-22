@@ -1,0 +1,9 @@
+
+function ClickedEditPrefs (GUIMenuEvent)
+	PerryIDE.New(app.prefpath)
+
+function string.IsProj (|bool|)
+	return self isa "scproj" or "uwuz"
+
+function string.PathIsCode (|bool|)
+	return .isproj or .isSource

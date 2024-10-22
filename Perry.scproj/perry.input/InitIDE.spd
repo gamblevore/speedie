@@ -282,6 +282,7 @@ extend PerryIDE
 		with .PopupDisplay
 			isnt visible
 			is clickthrough
+			.alignment		= MoveCode.Center
 			.clipmode = ControlClipMode.SlideBackInWindow
 			.ID				= "PopupDisplay"
 			.size 			= the~area

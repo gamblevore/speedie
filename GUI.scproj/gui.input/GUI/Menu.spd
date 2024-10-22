@@ -81,17 +81,17 @@ class Menu (ListView)
 		|| CP = ((Y)~up, ControlPoint.low)(Y)
 		|| H = CP back .DesiredHeight
 		.size = w by h
-		.ShowMenu(owner)
+		.ShowMenu
 	
 	
-	function ShowMenu (|guicontrol| Owner)
+	function ShowMenu
 		|| win = .window					#require
 		win.inline.clear
 		win.openedmenu = self
 		is visible
 		._Scroll = nil
 //		.slideopen(0.125s)
-		.SelectFirst(listviewselectmode.initialselection)
+		.SelectFirst(ListViewSelectMode.InitialSelection)
 	
 	
 	function IsCmm (|bool|)

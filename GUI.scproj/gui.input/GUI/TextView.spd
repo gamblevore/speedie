@@ -16,7 +16,7 @@ class TextView (GUIControl)
 	|byte|						LineNumWidth
 	|byte|						LineHeight
 	|byte|						ExpectsParse
-	|MoveCode|					Alignment
+	|MoveCode|					Alignment // centered, left, right
 	|uint16|					LastDrawWidth
 	|int|						ClickedPos
 	|int|						AutoCompleteBack
@@ -966,6 +966,7 @@ class TextView (GUIControl)
 
 	function DoExplode (|textviewline| D, |float| strength)
 		opt NoRefCounts
+		(D),(strength)
 		return // kinda annoying sometimes. can we make it nicer?
 		// or a different effect? maybe like a background warp-star-effect that only occurs within the textview?
 		|| w = .window
@@ -1191,7 +1192,7 @@ class TextView (GUIControl)
 			p++
 
 		
-	helper CounterPartType (|string| s, |bool| Force=false, |bool|)
+	helper CounterPartType (|string| s, |bool|)
 		require (!.singleline and s.length == 1)
 		|| sel  = .SelRange
 		|| sel2 = sel.x2
@@ -1253,14 +1254,14 @@ class TextView (GUIControl)
 		if input.LengthUTF8 == 1
 			if (.onkeydown)(self, input.codepoint(false))?
 				return true
-		return .typed(input, true)
+		return .typed(input)
 	
 
-	helper Typed (|string| s, |bool| ForceCounter=false, |int|)
+	helper Typed (|string| s, |int|)
 		debug_require self is editable
 		SdlApp.ShowCursor(false)
 		
-		if .CounterPartType(s, ForceCounter)
+		if .CounterPartType(s)
 			return 2
 		.insert(S)
 		return 1
@@ -1492,7 +1493,7 @@ class TextView (GUIControl)
 			return w.inline.editingfor == self
 
 
-	helper FoundInfo (|ivec2|m, |int| Pos, |bool|sec, |bool|)
+	helper FoundInfo (|ivec2|m, |int| Pos, |bool|)
 		if M contains Pos
 			if (m.x2 == Pos) and !._PreferPrevLine
 				return false
@@ -1500,15 +1501,15 @@ class TextView (GUIControl)
 
 	
 	helper FindDrawInfo (|int| Char, |?&int| VLine=nil, |TextViewLine!|)
-		return .FindDrawInfoSub(char, vline, !._PreferPrevLine)
+		return .FindDrawInfoSub(char, vline)
 		 
 		
-	helper FindDrawInfoSub (|int| Char, |?&int| VLine,  |bool| sec, |TextViewLine!|)
+	helper FindDrawInfoSub (|int| Char, |?&int| VLine, |TextViewLine!|)
 		.PrepareLinesOfText
-		return .FindDrawInfoSub2(char, vline, sec)
+		return .FindDrawInfoSub2(char, vline)
 
 		
-	helper FindDrawInfoSub2 (|int| Char,  |?&int| VLine,  |bool| sec,  |TextViewLine!|)
+	helper FindDrawInfoSub2 (|int| Char,  |?&int| VLine,  |TextViewLine!|)
 		opt norefcounts
 		char = .clamp(char)
 		|| c = -int.max
@@ -1519,7 +1520,7 @@ class TextView (GUIControl)
 			|| n = d.next
 			if d == s
 				c = 0
-			if !n or .FoundInfo(d.DrawRange, char, sec)
+			if !n or .FoundInfo(d.DrawRange, char)
 				if vline
 					vline[] = c
 //				_LastVLine = c
@@ -1782,13 +1783,14 @@ class TextView (GUIControl)
 	
 	helper Clear (|string| NewText, |bool| KeepStart=false, |bool|)
 		if super.textset(NewText)
-			.ClearSub(NewText, keepstart)
+			.ClearSub(keepstart)
 			return true
 		if !._lines.hasany // in case we need to anyhow... usually for ""
-			.ClearSub(NewText, keepstart)
+			.ClearSub(keepstart)
 
 
-	helper ClearSub (|string| newtext, |bool| KeepStart)
+	helper ClearSub (|bool| KeepStart)
+		// why is newtext unused? ;_;
 		if !KeepStart
 			|| sel = (.text.length, 0)(.SingleLine) 
 			.TypingPlaceDirect((sel,sel))
@@ -1977,7 +1979,7 @@ class TextView (GUIControl)
 		if StayAtEnd
 			d = .FindStayAtEnd
 		if !StayAtEnd       // or !d
-			d = .FindDrawInfoSub2(pos, nil, false)
+			d = .FindDrawInfoSub2(pos, nil)
 		.StartWithoutScrollDraw = d
 		.ClearReclaim	
 	
@@ -2141,6 +2143,7 @@ helper string.DeleteTwoBytes (|ivec2|r, |string|)
 
 extend Window
 	function TextView (|string| txt="", |bool| Editable=true, |textview|)
+		visible
 		rz = TextView(self)
 		(rz is editable) = Editable
 		rz.text = txt
