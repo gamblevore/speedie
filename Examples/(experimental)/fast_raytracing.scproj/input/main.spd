@@ -26,7 +26,7 @@ struct RayHit
 class RayScene (window)
 	|float|			G
 	|date| 			LastDraw
-	|[shape]|		Shapes
+	|list of shape|	Shapes
 	|textview| 		FPS
 	|date| 			LastFPSChange
 	|vec3|			cam
@@ -38,7 +38,7 @@ class RayScene (window)
 		.cam = (1.6, 5.0, -22.0)
 		.FPS = .TextView(false)
 		.GNormal.clear // black background
-		
+		.shapes = list()
 		.shapes <~ Sphere((-1.0, 1.5, 12.0), 2)
 		.shapes <~ Sphere(( 1.5, 2.5, 18.0), 3)
 		.shapes <~ Sphere(( 7.0, 8.0, 18.0), 4)
@@ -62,8 +62,8 @@ class RayScene (window)
 		opt min 3
 		.PrintFrameRate
 		
-		.Tracker.griddy(Where.size.vec2)			// x ranges from -0.5 to 0.5, y from smaller
-		for (c in where) (p)						// might be nicer to iterate over tracker
+		.Tracker.griddy(Where.size.vec2, .shapes.first)		// x ranges from -0.5 to 0.5, y from smaller
+		for (c in where) (p)								// might be nicer to iterate over tracker
 			|| Ray = .Tracker.Ray(p)
 			|| InvRay = -1.0 / Ray
 			|| Found = RayHit()

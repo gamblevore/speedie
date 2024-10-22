@@ -33,6 +33,10 @@ datatype vec4
 		cpp_part Dot
 		return (self * other).sum
 
+	function operatordot3 (|vec4| V, |float|)
+		V *= self
+		return v.x+v.y+v.z
+
 	function CosR (|vec4|)
 		return (self * math.iTau).cos
 

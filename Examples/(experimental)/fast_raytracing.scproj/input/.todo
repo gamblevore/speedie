@@ -1,0 +1,26 @@
+
+
+todo:
+
+* how avoid recalculating frustrum? split by HV? May skip more objects too?
+	* HV split means really there is no frustrum. Just planes.
+
+* How to deal with overlaps?
+	* 3 sections? But won't the overlaps get muddled
+	* Restore them, perhaps with a bit per-object
+	* Draw overlaps last. (Bad, can't depth sort)
+
+* Depth-sorting sounds nice, doesn't have to be done initially
+	* just get the closest depth most of the time, and the cell-draw can do the actual-sort.
+		* This may saves us from needing to check the depth, per-pixel
+	* Draw by apparant-size... drawing large far-away objects... or skip near-small ones
+	* If an object covers a cell, and is closer, we can skip the farther objects
+
+* Threads? 1 splitter thread and 4 drawer threads! Could increase cache-locality.
+	* Avoid GPU! I want speedie to be a nice language!
+
+* Still need to do the back/front/up/right/down/left plane splitting
+
+		---
+
+bounding hierarchies?

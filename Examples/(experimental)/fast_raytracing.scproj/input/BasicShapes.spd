@@ -1,10 +1,13 @@
 
 
-class Shape
+
+class Shape	(list)
+	contains Shape
 	|vec3|			Center
 	|float|			Radius
 	|vec3|			Speed
 	|float|			RadiusSq // optimised version
+	|uint|			DrawCulled
 
 	constructor (|vec3| c, |float| r)
 		.center = c

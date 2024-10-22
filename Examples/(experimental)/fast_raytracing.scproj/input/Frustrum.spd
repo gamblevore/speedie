@@ -1,62 +1,71 @@
 
-
-// we can do this using a back plane and a front-plane
-// then we can subdivide the screen into blocks.
-// each block can take the edges of it's parent...
-
 class ViewFrustrum
 	|float|		CellSize
 	|vec2|		Scale
 	|vec2|		Adjust
 	|vec4|		Screen
 	|vec2|		LastSize
+	|int|		Depth // really goes up to 16 bits really.
+	|int|		TestCount
 	|Plane|		Back
 	|Plane|		Fwd
 	|Plane[4]|	Edges
 
 	constructor (|int| CellSize)
 		.CellSize = (1<<CellSize)|float|
-		
-	function Draw (|vec4| B)
-		// draw stuff in the list
-	function ShrinkList (|vec4| B, |bool|)
-		// need the box-planes
-		// just recalc for now... 
-	function RestoreList
+	
+	function ShrinkList (|vec4| B, |shape| curr, |shape?|)
+		opt norefcounts
+		while curr
+			if .contains(B, curr)
+				if !rz
+					rz = curr
+			  elseif rz
+				rz.prev = curr
+			curr++
+		// Need the box-plane. Just recalc for now... 
 		
 
-	function Griddy (|vec2| Size)
+	function Griddy (|vec2| Size, |shape| first)
 		require .LastSize != size
 		.LastSize = size
 		.scale = 1.0/size.xx
 		.adjust = size * -0.5
-		|| log = (size.max/.cellsize).log2.ceil		// (1440, 900) --> (6,6) // < (2K, 2K)
+		require first
+		|| log = (size.max/.cellsize).log2.ceil		// (1440, 900) --> 6 --> (2K, 2K)
 		|| bounds = (vec2(), vec2(2.0) pow vec2(log))
-		.SubDivide(bounds)	
-	
-	function SubDivide (|vec4| B)
+		.TestCount++
+		.SubDivide(bounds, first)	
+
+
+	function SubDivide (|vec4| B, |shape| first)
+		opt norefcounts
 		|| Clip = B.Clip(.screen)
-		require Clip.area > 0.0
-		if .ShrinkList(B)
-			|| Half = B.Size * 0.5
-			if half.x <= .CellSize
-				.draw(B)
-			  else
-				|| S = B.xy
-				|| M = S+Half
-				
-				|| LD = (S, M)
-				|| LU = LD.up(M.y)
-				|| RU = LD.right(M.x)
-				|| RD = RU.up(M.y)
-				.SubDivide(LD)
-				.SubDivide(LU)
-				.SubDivide(RD)
-				.SubDivide(LD)
-		.RestoreList
+		require (Clip.area > 0.0)
+		first = .ShrinkList(B, first) #require
+		|| Half = B.Size * 0.5
+		if half.x <= .CellSize
+			.draw(B, first)
+		  else
+			|| S = B.xy
+			|| M = S+Half
+			
+			|| LD = (S, M)
+			|| LU = LD.up(M.y)
+			|| RU = LD.right(M.x)
+			|| RD = RU.up(M.y)
+			.Depth++
+			.SubDivide(LD, first)
+			.SubDivide(LU, first)
+			.SubDivide(RD, first)
+			.SubDivide(LD, first)
+			.Depth--
 		
 
 		
+
+	function Draw (|vec4| B, |shape| curr)
+		// draw stuff in the list
 
 /*
 https://stackoverflow.com/questions/13665932/calculating-the-viewing-frustum-in-a-3d-space
@@ -102,8 +111,13 @@ Compute each plane from any three corners of the plane, wound CW or CCW to point
 	function Ray (|ivec2| p, |vec3|)
 		|| XY = (p.vec2 + .adjust) * .scale
 		return (xy, 1.0).Normal
-
 		
+	function Contains (|vec4| Box, |shape| curr,  |bool|)
+		// should take curr.drawculled into account
+		opt inline
+		if rz
+			curr.DrawCulled |= 1<<.Depth
+	
 	function Contains (|vec4| Sphere, |bool|)
 		for i in 4
 			require .Edges[i].sphere(Sphere)
@@ -126,7 +140,3 @@ datatype Plane (vec4)
 		return (s dot3 self) + .w
 	function Sphere (|vec4| S, |SignedDistance|)
 		return .Point(S) - s.w
-
-function vec4.operatordot3 (|vec4| V, |float|)
-	V*=self
-	return v.x+v.y+v.z
