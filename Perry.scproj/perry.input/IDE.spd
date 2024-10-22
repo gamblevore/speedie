@@ -46,7 +46,7 @@ class PerryIDE (Window)
 	|ListView|					FoundList
 	|textview| 					DebugArgsList
 	|Guicontrol of buttonview|	ViewButtons
-	|buttonview?|				PrevView
+	|buttonview?--|				PrevView
 	|ButtonView|				CurrFileName
 	|ButtonView|				FunctionMenu
 	|buttonview|				Toolbar
@@ -433,8 +433,8 @@ class PerryIDE (Window)
 			|| msg = "Released Speedie: " + .name
 			.LogOneAction(@emb + msg)
 			f.Kill("SaveMemory")
-		
-
+	
+	
 	behaviour FrameUpdate // perframe, eachframe, onframe
 		.ProjectTabs.TrimWidth
 		if !ShouldNotDisturbGUI
@@ -798,7 +798,12 @@ So anything not 0 means "its OK"`
 		if ok != 1
 			return ok
 
-		.CurrFileName.text = r.name
+		|| s = r.DirFile.name
+		if s[] == '.'
+			s = r.name + "/" + s
+		  else
+			s = r.name
+		.CurrFileName.text = s
 		.DuringLoad++
 		.filelist.select(r)
 		
@@ -897,7 +902,8 @@ So anything not 0 means "its OK"`
 			|| err = .editme.MyError
 				ifn err isa error
 					log "ParseErrorDetect bug"
-				.errorlist <~ err // right?
+				  elseif err is parse
+					.errorlist <~ err // right?
 
 	
 	function LoadStartupErrors
@@ -915,8 +921,9 @@ So anything not 0 means "its OK"`
 		opt norefcounts
 		if .DrawMe is visible
 			return .SaveDrawing
+
 		.ParseErrorDetect
-		
+				
 		|| e = .editme
 		if purpose == documentstate.errorchecking
 			require e is modified
