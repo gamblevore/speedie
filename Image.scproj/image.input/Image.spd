@@ -95,6 +95,9 @@ class Image (memory)
 	function ResetBoundsToSize
 		cpp_Part resetarea
 		.WindowBase   = (0, 0)
+		.noclip
+	
+	helper NoClip
 		._ControlClip = (0, 0, .size)
 	
 	function Horz (assigns:|ivec2|r)

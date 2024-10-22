@@ -1076,7 +1076,7 @@ module SDLApp
 		if !w.openedmenu and !.AllowKeyDown(kev)
 			return SDLActivity.nothing
 		
-		ifn (key is escape) and keys.escape.heldkey
+		if (key isnt escape) or key.IsFirstFrame
 			if .StandardKeys(key)
 				return SDLActivity.activity
 			if w.__keydown__(key)

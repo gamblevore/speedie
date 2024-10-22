@@ -84,10 +84,14 @@ dataType Keys (int) {
 		|| i = keys.has(self)
 			keys.downdate[i] = 0
 
-	function HeldKey (|date| durr=1, |bool|)
+	function HeldKey (|date| durr=0.05s, |bool|)
 		|| i = keys.has(self)
 			return keys.downdate[i].ago >= durr
-
+	
+	function IsFirstFrame (|bool|)
+		|| i = keys.has(self)
+			return keys.downdate[i] == sdlapp.framestart
+		
 	function Length (|float|)
 		|| i = keys.has(self)
 			return keys.downdate[i].ago.float

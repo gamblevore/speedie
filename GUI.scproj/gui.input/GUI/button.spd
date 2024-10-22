@@ -269,18 +269,19 @@ class ButtonView (GUIControl)
 		textcol.alpha = fader
 		pn.x = font.small!.DrawText(t,  Where,  Pn, TextCol, DrawInvis) + 2
 		|| MI = MouseXInside and  (R.y1y2 contains M.y)
-		if  .pressing  and MI  and  r.Width > 19  
-			(pn.x min= r.x2-(font.Width+2))
-			|| ago = -.DelayTill.ago.Float
-				ago *= 4	// effect needs improving
-				if ago > 4	// perhaps something like soft-explode or at least half-pixels
-					ago = 4 // also the maths is wrong somehow...
-				  else
-					sdlapp.Touch
-				pn.y -= (ago-4.0)|int|
-			  elseif .MenuIsOpen
-				pn.y += 4
-			font.small!.DrawText("\03", where, pn, TextCol, DrawInvis)
+			if  !disabled and .pressing  and  r.Width > 19  
+				(pn.x min= r.x2-2)
+				|| ago = -.DelayTill.ago.Float
+					ago *= 4	// effect needs improving
+					if ago > 4	// perhaps something like soft-explode or at least half-pixels
+						ago = 4 // also the maths is wrong somehow...
+					  else
+						sdlapp.Touch
+					pn.y -= (ago-4.0)|int|
+				  elseif .MenuIsOpen
+					pn.y += 4
+//				where.noclip // hmmmm
+				font.small!.DrawText("\03", where, pn, TextCol, DrawInvis)
 		
 		
 	function ListViewRow.ButtonText (|string| Default, |string|)
