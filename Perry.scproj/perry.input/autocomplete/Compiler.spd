@@ -76,7 +76,7 @@ extend PerryIDE
 		if arg != @arg
 			arg = msg.arg
 		  else
-			maybeok = msg
+			MaybeOK = msg
 		arg.cleanErrors
 		
 		is Broken
