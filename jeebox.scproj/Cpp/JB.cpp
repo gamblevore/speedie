@@ -2484,9 +2484,7 @@ ParserLineAndIndent JB_Tk__NextLineAndIndent(Message* Parent) {
 			(++Rz[0]);
 			Rz[1] = (N - 1);
 			Rz[2] = 0;
-			if (Rz[3]) {
-				Rz[3] = 1;
-			}
+			Rz[3] = 0;
 			Commas = 0;
 			State = 2;
 			if (Parent->Func == kJB_SyxList) {
@@ -5620,7 +5618,7 @@ JB_String* JB_SS_Str(StringReader* Self, int N, int Skip) {
 		return JB_LUB[0];
 	}
 	if ((JB_FastBuff_Has((&Self->Data), N)) or (JB_SS_NoMoreChunks(Self))) {
-		N = JB_int_OperatorMin(N, JB_SS_Remaining(Self));
+		(N = JB_int_OperatorMin(N, JB_SS_Remaining(Self)));
 		int Pos = JB_FastBuff_Position((&Self->Data));
 		(JB_FastBuff_PositionSet((&Self->Data), N + Pos));
 		return JB_FastBuff_AccessStr((&Self->Data), Pos + Skip, JB_FastBuff_Position((&Self->Data)));
@@ -8386,7 +8384,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024101918);
+	return (2024102215);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8398,4 +8396,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 -8930785917656102461 -1713023770187091343
+// -2934619186805667969 -8930785917656102461 -5548816328016973856
