@@ -1076,8 +1076,7 @@ ive been~running #since morning
 				rz.r++
 				rz.g = n-1
 				rz.b = 0
-				if rz.a
-					rz.a = 1 // lower it
+				rz.a = 0
 				commas = 0
 				State = 2
 				if parent.func == @list
@@ -1166,7 +1165,7 @@ ive been~running #since morning
 			
 			|| ch = .ParseLoopItem(output, TmpoFlags, prev, info.b)
 			if !ch
-				return .finishparseloop(lc, output, .nextstart-1)
+				return .FinishParseLoop(lc, output, .nextstart-1)
 			if ch != output // haha
 				LC += (ch == @item)
 				if info.a
