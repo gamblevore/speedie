@@ -345,14 +345,15 @@ function SetSize (CollectFunc)
 	return compiler.program
 
 function LoadClassName (|message| node, |string|)
+	opt norefcounts
 	|| S = node.first
 	if (s == @thg or @dot)
-		return s.name 
-	if (node istmp "class")
-		error (node, "Can't find class name.")
+		return s.name
+	error (node, "Can't find class name.")
 }
 
 function SCFunction.CopyParams (|message| list)
+	opt norefcounts
 	|| p = .prms
 	using list
 	|| a = .source.GiveArg
