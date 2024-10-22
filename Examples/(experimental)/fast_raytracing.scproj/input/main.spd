@@ -3,11 +3,6 @@
 https://www.scratchapixel.com // simple raytracing demo... based on code from here
 
 
-// We could divide the screen into squares, then each square becomes a frustrum.
-// Each frustrum can make a list of possible objects it can hit.
-// We could also do hierarchical bounding box detection.
-
-
 main
 	sdlapp.Rescale(3)
 	return RayScene()

@@ -67,47 +67,7 @@ class ViewFrustrum
 	function Draw (|vec4| B, |shape| curr)
 		// draw stuff in the list
 
-/*
-https://stackoverflow.com/questions/13665932/calculating-the-viewing-frustum-in-a-3d-space
-    vec3 nearCenter = camPos - camForward * nearDistance;
-    vec3 farCenter = camPos - camForward * farDistance;
-Compute the widths and heights of the near and far planes:
 
-    real nearHeight = 2 * tan(fovRadians/ 2) * nearDistance;
-    real farHeight = 2 * tan(fovRadians / 2) * farDistance;
-    real nearWidth = nearHeight * viewRatio;
-    real farWidth = farHeight * viewRatio;
-Compute the corner points from the near and far planes:
-
-    vec3 farTopLeft = farCenter + camUp * (farHeight*0.5) - camRight * (farWidth*0.5);
-    vec3 farTopRight = farCenter + camUp * (farHeight*0.5) + camRight * (farWidth*0.5);
-    vec3 farBottomLeft = farCenter - camUp * (farHeight*0.5) - camRight * (farWidth*0.5);
-    vec3 farBottomRight = farCenter - camUp * (farHeight*0.5) + camRight * (farWidth*0.5);
-
-    vec3 nearTopLeft = nearCenter + camY * (nearHeight*0.5) - camX * (nearWidth*0.5);
-    vec3 nearTopRight = nearCenter + camY * (nearHeight*0.5) + camX * (nearWidth*0.5);
-    vec3 nearBottomLeft = nearCenter - camY * (nearHeight*0.5) - camX * (nearWidth*0.5);
-    vec3 nearBottomRight = nearCenter - camY * (nearHeight*0.5) + camX * (nearWidth*0.5);
-Compute each plane from any three corners of the plane, wound CW or CCW to point inward (depending on coordinate system).
-
-    vec3 p0, p1, p2;
-
-    p0 = nearBottomLeft; p1 = farBottomLeft; p2 = farTopLeft;
-    vec3 leftPlaneNormal = Normalize(Cross(p1-p0, p2-p1));
-    vec3 leftPlaneOffset = Dot(leftPlaneNormal, p0);
-
-    p0 = nearTopLeft; p1 = farTopLeft; p2 = farTopRight;
-    vec3 topPlaneNormal = Normalize(Cross(p1-p0, p2-p1));
-    vec3 topPlaneNormal = Dot(topPlaneNormal , p0);
-
-    p0 = nearTopRight; p1 = farTopRight; p2 = farBottomRight;
-    vec3 rightPlaneNormal = Normalize(Cross(p1-p0, p2-p1));
-    vec3 rightPlaneNormal = Dot(rightPlaneNormal , p0);
-
-    p0 = nearBottomRight; p1 = farBottomRight; p2 = farBottomLeft;
-    vec3 bottomPlaneNormal = Normalize(Cross(p1-p0, p2-p1));
-    vec3 bottomPlaneNormal = Dot(bottomPlaneNormal , p0);
-*/	
 	function Ray (|ivec2| p, |vec3|)
 		|| XY = (p.vec2 + .adjust) * .scale
 		return (xy, 1.0).Normal
