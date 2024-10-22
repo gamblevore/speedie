@@ -1,24 +1,18 @@
 
-// SDF demo.
-// we can make a "Scene" class that can contain other objects that can be scenes
-// so we can make hierarchical objects by combining objects
-// like a snake made out of spheres
-// Also... We want to allow for analytical instant hits :) for speed.
-// and also break down the screen into areas... so we know which SDFs are available or not
-// and perhaps a tree for the SDFs themselves... like an oct-tree...
-// then we can have much faster SDFs
-// also the SDFs can have a list of thme, so we know which are available.
+https://www.scratchapixel.com // simple raytracing demo... based on code from here
+
 
 main
-	"unimplemented"
-	return 0
-//	return RayScene()
+	sdlapp.Rescale(3)
+	return RayScene()
 
-/*
+
 struct RayHit
 	|vec4|  Color
 	|float| Dist
-	syntax cast (|bool|)
+	constructor
+		.Dist = float.max
+	function ok (|bool|)
 		return .dist < float.max
 	
 
@@ -36,29 +30,20 @@ class RayScene (window)
 		.FPS = .TextView(false)
 		.GNormal.clear // black background
 		
-		self <~ Sphere((-1.0, 1.5, 12.0), 2)
-		self <~ Sphere(( 1.5, 2.5, 18.0), 3)
-		self <~ Sphere(( 7.0, 8.0, 18.0), 4)
-		self <~ Sphere(( -2.0, 9.0, 24.0), 6)
-		self <~ CubeShape(( 12.0, 3.0, 24.0), 4)
-	
-	
-	syntax Append (|shape| sp)
-		.shapes <~ sp
-		
-	function Bounce
-		opt norefcounts
-		for sp in .shapes
-			sp.Move(.g)
+		.shapes <~ Sphere((-1.0, 1.5, 12.0), 2)
+		.shapes <~ Sphere(( 1.5, 2.5, 18.0), 3)
+		.shapes <~ Sphere(( 7.0, 8.0, 18.0), 4)
+		.shapes <~ Sphere(( -2.0, 9.0, 24.0), 6)
+		.shapes <~ CubeShape(( 12.0, 3.0, 24.0), 4)
 	
 	behaviour Drawbackground
 		opt norefcounts
 		opt min 3
 		|| Ago = .LastDraw.ago
 		.LastDraw = date.now
-		.LastFPSChange := .LastDraw
+		.LastFPSChange ?= .LastDraw
 		if .LastFPSChange.ago > 0.5s
-			|| fps = ago.rate.Render(1) + "fps"
+			|| fps = (1.0/ago.Float64).Render(1) + "fps"
 			.fps.text = fps
 			printline fps
 			.LastFPSChange = .LastDraw
@@ -70,25 +55,27 @@ class RayScene (window)
 			|| XY = (p.vec2 + adjust) * scale
 			|| xyz = (xy, 1.0).Normal
 			|| ixyz = -1.0 / xyz
-			|rayhit| Found
-			found.Dist = float.max
+			|| Found = RayHit()
 			for sp in .Shapes
 				sp.color(.cam, xyz, ixyz, Found)
-			if (Found)
+			if (Found.ok)
 				C <~ Found.Color
 	
 	
 	function Moved (|vec3|)
-		rz.y = keys.SPACE[] - keys.LSHIFT[]
-		rz.z = keys.W[]     - keys.S[]
-		rz.x = keys.D[]     - keys.A[]
+		|| k = ivec3()
+		k.y = keys.SPACE[] - keys.LSHIFT[]
+		k.z = keys.W[]     - keys.S[]
+		k.x = keys.D[]     - keys.A[]
+		return k.Vec3
 
 	
 	behaviour FrameUpdate
 		|| m = .moved
 			.cam += m * 0.2
 			SDLApp.touch
-		.Bounce
+		for sp in .shapes
+			sp.Move(.g)
 
 
 
@@ -117,7 +104,7 @@ class Shape
 		.center += .speed
 		SDLApp.Touch
 
-	function Color (|Vec3| orig, |Vec3| dir, |vec3| idir, |&rayhit| H)
+	function Color (|Vec3| orig, |Vec3| dir, |vec3| idir, |rayhit| H)
 		opt min 3
 		|| t = .__dist__(orig, dir, idir)
 		if (t > 0) and (t < H.Dist)
@@ -154,4 +141,3 @@ class CubeShape (Shape)
 		|| tmax = (P0 max P1).min
 		
 		require tmax >= rz
-*/
