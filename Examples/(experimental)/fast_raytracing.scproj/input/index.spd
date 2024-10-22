@@ -1,10 +1,9 @@
 import "GUI"
 
 conf
-    name	UnderstandableRayTracing
+    name	FastRayTracing
     targets gui
-    prefs "uray"
+    prefs "fray"
 	version	1.0
 	creator	jeebox
-	helpurl	"https://github.com/gamblevore/speedie/blob/main/examples/understandable_raytracing.scproj/UnderstandableRaytracing.md"
     
