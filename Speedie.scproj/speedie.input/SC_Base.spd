@@ -374,6 +374,7 @@ function Message.FindAndRemoveSub (|String| name,  |bool| NothingOK,  |bool| IsC
 		return .FindAndRemove2(place, NothingOK, isclass)
 	
 
+
 function scfunction.FindCppWrapperFunc (|message| place, |message|)
 	opt NoRefCounts
 	for cpp in place
@@ -412,6 +413,7 @@ function LoadExportName
 
 	if self isa SCFunction
 		.IsCppInBuilt ?= (cw == @bra)|int|
+		(self is cpp) = cw
 		|| CppWrapper = cw.cpp_Wrapper
 			.MakeParamsReal
 		require !.UseExportWrapper(CppWrapper) and !.UseCppName(CppName) and (self isnt disabled)

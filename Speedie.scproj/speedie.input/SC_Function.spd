@@ -44,6 +44,7 @@ datatype FunctionType (int)
 		HidesProperties
 		PrintedForDebugViewing // can print a function only once for debug
 		ReturnASMFloats
+		Cpp
 		
 		ConOrDes = Constructor + Destructor
 		

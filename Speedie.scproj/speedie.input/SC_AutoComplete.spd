@@ -191,12 +191,19 @@ function scfunction.CheckUnused (|message| feedback)
 				str = "()'s callers are unused"
 			feedback.msg(@tmp, .name + str) <~ src.position
 
-	if !.HasProto and !.IsCppInBuilt
+	if !.HasProto and self isnt cpp
+		|message| errname
 		for arg in .args
 			if arg isnt readfrom
 				|| Src = arg.source
-					feedback.msg(@tmp, arg.name + " is unused") <~ Src.position
-
+					if !errname	
+						errname = feedback.msg(@tmp, arg.name)
+						errname <~ Src.position
+					  else
+						errname.name += ", "
+						errname.name += arg.name
+		if errname
+			errname.Name += " is unused"
 
 
 function Check (|message| cmd, |message|)
