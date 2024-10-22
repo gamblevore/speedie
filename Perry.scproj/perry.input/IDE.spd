@@ -132,28 +132,11 @@ class PerryIDE (Window)
 			r.remove
 
 
-	function JeeboxEffects (|image| where, |message| bg)
-		return
-		effects.dest = where
-		if Effects.StartJeebox(bg, 0.5)
-			Effects.Backup
-		  else
-			Effects.Restore
-	
 	behaviour Tickle
 		opt norefcounts
 // seems to cause blockages sometimes? why?
 //		.Feedback$.Pico.Tickle
 	
-	behaviour Drawbackground
-		opt norefcounts
-		|| bg = app.Prefmsg("bg")
-		if bg == "flat"
-			return super.drawbackground(where)
-		if !bg
-			app.pref("bg") = "jeebox"
-		.Jeeboxeffects(where, bg)
-
 
 	behaviour CancelClose 
 		|| proj = .projmsg					#require
@@ -406,7 +389,7 @@ class PerryIDE (Window)
 		fs <~ "Crashed ${p.Status.SignalName} : ${p.render}\n"
 		fs <~ p.erroroutput.getresult.FindStacktrace
 		.notify(fs, @emb + what)
-		.CancelCompile("crashed")
+		.CancelCompile
 		pp[] = nil
 
 

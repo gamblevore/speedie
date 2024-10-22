@@ -119,6 +119,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 
 
 function PerryIDE.ActualCompile (|string| operation)
+	(operation) // i guess we'll use this later. debug vs compile
 	if .compilr: return app.beep // wah?
 	
 	require .filelist.SaveAll(documentstate.saving)

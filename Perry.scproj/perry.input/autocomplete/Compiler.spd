@@ -20,8 +20,8 @@ extend PerryIDE
 	function AskCheck
 		.SendFeedbackStr "check"
 
-	syntax is (|ListViewState| s, |bool|)
-		return .projmsg.syntaxis(s)
+//	syntax is (|ListViewState| s, |bool|)
+//		return .projmsg.syntaxis(s)
 		
 
 	syntax is (|ListViewState| s, assigns:|bool| mod)
@@ -149,10 +149,6 @@ extend PerryIDE
 		.LoadErrors(RealErrors, realerrors)
 		.showstats
 
-
-	function LogFB (|message| msg)
-		// ignore.
-	
 	
 	function Readlog (|bool| Killed=false)
 		|| c = .Compilr $
@@ -209,7 +205,7 @@ extend PerryIDE
 		notifications <~ (what, response)
 	
 	
-	function CancelCompile (|string| why="CompiledOK")
+	function CancelCompile
 		|| c = .Compilr
 			c.Kill
 			app.Sleep(0.025) // allow pipes to work

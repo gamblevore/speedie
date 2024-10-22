@@ -174,7 +174,7 @@ function PerryIDE.DisplayStr (|message| f, |date|)
 		.DisplayInPopup(f.name, false)
 	return 1
 
-function name
+
 function PerryIDE.DisplayInPopup (|string| s,  |bool| instant,  |vec4| Color=vec4(),  |ivec2| Corner=.PopupDisplayCorner)
 	// using GUITask would be better... sigh.
 	|| sizer_str = s.wrap(80)
@@ -281,7 +281,7 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 		  elseif msg starts "unused_funcs"
 			.UnusedFuncsFB(msg)
 		  elseif msg starts "log"
-			.LogFB(msg)
+			0 //
 		  elseif msg starts "callfrom"
 			.CallFromFB(msg)
 		  elseif msg starts "check"

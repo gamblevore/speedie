@@ -185,7 +185,7 @@ function ClickedCancel (GUIAction)
 	|| name = i.project.TrimCodeExt
 	|| q = "Currently building $name... Cancel Build of $name?"
 	if q.confirm(can)
-		i.CancelCompile("UserCancel")
+		i.CancelCompile
 		return true
 		
 
