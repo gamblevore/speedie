@@ -2181,6 +2181,7 @@ extern Array* JB__ErrorSeverity__names;
 #define kSC__FunctionType_Comparison ((FunctionType)4)
 #define kSC__FunctionType_ConOrDes ((FunctionType)3)
 #define kSC__FunctionType_Constructor ((FunctionType)1)
+#define kSC__FunctionType_Cpp ((FunctionType)268435456)
 #define kSC__FunctionType_Destructor ((FunctionType)2)
 #define kSC__FunctionType_Disabled ((FunctionType)2097152)
 #define kSC__FunctionType_EmptyConstructor ((FunctionType)512)
@@ -2404,7 +2405,7 @@ extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_kDelete ((int)2)
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2146])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2128])
 extern Float64 JB__Rec_Progress;
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
