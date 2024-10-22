@@ -79,16 +79,31 @@ dataType Keys (int) {
 		wrapper
 		cpp_class SDL_Keycode
 		cpp_part Key
+	
+	function Eat
+		|| i = keys.has(self)
+			keys.downdate[i] = 0
 
+	function HeldKey (|date| durr=1, |bool|)
+		|| i = keys.has(self)
+			return keys.downdate[i].ago >= durr
 
+	function Length (|float|)
+		|| i = keys.has(self)
+			return keys.downdate[i].ago.float
 
+	function IsCancelled (|bool|) // surely its "IsEaten?"
+		|| i = keys.has(self)
+			if !keys.downdate[i]
+				return true
+		
 	function Scan (|SDL_Scancode|)
 		cpp_wrapper SDL_GetScancodeFromKey
 			
 	function IsAccept (|bool|)
 		return (self is RETURN or RETURN2 or Enter or AC_FORWARD)
 	
-	operator iscmd (|keys|s, |bool|)
+	operator IsCmd (|keys|s, |bool|)
 		return keys.cmd and self == s
 
 	function IsCMM  (|bool|shift=false, |bool|)
@@ -133,31 +148,20 @@ dataType Keys (int) {
 		function State (|&int| n, |&byte|)
 			cpp_Wrapper SDL_GetKeyboardState
 		
-		function keys.Eat
-			|| i = keys.has(self)
-				keys.downdate[i] = 0
-
-		function keys.HeldKey (|date| durr=1, |bool|)
-			|| i = keys.has(self)
-				return keys.downdate[i].ago >= durr
-
-		function keys.IsCancelled (|bool|)
-			|| i = keys.has(self)
-				if !keys.downdate[i]
-					return true
-			
 		helper AddKey (|keys| K)
 			if (.count < 8) and !.has(K)
 				|| i = .count++
-				.DownDate[i] = date()
+				.DownDate[i] = sdlapp.FrameStart
 				.DownKeys[i] = K
 				
 		function RemoveKey (|keys| K, |int|)
 			for i in .count
 				if .downkeys[i] == K
 					|| m = --.count
-					.downkeys[i] = .downkeys[m]
-					.downkeys[m] = 0
+					.DownKeys[i] = .DownKeys[m]
+					.DownKeys[m] = 0
+					.DownDate[i] = .DownDate[m]
+					.DownDate[m] = 0
 			return SDLActivity.activity
 			
 		function Has (|keys| s, |ind|)
@@ -170,7 +174,6 @@ dataType Keys (int) {
 				return true
 			target osx
 				return SDL_KeyMod.cmd[]
-			
 			
 		function CmdAgo (|date| ago, |bool|)
 			require .cmd

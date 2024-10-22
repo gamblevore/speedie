@@ -22,6 +22,7 @@ module SDLApp
 	|ivec2| 					CurrMouseXY
 	|ivec2|						TryResizeLater
 	|date|						CmdReleaseDate
+	|date|						FrameStart
 	|date|						FrameLength
 	|date|						LastFrameDate = 1 // wont fire otherwise
 	|date|						LastWindowClose
@@ -670,6 +671,7 @@ module SDLApp
 
 		SpdProcess.CheckAllAlive
 		
+		.FrameStart = date()
 		|| occured = .PreFrame
 		.ClearAlerts
 		.CheckKeyMods
