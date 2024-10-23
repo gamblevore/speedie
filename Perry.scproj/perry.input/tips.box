@@ -21,3 +21,4 @@
 
 "Use perry from the terminal! Just type: perry <path to file> (needs link to perry in /usr/local/bin)"
 
+"\1FK can clear your build-log, or other logs in the log-area."
