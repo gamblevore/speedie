@@ -393,7 +393,7 @@ function MainAct (|Message| cmd, |scfile| my_file, |message|)
 	
 	|| thg = fn.source!.findpos(f, n)
 	if !thg and cmd == "callfrom"
-		thg = fn.source // sigh
+		thg = fn.source
 	if  thg == @thg  and  fn.source!.isbehaviour  and  thg in fn.source
 		return .define_behaviour(fn, cmd.name)
 	if cmd starts "define" or "display" or "callfrom"
