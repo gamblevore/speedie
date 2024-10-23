@@ -81,8 +81,12 @@ class list (Saveable)
 	syntax Equals (|int| n, |bool|Aware, |bool|)
 		return .HasChildCount( n )
 	
+	syntax Equals (|byte| b, |bool|Aware, |bool|)
+		disabled `Did you mean == int, or == "string"?`
+	
+	
 	operator More (|int| N, |bool|)
-		disabled ">" // has more children than N	
+		disabled "use >" // has more children than N	
 	
 	operator LessOrEqual (|int| N, |bool|)
 		// has N children or less.
