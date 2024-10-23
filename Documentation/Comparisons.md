@@ -123,7 +123,7 @@ For example, if you alter the line, to replace `2` with `5`:
       // *List::find_inner_mut(&mut list, 2).unwrap() = 42;
       *List::find_inner_mut(&mut list, 5).unwrap() = 42;
 
-You will get a crash. Yep... your "not marked as unsafe" code will crash. Cos you used `unwrap`. How terrible.
+You will get a crash. Yep... your "not marked as unsafe" code will crash. Cos you used `unwrap`. How terrible. (Apparantly, Rust considers crashing via `unwrap` to be "safe". 🤦‍♂️ 🤦🏽 🤦‍♀️. Well they might consider it "safe" but it didn't help find the crash bug in that Rust code did it!)
 
 The speedie code above WON'T crash if the item can't be found! Or the same alteration is made!
 
