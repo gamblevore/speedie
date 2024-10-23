@@ -105,7 +105,7 @@ Now lets look at a Speedie version!!
                 "where did it go?"
     		
 
-Hooray we did it! Far simpler. Totally understandable. As a side-benefit, we also added 6 lines of helpful print statements code to show what is going on. You could strip that out as the original doesn't have that.
+Hooray we did it! Far simpler. Totally understandable. As a side-benefit, we also added 7 lines of helpful print-related statements code to show what is going on. You could strip that out as the original doesn't have that.
 
 You should see this:
 
