@@ -513,7 +513,7 @@ class TextView (GUIControl)
 		if mode is wantagoodview
 			back += before/2
 		|| lim = .MaxVisibleLines - back
-		if i inrange lim
+		if (i inrange lim) and (mode isnt wantagoodview)
 			return d
 		.StartLine(mode) = d.movecapped(-before) 
 		sdlapp.touch(self)
