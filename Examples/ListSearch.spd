@@ -14,8 +14,8 @@ main
 	L <~ list(1)
 	L <~ list(2)
 	|| F = L.findposition(2)
-	printline f
-	F.Position = 42
+		printline f
+		F.Position = 42
 	|| F2 = L.findposition(2)
 		"wierd it still exists?"
 	  else
