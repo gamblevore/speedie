@@ -127,7 +127,7 @@ You will get a crash. Yep... your "not marked as unsafe" code will crash. Cos yo
 
 The speedie code above WON'T crash if the item can't be found! Or the same alteration is made!
 
-    || F = L.findposition(2) // gets a var and then does an 'if' block on it
+    || F = L.findposition(5) // won't run this branch if "5" isn't found.
         printline f
         F.Position = 42
 
