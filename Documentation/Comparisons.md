@@ -1,6 +1,6 @@
 ## Comparisons with Other Languages
 
-Lets compare Speedie vs a few other languages. Many languages seem good with very simple examples, but break down once you try anything slightly significant.
+Lets compare Speedie vs a few other languages. Many languages seem good when viewing simple examples, but break down once you try anything slightly significant.
 
 Here is a good example, from Rust. We are trying to search through a list. Due to how Rust overcomplicates everything... its quite a nightmare even to look at.
 
