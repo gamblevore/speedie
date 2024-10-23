@@ -3452,7 +3452,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2024102221));
+	JB_FS_AppendInt32(_fsf0, (2024102311));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8879,7 +8879,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2024102221));
+	JB_FS_AppendInt32(_fsf0, (2024102311));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -10500,24 +10500,26 @@ void SC_Create_JeeboxTest(Message* Msg) {
 }
 
 SCDecl* SC_CustomFuncOp(Message* Exp, SCOperator* Comp, SCNode* Name_space, Message* RN) {
+	//using;
+	MessagePosition _usingf0 = ((MessagePosition){});
+	JB_Msg_SyntaxUsing(Exp, (&_usingf0));
 	JB_Msg_BecomeStr(Exp, kJB_SyxDot, Comp->FuncName);
 	Message* Prm = (JB_Syx_Msg(kJB_SyxPrm, JB_LUB[0]));
 	JB_Tree_SyntaxAppend(Prm, RN);
 	JB_Tree_SyntaxAppend(Exp, Prm);
 	JB_Tree_Remove(((Message*)JB_Tree_Second(Exp)));
 	SCDecl* Ty = SC_TypeOfExpr(Exp, Name_space, nil);
-	iif (!Ty) {
-		return nil;
-	}
-	iif (RN and (JB_Tree_Obj(Prm) == SC__Comp_fnAs)) {
+	iif (Ty and (RN and (JB_Tree_Obj(Prm) == SC__Comp_fnAs))) {
 		SCClass* Cls = SC_Msg_ObjCls(RN);
 		iif (Cls) {
 			iif (!SC_Class_SyntaxIs(Cls, kSC__ClassInfo_HasSubClass)) {
 				(JB_Tree_ObjSet(Prm, SC__Comp_fnFastAs));
 			}
-			return Cls->TypeNormal;
+			Ty = Cls->TypeNormal;
 		}
 	}
+	JB_MsgPos_SyntaxUsingComplete((&_usingf0), Exp);
+	JB_MsgPos_Destructor((&_usingf0));
 	return Ty;
 }
 
@@ -37639,11 +37641,11 @@ int64 JB_Msg_Int(Message* Self, int StrStart) {
 		iif ((!F) or (!JB_Msg_EqualsSyx(Self, kJB_SyxUnit, false))) {
 			return JB_Str_TextIntegerSection(Self->Name, StrStart, Self);
 		}
-		iif (JB_Tree_SyntaxEquals(Self, 'x', false)) {
+		iif (JB_Msg_SyntaxEquals(Self, JB_LUB[86], false)) {
 			return JB_Str_HexIntegerSection(F->Name, StrStart, F);
 		}
 		Float64 Mul = JB_Str_TextDouble(F->Name, nil);
-		iif (JB_Tree_SyntaxEquals(Self, 'K', false)) {
+		iif (JB_Msg_SyntaxEquals(Self, JB_LUB[873], false)) {
 			Mul = (Mul * ((Float64)1024));
 		}
 		 else iif (JB_Msg_SyntaxEquals(Self, JB_LUB[895], false)) {
