@@ -84,11 +84,11 @@ Now lets look at a Speedie version!!
     // Linked-lists are hard to get right, far more complex than the Rust example hints at.
     
     function list.FindPosition (|int| Match, |list|)
-    	for s in self
-    		if s.Position == match
-    			return s
+        for s in self
+            if s.Position == match
+                return s
     	
-    main 
+    main
     	|| L = list()
     	L <~ list(3)
     	L <~ list(1)
@@ -127,17 +127,17 @@ You will get a crash. Yep... your "not marked as unsafe" code will crash. Cos yo
 
 The speedie code above WON'T crash if the item can't be found! Or the same alteration is made!
 
-	|| F = L.findposition(2) // gets a var and then does an 'if' block on it
-		printline f
-		F.Position = 42
+    || F = L.findposition(2) // gets a var and then does an 'if' block on it
+        printline f
+        F.Position = 42
 
 Guess what else? Wanna try remove that test? Sure? See what happens. You think Speedie will crash like other languages?
 
 Nope!
 
-	|| F = L.findposition(2)
-	printline f
-	F.Position = 42 // ERROR! "Accessing property on optional: F"
+    || F = L.findposition(2)
+    printline f
+    F.Position = 42 // ERROR! "Accessing property on optional: F"
 
 Speedie realises that `F` might not exist. And so this code won't compile. Speedie is very intelligent around figuring out what vars can be `nil` or not. So you literally get all the safety with none of the nightmare overhead of Rust.
 
