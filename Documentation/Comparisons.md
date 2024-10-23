@@ -89,20 +89,20 @@ Now lets look at a Speedie version!!
                 return s
     	
     main
-    	|| L = list()
-    	L <~ list(3)
-    	L <~ list(1)
-    	L <~ list(2)
-    	|| F = L.findposition(2)
-    		printline f
-    		F.Position = 42
-    	|| F2 = L.findposition(2)
-    		"wierd it still exists?"
-    	  else
-    		|| F3 = l.FindPosition(42)
-    			"2 was found and altered successfully"
-    		  else
-    			"where did it go?"
+        || L = list()
+        L <~ list(3)
+        L <~ list(1)
+        L <~ list(2)
+        || F = L.findposition(2)
+            printline f
+            F.Position = 42
+        || F2 = L.findposition(2)
+            "wierd it still exists?"
+          else
+            || F3 = l.FindPosition(42)
+                "2 was found and altered successfully"
+              else
+                "where did it go?"
     		
 
 Hooray we did it! Far simpler. Totally understandable. As a side-benefit, we also added 6 lines of helpful print statements code to show what is going on. You could strip that out as the original doesn't have that.
