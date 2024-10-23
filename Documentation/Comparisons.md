@@ -114,7 +114,7 @@ You should see this:
 
 Honestly, the difference is shocking and really shows how bad Rust can be.
 
-The funny thing here is that Speedie is *safer* than Rust, builds faster than Rust, and the programs runs faster too! Speedie beings Rust in the things Rust is meant to be good at!
+The funny thing here is that Speedie is *safer* than Rust, builds faster than Rust, and the programs runs faster too! Speedie beats Rust in the things Rust is meant to be good at!
 
 Note, this Rust code makes no mention of being "unsafe"!! Wow.
 
