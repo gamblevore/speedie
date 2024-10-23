@@ -388,17 +388,19 @@ function CustomFuncOp (|Message| exp, |SCOperator| comp, |SCNode|name_space, |Me
 	// a + b   --> a.operator_plus(b)
 	// a ?? b  --> a.operator_oar(b.syntaxcast?)
 	opt norefcounts
+	using exp
 	exp.become(@Dot, comp.FuncName)
 	|| prm = «prm, RN » 
 	exp <~ prm
 	exp.second.Remove
 	
-	|| ty = TypeOfExpr( exp, name_space )$
-	if rn and (prm.obj == compiler.fnAs)
+	|| ty = TypeOfExpr( exp, name_space )
+	if ty and rn and (prm.obj == compiler.fnAs)
 		|| cls = rn.ObjCls
 			if cls isnt Hassubclass
 				prm.obj = compiler.fnFastas // noice
-			return cls.typenormal
+			ty = cls.typenormal
+			
 	return ty
 
 
