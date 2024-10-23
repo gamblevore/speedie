@@ -1,0 +1,26 @@
+#!/usr/local/bin/spd
+
+// We'll just use the inbuilt list class. You would be mad not to.
+// Linked-lists are hard to get right, far more complex than the Rust example hints at.
+
+function list.FindPosition (|int| Match, |list|)
+	for s in self
+		if s.Position == match
+			return s
+	
+main 
+	|| L = list()
+	L <~ list(3)
+	L <~ list(1)
+	L <~ list(2)
+	|| F = L.findposition(2)
+	printline f
+	F.Position = 42
+	|| F2 = L.findposition(2)
+		"wierd it still exists?"
+	  else
+		|| F3 = l.FindPosition(42)
+			"2 was found and altered successfully"
+		  else
+			"where did it go?"
+		

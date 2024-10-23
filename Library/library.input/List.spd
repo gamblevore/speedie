@@ -350,13 +350,14 @@ class list (Saveable)
 	render
 		cpp_name JB_List_Render
 		visible
+		fs <~ .position
+		fs <~ ":"
 		fs <~ "("
 		for f in self
 			f.__render__(Fs)
 			fs <~ ","
 			fs <~ " "
 		fs <~ ")"
-
 
 	syntax Append (|| Last)
 		.Last = Last
@@ -525,6 +526,12 @@ class list (Saveable)
 			yield _curr (_curr)
 			_curr = _curr.parent
 		(self)
+
+
+	module // just for making a simple demo involving storing numbers.
+		function New (|| Parent=nil, |int| Position, |list|)
+			rz = list(parent)
+			rz.Position = Position
 
 
 
