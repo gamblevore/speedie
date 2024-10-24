@@ -43,8 +43,9 @@ module Math
 		cpp_wrapper (__sincospif)
 		
 	function float.SinCos (|vec2|)
-		|float| a // surely we'd have to multiply by 2 first???
+		|float| a
 		|float| b
+		self*=2
 		.__sincospi(a, b)
 		return (a, b)
 		
