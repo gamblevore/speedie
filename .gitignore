@@ -5,6 +5,8 @@ cpp.hidden
 xcuserdata/
 *nogit
 *.mz
+*.hol
+*.note
 *(ignored)*
 **/.gitignore
 
@@ -27,17 +29,13 @@ Utils/jz
 **/DerivedData/
 *.args
 
-#Notes To Self
-*.note
+#Stuff
 Speedie.scproj/Speedie.xcodeproj/xcshareddata/xcschemes/Update.xcscheme
 *.xcscheme
-Perry.scproj/perry.input/.todo
 examples/prototest.spd
 examples/prototest
-Speedie.scproj/BuildTest/strings.txt
+*.strings.txt
 examples/encoding_test(ignore).spd
-*.hol
 Library/CppLib/spdsort/spdsort.xcodeproj/project.pbxproj
 Library/CppLib/spdsort/spdsort.cpp
 Library/CppLib/spdsort/spdsort.xcodeproj/project.xcworkspace/contents.xcworkspacedata
-Examples/.strings.txt
