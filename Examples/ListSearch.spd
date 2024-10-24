@@ -1,7 +1,11 @@
 #!/usr/local/bin/spd
 
-// We'll just use the inbuilt list class. You would be mad not to.
-// Linked-lists are hard to get right, far more complex than the Rust example hints at.
+
+// 	This file is a comparison vs Rust. You can see the Rust code here.
+file:///usr/local/speedie/Documentation/Comparisons.md
+
+// We'll just use the inbuilt list class. This makes more sense, because
+// linked-lists are hard to get right, far more complex than the Rust example hints at.
 
 function list.FindPosition (|int| Match, |list|)
 	for s in self
@@ -14,13 +18,6 @@ main
 	L <~ list(1)
 	L <~ list(2)
 	|| F = L.findposition(2)
-		printline f
 		F.Position = 42
 	|| F2 = L.findposition(2)
-		"wierd it still exists?"
-	  else
-		|| F3 = l.FindPosition(42)
-			"2 was found and altered successfully"
-		  else
-			"where did it go?"
-		
+	printline f2
