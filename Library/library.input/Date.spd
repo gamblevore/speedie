@@ -53,6 +53,9 @@ datatype Date (int64)
 	operator Minus (|date| D, |duration|)
 		return self|int64| - D|int64|
 
+	operator Mod (|duration| D, |duration|)
+		return self|int64| mod D|int64|
+
 	function ReportAgo (|string|)
 		|| s = .Float64
 		|| unit = "s"
@@ -105,6 +108,20 @@ datatype Date (int64)
 
 	function int64.ToSeconds (|date|)
 		return self << 16
+
+
+	function Cycle (|duration| Length, |float|)
+		description "Returns a number between 0 and 1. This number cycles back and forth in a sinusoidal fashion."
+		opt min 3
+		|| P = .loop(length)
+		return (P.sin * 0.5) - 0.5
+
+
+	function Loop (|duration| Length, |float|)
+		description "Returns a number between 0 and 1. This number increases linearly, then resets"
+		opt min 3
+		return (self mod Length)|float| / Length|float|
+
 	
 	iterator
 		|| StartDate = date.now()

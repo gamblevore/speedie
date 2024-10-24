@@ -23,7 +23,7 @@ module GUI
 	|ivec2|						TryResizeLater
 	|date|						CmdReleaseDate
 	|date|						FrameStart
-	|date|						FrameLength
+	|duration|					FrameLength
 	|date|						LastFrameDate = 1 // wont fire otherwise
 	|date|						LastWindowClose
 	|date|						FixScreenBug
@@ -140,7 +140,7 @@ module GUI
 	helper SizeOrig (assigns:|ivec2|)
 		|| p = .ScreenPosOrig
 		|| r = (p, p + value)
-		.screenorig(r)
+		.ScreenOrig(r)
 
 
 	function Title (|string|)
@@ -171,7 +171,7 @@ module GUI
 	helper ScreenOrig (assigns:|ivec4| result, |bool|)
 		require .ScreenWindow
 		if (result.x <= 0) and (result.y <= 0)
-			|| n = .nativewindow
+			|| n = .NativeWindow
 				.SDL_FullScreen(n)
 			return true
 		|| Old = .SizeOrig
@@ -206,12 +206,14 @@ module GUI
 	
 	
 	function Run (|errorint|)
+		target !gui
+			disabled `Put "targets gui" in the app's conf section to use this!`
+
 		if !window.all.HasAny
 			"Error: Create a window first, then call GUI.run"
 			return -1
+			
 		.init
-		target !gui
-			disabled `Put "targets gui" in the app's conf section to use this!`
 		app.ClearCaches
 		|uint| n 
 		while .SingleFrame
@@ -649,18 +651,18 @@ module GUI
 			w.RunmyTasks(false)
 			w.FixFocus
 			if !dlg or w.IsLiveAction // stop needless updates
-				w.__FrameUpdate__(dlg or w.openedmenu or .IsBackground)
+				w.__FrameUpdate__(dlg or w.OpenedMenu or .IsBackground)
 		.StartResize
-		
-		
-	function Mod (|int| period, |float|)
-		opt min 3
-		return (.FrameCount mod period)|float| / period|float|
 
 
-	function Cycle (|date| amount, |float|)
-		opt min 3
-		return (.mod((amount*60).WholeSeconds).sin + 1.0) * 0.5
+	function Cycle (|duration| length, |float|)
+		opt inline
+		return .FrameStart.cycle(length)
+
+
+	function Loop (|duration| length, |float|)
+		opt inline
+		return .FrameStart.loop(length)
 	
 
 	helper NapTime (|date|)
