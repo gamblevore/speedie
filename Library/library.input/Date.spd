@@ -9,22 +9,32 @@ datatype Date (int64)
 //	syntax cast (|bool|)
 //		return self|bool|
 
-	syntax cast (|float|)
-		// are these bad? remove them??
-		cpp_Part CastFloat
-		return .Float
-	
-	syntax cast (|Float64|)
-		cpp_Part CastDouble
-		return .Float64
-	
-	
 	constants
 		Highest = 0x7FFFffffFFFFffff_
 		kOneStep = 0.000015258789 // 1.0 / 64.0K
 		kSecondsPerDay = 86400
 		kSecondsPerWeek = 604800
 		kSecondsPerMonthApprox = 2628000
+	
+//	syntax cast (|float|)
+//		// are these bad? remove them??
+//		cpp_Part CastFloat
+//		return .Float
+	
+	syntax cast (|Float64|)
+		cpp_Part CastDouble
+		return .Float64
+	
+	
+	function Seconds (|float|)
+		disabled "Use .float or .float64"
+	
+	function Float (|float|)
+		disabled "This loses seconds precision"
+		return .float64|float| // better. Or else we lose too much precision
+	
+	function Float64 (|Float64|)
+		return self|Float64| * kOneStep
 	
 	
 	syntax Compare (|float| Other, |bool|Aware, |int|)
@@ -39,16 +49,10 @@ datatype Date (int64)
 	
 //	function Rate (|Float64|) // per what, though? per-second is common, but if we are talking about per-day its another thing.
 //		return 1.0 / .Seconds 
-	
-	function Seconds (|float|)
-		disabled "Use .float or .float64"
-	
-	function Float (|float|)
-		return self|float| * kOneStep
-	
-	function Float64 (|Float64|)
-		return self|Float64| * kOneStep
-	
+
+	operator Minus (|date| D, |duration|)
+		return self|int64| - D|int64|
+
 	function ReportAgo (|string|)
 		|| s = .Float64
 		|| unit = "s"
@@ -57,7 +61,7 @@ datatype Date (int64)
 			unit = "ms"
 		return s.Render + unit
 		
-	function Ago (|date|)
+	function Ago (|Duration|)
 		if self
 			return now() - self
 	
@@ -82,14 +86,14 @@ datatype Date (int64)
 		return .Days mod 7
 	
 	function Days (|int64|)
-		return (.wholeSeconds / kSecondsPerDay)
+		return (.wholeSeconds / date.kSecondsPerDay)
 	
 	function Minutes (|int64|) // needs 48 bits!
 		return .wholeSeconds / 60
 
 	function MonthsApprox (|int64|)
-		return (.wholeSeconds / kSecondsPerMonthApprox)
-
+		return (.wholeSeconds / date.kSecondsPerMonthApprox)
+	
 	function WeekOfYear (|int|)
 		return .Weeks mod 52
 	
@@ -132,3 +136,14 @@ datatype Date (int64)
 			return .timestamp.hash
 
 
+datatype Duration (date)
+	function Float (|float|)
+		return .float64|float| // better. Or else we lose too much precision
+
+	function WholeSeconds (|int64|) // needs 48 bits!
+		return self >> 16
+	
+	syntax cast (|float|)
+		// are these bad? remove them??
+		cpp_Part CastFloat
+		return .Float	

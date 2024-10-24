@@ -362,7 +362,7 @@ function TypeOfUnit (ExprResolver)
 	  elseif unit == "th"
 		Mul = 0
 	  else
-		type = typedate!
+		type = TypeDuration!
 		|Float64| s4 = 64.0*1024.0
 		if unit == "s"
 			mul = s4
@@ -400,7 +400,7 @@ function TypeOfUnit (ExprResolver)
 	|| CanFloat = type.typeinfo.isfloat
 	if !CanFloat// and !(type == typeint and mul != 0.0)
 		CanFloat = it.name contains '.'
-	if type == typedate
+	if type == TypeDuration
 		str = val|int64|.render
 		
 	  elseif CanFloat

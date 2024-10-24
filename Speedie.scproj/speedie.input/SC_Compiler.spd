@@ -10,6 +10,7 @@
 |SCClass|	TypeInt
 |SCClass|	TypeInt16
 |SCClass|	TypeDate
+|SCClass|	TypeDuration
 |SCClass|	TypeInt64
 |SCClass|	TypeuInt16
 |SCClass|	TypeuInt
@@ -256,6 +257,7 @@ function InitTypes (|bool|)
 	Typeivec3			= compiler["ivec3"]
 	Typeivec4			= compiler["ivec4"]
 	Typedate			= compiler["date"]
+	TypeDuration		= Compiler["duration"]
 	TypeJBClass			= Compiler["classdata"]
 	TypeTask			= Compiler["task"]
 	TypeObject			= Compiler["object"]
