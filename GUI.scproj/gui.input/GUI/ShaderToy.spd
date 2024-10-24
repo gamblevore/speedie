@@ -44,18 +44,9 @@ class ShaderToy (window)
 			|| Col = (.Shader)(self, size, pv, XY)
 			c <~ col
 				
-	
-	
-	function Moved (|vec3|)
-		|ivec3| k
-		k.y = keys.SPACE[] - keys.LSHIFT[]
-		k.z = keys.W[]     - keys.S[]
-		k.x = keys.D[]     - keys.A[]
-		return k.vec3
-
-	
+		
 	behaviour FrameUpdate
-		|| m = .moved
+		|| m = keys.vec3
 			.cam += m * 0.2
 			printline "cam: " + .cam.Render
 		GUI.touch
