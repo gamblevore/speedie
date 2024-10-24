@@ -55,7 +55,7 @@ linkage
 
 |SCNode|					VisibleFuncs = SCNode("Visible")
 |SCNode|					Interpreter = SCNode("Interpreter")
-|File|						BaseProjectPath
+|File|						BaseProjectPath  // projectfolder, projfol
 |string|					OriginalInputPath
 |File|						_BuildFolder
 |String|					_Projects
