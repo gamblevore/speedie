@@ -5,18 +5,29 @@
 */
 
 // probably the capcity should just be raw byte capacity.
-// seems to make more sense... right? 
+// seems to make more sense... right?
+// I think we could replace this with a "byte-slice" type!
+// basically it would be a pointer, that has a Size/Length stored before the data.
+// It must be refcounted, to replace the array class. So thats 3 ints
+// We'll also need a death-action, but that can be stored within the refcount
+// what about "locking" the data, so we can safely iterate over it quickly?
+// won't that need another int? Perhaps...
+// In fact... its not possible to reallocate ANYHOW... because if it moves
+// we've fückéd it. Anything that has a ref to it, no longer does.
+// Perhaps reallocation has to come via an array-wrapper object...
+// So the array-wrapper object can refer to a byte-slice. I guess the slice
+// can do locking, though.
+
 class Memory
 	linkage
 		cpp_part Mrap
 		cpp_class MWrap
 		pragma noearlyfree
 	
-	|int|				Capacity
+	|int|				BufferSize
 	|&byte|				_Ptr
 	|int|				Length
 	|uint16|			ItemSize
-	|DataTypeCode|		DataType
 	|byte|				DeathAction
 	contains byte // should be byte?
 	
@@ -26,7 +37,7 @@ class Memory
 		.ItemSize = ItemSize
 		.deathaction = deathaction
 		.length = 0
-		.Capacity = itemcount
+		.buffersize = itemcount
 		._ptr = ptr
 	
 	
@@ -44,8 +55,8 @@ class Memory
 		return (._ptr + .BytesUsed)|&...|
 		
 	setter Length (|int|)
-		if Value > .Capacity
-			value = .Capacity
+		if Value > .buffersize
+			value = .buffersize
 		  elseif Value < 0
 			value = 0
 		.length = Value
@@ -86,7 +97,7 @@ class Memory
 		
 	function AppendPlace (|&...|)
 		|| L = .length
-		if (L >= .Capacity)
+		if (L >= .buffersize)
 			// try grow
 			|| NewSize = .itemsize*L*2
 			|| P2 = Memory.realloc(._ptr, NewSize)
@@ -104,21 +115,21 @@ class Memory
 		random.shared.temporal(self)
 	
 		
-	setter Capacity	(|int|)
-		.setcap(value) // shouldn't be necesary!!
+	setter Size	(|int|)
+		.setsize(value) // shouldn't be necesary!!
 		// image(class) is setting .capacity but not coming here, even when called like: .capacity(n)
 
 	
-	function SetCap (|int| value, |bool|)
+	function SetSize (|int| value, |bool|)
 		require .deathaction == DataObject.kfree
 		|| S = .itemsize|int|
-		|| old = S * .capacity
+		|| old = S * .buffersize
 		|| New = S * value
 		if new == old
 			return true // right?
 		|| Mem = Memory.realloc(._ptr, New)
 			._ptr = mem
-			.Capacity = Value
+			.buffersize = Value
 			if value < .length
 				.length = value
 			if New > Old
@@ -127,10 +138,10 @@ class Memory
 		error (self, "Can't allocate enough bytes: " + new.render)
 
 	function HasSpare (|bool|)
-		return .Length < .Capacity
+		return .Length < .buffersize
 	
 	function ByteCapacity (|int|)
-		return .ItemSize|int|*.Capacity|int|
+		return .ItemSize|int|*.buffersize|int|
 	
 	
 	function BytesUsed (|int|)

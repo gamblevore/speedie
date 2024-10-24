@@ -16,7 +16,7 @@ class Image (memory)
 		cpp_Part ConstructorPointer
 		super.constructor(s.area, 4, P)
 		.name = name
-		.length = .capacity 
+		.length = .buffersize 
 		.SizeInfo = s
 	
 
@@ -139,14 +139,14 @@ class Image (memory)
 	
 	function ResizeTo (|ivec2| value, |bool|)
 		|| N = value.area
-		if .capacity == n // same already
+		if .buffersize == n // same already
 			.length = n
 			.sizeinfo = value
 			return true
 		
 		// !.deathaction means our memory is externally managed, so we assume its already been resized.
-		if !.deathaction  or .setcap(N)
-			.capacity = n // setcap might not be called if !.deathaction
+		if !.deathaction  or .setsize(N)
+			.buffersize = n // setcap might not be called if !.deathaction
 			.length = n
 			.SizeInfo = value
 			return true
@@ -154,7 +154,7 @@ class Image (memory)
 	
 	function DrawGradientV (|ivec4| r, |vec4| B, |vec4| T)
 		if B == T
-			return .RectBasic(r, b)
+			return .DrawRect(r, b)
 		|| hz = r.horz
 		|| vt = r.vert
 		|| Step = 1.0 / (vt[1] - vt[0])|float|
@@ -170,7 +170,7 @@ class Image (memory)
 	
 	
 	function Clear (|imagepixel| Color=colors.black)
-		.RectBasic((0,0,.size), color)
+		.DrawRect((0,0,.size), color)
 	
 	
 	function Pixels (|&imagepixel|)
@@ -404,7 +404,7 @@ class Image (memory)
 	
 	function LoadEmpty (|int| W, |int| H, |bool|)
 		if (.size.x != W or .size.y != h)
-			.Capacity = w * h
+			.buffersize = w * h
 			.SizeInfo = (w,h)
 		return .Pixels
 	
@@ -444,14 +444,14 @@ class Image (memory)
 		using g
 			g.edge.alpha = alpha
 			g.bg.a = 0
-			.RectOutlined(r, G, AllowEdge)
+			.DrawRectOutlined(r, G, AllowEdge)
 
 
-	function RectStyled (|ivec4| R, |DrawStyle?| G=nil, |uint| Side=3)
+	function DrawRectStyled (|ivec4| R, |DrawStyle?| G=nil, |uint| Side=3)
 		|| D = g.Drawer?
 			(D)(self, r, G!, side == 2)
 		  else
-			.RectOutlined(r, g)
+			.DrawRectOutlined(r, g)
 
 		
 	function Rotate (|image| Dest, |bool| Right=true)
@@ -481,7 +481,7 @@ class Image (memory)
 			
 				
 		
-	function RectBasic (|ivec4| Rect, |ImagePixel| Color)
+	function DrawRect (|ivec4| Rect, |ImagePixel| Color)
 		cpp_part SimpleRectSub
 		require Color.a
 		if color.a != 255
@@ -495,7 +495,7 @@ class Image (memory)
 				sigh[0] = color
 
 
-	function RectOutlineOnly (|ivec4| R, |ImagePixel| Edge, |imagepixel| attached_edge=imagepixel.clear, |MoveCode| AllowEdge=MoveCode.all)
+	function DrawOutlineOnly (|ivec4| R, |ImagePixel| Edge, |imagepixel| attached_edge=imagepixel.clear, |MoveCode| AllowEdge=MoveCode.all)
 		require Edge.a
 		// not sure why this is so complicated.
 		// did I do something wrong? is all my code off by 1 or something?
@@ -520,15 +520,15 @@ class Image (memory)
 		.DrawLineH(P,  r.width,  C)
 
 
-	function RectOutlined (|ivec4| Rect, |drawstyle?| g, |MoveCode| AllowEdge=movecode.all)
+	function DrawRectOutlined (|ivec4| Rect, |drawstyle?| g, |MoveCode| AllowEdge=movecode.all)
 		|| Outline = g.SafeEdge
 		|| BG = g.safebg
 
 		|| InnerRect = Rect ± (!BG.equals(outline))|int|
 		
-		.RectBasic(InnerRect, BG)
+		.DrawRect(InnerRect, BG)
 		if rect!=InnerRect
-			.RectOutlineOnly(rect, outline, bg, AllowEdge)
+			.DrawOutlineOnly(rect, outline, bg, AllowEdge)
 	
 	
 	function Invert 
@@ -594,7 +594,7 @@ class Image (memory)
 
 	
 //	function Fill (|DrawStyle| G)
-//		.RectStyled(._controlclip, G)
+//		.DrawRectStyled(._controlclip, G)
 
 
 	

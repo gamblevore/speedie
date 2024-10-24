@@ -112,7 +112,7 @@ struct Random
 		|| after = (mem.ptr + mem.ByteCapacity - 7)|&uint64|
 		while p < after
 			p++[] = .int
-		mem.Length = mem.Capacity
+		mem.Length = mem.buffersize
 	
 	function Init
 		if !.store
