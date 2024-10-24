@@ -172,7 +172,13 @@ helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |AS
 		return .BranchAnd(A, B, Dest)
 
 	ifn ml.isbool and mr.isbool
-		return .BoolValue(A, dest, opp, b)
+		if "AndOrRest".trap
+			debugger
+		|| asdas = .BoolValue(A, dest, opp, b)
+		if "AndOrRest".trap
+			.printprogress(exp.parent.parent)
+			debugger
+		return asdas
 	return .BoolFromBools(exp, dest, opp, ml, mr)			// No consts via .existingvar		
 	
 			
@@ -204,7 +210,7 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 		if first is ConstAny
 			return .BoolConst1(b, dest, opp, first)					// x = 5 or Y() --> x = Y()
 	
-	|| JUMP = .BoolTestAndJump(a.next!, first, opp)
+	|| JUMP = .BoolTestAndJump(a.next!, first, opp)					// AND/OR here.
 	|| Second = .µBoolInto(B, first)
 	if Second is ConstAny											// Wow this is frustrating!
 		.NOP(jump)
@@ -216,6 +222,15 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 /		return first
 
 	return .Exists(dest, first, a.next!)							// first.reg == dest.reg
+
+
+function PrintProgress (|message| exp)
+	"---"
+	printline exp.parent.parent
+	|| Curr = .FuncStart
+	while curr < .curr
+		curr.debugprint
+		curr++
 
 
 function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asmreg|)

@@ -309,10 +309,10 @@ function ASMState.PackMakerInit (|bool|)
 
 
 function ASMState.Alloc (|memory of fatasm| j, |bool|)
-	if j.SetCap(4MB)
+	if j.SetSize(4MB)
 		.start = j.ptr
 		.curr = .start
-		.end = j.Capacity + .start
+		.end = j.buffersize + .start
 		spdassembler.Guard
 		Ancients <~ j
 		return true

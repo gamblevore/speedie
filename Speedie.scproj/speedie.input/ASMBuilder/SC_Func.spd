@@ -21,10 +21,10 @@ class µFunc
 			return .testing
 		rz = asm[.length*3]$
 		.testing = rz
-		rz.length = rz.capacity
+		rz.length = rz.buffersize
 		|| p = rz.ptr
 		|| after = .µRender(P, P+rz.length)
-		rz.capacity = after-p
+		rz.size = after-p
 	
 	// cosmic lore unfold... into tales untold
 	

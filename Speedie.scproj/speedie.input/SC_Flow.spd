@@ -19,4 +19,7 @@ target Debug
 			if msg
 				printline msg
 			return true
-
+  else
+	function string.trap (|message| msg=nil, |bool|)
+		(msg)
+		visible
