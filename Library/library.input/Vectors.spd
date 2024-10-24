@@ -5,6 +5,10 @@ datatype vec4
 		cpp_part Bool
 		return self != vec4()	
 	
+	operator ± (|float| i, |vec4|)
+		cpp_part Shrink
+		return (.x+i, .y+i, .z-i, .w-i)
+	
 	syntax Equals (|vec4| v, |bool|Aware, |bool|)
 		return (.x == v.x) and (.y == v.y) and (.z == v.z) and (.w == v.w) 
 	
@@ -73,7 +77,7 @@ datatype vec4
 		return R
 	
 	render
-		fs <~ "${.x}, ${.y}, ${.z}, ${.w}"
+		fs <~ "(${.x}, ${.y}, ${.z}, ${.w})"
 	
 	module
 		function New (|vec4|)
