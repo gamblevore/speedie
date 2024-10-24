@@ -18,10 +18,10 @@ extend_module app
 			.alert(q)
 	
 	function Alert (|string| Q)
-		if sdlapp.StartedProperly
+		if GUI.StartedProperly
 			ConfirmIt(q, "", ["OK"])
 		  else
-			sdlapp.PendingAlerts <~ q
+			GUI.PendingAlerts <~ q
 
 
 function ConfirmCancel (|string| Q,  |string| Title="",  |int|)
@@ -59,7 +59,7 @@ function ConfirmWindow_.Resize (|string| s)
 	|| desired = .question.TextSize(s) + (12, 34)
 	|| actual = desired max (200, 100)
 	actual = actual min (350, 450)
-	actual = actual min (SDLApp.Screensize.x2y2 - 8)
+	actual = actual min (GUI.Screensize.x2y2 - 8)
 	.size = actual.layout
 
 

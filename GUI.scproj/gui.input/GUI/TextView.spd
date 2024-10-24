@@ -123,7 +123,7 @@ class TextView (GUIControl)
 	behaviour GotFocus
 		if (.isinline or .singleline) and !.selrange.width
 			.selrange = .text.length
-		sdlapp.SelChanged
+		GUI.SelChanged
 		super.gotfocus
 
 
@@ -295,7 +295,7 @@ class TextView (GUIControl)
 
 	helper TypingPlaceChanged (|bool| insert, |textviewline| d)
 		if .hasfocus
-			sdlapp.selchanged
+			GUI.selchanged
 		if !.IsCleared
 			(.OnSelChanged)(self, 0, insert)?
 		d ?= .FindDrawInfo(.sel0)
@@ -409,7 +409,7 @@ class TextView (GUIControl)
 	helper MoveSel (|int| i, |bool|)
 		opt norefcounts
 		debug_require i
-		sdlapp.showcursor(false)
+		GUI.showcursor(false)
 
 		|| t = ._TypingPlace
 		|| x = t.x2
@@ -516,7 +516,7 @@ class TextView (GUIControl)
 		if (i inrange lim) and (mode isnt wantagoodview)
 			return d
 		.StartLine(mode) = d.movecapped(-before) 
-		sdlapp.touch(self)
+		GUI.touch(self)
 		return d
 
 
@@ -562,7 +562,7 @@ class TextView (GUIControl)
 	helper MoveSelLine (|int| i, |int| Page, |bool|)
 		opt norefcounts
 		debug_require i
-		sdlapp.showcursor(false)
+		GUI.showcursor(false)
 		if !page
 			page = (keys.Option)|int|
 			target osx
@@ -621,7 +621,7 @@ class TextView (GUIControl)
 		if oncl and (self isnt editable) and (key.isaccept or key.IsCmm)
 			(oncl)(self)
 			return true			
-		if (key is RGUI or LGUI) and sdlapp.CursorVisible
+		if (key is RGUI or LGUI) and GUI.CursorVisible
 			.ShowExtraInfo(.mousexy)
 	
 
@@ -960,7 +960,7 @@ class TextView (GUIControl)
 
 		if r.TrySetError(e) or !.MyError
 			.MyError ?= e
-			sdlapp.touch(Self)
+			GUI.touch(Self)
 			return r
 
 
@@ -1006,7 +1006,7 @@ class TextView (GUIControl)
 			|| Rect = (s-2.5, s+2.5)
 			rect.y1-=2
 			rect.y2-=2
-			sdlapp.Screen.DrawCircle2( Rect,  C1 )
+			GUI.Screen.DrawCircle2( Rect,  C1 )
 
 
 	helper message.LastAfter (|int| IgnoreAfter, |ind|)
@@ -1259,7 +1259,7 @@ class TextView (GUIControl)
 
 	helper Typed (|string| s, |int|)
 		debug_require self is editable
-		SdlApp.ShowCursor(false)
+		GUI.ShowCursor(false)
 		
 		if .CounterPartType(s)
 			return 2
@@ -1365,7 +1365,7 @@ class TextView (GUIControl)
 		|| d = (1, -1)(fwd)
 		if !.deletekeysub(d)
 			beep
-		sdlapp.showcursor(false)
+		GUI.showcursor(false)
 		return true
 
 
@@ -1473,12 +1473,12 @@ class TextView (GUIControl)
 			.DrawSelRange(Where, r, g)
 		  elseif .ShouldDrawSel
 			|| Cp = (1.0, 1.0, 1.0, 0.666).px
-			Where.RectBasic(.SelectorRect(r.x), Cp)
+			Where.DrawRect(.SelectorRect(r.x), Cp)
 	
 	
 	helper ShouldDrawSel (|bool|)
 		opt norefcounts
-		require sdlapp.FlashSelector and !.hasinline and .window.islast
+		require GUI.FlashSelector and !.hasinline and .window.islast
 		if .hasfocus
 			return true
 		|| p = .parent
@@ -1775,7 +1775,7 @@ class TextView (GUIControl)
 	helper ReallySetStart (|textviewline!| d)
 		opt norefcounts
 		._Start = d
-		.ShowExtraInfo(sdlapp.mousexy, false)
+		.ShowExtraInfo(GUI.mousexy, false)
 		if d.position >= 0
 			|| doc = .document
 				doc.scrollpos = d.position

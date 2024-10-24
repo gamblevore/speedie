@@ -460,7 +460,7 @@ function ClickedError (GUIListEvent)
 			ide.ClickedError(row)
 		  else
 			ide.ClickedFind(row)
-	  elseif sdlapp.event is mousedown
+	  elseif GUI.event is mousedown
 		if !.Start and ide.filelist isnt visible
 			clickedaview(ide.ViewFiles)
 	return true

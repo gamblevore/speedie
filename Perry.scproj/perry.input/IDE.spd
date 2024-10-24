@@ -107,14 +107,14 @@ class PerryIDE (Window)
 	function PerryError (|error?|) 
 		opt norefcounts
 		if keys.shift
-			|| u = sdlapp.tooltip.useable
+			|| u = GUI.tooltip.useable
 				return u
 		|| e = .editme.myerror.useable(0)
 			if .editme.ParsedMessage				// don't show simple parse errors
 				return e
 			if .editme.expectsparse >= textview.probablyjeebox
 				return e
-		return sdlapp.tooltip.useable
+		return GUI.tooltip.useable
 	
 	
 	function PerryStatus (|string|)
@@ -226,7 +226,7 @@ class PerryIDE (Window)
 					fs <~ "no source found"
 		
 		  elseif i == 3
-			|| img = sdlapp.screen.size.area*4*2
+			|| img = GUI.screen.size.area*4*2
 			|| PS = PicoGlobalStats.Read 
 			fs <~ "Obj ${app.ObjMemory.strsize}   "
 			fs <~ "Str ${app.stringmemory.strsize}   "
@@ -301,7 +301,7 @@ class PerryIDE (Window)
 			.editme.SetFocus // make it simple
 			super.show
 		.id = .name
-		sdlapp.Title = .id
+		GUI.Title = .id
 
 
 	helper UpdateSearchSwap (|textview|)
@@ -321,7 +321,7 @@ class PerryIDE (Window)
 		|| other = .UpdateSearchSwap #require 
 		|| rf = .RealFocus // what if they just used the same document??
 			|| t = rf.text // sigh
-			sdlapp.LastSearch = t
+			GUI.LastSearch = t
 			if other.text != t
 				other.text = t
 				other.Selrange = 0
@@ -433,7 +433,7 @@ class PerryIDE (Window)
 		.ReadLog
 		.PopupDisplayFadeIn
 		
-		|| fc = sdlapp.FrameCount|int|
+		|| fc = GUI.FrameCount|int|
 		require .IsFront
 		if fc+1 isa 64
 			require !.ProjClosed

@@ -282,7 +282,7 @@ class ListView (GUIControl) {
 			willsel.ChangeSel(true)
 			.SelectedEvent( willsel )
 
-		sdlapp.touch(self)
+		GUI.touch(self)
 		if Update
 			.touch				// setmodified
 	
@@ -500,7 +500,7 @@ class ListView (GUIControl) {
 	
 	function CheckDrawUpdate
 		if ._ScrollDrawTimer and !.inscrollarea(.mousexy)
-			sdlapp.Touch(self)
+			GUI.Touch(self)
 
 
 	function EnableDrag
@@ -1194,7 +1194,7 @@ class ListView (GUIControl) {
 
 	helper RowBorderDraw (|ListViewrow| curr, |ListViewrow| find, |int| add, |image| where, |drawstyle| g)
 		|| r = .RowBounds(curr, find, add)
-			where.RectStyled(r, g)
+			where.DrawRectStyled(r, g)
 	
 	
 	helper ListViewRow.CalculateSkip (|ListViewRow| prev, |int| n, |int|)
@@ -1319,7 +1319,7 @@ class ListView (GUIControl) {
 				if !shl
 					real = 0
 			.ScrollRealigner = real
-			sdlapp.touch(Self)
+			GUI.touch(Self)
 		return shl
 
 
@@ -1328,7 +1328,7 @@ class ListView (GUIControl) {
 			.ScrollPixelsSub(rem)
 			.bumpscroll
 			.ScrollRealigner = (48, 0)(.scrollshift)
-			sdlapp.touch(self)
+			GUI.touch(self)
 
 
 	function ScrollEnd (|listviewrow|)
@@ -1398,11 +1398,11 @@ class ListView (GUIControl) {
 			re = re up .rowheight
 			if !.draggingrowto.prev
 				re = re down 2
-			where.RectStyled(re, ¥.border)
+			where.DrawRectStyled(re, ¥.border)
 		
 		.SetInlineSize
 		
-		where.RectOutlineOnly(.lastrect, .gnormal.edge, .gnormal.bg, ~.FindAttachedEdge)
+		where.DrawOutlineOnly(.lastrect, .gnormal.edge, .gnormal.bg, ~.FindAttachedEdge)
 
 		if .CanSeeAllLines
 			.ScrollDrawTimer = 0

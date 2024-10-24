@@ -58,5 +58,5 @@ class ShaderToy (window)
 		|| m = .moved
 			.cam += m * 0.2
 			printline "cam: " + .cam.Render
-		SDLApp.touch
+		GUI.touch
 

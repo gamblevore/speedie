@@ -82,7 +82,7 @@ function AppMenuHelp (GuiMenuEvent)
 
 
 function AppMenuQuit (GuiMenuEvent)
-	sdlapp.WantsQuit = true
+	GUI.WantsQuit = true
 
 
 function AppMenuAbout (GuiMenuEvent)

@@ -7,7 +7,7 @@ datatype SDL_KeyMod (int)
 		cpp_part KM
 	
 	syntax access (|bool|)
-		return (self|uint|) & (sdlapp.keymod|uint|)
+		return (self|uint|) & (GUI.keymod|uint|)
 
 	syntax is (|sdl_keymod| k, |bool|)
 		return (self & k) != 0
@@ -90,7 +90,7 @@ dataType Keys (int) {
 	
 	function IsFirstFrame (|bool|)
 		|| i = keys.has(self)
-			return keys.downdate[i] == sdlapp.framestart
+			return keys.downdate[i] == GUI.framestart
 		
 	function Length (|float|)
 		|| i = keys.has(self)
@@ -155,7 +155,7 @@ dataType Keys (int) {
 		helper AddKey (|keys| K)
 			if (.count < 8) and !.has(K)
 				|| i = .count++
-				.DownDate[i] = sdlapp.FrameStart
+				.DownDate[i] = GUI.FrameStart
 				.DownKeys[i] = K
 				
 		function RemoveKey (|keys| K, |int|)

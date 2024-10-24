@@ -27,7 +27,7 @@ module Notifications
 			sz = (width)~left  by  (h)~up back height
 		  elseif ago < 5.0									// stay
 			sz = (width)~left  by  (height)~up back height
-		  elseif !(w contains sdlapp.mousexy)				// swap-direction
+		  elseif !(w contains GUI.mousexy)				// swap-direction
 			w.CreatedDate = date.now
 			w.tag = nil
 				
@@ -60,7 +60,7 @@ module Notifications
 	function Draw  // drawnotifications, drawnote
 		opt norefcounts
 		for w in .Alerts
-			w.drawwindow(sdlapp.Screen)
+			w.drawwindow(GUI.Screen)
 
 
 	function CheckForDisappear

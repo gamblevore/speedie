@@ -97,11 +97,11 @@ class ButtonView (GUIControl)
 	behaviour MouseMove
 		opt norefcounts
 		if (state is enter or leave)
-			sdlapp.touch
+			GUI.touch
 		|| item = .itemat(p.x)
 		if .CurrOverItem != item
 			.CurrOverItem = item
-			sdlapp.touch
+			GUI.touch
 			(.onover)(self, state|int|, item)?
 
 
@@ -221,7 +221,7 @@ class ButtonView (GUIControl)
 		if .MenuIsOpen
 			grow = nil
 		
-		|| M = SDLApp.MouseXY
+		|| M = GUI.MouseXY
 		|| MouseXInside = R.x1x2 contains M.x
 		|| clicked = .MouseIsDown and mouseXinside and !.NoDrawClicked
 		|| strength = 1.0
@@ -229,8 +229,8 @@ class ButtonView (GUIControl)
 		|| WillDrawFocus = clicked and i and .ClickedItem
 		|| fader = 1.0
 		if i is Active
-			strength += (SDLApp.cycle(1.25s)*0.95)-0.2
-			SDLApp.Touch
+			strength += (GUI.cycle(1.25s)*0.95)-0.2
+			GUI.Touch
 		  else
 			fader = .declutterer.strength					#require
 			
@@ -258,7 +258,7 @@ class ButtonView (GUIControl)
 				g.edge = .FocusBorderStyle.edge
 				g.edge.Alpha = 1.0
 			g.Strengthen(fader)
-			Where.RectStyled(Grow, G)
+			Where.DrawRectStyled(Grow, G)
 		
 		if !i and .SubMenu
 			i = .SubMenu!.ListSource // allow these text to be added.
@@ -276,7 +276,7 @@ class ButtonView (GUIControl)
 					if ago > 4	// perhaps something like soft-explode or at least half-pixels
 						ago = 4 // also the maths is wrong somehow...
 					  else
-						sdlapp.Touch
+						GUI.Touch
 					pn.y -= (ago-4.0)|int|
 				  elseif .MenuIsOpen
 					pn.y += 4

@@ -27,7 +27,7 @@ class Slider (GuiControl)
 	function SilentValue (assigns:|float|v)
 		.value = v.clamp
 		if .DrawPos(.value) != .lastdrawpos
-			sdlapp.touch(Self)
+			GUI.touch(Self)
 	
 	
 	setter Value (|float|)
@@ -43,7 +43,7 @@ class Slider (GuiControl)
 		.value = value
 		.InitialValue = false
 		if diff
-			sdlapp.touch(Self)
+			GUI.touch(Self)
 		(.onslide)(self)?
 	
 		
@@ -110,7 +110,7 @@ class Slider (GuiControl)
 		|| D  = s.width > s.height
 		|| x  = 0 + !D 
 		|| x2 = 2 + !D 
-		Where.RectStyled(s, .Gnormal)
+		Where.DrawRectStyled(s, .Gnormal)
 		
 		|| y  = .DrawPos(.value)
 		.lastDrawPos = y
@@ -124,7 +124,7 @@ class Slider (GuiControl)
 			s2[x] = y
 			s2[x2] = y
 			|| px = colors.white(0.15)
-			Where.RectBasic(s2, px)
+			Where.DrawRect(s2, px)
 		
 		where.DrawCircleStyled(s, .gnormal)
 

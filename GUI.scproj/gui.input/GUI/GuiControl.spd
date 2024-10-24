@@ -74,7 +74,7 @@ class GUIControl (list)
 		|| G = .GNormal
 		using g
 			g.Strengthen(.declutterer.strength)
-			Where.RectStyled(.lastrect, g)
+			Where.DrawRectStyled(.lastrect, g)
 	virtual PostLoad
 		0
 	virtual Copy
@@ -195,7 +195,7 @@ class GUIControl (list)
 		if f & guicontrolflags.visible
 			if self is TrapVisibleChange
 			#!VisibleChange
-			sdlapp.resized(self)
+			GUI.resized(self)
 
 	function Decluttering (|bool|)
 		return .Declutterer.final
@@ -211,14 +211,14 @@ class GUIControl (list)
 	
 	function Touch (|int| Amount = 2)
 		opt norefcounts
-		if sdlapp.TouchCount < amount
-			sdlapp.touchcount = Amount
+		if GUI.TouchCount < amount
+			GUI.touchcount = Amount
 		(.window is modified)
 
 	setter ScrollDrawTimer (|uint|)
 		if ._ScrollDrawTimer != value
 			._ScrollDrawTimer = value
-			sdlapp.touch(self)
+			GUI.touch(self)
 
 	function BumpScroll (|int| extra = 0)
 		.ScrollDrawTimer = ScrollInfo.timer-extra
@@ -227,7 +227,7 @@ class GUIControl (list)
 		|| t = (value.clamp * 4.0K)|int|
 		if ._TransitionFraction != t
 			._TransitionFraction = t
-			sdlapp.resized(self)
+			GUI.resized(self)
 	
 	
 	function Transition (|int| Value, |int| field, |movecode| matching, |int|)
@@ -441,7 +441,7 @@ class GUIControl (list)
 		if w.alphasubtle
 			remain += 0.5s
 		if remain > 0
-			sdlapp.touch(Self)
+			GUI.touch(Self)
 			|| f2 = (remain)|float| / 1s|float|
 			if w.alphasubtle
 				f2 *= 0.2
@@ -475,7 +475,7 @@ class GUIControl (list)
 		require (self and text != .text)
 		.text = text
 		.TextAlteredForDraw |= 2
-		sdlapp.Touch(Self)
+		GUI.Touch(Self)
 		return true	
 	
 	

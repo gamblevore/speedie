@@ -195,7 +195,7 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
 				JB_App__CrashInstall();
 				if (getppid() > 1)
 					PicoGlobalConf()->SuicideIfParentDies = true;
-				// default Pico to suicide, if run. SDLapp.init will reset this.
+				// default Pico to suicide, if run. GUI.init will reset this.
 			}
 			atexit(JB_KillChildrenOnExit);
 			

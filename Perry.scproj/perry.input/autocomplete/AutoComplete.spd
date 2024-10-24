@@ -178,7 +178,7 @@ function PerryIDE.DisplayStr (|message| f, |date|)
 function PerryIDE.DisplayInPopup (|string| s,  |bool| instant,  |vec4| Color=vec4(),  |ivec2| Corner=.PopupDisplayCorner)
 	// using GUITask would be better... sigh.
 	|| sizer_str = s.wrap(80)
-	|| size = .PopupDisplay.TextSize(sizer_str) + (8, 2) // i think textsize isnt accurate. so no amount of +8 or +5
+	|| size = .PopupDisplay.TextSize(sizer_str) + (10, 2) // i think textsize isnt accurate. so no amount of +8 or +5
 	// will get it right, as it alters per whatever
 	(size.x max= 40)
 	if Corner.x < 0
@@ -224,7 +224,7 @@ function PerryIDE.PopupDisplayFadeInSub (|bool|)
 	|| g = .PopupDisplay.GNormal
 	|| New = (alpha * 255.0)|int|
 	if g.BG.a != New
-		sdlapp.touch
+		GUI.touch
 	g.BG.a = New
 	g.Text.a = New
 	return true
@@ -305,7 +305,7 @@ function EditMeModified (guitextevent)
 	
 	if (reason != documentstate.saving) and !i.DuringTempView
 		|| x = .sel1
-		if !sdlapp.IsTyping
+		if !GUI.IsTyping
 			i.InteractUpdate
 		  elseif !i.DuringLoad and (.sel0 == x)
 			|| b = self[x]

@@ -6,10 +6,10 @@ main // main {
 	if x!=z
 	if app.Yes("crash")
 		app.Crash
-	SDLApp.Init
+	GUI.Init
 	Perry.Startup
 	notifications.ShowTip( file://tips.box )
-	return SDLApp.Run
+	return GUI.Run
 	
 
 function app.InitColors

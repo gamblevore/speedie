@@ -76,7 +76,7 @@ struct TimeFader
 		if remy > 0
 			|| str = remy.float * .Scale
 			if touch
-				sdlapp.touch
+				GUI.touch
 			rz = str.clamp
 			if rz == 0.0
 				.final = 0
@@ -87,7 +87,7 @@ struct TimeFader
 			return now >= f
 
 	function Value (assigns:|bool|)
-		sdlapp.touch
+		GUI.touch
 		if value
 			.final = date.now
 			.scale = 1.0
@@ -97,7 +97,7 @@ struct TimeFader
 		
 
 	function Fire (|float| Seconds, |float| Delay = 0.0,  assigns:|bool|)
-		sdlapp.touch
+		GUI.touch
 		if value
 			.final = date.now + (seconds+delay).date
 			.scale = 1.0 / seconds

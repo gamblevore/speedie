@@ -4,12 +4,12 @@
 // openfile,  filedialog,  folderdialog,  askfile,  openfolder
 
 function app.AskOpen (|string| types, |string| base="", |string|question="", |string|accept="Open", |string| Restore="", |string|)
-	require sdlapp.StartedProperly
+	require GUI.StartedProperly
 	return OpenSaveRequest(types, base, accept, false, question, restore)
 
 
 function app.AskSave (|string| SingleType, |string| base="", |string|question="", |string|accept="Save", |string| Restore="",   |string|)
-	require sdlapp.StartedProperly
+	require GUI.StartedProperly
 	if SingleType contains ','
 		error "Can't save with multiple extensions"
 		return string.error
@@ -58,7 +58,7 @@ function OpenSaveRequest (|string| types,  |string| base,  |string| Accept,  |bo
 	|| p = w.path.text
 	if p.FileExists
 		OpenSaveDialog.LastDir[restoredir??types] = p
-		sdlapp.Saveprefs // nicer
+		GUI.Saveprefs // nicer
 	
 
 

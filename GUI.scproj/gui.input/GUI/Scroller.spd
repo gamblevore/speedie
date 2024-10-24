@@ -35,7 +35,7 @@ helper textview.SLH (|vec3|)
 extend guicontrol {
 function CanDrawScroll (|bool|)
 	opt NoRefCounts
-	return (._ScrollDrawTimer > 1) or (!sdlapp.MouseButtons and .InScrollArea(.mousexy))
+	return (._ScrollDrawTimer > 1) or (!GUI.MouseButtons and .InScrollArea(.mousexy))
 
 
 function DrawScroll (|vec3| slh, |image?| where=nil, |float|)
@@ -43,7 +43,7 @@ function DrawScroll (|vec3| slh, |image?| where=nil, |float|)
 	require .CanDrawScroll
 	
 	|| t = ._ScrollDrawTimer
-	|| mb	= sdlapp.MouseButtons
+	|| mb	= GUI.MouseButtons
 	if !.MouseNotDownOverOther
 		if where
 			.ScrollDrawTimer = 0
@@ -65,9 +65,9 @@ function DrawScroll (|vec3| slh, |image?| where=nil, |float|)
 	if s
 		|| scr = ¥.scroll
 		using scr
-		sdlapp.touch
+		GUI.touch
 		scr.Strengthen(s)
-		where.RectStyled(R, scr)
+		where.DrawRectStyled(R, scr)
 	  else
 		._ScrollDrawTimer = 0
 
@@ -91,7 +91,7 @@ function HandleMouseInScrollArea (|ivec2| p, |&uint| timer, |bool|)
 	if .HasFocus or timer[]
 		if .InScrollArea(p)
 			timer[] = ScrollInfo.TimerStart + date.ticks
-			sdlapp.touch
+			GUI.touch
 			return true
 
 

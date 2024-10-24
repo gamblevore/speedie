@@ -1,6 +1,6 @@
 
 
-module SDLApp
+module GUI
 	linkage
 		cpp_part App
 	|image|						Screen = image("read")
@@ -206,6 +206,10 @@ module SDLApp
 	
 	
 	function Run (|errorint|)
+		if !window.all.HasAny
+			"Error: Create a window first, then call GUI.run"
+			return -1
+		.init
 		target !gui
 			disabled `Put "targets gui" in the app's conf section to use this!`
 		app.ClearCaches
@@ -288,7 +292,7 @@ module SDLApp
 
 	function SavePrefs
 		if app._prefs
-			app.prefmsg("screen") = sdlapp.ScreenOrig.List
+			app.prefmsg("screen") = GUI.ScreenOrig.List
 			app.SavePrefs
 
 
@@ -313,7 +317,7 @@ module SDLApp
 	
 	
 	function IsFullScreen (assigns:|bool|)
-		|| n = sdlapp.NativeWindow
+		|| n = GUI.NativeWindow
 			.SDL_FullScreen(n, (value<<1)-1)
 		
 	function IsFullScreen (|bool|)
@@ -323,7 +327,7 @@ module SDLApp
 	helper BumpSize
 		description "Fixes a MacOSX bug. Not my fault!" 
 		.FixScreenBug = 0
-		|| n = sdlapp.NativeWindow
+		|| n = GUI.NativeWindow
 			|| was = .IsFullScreen
 			.SDL_FullScreen(n, -1)
 			if was
@@ -358,11 +362,11 @@ module SDLApp
 	
 	
 	function Init (|ivec2| s=(414,256), |int| FullScreen=0) // startup
+		require !.framelength
 		pico.GlobalConfig.SuicideIfParentDies = false
 		pico.start
 		target !gui
 			disabled `Put "targets gui" in the app's conf section to use this!`
-		require !.framelength
 		.FrameLength = 180th.date
 		.openedfirst = date.now
 		app.PrefsInit(.openedfirst)
@@ -374,7 +378,7 @@ module SDLApp
 		
 		.GUICheck
 		if !font.small
-			sdlapp.Alert("Exitting...", "SmallFont not loaded.")
+			GUI.Alert("Exitting...", "SmallFont not loaded.")
 			app.quit
 		.FastToolTipDate = 1
 
@@ -402,12 +406,12 @@ module SDLApp
 	
 	
 	helper TrySelectorFlash
-		if !.IsBackground and (sdlapp.ChangeSelFlash.fired)
+		if !.IsBackground and (GUI.ChangeSelFlash.fired)
 			.FlashSelector = !.FlashSelector
 			.Touch
 			if .ChangeSelFlash == 1
 				.FlashSelector = true
-			sdlapp.ChangeSelFlash = date.now + 1s
+			GUI.ChangeSelFlash = date.now + 1s
 
 
 	function ClearAlerts
@@ -465,7 +469,7 @@ module SDLApp
 		|| AllowTyping = !f or (f is editable) or (f isa menu)  or (f isa textview)
 		if (f isa textview)
 			if (!f.SelRange.width)
-				sdlapp.TrySelectorFlash
+				GUI.TrySelectorFlash
 		
 		require .TextInputEnabled != AllowTyping
 		.TextInputEnabled = AllowTyping
@@ -504,7 +508,7 @@ module SDLApp
 		|| i = 0
 		for w in window.all
 			if w is NewlyShown
-				sdlapp.Resized(w)
+				GUI.Resized(w)
 				(w isnt newlyshown)
 			if w is visible
 				if rz
@@ -593,7 +597,7 @@ module SDLApp
 	helper Window.Reflow (|bool| UsePrev = true, |ivec4|)
 		opt norefcounts
 		|| p = .parent ?? window.all
-		|| D = sdlapp.Screen
+		|| D = GUI.Screen
 		|| BigRect = d.rect
 		|| rect = (0,0,0,0)
 		|| b = .prev
@@ -633,7 +637,7 @@ module SDLApp
 		rz = ago*Scale*4.0
 		if rz > Scale
 			return scale
-		sdlapp.Touch
+		GUI.Touch
 
 
 	function FrameUpdatesAndResize
@@ -694,7 +698,7 @@ module SDLApp
 
 	helper CheckQuarantine
 		if platform.osx and app.isQuarantined
-			sdlapp.alert("Please drag this app to the /Applications/ folder to stop MacOSX quarantining it.", "Quarantine Warning" )
+			GUI.alert("Please drag this app to the /Applications/ folder to stop MacOSX quarantining it.", "Quarantine Warning" )
 
 
 	helper Rescale (|float| NewScale, |bool|)
@@ -798,7 +802,7 @@ module SDLApp
 		|| rf = w.realfocus
 			if keys.cmd
 				if (key is g)
-					if !rf.__Search__(sdlapp.lastsearch, false)
+					if !rf.__Search__(GUI.lastsearch, false)
 						beep
 					return true
 				if (key is f) and !(keys.shift or keys.option)
@@ -841,7 +845,7 @@ module SDLApp
 			(reason is windowclose     )
 		  elseif reason is windowclose
 			.LastWindowClose = date.now
-			require sdlapp.AskQuit
+			require GUI.AskQuit
 		
 		.IsQuitting = true
 		if .DidCloseDialogs and .DidCloseDocuments(reason)
@@ -1187,11 +1191,11 @@ module SDLApp
 		|| info = ""
 		ifn r isa textview  and  r is editable
 			info = r.Description
-		|| delay = (0.0s, 1.5s)(!sdlapp.FastToolTipDate.fired)
+		|| delay = (0.0s, 1.5s)(!GUI.FastToolTipDate.fired)
 		|| now = date()
 		|| t = .tooltip
 		if t.name and t.when.fired
-			sdlapp.FastToolTipDate = now + 1s
+			GUI.FastToolTipDate = now + 1s
 		t.when = now + delay
 		t.name = info
 

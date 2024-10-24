@@ -520,7 +520,7 @@ extend PerryIDE
 			m.first.remove
 			m.position--
 		if .CommsLogList.IsViewable
-			SDLApp.Touch
+			GUI.Touch
 	
 	
 	function LogOneComm (|message| msg, |string| type="")
@@ -585,7 +585,7 @@ extend PerryIDE
 		StartupWindow.hide
 		.viewasproject
 		.AskCheck
-		SDLApp.SavePrefs // for pref-file editing
+		GUI.SavePrefs // for pref-file editing
 		.ShowIDE
 		.ViewAsbetter
 		.LoadStartupErrors

@@ -22,7 +22,7 @@
 	function UnRegister
 		app.Unregistered = true
 		.code = ""
-		sdlapp.saveprefs
+		GUI.saveprefs
 
 	function app.RegStartup
 		|| r = app._conf..registration
@@ -69,7 +69,7 @@
 			|| Code = ("Please enter your registration code\n\n" + reason + err).ask$
 			err = .TestFailed(code)
 			if !err
-				sdlapp.saveprefs
+				GUI.saveprefs
 				beep "Serial accepted!"
 				return true
 	

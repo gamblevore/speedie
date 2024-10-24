@@ -40,8 +40,8 @@ class Window (GUIControl)
 	
 	
 	helper SubConstructor (|ControlRect| Size)
-		if !sdlapp.framelength
-			sdlapp.init()
+		if !GUI.framelength
+			GUI.init()
 		.size = Size
 		.createddate = date.now
 		.InlineEditorPlace.Init(self)
@@ -66,7 +66,7 @@ class Window (GUIControl)
 			¥.DrawBackground(where)
 		
 		if a > 0
-			where.RectStyled(.lastrect.soothe, .GNormal, 1)
+			where.DrawRectStyled(.lastrect.soothe, .GNormal, 1)
 	
 	
 	behaviour AppForegroundChanged
@@ -101,7 +101,7 @@ class Window (GUIControl)
 	function RunAsMain (|ErrorInt|)
 		.IsLiveAction = true // probably true
 		.show
-		return SDLApp.run
+		return GUI.run
 
 	syntax cast (|ErrorInt|)
 		return .RunAsMain
@@ -110,7 +110,7 @@ class Window (GUIControl)
 		require !(Cancel)() and self isnt visible // recursive... sigh
 		.OpenDialog
 		.returnvalue = nil
-		while sdlapp.SingleFrame
+		while GUI.SingleFrame
 			rz = .returnvalue
 			if rz or (Cancel)()
 				exit
@@ -143,8 +143,8 @@ class Window (GUIControl)
 			.alphafader = 0
 		
 		.FocusWasSet = true // for stop mousedown bug
-		sdlapp.UpdateTextFocus(self)
-		sdlapp.touch(Self)
+		GUI.UpdateTextFocus(self)
+		GUI.touch(Self)
 
 
 	helper SetFocus (|guicontrol| Focus)
@@ -171,15 +171,15 @@ class Window (GUIControl)
 
 	syntax is (|guicontrolflags| F, assigns:|bool|)
 		require self
-		|| n = sdlapp.nativewindow
+		|| n = GUI.nativewindow
 			if (f == guicontrolflags.Modified) and ((self is modified) != value)
-				sdlapp.JB_SDL_SetModified(n, value)
+				GUI.JB_SDL_SetModified(n, value)
 		super.syntaxis(f) = value
 
 
 	behaviour MouseWheel
 		opt norefcounts
-		|| XY = sdlapp.MouseXY
+		|| XY = GUI.MouseXY
 		|| it = .OpenedMenu()
 		if it and it.lastrect.Contains(xy)
 			return it.__MouseWheel__(P, direction)
@@ -353,15 +353,15 @@ class Window (GUIControl)
 	
 	
 	function ClearDrops
-		sdlapp.candrag = 0
-		sdlapp.drawdrag = nil
+		GUI.candrag = 0
+		GUI.drawdrag = nil
 		.DroppingInto = nil
 		.currmousedown = nil
 
 
 	function DoDragAcrossControls (|ivec2| P, |guicontrol| r, |bool|)
-		sdlapp.drawdrag ?= r.CopyList
-		if sdlapp.drawdrag
+		GUI.drawdrag ?= r.CopyList
+		if GUI.drawdrag
 			|| dest = r.CanPasteInto(self[p, true])
 			.DroppingInto = dest
 			if dest
@@ -386,7 +386,7 @@ class Window (GUIControl)
 		
 		if !Beyond
 			require (r.lastrect ± -20) contains p
-		sdlapp.candrag = R.__mousedown__(p, -1)
+		GUI.candrag = R.__mousedown__(p, -1)
 
 	
 	syntax access (|ivec2| P, |bool|fordrag=false, |guicontrol|)
@@ -419,25 +419,25 @@ class Window (GUIControl)
 		.isdialog = true
 		window.all			<~ self
 		is visible
-		sdlapp.StartResize // sigh
+		GUI.StartResize // sigh
 
 
-	helper sdlapp.AskQuit (|bool|) // !sdlapp.askquit
+	helper GUI.AskQuit (|bool|) // !GUI.askquit
 		debugger
 		|| q = "Quit " + app.AppName + "?"
 		return q.confirm
 	
 	
 	function Close (|SDLCloseReason| reason=SDLCloseReason.windowclose, |bool|)
-		if !sdlapp.wantsquit and (reason < SDLCloseReason.tryquit)
+		if !GUI.wantsquit and (reason < SDLCloseReason.tryquit)
 			if (window.DocumentCount == 1)  and  !.isdialog
-				require sdlapp.AskQuit and !.__CancelClose__(reason)
+				require GUI.AskQuit and !.__CancelClose__(reason)
 				.disposeall(true)
-				sdlapp.wantsquit = true
+				GUI.wantsquit = true
 				return true
 
 		|| cancelled = .__CancelClose__(reason)
-		if !cancelled or (reason is terminating) or sdlapp.WantsQuit
+		if !cancelled or (reason is terminating) or GUI.WantsQuit
 			.DisposeAll(true) // its probably OK????
 			return true
 
@@ -454,7 +454,7 @@ class Window (GUIControl)
 		|| M = .openedmenu 
 			|| O = .focus
 			if (m contains p) and (m is enabled)
-				SdlApp.CanDrag = M.__mousedown__(p, clicks)
+				GUI.CanDrag = M.__mousedown__(p, clicks)
 				return m
 			
 			m.CloseMenu
@@ -464,7 +464,7 @@ class Window (GUIControl)
 		.FocusWasSet = false
 		|| Found = .ControlAt(p.point, 0, true)
 			|| clicks2 = Found.__MouseDown__(p, clicks)
-				SdlApp.CanDrag = clicks2 * (clicks2 > mousedragging.handled)
+				GUI.CanDrag = clicks2 * (clicks2 > mousedragging.handled)
 				if !.FocusWasSet and (found != .innerfocus)
 					.setfocus(Found)
 				return Found
@@ -481,7 +481,7 @@ class Window (GUIControl)
 	function SmartRunTask (|taskgui| P,  |bool| Animated, |bool|)
 		|| s = p.StartTime
 		|| e = s + p.duration
-		|| now = sdlapp.LastFrameDate
+		|| now = GUI.LastFrameDate
 		if now >= s
 			if now > e
 				require p isnt finished
@@ -493,7 +493,7 @@ class Window (GUIControl)
 		|| Prog = p.progress(now)
 		|| ok = (p)(self, Prog)
 		if p is Animation
-			sdlapp.touch
+			GUI.touch
 		if p isnt Finished
 			return ok
 			 
@@ -582,13 +582,13 @@ struct SDL_Texture
 
 
 function window.MouseXY (|ivec2|)
-	return sdlapp.MouseXY - .lastrect.xy
+	return GUI.MouseXY - .lastrect.xy
 
 
 function guicontrol.MouseXY (|ivec2|)
 	opt norefcounts
 	|| w = .window
-		return sdlapp.mousexy - w.lastrect.xy
+		return GUI.mousexy - w.lastrect.xy
 
 
 

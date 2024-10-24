@@ -10,12 +10,12 @@ struct ControlSize
 	setter G (|int| i, |ControlPoint|)
 		if .gsize[i] != value
 			.GSize[i] = value
-			sdlapp.resized
+			GUI.resized
 	
 	function SetSize (|controlrect| GSize) // only one we need, right?
 		ifn .gsize equals gsize
 			.GSize = gsize
-			sdlapp.resized
+			GUI.resized
 	
 	function ivec4.OperatorEquals (|ivec4| v, |bool|) // sigh
 		for i in 4
@@ -50,7 +50,7 @@ struct ControlSize
 		rz = .sizer.Calculate(parent, prev, Hard, self)
 		if .LastRect!=rz
 			.LastRect = rz
-			sdlapp.NeedMouseMove = true
+			GUI.NeedMouseMove = true
 			.__Resized__()
 		if !.hasany
 			return rz

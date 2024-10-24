@@ -126,7 +126,7 @@ role ListViewRow (message)
 		rect = (rect.x+1, y, rect.x2, y+1)
 		|| v = (1.0, 1.0, 1.0, 0.25*str)
 		|| A = v.px
-		where.RectBasic(Rect, A) 
+		where.DrawRect(Rect, A) 
 	
 	
 	function DrawDividerH (|ivec4| z2, |image| Where, |ListView| p, |int| i)
@@ -159,14 +159,14 @@ role ListViewRow (message)
 		
 		if self is Grayed
 			|| gr = colors.gray(0.4*str)
-			where.RectBasic(z2 + (0,0,0,-1), gr)
+			where.DrawRect(z2 + (0,0,0,-1), gr)
 			
 		if self is found
 			z2 += (0, 1, 0, 0)
 			z2.y2 = z2.y + 1
 			|| edge = ¥.textselection.edge
 			edge.Alpha *= str
-			where.RectBasic(z2, edge)
+			where.DrawRect(z2, edge)
 
 
 	function DrawRowColumn (|ivec4| rect, |image| Where, |ListView| Parent, |int| Depth, |int| Column, |float| str)

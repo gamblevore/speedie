@@ -249,7 +249,7 @@ class TextViewLine (list)
 		  elseif r.x2==m.x2
 			sel.x2++
 
-		Where.RectStyled(sel, g)
+		Where.DrawRectStyled(sel, g)
 
 
 	function SetLineNum (|int| t, |int|)
@@ -332,9 +332,9 @@ helper textview.DrawError (|image| Where, |int| y, |TextViewLine| D)
 	if e is parse
 		|| Alpa = (e.when.ago.float - 1.0) * lm
 		if (Alpa <= lm)
-			sdlapp.touch(Self)
+			GUI.touch(Self)
 		v.a = alpa min lm
-	where.RectBasic(r, v.px)
+	where.DrawRect(r, v.px)
 
 
 //helper textview.DrawFound (|image| Where, |int| y, |TextViewLine| D)
@@ -344,7 +344,7 @@ helper textview.DrawError (|image| Where, |int| y, |TextViewLine| D)
 //	r.y2 = y + 2
 //	|| add = (0.15, 0.0)(d is currfound)
 //	|| v = (0.6+Add, 0.5+Add, 0.1+Add, 0.4).px
-//	where.RectBasic(r, v)
+//	where.DrawRect(r, v)
 
 
 helper textview.DrawLighter (|image| Where, |int| y)
@@ -352,7 +352,7 @@ helper textview.DrawLighter (|image| Where, |int| y)
 	r.y		= y + 1
 	r.y2	= y + .lineheight + 1
 	|| col	= (1.0, 1.0, 1.0, 0.06).px
-	where.RectBasic(r, col)
+	where.DrawRect(r, col)
 
 
 helper TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,  |imagepixel| lc,  |int|)

@@ -36,7 +36,7 @@ class GraphicsEditor (GuiControl)
 		return .merged.size
 	
 	behaviour Draw
-		where.RectBasic(self, .gnormal.bg)
+		where.DrawRect(self, .gnormal.bg)
 		.merged.Drawcentered(where, .gnormal)
 
 
@@ -116,7 +116,7 @@ class GraphicsEditor (GuiControl)
 		|| img2 = image(s.yx)
 			.Merged.Rotate(img2, right)
 			.Merged = img2
-			SDLApp.Touch
+			GUI.Touch
 	
 		
 	function DoBG (|int| size=3)

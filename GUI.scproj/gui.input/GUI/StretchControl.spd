@@ -117,7 +117,7 @@ class StretchDivider (GuiControl)
 		(.OnStretch)(self)?
 
 	behaviour Resized
-		.InTest(sdlapp.mousexy, true)
+		.InTest(GUI.mousexy, true)
 		
 
 	function Collapsed (|bool|)
@@ -215,9 +215,9 @@ class StretchDivider (GuiControl)
 		|| Out = MightBeOut and !(.lastrect contains P)
 		|| dateout = !.entered
 		if Out != dateout
-			sdlapp.touch(Self)
+			GUI.touch(Self)
 			.Entered = (0, date())(out)
-		if sdlapp.MouseButtons is left
+		if GUI.MouseButtons is left
 			|| d = date()-0.75s
 			if .Entered > d
 				.Entered = d
@@ -236,7 +236,7 @@ class StretchDivider (GuiControl)
 		|| f = (diff.float - 0.6)*2.0
 		rz = f.clamp
 		if rz >= 0 and rz < 1.0
-			sdlapp.touch(Self)
+			GUI.touch(Self)
 
 
 	behaviour Draw

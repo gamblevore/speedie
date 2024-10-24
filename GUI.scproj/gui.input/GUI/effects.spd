@@ -32,7 +32,7 @@ struct JeeboxEffects
 		for r in img.tile((size, size))
 			|| c = .cols[.rnd.int & 7]
 			c.a = a
-			img.RectBasic(r, c)
+			img.DrawRect(r, c)
 			
 
 	function MakeBoxes (|image| img, |int| seed)
@@ -53,7 +53,7 @@ struct JeeboxEffects
 		
 		|| src = img.tile((img.size+1)/2)
 		for (t in src) (i)
-			img.RectBasic(t, col[i])
+			img.DrawRect(t, col[i])
 		
 	
 	function image.blur (|float| sigma)

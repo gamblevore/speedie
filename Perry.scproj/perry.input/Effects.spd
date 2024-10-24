@@ -32,4 +32,4 @@ module Effects
 			Alpha *= str * .Strength
 			|| C1 = (1.0, 1.0, 2.0, alpha)
 			|| Rect = (s-2.5, s+2.5)
-			sdlapp.Screen.DrawCircle2( Rect,  C1 )
+			GUI.Screen.DrawCircle2( Rect,  C1 )

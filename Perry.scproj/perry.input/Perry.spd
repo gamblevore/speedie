@@ -30,7 +30,7 @@ module Perry
 		|| line = (0, 0)
 		|| path = arg.ExtractPathAndLine(line)
 		require path.FileExists or path.write("")
-		|| ide = sdlapp.OpenDocument(path)
+		|| ide = GUI.OpenDocument(path)
 		if ide isa PerryIDE
 			ide.editme.ViewLineAndSel(line.x)
 			return ide
@@ -94,8 +94,8 @@ module Perry
 
 	
 	function Startup (GUIApplicationInit)
-		target lin: sdlapp.removeborder // doesnt seem to work in Windows WSL?
-		sdlapp.AppDocumentOpen = &PerryIDE.PerryOpenDoc
+		target lin: GUI.removeborder // doesnt seem to work in Windows WSL?
+		GUI.AppDocumentOpen = &PerryIDE.PerryOpenDoc
 		stderr.LogFile = "PerryErrors.txt"
 		app.InitColors
 		¥.LoadDefaults
@@ -197,7 +197,7 @@ function View (|ButtonView| btn, |bool| CanChangeFocus=true)
 	// consistancy
 	if (btn == .viewsearch)
 		.MassSearchField.setfocus
-		.masssearchfield.text = SDLApp.LastSearch
+		.masssearchfield.text = GUI.LastSearch
 		changed = false
 	  elseif (btn == .viewerrors)
 		.SwitchedToErrors

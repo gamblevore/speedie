@@ -30,7 +30,7 @@ class StartupWindow (window) // splashscreen, startupscreen, startwindow
 			with .create
 				if !vis
 					.hide
-				  elseif sdlapp.startedproperly
+				  elseif GUI.startedproperly
 					(it)()
 				  else
 					.show
