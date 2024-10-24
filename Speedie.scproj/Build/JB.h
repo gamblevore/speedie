@@ -235,6 +235,8 @@ typedef ASM ASM_U4;
 
 typedef ASM ASM_Write;
 
+typedef Date Duration;
+
 typedef Date HumanDate;
 
 struct ASMVarType;
@@ -680,7 +682,7 @@ struct ArgArrayCounter {
 };
 
 struct CompressionStats {
-	Date Duration;
+	Duration Duration;
 	int In;
 	int Out;
 	bool Live;
@@ -905,10 +907,9 @@ struct Memory_Behaviour: Object_Behaviour {
 };
 
 JBClass ( MWrap , JB_Object , 
-	int Capacity;
+	int BufferSize;
 	byte* _Ptr;
 	int Length;
-	DataTypeCode DataType;
 	u16 ItemSize;
 	byte DeathAction;
 );
@@ -1818,6 +1819,7 @@ extern SCClass* SC_TypeCharSet;
 extern SCClass* SC_TypeCodePoint;
 extern SCClass* SC_TypeDate;
 extern SCClass* SC_TypeDictionary;
+extern SCClass* SC_TypeDuration;
 extern SCClass* SC_TypeFastString;
 extern SCClass* SC_Typefloat;
 extern SCClass* SC_TypeFloat16;
@@ -4737,13 +4739,15 @@ Dictionary* JB_TC__Types();
 
 
 // Date
-Date JB_Date_Ago(Date Self);
+Duration JB_Date_Ago(Date Self);
 
 int JB_Date_DayOfWeek(Date Self);
 
 int64 JB_Date_Days(Date Self);
 
-float JB_Date_Float(Date Self);
+Float64 JB_Date_Float64(Date Self);
+
+Duration JB_Date_OperatorMinus(Date Self, Date D);
 
 JB_String* JB_Date_RenderDurr(Date Self, FastString* Fs_in);
 
@@ -5215,6 +5219,11 @@ ASM* JB_ASM_U4__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 // ASM_Write
 ASM* JB_ASM_Write__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+
+
+
+// Duration
+float JB_Duration_Float(Duration Self);
 
 
 
@@ -6027,6 +6036,8 @@ bool SC_Pac_PackMakerInit(ASMState* Self);
 
 ASMReg SC_Pac_Plus(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
+void SC_Pac_PrintProgress(ASMState* Self, Message* Exp);
+
 uint64 SC_Pac_PrmCollect(ASMState* Self, Message* Prms, SCFunction* Fn, bool Native);
 
 uint64 SC_Pac_PrmCollectNative(ASMState* Self, Message* Prms, SCFunction* Fn);
@@ -6783,8 +6794,6 @@ int JB_Macro__Init_();
 
 
 // JB_Memory
-void JB_Mrap_CapacitySet(MWrap* Self, int Value);
-
 MWrap* JB_Mrap_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Ptr, uint /*byte*/ DeathAction);
 
 void JB_Mrap_Destructor(MWrap* Self);
@@ -6793,7 +6802,9 @@ void JB_Mrap_LengthSet(MWrap* Self, int Value);
 
 byte* JB_Mrap_Ptr(MWrap* Self);
 
-bool JB_Mrap_SetCap(MWrap* Self, int Value);
+bool JB_Mrap_SetSize(MWrap* Self, int Value);
+
+void JB_Mrap_SizeSet(MWrap* Self, int Value);
 
 Array* JB_Mrap__CollectLeaks_(JB_Object* Self);
 
@@ -7277,6 +7288,8 @@ bool JB_Str_EqualsInt(JB_String* Self, int Other, bool Aware);
 void JB_Str_Fail(JB_String* Self);
 
 JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in);
+
+bool SC_Str_trap(JB_String* Self, Message* Msg);
 
 JB_String* JB_Str_Shorten(JB_String* Self, int N);
 

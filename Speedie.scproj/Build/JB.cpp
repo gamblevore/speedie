@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2147];
+extern JB_StringC* JB_LUB[2149];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -751,7 +751,7 @@ void SC_Comp__CompileTime() {
 		(--JB__Flow_Disabled);
 		 0;
 	});
-	Date Elapsed = ({
+	Duration Elapsed = ({
 		Date Starttime = JB_Date__Now();
 		(SC_Comp__CompileAll());
 		 (JB_Date_Ago(Starttime));
@@ -1929,6 +1929,7 @@ bool SC_Comp__InitTypes() {
 	JB_SetRef(SC_TypeiVec3, SC_Comp__FindClassName(JB_LUB[1651], 0));
 	JB_SetRef(SC_TypeiVec4, SC_Comp__FindClassName(JB_LUB[1652], 0));
 	JB_SetRef(SC_TypeDate, SC_Comp__FindClassName(JB_LUB[1492], 0));
+	JB_SetRef(SC_TypeDuration, SC_Comp__FindClassName(JB_LUB[1290], 0));
 	JB_SetRef(SC_TypeJBClass, SC_Comp__FindClassName(JB_LUB[1451], 0));
 	JB_SetRef(SC_TypeTask, SC_Comp__FindClassName(JB_LUB[350], 0));
 	JB_SetRef(SC_TypeObject, SC_Comp__FindClassName(JB_LUB[211], 0));
@@ -2673,7 +2674,7 @@ void SC_Comp__TestTask() {
 void SC_Comp__Timer(JB_String* Name) {
 	Date Curr = JB_Date__Now();
 	iif (SC__Comp_LastTime) {
-		SC_Comp__TimerSub(SC__Comp_LastTimeName, ((int)(Curr - SC__Comp_LastTime)));
+		SC_Comp__TimerSub(SC__Comp_LastTimeName, ((int)(JB_Date_OperatorMinus(Curr, SC__Comp_LastTime))));
 	}
 	iif ((!JB_Str_Exists(Name)) and (!SC__Options_Silent)) {
 		JB_Obj_Print(SC__Comp_TimerOutput);
@@ -3452,7 +3453,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2024102311));
+	JB_FS_AppendInt32(_fsf0, (2024102416));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -7981,16 +7982,13 @@ void SC_Crkt__CorrectFile(JB_File* Where) {
 }
 
 void SC_Crkt__CorrectStrings() {
-	JB_File* _tmPf0 = SC_Comp__GeneratedCppsFolder();
-	JB_Incr(_tmPf0);
-	JB_File* F = JB_File_SyntaxAccess(_tmPf0, JB_LUB[1283]);
+	JB_File* F = ((JB_File*)JB_Ternaryy(JB_Str_Exists(SC__Options_SingleFileInput), SC_Comp__GeneratedCppsFolder(), SC__Comp_BaseProjectPath));
 	JB_Incr(F);
-	JB_Decr(_tmPf0);
-	iif (SC__Options_SelfReplacement) {
-		JB_SetRef(F, SC_Comp__SpeedieDir(JB_LUB[1290]));
-	}
-	SC_Crkt__CorrectFile(F);
+	JB_File* Strs = JB_File_SyntaxAccess(F, JB_LUB[2148]);
+	JB_Incr(Strs);
 	JB_Decr(F);
+	SC_Crkt__CorrectFile(Strs);
+	JB_Decr(Strs);
 }
 
 int SC_Crkt__Count() {
@@ -8113,7 +8111,7 @@ void SC_Crkt__WriteTable(FastString* Fs) {
 void JB_Terminal__Display() {
 	Date Now = JB_Date__Now();
 	iif (JB__Terminal_LastDisplay) {
-		JB_Date__Sleep((JB__Terminal_LastDisplay + (65536 / 60)) - Now);
+		JB_Date__Sleep(JB_Date_OperatorMinus((JB__Terminal_LastDisplay + (65536 / 60)), Now));
 	}
 	 else {
 		JB_PrintLine(JB_LUB[1802]);
@@ -8879,7 +8877,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2024102311));
+	JB_FS_AppendInt32(_fsf0, (2024102416));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -14325,7 +14323,7 @@ SCObject* SC_TypeOfUnit(Message* Exp, SCNode* Name_space, Message* Side) {
 		Mul = 0;
 	}
 	 else {
-		Type = SC_TypeDate;
+		Type = SC_TypeDuration;
 		Float64 S4 = ((Float64)(64.0f * 1024.0f));
 		iif (JB_Str_Equals(Unit, JB_LUB[119], false)) {
 			Mul = S4;
@@ -14379,7 +14377,7 @@ SCObject* SC_TypeOfUnit(Message* Exp, SCNode* Name_space, Message* Side) {
 	iif (!CanFloat) {
 		CanFloat = JB_Str_ContainsByte(It->Name, '.');
 	}
-	iif (Type == SC_TypeDate) {
+	iif (Type == SC_TypeDuration) {
 		JB_SetRef(Str, JB_int64_Render(((int64)Val), nil));
 	}
 	 else iif (CanFloat) {
@@ -18812,9 +18810,9 @@ Dictionary* JB_TC__Types() {
 }
 
 
-Date JB_Date_Ago(Date Self) {
+Duration JB_Date_Ago(Date Self) {
 	iif (Self) {
-		return JB_Date__Now() - Self;
+		return JB_Date_OperatorMinus(JB_Date__Now(), Self);
 	}
 	return 0;
 }
@@ -18827,8 +18825,12 @@ int64 JB_Date_Days(Date Self) {
 	return (JB_Date_WholeSeconds(Self) / kJB__Date_kSecondsPerDay);
 }
 
-float JB_Date_Float(Date Self) {
-	return ((float)Self) * kJB__Date_kOneStep;
+Float64 JB_Date_Float64(Date Self) {
+	return ((Float64)Self) * ((Float64)kJB__Date_kOneStep);
+}
+
+Duration JB_Date_OperatorMinus(Date Self, Date D) {
+	return ((int64)Self) - ((int64)D);
 }
 
 JB_String* JB_Date_RenderDurr(Date Self, FastString* Fs_in) {
@@ -19910,6 +19912,11 @@ ASM* JB_ASM_Write__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo) 
 		Curr++[0] = Rz;
 	}
 	return Curr;
+}
+
+
+float JB_Duration_Float(Duration Self) {
+	return ((float)JB_Date_Float64(Self));
 }
 
 
@@ -21062,11 +21069,11 @@ void JB_ClassData_Restore(JB_Class* Self) {
 
 
 float JB_MzSt_Durr(CompressionStats* Self) {
-	Date D = Self->Duration;
+	Duration D = Self->Duration;
 	iif (D < 0) {
 		D = (D + JB_Date__New0());
 	}
-	return JB_Date_Float(D);
+	return JB_Duration_Float(D);
 }
 
 void JB_MzSt_End(CompressionStats* Self) {
@@ -22501,10 +22508,10 @@ ASMReg SC_Pac_AddOrSubtractInt(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, 
 }
 
 bool SC_Pac_Alloc(ASMState* Self, MWrap* J) {
-	iif (JB_Mrap_SetCap(J, 4194304)) {
+	iif (JB_Mrap_SetSize(J, 4194304)) {
 		Self->Start = ((FatASM*)JB_Mrap_Ptr(J));
 		Self->Curr = Self->Start;
-		Self->End = (J->Capacity + Self->Start);
+		Self->End = (J->BufferSize + Self->Start);
 		SC_SpdAssembler__Guard();
 		JB_Array_SyntaxAppend(SC__Pac_Ancients, J);
 		return true;
@@ -22532,7 +22539,13 @@ ASMReg SC_Pac_ASMBoolBadnessMadness(ASMState* Self, Message* Exp, ASMReg Dest, O
 		return SC_Pac_BranchAnd(Self, A, B, Dest);
 	}
 	iif (!(SC_Reg_IsBool(Ml) and SC_Reg_IsBool(Mr))) {
-		return SC_Pac_BoolValue(Self, A, Dest, Opp, B);
+		iif (SC_Str_trap(JB_LUB[2147], nil)) {
+		}
+		ASMReg Asdas = SC_Pac_BoolValue(Self, A, Dest, Opp, B);
+		iif (SC_Str_trap(JB_LUB[2147], nil)) {
+			SC_Pac_PrintProgress(Self, ((Message*)JB_Ring_Parent(((Message*)JB_Ring_Parent(Exp)))));
+		}
+		return Asdas;
 	}
 	return SC_Pac_BoolFromBools(Self, Exp, Dest, Opp, Ml, Mr);
 }
@@ -23345,6 +23358,22 @@ ASMReg SC_Pac_Plus(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp
 		return SC_Pac_AddOrSubtractInt(Self, Dest, L, R, Exp);
 	}
 	return SC_Pac_FloatPlus(Self, Dest, L, R, Exp);
+}
+
+void SC_Pac_PrintProgress(ASMState* Self, Message* Exp) {
+	JB_PrintLine(JB_LUB[1283]);
+	Message* _tmPf1 = ((Message*)JB_Ring_Parent(Exp));
+	JB_Incr(_tmPf1);
+	Message* _tmPf0 = ((Message*)JB_Ring_Parent(_tmPf1));
+	JB_Incr(_tmPf0);
+	JB_Decr(_tmPf1);
+	JB_Obj_PrintLine(_tmPf0);
+	JB_Decr(_tmPf0);
+	FatASM* Curr = Self->FuncStart;
+	wwhile (Curr < Self->Curr) {
+		SC_FAT_DebugPrint(Curr);
+		(++Curr);
+	};
 }
 
 uint64 SC_Pac_PrmCollect(ASMState* Self, Message* Prms, SCFunction* Fn, bool Native) {
@@ -27826,19 +27855,14 @@ int JB_Macro__Init_() {
 }
 
 
-void JB_Mrap_CapacitySet(MWrap* Self, int Value) {
-	JB_Mrap_SetCap(Self, Value);
-}
-
 MWrap* JB_Mrap_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Ptr, uint /*byte*/ DeathAction) {
 	iif (Self == nil) {
 		Self = ((MWrap*)JB_NewClass(&MWrapData));
 	}
-	Self->DataType = kJB__TC_UnusedType;
 	Self->ItemSize = ItemSize;
 	Self->DeathAction = DeathAction;
 	Self->Length = 0;
-	Self->Capacity = ItemCount;
+	Self->BufferSize = ItemCount;
 	Self->_Ptr = Ptr;
 	return Self;
 }
@@ -27850,8 +27874,8 @@ void JB_Mrap_Destructor(MWrap* Self) {
 }
 
 void JB_Mrap_LengthSet(MWrap* Self, int Value) {
-	iif (Value > Self->Capacity) {
-		Value = Self->Capacity;
+	iif (Value > Self->BufferSize) {
+		Value = Self->BufferSize;
 	}
 	 else iif (Value < 0) {
 		Value = 0;
@@ -27863,12 +27887,12 @@ byte* JB_Mrap_Ptr(MWrap* Self) {
 	return ((byte*)Self->_Ptr);
 }
 
-bool JB_Mrap_SetCap(MWrap* Self, int Value) {
+bool JB_Mrap_SetSize(MWrap* Self, int Value) {
 	iif (Self->DeathAction != kJB__Wrap_kFree) {
 		return nil;
 	}
 	int S = ((int)Self->ItemSize);
-	int Old = S * Self->Capacity;
+	int Old = S * Self->BufferSize;
 	int New = S * Value;
 	iif (New == Old) {
 		return true;
@@ -27876,7 +27900,7 @@ bool JB_Mrap_SetCap(MWrap* Self, int Value) {
 	byte* Mem = JB_realloc(Self->_Ptr, New);
 	iif (Mem) {
 		Self->_Ptr = Mem;
-		Self->Capacity = Value;
+		Self->BufferSize = Value;
 		iif (Value < Self->Length) {
 			Self->Length = Value;
 		}
@@ -27895,6 +27919,10 @@ bool JB_Mrap_SetCap(MWrap* Self, int Value) {
 		JB_Decr(_tmPf0);
 	}
 	return false;
+}
+
+void JB_Mrap_SizeSet(MWrap* Self, int Value) {
+	JB_Mrap_SetSize(Self, Value);
 }
 
 Array* JB_Mrap__CollectLeaks_(JB_Object* Self) {
@@ -30701,7 +30729,7 @@ Message* SC_Str_ParseClean(JB_String* Self) {
 	JB_SetRef(Rz, JB_Str_Parse(Self, kJB_SyxArg, true));
 	(--JB__Flow_Disabled);
 	iif (Rz) {
-		SC__Comp_stParseTime = (SC__Comp_stParseTime + ((int)(JB_Date__Now() - P1)));
+		SC__Comp_stParseTime = (SC__Comp_stParseTime + ((int)(JB_Date_OperatorMinus(JB_Date__Now(), P1))));
 		SC_Msg_Clean(Rz, true);
 		SC_Msg_PrepareAST(Rz);
 	}
@@ -31063,6 +31091,12 @@ JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in) {
 	JB_Decr(Fs);
 	JB_SafeDecr(_tmPf2);
 	return _tmPf2;
+}
+
+bool SC_Str_trap(JB_String* Self, Message* Msg) {
+	;
+	//visible;
+	return false;
 }
 
 JB_String* JB_Str_Shorten(JB_String* Self, int N) {
@@ -32157,10 +32191,10 @@ MWrap* SC_FuncInASM_xC2xB5Test(FuncInASM* Self) {
 		return nil;
 	}
 	JB_SetRef(Self->Testing, Rz);
-	(JB_Mrap_LengthSet(Rz, Rz->Capacity));
+	(JB_Mrap_LengthSet(Rz, Rz->BufferSize));
 	ASM* P = ((ASM*)JB_Mrap_Ptr(Rz));
 	ASM* After = SC_FuncInASM_xC2xB5Render(Self, P, P + Rz->Length);
-	(JB_Mrap_CapacitySet(Rz, After - P));
+	(JB_Mrap_SizeSet(Rz, After - P));
 	JB_SafeDecr(Rz);
 	return Rz;
 }
@@ -33544,6 +33578,8 @@ JB_String* JB_List_Render(JB_List* Self, FastString* Fs_in) {
 	FastString* Fs = JB_FS__FastNew(Fs_in);
 	JB_Incr(Fs);
 	//visible;
+	JB_FS_AppendInt32(Fs, Self->Position);
+	JB_FS_AppendByte(Fs, ':');
 	JB_FS_AppendByte(Fs, '(');
 	{
 		JB_List* F = JB_Ring_First(Self);
@@ -57489,4 +57525,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -1503183678161888065 3275644447633622125
+// -5755633920743256651 -628001946639639329
