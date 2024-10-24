@@ -1,0 +1,63 @@
+#!/usr/local/bin/spd
+import "GUI"
+
+main
+	return Breakout()
+
+
+class Breakout (Window)
+	|[bounceable]|		Spirals
+	
+	constructor
+		.spirals <~ bounceable((0.5, 0.25), (0.13,0.0), vec4(0.1,0,0,0))
+		.spirals <~ bounceable((0.25, 0.5), (0.05,0.0), vec4(0.3,0,0,0))
+		.spirals <~ bounceable((0.75, 0.75), (-0.1,0.0), vec4(0.5,0,0,0))
+	
+	behaviour Drawbackground
+		where.DrawRect(self, colors.black)	
+		|| C = .LastRect.vec4
+		C += (C.size*0.25, -C.size*0.25)
+		|| L = gui.Loop(24s)
+		for b in .Spirals
+			b.step
+			where.DrawSpiral(144.0, L, b.XY(C), (vec4(), b.col)(0.2[]))
+		gui.Touch
+
+
+class Bounceable
+	|vec2| Pos
+	|vec2| Speed
+	|vec4| Col
+	
+	function XY (|vec4| P, |vec2|)
+		return (.pos * p.size) + p.xy
+
+	function Step
+		.speed.y -= g
+		.pos += .speed*128th
+		if .Pos.y > 1.0
+			.pos.y = 2.0-.pos.y
+			.Speed.y = -.Speed.y
+		  elseif .Pos.y < 0
+			.pos.y = -.pos.y
+			.Speed.y = -.Speed.y
+		if .Pos.x > 1.0
+			.pos.x = 2.0-.pos.x
+			.Speed.x = -.Speed.x
+		  elseif .Pos.x < 0
+			.pos.x = -.pos.x
+			.Speed.x = -.Speed.x
+	module
+		|| g = 0.0024
+
+	
+function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| HSB)
+	for i in max
+		|| R = ((i*0.2123)+angle).SinCos
+		|| P = R*(50.0+i) + XY
+		|| Circle = (P-4.0, P+4.0)
+		|| A = ((Max-i)*2.0)/max
+		|| C = Colors.HSB((i*0.005, 1.0, 1.0, A)+HSB)
+	
+		.DrawCircle2(Circle, C)
+
