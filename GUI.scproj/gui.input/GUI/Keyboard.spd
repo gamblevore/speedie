@@ -135,6 +135,27 @@ dataType Keys (int) {
 	function IsCmd (|bool|)
 		return self is lgui or rgui
 		
+	function Vec3 (|vec3|)
+		return (.x, .y, .z)
+	
+	function X (|float|)
+		if self is a or left
+			return -1
+		if self is d or right
+			return 1
+		
+	function Z (|float|)
+		if self is w or up
+			return -1
+		if self is s or down
+			return 1
+		
+	function Y (|float|)
+		if self is LCTRL or RCTRL
+			return -1
+		if self is space
+			return 1
+				
 	syntax access (|bool|)
 		return keys.has(self)
 	
@@ -149,6 +170,10 @@ dataType Keys (int) {
 		|date[8]|				DownDate
 		|int|					Count
 
+		function Vec3 (|vec3|)
+			for i in .count
+				rz += .downkeys[i].vec3
+		
 		function State (|&int| n, |&byte|)
 			cpp_Wrapper SDL_GetKeyboardState
 		
