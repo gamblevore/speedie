@@ -3,6 +3,34 @@
 module Colors
 	// should make this return vec4! better to do all our work in vec4...
 	// just store/read imagepixel only. 
+
+	function HSB (|vec4| Y,  |vec4|)
+		require y
+	
+		|| h = y.r.Fract * 6.0
+		|| s = y.g
+		|| b = y.b
+		|| a = y.a
+	    || i = h|int|
+	    || f = h.fract
+	    || p = b * (1.0 - s)
+	    || q = b * (1.0 - (s * f))
+	    || t = b * (1.0 - (s * (1.0 - f)))
+	
+	    if (i == 0)
+			return (b, t, p, a)
+	    if (i == 1)
+			return (q, b, p, a)
+	    if (i == 2)
+			return (p, b, t, a)
+	    if (i == 3)
+			return (p, q, b, a)
+	    if (i == 4)
+			return (t, p, b, a)
+		return (b, p, q, a)
+
+	
+	
 	function White (|float| alpha=1.0, |imagepixel|)
 		return vec4(1.0, alpha).px
 	function Gray (|float| alpha=1.0, |imagepixel|)
