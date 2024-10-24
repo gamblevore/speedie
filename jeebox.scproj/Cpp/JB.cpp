@@ -3325,6 +3325,7 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, 
 
 
 
+
 JB_MemoryLayer* JB_ClassData_CreateUseLayer(JB_Class* Self, JB_Object* Obj, JB_Object* Obj2) {
 	JB_MemoryLayer* Rz = nil;
 	JB_Incr(Rz);
@@ -4473,11 +4474,10 @@ MWrap* JB_Mrap_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Pt
 	if (Self == nil) {
 		Self = ((MWrap*)JB_NewClass(&MWrapData));
 	}
-	Self->DataType = kJB__TC_UnusedType;
 	Self->ItemSize = ItemSize;
 	Self->DeathAction = DeathAction;
 	Self->Length = 0;
-	Self->Capacity = ItemCount;
+	Self->BufferSize = ItemCount;
 	Self->_Ptr = Ptr;
 	return Self;
 }
@@ -6053,6 +6053,8 @@ JB_String* JB_List_Render(JB_List* Self, FastString* Fs_in) {
 	FastString* Fs = JB_FS__FastNew(Fs_in);
 	JB_Incr(Fs);
 	//visible;
+	JB_FS_AppendInt32(Fs, Self->Position);
+	JB_FS_AppendByte(Fs, ':');
 	JB_FS_AppendByte(Fs, '(');
 	{
 		JB_List* F = JB_Ring_First(Self);
@@ -8380,7 +8382,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024102311);
+	return (2024102416);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8392,4 +8394,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 2235897687253126669 4068266322178246116
+// -2934619186805667969 1800854179113821346 4068266322178246116
