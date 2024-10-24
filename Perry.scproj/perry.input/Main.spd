@@ -1,9 +1,6 @@
 
 
 main // main { 
-	|| x = file://tips.box
-	|| z = x.compress.decompress
-	if x!=z
 	if app.Yes("crash")
 		app.Crash
 	GUI.Init
