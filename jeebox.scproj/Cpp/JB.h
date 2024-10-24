@@ -107,6 +107,8 @@ typedef int jbinLeaver;
 
 typedef vec4 mat2;
 
+typedef Date Duration;
+
 typedef Date HumanDate;
 
 struct CompressionStats;
@@ -464,10 +466,9 @@ struct Memory_Behaviour: Object_Behaviour {
 };
 
 JBClass ( MWrap , JB_Object , 
-	int Capacity;
+	int BufferSize;
 	byte* _Ptr;
 	int Length;
-	DataTypeCode DataType;
 	u16 ItemSize;
 	byte DeathAction;
 );
@@ -1573,6 +1574,9 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, 
 
 
 // mat2
+
+
+// Duration
 
 
 // HumanDate
