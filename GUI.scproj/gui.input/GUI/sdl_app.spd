@@ -461,6 +461,30 @@ module GUI
 		return __modules__.window.front.droppinginto?
 	
 	
+	function bugged2 (|bool| a, |guicontrol!| b)
+		
+		
+	function Bugged (|guicontrol?| f)
+		opt norefcounts
+		.Bugged2( (f is editable) or (f isa menu), f)
+		|| X = ((f is editable) or (f isa menu)) + f.position
+		target debug2 
+			if f
+		// rels, funcpararms, decls... need to reset the nilstate?
+		// any others??? why isnt it being done by default?
+		// I think we need to reset this in general for anything thats not asking for a boolean.
+		// (if/while/tern/booleanlogic)
+		
+		// So we need to specify this... and also NOT have it go through anywhere else.
+		// other possible cases:
+		// * x = (((a or b)))
+		// * if a()+b() {}
+		// * while a or b {}
+
+//		|| AllowTyping = (f is editable) or (f isa menu)
+//		if !f		// nilchecker bug
+
+
 	function UpdateTextFocus (|window| w)
 		opt norefcounts
 		|| f = w.realfocus
