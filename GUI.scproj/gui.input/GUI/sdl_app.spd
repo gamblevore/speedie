@@ -57,7 +57,7 @@ module GUI
 	cpp_wrapper SDL_GetWindowTitle		(|&SDL_Window| win, |cstring|) 
 	cpp_wrapper SDL_CaptureMouse		(|bool| state, |int|) 
 	
-	cpp_Wrapper SDL_CreateRenderer		(|&SDL_Window| window, |int| index, |Uint| flags, |&SDL_renderer|)
+	cpp_Wrapper SDL_CreateRenderer		(|&SDL_Window| window, |int| index, |Uint| flags, |?&SDL_renderer|)
 
 	cpp_Wrapper SDL_GetRendererOutputSize (|&SDL_Renderer| renderer, |&int| w, |&int| H, |int|)
 	cpp_Wrapper SDL_CreateTexture		(|&SDL_Renderer| renderer, |Uint| format, |int| access, |int| w, |int| h, |&SDL_Texture|)
@@ -209,11 +209,9 @@ module GUI
 		target !gui
 			disabled `Put "targets gui" in the app's conf section to use this!`
 
-		if !window.all.HasAny
-			"Error: Create a window first, then call GUI.run"
-			return -1
+		expect (window.all.HasAny) "Create a window first, then call GUI.run"
 			
-		.init
+		require .init
 		app.ClearCaches
 		|uint| n 
 		while .SingleFrame
@@ -221,8 +219,7 @@ module GUI
 				app.ClearCaches //  :)
 		.Quit
 		
-		if !StdErr.OK
-			return 1
+		return (!StdErr.OK)|int|
 
 	
 	helper PostLoads
@@ -266,20 +263,19 @@ module GUI
 		SDL_WINDOW_ALLOW_HIGHDPI =	0x00002000
 
 
-	helper InitWindow (|ivec2| s, |string| name)
+	helper InitSDL (|ivec2| s, |bool|)
+		expect (font.small) "SmallFont not loaded."
 		SDL_Init(SDL_INIT_AUDIO ||| SDL_INIT_VIDEO ||| SDL_INIT_EVENTS ||| SDL_INIT_HAPTIC)
 
-		.screenwindow = SDL_CreateWindow(name.cstr,
-			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, s.x, s.y, SDL_WINDOW_RESIZABLE ||| SDL_WINDOW_ALLOW_HIGHDPI)
-		if !.ScreenWindow
-			app.quit("Can't init window", -1)
-
-		.SDL_SetWindowMaximumSize(.screenwindow!, 2K, 2K)
-		.SDL_SetWindowMinimumSize(.screenwindow!,  400,  200)
+		s = s min .CurrDisplaySize
+		|| W = SDL_CreateWindow(.NiceAppName.cstr,
+			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, s.x, s.y, SDL_WINDOW_RESIZABLE ||| SDL_WINDOW_ALLOW_HIGHDPI) #expect "Can't init window"
+		.screenwindow = w
+		.SDL_SetWindowMaximumSize(w, 2K, 2K)
+		.SDL_SetWindowMinimumSize(w,  400,  200)
 		.vsync = true
-		.renderer = SDL_CreateRenderer(.screenwindow!, -1, 0)
-		if !.Renderer
-			app.Quit("Can't init renderer", -1)
+		.renderer = SDL_CreateRenderer(w, -1, 0)  #expect  "Can't init renderer"
+		return true
 
 
 	helper vsync (assigns:|bool|)
@@ -363,8 +359,9 @@ module GUI
 		return app.appname
 	
 	
-	function Init (|ivec2| s=(414,256), |int| FullScreen=0) // startup
-		require !.framelength
+	function Init (|ivec2| s=(414,256), |int| FullScreen=0, |bool|) // startup
+		if .framelength
+			return true
 		pico.GlobalConfig.SuicideIfParentDies = false
 		pico.start
 		target !gui
@@ -376,16 +373,14 @@ module GUI
 			s = PrevSize.size
 		  else
 			s = (800, 600)
-		s = s min (2K, 2K) max (500, 400)
-		
+		s = s max (500, 400)
 		.GUICheck
-		if !font.small
-			GUI.Alert("Exitting...", "SmallFont not loaded.")
-			app.quit
-		.FastToolTipDate = 1
-
-		.InitWindow(s, .NiceAppName)
+		if !.InitSDL(s)
+			gui.Alert("Unable to load SDL2", StdErr.LastError.name)
+			return false
+		.sdl_stoptextinput
 		.scaling = 2.0 - (0.5*.IsHighDPI)
+		.FastToolTipDate = 1
 		
 		.CheckQuarantine
 		¥.LoadDefaults
@@ -401,6 +396,7 @@ module GUI
 			.SDL_FullScreen(n)
 			
 		.StartedProperly = true
+		return true
 		
 	
 	helper SetHint (|cstring| name, |cstring| value)
@@ -467,8 +463,10 @@ module GUI
 	
 	function UpdateTextFocus (|window| w)
 		opt norefcounts
-		|| f = w.realfocus // if theres nothing to focus, we can still type into the window!
-		|| AllowTyping = !f or (f is editable) or (f isa menu)  or (f isa textview)
+		|| f = w.realfocus
+		|| AllowTyping = f and ((f is editable) or (f isa menu) or (f isa textview))
+		if !f? and (w is editable)		// nilchecker bug
+			AllowTyping = true	// allow type-through if the window is "editable". like to type secret codes in
 		if (f isa textview)
 			if (!f.SelRange.width)
 				GUI.TrySelectorFlash
@@ -648,10 +646,11 @@ module GUI
 		.StartResize
 		|| Dlg = .DialogIsOpen
 		for w  in  window.all
-			w.RunmyTasks(false)
+			w.RunMyTasks(false)
 			w.FixFocus
 			if !dlg or w.IsLiveAction // stop needless updates
-				w.__FrameUpdate__(dlg or w.OpenedMenu or .IsBackground)
+//				.sdl_stoptextinput
+				w.__FrameStep__(dlg or w.OpenedMenu or .IsBackground)
 		.StartResize
 
 
@@ -704,7 +703,7 @@ module GUI
 
 
 	helper Rescale (|float| NewScale, |bool|)
-		.init
+		require .init
 		if (NewScale >= 1.0 and NewScale <= 8.0)
 			.scale = NewScale
 			.NewSize = .SizeOrig

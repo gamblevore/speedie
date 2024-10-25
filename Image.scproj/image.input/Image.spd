@@ -575,7 +575,7 @@ class Image (memory)
 				self[Pix].Overlay(cm)
 
 		
-	function DrawCircle2 (|vec4| R, |vec4| Col, |float| str=1.0)
+	function DrawSoftCircle (|vec4| R, |vec4| Col, |float| str=1.0)
 		|| Back		= .Clip(R)$
 
 		|| mid		= r.Center

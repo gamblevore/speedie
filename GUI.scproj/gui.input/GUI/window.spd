@@ -40,8 +40,6 @@ class Window (GUIControl)
 	
 	
 	helper SubConstructor (|ControlRect| Size)
-		if !GUI.framelength
-			GUI.init()
 		.size = Size
 		.createddate = date.now
 		.InlineEditorPlace.Init(self)
@@ -53,7 +51,7 @@ class Window (GUIControl)
 		.disposeall
 
 
-	virtual FrameUpdate (|bool| ShouldNotDisturbGUI)
+	virtual FrameStep (|bool| ShouldNotDisturbGUI)
 		0
 
 	virtual CancelClose (|SDLCloseReason| Reason=SDLCloseReason.windowclose, |bool|)
@@ -82,7 +80,7 @@ class Window (GUIControl)
 		.lastrect = value.rect
 		.size = .lastrect.layout
  
-	helper RealFocus (|guicontrol|)
+	helper RealFocus (|guicontrol?|)
 		opt norefcounts
 		return .innerfocus ?? .focus
 
@@ -101,7 +99,8 @@ class Window (GUIControl)
 	function RunAsMain (|ErrorInt|)
 		.IsLiveAction = true // probably true
 		.show
-		return GUI.run
+		if gui.init((4K,4K))
+			return GUI.run
 
 	syntax cast (|ErrorInt|)
 		return .RunAsMain

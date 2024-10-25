@@ -418,7 +418,7 @@ class PerryIDE (Window)
 			f.Kill("SaveMemory")
 	
 	
-	behaviour FrameUpdate // perframe, eachframe, onframe
+	behaviour FrameStep // perframe, eachframe, onframe
 		.ProjectTabs.TrimWidth
 		if !ShouldNotDisturbGUI
 			.SaveMemory

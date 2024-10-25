@@ -1006,7 +1006,7 @@ class TextView (GUIControl)
 			|| Rect = (s-2.5, s+2.5)
 			rect.y1-=2
 			rect.y2-=2
-			GUI.Screen.DrawCircle2( Rect,  C1 )
+			GUI.Screen.DrawSoftCircle( Rect,  C1 )
 
 
 	helper message.LastAfter (|int| IgnoreAfter, |ind|)
