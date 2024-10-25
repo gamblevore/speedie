@@ -48,7 +48,7 @@ If you'd like to support the ongoing development of Speedie, consider [sponsorin
 * Integrates with C easily, so you can call C-library functions easily, if you need to, with no overhead.
 * Speedie is designed as a fast language. [Read More](Documentation/Speed.md)
 * Doesn't infantilise you like Javascript or Java. Allows you to mess around with pointers if you need... (but try to avoid pointers anyhow).
-* Other languages (Rust) feel like pedantic "form-filling" ask the government to build on your own land, (and hoping the bureaucrats don't block you), rather than simply building. Speedie is more like a friend that helps you build your barn while stopping you when your chainsaw is too close to your leg.
+* Other languages ([Rust](Documentation/Comparisons.md)) feel like pedantic "form-filling" ask the government to build on your own land, (and hoping the bureaucrats don't block you), rather than simply building. Speedie is more like a friend that helps you build your barn while stopping you when your chainsaw is too close to your leg.
 
 
 # Remaining Challenges #
