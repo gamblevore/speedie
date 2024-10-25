@@ -269,7 +269,7 @@ struct ArchonPurger
 			t.FinishNil(f)
 
 		
-		function FixArchons
+		function LaunchMothership
 			opt norefcounts
 			|| Old = stderr
 			|| Rec = ErrorReceiver()

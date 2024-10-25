@@ -388,6 +388,12 @@ function Tern (Niltrackerfn)
 									// but thats sooo awkward to even think of a real-case
 									// where I want this! Just don't do it!
 
+/*
+	|| AllowTyping = ((f is editable) or (f isa menu)) and f.position // f is real
+	|| AllowTyping = !((f is editable) or (f isa menu)) and f.position // f is nil
+	|| AllowTyping = ((f is editable) or (f isa menu)) + f.position
+
+*/
 
 
 function BooleanLogic (niltrackerfn)
@@ -396,11 +402,12 @@ function BooleanLogic (niltrackerfn)
 	|| BB = msg.last!
 	|| IsAnd = test is AND
 	(test is AND) = false 
+	if "Bugged".trap
 	if IsAnd == (test is positive)
 		|| NC = .Jump(AA, test)						// x = (!a or !a.y)
 		NC   |= .JumpWithinBool(BB, test)
 		return nilstate.real ||| (NC & nilstate.FnBecomesNilCh)
-
+	
 	|| Orig = T.BranchEnter(AA)				#require
 	
 	#!"test A+"
