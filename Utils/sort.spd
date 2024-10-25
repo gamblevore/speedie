@@ -1,16 +1,18 @@
 #!/usr/local/bin/speedie
 
-app.usage = `Usage: sort.spd path1 [path2, path3]
+app.usage = `Usage: ` + app.filename + ` path1 [path2, path3]
+
+Prints a list of files that match the extensions. Default extension is spd. Sorts the files by file-size. Useful to see how big your speedie projects are. Also sums the total file-size.
 
 options:
 	types=txt/html
 	quiet
-
+	
 example:
 	sort.spd /usr/local/speedie
-	sort.spd dir1 dir2 --types=a
-	sort.spd /usr/local/speedie -q
-	sort.spd /usr/local/speedie --types=cpp -q
+	sort.spd dir1 dir2 --types=zip/rar/xz
+	sort.spd /usr/local/speedie -quiet
+	sort.spd /usr/local/speedie --types=cpp -quiet
 	sort.spd /usr/local/speedie --types=md
 `
 
