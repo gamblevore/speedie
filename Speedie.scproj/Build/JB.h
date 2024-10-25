@@ -233,6 +233,8 @@ typedef ASM ASM_U3;
 
 typedef ASM ASM_U4;
 
+typedef ASM ASM_VecMix;
+
 typedef ASM ASM_Write;
 
 typedef Date Duration;
@@ -794,6 +796,7 @@ struct ASMState {
 	bool Inited;
 	FuncInASM* Out;
 	FatASM* FuncStart;
+	FatASM* LastProgress;
 	FatASM* Start;
 	FatASM* Curr;
 	FatASM* End;
@@ -2270,31 +2273,32 @@ extern Array* SC__NilReason_values;
 #define kSC__NilState_Stated ((NilState)4)
 #define kSC__NilState_TrueValue ((NilState)32)
 #define kSC__OpMode_Addition ((OpMode)16)
-#define kSC__OpMode_AND ((OpMode)65536)
-#define kSC__OpMode_AndOr ((OpMode)98304)
+#define kSC__OpMode_AND ((OpMode)131072)
+#define kSC__OpMode_AndOr ((OpMode)196608)
 #define kSC__OpMode_Assigns ((OpMode)2)
 #define kSC__OpMode_Bit ((OpMode)4)
-#define kSC__OpMode_CaseAware ((OpMode)262144)
+#define kSC__OpMode_CaseAware ((OpMode)524288)
 #define kSC__OpMode_Compare ((OpMode)1)
 #define kSC__OpMode_Comparison ((OpMode)512)
 #define kSC__OpMode_CompOrSet ((OpMode)3)
-#define kSC__OpMode_Custom ((OpMode)131072)
+#define kSC__OpMode_Custom ((OpMode)262144)
 #define kSC__OpMode_EqualOrNot ((OpMode)256)
 #define kSC__OpMode_ExactEquals ((OpMode)4481)
 #define kSC__OpMode_ExactlyEquals ((OpMode)128)
 #define kSC__OpMode_ExactNotEquals ((OpMode)4353)
 #define kSC__OpMode_Less ((OpMode)2048)
-#define kSC__OpMode_LoseBits ((OpMode)16384)
+#define kSC__OpMode_LoseBits ((OpMode)32768)
 #define kSC__OpMode_MakesSigned ((OpMode)64)
 #define kSC__OpMode_Math ((OpMode)8)
 #define kSC__OpMode_MathLike ((OpMode)12)
 #define kSC__OpMode_More ((OpMode)1024)
-#define kSC__OpMode_NeedsCppFuncOnFloats ((OpMode)524288)
+#define kSC__OpMode_Multiply ((OpMode)8192)
+#define kSC__OpMode_NeedsCppFuncOnFloats ((OpMode)1048576)
 #define kSC__OpMode_NilTest ((OpMode)4096)
-#define kSC__OpMode_NoExtraBits ((OpMode)8192)
-#define kSC__OpMode_OR ((OpMode)32768)
-#define kSC__OpMode_SameOrLessBits ((OpMode)24576)
-#define kSC__OpMode_Shift ((OpMode)8224)
+#define kSC__OpMode_NoExtraBits ((OpMode)16384)
+#define kSC__OpMode_OR ((OpMode)65536)
+#define kSC__OpMode_SameOrLessBits ((OpMode)49152)
+#define kSC__OpMode_Shift ((OpMode)16416)
 #define kSC__OpMode_ShiftOnly ((OpMode)32)
 #define kSC__OpMode_Subtraction ((OpMode)80)
 #define kJB__ProcessMode_AutoPrintErrors ((int)4)
@@ -4482,6 +4486,10 @@ ASM SC_ASM_U3_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_U4_LSet(ASM Self, uint Value);
 
+ASM SC_ASM_VecMix_LSet(ASM Self, uint Value);
+
+ASM SC_ASM_VecMix_ModeSet(ASM Self, uint Value);
+
 ASM SC_ASM_Write_moveSet(ASM Self, uint Value);
 
 ASM SC_ASM_Write_OffsetSet(ASM Self, uint Value);
@@ -4940,9 +4948,9 @@ bool SC_SCNodeFindMode_SyntaxIs(SCNodeFindMode Self, SCNodeFindMode M);
 
 
 // SCNodeType
-bool SC_SCNodeType_HasPtrs(uint /*SCNodeType*/ Self);
+bool SC_SCNodeType_HasPtrs(SCNodeType Self);
 
-bool SC_SCNodeType_SyntaxIs(uint /*SCNodeType*/ Self, uint /*SCNodeType*/ D);
+bool SC_SCNodeType_SyntaxIs(SCNodeType Self, SCNodeType D);
 
 
 
@@ -5214,6 +5222,11 @@ ASM* JB_ASM_U3__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 // ASM_U4
 ASM* JB_ASM_U4__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+
+
+
+// ASM_VecMix
+ASM* JB_ASM_VecMix__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
@@ -9773,7 +9786,7 @@ JB_String* SC_Class_StructName(SCClass* Self);
 
 bool SC_Class_EqualsName(SCClass* Self, JB_String* Name, bool Aware);
 
-bool SC_Class_EqualsType(SCClass* Self, uint /*SCNodeType*/ D, bool Aware);
+bool SC_Class_EqualsType(SCClass* Self, SCNodeType D, bool Aware);
 
 bool SC_Class_SyntaxIs(SCClass* Self, ClassInfo Cls);
 
@@ -9789,7 +9802,7 @@ void SC_Class_WriteStructOrUnion(SCClass* Self, FastStringCpp* Fs);
 
 SCNode* SC_Class__DataType(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
-SCModule* SC_Class__DataTypeSub(Message* Node, SCNode* Parent, Message* ErrPlace, JB_String* ForInterface, uint /*SCNodeType*/ BaseType);
+SCModule* SC_Class__DataTypeSub(Message* Node, SCNode* Parent, Message* ErrPlace, JB_String* ForInterface, SCNodeType BaseType);
 
 SCNode* SC_Class__ExtendOneFunc(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
@@ -9803,7 +9816,7 @@ SCNode* SC_Class__LoadSyntax(Message* Node, SCNode* Name_space, Message* ErrPlac
 
 SCNode* SC_Class__NeuClass(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
-SCClass* SC_Class__NeuClassSub(Message* Node, SCNode* Parent, Message* ErrPlace, JB_String* ForInterface, uint /*SCNodeType*/ Base);
+SCClass* SC_Class__NeuClassSub(Message* Node, SCNode* Parent, Message* ErrPlace, JB_String* ForInterface, SCNodeType Base);
 
 SCNode* SC_Class__NeuRole(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
@@ -10090,7 +10103,7 @@ int SC_Func__Init_();
 
 int SC_Func__InitCode_();
 
-bool SC_Func__InType(uint /*SCNodeType*/ Ty);
+bool SC_Func__InType(SCNodeType Ty);
 
 JB_String* SC_Func__NameList();
 

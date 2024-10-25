@@ -2160,7 +2160,7 @@ bool SC_Comp__ModulesSorter(JB_Object* A, JB_Object* B) {
 		}
 	}
 	 else {
-		uint Tt = Ca->BaseType;
+		SCNodeType Tt = Ca->BaseType;
 		int D = ((int)Tt) - ((int)Cb->BaseType);
 		iif (D) {
 			return D < 0;
@@ -3453,7 +3453,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2024102416));
+	JB_FS_AppendInt32(_fsf0, (2024102504));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8877,7 +8877,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2024102416));
+	JB_FS_AppendInt32(_fsf0, (2024102504));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -11858,6 +11858,7 @@ int JB_InitCode_() {
 	SC__ASM_Forms[41] = (&JB_ASM_RefSet2__Encode);
 	SC__ASM_Forms[42] = (&JB_ASM_RefSet3__Encode);
 	SC__ASM_Forms[43] = (&JB_ASM_RefDecrMem__Encode);
+	SC__ASM_Forms[44] = (&JB_ASM_VecMix__Encode);
 	JB_Syx__StdNew(JB_Msg_Nil__, JB_LUB[3], JB_LUB[1973], 0);
 	JB_Syx__StdNew(JB_Msg_Arg__, JB_LUB[1391], JB_LUB[1974], 1);
 	JB_Syx__StdNew(JB_Msg_Emb__, JB_LUB[1975], JB_LUB[1976], 2);
@@ -14462,6 +14463,15 @@ int SC_UseCustomOperators(SCDecl* LC, SCDecl* RC, SCOperator* Comp, Message* Msg
 		iif (LN and (RN and ((LN == 1) or (RN == 1)))) {
 			iif (CompOrSet) {
 				return kSC__CustomOps_Needed;
+			}
+			iif (SC_Opp_SyntaxIs(Comp, kSC__OpMode_Multiply)) {
+				SCClass* B = SC_TypeBool;
+				iif (SC_Decl_OperatorExact_isa(LC, B)) {
+					return kSC__CustomOps_OnlyRightIsVector;
+				}
+				iif (SC_Decl_OperatorExact_isa(RC, B)) {
+					return kSC__CustomOps_OnlyLeftIsVector;
+				}
 			}
 			iif (!JB_TC_SameBasicType(LNT, RNT)) {
 				JB_Msg_Fail(MsgRel, JB_LUB[1271]);
@@ -17583,6 +17593,14 @@ ASM SC_ASM_U4_LSet(ASM Self, uint Value) {
 	return Self | ((Value << 28) >> 28);
 }
 
+ASM SC_ASM_VecMix_LSet(ASM Self, uint Value) {
+	return Self | ((Value << 31) >> 31);
+}
+
+ASM SC_ASM_VecMix_ModeSet(ASM Self, uint Value) {
+	return Self | ((Value << 29) >> 28);
+}
+
 ASM SC_ASM_Write_moveSet(ASM Self, uint Value) {
 	return Self | ((Value << 30) >> 30);
 }
@@ -19152,11 +19170,11 @@ bool SC_SCNodeFindMode_SyntaxIs(SCNodeFindMode Self, SCNodeFindMode M) {
 
 
 
-bool SC_SCNodeType_HasPtrs(uint /*SCNodeType*/ Self) {
-	return ((bool)(Self & 1));
+bool SC_SCNodeType_HasPtrs(SCNodeType Self) {
+	return ((bool)(((int)Self) & 1));
 }
 
-bool SC_SCNodeType_SyntaxIs(uint /*SCNodeType*/ Self, uint /*SCNodeType*/ D) {
+bool SC_SCNodeType_SyntaxIs(SCNodeType Self, SCNodeType D) {
 	return Self == D;
 }
 
@@ -19893,6 +19911,22 @@ ASM* JB_ASM_U4__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo) {
 	Rz = SC_ASM_R3Set(Rz, Self->R[2]);
 	Rz = SC_ASM_R4Set(Rz, Self->R[3]);
 	Rz = SC_ASM_U4_LSet(Rz, Self->R[5]);
+	iif (Curr < After) {
+		Curr++[0] = Rz;
+	}
+	return Curr;
+}
+
+
+ASM* JB_ASM_VecMix__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo) {
+	//visible;
+	ASM Rz = Self->Op << 24;
+	Rz = SC_ASM_R1Set(Rz, Self->R[0]);
+	Rz = SC_ASM_R2Set(Rz, Self->R[1]);
+	Rz = SC_ASM_R3Set(Rz, Self->R[2]);
+	Rz = SC_ASM_R4Set(Rz, Self->R[3]);
+	Rz = SC_ASM_VecMix_ModeSet(Rz, Self->R[4]);
+	Rz = SC_ASM_VecMix_LSet(Rz, Self->R[5]);
 	iif (Curr < After) {
 		Curr++[0] = Rz;
 	}
@@ -23369,11 +23403,12 @@ void SC_Pac_PrintProgress(ASMState* Self, Message* Exp) {
 	JB_Decr(_tmPf1);
 	JB_Obj_PrintLine(_tmPf0);
 	JB_Decr(_tmPf0);
-	FatASM* Curr = Self->FuncStart;
+	FatASM* Curr = Self->LastProgress;
 	wwhile (Curr < Self->Curr) {
 		SC_FAT_DebugPrint(Curr);
 		(++Curr);
 	};
+	Self->LastProgress = Curr;
 }
 
 uint64 SC_Pac_PrmCollect(ASMState* Self, Message* Prms, SCFunction* Fn, bool Native) {
@@ -23610,6 +23645,7 @@ void SC_Pac_StartFunc(ASMState* Self, SCFunction* Fn) {
 	Self->Zero.Info = SC_Reg__New();
 	(SC_FAT_SyntaxIsSet((&Self->Zero), kSC__Reg_NeverAltered, true));
 	Self->FuncStart = Self->Curr;
+	Self->LastProgress = Self->Curr;
 	(SC_Func__CurrFuncSet(Fn));
 	Self->ReturnASM = SC_Decl_RegType(Fn->ReturnType);
 	Self->OK = true;
@@ -29218,7 +29254,7 @@ void SC_Opp__Init() {
 	SC_Opp__AddMath(JB_LUB[9], JB_LUB[9], (&SC_Pac_Mod), kSC__OpMode_NeedsCppFuncOnFloats);
 	SC_Opp__AddMath(JB_LUB[295], JB_LUB[1037], (&SC_Pac_Plus), kSC__OpMode_Addition);
 	SC_Opp__AddMath(JB_LUB[304], JB_LUB[905], (&SC_Pac_Subtract), kSC__OpMode_Subtraction);
-	SC_Opp__AddMath(JB_LUB[292], JB_LUB[927], (&SC_Pac_Multiply), 0);
+	SC_Opp__AddMath(JB_LUB[292], JB_LUB[927], (&SC_Pac_Multiply), kSC__OpMode_Multiply);
 	SC_Opp__AddMath(JB_LUB[383], JB_LUB[720], (&SC_Pac_Divide), 0);
 	JB_FreeIfDead(SC_Opp__AddBit(JB_LUB[482], JB_LUB[1114], (&SC_Pac_SHR), kSC__OpMode_Shift));
 	SC__Opp_LeftShift = SC_Opp__AddBit(JB_LUB[467], JB_LUB[1113], (&SC_Pac_SHL), kSC__OpMode_ShiftOnly);
@@ -42520,7 +42556,7 @@ ASMReg SC_Decl_CalculateASMType(SCDecl* Self) {
 		return ((ASMReg)kJB__TC__voidptr);
 	}
 	SCClass* T = Self->Type;
-	uint B = T->BaseType;
+	SCNodeType B = T->BaseType;
 	iif (B > kSC__SCNodeType_DataType) {
 		return ((ASMReg)kJB__TC__voidptr);
 	}
@@ -44373,7 +44409,7 @@ bool SC_Decl_TypeSuffers(SCDecl* Self) {
 	iif (Self->PointerCount) {
 		return true;
 	}
-	uint D = Self->Type->BaseType;
+	SCNodeType D = Self->Type->BaseType;
 	return (D == kSC__SCNodeType_FuncProto) or (D == kSC__SCNodeType_Object);
 }
 
@@ -48546,7 +48582,7 @@ SCClass* SC_Class_Constructor(SCClass* Self, Message* Node, bool HasPtrs, SCModu
 	Self->Flags = 0;
 	Self->TaskObjectCount = 0;
 	Self->Size = 0;
-	Self->BaseType = 0;
+	Self->BaseType = kSC__SCNodeType_Nil;
 	Self->Depth = 0;
 	Self->MinOpt = 0;
 	Self->Behaviourness = 0;
@@ -50493,7 +50529,7 @@ bool SC_Class_EqualsName(SCClass* Self, JB_String* Name, bool Aware) {
 	return false;
 }
 
-bool SC_Class_EqualsType(SCClass* Self, uint /*SCNodeType*/ D, bool Aware) {
+bool SC_Class_EqualsType(SCClass* Self, SCNodeType D, bool Aware) {
 	iif (Self and (D > kSC__SCNodeType_Nil)) {
 		return Self->BaseType == D;
 	}
@@ -50568,7 +50604,7 @@ SCNode* SC_Class__DataType(Message* Node, SCNode* Name_space, Message* ErrPlace)
 	return SC_Class__DataTypeSub(Node, Name_space, ErrPlace, JB_LUB[0], kSC__SCNodeType_DataType);
 }
 
-SCModule* SC_Class__DataTypeSub(Message* Node, SCNode* Parent, Message* ErrPlace, JB_String* ForInterface, uint /*SCNodeType*/ BaseType) {
+SCModule* SC_Class__DataTypeSub(Message* Node, SCNode* Parent, Message* ErrPlace, JB_String* ForInterface, SCNodeType BaseType) {
 	iif (JB_FreeIfDead(JB_Tree_Obj(Node))) {
 		return SC__Comp_program;
 	}
@@ -50679,7 +50715,7 @@ SCNode* SC_Class__NeuClass(Message* Node, SCNode* Name_space, Message* ErrPlace)
 	return Rz;
 }
 
-SCClass* SC_Class__NeuClassSub(Message* Node, SCNode* Parent, Message* ErrPlace, JB_String* ForInterface, uint /*SCNodeType*/ Base) {
+SCClass* SC_Class__NeuClassSub(Message* Node, SCNode* Parent, Message* ErrPlace, JB_String* ForInterface, SCNodeType Base) {
 	iif (!JB_Str_Exists(ForInterface)) {
 		iif (!SC_Base_ExpectModule(Parent, ErrPlace)) {
 			return nil;
@@ -54400,7 +54436,7 @@ int SC_Func__InitCode_() {
 	return 0;
 }
 
-bool SC_Func__InType(uint /*SCNodeType*/ Ty) {
+bool SC_Func__InType(SCNodeType Ty) {
 	SCFunction* Fn = SC_Func__CurrFunc();
 	iif (Fn) {
 		SCClass* Cls = Fn->Cls;
@@ -57525,4 +57561,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -5755633920743256651 -628001946639639329
+// 8566343988803170944 -628001946639639329
