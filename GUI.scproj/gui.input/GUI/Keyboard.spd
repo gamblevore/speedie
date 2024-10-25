@@ -145,9 +145,9 @@ dataType Keys (int) {
 			return 1
 		
 	function Z (|float|)
-		if self is w or up
-			return -1
 		if self is s or down
+			return -1
+		if self is w or up
 			return 1
 		
 	function Y (|float|)
