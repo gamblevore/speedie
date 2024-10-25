@@ -42,12 +42,12 @@ struct LoopInfo
 		|| Ex = .ExitRecord						#check (msg, "Loop never exits.")
 		if !.HasEscape and !msg.islast
 			msg.KinderRemoveAfter
-		ArchonPurger.t.SetAllNil(Ex)
+		ArchonPurger.t.value = Ex
 	
 	
 	function NextLoop 
 		.ContRecord |= ArchonPurger.value
-		ArchonPurger.t.SetAllNil(.contrecord)
+		ArchonPurger.t.value = .contrecord
 
 
 	
@@ -107,21 +107,38 @@ struct ArchonPurger
 	
 	
 	function BranchEnter (|message| where, |NilRecord|)
-		expect (.Neel < .RowEnd) (where, "Branch depth too deep (over 63)")
-		rz = .Neel++[]
-		.neel[] = rz // no realnesses
+		if .Neel < .RowEnd
+			|| n = .Neel++[]
+			.neel[] = n // no realnesses
+			return n
+			
+		error (where, "Branch depth too deep (over 63)")
+		
 	
 	
 	function BranchSwap (|NilRecord| A, |nilrecord|)
 		rz = value()
-		.SetAllNil(A)
+		.value = A
 	
 	
-	function BranchExit (|NilRecord| A=0,  |nilstate|)
+	function BranchExitBool (|NilRecord| A, |NilCheckMode| Test, |nilrecord| Orig,  |nilstate|)
+		if test is ForBools
+			return .BranchExit(a)
+		.neel[] = 0
+		return .BranchRestore(orig) // restore old value
+	
+	
+	function BranchRestore (|NilRecord| A,  |nilstate|)
+		.Neel--[] = 0 // cleanup
+		t.value = A
+		if .NestDepth == 0
+			.Realnesses = -1
+		return NilState.real
+	
+	function BranchExit (|NilRecord| A,  |nilstate|)
 		|| B = value()
 		.Neel--[] = 0 // cleanup
-		
-		.SetAllNil(A ||| B)
+		t.value = A ||| B
 		if .NestDepth == 0
 			.Realnesses = -1
 		return nilstate.real
@@ -218,22 +235,21 @@ struct ArchonPurger
 		return (.value)[1]
 
 
-	target debugnil {
-		function SetAllNil (|NilRecord| Dest)
-			dest &= .Realnesses
+//	target debugnil {
+//		function SetAllNil (|NilRecord| Dest)
+//			dest &= .Realnesses
+//
+//			|| diff = dest xor value()
+//			*.neel = dest
+//			
+//			for i in 32
+//				|| d = .decls[i]
+//				if d and diff[i]
+//					d.nilprint("change")
 
-			|| diff = dest xor value()
-			*.neel = dest
-			
-			for i in 32
-				|| d = .decls[i]
-				if d and diff[i]
-					d.nilprint("change")
-	} else {
-		function SetAllNil (|NilRecord| Dest)
-			opt inline
-			.neel[] = dest & .Realnesses
-	}
+	setter Value (|NilRecord| Dest)
+		opt inline
+		.neel[] = dest & .Realnesses
 
 
 	module
@@ -250,14 +266,14 @@ struct ArchonPurger
 		function EndBlock (|nilrecord|)
 			opt inline
 			rz = .value
-			t.SetAllNil(nilstate.basic)
+			t.value = nilstate.basic
 
 
 		function DeclKill
 			opt inline
 			if !t.nestdepth
 				t.RootReturned = true
-			t.SetAllNil(nilstate.Basic)
+			t.value = nilstate.Basic
 		
 
 		function ExterminateZergBugs (|scfunction| f)

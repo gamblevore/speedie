@@ -1,5 +1,6 @@
 
 
+#! `probably faster to pass the nil tracker in "T"!`
 prototype NilTrackerFn (|message| msg, |NilCheckMode| Test=0,  |nilstate|)
 
 
@@ -40,10 +41,13 @@ datatype NilCheckMode (int)
 		While
 		Disappears
 		Assigns
-		WhilePos = Positive + While 
-		WhileNeg = Negative + While
-		Active  = Positive + Negative
-		Basic   = Active + Soft
+		ForBools
+		IfPos = Positive ||| ForBools 
+		IfNeg = Negative ||| ForBools 
+		WhilePos = IfPos ||| while
+		WhileNeg = IfNeg ||| while
+		Active  = Positive ||| Negative
+		Basic   = Active ||| Soft
 
 	syntax is (|NilCheckMode| other, |bool|)
 		return self & other

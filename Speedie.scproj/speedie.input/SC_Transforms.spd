@@ -812,12 +812,13 @@ function Tran_FuncTable (|Message| msg, |bool|) // tran_Dispatch
 				check (item_value != @emb) (item_value, "Use an argument instead.")
 				if (item_value != @arg)
 					item_value = item_value.wrapwith(@arg.msg)
-			
-				// create a function...
-				if !newname
-					NewName = name + "_" + item_name.CollectFuncTableName
-					msg.CollectionPlace <~ ArgToFunc( NewName, «Thg protoName », item_value )
-				I <~ «brel "&", «Thg NewName »»
+				
+				if item_name #check (I, "Missing name")
+					// create a function...
+					if !newname
+						NewName = name + "_" + item_name.CollectFuncTableName
+						msg.CollectionPlace <~ ArgToFunc( NewName, «Thg protoName », item_value )
+					I <~ «brel "&", «Thg NewName »»
 			
 			|| iname = i.name
 			if  (i == @tmp) and table_name // why would this be nil?

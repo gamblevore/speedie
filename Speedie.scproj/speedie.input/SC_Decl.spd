@@ -110,8 +110,8 @@ class SCDecl (SCNamed) {
 	|SCClass|			Type
 	|SCDeclInfo|		Info
 	|Datatypecode|		DataType
-	|Byte|				PointerCount
 	|NilState|			NilDeclared
+	|Byte|				PointerCount
 	|byte| 				NilReg
 	|byte| 				NilAllocDepth
 
@@ -513,9 +513,9 @@ class SCDecl (SCNamed) {
 			.contains = c.MakeAsObject(self, ErrPlace)
 
 	
-	function NewWrapper (|scdecl| CastTo, |scdecl|)
+	function NewWrapper (|scdecl!| CastTo, |scdecl|)
 		opt norefcounts
-		|| IsNormal = castto and CastTo.isnormal
+		|| IsNormal = CastTo.isnormal
 			|| it = .type.DataObject
 				return it.ForContained
 		|| dcl = SCDecl(TypeWrapper!)

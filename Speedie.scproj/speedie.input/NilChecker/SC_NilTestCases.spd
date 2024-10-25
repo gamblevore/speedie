@@ -1,6 +1,6 @@
 
 
-target debug {
+target debug2 {
 class NilTest
 	|int|		V
 	|string|	V2
@@ -274,26 +274,24 @@ function NilState.NilName (|faststring| fs, |bool| Expected)
 		  else
 			fs <~ "stated "
 	fs <~ .Rawname
-
-
-function @ArchonPurger.ndb4
-	cpp_name ndb4
-	visible
-	(t.Neel[]).ndb5()
-
-
-function NilRecord.ndb5 
-	cpp_name ndb5
-	visible
-	
-	|| n = .DepthOfVars + 1
-	for i in n
-		// item 0 is nil
-		|| D = ArchonPurger.T.decls[i]
-			|| Name = D.name
-			|| V = self[i].RawName
-			"$Name:  $V"
-
-
 }
+
+target debug
+	function @ArchonPurger.ndb4
+		cpp_name ndb4
+		visible
+		(t.Neel[]).ndb5()
+
+
+	function NilRecord.ndb5 
+		cpp_name ndb5
+		visible
+		
+		|| n = .DepthOfVars + 1
+		for i in n
+			// item 0 is nil
+			|| D = ArchonPurger.T.decls[i]
+				|| Name = D.name
+				|| V = self[i].RawName
+				"$Name:  $V"
 

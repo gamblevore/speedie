@@ -69,7 +69,7 @@ function SyncJump (NilTrackerFn)
 
 function JumpWithinBool (niltrackerfn)
 	t.InsideBoolLogic++
-	rz = .jump(msg, test)
+	rz = .jump(msg, test ||| nilcheckmode.ForBools)
 	t.InsideBoolLogic--
 
 
@@ -78,8 +78,9 @@ function JumpSub (NilTrackerFn)
 	|| t = msg.ASMType
 		return (NilTable[t]!)(msg, test)
 	t = msg.func|ASMType|
-	msg.ASMType = t						// main setter here.
+	msg.ASMType = t
 	return (NilTable[t]!)(msg, test)
+
 
 function Jump (NilTrackerFn)
 	cpp_part FlowJump
@@ -87,10 +88,8 @@ function Jump (NilTrackerFn)
 		if FlowControl.Active
 			FlowControl <~ msg.func|byte|
 			FlowControl.input("", msg.name)
-	rz = .JumpSub(msg, test)
-	target flow
-		if FlowControl.Active
-			FlowControl <~ rz|byte|
+	return .JumpSub(msg, test)
+		
 
 
 function PropertyToFunc (|message!| dot, |scfunction!| fn, |nilstate|)
@@ -321,7 +320,9 @@ function While (NilTrackerFn)
 	require !CondTest.KnownFalse and T.BranchEnter(msg)
 
 	|| W = .loops.BeginLoop(!condtest.KnownTrue)
-
+	
+	if NilCheckMode.whilepos != NilCheckMode.forbools + NilCheckMode.positive + NilCheckMode.while
+	if NilCheckMode.whilepos != NilCheckMode.forbools ||| NilCheckMode.positive ||| NilCheckMode.while
 	for i in 3 
 		.SyncJump(cond, NilCheckMode.whilepos)
 		.Argument(cond.next)
@@ -334,7 +335,7 @@ function While (NilTrackerFn)
 	.loops.FinishLoop(msg)
 	ArchonPurger.loops = W
 
-	return t.BranchExit
+	return t.BranchExit(0)
 	
 
 
@@ -350,15 +351,15 @@ function If (NilTrackerFn)
 		ElseIfCond = arg2
 		arg2 = arg2.next
 
-	|| Orig = T.BranchEnter(msg)				#require
+	|| Orig = T.BranchEnter(msg) #require
 	#!"First Branch"
-	.SyncJump(Cond, NilCheckMode.positive)
+	.SyncJump(Cond, NilCheckMode.Ifpos)
 	.Argument(arg1)
 	
 	|| First = T.BranchSwap(Orig)
 
 	#!"Second Branch"
-	.SyncJump(cond, NilCheckMode.negative) // we need the negative, for the merging.
+	.SyncJump(cond, NilCheckMode.ifneg) // we need the negative, for the merging.
 	if ElseIfCond
 		.if(Else)
 	  elseif arg2.HasAny
@@ -372,7 +373,7 @@ function Tern (Niltrackerfn)
 	test &=~ NilCheckMode.Disappears
 	msg = msg.second!
 
-	|| Orig = T.BranchEnter(msg)			#require
+	|| Orig = T.BranchEnter(msg)	#require
 	|| tC = msg.first!,  || tA = tC.next!,  || tB = tA.next!
 
 	#!"First Branch"
@@ -381,19 +382,12 @@ function Tern (Niltrackerfn)
 	|| First = T.BranchSwap(Orig)
 
 	#!"Second Branch"
-	.jump(tC, nilcheckmode.negative)
+	.JumpWithinBool(tC, nilcheckmode.negative)
 	rz |= .JumpWithinBool(tB, test)
-	t.BranchExit(First)
+	t.BranchExitBool(First, test, orig)
 	rz &= ~nilstate.FnBecomesNilCh	// in theory if BOTH were nil-testers... its OK
 									// but thats sooo awkward to even think of a real-case
 									// where I want this! Just don't do it!
-
-/*
-	|| AllowTyping = ((f is editable) or (f isa menu)) and f.position // f is real
-	|| AllowTyping = !((f is editable) or (f isa menu)) and f.position // f is nil
-	|| AllowTyping = ((f is editable) or (f isa menu)) + f.position
-
-*/
 
 
 function BooleanLogic (niltrackerfn)
@@ -402,23 +396,24 @@ function BooleanLogic (niltrackerfn)
 	|| BB = msg.last!
 	|| IsAnd = test is AND
 	(test is AND) = false 
-	if "Bugged".trap
+
+	if "Bugged".trap// or "GoUpTo".trap
+	|| Orig = T.BranchEnter(AA)	#require
 	if IsAnd == (test is positive)
-		|| NC = .Jump(AA, test)						// x = (!a or !a.y)
+		|| NC = .Jump(AA, test ||| nilcheckmode.ForBools)				// x = (!a or !a.y)
 		NC   |= .JumpWithinBool(BB, test)
+		t.BranchExitBool(.value, test, orig)
 		return nilstate.real ||| (NC & nilstate.FnBecomesNilCh)
-	
-	|| Orig = T.BranchEnter(AA)				#require
 	
 	#!"test A+"
 	.Jump(AA, test)
 	|| First = T.BranchSwap(Orig)
 
 	#!"test A-B+"
-	.Jump(AA, test.negate)
+	.Jump(AA, test.negate ||| nilcheckmode.ForBools)
 	.JumpWithinBool(BB, test)
 
-	return t.BranchExit(First)
+	return t.BranchExitBool(First, test, orig)
 
 
 
@@ -508,7 +503,7 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 	if  test isnt active  or  test is soft and Negative
 		return Y
 
-	if Unknown or Y != test
+	if Unknown or (Y==nilstate.either) or (Y != (test&nilstate.Either))
 		return T.SetNilness(dcl, Test)
 
 	return msg.Redundantvar(dcl, test)
@@ -536,7 +531,7 @@ function Argument (Niltrackerfn)
 			exit
 	
 	|| Allowed = (1|uint64| << (v<<1)) - 1|uint64|
-	t.SetAllNil(ArchonPurger.value & Allowed)
+	t.value = ArchonPurger.value & Allowed
 
 
 function Bracket (Niltrackerfn)
