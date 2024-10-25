@@ -320,9 +320,6 @@ function While (NilTrackerFn)
 	require !CondTest.KnownFalse and T.BranchEnter(msg)
 
 	|| W = .loops.BeginLoop(!condtest.KnownTrue)
-	
-	if NilCheckMode.whilepos != NilCheckMode.forbools + NilCheckMode.positive + NilCheckMode.while
-	if NilCheckMode.whilepos != NilCheckMode.forbools ||| NilCheckMode.positive ||| NilCheckMode.while
 	for i in 3 
 		.SyncJump(cond, NilCheckMode.whilepos)
 		.Argument(cond.next)
@@ -397,7 +394,6 @@ function BooleanLogic (niltrackerfn)
 	|| IsAnd = test is AND
 	(test is AND) = false 
 
-	if "Bugged".trap// or "GoUpTo".trap
 	|| Orig = T.BranchEnter(AA)	#require
 	if IsAnd == (test is positive)
 		|| NC = .Jump(AA, test ||| nilcheckmode.ForBools)				// x = (!a or !a.y)
