@@ -2,6 +2,8 @@
 
 
 datatype SCNodeType (byte)
+	linkage
+		numeric false
 	constants (
 		|SCNodeType|
 		Module = 0	// not actually a type
@@ -14,7 +16,7 @@ datatype SCNodeType (byte)
 	syntax is (|SCNodetype| d, |bool|)
 		return self == d
 	function HasPtrs (|bool|)
-		return self & 1
+		return self|int| & 1
 
 
 extend scclass

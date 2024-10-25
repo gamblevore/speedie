@@ -20,6 +20,7 @@ datatype OpMode (int)
 		More  			// >				// if unsigned > 0
 		Less  			// <				// if 0 < unsigned
 		NilTest			// not the same as EqualOrNot... because those include customops
+		Multiply
 		Subtraction = (makessigned + Addition)
 		SameOrLessBits = [NoExtraBits, LoseBits]
 		Shift = ShiftOnly + NoExtraBits
@@ -174,7 +175,7 @@ module {
 		.AddMath( "mod",	"mod",		&asmstate.Mod,		/*.Mod*/	opmode.NeedsCppFuncOnFloats)
 		.AddMath( "+",		"Plus",		&asmstate.Plus,		/*.Add*/	opmode.Addition)
 		.AddMath( "-",		"Minus",	&asmstate.Subtract,	/*.sub*/	opmode.subtraction)
-		.AddMath( "*",		"Mul",		&asmstate.Multiply,	/*.mul*/)
+		.AddMath( "*",		"Mul",		&asmstate.Multiply,	/*.mul*/	opmode.Multiply)
 		.AddMath( "/",		"Divide",	&asmstate.Divide,	/*.div*/)
 
 		.AddBit( ">>",	"ShiftRight",	&asmstate.SHR,		/*.shru*/	opmode.shift)
@@ -451,7 +452,12 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 		if ln and rn and (ln == 1 or rn == 1)
 			if (CompOrSet)
 				return CustomOps.Needed
-			
+			if (comp is Multiply)
+				|| B = TypeBool!
+				if lc exact_isa B
+					return CustomOps.OnlyRightIsVector
+				if rc exact_isa B
+					return CustomOps.OnlyLeftIsVector
 			expect (LNT.SameBasicType(RNT)) (MsgRel, "Vector type mismatch.")
 			if LN > RN
 				return CustomOps.OnlyLeftIsVector

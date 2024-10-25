@@ -13,6 +13,7 @@ struct ASMState
 
 	|µFunc|						Out      
 	|&FatASM|					FuncStart
+	|&fatasm|					LastProgress
 	|&FatASM|					Start		// a "slice" feature would be nice    
 	|&FatASM|					Curr    
 	|&FatASM|					End    
@@ -335,6 +336,7 @@ function ASMState.StartFunc (|scfunction| fn)
 	.zero.info = AsmReg()
 	(.zero is NeverAltered)
 	.FuncStart = .curr
+	.LastProgress = .curr
 	scfunction.currfunc = fn
 	.ReturnASM = fn.ReturnType.regtype
 	.OK = true

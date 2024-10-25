@@ -227,10 +227,11 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 function PrintProgress (|message| exp)
 	"---"
 	printline exp.parent.parent
-	|| Curr = .FuncStart
+	|| Curr = .LastProgress
 	while curr < .curr
 		curr.debugprint
 		curr++
+	.LastProgress = curr
 
 
 function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asmreg|)
