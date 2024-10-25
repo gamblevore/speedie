@@ -235,6 +235,13 @@ forms
 		Count	7
 		Offset	l
 
+	VecMix
+		r1		R
+		r2		r // can load a float, vec2, or vec3
+		r3		r
+		r4		r
+		Mode	3 // only 6 actual cases. Only list possible entries.
+
 
 // this file:
 // 1) builds the c++ codes, and the jump-table, and the ASM accessor functions

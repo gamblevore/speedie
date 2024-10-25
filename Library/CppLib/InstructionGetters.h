@@ -521,3 +521,16 @@
 #define   RefDecrMem_Offsetu       (((uint)((Op)<<20))>>20)
 #define   RefDecrMem_Offsetu_(x)   (((uint)((x)<<20))>>20)
 
+
+#define   VecMix_Modei       ((( int)((Op)<<28))>>29)
+#define   VecMix_Modei_(x)   ((( int)((x)<<28))>>29)
+
+#define   VecMix_Modeu       (((uint)((Op)<<28))>>29)
+#define   VecMix_Modeu_(x)   (((uint)((x)<<28))>>29)
+
+#define   VecMix_Li       ((( int)((Op)<<31))>>31)
+#define   VecMix_Li_(x)   ((( int)((x)<<31))>>31)
+
+#define   VecMix_Lu       (((uint)((Op)<<31))>>31)
+#define   VecMix_Lu_(x)   (((uint)((x)<<31))>>31)
+
