@@ -60,7 +60,7 @@ datatype Type (int)
 		if self is Compressed
 			fs <~ "compressed "
 		if self is jbin
-			fs <~ "jbin"
+			fs <~ "jbn"
 		  elseif self is box
 			fs <~ "jeebox"
 		  elseif self is json
@@ -363,7 +363,7 @@ module Conv
 		if dest is box
 			return "box"
 		if dest is jbin
-			return "jbin"
+			return "jbn"
 	
 	
 	function OutPath (|file|)
@@ -378,7 +378,7 @@ module Conv
 			str = str.TrimExt
 		
 		|| x = .ext
-			if str isa "box" or "jbin" or "xml"			
+			if str isa "box" or "jbn" or "xml"			
 				str = str.SetExt(x)
 			  else
 				str = str.AddExt(x) 
