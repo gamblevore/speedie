@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[2149];
+extern JB_StringC* JB_LUB[2151];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 void JB_InitClassList(SaverLoadClass fn);
@@ -708,7 +708,7 @@ bool SC_Comp__CompileAll() {
 	}
 	iif (SC_Comp__Stage(JB_LUB[958])) {
 		SC_Comp__Timer(JB_LUB[958]);
-		SC_nil__FixArchons();
+		SC_nil__LaunchMothership();
 	}
 	iif (!SC_Comp__Stage(JB_LUB[1073])) {
 		return nil;
@@ -3453,7 +3453,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2024102504));
+	JB_FS_AppendInt32(_fsf0, (2024102520));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8877,7 +8877,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2024102504));
+	JB_FS_AppendInt32(_fsf0, (2024102520));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -19996,7 +19996,6 @@ void JB_SorterComparerBool_sort(FP_SorterComparerBool Self, Array* A) {
 
 
 
-
 void SC_nil_BecomeRealSub(ArchonPurger* Self, SCDecl* V) {
 	V->NilDeclared = kSC__NilState_Real;
 	iif (SC_Decl_SyntaxIs(V, kSC__SCDeclInfo_Self)) {
@@ -20008,20 +20007,38 @@ void SC_nil_BecomeRealSub(ArchonPurger* Self, SCDecl* V) {
 }
 
 NilRecord SC_nil_BranchEnter(ArchonPurger* Self, Message* Where) {
-	NilRecord Rz = 0;
-	iif (Self->Neel >= Self->RowEnd) {
-		JB_Msg_Fail(Where, JB_LUB[561]);
-		return 0;
+	iif (Self->Neel < Self->RowEnd) {
+		NilRecord N = Self->Neel++[0];
+		Self->Neel[0] = N;
+		return N;
 	}
-	Rz = Self->Neel++[0];
-	Self->Neel[0] = Rz;
-	return Rz;
+	iif (true) {
+		JB_Msg_Fail(Where, JB_LUB[561]);
+	}
+	return 0;
 }
 
 NilState SC_nil_BranchExit(ArchonPurger* Self, NilRecord A) {
 	NilRecord B = SC_nil__Value();
 	Self->Neel--[0] = 0;
-	SC_nil_SetAllNil(Self, A | B);
+	(SC_nil_ValueSet((&SC__nil_T), A | B));
+	iif (SC_nil_NestDepth(Self) == 0) {
+		Self->Realnesses = -1;
+	}
+	return kSC__NilState_Real;
+}
+
+NilState SC_nil_BranchExitBool(ArchonPurger* Self, NilRecord A, NilCheckMode Test, NilRecord Orig) {
+	iif (SC_khalai_SyntaxIs(Test, kSC__khalai_ForBools)) {
+		return SC_nil_BranchExit(Self, A);
+	}
+	Self->Neel[0] = 0;
+	return SC_nil_BranchRestore(Self, Orig);
+}
+
+NilState SC_nil_BranchRestore(ArchonPurger* Self, NilRecord A) {
+	Self->Neel--[0] = 0;
+	(SC_nil_ValueSet((&SC__nil_T), A));
 	iif (SC_nil_NestDepth(Self) == 0) {
 		Self->Realnesses = -1;
 	}
@@ -20031,7 +20048,7 @@ NilState SC_nil_BranchExit(ArchonPurger* Self, NilRecord A) {
 NilRecord SC_nil_BranchSwap(ArchonPurger* Self, NilRecord A) {
 	NilRecord Rz = 0;
 	Rz = SC_nil__Value();
-	SC_nil_SetAllNil(Self, A);
+	(SC_nil_ValueSet(Self, A));
 	return Rz;
 }
 
@@ -20194,7 +20211,7 @@ NilState SC_nil__Argument(Message* Msg, NilCheckMode Test) {
 	}
 	;
 	int64 Allowed = (((uint64)1) << (V << 1)) - ((uint64)1);
-	SC_nil_SetAllNil((&SC__nil_T), SC_nil__Value() & Allowed);
+	(SC_nil_ValueSet((&SC__nil_T), SC_nil__Value() & Allowed));
 	return Rz;
 }
 
@@ -20222,22 +20239,25 @@ NilState SC_nil__BooleanLogic(Message* Msg, NilCheckMode Test) {
 	Message* BB = ((Message*)JB_Ring_Last(Msg));
 	bool IsAnd = SC_khalai_SyntaxIs(Test, kSC__khalai_And);
 	Test = (SC_khalai_SyntaxIsSet(Test, kSC__khalai_And, false));
-	iif (IsAnd == (SC_khalai_SyntaxIs(Test, kSC__khalai_Positive))) {
-		uint NC = SC_nil__FlowJump(AA, Test);
-		NC = (NC | SC_nil__JumpWithinBool(BB, Test));
-		return kSC__NilState_Real | (NC & kSC__NilState_FnBecomesNilCh);
+	iif (SC_Str_trap(JB_LUB[2149], nil)) {
 	}
 	NilRecord Orig = SC_nil_BranchEnter((&SC__nil_T), AA);
 	iif (!Orig) {
 		return 0;
 	}
+	iif (IsAnd == (SC_khalai_SyntaxIs(Test, kSC__khalai_Positive))) {
+		uint NC = SC_nil__FlowJump(AA, Test | kSC__khalai_ForBools);
+		NC = (NC | SC_nil__JumpWithinBool(BB, Test));
+		SC_nil_BranchExitBool((&SC__nil_T), SC_nil__Value(), Test, Orig);
+		return kSC__NilState_Real | (NC & kSC__NilState_FnBecomesNilCh);
+	}
 	//"test A+";
 	SC_nil__FlowJump(AA, Test);
 	NilRecord First = SC_nil_BranchSwap((&SC__nil_T), Orig);
 	//"test A-B+";
-	SC_nil__FlowJump(AA, SC_khalai_Negate(Test));
+	SC_nil__FlowJump(AA, SC_khalai_Negate(Test) | kSC__khalai_ForBools);
 	SC_nil__JumpWithinBool(BB, Test);
-	return SC_nil_BranchExit((&SC__nil_T), First);
+	return SC_nil_BranchExitBool((&SC__nil_T), First, Test, Orig);
 }
 
 NilState SC_nil__Bracket(Message* Msg, NilCheckMode Test) {
@@ -20409,31 +20429,6 @@ NilState SC_nil__FailedReal(SCFunction* To, Message* Where, uint /*NilReason*/ R
 	return 0;
 }
 
-void SC_nil__FixArchons() {
-	JB_ErrorReceiver* Old = JB_StdErr;
-	JB_ErrorReceiver* Rec = JB_Rec_Constructor(nil);
-	iif (true) {
-		JB_ErrorReceiver* _usingf0 = JB_Rec_SyntaxUsing(Rec);
-		{
-			Array* _LoopSrcf3 = SC__Comp_FuncList;
-			int _if1 = 0;
-			while (true) {
-				SCFunction* Xoxo = ((SCFunction*)JB_Array_Value(_LoopSrcf3, _if1));
-				iif (Xoxo == nil) {
-					break;
-				}
-				int I = _if1;
-				SC_nil__ExterminateZergBugs(Xoxo);
-				SC_Rec_ReturnErrors(Rec, Old);
-				(++_if1);
-			};
-		}
-		;
-		JB_Rec_SyntaxUsingComplete(_usingf0, Rec);
-	}
-	(SC_Func__CurrFuncSet(nil));
-}
-
 NilState SC_nil__Function(Message* Msg, NilCheckMode Test) {
 	uint Rz = 0;
 	Test = (Test & (~kSC__khalai_Disappears));
@@ -20555,11 +20550,11 @@ NilState SC_nil__If(Message* Msg, NilCheckMode Test) {
 		return 0;
 	}
 	//"First Branch";
-	SC_nil__SyncJump(Cond, kSC__khalai_Positive);
+	SC_nil__SyncJump(Cond, kSC__khalai_IfPos);
 	SC_nil__Argument(Arg1, 0);
 	NilRecord First = SC_nil_BranchSwap((&SC__nil_T), Orig);
 	//"Second Branch";
-	SC_nil__SyncJump(Cond, kSC__khalai_Negative);
+	SC_nil__SyncJump(Cond, kSC__khalai_IfNeg);
 	iif (ElseIfCond) {
 		SC_nil__If(Else, 0);
 	}
@@ -20634,24 +20629,44 @@ NilState SC_nil__Item(Message* Msg, NilCheckMode Test) {
 }
 
 NilState SC_nil__FlowJump(Message* Msg, NilCheckMode Test) {
-	uint Rz = 0;
 	iif (JB__Flow_Active) {
 		JB_Flow__SyntaxAppend(((byte)Msg->Func));
 		JB_Flow__Input(JB_LUB[0], Msg->Name);
 	}
-	Rz = SC_nil__JumpSub(Msg, Test);
-	iif (JB__Flow_Active) {
-		JB_Flow__SyntaxAppend(((byte)Rz));
-	}
-	return Rz;
+	return SC_nil__JumpSub(Msg, Test);
 }
 
 NilState SC_nil__JumpWithinBool(Message* Msg, NilCheckMode Test) {
 	uint Rz = 0;
 	(++SC__nil_T.InsideBoolLogic);
-	Rz = SC_nil__FlowJump(Msg, Test);
+	Rz = SC_nil__FlowJump(Msg, Test | kSC__khalai_ForBools);
 	(--SC__nil_T.InsideBoolLogic);
 	return Rz;
+}
+
+void SC_nil__LaunchMothership() {
+	JB_ErrorReceiver* Old = JB_StdErr;
+	JB_ErrorReceiver* Rec = JB_Rec_Constructor(nil);
+	iif (true) {
+		JB_ErrorReceiver* _usingf0 = JB_Rec_SyntaxUsing(Rec);
+		{
+			Array* _LoopSrcf3 = SC__Comp_FuncList;
+			int _if1 = 0;
+			while (true) {
+				SCFunction* Xoxo = ((SCFunction*)JB_Array_Value(_LoopSrcf3, _if1));
+				iif (Xoxo == nil) {
+					break;
+				}
+				int I = _if1;
+				SC_nil__ExterminateZergBugs(Xoxo);
+				SC_Rec_ReturnErrors(Rec, Old);
+				(++_if1);
+			};
+		}
+		;
+		JB_Rec_SyntaxUsingComplete(_usingf0, Rec);
+	}
+	(SC_Func__CurrFuncSet(nil));
 }
 
 NilState SC_nil__List(Message* Msg, NilCheckMode Test) {
@@ -20877,9 +20892,9 @@ NilState SC_nil__Tern(Message* Msg, NilCheckMode Test) {
 	Rz = SC_nil__JumpWithinBool(tA, Test);
 	NilRecord First = SC_nil_BranchSwap((&SC__nil_T), Orig);
 	//"Second Branch";
-	SC_nil__FlowJump(tC, kSC__khalai_Negative);
+	SC_nil__JumpWithinBool(tC, kSC__khalai_Negative);
 	Rz = (Rz | SC_nil__JumpWithinBool(tB, Test));
-	SC_nil_BranchExit((&SC__nil_T), First);
+	SC_nil_BranchExitBool((&SC__nil_T), First, Test, Orig);
 	Rz = (Rz & (~kSC__NilState_FnBecomesNilCh));
 	return Rz;
 }
@@ -20910,7 +20925,7 @@ NilState SC_nil__ThingSub(Message* Msg, NilCheckMode Test, SCDecl* Dcl) {
 	iif ((!SC_khalai_SyntaxIs(Test, kSC__khalai_Active)) or (SC_khalai_SyntaxIs(Test, kSC__khalai_Soft) and SC_khalai_SyntaxIs(Test, kSC__khalai_Negative))) {
 		return Y;
 	}
-	iif (Unknown or (Y != Test)) {
+	iif (Unknown or ((Y == kSC__NilState_Either) or (Y != (Test & kSC__NilState_Either)))) {
 		return SC_nil_SetNilness((&SC__nil_T), Dcl, Test);
 	}
 	return SC_Msg_RedundantVar(Msg, Dcl, Test);
@@ -21026,6 +21041,10 @@ NilState SC_nil__While(Message* Msg, NilCheckMode Test) {
 	}
 	LoopInfo W = ((LoopInfo){});
 	SC_LoopInfo_BeginLoop((&SC__nil_Loops), (!JB_MaybeBool_KnownTrue(CondTest)), (&W));
+	iif (kSC__khalai_WhilePos != (kSC__khalai_ForBools + (kSC__khalai_Positive + kSC__khalai_While))) {
+	}
+	iif (kSC__khalai_WhilePos != (kSC__khalai_ForBools | (kSC__khalai_Positive | kSC__khalai_While))) {
+	}
 	{
 		int I = 0;
 		wwhile (I < 3) {
@@ -21967,12 +21986,12 @@ void SC_LoopInfo_FinishLoop(LoopInfo* Self, Message* Msg) {
 	iif ((!Self->HasEscape) and (!JB_Tree_IsLast(Msg))) {
 		SC_Msg_KinderRemoveAfter(Msg);
 	}
-	SC_nil_SetAllNil((&SC__nil_T), Ex);
+	(SC_nil_ValueSet((&SC__nil_T), Ex));
 }
 
 void SC_LoopInfo_NextLoop(LoopInfo* Self) {
 	Self->ContRecord = (Self->ContRecord | SC_nil__Value());
-	SC_nil_SetAllNil((&SC__nil_T), Self->ContRecord);
+	(SC_nil_ValueSet((&SC__nil_T), Self->ContRecord));
 }
 
 
@@ -22786,7 +22805,6 @@ ASMReg SC_Pac_BoolValue(ASMState* Self, Message* A, ASMReg Dest, OpMode Opp, Mes
 	}
 	(SC_FAT_JumpToSet(JUMP, Self->Curr));
 	iif (SC_Reg_IsBool(First) and SC_Reg_IsBool(Second)) {
-		JB_DoAt(1);
 		return First;
 	}
 	return SC_Pac_Exists(Self, Dest, First, ((Message*)JB_Ring_NextSib(A)));
@@ -23871,11 +23889,17 @@ ASMReg SC_Pac_Zeros(ASMState* Self, ASMReg Dest, Message* Exp) {
 }
 
 ASMReg SC_Pac_xC2xB5BoolInto(ASMState* Self, Message* Exp, ASMReg Dest) {
+	ASMReg Rz = ((ASMReg)0);
 	ASMReg X = SC_Pac_ExistingVar(Self, Exp);
 	iif (X) {
-		return SC_Pac_Exists(Self, SC_Reg_OperatorAs(Dest, (SC_Reg_OperatorBitand(X, kSC__Reg_FromExistingVar))), X, Exp);
+		Rz = SC_Pac_Exists(Self, SC_Reg_OperatorAs(Dest, (SC_Reg_OperatorBitand(X, kSC__Reg_FromExistingVar))), X, Exp);
 	}
-	return SC_Pac_xC2xB5Into(Self, Exp, Dest);
+	 else {
+		Rz = SC_Pac_xC2xB5Into(Self, Exp, Dest);
+	}
+	iif (SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate) and (!SC_Reg_SyntaxIs(Rz, kSC__Reg_AlreadyNegated))) {
+	}
+	return Rz;
 }
 
 ASMReg SC_Pac_xC2xB5Into(ASMState* Self, Message* Exp, ASMReg Dest) {
@@ -42720,8 +42744,8 @@ SCDecl* SC_Decl_Constructor(SCDecl* Self, SCClass* Type) {
 	Self->C_Array = 0;
 	Self->DataType = kJB__TC_UnusedType;
 	Self->NilAllocDepth = 0;
-	Self->PointerCount = 0;
 	Self->NilReg = 0;
+	Self->PointerCount = 0;
 	JB_Incr2(Self->Type, Type);
 	Self->NilDeclared = kSC__NilState_Either;
 	Self->Info = kSC__SCDeclInfo_Altered;
@@ -43695,7 +43719,7 @@ bool SC_Decl_NeedsContainedfix(SCDecl* Self) {
 }
 
 SCDecl* SC_Decl_NewWrapper(SCDecl* Self, SCDecl* CastTo) {
-	bool IsNormal = CastTo and SC_Decl_IsNormal(CastTo);
+	bool IsNormal = SC_Decl_IsNormal(CastTo);
 	iif (IsNormal) {
 		SCDecl* It = Self->Type->DataObject;
 		iif (It) {
@@ -51943,16 +51967,16 @@ SCFunction* SC_Func_Constructor(SCFunction* Self, Message* Msg) {
 	Self->DepthFinder = nil;
 	Self->ReturnType = nil;
 	Self->FuncInfo = 0;
+	Self->AltersParams = 0;
 	Self->LinkDepth = 0;
 	Self->TmpCounter = 0;
-	Self->AltersParams = 0;
 	Self->IntPrmCount = 0;
+	Self->NilSelf = 0;
 	Self->MinOpt = 0;
 	Self->IsAssigns = 0;
 	Self->IsCppInBuilt = 0;
 	Self->BlindCasts = 0;
 	Self->IsNilChecker = 0;
-	Self->NilSelf = 0;
 	Self->Badness = 0;
 	Self->OptCounts = 0;
 	Self->StructReturnPos = 0;
@@ -56109,38 +56133,43 @@ bool SC_Func__Tran_FuncTable(Message* Msg) {
 						JB_SetRef(Item_value, ((Message*)JB_Tree_WrapWith(Item_value, _tmPf13)));
 						JB_Decr(_tmPf13);
 					}
-					iif (!JB_Str_Exists(NewName)) {
-						JB_String* _tmPf15 = SC_Msg_CollectFuncTableName(Item_name);
-						JB_Incr(_tmPf15);
-						JB_String* _tmPf14 = JB_Str_OperatorPlus(JB_LUB[1330], _tmPf15);
-						JB_Incr(_tmPf14);
-						JB_Decr(_tmPf15);
-						JB_SetRef(NewName, JB_Str_OperatorPlus(Name, _tmPf14));
-						JB_Decr(_tmPf14);
-						Message* _tmPf16 = SC_Msg_CollectionPlace(Msg);
-						JB_Incr(_tmPf16);
-						Message* _tmPf18 = JB_Syx_Msg(kJB_SyxThg, protoName);
-						JB_Incr(_tmPf18);
-						Message* _tmPf17 = SC_Func__ArgToFunc(NewName, (_tmPf18), Item_value);
-						JB_Incr(_tmPf17);
-						JB_Decr(_tmPf18);
-						JB_Tree_SyntaxAppend(_tmPf16, _tmPf17);
-						JB_Decr(_tmPf16);
-						JB_Decr(_tmPf17);
+					iif (!Item_name) {
+						JB_Msg_Fail(I, JB_LUB[2150]);
 					}
-					Message* _tmPf19 = ({
-						Message* __imPf5 = (JB_Syx_Msg(kJB_SyxBRel, JB_LUB[240]));
-						JB_Incr(__imPf5);
-						Message* _tmPf20 = JB_Syx_Msg(kJB_SyxThg, NewName);
-						JB_Incr(_tmPf20);
-						JB_Tree_SyntaxAppend(__imPf5, (_tmPf20));
-						JB_Decr(_tmPf20);
-						JB_SafeDecr(__imPf5);
-						 __imPf5;
-					});
-					JB_Incr(_tmPf19);
-					JB_Tree_SyntaxAppend(I, _tmPf19);
-					JB_Decr(_tmPf19);
+					iif (Item_name) {
+						iif (!JB_Str_Exists(NewName)) {
+							JB_String* _tmPf15 = SC_Msg_CollectFuncTableName(Item_name);
+							JB_Incr(_tmPf15);
+							JB_String* _tmPf14 = JB_Str_OperatorPlus(JB_LUB[1330], _tmPf15);
+							JB_Incr(_tmPf14);
+							JB_Decr(_tmPf15);
+							JB_SetRef(NewName, JB_Str_OperatorPlus(Name, _tmPf14));
+							JB_Decr(_tmPf14);
+							Message* _tmPf16 = SC_Msg_CollectionPlace(Msg);
+							JB_Incr(_tmPf16);
+							Message* _tmPf18 = JB_Syx_Msg(kJB_SyxThg, protoName);
+							JB_Incr(_tmPf18);
+							Message* _tmPf17 = SC_Func__ArgToFunc(NewName, (_tmPf18), Item_value);
+							JB_Incr(_tmPf17);
+							JB_Decr(_tmPf18);
+							JB_Tree_SyntaxAppend(_tmPf16, _tmPf17);
+							JB_Decr(_tmPf16);
+							JB_Decr(_tmPf17);
+						}
+						Message* _tmPf19 = ({
+							Message* __imPf5 = (JB_Syx_Msg(kJB_SyxBRel, JB_LUB[240]));
+							JB_Incr(__imPf5);
+							Message* _tmPf20 = JB_Syx_Msg(kJB_SyxThg, NewName);
+							JB_Incr(_tmPf20);
+							JB_Tree_SyntaxAppend(__imPf5, (_tmPf20));
+							JB_Decr(_tmPf20);
+							JB_SafeDecr(__imPf5);
+							 __imPf5;
+						});
+						JB_Incr(_tmPf19);
+						JB_Tree_SyntaxAppend(I, _tmPf19);
+						JB_Decr(_tmPf19);
+					}
 				}
 				JB_String* Iname = I->Name;
 				JB_Incr(Iname);
@@ -57561,4 +57590,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 8566343988803170944 -628001946639639329
+// 1600918502614680107 -6880322557192767257

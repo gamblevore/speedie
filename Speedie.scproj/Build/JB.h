@@ -241,8 +241,6 @@ typedef Date Duration;
 
 typedef Date HumanDate;
 
-struct ASMVarType;
-
 struct ArchonPurger;
 
 struct ArgArrayCounter;
@@ -1193,9 +1191,9 @@ JBClass ( SCDecl , SCNamed ,
 	int C_Array;
 	DataTypeCode DataType;
 	byte NilAllocDepth;
-	byte PointerCount;
-	byte NilReg;
 	NilState NilDeclared;
+	byte NilReg;
+	byte PointerCount;
 );
 
 struct SCFile_Behaviour: File_Behaviour {
@@ -1377,17 +1375,17 @@ JBClass ( SCFunction , SCBetterNode ,
 	SCFunction* DepthFinder;
 	SCDecl* ReturnType;
 	FunctionType FuncInfo;
-	u16 LinkDepth;
-	u16 TmpCounter;
 	u16 AltersParams;
+	u16 LinkDepth;
 	u16 TableId;
+	u16 TmpCounter;
 	byte IntPrmCount;
+	NilState NilSelf;
 	byte MinOpt;
 	byte IsAssigns;
 	byte IsCppInBuilt;
 	ErrorSeverity BlindCasts;
 	byte IsNilChecker;
-	NilState NilSelf;
 	byte Badness;
 	byte OptCounts;
 	byte StructReturnPos;
@@ -2242,14 +2240,17 @@ extern Array* JB__ErrorSeverity__names;
 #define kSC__khalai_Assigns ((NilCheckMode)128)
 #define kSC__khalai_Basic ((NilCheckMode)7)
 #define kSC__khalai_Disappears ((NilCheckMode)64)
+#define kSC__khalai_ForBools ((NilCheckMode)256)
+#define kSC__khalai_IfNeg ((NilCheckMode)257)
+#define kSC__khalai_IfPos ((NilCheckMode)258)
 #define kSC__khalai_Negative ((NilCheckMode)1)
 #define kSC__khalai_Nothing ((NilCheckMode)0)
 #define kSC__khalai_Positive ((NilCheckMode)2)
 #define kSC__khalai_Reversed ((NilCheckMode)16)
 #define kSC__khalai_Soft ((NilCheckMode)4)
 #define kSC__khalai_While ((NilCheckMode)32)
-#define kSC__khalai_WhileNeg ((NilCheckMode)33)
-#define kSC__khalai_WhilePos ((NilCheckMode)34)
+#define kSC__khalai_WhileNeg ((NilCheckMode)289)
+#define kSC__khalai_WhilePos ((NilCheckMode)290)
 #define kSC__NilReason_Accessing ((NilReason)0)
 #define kSC__NilReason_Passing ((NilReason)4)
 #define kSC__NilReason_Property ((NilReason)1)
@@ -5356,15 +5357,16 @@ void JB_SorterComparerBool_sort(FP_SorterComparerBool Self, Array* A);
 // prototype
 
 
-// JB_ASMVarType
-
-
 // JB_ArchonPurger
 void SC_nil_BecomeRealSub(ArchonPurger* Self, SCDecl* V);
 
 NilRecord SC_nil_BranchEnter(ArchonPurger* Self, Message* Where);
 
 NilState SC_nil_BranchExit(ArchonPurger* Self, NilRecord A);
+
+NilState SC_nil_BranchExitBool(ArchonPurger* Self, NilRecord A, NilCheckMode Test, NilRecord Orig);
+
+NilState SC_nil_BranchRestore(ArchonPurger* Self, NilRecord A);
 
 NilRecord SC_nil_BranchSwap(ArchonPurger* Self, NilRecord A);
 
@@ -5420,8 +5422,6 @@ NilState SC_nil__Fail(Message* Msg, NilCheckMode Test);
 
 NilState SC_nil__FailedReal(SCFunction* To, Message* Where, uint /*NilReason*/ Reason, uint /*NilState*/ State);
 
-void SC_nil__FixArchons();
-
 NilState SC_nil__Function(Message* Msg, NilCheckMode Test);
 
 NilState SC_nil__If(Message* Msg, NilCheckMode Test);
@@ -5437,6 +5437,8 @@ NilState SC_nil__Item(Message* Msg, NilCheckMode Test);
 NilState SC_nil__FlowJump(Message* Msg, NilCheckMode Test);
 
 NilState SC_nil__JumpWithinBool(Message* Msg, NilCheckMode Test);
+
+void SC_nil__LaunchMothership();
 
 NilState SC_nil__List(Message* Msg, NilCheckMode Test);
 
@@ -10343,9 +10345,9 @@ inline bool SC_PA_SyntaxCast(SCParamArray* Self);
 
 inline DataTypeCode SC_Reg_xC2xB5Type(ASMReg Self);
 
-inline void SC_nil_SetAllNil(ArchonPurger* Self, NilRecord Dest);
-
 inline NilRecord SC_nil_Value(ArchonPurger* Self);
+
+inline void SC_nil_ValueSet(ArchonPurger* Self, NilRecord Dest);
 
 inline FatASM* SC_uint_FAT(uint Self);
 
@@ -10522,12 +10524,12 @@ inline DataTypeCode SC_Reg_xC2xB5Type(ASMReg Self) {
 	return ((DataTypeCode)Self) & kJB__TC_PossibleBits;
 }
 
-inline void SC_nil_SetAllNil(ArchonPurger* Self, NilRecord Dest) {
-	Self->Neel[0] = (Dest & Self->Realnesses);
-}
-
 inline NilRecord SC_nil_Value(ArchonPurger* Self) {
 	return Self->Neel[0];
+}
+
+inline void SC_nil_ValueSet(ArchonPurger* Self, NilRecord Dest) {
+	Self->Neel[0] = (Dest & Self->Realnesses);
 }
 
 inline FatASM* SC_uint_FAT(uint Self) {
@@ -10628,7 +10630,7 @@ inline void SC_nil__DeclKill() {
 	iif (!SC_nil_NestDepth((&SC__nil_T))) {
 		SC__nil_T.RootReturned = true;
 	}
-	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
+	(SC_nil_ValueSet((&SC__nil_T), kSC__NilState_Basic));
 }
 
 inline NilState SC_nil__JumpSub(Message* Msg, NilCheckMode Test) {
@@ -10670,7 +10672,7 @@ inline bool SC_Reg_IsInt(ASMReg Self) {
 inline NilRecord SC_nil__EndBlock() {
 	NilRecord Rz = 0;
 	Rz = SC_nil__Value();
-	SC_nil_SetAllNil((&SC__nil_T), kSC__NilState_Basic);
+	(SC_nil_ValueSet((&SC__nil_T), kSC__NilState_Basic));
 	return Rz;
 }
 
