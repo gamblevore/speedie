@@ -465,7 +465,7 @@ module GUI
 		opt norefcounts
 		|| f = w.realfocus
 		|| AllowTyping = f and ((f is editable) or (f isa menu) or (f isa textview))
-		if !f and (w is editable)		// nilchecker bug
+		if !f and (w is editable)
 			AllowTyping = true	// allow type-through if the window is "editable". like to type secret codes in
 		if (f isa textview)
 			if (!f.SelRange.width)
