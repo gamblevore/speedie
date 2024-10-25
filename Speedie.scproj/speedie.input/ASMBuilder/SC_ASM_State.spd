@@ -145,8 +145,11 @@ struct ASMState
 
 	function µBoolInto (|message| exp, |AsmReg| Dest, |asmreg|)
 		|| X = .ExistingVar(Exp)
-			return .exists(dest as (x bitand asmreg.fromexistingvar), X, exp)
-		return .µInto(exp, dest)
+			rz = .exists(dest as (x bitand asmreg.fromexistingvar), X, exp) // negates
+		  else
+			rz = .µInto(exp, dest) // negates?
+		if dest is negate and rz isnt alreadynegated // ?? good test
+		
 
 
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)

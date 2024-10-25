@@ -210,16 +210,16 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 		if first is ConstAny
 			return .BoolConst1(b, dest, opp, first)					// x = 5 or Y() --> x = Y()
 	
-	|| JUMP = .BoolTestAndJump(a.next!, first, opp)					// AND/OR here.
+	|| JUMP = .BoolTestAndJump(a.next!, first, opp)					// AND/OR
 	|| Second = .µBoolInto(B, first)
-	if Second is ConstAny											// Wow this is frustrating!
+	if Second is ConstAny
 		.NOP(jump)
 		return .BoolConst2(opp, first, Second)
 
 	JUMP.JumpTo = .curr
 	
-	if first.IsBool and Second.IsBool
-/		return first
+	if first.IsBool and Second.IsBool	// always already share reg. Perhaps not same type.
+		return first					// second already set into first...
 
 	return .Exists(dest, first, a.next!)							// first.reg == dest.reg
 
