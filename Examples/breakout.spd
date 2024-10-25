@@ -7,46 +7,83 @@ main
 
 class Breakout (Window)
 	|[bounceable]|		Spirals
+	|[block]|			Blocks
+	|block|				Bar
+	|block|				Ball
 	
+	// we need some kind of unit-grid system instead. Not screen-coords or pixels
+	// but like... say a tile is 32-pixels and that counts as 1 block.
 	constructor
-		.spirals <~ bounceable((0.5, 0.25), (0.13,0.0), vec4(0.1,0,0,0))
-		.spirals <~ bounceable((0.25, 0.5), (0.05,0.0), vec4(0.3,0,0,0))
-		.spirals <~ bounceable((0.75, 0.75), (-0.1,0.0), vec4(0.5,0,0,0))
+		.bar = block((0, -0.9), (0.3, 0.055), vec2(), colors.white)
+		.ball = block((0, -0.8), (0.03, 0.03), vec2(), colors.white)
+		for y in 6.0.Steps
+			|| Col = colors.hsb(((-y+0.75)*0.125, 0.8, 0.5, 1.0))
+			for x in 14.0.Steps
+				|| pos = (x*0.9+0.005, y*0.33+0.7)
+				.Blocks <~ block(pos, (0.1, 0.075), vec2(), col)
+		
+		.spirals <~ bounceable((0.5 , 0.13),  (0.25,0.0), vec4(0.1,0,0.3,0))
+		.spirals <~ bounceable((0.25, 0.05),  (0.5,0.0),  vec4(0.3,0.2,0,0))
+		.spirals <~ bounceable((0.75, -0.1),  (0.75,0.0), vec4(0.5,0,0,0))
+	
+	behaviour FrameStep
+		for s in .Spirals
+			s.step
+		for b in .Blocks
+			b.pos += b.Velocity
+		.bar.Pos += keys.Vec3.xz*0.01
+		gui.Touch
+	
 	
 	behaviour Drawbackground
 		where.DrawRect(self, colors.black)	
 		|| C = .LastRect.vec4
-		C += (C.size*0.25, -C.size*0.25)
+		|| C2 = C + (C.size*0.25, -C.size*0.25)
 		|| L = gui.Loop(24s)
-		for b in .Spirals
-			b.step
-			where.DrawSpiral(144.0, L, b.XY(C), (vec4(), b.col)(0.2[]))
-		gui.Touch
+		for s in .Spirals
+			where.DrawSpiral(144, L, s.XY(C2), s.col * 0.2[])
+		for b in .Blocks
+			b.draw(where, C)
+		.bar.draw(Where, C)
+		.ball.draw(where, C)
 
 
-class Bounceable
+class Block
 	|vec2| Pos
-	|vec2| Speed
+	|vec2| Size
+	|vec2| Velocity
+	|vec4| Color
+	
+	function Draw (|image| where, |vec4| R)
+		|| S = R.size
+		|| C = R.Center
+		|| rad = .size*0.5
+		|| P = ((.pos-rad, .pos+rad)+1.0)*0.5*R.size.xyxy
+		where.DrawRect(P.ivec4, .color)
+
+
+class Bounceable // merge with block?
+	|vec2| X // This is wierd but i don't care
+	|vec2| Y // Its just a demo :). demos are ALWWAYS WIERD
 	|vec4| Col
 	
 	function XY (|vec4| P, |vec2|)
-		return (.pos * p.size) + p.xy
+		return ((.x.x, .y.x) * p.size) + p.xy
 
+	function vec2.bounce (|vec2|)
+		if .x > 1.0
+			return (2.0, 0) - self
+		if .x < 0
+			return -self
+		return self
+		
 	function Step
-		.speed.y -= g
-		.pos += .speed*128th
-		if .Pos.y > 1.0
-			.pos.y = 2.0-.pos.y
-			.Speed.y = -.Speed.y
-		  elseif .Pos.y < 0
-			.pos.y = -.pos.y
-			.Speed.y = -.Speed.y
-		if .Pos.x > 1.0
-			.pos.x = 2.0-.pos.x
-			.Speed.x = -.Speed.x
-		  elseif .Pos.x < 0
-			.pos.x = -.pos.x
-			.Speed.x = -.Speed.x
+		.y.x2 -= g
+		.x.x += .x.x2/128
+		.y.x += .y.x2/128
+		.x = .x.Bounce
+		.y = .y.Bounce
+
 	module
 		|| g = 0.0024
 
@@ -57,7 +94,7 @@ function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| HSB)
 		|| P = R*(50.0+i) + XY
 		|| Circle = (P-4.0, P+4.0)
 		|| A = ((Max-i)*2.0)/max
-		|| C = Colors.HSB((i*0.005, 1.0, 1.0, A)+HSB)
+		|| C = Colors.HSB((i*0.005, 0.7, 1.0, A)+HSB)
 	
-		.DrawCircle2(Circle, C)
+		.DrawSoftCircle(Circle, C)
 
