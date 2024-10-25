@@ -1,10 +1,27 @@
 #!/usr/local/bin/speedie
 
+app.usage = `Usage: sort.spd path1 [path2, path3]
+
+options:
+	types=txt/html
+	quiet
+
+example:
+	sort.spd /usr/local/speedie
+	sort.spd dir1 dir2 --types=a
+	sort.spd /usr/local/speedie -q
+	sort.spd /usr/local/speedie --types=cpp -q
+	sort.spd /usr/local/speedie --types=md
+`
+
 |[file]|				Found
 |dictionary?|			Types
 |int|					Total
 
 main (|[existingfile]| files)
+	if !files
+		printline app.Usage
+		return 0
 	types = dictionary.new
 	types!["spd"] = "x"
 	|| t = app["types"]
@@ -17,7 +34,7 @@ main (|[existingfile]| files)
 		app.Collect(f)
 	found.sort(MySorter)
 	|| remover = app.Findremover
-	if app.No("quiet")
+	if app.No("quiet") and app.no("q")
 		for f in found
 			"${f.trimstart(remover)} --> ${f.size.strsize}"
 	"Total: ${Total.strsize}"
