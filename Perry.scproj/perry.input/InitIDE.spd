@@ -317,7 +317,7 @@ extend PerryIDE
 			.SingleLine		= TextView.SingleLine
 			isnt editable 
 			.takesfocus		= 0
-			.size 			= the~left for 300  by  0 to 13
+			.size 			= the~left for 350  by  0 to 13
 			.gnormal.clear
 
 

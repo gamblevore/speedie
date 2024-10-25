@@ -202,11 +202,22 @@ class PerryIDE (Window)
 			|| e = .editme
 			|| t = e.text
 
-			// * char count:  x~chars  x~lines  x~loc  x~nodes, Same for memory
 			fs <~ "Chars ${t.charcount}   Lines ${t.linecount}"
 			|| msg = .EditMe.ParsedMessage
 				|| loc = msg.loc
 				fs <~ "   LOC ${loc[0]}   Nodes ${loc[1]}"
+			fs <~ (' ', 3)
+			if t.IsASCII
+				fs <~ "ASCII"
+			  elseif t.IsBadUTF8
+				fs <~ "binary"
+			  else
+				fs <~ "UTF-8"
+			|| d = e.Document
+				if d.WasJbin
+					fs <~ ".jbn"
+				if d.WasCompressed
+					fs <~ ".mz"
 			
 		  elseif i == 2
 			|| f = .filelist.FirstSelected as filerow
