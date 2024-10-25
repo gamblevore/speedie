@@ -255,9 +255,12 @@ class FastString {
 		cpp_wrapper JB_FS_AppendLocalTime
 
 
+	syntax Append (|Float| F)
+		cpp_name JB_FS_AppendFloatAsText
+		self <~ F|Float64|
+
 	syntax Append (|Float64| D)
 		cpp_wrapper JB_FS_AppendDoubleAsText0
-
 	
 	function AppendDouble (|Float64| D, |int| dp=1, |bool| CanExp=false, |bool| Dot=false)
 		cpp_wrapper JB_FS_AppendDoubleAsText
@@ -266,15 +269,9 @@ class FastString {
 		opt inline
 		.AppendDouble(D|Float64|, dp, canexp, dot)
 	
-	
-	syntax Append (|Float| F)
-		cpp_name JB_FS_AppendFloatAsText
-		self <~ F|Float64|
-
 	syntax Append (|bool| B)
 		cpp_name JB_FS_AppendBool
 		self <~ b.string
-
 	
 	function Mark (|int|)
 		description "Returns 'The Mark'. Like a sea-level-marker, this is the amount that something has risen by. This is the-written-to-disk-length + the-length-current in the faststring. If the faststring did not flush anything to disk (maybe it has no file), then .mark == .length"

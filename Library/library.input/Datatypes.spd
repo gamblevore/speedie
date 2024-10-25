@@ -216,6 +216,12 @@ struct RetroFloat
 		.remain = rem
 		return A|int|
 
+	
+function float.Steps (|FloatRange|)
+	rz.from = -1
+	rz.to = 1
+	rz.Step = 2.0 / self
+
 
 struct IntDownRange   /// :3
 	|int| From
@@ -365,7 +371,12 @@ datatype float
 			cpp_wrapper JB_f__nan
 	
 	render
-		fs <~ self
+		return .Render(6, fs_in)
+	
+	render (|int| dp)
+		cpp_part RenderDP
+		fs.AppendFloat(self, dp)
+
 
 	render PC // operator percent, operator pc 
 		if !self
