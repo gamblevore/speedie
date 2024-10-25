@@ -12,12 +12,12 @@ class Breakout (Window)
 	|block|				Ball
 	
 	// we need some kind of unit-grid system instead. Not screen-coords or pixels
-	// but like... say a tile is 32-pixels and that counts as 1 block.
+	// but like... say a tile is 48-pixels and that counts as 1 block.
 	constructor
 		.bar = block((0, -0.9), (0.3, 0.055), vec2(), colors.white)
 		.ball = block((0, -0.8), (0.03, 0.03), vec2(), colors.white)
 		for y in 6.0.Steps
-			|| Col = colors.hsb(((-y+0.75)*0.125, 0.8, 0.5, 1.0))
+			|| Col = colors.hsb(((-y+0.75)*16th, 0.8, 0.5, 1.0))
 			for x in 14.0.Steps
 				|| pos = (x*0.9+0.005, y*0.33+0.7)
 				.Blocks <~ block(pos, (0.1, 0.075), vec2(), col)
