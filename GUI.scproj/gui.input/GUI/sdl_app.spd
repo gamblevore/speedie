@@ -1235,3 +1235,5 @@ datatype SDLCloseReason (uint)
 
 
 
+function Duration.syntaxcall (|float|)
+	return gui.loop(self)

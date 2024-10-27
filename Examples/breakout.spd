@@ -23,7 +23,7 @@ class Breakout (Window)
 				.Blocks <~ block(pos, (0.1, 0.075), vec2(), col)
 		
 		.spirals <~ bounceable((0.5 , 0.13),  (0.25,0.0), vec4(0.1,0,0.3,0))
-		.spirals <~ bounceable((0.25, 0.05),  (0.5,0.0),  vec4(0.3,0.2,0,0))
+		.spirals <~ bounceable((0.25, 0.05),  (0.5,0.0),  vec4(0.3,-0.2,0,0))
 		.spirals <~ bounceable((0.75, -0.1),  (0.75,0.0), vec4(0.5,0,0,0))
 	
 	behaviour FrameStep
@@ -39,9 +39,10 @@ class Breakout (Window)
 		where.DrawRect(self, colors.black)	
 		|| C = .LastRect.vec4
 		|| C2 = C + (C.size*0.25, -C.size*0.25)
-		|| L = gui.Loop(24s)
-		for s in .Spirals
-			where.DrawSpiral(144, L, s.XY(C2), s.col * 0.2[])
+		|| L = 24s()
+		for (s in .Spirals) (i)
+			L = -L
+			where.DrawSpiral(144, L, s.XY(C2), s.col * 0.2[], (3s+i*1s)()) // can we make them pulsate too?
 		for b in .Blocks
 			b.draw(where, C)
 		.bar.draw(Where, C)
@@ -88,10 +89,19 @@ class Bounceable // merge with block?
 		|| g = 0.0024
 
 	
-function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| HSB)
-	for i in max
+function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| HSB, |float| Pulse)
+	|| sub = 24.0
+	max+=sub/2
+	Pulse = Pulse * max
+	for j in max
+		if j <= sub
+			continue 
+		|| i = j - sub
 		|| R = ((i*0.2123)+angle).SinCos
-		|| P = R*(50.0+i) + XY
+		|| closeness = (i - Pulse + 4.0() ).abs
+		|| strength = (-0.005*closeness.pow2).Exp * 5.0
+
+		|| P = R*(50.0+i+strength) + XY
 		|| Circle = (P-4.0, P+4.0)
 		|| A = ((Max-i)*2.0)/max
 		|| C = Colors.HSB((i*0.005, 0.7, 1.0, A)+HSB)
