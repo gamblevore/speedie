@@ -9,6 +9,7 @@ extend asmreg
 		.µtype = DataTypeCode.bool
 		
 		is AlreadyNegated
+		isnt negate
 		if self is CondRequest
 			isnt condrequest
 			is CondAnswer
@@ -45,7 +46,7 @@ extend ASMState
 	
 	function Exists (|asmreg| dest, |asmreg| L, |message| exp, |asmreg|)
 		opt inline
-		return .Equals(dest, l, asmreg(), exp)
+		return .Equals(dest.negate, l, asmreg(), exp)
 
 
 	function Equals (fn_opasm)
@@ -53,8 +54,10 @@ extend ASMState
 			swap (l) (r) // put reg 0 into the left... more convenient.
 
 		if dest.IsInt
-			return .EqualsInt(dest, l, r, exp)
-		return .CompareFloat(dest, l, r, exp, 2)
+			rz = .EqualsInt(dest, l, r, exp)
+		  else
+			rz = .CompareFloat(dest, l, r, exp, 2)
+		rz = rz.boolanswer
 	
 		
 	function NotEq  (fn_opasm)
@@ -85,8 +88,11 @@ extend ASMState
 
 	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |int| Mode,  |asmreg|)
 		if dest.IsInt
-			return .CompareInt(dest, l, r, exp, mode)
-		return .CompareFloat(dest, l, r, exp, mode)
+			rz = .CompareInt(dest, l, r, exp, mode)
+		  else
+			rz = .CompareFloat(dest, l, r, exp, mode)
+		rz = rz.boolanswer
+
 /*				(A >  B)    (A <= B)    (A == B)    (A != B)			*/
 	
 	function More   (fn_opasm)

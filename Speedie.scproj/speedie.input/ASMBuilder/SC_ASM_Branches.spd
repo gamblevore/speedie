@@ -155,6 +155,8 @@ helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |AS
 	debugat 0
 	dest.µtype = datatypecode.bool
 	
+	if "AndOrRest".trap
+		debugat 5
 	|| A = exp.first!
 	|| B = exp.last!
 	|| ml = .ExistingVar(A)
@@ -173,26 +175,33 @@ helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |AS
 
 	ifn ml.isbool and mr.isbool
 		if "AndOrRest".trap
-			debugger
 		|| asdas = .BoolValue(A, dest, opp, b)
 		if "AndOrRest".trap
-			.printprogress(exp.parent.parent)
+			.printprogress(exp)
 			debugger
 		return asdas
 	return .BoolFromBools(exp, dest, opp, ml, mr)			// No consts via .existingvar		
 	
+
+function Unchanged (|message| A, |asmreg| dest, |bool|)
+	|| mA = .existingvar(A)
+	return mA and ma.reg!=dest.reg
 			
 
-function UniqueLocation (|message| opmsg, |asmreg| dest, |asmreg|)
+function UniqueLocation (|message| A, |asmreg| dest, |message| B, |asmreg|)
 	if dest is NotYetUsed
 		return dest
-	rz = .temponly(opmsg)
+	if .Unchanged(A, dest)
+		return dest
+	rz = .temponly(A)
+	(rz is negate) = (Dest is negate)
 	rz.µtype = dest.µtype	
 
 
 function ExistingBool (|message| A, |ASMReg| Dest, |ASMReg|)
 	|| ml = .ExistingVar(A)
 	if ml.isbool and (dest.reg == ml.reg)
+		(ml is negate) = (dest is negate)
 		return ml
 	
 
@@ -203,10 +212,11 @@ function BoolTestAndJump (|message| exp, |asmreg| req, |opmode| opp, |&fatasm|)
 
 function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMReg|)
 	opt norefcounts
-	|| first = .ExistingBool(A, dest)
+	|| first = .ExistingBool(A, dest) // doesnt do negation. it should
 	if !first
-		first = .UniqueLocation(A, dest)	
+		first = .UniqueLocation(A, dest, B)	
 		first = .µBoolInto(A, first)
+		(first is negate) = (dest is negate)
 		if first is ConstAny
 			return .BoolConst1(b, dest, opp, first)					// x = 5 or Y() --> x = Y()
 	
@@ -225,8 +235,9 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 
 
 function PrintProgress (|message| exp)
+	opt norefcounts
 	"---"
-	printline exp.parent.parent
+	printline exp.niceparent
 	|| Curr = .LastProgress
 	while curr < .curr
 		curr.debugprint

@@ -116,7 +116,7 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 	opt norefcounts
 	|| NewDecl = exp.ASMDecl
 	|| NewType = newdecl.regtype
-	if !sr.reg								// x = 0|float|
+	if !sr.reg												// x = 0|float|
 		sr.µtype = newtype
 		return sr
 
@@ -125,7 +125,7 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 		if NewType.count != OldType.count
 	
 	if NewType is bool
-		if OldType is bool					// x = true|bool| // why?
+		if (OldType is bool) and (dest isnt negate)			// x = true|bool| // why?
 			return sr
 		return .NotEq(dest, asmreg(), sr, exp)
 
