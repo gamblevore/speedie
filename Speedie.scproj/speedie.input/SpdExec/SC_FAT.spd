@@ -29,6 +29,7 @@ struct FatASM
 
 	operator mul (|asmreg| info, |asmreg|)
 		cpp_part AsReg
+		
 		info.FatIndex = .index
 		.info = info
 		return info
@@ -51,11 +52,6 @@ struct FatASM
 		
 	setter Debug (|message|)
 		.msg = Value
-
-	function Nop (|bool|)
-		.op = asm.noop
-		.jumpreg = 0
-		return true
 
 	function has (|int| a, |int| b, |bool|)
 		|| out = .out
@@ -94,35 +90,13 @@ struct FatASM
 		  else
 			(.info asnt= flags)
 		
-		
+	function optnop (|bool|)
+		.op = asm.noop
+		.JumpReg = 0
+		return true
 	function LinkedFrom (|fatasm| New)
 		.refcount++
-//		if New.BlockNum == .BlockNum					// add it's backlink
-//			.BackLink = New.BackLink
-//		  elseif .ParentBlock == New.parentblock		// if x {a=b} else {a=c}
-//			.BackLink = New								// what about while loops or combinations?
-														// what about nested ifs?
-														// if a {if b {x=1}} else {x=2}
 
-														// what about this?
-														// || xx = 1
-														// if y
-														//     x = 2
-	
-	// REFCOUNTMADNESS
-	// || X = 1,  || Y = 2,  || Z = 3
-	// || B = X + Y
-	// || C = X << Z
-	// seems like B and C both refer to 2 fats each. So... how can that be done?
-	// Z/A can have a list of things that they own...?
-	// but it won't be independant.
-	// seems we should remove the backlink... and just say that each register input...
-	// refers to a FAT.
-	// its a lot of info to keep track of! and theres so many ways of doing it
-	// we COULD... just... NOT keep track of who owns what
-	// if something is unused... we remove it... then rescan the entire thing
-	// after all... it won't be refering to anything else?
-	
 	function RegInput (|int| a, assigns:|asmreg| info, |int|)
 		cpp_part Prm
 		rz = info.reg
@@ -156,7 +130,9 @@ struct FatASM
 		
 	function JumpTo (assigns:|&fatasm|)
 		|| j = .jumpreg
-			.r[j-1] = 1 + value - self
+			|| D = (value - self) - 1
+			check (D != 0 and -1) (self, "bad jump")
+			.r[j-1] = D
 		  else
 			debugger
 
@@ -199,6 +175,13 @@ struct FatASM
 			return true
 		return reg == .b
 	
+	
+	function CheckReg
+		opt inline
+		target debug
+			if .r[0] == 0
+				|| form = .form
+					check (form.params[0] isnt output) (.msg, "Missing ASM output")
 	
 	function FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 		|| where = start+.ASMIndex

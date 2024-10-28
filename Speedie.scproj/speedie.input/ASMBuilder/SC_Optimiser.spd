@@ -101,7 +101,7 @@ function OptFunc (Fn_µOpt)
 	if RetResult == FuncResult // Return the result of this function
 		.op = asm.tail
 		OptPath "tail"
-		return N.nop // what if something jumps to this?
+		return n.optnop // what if something jumps to this?
 
 
 function OptSubI (Fn_µOpt)
@@ -116,7 +116,7 @@ function OptAddI (Fn_µOpt)
 	if .match3_2(0)
 		if out == .a // a = a + 0
 			OptPath "add->nop"
-			return .nop
+			return .optnop
 		
 		// a = b + 0
 		OptPath "add->boar"
@@ -154,7 +154,7 @@ function OptAddF (Fn_µOpt)
 	if (a4 == .b)	or (.match3_2(0) and !a4)
 		if mout == .a // a = a + 0
 			OptPath "fadd_nop"
-			return .nop
+			return .optnop
 		
 		// a = b + 0
 		OptPath "fadd+0"
@@ -239,9 +239,9 @@ function OptBitNot (fn_µopt)
 		if x == a and y == a
 			//  x = ~x,  x = ~x		-->		Entire thing is a nop. Any other changes would corrupt.
 			OptPath "bitnot_nop"
-			p.nop
-			.nop
-			n.nop
+			p.optnop
+			.optnop
+			n.optnop
 			return true
 		
 		if x != y  and  y == a and b

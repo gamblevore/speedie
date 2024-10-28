@@ -64,11 +64,9 @@ datatype ASMReg (uint64)
 			return f.f32|float64|
 
 	function NOP (|int64|)
+		disabled "use asmstate"
 		if .reg
-			|| f = .fat
-				f.nop
-				return f.const
-			debugger 
+			return ASMState.sh.nop(self)
 
 	function Const (|int64|)
 		if .reg == 0

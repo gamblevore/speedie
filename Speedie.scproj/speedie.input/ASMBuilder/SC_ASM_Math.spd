@@ -22,9 +22,9 @@ extend ASMState
 		dest = dest.BoolAnswer
 		|| negate = (Olddest is negate)|int|
 		if Olddest isnt CondRequest
-			if Olddest is constany
-				l.nop
-				r.nop
+			if L is constany and R is constany
+				.nop(r)
+				.nop(l)
 				// what if we get false? theres no fat? its just reg0
 				return .numtoreg(exp, ((l.const==r.const)==!negate)|int|, dest)
 /*			if negate
@@ -77,6 +77,7 @@ extend ASMState
 
 	function CompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
 		|| OldDest = dest
+		if dest is constany or (l is constany and r is constany) // needs to handle this!
 		dest = dest.BoolAnswer
 		mode |= l.IsBig<<3
 		mode |= r.IsBig<<2
@@ -122,7 +123,7 @@ extend ASMState
 		|| k = r.Const|uint64|
 		k ^= (l is Alternate)<<31
 		require (k >> 18) << 18 == k
-		r.nop
+		.nop(r)
 		return exp.FADK(dest, l, k) * Dest
 
 
@@ -136,7 +137,7 @@ extend ASMState
 		if v == 0.0
 			Exp.DivByZero
 		if !v.fract
-			r.nop
+			.nop(r)
 			return .Quick1Or1Sub(dest, l, v|int|, exp)
 
 
@@ -163,17 +164,17 @@ extend ASMState
 		require r is ConstAny	
 		|| v = r.float
 		if  v == 1.0 or 0.0 or -1.0
-			r.nop
+			.nop(r)
 			return .Quick1Or1Sub(dest, l, v|int|, exp)
 		if  v == 2.0
-			r.nop
+			.nop(r)
 			return .plus(dest, l, l, exp)
 		
 		if r.Fourbytes
 			|| x = r.const
 			|| y = x >> 18
 			if x == y << 18
-				r.nop
+				.nop(r)
 				return exp.FMLK(dest, l, x) * Dest
 
 	
@@ -239,7 +240,7 @@ extend ASMState
 				RR = -RR
 			rr *= lmul
 			if r.CanAddK(RR)							// a - 1,  a + 1
-				r.nop
+				.nop(r)
 				return exp.ADDK(dest, L, RR) * dest
 
 		|&fatasm| fat
@@ -422,9 +423,9 @@ extend ASMState
 	function BitOr (fn_opasm)
 		if dest is ConstAny
 			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyBitOr)
-		if l.NopMinusOne
+		if .NopMinusOne(l)
 			return .Assign(dest, R, exp)
-		if r.NopMinusOne
+		if .NopMinusOne(r)
 			return .Assign(dest, L, exp)
 		return .BitMakerSwap(dest, l, r, exp, asm.bor)
 
@@ -432,9 +433,9 @@ extend ASMState
 	function BitAnd (fn_opasm)		
 		if dest is constany
 			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyBitAnd)
-		if r.nopminusone
+		if .nopminusone(r)
 			return .Assign(dest, l, exp)
-		if l.nopminusone
+		if .nopminusone(l)
 			return .Assign(dest, r, exp)
 		if l.isconst(0) or r.IsConst(0)
 			return .Zeros(dest, exp)
@@ -455,7 +456,7 @@ extend ASMState
 		if r.reg and (r is ConstAny)
 			|| k = r.const
 			if k.fits(9, op!=asm.bor) // we want bitor unsigned
-				r.nop
+				.nop(r)
 				fat.r[3] = k
 				fat.r[2] = 0
 		fat.op = op
@@ -466,7 +467,7 @@ extend ASMState
 		if dest is constany
 			return .MakeConst2(dest, l, r, exp, (&fatasm.ConstifyBitSHS, &fatasm.ConstifyBitSHR)(l.signed))
 		if r is ConstAny
-			return .BFLG_Const(exp, dest, l, 0, r.nop)
+			return .BFLG_Const(exp, dest, l, 0, .nop(r))
 		
 		|| op = (asm.BSHS, asm.BSHR)(l.signed)
 		return .BitMaker(dest, l, r, exp, op)
@@ -476,7 +477,7 @@ extend ASMState
 		if dest is constany
 			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyBitSHL)
 		if r is ConstAny
-			return .BFLG_Const(exp, dest, l,  r.nop, 0)
+			return .BFLG_Const(exp, dest, l,  .nop(r), 0)
 		
 		return .BitMaker(dest, l, r, exp, asm.bshl)
 
@@ -511,7 +512,12 @@ extend ASMState
 		return dest		// hmmm... we are already there
 
 
-
+	function NopMinusOne (|asmreg| r, |bool|)
+		if r.IsConst(-1)
+			.nop(r)
+			return true
+	
+	
 function int64.Fits (|int| amount, |bool| signed=true,  |bool|)
 	|| sh = 64 - amount
 	|| x = self << sh
@@ -525,9 +531,3 @@ function int64.Fits (|int| amount, |bool| signed=true,  |bool|)
 function asmreg.IsConst (|int64| val, |bool|)
 	return  (self is ConstAny) and (.const == val)
 	
-	
-function asmreg.NopMinusOne (|bool|)
-	if .IsConst(-1)
-		.nop
-		return true
-

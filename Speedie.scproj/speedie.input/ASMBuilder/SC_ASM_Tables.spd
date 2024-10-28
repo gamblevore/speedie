@@ -92,7 +92,7 @@ function Return			(fn_asm)
 	if reg is ConstAny
 		|| K = reg.const // return true, or -1 or whatever
 		if k and k.fits(15)
-			reg.nop
+			.nop(reg)
 			exp.RET(reg, 1, 0, K)
 			return asmreg()
 			
@@ -510,6 +510,17 @@ function ASMReg.Write (|message| m,  |asmreg| ptr,  |int| index=0,  |&fatasm|)
 	return .ReadOrWrite(m, ptr, index, true)
 
 
+function message.asmlocal (|asmreg| extra = 0, |asmreg|)
+	opt	norefcounts
+	|| d = .ASMDecl
+	if d is local
+		return d.WholeType as extra
+
+
+function message.ASMReg (|int|)
+	return .asmlocal.reg
+
+
 function ASMState.ExistingVar (|message| m, |asmreg|)
 	opt	norefcounts
 	real self
@@ -518,9 +529,7 @@ function ASMState.ExistingVar (|message| m, |asmreg|)
 		m = m.first!
 		fn = m.func
 	if fn == @thg
-		|| d = m.ASMDecl
-		if d is local
-			return d.WholeType as ASMReg.FromExistingVar
+		return m.ASMLocal(ASMReg.FromExistingVar)
 	
 
 function message.HasAsmStuff (|bool|)

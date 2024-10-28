@@ -42,6 +42,7 @@ function SemiConst (|int| f1, |int|)
 
 function AndOrRest (|int| a, |int| b, |int|) // stragglers
 	|| x3 = false
+	x3 = (0 or b)+1				// x3 = b+1
 	x3 = a or b					// old bool logic
 	x3 = a and b
 	x3 = !(!a or b)

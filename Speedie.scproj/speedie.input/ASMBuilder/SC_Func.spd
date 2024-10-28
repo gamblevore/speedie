@@ -27,7 +27,7 @@ class µFunc
 		rz.size = after-p
 	
 	// cosmic lore unfold... into tales untold
-	
+
 	function µRender (|!&ASM| Where, |!&asm| After, |!&asm|)
 		|uint64| HasLabel
 		rz = where
@@ -35,8 +35,7 @@ class µFunc
 			|| fat = .ir+i
 			haslabel |= fat.jumpreg<<(i&63)
 			fat.ASMIndex = rz - where
-//			check (fat.r[0] != 0) (fat.msg) // what about branch or other instructions?
-// *Code = 0x09200373 / 153092979
+			fat.CheckReg
 			rz = fat.µrenderinto(rz, after)
 
 		if haslabel // Use this as a jump-map??? To skip huge sections?

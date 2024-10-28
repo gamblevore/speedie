@@ -46,11 +46,11 @@ struct ASMState
 		if r is ConstAny
 			|| v = r.const
 			if v == -1
-				r.nop
+				.nop(r)
 				return v
 			v -= Sub
 			if v.IsPow2
-				r.nop
+				.nop(r)
 				return v.Log2+1
 
 		if (!r.reg) // what?
@@ -134,20 +134,29 @@ struct ASMState
 		.vtmps = r
 		return t
 	
-	function Nop (|&fatasm| R)
-		r.nop
+	function Nop (|asmreg| R, |int64|)
+		|| f = r.fat
+			return .nop(f)
+		if r.reg
+			debugat // bad!
+	
+	function Nop (|&fatasm| R, |int64|)
+		r.op = asm.noop
+		r.jumpreg = 0
 		|| C = .curr - 1
 		if R == C
 			.curr = C // nice
-			debugat
+		return r.Const
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	function µBoolInto (|message| exp, |AsmReg| Dest, |asmreg|)
-		rz = .ExistingVar(Exp)
-		rz ?= .µInto(exp, dest)
-		if (rz.µtype isnt bool) or (dest is negate and rz isnt alreadynegated)
-			rz = .exists(dest as (rz bitand asmreg.fromexistingvar), rz, exp)
+		|| X = .ExistingVar(Exp)
+		X ?= .µInto(exp, dest)
+		if (X.µtype isnt bool) or (dest is negate and X isnt alreadynegated)
+			return .exists(dest as (X bitand asmreg.fromexistingvar), X, exp)
+		return .Assign(dest, X, exp)
+			
 		
 
 

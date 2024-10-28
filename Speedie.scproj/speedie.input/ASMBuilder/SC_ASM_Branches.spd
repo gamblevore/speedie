@@ -139,15 +139,18 @@ helper ASMBoolShrink (|message| exp,  |ASMReg| Dest,  |ASMReg| ml,  |ASMReg|)
 
 
 helper BoolFromBools (|message| exp, |ASMReg| Dest, |opmode| opp, |ASMReg| ml, |ASMReg| mr, |ASMReg|)
-/	dest = .TempTyped(exp, dest)
+	// handles:  a = a and b,  a = a or b
+	dest = .TempTyped(exp, dest)
 	|| fat = exp.BAND(dest, ml, mr, 0)
 	fat.op += opp is OR
-	if (dest is negate)  and  (opp is AND)
-/		fat.op = asm.bnot
+	if (dest is negate)
+		.BitNot(dest, dest, asmreg(), exp)
 		(dest is AlreadyNegated)
-	if dest isnt negate
-/		(dest is AlreadyNegated)
 	return fat * dest
+
+
+function asmreg.IsBoolV (|bool|)
+	return self.isbool and (self isnt constany)
 
 
 helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
@@ -155,8 +158,6 @@ helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |AS
 	debugat 0
 	dest.µtype = datatypecode.bool
 	
-	if "AndOrRest".trap
-		debugat 5
 	|| A = exp.first!
 	|| B = exp.last!
 	|| ml = .ExistingVar(A)
@@ -173,25 +174,33 @@ helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |AS
 			return .BranchOr(A, B, dest)
 		return .BranchAnd(A, B, Dest)
 
-	ifn ml.isbool and mr.isbool
-		if "AndOrRest".trap
-		|| asdas = .BoolValue(A, dest, opp, b)
-		if "AndOrRest".trap
-			.printprogress(exp)
-			debugger
-		return asdas
-	return .BoolFromBools(exp, dest, opp, ml, mr)			// No consts via .existingvar		
+	if ml.isboolV and mr.isboolV
+		return .BoolFromBools(exp, dest, opp, ml, mr)			// No consts via .existingvar		
+
+	if "AndOrRest".trap
+		.lastprogress = .curr
+	rz = .BoolValue(A, dest, opp, b)
+	if "AndOrRest".trap
+		.printprogress(exp)
+		debugger
 	
 
-function Unchanged (|message| A, |asmreg| dest, |bool|)
-	|| mA = .existingvar(A)
-	return mA and ma.reg!=dest.reg
-			
+function message.FoundReg (|int| R, |bool|)
+	opt norefcounts
+	for s.flat in self
+		if s == @thg
+			|| sr = s.asmreg
+			if sr == r
+				return true
+
+
+function Unchanged (|message| A, |asmreg| dest, |message| B, |bool|)
+	|| Dr = dest.reg
+	return !a.foundreg(dr) or !b.foundreg(dr)
+
 
 function UniqueLocation (|message| A, |asmreg| dest, |message| B, |asmreg|)
-	if dest is NotYetUsed
-		return dest
-	if .Unchanged(A, dest)
+	if (dest is NotYetUsed) or .Unchanged(A, dest, B)
 		return dest
 	rz = .temponly(A)
 	(rz is negate) = (Dest is negate)
@@ -206,32 +215,30 @@ function ExistingBool (|message| A, |ASMReg| Dest, |ASMReg|)
 	
 
 function BoolTestAndJump (|message| exp, |asmreg| req, |opmode| opp, |&fatasm|)
-	|| mode = ASMReg.CondRequest.negate(opp is AND)
+	|| mode = ASMReg.CondRequest.negate(opp is OR)
 	return .Exists(mode, req, exp).fat!
 
 
 function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMReg|)
 	opt norefcounts
-	|| first = .ExistingBool(A, dest) // doesnt do negation. it should
-	if !first
-		first = .UniqueLocation(A, dest, B)	
-		first = .µBoolInto(A, first)
-		(first is negate) = (dest is negate)
-		if first is ConstAny
-			return .BoolConst1(b, dest, opp, first)					// x = 5 or Y() --> x = Y()
+	dest = .UniqueLocation(a, dest, B) // got a fucking dest
+	|| first = .µBoolInto(A, dest)
+
+	if first is ConstAny
+		return .BoolConst1(b, dest, opp, first)					// x = 5 or Y() --> x = Y()
 	
-	|| JUMP = .BoolTestAndJump(a.next!, first, opp)					// AND/OR
-	|| Second = .µBoolInto(B, first)
+	|| JUMP = .BoolTestAndJump(a.next!, dest, opp)				// AND/OR
+	|| Second = .µBoolInto(B, dest)
 	if Second is ConstAny
 		.NOP(jump)
 		return .BoolConst2(opp, first, Second)
 
-	JUMP.JumpTo = .curr
+	JUMP.JumpTo = .curr // why is this 1 extra? and why does the other jumpto subtract one?
 	
-	if first.IsBool and Second.IsBool	// always already share reg. Perhaps not same type.
-		return first					// second already set into first...
+	if first.IsBool and Second.IsBool
+		return dest
 
-	return .Exists(dest, first, a.next!)							// first.reg == dest.reg
+	return .Exists(dest, dest, A.next!)
 
 
 function PrintProgress (|message| exp)
@@ -253,7 +260,7 @@ function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asm
 		ml.Const = v|int|				// x = 5 or  2	 --> x = true
 		return ml						// x = 0 and 2	 --> x = false
 	
-	ml.nop								// x = 0 or y()  --> x = y()
+	.nop(ml)							// x = 0 or y()  --> x = y()
 										// x = 7 and y() --> x = y()
 	|| mr = .µ(B, dest)
 	if mr is ConstAny
@@ -262,20 +269,20 @@ function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asm
 		return mr.BoolAnswer
 	
 	if mr.isbool
-/		return mr
-	return .Exists(dest.negate, mr, B)
+		return mr
+	return .Exists(dest, mr, B)
 
 
 
 function BoolConst2 (|opmode| Opp, |asmreg| ml,  |asmreg| mr, |asmreg|)
 	|| V = mr.const!=0
 	if v == (opp is AND)
-		mr.nop
+		.nop(mr)
 		ml.µtype = datatypecode.bool
 		return ml
 	
 	if ml is FromExistingVar // why not?
-		ml.nop
+		.nop(ml)
 	mr.µtype = datatypecode.bool
 	mr.const = v|int|
 	return mr
@@ -325,7 +332,6 @@ Struct FatRange
 	
 	function JumpTo (|&fatasm| curr)
 		|| any = false
-		curr-- // hmmmmmm
 		for s in self
 			if s is CondAnswer
 				(s isnt CondAnswer)

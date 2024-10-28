@@ -36,8 +36,8 @@ extend ASMState
 	function MakeConst2 (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |fn_ASMConstifier| fn,  |asmreg|)
 		|| knst = .NumToFat(exp, 0, dest as asmreg.Textual)
 		(fn)(knst,l,r)
-		l.nop
-		r.nop
+		.nop(r)
+		.nop(l)
 		return .makeconst(knst, dest)
 
 
