@@ -125,8 +125,6 @@ function BranchSub (|message| cond,  |bool| neg=false, |bool| CanConst=false, |f
 	if answer isnt CondAnswer
 		(canconst)
 //		if (answer is constany) and canconst // deal with these const stuff later.
-		if answer isnt alreadynegated
-			mode = mode.Negate
 		answer = .exists(mode, answer, cond)
 	rz.after = .curr
 	// boolean logic is very awkward
@@ -135,7 +133,7 @@ function BranchSub (|message| cond,  |bool| neg=false, |bool| CanConst=false, |f
 helper ASMBoolShrink (|message| exp,  |ASMReg| Dest,  |ASMReg| ml,  |ASMReg|)
 	if (ml.isbool) and (dest isnt negate) and (dest isnt condrequest)
 /		return ml.boolanswer								// x = a or a   -->  x = a
-	/return .Exists(dest.negate, ml, exp)					// if  a or a   -->  if a
+	/return .Exists(dest, ml, exp)							// if  a or a   -->  if a
 
 
 helper BoolFromBools (|message| exp, |ASMReg| Dest, |opmode| opp, |ASMReg| ml, |ASMReg| mr, |ASMReg|)
@@ -150,7 +148,7 @@ helper BoolFromBools (|message| exp, |ASMReg| Dest, |opmode| opp, |ASMReg| ml, |
 
 
 function asmreg.IsBoolV (|bool|)
-	return self.isbool and (self isnt constany)
+	return self.IsBool and (self isnt constany)
 
 
 helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
@@ -221,7 +219,7 @@ function BoolTestAndJump (|message| exp, |asmreg| req, |opmode| opp, |&fatasm|)
 
 function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMReg|)
 	opt norefcounts
-	dest = .UniqueLocation(a, dest, B) // got a fucking dest
+	dest = .UniqueLocation(a, dest, B)
 	|| first = .µBoolInto(A, dest)
 
 	if first is ConstAny
@@ -233,7 +231,7 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 		.NOP(jump)
 		return .BoolConst2(opp, first, Second)
 
-	JUMP.JumpTo = .curr // why is this 1 extra? and why does the other jumpto subtract one?
+	JUMP.JumpTo = .curr
 	
 	if first.IsBool and Second.IsBool
 		return dest

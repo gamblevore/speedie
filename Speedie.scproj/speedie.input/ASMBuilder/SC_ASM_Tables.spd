@@ -321,11 +321,11 @@ function BoolNot		(fn_asm)						// !a
 	
 
 function BitNot				(fn_asm)					// ~a
-	return .DoMathSub(exp, dest as asmreg.singleexpr, scoperator.bnot.asm!)
+	return .DoMathSub(exp, dest as asmreg.SingleExpr, scoperator.bnot.asm!)
 
 
 function Negative			(fn_asm)					// -a
-	return .DoMathSub(exp, dest as asmreg.singleexpr, scoperator.Negative!.asm!)
+	return .DoMathSub(exp, dest as asmreg.singleexpr, scoperator.Negative.asm!)
 
 
 function IncrSlowOnAddr (|&ASMState| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |ASMReg|)	
