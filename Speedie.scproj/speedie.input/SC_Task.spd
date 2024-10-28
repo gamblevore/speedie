@@ -60,7 +60,7 @@ function NewTaskActual (|Message| node, |SCNode| name_space)
 		level = 3
 	  else
 		fields <~ (@sdot, "interface")
-	arg.BuildTask(fields, node, level)
+	arg.BuildTask(fields, level)
 	arg.TakeAllFrom(tmp)
 	node.name = "role"
 	
@@ -170,18 +170,11 @@ function Message.BuildRunTask (|message| fields, |int| level, |bool|)
 	return true
 
 
-function Message.BuildTask (|message| fields, |message!| root, |int| level)
+function Message.BuildTask (|message| fields, |int| level)
 	|| Runs = .FindAll("run")
 	|| run = runs[0]
 	check (runs <= 1) (run, "Multiple run statements")
-
-	if root == "task_run"
-		if run: error run
-		run = @tmp + "run"
-		run.msg(@arg).TakeAllFrom(self)
-		self <~ run
-	  else
-		expect (run) (self, "Missing 'run' statement")
+	expect (run) (self, "Missing 'run' statement")
 
 	if run.BuildRunTask(fields, level) and !.findall("constructor")
 		run.prev = "constructor () {}"~parse

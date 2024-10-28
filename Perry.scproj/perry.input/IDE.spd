@@ -821,11 +821,12 @@ So anything not 0 means "its OK"`
 			return 1
 		
 
-	task_run CheckScrollErrors (taskgui)
-		|| e = .upon.editme 
-		if e.myerror
-			e.BumpScroll(60)
-	
+	task CheckScrollErrors (taskgui)
+		run
+			|| e = .upon.editme 
+			if e.myerror
+				e.BumpScroll(60)
+			
 	
 	function EditText (|FileRow| r, |int|) // edittextfile, loadfile, fileload, fileedit, openfile, fileopen
 		|| E	= .editme
