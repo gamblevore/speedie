@@ -3453,7 +3453,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2024102911));
+	JB_FS_AppendInt32(_fsf0, (2024102912));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8877,7 +8877,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2024102911));
+	JB_FS_AppendInt32(_fsf0, (2024102912));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -16219,19 +16219,19 @@ int JB_Tk__MessageErrorSub(FastString* Fs, int Num, int ButFound) {
 	iif (!E) {
 		JB_SetRef(E, JB_Dict_Constructor(nil));
 		JB_SetRef(JB__Tk__ErrorNames, E);
-		(JB_Dict_SetInt(E, kJB__Tk_kTemporal, JB_LUB[1798]));
-		(JB_Dict_SetInt(E, kJB__Tk_kTemporalSyx, JB_LUB[1799]));
-		(JB_Dict_SetInt(E, kJB__Tk_kTemporalWord, JB_LUB[1800]));
-		(JB_Dict_SetInt(E, kJB__Tk_kEndOfLine, JB_LUB[1801]));
+		(JB_Dict_SetInt(E, kJB__Tk_kTemporal, JB_LUB[1800]));
+		(JB_Dict_SetInt(E, kJB__Tk_kTemporalSyx, JB_LUB[1973]));
+		(JB_Dict_SetInt(E, kJB__Tk_kTemporalWord, JB_LUB[1975]));
+		(JB_Dict_SetInt(E, kJB__Tk_kEndOfLine, JB_LUB[1803]));
 		(JB_Dict_SetInt(E, kJB__Tk_kColon, JB_LUB[1802]));
-		(JB_Dict_SetInt(E, kJB__Tk_kOppSyx, JB_LUB[459]));
-		(JB_Dict_SetInt(E, kJB__Tk_kOppWord, JB_LUB[459]));
-		(JB_Dict_SetInt(E, kJB__Tk_kOpp, JB_LUB[459]));
-		(JB_Dict_SetInt(E, kJB__Tk_kOppTemporal, JB_LUB[1803]));
-		(JB_Dict_SetInt(E, kJB__Tk_kThing, JB_LUB[1804]));
-		(JB_Dict_SetInt(E, kJB__Tk_kThingWord, JB_LUB[1804]));
-		(JB_Dict_SetInt(E, kJB__Tk_kThingSyx, JB_LUB[1805]));
-		(JB_Dict_SetInt(E, kJB__Tk_kIllegalChar, JB_LUB[1806]));
+		(JB_Dict_SetInt(E, kJB__Tk_kOppSyx, JB_LUB[1014]));
+		(JB_Dict_SetInt(E, kJB__Tk_kOppWord, JB_LUB[1014]));
+		(JB_Dict_SetInt(E, kJB__Tk_kOpp, JB_LUB[1014]));
+		(JB_Dict_SetInt(E, kJB__Tk_kOppTemporal, JB_LUB[1804]));
+		(JB_Dict_SetInt(E, kJB__Tk_kThing, JB_LUB[1806]));
+		(JB_Dict_SetInt(E, kJB__Tk_kThingWord, JB_LUB[1806]));
+		(JB_Dict_SetInt(E, kJB__Tk_kThingSyx, JB_LUB[1798]));
+		(JB_Dict_SetInt(E, kJB__Tk_kIllegalChar, JB_LUB[1799]));
 	}
 	iif (Fs->Length) {
 		JB_FS_AppendString(Fs, JB_LUB[146]);
@@ -47138,7 +47138,6 @@ SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, FP_SpdMainFn 
 	JB_Incr2(Self->Args, Params);
 	Self->SubProcess = Fn;
 	Self->Mode = Mode;
-	Self->ExitCodeMeansDied = true;
 	JB_Incr2(Self->Output, ((FastString*)JB_Ternaryy(JB_ProcessMode_SyntaxIs(Self->Mode, kJB__ProcessMode_CaptureStdOut), JB_FS_Constructor(nil), nil)));
 	JB_Incr2(Self->ErrorOutput, ((FastString*)JB_Ternaryy(JB_ProcessMode_SyntaxIs(Self->Mode, kJB__ProcessMode_CaptureOrPrintErrors), JB_FS_Constructor(nil), nil)));
 	JB_Incr2(Self->Writer, JB_FS_Constructor(nil));
@@ -57599,4 +57598,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -7334897212505627672 5972131913145751775
+// -4368932999508898539 -7197328823809117831
