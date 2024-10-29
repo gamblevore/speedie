@@ -18,7 +18,6 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	|int| 						DeathLimit
 	|int|						DiedCount
 	|bool|						AlreadyWarnedDied
-	|bool|						ExitCodeMeansDied
 	|bool|						WeAreParent
 	|ProcessMode|				Mode
 
@@ -31,7 +30,6 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		.args	= params
 		.SubProcess = fn
 		.mode = mode
-		.ExitCodeMeansDied = true // usually true?
 		.output = (faststring(), nil)(.Mode is CaptureStdOut)
 		.erroroutput = (faststring(), nil)(.mode is CaptureOrPrintErrors)
 		.writer = FastString()
@@ -97,8 +95,6 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	
 	helper HandleDied
 		|| Bad = !.signal
-		if !bad
-			bad = (.ExitCodeMeansDied and !.exit)
 		.DiedCount += Bad
 		if (.ErrorOutput!=nil) and (.mode is AutoPrintErrors)
 			printline .ErrorOutput.GetResult

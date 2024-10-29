@@ -23,6 +23,8 @@ static void AddLostChild_(int PID, int C) {
 			if (WIFSIGNALED(C)) Sig = WTERMSIG(C);
 			if (Sig and !Ex) // in case unix is being dumb. Which happens a lot.
 				Ex = 1;
+			if (!Sig and Ex > 128)
+				Sig = Ex&~128; // unix convention to return signal numbers.
 			F->_Exit = Ex;
 			F->_Signal = Sig;
 			return;

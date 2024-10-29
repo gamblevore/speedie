@@ -109,7 +109,7 @@ void JB_CrashHandler(int Sig) {
 				// print normal-errors
 	JB_Rec_ShellPrintErrors(nil);
 	JB_KillChildrenOnExit();
-	exit(-1);	// we should crash now... that we removed this crash handler.
+	exit(128|Sig);
 }
 
 
