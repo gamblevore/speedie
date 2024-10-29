@@ -57,11 +57,11 @@ typedef byte ErrorFlags;
 
 typedef int ErrorInt;
 
-typedef ivec2 ErrorInt2;
-
 typedef int ErrorMarker;
 
 typedef byte ErrorSeverity;
+
+typedef byte ExitCode;
 
 typedef int FileDes;
 
@@ -1468,9 +1468,6 @@ Date JB_Date__New0();
 // ErrorInt
 
 
-// ErrorInt2
-
-
 // ErrorMarker
 
 
@@ -1481,6 +1478,9 @@ int JB_ErrorSeverity__Init_();
 
 Array* JB_ErrorSeverity__InitNames();
 
+
+
+// ExitCode
 
 
 // FileDes
