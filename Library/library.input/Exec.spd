@@ -28,7 +28,7 @@ datatype PID_Int (int)
 
 
 datatype ExitCode (byte)
-	description "Some unix process operations, need to describe both a signal (crash number) and an exit code."
+	description "Can describe both signal errors, and exit codes."
 	function IsSignal (|bool|)
 		description "This is a signal error (a crash)" 
 		return  self > 128
@@ -80,7 +80,7 @@ extend string
 
 	function ExecuteStr (|[string]| Args=nil, |string|)
 		|| fs = faststring()
-		if .execute(args, fs) == 0
+		if .execute(args, fs).Successful
 			rz = fs
 
 	function System (|int|)
