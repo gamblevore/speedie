@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[565];
+extern JB_StringC* JB_LUB[564];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -2328,19 +2328,19 @@ int JB_Tk__MessageErrorSub(FastString* Fs, int Num, int ButFound) {
 	if (!E) {
 		JB_SetRef(E, JB_Dict_Constructor(nil));
 		JB_SetRef(JB__Tk__ErrorNames, E);
-		(JB_Dict_SetInt(E, kJB__Tk_kTemporal, JB_LUB[525]));
-		(JB_Dict_SetInt(E, kJB__Tk_kTemporalSyx, JB_LUB[411]));
-		(JB_Dict_SetInt(E, kJB__Tk_kTemporalWord, JB_LUB[520]));
-		(JB_Dict_SetInt(E, kJB__Tk_kEndOfLine, JB_LUB[420]));
+		(JB_Dict_SetInt(E, kJB__Tk_kTemporal, JB_LUB[369]));
+		(JB_Dict_SetInt(E, kJB__Tk_kTemporalSyx, JB_LUB[219]));
+		(JB_Dict_SetInt(E, kJB__Tk_kTemporalWord, JB_LUB[297]));
+		(JB_Dict_SetInt(E, kJB__Tk_kEndOfLine, JB_LUB[411]));
 		(JB_Dict_SetInt(E, kJB__Tk_kColon, JB_LUB[86]));
-		(JB_Dict_SetInt(E, kJB__Tk_kOppSyx, JB_LUB[480]));
-		(JB_Dict_SetInt(E, kJB__Tk_kOppWord, JB_LUB[480]));
-		(JB_Dict_SetInt(E, kJB__Tk_kOpp, JB_LUB[480]));
-		(JB_Dict_SetInt(E, kJB__Tk_kOppTemporal, JB_LUB[526]));
-		(JB_Dict_SetInt(E, kJB__Tk_kThing, JB_LUB[369]));
-		(JB_Dict_SetInt(E, kJB__Tk_kThingWord, JB_LUB[369]));
-		(JB_Dict_SetInt(E, kJB__Tk_kThingSyx, JB_LUB[515]));
-		(JB_Dict_SetInt(E, kJB__Tk_kIllegalChar, JB_LUB[443]));
+		(JB_Dict_SetInt(E, kJB__Tk_kOppSyx, JB_LUB[284]));
+		(JB_Dict_SetInt(E, kJB__Tk_kOppWord, JB_LUB[284]));
+		(JB_Dict_SetInt(E, kJB__Tk_kOpp, JB_LUB[284]));
+		(JB_Dict_SetInt(E, kJB__Tk_kOppTemporal, JB_LUB[443]));
+		(JB_Dict_SetInt(E, kJB__Tk_kThing, JB_LUB[480]));
+		(JB_Dict_SetInt(E, kJB__Tk_kThingWord, JB_LUB[480]));
+		(JB_Dict_SetInt(E, kJB__Tk_kThingSyx, JB_LUB[520]));
+		(JB_Dict_SetInt(E, kJB__Tk_kIllegalChar, JB_LUB[525]));
 	}
 	if (Fs->Length) {
 		JB_FS_AppendString(Fs, JB_LUB[33]);
@@ -6723,7 +6723,7 @@ int64 JB_Msg_Int(Message* Self, int StrStart) {
 			return JB_Str_HexIntegerSection(F->Name, StrStart, F);
 		}
 		Float64 Mul = JB_Str_TextDouble(F->Name, nil);
-		if (JB_Msg_SyntaxEquals(Self, JB_LUB[564], false)) {
+		if (JB_Msg_SyntaxEquals(Self, JB_LUB[526], false)) {
 			Mul = (Mul * ((Float64)1024));
 		}
 		 else if (JB_Msg_SyntaxEquals(Self, JB_LUB[258], false)) {
@@ -8382,7 +8382,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024102416);
+	return (2024102911);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8394,4 +8394,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 1800854179113821346 4068266322178246116
+// -2934619186805667969 1800854179113821346 3567612225440863659

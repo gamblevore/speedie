@@ -190,19 +190,19 @@ extend Parser
 		if !e
 			e = Dictionary()
 			._ErrorNames = e
-	        e[kTemporal]           = "temporal"
-	        e[kTemporalSyx]        = "declaration"
-	        e[kTemporalWord]       = "statement"
-	        e[kEndOfLine]          = "end-of-line"
+	        e[kTemporal]           = "Temporal"
+	        e[kTemporalSyx]        = "Declaration"
+	        e[kTemporalWord]       = "Statement"
+	        e[kEndOfLine]          = "End-Of-Line"
 	        E[kColon]              = "':'"
-	        E[kOppSyx]             = "operator"
-	        E[kOppWord]            = "operator"
-	        E[kOpp]                = "operator"
-	        E[kOppTemporal]        = "temporal-operator"
-	        E[kThing]              = "a name"
-	        E[kThingWord]          = "a name"
-	        E[kThingSyx]           = "something"
-	        E[kIllegalChar]        = "illegal-character"
+	        E[kOppSyx]             = "Operator"
+	        E[kOppWord]            = "Operator"
+	        E[kOpp]                = "Operator"
+	        E[kOppTemporal]        = "Temporal-operator"
+	        E[kThing]              = "A name"
+	        E[kThingWord]          = "A name"
+	        E[kThingSyx]           = "Something"
+	        E[kIllegalChar]        = "Illegal-character"
 	    
 		if fs.length
 			fs <~ " / "
