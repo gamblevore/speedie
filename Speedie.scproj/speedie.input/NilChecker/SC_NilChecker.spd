@@ -596,14 +596,19 @@ function arel (Niltrackerfn)
 
 function Declaration (niltrackerfn) // function decl 
 	opt norefcounts
-	|| rel = msg.last
-	target debug: if rel!=@rel
-	|| thg = rel.first!
-	//thg.resetasm
-	|| d = thg.FastDecl
-	|| J = .Jump(rel.last!)
-	if d.IsReg
-		return T.Declare(D, J)
+	|| rel = msg.last!
+	// carrays declared like: |int[1]| LocalVar
+	|| thg = rel.first
+		|| d = thg.FastDecl
+		// if d != rel.FastDecl // some still not updated
+		|| J = .Jump(rel.last!)
+		if d.IsReg
+			return T.Declare(D, J)
+	  else
+		|| d = rel.FastDecl
+		if d.IsReg
+			return T.Declare(D, nilstate.real)
+	
 
 
 
