@@ -27,7 +27,7 @@
 #pragma GCC visibility push(hidden)
 extern "C" {
 
-extern JB_StringC* JB_LUB[564];
+extern JB_StringC* JB_LUB[563];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -2453,7 +2453,7 @@ ParserLineAndIndent JB_Tk__NextLineAndIndent(Message* Parent) {
 			if ((C2 != '/') and (C2 != '*')) {
 				if (((bool)(State & 2))) {
 					if (Rz[3] > 1) {
-						JB_FreeIfDead(JB_Tk__ErrorAdd(JB_LUB[563], N - 1));
+						JB_FreeIfDead(JB_Tk__ErrorAdd(JB_LUB[460], N - 1));
 					}
 					Rz[3] = 3;
 					Rz[2] = (Rz[2] + (!Commas));
@@ -3146,7 +3146,6 @@ Date JB_Date__New0() {
 
 
 
-
 JB_String* JB_ErrorSeverity_Render(uint /*ErrorSeverity*/ Self, FastString* Fs_in) {
 	if (Self < kJB__ErrorSeverity_MaxError) {
 		Array* _tmPf0 = JB_ErrorSeverity__InitNames();
@@ -3188,6 +3187,7 @@ Array* JB_ErrorSeverity__InitNames() {
 		 _X;
 	});
 }
+
 
 
 
@@ -8382,7 +8382,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024102911);
+	return (2024102915);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8394,4 +8394,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 1800854179113821346 3567612225440863659
+// -2934619186805667969 2344177723007253905 6161127026077918259
