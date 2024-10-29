@@ -113,8 +113,8 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	helper Kill
 		disabled "Explain why"
 		
-	helper Kill (|stringzeroterminated| why)
-		super.kill
+	helper Kill (|int| ExitCode, |stringzeroterminated| why)
+		super.kill(ExitCode)
 		.Disconnect(why)
 
 	syntax expect (|string| err)
@@ -159,19 +159,19 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			return .subprocess or .isrunning
 		return app.ParentID > 1
 			
-	function Deactivate
-		|| ChAlive = .isrunning
-		if .CommsOpen and !ChAlive	// inconsistant...
+	function Deactivate (|int| ExitCode)
+		|| running = .isrunning
+		if .CommsOpen and !running	// inconsistant...
 			.handledied				// disconnect comms
-		if ChAlive
-			.Kill("lost comms")		// kill child
+		if running
+			.Kill(ExitCode)		// kill child
 	
 	
 	function ActivateChild (|bool|)
 		if .isopen
 			return true
 
-		.Deactivate
+		.Deactivate(0)
 		
 		if .CanActivate
 			expect (.path) (self, "Can't re-activate process without a path.")

@@ -379,7 +379,7 @@ class PerryIDE (Window)
 		
 		if (hideside == visside)
 			.filelist.declutter = hideside
-			if hideside and .filelist.hasfocus
+			if HideSide and .filelist.HasFocus
 				.editme.SetFocus
 			if .viewing == .viewfiles
 				.noneed
@@ -405,7 +405,7 @@ class PerryIDE (Window)
 		fs <~ " {${p.render}}\n"
 		fs <~ p.erroroutput.getresult.FindStacktrace
 		pp[] = nil
-		.notify(fs, @emb + what)
+		.Notify(fs, @emb + what)
 		.CancelCompile
 
 
@@ -431,7 +431,7 @@ class PerryIDE (Window)
 		if f.CommsOpen and f.lastsend.ago > (30.0+.position|float|).date
 			|| msg = "Released Speedie: " + .name
 			.LogOneAction(@emb + msg)
-			f.Kill("SaveMemory")
+			f.Kill(0, "SaveMemory")
 	
 	
 	behaviour FrameStep // perframe, eachframe, onframe

@@ -207,7 +207,7 @@ extend PerryIDE
 	
 	function CancelCompile
 		|| c = .Compilr
-			c.Kill
+			c.Kill(0)
 			app.Sleep(0.025) // allow pipes to work
 			.Readlog(true)
 		  else

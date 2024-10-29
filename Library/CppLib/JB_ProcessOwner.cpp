@@ -73,9 +73,8 @@ void JB_KillChildrenOnExit() {
 
  
 #ifndef AS_LIBRARY // shouldn't this be around more??
-int JB_PID_Kill (ProcessOwner* F) {
-	if (F->_Exit < 0)
-		F->_Exit = 1; // negative means still OK.
+int JB_PID_Kill (ProcessOwner* F, int Code) {
+	F->_Exit = Code; // negative means still OK.
 	
 	return JB_Kill(F->PID);
 }

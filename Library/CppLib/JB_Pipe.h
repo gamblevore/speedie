@@ -20,7 +20,7 @@ ProcessOwner* JB_PID_Constructor(ProcessOwner* self);
 void JB_PID_UnRegister(ProcessOwner* self);
 void JB_PID_Destructor(ProcessOwner* self);
 void JB_PID_Register(ProcessOwner* self);
-int JB_PID_Kill (ProcessOwner* F);
+int JB_PID_Kill (ProcessOwner* F, int Code);
 void JB_KillChildrenOnExit();
 int JB_PID_Exit (ProcessOwner* F);
 int JB_PID_Signal (ProcessOwner* F);

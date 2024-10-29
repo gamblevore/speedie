@@ -48,7 +48,7 @@ function Window.Confirm (|string| Q, |fnConfirmCanceller| fn, |bool|)
 function perryide.MakeNothingRunning (|string| reason, |bool|)
 	|| prod = .runcompiledapp
 		if .confirm("Kill running product " + .Name + Reason, fnStillRunning)
-			prod.kill
+			prod.kill(-1)
 			.UpdateDebuggedApp(true)
 			prod = nil
 	return !prod

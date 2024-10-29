@@ -35,7 +35,7 @@ class ProcessOwner
 		description "Removes from the list. Doesnt change the exit, pid, or status codes" 
 		cpp_wrapper JB_PID_UnRegister
 
-	function Kill
+	function Kill (|int| ExitCode)
 		cpp_wrapper JB_PID_Kill
 	
 	function Next (|ProcessOwner|)
