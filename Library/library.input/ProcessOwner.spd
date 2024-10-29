@@ -15,14 +15,18 @@ class ProcessOwner
 	destructor
 		cpp_Wrapper JB_PID_Destructor
 	
-	function Exit (|ErrorInt|)
+	helper Status (|int|)
 		cpp_Wrapper JB_PID_Exit
 	
-	function Status (|ErrorInt|)
-		cpp_Wrapper JB_PID_Status
+	function Exit (|ErrorInt|)
+		rz = .Status
+		if rz < 0: rz = 0 // still running or hasn't yet been run.
+	
+	function Signal (|ErrorInt|)
+		cpp_Wrapper JB_PID_Signal
 
 	function IsRunning (|bool|)
-		return .exit == -1
+		return .Status == -1
 		
 	function Register
 		cpp_wrapper JB_PID_Register

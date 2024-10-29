@@ -22,9 +22,9 @@ static void AddLostChild_(int PID, int C) {
 			if (WIFEXITED(C))   Ex = WEXITSTATUS(C);
 			if (WIFSIGNALED(C)) Sig = WTERMSIG(C);
 			if (Sig and !Ex) // in case unix is being dumb. Which happens a lot.
-				Ex =1;
+				Ex = 1;
 			F->_Exit = Ex;
-			F->_Status = Sig;
+			F->_Signal = Sig;
 			return;
 		}
 	}
@@ -36,21 +36,22 @@ void JB_SigChild (int signum) {
 	SigChildOutStanding++;
 }
 
-int JB_PID_Status (ProcessOwner* F) {
-	return F->_Status;
+int JB_PID_Signal (ProcessOwner* F) {
+	return F->_Signal;
 }
 
 int JB_PID_Exit (ProcessOwner* F) {
+// this conflicts with CheckStillAlive
+// only one caller of waitpid should exist!
 	while (SigChildOutStanding > 0) {
 		while (true) {
 			int ExitCode = 0;
 			int PID = waitpid(-1, &ExitCode, WNOHANG);
 			if (PID > 0) {
 				AddLostChild_(PID, ExitCode);
-			} else if (PID == 0) {
+				JB_PID_UnRegister(F);
+			} else if (PID == 0 or errno != EINTR) {
 				break;
-			} else if (errno != EINTR) {
-				return -3; // error
 			}
 		}
 		SigChildOutStanding--;
@@ -71,8 +72,8 @@ void JB_KillChildrenOnExit() {
  
 #ifndef AS_LIBRARY // shouldn't this be around more??
 int JB_PID_Kill (ProcessOwner* F) {
-	if (F->_Exit == -1)
-		F->_Exit = 1;
+	if (F->_Exit < 0)
+		F->_Exit = 1; // negative means still OK.
 	
 	return JB_Kill(F->PID);
 }
@@ -96,7 +97,7 @@ void JB_Helper_SelfLink(JB_RingList* New) {
 ProcessOwner* JB_PID_Constructor(ProcessOwner* self) {
 	JB_New2(ProcessOwner);
 	JB_Helper_SelfLink((JB_RingList*)self);
-	self->_Status = 0;
+	self->_Signal = 0;
 	self->_Exit = -2;
 	self->KillOnExit = true;
 	return self;
@@ -139,7 +140,7 @@ ProcessOwner* JB_PID__First() {
 	return JB_PID_Next((ProcessOwner*)&PSRoot);
 }
 
-int JB_PID_Signal(int PID, int sig) {
+int JB_Signal(int PID, int sig) {
 	return kill(PID, sig);
 }
 

@@ -8,7 +8,7 @@
 class Process (ProcessOwner)
 // merge this with processowner!
 	|string|				Path
-	|[string]?|				Params
+	|[string]?|				Args
 	|FastString?|			Output
 	|FastString?|			ErrorOutput
     |Date|					LastRead
@@ -24,7 +24,7 @@ class Process (ProcessOwner)
 	destructor:							cpp_wrapper JB_Sh_Destructor
 
 	render
-		fs <~ "PID: $.pid,  ${.path.name} $.params"
+		fs <~ "PID: $.pid,  ${.path.name} $.args"
 	
 	function ClosePipes
 		cpp_wrapper JB_Sh_ClosePipes

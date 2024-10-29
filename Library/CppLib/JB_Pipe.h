@@ -11,7 +11,7 @@ extern "C" {
 
 JBClass( ProcessOwner, JB_RingList,
 	volatile int		_Exit; // turn these into an ErrorInt2?
-	volatile int		_Status;
+	volatile int		_Signal;
 	bool				KillOnExit;
 );
 
@@ -23,7 +23,7 @@ void JB_PID_Register(ProcessOwner* self);
 int JB_PID_Kill (ProcessOwner* F);
 void JB_KillChildrenOnExit();
 int JB_PID_Exit (ProcessOwner* F);
-int JB_PID_Status (ProcessOwner* F);
+int JB_PID_Signal (ProcessOwner* F);
 JB_StringC* JB_Err_SignalName (int Sig);
 JB_StringC* JB_Err_Name (int Sig);
 ProcessOwner* JB_PID_Next(ProcessOwner* self);
@@ -36,7 +36,7 @@ ProcessOwner* JB_PID__First();
 JBClass( ShellStream, ProcessOwner,
 	bool		IsClosed;
 	JB_String*  Path;
-	Array*  	Params;
+	Array*  	Args;
 	FastString* Output;
 	FastString* ErrorOutput;
     int			CaptureOut[2];
@@ -62,7 +62,7 @@ typedef void (*fn_app_deathaction)();
 //void JB_App__AtExit (fn_app_deathaction b);
 int JB_Str_System(JB_String* self);
 int JB_Kill(int PID);
-int JB_PID_Signal(int pid, int sig);
+int JB_Signal(int pid, int sig);
 void JB_App__CrashOnInterupt (bool b);
 void JB_SigChild (int signum);
 void JB_SigMsgReceived(int signum);

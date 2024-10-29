@@ -164,25 +164,14 @@ static void Unblock (int fd) {
 }
 
 
-static bool PIDDied_ (ShellStream* Sh) {
-	return kill(Sh->PID, 0) != 0; // this kill function actually doesnt fucking work. FUCK UNIX!
-								  // it is breaking it's own guidelines! As usual!
-}
-
 
 static void CheckStillAlive (ShellStream* Sh) {
-	if (Sh->_Exit == -1 and PIDDied_(Sh)) {
-		int Exit = 0;
-		int PID = waitpid(-1, &Exit, WNOHANG);
-		if (PID>0) {
-			Sh->_Exit = Exit;
-		} else {
-			Sh->_Exit = 0;
-		}
-		
-		Sh->_Status = 0;
-		JB_PID_UnRegister(Sh); // actually the spdprocess checker does a lot more work than this.
-	}
+// kill() function unreliable. UNIX breaking it's own guidelines! As usual!
+	require0 (Sh->_Exit == -1  and  kill(Sh->PID, 0) != 0);
+	JB_PID_Exit(Sh);
+	if (Sh->_Exit < 0) // why?
+		Sh->_Exit = 0;
+	JB_PID_UnRegister(Sh); // in case JB_PID_Exit can't find this. its possible! with unix.
 }
 
 
@@ -219,7 +208,7 @@ bool StartProcessSub(ShellStream& Sh, JB_String* path, Array* Args, PicoComms* C
 	if (PID > 0) {
 		JB_PID_Register(&Sh);
 		Sh._Exit = -1;
-		Sh._Status = 0;
+		Sh._Signal = 0;
 		Sh.PID = PID;
 		pipe_close(Sh.CaptureOut[WR]);
 		pipe_close(Sh.CaptureErr[WR]);
@@ -282,7 +271,7 @@ ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastStr
 		Mode &= ~1;
 	rz->Output = JB_Incr(FSOut);
 	rz->ErrorOutput = JB_Incr(JB_FS__FastNew(FSErrIn));
-	rz->Params = JB_Incr(Args);
+	rz->Args = JB_Incr(Args);
 	bool OK = JB_Sh_StartProcess(rz, self, Args, 0, Mode);
 	if (!OK) {
 		JB_SetRef(rz, 0);
@@ -302,7 +291,7 @@ ivec2 JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* 
 
 	while (TimeOut >= 0) { // allow -1 time out which instantly exits...
 		bool DidAnything = JB_Sh_UpdatePipes(Sh) & 2;
-		if (JB_PID_Exit(Sh) != -1  or  JB_PID_Status(Sh) != 0)
+		if (JB_PID_Exit(Sh) != -1  or  JB_PID_Signal(Sh) != 0)
 			break;
 		if (TimeOut > 0) {
 			auto Now = JB_Date__Now();
@@ -322,7 +311,7 @@ ivec2 JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* 
 		JB_Rec__NewErrorWithNode(nil, JB_FS_GetResult(ShErr), nil);
 	}
 	
-	int Signal = Sh->_Status;
+	int Signal = Sh->_Signal;
 	int Exit = Sh->_Exit;
 	JB_FreeIfDead(Sh);
 	if (Signal)			// died from a signal // usually its what we want, despite being mixed up
@@ -357,7 +346,7 @@ void JB_Sh_Destructor(ShellStream* self) {
 	JB_Decr(Sh.ErrorOutput);
 	JB_Decr(Sh.Path);
 	JB_Decr(Sh.Output);
-	JB_Decr(Sh.Params);
+	JB_Decr(Sh.Args);
 	JB_PID_Destructor(self);
 }
 

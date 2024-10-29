@@ -24,7 +24,7 @@ datatype PID_Int (int)
 	function Kill (|ErrorInt|)
 		cpp_wrapper JB_Kill
 	function Signal (|int| Sig, |errorint|)
-		cpp_wrapper JB_PID_Signal
+		cpp_wrapper JB_Signal
 
 
 
