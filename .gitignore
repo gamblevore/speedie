@@ -36,6 +36,5 @@ examples/prototest.spd
 examples/prototest
 *.strings.txt
 examples/encoding_test(ignore).spd
-Library/CppLib/spdsort/spdsort.xcodeproj/project.pbxproj
+Library/CppLib/spdsort/spdsort.xcodeproj/*
 Library/CppLib/spdsort/spdsort.cpp
-Library/CppLib/spdsort/spdsort.xcodeproj/project.xcworkspace/contents.xcworkspacedata
