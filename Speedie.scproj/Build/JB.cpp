@@ -3453,7 +3453,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2024102822));
+	JB_FS_AppendInt32(_fsf0, (2024102911));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8877,7 +8877,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2024102822));
+	JB_FS_AppendInt32(_fsf0, (2024102911));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -20305,10 +20305,18 @@ NilState SC_nil__Continue(Message* Msg, NilCheckMode Test) {
 NilState SC_nil__Declaration(Message* Msg, NilCheckMode Test) {
 	Message* Rel = ((Message*)JB_Ring_Last(Msg));
 	Message* Thg = ((Message*)JB_Ring_First(Rel));
-	SCDecl* D = SC_Msg_FastDecl(Thg);
-	uint J = SC_nil__FlowJump(((Message*)JB_Ring_Last(Rel)), 0);
-	iif (SC_Decl_IsReg(D)) {
-		return SC_nil_Declare((&SC__nil_T), D, J);
+	iif (Thg) {
+		SCDecl* D = SC_Msg_FastDecl(Thg);
+		uint J = SC_nil__FlowJump(((Message*)JB_Ring_Last(Rel)), 0);
+		iif (SC_Decl_IsReg(D)) {
+			return SC_nil_Declare((&SC__nil_T), D, J);
+		}
+	}
+	 else {
+		SCDecl* D = SC_Msg_FastDecl(Rel);
+		iif (SC_Decl_IsReg(D)) {
+			return SC_nil_Declare((&SC__nil_T), D, kSC__NilState_Real);
+		}
 	}
 	return 0;
 }
@@ -33393,7 +33401,7 @@ JB_String* JB_Sh_Render(ShellStream* Self, FastString* Fs_in) {
 	JB_FS_AppendString(Fs, _tmPf1);
 	JB_Decr(_tmPf1);
 	JB_FS_AppendByte(Fs, ' ');
-	JB_FreeIfDead(JB_Array_Render(Self->Params, Fs));
+	JB_FreeIfDead(JB_Array_Render(Self->Args, Fs));
 	//;
 	JB_String* _tmPf2 = JB_FS_SmartResult(Fs, Fs_in);
 	JB_Incr(_tmPf2);
@@ -47127,9 +47135,10 @@ SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, FP_SpdMainFn 
 	Self->DeathLimit = 12;
 	JB_Incr2(Self->_DebugName, JB_Str_CastZero(Path));
 	Self->WeAreParent = ((!JB_Str_Equals(Path, JB_LUB[0], false)) or (Fn != nil));
-	JB_Incr2(Self->Params, Params);
+	JB_Incr2(Self->Args, Params);
 	Self->SubProcess = Fn;
 	Self->Mode = Mode;
+	Self->ExitCodeMeansDied = true;
 	JB_Incr2(Self->Output, ((FastString*)JB_Ternaryy(JB_ProcessMode_SyntaxIs(Self->Mode, kJB__ProcessMode_CaptureStdOut), JB_FS_Constructor(nil), nil)));
 	JB_Incr2(Self->ErrorOutput, ((FastString*)JB_Ternaryy(JB_ProcessMode_SyntaxIs(Self->Mode, kJB__ProcessMode_CaptureOrPrintErrors), JB_FS_Constructor(nil), nil)));
 	JB_Incr2(Self->Writer, JB_FS_Constructor(nil));
@@ -57590,4 +57599,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -4368932999508898539 5972131913145751775
+// -7334897212505627672 5972131913145751775

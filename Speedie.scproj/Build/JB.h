@@ -1255,8 +1255,9 @@ JBClass ( SpdProcess , ShellStream ,
 	int DiedCount;
 	int DeathLimit;
 	ProcessMode Mode;
-	bool AlreadyWarnedDied;
 	bool WeAreParent;
+	bool ExitCodeMeansDied;
+	bool AlreadyWarnedDied;
 	FP_SpdMainFn SubProcess;
 );
 
