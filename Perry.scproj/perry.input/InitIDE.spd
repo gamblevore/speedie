@@ -77,8 +77,10 @@ extend PerryIDE
 		|| f = .Findrecent(project)
 			f.name = project // fix case
 			return 
-		Perry.RecentProjects.msg(@tmp, project).msg(@str, project.name)
-		Perry.RecentProjects.trim(12)
+		|| Added = @tmp + project
+		added <~ (@str, project.name)
+		Perry.RecentProjects.first = added
+		Perry.RecentProjects.trim(15)
 	
 	
 	function Init // perryide.init
