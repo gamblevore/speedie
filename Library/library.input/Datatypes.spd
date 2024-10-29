@@ -187,19 +187,6 @@ datatype Ind (int) // an INDex. And an INT.
 		return self >= 0
 
 
-datatype ErrorInt (int) // useful for unix-functions which has 0 == success
-	default 0 // defaults to true... unlike everything else?
-	false -1
-	syntax cast (|bool|)
-		return self == 0
-
-	function SignalName (|stringzeroterminated|)
-		cpp_wrapper JB_Err_SignalName
-
-	function Name (|stringzeroterminated|)
-		cpp_wrapper JB_Err_Name
-
-
 struct RetroFloat
 // for doing pixel-based animations that move smoothly for retro-games
 	|float|		Amount

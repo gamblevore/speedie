@@ -271,7 +271,7 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 
 
 function ExecuteGCC (|[string]| Commands, |bool|)
-	if CppCompilerPath.Execute(Commands)
+	if CppCompilerPath.Execute(Commands).Successful
 		return true
 	error ("C++ compiler failed to compile source code. Command:\n\n " + commands.join(" "))
 	CppCompilerPath.Execute(Commands)		
@@ -407,6 +407,7 @@ function ShouldTransComp (|bool|)
 		return true
 	if !options.silent
 		"Already up to date"
+
 
 
 function TransCompile (|[File]| Files, |String| Dest, |string| Type, |bool|)

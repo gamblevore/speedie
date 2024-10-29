@@ -153,7 +153,7 @@ extend PerryIDE
 	function Readlog (|bool| Killed=false)
 		|| c = .Compilr $
 		.speedietext <~ c.ReadStdOut
-		require !c.IsRunning or Killed
+		require !c.status.IsRunning or Killed
 
 		|| OK = !killed and .TestCompilerAlive
 

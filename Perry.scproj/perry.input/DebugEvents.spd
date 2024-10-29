@@ -186,7 +186,8 @@ function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 	r.step
 	.UpdateProductText(r)
 	
-	if kill or !r.IsRunning
+	|| x = r.Status
+	if kill or !x.IsRunning
 		.RunCompiledApp = nil
 		.RunButton.text = "\02"
 	
@@ -194,9 +195,8 @@ function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 	
 	if kill
 		.ProductOut <~ "\n(--Process Killed--)"
-	  elseif !r.IsRunning
+	  elseif !x.IsRunning
 		|| exitcode = "\n(--Exit OK--)"
-		|| x = r.exit
 		if x > 0
 			exitcode = "\n(--Exit Error: ${x}--)"
 			.addProductErr(exitcode)

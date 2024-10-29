@@ -110,6 +110,7 @@ const char** JB_Proc__CreateArgs(JB_String* self, Array* R) {
 
 	if (Strs >= ARG_MAX-1) {
 		JB_ErrorHandleFile(self, nil, E2BIG, "Arguments too long", "Creating shell-arguments");
+		errno = E2BIG;
 		return 0;
 	}
 
@@ -167,19 +168,19 @@ static void Unblock (int fd) {
 
 static void CheckStillAlive (ShellStream* Sh) {
 // kill() function unreliable. UNIX breaking it's own guidelines! As usual!
-	require0 (Sh->_Exit == -1  and  kill(Sh->PID, 0) != 0);
-	JB_PID_Exit(Sh);
-	if (Sh->_Exit < 0) // why?
-		Sh->_Exit = 0;
+	require0 (Sh->_Status == -1  and  kill(Sh->PID, 0) != 0);
+	JB_PID_Status(Sh);
+	if (Sh->_Status < 0) // why?
+		Sh->_Status = 0;
 	JB_PID_UnRegister(Sh); // in case JB_PID_Exit can't find this. its possible! with unix.
 }
 
 
 // Mode was "bool CaptureStdOut"
-bool StartProcessSub(ShellStream& Sh, JB_String* path, Array* Args, PicoComms* C, int Mode) {
+byte StartProcessSub(ShellStream& Sh, JB_String* path, Array* Args, PicoComms* C, int Mode) {
 // fcntl,Fork,execvp,Pipe,Dup2,Waitid,Errno,Close,Eintr,_exit // far too much stuff in unix.
 	auto argv = JB_Proc__CreateArgs(path, Args);
-	if (!argv) return false;
+	if (!argv) return E2BIG;
 	
 	if (!(Mode&1) or Sh.Output)
 		pipe(Sh.CaptureOut);
@@ -201,31 +202,29 @@ bool StartProcessSub(ShellStream& Sh, JB_String* path, Array* Args, PicoComms* C
 		pipe_close(Sh.CaptureErr[RD]);
 		execvp(argv[0], (char* const*)argv);
 		_exit(errno-!errno); // in case execvp fails
-		return false;
 	}
 
-	bool OK = true;
+	byte Result = 0;
 	if (PID > 0) {
 		JB_PID_Register(&Sh);
-		Sh._Exit = -1;
-		Sh._Signal = 0;
+		Sh._Status = -1;
 		Sh.PID = PID;
 		pipe_close(Sh.CaptureOut[WR]);
 		pipe_close(Sh.CaptureErr[WR]);
 		CheckStillAlive(&Sh);
 	} else {
-		OK = false;
-		JB_ErrorHandleFile(path, nil, errno, nil, "run");
+		Result = errno;
+		JB_ErrorHandleFile(path, nil, Result, nil, "run");
 	}
 
 	JB_FreeIfDead(path);
 	free(argv);
-	return OK;
+	return Result;
 }
 
 
 // Mode was bool CaptureStdOut
-bool JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, int Mode) {
+byte JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, int Mode) {
 	return StartProcessSub(*self, path, Args, C, Mode);
 }
 
@@ -272,8 +271,8 @@ ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastStr
 	rz->Output = JB_Incr(FSOut);
 	rz->ErrorOutput = JB_Incr(JB_FS__FastNew(FSErrIn));
 	rz->Args = JB_Incr(Args);
-	bool OK = JB_Sh_StartProcess(rz, self, Args, 0, Mode);
-	if (!OK) {
+	byte Error = JB_Sh_StartProcess(rz, self, Args, 0, Mode);
+	if (Error) {
 		JB_SetRef(rz, 0);
 	}
 	return rz;
@@ -281,9 +280,9 @@ ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastStr
 
 
 // mode was bool StdOutFlowThru
-ivec2 JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, int Mode, Date TimeOut) {
+byte JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, int Mode, Date TimeOut) {
 	auto Sh = ShellStart(self, R, FSOut, FSErrIn, Mode);
-	if (!Sh) return ivec2{1, 0};
+	if (!Sh) return errno+!errno;
 	
 	Date ExitAfter = 0;
 	if (TimeOut > 0)
@@ -291,7 +290,7 @@ ivec2 JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* 
 
 	while (TimeOut >= 0) { // allow -1 time out which instantly exits...
 		bool DidAnything = JB_Sh_UpdatePipes(Sh) & 2;
-		if (JB_PID_Exit(Sh) != -1  or  JB_PID_Signal(Sh) != 0)
+		if (JB_PID_Status(Sh) != 255)
 			break;
 		if (TimeOut > 0) {
 			auto Now = JB_Date__Now();
@@ -310,13 +309,11 @@ ivec2 JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* 
 	if (!FSErrIn and JB_FS_Length(ShErr)) {
 		JB_Rec__NewErrorWithNode(nil, JB_FS_GetResult(ShErr), nil);
 	}
-	
-	int Signal = Sh->_Signal;
-	int Exit = Sh->_Exit;
+	int Exit = Sh->_Status;
 	JB_FreeIfDead(Sh);
-	if (Signal)			// died from a signal // usually its what we want, despite being mixed up
-		JB_ErrorHandleFile(self, nil, Signal, "crashed", "running");
-	return ivec2{Exit, Signal}; // ivec2 specifier needed for linux
+	if (Exit>128)			// died from a signal // usually its what we want, despite being mixed up
+		JB_ErrorHandleFile(self, nil, Exit, "crashed", "running");
+	return Exit; // ivec2 specifier needed for linux
 }
 
 

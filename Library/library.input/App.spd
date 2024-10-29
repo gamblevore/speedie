@@ -313,16 +313,16 @@ function Configure (assigns:|string|)
 
 
 target !minilib {
-function Say (|string| s, |bool| print=true,  |errorint2|)
+function Say (|string| s, |bool| print=true,  |ExitCode|)
 	// what if we don't want to wait. pass -1 for the timeout?
 	if print
 		printline s
 	return "/usr/bin/say".execute([s])
 	
-function AppleScript (|string| str, |ErrorInt2|)
+function AppleScript (|string| str, |ExitCode|)
 	return "/usr/bin/osascript".execute(["-e",str], nil)
 
-function Sudo (|string| p, |ErrorInt2|)
+function Sudo (|string| p, |ExitCode|)
 	return .applescript("do shell script \"$p\" with administrator privileges")
 
 function Icon (assigns:|string| path)

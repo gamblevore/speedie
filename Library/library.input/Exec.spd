@@ -13,7 +13,6 @@ datatype FileDes (int)
 
 	function IsTerminal (|bool|)
 		cpp_wrapper JB_IsTerminal
-		
 
 
 
@@ -28,31 +27,60 @@ datatype PID_Int (int)
 
 
 
-datatype ErrorInt2 (ivec2)
+datatype ExitCode (byte)
 	description "Some unix process operations, need to describe both a signal (crash number) and an exit code."
-
-	linkage
-		cpp_part Err2
-	function Exit (|errorint|)
-		return self[0]
-	function Signal (|errorint|)
-		return self[1]
+	function IsSignal (|bool|)
+		description "This is a signal error (a crash)" 
+		return  self > 128
+	function IsOK (|bool|)
+		description "We have either completed successfully, or not yet started. Either way there is no error." 
+		return  (self-1)|uint| >= 253
+	function Successful (|bool|)
+		description "Completed successfully." 
+		return  self == 0
 	syntax cast (|bool|)
-		return self == (0, 0)
+		disabled "Do you mean self != 0, or .isok, or .successful"
+
+	function Name (|string|)
+		description "The name of the error (if any)." 
+		if .IsSignal
+			return (self|errorint|&~128).SignalName
+		return self|errorint|.name
+	
+	function IsRunning (|bool|)
+		return self == 255
+
+	function NotStarted (|bool|)
+		return self == 254
+
+
+
+datatype ErrorInt (int) // useful for unix-functions which has 0 == success
+	default 0 // defaults to true... unlike everything else?
+	false -1
+	syntax cast (|bool|)
+		return self == 0
+
+	function SignalName (|stringzeroterminated|)
+		cpp_wrapper JB_Err_SignalName
+
+	function Name (|stringzeroterminated|)
+		cpp_wrapper JB_Err_Name
+
 
 
 
 target !minilib {
 extend string	
-	function Execute (|[string]?| Args = [],  |faststring?| Out = nil, |faststring?| Errs = nil, |ProcessOwnerMode| Mode=ProcessOwnerMode.StdOutFlowsThroughUs, |date| timeout=0, |ErrorInt2|)
+	function Execute (|[string]?| Args = [],  |faststring?| Out = nil, |faststring?| Errs = nil, |ProcessOwnerMode| Mode=ProcessOwnerMode.StdOutFlowsThroughUs, |date| timeout=0, |ExitCode|)
 		cpp_wrapper JB_Str_Execute
 
-	function SilentExecute (|[string]?| Args = [],  |faststring?| Out = nil, |faststring?| Errs = nil, |date| timeout=0,  |ErrorInt2|)
+	function SilentExecute (|[string]?| Args = [],  |faststring?| Out = nil, |faststring?| Errs = nil, |date| timeout=0,  |ExitCode|)
 		return .execute(args, out, errs, nil, timeout)
 
 	function ExecuteStr (|[string]| Args=nil, |string|)
 		|| fs = faststring()
-		if .execute(args, fs)
+		if .execute(args, fs) == 0
 			rz = fs
 
 	function System (|int|)

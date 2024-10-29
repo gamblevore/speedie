@@ -1,6 +1,7 @@
 
 
 class ProcessOwner
+// merge this with process!
 	size 32
 	linkage
 		wrapper
@@ -15,19 +16,9 @@ class ProcessOwner
 	destructor
 		cpp_Wrapper JB_PID_Destructor
 	
-	helper Status (|int|)
-		cpp_Wrapper JB_PID_Exit
+	function Status (|ExitCode|)
+		cpp_Wrapper JB_PID_Status
 	
-	function Exit (|ErrorInt|)
-		rz = .Status
-		if rz < 0: rz = 0 // still running or hasn't yet been run.
-	
-	function Signal (|ErrorInt|)
-		cpp_Wrapper JB_PID_Signal
-
-	function IsRunning (|bool|)
-		return .Status == -1
-		
 	function Register
 		cpp_wrapper JB_PID_Register
 
@@ -58,3 +49,5 @@ datatype ProcessOwnerMode (byte)
 		OwnGroup=2
 	
 // the signal constants are different per-platform
+
+

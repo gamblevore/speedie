@@ -395,13 +395,14 @@ class PerryIDE (Window)
 	function CheckNotCrashed (|&Process| pp, |string| what, |bool|)
 		|| p = (pp[])|process--|
 		require p
-		if p.signal == 0 and p.exit == 0
+		|| Exit = p.Status
+		if exit.isok
 			return true
+
 		|| fs = faststring()
-		if p.signal != 0
-			fs <~ "Crash: ${p.signal.SignalName} "
-		if p.exit != 0 // output both infos
-			fs <~ "Exited: ${p.Exit} "
+		fs <~ ("Crash", "Exited")(exit.IsSignal)
+		fs <~ ": ${exit.name} "
+
 		fs <~ " {${p.render}}\n"
 		fs <~ p.erroroutput.getresult.FindStacktrace
 		pp[] = nil

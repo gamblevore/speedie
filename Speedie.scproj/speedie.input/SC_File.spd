@@ -125,10 +125,10 @@ class SCFile (file)
 //	errorreceiver.newproblem( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign self." )
 
 
-function file.CodeSign (|string| sign, |errorint2|)
+function file.CodeSign (|string| sign, |ExitCode|)
 	target osx
 		if !platform.osx
-			return (-1, -1)|errorint2|
+			return 45 // ENOSUPPORT
 		using ErrorSeverity.Warning
 		|[string]| args = []
 		args <~ "--deep"
@@ -146,14 +146,14 @@ function file.CodeSign (|string| sign, |errorint2|)
 		if options.PrintCompileString
 			args <~ "--verbose"
 		args <~ self
-		if rz
+		if rz.Successful
 			rz = "/usr/bin/codesign".DebugExecute(args)
-		if rz
+		if rz.Successful
 			args[0] = "-a"
 			rz = "/usr/sbin/spctl".DebugExecute(args)
 
 
-function string.DebugExecute (|[string]?| Args=nil, |faststring|Out=nil, |faststring| Errs=nil, |ErrorInt2|)
+function string.DebugExecute (|[string]?| Args=nil, |faststring|Out=nil, |faststring| Errs=nil, |ExitCode|)
 	if file.DebugExecute // shouldnt be default!
 		print self
 		print " "

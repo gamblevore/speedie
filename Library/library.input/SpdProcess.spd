@@ -53,7 +53,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	helper ChildAlive (|bool|)
 		if .SubProcess
 			return .CommsOpen
-		if .isrunning
+		if .status.isrunning
 			return true
 
 
@@ -94,11 +94,11 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 
 	
 	helper HandleDied
-		|| Bad = !.signal
+		|| Bad = !.Status.isok
 		.DiedCount += Bad
 		if (.ErrorOutput!=nil) and (.mode is AutoPrintErrors)
 			printline .ErrorOutput.GetResult
-		.Disconnect(.signal.signalname) // removes us from the check-list
+		.Disconnect(.status.name) // removes us from the check-list
 
 
 	function CanActivate (|bool|)
@@ -136,7 +136,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		.pico!.close(Why)
 
 
-	helper StartProcess (|string| path, |[string]| Args=nil, |pico| C = nil, |bool| CaptureStdOut, |bool|)
+	helper StartProcess (|string| path, |[string]| Args=nil, |pico| C = nil, |bool| CaptureStdOut, |ExitCode|)
 		cpp_Wrapper JB_Sh_StartProcess
 
 	
@@ -144,7 +144,8 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		if !.pico.isok
 			require pico.replace(.pico)
 
-		return .StartProcess(.path, .args, .pico, .output!=nil)
+		|| err = .StartProcess(.path, .args, .pico, .output!=nil)
+		return err.successful
 
 
 	function TimedOut (|date| Durr, |bool|)
@@ -156,11 +157,11 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		nil checker // shouldn't be necessary
 		require .CommsOpen
 		if .WeAreParent
-			return .subprocess or .isrunning
+			return .subprocess or .status.isrunning
 		return app.ParentID > 1
 			
 	function Deactivate (|int| ExitCode)
-		|| running = .isrunning
+		|| running = .status.isrunning
 		if .CommsOpen and !running	// inconsistant...
 			.handledied				// disconnect comms
 		if running
@@ -198,7 +199,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			while m
 				|| ch = m
 				m++
-				if !ch.IsRunning
+				if !ch.status.IsRunning
 					if (ch isa SpdProcess)
 						ch.HandleDied
 					ch.UnRegister

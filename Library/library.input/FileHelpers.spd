@@ -316,7 +316,7 @@ extend String
 		return self.Child(ch).file
 	
 	target !minilib {
-	function OpenFile (|errorint2|)
+	function OpenFile (|ExitCode|)
 		|| p = .pathfix
 			return "/usr/bin/open".SilentExecute([p], NIL, nil)
 	
@@ -351,7 +351,7 @@ function string.ShellPath (|string|)
 
 target !minilib {
 extend file
-	function UploadTo (|string| url, |errorint2|) // move to the network module
+	function UploadTo (|string| url, |ExitCode|) // move to the network module
 		return "/usr/bin/curl".silentexecute([
 			"-T"
 			self
@@ -370,7 +370,7 @@ extend file
 		if .zipto(zip)
 			return zip.file
 		
-	function ZipUpload (|string| url, |errorint2|)
+	function ZipUpload (|string| url, |ExitCode|)
 		return .ZipTmp$.uploadto(url)
 }
 
