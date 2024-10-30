@@ -702,10 +702,12 @@ function RehomeExport (|bool|)
 	return true
 
 			
-function scobject.NameConflict (|scobject| Old, |string| name)
+function scobject.NameConflict (|SCObject| Old, |string| name)
 	|| msg = "Name conflict: " + name
 	error ( .source,   msg)
+	(stderr.lasterror! is dontstrip)
 	error (old.source, msg)
+	(stderr.lasterror! is dontstrip)
 	
 
 function TestExportName (|String| s, |bool| Explicit, |string|) {

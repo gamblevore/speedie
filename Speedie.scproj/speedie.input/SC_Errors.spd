@@ -46,13 +46,10 @@ module SC_Errors
 				a = a.Ancestor(@arg)
 		if a
 			|| Fn = A.MsgOwningFunc
-			if !fn or fn is initfunc
-				return true
-
-			|| OldErr = .AlreadyIgnored(A, fn)
-			if olderr and OldErr.Severity >= err.Severity
-				return false
-			.IgnoredBranches.obj(A) = err
+				|| OldErr = .AlreadyIgnored(A, fn)
+				if olderr and OldErr.Severity >= err.Severity
+					return false
+				.IgnoredBranches.obj(A) = err
 		return true
 
  
