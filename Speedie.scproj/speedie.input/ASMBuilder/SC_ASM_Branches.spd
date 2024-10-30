@@ -47,7 +47,6 @@ function While			(fn_asm)
 	|| LOOP_TEST = .Branch(exp.first!)
 	if loop_test.Constness.knownfalse
 /		.nop(begin, loop_Test.start)
-		.nop(.last) // may be instructions inbetween      /*  while x()==1  */
 		return asmreg()
 	
 	BEGIN.jumpto = LOOP_Test.start
@@ -77,6 +76,14 @@ function Continue		(fn_asm)
 	self <~ (kcontinue, exp)										// request jump fwd a little less
 
 
+function BackCond (|fatasm| after)
+	|| l = .last
+	if l < after
+		.nop(l)
+		if --l < after and l is ConstAny
+			.nop(l)
+
+
 function Ternary		(fn_asm)
 	opt norefcounts
 	
@@ -92,19 +99,19 @@ function Ternary		(fn_asm)
 		return .SimpleTernary(dest, ma, mb, cond)
 
 	dest = .TempTyped(exp, dest)
-	|| FirstOK = .Branch(cond)
-	|| KK = FirstOK.Constness
+	|| TernTest = .Branch(cond)
+	|| KK = TernTest.Constness
 	if KK.IsKnown
-		.nop(.last)
 /		|| which = (A, B)(KK.Default)
 		rz = .µInto(which, dest)
 	  else
 		
 		.µInto(A, dest)
 		|| Exit = exp.jump(0)
-		FirstOK.AllJumpTo(.curr)
+		TernTest.AllJumpTo(.curr)
 		rz = .µInto(B, dest)
 		Exit.jumpto = .curr
+
 
 function SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond, |asmreg|)
 	opt norefcounts
@@ -114,21 +121,28 @@ function SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond,
 	return cond.TERN(dest, µ, ma, mb) * dest
 
 
+function AskCond (|message| cond, |bool| Neg, |asmreg|)
+	|| mode = asmreg.CondRequest.Negate(neg)
+	rz = .µ(cond, mode)
+	if rz isnt CondAnswer
+		if rz is alreadynegated
+			debugger
+			(mode isnt negate) // does this ever happen?
+		rz = .exists(mode, rz, cond)
+	rz = rz.boolanswer
+
+
+function OofBranch (|message| cond,  |bool| neg=false)
+	|| tmp = .Branch(cond, neg)
+	
 function Branch (|message| cond,  |bool| neg=false,  |fatrange|)
 	rz.start = .curr
+	|| answer = .AskCond(cond, neg)
 	rz.constness = maybebool.default(false)
-	|| mode = asmreg.CondRequest.Negate(neg)
-	|| answer = .µ(cond, mode)
-		
-	if answer isnt CondAnswer
-		if answer is alreadynegated
-			(mode isnt negate)
-		answer = .exists(mode, answer, cond)
 	if answer is constany
 		rz.constness = (answer.const!=0)|maybebool|
-	|| c = .curr
-	rz.after = c
-	ifn (c-1).jumpreg // bad
+		.backcond(rz.start)
+	rz.after = .curr
 
 
 helper ASMBoolShrink (|message| exp,  |ASMReg| Dest,  |ASMReg| ml,  |ASMReg|)
@@ -238,7 +252,10 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 function PrintProgress (|message| exp)
 	opt norefcounts
 	"---"
-	printline exp
+	if !exp
+		.LastProgress = .funcstart
+	  else
+		printline exp
 	|| Curr = .LastProgress
 	while curr < .curr
 		curr.debugprint
@@ -285,27 +302,19 @@ function BoolConst2 (|opmode| Opp, |asmreg| ml,  |asmreg| mr, |asmreg|)
 
 
 function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
-	|| FirstPart = .Branch(A, dest is negate)
-	|| KK = FirstPart.Constness
-	if KK.IsKnown
-/		if KK.KnownTrue
-/			.nop(firstpart)
-			|| tmp = .Branch(b, dest is negate)
-/		return dest.boolanswer
-	
-	|| tmp2 = .Branch(B, dest is negate)
+	|| AndTest = .Branch(A, dest is negate)
+	if !AndTest.Constness.KnownFalse
+		.OofBranch(B, dest is negate)
 	return dest.BoolAnswer
 
 
 
 function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
-	|| FirstPart = .Branch(A, dest isnt negate)
-	|| KK = FirstPart.Constness
-	if !KK.KnownTrue
-		|| part2 = .Branch(B, dest is negate)
-		FirstPart.AllJumpTo(.curr)	
-	  else
-/		0
+	if "andorrest2".trap
+	|| OrTest = .Branch(A, dest isnt negate)
+	if !OrTest.Constness.KnownFalse // opposite const test of expected, cos OR is opposite of AND
+		.OofBranch(B, dest is negate)
+		OrTest.AllJumpTo(.curr)	
 	return dest.BoolAnswer
 
 }
@@ -324,11 +333,8 @@ Struct FatRange
 			yield curr
 	
 	function AllJumpTo (|&fatasm| curr)
-		|| any = false
 		for s in self
 			if s is CondAnswer
 				(s isnt CondAnswer)
 				s.jumpto = curr
-				any = true
-		if !any // what?
 

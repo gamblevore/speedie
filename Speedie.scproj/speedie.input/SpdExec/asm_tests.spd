@@ -67,7 +67,7 @@ function AndOrRest (|int| a, |int| b, |int|) // stragglers
 
 	
 function AndOrRest2 (|int| a, |int| b) // more stragglers
-	if 1 or a: a = 2
+	if 1 or b: a = 2
 	if 0 or a: a = 3
 
 	|| x3 = (a, b)(1)

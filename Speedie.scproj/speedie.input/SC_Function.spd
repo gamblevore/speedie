@@ -106,11 +106,6 @@ syntax is (|FunctionType| k, assigns:|bool|)
 	  else
 		.FuncInfo &= ~k
 
-
-//function DebugPrintOnce
-//	if self isnt PrintedForDebugViewing
-//		is PrintedForDebugViewing
-//		printline self
  
 
 syntax equals (|string| name, |bool| Aware, |bool|)
