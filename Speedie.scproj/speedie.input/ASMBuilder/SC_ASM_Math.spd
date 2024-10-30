@@ -40,8 +40,8 @@ extend ASMState
 				return exp.JMPN(r,l,0)*Dest
 			return exp.JMPE(r,l,0)*Dest
 		if negate
-			return exp.JBRN(r,0)*Dest
-		return exp.JBRA(r,0)*Dest
+			return exp.JBAN(r,0)*Dest
+		return exp.JBOR(r,0)*Dest
 
 	
 	function Exists (|asmreg| dest, |asmreg| L, |message| exp, |asmreg|)
