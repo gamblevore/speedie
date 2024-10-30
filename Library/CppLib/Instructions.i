@@ -155,13 +155,13 @@
 	__;
 	Code = JumpNeq(r, Op, Code);
 	___;
-ı JBRA: 
+ı JBOR: 
 	__;
 	if (i1) 
 	Code += Bra_Jmpi
 ;
 	___;
-ı JBRN: 
+ı JBAN: 
 	__;
 	if (!i1) 
 	Code += Bra_Jmpi

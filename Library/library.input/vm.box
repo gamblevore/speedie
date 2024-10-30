@@ -457,12 +457,12 @@ POS 6
 		__
 		Code = JumpNeq(r, Op, Code)
 		___
-/**/ JBRA  (Bra)
+/**/ JBOR  (Bra)
 		__
 		if (i1)
 			Code += Bra_Jmpi
 		___
-/**/ JBRN  (Bra)					
+/**/ JBAN  (Bra)					
 		__
 		if (!i1)
 			Code += Bra_Jmpi
