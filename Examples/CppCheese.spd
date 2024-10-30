@@ -16,7 +16,7 @@ class CheeseShop // An example to show how bad c++ is compared to speedie.
 
 
 main
-	|| shop = CheeseShop(ConfigData.parse$)
+	|| shop = CheeseShop(ConfigData.parse #require)
 	"Red Leicester? ${shop[`red leicester`]}"
 	"Tilsit?        ${shop[`tilsit`]}"
 	"Wenslydale?    ${shop[`wenslydale`]}"
@@ -24,17 +24,13 @@ main
 	"Barris?        ${shop[`barris`]}"
 	
 /*
-   Speedie doesn't have exceptions, but 'ErrorList' instead.
+   #require means: **If the result of this expression doesn't exist, exit the function**
+This is a simple way to make code-flow explicit, but 'get it out of the way'.
 
-   The $ symbol means: "get the result of this expression (ConfigData.parse) and if it
-doesn't exist, exit the calling function". A simple way to make code-flow still
-explicit, but 'get it out of the way'.
+   The original C++ uses 'toml::parse' that raises an exception... causing issues.
+Speedie has no exceptions, but a far better error-handling system.
 
- The original C++ uses 'toml::parse' that raises an exception... causing all sorts of issues.
-
- Also... unlike C++, Speedie is refcounted by default, making code just work naturally.
- No wierd "copy the whole class... calling constructors and destructors all over the place"
- when all you want to do is set a variable.
+   Speedie is refcounted, avoiding C++'s issues around constructors and destructors.
 */
 
 
