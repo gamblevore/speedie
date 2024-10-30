@@ -1,0 +1,46 @@
+#!/usr/local/bin/spd
+
+// this is just to explain input and output. Not how you actually check passwords.
+// which would need to be secure.
+
+main
+	for i in 3
+		"Please enter the passcode, you have ${3-i} attempts"
+		|| passcode = app.input
+        if passcode == "1539"
+			"Success!"
+			return 0
+        "Wrong passcode!"
+
+	"Wrong passcode! Your server has now been locked!"
+	return -1
+
+
+/*
+// C++ version. As you can see, the C++ Version is terrible compared.
+// Also the speedie version should run just as fast, unlike python/javascript.
+#include <stdio.h>
+#include <string.h>
+
+int main(){
+    char passcode[5];
+
+    for(int i = 0; i < 3; i++){
+        printf("Please enter the passcode, you have %d attempts : ", (3 - i));
+        fgets(passcode, sizeof(passcode), stdin);
+        passcode[strlen(passcode) - 1] = '\0';
+
+        if(strcmp(passcode, "1539")){
+            if(i == 2){
+                printf("Wrong passcode! Your server has now been locked!\n");
+                break;
+            }   
+            printf("Wrong passcode!\n");
+        }
+        else{
+            printf("Success!\n");
+            break;
+        }
+    }
+    return 0;
+}*/
