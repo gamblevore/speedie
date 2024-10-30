@@ -3277,7 +3277,7 @@ void SC_SC_API__NewExportAPISub(Message* Node, SCObject* Parent);
 
 
 // Errors
-JB_Error* SC_Errors__AlreadyIgnored(Message* F);
+JB_Error* SC_Errors__AlreadyIgnored(Message* F, SCFunction* Fn);
 
 bool SC_Errors__CanKeep(JB_Error* Err);
 
@@ -4707,8 +4707,6 @@ int JB_TC_ByteCount(uint /*DataTypeCode*/ Self);
 
 int JB_TC_Count(uint /*DataTypeCode*/ Self);
 
-void JB_TC_DebugPrint(uint /*DataTypeCode*/ Self);
-
 int SC_TC_FloatIntMerge(uint /*DataTypeCode*/ Self, int Old, Message* S);
 
 int JB_TC_Floatness(uint /*DataTypeCode*/ Self);
@@ -4728,8 +4726,6 @@ int JB_TC_ItemBitCount(uint /*DataTypeCode*/ Self);
 int JB_TC_NumericCount(uint /*DataTypeCode*/ Self);
 
 int SC_TC_NumericCountBoolsToo(uint /*DataTypeCode*/ Self, SCDecl* D);
-
-JB_String* JB_TC_Render(uint /*DataTypeCode*/ Self, FastString* Fs_in);
 
 bool JB_TC_SameBasicType(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ B);
 

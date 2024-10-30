@@ -3453,7 +3453,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2024102915));
+	JB_FS_AppendInt32(_fsf0, (2024103000));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -3853,14 +3853,6 @@ void SC_FB__SetFlow() {
 }
 
 void SC_FB__StopStripping() {
-	iif (JB_Str_Exists(JB_LUB[0])) {
-		jdb(JB_LUB[0]);
-		jdb2(((Message*)nil));
-		fdb(((Array*)nil));
-		JB_TC_DebugPrint(((DataTypeCode)nil));
-		FatASM X = ((FatASM){});
-		SC_FAT_DebugPrint((&X));
-	}
 }
 
 JB_String* SC_FB__TryUseProject(JB_String* Path, bool IsScript) {
@@ -7380,16 +7372,12 @@ void SC_SC_API__NewExportAPISub(Message* Node, SCObject* Parent) {
 }
 
 
-JB_Error* SC_Errors__AlreadyIgnored(Message* F) {
+JB_Error* SC_Errors__AlreadyIgnored(Message* F, SCFunction* Fn) {
 	JB_Error* E = ((JB_Error*)JB_Dict_Obj(SC__Errors_IgnoredBranches, F));
 	iif (E) {
 		return E;
 	}
-	SCFunction* _tmPf0 = SC_Msg_MsgOwningFunc(F);
-	iif (!_tmPf0) {
-		return nil;
-	}
-	Message* RipRoot = SC_Func_SourceArg(_tmPf0);
+	Message* RipRoot = SC_Func_SourceArg(Fn);
 	{
 		Message* Curr = F;
 		wwhile (Curr) {
@@ -7424,7 +7412,11 @@ bool SC_Errors__CanKeep(JB_Error* Err) {
 		}
 	}
 	iif (A) {
-		JB_Error* OldErr = SC_Errors__AlreadyIgnored(A);
+		SCFunction* Fn = SC_Msg_MsgOwningFunc(A);
+		iif ((!Fn) or SC_Func_SyntaxIs(Fn, kSC__FunctionType_InitFunc)) {
+			return true;
+		}
+		JB_Error* OldErr = SC_Errors__AlreadyIgnored(A, Fn);
 		iif (OldErr and (OldErr->Severity >= Err->Severity)) {
 			return false;
 		}
@@ -8877,7 +8869,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2024102915));
+	JB_FS_AppendInt32(_fsf0, (2024103000));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -18580,13 +18572,6 @@ int JB_TC_Count(uint /*DataTypeCode*/ Self) {
 	return (Self & 3) + 1;
 }
 
-void JB_TC_DebugPrint(uint /*DataTypeCode*/ Self) {
-	JB_String* _tmPf0 = JB_TC_Render(Self, nil);
-	JB_Incr(_tmPf0);
-	JB_PrintLine(_tmPf0);
-	JB_Decr(_tmPf0);
-}
-
 int SC_TC_FloatIntMerge(uint /*DataTypeCode*/ Self, int Old, Message* S) {
 	iif (JB_TC_IsFloat(Self)) {
 		Old = (Old | 2);
@@ -18650,54 +18635,6 @@ int SC_TC_NumericCountBoolsToo(uint /*DataTypeCode*/ Self, SCDecl* D) {
 		return JB_TC_Count(Self);
 	}
 	return 0;
-}
-
-JB_String* JB_TC_Render(uint /*DataTypeCode*/ Self, FastString* Fs_in) {
-	FastString* Fs = JB_FS__FastNew(Fs_in);
-	JB_Incr(Fs);
-	Self = (Self & kJB__TC_PossibleBits);
-	iif (!JB_TC_IsNumeric(Self)) {
-		iif (JB_TC_SyntaxIs(Self, kJB__TC_bool)) {
-			JB_FS_AppendString(Fs, JB_LUB[1425]);
-		}
-		 else {
-			JB_FS_AppendString(Fs, JB_LUB[1702]);
-		}
-	}
-	 else iif (Self == kJB__TC_byte) {
-		JB_FS_AppendString(Fs, JB_LUB[1432]);
-	}
-	 else {
-		iif (!JB_TC_IsSigned(Self)) {
-			JB_FS_AppendByte(Fs, 'u');
-		}
-		int B = JB_TC_ByteCount(Self);
-		iif (JB_TC_IsInt(Self)) {
-			iif (B == 1) {
-				JB_FS_AppendString(Fs, JB_LUB[1703]);
-			}
-			 else iif (B == 2) {
-				JB_FS_AppendString(Fs, JB_LUB[1704]);
-			}
-			 else iif (B == 4) {
-				JB_FS_AppendString(Fs, JB_LUB[1628]);
-			}
-			 else iif (B == 8) {
-				JB_FS_AppendString(Fs, JB_LUB[1633]);
-			}
-		}
-		 else {
-			JB_FS_AppendString(Fs, JB_LUB[1570]);
-			iif (B != 4) {
-				JB_FS_AppendInt32(Fs, B * 8);
-			}
-		}
-	}
-	JB_String* _tmPf0 = JB_FS_SmartResult(Fs, Fs_in);
-	JB_Incr(_tmPf0);
-	JB_Decr(Fs);
-	JB_SafeDecr(_tmPf0);
-	return _tmPf0;
 }
 
 bool JB_TC_SameBasicType(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ B) {
@@ -38509,9 +38446,9 @@ JB_String* JB_Msg_Locate(Message* Self) {
 	iif (Self->Position >= 0) {
 		JB_FS_AppendString(Fs, JB_LUB[1832]);
 		JB_FS_AppendInt32(Fs, Self->Position);
-		Message* _tmPf0 = ((Message*)JB_Ring_Root(Self));
+		JB_MemoryLayer* _tmPf0 = JB_ObjLayer(Self);
 		JB_Incr(_tmPf0);
-		JB_Object* R = JB_Tree_Obj(_tmPf0);
+		JB_Object* R = _tmPf0->Obj;
 		JB_Incr(R);
 		JB_Decr(_tmPf0);
 		iif (JB_Object_Isa(R, &JB_StringData)) {
@@ -46921,7 +46858,7 @@ void SC_Base_TryAddSub(SCNode* Self, Message* ErrPlace, SCObject* IncObj, JB_Str
 		}
 	}
 	 else {
-		SC_SCObject_NameConflict(Self, Old, Name);
+		SC_SCObject_NameConflict(IncObj, Old, Name);
 	}
 }
 
@@ -57598,4 +57535,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 4310012265942523095 2921301095732023086
+// -3270917750130537939 2921301095732023086
