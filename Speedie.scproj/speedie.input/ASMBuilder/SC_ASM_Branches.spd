@@ -23,7 +23,8 @@ function If				(fn_asm)
 		ElseIfCond = nil
 		arg2 = nil
 
-	|| B = .Branch(cond, Flip)
+	|fatrange| B
+	.Branch(cond, Flip, B)
 	if !b.Constness.KnownFalse
 		ASMType.arg(self, arg1)
 		B.AllJumpTo(.curr)
@@ -44,7 +45,8 @@ function While			(fn_asm)
 	|| BEGIN = exp.JUMP(0)							// jump to end... THEN EMIT arg and jump back.
 	ASMType.arg(self, exp.second)					// arg
 
-	|| LOOP_TEST = .Branch(exp.first!)
+	|fatrange| LOOP_TEST
+	|| LT = .Branch(exp.first!, loop_Test)
 	if loop_test.Constness.knownfalse
 /		.nop(begin, loop_Test.start)
 		return asmreg()
@@ -76,11 +78,11 @@ function Continue		(fn_asm)
 	self <~ (kcontinue, exp)										// request jump fwd a little less
 
 
-function BackCond (|fatasm| after)
+function BackCond (|fatasm| start)
 	|| l = .last
-	if l < after
+	if l >= start
 		.nop(l)
-		if --l < after and l is ConstAny
+		if --l >= start and l is ConstAny
 			.nop(l)
 
 
@@ -99,7 +101,8 @@ function Ternary		(fn_asm)
 		return .SimpleTernary(dest, ma, mb, cond)
 
 	dest = .TempTyped(exp, dest)
-	|| TernTest = .Branch(cond)
+	|fatrange| TernTest
+	|| TT = .Branch(cond, terntest)
 	|| KK = TernTest.Constness
 	if KK.IsKnown
 /		|| which = (A, B)(KK.Default)
@@ -121,7 +124,13 @@ function SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond,
 	return cond.TERN(dest, µ, ma, mb) * dest
 
 
-function AskCond (|message| cond, |bool| Neg, |asmreg|)
+function OofBranch (|message| cond,  |bool| neg=false, |asmreg|)
+	|fatrange| tmp
+	return .Branch(cond, neg, tmp)
+
+
+function Branch (|message| cond,  |bool| neg=false,  |fatrange| range, |asmreg|)
+	range.start = .curr
 	|| mode = asmreg.CondRequest.Negate(neg)
 	rz = .µ(cond, mode)
 	if rz isnt CondAnswer
@@ -129,20 +138,13 @@ function AskCond (|message| cond, |bool| Neg, |asmreg|)
 			debugger
 			(mode isnt negate) // does this ever happen?
 		rz = .exists(mode, rz, cond)
-	rz = rz.boolanswer
-
-
-function OofBranch (|message| cond,  |bool| neg=false)
-	|| tmp = .Branch(cond, neg)
-	
-function Branch (|message| cond,  |bool| neg=false,  |fatrange|)
-	rz.start = .curr
-	|| answer = .AskCond(cond, neg)
-	rz.constness = maybebool.default(false)
-	if answer is constany
-		rz.constness = (answer.const!=0)|maybebool|
-		.backcond(rz.start)
-	rz.after = .curr
+		#! TrueConstCond
+	rz = rz.CondAnswer
+	range.constness = maybebool.default(false)
+	if rz is constany
+		range.constness = (rz.const!=0)|maybebool|
+		.backcond(range.start)
+	range.after = .curr
 
 
 helper ASMBoolShrink (|message| exp,  |ASMReg| Dest,  |ASMReg| ml,  |ASMReg|)
@@ -302,20 +304,19 @@ function BoolConst2 (|opmode| Opp, |asmreg| ml,  |asmreg| mr, |asmreg|)
 
 
 function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
-	|| AndTest = .Branch(A, dest is negate)
+	|fatrange| AndTest
+	rz = .Branch(A, dest is negate, andtest)
 	if !AndTest.Constness.KnownFalse
 		.OofBranch(B, dest is negate)
-	return dest.BoolAnswer
 
 
 
 function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
-	if "andorrest2".trap
-	|| OrTest = .Branch(A, dest isnt negate)
+	|fatrange| OrTest
+	rz = .Branch(A, dest isnt negate, Ortest)
 	if !OrTest.Constness.KnownFalse // opposite const test of expected, cos OR is opposite of AND
 		.OofBranch(B, dest is negate)
 		OrTest.AllJumpTo(.curr)	
-	return dest.BoolAnswer
 
 }
 

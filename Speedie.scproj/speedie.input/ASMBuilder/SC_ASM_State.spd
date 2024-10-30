@@ -53,8 +53,6 @@ struct ASMState
 				.nop(r)
 				return v.Log2+1
 
-		if (!r.reg) // what?
-
 
 	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
 		if dest isnt discard

@@ -5,6 +5,13 @@ prototype fn_ASMConstifier  (|&fatasm| self, |asmreg| L, |asmreg| R)
 
 
 extend asmreg
+	function CondAnswer (|asmreg|)
+		.µtype = DataTypeCode.bool
+		is AlreadyNegated
+		is CondAnswer
+		isnt negate
+		return self
+
 	function BoolAnswer (|asmreg|)
 		.µtype = DataTypeCode.bool
 		
@@ -62,10 +69,16 @@ extend ASMState
 // making this work generally... say from compare or whatever
 // would be some work. Its just compare thats missing, though?
 // compare already doesn't even do consts at all.
-		if  l is constany  and  r is constany  and  rz isnt constany  // a cond?
+		|| eq = false
+		if rz is constany
+			eq = rz.const
+		  elseif  l is constany  and  r is constany  // a cond?
 			(rz is constany)
-			|| eq = (l.const == r.const) == (dest isnt negate)
-			rz.const = (eq)|int|
+			eq = (l.const == r.const) == (dest isnt negate)
+			rz.const = eq|int|
+		
+		(rz is TrueConstCond) = eq // in case we compare to 0 and get nopped later
+			
 		rz = rz.boolanswer
 	
 		
