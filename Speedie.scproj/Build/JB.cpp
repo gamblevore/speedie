@@ -3453,7 +3453,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2024103015));
+	JB_FS_AppendInt32(_fsf0, (2024103020));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8868,7 +8868,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2024103015));
+	JB_FS_AppendInt32(_fsf0, (2024103020));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -17672,6 +17672,14 @@ bool SC_Reg_CanAddK(ASMReg Self, int64 T) {
 	return false;
 }
 
+ASMReg SC_Reg_CondAnswer(ASMReg Self) {
+	Self = SC_Reg_xC2xB5TypeSet(Self, kJB__TC_bool);
+	Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_AlreadyNegated, true);
+	Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_CondAnswer, true);
+	Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_Negate, (!true));
+	return Self;
+}
+
 int64 SC_Reg_Const(ASMReg Self) {
 	FatASM* F = SC_Reg_FAT(Self);
 	iif (F) {
@@ -21858,7 +21866,6 @@ void SC_FAT_TryRotateConst(FatASM* Self) {
 
 
 void SC_FatRange_AllJumpTo(FatRange* Self, FatASM* Curr) {
-	bool Any = false;
 	{
 		FatASM* S = Self->After;
 		wwhile (S > Self->Start) {
@@ -21866,13 +21873,9 @@ void SC_FatRange_AllJumpTo(FatRange* Self, FatASM* Curr) {
 			iif (SC_FAT_SyntaxIs(S, kSC__Reg_CondAnswer)) {
 				(SC_FAT_SyntaxIsSet(S, kSC__Reg_CondAnswer, (!true)));
 				(SC_FAT_JumpToSet(S, Curr));
-				Any = true;
 			}
 		};
-	}
-	;
-	iif (!Any) {
-	}
+	};
 }
 
 
@@ -22480,6 +22483,16 @@ ASMReg SC_Pac_Assign(ASMState* Self, ASMReg Dest, ASMReg Src, Message* Exp) {
 	return Dest;
 }
 
+void SC_Pac_BackCond(ASMState* Self, FatASM* Start) {
+	FatASM* L = SC_Pac_Last(Self);
+	iif (L >= Start) {
+		SC_Pac_NopWithFat(Self, L);
+		iif (((--L) >= Start) and SC_FAT_SyntaxIs(L, kSC__Reg_ConstAny)) {
+			SC_Pac_NopWithFat(Self, L);
+		}
+	}
+}
+
 ASMReg SC_Pac_BFLG_Const(ASMState* Self, Message* Exp, ASMReg Dest, ASMReg Src, uint Up, uint Down) {
 	uint Srcbits = SC_Reg_BitCount(Src);
 	iif ((Up > Srcbits) or (Down > Srcbits)) {
@@ -22661,60 +22674,47 @@ ASMReg SC_Pac_BoolValue(ASMState* Self, Message* A, ASMReg Dest, OpMode Opp, Mes
 	return SC_Pac_Exists(Self, Dest, Dest, ((Message*)JB_Ring_NextSib(A)));
 }
 
-void SC_Pac_Branch(ASMState* Self, Message* Cond, bool Neg, FatRange* Rz) {
-	Rz->Start = Self->Curr;
-	Rz->Constness = JB_MaybeBool__Default(false);
+ASMReg SC_Pac_Branch(ASMState* Self, Message* Cond, bool Neg, FatRange* Range) {
+	ASMReg Rz = ((ASMReg)0);
+	Range->Start = Self->Curr;
 	ASMReg Mode = SC_Reg_Negate(kSC__Reg_CondRequest, Neg);
-	ASMReg Answer = SC_Pac_GetASM(Self, Cond, Mode);
-	iif (!SC_Reg_SyntaxIs(Answer, kSC__Reg_CondAnswer)) {
-		iif (SC_Reg_SyntaxIs(Answer, kSC__Reg_AlreadyNegated)) {
+	Rz = SC_Pac_GetASM(Self, Cond, Mode);
+	iif (!SC_Reg_SyntaxIs(Rz, kSC__Reg_CondAnswer)) {
+		iif (SC_Reg_SyntaxIs(Rz, kSC__Reg_AlreadyNegated)) {
 			Mode = SC_Reg_SyntaxIsSet(Mode, kSC__Reg_Negate, (!true));
 		}
-		Answer = SC_Pac_Exists(Self, Mode, Answer, Cond);
+		Rz = SC_Pac_Exists(Self, Mode, Rz, Cond);
+		// TrueConstCond;
 	}
-	iif (SC_Reg_SyntaxIs(Answer, kSC__Reg_ConstAny)) {
-		Rz->Constness = ((MaybeBool)(SC_Reg_Const(Answer) != 0));
+	Rz = SC_Reg_CondAnswer(Rz);
+	Range->Constness = JB_MaybeBool__Default(false);
+	iif (SC_Reg_SyntaxIs(Rz, kSC__Reg_ConstAny)) {
+		Range->Constness = ((MaybeBool)(SC_Reg_Const(Rz) != 0));
+		SC_Pac_BackCond(Self, Range->Start);
 	}
-	FatASM* C = Self->Curr;
-	Rz->After = C;
-	iif (!(C - 1)->JumpReg) {
-	}
+	Range->After = Self->Curr;
+	return Rz;
 }
 
 ASMReg SC_Pac_BranchAnd(ASMState* Self, Message* A, Message* B, ASMReg Dest) {
-	FatRange FirstPart = ((FatRange){});
-	SC_Pac_Branch(Self, A, SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate), (&FirstPart));
-	MaybeBool KK = FirstPart.Constness;
-	iif (JB_MaybeBool_IsKnown(KK)) {
-		JB_DoAt(1);
-		iif (JB_MaybeBool_KnownTrue(KK)) {
-			JB_DoAt(1);
-			SC_Pac_NopWithFatrange(Self, (&FirstPart));
-			FatRange Tmp = ((FatRange){});
-			SC_Pac_Branch(Self, B, SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate), (&Tmp));
-		}
-		JB_DoAt(1);
-		return SC_Reg_BoolAnswer(Dest);
+	ASMReg Rz = ((ASMReg)0);
+	FatRange AndTest = ((FatRange){});
+	Rz = SC_Pac_Branch(Self, A, SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate), (&AndTest));
+	iif (!JB_MaybeBool_KnownFalse(AndTest.Constness)) {
+		SC_Pac_OofBranch(Self, B, SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate));
 	}
-	FatRange Tmp2 = ((FatRange){});
-	SC_Pac_Branch(Self, B, SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate), (&Tmp2));
-	return SC_Reg_BoolAnswer(Dest);
+	return Rz;
 }
 
 ASMReg SC_Pac_BranchOr(ASMState* Self, Message* A, Message* B, ASMReg Dest) {
-	FatRange FirstPart = ((FatRange){});
-	SC_Pac_Branch(Self, A, (!SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate)), (&FirstPart));
-	MaybeBool KK = FirstPart.Constness;
-	iif (!JB_MaybeBool_KnownTrue(KK)) {
-		FatRange Part2 = ((FatRange){});
-		SC_Pac_Branch(Self, B, SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate), (&Part2));
-		SC_FatRange_AllJumpTo((&FirstPart), Self->Curr);
+	ASMReg Rz = ((ASMReg)0);
+	FatRange OrTest = ((FatRange){});
+	Rz = SC_Pac_Branch(Self, A, (!SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate)), (&OrTest));
+	iif (!JB_MaybeBool_KnownFalse(OrTest.Constness)) {
+		SC_Pac_OofBranch(Self, B, SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate));
+		SC_FatRange_AllJumpTo((&OrTest), Self->Curr);
 	}
-	 else {
-		JB_DoAt(1);
-		0;
-	}
-	return SC_Reg_BoolAnswer(Dest);
+	return Rz;
 }
 
 void SC_Pac_CloseVDecls(ASMState* Self, int I) {
@@ -22860,11 +22860,16 @@ ASMReg SC_Pac_Equals(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* E
 	 else {
 		Rz = SC_Pac_CompareFloat(Self, Dest, L, R, Exp, 2);
 	}
-	iif (SC_Reg_SyntaxIs(L, kSC__Reg_ConstAny) and (SC_Reg_SyntaxIs(R, kSC__Reg_ConstAny) and (!SC_Reg_SyntaxIs(Rz, kSC__Reg_ConstAny)))) {
-		Rz = SC_Reg_SyntaxIsSet(Rz, kSC__Reg_ConstAny, true);
-		bool Eq = (SC_Reg_Const(L) == SC_Reg_Const(R)) == ((!SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate)));
-		(SC_Reg_ConstSet(Rz, ((int)(Eq))));
+	bool Eq = false;
+	iif (SC_Reg_SyntaxIs(Rz, kSC__Reg_ConstAny)) {
+		Eq = ((bool)SC_Reg_Const(Rz));
 	}
+	 else iif (SC_Reg_SyntaxIs(L, kSC__Reg_ConstAny) and SC_Reg_SyntaxIs(R, kSC__Reg_ConstAny)) {
+		Rz = SC_Reg_SyntaxIsSet(Rz, kSC__Reg_ConstAny, true);
+		Eq = ((SC_Reg_Const(L) == SC_Reg_Const(R)) == ((!SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate))));
+		(SC_Reg_ConstSet(Rz, ((int)Eq)));
+	}
+	Rz = (SC_Reg_SyntaxIsSet(Rz, kSC__Reg_TrueConstCond, Eq));
 	Rz = SC_Reg_BoolAnswer(Rz);
 	return Rz;
 }
@@ -23128,8 +23133,6 @@ FailableInt SC_Pac_IntPowerOfTwo(ASMState* Self, ASMReg R, int Sub) {
 			return JB_int64_Log2(V) + 1;
 		}
 	}
-	iif ((!SC_Reg_Reg(R))) {
-	}
 	return kSC__FailableInt_Fail;
 }
 
@@ -23278,10 +23281,6 @@ void SC_Pac_NopWithFat(ASMState* Self, FatASM* R) {
 	}
 }
 
-void SC_Pac_NopWithFatrange(ASMState* Self, FatRange* R) {
-	SC_Pac_NopWithFatFat(Self, R->Start, R->After);
-}
-
 void SC_Pac_NopWithFatFat(ASMState* Self, FatASM* Start, FatASM* After) {
 	wwhile (Start < After) {
 		SC_Pac_NopWithFat(Self, (--After));
@@ -23333,6 +23332,11 @@ ASMReg SC_Pac_NumToReg(ASMState* Self, Message* Exp, int64 V, ASMReg Reg) {
 	return SC_Pac_NumToFat(Self, Exp, V, Reg)->Info;
 }
 
+ASMReg SC_Pac_OofBranch(ASMState* Self, Message* Cond, bool Neg) {
+	FatRange Tmp = ((FatRange){});
+	return SC_Pac_Branch(Self, Cond, Neg, (&Tmp));
+}
+
 bool SC_Pac_PackMakerInit(ASMState* Self) {
 	iif (Self->Inited) {
 		return true;
@@ -23367,7 +23371,12 @@ ASMReg SC_Pac_Plus(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp
 
 void SC_Pac_PrintProgress(ASMState* Self, Message* Exp) {
 	JB_PrintLine(JB_LUB[1283]);
-	JB_Obj_PrintLine(Exp);
+	iif (!Exp) {
+		Self->LastProgress = Self->FuncStart;
+	}
+	 else {
+		JB_Obj_PrintLine(Exp);
+	}
 	FatASM* Curr = Self->LastProgress;
 	wwhile (Curr < Self->Curr) {
 		SC_FAT_DebugPrint(Curr);
@@ -23690,11 +23699,10 @@ ASMReg SC_Pac_Ternary(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
 		return SC_Pac_SimpleTernary(Self, Dest, mA, mB, Cond);
 	}
 	Dest = SC_Pac_TempTyped(Self, Exp, Dest);
-	FatRange FirstOK = ((FatRange){});
-	SC_Pac_Branch(Self, Cond, false, (&FirstOK));
-	MaybeBool KK = FirstOK.Constness;
+	FatRange TernTest = ((FatRange){});
+	ASMReg TT = SC_Pac_Branch(Self, Cond, false, (&TernTest));
+	MaybeBool KK = TernTest.Constness;
 	iif (JB_MaybeBool_IsKnown(KK)) {
-		SC_Pac_NopWithFat(Self, SC_Pac_Last(Self));
 		JB_DoAt(1);
 		Message* Which = ((Message*)JB_Ternaryy(JB_MaybeBool_Default(KK), A, B));
 		Rz = SC_Pac_xC2xB5Into(Self, Which, Dest);
@@ -23702,7 +23710,7 @@ ASMReg SC_Pac_Ternary(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
 	 else {
 		SC_Pac_xC2xB5Into(Self, A, Dest);
 		FatASM* Exit = JB_Msg_JUMP(Exp, 0);
-		SC_FatRange_AllJumpTo((&FirstOK), Self->Curr);
+		SC_FatRange_AllJumpTo((&TernTest), Self->Curr);
 		Rz = SC_Pac_xC2xB5Into(Self, B, Dest);
 		(SC_FAT_JumpToSet(Exit, Self->Curr));
 	}
@@ -23816,11 +23824,10 @@ ASMReg SC_Pac_While(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
 	FatASM* BEGIN = JB_Msg_JUMP(Exp, 0);
 	SC_ASMType__Arg(Self, ((Message*)JB_Tree_Second(Exp)), SC_Reg__New(), 0);
 	FatRange LOOP_TEST = ((FatRange){});
-	SC_Pac_Branch(Self, ((Message*)JB_Ring_First(Exp)), false, (&LOOP_TEST));
+	ASMReg LT = SC_Pac_Branch(Self, ((Message*)JB_Ring_First(Exp)), false, (&LOOP_TEST));
 	iif (JB_MaybeBool_KnownFalse(LOOP_TEST.Constness)) {
 		JB_DoAt(1);
 		SC_Pac_NopWithFatFat(Self, BEGIN, LOOP_TEST.Start);
-		SC_Pac_NopWithFat(Self, SC_Pac_Last(Self));
 		return SC_Reg__New();
 	}
 	(SC_FAT_JumpToSet(BEGIN, LOOP_TEST.Start));
@@ -57571,4 +57578,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 4731468743949516139 1643558347113418377
+// -1207615194321866126 1643558347113418377

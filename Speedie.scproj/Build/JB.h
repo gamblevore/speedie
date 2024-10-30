@@ -2002,14 +2002,14 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_WR2U ((ASM_Write)92)
 #define kSC__ASM_WR4U ((ASM_Write)93)
 #define kSC__ASM_WR8U ((ASM_Write)94)
-#define kSC__Reg_AddrRequest ((ASMReg)4294967296)
+#define kSC__Reg_AddrRequest ((ASMReg)8589934592)
 #define kSC__Reg_AlreadyNegated ((ASMReg)1048576)
 #define kSC__Reg_Alternate ((ASMReg)2097152)
 #define kSC__Reg_Arg ((ASMReg)4194304)
-#define kSC__Reg_CondAnswer ((ASMReg)34359738368)
-#define kSC__Reg_CondRequest ((ASMReg)17179869184)
+#define kSC__Reg_CondAnswer ((ASMReg)68719476736)
+#define kSC__Reg_CondRequest ((ASMReg)34359738368)
 #define kSC__Reg_ConstAny ((ASMReg)1073741824)
-#define kSC__Reg_ContainsAddr ((ASMReg)2147483648)
+#define kSC__Reg_ContainsAddr ((ASMReg)4294967296)
 #define kSC__Reg_Decl ((ASMReg)25165824)
 #define kSC__Reg_Discard ((ASMReg)4194304)
 #define kSC__Reg_FatRef ((int)1073741824)
@@ -2025,7 +2025,8 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__Reg_SingleExpr ((ASMReg)536870912)
 #define kSC__Reg_StayOpen ((ASMReg)524288)
 #define kSC__Reg_Temp ((ASMReg)134217728)
-#define kSC__Reg_Textual ((ASMReg)8589934592)
+#define kSC__Reg_Textual ((ASMReg)17179869184)
+#define kSC__Reg_TrueConstCond ((ASMReg)2147483648)
 #define kSC__Reg_Zero ((ASMReg)1073741880)
 #define kSC__ASMType_IncrAfter ((int)2)
 #define kSC__ASMType_IncrBefore ((int)0)
@@ -4511,6 +4512,8 @@ int SC_Reg_CallFunc(ASMReg Self, int V);
 
 bool SC_Reg_CanAddK(ASMReg Self, int64 T);
 
+ASMReg SC_Reg_CondAnswer(ASMReg Self);
+
 int64 SC_Reg_Const(ASMReg Self);
 
 void SC_Reg_ConstSet(ASMReg Self, int64 Value);
@@ -5918,6 +5921,8 @@ ASMReg SC_Pac_ASMBoolShrink(ASMState* Self, Message* Exp, ASMReg Dest, ASMReg Ml
 
 ASMReg SC_Pac_Assign(ASMState* Self, ASMReg Dest, ASMReg Src, Message* Exp);
 
+void SC_Pac_BackCond(ASMState* Self, FatASM* Start);
+
 ASMReg SC_Pac_BFLG_Const(ASMState* Self, Message* Exp, ASMReg Dest, ASMReg Src, uint Up, uint Down);
 
 ASMReg SC_Pac_BitAnd(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
@@ -5944,7 +5949,7 @@ FatASM* SC_Pac_BoolTestAndJump(ASMState* Self, Message* Exp, ASMReg Req, OpMode 
 
 ASMReg SC_Pac_BoolValue(ASMState* Self, Message* A, ASMReg Dest, OpMode Opp, Message* B);
 
-void SC_Pac_Branch(ASMState* Self, Message* Cond, bool Neg, FatRange* Rz);
+ASMReg SC_Pac_Branch(ASMState* Self, Message* Cond, bool Neg, FatRange* Range);
 
 ASMReg SC_Pac_BranchAnd(ASMState* Self, Message* A, Message* B, ASMReg Dest);
 
@@ -6034,8 +6039,6 @@ void SC_Pac_NopWithReg(ASMState* Self, ASMReg R);
 
 void SC_Pac_NopWithFat(ASMState* Self, FatASM* R);
 
-void SC_Pac_NopWithFatrange(ASMState* Self, FatRange* R);
-
 void SC_Pac_NopWithFatFat(ASMState* Self, FatASM* Start, FatASM* After);
 
 int64 SC_Pac_NopConst(ASMState* Self, ASMReg R);
@@ -6047,6 +6050,8 @@ ASMReg SC_Pac_NotEq(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Ex
 FatASM* SC_Pac_NumToFat(ASMState* Self, Message* Exp, int64 V, ASMReg Reg);
 
 ASMReg SC_Pac_NumToReg(ASMState* Self, Message* Exp, int64 V, ASMReg Reg);
+
+ASMReg SC_Pac_OofBranch(ASMState* Self, Message* Cond, bool Neg);
 
 bool SC_Pac_PackMakerInit(ASMState* Self);
 
