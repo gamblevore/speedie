@@ -146,7 +146,7 @@ Speedie realises that `F` might not exist. And so this code won't compile. Speed
 
 ### C Comparison
 
-#### **Student passcode checking Assignment **
+#### **Student passcode checking Assignment**
 
 Sometimes as a student, you are asked to do simple things, like perform some IO. Basically ask for something via stdin and print something into stdout.
 
