@@ -52,11 +52,20 @@ extend ASMState
 	function Equals (fn_opasm)
 		if !r.reg  and  l.reg
 			swap (l) (r) // put reg 0 into the left... more convenient.
-
+		
 		if dest.IsInt
 			rz = .EqualsInt(dest, l, r, exp)
 		  else
 			rz = .CompareFloat(dest, l, r, exp, 2)
+			
+// equals can come from outside of domathsub... like exists/noteq/etc.
+// making this work generally... say from compare or whatever
+// would be some work. Its just compare thats missing, though?
+// compare already doesn't even do consts at all.
+		if  l is constany  and  r is constany  and  rz isnt constany  // a cond?
+			(rz is constany)
+			|| eq = (l.const == r.const) == (dest isnt negate)
+			rz.const = (eq)|int|
 		rz = rz.boolanswer
 	
 		
@@ -77,7 +86,7 @@ extend ASMState
 
 	function CompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
 		|| OldDest = dest
-		if dest is constany or (l is constany and r is constany) // needs to handle this!
+		if (l is constany and r is constany) // needs to handle this!
 		dest = dest.BoolAnswer
 		mode |= l.IsBig<<3
 		mode |= r.IsBig<<2
@@ -208,7 +217,7 @@ extend ASMState
 		return 1
 	
 
-	function AddOrSubtractInt     (fn_opasm)
+	function IntPlus     (fn_opasm)
 		//		a - 1,		a + 1		//
 		//		1 - a,		1 + a		//
 		if dest is ConstAny // perhaps we can do this in domathsub?
@@ -216,9 +225,8 @@ extend ASMState
 
 		if l.reg == r.reg // shift
 			if l is Alternate
-				return .zeros(dest, exp)
-			  else
-				return .BFLG_Const(exp, dest, l, 1, 0) // shift up
+				debugger // shouldn't happen
+			return .BFLG_Const(exp, dest, l, 1, 0) // shift up
 
 		|| swapped = 0
 		if  l.LeftScore < r.LeftScore // put consts into R
@@ -272,14 +280,19 @@ extend ASMState
 		|| rr = r.reg
 		return exp.fADD(dest, l, r*!ss, r*ss, 1-IsF32) * Dest
 
-		
+
 	function Plus   (fn_opasm) // add (
-		if !r.reg
+		|| rr = r.reg, || ll = l.reg
+		if !rr
 			return l
-		if !l.reg and (l isnt alternate)
-			return r
+		if l is alternate
+			if rr == ll
+				return .zeros(dest, exp)
+		  else
+			if !ll
+				return r
 		if l.isint
-			return .AddOrSubtractInt(dest, l, r, exp)
+			return .IntPlus(dest, l, r, exp)
 		return .FloatPlus(dest, l, r, exp)
 
 
@@ -317,7 +330,7 @@ extend ASMState
 
 	function BoolMul (|asmreg| dest, |asmreg| Bule, |asmreg| V, |message| exp, |asmreg|)		
 		if dest is ConstAny
-			return .MakeConst2(dest, Bule, V, exp, &fatasm.ConstifyBoolMul)
+			return .MakeConst2(dest, Bule, V, exp, fatasm.ConstifyBoolMul)
 		rz = .QuickIntMul(dest, Bule, V, exp)
 		if !rz
 /			rz = exp.TERN(dest, Bule, V, asmreg()) * Dest				// TERN
@@ -467,7 +480,7 @@ extend ASMState
 		if dest is constany
 			return .MakeConst2(dest, l, r, exp, (&fatasm.ConstifyBitSHS, &fatasm.ConstifyBitSHR)(l.signed))
 		if r is ConstAny
-			return .BFLG_Const(exp, dest, l, 0, .nop(r))
+			return .BFLG_Const(exp, dest, l, 0, .nopconst(r))
 		
 		|| op = (asm.BSHS, asm.BSHR)(l.signed)
 		return .BitMaker(dest, l, r, exp, op)
@@ -477,7 +490,7 @@ extend ASMState
 		if dest is constany
 			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyBitSHL)
 		if r is ConstAny
-			return .BFLG_Const(exp, dest, l,  .nop(r), 0)
+			return .BFLG_Const(exp, dest, l,  .nopconst(r), 0)
 		
 		return .BitMaker(dest, l, r, exp, asm.bshl)
 
@@ -502,6 +515,7 @@ extend ASMState
 		(Exp)
 //		if dest is frommath // just do it always?
 		dest.reg = 0
+		(dest is constany)
 		return dest // ???
 //		return .Assign(dest, asmreg(), exp)	
 	

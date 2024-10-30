@@ -18,6 +18,13 @@ function AndOrConsts (|int|)
 	return f1 + f2 + f3 + t4 + t5 + t6 + (f7 + f7) + t8
 
 
+function VarConst (|int| a)
+	|| x = 11
+	|| y = 12
+	|| z = y<<x
+	|| w = a<<x
+
+
 function SemiConst (|int| f1, |int|)
 	visible
 	|| x2 = f1 or  1

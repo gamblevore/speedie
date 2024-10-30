@@ -449,6 +449,7 @@ helper ASMState.DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMR
 	|| mr = ASMReg()
 	|| TmpCloser = .VTmps
 	|| DiscardMode = dest & AsmReg.Discard
+	if "VarConst".trap
 	if dest is SingleExpr
 		ml = .µ(exp, DiscardMode)
 	  else

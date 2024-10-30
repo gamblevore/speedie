@@ -63,15 +63,11 @@ datatype ASMReg (uint64)
 				return f.f64
 			return f.f32|float64|
 
-	function NOP (|int64|)
-		disabled "use asmstate"
-		if .reg
-			return ASMState.sh.nop(self)
-
 	function Const (|int64|)
-		if .reg == 0
-			return 0
-		return .needfat.const
+		|| F = .FAT
+			return f.const
+		if .reg
+			.needfat
 
 	function Const (assigns:|int64|)
 		.needfat.const = value

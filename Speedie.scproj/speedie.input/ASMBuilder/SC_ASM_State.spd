@@ -134,20 +134,35 @@ struct ASMState
 		.vtmps = r
 		return t
 	
-	function Nop (|asmreg| R, |int64|)
+	function Nop (|asmreg| R)
 		|| f = r.fat
-			return .nop(f)
+			return .Nop(f)
 		if r.reg
 			debugat // bad!
 	
-	function Nop (|&fatasm| R, |int64|)
+	function NopConst (|asmreg| R, |int64|)
+		|| f = r.fat
+			.Nop(f)
+			return f.const
+		if r.reg
+			debugat // bad!
+	
+	function Nop (|fatasm| R)
 		r.op = asm.noop
 		r.jumpreg = 0
 		|| C = .curr - 1
 		if R == C
 			.curr = C // nice
-		return r.Const
 
+	function Nop (|fatrange| R)
+		.nop(r.start, r.after!)
+
+
+	function Nop (|fatasm| Start, |fatasm| After)
+		while start < After
+			.nop(--after)
+			
+		
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	function µBoolInto (|message| exp, |AsmReg| Dest, |asmreg|)
@@ -179,6 +194,10 @@ struct ASMState
 
 		target debug
 			check (ss) (self, exp, "µInto failed")
+			if !ss.reg and (ss isnt condanswer)
+				if (ss isnt constany)
+					debugger
+					(fn)(self, exp, dest)
 			if exp.asmtype < ASMType.kElseIf
 				|| ty = exp.ASMDecl
 				|| sst = ss.µtype
