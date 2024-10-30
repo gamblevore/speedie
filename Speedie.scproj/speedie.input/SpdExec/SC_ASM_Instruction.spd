@@ -75,6 +75,6 @@ class Instruction
 					.typelist[i] ?= ERR 
 			  else
 				debugger 
-			.OpDict["bra"] = .OpDict["jbra"]
+			.OpDict["bra"] = .OpDict["jbor"]
 			.OpDict["halt"] = .OpDict["eror"]
 

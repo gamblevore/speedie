@@ -49,14 +49,14 @@ function SemiConst (|int| f1, |int|)
 
 function AndOrRest (|int| a, |int| b, |int|) // stragglers
 	|| x3 = false
+	|| x4 = !(a and b)
 	x3 = (0 or b)+1				// x3 = b+1
-	x3 = a or b					// old bool logic
+	x4 = a or b					// old bool logic
 	x3 = a and b
-	x3 = !(!a or b)
+	x4 = !(!a or b)
 	x3 = !(a or b)				// new bool logic
-	|| x4 = !(a and b)			// same
 	x4 = (a and !b)
-	x4 = !(a or !b)
+	x3 = !(a or !b)
 	|| x5 = (0 or x3)+1			// x5 = x3+1
 	|| x6 = x3 or x4			// no need cmpb
 	|| x7 = x3 or x4
@@ -67,15 +67,15 @@ function AndOrRest (|int| a, |int| b, |int|) // stragglers
 
 	
 function AndOrRest2 (|int| a, |int| b) // more stragglers
+	if 1 or a: a = 2
+	if 0 or a: a = 3
+
 	|| x3 = (a, b)(1)
 	|| x4 = (a, b)(0)
 	if a or a
 		x3 = (b or b)|int|
 	  else
 		x4 = (a and a)|int|
-
-	if 1 or a: a = 2
-	if 0 or a: a = 3
 
 	if 0 and b: b = 4	
 	if 1 and b: b = 5

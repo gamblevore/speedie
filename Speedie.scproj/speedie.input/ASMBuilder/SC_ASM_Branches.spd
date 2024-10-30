@@ -105,7 +105,6 @@ function Ternary		(fn_asm)
 		FirstOK.AllJumpTo(.curr)
 		rz = .µInto(B, dest)
 		Exit.jumpto = .curr
-	.printprogress(exp)
 
 function SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond, |asmreg|)
 	opt norefcounts
@@ -220,18 +219,18 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 	|| first = .µBoolInto(A, dest)
 
 	if first is ConstAny
-		return .BoolConst1(b, dest, opp, first)					// x = 5 or Y() --> x = Y()
+		return .BoolConst1(b, dest, opp, first).boolanswer			// x = 5 or Y() --> x = Y()
 	
-	|| JUMP = .BoolTestAndJump(a.next!, dest, opp)				// AND/OR
+	|| JUMP = .BoolTestAndJump(a.next!, dest, opp)					// AND/OR
 	|| Second = .µBoolInto(B, dest)
 	if Second is ConstAny
 		.NOP(jump)
-		return .BoolConst2(opp, first, Second)
+		return .BoolConst2(opp, first, Second).boolanswer
 
 	JUMP.JumpTo = .curr
 	
 	if first.IsBool and Second.IsBool
-		return dest
+		return dest.boolanswer
 
 	return .Exists(dest, dest, A.next!)
 
@@ -239,12 +238,13 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 function PrintProgress (|message| exp)
 	opt norefcounts
 	"---"
-	printline exp.niceparent
+	printline exp
 	|| Curr = .LastProgress
 	while curr < .curr
 		curr.debugprint
 		curr++
 	.LastProgress = curr
+
 
 
 function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asmreg|)
@@ -261,7 +261,7 @@ function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asm
 	if mr is ConstAny
 		ml.µtype = datatypecode.bool
 		mr.const = (mr.const != 0)|int|
-		return mr.BoolAnswer
+		return mr
 	
 	if mr.isbool
 		return mr
@@ -291,7 +291,7 @@ function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 /		if KK.KnownTrue
 /			.nop(firstpart)
 			|| tmp = .Branch(b, dest is negate)
-		/ return dest.boolanswer
+/		return dest.boolanswer
 	
 	|| tmp2 = .Branch(B, dest is negate)
 	return dest.BoolAnswer

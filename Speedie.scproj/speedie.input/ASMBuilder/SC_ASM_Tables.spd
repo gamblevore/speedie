@@ -134,7 +134,11 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 
 	|| FloatDiff = newtype.isfloat != oldtype.isfloat
 	if !FloatDiff and (nc == oc)			// same bittype!
-		debugger // should never happen!
+		debugger							// should never happen!
+		return sr
+	
+	if (nc > oc) or (!oldtype.issigned and nc==oc)
+		sr.µtype = newtype
 		return sr
 	
 	dest = .TempOnly(exp, dest)
@@ -187,8 +191,9 @@ function Arg   (fn_asm)
 	opt norefcounts
 	|| DclCloser = .VDecls // dcl ooffer
 	for ch.fast in exp
-		if ch != @sheb
-			.µ(ch, AsmReg.Arg)
+		.µ(ch, AsmReg.Arg)
+		.printprogress(ch)
+
 	.CloseVDecls(DclCloser)
 
 
@@ -432,6 +437,7 @@ function DoMath (fn_asm)
 
 
 function Ignore			(fn_asm)
+	return asmreg()
 
 
 function Unexpected		(fn_asm)
