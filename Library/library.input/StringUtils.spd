@@ -227,7 +227,20 @@ helper String.TabbifySub (|faststring| fs)
 		fs.AppendSection(self, sp, int.max)
 	
 
-function String.AddTabs (|bool| Tabs=true, |string|)
+
+function String.TabsToSpaces2 (|string|)
+	|| fs = FastString()
+	for (l.lines in self) (p)
+		l.TabsToSpacesSub(fs)
+		if p
+			fs <~ self[p] // match line-ending
+	return fs
+#! why do i have two of these?
+#! why do i have two of these?
+#! why do i have two of these?
+#! why do i have two of these?
+
+function String.TabsToSpaces (|bool| Tabs=true, |string|)
 	|| fs = faststring()
 	|| n = 0
 	for t.lines in self
@@ -254,14 +267,6 @@ helper String.TabsToSpacesSub (|faststring| fs)
 			fs <~ c
 			i++
 		
-
-function String.TabsToSpaces (|string|)
-	|| fs = FastString()
-	for (l.lines in self) (p)
-		l.TabsToSpacesSub(fs)
-		if p
-			fs <~ self[p] // match line-ending
-	return fs
 		
 		
 function faststring.RenderSpeed (|float| seconds, |int64| BytesIn, |int64| BytesOut, |string| Name)

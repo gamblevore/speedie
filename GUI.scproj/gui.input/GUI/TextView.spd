@@ -2009,7 +2009,7 @@ class TextView (GUIControl)
 	helper TextCopy (GUICopyEvent)
 		rz = .SelText
 		if keys.shift //(.ExpectsParse >= CurrentlyJeebox)
-			rz = rz.AddTabs(false) // untabbifying WITHIN our GUI is actually bad.
+			rz = rz.TabsToSpaces(false) // untabbifying WITHIN our GUI is actually bad.
 								   // i could paste it from one part of our gui to another.
 								   // and it will totally SUCK.
 								   // It should only tabbify for external... so we'd need two versions??
@@ -2050,7 +2050,7 @@ class TextView (GUIControl)
 			if data > 1
 				.UndoChecker = -1
 			if .ExpectsParse >= textview.AlwaysJeebox
-				data = data.AddTabs
+				data = data.TabsToSpaces2
 				if (data contains ";") and !data.parse
 					|| Q = "The text below contains ';'. Would you like to strip it?\n\n" + data.Preview(200)
 					if Q.Confirm
