@@ -23,10 +23,10 @@ function If				(fn_asm)
 		ElseIfCond = nil
 		arg2 = nil
 
-	|| B = .BranchConstAware(cond, Flip)
+	|| B = .Branch(cond, Flip)
 	if !b.Constness.KnownFalse
 		ASMType.arg(self, arg1)
-		B.jumpto(.curr)
+		B.AllJumpTo(.curr)
 		
 	if !b.constness.KnownTrue and (ElseIfCond or arg2.HasAny)
 		|| AfterFirst = (arg1.jump(0), nil)(!b.constness.knownfalse) // skip second branch, cos first branch ran
@@ -44,25 +44,27 @@ function While			(fn_asm)
 	|| BEGIN = exp.JUMP(0)							// jump to end... THEN EMIT arg and jump back.
 	ASMType.arg(self, exp.second)					// arg
 
-	|| CONTINUE = .Curr
-	BEGIN.jumpto = CONTINUE
-	|| GOBACK = .BranchSub(exp.first!)
-	|| EXIT = .Curr
-	GOBACK.jumpto(BEGIN+1)
-	|| C = BEGIN
-
-	while C < CONTINUE
-		#!ClearExits
-		|| op = C.Op
-		if op >= kContinue
-			C.op = ASM.Jump
-			if op == kContinue // continue
-				C.JumpTo = CONTINUE
-			  else       // exit
-				C.JumpTo = EXIT
-		C++
+	|| LOOP_TEST = .Branch(exp.first!)
+	if loop_test.Constness.knownfalse
+/		.nop(begin, loop_Test.start)
+		.nop(.last) // may be instructions inbetween      /*  while x()==1  */
+		return asmreg()
 	
-	return asmreg()
+	BEGIN.jumpto = LOOP_Test.start
+	LOOP_TEST.AllJumpTo(BEGIN+1)
+
+	while BEGIN < LOOP_Test.start
+		#!ClearExits
+		|| op = BEGIN.Op
+		if op >= kContinue
+			BEGIN.op = ASM.Jump
+			if op == kContinue			// continue
+				BEGIN.JumpTo = LOOP_Test.start
+			  else       				// exit
+				BEGIN.JumpTo = LOOP_Test.After!
+		BEGIN++
+	
+/	return asmreg()
 
 
 function Exit			(fn_asm)
@@ -90,20 +92,20 @@ function Ternary		(fn_asm)
 		return .SimpleTernary(dest, ma, mb, cond)
 
 	dest = .TempTyped(exp, dest)
-	|| FirstOK = .BranchConstAware(cond)
+	|| FirstOK = .Branch(cond)
 	|| KK = FirstOK.Constness
 	if KK.IsKnown
-		#! what about nopping? or does the branch nop?
-/		|| which = (A,B)(KK.Default)
-		return .µInto(which, dest)
-	.µInto(A, dest)
-	|| Exit = exp.jump(0)
-
-	FirstOK.jumpto(.curr)
-
-	rz = .µInto(B, dest)
-	Exit.r[3] = .curr - Exit
-
+		.nop(.last)
+/		|| which = (A, B)(KK.Default)
+		rz = .µInto(which, dest)
+	  else
+		
+		.µInto(A, dest)
+		|| Exit = exp.jump(0)
+		FirstOK.AllJumpTo(.curr)
+		rz = .µInto(B, dest)
+		Exit.jumpto = .curr
+	.printprogress(exp)
 
 function SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond, |asmreg|)
 	opt norefcounts
@@ -113,27 +115,27 @@ function SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond,
 	return cond.TERN(dest, µ, ma, mb) * dest
 
 
-function BranchConstAware (|message| cond,  |bool| neg=false, |fatrange|)
-	return .Branchsub(cond, neg, true)
-
-
-function BranchSub (|message| cond,  |bool| neg=false, |bool| CanConst=false, |fatrange|)
-	|| mode = asmreg.CondRequest.Negate(neg)
+function Branch (|message| cond,  |bool| neg=false,  |fatrange|)
 	rz.start = .curr
+	rz.constness = maybebool.default(false)
+	|| mode = asmreg.CondRequest.Negate(neg)
 	|| answer = .µ(cond, mode)
 		
 	if answer isnt CondAnswer
-		(canconst)
-//		if (answer is constany) and canconst // deal with these const stuff later.
+		if answer is alreadynegated
+			(mode isnt negate)
 		answer = .exists(mode, answer, cond)
-	rz.after = .curr
-	// boolean logic is very awkward
+	if answer is constany
+		rz.constness = (answer.const!=0)|maybebool|
+	|| c = .curr
+	rz.after = c
+	ifn (c-1).jumpreg // bad
 
 
 helper ASMBoolShrink (|message| exp,  |ASMReg| Dest,  |ASMReg| ml,  |ASMReg|)
 	if (ml.isbool) and (dest isnt negate) and (dest isnt condrequest)
 /		return ml.boolanswer								// x = a or a   -->  x = a
-	/return .Exists(dest, ml, exp)							// if  a or a   -->  if a
+	return .Exists(dest, ml, exp)							// if  a or a   -->  if a
 
 
 helper BoolFromBools (|message| exp, |ASMReg| Dest, |opmode| opp, |ASMReg| ml, |ASMReg| mr, |ASMReg|)
@@ -152,8 +154,7 @@ function asmreg.IsBoolV (|bool|)
 
 
 helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
-	opt norefcounts // 😵‍💫 // 😵‍💫 // 😵‍💫 // 😵‍💫 	// deal with consts later!!! :O
-	debugat 0
+	opt norefcounts // 😵‍💫 // 😵‍💫 // 😵‍💫 // 😵‍💫
 	dest.µtype = datatypecode.bool
 	
 	|| A = exp.first!
@@ -173,14 +174,9 @@ helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |AS
 		return .BranchAnd(A, B, Dest)
 
 	if ml.isboolV and mr.isboolV
-		return .BoolFromBools(exp, dest, opp, ml, mr)			// No consts via .existingvar		
+		return .BoolFromBools(exp, dest, opp, ml, mr)		// No consts via .existingvar		
 
-	if "AndOrRest".trap
-		.lastprogress = .curr
-	rz = .BoolValue(A, dest, opp, b)
-	if "AndOrRest".trap
-		.printprogress(exp)
-		debugger
+	return .BoolValue(A, dest, opp, b)
 	
 
 function message.FoundReg (|int| R, |bool|)
@@ -198,8 +194,9 @@ function Unchanged (|message| A, |asmreg| dest, |message| B, |bool|)
 
 
 function UniqueLocation (|message| A, |asmreg| dest, |message| B, |asmreg|)
-	if (dest is NotYetUsed) or .Unchanged(A, dest, B)
-		return dest
+	if dest.reg
+		if (dest is NotYetUsed) or .Unchanged(A, dest, B)
+			return dest
 	rz = .temponly(A)
 	(rz is negate) = (Dest is negate)
 	rz.µtype = dest.µtype	
@@ -288,25 +285,25 @@ function BoolConst2 (|opmode| Opp, |asmreg| ml,  |asmreg| mr, |asmreg|)
 
 
 function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
-	|| FirstPart = .BranchConstAware(A, dest is negate)
+	|| FirstPart = .Branch(A, dest is negate)
 	|| KK = FirstPart.Constness
 	if KK.IsKnown
 /		if KK.KnownTrue
 /			.nop(firstpart)
-			|| tmp = .BranchConstAware(b, dest is negate)
+			|| tmp = .Branch(b, dest is negate)
 		/ return dest.boolanswer
 	
-	|| tmp2 = .BranchConstAware(B, dest is negate)
+	|| tmp2 = .Branch(B, dest is negate)
 	return dest.BoolAnswer
 
 
 
 function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
-	|| FirstPart = .BranchConstAware(A, dest isnt negate)
+	|| FirstPart = .Branch(A, dest isnt negate)
 	|| KK = FirstPart.Constness
 	if !KK.KnownTrue
-		|| part2 = .BranchConstAware(B, dest is negate)
-		FirstPart.jumpto(.curr)	
+		|| part2 = .Branch(B, dest is negate)
+		FirstPart.AllJumpTo(.curr)	
 	  else
 /		0
 	return dest.BoolAnswer
@@ -316,19 +313,17 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 
 
 Struct FatRange
-	|&FatASM| Start
-	|?&FatASM| After
+	|&FatASM|   Start
+	|&FatASM|   After
+	|maybebool| Constness
+	
 	iterator
 		|| curr = .after!
 		while (curr > .start)
 			curr--
 			yield curr
 	
-	function asmstate.Nop (|!&fatrange| R)
-		for s in R
-			.nop(s)
-	
-	function JumpTo (|&fatasm| curr)
+	function AllJumpTo (|&fatasm| curr)
 		|| any = false
 		for s in self
 			if s is CondAnswer
@@ -336,9 +331,4 @@ Struct FatRange
 				s.jumpto = curr
 				any = true
 		if !any // what?
-	
-	function Constness (|maybebool|)
-		|| a = .After|uint64|
-		if a <= 1
-			return a|maybebool|
-		
+
