@@ -9,7 +9,9 @@ What this Rust code is doing, is creating a list containing the numbers "2", "1"
 All those wierd things like `box`, `mut`, `&`, `&'` make the code hard to understand. You spend most of your time fighting your way past syntax instead of just... writing code.
 
 
-#### Rust List Search
+## Rust Comparison
+
+#### **Rust List Search**
 
     struct Link<T> {
       val: T,
@@ -78,7 +80,7 @@ All those wierd things like `box`, `mut`, `&`, `&'` make the code hard to unders
     
 Now lets look at a Speedie version!!
 
-#### Speedie List Search
+#### **Speedie List Search**
 
     // We'll just use the inbuilt list class. You would be mad not to.
     // Linked-lists are hard to get right, far more complex than the Rust example hints at.
@@ -141,5 +143,72 @@ Nope!
 
 Speedie realises that `F` might not exist. And so this code won't compile. Speedie is very intelligent around figuring out what vars can be `nil` or not. So you literally get all the safety with none of the nightmare overhead of Rust.
 
-I hope that helps understand how much better the design of Speedie is.
+
+### C Comparison
+
+#### **Student passcode checking Assignment **
+
+Sometimes as a student, you are asked to do simple things, like perform some IO. Basically ask for something via stdin and print something into stdout.
+
+Well... C is full of "gotchas". Absolutely full of them. Lets look at this C example:
+
+    #include <stdio.h>
+    #include <string.h>
+    
+    int main() {
+        char passcode[5];
+    
+        for(int i = 0; i < 3; i++){
+            printf("Please enter the passcode, you have %d attempts : ", (3 - i));
+            fgets(passcode, sizeof(passcode), stdin);
+            passcode[strlen(passcode) - 1] = '\0';
+    
+            if(strcmp(passcode, "1539")){
+                if(i == 2){
+                    printf("Wrong passcode! Your server has now been locked!\n");
+                    break;
+                }   
+                printf("Wrong passcode!\n");
+            }
+            else{
+                printf("Success!\n");
+                break;
+            }
+        }
+        return 0;
+    }
+
+Unfortunately, this code has a subtle bug despite the best intentions, which is basically the kind of experience that students have to suffer from. The code "looks right" and you really tried your best, and yet theres some simple bullshit bug hiding in here... somewhere. In this case, the bug is tht fgets actually ends its strings with "\n". Which isn't what you would expect!
+
+In addition, this code only allows for 4 byte inputs. What if the user typed in "15391" as his password? It is still wrong. But this code would accept it. To get around this, now you need more advanced memory management systems. Its not fun.
+
+You aren't really learning to code. Just learning how to be frustrated.
+
+
+
+#### **Speedie Student Assignment**
+
+Lets try do the same assignment in Speedie:
+
+    #!/usr/local/bin/spd
+        
+    main
+    	for i in 3
+    		"Please enter the passcode, you have ${3-i} attempts"
+    		|| passcode = app.input
+            if passcode == "1539"
+    			"Success!"
+    			return 0
+            "Wrong passcode!"
+    
+    	"Wrong passcode! Your server has now been locked!"
+    	return -1
+
+Perfect! it looks simple, it **is** simple. It works... and it looks nice. Its understandable and easy to debug.
+
+As an added bonus, you are writing in a fast language (Speedie). So this isn't like "well I did my assignment in a slow language like python or javascript". Speedie is usually as fast as C.
+
+Often speedie is faster than C code, because it has better libraries that look as if they were designed by people who are the elite of elites.
+
+The fact that there are no wierd issues by including the "\n" in the string via `app.input`... helps demonstrate this.
 
