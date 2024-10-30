@@ -195,16 +195,16 @@ Lets try do the same assignment in Speedie:
     #!/usr/local/bin/spd
         
     main
-    	for i in 3
-    		"Please enter the passcode, you have ${3-i} attempts"
-    		|| passcode = app.input
+        for i in 3
+            "Please enter the passcode, you have ${3-i} attempts"
+            || passcode = app.input
             if passcode == "1539"
-    			"Success!"
-    			return 0
+                "Success!"
+                return 0
             "Wrong passcode!"
     
-    	"Wrong passcode! Your server has now been locked!"
-    	return -1
+        "Wrong passcode! Your server has now been locked!"
+        return -1
 
 Perfect! it looks simple, it **is** simple. It works... and it looks nice. Its understandable and easy to debug.
 
