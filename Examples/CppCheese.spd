@@ -23,13 +23,19 @@ main
 	"Cheddar?       ${shop[`cheddar`]}"
 	"Barris?        ${shop[`barris`]}"
 	
-// Speedie doesn't have exceptions, but 'ErrorList' instead.   The $ symbol means:
-// "get the result of this expression (ConfigData.parse) and if it doesn't exist, return false-like value"
-// A simple way to make code-flow still explicit, but 'get it out of the way'.
-// The original C++ uses 'toml::parse' that raises an exception... causing all sorts of issues.
-// Also... unlike C++, Speedie is refcounted by default, making code just work naturally.
-// No wierd "copy the whole class... calling constructors and destructors all over the place"
-// when all you want to do is set a variable.
+/*
+   Speedie doesn't have exceptions, but 'ErrorList' instead.
+
+   The $ symbol means: "get the result of this expression (ConfigData.parse) and if it
+doesn't exist, exit the calling function". A simple way to make code-flow still
+explicit, but 'get it out of the way'.
+
+ The original C++ uses 'toml::parse' that raises an exception... causing all sorts of issues.
+
+ Also... unlike C++, Speedie is refcounted by default, making code just work naturally.
+ No wierd "copy the whole class... calling constructors and destructors all over the place"
+ when all you want to do is set a variable.
+*/
 
 
 || ConfigData = `

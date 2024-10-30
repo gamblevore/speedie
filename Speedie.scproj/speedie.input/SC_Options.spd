@@ -107,13 +107,15 @@ module Feedback
 
 
 	function StopStripping
-		if ""
-			"".debugprint // stop from being stripped
-			nil|message|.jdb2
-			fdb(nil|[scfunction]|)
-			nil|DataTypeCode|.DebugPrint
-			|fatasm| X
-			X.DebugPrint
+		target debug
+			if ""
+				"".debugprint // stop from being stripped
+				nil|message|.jdb2
+				nil|message|.PrintLocate
+				fdb(nil|[scfunction]|)
+				nil|DataTypeCode|.DebugPrint
+				|fatasm| X
+				X.DebugPrint
 	
 	
 	function ParseArgsSub (|[]| args, |bool|) 

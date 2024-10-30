@@ -27,6 +27,14 @@ extend_module Message
 		return true
 
 
+target debug
+	function list.PrintLocate
+		visible
+		cpp_name jdbloc
+		if !self or self isa message
+			printline self|message|.locate
+
+
 function Message.Locate (|string|)
 	if (!self)
 		return "(nil)"
@@ -44,7 +52,7 @@ function Message.Locate (|string|)
 	if (.position >= 0)
 		fs <~ " at byte: "
 		fs <~ .position
-		|| r = .root.obj
+		|| r = .memorylayer.obj
 		if (r isa string)
 			if r.length
 				fs <~ " in "

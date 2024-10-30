@@ -22,11 +22,11 @@ module SC_Errors
 
 	|dictionary of error| IgnoredBranches = dictionary.new
 
-	function AlreadyIgnored (|Message| F, |error|)
+	function AlreadyIgnored (|Message| F, |scfunction| fn, |error|)
 		opt norefcounts
 		|| e = .IgnoredBranches.obj(F)
 			return e
-		|| RipRoot = F.MsgOwningFunc$.SourceArg
+		|| RipRoot = fn.SourceArg
 		for Curr.up in F
 			if (Curr == @arg)
 				|| e2 = .IgnoredBranches.obj(Curr)
@@ -45,7 +45,11 @@ module SC_Errors
 			ifn a.obj isa scfunction // keep otherwise
 				a = a.Ancestor(@arg)
 		if a
-			|| OldErr = .AlreadyIgnored(A)
+			|| Fn = A.MsgOwningFunc
+			if !fn or fn is initfunc
+				return true
+
+			|| OldErr = .AlreadyIgnored(A, fn)
 			if olderr and OldErr.Severity >= err.Severity
 				return false
 			.IgnoredBranches.obj(A) = err

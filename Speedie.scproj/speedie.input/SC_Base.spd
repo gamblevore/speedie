@@ -222,7 +222,7 @@ function TryAddSub (|Message| ErrPlace, |SCObject| IncObj, |String| name)
 	if (name == "self") and scfunction.intype(scnodetype.object)
 		error ( ErrPlace, "Can't use 'self' here." )
 	  else
-		.nameconflict(old, name)
+		incobj.nameconflict(old, name)
 
 
 function scfunction.IsConstructorOnModule (|scfunction| old, |bool|)
