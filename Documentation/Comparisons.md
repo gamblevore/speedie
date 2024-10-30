@@ -191,8 +191,6 @@ You aren't really learning to code. Just learning how to be frustrated.
 #### **Speedie Student Assignment**
 
 Lets try do the same assignment in Speedie:
-
-    #!/usr/local/bin/spd
         
     main
         for i in 3
