@@ -178,7 +178,7 @@ Well... C is full of "gotchas". Absolutely full of them. Lets look at this C exa
         return 0;
     }
 
-Unfortunately, this code has a subtle bug despite the best intentions, which is basically the kind of experience that students have to suffer from. The code "looks right" and you really tried your best, and yet theres some simple bullshit bug hiding in here... somewhere.
+Unfortunately, this code has a subtle bug despite the best intentions. Finding gotchas is the kind of experience that C-students have to suffer from. The code "looks right" and you really tried your best, and yet theres some simple bug hiding in here... somewhere.
 
 In this case, the bug is that `fgets` ends its strings with "\n". Which isn't what you expected!
 
