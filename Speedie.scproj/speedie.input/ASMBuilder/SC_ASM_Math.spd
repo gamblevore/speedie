@@ -399,7 +399,7 @@ extend ASMState
 	
 	function DivInt    (fn_opasm)
 		if dest is ConstAny
-			return .MakeConst2(dest, L, R, exp, &fatasm.ConstifyIntDiv)
+			return .MakeConst2(dest, L, R, exp, fatasm.ConstifyIntDiv)
 		|| q = .QuickIntDiv(dest, l, r, exp)
 			return q
 		return exp.DIVV(dest, ASMReg(), l, r, dest.IntDivType) * dest
@@ -407,17 +407,16 @@ extend ASMState
 	
 	function ModFloat    (fn_opasm)
 		if dest is ConstAny
-			return .MakeConst2(dest, L, R, exp, &fatasm.Constifyfloatmod)
+			return .MakeConst2(dest, L, R, exp, fatasm.Constifyfloatmod)
 		|| big = dest.IsBig|int|
-		exp.fdiv(dest, asmreg(), L, R, big)
+		exp.fdiv(dest, L, R, asmreg(), big)
 		return exp.FFRC(dest, asmreg(), dest, R, big) * dest
 	
 	
 	function ModInt    (fn_opasm)
 		if dest is ConstAny
-			return .MakeConst2(dest, L, R, exp, &fatasm.ConstifyIntMod)
-		|| fat = exp.DIVV(asmreg(), dest, L, R, dest.IntDivType)
-		return fat * Dest
+			return .MakeConst2(dest, L, R, exp, fatasm.ConstifyIntMod)
+		return exp.DIVV(asmreg(), dest, L, R, dest.IntDivType) * Dest
 	
 	
 	function Mod    (fn_opasm)
@@ -431,13 +430,13 @@ extend ASMState
 	function BitNot (fn_opasm)
 		if r.reg // what?
 		if dest is ConstAny
-			return .makeconst2(dest, l, asmreg(), exp, &fatasm.ConstifyBitNot)
+			return .makeconst2(dest, l, asmreg(), exp, fatasm.ConstifyBitNot)
 		return .BitMaker(dest, l, asmreg(), exp, asm.bnot)
 
 	
 	function BitXor (fn_opasm)
 		if dest is ConstAny
-			return .MakeConst2(dest, l, r, exp, &fatasm.ConstifyBitXor)
+			return .MakeConst2(dest, l, r, exp, fatasm.ConstifyBitXor)
 		if (l.reg == r.reg)
 			return .Zeros(dest, exp)
 		if !l.reg

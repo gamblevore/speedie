@@ -131,37 +131,39 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 
 	|| OC = oldtype.BitCount
 	|| NC = newtype.BitCount
+	|| IsInt = NewType.IsInt
 
-	|| FloatDiff = newtype.isfloat != oldtype.isfloat
-	if !FloatDiff and (nc == oc)			// same bittype!
-		debugger							// should never happen!
-		return sr
-	
-	if (nc > oc) or (!oldtype.issigned and nc==oc)
-		sr.µtype = newtype
-		return sr
+	|| Floatness = (newtype.isfloat<<1)+oldtype.isfloat
+	if floatness == 0 or 3
+		if (nc == oc) and (oldtype.issigned == newtype.issigned)
+			sr.µtype = newtype // same all. maybe quicker to test in one go?
+			return sr
+		if isint  and  (nc > oc  or  oc == 64)
+			sr.µtype = newtype
+			return sr
 	
 	dest = .TempOnly(exp, dest)
 	dest.µType = NewType
+	if sr is ConstAny
+		|| srf = sr.needfat
+		if floatness == 0
+			|| sh = 64 - oc
+			|| oof = srf.Const << sh
+			srf.Const = (oof|int64| >> sh, oof|uint64| >> sh)(sr.Signed) // shift up and down
+		  elseif floatness == 3
+			srf.FloatConvConst(srf, NC)
+		  else
+			srf.FloatIntConvConst(srf, oldtype, newtype)
+		
+		return .makeconst(srf, dest)
+		
+	
 	|&fatasm| fat
 	if oldtype.isfloat or newtype.isfloat
 		fat = exp.CONV(dest, sr, oldtype.asmconv(newtype))
-		if sr is ConstAny			// shouldn't this just place the old fat?
-			|| srf = sr.needfat		// no, because it could be used twice.
-			if NewType.IsFloat and !FloatDiff
-				fat.FloatConvConst(srf, NC)
-			  else
-				fat.FloatIntConvConst(srf, oldtype, newtype)
-				
 	  else
 		|| sh = 64 - oc
 		fat = exp.BFLG(dest, sr, sh, sh, sr.signed|int|)
-		if sr is ConstAny
-			|| oof = fat.Const << sh
-			fat.Const = (oof|int64| >> sh, oof|uint64| >> sh)(sr.Signed) // shift up and down
-
-	if sr is constany
-		return .MakeConst(fat, dest)
 
 	return fat * dest
 

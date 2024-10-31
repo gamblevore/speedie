@@ -42,9 +42,9 @@ extend ASMState
 
 
 	function MakeConst (|&fatasm| fat, |asmreg| reg, |asmreg|)
-		Fat.TryRotateConst
-		(reg is ConstAny)
-		return fat*reg
+//		Fat.TryRotateConst // shouldn't we do this later?
+		(reg is ConstAny)  // just before export?
+		return fat*reg     // or the exporter itself should do it!
 
 	
 	function fatasm.TryRotateConst

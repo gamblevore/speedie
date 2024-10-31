@@ -40,32 +40,35 @@ function If				(fn_asm)
 	return asmreg()
 
 
+function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
+	while C < S
+		#!ClearExits
+		|| op = C.Op
+		if op >= kContinue
+			C.op = ASM.Jump
+			if op == kContinue			// continue
+				C.JumpTo = S
+			  else       				// exit
+				C.JumpTo = A
+		C++
+
+
 function While			(fn_asm)
 	opt norefcounts
 	|| BEGIN = exp.JUMP(0)							// jump to end... THEN EMIT arg and jump back.
 	ASMType.arg(self, exp.second)					// arg
 
 	|fatrange| LOOP_TEST
-	|| LT = .Branch(exp.first!, loop_Test)
+	|| LT = .Branch(exp.first!, true, loop_test)
 	if loop_test.Constness.knownfalse
 /		.nop(begin, loop_Test.start)
 		return asmreg()
 	
 	BEGIN.jumpto = LOOP_Test.start
 	LOOP_TEST.AllJumpTo(BEGIN+1)
-
-	while BEGIN < LOOP_Test.start
-		#!ClearExits
-		|| op = BEGIN.Op
-		if op >= kContinue
-			BEGIN.op = ASM.Jump
-			if op == kContinue			// continue
-				BEGIN.JumpTo = LOOP_Test.start
-			  else       				// exit
-				BEGIN.JumpTo = LOOP_Test.After!
-		BEGIN++
+	.loopfill(begin, LOOP_Test.start, LOOP_Test.After)
 	
-/	return asmreg()
+	return asmreg()
 
 
 function Exit			(fn_asm)
@@ -105,7 +108,7 @@ function Ternary		(fn_asm)
 	|| TT = .Branch(cond, terntest)
 	|| KK = TernTest.Constness
 	if KK.IsKnown
-/		|| which = (A, B)(KK.Default)
+		|| which = (A, B)(KK.Default)
 		rz = .µInto(which, dest)
 	  else
 		
