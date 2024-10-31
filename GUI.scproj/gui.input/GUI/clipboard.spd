@@ -18,6 +18,8 @@ module clipboard
 	function Text (assigns: |string| s)
 		if s // don't copy empty string!
 			._backup = s.cstr // macos hates copying binary data.
+			if keys.Shift
+				._backup = ._backup.TabsToSpaces
 			.SDL_SetClipboardText(._backup)
 		  else
 			beep

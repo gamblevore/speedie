@@ -3,6 +3,8 @@
 
 "\1F\04R opens the run-argument editor"
 
+"\1F\04C copies text and converts tabs-to-spaces. \1FC copies normally."
+
 "Hold esc to bring up the application menu"
 
 "\1FJ opens up the Jeebox viewer"

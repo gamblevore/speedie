@@ -217,44 +217,6 @@ helper String.UnTabbifySub (|faststring| fs)
 		fs.AppendSection(self, tabs, int.max)
 
 
-helper String.TabbifySub (|faststring| fs)
-	|| Sp = .OutByte(' ') ?? .length
-	if Sp == 0
-		fs <~ self
-	  else
-		sp = Sp.AlignDown(4)
-		fs <~ ('\t', Sp>>2)
-		fs.AppendSection(self, sp, int.max)
-	
-
-
-function String.TabsToSpaces2 (|string|)
-	|| fs = FastString()
-	for (l.lines in self) (p)
-		l.TabsToSpacesSub(fs)
-		if p
-			fs <~ self[p] // match line-ending
-	return fs
-#! why do i have two of these?
-#! why do i have two of these?
-#! why do i have two of these?
-#! why do i have two of these?
-
-function String.TabsToSpaces (|bool| Tabs=true, |string|)
-	|| fs = faststring()
-	|| n = 0
-	for t.lines in self
-		if n++
-			fs <~ '\n'
-		if tabs
-			t.TabbifySub(fs)
-		  else
-			t.UntabbifySub(fs)
-	rz = fs.GetResult
-	if rz == self // nice opt
-		rz = self
-
-
 helper String.TabsToSpacesSub (|faststring| fs)
 	|| i = 0 
 	for (c in self)
@@ -266,7 +228,40 @@ helper String.TabsToSpacesSub (|faststring| fs)
 		  else
 			fs <~ c
 			i++
-		
+
+
+helper String.TabbifySub (|faststring| fs)
+	|| Sp = .OutByte(' ') ?? .length
+	if Sp == 0
+		fs <~ self
+	  else
+		sp = Sp.AlignDown(4)
+		fs <~ ('\t', Sp>>2)
+		fs.AppendSection(self, sp, int.max)
+	
+
+
+function String.TabsToSpaces (|string|)
+	|| fs = FastString()
+	for (l.lines in self) (p)
+		l.TabsToSpacesSub(fs)
+		if p
+			fs <~ self[p] // match line-ending
+	return fs
+
+
+function String.SpacesToTabs (|string|)
+	|| fs = faststring()
+	|| n = 0
+	for t.lines in self
+		if n++
+			fs <~ '\n'
+		t.UntabbifySub(fs)
+	rz = fs.GetResult
+	if rz == self // nice opt
+		rz = self
+
+
 		
 		
 function faststring.RenderSpeed (|float| seconds, |int64| BytesIn, |int64| BytesOut, |string| Name)
