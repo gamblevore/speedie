@@ -176,20 +176,22 @@ int JB_Array_Size( Array* self ) {
     return 0;
 }
 
-
 Array* JB_Array_Copy(Array* self) {
     require(self);
-	Array* Result = (Array*)JB_New(Array);
+	Array* Result = JB_Array_Constructor0(nil);
 	int n = self->Length;
 	if (!GrowToLength_(Result, n)) {
 		JB_Decr(Result);
 		return 0;
 	}
 
-    auto Place = Result->_Ptr;
-	CopyBytes(self->_Ptr, Place, sizeof(void*) * n);
-	for_(n) {
-		JB_Incr(Place[i]);
+    auto Dest = Result->_Ptr;
+    auto After = Dest + n;
+    auto Src = self->_Ptr;
+	while (Dest < After) {
+		auto O = *Src++;
+		*Dest++ = O;
+		JB_Incr(O);
 	}
     return Result;
 }
