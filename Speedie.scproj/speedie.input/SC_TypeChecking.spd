@@ -3,7 +3,10 @@
 
 function Message.ExpandToBool (|SCNode| name_space, |Message|)
 	opt norefcounts
-	|| decl = TypeOfExpr( self, name_space )	
+	|| decl = TypeOfExpr( self, name_space )
+		if decl.isnormal and !decl.type.theboolfunc
+			return self
+		
 		|| upon = .unbra
 		rz = TypeBool!.TypeNormal.ExpectMatch( decl, kTypeCastTrue, upon )
 	
