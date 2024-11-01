@@ -171,7 +171,7 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| OExp, |int| TypeCast, |int|)
 	if (TypeCast & kTypeCastMost)				// Type Casting
 		// we do bool casting after, as its usually a sign of a bug.
 		for (b.Upwards in Ot)
-			for (C in b.Casts)
+			for (C.backwards in b.Casts)
 				ifn NoBools and (C.returnType.isbool)
 					if .TypeMatch( C.ReturnType, 0 ).IsNormalMatch
 						return C.CreateTypeCast( O, oexp )

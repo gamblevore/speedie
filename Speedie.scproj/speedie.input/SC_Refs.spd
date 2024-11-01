@@ -635,6 +635,11 @@ function Message.RefDisappears (|bool|)
 			0 // go up
 		  elseif f == @prm
 			return false
+		  elseif f == @brel
+			return true // !obj
+		  elseif f == @tmp // if/while
+			|| T = p.asmtype
+			return T != asmtype.kreturn and asmtype.krejoin 
 		  elseif (F == @arg)
 			return true // right?
 		  elseif (f == @rel)

@@ -566,9 +566,9 @@ function scfunction.DontWantSameReturnType (|scfunction| f)
 	
 
 
-function FindNilChecker
+function FindNilChecker 
 	|| cast = .FindSpecialFunc( "SyntaxCast", false )
-
+	
 	if !.IsStruct
 		is HasNilChecker // default to true
 
