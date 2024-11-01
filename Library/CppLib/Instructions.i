@@ -2,6 +2,15 @@
 	if (u2 == u1 and u3 == u4) 
 	VMFinish
 ;
+ı TAIL: 
+	__;
+	TailStack(r, Code, Op);
+	___;
+ı KNST2: _
+	LoadConst(r, Op, *Code++);
+ı KNST3: _
+	LoadConst(r, Op, *((uint64 *)(Code)));
+	Code += 2;
 ı FNC: 
 	__;
 	Code = BumpStack(vm, r, Code + 1, Op, *Code);
@@ -10,26 +19,25 @@
 	__;
 	Code = BumpStack(vm, r, Code + 2, Op, Code64);
 	___;
-ı KNST: _
-	LoadConst(r, Op, 0);
-ı KNST2: _
-	LoadConst(r, Op, *Code++);
-ı KNST3: _
-	LoadConst(r, Op, *((uint64 *)(Code)));
-	Code += 2;
-ı FFNC: 
+ı FNCX: 
 	__;
 	ForeignFunc(vm, Code, r, Op, *Code);
 	Code++;
 	___;
-ı FFNC3: 
+ı FNCX3: 
 	__;
 	ForeignFunc(vm, Code, r, Op, Code64);
 	Code += 2;
 	___;
-ı TAIL: 
+ı FNCIX: 
 	__;
-	TailStack(r, Code, Op);
+	ForeignFunc2(vm, Code, r, Op, *Code);
+	Code++;
+	___;
+ı FNCIX3: 
+	__;
+	ForeignFunc2(vm, Code, r, Op, Code64);
+	Code += 2;
 	___;
 ı NOOP: _
 	i1 = i1;
@@ -42,7 +50,11 @@
 	u3 = (uint64)(&u4);
 ı RET: 
 	__;
-	Code = Return(r, Op);
+	Code = Return1(r, Op);
+	___;
+ı RETO: 
+	__;
+	Code = Return2(r, Op);
 	___;
 ı ALLO: _
 	AllocStack(vm, r, Op);
@@ -59,6 +71,8 @@
 	RegConv(r, Op);
 ı KNSR: _
 	RotateConst(r, Op);
+ı KNST: _
+	LoadConst(r, Op, 0);
 ı ADDK: _
 	i1 = i2 + U2_Li;
 ı ADPK: _

@@ -211,11 +211,10 @@ extend ASMState
 		
 		|| fn = exp.Func
 		if fn == @opp
-/			exp = exp.parent
-			if swapped
-				exp = exp.last
+/			if swapped
+				exp = exp.next
 			  else
-				exp = exp.first
+				exp = exp.prev
 			
 		  elseif fn == @arel or @brel
 /			exp = exp.first
@@ -227,7 +226,8 @@ extend ASMState
 			// should never happen. Even @thg shouldn't.
 			error "aaargh"
 			debugger 
-		return 1
+		|| d = exp.ASMDecl
+		return d.AllocatedSize
 	
 
 	function IntPlus     (fn_opasm)
@@ -281,7 +281,7 @@ extend ASMState
 		return fat * Dest
 		
 
-	function FloatPlus   (fn_opasm)
+	function FloatPlus (fn_opasm)
 		if dest is ConstAny
 			return .makeconst2(dest, l, r, exp, &fatasm.ConstifyFloatPlus)
 
@@ -294,7 +294,7 @@ extend ASMState
 		return exp.fADD(dest, l, r*!ss, r*ss, 1-IsF32) * Dest
 
 
-	function Plus   (fn_opasm) // add (
+	function Plus (fn_opasm) // add (
 		|| rr = r.reg, || ll = l.reg
 		if !rr
 			return l
@@ -309,12 +309,12 @@ extend ASMState
 		return .FloatPlus(dest, l, r, exp)
 
 
-	function Subtract  (fn_opasm)	// x = a - b
+	function Subtract (fn_opasm)	// x = a - b
 		(l is alternate) // the logic ismostly shared...
 		return .plus(dest, l, r, exp)
 
 
-	function Minus  (fn_opasm)		// x = -b
+	function Minus (fn_opasm)		// x = -b
 		// not the same as negative, which is an fn_asm... that means it works on the exp
 		// where as fn_opasms work on the op.
 		(l is alternate)

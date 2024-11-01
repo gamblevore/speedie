@@ -4,6 +4,7 @@ function fatasm.NOOP_Encoder (Asm_encoder)
 	curr[] = asm.noop << 24
 	return curr
 
+
 function fatasm.KNST_Encoder (Asm_encoder)
 	if curr >= after-2
 		return curr
@@ -11,7 +12,8 @@ function fatasm.KNST_Encoder (Asm_encoder)
 	|| Orig = curr++
 	|| inv = v>>63					// We only need to store 63 bits then? if the top is always false.
 		v = ~v	  					// Opportunity to reclaim the top bit. I'll do it later.
-	|asm| knst = asm.knst << 24
+	|asm| knst
+	|| Mode = asm.knst << 24
 	knst.R1 = .R[0]
 	knst.ConstStretchy_Inv = inv
 	knst.ConstStretchy_Value = v
@@ -19,12 +21,13 @@ function fatasm.KNST_Encoder (Asm_encoder)
 
 	if v
 		curr++[] = v
-		knst += 1<<24
+		mode = asm.knst2 << 24
 		v >>= 32
 		if v
-			knst += 1<<24
+			mode = asm.knst3 << 24
 			curr++[] = v
-	orig[] = knst
+
+	orig[] = knst ||| mode
 			
 	return Curr
 

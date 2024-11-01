@@ -1139,15 +1139,17 @@ class SCDecl (SCNamed) {
 
 	function RegType (|datatypecode|)
 		opt norefcounts
-		if self
-			|| Ty = .type
-			DEBUG_REQUIRE !(.c_array ||| ty.IsStruct)
-			
-			if ty.IsObject
-				return datatypecode.cstring
-			rz = ty.typeinfo
-			if .pointercount
-				rz = datatypecode._voidptr // what about carrays?
+		if !self
+			return datatypecode._void
+		
+		|| Ty = .type
+		DEBUG_REQUIRE !(.c_array ||| ty.IsStruct)
+		
+		if ty.IsObject
+			return datatypecode.cstring
+		rz = ty.typeinfo
+		if .pointercount
+			rz = datatypecode._voidptr // what about carrays?
 
 
 	function VarSizeSub (|bool| TheVarItself, |int|)

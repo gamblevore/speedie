@@ -64,13 +64,13 @@ function InitAccess
 	R++[] = ASM.RD16	
 
 
-function Debugger		(fn_asm)
+function Debugger (fn_asm)
 	if Options.targetdebug
 		return exp.TRAP(asmreg(), 0, 2)*asmreg() // 2 == sigint
 	return asmreg()
 	
 
-function StatExpr		(fn_asm)
+function StatExpr (fn_asm)
 	opt norefcounts
 	for ch.fast in exp
 		if ch.islast
@@ -78,30 +78,31 @@ function StatExpr		(fn_asm)
 		.µ(ch, asmreg.Arg)
 
 	
-function First			(fn_asm)
+function First (fn_asm)
 	opt norefcounts
 	return .µ(exp.first!, dest)
 
 
-function Return			(fn_asm)
+function Return (fn_asm)
 	opt norefcounts
 	|| reg = ASMReg()
 	|| f = exp.first
 		reg = .µ(f, .ReturnASM|asmreg| as AsmReg.ForReturn)
-
+	
+	|| amount = (f!=nil)|int|
 	if reg is ConstAny
 		|| K = reg.const // return true, or -1 or whatever
 		if k and k.fits(15)
 			.nop(reg)
-			exp.RET(reg, 1, 0, K)
+			exp.RET(reg, asmreg(), asmreg(), amount, K)
 			return asmreg()
 			
-	exp.RET(reg, 1, 0, 0)
+	exp.RET(reg, asmreg(), asmreg(), amount, 0)
 	return asmreg()
 	
 
 
-function TypeCast		(fn_asm)
+function TypeCast (fn_asm)
 	opt norefcounts
 	|| f = exp.first!
 	|| req = dest as asmreg.ForCast
@@ -169,13 +170,14 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 
 
 
-function Pointer		(fn_asm)
+function Pointer (fn_asm) // this is unused these days???
 	// *a, x = *(a.b) 
 	opt	NoRefCounts
+	debugger // remove this func?
 	if dest is AddrRequest // hmmm?
 	dest = .TempTyped(exp, dest)
 	|| Ptr = .µ(exp.first!, dest)
-	return Dest.ReadOrWrite(exp,ptr)
+	return Dest.ReadOrWrite(exp,ptr, asmreg())
 
 
 
@@ -189,7 +191,7 @@ function Decl (fn_asm)
 
 
 
-function Arg   (fn_asm)
+function Arg (fn_asm)
 	opt norefcounts
 	|| DclCloser = .VDecls // dcl ooffer
 	for ch.fast in exp
@@ -200,38 +202,34 @@ function Arg   (fn_asm)
 
 
 
-function Access		(fn_asm)						// a[b], struct.mem[b]
+function Access (fn_asm)						// a[b], struct.mem[b]
 	opt	NoRefCounts
 	dest = .TempTyped(exp, dest)
 
 	|| Ptr = .µ(exp.first!, dest.RequestPos)		// x = a.b[0]
 	check (ptr is ContainsAddr) (exp)
-	|| Ind = .µ(exp.second!, ptr • dest)
+	|| vara = .µ(exp.second!, ptr • dest)
 	if (dest is AddrRequest)
-		return .Plus(dest.HaveAddr, ptr, ind, exp)
+		return .Plus(dest.HaveAddr, ptr, vara, exp)
 	
-	return Dest.ReadOrWrite(exp, ptr, ind)
+	return Dest.ReadOrWrite(exp, ptr, vara, 0)
 
 
-function Dot		(fn_asm)						// a.b
+function Dot (fn_asm)						// a.b
 	opt	NoRefCounts
 	dest = .TempTyped(exp, dest)
 	|| Obj = .µ(exp.first!, dest)
 	|| prop = exp.ASMDecl
 	|| T = prop.typeinfo
 	dest.µtype = T
-	debugger
 	
-	|| B = t.ByteCount.log2
-	|| Pos = prop.exportposition >> B
-	if !pos // what?
-	if (dest is AddrRequest) or (pos >= 128)						// read/write only allows up to 127
-		|| addk = exp.ADDK(dest, obj, pos)
-		if dest is AddrRequest
-			return addk.HaveAddr * dest
-		pos = 0
-	
-	return Dest.ReadOrWrite(exp, obj, pos)
+	|int64| Pos = prop.exportposition
+	if pos <= 0 // what?
+	if dest is AddrRequest
+/		pos *= t.ByteCount
+		return exp.ADDK(dest, obj, pos).HaveAddr * dest
+
+	return Dest.ReadOrWrite(exp, obj, asmreg(), pos)
 		
 
 function SetRel	(fn_asm)	// function relset (
@@ -315,7 +313,7 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 	if !itable and !iread and iold
 		DoGlobalSub(tabl, iold, exp)
 	debugger 
-	return dest.ReadOrWrite(Exp, addr, iread)
+	return dest.ReadOrWrite(Exp, addr, asmreg(), iread)
 
 	
 
@@ -483,40 +481,45 @@ helper ASMState.DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMR
 
 
 
-function ASMReg.ReadOrWrite (|message| m, |asmreg| ptr, |int| index=0, |asmreg|)
-	return .ReadOrWrite(m, ptr, index, self is set) * self
+function ASMReg.ReadOrWrite (|message| m, |asmreg| ptr, |asmreg| varadd, |int| index=0, |asmreg|)
+	return .ReadOrWriteSub(m, ptr, varadd, index, self is set) * self
 
 
-function ASMReg.ReadOrWrite (|message| m, |asmreg| ptr, |int| index, |bool| DoWrite, |&fatasm|)
+// we need a varadd... for x = a[b]
+function ASMReg.ReadOrWriteSub (|message| m, |asmreg| ptr, |asmreg| varadd, |int| index, |bool| DoWrite, |&fatasm|)
 	if self is containsaddr
 		#!wait?? this is meant to be an addrrequest? not a response.
 		debugger
 	
-	self = self asnt asmreg.AddrRequest
-	debugat
+	(self asnt= asmreg.AddrRequest)
 	|| T = .µtype
 	|| BC = t.ByteCount
 	|| bytes = BC.log2
-	check  (bytes <= 4)   (m, "Object to large to access")
-	check  (index < 512)  (m, "Index too large (compiler limitation)")
-		
-	|asm| A
+	if  (bytes|uint| > 4)
+		error (m, "Object to large to access") // later we can do a struct-mem-copy operation?
+		bytes = 0
+	
+	if index >= 128						// read/write only allows up to 127
+/		|| num = asmstate.sh.NumToReg(m, index)
+		ptr = asmstate.sh.Plus(num, ptr, num, m)
+		index = 0
+	
+	rz = m.RD4U(self, ptr, varadd, index, 0)
 	if DoWrite
-		A = ASMType.WriteASM[bytes]
+		rz.op = ASMType.WriteASM[bytes]
 	  else
 		|| B = (bytes<<1) + t.issigned
-		A = ASMType.ReadASM[b]
-	return m.RD4U(self, ptr, asmreg(), index, 0)
+		rz.op = ASMType.ReadASM[b]
 
 
-function ASMReg.Read  (|message| m,  |asmreg| ptr,  |int| index=0,  |&fatasm|)
+function ASMReg.Read  (|message| m,  |asmreg| ptr,  |asmreg| varadd,  |int| index=0,  |&fatasm|)
 	opt inline
-	return .ReadOrWrite(m, ptr, index, false)
+	return .ReadOrWriteSub(m, ptr, varadd, index, false)
 	
 
-function ASMReg.Write (|message| m,  |asmreg| ptr,  |int| index=0,  |&fatasm|)
+function ASMReg.Write (|message| m,  |asmreg| ptr,  |asmreg| varadd,  |int| index=0,  |&fatasm|)
 	opt inline
-	return .ReadOrWrite(m, ptr, index, true)
+	return .ReadOrWriteSub(m, ptr, varadd, index, true)
 
 
 function message.asmlocal (|asmreg| extra = 0, |asmreg|)

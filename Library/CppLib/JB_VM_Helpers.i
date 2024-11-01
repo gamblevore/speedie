@@ -422,7 +422,29 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 //	Stack->Stack.Alloc = vm.Env.AllocCurr;
 //	return Stack+1;
 
-AlwaysInline ASM* Return (VMRegister*& ZeroPlace, ASM Op) {
+AlwaysInline ASM* Return2 (VMRegister*& ZeroPlace, ASM Op) {
+// safedecr!
+//	RETObj				// keep simple for speed
+//		r1		r		// return reg
+//		r2		r		// decr
+//		r3		r		// decr
+//		r4		r		// decr
+//		Count	3		// amount of returned registers
+//		SafeDecr 1
+	auto OldZero = ZeroPlace;
+	VMRegister* stck = OldZero-1;
+	auto R1 = stck - stck->Stack.SavedReg;
+	auto Code = stck->Stack.Code;
+	auto V = RET_Valuei; // get before copy!
+	auto Src = OldZero+n1;
+	ZeroPlace = R1-1; // NewZero
+	stck = (VMRegister*)memcpy(stck, Src, RET_Countu<<4);
+	if (V)
+		stck->Uint |= V;
+	return Code;
+}
+
+AlwaysInline ASM* Return1 (VMRegister*& ZeroPlace, ASM Op) {
 	auto OldZero = ZeroPlace;
 	VMRegister* stck = OldZero-1;
 	auto R1 = stck - stck->Stack.SavedReg;
@@ -545,6 +567,19 @@ AlwaysInline void ForeignFunc (jb_vm& vv, ASM* CodePtr, VMRegister* r, ASM Op, u
 	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.Env.Cpp[T]);
 	if (fn)
 		return Nativeize(funcdata, fn, r, n1);
+	
+	debugger;
+	r[n1] = {}; // ugh
+}
+
+AlwaysInline void ForeignFunc2 (jb_vm& vv, ASM* CodePtr, VMRegister* r, ASM Op, u64 funcdata) {
+	auto T = ForeignFunc_Tableu;
+	auto fn = (T<32) ? ((Fn0)(r[T].Uint)) : (vv.Env.Cpp[T]);
+	if (fn) {
+		Nativeize(funcdata, fn, r, n1);
+		JB_Incr(r[n1].Obj);
+		return;
+	}
 	
 	debugger;
 	r[n1] = {}; // ugh

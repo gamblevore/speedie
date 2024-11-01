@@ -57,36 +57,36 @@ extend SpdAssembler {
 
 
 dispatch µOpt (|&fatasm| self, |?&fatasm| P, |?&fatasm| N, |bool|)
-	(ASM.FNC2):  OptFunc
-//	(ASM.FNC3):  OptFunc
+	(ASM.FNC):		OptFunc
+//	(ASM.FNC3):		OptFunc
 		
-	(ASM.CNTC):   OptCount
-	(ASM.TABL):   OptTabl
+	(ASM.CNTC):		OptCount
+	(ASM.TABL):		OptTabl
 
-	(ASM.SUB):   OptSubI
-	(ASM.ADD):    OptAddI
-	(ASM.FADD):   OptAddF
-	(ASM.FADK):   OptFADK
+	(ASM.SUB):		OptSubI
+	(ASM.ADD):		OptAddI
+	(ASM.FADD):		OptAddF
+	(ASM.FADK):		OptFADK
 	
-	(ASM.RET):    OptRet
-	(ASM.TERN):   OptTern
-	(ASM.BFLG):   OptBFLG
-	(ASM.BSHR):   OptShifting
-	(ASM.BSHS):   OptShifting
-	(ASM.BSHL):   OptShifting
-	(ASM.BAND):   OptBitAnd
-	(ASM.BOR ):   OptBitOr
-	(ASM.BNOT):	  OptBitNot
-	(ASM.CMPF):	  OptCompare
-	(ASM.CMPI):   OptCompare
+	(ASM.RET):		OptRet
+	(ASM.TERN):		OptTern
+	(ASM.BFLG):		OptBFLG
+	(ASM.BSHR):		OptShifting
+	(ASM.BSHS):		OptShifting
+	(ASM.BSHL):		OptShifting
+	(ASM.BAND):		OptBitAnd
+	(ASM.BOR ):		OptBitOr
+	(ASM.BNOT):		OptBitNot
+	(ASM.CMPF):		OptCompare
+	(ASM.CMPI):		OptCompare
 	
-	(ASM.JUMP):   OptJump // control flow?
-	(ASM.JMPI):   OptJumpC
-	(ASM.JMPF):   OptJumpC
-	(ASM.JMPN):   OptJumpE
-	(ASM.JMPE):   OptJumpE
-	(ASM.JBOR):   OptBra
-	(ASM.JBAN):   OptBra
+	(ASM.JUMP):		OptJump // control flow?
+	(ASM.JMPI):		OptJumpC
+	(ASM.JMPF):		OptJumpC
+	(ASM.JMPN):		OptJumpE
+	(ASM.JMPE):		OptJumpE
+	(ASM.JBOR):		OptBra
+	(ASM.JBAN):		OptBra
 	255:		  OptNothing
 
 

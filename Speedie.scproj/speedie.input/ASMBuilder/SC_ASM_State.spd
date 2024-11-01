@@ -198,10 +198,14 @@ struct ASMState
 					debugger
 					(fn)(self, exp, dest)
 			if exp.asmtype < ASMType.kElseIf
-				|| ty = exp.ASMDecl
+				|| ty = exp.ASMDecl.typeonly
 				|| sst = ss.µtype
-				if sst != dest.µtype and ty.typeonly
+				|| dt = dest.µtype
+				if sst != dt and ty
 					printline exp
+					sst.debugprint
+					ty.debugprint
+					dt.debugprint
 					debugger
 					(fn)(self, exp, dest)
 		return ss
@@ -296,7 +300,7 @@ function @ASMType.DoFunction (fn_Asm)
 	opt norefcounts
 	#! The .asint/.asfloat functions should be recognised as working on constants? Or is that just a general case of inline functions? Technically, its an inline func that does nothing, just returns the original... with a different type. 
 	|| prms = exp.last!
-	|| fn = prms.asfunc #require
+	|| fn = prms.asfunc!
 
 	// Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:4
 	// There are only 4 above 6!, only 14 above 5, 75 above 4
@@ -315,13 +319,10 @@ function @ASMType.DoFunction (fn_Asm)
 	|| PExt = P >> 32
 	|| fat = exp.FNC(dest, fn.tableid+31, P,  PExt)
 	if isc
-		fat.op = asm.FFNC
+		fat.op = asm.FNCX
 	fat.op += PExt > 0
 
 //  Mostly I'm doing:  || x = msg.function(),  (which uses the correct position.)
-	
-	if !fn.ReturnType
-		dest.reg = 0
 
 	return fat * dest
 
@@ -381,7 +382,7 @@ function ASMState.FinishASM
 	ifn (l isa asm.ret) or (l isa asm.trap)
 		|| fn = scfunction.currfunc!
 		expect (!fn.returntype) ("ASMReturn".internal) // why?
-		fn.SourceArg!.RET(asmreg(), 1, 0, 0)
+		fn.SourceArg!.RET(asmreg(), asmreg(), asmreg(), 1, 0)
 	.SetLength
 
 

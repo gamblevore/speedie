@@ -315,23 +315,30 @@
 #define   Convert_Lu_(x)   (((uint)((x)<<22))>>22)
 
 
-#define   RET_Counti       ((( int)((Op)<<13))>>29)
-#define   RET_Counti_(x)   ((( int)((x)<<13))>>29)
+#define   RET_Counti       ((( int)((Op)<<23))>>29)
+#define   RET_Counti_(x)   ((( int)((x)<<23))>>29)
 
-#define   RET_Countu       (((uint)((Op)<<13))>>29)
-#define   RET_Countu_(x)   (((uint)((x)<<13))>>29)
+#define   RET_Countu       (((uint)((Op)<<23))>>29)
+#define   RET_Countu_(x)   (((uint)((x)<<23))>>29)
 
-#define   RET_SafeDecri       ((( int)((Op)<<16))>>31)
-#define   RET_SafeDecri_(x)   ((( int)((x)<<16))>>31)
+#define   RET_Valuei       ((( int)((Op)<<26))>>26)
+#define   RET_Valuei_(x)   ((( int)((x)<<26))>>26)
 
-#define   RET_SafeDecru       (((uint)((Op)<<16))>>31)
-#define   RET_SafeDecru_(x)   (((uint)((x)<<16))>>31)
+#define   RET_Valueu       (((uint)((Op)<<26))>>26)
+#define   RET_Valueu_(x)   (((uint)((x)<<26))>>26)
 
-#define   RET_Valuei       ((( int)((Op)<<17))>>17)
-#define   RET_Valuei_(x)   ((( int)((x)<<17))>>17)
 
-#define   RET_Valueu       (((uint)((Op)<<17))>>17)
-#define   RET_Valueu_(x)   (((uint)((x)<<17))>>17)
+#define   RETObj_Counti       ((( int)((Op)<<28))>>29)
+#define   RETObj_Counti_(x)   ((( int)((x)<<28))>>29)
+
+#define   RETObj_Countu       (((uint)((Op)<<28))>>29)
+#define   RETObj_Countu_(x)   (((uint)((x)<<28))>>29)
+
+#define   RETObj_SafeDecri       ((( int)((Op)<<31))>>31)
+#define   RETObj_SafeDecri_(x)   ((( int)((x)<<31))>>31)
+
+#define   RETObj_SafeDecru       (((uint)((Op)<<31))>>31)
+#define   RETObj_SafeDecru_(x)   (((uint)((x)<<31))>>31)
 
 
 #define   REQ_Modei       ((( int)((Op)<<18))>>28)

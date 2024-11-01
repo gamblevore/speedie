@@ -232,16 +232,17 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 	if self == typeobject
 		count = 4 // refcount
 	|| s = .super
-		Count = s.CalculateSizeRaw					#DEBUG_REQUIRE
+		Count = s.CalculateSizeRaw								#DEBUG_REQUIRE
+
 	|| bits = 0
 	for p in .properties
 		|| curr = platform.PointerBytes
 		ifn P.Type.IsObject or p.PointerCount
-			Curr = P.type.calculatesize(depth+1)	#require
+			Curr = P.type.calculatesize(depth+1)				#require
 		if (p is task) and p.isobject
 			bits[(count+(platform.PointerBytes-1))>>3] = true
 		Count = Count Align Curr
-		p.ExportPosition = count
+		p.ExportPosition = count / curr
 
 		|| Mul = P.c_Array ?? 1
 		Count += Curr * Mul 
@@ -471,14 +472,19 @@ function FindSpecialFunc (|string| keyword, |bool| CheckParents, |SCFunction|)
 	return .FindFunc(keyword.lowercase, CheckParents, true)
 
 
+function GetFunc (|string| keyword, |bool| DoError=true, |scfunction|)
+	opt norefcounts
+	|| o = .access[ keyword ]
+		if o isa SCFunction
+			return o
+		check (!.IsObject or !doerror) (.source, keyword + " keyword only usable with functions.")
+
+
 function FindFunc (|string| keyword, |bool| CheckParents, |bool| DoError, |SCFunction|)
 	opt norefcounts
 	for (b.upwards in self)
-		|| o = b.access[ keyword ]
-			if o isa SCFunction
-				return o
-			expect (!.IsObject or !doerror) (b.source, keyword + " keyword only usable with functions.")
-		
+		|| fn = b.getfunc(keyword, doerror)
+			return fn
 		loop CheckParents
 
 
@@ -559,14 +565,14 @@ function scfunction.DontWantSameReturnType (|scfunction| f)
 		error (f.source, "Multiple casts found [2]")
 	
 
-function OverrideSyntax
-	require stderr.OK
+
+function FindNilChecker
 	|| cast = .FindSpecialFunc( "SyntaxCast", false )
 	.casts = array.new
 
 	if !.IsStruct
 		is HasNilChecker // default to true
-	
+
 	for f in cast
 		(f Is Inline)
 		check  (f.args == 1)		  (f.Source, "No params allowed." )
@@ -580,7 +586,46 @@ function OverrideSyntax
 			f.IsNilChecker = Mode
 			is HasNilChecker
 			.TheBoolFunc = f
+
+	ignore {
+	if !.IsStruct
+		is HasNilChecker // default to true
 	
+	|| s = .super
+		(self is HasNilChecker) = s is HasNilChecker
+		.theboolfunc = s.theboolfunc
+		.casts = s.casts.copy
+	else
+		.casts = array()
+		
+	|| cast = .getfunc( "syntaxcast" )
+	for f in cast
+		(f Is Inline)
+		check  (f.args == 1)		 			(f.Source, "No params allowed." )
+		f.NextFunc.DontWantSameReturnType(f)
+		.Casts <~ f
+
+		|| ret = f.ReturnType
+		if !ret
+			error (f.Source, "Need a return type.")			
+		  elseif ret.IsNormalBool
+			|| OK = (f isnt disabled)
+				f.args.first!.NilDeclared = nilstate.Optional
+			|| Mode = f.sourcearg!.nilcheckmode(ok)
+			f.IsNilChecker = Mode
+			is HasNilChecker // what about super-classes?
+			.TheBoolFunc = f	
+	}
+
+
+function OverrideSyntax
+	require stderr.OK
+	// .FindSpecialFunc is parent-based, so it tries to find one in our level
+	// then goes upwards. the problem is... lets say we have ONE cast,
+	// but our parent has a few, and they are better.
+	// I think, this only matters for syntax cast to bool?
+
+	.FindNilChecker
 	(self is HasCompareFunc) = .FindSpecialFunc( "SyntaxCompare", true ) != nil
 	(self is HasEqualsFunc) = .FindSpecialFunc( "SyntaxEquals", true ) != nil
 	(.TheIsFunc) = .FindSpecialFunc( "SyntaxIs", true )
@@ -883,6 +928,7 @@ module
 		cls.BaseType = base
 		if base is Object
 			(cls is SortsProperties)
+			cls.typeinfo = datatypecode._Voidptr
 		cls.IsRole = (node ~= "role")|int|
 
 		|| SA = cls.SourceArg
@@ -944,7 +990,10 @@ module
 	
 
 	function SCClass.DataTypePostLoad
-		require .IsDataTypeOnly and self ~!= "_void"
+		require .IsDataTypeOnly
+		if self ~= "_void"
+			.typeinfo = datatypecode._void
+			return
 
 		|| node = .Source
 		|| sup = .super
@@ -952,7 +1001,7 @@ module
 			.TypeInfo = sup.TypeInfo
 			|| nr = .NumericReduction
 				if nr & classinfo.symbol
-					.typeinfo = .typeinfo &~ datatypecode.numeric
+					.typeinfo &= ~datatypecode.numeric
 			  else
 				.defawlt ?= sup.defawlt
 		
@@ -963,12 +1012,12 @@ module
 				.size = T.ByteCount
 				if t == datatypecode.Vec3 or datatypecode.iVec3
 					.size = 16 // sigh 
-				.TypeInfo	= T
+				.TypeInfo = T
 				is Builtin
 				require T.isint and !.Signed
-				|| s2		= t.SignedStuffClass
-					.Signed		= s2.typenormal
-					s2.Signed	= .typenormal
+				|| s2 = t.SignedStuffClass
+					.Signed = s2.typenormal
+					s2.Signed = .typenormal
 			  else
 				debugger // what?
 		  else
@@ -1105,4 +1154,3 @@ extend SCClass
 		while (Curr_)
 			yield Curr_
 			Curr_ = Curr_.super
-

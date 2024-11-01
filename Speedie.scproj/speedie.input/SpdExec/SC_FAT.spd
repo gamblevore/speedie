@@ -19,7 +19,7 @@ struct FatASM
 		rz = .op
 		if rz < 32
 			rz = rz & ~3
-			if rz == (asm.FFNC-1) or (asm.FNC-1)
+			if rz == (asm.FNCX-1) or (asm.FNC-1)
 				rz++
 	
 	function Form (|µform|)

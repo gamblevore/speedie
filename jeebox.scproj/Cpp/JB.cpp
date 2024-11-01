@@ -6882,9 +6882,9 @@ JB_String* JB_Msg_Locate(Message* Self) {
 	if (Self->Position >= 0) {
 		JB_FS_AppendString(Fs, JB_LUB[39]);
 		JB_FS_AppendInt32(Fs, Self->Position);
-		Message* _tmPf0 = ((Message*)JB_Ring_Root(Self));
+		JB_MemoryLayer* _tmPf0 = JB_ObjLayer(Self);
 		JB_Incr(_tmPf0);
-		JB_Object* R = JB_Tree_Obj(_tmPf0);
+		JB_Object* R = _tmPf0->Obj;
 		JB_Incr(R);
 		JB_Decr(_tmPf0);
 		if (JB_Object_Isa(R, &JB_StringData)) {
@@ -8382,7 +8382,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024102915);
+	return (2024103023);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {

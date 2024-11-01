@@ -1506,12 +1506,11 @@ function TypeOfRel (ExprResolver)
 		return Or_And_Expansion( LC, RC, exp, name_Space ) // expects both sides to be booleans, right?
 
 
-	|| Custom = 0
 	if (RC != TypeNil)
 		|| IPM = IsPointerMath(LC, RC, comp, exp)
 			return ipm.CheckMath(exp)
 	
-	Custom = UseCustomOperators(LC, RC, comp, exp) 
+	|| Custom = UseCustomOperators(LC, RC, comp, exp) 
 
 	if Custom == CustomOps.needed
 		if !comp.IsCompOrset

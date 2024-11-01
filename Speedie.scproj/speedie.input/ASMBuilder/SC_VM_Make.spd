@@ -232,7 +232,7 @@ function BadEncoder (ASM_Encoder)
 	debugger
 
 
-function VM_NewInstructions (|message| list, |int| Amount, |[message]| rz)
+function VM_NewInstructions (|message| list, |bool| Amount, |[message]| rz)
 	opt norefcounts
 	for ch in list
 		require .VM_NewIns(ch, amount, rz)
@@ -248,7 +248,7 @@ function VM_FillPos (|message| list, |[message]| rz)
 				|| i = f.int
 				|| arg = ch.last(@arg) // now what?
 				|| item = arg.first
-					.VM_MakeInstructionSub(item, 0, rz, i)				
+					.VM_MakeInstructionSub(item, false, rz, i)				
 
 
 function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true)
@@ -259,10 +259,10 @@ function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true)
 		.NameList = r
 		R <~ (@thg+"EROR",  256)
 	.vm_FillPos(list, r)
-	.VM_NewInstructions(list, 0, R)
-	.VM_NewInstructions(list, 3, R)
-	.VM_NewInstructions(list, 2, R)
-	.VM_NewInstructions(list, 1, R)
+	.VM_NewInstructions(list, false, R)
+//	.VM_NewInstructions(list, 3, R)
+//	.VM_NewInstructions(list, 2, R)
+	.VM_NewInstructions(list, true, R)
 	for i in 256
 		asm.encoders[i] ?= badencoder
 
@@ -300,17 +300,18 @@ function message.VMBits (|int|)
 	opt norefcounts
 	for s in self
 		if s == @num
-			rz |= 1<<(s.int(0, 1, 4)-1)
+			rz |= 1<<(s.int(0, 1, 3)-1)
 	rz ?= 1
 
 
-function VM_MakeInstructionSub (|message| tmp,  |int| Ask,  |[message]?| ActuallyMakeTheVM, |int| ForceID)
+// vmmake
+function VM_MakeInstructionSub (|message| tmp,  |bool| Ask,  |[message]?| ActuallyMakeTheVM, |int| ForceID)
 	opt norefcounts
+	// could be simplified but i dont care anymore. i dont wanna deal with this code.
 	|| prms = tmp.first
 	|| FoundBits = prms.VMBits
 	if ask
-		ask = 1<<(ask-1)
-		require FoundBits & Ask
+		require FoundBits & 1
 	
 	tmp.flags |= 32K
 	|| P1 = prms.first
@@ -337,12 +338,11 @@ function VM_MakeInstructionSub (|message| tmp,  |int| Ask,  |[message]?| Actuall
 	|| Done = false
 	for (b.bits in foundbits) (extra)
 		|| x = id + extra
-		if .OKBoomer(tmp, x, formenc, ActuallyMakeTheVM)
-			if !done
-				.AddµOp(tmp.name, X)
-				done = true
-			if ask > 1
-				.AddµOp(tmp.name+(extra+1).render, X)
+		if .OKBoomer(tmp, x, formenc, ActuallyMakeTheVM) and !done
+			.AddµOp(tmp.name, X)
+			done = true
+			///if ask > 1
+				///.AddµOp(tmp.name+(extra+1).render, X)
 
 
 function OKBoomer (|message| tmp,  |int| x,  |asm_encoder| formenc,  |array?| R,  |bool|)
@@ -456,7 +456,7 @@ function FreeID (|message| m, |int| ask, |int|)
 		return n
 	
 	|| f = .FreeMultiASM
-	for i in 8
+	for i in 16
 		if f&ask == ask
 			.freemultiasm = f&~ask
 			return i<<2
@@ -464,7 +464,7 @@ function FreeID (|message| m, |int| ask, |int|)
 	error (m, "Can't find free ID for ASM")
 
 
-function VM_NewIns (|message| tmp, |int| ask, |[message]?| ActuallyMakeTheVM, |bool|)
+function VM_NewIns (|message| tmp, |bool| ask, |[message]?| ActuallyMakeTheVM, |bool|)
 	if (tmp == @tmp) and !(tmp.flags&32K) 
 		if (tmp != "forms" and "ignore")
 			.VM_MakeInstructionSub(tmp, ask, ActuallyMakeTheVM, 0)

@@ -448,6 +448,8 @@ bool JB_Ring_FirstSet( JB_List* self, JB_List* Mover ) {
 
 
 void JB_Tree_ObjSet( JB_List* self, JB_Object* Obj ) {
+//	if (Obj and JB_ObjectID(self) == 16845792)
+//		debugger;
 	auto V = self->Number;
 	if (V>>63)
 		self->Number = 0;

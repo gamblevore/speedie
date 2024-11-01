@@ -148,9 +148,18 @@ forms
 		
 	RET					// keep simple for speed
 		r1		r		// return reg
+		r2		r		// decr
+		r3		r		// decr
+		Count	3		// amount of returned registers
+		Value	l
+		
+	RETObj				// keep simple for speed
+		r1		r		// return reg
+		r2		r		// decr
+		r3		r		// decr
+		r4		r		// decr
 		Count	3		// amount of returned registers
 		SafeDecr 1
-		Value	l
 
 	REQ
 		r1		r		// 
@@ -255,7 +264,7 @@ forms
 		if (u2 == u1 and u3 == u4)
 			VMFinish
 
-/**/ NOOP (U0)	// does nothing // (could be removed/replaced with bitor 0?)
+/**/ NOOP (U0)	// does nothing // (could be replaced with bitor 0?)
 		i1 = i1
 		#!NOOP
 
@@ -272,36 +281,74 @@ forms
 		u1 = (uint64)(&u2)
 		u3 = (uint64)(&u4)
 
-/**/ RET (Ret)			// ret: 
+/**/ RET (Ret)				// ret: 
 		__ 
-		Code = Return(r, Op)
+		Code = Return1(r, Op)
 		___
 
-/**/ FNC (Func, 2)		// func: 
+/**/ RETO (RETObj)			// ret: 
+		__ 
+		Code = Return2(r, Op)
+		___
+
+POS 2
+	TAIL (Tail)
+		__
+		TailStack(r, Code, Op)
+		___
+
+
+POS 24 // force position
+	FNC (Func)			// func: 
 		__
 		Code = BumpStack(vm, r, Code+1, Op, *Code)
 		___
 
-/**/ FNC3 (Func, 3)
+POS 25
+	FNC3 (Func)
 		__
 		Code = BumpStack(vm, r, Code+2, Op, Code64)
 		___
 
-/**/ FFNC (ForeignFunc, 2) // rename to nativefunc?
+POS 26
+	FNCX (ForeignFunc)
 		__
 		ForeignFunc(vm, Code, r, Op, *Code)
 		Code++ 
 		___
 
-/**/ FFNC3 (ForeignFunc, 3)
+POS 27
+	FNCX3 (ForeignFunc)
 		__
 		ForeignFunc(vm, Code, r, Op, Code64) 
 		Code += 2
 		___
 
-/**/ TAIL (Tail, 2)
+
+//POS 28
+//	FNCI (Func)			// func: 
+//		__
+//		Code = BumpStack2(vm, r, Code+1, Op, *Code)
+//		___
+
+//POS 29
+//	FNCI3 (Func)
+//		__
+//		Code = BumpStack2(vm, r, Code+2, Op, Code64)
+//		___
+
+POS 30
+	FNCIX (ForeignFunc)
 		__
-		TailStack(r, Code, Op)
+		ForeignFunc2(vm, Code, r, Op, *Code)
+		Code++ 
+		___
+
+POS 31
+	FNCIX3 (ForeignFunc)
+		__
+		ForeignFunc2(vm, Code, r, Op, Code64) 
+		Code += 2
 		___
 
 /**/ ALLO (Alloc)
@@ -330,19 +377,18 @@ forms
 /**/ KNSR (RotateConst)
 		RotateConst(r, Op)
 
-POS 4 // force position
-	// @4 would be better!
-	KNST (ConstStretchy, 1)
+/**/ KNST (ConstStretchy)
 		LoadConst(r, Op, 0)
-POS 5
-	KNST2 (ConstStretchy, 2)
+
+POS 4
+	KNST2 (ConstStretchy)
 		LoadConst(r, Op, *Code++)   // would be better to do:   (uint64)(*Code++) << 17
 									// thats 49 bits at least!
 									// LoadConst(r, Op, ConstStretchy_Valueu) --> LoadConst(r, Op, 0)
-POS 6
-	KNST3 (ConstStretchy, 3)		// this would lose 17 bits? but they are already lost...
+POS 5
+	KNST3 (ConstStretchy)			// this would lose 17 bits? but they are already lost...
 									// more like 17 bits become spare and more easy to reuse.
-									// perhas to set simd values!
+									// perhaps to set simd values!
 		LoadConst(r, Op, *((uint64*)(Code)))
 		Code+=2
 
