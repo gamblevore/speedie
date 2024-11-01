@@ -204,7 +204,7 @@ function Yes4 (|int| b, |int| c, |int|)
 
 function No4 (|int| b, |int| c, |int| d, |int|)
 	b = b + 1
-	c = b + 2
+	c = b + 2	// opt c = b + 3? but only if .refcount == 1
 	d = b * 2
 	return c-d
 
@@ -217,30 +217,22 @@ function Yes5 (|int| b, |int| c, |int|)
 	return c
 
 
-function No5 (|int| b, |int| c, |int| d, |int|)
-	b = b + 1
-	c = b + 2	// opt c = b + 3? but only if .refcount == 1
-	d = b * 2	// 
-	return c-d
-
-
 // case 6
 function YesTail6 (|int| b, |int| c, |int|)
-	return No5(b+1, c, c)
+	return No4(b+1, c, c)
 
 
 function NoTail6 (|int| b, |int| c, |int|)
-	return No5(b, c, c) + 1
+	return No4(b, c, c) + 1
 
 
 function YesInline6 (|int| b, |int| c, |int|)
 	// how to do inlining? Not sure? Won't they inline anyhow?
-	
-	return No5(b+1, c, c)
+	return No4(b+1, c, c)
 
 
 function NoInline6 (|int| b, |int| c, |int|)
-	return No5(b, c, c) + 1
+	return No4(b, c, c) + 1
 
 
 

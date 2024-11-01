@@ -46,6 +46,7 @@ extend ASMState
 			if negate
 				return exp.JMPN(r,l,0)*Dest
 			return exp.JMPE(r,l,0)*Dest
+		if  "No2".trap  or  "no1".trap
 		if negate
 			return exp.JBAN(r,0)*Dest
 		return exp.JBOR(r,0)*Dest
@@ -477,13 +478,15 @@ extend ASMState
 	
 	
 	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
-		|| fat = exp.BAND(dest, L, R, 0) 
+		|int64| k
 		if r.reg and (r is ConstAny)
-			|| k = r.const
+			k = r.const
 			if k.fits(9, op!=asm.bor) // we want bitor unsigned
 				.nop(r)
-				fat.r[3] = k
-				fat.r[2] = 0
+				r = asmreg()
+			  else
+				k = 0
+		|| fat = exp.BAND(dest, L, R, k) 
 		fat.op = op
 		return fat * Dest
 

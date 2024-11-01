@@ -196,9 +196,10 @@ function Arg (fn_asm)
 	|| DclCloser = .VDecls // dcl ooffer
 	for ch.fast in exp
 		.µ(ch, AsmReg.Arg)
-		.printprogress(ch)
+		//.printprogress(ch)
 
 	.CloseVDecls(DclCloser)
+	return asmreg()
 
 
 

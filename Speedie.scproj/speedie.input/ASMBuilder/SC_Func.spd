@@ -59,10 +59,9 @@ class µFunc
 	render
 		fs <~ "asm ${.fn.name}\n"
 		for µ in self
-			if µ.op != asm.NOOP
-				fs <~ '\t'
-				µ.Renda(fs)
-				fs <~ '\n'
+			fs <~ '\t'
+			µ.Renda(fs)
+			fs <~ '\n'
 
 /// NIBBLER NIBBler nIBBLerr
 

@@ -197,7 +197,7 @@ struct ASMState
 				if (ss isnt constany)
 					debugger
 					(fn)(self, exp, dest)
-			if exp.asmtype < ASMType.kElseIf
+			if exp.asmtype < ASMType.kElseIf and ss != asmreg()
 				|| ty = exp.ASMDecl.typeonly
 				|| sst = ss.µtype
 				|| dt = dest.µtype

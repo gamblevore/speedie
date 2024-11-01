@@ -115,10 +115,10 @@ struct FatASM
 		|| s = scimport.allfiles[.filenum]
 			return s
 	
-	function SyntaxExpect (|string| Error)
+	Syntax Expect (|string| Error)
 		|| err = Error(nil, error, ErrorSeverity.Error, .file)
 		err.position = .BytePos
-		target debug: .debugprint
+		target debug: asmstate.sh.printprogress(nil)
 		stderr <~ err
 
 	function NumInput (|int| a, assigns:|int| v)
