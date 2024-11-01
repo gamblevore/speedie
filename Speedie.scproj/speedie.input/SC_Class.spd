@@ -568,18 +568,26 @@ function scfunction.DontWantSameReturnType (|scfunction| f)
 
 function FindNilChecker
 	|| cast = .FindSpecialFunc( "SyntaxCast", false )
-	.casts = array.new
 
 	if !.IsStruct
 		is HasNilChecker // default to true
 
+	|| s = .super
+		(self is HasNilChecker) = (s is HasNilChecker)
+		.theboolfunc = s.theboolfunc
+		.casts = s.casts.copy
+	  else
+		.casts = array()
+
 	for f in cast
 		(f Is Inline)
 		check  (f.args == 1)		  (f.Source, "No params allowed." )
-		|| ret = f.ReturnType #expect (f.Source, "Need a return type.")
 		f.NextFunc.DontWantSameReturnType(f)
 		.Casts <~ f
-		if ret.IsNormalBool
+		|| ret = f.ReturnType
+		if !ret
+			error (f.Source, "Need a return type.")	
+		  elseif ret.IsNormalBool
 			|| OK = (f isnt disabled)
 				f.args.first!.nildeclared = nilstate.Optional
 			|| Mode = f.sourcearg!.nilcheckmode(ok)
@@ -587,44 +595,10 @@ function FindNilChecker
 			is HasNilChecker
 			.TheBoolFunc = f
 
-	ignore {
-	if !.IsStruct
-		is HasNilChecker // default to true
-	
-	|| s = .super
-		(self is HasNilChecker) = s is HasNilChecker
-		.theboolfunc = s.theboolfunc
-		.casts = s.casts.copy
-	else
-		.casts = array()
-		
-	|| cast = .getfunc( "syntaxcast" )
-	for f in cast
-		(f Is Inline)
-		check  (f.args == 1)		 			(f.Source, "No params allowed." )
-		f.NextFunc.DontWantSameReturnType(f)
-		.Casts <~ f
-
-		|| ret = f.ReturnType
-		if !ret
-			error (f.Source, "Need a return type.")			
-		  elseif ret.IsNormalBool
-			|| OK = (f isnt disabled)
-				f.args.first!.NilDeclared = nilstate.Optional
-			|| Mode = f.sourcearg!.nilcheckmode(ok)
-			f.IsNilChecker = Mode
-			is HasNilChecker // what about super-classes?
-			.TheBoolFunc = f	
-	}
 
 
 function OverrideSyntax
 	require stderr.OK
-	// .FindSpecialFunc is parent-based, so it tries to find one in our level
-	// then goes upwards. the problem is... lets say we have ONE cast,
-	// but our parent has a few, and they are better.
-	// I think, this only matters for syntax cast to bool?
-
 	.FindNilChecker
 	(self is HasCompareFunc) = .FindSpecialFunc( "SyntaxCompare", true ) != nil
 	(self is HasEqualsFunc) = .FindSpecialFunc( "SyntaxEquals", true ) != nil
