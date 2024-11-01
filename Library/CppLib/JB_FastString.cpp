@@ -110,6 +110,7 @@ bool JB_FS_ResizeTo_(FastString* fs, int NewLength) {
 		if (fs->ResultPtr) {fs->Failed = true; return 0;}; // direct memory write.
 		S = JB_Incr(JB_New( JB_String ));
 		S->Addr = 0;
+		S->Length = 0;
 		fs->Result = S;
 	}
 	// So what if the size is lower than the current? AND if the current is... shared?
