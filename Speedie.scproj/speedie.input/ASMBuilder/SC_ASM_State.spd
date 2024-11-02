@@ -72,7 +72,7 @@ struct ASMState
 		  elseif dest.isfloat and dest.FourBytes and value|uint64|.CanStoreAsfloatImmediate
 			rz = exp.FADK(src, src, value) * dest
 		  else
-			|| where = .NumToReg(exp, value)
+			|| where = .NumToReg(exp, value, asmreg(), datatypecode.int64)
 			rz = .Plus(src, src, where, exp)
 		if dest.reg!=src.reg
 			rz = .Assign(dest, src, exp)

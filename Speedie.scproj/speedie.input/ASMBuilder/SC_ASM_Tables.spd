@@ -249,7 +249,7 @@ function Num (fn_asm)
 	opt norefcounts
 	|| d = exp.ASMDecl
 	dest.µtype = d.typeonly
-	return .numtoreg(exp, d.exportposition, dest) 
+	return .numtoreg(exp, d.exportposition, dest, dest.µtype) 
 
 
 function Thg (fn_asm)
@@ -270,7 +270,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	
 	if d is const
 		(dest is constany)
-		return .NumToReg(exp, d.exportposition, dest)
+		return .NumToReg(exp, d.exportposition, dest, dest.µtype)
 
 	rz = d.typeonly.zero
 	check (d is global) (Exp)
@@ -279,7 +279,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 
 helper DoGlobalSub (|&FATASM| addr, |int| add, |message| exp,  |asmreg|)
 	|| Reg = addr.info
-	|| NumAt = ASMState.sh.NumToReg(exp, add)
+	|| NumAt = ASMState.sh.NumToReg(exp, add, asmreg(), datatypecode.int)
 	return ASMState.sh.Plus(reg, reg, numat, exp)
 
 
@@ -501,7 +501,7 @@ function ASMReg.ReadOrWriteSub (|message| m, |asmreg| ptr, |asmreg| varadd, |int
 		bytes = 0
 	
 	if index >= 128						// read/write only allows up to 127
-/		|| num = asmstate.sh.NumToReg(m, index)
+/		|| num = asmstate.sh.NumToReg(m, index, asmreg(), datatypecode.int)
 		ptr = asmstate.sh.Plus(num, ptr, num, m)
 		index = 0
 	

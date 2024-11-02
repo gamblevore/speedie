@@ -31,7 +31,7 @@ extend ASMState
 			if  L is constany  and  R is constany
 				.nop2(r, l)
 				// what if we get false? theres no fat? its just reg0
-				return .NumToReg(exp, ((l.const==r.const)==!negate)|int|, res)
+				return .NumToReg(exp, ((l.const==r.const)==!negate)|int|, res, datatypecode.bool)
 			return exp.CMPB(dest, L, R, negate xor 1) * res
 
 		if l.reg
@@ -49,15 +49,14 @@ extend ASMState
 
 
 	function EqualsSame (fn_opasm)
-		return .numtoreg(exp, (dest isnt negate)|int|, dest)
+		return .numtoreg(exp, (dest isnt negate)|int|, dest, datatypecode.bool)
 	
 	
 	function Equals (fn_opasm)
 		|| rr = r.reg,  || ll = l.reg
 		if !rr  and  ll
 			swap (l) (r) // put reg 0 into the left... more convenient.
-		if  l is constany  and  r is constany
-			(Dest is constany) // can come from outside of DoMathSub
+		(Dest  as=  l bitand r bitand asmreg.constany)
 		
 		if rr == ll
 			rz = .EqualsSame(dest, l, r, exp)
@@ -265,13 +264,13 @@ extend ASMState
 			if l is alternate
 				fat.op ++
 		  else
-			|| v = .numtoreg(exp, lmul)
+			|| v = .numtoreg(exp, lmul, asmreg(), datatypecode.uint)
 			if l isnt alternate							// x = lptr + r*12
 				fat = exp.MULT(dest, R, V, L)
 			  else										// x = (lptr - rptr)/12
 				exp.SUB(dest, L, R, ASMReg())
-				|| uint64type = 0, debugger
-				fat = exp.DIVV(dest, ASMReg(), dest, V, uint64type)  
+				|| uinttype = 0, debugger
+				fat = exp.DIVV(dest, ASMReg(), dest, V, uinttype)  
 			  
 		return fat * Dest
 		
@@ -375,10 +374,10 @@ extend ASMState
 
 	function SelfDivide (|asmreg| dest, |message| exp, |asmreg|)
 		if dest.IsInt
-			return .NumToReg(exp, 1, dest) // x/x=1
+			return .NumToReg(exp, 1, dest, datatypecode.int) // x/x=1
 		if !dest.Isbig
-			return .NumToReg(exp, 0x3f800000 /*1.0*/, dest)
-		return .NumToReg(exp, 0x3ff0000000000000 /*1.0 double*/, dest)
+			return .NumToReg(exp, 0x3f800000 /*1.0*/, dest, datatypecode.float)
+		return .NumToReg(exp, 0x3ff0000000000000 /*1.0 double*/, dest, datatypecode.f64)
 		
 
 	function QuickIntDiv    (fn_opasm)

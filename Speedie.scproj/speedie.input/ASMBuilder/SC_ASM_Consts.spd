@@ -39,7 +39,7 @@ extend ASMState
 	function MakeConst2 (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |fn_ASMConstifier| fn,  |asmreg|)
 		|| K = (fn)(l,r)
 		.nop2(r, l)
-		return .numtoreg(exp, k, dest as asmreg.textual)
+		return .numtoreg(exp, k, dest, dest.µtype)
 
 
 	function MakeConst (|&fatasm| fat, |asmreg| reg, |asmreg|)
@@ -71,24 +71,23 @@ extend ASMState
 			if back!=.const // oof
 	
 	
-	function NumToFat (|message| exp, |int64| V, |asmreg| Reg, |&fatasm|)
-		|| DestType = Reg.µtype
-		Reg = .TempTyped(exp, Reg)				// could we do this without typing?
+	function NumToFat (|message| exp, |int64| V, |asmreg| Dest, |datatypecode| SrcType, |&fatasm|)
+		|| Reg = .temponly(exp, dest)
 		|| fat = exp.KNST(reg, 0, 0, 0)
 		fat.Const = v
-		|| SrcType = reg.µtype
+		|| desttype = dest.µtype
 		if  srctype!=desttype  and (reg is ForCast) // ooop
 			fat.ConvertConst(srctype, desttype)
 			reg.µtype = desttype
 		
-		.Makeconst(fat, reg)
+		.Makeconst(fat, dest)
 		return fat
 	
 	
-	function NumToReg (|message| exp, |int64| V, |asmreg| Reg=ASMReg(), |asmreg|)
+	function NumToReg (|message| exp, |int64| V, |asmreg| Reg, |datatypecode| SrcType, |asmreg|)
 		if !v and (!reg.reg)
 			return reg as asmreg.constany
-		return .NumToFat(exp, v, reg).info
+		return .NumToFat(exp, v, reg, SrcType).info
 	
 	
 	function SetConst (|Message| List,  |message| Orig,  |bool|)
@@ -97,7 +96,7 @@ extend ASMState
 		|| ValMsg = regmsg.Next				#require
 		|| Value  = ValMsg.ASMConst
 		
-		.NumToReg(orig, value, RegMsg.Reg.textasm)
+		.NumToReg(orig, value, RegMsg.Reg.textasm, datatypecode.uint64)
 		return true
 	
 	
