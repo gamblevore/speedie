@@ -1,42 +1,59 @@
 	
 
+#!"if (x) return, a(), b()   -->   if !x {a(), b()}, return"
+
 extend ASMState {
 
-// abc(), if (x) return, def()   -->   abc(), if !x {def()}, return
+function ArgOrIf (|message?| other, |asmreg|)
+	opt norefcounts
+	if other
+		|| T = other.asmtype
+		if T != asmtype.kif
+			if other != @arg
+				other = other.first
+			else
+				debugger
+			return ASMType.ARG(self, other)
+		return .IF(other, asmreg())
+	return asmreg()
+
+
+function IfEmpty (|message| cond, |message| other, |asmreg|)
+	if !other
+/		return .µ(cond, asmreg.arg)			// if (x())    -->   x() + discard
+	// optimise branch a little
+	|fatrange| B
+/	.Branch(cond, true, B)
+	if b.never
+		return asmreg() // assume subjumps are sorted out.
+	.argorif(other)
+	B.AllJumpTo(.curr)
+	return asmreg()
+
+
 function If				(fn_asm)
 	opt norefcounts
 	
 	|| cond = exp.first!,  || arg1 = cond.next!
-	|| Else = arg1.next!,  || arg2 = else.first
-	|message| ElseIfCond
-	if arg2 and arg2 != @arg
-		ElseIfCond = arg2
-		arg2 = arg2.next
+	|| Other = arg1.next					// else / elseif
 	
-	|| Flip = !arg1.HasAsmStuff
-		if ElseIfCond		// if (x) {} elseif (y) {yy} else {zz} --> if (!x) {if (y) {yy} else {zz}}
-			arg1 = ElseIfCond
-		  elseif arg2		// if (x) {} else {y()}                --> if (!x) {y()}...
-			arg1 = arg2
-		  else				// if (X) --> {x} // with discard
-			return .µ(cond, asmreg.arg)
-		ElseIfCond = nil
-		arg2 = nil
+	if !arg1.HasAsmStuff
+		return .IfEmpty(cond, other)
 
 	|fatrange| B
-	.Branch(cond, Flip, B)
-	if !b.Constness.KnownFalse
-		ASMType.arg(self, arg1)
-		B.AllJumpTo(.curr)
-		
-	if !b.constness.KnownTrue and (ElseIfCond or arg2.HasAny)
-		|| AfterFirst = (arg1.jump(0), nil)(!b.constness.knownfalse) // skip second branch, cos first branch ran
-		if ElseIfCond
-			.IF(ElseIfCond, asmreg())
-		  else
-			ASMType.ARG(self, arg2)
-		if afterfirst
-			AfterFirst.jumpto = .curr
+	.Branch(cond, B)
+	if b.never
+		return .ArgOrIf(other)
+
+	ASMType.arg(self, arg1)
+	B.AllJumpTo(.curr)
+	if b.always or !other
+		return asmreg()					// were done!
+
+	|| AfterFirst = arg1.jump(0)
+	.argorif(other)
+	AfterFirst.jumpto = .curr
+	
 	return asmreg()
 
 
@@ -60,7 +77,7 @@ function While			(fn_asm)
 
 	|fatrange| LOOP_TEST
 	|| LT = .Branch(exp.first!, true, loop_test)
-	if loop_test.Constness.knownfalse
+	if loop_test.never
 /		.nop(begin, loop_Test.start)
 		return asmreg()
 	
@@ -220,11 +237,11 @@ function UniqueLocation (|message| A, |asmreg| dest, |message| B, |asmreg|)
 	rz.µtype = dest.µtype	
 
 
-function ExistingBool (|message| A, |ASMReg| Dest, |ASMReg|)
-	|| ml = .ExistingVar(A)
-	if ml.isbool and (dest.reg == ml.reg)
-		(ml is negate) = (dest is negate)
-		return ml
+//function ExistingBool (|message| A, |ASMReg| Dest, |ASMReg|)
+//	|| ml = .ExistingVar(A)
+//	if ml.isbool and (dest.reg == ml.reg)
+//		(ml is negate) = (dest is negate)
+//		return ml
 	
 
 function BoolTestAndJump (|message| exp, |asmreg| req, |opmode| opp, |&fatasm|)
@@ -309,7 +326,7 @@ function BoolConst2 (|opmode| Opp, |asmreg| ml,  |asmreg| mr, |asmreg|)
 function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	|fatrange| AndTest
 	rz = .Branch(A, dest is negate, andtest)
-	if !AndTest.Constness.KnownFalse
+	if !AndTest.never
 		.OofBranch(B, dest is negate)
 
 
@@ -317,7 +334,7 @@ function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	|fatrange| OrTest
 	rz = .Branch(A, dest isnt negate, Ortest)
-	if !OrTest.Constness.KnownFalse // opposite const test of expected, cos OR is opposite of AND
+	if !OrTest.never // opposite const test of expected, cos OR is opposite of AND
 		.OofBranch(B, dest is negate)
 		OrTest.AllJumpTo(.curr)	
 
@@ -330,6 +347,14 @@ Struct FatRange
 	|&FatASM|   After
 	|maybebool| Constness
 	
+	function Always (|bool|)
+		opt inline
+		return .constness.knowntrue
+	
+	function Never (|bool|)
+		opt inline
+		return .constness.knownfalse
+				
 	iterator
 		|| curr = .after!
 		while (curr > .start)

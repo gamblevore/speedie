@@ -37,11 +37,9 @@ extend ASMState
 	// would be better if each scop... knew it's constifier
 	// then the ops themselves don't need to call this... just DoMath can
 	function MakeConst2 (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |fn_ASMConstifier| fn,  |asmreg|)
-		|| knst = .NumToFat(exp, 0, dest as asmreg.Textual)
-		(fn)(knst,l,r)
-		.nop(r)
-		.nop(l)
-		return .makeconst(knst, dest)
+		|| K = (fn)(l,r)
+		.nop2(r, l)
+		return .numtoreg(exp, k, dest as asmreg.textual)
 
 
 	function MakeConst (|&fatasm| fat, |asmreg| reg, |asmreg|)
@@ -88,7 +86,7 @@ extend ASMState
 	
 	
 	function NumToReg (|message| exp, |int64| V, |asmreg| Reg=ASMReg(), |asmreg|)
-		if !v and !reg.reg
+		if !v and (!reg.reg)
 			return reg as asmreg.constany
 		return .NumToFat(exp, v, reg).info
 	
@@ -146,54 +144,42 @@ function asmreg.CanAddK (|int64| T, |bool|) // used to be used from .plus()... w
 		return t.CanStoreAsIntImmediate
 
 
-function fatasm.ConstifyIntDiv (fn_ASMConstifier)
-	|int64| C
+function ConstifyIntDiv (fn_ASMConstifier)
 	if l.FourBytes
 		if l.Signed
-			C = l.const|int| / r.const|int|
-		  else
-			C = l.const|uint| / r.const|uint|
-	  else
-		if l.Signed
-			C = l.const|int64| / r.const|int64|
-		  else
-			C = l.const|uint64| / r.const|uint64|
-	.Const = C
+			return l.const|int| / r.const|int|
+		return l.const|uint| / r.const|uint|
+	if l.Signed
+		return l.const|int64| / r.const|int64|
+	return l.const|uint64| / r.const|uint64|
 
 
-function fatasm.ConstifyIntMod (fn_ASMConstifier)
-	|int64| C
+function ConstifyIntMod (fn_ASMConstifier)
 	if l.FourBytes
 		if l.Signed
-			C = l.const|int| mod r.const|int|
-		  else
-			C = l.const|uint| mod r.const|uint|
-	  else
-		if l.Signed
-			C = l.const|int64| mod r.const|int64|
-		  else
-			C = l.const|uint64| mod r.const|uint64|
-	.Const = C
+			return l.const|int| mod r.const|int|
+		return l.const|uint| mod r.const|uint|
+	if l.Signed
+		return l.const|int64| mod r.const|int64|
+	return l.const|uint64| mod r.const|uint64|
 
 
-function fatasm.ConstifyIntMul (fn_ASMConstifier)
+function ConstifyIntMul (fn_ASMConstifier)
 	if l.FourBytes
-		.const = l.const|int| * r.const|int|
-	  else
-		.const = l.const|int64| * r.const|int64|
+		return l.const|int| * r.const|int|
+	return l.const|int64| * r.const|int64|
 
 
-function fatasm.ConstifyBoolMul (fn_ASMConstifier)
-	.const = l.const|bool| * r.const|uint64|
+function ConstifyBoolMul (fn_ASMConstifier)
+	return l.const|bool| * r.const|uint64|
 
-function fatasm.ConstifyIntPlus (fn_ASMConstifier)
+function ConstifyIntPlus (fn_ASMConstifier)
 	if l is alternate
-		.const = l.const - r.const
-	  else
-		.const = l.const + r.const
+		return l.const - r.const
+	return l.const + r.const
 
 
-function fatasm.ConstifyFloatPlus (fn_ASMConstifier)
+function ConstifyFloatPlus (fn_ASMConstifier)
 	if l.fourbytes
 		|| rf = r.F32
 		|| lf = l.F32
@@ -201,58 +187,56 @@ function fatasm.ConstifyFloatPlus (fn_ASMConstifier)
 			lf -= rf
 		  else
 			lf += rf
-		.f32 = lf
-	  else
+		return lf.asint
+	else
 		|| rf = r.F64
 		|| lf = l.F64
 		if l is alternate
 			lf -= rf
 		  else
 			lf += rf
-		.f64 = lf
+		return lf.asint
 
 
-function fatasm.ConstifyFloatDiv (fn_ASMConstifier)
+function ConstifyFloatDiv (fn_ASMConstifier)
 	if l.FourBytes
-		.f32 = l.f32 / r.f32
-	  else
-		.f64 = l.f64 / r.f64
+		return (l.f32 / r.f32).asint
+	return (l.f64 / r.f64).asint
 
 
-function fatasm.ConstifyFloatMul (fn_ASMConstifier)
+function ConstifyFloatMul (fn_ASMConstifier)
 	if l.FourBytes
-		.f32 = l.f32 * r.f32
-	  else
-		.f64 = l.f64 * r.f64
+		return (l.f32 * r.f32).asint
+	return (l.f64 * r.f64).asint
 
 
-function fatasm.ConstifyFloatMod (fn_ASMConstifier)
+function ConstifyFloatMod (fn_ASMConstifier)
 	if l.FourBytes
-		.f32 = l.f32 mod r.f32
+		return (l.f32 mod r.f32).asint
 	  else
-		.f64 = l.f64 mod r.f64
+		return (l.f64 mod r.f64).asint
 
 
-function fatasm.ConstifyBitAnd (fn_ASMConstifier)
-	.const = l.Const & r.const
+function ConstifyBitAnd (fn_ASMConstifier)
+	return l.Const & r.const
 
-function fatasm.ConstifyBitOr (fn_ASMConstifier)
-	.const = l.Const ||| r.const
+function ConstifyBitOr (fn_ASMConstifier)
+	return l.Const ||| r.const
 
-function fatasm.ConstifyBitNot (fn_ASMConstifier)
-	.const = ~l.Const
+function ConstifyBitNot (fn_ASMConstifier)
+	return ~l.Const
 
-function fatasm.ConstifyBitXor (fn_ASMConstifier)
-	.const = l.Const xor r.const
+function ConstifyBitXor (fn_ASMConstifier)
+	return l.Const xor r.const
 
-function fatasm.ConstifyBitSHS (fn_ASMConstifier)
-	.const = l.const >> r.const
+function ConstifyBitSHS (fn_ASMConstifier)
+	return l.const >> r.const
 
-function fatasm.ConstifyBitSHR (fn_ASMConstifier)
-	.const = l.const|uint64| >> r.const|uint64|
+function ConstifyBitSHR (fn_ASMConstifier)
+	return l.const|uint64| >> r.const|uint64|
 
-function fatasm.ConstifyBitSHL (fn_ASMConstifier)
-	.const = l.const|uint64| << r.const|uint64|
+function ConstifyBitSHL (fn_ASMConstifier)
+	return l.const|uint64| << r.const|uint64|
 
 
 

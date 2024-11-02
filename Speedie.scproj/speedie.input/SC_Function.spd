@@ -1538,7 +1538,7 @@ function Tran_IfSub (|message| node, |SCNode| name_space)
 		SubTest.ExpectLast
 		
 		if SubTest == "elseif"
-			subtest.ASMType = ASMType.kelseIf		// for the ASM
+			subtest.ASMType = ASMType.kIf		// for the ASM
 			Tran_IfSub(SubTest, name_Space)
 		  else // "else" branch
 			|| ElseArg = SubTest.first

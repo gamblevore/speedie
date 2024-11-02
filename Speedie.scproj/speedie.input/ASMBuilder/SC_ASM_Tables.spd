@@ -148,9 +148,9 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 	if sr is ConstAny
 		|| srf = sr.needfat
 		if floatness == 0
-			|| sh = 64 - oc
+			|| sh = 64 - nc
 			|| oof = srf.Const << sh
-			srf.Const = (oof|int64| >> sh, oof|uint64| >> sh)(sr.Signed) // shift up and down
+			srf.Const = (oof|int64| >> sh, oof|uint64| >> sh)(dest.Signed) // shift up and down
 		  elseif floatness == 3
 			srf.FloatConvConst(srf, NC)
 		  else
@@ -318,19 +318,20 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 
 	
 
-function BoolNot		(fn_asm)						// !a
+function BoolNot (fn_asm)						// !a
 	opt	NoRefCounts
-	|| src = .µ(exp, dest.negate)
+	dest = dest.negate
+	|| src = .µ(exp, dest)
 	if src is AlreadyNegated
 		return src
 	return .exists(dest, src, exp)
 	
 
-function BitNot				(fn_asm)					// ~a
+function BitNot (fn_asm)					// ~a
 	return .DoMathSub(exp, dest as asmreg.SingleExpr, scoperator.bnot.asm!)
 
 
-function Negative			(fn_asm)					// -a
+function Negative (fn_asm)					// -a
 	return .DoMathSub(exp, dest as asmreg.singleexpr, scoperator.Negative.asm!)
 
 
@@ -456,7 +457,6 @@ helper ASMState.DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMR
 	|| mr = ASMReg()
 	|| TmpCloser = .VTmps
 	|| DiscardMode = dest & AsmReg.Discard
-	if "VarConst".trap
 	if dest is SingleExpr
 		ml = .µ(exp, DiscardMode)
 	  else
@@ -548,8 +548,17 @@ function ASMState.ExistingVar (|message| m, |asmreg|)
 function message.HasAsmStuff (|bool|)
 	opt norefcounts
 	for ch in self
-		if ch.func != @sheb
+		|| fn = ch.brafunc
+		if fn != @sheb and @num and @char
 			return true
+		
+function message.brafunc (|syntax|)
+	opt norefcounts
+	while self
+		|| fn = .func
+		if fn != @bra
+			return fn
+		self = .first
 
 
 function FatASM.ConvertConst (|datatypecode| Oldtype, |datatypecode| Newtype)

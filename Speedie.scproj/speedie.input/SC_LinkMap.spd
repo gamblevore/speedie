@@ -56,11 +56,6 @@ module LinkMap
 				if !inbranch
 					|| T = msg.ASMType
 					InBranch = (t == ASMType.kIf or ASMType.kwhile or ASMType.ktern)
-								// how do we check that this isnt recursive?
-								// seems to do this, we need to go over the entire program
-								// anytime we wanna add a function! like if we call .parse
-								// now we gotta test every other function... its not so simple is it.
-								// We could just do it 1 level deep? 
 				CollectFromSource(Self, msg, inbranch)
 		
 

@@ -19,8 +19,8 @@ function AndOrConsts (|int|)
 
 
 function VarConst (|int| a)
-	|| x = 11
-	|| y = 12
+	|| x = 11 // opt this later.
+	|| y = 12 // during the opt-phase
 	|| z = y<<x
 	|| w = a<<x
 
@@ -107,6 +107,7 @@ function ForeignFuncs (|string?| x, |string?| y, |string|)
 	return e + d // fails?
 
 function Mul (|int| a, |int| b, |int| c, |int| d, |int|)
+	|| x = 12 * 10
 	return ((a + b) * c) / d
 
 function Math (|int| a, |int| b, |int|)
@@ -279,7 +280,8 @@ function YesBasic10 (|int|)
 	
 
 function YesBasic11 (|int|)
-	|| x = 0+0+0+1+2+3+4 // 10
+	|| x = 12 * 10
+	|| y = 0+0+0+1+2+3+4 // 10
 	return x
 	
 function YesBasic12 (|int|)

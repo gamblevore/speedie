@@ -138,6 +138,11 @@ struct ASMState
 		if r.reg
 			debugat // bad!
 	
+	function Nop2 (|asmreg| A, |asmreg| B)
+		.nop(A)
+		.nop(B)
+		.nop(A) // in case of swapped order
+	
 	function NopConst (|asmreg| R, |int64|)
 		|| f = r.fat
 			.Nop(f)
@@ -145,7 +150,7 @@ struct ASMState
 		if r.reg
 			debugat // bad!
 	
-	function Nop (|fatasm| R)
+	function Nop (|FATASM| R) //!!
 		r.op = asm.noop
 		r.jumpreg = 0
 		|| C = .curr - 1
@@ -186,7 +191,6 @@ struct ASMState
 		cpp_part GetASM
 		|| fn = fn_asm_table[exp.ASMType]!
 		|| TmpCloser = .VTmps
-//		if "consts".trap
 		|| ss = (fn)(self, exp, dest)
 		if dest isnt StayOpen
 			.CloseVTmps(TmpCloser)
@@ -197,7 +201,7 @@ struct ASMState
 				if (ss isnt constany)
 					debugger
 					(fn)(self, exp, dest)
-			if exp.asmtype < ASMType.kElseIf and ss != asmreg()
+			if exp.asmtype < ASMType.kIf and ss != asmreg()
 				|| ty = exp.ASMDecl.typeonly
 				|| sst = ss.µtype
 				|| dt = dest.µtype

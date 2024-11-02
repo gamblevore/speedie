@@ -24,7 +24,6 @@ datatype ASMType (uint16)
 		kPointer
 		kTern
 		kStatExpr
-		kElseIf
 		kIf
 		kWhile
 		kContinue
