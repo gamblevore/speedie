@@ -87,17 +87,15 @@ function Return (fn_asm)
 	opt norefcounts
 	|| reg = ASMReg()
 	|| f = exp.first
-		reg = .µ(f, .ReturnASM|asmreg| as AsmReg.ForReturn)
+		|| ret = .ReturnASM|asmreg| as AsmReg.ForReturn
+		reg = .µ(f, ret)
 	
+	|| K = .const(reg, 6, true) // return true, or -1 or whatever
+		reg = asmreg()
+	  else
+		k = 0
 	|| amount = (f!=nil)|int|
-	if reg is ConstAny
-		|| K = reg.const // return true, or -1 or whatever
-		if k and k.fits(15)
-			.nop(reg)
-			exp.RET(reg, asmreg(), asmreg(), amount, K)
-			return asmreg()
-			
-	exp.RET(reg, asmreg(), asmreg(), amount, 0)
+	exp.RET(reg, asmreg(), asmreg(), amount, K)
 	return asmreg()
 	
 
@@ -186,8 +184,11 @@ function Decl (fn_asm)
 	exp = exp.last!
 	|| ty = exp.first!.fastdecl
 	dest = .DeclareMe(Exp, ty) as ASMReg.decl
-	(dest as= asmreg.neveraltered * (ty isnt altered))
-	return .µinto(exp.last!, dest)
+	if (ty isnt altered) and (ty is local)
+		(dest as= asmreg.neveraltered)
+	rz = .µinto(exp.last!, dest)
+	if dest is neveraltered
+		.neveraltered[.VDecls] = .last.index
 
 
 
@@ -242,14 +243,15 @@ function SetRel	(fn_asm)	// function relset (
 		return .µinto(B, X)
 
 	dest = .µ(B, X)
-	.µ(A, dest as AsmReg.set)
+	return .µ(A, dest as AsmReg.set)
 
 
 function Num (fn_asm)
 	opt norefcounts
 	|| d = exp.ASMDecl
-	dest.µtype = d.typeonly
-	return .numtoreg(exp, d.exportposition, dest, dest.µtype) 
+	|| T = d.typeonly
+	dest.µtype = T
+	return .numtoreg(exp, d.exportposition, dest, T)
 
 
 function Thg (fn_asm)
@@ -266,7 +268,12 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
 	|| d = exp.ASMDecl
 	if d is local
-		return d.wholetype
+		|| T = d.wholetype
+		if d isnt altered
+			(T is neveraltered) = true // what about carrays?
+			t.FatIndex = .neveraltered[t.reg]
+		(t is param) = (d is param)
+		return T
 	
 	if d is const
 		(dest is constany)
@@ -275,7 +282,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	rz = d.typeonly.zero
 	check (d is global) (Exp)
 	DoGlobal(self, exp, dest, d)
- 
+
 
 helper DoGlobalSub (|&FATASM| addr, |int| add, |message| exp,  |asmreg|)
 	|| Reg = addr.info
@@ -457,6 +464,7 @@ helper ASMState.DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMR
 	|| mr = ASMReg()
 	|| TmpCloser = .VTmps
 	|| DiscardMode = dest & AsmReg.Discard
+	if exp.objectid == 16838248
 	if dest is SingleExpr
 		ml = .µ(exp, DiscardMode)
 	  else
@@ -465,19 +473,19 @@ helper ASMState.DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMR
 	.CloseVTmps(TmpCloser)
 	
 	if dest is Discard
+		.nopconst(mr)
+		.nopconst(ml)
 		return dest & ASMReg.discard // no need to do anything:   {a() + b()}
 	
 	if dest isnt CondRequest
 		dest = .TempTyped(exp, dest)
-		(dest is FromMath)
 	if  ml is ConstAny  and  mr is ConstAny
-		(Dest is MathConst)
+		(Dest is constany) // do the bitand trick... later
 	
-	// what if the operator is and/or?
 	target debug:if ml.floatness != mr.floatness							// Shouldn't happen.
 	rz = (fn)(self, dest, ml, mr, exp.second!)
 	target debug
-		if dest is MathConst  and  rz isnt MathConst		// hmm?
+		if dest is Constany  and  rz isnt Constany		// hmm?
 			debugger, (fn)(self, dest, ml, mr, exp.second!)
 
 
@@ -569,47 +577,43 @@ function FatASM.ConvertConst (|datatypecode| Oldtype, |datatypecode| Newtype)
 
 
 function FatASM.FloatConvConst (|&FatASM| src, |int| DestBitSize)
-	|| f = (&src.Const)|&nil|
-	|| d = (&.Const)|&nil|
+	|| f = (&src._Const)|&nil|
 	if DestBitSize == 64			// f32 to f64
-		d|&f64|[]   = f|&float|[]|Float64|
+		.f64   = f|&float|[]|Float64|
 	  elseif DestBitSize == 32		// f64 to f32
-		d|&float|[] = f|&f64|[]|float|
+		.f32 = f|&f64|[]|float|
 	  else
 		error (src.msg)
 
 
 function FatASM.FloatIntConvConst (|&FatASM| fat, |datatypecode| src, |datatypecode| dest)
 	|| dbc = dest.ByteCount
-	|| f = (&fat.Const)|&nil|
-	|| d = (&.Const)|&nil|
+	|| f = (&fat._Const)|&nil|
 	if src.IsInt
 		|| v = fat.Const
 		if src.IsSigned
 			if dbc == 4
-				(d|&float|)[] = v|float|				// i to f32
+				.f32 = v|float|					// i to f32
 			  else
-				(d|&f64|)[] = v|Float64|					// i to f64
+				.f64 = v|Float64|				// i to f64
 		  else
 			if dbc == 4
-				(d|&float|)[] = v|uint64||float|		// u to f32
+				.f32 = v|uint64||float|			// u to f32
 			  else
-				(d|&f64|)[] = v|uint64||Float64|			// u to f64
+				.f64 = v|uint64||Float64|		// u to f64
 	  else
-		|| i = d|&int64|
-		|| u = d|&uint64|
 		if dbc == 4
 			|| f32 = f|&float|
 			if dest.IsSigned
-				i[] = f32[]|int|						// f32 to i
+				.const = f32[]|int|				// f32 to i
 			  else
-				u[] = f32[]|int|						// f32 to u
+				.const = f32[]|int|				// f32 to u
 		  else
 			|| f64 = f|&f64|
 			if dest.IsSigned
-				i[] = f64[]|int64|						// f64 to i
+				.const = f64[]|int64|			// f64 to i
 			  else
-				u[] = f64[]|uint64|						// f64 to u
+				.const = f64[]|uint64|			// f64 to u
 
 
 function DataTypecode.ASMConv (|Datatypecode| To, |int|)

@@ -183,8 +183,8 @@ datatype Ind (int) // an INDex. And an INT.
 	false -1
 	syntax cast (|bool|)
 		return self >= 0
-	function Exists (|bool|)
-		return self >= 0
+//	function Exists (|bool|)
+//		return self >= 0
 
 
 struct RetroFloat
@@ -708,6 +708,11 @@ datatype uint64
 //	operator ror (|uint| bits, |uint64|)
 //		bits &= 63
 //		return ((self >> bits) ||| (self << (64 - bits)))
+
+
+	function Trim (|int| B, |uint64|)
+		B = 64-B
+		return (self << B) >> B
 
 	function XorByte (|byte|)
 		|uint| x = (self >> 32) xor self

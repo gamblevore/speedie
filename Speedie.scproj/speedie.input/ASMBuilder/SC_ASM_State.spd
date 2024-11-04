@@ -18,6 +18,7 @@ struct ASMState
 	|&FatASM|					Curr    
 	|&FatASM|					End    
 	|FATASM| 					Zero
+	|int[32]|					NeverAltered
 // constants...
 
 	constants
@@ -143,12 +144,18 @@ struct ASMState
 		.nop(B)
 		.nop(A) // in case of swapped order
 	
-	function NopConst (|asmreg| R, |int64|)
-		|| f = r.fat
-			.Nop(f)
-			return f.const
-		if r.reg
-			debugat // bad!
+	function Const (|asmreg| R, |int| bits, |bool| signed, |ind|)
+		if R & asmreg.KindaConst
+			|| k = R.const
+			if k.fits(bits, signed)
+				if r is ConstAny
+					.nop(R)
+				return k|uint64|.trim(bits)
+
+	function NopConst (|asmreg| R)
+		if r is constany
+			|| f = r.fat
+				.Nop(f)
 	
 	function Nop (|FATASM| R) //!!
 		r.op = asm.noop
@@ -197,6 +204,10 @@ struct ASMState
 
 		target debug
 			check (ss) (self, exp, "µInto failed")
+			if (ss is constany) and ss.reg
+				if !ss.fat
+					debugger
+					(fn)(self, exp, dest)
 			if !ss.reg and (ss isnt condanswer)
 				if (ss isnt constany)
 					debugger
@@ -369,6 +380,8 @@ function ASMState.StartFunc (|scfunction| fn)
 	.zero = nil
 	.zero.info = AsmReg()
 	(.zero is NeverAltered)
+	memory.Fill((&.neveraltered[0])|&byte|, –sizeof .neveraltered, 0)
+	.neveraltered[0] = .zero.Index
 	.FuncStart = .curr
 	.LastProgress = .curr
 	scfunction.currfunc = fn

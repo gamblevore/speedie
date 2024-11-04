@@ -49,7 +49,7 @@ extend ASMState
 
 
 	function EqualsSame (fn_opasm)
-		return .numtoreg(exp, (dest isnt negate)|int|, dest, datatypecode.bool)
+		return .NumToReg(exp, (dest isnt negate)|int|, dest, datatypecode.bool)
 	
 	
 	function Equals (fn_opasm)
@@ -471,14 +471,10 @@ extend ASMState
 	
 	
 	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
-		|int64| k
-		if r.reg and (r is ConstAny)
-			k = r.const
-			if k.fits(9, op!=asm.bor) // we want bitor unsigned
-				.nop(r)
-				r = asmreg()
-			  else
-				k = 0
+		|| k = .const(R, 9, op!=asm.bor)
+			r = asmreg()
+		  else
+			k = 0
 		|| fat = exp.BAND(dest, L, R, k) 
 		fat.op = op
 		return fat * Dest
@@ -487,8 +483,8 @@ extend ASMState
 	function SHR  (fn_opasm)
 		if dest is constany
 			return .MakeConst2(dest, l, r, exp, (ConstifyBitSHS, ConstifyBitSHR)(l.signed))
-		if r is ConstAny
-			return .BFLG_Const(exp, dest, l, 0, .nopconst(r))
+		|| K = .const(R, 6, false)
+			return .BFLG_Const(exp, dest, l, 0, k)
 		
 		|| op = (asm.BSHS, asm.BSHR)(l.signed)
 		return .BitMaker(dest, l, r, exp, op)
@@ -497,8 +493,8 @@ extend ASMState
 	function SHL  (fn_opasm)
 		if dest is constany
 			return .MakeConst2(dest, l, r, exp, ConstifyBitSHL)
-		if r is ConstAny
-			return .BFLG_Const(exp, dest, l,  .nopconst(r), 0)
+		|| K = .const(R, 6, false)
+			return .BFLG_Const(exp, dest, l,  K, 0)
 		
 		return .BitMaker(dest, l, r, exp, asm.bshl)
 
@@ -521,7 +517,6 @@ extend ASMState
 
 	function Zeros (|asmreg| dest, |message| exp, |asmreg|)
 		(Exp)
-//		if dest is frommath // just do it always?
 		dest.reg = 0
 		(dest is constany)
 		return dest // ???
@@ -549,7 +544,3 @@ function int64.Fits (|int| amount, |bool| signed=true,  |bool|)
 		x = self|uint64| >> sh
 	return x == self
 
-
-function asmreg.IsConst (|int64| val, |bool|)
-	return  (self is ConstAny) and (.const == val)
-	

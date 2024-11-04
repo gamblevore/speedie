@@ -98,4 +98,6 @@ function compiler.CompileTime
 
 	if stderr.ok
 		TransCompiler.ExportAndInstall(elapsed)
+		if stderr.ok
+			stringcorrector.CorrectStrings
 

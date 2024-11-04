@@ -3,12 +3,15 @@
 module ASMExamples {
 
 target pack { 
+function AskConst (|int| x)
+	|| y = 14
+	|| z = x << y
+	
 function AndOrConsts (|int|)
 	visible
-
-	|| f1 = 0 and 5 // test consts
+	|| f1 = 0 and 5
 	|| f2 = 6 and 0
-	|| f3 = 0 and 0
+	|| f3 = 0 and 0 // these first 3 should be optimised of the add!
 	|| T4 = 7 and 8
 	|| T5 = 0 or  3
 	|| T6 = 4 or  0

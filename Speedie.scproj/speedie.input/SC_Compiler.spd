@@ -179,7 +179,7 @@ function CompileAll (|bool|)
 
 	require .Stage( "String Correction" )
 	PackMaker.AddAll
-	StringCorrector.Correct
+	StringCorrector.Correctconsts
 	
 	if Options.ModePack
 		.Timer( "Export Pack" )

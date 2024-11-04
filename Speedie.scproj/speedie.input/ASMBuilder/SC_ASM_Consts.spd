@@ -49,7 +49,7 @@ extend ASMState
 
 	
 	function fatasm.TryRotateConst
-		|| v = .const
+		|| v = .const|uint64|
 		|| OtherInv = (~v, v)(v>>63)
 		require otherinv >> 17
 		
@@ -72,13 +72,13 @@ extend ASMState
 	
 	
 	function NumToFat (|message| exp, |int64| V, |asmreg| Dest, |datatypecode| SrcType, |&fatasm|)
-		|| Reg = .temponly(exp, dest)
-		|| fat = exp.KNST(reg, 0, 0, 0)
+		dest = .temponly(exp, dest)
+		|| fat = exp.KNST(dest, 0, 0, 0)
 		fat.Const = v
 		|| desttype = dest.µtype
-		if  srctype!=desttype  and (reg is ForCast) // ooop
+		if  srctype!=desttype  and (dest is ForCast) // ooop
 			fat.ConvertConst(srctype, desttype)
-			reg.µtype = desttype
+			dest.µtype = desttype
 		
 		.Makeconst(fat, dest)
 		return fat
@@ -86,7 +86,7 @@ extend ASMState
 	
 	function NumToReg (|message| exp, |int64| V, |asmreg| Reg, |datatypecode| SrcType, |asmreg|)
 		if !v and (!reg.reg)
-			return reg as asmreg.constany
+			return reg as (asmreg.constany as asmreg.param)
 		return .NumToFat(exp, v, reg, SrcType).info
 	
 	

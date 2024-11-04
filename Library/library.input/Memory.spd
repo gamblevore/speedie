@@ -229,12 +229,14 @@ class Memory
 			if rz
 				random.shared.temporal(rz)
 		
+		helper _memset	 (|&byte| p, |byte| B, |int| n):				cpp_wrapper memset
+		function Fill	 (|&byte| p, |int| n, |byte| B):				._memset(p, b, n)
 		function FillInt (|&int| p, |int| n, |int| Pattern):			cpp_wrapper JB_FillInts
 		function Unmap	 (|&nil| p, |int| n):							cpp_wrapper JB_munmap
 		function Zalloc  (|int| n, |?&byte|)
 			return byte.zalloc(n)
 		function Realloc (|?&nil| b, |int| n, |?&byte|):				cpp_wrapper JB_realloc
-		function Free	 (|?&nil| b):								cpp_wrapper JB_free
+		function Free	 (|?&nil| b):									cpp_wrapper JB_free
 		function Zero	 (|&nil| addr, |int| n):						cpp_wrapper memzero (||)
-		function Copy	 (|&nil| dest, |&nil| src, |int| N):		cpp_wrapper memcpy
+		function Copy	 (|&nil| dest, |&nil| src, |int| N):			cpp_wrapper memcpy
 

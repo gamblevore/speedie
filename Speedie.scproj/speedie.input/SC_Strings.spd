@@ -536,11 +536,6 @@ module StringCorrector
 				.CollectString(def, d.IsLib)
 	
 	
-	function Correct
-		.CorrectConsts
-		.CorrectStrings
-
-
 	function CorrectStrings
 		|| f = (compiler.GeneratedCppsFolder, Compiler.BaseProjectPath)(Options.SingleFileInput)!
 		|| strs = f[".strings.txt"]

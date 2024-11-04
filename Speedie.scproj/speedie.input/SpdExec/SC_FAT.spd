@@ -5,7 +5,7 @@ struct FatASM
 		cpp_part FAT
 	|ASMReg| 			Info		// only needs 32-bits of this. Could we make a smaller asmreg?
 	|message--| 		Msg
-	|uint64| 			Const
+	|uint64| 			_Const
 	|uint[7]|			R
 	|uint|				ASMIndex	
 	|uint16| 			BlockNum		// remove?
@@ -34,20 +34,29 @@ struct FatASM
 		.info = info
 		return info
 	
+	function Const (|int64|)
+		opt norefcounts
+		return ._const
+		
+	function Const (assigns:|int64|)
+		opt norefcounts
+//		if value == 9218868437227405312
+		._const = value
+
 	function F32 (assigns:|float|)
 		if !value: value = 0			// rationalise
-		((&.const)|&float|)[] = Value
+		.const = value.AsInt
 
 	function F64 (assigns:|Float64|)
 		if !value: value = 0			// rationalise
-		((&.const)|&f64|)[] = Value
+		.const = value.AsInt
 		
 	function F32 (|float|)
-		rz = ((&.const)|&float|)[]
+		rz = ((&._const)|&float|)[]
 		if !rz: rz = 0					// rationalise
 
 	function F64 (|Float64|)
-		rz = ((&.const)|&f64|)[]
+		rz = ((&._const)|&f64|)[]
 		if !rz: rz = 0					// rationalise
 		
 	setter Debug (|message|)
