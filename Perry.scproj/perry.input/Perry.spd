@@ -9,6 +9,7 @@ module Perry
 	|Dictionary of String|			PathDict
 	|listviewrow|					RecentProjects=message()
     |bool|							Checked	
+    |bool|							FinishedStartUp
     |byte| 							FindID
 	
 	constants
@@ -113,10 +114,12 @@ module Perry
 
 		if !.LoadWindowsFromArgs and !.LoadWindowsSub()
 			startupwindow.show
-			return 0
-		|| oof = (.FindProj(old),  .Projects.First)(old)
-			|| ide = oof.ide
-			ide.showide
+		  else
+			|| oof = (.FindProj(old),  .Projects.First)(old)
+				|| ide = oof.ide
+				ide.showide
+		
+		perry.FinishedStartUp = true
 			
 
 

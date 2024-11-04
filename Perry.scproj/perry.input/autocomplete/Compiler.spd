@@ -85,8 +85,9 @@ extend PerryIDE
 		newlist ?= Error()
 		.errorlist.listsource = newlist
 		.UpdateErrorCount
-		if RealCompile or .ErrorList isnt Visible
-			beep
+		if .IsFront
+			if RealCompile or .ErrorList isnt Visible
+				beep
 		.ShowErrors
 
 
