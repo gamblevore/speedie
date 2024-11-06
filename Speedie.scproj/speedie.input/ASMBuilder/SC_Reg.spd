@@ -29,7 +29,7 @@ datatype ASMReg (uint64)
 		KindaConst = [ConstAny, NeverAltered]
 		TrueConstCond
 		ContainsAddr
-		AddrRequest
+		AddrNeed = [AddrRequest, AddrForceRequest]
 		Textual
 		Arg				= Discard				// ||| SrcConst
 		CondRequest
@@ -150,10 +150,7 @@ datatype ASMReg (uint64)
 			return self as r
 		  else
 			return self asnt r
-			
-	function RequestPos (|asmreg|)
-		return self as addrrequest
-	
+		
 	function datatypecode.zero (|asmreg|)
 		rz.µtype = self
 	
@@ -162,8 +159,8 @@ datatype ASMReg (uint64)
 		return self
 		
 	function HaveAddr (|asmreg|)
-		rz = self asnt AsmReg.AddrRequest
-		rz = rz as AsmReg.ContainsAddr
+		rz = self asnt AddrNeed
+		rz = rz as ContainsAddr
 	
 	function Reg (|int|)
 		return (self|uint64| >> 11)&31

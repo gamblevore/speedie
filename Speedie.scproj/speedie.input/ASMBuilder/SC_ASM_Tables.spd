@@ -31,7 +31,6 @@ dispatch fn_asm_table (fn_asm)
 
 	(ASMType.kSetRel):		ASMType.SetRel
 	(ASMType.kStatExpr): 	ASMType.StatExpr
-	(ASMType.kPointer):		ASMType.Pointer
 	(asmtype.kRefCount):	ASMType.RefCount
 
 	(ASMType.kIgnore):		ASMType.Ignore
@@ -157,25 +156,10 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 		return .makeconst(srf, dest)
 		
 	
-	|&fatasm| fat
 	if oldtype.isfloat or newtype.isfloat
-		fat = exp.CONV(dest, sr, oldtype.asmconv(newtype))
-	  else
-		|| sh = 64 - oc
-		fat = exp.BFLG(dest, sr, sh, sh, sr.signed|int|)
-
-	return fat * dest
-
-
-
-function Pointer (fn_asm) // this is unused these days???
-	// *a, x = *(a.b) 
-	opt	NoRefCounts
-	debugger // remove this func?
-	if dest is AddrRequest // hmmm?
-	dest = .TempTyped(exp, dest)
-	|| Ptr = .µ(exp.first!, dest)
-	return Dest.ReadOrWrite(exp,ptr, asmreg())
+		return exp.CONV(dest, sr, oldtype.asmconv(newtype))*dest
+	|| sh2 = 64 - oc
+	return exp.BFLG(dest, sr, sh2, sh2, sr.signed|int|) * dest
 
 
 
@@ -207,12 +191,16 @@ function Arg (fn_asm)
 function Access (fn_asm)						// a[b], struct.mem[b]
 	opt	NoRefCounts
 	dest = .TempTyped(exp, dest)
-
-	|| Ptr = .µ(exp.first!, dest.RequestPos)		// x = a.b[0]
-	check (ptr is ContainsAddr) (exp)
-	|| vara = .µ(exp.second!, ptr • dest)
+	
+	|| f = exp.first!
+	target debug
+		|| d = f.asmdecl
+		if !d.pointercount
+	|| Ptr = .µ(f, dest)				// x = a.b[0]
+	|| sc = exp.second.first!
+	|| vara = .µ(sc)
 	if (dest is AddrRequest)
-		return .Plus(dest.HaveAddr, ptr, vara, exp)
+/		return .Plus(dest.HaveAddr, ptr, vara, exp)
 	
 	return Dest.ReadOrWrite(exp, ptr, vara, 0)
 
@@ -227,14 +215,14 @@ function Dot (fn_asm)						// a.b
 	
 	|int64| Pos = prop.exportposition
 	if pos <= 0 // what?
-	if dest is AddrRequest
+	if (dest is AddrRequest) or prop.iscarray
 /		pos *= t.ByteCount
 		return exp.ADDK(dest, obj, pos).HaveAddr * dest
 
 	return Dest.ReadOrWrite(exp, obj, asmreg(), pos)
 		
 
-function SetRel	(fn_asm)	// function relset (
+function SetRel (fn_asm)	// function relset (
 	opt	norefcounts									//   x[func()] = y++
 	|| A = exp.first!
 	|| B = exp.last!
@@ -242,6 +230,8 @@ function SetRel	(fn_asm)	// function relset (
 	if X.reg
 		return .µinto(B, X)
 
+	debugat 5
+	
 	dest = .µ(B, X)
 	return .µ(A, dest as AsmReg.set)
 
@@ -269,11 +259,13 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	|| d = exp.ASMDecl
 	if d is local
 		|| T = d.wholetype
-		if d isnt altered
-			(T is neveraltered) = true // what about carrays?
-			t.FatIndex = .neveraltered[t.reg]
 		(t is param) = (d is param)
-		return T
+		if (d isnt altered) and (d isnt param)			// what about params?
+			(T is NeverAltered) = true					// what about carrays?
+			t.FatIndex = .NeverAltered[t.reg]
+		if dest isnt addrneed
+			return T
+		return exp.addr(dest, t, dest, t) * dest.haveaddr
 	
 	if d is const
 		(dest is constany)
@@ -386,7 +378,7 @@ function IncrAmount (|asmreg| upon, |int| IsSubtract, |scdecl| D,  |int64|)
 function Incrementatulatorifier		(fn_asm)				// --a++
 	visible
 	opt	NoRefCounts
-	|| Src = .µ(exp, dest.RequestPos)
+	|| Src = .µ(exp, dest as asmreg.addrrequest)
 	|| Amount = IncrAmount(src, mode, exp.ASMDecl)
 	if src is ContainsAddr
 		return IncrOnAddr(self, exp, dest, mode, src, amount)
@@ -416,7 +408,7 @@ function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 	|| n = exp.name[]
 	|| F = exp.first!
 	if n == '&'
-		return .µ(F, dest.requestpos)
+		return .µ(F, dest as asmreg.addrneed)
 	if n == '~'
 		return BitNot(self, f, dest)
 	if n == '!'
@@ -464,7 +456,6 @@ helper ASMState.DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMR
 	|| mr = ASMReg()
 	|| TmpCloser = .VTmps
 	|| DiscardMode = dest & AsmReg.Discard
-	if exp.objectid == 16838248
 	if dest is SingleExpr
 		ml = .µ(exp, DiscardMode)
 	  else

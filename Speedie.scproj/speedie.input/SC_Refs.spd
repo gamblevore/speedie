@@ -326,9 +326,6 @@ function Message.SetType (|DotUseType|)
 		return d
 	if .func == @acc
 		return DotUseType.memory
-	if self isbrel "*"
-		if .ASMType!=ASMType.kPointer // what?
-		return DotUseType.memory
 
 
 function Message.DotType (|DotUseType|)

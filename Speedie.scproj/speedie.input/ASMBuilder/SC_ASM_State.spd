@@ -17,15 +17,32 @@ struct ASMState
 	|&FatASM|					Start		// a "slice" feature would be nice    
 	|&FatASM|					Curr    
 	|&FatASM|					End    
+// constants...
 	|FATASM| 					Zero
 	|int[32]|					NeverAltered
-// constants...
 
 	constants
 		kContinue = 254
 		kExit = 255
 	
-	function CloseVDecls (|int| i)
+	
+//	function fatasm.MoveRegDown (|int| r)
+//		// any regs above this, can be moved down by 1... assuming they are not tmps?
+//		// how to tell if a reg is a tmp or not?
+//		// not so easy. Maybe better to regenerate that section.
+//
+//
+//	function MoveRegDown (|int| r, |fatasm| start)
+//		|| After = .curr
+//		while start < After
+//			start.MoveRegDown(r)
+//			Start++
+//		
+//		
+	function CloseVDecls (|int| i, |bool|)
+		|| top = .vdecls
+		while top > i
+			.NeverAltered[top--] = 0
 		.VDecls = i
 
 	function CloseVTmps (|int| i)
@@ -131,6 +148,7 @@ struct ASMState
 		check (r > .vdecls) (where, "No free local variables.")
 		t.reg = r
 		.vtmps = r
+		(t is temp)
 		return t
 	
 	function Nop (|asmreg| R)
@@ -195,7 +213,7 @@ struct ASMState
 		opt norefcounts
 		target !debug
 			opt inline
-		cpp_part GetASM
+		cpp_part GetASM 
 		|| fn = fn_asm_table[exp.ASMType]!
 		|| TmpCloser = .VTmps
 		|| ss = (fn)(self, exp, dest)
@@ -212,6 +230,8 @@ struct ASMState
 				if (ss isnt constany)
 					debugger
 					(fn)(self, exp, dest)
+			if dest is set
+				return ss // no need test.
 			if exp.asmtype < ASMType.kIf and ss != asmreg()
 				|| ty = exp.ASMDecl.typeonly
 				|| sst = ss.µtype

@@ -6,55 +6,54 @@ extend_module ASMType
 		opt	NoRefCounts
 		|| prms = exp.last!
 		|| fn = prms.obj|SCFunction|!
-		|| A = .µ(prms.first!, dest)
-
-		if fn == Compiler.RefIncr
-			target debug: if A is ContainsAddr					// always a reg!
-			return exp.RFRG(a, a, 1, 0, 0, 0)
-
-		|| offset = 0 // needs to be set still
-		if fn == Compiler.RefDecr
-			if a is ContainsAddr // do we need addrrequest?
-				return exp.RFDC(a, 1, offset)					// SHOULD do decrmulti in destructors/carrays
-			return exp.RFRG(a, a, 0, 0, 1, 1)					// (but refcounter doesnt do it yet)
-
-		if fn == Compiler.RefSafeDecr
-			target debug: if a is ContainsAddr					// always a reg!
-			return exp.RFRG(a, a, 0, 0, 0, 1)
-
-		if fn == Compiler.RefFreeIfDead
-			target debug: if a is ContainsAddr					// always a reg!
-			return exp.RFRG(a, a, 0, 0, 1, 0)
-
-		if fn == Compiler.RefIncr2
-			|| B = .µ(prms.second!)
-			target debug: if a isnt ContainsAddr				// always memory
-			target debug: if b is ContainsAddr					// always reg
-			return exp.RFWR(a, b, 0, offset)
-
-		if fn == Compiler.RefClear
-			target debug: if a isnt ContainsAddr				// always an addr
-			return exp.RFWR(A, ASMReg(), offset, 1)				// set mem to nil
-	
-		if fn == Compiler.RefDecrMulti							// seems unused
-			|| BD = prms.second!.asmdecl
-			target debug: if a isnt ContainsAddr				// always memory
-			target debug: if bd isnt const						// always const!!
-			return exp.RFDC(a, bd.ExportPosition, offset)	
 			
-		if fn == Compiler.RefSetRef								// full refcounts
+		if fn == Compiler.RefSetRef	or compiler.refclear
+			|| offset = 0
+			|| A = asmreg()
+			if fn == Compiler.RefSetRef
+				A = .µ(prms.first!, asmreg.AddrRequest)
 			|| second = prms.second!
 			|| B = .µ(second, asmreg.AddrRequest)
 			if a is ContainsAddr
 				if b is ContainsAddr
 					|| where = .TempTyped(second)
-					b = where.Read(exp, b, asmreg()) * where	// mem to reg (only)
-				return exp.RFWR(A, B, 1, offset)				// reg to mem (full refcount)
+					b = where.Read(exp, b, asmreg()) * where		// mem to reg (only)
+				return exp.RFWR(A, B, 1, offset)					// reg to mem (full refcount)
+		
+			if b is ContainsAddr									// mem to reg
+				return exp.RFRD(a, b, 1, offset)	
+			return exp.RFRG(a, a, 1, 1, 1, 1)						// reg to reg
+		
+		if fn == Compiler.RefIncr2 or Compiler.RefDecrMulti
+			|| A = .µ(prms.first!, asmreg.addrneed)
+			|| offset = 0 // needs to be set still
+			if fn == Compiler.RefIncr2
+				|| B = .µ(prms.second!)
+				target debug: if a isnt ContainsAddr				// always memory
+				target debug: if b is ContainsAddr					// always reg
+				return exp.RFWR(a, b, 0, offset)
+																	// RefDecrMulti unused?
+			|| BD = prms.second!.asmdecl
+			target debug: if a isnt ContainsAddr				// always memory
+			target debug: if bd isnt const						// always const!!
+			return exp.RFDC(a, bd.ExportPosition, offset)	
+		  else
+			|| A = .µ(prms.first!)
+			target debug: if A is ContainsAddr						// always a reg!
+
+			if fn == Compiler.RefIncr
+				return exp.RFRG(a, a, 1, 0, 0, 0)
+
+			if fn == Compiler.RefDecr
+				return exp.RFRG(a, a, 0, 0, 1, 1)					// (but refcounter doesnt do it yet)
+
+			if fn == Compiler.RefSafeDecr
+				return exp.RFRG(a, a, 0, 0, 0, 1)
+
+			if fn == Compiler.RefFreeIfDead
+				return exp.RFRG(a, a, 0, 0, 1, 0)
 	
-			if b is ContainsAddr								// mem to reg
-				return exp.RFRD(a, b, 1, offset)
-	
-		return exp.RFRG(a, a, 1, 1, 1, 1)					// reg to reg
+		return exp.EROR(asmreg(), asmreg(), asmreg(), asmreg(), 0)
 
 
 
