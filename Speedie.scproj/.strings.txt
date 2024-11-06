@@ -1308,7 +1308,7 @@
 "macro"
 "asmreg"
 "No global address"
-"Too much global data"
+"Expected under 16K of global data"
 "”."
 "__PROJECT_"
 "POS"

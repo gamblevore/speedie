@@ -987,20 +987,20 @@ struct SCParamArray_Behaviour: Object_Behaviour {
 
 JBClass ( SCParamArray , JB_Object , 
 	s16 Size;
+	Message* Items[8];
 	SCClass* Cls;
 	Message* Exp;
 	s16 ErrCount;
 	bool AllowSelfToConstructor;
-	bool Found;
 	int8 FailedAt;
 	bool HasSide;
 	bool HasProperParams;
 	bool IsDot;
 	bool IsAddress;
 	bool IsNotModule;
-	bool IsSuper;
 	bool IsSelf;
-	Message* Items[8];
+	bool Found;
+	bool IsSuper;
 );
 
 struct Saveable_Behaviour: Object_Behaviour {
@@ -2003,32 +2003,36 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_WR2U ((ASM_Write)94)
 #define kSC__ASM_WR4U ((ASM_Write)95)
 #define kSC__ASM_WR8U ((ASM_Write)96)
-#define kSC__Reg_AddrRequest ((ASMReg)8589934592)
-#define kSC__Reg_AlreadyNegated ((ASMReg)1048576)
-#define kSC__Reg_Alternate ((ASMReg)2097152)
-#define kSC__Reg_Arg ((ASMReg)4194304)
-#define kSC__Reg_CondAnswer ((ASMReg)68719476736)
-#define kSC__Reg_CondRequest ((ASMReg)34359738368)
-#define kSC__Reg_ConstAny ((ASMReg)536870912)
-#define kSC__Reg_ContainsAddr ((ASMReg)4294967296)
-#define kSC__Reg_Decl ((ASMReg)25165824)
-#define kSC__Reg_Discard ((ASMReg)4194304)
+#define kSC__Reg_AddrForceRequest ((ASMReg)34359738368)
+#define kSC__Reg_AddrNeed ((ASMReg)51539607552)
+#define kSC__Reg_AddrRequest ((ASMReg)17179869184)
+#define kSC__Reg_AlreadyNegated ((ASMReg)2097152)
+#define kSC__Reg_Alternate ((ASMReg)4194304)
+#define kSC__Reg_Arg ((ASMReg)8388608)
+#define kSC__Reg_CondAnswer ((ASMReg)274877906944)
+#define kSC__Reg_CondRequest ((ASMReg)137438953472)
+#define kSC__Reg_ConstAny ((ASMReg)1073741824)
+#define kSC__Reg_ContainsAddr ((ASMReg)8589934592)
+#define kSC__Reg_Decl ((ASMReg)50331648)
+#define kSC__Reg_Discard ((ASMReg)8388608)
 #define kSC__Reg_FatRef ((int)1073741824)
 #define kSC__Reg_ForCast ((ASMReg)67108864)
-#define kSC__Reg_ForReturn ((ASMReg)33554432)
 #define kSC__Reg_FromExistingVar ((ASMReg)262144)
-#define kSC__Reg_KindaConst ((ASMReg)1610612736)
+#define kSC__Reg_KindaConst ((ASMReg)3221225472)
 #define kSC__Reg_Negate ((ASMReg)65536)
-#define kSC__Reg_NeverAltered ((ASMReg)1073741824)
-#define kSC__Reg_NotYetUsed ((ASMReg)16777216)
+#define kSC__Reg_NeverAltered ((ASMReg)2147483648)
+#define kSC__Reg_NoScale ((ASMReg)536870912)
+#define kSC__Reg_NotYetUsed ((ASMReg)33554432)
 #define kSC__Reg_Param ((ASMReg)131072)
-#define kSC__Reg_Set ((ASMReg)8388608)
+#define kSC__Reg_Set ((ASMReg)16777216)
 #define kSC__Reg_SingleExpr ((ASMReg)268435456)
 #define kSC__Reg_StayOpen ((ASMReg)524288)
 #define kSC__Reg_Temp ((ASMReg)134217728)
-#define kSC__Reg_Textual ((ASMReg)17179869184)
-#define kSC__Reg_TrueConstCond ((ASMReg)2147483648)
-#define kSC__Reg_Zero ((ASMReg)537002040)
+#define kSC__Reg_Textual ((ASMReg)68719476736)
+#define kSC__Reg_TrueConstCond ((ASMReg)4294967296)
+#define kSC__Reg_UseForAWhile ((ASMReg)1048576)
+#define kSC__Reg_VeryOpen ((ASMReg)1572864)
+#define kSC__Reg_Zero ((ASMReg)1073872952)
 #define kSC__ASMType_IncrAfter ((int)2)
 #define kSC__ASMType_IncrBefore ((int)0)
 #define kSC__ASMType_kContinue ((ASMType)53)
@@ -4333,8 +4337,6 @@ bool SC_uint_isconst(uint Self);
 
 
 // uint64
-bool SC_uint64_CanStoreAsFloatImmediate(uint64 Self);
-
 uint64 JB_uint64_Trim(uint64 Self, int B);
 
 
@@ -4598,8 +4600,6 @@ int SC_Reg_Reg(ASMReg Self);
 
 ASMReg SC_Reg_RegSet(ASMReg Self, int Value);
 
-ASMReg SC_Reg_RequestPos(ASMReg Self);
-
 bool SC_Reg_Signed(ASMReg Self);
 
 bool SC_Reg_SyntaxIs(ASMReg Self, ASMReg R);
@@ -4637,8 +4637,6 @@ ASMReg SC_ASMType__DoFunction(ASMState* Self, Message* Exp, ASMReg Dest, int Mod
 
 ASMReg SC_ASMType__DoGlobal(ASMState* Self, Message* Exp, ASMReg Dest, SCDecl* D);
 
-ASMReg SC_ASMType__DoGlobalSub(FatASM* Addr, int Add, Message* Exp);
-
 ASMReg SC_ASMType__DoMath(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
 ASMReg SC_ASMType__Dot(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
@@ -4662,8 +4660,6 @@ void SC_ASMType__InitAccess();
 ASMReg SC_ASMType__Negative(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
 ASMReg SC_ASMType__Num(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
-
-ASMReg SC_ASMType__Pointer(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
 ASMReg SC_ASMType__RefCount(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
@@ -5669,8 +5665,6 @@ xC2xB5Form* SC_FAT_Form(FatASM* Self);
 
 bool SC_FAT_has(FatASM* Self, int A, int B);
 
-FatASM* SC_FAT_HaveAddr(FatASM* Self);
-
 void SC_FAT_JumpInputSet(FatASM* Self, int A, int V);
 
 void SC_FAT_JumpToSet(FatASM* Self, FatASM* Value);
@@ -5918,6 +5912,8 @@ void SC_Pac_AddFuncParams(ASMState* Self, SCFunction* Fn);
 
 void SC_Pac_AddLabel(ASMState* Self, Message* Ch);
 
+ASMReg SC_Pac_AddToReg(ASMState* Self, Message* Exp, ASMReg Dest, ASMReg Orig, int64 Amount);
+
 bool SC_Pac_Alloc(ASMState* Self, MWrap* J);
 
 ASMReg SC_Pac_ArgOrIf(ASMState* Self, Message* Other);
@@ -5962,7 +5958,7 @@ ASMReg SC_Pac_BranchAnd(ASMState* Self, Message* A, Message* B, ASMReg Dest);
 
 ASMReg SC_Pac_BranchOr(ASMState* Self, Message* A, Message* B, ASMReg Dest);
 
-void SC_Pac_CloseVDecls(ASMState* Self, int I);
+bool SC_Pac_CloseVDecls(ASMState* Self, int I);
 
 void SC_Pac_CloseVTmps(ASMState* Self, int I);
 
@@ -6074,9 +6070,9 @@ bool SC_Pac_PackMakerInit(ASMState* Self);
 
 ASMReg SC_Pac_Plus(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
-uint64 SC_Pac_PrmCollect(ASMState* Self, Message* Prms, SCFunction* Fn, bool Native);
+uint64 SC_Pac_PrmCollect(ASMState* Self, Message* Prms, SCFunction* Fn);
 
-uint64 SC_Pac_PrmCollectNative(ASMState* Self, Message* Prms, SCFunction* Fn);
+uint64 SC_Pac_PrmCollectC(ASMState* Self, Message* Prms, SCFunction* Fn);
 
 ASMReg SC_Pac_Quick1Or1Sub(ASMState* Self, ASMReg Dest, ASMReg L, int Ptoi, Message* Exp);
 
@@ -8902,8 +8898,6 @@ int SC_Decl_AccessType(SCDecl* Self, SCDecl* Access, Message* Ch);
 
 SCDecl* SC_Decl_ActualReplace(SCDecl* Self, SCDecl* New);
 
-int SC_Decl_AllocatedSize(SCDecl* Self);
-
 bool SC_Decl_AlreadyContains(SCDecl* Self);
 
 uint64 SC_Decl_AsConst(SCDecl* Self, Message* Value, DataTypeCode* Ty);
@@ -8920,6 +8914,8 @@ SCDecl* SC_Decl_Better_Numeric(SCDecl* Self, SCDecl* O, OpMode Mode, Message* Le
 
 ASMReg SC_Decl_CalculateASMType(SCDecl* Self);
 
+int SC_Decl_CalculateSize(SCDecl* Self, int Depth);
+
 bool SC_Decl_CanCompare(SCDecl* Self, SCDecl* Against, bool AsEquals);
 
 bool SC_Decl_CanNilCheck(SCDecl* Self);
@@ -8933,6 +8929,8 @@ SCDecl* SC_Decl_CanUpgradeInternalPointer(SCDecl* Self);
 bool SC_Decl_CanUseDefault(SCDecl* Self);
 
 bool SC_Decl_CanWrap(SCDecl* Self);
+
+int SC_Decl_CArraySize(SCDecl* Self);
 
 SCDecl* SC_Decl_CheckMath(SCDecl* Self, Message* Exp);
 
@@ -8965,8 +8963,6 @@ Message* SC_Decl_CreateSimpleTypeCast(SCDecl* Self, Message* Exp);
 Message* SC_Decl_CreateStructNil(SCDecl* Self, Message* Where);
 
 Message* SC_Decl_CreateStructNilSub(SCDecl* Self);
-
-int SC_Decl_DeclSize(SCDecl* Self);
 
 int SC_Decl_DeclSizeSort(SCDecl* Self);
 
@@ -9178,6 +9174,8 @@ bool SC_Decl_SafelyWrappable(SCDecl* Self);
 
 bool SC_Decl_SameForReplace(SCDecl* Self, SCDecl* C);
 
+int SC_Decl_SizeOfQuery(SCDecl* Self);
+
 bool SC_Decl_SpecialRegs(SCDecl* Self);
 
 NilState SC_Decl_StatedOptional(SCDecl* Self);
@@ -9209,8 +9207,6 @@ DataTypeCode SC_Decl_TypeOnly(SCDecl* Self);
 void SC_Decl_TypeReach(SCDecl* Self, SCNode* From, Message* Src);
 
 bool SC_Decl_TypeSuffers(SCDecl* Self);
-
-int SC_Decl_VarSizeSub(SCDecl* Self, bool TheVarItself);
 
 void SC_Decl_WholeTypeSet(SCDecl* Self, uint /*DataTypeCode*/ Value);
 
@@ -10734,7 +10730,7 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 			Message* __varf1 = F->Source;
 			MessagePosition _usingf0 = ((MessagePosition){});
 			JB_Msg_SyntaxUsing(__varf1, (&_usingf0));
-			JB_Tree_SyntaxAppend(Self, (JB_Syx_Msg(kJB_SyxThg, JB_LUB[478])));
+			JB_Tree_SyntaxAppend(Self, (JB_Syx_Msg(kJB_SyxThg, JB_LUB[476])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0), __varf1);
 			JB_MsgPos_Destructor((&_usingf0));
 		}
