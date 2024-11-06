@@ -128,7 +128,6 @@ function Ternary		(fn_asm)
 		|| which = (A, B)(KK.Default)
 		rz = .µInto(which, dest)
 	  else
-		
 		.µInto(A, dest)
 		|| Exit = exp.jump(0)
 		TernTest.AllJumpTo(.curr)
@@ -271,21 +270,6 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 	return .Exists(dest, dest, A.next!)
 
 
-function PrintProgress (|message| exp)
-	opt norefcounts
-	"---"
-	if !exp
-		.LastProgress = .funcstart
-	  else
-		printline exp
-	|| Curr = .LastProgress
-	while curr < .curr
-		curr.debugprint
-		curr++
-	.LastProgress = curr
-
-
-
 function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asmreg|)
 	|| V = (ml.const!=0) != (dest is negate)
 	|| expect = opp is OR
@@ -366,4 +350,20 @@ Struct FatRange
 			if s is CondAnswer
 				(s isnt CondAnswer)
 				s.jumpto = curr
+
+
+function @asmstate.PrintProgress (|message| exp)
+	cpp_name adb
+	opt norefcounts
+	"---"
+	|| s = ASMState.sh
+	if !exp
+		s.LastProgress = s.funcstart
+	  else
+		printline exp
+	|| Curr = s.LastProgress
+	while curr < s.curr
+		curr.debugprint
+		curr++
+	s.LastProgress = curr
 

@@ -288,7 +288,7 @@ function SCFunction.HasCVersion (|bool|)
 
 
 
-function ASMState.PrmCollectNative (|message| prms, |SCFunction| fn, |uint64|)
+function ASMState.PrmCollectC (|message| prms, |SCFunction| fn, |uint64|)
 	// we need to do ints last, and also collect these backwards.
 	opt norefcounts
 	|| sh = 0
@@ -317,10 +317,10 @@ function ASMState.PrmCollectNative (|message| prms, |SCFunction| fn, |uint64|)
 		rz |= (17-ic) << 6
 
 
-function ASMState.PrmCollect (|message| prms, |scfunction| fn, |bool| native, |uint64|)
+function ASMState.PrmCollect (|message| prms, |scfunction| fn, |uint64|)
 	opt norefcounts
-	if native
-		return .PrmCollectNative(prms, fn)
+	if fn.HasCVersion
+		return .PrmCollectC(prms, fn)
 	
 	|| sh = 7
 	|| p = prms.first
@@ -354,20 +354,22 @@ function @ASMType.DoFunction (fn_Asm)
 	dest.reg = vd
 
 	|| TmpCloser = .VTmps
-	|| IsC = fn.HasCVersion
-	|| P = .PrmCollect(prms, fn, IsC)
+	|| P = .PrmCollect(prms, fn)
 	.CloseVTmps(TmpCloser)
 	
 	|| PExt = P >> 32
 	|| fat = exp.FNC(dest, fn.tableid+31, P,  PExt)
-	if isc
+	if fn.HasCVersion
 		fat.op = asm.FNCX
 	fat.op += PExt > 0
-
+	rz = fat*dest
+	
 //  Mostly I'm doing:  || x = msg.function(),  (which uses the correct position.)
-
-	return fat * dest
-
+	if dest is UseForAWhile // but not here.
+		rz = .temponly(exp)
+		rz.µtype = dest.µtype
+		rz = .assign(rz, dest, exp)
+		
 
 
 function ASMState.PackMakerInit (|bool|)

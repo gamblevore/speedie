@@ -17,12 +17,11 @@ datatype ASMReg (uint64)
 		Negate      // dont put anything before we test for (x << 16)
 		Param
 		FromExistingVar
-		StayOpen
+		VeryOpen = [StayOpen, UseForAWhile]
 		AlreadyNegated
 		Alternate
 		Discard
 		Decl = [Set, NotYetUsed]
-		ForReturn
 		ForCast
 		Temp
 		SingleExpr

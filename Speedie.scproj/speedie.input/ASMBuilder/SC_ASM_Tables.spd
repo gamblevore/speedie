@@ -86,7 +86,7 @@ function Return (fn_asm)
 	opt norefcounts
 	|| reg = ASMReg()
 	|| f = exp.first
-		|| ret = .ReturnASM|asmreg| as AsmReg.ForReturn
+		|| ret = .ReturnASM|asmreg|
 		reg = .µ(f, ret)
 	
 	|| K = .const(reg, 6, true) // return true, or -1 or whatever
@@ -275,11 +275,6 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	DoGlobal(self, exp, dest, d)
 
 
-helper DoGlobalSub (|&FATASM| addr, |int| add, |message| exp,  |asmreg|)
-	|| Reg = addr.info
-	return asmstate.sh.addtoreg(exp, reg, Reg, add)
-
-
 function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |asmreg|)
 	opt	NoRefCounts
 	|| addr = dest
@@ -287,31 +282,17 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 		addr = .TempTyped(exp, dest)
 
 	|int64| iTable = d.ExportPosition
-	expect (iTable > 0)      (exp, "No global address".internal)
-	expect (iTable < 16MB)   (exp, "Too much global data")
+	|| sixteen = 16K-1
+	expect (iTable > 0)          (exp, "No global address".internal)
+	expect (iTable <= sixteen)   (exp, "Expected under 16K of global data")
 						
 	if dest is AddrRequest
-		|| sixteen = 16K-1
 		|| a = exp.TABL(addr,  (!d.IsLib)|int|,  iTable&sixteen)
-		if iTable <= sixteen
-			return (a * Dest).HaveAddr
-		return DoGlobalSub(a, iTable &~sixteen, exp).HaveAddr
+		return (a * Dest).HaveAddr
 	
-	|| iRead = iTable
-	|| iOld = iRead
-	if iTable < 128
-		iTable = 0				// keep the current table. More optimisable.
-	  elseif iTable < 16K
-		iRead = 0				// itable has a bigger range... so use that. 
-	  else
-		itable = 0				// Make this optimisable.
-		iRead = 0
-
-	|| tabl = exp.TABL(addr,  (!d.IsLib)|int|, iTable)
-	if !itable and !iread and iold
-		DoGlobalSub(tabl, iold, exp)
-	debugger 
-	return dest.ReadOrWrite(Exp, addr, asmreg(), iread)
+	|| AddCosTooBig = (iTable >= 128) * iTable
+	|| tabl = exp.TABL(addr,  (!d.IsLib)|int|, AddCosTooBig)
+	return dest.ReadOrWrite(Exp, addr, asmreg(), iTable-AddCosTooBig)
 
 	
 
@@ -457,7 +438,9 @@ helper ASMState.DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMR
 	if dest is SingleExpr
 		ml = .µ(exp, DiscardMode)
 	  else
-		ml = .µ(exp.first!, (DiscardMode with dest) as ASMReg.StayOpen)
+		// should check if the rightside has a function in it...
+		// then we can't set the reg specifically.
+		ml = .µ(exp.first!, (DiscardMode with dest) as ASMReg.VeryOpen)
 		mr = .µ(exp.last!,   DiscardMode.with(dest, ml))
 	.CloseVTmps(TmpCloser)
 	
@@ -630,4 +613,3 @@ function Message.TypeCastDoesNothing (|bool|)
 	require byteslost <= 0
 
 
-ignore

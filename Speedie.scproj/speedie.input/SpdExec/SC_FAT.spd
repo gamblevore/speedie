@@ -127,7 +127,7 @@ struct FatASM
 	Syntax Expect (|string| Error)
 		|| err = Error(nil, error, ErrorSeverity.Error, .file)
 		err.position = .BytePos
-		target debug: asmstate.sh.printprogress(nil)
+		target debug: asmstate.printprogress(nil)
 		stderr <~ err
 
 	function NumInput (|int| a, assigns:|int| v)

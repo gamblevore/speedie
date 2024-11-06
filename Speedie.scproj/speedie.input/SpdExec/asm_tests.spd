@@ -381,7 +381,7 @@ helper asm_test_func (|int| a, |int| b, |int|)
 
 
 helper asm_test_ptr (|fixeddict| a, |&int| b,  |int|)
-	cpp_name asm_test_ptr
+	cpp_name asm_test_ptr // many bugs here
 	visible
 	a.letter = -1
 	b[] = 0
@@ -398,6 +398,8 @@ helper asm_test_ptr (|fixeddict| a, |&int| b,  |int|)
 helper asm_test_flow (|int| a, |int| b, |int|)
 	cpp_name asm_test_flow
 	visible
+	if 1.CountBits == 3.CountBits
+		|| x = 2
 	if a > b
 		a = b
 	if b < a
@@ -406,8 +408,6 @@ helper asm_test_flow (|int| a, |int| b, |int|)
 		a = 0
 	if b != b // NOOP
 		b = 0
-	if 1.CountBits == 2.CountBits
-		|| x = 2
 }}}
 
 // im not sure what other tests need doing? We'll think of some... over time!!

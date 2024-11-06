@@ -483,6 +483,7 @@ class SCDecl (SCNamed) {
 		opt norefcounts
 		if (!.IsCArray) and (!.PointerCount)
 			return .Type.typeinfo
+		return datatypecode._voidptr
 
 
 	function MiniMatch (|SCDecl?| O, |int| TypeCast = 0, |bool|)
