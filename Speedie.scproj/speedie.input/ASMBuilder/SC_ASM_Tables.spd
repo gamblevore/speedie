@@ -195,14 +195,14 @@ function Access (fn_asm)						// a[b], struct.mem[b]
 	|| f = exp.first!
 	target debug
 		|| d = f.asmdecl
-		if !d.pointercount
-	|| Ptr = .µ(f, dest)				// x = a.b[0]
+		if !d.pointercount and !d.iscarray
+	|| Ptr = .µ(f)								// x = a.b[0]
 	|| sc = exp.second.first!
 	|| vara = .µ(sc)
 	if (dest is AddrRequest)
 /		return .Plus(dest.HaveAddr, ptr, vara, exp)
 	
-	return Dest.ReadOrWrite(exp, ptr, vara, 0)
+	return Dest.ReadOrWrite(exp, ptr, vara)
 
 
 function Dot (fn_asm)						// a.b
@@ -214,10 +214,11 @@ function Dot (fn_asm)						// a.b
 	dest.µtype = T
 	
 	|int64| Pos = prop.exportposition
-	if pos <= 0 // what?
+	if (pos < 0 or pos > 1K) // what?
+	
 	if (dest is AddrRequest) or prop.iscarray
-/		pos *= t.ByteCount
-		return exp.ADDK(dest, obj, pos).HaveAddr * dest
+		pos *= t.ByteCount
+		return .addtoreg(exp, dest.haveaddr, obj as asmreg.noscale, pos)
 
 	return Dest.ReadOrWrite(exp, obj, asmreg(), pos)
 		
@@ -229,10 +230,8 @@ function SetRel (fn_asm)	// function relset (
 	|| X = .ExistingVar(A)
 	if X.reg
 		return .µinto(B, X)
-
-	debugat 5
 	
-	dest = .µ(B, X)
+	dest = .µ(B, X) asnt asmreg.kindaconst
 	return .µ(A, dest as AsmReg.set)
 
 
@@ -278,8 +277,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 
 helper DoGlobalSub (|&FATASM| addr, |int| add, |message| exp,  |asmreg|)
 	|| Reg = addr.info
-	|| NumAt = ASMState.sh.NumToReg(exp, add, asmreg(), datatypecode.int)
-	return ASMState.sh.Plus(reg, reg, numat, exp)
+	return asmstate.sh.addtoreg(exp, reg, Reg, add)
 
 
 function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |asmreg|)
@@ -500,8 +498,8 @@ function ASMReg.ReadOrWriteSub (|message| m, |asmreg| ptr, |asmreg| varadd, |int
 		bytes = 0
 	
 	if index >= 128						// read/write only allows up to 127
-/		|| num = asmstate.sh.NumToReg(m, index, asmreg(), datatypecode.int)
-		ptr = asmstate.sh.Plus(num, ptr, num, m)
+		index *= t.ByteCount
+		ptr = asmstate.sh.AddToReg(m, asmreg(), ptr as asmreg.noscale, index)
 		index = 0
 	
 	rz = m.RD4U(self, ptr, varadd, index, 0)

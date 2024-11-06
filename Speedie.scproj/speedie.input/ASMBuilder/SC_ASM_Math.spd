@@ -200,9 +200,6 @@ extend ASMState
 	
 	function asmreg.PointerMul (|message| exp, |int| swapped, |int|)
 		opt norefcounts
-		if !.µtype.ispointer
-			return 1
-		
 		|| fn = exp.Func
 		if fn == @opp
 /			if swapped
@@ -216,12 +213,15 @@ extend ASMState
 		  elseif fn == @acc // merge after testing this
 /			exp = exp.first
 			
+		  elseif fn == @dot // obj.Prop // requires pointermul on .prop cos of prev props
+			// leave it?
+			debugat
 		  else
-			// should never happen. Even @thg shouldn't.
 			error "aaargh"
 			debugger 
-		|| d = exp.ASMDecl
-		return d.AllocatedSize
+		|| d = exp.ASMDecl.Internal
+			return d.CArraySize
+		debugger // hmmmm. its not a pointer after all?
 	
 
 	function IntPlus     (fn_opasm)
@@ -248,7 +248,9 @@ extend ASMState
 			return .Assign(dest, l, exp)
 		
 	
-		|| lmul = l.PointerMul(exp, swapped)
+		|| lmul = 1
+		if (l isnt noscale) and l.µtype.ispointer
+			lmul = l.PointerMul(exp, swapped)
 		if r is ConstAny
 			|| RR = r.const
 			if l is alternate

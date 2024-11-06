@@ -216,14 +216,14 @@ function CalculateSize (|int| Depth = 0, |int|)
 	return .size
 
 
-function scdecl.CalculateSize (|int|depth, |int|)
+function scdecl.CalculateSize (|int| depth, |int|)
 	opt norefcounts
 	if .Type.IsObject or .PointerCount
 		return platform.PointerBytes
 	depth++
 	if .iscarray
 		|| i = .internal
-			return i.calculatesize(depth)
+			return i.calculatesize(depth) // * .c_array // its caller does this
 		debugger
 	return .type.calculatesize(depth)
 
@@ -245,7 +245,7 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 		count = 4 // refcount
 	|| s = .super
 		Count = s.CalculateSizeRaw								#DEBUG_REQUIRE
-
+	
 	|| bits = 0
 	for p in .properties
 		|| curr = P.calculatesize(depth) #loop
@@ -270,7 +270,7 @@ function SortPropHelper (|scdecl|)
 		
 	for i in 4 downto 1
 		for p in .Properties
-			if p.declsize == i
+			if p.CarraySize == i
 				(p is biggest)
 				return p
 

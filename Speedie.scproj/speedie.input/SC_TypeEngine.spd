@@ -453,7 +453,7 @@ function TypeOfNumSub (ExprResolver)
 		|| d = Typefloat!.typenormal.copydecl
 		|| f8 = exp.float
 		|uint64| V
-		if (d.DeclSize == 4) and !side
+		if (d.CarraySize == 4) and !side
 			V = f8|float|.asint
 		  else
 			V = f8.asint

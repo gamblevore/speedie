@@ -374,11 +374,6 @@ class SCDecl (SCNamed) {
 			return typeofexpr(brel, name_space)
 		
 
-	render
-		if self
-			.WriteDeclFull("", 2).Render(fs)
-
-
 	function WriteDeclFull (|String| DeclName = "", |int| minimal = 0, |Message|)
 		DeclName ?= .Name
 		expect DeclName or !.default
@@ -1099,9 +1094,19 @@ class SCDecl (SCNamed) {
 		return TheType
 
 
+	render
+		if self
+			fs <~ "|"
+			.rendertypename(fs)
+			fs <~ "|"
+			fs <~ " "
+			fs <~ .name
+
+
 	render RenderTypeNameNicer
 		opt norefcounts
 		return .DownGrade.RenderTypeName(fs_in)
+
 
 	render RenderTypeName 
 		if !self
@@ -1109,31 +1114,54 @@ class SCDecl (SCNamed) {
 		  else 
 			if (.IsNil) 
 				fs <~ "nil"
-			  else 
-				fs <~ ( '&', .PointerCount )
-				fs <~ .Type.Name
-			
-			if .IsCArray
+			  elseif .IsCArray
+				.internal!.rendertypename(fs)
 				fs <~ '['
 				fs <~ .c_Array
 				fs <~ ']'
+			  else 
+				fs <~ ( '&', .PointerCount )
+				fs <~ .Type.Name
 			
 			|| c = .Contains
 			if c and !c.minimatch(.type.contained, 0) 
 				fs <~ " of "
 				fs <~ c.type.name
+			if self is borrowed
+				fs <~ "--"
+			if .TypeSuffers and .nilstated
+				if .StatedOptional
+					fs <~ "?"
+				  elseif .StatedReal
+					fs <~ "!"
 
-	function AllocatedSize (|int|)
-		return .varsizesub(false)
+
+	function SizeOfQuery (|int|)
+		opt norefcounts
+		|| n = Platform.PointerBytes
+		if !.PointerCount
+			n = .type.Size
+		if .IsCArray
+			n *= .C_Array
+		return N
+
 
 	function DeclSizeSort (|int|)
 		if self is biggest
 			return 1K
-		return .varsizesub(true)
+		return .CarraySize
 
 
-	function DeclSize (|int|)
-		return .VarSizeSub(true)
+	function CArraySize (|int|)
+		opt norefcounts
+		description "The size of the variable itself, in memory. Default carray size is 1. Objects use the pointer-size."
+		if .iscarray
+			|| i = .internal
+				return i.CArraySize * .c_array
+			debugger
+		if .Type.IsObject or .PointerCount
+			return platform.PointerBytes
+		return .type.size
 
 
 	function RegType (|datatypecode|)
@@ -1150,15 +1178,6 @@ class SCDecl (SCNamed) {
 		if .pointercount
 			rz = datatypecode._voidptr // what about carrays?
 
-
-	function VarSizeSub (|bool| TheVarItself, |int|)
-		opt norefcounts
-		|| n = Platform.PointerBytes
-		ifn .PointerCount or (TheVarItself and .isobject)
-			n = .type.Size
-		if .IsCArray
-			n *= .C_Array
-		return N
 		
 	function PointerIncrement (|int|)
 		// only called on pointers

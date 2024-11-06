@@ -172,7 +172,7 @@ module PackMaker
 		opt norefcounts
 		|| G = 1				// So we can detect bugs easier... if something lacks an export position.
 		for (d in .PackGlobs)
-			|| s = d.DeclSize
+			|| s = d.CarraySize
 			G = G align s
 			d.ExportPosition = G
 			G += s

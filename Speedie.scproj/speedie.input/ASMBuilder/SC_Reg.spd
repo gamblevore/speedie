@@ -1,6 +1,6 @@
 
 
-prototype fn_asm (|&ASMState| self=asmstate.sh, |message| exp, |AsmReg| Dest=asmreg(), |int| Mode = 0, |AsmReg|)
+prototype fn_asm    (|&ASMState| self=asmstate.sh, |message| exp, |AsmReg| Dest=asmreg(), |int| Mode=0, |AsmReg|)
 prototype fn_fatasm (|&ASMState| self=asmstate.sh, |message| exp, |AsmReg| Dest, |&FatASM|)
 
 
@@ -26,6 +26,7 @@ datatype ASMReg (uint64)
 		ForCast
 		Temp
 		SingleExpr
+		NoScale
 		KindaConst = [ConstAny, NeverAltered]
 		TrueConstCond
 		ContainsAddr
