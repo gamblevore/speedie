@@ -216,6 +216,18 @@ function CalculateSize (|int| Depth = 0, |int|)
 	return .size
 
 
+function scdecl.CalculateSize (|int|depth, |int|)
+	opt norefcounts
+	if .Type.IsObject or .PointerCount
+		return platform.PointerBytes
+	depth++
+	if .iscarray
+		|| i = .internal
+			return i.calculatesize(depth)
+		debugger
+	return .type.calculatesize(depth)
+
+	
 function CalculateSizeRaw (|int| Depth=0, |int|)
 	|| si = .size
 		return si
@@ -236,9 +248,7 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 
 	|| bits = 0
 	for p in .properties
-		|| curr = platform.PointerBytes
-		ifn P.Type.IsObject or p.PointerCount
-			Curr = P.type.calculatesize(depth+1)				#require
+		|| curr = P.calculatesize(depth) #loop
 		if (p is task) and p.isobject
 			bits[(count+(platform.PointerBytes-1))>>3] = true
 		Count = Count Align Curr

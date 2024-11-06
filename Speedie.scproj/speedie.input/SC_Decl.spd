@@ -360,18 +360,17 @@ class SCDecl (SCNamed) {
 		opt norefcounts
 		if .IsCArray
 			check (IsAccess) (brel, "Use [0] instead.")
-			|| i = .Internal$				
+			|| i = .Internal								#require			
 			if i.TypeSuffers
 				return i.MakeNewOptional
 			return i
 		
 		if .PointerCount > 0
-			brel.ASMType = ASMType.kPointer
 			return .internal
 		
 		if !isaccess and .isnormalobject
 			brel.become(@dot, "first")
-			brel<~(@prm)
+			brel <~ @prm
 			return typeofexpr(brel, name_space)
 		
 
