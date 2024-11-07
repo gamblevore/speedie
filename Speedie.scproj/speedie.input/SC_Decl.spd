@@ -75,7 +75,7 @@ datatype SCDeclInfo (int)
 		ReadFrom
 		SetTo					// a var sets it... like: rz = obj
 		Hidden					// internal global... should not be exposed to non-lib stuff
-		Biggest
+		Grabbed
 		PostIncremented
 		ReturnedStruct
 		IntendedAsReturn // were at 32... cant add more. Speedie should also warn if theres too many. (it wasnt!)
@@ -1147,12 +1147,6 @@ class SCDecl (SCNamed) {
 		return N
 
 
-	function DeclSizeSort (|int|)
-		if self is biggest
-			return 1K
-		return .CarraySize
-
-
 	function CArraySize (|int|)
 		opt norefcounts
 		description "The size of the variable itself, in memory. Default carray size is 1. Objects use the pointer-size."
@@ -1160,10 +1154,25 @@ class SCDecl (SCNamed) {
 			|| i = .internal
 				return i.CArraySize * .c_array
 			debugger
-		if .Type.IsObject or .PointerCount
+		|| T = .type
+		if T.IsObject or .PointerCount// or t.FuncProto
 			return platform.PointerBytes
-		return .type.size
+		return T.size
 
+
+	function Alignment (|int|)
+		if .isobject or .pointercount
+			return platform.pointerbytes
+		if .iscarray
+			return .internal!.Alignment
+		|| T = .type
+		if T.isstruct
+			return 32 // put them after other things
+					  // we might not have that info yet?
+//		if t.FuncProto
+//			return platform.pointerbytes
+		return t.size
+	
 
 	function RegType (|datatypecode|)
 		opt norefcounts
@@ -1235,3 +1244,17 @@ function int64.MsgForConst (|bool| AllowShift, |message|)
 	op.obj = scoperator.lookup(op) 
 	rz <~ newdeclnum(nil, .Log2)
 
+
+function SmallestFirst (SorterComparer)
+	return b|scdecl|.carraysize - a|scdecl|.carraysize
+
+function SmallestAlignedFirst (SorterComparer)
+	return b|scdecl|.alignment - a|scdecl|.alignment
+
+
+function array.CArraySize (|[scdecl]| self, |int| size, |int|)
+	opt norefcounts
+	for p in self
+		size = size align p.alignment
+		size += p.carraysize
+	return size

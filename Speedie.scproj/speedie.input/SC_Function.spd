@@ -1260,6 +1260,7 @@ function NewProtoTypeSub (|Message| node, |SCNode!| parent, |Message| ErrPlace, 
 		clss.BaseType = SCNodeType.funcproto
 		(clss isnt Builtin)		// datatype sets it to true.
 		clss.FuncProto = f
+		clss.size = platform.pointerbytes
 		f.ProtoType = clss
 		Compiler.ProtoTypes <~ f
 	

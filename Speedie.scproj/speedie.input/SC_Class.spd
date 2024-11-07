@@ -61,6 +61,7 @@ linkage
 |SCDecl?|					DataObject
 |ClassInfo|					Flags
 |DataTypeCode|  			TypeInfo
+|uint16|					SizeRaw
 |uint16|					Size			// use scdecl.ByteSize to find the size of this in a var.
 |uint16|					TaskObjectCount
 |byte|						Depth
@@ -181,8 +182,8 @@ function CollectProperties
 		.TaskProperties
 	  else
 		|| it = .properties.first
-			.sortproperties
-			expect (!.IsRole) (it.source, "Roles can't have properties!")
+			.AlignProperties
+			check (!.IsRole) (it.source, "Roles can't have properties!")
 
 	if .IsModel
 		.ModelDecls
@@ -257,40 +258,78 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 		|| Mul = P.c_Array ?? 1
 		Count += Curr * Mul 
 
-	.size = Count align 4
+	.SizeRaw = Count
+	.Size = Count align 4
 	if .istask
 		.taskobjectcount = .super!.taskobjectcount ||| bits
 		check (.size <= 128) (.source, "Task size is over 128.") // could make it dynamic. Perhaps just allocate the largest task found? still limit to 256 bytes tho.
 	return count	
 
 
-function SortPropHelper (|scdecl|)
+function AlignProperties
 	opt norefcounts
-	require .isobject and .Super == TypeObject
-		
-	for i in 4 downto 1
-		for p in .Properties
-			if p.CarraySize == i
-				(p is biggest)
-				return p
+	require (self is SortsProperties) and (!.iswrapper) and !.isrole
+// Replicates some of .calculatesize... Not so simple to remove.
+// Perhaps CalculateSize could be merged?
+
+// Want things tight:       (usually biggest first)
+// Want RD1U accessibility: (smallest first)
+// Not so simple! If class <= 128, make it tight.
+// Otherwise, % loss is low anyhow. Put smallest first
+	.properties.sort(SmallestAlignedFirst)			// Smallest first, structs last though
+	|| ParentSize = 4
+	|| sp = .super
+	if sp and sp != typeobject
+		ParentSize = sp.SizeRaw
+
+	|| LargeSize = .properties.CarraySize(ParentSize)
+	if LargeSize > 128 // if over 128 keep curr sort
+		.sizeraw = LargeSize
+		return
+
+	.sizeraw = parentsize
+	|[scdecl]| Sorted
+	.AlignTo(sorted, 3)
+	.AlignTo(sorted, 4)
+	.GrabRemaining(sorted)
+	.properties = sorted
 
 
-function SortProperties
-	if (self is SortsProperties) and (!.iswrapper) and !.isrole
-		|| Aligner = .SortPropHelper
-		.Properties.sort(DeclSizeSorterRev)
-		// in theory its better the other way around, with smaller ones first
-		// however, it can introduce gaps. For big objects where the properties
-		// are harder to reach, it would make code smaller if we put the smaller
-		// items first, however. We could put smaller ones first as long as
-		// it doesn't introduce gaps... its also a possibility.
-		// we could just sort this... a plain simple sort by size... then grab whatever
-		// sized parts that canfind from what we need. like first get all the smallest ones...
-		// unless it leads to unaligned stuff. etc etc.
-		// only necessary for objects over 128 values big (defined in my ASM via Read_Lu)
-		// so... 128 bytes, 128 u16s, 128 uint32s etc...
-		if Aligner
-			(Aligner isnt biggest)
+function GrabRemaining (|[scdecl]| dest)
+	opt norefcounts
+	for s.backwards in .properties
+		if s isnt grabbed
+			.alignsub(dest, s)
+
+
+function FindPropAlignedTo (|int| align, |[scdecl]| dest, |scdecl|)
+	opt norefcounts
+	for s in .properties
+		if (s isnt Grabbed) and (align == s.alignment)
+			(s is Grabbed)
+			return s
+
+
+function AlignSub (|[scdecl]| dest, |scdecl| D, |bool|)
+	opt norefcounts
+	dest <~ d
+	|| al = d.alignment
+	|| size = .sizeraw|int| align al
+	size += d.carraysize
+	.sizeraw = size
+	return true
+
+
+function AlignTo (|[scdecl]| dest, |int| Bits)
+	|| AlignBits = (1<<Bits)-1
+	require .sizeraw & Alignbits
+	
+	while Bits-- > 0
+		while .sizeraw & AlignBits
+			|| d = .FindPropAlignedTo(1<<Bits, dest)
+				.alignsub(dest, d)
+			  else
+				exit
 
 
 function LoadSuperClass

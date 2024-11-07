@@ -163,7 +163,7 @@ module PackMaker
 
 
 	function OrderGlobals (|jbin| j)
-		.PackGlobs.sort(DeclSizeSorter)
+		.PackGlobs.sort(SmallestFirst)
 		|| g = .OrderGlobalsSub
 		j.addint(G + 16)
 
@@ -343,5 +343,3 @@ function scfunction.operatorin (|string| s, |bool|)
 	opt norefcounts
 	return .parent.name ~= s
 
-
-|| ASM_ASK = " RUN!" + "!"				// remove this
