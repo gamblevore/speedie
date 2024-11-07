@@ -559,8 +559,6 @@ typedef int (*FP_SorterComparer)(JB_Object* a, JB_Object* b);
 
 typedef bool (*FP_SorterComparerBool)(JB_Object* a, JB_Object* b);
 
-typedef bool (*FP_SorterComparerDecl)(SCDecl* a, SCDecl* b);
-
 typedef bool (*FP_SorterComparerFn)(SCFunction* a, SCFunction* b);
 
 typedef bool (*FP_SpdMainFn)(void* Obj, _cstring* args, PicoComms* Comms);
@@ -724,11 +722,6 @@ struct FatRange {
 	MaybeBool Constness;
 };
 
-struct IntDownRange {
-	int From;
-	int To;
-};
-
 struct IsaTester {
 	Message* Items[4];
 	int Count;
@@ -818,23 +811,23 @@ struct CppRefs_Behaviour: Object_Behaviour {
 
 JBClass ( CppRefs , JB_Object , 
 	u16 DisturbParams;
-	Array* Disturbs;
 	bool Owned;
+	Array* Disturbs;
 );
 
 struct Cpp_Export_Behaviour: Object_Behaviour {
 };
 
 JBClass ( Cpp_Export , JB_Object , 
-	FastStringCpp* ModuleProperties;
 	Array* Outputs_cpp;
-	Array* Outputs_h;
-	FastStringCpp* T;
-	FastStringCpp* AllTypes;
-	FastStringCpp* TypesProj;
-	FastStringCpp* HeaderProj;
+	FastStringCpp* ModuleProperties;
 	FastStringCpp* Inlines;
 	FastStringCpp* Syxes;
+	FastStringCpp* HeaderProj;
+	FastStringCpp* TypesProj;
+	FastStringCpp* AllTypes;
+	FastStringCpp* T;
+	Array* Outputs_h;
 );
 
 struct DataObject_Behaviour: Object_Behaviour {
@@ -842,8 +835,8 @@ struct DataObject_Behaviour: Object_Behaviour {
 
 JBClass ( DTWrap , JB_Object , 
 	DataTypeCode DataType;
-	int64 PrivValue;
 	byte DeathAction;
+	int64 PrivValue;
 );
 
 struct DictionaryReader_Behaviour: Object_Behaviour {
@@ -853,17 +846,17 @@ struct ErrorReceiver_Behaviour: Object_Behaviour {
 };
 
 JBClass ( JB_ErrorReceiver , JB_Object , 
-	int MaxErrors;
-	JB_String* Source;
-	JB_Object* _LogObj;
-	JB_Error* Errors;
 	int LowerErrorsTo;
+	JB_Object* _LogObj;
+	JB_String* Source;
+	JB_Error* Errors;
+	FP_fnErrorLogger _LogFunc;
+	int MaxErrors;
 	int MaxProblems;
 	int ErrorCount;
-	int WarnCount;
 	int ProblemCount;
+	int WarnCount;
 	bool BlockErrors;
-	FP_fnErrorLogger _LogFunc;
 );
 
 struct FastString_Behaviour: Object_Behaviour {
@@ -874,9 +867,9 @@ struct FlowControl_Behaviour: Object_Behaviour {
 
 JBClass ( FlowControl , JB_Object , 
 	bool CanDoErrors;
-	StringReader* ReadInput;
 	FastString* Write;
 	FastBuff Buff;
+	StringReader* ReadInput;
 );
 
 struct Instruction_Behaviour: Object_Behaviour {
@@ -884,11 +877,11 @@ struct Instruction_Behaviour: Object_Behaviour {
 
 JBClass ( Instruction , JB_Object , 
 	byte OpCode;
-	JB_String* Name;
-	xC2xB5Form* Sizes;
-	JB_String* FormName;
 	byte aType;
 	byte PCount;
+	xC2xB5Form* Sizes;
+	JB_String* Name;
+	JB_String* FormName;
 );
 
 struct LeakTester_Behaviour: Object_Behaviour {
@@ -904,17 +897,17 @@ struct Macro_Behaviour: Object_Behaviour {
 
 JBClass ( Macro , JB_Object , 
 	bool Cleaned;
-	Message* _Parsed;
 	JB_String* Input;
+	Message* _Parsed;
 );
 
 struct Memory_Behaviour: Object_Behaviour {
 };
 
 JBClass ( MWrap , JB_Object , 
-	int BufferSize;
-	byte* _Ptr;
 	int Length;
+	byte* _Ptr;
+	int BufferSize;
 	u16 ItemSize;
 	byte DeathAction;
 );
@@ -937,14 +930,14 @@ struct SCImport_Behaviour: Object_Behaviour {
 
 JBClass ( SCImport , JB_Object , 
 	int Depth;
+	JB_File* Where;
 	Dictionary* Resources;
 	SCModule* Mod;
-	JB_File* Where;
-	SCFile* Conf;
 	JB_MemoryLayer* DeclLayer;
 	Array* Files;
-	bool WarnUnusedFuncs;
+	SCFile* Conf;
 	ErrorSeverity BlindCast;
+	bool WarnUnusedFuncs;
 	bool IsSTDLib;
 );
 
@@ -952,8 +945,8 @@ struct SCNodeRenamer_Behaviour: Object_Behaviour {
 };
 
 JBClass ( SCNodeRenamer , JB_Object , 
-	JB_String* Name;
 	Array* Nodes;
+	JB_String* Name;
 );
 
 struct SCObject_Behaviour: Object_Behaviour {
@@ -964,8 +957,8 @@ JBClass ( SCObject , JB_Object ,
 	Message* Source;
 	Array* LinkFrom;
 	SCNodeInfo NodeInfo;
-	byte NoAutoComplete;
 	byte AllocSource;
+	byte NoAutoComplete;
 );
 
 struct SCOperator_Behaviour: Object_Behaviour {
@@ -973,13 +966,13 @@ struct SCOperator_Behaviour: Object_Behaviour {
 
 JBClass ( SCOperator , JB_Object , 
 	int Score;
+	JB_String* CompOp;
 	SCOperator* Opposite;
 	JB_String* Name;
-	JB_String* CompOp;
-	JB_String* CompParam;
-	JB_String* FuncName;
-	OpMode Kind;
 	fn_OpASM ASM;
+	JB_String* FuncName;
+	JB_String* CompParam;
+	OpMode Kind;
 );
 
 struct SCParamArray_Behaviour: Object_Behaviour {
@@ -987,20 +980,20 @@ struct SCParamArray_Behaviour: Object_Behaviour {
 
 JBClass ( SCParamArray , JB_Object , 
 	s16 Size;
-	Message* Items[8];
+	s16 ErrCount;
 	SCClass* Cls;
 	Message* Exp;
-	s16 ErrCount;
+	Message* Items[8];
 	bool AllowSelfToConstructor;
-	int8 FailedAt;
-	bool HasSide;
-	bool HasProperParams;
-	bool IsDot;
-	bool IsAddress;
-	bool IsNotModule;
-	bool IsSelf;
 	bool Found;
 	bool IsSuper;
+	bool IsSelf;
+	bool IsNotModule;
+	bool IsAddress;
+	bool IsDot;
+	bool HasProperParams;
+	bool HasSide;
+	int8 FailedAt;
 );
 
 struct Saveable_Behaviour: Object_Behaviour {
@@ -1014,8 +1007,8 @@ struct Selector_Behaviour: Object_Behaviour {
 
 JBClass ( Selector , JB_Object , 
 	int ID;
-	Selector* Next;
 	JB_String* Name;
+	Selector* Next;
 );
 
 struct String_Behaviour: Object_Behaviour {
@@ -1033,13 +1026,13 @@ struct StringReader_Behaviour: Object_Behaviour {
 };
 
 JBClass ( StringReader , JB_Object , 
-	int Length;
-	JB_Object* UserObj;
-	JB_File* File;
 	int StartFrom;
+	JB_File* File;
+	FastBuff Data;
+	JB_Object* UserObj;
+	int Length;
 	int ChunkSize;
 	bool _NoMoreChunks;
-	FastBuff Data;
 );
 
 struct SyntaxObj_Behaviour: Object_Behaviour {
@@ -1047,10 +1040,10 @@ struct SyntaxObj_Behaviour: Object_Behaviour {
 
 JBClass ( SyntaxObj , JB_Object , 
 	Syntax ID;
-	JB_String* Name;
 	JB_String* LongName;
 	FP_fpMsgRender RenderAddr;
 	FP_fpMsgRender ExportAddr;
+	JB_String* Name;
 );
 
 struct TerminalCell_Behaviour: Object_Behaviour {
@@ -1081,13 +1074,13 @@ struct xC2xB5Form_Behaviour: Object_Behaviour {
 
 JBClass ( xC2xB5Form , JB_Object , 
 	int Count;
-	ASMParam Params[7];
 	Message* src;
 	JB_String* Name;
 	int RegForJump;
-	int TotalBits;
 	int Index;
 	int Outputs;
+	int TotalBits;
+	ASMParam Params[7];
 );
 
 struct xC2xB5Func_Behaviour: Object_Behaviour {
@@ -1095,8 +1088,8 @@ struct xC2xB5Func_Behaviour: Object_Behaviour {
 
 JBClass ( FuncInASM , JB_Object , 
 	int Length;
-	SCFunction* Fn;
 	MWrap* Testing;
+	SCFunction* Fn;
 	FatASM* IR;
 	bool OK;
 );
@@ -1131,8 +1124,8 @@ struct SCNamed_Behaviour: SCObject_Behaviour {
 };
 
 JBClass ( SCNamed , SCObject , 
-	JB_String* Name;
 	JB_String* ExportName;
+	JB_String* Name;
 );
 
 struct SavingTest_Behaviour: Saveable_Behaviour {
@@ -1162,19 +1155,19 @@ struct Message_Behaviour: list_Behaviour {
 JBClass ( Message , JB_List , 
 	JB_String* Name;
 	u16 Tag;
-	u16 RangeLength;
 	MsgParseFlags Flags;
-	Syntax Func;
+	u16 RangeLength;
 	byte Indent;
+	Syntax Func;
 );
 
 struct MessageID_Behaviour: StringShared_Behaviour {
 };
 
 JBClass ( MessageID , JB_StringShared , 
-	int64 Frequency;
-	int64 ID;
 	JB_Object* Obj;
+	int64 ID;
+	int64 Frequency;
 	int Position;
 	Syntax Func;
 );
@@ -1183,32 +1176,32 @@ struct SCDecl_Behaviour: SCNamed_Behaviour {
 };
 
 JBClass ( SCDecl , SCNamed , 
-	SCClass* Type;
-	uint64 ExportPosition;
-	SCFunction* HiderFunc;
 	JB_Object* IsLookupOnly;
-	JB_String* StringData;
-	SCDecl* Internal;
-	Message* Default;
+	SCFunction* HiderFunc;
+	uint64 ExportPosition;
 	SCDecl* Contains;
-	SCDeclInfo Info;
+	SCDecl* Internal;
+	JB_String* StringData;
+	SCClass* Type;
+	Message* Default;
 	int C_Array;
+	SCDeclInfo Info;
 	DataTypeCode DataType;
 	byte NilAllocDepth;
-	NilState NilDeclared;
 	byte NilReg;
 	byte PointerCount;
+	NilState NilDeclared;
 );
 
 struct SCFile_Behaviour: File_Behaviour {
 };
 
 JBClass ( SCFile , JB_File , 
-	Message* OrigAST;
 	JB_String* ExportName;
 	SCImport* Proj;
-	Message* LiveAST;
 	JB_String* FData;
+	Message* LiveAST;
+	Message* OrigAST;
 	u16 FileNum;
 	bool IsInternal;
 );
@@ -1217,17 +1210,17 @@ struct SCIterator_Behaviour: SCNamed_Behaviour {
 };
 
 JBClass ( SCIterator , SCNamed , 
+	bool OK;
 	SCClass* Parent;
-	Array* Names;
-	SCNodeRenamer* selfs;
-	SCNodeRenamer* ValueRenamer;
-	Message* Index;
-	Message* LoopCond;
-	Message* LoopEndCond;
-	Message* Value;
 	Message* Yield;
 	Message* WhileLoop;
-	bool OK;
+	Message* Value;
+	Message* LoopEndCond;
+	Message* LoopCond;
+	Message* Index;
+	SCNodeRenamer* ValueRenamer;
+	SCNodeRenamer* selfs;
+	Array* Names;
 );
 
 struct SCNode_Behaviour: SCNamed_Behaviour {
@@ -1235,9 +1228,9 @@ struct SCNode_Behaviour: SCNamed_Behaviour {
 
 JBClass ( SCNode , SCNamed , 
 	SCImport* Project;
-	Dictionary* Access;
 	SCNode* MyReacher;
 	SCNode* Parent;
+	Dictionary* Access;
 );
 
 struct SaverClassInfo_Behaviour: Array_Behaviour {
@@ -1256,12 +1249,12 @@ JBClass ( SpdProcess , ShellStream ,
 	JB_StringC* _DebugName;
 	PicoComms* Pico;
 	FastString* Writer;
+	FP_SpdMainFn SubProcess;
 	int DiedCount;
 	int DeathLimit;
 	ProcessMode Mode;
 	bool AlreadyWarnedDied;
 	bool WeAreParent;
-	FP_SpdMainFn SubProcess;
 );
 
 struct Task_Behaviour: list_Behaviour {
@@ -1277,12 +1270,12 @@ struct Error_Behaviour: Message_Behaviour {
 };
 
 JBClass ( JB_Error , Message , 
-	Date When;
-	JB_String* Path;
 	JB_String* OriginalData;
-	JB_String* StackTrace;
+	JB_String* Path;
+	Date When;
 	Message* Node;
 	Float64 Progress;
+	JB_String* StackTrace;
 	ErrorFlags ErrorFlags;
 	ErrorSeverity Severity;
 );
@@ -1323,50 +1316,67 @@ struct SCClass_Behaviour: SCBetterNode_Behaviour {
 };
 
 JBClass ( SCClass , SCBetterNode , 
+	byte Depth;
+	byte MinOpt;
+	byte Behaviourness;
+	byte IsWrapper;
+	byte IsRole;
+	SCNodeType BaseType;
+	DataTypeCode TypeInfo;
+	u16 SizeRaw;
+	u16 Size;
+	u16 TaskObjectCount;
+	ClassInfo Flags;
 	SCDecl* DataObject;
+	SCClass* DowngradeTo;
+	SCClass* ProcessAs;
+	JB_String* SaveAs;
+	SCBehaviour* Behaviour;
+	Message* IsModel;
+	SCDecl* SelfDecl;
+	SCDecl* ClassType;
+	JB_String* CppClass;
+	SCFunction* DestructorFunc;
+	SCFunction* ConstructorFunc;
+	SCFunction* TheBoolFunc;
+	SCFunction* TheIsFunc;
+	SCFunction* FuncProto;
+	SCDecl* _NotConst;
+	SCDecl* Signed;
+	SCDecl* Contained;
+	SCDecl* TypeOptional;
+	SCDecl* TypeReal;
+	Array* Casts;
+	Array* Children;
 	SCClass* Super;
 	Message* Defawlt;
 	Message* False;
 	SCModule* Modul;
 	Array* Properties;
 	SCDecl* TypeNormal;
-	SCDecl* TypeOptional;
-	SCDecl* TypeReal;
-	Array* Casts;
-	Array* Children;
-	SCDecl* Contained;
-	SCDecl* Signed;
-	SCDecl* _NotConst;
-	SCFunction* FuncProto;
-	SCFunction* TheIsFunc;
-	SCFunction* TheBoolFunc;
-	SCFunction* ConstructorFunc;
-	SCFunction* DestructorFunc;
-	JB_String* CppClass;
-	SCDecl* ClassType;
-	SCDecl* SelfDecl;
-	Message* IsModel;
-	SCBehaviour* Behaviour;
-	JB_String* SaveAs;
-	SCClass* DowngradeTo;
-	SCClass* ProcessAs;
-	ClassInfo Flags;
-	u16 TaskObjectCount;
-	u16 Size;
-	DataTypeCode TypeInfo;
-	SCNodeType BaseType;
-	byte Depth;
-	byte MinOpt;
-	byte Behaviourness;
-	byte IsRole;
-	byte IsWrapper;
 );
 
 struct SCFunction_Behaviour: SCBetterNode_Behaviour {
 };
 
 JBClass ( SCFunction , SCBetterNode , 
+	NilState NilSelf;
+	byte MinOpt;
+	byte IsAssigns;
+	byte IsCppInBuilt;
+	ErrorSeverity BlindCasts;
+	byte IsNilChecker;
+	byte Badness;
+	byte StructReturnPos;
+	byte OptCounts;
+	byte IntPrmCount;
+	u16 LinkDepth;
+	u16 TmpCounter;
+	u16 TableId;
+	u16 AltersParams;
+	FunctionType FuncInfo;
 	Macro* IsMacro;
+	SCFunction* DepthFinder;
 	Array* LinkTo;
 	Array* Args;
 	SCClass* Cls;
@@ -1376,40 +1386,24 @@ JBClass ( SCFunction , SCBetterNode ,
 	FuncInASM* ASM;
 	SCDecl* HasProto;
 	SCClass* ProtoType;
-	SCFunction* DepthFinder;
 	SCDecl* ReturnType;
-	FunctionType FuncInfo;
-	u16 AltersParams;
-	u16 LinkDepth;
-	u16 TableId;
-	u16 TmpCounter;
-	byte IntPrmCount;
-	NilState NilSelf;
-	byte MinOpt;
-	byte IsAssigns;
-	byte IsCppInBuilt;
-	ErrorSeverity BlindCasts;
-	byte IsNilChecker;
-	byte Badness;
-	byte OptCounts;
-	byte StructReturnPos;
 );
 
 struct SCModule_Behaviour: SCBetterNode_Behaviour {
 };
 
 JBClass ( SCModule , SCBetterNode , 
+	bool Grabbed;
+	bool IsImport;
+	bool Inited;
+	bool IsRequiredInterface;
+	CppRefs* DefaultRefs;
+	Message* InitAfter;
 	JB_String* SubsFrom;
 	SCClass* Cls;
 	Message* InitVarsArg;
 	Message* InitCodeArg;
 	JB_String* CppPart;
-	Message* InitAfter;
-	CppRefs* DefaultRefs;
-	bool IsRequiredInterface;
-	bool Grabbed;
-	bool Inited;
-	bool IsImport;
 );
 
 JBClass ( Task2 , LessThan3 , 
@@ -1514,13 +1508,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool ((int)16)
 #define kSC__CustomOps_TypeCastToBetter ((int)32)
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2141])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2140])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2142])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2143])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2140])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2143])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2144])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2141])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2142])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2139])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2142])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2143])
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
 extern int SC__FastStringOpts_StrRemoved;
@@ -1707,12 +1701,11 @@ extern JB_String* SC___AppConfString;
 extern JB_String* JB__JbinHeader;
 extern JB_String* JB__jBinNotJbin;
 extern int JB_aaaaaaa;
-extern JB_String* SC_ASM_ASK;
 extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2149])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2148])
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
 extern CharSet* SC_CSNum;
@@ -1736,7 +1729,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kNoMatch ((int)0)
 #define kJB_kNumericMatch ((int)8388608)
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2145])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2144])
 #define kJB_kSimpleMatch ((int)4194304)
 #define kJB_kSuperClassMatch ((int)16777216)
 #define kJB_kTypeCastAssigns ((int)64)
@@ -1754,7 +1747,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2150])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2149])
 #define kJB_kVoidPtrMatch ((int)20971520)
 extern Message* SC_ReturnSelfEqNil;
 extern Dictionary* SC_RootCollectTable;
@@ -1896,10 +1889,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp ((int)32784)
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2148])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2147])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2147])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2146])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2146])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2145])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int16_max ((s16)32767)
@@ -2323,7 +2316,6 @@ extern Array* SC__NilReason_values;
 #define kSC__SCDeclInfo_Altered ((SCDeclInfo)1048576)
 #define kSC__SCDeclInfo_AlteredViaPointer ((SCDeclInfo)524288)
 #define kSC__SCDeclInfo_API ((SCDeclInfo)1024)
-#define kSC__SCDeclInfo_Biggest ((SCDeclInfo)268435456)
 #define kSC__SCDeclInfo_Body ((SCDeclInfo)32768)
 #define kSC__SCDeclInfo_Borrowed ((SCDeclInfo)1)
 #define kSC__SCDeclInfo_ClassObj ((SCDeclInfo)2048)
@@ -2333,6 +2325,7 @@ extern Array* SC__NilReason_values;
 #define kSC__SCDeclInfo_DirectNumber ((SCDeclInfo)4)
 #define kSC__SCDeclInfo_GameFlyingMem ((SCDeclInfo)4194304)
 #define kSC__SCDeclInfo_Global ((SCDeclInfo)131072)
+#define kSC__SCDeclInfo_Grabbed ((SCDeclInfo)268435456)
 #define kSC__SCDeclInfo_Hidden ((SCDeclInfo)134217728)
 #define kSC__SCDeclInfo_IntendedAsReturn ((SCDeclInfo)2147483648)
 #define kSC__SCDeclInfo_Local ((SCDeclInfo)49152)
@@ -2417,7 +2410,7 @@ extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_kDelete ((int)2)
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2139])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2138])
 extern Float64 JB__Rec_Progress;
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -3677,10 +3670,6 @@ SCDecl* SC_DeclOfObjForC(Message* Curr);
 
 Message* SC_DeclsDefault(Message* Def);
 
-bool SC_DeclSizeSorter(SCDecl* A, SCDecl* B);
-
-bool SC_DeclSizeSorterRev(SCDecl* A, SCDecl* B);
-
 Message* SC_DefaultStitch(Message* Default, Message* Dcl);
 
 SCObject* SC_DollaDolla(Message* Exp, SCNode* Name_space);
@@ -3788,6 +3777,10 @@ Message* SC_SettingAProperty(Message* Rel);
 bool SC_SettingMemory(Message* Rel);
 
 bool SC_SettingSelfProperty(Message* Rel);
+
+int SC_SmallestAlignedFirst(JB_Object* A, JB_Object* B);
+
+int SC_SmallestFirst(JB_Object* A, JB_Object* B);
 
 Array* SC_SortInitOrder(Array* Mods);
 
@@ -4244,8 +4237,6 @@ int JB_int_LowestBit(int Self);
 Message* JB_int_Msg(int Self);
 
 int JB_int_OperatorAlign(int Self, int To);
-
-void JB_int_OperatorDownto(int Self, int Other, IntDownRange* Rz);
 
 bool JB_int_OperatorIsa(int Self, uint N);
 
@@ -7507,6 +7498,8 @@ void SC_Array_AddCStr(Array* Self, JB_String* S);
 
 void SC_Array_AppendWords(Array* Self, JB_String* R);
 
+int SC_Array_CArraySize(Array* Self, int Size);
+
 void JB_Array_Clear(Array* Self);
 
 JB_Object* JB_Array_First(Array* Self);
@@ -8897,6 +8890,8 @@ int SC_Decl_AccessType(SCDecl* Self, SCDecl* Access, Message* Ch);
 
 SCDecl* SC_Decl_ActualReplace(SCDecl* Self, SCDecl* New);
 
+int SC_Decl_Alignment(SCDecl* Self);
+
 bool SC_Decl_AlreadyContains(SCDecl* Self);
 
 uint64 SC_Decl_AsConst(SCDecl* Self, Message* Value, DataTypeCode* Ty);
@@ -8962,8 +8957,6 @@ Message* SC_Decl_CreateSimpleTypeCast(SCDecl* Self, Message* Exp);
 Message* SC_Decl_CreateStructNil(SCDecl* Self, Message* Where);
 
 Message* SC_Decl_CreateStructNilSub(SCDecl* Self);
-
-int SC_Decl_DeclSizeSort(SCDecl* Self);
 
 Message* SC_Decl_DeclToAddr(SCDecl* Self, SCDecl* P0);
 
@@ -9616,6 +9609,12 @@ void SC_Class_AfterAfterFuncs(SCClass* Self);
 
 void SC_Class_AfterFuncsDecled(SCClass* Self);
 
+void SC_Class_AlignProperties(SCClass* Self);
+
+bool SC_Class_AlignSub(SCClass* Self, Array* Dest, SCDecl* D);
+
+void SC_Class_AlignTo(SCClass* Self, Array* Dest, int Bits);
+
 JB_String* SC_Class_APIStructName(SCClass* Self);
 
 void SC_Class_BannedCheck(SCClass* Self, Message* Src);
@@ -9694,6 +9693,8 @@ SCFunction* SC_Class_FindFunc(SCClass* Self, JB_String* Keyword, bool CheckParen
 
 void SC_Class_FindNilChecker(SCClass* Self);
 
+SCDecl* SC_Class_FindPropAlignedTo(SCClass* Self, int Align, Array* Dest);
+
 SCFunction* SC_Class_FindSpecialFunc(SCClass* Self, JB_String* Keyword, bool CheckParents);
 
 SCFunction* SC_Class_FirstDestructor(SCClass* Self);
@@ -9709,6 +9710,8 @@ SCFunction* SC_Class_GetFunc(SCClass* Self, JB_String* Keyword, bool DoError);
 SCIterator* SC_Class_GetIteratorAny(SCClass* Self, JB_String* Name, Message* Node);
 
 SCClass* SC_Class_GoUpTo(SCClass* Self, int D);
+
+void SC_Class_GrabRemaining(SCClass* Self, Array* Dest);
 
 bool SC_Class_HasObjectProperties(SCClass* Self);
 
@@ -9813,10 +9816,6 @@ void SC_Class_RenderSaveable(SCClass* Self, FastString* Fs);
 bool SC_Class_RenderSaveableSub(SCClass* Self, FastString* Fs);
 
 void SC_Class_SimplerDataTypes(SCClass* Self, FastString* Fs, SCDecl* D);
-
-void SC_Class_SortProperties(SCClass* Self);
-
-SCDecl* SC_Class_SortPropHelper(SCClass* Self);
 
 void SC_Class_StartupSaver(SCClass* Self, JB_String* Name);
 
