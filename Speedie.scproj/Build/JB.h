@@ -2003,36 +2003,35 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_WR2U ((ASM_Write)94)
 #define kSC__ASM_WR4U ((ASM_Write)95)
 #define kSC__ASM_WR8U ((ASM_Write)96)
-#define kSC__Reg_AddrForceRequest ((ASMReg)34359738368)
-#define kSC__Reg_AddrNeed ((ASMReg)51539607552)
-#define kSC__Reg_AddrRequest ((ASMReg)17179869184)
-#define kSC__Reg_AlreadyNegated ((ASMReg)2097152)
-#define kSC__Reg_Alternate ((ASMReg)4194304)
-#define kSC__Reg_Arg ((ASMReg)8388608)
-#define kSC__Reg_CondAnswer ((ASMReg)274877906944)
-#define kSC__Reg_CondRequest ((ASMReg)137438953472)
-#define kSC__Reg_ConstAny ((ASMReg)1073741824)
-#define kSC__Reg_ContainsAddr ((ASMReg)8589934592)
-#define kSC__Reg_Decl ((ASMReg)50331648)
-#define kSC__Reg_Discard ((ASMReg)8388608)
+#define kSC__Reg_AddrForceRequest ((ASMReg)17179869184)
+#define kSC__Reg_AddrNeed ((ASMReg)25769803776)
+#define kSC__Reg_AddrRequest ((ASMReg)8589934592)
+#define kSC__Reg_AlreadyNegated ((ASMReg)1048576)
+#define kSC__Reg_Alternate ((ASMReg)2097152)
+#define kSC__Reg_Arg ((ASMReg)4194304)
+#define kSC__Reg_CondAnswer ((ASMReg)137438953472)
+#define kSC__Reg_CondRequest ((ASMReg)68719476736)
+#define kSC__Reg_ConstAny ((ASMReg)536870912)
+#define kSC__Reg_ContainsAddr ((ASMReg)4294967296)
+#define kSC__Reg_Decl ((ASMReg)25165824)
+#define kSC__Reg_Discard ((ASMReg)4194304)
 #define kSC__Reg_FatRef ((int)1073741824)
-#define kSC__Reg_ForCast ((ASMReg)67108864)
+#define kSC__Reg_ForCast ((ASMReg)33554432)
 #define kSC__Reg_FromExistingVar ((ASMReg)262144)
-#define kSC__Reg_KindaConst ((ASMReg)3221225472)
+#define kSC__Reg_KindaConst ((ASMReg)1610612736)
 #define kSC__Reg_Negate ((ASMReg)65536)
-#define kSC__Reg_NeverAltered ((ASMReg)2147483648)
-#define kSC__Reg_NoScale ((ASMReg)536870912)
-#define kSC__Reg_NotYetUsed ((ASMReg)33554432)
+#define kSC__Reg_NeverAltered ((ASMReg)1073741824)
+#define kSC__Reg_NoScale ((ASMReg)268435456)
+#define kSC__Reg_NotYetUsed ((ASMReg)16777216)
 #define kSC__Reg_Param ((ASMReg)131072)
-#define kSC__Reg_Set ((ASMReg)16777216)
-#define kSC__Reg_SingleExpr ((ASMReg)268435456)
+#define kSC__Reg_Set ((ASMReg)8388608)
+#define kSC__Reg_SetRelRemove ((ASMReg)1611137024)
+#define kSC__Reg_SingleExpr ((ASMReg)134217728)
 #define kSC__Reg_StayOpen ((ASMReg)524288)
-#define kSC__Reg_Temp ((ASMReg)134217728)
-#define kSC__Reg_Textual ((ASMReg)68719476736)
-#define kSC__Reg_TrueConstCond ((ASMReg)4294967296)
-#define kSC__Reg_UseForAWhile ((ASMReg)1048576)
-#define kSC__Reg_VeryOpen ((ASMReg)1572864)
-#define kSC__Reg_Zero ((ASMReg)1073872952)
+#define kSC__Reg_Temp ((ASMReg)67108864)
+#define kSC__Reg_Textual ((ASMReg)34359738368)
+#define kSC__Reg_TrueConstCond ((ASMReg)2147483648)
+#define kSC__Reg_Zero ((ASMReg)537002040)
 #define kSC__ASMType_IncrAfter ((int)2)
 #define kSC__ASMType_IncrBefore ((int)0)
 #define kSC__ASMType_kContinue ((ASMType)53)
@@ -4594,7 +4593,7 @@ int SC_Reg_PointerMul(ASMReg Self, Message* Exp, int Swapped);
 
 ASMReg SC_Reg_ReadOrWrite(ASMReg Self, Message* M, ASMReg Ptr, ASMReg Varadd, int Index);
 
-FatASM* SC_Reg_ReadOrWriteSub(ASMReg Self, Message* M, ASMReg Ptr, ASMReg Varadd, int Index, bool DoWrite);
+FatASM* SC_Reg_ReadOrWriteSub(ASMReg Self, Message* Exp, ASMReg Ptr, ASMReg Varadd, int Index, bool DoWrite);
 
 int SC_Reg_Reg(ASMReg Self);
 
@@ -7848,7 +7847,7 @@ uint64 SC_Msg_ASMConst(Message* Self);
 
 SCDecl* SC_Msg_ASMDecl(Message* Self);
 
-ASMReg SC_Msg_asmlocal(Message* Self, ASMReg Extra);
+ASMReg SC_Msg_ASMLocal(Message* Self, ASMReg Extra);
 
 int SC_Msg_ASMReg(Message* Self);
 
@@ -10454,9 +10453,9 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F);
 
 inline ASMReg SC_Pac_Exists(ASMState* Self, ASMReg Dest, ASMReg L, Message* Exp);
 
-inline FatASM* SC_Reg_Read(ASMReg Self, Message* M, ASMReg Ptr, ASMReg Varadd, int Index);
+inline FatASM* SC_Reg_Read(ASMReg Self, Message* Exp, ASMReg Ptr, ASMReg Varadd, int Index);
 
-inline FatASM* SC_Reg_Write(ASMReg Self, Message* M, ASMReg Ptr, ASMReg Varadd, int Index);
+inline FatASM* SC_Reg_Write(ASMReg Self, Message* Exp, ASMReg Ptr, ASMReg Varadd, int Index);
 
 inline SCDecl* SC_TypeOfSwiz(Message* Exp, SCNode* Name_space, Message* Side, SCDecl* class_Space);
 
@@ -10706,6 +10705,7 @@ inline bool SC_Decl_IsUnknownParam(SCDecl* Self) {
 inline ASMReg SC_Pac_GetASM(ASMState* Self, Message* Exp, ASMReg Dest) {
 	fn_asm Fn = SC_fn_asm_table[SC_Msg_ASMType(Exp)];
 	uint TmpCloser = Self->VTmps;
+	JB_DoAt(0);
 	ASMReg Ss = (Fn)(Self, Exp, Dest, 0);
 	iif (!SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen)) {
 		SC_Pac_CloseVTmps(Self, TmpCloser);
@@ -10741,12 +10741,12 @@ inline ASMReg SC_Pac_Exists(ASMState* Self, ASMReg Dest, ASMReg L, Message* Exp)
 	return SC_Pac_Equals(Self, SC_Reg_Negate(Dest, true), L, SC_Reg__New(), Exp);
 }
 
-inline FatASM* SC_Reg_Read(ASMReg Self, Message* M, ASMReg Ptr, ASMReg Varadd, int Index) {
-	return SC_Reg_ReadOrWriteSub(Self, M, Ptr, Varadd, Index, false);
+inline FatASM* SC_Reg_Read(ASMReg Self, Message* Exp, ASMReg Ptr, ASMReg Varadd, int Index) {
+	return SC_Reg_ReadOrWriteSub(Self, Exp, Ptr, Varadd, Index, false);
 }
 
-inline FatASM* SC_Reg_Write(ASMReg Self, Message* M, ASMReg Ptr, ASMReg Varadd, int Index) {
-	return SC_Reg_ReadOrWriteSub(Self, M, Ptr, Varadd, Index, true);
+inline FatASM* SC_Reg_Write(ASMReg Self, Message* Exp, ASMReg Ptr, ASMReg Varadd, int Index) {
+	return SC_Reg_ReadOrWriteSub(Self, Exp, Ptr, Varadd, Index, true);
 }
 
 inline SCDecl* SC_TypeOfSwiz(Message* Exp, SCNode* Name_space, Message* Side, SCDecl* class_Space) {

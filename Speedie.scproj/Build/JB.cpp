@@ -3456,7 +3456,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[220]);
-	JB_FS_AppendInt32(_fsf0, (2024110616));
+	JB_FS_AppendInt32(_fsf0, (2024110715));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8866,7 +8866,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1377]);
-	JB_FS_AppendInt32(_fsf0, (2024110616));
+	JB_FS_AppendInt32(_fsf0, (2024110715));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -17949,7 +17949,7 @@ ASMReg SC_Reg_ReadOrWrite(ASMReg Self, Message* M, ASMReg Ptr, ASMReg Varadd, in
 	return SC_FAT_AsReg(SC_Reg_ReadOrWriteSub(Self, M, Ptr, Varadd, Index, SC_Reg_SyntaxIs(Self, kSC__Reg_Set)), Self);
 }
 
-FatASM* SC_Reg_ReadOrWriteSub(ASMReg Self, Message* M, ASMReg Ptr, ASMReg Varadd, int Index, bool DoWrite) {
+FatASM* SC_Reg_ReadOrWriteSub(ASMReg Self, Message* Exp, ASMReg Ptr, ASMReg Varadd, int Index, bool DoWrite) {
 	FatASM* Rz = nil;
 	iif (SC_Reg_SyntaxIs(Self, kSC__Reg_ContainsAddr)) {
 		//wait?? this is meant to be an addrrequest? not a response.;
@@ -17960,16 +17960,16 @@ FatASM* SC_Reg_ReadOrWriteSub(ASMReg Self, Message* M, ASMReg Ptr, ASMReg Varadd
 	int Bytes = JB_Int_Log2(BC);
 	iif (((uint)Bytes) > 4) {
 		iif (true) {
-			JB_Msg_Fail(M, JB_LUB[1772]);
+			JB_Msg_Fail(Exp, JB_LUB[1772]);
 		}
 		Bytes = 0;
 	}
 	iif (Index >= 128) {
 		Index = (Index * JB_TC_ByteCount(T));
-		Ptr = SC_Pac_AddToReg((&SC__Pac_Sh), M, SC_Reg__New(), SC_Reg_OperatorAs(Ptr, kSC__Reg_NoScale), Index);
+		Ptr = SC_Pac_AddToReg((&SC__Pac_Sh), Exp, SC_Reg__New(), SC_Reg_OperatorAs(Ptr, kSC__Reg_NoScale), Index);
 		Index = 0;
 	}
-	Rz = JB_Msg_RD4U(M, Self, Ptr, Varadd, Index, 0);
+	Rz = JB_Msg_RD4U(Exp, Self, Ptr, Varadd, Index, 0);
 	iif (DoWrite) {
 		Rz->Op = SC__ASMType_WriteASM[Bytes];
 	}
@@ -18032,11 +18032,13 @@ bool SC_ASMType_SyntaxIs(uint /*ASMType*/ Self, uint /*ASMType*/ T) {
 }
 
 ASMReg SC_ASMType__Access(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
-	Dest = SC_Pac_TempTyped(Self, Exp, Dest);
+	iif (!SC_Reg_SyntaxIs(Dest, kSC__Reg_Set)) {
+		Dest = SC_Pac_TempTyped(Self, Exp, Dest);
+	}
 	Message* F = ((Message*)JB_Ring_First(Exp));
-	ASMReg Ptr = SC_Pac_GetASM(Self, F, SC_Reg__New());
+	ASMReg Ptr = SC_Pac_GetASM(Self, F, kSC__Reg_StayOpen);
 	Message* Sc = ((Message*)JB_Ring_First(((Message*)JB_Tree_Second(Exp))));
-	ASMReg Vara = SC_Pac_GetASM(Self, Sc, SC_Reg__New());
+	ASMReg Vara = SC_Pac_GetASM(Self, Sc, kSC__Reg_StayOpen);
 	iif (SC_Reg_SyntaxIs(Dest, kSC__Reg_AddrRequest)) {
 		JB_DoAt(1);
 		return SC_Pac_Plus(Self, SC_Reg_HaveAddr(Dest), Ptr, Vara, Exp);
@@ -18126,12 +18128,14 @@ ASMReg SC_ASMType__Decl(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
 }
 
 ASMReg SC_ASMType__DoFunction(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
-	ASMReg Rz = ((ASMReg)0);
 	// The .asint/.asfloat functions should be recognised as working on constants? Or is that just a general case of inline functions? Technically, its an inline func that does nothing, just returns the original... with a different type. ;
 	Message* Prms = ((Message*)JB_Ring_Last(Exp));
 	SCFunction* Fn = SC_Msg_AsFunc(Prms);
 	Dest = SC_Reg_xC2xB5TypeSet(Dest, SC_Func_RegType(Fn));
 	int Vd = SC_Reg_CallFunc(Dest, Self->VDecls) + 1;
+	iif (SC_Reg_SyntaxIs(Dest, kSC__Reg_StayOpen)) {
+		(++Self->VDecls);
+	}
 	iif (Vd >= 32) {
 		JB_Msg_Fail(Exp, JB_LUB[1786]);
 	}
@@ -18145,13 +18149,7 @@ ASMReg SC_ASMType__DoFunction(ASMState* Self, Message* Exp, ASMReg Dest, int Mod
 		Fat->Op = kSC__ASM_FNCX;
 	}
 	Fat->Op = (Fat->Op + (PExt > 0));
-	Rz = SC_FAT_AsReg(Fat, Dest);
-	iif (SC_Reg_SyntaxIs(Dest, kSC__Reg_UseForAWhile)) {
-		Rz = SC_Pac_TempOnly(Self, Exp, kSC__Reg_Temp);
-		Rz = SC_Reg_xC2xB5TypeSet(Rz, SC_Reg_xC2xB5Type(Dest));
-		Rz = SC_Pac_Assign(Self, Rz, Dest, Exp);
-	}
-	return Rz;
+	return SC_FAT_AsReg(Fat, Dest);
 }
 
 ASMReg SC_ASMType__DoGlobal(ASMState* Self, Message* Exp, ASMReg Dest, SCDecl* D) {
@@ -18197,8 +18195,10 @@ ASMReg SC_ASMType__DoMath(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
 }
 
 ASMReg SC_ASMType__Dot(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
-	Dest = SC_Pac_TempTyped(Self, Exp, Dest);
-	ASMReg Obj = SC_Pac_GetASM(Self, ((Message*)JB_Ring_First(Exp)), Dest);
+	iif (!SC_Reg_SyntaxIs(Dest, kSC__Reg_Set)) {
+		Dest = SC_Pac_TempTyped(Self, Exp, Dest);
+	}
+	ASMReg Obj = SC_Pac_GetASM(Self, ((Message*)JB_Ring_First(Exp)), SC_Reg_OperatorAs(Dest, kSC__Reg_StayOpen));
 	SCDecl* Prop = SC_Msg_ASMDecl(Exp);
 	uint T = SC_Decl_TypeInfo(Prop);
 	Dest = SC_Reg_xC2xB5TypeSet(Dest, T);
@@ -18397,7 +18397,7 @@ ASMReg SC_ASMType__SetRel(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
 	iif (SC_Reg_Reg(X)) {
 		return SC_Pac_xC2xB5Into(Self, B, X);
 	}
-	Dest = SC_Reg_OperatorAsnt(SC_Pac_GetASM(Self, B, X), kSC__Reg_KindaConst);
+	Dest = SC_Reg_OperatorAsnt(SC_Pac_GetASM(Self, B, SC_Reg_OperatorAs(X, kSC__Reg_StayOpen)), kSC__Reg_SetRelRemove);
 	return SC_Pac_GetASM(Self, A, SC_Reg_OperatorAs(Dest, kSC__Reg_Set));
 }
 
@@ -22806,8 +22806,10 @@ ASMReg SC_Pac_DoMathSub(ASMState* Self, Message* Exp, ASMReg Dest, fn_OpASM Fn) 
 		Ml = SC_Pac_GetASM(Self, Exp, DiscardMode);
 	}
 	 else {
-		Ml = SC_Pac_GetASM(Self, ((Message*)JB_Ring_First(Exp)), SC_Reg_OperatorAs((SC_Reg_OperatorWith(DiscardMode, Dest)), kSC__Reg_VeryOpen));
-		Mr = SC_Pac_GetASM(Self, ((Message*)JB_Ring_Last(Exp)), SC_Reg_with(DiscardMode, Dest, Ml));
+		ASMReg Mode = SC_Reg_OperatorAs((SC_Reg_OperatorWith(DiscardMode, Dest)), kSC__Reg_StayOpen);
+		Ml = SC_Pac_GetASM(Self, ((Message*)JB_Ring_First(Exp)), Mode);
+		Mode = SC_Reg_with(DiscardMode, Dest, Ml);
+		Mr = SC_Pac_GetASM(Self, ((Message*)JB_Ring_Last(Exp)), Mode);
 	}
 	SC_Pac_CloseVTmps(Self, TmpCloser);
 	iif (SC_Reg_SyntaxIs(Dest, kSC__Reg_Discard)) {
@@ -22886,7 +22888,7 @@ ASMReg SC_Pac_ExistingVar(ASMState* Self, Message* M) {
 		Fn = M->Func;
 	};
 	iif (Fn == kJB_SyxThg) {
-		return SC_Msg_asmlocal(M, kSC__Reg_FromExistingVar);
+		return SC_Msg_ASMLocal(M, kSC__Reg_FromExistingVar);
 	}
 	return ((ASMReg)0);
 }
@@ -34132,7 +34134,7 @@ SCDecl* SC_Msg_ASMDecl(Message* Self) {
 	return Rz;
 }
 
-ASMReg SC_Msg_asmlocal(Message* Self, ASMReg Extra) {
+ASMReg SC_Msg_ASMLocal(Message* Self, ASMReg Extra) {
 	SCDecl* D = SC_Msg_ASMDecl(Self);
 	iif (SC_Decl_SyntaxIs(D, kSC__SCDeclInfo_Local)) {
 		return SC_Reg_OperatorAs(SC_Decl_WholeType(D), Extra);
@@ -34141,7 +34143,7 @@ ASMReg SC_Msg_asmlocal(Message* Self, ASMReg Extra) {
 }
 
 int SC_Msg_ASMReg(Message* Self) {
-	return SC_Reg_Reg(SC_Msg_asmlocal(Self, 0));
+	return SC_Reg_Reg(SC_Msg_ASMLocal(Self, 0));
 }
 
 ASMType SC_Msg_ASMType(Message* Self) {
@@ -57648,4 +57650,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -7430265092184824769 -939646426291940302
+// -56795968180230804 -939646426291940302
