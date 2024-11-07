@@ -383,9 +383,9 @@ helper asm_test_func (|int| a, |int| b, |int|)
 helper asm_test_ptr (|fixeddict| a, |&int| b,  |int|)
 	cpp_name asm_test_ptr // many bugs here
 	visible
-	a.letter = -1
 	b[] = 0
 	b[0] = 1
+	a.letter = -1
 	|| n = 10
 	b[n] = 5
 	n = b[1]

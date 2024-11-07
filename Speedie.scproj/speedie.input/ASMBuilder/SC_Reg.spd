@@ -17,7 +17,7 @@ datatype ASMReg (uint64)
 		Negate      // dont put anything before we test for (x << 16)
 		Param
 		FromExistingVar
-		VeryOpen = [StayOpen, UseForAWhile]
+		StayOpen
 		AlreadyNegated
 		Alternate
 		Discard
@@ -27,6 +27,7 @@ datatype ASMReg (uint64)
 		SingleExpr
 		NoScale
 		KindaConst = [ConstAny, NeverAltered]
+		SetRelRemove = KindaConst|||stayopen
 		TrueConstCond
 		ContainsAddr
 		AddrNeed = [AddrRequest, AddrForceRequest]

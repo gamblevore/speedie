@@ -190,25 +190,29 @@ function Arg (fn_asm)
 
 function Access (fn_asm)						// a[b], struct.mem[b]
 	opt	NoRefCounts
-	dest = .TempTyped(exp, dest)
+//	if dest is set
+	if dest isnt set
+		dest = .TempTyped(exp, dest)
 	
 	|| f = exp.first!
 	target debug
 		|| d = f.asmdecl
 		if !d.pointercount and !d.iscarray
-	|| Ptr = .µ(f)								// x = a.b[0]
+	|| Ptr = .µ(f, asmreg.stayopen)								// x = a.b[0]
 	|| sc = exp.second.first!
-	|| vara = .µ(sc)
+	|| vara = .µ(sc, asmreg.stayopen)
 	if (dest is AddrRequest)
 /		return .Plus(dest.HaveAddr, ptr, vara, exp)
 	
 	return Dest.ReadOrWrite(exp, ptr, vara)
 
 
-function Dot (fn_asm)						// a.b
+function Dot (fn_asm)							// a.b
 	opt	NoRefCounts
-	dest = .TempTyped(exp, dest)
-	|| Obj = .µ(exp.first!, dest)
+//	if dest is set
+	if dest isnt set
+		dest = .TempTyped(exp, dest)
+	|| Obj = .µ(exp.first!, dest as asmreg.stayopen)
 	|| prop = exp.ASMDecl
 	|| T = prop.typeinfo
 	dest.µtype = T
@@ -218,7 +222,7 @@ function Dot (fn_asm)						// a.b
 	
 	if (dest is AddrRequest) or prop.iscarray
 		pos *= t.ByteCount
-		return .addtoreg(exp, dest.haveaddr, obj as asmreg.noscale, pos)
+		return .AddToReg(exp, dest.HaveAddr, obj as asmreg.NoScale, pos)
 
 	return Dest.ReadOrWrite(exp, obj, asmreg(), pos)
 		
@@ -231,7 +235,7 @@ function SetRel (fn_asm)	// function relset (
 	if X.reg
 		return .µinto(B, X)
 	
-	dest = .µ(B, X) asnt asmreg.kindaconst
+	dest = .µ(B, X as asmreg.stayopen) asnt asmreg.SetRelRemove
 	return .µ(A, dest as AsmReg.set)
 
 
@@ -440,8 +444,10 @@ helper ASMState.DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMR
 	  else
 		// should check if the rightside has a function in it...
 		// then we can't set the reg specifically.
-		ml = .µ(exp.first!, (DiscardMode with dest) as ASMReg.VeryOpen)
-		mr = .µ(exp.last!,   DiscardMode.with(dest, ml))
+		|| Mode = (DiscardMode with dest) as ASMReg.stayopen
+		ml = .µ(exp.first!, mode)
+		mode = DiscardMode.with(dest, ml)
+		mr = .µ(exp.last!, mode)
 	.CloseVTmps(TmpCloser)
 	
 	if dest is Discard
@@ -467,7 +473,7 @@ function ASMReg.ReadOrWrite (|message| m, |asmreg| ptr, |asmreg| varadd, |int| i
 
 
 // we need a varadd... for x = a[b]
-function ASMReg.ReadOrWriteSub (|message| m, |asmreg| ptr, |asmreg| varadd, |int| index, |bool| DoWrite, |&fatasm|)
+function ASMReg.ReadOrWriteSub (|message| exp, |asmreg| ptr, |asmreg| varadd, |int| index, |bool| DoWrite, |&fatasm|)
 	if self is containsaddr
 		#!wait?? this is meant to be an addrrequest? not a response.
 		debugger
@@ -477,15 +483,15 @@ function ASMReg.ReadOrWriteSub (|message| m, |asmreg| ptr, |asmreg| varadd, |int
 	|| BC = t.ByteCount
 	|| bytes = BC.log2
 	if  (bytes|uint| > 4)
-		error (m, "Object to large to access") // later we can do a struct-mem-copy operation?
+		error (exp, "Object to large to access") // later we can do a struct-mem-copy operation?
 		bytes = 0
 	
 	if index >= 128						// read/write only allows up to 127
 		index *= t.ByteCount
-		ptr = asmstate.sh.AddToReg(m, asmreg(), ptr as asmreg.noscale, index)
+		ptr = asmstate.sh.AddToReg(exp, asmreg(), ptr as asmreg.noscale, index)
 		index = 0
 	
-	rz = m.RD4U(self, ptr, varadd, index, 0)
+	rz = exp.RD4U(self, ptr, varadd, index, 0)
 	if DoWrite
 		rz.op = ASMType.WriteASM[bytes]
 	  else
@@ -493,17 +499,17 @@ function ASMReg.ReadOrWriteSub (|message| m, |asmreg| ptr, |asmreg| varadd, |int
 		rz.op = ASMType.ReadASM[b]
 
 
-function ASMReg.Read  (|message| m,  |asmreg| ptr,  |asmreg| varadd,  |int| index=0,  |&fatasm|)
+function ASMReg.Read  (|message| exp,  |asmreg| ptr,  |asmreg| varadd,  |int| index=0,  |&fatasm|)
 	opt inline
-	return .ReadOrWriteSub(m, ptr, varadd, index, false)
+	return .ReadOrWriteSub(exp, ptr, varadd, index, false)
 	
 
-function ASMReg.Write (|message| m,  |asmreg| ptr,  |asmreg| varadd,  |int| index=0,  |&fatasm|)
+function ASMReg.Write (|message| exp,  |asmreg| ptr,  |asmreg| varadd,  |int| index=0,  |&fatasm|)
 	opt inline
-	return .ReadOrWriteSub(m, ptr, varadd, index, true)
+	return .ReadOrWriteSub(exp, ptr, varadd, index, true)
 
 
-function message.asmlocal (|asmreg| extra = 0, |asmreg|)
+function message.ASMLocal (|asmreg| extra = 0, |asmreg|)
 	opt	norefcounts
 	|| d = .ASMDecl
 	if d is local

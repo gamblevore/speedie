@@ -220,7 +220,7 @@ struct ASMState
 		cpp_part GetASM 
 		|| fn = fn_asm_table[exp.ASMType]!
 		|| TmpCloser = .VTmps
-		// debugat 318 // keep this
+		debugat 0 // keep this
 		|| ss = (fn)(self, exp, dest)
 		if dest isnt StayOpen
 			.CloseVTmps(TmpCloser)
@@ -231,12 +231,12 @@ struct ASMState
 				if !ss.fat
 					debugger
 					(fn)(self, exp, dest)
+			if dest is set or ss is set
+				return ss // no need test.
 			if !ss.reg and (ss isnt condanswer)
 				if (ss isnt constany)
 					debugger
 					(fn)(self, exp, dest)
-			if dest is set
-				return ss // no need test.
 			if exp.asmtype < ASMType.kIf and ss != asmreg()
 				|| D = exp.asmdecl
 				|| ty = D.typeonly
@@ -350,6 +350,9 @@ function @ASMType.DoFunction (fn_Asm)
 
 	dest.µtype = fn.RegType
 	|| vd = dest.CallFunc(.VDecls) + 1
+	if dest is StayOpen // but not here.
+		.vdecls++
+
 	check (vd < 32) (exp, "Too many registers in use. No space for result.")
 	dest.reg = vd
 
@@ -362,13 +365,8 @@ function @ASMType.DoFunction (fn_Asm)
 	if fn.HasCVersion
 		fat.op = asm.FNCX
 	fat.op += PExt > 0
-	rz = fat*dest
-	
+	return fat*dest
 //  Mostly I'm doing:  || x = msg.function(),  (which uses the correct position.)
-	if dest is UseForAWhile // but not here.
-		rz = .temponly(exp)
-		rz.µtype = dest.µtype
-		rz = .assign(rz, dest, exp)
 		
 
 
