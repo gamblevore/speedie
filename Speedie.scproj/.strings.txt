@@ -822,7 +822,7 @@
 "Interfaces can’t start or end with underscore."
 "Interpreter"
 "Invalid codepoint"
-"refset"
+"refsetcode"
 "Invalid libpack"
 "RFRG"
 "Invalid name."
