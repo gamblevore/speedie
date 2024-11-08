@@ -315,30 +315,24 @@
 #define   Convert_Lu_(x)   (((uint)((x)<<22))>>22)
 
 
-#define   RET_Counti       ((( int)((Op)<<23))>>29)
-#define   RET_Counti_(x)   ((( int)((x)<<23))>>29)
+#define   RET_Valuei       ((( int)((Op)<<23))>>26)
+#define   RET_Valuei_(x)   ((( int)((x)<<23))>>26)
 
-#define   RET_Countu       (((uint)((Op)<<23))>>29)
-#define   RET_Countu_(x)   (((uint)((x)<<23))>>29)
+#define   RET_Valueu       (((uint)((Op)<<23))>>26)
+#define   RET_Valueu_(x)   (((uint)((x)<<23))>>26)
 
-#define   RET_Valuei       ((( int)((Op)<<26))>>26)
-#define   RET_Valuei_(x)   ((( int)((x)<<26))>>26)
+#define   RET_Counti       ((( int)((Op)<<29))>>29)
+#define   RET_Counti_(x)   ((( int)((x)<<29))>>29)
 
-#define   RET_Valueu       (((uint)((Op)<<26))>>26)
-#define   RET_Valueu_(x)   (((uint)((x)<<26))>>26)
+#define   RET_Countu       (((uint)((Op)<<29))>>29)
+#define   RET_Countu_(x)   (((uint)((x)<<29))>>29)
 
 
-#define   RETObj_Counti       ((( int)((Op)<<28))>>29)
-#define   RETObj_Counti_(x)   ((( int)((x)<<28))>>29)
+#define   RETObj_Li       ((( int)((Op)<<28))>>28)
+#define   RETObj_Li_(x)   ((( int)((x)<<28))>>28)
 
-#define   RETObj_Countu       (((uint)((Op)<<28))>>29)
-#define   RETObj_Countu_(x)   (((uint)((x)<<28))>>29)
-
-#define   RETObj_SafeDecri       ((( int)((Op)<<31))>>31)
-#define   RETObj_SafeDecri_(x)   ((( int)((x)<<31))>>31)
-
-#define   RETObj_SafeDecru       (((uint)((Op)<<31))>>31)
-#define   RETObj_SafeDecru_(x)   (((uint)((x)<<31))>>31)
+#define   RETObj_Lu       (((uint)((Op)<<28))>>28)
+#define   RETObj_Lu_(x)   (((uint)((x)<<28))>>28)
 
 
 #define   REQ_Modei       ((( int)((Op)<<18))>>28)
@@ -488,6 +482,19 @@
 
 #define   RefSet_Decru       (((uint)((Op)<<21))>>31)
 #define   RefSet_Decru_(x)   (((uint)((x)<<21))>>31)
+
+
+#define   RefSetCode_Codei       ((( int)((Op)<<18))>>28)
+#define   RefSetCode_Codei_(x)   ((( int)((x)<<18))>>28)
+
+#define   RefSetCode_Codeu       (((uint)((Op)<<18))>>28)
+#define   RefSetCode_Codeu_(x)   (((uint)((x)<<18))>>28)
+
+#define   RefSetCode_Li       ((( int)((Op)<<22))>>22)
+#define   RefSetCode_Li_(x)   ((( int)((x)<<22))>>22)
+
+#define   RefSetCode_Lu       (((uint)((Op)<<22))>>22)
+#define   RefSetCode_Lu_(x)   (((uint)((x)<<22))>>22)
 
 
 #define   RefSet2_Decri       ((( int)((Op)<<18))>>31)

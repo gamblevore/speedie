@@ -82,6 +82,7 @@ function First (fn_asm)
 	return .µ(exp.first!, dest)
 
 
+
 function Return (fn_asm)
 	opt norefcounts
 	|| reg = ASMReg()
@@ -89,13 +90,19 @@ function Return (fn_asm)
 		|| ret = .ReturnASM|asmreg|
 		reg = .µ(f, ret)
 	
+	|| amount = (f!=nil)|int|
+	|| D0 = .SafeDecr
+	|| D1 = .decr
+	|| D2 = .decr
+	if d0 and d0.reg == reg.reg
+		return exp.RETO(D0, D1, D2, .decr) * asmreg()
+		
+	
 	|| K = .const(reg, 6, true) // return true, or -1 or whatever
 		reg = asmreg()
 	  else
 		k = 0
-	|| amount = (f!=nil)|int|
-	exp.RET(reg, asmreg(), asmreg(), amount, K)
-	return asmreg()
+	return exp.RET(reg, D1, D2, amount, K) * asmreg()
 	
 
 

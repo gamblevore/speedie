@@ -150,16 +150,14 @@ forms
 		r1		r		// return reg
 		r2		r		// decr
 		r3		r		// decr
+		Value	6
 		Count	3		// amount of returned registers
-		Value	l
 		
 	RETObj				// keep simple for speed
-		r1		r		// return reg
+		r1		r		// safedecr
 		r2		r		// decr
 		r3		r		// decr
 		r4		r		// decr
-		Count	3		// amount of returned registers
-		SafeDecr 1
 
 	REQ
 		r1		r		// 
@@ -228,6 +226,11 @@ forms
 		Move	1
 		Free	1
 		Decr	1
+
+	RefSetCode
+		r1		R
+		r2		r
+		Code	4
 
 	RefSet2
 		r1		r		// Small R
@@ -527,7 +530,7 @@ POS 5
 
 
 #!						 (((((Refs)))))
-/**/ RFRG  (RefSet)
+/**/ RFRG  (RefSetCode)
 		SetRefRegToReg(r, Op)		
 
 /**/ RFWR  (RefSet2)							// RefCount reg to mem

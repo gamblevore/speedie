@@ -475,11 +475,16 @@ function ASMState.FinishASM
 	opt norefcounts
 	if .zero.Const // what?
 	|| l = .last
-	ifn (l isa asm.ret) or (l isa asm.trap)
+	if !l.IsFinisher
 		|| fn = scfunction.currfunc!
 		expect (!fn.returntype) ("ASMReturn".internal) // why?
 		fn.SourceArg!.RET(asmreg(), asmreg(), asmreg(), 1, 0)
 	.SetLength
+
+
+function fatasm.IsFinisher (|bool|)
+	|| o = .op|asm|
+	return o is ret or trap or reto
 
 
 function ASMState.SetLength

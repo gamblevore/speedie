@@ -22,7 +22,7 @@ extend_module ASMType
 		
 			if b is ContainsAddr									// mem to reg
 				return exp.RFRD(a, b, 1, offset)	
-			return exp.RFRG(a, a, 1, 1, 1, 1)						// reg to reg
+			return exp.RFRG(a, a, 0b1111)						// reg to reg
 		
 		if fn == Compiler.RefIncr2 or Compiler.RefDecrMulti
 			|| A = .µ(prms.first!, asmreg.addrneed)
@@ -42,16 +42,17 @@ extend_module ASMType
 			target debug: if A is ContainsAddr						// always a reg!
 
 			if fn == Compiler.RefIncr
-				return exp.RFRG(a, a, 1, 0, 0, 0)
+				return exp.RFRG(a, a, 0b1000)
 
 			if fn == Compiler.RefDecr
-				return exp.RFRG(a, a, 0, 0, 1, 1)					// (but refcounter doesnt do it yet)
+				return exp.RFRG(a, a, 0b0011)					// (but refcounter doesnt do it yet)
 
+		// these two can be removed. then we are left with incr and decr only. nice!
 			if fn == Compiler.RefSafeDecr
-				return exp.RFRG(a, a, 0, 0, 0, 1)
+				return exp.RFRG(a, a, 0b0001)
 
 			if fn == Compiler.RefFreeIfDead
-				return exp.RFRG(a, a, 0, 0, 1, 0)
+				return exp.RFRG(a, a, 0b0010)
 	
 		return exp.EROR(asmreg(), asmreg(), asmreg(), asmreg(), 0)
 
@@ -60,6 +61,18 @@ extend_module ASMType
 	function RefCount (fn_asm)	// JB_SetRef(a,b)
 		return RefCountSub(self, exp, dest) * asmreg()
 
+
+
+function asmstate.Decr (|int| Code=0b0011, |asmreg|)
+	|| d = .last
+	if d.op == asm.rfrg and d.B == Code
+		.nop(D)
+		rz.reg = d.out&31
+
+
+function asmstate.SafeDecr (|asmreg|)
+	return .decr(0b0001)
+	
 
 
 class RefTest
