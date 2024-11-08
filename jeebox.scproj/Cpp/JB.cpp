@@ -3887,14 +3887,14 @@ JB_ErrorReceiver* JB_Rec_Constructor(JB_ErrorReceiver* Self) {
 	if (Self == nil) {
 		Self = ((JB_ErrorReceiver*)JB_NewClass(&JB_ErrorReceiverData));
 	}
-	JB_Incr2(Self->Source, JB_LUB[0]);
-	Self->_LogObj = nil;
 	Self->LowerErrorsTo = 0;
-	Self->ErrorCount = 0;
-	Self->WarnCount = 0;
-	Self->ProblemCount = 0;
-	Self->BlockErrors = false;
+	Self->_LogObj = nil;
+	JB_Incr2(Self->Source, JB_LUB[0]);
 	Self->_LogFunc = nil;
+	Self->ErrorCount = 0;
+	Self->ProblemCount = 0;
+	Self->WarnCount = 0;
+	Self->BlockErrors = false;
 	JB_Incr2(Self->Errors, JB_Err_ConstructorNothing(nil));
 	Self->MaxErrors = 512;
 	Self->MaxProblems = 64;
@@ -3903,8 +3903,8 @@ JB_ErrorReceiver* JB_Rec_Constructor(JB_ErrorReceiver* Self) {
 }
 
 void JB_Rec_Destructor(JB_ErrorReceiver* Self) {
-	JB_Clear(Self->Source);
 	JB_Clear(Self->_LogObj);
+	JB_Clear(Self->Source);
 	JB_Clear(Self->Errors);
 }
 
@@ -4260,9 +4260,9 @@ void JB_Flow_Destructor(FlowControl* Self) {
 	if (Self->ReadInput != nil) {
 		JB_PrintLine(JB_LUB[226]);
 	}
-	JB_Clear(Self->ReadInput);
 	JB_Clear(Self->Write);
 	JB_FastBuff_Destructor((&Self->Buff));
+	JB_Clear(Self->ReadInput);
 }
 
 void JB_Flow_Fail(FlowControl* Self, JB_String* Found, JB_String* Expected, JB_String* InputName) {
@@ -4569,8 +4569,8 @@ void JB_Sav_SaveWrite(Saveable* Self, ObjectSaver* Saver) {
 
 
 void JB_Sel_Destructor(Selector* Self) {
-	JB_Clear(Self->Next);
 	JB_Clear(Self->Name);
+	JB_Clear(Self->Next);
 }
 
 
@@ -5319,13 +5319,13 @@ StringReader* JB_SS_Constructor(StringReader* Self, JB_String* Data) {
 	if (Self == nil) {
 		Self = ((StringReader*)JB_NewClass(&StringReaderData));
 	}
-	Self->Length = 0;
-	Self->UserObj = nil;
-	Self->File = nil;
 	Self->StartFrom = 0;
+	Self->File = nil;
+	Self->Data = ((FastBuff){});
+	Self->UserObj = nil;
+	Self->Length = 0;
 	Self->ChunkSize = 0;
 	Self->_NoMoreChunks = false;
-	Self->Data = ((FastBuff){});
 	JB_SS_Reset(Self, Data);
 	return Self;
 }
@@ -5691,8 +5691,8 @@ SyntaxObj* JB_Fn_Constructor(SyntaxObj* Self, FP_fpMsgRender Msg, JB_String* Nam
 }
 
 void JB_Fn_Destructor(SyntaxObj* Self) {
-	JB_Clear(Self->Name);
 	JB_Clear(Self->LongName);
+	JB_Clear(Self->Name);
 }
 
 JB_String* JB_Fn_Render(SyntaxObj* Self, FastString* Fs_in) {
@@ -7804,11 +7804,11 @@ JB_Error* JB_Err_ConstructorNothing(JB_Error* Self) {
 		Self = ((JB_Error*)JB_NewClass(&JB_ErrorData));
 	}
 	JB_Msg_ConstructorEmpty(Self);
-	JB_Incr2(Self->Path, JB_LUB[0]);
 	JB_Incr2(Self->OriginalData, JB_LUB[0]);
-	JB_Incr2(Self->StackTrace, JB_LUB[0]);
+	JB_Incr2(Self->Path, JB_LUB[0]);
 	Self->Node = nil;
 	Self->Progress = 0.0f;
+	JB_Incr2(Self->StackTrace, JB_LUB[0]);
 	Self->ErrorFlags = 0;
 	Self->Position = -1;
 	Self->Severity = kJB__ErrorSeverity_OK;
@@ -7818,10 +7818,10 @@ JB_Error* JB_Err_ConstructorNothing(JB_Error* Self) {
 }
 
 void JB_Err_Destructor(JB_Error* Self) {
-	JB_Clear(Self->Path);
 	JB_Clear(Self->OriginalData);
-	JB_Clear(Self->StackTrace);
+	JB_Clear(Self->Path);
 	JB_Clear(Self->Node);
+	JB_Clear(Self->StackTrace);
 	JB_Msg_Destructor(Self);
 }
 
@@ -8382,7 +8382,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024110415);
+	return (2024110719);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8394,4 +8394,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 -4974089323347435409 566357622310560501
+// -2934619186805667969 -5898164094208557450 566357622310560501

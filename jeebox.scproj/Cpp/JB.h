@@ -417,8 +417,8 @@ struct DataObject_Behaviour: Object_Behaviour {
 
 JBClass ( DTWrap , JB_Object , 
 	DataTypeCode DataType;
-	int64 PrivValue;
 	byte DeathAction;
+	int64 PrivValue;
 );
 
 struct DictionaryReader_Behaviour: Object_Behaviour {
@@ -428,17 +428,17 @@ struct ErrorReceiver_Behaviour: Object_Behaviour {
 };
 
 JBClass ( JB_ErrorReceiver , JB_Object , 
-	int MaxErrors;
-	JB_String* Source;
-	JB_Object* _LogObj;
-	JB_Error* Errors;
 	int LowerErrorsTo;
+	JB_Object* _LogObj;
+	JB_String* Source;
+	JB_Error* Errors;
+	FP_fnErrorLogger _LogFunc;
+	int MaxErrors;
 	int MaxProblems;
 	int ErrorCount;
-	int WarnCount;
 	int ProblemCount;
+	int WarnCount;
 	bool BlockErrors;
-	FP_fnErrorLogger _LogFunc;
 );
 
 struct FastString_Behaviour: Object_Behaviour {
@@ -449,9 +449,9 @@ struct FlowControl_Behaviour: Object_Behaviour {
 
 JBClass ( FlowControl , JB_Object , 
 	bool CanDoErrors;
-	StringReader* ReadInput;
 	FastString* Write;
 	FastBuff Buff;
+	StringReader* ReadInput;
 );
 
 struct LeakTester_Behaviour: Object_Behaviour {
@@ -466,9 +466,9 @@ struct Memory_Behaviour: Object_Behaviour {
 };
 
 JBClass ( MWrap , JB_Object , 
-	int BufferSize;
-	byte* _Ptr;
 	int Length;
+	byte* _Ptr;
+	int BufferSize;
 	u16 ItemSize;
 	byte DeathAction;
 );
@@ -487,8 +487,8 @@ struct Selector_Behaviour: Object_Behaviour {
 
 JBClass ( Selector , JB_Object , 
 	int ID;
-	Selector* Next;
 	JB_String* Name;
+	Selector* Next;
 );
 
 struct String_Behaviour: Object_Behaviour {
@@ -506,13 +506,13 @@ struct StringReader_Behaviour: Object_Behaviour {
 };
 
 JBClass ( StringReader , JB_Object , 
-	int Length;
-	JB_Object* UserObj;
-	JB_File* File;
 	int StartFrom;
+	JB_File* File;
+	FastBuff Data;
+	JB_Object* UserObj;
+	int Length;
 	int ChunkSize;
 	bool _NoMoreChunks;
-	FastBuff Data;
 );
 
 struct SyntaxObj_Behaviour: Object_Behaviour {
@@ -520,10 +520,10 @@ struct SyntaxObj_Behaviour: Object_Behaviour {
 
 JBClass ( SyntaxObj , JB_Object , 
 	Syntax ID;
-	JB_String* Name;
 	JB_String* LongName;
 	FP_fpMsgRender RenderAddr;
 	FP_fpMsgRender ExportAddr;
+	JB_String* Name;
 );
 
 struct TokenHandler_Behaviour: Object_Behaviour {
@@ -553,10 +553,10 @@ struct Message_Behaviour: list_Behaviour {
 JBClass ( Message , JB_List , 
 	JB_String* Name;
 	u16 Tag;
-	u16 RangeLength;
 	MsgParseFlags Flags;
-	Syntax Func;
+	u16 RangeLength;
 	byte Indent;
+	Syntax Func;
 );
 
 struct SaverClassInfo_Behaviour: Array_Behaviour {
@@ -581,12 +581,12 @@ struct Error_Behaviour: Message_Behaviour {
 };
 
 JBClass ( JB_Error , Message , 
-	Date When;
-	JB_String* Path;
 	JB_String* OriginalData;
-	JB_String* StackTrace;
+	JB_String* Path;
+	Date When;
 	Message* Node;
 	Float64 Progress;
+	JB_String* StackTrace;
 	ErrorFlags ErrorFlags;
 	ErrorSeverity Severity;
 );
