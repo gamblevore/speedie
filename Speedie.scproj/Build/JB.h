@@ -213,6 +213,8 @@ typedef ASM ASM_RefSet2;
 
 typedef ASM ASM_RefSet3;
 
+typedef ASM ASM_RefSetCode;
+
 typedef ASM ASM_RotateConst;
 
 typedef ASM ASM_Shift;
@@ -1983,7 +1985,7 @@ extern byte SC__ASM_NoisyASM;
 #define kSC__ASM_RETO ((ASM_RETObj)36)
 #define kSC__ASM_RFDC ((ASM_RefDecrMem)82)
 #define kSC__ASM_RFRD ((ASM_RefSet3)81)
-#define kSC__ASM_RFRG ((ASM_RefSet)79)
+#define kSC__ASM_RFRG ((ASM_RefSetCode)79)
 #define kSC__ASM_RFWR ((ASM_RefSet2)80)
 #define kSC__ASM_SUB ((ASM_Shift)47)
 #define kSC__ASM_SWAP ((ASM_Swap)38)
@@ -4464,6 +4466,10 @@ ASM SC_ASM_RefSet_IncrSet(ASM Self, uint Value);
 
 ASM SC_ASM_RefSet_MoveSet(ASM Self, uint Value);
 
+ASM SC_ASM_RefSetCode_CodeSet(ASM Self, uint Value);
+
+ASM SC_ASM_RefSetCode_LSet(ASM Self, uint Value);
+
 ASM SC_ASM_REQ_ModeSet(ASM Self, uint Value);
 
 ASM SC_ASM_REQ_ValSet(ASM Self, uint Value);
@@ -4472,9 +4478,7 @@ ASM SC_ASM_RET_CountSet(ASM Self, uint Value);
 
 ASM SC_ASM_RET_ValueSet(ASM Self, uint Value);
 
-ASM SC_ASM_RETObj_CountSet(ASM Self, uint Value);
-
-ASM SC_ASM_RETObj_SafeDecrSet(ASM Self, uint Value);
+ASM SC_ASM_RETObj_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_RotateConst_InvSet(ASM Self, uint Value);
 
@@ -4485,6 +4489,8 @@ ASM SC_ASM_RotateConst_ValueSet(ASM Self, uint Value);
 ASM SC_ASM_Shift_ShSet(ASM Self, uint Value);
 
 ASM SC_ASM_Swap_LSet(ASM Self, uint Value);
+
+bool SC_ASM_SyntaxIs(ASM Self, ASM OpCode);
 
 ASM SC_ASM_Table_AddSet(ASM Self, uint Value);
 
@@ -5189,6 +5195,11 @@ ASM* JB_ASM_RefSet3__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo
 
 
 
+// ASM_RefSetCode
+ASM* JB_ASM_RefSetCode__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+
+
+
 // ASM_RotateConst
 ASM* JB_ASM_RotateConst__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
@@ -5646,6 +5657,8 @@ xC2xB5Form* SC_FAT_Form(FatASM* Self);
 
 bool SC_FAT_has(FatASM* Self, int A, int B);
 
+bool SC_FAT_IsFinisher(FatASM* Self);
+
 void SC_FAT_JumpInputSet(FatASM* Self, int A, int V);
 
 void SC_FAT_JumpToSet(FatASM* Self, FatASM* Value);
@@ -5951,6 +5964,8 @@ ASMReg SC_Pac_Continue(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
 ASMReg SC_Pac_DeclareMe(ASMState* Self, Message* Where, SCDecl* Type);
 
+ASMReg SC_Pac_Decr(ASMState* Self, int Code);
+
 void SC_Pac_Destructor(ASMState* Self);
 
 ASMReg SC_Pac_DivFloat(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
@@ -6068,6 +6083,8 @@ ASMReg SC_Pac_QuickIntMul(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Messa
 ASMReg SC_Pac_ReadOrWrite(ASMState* Self, ASMReg Dest, Message* M, ASMReg Ptr, ASMReg Varadd, int Index);
 
 FatASM* SC_Pac_ReadOrWriteSub(ASMState* Self, ASMReg Dest, Message* Exp, ASMReg Base, ASMReg Varadd, int Index);
+
+ASMReg SC_Pac_SafeDecr(ASMState* Self);
 
 ASMReg SC_Pac_SelfDivide(ASMState* Self, ASMReg Dest, Message* Exp);
 
@@ -8607,15 +8624,15 @@ JB_Object* JB_Msg_RestoreLoad(Message* Self);
 
 Message* SC_Msg_Resync(Message* Self, Message* Parent);
 
-FatASM* JB_Msg_RET(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Count, int Value);
+FatASM* JB_Msg_RET(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Value, int Count);
 
-FatASM* JB_Msg_RETO(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int Count, int SafeDecr);
+FatASM* JB_Msg_RETO(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4);
 
 FatASM* JB_Msg_RFDC(Message* Self, ASMReg R1, int Count, int Offset);
 
 FatASM* JB_Msg_RFRD(Message* Self, ASMReg R1, ASMReg R2, int Decr, int Offset);
 
-FatASM* JB_Msg_RFRG(Message* Self, ASMReg R1, ASMReg R2, int Incr, int Move, int Free, int Decr);
+FatASM* JB_Msg_RFRG(Message* Self, ASMReg R1, ASMReg R2, int Code);
 
 FatASM* JB_Msg_RFWR(Message* Self, ASMReg R1, ASMReg R2, int Decr, int Offset);
 
