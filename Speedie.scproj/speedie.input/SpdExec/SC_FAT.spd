@@ -3,7 +3,7 @@
 struct FatASM 
 	linkage
 		cpp_part FAT
-	|ASMReg| 			Info		// only needs 32-bits of this. Could we make a smaller asmreg?
+	|ASMReg| 			Info
 	|message--| 		Msg
 	|uint64| 			_Const
 	|uint[7]|			R
@@ -40,7 +40,6 @@ struct FatASM
 		
 	function Const (assigns:|int64|)
 		opt norefcounts
-//		if value == 9218868437227405312
 		._const = value
 
 	function F32 (assigns:|float|)
@@ -99,24 +98,25 @@ struct FatASM
 		  else
 			(.info asnt= flags)
 		
-	function optnop (|bool|)
+	function OptNop (|bool|)
 		.op = asm.noop
 		.JumpReg = 0
 		return true
+	
 	function LinkedFrom (|fatasm| New)
 		.refcount++
 
-	function RegInput (|int| a, assigns:|asmreg| info, |int|)
+	function RegInput (|int| a, assigns:|asmreg| info)
 		cpp_part Prm
-		rz = info.reg
-		.r[a] = rz
-		|| Src = info.fat
-			Src.LinkedFrom(self) // what?
-		
-
-	function Dest (|uint| a, |asmreg| info, |bool|)
-		|| dest = info.reg
-		.r[a] = dest
+		opt inline
+		.r[a] = info.reg ||| ((info is Temp)<<31)
+//		|| Src = info.fat
+//			Src.LinkedFrom(self) // what?
+	
+	
+	function Dest (|uint| a, |asmreg| info)
+		opt inline
+		.reginput(A) = info
 	
 	
 	function File (|string|)
@@ -129,7 +129,7 @@ struct FatASM
 		err.position = .BytePos
 		target debug: asmstate.printprogress(nil)
 		stderr <~ err
-
+	
 	function NumInput (|int| a, assigns:|int| v)
 		.r[a] = v
 
@@ -148,7 +148,7 @@ struct FatASM
 	function out (|uint|): return .r[0]
 //	function out (assigns:|uint|): .r[0] = value
 	
-	// easier to do maths ad figure stuff out if its expressed like abcd
+	// easier to optimise if its expressed like abcd
 	function a (|uint|): return .r[1]
 	function a (assigns:|uint|): .r[1] = value
 	function b (|uint|): return .r[2]
@@ -185,10 +185,10 @@ struct FatASM
 		return reg == .b
 	
 	
-	function CheckReg
+	function CheckHasOutput
 		opt inline
 		target debug
-			if .r[0] == 0
+			if .r[0]<<1 == 0
 				|| form = .form
 					check (form.params[0] isnt output) (.msg, "Missing ASM output")
 	
@@ -230,9 +230,14 @@ struct FatASM
 			if bs and (remain > 0)
 				fs <~ GotAny
 				GotAny = ", "
+				|int| v = .r[i]
 				if f[i].isreg
-					fs <~ 'r'
-				fs <~ .r[i]|int|
+					if v & (1<<31)
+						v &=~ (1<<31)
+						fs <~ 't'
+					  else
+						fs <~ 'r'
+				fs <~ v
 				remain += bs
 			if .op == asm.knst
 				exit

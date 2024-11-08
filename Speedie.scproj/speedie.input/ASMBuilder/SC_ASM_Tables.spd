@@ -167,7 +167,7 @@ function Decl (fn_asm)
 	opt norefcounts
 	exp = exp.last!
 	|| ty = exp.first!.fastdecl
-	dest = .DeclareMe(Exp, ty) as ASMReg.decl
+	dest = .DeclareMe(Exp, ty) as ASMReg.NotYetUsed
 	if (ty isnt altered) and (ty is local)
 		(dest as= asmreg.neveraltered)
 	rz = .µinto(exp.last!, dest)
@@ -190,7 +190,6 @@ function Arg (fn_asm)
 
 function Access (fn_asm)						// a[b], struct.mem[b]
 	opt	NoRefCounts
-//	if dest is set
 	if dest isnt set
 		dest = .TempTyped(exp, dest)
 	
@@ -204,7 +203,7 @@ function Access (fn_asm)						// a[b], struct.mem[b]
 	if (dest is AddrRequest)
 /		return .Plus(dest.HaveAddr, ptr, vara, exp)
 	
-	return Dest.ReadOrWrite(exp, ptr, vara)
+	return .ReadOrWrite(Dest, exp, ptr, vara)
 
 
 function Dot (fn_asm)							// a.b
@@ -224,7 +223,7 @@ function Dot (fn_asm)							// a.b
 		pos *= t.ByteCount
 		return .AddToReg(exp, dest.HaveAddr, obj as asmreg.NoScale, pos)
 
-	return Dest.ReadOrWrite(exp, obj, asmreg(), pos)
+	return .ReadOrWrite(Dest, exp, obj, asmreg(), pos)
 		
 
 function SetRel (fn_asm)	// function relset (
@@ -296,7 +295,7 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 	
 	|| AddCosTooBig = (iTable >= 128) * iTable
 	|| tabl = exp.TABL(addr,  (!d.IsLib)|int|, AddCosTooBig)
-	return dest.ReadOrWrite(Exp, addr, asmreg(), iTable-AddCosTooBig)
+	return .ReadOrWrite(dest, Exp, addr, asmreg(), iTable-AddCosTooBig)
 
 	
 
@@ -320,12 +319,12 @@ function Negative (fn_asm)					// -a
 function IncrSlowOnAddr (|&ASMState| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |ASMReg|)	
 	opt	NoRefCounts									// *a, x = *(a.b)
 	|| TmpCloser = .VTmps
-	Dest.Read(F, dest, addr)						// READ
+	.Read(Dest, F, dest, addr)						// READ
 
 	|| NewValue = (.Temptyped(f), dest)(mode & IncrAfter)
 	.IncrPre(f, NewValue, dest, amount)				// ADD
 
-	|| fat = dest.write(f, newvalue, addr)			// WRITE BACK
+	|| fat = .write(dest, f, newvalue, addr)		// WRITE BACK
 
 	// the new value should exist! now lets close
 	.CloseVTmps(TmpCloser)
@@ -467,48 +466,6 @@ helper ASMState.DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMR
 			debugger, (fn)(self, dest, ml, mr, exp.second!)
 
 
-
-function ASMReg.ReadOrWrite (|message| m, |asmreg| ptr, |asmreg| varadd, |int| index=0, |asmreg|)
-	return .ReadOrWriteSub(m, ptr, varadd, index, self is set) * self
-
-
-// we need a varadd... for x = a[b]
-function ASMReg.ReadOrWriteSub (|message| exp, |asmreg| ptr, |asmreg| varadd, |int| index, |bool| DoWrite, |&fatasm|)
-	if self is containsaddr
-		#!wait?? this is meant to be an addrrequest? not a response.
-		debugger
-	
-	(self asnt= asmreg.AddrRequest)
-	|| T = .µtype
-	|| BC = t.ByteCount
-	|| bytes = BC.log2
-	if  (bytes|uint| > 4)
-		error (exp, "Object to large to access") // later we can do a struct-mem-copy operation?
-		bytes = 0
-	
-	if index >= 128						// read/write only allows up to 127
-		index *= t.ByteCount
-		ptr = asmstate.sh.AddToReg(exp, asmreg(), ptr as asmreg.noscale, index)
-		index = 0
-	
-	rz = exp.RD4U(self, ptr, varadd, index, 0)
-	if DoWrite
-		rz.op = ASMType.WriteASM[bytes]
-	  else
-		|| B = (bytes<<1) + t.issigned
-		rz.op = ASMType.ReadASM[b]
-
-
-function ASMReg.Read  (|message| exp,  |asmreg| ptr,  |asmreg| varadd,  |int| index=0,  |&fatasm|)
-	opt inline
-	return .ReadOrWriteSub(exp, ptr, varadd, index, false)
-	
-
-function ASMReg.Write (|message| exp,  |asmreg| ptr,  |asmreg| varadd,  |int| index=0,  |&fatasm|)
-	opt inline
-	return .ReadOrWriteSub(exp, ptr, varadd, index, true)
-
-
 function message.ASMLocal (|asmreg| extra = 0, |asmreg|)
 	opt	norefcounts
 	|| d = .ASMDecl
@@ -537,7 +494,8 @@ function message.HasAsmStuff (|bool|)
 		|| fn = ch.brafunc
 		if fn != @sheb and @num and @char
 			return true
-		
+
+
 function message.brafunc (|syntax|)
 	opt norefcounts
 	while self

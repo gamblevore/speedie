@@ -3,6 +3,17 @@
 module ASMExamples {
 
 target pack { 
+class LargeClass {
+	// we need a lot of properties
+	|byte[100]| a
+	|byte[100]| b
+	|byte[100]| c
+}
+class LargeClass2 {
+	|byte[100]| a
+	|uint16[100]| b
+}
+
 function AskConst (|int| x)
 	|| y = 14
 	|| z = x << y
@@ -393,7 +404,17 @@ helper asm_test_ptr (|fixeddict| a, |&int| b,  |int|)
 	a.Value = a|&nil|
 	a.items[1] = 5|&nil|
 	a.items[n] = 5|&nil|
-	
+
+
+helper asm_test_largeclass (|LargeClass2| L)
+	l.a[3] = 0
+	l.a[3] = 1
+	l.b[4] = 0
+	|| y = l.b[1]
+	|| x = l.a[1]
+	l.a[3] = y
+	l.b[4] = x
+
 
 helper asm_test_flow (|int| a, |int| b, |int|)
 	cpp_name asm_test_flow

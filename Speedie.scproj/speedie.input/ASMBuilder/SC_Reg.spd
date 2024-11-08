@@ -21,7 +21,8 @@ datatype ASMReg (uint64)
 		AlreadyNegated
 		Alternate
 		Discard
-		Decl = [Set, NotYetUsed]
+		Set
+		NotYetUsed
 		ForCast
 		Temp
 		SingleExpr
@@ -206,7 +207,17 @@ datatype ASMReg (uint64)
 		  else									// dest is free!
 			.reg = dest.reg
 		return self
-		
+	
+	function TmpCheck
+		|| R = .reg
+		|| IsTmp = self is temp
+		|| Big = R >= 24
+		if big != IsTmp // bad?
+			if big
+				"big reg $R unmarked"
+			  else
+				"low reg $R marked"
+			debugger
 	
 			
 	module

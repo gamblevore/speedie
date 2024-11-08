@@ -107,7 +107,7 @@ module PackMaker
 		if fn
 			|| Andor = fn.Test|&int64|[]
 		
-		fn = .testfn("PackTestConsts")
+		fn = .testfn("Consts")
 		if fn
 			|| D = fn.Test|&f64|[]
 		

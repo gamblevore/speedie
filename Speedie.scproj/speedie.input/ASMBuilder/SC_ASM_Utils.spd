@@ -44,7 +44,8 @@ function scdecl.CalculateASMType (|asmreg|)
 	if b > scnodetype.datatype
 		return datatypecode._voidptr|ASMReg|
 	
-	if t.typeinfo == datatypecode.unusedtype // what?
-	return t.typeinfo|asmreg|
+	|| I = t.typeinfo
+	if I == datatypecode.unusedtype // what?
+	return I|asmreg|
 
 

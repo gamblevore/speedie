@@ -275,7 +275,7 @@ function AlignProperties
 // Want things tight:       (usually biggest first)
 // Want RD1U accessibility: (smallest first)
 // Not so simple! If class <= 128, make it tight.
-// Otherwise, % loss is low anyhow. Put smallest first
+
 	.properties.sort(SmallestAlignedFirst)			// Smallest first, structs last though
 	|| ParentSize = 4
 	|| sp = .super

@@ -256,20 +256,20 @@ extend ASMState
 			if l is alternate
 				RR = -RR
 			rr *= lmul
-			if r.CanAddK(RR)							// a - 1,  a + 1
+			if r.CanAddK(RR)								// a - 1,  a + 1
 				.nop(r)
 				return exp.ADDK(dest, L, RR) * dest
 
 		|&fatasm| fat
-		if lmul.ispow2		  							// x = int1 + int2
-			fat = exp.ADD(dest, L, R, lmul.log2)		// x = lptr + r<<3
+		if lmul.ispow2		  								// x = int1 + int2
+			fat = exp.ADD(dest, L, R, lmul.log2)			// x = lptr + r<<3
 			if l is alternate
 				fat.op ++
 		  else
 			|| v = .numtoreg(exp, lmul, asmreg(), datatypecode.uint)
-			if l isnt alternate							// x = lptr + r*12
+			if l isnt alternate								// x = lptr + r*12
 				fat = exp.MULT(dest, R, V, L)
-			  else										// x = (lptr - rptr)/12
+			  else											// x = (lptr - rptr)/12
 				exp.SUB(dest, L, R, ASMReg())
 				|| uinttype = 0, debugger
 				fat = exp.DIVV(dest, ASMReg(), dest, V, uinttype)  
@@ -296,7 +296,7 @@ extend ASMState
 			return l
 		if l is alternate
 			if rr == ll
-				return .zeros(dest, exp)
+				return .zeros(dest)
 		  else
 			if !ll
 				return r
@@ -434,7 +434,7 @@ extend ASMState
 		if dest is ConstAny
 			return .MakeConst2(dest, l, r, exp, ConstifyBitXor)
 		if (l.reg == r.reg)
-			return .Zeros(dest, exp)
+			return .Zeros(dest)
 		if !l.reg
 			return .Assign(dest, r, exp)
 		if !r.reg
@@ -459,7 +459,7 @@ extend ASMState
 		if .nopminusone(l)
 			return .Assign(dest, r, exp)
 		if l.isconst(0) or r.IsConst(0)
-			return .Zeros(dest, exp)
+			return .Zeros(dest)
 		if (l.reg == r.reg)
 			return .Assign(dest, l, exp)
 		return .BitMakerSwap(dest, l, r, exp, asm.band)
@@ -512,17 +512,14 @@ extend ASMState
 		up += extra
 		down += extra
 		if  !src.reg  or  (up >= 64)  or  (!src.signed and down >= 64)
-			return .zeros(dest, exp)
+			return .zeros(dest)
 	
 		return exp.BFLG(dest,  src,  up,  down,  src.signed|int|) * dest
 
 
-	function Zeros (|asmreg| dest, |message| exp, |asmreg|)
-		(Exp)
-		dest.reg = 0
-		(dest is constany)
-		return dest // ???
-//		return .Assign(dest, asmreg(), exp)	
+	function Zeros (|asmreg| dest, |asmreg|)
+		rz = asmreg()
+		rz.µtype = dest.µtype
 	
 	
 	function Assign (|asmreg| dest, |asmreg| src, |message| exp, |asmreg|)

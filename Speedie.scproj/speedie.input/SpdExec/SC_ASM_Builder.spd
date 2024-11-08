@@ -5,17 +5,12 @@
 
 
 
-function FatASM.AddRegNum (|message| src, |int| write, |int| num)
-	opt norefcounts
-	if write <= 5
-		.r[write] = num // what if it's the last one...
-	  else
-		debugger
-
-
 function FatASM.AddRegParam (|message| src, |int| write)
 	opt norefcounts
-	.addregnum(src, write, src.regornum)
+	if write|uint| <= 6
+		.r[write] = src.regornum // what if it's the last one...
+	  else
+		debugger
 
 
 

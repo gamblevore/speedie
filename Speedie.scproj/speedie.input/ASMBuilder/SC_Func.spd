@@ -35,7 +35,7 @@ class µFunc
 			|| fat = .ir+i
 			haslabel |= fat.jumpreg<<(i&63)
 			fat.ASMIndex = rz - where
-			fat.CheckReg
+			fat.CheckHasOutput
 			rz = fat.µrenderinto(rz, after)
 
 		if haslabel // Use this as a jump-map??? To skip huge sections?

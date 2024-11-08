@@ -25,20 +25,13 @@ struct ASMState
 		kContinue = 254
 		kExit = 255
 	
-	
-//	function fatasm.MoveRegDown (|int| r)
-//		// any regs above this, can be moved down by 1... assuming they are not tmps?
-//		// how to tell if a reg is a tmp or not?
-//		// not so easy. Maybe better to regenerate that section.
-//
-//
-//	function MoveRegDown (|int| r, |fatasm| start)
-//		|| After = .curr
-//		while start < After
-//			start.MoveRegDown(r)
-//			Start++
-//		
-//		
+
+	module
+		|FatASM[]|					JSMSpace = FatASM[0]!
+		|[memory of fatasm]|		Ancients
+		|ASMState|					Sh
+
+
 	function CloseVDecls (|int| i, |bool|)
 		|| top = .vdecls
 		while top > i
@@ -48,7 +41,6 @@ struct ASMState
 	function CloseVTmps (|int| i)
 		target debug: if i < .vtmps // what?
 		.VTmps = i
-
 			
 	function AddFuncParams (|SCFunction| fn)
 		opt norefcounts
@@ -205,8 +197,6 @@ struct ASMState
 		return .Assign(dest, X, exp)
 			
 		
-
-
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
 		|| rz = .µ(Exp, dest)
 		dest = rz.reg(dest)
@@ -215,17 +205,22 @@ struct ASMState
 			
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		opt norefcounts
-		target !debug
-			opt inline
 		cpp_part GetASM 
+		target debug
+			dest.tmpcheck
+			debugat 0 // keep this
+		  else
+			opt inline
+
 		|| fn = fn_asm_table[exp.ASMType]!
 		|| TmpCloser = .VTmps
-		debugat 0 // keep this
+		
 		|| ss = (fn)(self, exp, dest)
 		if dest isnt StayOpen
 			.CloseVTmps(TmpCloser)
 
 		target debug
+			ss.tmpcheck
 			check (ss) (self, exp, "µInto failed")
 			if (ss is constany) and ss.reg
 				if !ss.fat
@@ -239,7 +234,7 @@ struct ASMState
 					(fn)(self, exp, dest)
 			if exp.asmtype < ASMType.kIf and ss != asmreg()
 				|| D = exp.asmdecl
-				|| ty = D.typeonly
+				|| ty = D.typeinfo
 				|| sst = ss.µtype
 				|| dt = dest.µtype
 				if sst != dt and ty
@@ -259,10 +254,67 @@ struct ASMState
 		return .µ(prm, asmreg.stayopen)
 
 
-	module
-		|FatASM[]|					JSMSpace = FatASM[0]!
-		|[memory of fatasm]|		Ancients
-		|ASMState|					Sh
+	function ReadOrWrite (|ASMReg| dest, |message| m, |asmreg| ptr, |asmreg| varadd, |int| index=0, |asmreg|)
+		return .ReadOrWriteSub(dest, m, ptr, varadd, index) * dest
+
+
+	function ReadOrWriteSub (|ASMReg| dest, |message| exp, |asmreg| base, |asmreg| varadd, |int| index, |&fatasm|)
+		if dest is containsaddr
+			#!wait?? this is meant to be an addrrequest? not a response.
+			debugger
+		
+		(dest asnt= asmreg.AddrRequest)
+		|| ScalingType = (base, dest)(dest is set)
+		|| T = ScalingType.µtype
+		|| bytes = t.ByteCount.log2
+		if  (bytes|uint| > 4)
+			error (exp, "Object to large to access")				// can we do struct-mem-copy?
+			bytes = 0
+		
+		if varadd is constany
+			|| CC = varadd.fat
+				.nop(cc)
+				index += cc.const
+				varadd = asmreg()
+
+		if base is temp
+			|| bs = base.fat
+			if bs and bs.op == asm.addk
+				|| CC = bs.r[2]
+				ifn CC & (1<<bytes)-1
+					.nop(bs)
+					index += CC >> bytes
+					base.reg = bs.r[1]
+					(base isnt temp)
+/*
+	ADDK: bs, r1, 4
+	RD1U: r2, bs, value, 4, 0
+*/					
+		if index >= 128												// read/write only allows up to 127
+			index <<= bytes
+			base = .AddToReg(exp, asmreg(), base as asmreg.noscale, index)
+			index = 0
+		
+		rz = exp.RD4U(dest, base, varadd, index, 0)
+		if dest is set
+			rz.op = ASMType.WriteASM[bytes]
+		  else
+			|| B = (bytes<<1) + t.issigned
+			rz.op = ASMType.ReadASM[b]
+
+
+	function Read (|asmreg| dest, |message| exp,  |asmreg| ptr,  |asmreg| varadd,  |int| index=0,  |&fatasm|)
+		opt inline
+		(dest isnt set)
+		return .ReadOrWriteSub(dest, exp, ptr, varadd, index)
+		
+
+	function Write (|asmreg| dest, |message| exp,  |asmreg| ptr,  |asmreg| varadd,  |int| index=0,  |&fatasm|)
+		opt inline
+		(dest is set)
+		return .ReadOrWriteSub(dest, exp, ptr, varadd, index)
+
+
 		
 
 

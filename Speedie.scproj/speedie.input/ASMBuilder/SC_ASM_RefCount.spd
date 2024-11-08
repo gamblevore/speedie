@@ -17,7 +17,7 @@ extend_module ASMType
 			if a is ContainsAddr
 				if b is ContainsAddr
 					|| where = .TempTyped(second)
-					b = where.Read(exp, b, asmreg()) * where		// mem to reg (only)
+					b = .Read(where, exp, b, asmreg()) * where		// mem to reg (only)
 				return exp.RFWR(A, B, 1, offset)					// reg to mem (full refcount)
 		
 			if b is ContainsAddr									// mem to reg
