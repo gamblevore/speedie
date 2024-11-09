@@ -3,21 +3,19 @@
 module ASMExamples {
 
 target pack { 
-class LargeClass {
-	// we need a lot of properties
-	|byte[100]| a
-	|byte[100]| b
-	|byte[100]| c
-}
 class LargeClass2 {
-	|byte[100]| a
+	|byte[100]|   a
 	|uint16[100]| b
 }
 
 function AskConst (|int| x)
 	|| y = 14
 	|| z = x << y
-	
+
+function AddK
+	|| y = 1
+	|| x = (1+y)+1
+
 function AndOrConsts (|int|)
 	visible
 	|| f1 = 0 and 5

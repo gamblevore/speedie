@@ -237,19 +237,20 @@ struct ASMState
 				if (ss isnt constany)
 					debugger
 					(fn)(self, exp, dest)
+/*
 			if exp.asmtype < ASMType.kIf and ss != asmreg()
 				|| D = exp.asmdecl
-				|| ty = D.typeinfo
 				|| sst = ss.µtype
 				|| dt = dest.µtype
-				if sst != dt and ty
+				if dt and (sst != dt)
+					D.typeinfo.debugprint
 					printline exp
 					sst.debugprint
-					ty.debugprint
 					dt.debugprint
 					debugger
 					printline D
 					(fn)(self, exp, dest)
+*/
 		return ss
 
 
@@ -282,7 +283,7 @@ struct ASMState
 				index += cc.const
 				varadd = asmreg()
 
-		base = .InlineOffset(Base, bytes, index)
+		base = .InlineOffset(Base, bytes, index, 128)
 /*
 	ADDK: bs, r1, 4
 	RD1U: r2, bs, value, 4, 0

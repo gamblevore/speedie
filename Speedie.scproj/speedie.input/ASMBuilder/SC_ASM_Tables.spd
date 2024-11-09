@@ -208,14 +208,13 @@ function Access (fn_asm)						// a[b], struct.mem[b]
 	|| sc = exp.second.first!
 	|| vara = .µ(sc, asmreg.stayopen)
 	if (dest is AddrRequest)
-/		return .Plus(dest.HaveAddr, ptr, vara, exp)
+/		return .Plus(dest, ptr.HaveAddr, vara, exp)
 	
 	return .ReadOrWrite(Dest, exp, ptr, vara)
 
 
-function Dot (fn_asm)							// a.b
+function Dot (fn_asm)								// a.b
 	opt	NoRefCounts
-//	if dest is set
 	if dest isnt set
 		dest = .TempTyped(exp, dest)
 	|| Obj = .µ(exp.first!, dest as asmreg.stayopen)
@@ -228,7 +227,10 @@ function Dot (fn_asm)							// a.b
 	
 	if (dest is AddrRequest) or prop.iscarray
 		pos *= t.ByteCount
-		return .AddToReg(exp, dest.HaveAddr, obj as asmreg.NoScale, pos)
+		if prop.iscarray
+			dest = dest.haveaddr
+			dest.µtype = datatypecode._voidptr
+		return .AddToReg(exp, dest, obj as asmreg.NoScale, pos)
 
 	return .ReadOrWrite(Dest, exp, obj, asmreg(), pos)
 		

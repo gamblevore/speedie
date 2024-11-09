@@ -194,8 +194,12 @@ extend ASMState
 				return exp.FMLK(dest, l, x) * Dest
 
 	
+	function ASMReg.SomePointer (|bool|)
+		return (self is containsaddr) or .µtype.ispointer
+
+
 	function ASMReg.LeftScore (|int|) // we want pointers on the left... ints on the left, and consts on the right
-		return (.µtype.ispointer<<1) + (self isnt constany)
+		return (.somepointer<<1) + (self isnt constany)
 	
 	
 	function asmreg.PointerMul (|message| exp, |int| swapped, |int|)
@@ -208,10 +212,10 @@ extend ASMState
 				exp = exp.prev
 			
 		  elseif fn == @arel or @brel
-/			exp = exp.first
+/			exp = exp.first // merge after testing this
 		
-		  elseif fn == @acc // merge after testing this
-/			exp = exp.first
+		  elseif fn == @acc
+			exp = exp.first
 			
 		  elseif fn == @dot // obj.Prop // requires pointermul on .prop cos of prev props
 			// leave it?
@@ -226,11 +230,11 @@ extend ASMState
 
 	function InlineAddK (|asmreg| L, |int64| R, |bool|)
 		if l is temp
-/			|| fat = l.fat
+			|| fat = l.fat
 			if fat isa asm.addk
-	/			|| CC = fat.r[2] + R
+				|| CC = fat.r[2] + R
 				if CC.CanStoreAsIntImmediate
-/					fat.r[2] = CC
+					fat.r[2] = CC
 					return true
 
 
@@ -259,7 +263,7 @@ extend ASMState
 		
 	
 		|| lmul = 1
-		if (l isnt noscale) and l.µtype.ispointer
+		if (l isnt noscale) and l.SomePointer
 			lmul = l.PointerMul(exp, swapped)
 		if r is ConstAny
 			|| RR = r.const
