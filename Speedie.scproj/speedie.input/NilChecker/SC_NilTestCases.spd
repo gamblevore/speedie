@@ -190,10 +190,6 @@ class NilTest
 
 
 
-/*
-	* prototype GUIPasteEvent (|GUIControl| self)
-*/
-
 module NilTest2
 	function HelloTest
 		NilTest.n0

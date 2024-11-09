@@ -224,6 +224,16 @@ extend ASMState
 		debugger // hmmmm. its not a pointer after all?
 	
 
+	function InlineAddK (|asmreg| L, |int64| R, |bool|)
+		if l is temp
+/			|| fat = l.fat
+			if fat isa asm.addk
+	/			|| CC = fat.r[2] + R
+				if CC.CanStoreAsIntImmediate
+/					fat.r[2] = CC
+					return true
+
+
 	function IntPlus     (fn_opasm)
 		//		a - 1,		a + 1		//
 		//		1 - a,		1 + a		//
@@ -258,6 +268,8 @@ extend ASMState
 			rr *= lmul
 			if r.CanAddK(RR)								// a - 1,  a + 1
 				.nop(r)
+				if .InlineAddK(l, rr)
+					return l
 				return exp.ADDK(dest, L, RR) * dest
 
 		|&fatasm| fat

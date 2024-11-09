@@ -1,77 +1,110 @@
 
 
+function RefCountTest (|message| msg)
+	visible
+	|| x = msg.name
+	x = x
+	x = msg.name
+/*		-->
+	JB_String* X = Msg->Name;
+	JB_Incr(X);
+	JB_SetRef(X, Msg->Name);
+	JB_Decr(X);
+*/
 
-extend_module ASMType
+
+extend asmstate
+	function InlineOffset (|asmreg| base, |int| pow2, |&int| index, |int| maximum=1GB, |asmreg|)
+		if base is temp and containsaddr
+			|| bs = base.fat
+			if bs isa asm.addk
+				|| CC = bs.r[2]
+				|| CC2 = CC >> pow2
+				if (CC2 <= maximum) and (CC2>>pow2 == CC)
+					.nop(bs)
+					index[] += CC2
+					|| R = bs.r[1]
+					base.reg = R
+					(base is temp) = (R >> 31)
+		return base
+
+
 	function RefCountSub (fn_fatasm)	// JB_SetRef(a,b)
 		opt	NoRefCounts
 		|| prms = exp.last!
 		|| fn = prms.obj|SCFunction|!
 			
-		if fn == Compiler.RefSetRef	or compiler.refclear
+		if fn == compiler.refclear
 			|| offset = 0
-			|| A = asmreg()
-			if fn == Compiler.RefSetRef
-				A = .µ(prms.first!, asmreg.AddrRequest)
-			|| second = prms.second!
-			|| B = .µ(second, asmreg.AddrRequest)
-			if a is ContainsAddr
-				if b is ContainsAddr
-					|| where = .TempTyped(second)
-					b = .Read(where, exp, b, asmreg()) * where		// mem to reg (only)
-				return exp.RFWR(A, B, 1, offset)					// reg to mem (full refcount)
-		
-			if b is ContainsAddr									// mem to reg
-				return exp.RFRD(a, b, 1, offset)	
-			return exp.RFRG(a, a, 0b1111)						// reg to reg
-		
-		if fn == Compiler.RefIncr2 or Compiler.RefDecrMulti
-			|| A = .µ(prms.first!, asmreg.addrneed)
-			|| offset = 0 // needs to be set still
-			if fn == Compiler.RefIncr2
-				|| B = .µ(prms.second!)
-				target debug: if a isnt ContainsAddr				// always memory
-				target debug: if b is ContainsAddr					// always reg
-				return exp.RFWR(a, b, 0, offset)
-																	// RefDecrMulti unused?
-			|| BD = prms.second!.asmdecl
-			target debug: if a isnt ContainsAddr				// always memory
-			target debug: if bd isnt const						// always const!!
-			return exp.RFDC(a, bd.ExportPosition, offset)	
+			|| A = .µ(prms.first!, asmreg.AddrRequest)
+			return exp.RFWR(A, nil, 1, offset)						// reg to mem
+
+		if fn == Compiler.RefSetRef
+			|| Out = .µ(prms.first!, asmreg.AddrRequest)
+			|| From = .µ(prms.second!, asmreg.AddrRequest)
+			if out.reg == from.reg
+/				return exp.noop // wat?
+			
+			|| offset = 0
+			if Out isnt ContainsAddr
+				if From is ContainsAddr
+					from = .InlineOffset(from, 3, offset)
+					return exp.RFRD(Out, From, 1, offset)			// mem to reg
+				return exp.RFST(Out, From, nil)						// reg to reg
+
+			if  From is ContainsAddr
+				|| where = .TempTyped(prms)
+				From = .Read(where, exp, From, nil) * where			// (mem to reg)?
+			from = .InlineOffset(Out, 3, offset)
+			return exp.RFWR(Out, From, 1, offset)					// reg to mem
+
+
+		if fn == Compiler.RefIncr2
+			|| A = .µ(prms.first!, asmreg.addrrequest)
+			|| offset = 0
+			A = .InlineOffset(A, 3, offset)
+			|| B = .µ(prms.second!)
+			target debug: if a isnt ContainsAddr					// always memory
+			target debug: if b is ContainsAddr						// always reg
+			return exp.RFWR(a, b, 0, offset)
 		  else
 			|| A = .µ(prms.first!)
 			target debug: if A is ContainsAddr						// always a reg!
 
 			if fn == Compiler.RefIncr
-				return exp.RFRG(a, a, 0b1000)
+				return exp.RFST(asmreg(), a, asmreg())
 
 			if fn == Compiler.RefDecr
-				return exp.RFRG(a, a, 0b0011)					// (but refcounter doesnt do it yet)
-
-		// these two can be removed. then we are left with incr and decr only. nice!
+				return exp.RFST(a, asmreg(), asmreg())
+	
 			if fn == Compiler.RefSafeDecr
-				return exp.RFRG(a, a, 0b0001)
+				return exp.RFST(a, a, asmreg())
 
 			if fn == Compiler.RefFreeIfDead
-				return exp.RFRG(a, a, 0b0010)
+				return exp.RFST(asmreg(), asmreg(), a)
 	
+		debugger 
 		return exp.EROR(asmreg(), asmreg(), asmreg(), asmreg(), 0)
 
 
 
 	function RefCount (fn_asm)	// JB_SetRef(a,b)
-		return RefCountSub(self, exp, dest) * asmreg()
+		return .RefCountSub(exp, dest) * asmreg()
 
 
 
-function asmstate.Decr (|int| Code=0b0011, |asmreg|)
-	|| d = .last
-	if d.op == asm.rfrg and d.B == Code
-		.nop(D)
-		rz.reg = d.out&31
+function asmstate.Decr (|bool| SafeDecr=false, |asmreg|)
+	|| fat = .last(asm.rfst)
+		|| out = fat.out&31
+			|| In = fat.a&31
+			|| against = (out, nil)(SafeDecr)
+			if in == against
+				.nop(fat)
+				rz.reg = out
 
 
-function asmstate.SafeDecr (|asmreg|)
-	return .decr(0b0001)
+function ASMState.SafeDecr (|asmreg|)
+	return .decr(true)
 	
 
 

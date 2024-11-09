@@ -31,7 +31,7 @@ dispatch fn_asm_table (fn_asm)
 
 	(ASMType.kSetRel):		ASMType.SetRel
 	(ASMType.kStatExpr): 	ASMType.StatExpr
-	(asmtype.kRefCount):	ASMType.RefCount
+	(asmtype.kRefCount):	asmstate.RefCount
 
 	(ASMType.kIgnore):		ASMType.Ignore
 	(ASMType.kFail):		ASMType.Ignore
@@ -94,11 +94,11 @@ function Return (fn_asm)
 	|| D0 = .SafeDecr
 	|| D1 = .decr
 	|| D2 = .decr
-	if d0 and d0.reg == reg.reg
+	if d0
+		if d0.reg != reg.reg // problem
 		return exp.RETO(D0, D1, D2, .decr) * asmreg()
-		
 	
-	|| K = .const(reg, 6, true) // return true, or -1 or whatever
+	|| K = .Const(reg, 6, true) // return true, or -1 or whatever
 		reg = asmreg()
 	  else
 		k = 0
@@ -306,8 +306,15 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 
 	
 
-function BoolNot (fn_asm)						// !a
-	opt	NoRefCounts
+function AddressOf (fn_asm)
+	rz = .µ(exp, dest as asmreg.addrneed)
+	if (rz is ContainsAddr)
+		return rz
+	error (exp, "ASM fail")
+	.µ(exp, dest as asmreg.addrneed)
+
+
+function BoolNot (fn_asm)							// !a
 	dest = dest.negate
 	|| src = .µ(exp, dest)
 	if src is AlreadyNegated
@@ -315,13 +322,15 @@ function BoolNot (fn_asm)						// !a
 	return .exists(dest, src, exp)
 	
 
-function BitNot (fn_asm)					// ~a
+function BitNot (fn_asm)							// ~a
 	return .DoMathSub(exp, dest as asmreg.SingleExpr, scoperator.bnot.asm!)
 
 
-function Negative (fn_asm)					// -a
+function Negative (fn_asm)							// -a
 	return .DoMathSub(exp, dest as asmreg.singleexpr, scoperator.Negative.asm!)
 
+
+///   ///
 
 function IncrSlowOnAddr (|&ASMState| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |ASMReg|)	
 	opt	NoRefCounts									// *a, x = *(a.b)
@@ -339,13 +348,12 @@ function IncrSlowOnAddr (|&ASMState| self, |message| f, |ASMReg| Dest, |int| Mod
 
 
 function IncrOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |asmreg|)
-	ifn  dest.isint  and  amount <= 63  and  amount >= -64
+	ifn  dest.isint  and  amount.fits(7)
 		return IncrSlowOnAddr(self, f, dest, mode, Addr, amount)
-//	|| opp = (ASM.CNTC, ASM.CNTD)(mode & IncrAfter)	
 	|| bc  = dest.µtype.ByteCount
 	|| log = bc.Log2
 	if dest.BitCount * (1<<log) != bc // hmm? maths bug?
-	|| fat = f.cntc(Addr, dest, 0, amount, log)
+	|| fat = f.CNTC(Addr, dest, 1, amount, log)
 	if mode & IncrAfter
 		fat.op = asm.cntd
 	return fat * dest
@@ -380,7 +388,7 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 
 
 
-function ARel		(fn_asm)
+function ARel (fn_asm)
 	opt	NoRefCounts
 	|| F = exp.name[]
 	if F == '?' or '!'
@@ -392,17 +400,16 @@ function ARel		(fn_asm)
 
 
 
-function BRel		(fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
+function BRel (fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 	opt	NoRefCounts
 	|| n = exp.name[]
 	|| F = exp.first!
 	if n == '&'
-		return .µ(F, dest as asmreg.addrneed)
+		return AddressOf(self, f, dest)
 	if n == '~'
 		return BitNot(self, f, dest)
 	if n == '!'
 		return BoolNot(self, F, dest)
-
 	if exp.name == 1								// -a
 		return Negative(Self, f, dest)
 	

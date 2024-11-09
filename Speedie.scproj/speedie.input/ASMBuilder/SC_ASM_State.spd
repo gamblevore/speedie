@@ -49,6 +49,11 @@ struct ASMState
 
 	function Last (|&FatASM|)
 		return .curr-1
+
+	function Last (|asm| type, |&FatASM|)
+		|| L = .curr-1
+		if l isa type
+			return L
 	
 	function IntPowerOfTwo (|asmreg| r, |int| Sub=0, |FailableInt|)
 		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
@@ -277,15 +282,7 @@ struct ASMState
 				index += cc.const
 				varadd = asmreg()
 
-		if base is temp
-			|| bs = base.fat
-			if bs and bs.op == asm.addk
-				|| CC = bs.r[2]
-				ifn CC & (1<<bytes)-1
-					.nop(bs)
-					index += CC >> bytes
-					base.reg = bs.r[1]
-					(base isnt temp)
+		base = .InlineOffset(Base, bytes, index)
 /*
 	ADDK: bs, r1, 4
 	RD1U: r2, bs, value, 4, 0

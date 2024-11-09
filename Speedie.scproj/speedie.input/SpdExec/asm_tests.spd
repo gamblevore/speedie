@@ -414,6 +414,7 @@ helper asm_test_largeclass (|LargeClass2| L)
 	|| x = l.a[1]
 	l.a[3] = y
 	l.b[4] = x
+	|| z = &l.b[5]
 
 
 helper asm_test_flow (|int| a, |int| b, |int|)
