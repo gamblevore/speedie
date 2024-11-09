@@ -1473,7 +1473,10 @@ function TypeOfRel (ExprResolver)
 	|| ShouldBeSet = (ParentFunc == @Arg or @Decl) 
 	if (comp != "=")
 		if (ShouldBeSet)
-			error (opch, "Can't use this operator here.")
+			if comp == "=="
+				error (opch, "Did you mean '='?")
+			  else
+				error (opch, "Can't use this operator here.")
 	  elseif (ShouldBeSet)
 		side = rn
 		exp.ASMType = ASMType.kSetRel // for the ASM
