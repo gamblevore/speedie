@@ -29,16 +29,6 @@
 	ForeignFunc(vm, Code, r, Op, Code64);
 	Code += 2;
 	___;
-ı FNCIX: 
-	__;
-	ForeignFunc2(vm, Code, r, Op, *Code);
-	Code++;
-	___;
-ı FNCIX3: 
-	__;
-	ForeignFunc2(vm, Code, r, Op, Code64);
-	Code += 2;
-	___;
 ı NOOP: _
 	i1 = i1;
 	// NOOP
@@ -193,8 +183,8 @@
 	Code += Loop_Jmpi
 ;
 	___;
-ı RFRG: _
-	SetRefRegToReg(r, Op);
+ı RFST: _
+	SetRefBasic(r, Op);
 ı RFWR: _
 	SetRefRegToMem(r, Op);
 ı RFRD: _

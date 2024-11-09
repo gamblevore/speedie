@@ -106,13 +106,13 @@ forms
 		r3		r	// VarAdd
 		Offset	7	// Const A
 		move	2
-	
+
 	MemUtil
 		r1		R
 		r2		r
 		Op		3
 		N		l
-		
+
 	CNTC
 		r1		R
 		r2		R
@@ -120,14 +120,14 @@ forms
 		cnst	7
 		size	2 // 1, 2, 4, 8
 		// *p1[offset] += cnst
-	
+
 	BFLD
 		r1		R
 		r2		r
 		up		6
 		down	6
 		sign	1
-	
+
 	CmpB	// cmpb:
 		r1		R
 		r2		r
@@ -328,32 +328,6 @@ POS 27
 		___
 
 
-//POS 28
-//	FNCI (Func)			// func: 
-//		__
-//		Code = BumpStack2(vm, r, Code+1, Op, *Code)
-//		___
-
-//POS 29
-//	FNCI3 (Func)
-//		__
-//		Code = BumpStack2(vm, r, Code+2, Op, Code64)
-//		___
-
-POS 30
-	FNCIX (ForeignFunc)
-		__
-		ForeignFunc2(vm, Code, r, Op, *Code)
-		Code++ 
-		___
-
-POS 31
-	FNCIX3 (ForeignFunc)
-		__
-		ForeignFunc2(vm, Code, r, Op, Code64) 
-		Code += 2
-		___
-
 /**/ ALLO (Alloc)
 		AllocStack(vm, r, Op)
 	
@@ -530,8 +504,8 @@ POS 5
 
 
 #!						 (((((Refs)))))
-/**/ RFRG  (RefSetCode)
-		SetRefRegToReg(r, Op)		
+/**/ RFST  (U3)
+		SetRefBasic(r, Op)		
 
 /**/ RFWR  (RefSet2)							// RefCount reg to mem
 		SetRefRegToMem(r, Op)
@@ -539,7 +513,7 @@ POS 5
 /**/ RFRD  (RefSet3)							// RefCount mem to reg
 		SetRefMemToReg(r, Op)
 /**/ RFDC  (RefDecrMem)							// for destructors/closers.
-		SetRefDecrMem(r, Op)
+		SetRefDecrMem(r, Op)					// unused rn 😭 *sadface*
 
 
 /**/ RALO  (U2)

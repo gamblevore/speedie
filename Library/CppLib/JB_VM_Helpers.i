@@ -166,19 +166,21 @@ AlwaysInline void SetRefDecrMem(VMRegister* r, ASM Op) {
 }
 
 
-AlwaysInline void SetRefRegToReg(VMRegister* r, ASM Op) {
-	auto A = r[n1].Obj;
-	auto B = r[n2].Obj;
-	if (RefSet_Incru)
+AlwaysInline void SetRefBasic(VMRegister* r, ASM Op) {
+	int out = n1;
+	int in = n2;
+	auto B = r[in].Obj;
+	if (out != in) {
 		JB_Incr(B);
-	if (RefSet_Moveu)
-		r[n1].Obj = B;
-	if (A) {
-		if (RefSet_Decru)
-			JB_SafeDecr_(A);
-		if (RefSet_Freeu)
-			JB_FreeIfDead(A);
+		if (out) {
+			auto A = r[out].Obj;
+			r[out].Obj = B;
+			JB_Decr(A);
+		}
+		return;
 	}
+	JB_SafeDecr(B);
+	JB_FreeIfDead(o3);
 }
 
 
@@ -382,36 +384,39 @@ void MemStuff(u32* A, u32* B, u32 Operation, u32 L) {
 
 AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 	int Size = CNTC_sizeu;
-	int Off  = CNTC_offsetu;
+	int Off  = ((int)(CNTC_offsetu))-1;
 	int Add  = CNTC_cnsti;
 	auto PP = p1(u8);
-	PP += Off << Size;
-	uint64 Old;
-	uint64 New;
 	auto ni = n2;
-	if (!ni) ni = 32; // just write past the end.
-	auto Where = &(r[ni].Uint);
-
-	switch (Size) {
-	case 0:
-		Old = *PP;         New = Old+Add;
-		*PP = New;
-		break;
-	case 1:
-		Old = *((u16*)PP); New = Old+Add;
-		*((u16*)PP) = New;
-		break;
-	case 2:
-		Old = *((u32*)PP); New = Old+Add;
-		*((u32*)PP) = (u32)(New);
-		break;
-	default:
-	case 3:
-		Old = *((u64*)PP); New = Old+Add;
-		*((u64*)PP) = New;
-		break;
+	auto Result = &(r[ni].Uint);
+	if (PP) {
+		uint64 Old;
+		uint64 New;
+		PP += Off << Size;
+		switch (Size) {
+		case 0:
+			Old = *PP;         New = Old+Add;
+			*PP = New;
+			break;
+		case 1:
+			Old = *((u16*)PP); New = Old+Add;
+			*((u16*)PP) = New;
+			break;
+		case 2:
+			Old = *((u32*)PP); New = Old+Add;
+			*((u32*)PP) = (u32)(New);
+			break;
+		default:
+		case 3:
+			Old = *((u64*)PP); New = Old+Add;
+			*((u64*)PP) = New;
+			break;
+		}
+		if (ni)
+			*Result = UseOld?Old:New;
+	} else if (ni) {
+		*Result = !UseOld;
 	}
-	*Where = UseOld?Old:New;
 }
 
 
