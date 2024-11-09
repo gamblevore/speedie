@@ -115,13 +115,17 @@ function RC_Rel (|Message| rel)
 	// a = b.c   ->   || tmp = b.c, jb_incr(tmp), jb_decr(a), a = tmp
 	opt norefcounts
 	
-	|| First = rel.first!
+	|| First = rel.first!.unbra
 	require RelNeedsRef( first )
+	
+	|| last = rel.last!
+	if first.func == @thg and first.obj == last.obj // oof
+		return // do nothing!
 	
 	|| result = RefMsg0( "JB_SetRef", Compiler.RefSetRef! )
 	|| lst = result.Last!
 	lst <~ first
-	lst <~ rel.Last
+	lst <~ Last
 
 	rel.ReplaceWith( result )
 
@@ -133,22 +137,15 @@ function RC_CheckNoObjPms (|message| msg)
 			if i.PointerCount
 				expect (!i.Type.IsObject) (msg, "Can't pass address of object while using 'opt norefcounts'")
 
-	
+
 function RC_IgnoreReturn (|Message| msg)
 	opt norefcounts
 	require RefBasis( msg, false ) == kBasisObj
-	if msg.func == @func
-		|| dcl = msg.last!
-		if dcl.func == @prm
-			|| fn = dcl.obj!|scfunction|
-			require fn isnt constructor
-	
-	|| free_if_dead = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead! )
-	msg.FuncWrap( free_if_dead )
-
-
-//function decrTest
-//	|message[4]| Test // seems to not be working yet!
+	require msg.func == @func
+	|| fn = msg.last!.obj|scfunction|
+	if fn isnt constructor	
+		|| free_if_dead = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead! )
+		msg.FuncWrap( free_if_dead )
 
 
 function RefDecr (|Message| msg, |Message| place, |int| Basis)
@@ -681,6 +678,7 @@ function RC_NeedsOwnBlock (|message| msg, |message| pp, |bool|)
 function RC_HandleDisappearing (|Message| msg, |int| Basis)
 	|| ch = msg.UseNonRefChangers
 	if Basis & kBasisDestructable or kBasisTempStruct
+		if msg != @func
 		ifn msg.IsSetIntoPlace or ch.parent.IsReturnOrRejoin
 			scfunction.TempMoveOut(Msg)
 		return 
@@ -691,7 +689,8 @@ function RC_HandleDisappearing (|Message| msg, |int| Basis)
 	
 	if ch.RefDisappears
 		|| fnc = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead! )
-		msg.ReplaceWith( fnc )
+		msg.Prev = fnc
+		msg.CheckFreeIfDeadValid
 		fnc.Last <~ msg
 		return
 	
@@ -913,3 +912,6 @@ function scdecl.RefDestructor (|message|)
 		return screfs.DecrMulti(self, m)
 	return SCRefs.RefClearMsg( m )
 
+function message.CheckFreeIfDeadValid
+	opt inline
+	check (self == @func) (self, "assumption #749 invalid") // JB_FreeIfDead should exist on function calls.
