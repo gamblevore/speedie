@@ -4593,6 +4593,8 @@ ASMReg SC_Reg_RegSet(ASMReg Self, int Value);
 
 bool SC_Reg_Signed(ASMReg Self);
 
+bool SC_Reg_SomePointer(ASMReg Self);
+
 bool SC_Reg_SyntaxIs(ASMReg Self, ASMReg R);
 
 ASMReg SC_Reg_SyntaxIsSet(ASMReg Self, ASMReg R, bool Value);

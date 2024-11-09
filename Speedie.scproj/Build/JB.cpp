@@ -3456,7 +3456,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[220]);
-	JB_FS_AppendInt32(_fsf0, (2024110915));
+	JB_FS_AppendInt32(_fsf0, (2024110916));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8870,7 +8870,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1383]);
-	JB_FS_AppendInt32(_fsf0, (2024110915));
+	JB_FS_AppendInt32(_fsf0, (2024110916));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -17882,7 +17882,7 @@ bool SC_Reg_IsConst(ASMReg Self, int64 Val) {
 }
 
 int SC_Reg_LeftScore(ASMReg Self) {
-	return (JB_TC_IsPointer(SC_Reg_xC2xB5Type(Self)) << 1) + ((!SC_Reg_SyntaxIs(Self, kSC__Reg_ConstAny)));
+	return (SC_Reg_SomePointer(Self) << 1) + ((!SC_Reg_SyntaxIs(Self, kSC__Reg_ConstAny)));
 }
 
 FatASM* SC_Reg_NeedFAT(ASMReg Self) {
@@ -17950,7 +17950,6 @@ int SC_Reg_PointerMul(ASMReg Self, Message* Exp, int Swapped) {
 		Exp = ((Message*)JB_Ring_First(Exp));
 	}
 	 else iif (Fn == kJB_SyxAcc) {
-		JB_DoAt(1);
 		Exp = ((Message*)JB_Ring_First(Exp));
 	}
 	 else iif (Fn == kJB_SyxDot) {
@@ -17980,6 +17979,10 @@ ASMReg SC_Reg_RegSet(ASMReg Self, int Value) {
 
 bool SC_Reg_Signed(ASMReg Self) {
 	return JB_TC_IsSigned(((DataTypeCode)Self));
+}
+
+bool SC_Reg_SomePointer(ASMReg Self) {
+	return (SC_Reg_SyntaxIs(Self, kSC__Reg_ContainsAddr)) or JB_TC_IsPointer(SC_Reg_xC2xB5Type(Self));
 }
 
 bool SC_Reg_SyntaxIs(ASMReg Self, ASMReg R) {
@@ -18029,7 +18032,7 @@ ASMReg SC_ASMType__Access(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
 	ASMReg Vara = SC_Pac_GetASM(Self, Sc, kSC__Reg_StayOpen);
 	iif (SC_Reg_SyntaxIs(Dest, kSC__Reg_AddrRequest)) {
 		JB_DoAt(1);
-		return SC_Pac_Plus(Self, SC_Reg_HaveAddr(Dest), Ptr, Vara, Exp);
+		return SC_Pac_Plus(Self, Dest, SC_Reg_HaveAddr(Ptr), Vara, Exp);
 	}
 	return SC_Pac_ReadOrWrite(Self, Dest, Exp, Ptr, Vara, 0);
 }
@@ -18208,7 +18211,11 @@ ASMReg SC_ASMType__Dot(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
 	}
 	iif ((SC_Reg_SyntaxIs(Dest, kSC__Reg_AddrRequest)) or SC_Decl_IsCArray(Prop)) {
 		Pos = (Pos * JB_TC_ByteCount(T));
-		return SC_Pac_AddToReg(Self, Exp, SC_Reg_HaveAddr(Dest), SC_Reg_OperatorAs(Obj, kSC__Reg_NoScale), Pos);
+		iif (SC_Decl_IsCArray(Prop)) {
+			Dest = SC_Reg_HaveAddr(Dest);
+			Dest = SC_Reg_xC2xB5TypeSet(Dest, kJB__TC__voidptr);
+		}
+		return SC_Pac_AddToReg(Self, Exp, Dest, SC_Reg_OperatorAs(Obj, kSC__Reg_NoScale), Pos);
 	}
 	return SC_Pac_ReadOrWrite(Self, Dest, Exp, Obj, SC_Reg__New(), Pos);
 }
@@ -22989,13 +22996,10 @@ ASMReg SC_Pac_IncrPre(ASMState* Self, Message* Exp, ASMReg Dest, ASMReg Src, int
 
 bool SC_Pac_InlineAddK(ASMState* Self, ASMReg L, int64 R) {
 	iif (SC_Reg_SyntaxIs(L, kSC__Reg_Temp)) {
-		JB_DoAt(1);
 		FatASM* Fat = SC_Reg_FAT(L);
 		iif (SC_FAT_OperatorIsa(Fat, kSC__ASM_ADDK)) {
-			JB_DoAt(1);
 			int64 CC = Fat->R[2] + R;
 			iif (SC_int64_CanStoreAsIntImmediate(CC)) {
-				JB_DoAt(1);
 				Fat->R[2] = CC;
 				return true;
 			}
@@ -23005,12 +23009,12 @@ bool SC_Pac_InlineAddK(ASMState* Self, ASMReg L, int64 R) {
 }
 
 ASMReg SC_Pac_InlineOffset(ASMState* Self, ASMReg Base, int Pow2, int* Index, int Maximum) {
-	iif (SC_Reg_SyntaxIs(Base, kSC__Reg_Temp) and SC_Reg_SyntaxIs(Base, kSC__Reg_ContainsAddr)) {
+	iif (SC_Reg_SyntaxIs(Base, kSC__Reg_Temp)) {
 		FatASM* Bs = SC_Reg_FAT(Base);
 		iif (SC_FAT_OperatorIsa(Bs, kSC__ASM_ADDK)) {
 			uint CC = Bs->R[2];
 			uint CC2 = CC >> Pow2;
-			iif ((CC2 <= Maximum) and ((CC2 >> Pow2) == CC)) {
+			iif ((CC2 <= Maximum) and ((CC2 << Pow2) == CC)) {
 				SC_Pac_NopWithFat(Self, Bs);
 				Index[0] = (Index[0] + CC2);
 				uint R = Bs->R[1];
@@ -23059,7 +23063,7 @@ ASMReg SC_Pac_IntPlus(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* 
 		return SC_Pac_Assign(Self, Dest, L, Exp);
 	}
 	int Lmul = 1;
-	iif (((!SC_Reg_SyntaxIs(L, kSC__Reg_NoScale))) and JB_TC_IsPointer(SC_Reg_xC2xB5Type(L))) {
+	iif (((!SC_Reg_SyntaxIs(L, kSC__Reg_NoScale))) and SC_Reg_SomePointer(L)) {
 		Lmul = SC_Reg_PointerMul(L, Exp, Swapped);
 	}
 	iif (SC_Reg_SyntaxIs(R, kSC__Reg_ConstAny)) {
@@ -23567,7 +23571,7 @@ FatASM* SC_Pac_ReadOrWriteSub(ASMState* Self, ASMReg Dest, Message* Exp, ASMReg 
 			Varadd = SC_Reg__New();
 		}
 	}
-	Base = SC_Pac_InlineOffset(Self, Base, Bytes, (&Index), 1073741824);
+	Base = SC_Pac_InlineOffset(Self, Base, Bytes, (&Index), 128);
 	iif (Index >= 128) {
 		Index = (Index << Bytes);
 		Base = SC_Pac_AddToReg(Self, Exp, SC_Reg__New(), SC_Reg_OperatorAs(Base, kSC__Reg_NoScale), Index);
@@ -57825,4 +57829,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -2436879885896071042 -220772774826096124
+// 2779292710896411644 -220772774826096124
