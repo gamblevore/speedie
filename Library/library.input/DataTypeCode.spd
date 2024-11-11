@@ -58,7 +58,7 @@ datatype DataTypeCode (uint16)
 		_void = 0
 		_voidptr = 48
 		cstring = 48
-		Failed = 1<<10
+		Failed = 1<<10   // 1KB
 		PossibleBits = 2047
 		Numeric = 8
 		
@@ -131,9 +131,6 @@ datatype DataTypeCode (uint16)
 	
 	function IsNumeric (|bool|)
 		return (self & numeric)
-	
-//	function IsAtomic (|bool|)
-//		return (self & 4)
 	
 	function NumericCount (|int|)
 		if (self & numeric)
