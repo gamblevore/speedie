@@ -23302,7 +23302,7 @@ void SC_Pac_NopWithReg(ASMState* Self, ASMReg R) {
 	iif (F) {
 		return SC_Pac_NopWithFat(Self, F);
 	}
-	iif (SC_Reg_Reg(R)) {
+	iif (SC_Reg_Reg(R) and (!SC_Reg_SyntaxIs(R, kSC__Reg_Param))) {
 		JB_DoAt(1);
 	}
 }
