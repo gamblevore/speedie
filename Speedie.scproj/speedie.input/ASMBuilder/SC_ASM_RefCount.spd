@@ -43,7 +43,7 @@ extend asmstate
 			|| Out = .µ(prms.first!, asmreg.AddrRequest)
 			|| From = .µ(prms.second!, asmreg.AddrRequest)
 			if out.reg == from.reg
-/				return exp.noop // wat?
+				return exp.noop // wat?
 			
 			|| offset = 0
 			if Out isnt ContainsAddr
@@ -51,12 +51,13 @@ extend asmstate
 					from = .InlineOffset(from, 3, offset, 13~bits)
 /					return exp.RFRD(Out, From, 1, offset)			// mem to reg
 /				return exp.RFST(Out, From, nil)						// reg to reg
-
+			
 			if  From is ContainsAddr
 				|| where = .TempTyped(prms)
 /				From = .Read(where, exp, From, nil) * where			// (mem to reg)?
 			  else
 /				0
+
 			from = .InlineOffset(Out, 3, offset, 13~bits)
 			return exp.RFWR(Out, From, 1, offset)					// reg to mem
 

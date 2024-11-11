@@ -1,8 +1,16 @@
 
 
 module ASMExamples {
-
+//|string| A
+//constructor {
+//	.A = "A"
+//}
+//destructor {
+//	printline .A
+//}
 target pack { 
+	
+
 class LargeClass2 {
 	|byte[100]|   a
 	|uint16[100]| b
@@ -120,6 +128,21 @@ function ForeignFuncs (|string?| x, |string?| y, |string|)
 	|| d = x! + y!
 	|| e = string.char(0xb16b00b5)
 	return e + d // fails?
+
+
+function RefCountTests (|string| a, |string| b, |message| m, |message| mm)
+	// need destructor for refclear
+	// need incr2 for constructors
+
+	#!function call for freeifdead.
+	|| e = string.char(0xb16b00b5)
+	
+	#!all 4 combos of mem/ptr set
+	m.name = b
+	b = m.name
+	|| f = b
+	m.name = mm.name
+
 
 function Mul (|int| a, |int| b, |int| c, |int| d, |int|)
 	|| x = 12 * 10
