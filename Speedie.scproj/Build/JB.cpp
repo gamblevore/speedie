@@ -3456,7 +3456,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[220]);
-	JB_FS_AppendInt32(_fsf0, (2024111118));
+	JB_FS_AppendInt32(_fsf0, (2024111120));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8870,7 +8870,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1383]);
-	JB_FS_AppendInt32(_fsf0, (2024111118));
+	JB_FS_AppendInt32(_fsf0, (2024111120));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -18013,8 +18013,8 @@ ASMReg SC_Reg_with(ASMReg Self, ASMReg Dest, ASMReg InUse) {
 }
 
 ASMReg SC_Reg_xC2xB5TypeSet(ASMReg Self, uint /*DataTypeCode*/ Value) {
-	uint64 Clear = (~((uint64)kJB__TC_PossibleBits));
-	return ((ASMReg)((((uint64)Self) & Clear) | Value));
+	uint64 Mask = ((uint64)kJB__TC_PossibleBits);
+	return ((ASMReg)((((uint64)Self) & (~Mask)) | (Value & Mask)));
 }
 
 ASMReg SC_Reg__New() {
@@ -22573,14 +22573,19 @@ ASMReg SC_Pac_BoolConst2(ASMState* Self, OpMode Opp, ASMReg Ml, ASMReg Mr) {
 }
 
 ASMReg SC_Pac_BoolFromBools(ASMState* Self, Message* Exp, ASMReg Dest, OpMode Opp, ASMReg Ml, ASMReg Mr) {
+	ASMReg Rz = ((ASMReg)0);
 	Dest = SC_Pac_TempTyped(Self, Exp, Dest);
-	FatASM* Fat = JB_Msg_BAND(Exp, Dest, Ml, Mr, 0);
-	Fat->Op = (Fat->Op + (SC_OpMode_SyntaxIs(Opp, kSC__OpMode_OR)));
-	iif (SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate)) {
-		SC_Pac_BitNot(Self, Dest, Dest, SC_Reg__New(), Exp);
-		Dest = SC_Reg_SyntaxIsSet(Dest, kSC__Reg_AlreadyNegated, true);
+	iif (SC_OpMode_SyntaxIs(Opp, kSC__OpMode_OR)) {
+		Rz = SC_Pac_BitOr(Self, Dest, Ml, Mr, Exp);
 	}
-	return SC_FAT_AsReg(Fat, Dest);
+	 else {
+		Rz = SC_Pac_BitAnd(Self, Dest, Ml, Mr, Exp);
+	}
+	iif (SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate)) {
+		Rz = SC_Pac_BitNot(Self, Rz, Dest, SC_Reg__New(), Exp);
+		Rz = SC_Reg_SyntaxIsSet(Rz, kSC__Reg_AlreadyNegated, true);
+	}
+	return Rz;
 }
 
 ASMReg SC_Pac_BoolMul(ASMState* Self, ASMReg Dest, ASMReg Bule, ASMReg V, Message* Exp) {
