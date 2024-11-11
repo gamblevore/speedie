@@ -121,17 +121,17 @@
 #define   HALT_IsOKu_(x)   (((uint)((x)<<28))>>28)
 
 
-#define   JCmpF_Cmpi       ((( int)((Op)<<18))>>28)
-#define   JCmpF_Cmpi_(x)   ((( int)((x)<<18))>>28)
+#define   JCmpF_Cmpi       ((( int)((Op)<<18))>>29)
+#define   JCmpF_Cmpi_(x)   ((( int)((x)<<18))>>29)
 
-#define   JCmpF_Cmpu       (((uint)((Op)<<18))>>28)
-#define   JCmpF_Cmpu_(x)   (((uint)((x)<<18))>>28)
+#define   JCmpF_Cmpu       (((uint)((Op)<<18))>>29)
+#define   JCmpF_Cmpu_(x)   (((uint)((x)<<18))>>29)
 
-#define   JCmpF_Jmpi       ((( int)((Op)<<22))>>22)
-#define   JCmpF_Jmpi_(x)   ((( int)((x)<<22))>>22)
+#define   JCmpF_Jmpi       ((( int)((Op)<<21))>>21)
+#define   JCmpF_Jmpi_(x)   ((( int)((x)<<21))>>21)
 
-#define   JCmpF_Jmpu       (((uint)((Op)<<22))>>22)
-#define   JCmpF_Jmpu_(x)   (((uint)((x)<<22))>>22)
+#define   JCmpF_Jmpu       (((uint)((Op)<<21))>>21)
+#define   JCmpF_Jmpu_(x)   (((uint)((x)<<21))>>21)
 
 
 #define   JCmpI_Cmpi       ((( int)((Op)<<18))>>29)

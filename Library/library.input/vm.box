@@ -65,7 +65,7 @@ forms
 	JCmpF	// cmp:
 		r1		r
 		r2		r
-		Cmp		4
+		Cmp		3
 		Jmp		j
 
 	JCmpI	// cmp:
