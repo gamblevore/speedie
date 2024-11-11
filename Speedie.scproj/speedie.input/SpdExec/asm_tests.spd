@@ -59,24 +59,25 @@ function SemiConst (|int| f1, |int|)
 	return y6+y8
 
 
-function AndOrRest (|int| a, |int| b, |int|) // stragglers
-	|| x3 = false
-	|| x4 = !(a and b)
-	x3 = (0 or b)+1				// x3 = b+1
-	#!AAA
-	x4 = a or b					// old bool logic
-	x3 = a and b
-	x4 = !(!a or b)
-	x3 = !(a or b)				// new bool logic
-	x4 = (a and !b)
-	x3 = !(a or !b)
-	#!BBB
+function AndOrRest (|int| a, |int| b, |bool| x3, |bool| x4, |int|) // stragglers
+	#!AAAA
 	|| x5 = (0 or x3)+1			// x5 = x3+1
 	|| x6 = x3 or x4			// no need cmpb
 	|| x7 = x3 or x4
 	|| x8 = x3 and x4
 	|| x9 = !(x3 or x4)
 	|| x10 = !(x3 and x4)
+	#!BBBB
+	x3 = (0 or b)+1				// x3 = b+1
+	x4 = !(a and b)
+	#!DDDD
+	x4 = a or b					// old bool logic
+	x3 = a and b
+	x4 = !(!a or b)
+	x3 = !(a or b)				// new bool logic
+	x4 = (a and !b)
+	x3 = !(a or !b)
+	#!CCCC
 	return x9 + x10
 
 	

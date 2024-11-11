@@ -155,7 +155,7 @@ struct ASMState
 	function Nop (|asmreg| R)
 		|| f = r.fat
 			return .Nop(f)
-		if r.reg
+		if r.reg and r isnt param
 			debugat // bad!
 	
 	function Nop2 (|asmreg| A, |asmreg| B)
