@@ -334,17 +334,6 @@ function message.IsBehaviour (|bool|)
 // .isbehaviour // name == "behaviour"
 
 
-//extend SCClass
-//	syntax Compare (|string| Other, |bool|Aware, |int|)
-//		if !self
-//			return 1
-//		return .name.Compare(other, Aware)
-//	syntax Equals (|string| Other, |bool|Aware, |bool|)
-//		cpp_part EqualsStr
-//		if self
-//			return .name.syntaxequals(other, Aware)
-
-
 function SCClass.RenameInterfaces
 	|| b = .Behaviour$
 	for (f in b.interfaces)

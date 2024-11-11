@@ -26,12 +26,11 @@ extend asmreg
 extend ASMState
 	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asmreg|)
 		|| negate = (dest is negate)|int|
-		|| Res = dest.BoolAnswer		// Hmmm... so what should it be?
+		|| Res = dest.BoolAnswer						// Hmmm... so what should it be?
+		if  L is constany  and  R is constany
+			.nop2(r, l)
+			return .NumToReg(exp, ((l.const==r.const)==!negate)|int|, res, datatypecode.bool)
 		if dest isnt CondRequest
-			if  L is constany  and  R is constany
-				.nop2(r, l)
-				// what if we get false? theres no fat? its just reg0
-				return .NumToReg(exp, ((l.const==r.const)==!negate)|int|, res, datatypecode.bool)
 			return exp.CMPB(dest, L, R, negate xor 1) * res
 
 		if l.reg
@@ -65,11 +64,8 @@ extend ASMState
 		  else
 			rz = .CompareFloat(dest, l, r, exp, 2)
 			
-		if rz is constany
-			if dest is constany
-				.nop2(l, r)
-			|| eq = (rz.const)|bool| != (dest is negate)
-			(rz is TrueConstCond) = eq // in case we compare to 0 and get nopped later
+		if rz is constany // in case called from outside of domathsub
+			.nop2(l, r)
 			
 		rz = rz.boolanswer
 	
@@ -79,36 +75,75 @@ extend ASMState
 
 
 	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
-		|| OldDest = dest
-		dest = dest.BoolAnswer
 		mode |= !r.signed<<2
-		mode ^= OldDest isnt Negate
-		if OldDest isnt CondRequest
+		mode ^= dest isnt Negate
+		dest = dest.BoolAnswer
+		if l is constany and r is constany
+			return .ConstCompareInt(dest, L, R, exp, Mode)
+		if Dest isnt CondAnswer
 			return exp.CMPI(dest, L, R, mode) * dest
-
 		return exp.JMPI(L, R, mode, 0) * dest
 
 
+	function ConstCompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
+		.nop2(r, l)
+		|| Result = .ConstCompareFloatSub(l, r, mode)
+		return .NumToReg(exp, result|int|, dest.BoolAnswer, datatypecode.bool)
+		
+		
+	function ConstCompareFloatSub (|asmreg| L, |asmreg| R, |int| Mode, |bool|)
+		opt inline
+		ifn mode & 4
+			if mode <= 1
+				if mode == 0
+					return L.f32 >  R.f32
+				return L.f32 <= R.f32
+			if mode == 2
+				return L.f32 == R.f32
+			return L.f32 != R.f32
+
+		if mode <= 5
+			if mode == 4
+				return L.f64 >  R.f64
+			return L.f64 <= R.f64
+		if mode == 6
+			return L.f64 == R.f64
+		return L.f64 != R.f64
+
+
+	function ConstCompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
+		.nop2(r, l)
+		|| Result = .ConstCompareIntSub(l, r, mode)
+		return .NumToReg(exp, result|int|, dest.BoolAnswer, datatypecode.bool)
+		
+		
+	function ConstCompareIntSub (|asmreg| L, |asmreg| R, |int| Mode, |bool|)
+		opt inline
+		if mode <= 1
+			if mode == 0
+				return L.f32 >  R.f32
+			return L.f32 <= R.f32
+		if mode == 2
+			return L.f32 == R.f32
+		return L.f32 != R.f32
+
+
 	function CompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
-		|| OldDest = dest
-		if (l is constany and r is constany) // needs to handle this!
-		dest = dest.BoolAnswer
-		mode |= l.IsBig<<3
 		mode |= r.IsBig<<2
-		mode ^= OldDest isnt Negate
-		if dest isnt CondRequest
+		mode ^= dest isnt Negate
+		dest = dest.BoolAnswer
+		if (l is constany and r is constany) // needs to handle this!
+			return .ConstCompareFloat(dest, L, R, exp, Mode)
+		if dest isnt Condanswer
 			return exp.CMPF(dest, L, R, Mode) * dest
 		return exp.JMPF(L, R, Mode, 0) * dest
 
 
 	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |int| Mode,  |asmreg|)
+/*	 (A >  B)    (A <= B)    (A == B)    (A != B)	*/
 		if dest.IsInt
-			rz = .CompareInt(dest, l, r, exp, mode)
-		  else
-			rz = .CompareFloat(dest, l, r, exp, mode)
-		rz = rz.boolanswer
-
-/*				(A >  B)    (A <= B)    (A == B)    (A != B)			*/
+			return .CompareInt(dest, l, r, exp, mode)
+		return .CompareFloat(dest, l, r, exp, mode)
 	
 	function More   (fn_opasm)
 		return .compare(dest, l, r, exp, 0)
@@ -164,7 +199,7 @@ extend ASMState
 		if ptoi == 1										//   x * 1   -->  x 
 			return l
 		return dest.µtype.zero								//   x * 0   -->  0
-		
+
 
 	function QuickIntMul    (fn_OpASM)
 		|| Pow2 = .IntPowerOfTwo(r)
@@ -228,13 +263,14 @@ extend ASMState
 		debugger // hmmmm. its not a pointer after all?
 	
 
-	function InlineAddK (|asmreg| L, |int64| R, |bool|)
+	function InlineAddK (|asmreg| L, |int64| R, |asmreg| Dest, |bool|)
 		if l is temp
 			|| fat = l.fat
 			if fat isa asm.addk
 				|| CC = fat.r[2] + R
 				if CC.CanStoreAsIntImmediate
-					fat.r[2] = CC
+					fat.b = CC
+					fat.out = dest
 					return true
 
 
@@ -261,7 +297,6 @@ extend ASMState
 		if !r.reg // add or subtract zero
 			return .Assign(dest, l, exp)
 		
-	
 		|| lmul = 1
 		if (l isnt noscale) and l.SomePointer
 			lmul = l.PointerMul(exp, swapped)
@@ -272,8 +307,8 @@ extend ASMState
 			rr *= lmul
 			if r.CanAddK(RR)								// a - 1,  a + 1
 				.nop(r)
-				if .InlineAddK(l, rr)
-					return l
+				if .InlineAddK(l, rr, dest)
+					return dest
 				return exp.ADDK(dest, L, RR) * dest
 
 		|&fatasm| fat
@@ -282,7 +317,7 @@ extend ASMState
 			if l is alternate
 				fat.op ++
 		  else
-			|| v = .numtoreg(exp, lmul, asmreg(), datatypecode.uint)
+			|| v = .NumToReg(exp, lmul, asmreg(), datatypecode.uint)
 			if l isnt alternate								// x = lptr + r*12
 				fat = exp.MULT(dest, R, V, L)
 			  else											// x = (lptr - rptr)/12
@@ -291,7 +326,7 @@ extend ASMState
 				fat = exp.DIVV(dest, ASMReg(), dest, V, uinttype)  
 			  
 		return fat * Dest
-		
+	
 
 	function FloatPlus (fn_opasm)
 		if dest is ConstAny

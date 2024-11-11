@@ -136,7 +136,7 @@ struct ASMState
 		if t isnt textual
 			// what if there is a type and its different?
 			// and if its NEVER different... why add it?
-			t.µtype = where.asmdecl.typeonly // probably needs changing.
+			t.µtype = where.asmdecl.datatype
 		return .TempOnly(where, t)
 
 
@@ -197,13 +197,16 @@ struct ASMState
 	function µBoolInto (|message| exp, |AsmReg| Dest, |asmreg|)
 		|| X = .ExistingVar(Exp)
 		X ?= .µInto(exp, dest)
-		if (X.µtype isnt bool) or (dest is negate and X isnt alreadynegated)
+		if  (X.µtype isnt bool)  or  (dest is negate  and  X isnt AlreadyNegated)
 			return .exists(dest as (X bitand asmreg.fromexistingvar), X, exp)
 		return .Assign(dest, X, exp)
 			
 		
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
 		|| rz = .µ(Exp, dest)
+		debugat 0
+//		if rz is temp // what?
+//			.µ(Exp, dest)
 		dest = rz.reg(dest)
 		return .Assign(Dest, rz, exp)
 	
@@ -260,18 +263,17 @@ struct ASMState
 		return .µ(prm, asmreg.stayopen)
 
 
-	function ReadOrWrite (|ASMReg| dest, |message| m, |asmreg| ptr, |asmreg| varadd, |int| index=0, |asmreg|)
-		return .ReadOrWriteSub(dest, m, ptr, varadd, index) * dest
+	function ReadOrWrite (|ASMReg| dest, |message| m, |asmreg| base, |asmreg| varadd, |int| index=0, |asmreg|)
+		return .ReadOrWriteSub(dest, m, base, varadd, index) * dest
 
 
 	function ReadOrWriteSub (|ASMReg| dest, |message| exp, |asmreg| base, |asmreg| varadd, |int| index, |&fatasm|)
 		if dest is containsaddr
 			#!wait?? this is meant to be an addrrequest? not a response.
 			debugger
-		
+
 		(dest asnt= asmreg.AddrRequest)
-		|| ScalingType = (base, dest)(dest is set)
-		|| T = ScalingType.µtype
+		|| T = dest.µtype
 		|| bytes = t.ByteCount.log2
 		if  (bytes|uint| > 4)
 			error (exp, "Object to large to access")				// can we do struct-mem-copy?
@@ -283,7 +285,7 @@ struct ASMState
 				index += cc.const
 				varadd = asmreg()
 
-		base = .InlineOffset(Base, bytes, index, 128)
+		base = .InlineOffset(Base, bytes, index, 127)
 /*
 	ADDK: bs, r1, 4
 	RD1U: r2, bs, value, 4, 0

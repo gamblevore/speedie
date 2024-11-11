@@ -29,7 +29,7 @@ datatype ASMReg (uint64)
 		NoScale
 		KindaConst = [ConstAny, NeverAltered]
 		SetRelRemove = KindaConst|||stayopen
-		TrueConstCond
+//		TrueConstCond
 		ContainsAddr
 		AddrNeed = [AddrRequest, AddrForceRequest]
 		Textual

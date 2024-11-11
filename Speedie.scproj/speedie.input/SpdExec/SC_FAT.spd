@@ -106,10 +106,13 @@ struct FatASM
 	function LinkedFrom (|fatasm| New)
 		.refcount++
 
+	function asmreg.treg (|uint|)
+		return .reg ||| ((self is Temp)<<31)
+
 	function RegInput (|int| a, assigns:|asmreg| info)
 		cpp_part Prm
 		opt inline
-		.r[a] = info.reg ||| ((info is Temp)<<31)
+		.r[a] = info.treg
 //		|| Src = info.fat
 //			Src.LinkedFrom(self) // what?
 	
@@ -146,7 +149,7 @@ struct FatASM
 			debugger
 
 	function out (|uint|): return .r[0]
-//	function out (assigns:|uint|): .r[0] = value
+	function out (assigns:|asmreg|): .r[0] = value.treg
 	
 	// easier to optimise if its expressed like abcd
 	function a (|uint|): return .r[1]
@@ -241,8 +244,17 @@ struct FatASM
 				remain += bs
 			if .op == asm.knst
 				exit
-		if (op.OpCode == asm.knst or asm.knsr)
+		if (self isa asm.knst or asm.knsr)
 			.RendaKnst(fs, fs.mark-m)
+		if (self isa asm.noop)
+			.rendamsg(fs, fs.mark-m)
+	
+	
+	function RendaMsg (|faststring| fs, |int| sofar)
+		fs <~ (' ', 26-sofar)
+		fs <~ "/# "
+		fs <~ .msg.name
+		fs <~ " #/"
 	
 	
 	function RendaKnst (|faststring| fs, |int| sofar)

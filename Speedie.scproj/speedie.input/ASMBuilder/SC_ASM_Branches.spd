@@ -143,26 +143,20 @@ function SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond,
 	return cond.TERN(dest, µ, ma, mb) * dest
 
 
-function OofBranch (|message| cond,  |bool| neg=false, |asmreg|)
-	|fatrange| tmp
-	return .Branch(cond, neg, tmp)
-
-
 function Branch (|message| cond,  |bool| neg=false,  |fatrange| range, |asmreg|)
-	range.start = .curr
+	range.Start = .curr
 	|| mode = asmreg.CondRequest.Negate(neg)
 	rz = .µ(cond, mode)
 	if rz isnt CondAnswer
 		if rz is alreadynegated
 			debugger
 			(mode isnt negate) // does this ever happen?
-		rz = .exists(mode, rz, cond)
-		#! TrueConstCond
-	rz = rz.CondAnswer
-	range.constness = maybebool.default(false)
-	if rz is constany
-		range.constness = (rz.const!=0)|maybebool|
-		.backcond(range.start)
+		rz = .Exists(mode, rz, cond)
+		if !rz.CondAnswer // wat?
+	range.Constness = maybebool.default(false)
+	if rz is ConstAny
+		range.Constness = (rz.const!=0)|maybebool|
+		.BackCond(range.start)
 	range.after = .curr
 
 
@@ -311,7 +305,7 @@ function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	|fatrange| AndTest
 	rz = .Branch(A, dest is negate, andtest)
 	if !AndTest.never
-		.OofBranch(B, dest is negate)
+		.Branch(B, dest is negate, andtest)
 
 
 
@@ -319,7 +313,8 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	|fatrange| OrTest
 	rz = .Branch(A, dest isnt negate, Ortest)
 	if !OrTest.never // opposite const test of expected, cos OR is opposite of AND
-		.OofBranch(B, dest is negate)
+		|fatrange| tmp
+		.Branch(B, dest is negate, tmp)
 		OrTest.AllJumpTo(.curr)	
 
 }
