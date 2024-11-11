@@ -29,7 +29,6 @@ datatype ASMReg (uint64)
 		NoScale
 		KindaConst = [ConstAny, NeverAltered]
 		SetRelRemove = KindaConst|||stayopen
-//		TrueConstCond
 		ContainsAddr
 		AddrNeed = [AddrRequest, AddrForceRequest]
 		Textual
@@ -141,8 +140,8 @@ datatype ASMReg (uint64)
 		return self|DataTypeCode| & DataTypeCode.PossibleBits
 	
 	function µType (assigns:|DataTypeCode|, |asmreg|)
-		|| Clear = ~(DataTypeCode.PossibleBits|uint64|)
-		return ((self|uint64| & Clear) ||| value)|asmreg|
+		|| Mask = DataTypeCode.PossibleBits|uint64| // first 10 bits
+		return ((self|uint64| & ~Mask) ||| (value&Mask))|asmreg|
 	
 	syntax is (|AsmReg| R, |bool|)
 		return (self & R) == r

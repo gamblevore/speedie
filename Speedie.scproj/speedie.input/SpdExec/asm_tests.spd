@@ -63,7 +63,7 @@ function AndOrRest (|int| a, |int| b, |bool| x3, |bool| x4, |int|) // stragglers
 	#!AAAA
 	|| x5 = (0 or x3)+1			// x5 = x3+1
 	|| x6 = x3 or x4			// no need cmpb
-	|| x7 = x3 or x4
+	|| x7 = !(!x3 and !x4)
 	|| x8 = x3 and x4
 	|| x9 = !(x3 or x4)
 	|| x10 = !(x3 and x4)

@@ -492,6 +492,7 @@ extend ASMState
 			return .Assign(dest, l, exp)
 		return .BitMakerSwap(dest, l, r, exp, asm.bxor)
 
+
 	function BitOr (fn_opasm)
 		if dest is ConstAny
 			return .MakeConst2(dest, l, r, exp, ConstifyBitOr)

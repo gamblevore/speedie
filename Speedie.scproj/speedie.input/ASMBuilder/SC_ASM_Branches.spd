@@ -169,12 +169,14 @@ helper ASMBoolShrink (|message| exp,  |ASMReg| Dest,  |ASMReg| ml,  |ASMReg|)
 helper BoolFromBools (|message| exp, |ASMReg| Dest, |opmode| opp, |ASMReg| ml, |ASMReg| mr, |ASMReg|)
 	// handles:  a = a and b,  a = a or b
 	dest = .TempTyped(exp, dest)
-	|| fat = exp.BAND(dest, ml, mr, 0)
-	fat.op += opp is OR
+	if opp is or
+		rz = .bitor(dest, ml, mr, exp)
+	  else
+		rz = .bitand(dest, ml, mr, exp)
+	
 	if (dest is negate)
-		.BitNot(dest, dest, asmreg(), exp)
-		(dest is AlreadyNegated)
-	return fat * dest
+		rz = .BitNot(rz, dest, asmreg(), exp)
+		(rz is AlreadyNegated)
 
 
 function asmreg.IsBoolV (|bool|)
@@ -245,8 +247,8 @@ function BoolTestAndJump (|message| exp, |asmreg| req, |opmode| opp, |&fatasm|)
 function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMReg|)
 	opt norefcounts
 	dest = .UniqueLocation(a, dest, B)
-	|| first = .µBoolInto(A, dest)
 
+	|| first = .µBoolInto(A, dest)
 	if first is ConstAny
 		return .BoolConst1(b, dest, opp, first).boolanswer			// x = 5 or Y() --> x = Y()
 	
@@ -311,8 +313,8 @@ function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 
 function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	|fatrange| OrTest
-	rz = .Branch(A, dest isnt negate, Ortest)
-	if !OrTest.never // opposite const test of expected, cos OR is opposite of AND
+	rz = .Branch(A, dest isnt negate, OrTest)
+	if !OrTest.never		// opposite const test of expected, cos OR is opposite of AND
 		|fatrange| tmp
 		.Branch(B, dest is negate, tmp)
 		OrTest.AllJumpTo(.curr)	
