@@ -44,7 +44,7 @@ extend ASMState
 
 	function MakeConst (|&fatasm| fat, |asmreg| reg, |asmreg|)
 //		Fat.TryRotateConst // shouldn't we do this later?
-		(reg is ConstAny)  // just before export?
+		(reg is RealConst)  // just before export?
 		return fat*reg     // or the exporter itself should do it!
 
 	
@@ -86,7 +86,7 @@ extend ASMState
 	
 	function NumToReg (|message| exp, |int64| V, |asmreg| Reg, |datatypecode| SrcType, |asmreg|)
 		if !v and (!reg.reg)
-			return reg as (asmreg.constany as asmreg.param)
+			return reg as (asmreg.RealConst as asmreg.param)
 		return .NumToFat(exp, v, reg, SrcType).info
 	
 	
@@ -139,7 +139,7 @@ function uint64.CanStoreAsFloatImmediate (|bool|)
 
 
 function asmreg.CanAddK (|int64| T, |bool|) // used to be used from .plus()... works now from render
-	if (self is constany) and .isint
+	if (self is RealConst) and .isint
 		return t.CanStoreAsIntImmediate
 
 

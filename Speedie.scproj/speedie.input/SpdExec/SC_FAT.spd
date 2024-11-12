@@ -9,7 +9,7 @@ struct FatASM
 	|uint[7]|			R
 	|uint|				ASMIndex	
 	|uint16| 			BlockNum		// remove?
-	|uint16| 			ParentBlock		// remove?
+	|uint16| 			Nothing			// remove?
 	|uint16|			RefCount
 	|byte|				Op
 	|byte|				JumpReg
@@ -139,6 +139,7 @@ struct FatASM
 	function JumpInput (|int| a, assigns:|int| v)
 		.r[a] = v
 		.jumpreg = a + 1
+		ASMState.sh.BasicBlock++
 		
 	function JumpTo (assigns:|&fatasm|)
 		|| j = .jumpreg

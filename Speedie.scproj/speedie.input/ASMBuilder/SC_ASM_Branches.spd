@@ -11,7 +11,7 @@ function ArgOrIf (|message?| other, |asmreg|)
 		if T != asmtype.kif
 			if other != @arg
 				other = other.first
-			else
+			  else
 				debugger
 			return ASMType.ARG(self, other)
 		return .IF(other, asmreg())
@@ -25,8 +25,8 @@ function IfEmpty (|message| cond, |message| other, |asmreg|)
 	|fatrange| B
 /	.Branch(cond, true, B)
 	if b.never
-		return asmreg() // assume subjumps are sorted out.
-	.argorif(other)
+		return ASMReg() // assume SubJumps are sorted out.
+	.ArgOrIf(other)
 	B.AllJumpTo(.curr)
 	return asmreg()
 
@@ -48,10 +48,11 @@ function If				(fn_asm)
 	ASMType.arg(self, arg1)
 	B.AllJumpTo(.curr)
 	if b.always or !other
-		return asmreg()					// were done!
+		.BasicBlock++
+		return asmreg()						// were done!
 
 	|| AfterFirst = arg1.jump(0)
-	.argorif(other)
+	.ArgOrIf(other)
 	AfterFirst.jumpto = .curr
 	
 	return asmreg()
@@ -70,7 +71,7 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 		C++
 
 
-function While			(fn_asm)
+function While (fn_asm)
 	opt norefcounts
 	|| BEGIN = exp.JUMP(0)							// jump to end... THEN EMIT arg and jump back.
 	ASMType.arg(self, exp.second)					// arg
@@ -78,7 +79,7 @@ function While			(fn_asm)
 	|fatrange| LOOP_TEST
 	|| LT = .Branch(exp.first!, true, loop_test)
 	if loop_test.never
-/		.nop(begin, loop_Test.start)
+/		.Nop(begin, loop_Test.start)
 		return asmreg()
 	
 	BEGIN.jumpto = LOOP_Test.start
@@ -102,7 +103,7 @@ function BackCond (|fatasm| start)
 	|| l = .last
 	if l >= start
 		.nop(l)
-		if --l >= start and l is ConstAny
+		if --l >= start and l is RealConst
 			.nop(l)
 
 
@@ -138,31 +139,31 @@ function Ternary		(fn_asm)
 function SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond, |asmreg|)
 	opt norefcounts
 	|| dr = dest.reg
-	|| mc = (asmreg(), dest)(dr == ma.reg or mb.reg)
+	|| mc = (ASMReg(), dest)(dr == ma.reg or mb.reg)
 	|| µ = .µ(cond, mc)
 	return cond.TERN(dest, µ, ma, mb) * dest
 
 
-function Branch (|message| cond,  |bool| neg=false,  |fatrange| range, |asmreg|)
+function Branch (|message| Cond,  |bool| Neg = false,  |fatrange| Range, |asmreg|)
 	range.Start = .curr
 	|| mode = asmreg.CondRequest.Negate(neg)
+
 	rz = .µ(cond, mode)
 	if rz isnt CondAnswer
-		if rz is alreadynegated
-			debugger
-			(mode isnt negate) // does this ever happen?
 		rz = .Exists(mode, rz, cond)
-		if !rz.CondAnswer // wat?
-	range.Constness = maybebool.default(false)
-	if rz is ConstAny
+
+	if rz is RealConst
 		range.Constness = (rz.const!=0)|maybebool|
 		.BackCond(range.start)
+	  else
+		range.Constness = maybebool.default(false)
+	
 	range.after = .curr
 
 
 helper ASMBoolShrink (|message| exp,  |ASMReg| Dest,  |ASMReg| ml,  |ASMReg|)
-	if (ml.isbool) and (dest isnt negate) and (dest isnt condrequest)
-/		return ml.boolanswer								// x = a or a   -->  x = a
+	if (ml.IsBool) and (dest isnt Negate) and (dest isnt CondRequest)
+/		return ml.BoolAnswer								// x = a or a   -->  x = a
 	return .Exists(dest, ml, exp)							// if  a or a   -->  if a
 
 
@@ -170,9 +171,9 @@ helper BoolFromBools (|message| exp, |ASMReg| Dest, |opmode| opp, |ASMReg| ml, |
 	// handles:  a = a and b,  a = a or b
 	dest = .TempTyped(exp, dest)
 	if opp is or
-		rz = .bitor(dest, ml, mr, exp)
+		rz = .BitOr(dest, ml, mr, exp)
 	  else
-		rz = .bitand(dest, ml, mr, exp)
+		rz = .BitAnd(dest, ml, mr, exp)
 	
 	if (dest is negate)
 		rz = .BitNot(rz, dest, asmreg(), exp)
@@ -180,7 +181,7 @@ helper BoolFromBools (|message| exp, |ASMReg| Dest, |opmode| opp, |ASMReg| ml, |
 
 
 function asmreg.IsBoolV (|bool|)
-	return self.IsBool and (self isnt constany)
+	return self.IsBool and (self isnt RealConst)
 
 
 helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
@@ -232,13 +233,6 @@ function UniqueLocation (|message| A, |asmreg| dest, |message| B, |asmreg|)
 	rz.µtype = dest.µtype	
 
 
-//function ExistingBool (|message| A, |ASMReg| Dest, |ASMReg|)
-//	|| ml = .ExistingVar(A)
-//	if ml.isbool and (dest.reg == ml.reg)
-//		(ml is negate) = (dest is negate)
-//		return ml
-	
-
 function BoolTestAndJump (|message| exp, |asmreg| req, |opmode| opp, |&fatasm|)
 	|| mode = ASMReg.CondRequest.negate(opp is OR)
 	return .Exists(mode, req, exp).fat!
@@ -249,12 +243,12 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 	dest = .UniqueLocation(a, dest, B)
 
 	|| first = .µBoolInto(A, dest)
-	if first is ConstAny
+	if first is RealConst
 		return .BoolConst1(b, dest, opp, first).boolanswer			// x = 5 or Y() --> x = Y()
 	
 	|| JUMP = .BoolTestAndJump(a.next!, dest, opp)					// AND/OR
 	|| Second = .µBoolInto(B, dest)
-	if Second is ConstAny
+	if Second is RealConst
 		.NOP(jump)
 		return .BoolConst2(opp, first, Second).boolanswer
 
@@ -277,7 +271,7 @@ function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asm
 	.nop(ml)							// x = 0 or y()  --> x = y()
 										// x = 7 and y() --> x = y()
 	|| mr = .µ(B, dest)
-	if mr is ConstAny
+	if mr is RealConst
 		ml.µtype = datatypecode.bool
 		mr.const = (mr.const != 0)|int|
 		return mr
@@ -302,22 +296,57 @@ function BoolConst2 (|opmode| Opp, |asmreg| ml,  |asmreg| mr, |asmreg|)
 	return mr
 
 
-
 function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	|fatrange| AndTest
-	rz = .Branch(A, dest is negate, andtest)
-	if !AndTest.never
-		.Branch(B, dest is negate, andtest)
+	|| First = .Branch(A, dest is negate, andtest)
+	if AndTest.never
+		return first
 
+	|| Second = .Branch(B, dest is negate, AndTest)
+	if  first isnt RealConst
+		// a and b
+		// a and 1
+		// a and 0
+		return first
+
+	// 1 and 1
+	// 1 and 0
+	// 1 and b
+	return second
 
 
 function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
-	|fatrange| OrTest
-	rz = .Branch(A, dest isnt negate, OrTest)
-	if !OrTest.never		// opposite const test of expected, cos OR is opposite of AND
-		|fatrange| tmp
-		.Branch(B, dest is negate, tmp)
-		OrTest.AllJumpTo(.curr)	
+	|FatRange| OrTest
+	|| First = .Branch(A, dest isnt negate, OrTest)
+	|| KF = OrTest.Constness.negate
+	if kf.knowntrue
+		|| nop = A.noop
+		nop.const = KF|int|
+		// 1 or 1
+		// 1 or 0
+		// 1 or b
+		first.fatindex = nop.index
+		return nop*first						// only way around this. Cos we got asm-reg(0)
+
+	
+	|fatrange| Br2
+	|| second = .Branch(B, dest is negate, Br2)
+	OrTest.AllJumpTo(.curr)
+
+	if Br2.always
+		// a or 1
+		// 0 or 1
+		return second
+
+	if kf.knownfalse
+		// 0 or 0
+		// 0 or b
+		return second
+
+	// a or 0
+	// a or b
+	
+	return first
 
 }
 
@@ -353,11 +382,12 @@ function @asmstate.PrintProgress (|message| exp)
 	cpp_name adb
 	opt norefcounts
 	"---"
+	printline scfunction.currfunc!
 	|| s = ASMState.sh
-	if !exp
-		s.LastProgress = s.funcstart
-	  else
+	if exp
 		printline exp
+	  else
+		s.LastProgress = s.funcstart
 	|| Curr = s.LastProgress
 	while curr < s.curr
 		curr.debugprint

@@ -1,18 +1,5 @@
 
 
-function RefCountTest (|message| msg)
-	visible
-	|| x = msg.name
-	x = x
-	x = msg.name
-/*		-->
-	JB_String* X = Msg->Name;
-	JB_Incr(X);
-	JB_SetRef(X, Msg->Name);
-	JB_Decr(X);
-*/
-
-
 extend asmstate
 	function InlineOffset (|asmreg| base, |int| pow2, |&int| index, |int| maximum, |asmreg|)
 		if base is temp// and containsaddr
@@ -40,7 +27,7 @@ extend asmstate
 /			return exp.RFWR(A, nil, 1, offset)						// reg to mem
 
 		if fn == Compiler.RefSetRef
-			|| Out = .µ(prms.first!, asmreg.AddrRequest)
+			|| Out = .µ(prms.first!, asmreg.AddrRequest as asmreg.stayopen)
 			|| From = .µ(prms.second!, asmreg.AddrRequest)
 			if out.reg == from.reg
 				return exp.noop // wat?
@@ -49,16 +36,16 @@ extend asmstate
 			if Out isnt ContainsAddr
 				if From is ContainsAddr
 					from = .InlineOffset(from, 3, offset, 13~bits)
-/					return exp.RFRD(Out, From, 1, offset)			// mem to reg
-/				return exp.RFST(Out, From, nil)						// reg to reg
+					return exp.RFRD(Out, From, 1, offset)			// mem to reg
+				return exp.RFST(Out, From, nil)						// reg to reg
 			
 			if  From is ContainsAddr
-				|| where = .TempTyped(prms)
-/				From = .Read(where, exp, From, nil) * where			// (mem to reg)?
-			  else
-/				0
+				|| P = prms.second!
+				|| where = .Temponly(P)
+				where.µtype = datatypecode._voidptr
+/				From = .Read(where, P, From, nil) * where			// (mem to reg)?
 
-			from = .InlineOffset(Out, 3, offset, 13~bits)
+			out = .InlineOffset(Out, 3, offset, 13~bits)
 			return exp.RFWR(Out, From, 1, offset)					// reg to mem
 
 
@@ -88,7 +75,6 @@ extend asmstate
 	
 		debugger 
 		return exp.EROR(asmreg(), asmreg(), asmreg(), asmreg(), 0)
-
 
 
 	function RefCount (fn_asm)	// JB_SetRef(a,b)

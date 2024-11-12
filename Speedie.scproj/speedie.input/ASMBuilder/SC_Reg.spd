@@ -27,7 +27,7 @@ datatype ASMReg (uint64)
 		Temp
 		SingleExpr
 		NoScale
-		KindaConst = [ConstAny, NeverAltered]
+		KindaConst = [RealConst, NeverAltered]
 		SetRelRemove = KindaConst|||stayopen
 		ContainsAddr
 		AddrNeed = [AddrRequest, AddrForceRequest]
@@ -35,7 +35,7 @@ datatype ASMReg (uint64)
 		Arg				= Discard				// ||| SrcConst
 		CondRequest
 		CondAnswer
-		Zero			= ConstAny ||| 56 ||| param		// 56 == datatypecode.uint64
+		Zero			= RealConst ||| 56 ||| param		// 56 == datatypecode.uint64
 	
 
 	render
@@ -73,7 +73,7 @@ datatype ASMReg (uint64)
 		.needfat.const = value
 
 	function IsConst (|int64| val, |bool|)
-		return  (self is ConstAny) and (.const == val)
+		return  (self is RealConst) and (.const == val)
 	
 	function Negate (|bool| Neg=true, |asmreg|)
 		return (self|uint64| xor (neg << 16)|uint64|)|asmreg|

@@ -156,7 +156,7 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 	
 	dest = .TempOnly(exp, dest)
 	dest.µType = NewType
-	if sr is ConstAny
+	if sr is RealConst
 		|| srf = sr.needfat
 		if floatness == 0
 			|| sh = 64 - nc
@@ -240,8 +240,8 @@ function Dot (fn_asm)								// a.b
 	if (dest is AddrRequest) or prop.iscarray
 		pos *= t.ByteCount
 		if prop.iscarray
-			dest = dest.haveaddr
 			dest.µtype = datatypecode._voidptr
+		dest = dest.haveaddr
 		return .AddToReg(exp, dest, obj as asmreg.NoScale, pos)
 
 	
@@ -273,7 +273,7 @@ function Thg (fn_asm)
 	|| reg = thg.reg
 	if (reg-1)|uint| < 31							// what?
 		return thg
-	if reg == 0  and  thg is constany
+	if reg == 0  and  thg is RealConst
 		return thg // its still ok.   nil/false
 	error (exp, "Register out of bounds")
 
@@ -292,7 +292,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 		return exp.addr(dest, t, dest, t) * dest.haveaddr
 	
 	if d is const
-		(dest is constany)
+		(dest is RealConst)
 		return .NumToReg(exp, d.exportposition, dest, dest.µtype)
 
 	rz = d.typeonly.zero
@@ -485,13 +485,13 @@ helper ASMState.DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMR
 	
 	if dest isnt CondRequest
 		dest = .TempTyped(exp, dest)
-	if  ml is ConstAny  and  mr is ConstAny
-		(Dest is constany) // do the bitand trick... later
+	if  ml is RealConst  and  mr is RealConst
+		(Dest is RealConst) // do the bitand trick... later
 	
-	target debug:if ml.floatness != mr.floatness							// Shouldn't happen.
+	|| dr = dest.reg
 	rz = (fn)(self, dest, ml, mr, exp.second!)
 	target debug
-		if dest is Constany  and  rz isnt Constany		// hmm?
+		if dest is RealConst  and  rz isnt RealConst		// hmm?
 			debugger, (fn)(self, dest, ml, mr, exp.second!)
 
 

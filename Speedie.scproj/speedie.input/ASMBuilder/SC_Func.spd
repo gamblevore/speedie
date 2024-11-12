@@ -58,7 +58,11 @@ class µFunc
 /// TEXTUAL STUFF		
 	render
 		fs <~ "asm ${.fn.name}\n"
+		|| bb = 0
 		for µ in self
+			if µ.BlockNum != bb
+				bb = µ.BlockNum
+				fs <~ "//$bb\n"
 			fs <~ '\t'
 			µ.Renda(fs)
 			fs <~ '\n'

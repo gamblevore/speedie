@@ -24,6 +24,11 @@ function AddK
 	|| y = 1
 	|| x = (1+y)+1
 
+function AddK2 (|int| x, |int|)
+	x++
+	x++
+	return x
+
 function AndOrConsts (|int|)
 	visible
 	|| f1 = 0 and 5
@@ -127,6 +132,9 @@ function ForeignFuncs (|string?| x, |string?| y, |string|)
 	|| c = x._white(12345, 98765, true)
 	|| d = x! + y!
 	|| e = string.char(0xb16b00b5)
+	|| f = Message()
+	if f.parent
+	f.parent
 	return e + d // fails?
 
 
@@ -138,6 +146,7 @@ function RefCountTests (|string| a, |string| b, |message| m, |message| mm)
 	|| e = string.char(0xb16b00b5)
 	
 	#!all 4 combos of mem/ptr set
+	e = b
 	m.name = b
 	b = m.name
 	|| f = b

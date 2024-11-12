@@ -2,8 +2,7 @@
 
 struct ASMState
 	linkage: cpp_part Pac
-	|uint16| 					BlockNum
-	|uint16| 					ParentBlock
+	|uint16| 					BasicBlock
 
 	|byte|						VDecls
 	|byte|						VTmps
@@ -58,7 +57,7 @@ struct ASMState
 	function IntPowerOfTwo (|asmreg| r, |int| Sub=0, |FailableInt|)
 		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
 		// this is used for multiplication mostly. like x*-1, or x*0, or x*1
-		if r is ConstAny
+		if r is RealConst
 			|| v = r.const
 			if v == -1
 				.nop(r)
@@ -83,6 +82,8 @@ struct ASMState
 			dest.µtype = orig.µtype
 		dest = .temponly(exp, dest)
 		|| K = .NumToReg(exp, amount, orig • dest, orig.µtype)
+//		if orig.reg == dest.reg
+//			(orig is temp) // doesntwork
 		return .Plus(dest, Orig, K, exp)
 	
 	
@@ -103,8 +104,7 @@ struct ASMState
 			.curr = p + 1
 			P.op = code
 			p.debug = dbg
-			p.BlockNum = .BlockNum
-			p.ParentBlock = .ParentBlock
+			p.BlockNum = .BasicBlock
 			return p
 		.OK = false
 		return .start
@@ -167,12 +167,12 @@ struct ASMState
 		if R & asmreg.KindaConst
 			|| k = R.const
 			if k.fits(bits, signed)
-				if r is ConstAny
+				if r is RealConst
 					.nop(R)
 				return k|uint64|.trim(bits)
 
 	function NopConst (|asmreg| R)
-		if r is constany
+		if r is RealConst
 			|| f = r.fat
 				.Nop(f)
 	
@@ -204,9 +204,6 @@ struct ASMState
 		
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
 		|| rz = .µ(Exp, dest)
-		debugat 0
-//		if rz is temp // what?
-//			.µ(Exp, dest)
 		dest = rz.reg(dest)
 		return .Assign(Dest, rz, exp)
 	
@@ -230,14 +227,14 @@ struct ASMState
 		target debug
 			ss.tmpcheck
 			check (ss) (self, exp, "µInto failed")
-			if (ss is constany) and ss.reg
+			if (ss is RealConst) and ss.reg
 				if !ss.fat
 					debugger
 					(fn)(self, exp, dest)
 			if dest is set or ss is set
 				return ss // no need test.
 			if !ss.reg and (ss isnt condanswer)
-				if (ss isnt constany)
+				if (ss isnt RealConst)
 					debugger
 					(fn)(self, exp, dest)
 /*
@@ -279,7 +276,7 @@ struct ASMState
 			error (exp, "Object to large to access")				// can we do struct-mem-copy?
 			bytes = 0
 		
-		if varadd is constany
+		if varadd is RealConst
 			|| CC = varadd.fat
 				.nop(cc)
 				index += cc.const
@@ -315,7 +312,115 @@ struct ASMState
 		return .ReadOrWriteSub(dest, exp, ptr, varadd, index)
 
 
+
+	function PrmCollectC (|message| prms, |SCFunction| fn, |uint64|)
+		// we need to do ints last, and also collect these backwards.
+		opt norefcounts
+		|| sh = 0
+		|| fc = 0
+		|| ic = 0
+		|| n = fn.args.Length
+		for Ints in 2
+			|| p = prms.last
+			while p
+				|| ty = p.ASMDecl
+				if ty.SpecialRegs|int| != Ints // should get .specialregs from message somehow?
+					|| v = .FuncPrm(p!).reg
+					rz  |=  v << sh
+					sh += 5
+					ic += ints
+					fc += !ints
+				p--
 		
+		if fc>8 or ic>8			// hmmm
+		rz <<= 12
+		rz |= fn.ReturnType.SpecialRegs << 11
+		if fc
+			rz |= (8-fc) << 6
+			rz |= (8-ic) << 0
+		  else
+			rz |= (17-ic) << 6
+
+
+	function PrmCollect (|message| prms, |scfunction| fn, |uint64|)
+		opt norefcounts
+		if fn.HasCVersion
+			return .PrmCollectC(prms, fn)
+		
+		|| sh = 7
+		|| p = prms.first
+		for FnArg in fn.args
+			|| v = .FuncPrm(p!).reg
+			sh += 5
+			rz  |=  v << sh
+			rz++								// Send-count (4 bits max)
+			p++
+
+
+	function CallFunc (|message| exp, |asmreg| dest, |asmreg|)
+		|| v = .VDecls
+		if dest is StayOpen // but not here.
+			.vdecls = v + 1
+		v += (dest.reg < v) // NOICE
+		check (v < 32) (exp, "Too many registers in use. No space for result.")
+		dest.reg = v
+		return Dest
+
+
+	function PackMakerInit (|bool|)
+		opt norefcounts
+		if .Inited
+			return true
+		.inited = true
+		VM_Builder.JustDefineInstructions
+		SpdAssembler.InitAss
+		return .alloc(ASMState.JSMSpace)
+
+
+	function Alloc (|memory of fatasm| j, |bool|)
+		if j.SetSize(4MB)
+			.start = j.ptr
+			.curr = .start
+			.end = j.buffersize + .start
+			spdassembler.Guard
+			Ancients <~ j
+			return true
+
+
+	function StartFunc (|scfunction| fn)
+		if fn.ASM
+			.out = fn.asm!
+		  else
+			.out = µfunc(fn, .curr)
+		.zero = nil
+		.zero.info = AsmReg()
+		(.zero is NeverAltered)
+		memory.Fill((&.neveraltered[0])|&byte|, –sizeof .neveraltered, 0)
+		.neveraltered[0] = .zero.Index
+		.FuncStart = .curr
+		.LastProgress = .curr
+		scfunction.currfunc = fn
+		.ReturnASM = fn.ReturnType.regtype
+		.OK = true
+		.BasicBlock = 0
+		.VDecls = 0
+		.VTmps = 32
+		.AddFuncParams(fn)
+
+
+	function FinishASM
+		opt norefcounts
+		if .zero.Const // what?
+		|| l = .last
+		if !l.IsFinisher
+			|| fn = scfunction.currfunc!
+			expect (!fn.returntype) ("ASMReturn".internal) // why?
+			fn.SourceArg!.RET(asmreg(), asmreg(), asmreg(), 1, 0)
+		.SetLength
+
+
+	function SetLength
+		.out.length = .curr - .FuncStart
 
 
 	
@@ -340,73 +445,16 @@ function SCFunction.HasCVersion (|bool|)
 
 
 
-function ASMState.PrmCollectC (|message| prms, |SCFunction| fn, |uint64|)
-	// we need to do ints last, and also collect these backwards.
-	opt norefcounts
-	|| sh = 0
-	|| fc = 0
-	|| ic = 0
-	|| n = fn.args.Length
-	for Ints in 2
-		|| p = prms.last
-		while p
-			|| ty = p.ASMDecl
-			if ty.SpecialRegs|int| != Ints // should get .specialregs from message somehow?
-				|| v = .FuncPrm(p!).reg
-				rz  |=  v << sh
-				sh += 5
-				ic += ints
-				fc += !ints
-			p--
-	
-	if fc>8 or ic>8			// hmmm
-	rz <<= 12
-	rz |= fn.ReturnType.SpecialRegs << 11
-	if fc
-		rz |= (8-fc) << 6
-		rz |= (8-ic) << 0
-	  else
-		rz |= (17-ic) << 6
 
-
-function ASMState.PrmCollect (|message| prms, |scfunction| fn, |uint64|)
-	opt norefcounts
-	if fn.HasCVersion
-		return .PrmCollectC(prms, fn)
-	
-	|| sh = 7
-	|| p = prms.first
-	for FnArg in fn.args
-		|| v = .FuncPrm(p!).reg
-		sh += 5
-		rz  |=  v << sh
-		rz++								// Send-count (4 bits max)
-		p++
-
-
-function asmreg.CallFunc (|int| v, |int|)
-	if (.reg == v)
-		v -= self is Set // NOICE
-	return v
-
+/* The .asint/.asfloat functions should be recognised as working on constants? Or is that just a general case of inline functions? Technically, its an inline func that does nothing, just returns the original... with a different type. */
 
 function @ASMType.DoFunction (fn_Asm)
 	opt norefcounts
-	#! The .asint/.asfloat functions should be recognised as working on constants? Or is that just a general case of inline functions? Technically, its an inline func that does nothing, just returns the original... with a different type. 
 	|| prms = exp.last!
 	|| fn = prms.asfunc!
 
-	// Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:4
-	// There are only 4 above 6!, only 14 above 5, 75 above 4
-	// almost all lib functions have 4 or less. 5 is for proj funcs.
-
 	dest.µtype = fn.RegType
-	|| vd = dest.CallFunc(.VDecls) + 1
-	if dest is StayOpen // but not here.
-		.vdecls++
-
-	check (vd < 32) (exp, "Too many registers in use. No space for result.")
-	dest.reg = vd
+	dest = .CallFunc(exp, dest)
 
 	|| TmpCloser = .VTmps
 	|| P = .PrmCollect(prms, fn)
@@ -419,28 +467,11 @@ function @ASMType.DoFunction (fn_Asm)
 	fat.op += PExt > 0
 	return fat*dest
 //  Mostly I'm doing:  || x = msg.function(),  (which uses the correct position.)
+
+// Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:4
+// There are only 4 above 6!, only 14 above 5, 75 above 4
+// almost all lib functions have 4 or less. 5 is for proj funcs.
 		
-
-
-function ASMState.PackMakerInit (|bool|)
-	opt norefcounts
-	if .Inited
-		return true
-	.inited = true
-	VM_Builder.JustDefineInstructions
-	SpdAssembler.InitAss
-	return .alloc(ASMState.JSMSpace)
-
-
-
-function ASMState.Alloc (|memory of fatasm| j, |bool|)
-	if j.SetSize(4MB)
-		.start = j.ptr
-		.curr = .start
-		.end = j.buffersize + .start
-		spdassembler.Guard
-		Ancients <~ j
-		return true
 
 
 function @ASMState.ExpandJSM (|bool|)
@@ -451,43 +482,8 @@ function @ASMState.ExpandJSM (|bool|)
 		return sh.Alloc(j)
 	
 
-function ASMState.StartFunc (|scfunction| fn)
-	if fn.ASM
-		.out = fn.asm!
-	  else
-		.out = µfunc(fn, .curr)
-	.zero = nil
-	.zero.info = AsmReg()
-	(.zero is NeverAltered)
-	memory.Fill((&.neveraltered[0])|&byte|, –sizeof .neveraltered, 0)
-	.neveraltered[0] = .zero.Index
-	.FuncStart = .curr
-	.LastProgress = .curr
-	scfunction.currfunc = fn
-	.ReturnASM = fn.ReturnType.regtype
-	.OK = true
-	.VDecls = 0
-	.VTmps = 32
-	.AddFuncParams(fn)
-
-
-function ASMState.FinishASM
-	opt norefcounts
-	if .zero.Const // what?
-	|| l = .last
-	if !l.IsFinisher
-		|| fn = scfunction.currfunc!
-		expect (!fn.returntype) ("ASMReturn".internal) // why?
-		fn.SourceArg!.RET(asmreg(), asmreg(), asmreg(), 1, 0)
-	.SetLength
-
 
 function fatasm.IsFinisher (|bool|)
 	|| o = .op|asm|
 	return o is ret or trap or reto
-
-
-function ASMState.SetLength
-	.out.length = .curr - .FuncStart
-
 
