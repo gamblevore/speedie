@@ -770,6 +770,8 @@ datatype MaybeBool (byte) // could just put these on int? do we need a whole new
 		return self|byte| == 1
 	function KnownFalse (|bool|)
 		return self|byte| == 0
+	function Negate (|maybebool|)
+		return (self|byte| xor 1)|maybebool|
 	syntax cast (|bool|)
 		disabled "Do you mean .istrue? Maybebools can have an unknown state."
 	module
