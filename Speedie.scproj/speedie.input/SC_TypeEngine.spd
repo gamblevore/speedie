@@ -832,8 +832,7 @@ function TypeOfSthg (ExprResolver)
 
 
 function TypeOfMsg (ExprResolver)
-	|| type = exp.first!
-	require message.GetFunc(type)
+	|| type = exp.first$
 	|| name = type.first
 		TypeOfExpr( name, name_space )
 	for ch.forward in type.next

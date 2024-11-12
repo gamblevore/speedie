@@ -138,6 +138,14 @@ function ForeignFuncs (|string?| x, |string?| y, |string|)
 	return e + d // fails?
 
 
+function RefFuncs (|message| a, |string|)
+	|| b = 1
+	if a.parent
+	|| c = 2
+	a.parent
+	|| d = 3
+
+
 function RefCountTests (|string| a, |string| b, |message| m, |message| mm)
 	// need destructor for refclear
 	// need incr2 for constructors

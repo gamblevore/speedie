@@ -16,11 +16,8 @@ extend asmstate
 		return base
 
 
-	function RefCountSub (fn_fatasm)	// JB_SetRef(a,b)
+	function RefCountSub (|message| exp, |message| prms,  |scfunction| fn, |&FatASM|)	// JB_SetRef(a, b)
 		opt	NoRefCounts
-		|| prms = exp.last!
-		|| fn = prms.obj|SCFunction|!
-			
 		if fn == compiler.refclear
 			|| offset = 0
 			|| A = .µ(prms.first!, asmreg.AddrRequest)
@@ -43,7 +40,7 @@ extend asmstate
 				|| P = prms.second!
 				|| where = .Temponly(P)
 				where.µtype = datatypecode._voidptr
-/				From = .Read(where, P, From, nil) * where			// (mem to reg)?
+				From = .Read(where, P, From, nil) * where			// (mem to reg)?
 
 			out = .InlineOffset(Out, 3, offset, 13~bits)
 			return exp.RFWR(Out, From, 1, offset)					// reg to mem
@@ -69,16 +66,26 @@ extend asmstate
 	
 			if fn == Compiler.RefSafeDecr
 				return exp.RFST(a, a, asmreg())
-
-			if fn == Compiler.RefFreeIfDead
-/				return exp.RFST(asmreg(), asmreg(), a)
 	
 		debugger 
 		return exp.EROR(asmreg(), asmreg(), asmreg(), asmreg(), 0)
 
 
+
 	function RefCount (fn_asm)	// JB_SetRef(a,b)
-		return .RefCountSub(exp, dest) * asmreg()
+		opt norefcounts
+		|| prms = exp.last!
+		|| fn = prms.obj|SCFunction|!
+			
+		if fn != Compiler.RefFreeIfDead
+			return .RefCountSub(exp, prms, fn) * asmreg()
+		|| A = .µ(prms.first!)
+		#! we can do: if (JB_FreeIfDead(obj)), which makes no sense.
+		#! In fact all those functions never "disown anything". We should disable
+		#! returning the result of freeifdead
+		#! if the result is needed... function must not disown, then we remove the freeifdead. 
+/		exp.RFST(asmreg(), asmreg(), a)
+		return a
 
 
 
