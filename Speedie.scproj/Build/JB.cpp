@@ -22776,9 +22776,9 @@ ASMReg SC_Pac_Decr(ASMState* Self) {
 	ASMReg Rz = ((ASMReg)0);
 	FatASM* Fat = SC_Pac_LastWithAsm(Self, kSC__ASM_RFST);
 	iif (Fat) {
-		uint Upon = Fat->R[1];
+		uint Upon = Fat->R[0];
 		iif (Upon) {
-			iif ((!Fat->R[0]) and (!Fat->R[2])) {
+			iif ((!Fat->R[1]) and (!Fat->R[2])) {
 				SC_Pac_NopWithFat(Self, Fat);
 				Rz = SC_Reg_RegSet(Rz, Upon);
 			}
@@ -23703,8 +23703,8 @@ ASMReg SC_Pac_SafeDecr(ASMState* Self) {
 	ASMReg Rz = ((ASMReg)0);
 	FatASM* Fat = SC_Pac_LastWithAsm(Self, kSC__ASM_RFAP);
 	iif (Fat) {
-		uint Upon = Fat->R[0];
-		iif (Upon and ((!Fat->R[1]) and (!Fat->R[2]))) {
+		uint Upon = Fat->R[1];
+		iif (Upon and ((!Fat->R[0]) and (!Fat->R[2]))) {
 			SC_Pac_NopWithFat(Self, Fat);
 			Rz = SC_Reg_RegSet(Rz, Upon);
 		}
