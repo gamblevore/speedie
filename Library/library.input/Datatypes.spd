@@ -761,6 +761,13 @@ datatype uint64
 datatype MaybeBool (byte) // could just put these on int? do we need a whole new type?
 	linkage
 		numeric false
+	constants
+		|maybebool| 
+		true = 1
+		false = 0
+		maybefalse = 8
+		maybetrue = 9
+		
 	default 8|MaybeBool|
 	function Default (|bool|)
 		return self|byte|&1

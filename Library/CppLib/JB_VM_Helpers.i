@@ -170,22 +170,23 @@ AlwaysInline void SetRefBasic(VMRegister* r, ASM Op) {
 	int out = n1;
 	int in = n2;
 	auto B = r[in].Obj;
-	if (out != in) {
-		JB_Incr(B);
-		if (out) {
-			auto A = r[out].Obj;
-			r[out].Obj = B;
-			JB_Decr(A);
-		}
-		return;
+	JB_Incr(B);
+	if (out) {
+		auto A = r[out].Obj;
+		r[out].Obj = B;
+		JB_Decr(A);
 	}
-	JB_SafeDecr(B);
-	JB_FreeIfDead(o3);
+}
+
+
+AlwaysInline void SetRefApart(VMRegister* r, ASM Op) {
+	JB_Incr(o3);
+	JB_SafeDecr(o2);
+	JB_FreeIfDead(o1);
 }
 
 
 
-#define table(b)			((u64)(((void**)(&vm.Env))[b])+L2)
 #define mem0(t)				({ (u2) ? ((t*)u2)[u3+Read_Offsetu] : 0; }) // safely read.
 #define mem1(t)				((t*)u2)[u3+Read_Offsetu]
 #define mem2(t)				(u2 = (u64)((t*)u2 + Read_moveu-1))
@@ -194,6 +195,20 @@ AlwaysInline JB_Object* alloc(void* o) {
 	// we need a class table, and look it up from there.
 	// we don't have dynamicly created classes anyhow...
 	return JB_AllocNew(((JB_MemoryLayer*)o)->CurrBlock);
+}
+
+u64 table (jb_vm& vm, ASM Op) {
+	if (Table_Modeu)
+		return (u64)(vm.Env.LibGlobs+Table_Addu);
+	return (u64)(vm.Env.PackGlobs+Table_Addu);
+}
+
+
+JB_Object* strs (jb_vm& vm, ASM Op) {
+	auto Str = vm.Env.PackStrs[Table_Addu];
+	if (Table_Modeu)
+		JB_Incr(Str);
+	return Str;
 }
 
 

@@ -421,7 +421,28 @@ struct ASMState
 
 	function SetLength
 		.out.length = .curr - .FuncStart
-
+		
+		
+	function SmartSecretFat (|asmreg| Thg, |&fatasm|)
+		// OK... so what if we want the fat from a @thg?
+		// whre is it? the last thing that set to it, right?
+		// well no, we can't just erase that, as others might be reading it.
+		// So lets make sure of ALL of that.
+		|| F = thg.fat
+			return F
+		
+		|| Where = .last
+		|| Start = .FuncStart
+		|| reg = thg.reg
+		while  where >= start
+			require where.BlockNum == .BasicBlock
+			|| X = where.SmartFatness(reg)
+			require !X.KnownFalse
+			if X.knowntrue
+				return where
+			// now what?
+			Where--
+		
 
 	
 function SCFunction.HasCVersion (|bool|)
@@ -452,7 +473,8 @@ function @ASMType.DoFunction (fn_Asm)
 	opt norefcounts
 	|| prms = exp.last!
 	|| fn = prms.asfunc!
-
+	
+	dest = nil
 	dest.µtype = fn.RegType
 	dest = .CallFunc(exp, dest)
 
@@ -465,7 +487,7 @@ function @ASMType.DoFunction (fn_Asm)
 	if fn.HasCVersion
 		fat.op = asm.FNCX
 	fat.op += PExt > 0
-	return fat*dest
+	return fat * dest
 //  Mostly I'm doing:  || x = msg.function(),  (which uses the correct position.)
 
 // Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:4

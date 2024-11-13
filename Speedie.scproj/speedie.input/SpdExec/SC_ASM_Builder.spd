@@ -19,21 +19,21 @@ datatype µParam (uint16)
 	
 	syntax is (|µparam| p, |bool|)
 		return (self & p)
-
+	
 	flags
 		|µparam|
 		(32)		// starting point
-		Jump
-		Number
+		NonReg = [Jump, Number]
 		Signed
 		NoExpect
 		PositionBits
 		Output
-
+	
 	function BitSize (|int|)
 		return (self & 31) + 1
+	
 	function IsReg (|bool|)
-		return self isnt Number
+		return self isnt NonReg
 
 
 

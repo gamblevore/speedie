@@ -127,19 +127,19 @@ function Incr (|int| x, |int| y, |int|)
 	return .math(x++, --y)
 	
 function ForeignFuncs (|string?| x, |string?| y, |string|)
-	|| a = x.Length
-	|| b = x._Addr
-	|| c = x._white(12345, 98765, true)
-	|| d = x! + y!
-	|| e = string.char(0xb16b00b5)
-	|| f = Message()
-	if f.parent
-	f.parent
-	return e + d // fails?
+	|| x3 = x.Length
+	|| x4 = x._Addr
+	|| x5 = x._white(12345, 98765, true)
+	|| x6 = x! + y!
+	|| x7 = string.char(0xb16b00b5)
+	|| x8 = Message()
+	if x8.parent
+	x8.parent
+	return x6 + x7 // fails?
 
 
 function RefFuncs (|message| a, |string|)
-	|| b = 1
+	|| b = "abc"
 	if a.parent
 	|| c = 2
 	a.parent

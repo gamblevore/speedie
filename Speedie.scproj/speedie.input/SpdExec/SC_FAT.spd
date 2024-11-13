@@ -26,6 +26,7 @@ struct FatASM
 		|| i = instruction.typelist[.op]
 			return i.Sizes
 		debugger
+		return instruction.typelist[0]!.Sizes
 
 	operator mul (|asmreg| info, |asmreg|)
 		cpp_part AsReg
@@ -69,6 +70,17 @@ struct FatASM
 		nil safe
 		return .info
 	
+
+	function SmartFatness (|int| reg, |maybebool|)
+		opt norefcounts
+		|| f = .form
+		for i in f.Count
+			if .r[i]&31==reg
+				|| p = f.Params[i]
+				if p.IsReg
+					return (p is Output)|maybebool|
+
+
 	function Index (|uint|)
 		opt inline
 		return 1 + self - asmstate.sh.funcstart
@@ -82,7 +94,7 @@ struct FatASM
 	
 	function BytePos (|int|)
 		return .msg.position
-		
+	
 	operator isa (|int| m, |bool|)
 		nil checker
 		if self
@@ -152,15 +164,14 @@ struct FatASM
 	function out (|uint|): return .r[0]
 	function out (assigns:|asmreg|): .r[0] = value.treg
 	
-	// easier to optimise if its expressed like abcd
-	function a (|uint|): return .r[1]
-	function a (assigns:|uint|): .r[1] = value
-	function b (|uint|): return .r[2]
-	function b (assigns:|uint|): .r[2] = value
-	function c (|uint|): return .r[3]
-	function c (assigns:|uint|): .r[3] = value
-	function d (|uint|): return .r[4]
-	function d (assigns:|uint|): .r[4] = value
+	function r1 (|uint|): return .r[1]
+	function r1 (assigns:|uint|): .r[1] = value
+	function r2 (|uint|): return .r[2]
+	function r2 (assigns:|uint|): .r[2] = value
+	function r3 (|uint|): return .r[3]
+	function r3 (assigns:|uint|): .r[3] = value
+	function r4 (|uint|): return .r[4]
+	function r4 (assigns:|uint|): .r[4] = value
 
 	function Swap (|int| a, |int| b)
 		swap (.r[a-1]) (.r[b-1])
@@ -183,10 +194,10 @@ struct FatASM
 
 	function match3_2 (|int| reg, |bool|)
 		// prefers the value to be at 3.
-		if reg == .a
+		if reg == .r1
 			.swap(2, 3)
 			return true
-		return reg == .b
+		return reg == .r2
 	
 	
 	function CheckHasOutput
@@ -194,7 +205,7 @@ struct FatASM
 		target debug
 			if .r[0]<<1 == 0
 				|| form = .form
-					check (form.params[0] isnt output) (.msg, "Missing ASM output")
+				check (form.params[0] isnt output) (.msg, "Missing ASM output")
 	
 	function FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 		|| where = start+.ASMIndex

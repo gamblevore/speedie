@@ -94,11 +94,11 @@ datatype ASMReg (uint64)
 	function FAT (|&fatasm|)
 		|| i = .FatIndex
 			return i.fat
-
+	
 	function NeedFAT (|&fatasm|)
 		|| i = .FatIndex
 			return i.fat
-		error "reg is too skinny"
+		error "anorexic register"
 		return asmstate.sh.zero
 
 	operator isa (|datatypecode| M, |bool|)

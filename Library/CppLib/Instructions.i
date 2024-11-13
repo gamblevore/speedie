@@ -183,6 +183,8 @@
 	Code += Loop_Jmpi
 ;
 	___;
+ı RFAP: _
+	SetRefApart(r, Op);
 ı RFST: _
 	SetRefBasic(r, Op);
 ı RFWR: _
@@ -195,8 +197,10 @@
 	o1 = alloc(o2);
 	// should call constructor too.
 
-ı TABL: _
-	u1 = table(n2);
+ı GSTR: _
+	o1 = strs(vm, Op);
+ı GTAB: _
+	u1 = table(vm, Op);
 ı RD1U: _
 	u1 = mem1(uint8);
 	mem2(uint8);

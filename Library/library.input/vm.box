@@ -90,7 +90,7 @@ forms
 	
 	Table
 		r1		R
-		Mode	2
+		Mode	1
 		Add		l
 	
 	Read			// mem:
@@ -439,6 +439,7 @@ POS 5
 //		i1 = JB_u64_RotR(u2, u3 + L3)
 
 
+
 #!						 (((((MiniCompare)))))
 /**/ CMPB  (CmpB)
 		u1 = BitComp(r, Op)
@@ -504,17 +505,20 @@ POS 5
 
 
 #!						 (((((Refs)))))
+/**/ RFAP  (U3)
+		SetRefApart(r, Op)
+
 /**/ RFST  (U3)
 		SetRefBasic(r, Op)		
 
-/**/ RFWR  (RefSet2)							// RefCount reg to mem
+/**/ RFWR  (RefSet2)							// RefCount reg --> mem
 		SetRefRegToMem(r, Op)
 
-/**/ RFRD  (RefSet3)							// RefCount mem to reg
+/**/ RFRD  (RefSet3)							// RefCount reg <-- mem
 		SetRefMemToReg(r, Op)
+
 /**/ RFDC  (RefDecrMem)							// for destructors/closers.
 		SetRefDecrMem(r, Op)					// unused rn 😭 *sadface*
-
 
 /**/ RALO  (U2)
 		o1 = alloc(o2)
@@ -523,8 +527,10 @@ POS 5
 
 
 #!						(((((Memory)))))
-/**/ TABL  (table)
-		u1 = table(n2)
+/**/ GSTR  (table)
+		o1 = strs(vm, Op)
+/**/ GTAB  (table)
+		u1 = table(vm, Op)
 /**/ RD1U  (Read)
 		u1 = mem1(uint8)
 		mem2(uint8)

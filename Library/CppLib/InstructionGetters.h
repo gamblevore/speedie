@@ -174,17 +174,17 @@
 #define   Loop_Jmpu_(x)   (((uint)((x)<<18))>>18)
 
 
-#define   Table_Modei       ((( int)((Op)<<13))>>30)
-#define   Table_Modei_(x)   ((( int)((x)<<13))>>30)
+#define   Table_Modei       ((( int)((Op)<<13))>>31)
+#define   Table_Modei_(x)   ((( int)((x)<<13))>>31)
 
-#define   Table_Modeu       (((uint)((Op)<<13))>>30)
-#define   Table_Modeu_(x)   (((uint)((x)<<13))>>30)
+#define   Table_Modeu       (((uint)((Op)<<13))>>31)
+#define   Table_Modeu_(x)   (((uint)((x)<<13))>>31)
 
-#define   Table_Addi       ((( int)((Op)<<15))>>15)
-#define   Table_Addi_(x)   ((( int)((x)<<15))>>15)
+#define   Table_Addi       ((( int)((Op)<<14))>>14)
+#define   Table_Addi_(x)   ((( int)((x)<<14))>>14)
 
-#define   Table_Addu       (((uint)((Op)<<15))>>15)
-#define   Table_Addu_(x)   (((uint)((x)<<15))>>15)
+#define   Table_Addu       (((uint)((Op)<<14))>>14)
+#define   Table_Addu_(x)   (((uint)((x)<<14))>>14)
 
 
 #define   Read_Offseti       ((( int)((Op)<<23))>>25)

@@ -242,15 +242,15 @@ extend ASMState
 		|| fn = exp.Func
 		if fn == @opp
 /			if swapped
-				exp = exp.next
+				exp = exp.next!
 			  else
-				exp = exp.prev
+				exp = exp.prev!
 			
 		  elseif fn == @arel or @brel
-/			exp = exp.first // merge after testing this
+/			exp = exp.first! // merge after testing this
 		
 		  elseif fn == @acc
-			exp = exp.first
+			exp = exp.first!
 			
 		  elseif fn == @dot // obj.Prop // requires pointermul on .prop cos of prev props
 			// leave it?
@@ -261,15 +261,21 @@ extend ASMState
 		|| d = exp.ASMDecl.Internal
 			return d.CArraySize
 		debugger // hmmmm. its not a pointer after all?
-	
+
 
 	function InlineAddK (|asmreg| L, |int64| R, |asmreg| Dest, |bool|)
-		if l is temp
-			|| fat = l.fat
+		// this may be over-optimisation:   (dest.reg == l.reg) + .SmartSecretFat
+		// this allows for optimising x++, x++ --> x+=2
+		// but thats all, and it does a lot of effort to achieve this.
+		// we can't make the same effort all over for every opt we wanna make
+		// Allow as a once-off, to prove a point. Its possible but not the right way.
+		
+		if (l is temp) or (dest.reg == l.reg)
+			|| fat = .SmartSecretFat(l)
 			if fat isa asm.addk
-				|| CC = fat.r[2] + R
+				|| CC = fat.r2 + R
 				if CC.CanStoreAsIntImmediate
-					fat.b = CC
+					fat.r2 = CC
 					fat.out = dest
 					return true
 

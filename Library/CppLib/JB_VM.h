@@ -34,6 +34,7 @@ struct Function {
 struct vm_globs {
     byte*			LibGlobs;
     byte*			PackGlobs;
+    JB_String**		PackStrs;
     Fn0*			Cpp;
     Function**		DebugFuncTable;
     byte*			AllocBase;

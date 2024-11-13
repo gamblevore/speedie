@@ -9,6 +9,7 @@ dispatch fn_asm_table (fn_asm)
 	@thg:  ASMType.Thg
 	@bra:  ASMType.First
 	@sheb: ASMType.Sheb
+	@sstr: ASMState.Str
 	@list: // vectors
 		debugger
 	@func: ASMType.DoFunction
@@ -306,19 +307,16 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 		dest = .TempTyped(exp, dest)
 
 	|int64| iTable = d.ExportPosition
-	|| sixteen = 16K-1
 	expect (iTable > 0)          (exp, "No global address".internal)
-	expect (iTable <= sixteen)   (exp, "Expected under 16K of global data")
-						
+	expect (iTable <= 18~bits)   (exp, "Used over 256K of global data")
+	
+	|| table = exp.GTAB(dest,  (!d.IsLib)|int|,  iTable)
 	if dest is AddrRequest
 		Dest.µtype = DataTypeCode._voidptr
-		return (exp.TABL(dest,  (!d.IsLib)|int|,  iTable&sixteen) * dest).HaveAddr
+		return (table * dest).HaveAddr
 	
 	dest.µtype = exp.asmdecl.DataType
-	|| AddCosTooBig = (iTable >= 128) * iTable
-	exp.TABL(dest,  (!d.IsLib)|int|, AddCosTooBig)
-	return .ReadOrWrite(dest, Exp, dest, asmreg(), iTable-AddCosTooBig)
-
+	return .ReadOrWrite(dest, Exp, dest, asmreg(), 0)
 	
 
 function AddressOf (fn_asm)
@@ -461,7 +459,31 @@ function Unexpected		(fn_asm)
 }
 
 
-helper ASMState.DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
+
+extend ASMState {
+
+function ExistingVar (|message| m, |asmreg|)
+	opt	norefcounts
+	real self
+	|| fn = m.func 
+	while (fn == @bra) or ((fn == @type) and m.TypeCastDoesnothing)
+		m = m.first!
+		fn = m.func
+	if fn == @thg
+		return m.ASMLocal(ASMReg.FromExistingVar)
+	
+
+
+function Str (fn_asm)
+	opt	norefcounts
+	dest = .temponly(exp, dest)
+	|| real = exp.name|messageid|
+	dest.µtype = datatypecode._voidptr
+	return exp.gstr(dest, 0, real.ID) * dest // seems good!
+
+
+
+helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	opt norefcounts
 	|| ml = ASMReg()
 	|| mr = ASMReg()
@@ -493,6 +515,7 @@ helper ASMState.DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMR
 	target debug
 		if dest is RealConst  and  rz isnt RealConst		// hmm?
 			debugger, (fn)(self, dest, ml, mr, exp.second!)
+}
 
 
 function message.ASMLocal (|asmreg| extra = 0, |asmreg|)
@@ -505,17 +528,6 @@ function message.ASMLocal (|asmreg| extra = 0, |asmreg|)
 function message.ASMReg (|int|)
 	return .asmlocal.reg
 
-
-function ASMState.ExistingVar (|message| m, |asmreg|)
-	opt	norefcounts
-	real self
-	|| fn = m.func 
-	while (fn == @bra) or ((fn == @type) and m.TypeCastDoesnothing)
-		m = m.first!
-		fn = m.func
-	if fn == @thg
-		return m.ASMLocal(ASMReg.FromExistingVar)
-	
 
 function message.HasAsmStuff (|bool|)
 	opt norefcounts
