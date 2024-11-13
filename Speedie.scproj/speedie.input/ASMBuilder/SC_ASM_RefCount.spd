@@ -89,16 +89,16 @@ extend asmstate
 
 function ASMState.Decr (|asmreg|)
 	|| fat = .last(asm.rfst)
-		|| upon = fat.r[1]
-			if !fat.r[0 	] and !fat.r[2]
+		|| upon = fat.r[0]
+			if !fat.r[1] and !fat.r[2]
 				.nop(fat)
 				rz.reg = upon
 
 
 function ASMState.SafeDecr (|asmreg|)
 	|| fat = .last(asm.rfap)
-		|| upon = fat.r[0]
-		if upon and !fat.r[1] and !fat.r[2]
+		|| upon = fat.r[1]
+		if upon and !fat.r[0] and !fat.r[2]
 			.nop(fat)
 			rz.reg = upon
 	
