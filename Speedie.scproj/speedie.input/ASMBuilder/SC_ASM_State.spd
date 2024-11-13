@@ -364,7 +364,7 @@ struct ASMState
 		v += (dest.reg < v) // NOICE
 		check (v < 32) (exp, "Too many registers in use. No space for result.")
 		dest.reg = v
-		return Dest
+		return Dest.Simplify
 
 
 	function PackMakerInit (|bool|)
@@ -474,7 +474,6 @@ function @ASMType.DoFunction (fn_Asm)
 	|| prms = exp.last!
 	|| fn = prms.asfunc!
 	
-	dest = nil
 	dest.µtype = fn.RegType
 	dest = .CallFunc(exp, dest)
 

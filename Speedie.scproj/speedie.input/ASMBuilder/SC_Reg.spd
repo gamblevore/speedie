@@ -11,7 +11,6 @@ datatype ASMReg (uint64)
 		numeric false
 	
 	Flags
-		FatRef			= 1<<30
 		|asmreg|
 		(1<<16)		// starting point
 		Negate      // dont put anything before we test for (x << 16)
@@ -63,6 +62,9 @@ datatype ASMReg (uint64)
 				return f.f64
 			return f.f32|float64|
 
+	function Simplify (|asmreg|)
+		return self|uint16||asmreg|
+		
 	function Const (|int64|)
 		|| F = .FAT
 			return f.const
