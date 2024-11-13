@@ -6323,10 +6323,7 @@ Message* JB_Msg_ConstructorCopy(Message* Self, Message* Other) {
 	Self->Position = Other->Position;
 	JB_Incr2(Self->Name, Other->Name);
 	Self->Func = Other->Func;
-	JB_Object* _tmPf0 = JB_Tree_Obj(Other);
-	JB_Incr(_tmPf0);
-	(JB_Tree_ObjSet(Self, _tmPf0));
-	JB_Decr(_tmPf0);
+	JB_Incr2(Self->Obj, Other->Obj);
 	Self->Indent = Other->Indent;
 	Self->Flags = (Other->Flags | JB__Tk_Using.Flags);
 	Self->RangeLength = Other->RangeLength;
@@ -8078,7 +8075,7 @@ __lib__ void* jb_msg_tag(Message* Self) {
 	if (!JB_Msg_NilCheck(Self)) {
 		return nil;
 	}
-	return ((void*)JB_FreeIfDead(JB_Tree_Obj(Self)));
+	return ((void*)Self->Obj);
 }
 
 __lib__ void jb_msg_nameset(Message* Self, JB_String* Result) {
@@ -8106,7 +8103,7 @@ __lib__ void jb_msg_tagset(Message* Self, void* Result) {
 	if (!JB_Msg_NilCheck(Self)) {
 		return;
 	}
-	(JB_Tree_ObjSet(Self, ((JB_Object*)Result)));
+	JB_SetRef(Self->Obj, ((JB_Object*)Result));
 }
 
 __lib__ void jb_msg_firstset(Message* Self, Message* Result) {
@@ -8382,7 +8379,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024110719);
+	return (2024111315);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8394,4 +8391,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 -5898164094208557450 566357622310560501
+// -2934619186805667969 7864991415905050453 566357622310560501
