@@ -57,14 +57,14 @@ struct ASMState
 	function IntPowerOfTwo (|asmreg| r, |int| Sub=0, |FailableInt|)
 		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
 		// this is used for multiplication mostly. like x*-1, or x*0, or x*1
-		if r is RealConst
+		if r is ConstOutput
 			|| v = r.const
 			if v == -1
-				.nop(r)
+				.NopConst(r)
 				return v
 			v -= Sub
 			if v.IsPow2
-				.nop(r)
+				.NopConst(r)
 				return v.Log2+1
 
 
@@ -81,9 +81,9 @@ struct ASMState
 		if !dest or dest == asmreg()
 			dest.µtype = orig.µtype
 		dest = .temponly(exp, dest)
-		|| K = .NumToReg(exp, amount, orig • dest, orig.µtype)
-//		if orig.reg == dest.reg
-//			(orig is temp) // doesntwork
+		|| Where = orig • dest
+		(where is realconst)
+		|| K = .NumToReg(exp, amount, where, orig.µtype)
 		return .Plus(dest, Orig, K, exp)
 	
 	
@@ -167,8 +167,7 @@ struct ASMState
 		if R & asmreg.KindaConst
 			|| k = R.const
 			if k.fits(bits, signed)
-				if r is RealConst
-					.nop(R)
+				.nopconst(R)
 				return k|uint64|.trim(bits)
 
 	function NopConst (|asmreg| R)
@@ -219,13 +218,17 @@ struct ASMState
 
 		|| fn = fn_asm_table[exp.ASMType]!
 		|| TmpCloser = .VTmps
+		|| DeclCloser = .VDecls
 		
 		|| ss = (fn)(self, exp, dest)
 		if dest isnt StayOpen
 			.CloseVTmps(TmpCloser)
+		if ss isnt Declaration // cos of nested func-calls
+			.CloseVDecls(DeclCloser)
 
 		target debug
-			ss.tmpcheck
+			if !ss.tmpcheck
+				(fn)(self, exp, dest)
 			check (ss) (self, exp, "µInto failed")
 			if (ss is RealConst) and ss.reg
 				if !ss.fat
@@ -234,23 +237,9 @@ struct ASMState
 			if dest is set or ss is set
 				return ss // no need test.
 			if !ss.reg and (ss isnt condanswer)
-				if (ss isnt RealConst)
+				if (ss isnt constoutput)
 					debugger
 					(fn)(self, exp, dest)
-/*
-			if exp.asmtype < ASMType.kIf and ss != asmreg()
-				|| D = exp.asmdecl
-				|| sst = ss.µtype
-				|| dt = dest.µtype
-				if dt and (sst != dt)
-					D.typeinfo.debugprint
-					printline exp
-					sst.debugprint
-					dt.debugprint
-					debugger
-					printline D
-					(fn)(self, exp, dest)
-*/
 		return ss
 
 
@@ -359,7 +348,7 @@ struct ASMState
 
 	function CallFunc (|message| exp, |asmreg| dest, |asmreg|)
 		|| v = .VDecls
-		if dest is StayOpen // but not here.
+		if dest is StayOpen
 			.vdecls = v + 1
 		v += (dest.reg < v) // NOICE
 		check (v < 32) (exp, "Too many registers in use. No space for result.")
@@ -474,6 +463,7 @@ function @ASMType.DoFunction (fn_Asm)
 	|| prms = exp.last!
 	|| fn = prms.asfunc!
 	
+//	if "ConstRemovals".trap
 	dest.µtype = fn.RegType
 	dest = .CallFunc(exp, dest)
 

@@ -4,24 +4,3 @@
 */
 
 
-extend_module ASM
-	function ListInstructions
-		|| fs = faststring()
-		fs <~ "Opcodes:\n"
-		|| n = 0
-		for opcode in 256
-			|instruction--| inst = Instruction.typelist[opcode]
-			if inst and (!opcode or inst.opcode)
-				fs.AppendIntegerAsText(opcode, 2)
-				fs <~ " = ${inst.name}"
-				fs <~ (' ', 4-inst.name.length)
-				n++
-				if n >= 7
-					fs <~ "\n"
-					n = 0
-				  else
-					fs <~ ",  "
-			
-		printline fs
-
-

@@ -83,14 +83,30 @@ extend ASMState
 		.Makeconst(fat, dest)
 		return fat
 	
-	
+
+	function SetConst (|message| exp, |int64| value, |asmreg| ml, |asmreg| Dest, |asmreg|)
+		|| f = ml.fat
+			f.const = value
+			return ml
+		if !ml.reg // its understandable, we sent across reg 0, so lets create a new FAT
+			if !value
+				return ml
+			return .NumToReg(exp, value, dest, ml.µtype)
+		ml.NeedFAT // sigh
+
+
 	function NumToReg (|message| exp, |int64| V, |asmreg| Reg, |datatypecode| SrcType, |asmreg|)
-		if !v and (!reg.reg)
-			return reg as (asmreg.RealConst as asmreg.param)
-		return .NumToFat(exp, v, reg, SrcType).info
+		if v // or (reg.reg)
+			return .NumToFat(exp, v, reg, SrcType).info
+
+		if reg.reg
+			printline exp
+		rz = asmreg.ZeroParam as (reg & asmreg.ConstInput)
+		rz.µType = SrcType
 	
 	
 	function SetConst (|Message| List,  |message| Orig,  |bool|)
+		cpp_part TextConst
 		opt norefcounts								// set1: r1, 123
 		|| RegMsg = list[@thg]
 		|| ValMsg = regmsg.Next				#require
@@ -98,6 +114,7 @@ extend ASMState
 		
 		.NumToReg(orig, value, RegMsg.Reg.textasm, datatypecode.uint64)
 		return true
+	
 	
 	function InCurrBlock (|&fatasm| fat, |bool|)
 		if fat

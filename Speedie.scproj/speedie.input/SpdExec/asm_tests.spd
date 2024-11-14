@@ -31,12 +31,12 @@ function AddK2 (|int| x, |int|)
 
 function AndOrConsts (|int|)
 	visible
-	|| f1 = 0 and 5
-	|| f2 = 6 and 0
+	|| f1 = 4 or  0
+	|| f2 = 0 and 5
 	|| f3 = 0 and 0 // these first 3 should be optimised of the add!
 	|| T4 = 7 and 8
-	|| T5 = 0 or  3
-	|| T6 = 4 or  0
+	|| T5 = 6 and 0
+	|| T6 = 0 or  3
 	|| f7 = 0 or  0
 	|| T8 = 9 or  2
 	|| X = (t8+t8)+(t8-t8)
@@ -125,7 +125,8 @@ function Consts (|float64|)
 
 function Incr (|int| x, |int| y, |int|)
 	return .math(x++, --y)
-	
+
+
 function ForeignFuncs (|string?| x, |string?| y, |string|)
 	|| x3 = x.Length
 	|| x4 = x._Addr
@@ -137,6 +138,24 @@ function ForeignFuncs (|string?| x, |string?| y, |string|)
 	x8.parent
 	return x6 + x7 // fails?
 
+
+function ConstRemovals (|message| a, |string|)
+	|| x2 = 2
+	if a.Length & 0
+		x2 = a.Length & 0
+	|| x3 = 3
+	if a.Length * 0
+		x3 = a.Length * 0
+	|| x4 = 4
+	if a.Length + 0
+		x4 = a.Length + 0
+	|| x5 = 5
+	if a.Length ||| 0
+		x5 = a.Length ||| 0
+	|| x6 = 6
+	if a.Length & -1
+		x6 = a.Length & -1
+	
 
 function RefFuncs (|message| a, |string|)
 	|| b = "abc"

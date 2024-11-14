@@ -410,7 +410,7 @@ function MainAct (|Message| cmd, |scfile| my_file, |message|)
 
 
 
-function Message.ACInIsa (|bool|)
+helper Message.ACInIsa (|bool|)
 	opt norefcounts
 	require (self == @thg) and .islast
 	|| p = .parent$

@@ -21,20 +21,23 @@ datatype ASMReg (uint64)
 		Alternate
 		Discard
 		Set
-		NotYetUsed
+		Declaration
 		ForCast
 		Temp
 		SingleExpr
 		NoScale
-		KindaConst = [RealConst, NeverAltered]
-		SetRelRemove = KindaConst|||stayopen
+		NeverAltered
 		ContainsAddr
-		AddrNeed = [AddrRequest, AddrForceRequest]
 		Textual
-		Arg				= Discard				// ||| SrcConst
 		CondRequest
 		CondAnswer
-		Zero			= RealConst ||| 56 ||| param		// 56 == datatypecode.uint64
+		RealConst  = [ConstInput, ConstOutput]
+		AddrNeed   = [AddrRequest, AddrForceRequest]
+		KindaConst = RealConst ||| NeverAltered
+		SetRelRemove = KindaConst ||| StayOpen
+		Arg		   = Discard				// ||| SrcConst
+		Zero	   = RealConst ||| 56 ||| param		// 56 == datatypecode.uint64
+		ZeroParam  = ConstOutput ||| param
 	
 
 	render
@@ -155,7 +158,9 @@ datatype ASMReg (uint64)
 			return self asnt r
 		
 	function datatypecode.zero (|asmreg|)
-		rz.µtype = self
+		|| K = asmreg.RealConst
+		K.µtype = self
+		return K
 	
 	function Fatasm.HaveAddr (|&fatasm|)
 		.info = .info.HaveAddr
@@ -198,7 +203,7 @@ datatype ASMReg (uint64)
 		return dest
 
 	operator with (|asmreg| dest, |asmreg|)
-		if dest is NotYetUsed
+		if dest is Declaration
 			.reg = dest.reg
 		return self
 
@@ -209,16 +214,17 @@ datatype ASMReg (uint64)
 			.reg = dest.reg
 		return self
 	
-	function TmpCheck
+	function TmpCheck (|bool|)
 		|| R = .reg
 		|| IsTmp = self is temp
 		|| Big = R >= 24
-		if big != IsTmp // bad?
-			if big
-				"big reg $R unmarked"
-			  else
-				"low reg $R marked"
-			debugger
+		if big == IsTmp // bad?
+			return true
+		if big
+			"big reg $R unmarked"
+		  else
+			"low reg $R marked"
+		debugger
 	
 			
 	module

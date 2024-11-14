@@ -226,7 +226,7 @@ function Unchanged (|message| A, |asmreg| dest, |message| B, |bool|)
 
 function UniqueLocation (|message| A, |asmreg| dest, |message| B, |asmreg|)
 	if dest.reg
-		if (dest is NotYetUsed) or .Unchanged(A, dest, B)
+		if (dest is Declaration) or .Unchanged(A, dest, B)
 			return dest
 	rz = .temponly(A)
 	(rz is negate) = (Dest is negate)
@@ -242,15 +242,16 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 	opt norefcounts
 	dest = .UniqueLocation(a, dest, B)
 
+	if "AndOrConsts".trap
 	|| first = .µBoolInto(A, dest)
-	if first is RealConst
+	if first is ConstOutput
 		return .BoolConst1(b, dest, opp, first).boolanswer			// x = 5 or Y() --> x = Y()
 	
 	|| JUMP = .BoolTestAndJump(a.next!, dest, opp)					// AND/OR
 	|| Second = .µBoolInto(B, dest)
-	if Second is RealConst
-		.NOP(jump)
-		return .BoolConst2(opp, first, Second).boolanswer
+	if Second is ConstOutput
+		.NOP(jump) //opp, first, Second, B
+		return .BoolConst2(second, dest, opp, b, first).boolanswer
 
 	JUMP.JumpTo = .curr
 	
@@ -265,24 +266,24 @@ function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asm
 	|| expect = opp is OR
 	if v == expect
 		ml.µtype = datatypecode.bool
-		ml.Const = v|int|				// x = 5 or  2	 --> x = true
-		return ml						// x = 0 and 2	 --> x = false
+		return .SetConst(b, v|int|, ml, dest)
+									// x = 5 or  2	 --> x = true
+									// x = 0 and 2	 --> x = false
 	
-	.nop(ml)							// x = 0 or y()  --> x = y()
-										// x = 7 and y() --> x = y()
+	.nop(ml)						// x = 0 or y()  --> x = y()
+									// x = 7 and y() --> x = y()
 	|| mr = .µ(B, dest)
-	if mr is RealConst
-		ml.µtype = datatypecode.bool
-		mr.const = (mr.const != 0)|int|
-		return mr
+	if mr is ConstOutput
+		mr.µtype = datatypecode.bool
+		v = (mr.const!=0) != (dest is negate)
+		return .SetConst(b, v|int|, mr, dest)
 	
 	if mr.isbool
 		return mr
 	return .Exists(dest, mr, B)
 
 
-
-function BoolConst2 (|opmode| Opp, |asmreg| ml,  |asmreg| mr, |asmreg|)
+function BoolConst2 (|asmreg| mr, |asmreg| Dest,  |opmode| Opp, |message| exp, |asmreg| ml, |asmreg|)
 	|| V = mr.const!=0
 	if v == (opp is AND)
 		.nop(mr)
@@ -291,9 +292,8 @@ function BoolConst2 (|opmode| Opp, |asmreg| ml,  |asmreg| mr, |asmreg|)
 	
 	if ml is FromExistingVar // why not?
 		.nop(ml)
-	mr.µtype = datatypecode.bool
-	mr.const = v|int|
-	return mr
+	mr.µtype = DataTypeCode.bool
+	return .SetConst(exp, v|int|, mr, dest)
 
 
 function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)

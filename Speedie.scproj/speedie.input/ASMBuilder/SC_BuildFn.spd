@@ -19,8 +19,6 @@ extend_module ASM
 		require options.ModePack
 		if options.dev >= 2
 			asm.noisyasm = 3
-		//if asm.noisyasm >= 3
-			//.Listinstructions
 
 		require options.dev > 0
 

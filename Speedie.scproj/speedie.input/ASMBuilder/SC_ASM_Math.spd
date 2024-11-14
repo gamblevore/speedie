@@ -25,13 +25,14 @@ extend asmreg
 
 extend ASMState
 	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asmreg|)
-		|| negate = (dest is negate)|int|
+		|| negate = dest is negate
 		|| Res = dest.BoolAnswer						// Hmmm... so what should it be?
-		if  L is RealConst  and  R is RealConst
+		if  L is realconst  and  R is realconst
 			.nop2(r, l)
-			return .NumToReg(exp, ((l.const==r.const)==!negate)|int|, res, datatypecode.bool)
+			|| num = ((l.const==r.const)!=negate)|int|
+			return .NumToReg(exp, num, res, datatypecode.bool)
 		if dest isnt CondRequest
-			return exp.CMPB(dest, L, R, negate xor 1) * res
+			return exp.CMPB(dest, L, R, negate|int| xor 1) * res
 
 		if l.reg
 			if negate
@@ -48,14 +49,15 @@ extend ASMState
 
 
 	function EqualsSame (fn_opasm)
-		return .NumToReg(exp, (dest isnt negate)|int|, dest, datatypecode.bool)
+		|| num = (dest isnt negate)|int|
+		return .NumToReg(exp, num, dest, datatypecode.bool)
 	
 	
 	function Equals (fn_opasm)
 		|| rr = r.reg,  || ll = l.reg
 		if !rr  and  ll
 			swap (l) (r) // put reg 0 into the left... more convenient.
-		(Dest  as=  l bitand r bitand asmreg.RealConst)
+		(Dest  as=  l & r & asmreg.RealConst)
 		
 		if rr == ll
 			rz = .EqualsSame(dest, l, r, exp)
@@ -65,7 +67,11 @@ extend ASMState
 			rz = .CompareFloat(dest, l, r, exp, 2)
 			
 		if rz is RealConst // in case called from outside of domathsub
-			.nop2(l, r)
+			debugat
+			.nop2(l, r) // not good. We actually re-write some consts...
+						// never re-write?
+						// or don't do this?
+						
 			
 		rz = rz.boolanswer
 	
@@ -362,12 +368,12 @@ extend ASMState
 		return .FloatPlus(dest, l, r, exp)
 
 
-	function Subtract (fn_opasm)	// x = a - b
-		(l is alternate) // the logic ismostly shared...
+	function Subtract (fn_opasm)				// x = a - b
+		(l is alternate)						// the logic ismostly shared...
 		return .plus(dest, l, r, exp)
 
 
-	function Minus (fn_opasm)		// x = -b
+	function Minus (fn_opasm)					// x = -b
 		// not the same as negative, which is an fn_asm... that means it works on the exp
 		// where as fn_opasms work on the op.
 		(l is alternate)
@@ -476,7 +482,6 @@ extend ASMState
 		if dest.isint
 			return .ModInt(dest, l, r, exp)
 		return .ModFloat(dest, l, r, exp)
-		
 
 
 	// BITS
@@ -486,7 +491,7 @@ extend ASMState
 			return .makeconst2(dest, l, asmreg(), exp, ConstifyBitNot)
 		return .BitMaker(dest, l, asmreg(), exp, asm.bnot)
 
-	
+
 	function BitXor (fn_opasm)
 		if dest is RealConst
 			return .MakeConst2(dest, l, r, exp, ConstifyBitXor)
@@ -577,6 +582,7 @@ extend ASMState
 
 	function Zeros (|asmreg| dest, |asmreg|)
 		rz = asmreg()
+		(rz is constinput) = (dest is ConstInput)
 		rz.µtype = dest.µtype
 	
 	

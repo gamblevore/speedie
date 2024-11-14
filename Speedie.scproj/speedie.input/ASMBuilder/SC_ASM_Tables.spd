@@ -117,48 +117,48 @@ function Return (fn_asm)
 function TypeCast (fn_asm)
 	opt norefcounts
 	|| f = exp.first!
-	|| req = dest as asmreg.ForCast
+	|| req = dest as ASMReg.ForCast
 	req.µtype = exp.asmdecl.datatype
-	|| sr = .µ(F, req)
-	if sr.µtype == req.µtype
-		return sr // already done!
-	return TypeCastSub(self, exp, dest, sr)
+	|| freg = .µ(F, req)
+	if freg.µtype == req.µtype
+		return freg // already done!
+	return TypeCastSub(self, exp, dest, freg)
 
 
-function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| sr, |asmreg|)
+function TypeCastSub (|&asmstate| self, |message| exp, |ASMReg| dest, |ASMReg| from, |ASMReg|)
 	opt norefcounts
 	|| NewDecl = exp.ASMDecl
-	|| NewType = newdecl.regtype
-	if !sr.reg												// x = 0|float|
-		sr.µtype = newtype
-		return sr
+	|| NewType = NewDecl.regtype
+	if !from.Reg												// x = 0|float|
+		from.µtype = NewType
+		return from
 
-	|| OldType = sr.µtype
+	|| OldType = from.µtype
 	target debug
 		if NewType.count != OldType.count
 	
 	if NewType is bool
-		if (OldType is bool) and (dest isnt negate)			// x = true|bool| // why?
-			return sr
-		return .NotEq(dest, asmreg(), sr, exp)
+		if (OldType is bool) and (dest isnt negate)				// x = true|bool| // why?
+			return from
+		return .NotEq(dest, asmreg(), from, exp)
 
-	|| OC = oldtype.BitCount
-	|| NC = newtype.BitCount
+	|| OC = OldType.BitCount
+	|| NC = NewType.BitCount
 	|| IsInt = NewType.IsInt
 
-	|| Floatness = (newtype.isfloat<<1)+oldtype.isfloat
-	if floatness == 0 or 3
-		if (nc == oc) and (oldtype.issigned == newtype.issigned)
-			sr.µtype = newtype // same all. maybe quicker to test in one go?
-			return sr
+	|| Floatness = (NewType.IsFloat<<1) + oldtype.isfloat
+	if Floatness == 0 or 3
+		if (nc == oc) and (oldtype.IsSigned == newtype.IsSigned)
+			from.µtype = newtype								// same all. maybe quicker to test in one go?
+			return from
 		if isint  and  (nc > oc  or  oc == 64)
-			sr.µtype = newtype
-			return sr
+			from.µtype = NewType
+			return from
 	
 	dest = .TempOnly(exp, dest)
 	dest.µType = NewType
-	if sr is RealConst
-		|| srf = sr.needfat
+	if from is ConstOutput
+		|| srf = from.NeedFAT
 		if floatness == 0
 			|| sh = 64 - nc
 			|| oof = srf.Const << sh
@@ -168,13 +168,13 @@ function TypeCastSub (|&asmstate| self, |message| exp, |asmreg| dest, |asmreg| s
 		  else
 			srf.FloatIntConvConst(srf, oldtype, newtype)
 		
-		return .makeconst(srf, dest)
+		return .MakeConst(srf, dest)
 		
 	
 	if oldtype.isfloat or newtype.isfloat
-		return exp.CONV(dest, sr, oldtype.asmconv(newtype))*dest
+		return exp.CONV(dest, from, oldtype.asmconv(newtype))*dest
 	|| sh2 = 64 - oc
-	return exp.BFLG(dest, sr, sh2, sh2, sr.signed|int|) * dest
+	return exp.BFLG(dest, from, sh2, sh2, from.signed|int|) * dest
 
 
 
@@ -182,12 +182,13 @@ function Decl (fn_asm)
 	opt norefcounts
 	exp = exp.last!
 	|| ty = exp.first!.fastdecl
-	dest = .DeclareMe(Exp, ty) as ASMReg.NotYetUsed
+	dest = .DeclareMe(Exp, ty)
 	if (ty isnt altered) and (ty is local)
 		(dest as= asmreg.neveraltered)
 	rz = .µinto(exp.last!, dest)
 	if dest is neveraltered
 		.neveraltered[.VDecls] = .last.index
+	(rz as= asmreg.declaration)
 
 
 
@@ -266,6 +267,7 @@ function Num (fn_asm)
 	|| d = exp.ASMDecl
 	|| T = d.typeonly
 	dest.µtype = T
+	(dest is RealConst)
 	return .numtoreg(exp, d.exportposition, dest, T)
 
 
@@ -494,27 +496,23 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	  else
 		// should check if the rightside has a function in it...
 		// then we can't set the reg specifically.
-		|| Mode = (DiscardMode with dest) as ASMReg.stayopen
+		|| Mode = (DiscardMode with dest) as ASMReg.StayOpen
 		ml = .µ(exp.first!, mode)
 		mode = DiscardMode.with(dest, ml)
 		mr = .µ(exp.last!, mode)
 	.CloseVTmps(TmpCloser)
 	
 	if dest is Discard
-		.nopconst(mr)
-		.nopconst(ml)
-		return dest & ASMReg.discard // no need to do anything:   {a() + b()}
+		.NopConst(mr)
+		.NopConst(ml)
+		return dest & ASMReg.discard							// no need to do anything:   {a() + b()}
 	
-	if dest isnt CondRequest
-		dest = .TempTyped(exp, dest)
-	if  ml is RealConst  and  mr is RealConst
-		(Dest is RealConst) // do the bitand trick... later
+	dest = .TempTyped(exp, dest)
+	(dest isnt realconst)
+	(dest as= ml & mr & asmreg.realconst)
 	
-	|| dr = dest.reg
 	rz = (fn)(self, dest, ml, mr, exp.second!)
-	target debug
-		if dest is RealConst  and  rz isnt RealConst		// hmm?
-			debugger, (fn)(self, dest, ml, mr, exp.second!)
+	(rz is constinput) = dest & asmreg.ConstInput				// reset
 }
 
 
