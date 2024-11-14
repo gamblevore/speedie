@@ -1009,7 +1009,7 @@
 "Only allowed value is 'off'."
 "Only applies to structs or objects"
 "Only use this on functions"
-"Opcodes:\n"
+"GTAB"
 "vec3"
 "Operator"
 "OperatorCompare"
@@ -2153,4 +2153,3 @@
 " marked"
 "ASM fail"
 "RFAP"
-"GTAB"
