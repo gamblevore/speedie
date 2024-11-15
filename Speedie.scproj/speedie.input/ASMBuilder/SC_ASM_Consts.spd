@@ -37,15 +37,15 @@ extend ASMState
 	// would be better if each scop... knew it's constifier
 	// then the ops themselves don't need to call this... just DoMath can
 	function MakeConst2 (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |fn_ASMConstifier| fn,  |asmreg|)
-		|| K = (fn)(l,r)
-		.nop2(r, l)
-		return .numtoreg(exp, k, dest, dest.µtype)
+		|| K = (fn)(l, r)
+		.Nop2Consts(r, l)
+		return .NumToReg(exp, k, dest, dest.µtype)
 
 
 	function MakeConst (|&fatasm| fat, |asmreg| reg, |asmreg|)
-//		Fat.TryRotateConst // shouldn't we do this later?
-		(reg is RealConst)  // just before export?
-		return fat*reg     // or the exporter itself should do it!
+//		Fat.TryRotateConst		// shouldn't we do this later?
+		(reg is RealConst)		// just before export?
+		return fat*reg			// or the exporter itself should do it!
 
 	
 	function fatasm.TryRotateConst
@@ -73,6 +73,8 @@ extend ASMState
 	
 	function NumToFat (|message| exp, |int64| V, |asmreg| Dest, |datatypecode| SrcType, |&fatasm|)
 		dest = .temponly(exp, dest)
+		target debug
+			if !dest.reg and v // waaaaitttt
 		|| fat = exp.KNST(dest, 0, 0, 0)
 		fat.Const = v
 		|| desttype = dest.µtype
@@ -95,12 +97,15 @@ extend ASMState
 		ml.NeedFAT // sigh
 
 
+	function _Num (|message| exp, |int64| V, |asmreg| Reg, |datatypecode| SrcType, |asmreg|)
+		return .NumToFat(exp, v, reg, SrcType).info
+		
 	function NumToReg (|message| exp, |int64| V, |asmreg| Reg, |datatypecode| SrcType, |asmreg|)
 		if v // or (reg.reg)
-			return .NumToFat(exp, v, reg, SrcType).info
+			return ._Num(exp, v, reg, SrcType)
 
-		if reg.reg
-			printline exp
+//		if reg.reg
+//			printline exp
 		rz = asmreg.ZeroParam as (reg & asmreg.ConstInput)
 		rz.µType = SrcType
 	
@@ -116,9 +121,9 @@ extend ASMState
 		return true
 	
 	
-	function InCurrBlock (|&fatasm| fat, |bool|)
-		if fat
-			return fat.BlockNum == .BasicBlock
+//	function InCurrBlock (|&fatasm| fat, |bool|)
+//		if fat
+//			return fat.BlockNum == .BasicBlock
 		
 
 	

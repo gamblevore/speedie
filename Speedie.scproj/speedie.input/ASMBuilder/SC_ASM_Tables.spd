@@ -75,7 +75,7 @@ function StatExpr (fn_asm)
 	for ch.fast in exp
 		if ch.islast
 			return .µ(ch, dest)
-		.µ(ch, asmreg.Arg)
+		.µ(ch, asmreg.Discard)
 
 	
 function First (fn_asm)
@@ -85,9 +85,7 @@ function First (fn_asm)
 
 function Sheb (fn_asm)
 	opt norefcounts
-	|| fat = exp.noop()
-	fat.info = (-1|int64|)|asmreg|
-	return fat*asmreg()
+	return exp.noop*asmreg()
 
 
 
@@ -185,21 +183,26 @@ function Decl (fn_asm)
 	dest = .DeclareMe(Exp, ty)
 	if (ty isnt altered) and (ty is local)
 		(dest as= asmreg.neveraltered)
-	rz = .µinto(exp.last!, dest)
-	if dest is neveraltered
-		.neveraltered[.VDecls] = .last.index
-	(rz as= asmreg.declaration)
+		
+	exp = exp.last!
+	if dest isnt neveraltered
+		return .µinto(exp, dest)
+
+	.µinto(exp, dest)
+	.neveraltered[.VDecls] = .last.index
 
 
 
 function Arg (fn_asm)
 	opt norefcounts
-	|| DclCloser = .VDecls // dcl ooffer
+	|| Closer = .OpenVars // dcl ooffer
 	for ch.fast in exp
-		.µ(ch, AsmReg.Arg)
-		//.printprogress(ch)
+		if ch.func == @decl
+			asmtype.decl(self, ch, AsmReg.Discard)
+		  else
+			.µ(ch, AsmReg.Discard)
 
-	.CloseVDecls(DclCloser)
+	.Closevars(Closer)
 	return asmreg()
 
 
@@ -213,9 +216,9 @@ function Access (fn_asm)								// a[b], struct.mem[b]
 	target debug
 		|| d = f.asmdecl
 		if !d.pointercount and !d.iscarray
-	|| base = .µ(f, asmreg.stayopen)					// x = a.b[0]
+	|| base = .µopen(f)					// x = a.b[0]
 	|| sc = exp.second.first!
-	|| vara = .µ(sc, asmreg.stayopen)
+	|| vara = .µopen(sc)
 	if dest isnt AddrRequest
 		dest.µType = exp.ASMDecl.DataType
 		return .ReadOrWrite(Dest, exp, base, vara)
@@ -227,11 +230,11 @@ function Access (fn_asm)								// a[b], struct.mem[b]
 	
 
 
-function Dot (fn_asm)								// a.b
+function Dot (fn_asm)									// a.b
 	opt	NoRefCounts
 	if dest isnt set
 		dest = .TempTyped(exp, dest)
-	|| Obj = .µ(exp.first!, dest as asmreg.stayopen)
+	|| Obj = .µopen(exp.first!, dest)
 	|| prop = exp.ASMDecl
 	|| T = prop.typeinfo
 	dest.µtype = T
@@ -244,10 +247,10 @@ function Dot (fn_asm)								// a.b
 		if prop.iscarray
 			dest.µtype = datatypecode._voidptr
 		dest = dest.haveaddr
-		return .AddToReg(exp, dest, obj as asmreg.NoScale, pos)
+		return .AddToReg(exp, dest, obj as ASMReg.NoScale, pos)
 
 	
-	return .ReadOrWrite(Dest, exp, obj, asmreg(), pos)
+	return .ReadOrWrite(Dest, exp, obj, ASMReg(), pos)
 		
 
 function SetRel (fn_asm)	// function relset (
@@ -258,7 +261,7 @@ function SetRel (fn_asm)	// function relset (
 	if X.reg
 		return .µinto(B, X)
 	
-	dest = .µ(B, X as asmreg.stayopen) asnt asmreg.SetRelRemove
+	dest = .µopen(B, X) asnt ASMReg.KindaConst
 	return .µ(A, dest as AsmReg.set)
 
 
@@ -349,7 +352,7 @@ function Negative (fn_asm)							// -a
 
 function IncrSlowOnAddr (|&ASMState| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |ASMReg|)	
 	opt	NoRefCounts									// *a, x = *(a.b)
-	|| TmpCloser = .VTmps
+	|| TmpCloser = .OpenVars
 	.Read(Dest, F, dest, addr)						// READ
 
 	|| NewValue = (.Temptyped(f), dest)(mode & IncrAfter)
@@ -358,7 +361,7 @@ function IncrSlowOnAddr (|&ASMState| self, |message| f, |ASMReg| Dest, |int| Mod
 	|| fat = .write(dest, f, newvalue, addr)		// WRITE BACK
 
 	// the new value should exist! now lets close
-	.CloseVTmps(TmpCloser)
+	.CloseVars(TmpCloser)
 	return fat * Dest
 
 
@@ -489,30 +492,24 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	opt norefcounts
 	|| ml = ASMReg()
 	|| mr = ASMReg()
-	|| TmpCloser = .VTmps
-	|| DiscardMode = dest & AsmReg.Discard
 	if dest is SingleExpr
-		ml = .µ(exp, DiscardMode)
+		ml = .µ(exp, dest)
 	  else
-		// should check if the rightside has a function in it...
-		// then we can't set the reg specifically.
-		|| Mode = (DiscardMode with dest) as ASMReg.StayOpen
-		ml = .µ(exp.first!, mode)
+		|| Closer = .OpenVars
+		|| discardmode = dest & AsmReg.Discard
+		|| Mode = discardmode with dest
+		ml = .µopen(exp.first!, mode)
 		mode = DiscardMode.with(dest, ml)
 		mr = .µ(exp.last!, mode)
-	.CloseVTmps(TmpCloser)
-	
-	if dest is Discard
-		.NopConst(mr)
-		.NopConst(ml)
-		return dest & ASMReg.discard							// no need to do anything:   {a() + b()}
+		.CloseVars(Closer)
 	
 	dest = .TempTyped(exp, dest)
 	(dest isnt realconst)
 	(dest as= ml & mr & asmreg.realconst)
 	
 	rz = (fn)(self, dest, ml, mr, exp.second!)
-	(rz is constinput) = dest & asmreg.ConstInput				// reset
+	(rz is constinput) = dest & ASMReg.ConstInput				// reset
+	rz.µtype = dest.µtype
 }
 
 

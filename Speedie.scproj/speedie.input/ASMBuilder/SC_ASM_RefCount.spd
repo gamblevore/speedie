@@ -20,12 +20,12 @@ extend asmstate
 		opt	NoRefCounts
 		if fn == compiler.refclear
 			|| offset = 0
-			|| A = .µ(prms.first!, asmreg.AddrRequest)
+			|| A = .µ(prms.first!, ASMReg.AddrRequest)
 /			return exp.RFWR(A, nil, 1, offset)						// reg to mem
 
 		if fn == Compiler.RefSetRef
-			|| Out = .µ(prms.first!, asmreg.AddrRequest as asmreg.stayopen)
-			|| From = .µ(prms.second!, asmreg.AddrRequest)
+			|| Out = .µopen(prms.first!, ASMReg.AddrRequest)
+			|| From = .µ(prms.second!, ASMReg.AddrRequest)
 			if out.reg == from.reg
 				return exp.noop // wat?
 			

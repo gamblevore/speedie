@@ -368,6 +368,7 @@ function MakeMsgCreator (|string| name, |µform| form)
 	|| r = [arg,arg]
 	|| f = form.src.first.first
 	
+	|| o = 0
 	for (p in form) (i)
 		|| ty = ("asmreg", "int")(p.isreg)
 		|| pname = f.VMMsgArgName(i)
@@ -381,7 +382,10 @@ function MakeMsgCreator (|string| name, |µform| form)
 			|| size = 32 - p.bitsize
 			r[1] = @num+size
 			arg <~ ohio.run(r)
+		o |= (p is Output)<<i
 		f++
+	if o
+		arg <~ outputs.run(@num+o)
 		
 
 function µparam.Which (|macro!--|)
@@ -427,7 +431,8 @@ return curr
 || legs    = "rz.numinput(_0) = _1".macro
 || arms    = "rz.reginput(_0) = _1".macro
 || skibidy = "rz.dest(_0, _1)".macro
-
+|| outputs = "rz.outputs = _0".macro
+//Div
 
 
 || ASM_Datatype = "datatype _0 (ASM) 

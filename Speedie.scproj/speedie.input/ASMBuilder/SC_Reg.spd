@@ -16,7 +16,6 @@ datatype ASMReg (uint64)
 		Negate      // dont put anything before we test for (x << 16)
 		Param
 		FromExistingVar
-		StayOpen
 		AlreadyNegated
 		Alternate
 		Discard
@@ -34,8 +33,7 @@ datatype ASMReg (uint64)
 		RealConst  = [ConstInput, ConstOutput]
 		AddrNeed   = [AddrRequest, AddrForceRequest]
 		KindaConst = RealConst ||| NeverAltered
-		SetRelRemove = KindaConst ||| StayOpen
-		Arg		   = Discard				// ||| SrcConst
+//		SetRelRemove = KindaConst ||| StayOpen
 		Zero	   = RealConst ||| 56 ||| param		// 56 == datatypecode.uint64
 		ZeroParam  = ConstOutput ||| param
 	
@@ -78,7 +76,7 @@ datatype ASMReg (uint64)
 		.needfat.const = value
 
 	function IsConst (|int64| val, |bool|)
-		return  (self is RealConst) and (.const == val)
+		return  (self is constoutput) and (.const == val)
 	
 	function Negate (|bool| Neg=true, |asmreg|)
 		return (self|uint64| xor (neg << 16)|uint64|)|asmreg|

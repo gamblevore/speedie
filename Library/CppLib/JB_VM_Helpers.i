@@ -329,19 +329,6 @@ AlwaysInline uint64 BitComp (VMRegister* r, ASM Op) { // cmpb
 	// the first two could be "future upgrades"...?
 }
 
-AlwaysInline void BitClear (VMRegister* r, ASM Op) {
-	auto i = BClear_Signu;
-	uint S1 = BClear_Shift1u;
-	uint S2 = BClear_Shift2u;
-	if (i&1)
-		i1 = (i1 << S1)>>S1;
-	  else
-		u1 = (u1 << S1)>>S1;
-	if (i&2)
-		i2 = (i2 << S2)>>S2;
-	  else
-		u2 = (u2 << S2)>>S2;
-}
 
 AlwaysInline ASM* JumpEq (VMRegister* r, ASM Op, ASM* Code) {
 	if (u1 == u2)

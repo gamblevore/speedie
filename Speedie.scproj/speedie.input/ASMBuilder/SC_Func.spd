@@ -56,18 +56,20 @@ class µFunc
 
 
 /// TEXTUAL STUFF		
-	render
-		fs <~ "asm ${.fn.name}\n"
+	function DebugPrint (|scfunction| fn)
+		printline fn
+		|| fs = faststring()
+		fs <~ "asm ${fn.name}\n"
 		|| bb = 0
 		for µ in self
-			if µ.BlockNum != bb
+			if options.ASMRenderBlocks and µ.BlockNum != bb
 				bb = µ.BlockNum
 				fs <~ "//$bb\n"
 			fs <~ '\t'
 			µ.Renda(fs)
 			fs <~ '\n'
+		printline fs
 
-/// NIBBLER NIBBler nIBBLerr
 
 	iterator
 		|| CurrInst = .IR

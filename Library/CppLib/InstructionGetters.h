@@ -283,25 +283,6 @@
 #define   CmpB_Lu_(x)   (((uint)((x)<<26))>>26)
 
 
-#define   BClear_Shift1i       ((( int)((Op)<<18))>>26)
-#define   BClear_Shift1i_(x)   ((( int)((x)<<18))>>26)
-
-#define   BClear_Shift1u       (((uint)((Op)<<18))>>26)
-#define   BClear_Shift1u_(x)   (((uint)((x)<<18))>>26)
-
-#define   BClear_Shift2i       ((( int)((Op)<<24))>>26)
-#define   BClear_Shift2i_(x)   ((( int)((x)<<24))>>26)
-
-#define   BClear_Shift2u       (((uint)((Op)<<24))>>26)
-#define   BClear_Shift2u_(x)   (((uint)((x)<<24))>>26)
-
-#define   BClear_Signi       ((( int)((Op)<<30))>>30)
-#define   BClear_Signi_(x)   ((( int)((x)<<30))>>30)
-
-#define   BClear_Signu       (((uint)((Op)<<30))>>30)
-#define   BClear_Signu_(x)   (((uint)((x)<<30))>>30)
-
-
 #define   Convert_Modei       ((( int)((Op)<<18))>>28)
 #define   Convert_Modei_(x)   ((( int)((x)<<18))>>28)
 

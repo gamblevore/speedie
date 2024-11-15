@@ -8,8 +8,9 @@ struct FatASM
 	|uint64| 			_Const
 	|uint[7]|			R
 	|uint|				ASMIndex	
-	|uint16| 			BlockNum		// remove?
-	|uint16| 			Nothing			// remove?
+	|uint16| 			BlockNum
+	|byte| 				Outputs
+	|byte| 				Nothing
 	|uint16|			RefCount
 	|byte|				Op
 	|byte|				JumpReg
@@ -66,10 +67,14 @@ struct FatASM
 		|| out = .out
 		return out == a or b
 	
-	function Info (|asmreg|)
-		nil safe
-		return .info
-	
+	function ResetOutput (|int| reg, |bool|)
+		|| o = .Outputs
+		if (o&1) and .r[0]
+			.r[0] = reg
+			return true
+		if (o&2) and .r[1]
+			.r[1] = reg
+			return true
 
 	function SmartFatness (|int| reg, |maybebool|)
 		opt norefcounts
@@ -231,6 +236,10 @@ struct FatASM
 	
 	function Renda (|FastString| fs)
 		opt norefcounts
+		if (self isa asm.noop)  and  (.msg.func == @sheb)
+			.rendamsg(fs, 0)
+			return 
+		
 		|| M = fs.mark
 		|| op = instruction.typelist[.baseop]!
 		fs <~ op.name
@@ -258,8 +267,6 @@ struct FatASM
 				exit
 		if (self isa asm.knst or asm.knsr)
 			.RendaKnst(fs, fs.mark-m)
-		if (self isa asm.noop)
-			.rendamsg(fs, fs.mark-m)
 	
 	
 	function RendaMsg (|faststring| fs, |int| sofar)

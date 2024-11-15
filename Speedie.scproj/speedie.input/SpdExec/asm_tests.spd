@@ -82,6 +82,7 @@ function AndOrRest (|int| a, |int| b, |bool| x3, |bool| x4, |int|) // stragglers
 	|| x10 = !(x3 and x4)
 	#!BBBB
 	x3 = (0 or b)+1				// x3 = b+1
+	x3 = x4 or x4
 	x4 = !(a and b)
 	#!DDDD
 	x4 = a or b					// old bool logic
@@ -95,6 +96,7 @@ function AndOrRest (|int| a, |int| b, |bool| x3, |bool| x4, |int|) // stragglers
 
 	
 function AndOrRest2 (|int| a, |int| b) // more stragglers
+	if 1 or b: a = 2
 	if 0 and b: b = 4	
 	if 1 and b: b = 5
 
@@ -105,7 +107,6 @@ function AndOrRest2 (|int| a, |int| b) // more stragglers
 	  else
 		x4 = (a and a)|int|
 
-	if 1 or b: a = 2
 	if 0 or a: a = 3
 	
 
@@ -141,20 +142,26 @@ function ForeignFuncs (|string?| x, |string?| y, |string|)
 
 function ConstRemovals (|message| a, |string|)
 	|| x2 = 2
+	x2 = a.length + 0
+	if x2 // will not be removed :)
+		x2 = a.Length
+	#!---
 	if a.Length & 0
 		x2 = a.Length & 0
-	|| x3 = 3
+	#!---
 	if a.Length * 0
-		x3 = a.Length * 0
-	|| x4 = 4
-	if a.Length + 0
-		x4 = a.Length + 0
-	|| x5 = 5
-	if a.Length ||| 0
-		x5 = a.Length ||| 0
-	|| x6 = 6
+		x2 = a.Length * 0
+	
+function ConstRemovals2 (|message| a, |string|)
+	|| x2 = 2
+	if a.Length ||| -1
+		x2 = a.Length ||| -1
+	#!---
 	if a.Length & -1
-		x6 = a.Length & -1
+		x2 = a.Length & -1
+	#!---
+	if a.Length ||| 0
+		x2 = a.Length ||| 0
 	
 
 function RefFuncs (|message| a, |string|)

@@ -134,12 +134,12 @@ forms
 		r3		r
 		Inv		3
 
-	BClear
-		r1		R
-		r2		R
-		Shift1	6
-		Shift2	6
-		Sign	2
+//	BClear
+//		r1		R
+//		r2		R
+//		Shift1	6
+//		Shift2	6
+//		Sign	2
 	
 	Convert
 		r1		R
@@ -428,8 +428,8 @@ POS 5
 			u1 = ((u2 << BFLD_upu) >> BFLD_downu)	
 /**/ BSTT  (U4)
 		i1 = 0 // bitstats(u2, u3, u4)
-/**/ BCLR  (BClear)
-		BitClear(r, Op)
+///**/ BCLR  (BClear)
+//		BitClear(r, Op)
 
 ///**/ BFLS  (BFLD) // seems useless?
 //		BFLS(r, Op)

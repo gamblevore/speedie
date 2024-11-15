@@ -31,15 +31,18 @@ struct ASMState
 		|ASMState|					Sh
 
 
-	function CloseVDecls (|int| i, |bool|)
+	function OpenVars (|uint64|)
+		rz = (.VDecls|uint64| << 32) ||| (.vtmps << 0)
+//		printline ">> ${.vdecls|int64|} ${.vtmps|int64|} ${rz|int64|}"
+		
+	function CloseVars (|uint64| V)
 		|| top = .vdecls
-		while top > i
+		|| d = v.high
+		while top > d
 			.NeverAltered[top--] = 0
-		.VDecls = i
-
-	function CloseVTmps (|int| i)
-		target debug: if i < .vtmps // what?
-		.VTmps = i
+		.VDecls = d
+		.VTmps = v.low
+//		printline "<< ${.vdecls|int64|} ${.vtmps|int64|} ${v|int64|}"
 			
 	function AddFuncParams (|SCFunction| fn)
 		opt norefcounts
@@ -47,10 +50,10 @@ struct ASMState
 			.DeclareMe(a.source, a)
 
 	function Last (|&FatASM|)
-		return .curr-1
+		return .curr - 1
 
 	function Last (|asm| type, |&FatASM|)
-		|| L = .curr-1
+		|| L = .curr - 1
 		if l isa type
 			return L
 	
@@ -158,10 +161,10 @@ struct ASMState
 		if r.reg and r isnt param
 			debugat // bad!
 	
-	function Nop2 (|asmreg| A, |asmreg| B)
-		.nop(A)
-		.nop(B)
-		.nop(A) // in case of swapped order
+	function Nop2Consts (|asmreg| A, |asmreg| B)
+		.nopconst(A)
+		.nopconst(B)
+		.nopconst(A) // in case of swapped order
 	
 	function Const (|asmreg| R, |int| bits, |bool| signed, |ind|)
 		if R & asmreg.KindaConst
@@ -203,11 +206,18 @@ struct ASMState
 		
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
 		|| rz = .µ(Exp, dest)
-		dest = rz.reg(dest)
-		return .Assign(Dest, rz, exp)
+		|| dest2 = rz.reg(dest)
+		(dest2 is temp) = (dest is temp)
+		return .Assign(Dest2, rz, exp)
 	
 			
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
+		|| Closer = .OpenVars
+		rz = .µopen(exp, dest)
+		.CloseVars(Closer)
+
+
+	function µOpen (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		opt norefcounts
 		cpp_part GetASM 
 		target debug
@@ -217,14 +227,7 @@ struct ASMState
 			opt inline
 
 		|| fn = fn_asm_table[exp.ASMType]!
-		|| TmpCloser = .VTmps
-		|| DeclCloser = .VDecls
-		
 		|| ss = (fn)(self, exp, dest)
-		if dest isnt StayOpen
-			.CloseVTmps(TmpCloser)
-		if ss isnt Declaration // cos of nested func-calls
-			.CloseVDecls(DeclCloser)
 
 		target debug
 			if !ss.tmpcheck
@@ -246,7 +249,7 @@ struct ASMState
 	function FuncPrm (|message| prm, |asmreg|)
 		|| r = .ExistingVar(prm)
 			return r
-		return .µ(prm, asmreg.stayopen)
+		return .µopen(prm)
 
 
 	function ReadOrWrite (|ASMReg| dest, |message| m, |asmreg| base, |asmreg| varadd, |int| index=0, |asmreg|)
@@ -265,9 +268,10 @@ struct ASMState
 			error (exp, "Object to large to access")				// can we do struct-mem-copy?
 			bytes = 0
 		
-		if varadd is RealConst
+		if varadd is ConstOutput
 			|| CC = varadd.fat
-				.nop(cc)
+				if varadd is RealConst
+					.nop(cc)
 				index += cc.const
 				varadd = asmreg()
 
@@ -348,9 +352,8 @@ struct ASMState
 
 	function CallFunc (|message| exp, |asmreg| dest, |asmreg|)
 		|| v = .VDecls
-		if dest is StayOpen
-			.vdecls = v + 1
 		v += (dest.reg < v) // NOICE
+		.vdecls = v
 		check (v < 32) (exp, "Too many registers in use. No space for result.")
 		dest.reg = v
 		return Dest.Simplify
@@ -463,13 +466,12 @@ function @ASMType.DoFunction (fn_Asm)
 	|| prms = exp.last!
 	|| fn = prms.asfunc!
 	
-//	if "ConstRemovals".trap
 	dest.µtype = fn.RegType
 	dest = .CallFunc(exp, dest)
 
-	|| TmpCloser = .VTmps
+	|| Closer = .openvars
 	|| P = .PrmCollect(prms, fn)
-	.CloseVTmps(TmpCloser)
+	.CloseVars(Closer)
 	
 	|| PExt = P >> 32
 	|| fat = exp.FNC(dest, fn.tableid+31, P,  PExt)

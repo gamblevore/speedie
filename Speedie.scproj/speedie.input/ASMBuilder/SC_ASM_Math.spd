@@ -27,8 +27,8 @@ extend ASMState
 	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asmreg|)
 		|| negate = dest is negate
 		|| Res = dest.BoolAnswer						// Hmmm... so what should it be?
-		if  L is realconst  and  R is realconst
-			.nop2(r, l)
+		if  L is constoutput  and  R is constoutput
+			.Nop2Consts(r, l)
 			|| num = ((l.const==r.const)!=negate)|int|
 			return .NumToReg(exp, num, res, datatypecode.bool)
 		if dest isnt CondRequest
@@ -50,7 +50,7 @@ extend ASMState
 
 	function EqualsSame (fn_opasm)
 		|| num = (dest isnt negate)|int|
-		return .NumToReg(exp, num, dest, datatypecode.bool)
+		return .NumToReg(exp, num, dest, datatypecode.bool).BoolAnswer
 	
 	
 	function Equals (fn_opasm)
@@ -60,18 +60,12 @@ extend ASMState
 		(Dest  as=  l & r & asmreg.RealConst)
 		
 		if rr == ll
-			rz = .EqualsSame(dest, l, r, exp)
-		  elseif dest.IsInt
+			return .EqualsSame(dest, l, r, exp)
+		
+		if dest.IsInt
 			rz = .EqualsInt(dest, l, r, exp)
 		  else
-			rz = .CompareFloat(dest, l, r, exp, 2)
-			
-		if rz is RealConst // in case called from outside of domathsub
-			debugat
-			.nop2(l, r) // not good. We actually re-write some consts...
-						// never re-write?
-						// or don't do this?
-						
+			rz = .CompareFloat(dest, l, r, exp, 2)						
 			
 		rz = rz.boolanswer
 	
@@ -84,7 +78,7 @@ extend ASMState
 		mode |= !r.signed<<2
 		mode ^= dest isnt Negate
 		dest = dest.BoolAnswer
-		if l is RealConst and r is RealConst
+		if l is constoutput and r is constoutput
 			return .ConstCompareInt(dest, L, R, exp, Mode)
 		if Dest isnt CondAnswer
 			return exp.CMPI(dest, L, R, mode) * dest
@@ -92,7 +86,7 @@ extend ASMState
 
 
 	function ConstCompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
-		.nop2(r, l)
+		.Nop2Consts(r, l)
 		|| Result = .ConstCompareFloatSub(l, r, mode)
 		return .NumToReg(exp, result|int|, dest.BoolAnswer, datatypecode.bool)
 		
@@ -118,7 +112,7 @@ extend ASMState
 
 
 	function ConstCompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
-		.nop2(r, l)
+		.Nop2Consts(r, l)
 		|| Result = .ConstCompareIntSub(l, r, mode)
 		return .NumToReg(exp, result|int|, dest.BoolAnswer, datatypecode.bool)
 		
@@ -138,7 +132,7 @@ extend ASMState
 		mode |= r.IsBig<<2
 		mode ^= dest isnt Negate
 		dest = dest.BoolAnswer
-		if (l is RealConst and r is RealConst) // needs to handle this!
+		if (l is constoutput and r is constoutput) // needs to handle this!
 			return .ConstCompareFloat(dest, L, R, exp, Mode)
 		if dest isnt Condanswer
 			return exp.CMPF(dest, L, R, Mode) * dest
@@ -167,10 +161,10 @@ extend ASMState
 
 	// MATH 
 	function QuickFloat32Plus    (fn_OpASM)
-		if  r is RealConst // a + 1,   a - 1
+		if  r is constoutput // a + 1,   a - 1
 			|| QQ = .QuickFloatPlusConstSub(dest, l, r, exp)
 				return qq
-		if  l is RealConst  and  l isnt Alternate   // 1 + a --> a + 1
+		if  l is constoutput  and  l isnt Alternate   // 1 + a --> a + 1
 			return .QuickFloatPlusConstSub(dest, r asnt asmreg.alternate, l, exp)
 	
 			
@@ -178,7 +172,7 @@ extend ASMState
 		|| k = r.Const|uint64|
 		k ^= (l is Alternate)<<31
 		require (k >> 18) << 18 == k
-		.nop(r)
+		.nopconst(r)
 		return exp.FADK(dest, l, k) * Dest
 
 
@@ -187,14 +181,14 @@ extend ASMState
 
 
 	function QuickFloatDiv    (fn_OpASM)
-		require r is RealConst
+		require r is ConstOutput
 		|| v = r.float
 		|| v2 = v.abs
 		// could use exp.FEXK to do powers of 2
 		if v2 == 1.0 or 0.0
 			if v2 == 0.0
 				Exp.DivByZero
-			.nop(r)
+			.nopconst(r)
 			return .Quick1Or1Sub(dest, l, v|int|, exp)
 
 
@@ -218,13 +212,13 @@ extend ASMState
 
 
 	function QuickFloatMul    (fn_OpASM)
-		require r is RealConst	
+		require r is constoutput	
 		|| v = r.float
 		if  v == 1.0 or 0.0 or -1.0
-			.nop(r)
+			.nopconst(r)
 			return .Quick1Or1Sub(dest, l, v|int|, exp)
 		if  v == 2.0
-			.nop(r)
+			.nopconst(r)
 			return .plus(dest, l, l, exp)
 		
 		if r.Fourbytes
@@ -289,13 +283,8 @@ extend ASMState
 	function IntPlus     (fn_opasm)
 		//		a - 1,		a + 1		//
 		//		1 - a,		1 + a		//
-		if dest is RealConst // perhaps we can do this in domathsub?
+		if dest is constoutput // perhaps we can do this in domathsub?
 			return .MakeConst2(dest, l, r, exp, ConstifyIntPlus)
-
-		if l.reg == r.reg // shift
-			if l is Alternate
-				debugger // shouldn't happen
-			return .BFLG_Const(exp, dest, l, 1, 0) // shift up
 
 		|| swapped = 0
 		if  l.LeftScore < r.LeftScore // put consts into R
@@ -312,13 +301,13 @@ extend ASMState
 		|| lmul = 1
 		if (l isnt noscale) and l.SomePointer
 			lmul = l.PointerMul(exp, swapped)
-		if r is RealConst
+		if r is ConstOutput
 			|| RR = r.const
 			if l is alternate
 				RR = -RR
 			rr *= lmul
 			if r.CanAddK(RR)								// a - 1,  a + 1
-				.nop(r)
+				.nopconst(r)
 				if .InlineAddK(l, rr, dest)
 					return dest
 				return exp.ADDK(dest, L, RR) * dest
@@ -341,7 +330,7 @@ extend ASMState
 	
 
 	function FloatPlus (fn_opasm)
-		if dest is RealConst
+		if dest is ConstOutput
 			return .makeconst2(dest, l, r, exp, ConstifyFloatPlus)
 
 		|| IsF32 = dest.FourBytes
@@ -381,7 +370,7 @@ extend ASMState
 
 
 	function FloatMul (fn_opasm)
-		if dest is RealConst
+		if dest is ConstOutput
 			return .makeconst2(dest, l, r, exp, ConstifyFloatMul)
 		rz = .QuickFloatMul(dest, R, L, exp)
 		if rz == nil
@@ -391,7 +380,7 @@ extend ASMState
 
 
 	function IntMul (fn_opasm)
-		if dest is RealConst
+		if dest is ConstOutput
 			return .MakeConst2(dest, l, r, exp, ConstifyIntMul)
 		rz = .QuickIntMul(dest, R, L, exp)
 		if rz == nil
@@ -401,7 +390,7 @@ extend ASMState
 
 
 	function BoolMul (|asmreg| dest, |asmreg| Bule, |asmreg| V, |message| exp, |asmreg|)		
-		if dest is RealConst
+		if dest is ConstOutput
 			return .MakeConst2(dest, Bule, V, exp, ConstifyBoolMul)
 		rz = .QuickIntMul(dest, Bule, V, exp)
 		if !rz
@@ -414,7 +403,7 @@ extend ASMState
 		if r isa DataTypeCode.bool
 			return .BoolMul(dest, r, l, exp)
 
-		if l is RealConst
+		if l is ConstOutput
 			swap (l) (r)
 		if l.isint
 			return .IntMul(dest, r, l, exp)
@@ -430,7 +419,7 @@ extend ASMState
 
 
 	function DivFloat    (fn_opasm)
-		if (dest is RealConst) and (l isnt alternate)
+		if (dest is ConstOutput) and (l isnt alternate)
 			return .MakeConst2(dest, l, r, exp, ConstifyFloatDiv)
 		rz = .QuickFloatDiv(dest, L, R, exp)
 		if rz == nil
@@ -457,7 +446,7 @@ extend ASMState
 	
 	
 	function DivInt    (fn_opasm)
-		if dest is RealConst
+		if dest is ConstOutput
 			return .MakeConst2(dest, L, R, exp, ConstifyIntDiv)
 		|| q = .QuickIntDiv(dest, l, r, exp)
 			return q
@@ -465,7 +454,7 @@ extend ASMState
 	
 	
 	function ModFloat    (fn_opasm)
-		if dest is RealConst
+		if dest is ConstOutput
 			return .MakeConst2(dest, L, R, exp, Constifyfloatmod)
 		|| big = dest.IsBig|int|
 		exp.fdiv(dest, L, R, asmreg(), big)
@@ -473,7 +462,7 @@ extend ASMState
 	
 	
 	function ModInt    (fn_opasm)
-		if dest is RealConst
+		if dest is ConstOutput
 			return .MakeConst2(dest, L, R, exp, ConstifyIntMod)
 		return exp.DIVV(asmreg(), dest, L, R, dest.IntDivType) * Dest
 	
@@ -487,50 +476,63 @@ extend ASMState
 	// BITS
 	function BitNot (fn_opasm)
 		if r.reg // what?
-		if dest is RealConst
+		if dest is ConstOutput
 			return .makeconst2(dest, l, asmreg(), exp, ConstifyBitNot)
 		return .BitMaker(dest, l, asmreg(), exp, asm.bnot)
 
 
 	function BitXor (fn_opasm)
-		if dest is RealConst
+		if dest is ConstOutput
 			return .MakeConst2(dest, l, r, exp, ConstifyBitXor)
 		if (l.reg == r.reg)
 			return .Zeros(dest)
 		if !l.reg
-			return .Assign(dest, r, exp)
+			return r
 		if !r.reg
-			return .Assign(dest, l, exp)
+			return l
 		return .BitMakerSwap(dest, l, r, exp, asm.bxor)
 
 
 	function BitOr (fn_opasm)
-		if dest is RealConst
+		if dest is ConstOutput
 			return .MakeConst2(dest, l, r, exp, ConstifyBitOr)
-		if .NopMinusOne(l)
-			return .Assign(dest, R, exp)
-		if .NopMinusOne(r)
-			return .Assign(dest, L, exp)
+		|| ll = l.reg
+		|| rr = r.reg
+		// we should use the type... of dest?
+		// that or domath should call us?
+		if (ll == rr)
+			return l
+		if l is constoutput
+			if !l.reg
+				return r
+			if l.isconst(-1)
+				return l
+		if r is constoutput
+			if !r.reg
+				return l
+			if r.isconst(-1)
+				return r
 		return .BitMakerSwap(dest, l, r, exp, asm.bor)
 
 			
 	function BitAnd (fn_opasm)		
-		if dest is RealConst
+		if dest is ConstOutput
 			return .MakeConst2(dest, l, r, exp, ConstifyBitAnd)
-		if .nopminusone(r)
-			return .Assign(dest, l, exp)
-		if .nopminusone(l)
-			return .Assign(dest, r, exp)
-		if l.isconst(0) or r.IsConst(0)
+		|| ll = l.reg
+		|| rr = r.reg
+		if (ll == rr)
+			return l
+		if !ll or !rr
 			return .Zeros(dest)
-		if (l.reg == r.reg)
-			return .Assign(dest, l, exp)
+		if .nopminusone(l)
+			return r
+		if .nopminusone(r)
+			return l
 		return .BitMakerSwap(dest, l, r, exp, asm.band)
 
 
 	function BitMakerSwap (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
-		if (l is RealConst)
-			if  r.reg and (r is RealConst) // ??? both consts?
+		if (l is ConstOutput)
 			swap (l) (r)
 		return .BitMaker(Dest, l, r, exp, op)
 	
@@ -546,7 +548,7 @@ extend ASMState
 
 
 	function SHR  (fn_opasm)
-		if dest is RealConst
+		if dest is ConstOutput
 			return .MakeConst2(dest, l, r, exp, (ConstifyBitSHS, ConstifyBitSHR)(l.signed))
 		|| K = .const(R, 6, false)
 			return .BFLG_Const(exp, dest, l, 0, k)
@@ -556,7 +558,7 @@ extend ASMState
 	
 
 	function SHL  (fn_opasm)
-		if dest is RealConst
+		if dest is ConstOutput
 			return .MakeConst2(dest, l, r, exp, ConstifyBitSHL)
 		|| K = .const(R, 6, false)
 			return .BFLG_Const(exp, dest, l,  K, 0)
@@ -586,15 +588,23 @@ extend ASMState
 		rz.µtype = dest.µtype
 	
 	
-	function Assign (|asmreg| dest, |asmreg| src, |message| exp, |asmreg|)
-		if src.reg != dest.reg
-			return .BitMakerSwap(dest, src, asmreg(), exp, asm.bor) //
-		return dest		// hmmm... we are already there
+	function Assign (|asmreg| dest, |asmreg| src, |message| exp, |asmreg|)  // assigns (
+		|| sr = src.reg
+		if sr == dest.reg
+			return dest								// hmmm... we are already there
+		if !sr
+			return ._num(exp, 0, dest, src.µtype)	// force zero. More readable
+		
+		if src is temp
+			|| f = src.fat
+				if f.ResetOutput(dest.reg)
+					return dest
+		return .BitMakerSwap(dest, src, asmreg(), exp, asm.bor) //
 
 
 	function NopMinusOne (|asmreg| r, |bool|)
 		if r.IsConst(-1)
-			.nop(r)
+			.nopconst(r)
 			return true
 	
 	

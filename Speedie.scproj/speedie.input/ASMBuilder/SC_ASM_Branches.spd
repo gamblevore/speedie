@@ -20,7 +20,7 @@ function ArgOrIf (|message?| other, |asmreg|)
 
 function IfEmpty (|message| cond, |message| other, |asmreg|)
 	if !other
-/		return .µ(cond, asmreg.arg)			// if (x())    -->   x() + discard
+/		return .µ(cond, asmreg.Discard)			// if (x())    -->   x()
 	// optimise branch a little
 	|fatrange| B
 /	.Branch(cond, true, B)
@@ -152,9 +152,10 @@ function Branch (|message| Cond,  |bool| Neg = false,  |fatrange| Range, |asmreg
 	if rz isnt CondAnswer
 		rz = .Exists(mode, rz, cond)
 
-	if rz is RealConst
+	if rz is constoutput
 		range.Constness = (rz.const!=0)|maybebool|
-		.BackCond(range.start)
+		if rz is RealConst
+			.BackCond(range.start)
 	  else
 		range.Constness = maybebool.default(false)
 	
@@ -163,7 +164,7 @@ function Branch (|message| Cond,  |bool| Neg = false,  |fatrange| Range, |asmreg
 
 helper ASMBoolShrink (|message| exp,  |ASMReg| Dest,  |ASMReg| ml,  |ASMReg|)
 	if (ml.IsBool) and (dest isnt Negate) and (dest isnt CondRequest)
-/		return ml.BoolAnswer								// x = a or a   -->  x = a
+		return ml.BoolAnswer								// x = a or a   -->  x = a
 	return .Exists(dest, ml, exp)							// if  a or a   -->  if a
 
 
@@ -193,8 +194,11 @@ helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |AS
 	|| ml = .ExistingVar(A)
 	|| mr = .ExistingVar(B)
 	
-	if ml and ml.reg == mr.reg
+	if ml and (ml.reg == mr.reg)
 		return .ASMBoolShrink(exp, dest, ml)
+
+	if (dest isnt condrequest) and (ml.isboolV and mr.isboolV) 
+		return .BoolFromBools(exp, dest, opp, ml, mr)		// No consts via .existingvar		
 
 	if dest is negate
 		(opp xor= OpMode.AndOr)								//  !(a and b)  -->  !a or !b
@@ -203,9 +207,6 @@ helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |AS
 		if OPP is OR
 			return .BranchOr(A, B, dest)
 		return .BranchAnd(A, B, Dest)
-
-	if ml.isboolV and mr.isboolV
-		return .BoolFromBools(exp, dest, opp, ml, mr)		// No consts via .existingvar		
 
 	return .BoolValue(A, dest, opp, b)
 	
@@ -242,7 +243,6 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 	opt norefcounts
 	dest = .UniqueLocation(a, dest, B)
 
-	if "AndOrConsts".trap
 	|| first = .µBoolInto(A, dest)
 	if first is ConstOutput
 		return .BoolConst1(b, dest, opp, first).boolanswer			// x = 5 or Y() --> x = Y()
@@ -320,13 +320,13 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	|| First = .Branch(A, dest isnt negate, OrTest)
 	|| KF = OrTest.Constness.negate
 	if kf.knowntrue
-		|| nop = A.noop
-		nop.const = KF|int|
+		|| fake = A.noop
+		fake.const = KF|int|
 		// 1 or 1
 		// 1 or 0
 		// 1 or b
-		first.fatindex = nop.index
-		return nop*first						// only way around this. Cos we got asm-reg(0)
+		(first is condanswer)
+		return fake*first.boolanswer						// only way around this. Cos we got asm-reg(0)
 
 	
 	|fatrange| Br2

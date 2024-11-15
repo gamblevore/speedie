@@ -124,8 +124,6 @@
 ;
 ı BSTT: _
 	i1 = 0;
-ı BCLR: _
-	BitClear(r, Op);
 ı CMPB: _
 	u1 = BitComp(r, Op);
 ı TERN: _
