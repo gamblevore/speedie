@@ -5,8 +5,7 @@ datatype ASM (uint)
 		visible
 		cpp_name ASMPrint
 
-	syntax is (|asm| OpCode, |bool|)
-		return (self xor opcode)>>24 == 0
+
 	function Length (|int|)
 		|| op = .decodeop
 		if op >= 32

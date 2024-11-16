@@ -498,5 +498,5 @@ function @ASMState.ExpandJSM (|bool|)
 
 function fatasm.IsFinisher (|bool|)
 	|| o = .op|asm|
-	return o is ret or trap or reto
+	return o == asm.ret or asm.trap or asm.reto
 

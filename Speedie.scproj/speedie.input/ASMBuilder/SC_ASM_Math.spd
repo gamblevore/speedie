@@ -588,16 +588,26 @@ extend ASMState
 		rz.µtype = dest.µtype
 	
 	
+	function CanImproveAssign (|asmreg| dest, |asmreg| src, |&fatasm|)
+		opt inline
+		if  src is temp
+			return src.fat
+		if  src.reg > .vdecls
+			|| f = src.fat
+			if f == .last
+				return f
+	
 	function Assign (|asmreg| dest, |asmreg| src, |message| exp, |asmreg|)  // assigns (
 		|| sr = src.reg
-		if sr == dest.reg
+		|| dr = dest.reg
+		if sr == dr
 			return dest								// hmmm... we are already there
 		if !sr
 			return ._num(exp, 0, dest, src.µtype)	// force zero. More readable
-		
-		if src is temp
-			|| f = src.fat
-				if f.ResetOutput(dest.reg)
+
+		if dest isnt temp
+			|| improve = .CanImproveAssign(dest, src)
+				if improve.ResetOutput(dr)
 					return dest
 		return .BitMakerSwap(dest, src, asmreg(), exp, asm.bor) //
 

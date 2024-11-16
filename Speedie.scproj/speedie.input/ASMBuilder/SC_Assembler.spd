@@ -55,7 +55,7 @@ module SpdAssembler
 		|| fp = fn_asm_table[@arg]!
 		|| R = asmreg()
 		|| A = fn.SourceArg!
-		(fp)(ASmState.Sh, A, R)
+		ASMType.arg(ASmState.Sh, A, R)
 		ASMState.Sh.FinishASM
 		.Guard
 		return ASMState.Sh.ok
@@ -71,12 +71,6 @@ module SpdAssembler
 		expect (.GenerateASMSub(fn) or (ASMState.ExpandJSM and .GenerateASMSub(fn))) "ASM is out of memory." 
 
 		fn.asm!.debugprint(fn)
-
-// I think we just need inlining, and flow-control, not the rest below.
-//		while .Optimise(fn.asm!)
-//			loop ++fn.OptCounts <= 16
-//		.FlowControl
-
 		return true
 
 

@@ -151,7 +151,8 @@ function ConstRemovals (|message| a, |string|)
 	#!---
 	if a.Length * 0
 		x2 = a.Length * 0
-	
+
+
 function ConstRemovals2 (|message| a, |string|)
 	|| x2 = 2
 	if a.Length ||| -1
