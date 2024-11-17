@@ -42,6 +42,7 @@ module SpdAssembler
 		TextAssembler.Requests		?= dictionary()
 		TextAssembler.RequestTable	?= array()
 
+
 	syntax access (|message| m, |µFunc|)
 		cpp_part AccessStr
 		opt norefcounts
@@ -73,10 +74,3 @@ module SpdAssembler
 		fn.asm!.debugprint(fn)
 		return true
 
-
-//extend_module ASM
-//	function Needed (|bool|)
-//		|| fn = compiler.XFunc("JB_ASM_Run")
-//			return fn.MyReacher
-//
-//

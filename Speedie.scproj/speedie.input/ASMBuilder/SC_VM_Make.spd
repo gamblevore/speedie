@@ -439,7 +439,7 @@ return curr
 	module
 		function Encode (ASM_Encoder,)
 			visible true
-			|asm| rz = .op << 24
+			|asm| rz = .op|asm| << 24
 		
 ASM.Forms[_1] = &_0.Encode // for now
 ".macro

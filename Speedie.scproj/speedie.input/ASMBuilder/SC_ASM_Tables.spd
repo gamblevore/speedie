@@ -181,15 +181,18 @@ function Decl (fn_asm)
 	exp = exp.last!
 	|| ty = exp.first!.fastdecl
 	dest = .DeclareMe(Exp, ty)
-	if (ty isnt altered) and (ty is local)
-		(dest as= asmreg.neveraltered)
-		
 	exp = exp.last!
-	if dest isnt neveraltered
+
+	ifn (ty isnt altered) and (ty is local) // its always local ???
 		return .µinto(exp, dest)
 
-	.µinto(exp, dest)
-	.neveraltered[.VDecls] = .last.index
+	// we only want constants...
+	|| K = .µinto(exp, dest as asmreg.neveraltered)
+	if k is ConstOutput
+		(ty is const)
+		|| f = k.fat
+			ty.exportposition = f._const
+		.neveraltered[.VDecls] = k.fatindex
 
 
 
@@ -261,7 +264,7 @@ function SetRel (fn_asm)	// function relset (
 	if X.reg
 		return .µinto(B, X)
 	
-	dest = .µopen(B, X) asnt ASMReg.KindaConst
+	dest = .µopen(B, X) asnt ASMReg.KindaConst		// why remove these?
 	return .µ(A, dest as AsmReg.set)
 
 
@@ -290,8 +293,10 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	if d is local
 		|| T = d.wholetype
 		(t is param) = (d is param)
-		if (d isnt altered) and (d isnt param)			// what about params?
-			(T is NeverAltered) = true					// what about carrays?
+		if "VarConst".trap
+		if (d isnt altered) and (d isnt param)
+			(T is NeverAltered)							// what about carrays?
+			(T is constoutput)
 			t.FatIndex = .NeverAltered[t.reg]
 		if dest isnt addrneed
 			return T
@@ -517,6 +522,7 @@ function message.ASMLocal (|asmreg| extra = 0, |asmreg|)
 	opt	norefcounts
 	|| d = .ASMDecl
 	if d is local
+		(extra is neveraltered) = (d isnt altered)
 		return d.WholeType as extra
 
 

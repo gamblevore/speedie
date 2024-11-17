@@ -64,7 +64,7 @@ struct FatASM
 		.msg = Value
 
 	function has (|int| a, |int| b, |bool|)
-		|| out = .out
+		|| out = .r0
 		return out == a or b
 	
 	function ResetOutput (|int| reg, |bool|)
@@ -166,9 +166,8 @@ struct FatASM
 		  else
 			debugger
 
-	function out (|uint|): return .r[0]
-	function out (assigns:|asmreg|): .r[0] = value.treg
-	
+	function r0 (|uint|): return .r[0]
+	function r0 (assigns:|asmreg|): .r[0] = value.treg
 	function r1 (|uint|): return .r[1]
 	function r1 (assigns:|uint|): .r[1] = value
 	function r2 (|uint|): return .r[2]

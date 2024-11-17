@@ -276,7 +276,7 @@ extend ASMState
 				|| CC = fat.r2 + R
 				if CC.CanStoreAsIntImmediate
 					fat.r2 = CC
-					fat.out = dest
+					fat.r0 = dest
 					return true
 
 

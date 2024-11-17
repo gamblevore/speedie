@@ -34,7 +34,7 @@ extend asmstate
 				if From is ContainsAddr
 					from = .InlineOffset(from, 3, offset, 13~bits)
 					return exp.RFRD(Out, From, 1, offset)			// mem to reg
-				return exp.RFST(Out, From, nil)						// reg to reg
+				return exp.RFST(Out, From)							// reg to reg
 			
 			if  From is ContainsAddr
 				|| P = prms.second!
@@ -59,10 +59,20 @@ extend asmstate
 			target debug: if A is ContainsAddr						// always a reg!
 
 			if fn == Compiler.RefIncr
-				return exp.RFST(asmreg(), a, asmreg())
+				|| P = .last(asm.gstr)
+					if (p.r0 == a.reg) and p.r1 == 0
+						p.r1 = 1
+						return p
+				return exp.rfst(asmreg(), a)
 
 			if fn == Compiler.RefDecr
-				return exp.RFST(a, asmreg(), asmreg())
+				|| P = .last(asm.rfst)
+					if (p.r1 == a.reg) and (p.r0 == 0)
+						p.op = asm.rfap
+						p.r[0] = p.r[1]
+						p.r1 = 0
+						return p
+				return exp.RFST(a, asmreg())
 	
 			if fn == Compiler.RefSafeDecr
 				return exp.RFAP(asmreg(), a, asmreg())

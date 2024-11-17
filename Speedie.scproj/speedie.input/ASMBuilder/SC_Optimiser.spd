@@ -96,8 +96,8 @@ function OptNothing (fn_µopt) // do nothing
 function OptFunc (Fn_µOpt)
 	// TAILCALL
 	require N isa asm.ret
-	|| RetResult = N.out
-	|| FuncResult = .out
+	|| RetResult = N.r0
+	|| FuncResult = .r0
 	if RetResult == FuncResult // Return the result of this function
 		.op = asm.tail
 		OptPath "tail"
@@ -112,7 +112,7 @@ function OptSubI (Fn_µOpt)
 
 
 function OptAddI (Fn_µOpt)
-	|| out = .out
+	|| out = .r0
 	if .match3_2(0)
 		if out == .r1 // a = a + 0
 			OptPath "add->nop"
@@ -125,7 +125,7 @@ function OptAddI (Fn_µOpt)
 		return true
 	
 	require  p  and  !.r3
-	|| pout = p.out
+	|| pout = p.r0
 	require (pout == .r1)
 
 	// c = d << k,  a = b + c  -->  a = b + (d << k)
@@ -148,7 +148,7 @@ function OptAddI (Fn_µOpt)
 
 
 function OptAddF (Fn_µOpt)
-	|| mout = .out
+	|| mout = .r0
 	|| a4 = .r3
 	// a = b + (c - c),   (a = b + 0 - 0)
 	if (a4 == .r2)	or (.match3_2(0) and !a4)
@@ -164,7 +164,7 @@ function OptAddF (Fn_µOpt)
 
     // a*b + c --> MUL
 	require p  and  p.r4 == .r4		// Both are 64.  or both are 32
-	|| pout = p.out
+	|| pout = p.r0
 	if p isa asm.FADD
 		require .match3_2(pout)
 		if !p.r3 and !.r2				// pa = p2 + p3,   f1 = pa - f4   <--   f1 = p2 + p3 - f4
@@ -222,8 +222,8 @@ function OptBitNot (fn_µopt)
 
 	|| nl = n.r1
 	|| nr = n.r2
-	|| x = p.out
-	|| y = .out
+	|| x = p.r0
+	|| y = .r0
 	require  n.match3_2(x)  and  n.r1 == y
 	
 	if .has(x,y) or p.has(x,y)
@@ -276,7 +276,7 @@ function OptBitAnd (fn_µopt)
 //  x = a & contig_k2 --> bflg(a,k2)   // optimises well
 	// lets find if one is a const...
 	require p
-	|| pout = p.out
+	|| pout = p.r0
 
 
 function OptTern (fn_µopt)

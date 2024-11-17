@@ -56,19 +56,23 @@ function SemiConst (|int| f1, |int|)
 	|| x3 = f1 or  0
 	|| x4 = f1 and 1
 	|| x5 = f1 and 0
+	#!------
 
 	|| y6 = 1 or  f1
 	|| y7 = 0 or  f1
 	|| y8 = 1 and f1
 	|| y9 = 0 and f1
-	
+	#!------
 	y6 = 1 or  f1
 	y7 = 0 or  f1
 	y8 = 1 and f1
 	y9 = 0 and f1
+	#!y6
 	
 	y6 = y6 or y7*2
+	#!y8
 	y8 = !y8 and x2*3
+	#!ret
 	return y6+y8
 
 
@@ -172,6 +176,10 @@ function RefFuncs (|message| a, |string|)
 	a.parent
 	|| d = 3
 
+
+function RefCountOpts (|message| m)
+	|| x = m.name
+	
 
 function RefCountTests (|string| a, |string| b, |message| m, |message| mm)
 	// need destructor for refclear

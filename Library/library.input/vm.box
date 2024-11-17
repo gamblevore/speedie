@@ -508,7 +508,7 @@ POS 5
 /**/ RFAP  (U3)
 		SetRefApart(r, Op)
 
-/**/ RFST  (U3)
+/**/ RFST  (U2)
 		SetRefBasic(r, Op)		
 
 /**/ RFWR  (RefSet2)							// RefCount reg --> mem
