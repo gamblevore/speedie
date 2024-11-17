@@ -498,15 +498,34 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 		if t.super and t.hasOperator(comp.funcname)
 			return CustomOps.Needed
 
-	if comp == scoperator.LeftShift	   // we need to check for something
-		extra |= MsgRel.TryImproveShiftConstants(lc, rc)
+	if comp is shiftonly and rc is const
+		// check shift size
+		|| IsLeft = comp == scoperator.LeftShift
+		msgrel.CheckConstShift(lc, rc, isleft)
+		if (isleft) and (lc is const) 	   // we need to check for something
+			extra |= MsgRel.TryImproveShiftConstants(lc, rc)
 
 	return extra
 
 
+function message.CheckConstShift (|scdecl| LC, |scdecl| RC, |bool| Bigger)
+	|int64| rk = rc.exportposition
+	expect (rk >= 0) (self, "Invalid bit shift")
+	|| T = lc.typeinfo
+	|| BC = T.BitCount
+	if (T == datatypecode.bool)
+		if bigger
+			BC = 32
+		  else
+			BC = 1
+		
+	expect (rk < BC) (self, "Too large bit shift")
+		
+	
+
+	
 function message.TryImproveShiftConstants (|scdecl| LC, |scdecl| RC, |int|)
 	opt norefcounts
-	require lc is const and rc is const
 	|| lk = lc.exportposition
 	|| uk = lc is unknownconst
 	|| rk = rc.exportposition
