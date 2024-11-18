@@ -75,14 +75,16 @@ extend ASMState
 		dest = .temponly(exp, dest)
 		target debug
 			if !dest.reg and v // waaaaitttt
+		
+		if dest isnt textual
+			|| K = .last(asm.knst)
+				if k.r0 == dest.reg
+					.nop(k)
+
 		|| fat = exp.KNST(dest, 0, 0, 0)
 		fat.Const = v
-		|| desttype = dest.µtype
-		if  srctype!=desttype  and (dest is ForCast) // ooop
-			fat.ConvertConst(srctype, desttype)
-			dest.µtype = desttype
-		
-		.Makeconst(fat, dest)
+		(dest is realconst)
+		.MakeConst(fat, dest)
 		return fat
 	
 
@@ -100,12 +102,11 @@ extend ASMState
 	function _Num (|message| exp, |int64| V, |asmreg| Reg, |datatypecode| SrcType, |asmreg|)
 		return .NumToFat(exp, v, reg, SrcType).info
 		
+
 	function NumToReg (|message| exp, |int64| V, |asmreg| Reg, |datatypecode| SrcType, |asmreg|)
 		if v // or (reg.reg)
 			return ._Num(exp, v, reg, SrcType)
 
-//		if reg.reg
-//			printline exp
 		rz = asmreg.ZeroParam as (reg & asmreg.ConstInput)
 		rz.µType = SrcType
 	
@@ -120,11 +121,6 @@ extend ASMState
 		.NumToReg(orig, value, RegMsg.Reg.textasm, datatypecode.uint64)
 		return true
 	
-	
-//	function InCurrBlock (|&fatasm| fat, |bool|)
-//		if fat
-//			return fat.BlockNum == .BasicBlock
-		
 
 	
 	

@@ -47,9 +47,6 @@ datatype FunctionType (int)
 		Cpp
 		
 		ConOrDes = Constructor + Destructor
-		
-//	syntax is (|FunctionType| t, |bool|)
-//		return self & t
 
 
 
@@ -390,8 +387,7 @@ function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming,
 			for (b.bits in altered) (i)
 				|| m = incoming.items[i]
 					|| d = m.obj as scdecl
-					if d is local
-						d.markasaltered
+					d.markasaltered
 		
 		|| ft = rz.StructReturned
 			incoming.StructLover(ft.aslocal, self)
@@ -1161,11 +1157,12 @@ function RegType (|datatypecode|)
 
 function scdecl.MarkAsAltered 
 	opt norefcounts
-	(self is altered)
-	if self is TypeImprove
-		|| orig = .IsLookupOnly
-		if orig isa scdecl
-			(orig is altered)
+	if self is local
+		(self is altered)
+		if self is TypeImprove
+			|| orig = .IsLookupOnly
+			if orig isa scdecl
+				(orig is altered)
 
 
 
@@ -1292,14 +1289,13 @@ function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side,  |SC
 	Using (exp)
 	|message| exp_copy
 	if exp != @thg
-		exp_copy = exp.copy			// needed before get type :(
-									// or else we can't do array.size++
+		exp_copy = exp.copy				// needed before get type :(
+										// or else we can't do array.size++
 
 	|| Type = TypeOfExpr( exp, name_space )					#require
 	if type.PointerCount > 0
-//		if IsARel
-//			problem msg
 		check (!side) (msg, "Not assignable.")
+		type.MarkAsAltered
 		return type.CheckMath(msg)
 
 	check (!Type.IsBool) (msg, "Can't do ++ or -- on bools. (use '!' instead")
@@ -1308,8 +1304,7 @@ function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side,  |SC
 
 	|| numc = Type.type.NumericCount
 	if !Type.type.IsObject  and  !type.hiderfunc  and  numc <= 1
-//		if IsARel
-//			problem msg
+		type.MarkAsAltered
 		check (!side) (msg, "Not assignable.")
 		return type
 

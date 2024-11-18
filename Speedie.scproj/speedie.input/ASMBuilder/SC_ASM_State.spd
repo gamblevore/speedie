@@ -8,11 +8,13 @@ struct ASMState
 	|byte|						VTmps
 	|datatypecode|				ReturnASM
 	|bool|						OK    
-	|bool|						Inited   
+	|bool|						Inited
+	|asmreg|					InlineReturnTo
 
+	target debug
+		|&fatasm|				LastProgress
 	|µFunc|						Out      
 	|&FatASM|					FuncStart
-	|&fatasm|					LastProgress
 	|&FatASM|					Start		// a "slice" feature would be nice    
 	|&FatASM|					Curr    
 	|&FatASM|					End    
@@ -53,7 +55,8 @@ struct ASMState
 	function Last (|asm| type, |&FatASM|)
 		|| L = .curr - 1
 		if l isa type
-			return L
+			if l.blocknum == .basicblock
+				return L
 	
 	function IntPowerOfTwo (|asmreg| r, |int| Sub=0, |FailableInt|)
 		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
@@ -149,7 +152,7 @@ struct ASMState
 		check (r > .vdecls) (where, "No free local variables.")
 		t.reg = r
 		.vtmps = r
-		(t isnt kindaconst) // why would it be?
+		(t isnt realconst) // why would it be?
 		(t is temp)
 		return t
 	
@@ -165,14 +168,14 @@ struct ASMState
 		.nopconst(A) // in case of swapped order
 	
 	function Const (|asmreg| R, |int| bits, |bool| signed, |ind|)
-		if R & asmreg.KindaConst
+		if R is ConstOutput
 			|| k = R.const
 			if k.fits(bits, signed)
 				.nopconst(R)
 				return k|uint64|.trim(bits)
 
 	function NopConst (|asmreg| R)
-		if r is RealConst
+		if (r is RemoveableOutput) or (r is realconst)
 			|| f = r.fat
 				.Nop(f)
 	
@@ -183,8 +186,8 @@ struct ASMState
 		if R == C
 			.curr = C // nice
 
-	function Nop (|fatrange| R)
-		.nop(r.start, r.after!)
+//	function Nop (|fatrange| R)
+//		.nop(r.start, r.after!)
 
 
 	function Nop (|fatasm| Start, |fatasm| After)
@@ -200,18 +203,18 @@ struct ASMState
 		if  (X.µtype isnt bool)  or  (dest is negate  and  X isnt AlreadyNegated)
 			return .exists(dest as (X bitand asmreg.fromexistingvar), X, exp)
 		return .Assign(dest, X, exp)
-			
-		
+
+
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
 		|| rz = .µ(Exp, dest)
 		|| dest2 = rz.reg(dest)
 		(dest2 is temp) = (dest is temp)
 		return .Assign(Dest2, rz, exp)
-	
-			
+
+		
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		|| Closer = .OpenVars
-		rz = .µopen(exp, dest)
+		rz = .µOpen(exp, dest)
 		.CloseVars(Closer)
 
 
@@ -247,7 +250,7 @@ struct ASMState
 	function FuncPrm (|message| prm, |asmreg|)
 		|| r = .ExistingVar(prm)
 			return r
-		return .µopen(prm)
+		return .µOpen(prm)
 
 
 	function ReadOrWrite (|ASMReg| dest, |message| m, |asmreg| base, |asmreg| varadd, |int| index=0, |asmreg|)
@@ -301,7 +304,6 @@ struct ASMState
 		opt inline
 		(dest is set)
 		return .ReadOrWriteSub(dest, exp, ptr, varadd, index)
-
 
 
 	function PrmCollectC (|message| prms, |SCFunction| fn, |uint64|)
@@ -384,11 +386,11 @@ struct ASMState
 			.out = µfunc(fn, .curr)
 		.zero = nil
 		.zero.info = AsmReg()
-		(.zero is NeverAltered)
 		memory.Fill((&.neveraltered[0])|&byte|, –sizeof .neveraltered, 0)
 		.neveraltered[0] = .zero.Index
 		.FuncStart = .curr
-		.LastProgress = .curr
+		target debug
+			.LastProgress = .curr
 		scfunction.currfunc = fn
 		.ReturnASM = fn.ReturnType.regtype
 		.OK = true
@@ -407,6 +409,37 @@ struct ASMState
 			expect (!fn.returntype) ("ASMReturn".internal) // why?
 			fn.SourceArg!.RET(asmreg(), asmreg(), asmreg(), 1, 0)
 		.SetLength
+		.ImproveJumps
+
+
+	function fatasm.JumpImprove (|bool|)
+		|| D = self
+		|| n = 0
+		while
+			n++
+			expect (n < 30) (.msg)
+			D = D.jumpto			#require
+			if d isa asm.jump
+/				.jumpto = D
+				rz = true
+				continue
+			if d isa asm.ret
+				(self)[0] = (d)[0]
+				rz = true
+			exit
+
+
+	function ImproveJumps
+		|| A = .Curr
+		|| J = .funcstart
+		|| C = 0
+		while A > J
+			if J isa asm.jump
+				C += J.JumpImprove
+			J++
+		target debug
+			if C
+				PrintProgress(nil)
 
 
 	function SetLength
@@ -414,10 +447,6 @@ struct ASMState
 		
 		
 	function SmartSecretFat (|asmreg| Thg, |&fatasm|)
-		// OK... so what if we want the fat from a @thg?
-		// whre is it? the last thing that set to it, right?
-		// well no, we can't just erase that, as others might be reading it.
-		// So lets make sure of ALL of that.
 		|| F = thg.fat
 			return F
 		
@@ -459,25 +488,83 @@ function SCFunction.HasCVersion (|bool|)
 
 /* The .asint/.asfloat functions should be recognised as working on constants? Or is that just a general case of inline functions? Technically, its an inline func that does nothing, just returns the original... with a different type. */
 
-function @ASMType.DoFunction (fn_Asm)
+
+function ASMState.IsASMConst (|message| exp, |bool|)
+	|| fn = exp.func
+	if fn == @num
+		return true
+	if fn == @thg // now what?
+		return ASMType.ThgSub(self, exp, ASMReg.ConstRequest)
+
+
+
+function ASMState.TryInline (|message| prms, |asmreg| dest, |µFunc| asm)
+	opt norefcounts
+	|| fn = asm.fn
+	.InlineReturnTo = dest
+
+// theres a lot to do here...
+// if we don't alter the param... we can just use it, it doesn't need to be declared...
+
+	|| p = prms.first
+	for a in fn.Args
+// fix this later
+		if a isnt Altered
+			debugger 
+		  else
+			|| SubDest = .DeclareMe(a.source, a)
+			.µInto(p!, SubDest)
+		p++
+	
+	ASMType.arg(self, fn.SourceArg!, ASMReg())
+	.InlineReturnTo = nil
+
+
+
+function ASMState.AskForInline (|message| prms, |asmreg| dest, |SCFunction| fn, |bool|)
+	opt norefcounts
+	|| A = fn.ASM
+	require A and !fn.HasCVersion
+	|| Gain = 5	- (A.Length-1)				// assume that functions have 5 instruction overhead.
+	Gain += (fn is inline) * 20				// sigh...
+	
+	|| K = 0
+	for p.fast in prms
+		K += .IsASMConst(p)
+
+	require Gain + K > 0
+
+	|| Start = .curr
+	.TryInline(prms, dest, A)
+	|| Grown = .curr - start
+	if Grown < gain
+		return true
+	.curr = start
+
+
+
+function @ASMType.DoFunction (fn_asm)
 	opt norefcounts
 	|| prms = exp.last!
 	|| fn = prms.asfunc!
 	
 	dest.µtype = fn.RegType
-	dest = .CallFunc(exp, dest)
+	if .AskForInline(prms, dest, fn)
+		return dest
 
-	|| Closer = .openvars
+	dest = .CallFunc(exp, dest)
+	
+	|| Closer = .OpenVars
 	|| P = .PrmCollect(prms, fn)
 	.CloseVars(Closer)
 	
 	|| PExt = P >> 32
-	|| fat = exp.FNC(dest, fn.tableid+31, P,  PExt)
+	|| fat = exp.FNC(dest, fn.TableID+31, P,  PExt)
 	if fn.HasCVersion
 		fat.op = asm.FNCX
 	fat.op += PExt > 0
 	return fat * dest
-//  Mostly I'm doing:  || x = msg.function(),  (which uses the correct position.)
+
 
 // Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:4
 // There are only 4 above 6!, only 14 above 5, 75 above 4

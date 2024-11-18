@@ -53,10 +53,8 @@ module SpdAssembler
 	function GenerateASMSub (|scfunction| fn, |bool|)
 		opt norefcounts
 		ASMState.Sh.StartFunc(fn)
-		|| fp = fn_asm_table[@arg]!
-		|| R = asmreg()
 		|| A = fn.SourceArg!
-		ASMType.arg(ASmState.Sh, A, R)
+		ASMType.arg(ASmState.Sh, A, ASMReg())
 		ASMState.Sh.FinishASM
 		.Guard
 		return ASMState.Sh.ok

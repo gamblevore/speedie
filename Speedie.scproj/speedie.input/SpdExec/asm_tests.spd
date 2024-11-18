@@ -9,13 +9,43 @@ module ASMExamples {
 //	printline .A
 //}
 target pack { 
-	
+
 
 class LargeClass2 {
 	|byte[100]|   a
 	|uint16[100]| b
 }
 
+
+function InlineTest1 (|int| A, |int| B, |int|)
+	if A > 0
+		return B+1
+	return B-1
+	
+
+function InlineDecl (|scdecl| X)
+	|| y = x.IsUnknownParam
+	// what kind of tests do I want? just somthing with branchs and consts...
+
+
+function InlineInt (|int| A)
+	#!BBB
+	|| B = inlinetest1(1, 2)
+	#!CCC
+	|| C = inlinetest1(-1, 2)
+	#!DDD
+	|| D = inlinetest1(-1, 0)
+	#!EEE
+	|| E = A+inlinetest1(-1, 0)
+	#!FFF
+	|| F = inlinetest1(-1, A)
+	#!GGG
+	|| G = inlinetest1(A, 0)
+	#!HHH
+	|| H = inlinetest1(A, A)
+	// what kind of tests do I want? just somthing with branchs and consts...
+
+	
 function AskConst (|int| x)
 	|| y = 14
 	|| z = x << y
@@ -125,6 +155,8 @@ function Consts (|float64|)
 	|| r5 = 1234.5|float64| + 5678.9|float64|	// f64 + f64
 	|float| r6 = 2								// int as f32
 	|float64| r7 = 1.0							// f32 as f64
+	|| r8 = r3 + r4
+	|| r9 = r4|float64| + r7
 	return r2 + r5
 
 
@@ -452,8 +484,6 @@ function Func27 (|message?| m)
 		printline s.name
 
 
-
-
 helper asm_test_add (|int| a, |int| b, |int|)
 	cpp_name asm_test_sub
 	visible
@@ -493,10 +523,21 @@ helper asm_test_largeclass (|LargeClass2| L)
 	|| z = &l.b[5]
 
 
+helper jump_improvements (|int| a, |int|)
+	Rz = 1
+	|| m = message()
+	if a
+		rz++
+	  else
+		rz--
+	(m)
+	
+
+
 helper asm_test_flow (|int| a, |int| b, |int|)
 	cpp_name asm_test_flow
 	visible
-	if 1.CountBits == 3.CountBits
+	if 3.CountBits == 4.CountBits
 		|| x = 2
 	if a > b
 		a = b

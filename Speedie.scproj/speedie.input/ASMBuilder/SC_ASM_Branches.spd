@@ -2,9 +2,15 @@
 
 #!"if (x) return, a(), b()   -->   if !x {a(), b()}, return"
 
+
 extend ASMState {
 
 function ArgOrIf (|message?| other, |asmreg|)
+	rz = .ArgOrIfSub(other)
+	.BasicBlock++
+
+
+function ArgOrIfSub (|message?| other, |asmreg|)
 	opt norefcounts
 	if other
 		|| T = other.asmtype
@@ -20,8 +26,7 @@ function ArgOrIf (|message?| other, |asmreg|)
 
 function IfEmpty (|message| cond, |message| other, |asmreg|)
 	if !other
-/		return .µ(cond, asmreg.Discard)			// if (x())    -->   x()
-	// optimise branch a little
+/		return .µ(cond, asmreg.Discard)							// if (x())    -->   x()
 	|fatrange| B
 /	.Branch(cond, true, B)
 	if b.never
@@ -31,26 +36,26 @@ function IfEmpty (|message| cond, |message| other, |asmreg|)
 	return asmreg()
 
 
-function If				(fn_asm)
+function If (fn_asm)
 	opt norefcounts
 	
 	|| cond = exp.first!,  || arg1 = cond.next!
-	|| Other = arg1.next					// else / elseif
-	
+	|| Other = arg1.next
 	if !arg1.HasAsmStuff
 		return .IfEmpty(cond, other)
 
-	|fatrange| B
+	|FATRange| B
 	.Branch(cond, B)
 	if b.never
 		return .ArgOrIf(other)
 
 	ASMType.arg(self, arg1)
-	B.AllJumpTo(.curr)
 	if b.always or !other
+		B.AllJumpTo(.curr)
 		.BasicBlock++
 		return asmreg()						// were done!
 
+	B.AllJumpTo(.curr+1)
 	|| AfterFirst = arg1.jump(0)
 	.ArgOrIf(other)
 	AfterFirst.jumpto = .curr
@@ -291,7 +296,7 @@ function BoolConst2 (|asmreg| mr, |asmreg| Dest,  |opmode| Opp, |message| exp, |
 		return ml
 	
 	if ml is FromExistingVar // why not?
-		.nop(ml)
+		.Nop(ml)
 	mr.µtype = DataTypeCode.bool
 	return .SetConst(exp, v|int|, mr, dest)
 
@@ -359,11 +364,11 @@ Struct FatRange
 	
 	function Always (|bool|)
 		opt inline
-		return .constness.knowntrue
+		return .constness.KnownTrue
 	
 	function Never (|bool|)
 		opt inline
-		return .constness.knownfalse
+		return .constness.KnownFalse
 				
 	iterator
 		|| curr = .after!
@@ -379,6 +384,7 @@ Struct FatRange
 
 
 function @asmstate.PrintProgress (|message| exp)
+	target debug {
 	cpp_name adb
 	opt norefcounts
 	"---"
@@ -393,4 +399,4 @@ function @asmstate.PrintProgress (|message| exp)
 		curr.debugprint
 		curr++
 	s.LastProgress = curr
-
+	}

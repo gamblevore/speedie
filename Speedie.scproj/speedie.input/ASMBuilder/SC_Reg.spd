@@ -21,19 +21,17 @@ datatype ASMReg (uint64)
 		Discard
 		Set
 		Declaration
-		ForCast
 		Temp
 		SingleExpr
 		NoScale
-		NeverAltered
 		ContainsAddr
 		Textual
+		ConstRequest
 		CondRequest
 		CondAnswer
 		RealConst  = [ConstInput, ConstOutput]
 		AddrNeed   = [AddrRequest, AddrForceRequest]
-		KindaConst = RealConst ||| NeverAltered
-//		SetRelRemove = KindaConst ||| StayOpen
+		RemoveableOutput = ConstOutput|||Temp
 		Zero	   = RealConst ||| 56 ||| param		// 56 == datatypecode.uint64
 		ZeroParam  = ConstOutput ||| param
 	
