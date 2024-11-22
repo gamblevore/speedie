@@ -250,7 +250,7 @@ class ButtonView (GUIControl)
 					G.overlay(0.3~black, 0.25)
 				  else
 					|| amount = (0.66, 0.3)(i is active)
-					G.overlay((1.0, 1.0, 0.5, amount).premul, 0.25)
+					G.overlay((1.0, 1.0, 0.5, amount), 0.25)
 				
 			if disabled
 				G.overlay(0.6~gray, 0.4)
@@ -266,7 +266,7 @@ class ButtonView (GUIControl)
 		|| Pn = R.TextCorner(g,  t,  .align) + (0, 1)
 		|| DrawInvis = (.align & listviewstate.DrawWhiteSpace)!=0
 		|| TextCol = colors.white
-		textcol.alpha = fader
+		textcol.a = fader
 		pn.x = font.small!.DrawText(t,  Where,  Pn, TextCol, DrawInvis) + 2
 		|| MI = MouseXInside and  (R.y1y2 contains M.y)
 			if  !disabled and .pressing  and  r.Width > 19  

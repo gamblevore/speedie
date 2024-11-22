@@ -169,7 +169,7 @@ class Image (memory)
 			curr+=step
 	
 	
-	function Clear (|imagepixel| Color=colors.black)
+	function Clear (|vec4| Color=colors.black)
 		.DrawRect((0,0,.size), color)
 	
 	
@@ -481,18 +481,19 @@ class Image (memory)
 			
 				
 		
-	function DrawRect (|ivec4| Rect, |ImagePixel| Color)
+	function DrawRect (|ivec4| Rect, |vec4| Color)
 		cpp_part SimpleRectSub
-		require Color.a
+		|| px = color.px
+		require px.a
 		if color.a != 255
 			|| c = color.PreMul
 			for (sigh in self[rect]) (v)
 				sigh.Overlay(C)
 		  elseif Rect == .rect
-			memory.fillint(.ptr|&int|, .length, color.uint)
+			memory.fillint(.ptr|&int|, .length, px.uint)
 		  else
 			for (sigh in self[rect]) (v)
-				sigh[0] = color
+				sigh[0] = px
 
 
 	function DrawOutlineOnly (|ivec4| R, |ImagePixel| Edge, |imagepixel| attached_edge=imagepixel.clear, |MoveCode| AllowEdge=MoveCode.all)

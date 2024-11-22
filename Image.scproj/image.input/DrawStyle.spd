@@ -41,7 +41,8 @@ class DrawStyle
 		fs <~ "\ntext: "
 		.text.Render(fs)
 	
-	function Overlay (|PreMultipliedColor| T, |float| a=0)
+	function Overlay (|vec4| C, |float| a=0)
+		|| T = C.PreMul
 		.BG.overlay(T)
 		.Edge.overlay(T)
 		if a

@@ -50,7 +50,7 @@ class MessageView (ListView)
 				|| v	= (6 + .depth(parent)*sh, texty)
 				|| mod	= d.ismodified?
 				|| ddd	= (Colors.black(0.5), Colors.clear)(mod)
-				ddd.Alpha *= strength
+				ddd.a *= strength
 				font.small!.drawicon(.Modifier, where, V, ddd)
 
 				if .HasError

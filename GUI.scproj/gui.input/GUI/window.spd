@@ -7,7 +7,7 @@ class Window (GUIControl)
 	|bool|								AlphaSubtle
 	|bool|								IsDialog
 	|bool|								FlashSelf
-	|bool|								BlockRecurseKeyDown
+	|bool|								_BlockRecurseKeyDown
 	|bool| 								IsLiveAction
 	|GUIControl?|						Focus
 	|Guicontrol?|						InnerFocus
@@ -235,10 +235,10 @@ class Window (GUIControl)
 			
 	
 	behaviour KeyDown
-		debug_require !.BlockRecurseKeyDown
-		.BlockRecurseKeyDown = true
+		debug_require !._BlockRecurseKeyDown
+		._BlockRecurseKeyDown = true
 		rz = .KeyDownWin(key)
-		.BlockRecurseKeyDown = false
+		._BlockRecurseKeyDown = false
 
 
 	helper KeyDownWin (|keys| key, |bool|)

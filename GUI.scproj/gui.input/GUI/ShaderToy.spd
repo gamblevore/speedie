@@ -8,10 +8,21 @@ prototype ShaderToyFunc (|ShaderToy| self,  |vec2| Resolution,  |vec2| Pos,  |ve
 		return win.RunAsMain
 
 
-class ShaderToy (window)
+class FPSTextView (textview)
 	|date| 			LastDraw
 	|date| 			LastFPSChange
-	|textview| 		FPS
+
+	function Update
+		|| Ago = .LastDraw.ago
+		.LastDraw = date.now
+		.LastFPSChange ?= .LastDraw
+		if .LastFPSChange.ago > 0.5s
+			.text = (1.0/ago.float).Render(1) + "fps"
+			.LastFPSChange = .LastDraw
+
+
+class ShaderToy (window)
+	|fpstextview| 	FPS
 	|vec3|			cam
 	|float|			Time
 	|ShaderToyFunc| Shader
@@ -19,26 +30,21 @@ class ShaderToy (window)
 
 	constructor (|ShaderToyFunc| fn)
 		.Shader = fn
-		.FPS = .TextView(false)
+		.FPS = fpsTextView(self)
+		.fps.MakeInline()
 		.GNormal.clear // black background
 	
 	
 	behaviour Drawbackground
 		opt norefcounts
 		opt min 3
-		|| Ago = .LastDraw.ago
-		.LastDraw = date.now
-		.LastFPSChange ?= .LastDraw
-		if .LastFPSChange.ago > 0.5s
-			.fps.text = (1.0/ago.float).Render(1) + "fps"
-			printline .fps.text
-			.LastFPSChange = .LastDraw
+		.fps.Update
 		
+		.time = (GUI.FrameStart - .CreatedDate).Float
 		|| size = where.size.vec2
 		|| scale = 1.0/size.xx
 		|| adjust = size*-0.5	
 		for (c in where) (p)
-			.time = (.LastDraw - .CreatedDate).Float
 			|| pv = p.vec2
 			|| XY = (pv + adjust) * scale
 			|| Col = (.Shader)(self, size, pv, XY)

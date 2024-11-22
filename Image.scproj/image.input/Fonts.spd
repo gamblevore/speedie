@@ -37,7 +37,7 @@ module font
 		Height = 9 
 
 
-function image.DrawText (|string| Str, |image| Where, |ivec2| xy=(0,0), |ImagePixel| Col = ImagePixel.clear, |bool| DrawInvis=false, |int|)
+function image.DrawText (|string| Str, |image| Where, |ivec2| xy=(0,0), |vec4| Col = colors.clear, |bool| DrawInvis=false, |int|)
 	opt min 3
 	require (str and Where.Pixels and .Pixels)
 	for c.codepoints in str
@@ -49,7 +49,7 @@ function image.DrawText (|string| Str, |image| Where, |ivec2| xy=(0,0), |ImagePi
 		
 
 
-function image.DrawTextWrap (|string| Str, |image| Where, |ivec2| xy, |ImagePixel| Col, |int| H)
+function image.DrawTextWrap (|string| Str, |image| Where, |ivec2| xy, |vec4| Col, |int| H)
 	opt min 3
 	|| lines = (H / 12) max 1
 	if lines <= 1
@@ -97,11 +97,11 @@ function vec4.FontPixelCleanup (|vec4|)
 
 
 
-function image.DrawIcon (|CodePoint| C, |image| Where, |ivec2| XY, |imagepixel| Col=colors.white)
+function image.DrawIcon (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col=colors.white)
 	.drawchar(c, where, xy, col, 0) 
 
 
-function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |imagepixel| Col, |int| DrawMode=1, |int|)
+function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |int| DrawMode=1, |int|)
 	opt min 3
 	rz = (font.Width + XY.x) max 1
 	if c.iswhite
@@ -127,7 +127,6 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |imagepixel| 
 	if !col.a and (drawmode == 1)
 		col = colors.white
 	
-	|| col4		= col.color 
 	|| Read		= (font.Width, font.Height-1)
 	|| Clip		= where.clip((XY, xy+Read))
 	if !clip.ispositive
@@ -135,10 +134,10 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |imagepixel| 
 	
 	|| X2  		= C|int| * font.Width
 	|| v0		= (X2, 0) - xy
-	if (c < 32) and (col4 == vec4(1) or drawmode == 1)
+	if (c < 32) and (col == vec4(1) or drawmode == 1)
 		drawmode = -1
 	  elseif drawmode == 1
-		drawmode = col.a + 1
+		drawmode = (col.a*255.0)|int| + 1
 
 	|| y = 0
 	while clip.y < clip.y2
@@ -159,11 +158,11 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |imagepixel| 
 						dz <~ col								// opaque pixel
 					  else
 						|| f = A|float| * 65536th
-						dz <~ mix(dz.color, col4, f)			// transparent pixel
+						dz <~ mix(dz.color, col, f)			// transparent pixel
 				  elseif drawmode < 0
 					dz <~ sz									// emoji direct
 				  else
-					dz <~ mix(sz.color, col4, col4.a)			// emoji darkened
+					dz <~ mix(sz.color, col, col.a)			// emoji darkened
 			sz++
 			dz++
 		clip.y++
@@ -174,40 +173,6 @@ function message.Now (||)
 	|| a = .slowcount #require
 	|int| b = date.now mod a
 	return self[b]
-
-//extend FastString
-//
-//	function Picture (|int| c, |image| f)
-//		cpp_part ram_test_encode
-//		if c > 127 // unicode...
-//			c = 32
-//		elseif c == 32
-//			c = 0
-//		
-//		|| X0 = C * font.Width
-//		for x in font.Width
-//			|| B = 0
-//			for y in 8
-//				|| rz = f[x0 + x,  y]
-//				if rz.hascolor
-//					b |= (1<<y)
-//			self <~ b|byte|
-
-
-//extend string
-//	render Picture (|image| font=font.small)
-//		cpp_part ram_test_encode
-//		for c in self
-//			fs.Picture(c, font)
-//
-//
-//	render Depicture
-//		cpp_part ram_test_decode
-//		for row in (7 downto 0)
-//			for c in self
-//				|| bit = c & (1 << row)
-//				fs <~ ('*', ' ')(bit)
-//			fs <~ '\n'
 
 		
 function string.EndsWithLine (|bool|)

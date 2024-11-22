@@ -571,7 +571,7 @@ class FileViewer (ListView)
 				|| v	= (6 + .depth(parent)*sh, texty)
 				|| mod	= ._Document.ismodified?
 				|| ddd	= (Colors.black(0.5), Colors.clear)(mod)
-				ddd.alpha *= strength // sigh...
+				ddd.a *= strength // sigh...
 				font.small!.drawicon(.Modifier, where, V, ddd)
 
 				if .HasError and (!.hasany or self isnt expanded)
