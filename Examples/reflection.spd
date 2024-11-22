@@ -5,6 +5,13 @@ main
 	return Breakout()
  
 
+// make spirals expand (or just replace with explosions)
+// some blocks add balls...
+	// they will head towards a random block (with random offset so it might miss)
+// some blocks explode nearby things
+// some are resistant (by color)
+
+
 class Breakout (Window)
 	|fpstextview|		FPS
 	|[block]|			Blocks
@@ -12,6 +19,7 @@ class Breakout (Window)
 	|[block]|			Balls
 	|float|				BallSpeed
 	|int|				Hits
+	|[block]|			Spirals
 
 	constructor
 		.bar  = block(vec4())
@@ -22,7 +30,7 @@ class Breakout (Window)
 	function addballs (|int| n)	
 		|| H = 6.0
 		for n
-			|| b = block(vec4(10.0, H, 16th,  16th))
+			|| b = block(vec4(10.3, H, 16th,  16th))
 			H++
 			b.Velocity = vec2(0, -.ballspeed)
 			.balls <~ b
@@ -41,14 +49,15 @@ class Breakout (Window)
 				|| pos = (2.0+x*(16.0/9.0), 9.0+y*0.5,  0.75, 0.2)
 				.Blocks <~ block(pos, col)
 	
-	function BounceBar (|block| A, |block| B,  |bool|)
-		|| Hit = A.OverlapsBlock(B)
+	
+	function BounceBar (|block| bar, |block| B,  |bool|)
+		|| Hit = bar.OverlapsBlock(B)
 		require hit.Exists
 		|| v = b.Velocity
 		require v.y < 0.0
-		|| D = b.pos - a.pos
+		|| D = (b.pos - bar.pos) / bar.Radius
 		v.y = -v.y
-		v.x = d.x*0.05
+		v.x = d.x * 0.2
 		b.Velocity = v.Normal*.ballspeed
 		return true
 
@@ -79,6 +88,9 @@ class Breakout (Window)
 		for (bl.backwards in .Blocks) (i)
 			|| R2 = bl.OverlapsRect(R)
 			if r2.exists
+				|| Cn = r2.Center
+				.spirals <~ block((cn, 3.0, 3.0), vec4(0.5,0,0,0))
+				
 				.blocks.FastRemove(i)
 				
 				if r2.Height > r2.Width
@@ -102,7 +114,11 @@ class Breakout (Window)
 					beep "You failed"
 					.reset
 		.bar.Pos += keys.Vec3.xz * (0.2, 0.0)
-			
+		
+		for (s.backwards in .Spirals) (i)
+			s.Radius -= 0.03
+			if s.Radius.x < 0
+				.Spirals.Remove(i)
 		gui.Touch
 		.fps.update
 	
@@ -114,6 +130,10 @@ class Breakout (Window)
 		for b in .Blocks
 			b.draw(Where, J)
 		.bar.draw(Where, J)
+		|| L = 24s()
+		for (s in .Spirals) (i)
+			|| B = s.boxj(J)
+			where.DrawSpiral(0.01*b.width|float|*j.x, L, b.center, s.color * 0.2[], (3s+i*1s)())
 		for b in .balls
 			b.draw(where, J)
 
@@ -145,14 +165,17 @@ class Block
 		|| rad = .Radius
 		return (.pos-rad, .pos+rad)
 
-	function Draw (|image| where, |vec4| J, |ivec4|)
+	function BoxJ (|vec4| J, |ivec4|)
 		|| P = .box * J.xyxy + J.zwzw
 		|| w = p.Width
 		|| h = p.Height
 		p = p.floor
 		p.x2 = p.x + w
 		p.y2 = p.y + h
-		rz = p.iVec4
+		return p.iVec4
+		
+	function Draw (|image| where, |vec4| J, |ivec4|)
+		rz = .BoxJ(J)
 		where.DrawRect(rz, .Color)
 
 	function Step
@@ -165,3 +188,25 @@ class Block
 		
 // later: handle other ratios, for example (Add borders)
 // could we try to get closer to phi? say trim a few pixels off the top? to 865 pixels
+
+
+	
+function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| HSB, |float| Pulse)
+	|| sub = 24.0
+	max+=sub/2
+	Pulse = Pulse * max
+	for j in max
+		if j <= sub
+			continue 
+		|| i = j - sub
+		|| R = ((i*0.2123)+angle).SinCos
+		|| closeness = (i - Pulse + 4.0() ).abs
+		|| strength = (-0.005*closeness.pow2).Exp * 5.0
+
+		|| P = R*(50.0+i+strength) + XY
+		|| Circle = (P-4.0, P+4.0)
+		|| A = ((Max-i)*2.0)/max
+		|| C = Colors.HSB((i*0.005, 0.7, 1.0, A)+HSB)
+	
+		.DrawSoftCircle(Circle, C)
+
