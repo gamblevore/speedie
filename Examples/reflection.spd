@@ -1,0 +1,167 @@
+#!/usr/local/bin/spd
+import "GUI"
+
+main
+	return Breakout()
+ 
+
+class Breakout (Window)
+	|fpstextview|		FPS
+	|[block]|			Blocks
+	|block|				Bar
+	|[block]|			Balls
+	|float|				BallSpeed
+	|int|				Hits
+
+	constructor
+		.bar  = block(vec4())
+		.fps = fpstextview(self)
+		.fps.MakeInline()
+		.reset
+
+	function addballs (|int| n)	
+		|| H = 6.0
+		for n
+			|| b = block(vec4(10.0, H, 16th,  16th))
+			H++
+			b.Velocity = vec2(0, -.ballspeed)
+			.balls <~ b
+
+	function reset
+		.ballspeed = 0.09
+		.bar.pos = vec2(10.0, 1.0)
+		.bar.radius = vec2(1.0,  0.125)
+		.balls.length = 0
+		.Blocks.Length = 0
+		.addballs(2)
+		for y in 5.0
+			|| y2 = -1.0 + y*3th
+			|| Col = colors.hsb(((-y2+0.75)*16th, 0.8, 0.5, 1.0))
+			for x in 10.0
+				|| pos = (2.0+x*(16.0/9.0), 9.0+y*0.5,  0.75, 0.2)
+				.Blocks <~ block(pos, col)
+	
+	function BounceBar (|block| A, |block| B,  |bool|)
+		|| Hit = A.OverlapsBlock(B)
+		require hit.Exists
+		|| v = b.Velocity
+		require v.y < 0.0
+		|| D = b.pos - a.pos
+		v.y = -v.y
+		v.x = d.x*0.05
+		b.Velocity = v.Normal*.ballspeed
+		return true
+
+
+	function Bounds (|block| b)
+		|| bvx = b.Velocity.x
+		if bvx < 0
+			if b.left <= 0
+				bvx = -bvx
+		  else
+			if b.right >= 20.0
+				bvx = -bvx
+		b.Velocity.x = bvx
+		
+		if b.y >= 12.0
+			b.Velocity.y = -b.Velocity.y
+	
+	
+	function Incr (|float|)
+		|| h = ++.Hits
+		|| add = 0.02 / h|float| pow 1.5
+		.BallSpeed += add
+		return .BallSpeed
+	
+			
+	function DoHits (|block| b)
+		|| R = b.box
+		for (bl.backwards in .Blocks) (i)
+			|| R2 = bl.OverlapsRect(R)
+			if r2.exists
+				.blocks.FastRemove(i)
+				
+				if r2.Height > r2.Width
+					b.Velocity.x = -b.Velocity.x
+				  else
+					b.Velocity.y = -b.Velocity.y
+				b.Velocity = b.Velocity.Normal * .incr
+				exit 
+	
+	
+	behaviour FrameStep
+		require !ShouldNotDisturbGUI
+		for (b.backwards in .balls) (i)
+			b.Step
+			.bounds(b)
+			.Dohits(b)
+			.BounceBar(.bar, b)
+			if b.y <= 0
+				.balls.FastRemove(i)
+				if !.balls
+					beep "You failed"
+					.reset
+		.bar.Pos += keys.Vec3.xz * (0.2, 0.0)
+			
+		gui.Touch
+		.fps.update
+	
+	
+	behaviour Drawbackground
+		where.DrawRect(self, colors.black)	
+		|| C = .LastRect.vec4
+		|| J = ((c.width, c.height, 0, 0) / (20.0, 12.5, 1.0, 1.0))
+		for b in .Blocks
+			b.draw(Where, J)
+		.bar.draw(Where, J)
+		for b in .balls
+			b.draw(where, J)
+
+
+class Block
+	|vec2| Pos
+	|vec2| Radius
+	|vec2| Velocity
+	|vec4| Color
+	
+	constructor (|vec4| Pos_Rad, |vec4| Color=colors.white)
+		.pos = Pos_Rad.xy
+		.Radius = Pos_Rad.zw
+		.Color = color
+	
+	function y (|float|)
+		return .pos.y
+
+	function x (|float|)
+		return .pos.x
+
+	function left (|float|)
+		return .pos.x - .Radius.x
+
+	function right (|float|)
+		return .pos.x + .Radius.x
+		
+	function Box (|vec4|)
+		|| rad = .Radius
+		return (.pos-rad, .pos+rad)
+
+	function Draw (|image| where, |vec4| J, |ivec4|)
+		|| P = .box * J.xyxy + J.zwzw
+		|| w = p.Width
+		|| h = p.Height
+		p = p.floor
+		p.x2 = p.x + w
+		p.y2 = p.y + h
+		rz = p.iVec4
+		where.DrawRect(rz, .Color)
+
+	function Step
+		.pos += .Velocity
+
+	function OverlapsBlock (|block| B, |vec4|)
+		return .overlapsrect(b.box)
+	function OverlapsRect (|vec4| B, |vec4|)
+		return B.Clip(.box)
+		
+// later: handle other ratios, for example (Add borders)
+// could we try to get closer to phi? say trim a few pixels off the top? to 865 pixels
