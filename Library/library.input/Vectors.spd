@@ -53,7 +53,6 @@ datatype vec4
 	function Lum (|float|)
 		return .xyz.lum
 
-	
 	function Width (|float|)
 		return .x2 - .x1			// not quite true but SubliminalApp uses it this way :(
 
@@ -68,13 +67,20 @@ datatype vec4
 	
 	function Sum (|float|)
 		return .x + .y + .z + .w
-		
+	
+	function Overlap (|vec4| R, |vec4|)
+		disabled "Use .clip"
+	
 	function Clip (|vec4| R, |vec4|)
 		r.x  = r.x  max .x
 		r.y  = r.y  max .y
 		r.x2 = r.x2 min .x2
 		r.y2 = r.y2 min .y2
-		return R
+		return r
+	
+	function Posify (|vec4|)
+		description "Make this vector have positive area." 
+		return (.x1 min .x2, .y1 min .y2, .x1 max .x2, .y1 max .y2)
 	
 	render
 		fs <~ "(${.x}, ${.y}, ${.z}, ${.w})"
@@ -612,6 +618,12 @@ datatype vec2
 
 	function iVec2 (|ivec2|)
 		return (.x|int|, .y|int|)
+
+	function Reflect (|vec2| plane, |vec2|)
+		return self - 2.0 * (self • plane) * plane
+	
+	function Box (|float| x, |vec4|)
+		return (self - x, self+x)
 
 	function IFloor (|ivec2|)
 		return .floor.ivec2
