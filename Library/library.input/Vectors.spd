@@ -65,6 +65,9 @@ datatype vec4
 	function Aspect (|float|)
 		return .width / .height
 	
+	function Floor (|vec4|)
+		return (.x.floor, .y.floor, .z.floor, .w.floor)
+	
 	function Sum (|float|)
 		return .x + .y + .z + .w
 	
@@ -78,6 +81,8 @@ datatype vec4
 		r.y2 = r.y2 min .y2
 		return r
 	
+	function Exists (|bool|)
+		return .width > 0 and .Height > 0
 	function Posify (|vec4|)
 		description "Make this vector have positive area." 
 		return (.x1 min .x2, .y1 min .y2, .x1 max .x2, .y1 max .y2)
@@ -620,7 +625,10 @@ datatype vec2
 		return (.x|int|, .y|int|)
 
 	function Reflect (|vec2| plane, |vec2|)
-		return self - 2.0 * (self • plane) * plane
+		return self - (2.0 * (self • plane) * plane)
+		
+	function Normal (|vec2|)
+		return self / .Length
 	
 	function Box (|float| x, |vec4|)
 		return (self - x, self+x)

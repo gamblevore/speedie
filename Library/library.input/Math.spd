@@ -325,11 +325,11 @@ function math.RangeConvert (|float| lfrom, |float| hfrom, |FloatRangeConverterBa
 
 datatype FloatRangeConverter (vec4)
 	function Convert (|float| x, |float|)
-		return mix(self[2], self[3], (x + self[0]) * self[1])
+		return mix(.z, .w, (x + .x) * .y)
 
 datatype FloatRangeConverterBasic (vec2)
 	function Convert (|float| x, |float|)
-		return (x + self[0]) * self[1]
+		return (x + .x) * .y
 
 
 
@@ -346,13 +346,13 @@ function int.Towards (|int| Dest, |int| N, |int|)
 
 	
 function float.Mul (|float| by, |bool| Cond, |float|)
-	if (cond)
+	if cond
 		return self * by
 	return self
 
 
 function float.Plus (|bool|b, |float| add=1.0, |float|)
-	if (b)
+	if b
 		return self + add
 	return self
 

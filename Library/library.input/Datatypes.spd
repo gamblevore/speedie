@@ -404,6 +404,12 @@ datatype float
 		|| v = (10 pow to)|float|
 		return (self * v).Round / v
 
+	function q (|float| sigma=0.0, |float|)
+		if self > sigma
+			return 1
+		if self < -sigma
+			return -1
+	
 	function SinR (|float|)
 		return (self * math.iTau).sin
 
@@ -435,6 +441,9 @@ datatype float
 		description "Computes e to the power of (x) " 
 		cpp_wrapper (expf)
 	
+	function Log (|float|)
+		cpp_wrapper JB_f_Log
+	
 	function Ceil (|float|)
 		rz = .floor
 		if rz != self
@@ -443,6 +452,12 @@ datatype float
 	helper IntegerToMod2 (|float|)
 		return (self*0.5).Fract*2.0
 		
+	operator ± (|float| i, |float|)
+		cpp_part Shrink
+		if self > 0
+			return self + i
+		return self - i
+
 	operator avg (|float| f, |float|)
 		return (f + self) * 0.5
 	

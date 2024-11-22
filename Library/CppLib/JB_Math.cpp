@@ -102,6 +102,15 @@ extern "C" {
 		int x2 = x - 127;
 		return (ivec2){ x2, JB_uint_IsPow2(i<<9) };
 	}
+    
+	float JB_f_Log(float f) {
+		return std::log(f);
+	}
+	
+	double JB_dbl_Log(double f) {
+		return std::log(f);
+	}
+	
 
 	ivec2 JB_F64_Exponent(double d) {
 		uint64 i = reinterpret_cast<uint64&>(d);

@@ -15,6 +15,8 @@ extern "C" {
     u32    JB_uint_unhash  (u32 x);
     u64    JB_uint64_hash  (u64 x);
 	ivec2  JB_f_Exponent   (float x);
+	float  JB_f_Log   	(float x);
+	double  JB_dbl_Log   (double x);
 	ivec2  JB_F64_Exponent (double x);
 	
 	
