@@ -9,6 +9,7 @@ struct ASMState
 	|datatypecode|				ReturnASM
 	|bool|						OK    
 	|bool|						Inited
+	|bool|						InlineStillOK
 	|asmreg|					InlineReturnTo
 
 	target debug
@@ -498,26 +499,33 @@ function ASMState.IsASMConst (|message| exp, |bool|)
 
 
 
-function ASMState.TryInline (|message| prms, |asmreg| dest, |µFunc| asm)
+function ASMState.TryInline (|message| prms, |asmreg| dest, |µFunc| asm, |bool|)
 	opt norefcounts
 	|| fn = asm.fn
+	if fn.ASMCurrInliningCount
+		return false
+	
+	fn.ASMCurrInliningCount = 1
 	.InlineReturnTo = dest
+	.InlineStillOK = true
 
-// theres a lot to do here...
-// if we don't alter the param... we can just use it, it doesn't need to be declared...
+// Theres a lot to do here... if we don't alter the param...
+// we can just use it, it doesn't need to be declared...
 
 	|| p = prms.first
-	for a in fn.Args
-// fix this later
+	for a in fn.Args								// fix this later
 		if a isnt Altered
 			debugger 
 		  else
 			|| SubDest = .DeclareMe(a.source, a)
 			.µInto(p!, SubDest)
 		p++
+		require .InlineStillOK
 	
 	ASMType.arg(self, fn.SourceArg!, ASMReg())
 	.InlineReturnTo = nil
+	fn.ASMCurrInliningCount--
+	return .InlineStillOK
 
 
 
@@ -535,10 +543,10 @@ function ASMState.AskForInline (|message| prms, |asmreg| dest, |SCFunction| fn, 
 	require Gain + K > 0
 
 	|| Start = .curr
-	.TryInline(prms, dest, A)
-	|| Grown = .curr - start
-	if Grown < gain
-		return true
+	if .TryInline(prms, dest, A)
+		|| Grown = .curr - start
+		if Grown < gain
+			return true
 	.curr = start
 
 

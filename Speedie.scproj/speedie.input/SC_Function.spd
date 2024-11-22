@@ -75,6 +75,7 @@ linkage
 |Byte|					MinOpt
 |Byte|					IsAssigns
 |byte|					IsCppInBuilt
+|byte|					ASMCurrInliningCount
 |errorseverity|			BlindCasts
 |byte|					IsNilChecker
 |byte| 					Badness
