@@ -2253,7 +2253,7 @@ void SC_Comp__PrintCompileTime(Date Durr) {
 	JB_FS_AppendString(Fs, JB_LUB[570]);
 	//;
 	JB_FS_Normal(Fs, JB_LUB[571]);
-	float Avg = ((float)SC__Crkt_TotalSize) / ((float)JB_Array_Size(SC__Crkt_List));
+	float Avg = JB_int_OperatorDiv(SC__Crkt_TotalSize, JB_Array_Size(SC__Crkt_List));
 	//;
 	JB_FS_AppendInt32(Fs, JB_Array_Size(SC__Crkt_List));
 	JB_FS_AppendString(Fs, JB_LUB[432]);
@@ -3456,7 +3456,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[220]);
-	JB_FS_AppendInt32(_fsf0, (2024112217));
+	JB_FS_AppendInt32(_fsf0, (2024112322));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8864,7 +8864,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1385]);
-	JB_FS_AppendInt32(_fsf0, (2024112217));
+	JB_FS_AppendInt32(_fsf0, (2024112322));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -17249,6 +17249,10 @@ Message* SC_int64_MsgForConst(int64 Self, bool AllowShift) {
 	return Rz;
 }
 
+Float64 JB_int64_OperatorDiv(int64 Self, int64 D) {
+	return ((Float64)Self) / ((Float64)D);
+}
+
 int64 JB_int64_OperatorMax(int64 Self, int64 D) {
 	iif (D > Self) {
 		return D;
@@ -17275,7 +17279,7 @@ JB_String* JB_int64_Render(int64 Self, FastString* Fs_in) {
 }
 
 void JB_int64_RenderSizePart(int64 Self, FastString* Fs, int Size, JB_String* Suff) {
-	float F = JB_f_RoundTo((((float)Self) / ((float)Size)), 1);
+	float F = JB_f_RoundTo(((float)(JB_int64_OperatorDiv(Self, Size))), 1);
 	JB_FS_AppendInt32(Fs, ((int)F));
 	iif (F < 120.0f) {
 		int Frac = ((int)(JB_f_Fract(F) * 10.0f));
@@ -22417,17 +22421,17 @@ bool SC_Pac_AskForInline(ASMState* Self, Message* Prms, ASMReg Dest, SCFunction*
 	}
 	int Gain = 5 - (A->Length - 1);
 	Gain = (Gain + ((SC_Func_SyntaxIs(Fn, kSC__FunctionType_Inline)) * 20));
-	int K = 0;
+	int Grace = 8;
 	{
 		Message* P = ((Message*)JB_Ring_First(Prms));
 		wwhile (P) {
-			K = (K + SC_Pac_IsASMConst(Self, P));
+			Grace = (Grace + (SC_Pac_IsASMConst(Self, P) << 2));
 			P = ((Message*)JB_Ring_NextSib(P));
 		};
 		;
 	}
 	;
-	iif ((Gain + K) <= 0) {
+	iif ((Gain + Grace) <= 0) {
 		return nil;
 	}
 	FatASM* Start = Self->Curr;
@@ -27576,7 +27580,7 @@ void JB_FS_RenderSpeed(FastString* Self, float Seconds, int64 BytesIn, int64 Byt
 		JB_FS_AppendString(Self, JB_LUB[317]);
 		JB_FreeIfDead(JB_int64_StrSize(BytesOut, Self));
 		JB_FS_AppendString(Self, JB_LUB[166]);
-		float Ratio = ((((float)BytesOut) / ((float)BytesIn)) * 100.0f);
+		float Ratio = (((float)(JB_int64_OperatorDiv(BytesOut, BytesIn))) * 100.0f);
 		JB_FS_AppendFloat(Self, Ratio, 1, false, false);
 		JB_FS_AppendString(Self, JB_LUB[497]);
 	}
@@ -58124,4 +58128,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -403980704344136563 -7801823231334923150
+// 7564731217341572519 -7801823231334923150

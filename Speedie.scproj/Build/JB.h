@@ -4288,6 +4288,8 @@ Message* JB_int64_Msg(int64 Self);
 
 Message* SC_int64_MsgForConst(int64 Self, bool AllowShift);
 
+Float64 JB_int64_OperatorDiv(int64 Self, int64 D);
+
 int64 JB_int64_OperatorMax(int64 Self, int64 D);
 
 int64 JB_int64_OperatorMin(int64 Self, int64 D);
@@ -10406,6 +10408,8 @@ inline bool JB_int64_OperatorInRange(int64 Self, int64 D);
 
 inline bool JB_int_IsPow2(int Self);
 
+inline float JB_int_OperatorDiv(int Self, int D);
+
 inline bool JB_int_OperatorInRange(int Self, int D);
 
 inline void SC_FAT_CheckHasOutput(FatASM* Self);
@@ -10575,6 +10579,10 @@ inline bool JB_int64_OperatorInRange(int64 Self, int64 D) {
 
 inline bool JB_int_IsPow2(int Self) {
 	return (Self & (Self - 1)) == 0;
+}
+
+inline float JB_int_OperatorDiv(int Self, int D) {
+	return ((float)Self) / ((float)D);
 }
 
 inline bool JB_int_OperatorInRange(int Self, int D) {
