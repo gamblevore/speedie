@@ -7,7 +7,7 @@ function compiler.PrintCompileTime (|date| durr)
 	fs.normal  "Classes",		fs <~ compiler.ReachedClassCount
 	fs.normal  "Funcs",			fs <~ "${compiler.streachedfunc} / ${compiler.funclist.length}  // (${compiler.stLibFuncs} lib)"
 	fs.normal  "Strings"
-	|| avg = stringcorrector.TotalSize|float| / stringcorrector.list.length|float|
+	|| avg = stringcorrector.TotalSize div stringcorrector.list.length
 	fs <~ "${stringcorrector.list.length} / "	
 	stringcorrector.TotalSize.strsize(fs)
 	fs <~ " // (avg "

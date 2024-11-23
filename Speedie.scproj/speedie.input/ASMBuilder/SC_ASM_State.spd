@@ -536,11 +536,11 @@ function ASMState.AskForInline (|message| prms, |asmreg| dest, |SCFunction| fn, 
 	|| Gain = 5	- (A.Length-1)				// assume that functions have 5 instruction overhead.
 	Gain += (fn is inline) * 20				// sigh...
 	
-	|| K = 0
+	|| Grace = 8
 	for p.fast in prms
-		K += .IsASMConst(p)
+		Grace += .IsASMConst(p)<<2
 
-	require Gain + K > 0
+	require Gain + Grace > 0
 
 	|| Start = .curr
 	if .TryInline(prms, dest, A)
