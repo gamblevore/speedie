@@ -2,55 +2,66 @@
 import "GUI"
 
 main
+	gui.Init((480, 300))
 	return Breakout()
  
 
-// make spirals expand (or just replace with explosions)
-// some blocks add balls...
-	// they will head towards a random block (with random offset so it might miss)
-// some blocks explode nearby things
-// some are resistant (by color)
+// block draw edge
+// wierd bug with evreything being hit.
+// remove explosions (and make them explode)
+	// why do thy disappear SOMEtIMES?
+	// make spirals expand (or just replace with explosions)
+	// block nudge... for vibration on hit
+// copy your favourite arkanoid examples. (any on sega megadrive?)
+// text!
+// hsb color bug
+// ball limit, bar limit
 
 
 class Breakout (Window)
 	|fpstextview|		FPS
-	|[block]|			Blocks
-	|block|				Bar
-	|[block]|			Balls
+	|[block2d]|			Blocks
+	|block2d|			Bar
+	|[block2d]|			Balls
 	|float|				BallSpeed
 	|int|				Hits
-	|[block]|			Spirals
+	|[block2d]|			Spirals
 
 	constructor
-		.bar  = block(vec4())
+		.bar  = block2d(vec4())
 		.fps = fpstextview(self)
 		.fps.MakeInline()
 		.reset
 
-	function addballs (|int| n)	
-		|| H = 6.0
+	function addballs (|int| n, |vec2| P, |block2d|)
 		for n
-			|| b = block(vec4(10.3, H, 16th,  16th))
-			H++
-			b.Velocity = vec2(0, -.ballspeed)
-			.balls <~ b
+			Rz = block2D((P, 16th,  16th))
+			P.y++
+			rz.Velocity = vec2(0, -.ballspeed)
+			.balls <~ rz
+		if !rz
+			app.Crash
 
-	function reset
+	function reset (|string| msg="")
+		if msg
+			beep msg
 		.ballspeed = 0.09
 		.bar.pos = vec2(10.0, 1.0)
 		.bar.radius = vec2(1.0,  0.125)
 		.balls.length = 0
 		.Blocks.Length = 0
-		.addballs(2)
+		.addballs(2, (10.3, 6.0))
 		for y in 5.0
 			|| y2 = -1.0 + y*3th
-			|| Col = colors.hsb(((-y2+0.75)*16th, 0.8, 0.5, 1.0))
 			for x in 10.0
 				|| pos = (2.0+x*(16.0/9.0), 9.0+y*0.5,  0.75, 0.2)
-				.Blocks <~ block(pos, col)
+				|| bl = block2d(pos)
+				bl.Health = 1.0 + y
+				.Blocks <~ bl
+				
 	
 	
-	function BounceBar (|block| bar, |block| B,  |bool|)
+	function BounceBar (|block2d| bar, |block2d| B,  |bool|)
 		|| Hit = bar.OverlapsBlock(B)
 		require hit.Exists
 		|| v = b.Velocity
@@ -62,7 +73,7 @@ class Breakout (Window)
 		return true
 
 
-	function Bounds (|block| b)
+	function Bounds (|block2d| b)
 		|| bvx = b.Velocity.x
 		if bvx < 0
 			if b.left <= 0
@@ -82,28 +93,67 @@ class Breakout (Window)
 		.BallSpeed += add
 		return .BallSpeed
 	
-			
-	function DoHits (|block| b)
-		|| R = b.box
+		
+	function HitOne (|block2d| bl, |vec4| R, |block2d| ball, |bool|)
+		|| R2 = bl.OverlapsRect(R)
+		require r2.exists
+		|| Cn = r2.Center
+		.spirals <~ block2d((cn, 3.0, 3.0), vec4(0.5,0,0,0))
+		
+		if r2.Height > r2.Width
+			ball.Velocity.x = -ball.Velocity.x
+		  else
+			ball.Velocity.y = -ball.Velocity.y
+		ball.Velocity = ball.Velocity.Normal * .incr
+
+		|| hp = --bl.Health
+		if (hp <= 0) or 0.5[]
+			|| pu = .PowerUp(8)
+			if !pu
+				0 //
+			  elseif pu <= 2
+				|| b2 = .addballs(1, cn)
+				|| old = .Blocks.now!
+				b2.towards(old.pos, .BallSpeed)
+			  elseif pu <= 5
+				|| b2 = .addballs(1, ball.pos)
+				b2.Radius = vec2(1+(pu-3))
+				b2.Color = colors.Red // 
+				b2.Velocity = nil
+				b2.Health = -2
+			  elseif pu <= 7
+				ball.Radius += 16th
+			  elseif pu == 8
+				.Bar.Radius.x += 8th
+		return hp <= 0
+// guidable flurry aura
+		
+	
+	function PowerUp (|float| n, |int|)
+		|| x = .Blocks.Length|float|
+		|| chance = (12.0 / x)
+		if chance[]
+			return 1+random.shared.float(n)|int|
+
+
+	function DoHits (|block2d| ball)
+		|| R = ball.box
 		for (bl.backwards in .Blocks) (i)
-			|| R2 = bl.OverlapsRect(R)
-			if r2.exists
-				|| Cn = r2.Center
-				.spirals <~ block((cn, 3.0, 3.0), vec4(0.5,0,0,0))
-				
+			if .HitOne(bl, r, ball)
 				.blocks.FastRemove(i)
-				
-				if r2.Height > r2.Width
-					b.Velocity.x = -b.Velocity.x
-				  else
-					b.Velocity.y = -b.Velocity.y
-				b.Velocity = b.Velocity.Normal * .incr
-				exit 
+				if !.blocks
+					.reset( "Success! You beat level-1")
+				return 
 	
 	
 	behaviour FrameStep
 		require !ShouldNotDisturbGUI
+		|| minsp = .BallSpeed*8th
 		for (b.backwards in .balls) (i)
+			if b.Health > 0
+				|| y = b.Velocity.y
+				if y.Abs < minsp
+					b.Velocity.y = minsp.CopySign(y)
 			b.Step
 			.bounds(b)
 			.Dohits(b)
@@ -111,9 +161,16 @@ class Breakout (Window)
 			if b.y <= 0
 				.balls.FastRemove(i)
 				if !.balls
-					beep "You failed"
-					.reset
-		.bar.Pos += keys.Vec3.xz * (0.2, 0.0)
+					.reset( "You failed")
+					exit
+		
+		.bar.Pos.x += keys.Vec3.x * 0.2
+		|| bl = .bar.left
+		if bl < 0
+			.bar.pos.x -= bl
+		bl = .bar.right
+		if bl > 20.0
+			.bar.pos.x -= (bl-20.0)
 		
 		for (s.backwards in .Spirals) (i)
 			s.Radius -= 0.03
@@ -126,29 +183,40 @@ class Breakout (Window)
 	behaviour Drawbackground
 		where.DrawRect(self, colors.black)	
 		|| C = .LastRect.vec4
-		|| J = ((c.width, c.height, 0, 0) / (20.0, 12.5, 1.0, 1.0))
+		block2d.adjust = ((c.width, c.height, 0, 0) / (20.0, 12.5, 1.0, 1.0))
 		for b in .Blocks
-			b.draw(Where, J)
-		.bar.draw(Where, J)
+			|| Col = colors.HSB((1.0-b.health)*12th, 0.8, 0.5)
+			where.DrawRect(b, col)
+		where.DrawRect(.bar)
+
 		|| L = 24s()
 		for (s in .Spirals) (i)
-			|| B = s.boxj(J)
-			where.DrawSpiral(0.01*b.width|float|*j.x, L, b.center, s.color * 0.2[], (3s+i*1s)())
+			|| B = s.Screen
+			where.DrawSpiral(0.01*b.width|float|*block2d.adjust.x, L, b.center, s.color * 0.2[], (3s+i*1s)())
 		for b in .balls
-			b.draw(where, J)
+			|| bx = b.Box.scr0 ± -4.0
+			where.DrawSoftCircle(bx, b.Color, 2.0)
 
 
-class Block
+class Block2D
 	|vec2| Pos
 	|vec2| Radius
 	|vec2| Velocity
 	|vec4| Color
+	|float|	Health
 	
 	constructor (|vec4| Pos_Rad, |vec4| Color=colors.white)
 		.pos = Pos_Rad.xy
 		.Radius = Pos_Rad.zw
 		.Color = color
+		.Health = 1
+		
+	syntax cast (|ivec4|)
+		return .Screen
 	
+	function Towards (|vec2| P, |float| Speed)
+		.Velocity = (P - .pos).Normal * Speed
+		
 	function y (|float|)
 		return .pos.y
 
@@ -165,8 +233,15 @@ class Block
 		|| rad = .Radius
 		return (.pos-rad, .pos+rad)
 
-	function BoxJ (|vec4| J, |ivec4|)
-		|| P = .box * J.xyxy + J.zwzw
+	function Screen (|ivec4|)
+		return .box.Scr
+	
+	function vec4.Scr0 (|vec4|)
+		|| J = block2d.adjust
+		return self * J.xyxy + J.zwzw
+	
+	function vec4.Scr (|ivec4|)
+		|| p = .scr0
 		|| w = p.Width
 		|| h = p.Height
 		p = p.floor
@@ -174,18 +249,19 @@ class Block
 		p.y2 = p.y + h
 		return p.iVec4
 		
-	function Draw (|image| where, |vec4| J, |ivec4|)
-		rz = .BoxJ(J)
-		where.DrawRect(rz, .Color)
+	function Draw (|image| where)
+		where.DrawRect(.Screen, .Color)
 
 	function Step
 		.pos += .Velocity
 
-	function OverlapsBlock (|block| B, |vec4|)
+	function OverlapsBlock (|block2d| B, |vec4|)
 		return .overlapsrect(b.box)
 	function OverlapsRect (|vec4| B, |vec4|)
 		return B.Clip(.box)
-		
+	
+	module
+		|vec4| Adjust
 // later: handle other ratios, for example (Add borders)
 // could we try to get closer to phi? say trim a few pixels off the top? to 865 pixels
 

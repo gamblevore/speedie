@@ -1,16 +1,14 @@
 
 
 module Colors
-	// should make this return vec4! better to do all our work in vec4...
-	// just store/read imagepixel only. 
-
 	function HSB (|vec4| Y,  |vec4|)
-		require y
+		cpp_part HSB4
+		return .HSB(y.r, y.g, y.b, y.a)
 	
-		|| h = y.r.Fract * 6.0
-		|| s = y.g
-		|| b = y.b
-		|| a = y.a
+	function HSB (|float| H, |float| S, |float| B, |float| A=1.0,  |vec4|)
+		require h or s or b or a
+	
+		h = h * 6.0
 	    || i = h|int|
 	    || f = h.fract
 	    || p = b * (1.0 - s)

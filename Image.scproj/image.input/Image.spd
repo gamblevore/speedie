@@ -481,7 +481,7 @@ class Image (memory)
 			
 				
 		
-	function DrawRect (|ivec4| Rect, |vec4| Color)
+	function DrawRect (|ivec4| Rect, |vec4| Color=colors.white)
 		cpp_part SimpleRectSub
 		|| px = color.px
 		require px.a
