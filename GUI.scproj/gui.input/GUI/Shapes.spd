@@ -1,0 +1,67 @@
+
+
+class Block2D
+	|vec2| Pos
+	|vec2| Radius
+	|vec2| Velocity
+	|byte| Nudge
+	|vec4| Color
+	|float|	Health
+	
+	constructor (|vec4| Pos_Rad, |vec4| Color=colors.white)
+		.pos = Pos_Rad.xy
+		.Radius = Pos_Rad.zw
+		.Color = color
+		.Health = 1
+		
+	syntax cast (|ivec4|)
+		return .Screen
+	
+	function Towards (|vec2| P, |float| Speed)
+		.Velocity = (P - .pos).Normal * Speed
+		
+	function y (|float|)
+		return .pos.y
+
+	function x (|float|)
+		return .pos.x
+
+	function left (|float|)
+		return .pos.x - .Radius.x
+
+	function right (|float|)
+		return .pos.x + .Radius.x
+		
+	function Box (|vec4|)
+		|| rad = .Radius
+		return (.pos-rad, .pos+rad)
+
+	function Screen (|ivec4|)
+		return .box.Scr
+	
+	function vec4.Scr0 (|vec4|)
+		|| J = block2d.adjust
+		return self * J.xyxy + J.zwzw
+	
+	function vec4.Scr (|ivec4|)
+		|| p = .scr0
+		|| w = p.Width
+		|| h = p.Height
+		p = p.floor
+		p.x2 = p.x + w
+		p.y2 = p.y + h
+		return p.iVec4
+
+	function Step
+		.pos += .Velocity
+
+	function OverlapsBlock (|block2d| B, |vec4|)
+		return .overlapsrect(b.box)
+	
+	function OverlapsRect (|vec4| B, |vec4|)
+		return B.Clip(.box)
+	
+	module
+		|vec4| Adjust
+// later: handle other ratios, for example (Add borders)
+// could we try to get closer to phi? say trim a few pixels off the top? to 865 pixels

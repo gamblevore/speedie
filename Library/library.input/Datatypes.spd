@@ -44,6 +44,10 @@ datatype int
 
 	function AlignDown (|int| To, |int64|)
 		return self - (self mod to) // ???
+	
+	operator Div (|int| D, |float|)
+		opt inline
+		return self|float| / d|float|
 		
 	syntax compare (|string|s, |bool| aware, |int|)
 		return self - s.length
@@ -599,6 +603,9 @@ datatype int64
 		opt inline
 		return (self|uint64| < d|uint64|)
 
+	operator Div (|int64| D, |float64|)
+		return self|float64| / d|float64|
+
 	operator isa (|uint| n, |bool|)
 		return !(self mod n)
 
@@ -639,7 +646,7 @@ datatype int64
 		fs.appendhex(self)
 
 	helper RenderSizePart (|faststring| fs, |int| Size, |string| Suff)
-		|| f = (self|float|/size|float|).DecimalPlaces(1)
+		|| f = (self div size)|float|.DecimalPlaces(1)
 		fs <~ f|int|
 		if f < 120.0
 			|| frac = (f.fract*10.0)|int|

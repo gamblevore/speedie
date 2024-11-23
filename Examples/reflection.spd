@@ -2,20 +2,14 @@
 import "GUI"
 
 main
-	gui.Init((480, 300))
-	return Breakout()
- 
+	return Breakout().RunAsMain(2.0)
 
-// block draw edge
 // wierd bug with evreything being hit.
 // remove explosions (and make them explode)
-	// why do thy disappear SOMEtIMES?
+	// why do they disappear SOMEtIMES?
 	// make spirals expand (or just replace with explosions)
 	// block nudge... for vibration on hit
-// copy your favourite arkanoid examples. (any on sega megadrive?)
-// text!
-// hsb color bug
-// ball limit, bar limit
+
 
 
 class Breakout (Window)
@@ -33,7 +27,7 @@ class Breakout (Window)
 		.fps.MakeInline()
 		.reset
 
-	function addballs (|int| n, |vec2| P, |block2d|)
+	function AddBalls (|int| n, |vec2| P, |block2d|)
 		for n
 			Rz = block2D((P, 16th,  16th))
 			P.y++
@@ -46,7 +40,7 @@ class Breakout (Window)
 		if msg
 			beep msg
 		.ballspeed = 0.09
-		.bar.pos = vec2(10.0, 1.0)
+		.bar.pos = vec2(10.0, 0.5)
 		.bar.radius = vec2(1.0,  0.125)
 		.balls.length = 0
 		.Blocks.Length = 0
@@ -58,7 +52,6 @@ class Breakout (Window)
 				|| bl = block2d(pos)
 				bl.Health = 1.0 + y
 				.Blocks <~ bl
-				
 	
 	
 	function BounceBar (|block2d| bar, |block2d| B,  |bool|)
@@ -125,6 +118,9 @@ class Breakout (Window)
 				ball.Radius += 16th
 			  elseif pu == 8
 				.Bar.Radius.x += 8th
+				if .bar.Radius.x > 2.5
+					.bar.Radius.x = 2.5
+				.Bar.Radius.x += 8th
 		return hp <= 0
 // guidable flurry aura
 		
@@ -182,11 +178,17 @@ class Breakout (Window)
 	
 	behaviour Drawbackground
 		where.DrawRect(self, colors.black)	
-		|| C = .LastRect.vec4
-		block2d.adjust = ((c.width, c.height, 0, 0) / (20.0, 12.5, 1.0, 1.0))
+		|| VRect = .LastRect.vec4
+		for x in .Width
+			|| Col = Colors.wheel(x div .width, 1, 0.5)
+			where.DrawLineV((x,0), .height, col)
+		
 		for b in .Blocks
-			|| Col = colors.HSB((1.0-b.health)*12th, 0.8, 0.5)
+			|| H = (1.0-b.health)*12th
+			|| Col = colors.wheel(H, 0.8, 0.5)
 			where.DrawRect(b, col)
+			Col = colors.wheel(H, 1.0, 0.4)
+			where.DrawOutlineOnly(b, col)
 		where.DrawRect(.bar)
 
 		|| L = 24s()
@@ -198,78 +200,9 @@ class Breakout (Window)
 			where.DrawSoftCircle(bx, b.Color, 2.0)
 
 
-class Block2D
-	|vec2| Pos
-	|vec2| Radius
-	|vec2| Velocity
-	|vec4| Color
-	|float|	Health
-	
-	constructor (|vec4| Pos_Rad, |vec4| Color=colors.white)
-		.pos = Pos_Rad.xy
-		.Radius = Pos_Rad.zw
-		.Color = color
-		.Health = 1
-		
-	syntax cast (|ivec4|)
-		return .Screen
-	
-	function Towards (|vec2| P, |float| Speed)
-		.Velocity = (P - .pos).Normal * Speed
-		
-	function y (|float|)
-		return .pos.y
-
-	function x (|float|)
-		return .pos.x
-
-	function left (|float|)
-		return .pos.x - .Radius.x
-
-	function right (|float|)
-		return .pos.x + .Radius.x
-		
-	function Box (|vec4|)
-		|| rad = .Radius
-		return (.pos-rad, .pos+rad)
-
-	function Screen (|ivec4|)
-		return .box.Scr
-	
-	function vec4.Scr0 (|vec4|)
-		|| J = block2d.adjust
-		return self * J.xyxy + J.zwzw
-	
-	function vec4.Scr (|ivec4|)
-		|| p = .scr0
-		|| w = p.Width
-		|| h = p.Height
-		p = p.floor
-		p.x2 = p.x + w
-		p.y2 = p.y + h
-		return p.iVec4
-		
-	function Draw (|image| where)
-		where.DrawRect(.Screen, .Color)
-
-	function Step
-		.pos += .Velocity
-
-	function OverlapsBlock (|block2d| B, |vec4|)
-		return .overlapsrect(b.box)
-	function OverlapsRect (|vec4| B, |vec4|)
-		return B.Clip(.box)
-	
-	module
-		|vec4| Adjust
-// later: handle other ratios, for example (Add borders)
-// could we try to get closer to phi? say trim a few pixels off the top? to 865 pixels
-
-
-	
 function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| HSB, |float| Pulse)
 	|| sub = 24.0
-	max+=sub/2
+	max += sub/2
 	Pulse = Pulse * max
 	for j in max
 		if j <= sub
@@ -282,7 +215,9 @@ function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| HSB, |f
 		|| P = R*(50.0+i+strength) + XY
 		|| Circle = (P-4.0, P+4.0)
 		|| A = ((Max-i)*2.0)/max
-		|| C = Colors.HSB((i*0.005, 0.7, 1.0, A)+HSB)
+		|| C = Colors.wheel((i*0.005, 0.7, 1.0, A)+HSB)
 	
 		.DrawSoftCircle(Circle, C)
 
+
+// copy your favourite arkanoid examples. (any on sega megadrive?)

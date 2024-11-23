@@ -197,7 +197,7 @@ datatype ivec4
 		return .width * .height
 	
 	function Aspect (|float|)
-		return .width|float| / .height|float|
+		return .width div .height
 	
 	function Horz (|intrange|)
 		return .x1 to .x2

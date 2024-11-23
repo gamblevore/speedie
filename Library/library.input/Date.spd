@@ -120,7 +120,7 @@ datatype Date (int64)
 	function Loop (|duration| Length, |float|)
 		description "Returns a number between 0 and 1. This number increases linearly, then resets"
 		opt min 3
-		return (self mod Length)|float| / Length|float|
+		return (self mod Length)|int| div Length
 
 	
 	iterator

@@ -2137,6 +2137,7 @@ helper string.DeleteTwoBytes (|ivec2|r, |string|)
 function TextView.MakeInline (|string| txt="", |bool| Editable=false, |textview|)
 	visible
 	(self is editable) = Editable
+	(self is Enabled) = Editable
 	.text = txt
 	.GNormal.Edge <~ (0,0,0,0)
 	.Size = (3~right for 89)  by 18~down

@@ -68,6 +68,8 @@ module GUI
 	cpp_wrapper SDL_EventState			(|int| event, |int| enable, |byte|)
 	cpp_wrapper SDL_SetWindowPosition	(|&SDL_Window| w,  |int| x, |int| y)
 	cpp_wrapper SDL_ShowCursor			(|int| show=-1, |int|)
+	cpp_wrapper SDL_CreateCursor		(|&byte| data, |&byte| mask, |int| w, |int| h, |int| hot_x, |int| hot_y, |&SDL_Cursor|)
+	cpp_wrapper SDL_SetCursor			(|&SDL_Cursor| Cursor)
 	cpp_wrapper SDL_GetDisplayBounds	(|int| displayIndex, |&SDL_Rect| rect, |int|)
 	cpp_wrapper SDL_SetWindowMaximumSize (|&SDL_Window| window, |int| max_w, |int| max_h)
 	cpp_wrapper SDL_SetWindowMinimumSize (|&SDL_Window| window, |int| max_w, |int| max_h)
@@ -131,10 +133,11 @@ module GUI
 
 
 	helper SizeOrig (|ivec2|)
-		|int[2]| place
+		|ivec2[1]| place
 		|| s = .ScreenWindow
-			.SDL_GetWindowSize(s,  &place[0],  place[1])
-			return (place[0], place[1])
+			|| p0 = (&place[0])|&int|
+			.SDL_GetWindowSize(s,  p0,  p0+1)
+			return place[0]
 
 
 	helper SizeOrig (assigns:|ivec2|)
@@ -159,7 +162,14 @@ module GUI
 			.SDL_GetWindowPosition(s,  place[0],  place[1])
 			return (place[0], place[1])
 
-		
+
+	function NukeCursor
+		|byte[1]| nothing
+		|| g_cursor = SDL_CreateCursor(&nothing[0], &nothing[0], 1, 1, 0, 0)
+		SDL_SetCursor(g_cursor)
+		.ShowCursor(false)
+						
+
 	function ShowCursor (|bool| v = true)
 		SDL_ShowCursor(v|int|)
 
@@ -263,19 +273,19 @@ module GUI
 		SDL_WINDOW_ALLOW_HIGHDPI =	0x00002000
 
 
-	helper InitSDL (|ivec2| s, |bool|)
+	helper InitSDL (|&nil|)
 		expect (font.small) "SmallFont not loaded."
 		SDL_Init(SDL_INIT_AUDIO ||| SDL_INIT_VIDEO ||| SDL_INIT_EVENTS ||| SDL_INIT_HAPTIC)
 
-		s = s min .CurrDisplaySize
+		|| DS = .CurrDisplaySize
 		|| W = SDL_CreateWindow(.NiceAppName.cstr,
-			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, s.x, s.y, SDL_WINDOW_RESIZABLE ||| SDL_WINDOW_ALLOW_HIGHDPI) #expect "Can't init window"
+			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, DS.x, DS.y, SDL_WINDOW_RESIZABLE ||| SDL_WINDOW_ALLOW_HIGHDPI) #expect "Can't init window"
 		.screenwindow = w
 		.SDL_SetWindowMaximumSize(w, 2K, 2K)
 		.SDL_SetWindowMinimumSize(w,  400,  200)
 		.vsync = true
 		.renderer = SDL_CreateRenderer(w, -1, 0)  #expect  "Can't init renderer"
-		return true
+		return .NativeWindow
 
 
 	helper vsync (assigns:|bool|)
@@ -333,6 +343,7 @@ module GUI
 	
 	
 	function Scaling (assigns:|float| scale)
+		scale = scale.clamp(1.0, 8.0)
 		|| v1 = .SizeOrig.vec2
 		|| v2 = v1 / scale
 		|| bigPx = v2.ivec2
@@ -359,9 +370,11 @@ module GUI
 		return app.appname
 	
 	
-	function Init (|ivec2| s=(414,256), |int| FullScreen=0, |bool|) // startup
+	function Init (|float| Scaling=1.0, |bool|) // startup
+		opt norefcounts
 		if .framelength
 			return true
+		.GUICheck
 		pico.GlobalConfig.SuicideIfParentDies = false
 		pico.start
 		target !gui
@@ -369,32 +382,23 @@ module GUI
 		.FrameLength = 180th.date
 		.openedfirst = date.now
 		app.PrefsInit(.openedfirst)
-		|| PrevSize = app.prefmsg("screen").ivec4
-			s = PrevSize.size
-		  else
-			s = (800, 600)
-		s = s max (500, 400)
-		.GUICheck
-		if !.InitSDL(s)
+		AppMenu.GetAppMenu
+		|| n = .InitSDL
+		if !n
 			gui.Alert("Unable to load SDL2", StdErr.LastError.name)
 			return false
+	
+		.SDL_FullScreen(n, 1)
+		scaling *= 2.0 - (0.5*.IsHighDPI)
+		.Scaling = scaling
 		.sdl_stoptextinput
-		.scaling = 2.0 - (0.5*.IsHighDPI)
 		.FastToolTipDate = 1
 		
 		.CheckQuarantine
 		¥.LoadDefaults
 
-		AppMenu.GetAppMenu
 		.InitDelegates
-		|| n = .nativewindow$
-		|| PP = PrevSize.size
-		|| CDS = .CurrDisplaySize
-		if FullScreen
-			.SDL_FullScreen(n, FullScreen)
-		  elseif !PP or PP.y >= CDS.y
-			.SDL_FullScreen(n)
-			
+		.ShowCursor(false)
 		.StartedProperly = true
 		return true
 		
@@ -702,8 +706,7 @@ module GUI
 			GUI.alert("Please drag this app to the /Applications/ folder to stop MacOSX quarantining it.", "Quarantine Warning" )
 
 
-	helper Rescale (|float| NewScale, |bool|)
-		require .init
+	helper ReScale (|float| NewScale, |bool|)
 		if (NewScale >= 1.0 and NewScale <= 8.0)
 			.scale = NewScale
 			.NewSize = .SizeOrig
@@ -1142,33 +1145,6 @@ module GUI
 		.currmousedown = clicked
 		return clicked
 
-
-/*	 // too buggy
-	|ivec2| 					AppResizingXY
-	
-	function FindResizeCorner (|ivec2| p, |ivec2|)
-		opt norefcounts
-		|| R = window.all.lastrect.x2
-		return (r-p.x, p.y)
-
-
-	function DoAppResize (|ivec2| M, |int|)
-		|| P = .FindResizeCorner(M)
-		|| D = .AppResizingXY - p
-		|| L = window.all.size
-		|| R = ((0, 0, l + D).vec4*.scale).ivec4
-		.ScreenOrig = R
-		return SDLActivity.activity
-	
-
-	function InResizeCorner (|ivec2| P, |bool|)
-		p = .FindResizeCorner(p)
-		|| m = 30
-		if p.x < m  and  p.y < m
-			.AppResizingXY = p
-			SDL_CaptureMouse(True)
-			return true
-*/
 
 	function GuiControl.ContainedName (|string|)
 		|| fs = FastString()

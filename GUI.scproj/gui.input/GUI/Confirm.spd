@@ -180,7 +180,7 @@ class ConfirmWindow_ (Window)
 				.returnvalue = .NO
 				return true
 
-		if (.yes is visible) and (key.IsAccept or cans)
+		if (.yes is visible) and (key.IsAccept or cans or (key is space))
 			.returnvalue = .YES
 			return true
 		return super.keydown(key)

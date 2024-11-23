@@ -1,13 +1,11 @@
 
 
 module Colors
-	function HSB (|vec4| Y,  |vec4|)
-		cpp_part HSB4
-		return .HSB(y.r, y.g, y.b, y.a)
-	
-	function HSB (|float| H, |float| S, |float| B, |float| A=1.0,  |vec4|)
+	function Wheel (|float| H, |float| S, |float| B, |float| A=1.0,  |vec4|)
+		description "Perceptual color wheel. I may change the internals later. Currently yellow does not have enough space." 
 		require h or s or b or a
-	
+		
+		h = h.Fract
 		h = h * 6.0
 	    || i = h|int|
 	    || f = h.fract
@@ -26,6 +24,11 @@ module Colors
 	    if (i == 4)
 			return (t, p, b, a)
 		return (b, p, q, a)
+	
+	function Wheel (|vec4| Y,  |vec4|)
+		cpp_part WheelVec
+		return .Wheel(y.r, y.g, y.b, y.a)
+	
 
 	
 	

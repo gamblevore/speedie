@@ -440,23 +440,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXLegacyTarget section */
-		AC310BC62A5188E600837DCB /* BirdBuilder */ = {
-			isa = PBXLegacyTarget;
-			buildArgumentsString = "--nocolor --x --nocompile --targetdebug /usr/local/speedie/Utils/birds.scproj";
-			buildConfigurationList = AC310BC72A5188E600837DCB /* Build configuration list for PBXLegacyTarget "BirdBuilder" */;
-			buildPhases = (
-			);
-			buildToolPath = /usr/local/bin/speedie;
-			buildWorkingDirectory = "";
-			dependencies = (
-			);
-			name = BirdBuilder;
-			passBuildSettingsInEnvironment = 1;
-			productName = debug;
-		};
 		AC9220A22857A127002F3F97 /* DebugBuilder */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--nocolor --x --nocompile --targetdebug /usr/local/speedie/Perry.scproj --target=perry";
+			buildArgumentsString = "--nocolor --x --nocompile --targetdebug /usr/local/speedie/Perry.scproj/test.spd --target=perry";
 			buildConfigurationList = AC9220A32857A127002F3F97 /* Build configuration list for PBXLegacyTarget "DebugBuilder" */;
 			buildPhases = (
 			);
@@ -600,7 +586,6 @@
 				AC9220A22857A127002F3F97 /* DebugBuilder */,
 				AC9E17A5233A8B70003B433F /* ReleaseBuilder */,
 				ACBA49F027AAB490009C2631 /* SpeedieBuilder */,
-				AC310BC62A5188E600837DCB /* BirdBuilder */,
 			);
 		};
 /* End PBXProject section */
@@ -780,24 +765,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		AC310BC82A5188E600837DCB /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DEAD_CODE_STRIPPING = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		AC310BC92A5188E600837DCB /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DEAD_CODE_STRIPPING = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 		AC61010F2798768C00278BEF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1230,15 +1197,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AC310BC72A5188E600837DCB /* Build configuration list for PBXLegacyTarget "BirdBuilder" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				AC310BC82A5188E600837DCB /* Debug */,
-				AC310BC92A5188E600837DCB /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		AC6101112798768C00278BEF /* Build configuration list for PBXNativeTarget "Speedie" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

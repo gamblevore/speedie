@@ -48,7 +48,7 @@ function byte.IsVowel (|bool|)
 
 
 function int.OperatorPC (|int| x, |string|) 
-	return (self|float| / x|float|).pc
+	return (self div x).pc
 
 function int.operatorof (|string| type, |string| nothing="", |string|)
 	return type.Pluralize(self, nothing)
@@ -274,7 +274,7 @@ function faststring.RenderSpeed (|float| seconds, |int64| BytesIn, |int64| Bytes
 		self <~ " to "
 		Bytesout.strsize(self)
 		self <~ " ("
-		|| ratio = ((Bytesout|float| / Bytesin|float|)*100.0)
+		|| ratio = ((Bytesout div Bytesin)|float|*100.0)
 		self.appendfloat(ratio)
 		self <~ "%)"
 

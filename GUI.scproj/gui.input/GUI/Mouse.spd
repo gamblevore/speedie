@@ -7,7 +7,9 @@ datatype MouseDragging (int)
 		Within = 2<<4
 		Beyond = 3<<4
 		EvenIfNoMovement = 4<<4
-		
+
+struct SDL_Cursor
+	linkage:wrapper
 
 /*
 	return (x,y).sdlxy

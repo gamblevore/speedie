@@ -24,6 +24,7 @@ class Window (GUIControl)
 	|object?|							ReturnValue
 	|date|								AlphaFader
 	|date|								CreatedDate
+	|vec2|								BlockScale
 	
 	
 	constructor
@@ -40,6 +41,8 @@ class Window (GUIControl)
 	
 	
 	helper SubConstructor (|ControlRect| Size)
+		todo "should just be 20...  Y should be calculated."
+		.BlockScale = (20.0, 12.5) // 
 		.size = Size
 		.createddate = date.now
 		.InlineEditorPlace.Init(self)
@@ -96,10 +99,11 @@ class Window (GUIControl)
 	function SetMenu (|menu| m)
 		disabled "use openedmenu"
 
-	function RunAsMain (|ErrorInt|)
+	function RunAsMain (|float| Scaling = 1.0, |ErrorInt|)
 		.IsLiveAction = true // probably true
 		.show
-		if gui.init((4K,4K))
+		if gui.init(scaling)
+			gui.NukeCursor
 			return GUI.run
 
 	syntax cast (|ErrorInt|)
@@ -286,8 +290,16 @@ class Window (GUIControl)
 		return .lastrect == All.lastrect
 
 
+	function ReadjustBlock2D
+		|| R = .LastRect
+		|| J = vec2(R.width, R.height) / .BlockScale
+		block2d.adjust.x = j.x
+		block2d.adjust.y = j.y
+
+
 	function DrawWindow (|image| where)
 		where.window = self
+		.ReadjustBlock2D
 		.__drawbackground__(where)
 		.DrawContents(where)
 		.__draw__(where)
