@@ -608,8 +608,7 @@ function FindContainedClass (|scclass|)
 
 function scfunction.DontWantSameReturnType (|scfunction| f)
 	require self
-	|| r = f.ReturnType					#DEBUG_REQUIRE
-	if r.MiniMatch(.returntype, 0)
+	if f.ReturnType.MiniMatch(.returntype, 0)
 		error (.source,  "Multiple casts found [1]")
 		error (f.source, "Multiple casts found [2]")
 	
