@@ -18,10 +18,11 @@ static void AddLostChild_(int PID, int C) {
 	ProcessOwner* F = &PSRoot;
 	while ((F = JB_PID_Next(F))) {
 		if (F->PID == PID) {
-			int Ex = 255; 	int Sig = 0;
-			if (WIFEXITED(C))   Ex = WEXITSTATUS(C);
-			if (WIFSIGNALED(C)) Sig = WTERMSIG(C);
-			if (Sig)
+			int Ex = WEXITSTATUS(C);
+			int Sig = WTERMSIG(C);
+			bool Exited = WIFEXITED(C);
+			bool Signalled = WIFSIGNALED(C);
+			if (Signalled)
 				F->_Status = Sig|128;
 			  else
 				F->_Status = Ex;
@@ -69,7 +70,8 @@ void JB_KillChildrenOnExit() {
  
 #ifndef AS_LIBRARY // shouldn't this be around more??
 int JB_PID_Kill (ProcessOwner* F, int Code) {
-	F->_Status = Code; // negative means still OK.
+	if (Code < 0) Code = 0;
+	F->_Status = Code;
 	
 	return JB_Kill(F->PID);
 }

@@ -6,7 +6,7 @@
 #include "JB_Umbrella.h"
 
 extern "C" {
-extern int JB_ErrorNumber;
+extern byte JB_ErrorNumber;
 int JB_ErrorHandleFile(JB_String* self, JB_String* other, int errno, const char* errmsg, const char* Operation, int Severity=4, const char* verb=0);
 void JB_ErrorHandleC(const char* Desc, JB_String* path, bool CanFreeDesc);
 int JB_ErrorHandleFileC(const char* Path, int err, const char* Operation);

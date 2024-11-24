@@ -261,7 +261,7 @@ function exit (|int| Code=0)
 function Quit (|string| Err = "", |int| Code=0)
 	cpp_wrapper JB_App__Quit
 
-function ErrorNumber (|&int|)
+function ErrorNumber (|&byte|)
 	cpp_wrapper JB_App__ErrorNumber
 
 

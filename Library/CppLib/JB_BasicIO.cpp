@@ -24,8 +24,7 @@ void JB_Str_PrintError(JB_String* s) {
     if (N) {
         JB_Write( STDERR_FILENO, s->Addr, N );
 		if (!JB_ErrorNumber) {
-			JB_DoAt(0);
-			JB_ErrorNumber = -1; // terminals complain if printerror without return -1;
+			JB_ErrorNumber = 1; // terminals complain if printerror without return 1;
 		}
     }
 }
@@ -52,8 +51,7 @@ void JB_Str_PrintError(JB_String* s) {
     if (JB_Str_Length(s)) {
 		fprintf(stderr, "%s", StrAddr(s)); // in wierd environments. also faster.
 		if (!JB_ErrorNumber) {
-			JB_DoAt(0);
-			JB_ErrorNumber = -1; // terminals complain if printerror without return -1;
+			JB_ErrorNumber = 1; // terminals complain if printerror without return -1;
 		}
     }
 }

@@ -396,14 +396,11 @@ class PerryIDE (Window)
 		|| p = (pp[])|process--|
 		require p
 		|| Exit = p.Status
-		if exit.isok
+		if !exit.Crashed
 			return true
 
 		|| fs = faststring()
-		fs <~ ("Crash", "Exited")(exit.IsSignal)
-		fs <~ ": ${exit.name} "
-
-		fs <~ " {${p.render}}\n"
+		fs <~ "Crashed: ${exit.name}  {${p.render}}\n"
 		fs <~ p.erroroutput.getresult.FindStacktrace
 		pp[] = nil
 		.Notify(fs, @emb + what)

@@ -29,10 +29,10 @@ datatype PID_Int (int)
 
 datatype ExitCode (int)
 	description "Can describe both signal errors, and exit codes."
-	function IsSignal (|bool|)
+	function Crashed (|bool|)
 		description "This is a signal error (a crash)" 
 		return  self > 128
-	function IsOK (|bool|)
+	function NoErrors (|bool|)
 		description "We have either completed successfully, or not yet started. Either way there is no error." 
 		return  self <= 0
 	function Successful (|bool|)
@@ -43,7 +43,7 @@ datatype ExitCode (int)
 
 	function Name (|string|)
 		description "The name of the error (if any)." 
-		if .IsSignal
+		if .Crashed
 			return (self|errorint|&~128).SignalName
 		return self|errorint|.name
 	

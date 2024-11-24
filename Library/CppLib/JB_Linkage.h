@@ -18,7 +18,7 @@ int JB_App__ID();
 int JB_App__SelfSignal(int Sig);
 Dictionary* JB_App__Env();
 void JB_App__Quit (JB_String* Err, int Code);
-int* JB_App__ErrorNumber ();
+byte* JB_App__ErrorNumber ();
 JB_String* JB_App__Path();
 int JB_App__SetEnv(JB_StringC* name, JB_StringC* value);
 int JB_Rec__PrintErrors();

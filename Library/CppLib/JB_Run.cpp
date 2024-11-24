@@ -73,7 +73,7 @@ JB_StringC*         EmptyString_;
 JB_StringC*         ErrorString_;
 JBObject_Behaviour  JB_Object_FuncTable_ = {0,0};
 JB_Class*           ClassList;
-int					JB_ErrorNumber;
+byte				JB_ErrorNumber;
 byte				JB_Active = 0;
 extern char**		environ;
 extern uint			JB__Flow_Disabled;
@@ -240,12 +240,16 @@ int JB_SP_Run (_cstring* C, int Mode)	{
 			JB_FinalEvents();
 	}
 	JB_Active = 0;
-	return JB_ErrorNumber;
+	
+	byte b = JB_ErrorNumber;
+	if (b >= 128)
+		b = EINVAL;
+	return b;
 }
 
 
 
-int* JB_App__ErrorNumber () {
+byte* JB_App__ErrorNumber () {
 	return &JB_ErrorNumber;
 }
 

@@ -94,7 +94,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 
 	
 	helper HandleDied
-		|| Bad = !.Status.isok
+		|| Bad = !.Status.crashed
 		.DiedCount += Bad
 		if (.ErrorOutput!=nil) and (.mode is AutoPrintErrors)
 			printline .ErrorOutput.GetResult
