@@ -15,7 +15,11 @@ class SpiralDemo (Window)
 	
 	behaviour FrameStep
 		for s in .Spirals
-			s.BounceInFrame
+			s.y.x2 -= 0.0024
+			s.x.x += s.x.x2/128
+			s.y.x += s.y.x2/128
+			s.x = s.x.Bounce
+			s.y = s.y.Bounce
 		gui.Touch
 	
 	behaviour Drawbackground
@@ -25,23 +29,14 @@ class SpiralDemo (Window)
 		|| L = 24s()
 		for (s in .Spirals) (i)
 			L = -L
-			where.DrawSpiral(144, L, s.XY(C2), s.col * 0.2[], (3s+i*1s)()) // can we make them pulsate too?
+			|| PS = ((s.x.x, s.y.x) * c2.size) + c2.xy
+			where.DrawSpiral(144, L, PS, s.col * 0.2[], (3s+i*1s)())
 
 
 class Bounceable
 	|vec2| X // This is wierd but i don't care
 	|vec2| Y // Its just a demo :). demos are ALWWAYS WIERD
 	|vec4| Col
-	
-	function XY (|vec4| P, |vec2|)
-		return ((.x.x, .y.x) * p.size) + p.xy
-		
-	function BounceInFrame
-		.y.x2 -= 0.0024
-		.x.x += .x.x2/128
-		.y.x += .y.x2/128
-		.x = .x.Bounce
-		.y = .y.Bounce
 
 
 function vec2.bounce (|vec2|)
@@ -65,9 +60,8 @@ function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| HSB, |f
 		|| strength = (-0.005*closeness.pow2).Exp * 5.0
 
 		|| P = R*(50.0+i+strength) + XY
-		|| Circle = (P-4.0, P+4.0)
 		|| A = ((Max-i)*2.0)/max
 		|| C = Colors.wheel((i*0.005, 0.7, 1.0, A)+HSB)
 	
-		.DrawSoftCircle(Circle, C)
+		.DrawSoftCircle((P-4.0, P+4.0), C)
 
