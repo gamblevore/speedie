@@ -13,7 +13,7 @@ class Window (GUIControl)
 	|Guicontrol?|						InnerFocus
 	|GUIControl?|						CurrMouseDown
 	|GuiControl?|						SelBeforeMouseDown
-	|guicontrol?|						ToolTipControl // probably better to remove this
+	|guicontrol?|						ToolTipControl
 	|guicontrol?|						DroppingInto
 	|guicontrol?|						MouseIsOver
 	|guicontrol?|						FocusAttempt
@@ -24,7 +24,9 @@ class Window (GUIControl)
 	|object?|							ReturnValue
 	|date|								AlphaFader
 	|date|								CreatedDate
-	|float|								BlockScale
+	|float|								ShapeScale
+	|vec2|								ShapeMove
+	|byte|								ShapeMode
 	
 	
 	constructor
@@ -41,8 +43,6 @@ class Window (GUIControl)
 	
 	
 	helper SubConstructor (|ControlRect| Size)
-		todo "should just be 20...  Y should be calculated."
-		.BlockScale = 20.0
 		.size = Size
 		.createddate = date.now
 		.InlineEditorPlace.Init(self)
@@ -289,17 +289,9 @@ class Window (GUIControl)
 	function IsFullScreen (|bool|)
 		return .LastRect == All.lastrect
 
-
-	function ReadjustBlock2D
-		|| R = .LastRect
-		|| J = vec2(R.width) / .BlockScale
-		block2d.adjust.x = j.x
-		block2d.adjust.y = j.y
-
-
 	function DrawWindow (|image| where)
 		where.window = self
-		.ReadjustBlock2D
+		._ReadjustBlock2D
 		.__drawbackground__(where)
 		.DrawContents(where)
 		.__draw__(where)
