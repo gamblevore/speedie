@@ -339,14 +339,14 @@ bool Stat_( JB_String* self, struct _stat* st, bool normal=true ) {
 
 
 uint8* JB_FastCString( JB_String* Path, uint8* Tmp, int Max ) {
-	uint8* Result = Path->Addr;
-    if (JB_Str_IsC(Path))
-        return Result;
-
     u32 N = JB_Str_Length( Path );
     if ( ! N ) {
         return (uint8*)"";
     }
+
+	uint8* Result = Path->Addr;
+    if (JB_Str_IsC(Path))
+        return Result;
 
     if (N > Max)
         N = Max;
