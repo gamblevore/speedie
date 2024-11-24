@@ -144,7 +144,7 @@ class Breakout (Window)
 	
 	behaviour FrameStep
 		require !ShouldNotDisturbGUI
-		|| minsp = .BallSpeed*8th
+		|| minsp = .BallSpeed/4
 		for (b.backwards in .balls) (i)
 			if b.Health > 0
 				|| y = b.Velocity.y
