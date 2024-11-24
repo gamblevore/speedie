@@ -349,25 +349,28 @@ class SCDecl (SCNamed) {
 		.nildeclared = nilstate.realish
 
 
-	function DeReference (|message| brel, |SCNode|name_space,  |bool| IsAccess,  |scdecl|)
+	function DeReference (|message| brel, |SCNode|name_space,  |scdecl|)
 		opt norefcounts
-		|| c = .DeReferenceSub(brel, name_space, isaccess)
+		|| c = .DeReferenceSub(brel, name_space)
 			return c
 		error (brel.first, "Can't dereference this.")
 		
 	
-	function DeReferenceSub (|message| brel, |SCNode| name_space,  |bool| IsAccess, |scdecl|)
+	function DeReferenceSub (|message| brel, |SCNode| name_space, |scdecl|)
 		opt norefcounts
 		if .IsCArray
-			check (IsAccess) (brel, "Use [0] instead.")
 			|| i = .Internal								#require			
 			if i.TypeSuffers
 				return i.MakeNewOptional
+//			if i.IsCarray or i.Type.IsStruct
+//				i = i.GetAddress
+// not so simple to fix!
 			return i
 		
 		if .PointerCount > 0
 			return .internal
-		
+	
+		|| isaccess = true ///??
 		if !isaccess and .isnormalobject
 			brel.become(@dot, "first")
 			brel <~ @prm

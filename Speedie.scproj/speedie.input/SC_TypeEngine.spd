@@ -205,10 +205,6 @@ function TypeOfBRel (ExprResolver)
 
 	|| SubType = TypeOfExpr( F, name_space )			#require
 	
-	if n == '*'
-		problem (exp, "Use [] instead")
-		return SubType.Dereference(exp, name_space, false)
-	
 	if n == '-' and name == 1 // minus
 		expect (subtype.IsNearlyNormalNumber or subtype.isbool) (exp, "Expected a number.") 
 		Return subtype
@@ -789,7 +785,7 @@ function TypeOfAccess (ExprResolver)
 				if oof == 1
 					return TypeOfVecAccess(index, ty0, ty0.isnumeric)
 				  else
-					return ty0.Dereference(exp, name_space, true)
+					return ty0.Dereference(exp, name_space)
 
 	arr.Func = @prm
 	exp.become(@dot, "SyntaxAccess")
