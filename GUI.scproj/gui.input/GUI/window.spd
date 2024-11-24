@@ -24,7 +24,7 @@ class Window (GUIControl)
 	|object?|							ReturnValue
 	|date|								AlphaFader
 	|date|								CreatedDate
-	|vec2|								BlockScale
+	|float|								BlockScale
 	
 	
 	constructor
@@ -42,7 +42,7 @@ class Window (GUIControl)
 	
 	helper SubConstructor (|ControlRect| Size)
 		todo "should just be 20...  Y should be calculated."
-		.BlockScale = (20.0, 12.5) // 
+		.BlockScale = 20.0
 		.size = Size
 		.createddate = date.now
 		.InlineEditorPlace.Init(self)
@@ -287,12 +287,12 @@ class Window (GUIControl)
 
 
 	function IsFullScreen (|bool|)
-		return .lastrect == All.lastrect
+		return .LastRect == All.lastrect
 
 
 	function ReadjustBlock2D
 		|| R = .LastRect
-		|| J = vec2(R.width, R.height) / .BlockScale
+		|| J = vec2(R.width) / .BlockScale
 		block2d.adjust.x = j.x
 		block2d.adjust.y = j.y
 

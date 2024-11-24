@@ -176,8 +176,7 @@ static void CheckStillAlive (ShellStream* Sh) {
 }
 
 
-// Mode was "bool CaptureStdOut"
-byte StartProcessSub(ShellStream& Sh, JB_String* path, Array* Args, PicoComms* C, int Mode) {
+int StartProcessSub(ShellStream& Sh, JB_String* path, Array* Args, PicoComms* C, int Mode) {
 // fcntl,Fork,execvp,Pipe,Dup2,Waitid,Errno,Close,Eintr,_exit // far too much stuff in unix.
 	auto argv = JB_Proc__CreateArgs(path, Args);
 	if (!argv) return E2BIG;
@@ -224,7 +223,7 @@ byte StartProcessSub(ShellStream& Sh, JB_String* path, Array* Args, PicoComms* C
 
 
 // Mode was bool CaptureStdOut
-byte JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, int Mode) {
+int JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, int Mode) {
 	return StartProcessSub(*self, path, Args, C, Mode);
 }
 
@@ -280,7 +279,7 @@ ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastStr
 
 
 // mode was bool StdOutFlowThru
-byte JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, int Mode, Date TimeOut) {
+int JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, int Mode, Date TimeOut) {
 	auto Sh = ShellStart(self, R, FSOut, FSErrIn, Mode);
 	if (!Sh) return errno+!errno;
 	
@@ -290,7 +289,7 @@ byte JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* F
 
 	while (TimeOut >= 0) { // allow -1 time out which instantly exits...
 		bool DidAnything = JB_Sh_UpdatePipes(Sh) & 2;
-		if (JB_PID_Status(Sh) != 255)
+		if (JB_PID_Status(Sh) != -1)
 			break;
 		if (TimeOut > 0) {
 			auto Now = JB_Date__Now();

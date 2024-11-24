@@ -154,6 +154,8 @@ datatype Date (int64)
 
 
 datatype Duration (date)
+	linkage
+		cpp_class JB_Duration
 	function Float (|float|)
 		return .float64|float| // better. Or else we lose too much precision
 

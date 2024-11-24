@@ -265,7 +265,7 @@ class File (String)
 		error (self, fs)
 
 	
-	function Exists (|bool|TestLinkExists=false, |bool|)
+	function Exists (|bool|)
 		nil checker
 		cpp_wrapper JB_File_Exists
 	

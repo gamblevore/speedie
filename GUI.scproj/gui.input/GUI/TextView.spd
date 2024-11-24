@@ -2140,7 +2140,7 @@ function TextView.MakeInline (|string| txt="", |bool| Editable=false, |textview|
 	(self is Enabled) = Editable
 	.text = txt
 	.GNormal.Edge <~ (0,0,0,0)
-	.Size = (3~right for 89)  by 18~down
+	.Size = (3~right for 89)  by  14~down
 		
 
 datatype TextViewJumpMode (int)

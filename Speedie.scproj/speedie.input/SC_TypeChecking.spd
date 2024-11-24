@@ -146,11 +146,13 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| OExp, |int| TypeCast, |int|)
 	if (.PointerCount == O.PointerCount + 1)
 		|| found = .TryTypeCastPointer(o, oexp, typecast, false)
 			return found
-
+	
+	//if "jb_main".trap
 	if (o.IsCArray) and (.pointercount == 1)
 		|| found = .TryTypeCastPointer(o, oexp, typecast, true)
+			"adasdsaooooppop"
+			// does this ever happen?
 			return found
-	
 	
 	/// hmmmm... need to test it... without the c-array? how?
 	ifn typecast & knobooltypecast

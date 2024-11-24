@@ -27,14 +27,14 @@ datatype PID_Int (int)
 
 
 
-datatype ExitCode (byte)
+datatype ExitCode (int)
 	description "Can describe both signal errors, and exit codes."
 	function IsSignal (|bool|)
 		description "This is a signal error (a crash)" 
 		return  self > 128
 	function IsOK (|bool|)
 		description "We have either completed successfully, or not yet started. Either way there is no error." 
-		return  (self-1)|uint| >= 253
+		return  self <= 0
 	function Successful (|bool|)
 		description "Completed successfully." 
 		return  self == 0
@@ -48,10 +48,10 @@ datatype ExitCode (byte)
 		return self|errorint|.name
 	
 	function IsRunning (|bool|)
-		return self == 255
+		return self == -1
 
 	function NotStarted (|bool|)
-		return self == 254
+		return self < -1
 
 
 

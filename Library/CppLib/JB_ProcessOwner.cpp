@@ -37,7 +37,7 @@ void JB_SigChild (int signum) {
 }
 
 
-byte JB_PID_Status (ProcessOwner* F) {
+int JB_PID_Status (ProcessOwner* F) {
 // this conflicts with CheckStillAlive
 // only one caller of waitpid should exist!
 	while (SigChildOutStanding > 0) {
