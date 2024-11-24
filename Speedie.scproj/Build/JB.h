@@ -75,7 +75,7 @@ typedef int ErrorMarker;
 
 typedef byte ErrorSeverity;
 
-typedef byte ExitCode;
+typedef int ExitCode;
 
 typedef int FailableInt;
 
@@ -239,7 +239,7 @@ typedef ASM ASM_VecMix;
 
 typedef ASM ASM_Write;
 
-typedef Date Duration;
+typedef Date JB_Duration;
 
 typedef Date HumanDate;
 
@@ -682,7 +682,7 @@ struct ArgArrayCounter {
 };
 
 struct CompressionStats {
-	Duration Duration;
+	JB_Duration Duration;
 	int In;
 	int Out;
 	bool Live;
@@ -4764,7 +4764,7 @@ Dictionary* JB_TC__Types();
 
 
 // Date
-Duration JB_Date_Ago(Date Self);
+JB_Duration JB_Date_Ago(Date Self);
 
 int JB_Date_DayOfWeek(Date Self);
 
@@ -4772,7 +4772,7 @@ int64 JB_Date_Days(Date Self);
 
 Float64 JB_Date_Float64(Date Self);
 
-Duration JB_Date_OperatorMinus(Date Self, Date D);
+JB_Duration JB_Date_OperatorMinus(Date Self, Date D);
 
 JB_String* JB_Date_RenderDurr(Date Self, FastString* Fs_in);
 
@@ -4821,9 +4821,9 @@ Array* JB_ErrorSeverity__InitNames();
 
 
 // ExitCode
-bool JB_ExitCode_IsRunning(uint /*ExitCode*/ Self);
+bool JB_ExitCode_IsRunning(ExitCode Self);
 
-bool JB_ExitCode_Successful(uint /*ExitCode*/ Self);
+bool JB_ExitCode_Successful(ExitCode Self);
 
 
 
@@ -5266,7 +5266,7 @@ ASM* JB_ASM_Write__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 // Duration
-float JB_Duration_Float(Duration Self);
+float JB_Duration_Float(JB_Duration Self);
 
 
 
@@ -9227,6 +9227,8 @@ void SC_Decl_SyntaxIsSet(SCDecl* Self, SCDeclInfo D, bool Value);
 int SC_Decl_TryTypeCast(SCDecl* Self, SCDecl* O, Message* OExp, int TypeCast);
 
 int SC_Decl_TryTypeCastAccess(SCDecl* Self, SCDecl* O, Message* Exp, int TypeCast);
+
+int SC_Decl_TryTypeCastCarray(SCDecl* Self, SCDecl* O, Message* Exp, int TypeCast);
 
 int SC_Decl_TryTypeCastPointer(SCDecl* Self, SCDecl* O, Message* Exp, int TypeCast, bool CArray);
 

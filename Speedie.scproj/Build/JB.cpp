@@ -251,7 +251,7 @@ ExitCode JB_App__Say(JB_String* S, bool Print) {
 	Array* _tmPf0 = (JB_Array_Constructor0(nil));
 	JB_Incr(_tmPf0);
 	JB_Array_SyntaxAppend(_tmPf0, S);
-	uint _tmPf1 = JB_Str_Execute(JB_LUB[117], _tmPf0, nil, nil, kJB__PIDM_StdOutFlowsThroughUs, 0);
+	ExitCode _tmPf1 = JB_Str_Execute(JB_LUB[117], _tmPf0, nil, nil, kJB__PIDM_StdOutFlowsThroughUs, 0);
 	JB_Decr(_tmPf0);
 	return _tmPf1;
 }
@@ -459,7 +459,7 @@ void SC_Comp__AppBuildOneLib(JB_File* Inner, Message* Lib) {
 	JB_Incr(Ldest);
 	JB_Decr(_tmPf0);
 	JB_Decr(_tmPf1);
-	iif (!JB_File_Exists(Ldest, false)) {
+	iif (!JB_File_Exists(Ldest)) {
 		JB_File* Dir = JB_Str_AsFile(JB_LUB[1001]);
 		JB_Incr(Dir);
 		JB_File* _tmPf2 = JB_File_SyntaxAccess(Dir, Lib->Name);
@@ -546,7 +546,7 @@ bool SC_Comp__Banned(JB_String* Name) {
 
 JB_File* SC_Comp__BuildFolder() {
 	JB_File* B = SC__Comp__BuildFolder;
-	iif (!JB_File_Exists(B, false)) {
+	iif (!JB_File_Exists(B)) {
 		JB_Str_MakeDir(B);
 	}
 	return B;
@@ -751,7 +751,7 @@ void SC_Comp__CompileTime() {
 		(--JB__Flow_Disabled);
 		 0;
 	});
-	Duration Elapsed = ({
+	JB_Duration Elapsed = ({
 		Date Starttime = JB_Date__Now();
 		(SC_Comp__CompileAll());
 		 (JB_Date_Ago(Starttime));
@@ -937,7 +937,7 @@ void SC_Comp__FileTestsSub(JB_File* Dest, JB_File* Src, JB_String* A, JB_String*
 	JB_File_DeleteAll(Src);
 	JB_String* Q = JB_LUB[1622];
 	JB_Incr(Q);
-	iif (!((!JB_File_Exists(Dest, false)) and (!JB_File_Exists(Src, false)))) {
+	iif (!((!JB_File_Exists(Dest)) and (!JB_File_Exists(Src)))) {
 		JB_Str_Fail(Q);
 		JB_Decr(Q);
 		return;
@@ -1066,7 +1066,7 @@ JB_File* SC_Comp__FindProjectSub(JB_String* Base, JB_String* Path) {
 	}
 	JB_SetRef(Rz, JB_Str_ChildFile(Base, First));
 	JB_Decr(First);
-	iif (!JB_File_Exists(Rz, false)) {
+	iif (!JB_File_Exists(Rz)) {
 		JB_SetRef(Rz, nil);
 	}
 	JB_SafeDecr(Rz);
@@ -2005,9 +2005,9 @@ JB_File* SC_Comp__InputFile(JB_File* Default, JB_String* S, Message* Where) {
 		return Rz;
 	}
 	Rz = JB_File_SyntaxAccess(SC__Comp_BaseProjectPath, S);
-	iif ((Default != nil) and (!JB_File_Exists(Rz, false))) {
+	iif ((Default != nil) and (!JB_File_Exists(Rz))) {
 		Rz = JB_File_SyntaxAccess(Default, S);
-		iif (!JB_File_Exists(Rz, false)) {
+		iif (!JB_File_Exists(Rz)) {
 			Rz = nil;
 		}
 	}
@@ -2510,7 +2510,7 @@ JB_File* SC_Comp__ScriptLoc(JB_String* F) {
 }
 
 bool SC_Comp__ScriptRecompile(JB_File* F, JB_File* Script_build) {
-	iif (!JB_File_Exists(Script_build, false)) {
+	iif (!JB_File_Exists(Script_build)) {
 		return true;
 	}
 	iif (JB_File_Modified(Script_build) < JB_File_Modified(F)) {
@@ -2757,7 +2757,7 @@ bool SC_Comp__TryVariousStartModes() {
 	iif (SC_Comp__ScriptRecompile(F, It)) {
 		SC_Comp__CompileTime();
 	}
-	iif (JB_File_Exists(It, false) and JB_Rec_OK(JB_StdErr)) {
+	iif (JB_File_Exists(It) and JB_Rec_OK(JB_StdErr)) {
 		(JB_App__CWDSet(Cwd));
 		JB_StringC* _tmPf7 = JB_Str_CastZero(F);
 		JB_Incr(_tmPf7);
@@ -3456,7 +3456,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[220]);
-	JB_FS_AppendInt32(_fsf0, (2024112322));
+	JB_FS_AppendInt32(_fsf0, (2024112416));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -3783,7 +3783,7 @@ bool SC_FB__ParseArgsSub(Array* Args) {
 	 else iif (SC__Options_OperationCount >= 2) {
 		JB_Rec__NewErrorWithNode(nil, JB_LUB[1965], nil);
 	}
-	return JB_Rec_OK(JB_StdErr) and JB_File_Exists(SC__Comp_BaseProjectPath, false);
+	return JB_Rec_OK(JB_StdErr) and JB_File_Exists(SC__Comp_BaseProjectPath);
 }
 
 void SC_FB__ParseOption(JB_Object* Obj) {
@@ -3893,7 +3893,7 @@ JB_String* SC_FB__TryUseProject(JB_String* Path, bool IsScript) {
 	JB_SetRef(SC__Comp_BaseProjectPath, F);
 	JB_SetRef(SC__Comp_ProjectName, JB_Str_TrimExtAndPath(F, true));
 	JB_SetRef(SC__Comp_ReportedName, SC__Comp_ProjectName);
-	bool Exists = JB_File_Exists(F, false);
+	bool Exists = JB_File_Exists(F);
 	bool IsSpd = ({
 		JB_String* _tmPf5 = JB_Str_Name(F);
 		JB_Incr(_tmPf5);
@@ -4796,7 +4796,7 @@ Message* SC_AC__JumpImport(Message* Cmd) {
 		JB_Tree_Clear(Cmd);
 		JB_File* Proj = SC_Comp__FindProject(F->Name);
 		JB_Incr(Proj);
-		iif (!JB_File_Exists(Proj, false)) {
+		iif (!JB_File_Exists(Proj)) {
 			JB_Decr(Proj);
 			JB_Decr(F);
 			return nil;
@@ -8563,7 +8563,7 @@ Array* SC_Ext__CollectCppsInto(JB_File* Fol, JB_File* Objects) {
 void SC_Ext__CollectPico(JB_String* Lib) {
 	JB_File* OfficialLocation = JB_Str_AsFile(JB_LUB[454]);
 	JB_Incr(OfficialLocation);
-	iif (!JB_File_Exists(OfficialLocation, false)) {
+	iif (!JB_File_Exists(OfficialLocation)) {
 		JB_Decr(OfficialLocation);
 		return;
 	}
@@ -8572,7 +8572,7 @@ void SC_Ext__CollectPico(JB_String* Lib) {
 	JB_File* SpdLocation = JB_Str_AsFile((_tmPf0));
 	JB_Incr(SpdLocation);
 	JB_Decr(_tmPf0);
-	iif (JB_File_Exists(SpdLocation, false)) {
+	iif (JB_File_Exists(SpdLocation)) {
 		JB_File_Delete(SpdLocation);
 	}
 	JB_StringC* _tmPf1 = JB_Str_CastZero(SpdLocation);
@@ -8864,7 +8864,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1385]);
-	JB_FS_AppendInt32(_fsf0, (2024112322));
+	JB_FS_AppendInt32(_fsf0, (2024112416));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8957,7 +8957,7 @@ JB_String* SC_Ext__LibTmpPath() {
 }
 
 JB_File* SC_Ext__LinkOK(JB_File* P) {
-	iif (!JB_File_Exists(P, false)) {
+	iif (!JB_File_Exists(P)) {
 		return nil;
 	}
 	JB_String* Lto = JB_File_LinkToGet(P);
@@ -8972,7 +8972,7 @@ JB_File* SC_Ext__LinkOK(JB_File* P) {
 	JB_File* Tof = JB_Str_AsFile(_tmPf0);
 	JB_Incr(Tof);
 	JB_Decr(_tmPf0);
-	iif (JB_File_Exists(Tof, false) and (!({
+	iif (JB_File_Exists(Tof) and (!({
 		JB_String* _tmPf2 = JB_File_LinkToGet(Tof);
 		JB_Incr(_tmPf2);
 		bool _tmPf1 = JB_Str_Exists(_tmPf2);
@@ -9067,10 +9067,10 @@ int SC_Ext__NeedNewObjForSrc(JB_String* Cpp, JB_File* Objects) {
 }
 
 int SC_Ext__NoGoodObject(JB_String* Cpp, JB_File* H, JB_File* O) {
-	iif (JB_File_Exists(H, false) and JB_File_NewerThanFile(H, O)) {
+	iif (JB_File_Exists(H) and JB_File_NewerThanFile(H, O)) {
 		return 4;
 	}
-	iif (!JB_File_Exists(O, false)) {
+	iif (!JB_File_Exists(O)) {
 		return 1;
 	}
 	JB_File* _tmPf0 = JB_Str_AsFile(Cpp);
@@ -18810,7 +18810,7 @@ Dictionary* JB_TC__Types() {
 }
 
 
-Duration JB_Date_Ago(Date Self) {
+JB_Duration JB_Date_Ago(Date Self) {
 	iif (Self) {
 		return JB_Date_OperatorMinus(JB_Date__Now(), Self);
 	}
@@ -18829,7 +18829,7 @@ Float64 JB_Date_Float64(Date Self) {
 	return ((Float64)Self) * ((Float64)kJB__Date_kOneStep);
 }
 
-Duration JB_Date_OperatorMinus(Date Self, Date D) {
+JB_Duration JB_Date_OperatorMinus(Date Self, Date D) {
 	return ((int64)Self) - ((int64)D);
 }
 
@@ -18960,11 +18960,11 @@ Array* JB_ErrorSeverity__InitNames() {
 }
 
 
-bool JB_ExitCode_IsRunning(uint /*ExitCode*/ Self) {
-	return Self == 255;
+bool JB_ExitCode_IsRunning(ExitCode Self) {
+	return Self == -1;
 }
 
-bool JB_ExitCode_Successful(uint /*ExitCode*/ Self) {
+bool JB_ExitCode_Successful(ExitCode Self) {
 	return Self == 0;
 }
 
@@ -19962,7 +19962,7 @@ ASM* JB_ASM_Write__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo) 
 }
 
 
-float JB_Duration_Float(Duration Self) {
+float JB_Duration_Float(JB_Duration Self) {
 	return ((float)JB_Date_Float64(Self));
 }
 
@@ -21134,7 +21134,7 @@ void JB_ClassData_Restore(JB_Class* Self) {
 
 
 float JB_MzSt_Durr(CompressionStats* Self) {
-	Duration D = Self->Duration;
+	JB_Duration D = Self->Duration;
 	iif (D < 0) {
 		D = (D + JB_Date__New0());
 	}
@@ -30585,7 +30585,7 @@ JB_File* JB_Str_ChildFile(JB_String* Self, JB_String* Ch) {
 bool JB_Str_FileExists(JB_String* Self) {
 	JB_File* F = JB_Str_AsFile(Self);
 	JB_Incr(F);
-	bool _tmPf0 = JB_File_Exists(F, false);
+	bool _tmPf0 = JB_File_Exists(F);
 	JB_Decr(F);
 	return _tmPf0;
 }
@@ -32979,7 +32979,7 @@ JB_File* JB_File_Child(JB_File* Self, JB_String* Name) {
 }
 
 ExitCode SC_File_CodeSign(JB_File* Self, JB_String* Sign) {
-	uint Rz = 0;
+	ExitCode Rz = 0;
 	iif (!JB_Platform__OSX()) {
 		return 45;
 	}
@@ -33104,7 +33104,7 @@ ErrorInt JB_File_FileCompareSub(JB_File* Self, JB_File* A) {
 
 Message* JB_File_Conf(JB_File* Self, int Lim) {
 	Message* Rz = ((Message*)nil);
-	iif (JB_File_Exists(Self, false)) {
+	iif (JB_File_Exists(Self)) {
 		Rz = ((Message*)JB_File_Parse(Self, Lim, false));
 	}
 	iif (!Rz) {
@@ -33243,7 +33243,7 @@ Array* JB_File_ListFiles(JB_File* Self, bool Invis) {
 }
 
 bool JB_File_MustExist(JB_File* Self, JB_String* Operation) {
-	iif (JB_File_Exists(Self, false)) {
+	iif (JB_File_Exists(Self)) {
 		return true;
 	}
 	FastString* Fs = JB_FS_Constructor(nil);
@@ -33520,7 +33520,7 @@ ExitCode JB_File_Touch(JB_File* Self) {
 	Array* _tmPf0 = (JB_Array_Constructor0(nil));
 	JB_Incr(_tmPf0);
 	JB_Array_SyntaxAppend(_tmPf0, Self);
-	uint _tmPf1 = JB_Str_SilentExecute(JB_LUB[134], _tmPf0, nil, nil, 0);
+	ExitCode _tmPf1 = JB_Str_SilentExecute(JB_LUB[134], _tmPf0, nil, nil, 0);
 	JB_Decr(_tmPf0);
 	return _tmPf1;
 }
@@ -42895,9 +42895,8 @@ int SC_Decl_Alignment(SCDecl* Self) {
 
 bool SC_Decl_AlreadyContains(SCDecl* Self) {
 	SCDecl* Ty = Self->Type->Contained;
-	SCDecl* C = Self->Contains;
-	iif (Ty and C) {
-		return SC_Decl_MiniMatch(C, Ty, 0);
+	iif (Ty) {
+		return SC_Decl_MiniMatch(Self->Contains, Ty, 0);
 	}
 	return false;
 }
@@ -44173,7 +44172,10 @@ bool SC_Decl_MatchC(SCDecl* Self, SCDecl* O) {
 }
 
 bool SC_Decl_MiniMatch(SCDecl* Self, SCDecl* O, int TypeCast) {
-	return ((bool)SC_Decl_TypeMatch(Self, O, TypeCast, nil));
+	iif (Self) {
+		return ((bool)SC_Decl_TypeMatch(Self, O, TypeCast, nil));
+	}
+	return false;
 }
 
 void SC_Decl_NameSet(SCDecl* Self, JB_String* Value) {
@@ -44662,7 +44664,7 @@ int SC_Decl_TryTypeCast(SCDecl* Self, SCDecl* O, Message* OExp, int TypeCast) {
 		}
 	}
 	iif ((SC_Decl_IsCArray(O)) and (Self->PointerCount == 1)) {
-		int Found = SC_Decl_TryTypeCastPointer(Self, O, OExp, TypeCast, true);
+		int Found = SC_Decl_TryTypeCastCarray(Self, O, OExp, TypeCast);
 		iif (Found) {
 			return Found;
 		}
@@ -44782,16 +44784,27 @@ int SC_Decl_TryTypeCast(SCDecl* Self, SCDecl* O, Message* OExp, int TypeCast) {
 
 int SC_Decl_TryTypeCastAccess(SCDecl* Self, SCDecl* O, Message* Exp, int TypeCast) {
 	SCDecl* I = O->Internal;
-	iif (I and SC_Decl_MiniMatch(Self, I, TypeCast)) {
+	iif (SC_Decl_MiniMatch(Self, I, TypeCast)) {
 		return SC_Msg_MakeDereference(Exp, I);
+	}
+	return 0;
+}
+
+int SC_Decl_TryTypeCastCarray(SCDecl* Self, SCDecl* O, Message* Exp, int TypeCast) {
+	SCDecl* Si = Self->Internal;
+	SCDecl* Oi = O->Internal;
+	iif (SC_Decl_MiniMatch(Si, Oi, 0)) {
+		iif (!Exp) {
+			return kJB_kNeedsTypeCast;
+		}
+		return kJB_kCastedMatch;
 	}
 	return 0;
 }
 
 int SC_Decl_TryTypeCastPointer(SCDecl* Self, SCDecl* O, Message* Exp, int TypeCast, bool CArray) {
 	int Rz = 0;
-	SCDecl* I = Self->Internal;
-	iif (I and SC_Decl_MiniMatch(I, O, 0)) {
+	iif (SC_Decl_MiniMatch(Self->Internal, O, 0)) {
 		SCDecl* OAddr = SC_Decl_GetAddress(O, kSC__DeclMode_Always);
 		iif (CArray) {
 			OAddr->C_Array = 0;
@@ -47873,7 +47886,7 @@ void SC_Err_Improve(JB_Error* Self) {
 		iif (!JB_File_SyntaxEquals(SC, SC_Msg_File(Self->Node), false)) {
 			JB_SetRef(Self->Node, Node);
 		}
-		iif (JB_File_Exists(SC, false)) {
+		iif (JB_File_Exists(SC)) {
 			JB_SetRef(Self->Path, JB_File_Path(SC));
 		}
 	}
@@ -48140,7 +48153,7 @@ JB_String* SC_Err_SCOriginalData(JB_Error* Self) {
 	iif (JB_Str_Exists(P)) {
 		JB_File* F = JB_Str_AsFile(P);
 		JB_Incr(F);
-		iif (JB_File_Exists(F, false) and (!JB_File_IsDir(F))) {
+		iif (JB_File_Exists(F) and (!JB_File_IsDir(F))) {
 			JB_String* _tmPf0 = JB_File_ReadAll(F, 134217728, true);
 			JB_Incr(_tmPf0);
 			JB_Decr(F);
@@ -52943,13 +52956,7 @@ void SC_Func_DontWantSameReturnType(SCFunction* Self, SCFunction* F) {
 	iif (!Self) {
 		return;
 	}
-	SCDecl* R = F->ReturnType;
-	JB_Incr(R);
-	iif (!R) {
-		JB_Decr(R);
-		return;
-	}
-	iif (SC_Decl_MiniMatch(R, Self->ReturnType, 0)) {
+	iif (SC_Decl_MiniMatch(F->ReturnType, Self->ReturnType, 0)) {
 		iif (true) {
 			JB_Msg_Fail(Self->Source, JB_LUB[1604]);
 		}
@@ -52957,7 +52964,6 @@ void SC_Func_DontWantSameReturnType(SCFunction* Self, SCFunction* F) {
 			JB_Msg_Fail(F->Source, JB_LUB[1605]);
 		}
 	}
-	JB_Decr(R);
 }
 
 bool SC_Func_DoRefs(SCFunction* Self) {
@@ -58128,4 +58134,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 7564731217341572519 -7801823231334923150
+// -5326601066588629606 -7801823231334923150
