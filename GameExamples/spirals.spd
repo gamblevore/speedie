@@ -2,22 +2,21 @@
 import "GUI"
 
 main
-	return Breakout()
+	return SpiralDemo()
 
 
-class Breakout (Window)
+class SpiralDemo (Window)
 	|[bounceable]|		Spirals
 
 	constructor
-		.spirals <~ bounceable((0.5 , 0.13),  (0.25,0.0), vec4(0.1,0,0.3,0))
-		.spirals <~ bounceable((0.25, 0.05),  (0.5,0.0),  vec4(0.3,-0.2,0,0))
-		.spirals <~ bounceable((0.75, -0.1),  (0.75,0.0), vec4(0.5,0,0,0))
+		.spirals <~ bounceable((0.5 , 0.13),  (0.25,0.0), vec4(0.1, 0,  0.3,0))
+		.spirals <~ bounceable((0.25, 0.05),  (0.5, 0.0), vec4(0.3,-0.2,0,  0))
+		.spirals <~ bounceable((0.75, -0.1),  (0.75,0.0), vec4(0.5, 0,  0,  0))
 	
 	behaviour FrameStep
 		for s in .Spirals
 			s.BounceInFrame
 		gui.Touch
-	
 	
 	behaviour Drawbackground
 		where.DrawRect(self, colors.black)	
@@ -29,35 +28,33 @@ class Breakout (Window)
 			where.DrawSpiral(144, L, s.XY(C2), s.col * 0.2[], (3s+i*1s)()) // can we make them pulsate too?
 
 
-class Bounceable // merge with block?
+class Bounceable
 	|vec2| X // This is wierd but i don't care
 	|vec2| Y // Its just a demo :). demos are ALWWAYS WIERD
 	|vec4| Col
 	
 	function XY (|vec4| P, |vec2|)
 		return ((.x.x, .y.x) * p.size) + p.xy
-
-	function vec2.bounce (|vec2|)
-		if .x > 1.0
-			return (2.0, 0) - self
-		if .x < 0
-			return -self
-		return self
 		
 	function BounceInFrame
-		.y.x2 -= g
+		.y.x2 -= 0.0024
 		.x.x += .x.x2/128
 		.y.x += .y.x2/128
 		.x = .x.Bounce
 		.y = .y.Bounce
 
-	module
-		|| g = 0.0024
+
+function vec2.bounce (|vec2|)
+	if .x > 1.0
+		return (2.0, 0) - self
+	if .x < 0
+		return -self
+	return self
 
 	
 function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| HSB, |float| Pulse)
 	|| sub = 24.0
-	max+=sub/2
+	max += sub/2
 	Pulse = Pulse * max
 	for j in max
 		if j <= sub
@@ -70,7 +67,7 @@ function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| HSB, |f
 		|| P = R*(50.0+i+strength) + XY
 		|| Circle = (P-4.0, P+4.0)
 		|| A = ((Max-i)*2.0)/max
-		|| C = Colors.HSB((i*0.005, 0.7, 1.0, A)+HSB)
+		|| C = Colors.wheel((i*0.005, 0.7, 1.0, A)+HSB)
 	
 		.DrawSoftCircle(Circle, C)
 
