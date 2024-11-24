@@ -61,7 +61,7 @@ typedef int ErrorMarker;
 
 typedef byte ErrorSeverity;
 
-typedef byte ExitCode;
+typedef int ExitCode;
 
 typedef int FileDes;
 
@@ -107,7 +107,7 @@ typedef int jbinLeaver;
 
 typedef vec4 mat2;
 
-typedef Date Duration;
+typedef Date JB_Duration;
 
 typedef Date HumanDate;
 
