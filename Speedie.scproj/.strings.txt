@@ -2150,3 +2150,6 @@
 "big reg "
 " unmarked"
 "low reg "
+"AccessToMemCpy fail"
+"memzero"
+"memcpy"
