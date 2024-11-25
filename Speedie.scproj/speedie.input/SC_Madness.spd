@@ -105,7 +105,6 @@ function scdecl.AccessToMemCpy (|message| exp, |message| side, |scdecl| type, |s
 	opt norefcounts
 	
 	|| rel = exp.ancestor(@rel)    #expect    (rel, "AccessToMemCpy fail")
-	if side == "nil" or "exp" == nil
 	|| F = rel.first!
 	rel.func = @func
 	|| Name = @thg + "memcpy"
