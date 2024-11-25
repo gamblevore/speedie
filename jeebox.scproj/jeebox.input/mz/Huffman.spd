@@ -3,7 +3,7 @@
 // Huff Coder
 // unfinished.
 
-
+/*
 struct RangeCoderItem
 	|uint16|  Code
 	|uint16|  Depth
@@ -143,3 +143,4 @@ class RangeCoder (list)
 			|| fs = faststring()
 			.EncodeBytes(s, fs)
 				
+*/

@@ -346,7 +346,6 @@ function message.FailOrCopy (|message| p, |message|)
 	if f == @Thg
 		return .copy
 	|| ch = .first
-		ch = ch.Unwrap
 		if ch == @thg
 			if (self isbrel "&") or (f == @acc)
 				return .copy

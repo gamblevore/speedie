@@ -185,10 +185,10 @@ extend_module scfunction
 		|| Using = msg.SyntaxUsing
 		name ?= UniqueTmpVar(msg.MsgOwningFunc)
 		|| repl = «thg name »
+		|| insert = msg
 		msg.ReplaceWith( repl )
 		
 		|| p = repl.ParentPoint!
-		|| insert = msg
 		if (msg == @rel)
 			insert = «bra, (msg)»
 	

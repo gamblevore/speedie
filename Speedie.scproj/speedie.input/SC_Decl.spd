@@ -318,12 +318,22 @@ class SCDecl (SCNamed) {
 		dcl.Info |= .info & cpyflags
 		dcl.C_array		= .C_array
 		dcl.NilDeclared = .NilDeclared
-			
+		
+	
+	function CArrayAddrSimplify (|scdecl|)
+		opt norefcounts
+		// C++ does this, and it actually makes sense :)
+		// hard to explain, but intuitive to use
+		if .iscarray
+			if .internal!.isnormal
+				return .Internal
+		return self
+		
 
 	function GetAddress (|declmode| Purpose=declmode.always, |SCDecl|)
 		rz = SCDecl(.type)
 		.CopyTypeInfoTo(rz)
-		rz.internal = self
+		rz.internal = .CArrayAddrSimplify
 		rz.PointerCount++
 		rz.c_array = 0
 		|| ns = nilstate.realish
@@ -349,33 +359,33 @@ class SCDecl (SCNamed) {
 		.nildeclared = nilstate.realish
 
 
-	function DeReference (|message| brel, |SCNode|name_space,  |scdecl|)
+	function Access (|message| Access,  |scdecl|)
 		opt norefcounts
-		|| c = .DeReferenceSub(brel, name_space)
+		|| c = .AccessSub(Access)
 			return c
-		error (brel.first, "Can't dereference this.")
+		error (Access.first, "Can't access this.")
 		
 	
-	function DeReferenceSub (|message| brel, |SCNode| name_space, |scdecl|)
+	function AccessSub (|message| Exp, |scdecl|)
 		opt norefcounts
 		if .IsCArray
 			|| i = .Internal								#require			
 			if i.TypeSuffers
 				return i.MakeNewOptional
-//			if i.IsCarray or i.Type.IsStruct
-//				i = i.GetAddress
-// not so simple to fix!
+			if i.IsMemoryOnly
+				|| P = Exp.niceparent
+				if (p == @brel) and (p == "&")
+					return i
+				
+				i = i.GetAddress
+				Exp.GetAddressOf(i)
+				if p==@acc
+					SCFunction.TempMoveOut(Exp.parent!, "", i)
 			return i
 		
 		if .PointerCount > 0
-			return .internal
-	
-		|| isaccess = true ///??
-		if !isaccess and .isnormalobject
-			brel.become(@dot, "first")
-			brel <~ @prm
-			return typeofexpr(brel, name_space)
-		
+			return .internal		
+
 
 	function WriteDeclFull (|String| DeclName = "", |int| minimal = 0, |Message|)
 		DeclName ?= .Name
@@ -681,11 +691,16 @@ class SCDecl (SCNamed) {
 		require c.PointerCount == .PointerCount
 		if .nildeclared != c.nildeclared
 			return false
-		return c.C_array      == .C_array
+		return c.C_array == .C_array
 
 //	function IsVeryNormal (|bool|)
 //		return .IsNormal and !.Type.IsStruct
 	
+	function IsMemoryOnly (|bool|)
+		if .pointercount
+			return false
+		return .iscarray or .Type.IsStruct
+		
 	function IsNormal (|bool|)
 		return !.PointerCount and !.IsNil and !.IsCArray
 
@@ -1004,10 +1019,9 @@ class SCDecl (SCNamed) {
 		if !self
 			Return kNeedsAddressOf
 		
-		|| Addr = «brel "&"»
-		.ReplaceWith( Addr )
-
+		|| Addr = @brel +"&"
 		|| inside = self
+		.ReplaceWith( Addr )
 		if WasCArray
 			inside = «acc 
 				self
@@ -1117,7 +1131,15 @@ class SCDecl (SCNamed) {
 				fs <~ ']'
 			  else 
 				fs <~ ( '&', .PointerCount )
-				fs <~ .Type.Name
+				if .pointercount
+					|scdecl--| i = .internal!
+					if i.internal
+						fs <~ '('
+					i.rendertypename(fs)
+					if i.internal
+						fs <~ ')'
+				  else
+					fs <~ .Type.Name
 			
 			|| c = .Contains
 			if c and !c.minimatch(.type.contained, 0) 

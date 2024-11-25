@@ -7,6 +7,7 @@ main // speedie main {
 	Compiler.PrintResults
 
 
+
 function Compiler.Main
 	if .EnterCompile
 		using FlowControl.attempt("Speedie"+options.variant)

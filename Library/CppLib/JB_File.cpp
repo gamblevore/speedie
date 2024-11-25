@@ -787,10 +787,8 @@ int JB_Str_MakeDir(JB_String* self) {
     if (err == -1 and errno == ENOENT and RetryMakePath(self)) {
 		err = mkdir(tmp, kDefaultMode);
 	}
-    if (!err) {
-		RelaxPath_(tmp, true, self);
-		return 0;
-	}
+    if (!err)
+		return RelaxPath_(tmp, true, self);
     return (int)ErrorHandle_(err, self, nil, "creating a folder");
 }
 
@@ -807,7 +805,7 @@ int JB_File_Delete (JB_String* self) {
 
 
 JB_String* JB_File_Path(JB_File* P) {
-	if  (P) 
+	if (P) 
 		return (JB_String*)(P->Parent); // hmmmm
 	return JB_Str__Empty();
 }
@@ -953,9 +951,8 @@ int JB_Str_SymLink( JB_StringC* Existing, JB_String* ToCreate ) {
 	struct _stat st;
 	if (Stat_(ToCreate, &st, false)) {
 		Err = JB_File_Delete(ToCreate);
-		if (Err) {
+		if (Err)
 			errno = EEXIST; // clearer error message.
-		}
 	}
 	if (!Err) {
 		uint8 Tmp[PATH_MAX];
@@ -964,13 +961,11 @@ int JB_Str_SymLink( JB_StringC* Existing, JB_String* ToCreate ) {
 		
 		if (Err and errno == ENOENT) {
 			Err = 1; // creates clearer error messages.
-			if (RetryMakePath(ToCreate)) {
+			if (RetryMakePath(ToCreate))
 				Err = symlink((const char*)(Existing->Addr), Created);
-			}
 		}
-		if (!Err) {
+		if (!Err)
 			RelaxPath_(Created, true, ToCreate); // needed on MacOSX but not linux!
-		} 
 	}
 	return (int)ErrorHandle_(Err, ToCreate, Existing, "linking");
 }
@@ -1073,7 +1068,7 @@ Date JB_File_Created( JB_File* self ) {
     struct _stat st = {};
     require (Stat_(self, &st))
 	#if __linux__
-		return JB_Date__Create(st.st_ctime, 0);//st.st_ctime_nsec);
+		return JB_Date__Create(st.st_ctime, 0);
 	#else
 		return JB_Date__Create(st.st_ctimespec.tv_sec, st.st_ctimespec.tv_nsec);
 	#endif
@@ -1106,8 +1101,7 @@ int JB_File_MoveTo(JB_File* self, JB_String* New) {
     if (Err and RetryMakePath(New))
 		Err = rename((const char*)SelfPath, (const char*)NewPath);
     ErrorHandle_(Err, self, New, "moving");
-//    if (!Err) // causes so many bugs
-//        JB_SetRef(self, New);
+    // do not change the path
     return Err;
 }
 
@@ -1115,9 +1109,8 @@ int JB_File_MoveTo(JB_File* self, JB_String* New) {
 // copy file properly!! keeps attrs!! :)
 int CopyStats_(JB_File* self, JB_File* To) {
 	struct stat st;
-	if (Stat_(self, &st)) {
+	if (Stat_(self, &st))
 		return JB_File_ModeSet(To, st.st_mode);
-	}
 	return 0;
 }
 
@@ -1132,7 +1125,7 @@ int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 		return -1;
 
 	int result = 0;
-	int input	= JB_File_OpenStart( self, false );
+	int input = JB_File_OpenStart( self, false );
 	if (input > 0) {
 		int ChunkSize = 4*1024;
 		u8 TotalBlock[ChunkSize*2];
@@ -1196,9 +1189,8 @@ int JB_File_Copy(JB_File* self, JB_File* To, bool AttrOnly) {
 
 bool JB_File_DataSet( JB_File* self, JB_String* Data ) {
 	bool WasOpen = HasFD(self);
-	if (JB_File_Open(self, O_RDWR | O_CREAT | O_TRUNC, false)<0) {
+	if (JB_File_Open(self, O_RDWR | O_CREAT | O_TRUNC, false) < 0)
 		return false;
-	}
 	JB_File_SizeSet(self, 0);
 	JB_File_OffsetSet(self, 0); // necessary as ftruncate doesnt do this.
 	int N = JB_File_Write(self, Data);
@@ -1209,9 +1201,8 @@ bool JB_File_DataSet( JB_File* self, JB_String* Data ) {
 
 
 JB_File* JB_File__NewPipe(int Pipe) {
-	if (Pipe < 0) {
+	if (Pipe < 0)
 		return nil;
-	}
 	JB_File* F = JB_File_Constructor( 0, 0 );
 	F->Descriptor = Pipe;
 	F->MyFlags |= 2;
@@ -1275,9 +1266,8 @@ bool JB_File_IsLink (JB_String* self) {
 
 
 void JB_munmap (void* mem, int64 n) {
-	if (mem) {
+	if (mem)
 		ErrorHandle_(munmap(mem, n), nil, nil, "un-memmap");
-	}
 }
 
 

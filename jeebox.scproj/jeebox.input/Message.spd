@@ -119,8 +119,9 @@ After that, you now have a tree-data-structure that represents your data. The Me
 		if Braces
 			fs.AppendIndent
 			fs <~ '}'
-			fs <~ '\n'
-		if !.parent
+			if .parent == @tmp
+				fs <~ '\n'
+		  elseif !.parent
 			fs <~ "\n" // make sure it will reparse as an arg
 		
 
