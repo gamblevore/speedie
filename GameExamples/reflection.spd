@@ -14,22 +14,22 @@ main
 
 class Breakout (Window)
 	|fpstextview|		FPS
-	|[block2d]|			Blocks
-	|block2d|			Bar
-	|[block2d]|			Balls
+	|[vobject]|			Blocks
+	|vobject|			Bar
+	|[vobject]|			Balls
 	|float|				BallSpeed
 	|int|				Hits
-	|[block2d]|			Spirals
+	|[vobject]|			Spirals
 
 	constructor
-		.bar  = block2d(vec4())
+		.bar = vobject(vec4())
 		.fps = fpstextview(self)
 		.fps.MakeInline()
 		.reset
 
-	function AddBalls (|int| n, |vec2| P, |block2d|)
+	function AddBalls (|int| n, |vec2| P, |vobject|)
 		for n
-			Rz = block2D((P, 16th,  16th))
+			Rz = vobject((P, 16th,  16th))
 			P.y++
 			rz.Velocity = vec2(0, -.ballspeed)
 			.balls <~ rz
@@ -49,12 +49,12 @@ class Breakout (Window)
 			|| y2 = -1.0 + y*3th
 			for x in 10.0
 				|| pos = (2.0+x*(16.0/9.0), 9.0+y*0.5,  0.75, 0.2)
-				|| bl = block2d(pos)
+				|| bl = vobject(pos)
 				bl.Health = 1.0 + y
 				.Blocks <~ bl
 	
 	
-	function BounceBar (|block2d| bar, |block2d| B,  |bool|)
+	function BounceBar (|vobject| bar, |vobject| B,  |bool|)
 		|| Hit = bar.OverlapsBlock(B)
 		require hit.Exists
 		|| v = b.Velocity
@@ -66,7 +66,7 @@ class Breakout (Window)
 		return true
 
 
-	function Bounds (|block2d| b)
+	function Bounds (|vobject| b)
 		|| bvx = b.Velocity.x
 		if bvx < 0
 			if b.left <= 0
@@ -87,11 +87,11 @@ class Breakout (Window)
 		return .BallSpeed
 	
 		
-	function HitOne (|block2d| bl, |vec4| R, |block2d| ball, |bool|)
+	function HitOne (|vobject| bl, |vec4| R, |vobject| ball, |bool|)
 		|| R2 = bl.OverlapsRect(R)
 		require r2.exists
 		|| Cn = r2.Center
-		.spirals <~ block2d((cn, 3.0, 3.0), vec4(0.5,0,0,0))
+		.spirals <~ vobject((cn, 3.0, 3.0), vec4(0.5,0,0,0))
 		
 		if r2.Height > r2.Width
 			ball.Velocity.x = -ball.Velocity.x
@@ -132,7 +132,7 @@ class Breakout (Window)
 			return 1+random.shared.float(n)|int|
 
 
-	function DoHits (|block2d| ball)
+	function DoHits (|vobject| ball)
 		|| R = ball.box
 		for (bl.backwards in .Blocks) (i)
 			if .HitOne(bl, r, ball)
@@ -151,7 +151,7 @@ class Breakout (Window)
 				if y.Abs < minsp
 					b.Velocity.y = minsp.CopySign(y)
 			b.Step
-			.bounds(b)
+			.Bounds(b)
 			.Dohits(b)
 			.BounceBar(.bar, b)
 			if b.y <= 0
@@ -177,8 +177,7 @@ class Breakout (Window)
 	
 	
 	behaviour Drawbackground
-		where.DrawRect(self, colors.black)	
-		|| VRect = .LastRect.vec4
+		where.DrawRect(self, colors.black)
 		for x in .Width
 			|| Col = Colors.wheel(x div .width, 1, 0.5)
 			where.DrawLineV((x,0), .height, col)
@@ -194,7 +193,7 @@ class Breakout (Window)
 		|| L = 24s()
 		for (s in .Spirals) (i)
 			|| B = s.Screen
-			where.DrawSpiral(0.01*b.width|float|*block2d.adjust.x, L, b.center, s.color * 0.2[], (3s+i*1s)())
+			where.DrawSpiral(0.01*b.width|float|*vobject.drawscale, L, b.center, s.color * 0.2[], (3s+i*1s)())
 		for b in .balls
 			|| bx = b.Box.scr0 ± -4.0
 			where.DrawSoftCircle(bx, b.Color, 2.0)

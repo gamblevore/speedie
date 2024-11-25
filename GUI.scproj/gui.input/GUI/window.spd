@@ -24,9 +24,9 @@ class Window (GUIControl)
 	|object?|							ReturnValue
 	|date|								AlphaFader
 	|date|								CreatedDate
-	|float|								ShapeScale
-	|vec2|								ShapeMove
-	|byte|								ShapeMode
+	|float|								VastuScale
+	|vec2|								VastuMove
+	|byte|								VastuMode
 	
 	
 	constructor
@@ -104,6 +104,8 @@ class Window (GUIControl)
 		.show
 		if gui.init(scaling)
 			gui.NukeCursor
+			.VastuScale ?= 20
+
 			return GUI.run
 
 	syntax cast (|ErrorInt|)
