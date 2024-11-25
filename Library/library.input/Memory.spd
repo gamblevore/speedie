@@ -237,6 +237,6 @@ class Memory
 			return byte.zalloc(n)
 		function Realloc (|?&nil| b, |int| n, |?&byte|):				cpp_wrapper JB_realloc
 		function Free	 (|?&nil| b):									cpp_wrapper JB_free
-		function Zero	 (|&nil| addr, |int| n):						cpp_wrapper memzero (||)
+		function Zero	 (|&nil| addr, |int| n):						cpp_wrapper memzero
 		function Copy	 (|&nil| dest, |&nil| src, |int| N):			cpp_wrapper memcpy
 

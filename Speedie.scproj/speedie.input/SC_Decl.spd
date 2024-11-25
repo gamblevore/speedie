@@ -38,6 +38,7 @@ constants
 	kTypeCastSetToMemory		= 1024
 	kTypeCastFromZero			= 2048
 	kTypeCastFromSmallInt		= 4096
+	kTypeCastForRelSet			= 8192
 	kActualTypecasts			= ~(kTypeCastWantSuperDistance ||| kNoBoolTypeCast)  
 	kTypeCastFalse				= 0
 
@@ -359,32 +360,24 @@ class SCDecl (SCNamed) {
 		.nildeclared = nilstate.realish
 
 
-	function Access (|message| Access,  |scdecl|)
+/*	
+	function AccessSub (|message| Exp, |message| side, |scdecl|)
 		opt norefcounts
-		|| c = .AccessSub(Access)
-			return c
-		error (Access.first, "Can't access this.")
-		
-	
-	function AccessSub (|message| Exp, |scdecl|)
-		opt norefcounts
-		if .IsCArray
-			|| i = .Internal								#require			
+		|| i = .Internal$
+		if .IsCArray //or i.isbarestruct
 			if i.TypeSuffers
 				return i.MakeNewOptional
-			if i.IsMemoryOnly
+			if !side and i.IsMemoryOnly 
 				|| P = Exp.niceparent
 				if (p == @brel) and (p == "&")
 					return i
-				
-				i = i.GetAddress
-				Exp.GetAddressOf(i)
-				if p==@acc
-					SCFunction.TempMoveOut(Exp.parent!, "", i)
-			return i
-		
-		if .PointerCount > 0
-			return .internal		
+					
+				// carrays are a total bastard...
+//				if (p == @rel)
+//					|| L = p.last
+//					if  exp == L  or  exp in L
+				// opting structs around this buggers them up too.
+*/
 
 
 	function WriteDeclFull (|String| DeclName = "", |int| minimal = 0, |Message|)
@@ -956,97 +949,6 @@ class SCDecl (SCNamed) {
 				  else
 					error p
 
-
-	function Message.WrapExpr (|scdecl| src, |int|)
-		if !self
-			Return kNeedsTypeCast
-
-		|| W = «dot "new"
-			«thg "dataobject"»
-			«emb »
-		»
-		if src.isfloat
-			w.name = "newfloat" // sigh
-		.ReplaceWith(W)
-		W.last <~ self
-		TypeOfExpr(W, compiler.program)
-		|| D = .AsDecl
-			w.obj = D.NewWrapper(D)
-		  else
-			debugger
-		
-		return kCastedmatch
-		
-	
-	function Message.CastToBool (|SCNode| name_space = nil, |int|)
-		return .castToType("bool", TypeBool!, name_space, kLossyCastedMatch)
-
-
-	function Message.CastFPToVoidPtr (|int|)
-		|| cst = @type + ":)"
-		.prev = cst
-		cst <~ self
-		cst.msg(@emb).obj = TypeVoidPtr
-		
-		cst.obj = TypeVoidPtr	 // hmmm.... why not do it anyhow?
-		return kCastedMatch
-
-
-	function Message.CastToClass (|scclass|type, |SCNode|name_space=nil, |int|)
-		return .CastToType(type.name, type, name_space)
-
-
-	function Message.CastToType (|string| TypeName, |SCClass| type, |SCNode| name_space, |int| loss = kCastedMatch, |int|)
-		if (!self)
-			Return kNeedsTypeCast ||| loss
-		
-		|| FoundType = TypeOfExpr(self, name_space)
-			if FoundType.type.isstruct
-				expect FoundType.PointerCount (self, "Can't typecast a struct!")
-			
-			if (self == @type) and (FoundType.isnormal and foundtype.type == type)
-				return kSimpleMatch // done.
-	
-		|| cst = «type ":)" »
-		.prev = cst
-		cst <~ self
-		cst.msg(@thg, typeName).obj = Type.TypeNormal 
-		cst.obj = Type.TypeNormal	 // hmmm.... why not do it anyhow?
-		Return loss	
-
-	
-	function Message.GetAddressOf (|SCDecl| Type, |bool| WasCArray = false, |int|)
-		if !self
-			Return kNeedsAddressOf
-		
-		|| Addr = @brel +"&"
-		|| inside = self
-		.ReplaceWith( Addr )
-		if WasCArray
-			inside = «acc 
-				self
-				«arr 
-					«num "0"»
-				»
-			»
-		
-		Addr <~ inside
-		Addr.obj = Type
-		Return kAddressOfMatch
-	
-	
-	function Message.MakeDereference (|SCDecl| Type, |int|)
-		if !self
-			Return kNeedsAddressOf
-		
-		|| Addr = @acc.msg
-		.next = addr
-		Addr <~ self
-		addr.msg(@arr) <~ 0
-		Addr.obj = Type
-		Return kAddressOfMatch
-	
-
 	function MakeAccess0 (|message|)
 		opt norefcounts
 		|| l = @thg + .name
@@ -1065,8 +967,10 @@ class SCDecl (SCNamed) {
 		|| Cast = kTypeCastTrue
 		if !side
 			cast |= kTypeCastBothWays
-		  elseif  self isnt local  or  o isnt local
-			cast |= kTypeCastSetToMemory // float conversion...
+		  else
+			cast |= kTypeCastForRelSet
+			if  self isnt local  or  o isnt local
+				cast |= kTypeCastSetToMemory // float conversion...
 		
 		rz = .ExpectMatchSub( O, Cast, exp, ErrNode )
 		

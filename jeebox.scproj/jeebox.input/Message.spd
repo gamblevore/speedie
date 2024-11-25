@@ -726,10 +726,9 @@ After that, you now have a tree-data-structure that represents your data. The Me
 
 	function Ancestor (|Syntax| f, |Message|)
 		Opt NoRefCounts
-		if self
-			for ch.Up in .parent
-				if ch == f
-					return ch
+		for ch.Up in .parent
+			if ch == f
+				return ch
 
 
 	function Find (|Syntax| s, |Message|)

@@ -1,0 +1,172 @@
+
+
+function Message.WrapExpr (|scdecl| src, |int|)
+	if !self
+		Return kNeedsTypeCast
+
+	|| W = «dot "new"
+		«thg "dataobject"»
+		«emb »
+	»
+	if src.isfloat
+		w.name = "newfloat" // sigh
+	.ReplaceWith(W)
+	W.last <~ self
+	TypeOfExpr(W, compiler.program)
+	|| D = .AsDecl
+		w.obj = D.NewWrapper(D)
+	  else
+		debugger
+	
+	return kCastedmatch
+	
+
+function Message.CastToBool (|SCNode| name_space = nil, |int|)
+	return .castToType("bool", TypeBool!, name_space, kLossyCastedMatch)
+
+
+function Message.CastFPToVoidPtr (|int|)
+	|| cst = @type + ":)"
+	.prev = cst
+	cst <~ self
+	cst.msg(@emb).obj = TypeVoidPtr
+	
+	cst.obj = TypeVoidPtr	 // hmmm.... why not do it anyhow?
+	return kCastedMatch
+
+
+function Message.CastToClass (|scclass|type, |SCNode|name_space=nil, |int|)
+	return .CastToType(type.name, type, name_space)
+
+
+function Message.CastToType (|string| TypeName, |SCClass| type, |SCNode| name_space, |int| loss = kCastedMatch, |int|)
+	if (!self)
+		Return kNeedsTypeCast ||| loss
+	
+	|| FoundType = TypeOfExpr(self, name_space)
+		if FoundType.type.isstruct
+			expect FoundType.PointerCount (self, "Can't typecast a struct!")
+		
+		if (self == @type) and (FoundType.isnormal and foundtype.type == type)
+			return kSimpleMatch // done.
+
+	|| cst = «type ":)" »
+	.prev = cst
+	cst <~ self
+	cst.msg(@thg, typeName).obj = Type.TypeNormal 
+	cst.obj = Type.TypeNormal	 // hmmm.... why not do it anyhow?
+	Return loss	
+
+
+
+function message.GetAddrButNicer (|message|)
+	opt norefcounts
+	if .func == @acc
+		|| L = .last
+		|| num = L.first
+		if num == @num and "0"
+			.func = @bra
+			l.remove
+			return self
+	rz = @brel + "&"
+	.next = rz
+	rz <~ self
+
+
+function Message.GetAddressOf (|SCDecl| Type, |bool| WasCArray = false, |int|)
+	if !self
+		Return kNeedsAddressOf
+	
+	|| Addr = @brel +"&"
+	|| inside = self
+	.ReplaceWith( Addr )
+	if WasCArray
+		inside = «acc 
+			self
+			«arr 
+				«num "0"»
+			»
+		»
+	
+	Addr <~ inside
+	Addr.obj = Type
+	Return kAddressOfMatch
+
+
+
+function scdecl.Access (|message| Access, |message| side,   |scdecl|)
+	opt norefcounts
+	|| c = .AccessSub(Access, side)
+		return c
+	error (Access.first, "Can't access this.")
+
+
+function scdecl.AccessToMemCpy (|message| exp, |message| side, |scdecl| type, |scdecl|)
+	opt norefcounts
+	
+	|| rel = exp.ancestor(@rel)    #expect    (rel, "AccessToMemCpy fail")
+	if side == "nil" or "exp" == nil
+	|| F = rel.first!
+	rel.func = @func
+	|| Name = @thg + "memcpy"
+	rel.first = name
+	rel.obj = typevoid
+	rel.asmtype = 0
+	|| prms = F.next!
+	prms.func = @prm
+	prms <~ f
+	if side.obj == typenil
+		name.name = "memzero"
+	  else
+		prms <~ prms.next
+	prms!.obj = compiler.XFunc(name.name)
+	|| msg = type.SizeOfQuery.msg
+	msg.obj = typeint!.typenormal
+	prms <~ msg
+	return Type
+
+
+/*	
+	function scdecl.AccessSub (|message| Exp, |message| side, |scdecl|)
+		opt norefcounts
+		|| i = .Internal$
+		if .IsCArray //or i.isbarestruct
+			if i.TypeSuffers
+				return i.MakeNewOptional
+			if !side and i.IsMemoryOnly 
+				|| P = Exp.niceparent
+				if (p == @brel) and (p == "&")
+					return i
+					
+				// carrays are a total bastard...
+//				if (p == @rel)
+//					|| L = p.last
+//					if  exp == L  or  exp in L
+				// opting structs around this buggers them up too.
+*/
+
+
+function scdecl.AccessSub (|message| Exp, |message| side,  |scdecl|)
+	opt norefcounts
+	(side)
+	|| i = .Internal								#require			
+	if .IsCArray or i.isbarestruct
+		if i.TypeSuffers
+			return i.MakeNewOptional
+		if i.IsMemoryOnly
+			|| P = Exp.niceparent
+			if (p == @brel) and (p == "&")
+				return i
+			
+			|| Newexp = exp.GetAddrButNicer()
+			i = i.GetAddress
+			newexp.obj = i
+			if side
+				return .AccessToMemCpy(newexp, side, i)
+			if p == @acc
+				SCFunction.TempMoveOut(newExp, "", i)
+		return i
+	
+	if .PointerCount > 0
+		return i		
+

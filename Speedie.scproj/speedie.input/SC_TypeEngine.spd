@@ -784,7 +784,7 @@ function TypeOfAccess (ExprResolver)
 			if access and Index.ExpectInt(Access)
 				if oof == 1
 					return TypeOfVecAccess(index, ty0, ty0.isnumeric)
-				return ty0.Access(exp)
+				return ty0.Access(exp, side)
 
 	arr.Func = @prm
 	exp.become(@dot, "SyntaxAccess")

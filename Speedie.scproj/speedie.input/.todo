@@ -9,6 +9,7 @@ bugs:
 	* status(.CurrMousePixelColor.render) // tmp struct.
 	* refcounter passing properties as function param, SHOULD NOT assume it won't be cleared... not without disturbance checker
 	* carray iterators don't work properly on: byte[10][4]
+	* |carray[1][1]| x, x = nil // c++ can't compile this! needs memset
 
 additions:
 	* rename "flags" to something else. I wanna use "flags" for somekinda default Info and Syntax is

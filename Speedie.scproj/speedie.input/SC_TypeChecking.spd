@@ -65,7 +65,7 @@ function scdecl.FastMatch (|SCDecl| O, |bool|)
 	return o.c_array == .c_array
 
 
-function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil, |int|)
+function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil,  |int|)
 // Make TypeCast = true able to deal with... pointers to structs!
 	real self
 	if (o == nil)
@@ -119,7 +119,7 @@ function scdecl.SafelyWrappable (|bool|)
 			return true
  
 
-function scdecl.TryTypeCastCarray (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
+function scdecl.TryTypeCastCarray (|SCDecl| O, |Message| exp, |int|)
 	opt norefcounts
 	|| si = .Internal
 	|| oi = o.internal
@@ -140,14 +140,22 @@ function scdecl.TryTypeCastPointer (|SCDecl| O, |Message| exp, |int| TypeCast, |
 			rz = exp.GetAddressOf(OAddr, CArray)
 
 
-function scdecl.TryTypeCastAccess (|SCDecl| O, |Message| exp, |int| TypeCast, |int|)
+function scdecl.TryTypeCastDeref (|SCDecl| O, |Message| exp, |int| TypeCast,  |int|)
 	opt norefcounts
-	|| i = o.Internal
-	if .MiniMatch(i, typecast)
-		return exp.MakeDereference(i)
+	|| i = o.Internal!
+	require .MiniMatch(i, typecast)
+	if !exp
+		Return kNeedsAddressOf
+
+	|| Addr = @acc.msg
+	exp.next = addr
+	Addr <~ exp
+	addr.msg(@arr) <~ 0
+	Addr.obj = i
+	Return kAddressOfMatch		
 
 
-function scdecl.TryTypeCast (|SCDecl| O, |Message| OExp, |int| TypeCast, |int|)
+function scdecl.TryTypeCast (|SCDecl| O, |Message| OExp, |int| TypeCast,  |int|)
 	opt norefcounts
 
 	|| t = .type
@@ -157,7 +165,7 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| OExp, |int| TypeCast, |int|)
 			return found
 	
 	if (o.IsCArray) and (.pointercount == 1)
-		|| found = .TryTypeCastCarray(o, oexp, typecast)
+		|| found = .TryTypeCastCarray(o, oexp)
 			return found
 	
 	/// hmmmm... need to test it... without the c-array? how?
@@ -166,7 +174,7 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| OExp, |int| TypeCast, |int|)
 			return oexp.CastToBool(nil)
 	
 	if (.PointerCount + 1 == O.PointerCount)
-		|| found = .TryTypeCastAccess(o, oexp, typecast)
+		|| found = .TryTypeCastDeref(o, oexp, typecast)
 			return found
 
 	if TypeCast & (kTypeCastMost|||kTypeCastNumbers)
