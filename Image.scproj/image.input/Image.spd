@@ -20,11 +20,9 @@ class Image (memory)
 		.SizeInfo = s
 	
 
-	
 	destructor
 		if .name
 			"Destroying: $.name"
-
 	
 	render	
 		fs <~ "image${.size}:${.name}"
