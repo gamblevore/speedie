@@ -166,7 +166,6 @@ function SCDecl.MemAccessNonStorable (|message| Exp, |message| side, |scdecl|)
 function SCDecl.MemAccessSub (|message| Exp, |message| side,  |scdecl|)
 	opt norefcounts
 	(side)
-	if "jb_main".trap
 	|| i = .Internal								#require			
 	if .IsCArray or i.isBareStruct
 		return i.MemAccessNonStorable(exp, side)

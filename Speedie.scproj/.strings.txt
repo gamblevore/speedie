@@ -1645,7 +1645,7 @@
 "items"
 "iterator"
 "iterator\t// eyyy mammi, i aint doin this\n\t|| first = &self[0]\n\t|| i = 0\n\twhile (i <  –count self)\n\t\tyield first[i] (i)\n\t\ti++"
-"iterator\n\t|| curr = self\n\twhile self[0]\n\t\tyield self[0] (self)\n\t\tself++"
+"memcpy"
 "iterator iter_test () {for yield_test"
 "ivec2"
 "ivec3"
@@ -2152,4 +2152,3 @@
 "low reg "
 "AccessToMemCpy fail"
 "memzero"
-"memcpy"

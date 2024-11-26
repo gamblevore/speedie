@@ -1504,13 +1504,13 @@ extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_TypeCastFromBool ((int)16)
 #define kSC__CustomOps_TypeCastToBetter ((int)32)
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2146])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2145])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2147])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2148])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2145])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2148])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2149])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2146])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2147])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2144])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2147])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2148])
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
 extern int SC__FastStringOpts_StrRemoved;
@@ -1703,7 +1703,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2154])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2153])
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
 extern CharSet* SC_CSNum;
@@ -1727,7 +1727,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kNoMatch ((int)0)
 #define kJB_kNumericMatch ((int)8388608)
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2150])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2149])
 #define kJB_kSimpleMatch ((int)4194304)
 #define kJB_kSuperClassMatch ((int)16777216)
 #define kJB_kTypeCastAssigns ((int)64)
@@ -1746,7 +1746,7 @@ extern Dictionary* SC_FuncPreReader;
 #define kJB_kTypeCastTrue ((int)3)
 #define kJB_kTypeCastWantSuperDistance ((int)128)
 #define kJB_kUseDefaultParams ((int)33554432)
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2155])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2154])
 #define kJB_kVoidPtrMatch ((int)20971520)
 extern Message* SC_ReturnSelfEqNil;
 extern Dictionary* SC_RootCollectTable;
@@ -1888,10 +1888,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp ((int)32784)
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2153])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2152])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2152])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2151])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2151])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2150])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int16_max ((s16)32767)
@@ -2409,7 +2409,7 @@ extern bool SC__Cpp_WroteAny;
 #define kJB__Wrap_kDelete ((int)2)
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2144])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2143])
 extern Float64 JB__Rec_Progress;
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -2463,7 +2463,6 @@ extern MaterialsLol* SC__MaterialsLol_Pellets;
 extern MaterialsLol* SC__MaterialsLol_WierdBlock;
 extern MaterialsLol* SC__MaterialsLol_Wood;
 extern SCIterator* SC__Iter_carray;
-extern SCIterator* SC__Iter_pointer;
 extern bool SC__Base_ConstantsLoadingOverride;
 extern bool SC__Base_CurrVisibility;
 #define kSC__Base_DontGoUp ((int)2)
@@ -8303,6 +8302,8 @@ void SC_Msg_IntoVariable(Message* Self, SCNode* Name_space, NameAndMsg* Rz);
 
 int SC_Msg_IntSmallness(Message* Self, SCDecl* T);
 
+bool SC_Msg_IsAddr(Message* Self);
+
 MaybeBool SC_Msg_IsAlwaysBool(Message* Self);
 
 bool SC_Msg_IsAlwaysFalse(Message* Self);
@@ -8916,10 +8917,6 @@ bool JB_ID__ByID(JB_Object* A, JB_Object* B);
 
 
 // JB_SCDecl
-SCDecl* SC_Decl_Access(SCDecl* Self, Message* Access, Message* Side);
-
-SCDecl* SC_Decl_AccessSub(SCDecl* Self, Message* Exp, Message* Side);
-
 SCDecl* SC_Decl_AccessToMemCpy(SCDecl* Self, Message* Exp, Message* Side, SCDecl* Type);
 
 int SC_Decl_AccessType(SCDecl* Self, SCDecl* Access, Message* Ch);
@@ -8959,8 +8956,6 @@ SCDecl* SC_Decl_CanUpgradeInternalPointer(SCDecl* Self);
 bool SC_Decl_CanUseDefault(SCDecl* Self);
 
 bool SC_Decl_CanWrap(SCDecl* Self);
-
-SCDecl* SC_Decl_CArrayAddrSimplify(SCDecl* Self);
 
 int SC_Decl_CArraySize(SCDecl* Self);
 
@@ -9138,11 +9133,19 @@ void SC_Decl_MarkAsAltered(SCDecl* Self);
 
 bool SC_Decl_MatchC(SCDecl* Self, SCDecl* O);
 
+SCDecl* SC_Decl_MemAccess(SCDecl* Self, Message* Access, Message* Side);
+
+SCDecl* SC_Decl_MemAccessNonStorable(SCDecl* Self, Message* Exp, Message* Side);
+
+SCDecl* SC_Decl_MemAccessSub(SCDecl* Self, Message* Exp, Message* Side);
+
 bool SC_Decl_MiniMatch(SCDecl* Self, SCDecl* O, int TypeCast);
 
 void SC_Decl_NameSet(SCDecl* Self, JB_String* Value);
 
 bool SC_Decl_NeedsContainedfix(SCDecl* Self);
+
+bool SC_Decl_NeedsCppCarrayFix(SCDecl* Self);
 
 SCDecl* SC_Decl_NewWrapper(SCDecl* Self, SCDecl* CastTo);
 
