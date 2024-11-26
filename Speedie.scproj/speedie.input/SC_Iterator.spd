@@ -124,7 +124,7 @@ class SCIterator (SCNamed)
 
 	module
 		|sciterator| carray
-		|sciterator| pointer
+//		|sciterator| pointer
 		
 		function SimpleIter (|string| src, |sciterator|)
 			|| s = src.parse.first!
@@ -149,13 +149,13 @@ class SCIterator (SCNamed)
 		i++"
 )
 
-		pointer = SimpleIter(
-"iterator
-	|| curr = self
-	while self[0]
-		yield self[0] (self)
-		self++"
-)
+//		pointer = SimpleIter(
+//"iterator
+//	|| curr = self
+//	while self[0]
+//		yield self[0] (self)
+//		self++"
+//)
 		
 
 
@@ -184,10 +184,12 @@ function SCClass.CheckIterator
 function scdecl.GetIteratorAny (|String| name, |message| node, |SCIterator|)
 	if .IsCArray
 		return sciterator.carray
-	|| cls = .type
-	if .PointerCount and !cls.isstruct
-		return sciterator.pointer
-	
-	return cls.GetIteratorAny(name, node)
+	if .pointercount and .internal!.iscarray
+		debugger 
+		return sciterator.carray
+//	if .PointerCount and !cls.isstruct
+//		return sciterator.pointer
+//	
+	return .type.GetIteratorAny(name, node)
 
 

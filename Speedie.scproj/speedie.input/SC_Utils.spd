@@ -42,6 +42,9 @@ function Message.ListAll (|[Message]|)
 //  //  //  //  //  //  // syntax type detection //  //  //  //  //  //  //  // 
 
 extend Message {
+	function IsAddr (|bool|)
+		Return (self) and (.func == @brel) and (.name == "&")
+		
 	operator IsThing (|String| name, |bool|)
 	// case aware....
 	// if I had my... "nil.fnc always returns nil"... then I could

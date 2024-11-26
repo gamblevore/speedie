@@ -48,13 +48,13 @@ function Message.CastToType (|string| TypeName, |SCClass| type, |SCNode| name_sp
 			expect FoundType.PointerCount (self, "Can't typecast a struct!")
 		
 		if (self == @type) and (FoundType.isnormal and foundtype.type == type)
-			return kSimpleMatch // done.
+			return kSimpleMatch			// done.
 
 	|| cst = «type ":)" »
 	.prev = cst
 	cst <~ self
 	cst.msg(@thg, typeName).obj = Type.TypeNormal 
-	cst.obj = Type.TypeNormal	 // hmmm.... why not do it anyhow?
+	cst.obj = Type.TypeNormal	 		// hmmm.... why not do it anyhow?
 	Return loss	
 
 
@@ -94,11 +94,12 @@ function Message.GetAddressOf (|SCDecl| Type, |bool| WasCArray = false, |int|)
 
 
 
-function scdecl.Access (|message| Access, |message| side,   |scdecl|)
+function scdecl.MemAccess (|message| Access, |message| side,   |scdecl|)
 	opt norefcounts
-	|| c = .AccessSub(Access, side)
+	|| c = .MemAccessSub(Access, side)
 		return c
 	error (Access.first, "Can't access this.")
+
 
 
 function scdecl.AccessToMemCpy (|message| exp, |message| side, |scdecl| type, |scdecl|)
@@ -125,47 +126,86 @@ function scdecl.AccessToMemCpy (|message| exp, |message| side, |scdecl| type, |s
 	return Type
 
 
-/*	
-	function scdecl.AccessSub (|message| Exp, |message| side, |scdecl|)
-		opt norefcounts
-		|| i = .Internal$
-		if .IsCArray //or i.isbarestruct
-			if i.TypeSuffers
-				return i.MakeNewOptional
-			if !side and i.IsMemoryOnly 
-				|| P = Exp.niceparent
-				if (p == @brel) and (p == "&")
-					return i
-					
-				// carrays are a total bastard...
-//				if (p == @rel)
-//					|| L = p.last
-//					if  exp == L  or  exp in L
-				// opting structs around this buggers them up too.
-*/
+
+//function SCDecl.CArrayFinal (|scdecl|)
+//	opt norefcounts
+//	|| i = self
+//	while
+//		|| n = i.Internal
+//		if !n
+//			return i
+//		if !n.IsCarray
+//			return n
+//		i = n
 
 
-function scdecl.AccessSub (|message| Exp, |message| side,  |scdecl|)
+function SCDecl.MemAccessNonStorable (|message| Exp, |message| side, |scdecl|)
+	opt norefcounts
+	if .TypeSuffers
+		return .MakeNewOptional
+	if .IsMemoryOnly
+		|| P = Exp.niceparent
+		if p.IsAddr
+			return self
+		|| IsAcc = p == @Acc
+		if IsAcc and .iscarray // x = y[1][0]
+			debugger
+			return self
+		
+		|| NewExp = exp.GetAddrButNicer
+		|| i = .GetAddress
+		NewExp.obj = i
+		if side
+			return .AccessToMemCpy(newexp, side, i)
+		if IsAcc
+			SCFunction.TempMoveOut(newExp, "", i)
+		return i
+	return self
+
+
+function SCDecl.MemAccessSub (|message| Exp, |message| side,  |scdecl|)
 	opt norefcounts
 	(side)
+	if "jb_main".trap
 	|| i = .Internal								#require			
-	if .IsCArray or i.isbarestruct
-		if i.TypeSuffers
-			return i.MakeNewOptional
-		if i.IsMemoryOnly
-			|| P = Exp.niceparent
-			if (p == @brel) and (p == "&")
-				return i
-			
-			|| Newexp = exp.GetAddrButNicer()
-			i = i.GetAddress
-			newexp.obj = i
-			if side
-				return .AccessToMemCpy(newexp, side, i)
-			if p == @acc
-				SCFunction.TempMoveOut(newExp, "", i)
+	if .IsCArray or i.isBareStruct
+		return i.MemAccessNonStorable(exp, side)
+	require .PointerCount > 0
+	if !i.IsCarray
 		return i
+	return i.MemAccessNonStorable(exp, side)
 	
-	if .PointerCount > 0
-		return i		
+//	i = i.Internal! // double-internal:   x is &byte[10]  -->  x[] is byte
+//	if i.IsCarray	// we can't have carray values lying around. So its actually the address of a carray
+//		return i.MemAccessNonStorable(exp, side)
+//	return i
+
+
+/*
+	|byte[10]| C1
+	|| y = &C1		// y is &byte[10]
+	|| x = y[]		// x is byte
+
+	for r1 in C1
+	|| R1 = &C1[0]
+	|| i = 0
+	while i < 10
+		yield r1[]
+		r1++
+
+	
+	|byte[10][20]| C2
+	|| y = &C2		// y is &(byte[10][20])
+	|| x = y[]		// x is &byte[10]
+	for R2 in Carray
+
+	|| R2 = &C2[0] // r1 is &byte[10]
+				   // wouldn't we be iterating over an addrses of a carray?
+				   // we'll need to remove the standard pointer iterator...
+	|| i = 0
+	while i < 20
+		yield r2[]
+		r2++s
+*/
+
 

@@ -1,6 +1,10 @@
 
 
 main // speedie main {
+//	|byte[10][20]| C2
+//	for r in c2
+//		target debug2
+//			for r2 in r	
 	Compiler.SetupEnv	
 	Compiler.MiniTests
 	Compiler.Main

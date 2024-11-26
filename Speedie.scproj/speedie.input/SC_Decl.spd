@@ -321,20 +321,10 @@ class SCDecl (SCNamed) {
 		dcl.NilDeclared = .NilDeclared
 		
 	
-	function CArrayAddrSimplify (|scdecl|)
-		opt norefcounts
-		// C++ does this, and it actually makes sense :)
-		// hard to explain, but intuitive to use
-		if .iscarray
-			if .internal!.isnormal
-				return .Internal
-		return self
-		
-
 	function GetAddress (|declmode| Purpose=declmode.always, |SCDecl|)
 		rz = SCDecl(.type)
 		.CopyTypeInfoTo(rz)
-		rz.internal = .CArrayAddrSimplify
+		rz.internal = self
 		rz.PointerCount++
 		rz.c_array = 0
 		|| ns = nilstate.realish
@@ -979,7 +969,7 @@ class SCDecl (SCNamed) {
 				.MarkAsAltered
 			if (self is self) and (scfunction.currfunc is Destructor) 
 				error (exp, "You can’t modify 'self' in a constructor or destructor.")
-						
+
 
 	function WriteNilRel (|Message|)
 		return NeweqRel( .Name, "nil" )

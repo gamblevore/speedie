@@ -1138,15 +1138,20 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		  else
 			fs <~ s
 
-
+	
+	function scdecl.NeedsCppCarrayFix (|bool|)
+		opt norefcounts
+		return .PointerCount and .Internal!.IsCarray
+		
 	function C_RenderBrel (fpMsgRenderCpp)
 		opt norefcounts
-		fs <~ '('
-		|| s = .name
-		if (s == "~")
-			s = "~"
+		if .name == "&" // address
+			|| type = .obj|scdecl|
+			if type and Type.NeedsCppCarrayFix
+				WriteDeclBrackets(self, fs)
 		
-		fs <~ s
+		fs <~ '('
+		fs <~ .name
 		RenderInBracketsIfRel( .first!, fs )
 		fs <~ ')'
 

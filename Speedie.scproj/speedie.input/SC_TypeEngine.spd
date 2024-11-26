@@ -127,7 +127,6 @@ function Message.CanGetAddress (|SCNode| name_space, |bool|)
 	
 	if (curr == @thg) and t2.isregister
 		|| f = .ParentForAddress
-		t2.isregister
 		expect (f == @prm or @dot)		(curr, "Can't store the address of register based variables.")
 			
 	return true
@@ -140,7 +139,7 @@ function Message.ParentForAddress (|syntax|)
 	while p
 		|| f = p.func
 		if (f != @Bra and @Type)
-			if (f == @brel and p == "&")
+			if p.IsAddr
 				gotaddr++
 				require gotaddr <= 1
 			  else
@@ -214,7 +213,6 @@ function TypeOfBRel (ExprResolver)
 			return TypeOfFuncPointer(F, name_space, side)
 		subtype.MarkAsAltered
 
-		F.CanGetAddress(name_Space)
 		require F.CanGetAddress(name_Space)
 		return Subtype.GetAddress
 		
@@ -784,7 +782,7 @@ function TypeOfAccess (ExprResolver)
 			if access and Index.ExpectInt(Access)
 				if oof == 1
 					return TypeOfVecAccess(index, ty0, ty0.isnumeric)
-				return ty0.Access(exp, side)
+				return ty0.MemAccess(exp, side)
 
 	arr.Func = @prm
 	exp.become(@dot, "SyntaxAccess")
