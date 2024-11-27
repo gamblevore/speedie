@@ -4774,8 +4774,6 @@ JB_String* JB_Date_RenderInt(Date Self, FastString* Fs_in);
 
 int64 JB_Date_WholeSeconds(Date Self);
 
-Date JB_Date__New0();
-
 
 
 // DeclMode

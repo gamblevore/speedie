@@ -3456,7 +3456,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[219]);
-	JB_FS_AppendInt32(_fsf0, (2024112619));
+	JB_FS_AppendInt32(_fsf0, (2024112721));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8864,7 +8864,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1384]);
-	JB_FS_AppendInt32(_fsf0, (2024112619));
+	JB_FS_AppendInt32(_fsf0, (2024112721));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -18859,10 +18859,6 @@ int64 JB_Date_WholeSeconds(Date Self) {
 	return Self >> 16;
 }
 
-Date JB_Date__New0() {
-	return JB_Date__Now();
-}
-
 
 bool SC_DeclMode_SyntaxIs(DeclMode Self, DeclMode O) {
 	return Self == O;
@@ -21136,13 +21132,13 @@ void JB_ClassData_Restore(JB_Class* Self) {
 float JB_MzSt_Durr(CompressionStats* Self) {
 	JB_Duration D = Self->Duration;
 	iif (D < 0) {
-		D = (D + JB_Date__New0());
+		D = (D + JB_Date__Now());
 	}
 	return JB_Duration_Float(D);
 }
 
 void JB_MzSt_End(CompressionStats* Self) {
-	Self->Duration = (Self->Duration + JB_Date__New0());
+	Self->Duration = (Self->Duration + JB_Date__Now());
 }
 
 void JB_MzSt_LiveUpdate(CompressionStats* Self, int Inn, int Outt, bool Compress) {
@@ -21177,7 +21173,7 @@ CompressionStats* JB_MzSt_Start(CompressionStats* Self) {
 	iif (!Self) {
 		Self = (&JB__MzSt_All);
 	}
-	Self->Duration = (Self->Duration - JB_Date__New0());
+	Self->Duration = (Self->Duration - JB_Date__Now());
 	return Self;
 }
 
@@ -22291,7 +22287,7 @@ Float64 JB_Rnd_SyntaxAccess(Random* Self) {
 }
 
 void JB_Rnd_TimeSeed(Random* Self) {
-	(JB_Rnd_SeedSet(Self, JB_Date__New0()));
+	(JB_Rnd_SeedSet(Self, JB_Date__Now()));
 }
 
 int JB_Rnd__Init_() {
@@ -47856,7 +47852,7 @@ JB_Error* JB_Err_Constructor(JB_Error* Self, Message* Node, JB_String* Desc, uin
 	Self->Progress = JB__Rec_Progress;
 	JB_Incr2(Self->Name, Desc);
 	JB_Incr2(Self->Path, Path);
-	Self->When = JB_Date__New0();
+	Self->When = JB_Date__Now();
 	Self->Func = kJB_SyxSStr;
 	JB_Err_UpgradeWithNode(Self);
 	return Self;
@@ -47875,7 +47871,7 @@ JB_Error* JB_Err_ConstructorNothing(JB_Error* Self) {
 	Self->ErrorFlags = 0;
 	Self->Position = -1;
 	Self->Severity = kJB__ErrorSeverity_OK;
-	Self->When = JB_Date__New0();
+	Self->When = JB_Date__Now();
 	Self->Func = kJB_SyxArg;
 	return Self;
 }
@@ -58210,4 +58206,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 2323634484021642715 4549558731523265155
+// -5682746152912822838 4549558731523265155
