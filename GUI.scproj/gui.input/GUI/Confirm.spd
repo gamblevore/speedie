@@ -13,7 +13,7 @@ extend_module app
 	function Beep (|string?| q="")
 		if beep.OK.fired
 			.BeepSub
-			beep.OK = date() + (1s/12)
+			beep.OK = gui.FrameStart + (1s/12)
 		if q
 			.alert(q)
 	
@@ -80,7 +80,7 @@ function ConfirmIt (|string| Q,  |string| Title,  |[string]| answers,  |string| 
 			return -1			// cancel
 		return 0
 
-	w.DelayUntil = date() + 0.5s
+	w.DelayUntil = gui.FrameStart + 0.5s
 	with w
 		.text = title
 		.Resize(q)

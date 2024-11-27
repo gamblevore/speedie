@@ -1338,7 +1338,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		require .hasfocus
 		|| w = .Window
-			w.alphafader = date()
+			w.alphafader = gui.FrameStart
 			w.alphasubtle = true
 
 	

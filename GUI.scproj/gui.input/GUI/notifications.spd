@@ -13,7 +13,7 @@ module Notifications
 	
 	function ShouldDraw (|window| w, |bool|)
 		opt norefcounts
-		|| ago = w.CreatedDate.ago.Float
+		|| ago = w.CreatedDate.guiago.Float
 		|controlrect| sz
 		|| wd = width|float|
 		if !w.tag											// fall
@@ -28,7 +28,7 @@ module Notifications
 		  elseif ago < 5.0									// stay
 			sz = (width)~left  by  (height)~up back height
 		  elseif !(w contains GUI.mousexy)				// swap-direction
-			w.CreatedDate = date.now
+			w.CreatedDate = gui.FrameStart
 			w.tag = nil
 				
 		w.Size = sz
@@ -46,7 +46,7 @@ module Notifications
 			  else
 				clipboard.text = T.name
 		w.tag = nil
-		w.CreatedDate = date.now
+		w.CreatedDate = gui.FrameStart
 	
 	
 	function ClickedAt (|ivec2| XY, |bool|)
@@ -119,7 +119,7 @@ module Notifications
 function error.Useable (|date| ago=8s, |error|)
 	require self and .name
 	if !.when
-		.when = date.now
+		.when = gui.FrameStart
 		return self
 	if !ago
 		return self

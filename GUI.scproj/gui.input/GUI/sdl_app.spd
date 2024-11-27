@@ -413,7 +413,7 @@ module GUI
 			.Touch
 			if .ChangeSelFlash == 1
 				.FlashSelector = true
-			GUI.ChangeSelFlash = date.now + 1s
+			GUI.ChangeSelFlash = .FrameStart + 1s
 
 
 	function ClearAlerts
@@ -503,8 +503,8 @@ module GUI
 	function HandleOpenFile
 		|| d = .DocumentOpened$
 		.OpenDocument(d)
-		if .OpenedFirst.ago < 3s
-			.FixScreenBug = date.now + 1s
+		if .OpenedFirst.guiago < 3s
+			.FixScreenBug = .FrameStart + 1s
 
 
 	function OrderWindows (|window|)
@@ -617,7 +617,7 @@ module GUI
 		if !.DialogIsOpen
 			.BlurBackgroundStart = 0
 			
-		.LastFrameDate = date.now
+		.LastFrameDate = .FrameStart
 		|| w1 = .DrawWinFrom		#require
 		.StartFrame(.Raw!)
 		|| D = .DialogIsOpen
@@ -635,9 +635,9 @@ module GUI
 
 
 	function BGBlurAmount (|float|)
-		.BlurBackgroundStart ?= date.now
+		.BlurBackgroundStart ?= gui.FrameStart
 		|| Scale = 7.0
-		|| ago = .BlurBackgroundStart.ago.Float
+		|| ago = .BlurBackgroundStart.guiago.Float
 		rz = ago*Scale*4.0
 		if rz > Scale
 			return scale
@@ -681,7 +681,7 @@ module GUI
 
 		SpdProcess.CheckAllAlive
 		
-		.FrameStart = date()
+		.FrameStart = gui.FrameStart
 		|| occured = .PreFrame
 		.ClearAlerts
 		.CheckKeyMods
@@ -843,12 +843,12 @@ module GUI
 	function TryQuit (|SDLCloseReason| reason = SDLCloseReason.Terminating, |SDLActivity|)
 		opt norefcounts
 		if (reason is QuitEvent)
-			|| w = .LastWindowClose.ago
+			|| w = .LastWindowClose.guiago
 			if (w and w < 0.1s)
 				return 0 // just block it. SDL is sending duplicate events
 			(reason is windowclose     )
 		  elseif reason is windowclose
-			.LastWindowClose = date.now
+			.LastWindowClose = .FrameStart
 			require GUI.AskQuit
 		
 		.IsQuitting = true
@@ -877,7 +877,7 @@ module GUI
 
 
 	function TryCloseFrontWindow (|int|)
-		.LastWindowClose = date.now
+		.LastWindowClose = .FrameStart
 		if !.DialogIsOpen
 			|| w = window.front
 			if w and w.close
@@ -1085,7 +1085,7 @@ module GUI
 	helper Window.GetUserAttention
 		if !.Focus
 			.flashself = true
-		.alphafader = date()
+		.alphafader = gui.FrameStart
 		beep
 	
 	
@@ -1126,7 +1126,7 @@ module GUI
 			clicked = .ControlOrMenuAt(xy)
 			clicked.__rightclick__(xy)?
 		  else
-			mousebutton.DownAt = date()
+			mousebutton.DownAt = gui.FrameStart
 			clicked = .DoMouseDown(xy, clicks)
 		.currmousedown = clicked
 		return clicked
@@ -1155,7 +1155,7 @@ module GUI
 		ifn r isa textview  and  r is editable
 			info = r.Description
 		|| delay = (0.0s, 1.5s)(!GUI.FastToolTipDate.fired)
-		|| now = date()
+		|| now = gui.FrameStart
 		|| t = .tooltip
 		if t.name and t.when.fired
 			GUI.FastToolTipDate = now + 1s

@@ -130,7 +130,7 @@ datatype MouseButton (uint)
 	module
 		|date|						DownAt
 		function Durr (|date|)
-			return date() - .DownAt
+			return gui.FrameStart - .DownAt
 	
 
 

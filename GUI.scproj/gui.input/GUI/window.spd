@@ -44,7 +44,7 @@ class Window (GUIControl)
 	
 	helper SubConstructor (|ControlRect| Size)
 		.size = Size
-		.createddate = date.now
+		.createddate = gui.FrameStart
 		.InlineEditorPlace.Init(self)
 		.reflow
 		.show
@@ -142,7 +142,7 @@ class Window (GUIControl)
 
 	helper FinishFocus (|guicontrol| focus)
 		if focus and .parent and focus isnt drawsfocus
-			.alphafader = date()
+			.alphafader = gui.FrameStart
 		  else
 			.alphafader = 0
 		

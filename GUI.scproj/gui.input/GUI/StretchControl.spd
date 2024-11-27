@@ -216,9 +216,9 @@ class StretchDivider (GuiControl)
 		|| dateout = !.entered
 		if Out != dateout
 			GUI.touch(Self)
-			.Entered = (0, date())(out)
+			.Entered = (0, gui.FrameStart)(out)
 		if GUI.MouseButtons is left
-			|| d = date()-0.75s
+			|| d = gui.FrameStart-0.75s
 			if .Entered > d
 				.Entered = d
 		return !Out
@@ -231,7 +231,7 @@ class StretchDivider (GuiControl)
 
 
 	helper FadeAlpha (|float|)
-		|| now  = date()
+		|| now  = gui.FrameStart
 		|| diff = now - .entered
 		|| f = (diff.float - 0.6)*2.0
 		rz = f.clamp

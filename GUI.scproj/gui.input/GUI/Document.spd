@@ -162,7 +162,7 @@ class Document (list)
 			if KeepDate
 				f.modified = .filedate
 			  else
-				f.modified = date() // just clear the subsecond bits
+				f.modified = gui.FrameStart // just clear the subsecond bits
 			.filedate = f.modified  // read it back to be sure its what we think it is.
 			.UpdateSavedState
 			
@@ -228,7 +228,7 @@ class Document (list)
 		|| Lim = document.AskLimit(f)
 		|| Data	= f.readall(lim)		#require
 		
-		.viewdate = date()
+		.viewdate = gui.FrameStart
 		.wascompressed = data.IsCompressed
 		if .wascompressed
 			data = data.decompress

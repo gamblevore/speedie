@@ -149,7 +149,7 @@ class OpenSaveDialog (Window)
 			return super.typedstring(input)
 		if .KeyDownExpired.Fired
 			.Keyboard = ""
-		.KeyDownExpired = date() + 0.5s
+		.KeyDownExpired = gui.FrameStart + 0.5s
 		.Keyboard += input
 		.Files.JumpTo(.keyboard)
 		return true

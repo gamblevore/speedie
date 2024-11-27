@@ -687,7 +687,7 @@ class ListView (GUIControl) {
 
 	function DelayedRename (|ListViewCell| i)
 		.EditDelayed = i
-		delayedittill_ = (date() + 0.5s, nil)(i)
+		delayedittill_ = (gui.FrameStart + 0.5s, nil)(i)
 
 
 	function TryDelayedEdit

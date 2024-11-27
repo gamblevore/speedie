@@ -13,10 +13,10 @@ class FPSTextView (textview)
 	|date| 			LastFPSChange
 
 	function Update
-		|| Ago = .LastDraw.ago
-		.LastDraw = date.now
+		|| Ago = .LastDraw.guiago
+		.LastDraw = gui.FrameStart
 		.LastFPSChange ?= .LastDraw
-		if .LastFPSChange.ago > 0.5s
+		if .LastFPSChange.guiago > 0.5s
 			.text = (1.0/ago.float).Render(1) + "fps"
 			.LastFPSChange = .LastDraw
 

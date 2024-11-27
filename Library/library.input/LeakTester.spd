@@ -82,7 +82,7 @@ struct SpeedTester
 	|string|			Name
 		
 	helper SyntaxUsingComplete (|object| idk=nil)
-		|| µs = date() - .start
+		|| µs = date.now - .start
 		SpeedTester.log( .Name + ": " + µs.renderdurr + "s" )
 			
 	module
@@ -93,7 +93,7 @@ struct SpeedTester
 function string.SyntaxUsing (|SpeedTester|)
 	SpeedTester.log( "Starting: " + self )
 	rz.name = self
-	rz.start = date()
+	rz.start = date.now
 
 
 cpp_wrapper JB_FindLeakedObject 	(|object| Obj,			|array| dest)

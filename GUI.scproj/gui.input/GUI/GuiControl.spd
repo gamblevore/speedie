@@ -436,7 +436,7 @@ class GUIControl (list)
 		opt norefcounts
 		|| w = .window!
 		|| f = w.AlphaFader				#require
-		|| delay = date() - f
+		|| delay = gui.FrameStart - f
 		|| remain = 1s - delay
 		if w.alphasubtle
 			remain += 0.5s

@@ -29,7 +29,7 @@ class Error (Message)
 		.progress = errorreceiver.progress
 		.name = desc // sigh
 		.path = path
-		.when = date()
+		.when = date.now
 		.func = @sstr // whatever
 		.UpgradeWithNode
 	
@@ -39,7 +39,7 @@ class Error (Message)
 		super.constructor
 		.position = -1
 		.severity = ErrorSeverity.ok
-		.when = date()
+		.when = date.now
 		.func = @arg
 
 
@@ -163,7 +163,7 @@ class Error (Message)
 
 	syntax compare (|date| d, |bool| aware, |int|)
 		|| w = .when + d
-		return date() - w
+		return date.now - w
 
 
 	render Render

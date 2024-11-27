@@ -41,7 +41,7 @@ extend_module perry
 
 	function Backup (|file| zip, |file|)
 // Daily file per week, weekly file per month.
-		|| now  = date() - 107020500000000
+		|| now  = gui.FrameStart - 107020500000000
 		|| latest = .latest_name
 		|| daily = .daily_name(now)
 		|| monthly = .monthly_name(now)

@@ -83,7 +83,7 @@ datatype Date (int64)
 		
 	function Fired (|bool|)
 		if self != 0
-			return self < date()
+			return self < date.now
 	
 	function DayOfWeek (|int|)
 		return .Days mod 7
@@ -143,8 +143,7 @@ datatype Date (int64)
 			cpp_wrapper JB_Date__Now
 
 		function New (|Date|)
-			cpp_part New0
-			return now()
+			disabled "Use .now"
 
 		function TimeStamp  (|uint64|)
 			cpp_Wrapper RDTSC

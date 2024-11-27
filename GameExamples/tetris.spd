@@ -1,7 +1,13 @@
 #!/usr/local/bin/spd
 import "GUI"
 
+// todo:
+// score board needs block positioning
+// forgiveness like tetris has
+// pink cloudy blocks with cute faces? and hearts as they disppear
+
 main
+	gui.Init(2.0)
 	return TetrisWin()
 
 
@@ -44,22 +50,27 @@ datatype Tetromino (uint64)
 
 class TetrisWin (Window)
 	|Tetris|			Grid
+	|textview|			Score
 	|int|				FramesLeft
 	
 	constructor
-		.grid = GridSection()
-		.grid.Dimensions[1] = 24
+		.grid = Tetris()
+		.Score = TextView(self)
+		.Score.MakeInline
 		.blockheight = 24
 		.blockX(true) = -0.5//-6
 		.blockY = 1.5
-		.grid.restart
 		.FramesLeft = 48
-		
+	
+	behaviour keydown
+		if key is l
+			keylog = !keylog
+			Notifications <~ "keylog: " + keylog.Render
+			return true
+	
 	behaviour Framestep
 		require GUIActive
 		|| M2 = keys.Movement
-//		if m2.x or m2.w // this isnt responding sometimes!
-//			beep  // the logic is wrong!?
 		|| M = keys.Movement((8th, 0, 0, 4th))
 		if .Grid.State == 1 // game over
 			if keys.SPACE or Keys.RETURN
@@ -72,22 +83,28 @@ class TetrisWin (Window)
 			
 			if (m.y > 0 or m.z < 0) or (.FramesLeft <= 0)
 				.FramesLeft = 60
-				if .grid.Move(-16)
-					.grid.MakeReal
+				.Grid.drop
 			.FramesLeft--
 		gui.Touch
 
 	behaviour DrawBackground
 		where.DrawRect(self, colors.black)
 		.Grid.draw(where)
+		.Score.Text = .grid.Score.Render
 
 
-role Tetris (GridSection)
+
+class Tetris (GridSection)
 	contains Tetromino
+	|int|	Score
 
+	constructor
+		.Dimensions[1] = 24
+		.restart
+		
 	syntax Access (|int| x, |int| y, |&Tetromino|)
 		return .at(x + y*16)
-	
+			
 	function AddShape (|string| s)
 		|| y = 20
 		|| x = 0
@@ -154,6 +171,7 @@ role Tetris (GridSection)
 	
 	function Restart
 		.State = 0
+		.Score = 0
 		|| i = 0
 		|| h = .Height
 		for y in h
@@ -167,7 +185,8 @@ role Tetris (GridSection)
 					b|=!b
 					b = b|byte|.real
 				self[x, y][] = b
-			self[10()+1, y][] = 0
+			if y
+				self[10()+1, y][] = 0
 		.AddShape(shapes[0]!)
 
 	function RowIsFull (|int| y, |bool|)
@@ -187,16 +206,26 @@ role Tetris (GridSection)
 		beep "Game Over"
 		.State = 1
 		
+	function Drop
+		if .Move(-16)
+			.MakeReal
+
 	function MakeReal		
 		for (b in self) (c)
 			if b is Dropper
 				c[] = (b &~ Tetromino.proper)|||Tetromino.Real
 		
+		|| Score = 0
 		for y in .Height-1
 			if .RowIsFull(y+1) // animating this would be better
+				if !Score
+					score = 100
+				  else
+					Score*=3
 				.PullDown(y+1)
 				y--
 		
+		.Score += Score
 		for x in 10
 			if self[x+1, .height-5][]
 				return .GameOver
@@ -226,10 +255,9 @@ role Tetris (GridSection)
 		|| C = colors.wheel(Hu, SA, br, SA)
 		where.DrawRect(R, C)
 		if b is Dropper
-			hu += 12th
+			br *= 0.9
 		  else
-			br *= 0.75
-			r+=(0,0,1,1)
+			hu += 24th
 		C = colors.wheel(Hu, SA, br, SA)
 		where.DrawOutlineOnly(R, C)
 	

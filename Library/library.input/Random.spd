@@ -31,7 +31,7 @@ struct Random
 		.state = 1
 		
 	function TimeSeed
-		.seed = date()
+		.seed = date.now
 	
 	function Text (|int| n, |codepoint| a, |codepoint| b, |string|)
 		|| fs = FastString()

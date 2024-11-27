@@ -189,7 +189,7 @@ class ButtonView (GUIControl)
 		if !.Pressing
 			return (mousedragging.Beyond, mousedragging.handled)(D)
 		
-		|| n = date()
+		|| n = gui.FrameStart
 		if !.DelayTill
 			.DelayTill = n + 0.7s
 		  elseif (D == .clickeditem) and (n >= .DelayTill)
@@ -271,7 +271,7 @@ class ButtonView (GUIControl)
 		|| MI = MouseXInside and  (R.y1y2 contains M.y)
 			if  !disabled and .pressing  and  r.Width > 19  
 				(pn.x min= r.x2-2)
-				|| ago = -.DelayTill.ago.Float
+				|| ago = -.DelayTill.guiago.Float
 					ago *= 4	// effect needs improving
 					if ago > 4	// perhaps something like soft-explode or at least half-pixels
 						ago = 4 // also the maths is wrong somehow...
@@ -326,7 +326,7 @@ class ButtonView (GUIControl)
 	function SearchMenu (|listviewrow| row=nil, |bool|)
 		|| sub = .openmenu(row)
 			sub.IsSearchMenu = true
-			//SlideMenuOpen(self, date.now, 0.5s)
+			//SlideMenuOpen(self, gui.FrameStart, 0.5s)
 			return sub.typedstring("")
 
 
@@ -346,3 +346,9 @@ class ButtonView (GUIControl)
 			m.stopfilter
 		m.ShowCmm(self, 0, x)
 		return m
+
+
+function Date.GuiAgo (|Duration|)
+	if self
+		return gui.framestart - self
+

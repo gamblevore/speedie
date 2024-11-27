@@ -159,11 +159,11 @@ struct CompressionStats
 	function Start (|&CompressionStats|)
 		nil self
 		self ?= CompressionStats.all
-		.Duration -= date()
+		.Duration -= date.now
 		return self
 	
 	function End
-		.Duration += date()
+		.Duration += date.now
 
 	function Print (|bool| Compression)
 		printline .Report(Compression)
@@ -177,7 +177,7 @@ struct CompressionStats
 	function Durr (|float|)
 		|| d = .duration
 		if d < 0
-			d += date()
+			d += date.now
 		return d.Float
 	
 	render Report (|bool| Compression)

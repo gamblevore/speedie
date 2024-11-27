@@ -86,7 +86,7 @@ dataType Keys (int) {
 
 	function HeldKey (|date| durr=0.05s, |bool|)
 		|| i = keys.has(self)
-			return keys.downdate[i].ago >= durr
+			return keys.downdate[i].guiago >= durr
 	
 	function IsFirstFrame (|bool|)
 		|| i = keys.has(self)
@@ -94,18 +94,16 @@ dataType Keys (int) {
 		
 	function Length (|int| Plus,  |float| Limit,  |float|)
 		require Plus
-		if keylog: "Length: Plus $Plus,  Limit $limit"
 		|| i = keys.has(self) #require
 		|| D = Keys.DownDate[i]
-		if keylog: "Length: D $D"
-		rz = (D.ago*plus).float
-		if limit and D < gui.FrameStart
-			if keylog: "Length: C"
+		|| G = gui.FrameStart
+		if D==G
+			return plus|float|
+		rz = ((G-D)*plus).float
+		if limit
 			if rz.abs > limit
-				if keylog: "Length: D"
-				keys.downdate[i] = gui.FrameStart
+				keys.downdate[i] = G
 			  else 
-				if keylog: "Length: E"
 				rz = 0
 
 	function IsCancelled (|bool|) // surely its "IsEaten?"
@@ -177,7 +175,6 @@ dataType Keys (int) {
 		helper AddKey (|keys| K, |int|)
 			if (.count < 8) and !.has(K)
 				|| i = .count++
-				if keylog: "add $k at ${GUI.FrameStart}"
 				.DownDate[i] = GUI.FrameStart
 				.DownKeys[i] = K
 				return SDLActivity.Activity
