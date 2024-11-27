@@ -681,7 +681,7 @@ module GUI
 
 		SpdProcess.CheckAllAlive
 		
-		.FrameStart = gui.FrameStart
+		.FrameStart = date.now
 		|| occured = .PreFrame
 		.ClearAlerts
 		.CheckKeyMods
