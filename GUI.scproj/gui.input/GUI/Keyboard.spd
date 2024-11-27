@@ -97,10 +97,8 @@ dataType Keys (int) {
 		|| i = keys.has(self) #require
 		|| D = Keys.DownDate[i]
 		|| G = gui.FrameStart
-		if D==G
-			return plus|float|
-		rz = ((G-D)*plus).float
-		if limit
+		rz = (((1+G)-D)*plus).float
+		if limit and d!=g
 			if rz.abs > limit
 				keys.downdate[i] = G
 			  else 

@@ -2,9 +2,14 @@
 import "GUI"
 
 // todo:
-// score board needs block positioning
+// **window alignment sucks**
+	// scaling too for scale2
 // forgiveness like tetris has
-// pink cloudy blocks with cute faces? and hearts as they disppear
+
+// score board needs block positioning, and history
+// pink cloudy blocks with cute faces? and hearts/rainbows/stars as they disappear
+	// Clouds with overlapping volumetric spheres and edge detection post-processing
+	// frilly frames?
 
 main
 	gui.Init(2.0)
@@ -41,10 +46,11 @@ datatype Tetromino (uint64)
 	"bb\n Bb"
 	" Bb\nbb"
 	"ccCc"
-	"ccCc"
+	"ffFf"
 	"dDd\nd"
 	"dDd\n  d"
 	"eEe\n e"
+	// I could add 0 bombs. like a shape with a hole in it, to punish players lol.
 ]
 
 
@@ -58,7 +64,7 @@ class TetrisWin (Window)
 		.Score = TextView(self)
 		.Score.MakeInline
 		.blockheight = 24
-		.blockX(true) = -0.5//-6
+		.blockX(true) = -0.5
 		.blockY = 1.5
 		.FramesLeft = 48
 	
@@ -70,7 +76,6 @@ class TetrisWin (Window)
 	
 	behaviour Framestep
 		require GUIActive
-		|| M2 = keys.Movement
 		|| M = keys.Movement((8th, 0, 0, 4th))
 		if .Grid.State == 1 // game over
 			if keys.SPACE or Keys.RETURN

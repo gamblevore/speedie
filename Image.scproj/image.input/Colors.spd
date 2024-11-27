@@ -2,7 +2,7 @@
 
 module Colors
 	function Wheel (|float| H, |float| S, |float| B, |float| A=1.0,  |vec4|)
-		description "Perceptual color wheel. I may change the internals later. Currently yellow does not have enough space." 
+		description "Perceptual color wheel. Not truely HSV." 
 		require h or s or b or a
 		
 		h = h.Fract
@@ -11,6 +11,9 @@ module Colors
 	    || f = h.fract
 	    || p = b * (1.0 - s)
 	    || q = b * (1.0 - (s * f))
+
+
+		f = (2.0-f)*f // theo-addition? :o) might tweak later. Not enough red.
 	    || t = b * (1.0 - (s * (1.0 - f)))
 	
 	    if (i == 0)
@@ -89,5 +92,4 @@ function errorseverity.color (|vec4|)
 	if self < ErrorSeverity.Warning
 		return colors.White
 	return colors.red
-	
 	

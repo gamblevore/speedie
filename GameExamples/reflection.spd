@@ -143,7 +143,7 @@ class Breakout (Window)
 	
 	
 	behaviour FrameStep
-		require !ShouldNotDisturbGUI
+		require GUIActive
 		|| minsp = .BallSpeed/4
 		for (b.backwards in .balls) (i)
 			if b.Health > 0
@@ -160,7 +160,7 @@ class Breakout (Window)
 					.reset( "You failed")
 					exit
 		
-		.bar.Pos.x += keys.Vec3.x * 0.2
+		.bar.Pos.x += keys.movement.x.sign * 0.2
 		|| bl = .bar.left
 		if bl < 0
 			.bar.pos.x -= bl

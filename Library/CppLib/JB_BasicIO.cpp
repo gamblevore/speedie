@@ -34,18 +34,18 @@ void JB_Str_Print(JB_String* S) {
 		SendToStdOut(S->Addr, S->Length);
 }
 
-FastString* PrintCapturer;
-FastString** JB_Str_PrintCapturer() {
-	return &PrintCapturer;
-}
+//FastString* PrintCapturer;
+//FastString** JB_Str_PrintCapturer() {
+//	return &PrintCapturer;
+//}
 
 void JB_Str_PrintLine(JB_String* S) {
 	JB_Str_Print(S);
 	SendToStdOut( (uint8*)"\n", 1 );
-	auto P = PrintCapturer;
-	if_rare (P) {
-		JB_FS_AppendLine(P, S);
-	}
+//	auto P = PrintCapturer;
+//	if_rare (P) {`
+//		JB_FS_AppendLine(P, S);
+//	}
 }
 
 #else
