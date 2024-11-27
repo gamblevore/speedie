@@ -53,7 +53,7 @@ datatype int
 		return self - s.length
 
 	syntax access (|bool|) // should be a bool?
-		cpp_part rnd
+		cpp_part rnd // these random funcs need unifying their purpose / names
 		disabled "use intnum() for a random int, or floatnum[] for a chance at getting true"
 
 	syntax access (|int| bit, |bool|)
@@ -408,7 +408,7 @@ datatype float
 		|| v = (10 pow to)|float|
 		return (self * v).Round / v
 
-	function q (|float| sigma=0.0, |float|)
+	function Sign (|float| sigma=0.0, |float|)
 		if self > sigma
 			return 1
 		if self < -sigma

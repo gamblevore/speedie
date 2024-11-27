@@ -21,7 +21,6 @@ module GUI
 	|ivec2| 					NewSize
 	|ivec2| 					CurrMouseXY
 	|ivec2|						TryResizeLater
-	|date|						CmdReleaseDate
 	|date|						FrameStart
 	|duration|					FrameLength
 	|date|						LastFrameDate = 1 // wont fire otherwise
@@ -82,6 +81,7 @@ module GUI
 	cpp_wrapper SDL_GetModState			(|SDL_KeyMod|)
 	cpp_wrapper SDL_SetModState			(|SDL_KeyMod| State) // can we use this to clear the cmd-key
 	
+	cpp_wrapper SDL_ResetKeyboard		()
 	cpp_wrapper SDL_StartTextInput		()
 	cpp_wrapper SDL_StopTextInput		()
 	cpp_wrapper SDL_ShowSimpleMessageBox		(|int| Flags, |cstring| title, |cstring| msg, |?&SDL_Window| window)
@@ -644,7 +644,7 @@ module GUI
 		GUI.Touch
 
 
-	function FrameUpdatesAndResize
+	function FrameStepAndResize
 		opt norefcounts
 		notifications.CheckForDisappear		
 		.StartResize
@@ -654,7 +654,7 @@ module GUI
 			w.FixFocus
 			if !dlg or w.IsLiveAction // stop needless updates
 //				.sdl_stoptextinput
-				w.__FrameStep__(dlg or w.OpenedMenu or .IsBackground)
+				w.__FrameStep__(!(dlg or w.OpenedMenu or .IsBackground))
 		.StartResize
 
 
@@ -689,10 +689,10 @@ module GUI
 		.PostLoads
 		occured |= .FrameAndEvents
 		
-		.FrameUpdatesAndResize
-		ifn Occured is Exiting
+		.FrameStepAndResize
+		if Occured isnt Exiting
 			.PutDialogsInFront
-			if occured is activity
+			if (occured is activity) or .TouchCount
 				.DrawFrame
 			if !sdl_event.HasAny
 				app.sleep(.NapTime)
@@ -887,6 +887,7 @@ module GUI
 	function AppIsBackground (|bool| v, |int|)
 		beep.OK = 1
 		.keymod = 0
+		.sdl_Resetkeyboard
 		require .IsBackground != v // what? why is tihs happenin 
 		.IsBackground = v
 		.FlashSelector = false
@@ -898,21 +899,8 @@ module GUI
 		
 
 	function CheckKeyMods
-		|| old = .KeyMod
-		|| New = .SDL_GetModState
-		.KeyMod = New
-		
-		#!Work around some SDL bug... the cmd-key (not shift or ctrl) gets sticky sometimes
-		if ((Old xor New) is cmd)
-			if new is cmd
-				.CmdReleaseDate = date.now + 5s
-			  else
-				.CmdReleaseDate = 0
-		  elseif .CmdReleaseDate.Fired
-			.CmdReleaseDate = 0
-			New &= ~sdl_keymod.cmd
-			.keymod = new
-			.SDL_SetModState(New)
+		.KeyMod = .SDL_GetModState
+
 
 	helper EventWindow (|window|)
 		return .FrontDialog ?? __modules__.window.front
@@ -1070,8 +1058,6 @@ module GUI
 	
 	helper KeyDownEvent (|&SDL_Event| ev, |window| w, |int|)
 		#!keydown!
-		if .CmdReleaseDate
-			.CmdReleaseDate = date.now + 5s
 		|| kev = ev.keysym
 		|| key = kev.sym
 		if key.IsCancelled or .CanDrag >= mousedragging.Within

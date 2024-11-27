@@ -12,6 +12,14 @@ struct Random
 	
 	saveas struct
 
+	function Int (|int64| a, |int64| b, |int64|)
+		cpp_part RndIntRange
+		|| n = b-a
+		return .int(n|float64|) + n
+
+	function Int (|Float64| n, |int64|) 
+		return (.Float64 * n)|int64|
+
 	function Int (|int64|)
 		cpp_part RndInt
 		|| s = ++.state
@@ -47,9 +55,6 @@ struct Random
 				addr[i] = .int
 			return s[0,n]
 	
-	function Int (|Float64| n, |int64|) 
-		return (.Float64 * n)|int64|
-
 	function Float64 (|Float64|) // Double (
 		|| i = .int|uint64|
 		|uint64[1]| C
@@ -127,21 +132,35 @@ struct Random
 			random.shared.float(*_)
 
 
-
-function ivec2.syntaxcall (|int| n, |string|)
+// these random funcs need unifying their purpose / names
+// do they return the same type of a different?
+// access is nicer for different. fits with float, even int! int[1] == bool
+// doesnt work with ivecs2 for string, but w can just rename it to text.
+function ivec2.Text (|int| n, |string|)
 	return random.shared.Text(n, .x, .y)
+	
+function float.SyntaxAccess (|bool|)
+	return random[] < self
 
-function float.syntaxcall (|float|)		// can this even be accessed anymore? seems no?
+function float.SyntaxCall (|float|)		// can this even be accessed anymore? seems no?
 	return random.shared.float * self	// 1.0() doesnt work anymore? neither 1.0[]
 
-function float64.syntaxcall (|float64|)
+function float64.SyntaxCall (|float64|)
 	return random.shared.float64 * self
 
-function int.syntaxcall (|int|)
+function int.SyntaxCall (|int|)
 	return (random.shared.Float64 * self|Float64|)|int|
 
 function int.Rand (|int|)
 	disabled "use 'num()'"
+
+function byte.SyntaxCall (|byte| to, |byte|) 
+	return random.shared.int(self, to) // these random funcs need unifying their purpose / names
+
+function ivec2.SyntaxCall (|ivec2|) // speedrogue uses this
+	|| cw = random[0.0, .x|float|, 1.0]
+	|| ch = random[0.0, .y|float|, 1.0]
+	return (cw, ch).iVec2
 
 
 function uint64.Now (|uint64|)

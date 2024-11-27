@@ -24,9 +24,9 @@ class Window (GUIControl)
 	|object?|							ReturnValue
 	|date|								AlphaFader
 	|date|								CreatedDate
-	|float|								GameScale
-	|vec2|								GameMove
-	|byte|								GameMode
+	|float|								BlockScale
+	|vec2|								BlockMove
+	|byte|								BlockMode
 	
 	
 	constructor
@@ -54,7 +54,7 @@ class Window (GUIControl)
 		.disposeall
 
 
-	virtual FrameStep (|bool| ShouldNotDisturbGUI)
+	virtual FrameStep (|bool| GUIActive)
 		0
 
 	virtual CancelClose (|SDLCloseReason| Reason=SDLCloseReason.windowclose, |bool|)
@@ -104,7 +104,7 @@ class Window (GUIControl)
 		.show
 		if gui.init(scaling)
 			gui.NukeCursor
-			.gameScale ?= 20
+			.BlockScale ?= 20
 			return GUI.run
 
 	syntax cast (|ErrorInt|)

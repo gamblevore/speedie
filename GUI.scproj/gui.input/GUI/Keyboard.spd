@@ -92,9 +92,21 @@ dataType Keys (int) {
 		|| i = keys.has(self)
 			return keys.downdate[i] == GUI.framestart
 		
-	function Length (|float|)
-		|| i = keys.has(self)
-			return keys.downdate[i].ago.float
+	function Length (|int| Plus,  |float| Limit,  |float|)
+		require Plus
+		if keylog: "Length: Plus $Plus,  Limit $limit"
+		|| i = keys.has(self) #require
+		|| D = Keys.DownDate[i]
+		if keylog: "Length: D $D"
+		rz = (D.ago*plus).float
+		if limit and D < gui.FrameStart
+			if keylog: "Length: C"
+			if rz.abs > limit
+				if keylog: "Length: D"
+				keys.downdate[i] = gui.FrameStart
+			  else 
+				if keylog: "Length: E"
+				rz = 0
 
 	function IsCancelled (|bool|) // surely its "IsEaten?"
 		|| i = keys.has(self)
@@ -135,26 +147,11 @@ dataType Keys (int) {
 	function IsCmd (|bool|)
 		return self is lgui or rgui
 		
-	function Vec3 (|vec3|)
-		return (.x, .y, .z)
-	
-	function X (|float|)
-		if self is a or left
-			return -1
-		if self is d or right
-			return 1
-		
-	function Z (|float|)
-		if self is s or down
-			return -1
-		if self is w or up
-			return 1
-		
-	function Y (|float|)
-		if self is LCTRL or RCTRL
-			return -1
-		if self is space
-			return 1
+	function Movement (|vec4| L, |vec4|)
+		rz.x = .Length((self is d or right) - (self is a or left), l.x)
+		rz.y = .Length((self is space) - (self is LCTRL or RCTRL), l.y)
+		rz.z = .Length((self is w or up) - (self is s or down), l.z)
+		rz.w = .Length((self is e) - (self is q), l.w)
 				
 	syntax access (|bool|)
 		return keys.has(self)
@@ -170,26 +167,28 @@ dataType Keys (int) {
 		|date[8]|				DownDate
 		|int|					Count
 
-		function Vec3 (|vec3|)
+		function Movement (|vec4| Limiter=vec4(), |vec4|)
 			for i in .count
-				rz += .downkeys[i].vec3
+				rz += .downkeys[i].Movement(limiter)
 		
 		function State (|&int| n, |&byte|)
 			cpp_Wrapper SDL_GetKeyboardState
 		
-		helper AddKey (|keys| K)
+		helper AddKey (|keys| K, |int|)
 			if (.count < 8) and !.has(K)
 				|| i = .count++
+				if keylog: "add $k at ${GUI.FrameStart}"
 				.DownDate[i] = GUI.FrameStart
 				.DownKeys[i] = K
+				return SDLActivity.Activity
 				
 		function RemoveKey (|keys| K, |int|)
 			for i in .count
 				if .downkeys[i] == K
 					|| m = --.count
 					.DownKeys[i] = .DownKeys[m]
-					.DownKeys[m] = 0
 					.DownDate[i] = .DownDate[m]
+					.DownKeys[m] = 0
 					.DownDate[m] = 0
 			return SDLActivity.activity
 			
@@ -709,3 +708,4 @@ dataType Keys (int) {
 }
 
 
+|| keylog = false

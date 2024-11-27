@@ -434,7 +434,7 @@ class PerryIDE (Window)
 	
 	behaviour FrameStep // perframe, eachframe, onframe
 		.ProjectTabs.TrimWidth
-		if !ShouldNotDisturbGUI
+		if GUIactive
 			.SaveMemory
 			if !.focus
 				.setfocus(.editme) // shouldn't need this... why doesn't .focus setter get called?
@@ -458,7 +458,7 @@ class PerryIDE (Window)
 		if fc isa 32
 			.CheckModified
 		
-		if !ShouldNotDisturbGUI and !.DebugArgsList.HasFocus
+		if GUIActive and !.DebugArgsList.HasFocus
 			.HideStuff
 
 

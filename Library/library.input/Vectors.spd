@@ -508,11 +508,6 @@ datatype ivec2
 		if (Lsq < osq)
 			return -1
 
-	syntax access (|ivec2|) // speedrogue uses this
-		|| cw = random[0.0, .x|float|, 1.0]
-		|| ch = random[0.0, .y|float|, 1.0]
-		return (cw, ch).iVec2
-
 	syntax cast (|intrange|)
 		return self|intrange|
 
@@ -592,6 +587,14 @@ datatype ivec2
 
 	syntax Equals (|int| v, |bool|Aware, |bool|)
 		return (.x == v) and (.y == v) 
+	
+	function RotateRight (|ivec2|)
+		description "Rotates like a steering wheel, so turning the top to the right" 
+		return (.y, -.x)
+	
+	function RotateLeft (|ivec2|)
+		description "Rotates like a steering wheel, so turning the top to the left" 
+		return (-.y, .x)
 		
 	render
 		fs <~ "(${.x}, ${.y})"

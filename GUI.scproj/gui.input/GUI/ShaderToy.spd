@@ -52,7 +52,7 @@ class ShaderToy (window)
 				
 		
 	behaviour FrameStep
-		|| m = keys.vec3
-			.cam += m * 0.2
+		|| m = keys.Movement.Clamp
+			.cam += m.xyz * 0.2
 		GUI.touch
 

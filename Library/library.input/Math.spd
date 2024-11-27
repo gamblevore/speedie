@@ -308,10 +308,6 @@ extend float
 		rz *= rz
 		rz *= rz
 		rz *= rz
-	
-	syntax access (|bool|)
-		return random[] < self
-
 
 function math.RangeConvert (|float| lfrom, |float| hfrom, |float| lto, |float| hto, |FloatRangeConverter|)
 	description "Converts numbers in one range, to another range. Very awkward to do, normally!" 
