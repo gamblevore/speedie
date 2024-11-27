@@ -79,7 +79,7 @@ function vec4.Screen (|ivec4|)
 extend Window
 	helper _ReadjustBlock2D
 		description "Readjusts current draw-matrix. This converts object coords to screen coords." 
-		|| BS = .VastuScale$
+		|| BS = .gameScale$
 		|| J = 0.0
 		if bs > 0 
 			J = .LastRect.width|float|
@@ -89,24 +89,48 @@ extend Window
 		
 		j/=bs
 		VObject.DrawScale = j
-		|| M = .VastuMove
-		if .VastuMode&1
+		|| M = .GameMove
+		if .GameMode&1
 			M.x = (j-m.x)*0.5
-		if .VastuMode&2
+		if .GameMode&2
 			M.y = (j-m.y)*0.5
 		VObject.DrawMovement = M
 
-	function BlockX (|bool| Middle=false,assigns:|float|)
-		.VastuMove.x = Value
-		.VastuMode = (.VastuMode &~1) ||| Middle
+	function BlockX (|bool| Middle=false, assigns:|float|)
+		.GameMove.x = Value
+		.GameMode = (.GameMode &~1) ||| Middle
 	
-	function BlockY (|bool| Middle=false,assigns:|float|)
-		.VastuMove.y = Value
-		.VastuMode = (.VastuMode &~2) ||| (Middle<<1)
+	function BlockY (|bool| Middle=false, assigns:|float|)
+		.GameMove.y = Value
+		.GameMode = (.GameMode &~2) ||| (Middle<<1)
 		
 	setter BlockHeight (|float|)
-		.Vastuscale = -Value.abs
+		.Gamescale = -Value.abs
 	
 	setter BlockWidth (|float|)
-		.Vastuscale = Value.abs
+		.Gamescale = Value.abs
+
+
+
+class GridSection
+	|...[512]| Cells
+	|object--?| Owner
+	contains uint64
+	constants
+		CellMax = 512
+
+	constructor
+		.Fill(0)
+
+	function at (|uint| i=0, |&...|)
+		if i < 512
+			return .Cells[i]
+		return Dummy
+	
+	function Fill (|uint64| V)
+		|| C = .at
+		for i in CellMax
+			C[i] = v
+	module
+		|...| Dummy
 

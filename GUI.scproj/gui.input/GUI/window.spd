@@ -24,9 +24,9 @@ class Window (GUIControl)
 	|object?|							ReturnValue
 	|date|								AlphaFader
 	|date|								CreatedDate
-	|float|								VastuScale
-	|vec2|								VastuMove
-	|byte|								VastuMode
+	|float|								GameScale
+	|vec2|								GameMove
+	|byte|								GameMode
 	
 	
 	constructor
@@ -104,8 +104,7 @@ class Window (GUIControl)
 		.show
 		if gui.init(scaling)
 			gui.NukeCursor
-			.VastuScale ?= 20
-
+			.gameScale ?= 20
 			return GUI.run
 
 	syntax cast (|ErrorInt|)

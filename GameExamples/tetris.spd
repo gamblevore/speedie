@@ -1,0 +1,169 @@
+#!/usr/local/bin/spd
+import "GUI"
+
+main
+	return TetrisWin()
+
+
+datatype TetrisBlock (uint64)
+	flags
+		|uint64|
+		(1<<8)
+		Ghost
+		Dropper
+		Real
+		Destroying
+
+	syntax is (|tetrisblock| V, |bool|)
+		return (self&V)==V
+
+	function byte.real (|tetrisblock|)
+		return self|TetrisBlock| ||| TetrisBlock.Real
+	
+	function byte.dropper (|tetrisblock|)
+		return self|TetrisBlock| ||| TetrisBlock.Dropper
+
+|| Shapes = [
+	"aa\naa"
+	"bb\n bb"
+	"cccc"
+	"ddd\nd"
+	"eee\n e"
+]
+
+
+class TetrisWin (Window)
+	|Tetris|			Grid
+	
+	constructor
+		.grid = GridSection()
+		.blockheight = 24
+		.blockX(true) = 0
+		.blockY = 1.5
+		.grid.restart
+		
+	behaviour Framestep
+		if gui.FrameCount isa 32
+			.grid.drop
+		|| M = keys.Vec3
+		|| x = M.x
+			.grid.move(x|int|)
+		if keys.Vec3.y > 0
+			.Grid.Move(-16)
+		gui.Touch
+
+	behaviour DrawBackground
+		where.DrawRect(self, colors.black)
+		.Grid.draw(where)
+
+
+role Tetris (GridSection)
+	contains TetrisBlock
+
+	syntax Access (|int| x, |int| y, |&tetrisblock|)
+		return .at(x + y*16)
+	
+	function AddShape (|string| s)
+		|| y = 19
+		|| x = 0
+		for c in s
+			if c == '\n'
+				y--
+				x = 0
+			  elseif c != ' '
+				self[x+4,y][] = c.dropper
+				x++
+
+	function NextShape
+		.AddShape(shapes.now!)
+		
+	function Debug (|&tetrisblock| v)
+		|| x = v - .at
+		|| y = x/16
+		x = x&15
+		"$x, $y"
+	
+	function Move (|int| x, |bool|)
+		for (b in self) (c)
+			if b is dropper
+				|| dest = x+c
+				rz |= dest[] is Real
+				dest[] |= b<<16
+		for (b in self) (c)
+			if !rz
+				|| m = b>>16
+					b = m
+				  elseif b is Dropper
+					b = 0
+			c[] = b & 16~bits // flush
+		
+
+	function Restart
+		|| i = 0
+		for y in 24
+			for x in 12
+				|tetrisblock| B
+				if !y or (x == 0 or 11)
+					B = 'x'.real
+				  elseif y <= 4
+					B = ++i & 15
+					b|=!b
+					b = b|byte|.real
+				self[x, y][] = b
+			self[10()+1, y][] = 0
+		.AddShape(shapes[0]!)
+
+	function row (|int| y, |bool|)
+		for x in 10
+			if !self[x+1, y][]
+				return true
+		
+	function MakeReal		
+		for (b in self) (c)
+			if b is Dropper
+				c[] = (b &~ TetrisBlock.Dropper)|||TetrisBlock.Real
+		for y in 23
+			if !.row(y+1)
+				for x in 10
+					self[x+1, y+1][] = 0
+				y--
+				
+		for x in 10
+			if self[x+1,19][]
+				beep "Game Over"
+				return .restart
+		
+	function Drop
+		if .Move(-16)
+			.MakeReal
+			.NextShape
+		
+	function Draw (|image| where)
+		for i in 23
+			.drawRow(where, i+1)
+	
+	function DrawBlock (|image| where, |int| y, |int| x, |int| b)
+		|| R = (x, y, x+1, y+1).screen
+		|| C = colors.wheel(b div 11, 1, 0.8)
+		where.DrawRect(R, C)
+		C.r += 12th
+		where.DrawOutlineOnly(R, C)
+	
+	function DrawRow (|image| where, |int| y)
+		|| row = .at(y*16)
+		for x in 12
+			|| b = row[x]
+				// this -2 shouldn't be here
+				// .blockX needs fixing
+				.DrawBlock(where, y, x-2, b&255)
+
+	iterator
+		|| y = 0
+		while y < 24
+			|| x = 0
+			while x < 12
+				|| c = self[x,y]
+				yield (c[]) (c)
+				++x
+			y++
+
