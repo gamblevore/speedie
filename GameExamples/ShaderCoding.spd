@@ -3,7 +3,7 @@ https://youtu.be/f4s1h2YETNY
 
 import "GUI"
 main
-	gui.Rescale(4)
+	gui.init(2)
 	return MainImage
 
 

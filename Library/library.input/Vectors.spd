@@ -80,6 +80,14 @@ datatype vec4
 		r.x2 = r.x2 min .x2
 		r.y2 = r.y2 min .y2
 		return r
+
+
+	function Sign (|float| sigma=0.0, |vec4|)
+		.x = .x.sign(sigma)
+		.y = .y.sign(sigma)
+		.z = .z.sign(sigma)
+		.w = .w.sign(sigma)
+		return self
 	
 	function Exists (|bool|)
 		return .width > 0 and .Height > 0

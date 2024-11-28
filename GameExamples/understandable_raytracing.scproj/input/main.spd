@@ -3,7 +3,7 @@ https://www.scratchapixel.com // simple raytracing demo... based on code from he
 
 
 main
-	sdlapp.Rescale(3)
+	gui.init(2)
 	return RayScene()
 
 
@@ -27,7 +27,8 @@ class RayScene (window)
 	constructor
 		.g = 0.006
 		.cam = (1.6, 5.0, -22.0)
-		.FPS = .TextView(false)
+		.FPS = TextView(self)
+		.fps.MakeInline
 		.GNormal.clear // black background
 		
 		.shapes <~ Sphere((-1.0, 1.5, 12.0), 2)
@@ -45,7 +46,6 @@ class RayScene (window)
 		if .LastFPSChange.ago > 0.5s
 			|| fps = (1.0/ago.Float64).Render(1) + "fps"
 			.fps.text = fps
-			printline fps
 			.LastFPSChange = .LastDraw
 		
 		|| size = where.size.vec2
@@ -70,10 +70,10 @@ class RayScene (window)
 		return k.Vec3
 
 	
-	behaviour FrameUpdate
+	behaviour FrameStep
 		|| m = .moved
 			.cam += m * 0.2
-			SDLApp.touch
+			gui.touch
 		for sp in .shapes
 			sp.Move(.g)
 
@@ -102,7 +102,7 @@ class Shape
 				y = g * random[40, 60]
 		.Speed.y = y
 		.center += .speed
-		SDLApp.Touch
+		gui.Touch
 
 	function Color (|Vec3| orig, |Vec3| dir, |vec3| idir, |rayhit| H)
 		opt min 3
@@ -113,7 +113,7 @@ class Shape
 			|| Norm = (P - .center).normal
 			|| y = Norm.y.acos
 			|| x = Norm.z.abs.atan2(Norm.x)
-			|| grid = ((((x+y + SDLApp.Cycle(30s))*10).fract - 0.5)*10).clamp*0.1
+			|| grid = ((((x+y + gui.Cycle(30s))*10).fract - 0.5)*10).clamp*0.1
 			H.color = (0.6+x+grid, y+grid, 0.3, 1.0)
 
 

@@ -352,11 +352,11 @@ function RoomPurpose (|[rogueroom]| rooms, |message|)
 	|| Types = .AllowedRoom #require
 	|| Count = 0.0
 	for r in types
-		Count += r.first.Float
+		Count += r.first.Float|float|
 	
 	|| rnd = random[0,count]
 	for r in types
-		count -= r.first.Float
+		count -= r.first.Float|float|
 		if count <= 0
 			return r
 	return types.Last
@@ -417,7 +417,7 @@ function AllowedRoom (|int| Level_Num = 0, |[message]|)
 
 
 function message.Filter (|int| L, |bool| IsMonster=false,  |[rogueobject]|)
-	L := map.level[0].int
+	L ?= map.level[0].int
 	opt norefcounts
 	for Mon in self
 		if IsMonster
@@ -452,7 +452,7 @@ function info.LoadColors (|Message| msg, |TerminalColor| Default=0)
 
 
 function info.Load (|int64| Seed, |bool|)
-	seed := date.now & 0xffff
+	seed ?= date.now & 0xffff
 	Random.shared.seed = seed
 	map.seed = seed
 	if !"Creatures.txt".FileExists

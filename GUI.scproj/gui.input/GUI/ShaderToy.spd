@@ -40,7 +40,7 @@ class ShaderToy (window)
 		opt min 3
 		.fps.Update
 		
-		.time = (GUI.FrameStart - .CreatedDate).Float
+		.time = (date.now - .CreatedDate).Float
 		|| size = where.size.vec2
 		|| scale = 1.0/size.xx
 		|| adjust = size*-0.5	
@@ -49,10 +49,11 @@ class ShaderToy (window)
 			|| XY = (pv + adjust) * scale
 			|| Col = (.Shader)(self, size, pv, XY)
 			c <~ col
-				
-		
+
 	behaviour FrameStep
-		|| m = keys.Movement.Clamp
+		|| m = keys.Movement.sign
 			.cam += m.xyz * 0.2
 		GUI.touch
+
+
 

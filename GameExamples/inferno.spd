@@ -5,7 +5,7 @@ http://shadertoy.com/user/Xor	// Original by @XorDev,
 import "GUI"
 
 main
-	sdlapp.Rescale(8)
+	gui.init(4)
 	return MainImage
 
 

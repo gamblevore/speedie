@@ -45,6 +45,7 @@ class Window (GUIControl)
 	helper SubConstructor (|ControlRect| Size)
 		.size = Size
 		.createddate = gui.FrameStart
+		.CreatedDate ?= date.now
 		.InlineEditorPlace.Init(self)
 		.reflow
 		.show

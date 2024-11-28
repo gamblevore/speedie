@@ -59,7 +59,6 @@ class StartWindow (window)
 				b.text += "o"
 		
 	function Win (|int| who, |ivec2| From, |ivec2| To)
-		beep "$from -> $to"
 		|| name = ("crosses", "noughts")(who>0)
 		self[from].text += "!"
 		self[(from+to)/2].text += "!"
@@ -105,7 +104,6 @@ class StartWindow (window)
 
 
 main
-	SDLApp.init(-1)
 	|| w = StartWindow()
-	return sdlapp.Run
+	return GUI.Run
 
