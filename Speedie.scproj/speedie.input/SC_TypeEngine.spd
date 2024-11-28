@@ -1455,10 +1455,10 @@ function message.AndOrExpansionTest (|int|)
 
 
 function TypeOfRel (ExprResolver)
+	|message--| opch = exp.second!
+	|SCOperator--| Comp = SCOperator.Lookup( opch )
+	|| RN = opch.Next								#expect	(exp, "Missing right hand side")
 	|| LN = exp.first!
-	|| opch = ln.Next!
-	|| Comp = SCOperator.Lookup( opch )
-	|| RN = opch.Next #expect	(exp, "Missing right hand side")
 	if opch == "is" or "isnt"
 		return LN.NiceIsFlagSyntax(opch, RN, name_space, side)
 	
@@ -1479,34 +1479,33 @@ function TypeOfRel (ExprResolver)
 		error (opch, "Did you mean '=='?")
 
 	
-	|SCDecl| RC
-	|SCDecl| LC
+	|SCDecl--| RC
+	|SCDecl--| LC
 	
 	if (side)
-		RC = TypeOfExprNeeded( RN, name_space ) #require 
-		LC = TypeOfExpr( LN, name_space, side )
-		if (exp == @rel) and (ln == exp.last)		// oop. it just changed.
-			return TypeOfRel(Exp, name_space, side) // lol.
+		RC = TypeOfExprNeeded( RN, name_space )
+		if rc
+			LC = TypeOfExpr( LN, name_space, side )
+			if (exp == @rel) and (ln == exp.last)		// oop. it just changed.
+				return TypeOfRel(Exp, name_space, side) // lol.
 	  else 
 		LC = TypeOfExpr( LN, name_space )
-		RC = TypeOfExprNeeded( RN, name_space ) #require 
+		RC = TypeOfExprNeeded( RN, name_space )
 
-	require (exp == @rel) // has exp changed?
-	expect  (LC)  (LN, "Can’t find the type of this.")
-	
-	if (side)
-		// check for dumb stuff like "func() = nil" or "abc|bool| = false"
-		require LC.AssignabilityCheck(LN, RN, rc)
+	if !rc or !lc or (exp != @rel) or (side and !LC.AssignabilityCheck(LN, RN, rc))
+		if rc and !lc
+			error (LN, "Can’t find the type of this.")
+		return nil
 	
 	opch.obj = comp // shouldn't this be higher even?
-	
-	if comp is andor // either
+	if comp is AndOr // either
 		return Or_And_Expansion( LC, RC, exp, name_Space ) // expects both sides to be booleans, right?
 
 
 	if (RC != TypeNil)
 		|| IPM = IsPointerMath(LC, RC, comp, exp)
 			return ipm.CheckMath(exp)
+	
 	
 	|| Custom = UseCustomOperators(LC, RC, comp, exp) 
 
@@ -1550,7 +1549,7 @@ function TypeOfRel (ExprResolver)
 	  else
 		if custom & (CustomOps.TypeCastToBetter|||customops.TypeCastToSmaller) 
 			|| pc = lc.better_numeric(rc, comp.Kind, ln, rn)
-			if  pc is const  and  lc isnt const // sigh... we got rc instead of lc
+			if  pc is const  and  lc isnt const			// sigh... we got rc instead of lc
 				lc = pc.type.typenormal
 			  else
 				lc = pc

@@ -12,6 +12,7 @@ bugs:
 		* limit carrays to 2D. 3D is garbage even in C++.
 		* just use ptrs... and increment by inner carray size
 	* |carray[1][1]| x, x = nil // c++ can't compile this! Use accesstomemcpy which already calls memzero!
+	* vector .rgbaxywzhsb should always be lowercase! Allows names like vec4.HasGrab
 
 additions:
 	* rename "flags" to something else. I wanna use "flags" for somekinda default Info and Syntax is

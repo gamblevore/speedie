@@ -74,7 +74,7 @@ function PressingDebug (GUIAction)
 	|| db = .ide.DebugArgsList
 	if db.HasAnyFocus
 		db.ClearFocus
-	else
+	  else
 		db.setfocus
 
 
@@ -87,6 +87,7 @@ function PerryIDE.DebugEnvs (|message| env)
 
 
 function PerryIDE.DebugAppCallArgsDisplay (|file| f, |[string]| args, |faststring|)
+	#!------
 	rz = FastString()
 	rz <~ f.name
 	rz <~ ":"

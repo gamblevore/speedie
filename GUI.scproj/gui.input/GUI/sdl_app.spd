@@ -803,8 +803,9 @@ module GUI
 	function StandardKeys (|keys| key, |bool|)
 		opt norefcounts
 		|| w = __modules__.window.front						#require
+		|| cmd = keys.cmd
 		|| rf = w.realfocus
-			if keys.cmd
+			if cmd
 				if (key is g)
 					if !rf.__Search__(GUI.lastsearch, false)
 						beep
@@ -815,7 +816,7 @@ module GUI
 				return rf.OpenSearch
 
 		|| gw = rf ?? w
-		|| cmd = keys.cmd
+		if cmd
 			if (key is PLUS or EQUALS)
 				return .Rescale(.scale+0.5)
 			if (key is minus)
@@ -843,30 +844,39 @@ module GUI
 	function TryQuit (|SDLCloseReason| reason = SDLCloseReason.Terminating, |SDLActivity|)
 		opt norefcounts
 		if (reason is QuitEvent)
-			|| w = .LastWindowClose.guiago
-			if (w and w < 0.1s)
-				return 0 // just block it. SDL is sending duplicate events
-			(reason is windowclose     )
+			require LastWindowClose != gui.framestart  // just block it. SDL is sending duplicate events
+			(reason is windowclose)
 		  elseif reason is windowclose
 			.LastWindowClose = .FrameStart
 			require GUI.AskQuit
 		
+		if reason is WindowClose
+			if .DidCloseDialogs(SDLCloseReason.WindowClose)
+				return sdlactivity.activity
+			if .TryCloseFrontWindow
+				if window.all.hasany
+					return sdlactivity.activity
+				return SDLActivity.Exiting
+			return SDLActivity.nothing
+				
 		.IsQuitting = true
-		if .DidCloseDialogs and .DidCloseDocuments(reason)
+		if !.DidCloseDialogs(reason).y and .DidCloseDocuments(reason)
 			rz = SDLActivity.Exiting
 		  else
 			.WantsQuit = false
 		.IsQuitting = false
 
 
-	helper DidCloseDialogs (|bool|)
+	helper DidCloseDialogs (|SDLCloseReason| reason, |ivec2|)
 		opt norefcounts
 		for w in window.all
 			if w.isdialog
+				rz.x++
 				w.cancelreturn
-				require w.CanJustCloseForQuit
-				w.remove
-		return true
+				if w.CanJustCloseForQuit
+					w.remove
+				  else
+					rz.y++
 	
 	
 	helper DidCloseDocuments (|sdlclosereason| reason, |bool|)

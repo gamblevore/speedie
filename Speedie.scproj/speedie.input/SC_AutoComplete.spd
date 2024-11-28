@@ -935,16 +935,16 @@ helper Message.FuncPos (|scfunction| fn, |int|)
 	return .position // oh well
 
 
-function Define (|message| msg,  |string| purpose,  |object| found=nil,  |message|)
+function Define (|message--!| msg,  |string| purpose,  |object| found=nil,  |message|)
 	|| IsDisplay = purpose starts "display"
 	|| IsDefine  = purpose starts "define"
 	expect (IsDisplay or IsDefine) ("badcmd")
 	ifn found isa SCObject
 		found = nil
+	if msg == @prm
+		msg = msg.parent!
 	|| s = .LocateDefinition(msg, found|SCObject|, IsDisplay)	
 		return .RespondDefine(msg, s, purpose)
-//	if platform.isdebug
-//		.LocateDefinition(msg, found|SCObject|, IsDisplay)
 	error "nosource"
 
 

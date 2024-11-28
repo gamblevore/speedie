@@ -967,6 +967,8 @@ function perryide.IDECommand (|bool|)
 		.editme.beep = s2.name
 	  elseif cmd ~= "render"
 		.editme.beep = s.parse.Render
+	  elseif cmd ~= "tetris"
+		TetrisWin()
 	  else
 		beep "unrecognised: " + cmd
 

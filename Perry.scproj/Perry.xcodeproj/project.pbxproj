@@ -442,7 +442,7 @@
 /* Begin PBXLegacyTarget section */
 		AC9220A22857A127002F3F97 /* DebugBuilder */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "--nocolor --x --nocompile --targetdebug /usr/local/speedie/Perry.scproj --target=perry";
+			buildArgumentsString = "--nocolor --x --nocompile --targetdebug --target=perry /usr/local/speedie/Perry.scproj";
 			buildConfigurationList = AC9220A32857A127002F3F97 /* Build configuration list for PBXLegacyTarget "DebugBuilder" */;
 			buildPhases = (
 			);

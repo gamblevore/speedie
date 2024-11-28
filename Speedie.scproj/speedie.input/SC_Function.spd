@@ -739,6 +739,7 @@ function DeclsPrototypeInterface (|Message| ch0, |SCClass| fpType, |bool| late)
 
 function DeclsProtoTypeAdd (|SCClass| fpType, |scdecl|)
 	|| Dcl = SCDecl(fpType)
+	dcl.source = .source
 	dcl.IsLookupOnly = self
 	dcl.Name = .Name
 	compiler.newconst(Dcl)					// lets kill da hoe		// kill! kill!

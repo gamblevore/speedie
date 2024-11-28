@@ -428,7 +428,6 @@ class Window (GUIControl)
 
 
 	helper GUI.AskQuit (|bool|) // !GUI.askquit
-		debugger
 		|| q = "Quit " + app.AppName + "?"
 		return q.confirm
 	

@@ -117,7 +117,7 @@ class GUIControl (list)
 			rect += l.xyxy
 			.LastRect = rect // right?
 
-
+		
 	helper Reflow (|ivec4| mine, |ivec4| Hard) 
 		opt norefcounts
 		|| prev = mine.x2y2x1y1 // noice

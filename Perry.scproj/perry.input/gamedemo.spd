@@ -1,19 +1,4 @@
-#!/usr/local/bin/spd
-import "GUI"
 
-// todo:
-// **window alignment sucks**
-	// scaling too for scale2
-// forgiveness like tetris has
-
-// score board needs block positioning, and history
-// pink cloudy blocks with cute faces? and hearts/rainbows/stars as they disappear
-	// Clouds via overlapping volumetric spheres and edge detection post-processing
-	// frilly frames?
-
-main
-	gui.Init(2.0)
-	return TetrisWin()
 
 
 datatype Tetromino (uint64)

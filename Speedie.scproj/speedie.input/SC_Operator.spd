@@ -423,7 +423,7 @@ function scdecl.CompareUnclear (|scdecl| d, |bool| MakesSenseVsZero, |bool|)
 	|| L = .typeinfo, || R = d.typeinfo
 	|| bitdiff = l.bitcount - r.bitcount
 	
-	if (l.issigned and bitdiff <= 0)
+	if (l.IsSigned and bitdiff <= 0)
 		if (self is directnumber)
 			|| x = .exportposition
 				return x|int64| < 0
@@ -444,10 +444,9 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 
 	if lnt is numeric and rnt is numeric
 		if (comp is Comparison) and (lnt.issigned != rnt.issigned)
-			//   What are we comparing?   byte vs int is ok.   uint vs int NOT OK
+			// What are we comparing?   byte vs int is ok.   uint vs int NOT OK
 			if lc.CompareUnclear(rc, (comp is less)|bool|) or rc.CompareUnclear(lc, (comp is more)|bool|)
 				error (MsgRel, "Unclear signed vs unsigned comparison.")
-
 
 	ifn LN and LN == RN	   		// not both same numbers
 		if ln and rn and (ln == 1 or rn == 1)
@@ -479,9 +478,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 				  elseif (comp is ShiftOnly) and (lnt.isfloat) and (rnt.isint)
 					extra = CustomOps.Needed
 				  else
-					extra = CustomOps.TypeCastToBetter
-					
-			
+					extra = CustomOps.TypeCastToBetter			
 		  else
 			if GotABool and comp isnt Compare
 				extra = CustomOps.TypeCastFromBool
@@ -490,19 +487,24 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 
 	if (!SCNode.ConstantsLoadingOverride and LC.Type is TreatAsBaseType)
 		return CustomOps.Needed ||| extra
-	if ((LN > 1) and CompOrSet)					// can't compare vectors directly in C++
+	if (LN > 1) and CompOrSet									// can't compare vectors directly in C++
 		return CustomOps.Needed ||| extra
 
 	if !extra
 		|| t = lc.type
-		if t.super and t.hasOperator(comp.funcname)
+		if  t.super  and  t.hasOperator(comp.funcname)
 			return CustomOps.Needed
 
-	if comp is shiftonly and rc is const
+	if  comp is shiftonly  and  rc is const
 		// check shift size
 		|| IsLeft = comp == scoperator.LeftShift
-		msgrel.CheckConstShift(lc, rc, isleft)
-		if (isleft) and (lc is const) 	   // we need to check for something
+		// OK... so how to do this?
+		//  || x = 1<<32 // upgrade
+		//  || x = y<<32 // fail
+		if lc isnt const
+			msgrel.CheckConstShift(lc, rc, isleft)
+			
+		if (isleft) and (lc is const)							// we need to check for something
 			extra |= MsgRel.TryImproveShiftConstants(lc, rc)
 
 	return extra
@@ -518,7 +520,7 @@ function message.CheckConstShift (|scdecl| LC, |scdecl| RC, |bool| Bigger)
 			BC = 32
 		  else
 			BC = 1
-		
+	
 	expect (rk < BC) (self, "Too large bit shift")
 		
 	
@@ -548,13 +550,14 @@ function message.TryImproveShiftConstants (|scdecl| LC, |scdecl| RC, |int|)
 		.clear
 	return customops.RecheckType
 		
-	// what about more complex things? like (1) << (2)
-	// or (1+1) << (3) ?
-	// just report an error in my ASMifier
-	// seems OK
-	
+// what about more complex things? like (1) << (2)
+// or (1+1) << (3) ?
+// just report an error in my ASMifier
+// seems OK
 
-function scclass.HasOperator (|string| op, |bool|)
+
+
+function SCClass.HasOperator (|string| op, |bool|)
 	opt norefcounts
 	|| obj = self[op]
 	if obj isa scfunction

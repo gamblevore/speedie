@@ -1,7 +1,14 @@
 
 
-function Print (|string?| data) // macro this too?
+helper _StrPrint (|string?| data)
 	cpp_wrapper JB_Str_Print
+
+function Print (|string?| data)
+	_strprint(data)
+
+
+macro Print
+	_strprint(_0.render)
 
 
 function PrintLine (|string| data="")
@@ -12,13 +19,13 @@ macro PrintLine
 	StrPrintline(_0.render) // not self-referential anymore.
 
 
-function StrPrintLine (|string?| data)
+helper StrPrintLine (|string?| data) // ideally move this to string._printline
 	cpp_wrapper JB_Str_PrintLine
 
 
-function PrintLine (|object?| o)
-	cpp_name JB_Obj_PrintLine
-	printline o.render
+//function PrintLine (|object?| o)
+//	cpp_name JB_Obj_PrintLine
+//	printline o.render
 
 
 function ZalgoLine (|string| data)

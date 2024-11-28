@@ -161,8 +161,7 @@ function SCNode.CollectConstantsSub (|Message| ch)
 	  else
 		funcname = nil
 
-	expect (arg == vs) (vs)
-	expect (arg == @arg or arg == @list) (arg)
+	expect (arg == vs) and (arg == @arg or arg == @list) (vs)
 	
 	|uint64| NextNum = 0 + (ch == "flags")
 	|uint64| StartNum = NextNum
@@ -245,11 +244,6 @@ function SCNode.CollectConstantsSub (|Message| ch)
 			compiler.newconst(newitem)
 			NameList <~ NewItem.source!
 			.TryAdd( line, NewItem, NewItem.Name )
-	
-	
-//	if (ch == "flags")
-//		|| s = (FuncName.Name, "Flag")(FuncName)
-//		.AddNumericConst("Largest" + s, lastflag|int|.bits, ch)
 	
 	for (D in FixLater)
 		.Tran_Const( D, self )

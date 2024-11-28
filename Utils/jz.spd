@@ -397,7 +397,8 @@ module Conv
 		|| T = str.IsJbin						#require
 		|| mz = str.ParseJbin(3)
 		if !mz
-			printline StdErr.pop
+			|| err = StdErr.pop
+				printline err
 
 		ifn mz == @tmp and "µz"
 			.Detected |= type.jbin
