@@ -1,17 +1,44 @@
 
 
 module Colors
+	function Rainbow (|float| H, |float| S, |float| B, |float| A=1.0,  |vec4|)
+		description "Rainbow color wheel. More orange than color.Wheel" 
+//		h-=3th
+//		if keys.shift
+//			return .wheel(h,s,b,a)
+		h = h.Fract
+		h = h * 7.0
+	    || i = h|int|
+	    || hf = h.fract
+		|| f = hf*B
+		
+	    if (i == 0)							// R->O
+			rz = (B, f*0.5, 0, a)
+	      elseif (i == 1)					// O->Y
+			rz = (B, (f+B)*0.5, 0, a)
+	      elseif (i == 2)					// Y->G
+			rz = (B-f, B, 0,  a)
+	      elseif (i == 3)					// G->T
+			rz = (0, B, f, a)
+	      elseif (i == 4)					// T->B
+			rz = (0, B-f, B, a)
+	      elseif (i == 5)					// B->P
+			rz = (f, 0, B, a)			
+		  else								// P->R
+			rz = (B, 0, B-f, a)			
+		
+		|| Gray = vec4(B, A)
+		rz = (rz * S) + Gray * (1.0-S)
+
+	
 	function Wheel (|float| H, |float| S, |float| B, |float| A=1.0,  |vec4|)
 		description "Perceptual color wheel. Not truely HSV." 
-		require h or s or b or a
-		
 		h = h.Fract
 		h = h * 6.0
 	    || i = h|int|
 	    || f = h.fract
 	    || p = b * (1.0 - s)
 	    || q = b * (1.0 - (s * f))
-
 
 		f = (2.0-f)*f // theo-addition? :o) might tweak later. Not enough red.
 	    || t = b * (1.0 - (s * (1.0 - f)))

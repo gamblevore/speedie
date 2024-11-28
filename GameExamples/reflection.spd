@@ -5,9 +5,8 @@ main
 	return Breakout().RunAsMain(2.0)
 
 // wierd bug with evreything being hit.
-// remove explosions (and make them explode)
+// remove explosions after a while, (make them explode)
 	// why do they disappear SOMEtIMES?
-	// make spirals expand (or just replace with explosions)
 	// block nudge... for vibration on hit
 
 
@@ -17,6 +16,7 @@ class Breakout (Window)
 	|[vobject]|			Blocks
 	|vobject|			Bar
 	|[vobject]|			Balls
+	|[vobject]|			Explosions
 	|float|				BallSpeed
 	|int|				Hits
 	|[vobject]|			Spirals
@@ -27,14 +27,10 @@ class Breakout (Window)
 		.fps.MakeInline()
 		.reset
 
-	function AddBalls (|int| n, |vec2| P, |vobject|)
-		for n
-			Rz = vobject((P, 16th,  16th))
-			P.y++
-			rz.Velocity = vec2(0, -.ballspeed)
-			.balls <~ rz
-		if !rz
-			app.Crash
+	function AddBalls (|vec2| P, |vobject|)
+		Rz = vobject((P, 16th,  16th))
+		rz.Velocity = vec2(0, -.ballspeed)
+		.balls <~ rz
 
 	function reset (|string| msg="")
 		if msg
@@ -44,7 +40,9 @@ class Breakout (Window)
 		.bar.radius = vec2(1.0,  0.125)
 		.balls.length = 0
 		.Blocks.Length = 0
-		.addballs(2, (10.3, 6.0))
+		.Explosions.Length = 0
+		for y in 2.0
+			.addballs((10.3, 6.0+y))
 		for y in 5.0
 			|| y2 = -1.0 + y*3th
 			for x in 10.0
@@ -105,15 +103,13 @@ class Breakout (Window)
 			if !pu
 				0 //
 			  elseif pu <= 2
-				|| b2 = .addballs(1, cn)
+				|| b2 = .addballs(cn)
 				|| old = .Blocks.now!
 				b2.towards(old.pos, .BallSpeed)
 			  elseif pu <= 5
-				|| b2 = .addballs(1, ball.pos)
-				b2.Radius = vec2(1+(pu-3))
+				|| b2 = vobject((ball.pos, vec2(1+(pu-3))*0.3 ))
 				b2.Color = colors.Red // 
-				b2.Velocity = nil
-				b2.Health = -2
+				.Explosions <~ b2
 			  elseif pu <= 7
 				ball.Radius += 16th
 			  elseif pu == 8
@@ -145,11 +141,17 @@ class Breakout (Window)
 	behaviour FrameStep
 		require GUIActive
 		|| minsp = .BallSpeed/4
+		for (b.backwards in .explosions) (i)
+			b.Radius -= 0.03
+			if b.Radius.x <= 0.02
+				.explosions.fastRemove(i)
+			  else 
+				.Dohits(b)
+		
 		for (b.backwards in .balls) (i)
-			if b.Health > 0
-				|| y = b.Velocity.y
-				if y.Abs < minsp
-					b.Velocity.y = minsp.CopySign(y)
+			|| y = b.Velocity.y
+			if y.Abs < minsp
+				b.Velocity.y = minsp.CopySign(y)
 			b.Step
 			.Bounds(b)
 			.Dohits(b)
@@ -179,7 +181,7 @@ class Breakout (Window)
 	behaviour Drawbackground
 		where.DrawRect(self, colors.black)
 		for x in .Width
-			|| Col = Colors.wheel(x div .width, 1, 0.5)
+			|| Col = Colors.rainbow(x div .width, 1, 0.5)
 			where.DrawLineV((x,0), .height, col)
 		
 		for b in .Blocks
@@ -194,7 +196,12 @@ class Breakout (Window)
 		for (s in .Spirals) (i)
 			|| B = s.Screen
 			where.DrawSpiral(0.01*b.width|float|*vobject.drawscale, L, b.center, s.color * 0.2[], (3s+i*1s)())
-		for b in .balls
+		.BallDraw(where, .balls)
+		.BallDraw(where, .explosions)
+	
+	
+	function BallDraw (|image| where, |[vobject]| List)
+		for b in list
 			|| bx = b.Box.scr0 ± -4.0
 			where.DrawSoftCircle(bx, b.Color, 2.0)
 
