@@ -3,6 +3,7 @@
 extend PerryIDE  
     constructor (|file| project)
 		super.constructor 
+		.IsMainWindow		= true
 		.Project			= project
 		.InConstructor		= true
 		.CanAskingAboutMissing = true

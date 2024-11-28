@@ -845,38 +845,35 @@ module GUI
 		opt norefcounts
 		if (reason is QuitEvent)
 			require LastWindowClose != gui.framestart  // just block it. SDL is sending duplicate events
-			(reason is windowclose)
+			(reason is WindowClose)
 		  elseif reason is windowclose
 			.LastWindowClose = .FrameStart
 			require GUI.AskQuit
 		
 		if reason is WindowClose
-			if .DidCloseDialogs(SDLCloseReason.WindowClose)
-				return sdlactivity.activity
+			|| w = .FrontDialog
+				if w.TryCloseDialog
+					return SDLActivity.activity
 			if .TryCloseFrontWindow
-				if window.all.hasany
-					return sdlactivity.activity
-				return SDLActivity.Exiting
+				if !window.all.HasAny
+					return SDLActivity.Exiting
+				return sdlactivity.activity
 			return SDLActivity.nothing
-				
+		
 		.IsQuitting = true
-		if !.DidCloseDialogs(reason).y and .DidCloseDocuments(reason)
+		if .DidCloseDialogs and .DidCloseDocuments(reason)
 			rz = SDLActivity.Exiting
 		  else
 			.WantsQuit = false
 		.IsQuitting = false
 
 
-	helper DidCloseDialogs (|SDLCloseReason| reason, |ivec2|)
+	helper DidCloseDialogs (|bool|)
 		opt norefcounts
 		for w in window.all
-			if w.isdialog
-				rz.x++
-				w.cancelreturn
-				if w.CanJustCloseForQuit
-					w.remove
-				  else
-					rz.y++
+			if w.IsDialog
+				require w.TryCloseDialog
+		return true
 	
 	
 	helper DidCloseDocuments (|sdlclosereason| reason, |bool|)
@@ -1094,7 +1091,7 @@ module GUI
 
 	helper Window.GetUserAttention
 		if !.Focus
-			.flashself = true
+			._FlashSelf |= 1
 		.alphafader = gui.FrameStart
 		beep
 	

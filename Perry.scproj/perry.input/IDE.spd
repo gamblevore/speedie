@@ -93,7 +93,21 @@ class PerryIDE (Window)
 	|bool| 						IsGraphics
 	|byte|						PopupReason
 
-		
+	
+	destructor
+		opt norefcounts
+		|| proj = .projmsg					#require
+		proj["pos"] = .editme.sel0
+		Perry.save
+
+		|| n = proj.parent.slowcount
+		if n >= 2
+			.RemoveProjFromList
+		|| p = .prev
+		if p isa perryide
+			p.showide
+	
+	
 	function UpdateStatusErrors
 		.EditStatus.text = .PerryStatus
 
@@ -103,6 +117,7 @@ class PerryIDE (Window)
 
 		rz = path.Path_Expand(perry.PathDict) #expect ("Unrecognised @ in: " + path)
 		rz = rz.resolve(FileResolveMode.AllowMissing)
+	
 	
 	function PerryError (|error?|) 
 		opt norefcounts
@@ -139,21 +154,10 @@ class PerryIDE (Window)
 	
 
 	behaviour CancelClose 
-		|| proj = .projmsg					#require
-		proj["pos"] = .editme.sel0
-		Perry.save
-		
 		if !.filelist.AskSaveall
 			return true // failed
 		if !ClickedCancel(self) or !.MakeNothingRunning(" for closing the project?")
 			return true
-		
-		|| n = proj.parent.slowcount
-		if n >= 2 and reason|int| < SDLCloseReason.TryQuit|int|
-			.RemoveProjFromList
-		|| p = .prev
-		if p isa perryide
-			p.showide
 			
 
 	function LocateProjRoot (|string| path, |filerow|)

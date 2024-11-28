@@ -5,6 +5,7 @@ prototype ShaderToyFunc (|ShaderToy| self,  |vec2| Resolution,  |vec2| Pos,  |ve
 	syntax cast (|ErrorInt|)
 		cpp_name GUI_Toy_SilentRun
 		|| win = ShaderToy(self)
+		win.IsLiveAction = true
 		return win.RunAsMain
 
 

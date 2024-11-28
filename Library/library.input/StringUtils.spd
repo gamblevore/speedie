@@ -1,31 +1,25 @@
 
 
-helper _StrPrint (|string?| data)
-	cpp_wrapper JB_Str_Print
-
-function Print (|string?| data)
-	_strprint(data)
-
-
 macro Print
 	_strprint(_0.render)
-
-
-function PrintLine (|string| data="")
-	strprintline(Data)							// to disambiguate vs macro
-
 
 macro PrintLine
 	StrPrintline(_0.render) // not self-referential anymore.
 
 
-helper StrPrintLine (|string?| data) // ideally move this to string._printline
-	cpp_wrapper JB_Str_PrintLine
+helper _StrPrint (|string?| data)
+	cpp_wrapper JB_Str_Print
+
+helper StrPrintLine (|string?| data)	// ideally move this to string._printline
+	cpp_wrapper JB_Str_PrintLine		// AND... make printline x use this.
+
+function Print (|string?| data)
+	_strprint(data)
+
+function PrintLine (|string| data="")
+	strprintline(Data)							// to disambiguate vs macro
 
 
-//function PrintLine (|object?| o)
-//	cpp_name JB_Obj_PrintLine
-//	printline o.render
 
 
 function ZalgoLine (|string| data)

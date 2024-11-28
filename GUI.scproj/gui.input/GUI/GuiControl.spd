@@ -438,17 +438,16 @@ class GUIControl (list)
 		|| f = w.AlphaFader				#require
 		|| delay = gui.FrameStart - f
 		|| remain = 1s - delay
-		if w.alphasubtle
+		if w._FlashSelf & 2
 			remain += 0.5s
 		if remain > 0
 			GUI.touch(Self)
 			|| f2 = (remain)|float| / 1s|float|
-			if w.alphasubtle
+			if w._FlashSelf&2
 				f2 *= 0.2
 			return f2
 		w.alphafader = 0
-		w.alphasubtle = false
-		w.FlashSelf = false
+		w._FlashSelf = 0
 	
 			
 	function SetFocus

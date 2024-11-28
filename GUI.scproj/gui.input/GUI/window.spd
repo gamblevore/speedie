@@ -4,11 +4,11 @@ class Window (GUIControl)
 	linkage
 		cpp_part Win
 	|bool|								FocusWasSet
-	|bool|								AlphaSubtle
-	|bool|								IsDialog
-	|bool|								FlashSelf
-	|bool|								_BlockRecurseKeyDown
 	|bool| 								IsLiveAction
+	|bool|								IsDialog
+	|bool|								IsMainWindow
+	|byte|								_FlashSelf
+	|bool|								_BlockRecurseKeyDown
 	|GUIControl?|						Focus
 	|Guicontrol?|						InnerFocus
 	|GUIControl?|						CurrMouseDown
@@ -101,15 +101,13 @@ class Window (GUIControl)
 		disabled "use openedmenu"
 
 	function RunAsMain (|float| Scaling = 1.0, |ErrorInt|)
-		.IsLiveAction = true // probably true
 		.show
+		.IsMainWindow = true
 		if gui.init(scaling)
 			gui.NukeCursor
 			.BlockScale ?= 20
 			return GUI.run
 
-	syntax cast (|ErrorInt|)
-		return .RunAsMain
 		
 	syntax call (|ConfirmCanceller| Cancel=nil, |object?|)
 		require !(Cancel)() and self isnt visible // recursive... sigh
@@ -328,7 +326,7 @@ class Window (GUIControl)
 		i.DrawFocus(where)?
 
 		where.ResetBoundsToSize
-		if .AlphaFader and .FlashSelf
+		if .AlphaFader and ._FlashSelf
 			.DrawFocusRect(Where, .LastRect, .FaintingEdgeSub)
 
 
@@ -422,26 +420,31 @@ class Window (GUIControl)
 	
 	function OpenDialog
 		.isdialog = true
-		window.all			<~ self
+		window.all <~ self
 		is visible
 		GUI.StartResize // sigh
 
 
 	helper GUI.AskQuit (|bool|) // !GUI.askquit
 		|| q = "Quit " + app.AppName + "?"
-		return q.confirm
+		if q.confirm
+			rz = .CancelCloseAllForQuit
 	
+	helper gui.CancelCloseAllForQuit (|bool|)
+		opt norefcounts
+		for s in Window.all
+			require s.__CancelClose__(SDLCloseReason.tryquit)
+		return true
 	
-	function Close (|SDLCloseReason| reason=SDLCloseReason.windowclose, |bool|)
-		if !GUI.wantsquit and (reason < SDLCloseReason.tryquit)
-			if (window.DocumentCount == 1)  and  !.isdialog
-				require GUI.AskQuit and !.__CancelClose__(reason)
-				.disposeall(true)
-				GUI.wantsquit = true
-				return true
+	function Close (|SDLCloseReason| Reason=SDLCloseReason.windowclose, |bool|)
+		if !GUI.WantsQuit and (reason < SDLCloseReason.TryQuit) and .IsMainWindow
+			require GUI.AskQuit() and !.__CancelClose__(reason)
+			.DisposeAll(true)
+			GUI.WantsQuit = true
+			return true
 
 		|| cancelled = .__CancelClose__(reason)
-		if !cancelled or (reason is terminating) or GUI.WantsQuit
+		if !cancelled or (reason is Terminating) or GUI.WantsQuit
 			.DisposeAll(true) // its probably OK????
 			return true
 
@@ -508,6 +511,7 @@ class Window (GUIControl)
 			|| nxt = ctrl.flatnext
 			yield ctrl
 			ctrl = nxt
+	
 	
 	iterator flat
 		|| ctrl = .first|guicontrol|

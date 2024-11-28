@@ -63,14 +63,17 @@ function ConfirmWindow_.Resize (|string| s)
 	.size = actual.layout
 
 
-helper window.CanJustCloseForQuit (|bool|)
+helper window.TryCloseDialog (|bool|)
 	opt norefcounts
+	.cancelreturn
 	|| count = 0
 	if self isa ConfirmWindow_
 		for b in .Buttons
 			if b is visible
 				count++
-		return count == 1
+		if count == 1
+			.remove
+			return true
 
 
 function ConfirmIt (|string| Q,  |string| Title,  |[string]| answers,  |string| Response=string.byte(0), |ConfirmCanceller| Cancel = nil, |int|)

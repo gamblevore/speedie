@@ -1339,7 +1339,7 @@ class TextView (GUIControl)
 		require .hasfocus
 		|| w = .Window
 			w.alphafader = gui.FrameStart
-			w.alphasubtle = true
+			w._FlashSelf |= 2
 
 	
 	helper WasEverAltered (|bool|)

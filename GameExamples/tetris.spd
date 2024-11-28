@@ -13,7 +13,7 @@ import "GUI"
 
 main
 	gui.Init(2.0)
-	return TetrisWin()
+	return TetrisWin().RunAsMain
 
 
 datatype Tetromino (uint64)
