@@ -231,7 +231,7 @@ module Conv
 		|| d = .RealOut!.out
 		|| src = .in!.in
 		require src!=nil and d != nil
-		.start = date() 
+		.start = date.now 
 		if Decomp
 			.size = d.File.size|float|
 			src.DecompressInto(d)
@@ -260,7 +260,7 @@ module Conv
 			"$.in! is: ${OrigSize.strsize} compressed to ${.in!.size.strsize} ($CmpFormat)"
 			return 0
 				
-		.start = date()
+		.start = date.now
 		.data = .in!.ReadAll(int.max, false)
 		if .data != string.error
 			.Detected |= type.ReadOK
@@ -271,7 +271,7 @@ module Conv
 		.Time("Read ")
 		
 		if CmpFormat
-			.start = date()
+			.start = date.now
 			.data = .data.Decompress(int.max)
 			.time("Decompress", true)
 		
