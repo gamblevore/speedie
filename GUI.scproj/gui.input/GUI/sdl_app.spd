@@ -24,7 +24,6 @@ module GUI
 	|date|						FrameStart
 	|duration|					FrameLength
 	|date|						LastFrameDate = 1 // wont fire otherwise
-	|date|						LastWindowClose
 	|date|						FixScreenBug
 	|date|						FastToolTipDate
 	|date|						ChangeSelFlash
@@ -33,11 +32,9 @@ module GUI
 	|bool|						StartedProperly
 	|bool|						IsBackground
 	|bool|						FlashSelector
-	|bool|						WantsQuit
+	|sdlactivity|				QuitReason
 	|bool|						NeedMouseMove
-	|bool|						IsQuitting
 	|bool|						AControlWasResized
-	|bool|						LastWasKeyWindowClose
 	|bool|						TextInputEnabled
 	|bool|						TextInputEnabledAtStart
 	|byte|						TouchCount=3  // draw the first few frames always
@@ -227,7 +224,7 @@ module GUI
 		while .SingleFrame
 			if n++ isa 512
 				app.ClearCaches //  :)
-		.Quit
+		.Terminate
 		
 		return (!StdErr.OK)|int|
 
@@ -441,14 +438,15 @@ module GUI
 			.MouseMoveEvent(w, .MouseXY)
 	
 	
-	helper FrameAndEvents (|sdlactivity|) // frameevents
+	helper FrameAndEvents (|SDLActivity|) // frameevents
 		while .Event.Poll
 			rz |= .CheckEvent(.event)
 			.Event.type = 0
 		if .NeedMouseMove
 			.DoFakeMouseMove
-		if .WantsQuit
-			rz |= .TryQuit
+		|| Quitish = .QuitReason &~ SDLActivity.Activity
+			rz |= .StrongClose(Quitish)
+			.QuitReason = 0
 		if .NewSize
 			rz |= SDLActivity.activity
 
@@ -690,7 +688,7 @@ module GUI
 		occured |= .FrameAndEvents
 		
 		.FrameStepAndResize
-		if Occured isnt Exiting
+		if Occured isnt ExitOrTerminate
 			.PutDialogsInFront
 			if (occured is activity) or .TouchCount
 				.DrawFrame
@@ -750,18 +748,19 @@ module GUI
 		SDL_RenderPresent(.renderer!)
 
 
-//	function Delay (|int| ms)
-//		cpp_Wrapper SDL_Delay
+	function IsQuitting (|bool|)
+		return .quitreason
 
 
-	function Quit
+	function Terminate
+		.quitreason = sdlactivity.Terminating
 		.saveprefs // in case we crash during quit
 		for w in __modules__.window.all
-			w.close(SDLCloseReason.terminating)
+			w.close(SDLActivity.terminating)
 		.saveprefs
 		.sdl_quit
 
-	
+
 	function FileDroppedIntoApp (|window| w, |string| path, |SDLEventType| t, |int|)
 		|| p = (copypasteflags.pastefile, copypasteflags.pastetext)(t is dropfile)
 		|| c = w[.MouseXY] ?? w
@@ -841,54 +840,35 @@ module GUI
 			return gw.DoPaste(clipboard.text)
 
 
-	function TryQuit (|SDLCloseReason| reason = SDLCloseReason.Terminating, |SDLActivity|)
+	helper StrongClose (|sdlactivity| Reason, |SDLActivity|)
 		opt norefcounts
-		if (reason is QuitEvent)
-			require LastWindowClose != gui.framestart  // just block it. SDL is sending duplicate events
-			(reason is WindowClose)
-		  elseif reason is windowclose
-			.LastWindowClose = .FrameStart
-			require GUI.AskQuit
-		
-		if reason is WindowClose
-			|| w = .FrontDialog
-				if w.TryCloseDialog
-					return SDLActivity.activity
-			if .TryCloseFrontWindow
-				if !window.all.HasAny
-					return SDLActivity.Exiting
-				return sdlactivity.activity
-			return SDLActivity.nothing
-		
-		.IsQuitting = true
-		if .DidCloseDialogs and .DidCloseDocuments(reason)
-			rz = SDLActivity.Exiting
-		  else
-			.WantsQuit = false
-		.IsQuitting = false
+		if Reason is Terminating
+			return SDLActivity.Terminating // terminate will call windowclose anyhow
 
+		if Reason != sdlactivity.StrongWindowClose
+			return .quit(reason)
 
-	helper DidCloseDialogs (|bool|)
+		|| w = window.front
+		if !w
+			return reason
+		if w.IsMainWindow
+			return GUI.AskQuit
+		.quitreason = 0 // i guess?
+		return w.close
+	
+	
+	function Quit (|sdlactivity| Reason=0, |SDLActivity|)
 		opt norefcounts
+		reason |= sdlactivity.Exiting
 		for w in window.all
 			if w.IsDialog
 				require w.TryCloseDialog
-		return true
-	
-	
-	helper DidCloseDocuments (|sdlclosereason| reason, |bool|)
-		opt norefcounts // dialogs gone by now
 		for w in window.all
 			require w.close(reason)
-		return true
+		return reason
+			
 
-
-	function TryCloseFrontWindow (|int|)
-		.LastWindowClose = .FrameStart
-		if !.DialogIsOpen
-			|| w = window.front
-			if w and w.close
-				rz = SDLActivity.activity
+	helper StrongCloseWindow (|sdlactivity|)
 
 
 	function AppIsBackground (|bool| v, |int|)
@@ -915,21 +895,21 @@ module GUI
 	helper CheckEvent (|&SDL_Event| ev, |int|)
 		visible
 		.CheckKeyMods
-		|| KeyW = .LastWasKeyWindowClose
-		.LastWasKeyWindowClose = false
 		|| t = ev.type
 		 
 		if t is APP_DIDENTERFOREGROUND or APP_DIDENTERBACKGROUND
 			return .AppIsBackground(t is APP_DIDENTERBACKGROUND)
 		
 		if  t is APP_TERMINATING
-			return .tryquit
+			.quitreason |= SDLActivity.ExitOrTerminate
+			return sdlactivity.ExitOrTerminate
 		
 		if  t is QUIT
-			return .tryquit(sdlclosereason.QuitEvent)
+			.Quitreason |= SDLActivity.Exiting
+			return sdlactivity.activity
 		
 		if  t is WINDOWEVENT
-			return .windowevent(ev, keyw)
+			return .windowevent(ev)
 
 		|| w = .EventWindow
 		if !w
@@ -977,14 +957,12 @@ module GUI
 		return SDLActivity.nothing
 	
 	
-	helper WindowEvent (|&SDL_Event| ev, |bool| keyw,  |int|)
+	helper WindowEvent (|&SDL_Event| ev,  |int|)
 		|| wev = ev.window
 		|| wt = wev.event
-		if (wt is CLOSE)
-			if keyw
-				return .TryCloseFrontWindow
-			  else
-				return .TryQuit(sdlclosereason.WindowClose)
+		if (wt is CLOSE)						// A request to close ANY window.
+			.QuitReason |= SDLActivity.StrongWindowClose
+			return SDLActivity.activity
 		if (wt is RESIZED)
 			.NewSize = (wev.data1, wev.data2)
 			return SDLActivity.activity
@@ -1069,10 +1047,10 @@ module GUI
 		|| key = kev.sym
 		if key.IsCancelled or .CanDrag >= mousedragging.Within
 			return SDLActivity.nothing
+		if (key is w) and (keys.cmd) // checking for keys.cmd doesnt always work!!
+			return 0
 		beep.OK = 1
 		
-		if (key is w) // checking for keys.cmd actually doesnt always work!!
-			.LastWasKeyWindowClose = true
 
 		keys.AddKey(key)
 		if !w.openedmenu and !.AllowKeyDown(kev)
@@ -1174,32 +1152,21 @@ function guicontrol.Description (|string|)
 	return .tooltip // :)
 	
 	
-	
-datatype SDLActivity (uint)
+datatype SDLActivity (byte)
 	flags
 		|SDLActivity|
 		Nothing = 0
 		Activity
-		Exiting
+		WindowClose
+		ExitOrTerminate = [Exiting, Terminating]
+		StrongWindowClose = WindowClose+Exiting
 	syntax is (|SDLActivity| act, |bool|)
 		return self & act
-		
-	
-datatype SDLCloseReason (uint)
-	flags
-		|SDLCloseReason|
-		WindowClose
-		TryQuit
-		QuitEvent
-		Terminating
-	syntax is (|SDLCloseReason| act, |bool|)
-		return self|int| & act|int|
-	syntax is (|SDLCloseReason| act, assigns:|bool| value, |SDLCloseReason|)
-		cpp_Part Set
+	syntax is (|SDLActivity| act, assigns:|bool| value, |SDLActivity|)
 		if value
-			return (self|int| ||| act|int|)|SDLCloseReason|
+			return self ||| act
 		  else
-			return (self|int| &~ act|int|)|SDLCloseReason|
+			return self &~ act
 			
 
 

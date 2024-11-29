@@ -5,8 +5,8 @@ module Notifications
 	|list of window|	Alerts = list()
 	
 	constants
-		height = 60
-		width = 160
+		height = 70
+		width = 200
 		|int64|
 		disappear = 7.5
 	

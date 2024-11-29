@@ -46,7 +46,7 @@ datatype Tetromino (uint64)
 	"bb\n Bb"
 	" Bb\nbb"
 	"ccCc"
-	"ffFf"
+	"ccCc"
 	"dDd\nd"
 	"dDd\n  d"
 	"eEe\n e"
@@ -226,7 +226,7 @@ class Tetris (GridSection)
 				if !Score
 					score = 100
 				  else
-					Score*=3
+					Score *= 3
 				.PullDown(y+1)
 				y--
 		

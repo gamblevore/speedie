@@ -58,7 +58,7 @@ class Window (GUIControl)
 	virtual FrameStep (|bool| GUIActive)
 		0
 
-	virtual CancelClose (|SDLCloseReason| Reason=SDLCloseReason.windowclose, |bool|)
+	virtual CancelClose (|SDLActivity| Reason=SDLActivity.windowclose, |bool|)
 		return !reason
 
 
@@ -425,28 +425,28 @@ class Window (GUIControl)
 		GUI.StartResize // sigh
 
 
-	helper GUI.AskQuit (|bool|) // !GUI.askquit
-		|| q = "Quit " + app.AppName + "?"
-		if q.confirm
-			rz = .CancelCloseAllForQuit
-	
-	helper gui.CancelCloseAllForQuit (|bool|)
-		opt norefcounts
-		for s in Window.all
-			require s.__CancelClose__(SDLCloseReason.tryquit)
-		return true
-	
-	function Close (|SDLCloseReason| Reason=SDLCloseReason.windowclose, |bool|)
-		if !GUI.WantsQuit and (reason < SDLCloseReason.TryQuit) and .IsMainWindow
-			require GUI.AskQuit() and !.__CancelClose__(reason)
-			.DisposeAll(true)
-			GUI.WantsQuit = true
-			return true
+	helper GUI.AskQuit (|SDLActivity|)
+		|| Ask = "Quit " + app.AppName + "?"
+		.quitreason = SDLActivity.Activity
+		if Ask.confirm
+			rz = .QuitCloseAll
+		.quitreason = rz
 
+	
+	helper gui.QuitCloseAll (|SDLActivity|)
+		opt norefcounts
+		rz = SDLActivity.Exiting
+		for w in Window.all
+			require !w.__CancelClose__(rz)
+	
+	
+	function Close (|SDLActivity| Reason=SDLActivity.windowclose, |sdlactivity|)
 		|| cancelled = .__CancelClose__(reason)
-		if !cancelled or (reason is Terminating) or GUI.WantsQuit
-			.DisposeAll(true) // its probably OK????
-			return true
+		require !cancelled or (reason is Terminating)
+
+		.DisposeAll(true) // its probably OK????
+		return reason
+		
 
 	
 	function CloseDialog
