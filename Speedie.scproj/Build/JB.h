@@ -3752,11 +3752,11 @@ bool SC_NodeSorter(SCFunction* A, SCFunction* B);
 
 SCDecl* SC_Or_And_Expansion(SCDecl* LC, SCDecl* RC, Message* Exp, SCNode* Name_space);
 
+void JB_Print(JB_String* Data);
+
 void JB_Obj_Print(JB_Object* O);
 
 void JB_PrintLine(JB_String* Data);
-
-void JB_Obj_PrintLine(JB_Object* O);
 
 void SC_RelSetOrExpansion(Message* Exp);
 
