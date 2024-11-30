@@ -32,14 +32,8 @@ struct ControlSize
 	function Mode (|int|i, |int|)
 		return .GSize[i]&15
 
-	function Size (|int| i, |bool| UseBlocks,  |int|)
-		opt norefcounts
-		|| g = .GSize[i]>>4
-		if !UseBlocks
-			return g
-
-		|| sc = VObject.Drawmovement[i&1]
-		return ((g|float| + sc) * VObject.DrawScale)|int|
+	function Size (|int| i,  |int|)
+		return .GSize[i]>>4
 
 	helper sett (|int|i, |ivec2| value, |int| mode) // remove?
 		.g(i)   = ((value.x << 4) ||| mode)|controlpoint|
@@ -56,6 +50,8 @@ struct ControlSize
 		rz = .sizer.Calculate(parent, prev, Hard, self)
 		if .LastRect!=rz
 			.LastRect = rz
+			if self isa Window
+				._ReadjustBlock2D
 			GUI.NeedMouseMove = true
 			.__Resized__()
 		if !.hasany
@@ -68,13 +64,13 @@ struct ControlSize
 
 
 	function Calculate (|ivec4| Parent, |ivec4| Prev, |ivec4| Window, |guicontrol| upon, |ivec4|)
-		|| dbg = upon.clipmode is debug
-			"---------------"
-		|| vis = upon is visible
 		|| UseBlocks = upon is blocksized
+			return .CalculateBlocks
+//		|| dbg = upon.clipmode is debug
+//			"---------------"
 		|| pc = parent.size >> 1
 		for i in 4
-			|| sz = .size(i, UseBlocks)
+			|| sz = .size(i)
 			|| m = .Mode(i)
 			if m <= ControlPoint.Centered
 				|int| d = (m&2) + (i&1)
@@ -97,7 +93,7 @@ struct ControlSize
 			if .mode(i) == ControlPoint.Length
 				|| other = i xor 2
 				|| ro = rz[other]
-				|| sz = .size(i, UseBlocks)
+				|| sz = .size(i)
 				
 				sz = upon.Transition(sz, i, e)
 				rz[i] = ro + ((i>=2) sign sz)

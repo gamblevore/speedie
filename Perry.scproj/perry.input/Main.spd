@@ -1,4 +1,5 @@
 
+import "GameExamples/tetris.spd"
 
 main // main { 
 	if app.Yes("crash")

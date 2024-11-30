@@ -25,11 +25,11 @@ insertion
 	wide	_0.middlelayout
 	high	_0.middlelayout
 	after	ControlPoint.After.layout(_0)
-	before	ControlPoint.Before.layout(-(_0)) // brackets needed for cpp...
+	before	ControlPoint.Before.layout(-(_0)) // brackets needed for cpp... not for speedie! sheesh.
 	inside	_0.insidelayout
 	above	ControlPoint.After.layout(_0)
-	under	ControlPoint.Before.layout(-(_0)) // not for speedie! sheesh.
-	long	ControlPoint.length.layout(_0)    // i'd have to fix the cpp_Export to handle --x == x
+	under	ControlPoint.Before.layout(-(_0))
+	long	ControlPoint.length.layout(_0) 
 	pc		Controlpoint.percent.layout(_0*64K)
 	
 

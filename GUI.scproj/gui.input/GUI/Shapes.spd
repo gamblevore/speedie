@@ -56,18 +56,34 @@ class VObject
 	module
 		|float| DrawScale
 		|vec2|  DrawMovement
+		
 // later: handle other ratios, for example (Add borders)
 // could we try to get closer to phi? say trim a few pixels off the top? to 865 pixels
 
+		function Size (|float| X, |float| Width, |float| Y, |float| Height, |controlrect|)
+			if Width < 0
+				x += Width
+				Width = Width.abs
+			if height < 0
+				y += height
+				height = height.abs
+			|| V = (x,y,x+width,y+height)*16.0
+			return V.iVec4|controlrect|
 
-function vec4.Scr0 (|vec4|)
+
+function controlsize.CalculateBlocks (|ivec4|)
+	|| V = .gsize.vec4 * 16th
+	return V.Screen
+
+
+function vec4.ScreenFloat (|vec4|)
 	return (self + VObject.Drawmovement.xyxy) * VObject.DrawScale
 
 function ivec4.Screen (|ivec4|)
 	return .Vec4.Screen
 
 function vec4.Screen (|ivec4|)
-	|| p = .scr0
+	|| p = .ScreenFloat
 	|| w = p.Width
 	|| h = p.Height
 	p = p.floor
