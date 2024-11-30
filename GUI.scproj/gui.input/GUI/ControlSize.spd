@@ -32,8 +32,14 @@ struct ControlSize
 	function Mode (|int|i, |int|)
 		return .GSize[i]&15
 
-	function Size (|int|i, |int|)
-		return .GSize[i]>>4
+	function Size (|int| i, |bool| UseBlocks,  |int|)
+		opt norefcounts
+		|| g = .GSize[i]>>4
+		if !UseBlocks
+			return g
+
+		|| sc = VObject.Drawmovement[i&1]
+		return ((g|float| + sc) * VObject.DrawScale)|int|
 
 	helper sett (|int|i, |ivec2| value, |int| mode) // remove?
 		.g(i)   = ((value.x << 4) ||| mode)|controlpoint|
@@ -64,82 +70,84 @@ struct ControlSize
 	function Calculate (|ivec4| Parent, |ivec4| Prev, |ivec4| Window, |guicontrol| upon, |ivec4|)
 		|| dbg = upon.clipmode is debug
 			"---------------"
-		|| vis = upon is visible			
+		|| vis = upon is visible
+		|| UseBlocks = upon is blocksized
 		|| pc = parent.size >> 1
 		for i in 4
-			|| m = .mode(i)
+			|| sz = .size(i, UseBlocks)
+			|| m = .Mode(i)
 			if m <= ControlPoint.Centered
 				|int| d = (m&2) + (i&1)
 				if m ==	ControlPoint.Low or ControlPoint.High
 					d = parent[d]
 				  elseif m == ControlPoint.Before or ControlPoint.After
 					d = Prev[d]
-				  elseif m == controlpoint.Centered
+				  elseif m == ControlPoint.Centered
 					d = pc[i&1]
-				rz[i] = d + .Size(i)
-				if upon.clipmode is debug
-					.PrintExplain(i, d, rz)
+				rz[i] = d + sz
+//				if dbg
+//					.PrintExplain(i, d, rz)
 			  elseif m == controlpoint.Percent
-				rz[i] = (pc[i&1]|float| * (1.0/(64K|float|)) * .size(i)|float|)|int|
-				if dbg
-					.PrintExplain(i, 0, rz)
+				rz[i] = ((pc[i&1] * sz) + 32K) / 64K
+//				if dbg
+//					.PrintExplain(i, 0, rz)
 		
-		|| E = upon.findattachededge.flip
+		|| E = upon.FindAttachedEdge.flip
 		for i in 4
 			if .mode(i) == ControlPoint.Length
-				|| o = i xor 2
-				|| ro = rz[o]
-				|| Sz = .size(i)
+				|| other = i xor 2
+				|| ro = rz[other]
+				|| sz = .size(i, UseBlocks)
 				
-				sz = upon.transition(sz, i, e)
+				sz = upon.Transition(sz, i, e)
 				rz[i] = ro + ((i>=2) sign sz)
-				if dbg
-					.PrintExplain(i, ro, rz)
+//				if dbg
+//					.PrintExplain(i, ro, rz)
 
 		if upon.ClipMode is SlideBackInParent
 			|| rz2 = rz.Bound(parent)
-			if dbg
-				.ExplainBound(rz, rz2)
+//			if dbg
+//				.ExplainBound(rz, rz2)
 			rz = rz2
 		
 		if upon.ClipMode is SlideBackInWindow
 			|| rz2 = rz.Bound(window)
 			rz2 = rz2.boundclip(window) // in case parent goes outside window
-			if dbg
-				.ExplainBound(rz, rz2)
+//			if dbg
+//				.ExplainBound(rz, rz2)
 			rz = rz2
 	
 	
-	function PrintExplain (|int| i, |int| New, |ivec4| rz)
-		|| fs = faststring()
-		.explain(i, new, rz, fs)
-		printline fs
-	
-	
-	function Explain (|int| i,  |int| New,  |ivec4| rz,  |faststring| fs)
-		|| m = .mode(i)
-
-		|int| d = (m&2) + (i&1)
-		fs <~ ".${ivec4.edgename(i)} (${rz[i]}) = "
-		if m ==	ControlPoint.Low or ControlPoint.High
-			fs <~ ".parent."
-		  elseif m == ControlPoint.Before or ControlPoint.After
-			fs <~ ".prev."
-		  elseif m == controlpoint.Centered
-			fs <~ ".parentcenter."
-		  elseif m == controlpoint.Percent
-			fs <~ "percent "
-		  elseif m == ControlPoint.Length
-			fs <~ "add "
-			d = d xor 2
-		
-		fs <~ "${ivec4.edgename(d)} ($new) + ${.Size(i)}"
-
-	function ExplainBound (|ivec4| rz, |ivec4| rz2)
-		if rz != rz2
-			print rz.Render
-			print " bounded to "
-			printline rz2.Render
+//	function PrintExplain (|int| i, |int| New, |ivec4| rz)
+//		|| fs = faststring()
+//		.explain(i, new, rz, fs)
+//		printline fs
+//	
+//	
+//	function Explain (|int| i,  |int| New,  |ivec4| rz,  |faststring| fs)
+//		|| m = .mode(i)
+//
+//		|int| d = (m&2) + (i&1)
+//		fs <~ ".${ivec4.edgename(i)} (${rz[i]}) = "
+//		if m ==	ControlPoint.Low or ControlPoint.High
+//			fs <~ ".parent."
+//		  elseif m == ControlPoint.Before or ControlPoint.After
+//			fs <~ ".prev."
+//		  elseif m == controlpoint.Centered
+//			fs <~ ".parentcenter."
+//		  elseif m == controlpoint.Percent
+//			fs <~ "percent "
+//		  elseif m == ControlPoint.Length
+//			fs <~ "add "
+//			d = d xor 2
+//		
+//		fs <~ "${ivec4.edgename(d)} ($new) + ${.Size(i)}"
+//
+//	function ExplainBound (|ivec4| rz, |ivec4| rz2)
+//		if rz != rz2
+//			print rz.Render
+//			print " bounded to "
+//			printline rz2.Render
 
 
 

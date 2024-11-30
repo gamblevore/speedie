@@ -60,6 +60,7 @@ datatype GuiControlFlags (uint)
 		OpensMenu
 		NewlyShown
 		TrapVisibleChange
+		BlockSized
 		DrawsFocus // showborder, showsborder, hasborder, drawborder
 
 

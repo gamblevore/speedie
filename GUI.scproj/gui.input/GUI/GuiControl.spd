@@ -377,7 +377,7 @@ class GUIControl (list)
 		return .lastrect.x1x2
 
 	function Vert (|intrange|)
-		return .lastrect.xx2
+		return .lastrect.x1x2
 
 
 	function HasFocus (|bool|)
@@ -490,13 +490,12 @@ class GUIControl (list)
 		|| rc	= m.refcount
 		for r in self
 			|| r2 = r
-			r2.refsanity
+			r2.RefSanity
 
 
 	task SlideOpen (TaskGUI, |movecode| Dir = MoveCode.Open)
 		constructor
 			// is animation  // doing this seems to break the system? no idea why.
-			// 
 		run 
 			|| hide = (progress >= 1.0 and .dir is close)
 			(.upon is visible) = !hide
@@ -509,7 +508,7 @@ class GUIControl (list)
 		opt norefcounts
 		|| w = .window
 			w.tasks <~ t
-
+	
 // Should I remove upon... and move duration/start to the task itself?
 // I mean... tasks in general want a time? UNLESS... its like functional programming
 // (which sucks anyhow). I guess we can worry about this when we make functional
