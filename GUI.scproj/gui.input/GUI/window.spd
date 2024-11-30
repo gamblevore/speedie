@@ -427,10 +427,10 @@ class Window (GUIControl)
 
 	helper GUI.AskQuit (|SDLActivity|)
 		|| Ask = "Quit " + app.AppName + "?"
-		.quitreason = SDLActivity.Activity
+		.QuitReason = SDLActivity.Activity
 		if Ask.confirm
 			rz = .QuitCloseAll
-		.quitreason = rz
+		.QuitReason = rz
 
 	
 	helper gui.QuitCloseAll (|SDLActivity|)
@@ -441,10 +441,11 @@ class Window (GUIControl)
 	
 	
 	function Close (|SDLActivity| Reason=SDLActivity.windowclose, |sdlactivity|)
-		|| cancelled = .__CancelClose__(reason)
-		require !cancelled or (reason is Terminating)
+		if self
+			|| cancelled = .__CancelClose__(reason)
+			require !cancelled or (reason is Terminating)
 
-		.DisposeAll(true) // its probably OK????
+			.DisposeAll(true) // its probably OK????
 		return reason
 		
 
