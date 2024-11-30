@@ -133,8 +133,6 @@ struct Object_Behaviour;
 
 struct Random;
 
-struct RangeCoderItem;
-
 struct RetroFloat;
 
 struct SpeedTester;
@@ -203,8 +201,6 @@ struct MessageID_Behaviour;
 
 struct Message_Behaviour;
 
-struct RangeCoder_Behaviour;
-
 struct SaverClassInfo_Behaviour;
 
 struct SimpleGraph_Behaviour;
@@ -254,8 +250,6 @@ struct Message;
 struct MessageID;
 
 struct Dictionary;
-
-struct RangeCoder;
 
 struct SaverClassInfo;
 
@@ -596,13 +590,13 @@ extern JB_String* JB__App__Path;
 extern JB_File* JB__App__stdin;
 extern JB_File* JB__App__StdOut;
 extern JB_String* JB__App_Usage;
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[555])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[554])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[556])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[557])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[554])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[557])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[558])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[555])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[556])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[553])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[556])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[557])
 extern u16 JB__API_NilHappened_;
 extern SyntaxObj* JB__Constants__FuncArray[64];
 extern Dictionary* JB__Constants__SyxDict;
@@ -644,7 +638,7 @@ extern JB_String* JB__JbinHeader;
 extern JB_String* JB__jBinNotJbin;
 extern int JB_aaaaaaa;
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[559])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[558])
 extern JB_ErrorReceiver* JB_StdErr;
 #define kJB_SyxAcc ((Syntax)29)
 #define kJB_SyxAdj ((Syntax)27)
@@ -745,10 +739,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp ((int)32784)
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[562])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[561])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[561])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[560])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[560])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[559])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int16_max ((s16)32767)
@@ -915,7 +909,7 @@ extern Random JB__Rnd_Shared;
 #define kJB__Wrap_kDelete ((int)2)
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[553])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[552])
 extern Float64 JB__Rec_Progress;
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -1044,9 +1038,9 @@ int JB_SP_AppInitSub_();
 
 int JB_InitCode_();
 
-void JB_PrintLine(JB_String* Data);
+void JB_Print(JB_String* Data);
 
-void JB_Obj_PrintLine(JB_Object* O);
+void JB_PrintLine(JB_String* Data);
 
 
 
@@ -1462,8 +1456,6 @@ bool JB_TC_IsNumeric(uint /*DataTypeCode*/ Self);
 
 
 // Date
-Date JB_Date__New0();
-
 
 
 // ErrorFlags
@@ -1792,9 +1784,6 @@ int JB_Rnd__InitCode_();
 
 
 
-// JB_RangeCoderItem
-
-
 // JB_RetroFloat
 
 
@@ -1904,9 +1893,6 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 
 
 // JB_Message_Behaviour
-
-
-// JB_RangeCoder_Behaviour
 
 
 // JB_SaverClassInfo_Behaviour
@@ -2693,9 +2679,6 @@ void JB_Msg__TreeComparePrint(Message* Orig);
 
 
 // JB_MessageTable
-
-
-// JB_RangeCoder
 
 
 // JB_SaverClassInfo
