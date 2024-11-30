@@ -1,8 +1,6 @@
 
 // todo:
-// **window alignment sucks**
-	// scaling too for scale2
-
+// block positioning
 
 datatype Tetromino (uint64)
 	flags
@@ -52,16 +50,10 @@ class TetrisWin (Window)
 		.Score = TextView(self)
 		.Score.MakeInline
 		.blockheight = 24
-		.blockX(true) = -0.5
+		.blockX(true) = -6
 		.blockY = 1.5
 		.FramesLeft = 48
-	
-	behaviour keydown
-		if key is l
-			keylog = !keylog
-			Notifications <~ "keylog: " + keylog.Render
-			return true
-	
+		
 	behaviour Framestep
 		require GUIActive
 		|| M = keys.Movement((8th, 0, 0, 4th))
@@ -219,9 +211,8 @@ class Tetris (GridSection)
 				y--
 		
 		.Score += Score
-		for x in 10
-			if self[x+1, .height-5][]
-				return .GameOver
+		if .Reached >= .height-5
+			return .GameOver
 		
 		.NextShape
 	
