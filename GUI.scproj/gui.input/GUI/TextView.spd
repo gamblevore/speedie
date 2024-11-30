@@ -1397,7 +1397,7 @@ class TextView (GUIControl)
 		if i.width <= 1
 			return false
 		if !keys.option
-			i -= (0,1)
+			i -= (0, 1)
 		.InsertSub("", i, false)
 		return true
 		

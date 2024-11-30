@@ -79,21 +79,23 @@ function vec4.Screen (|ivec4|)
 extend Window
 	helper _ReadjustBlock2D
 		description "Readjusts current draw-matrix. This converts object coords to screen coords." 
-		|| BS = .BlockScale$
-		|| J = 0.0
-		if bs > 0 
-			J = .LastRect.width|float|
-		  else
-			bs = -bs
-			J = .LastRect.height|float|
+		|| Sc = .BlockScale$
+		|| LR = .lastrect
+		|| W = LR.width|float|
+		|| H = LR.Height|float|
+		|| Size = W
+		if Sc < 0 
+			sc = -sc
+			Size = H
 		
-		j/=bs
-		VObject.DrawScale = j
+		Size /= sc
+		Size = size.round(2)
+		VObject.DrawScale = Size
 		|| M = .BlockMove
 		if .BlockMode&1
-			M.x = (j*0.5)-m.x
+			M.x = ((W*0.5) + (Size * M.x))/Size
 		if .BlockMode&2
-			M.y = (j*0.5)-m.y
+			M.y = ((H*0.5) + (Size * M.y))/Size
 		VObject.DrawMovement = M
 
 	function BlockX (|bool| Middle=false, assigns:|float|)
