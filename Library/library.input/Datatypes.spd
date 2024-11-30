@@ -343,9 +343,6 @@ datatype int16
 		max = 32767
 		min = -32K
 
-//	syntax cast (|bool|)
-//		return self|bool|
-
 
 
 datatype float
@@ -397,12 +394,15 @@ datatype float
 	function AsInt (|int|)
 		cpp_wrapper
 	
+	function Round (|float| to, |float|)
+		return (self / to).round * to
+
 	function Round (|float|)
 		cpp_wrapper (roundf)
 
 	function Date (|date|)
 		return (self * 64.0K)|date|
-	
+
 	function DecimalPlaces (|int| to=2, |float|)
 		cpp_Part RoundTo
 		|| v = (10 pow to)|float|
@@ -413,7 +413,7 @@ datatype float
 			return 1
 		if self < -sigma
 			return -1
-	
+
 	function SinR (|float|)
 		return (self * math.iTau).sin
 
@@ -425,29 +425,29 @@ datatype float
 
 	function Abs (|float|)
 		cpp_wrapper (fabsf)
-	
+
 	function Sqrt (|float|)
 		cpp_wrapper (sqrtf)
-	
+
 	function RSqrt (|float|)
 		return 1.0 / .sqrt
-	
+
 	function Fract (|float|)
 		return self - .floor
-		
+
 	function IsPow2 (|bool|)
 		return !.log2.Fract
-		
+
 	function Log2 (|float|)
 		cpp_wrapper (log2f)
 
 	function Exp (|float|)
 		description "Computes e to the power of (x) " 
 		cpp_wrapper (expf)
-	
+
 	function Log (|float|)
 		cpp_wrapper JB_f_Log
-	
+
 	function Ceil (|float|)
 		rz = .floor
 		if rz != self
@@ -455,7 +455,7 @@ datatype float
 
 	helper IntegerToMod2 (|float|)
 		return (self*0.5).Fract*2.0
-		
+
 	operator ± (|float| i, |float|)
 		cpp_part Shrink
 		if self > 0
