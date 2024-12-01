@@ -2,11 +2,12 @@
 import "GUI"
 
 // todo:
-// ghost blocks
 // forgiveness like tetris has
 // score board needs history
 // pink cloudy blocks with cute faces? and hearts/rainbows/stars as they disappear
 	// Clouds via overlapping volumetric spheres and edge detection post-processing
+	// the ghost block kinda spoils the fun a bit... you end up staring at the bottom all the time.
+		// maybe speed the game up over time? then add it.
 	// frilly frames?
 
 main
@@ -26,7 +27,7 @@ datatype Tetromino (uint64)
 		Proper = Dropper + pivot
 
 	syntax is (|Tetromino| V, |bool|)
-		return (self&V)==V
+		return self&V
 
 	syntax is (|Tetromino| V, assigns:|bool|, |tetromino|)
 		if Value
@@ -56,6 +57,7 @@ class TetrisWin (Window)
 	|Tetris|			Grid
 	|textview|			Score
 	|int|				FramesLeft
+	|int|				FrameRate
 	
 	constructor
 		.grid = Tetris()
@@ -66,7 +68,8 @@ class TetrisWin (Window)
 		.blockheight = 24
 		.blockX(true) = -6
 		.blockY = 1.5
-		.FramesLeft = 48
+		.FrameRate = 48
+		.FramesLeft = .FrameRate*2		
 	
 	behaviour Framestep
 		require GUIActive
@@ -79,10 +82,10 @@ class TetrisWin (Window)
 				.grid.rotate(w)
 			|| x = m.x
 				.grid.move(x.sign|int|)
-			// we want to eat the down key if we hit the bottom.
-			if (m.y > 0 or m.z < 0) or (.FramesLeft <= 0)
-				.FramesLeft = 240
-				.Grid.drop
+			if (.FramesLeft <= 0) or (m.y > 0) or (m.z < 0 and .framesleft isa 2)
+				.FramesLeft = .FrameRate
+				if .Grid.drop
+					keys.Clear
 			.grid.makeghost
 			.FramesLeft--
 		gui.Touch
@@ -102,95 +105,6 @@ class Tetris (GridSection)
 		.Dimensions[1] = 24
 		.restart
 		
-	syntax Access (|int| x, |int| y, |&Tetromino|)
-		return .at(x + y*16)
-			
-	function AddShape (|string| s)
-		|| y = 20
-		|| x = 0
-		for c in s
-			if c == '\n'
-				y--
-				x = 0
-			  else
-				if c != ' '
-					|| T = c.dropper
-					(T is pivot) = c.IsUpper
-					self[x+4,y][] = T&~32
-				x++
-
-	function NextShape
-		.AddShape(shapes.now!)
-
-	function FindPivot (|int| adjust, |ivec2|)
-		for y in .Height
-			for x in 10
-				|| c = self[x+1,y][]
-				if !adjust
-					if c is pivot
-						return (x+1,y)
-				  elseif c is Dropper
-					if adjust == 1
-						return (x+1,y)
-					adjust--
-					
-				
-
-	///// ROTATIONS /////
-	function RotateOne (|ivec2| P, |int| x, |int| y, |Tetromino| b, |float| r, |int| move,  |bool|)
-		|| V = (x,y) - p
-		if r > 0
-			v = v.RotateRight
-		  else 
-			v = v.RotateLeft
-		V += P
-		require  v.x|uint| <= 10  and  v.y|uint| >= 1
-		|| NewPos = self[v.x, v.y]+move
-		NewPos[] |= b<<16
-		return NewPos[] isnt Real
-		
-
-	function Rotate (|float| r)
-		for pivot in 4
-			for Move in 3
-				require .RotateSub(r, (move&1)-((move&2)>>1), pivot)
-
-		.RotateSub(r,16,0)
-
-		
-	function RotateSub (|float| r, |int| move, |int| pivot, |bool|)
-		|| P = .FindPivot(pivot)$
-		|| Cancel = false
-		for y in .Height
-			for x in 11
-				|| c = self[x,y][]
-				Cancel |= (c is Dropper) and !.RotateOne(p, x, y, c, r, move)
-		.Flush(cancel)
-		return Cancel
-	////////////////////////
-	
-	function Flush (|bool| Cancel, |bool| Ghost=false, |bool|)
-		for (b in self) (c)
-			(b isnt ghost)
-			if !Cancel
-				|| m = b>>16
-					b = m
-					if ghost
-						(b isnt proper)
-						(b is ghost)
-				  elseif b is Dropper
-					b = 0
-			c[] = b & 16~bits // flush
-		return Cancel
-
-	function Move (|int| x, |bool| ghost=false, |bool|)
-		for (b in self) (c)
-			if b is dropper
-				|| dest = x+c
-				rz |= dest[] is Real
-				dest[] |= b<<16
-		rz = .Flush(rz, ghost)
-	
 	function Restart
 		.State = 0
 		.Score = 0
@@ -211,6 +125,102 @@ class Tetris (GridSection)
 				self[10()+1, y][] = 0
 		.AddShape(shapes[0]!)
 
+	syntax Access (|int| x, |int| y, |&Tetromino|)
+		return .at(x + y*16)
+			
+	function AddShape (|string| s)
+		|| y = 21
+		|| x = 0
+		for c in s
+			if c == '\n'
+				y--
+				x = 0
+			  else
+				if c != ' '
+					|| T = c.dropper
+					(T is pivot) = c.IsUpper
+					self[x+4,y][] = T&~32
+				x++
+		.move(-16)
+
+	function NextShape
+		.AddShape(shapes.now!)
+
+	function FindPivot (|int| adjust, |ivec2|)
+		for y in .Height
+			for x in 10
+				|| c = self[x+1,y][]
+				if !adjust
+					if c is pivot
+						return (x+1,y)
+				  elseif c is Dropper
+					if adjust == 1
+						return (x+1,y)
+					adjust--
+				
+
+	///// ROTATIONS /////
+	function RotateOne (|ivec2| P, |int| x, |int| y, |Tetromino| b, |float| r, |int| move,  |bool|)
+		|| V = (x,y) - p
+		if r > 0
+			v = v.RotateRight
+		  else 
+			v = v.RotateLeft
+		V += P
+		require  v.x|uint| <= 10  and  v.y|uint| >= 1
+		|| NewPos = self[v.x, v.y]+move
+		if NewPos[] is Real
+			return .Fail
+		NewPos[] |= b<<16
+		return true
+		
+
+	function Rotate (|float| r)
+		require .FindPivot(0)
+		for pivot in 4
+			for Move in 3
+				require !.CanRotate(r, (move&1)-((move&2)>>1), pivot)
+
+		.CanRotate(r,16,0)
+
+		
+	function CanRotate (|float| r, |int| move, |int| pivot, |bool|)
+		|| P = .FindPivot(pivot)$
+		for y in .Height
+			for x in 11
+				|| c = self[x,y][]
+				if c is Dropper
+					require .RotateOne(p, x, y, c, r, move)
+		return .pass
+	////////////////////////
+	
+	function Fail (|bool|)
+		for (b in self) (c)
+			c[] = b & 16~bits
+
+	function Pass (|bool|)
+		for (b in self) (c)
+			|| m = b>>16
+				b = m
+			  elseif b is Dropper
+				b = 0
+			c[] = b & 16~bits // flush
+		return true
+		
+	function MoveIsBlocked (|int| x, |tetromino| test, |tetromino|)
+		rz = -1
+		for (b in self) (c)
+			if b is dropper
+				rz = 0
+				|| dest = x+c
+				|| T = (dest[]&test, -1)(dest >= .at)
+					.fail
+					return t
+				dest[] |= b<<16
+
+	function Move (|int| x, |bool|)
+		return !.MoveIsBlocked(x, tetromino.real) and .Pass
+	
 	function RowIsFull (|int| y, |bool|)
 		for x in 10
 			require self[x+1, y][]
@@ -228,15 +238,28 @@ class Tetris (GridSection)
 		beep "Game Over"
 		.State = 1
 		
-	function Drop
-		if .Move(-16)
-			.MakeReal
-
-
-	function MakeGhost
-		.Move(-16, true)
+	function Drop (|bool|)
+		return !.Move(-16) and .MakeReal
 		
-	function MakeReal		
+	function MakeGhost
+		.FlushGhost
+		|| i = -32
+		while .MoveIsBlocked(i, tetromino.real ||| tetromino.proper) isnt Real
+			.FlushGhost
+			i-=16
+	
+		
+	function FlushGhost
+		for (b in self) (c)
+			|| m = b>>16
+				b = m
+				(b isnt proper)
+				(b is ghost)
+			  elseif b is ghost
+				b = 0
+			c[] = b & 16~bits // flush
+		
+	function MakeReal (|bool|)	
 		for (b in self) (c)
 			if b is Dropper
 				c[] = (b &~ Tetromino.proper)|||Tetromino.Real
@@ -253,10 +276,10 @@ class Tetris (GridSection)
 		
 		.Score += Score
 		if .Reached >= .height-5
-			return .GameOver
-		
-		keys.Clear
-		.NextShape
+			.GameOver
+		  else
+			.NextShape
+			return true
 	
 	function Reached (|int|)
 		for y in 23 downto 1
@@ -276,9 +299,11 @@ class Tetris (GridSection)
 		if b&255 == '*'
 			Hu = 0.75+(h*70th)
 		
-		|| SA = (0.2, 1.0)(b is Ghost)
+		|| sa = 1.0
 		|| Br = 0.8
-		|| C = colors.wheel(Hu, SA, br, SA)
+		if b is ghost
+			br = 0.05
+		|| C = colors.wheel(Hu, SA, br, 1.0)
 		where.DrawRect(R, C)
 		
 		// outline
@@ -289,7 +314,10 @@ class Tetris (GridSection)
 				br *= 0.9
 		  else
 			hu += 24th
-		C = colors.wheel(Hu, SA, br, SA)
+		if b is ghost
+			br = 0.075
+			r+=(0,0,1,1)
+		C = colors.wheel(Hu, SA, br, 1.0)
 		where.DrawOutlineOnly(R, C)
 	
 	function DrawRow (|image| where, |int| y, |float| h)
