@@ -49,7 +49,6 @@ function TypeOfType (ExprResolver) // typeoftypecast, typeofcast
 	|| exp0 = exp.first!.unbra
 	|| Old = TypeOfExpr( exp0, name_space, side )
 	|| New = ExtractDecl( exp.last!, name_space, declmode.TypeCast )
-	if "CalculateBlocks2".trap
 
 	if !new or !old
 		0 //

@@ -2152,3 +2152,4 @@
 "low reg "
 "AccessToMemCpy fail"
 "memzero"
+"Vector cast mismatch"
