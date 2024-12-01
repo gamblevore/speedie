@@ -2,6 +2,8 @@
 import "GUI"
 
 // todo:
+// ghost blocks
+// holding shouldnt drop so fast... have to let go and press again!
 // forgiveness like tetris has
 // score board needs history
 // pink cloudy blocks with cute faces? and hearts/rainbows/stars as they disappear
@@ -61,7 +63,8 @@ class TetrisWin (Window)
 		.grid = Tetris()
 		.Score = TextView(self)
 		.Score.MakeInline
-		.score.blocksize(-2.5,2.5,  17.5,-1.0)
+		.score.blocksize(-3.5,3.0,  17.5,-10.0)
+		.score.Alignment = MoveCode.Right
 		.blockheight = 24
 		.blockX(true) = -6
 		.blockY = 1.5
@@ -78,7 +81,7 @@ class TetrisWin (Window)
 				.grid.rotate(w)
 			|| x = m.x
 				.grid.move(x.sign|int|)
-			
+			// we want to eat the down key if we hit the bottom.
 			if (m.y > 0 or m.z < 0) or (.FramesLeft <= 0)
 				.FramesLeft = 60
 				.Grid.drop

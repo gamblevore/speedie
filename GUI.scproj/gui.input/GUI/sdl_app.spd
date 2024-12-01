@@ -225,6 +225,7 @@ module GUI
 			if n++ isa 512
 				app.ClearCaches //  :)
 		.Terminate
+		.sdl_quit
 		
 		return (!StdErr.OK)|int|
 
@@ -445,7 +446,7 @@ module GUI
 		if .NeedMouseMove
 			.DoFakeMouseMove
 		|| Quitish = .QuitReason &~ SDLActivity.Activity
-			rz |= .StrongClose(Quitish)
+			rz = .StrongClose(Quitish) ||| SDLActivity.Activity 
 		.QuitReason = 0
 		if .NewSize
 			rz |= SDLActivity.activity
@@ -755,22 +756,25 @@ module GUI
 	function Quit (|sdlactivity| Reason=0, |SDLActivity|)
 		opt norefcounts
 		reason |= sdlactivity.Exiting
-		for w in window.all
-			if w.IsDialog
-				require w.TryCloseDialog
-		for w in window.all
-			require w.close(reason)
-		return reason
+		
+		if reason isnt terminating
+			for w in window.all
+				if w.IsDialog
+					require w.TryCloseDialog
+				  else
+					require !w.__CancelClose__(Reason)
+
+		return .terminate
 
 
-	function Terminate
+	function Terminate (|sdlactivity|)
 		opt norefcounts
-		.quitreason = sdlactivity.Terminating
 		.SavePrefs // in case we crash during quit
-		while (|| w = window.all.first)
+		for w in window.all
+			.quitreason = SDLActivity.Terminating // in case of wierd events
 			w.close(SDLActivity.Terminating)
 		.SavePrefs
-		.sdl_quit
+		return SDLActivity.Terminating
 
 
 	function FileDroppedIntoApp (|window| w, |string| path, |SDLEventType| t, |int|)
@@ -870,11 +874,10 @@ module GUI
 	
 	
 	function AppIsBackground (|bool| v, |int|)
-		beep.OK = 1
-		.keymod = 0
-		.sdl_Resetkeyboard
 		require .IsBackground != v // what? why is tihs happenin 
 		.IsBackground = v
+		beep.OK = 1
+		keys.Clear
 		.FlashSelector = false
 		if !.DialogIsOpen
 			for w in __modules__.window.all

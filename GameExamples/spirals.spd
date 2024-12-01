@@ -2,7 +2,7 @@
 import "GUI"
 
 main
-	return SpiralDemo()
+	return SpiralDemo().RunAsMain
 
 
 class SpiralDemo (Window)

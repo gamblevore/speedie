@@ -277,6 +277,7 @@ class Window (GUIControl)
 		
 	function Show  
 		opt norefcounts
+		keys.Clear
 		is visible
 		is NewlyShown
 		window.all <~ self // why not?
@@ -442,12 +443,10 @@ class Window (GUIControl)
 	
 	function Close (|SDLActivity| Reason=SDLActivity.windowclose, |sdlactivity|)
 		if self
-			|| cancelled = .__CancelClose__(reason)
-			require !cancelled or (reason is Terminating)
-
-			.DisposeAll(true) // its probably OK????
+			if reason isnt terminating
+				require .__CancelClose__(reason)
+			.DisposeAll(true)						// its probably OK????
 		return reason
-		
 
 	
 	function CloseDialog

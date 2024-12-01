@@ -126,7 +126,7 @@ dataType Keys (int) {
 		return (self is lgui or rgui or lctrl or rctrl or lalt or ralt or lshift or rshift)
 
 	function IsCancel (|bool|) 
-		return (self is cancelkey or escape or AC_BACK)
+		return (self is cancel_key or escape or AC_BACK)
 
 	function IsDelete (|bool|)
 		return self is forwarddelete or delete or kp_delete
@@ -163,6 +163,11 @@ dataType Keys (int) {
 		|date[8]|				DownDate
 		|int|					Count
 
+		function Clear
+			gui.keymod = 0
+			gui.sdl_Resetkeyboard
+			.count = 0
+	
 		function Movement (|vec4| Limiter=vec4(), |vec4|)
 			for i in .count
 				rz += .downkeys[i].Movement(limiter)
@@ -221,7 +226,7 @@ dataType Keys (int) {
 			return SDL_KeyMod.shift[]		
 
 		function Cancel (|bool|) 
-			return (cancelkey or escape or AC_BACK)
+			return (cancel_key or escape or AC_BACK)
 
 		function Option (|bool|) 
 			return SDL_KeyMod.option[]		
@@ -607,8 +612,8 @@ dataType Keys (int) {
 
 		AltErase = scan + SDL_SCANCODE_ALTERASE
 		SYSREQ = scan + SDL_SCANCODE_SYSREQ
-		CANCELKey = scan + SDL_SCANCODE_CANCEL
-		CLEAR = scan + SDL_SCANCODE_CLEAR
+		CANCEL_KEY = scan + SDL_SCANCODE_CANCEL
+		CLEAR_KEY = scan + SDL_SCANCODE_CLEAR
 		PRIOR = scan + SDL_SCANCODE_PRIOR
 		RETURN2 = scan + SDL_SCANCODE_RETURN2
 		SEPARATOR = scan + SDL_SCANCODE_SEPARATOR

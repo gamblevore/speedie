@@ -1602,7 +1602,6 @@ class TextView (GUIControl)
 	behaviour Draw
 		opt norefcounts
 		super.Draw(Where)
-		if keys.Shift
 		|| c = where.controlclip
 		where.ControlClip = c ± 1
 		

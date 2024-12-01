@@ -219,11 +219,10 @@ class FileViewer (ListView)
 
 
 	function Modified (|[FileRow]|)
+		opt norefcounts
 		for f in self
 			if f.ismodified
 				rz <~ f
-		if rz.length == 0
-			rz = nil
 
 
 	function AskSaveAll (|bool|)
@@ -246,10 +245,7 @@ class FileViewer (ListView)
 		|| answer = AskSaveOrCancel(fs)
 		if answer >= 1  // save
 			return .saveall(documentstate.saving)
-		if answer == -1 // cancel
-			return false
-		if answer == 0	// don't
-			return true
+		return answer == 0	// don't
 
 
 	syntax access (|int| i, |filerow|)
@@ -258,6 +254,7 @@ class FileViewer (ListView)
 
 	syntax access (|string| path, |filerow|)
 		cpp_part AccessPath
+		if path ~= "/usr/local/speedie/exec.scproj/input/main.spd"
 		if path.file.IsDir
 			path = path.PathDir // standardise
 		for f in self
@@ -306,9 +303,9 @@ class FileViewer (ListView)
 					f.rangelength = it
 					if Copy
 						f = FileRow(f)
+						if f.Location.file.IsDir
+							f.name = f.name.PathDir
 					rz <~ f
-					if copy and f.Location.file.IsDir
-						f.name = f.name.PathDir
 		
 		if rz
 			rz.sort(FileRowScoreSorter)
@@ -321,7 +318,7 @@ class FileViewer (ListView)
 				d[f.name] = f
 		
 		for (f in rz) (i)
-			if f.SameNameAsPrev
+			if copy and f.SameNameAsPrev
 				|| name = f.name + "  --  " + f.location.neatenpath
 				f = filerow(f)
 				f.name = name
