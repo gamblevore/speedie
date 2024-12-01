@@ -47,11 +47,19 @@ function TypeOfSDot (ExprResolver)
 
 function TypeOfType (ExprResolver) // typeoftypecast, typeofcast
 	|| exp0 = exp.first!.unbra
-	|| Old = TypeOfExpr( exp0, name_space, side )									#require
-	|| New = ExtractDecl( exp.last!, name_space, declmode.TypeCast )				#require
-	// allow MOST typecasts, but NOT typecasts between struct instances...
-	if Old.isntReallyCastable(exp0)  or  New.isntReallyCastable(exp0)
+	|| Old = TypeOfExpr( exp0, name_space, side )
+	|| New = ExtractDecl( exp.last!, name_space, declmode.TypeCast )
+	if "CalculateBlocks2".trap
+
+	if !new or !old
+		0 //
+
+	  elseif Old.NoStructOrCArrayCasts(exp0)  or  New.NoStructOrCArrayCasts(exp0)
 		error (exp, "Can’t cast between structs/carrays")
+
+	  elseif old.NumericCountWithBools != new.NumericCountWithBools
+		error (exp, "Vector cast mismatch")
+
 	  else
 		if exp0.isint and new.TypeSuffers
 			if exp0.iszero or Old.IsNil
@@ -66,7 +74,7 @@ function TypeOfNothing (ExprResolver)
 	return nil
 
 
-function SCDecl.IsntReallyCastable (|message| side = nil, |bool|)
+function SCDecl.NoStructOrCArrayCasts (|message| side = nil, |bool|)
 	require (.type.IsStruct or .IsCArray) and (!.pointercount)
 	if !side
 		return true

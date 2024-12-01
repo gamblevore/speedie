@@ -3,17 +3,15 @@ import "GUI"
 
 // todo:
 // ghost blocks
-// holding shouldnt drop so fast... have to let go and press again!
 // forgiveness like tetris has
 // score board needs history
 // pink cloudy blocks with cute faces? and hearts/rainbows/stars as they disappear
 	// Clouds via overlapping volumetric spheres and edge detection post-processing
 	// frilly frames?
 
-target !imported
-	main
-		gui.Init(2.0)
-		return TetrisWin().RunAsMain
+main
+	gui.Init(2.0)
+	return TetrisWin().RunAsMain
 
 
 datatype Tetromino (uint64)
@@ -83,8 +81,9 @@ class TetrisWin (Window)
 				.grid.move(x.sign|int|)
 			// we want to eat the down key if we hit the bottom.
 			if (m.y > 0 or m.z < 0) or (.FramesLeft <= 0)
-				.FramesLeft = 60
+				.FramesLeft = 240
 				.Grid.drop
+			.grid.makeghost
 			.FramesLeft--
 		gui.Touch
 
@@ -117,20 +116,28 @@ class Tetris (GridSection)
 				if c != ' '
 					|| T = c.dropper
 					(T is pivot) = c.IsUpper
-					self[x+4,y][] = T
+					self[x+4,y][] = T&~32
 				x++
 
 	function NextShape
 		.AddShape(shapes.now!)
-		
-	function FindPivot (|ivec2|)
+
+	function FindPivot (|int| adjust, |ivec2|)
 		for y in .Height
 			for x in 10
-				if self[x+1,y][] is pivot
-					return (x+1,y)
+				|| c = self[x+1,y][]
+				if !adjust
+					if c is pivot
+						return (x+1,y)
+				  elseif c is Dropper
+					if adjust == 1
+						return (x+1,y)
+					adjust--
+					
+				
 
 	///// ROTATIONS /////
-	function RotateOne (|ivec2| P, |int| x, |int| y, |Tetromino| b, |float| r,  |bool|)
+	function RotateOne (|ivec2| P, |int| x, |int| y, |Tetromino| b, |float| r, |int| move,  |bool|)
 		|| V = (x,y) - p
 		if r > 0
 			v = v.RotateRight
@@ -138,37 +145,51 @@ class Tetris (GridSection)
 			v = v.RotateLeft
 		V += P
 		require  v.x|uint| <= 10  and  v.y|uint| >= 1
-		|| NewPos = self[v.x, v.y]
+		|| NewPos = self[v.x, v.y]+move
 		NewPos[] |= b<<16
 		return NewPos[] isnt Real
 		
+
 	function Rotate (|float| r)
-		|| P = .FindPivot$
+		for pivot in 4
+			for Move in 3
+				require .RotateSub(r, (move&1)-((move&2)>>1), pivot)
+
+		.RotateSub(r,16,0)
+
+		
+	function RotateSub (|float| r, |int| move, |int| pivot, |bool|)
+		|| P = .FindPivot(pivot)$
 		|| Cancel = false
 		for y in .Height
 			for x in 11
 				|| c = self[x,y][]
-				Cancel |= (c is Dropper) and !.RotateOne(p, x, y, c, r)
+				Cancel |= (c is Dropper) and !.RotateOne(p, x, y, c, r, move)
 		.Flush(cancel)
+		return Cancel
 	////////////////////////
 	
-	function Flush (|bool| Cancel, |bool|)
+	function Flush (|bool| Cancel, |bool| Ghost=false, |bool|)
 		for (b in self) (c)
+			(b isnt ghost)
 			if !Cancel
 				|| m = b>>16
 					b = m
+					if ghost
+						(b isnt proper)
+						(b is ghost)
 				  elseif b is Dropper
 					b = 0
 			c[] = b & 16~bits // flush
 		return Cancel
 
-	function Move (|int| x, |bool|)
+	function Move (|int| x, |bool| ghost=false, |bool|)
 		for (b in self) (c)
 			if b is dropper
 				|| dest = x+c
 				rz |= dest[] is Real
 				dest[] |= b<<16
-		rz = .Flush(rz)
+		rz = .Flush(rz, ghost)
 	
 	function Restart
 		.State = 0
@@ -211,6 +232,10 @@ class Tetris (GridSection)
 		if .Move(-16)
 			.MakeReal
 
+
+	function MakeGhost
+		.Move(-16, true)
+		
 	function MakeReal		
 		for (b in self) (c)
 			if b is Dropper
@@ -218,7 +243,7 @@ class Tetris (GridSection)
 		
 		|| Score = 0
 		for y in .Height-1
-			if .RowIsFull(y+1) // animating this would be better
+			if .RowIsFull(y+1)
 				if !Score
 					score = 100
 				  else
@@ -230,6 +255,7 @@ class Tetris (GridSection)
 		if .Reached >= .height-5
 			return .GameOver
 		
+		keys.Clear
 		.NextShape
 	
 	function Reached (|int|)
@@ -246,7 +272,7 @@ class Tetris (GridSection)
 	function DrawBlock (|image| where, |int| y, |int| x, |tetromino| b, |float| h)
 		|| R = (x, y, x+1, y+1).screen
 		|| Hu = ((b&31)+8) div 11
-		Hu -= (b|byte|.IsUpper)|float| * 0.025
+		Hu -= (b is pivot)|float| * 0.025
 		if b&255 == '*'
 			Hu = 0.75+(h*70th)
 		
@@ -254,8 +280,13 @@ class Tetris (GridSection)
 		|| Br = 0.8
 		|| C = colors.wheel(Hu, SA, br, SA)
 		where.DrawRect(R, C)
+		
+		// outline
 		if b is Dropper
-			br *= 0.9
+			if b is Pivot
+				br += 4th
+			  else 
+				br *= 0.9
 		  else
 			hu += 24th
 		C = colors.wheel(Hu, SA, br, SA)

@@ -36,9 +36,16 @@ class SCFile (file)
 			(message).restore
 	
 	
-	function Use 
+	function Stop (|scimport| Old)
+		scimport.curr = nil // whatever.
+		scimport.CurrIsManuallyImported = 0
+
+
+	function Use (|scimport|)
 		opt norefcounts
+		rz = scimport.curr
 		scimport.curr = .proj
+		scimport.CurrIsManuallyImported = .Proj.Depth
 		|| l = .LiveAst
 			l.memoryLayer.Use
 	

@@ -877,6 +877,7 @@ module GUI
 		require .IsBackground != v // what? why is tihs happenin 
 		.IsBackground = v
 		beep.OK = 1
+		gui.sdl_Resetkeyboard
 		keys.Clear
 		.FlashSelector = false
 		if !.DialogIsOpen

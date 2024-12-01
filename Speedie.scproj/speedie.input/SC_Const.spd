@@ -349,11 +349,22 @@ function compiler.CollectConstants
 
 
 function datatypecode.NumericCountBoolsToo (|scdecl| D, |int|)
+	// use NumericCountWithBools instead
 	if Self & numeric
 		return .count
 	if self & bool
 		return 1
 	if scnode.ConstantsLoadingOverride and d is const
 		return .count
+		
+
+function scdecl.NumericCountWithBools (|int|)
+	if .pointercount					// what about objects?
+		return 1
+	if .iscarray
+		return .internal!.NumericCountWithBools
+	if .DataType & datatypecode.bool
+		return 1
+	return .Type.TypeInfo.count
 		
 

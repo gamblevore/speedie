@@ -474,7 +474,6 @@ class SCDecl (SCNamed) {
 		if (!.IsCArray) and (!.PointerCount)
 			return .Type.NumericCount
 
-
 	function MiniMatch (|scdecl?| self, |SCDecl?| O, |int| TypeCast = 0, |bool|)
 		if self
 			return .TypeMatch( O, TypeCast, nil )

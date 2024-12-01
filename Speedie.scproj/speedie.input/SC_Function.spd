@@ -1938,6 +1938,9 @@ function message.MainFix (|message|)
 
 function NeuMain (CollectFunc)
 	expect  (name_space == compiler.program)  (node, "Can’t have main inside here.")
+	if scimport.CurrIsManuallyImported
+		return Compiler.program			// ignore imported mains
+	
 	|| fn_src = node.mainfix
 		Compiler.HasMainFunc = true
 		|| m = compiler.Project!.mod

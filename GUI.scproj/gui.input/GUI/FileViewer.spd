@@ -17,6 +17,7 @@ class FileViewer (ListView)
 		super.constructor(p, sel, ret)
 		.MultiSelection 	= true
 		.editme				= editme
+		.OnReturn			= ReturnFileList
 		.OnRightClick		= RightClickFileList
 		.quickopen			= textview(nil,		nil,		nil)
 		.Listopen			= ListView(nil,		nil, 		ClickedOpenList)
@@ -622,6 +623,10 @@ function fileviewer.FindSearchWithin (|filerow|)
 			s = s.parent
 		return s
 	
+function ReturnFileList (GUIListEvent)
+	if self isa FileViewer
+		.Editme.SetFocus
+		return true
 	
 function RightClickFileList (GUIListEvent)
 	opt NoRefCounts

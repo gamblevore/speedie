@@ -113,7 +113,8 @@ dataType Keys (int) {
 		cpp_wrapper SDL_GetScancodeFromKey
 			
 	function IsAccept (|bool|)
-		return (self is RETURN or RETURN2 or Enter or AC_FORWARD)
+		rz = (self is RETURN or RETURN2 or Enter or AC_FORWARD)
+		if rz
 	
 	operator IsCmd (|keys|s, |bool|)
 		return keys.cmd and self == s
@@ -165,7 +166,8 @@ dataType Keys (int) {
 
 		function Clear
 			gui.keymod = 0
-			gui.sdl_Resetkeyboard
+			for i in 8
+				.downdate[i] = 0
 			.count = 0
 	
 		function Movement (|vec4| Limiter=vec4(), |vec4|)
@@ -176,14 +178,14 @@ dataType Keys (int) {
 			cpp_Wrapper SDL_GetKeyboardState
 		
 		helper AddKey (|keys| K, |int|)
-			if (.count < 8) and !.has(K)
+			if (.count < 8) and !.exists(K)
 				|| i = .count++
 				.DownDate[i] = GUI.FrameStart
 				.DownKeys[i] = K
 				return SDLActivity.Activity
 				
-		function RemoveKey (|keys| K, |int|)
-			for i in .count
+		helper RemoveKey (|keys| K, |int|)
+			for i in 8
 				if .downkeys[i] == K
 					|| m = --.count
 					.DownKeys[i] = .DownKeys[m]
@@ -194,8 +196,13 @@ dataType Keys (int) {
 			
 		function Has (|keys| s, |ind|)
 			for i in 8
-				if .downkeys[i] == s
+				if (.downkeys[i] == s) and (.DownDate[i])
 					return i
+
+		helper Exists (|keys| s, |bool|)
+			for i in 8
+				if (.downkeys[i] == s)
+					return true
 
 		function Cmd (|bool|)
 			if SDL_KeyMod.ctrl[]

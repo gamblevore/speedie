@@ -620,9 +620,11 @@ function ImportFile (|SCFile| file)
 	todo `visibility needs to make a bit more sense than this...
 	 we should remove the "Visible" statement from within class scope... only allowed in the linkage.
 	 within modules... it should only apply to global vars`
-	file.Use
+	|| Old = file.Use
+	compiler.project = file.proj 
 	|| v = file.proj.isstdlib and Options.MakeInterpreter
 	compiler.program.CollectFromNode( ast, v )
+	file.Stop(old)
 
 
 function RequireContained (|Message| exp, |SCDecl|)
