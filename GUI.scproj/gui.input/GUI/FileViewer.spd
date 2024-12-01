@@ -318,12 +318,15 @@ class FileViewer (ListView)
 					f.SameNameAsPrev = true
 				d[f.name] = f
 		
-		for (f in rz) (i)
-			if copy and f.SameNameAsPrev
-				|| name = f.name + "  --  " + f.location.neatenpath
-				f = filerow(f)
-				f.name = name
-				rz[i] = f
+		for (f.backwards in rz) (i)
+			if f.SameNameAsPrev
+				if copy
+					|| name = f.name + "  --  " + f.location.neatenpath
+					f = filerow(f)
+					f.name = name
+					rz[i] = f
+				  else
+					rz.remove(i)
 		
 	
 	function Listviewrow.FileSort

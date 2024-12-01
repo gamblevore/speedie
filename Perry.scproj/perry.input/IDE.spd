@@ -955,7 +955,7 @@ function string.GetSpeedieProj (|string|)
 
 function perryide.IDECommand (|bool|)
 	// this should be a window really!
-	|| cmd = "Enter Command".ask $
+	|| cmd = "Enter Command".ask("tetris") $
 	|| s = .editme.SelText
 	if cmd ~= "beep"
 		for 2s

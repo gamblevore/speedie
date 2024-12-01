@@ -113,8 +113,7 @@ dataType Keys (int) {
 		cpp_wrapper SDL_GetScancodeFromKey
 			
 	function IsAccept (|bool|)
-		rz = (self is RETURN or RETURN2 or Enter or AC_FORWARD)
-		if rz
+		return (self is RETURN or RETURN2 or Enter or AC_FORWARD)
 	
 	operator IsCmd (|keys|s, |bool|)
 		return keys.cmd and self == s
