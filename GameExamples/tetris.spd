@@ -2,8 +2,8 @@
 import "GUI"
 
 // todo:
-// grab bag
 // forgiveness like tetris has
+// ghost block should be a temporay powerup! its makes the game too easy.
 // score board needs history
 // pink cloudy blocks with cute faces? and hearts/rainbows/stars as they disappear
 	// Clouds via overlapping volumetric spheres and edge detection post-processing
@@ -52,51 +52,77 @@ datatype Tetronimo (uint64)
 
 class TetrisWin (Window)
 	|Tetris|			Grid
+	|textview|			Time
+	|textview|			History
+	|textview|			HighestField
 	|textview|			Score
+	|config|			Prefs
+	|int|				Highest
 	|int|				FramesLeft
 	|int|				FrameRate
 	|int|				TotalFrames
 	
 	constructor
 		.grid = Tetris()
-		.Score = TextView(self)
-		.Score.MakeInline
-		.score.blocksize(-3.5,3.0,  17.5,-10.0)
-		.score.Alignment = MoveCode.Right
+		.HighestField = TextView.Block(self, -2.5, -5.0,  19.5, -3.0)
+		.Score = TextView.Block(  self, -2.5, -5.0,  16.5, -3.0)
+		.history = TextView.Block(self, -2.5, -15.0,  13.5, -10.0)
+		.time = TextView.Block(   self, 13.5,  5.0,   5.0,  3.0)
+		.prefs = app.PrefConfig("tetris")
+		.Highest = .prefs["max"].int
+		.History.text = .prefs["history"]
+		
 		.blockheight = 24
 		.blockX(true) = -6
 		.blockY = 1.5
 		.FrameRate = 48
-		.FramesLeft = .FrameRate*2		
+		.FramesLeft = .FrameRate*2
 	
-	behaviour Framestep
-		require GUIActive
-		// the faster the game moves, the fastr the kys should move.
+	function GameOver
+		if .grid.state == 1
+			if (.Highest == .grid.Score)
+				|| Name = "Enter your name, champion!".ask
+					.History.text = "$name @ $.Highest\n${.History.text}"
+				.prefs["history"] = .History.text
+			.prefs["max"] = .Highest
+			app.SavePrefs
+			.grid.State = 2
+		if keys.SPACE or Keys.RETURN
+			.Grid.Restart
+	
+	function HandleInput
 		|| f = 1.0/.FrameRate|float|
 		|| M = keys.Movement((5.0*f, 0, 0, 9.0*f))
-		if .Grid.State == 1 // game over
-			if keys.SPACE or Keys.RETURN
-				.Grid.Restart
+		|| w = m.w
+			.grid.rotate(w)
+		|| x = m.x
+			.grid.move(x.sign|int|)
+		if (.FramesLeft <= 0) or (m.y > 0) or (m.z < 0 and .framesleft isa 2)
+			.FramesLeft = .FrameRate
+			if .Grid.drop
+				keys.Clear
+		
+		(.Highest max= .grid.Score)
+		.grid.MakeGhost
+		.FramesLeft--
+		
+		.time.Text = "Time:\n" + (.TotalFrames|float| / 60.0).Render(1) + "s"
+		if ++.TotalFrames isa 600
+			.FrameRate = .FrameRate-1 max 16
+		
+	behaviour Framestep
+		require GUIActive
+		if .Grid.State >= 1 // game over
+			.GameOver
 		  else
-			|| w = m.w
-				.grid.rotate(w)
-			|| x = m.x
-				.grid.move(x.sign|int|)
-			if (.FramesLeft <= 0) or (m.y > 0) or (m.z < 0 and .framesleft isa 2)
-				.FramesLeft = .FrameRate
-				if .Grid.drop
-					keys.Clear
-			.grid.makeghost
-			.FramesLeft--
-			
-			if ++.TotalFrames isa 600
-				.FrameRate = .FrameRate-1 max 16
+			.HandleInput
 		gui.Touch
 
 	behaviour DrawBackground
 		where.DrawRect(self, colors.black)
 		.Grid.draw(where)
-		.Score.Text = .grid.Score.Render
+		.HighestField.Text = "Highest:\n" + .Highest.Render
+		.Score.Text = "Score:\n"+.grid.Score.Render
 
 
 
@@ -339,6 +365,7 @@ class Tetris (GridSection)
 			hu += 24th
 		if b is ghost
 			br = 0.075
+			br += gui.Cycle(5s, (x+y)*1s).pow8*0.3
 			r+=(0,0,1,1)
 		C = colors.wheel(Hu, SA, br, 1.0)
 		where.DrawOutlineOnly(R, C)
