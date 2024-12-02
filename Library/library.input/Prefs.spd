@@ -1,0 +1,78 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+module Prefs {
+|config|					Data
+
+// perhaps we should just have a prefs module.
+// it would be more natural, than app.prefblabla
+
+// I wonder if we can do this all with config?
+// a thing that can be turned
+// from/to strings/ints with no fuss?
+
+
+function String (|string| s, assigns:|string|)
+	opt norefcounts
+	.Init()[s] = Value
+
+function String (|string| s, |string|)
+	cpp_part GetPref
+	return .init()[s].value
+
+function Msg (|string| s, assigns:|message|)
+	opt norefcounts
+	cpp_part SetPrefMsg
+	.init()[s] = Value
+	
+function Msg (|string| s, |message|)
+	return .init()[s]
+
+function Config (|string| s, |message|)
+	rz = .Msg(s)
+	if !rz
+		rz = .Data.msg(@tmp, s).msg(@arg)
+
+function Path (|string|)
+	rz = app.BuildConfig("prefs")
+	if rz[] == '~'
+		rz = rz.pathfix
+	if rz ~= "default"
+		rz = ""
+	
+	if rz[] != '/'
+		rz = file.Prefs(rz)
+	check (rz[] == '/' or '~') ("App pref path should be 'default' or a full-path.")
+
+
+function Init (|date| when=0, |config!|)
+	if .Data
+		return .Data!
+	|| p = .path
+		.Data = p.file.conf
+	if !.Data 
+		.Data = Message(@arg, string.error)
+	if when
+		if when < 0: When = date.now
+		.string("first") ?= when.renderint
+		
+	return .Data!
+
+
+function Save
+	opt norefcounts
+	.Data.save?
+	
+
+//function Expired (|date| period, |date| From = __now__, |date|)
+//	|| expiry = period + from
+//	if gui.FrameStart > expiry
+//		return expiry
+
+}
+
+
+

@@ -16,7 +16,7 @@ class PerryIDE (Window)
 	|guicontrol| 				StdOutBorder
 	
 	|FileRow?|					NotTodo
-	|message?|					ProjMsg
+	|message?|					SharedProjectTabSource
 	|message?| 					LostFunks
 	|[guicontrol]|				Views
 	|File|						Project
@@ -97,7 +97,7 @@ class PerryIDE (Window)
 	destructor
 		opt norefcounts
 		if !gui.isquitting
-			|| proj = .projmsg					#require
+			|| proj = .SharedProjectTabSource					#require
 			proj["pos"] = .editme.sel0
 			Perry.save
 	
@@ -139,8 +139,8 @@ class PerryIDE (Window)
 
 
 	function RemoveProjFromList
-		|| r = .projmsg
-			.projmsg = message() // for now
+		|| r = .SharedProjectTabSource
+			.SharedProjectTabSource = message() // for now
 			|| n = r.next
 			n ?= r.prev
 			.ProjectTabs.selected = n
@@ -292,7 +292,7 @@ class PerryIDE (Window)
 		
 	function Name (|string|) //.ProjName
 		opt norefcounts
-		|| m = .projmsg
+		|| m = .SharedProjectTabSource
 			return m.name.name
 
 
@@ -303,7 +303,7 @@ class PerryIDE (Window)
 	function ShowIDE (|bool| FromClick=false)
 		debug_require self // what?
 		|| p = .Project
-		app.pref("currproj") = p
+		prefs.string("currproj") = p
 		|| rec = Perry.RecentProjects.Find(@tmp, p)
 			rec.Parent.first = rec
 		if FromClick
@@ -312,7 +312,7 @@ class PerryIDE (Window)
 			  else
 				.recheck
 		if !.isfront
-			.ProjectTabs.selected = .projmsg
+			.ProjectTabs.selected = .SharedProjectTabSource
 			.editme.SetFocus // make it simple
 			super.show
 		.id = .name
@@ -852,7 +852,7 @@ So anything not 0 means "its OK"`
 		doc.CompareTreesOnSave = doc.ExpectJeebox
 		.ListAllFuncs
 		.CheckScrollErrors(0, date.now + 0.25s)		
-		|| it = .ProjMsg
+		|| it = .SharedProjectTabSource
 			if !.DuringLoad
 				it["edit"] = r.location
 			it["pos"] = doc.Position
@@ -870,7 +870,7 @@ So anything not 0 means "its OK"`
 	function UpdateActiveFile
 		|| d = .editme.Document$
 		|| l = d.Location.Resolve(true)$
-		if l ~= app.prefpath.resolve
+		if l ~= prefs.path.resolve
 			.updateprefs
 		  elseif l ~= .perryfile
 			.updateperry
@@ -883,13 +883,13 @@ So anything not 0 means "its OK"`
 	
 	
 	function UpdatePrefs
-		|| oldPrefs = app._prefs
-		app._prefs = nil
-		if app.PrefsInit(0)
+		|| OldPrefs = prefs.Data
+		prefs.Data = nil
+		if prefs.Init(0)
 			.notify("Reloaded Prefs.")
 		  else
 			.notify("Prefs are corrupted")
-			app._prefs = oldPrefs
+			prefs.Data = oldPrefs
 		perry.LoadRecents
 		¥.LoadFromPrefs
 

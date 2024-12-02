@@ -8,7 +8,7 @@ module App {
 |[string]?|					_OldArgs = nil
 |string| 					Usage
 |message|					_Conf
-|config|					_Prefs
+
 |string| 					_Path
 |file?|						_StdOut
 |file?|						_stdin
@@ -42,29 +42,6 @@ function BuildConfig (|string| name, |string|)
 
 function BuildConfig (|string| name, assigns:|string|)
 	disabled "Set conf values in the original app.configure..."
-
-
-function Pref (|string| s, assigns:|string|)
-	opt norefcounts
-	.PrefsInit()[s] = Value
-
-function PrefMsg (|string| s, assigns:|message|)
-	opt norefcounts
-	cpp_part SetPrefMsg
-	.prefsinit()[s] = Value
-
-function Pref (|string| s, |string|)
-	cpp_part GetPref
-	return .prefsinit()[s].value
-	
-function PrefMsg (|string| s, |message|)
-	return .prefsinit()[s]
-
-function PrefConfig (|string| s, |message|)
-	rz = .PrefMsg(s)
-	if !rz
-		rz = ._Prefs.msg(@tmp, s).msg(@arg)
-
 
 function Created (|date|)
 	return __now__|date|
@@ -186,37 +163,6 @@ function OtherMemory (|int64|)
 
 function ClearCaches (|int| which=0)
 	cpp_wrapper JB_App__ClearCaches
-
-function PrefPath (|string|)
-	rz = app.BuildConfig("prefs")
-	if rz[] == '~'
-		rz = rz.pathfix
-	if rz ~= "default"
-		rz = ""
-	
-	if rz[] != '/'
-		rz = file.Prefs(rz)
-	check (rz[] == '/' or '~') ("App pref path should be 'default' or a full-path.")
-
-
-function PrefsInit (|date| when=0, |config!|)
-	if ._prefs
-		return ._prefs!
-	|| pref_path = .prefpath
-		._prefs = pref_path.file.conf
-	if !._prefs 
-		._prefs = Message(@arg, string.error)
-	if when
-		if when < 0: When = date.now
-		app.pref("first") ?= when.renderint
-		
-	return ._prefs!
-
-
-function SavePrefs
-	opt norefcounts
-	._prefs.save?
-	
 
 //function Expired (|date| period, |date| From = __now__, |date|)
 //	|| expiry = period + from

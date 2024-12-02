@@ -300,7 +300,7 @@ function EditMeKeyDown (guitextevent)
 function EditMeModified (guitextevent)
 	|| i = .ide
 	i.lastsendtime = 0
-	require i.projmsg
+	require i.SharedProjectTabSource
 	EditMeKeyDown(self, 0, false)
 	
 	if (reason != documentstate.saving) and !i.DuringTempView
@@ -313,7 +313,7 @@ function EditMeModified (guitextevent)
 				.PerryTryAutoComplete(x, "autocomplete_edit", PerryAutoCompleteReason.modified)
 	
 	(i is modified) = (self is modified)
-	|listviewrow| msg = i.ProjMsg
+	|listviewrow| msg = i.SharedProjectTabSource
 		|| Mod = (self is modified)
 		(msg is modified) = Mod
 		|| sub = i.CurrFileName.SubMenu

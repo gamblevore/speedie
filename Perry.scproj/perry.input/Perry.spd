@@ -53,7 +53,11 @@ module Perry
 	
 	function Save
 		visible
-		app.prefmsg("colors") = ¥.savecolors.parse
+		// huh? delteing the "¥" causes it to not compile.
+		// thats at least two errors
+		// one in perry and one in jeebox.
+		
+		prefs.msg("colors") = ¥.savecolors.parse
 
 		
 	helper LoadWindowsSub (|bool|)
@@ -85,7 +89,7 @@ module Perry
 
 
 	function LoadRecents
-		Perry.RecentProjects = app.PrefList("Recents")
+		Perry.RecentProjects = prefs.Config("Recents")
 		for s in Perry.RecentProjects
 			|| nxt = s.next
 				|| second = .FindRecent(s.name, nxt)
@@ -103,8 +107,8 @@ module Perry
 		.BuildAppMenu
 		.LoadRecents
 	
-		|| old = app.Pref("currproj")
-		.Projects = app.prefmsg("lastproj")
+		|| old = prefs.string("currproj")
+		.Projects = prefs.msg("lastproj")
 		
 		if app.CWD == "/"
 			app.args.remove("YES", true)
@@ -150,7 +154,7 @@ module Perry
 			old["edit"] = ""
 			old["pos"] = ""
 		
-		i.ProjMsg = old
+		i.SharedProjectTabSource = old
 		i.SetTab2Name(old)
 
 

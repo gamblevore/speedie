@@ -26,7 +26,7 @@ extend PerryIDE
 
 	syntax is (|ListViewState| s, assigns:|bool| mod)
 		opt norefcounts
-		.projmsg.syntaxis(s) = mod
+		.SharedProjectTabSource.syntaxis(s) = mod
 		
 		if (s == listviewstate.modified)
 			|| sub = .CurrFileName.SubMenu

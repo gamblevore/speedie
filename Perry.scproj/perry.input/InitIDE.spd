@@ -429,7 +429,7 @@ extend PerryIDE
 		.AddViewButton(.viewsearch,		"\16",	.searcharea)
 		.AddViewButton(.viewerrors,		"\17",	.errorlist)
 		.AddViewButton(.viewdebugger,	"\18",	.debugger)
-		if app.Pref("dev")
+		if prefs.string("dev")
 			.AddViewButton(.viewlog,		"\0D",	.CommsLogList)
 
 		.viewfiles.left = 5 ~ right
@@ -499,7 +499,7 @@ extend PerryIDE
 		|| g = .CommsLogList
 		g.istree = true
 		g.id = "log"
-		require !app.pref("nolog")
+		require !prefs.string("nolog")
 		g.gnormal.seps = g.gnormal.bg
 		g.gnormal.seps.alpha *= 0.8
 		
@@ -647,8 +647,8 @@ extend PerryIDE
 
 	function DesiredStart (|filerow| projfol, |&int| pos,  |filerow|)
 		opt norefcounts
-		|| edit = .ProjMsg["edit"]
-			pos[] = .ProjMsg["pos"].int
+		|| edit = .SharedProjectTabSource["edit"]
+			pos[] = .SharedProjectTabSource["pos"].int
 			|| n = edit.name
 				return self.filelist[n]
 		|| tod = .nottodo

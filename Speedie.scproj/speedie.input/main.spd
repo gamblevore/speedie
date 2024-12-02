@@ -50,9 +50,9 @@ function compiler.ClearEnvs
 function compiler.SetupEnv
 	opt norefcounts
 	.ClearEnvs
-	app.PrefsInit(-1)
+	prefs.init(-1)
 	
-	options.dev = app.pref("dev").int
+	options.dev = prefs.string("dev").int
 	if !app.IsMainThread
 		app.ThreadName = "SpeedieDebug"
 
