@@ -2,6 +2,7 @@
 import "GUI"
 
 // todo:
+// grab bag
 // forgiveness like tetris has
 // score board needs history
 // pink cloudy blocks with cute faces? and hearts/rainbows/stars as they disappear
@@ -15,9 +16,9 @@ main
 	return TetrisWin().RunAsMain
 
 
-datatype Tetromino (uint64)
+datatype Tetronimo (uint64)
 	flags
-		|uint64|
+		|Tetronimo|
 		(1<<8)
 		Ghost
 		Dropper
@@ -26,29 +27,25 @@ datatype Tetromino (uint64)
 		Destroying
 		Proper = Dropper + pivot
 
-	syntax is (|Tetromino| V, |bool|)
+	syntax is (|Tetronimo| V, |bool|)
 		return self&V
 
-	syntax is (|Tetromino| V, assigns:|bool|, |tetromino|)
+	syntax is (|Tetronimo| V, assigns:|bool|, |Tetronimo|)
 		if Value
 			return self|||v
 		return self&~v
 
-	function byte.real (|Tetromino|)
-		return self|Tetromino| ||| Tetromino.Real
-	
-	function byte.dropper (|Tetromino|)
-		return self|Tetromino| ||| Tetromino.Dropper
 
 || Shapes = [
 	"aa\naa"
 	"bb\n Bb"
 	" Bb\nbb"
-	"ccCc"
-	"ccCc"
+	"tTtt"
+	"ttTt"
 	"dDd\nd"
 	"dDd\n  d"
 	"eEe\n e"
+//	"tttTttt\n"*3 haha
 	// I could add 0 bombs. like a shape with a hole in it, to punish players lol.
 ]
 
@@ -58,6 +55,7 @@ class TetrisWin (Window)
 	|textview|			Score
 	|int|				FramesLeft
 	|int|				FrameRate
+	|int|				TotalFrames
 	
 	constructor
 		.grid = Tetris()
@@ -73,7 +71,9 @@ class TetrisWin (Window)
 	
 	behaviour Framestep
 		require GUIActive
-		|| M = keys.Movement((8th, 0, 0, 4th))
+		// the faster the game moves, the fastr the kys should move.
+		|| f = 1.0/.FrameRate|float|
+		|| M = keys.Movement((5.0*f, 0, 0, 9.0*f))
 		if .Grid.State == 1 // game over
 			if keys.SPACE or Keys.RETURN
 				.Grid.Restart
@@ -88,6 +88,9 @@ class TetrisWin (Window)
 					keys.Clear
 			.grid.makeghost
 			.FramesLeft--
+			
+			if ++.TotalFrames isa 600
+				.FrameRate = .FrameRate-1 max 16
 		gui.Touch
 
 	behaviour DrawBackground
@@ -98,8 +101,9 @@ class TetrisWin (Window)
 
 
 class Tetris (GridSection)
-	contains Tetromino
-	|int|	Score
+	contains Tetronimo
+	|int|				Score
+	|[string]|			Bag
 
 	constructor
 		.Dimensions[1] = 24
@@ -112,20 +116,20 @@ class Tetris (GridSection)
 		|| h = .Height
 		for y in h
 			for x in 12
-				|Tetromino| B
+				|Tetronimo| B
 				if !y or (x == 0 or 11)
-					B = '*'.real
+					B = '*' ||| Tetronimo.Real
 					b += y >= (h-4)
 				  elseif y <= 4
 					B = ++i & 15
-					b|=!b
-					b = b|byte|.real
+					b |= !b
+					b |= Tetronimo.Real
 				self[x, y][] = b
 			if y
 				self[10()+1, y][] = 0
-		.AddShape(shapes[0]!)
+		.NextShape
 
-	syntax Access (|int| x, |int| y, |&Tetromino|)
+	syntax Access (|int| x, |int| y, |&Tetronimo|)
 		return .at(x + y*16)
 			
 	function AddShape (|string| s)
@@ -137,14 +141,20 @@ class Tetris (GridSection)
 				x = 0
 			  else
 				if c != ' '
-					|| T = c.dropper
+					|| T = c ||| Tetronimo.Dropper
 					(T is pivot) = c.IsUpper
 					self[x+4,y][] = T&~32
 				x++
 		.move(-16)
 
+		
 	function NextShape
-		.AddShape(shapes.now!)
+		|| B = .bag.pop
+		if !b
+			.bag = Shapes.copy
+			.bag.Shuffle
+			b = .bag.pop!
+		.AddShape(b)
 
 	function FindPivot (|int| adjust, |ivec2|)
 		for y in .Height
@@ -160,7 +170,7 @@ class Tetris (GridSection)
 				
 
 	///// ROTATIONS /////
-	function RotateOne (|ivec2| P, |int| x, |int| y, |Tetromino| b, |float| r, |int| move,  |bool|)
+	function RotateOne (|ivec2| P, |int| x, |int| y, |Tetronimo| b, |float| r, |int| move,  |bool|)
 		|| V = (x,y) - p
 		if r > 0
 			v = v.RotateRight
@@ -173,7 +183,6 @@ class Tetris (GridSection)
 			return .Fail
 		NewPos[] |= b<<16
 		return true
-		
 
 	function Rotate (|float| r)
 		require .FindPivot(0)
@@ -183,7 +192,6 @@ class Tetris (GridSection)
 
 		.CanRotate(r,16,0)
 
-		
 	function CanRotate (|float| r, |int| move, |int| pivot, |bool|)
 		|| P = .FindPivot(pivot)$
 		for y in .Height
@@ -193,6 +201,7 @@ class Tetris (GridSection)
 					require .RotateOne(p, x, y, c, r, move)
 		return .pass
 	////////////////////////
+	
 	
 	function Fail (|bool|)
 		for (b in self) (c)
@@ -207,7 +216,7 @@ class Tetris (GridSection)
 			c[] = b & 16~bits // flush
 		return true
 		
-	function MoveIsBlocked (|int| x, |tetromino| test, |tetromino|)
+	function MoveIsBlocked (|int| x, |Tetronimo| test, |Tetronimo|)
 		rz = -1
 		for (b in self) (c)
 			if b is dropper
@@ -219,7 +228,7 @@ class Tetris (GridSection)
 				dest[] |= b<<16
 
 	function Move (|int| x, |bool|)
-		return !.MoveIsBlocked(x, tetromino.real) and .Pass
+		return !.MoveIsBlocked(x, Tetronimo.real) and .Pass
 	
 	function RowIsFull (|int| y, |bool|)
 		for x in 10
@@ -234,17 +243,13 @@ class Tetris (GridSection)
 				self[x+1, y][] = self[x+1, y+1][]
 			y++
 			
-	function GameOver
-		beep "Game Over"
-		.State = 1
-		
 	function Drop (|bool|)
 		return !.Move(-16) and .MakeReal
 		
 	function MakeGhost
 		.FlushGhost
 		|| i = -32
-		while .MoveIsBlocked(i, tetromino.real ||| tetromino.proper) isnt Real
+		while .MoveIsBlocked(i, Tetronimo.real ||| Tetronimo.proper) isnt Real
 			.FlushGhost
 			i-=16
 	
@@ -262,7 +267,7 @@ class Tetris (GridSection)
 	function MakeReal (|bool|)	
 		for (b in self) (c)
 			if b is Dropper
-				c[] = (b &~ Tetromino.proper)|||Tetromino.Real
+				c[] = (b &~ Tetronimo.proper)|||Tetronimo.Real
 		
 		|| Score = 0
 		for y in .Height-1
@@ -275,11 +280,12 @@ class Tetris (GridSection)
 				y--
 		
 		.Score += Score
-		if .Reached >= .height-5
-			.GameOver
-		  else
+		if .Reached < .height-5
 			.NextShape
 			return true
+
+		beep "Game Over"
+		.State = 1
 	
 	function Reached (|int|)
 		for y in 23 downto 1
@@ -287,12 +293,29 @@ class Tetris (GridSection)
 				if self[x+1,y][] is Real
 					return y
 		
+	
 	function Draw (|image| where)
 		|| h = .Reached|float|
 		for y in 21
 			.DrawRow(where, y, h)
+		|| n = .bag.Length-1
+		for i in 3
+			.drawnext(where, 14, 18-i*4, .bag[n-i])
+		
+		
+	function DrawNext (|image| where, |int| x1,   |int| y=21,  |string?| s)
+		require s
+		|| x = x1
+		for c in s
+			if c == '\n'
+				y--
+				x = x1-1
+			  elseif c != ' '
+				.DrawBlock(where, y, x, c, 1.0)
+			x++
 	
-	function DrawBlock (|image| where, |int| y, |int| x, |tetromino| b, |float| h)
+	
+	function DrawBlock (|image| where, |int| y, |int| x, |Tetronimo| b, |float| h)
 		|| R = (x, y, x+1, y+1).screen
 		|| Hu = ((b&31)+8) div 11
 		Hu -= (b is pivot)|float| * 0.025
