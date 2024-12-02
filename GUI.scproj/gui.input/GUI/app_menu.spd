@@ -73,7 +73,7 @@ class AppMenu (Window)
 
 
 function AppMenuHelp (GuiMenuEvent)
-	|| it = app.conf("HelpURL")
+	|| it = app.BuildConfig("HelpURL")
 		app.showurl(it)
 		return 
 	if self isa listview
@@ -87,8 +87,8 @@ function AppMenuQuit (GuiMenuEvent)
 
 function AppMenuAbout (GuiMenuEvent)
 	|| fs = faststring()
-	|| v = app.conf("version") ?? `$version`
-	|| c = app.conf("creator") ?? `$creator`
+	|| v = app.BuildConfig("version") ?? `$version`
+	|| c = app.BuildConfig("creator") ?? `$creator`
 	fs <~ "${app.filename} (${app.TimeID|int64|}) v$v, by $c."
 	beep fs
 

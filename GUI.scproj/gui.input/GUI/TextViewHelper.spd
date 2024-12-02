@@ -65,7 +65,7 @@ class TextViewLine (list)
 
 	operator contains (|ind| b, |bool|)
 		|| d = .drawrange
-		ifn self is last
+		if self isnt last
 			d.x2 -= 1 
 		return d contains b
 
@@ -317,8 +317,8 @@ helper textview.DrawError (|image| Where, |int| y, |TextViewLine| D)
 	|| lm= 0.225
 	|| v = (1.0, 0.1, 0.1, lm)
 	if e == .myerror
-		v = (1.0, 0.15, 0.1, 0.35)
-	 
+		v = (1.0, 0.15, 0.1, 0.22)
+	|| sc = e.Severity.color // why not use this?
 	if e.severity == errorseverity.ok
 		v = (0.6, 0.6, 0.6, 0.25)
 	  elseif e.severity == errorseverity.problem

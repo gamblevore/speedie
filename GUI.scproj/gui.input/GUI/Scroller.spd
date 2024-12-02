@@ -33,12 +33,12 @@ helper textview.SLH (|vec3|)
 
 
 extend guicontrol {
-function CanDrawScroll (|bool|)
+helper CanDrawScroll (|bool|)
 	opt NoRefCounts
 	return (._ScrollDrawTimer > 1) or (!GUI.MouseButtons and .InScrollArea(.mousexy))
 
 
-function DrawScroll (|vec3| slh, |image?| where=nil, |float|)
+helper DrawScroll (|vec3| slh, |image?| where=nil, |float|)
 	opt NoRefCounts
 	require .CanDrawScroll
 	
@@ -73,11 +73,11 @@ function DrawScroll (|vec3| slh, |image?| where=nil, |float|)
 
 
 
-function ScrollRectFind (|vec3| slh, |int| shift, |int|)
+helper ScrollRectFind (|vec3| slh, |int| shift, |int|)
 	return .ScrollRect(slh, shift).x|int|
 
 
-function ScrollRect (|vec3|slh, |ivec4|)
+helper ScrollRect (|vec3|slh, |ivec4|)
 	return .scrollrect(slh, 0).ivec4
 
 
@@ -87,7 +87,7 @@ function InScrollArea (|ivec2| p, |bool|)
 	return (xr contains p.x) and (self contains p)
 
 
-function HandleMouseInScrollArea (|ivec2| p, |&uint| timer, |bool|)
+helper HandleMouseInScrollArea (|ivec2| p, |&uint| timer, |bool|)
 	if .HasFocus or timer[]
 		if .InScrollArea(p)
 			timer[] = ScrollInfo.TimerStart + date.ticks
@@ -95,7 +95,7 @@ function HandleMouseInScrollArea (|ivec2| p, |&uint| timer, |bool|)
 			return true
 
 
-function ScrollBarMove (|vec3| slh, |int| shift)
+helper ScrollBarMove (|vec3| slh, |int| shift)
 	if shift
 		|| t = .ScrollRectFind(slh, shift)
 		if self isa ListView
@@ -104,7 +104,7 @@ function ScrollBarMove (|vec3| slh, |int| shift)
 			.StartLine = t
 
 
-function ClickedScrollbar (|ivec2| P,  |int| Clicks,  |vec3| slh,  |&uint| Timer,  |bool|)
+helper ClickedScrollbar (|ivec2| P,  |int| Clicks,  |vec3| slh,  |&uint| Timer,  |bool|)
 	|| t = Timer[]
 	if !t
 		return false

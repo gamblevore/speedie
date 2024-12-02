@@ -365,6 +365,10 @@ function ImportProj
 	|| ToUse = (options.SingleFileInput.file, .BaseProjectPath!)(options.SingleFileInput)
 	compiler.Project = SCImport.ImportPath( "",  ToUse,  0, false )
 	expect compiler.Project ("No user-project found.")
+	if !compiler.ConfMsg										// we need a conf, for prefs to work
+		|| conf = @tmp+"conf"
+		conf["prefs"] = Compiler.ProjectName + ".box.pref"
+		.SetConf(conf)
 
 
 function PrepareAST 

@@ -37,10 +37,10 @@ function Yes (|string| name, |bool|)
 function No (|string| name, |bool|)
 	return !.yes(name)
 
-function Conf (|string| name, |string|)
+function BuildConfig (|string| name, |string|)
 	return ._conf[name].value
 
-function Conf (|string| name, assigns:|string|)
+function BuildConfig (|string| name, assigns:|string|)
 	disabled "Set conf values in the original app.configure..."
 
 
@@ -55,13 +55,13 @@ function PrefMsg (|string| s, assigns:|message|)
 
 function Pref (|string| s, |string|)
 	cpp_part GetPref
-	return ._prefs[s].value
+	return .prefsinit()[s].value
 	
 function PrefMsg (|string| s, |message|)
-	return ._prefs[s]
+	return .prefsinit()[s]
 
-function PrefList (|string| s, |message|)
-	rz = ._prefs[s]
+function PrefConfig (|string| s, |message|)
+	rz = .PrefMsg(s)
 	if !rz
 		rz = ._Prefs.msg(@tmp, s).msg(@arg)
 
@@ -188,7 +188,7 @@ function ClearCaches (|int| which=0)
 	cpp_wrapper JB_App__ClearCaches
 
 function PrefPath (|string|)
-	rz = app.conf("prefs")$
+	rz = app.BuildConfig("prefs")
 	if rz[] == '~'
 		rz = rz.pathfix
 	if rz ~= "default"

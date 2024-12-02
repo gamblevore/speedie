@@ -1645,19 +1645,12 @@ class TextView (GUIControl)
 	helper DrawPreparedText (|image| where)
 		opt norefcounts
 		|| d		= .StartLine
-
-//		|| g = .GNormal
-//		|int| New = .strength*255
-//		g.BG.a = New
-//		g.Text.a = New // seems the text is not... drawing using the .text.a
-//		if it is colorised.
-
 		|| N		= .MaxVisibleLines
 		|| lc		= .LineNumColor
 		|| y		= (.lineheight|int| - font.height) + .lasttop
 		y -= 2
 
-		|| yend		= .lastbottom
+		|| yend		= .LastBottom
 		|| UseCol	= .UseColorAnyway
 		while (y > yend) and (d)
 			y -= .LineHeight
@@ -2100,12 +2093,17 @@ class TextView (GUIControl)
 		SingleLineWithTabs = 2
 	
 	module
-		|| csAntiWords		= makeanti()
+		|| csAntiWords		= jeebox.CSWordMiddle.Invert
 		|| CounterParts		= <(`{[(`'"|`)>
 		|| CounterParts2	= <(`}])`'"|`)>
-
-		function MakeAnti (|charset|)
-			return jeebox.CSWordMiddle.Invert
+		
+		function Block (|guicontrol| parent, |float| x, |float| w, |float| y, |float| h, |textview|)
+			rz = TextView(parent)
+			rz.MakeInline
+			rz.BlockSize(x,w,y,h)
+			if w < 0
+				rz.Alignment = MoveCode.Right
+			
 
 		task DelayedShowError (TaskGUI, |error| err, |ivec2| Point)
 			constructor

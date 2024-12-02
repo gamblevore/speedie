@@ -105,7 +105,7 @@ class SCImport
 			  elseif s ~= "compile_linking"
 				Linkage.CompilerCollect(s)
 			  elseif s ~= "conf"
-				.IndexConf(s)
+				compiler.SetConf(s)
 			  elseif s ~= "targets"
 				.IndexTargets(s)
 	
@@ -121,7 +121,7 @@ class SCImport
 		tar.remove
 		
 	
-	function IndexConf (|message| conf)
+	function compiler.SetConf (|message| conf)
 		|| arg = conf[@arg]
 			arg.remove
 			compiler.ConfMsg = arg

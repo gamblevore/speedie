@@ -354,16 +354,16 @@ module GUI
 
 	function GUICheck
 		if app.yes("version")
-			printline app.conf("version")
+			printline app.BuildConfig("version")
 			app.quit
 		if app.yes("created")
 			printline __now__|date|.LocalTime
 			app.quit
 	
 	function NiceAppName (|string|)
-		with app.conf("selfname")
+		with app.BuildConfig("selfname")
 			return it
-		with app.conf("name")
+		with app.BuildConfig("name")
 			return it
 		return app.appname
 	
@@ -657,9 +657,9 @@ module GUI
 		.StartResize
 
 
-	function Cycle (|duration| length, |float|)
+	function Cycle (|duration| length, |Duration| Adjust=0, |float|)
 		opt inline
-		return .FrameStart.cycle(length)
+		return (.FrameStart+adjust).cycle(length)
 
 
 	function Loop (|duration| length, |float|)
