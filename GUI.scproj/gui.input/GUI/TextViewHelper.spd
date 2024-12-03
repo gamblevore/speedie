@@ -402,7 +402,7 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 		lc.r += 80
 		lc.g += 80
 		lc.b += 80
-		.DrawLighter(where, y+goup)
+		.DrawLighter(where, y+GoUp)
 
 	|| x	 = .DrawLineNumber(where, d, y, lc)-1
 	|| state = MsgTextDrawState(x, d)

@@ -444,8 +444,8 @@ class Window (GUIControl)
 	function Close (|SDLActivity| Reason=SDLActivity.windowclose, |sdlactivity|)
 		if self
 			if reason isnt terminating
-				require .__CancelClose__(reason)
-			.DisposeAll(true)						// its probably OK????
+				require !.__CancelClose__(reason)
+			.DisposeAll(true)
 		return reason
 
 	
