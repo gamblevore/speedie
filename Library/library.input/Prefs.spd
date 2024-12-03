@@ -7,12 +7,10 @@
 module Prefs {
 |config|					Data
 
-// perhaps we should just have a prefs module.
-// it would be more natural, than app.prefblabla
-
 // I wonder if we can do this all with config?
 // a thing that can be turned
 // from/to strings/ints with no fuss?
+// guicontrol would need a default msg to store its text in.
 
 
 function String (|string| s, assigns:|string|)

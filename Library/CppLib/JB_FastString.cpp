@@ -400,8 +400,26 @@ void JB_FS_AppendDoubleAsText(FastString* self, double D, int dp, bool CanExp, b
 	}
     
 	double F = floor(D);
-	double Frac = D-F;
 	JB_FS_AppendIntegerAsText(self, F, 1);
+	double Frac = D - F;
+
+
+	if (Frac and dp > 0) {
+		int MaxDP = 1;
+		for (int i = 1; i < dp; i++) {
+			Frac *= 10;
+			double Num = floor(Frac);
+			if (Num)
+				MaxDP = i;
+			Frac -= Num;
+			if (!Frac)
+				break;
+		}
+		dp = MaxDP;
+		Frac = D - F;
+	}
+
+
 	if (Dot or (Frac and dp > 0)) {
 		JB_FS_AppendByte(self, '.');
 		while (dp-- > 0) {
