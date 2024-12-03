@@ -2,9 +2,7 @@
 import "GUI"
 
 // todo:
-// forgiveness like tetris has
-// ghost block should be a temporay powerup! its makes the game too easy.
-// score board needs history
+// ghost block should be a temporay powerup! its makes the game too easy.	
 // pink cloudy blocks with cute faces? and hearts/rainbows/stars as they disappear
 	// Clouds via overlapping volumetric spheres and edge detection post-processing
 	// the ghost block kinda spoils the fun a bit... you end up staring at the bottom all the time.
@@ -55,12 +53,9 @@ class TetrisWin (Window)
 	|textview|			Time
 	|textview|			History
 	|textview|			HighestField
+	|textview|			LevelField
 	|textview|			Score
 	|config|			Prefs
-	|int|				Highest
-	|int|				FramesLeft
-	|int|				FrameRate
-	|int|				TotalFrames
 	
 	constructor
 		.grid = Tetris()
@@ -68,67 +63,58 @@ class TetrisWin (Window)
 		.Score = TextView.Block(  self, -2.5, -5.0,  16.5, -3.0)
 		.history = TextView.Block(self, -2.5, -15.0,  13.5, -10.0)
 		.time = TextView.Block(   self, 13.5,  5.0,   5.0,  3.0)
+		.LevelField = TextView.Block(self, 13.5,  7.0,   2.0,  3.0)
 		.prefs = prefs.Config("tetris")
-		.Highest = .prefs["max"].int
+		.grid.Highest = .prefs["max"].int
 		.History.text = .prefs["history"]
 		
 		.blockheight = 24
 		.blockX(true) = -6
 		.blockY = 1.5
-		.FrameRate = 48
-		.FramesLeft = .FrameRate*2
 	
 	function GameOver
 		if .grid.state == 1
-			if (.Highest == .grid.Score)
+			|| H = .grid.Highest
+			if (H == .grid.Score)
 				|| Name = "Enter your name, champion!".ask
-					.History.text = "$name @ $.Highest\n${.History.text}"
+					.History.text = "$name @ $H\n${.History.text}"
 				.prefs["history"] = .History.text
-			.prefs["max"] = .Highest
+			.prefs["max"] = H
 			prefs.save
 			.grid.State = 2
 		if keys.SPACE or Keys.RETURN
-			.Grid.Restart
+			.Grid.Restart		
 	
-	function HandleInput
-		|| f = 1.0/.FrameRate|float|
-		|| M = keys.Movement((5.0*f, 0, 0, 9.0*f))
-		|| w = m.w
-			.grid.rotate(w)
-		|| x = m.x
-			.grid.move(x.sign|int|)
-		if (.FramesLeft <= 0) or (m.y > 0) or (m.z < 0 and .framesleft isa 2)
-			.FramesLeft = .FrameRate
-			if .Grid.drop
-				keys.Clear
-		
-		(.Highest max= .grid.Score)
-		.grid.MakeGhost
-		.FramesLeft--
-		
-		.time.Text = "Time:\n" + (.TotalFrames|float| / 60.0).Render(1) + "s"
-		if ++.TotalFrames isa 600
-			.FrameRate = .FrameRate-1 max 16
-		
-	behaviour Framestep
+	
+	behaviour FrameStep
 		require GUIActive
 		if .Grid.State >= 1 // game over
 			.GameOver
 		  else
-			.HandleInput
+			.grid.HandleInput
 		gui.Touch
+
 
 	behaviour DrawBackground
 		where.DrawRect(self, colors.black)
 		.Grid.draw(where)
-		.HighestField.Text = "Highest:\n" + .Highest.Render
-		.Score.Text = "Score:\n"+.grid.Score.Render
+		.HighestField.Text = "Highest:\n${.grid.Highest}"
+		.Score.Text = "Score:\n${.grid.Score}"
+		|| time = (.grid.TotalFrames|float| / 60.0)
+		.time.Text = "Time:\n" + time.render(1) + "s"
+		.LevelField.Text = "Level - ${.grid.Level}"
 
 
 
 class Tetris (GridSection)
 	contains Tetronimo
 	|int|				Score
+	|int|				FramesLeft
+	|int|				FrameRate
+	|int|				Level
+	|int|				TotalFrames
+	|int|				Highest
+	|int|				LockDelay
 	|[string]|			Bag
 
 	constructor
@@ -136,8 +122,12 @@ class Tetris (GridSection)
 		.restart
 		
 	function Restart
+		.FrameRate = 60
+		.FramesLeft = .FrameRate*2
 		.State = 0
 		.Score = 0
+		.Level = 0
+		
 		|| i = 0
 		|| h = .Height
 		for y in h
@@ -164,15 +154,41 @@ class Tetris (GridSection)
 		for c in s
 			if c == '\n'
 				y--
-				x = 0
-			  else
-				if c != ' '
-					|| T = c ||| Tetronimo.Dropper
-					(T is pivot) = c.IsUpper
-					self[x+4,y][] = T&~32
-				x++
+				x = -1
+			  elseif c != ' '
+				|| T = c ||| Tetronimo.Dropper
+				(T is pivot) = c.IsUpper
+				self[x+4,y][] = T&~32
+			x++
 		.move(-16)
 
+	function SomethingIsBeneath (|bool|)
+		rz = .MoveIsBlocked(-16, Tetronimo.real)
+		.fail
+		
+	function HandleInput
+		|| f = (.framerate max 40)|float|*2048th
+		|| M = keys.Movement((3.0*f, 0, 0, 13.0*f))
+		|| w = m.w
+		if w or m.z > 0
+			.rotate(w)
+		|| x = m.x
+			.move(x.sign|int|)
+		if (.FramesLeft <= 0) or (m.y > 0) or (m.z < 0 and .TotalFrames isa 3)
+			.drop(m.y > 0)
+		  elseif .SomethingIsBeneath
+			.LockDelay--
+		
+		
+		(.Highest max= .Score)
+		.MakeGhost
+		.FramesLeft--
+		if .TotalFrames++ isa 300
+			.FrameRate = .FrameRate-1 max 22
+//			printline .FrameRate
+		
+
+		
 		
 	function NextShape
 		|| B = .bag.pop
@@ -203,12 +219,12 @@ class Tetris (GridSection)
 		  else 
 			v = v.RotateLeft
 		V += P
-		require  v.x|uint| <= 10  and  v.y|uint| >= 1
-		|| NewPos = self[v.x, v.y]+move
-		if NewPos[] is Real
-			return .Fail
-		NewPos[] |= b<<16
-		return true
+		if  v.x|uint| <= 10  and  v.y|uint| >= 1
+			|| NewPos = self[v.x, v.y]+move
+			if NewPos[] is Real
+				return .Fail
+			NewPos[] |= b<<16
+			return true
 
 	function Rotate (|float| r)
 		require .FindPivot(0)
@@ -268,10 +284,34 @@ class Tetris (GridSection)
 			for x in 10
 				self[x+1, y][] = self[x+1, y+1][]
 			y++
-			
-	function Drop (|bool|)
-		return !.Move(-16) and .MakeReal
+	
+	/*
+		we want to drop
+		and soft lock
 		
+		if we hit the bottom... we allow 0.5 seconds of soft-lock
+		
+		So... if we cant move... allow 0.5 seconds
+		
+		how to allow, 0.5 seconds.
+		
+		When do we reset lock delay?
+		
+		I think anytime a down move is made.
+	*/
+	
+	
+	function Drop (|bool| Lock)
+		.FramesLeft = .FrameRate / 2
+		if .Move(-16)
+			.LockDelay = 48
+			
+		  elseif (lock or .LockDelay <= 0)
+			.Level++
+			.LockDelay = 48
+			.MakeReal
+	
+	
 	function MakeGhost
 		.FlushGhost
 		|| i = -32
@@ -279,7 +319,7 @@ class Tetris (GridSection)
 			.FlushGhost
 			i-=16
 	
-		
+	
 	function FlushGhost
 		for (b in self) (c)
 			|| m = b>>16
@@ -290,7 +330,7 @@ class Tetris (GridSection)
 				b = 0
 			c[] = b & 16~bits // flush
 		
-	function MakeReal (|bool|)	
+	function MakeReal
 		for (b in self) (c)
 			if b is Dropper
 				c[] = (b &~ Tetronimo.proper)|||Tetronimo.Real
@@ -298,17 +338,18 @@ class Tetris (GridSection)
 		|| Score = 0
 		for y in .Height-1
 			if .RowIsFull(y+1)
-				if !Score
-					score = 100
-				  else
+				if Score
 					Score *= 3
+				  else
+					score = 100
 				.PullDown(y+1)
 				y--
 		
 		.Score += Score
 		if .Reached < .height-5
 			.NextShape
-			return true
+			keys.Clear
+			return
 
 		beep "Game Over"
 		.State = 1
@@ -326,10 +367,10 @@ class Tetris (GridSection)
 			.DrawRow(where, y, h)
 		|| n = .bag.Length-1
 		for i in 3
-			.drawnext(where, 14, 18-i*4, .bag[n-i])
+			.DrawNextInBag(where, 14, 18-i*4, .bag[n-i])
 		
 		
-	function DrawNext (|image| where, |int| x1,   |int| y=21,  |string?| s)
+	function DrawNextInBag (|image| where, |int| x1,   |int| y=21,  |string?| s)
 		require s
 		|| x = x1
 		for c in s
@@ -351,7 +392,7 @@ class Tetris (GridSection)
 		|| sa = 1.0
 		|| Br = 0.8
 		if b is ghost
-			br = 0.05
+			br = 0.04
 		|| C = colors.wheel(Hu, SA, br, 1.0)
 		where.DrawRect(R, C)
 		
@@ -364,8 +405,8 @@ class Tetris (GridSection)
 		  else
 			hu += 24th
 		if b is ghost
-			br = 0.075
-			br += gui.Cycle(5s, (x+y)*1s).pow8*0.3
+			br = 0.1
+			br += gui.Cycle(5s, (x+y)*1s).pow8*0.05
 			r+=(0,0,1,1)
 		C = colors.wheel(Hu, SA, br, 1.0)
 		where.DrawOutlineOnly(R, C)
