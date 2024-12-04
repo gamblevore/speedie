@@ -18,7 +18,7 @@ class TextView (GUIControl)
 	|MoveCode|					Alignment // centered, left, right
 	|int|						ClickedPos
 
-	|bool|						CanAutoComplete
+	|byte|						CanAutoComplete
 	|int|						AutoCompleteBack
 	|string|					AutoCompleteString
 	
@@ -52,6 +52,7 @@ class TextView (GUIControl)
 		.TakesFocus = TakesFocusFlag.On
 		.OnClicked	= Clicked
 		.OnKeyDown	= keys
+		.CanAutoComplete = 2
 		.LineHeight = font.Height + 4	// whatever
 		.SetsDebugLines = 10
 		.ExpectsParse = TextView.allowjeebox
@@ -287,8 +288,9 @@ class TextView (GUIControl)
 		require result != ._TypingPlace
 		._TypingPlace = result
 		._PreferPrevLine = false
-		.CanAutoComplete = false
-		.autocompletestring = ""
+		if .CanAutoComplete <= 1
+			.CanAutoComplete = 0
+			.autocompletestring = ""
 		._UncorrectedSel = result
 		return true
 
@@ -838,12 +840,12 @@ class TextView (GUIControl)
 	
 	 
 	helper InsertAutoComplete (|bool|)
-		require .CanAutoComplete
+		require .CanAutoComplete == 1
 		|| c2 = .AutoCompleteString			#require
 		|| trim = c2.InsertTrim
 		|| autostart = c2[0, trim.x]
 		|| ins = .sel0
-		|| old = self[ins-.autocompleteback, ins]
+		|| old = self[ins - .autocompleteback, ins]
 		if old != c2
 			c2 = c2.DeleteTwoBytes(trim)
 			|| r = .selrange - (.autocompleteback, 0)
@@ -1322,8 +1324,9 @@ class TextView (GUIControl)
 			|| u = .undoer
 				|| c = u.current
 					c.typingplace = p
-			.CanAutoComplete = false
-			.AutoCompleteString = ""
+			if .CanAutoComplete <= 1
+				.CanAutoComplete = 0
+				.AutoCompleteString = ""
 			|| x = (p.x, p.x2)(s)
 			|| tab = (s in '\t')
 				.UndoChecker() = -1

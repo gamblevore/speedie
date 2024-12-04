@@ -127,6 +127,7 @@ class Tetris (GridSection)
 		.State = 0
 		.Score = 0
 		.Level = 0
+		.TotalFrames = 0
 		
 		|| i = 0
 		|| h = .Height

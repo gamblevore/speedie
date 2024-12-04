@@ -82,8 +82,7 @@ dataType Keys (int) {
 	
 	function Eat 
 		|| i = keys.has(self)
-			removekey(self)
-			keys.downKeys[i] = self
+			keys.downdate[i] = 0
 
 	function HeldKey (|date| durr=0.05s, |bool|)
 		|| i = keys.has(self)
@@ -179,34 +178,43 @@ dataType Keys (int) {
 		helper AddKey (|keys| K, |int|)
 			if (.count < 8) and !.exists(K)
 				|| i = .count++
+//				"adding $k ($i)"
 				.DownDate[i] = GUI.FrameStart
 				.DownKeys[i] = K
 				return SDLActivity.Activity
-				
-		helper RemoveKey (|keys| K, |int|)
-			require k
-			|| m = .count
+		
+		helper ReCount (|int|)
+			for v in 8
+				|| b = .DownKeys[v] != 0
+				rz += b
+			.count = rz
 			
-			for i in 8
-				m += .downdate[i]!=0
-				if .downkeys[i] == K
-					m--
-					.DownKeys[i] = .DownKeys[m]
-					.DownDate[i] = .DownDate[m]
-					.DownKeys[m] = 0
-					.DownDate[m] = 0
+		helper RemoveKey (|keys| K, |int|)
+			|| m = .recount
+			|| i = .Exists(k) #require
+//			"ask remove $k ($m) after ${.DownDate[i].ago.float}s"
+			
+			m--
+//			"remove"
+			.DownKeys[i] = .DownKeys[m]
+			.DownDate[i] = .DownDate[m]
+			.DownKeys[m] = 0
+			.DownDate[m] = 0
 			.count = m
+
 			return SDLActivity.activity
 			
 		function Has (|keys| s, |ind|)
-			for i in 8
-				if (.downkeys[i] == s) and (.DownDate[i])
-					return i
+			if s != 0
+				for i in 8
+					if (.downkeys[i] == s) and (.DownDate[i])
+						return i
 
-		helper Exists (|keys| s, |bool|)
-			for i in 8
-				if (.downkeys[i] == s)
-					return true
+		helper Exists (|keys| s, |ind|)
+			if s != 0
+				for i in 8
+					if (.downkeys[i] == s)
+						return i
 
 		function Cmd (|bool|)
 			if SDL_KeyMod.ctrl[]
