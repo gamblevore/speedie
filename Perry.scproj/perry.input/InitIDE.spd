@@ -7,7 +7,7 @@ extend PerryIDE
 		.Project			= project
 		.InConstructor		= true
 		.CanAskingAboutMissing = true
-		.RecentFiles		= message()
+		.RecentFiles 		= message()
 		.id					= "IDE"
 		.Debugger			= GUIControl(self)
 		.SearchArea			= guicontrol(self) 
@@ -320,7 +320,7 @@ extend PerryIDE
 			.SingleLine		= TextView.SingleLine
 			isnt editable 
 			.takesfocus		= 0
-			.size 			= the~left for 350  by  0 to 13
+			.size 			= the~left for 400  by  0 to 13
 			.gnormal.clear
 
 

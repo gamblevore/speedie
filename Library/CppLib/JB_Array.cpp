@@ -80,7 +80,7 @@ static void ShrinkCapacity_(Array* self, uint Smaller) {
 
 
 void JB_Array_AppendCount( Array* self, JB_Object* Value, int Count ) {
-	require0 (Value and Count > 0);
+	require0 (self and Value and Count > 0);
 	int n = self->Length; 
 	require0(GrowToLength_(self, n+Count));
 	JB_SetRefCount(Value, JB_RefCount(Value) + Count);

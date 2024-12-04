@@ -79,7 +79,9 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |
 	rz = (font.Width + XY.x) max 1
 	if c.iswhite
 		return rz
-	if c|int| < 0: c = -c // draw white-space
+	if c|int| < 0
+		c = -c // draw white-space
+	
 	|uint64| MissingChar = 0
 	if c == 0xAB
 		c = 128
@@ -131,11 +133,11 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |
 						dz <~ col								// opaque pixel
 					  else
 						|| f = A|float| * 65536th
-						dz <~ mix(dz.color, col, f)			// transparent pixel
+						dz <~ mix(dz.color, col, f)				// transparent pixel
 				  elseif drawmode < 0
 					dz <~ sz									// emoji direct
 				  else
-					dz <~ mix(sz.color, col, col.a)			// emoji darkened
+					dz <~ mix(sz.color, col, col.a)				// emoji darkened
 			sz++
 			dz++
 		clip.y++

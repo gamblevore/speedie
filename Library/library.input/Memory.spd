@@ -25,8 +25,8 @@ class Memory
 		pragma noearlyfree
 	
 	|int|				BufferSize
-	|&byte|				_Ptr
 	|int|				Length
+	|&byte|				_Ptr
 	|uint16|			ItemSize
 	|byte|				DeathAction
 	contains byte // should be byte?
@@ -35,13 +35,15 @@ class Memory
 	constructor (|int| ItemCount, |int| ItemSize, |&byte| ptr, |byte| DeathAction=DataObject.kfree)
 		cpp_part ConstructorPtr
 		.ItemSize = ItemSize
+		.buffersize = itemcount
 		.deathaction = deathaction
 		.length = 0
-		.buffersize = itemcount
 		._ptr = ptr
 	
 	
-	function UseExternalPointer (|&nil| P)
+	function UseExternalPointer (|&nil| P, |int| ItemCount, |int| ItemSize)
+		.ItemSize = ItemSize
+		.buffersize = itemcount
 		if .deathaction == dataobject.kfree
 			Memory.free(._ptr)
 		.deathaction = 0

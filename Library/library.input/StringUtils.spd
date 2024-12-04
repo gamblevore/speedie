@@ -284,7 +284,7 @@ function faststring.RenderSpeed (|float| seconds, |int64| BytesIn, |int64| Bytes
 	|| small = seconds < 0.01
 		seconds *= 1000.0
 
-	.appendfloat(seconds, 2)
+	.AppendFloat(seconds, 2)
 	if small
 		self <~ 'm'
 	self <~ 's'

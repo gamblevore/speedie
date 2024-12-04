@@ -210,6 +210,7 @@ class PerryIDE (Window)
 			|| msg = .EditMe.ParsedMessage
 				|| loc = msg.loc
 				fs <~ "   LOC ${loc[0]}   Nodes ${loc[1]}"
+
 			fs <~ (' ', 3)
 			if t.IsASCII
 				fs <~ "ASCII"
@@ -217,6 +218,12 @@ class PerryIDE (Window)
 				fs <~ "binary"
 			  else
 				fs <~ "UTF-8"
+				
+			t = e.SelText
+			if t.LengthUTF8 == 1
+				fs <~ "   CP "
+				fs <~ t.Codepoint(false	)
+			
 			|| d = e.Document
 				if d.WasJbin
 					fs <~ ".jbn"
@@ -235,7 +242,7 @@ class PerryIDE (Window)
 			
 			if f
 				|| s = f.lastsize
-					fs <~ " ${s.strsize} in (${f.lastfilecount} \11)"
+					fs <~ " ${s.StrSize} in (${f.LastFileCount} \11)"
 				  else
 					fs.Length = 0
 					fs <~ "no source found"
@@ -243,10 +250,10 @@ class PerryIDE (Window)
 		  elseif i == 3
 			|| img = GUI.screen.size.area*4*2
 			|| PS = PicoGlobalStats.Read 
-			fs <~ "Obj ${app.ObjMemory.strsize}   "
-			fs <~ "Str ${app.stringmemory.strsize}   "
-			fs <~ "Img ${(app.OtherMemory+img).strsize}   "
-			fs <~ "Sck ${PS.OpenSockets}/${PS.OpenPicos}"
+			fs <~ "Obj ${app.ObjMemory.strsize}"
+			fs <~ "   Str ${app.stringmemory.strsize}"
+			fs <~ "   Img ${(app.OtherMemory+img).strsize}"
+			fs <~ "   Sck ${PS.OpenSockets}/${PS.OpenPicos}"
 		return fs
 
 
@@ -458,7 +465,7 @@ class PerryIDE (Window)
 			
 		if .UpdateMem 
 			.ShowLeftStats
-				
+		
 		if fc isa 32
 			.CheckModified
 		

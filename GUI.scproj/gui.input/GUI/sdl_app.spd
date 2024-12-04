@@ -737,7 +737,7 @@ module GUI
 		|| stride = 0
 		|&nil| SDLBuff
 		t.lockThatZerosEventhoughItShouldnt(nil, &sdlbuff, &stride)
-		.screen.UseExternalPointer(sdlbuff)
+		.screen.UseExternalPointer(sdlbuff, .Screen.size.area, 4)
 		
 
 	

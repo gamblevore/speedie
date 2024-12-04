@@ -94,6 +94,9 @@ datatype ImagePixel (uint)
 	syntax cast (|&imagepixel| self, |bool|)
 		cpp_part Exists
 		return self and .a
+	
+	operator in (|image| src, |bool|)
+		return src contains self
 
 	syntax cast (|vec4|)
 		cpp_part CastVec4
@@ -188,6 +191,19 @@ datatype ImagePixel (uint)
 		|ImagePixel| Bad
 		|ImagePixel| White
 		|ImagePixel| Clear
+
+		function CheckPixel (|string| extra=nil)
+/*			|| W = .white
+			if  .White != -1  or  .Clear != 0
+/				.white = -1
+				.Clear = 0
+				|| s = "Corrupted pixel found via:\n\n" + app.StackTrace
+				if extra
+					s = extra + "\n" + s
+				printline s
+				beep s
+*/			
+			
 		init()
 		
 		function Init
@@ -199,24 +215,24 @@ datatype ImagePixel (uint)
 			return .clear
 
 
-extend vec4
-	syntax cast (|imagepixel|)
-		cpp_part AsPixel
-		return .px
+function vec4.syntaxcast (|imagepixel|)
+	cpp_part AsPixel
+	return .px
+
 function vec4.Px (|imagepixel|)
 	rz <~ self
 
-extend vec3
-	syntax cast (|imagepixel|)
-		cpp_part AsPixel
-		return .px
+function vec3.syntaxcast (|imagepixel|)
+	cpp_part AsPixel
+	return .px
+		
 function vec3.Px (|imagepixel|)
 	rz <~ ((self,1.0))
 
-extend ivec4
-	syntax cast (|imagepixel|)
-		cpp_part AsPixel
-		return .px		
+function ivec4.syntaxcast (|imagepixel|)
+	cpp_part AsPixel
+	return .px
+
 function ivec4.Px (|imagepixel|)
 	rz <~ (.r, .g, .b, .a)
 

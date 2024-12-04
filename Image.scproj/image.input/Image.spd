@@ -53,13 +53,12 @@ class Image (memory)
 		|| b = .WindowBase.xyxy
 		r = (r + b).clip(sigh)
 		._ControlClip = r - b
-	
-	
-//	function imagepixel.operatorin (|image| src, |bool|)
-//		|| p = src._ptr
-//		|| pi1 = p|&imagepixel|
-//		|| pi2 = (p+src.ByteCapacity)|&imagepixel| 
-//		return self >= pi1 and self < pi2
+
+	operator contains (|&imagepixel| P, |bool|)
+		cpp_part ContainsPixel
+		|| Start = ._ptr
+		|| After = Start+.ByteCapacity
+		return P >= Start|&imagepixel|  and P < After|&imagepixel| 
 		
 	
 	function ControlClip (|ivec4|)
@@ -122,13 +121,6 @@ class Image (memory)
 
 	syntax cast (|ivec4|)
 		return ._controlclip
-
-
-//	operator contains (|&imagepixel| r, |bool|)
-//		cpp_part ContainsPtr
-//		require r >= .ptr|&imagepixel|
-//		require r <  .ptr|&imagepixel| + .length
-//		return true
 
 		
 	setter Size (|ivec2|)
@@ -483,15 +475,22 @@ class Image (memory)
 		cpp_part SimpleRectSub
 		|| px = color.px
 		require px.a
+		|| i = 0
 		if color.a != 255
 			|| c = color.PreMul
 			for (sigh in self[rect]) (v)
+				if sigh == imagepixel.white or imagepixel.clear or imagepixel.bad
+				ifn self contains sigh
 				sigh.Overlay(C)
+				i++
 		  elseif Rect == .rect
 			memory.fillint(.ptr|&int|, .length, px.uint)
 		  else
 			for (sigh in self[rect]) (v)
+				if sigh == imagepixel.white or imagepixel.clear or imagepixel.bad
+				ifn self contains sigh
 				sigh[0] = px
+				i++
 
 
 	function DrawOutlineOnly (|ivec4| R, |ImagePixel| Edge, |imagepixel| attached_edge=imagepixel.clear, |MoveCode| AllowEdge=MoveCode.all)

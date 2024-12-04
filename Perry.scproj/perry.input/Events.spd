@@ -359,6 +359,7 @@ function EditMeSelChange (GUITextEvent)
 		i.UpdateJeeboxField
 	i.popuphide
 	i.ShowRightStats
+	i.ShowLeftStats
 	i.EditMeTabRetryThing = 0
 	require !TextWasAltered and i.feedback.CommsOpen
 	|| e = self|textview|

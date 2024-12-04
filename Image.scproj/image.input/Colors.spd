@@ -59,9 +59,6 @@ module Colors
 		cpp_part WheelVec
 		return .Wheel(y.r, y.g, y.b, y.a)
 	
-
-	
-	
 	function White (|float| alpha=1.0, |vec4|)
 		return vec4(1.0, alpha)
 	function Gray (|float| alpha=1.0, |vec4|)
@@ -96,11 +93,6 @@ datatype PreMultipliedColor (ivec4)
 
 function imagepixel.PreMul (|PreMultipliedColor|)
 	return .Color.PreMul
-
-
-//function imagepixel.PreMul (|imagepixel| self, |PreMultipliedColor|)
-//	cpp_part PreMul2 // shouldn't have to write this... dont do this!
-//	return .Color.PreMul
 
 
 function vec4.PreMul (|PreMultipliedColor|)

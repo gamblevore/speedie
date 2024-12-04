@@ -590,13 +590,13 @@ extern JB_String* JB__App__Path;
 extern JB_File* JB__App__stdin;
 extern JB_File* JB__App__StdOut;
 extern JB_String* JB__App_Usage;
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[554])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[555])
 extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[555])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[556])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[553])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[556])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[557])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[556])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[557])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[554])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[557])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[558])
 extern u16 JB__API_NilHappened_;
 extern SyntaxObj* JB__Constants__FuncArray[64];
 extern Dictionary* JB__Constants__SyxDict;
@@ -634,11 +634,12 @@ extern CharSet* JB__Constants_XMLWordMiddle;
 #define kJB__PicoNoise_EventsChild ((int)4)
 #define kJB__PicoNoise_EventsParent ((int)8)
 extern JB_File* JB__Platform_Logger_;
+extern JB_String* JB___AppConfString;
 extern JB_String* JB__JbinHeader;
 extern JB_String* JB__jBinNotJbin;
 extern int JB_aaaaaaa;
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[558])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[559])
 extern JB_ErrorReceiver* JB_StdErr;
 #define kJB_SyxAcc ((Syntax)29)
 #define kJB_SyxAdj ((Syntax)27)
@@ -739,10 +740,10 @@ extern JB_String* JB__Tk_Data;
 #define kJB__Tk_kTmpOpp ((int)32784)
 extern FP_fnIDGenerator JB__Tk_Splitter;
 extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[561])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[560])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[562])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[561])
 extern Random JB__zalgo_R;
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[559])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[560])
 #define kJB__byte_max ((byte)255)
 #define kJB__byte_min ((byte)0)
 #define kJB__int16_max ((s16)32767)
@@ -909,7 +910,7 @@ extern Random JB__Rnd_Shared;
 #define kJB__Wrap_kDelete ((int)2)
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[552])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[553])
 extern Float64 JB__Rec_Progress;
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -1008,6 +1009,11 @@ int JB_Platform__Init_();
 void JB_Platform__Log(JB_String* S);
 
 JB_File* JB_Platform__OpenLog();
+
+
+
+// Prefs
+int JB_Prefs__Init_();
 
 
 

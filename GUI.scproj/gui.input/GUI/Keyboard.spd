@@ -184,9 +184,15 @@ dataType Keys (int) {
 				return SDLActivity.Activity
 				
 		helper RemoveKey (|keys| K, |int|)
+			|| m = .count
+			debug_Require m >= 0 and m <= 8
+			require m
+
 			for i in 8
 				if .downkeys[i] == K
-					|| m = --.count
+					if m > 0
+						m--
+						.count = m
 					.DownKeys[i] = .DownKeys[m]
 					.DownDate[i] = .DownDate[m]
 					.DownKeys[m] = 0
