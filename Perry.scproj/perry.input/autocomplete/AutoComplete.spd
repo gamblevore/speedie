@@ -357,7 +357,16 @@ function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |error| err, |string| r
 function OnShowExtraInfo (GUITextShowEvent)
 	opt NoRefCounts
 	.ide.ShowExtraInfo(LeftCorner, msg, err, reason, !WasDelayed)
-	
+
+
+function perryide.ShowImport (|string| name)
+	|| path = name
+	if path[0] != '/'
+		ifn  (path contains "/")  or  (path contains "scproj")
+			path += ".scproj"
+		path = "/usr/local/speedie".child(path)
+	.filelist.OpenQuick(path)
+
 
 function JumpToDefinition (GUIAction)
 	|| rightclick = state == -1
@@ -365,10 +374,14 @@ function JumpToDefinition (GUIAction)
 	require (cmd or rightclick)
 	|| ide = .ide
 	|| msg = ide.EditMe.MessageAtSel
+		|| p = msg.parent
+			
 		if msg in @url
-			msg = msg.parent!
+			msg = p!
 		if msg == @url
 			app.ShowURL(msg.render)
+		  elseif p == @tmp and p ~= "import"
+			ide.ShowImport(msg.name)
 		  elseif msg == @sheb
 			msg.name.Reveal
 		  else
