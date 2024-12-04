@@ -351,10 +351,10 @@ function perryide.DoReplacement (|error| File, |string| r)
 	|| last = 0
 	for curr.fast in file
 		fs.appendRange(t, last, curr.position)
+		last = curr.after
 		curr.position = fs.length
 		curr.rangelength = R.Length
 		fs <~ R
-		last = curr.after
 
 	fs.appendRange(t, last)
 	.editme.InsertSub(fs, (0, int.max))
