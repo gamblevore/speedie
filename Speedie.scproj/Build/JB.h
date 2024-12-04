@@ -1409,7 +1409,6 @@ JBClass ( Task2 , LessThan3 ,
 extern Message* JB__App__Conf;
 extern Array* JB__App__OldArgs;
 extern JB_String* JB__App__Path;
-extern Message* JB__App__Prefs;
 extern JB_File* JB__App__stdin;
 extern JB_File* JB__App__StdOut;
 extern JB_String* JB__App_Usage;
@@ -1627,6 +1626,7 @@ extern JB_File* JB__Platform_Logger_;
 extern Message* SC__PostIncrementNil_Msgs[32];
 extern int SC__PostIncrementNil_Size;
 extern bool SC__PostIncrementNil_Sync;
+extern Message* JB__Prefs_Data;
 extern Dictionary* SC__SCGame3D_Types;
 extern int SC__SC_UniqueNum;
 #define kSC__Refs_kBasisCArray ((int)8)
@@ -2516,17 +2516,7 @@ bool JB_App__No(JB_String* Name);
 
 JB_String* JB_App__OrigPath();
 
-void JB_App__PrefSet(JB_String* S, JB_String* Value);
-
-JB_String* JB_App__GetPref(JB_String* S);
-
-JB_String* JB_App__PrefPath();
-
-Message* JB_App__PrefsInit(Date When);
-
 void JB_PrintStackTrace();
-
-void JB_App__SavePrefs();
 
 ExitCode JB_App__Say(JB_String* S, bool Print);
 
@@ -3138,6 +3128,21 @@ void SC_PostIncrementNil__Clear();
 int SC_PostIncrementNil__Init_();
 
 void SC_PostIncrementNil__SyntaxAppend(Message* Ch);
+
+
+
+// Prefs
+Message* JB_Prefs__Init(Date When);
+
+int JB_Prefs__Init_();
+
+JB_String* JB_Prefs__Path();
+
+void JB_Prefs__Save();
+
+void JB_Prefs__StringSet(JB_String* S, JB_String* Value);
+
+JB_String* JB_Prefs__GetPref(JB_String* S);
 
 
 

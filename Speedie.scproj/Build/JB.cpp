@@ -153,94 +153,12 @@ JB_String* JB_App__OrigPath() {
 	return JB_LUB[0];
 }
 
-void JB_App__PrefSet(JB_String* S, JB_String* Value) {
-	(JB_Msg_SetStr(JB_App__PrefsInit(0), S, Value));
-}
-
-JB_String* JB_App__GetPref(JB_String* S) {
-	Message* _tmPf1 = JB_App__PrefsInit(0);
-	JB_Incr(_tmPf1);
-	Message* _tmPf0 = JB_Msg_GetConf(_tmPf1, S, false);
-	JB_Incr(_tmPf0);
-	JB_String* _tmPf2 = JB_Msg_Value(_tmPf0);
-	JB_Incr(_tmPf2);
-	JB_Decr(_tmPf0);
-	JB_Decr(_tmPf1);
-	JB_SafeDecr(_tmPf2);
-	return _tmPf2;
-}
-
-JB_String* JB_App__PrefPath() {
-	JB_String* Rz = JB_LUB[0];
-	JB_Incr(Rz);
-	JB_SetRef(Rz, JB_App__BuildConfig(JB_LUB[1089]));
-	iif (JB_Str_First(Rz) == '~') {
-		JB_SetRef(Rz, JB_File_PathFix_(Rz));
-	}
-	iif (JB_Str_Equals(Rz, JB_LUB[1090], true)) {
-		JB_SetRef(Rz, JB_LUB[0]);
-	}
-	iif (JB_Str_First(Rz) != '/') {
-		JB_SetRef(Rz, JB_File__Prefs(Rz));
-	}
-	iif (!((JB_Str_First(Rz) == '/') or (JB_Str_First(Rz) == '~'))) {
-		JB_Str_Fail(JB_LUB[1091]);
-	}
-	JB_SafeDecr(Rz);
-	return Rz;
-}
-
-Message* JB_App__PrefsInit(Date When) {
-	iif (JB__App__Prefs) {
-		return JB__App__Prefs;
-	}
-	JB_String* Pref_path = JB_App__PrefPath();
-	JB_Incr(Pref_path);
-	iif (JB_Str_Exists(Pref_path)) {
-		JB_File* _tmPf0 = JB_Str_AsFile(Pref_path);
-		JB_Incr(_tmPf0);
-		JB_SetRef(JB__App__Prefs, JB_File_Conf(_tmPf0, 1048576));
-		JB_Decr(_tmPf0);
-	}
-	JB_Decr(Pref_path);
-	iif (!JB__App__Prefs) {
-		JB_String* _tmPf1 = JB_Str__Error();
-		JB_Incr(_tmPf1);
-		JB_SetRef(JB__App__Prefs, JB_Msg_ConstructorNormal(nil, kJB_SyxArg, _tmPf1));
-		JB_Decr(_tmPf1);
-	}
-	iif (When) {
-		iif (When < 0) {
-			When = JB_Date__Now();
-		}
-		JB_String* _tmPf2 = JB_App__GetPref(JB_LUB[1418]);
-		JB_Incr(_tmPf2);
-		iif (!JB_Str_Exists(_tmPf2)) {
-			JB_String* _tmPf3 = JB_Date_RenderInt(When, nil);
-			JB_Incr(_tmPf3);
-			(JB_App__PrefSet(JB_LUB[1418], _tmPf3));
-			JB_Decr(_tmPf3);
-		}
-		JB_Decr(_tmPf2);
-	}
-	return JB__App__Prefs;
-}
-
 void JB_PrintStackTrace() {
 	//visible;
 	JB_String* _tmPf0 = JB_App__StackTrace(2, nil);
 	JB_Incr(_tmPf0);
 	JB_Print(_tmPf0);
 	JB_Decr(_tmPf0);
-}
-
-void JB_App__SavePrefs() {
-	{
-		Message* _t = JB__App__Prefs;
-		iif (_t) {
-			JB_config_Save(_t);
-		}
-	};
 }
 
 ExitCode JB_App__Say(JB_String* S, bool Print) {
@@ -612,7 +530,7 @@ void SC_Comp__ClearEnvs() {
 }
 
 void SC_Comp__CodeSign(JB_File* Gui_exe) {
-	JB_String* Sign = JB_App__GetPref(kJB_codesign_native);
+	JB_String* Sign = JB_Prefs__GetPref(kJB_codesign_native);
 	JB_Incr(Sign);
 	iif (JB_Str_Exists(Sign)) {
 		SC_File_CodeSign(Gui_exe, Sign);
@@ -2557,8 +2475,8 @@ void SC_Comp__SetConf(Message* Conf) {
 
 void SC_Comp__SetupEnv() {
 	SC_Comp__ClearEnvs();
-	JB_FreeIfDead(JB_App__PrefsInit(-1));
-	SC__Options_Dev = JB_Str_Int(JB_App__GetPref(JB_LUB[1857]));
+	JB_FreeIfDead(JB_Prefs__Init(-1));
+	SC__Options_Dev = JB_Str_Int(JB_Prefs__GetPref(JB_LUB[1857]));
 	iif (!JB_App__IsMainThread()) {
 		(JB_App__SetThreadName(JB_LUB[1858]));
 	}
@@ -3052,7 +2970,7 @@ bool SC_FB__AppOptions_codesign(JB_String* Name, JB_String* Value, FastString* P
 		return nil;
 	}
 	iif ((JB_Str_Equals(Value, JB_LUB[0], true)) or (JB_Str_Equals(Value, JB_LUB[31], true))) {
-		JB_String* _tmPf1 = JB_App__GetPref(kJB_codesign_native);
+		JB_String* _tmPf1 = JB_Prefs__GetPref(kJB_codesign_native);
 		JB_Incr(_tmPf1);
 		JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1860], _tmPf1);
 		JB_Incr(_tmPf0);
@@ -3065,8 +2983,8 @@ bool SC_FB__AppOptions_codesign(JB_String* Name, JB_String* Value, FastString* P
 	iif ((JB_Str_Equals(Value, JB_LUB[1861], false)) or ((JB_Str_Equals(Value, JB_LUB[36], false)) or (JB_Str_Equals(Value, JB_LUB[525], false)))) {
 		JB_SetRef(Value, JB_LUB[0]);
 	}
-	(JB_App__PrefSet(kJB_codesign_native, Value));
-	JB_App__SavePrefs();
+	(JB_Prefs__StringSet(kJB_codesign_native, Value));
+	JB_Prefs__Save();
 	JB_String* _tmPf2 = JB_Str_OperatorPlus(JB_LUB[1862], Value);
 	JB_Incr(_tmPf2);
 	JB_Decr(Value);
@@ -3492,7 +3410,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[219]);
-	JB_FS_AppendInt32(_fsf0, (2024120215));
+	JB_FS_AppendInt32(_fsf0, (2024120417));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -3872,17 +3790,17 @@ void SC_FB__SetFlow() {
 	iif (JB_Str_Exists(_tmPf0)) {
 		JB_String* V = JB_bool_Render0(SC__Options_GenFlowControlCode);
 		JB_Incr(V);
-		JB_String* _tmPf1 = JB_App__GetPref(JB_LUB[1863]);
+		JB_String* _tmPf1 = JB_Prefs__GetPref(JB_LUB[1863]);
 		JB_Incr(_tmPf1);
 		iif (!JB_Str_Equals(_tmPf1, V, false)) {
-			(JB_App__PrefSet(JB_LUB[1863], V));
-			JB_App__SavePrefs();
+			(JB_Prefs__StringSet(JB_LUB[1863], V));
+			JB_Prefs__Save();
 		}
 		JB_Decr(V);
 		JB_Decr(_tmPf1);
 	}
 	 else {
-		JB_String* _tmPf2 = JB_App__GetPref(JB_LUB[1863]);
+		JB_String* _tmPf2 = JB_Prefs__GetPref(JB_LUB[1863]);
 		JB_Incr(_tmPf2);
 		SC__Options_GenFlowControlCode = JB_Str_Yes(_tmPf2, nil);
 		JB_Decr(_tmPf2);
@@ -6125,6 +6043,96 @@ void SC_PostIncrementNil__SyntaxAppend(Message* Ch) {
 	}
 	SC__PostIncrementNil_Msgs[S] = Ch;
 	SC__PostIncrementNil_Size = (S + 1);
+}
+
+
+Message* JB_Prefs__Init(Date When) {
+	iif (JB__Prefs_Data) {
+		return JB__Prefs_Data;
+	}
+	JB_String* P = JB_Prefs__Path();
+	JB_Incr(P);
+	iif (JB_Str_Exists(P)) {
+		JB_File* _tmPf0 = JB_Str_AsFile(P);
+		JB_Incr(_tmPf0);
+		JB_SetRef(JB__Prefs_Data, JB_File_Conf(_tmPf0, 1048576));
+		JB_Decr(_tmPf0);
+	}
+	JB_Decr(P);
+	iif (!JB__Prefs_Data) {
+		JB_String* _tmPf1 = JB_Str__Error();
+		JB_Incr(_tmPf1);
+		JB_SetRef(JB__Prefs_Data, JB_Msg_ConstructorNormal(nil, kJB_SyxArg, _tmPf1));
+		JB_Decr(_tmPf1);
+	}
+	iif (When) {
+		iif (When < 0) {
+			When = JB_Date__Now();
+		}
+		JB_String* _tmPf2 = JB_Prefs__GetPref(JB_LUB[1418]);
+		JB_Incr(_tmPf2);
+		iif (!JB_Str_Exists(_tmPf2)) {
+			JB_String* _tmPf3 = JB_Date_RenderInt(When, nil);
+			JB_Incr(_tmPf3);
+			(JB_Prefs__StringSet(JB_LUB[1418], _tmPf3));
+			JB_Decr(_tmPf3);
+		}
+		JB_Decr(_tmPf2);
+	}
+	return JB__Prefs_Data;
+}
+
+int JB_Prefs__Init_() {
+	{
+	}
+	;
+	return 0;
+}
+
+JB_String* JB_Prefs__Path() {
+	JB_String* Rz = JB_LUB[0];
+	JB_Incr(Rz);
+	JB_SetRef(Rz, JB_App__BuildConfig(JB_LUB[1089]));
+	iif (JB_Str_First(Rz) == '~') {
+		JB_SetRef(Rz, JB_File_PathFix_(Rz));
+	}
+	iif (JB_Str_Equals(Rz, JB_LUB[1090], true)) {
+		JB_SetRef(Rz, JB_LUB[0]);
+	}
+	iif (JB_Str_First(Rz) != '/') {
+		JB_SetRef(Rz, JB_File__Prefs(Rz));
+	}
+	iif (!((JB_Str_First(Rz) == '/') or (JB_Str_First(Rz) == '~'))) {
+		JB_Str_Fail(JB_LUB[1091]);
+	}
+	JB_SafeDecr(Rz);
+	return Rz;
+}
+
+void JB_Prefs__Save() {
+	{
+		Message* _t = JB__Prefs_Data;
+		iif (_t) {
+			JB_config_Save(_t);
+		}
+	};
+}
+
+void JB_Prefs__StringSet(JB_String* S, JB_String* Value) {
+	(JB_Msg_SetStr(JB_Prefs__Init(0), S, Value));
+}
+
+JB_String* JB_Prefs__GetPref(JB_String* S) {
+	Message* _tmPf1 = JB_Prefs__Init(0);
+	JB_Incr(_tmPf1);
+	Message* _tmPf0 = JB_Msg_GetConf(_tmPf1, S, false);
+	JB_Incr(_tmPf0);
+	JB_String* _tmPf2 = JB_Msg_Value(_tmPf0);
+	JB_Incr(_tmPf2);
+	JB_Decr(_tmPf0);
+	JB_Decr(_tmPf1);
+	JB_SafeDecr(_tmPf2);
+	return _tmPf2;
 }
 
 
@@ -8906,7 +8914,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1378]);
-	JB_FS_AppendInt32(_fsf0, (2024120215));
+	JB_FS_AppendInt32(_fsf0, (2024120417));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -28206,9 +28214,9 @@ MWrap* JB_Mrap_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Pt
 		Self = ((MWrap*)JB_NewClass(&MWrapData));
 	}
 	Self->ItemSize = ItemSize;
+	Self->BufferSize = ItemCount;
 	Self->DeathAction = DeathAction;
 	Self->Length = 0;
-	Self->BufferSize = ItemCount;
 	Self->_Ptr = Ptr;
 	return Self;
 }
@@ -31235,7 +31243,7 @@ void SC_Str_Safe(JB_String* Self, FastString* Fs, bool Local) {
 	iif (JB_Str_IsASCII(Self)) {
 		iif (Local and JB_Str_IsLower(Self)) {
 			JB_FS_AppendByte(Fs, JB_byte_UpperCase(JB_Str_First(Self)));
-			JB_FS_AppendSection(Fs, Self, 1, JB_int__Max());
+			JB_FS_AppendRange(Fs, Self, 1, JB_int__Max());
 		}
 		 else {
 			JB_FS_AppendString(Fs, Self);
@@ -58171,4 +58179,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 1131683928768721608 6694774643720778786
+// 212011435502114018 -6056995983814257182
