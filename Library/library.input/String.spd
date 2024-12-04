@@ -414,9 +414,9 @@ class String
 			n = 0
 		|| fs = faststring()
 		fs.size = .length + s.length - n
-		fs.appendsection(self, 0, i)
+		fs.appendRange(self, 0, i)
 		fs <~ s
-		fs.appendsection(self, i+n, int.max)
+		fs.appendRange(self, i+n, int.max)
 		return fs
 
 		

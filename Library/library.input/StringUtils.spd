@@ -215,7 +215,7 @@ helper String.UnTabbifySub (|faststring| fs)
 		fs <~ self
 	  else
 		fs <~ (' ', tabs*4)
-		fs.AppendSection(self, tabs, int.max)
+		fs.appendRange(self, tabs, int.max)
 
 
 helper String.TabsToSpacesSub (|faststring| fs)
@@ -238,7 +238,7 @@ helper String.TabbifySub (|faststring| fs)
 	  else
 		sp = Sp.AlignDown(4)
 		fs <~ ('\t', Sp>>2)
-		fs.AppendSection(self, sp, int.max)
+		fs.appendRange(self, sp, int.max)
 	
 
 

@@ -354,28 +354,28 @@ class FileViewer (ListView)
 			return true
 	
 	
-	helper BatchFindSub (|string| str, |error| all, |uint| id, |bool| Repl)
+	helper BatchFindSub (|string| str, |error| all, |uint| id, |bool| DoReplace)
 		opt norefcounts
 		|| Remain = 10K
 		for f in self
 			if (f isa filerow)
 				if .CanFind(f, id)
-					f.FindInFile(str, all, remain, repl)
+					f.FindInFile(str, all, remain, DoReplace)
 
 
 	function BatchFind (|string| str,  |message|)
 		cpp_part BatchFindWrap
-		return .BatchFind(str, 0, false)
+		return .BatchFindReplace(str, 0, false)
 		
 
-	function BatchFind (|string| str, |uint| findid, |bool| ForReplace,   |message|)
+	function BatchFindReplace (|string| str,  |uint| FindID, |bool| ForReplace,  |message|)
 		|| All = error()
 		if !str
 			return all
-		.BatchFindSub(str, all, findid, forreplace)
-		all.ExtractRecent(rz)			// Split into recent and not recent
-		rz.sort(ErrorSearchSorter)		// recent
-		all.sort(ErrorSearchSorter)		// not recent
+		.BatchFindSub(str, all, findid, ForReplace)
+		all.ExtractRecent(rz)				// Split into recent and not recent
+		rz.sort(ErrorSearchSorter)			// recent
+		all.sort(ErrorSearchSorter)			// not recent
 		for s in all
 			rz <~ s
 

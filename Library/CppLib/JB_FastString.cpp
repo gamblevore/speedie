@@ -165,9 +165,14 @@ void JB_FS_AppendLine( FastString* self, JB_String* u ) {
 }
 
 
-void JB_FS_AppendSection(FastString* self, JB_String* Data, int srStart, int srLength) {
-	if ( Data and SectFix_( srStart, srLength, Data->Length ) ) {
-        JB_FS_AppendMem_(self, Data->Addr + srStart, srLength );
+void JB_FS_AppendRange(FastString* self, JB_String* Data, int Start, int After) {
+	if ( Data) {
+		if (Start < 0)
+			Start = 0;
+		if (After > Data->Length)
+			After = Data->Length;
+		if (After > Start)
+			JB_FS_AppendMem_(self, Data->Addr + Start, After - Start );
 	}
 }
 

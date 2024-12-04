@@ -836,14 +836,14 @@ JB_String* JB_File_PathFix_(JB_String* P) {
     if (s[0] == '~') {
 		auto H = JB_File__Home();
 		JB_FS_AppendString(fs, H);
-		JB_FS_AppendSection(fs, P, 1, kMaxint);
+		JB_FS_AppendRange(fs, P, 1, kMaxint);
 	} else {
 		const char* Created = getcwd( 0, 0 );
 		JB_FS_AppendCString(fs, Created);
 		if (JB_FS_Last(fs, 0) != '/')
 			JB_FS_AppendByte(fs, '/');
 		if (s[0] == '.' and P->Length >= 2  and  s[1] == '/') {
-			JB_FS_AppendSection(fs, P, 2, kMaxint);
+			JB_FS_AppendRange(fs, P, 2, kMaxint);
 		} else {
 			JB_FS_AppendString(fs, P);
 		}

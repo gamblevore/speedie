@@ -150,25 +150,6 @@ inline MiniStr Mini2(const char* S) {
 // seems... we could try to re-link the parent memorylayer into the main memorylayer for String, and go through all the AllocationBlocks and set them to use the main memorylayer...
 
 
-inline bool SectFix_( int& srOffset, int& srLength, int CurrLen ) {
-    if (srOffset < 0) {
-        srLength += srOffset;
-        srOffset = 0;
-    }
-/*
-     * We want to make sure that we fix bad ranges.
-     * We want to allow huge ranges, like String.kEnd (largest possible number)
-     * We don't need it to be ints or uints specifically.
-     * As few operations as possible!
-*/
-    u32 Final = (u32)srLength + (u32)srOffset;
-    if (Final > (u32)CurrLen) {
-        srLength = CurrLen - srOffset;
-    }
-	return (srLength >= 1);
-}
-
-
 inline MiniStr ReadAddrs_( JB_String* self, int StartOff, int AfterOff ) {
     int SelfAfter = self->Length;
     if (StartOff < 0) {

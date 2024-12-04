@@ -1548,7 +1548,7 @@ function string.Safe (|faststring| fs, |bool| Local=false)
 	if .isascii
 		if local and .islower
 			fs <~ self[].uppercase
-			fs.appendsection(self, 1)
+			fs.appendRange(self, 1)
 		  else 
 			fs <~ self
 		return

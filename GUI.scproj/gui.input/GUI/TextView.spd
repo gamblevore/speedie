@@ -5,22 +5,25 @@ class TextView (GUIControl)
 	linkage
 		cpp_part Text
 	|byte|						SingleLine
-	|bool|						PreferStayAtEnd
+
 	|bool| 						ShowLineNumbers
 	|bool|						CanSeeAllLines
 	|bool|						GroupSaveAll
-	|bool| 						FastAppend
-	|bool|						CanAutoComplete
-	|byte|						CodeInsertionState
+//	|bool| 						FastAppend
+	|bool|						PreferStayAtEnd
 	|byte|						SetsDebugLines
 	|byte|						LineNumWidth
 	|byte|						LineHeight
 	|byte|						ExpectsParse
 	|MoveCode|					Alignment // centered, left, right
-	|uint16|					LastDrawWidth
 	|int|						ClickedPos
+
+	|bool|						CanAutoComplete
 	|int|						AutoCompleteBack
 	|string|					AutoCompleteString
+	
+	|byte|						_CodeInsertionState
+	|uint16|					_LastDrawWidth
 	|byte|						_ClicksDown
 	|bool|						_PreferPrevLine
 	|TextViewLine|				_Start
@@ -28,6 +31,7 @@ class TextView (GUIControl)
 	|ivec3|						_Reclaim		
 	|IntRange|					_TypingPlace
 	|IntRange|					_UncorrectedSel
+	
 	|GUIParticleEffect?|		LineEffect
 	|GUIKeyEvent?|				OnKeyDown
 	|GUITextEvent?|				OnTextChanged
@@ -834,8 +838,8 @@ class TextView (GUIControl)
 	
 	 
 	helper InsertAutoComplete (|bool|)
-		|| c2 = .AutoCompleteString
-		require .CanAutoComplete and c2
+		require .CanAutoComplete
+		|| c2 = .AutoCompleteString			#require
 		|| trim = c2.InsertTrim
 		|| autostart = c2[0, trim.x]
 		|| ins = .sel0
@@ -1817,8 +1821,8 @@ class TextView (GUIControl)
 
 	helper NeedsPrepare (|int|)
 		|| CW	= .MaxWidthInChars
-		|| ldw	= .LastDrawWidth
-		.LastDrawWidth = CW
+		|| ldw	= ._LastDrawWidth
+		._LastDrawWidth = CW
 		if (!._lines.hasany) or (.TextAlteredForDraw & 2)
 			return 2
 		if (CW != ldw)
@@ -1939,7 +1943,7 @@ class TextView (GUIControl)
 		|| StayAtEnd  = .EndGap
 		.LineNumWidth = (.text.TextLineCount.LineNumWidth, 0)(.ShowLineNumbers or Expect >= 3)
 		
-		|int| CharW	= .LastDrawWidth - .LineNumWidth
+		|int| CharW	= ._LastDrawWidth - .LineNumWidth
 		if .SingleLine
 			charw = 4KB
 	

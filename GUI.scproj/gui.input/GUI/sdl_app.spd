@@ -1049,7 +1049,7 @@ module GUI
 		#!keydown!
 		|| kev = ev.keysym
 		|| key = kev.sym
-		if key.IsCancelled or .CanDrag >= mousedragging.Within
+		if key.IsEaten or .CanDrag >= mousedragging.Within
 			return SDLActivity.nothing
 		if (key is w) and (keys.cmd) // checking for keys.cmd doesnt always work!!
 			return 0

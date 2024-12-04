@@ -26,12 +26,13 @@ class PerryIDE (Window)
 	|TextView|					SpeedieText
 	|TextView|					JeeboxText
 	|TextView|					MassSearchField
+	|TextView|					MassReplaceField
 	|TextView|					EditMe
 	|GraphicsEditor| 			DrawMe
 	|TextView|					EditStatus
 	|TextView|					ProjectInfo
 	|TextView|					SelInfo
-	|TextView|					NoNeeder
+	|TextView|					UnNeededLabel
 	|TextView|					PopupDisplay
 	|message?|					LastExtraInfo
 	|StretchControl|			ProductSep
@@ -390,7 +391,8 @@ class PerryIDE (Window)
 		
 		if (hideside == visside)
 			.filelist.declutter = hideside
-			if HideSide and .filelist.HasFocus
+			|| f = .Focus
+			if HideSide and (!f or f.declutterer.final)
 				.editme.SetFocus
 			if .viewing == .viewfiles
 				.noneed
@@ -594,6 +596,7 @@ class PerryIDE (Window)
 		.ShowText(s, nil, true)
 		return true
 
+
 	function ShowQuickStuff (|bool| FuncMenu, |bool|)
 		if FuncMenu
 			if (.FunctionMenu.MenuIsOpen)
@@ -602,7 +605,6 @@ class PerryIDE (Window)
 			if (.filelist.QuickOpen is visible)
 				FuncMenu = true
 		if FuncMenu
-			// some double -L bug here
 			.FileList.quickopen isnt visible
 			if .FunctionMenu.SearchMenu
 				return true

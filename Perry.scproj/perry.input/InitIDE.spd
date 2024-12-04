@@ -26,6 +26,7 @@ extend PerryIDE
 		.CurrFileName		= ButtonView(.RBorder,	OpenProjectPath, nil,	ReturnProjectPath) 
 		.FunctionMenu		= ButtonView(.RBorder,	MenuAllFuncs,	 nil,	ReturnAllFuncs) 
 		.MassSearchField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
+		.MassReplaceField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
 		.SubFindCheckBox	= ButtonView(.searcharea, PressedSearchWithin   	)
 		.FoundList			= ListView(.SearchArea,	ClickedError,			ReturnErrorList) 
 		.ErrorList			= ListView(self,		ClickedError,			ReturnErrorList) 
@@ -41,7 +42,7 @@ extend PerryIDE
 		.ProductOut			= TextView(self)
 		.ProductErrors		= TextView(self)
 		.CompileTabs		= ButtonView(.StdOutBorder,		ClickedCompileTabs) 
-		.NoNeeder			= TextView(self,		ClickedNoNeed)
+		.UnNeededLabel		= TextView(self,		ClickedNoNeed)
 		.AutoComplete		= menu(self, 			nil,					AutoCompleteInsertText)
 		.ViewFiles			= ButtonView(.ViewButtons,		ClickedAView)
 		.ViewSearch			= ButtonView(.ViewButtons,		ClickedAView)
@@ -203,7 +204,7 @@ extend PerryIDE
 		.ErrorLogInit(.Errorlist, "ErrorList" )
 		.ErrorLogInit(.CommsLogList,   "LogArea" )
 
-		with .NoNeeder 
+		with .UnNeededLabel 
 			.takesfocus 	= 0
 			.ID				= "NoNeed"
 			.size 			= 5~inside  by  17~up to 55~down
@@ -245,6 +246,20 @@ extend PerryIDE
 			.size 			= 3~inside  by  2~down back 15
 			.takesfocus		= takesfocusflag.On
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
+			.autocompletestring = "Find..."
+
+
+		with .MassReplaceField
+			is   editable
+			is   visible
+			isnt drawsfocus
+			.tooltip		= self.SearchArea.Tooltip			
+			.SingleLine		= TextView.SingleLine
+			.ID				= "mass"
+			.size 			= 3~inside  by  2~under back 15
+			.takesfocus		= takesfocusflag.On
+			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
+			.autocompletestring = "Replace..."
 
 
 		with .SubFindCheckBox
@@ -345,7 +360,7 @@ extend PerryIDE
 			.addlow  self.debugger
 			.addlow  self.SearchArea
 			.addlow  self.FileList
-			.addlow  self.Noneeder
+			.addlow  self.UnNeededLabel
 		
 		with .filesep.div
 			.onhide = FileSepClicker

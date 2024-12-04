@@ -1285,7 +1285,7 @@ JB_String* JB_Str_ReplaceAll(JB_String* self, JB_String* Old, JB_String* New, bo
     int prev = 0;
     int curr = JB_Str_InStr(self, Old, 0, kJB__int_max, Lex);
     while (curr >= 0) {
-        JB_FS_AppendSection(fs, self, prev, curr-prev);
+        JB_FS_AppendRange(fs, self, prev, curr);
         JB_FS_AppendString(fs, New);
         curr = (curr + JB_Str_Length(Old));
         prev = curr;
@@ -1294,7 +1294,7 @@ JB_String* JB_Str_ReplaceAll(JB_String* self, JB_String* Old, JB_String* New, bo
     if (!fs->Length and !fs_in) {
         return self;
     }
-    JB_FS_AppendSection(fs, self, prev, kJB__int_max);
+    JB_FS_AppendRange(fs, self, prev, kJB__int_max);
     return JB_FS_SmartResult(fs, fs_in);
 }
 

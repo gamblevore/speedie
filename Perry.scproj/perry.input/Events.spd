@@ -282,7 +282,7 @@ function PerryIDE.ShowText (|textview| field, |string?| Text, |bool| Always, |bo
 
 
 function perryIDE.UpdateJeeboxField (|bool|)
-	|| e = .editme
+	|| e = .EditMe
 	|| sr = e.SelRange
 	|| txt = e.SelText
 	if !sr.width
@@ -294,14 +294,13 @@ function perryIDE.UpdateJeeboxField (|bool|)
 		str = msg.RenderAST(0)
 	  else
 		str = Err!.render
-	// OK... so... what about resel from drag?
-	.ShowText(.JeeboxText, str, true)
+	.ShowText(.JeeboxText, str, true)	// OK... so... what about resel from drag?
 	
 	return true
 
 
-function PerryIDE.BatchPhind (|string| text, |uint| ID, |bool|)
-	|| found = .filelist.BatchFind(text, ID, false)
+function PerryIDE.BatchPhind (|string| text,  |uint| ID,  |bool| DoReplace,  |bool|)
+	|| found = .filelist.BatchFindReplace(text, ID, DoReplace)
 	.foundlist.use(found)
 	.foundlist.setfocus
 	return found.hasany
@@ -315,6 +314,7 @@ function PressedSelInfo (GUIaction)
 	i.filelist.showquickopen
 
 
+
 function PressedSearchWithin (Guiaction)
 	|| i = .ide
 	|| f = i.FileList
@@ -324,32 +324,77 @@ function PressedSearchWithin (Guiaction)
 		f.SearchWithin = f.FindSearchWithin
 	i.ReTextSubFind
 
+
+
+function perryide.MassSearch (|bool|)
+	opt norefcounts
+	|| t = .MassSearchField.Text
+	.ViewAsProject
+	|| ID = (perry.findID+1)&255
+	ID = ID max 1
+	perry.FindID = ID
 	
+	.BatchPhind(t, ID, true)
+	
+	if t and .FoundList.isempty
+		.NoNeed("The search text “${t}” wasn't found", nil)
+		perry.FindElseWhere(self, t, ID)
+	  else
+		.noneed
+	return true
+
+			
+	
+function perryide.DoReplacement (|error| File, |string| r)
+	|| fs = faststring()
+	|| t = .EditMe.Text
+	|| last = 0
+	for curr.fast in file
+		fs.appendRange(t, last, curr.position)
+		curr.position = fs.length
+		curr.rangelength = R.Length
+		fs <~ R
+		last = curr.after
+
+	fs.appendRange(t, last)
+	.editme.InsertSub(fs, (0, int.max))
+	
+
+
+function perryide.DoReplacements (|bool|)
+	opt norefcounts
+	if .FoundList.isempty
+		.MassSearch
+	|| r = .massreplacefield.text
+	|| f = .FoundList.ListSource.first
+	while  f
+		|| fr = f.obj as FileRow
+		if f.hasany and .EditFile(fr) and f isa error
+			.DoReplacement(f, r)
+		f++
+	return true
+	
+
 function PressedSearchKeys (GUIKeyEvent)
 	opt norefcounts
 	|| w = .ide
-	|| t = self as textview #require
 	
 	if key.isaccept
-		w.ViewAsProject
-		|| ID = ((perry.findID+1)&255) max 1
-		perry.findID = ID
-		w.BatchPhind(t.text, ID)
-		if w.foundlist.isempty and t.text
-			w.noneed("The search text “${t.text}” wasn't found", nil)
-			perry.FindElseWhere(w, t.text, ID)
-		  else
-			w.noneed
-		return true
+		if self == w.MassReplaceField
+			return w.DoReplacements
+		return w.MassSearch
+		
+	|| t = w.MassSearchField
 	if (key is down) and (t.selrange == t.text.length)
 		w.FoundList.setfocus
 		return true
-	require key.iscancel
-	if t.text
-		t.text = ""
-	  else
-		w.view(W.viewfiles)
-	return true
+	
+	if key.IsCancel
+		if t.text
+			t.text = ""
+		  else
+			w.view(W.viewfiles)
+		return true
 
 
 function EditMeSelChange (GUITextEvent)
@@ -357,7 +402,7 @@ function EditMeSelChange (GUITextEvent)
 	|| i = .ide
 	if i.ProductSep.IsOpen and i.jeeboxtext is visible
 		i.UpdateJeeboxField
-	i.popuphide
+	i.PopupHide
 	i.ShowRightStats
 	i.ShowLeftStats
 	i.EditMeTabRetryThing = 0
@@ -498,7 +543,7 @@ function SelectedFile (GuiListevent)
 
 function perry.FindElseWhere (|perryide| ignore, |string| find, |byte| FindID)
 	for w in perry.OpenProj
-		if (w != ignore) and w.BatchPhind(find, FindID)
+		if (w != ignore) and w.BatchPhind(find, FindID, false)
 			if "\"$find\" not found here, but was found in '${w.name}'.\n\nTake a look?".confirm
 				w.showide
 				w.ShowFind

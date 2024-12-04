@@ -240,22 +240,24 @@ class FileRow (ListViewRow)
 		(rz|listviewrow| is expanded)
 		rz.name = ("\11 ", "\19 ")(!.asdir) + .location.name
 		rz.path = .location
+		rz.obj = self
 		rz.position = -1
 		rz.when = ._document.viewdate?
 		found <~ rz
 
 
-	function FindInFile (|string| pattern,  |error| found,  |&int| Remain,  |bool| ForReplace)
-		require pattern
+	function FindInFile (|string| text,  |error| found,  |&int| Remain,  |bool| DoRepl)
+		require text
 		|| t		= .visibletext
 		require t and !t.IsBinary
 		
-		|error| parent
+		|error| parent // this is never returned? why is it made?
 		|| Lim		= Remain[]
 		|| i		= 0
 		|| LastBefore = -1
+		
 		while (i < t.length) and (lim > 0)
-			|| R	= t.StretchyFind(pattern, i)
+			|| R	= t.StretchyFind(text, i)
 			|| p = r.x
 			if p < 0
 				exit
@@ -263,31 +265,27 @@ class FileRow (ListViewRow)
 			|| after  = t.find(Jeebox.CSLine, i, i+30)   ??  (i+30)
 			|| before = t.find(Jeebox.CSLine, p, p-30 max 0)   ??  (p-10)
 			|| s = t[before, after]
-			if ForReplace or (lastbefore != before)
+			if DoRepl or (lastbefore != before)
 				LastBefore = before
 				
-				if !pattern[0].iswhite
+				if !text[0].iswhite
 					s = s.trim.remove(jeebox.csline)
-				|| err	= error(nil, ErrorSeverity.OK)
+				|| result = error(nil, ErrorSeverity.OK)
 				parent ?= .FindAllParent(found)
-				parent <~ err
+				parent <~ result
 				
 				lim--
-				err.position = p
-				err.path = .location
-				err.name = s
+				
+				result.range = R
+				result.obj = self
+				result.path = .location
+				result.name = s
 		Remain[] = lim
 
 
 	syntax append (|filerow| r)
 		super.syntaxappend(r)
 		r.inmainproj = .InMainProj
-
-//	syntax access (|string| name, |filerow|)
-//		opt norefcounts
-//		for r in self
-//			if r.location.name ~= name
-//				return r
 
 
 	helper Match (|string| path, |bool| NameOnly, |int|)

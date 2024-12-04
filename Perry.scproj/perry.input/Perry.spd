@@ -245,7 +245,7 @@ function SwitchedToErrors
 
 
 function NoNeed (|string| s = "", |buttonview| old = nil)
-	|| n = .noneeder
+	|| n = .UnNeededLabel
 	n.text = s
 	|bool| Vis = s
 	(n is visible) = vis 
@@ -322,7 +322,7 @@ function ViewAsVis (|bool| AsProject)
 	(.ViewButtons is visible) = AsProject
 	(.filesep.div is visible) = AsProject
 		
-	(.noneeder is visible)  = .noneeder.text and AsProject and (.FileList isnt visible)
+	(.UnNeededLabel is visible)  = .UnNeededLabel.text and AsProject and (.FileList isnt visible)
 	(.searcharea is visible)		= AsProject and (.searcharea is visible) 
 
 	if AsProject
