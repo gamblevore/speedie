@@ -382,14 +382,13 @@ Struct FatRange
 				(s isnt CondAnswer)
 				s.jumpto = curr
 
-
 function @asmstate.PrintProgress (|message| exp)
 	target debug {
 	cpp_name adb
 	opt norefcounts
 	"---"
-	printline .fn
 	|| s = ASMState.sh
+	printline s.fn
 	if exp
 		printline exp
 	  else

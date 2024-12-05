@@ -201,15 +201,6 @@ class FileRow (ListViewRow)
 		return n
 
 
-	function Save (|int| Purpose=documentstate.saving, |bool|)
-		opt norefcounts
-//		.Sanity
-		|| d = ._Document
-			|| tsize = D.save(purpose)
-				.lastsize = tsize
-		return true
-
-
 	function IsModified (|bool|)
 //		.Sanity
 		return ._Document$.ismodified

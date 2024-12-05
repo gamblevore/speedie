@@ -29,7 +29,7 @@ function DebugArgsGotFocus (guiaction)
 function textview.InitDebugArgs
 	if !.Document
 		|| f = .ide.DebugArgsFile
-		.LoadDocument(Document(f))
+		.LoadDocument(Document(f), true)
 	.text ?= templates.DebugArgs
 		
 

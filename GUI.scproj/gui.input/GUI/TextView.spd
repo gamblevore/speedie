@@ -1774,8 +1774,9 @@ class TextView (GUIControl)
 	
 	helper ReallySetStart (|textviewline!| d)
 		opt norefcounts
-		._Start = d
-		.ShowExtraInfo(GUI.mousexy, false)
+		if ._Start != d
+			._Start = d
+			.ShowExtraInfo(GUI.mousexy, false)
 		if d.position >= 0
 			|| doc = .document
 				doc.scrollpos = d.position
@@ -2022,7 +2023,7 @@ class TextView (GUIControl)
 		.MyError = nil
 
 
-	function LoadDocument (|document| D, |bool|)
+	function LoadDocument (|document| D, |bool| Show, |bool|)
 		debug_require d
 		|| old = .document
 			require .GroupSaveAll or old.DocClose
@@ -2031,8 +2032,9 @@ class TextView (GUIControl)
 		if d.load
 			.document = d
 			.MyError = nil
-			|| s = d.sel
-			.ShowAndSel(s.x, s.width)
+			if show
+				|| s = d.sel
+				.ShowAndSel(s.x, s.width)
 			return true
 		
 		.Clear("")

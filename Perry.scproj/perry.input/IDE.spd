@@ -200,6 +200,7 @@ class PerryIDE (Window)
 	function InfoStatus (|string|)
 		|| fs = .stats init FastString()
 		|| i = .MyStatsMode
+		|| d = .editme.Document
 		if i == 0
 			fs <~ "  --" // :)
 		
@@ -225,7 +226,7 @@ class PerryIDE (Window)
 				fs <~ "   CP "
 				fs <~ t.Codepoint(false	)
 			
-			|| d = e.Document
+			if d
 				if d.WasJbin
 					fs <~ ".jbn"
 				if d.WasCompressed
@@ -255,6 +256,9 @@ class PerryIDE (Window)
 			fs <~ "   Str ${app.stringmemory.strsize}"
 			fs <~ "   Img ${(app.OtherMemory+img).strsize}"
 			fs <~ "   Sck ${PS.OpenSockets}/${PS.OpenPicos}"
+		
+		if d and d.ShouldntSave
+			fs <~ "  Invalid Jeebox!"
 		return fs
 
 
@@ -855,7 +859,7 @@ So anything not 0 means "its OK"`
 		  else
 			doc.ExpectJeebox = TextView.AllowJeebox
 
-		|| Loaded = E.LoadDocument(doc)					#require
+		|| Loaded = E.LoadDocument(doc, true)					#require
 		|| m = .FunctionMenu.SubControl as menu
 			m.StopFilter
 		doc.CompareTreesOnSave = doc.ExpectJeebox

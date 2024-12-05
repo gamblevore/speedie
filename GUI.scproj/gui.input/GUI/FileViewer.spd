@@ -195,27 +195,34 @@ class FileViewer (ListView)
 	function SaveAll (|int| Purpose, |bool|)
 		cpp_part SaveAllArr
 		rz = true		
-		|| Decision = 0
 		|| m = .Modified // what if like 100 are invalid? THEN? ask for all?
 		for f in m
-			if .CanSave(purpose, f, Decision)
-				if !f.Save(purpose)
-					rz = false
+			if !.Save(f, purpose)
+				rz = false
 
 
-	helper CanSave (|int| Purpose, |filerow| f, |&int| Decision,   |bool|)
+	function Save (|filerow| f, |int| Purpose=documentstate.saving, |bool|)
+		opt norefcounts
+		require .CanSave(purpose, f)
+		
+		|| d = f._Document
+			|| tSize = D.save(purpose)
+				f.lastsize = tsize
+		return true
+
+
+	helper CanSave (|int| Purpose, |filerow| f,   |bool|)
 		|| d = f._Document		#require
 		if !d.ShouldntSave
 			return true
-		.editme.LoadDocument(d)
+
+		// some kinda error. We'll save anyhow. but alert them.
+		.editme.LoadDocument(d, false)
 		d.ShowParseErrorInViewers
 		if Purpose == DocumentState.ErrorChecking
 			return false 
 		if (purpose == DocumentState.Saving)
-			if !Decision[]
-				|| q = "Save invalid jeebox for document?\n" + f.location
-				decision[] = q.confirm.dir
-			return Decision[] > 0
+			Notifications <~ "Invalid jeebox saved to: " + f.location
 		return true
 
 

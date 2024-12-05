@@ -514,7 +514,7 @@ struct ASMState
 		.ReturnDest = dest.reg
 	
 		|| OK = .TryInlineSub(prms, dest, fn)
-	
+		if 0: "nothing"
 		
 		.ReturnDest = Olddest
 		.fn = oldFunc
@@ -565,7 +565,7 @@ struct ASMState
 		|| A = fn.ASM
 		require A and !fn.HasCVersion
 		|| Gain = 5	- (A.Length-1)				// assume that functions have 5 instruction overhead.
-		Gain += (fn is inline) * 20				// sigh...
+		Gain += (fn is inline) * 24				// sigh...
 		
 		|| Grace = 8
 		for p.fast in prms
