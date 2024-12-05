@@ -360,6 +360,21 @@ datatype float
 	
 	render
 		return .Render(6, fs_in)
+
+	Render RenderDuration (|bool| ms = false)
+		// perhaps just cast this to an ACTUAL duration
+		// AND THEN DO THE CAST!?
+		if self < 0
+			self = .abs
+			fs <~ '-'
+		|| s = self mod 60.0
+		|| m = (.floor - s) / 60.0
+		if m > 0
+			fs <~ (m+0.5)|int|
+			fs <~ 'm'
+			fs <~ ' '
+		fs.AppendFloat(s, 1+2*ms, false, ms)
+		fs <~ 's'
 	
 	render (|int| dp)
 		cpp_part RenderDP
