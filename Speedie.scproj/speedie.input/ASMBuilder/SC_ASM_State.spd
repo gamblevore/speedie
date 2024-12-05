@@ -9,19 +9,20 @@ struct ASMState
 	|datatypecode|				ReturnASM
 	|bool|						OK    
 	|bool|						Inited
-	|bool|						InlineStillOK
-	|asmreg|					InlineReturnTo
+	|byte|						ReturnDest
 
 	target debug
 		|&fatasm|				LastProgress
 	|µFunc|						Out      
 	|&FatASM|					FuncStart
 	|&FatASM|					Start		// a "slice" feature would be nice    
+	|scfunction!|				Fn    
+	|scdecl--[32]|				Vars
 	|&FatASM|					Curr    
 	|&FatASM|					End    
 // constants...
 	|FATASM| 					Zero
-	|int[32]|					NeverAltered
+//	|int[32]|					NeverAltered // use .vars instead?
 
 	constants
 		kContinue = 254
@@ -41,13 +42,18 @@ struct ASMState
 		|| top = .vdecls
 		|| d = v.high
 		while top > d
-			.NeverAltered[top--] = 0
+			// remove NeverAltered and use .vars?
+//			.NeverAltered[top] = 0
+			.Vars[top] = nil
+			top--
+			
 		.VDecls = d
 		.VTmps = v.low
 			
 	function AddFuncParams (|SCFunction| fn)
 		opt norefcounts
 		for a in fn.Args
+			(a is param) // reset
 			.DeclareMe(a.source, a)
 
 	function Last (|&FatASM|)
@@ -125,11 +131,18 @@ struct ASMState
 
 
 	function DeclareMe (|Message| where,  |scdecl| Type,  |asmreg|)
+		|| t = Type.CalculateASMType
+		// if we have a var, that we are returning, and we are an inline.
+		if .ReturnDest and (type is ReturnedVar) and (.fn.ReturnedVars == 1)
+			t.reg = .ReturnDest
+			Type.wholetype = t|DataTypeCode|
+			return t
+		
 		|| d = .VDecls|int| + 1
+		t.reg = d
+		Type.wholetype = t|DataTypeCode|
 		if (d < .vtmps)
-			|| t = Type.CalculateASMType
-			t.reg = d
-			Type.wholetype = t|DataTypeCode|   		// right?
+			.Vars[d] = Type
 			.vdecls = d
 			target debug: Type.ASMSanity
 			return t
@@ -351,12 +364,13 @@ struct ASMState
 			p++
 
 
-	function CallFunc (|message| exp, |asmreg| dest, |asmreg|)
+	function CallFunc (|message| exp, |asmreg| dest, |scfunction| fn,  |asmreg|)
 		|| v = .VDecls
 		v += (dest.reg < v) // NOICE
 		.vdecls = v
 		check (v < 32) (exp, "Too many registers in use. No space for result.")
 		dest.reg = v
+		dest.µtype = fn.RegType
 		return Dest.Simplify
 
 
@@ -380,21 +394,23 @@ struct ASMState
 			return true
 
 
-	function StartFunc (|scfunction| fn)
+	function InitAndStartFunc (|scfunction| fn)
 		if fn.ASM
 			.out = fn.asm!
 		  else
 			.out = µfunc(fn, .curr)
 		.zero = nil
 		.zero.info = AsmReg()
-		memory.Fill((&.neveraltered[0])|&byte|, –sizeof .neveraltered, 0)
-		.neveraltered[0] = .zero.Index
+		memory.Fill((&.vars[0])|&byte|, –sizeof .vars, 0)
+//		.vars[0] = .zero.Index
 		.FuncStart = .curr
 		target debug
 			.LastProgress = .curr
+		.fn = fn
 		scfunction.currfunc = fn
 		.ReturnASM = fn.ReturnType.regtype
 		.OK = true
+		.ReturnDest = nil
 		.BasicBlock = 0
 		.VDecls = 0
 		.VTmps = 32
@@ -406,9 +422,8 @@ struct ASMState
 		if .zero.Const // what?
 		|| l = .last
 		if !l.IsFinisher
-			|| fn = scfunction.currfunc!
-			expect (!fn.returntype) ("ASMReturn".internal) // why?
-			fn.SourceArg!.RET(asmreg(), asmreg(), asmreg(), 1, 0)
+			expect (!.fn.returntype) ("ASMReturn".internal) // why?
+			.fn.SourceArg!.RET(asmreg(), asmreg(), asmreg(), 1, 0)
 		.SetLength
 		.ImproveJumps
 
@@ -462,7 +477,110 @@ struct ASMState
 				return where
 			// now what?
 			Where--
+
+
+/* The .asint/.asfloat functions should be recognised as working on constants? Or is that just a general case of inline functions? Technically, its an inline func that does nothing, just returns the original... with a different type. */
+
+
+	function IsASMConst (|message| exp, |bool|)
+		|| fn = exp.func
+		if fn == @num
+			return true
+		if fn == @thg // now what?
+			return ASMType.ThgSub(self, exp, ASMReg.ConstRequest)
+	
+	
+	function CanReuseInput (|message| Prms, |asmreg| Dest, |int| vr,  |bool|)
+		opt norefcounts
+	
+		require (dest.reg == vr)
+		for p.fast in prms
+			// check for the address of the same var?
+			if .ExistingVar(p).reg == vr
+				require !rz
+				rz = true
+	
+	
+	function TryInline (|message| prms, |asmreg| dest, |µFunc| asm, |bool|)
+		opt norefcounts
+		|| fn = asm.fn
+		require !fn.CurrentlyInlining	
+		fn.CurrentlyInlining = true
+	
+		|| oldFunc = .fn
+		|| OldDest = .ReturnDest
+	
+		.fn = fn
+		.ReturnDest = dest.reg
+	
+		|| OK = .TryInlineSub(prms, dest, fn)
+	
 		
+		.ReturnDest = Olddest
+		.fn = oldFunc
+		fn.CurrentlyInlining=false
+		return OK
+	
+		
+	function TryInlineSub (|message| prms, |asmreg| dest, |scfunction| fn, |bool|)
+		opt norefcounts
+		|| p = prms.first
+		for a in fn.Args
+			|| v = .ExistingVar(p!) 
+				|| vr = v.reg
+				if (a isnt Altered) or .CanReuseInput(prms, dest, vr)
+					|| T = a.WholeType.reg(vr)
+					a.DataType = t|datatypecode|
+					(a is param) = (v is param)
+					continue 
+			
+			v = .DeclareMe(a.source, a)
+			.µInto(p!, v)
+			p++
+		
+		ASMType.arg(self, fn.SourceArg!, ASMReg())
+		return true
+	
+	
+	/*
+		V = lll(V)
+		function LLL (|int| Y, |int|)
+			if Y&1
+				Y++
+			return Y				// already handled. Passed Y via .onlypassedonce as E.
+		
+		function LLL (|int| Y, |int|)
+			return Y*2				// return can handle this.
+	
+		|| V = lll(E)
+		function LLL (|int| Y, |int|)
+			|| X = 9 + Y			// .declareme() uses V
+			return X
+	*/
+	
+	
+	
+	function AskForInline (|message| prms, |asmreg| dest, |SCFunction| fn, |bool|)
+		opt norefcounts
+		|| A = fn.ASM
+		require A and !fn.HasCVersion
+		|| Gain = 5	- (A.Length-1)				// assume that functions have 5 instruction overhead.
+		Gain += (fn is inline) * 20				// sigh...
+		
+		|| Grace = 8
+		for p.fast in prms
+			Grace += .IsASMConst(p)<<2
+	
+		require Gain + Grace > 0
+	
+		|| Start = .curr
+		if .TryInline(prms, dest, A)
+			|| Grown = .curr - start
+			if Grown < gain
+				return true
+		.curr = start
+	
+			
 
 	
 function SCFunction.HasCVersion (|bool|)
@@ -487,81 +605,16 @@ function SCFunction.HasCVersion (|bool|)
 
 
 
-/* The .asint/.asfloat functions should be recognised as working on constants? Or is that just a general case of inline functions? Technically, its an inline func that does nothing, just returns the original... with a different type. */
-
-
-function ASMState.IsASMConst (|message| exp, |bool|)
-	|| fn = exp.func
-	if fn == @num
-		return true
-	if fn == @thg // now what?
-		return ASMType.ThgSub(self, exp, ASMReg.ConstRequest)
-
-
-
-function ASMState.TryInline (|message| prms, |asmreg| dest, |µFunc| asm, |bool|)
-	opt norefcounts
-	|| fn = asm.fn
-	if fn.ASMCurrInliningCount
-		return false
-	
-	fn.ASMCurrInliningCount = 1
-	.InlineReturnTo = dest
-	.InlineStillOK = true
-
-// Theres a lot to do here... if we don't alter the param...
-// we can just use it, it doesn't need to be declared...
-
-	|| p = prms.first
-	for a in fn.Args								// fix this later
-		if a isnt Altered
-			debugger 
-		  else
-			|| SubDest = .DeclareMe(a.source, a)
-			.µInto(p!, SubDest)
-		p++
-		require .InlineStillOK
-	
-	ASMType.arg(self, fn.SourceArg!, ASMReg())
-	.InlineReturnTo = nil
-	fn.ASMCurrInliningCount--
-	return .InlineStillOK
-
-
-
-function ASMState.AskForInline (|message| prms, |asmreg| dest, |SCFunction| fn, |bool|)
-	opt norefcounts
-	|| A = fn.ASM
-	require A and !fn.HasCVersion
-	|| Gain = 5	- (A.Length-1)				// assume that functions have 5 instruction overhead.
-	Gain += (fn is inline) * 20				// sigh...
-	
-	|| Grace = 8
-	for p.fast in prms
-		Grace += .IsASMConst(p)<<2
-
-	require Gain + Grace > 0
-
-	|| Start = .curr
-	if .TryInline(prms, dest, A)
-		|| Grown = .curr - start
-		if Grown < gain
-			return true
-	.curr = start
-
-
 
 function @ASMType.DoFunction (fn_asm)
 	opt norefcounts
 	|| prms = exp.last!
 	|| fn = prms.asfunc!
 	
-	dest.µtype = fn.RegType
+	dest = .CallFunc(exp, dest, fn)
 	if .AskForInline(prms, dest, fn)
 		return dest
 
-	dest = .CallFunc(exp, dest)
-	
 	|| Closer = .OpenVars
 	|| P = .PrmCollect(prms, fn)
 	.CloseVars(Closer)

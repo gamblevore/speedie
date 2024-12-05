@@ -91,24 +91,23 @@ function Sheb (fn_asm)
 
 function Return (fn_asm)
 	opt norefcounts
-	|| reg = ASMReg()
+	|asmreg| V
 	|| f = exp.first
-		|| ret = .ReturnASM|asmreg|
-		reg = .µ(f, ret)
-	
+		V = .ExistingVar(f, true)
+		V ?= .µ(f)
 	|| amount = (f!=nil)|int|
 	|| D0 = .SafeDecr
 	|| D1 = .decr
 	|| D2 = .decr
 	if d0
-		if d0.reg != reg.reg // problem
+		if d0.reg != V.reg // problem
 		return exp.RETO(D0, D1, D2, .decr) * asmreg()
 	
-	|| K = .Const(reg, 6, true) // return true, or -1 or whatever
-		reg = asmreg()
+	|| K = .Const(V, 6, true) // return true, or -1, etc
+		V = asmreg()
 	  else
 		k = 0
-	return exp.RET(reg, D1, D2, amount, K) * asmreg()
+	return exp.RET(V, D1, D2, amount, K) * asmreg()
 	
 
 
@@ -196,7 +195,7 @@ function Decl (fn_asm)
 		|| f = k.fat
 			(ty is const)
 			ty.exportposition = f._const
-			.neveraltered[.VDecls] = k.fatindex
+			ty.FatConst = k.fatindex
 
 
 
@@ -296,10 +295,9 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	|| d = exp.ASMDecl
 	if d is local
 		|| T = d.wholetype
-		(t is param) = (d is param)
-		if (d isnt altered) and (d isnt param)
-			|| fi = .NeverAltered[t.reg]
-			if fi > 0
+		(t is param) = (d is param) // unused?
+		if (d isnt altered and param)
+			|| fi = d.FatConst
 				|| f = fi|uint|.fat
 				if f is ConstOutput
 					(T is ConstOutput)
@@ -481,7 +479,7 @@ function Unexpected		(fn_asm)
 
 extend ASMState {
 
-function ExistingVar (|message| m, |asmreg|)
+function ExistingVar (|message| m, |bool| ForReturn=false,  |asmreg|)
 	opt	norefcounts
 	real self
 	|| fn = m.func 
@@ -489,7 +487,7 @@ function ExistingVar (|message| m, |asmreg|)
 		m = m.first!
 		fn = m.func
 	if fn == @thg
-		return m.ASMLocal(ASMReg.FromExistingVar)
+		return .ASMLocal(m, forreturn, ASMReg.FromExistingVar)
 	
 
 
@@ -524,18 +522,22 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	rz = (fn)(self, dest, ml, mr, exp.second!)
 	(rz is constinput) = dest & ASMReg.ConstInput				// reset
 	rz.µtype = dest.µtype
+
+
+function RegOfMsg (|message| s, |int|)
+	return .asmlocal(s, false, nil).reg
+
+
+function ASMLocal (|message| s, |bool| ForReturn, |asmreg| extra, |asmreg|)
+	opt	norefcounts
+	|| d = s.ASMDecl
+	if d is local
+		rz = d.WholeType as extra
+		if forreturn and d isnt ReturnedVar
+			.fn.ReturnedVars++
+			(d is ReturnedVar)
 }
 
-
-function message.ASMLocal (|asmreg| extra = 0, |asmreg|)
-	opt	norefcounts
-	|| d = .ASMDecl
-	if d is local
-		return d.WholeType as extra
-
-
-function message.ASMReg (|int|)
-	return .asmlocal.reg
 
 
 function message.HasAsmStuff (|bool|)

@@ -7,7 +7,7 @@ module TextAssembler
 	function TextFunc (|message| msg, |bool|) // assemble a function from text
 		|| fn = SCFunction.new
 		fn.source = msg
-		ASmState.Sh.startfunc(fn)
+		ASmState.Sh.InitAndStartfunc(fn)
 		|| arg = ASMState.Sh.TextFuncSub(msg)
 			compiler.exportnames[fn.exportname] = fn
 		ASmState.Sh.FinishASM
@@ -52,7 +52,7 @@ module SpdAssembler
 
 	function GenerateASMSub (|scfunction| fn, |bool|)
 		opt norefcounts
-		ASMState.Sh.StartFunc(fn)
+		ASMState.Sh.InitAndStartFunc(fn)
 		|| A = fn.SourceArg!
 		ASMType.arg(ASmState.Sh, A, ASMReg())
 		ASMState.Sh.FinishASM

@@ -746,8 +746,8 @@ function TypeOfVecAccess (|message| index, |scdecl| ty0, |int| w, |scdecl|)
 
 function Message.ExpectInt (|scdecl| type, |bool|)
 	|| ty = type.Type.TypeInfo
-	expect ty.ByteCount <= 4 (self, "Can't use 64-bit index upon pointer (32-bit max)")
-	expect ty.IsInt (self, "Expected integer")
+	expect ty.ByteCount <= 4 (self, "Can't use 64-bit index on pointer (32-bit max)")
+	expect ty.IsInt and (ty isnt bool) (self, "Expected an integer.")
 	return true
 
 

@@ -72,10 +72,11 @@ linkage
 |uint16|				TableId
 |uint16|				AltersParams
 |nilstate|				NilSelf
+|byte|					ReturnedVars
 |Byte|					MinOpt
 |Byte|					IsAssigns
 |byte|					IsCppInBuilt
-|byte|					ASMCurrInliningCount
+|bool|					CurrentlyInlining
 |errorseverity|			BlindCasts
 |byte|					IsNilChecker
 |byte| 					Badness

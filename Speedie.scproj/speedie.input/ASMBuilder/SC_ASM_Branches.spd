@@ -216,18 +216,18 @@ helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |AS
 	return .BoolValue(A, dest, opp, b)
 	
 
-function message.FoundReg (|int| R, |bool|)
+function FoundReg (|message| A, |int| R, |bool|)
 	opt norefcounts
-	for s.flat in self
+	for s.flat in A
 		if s == @thg
-			|| sr = s.asmreg
+			|| sr = .RegOfMsg(s)
 			if sr == r
 				return true
 
 
 function Unchanged (|message| A, |asmreg| dest, |message| B, |bool|)
 	|| Dr = dest.reg
-	return !a.foundreg(dr) or !b.foundreg(dr)
+	return !.foundreg(a,dr) or !.foundreg(b,dr)
 
 
 function UniqueLocation (|message| A, |asmreg| dest, |message| B, |asmreg|)
@@ -388,7 +388,7 @@ function @asmstate.PrintProgress (|message| exp)
 	cpp_name adb
 	opt norefcounts
 	"---"
-	printline scfunction.currfunc!
+	printline .fn
 	|| s = ASMState.sh
 	if exp
 		printline exp

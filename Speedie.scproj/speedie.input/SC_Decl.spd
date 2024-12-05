@@ -67,7 +67,6 @@ datatype SCDeclInfo (int)
 		Property
 		Global
 		Return
-		AlteredViaPointer
 		Altered
 		UsedButAlteredBySomethingAheadInLoop
 		GameFlyingMem
@@ -79,7 +78,8 @@ datatype SCDeclInfo (int)
 		Grabbed
 		PostIncremented
 		ReturnedStruct
-		IntendedAsReturn // were at 32... cant add more. Speedie should also warn if theres too many. (it wasnt!)
+		ReturnedVar
+		IntendedAsReturn // were at 31... cant reach 33. Speedie should also warn if theres too many. (it wasnt!)
 		Swappable	 = Param + Body + Global + Property
 		Local		 = Body + Param
 		SelfImplicit = Self + local // local is set by CollectOneParam, anyhow?
@@ -115,6 +115,7 @@ class SCDecl (SCNamed) {
 	|Byte|				PointerCount
 	|byte| 				NilReg
 	|byte| 				NilAllocDepth
+	|int|				FatConst
 
 	
 	constructor (|scclass| type)
