@@ -4235,6 +4235,8 @@ float JB_f_Pow(float Self, int N);
 
 
 // int
+ASMReg SC_int_ToASM(int Self);
+
 bool SC_int_IsNormalMatch(int Self);
 
 bool SC_int_IsSimpleOrPointerCast(int Self);
@@ -6094,9 +6096,9 @@ bool SC_Pac_PackMakerInit(ASMState* Self);
 
 ASMReg SC_Pac_Plus(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
-uint64 SC_Pac_PrmCollect(ASMState* Self, Message* Prms, SCFunction* Fn);
+uint64 SC_Pac_PrmCollect(ASMState* Self, Message* Prms, SCFunction* Fn, uint* Addrs);
 
-uint64 SC_Pac_PrmCollectC(ASMState* Self, Message* Prms, SCFunction* Fn);
+uint64 SC_Pac_PrmCollectC(ASMState* Self, Message* Prms, SCFunction* Fn, uint* Addrs);
 
 ASMReg SC_Pac_Quick1Or1Sub(ASMState* Self, ASMReg Dest, ASMReg L, int Ptoi, Message* Exp);
 
@@ -6121,6 +6123,8 @@ ASMReg SC_Pac_RefCount(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 FatASM* SC_Pac_RefCountSub(ASMState* Self, Message* Exp, Message* Prms, SCFunction* Fn);
 
 int SC_Pac_RegOfMsg(ASMState* Self, Message* S);
+
+void SC_Pac_RegsBitClear(ASMState* Self, Message* Exp, int RegAddrs, SCFunction* Fn);
 
 ASMReg SC_Pac_SafeDecr(ASMState* Self);
 
