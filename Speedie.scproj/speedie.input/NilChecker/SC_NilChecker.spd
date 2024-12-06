@@ -271,7 +271,7 @@ function Function (NilTrackerFn)
 		.DeclKill
 		if (t.nestdepth == 0)  and  !t.AnyReturns // also if no returns happened...
 			(scfunction.currfunc! is killer)
-		msg.LastInBlock(SCBlockage.Quit)
+		msg.LastInBlock(SCBlockage.Quit) // may happen later than expected
 		return nilstate.Killer
 	
 	|| ret = fn.ReturnType

@@ -86,19 +86,22 @@ function LastInBlock (|SCBlockage| Reason)
 	arg.Blocks = reason
 	.Blocks = reason
 	|| Test = arg.parent
-	require Test istmp "else"
+	if Test istmp "else"
+		while test
+			arg = test.prev!
+			|| B = arg.Blocks		#require
+			Reason = Reason.BlockCombine(B)
 
-	while test
-		arg = test.prev!
-		|| B = arg.Blocks		#require
-		Reason = Reason.BlockCombine(B)
-
-		test = arg.parent!
-		if test.ASMType is kif // what about kElseIf? does this already handle that
-			return test.LastInBlock(reason) // bubble up :O
-		  else
-			test.Blocks = Reason
-		
+			test = arg.parent!
+			if test.ASMType is kif // what about kElseIf? does this already handle that
+				return test.LastInBlock(reason) // bubble up :O
+			  else
+				test.Blocks = Reason
+	
+	if (reason == scblockage.quit) and (self == @func) and scfunction.currfunc!.returntype
+		|| ret = arg.msg(@tmp, "return") // make cleaner c++
+		ret.ASMType = ASMType.kreturn 
+		ret <~ ret.CreateNil
 }
 
 

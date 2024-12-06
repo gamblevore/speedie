@@ -315,7 +315,7 @@ class PerryIDE (Window)
 	function ShowIDE (|bool| FromClick=false)
 		debug_require self // what?
 		|| p = .Project
-		prefs.string("currproj") = p
+		prefs()["currproj"] = p
 		|| rec = Perry.RecentProjects.Find(@tmp, p)
 			rec.Parent.first = rec
 		if FromClick
@@ -898,7 +898,8 @@ So anything not 0 means "its OK"`
 	function UpdatePrefs
 		|| OldPrefs = prefs.Data
 		prefs.Data = nil
-		if prefs.Init(0)
+		prefs()
+		if StdErr.ok
 			.notify("Reloaded Prefs.")
 		  else
 			.notify("Prefs are corrupted")

@@ -18,8 +18,17 @@ role config (message)
 			return l|message|.first
 			
 	syntax cast (|string|)
+		cpp_part AsString
 		if self
 			return .Value
+			
+	syntax cast (|int64|)
+		cpp_part AsInt
+		return .int
+			
+	syntax cast (|f64|)
+		cpp_part AsFloat
+		return .float
 	
 	syntax cast (|messagetable|)
 		cpp_part AsTable

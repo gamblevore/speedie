@@ -32,7 +32,7 @@ class ColorScheme
 	
 	function LoadFromPrefs
 		.loaddefaults
-		|| s = prefs.msg("colors")
+		|| s = prefs()["colors"]
 			¥.load(s)
 
 	
