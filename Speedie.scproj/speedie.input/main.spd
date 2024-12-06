@@ -50,7 +50,8 @@ function compiler.ClearEnvs
 function compiler.SetupEnv
 	opt norefcounts
 	.ClearEnvs
-	prefs.new(-1)
+	prefs.new
+	prefs.setdate()
 	
 	options.dev = prefs()["dev"].int // shouldn't need .int due to syntaxcast.
 	if !app.IsMainThread

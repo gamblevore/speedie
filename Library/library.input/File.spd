@@ -539,11 +539,7 @@ class File (String)
 		function Logs (|file|)
 			return "/tmp/logs/".file
 
-		function Prefs (|string|name = "", |file|)
-			if !name
-				name = app.FileName.lowercase
-				name ?= app.BuildConfig("name")
-				name += ".pref"
+		function Prefs (|string|name, |file|)
 			return .prefpath.child(name).file
 
 		function Preferences (|file|)

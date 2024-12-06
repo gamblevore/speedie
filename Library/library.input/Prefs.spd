@@ -5,55 +5,18 @@
 
 
 module Prefs {
+// just a simple accessor to Config class
 |config|					Data
 
-function New (|date| when=0, |config|)
-	|| D = .Data
-		return D
-	D = .path.file.conf
-	.Data = d
-	if when
-		if when < 0: When = date.now
-		D["first"] ?= when.renderint
+function SetDate (|date| when=date.now)
+	.new["first"] ?= when
 		
-	return D
+function New (|config|)
+	opt norefcounts
+	return .Data init config.Create(.DefaultPath)
 
-function Path (|string|)
-	rz = app.BuildConfig("prefs")
-	if rz[] == '~'
-		rz = rz.pathfix
-	if rz ~= "default"
-		rz = ""
-	
-	if rz[] != '/'
-		rz = file.Prefs(rz)
-	check (rz[] == '/' or '~') ("App pref path should be 'default' or a full-path.")
-
-
-// just make prefs a function that returns a config object!
-
-
-//function String (|string| s, assigns:|string|)
-//	opt norefcounts
-//	.Init()[s] = Value
-//
-//function String (|string| s, |string|)
-//	cpp_part GetPref
-//	return .init()[s].value
-//
-//function Msg (|string| s, assigns:|message|)
-//	opt norefcounts
-//	cpp_part SetPrefMsg
-//	.init()[s] = Value
-//	
-//function Msg (|string| s, |message|)
-//	return .new()[s]
-
-//function Config (|string| s, |message|)
-//	rz = .Msg(s)
-//	if !rz
-//		rz = .Data.msg(@tmp, s).msg(@arg)
-
+function DefaultPath (|string|)
+	return app.BuildConfig("prefs")
 
 function Save
 	opt norefcounts

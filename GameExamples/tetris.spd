@@ -10,7 +10,6 @@ import "GUI"
 	// frilly frames?
 
 main
-	gui.Init(2.0)
 	return TetrisWin().RunAsMain
 
 
@@ -76,7 +75,7 @@ class TetrisWin (Window)
 		.history = TextView.Block(self, -2.5, -15.0,  13.5, -10.0)
 		.time = TextView.Block(   self, 13.5,  5.0,   5.0,  3.0)
 		.LevelField = TextView.Block(self, 13.5,  7.0,   2.0,  3.0)
-		.prefs = config.new("tetris.spd.pref")
+		.prefs = config.Create("tetris.spd.pref")
 		.grid.Highest = .prefs["max"].int
 		.History.text = .prefs["history"]
 		
@@ -90,9 +89,9 @@ class TetrisWin (Window)
 			if (H == .grid.Score)
 				|| Name = "Enter your name, champion!".ask
 					.History.text = "$name @ $H\n${.History.text}"
-				.prefs["history"] = .History.text
+				.prefs["history"] = .History.text[0, 1K]
 			.prefs["max"] = H
-			prefs.save
+			.prefs.save
 			.grid.State = 2
 		if keys.SPACE or Keys.RETURN
 			.Grid.Restart		

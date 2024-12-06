@@ -883,7 +883,7 @@ So anything not 0 means "its OK"`
 	function UpdateActiveFile
 		|| d = .editme.Document$
 		|| l = d.Location.Resolve(true)$
-		if l ~= prefs.path.resolve
+		if l ~= prefs.DefaultPath.resolve
 			.updateprefs
 		  elseif l ~= .perryfile
 			.updateperry

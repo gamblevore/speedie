@@ -13,7 +13,7 @@ role config (message)
 			yield C
 			C++
 
-	function ConfFirst (||)
+	helper ConfFirst (||)
 		|| l = .confarg
 			return l|message|.first
 			
@@ -35,14 +35,26 @@ role config (message)
 		return .Dict(true)
 	
 	function Save (|bool|)
-		|| f = .obj as file
+		|| f = .path
 			|| p = .render
 			if p.ParseWithError(nil)
-				return f.smartdata(p) 
-
+				return f.smartdata(p)
+	
+	function Path (|file|)
+		return .obj as file
+	
+	module
+		function Create (|string| path,  |config|)
+			if path[] == '~'
+				path = path.pathfix
+			if (path ~= "default") or !path
+				path = app.FileName.lowercase + ".box.pref"	
+			if path[] != '/'
+				path = file.Prefs(path)
+			return path.file.config
 
  // why would a conf-file be so big?
-function file.Conf (|int| lim = 1MB,  |config|)
+function file.Config (|int| lim = 1MB,  |config|)
 	opt norefcounts
 	if .exists
 		rz = .parse(lim)|config|
