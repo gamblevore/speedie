@@ -108,7 +108,7 @@ function TypeOfFunc (ExprResolver)
 	opt norefcounts
 	if exp.istern
 		return TypeOfTernary(exp, name_space, side)
-	
+
 	|| fn = TypeOfFuncSub(exp, name_space, side)			#expect (exp, "Can’t use this as a function.")
 	if fn isa SCFunction
 		|| obj = fn.ReturnType
