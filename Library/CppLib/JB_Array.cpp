@@ -257,6 +257,7 @@ void JB_Array_Shuffle( Array* self ) {
 	int n = JB_Array_Size(self);
 	JB_Object** Array = self->_Ptr;
 	uint64 Hash = ~1234567;
+	self->Marker = 0;
 
 	for_(n) {
 		auto ai = Array[i];

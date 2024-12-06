@@ -48,7 +48,7 @@ datatype Tetronimo (uint64)
 ]
 
 || TrollShapes = [
-	"x"*10
+	"xxxxXxxxx"
 	`
  jj jj
 jjjJjjj
@@ -141,6 +141,7 @@ class Tetris (GridSection)
 		.Level = 1
 		.LinesRemaining = .Level*10 min 30
 		.TotalFrames = 0
+		shapes.shuffle
 		
 		|| i = 0
 		|| h = .Height
@@ -163,18 +164,29 @@ class Tetris (GridSection)
 		return .at(x + y*16)
 			
 	function AddShape (|string| s)
-		|| y = 21
-		|| x = 0
+		for i in 4
+			if .TryShape(s, 4+i) or .TryShape(s, 4-i)
+				exit
+		
+	function TryShape (|string| s, |int| Left, |bool|)
+		|| y = 22
+		|| x = left
 		for c in s
 			if c == '\n'
 				y--
-				x = -1
-			  elseif c != ' '
-				|| T = c ||| Tetronimo.Dropper
+				x = left
+				continue 
+			if c != ' '
+				if self[x,y][] is Real
+					return .fail
+				|| T = (c&~32) ||| Tetronimo.Dropper
 				(T is pivot) = c.IsUpper
-				self[x+4,y][] = T&~32
+				self[x,y][] = T<<16
 			x++
+		.Pass
 		.move(-16)
+		.move(-16)
+		return true
 
 	function SomethingIsBeneath (|bool|)
 		rz = .MoveIsBlocked(-16, Tetronimo.real)
@@ -207,7 +219,6 @@ class Tetris (GridSection)
 		|| B = bag.Next
 		if !b
 			bag.Shuffle
-			bag.Marker = 0
 			b = bag.Next!
 		.AddShape(b)
 
