@@ -233,9 +233,9 @@ datatype ASMReg (uint64)
 // (self-1)&31!!
 // this will "rotate" 0 back to 31 and 1 to 0.
 
-//function int.asm (|asmreg|)
-//	cpp_part ToASM
-//	rz.reg = self // (self - 1)&31 // would be better?
+function int.asm (|asmreg|)
+	cpp_part ToASM
+	rz.reg = self // (self - 1)&31 // would be better?
 
 function int.TextASM (|asmreg|)
 	rz.reg = self // (self - 1)&31 // would be better?

@@ -320,7 +320,7 @@ struct ASMState
 		return .ReadOrWriteSub(dest, exp, ptr, varadd, index)
 
 
-	function PrmCollectC (|message| prms, |SCFunction| fn, |uint64|)
+	function PrmCollectC (|message| prms, |SCFunction| fn, |&uint| Addrs, |uint64|)
 		// we need to do ints last, and also collect these backwards.
 		opt norefcounts
 		|| sh = 0
@@ -337,6 +337,8 @@ struct ASMState
 					sh += 5
 					ic += ints
 					fc += !ints
+					if .Last isa asm.addr
+						addrs[] |= v.Log2
 				p--
 		
 		if fc>8 or ic>8			// hmmm
@@ -349,10 +351,10 @@ struct ASMState
 			rz |= (17-ic) << 6
 
 
-	function PrmCollect (|message| prms, |scfunction| fn, |uint64|)
+	function PrmCollect (|message| prms, |scfunction| fn, |&uint| Addrs,  |uint64|)
 		opt norefcounts
 		if fn.HasCVersion
-			return .PrmCollectC(prms, fn)
+			return .PrmCollectC(prms, fn, addrs)
 		
 		|| sh = 7
 		|| p = prms.first
@@ -362,6 +364,8 @@ struct ASMState
 			rz  |=  v << sh
 			rz++								// Send-count (4 bits max)
 			p++
+			if .Last isa asm.addr
+				addrs[] |= v.Log2
 
 
 	function CallFunc (|message| exp, |asmreg| dest, |scfunction| fn,  |asmreg|)
@@ -604,6 +608,16 @@ function SCFunction.HasCVersion (|bool|)
 
 
 
+function asmstate.RegsBitClear (|message| exp, |int| RegAddrs, |scfunction| fn)
+	opt norefcounts
+	for (b.bits in RegAddrs) (i)
+		|| arg = fn.args[i]
+		if arg and arg.PointerCount == 1
+			|| in = arg.Internal
+			if in and in.IsNormal and !in.IsFloat
+				|| S = 64 - in.SizeOfQuery
+				if S >= 0
+					exp.BFLG(i.asm, i.asm, S, S, 0)
 
 
 function @ASMType.DoFunction (fn_asm)
@@ -616,7 +630,8 @@ function @ASMType.DoFunction (fn_asm)
 		return dest
 
 	|| Closer = .OpenVars
-	|| P = .PrmCollect(prms, fn)
+	|uint| RegAddrs
+	|| P = .PrmCollect(prms, fn, RegAddrs)
 	.CloseVars(Closer)
 	
 	|| PExt = P >> 32
@@ -624,6 +639,10 @@ function @ASMType.DoFunction (fn_asm)
 	if fn.HasCVersion
 		fat.op = asm.FNCX
 	fat.op += PExt > 0
+	
+	if RegAddrs
+		.RegsBitClear(exp, RegAddrs, fn)
+		
 	return fat * dest
 
 
