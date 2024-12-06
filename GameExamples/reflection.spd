@@ -2,6 +2,7 @@
 import "GUI"
 
 main
+	beep $"Hello"
 	return Breakout().RunAsMain(2.0)
 
 // wierd bug with evreything being hit.
@@ -35,7 +36,7 @@ class Breakout (Window)
 	function reset (|string| msg="")
 		if msg
 			beep msg
-		.ballspeed = 0.09
+		.ballspeed = 0.13
 		.bar.pos = vec2(10.0, 0.5)
 		.bar.radius = vec2(1.0,  0.125)
 		.balls.length = 0
@@ -57,9 +58,10 @@ class Breakout (Window)
 		require hit.Exists
 		|| v = b.Velocity
 		require v.y < 0.0
-		|| D = (b.pos - bar.pos) / bar.Radius
+		|| rr = bar.Box
+		|| D = math.RangeConvert(rr.x1, rr.x2, -1, 1).Convert(b.pos.x).spow2
 		v.y = -v.y
-		v.x = d.x * 0.2
+		v.x = D*.ballspeed
 		b.Velocity = v.Normal*.ballspeed
 		return true
 
@@ -89,7 +91,8 @@ class Breakout (Window)
 		|| R2 = bl.OverlapsRect(R)
 		require r2.exists
 		|| Cn = r2.Center
-		.spirals <~ vobject((cn, 3.0, 3.0), vec4(0.5,0,0,0))
+		|| SpBox = (cn, 3.0, 3.0)
+		.spirals <~ vobject(spbox, bl.Color)
 		
 		if r2.Height > r2.Width
 			ball.Velocity.x = -ball.Velocity.x
@@ -97,7 +100,8 @@ class Breakout (Window)
 			ball.Velocity.y = -ball.Velocity.y
 		ball.Velocity = ball.Velocity.Normal * .incr
 
-		|| hp = --bl.Health
+		|| hp = bl.Health - ball.box.Width*8
+		bl.Health = hp
 		if (hp <= 0) or 0.5[]
 			|| pu = .PowerUp(8)
 			if !pu
@@ -186,16 +190,16 @@ class Breakout (Window)
 		
 		for b in .Blocks
 			|| H = (1.0-b.health)*12th
-			|| Col = colors.wheel(H, 0.8, 0.5)
-			where.DrawRect(b, col)
-			Col = colors.wheel(H, 1.0, 0.4)
+			b.Color = colors.wheel(H, 0.8, 0.5)
+			where.DrawRect(b, b.color)
+			|| Col = colors.wheel(H, 1.0, 0.4)
 			where.DrawOutlineOnly(b, col)
 		where.DrawRect(.bar)
 
 		|| L = 24s()
 		for (s in .Spirals) (i)
 			|| B = s.Screen
-			where.DrawSpiral(0.01*b.width|float|*vobject.drawscale, L, b.center, s.color * 0.2[], (3s+i*1s)())
+			where.DrawSpiral(0.01*b.width|float|*vobject.drawscale, L, b.center, s.color, (3s+i*1s)())
 		.BallDraw(where, .balls)
 		.BallDraw(where, .explosions)
 	
@@ -203,10 +207,24 @@ class Breakout (Window)
 	function BallDraw (|image| where, |[vobject]| List)
 		for b in list
 			|| bx = b.Box.screenfloat ± -4.0
+			|| sh = bx.Width*4th
 			where.DrawSoftCircle(bx, b.Color, 2.0)
+			|| v = b.Velocity.Normal.xyxy
+			|| m = 1.0
+			|| ww = bx.Width*0.05
+			|| C = b.Color * (1.0, 1.0-ww, 1.0-ww*2.0, 1.0)
+			
+			while bx.Width >= 1.0
+				where.DrawSoftCircle((bx ± 2) - v*(sh*m), C, 2.0)
+				C.g -= 0.3
+				C.b -= 0.5
+				C.r -= 0.1
+				c = c.Clamp
+				bx = bx ± bx.width*0.1
+				m ++
 
 
-function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| HSB, |float| Pulse)
+function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| Col, |float| Pulse)
 	|| sub = 24.0
 	max += sub/2
 	Pulse = Pulse * max
@@ -221,7 +239,7 @@ function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| HSB, |f
 		|| P = R*(50.0+i+strength) + XY
 		|| Circle = (P-4.0, P+4.0)
 		|| A = ((Max-i)*2.0)/max
-		|| C = Colors.wheel((i*0.005, 0.7, 1.0, A)+HSB)
+		|| C = (i*0.005, 0, 0, A)+Col
 	
 		.DrawSoftCircle(Circle, C)
 

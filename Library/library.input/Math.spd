@@ -287,6 +287,9 @@ extend float
 	function Pow2 (|float|)
 		return self*self
 
+	function SPow2 (|float|)
+		return (self*self).CopySign(self)
+
 	function Pow3 (|float|)
 		return self*self*self
 
@@ -309,15 +312,15 @@ extend float
 		rz *= rz
 		rz *= rz
 
-function math.RangeConvert (|float| lfrom, |float| hfrom, |float| lto, |float| hto, |FloatRangeConverter|)
-	description "Converts numbers in one range, to another range. Very awkward to do, normally!" 
+function math.RangeConvert (|float| low_from, |float| high_from, |float| low_to, |float| high_to, |FloatRangeConverter|)
+	description "Converts numbers from one range, to another range. Turns something awkward into something simple" 
 	cpp_part RangeConv4
-	return (-lfrom,  1.0 / (hfrom - lfrom),  lto,  hto)|FloatRangeConverter|
+	return (-low_from,  1.0 / (high_from - low_from),  low_to,  high_to)|FloatRangeConverter|
 
-function math.RangeConvert (|float| lfrom, |float| hfrom, |FloatRangeConverterBasic|)
+function math.RangeConvert (|float| low, |float| high, |FloatRangeConverterBasic|)
 	description "Same as math.RangeConvert(lfrom, hfrom, 0, 1)" 
 	cpp_part RangeConv2
-	return (-lfrom,  1.0 / (hfrom - lfrom))|FloatRangeConverterBasic|
+	return (-low,  1.0 / (high - low))|FloatRangeConverterBasic|
 
 datatype FloatRangeConverter (vec4)
 	function Convert (|float| x, |float|)
