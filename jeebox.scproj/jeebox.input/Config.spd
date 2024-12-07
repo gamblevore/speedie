@@ -44,16 +44,20 @@ role config (message)
 		return .obj as file
 	
 	module
-		function Create (|string| path,  |config|)
+		function ConfigPath (|string| path,  |string|)
 			if path[] == '~'
 				path = path.pathfix
 			if (path ~= "default") or !path
 				path = app.FileName.lowercase + ".box.pref"	
 			if path[] != '/'
 				path = file.Prefs(path)
-			return path.file.config
+			return path
 
- // why would a conf-file be so big?
+		function Create (|string| path,  |config|)
+			return .ConfigPath(path).file.config
+
+
+// why would a conf-file be so big?
 function file.Config (|int| lim = 1MB,  |config|)
 	opt norefcounts
 	if .exists

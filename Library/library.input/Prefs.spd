@@ -16,7 +16,8 @@ function New (|config|)
 	return .Data init config.Create(.DefaultPath)
 
 function DefaultPath (|string|)
-	return app.BuildConfig("prefs")
+	opt norefcounts
+	return config.ConfigPath(app.BuildConfig("prefs"))
 
 function Save
 	opt norefcounts

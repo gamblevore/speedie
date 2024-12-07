@@ -138,7 +138,7 @@ uint8* JB_FS_GrowBy(FastString* fs, int Needs) {
 
     for (  int i = 2;   i >= 1;   i = i / 2  ) {
         if (NewLength*i  >=  NewLength) {
-            if (JB_FS_ResizeTo_(fs, NewLength*i-1)) { // -1 to zeroterm
+            if (JB_FS_ResizeTo_(fs, (NewLength*i)-1)) { // -1 to zeroterm
                 int L = fs->Length;
                 fs->Length = L + Needs;
                 return fs->ResultPtr + L;
