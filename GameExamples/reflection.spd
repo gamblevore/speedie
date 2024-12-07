@@ -43,7 +43,7 @@ class Breakout (Window)
 		.Blocks.Length = 0
 		.Explosions.Length = 0
 		for y in 2.0
-			.addballs((10.3, 6.0+y))
+			.addballs((10.0, 6.0+y))
 		for y in 5.0
 			|| y2 = -1.0 + y*3th
 			for x in 10.0
