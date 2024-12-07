@@ -396,8 +396,8 @@ class String
 	operator plus (|string| other, |string|)
 		cpp_wrapper JB_Str_OperatorPlus
 			
-	operator plus (|byte| B, |string|)
-		opt norefcounts
+	function PlusByte (|byte| B, |string|)
+		opt norefcounts // seems a bad function.
 		cpp_part PlusByte
 		return self + string.byte(b)
 	

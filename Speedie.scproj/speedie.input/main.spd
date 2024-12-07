@@ -1,6 +1,9 @@
 
+/*
+	Speedie. Owned and created by Theodore H. Smith, and no one else.
+*/
 
-	
+
 main // speedie main {
 	Compiler.SetupEnv	
 	Compiler.MiniTests
@@ -51,8 +54,7 @@ function compiler.SetupEnv
 	opt norefcounts
 	.ClearEnvs
 	prefs.new
-	prefs.setdate()
-	
+	prefs()["LastOpened"] = date.now
 	options.dev = prefs()["dev"].int // shouldn't need .int due to syntaxcast.
 	if !app.IsMainThread
 		app.ThreadName = "SpeedieDebug"

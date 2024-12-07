@@ -1,8 +1,6 @@
 
 
 // use a message... as a dictionary!!
-// wierd but efficient
-
 
 role config (message)
 	linkage
@@ -13,10 +11,6 @@ role config (message)
 			yield C
 			C++
 
-	helper ConfFirst (||)
-		|| l = .confarg
-			return l|message|.first
-			
 	syntax cast (|string|)
 		cpp_part AsString
 		if self
@@ -43,15 +37,20 @@ role config (message)
 	function Path (|file|)
 		return .obj as file
 	
+	helper ConfFirst (||)
+		|| l = .confarg
+			return l|message|.first
+			
 	module
 		function ConfigPath (|string| path,  |string|)
-			if path[] == '~'
-				path = path.pathfix
-			if (path ~= "default") or !path
-				path = app.FileName.lowercase + ".box.pref"	
-			if path[] != '/'
-				path = file.Prefs(path)
-			return path
+			|| f = path[]
+			if f == '~'
+				return path.pathfix
+			if f == '/'
+				return path
+			if !f
+				return app.FileName.lowercase + ".box.pref"	
+			return file.Prefs(path)
 
 		function Create (|string| path,  |config|)
 			return .ConfigPath(path).file.config

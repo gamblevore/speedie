@@ -896,14 +896,14 @@ So anything not 0 means "its OK"`
 	
 	
 	function UpdatePrefs
-		|| OldPrefs = prefs.Data
-		prefs.Data = nil
+		|| OldPrefs = prefs._Internal
+		prefs._internal = nil
 		prefs()
 		if StdErr.ok
 			.notify("Reloaded Prefs.")
 		  else
 			.notify("Prefs are corrupted")
-			prefs.Data = oldPrefs
+			prefs._internal = oldPrefs
 		perry.LoadRecents
 		¥.LoadFromPrefs
 

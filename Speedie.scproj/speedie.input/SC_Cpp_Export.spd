@@ -1196,7 +1196,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			WriteThgMaybeTypeToo( self, o, fs )
 			Return
 		
-		printline "Found @thg with .obj=nil: " + .objectid
+		printline "Found @thg with .obj=nil: " + .objectid.Render
 		debugger
 		.safe(fs)
 

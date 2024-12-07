@@ -297,7 +297,7 @@ module GUI
 
 
 	function SavePrefs
-		if prefs.data
+		if prefs._internal
 			prefs()["screen"] = GUI.ScreenOrig.List
 			Prefs.save
 
@@ -379,7 +379,7 @@ module GUI
 			disabled `Put "targets gui" in the app's conf section to use this!`
 		.FrameLength = 180th.date
 		.openedfirst = date.now
-		prefs.setdate(.openedfirst)
+		prefs()["LastOpened"] = .openedfirst
 		AppMenu.GetAppMenu
 		|| n = .InitSDL
 		if !n

@@ -189,7 +189,7 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| OExp, |int| TypeCast,  |int|)
 		for (b.Upwards in Ot)
 			for (C.backwards in b.Casts)
 				ifn NoBools and (C.returnType.isbool)
-					if .TypeMatch( C.ReturnType, 0 ).IsNormalMatch
+					if .TypeMatch( C.ReturnType, kTypeCastNumbers ).IsNormalMatch
 						return C.CreateTypeCast( O, oexp )
 		
 		

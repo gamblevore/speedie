@@ -4,25 +4,20 @@
 */
 
 
-module Prefs {
-// just a simple accessor to Config class
-|config|					Data
-
-function SetDate (|date| when=date.now)
-	.new["first"] ?= when
-		
-function New (|config|)
-	opt norefcounts
-	return .Data init config.Create(.DefaultPath)
-
-function DefaultPath (|string|)
-	opt norefcounts
-	return config.ConfigPath(app.BuildConfig("prefs"))
-
-function Save
-	opt norefcounts
-	.Data.save?
-}
-
+module Prefs
+	// just a simple accessor to Config class
+	|config| _Internal
+			
+	function New (|config|)
+		opt norefcounts
+		return ._Internal init config.Create(.DefaultPath)
+	
+	function DefaultPath (|string|)
+		opt norefcounts
+		return config.ConfigPath(app.BuildConfig("prefs"))
+	
+	function Save
+		opt norefcounts
+		._Internal.save?
 
 
