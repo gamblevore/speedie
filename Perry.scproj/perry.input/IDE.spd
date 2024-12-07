@@ -315,7 +315,7 @@ class PerryIDE (Window)
 	function ShowIDE (|bool| FromClick=false)
 		debug_require self // what?
 		|| p = .Project
-		prefs()["currproj"] = p
+		app.prefs["currproj"] = p
 		|| rec = Perry.RecentProjects.Find(@tmp, p)
 			rec.Parent.first = rec
 		if FromClick
@@ -883,7 +883,7 @@ So anything not 0 means "its OK"`
 	function UpdateActiveFile
 		|| d = .editme.Document$
 		|| l = d.Location.Resolve(true)$
-		if l ~= prefs.DefaultPath.resolve
+		if l ~= app.prefspath.resolve
 			.updateprefs
 		  elseif l ~= .perryfile
 			.updateperry
@@ -896,14 +896,14 @@ So anything not 0 means "its OK"`
 	
 	
 	function UpdatePrefs
-		|| OldPrefs = prefs._Internal
-		prefs._internal = nil
-		prefs()
+		|| OldPrefs = app._prefs
+		app._prefs = nil
+		app.prefs()
 		if StdErr.ok
 			.notify("Reloaded Prefs.")
 		  else
 			.notify("Prefs are corrupted")
-			prefs._internal = oldPrefs
+			app._prefs = OldPrefs
 		perry.LoadRecents
 		¥.LoadFromPrefs
 

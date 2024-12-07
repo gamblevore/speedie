@@ -186,7 +186,7 @@ class OpenSaveDialog (Window)
 		|OpenSaveDialog|				_Asker
 		
 		function LastDir (|message|)
-			rz = prefs()("opensave")
+			rz = app.prefs()("opensave")
 			rz.trim(20)
 			for f in rz
 				if f != @tmp

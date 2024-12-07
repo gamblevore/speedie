@@ -65,7 +65,7 @@ constants
 	codesign_native = "codesign_osx"
 
 function compiler.CodeSign (|file| gui_exe)
-	|| sign = prefs()[codesign_native]
+	|| sign = app.prefs[codesign_native]
 		gui_exe.codesign(sign)
 	  else
 		errorreceiver.NewWarning( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign " + gui_exe.path )

@@ -61,13 +61,14 @@ module Feedback
 	function SetFlow
 		if app["flow"] 	// options.GenFlowControlCode specified by --flow
 			|| v = options.GenFlowControlCode.string
-			if prefs()["self_flow"] != v
+			if app.prefs["self_flow"] != v
 				// update current self_flow pref
-				prefs()["self_flow"] = v
-				Prefs.Save
+				app.prefs["self_flow"] = v
+				app.PrefsSave
 		  else
 			// load from prefs unless overwritten by --flow
-			Options.GenFlowControlCode = prefs()["self_flow"].yes
+			Options.GenFlowControlCode = app.prefs["self_flow"].yes
+			Options.GenFlowControlCode = app.prefs["self_flow"].yes
 		
 		
 
@@ -419,13 +420,13 @@ module Feedback
 		+"codesign"
 			Explain(Purpose, "Gets/Sets the codesign certificate")$
 			if value ~= "" or "true"
-				printline "Codesign: " + prefs()[codesign_native]
+				printline "Codesign: " + app.prefs[codesign_native]
 				return true
 			
 			if value == "none" or "nil" or "-"
 				value = ""
-			prefs()[codesign_native] = value
-			Prefs.save
+			app.prefs[codesign_native] = value
+			app.prefssave
 			printline "Codesign set to " + value
 			return true
 		

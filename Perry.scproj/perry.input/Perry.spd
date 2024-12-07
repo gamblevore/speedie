@@ -57,7 +57,7 @@ module Perry
 		// thats at least two errors
 		// one in perry and one in jeebox.
 		
-		prefs()["colors"] = ¥.savecolors.parse
+		app.prefs["colors"] = ¥.savecolors.parse
 
 		
 	helper LoadWindowsSub (|bool|)
@@ -89,7 +89,7 @@ module Perry
 
 
 	function LoadRecents
-		Perry.RecentProjects = prefs()("Recents")|listviewrow|
+		Perry.RecentProjects = app.prefs()("Recents")|listviewrow|
 		for s in Perry.RecentProjects
 			|| nxt = s.next
 				|| second = .FindRecent(s.name, nxt)
@@ -107,7 +107,7 @@ module Perry
 		.BuildAppMenu
 		.LoadRecents
 	
-		|| p = prefs()
+		|| p = app.prefs
 		|| old = p["currproj"]
 		.Projects = p["lastproj"]|listviewrow|
 		

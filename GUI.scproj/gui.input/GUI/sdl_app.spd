@@ -297,9 +297,9 @@ module GUI
 
 
 	function SavePrefs
-		if prefs._internal
-			prefs()["screen"] = GUI.ScreenOrig.List
-			Prefs.save
+		if app._prefs
+			app.prefs["screen"] = GUI.ScreenOrig.List
+			app.PrefsSave
 
 
 	function CurrDisplaySize (|ivec2|) // screensize
@@ -379,7 +379,7 @@ module GUI
 			disabled `Put "targets gui" in the app's conf section to use this!`
 		.FrameLength = 180th.date
 		.openedfirst = date.now
-		prefs()["LastOpened"] = .openedfirst
+//		app.prefs["LastOpened"] = .openedfirst
 		AppMenu.GetAppMenu
 		|| n = .InitSDL
 		if !n
@@ -611,7 +611,7 @@ module GUI
 	
 	function DrawFrame
 		opt norefcounts
-		|| CanBlur = !Prefs()["noblur"]
+		|| CanBlur = !app.prefs["noblur"]
 		
 		if !.DialogIsOpen
 			.BlurBackgroundStart = 0

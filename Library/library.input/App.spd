@@ -8,7 +8,7 @@ module App {
 |[string]?|					_OldArgs = nil
 |string| 					Usage
 |message|					_Conf
-
+|config|					_Prefs
 |string| 					_Path
 |file?|						_StdOut
 |file?|						_stdin
@@ -249,12 +249,27 @@ helper IsQuarantined (|bool|)
 	return .path contains "/AppTranslocation/"
 
 
-function Configure (assigns:|string|)
+helper Configure (assigns:|string|)
 	|error| err
 	._conf  = Value.parsewitherror(err)
 	if err
 		printline err.render
 	._conf ?= message()
+
+
+// just a simple accessor to Config class
+function Prefs (|config|)
+	opt norefcounts
+	return ._Prefs init config.Create(.PrefsPath)
+
+function PrefsPath (|string|)
+	opt norefcounts
+	return config.ConfigPath(app.BuildConfig("prefs"))
+
+function PrefsSave
+	opt norefcounts
+	._Prefs.save?
+
 
 
 
