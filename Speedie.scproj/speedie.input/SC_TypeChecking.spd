@@ -199,7 +199,7 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| OExp, |int| TypeCast,  |int|)
 
 	
 		if (!isabool or !NoBools) and O.canwrap
-			if (Typewrapper!.typenormal.TypeMatch( self, 0 ).IsNormalMatch)
+			if (Typewrapper!.typenormal.TypeMatch( self, 0	 ).IsNormalMatch)
 				// Already have all the type info! So check the contained type is correct!
 				|| it = .contains
 					require it.TypeMatch(O, kTypeCastNumbers)

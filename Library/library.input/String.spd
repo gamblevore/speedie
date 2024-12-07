@@ -396,11 +396,6 @@ class String
 	operator plus (|string| other, |string|)
 		cpp_wrapper JB_Str_OperatorPlus
 			
-	function PlusByte (|byte| B, |string|)
-		opt norefcounts // seems a bad function.
-		cpp_part PlusByte
-		return self + string.byte(b)
-	
 	helper Append (|string| b, |string| c, |string| d="")
 		cpp_wrapper JB_Str_Append4
 	helper Append (|string| b, |string| c, |string| d, |string| e, |string| f="")

@@ -1234,7 +1234,7 @@ class TextView (GUIControl)
 			require s != "{"
 		
 		.undochecker = -1
-		|| x = .insert((s + t).plusbyte(other))
+		|| x = .insert(s + t + other.render)
 		.selrange = (x+1, x+t.length+1)
 		return true
 

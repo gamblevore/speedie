@@ -262,12 +262,12 @@ class Image (memory)
 			px.a = mark
 
 	function MarkLineH  (|ivec2| P, |int| Width, |int| Mark)
-		.DrawLineH(P, width, mark, nil)
+		.DrawLineH(P, width, nil, mark)
 
 	function MarkLineV (|ivec2| xy, |int| Height, |int| Mark)
-		.DrawLineV(xy, height, mark, nil)
+		.DrawLineV(xy, height, nil, mark)
 		
-	function DrawLineH  (|ivec2| P, |int| Width, |int| Mark=-1,  |imagepixel| Col)
+	function DrawLineH  (|ivec2| P, |int| Width,  |imagepixel| Col, |int| Mark=-1)
 		require col.a or mark >= 0
 
 		|| R = .clip(P.xyxy + (0,0,width,0))
@@ -285,7 +285,7 @@ class Image (memory)
 			sigh++
 				
 	
-	function DrawLineV (|ivec2| P, |int| Height, |int| Mark=-1, |imagepixel| Col)
+	function DrawLineV (|ivec2| P, |int| Height, |imagepixel| Col, |int| Mark=-1)
 		require col.a or mark >= 0
 		|| iw	= .width
 		|| ColV = col.PreMul
