@@ -620,7 +620,7 @@ function FLookup (assigns:|SCNode|)
 
 function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch, |int|)
 	if !exp
-		Return kNeedsTypeCast
+		Return kNeedsTypeCast ||| loss
 	expect  (self isnt disabled)  (exp, .description)
 
 	while (exp == @bra)

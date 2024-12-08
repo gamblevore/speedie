@@ -189,8 +189,12 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| OExp, |int| TypeCast,  |int|)
 		for (b.Upwards in Ot)
 			for (C.backwards in b.Casts)
 				ifn NoBools and (C.returnType.isbool)
-					if .TypeMatch( C.ReturnType, kTypeCastNumbers ).IsNormalMatch
-						return C.CreateTypeCast( O, oexp )
+					|| Loss = .TypeMatch( C.ReturnType, kTypeCastNumbers )
+					if Loss.IsNormalMatch
+						#! sigh
+						#! If theres one that doesnt need numeric cast... that should be considered a stronger match
+						#! C.CreateTypeCast should return the result, bitored with needscast.
+						return C.CreateTypeCast( O, oexp, loss )
 		
 		
 		|| IsaBool = (t == TypeBool) and (.IsNormal)
