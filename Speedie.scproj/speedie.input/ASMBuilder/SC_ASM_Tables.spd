@@ -94,8 +94,8 @@ function TryTail (fn_asm)
 	require l isa asm.FNC or asm.fnc3
 	|| fn = l.Msg.obj as SCFunction					#debug_require
 	|| Prms = l.FuncPrmBits							#require
-	
-/	L.op = asm.tail
+
+	L.op = asm.tail
 	l.R[0] = l.r[1]
 	l.r[1] = prms
 	
@@ -651,14 +651,14 @@ function Message.TypeCastDoesNothing (|bool|)
 
 function fatasm.FuncPrmBits (|uint64|)
 	rz = .r2
-	rz |= .r3|uint64| << 32
-	|| Count = rz&15
-	rz >>= 7
+	|| r3 = .r3|uint64| << 32
+	rz |= r3
+	rz >>= 7	
 	require !(rz>>31)
 	for i in 6
 		|| p = (rz >> (5*i)) & 31
 		if p > i
-			rz |= 1<<31
+			rz |= (1|uint64|<<31)
 			exit
 	// ffff(r4, r3, r2, r1)
 	

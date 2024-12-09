@@ -409,7 +409,6 @@ inline void JB_SetRef_(JB_Object** Place, JB_Object* New) {
 
 inline void JB_Incr2_(JB_Object** Place, JB_Object* New) {
 	JB_Incr(New);
-    JB_Object* Old = *Place;
 	*Place = New;
 }
 

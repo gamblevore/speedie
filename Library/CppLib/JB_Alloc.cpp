@@ -605,6 +605,7 @@ void JB_DebugAllMemory(bool b)  {
 	DoTotalMemoryTest = b;
 }
 
+extern int JB__Flow_Disabled;
 bool JB_TotalSanity(bool Force) {
 	if (!Force and !DoTotalMemoryTest)
 		return true;

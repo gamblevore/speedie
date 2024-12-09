@@ -33,7 +33,7 @@ function Inline_Branch1
 function gggFunc (|int| A, |int|)
 	if A > 1
 		return 5
-	return Macros.fs._Parsed.Length
+	return compiler.ConfMsg.SlowCount
 
 
 function Inline_Branch2 (|scdecl| D)

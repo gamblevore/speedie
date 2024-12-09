@@ -408,8 +408,7 @@ struct ASMState
 			.out = µfunc(fn, .curr)
 		.zero = nil
 		.zero.info = AsmReg()
-		memory.Fill((&.vars[0])|&byte|, –sizeof .vars, 0)
-//		.vars[0] = .zero.Index
+		memory.Fill((&.vars[0])|&byte|, 32*8, 0)
 		.FuncStart = .curr
 		target debug
 			.LastProgress = .curr
@@ -512,6 +511,7 @@ struct ASMState
 	function TryInline (|message| prms, |asmreg| dest, |µFunc| asm, |bool|)
 		opt norefcounts
 		|| fn = asm.fn
+		require .fn.ExportName contains "Inline_"
 		require !fn.CurrentlyInlining	
 		fn.CurrentlyInlining = true
 		
@@ -651,5 +651,5 @@ function @ASMState.ExpandJSM (|bool|)
 
 function fatasm.IsFinisher (|bool|)
 	|| o = .op|asm|
-	return o == asm.ret or asm.trap or asm.reto
+	return o == asm.ret or asm.trap or asm.reto or asm.TAIL
 

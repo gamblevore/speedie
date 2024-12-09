@@ -18,10 +18,11 @@ struct FatASM
 	
 	function BaseOp (|int|)
 		rz = .op
-		if rz < 32
-			rz = rz & ~3
-			if rz == (asm.FNCX-1) or (asm.FNC-1)
-				rz++
+		if rz == asm.FNCX3
+/			rz = asm.FNCX
+		  elseif rz == asm.FNC3
+/			rz = asm.FNC
+
 	
 	function Form (|µform|)
 		|| i = instruction.typelist[.op]

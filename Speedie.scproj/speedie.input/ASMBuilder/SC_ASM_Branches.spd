@@ -382,7 +382,7 @@ Struct FatRange
 				(s isnt CondAnswer)
 				s.jumpto = curr
 
-function @asmstate.PrintProgress (|message| exp)
+function @asmstate.PrintProgress (|message| exp=nil)
 	target debug {
 	cpp_name adb
 	opt norefcounts
