@@ -1962,7 +1962,7 @@
 "Attribute value didn't close."
 "Element malformed."
 "prefs"
-"nothing"
+"memzero"
 "Can't re-activate process without a path."
 "Nil object given to CompressInto"
 "µz"
@@ -2151,4 +2151,3 @@
 " unmarked"
 "low reg "
 "AccessToMemCpy fail"
-"memzero"
