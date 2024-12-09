@@ -1,13 +1,6 @@
 
 
 module ASMExamples {
-//|string| A
-//constructor {
-//	.A = "A"
-//}
-//destructor {
-//	printline .A
-//}
 target pack { 
 
 
@@ -16,39 +9,133 @@ class LargeClass2 {
 	|uint16[100]| b
 }
 
+	
 
-function InlineTest1 (|int| A, |int| B, |int|)
+function ggg_const (|int| A, |int|)
+	if A > 0
+		return 1
+	return -1
+
+function hhhMaybeConst (|int| A, |bool|)
+	if ggg_const(A) > 0
+		return true
+	return 0.5[]
+
+
+function Inline_Branch1
+	|| x = 0
+	if hhhMaybeConst(7)
+		x = 1
+	if hhhMaybeConst(0)
+		x = 2
+
+
+function gggFunc (|int| A, |int|)
+	if A > 1
+		return 5
+	return Macros.fs._Parsed.Length
+
+
+function Inline_Branch2 (|scdecl| D)
+	// what about inlining more complex expressions into branches?
+	require D.IsUnknownParam
+	|| x = 0
+	if hhhMaybeConst(7)
+		x = 1
+	if hhhMaybeConst(0)
+		x = 2
+	if gggFunc(2) > 4
+		x = 3
+	if gggFunc(1) > 4
+		x = 4
+
+
+function gggTest1 (|int| A, |int| B, |int|)
 	if A > 0
 		return B+1
 	return B-1
+
+
+function gggAlter (|int| A, |int| B, |int|)
+	A++
+	if A > 0
+		return B+1
+	return B-1
+
+
+function Inline_More
+	|| y = 1
+	y = gggFunc(y)
+
+	#!Set consts
+	y = gggAlter(1, 2)
+	y = gggAlter(-1, 2)
 	
+	#! Just alter Y
+	y = gggAlter(y, 2)
 
-function InlineDecl (|scdecl| X)
-	|| y = x.IsUnknownParam
-	// what kind of tests do I want? just somthing with branchs and consts...
+	#!Y Needs separate regs for A and B
+	y = gggAlter(y, y)
+	
+	#! IDK
+	y = gggAlter(2, Y)
+	
+	#! IDK2
+	y = 0
+	y = gggAlter(2, Y)
+
+	#! IDK3
+	y = 1
+	y = gggAlter(2, Y)
+	// test register-reuse and failing to re-use.
+	// also double-inlines
 
 
-function InlineInt (|int| A)
+function LLL (|int| Y, |int|)
+	if Y&1
+		Y++
+	return Y
+
+function LLL2 (|int| Y, |int|)
+	return Y*2				// return can handle this.
+
+function LLL3 (|int| Y, |int|)
+	|| X = 9 + Y
+	return X
+
+
+function Inline_LLL
+	|| V = 0
+	|| E = 10
+	v = lll(v)
+	v = 1
+	v = lll2(v)
+	v = lll2(v)
+	v = lll3(e)
+	v = lll3(-1)
+
+
+function Inline_Consts (|int| A)
 	#!BBB
-	|| B = inlinetest1(1, 2)
+	|| B = gggTest1(1, 2)
 	#!CCC
-	|| C = inlinetest1(-1, 2)
+	|| C = gggTest1(-1, 2)
 	#!DDD
-	|| D = inlinetest1(-1, 0)
+	|| D = gggTest1(-1, 0)
 	#!EEE
-	|| E = A+inlinetest1(-1, 0)
+	|| E = A+gggTest1(-1, 0)
 	#!FFF
-	|| F = inlinetest1(-1, A)
+	|| F = gggTest1(-1, A)
 	#!GGG
-	|| G = inlinetest1(A, 0)
+	|| G = gggTest1(A, 0)
 	#!HHH
-	|| H = inlinetest1(A, A)
-	// what kind of tests do I want? just somthing with branchs and consts...
+	|| H = gggTest1(A, A)
 
 	
 function AskConst (|int| x)
 	|| y = 14
 	|| z = x << y
+
 
 function AddK
 	|| y = 1

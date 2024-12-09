@@ -88,13 +88,45 @@ function Sheb (fn_asm)
 	return exp.noop*asmreg()
 
 
+function TryTail (fn_asm)
+	opt norefcounts
+	|| l = .Last
+	require l isa asm.FNC or asm.fnc3
+	|| fn = l.Msg.obj as SCFunction					#debug_require
+	|| Prms = l.FuncPrmBits							#require
+	
+/	L.op = asm.tail
+	l.R[0] = l.r[1]
+	l.r[1] = prms
+	
+	return ASMReg()
+
+
+function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest,  |AsmReg|)
+	opt norefcounts
+	|| f = exp.first
+		dest = .µinto(f, dest)
+	exp.JUMP(0)
+	return Dest
+
+
+function ReturnExp (|&ASMState| self, |message| f, |AsmReg|)
+	if f
+		|| V = .ExistingVar(f, true)
+			return V
+		return .µ(f)
+	
 
 function Return (fn_asm)
 	opt norefcounts
-	|asmreg| V
+	|int| L = .ReturnDest		// can remove constants, so try first
+		return InlinedReturn(self, exp, (l&31).asm)
+
 	|| f = exp.first
-		V = .ExistingVar(f, true)
-		V ?= .µ(f)
+	|| V = ReturnExp(self, f)
+	|| T = TryTail(self, exp)
+		return T
+		
 	|| amount = (f!=nil)|int|
 	|| D0 = .SafeDecr
 	|| D1 = .decr
@@ -615,4 +647,19 @@ function Message.TypeCastDoesNothing (|bool|)
 		return byteslost == 0
 	require byteslost <= 0
 
+
+
+function fatasm.FuncPrmBits (|uint64|)
+	rz = .r2
+	rz |= .r3|uint64| << 32
+	|| Count = rz&15
+	rz >>= 7
+	require !(rz>>31)
+	for i in 6
+		|| p = (rz >> (5*i)) & 31
+		if p > i
+			rz |= 1<<31
+			exit
+	// ffff(r4, r3, r2, r1)
+	
 

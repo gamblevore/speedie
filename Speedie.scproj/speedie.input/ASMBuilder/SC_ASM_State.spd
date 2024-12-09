@@ -359,9 +359,12 @@ struct ASMState
 		|| sh = 7
 		|| p = prms.first
 		for FnArg in fn.args
+		// we'd like to collect bits on the SIMD/normal register file
+		// for nativisation. 6 - bits per thing. Still counts as a 64-bit number
+		// FuncPrmBits() also would need upgrading.
 			|| v = .FuncPrm(p!).reg
-			sh += 5
 			rz  |=  v << sh
+			sh += 5
 			rz++								// Send-count (4 bits max)
 			p++
 			if .Last isa asm.addr
@@ -453,6 +456,7 @@ struct ASMState
 		|| A = .Curr
 		|| J = .funcstart
 		|| C = 0
+		// jumps of 0 can be rendered as a nop
 		while A > J
 			if J isa asm.jump
 				C += J.JumpImprove
@@ -510,16 +514,18 @@ struct ASMState
 		|| fn = asm.fn
 		require !fn.CurrentlyInlining	
 		fn.CurrentlyInlining = true
-	
+		
 		|| oldFunc = .fn
 		|| OldDest = .ReturnDest
 	
 		.fn = fn
-		.ReturnDest = dest.reg
+		.ReturnDest = dest.reg ||| 128
 	
+		|fatrange| LL 
+		LL.Start = .curr
 		|| OK = .TryInlineSub(prms, dest, fn)
-		if 0: "nothing"
-		
+		LL.AllJumpTo(.curr)
+
 		.ReturnDest = Olddest
 		.fn = oldFunc
 		fn.CurrentlyInlining=false
@@ -544,24 +550,6 @@ struct ASMState
 		
 		ASMType.arg(self, fn.SourceArg!, ASMReg())
 		return true
-	
-	
-	/*
-		V = lll(V)
-		function LLL (|int| Y, |int|)
-			if Y&1
-				Y++
-			return Y				// already handled. Passed Y via .onlypassedonce as E.
-		
-		function LLL (|int| Y, |int|)
-			return Y*2				// return can handle this.
-	
-		|| V = lll(E)
-		function LLL (|int| Y, |int|)
-			|| X = 9 + Y			// .declareme() uses V
-			return X
-	*/
-	
 	
 	
 	function AskForInline (|message| prms, |asmreg| dest, |SCFunction| fn, |bool|)
@@ -635,7 +623,7 @@ function @ASMType.DoFunction (fn_asm)
 	.CloseVars(Closer)
 	
 	|| PExt = P >> 32
-	|| fat = exp.FNC(dest, fn.TableID+31, P,  PExt)
+	|| fat = prms.FNC(dest, fn.TableID+31, P,  PExt)
 	if fn.HasCVersion
 		fat.op = asm.FNCX
 	fat.op += PExt > 0
@@ -655,7 +643,7 @@ function @ASMType.DoFunction (fn_asm)
 function @ASMState.ExpandJSM (|bool|)
 	require .Ancients < 16
 	|| j = FatASM[4MB]
-		.Ancients <~ .jsmspace
+		.Ancients <~ .JSMSpace
 		.JSMSpace = j
 		return sh.Alloc(j)
 	
