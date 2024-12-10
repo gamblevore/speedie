@@ -276,7 +276,7 @@ function Dot (fn_asm)									// a.b
 	if prop is global
 		return DoGlobal(self, exp, dest, prop)
 	target debug
-		if f.obj isa scmodule
+		if f.obj isa scmodule // should never happen
 		 
 	|| F = exp.first!
 	|| Obj = .µopen(F, dest)
