@@ -529,7 +529,7 @@ POS 5
 #!						(((((Memory)))))
 /**/ GSTR  (table)
 		o1 = strs(vm, Op)
-/**/ GTAB  (table)
+/**/ GTAB  (table) // we could make a GLRD and GLWR instruction. faster global read/writes
 		u1 = table(vm, Op)
 /**/ RD1U  (Read)
 		u1 = mem1(uint8)

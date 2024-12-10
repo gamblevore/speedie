@@ -9,23 +9,26 @@ module PackMaker
 	|[SCDecl]|				PackGlobs
 	|int| 					ExportPos
 
+	helper AddFunc (|scfunction| f)
+		opt norefcounts
+		if f.IsStdLib
+			if f.needsexport or options.MakeInterpreter
+				.LibFuncs <~ f
+		  elseif f.NeedsExport or (f in "ASMExamples")
+			.PackFuncs <~ f
+
+		
 	function AddAll
 		opt norefcounts
-		|| MakeExec = options.MakeInterpreter
 		for f in Compiler.FuncList
-			if !f.CanLibLoad
-				0
-			  elseif f.IsStdLib
-				if MakeExec or f.needsexport
-					.LibFuncs <~ f
-			  elseif f.NeedsExport or (f in "ASMExamples")
-				.PackFuncs <~ f
+			if f.CanLibLoad
+				.addfunc(f)
 		.SortAll
 	
 		
 	function AddLibGlob (|scdecl| d)
 		.LibGlobs <~ d
-		d.ExportPosition = ++.ExportPos
+		d.ExportPosition = ++.ExportPos // why though?
 	
 	
 	function DoLibGlobs (|jbin| lib)
@@ -146,12 +149,14 @@ module PackMaker
 	function MakePack 
 		if (–sizeof FatASM) != 64
 		require ASMState.Sh.PackMakerInit			// fn_asm_table[@arg]
+		PackMaker.AddAll
+		|| pg = .OrderGlobals(.PackGlobs)
 		require .ActualASMCompile
 
 		|| j = jbin(@tmp, "xpd")
 		j.enter
 		j.enter(@tmp, "app")
-		.OrderGlobals(j)
+		j.addint(pg + 16)
 		j.enter
 		.ListPackFuncs(j)
 		.DumpStrings(j)
@@ -162,21 +167,16 @@ module PackMaker
 		Compiler.ProductFile.SmartData = j
 
 
-	function OrderGlobals (|jbin| j)
-		.PackGlobs.sort(SmallestFirst)
-		|| g = .OrderGlobalsSub
-		j.addint(G + 16)
 
-
-	function OrderGlobalsSub (|int|)
+	function OrderGlobals (|[scdecl]| List, |int|)
 		opt norefcounts
-		|| G = 1				// So we can detect bugs easier... if something lacks an export position.
-		for (d in .PackGlobs)
+		list.sort(SmallestFirst)
+/		rz = 1				// rz = 1, so if .ExportPosition == 0 then something is wrong.
+		for (d in list)
 			|| s = d.CarraySize
-			G = G align s
-			d.ExportPosition = G
-			G += s
-		return g
+			rz = rz align s
+			d.ExportPosition = rz / s
+			rz += s
 
 	
 	function scfunction.Test (|?&ivec4|)

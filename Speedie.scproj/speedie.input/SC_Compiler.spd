@@ -178,7 +178,6 @@ function CompileAll (|bool|)
 	.DoRefAnalysis				// do actual refcounts.
 
 	require .Stage( "String Correction" )
-	PackMaker.AddAll
 	StringCorrector.Correctconsts
 	
 	if Options.ModePack

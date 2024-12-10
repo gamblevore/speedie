@@ -272,8 +272,14 @@ function Dot (fn_asm)									// a.b
 	opt	NoRefCounts
 	if dest isnt set
 		dest = .TempTyped(exp, dest)
-	|| Obj = .µopen(exp.first!, dest)
 	|| prop = exp.ASMDecl
+	if prop is global
+		return DoGlobal(self, exp, dest, prop)
+	target debug
+		if f.obj isa scmodule
+		 
+	|| F = exp.first!
+	|| Obj = .µopen(F, dest)
 	|| T = prop.typeinfo
 	dest.µtype = T
 	
@@ -352,8 +358,10 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 
 function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |asmreg|)
 	opt	NoRefCounts
+	|| d2 = exp.asmdecl
+	if !d.minimatch(d2) // isnt this the same as d?
 	if dest isnt set								// a = glob
-		dest = .TempTyped(exp, dest)
+		dest = .TempTyped(exp, dest) // no neede type if we have D?
 
 	|int64| iTable = d.ExportPosition
 	expect (iTable > 0)          (exp, "No global address".internal)
@@ -364,7 +372,7 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 		Dest.µtype = DataTypeCode._voidptr
 		return (table * dest).HaveAddr
 	
-	dest.µtype = exp.asmdecl.DataType
+	dest.µtype = d2.DataType
 	return .ReadOrWrite(dest, Exp, dest, asmreg(), 0)
 	
 
