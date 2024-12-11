@@ -62,7 +62,6 @@ JB_Globals JB__;
 
 function FillLibGlobs (|faststringcpp| fs, |bool| simple=false)
 	opt norefcounts
-	fs <~ "\n#define Float64 double"
 	fs <~ "\nstruct JB_Globals {\n\t"
 	for prop in PackMaker.LibGlobs
 		if simple and prop.Complexity > 1

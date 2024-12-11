@@ -135,7 +135,7 @@ extern const char* JB_CrashLogFileName;
 
 
 int JB_ErrorHandleFileC(const char* Path, int err, const char* Operation);
-extern uint Flow_Disabled; /////////
+extern uint Flow_Disabled;
 
 void JB_Flow__ReportStringData(u8* Addr, int Length, u8* Name, int NameLen) {
 #ifndef AS_LIBRARY

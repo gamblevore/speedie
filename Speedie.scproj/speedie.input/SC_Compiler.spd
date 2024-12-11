@@ -531,7 +531,6 @@ function ImportAll
 		m.InitDecls
 	for F in SCImport.AllFiles
 		F.CollectGlobals Compiler.Program
-	packmaker.LibGlobs.Sort(SimplestFirst)
 
 	scimport.noproj
 	(Message).Restore
@@ -547,6 +546,8 @@ function ImportAll
 		m.DelayedInitFuncTransform
 	.PostInitCodeCall
 	
+	packmaker.LibGlobs.Sort(SimplestFirst)
+
 	.Stage( "Creating Exportnames For Function Prototypes" )
 	for f in .FuncList
 		|| p = f.HasProto

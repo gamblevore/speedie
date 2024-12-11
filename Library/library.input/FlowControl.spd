@@ -138,8 +138,7 @@ class FlowControl
 		
 		syntax append (|byte| value)
 			visible,  flow off
-			return ///////
-			if !.disabled
+			if !.isdisabled
 				.disabled = 1
 				.flow!.TestByte(value)
 				.disabled = 0

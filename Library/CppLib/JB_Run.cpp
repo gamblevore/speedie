@@ -76,7 +76,7 @@ JB_Class*           ClassList;
 byte				JB_ErrorNumber;
 byte				JB_Active = 0;
 extern char**		environ;
-uint				Flow_Disabled; /////////
+uint				Flow_Disabled;
 static Array*		App_Args;
 _cstring			App_CallPath;
 
@@ -248,15 +248,9 @@ int JB_SP_Run (_cstring* C, int Mode)	{
 }
 
 
-void JB_Flow__DisabledIncr(int i) {
-	Flow_Disabled += i;
-}
-void JB_Flow__DisabledSet(int i) {
-	Flow_Disabled = i;
-}
-bool JB_Flow__IsDisabled() {
-	return Flow_Disabled;
-}
+void JB_Flow__DisabledIncr(int i) {	Flow_Disabled += i; }
+void JB_Flow__DisabledSet(int i) { 	Flow_Disabled = i; }
+bool JB_Flow__IsDisabled() { return Flow_Disabled; }
 
 
 byte* JB_App__ErrorNumber () {
