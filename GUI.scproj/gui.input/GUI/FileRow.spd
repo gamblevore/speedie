@@ -51,6 +51,7 @@ class FileRow (ListViewRow)
 		.dirfile	= DirFile
 
 		.asdir		= dirfile
+//		if name contains ".scproj"
 		.name		= name
 		.lastsize	= (path.File.Size, 0)(!.asdir)
 		.lastfilecount = (!.asdir)|int|
@@ -334,23 +335,23 @@ function ListView.ListFiles (|string| InPath, |string| types, |bool| save, |int|
 		if AllSight or n.platformvisible(ATroot)
 			if --max <= 0
 				exit
-			|| isdir = f.isdirlike
+			|| isdirlike = f.isdirlike
 			|| ext = n.ext
-			if isdir
+			if isdirlike
 				p = p.PathDir
 			|| icon = filerow.icon(p, types).Render
 			n = icon + " " + n
-			|| r = filerow(p, n, (".nothing", "")(isdir))
+			|| r = filerow(p, n, (".nothing", "")(isdirlike))
 			self <~ r
-			|| IsOK = isdir
-			if !save and !isdir and !types and f.isdir
+			|| IsOK = isdirlike
+			if !save and !isdirlike and !types and f.isdir
 				isok = false // can't open package if we want files
-			  elseif save and isdir and types.typecontains(ext + "/")
+			  elseif save and isdirlike and types.typecontains(ext + "/")
 				isok = false
 			  elseif !save and !isok
 				isok = !types
 				if !isok
-					if isdir
+					if isdirlike or f.isdir
 						ext = ext.pathdir
 					isok = types.typecontains(ext)
 			(r is Grayed) = !ISOK 

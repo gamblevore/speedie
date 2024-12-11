@@ -214,7 +214,7 @@ function file.IsDirLike (|bool|)
 	require .IsDir
 	|| n	= .Name
 	|| ext	= n.Ext
-	return (n != "XCBuildData") and (ext != "app" and "framework" and "bundle" and "xcodeproj" and "build" and "dSYM") // os x
+	return (n != "XCBuildData") and (ext != "app" and "framework" and "bundle" and "xcodeproj" and "build" and "dSYM" and "scproj") // mostly osx
 
 
 function OpenSaveDialog.RelistFiles (|string| path, |bool| AlwaysUse=true)

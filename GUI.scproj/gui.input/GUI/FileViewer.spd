@@ -504,7 +504,7 @@ class FileViewer (ListView)
 				|| bprj = b.InMainProj
 				if aprj == bprj
 					return FileRowNameSorter(a, b)
-				return aprj|int|
+				return bprj - aprj
 				
 			return b.rangelength - a.rangelength
 
@@ -527,8 +527,8 @@ class FileViewer (ListView)
 
 		function FileRowNameSorter (SorterComparerFileRow)
 			opt norefcounts
-			if (b.asdir) != (a.asdir)
-				return (b.asdir)|int|
+			|| c = b.asdir - a.asdir
+				return c
 			return (b.name ~<= a.name)
 
 		function QuickOpenModified (GUITextEvent)
