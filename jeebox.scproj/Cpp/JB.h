@@ -584,361 +584,724 @@ JBClass ( JB_Error , Message ,
 	ErrorFlags ErrorFlags;
 	ErrorSeverity Severity;
 );
-extern Message* JB__App__Conf;
-extern Array* JB__App__OldArgs;
-extern JB_String* JB__App__Path;
-extern JB_File* JB__App__stdin;
-extern JB_File* JB__App__StdOut;
-extern JB_String* JB__App_Usage;
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[554])
-extern bool JB__ErrorColors_Enabled;
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[555])
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[556])
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[553])
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[556])
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[557])
-extern u16 JB__API_NilHappened_;
-extern SyntaxObj* JB__Constants__FuncArray[64];
-extern Dictionary* JB__Constants__SyxDict;
-extern CharSet* JB__Constants_CSAfterDot;
-extern CharSet* JB__Constants_CSAfterStatement;
-extern CharSet* JB__Constants_CSLettersOnly;
-extern CharSet* JB__Constants_CSLine;
-extern CharSet* JB__Constants_CSLineBlack;
-extern CharSet* JB__Constants_CSNum;
-extern CharSet* JB__Constants_CSWordMiddle;
-extern CharSet* JB__Constants_CSWordStart;
-extern CharSet* JB__Constants_CSWrapSplit;
-extern Dictionary* JB__Constants_EscapeChr;
-extern Dictionary* JB__Constants_EscapeStr;
-extern JB_String* JB__Constants_FFUUU;
-extern Dictionary* JB__Constants_JS_EscapeStr;
-extern Dictionary* JB__Constants_JS_UnEscapeStr;
-extern Dictionary* JB__Constants_UnEscapeStr;
-extern Dictionary* JB__Constants_XML_EscapeStr;
-extern Dictionary* JB__Constants_XML_UnEscapeStr;
-extern CharSet* JB__Constants_XMLWordMiddle;
+#define JB__App__Conf JB__.App__Conf
+#define JB__App__OldArgs JB__.App__OldArgs
+#define JB__App__Path JB__.App__Path
+
+#define JB__App__stdin JB__.App__stdin
+#define JB__App__StdOut JB__.App__StdOut
+#define JB__App_Usage JB__.App_Usage
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[552])
+
+#define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[553])
+
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[554])
+
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[551])
+
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[554])
+
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[555])
+
+#define JB__API_NilHappened_ JB__.API_NilHappened_
+#define JB__Constants__FuncArray JB__.Constants__FuncArray
+#define JB__Constants__SyxDict JB__.Constants__SyxDict
+#define JB__Constants_CSAfterDot JB__.Constants_CSAfterDot
+#define JB__Constants_CSAfterStatement JB__.Constants_CSAfterStatement
+#define JB__Constants_CSLettersOnly JB__.Constants_CSLettersOnly
+#define JB__Constants_CSLine JB__.Constants_CSLine
+#define JB__Constants_CSLineBlack JB__.Constants_CSLineBlack
+#define JB__Constants_CSNum JB__.Constants_CSNum
+#define JB__Constants_CSWordMiddle JB__.Constants_CSWordMiddle
+#define JB__Constants_CSWordStart JB__.Constants_CSWordStart
+#define JB__Constants_CSWrapSplit JB__.Constants_CSWrapSplit
+#define JB__Constants_EscapeChr JB__.Constants_EscapeChr
+#define JB__Constants_EscapeStr JB__.Constants_EscapeStr
+#define JB__Constants_FFUUU JB__.Constants_FFUUU
+#define JB__Constants_JS_EscapeStr JB__.Constants_JS_EscapeStr
+#define JB__Constants_JS_UnEscapeStr JB__.Constants_JS_UnEscapeStr
+#define JB__Constants_UnEscapeStr JB__.Constants_UnEscapeStr
+#define JB__Constants_XML_EscapeStr JB__.Constants_XML_EscapeStr
+#define JB__Constants_XML_UnEscapeStr JB__.Constants_XML_UnEscapeStr
+#define JB__Constants_XMLWordMiddle JB__.Constants_XMLWordMiddle
 #define kJB__MZLab_Default ((int)3)
+
 #define kJB__MZLab_Fast ((int)2)
+
 #define kJB__MZLab_Fastest ((int)1)
+
 #define kJB__MZLab_None ((int)0)
+
 #define kJB__MZLab_Strong ((int)3)
+
 #define kJB__MZLab_Strongest ((int)4)
+
 #define kJB__Math_E (2.7182818284590452353602874713526f)
+
 #define kJB__Math_iTau (0.15915494309f)
+
 #define kJB__PicoNoise_All ((int)15)
+
 #define kJB__PicoNoise_Debug ((int)3)
+
 #define kJB__PicoNoise_DebugChild ((int)1)
+
 #define kJB__PicoNoise_DebugParent ((int)2)
+
 #define kJB__PicoNoise_Events ((int)12)
+
 #define kJB__PicoNoise_EventsChild ((int)4)
+
 #define kJB__PicoNoise_EventsParent ((int)8)
-extern JB_File* JB__Platform_Logger_;
-extern JB_String* JB___AppConfString;
-extern JB_String* JB__JbinHeader;
-extern JB_String* JB__jBinNotJbin;
-extern int JB_aaaaaaa;
+
+#define JB__Platform_Logger_ JB__.Platform_Logger_
+#define JB___AppConfString JB__._AppConfString
+#define JB__JbinHeader JB__.JbinHeader
+#define JB__jBinNotJbin JB__.jBinNotJbin
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[558])
-extern JB_ErrorReceiver* JB_StdErr;
+
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[556])
+
+#define JB_StdErr JB__.StdErr
 #define kJB_SyxAcc ((Syntax)29)
+
 #define kJB_SyxAdj ((Syntax)27)
+
 #define kJB_SyxARel ((Syntax)21)
+
 #define kJB_SyxArg ((Syntax)1)
+
 #define kJB_SyxArr ((Syntax)34)
+
 #define kJB_SyxAsk ((Syntax)43)
+
 #define kJB_SyxBack ((Syntax)16)
+
 #define kJB_SyxBadj ((Syntax)28)
+
 #define kJB_SyxBin ((Syntax)18)
+
 #define kJB_Syxbinn ((Syntax)42)
+
 #define kJB_SyxBra ((Syntax)31)
+
 #define kJB_SyxBRel ((Syntax)26)
+
 #define kJB_SyxChar ((Syntax)17)
+
 #define kJB_SyxCnj ((Syntax)8)
+
 #define kJB_SyxDecl ((Syntax)4)
+
 #define kJB_SyxDot ((Syntax)23)
+
 #define kJB_SyxEmb ((Syntax)2)
+
 #define kJB_SyxERel ((Syntax)38)
+
 #define kJB_SyxFile ((Syntax)35)
+
 #define kJB_SyxFunc ((Syntax)25)
+
 #define kJB_SyxItem ((Syntax)30)
+
 #define kJB_SyxList ((Syntax)32)
+
 #define kJB_Syxmax ((Syntax)55)
+
 #define kJB_SyxMsg ((Syntax)46)
+
 #define kJB_SyxName ((Syntax)22)
+
 #define kJB_SyxNil ((Syntax)0)
+
 #define kJB_SyxNum ((Syntax)14)
+
 #define kJB_SyxOat ((Syntax)6)
+
 #define kJB_SyxOpp ((Syntax)9)
+
 #define kJB_Syxpinn ((Syntax)41)
+
 #define kJB_SyxPrm ((Syntax)33)
+
 #define kJB_SyxQues ((Syntax)7)
+
 #define kJB_SyxQuot ((Syntax)36)
+
 #define kJB_SyxRel ((Syntax)37)
+
 #define kJB_SyxSCnj ((Syntax)12)
+
 #define kJB_SyxSCom ((Syntax)45)
+
 #define kJB_SyxSDot ((Syntax)24)
+
 #define kJB_SyxSheb ((Syntax)11)
+
 #define kJB_SyxSStr ((Syntax)15)
+
 #define kJB_SyxSThg ((Syntax)13)
+
 #define kJB_SyxStr ((Syntax)19)
+
 #define kJB_SyxThg ((Syntax)10)
+
 #define kJB_SyxTmp ((Syntax)5)
+
 #define kJB_SyxTodo ((Syntax)47)
+
 #define kJB_SyxTRel ((Syntax)39)
+
 #define kJB_SyxTril ((Syntax)40)
+
 #define kJB_SyxType ((Syntax)3)
+
 #define kJB_SyxUnit ((Syntax)20)
+
 #define kJB_Syxurl ((Syntax)48)
+
 #define kJB_SyxXAtt ((Syntax)49)
+
 #define kJB_SyxXCDT ((Syntax)53)
+
 #define kJB_SyxXCom ((Syntax)52)
+
 #define kJB_SyxXML ((Syntax)50)
+
 #define kJB_SyxXPI ((Syntax)51)
+
 #define kJB_SyxXTxt ((Syntax)54)
+
 #define kJB_SyxYoda ((Syntax)44)
-extern bool JB__Tk__DotInsertAllow;
-extern Message* JB__Tk__EndOfLineMarker;
-extern Dictionary* JB__Tk__ErrorNames;
-extern u16 JB__Tk__StopBars;
-extern JB_String* JB__Tk_Data;
+
+#define JB__Tk__DotInsertAllow JB__.Tk__DotInsertAllow
+#define JB__Tk__EndOfLineMarker JB__.Tk__EndOfLineMarker
+#define JB__Tk__ErrorNames JB__.Tk__ErrorNames
+#define JB__Tk__StopBars JB__.Tk__StopBars
 #define kJB__Tk_kAdjectiveOp ((int)1)
+
 #define kJB__Tk_kAllow ((bool)false)
+
 #define kJB__Tk_kColon ((int)2)
+
 #define kJB__Tk_kColonArg ((int)4)
+
 #define kJB__Tk_kComma ((int)128)
+
 #define kJB__Tk_kEnd ((int)448)
+
 #define kJB__Tk_kEndContainer ((int)256)
+
 #define kJB__Tk_kEndOfLine ((int)64)
+
 #define kJB__Tk_kExpect ((bool)1)
+
 #define kJB__Tk_kFuncAfterAny ((int)3584)
+
 #define kJB__Tk_kFuncAfterBar ((int)2048)
+
 #define kJB__Tk_kFuncAfterNormal ((int)512)
+
 #define kJB__Tk_kFuncAfterNoSpace ((int)1024)
+
 #define kJB__Tk_kIllegalChar ((int)4194304)
+
 #define kJB__Tk_kLameTemporal ((int)56)
+
 #define kJB__Tk_kOpp ((int)258048)
+
 #define kJB__Tk_kOppBar ((int)16384)
+
 #define kJB__Tk_kOppBra ((int)4096)
+
 #define kJB__Tk_kOppChain ((int)94208)
+
 #define kJB__Tk_kOppNoBar ((int)241664)
+
 #define kJB__Tk_kOppSNB ((int)8192)
+
 #define kJB__Tk_kOppSyx ((int)24576)
+
 #define kJB__Tk_kOppTemporal ((int)32768)
+
 #define kJB__Tk_kOppWord ((int)65536)
+
 #define kJB__Tk_kOppYoda ((int)131072)
+
 #define kJB__Tk_kTemporal ((int)56)
+
 #define kJB__Tk_kTemporalBar ((int)32)
+
 #define kJB__Tk_kTemporalSyx ((int)48)
+
 #define kJB__Tk_kTemporalSyxNoBar ((int)16)
+
 #define kJB__Tk_kTemporalWord ((int)8)
+
 #define kJB__Tk_kTemporalWordColon ((int)262144)
+
 #define kJB__Tk_kThing ((int)3670016)
+
 #define kJB__Tk_kThingBar ((int)1048576)
+
 #define kJB__Tk_kThingSyx ((int)524288)
+
 #define kJB__Tk_kThingWord ((int)2097152)
+
 #define kJB__Tk_kTmpOpp ((int)32784)
-extern FP_fnIDGenerator JB__Tk_Splitter;
-extern MessagePosition JB__Tk_Using;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[561])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[560])
-extern Random JB__zalgo_R;
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[559])
+
+#define JB__Tk_Splitter JB__.Tk_Splitter
+#define JB__Tk_Using JB__.Tk_Using
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[559])
+
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[558])
+
+#define JB__zalgo_R JB__.zalgo_R
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[557])
+
 #define kJB__byte_max ((byte)255)
+
 #define kJB__byte_min ((byte)0)
+
 #define kJB__int16_max ((s16)32767)
+
 #define kJB__int16_min ((s16)-32768)
+
 #define kJB__int64_max ((int64)9223372036854775807)
+
 #define kJB__int64_min ((int64)-9223372036854775808)
+
 #define kJB__int8_max ((int8)127)
+
 #define kJB__int8_min ((int8)-128)
+
 #define kJB__uint_max ((uint)4294967295)
+
 #define kJB__uint_min ((uint)0)
+
 #define kJB__uint16_max ((u16)65535)
+
 #define kJB__uint16_min ((u16)0)
+
 #define kJB__uint64_max ((uint64)-1)
+
 #define kJB__CharProp_AlmostLetter ((CharProp)6)
+
+
 #define kJB__CharProp_Letters ((CharProp)7)
+
 #define kJB__CharProp_Lower ((CharProp)9)
+
 #define kJB__CharProp_Nothing ((CharProp)0)
+
 #define kJB__CharProp_Number ((CharProp)5)
+
 #define kJB__CharProp_Punct ((CharProp)2)
+
 #define kJB__CharProp_Unicode ((CharProp)10)
+
 #define kJB__CharProp_Upper ((CharProp)8)
+
 #define kJB__CharProp_VarNames ((CharProp)4)
+
 #define kJB__CharProp_White ((CharProp)1)
+
 #define kJB__CharProp_XMLPunct ((CharProp)3)
+
 #define kJB__ControlClipMode_Debug ((int)4)
+
 #define kJB__ControlClipMode_SlideBackInParent ((int)1)
+
 #define kJB__ControlClipMode_SlideBackInWindow ((int)2)
+
 #define kJB__CL1_After ((ControlPoint)6)
+
 #define kJB__CL1_Before ((ControlPoint)4)
+
 #define kJB__CL1_Centered ((ControlPoint)7)
+
 #define kJB__CL1_High ((ControlPoint)2)
+
 #define kJB__CL1_Length ((ControlPoint)10)
+
 #define kJB__CL1_Low ((ControlPoint)0)
+
 #define kJB__CL1_Percent ((ControlPoint)8)
+
 #define kJB__TC__void ((DataTypeCode)0)
+
 #define kJB__TC__voidptr ((DataTypeCode)48)
+
 #define kJB__TC_bool ((DataTypeCode)256)
+
 #define kJB__TC_byte ((DataTypeCode)8)
+
 #define kJB__TC_Byte2 ((DataTypeCode)9)
+
 #define kJB__TC_Byte3 ((DataTypeCode)10)
+
 #define kJB__TC_Byte4 ((DataTypeCode)11)
+
 #define kJB__TC_char ((DataTypeCode)72)
+
 #define kJB__TC_cstring ((DataTypeCode)48)
+
 #define kJB__TC_Double ((DataTypeCode)248)
+
 #define kJB__TC_f16 ((DataTypeCode)216)
+
 #define kJB__TC_f64 ((DataTypeCode)248)
+
 #define kJB__TC_Failed ((DataTypeCode)1024)
+
 #define kJB__TC_Float ((DataTypeCode)232)
+
 #define kJB__TC_Float16 ((DataTypeCode)216)
+
 #define kJB__TC_HFloat ((DataTypeCode)216)
+
 #define kJB__TC_Int ((DataTypeCode)104)
+
 #define kJB__TC_int16 ((DataTypeCode)88)
+
 #define kJB__TC_int64 ((DataTypeCode)120)
+
 #define kJB__TC_int8 ((DataTypeCode)72)
+
 #define kJB__TC_iVec2 ((DataTypeCode)105)
+
 #define kJB__TC_iVec3 ((DataTypeCode)106)
+
 #define kJB__TC_iVec4 ((DataTypeCode)107)
+
 #define kJB__TC_Numeric ((DataTypeCode)8)
+
 #define kJB__TC_PossibleBits ((DataTypeCode)2047)
+
 #define kJB__TC_s16 ((DataTypeCode)88)
+
 #define kJB__TC_s16x2 ((DataTypeCode)89)
+
 #define kJB__TC_s16x3 ((DataTypeCode)90)
+
 #define kJB__TC_s16x4 ((DataTypeCode)91)
+
 #define kJB__TC_s64 ((DataTypeCode)120)
+
 #define kJB__TC_SByte ((DataTypeCode)72)
+
 #define kJB__TC_SByte2 ((DataTypeCode)73)
+
 #define kJB__TC_SByte3 ((DataTypeCode)74)
+
 #define kJB__TC_SByte4 ((DataTypeCode)75)
+
 #define kJB__TC_sign ((DataTypeCode)64)
+
 extern Dictionary* JB__TC_Types_Dict;
 #define kJB__TC_u16 ((DataTypeCode)24)
+
 #define kJB__TC_u32 ((DataTypeCode)40)
+
 #define kJB__TC_u64 ((DataTypeCode)56)
+
 #define kJB__TC_UInt ((DataTypeCode)40)
+
 #define kJB__TC_uint16 ((DataTypeCode)24)
+
 #define kJB__TC_uint64 ((DataTypeCode)56)
+
 #define kJB__TC_uint8 ((DataTypeCode)8)
+
 #define kJB__TC_UnusedType ((DataTypeCode)112)
+
 #define kJB__TC_Vec2 ((DataTypeCode)233)
+
 #define kJB__TC_Vec3 ((DataTypeCode)234)
+
 #define kJB__TC_Vec4 ((DataTypeCode)235)
+
 #define kJB__Date_Highest ((int64)9223372036854775807)
+
 #define kJB__Date_kOneStep (0.000015258789f)
+
 #define kJB__Date_kSecondsPerDay ((int)86400)
+
 #define kJB__Date_kSecondsPerMonthApprox ((int)2628000)
+
 #define kJB__Date_kSecondsPerWeek ((int)604800)
+
 #define kJB__ErrorFlags_DontStrip ((ErrorFlags)1)
+
 #define kJB__ErrorFlags_Keep ((int)0)
+
 #define kJB__ErrorFlags_Parse ((ErrorFlags)4)
+
 #define kJB__ErrorFlags_PreferNoRenderPath ((ErrorFlags)2)
+
 #define kJB__ErrorFlags_PrintAndKeep ((int)1)
+
 #define kJB__ErrorFlags_PrintAndRemove ((int)2)
-extern Array* JB__ErrorSeverity__names;
+
+#define JB__ErrorSeverity__names JB__.ErrorSeverity__names
 #define kJB__ErrorSeverity_Critical ((ErrorSeverity)5)
+
 #define kJB__ErrorSeverity_Error ((ErrorSeverity)4)
+
 #define kJB__ErrorSeverity_Hint ((ErrorSeverity)1)
+
 #define kJB__ErrorSeverity_MaxError ((ErrorSeverity)6)
+
 #define kJB__ErrorSeverity_OK ((ErrorSeverity)0)
+
 #define kJB__ErrorSeverity_Problem ((ErrorSeverity)3)
+
 #define kJB__ErrorSeverity_Warning ((ErrorSeverity)2)
+
 #define kJB__FileDes_StdErr ((FileDes)2)
+
 #define kJB__FileDes_StdIn ((FileDes)0)
+
 #define kJB__FileDes_StdOut ((FileDes)1)
+
 #define kJB__FileMode_CanExec ((FileMode)281474976710656)
+
 #define kJB__FileMode_Data ((FileMode)6)
+
 #define kJB__FileMode_Group ((FileMode)56)
+
 #define kJB__FileMode_Other ((FileMode)7)
+
 #define kJB__FileMode_Owner ((FileMode)448)
+
 #define kJB__FileMode_Process ((FileMode)115968)
+
 #define kJB__FileResolveMode_AllowMissing ((bool)1)
+
 #define kJB__MaybeBool_false ((MaybeBool)0)
+
 #define kJB__MaybeBool_maybefalse ((MaybeBool)8)
+
 #define kJB__MaybeBool_maybetrue ((MaybeBool)9)
+
 #define kJB__MaybeBool_true ((MaybeBool)1)
+
 #define kJB__MoveCode_All ((MoveCode)63)
+
 #define kJB__MoveCode_Back ((MoveCode)32)
+
 #define kJB__MoveCode_Backward ((MoveCode)32)
+
 #define kJB__MoveCode_Bottom ((MoveCode)8)
+
 #define kJB__MoveCode_Center ((MoveCode)63)
+
 #define kJB__MoveCode_Close ((MoveCode)128)
+
 #define kJB__MoveCode_Down ((MoveCode)8)
+
 #define kJB__MoveCode_Forward ((MoveCode)16)
+
 #define kJB__MoveCode_Front ((MoveCode)16)
+
 #define kJB__MoveCode_Horizontal ((MoveCode)3)
+
 #define kJB__MoveCode_Left ((MoveCode)2)
+
 #define kJB__MoveCode_MiddleLeft ((MoveCode)14)
+
 #define kJB__MoveCode_MiddleRight ((MoveCode)13)
+
 #define kJB__MoveCode_Negative ((MoveCode)170)
+
 #define kJB__MoveCode_Open ((MoveCode)64)
+
 #define kJB__MoveCode_Positive ((MoveCode)85)
+
 #define kJB__MoveCode_Right ((MoveCode)1)
+
 #define kJB__MoveCode_Top ((MoveCode)4)
+
 #define kJB__MoveCode_Up ((MoveCode)4)
+
 #define kJB__MoveCode_Vertical ((MoveCode)12)
+
 #define kJB__MsgParseFlags_BreakPoint ((int)32768)
+
 #define kJB__MsgParseFlags_Editable ((int)2048)
+
 #define kJB__MsgParseFlags_Inserted ((int)4096)
+
 #define kJB__MsgParseFlags_MacroInserted ((int)12288)
+
 #define kJB__MsgParseFlags_MacroMade ((int)8192)
+
 #define kJB__MsgParseFlags_NicelyPositioned ((int)1024)
+
 #define kJB__MsgParseFlags_Special ((int)2048)
+
 #define kJB__MsgParseFlags_Style2 ((int)16384)
+
 #define kJB__ProcessMode_AutoPrintErrors ((int)4)
+
 #define kJB__ProcessMode_CaptureAll ((int)5)
+
 #define kJB__ProcessMode_CaptureErrors ((int)2)
+
 #define kJB__ProcessMode_CaptureOrPrintErrors ((int)6)
+
 #define kJB__ProcessMode_CaptureStdOut ((int)1)
+
 #define kJB__PIDM_Default ((ProcessOwnerMode)0)
+
 #define kJB__PIDM_OwnGroup ((ProcessOwnerMode)2)
+
 #define kJB__PIDM_StdOutFlowsThroughUs ((ProcessOwnerMode)1)
-extern int JB__Syx_CurrFuncID_;
+
+#define JB__Syx_CurrFuncID_ JB__.Syx_CurrFuncID_
 #define kJB__TaskState_Animation ((TaskState)16)
+
 #define kJB__TaskState_Finished ((TaskState)64)
+
 #define kJB__TaskState_HadErrors ((TaskState)8)
+
 #define kJB__TaskState_Paused ((TaskState)2)
+
 #define kJB__TaskState_Started ((TaskState)1)
+
 #define kJB__TaskState_Successful ((TaskState)32)
+
 #define kJB__TaskState_WaitsTillStart ((TaskState)4)
-extern CompressionStats JB__MzSt_all;
-extern Dictionary* JB__LD_ClassList;
+
+#define JB__MzSt_all JB__.MzSt_all
+#define JB__LD_ClassList JB__.LD_ClassList
 #define kJB__Saver_RefMark ((int)1073741824)
-extern SaverClassInfo* JB__Saver_SaveableList;
-extern Random JB__Rnd_Shared;
+
+#define JB__Saver_SaveableList JB__.Saver_SaveableList
+
+#define JB__Rnd_Shared JB__.Rnd_Shared
 #define kJB__Wrap_kDelete ((int)2)
+
 #define kJB__Wrap_kFree ((int)1)
+
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[552])
-extern Float64 JB__Rec_Progress;
+
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[550])
+
+#define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
+
 #define kJB__fix_TypeObj ((int)1)
+
 #define kJB__fix_TypeStem ((int)2)
+
 #define kJB__fix_TypeValue ((int)0)
-extern byte JB__Flow_Active;
-extern bool JB__Flow_AlwaysMove;
-extern bool JB__Flow_BreakOnFail;
-extern int JB__Flow_Disabled;
-extern FlowControl* JB__Flow_Flow;
+
+#define JB__Flow_Active JB__.Flow_Active
+#define JB__Flow_AlwaysMove JB__.Flow_AlwaysMove
+#define JB__Flow_BreakOnFail JB__.Flow_BreakOnFail
+#define JB__Flow_Flow JB__.Flow_Flow
 #define kJB__Flow_Log ((int)1)
+
 #define kJB__Flow_Off ((int)0)
+
 #define kJB__Flow_Validate ((int)2)
-extern Array* JB__Macro_TmpPrms_;
-extern uint64 JB__Mrap_MDummy_[2];
-extern JB_String* JB__File__Speedie;
-extern bool JB__File_DebugExecute;
+
+#define JB__Macro_TmpPrms_ JB__.Macro_TmpPrms_
+#define JB__Mrap_MDummy_ JB__.Mrap_MDummy_
+#define JB__File__Speedie JB__.File__Speedie
+#define JB__File_DebugExecute JB__.File_DebugExecute
 #define kJB__File_IgnoreErrors ((bool)1)
+
 #define kJB__File_O_APPEND ((int)8)
+
 #define kJB__File_O_CREAT ((int)512)
+
 #define kJB__File_O_EXCL ((int)2048)
+
 #define kJB__File_O_RDONLY ((int)0x000)
+
 #define kJB__File_O_RDWR ((int)2)
+
 #define kJB__File_O_TRUNC ((int)1024)
+
 #define kJB__File_O_WRONLY ((int)1)
-extern byte JB__Err_AutoPrint;
-extern Array* JB__Err_CurrSource_;
-extern bool JB__Err_KeepStackTrace;
+
+
+#define JB__Err_AutoPrint JB__.Err_AutoPrint
+#define JB__Err_CurrSource_ JB__.Err_CurrSource_
+#define JB__Err_KeepStackTrace JB__.Err_KeepStackTrace
+
+//// HEADER LibGlobs.h
+
+struct JB_Globals {
+	bool ErrorColors_Enabled;
+	bool Tk__DotInsertAllow;
+	bool Flow_AlwaysMove;
+	bool Flow_BreakOnFail;
+	byte Flow_Active;
+	bool File_DebugExecute;
+	byte Err_AutoPrint;
+	bool Err_KeepStackTrace;
+	u16 Tk__StopBars;
+	u16 API_NilHappened_;
+	int Syx_CurrFuncID_;
+	Float64 Rec_Progress;
+	Dictionary* Constants_UnEscapeStr;
+	Dictionary* Constants_JS_UnEscapeStr;
+	Dictionary* Constants_XML_UnEscapeStr;
+	Dictionary* Constants_EscapeChr;
+	CharSet* Constants_CSWordMiddle;
+	CharSet* Constants_CSLettersOnly;
+	CharSet* Constants_CSWordStart;
+	CharSet* Constants_XMLWordMiddle;
+	CharSet* Constants_CSNum;
+	CharSet* Constants_CSLine;
+	CharSet* Constants_CSAfterDot;
+	CharSet* Constants_CSAfterStatement;
+	CharSet* Constants_CSLineBlack;
+	CharSet* Constants_CSWrapSplit;
+	JB_String* Constants_FFUUU;
+	JB_File* Platform_Logger_;
+	JB_String* _AppConfString;
+	JB_ErrorReceiver* StdErr;
+	JB_String* JbinHeader;
+	JB_String* jBinNotJbin;
+	Message* Tk__EndOfLineMarker;
+	Dictionary* Constants__SyxDict;
+	Message* App__Conf;
+	Array* ErrorSeverity__names;
+	Dictionary* Constants_XML_EscapeStr;
+	Dictionary* LD_ClassList;
+	SaverClassInfo* Saver_SaveableList;
+	Dictionary* Constants_JS_EscapeStr;
+	FlowControl* Flow_Flow;
+	Message* App__Prefs;
+	JB_String* App__Path;
+	JB_File* App__StdOut;
+	Array* Macro_TmpPrms_;
+	JB_File* App__stdin;
+	JB_String* File__Speedie;
+	Array* Err_CurrSource_;
+	JB_String* App_Usage;
+	Dictionary* Constants_EscapeStr;
+	Array* App__OldArgs;
+	Dictionary* Tk__ErrorNames;
+	SpdProcess* Proc_Parent;
+	FP_fnIDGenerator Tk_Splitter;
+	CompressionStats MzSt_all;
+	PicoComms* Pico_Parent_;
+	Random Rnd_Shared;
+	Random zalgo_R;
+	MessagePosition Tk_Using;
+	uint64 Mrap_MDummy_[2];
+	CharProp CharProp_Item[256];
+	SyntaxObj* Constants__FuncArray[64];
+};
+extern JB_Globals JB__;
+
 
 //// HEADER JB.h
 
@@ -1009,11 +1372,6 @@ int JB_Platform__Init_();
 void JB_Platform__Log(JB_String* S);
 
 JB_File* JB_Platform__OpenLog();
-
-
-
-// Prefs
-int JB_Prefs__Init_();
 
 
 
@@ -1286,8 +1644,6 @@ Message* JB_Tk__ProcessThingParent(Message* Parent, int Ops, int ThingFlags);
 Message* JB_Tk__ProcessThingSub(Message* Parent, int Ops, int KindOfThing, bool Expect);
 
 Message* JB_Tk__ReRoute(Message* Output, Message* Cnj, Message* F);
-
-void JB_Tk__StopParse();
 
 Message* JB_Tk__ThingXMLAtt(int Start, Message* Parent);
 
@@ -1594,9 +1950,6 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, 
 
 
 // SorterComparer
-
-
-// SorterComparerBool
 
 
 // SorterComparerMsg
@@ -2212,7 +2565,7 @@ Message* JB_Str_Parse(JB_String* Self, Syntax Owner, bool AllowDecomp);
 
 Message* JB_Str_ParseJbin(JB_String* Self, int64 Max);
 
-Message* JB_Str_ParseSub(JB_String* Self, Syntax Owner, bool AllowDecomp);
+Message* JB_Str_ParseSub(JB_String* Self, Syntax Owner);
 
 JB_String* JB_Str_Pluralize(JB_String* Self, int Amount, JB_String* Nothing);
 
@@ -2988,3 +3341,65 @@ inline bool JB_Syx_NilCheck(Syntax Self) {
 
 }
 #endif // __JB_H__
+
+
+#ifdef __NEED_LIB_GLOBS__
+struct JB_Globals {
+	bool ErrorColors_Enabled;
+	bool Tk__DotInsertAllow;
+	bool Flow_AlwaysMove;
+	bool Flow_BreakOnFail;
+	byte Flow_Active;
+	bool File_DebugExecute;
+	byte Err_AutoPrint;
+	bool Err_KeepStackTrace;
+	u16 Tk__StopBars;
+	u16 API_NilHappened_;
+	int Syx_CurrFuncID_;
+	Float64 Rec_Progress;
+	JB_Object* Constants_UnEscapeStr;
+	JB_Object* Constants_JS_UnEscapeStr;
+	JB_Object* Constants_XML_UnEscapeStr;
+	JB_Object* Constants_EscapeChr;
+	JB_Object* Constants_CSWordMiddle;
+	JB_Object* Constants_CSLettersOnly;
+	JB_Object* Constants_CSWordStart;
+	JB_Object* Constants_XMLWordMiddle;
+	JB_Object* Constants_CSNum;
+	JB_Object* Constants_CSLine;
+	JB_Object* Constants_CSAfterDot;
+	JB_Object* Constants_CSAfterStatement;
+	JB_Object* Constants_CSLineBlack;
+	JB_Object* Constants_CSWrapSplit;
+	JB_Object* Constants_FFUUU;
+	JB_Object* Platform_Logger_;
+	JB_Object* _AppConfString;
+	JB_Object* StdErr;
+	JB_Object* JbinHeader;
+	JB_Object* jBinNotJbin;
+	JB_Object* Tk__EndOfLineMarker;
+	JB_Object* Constants__SyxDict;
+	JB_Object* App__Conf;
+	JB_Object* ErrorSeverity__names;
+	JB_Object* Constants_XML_EscapeStr;
+	JB_Object* LD_ClassList;
+	JB_Object* Saver_SaveableList;
+	JB_Object* Constants_JS_EscapeStr;
+	JB_Object* Flow_Flow;
+	JB_Object* App__Prefs;
+	JB_Object* App__Path;
+	JB_Object* App__StdOut;
+	JB_Object* Macro_TmpPrms_;
+	JB_Object* App__stdin;
+	JB_Object* File__Speedie;
+	JB_Object* Err_CurrSource_;
+	JB_Object* App_Usage;
+	JB_Object* Constants_EscapeStr;
+	JB_Object* App__OldArgs;
+	JB_Object* Tk__ErrorNames;
+	JB_Object* Proc_Parent;
+};
+extern JB_Globals JB__;
+
+
+#endif // __NEED_LIB_GLOBS__ 
