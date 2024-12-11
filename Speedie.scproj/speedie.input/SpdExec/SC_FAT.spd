@@ -149,7 +149,7 @@ struct FatASM
 		|| err = Error(nil, error, ErrorSeverity.Error, .file)
 		err.position = .BytePos
 		target debug: asmstate.printprogress(nil)
-		stderr <~ err
+		nil|errorreceiver| <~ err
 	
 	function NumInput (|int| a, assigns:|int| v)
 		.r[a] = v

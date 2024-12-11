@@ -225,6 +225,7 @@ function Decl (fn_asm)
 	|| K = .µinto(exp, dest)
 	if k is ConstOutput
 		|| f = k.fat
+			if ty isnt const//???
 			(ty is const)
 			ty.exportposition = f._const
 			ty.FatConst = k.fatindex

@@ -68,12 +68,15 @@ function NewTaskActual (|Message| node, |SCNode| name_space)
 	if name == @dot
 		|| P = name_space.FindModuleMsg(name.first!)
 			name_Space = p // hmmm
-		
+
+	
+	name_Space.use
 	|| task = SCClass.NeuRole(node, name_space, node)|SCModule|
 		compiler.taskslist <~ task.cls
 		task.cls!.IsRole = level
 		task.parent = name_space
 		name_space.TryAdd(node, task, task.name)
+	scimport.curr = nil
 
 
 function NewTask (CollectFunc)

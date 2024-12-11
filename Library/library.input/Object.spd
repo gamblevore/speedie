@@ -213,8 +213,8 @@ class MemoryLayer
 		cpp_class JB_MemoryLayer
 		cpp_part  Mem
 
-	|Object|		Obj
-	|Object|		Obj2
+	|Object?|		Obj
+	|Object?|		Obj2
 	|uint64|		Num3
 	
 	constructor (|&ClassData| Cls)

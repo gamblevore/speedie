@@ -10,7 +10,6 @@ class FastString {
 		cpp_part FS
 
 // Fast appends and tools for building data formats
-// add bool append? it should be safe now?
 
 	|int|			Length
 	|int|			Reserved
@@ -28,6 +27,8 @@ class FastString {
 	destructor							{ cpp_wrapper JB_FS_Destructor }
 
 	setter Length (|int|)				{ cpp_wrapper JB_FS_LengthSet }
+	setter Reserved (|int|)				{ disabled }
+	setter ResultPtr (|int|)			{ disabled }
 	
 	function AppendLower (|string| data)
 		cpp_wrapper JB_FS_AppendLower
@@ -39,7 +40,7 @@ class FastString {
 
 	function Size (|int|)				{ cpp_wrapper JB_FS_Size }
 	function Size (assigns:|int|)		{ cpp_wrapper JB_FS_SizeSet }
-	function AppendMultiReplace (|string|s, |dictionary of string| m, |ErrorReceiver| Rec=stderr) { cpp_wrapper JB_FS_AppendMultiReplace }
+	function AppendMultiReplace (|string| s, |dictionary of string| m, |ErrorReceiver| Rec=stderr) { cpp_wrapper JB_FS_AppendMultiReplace }
 		
 	function AppendHex (|int64| Num, |int|RoundTo=2)
 		cpp_wrapper JB_FS_AppendHex
@@ -52,7 +53,13 @@ class FastString {
 	function AppendHexData (|&byte| Data, |int| N, |int| Spaces=0)
 		cpp_wrapper JB_FS_AppendHexData
 
-	function AppendRange (|String| Data, |int| Start, |int| Length=int.max)
+	function AppendRange (|String| Data, |int| Start, |int| After=int.max)
+		// would be nice if speedie can optimise
+		// fs <~ a[b,c]				// into
+		// fs.appendrange(a,b,c)
+		// perhaps it could do this for all classes? like Syntax AppendRange
+		// i guess only faststring needs it though. perhaps other things want string ranges
+		// fastbuff or whatever.
 		cpp_wrapper JB_FS_AppendRange
 
 	helper AppendHex3 (|int|Num)
@@ -137,11 +144,11 @@ class FastString {
 		function New (|file| dest, |bool| PrintLineOnFlush, |FastString|)
 			cpp_wrapper JB_FS__FileFlush
 		
-		function New (|&byte| b, |int| n, |FastString|)
-			cpp_part NewDirect
-			rz = faststring()
-			rz.ResultPtr = b
-			rz.Reserved = n
+//		function New (|&byte| b, |int| n, |FastString|)
+//			cpp_part NewDirect
+//			rz = faststring()
+//			rz.ResultPtr = b
+//			rz.Reserved = n
 
 
 	syntax Access (|int| off, |Byte|)

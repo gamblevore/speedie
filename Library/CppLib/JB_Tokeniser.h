@@ -62,7 +62,8 @@ extern "C" {
 	int JB_Tk__MessageIndent ( u32 N );
     TokHan* JB_Tk__Handler( int BitTypes, fpTok FuncName );
 
-    int JB_Tk__NextStart(  );
+    int JB_Tk__NextStart();
+    JB_String* JB_Tk_GetData();
     int JB_Tk__ErrorStart ();
     void JB_Tk__ErrorStartSet (int Start);
 	byte JB_Tk__Byte (int P);

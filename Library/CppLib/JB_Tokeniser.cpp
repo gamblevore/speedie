@@ -8,6 +8,8 @@
 
 
 #include "JB_Umbrella.hpp"
+//#define __NEED_LIB_GLOBS__
+// #include "/usr/local/speedie/Speedie.scproj/BuildTest/JB.h"
 
 extern "C" {
 
@@ -22,17 +24,17 @@ int JB_Tk__ErrorStart () {
     return self->ErrorStart;
 }
 
-extern JB_String* JB__Tk_Data;
+JB_String* PzData;
 void JB_Tk__ErrorStartSet (int Start) {
     self->ErrorStart = Start;
 }
 
 byte JB_Tk__Byte (int S) {
-	return JB_Str_ByteValue(JB__Tk_Data, S);
+	return JB_Str_ByteValue(PzData, S);
 }
 
 JB_String* JB_Tk__Range (int S, int E, byte F) {
-	return JB_Str_Range(JB__Tk_Data, S, E);
+	return JB_Str_Range(PzData, S, E);
 }
 
 
@@ -43,7 +45,7 @@ JB_String* JB_Tk__Range (int S, int E, byte F) {
 ////////////////////////////////////////////////////////////////////////////////
 
 inline bool Running_( u32 NextStart ) {
-	return  (NextStart < JB__Tk_Data->Length)  and  (self->ErrorStart < 0);
+	return  (NextStart < PzData->Length)  and  (self->ErrorStart < 0);
 }
 
 
@@ -70,7 +72,7 @@ bool JB_Tk__CppInited() {
 
 
 void JB_Tk__Clear(  ) { // never called
-	JB_SetRef( JB__Tk_Data, 0 );
+	JB_SetRef( PzData, 0 );
 	JB_SetRef( self->WordDict, 0 );
     JB_Zero(self);
 }
@@ -79,9 +81,9 @@ void JB_Tk__Clear(  ) { // never called
 
 
 int JB_Tk__NextByte() {
-    byte* B = JB__Tk_Data->Addr; 
+    byte* B = PzData->Addr; 
     if (B) {
-        int L = JB__Tk_Data->Length;
+        int L = PzData->Length;
         int N = self->NextStart;
         if (N < L) {
             byte b = B[N];
@@ -93,11 +95,11 @@ int JB_Tk__NextByte() {
 
 
 bool JB_Tk__EatString(JB_String* S) {
-    byte* DataAddr = JB__Tk_Data->Addr; 
+    byte* DataAddr = PzData->Addr; 
     if (DataAddr) {
         int SLength = S->Length;
         int DataPos = self->NextStart; 
-        if (DataPos + SLength <= JB__Tk_Data->Length) {   
+        if (DataPos + SLength <= PzData->Length) {   
             DataAddr += DataPos; 
 
             for (int i = 0; i < SLength; i++) {
@@ -116,10 +118,10 @@ bool JB_Tk__EatString(JB_String* S) {
 
 
 void JB_Tk__NextStartSet( u32 NextStart ) {
-	if ( NextStart < JB__Tk_Data->Length ) { // 0 - 1 = 4billion!
+	if ( NextStart < PzData->Length ) { // 0 - 1 = 4billion!
 		self->NextStart = NextStart;
 	} else {
-        self->NextStart = JB__Tk_Data->Length; // Not Running
+        self->NextStart = PzData->Length; // Not Running
 	}
 }
 
@@ -133,11 +135,11 @@ void JB_Tk__StartParse( JB_String* Data ) {
 	self->NextStart = 0;
 	self->ErrorStart = -1;
 	if ( ! Data ) {
-		JB_SetRef( JB__Tk_Data, JB_Str__Empty() );
+		JB_SetRef( PzData, JB_Str__Empty() );
 		return;
 	}
 
-	JB_SetRef( JB__Tk_Data, Data );
+	JB_SetRef( PzData, Data );
 	JB_String BOM = {};
 	BOM.Length = 3;
 	BOM.Addr = (u8*)"\xEF\xBB\xBF";
@@ -207,7 +209,7 @@ void JB_Tk__TokenSet( JB_String* TokStr, TokHan* New_ ) {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 int JB_Tk__CleanSpacesSub ( int S ) {
-	JB_String* D = JB__Tk_Data;
+	JB_String* D = PzData;
 
     uint8* A = D->Addr;
 	int N = D->Length;
@@ -232,7 +234,7 @@ int JB_Tk__CleanSpacesSub ( int S ) {
 
 int JB_Tk__ClearIndent() {
 	// merge with CleanSpacesSub?
-	JB_String* D = JB__Tk_Data;
+	JB_String* D = PzData;
 
     uint8* A = D->Addr;
 	uint8* Finish = A + D->Length;
@@ -270,7 +272,7 @@ Message* JB_Tk__Process( u32 AskBits, long Mode, Message* Parent ) {
 		return 0;
 	
 	u32 Start = JB_Tk__CleanSpacesSub( self->NextStart );
-	MiniStr AL = Mini(JB__Tk_Data, Start);
+	MiniStr AL = Mini(PzData, Start);
 	ObjLength Found = JB_Dict_LongestKey_( self->WordDict, AL );
 	TokHan* FatData = (TokHan*)Found.Obj;
 		

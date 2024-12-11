@@ -605,7 +605,6 @@ void JB_DebugAllMemory(bool b)  {
 	DoTotalMemoryTest = b;
 }
 
-extern int JB__Flow_Disabled;
 bool JB_TotalSanity(bool Force) {
 	if (!Force and !DoTotalMemoryTest)
 		return true;
@@ -1202,8 +1201,8 @@ void JB_Mem_ClassLeakCounter () {
 
 
 static inline JB_Object* Trap_ (FreeObject* Obj) { // what a task_ to trap
-//	if (JB_ObjectID((JB_Object*)Obj)==37815600)
-//		debugger;
+	if (JB_ObjectID((JB_Object*)Obj)==22097185)
+		debugger;
 	Obj->FakeRefCount = 0;
     return (JB_Object*)Obj;
 }

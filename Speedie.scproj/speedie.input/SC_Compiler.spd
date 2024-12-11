@@ -531,7 +531,7 @@ function ImportAll
 		m.InitDecls
 	for F in SCImport.AllFiles
 		F.CollectGlobals Compiler.Program
-	packmaker.LibGlobs.Sort(SmallestFirst)
+	packmaker.LibGlobs.Sort(SimplestFirst)
 
 	scimport.noproj
 	(Message).Restore

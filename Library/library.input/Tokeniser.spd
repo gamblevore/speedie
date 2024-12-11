@@ -33,9 +33,6 @@ extend Parser {
 	function StartParse (|string?| result)
 		cpp_wrapper
 
-	function StopParse
-		.StartParse(nil)
-
 	function NextStart (|int|)
 		cpp_wrapper
 

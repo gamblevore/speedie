@@ -122,6 +122,8 @@ class SCDecl (SCNamed) {
 		.type = type
 		.NilDeclared = NilState.Either
 		.info = scdeclinfo.altered // why? surely it should only be if its ACTUALLY altered??? sigh.
+		target debug
+			if !.project
 
 	setter Name (|string|)
 		super.exportname = value
@@ -936,6 +938,7 @@ class SCDecl (SCNamed) {
 					(rz is api)
 				  elseif (n ~= "const")
 					(rz is const)
+					"is this ever used??"
 				  else
 					error p
 
@@ -1166,6 +1169,20 @@ function int64.MsgForConst (|bool| AllowShift, |message|)
 
 
 function SmallestFirst (SorterComparer)
+	return b|scdecl|.carraysize - a|scdecl|.carraysize
+	
+
+function scdecl.Complexity (|int|)
+	opt norefcounts
+	|| T = .type
+	rz += T.IsObject
+	rz += (T.baseType is funcproto) << 1
+	rz += T.IsStruct << 2
+	rz += .IsCarray << 3
+
+function SimplestFirst (SorterComparer)
+	|| BComp = b|scdecl|.Complexity - a|scdecl|.Complexity
+		return BComp
 	return b|scdecl|.carraysize - a|scdecl|.carraysize
 
 function SmallestAlignedFirst (SorterComparer)

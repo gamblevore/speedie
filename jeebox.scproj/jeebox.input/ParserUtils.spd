@@ -73,14 +73,15 @@ function String.Parse (|syntax| owner = @arg, |bool| AllowDecomp=true,  |Message
 		data = data[j2, int.max]
 		rz = data.parsejbin
 	  else
-		rz = data.parsesub(owner, allowdecomp)
+		rz = data.parsesub(owner)
 		
 
 
-helper String.ParseSub (|syntax| owner, |bool| AllowDecomp,  |MessageRoot|)
+helper String.ParseSub (|syntax| owner,  |MessageRoot|)
 	// language2.scproj uses owner
 	if !Parser.CppInited
 	    Parser.Init
+	parser.data	= self
 	parser.StartParse( self )
 	parser._StopBars = 0
 	|| OK		= StdErr.mark
@@ -97,7 +98,8 @@ helper String.ParseSub (|syntax| owner, |bool| AllowDecomp,  |MessageRoot|)
 	if parser.Running
 	    parser.Expect( 0 )
 	
-	parser.StopParse // clear error message
+	parser.data = ""
+	parser.startparse(nil) // clear error message
 	if !OK
 		into = nil
 	return into|MessageRoot|
@@ -122,7 +124,7 @@ extend Parser
 		err.name			= s
 	    err.originaldata	= .data
 		
-		stderr <~ err
+		nil|errorreceiver| <~ err
 	
 	
 	function ErrorAdd (|String| s, |ind|Start = parser.NextStart, |Message|)

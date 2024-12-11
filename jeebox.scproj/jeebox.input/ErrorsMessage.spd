@@ -18,7 +18,7 @@ extend_module ErrorReceiver
 		if stderr.CanAddMore(sev)
 			if desc == nil
 				desc = node.MiniName("Unexpected ")
-			stderr <~ Error(node.FindNotInserted, desc, sev, path??"")
+			nil|errorreceiver| <~ Error(node.FindNotInserted, desc, sev, path??"")
 
 
 function Message.ErrorLocation (|string| desc = "", |string|)
@@ -47,7 +47,7 @@ extend_module Error
 		|| str = "Numeric overflow parsing number" 
 		if !Overflow
 			Str = "Can’t parse number. Found: " + num[pos].render
-		stderr <~ error(where, str)
+		nil|errorreceiver| <~ error(where, str)
 
 
 	function From (|message?| self, |error|)

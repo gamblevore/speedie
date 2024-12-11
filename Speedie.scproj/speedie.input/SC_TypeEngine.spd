@@ -86,7 +86,7 @@ function scdecl.NoBlindCasts (|scdecl| old, |message| exp)
 	if fn and (fn isnt constructor) and fn.blindcasts
 		if old.IsNormalObject and .IsNormalObject
 			if !old.type.real_isa2( .type )
-				stderr <~ error(exp, "Blindcasting error. Use 'isa' or 'as' to typecast.", fn.blindcasts)
+				nil|errorreceiver| <~ error(exp, "Blindcasting error. Use 'isa' or 'as' to typecast.", fn.blindcasts)
 
 
 function TypeOfReal (ExprResolver)

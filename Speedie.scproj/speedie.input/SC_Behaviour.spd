@@ -147,17 +147,28 @@ class SCBehaviour (SCNode)
 		return self[2, .length-2].lowercase
 
 		
-	function SCClass.ProcessBehaviours 
+	function SCClass.ProcessBehaviours
+		opt norefcounts
+		.project.use
+		.ProcessBehavioursSub
+		scimport.curr = nil
+	
+	
+	function SCClass.ProcessBehavioursSub
+		dbg_decl_layer()
 		|| B = .behaviour										#require
 		|| Table = b.FuncTable									#require
 		|| TableCls = Table.cls									#require
 		
+		dbg_decl_layer()
 		for (fn in B)
 			.FillInterFaceIn(fn, false)
 		
+		dbg_decl_layer()
 		for (W in b.Wrapperfuncs)
 			.FillInterfaceWrapper(w)
 
+		dbg_decl_layer()
 		for (interface in B.interfaces)
 			interface.AddInterfaceToTable(TableCls)
 	
@@ -331,7 +342,6 @@ function SCNode.IsNormalObject (|SCClass|)
 
 function message.IsBehaviour (|bool|)
 	return .name == "behaviour" or "actual"
-// .isbehaviour // name == "behaviour"
 
 
 function SCClass.RenameInterfaces
@@ -339,3 +349,8 @@ function SCClass.RenameInterfaces
 	for (f in b.interfaces)
 		|| it = f.cls
 			it.name = it.CppClass + it.name
+
+
+function dbg_decl_layer // sigh
+	ifn (scdecl).layer.obj
+		if scimport.curr

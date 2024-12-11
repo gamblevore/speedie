@@ -226,7 +226,7 @@ function SCNode.CollectConstantsSub (|Message| ch)
 				|| WasHex = ValueNode.Name[0, "0x"] or ValueNode.Name[0, "0b"]
 				NewType.AssignabilityCheck(nil, ValueNode, OMGType, washex)
 				nextnum = valuenode.int
-				if WasHex and (nextnum >= 0x8000_0000 and nextnum <= 0xFFFF_FFFF) and !currtype// hmmm lets see.
+				if WasHex and (nextnum >= 0x8000_0000 and nextnum <= 0xFFFF_FFFF) and !currtype // hmmm lets see.
 					error (ValueNode, "Unclear what type to use here. Use |int| or |int64| to specify")
 				newitem.NumberConst = nextnum
 				nextnum++

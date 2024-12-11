@@ -1277,7 +1277,7 @@ module parser
 		visible false
 		cpp_Part Tk
 
-	|string|				Data
+	|string--|				Data
 	|message|				_EndOfLineMarker
 	|dictionary of string|  _ErrorNames = nil
 	|fnIDGenerator|			Splitter = &parser.range
@@ -1373,5 +1373,3 @@ datatype MsgParseFlags (uint16)
 		BreakPoint			= 0x8000
 		MacroInserted		= MacroMade+Inserted
 
-
-|| aaaaaaa = 0

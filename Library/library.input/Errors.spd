@@ -119,7 +119,7 @@ class Error (Message)
 		while (|| err = list.first)
 			if suffix
 				err.name += suffix
-			stderr <~ err
+			nil|errorreceiver| <~ err
 		.remove
 	
 	

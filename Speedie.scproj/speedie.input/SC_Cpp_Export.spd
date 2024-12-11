@@ -18,6 +18,7 @@ linkage
 |FastStringCpp|						AllTypes
 |FastStringCpp|						TypesProj
 |FastStringCpp|						HeaderProj
+|FastStringCpp|						LibGlobs
 |FastStringCpp|						Syxes
 |FastStringCpp|						Inlines
 |FastStringCpp|						ModuleProperties
@@ -29,7 +30,7 @@ constructor
 	.AllTypes   = .StreamChild( "AllTypes.h"  )
 	.syxes		= .StreamChild( "SyntaxConstants.h" )
 	.TypesProj  = .StreamChild( "Proj.h" )
-	
+	.LibGlobs	= .StreamChild( "LibGlobs.h" )	
 	.HeaderProj = .StreamChild( "JB.h" )
 	.Inlines	= .StreamChild( "Inlines.h" )
 	.ModuleProperties = .StreamChild( "ModuleProperties.cpp" )
@@ -37,22 +38,44 @@ constructor
 
 
 function PreRun
+	opt norefcounts
 	.AllTypes <~ "
 #ifndef ObjCID
 	#define ObjCID void*
 #endif
 "
 
-	.Headerproj <~ '\n'
-	
-	.ModuleProperties <~ `// Globals put into a separate file to make things faster.
+	.HeaderProj <~ '\n'
+	|| fs = .ModuleProperties
+	fs <~ `// Globals put into a separate file to make things faster.
 #include "JB_Umbrella.hpp"
 #include "JB.h"
 #pragma GCC visibility push(hidden)
 
+const char* JB_CrashLogFileName = "/tmp/logs/`
+	fs <~ compiler.projectname
+	fs <~ `.fail.txt";
+	
+JB_Globals JB__;
 `
-	|| str = "const char* JB_CrashLogFileName = \"/tmp/logs/${compiler.projectname}.fail.txt\";\n\n"
-	.ModuleProperties <~ str
+
+
+function FillLibGlobs (|faststringcpp| fs, |bool| simple=false)
+	opt norefcounts
+	fs <~ "\n#define Float64 double"
+	fs <~ "\nstruct JB_Globals {\n\t"
+	for prop in PackMaker.LibGlobs
+		if simple and prop.Complexity > 1
+			exit
+		if simple and prop.IsObject
+			fs <~ "JB_Object* "
+			fs.Appendlibglob(prop)
+		  else
+			WriteDecl( prop, fs, nil )
+		fs <~ ";\n\t"
+	fs.Length--
+	fs <~ "};\nextern JB_Globals JB__;\n\n"
+
 
 
 function CanOpt (|bool| force, |bool|)
@@ -123,19 +146,6 @@ function CppFunc (|FastStringCpp| fs, |SCFunction| F) // function func (
 
 function SCClass.NeedsExport (|bool|)
 	return super.NeedsExport or .IsBehaviourTable
-
-
-
-function CreateGlobals (|scmodule| scb)
-	|| fs = .ModuleProperties
-	fs <~ "/* struct JB_Globals {\n"
-	for prop.vars in scb
-		if prop and (prop isnt Const) and prop.TypeIsReached and prop.IsLib
-			WriteDecl( prop, fs, nil )
-			fs <~ ';'
-			fs <~ '\n'
-	fs <~ "}; */"
-
 
 
 function Codify (|SCModule| scb, |string| fName)
@@ -319,7 +329,8 @@ __nodebug void jb_decr(jbobject* s) {
 
 
 
-function Run 		
+function Run
+	opt norefcounts
 	for c in Compiler.ClassList
 		if !c.IsFunc
 			WriteType( c, .AllTypes, true )
@@ -332,20 +343,21 @@ function Run
 		.Codify( c, "" )
 	for c in Compiler.ModuleList
 		.ExportModuleProperties( c, nil )
-	for c in Compiler.ModuleList
-		.CreateGlobals(c)
-	
+
 	.CodifyInlines
-	
 	if options.ProjectIsLibrary
-		|| WriteTo = Cpp_Export.APIHeader
-			|| File = .StreamChild( "API.cpp" )
-			file <~ "\n//// API START! ////\n\n"
-			file <~ "#pragma GCC visibility push(default)\n"
-			.CodifyFuncs( file, compiler.api_funcs )
-			file <~ "#pragma GCC visibility pop\n"
-			file <~ "//// API END! ////\n"
-			.WriteAPIHeader(WriteTo)
+		.LibAPI_Cpp
+
+
+function LibAPI_Cpp
+	|| WriteTo = Cpp_Export.APIHeader
+		|| File = .StreamChild( "API.cpp" )
+		file <~ "\n//// API START! ////\n\n"
+		file <~ "#pragma GCC visibility push(default)\n"
+		.CodifyFuncs( file, compiler.api_funcs )
+		file <~ "#pragma GCC visibility pop\n"
+		file <~ "//// API END! ////\n"
+		.WriteAPIHeader(WriteTo)
 
 
 function SCClass.CSuperStructName (|string|)
@@ -584,25 +596,37 @@ function ExportModuleProperties (|SCModule| modl, |FastStringCpp?| IntoModule)
 	|| fs = IntoModule ?? .TypesProj
 
 	for prop.vars in modl
-		if !prop
-			0
-		  elseif prop is Const
-			if !IntoModule
-				WriteConst( prop, fs )
-				fs <~ '\n'
+		if prop
+			fs.AddProperty(prop, intomodule!=nil)
+			fs <~ "\n"
 
-		  elseif prop.TypeIsReached
+
+function FastStringCpp.AddProperty (|scdecl| prop, |bool| intomodule)
+	opt norefcounts
+	if prop is Const
+		if !IntoModule
+			Cpp_Export.WriteConst( prop, self )
+			self <~ '\n'
+
+	  elseif prop.TypeIsReached
+		if prop.islib and prop is Global
+			if !intomodule
+				self <~ "#define "
+				self <~ prop.exportName		// 
+				self <~ " JB__."
+				.Appendlibglob(prop)
+				return 
+		  else
 			if !IntoModule
-				fs <~ "extern "
+				self <~ "extern "
 			  elseif prop is api
-				fs <~ "__lib__ "
-
+				self <~ "__lib__ " // not sure how this works with the new struct lib globs
+	
 			if IntoModule and prop is GameFlyingMem
-				prop.StringData.replaceall("$(N)", prop.name, fs)
+				prop.StringData.ReplaceAll("$(N)", prop.name, self)
 			  else
-				WriteDecl( prop, fs, nil )
-			fs <~ ';'
-			fs <~ '\n'
+				Cpp_Export.WriteDecl( prop, self, nil )
+		self <~ ";"
 
 
 
@@ -662,9 +686,12 @@ function WriteHeader
 	fs <~ "\n\n // Auto-generated file, by speedie.\n"
 	fs <~ Cpp_Export.CppLicence	
 	if Linkage.VM
-		fs <~ "\n#define __VM__ 1\n"
-	
-	fs <~ "\n#define __SPEEDIE__ 1\n"
+		fs <~ `
+#define __VM__ 1
+`
+	fs <~ `
+#define __SPEEDIE__ 1
+`
 	for h in Cpp_Export.H_Input
 		fs.includeh(h)
 	
@@ -681,7 +708,12 @@ extern "C" {
 		fs <~ f
 		fs <~ '\n'
 	
-	fs <~ "\n}\n#endif // __JB_H__\n"
+	fs <~ "\n}\n#endif // __JB_H__\n\n\n"
+	
+	fs <~ "#ifdef __NEED_LIB_GLOBS__"
+	.FillLibGlobs(fs, true)
+	fs <~ "\n"
+	fs <~ "#endif // __NEED_LIB_GLOBS__ "
 	Cpp_Export.SmartWrite(fs, Cpp_Export.HProduct)
 
 
@@ -738,6 +770,33 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		fs <~ .FindGlobalsCpp.ReplaceAll("@flow", FlowStr)
 
 
+	function WriteDecl (|SCDecl| D, |FastStringCpp| T, |Message| equality = nil) 
+		opt norefcounts
+		if (!d)
+			t <~ "void"
+			Return
+		
+		if d.IsCarray
+			.WriteDeclNoName( d.internal!, T )
+		  else
+			.WriteDeclNoName( d, T )
+		
+		if (d.exportName)
+			T <~ ' '
+			if d.islib and d is Global
+				t.Appendlibglob(d)
+			  else
+				d.exportName.safe(t, d is local)
+			if d.IsCArray
+				T <~ '['
+				T <~ d.C_Array
+				T <~ ']'
+		
+		if (equality)
+			T <~ " = "
+			equality.Export( T )
+
+
 	function WriteStrings (|faststring| Lengths, |string|)
 		opt norefcounts
 		|| fs = FastString()
@@ -758,6 +817,9 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function HProduct (|File|)
 		return Compiler.GeneratedCppsFolder[ "JB.h" ]!
+
+	function LibGlobProduct (|File|)
+		return Compiler.GeneratedCppsFolder[ "LG.h" ]!
 
 
 	function Product (|string| name, |File|)
@@ -791,30 +853,6 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		.WriteFuncSub(F, f.exportname, t)
 
 
-	function WriteDecl (|SCDecl| D, |FastStringCpp| T, |Message| equality = nil) 
-		opt norefcounts
-		if (!d)
-			t <~ "void"
-			Return
-		
-		if d.IsCarray
-			.WriteDeclNoName( d.internal!, T )
-		  else
-			.WriteDeclNoName( d, T )
-		
-		if (d.exportName)
-			T <~ ' '
-			d.exportName.safe(t, d is local)
-			if d.IsCArray
-				T <~ '['
-				T <~ d.C_Array
-				T <~ ']'
-		
-		if (equality)
-			T <~ " = "
-			equality.Export( T )
-
-
 	function SmartWrite (|string| S, |File| F)
 		flow off
 		FlowControl.Disabled++ // we don't care about previous file contents
@@ -844,6 +882,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| exp = Cpp_Export()
 		exp.PreRun
 		exp.ExportSyx
+		exp.FillLibGlobs(exp.libglobs)
 		exp.run
 		exp.WriteHeader
 		if Options.MakeInterpreter
@@ -1548,6 +1587,9 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		// ❤️‍🔥 ❤️‍🔥 ❤️‍🔥 ❤️‍🔥 ❤️‍🔥 ❤️‍🔥
 }
 
+
+
+
 function message.Safe (|faststring| fs)
 	.name.safe(fs)
 
@@ -1576,4 +1618,9 @@ class FastStringCpp (FastString)
 	constructor (|string| name = "")
 		.cpp_name = name
 
+	function AppendLibGlob (|scdecl| d)
+		|| x = d.ExportName[3]
+		|| i = 3 + (x == '_')
+		.appendrange(d.exportname, i)
+		
 

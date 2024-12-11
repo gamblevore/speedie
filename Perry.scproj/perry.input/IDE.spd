@@ -978,12 +978,12 @@ function perryide.IDECommand (|bool|)
 		.editme.beep = s.ReplaceAll("\r\n", "\r").ReplaceAll("\r", "\n")
 	  elseif cmd ~= "cr_use"
 		.editme.beep = s.ReplaceAll("\n", "\r\n")
-	  elseif cmd ~= "str"
+	  elseif cmd ~= "str" or "string"
 		|| s2 = s.parse
 		if s2 == @arg
 			s2 = s2.first
 		.editme.beep = s2.name
-	  elseif cmd ~= "render"
+	  elseif cmd ~= "render" or "parse"
 		.editme.beep = s.parse.Render
 	  elseif cmd ~= "tetris"
 		TetrisWin()

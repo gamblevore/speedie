@@ -71,12 +71,12 @@ extern JB_Class JB_TaskData;
 CharSet*            WhiteSpace_;
 JB_StringC*         EmptyString_;
 JB_StringC*         ErrorString_;
-JBObject_Behaviour  JB_Object_FuncTable_ = {0,0};
+JBObject_Behaviour  JB_Object_FuncTable_;
 JB_Class*           ClassList;
 byte				JB_ErrorNumber;
 byte				JB_Active = 0;
 extern char**		environ;
-extern uint			JB__Flow_Disabled;
+uint				Flow_Disabled; /////////
 static Array*		App_Args;
 _cstring			App_CallPath;
 
@@ -181,7 +181,7 @@ int		JB_SP_AppInit();
 int JB_SP_Init (_cstring* R, bool IsThread) {
 	JB_ErrorNumber = 0;
 	JB_TaskData.Size = 128;
-	JB__Flow_Disabled = 0x7fffFFFF;
+	Flow_Disabled = 0x7fffFFFF;
 
 	static_assert((sizeof(ivec3) == 16 and sizeof(ivec4)==16 and sizeof(ivec2)==8) and sizeof(vec3) == 16 and sizeof(vec4)==16 and sizeof(vec2)==8 and sizeof(int) == 4  and  sizeof(int64) == 8, "sizeof type");
     if (JB_MemStandardWorld()->CurrSuper)

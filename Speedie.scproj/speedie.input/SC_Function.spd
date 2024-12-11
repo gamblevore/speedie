@@ -240,8 +240,17 @@ function CollectStats
 //	if (self has hasvfloat) or (self is hasvint)
 //		FuncArgAndReturnTypes[4]++
 	
+
 function FuncParamsLoad
-	scfunction.CurrFunc = self
+	opt norefcounts
+	scfunction.CurrFunc = self // perhaps this should set the curr proj along with it.
+	|| old = scimport.curr
+	.project.use
+	.FuncParamsLoadSub
+	scimport.curr = old
+
+
+function FuncParamsLoadSub 
 	|| P = .Source.second				#require
 	if self is constructor
 		.AddConstructorReturn(p)

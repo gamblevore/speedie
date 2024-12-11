@@ -50,6 +50,8 @@ class ErrorReceiver
 	
 	syntax append (|Error| Err)
 		cpp_part AppendErr
+		if !self
+			self = StdErr!
 		target debug
 			|| CanPrint = !.BadCount and error.autoprint
 		  else
