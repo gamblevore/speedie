@@ -504,9 +504,9 @@ class FileViewer (ListView)
 				|| bprj = b.InMainProj
 				if aprj == bprj
 					return FileRowNameSorter(a, b)
-				return aprj
+				return aprj|int|
 				
-			return a.rangelength < b.rangelength
+			return b.rangelength - a.rangelength
 
 
 		function ErrorSearchSorter (SorterComparerError)
@@ -516,11 +516,11 @@ class FileViewer (ListView)
 			|| ae = an.ext
 			|| be = bn.ext
 			|| it = isbetter(ae, be, "spd")
-				rz = it == 1
+				rz = (it == 1)|int|
 			  else
 				it = isbetter(ae, be, "box")
 				if it
-					rz = it == 1
+					rz = (it == 1)|int|
 				  else
 					rz = (an ~< bn, ae ~< be)(be == ae)
 
@@ -528,7 +528,7 @@ class FileViewer (ListView)
 		function FileRowNameSorter (SorterComparerFileRow)
 			opt norefcounts
 			if (b.asdir) != (a.asdir)
-				return (b.asdir)
+				return (b.asdir)|int|
 			return (b.name ~<= a.name)
 
 		function QuickOpenModified (GUITextEvent)
@@ -729,5 +729,5 @@ function FileViewerSearchWithin (GuiMenuEvent)
 		
 	
 
-prototype SorterComparerFileRow (|filerow| a, |filerow| b, |bool|)
-prototype SorterComparerError   (|error|   a, |error|   b, |bool|)
+prototype SorterComparerFileRow (|filerow| a, |filerow| b, |int|)
+prototype SorterComparerError   (|error|   a, |error|   b, |int|)

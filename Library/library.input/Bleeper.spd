@@ -57,4 +57,5 @@ function string.Unbleep (|faststring?| fs_in=nil, |string|)
 		o++
 		c3 = (c3 xor o.hash) & 255
 		fs <~ C3|byte|
+	
 	return fs.GetResult(fs_in)

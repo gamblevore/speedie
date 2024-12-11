@@ -661,9 +661,9 @@ function AutoSub (|SCNode| scope, |string| name, |[autoitem]| found, |int| Types
 
 function AutoCompleteSorter (autosort_fn)
 	|| type = a.type - b.type 
-		return type < 0
+		return (type < 0)|int|
 	|| depth = a.depth - b.depth // doesnt seem to work just yet?
-		return depth < 0
+		return (depth < 0)|int|
 	return a.sort < b.sort
 
 
@@ -1105,7 +1105,7 @@ function LocateDefinitionSub (|message!| msg, |SCObject| already_defined, |scdec
 }
 
 
-prototype autosort_fn (|autoitem| a, |autoitem| b, |bool|)
+prototype autosort_fn (|autoitem| a, |autoitem| b, |int|)
 
 class autoitem
 	linkage

@@ -101,11 +101,6 @@ class Array (saveable)
 		|| p = .pop
 			self[pos] = P
 
-	function Sort (|SorterComparerBool| Compare)
-		cpp_part SortBool
-		opt inline
-		.sort(compare|SorterComparer|) // its actualyl an int
-
 	function Sort (|SorterComparer| Compare)
 		cpp_wrapper JB_Array_Sort
 	
@@ -186,13 +181,6 @@ class Array (saveable)
 			if item == nil: exit 
 			yield Item (i)
 			--i
-
-
-
-prototype SorterComparerBool (|object| a, |object| b, |bool|)
-	description "This prototype is deprecated. Use sorterComparer instead." 
-	function sort (|array| a)
-		a.sort(self)
 
 
 prototype SorterComparer (|object| a, |object| b, |int|)

@@ -275,10 +275,10 @@ function Dot (fn_asm)									// a.b
 	|| prop = exp.ASMDecl
 	if prop is global
 		return DoGlobal(self, exp, dest, prop)
+	|| F = exp.first!
 	target debug
 		if f.obj isa scmodule // should never happen
 		 
-	|| F = exp.first!
 	|| Obj = .µopen(F, dest)
 	|| T = prop.typeinfo
 	dest.µtype = T

@@ -53,7 +53,6 @@ function compiler.ClearEnvs
 function compiler.SetupEnv
 	opt norefcounts
 	.ClearEnvs
-//	app.prefs["LastOpened"] = date.now
 	options.dev = app.prefs["dev"]
 	if !app.IsMainThread
 		app.ThreadName = "SpeedieDebug"

@@ -25,15 +25,16 @@ module PackMaker
 				.addfunc(f)
 		.SortAll
 	
-		
-	function AddLibGlob (|scdecl| d)
-		.LibGlobs <~ d
-		d.ExportPosition = ++.ExportPos // why though?
+	
+	// we want to always create libglobs?
+	// then... and sort them nicely, by size! not name.
+	// sigh. i guess name is faster for lookup. but 
+	// we can make our own internal tables anyhow.
 	
 	
 	function DoLibGlobs (|jbin| lib)
 		opt norefcounts
-		LibGlobs.sort(NodeSorter)
+//		.LibGlobs.sort(NodeSorter)
 		
 		lib.enter(@arr)
 		for (f in LibGlobs)
@@ -174,8 +175,9 @@ module PackMaker
 /		rz = 1				// rz = 1, so if .ExportPosition == 0 then something is wrong.
 		for (d in list)
 			|| s = d.CarraySize
-			rz = rz align s
-			d.ExportPosition = rz / s
+			|| s16 = s min 16
+			rz = rz align s16
+			d.ExportPosition = rz / s16
 			rz += s
 
 	

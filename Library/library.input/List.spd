@@ -408,7 +408,7 @@ class list (Saveable)
 			.Last = item
 
 
-	helper SortAfter (|SorterComparerBool| fnc, |list|)
+	helper SortAfter (|SorterComparer| fnc, |list|)
 		opt norefcounts			// find the first obj that we are "more than"
 		|| p = .prev
 		while p
@@ -417,16 +417,16 @@ class list (Saveable)
 			p--
 
 
-	function Sort (|SorterComparerBool| fnc) // remove this func????
-		opt NoRefCounts
-		|| c = .second
-		while c
-			|| f = c
-			c = c.next
-			|| b = f.SortAfter(fnc)
-				b.next = f
-			  else
-				.first = f
+//	function Sort (|SorterComparer| fnc) // remove this func????
+//		opt NoRefCounts
+//		|| c = .second
+//		while c
+//			|| f = c
+//			c = c.next
+//			|| b = f.SortAfter(fnc)
+//				b.next = f
+//			  else
+//				.first = f
 
 
 	function Sort (|SorterComparer| fnc)

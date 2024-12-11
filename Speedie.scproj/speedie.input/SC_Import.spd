@@ -241,7 +241,7 @@ class SCImport
 			return compiler.program
 		
 		
-		function Sorter (SorterComparerbool)
+		function Sorter (SorterComparer)
 			opt norefcounts
 			|| aa = a|SCFile|
 			|| bb = b|SCFile|
@@ -249,7 +249,7 @@ class SCImport
 //			|| bbstd = bb.Proj.IsSTDLib
 //			if aa.isinternal or bb.isinternal
 			|| lib = aa.Proj.IsSTDLib - bb.Proj.IsSTDLib
-				return lib > 0
+				return lib
 //			|| intr = aa.isinternal - bb.isinternal
 //				return intr < 0 
 			return aa|string| < bb|string|

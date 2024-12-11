@@ -125,14 +125,24 @@ function SCClass.NeedsExport (|bool|)
 	return super.NeedsExport or .IsBehaviourTable
 
 
+
+function CreateGlobals (|scmodule| scb)
+	|| fs = .ModuleProperties
+	fs <~ "/* struct JB_Globals {\n"
+	for prop.vars in scb
+		if prop and (prop isnt Const) and prop.TypeIsReached and prop.IsLib
+			WriteDecl( prop, fs, nil )
+			fs <~ ';'
+			fs <~ '\n'
+	fs <~ "}; */"
+
+
+
 function Codify (|SCModule| scb, |string| fName)
 	// class and modules come through here.
 	|| cls = scb.Cls
 	if !fName
-		if (cls)
-			fName = cls.ExportName
-		  else
-			fName = scb.ExportName
+		fName = (cls.ExportName, scb.exportname)(cls)
 
 	if (scb == Compiler.program) // doesn't really matter...
 		fName = "main"
@@ -148,10 +158,9 @@ function Codify (|SCModule| scb, |string| fName)
 
 	.ExportModuleProperties( scb, .ModuleProperties )
 
-
 	if (Cls and cls.NeedsExport)
 		.ExportClass( cls, .ModuleProperties )
-		.optstart(file, cls.minopt, true)
+		.OptStart(file, cls.minopt, true)
 		.CodifyFuncs( file, cls.ListFunctions )
 		.optend(file, cls.minopt, true)
 	
@@ -321,9 +330,10 @@ function Run
 	
 	for c in Compiler.ModuleList
 		.Codify( c, "" )
-	
 	for c in Compiler.ModuleList
 		.ExportModuleProperties( c, nil )
+	for c in Compiler.ModuleList
+		.CreateGlobals(c)
 	
 	.CodifyInlines
 	
@@ -345,13 +355,13 @@ function SCClass.CSuperStructName (|string|)
 	return "JB_AsClass(${sup.CStructName})"
 
 
-function AppendPropField (|SCdecl|prop, |FastStringCpp| fs)
+function AppendPropField (|SCDecl| prop, |FastStringCpp| fs)
 	fs <~ "\n\t"
 	WriteDecl( prop, fs )
 	fs <~ ';'
 
 
-function AppendCppField (|string|prop, |FastStringCpp| fs)
+function AppendCppField (|string| prop, |FastStringCpp| fs)
 	fs <~ "\n\t"
 	fs <~ prop
 	fs <~ ';'
@@ -570,9 +580,8 @@ extern \"C\" JB_String* JB_App__LibPack(void*** Funcs) { // rename this to libpa
 
 
 function ExportModuleProperties (|SCModule| modl, |FastStringCpp?| IntoModule)
-	|| fs = IntoModule
-	if !fs
-		fs = .TypesProj
+	// Can I make this create global struct defintions?
+	|| fs = IntoModule ?? .TypesProj
 
 	for prop.vars in modl
 		if !prop
@@ -599,7 +608,7 @@ function ExportModuleProperties (|SCModule| modl, |FastStringCpp?| IntoModule)
 
 function ExportSyx
 	require Compiler.SyxArray
-	|| fs = .syxes
+	|| fs = .Syxes
 	for (syx in Compiler.SyxArray) (i)
 		fs <~ "#define kSyx$syx $i\n"
 
@@ -727,7 +736,6 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		fs <~ ";\n"
 		|| FlowStr = Options.GenFlowControlCode.string
 		fs <~ .FindGlobalsCpp.ReplaceAll("@flow", FlowStr)
-
 
 
 	function WriteStrings (|faststring| Lengths, |string|)

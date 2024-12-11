@@ -531,6 +531,7 @@ function ImportAll
 		m.InitDecls
 	for F in SCImport.AllFiles
 		F.CollectGlobals Compiler.Program
+	packmaker.LibGlobs.Sort(SmallestFirst)
 
 	scimport.noproj
 	(Message).Restore
@@ -565,6 +566,7 @@ function ImportAll
 	.Stage( "Building Function Link Map" )
 	LinkMap.CollectAll
 	scfunction.currfunc = nil
+	
 		
 
 
@@ -749,29 +751,28 @@ function SortModulesAndClasses (|bool|)
 	return stderr.ok
 	
 
-function ClassSorter (SorterComparerBool)
+function ClassSorter (SorterComparer)
 	return ModulesSorter(a|scclass|.modul, b|scclass|.modul)
 
 
-function ModulesSorter (SorterComparerbool)
+function ModulesSorter (SorterComparer)
 	opt norefcounts
 	|| aa = a|scmodule|
 	|| bb = b|scmodule|
 	|| ca = aa.cls
 	|| cb = bb.cls
 	
-	if (ca ~= "compressor" and cb ~= "rangecollector") or (cb ~= "compressor" and ca ~= "rangecollector")
 	if !ca or !cb // a module
 		if ca or cb
-			return cb
+			return (cb!=nil)|int|
 	  else
 		|| tt = ca.basetype
-		|| D = tt|int| - cb.basetype|int|
-			return D < 0
+		|| D = cb.basetype|int| - tt|int|
+			return D
 		
-		D = ca.depth|int| - cb.depth|int|
+		D = cb.depth|int| - ca.depth|int|
 		if D
-			return D < 0
+			return D
 		
 	return aa.name < bb.name
 

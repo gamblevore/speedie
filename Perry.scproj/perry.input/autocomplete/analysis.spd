@@ -93,23 +93,24 @@ function FuncListSorter (SorterComparerMsg)
 	|| aa = a[]
 	|| bb = b[]
 	if (!aa or !bb)
-		return aa < bb
+		return (aa < bb)|int|
 	if aa.func != bb.func
-		return aa.func|int| < bb.func|int|
+		return bb.func|int| - aa.func|int|
 	
 	if aa == @emb
-		return bb.name.SyntaxCompare(aa.name, true) < 0
+		// replace with aa.name.syntaxcompare and just replace the number
+/		return aa.name.SyntaxCompare(bb.name, true)
 	
 	|| af = aa[]
 	|| bf = bb[]
 	if (!af or !bf)
-		return af < bf
+		return (af < bf)|int|
 	|| an = af.name
 	|| bn = bf.name
-	|| cmp = bn.SyntaxCompare(an, true)
-	cmp ?= (bf.func|int| - af.func|int|)
-	cmp ?= bb.name.SyntaxCompare(aa.name, true)
-	return cmp < 0
+	|| cmp = an.SyntaxCompare(bn, true)
+	cmp ?= (Af.func|int| - bf.func|int|)
+	cmp ?= aa.name.SyntaxCompare(bb.name, true)
+	return cmp
 
 
 function message.FuncArg (|message|)

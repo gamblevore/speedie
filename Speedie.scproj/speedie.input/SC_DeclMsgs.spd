@@ -194,17 +194,20 @@ function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
 	|| dcl = .CollectDecl(scarg, scarg, declmode.Globals)		#require
 	|| def = dcl.Default
 	if def and !dcl.nilstated
-		|| d = def.msgdecl
+		|| d = def.MsgDecl
 		if d and d.StatedReal
 			dcl.nildeclared = nilstate.real			// in case of something like |object| x = real()
 	(dcl is property)
 	(dcl is Global)
-	
-	if (.Indent == 255) or ('_' == dcl.name[] or dcl.name.Last)
+
+//	|| A = .Indent == 255
+	|| B = '_' == dcl.name[]
+	|| C = '_' == dcl.name.Last
+	if B|||C
 		(dcl is hidden)
 	if dcl.islib
-		if (dcl isnt hidden) and (Options.MakeInterpreter or options.ModePack)
-			PackMaker.AddLibGlob(dcl)
+//		if (dcl isnt hidden) // and (Options.MakeInterpreter or options.ModePack)
+		PackMaker.LibGlobs <~ dcl
 	  else
 		if options.ModePack
 			packmaker.PackGlobs <~ dcl

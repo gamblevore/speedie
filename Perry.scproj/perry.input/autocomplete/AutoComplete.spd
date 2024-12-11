@@ -50,10 +50,10 @@ function CallFromSorter (SorterComparerMsg)
 	|| aa = a.second
 	|| bb = b.second
 	if !aa and !bb
-		return b.position < a.Position	
+		return a.Position - b.position
 	if !aa or !bb
-		return aa
-	return bb.name < aa.name
+		return (aa!=nil)|int|
+	return (bb.name < aa.name)|int|
 
 
 function string.LowerDiffAt (|string| A, |ind|)
