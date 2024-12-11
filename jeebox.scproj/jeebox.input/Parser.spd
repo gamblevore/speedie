@@ -1277,7 +1277,9 @@ module parser
 		visible false
 		cpp_Part Tk
 
-	|string--|				Data
+	function Data (|string--|)
+		cpp_wrapper JB_Tk__GetData
+
 	|message|				_EndOfLineMarker
 	|dictionary of string|  _ErrorNames = nil
 	|fnIDGenerator|			Splitter = &parser.range

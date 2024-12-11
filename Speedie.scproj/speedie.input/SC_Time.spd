@@ -74,12 +74,12 @@ function compiler.TimeTest (|date| elapsed, |bool|)
 	flow off
 	//
 	|| CanInstall = true
-	flowcontrol.disabled++
+	FlowControl.DisabledIncr
 	if (Options.SelfReplacement) and (Options.Variant ~= "Test") and (platform.release)
 		|| ReliableTime = (64.0*1024.0*2.5)|int| // in case my date creation code has a bug... which did happen a few times
 		CanInstall = elapsed < ReliableTime
 		check (CanInstall) ("Not installing as compile duration was over 2.5s. Perhaps this speedie has a bug leading to excessively slow compiles?")
-	flowcontrol.disabled--
+	FlowControl.DisabledIncr(-1)
 	return CanInstall
 
 

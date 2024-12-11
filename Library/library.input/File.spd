@@ -193,12 +193,12 @@ class File (String)
 	
 	function CompareFile (|File| A, |string| Error="", |bool|)
 		cpp_part FileCompare
-		++FlowControl.Disabled
+		FlowControl.DisabledIncr()
 		|| code = .CompareSub(a)
 		.Close
 		A.Close
 		rz = .CompareMsg(code, Error)
-		--FlowControl.Disabled
+		FlowControl.DisabledIncr(-1)
 	
 	
 	helper CompareMsg (|errorint| code, |string| Error, |bool|)
@@ -425,7 +425,7 @@ class File (String)
 				  else
 					rz <~ name
 		rz.sort(&string.sorter)
-		if !flowcontrol.disabled
+		if !flowcontrol.isdisabled
 			flowcontrol.input(rz, self)
 		
 	function ListFiles (|bool| invis = false, |[file]|)

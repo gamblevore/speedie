@@ -27,7 +27,7 @@ class FlowControl
 			printline InPath
 			s = inpath.in
 		.ReadInput = s
-		disabled = 0
+		flowcontrol.disabled = 0
 
 	
 	helper Flush
@@ -101,7 +101,6 @@ class FlowControl
 	
 	module
 		|flowcontrol|			Flow			// DONT directly alter this 
-		|int| 					Disabled		= int.max
 		|bool|					AlwaysMove		= true
 		|bool|					BreakOnFail
 		|byte|					Active
@@ -112,6 +111,13 @@ class FlowControl
 			Log					= 1
 			Off					= 0
 		
+		function Disabled (assigns:|int| value)
+			cpp_wrapper 
+		function DisabledIncr (|int| value=1)
+			cpp_wrapper 
+		function IsDisabled (|bool|)
+			cpp_wrapper 
+			
 		function GetActiveFlow
 			|| str = app["flowmode"]
 			if str ~= "validate"
@@ -153,7 +159,7 @@ class FlowControl
 		function Input (|string| data, |string| name)
 			visible
 			flow off
-			require !.disabled
+			require !.isdisabled
 
 			.disabled = 1
 			|flowcontrol--| f = .flow!

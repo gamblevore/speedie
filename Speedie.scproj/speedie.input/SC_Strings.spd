@@ -181,9 +181,9 @@ function String.ParseCleanWipe (|Message|)
 function String.ParseClean (|Message|)
 	Compiler.stTotalSourceSize += .Length
 	|| P1		= Date.Now
-	flowcontrol.disabled++ // the system parse less sensitive.
+	FlowControl.DisabledIncr // the system parse less sensitive.
 	rz			= .Parse   // clean already will detect real differences
-	flowcontrol.disabled--
+	FlowControl.DisabledIncr(-1)
 	if rz
 		Compiler.stParseTime += (Date.Now - P1)|int|
 		rz.clean(True)

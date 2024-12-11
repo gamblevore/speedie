@@ -49,7 +49,6 @@ extern "C" {
     bool JB_Tk__EatByte(byte b);
     bool JB_Tk__EatString(JB_String* s);
     bool JB_Tk__CppInited();    
-    JB_String* JB_Tk__Data();
 	void JB_Tk__StartParse( JB_String* Data );
 	void JB_Tk__NextStartSet( u32 NextStart );
 	bool JB_Tk__Running(  );
@@ -63,7 +62,7 @@ extern "C" {
     TokHan* JB_Tk__Handler( int BitTypes, fpTok FuncName );
 
     int JB_Tk__NextStart();
-    JB_String* JB_Tk_GetData();
+    JB_String* JB_Tk__GetData();
     int JB_Tk__ErrorStart ();
     void JB_Tk__ErrorStartSet (int Start);
 	byte JB_Tk__Byte (int P);

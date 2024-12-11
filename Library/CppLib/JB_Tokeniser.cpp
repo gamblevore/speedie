@@ -18,13 +18,16 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////////////
 Tokeniser OurModule;
 #define self (&OurModule)
+static JB_String* PzData;
 ////////////////////////////////////////////////////////////////////////////////
+JB_String* JB_Tk__GetData () {
+    return PzData;
+}
 
 int JB_Tk__ErrorStart () {
     return self->ErrorStart;
 }
 
-JB_String* PzData;
 void JB_Tk__ErrorStartSet (int Start) {
     self->ErrorStart = Start;
 }
@@ -275,7 +278,7 @@ Message* JB_Tk__Process( u32 AskBits, long Mode, Message* Parent ) {
 	MiniStr AL = Mini(PzData, Start);
 	ObjLength Found = JB_Dict_LongestKey_( self->WordDict, AL );
 	TokHan* FatData = (TokHan*)Found.Obj;
-		
+	
 	u32 FoundBits = FatData->BitTypes;
 	u32 MatchBits = FoundBits & AskBits;
 	

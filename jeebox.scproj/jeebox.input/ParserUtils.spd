@@ -81,7 +81,7 @@ helper String.ParseSub (|syntax| owner,  |MessageRoot|)
 	// language2.scproj uses owner
 	if !Parser.CppInited
 	    Parser.Init
-	parser.data	= self
+//	parser.data	= self
 	parser.StartParse( self )
 	parser._StopBars = 0
 	|| OK		= StdErr.mark
@@ -98,7 +98,7 @@ helper String.ParseSub (|syntax| owner,  |MessageRoot|)
 	if parser.Running
 	    parser.Expect( 0 )
 	
-	parser.data = ""
+//	parser.data = ""
 	parser.startparse(nil) // clear error message
 	if !OK
 		into = nil

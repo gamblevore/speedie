@@ -313,9 +313,9 @@ function ClearThis
 function IsCompilerAndNeedsInstall (|bool|)
 	require (Options.SelfReplacement)
 	require (StdErr.OK and !Compiler.IsTest)
-	flowcontrol.disabled++
+	FlowControl.DisabledIncr
 	rz = (.TestNewCompiler and .BackupCompiler)
-	flowcontrol.disabled--
+	FlowControl.DisabledIncr(-1)
 
 
 function ExportAndInstall (|date| elapsed)
@@ -524,11 +524,11 @@ function InstallCompiler
 	options.output_path = Compiler.Projects.child("Terminal/Speedie")
 	OldProd.File.MoveTo( options.output_path )
 
-	FlowControl.Disabled++
+	FlowControl.DisabledIncr
 	.InstallOne Cpp_Export.CppProduct
 	.InstallOne Cpp_Export.HProduct
 	.InstallOne Cpp_Export.HProduct.Sibling("JB_Globals.cpp")
-	FlowControl.Disabled--
+	FlowControl.DisabledIncr(-1)
 	
 	if options.Makelib
 		.MakeLib

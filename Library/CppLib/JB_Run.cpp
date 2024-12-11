@@ -248,6 +248,16 @@ int JB_SP_Run (_cstring* C, int Mode)	{
 }
 
 
+void JB_Flow__DisabledIncr(int i) {
+	Flow_Disabled += i;
+}
+void JB_Flow__DisabledSet(int i) {
+	Flow_Disabled = i;
+}
+bool JB_Flow__IsDisabled() {
+	return Flow_Disabled;
+}
+
 
 byte* JB_App__ErrorNumber () {
 	return &JB_ErrorNumber;
