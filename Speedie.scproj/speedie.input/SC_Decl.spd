@@ -66,9 +66,9 @@ datatype SCDeclInfo (int)
 		Body
 		Property
 		Global
+		Marked
 		Return
 		Altered
-		UsedButAlteredBySomethingAheadInLoop
 		GameFlyingMem
 		Task
 		Self

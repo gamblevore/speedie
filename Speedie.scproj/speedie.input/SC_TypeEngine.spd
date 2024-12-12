@@ -271,7 +271,7 @@ function TypeOfThg (ExprResolver)
 		|| Cls = R.Cls								#expect (Exp, "Can’t refer to a module like that.")
 		if Cls.IsModel
 			return Cls.GetFlyingMemory(exp)
-		if cls.isobject					//
+		if cls.isobject
 			|| T = Cls.classtype
 				exp.name = t.name			// right?
 				return T
@@ -286,6 +286,7 @@ function TypeOfThg (ExprResolver)
 		|| O = R.islookuponly
 		if O isa message
 			exp.SafeReplaceWith(o.copy(exp))
+		r.CheckLibGlob
 			
 	return R
 	
@@ -1208,6 +1209,7 @@ function TypeOfDot (ExprResolver)
 		exp.obj = decl
 		if exp != @func
 			fn.DotFuncToNormalFunc( exp )
+	decl.CheckLibGlob
 	
 	return decl
 
