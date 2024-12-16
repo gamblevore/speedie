@@ -2159,3 +2159,4 @@
 "is this ever used??"
 "LibGlobs.h"
 "\nstruct JB_Globals {\n\t"
+"Classes should look like: class ClassName (SuperName)"

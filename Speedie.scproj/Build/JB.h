@@ -1514,18 +1514,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2152])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2153])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2153])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2154])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2154])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2155])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2151])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2152])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2154])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2155])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2155])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2156])
 
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
@@ -1755,7 +1755,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2160])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2161])
 
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
@@ -1793,7 +1793,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2156])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2157])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1831,7 +1831,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2161])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2162])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2066,12 +2066,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2159])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2160])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2158])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2159])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2157])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2158])
 
 #define kJB__byte_max ((byte)255)
 
@@ -2904,7 +2904,7 @@ extern Array* SC__NilReason_values;
 
 #define kSC__SCBlockage_Return ((int)192)
 
-#define kSC__SCDeclInfo_Altered ((SCDeclInfo)524288)
+#define kSC__SCDeclInfo_Altered ((SCDeclInfo)1048576)
 
 #define kSC__SCDeclInfo_API ((SCDeclInfo)1024)
 
@@ -2918,7 +2918,7 @@ extern Array* SC__NilReason_values;
 
 #define kSC__SCDeclInfo_Const ((SCDeclInfo)8)
 
-#define kSC__SCDeclInfo_DclCopied ((SCDeclInfo)562274)
+#define kSC__SCDeclInfo_DclCopied ((SCDeclInfo)1086562)
 
 #define kSC__SCDeclInfo_DirectNumber ((SCDeclInfo)4)
 
@@ -2934,6 +2934,8 @@ extern Array* SC__NilReason_values;
 
 #define kSC__SCDeclInfo_Local ((SCDeclInfo)49152)
 
+#define kSC__SCDeclInfo_Marked ((SCDeclInfo)262144)
+
 #define kSC__SCDeclInfo_NewlyCreated ((SCDeclInfo)128)
 
 #define kSC__SCDeclInfo_NumberConst ((SCDeclInfo)12)
@@ -2948,7 +2950,7 @@ extern Array* SC__NilReason_values;
 
 #define kSC__SCDeclInfo_ReadFrom ((SCDeclInfo)16777216)
 
-#define kSC__SCDeclInfo_Return ((SCDeclInfo)262144)
+#define kSC__SCDeclInfo_Return ((SCDeclInfo)524288)
 
 #define kSC__SCDeclInfo_ReturnedStruct ((SCDeclInfo)536870912)
 
@@ -2973,8 +2975,6 @@ extern Array* SC__NilReason_values;
 #define kSC__SCDeclInfo_UnknownConst ((SCDeclInfo)16)
 
 #define kSC__SCDeclInfo_UpgradeableContained ((SCDeclInfo)64)
-
-#define kSC__SCDeclInfo_UsedButAlteredBySomethingAheadInLoop ((SCDeclInfo)1048576)
 
 #define kSC__SCDeclInfo_UsedByCode ((SCDeclInfo)512)
 
@@ -3075,7 +3075,7 @@ extern bool SC__Cpp_WroteAny;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2150])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2151])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -6224,6 +6224,8 @@ NilState SC_nil__FlowJump(Message* Msg, NilCheckMode Test);
 NilState SC_nil__JumpWithinBool(Message* Msg, NilCheckMode Test);
 
 void SC_nil__LaunchMothership();
+
+void SC_nil__LaunchMothershipSub(JB_ErrorReceiver* Old);
 
 NilState SC_nil__List(Message* Msg, NilCheckMode Test);
 
@@ -9733,6 +9735,8 @@ bool SC_Decl_CanWrap(SCDecl* Self);
 
 int SC_Decl_CArraySize(SCDecl* Self);
 
+void SC_Decl_CheckLibGlob(SCDecl* Self);
+
 SCDecl* SC_Decl_CheckMath(SCDecl* Self, Message* Exp);
 
 bool SC_Decl_CompareUnclear(SCDecl* Self, SCDecl* D, bool MakesSenseVsZero);
@@ -11602,7 +11606,7 @@ inline void SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info) {
 
 inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
 	iif ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc, false))) {
-		JB_Msg_Fail(Self, JB_LUB[812]);
+		JB_Msg_Fail(Self, JB_LUB[813]);
 	}
 }
 
