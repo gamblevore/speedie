@@ -182,11 +182,14 @@ function SCClass.CheckIterator
 
 
 function scdecl.GetIteratorAny (|String| name, |message| node, |SCIterator|)
+	opt norefcounts
 	if .IsCArray
 		return sciterator.carray
-	if .pointercount and .internal!.iscarray
-		debugger 
-		return sciterator.carray
+	if .pointercount
+		|| i = .internal // should never happen, but does for class structs? They need to be fixed?
+//			debugger 	 // we are getting raw structs. Isnt that OK?
+			if i.iscarray
+				return sciterator.carray
 //	if .PointerCount and !cls.isstruct
 //		return sciterator.pointer
 //	

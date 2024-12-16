@@ -286,15 +286,18 @@ struct ArchonPurger
 
 		
 		function LaunchMothership
-			opt norefcounts
 			|| Old = stderr
+			.LaunchMothershipSub(old)
+			SCFunction.currfunc = nil
+		
+		function LaunchMothershipSub (|errorreceiver| old)
+			opt norefcounts
 			|| Rec = ErrorReceiver()
 			using rec
 				for (xoxo in compiler.funclist) (i)
 					.ExterminateZergBugs(xoxo)
 					rec.ReturnErrors(old)
 
-			SCFunction.currfunc = nil
 
 
 			
