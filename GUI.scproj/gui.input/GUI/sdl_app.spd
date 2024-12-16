@@ -272,7 +272,8 @@ module GUI
 
 	helper InitSDL (|&nil|)
 		expect (font.small) "SmallFont not loaded."
-		SDL_Init(SDL_INIT_AUDIO ||| SDL_INIT_VIDEO ||| SDL_INIT_EVENTS ||| SDL_INIT_HAPTIC)
+		// joystick works around a sdl2-bug
+		SDL_Init(SDL_INIT_AUDIO ||| SDL_INIT_VIDEO ||| SDL_INIT_EVENTS ||| SDL_INIT_HAPTIC ||| SDL_INIT_JOYSTICK)
 
 		|| DS = .CurrDisplaySize
 		|| W = SDL_CreateWindow(.NiceAppName.cstr,

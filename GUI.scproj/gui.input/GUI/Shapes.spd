@@ -10,12 +10,13 @@ class VObject
 	|byte|		Nudge
 	|vec4|		Color			// image pixel?
 	|float|		Health			// are ints better? I think so?
-	|VObjDistance?| Shape
+	|VObjDistance| Shape
 	
-	prototype VObjDistance (|vec3| orig, |vec3| dir, |vec3| idir, |float|)
+	prototype VObjDistance (|vec3| orig, |vec3| dir, |vec3| idir, |vec2|)
 	constructor (|vec2| Pos,  |vec2| Size,  |vec4| Color=colors.white)
 		cpp_part ConstructorBox
 		.pos = (pos, 0.0)
+		.Shape = BoxShape
 		.Color = color
 		.Health = 256
 		.size = size
@@ -23,7 +24,9 @@ class VObject
 	constructor (|vec3| Pos,  |float| Rad,  |vec4| Color=colors.white)
 		cpp_part ConstructorSphere
 		.pos = pos
+		.Shape = SphereShape
 		.proportion = vec3(1)
+		.Radius = rad
 		.Color = color
 		.Health = 256
 		
@@ -90,13 +93,16 @@ class VObject
 			return V.iVec4|controlrect|
 
 ////
-		function SphereDistance (VObjDistance)
+		
+		function SphereShape (VObjDistance)
 			opt min 3
 			|| L = .pos - orig
-			|| tca = L • dir
-			if tca > 0
+			|| t = L • dir
+			if t > 0
 				|| r = .Radius
-				return tca - ((r*r) + (tca*tca) - (L • L) ).Sqrt
+				|| h = ((r*r) + (t*t) - (L • L) ).Sqrt
+				return (t-h, t+h) // what about tca + h? or returning (tca,h)?
+		
 		
 		function BoxShape (VObjDistance)
 			opt min 3
@@ -107,10 +113,11 @@ class VObject
 			|| p0 = (orig - r) * idir
 			|| p1 = (orig + r) * idir
 			
-			rz = (P0 min P1).max
-			|| tmax = (P0 max P1).min
+			|| t1 = (P0 min P1).max
+			|| t2 = (P0 max P1).min
 			
-			require tmax >= rz
+			if t2 >= t1
+				return (t1, t2)
 
 
 function controlsize.CalculateBlocks (|ivec4|)

@@ -62,16 +62,8 @@ class RayScene (window)
 				C <~ Found.Color
 	
 	
-	function Moved (|vec3|)
-		|| k = ivec3()
-		k.y = keys.SPACE[] - keys.LSHIFT[]
-		k.z = keys.W[]     - keys.S[]
-		k.x = keys.D[]     - keys.A[]
-		return k.Vec3
-
-	
 	behaviour FrameStep
-		|| m = .moved
+		|| m = keys.Movement.xyz
 			.cam += m * 0.2
 			gui.touch
 		for sp in .shapes
