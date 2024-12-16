@@ -91,6 +91,15 @@ struct Random
 		rz = rz pow power
 		rz = rz.rangeconvert(1.0, 0, from, to)
 	
+	function Vec3 (|vec3|)
+		return (.float, .float, .float)
+		
+	function Vec2 (|vec2|)
+		return (.float, .float)
+		
+	function Vec4 (|vec4|)
+		return (.float, .float, .float, .float)
+		
 	syntax access (|float| To, |float|) 
 		cpp_part AccessScale
 		return .float(to)

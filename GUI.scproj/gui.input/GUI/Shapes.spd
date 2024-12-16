@@ -1,26 +1,39 @@
 
 
+
+
 class VObject
-	|vec2| Pos
-	|vec2| Radius
-	|vec2| Velocity
-	|byte| Nudge
-	|vec4| Color
-	|float|	Health
+	|vec3|		Pos
+	|vec3|		Proportion
+	|float|		Radius			// Can this be packed?
+	|vec3|		Velocity
+	|byte|		Nudge
+	|vec4|		Color			// image pixel?
+	|float|		Health			// are ints better? I think so?
+	|VObjDistance?| Shape
 	
-	constructor (|vec4| Pos_Rad, |vec4| Color=colors.white)
-		.pos = Pos_Rad.xy
-		.Radius = Pos_Rad.zw
+	prototype VObjDistance (|vec3| orig, |vec3| dir, |vec3| idir, |float|)
+	constructor (|vec2| Pos,  |vec2| Size,  |vec4| Color=colors.white)
+		cpp_part ConstructorBox
+		.pos = (pos, 0.0)
 		.Color = color
-		.Health = 1
+		.Health = 256
+		.size = size
+
+	constructor (|vec3| Pos,  |float| Rad,  |vec4| Color=colors.white)
+		cpp_part ConstructorSphere
+		.pos = pos
+		.proportion = vec3(1)
+		.Color = color
+		.Health = 256
 		
-	function Towards (|vec2| P, |float| Speed)
+	function Towards (|vec3| P, |float| Speed)
 		.Velocity = (P - .pos).Normal * Speed
 	
-	syntax Access (|vec4| V, |vec4|)
-		|| P = .pos
-		V += (P, P) // add nudge later
-		return V
+//	syntax Access (|vec4| V, |vec4|)
+//		|| P = .pos
+//		V += (P, P)
+//		return V
 		
 	function y (|float|)
 		return .pos.y
@@ -29,26 +42,32 @@ class VObject
 		return .pos.x
 
 	function left (|float|)
-		return .pos.x - .Radius.x
+		return .pos.x - .Radius * .Proportion.x
 
 	function right (|float|)
-		return .pos.x + .Radius.x
+		return .pos.x + .Radius * .Proportion.x
+	
+	setter Size	(|vec2|)
+		|| M = Value.max
+		.Proportion = (value, 0.0)/M
+		.Radius = M*0.5
 		
-	function Box (|vec4|)
-		|| rad = .Radius
-		return (.pos-rad, .pos+rad)
+	function Box2D (|vec4|)
+		|| rad = .proportion.xy * .Radius
+		|| p = .pos.xy
+		return (P-rad, P+rad)
 
 	function Step
 		.pos += .Velocity
 
 	function OverlapsBlock (|VObject| B, |vec4|)
-		return .OverlapsRect(b.box)
+		return .OverlapsRect(b.box2d)
 	
 	function OverlapsRect (|vec4| B, |vec4|)
-		return B.Clip(.box)
+		return B.Clip(.box2d)
 	
 	function Screen (|ivec4|)
-		return .box.Screen
+		return .box2d.Screen
 	
 	syntax cast (|ivec4|)
 		return .Screen
@@ -69,6 +88,29 @@ class VObject
 				height = height.abs
 			|| V = (x,y,x+width,y+height)*16.0
 			return V.iVec4|controlrect|
+
+////
+		function SphereDistance (VObjDistance)
+			opt min 3
+			|| L = .pos - orig
+			|| tca = L • dir
+			if tca > 0
+				|| r = .Radius
+				return tca - ((r*r) + (tca*tca) - (L • L) ).Sqrt
+		
+		function BoxShape (VObjDistance)
+			opt min 3
+			
+			orig -= .pos
+			|| r = .Radius * .Proportion
+					
+			|| p0 = (orig - r) * idir
+			|| p1 = (orig + r) * idir
+			
+			rz = (P0 min P1).max
+			|| tmax = (P0 max P1).min
+			
+			require tmax >= rz
 
 
 function controlsize.CalculateBlocks (|ivec4|)

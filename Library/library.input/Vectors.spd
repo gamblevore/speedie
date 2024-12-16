@@ -302,6 +302,28 @@ datatype vec3
 		cpp_part Bool
 		return (self != vec3())
 
+
+	
+	function RotateXLeft (|vec3|)
+		return (.x, .z, -.y)
+	function RotateXRight (|vec3|)
+		return (.x, -.z, .y)
+		
+	function RotateYLeft (|vec3|)
+		return (.z, .y, -.x)
+	function RotateYRight (|vec3|)
+		return (.z, -.y, .x)
+		
+	function RotateZLeft (|vec3|)
+		return (.y, .x, -.z)
+	function RotateZRight (|vec3|)
+		return (.y, -.x, .z)
+	
+	syntax Compare (|float| Other, |bool|Aware, |float|)
+		|| LSq = .lengthsq
+		|| Osq = other*other
+		return lsq - Osq
+
 	syntax Equals (|vec3| v, |bool|Aware, |bool|)
 		return (.x == v.x) and (.y == v.y) and (.z == v.z) 
 	
@@ -389,6 +411,11 @@ datatype vec3
 
 	function Normal (|vec3|) 									// use invsqrt instead?
 		return self / .length
+
+	operator x (|vec3| V, |vec3|)
+	    rz.x = .y * v.z - .z * v.y
+	    rz.y = .z * v.x - .x * v.z
+	    rz.z = .x * v.y - .y * v.x
 
 	render
 		fs <~ "${.x}, ${.y}, ${.z}"

@@ -23,22 +23,22 @@ class Breakout (Window)
 	|[vobject]|			Spirals
 
 	constructor
-		.bar = vobject(vec4())
+		.bar = vobject(nil, nil)
 		.fps = fpstextview(self)
 		.fps.MakeInline()
 		.reset
 
 	function AddBalls (|vec2| P, |vobject|)
-		Rz = vobject((P, 16th,  16th))
-		rz.Velocity = vec2(0, -.ballspeed)
+		Rz = vobject(P, (16th,  16th))
+		rz.Velocity = vec3(0, -.ballspeed, 0)
 		.balls <~ rz
 
 	function reset (|string| msg="")
 		if msg
 			beep msg
 		.ballspeed = 0.13
-		.bar.pos = vec2(10.0, 0.5)
-		.bar.radius = vec2(1.0,  0.125)
+		.bar.pos = vec3(10.0, 0.5, 0)
+		.bar.size = vec2(2.0,  0.25)
 		.balls.length = 0
 		.Blocks.Length = 0
 		.Explosions.Length = 0
@@ -47,8 +47,8 @@ class Breakout (Window)
 		for y in 5.0
 			|| y2 = -1.0 + y*3th
 			for x in 10.0
-				|| pos = (2.0+x*(16.0/9.0), 9.0+y*0.5,  0.75, 0.2)
-				|| bl = vobject(pos)
+				|| pos = (2.0+x*(16.0/9.0), 9.0+y*0.5)
+				|| bl = vobject(pos,  (0.75, 0.2)*2.0)
 				bl.Health = 1.0 + y
 				.Blocks <~ bl
 	
@@ -58,7 +58,7 @@ class Breakout (Window)
 		require hit.Exists
 		|| v = b.Velocity
 		require v.y < 0.0
-		|| rr = bar.Box
+		|| rr = bar.Box2D
 		|| D = math.RangeConvert(rr.x1, rr.x2, -1, 1).Convert(b.pos.x).spow2
 		v.y = -v.y
 		v.x = D*.ballspeed
@@ -91,8 +91,7 @@ class Breakout (Window)
 		|| R2 = bl.OverlapsRect(R)
 		require r2.exists
 		|| Cn = r2.Center
-		|| SpBox = (cn, 3.0, 3.0)
-		.spirals <~ vobject(spbox, bl.Color)
+		.spirals <~ vobject(cn, vec2(6), bl.Color)
 		
 		if r2.Height > r2.Width
 			ball.Velocity.x = -ball.Velocity.x
@@ -100,7 +99,7 @@ class Breakout (Window)
 			ball.Velocity.y = -ball.Velocity.y
 		ball.Velocity = ball.Velocity.Normal * .incr
 
-		|| hp = bl.Health - ball.box.Width*8
+		|| hp = bl.Health - ball.box2d.Width*8
 		bl.Health = hp
 		if (hp <= 0) or 0.5[]
 			|| pu = .PowerUp(8)
@@ -111,16 +110,14 @@ class Breakout (Window)
 				|| old = .Blocks.now!
 				b2.towards(old.pos, .BallSpeed)
 			  elseif pu <= 5
-				|| b2 = vobject((ball.pos, vec2(1+(pu-3))*0.3 ))
+				|| b2 = vobject(ball.pos.xy, vec2(1+(pu-3))*0.3)
 				b2.Color = colors.Red // 
 				.Explosions <~ b2
 			  elseif pu <= 7
 				ball.Radius += 16th
 			  elseif pu == 8
-				.Bar.Radius.x += 8th
-				if .bar.Radius.x > 2.5
-					.bar.Radius.x = 2.5
-				.Bar.Radius.x += 8th
+				|| b = (.Bar.proportion.x + 8th) min 2.5
+				.bar.Proportion.x = b
 		return hp <= 0
 // guidable flurry aura
 		
@@ -133,7 +130,7 @@ class Breakout (Window)
 
 
 	function DoHits (|vobject| ball)
-		|| R = ball.box
+		|| R = ball.Box2D
 		for (bl.backwards in .Blocks) (i)
 			if .HitOne(bl, r, ball)
 				.blocks.FastRemove(i)
@@ -147,7 +144,7 @@ class Breakout (Window)
 		|| MinSp = .BallSpeed/4
 		for (b.backwards in .explosions) (i)
 			b.Radius -= 0.03
-			if b.Radius.x <= 0.02
+			if b.Radius <= 0.02
 				.explosions.fastRemove(i)
 			  else 
 				.Dohits(b)
@@ -176,14 +173,13 @@ class Breakout (Window)
 		
 		for (s.backwards in .Spirals) (i)
 			s.Radius -= 0.03
-			if s.Radius.x < 0
+			if s.Radius < 0
 				.Spirals.Remove(i)
 		gui.Touch
 		.fps.update
 	
 	
 	behaviour Drawbackground
-		where.DrawRect(self, colors.black)
 		for x in .Width
 			|| Col = Colors.rainbow(x div .width, 1, 0.5)
 			where.DrawLineV((x,0), .height, col)
@@ -206,7 +202,7 @@ class Breakout (Window)
 	
 	function BallDraw (|image| where, |[vobject]| List)
 		for b in list
-			|| bx = b.Box.screenfloat ± -4.0
+			|| bx = b.Box2d.screenfloat ± -4.0
 			|| sh = bx.Width*4th
 			where.DrawSoftCircle(bx, b.Color, 2.0)
 			|| v = b.Velocity.Normal.xyxy

@@ -4,7 +4,7 @@ https://www.scratchapixel.com // simple raytracing demo... based on code from he
 
 main
 	gui.init(2)
-	return RayScene()
+	return RayScene().RunAsMain
 
 
 struct RayHit

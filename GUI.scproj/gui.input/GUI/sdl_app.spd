@@ -103,8 +103,7 @@ module GUI
 
 	function ScreenSize (|ivec4|)
 		cpp_Part GetScreen
-		return (.ScreenOrig.vec4 / .scale).ivec4 	
-
+		return (.ScreenOrig.vec4 / .scale).iVec4
 
 	function NativeWindow (|&nil|)
 		|SDL_SysWMinfo| data
@@ -655,7 +654,6 @@ module GUI
 //				.sdl_stoptextinput
 				w.__FrameStep__(!(dlg or w.OpenedMenu or .IsBackground))
 		.StartResize
-
 
 	function Cycle (|duration| length, |Duration| Adjust=0, |float|)
 		opt inline
