@@ -947,7 +947,7 @@
 "Need properties for a Game3D Type."
 "Need space between bracket and name."
 "Need to set it into another var."
-"Need to specify a return value"
+"Missing return value"
 "floatconst"
 "FADK"
 "FMLK"

@@ -3447,7 +3447,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[216]);
-	JB_FS_AppendInt32(_fsf0, (2024121614));
+	JB_FS_AppendInt32(_fsf0, (2024121817));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8875,7 +8875,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1339]);
-	JB_FS_AppendInt32(_fsf0, (2024121614));
+	JB_FS_AppendInt32(_fsf0, (2024121817));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -58447,4 +58447,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -7355670873160469153 6020640112998425773
+// -7355670873160469153 -6913360919853996485
