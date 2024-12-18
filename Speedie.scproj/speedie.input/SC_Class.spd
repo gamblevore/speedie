@@ -897,12 +897,19 @@ function StructName (|String|)
 function MakeClassType (|scdecl| d, |scdecl|)
 	opt norefcounts
 	|| c = scdecl(TypeJBClass!)
+	|| i = scdecl(TypeJBClass!)
+	c.Internal = i
 	c.name = .name.lowercase
+	i.name = c.name
 	c.source = .source
+	i.source = c.source
 	C.pointercount = 1
-	(c is ClassObj)
 	C.nildeclared = nilstate.real
+	i.nildeclared = nilstate.real
 	C.Contains = d
+	i.Contains = d
+	(c is ClassObj)
+
 	return c
 
 
