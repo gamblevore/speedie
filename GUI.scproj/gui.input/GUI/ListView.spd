@@ -1294,7 +1294,7 @@ class ListView (GUIControl) {
 			
 	behaviour Gesture
 		if !.CanSeeAllLines
-			.scrollPixels(-wheel.y*6)
+			.scrollPixels(wheel.y*6)
 		return true
 
 

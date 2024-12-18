@@ -1063,7 +1063,7 @@ module GUI
 
 
 	helper MouseWheelEvent (|&SDL_Event| ev, |window| w,  |int|)
-		w.__gesture__(ev.wheel.xy, 0, 0)
+		w.__gesture__(ev.wheel.xy*(1,-1), 0, 0)
 		return sdlactivity.Activity
 	
 	

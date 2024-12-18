@@ -563,7 +563,7 @@ function PerrySearchWithin (GUIListEvent)
 
 
 function PerryFileViewRightClick (GuiListEvent)
-	require RightClickFileList(self, row, mode)
+	require self|fileviewer|.RightClickFileList(row, mode)
 	if row isa filerow
 		|| m = .CMM									#require
 		|| menu = menuitem("Count Lines Of Code", FileViewerCountCode)

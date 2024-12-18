@@ -633,12 +633,12 @@ function fileviewer.FindSearchWithin (|filerow|)
 			s = s.parent
 		return s
 	
-function ReturnFileList (GUIListEvent)
+function fileviewer.ReturnFileList (GUIListEvent)
 	if self isa FileViewer
 		.Editme.SetFocus
 		return true
 	
-function RightClickFileList (GUIListEvent)
+function fileviewer.RightClickFileList (GUIListEvent)
 	opt NoRefCounts
 	if self isa fileviewer
 		|| m = .newcmm

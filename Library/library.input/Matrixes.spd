@@ -27,9 +27,11 @@ struct Mat4
 			.rows[i].render(fs)
 			fs <~ '\n'
 	
-	operator mul (|mat4| m, |mat4|)
-		for i in 4
-			rz.rows[i] = .rows[i] * m.Columns(i)
+	operator mul (|mat4| B, |mat4|)
+		for bc in 4
+			|| BCol = b.Columns(bc)
+			for ar in 4
+				rz.rows[ar][bc] = bcol • .Rows[ar]
 
 
 

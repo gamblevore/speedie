@@ -197,7 +197,7 @@ helper ID (|pid_int|)
 function sp_run  (|&cstring| args, |int| mode = 3, |errorint|)
 	cpp_Wrapper JB_SP_Run
 
-function rawargs  (|array of string|)
+helper rawargs  (|array of string|)
 	cpp_wrapper JB_App__Args
 
 function exit (|int| Code=0)
