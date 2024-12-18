@@ -17,8 +17,8 @@ class FileViewer (ListView)
 		super.constructor(p, sel, ret)
 		.MultiSelection 	= true
 		.editme				= editme
-		.OnReturn			= ReturnFileList
-		.OnRightClick		= RightClickFileList
+		.OnReturn			= ReturnFileList|GUIListEvent| // c++ work around
+		.OnRightClick		= RightClickFileList|GUIListEvent|
 		.quickopen			= textview(nil,		nil,		nil)
 		.Listopen			= ListView(nil,		nil, 		ClickedOpenList)
 		.ondrawrow			= InsideFileViewRowDraw

@@ -1,5 +1,18 @@
 
 
+// todo:
+// 2) Add frustrum culling, make sure nothing good is missed.
+	// How can we do this? The culling, because its not a frustrum
+	// Lets look at the shape first?
+	// We could get 3 points and find the "worst"? or perhaps theres always a worst point?
+// 3) Some kind of visual partitioning system with cells?
+	// fractal circle based.
+// 4) turn the spheres into chunks?
+// 5) Optimisations around still objects
+// 6) hit-detection? (surely its just chunk vs chunk anyhow?)
+
+
+
 class RayTracer
 	visible false
 	|vec4|			Color
@@ -33,7 +46,8 @@ class RayTracer
 		._LookAt.reset
 		.spin = .spin.Fract
 		.Pitch = .Pitch.fract
-		|| M = .spin.SinCos.RotateAroundY
+		._LookAt = .spin.SinCos.RotateAroundY
+		|| M = .pitch.SinCos.RotateAroundX
 		._LookAt *= M
 		return ._LookAt
 	
@@ -75,6 +89,7 @@ class RayTracer
 
 	function RayTrace (|image| where, |float|)
 		opt norefcounts,  opt min 3
+		.ViewMat
 		.size = where.size.vec2
 		.scale = 1.0/.size.xx
 		.adjust = .size * -0.5

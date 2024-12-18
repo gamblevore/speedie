@@ -32,13 +32,22 @@ struct Mat4
 			.rows[i].render(fs)
 			fs <~ '\n'
 	
+	function Transpose (|mat4|)
+		for i in 4
+			rz.rows[i] = .columns(i)
+
 	operator mul (|mat4| B, |mat4|)
+		|| tmp = b.Transpose
+		|| r0 = .rows[0] // avoid smash inputs
+		|| r1 = .rows[1]
+		|| r2 = .rows[2]
+		|| r3 = .rows[3]
 		for bc in 4
-			|| BCol = b.Columns(bc)
-			for ar in 4
-				rz.rows[ar][bc] = bcol • .Rows[ar]
-//		for i in 4
-//			.Rows[i] = (.rows[i].xyz.normal, .rows[i].w)
+			|| BCol = tmp.rows[bc]
+			rz.rows[0][bc] = bcol • r0
+			rz.rows[1][bc] = bcol • r1
+			rz.rows[2][bc] = bcol • r2
+			rz.rows[3][bc] = bcol • r3
 
 
 
