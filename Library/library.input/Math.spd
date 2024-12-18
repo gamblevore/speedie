@@ -18,37 +18,12 @@ module Math
 	function Cos (|float| f, |float|)
 		return .cospi(f*2.0)
 		
-	function float.cos (|float|)
-		return math.cos(self)
-		
-	function float.exp2 (|float|)
-		return 2.0 pow self
-
 	function ACosBad (|float| f, |float|)
 		cpp_wrapper (acosf)
 	
 	function Tan (|float| f, |float|)
 		return .TanPi(f*2.0)
 	
-	function float.Acos (|float|)
-		return math.acosbad(self) * math.iTau
-		
-	function float.Sin (|float|)
-		return math.sin(self) //sigh
-
-	function float.tan (|float|)
-		return math.tan(self) //sigh
-
-	helper float.__sincospi (|&float| A, |&float| B)
-		cpp_wrapper (__sincospif)
-		
-	function float.SinCos (|vec2|)
-		|float| a
-		|float| b
-		self*=2
-		.__sincospi(a, b)
-		return (a, b)
-		
 	function CosPi (|float| f, |float|)
 		cpp_wrapper (__cospif)
 

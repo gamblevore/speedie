@@ -63,7 +63,7 @@ class Menu (ListView)
 	behaviour MouseMove
 		if state is leave or enter
 			return false // right? should have a different event for this
-		|| moved = super.mousemove(p, 0|SDL_WindowEventID|)
+		|| moved = super.mousemove(P, move, 0|SDL_WindowEventID|)
 		|| l = .FindClickedMenu(P.y)
 		if !l
 			return true

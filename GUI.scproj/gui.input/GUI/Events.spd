@@ -23,8 +23,14 @@ struct SDL_Event
 	function Button (|&SDL_MouseButtonEvent|)
 		return self|&SDL_MouseButtonEvent|
 	
+	function Gesture (|&SDL_MultiGestureEvent|)
+		return self|&SDL_MultiGestureEvent|
+	
 	function Finger (|&SDL_TouchFingerEvent|)
 		return self|&SDL_TouchFingerEvent|
+	
+	function Motion (|&SDL_MouseMotionEvent|)
+		return self|&SDL_MouseMotionEvent|
 	
 	function Wheel (|&SDL_MouseWheelEvent|)
 		return self|&SDL_MouseWheelEvent|
@@ -73,6 +79,19 @@ struct SDL_TextEditingEvent
 		|| b = (&.text[0])|cstring|
 		fs <~ string.wrap(b)
 
+
+
+struct SDL_MouseMotionEvent
+	linkage: wrapper
+	|SDLEventType|		type
+	|uint|				timestamp
+	|uint|				windowID
+    |Uint|				which
+    |Uint|				state
+    |int|				x
+    |int|				y
+    |int|				xrel
+    |int|				yrel
 
 
 
@@ -145,6 +164,22 @@ function ivec2.SDLXY (|ivec2|)
 	|| v = (x, scr - y)
 	v -= w.lastrect.xy
 	return v
+
+
+struct SDL_MultiGestureEvent
+	linkage
+		wrapper
+		cpp_part MGE
+    |Uint|		type
+    |Uint|		timestamp		/**< In milliseconds, populated using SDL_GetTicks() */
+    |uint64|	touchId			/**< The touch device id */
+    |float|		dTheta
+    |float|		dDist
+    |float|		x
+    |float|		y
+    |Uint16|	numFingers
+    |Uint16|	padding
+
 
 
 struct SDL_MouseButtonEvent

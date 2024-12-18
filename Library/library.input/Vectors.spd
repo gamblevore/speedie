@@ -297,13 +297,53 @@ datatype ivec4
 
 
 datatype vec3
-	size 16 // sigh. we are using vec4 for vec3 :)
+	size 16 // We are using vec4 for vec3 :)
 	syntax cast (|bool|)
 		cpp_part Bool
 		return (self != vec3())
 
 
-	
+	function Camera2 (|mat4|)
+		rz[3,3] = 1.0
+		rz[1,1] = 1.0
+		rz[0,0] =  .z, rz[2,0] = .x
+		rz[0,2] = -.x, rz[2,2] = .z
+
+
+	function Camera3 (|mat4|)
+		rz[3,3] = 1.0
+		rz[0,0] = 1.0
+		rz[1,1] =  .z, rz[2,1] = .y
+		rz[1,2] = -.y, rz[2,2] = .z
+
+	function Camera (|mat4|)
+		return .Camera2
+		// can we do a simple y rotation?
+		rz[3,3] = 1.0
+// a forward z... means everything stays "as-is"
+		rz[0,0] =  .z, rz[1,1] = .z, rz[2,2] = .z
+
+// now we have some kinda rotations.
+// all x, means we turn to the right		
+		rz[1,0] =  .y,  rz[2,0] =  .x
+		rz[0,1] =  .x,  rz[2,1] =  .y
+		rz[0,2] = -.x,  rz[1,2] = -.y
+		rz[0,0] = 1.0
+		rz[1,2] = -.y//, rz[2,2] = .z
+
+
+
+	function LookAt (|mat4|)
+		disabled "Not sure this function even makes sense originally."
+//	    || f = .normal
+//	    || u = vec3(0,1,0)
+//	    || s = (f x u).normal
+//	    u = s x f
+//	    rz.rows[0] = (s,  -(s • self))
+//	    rz.rows[1] = (u,  -(u • self))
+//	    rz.rows[2] = (f,  -(f • self))
+//		rz[3,3] = 1.0
+
 	function RotateXLeft (|vec3|)
 		return (.x, .z, -.y)
 	function RotateXRight (|vec3|)
@@ -413,6 +453,7 @@ datatype vec3
 		return self / .length
 
 	operator x (|vec3| V, |vec3|)
+		description "Gives something at right angles. IDK its just maths dont ask me." 
 	    rz.x = .y * v.z - .z * v.y
 	    rz.y = .z * v.x - .x * v.z
 	    rz.z = .x * v.y - .y * v.x
@@ -772,6 +813,11 @@ datatype vec2
 datatype mat2 (vec4)
 	function vec2.operatormul (|mat2| m, |vec2|)
 		return (m.xy • self, m.zw • self)
+	function vec3.operatormul (|mat2| m, |vec3|)
+		cpp_part YRotation
+		|| XZ = .xz
+		XZ = (m.xy • xz, m.zw • xz)
+		return (xz.x, .y, xz.y)
 	module
 		function New (|vec4| x, |mat2|)
 			numeric

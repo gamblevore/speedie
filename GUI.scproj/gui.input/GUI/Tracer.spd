@@ -1,0 +1,149 @@
+
+
+struct RayTracer
+	|vec4|			Color
+	|float|			Dist
+	|vec2|			Size
+	|vec2|			Scale
+	|vec2|			Adjust
+	|Vec3|			Camera
+	|Vec3|			dir
+	|vec3|			idir
+	|Mat4|			LookAt
+	|[vobject]--|	Shapes
+	
+	constructor (|image| where, |vec3| Cam, |vec3| CamDir)
+		|| s = where.size.vec2
+		.size = s
+		.scale = 1.0/s.xx
+		.adjust = s * -0.5
+		.Camera = cam
+		.LookAt = CamDir.Camera
+
+
+	function AntiAlias (|vec2| XY, |&imagepixel| pxl, |&imagepixel|)
+		|| ID = pxl.a
+		|| C = pxl.Color
+		for i in 4
+			|| sh = (i&1, i>>1).Vec2 - 0.5
+			c += .GetColor(XY + sh*0.75)
+		C *= 5th
+		C.a = ID|float|*255th
+		pxl <~ C
+		return pxl
+	
+	
+	function GetColor (|vec2| XY, , |vec4|)
+		opt min 3, opt norefcounts
+		.Color = nil
+		.Dist = float.max
+		XY = (xy + .adjust) * .scale
+		.dir = (xy, 1.0).Normal * .LookAt
+		.idir = -1.0 / .dir
+		
+		for sp in .Shapes
+			|| t = raytracer.SphereShape(sp, .Camera, .dir, .idir)
+			|| tx = t.x
+			if (tx > 0) and (tx < .Dist)
+				.Dist = t.x
+				|| P = .Camera + .dir*tx
+				|| Norm = (P - sp.pos).normal
+				|| C = (norm.abs * sp.Color.xyz)
+				.color = (C, sp.shapeID|float|*255th)
+		return .Color
+
+
+	function RayTrace (|image| where, |float|)
+		opt norefcounts,  opt min 3
+		|| P = vec2()
+		|| w = where.Width|float|
+		|| h = where.Height|float|
+		
+		while p.y < h
+			|| PY = (0, p.y|int|)
+			|| pxl = where[PY]
+			|| below = where[PY+(0,-1)]			
+			|| Left = pxl
+			while p.x < w
+				pxl <~ .GetColor(P)
+				if pxl.a!=left.a
+					left = .AntiAlias(p-(1.0,0), left)
+					pxl = .AntiAlias(p, pxl)
+					rz++
+				if pxl.a!=below.a
+					below = .AntiAlias(p-(0,1.0), below)
+					if pxl.a==left.a
+						pxl = .AntiAlias(p, pxl)
+					rz++
+				// :O
+				left = pxl
+				pxl++
+				below++
+				p.x++
+			p.y++
+			p.x = 0
+		rz /= where.size.area|float|		
+
+	module
+		function SphereShape (VObject.DistanceFunction)
+			opt min 3
+			|| L = .pos - orig
+			|| t = L • dir
+			if t > 0
+				|| r = .Radius
+				|| h = ((r*r) + (t*t) - (L • L) ).Sqrt
+				return (t-h, t+h) // what about tca + h? or returning (tca,h)?
+		
+		
+		function BoxShape (VObject.DistanceFunction)
+			opt min 3
+			
+			orig -= .pos
+			|| r = .Radius * .Proportion
+					
+			|| p0 = (orig - r) * idir
+			|| p1 = (orig + r) * idir
+			
+			|| t1 = (P0 min P1).max
+			|| t2 = (P0 max P1).min
+			
+			if t2 >= t1
+				return (t1, t2)
+
+
+
+
+class GridSection
+	|...[512]|  Cells
+	|uint64|    State
+	|byte[4]|	Dimensions
+	|object--?| Owner
+	contains uint64
+	constants
+		CellMax = 512
+
+	constructor
+		(&.Dimensions)|&int|[] = 0
+		.Fill(0)
+
+	function Width (|int|)
+		return .Dimensions[0]
+
+	function Height (|int|)
+		return .Dimensions[1]
+
+	function Depth (|int|)
+		return .Dimensions[2]
+
+	function at (|uint| i=0, |&...|)
+		if i < 512
+			return .Cells[i]
+		return Dummy
+	
+	function Fill (|uint64| V)
+		|| C = .at
+		for i in CellMax
+			C[i] = v
+	module
+		|...| Dummy
+

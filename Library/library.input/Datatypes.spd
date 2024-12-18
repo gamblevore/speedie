@@ -230,12 +230,11 @@ struct FloatRange   /// :3
 	|Float| To
 	|float| Step
 	
-	helper float.LoopOK (|float| Final, |float| Dir, |bool|)
+	helper float.LoopOK (|float| Final, |float| Step, |bool|)
 		opt inline
-		// could speed this up using copysign one day
-		if dir >= 0.0
-			return self < final
-		return self > final
+		if Step >= 0.0
+			return self <= final
+		return self >= final
 		
 	iterator
 		|| _c = .from
@@ -393,6 +392,35 @@ datatype float
 		fs <~ "%"
 
 
+	function cos (|float|)
+		return math.cos(self)
+		
+	function exp2 (|float|)
+		return 2.0 pow self
+
+	function Acos (|float|)
+		return math.acosbad(self) * math.iTau
+		
+	function Sin (|float|)
+		return math.sin(self) //sigh
+
+	function tan (|float|)
+		return math.tan(self) //sigh
+
+	helper __sincospi (|&float| A, |&float| B)
+		cpp_wrapper (__sincospif)
+	
+	function Rotation (|mat2|)
+		|| O = .SinCos
+		return mat2(o.y, o.x, -o.x, o.y)
+
+	function SinCos (|vec2|)
+		|float| a
+		|float| b
+		self*=2
+		.__sincospi(a, b)
+		return (a, b)
+		
 //	syntax cast (|bool|)
 //		cpp_part AsBool
 //		return self|bool|

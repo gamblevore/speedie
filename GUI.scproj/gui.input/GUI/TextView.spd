@@ -132,9 +132,9 @@ class TextView (GUIControl)
 		super.gotfocus
 
 
-	behaviour MouseWheel
+	behaviour Gesture
 		if (self is editable or AlwaysScrollable) and !.singleline
-			.StartLine = .StartLine.movecapped(-p.y)
+			.StartLine = .StartLine.movecapped(wheel.y)
 			return true
 
 
@@ -1677,8 +1677,8 @@ class TextView (GUIControl)
 	
 	
 	behaviour MouseMove
-		.ShowExtraInfo(p, true)
-		return .HandleMouseInScrollArea(p, ._ScrollDrawTimer)
+		.ShowExtraInfo(P, true)
+		return .HandleMouseInScrollArea(P, ._ScrollDrawTimer)
 	
 	
 	helper ShowNoExtra

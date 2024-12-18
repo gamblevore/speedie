@@ -183,6 +183,8 @@ function PerryIDE.DisplayInPopup (|string| s,  |bool| instant,  |vec4| Color=vec
 	(size.x max= 40)
 	if Corner.x < 0
 		Corner.x = .EditMe.lastrect.x2 - (size.x + 4)
+	Corner.y+=24
+	Corner.x-=4
 	.PopupDisplay.size = Corner.x~right for size.x   by   Corner.y~up back size.y
 	.PopupDisplay.text = s
 	

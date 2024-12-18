@@ -169,6 +169,18 @@ class FastString {
 		
 	syntax Append (|Byte| data)
 		cpp_wrapper JB_FS_AppendByte
+		
+	syntax Append (|vec3| data)
+		cpp_part AppendVec3 // shouldn't be necessay, .render(fs) should be called
+		opt norefcounts
+		real self
+		data.Render(self)
+		
+	syntax Append (|vec4| data) // same
+		cpp_part AppendVec4
+		opt norefcounts
+		real self
+		data.Render(self)
 
 	function AppendIntegerAsText (|int64| data, |int|RoundTo=1)
 		cpp_wrapper JB_FS_AppendIntegerAsText

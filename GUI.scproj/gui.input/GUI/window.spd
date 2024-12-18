@@ -100,9 +100,10 @@ class Window (GUIControl)
 	function SetMenu (|menu| m)
 		disabled "use openedmenu"
 
-	function RunAsMain (|float| Scaling = 1.0, |ErrorInt|)
+	function RunAsMain (|float| Scaling = 1.0, |bool| LiveAction=false, |ErrorInt|)
 		.show
 		.IsMainWindow = true
+		.IsLiveAction = LiveAction
 		if gui.init(scaling)
 			gui.NukeCursor
 			.BlockScale ?= 20
@@ -179,15 +180,15 @@ class Window (GUIControl)
 				GUI.JB_SDL_SetModified(n, value)
 		super.syntaxis(f) = value
 
-
-	behaviour MouseWheel
+// -wheel.y
+	behaviour Gesture
 		opt norefcounts
 		|| XY = GUI.MouseXY
 		|| it = .OpenedMenu()
 		if it and it.lastrect.Contains(xy)
-			return it.__MouseWheel__(P, direction)
+			return it.__Gesture__(wheel, rotate, pinch)
 		|| R = self[xy]
-			R.__MouseWheel__(P, Direction)
+			R.__Gesture__(wheel, rotate, pinch)
 		return true
 
 

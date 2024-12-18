@@ -128,7 +128,7 @@ dataType Keys (int) {
 		return (self is cancel_key or escape or AC_BACK)
 
 	function IsDelete (|bool|)
-		return self is forwarddelete or delete or kp_delete
+		return self is ForwardDELETE or DELETE or KP_DELETE
 
 	function IsShift (|bool|)
 		return self is lshift or rshift
@@ -142,7 +142,7 @@ dataType Keys (int) {
 	function IsCmd (|bool|)
 		return self is lgui or rgui
 		
-	function Movement (|vec4| L, |vec4|)
+	helper Movement (|vec4| L, |vec4|)
 		rz.x = .Length((self is d or right) - (self is a or left), l.x)
 		rz.y = .Length((self is space) - (self is LCTRL or RCTRL), l.y)
 		rz.z = .Length((self is w or up) - (self is s or down), l.z)

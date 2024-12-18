@@ -512,7 +512,7 @@ class ListView (GUIControl) {
 			.ScrollDrawTimer = 0
 			return .HasFocus
 		
-		return .HandleMouseInScrollArea(p, ._ScrollDrawTimer)
+		return .HandleMouseInScrollArea(P, ._ScrollDrawTimer)
 	
 	
 	behaviour LostFocus
@@ -1292,10 +1292,9 @@ class ListView (GUIControl) {
 		where.fillmarks(.lastrect ± 1, bgcol, .gnormal.seps, focuscol, unfoc)
 
 			
-	behaviour MouseWheel
+	behaviour Gesture
 		if !.CanSeeAllLines
-			|| i = -p.y
-			.scrollPixels(i*6)
+			.scrollPixels(-wheel.y*6)
 		return true
 
 

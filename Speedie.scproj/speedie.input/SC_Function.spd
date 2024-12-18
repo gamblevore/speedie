@@ -824,7 +824,7 @@ function CheckReturnValue (|Message| msg, |scnode| name_space)
 	
 	if (!c)
 		|| t = .ReturnType
-			check (t is returnedstruct) (msg, "Need to specify a return value")
+			check (t is returnedstruct) (msg, "Missing return value")
 		return
 
 	expect ( c.IsOnlyChild ) ( msg, "Can’t return multiple values" )

@@ -8,27 +8,31 @@ class VObject
 	|float|		Radius			// Can this be packed?
 	|vec3|		Velocity
 	|byte|		Nudge
+	|byte|		ShapeID
 	|vec4|		Color			// image pixel?
 	|float|		Health			// are ints better? I think so?
-	|VObjDistance| Shape
+	|DistanceFunction| Shape
 	
-	prototype VObjDistance (|vec3| orig, |vec3| dir, |vec3| idir, |vec2|)
+	prototype DistanceFunction (|vec3| orig, |vec3| dir, |vec3| idir, |vec2|)
+		
 	constructor (|vec2| Pos,  |vec2| Size,  |vec4| Color=colors.white)
 		cpp_part ConstructorBox
 		.pos = (pos, 0.0)
-		.Shape = BoxShape
+		.Shape = &raytracer.BoxShape
 		.Color = color
 		.Health = 256
 		.size = size
+		.ShapeID = ++ShapeIDs
 
 	constructor (|vec3| Pos,  |float| Rad,  |vec4| Color=colors.white)
 		cpp_part ConstructorSphere
 		.pos = pos
-		.Shape = SphereShape
+		.Shape = &raytracer.SphereShape
 		.proportion = vec3(1)
 		.Radius = rad
 		.Color = color
 		.Health = 256
+		.ShapeID = ++ShapeIDs
 		
 	function Towards (|vec3| P, |float| Speed)
 		.Velocity = (P - .pos).Normal * Speed
@@ -76,6 +80,7 @@ class VObject
 		return .Screen
 	
 	module
+		|byte| ShapeIDs
 		|float| DrawScale
 		|vec2|  DrawMovement
 		
@@ -93,31 +98,6 @@ class VObject
 			return V.iVec4|controlrect|
 
 ////
-		
-		function SphereShape (VObjDistance)
-			opt min 3
-			|| L = .pos - orig
-			|| t = L • dir
-			if t > 0
-				|| r = .Radius
-				|| h = ((r*r) + (t*t) - (L • L) ).Sqrt
-				return (t-h, t+h) // what about tca + h? or returning (tca,h)?
-		
-		
-		function BoxShape (VObjDistance)
-			opt min 3
-			
-			orig -= .pos
-			|| r = .Radius * .Proportion
-					
-			|| p0 = (orig - r) * idir
-			|| p1 = (orig + r) * idir
-			
-			|| t1 = (P0 min P1).max
-			|| t2 = (P0 max P1).min
-			
-			if t2 >= t1
-				return (t1, t2)
 
 
 function controlsize.CalculateBlocks (|ivec4|)
@@ -176,40 +156,3 @@ extend Window
 	
 	setter BlockWidth (|float|)
 		.Blockscale = Value.abs
-
-
-
-class GridSection
-	|...[512]|  Cells
-	|uint64|    State
-	|byte[4]|	Dimensions
-	|object--?| Owner
-	contains uint64
-	constants
-		CellMax = 512
-
-	constructor
-		(&.Dimensions)|&int|[] = 0
-		.Fill(0)
-
-	function Width (|int|)
-		return .Dimensions[0]
-
-	function Height (|int|)
-		return .Dimensions[1]
-
-	function Depth (|int|)
-		return .Dimensions[2]
-
-	function at (|uint| i=0, |&...|)
-		if i < 512
-			return .Cells[i]
-		return Dummy
-	
-	function Fill (|uint64| V)
-		|| C = .at
-		for i in CellMax
-			C[i] = v
-	module
-		|...| Dummy
-

@@ -98,7 +98,7 @@ class ButtonView (GUIControl)
 		opt norefcounts
 		if (state is enter or leave)
 			GUI.touch
-		|| item = .itemat(p.x)
+		|| item = .itemat(P.x)
 		if .CurrOverItem != item
 			.CurrOverItem = item
 			GUI.touch

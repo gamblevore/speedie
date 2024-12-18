@@ -7,14 +7,41 @@ struct Mat4
 			self[i, i] = 1.0
 	
 	syntax access (|int| x, |int| y, |float|)
-		return .rows[y][x]
+		return .rows[y&3][x]
 		
 	syntax access (|int| x, |int| y, assigns:|float|)
-		.rows[y][x] = value
+		.rows[y&3][x] = value
 	
+	syntax access (|int| y, |&vec4|)
+		cpp_part GetRow
+		return .rows[y&3]
 	
-function vec4.operatormul (|&mat4| M, |vec4|)
+	function Columns (|int| x, |vec4|)
+		x&=3
+		for i in 4
+			rz[i] = self[x, i]
+	
+	render
+		for i in 4
+			fs.AppendIndent
+			.rows[i].render(fs)
+			fs <~ '\n'
+	
+	operator mul (|mat4| m, |mat4|)
+		for i in 4
+			rz.rows[i] = .rows[i] * m.Columns(i)
+
+
+
+function vec4.operatormul (|mat4| M, |vec4|)
 	rz[0] = self • m.rows[0]
 	rz[1] = self • m.rows[1]
 	rz[2] = self • m.rows[2]
 	rz[3] = self • m.rows[3]
+
+
+function vec3.operatormul (|mat4| M, |vec3|)
+	|| s = (self, 1.0)
+	rz[0] = s • m.rows[0]
+	rz[1] = s • m.rows[1]
+	rz[2] = s • m.rows[2]

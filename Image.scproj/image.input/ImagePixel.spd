@@ -115,15 +115,16 @@ datatype ImagePixel (uint)
 		
 	syntax append (|&imagepixel| self, |imagepixel| r)
 		self[] = r
-
+		
 	syntax append (|&imagepixel| self, |vec4| V)
 		cpp_part AppendVec
 		v = (v.clamp * 255.0) + 0.25
 		|| b = v.iVec4
-		.r = b.r
-		.g = b.g
-		.b = b.b
-		.a = b.a
+		|| ugh = b.r|uint|		// more pipelineable
+		|| argh = b.b << 16		// to use two vars
+		ugh |= b.g << 8
+		argh |= b.a << 24
+		self[] = ugh|||argh
 	
 	syntax append (|&imagepixel| self, |int| r, |int| g, |int| b, |int| a=255)
 		cpp_part AppendInts

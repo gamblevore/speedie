@@ -179,7 +179,7 @@ function TextView.PerryTryAutoComplete (|int| x, |string| type, |string| Reason,
 
 
 function perryide.SetAutoPoint (|int| x)
-	.AutoPoint = .editme.XYOfChar(x)// - (0,.editme.lineheight)
+	.AutoPoint = .editme.XYOfChar(x) // - (0,.editme.lineheight)
 	.PopupDisplayCorner = .autopoint // wait why do I have two?
 
 

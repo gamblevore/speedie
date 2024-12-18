@@ -227,7 +227,7 @@ class StretchDivider (GuiControl)
 	behaviour MouseMove
 		opt norefcounts
 		if .MouseNotDownOverOther
-			return .intest(p, true)
+			return .intest(P, true)
 
 
 	helper FadeAlpha (|float|)
