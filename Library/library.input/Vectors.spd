@@ -302,37 +302,6 @@ datatype vec3
 		cpp_part Bool
 		return (self != vec3())
 
-
-	function Camera2 (|mat4|)
-		rz[3,3] = 1.0
-		rz[1,1] = 1.0
-		rz[0,0] =  .z, rz[2,0] = .x
-		rz[0,2] = -.x, rz[2,2] = .z
-
-
-	function Camera3 (|mat4|)
-		rz[3,3] = 1.0
-		rz[0,0] = 1.0
-		rz[1,1] =  .z, rz[2,1] = .y
-		rz[1,2] = -.y, rz[2,2] = .z
-
-	function Camera (|mat4|)
-		return .Camera2
-		// can we do a simple y rotation?
-		rz[3,3] = 1.0
-// a forward z... means everything stays "as-is"
-		rz[0,0] =  .z, rz[1,1] = .z, rz[2,2] = .z
-
-// now we have some kinda rotations.
-// all x, means we turn to the right		
-		rz[1,0] =  .y,  rz[2,0] =  .x
-		rz[0,1] =  .x,  rz[2,1] =  .y
-		rz[0,2] = -.x,  rz[1,2] = -.y
-		rz[0,0] = 1.0
-		rz[1,2] = -.y//, rz[2,2] = .z
-
-
-
 	function LookAt (|mat4|)
 		disabled "Not sure this function even makes sense originally."
 //	    || f = .normal
@@ -344,21 +313,27 @@ datatype vec3
 //	    rz.rows[2] = (f,  -(f • self))
 //		rz[3,3] = 1.0
 
-	function RotateXLeft (|vec3|)
-		return (.x, .z, -.y)
-	function RotateXRight (|vec3|)
-		return (.x, -.z, .y)
-		
-	function RotateYLeft (|vec3|)
-		return (.z, .y, -.x)
-	function RotateYRight (|vec3|)
-		return (.z, -.y, .x)
-		
-	function RotateZLeft (|vec3|)
-		return (.y, .x, -.z)
-	function RotateZRight (|vec3|)
-		return (.y, -.x, .z)
+//	function RotateXLeft (|vec3|)
+//		return (.x, .z, -.y)
+//	function RotateXRight (|vec3|)
+//		return (.x, -.z, .y)
+//		
+//	function RotateYLeft (|vec3|)
+//		return (.z, .y, -.x)
+//	function RotateYRight (|vec3|)
+//		return (.z, -.y, .x)
+//		
+//	function RotateZLeft (|vec3|)
+//		return (.y, .x, -.z)
+//	function RotateZRight (|vec3|)
+//		return (.y, -.x, .z)
 	
+	function MakeSane (|vec3|)
+		.x = .x.MakeSane
+		.y = .y.MakeSane
+		.z = .z.MakeSane
+		return self
+		
 	syntax Compare (|float| Other, |bool|Aware, |float|)
 		|| LSq = .lengthsq
 		|| Osq = other*other
@@ -450,7 +425,8 @@ datatype vec3
 
 
 	function Normal (|vec3|) 									// use invsqrt instead?
-		return self / .length
+		if self
+			return self / .length
 
 	operator x (|vec3| V, |vec3|)
 		description "Gives something at right angles. IDK its just maths dont ask me." 
@@ -706,6 +682,20 @@ datatype vec2
 	function Reflect (|vec2| plane, |vec2|)
 		return self - (2.0 * (self • plane) * plane)
 		
+	function RotateAroundY (|mat4|)
+		description "Assumes normalised vec2" 
+		rz[3,3] = 1.0
+		rz[1,1] = 1.0
+		rz[0,0] =  .y, rz[2,0] = .x
+		rz[0,2] = -.x, rz[2,2] = .y
+
+	function RotateAroundX (|mat4|)
+		description "Assumes normalised vec2" 
+		rz[3,3] = 1.0
+		rz[0,0] = 1.0
+		rz[1,1] =  .y, rz[2,1] = .x
+		rz[1,2] = -.x, rz[2,2] = .y
+
 	function Normal (|vec2|)
 		return self / .Length
 	

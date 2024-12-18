@@ -219,7 +219,7 @@ extend float
 		cpp_wrapper (__isnanf)
 	
 	function IsNormal (|bool|)
-		// not inf and not nan, but what about 0? i guess 0 is normal?
+		disabled "Not a good function, as it flags zero and subnormals as 'bad'"
 		cpp_wrapper (__isnormalf)
 	
 	function RangeConvert (|float| lfrom, |float| hfrom, |float| lto, |float| hto, |float| )

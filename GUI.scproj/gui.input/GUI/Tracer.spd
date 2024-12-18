@@ -1,26 +1,46 @@
 
 
-struct RayTracer
+class RayTracer
+	visible false
 	|vec4|			Color
 	|float|			Dist
+	//
 	|vec2|			Size
 	|vec2|			Scale
 	|vec2|			Adjust
+	//
+	|Vec3|			Dir
+	|vec3|			iDir
+	|Mat4|			_LookAt
+	|[vobject]|		Shapes
+	//
+	visible true
 	|Vec3|			Camera
-	|Vec3|			dir
-	|vec3|			idir
-	|Mat4|			LookAt
-	|[vobject]--|	Shapes
+	|float|			Pitch
+	|float|			Spin
+	//			|| M2 = lr.SinCos.RotateAroundY	
 	
-	constructor (|image| where, |vec3| Cam, |vec3| CamDir)
-		|| s = where.size.vec2
-		.size = s
-		.scale = 1.0/s.xx
-		.adjust = s * -0.5
-		.Camera = cam
-		.LookAt = CamDir.Camera
-
-
+	constructor (|vec3| Camera)
+		.Camera = Camera.MakeSane
+		._LookAt.reset
+	
+	
+	setter Camera (|vec3|)
+		.Camera = Value.MakeSane
+	
+	
+	helper ViewMat (|&mat4|)
+		._LookAt.reset
+		.spin = .spin.Fract
+		.Pitch = .Pitch.fract
+		|| M = .spin.SinCos.RotateAroundY
+		._LookAt *= M
+		return ._LookAt
+	
+	function MoveNicely (|vec3| P)
+		.Camera += p * .ViewMat
+	
+			
 	function AntiAlias (|vec2| XY, |&imagepixel| pxl, |&imagepixel|)
 		|| ID = pxl.a
 		|| C = pxl.Color
@@ -33,12 +53,12 @@ struct RayTracer
 		return pxl
 	
 	
-	function GetColor (|vec2| XY, , |vec4|)
+	function GetColor (|vec2| XY, |vec4|)
 		opt min 3, opt norefcounts
 		.Color = nil
 		.Dist = float.max
 		XY = (xy + .adjust) * .scale
-		.dir = (xy, 1.0).Normal * .LookAt
+		.dir = (xy, 1.0).Normal * ._LookAt
 		.idir = -1.0 / .dir
 		
 		for sp in .Shapes
@@ -55,6 +75,9 @@ struct RayTracer
 
 	function RayTrace (|image| where, |float|)
 		opt norefcounts,  opt min 3
+		.size = where.size.vec2
+		.scale = 1.0/.size.xx
+		.adjust = .size * -0.5
 		|| P = vec2()
 		|| w = where.Width|float|
 		|| h = where.Height|float|
@@ -84,6 +107,7 @@ struct RayTracer
 			p.x = 0
 		rz /= where.size.area|float|		
 
+	
 	module
 		function SphereShape (VObject.DistanceFunction)
 			opt min 3
