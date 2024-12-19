@@ -1,15 +1,18 @@
 
 
 // todo:
-// 2) Add frustrum culling, make sure nothing good is missed.
-	// How can we do this? The culling, because its not a frustrum
-	// Lets look at the shape first?
-	// We could get 3 points and find the "worst"? or perhaps theres always a worst point?
-// 3) Some kind of visual partitioning system with cells?
-	// fractal circle based.
-// 4) turn the spheres into chunks?
-// 5) Optimisations around still objects
-// 6) hit-detection? (surely its just chunk vs chunk anyhow?)
+// 1) Add screen cells and culling
+// 2) turn the spheres into chunks?
+// 3) Optimisations around unmoving objects
+// 4) hit-detection? (surely its just chunk vs chunk anyhow?)
+// 5) 4 threads, each can do one quad.
+// 6) more shapes:
+	// * box    / sloped voxels / blends with neighbours
+	// * pipe   / half-pipes    / bends
+	// * sphere / capsule       / blobs
+	// * SDFs
+	// (All shapes: Provide raydist for drawing, nearest point for hit-detection)
+	
 
 
 
@@ -145,39 +148,13 @@ class RayTracer
 				return (t1, t2)
 
 
-
-
-class GridSection
-	|...[512]|  Cells
-	|uint64|    State
-	|byte[4]|	Dimensions
-	|object--?| Owner
-	contains uint64
-	constants
-		CellMax = 512
-
-	constructor
-		(&.Dimensions)|&int|[] = 0
-		.Fill(0)
-
-	function Width (|int|)
-		return .Dimensions[0]
-
-	function Height (|int|)
-		return .Dimensions[1]
-
-	function Depth (|int|)
-		return .Dimensions[2]
-
-	function at (|uint| i=0, |&...|)
-		if i < 512
-			return .Cells[i]
-		return Dummy
-	
-	function Fill (|uint64| V)
-		|| C = .at
-		for i in CellMax
-			C[i] = v
-	module
-		|...| Dummy
+struct RayTracerCulling
+// for each division... we could get 3 points and find the "worst"? or perhaps theres always a worst point?
+// fractal circle based. Options?:
+	// * 9 levels, 0 == full, odd = within-quad, even = overlaps.
+		// * save as 4 bits, so we get 4 bits per level... 6 levels then sort an array.
+	// * Some screen-tree structure, with pointers, to do something similar?
+		// * can be improved. No need draw object in entire overlapping quads. usually only two small quads!
+		// * Put each object into tree individually??? OR put objs into "da curr level" of tree?
+	// * we need some kinda linked-list and memory-management for it.
 

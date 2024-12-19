@@ -1,0 +1,35 @@
+
+class GridSection
+	|...[512]|  Cells
+	|uint64|    State
+	|byte[4]|	Dimensions
+	|object--?| Owner
+	contains uint64
+	constants
+		CellMax = 512
+
+	constructor
+		(&.Dimensions)|&int|[] = 0
+		.Fill(0)
+
+	function Width (|int|)
+		return .Dimensions[0]
+
+	function Height (|int|)
+		return .Dimensions[1]
+
+	function Depth (|int|)
+		return .Dimensions[2]
+
+	function at (|uint| i=0, |&...|)
+		if i < 512
+			return .Cells[i]
+		return Dummy
+	
+	function Fill (|uint64| V)
+		|| C = .at
+		for i in CellMax
+			C[i] = v
+	module
+		|...| Dummy
+
