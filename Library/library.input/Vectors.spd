@@ -684,15 +684,13 @@ datatype vec2
 		
 	function RotateAroundY (|mat4|)
 		description "Assumes normalised vec2" 
-		rz[3,3] = 1.0
-		rz[1,1] = 1.0
+		rz.reset
 		rz[0,0] =  .y, rz[2,0] = .x
 		rz[0,2] = -.x, rz[2,2] = .y
 
 	function RotateAroundX (|mat4|)
 		description "Assumes normalised vec2" 
-		rz[3,3] = 1.0
-		rz[0,0] = 1.0
+		rz.reset
 		rz[1,1] =  .y, rz[2,1] = .x
 		rz[1,2] = -.x, rz[2,2] = .y
 
