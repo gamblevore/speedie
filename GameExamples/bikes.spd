@@ -55,7 +55,7 @@ class RayScene (window)
 		|| m = keys.Movement
 			m = m.keyfix((0.6, 0.25, 5.0))
 			|| P = m.xyz
-				.t.MoveNicely(P.normal)
+				.t.Camera += p.normal * .t.ViewMat
 			.t.spin += m.w*0.003
 
 

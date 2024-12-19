@@ -31,7 +31,6 @@ class RayTracer
 	|Vec3|			Camera
 	|float|			Pitch
 	|float|			Spin
-	//			|| M2 = lr.SinCos.RotateAroundY	
 	
 	constructor (|vec3| Camera)
 		.Camera = Camera.MakeSane
@@ -43,16 +42,12 @@ class RayTracer
 	
 	
 	helper ViewMat (|&mat4|)
-		._LookAt.reset
 		.spin = .spin.Fract
 		.Pitch = .Pitch.fract
 		._LookAt = .spin.SinCos.RotateAroundY
 		|| M = .pitch.SinCos.RotateAroundX
 		._LookAt *= M
 		return ._LookAt
-	
-	function MoveNicely (|vec3| P)
-		.Camera += p * .ViewMat
 	
 			
 	function AntiAlias (|vec2| XY, |&imagepixel| pxl, |&imagepixel|)
