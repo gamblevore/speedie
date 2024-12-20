@@ -528,7 +528,7 @@ class FileViewer (ListView)
 			opt norefcounts
 			|| c = b.asdir - a.asdir
 				return c
-			return (b.name ~<= a.name)
+			return A.name.syntaxcompare(b.name, true)
 
 		function QuickOpenModified (GUITextEvent)
 			|| fv = .tag as fileviewer
