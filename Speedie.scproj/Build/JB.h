@@ -1603,6 +1603,7 @@ extern bool SC__Options_Beep;
 extern bool SC__Options_CheckMaxVars;
 extern bool SC__Options_Compile;
 extern int SC__Options_Dev;
+extern JB_String* SC__Options_exe_path;
 extern bool SC__Options_ExternalCompile;
 extern bool SC__Options_ForceRecompile;
 extern bool SC__Options_GenFlowControlCode;
@@ -3342,6 +3343,8 @@ JB_File* SC_Comp__BuildFolder();
 
 void SC_Comp__Bundle();
 
+JB_File* SC_Comp__CanTryModes();
+
 void SC_Comp__CheckIsGoodLibrary();
 
 int SC_Comp__ClassSorter(JB_Object* A, JB_Object* B);
@@ -3371,6 +3374,8 @@ void SC_Comp__DoRefAnalysis();
 void SC_Comp__DoSavers(int Stage);
 
 bool SC_Comp__EnterCompile();
+
+JB_String* SC_Comp__exe();
 
 void SC_Comp__FileSanityTests();
 
@@ -4258,7 +4263,7 @@ JB_String* SC_Ext__TmpErr(JB_String* V);
 
 JB_String* SC_Ext__TmpOut(JB_String* V);
 
-bool SC_Ext__TransCompile(Array* Files, JB_String* Dest, JB_String* Type);
+bool SC_Ext__TransCompile(Array* Files, JB_String* Dest, JB_String* Type, JB_File* ToDelete);
 
 bool SC_Ext__TransCompileWrap(Array* Cpps);
 
@@ -11606,7 +11611,7 @@ inline void SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info) {
 
 inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
 	iif ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc, false))) {
-		JB_Msg_Fail(Self, JB_LUB[813]);
+		JB_Msg_Fail(Self, JB_LUB[815]);
 	}
 }
 
