@@ -1,0 +1,246 @@
+#!/usr/local/bin/spd
+import "GUI"
+
+main
+	return Breakout().RunAsMain(2.0)
+
+// wierd bug with evreything being hit.
+// remove explosions after a while, (make them explode)
+	// why do they disappear SOMEtIMES?
+	// block nudge... for vibration on hit
+
+
+
+class Breakout (Window)
+	|fpstextview|		FPS
+	|[vobject]|			Blocks
+	|vobject|			Bar
+	|raytracer|			T
+	|[vobject]|			Balls
+	|[vobject]|			Explosions
+	|float|				BallSpeed
+	|int|				Hits
+	|[vobject]|			Spirals
+
+	constructor
+		// want a default RayTracer constructor that uses the block positioning system
+		.t = RayTracer(vec3(10, 6.25, -20))
+		.bar = vobject.box(nil, nil)
+		.fps = fpstextview(self)
+		.fps.MakeInline()
+		.reset
+
+	function AddBalls (|vec2| P, |vobject|)
+		Rz = vobject.sphere(P.xy_, 8th)
+		rz.Velocity = vec3(0, -.ballspeed, 0)
+		.balls <~ rz
+
+	function reset (|string| msg="")
+		if msg
+			beep msg
+		.ballspeed = 0.13
+		.bar.pos = vec3(10.0, 0.5, 0)
+		.bar.size = vec3(2.0,  0.25, 0.5)
+		.balls.length = 0
+		.Blocks.Length = 0
+		.Explosions.Length = 0
+		for y in 2.0
+			.addballs((10.0, 6.0+y))
+		|| br = vec3(0.75, 0.2, 0.4)
+		for y in 5.0
+			for x in 10.0
+				|| pos = (2.0+x*(16.0/9.0), 9.0+y*0.5) // 2 to 19, 9 to 11.5
+				|| block = vobject.box(pos.xy_,  br)
+				block.Health = 1.0 + y
+				.Blocks <~ block
+	
+	
+	function BounceBar (|vobject| bar, |vobject| B,  |bool|)
+		|| Hit = bar.OverlapsBlock(B)
+		require hit.Exists
+		|| v = b.Velocity
+		require v.y < 0.0
+		|| rr = bar.Box2D
+		|| D = math.RangeConvert(rr.x1, rr.x2, -1, 1).Convert(b.pos.x).spow2
+		v.y = -v.y
+		v.x = D*.ballspeed
+		b.Velocity = v.Normal*.ballspeed
+		return true
+
+
+	function Bounds (|vobject| b)
+		|| bvx = b.Velocity.x
+		if bvx < 0
+			if b.left <= 0
+				bvx = -bvx
+		  else
+			if b.right >= 20.0
+				bvx = -bvx
+		b.Velocity.x = bvx
+		
+		if b.y >= 12.0
+			b.Velocity.y = -b.Velocity.y
+	
+	
+	function Incr (|float|)
+		|| h = ++.Hits
+		|| add = 0.02 / h|float| pow 1.5
+		.BallSpeed += add
+		return .BallSpeed
+	
+		
+	function HitOne (|vobject| bl, |vec4| R, |vobject| ball, |bool|)
+		|| R2 = bl.OverlapsRect(R)
+		require r2.exists
+		|| Cn = r2.Center
+		.spirals <~ vobject(cn, vec2(6), bl.Color)
+		
+		if r2.Height > r2.Width
+			ball.Velocity.x = -ball.Velocity.x
+		  else
+			ball.Velocity.y = -ball.Velocity.y
+		ball.Velocity = ball.Velocity.Normal * .incr
+
+		|| hp = bl.Health - ball.box2d.Width*8
+		bl.Health = hp
+		if (hp <= 0) or 0.5[]
+			|| pu = .PowerUp(8)
+			if !pu
+				0 //
+			  elseif pu <= 2
+				|| b2 = .addballs(cn)
+				|| old = .Blocks.now!
+				b2.towards(old.pos, .BallSpeed)
+			  elseif pu <= 5
+				|| b2 = vobject.sphere(ball.pos.xy_, (1+(pu-3))|float|*0.3)
+				b2.Color = colors.Red // 
+				.Explosions <~ b2
+			  elseif pu <= 7
+				ball.Radius += 16th
+			  elseif pu == 8
+				|| b = (.Bar.radius.x + 8th) min 2.5
+				.bar.radius.x = b
+		return hp <= 0
+// guidable flurry aura
+		
+	
+	function PowerUp (|float| n, |int|)
+		|| x = .Blocks.Length|float|
+		|| chance = 12.0 / x
+		if chance[]
+			return 1+random.shared.float(n)|int|
+
+
+	function DoHits (|vobject| ball)
+		|| R = ball.Box2D
+		for (bl.backwards in .Blocks) (i)
+			if .HitOne(bl, r, ball)
+				.blocks.FastRemove(i)
+				if !.blocks
+					.reset( "Success! You beat level-1")
+				return 
+	
+	
+	behaviour FrameStep
+		require GUIActive
+		|| MinSp = .BallSpeed/4
+		for (b.backwards in .explosions) (i)
+			b.Radius -= 0.03
+			if b.Radius <= 0.02
+				.explosions.fastRemove(i)
+			  else 
+				.Dohits(b)
+		
+		for (b.backwards in .balls) (i)
+			|| y = b.Velocity.y
+			if y.Abs < minsp
+				b.Velocity.y = minsp.CopySign(y)
+			b.Step
+			.Bounds(b)
+			.Dohits(b)
+			.BounceBar(.bar, b)
+			if b.y <= 0
+				.balls.FastRemove(i)
+				if !.balls
+					.reset( "You failed")
+					exit
+		
+		.bar.Pos.x += keys.movement.x.sign * 0.2
+		|| bl = .bar.left
+		if bl < 0
+			.bar.pos.x -= bl
+		bl = .bar.right
+		if bl > 20.0
+			.bar.pos.x -= (bl-20.0)
+		
+		for (s.backwards in .Spirals) (i)
+			s.Radius -= 0.03
+			if s.Radius.x < 0
+				.Spirals.Remove(i)
+		gui.Touch
+		.fps.update
+	
+	
+	behaviour Drawbackground
+		for x in .Width
+			|| Col = Colors.rainbow(x div .width, 1, 0.5)
+			where.DrawLineV((x,0), .height, col)
+		
+		
+		for b in .Blocks
+			|| H = (1.0-b.health)*12th
+			b.Color = colors.wheel(H, 0.8, 0.5)
+		.t.Shapes.Clear
+		.t.Shapes.append(.Blocks)
+		.t.Shapes <~ .bar
+		.t.shapes.append(.balls)
+		.t.shapes.append(.Explosions)
+		.t.RayTrace(where)
+
+		|| L = 24s()
+		for (s in .Spirals) (i)
+			|| B = s.Screen
+			where.DrawSpiral(0.01*b.width|float|*vobject.drawscale, L, b.center, s.color, (3s+i*1s)())
+//	
+//	
+//	function BallDraw (|image| where, |[vobject]| List)
+//		for b in list
+//			|| bx = b.Box2d.screenfloat ± -4.0
+//			|| sh = bx.Width*4th
+//			where.DrawSoftCircle(bx, b.Color, 2.0)
+//			|| v = b.Velocity.Normal.xyxy
+//			|| m = 1.0
+//			|| ww = bx.Width*0.05
+//			|| C = b.Color * (1.0, 1.0-ww, 1.0-ww*2.0, 1.0)
+//			
+//			while bx.Width >= 1.0
+//				where.DrawSoftCircle((bx ± 2) - v*(sh*m), C, 2.0)
+//				C.g -= 0.3
+//				C.b -= 0.5
+//				C.r -= 0.1
+//				c = c.Clamp
+//				bx = bx ± bx.width*0.1
+//				m ++
+
+
+function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| Col, |float| Pulse)
+	|| sub = 24.0
+	max += sub/2
+	Pulse = Pulse * max
+	for j in max
+		if j <= sub
+			continue 
+		|| i = j - sub
+		|| R = ((i*0.2123)+angle).SinCos
+		|| closeness = (i - Pulse + 4.0() ).abs
+		|| strength = (-0.005*closeness.pow2).Exp * 5.0
+
+		|| P = R*(50.0+i+strength) + XY
+		|| Circle = (P-4.0, P+4.0)
+		|| A = ((Max-i)*2.0)/max
+		|| C = (i*0.005, 0, 0, A)+Col
+	
+		.DrawSoftCircle(Circle, C)
+
+
+// copy your favourite arkanoid examples. (any on sega megadrive?)
