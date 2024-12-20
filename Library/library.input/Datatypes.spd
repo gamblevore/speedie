@@ -391,7 +391,6 @@ datatype float
 				fs <~ self
 		fs <~ "%"
 
-
 	function cos (|float|)
 		return math.cos(self)
 		
@@ -472,9 +471,9 @@ datatype float
 	function Sqrt (|float|)
 		cpp_wrapper (sqrtf)
 
-	function RSqrt (|float|)
-		return 1.0 / .sqrt
-
+	function InvSqrt (|float|)
+		return 1.0 / .Sqrt
+		
 	function Fract (|float|)
 		return self - .floor
 

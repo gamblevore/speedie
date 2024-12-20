@@ -193,13 +193,13 @@ class Tetris (GridSection)
 		
 	function HandleInput
 		|| f = (.framerate max 40)|float|*2048th
-		|| M = keys.Movement((3.0*f, 0, 0, 13.0*f))
+		|| M = keys.Movement((3.0*f, 1.0*f, 3.0*f, 13.0*f))
 		|| w = m.w
 		if w or m.z > 0
 			.rotate(w)
 		|| x = m.x
 			.move(x.sign|int|)
-		if (.FramesLeft <= 0) or (m.y > 0) or (m.z < 0 and .TotalFrames isa 3)
+		if (.FramesLeft <= 0) or (m.y > 0) or (m.z < 0)
 			.drop(m.y > 0)
 		  elseif .SomethingIsBeneath
 			.LockDelay--

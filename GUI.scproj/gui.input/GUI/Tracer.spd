@@ -58,7 +58,7 @@ class RayTracer
 		|| C = pxl.Color
 		for i in 4
 			|| sh = (i&1, i>>1).Vec2 - 0.5
-			c += .GetColor(XY + sh*0.75)
+			c += .GetColor(XY + sh*0.8)
 		C *= 5th
 		C.a = ID|float|*255th
 		pxl <~ C

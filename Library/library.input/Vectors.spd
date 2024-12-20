@@ -395,12 +395,15 @@ datatype vec3
 	function iVec3 (|ivec3|)
 		return (.x|int|, .y|int|, .z|int|)
 
-	function LengthSq (|float|)
-		return (.x*.x + .y*.y + .z*.z)
-
 	function Length (|float|)
 		return .lengthsq.sqrt
 		
+	function Normal (|vec3|) 									// use invsqrt instead?
+		return self * .LengthSq.InvSqrt
+
+	function LengthSq (|float|)
+		return (.x*.x + .y*.y + .z*.z)
+
 	operator mul (|float| x, |vec3|)
 		cpp_part MulF
 		return (x,x,x)*self
@@ -416,17 +419,11 @@ datatype vec3
 		cpp_part Dot
 		return (self * other).sum
 
-
 	function Reflect (|vec3| plane, |vec3|)
 		return self - 2.0 * (self • plane) * plane
 
 	function Sum (|float|)
 		return .x + .y + .z
-
-
-	function Normal (|vec3|) 									// use invsqrt instead?
-		if self
-			return self / .length
 
 	operator x (|vec3| V, |vec3|)
 		description "Gives something at right angles. IDK its just maths dont ask me." 
