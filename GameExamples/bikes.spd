@@ -3,7 +3,7 @@ import "GUI"
 
 // possible games:
 	// 3d arkanoid with 3d balls?
-	// bubbl-tank?
+	// bubble-tank?
 	// bubble-bobble? (maybe not, needs sprite artwork)
 	// that fruit-merging game?
 	// clouds dropping rain or fire or somthing and you have to burn people? (or tanks)
