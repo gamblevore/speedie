@@ -447,7 +447,6 @@ function PerryIDE.BuildCmdSub (|string| cmd,  |message| where,  |string| name,  
 			jump = 1
 		
 	rz = @tmp + cmd
-	// pp is the @arg containing "f" right now?
 	if (where == 0 and @tmp) and (pp == @arg) and (ppp and ppp.OwningModClass)
 		ppp = nil
 		

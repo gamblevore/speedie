@@ -28,29 +28,32 @@ class RayTracer
 	|Vec3|			Dir
 	|vec3|			iDir
 	|Mat4|			_LookAt
-	|[vobject]|		Shapes
+	|Vec3|			_Camera
 	//
 	visible true
-	|Vec3|			Camera
+	|[vobject]|		Shapes
 	|float|			Pitch
 	|float|			Spin
 	
 	constructor (|vec3| Camera)
 		// Default RayTracer constructor should use the block positioning system
-		.Camera = Camera.MakeSane
 		._LookAt.reset
+		.Camera(Camera)
 	
 	
+	function Camera (|vec3|)
+		return ._Camera
+
 	setter Camera (|vec3|)
-		.Camera = Value.MakeSane
+		._Camera = Value.MakeSane
 	
 	
 	helper ViewMat (|&mat4|)
 		.spin = .spin.Fract
 		.Pitch = .Pitch.fract
-		._LookAt = .spin.SinCos.RotateAroundY
-		|| M = .pitch.SinCos.RotateAroundX
-		._LookAt *= M
+		._LookAt = .spin.SinCos.RotateAroundY	// could make a faster version that creates already transposed thing
+		|| M = .pitch.SinCos.RotateAroundX   	// or just creates needed values and applies directly
+		._LookAt *= M							// and only needs a "virtual" vec3
 		return ._LookAt
 	
 			
@@ -123,33 +126,6 @@ class RayTracer
 			p.y++
 			p.x = 0
 		rz /= where.size.area|float|		
-
-	
-	module
-		function SphereShape (VObject.DistanceFunction)
-			opt min 3
-			|| L = .pos - orig
-			|| t = L • dir
-			if t > 0
-				|| r = .Radius.x
-				|| h = ((r*r) + (t*t) - (L • L) ).Sqrt
-				return (t-h, t+h) // what about tca + h? or returning (tca,h)?
-		
-		
-		function BoxShape (VObject.DistanceFunction)
-			opt min 3
-			
-			orig -= .pos
-			|| r = .Radius
-					
-			|| p0 = (orig - r) * idir
-			|| p1 = (orig + r) * idir
-			
-			|| t1 = (P0 min P1).max
-			|| t2 = (P0 max P1).min
-			
-			if t2 >= t1
-				return (t1, t2)
 
 
 struct RayTracerCulling

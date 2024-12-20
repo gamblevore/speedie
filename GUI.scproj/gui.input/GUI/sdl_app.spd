@@ -22,8 +22,10 @@ module GUI
 	|ivec2| 					CurrMouseXY
 	|ivec2|						TryResizeLater
 	|date|						FrameStart
-	|duration|					FrameLength
-	|date|						LastFrameDate = 1 // wont fire otherwise
+	|int|						EventFrameLength
+	|byte|						DrawSkips
+	|int|						DrawFrameLength
+	|date|						PrevFrameDate = 1 // wont fire otherwise
 	|date|						FixScreenBug
 	|date|						FastToolTipDate
 	|date|						ChangeSelFlash
@@ -37,7 +39,7 @@ module GUI
 	|bool|						AControlWasResized
 	|bool|						TextInputEnabled
 	|bool|						TextInputEnabledAtStart
-	|byte|						TouchCount=3  // draw the first few frames always
+	|byte|						DrawForce=3  // draw the first few frames always
 											  // helps with startup events! at least on osx
 	|byte|						SingleFrameNest
 	|byte|						TouchFingersDown
@@ -198,9 +200,7 @@ module GUI
 		
 	
 	function Touch (|guicontrol| modified=nil)
-		(modified)
-		if .TouchCount < 1
-			.touchcount = 1
+		modified.touch
 
 	
 	function Resized (|guicontrol| modified=nil)
@@ -282,7 +282,7 @@ module GUI
 		.screenwindow = w
 		.SDL_SetWindowMaximumSize(w, 2K, 2K)
 		.SDL_SetWindowMinimumSize(w,  400,  200)
-		.vsync = true
+//		.vsync = true
 		.renderer = SDL_CreateRenderer(w, -1, 0)  #expect  "Can't init renderer"
 		return .NativeWindow
 
@@ -371,14 +371,15 @@ module GUI
 	
 	function Init (|float| Scaling=1.0, |bool|) // startup
 		opt norefcounts
-		if .framelength
+		if .eventframelength
 			return true
 		.GUICheck
 		pico.GlobalConfig.SuicideIfParentDies = false
 		pico.start
 		target !gui
 			disabled `Put "targets gui" in the app's conf section to use this!`
-		.FrameLength = 180th.date
+		.eventframelength = 60th.date
+		.drawframelength = 60th.date
 		.openedfirst = date.now
 		.CurrMouseXY = ivec2(-1)
 //		app.prefs["LastOpened"] = .openedfirst
@@ -452,10 +453,6 @@ module GUI
 			rz = .StrongClose(Quitish) ||| SDLActivity.Activity 
 		.QuitReason = 0
 		if .NewSize
-			rz |= SDLActivity.activity
-
-		if .TouchCount
-			.TouchCount--
 			rz |= SDLActivity.activity
 
 		if rz is activity
@@ -619,7 +616,6 @@ module GUI
 		if !.DialogIsOpen
 			.BlurBackgroundStart = 0
 			
-		.LastFrameDate = .FrameStart
 		|| w1 = .DrawWinFrom		#require
 		.StartFrame(.Raw!)
 		|| D = .DialogIsOpen
@@ -646,7 +642,7 @@ module GUI
 		GUI.Touch
 
 
-	function FrameStepAndResize
+	function WindowFrameSteps
 		opt norefcounts
 		notifications.CheckForDisappear		
 		.StartResize
@@ -668,10 +664,12 @@ module GUI
 		return .FrameStart.loop(length)
 	
 
-	helper NapTime (|date|)
-		rz = .FrameLength
+	helper DoNapTime (|duration| Durr)
+		|| L = .EventFrameLength - durr
+		require (L > 0) and !sdl_event.HasAny
 		if .IsBackground and !.DroppingInto
-			rz *= 9
+			l = .DrawFrameLength*9
+		app.Sleep(l)
 
 	
 	helper SingleFrame (|bool|)
@@ -679,26 +677,57 @@ module GUI
 		require .SingleFrameNest <= 2
 		.SingleFrameNest++
 
+		.PrevFrameDate = .FrameStart
+		.FrameStart = date.now
 		SpdProcess.CheckAllAlive
 		
-		.FrameStart = date.now
 		|| occured = .PreFrame
+//		|| X = 0
+//		if occured and !X and .IsBackground
+//			X = 1
+//			log "A"
+//			beep 
 		.ClearAlerts
 		.CheckKeyMods
 		.HandleAppResize
 		.PostLoads
 		occured |= .FrameAndEvents
-		
-		.FrameStepAndResize
-		if Occured isnt ExitOrTerminate
-			.PutDialogsInFront
-			if (occured is activity) or .TouchCount
-				.DrawFrame
-			if !sdl_event.HasAny
-				app.sleep(.NapTime)
+//		if occured and !X and .IsBackground
+//			X = 2
+//			log "B"
+//			beep 
+		occured |= .DrawForce!=0
+//		if occured and !X and .IsBackground
+//			X = 3
+//			log "C"
+//			beep 
+		require Occured isnt ExitOrTerminate
 			
-			.SingleFrameNest--
-			rz = true
+		.WindowFrameSteps
+		.PutDialogsInFront
+
+		// if this is too slow... we can do everything, except drawing.
+		|| Skip = .DrawSkips
+			.DrawSkips = (.DrawSkips|int| min 4) - 1
+		  else
+			if .DrawForce // happens during .WindowFrameSteps
+				.DrawForce--
+				occured |= sdlactivity.activity
+//				if occured and !X and .IsBackground
+//					X = 4
+//					log "D"
+//					beep 
+			if occured is activity
+				.DrawFrame
+		
+		|| durr = date.now - .FrameStart
+		if durr >= .DrawFrameLength
+			.DrawSkips = durr / .DrawFrameLength
+		  else
+			.DoNapTime(durr)
+		
+		.SingleFrameNest--
+		return true
 
 
 	helper CheckQuarantine
@@ -952,10 +981,12 @@ module GUI
 			return .mousedownevent(w, b)
 
 		if t is MULTIGESTURE
+			require !.IsBackground
 			return .GestureEvent(ev, w)
 
 		|| xy = b.xy
 		if t is MOUSEMOVE
+			require !.IsBackground or w.DroppingInto
 			return .MouseMoveEvent(ev.motion, w, xy)
 
 		if t is MOUSEUP
@@ -1010,12 +1041,16 @@ module GUI
 
 
 	helper MouseMoveEvent (|?&SDL_MouseMotionEvent| ev, |window| w, |ivec2| XY, |int|)
+		// shouldn't occurr in background... unless we have a dragevent?
 		|| OldXY = .CurrMouseXY
 		|| move = xy - OldXY
 		if ev
 			move = (ev.xrel, ev.yrel)
 		
-		require move and .framecount > 4
+		require move
+		if .framecount <= 4
+			return SDLActivity.Activity // or else we never get there
+
 		|| MB = .MouseButtons
 		require MB or !.IsBackground
 	

@@ -1805,7 +1805,7 @@ class TextView (GUIControl)
 			|| sel = (.text.length, 0)(.SingleLine) 
 			.TypingPlaceDirect((sel,sel))
 		
-		.ScrollDrawTimer = 0
+		.ScrollDrawTimer(0)
 		.TextAlteredForDraw |= 2	// This might not clear text?
 
 		//require !NotYetFinished	// Shouldn't these be done anyway?

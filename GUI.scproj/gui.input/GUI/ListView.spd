@@ -509,7 +509,7 @@ class ListView (GUIControl) {
 
 	behaviour MouseMove
 		if .CanSeeAllLines
-			.ScrollDrawTimer = 0
+			.ScrollDrawTimer(0)
 			return .HasFocus
 		
 		return .HandleMouseInScrollArea(P, ._ScrollDrawTimer)
@@ -1404,10 +1404,10 @@ class ListView (GUIControl) {
 		where.DrawOutlineOnly(.lastrect, .gnormal.edge, .gnormal.bg, ~.FindAttachedEdge)
 
 		if .CanSeeAllLines
-			.ScrollDrawTimer = 0
+			.ScrollDrawTimer(0)
 		  else
 			if self isa menu
-				.ScrollDrawTimer = 1							// oooop
+				.ScrollDrawTimer(1)							// oooop
 			.DrawScroll(.slh, where)
 
 

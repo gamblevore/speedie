@@ -14,12 +14,12 @@ class VObject
 	
 	prototype DistanceFunction (|vec3| orig, |vec3| dir, |vec3| idir, |vec2|)
 		// this should become a more generalised "hitter"
-		// for shape, nearest point, and color and maybe even sound+energy uses
+		// for shape, nearest point, and color and maybe even sound+energy/magic uses
 		
 	constructor (|vec2| Pos,  |vec2| Size,  |vec4| Color=colors.white)
 		cpp_part ConstructorBox2D
 		.pos = (pos, 0.0)
-		.Shape = &raytracer.BoxShape
+		.Shape = BoxShape
 		.Color = color
 		.Health = 256
 		.size = vec3(size,1.0)
@@ -77,17 +77,45 @@ class VObject
 		|float| DrawScale
 		|vec2|  DrawMovement
 		
+
+	
+	module
+		function SphereShape (DistanceFunction)
+			opt min 3
+			|| L = .pos - orig
+			|| t = L • dir
+			if t > 0
+				|| r = .Radius.x
+				|| h = ((r*r) + (t*t) - (L • L) ).Sqrt
+				return (t-h, t+h) // what about tca + h? or returning (tca,h)?
+		
+		
+		function BoxShape (DistanceFunction)
+			opt min 3
+			
+			orig -= .pos
+			|| r = .Radius
+					
+			|| p0 = (orig - r) * idir
+			|| p1 = (orig + r) * idir
+			
+			|| t1 = (P0 min P1).max
+			|| t2 = (P0 max P1).min
+			
+			if t2 >= t1
+				return (t1, t2)
+
 		function Box (|vec3| Pos, |vec3| Radius, |vec4| Color=colors.white, |vobject|)
-			return VObject(pos, radius, &raytracer.BoxShape, color)
+			return VObject(pos, radius, BoxShape, color)
 			
 			
 		function Sphere (|vec3| Pos, |float| Radius,  |vec4| Color=colors.white, |vobject|)
-			return VObject(pos, vec3(radius), &raytracer.SphereShape, color)
+			return VObject(pos, vec3(radius), SphereShape, color)
 			
 // later: handle other ratios, for example (Add borders)
 // could we try to get closer to phi? say trim a few pixels off the top? to 865 pixels
 
-		function Size (|float| X, |float| Width, |float| Y, |float| Height, |controlrect|)
+		function Size2D (|float| X, |float| Width, |float| Y, |float| Height, |controlrect|)
 			if Width < 0
 				x += Width
 				Width = Width.abs

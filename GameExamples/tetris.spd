@@ -2,6 +2,7 @@
 import "GUI"
 
 // todo:
+// framestep happening much faster now? and too fast? we want them to happen more stably...
 // ghost block should be a temporay powerup! its makes the game too easy.	
 // pink cloudy blocks with cute faces? and hearts/rainbows/stars as they disappear
 	// Clouds via overlapping volumetric spheres and edge detection post-processing

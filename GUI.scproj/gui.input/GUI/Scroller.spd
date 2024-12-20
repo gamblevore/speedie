@@ -42,17 +42,22 @@ helper DrawScroll (|vec3| slh, |image?| where=nil, |float|)
 	opt NoRefCounts
 	require .CanDrawScroll
 	
+	// needs rework...
+	// sending touch events even if the scroll strength didn't change
+	// also... its capable of drawing two scrolls... which isnt right
+	
 	|| t = ._ScrollDrawTimer
 	|| mb	= GUI.MouseButtons
 	if !.MouseNotDownOverOther
 		if where
-			.ScrollDrawTimer = 0
+			.ScrollDrawTimer(0)
 		return 0
 	
 	|| now = ScrollInfo.timer
+	|| altered = false
 	if (t == 0) or .InScrollArea(.mousexy) or (mb)
 		if where
-			.ScrollDrawTimer = now
+			.ScrollDrawTimer(now)
 		t = now
 	|| R	= .ScrollRect(slh)
 	|| d	= (scrollinfo.TimerStart - (now - t))|float| max 0.0
@@ -64,8 +69,8 @@ helper DrawScroll (|vec3| slh, |image?| where=nil, |float|)
 		return s
 	if s
 		|| scr = ¥.scroll
-		using scr
-		GUI.touch
+		using scr 
+		.touch(-1)
 		scr.Strengthen(s)
 		where.DrawRectStyled(R, scr)
 	  else

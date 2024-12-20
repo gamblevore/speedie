@@ -110,7 +110,7 @@ class GUIControl (list)
 
 	function BlockSize (|float| X, |float| Width, |float| Y, |float| Height)
 		is blocksized
-		|| Sz = VObject.Size(x, width, y, height)
+		|| Sz = VObject.Size2d(x, width, y, height)
 		.sizer.setsize(sz)
 
 
@@ -216,19 +216,31 @@ class GUIControl (list)
 	function Decluttered (|bool|)
 		return .Declutterer.Finished
 	
-	function Touch (|int| Amount = 2)
+	function Touch (|int| Amount = 1)
 		opt norefcounts
-		if GUI.TouchCount < amount
-			GUI.touchcount = Amount
-		(.window is modified)
+		if (Amount < 0) and gui.IsBackground
+			return 
+//		if gui.IsBackground or (keys.shift and amount < 1)
+//			if self
+//				log .ID
+//			  else
+//				log "unknown"
+//			log app.StackTrace
+//			log "-----"
+//			if Amount < 0
+//				beep 
+		Amount = amount.abs
+		if gui.DrawForce < amount
+			gui.DrawForce = amount
 
-	setter ScrollDrawTimer (|uint|)
+	helper ScrollDrawTimer (|uint| value, |bool|)
 		if ._ScrollDrawTimer != value
 			._ScrollDrawTimer = value
-			GUI.touch(self)
+			if !gui.IsBackground
+				.touch(-1)
 
 	function BumpScroll (|int| extra = 0)
-		.ScrollDrawTimer = ScrollInfo.timer-extra
+		.ScrollDrawTimer(ScrollInfo.timer-extra)
 
 	function SizeFraction (assigns:|float|)
 		|| t = (value.clamp * 4.0K)|int|
