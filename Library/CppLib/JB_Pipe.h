@@ -56,7 +56,7 @@ const char** JB_Proc__CreateArgs(JB_String* self, Array* R);
 int JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, int Mode);
 int JB_Sh_UpdatePipes(ShellStream* self);
 void JB_Sh_ClosePipes(ShellStream* self);
-void JB_App__TurnInto(JB_String* self, Array* R); 
+bool JB_App__TurnInto(JB_String* self, Array* R); 
 typedef void (*fn_app_deathaction)();
 //void JB_App__AtExit (fn_app_deathaction b);
 int JB_Str_System(JB_String* self);

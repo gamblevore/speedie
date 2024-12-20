@@ -28,22 +28,31 @@ function compiler.ScriptRecompile (|file| f, |file|script_build, |bool|)
 		return true
 
 
-function compiler.TryVariousStartModes (|bool|)
+function compiler.CanTryModes (|file|)
+	opt norefcounts
 	require !spdprocess.parent
 	require !app["perry"] and !app["nocompile"]
 	|| p = app.rawargs[0]
-	require p and !p.argname
-			
-	|| f   = p.file
-	|| it  = compiler.UsingScript(f)$
-	|| cwd = app.cwd
-	if compiler.ScriptRecompile(f, it)
-		compiler.CompileTime
-	if it.exists and stderr.ok
-		app.cwd = cwd
-		app.ChildEnv("OrigScriptPath") = f
-		app.turninto(it.path, app.rawargs)
-	return true
+	if p and !p.argname
+		rz = p.file
+
+
+function compiler.exe (|string|)
+	opt norefcounts
+	return options.exe_path ?? options.output_path
+
+
+function compiler.TryVariousStartModes (|bool|)
+	|| f = .CanTryModes$		
+	|| it = compiler.UsingScript(f)
+		|| cwd = app.cwd
+		if compiler.ScriptRecompile(f, it)
+			compiler.CompileTime
+		if stderr.ok
+			app.cwd = cwd
+			app.ChildEnv("OrigScriptPath") = f
+			app.turninto(.exe, app.rawargs)
+		rz = true
 
 
 

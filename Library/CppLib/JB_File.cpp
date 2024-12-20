@@ -338,7 +338,7 @@ bool Stat_( JB_String* self, struct _stat* st, bool normal=true ) {
 }
 
 
-uint8* JB_FastCString( JB_String* Path, uint8* Tmp, int Max ) {
+uint8* JB_FastFileString( JB_String* Path, uint8* Tmp ) { // just use posix funcs? fuck windows 16-bit chars.
     u32 N = JB_Str_Length( Path );
     if ( ! N ) {
         return (uint8*)"";
@@ -348,26 +348,10 @@ uint8* JB_FastCString( JB_String* Path, uint8* Tmp, int Max ) {
     if (JB_Str_IsC(Path))
         return Result;
 
-    if (N > Max)
-        N = Max;
+    if (N > PATH_MAX)
+        N = PATH_MAX;
     Tmp[ N ] = 0;
     return (uint8*)CopyBytes( Result, Tmp, N );
-}
-
-
-uint8* JB_FastFileString( JB_String* Path, uint8* Tmp ) { // utf-16 on windows :(? Or do we just use posix funcs?
-#ifndef TARGET_WINDOWS
-    return JB_FastCString(Path, Tmp, PATH_MAX);
-#else
-	unsigned short* Result16 = (unsigned short*)Result;
-    N = local_c8to16( Result, N, &BufferData );
-    if ( ! N ) {
-        return 0; // error
-    }
-    Result16 = (unsigned short*)BufferData.Addr;
-    Result16[ N / 2 ] = 0;
-    return (uint8*)Result16;
-#endif
 }
 
 
@@ -1093,14 +1077,47 @@ bool JB_File_Exists( JB_String* self ) {
 }
 
 
-int JB_File_MoveTo(JB_File* self, JB_String* New) {
+static uint8* TempBeforeMove(MiniStr& Self, uint8* Buff) {
+	int N = Self.Length + 8;
+	if (N > PATH_MAX)
+		return Self.Addr;
+	
+	memmove(Buff, Self.Addr, Self.Length);
+	memmove(Buff + Self.Length, ".tmpmov", 8);
+	int Err = rename((const char*)Self.Addr, (const char*)Buff);
+	if (Err)
+		return Self.Addr;
+	errno = ENOENT;
+	return Buff;
+}
+
+
+static uint8* MoveWithinSelf(JB_File* Self, JB_String* New, uint8* Buff) {
+	auto N = Mini(New);
+	auto S = Mini(Self);
+	if (N.Length > S.Length and N[S.Length] == '/') {
+		N.Length = S.Length;
+		if (StrEquals( N, S ))
+			return TempBeforeMove(S, Buff);
+	}
+	return Self->Addr;
+}
+
+
+int JB_File_MoveTo(JB_File* Self, JB_String* New) {
     uint8 Buffer2[PATH_MAX];
-    uint8* SelfPath = JB_FastFileThing(self);
+    uint8* SelfPath = Self->Addr;
     uint8* NewPath  = JB_FastFileString(New,        Buffer2);
     int Err			= rename((const char*)SelfPath, (const char*)NewPath);
-    if (Err and RetryMakePath(New))
-		Err = rename((const char*)SelfPath, (const char*)NewPath);
-    ErrorHandle_(Err, self, New, "moving");
+    if (Err) {
+		uint8 Buffer3[PATH_MAX];
+		uint8* S2 = MoveWithinSelf(Self, New, Buffer3);
+		if (RetryMakePath(New))
+			Err = rename((const char*)S2, (const char*)NewPath);
+		if (Err and S2 != SelfPath)
+			Err = rename((const char*)S2, (const char*)SelfPath);
+		ErrorHandle_(Err, Self, New, "moving");
+	}
     // do not change the path
     return Err;
 }

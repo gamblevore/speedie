@@ -4,12 +4,12 @@
 
 
 function compiler.Bundle 
-	require !Compiler.IsTest and !Options.ExternalCompile
-	require SC_Targets..gui
-	|| Pd = .productfile
-	|| Pj = .BaseProjectPath.path
-	if platform.osx
-		.AppleBuildApp(pd)
+	target osx
+		require !Compiler.IsTest and !Options.ExternalCompile
+		require SC_Targets..gui
+		|| Pd = .productfile
+		|| Pj = .BaseProjectPath.path
+			.AppleBuildApp(pd)
 
 	
 function compiler.WrongConf (CollectFunc)
@@ -18,9 +18,11 @@ function compiler.WrongConf (CollectFunc)
 
 
 function compiler.IdealName (|string|)
+	if options.output_path
+		return options.output_path.TrimExtAndPath
 	|| s = .confmsg["name"]
 		return s.name
-	return TransCompiler.ProductBaseName.trimextandpath
+	return TransCompiler.ProductBaseName.TrimExtAndPath
 
 
 
@@ -39,25 +41,26 @@ function compiler.AppBuildLibs (|file| inner)
 
 
 function compiler.AppleBuildApp (|file| product)
-	require platform.osx
-	|| dest = product.linksto
-		error (dest, "This should not be a link")
-		return
-	
-	Compiler.stage("Create MacOSX Package")
-	|| name			= .idealname
-	|| prefered_name=name + ".app"
-	|| prefered_app	= product.sibling(prefered_name)
-	|| xcode_place	= prefered_app.sibling("Release/"+prefered_name)
-	|| final_app	= (xcode_place, prefered_app)(xcode_place.fileexists)
-	|| inner		= final_app["Contents/MacOS/"+name]!
-	if product.moveto( inner )
-		.AppBuildLibs(inner)
-		.CodeSign(final_app)
-		if prefered_app != final_app
-			prefered_app.linkto = final_app
-		options.output_path = prefered_app
-		prefered_app.touch
+	target OSX
+		|| dest = product.linksto
+			error (dest, "This should not be a link")
+			return
+		
+		Compiler.stage("Create MacOSX Package")
+		|| name			= .idealname
+		|| prefered_name=name + ".app"
+		|| prefered_app	= product.sibling(prefered_name)
+		|| xcode_place	= prefered_app.sibling("Release/"+prefered_name)
+		|| final_app	= (xcode_place, prefered_app)(xcode_place.fileexists)
+		|| inner		= final_app["Contents/MacOS/"+name]!
+		if product.moveto( inner )
+			options.exe_path = inner
+			.AppBuildLibs(inner)
+			.CodeSign(final_app)
+			if prefered_app != final_app
+				prefered_app.linkto = final_app
+			options.output_path = prefered_app
+			prefered_app.touch
 
 
 

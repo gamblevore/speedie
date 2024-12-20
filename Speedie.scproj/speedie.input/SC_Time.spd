@@ -87,17 +87,18 @@ function compiler.CompileTime
 	if !options.output_path and options.UseScriptLoc
 		.ScriptLoc(compiler.originalinputpath)		
 	
-	if options.SelfReplacement // avoid failing needlessly
-		.FileSanityTests // sometimes this fails due to lack of permissions in xcode...
-						 // xcode gives lower perms to it's builder scripts, strangely.
-	.VariousSelfTests
-	SC_Saver.TestSaver~quietly
+	if !options.scripting
+		if options.SelfReplacement // avoid failing needlessly
+			.FileSanityTests // sometimes this fails due to lack of permissions in xcode...
+							 // xcode gives lower perms to it's builder scripts, strangely.
+		.VariousSelfTests
+		SC_Saver.TestSaver~quietly
 
 	|| elapsed = .CompileAll~timeit
 	.PrintCompileTime(elapsed)
 
 	if stderr.ok
 		TransCompiler.ExportAndInstall(elapsed)
-		if stderr.ok
+		if !options.scripting and stderr.ok
 			stringcorrector.CorrectStrings
 

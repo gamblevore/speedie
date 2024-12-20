@@ -907,7 +907,6 @@ function MakeClassType (|scdecl| d, |scdecl|)
 	C.nildeclared = nilstate.real
 	i.nildeclared = nilstate.real
 	C.Contains = d
-	i.Contains = d
 	(c is ClassObj)
 
 	return c

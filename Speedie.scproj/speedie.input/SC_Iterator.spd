@@ -124,7 +124,6 @@ class SCIterator (SCNamed)
 
 	module
 		|sciterator| carray
-//		|sciterator| pointer
 		
 		function SimpleIter (|string| src, |sciterator|)
 			|| s = src.parse.first!
@@ -186,13 +185,9 @@ function scdecl.GetIteratorAny (|String| name, |message| node, |SCIterator|)
 	if .IsCArray
 		return sciterator.carray
 	if .pointercount
-		|| i = .internal // should never happen, but does for class structs? They need to be fixed?
-//			debugger 	 // we are getting raw structs. Isnt that OK?
-			if i.iscarray
-				return sciterator.carray
-//	if .PointerCount and !cls.isstruct
-//		return sciterator.pointer
-//	
+		|| i = .internal!
+		if i.iscarray
+			return sciterator.carray
 	return .type.GetIteratorAny(name, node)
 
 

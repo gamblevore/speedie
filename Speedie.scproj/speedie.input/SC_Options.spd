@@ -4,6 +4,7 @@ module Options
 	flags: native,pack
 	
 	||		BannedClasses			= nil|dictionary|
+	||		exe_path				= "" // if not exist, use output_path
 	||		output_path				= ""
 	||		SingleFileInput			= ""
 	||		Variant					= ""

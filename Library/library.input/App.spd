@@ -149,7 +149,7 @@ function AppPath (|string|)
 function CallPath (|stringzeroterminated|)
 	cpp_wrapper JB_App__CallPath
 
-function TurnInto (|string| s, |[string]| R=nil)
+function TurnInto (|string| s, |[string]| R=nil, |bool|)
 	cpp_Wrapper JB_App__TurnInto
 
 function ObjMemory (|int64|)

@@ -65,7 +65,7 @@ static void pipe_close (int& fd) {
 void JB_App__SetThreadName(JB_String* self) {
 	require0(self);
 	u8 CName[32];
-	auto tmp = (const char*)JB_FastCString(self, CName, sizeof(CName));
+	auto tmp = (const char*)JB_FastFileString(self, CName);
 	
 	
 #if __APPLE__
@@ -249,7 +249,7 @@ void JB_Sh_ClosePipes(ShellStream* self) {
 
 int JB_Str_System(JB_String* self) { // needz escape params manually...
     uint8 Buffer[PATH_MAX];
-    uint8* Result = JB_FastCString(self, Buffer, PATH_MAX);
+    uint8* Result = JB_FastFileString(self, Buffer);
     int ugh = system((const char*)Result);
     return WEXITSTATUS(ugh);
 }
@@ -378,10 +378,13 @@ bool JB_Sh_Step(ShellStream* self) {
 
 
 
-void JB_App__TurnInto(JB_String* self, Array* R) {
+bool JB_App__TurnInto(JB_String* self, Array* R) {
 	auto argv = JB_Proc__CreateArgs(JB_Str_MakeC(self), R);
-	execvp(argv[0], (char* const*)argv);
-	exit(-1);	// in case execvp fails
+	execvp(argv[0], (char* const*)argv); // may exit here. :)
+	free(argv);
+	JB_ErrorHandleFile(self, nil, errno, nil, "running");
+	return false;
+	
 }
 
 

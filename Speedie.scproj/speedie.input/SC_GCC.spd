@@ -366,8 +366,9 @@ function RunCppCompile
 	.CompilingLibFiles--
 	
 	.CollectAndCompile(	Compiler.GeneratedCppsFolder,	.ProjTmpPath )$
-	.UseAndCompile(		Cpp_Export.Cpp_input,			.ProjTmpPath        )$
-	.TransCompile(		.FoundObjects,			"-o " + compiler.ProductPath,	"o" )$
+	.UseAndCompile(		Cpp_Export.Cpp_input,			.ProjTmpPath )$
+	|| P = compiler.ProductPath
+	.TransCompile(		.FoundObjects,			"-o " + P,	"o",  p.file )
 		
 
 function MakeLib
@@ -410,7 +411,7 @@ function ShouldTransComp (|bool|)
 
 
 
-function TransCompile (|[File]| Files, |String| Dest, |string| Type, |bool|)
+function TransCompile (|[File]| Files, |String| Dest, |string| Type, |file| ToDelete=nil, |bool|)
 	if !Files
 		return true // awesome
 	
@@ -422,7 +423,10 @@ function TransCompile (|[File]| Files, |String| Dest, |string| Type, |bool|)
 		print	 "\n ${cppcompilerpath} "
 		printline CompileString.Join(" ")
 	
-	app.sleep(0.125s)
+	if todelete
+		todelete.deleteall
+	
+	app.sleep(0.05s)
 	return .ExecuteGCC( CompileString )
 
 
