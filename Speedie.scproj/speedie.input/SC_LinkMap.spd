@@ -3,16 +3,16 @@
 module LinkMap 
 	|int| 			CurrID
 
-	function scfunction.CanLinkTo (|SCNode| To, |bool|)
+	function SCFunction.CanLinkTo (|SCNode| To, |bool|)
 		if to.LinkedFrom < LinkMap.CurrID
 			to.LinkedFrom = LinkMap.CurrID
 			return true
 			
-	function scfunction.DoLinkTo (|SCNode| To)
+	function SCFunction.DoLinkTo (|SCNode| To)
 		if .canlinkto(to)
 			linkmap.Store(.linkto, To)
 	
-	function scfunction.DoLinkBoth (|SCNode| To)
+	function SCFunction.DoLinkBoth (|SCNode| To)
 		if .canlinkto(to)
 			linkmap.Store(.linkto, to)
 			if compiler.InPerry

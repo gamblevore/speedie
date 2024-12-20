@@ -6,7 +6,6 @@ main // main {
 		app.Crash
 	GUI.Init
 	Perry.Startup
-//	tetriswin()
 	notifications.ShowTip( file://tips.box )
 	return GUI.Run
 	

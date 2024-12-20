@@ -283,10 +283,18 @@ class TextView (GUIControl)
 	helper SelectedLine (|textviewline|)
 		return .FindDrawInfo(.sel0)
 
+	helper TypingPlaceReal (assigns:|intrange| result)
+		opt norefcounts
+		._TypingPlace = result
+		|| doc = .document
+			doc.TypingPlace = result
+			|| L = doc.current
+				L.typingplace = result
+
 	helper TypingPlaceDirect (|intrange| result, |bool|)
 		opt norefcounts
 		require result != ._TypingPlace
-		._TypingPlace = result
+		.TypingPlaceReal = result
 		._PreferPrevLine = false
 		if .CanAutoComplete <= 1
 			.CanAutoComplete = 0
@@ -468,9 +476,9 @@ class TextView (GUIControl)
 	}
 
 	function ShowTypingPlace (|ivec2| r)
-		if r.width
-			.show(r.x)
-		.show(r.x2)
+		|| i = (r.width>0)|int|
+		i = r[i]
+		.show(i)
 
 
 	function CurrLine (|int|)
@@ -822,7 +830,7 @@ class TextView (GUIControl)
 			fs <~ s.DeSlashComment
 			if p
 				fs <~ t[p] // match line-ending
-		._typingplace = r
+		.TypingPlaceReal = r
 		.InsertSub(fs, r, true)
 		return true		
 		
@@ -1079,7 +1087,7 @@ class TextView (GUIControl)
 			beep
 			return true
 		
-		._typingplace = t
+		.TypingPlaceReal = t
 		.InsertSub(Tabbed, t, true)
 		return true
 	
@@ -1304,11 +1312,12 @@ class TextView (GUIControl)
 		// good for now!
 
 	
-	helper InsertSub (|string| s, |intrange| p, |bool| selnew=false, |int|)
+	helper InsertSub (|string| s, |intrange| p, |bool| selnew=false, |bool|show=true, |int|)
 		p = .clamp(p)
 		|| Same = (p.width == s.length) and self[p.x, s] 
 		|| i	= (p.x + s.length, p.x2)(!Same)
-		.show(i)
+		if show
+			.show(i)
 		
 		if !same
 			i = p.x + s.length
@@ -1336,7 +1345,8 @@ class TextView (GUIControl)
 			|| it = .isinline
 				it.UpdateSearch(nt)
 		
-		.ShowTypingplace((p.x, i))
+		if show
+			.ShowTypingplace((p.x, i))
 		.UndoChecker = i
 		return p.x
 
@@ -1776,10 +1786,9 @@ class TextView (GUIControl)
 		opt norefcounts
 		if ._Start != d
 			._Start = d
-			.ShowExtraInfo(GUI.mousexy, false)
-		if d.position >= 0
 			|| doc = .document
 				doc.scrollpos = d.position
+			.ShowExtraInfo(GUI.mousexy, false)
 			
 	
 	helper Clear (|string| NewText, |bool| KeepStart=false, |bool|)
@@ -1790,25 +1799,28 @@ class TextView (GUIControl)
 			.ClearSub(keepstart)
 
 
-	helper ClearSub (|bool| KeepStart)
+	helper ClearSub (|bool| NotYetFinished)
 		// why is newtext unused? ;_;
-		if !KeepStart
+		if !NotYetFinished
 			|| sel = (.text.length, 0)(.SingleLine) 
 			.TypingPlaceDirect((sel,sel))
 		
 		.ScrollDrawTimer = 0
-		.TextAlteredForDraw |= 2 // this might not clear text?
+		.TextAlteredForDraw |= 2	// This might not clear text?
 
-		require !Keepstart
-		._Start = ._lines
-		._lines.clear
+		//require !NotYetFinished	// Shouldn't these be done anyway?
+		._Start = ._lines			// right? just pass NotYetFinished to ReallySetStart
+		._lines.clear				// so it doesnt ruin the doc position
 
 		|| d = textviewline()
 		._lines <~ d
 		.ClearReclaim
 		d.tline = 1
 		d.position = -1
-		.ReallySetStart(D)
+		if NotYetFinished
+			._Start = d
+		  else
+			.ReallySetStart(D)
 
 
 	helper NextVline (|TextViewLine| place, |TextViewLine| curr, |int| p, |TextViewLine|)
@@ -2010,13 +2022,24 @@ class TextView (GUIControl)
 	helper TextCopy (GUICopyEvent)
 		return .SelText
 	
+	
 	function ScrollPos (|int|)
 		return ._Start.position
 
+	setter ScrollPos (|int|)
+		opt norefcounts
+		for s in ._Lines
+			if s.Position >= Value
+				return .ReallySetStart(s)
+//		return ._Start.position
+
 
 	helper UnloadDoc (|document| old)
+		opt norefcounts
 		old.ScrollPos = .scrollpos
-		old.sel = .selrange
+		old.TypingPlace = .selrange
+		|| c = old.current
+			c.typingplace = .selrange
 		if old <= 1
 			old.clear
 		.document = nil
@@ -2033,8 +2056,10 @@ class TextView (GUIControl)
 			.document = d
 			.MyError = nil
 			if show
-				|| s = d.sel
-				.ShowAndSel(s.x, s.width)
+				.SelDirect(d.TypingPlace, nil)
+				.scrollpos = d.scrollpos
+				// 
+				// .ShowAndSel(s.x, s.width)
 			return true
 		
 		.Clear("")

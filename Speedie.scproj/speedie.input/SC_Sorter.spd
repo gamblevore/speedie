@@ -38,7 +38,7 @@ module CodeSorter
 		return 0
 	
 	
-function scfunction.MarkRecursive (|scfunction| EndAt)
+function SCFunction.MarkRecursive (|scfunction| EndAt)
 	opt norefcounts
 	|| s = self
 	while
@@ -48,7 +48,7 @@ function scfunction.MarkRecursive (|scfunction| EndAt)
 		require s != nil and EndAt
 
 
-function scfunction.FindDepths (|int|)
+function SCFunction.FindDepths (|int|)
 	opt norefcounts
 	flow off
 	// Orders the functions in terms of which ones need others.

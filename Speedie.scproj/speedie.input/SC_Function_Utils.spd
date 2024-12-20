@@ -11,7 +11,7 @@ constants
 
 prototype fnPreReader (|scfunction| self, |message| msg, |bool|)
 
-function scfunction.PreRead (|message| Arg)
+function SCFunction.PreRead (|message| Arg)
 	opt norefcounts
 	for s in arg
 		if s == @tmp
@@ -90,7 +90,7 @@ dispatch FuncPreReader (fnPreReader)
 	
 
 
-function scfunction.MakeNilChecker (|message| msg)
+function SCFunction.MakeNilChecker (|message| msg)
 	.NilSelff(msg, nilstate.optional)
 	.IsNilChecker = 1
 	
@@ -120,7 +120,7 @@ function SettingMemory (|Message| Rel, |bool|)
 			return true
 
 
-function scfunction.NilSelff (|message| where, |nilstate| v)
+function SCFunction.NilSelff (|message| where, |nilstate| v)
 	expect (!.nilself) (where, "Already stated")
 	.nilself = v
 

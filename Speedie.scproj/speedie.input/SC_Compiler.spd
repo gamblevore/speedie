@@ -709,7 +709,7 @@ function FindFunction (|string| Name, |SCFunction|)
 	return Compiler.program.findfunction(name)
 
 
-function scfunction.IsAllocOrNew (|bool|)
+function SCFunction.IsAllocOrNew (|bool|)
 	return self is Constructor
 
 
@@ -729,14 +729,14 @@ function DoRefAnalysis
 	scfunction.currfunc = nil
 
 
-function scfunction.IsARealSpdFunc (|bool|)
+function SCFunction.IsARealSpdFunc (|bool|)
 	if (self Is Wrapper) or .IsMacro
 		return false
 	scfunction.currfunc = self
 	return true
 
 
-function scfunction.CanBuildConstructor (|bool|)
+function SCFunction.CanBuildConstructor (|bool|)
 	return (self is ConOrDes) and .IsARealSpdFunc
 
 

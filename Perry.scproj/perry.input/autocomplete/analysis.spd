@@ -13,7 +13,7 @@ function MenuAllFuncs (GUIaction)
 		.OpenMenu
 
 
-function perryide.ListAllFuncs (|bool| sel=false, |string| filter="")
+function PerryIDE.ListAllFuncs (|bool| sel=false, |string| filter="")
 	|| submenu = .FunctionMenu.submenu!
 	|| result = submenu.listsource
 	result.clear
@@ -71,7 +71,7 @@ function PerryAutoCompleteSelected (GUIListEvent)
 	|| p = row.firstname
 	if !row
 		p = .ListSource.obj as string
-	if p and i.EditPath(p)
+	if p and i.EditPath2(p)
 		|| rl = row[2]
 			e.ShowAndSel(rl.int, true)
 
@@ -120,7 +120,7 @@ function message.FuncArg (|message|)
 		return s
 
 
-function perryide.ListAllFuncsMsg (|message| items, |message| result, |string| filter)
+function PerryIDE.ListAllFuncsMsg (|message| items, |message| result, |string| filter)
 	opt norefcounts
 	for line in items
 		if line == @decl

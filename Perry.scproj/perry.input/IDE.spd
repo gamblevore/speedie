@@ -637,12 +637,19 @@ class PerryIDE (Window)
 
 	
 	function GotoIncludedFile (|string| path, |bool|)
+		opt norefcounts
 		|| f = .FileList[path]
 			.FileList.Select(f)
 			return true
 	
 	
-	function GotoAnyFile (|string| path, |bool| ChangeFocus, |bool|)
+	function EditPath2 (|string| s, |bool|)
+		opt norefcounts		// using the other seems to cause issues
+		if s
+			return .editfile(.FileList[s] ?? .FileList.AddExtra(s))
+
+
+	function EditPath (|string| path, |bool| ChangeFocus=true, |bool|)
 		require path.FileExists
 		if ChangeFocus
 			.Editme.SetFocus
@@ -788,11 +795,6 @@ So anything not 0 means "its OK"`
 		opt norefcounts
 		return .editme.document$.location
 	
-
-	function EditPath (|string| s, |bool|)
-		if s
-			return .editfile(.findpath(s))
-
 
 	function EditFile (|FileRow| r, |int|) // editfile, loadfile, fileload, fileedit, openfile, fileopen
 		require r and r.location and !.DuringLoad
@@ -967,7 +969,7 @@ function string.GetSpeedieProj (|string|)
 		rz = rz.parent
 
 
-function perryide.IDECommand (|bool|)
+function PerryIDE.IDECommand (|bool|)
 	// this should be a window really!
 	|| cmd = "Enter Command".ask("tetris") $
 	|| s = .editme.SelText

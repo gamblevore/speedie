@@ -74,7 +74,7 @@ function DefaultStitch (|Message| Default, |Message| dcl, |message|)
 	rz <~ Default
 
 
-function scfunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
+function SCFunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 	opt norefcounts
 	scmodule.curr = .parent|scmodule|
 	|| cls = .Cls

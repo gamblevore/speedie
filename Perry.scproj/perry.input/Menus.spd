@@ -26,14 +26,14 @@ function PerryIDE.EnablePrevNext
 	(.GoPrev is enabled) = m.prev!=nil
 
 
-function perryide.FindInHistory (|string| p, |message|)
+function PerryIDE.FindInHistory (|string| p, |message|)
 	opt norefcounts
 	for s in .RecentFiles
 		if s.firstname ~= p
 			return s
 
 
-function perryide.AddToJumpHistory
+function PerryIDE.AddToJumpHistory
 	require !.StillJumping
 	|| p = .path
 	|| old = .findinhistory(p)
@@ -83,11 +83,11 @@ function PerryIDE.GoToMarker (|message| m, |int| dir)
 	|| l = m.first
 	.duringNextPrev = dir
 	using self
-		.GoToAnyFile(m.firstname, true)
+		.EditPath(m.firstname)
 	.duringNextPrev = 0
 
 
-function perryide.SortedPrevious (|string| StrFilter = "", |message|)
+function PerryIDE.SortedPrevious (|string| StrFilter = "", |message|)
 	rz = Message()
 	for ch in .RecentFiles
 		if StrFilter.filter(ch.name)

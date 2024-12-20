@@ -262,7 +262,6 @@ class FileViewer (ListView)
 
 	syntax access (|string| path, |filerow|)
 		cpp_part AccessPath
-		if path ~= "/usr/local/speedie/exec.scproj/input/main.spd"
 		if path.file.IsDir
 			path = path.PathDir // standardise
 		for f in self

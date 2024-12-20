@@ -81,7 +81,7 @@ function DeclInit (|Message| dcl, |SCFunction| fn, |bool| IsJustAnArg)
 		Curr = Curr.FlatNext
 
 
-function scfunction.DoRefs (|bool|)
+function SCFunction.DoRefs (|bool|)
 	return self isnt NotRefCounted
 
 
@@ -708,7 +708,7 @@ function RC_HandleDisappearing (|Message| msg, |int| Basis)
 
 
 
-function scfunction.CallSuperMem (|SCFunction| fn)
+function SCFunction.CallSuperMem (|SCFunction| fn)
 	opt norefcounts
 	|| root = .sourcearg $
 	|| fnargs = fn.args
@@ -737,7 +737,7 @@ function scfunction.CallSuperMem (|SCFunction| fn)
 
 
 	
-function scfunction.FillInDestructor
+function SCFunction.FillInDestructor
 	opt norefcounts
 	|| s = .sourcearg$
 	|| c = .cls$
@@ -752,13 +752,13 @@ function scfunction.FillInDestructor
 				s.AddBefore( first, SCRefs.RefDestructorMsg( Addr, destr ) )
 
 
-function scfunction.FindCallParents (|message|)
+function SCFunction.FindCallParents (|message|)
 	opt norefcounts
 	|| s = .SourceArg
 		rz = .CountCallsToParentAlloc( s )
 
 
-function scfunction.CallParents 
+function SCFunction.CallParents 
 	opt norefcounts
 	require self is Constructor or Destructor
 	require .IsARealSpdFunc and !.FindCallParents
@@ -774,7 +774,7 @@ function scfunction.CallParents
 		.CallSuperMem( fn )
 
 
-function scfunction.ConOrDesForCall (|scclass| c, |bool| IsConstructor, |int| Task,  |scfunction|)
+function SCFunction.ConOrDesForCall (|scclass| c, |bool| IsConstructor, |int| Task,  |scfunction|)
 	opt norefcounts
 	|| parent = c.super		#require	
 	|| fn = parent.ConOrDesForCall(isconstructor, task)

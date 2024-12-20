@@ -45,7 +45,7 @@ function Window.Confirm (|string| Q, |fnConfirmCanceller| fn, |bool|)
 		return true
 
 
-function perryide.MakeNothingRunning (|string| reason, |bool|)
+function PerryIDE.MakeNothingRunning (|string| reason, |bool|)
 	|| prod = .runcompiledapp
 		if .confirm("Kill running product " + .Name + Reason, fnStillRunning)
 			prod.kill(-1)
@@ -98,7 +98,7 @@ function PerryIDE.DebugAppCallArgsDisplay (|file| f, |[string]| args, |faststrin
 		rz.AppendQuotedEscape(a)
 
 
-function perryide.DebugActual (|file| f, |[string]| args) // actuallyruncompiledapp, runproduct, actualdebug, debugproduct
+function PerryIDE.DebugActual (|file| f, |[string]| args) // actuallyruncompiledapp, runproduct, actualdebug, debugproduct
 	|| out = .DebugAppCallArgsDisplay(F, args)
 	.LogOneAction(@emb + out.Copy)
 	out <~ ("\n", 2)
@@ -109,7 +109,7 @@ function perryide.DebugActual (|file| f, |[string]| args) // actuallyruncompiled
 		.RunButton.text = "\07"
 
 
-function perryide.DebugPath (|message| conf)
+function PerryIDE.DebugPath (|message| conf)
 	|| p = .Project
 	if !p.isdir
 		p = p.Parent

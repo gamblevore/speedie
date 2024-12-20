@@ -178,7 +178,7 @@ function TextView.PerryTryAutoComplete (|int| x, |string| type, |string| Reason,
 		i.AutoComplete.CloseMenu
 
 
-function perryide.SetAutoPoint (|int| x)
+function PerryIDE.SetAutoPoint (|int| x)
 	.AutoPoint = .editme.XYOfChar(x) // - (0,.editme.lineheight)
 	.PopupDisplayCorner = .autopoint // wait why do I have two?
 
@@ -422,7 +422,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 				return 2
 
 
-function perryide.IsEditingSource (|bool|)
+function PerryIDE.IsEditingSource (|bool|)
 	opt norefcounts
 	|| f = .CurrFileRow
 		return f.location.issource// or "jb" or "jbin"

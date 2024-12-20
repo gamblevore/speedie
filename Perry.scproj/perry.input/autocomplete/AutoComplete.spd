@@ -141,9 +141,8 @@ function PerryIDE.DefineSub (|string| path, |int| L, |bool|)
 		path = path.file.FindProjectMain$
 		
 	using self
-		if .GotoAnyFile(path, true)
+		if .EditPath(path, false)
 			.editme.ShowAndSel(l, true)
-			.editme.SetFocus
 	.popuphide
 
 
@@ -361,7 +360,7 @@ function OnShowExtraInfo (GUITextShowEvent)
 	.ide.ShowExtraInfo(LeftCorner, msg, err, reason, !WasDelayed)
 
 
-function perryide.ShowImport (|string| name)
+function PerryIDE.ShowImport (|string| name)
 	|| path = name
 	if path[0] != '/'
 		ifn  (path contains "/")  or  (path contains "scproj")
@@ -397,7 +396,7 @@ function JumpToDefinition (GUIAction)
 	return true
 	
 
-function perryide.FuncText (|message| spd_func, |message|)
+function PerryIDE.FuncText (|message| spd_func, |message|)
 	require spd_func
 	rz = spd_func.OwningFullName(@prm)
 	|| Last = rz.last
@@ -475,7 +474,7 @@ function PerryIDE.BuildCmdSub (|string| cmd,  |message| where,  |string| name,  
 		rz = nil
 
 
-function perryide.DescribeWhere (|message| rz, |message| where)
+function PerryIDE.DescribeWhere (|message| rz, |message| where)
 	rz <~ (@str, .editme.path) 
 	rz <~ where.position
 	rz <~ where.rangelength

@@ -181,7 +181,7 @@ module PackMaker
 			rz += s
 
 	
-	function scfunction.Test (|?&ivec4|)
+	function SCFunction.Test (|?&ivec4|)
 		opt norefcounts
 		|| mu = .asm
 			|| mu2 = mu.µTest
@@ -305,14 +305,14 @@ module PackMaker
 		return pack
 
 
-function scfunction.WrappedName (|string|)
+function SCFunction.WrappedName (|string|)
 	if .iscppinbuilt
 		return .exportname + "Wrap"
 	  else
 		return .exportname
 
 
-function scfunction.CanLibLoad (|bool|)
+function SCFunction.CanLibLoad (|bool|)
 	if !.ismacro and (self isnt disabled) and (.iscppinbuilt != 2)
 		return true
 
@@ -333,7 +333,7 @@ Then exec can just... use the table directly, as it is already sorted. :)
 */
 
 
-function scfunction.operatorin (|string| s, |bool|)
+function SCFunction.operatorin (|string| s, |bool|)
 	opt norefcounts
 	return .parent.name ~= s
 

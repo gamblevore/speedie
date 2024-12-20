@@ -210,7 +210,7 @@ module NilTest2
 		nil|array| <~ ""
 
 
-function scfunction.NilPrint (|string| header="", |bool| nilch)
+function SCFunction.NilPrint (|string| header="", |bool| nilch)
 	cpp_name ndb1
 	|| fs = FastString()
 	fs <~ header

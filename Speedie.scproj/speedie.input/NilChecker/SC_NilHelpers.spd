@@ -207,13 +207,13 @@ function scdecl.NilStated (|bool|)
 	return .NilDeclared is Stated
 
 
-function scfunction.CanNil (|bool|)
+function SCFunction.CanNil (|bool|)
 	if .badness != 0 and .badness != 128
 		return false
 	return !.IsMacro and (self Isnt Wrapper) and (self isnt disabled)
 
 
-function scfunction.WantAs (|nilstate| NS)
+function SCFunction.WantAs (|nilstate| NS)
 	opt norefcounts
 	|| dcl = .args.first
 	expect (dcl and dcl.typesuffers and .cls) (.source, `This function should not specify nilness of self.`)

@@ -1220,7 +1220,7 @@ function NewMacro (CollectFunc)
 	return SCFunction.NewFunc( node, name_space, errplace )
 
 
-function scfunction.MakeProtoClassName (|string| start, |string|)
+function SCFunction.MakeProtoClassName (|string| start, |string|)
 	|| name = start
 	
 	|scnode--| p = .parent
@@ -1235,7 +1235,7 @@ function scfunction.MakeProtoClassName (|string| start, |string|)
 	return name
 
 
-function scfunction.ProtoExportName
+function SCFunction.ProtoExportName
 	opt norefcounts
 	|| cls = .prototype
 	
@@ -1806,7 +1806,7 @@ function message.SlidePositions (|int| add)
 
 
 
-function scfunction.Cleanupfunc (|message| s)
+function SCFunction.Cleanupfunc (|message| s)
 	|| n = s.name
 	using s
 	|| cls = .cls!.isnormalobject
@@ -1826,7 +1826,7 @@ function message.MainFix2
 		.become(m)
 
 
-function scfunction.UpdateSourceSub (|message| src, |bool|)
+function SCFunction.UpdateSourceSub (|message| src, |bool|)
 	opt norefcounts
 	if src ~= @tmp and "main"
 		src.MainFix2
@@ -1844,7 +1844,7 @@ function scfunction.UpdateSourceSub (|message| src, |bool|)
 		stderr.clear			// lol
 
 
-function scfunction.SetBlindCasts (|SCNode| name_space)
+function SCFunction.SetBlindCasts (|SCNode| name_space)
 	opt norefcounts
 	if name_space
 		|| p = name_space.project
@@ -1854,7 +1854,7 @@ function scfunction.SetBlindCasts (|SCNode| name_space)
 			.BlindCasts	= c.blindcast
 
 
-function scfunction.Init_Sub (|message| node,  |SCNode| name_space)
+function SCFunction.Init_Sub (|message| node,  |SCNode| name_space)
 	|| arg = node.NormaliseFunc
 	node.obj = self
 	if name_space
@@ -1876,7 +1876,7 @@ function scfunction.Init_Sub (|message| node,  |SCNode| name_space)
 			
 
 
-function scfunction.MakeMacro (|message| arg)
+function SCFunction.MakeMacro (|message| arg)
 	opt norefcounts
 	|| C = arg.first
 	|| prm = arg.prev

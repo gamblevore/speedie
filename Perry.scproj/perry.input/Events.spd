@@ -6,7 +6,7 @@ function FileSepClicker (guiaction)
 
 
 
-function perryide.UnusedFuncsFB (|message| stuff)
+function PerryIDE.UnusedFuncsFB (|message| stuff)
 	opt norefcounts
 	|| arg = stuff.last
 	require arg == @arg
@@ -15,7 +15,7 @@ function perryide.UnusedFuncsFB (|message| stuff)
 		.UnusedFuncsSub(tmp, where)
 
 
-function perryide.UnusedFuncsSub (|message| tmp, |string| where)
+function PerryIDE.UnusedFuncsSub (|message| tmp, |string| where)
 	|| err = error(nil, tmp.name, ErrorSeverity.warning, where )
 	err.position = tmp.first.int
 	.editme.LineErrorAdd(err)
@@ -173,7 +173,7 @@ function fnBuildIsDead (fnConfirmCanceller)
 			return true
 
 
-function Perryide.IsBuilding (|bool|) // .isbuilding, .iscompiling, .compiling 
+function PerryIDE.IsBuilding (|bool|) // .isbuilding, .iscompiling, .compiling 
 	return .buildbutton isnt enabled
 
 
@@ -259,7 +259,7 @@ function ClickedAView (GUIaction)
 		.ide.UseThisView(self, true)
 
 
-function perryide.UseThisView (|buttonview| btn, |bool| chng=false)
+function PerryIDE.UseThisView (|buttonview| btn, |bool| chng=false)
 	opt norefcounts
 	|| el = .errorlist
 	if (el is visible) and btn.tag == el
@@ -281,7 +281,7 @@ function PerryIDE.ShowText (|textview| field, |string?| Text, |bool| Always, |bo
 	return true
 
 
-function perryIDE.UpdateJeeboxField (|bool|)
+function PerryIDE.UpdateJeeboxField (|bool|)
 	|| e = .EditMe
 	|| sr = e.SelRange
 	|| txt = e.SelText
@@ -326,7 +326,7 @@ function PressedSearchWithin (Guiaction)
 
 
 
-function perryide.MassSearch (|bool|)
+function PerryIDE.MassSearch (|bool|)
 	opt norefcounts
 	|| t = .MassSearchField.Text
 	.ViewAsProject
@@ -345,10 +345,11 @@ function perryide.MassSearch (|bool|)
 
 			
 	
-function perryide.DoReplacement (|error| File, |string| r)
+function PerryIDE.DoReplacement (|error| File, |string| r)
 	|| fs = faststring()
 	|| t = .EditMe.Text
-	|| last = 0
+	|| First = file.first!.position
+	|| last = first
 	for curr.fast in file
 		fs.appendRange(t, last, curr.position)
 		last = curr.after
@@ -356,12 +357,11 @@ function perryide.DoReplacement (|error| File, |string| r)
 		curr.rangelength = R.Length
 		fs <~ R
 
-	fs.appendRange(t, last)
-	.editme.InsertSub(fs, (0, int.max))
+	.editme.InsertSub(fs, (first, last), false, false)
 	
 
 
-function perryide.DoReplacements (|bool|)
+function PerryIDE.DoReplacements (|bool|)
 	opt norefcounts
 	if .FoundList.isempty
 		.MassSearch
@@ -453,7 +453,7 @@ function PerryIDE.ClickedError (|error| row)
 	using self
 		|| f = row.path.file
 		if (row.path != .editme.path) and f.IsNicelyViewable
-			.GoToAnyFile(f, false)
+			.EditPath(f, false)
 		.editme.ShowAndSel(row.position, true)
 		.editme.MyError = row
 
@@ -529,7 +529,7 @@ function ReturnErrorList (GuiListEvent)
 	return true
 
 
-function perryide.ReTextSubFind
+function PerryIDE.ReTextSubFind
 	|| r = .filelist.SearchWithin
 		.SubFindCheckBox.text = "Searches: " + r.Name
 	  else

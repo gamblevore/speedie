@@ -11,12 +11,12 @@ function string.Path_Expand (|dictionary of string| dict, |string|)
 		return found.TrimSlashes + self[i...]
 
 
-function perryide.DebugArgsFile (|file|)
+function PerryIDE.DebugArgsFile (|file|)
 	|| p = .Project
 	if p.IsDir
 		return p.Child(".args")
 	return .PrefsFolder.child("args/"+.name+".args")
 
 	
-function Perryide.PrefsFolder (|file|)
+function PerryIDE.PrefsFolder (|file|)
 	return file.Prefs("perry.klinkerhoppen")

@@ -182,7 +182,7 @@ function UnusedFuncs (|message| cmd, |message|)
 	return cmd
 
 
-function scfunction.CheckUnused (|message| feedback)
+function SCFunction.CheckUnused (|message| feedback)
 	opt norefcounts
 	require self isnt Disabled
 	if .isunused
@@ -272,7 +272,7 @@ function message.CmdImprove (|message|)
 	return self
 
 
-function scfunction.InsertIn (|SCNode| parent, |string| name, |SCObject|)
+function SCFunction.InsertIn (|SCNode| parent, |string| name, |SCObject|)
 	.name = name
 	if parent isa scclass
 		.cls = parent

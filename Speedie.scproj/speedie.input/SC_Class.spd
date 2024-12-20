@@ -421,7 +421,7 @@ function SCFunction.CopyParams (|message| list)
 			subprms <~ c.copy
 
 
-function scfunction.Prms (|message|)
+function SCFunction.Prms (|message|)
 	return .source.find(@prm)
 
 
@@ -609,7 +609,7 @@ function FindContainedClass (|scclass|)
 		
 
 
-function scfunction.DontWantSameReturnType (|scfunction| f)
+function SCFunction.DontWantSameReturnType (|scfunction| f)
 	require self
 	if f.ReturnType.MiniMatch(.returntype, 0)
 		error (.source,  "Multiple casts found [1]")
@@ -750,7 +750,7 @@ function CanCompareSub (|string| s, |scdecl|against, |bool|)
 			
 	
 
-function scfunction.CanCompareAgainst (|SCDecl| Against, |bool|)
+function SCFunction.CanCompareAgainst (|SCDecl| Against, |bool|)
 	opt norefcounts
 	for (f in self)
 		|| arg = f.args[ 1 ]!
@@ -797,7 +797,7 @@ function FirstDestructor (|SCFunction|)
 			return fn
 
 
-function scfunction.AddSelfToFunc (|scclass| cls, |SCNode| space)
+function SCFunction.AddSelfToFunc (|scclass| cls, |SCNode| space)
 	opt norefcounts
 //	if self is constructor
 //		require cls.isobject
