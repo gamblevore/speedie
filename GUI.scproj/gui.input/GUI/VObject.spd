@@ -4,8 +4,7 @@
 
 class VObject
 	|vec3|		Pos
-	|vec3|		Proportion
-	|float|		Radius			// Can this be packed?
+	|vec3|		Radius
 	|vec3|		Velocity
 	|byte|		Nudge
 	|byte|		ShapeID
@@ -14,21 +13,22 @@ class VObject
 	|DistanceFunction| Shape
 	
 	prototype DistanceFunction (|vec3| orig, |vec3| dir, |vec3| idir, |vec2|)
+		// this should become a more generalised "hitter"
+		// for shape, nearest point, and color and maybe even sound+energy uses
 		
 	constructor (|vec2| Pos,  |vec2| Size,  |vec4| Color=colors.white)
-		cpp_part ConstructorBox
+		cpp_part ConstructorBox2D
 		.pos = (pos, 0.0)
 		.Shape = &raytracer.BoxShape
 		.Color = color
 		.Health = 256
-		.size = size
+		.size = vec3(size,1.0)
 		.ShapeID = ++ShapeIDs
 
-	constructor (|vec3| Pos,  |float| Rad,  |vec4| Color=colors.white)
+	constructor (|vec3| Pos,  |vec3| Rad, |DistanceFunction| shape,   |vec4| Color=colors.white)
 		cpp_part ConstructorSphere
 		.pos = pos
-		.Shape = &raytracer.SphereShape
-		.proportion = vec3(1)
+		.Shape = shape
 		.Radius = rad
 		.Color = color
 		.Health = 256
@@ -37,11 +37,6 @@ class VObject
 	function Towards (|vec3| P, |float| Speed)
 		.Velocity = (P - .pos).Normal * Speed
 	
-//	syntax Access (|vec4| V, |vec4|)
-//		|| P = .pos
-//		V += (P, P)
-//		return V
-		
 	function y (|float|)
 		return .pos.y
 
@@ -49,18 +44,16 @@ class VObject
 		return .pos.x
 
 	function left (|float|)
-		return .pos.x - .Radius * .Proportion.x
+		return .pos.x - .Radius.x
 
 	function right (|float|)
-		return .pos.x + .Radius * .Proportion.x
+		return .pos.x + .Radius.x
 	
-	setter Size	(|vec2|)
-		|| M = Value.max
-		.Proportion = (value, 0.0)/M
-		.Radius = M*0.5
+	setter Size	(|vec3|)
+		.Radius = value*0.5
 		
 	function Box2D (|vec4|)
-		|| rad = .proportion.xy * .Radius
+		|| rad = .Radius.xy
 		|| p = .pos.xy
 		return (P-rad, P+rad)
 
@@ -84,6 +77,13 @@ class VObject
 		|float| DrawScale
 		|vec2|  DrawMovement
 		
+		function Box (|vec3| Pos, |vec3| Radius, |vec4| Color=colors.white, |vobject|)
+			return VObject(pos, radius, &raytracer.BoxShape, color)
+			
+			
+		function Sphere (|vec3| Pos, |float| Radius,  |vec4| Color=colors.white, |vobject|)
+			return VObject(pos, vec3(radius), &raytracer.SphereShape, color)
+			
 // later: handle other ratios, for example (Add borders)
 // could we try to get closer to phi? say trim a few pixels off the top? to 865 pixels
 

@@ -36,6 +36,7 @@ class RayTracer
 	|float|			Spin
 	
 	constructor (|vec3| Camera)
+		// Default RayTracer constructor should use the block positioning system
 		.Camera = Camera.MakeSane
 		._LookAt.reset
 	
@@ -74,7 +75,7 @@ class RayTracer
 		.idir = -1.0 / .dir
 		
 		for sp in .Shapes
-			|| t = raytracer.SphereShape(sp, .Camera, .dir, .idir)
+			|| t = (sp.Shape)(sp, .Camera, .dir, .idir)
 			|| tx = t.x
 			if (tx > 0) and (tx < .Dist)
 				.Dist = t.x
@@ -86,6 +87,8 @@ class RayTracer
 
 
 	function RayTrace (|image| where, |float|)
+		// should allow alpha for drawing over prev images...
+		// meaning that the alpha can't be the ID!
 		opt norefcounts,  opt min 3
 		.ViewMat
 		.size = where.size.vec2
@@ -101,7 +104,8 @@ class RayTracer
 			|| below = where[PY+(0,-1)]			
 			|| Left = pxl
 			while p.x < w
-				pxl <~ .GetColor(P)
+				|| C = .GetColor(P)
+				pxl <~ C
 				if pxl.a!=left.a
 					left = .AntiAlias(p-(1.0,0), left)
 					pxl = .AntiAlias(p, pxl)
@@ -127,7 +131,7 @@ class RayTracer
 			|| L = .pos - orig
 			|| t = L • dir
 			if t > 0
-				|| r = .Radius
+				|| r = .Radius.x
 				|| h = ((r*r) + (t*t) - (L • L) ).Sqrt
 				return (t-h, t+h) // what about tca + h? or returning (tca,h)?
 		
@@ -136,7 +140,7 @@ class RayTracer
 			opt min 3
 			
 			orig -= .pos
-			|| r = .Radius * .Proportion
+			|| r = .Radius
 					
 			|| p0 = (orig - r) * idir
 			|| p1 = (orig + r) * idir

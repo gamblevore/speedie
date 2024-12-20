@@ -136,6 +136,12 @@ class Array (saveable)
 	syntax Append (|...?| item)
 		.SyntaxAppend(item, 1)
 	
+	function Append (|[...]| R)
+		cpp_part AppendMany
+		opt norefcounts
+		for s in r
+			self <~ s
+	
 	syntax Append (|...?| item, |int64| Count)
 		cpp_wrapper JB_Array_AppendCount
 	

@@ -30,11 +30,11 @@ class RayScene (window)
 		for i in (-L to L)
 			|| sh = (i, 0.0, i.abs)*24.0
 			|| C = vec4((2.0-i)*0.5, 1, 1, 1)
-			.T.shapes <~ vobject(sh+(-1.0, 1.5, 12.0), 2.0, C)
-			.T.shapes <~ vobject(sh+( 1.5, 2.5, 18.0), 3, C)
-			.T.shapes <~ vobject(sh+( 7.0, 8.0, 18.0), 4, C)
-			.T.shapes <~ vobject(sh+( -2.0, 9.0, 24.0), 6, C)
-			.T.shapes <~ vobject(sh+( 12.0, 3.0, 24.0), 4, C)
+			.T.shapes <~ vobject.sphere(sh+(-1.0, 1.5, 12.0), 2.0, C)
+			.T.shapes <~ vobject.sphere(sh+( 1.5, 2.5, 18.0), 3, C)
+			.T.shapes <~ vobject.sphere(sh+( 7.0, 8.0, 18.0), 4, C)
+			.T.shapes <~ vobject.sphere(sh+( -2.0, 9.0, 24.0), 6, C)
+			.T.shapes <~ vobject.sphere(sh+( 12.0, 3.0, 24.0), 4, C)
 
 
 	function PrepareDraw

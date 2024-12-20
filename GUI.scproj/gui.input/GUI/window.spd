@@ -24,6 +24,9 @@ class Window (GUIControl)
 	|object?|							ReturnValue
 	|date|								AlphaFader
 	|date|								CreatedDate
+
+	visible false
+
 	|float|								BlockScale
 	|vec2|								BlockMove
 	|byte|								BlockMode
