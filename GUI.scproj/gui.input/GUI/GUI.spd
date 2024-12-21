@@ -8,6 +8,7 @@ module GUI
 	|date|						OpenedFirst
 	|GUIPasteEvent|				AppDocumentOpen
 	|string|					LastSearch
+	|uint|						EventCount
 	|uint|						FrameCount
 
 	visible false
@@ -460,6 +461,7 @@ module GUI
 			rz |= SDLActivity.activity
 
 		if rz is activity
+			.eventcount++
 			.framecount++
 	
 	
@@ -638,7 +640,7 @@ module GUI
 		notifications.Draw
 		.DoDrawDrag(window.front!)
 
-		DrawStartCounter.Count("drawstart")
+//		DrawStartCounter.Count("drawstart")
 
 
 	function BGBlurAmount (|float|)
@@ -708,7 +710,7 @@ module GUI
 			if remain >= .EventFrameLength/2
 				return 
 			app.Sleep(remain)
-		DrawEndCounter.Count("Drawend")
+//		DrawEndCounter.Count("Drawend")
 		.DrawState &= ~2
 		.DrawFinish = d
 		.EndFrame(.Raw!)
@@ -734,7 +736,7 @@ module GUI
 	
 	helper HandleEvents (|SDLActivity|)
 		|| d = .DelayEvents()				#require
-		EventCounter.Count("events")
+//		EventCounter.Count("events")
 		.FrameStart = d
 		SpdProcess.CheckAllAlive
 		
@@ -1070,7 +1072,7 @@ module GUI
 			move = (ev.xrel, ev.yrel)
 		
 		require move
-		if .framecount <= 4
+		if .eventcount <= 4
 			return SDLActivity.Activity // or else we never get there
 
 		|| MB = .MouseButtons
@@ -1081,7 +1083,7 @@ module GUI
 		.CurrMouseXY = xy
 		if !w.IsLiveAction
 			.ShowCursor
-		if .FrameCount isa 8 // in case a window comes up or closes		
+		if .eventcount isa 8 // in case a window comes up or closes		
 			SDL_SetRelativeMouseMode(w.IsLiveAction) // don't do it every frame
 
 		if (.CanDrag >= mousedragging.Within) and (MB is left)
@@ -1256,9 +1258,35 @@ function Duration.syntaxcall (|float|)
 // CVDisplayLink could be used to make vsyncing possible? Its a lot of per-platform work though.
 // Linux/Win have their own alternatives.
 
-
-
-
-|FPSCounter| DrawStartCounter
-|FPSCounter| DrawEndCounter
-|FPSCounter| EventCounter
+//
+//
+//
+//struct FPSCounter
+//	|date|   Next
+//	|int|  Amount
+//
+//	function Count (|string| name="")
+//		.Amount++
+//		|| now = date.now
+//		require now >= .Next
+//
+//		now += 1s
+//		if .Next
+//			|| durr = now - .next
+//			|| rate = .Amount|float| / durr.Float
+//			|| fs = FastString()
+//			fs <~ name
+//			fs <~ " fps = "
+//			fs.AppendFloat(rate)
+//			fs <~ " : "
+//			fs <~ .amount
+//			.Amount = 1
+//			|| s = fs.GetResult
+//			log s
+//			printline s
+//		.next = now
+//
+//
+//|FPSCounter| DrawStartCounter
+//|FPSCounter| DrawEndCounter
+//|FPSCounter| EventCounter

@@ -37,6 +37,7 @@ class RayTracer
 	
 	constructor (|vec3| Camera)
 		// Default RayTracer constructor should use the block positioning system
+		// either by zpos or zoom
 		._LookAt.reset
 		.Camera(Camera)
 	

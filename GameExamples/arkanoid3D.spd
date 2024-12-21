@@ -201,26 +201,6 @@ class Breakout (Window)
 		for (s in .Spirals) (i)
 			|| B = s.Screen
 			where.DrawSpiral(0.01*b.width|float|*vobject.drawscale, L, b.center, s.color, (3s+i*1s)())
-//	
-//	
-//	function BallDraw (|image| where, |[vobject]| List)
-//		for b in list
-//			|| bx = b.Box2d.screenfloat ± -4.0
-//			|| sh = bx.Width*4th
-//			where.DrawSoftCircle(bx, b.Color, 2.0)
-//			|| v = b.Velocity.Normal.xyxy
-//			|| m = 1.0
-//			|| ww = bx.Width*0.05
-//			|| C = b.Color * (1.0, 1.0-ww, 1.0-ww*2.0, 1.0)
-//			
-//			while bx.Width >= 1.0
-//				where.DrawSoftCircle((bx ± 2) - v*(sh*m), C, 2.0)
-//				C.g -= 0.3
-//				C.b -= 0.5
-//				C.r -= 0.1
-//				c = c.Clamp
-//				bx = bx ± bx.width*0.1
-//				m ++
 
 
 function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| Col, |float| Pulse)
