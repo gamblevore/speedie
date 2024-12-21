@@ -21,25 +21,26 @@ module GUI
 	|ivec2| 					NewSize
 	|ivec2| 					CurrMouseXY
 	|ivec2|						TryResizeLater
-	|date|						FrameStart
-	|int|						EventFrameLength
-	|byte|						DrawSkips
-	|int|						DrawFrameLength
-	|date|						PrevFrameDate = 1 // wont fire otherwise
-	|date|						FixScreenBug
-	|date|						FastToolTipDate
-	|date|						ChangeSelFlash
+
+	|date|						DrawFinish
+	|date|						FrameStart = 1
+	|byte|						DrawState
+	|uint16|					DrawFrameLength
+
 	|date|						BlurBackgroundStart
 	|float|						Scale
 	|bool|						StartedProperly
 	|bool|						IsBackground
 	|bool|						FlashSelector
 	|sdlactivity|				QuitReason
+	|date|						FixScreenBug
+	|date|						FastToolTipDate
+	|date|						ChangeSelFlash
 	|bool|						NeedMouseMove
 	|bool|						AControlWasResized
 	|bool|						TextInputEnabled
 	|bool|						TextInputEnabledAtStart
-	|byte|						DrawForce=3  // draw the first few frames always
+	|byte|						TouchCount=3  // draw the first few frames always
 											  // helps with startup events! at least on osx
 	|byte|						SingleFrameNest
 	|byte|						TouchFingersDown
@@ -253,6 +254,7 @@ module GUI
 
 	
 	constants
+		EventFrameLength = 273 // 240th of a second
 		SDL_PIXELFORMAT_ARGB8888 = 372645892
 		SDL_PIXELFORMAT_RGBA8888 = 373694468
 		SDL_PIXELFORMAT_ABGR8888 = 376840196
@@ -288,6 +290,8 @@ module GUI
 
 
 	helper vsync (assigns:|bool|)
+		// Lowers frame-rate. We'll need a better option to resyncing.
+		// if we draw into our own buffer anyhow.
 		|| v = ("1", "0")(value)
 		.SetHint("SDL_RENDER_VSYNC".cstr, v.cstr)
 	
@@ -371,18 +375,18 @@ module GUI
 	
 	function Init (|float| Scaling=1.0, |bool|) // startup
 		opt norefcounts
-		if .eventframelength
+		target !gui
+			disabled `Put "targets gui" in the app's conf section to use this!`
+		if .drawframelength
 			return true
+		.drawframelength = 60th.date
+
 		.GUICheck
 		pico.GlobalConfig.SuicideIfParentDies = false
 		pico.start
-		target !gui
-			disabled `Put "targets gui" in the app's conf section to use this!`
-		.eventframelength = 60th.date
-		.drawframelength = 60th.date
 		.openedfirst = date.now
 		.CurrMouseXY = ivec2(-1)
-//		app.prefs["LastOpened"] = .openedfirst
+
 		AppMenu.GetAppMenu
 		|| n = .InitSDL
 		if !n
@@ -574,11 +578,6 @@ module GUI
 			return a.isdialog|int| - b.isdialog|int|
 
 
-	function PutDialogsInFront
-		opt norefcounts
-		window.all.sort(DialogSorter|sortercomparer|)
-
-
 	function DrawWinFrom (|window|)
 		opt norefcounts
 		for w.reverse in window.all
@@ -609,16 +608,25 @@ module GUI
 		return .reflowdoc(bigrect, rect, bigrect)
 
 	
-	function DrawFrame
+	function StartDraw
 		opt norefcounts
+
+		// how to delay drawing?
+		// we actually want the draw to FINISH at a certain time!
+		// not start! So... we can start the draw always immediatly
+		// then finish when we think its a good time.
+		// of course, we don't redraw if theres already one redraw waiting.
+		// why not just draw right away?
+		// of course, we want to delay it, so we don't draw more than 60fps.
+		// its just enddraw that needs delaying, though!
+		|| w1 = .DrawWinFrom		#require
 		|| CanBlur = !app.prefs["noblur"]
 		
 		if !.DialogIsOpen
 			.BlurBackgroundStart = 0
-			
-		|| w1 = .DrawWinFrom		#require
+		
+		.DrawState = 2
 		.StartFrame(.Raw!)
-		|| D = .DialogIsOpen
 		while w1
 			if w1.IsViewable
 				if w1.IsDialog
@@ -629,7 +637,8 @@ module GUI
 		
 		notifications.Draw
 		.DoDrawDrag(window.front!)
-		.EndFrame(.Raw!)
+
+		DrawStartCounter.Count("drawstart")
 
 
 	function BGBlurAmount (|float|)
@@ -642,7 +651,7 @@ module GUI
 		GUI.Touch
 
 
-	function WindowFrameSteps
+	function WindowFrameSteps (|sdlactivity|)
 		opt norefcounts
 		notifications.CheckForDisappear		
 		.StartResize
@@ -653,6 +662,13 @@ module GUI
 			if !dlg or w.IsLiveAction // stop needless updates
 				w.__FrameStep__(!(dlg or w.OpenedMenu or .IsBackground))
 		.StartResize
+		
+		window.all.sort(DialogSorter|sortercomparer|)
+
+		if .TouchCount // happens during .WindowFrameSteps
+			.TouchCount--
+			rz = SDLActivity.activity		
+
 
 	function Cycle (|duration| length, |Duration| Adjust=0, |float|)
 		opt inline
@@ -662,59 +678,75 @@ module GUI
 	function Loop (|duration| length, |float|)
 		opt inline
 		return .FrameStart.loop(length)
-	
-
-	helper DoNapTime (|duration| Durr)
-		|| L = .EventFrameLength - durr
-		require (L > 0) and !sdl_event.HasAny
-		if .IsBackground and !.DroppingInto
-			l = .DrawFrameLength*9
-		app.Sleep(l)
 
 	
 	helper SingleFrame (|bool|)
 		opt norefcounts
 		require .SingleFrameNest <= 2
 		.SingleFrameNest++
+		
+		|| occur = .HandleEvents
+		// we want to count evntes per second
+		// and draws too.
+		if occur isnt ExitOrTerminate
+			if occur is activity
+				.DrawState |= 1
+			if .DrawState == 1
+				.StartDraw
+			if .DrawState & 2
+				.EndDraw		// if its too early, we don't draw.
+			
+		.SingleFrameNest--
+		return occur isnt ExitOrTerminate
 
-		.PrevFrameDate = .FrameStart
-		.FrameStart = date.now
+
+	helper EndDraw
+		|| d = date.now
+		|uint64| ago = d - .DrawFinish				// super dooper unsigned clock saver
+		|date| remain = .DrawFrameLength - ago
+		if remain > 0
+			if remain >= .EventFrameLength/2
+				return 
+			app.Sleep(remain)
+		DrawEndCounter.Count("Drawend")
+		.DrawState &= ~2
+		.DrawFinish = d
+		.EndFrame(.Raw!)
+
+
+	helper DelayEvents (|date|)
+		rz = date.now
+		|uint64| Ago = rz - .FrameStart				// unsigned, in case the clock goes backwards
+		|| L = .EventFrameLength
+		if .IsBackground and !.DroppingInto
+			l = .DrawFrameLength*9
+
+		|date| Remain = L - ago
+		if Remain > 0
+			if Remain > 1
+				app.Sleep(Remain-1)
+			return 0
+		
+//		if !sdl_event.HasAny
+//			app.Sleep(.EventFrameLength/2)
+//			return 0
+	
+	
+	helper HandleEvents (|SDLActivity|)
+		|| d = .DelayEvents()				#require
+		EventCounter.Count("events")
+		.FrameStart = d
 		SpdProcess.CheckAllAlive
 		
-		|| occured = .PreFrame
+		rz = .PreFrame
 		.ClearAlerts
 		.CheckKeyMods
 		.HandleAppResize
 		.PostLoads
-		occured |= .FrameAndEvents
-		occured |= .DrawForce!=0
-		require Occured isnt ExitOrTerminate
-			
-		.WindowFrameSteps
-		.PutDialogsInFront
-
-		// also needs to ALWAYS draw after a skip has finished
-		// AND needs to NOT draw too fast! even if we have a gui-touch.
-		// perhaps we can temporaily decraese the framelength? then slowly increase?
-		// and remove the frameskip?
-		if .DrawForce // happens during .WindowFrameSteps
-			.DrawForce--
-			occured |= sdlactivity.activity
-
-		|| Skip = .DrawSkips
-			.DrawSkips = (.DrawSkips|int| min 4) - 1
-		  elseif occured is activity
-			.DrawFrame
-		
-		|| durr = date.now - .FrameStart
-		if durr >= .DrawFrameLength
-			if .DrawSkips == 0
-				.DrawSkips = durr / .DrawFrameLength
-		  else
-			.DoNapTime(durr)
-		
-		.SingleFrameNest--
-		return true
+		rz |= .FrameAndEvents
+		rz |= .TouchCount!=0
+		if rz isnt ExitOrTerminate
+			rz |= .WindowFrameSteps
 
 
 	helper CheckQuarantine
@@ -754,14 +786,17 @@ module GUI
 		|| stride = 0
 		|&nil| SDLBuff
 		t.lockThatZerosEventhoughItShouldnt(nil, &sdlbuff, &stride)
-		.screen.UseExternalPointer(sdlbuff, .Screen.size.area, 4)
+		// could use SDL_UpdateTexture instead? use my own buffer! then
+		// we don't need to lock/unlock, which uses 2x memory and DOESN'T
+		// let me get access to the old buffer! might be faster too.
+		.screen.UseExternalPointer(SDLBuff, .Screen.size.area, 4)
 		
-
 	
 	function EndFrame (|&SDL_Texture| T)
-		t.UnlockThatCopiesEvenThoughItShouldnt // seems like we are double doing this?
 		|SDL_Rect| dstrect
 		SDL_GL_GetDrawableSize( .screenwindow!,  &dstrect.w,  &dstrect.h )
+		t.UnlockThatCopiesEvenThoughItShouldnt
+		// SDL_UpdateTexture(T, nil, &pixels, w*h*4);
 		SDL_RenderCopy(.renderer!, T, nil, &dstrect)
 		SDL_RenderPresent(.renderer!)
 
@@ -1217,3 +1252,13 @@ datatype SDLActivity (byte)
 
 function Duration.syntaxcall (|float|)
 	return gui.loop(self)
+
+// CVDisplayLink could be used to make vsyncing possible? Its a lot of per-platform work though.
+// Linux/Win have their own alternatives.
+
+
+
+
+|FPSCounter| DrawStartCounter
+|FPSCounter| DrawEndCounter
+|FPSCounter| EventCounter
