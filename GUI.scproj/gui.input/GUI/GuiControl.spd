@@ -230,8 +230,8 @@ class GUIControl (list)
 //			if Amount < 0
 //				beep 
 		Amount = amount.abs
-		if gui.DrawForce < amount
-			gui.DrawForce = amount
+		if gui.TouchCount < amount
+			gui.TouchCount = amount
 
 	helper ScrollDrawTimer (|uint| value, |bool|)
 		if ._ScrollDrawTimer != value

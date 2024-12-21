@@ -165,3 +165,34 @@ datatype Duration (date)
 		// are these bad? remove them??
 		cpp_Part CastFloat
 		return .Float	
+		
+		
+		
+struct FPSCounter
+	|date|   Next
+	|int|  Amount
+
+	function Count (|string| name="")
+		.Amount++
+		|| now = date.now
+		require now >= .Next
+
+		now += 1s
+		if .Next
+			|| durr = now - .next
+			|| rate = .Amount|float| / durr.Float
+			|| fs = FastString()
+			fs <~ name
+			fs <~ " fps = "
+			fs.AppendFloat(rate)
+			fs <~ " : "
+			fs <~ .amount
+			.Amount = 1
+			|| s = fs.GetResult
+			log s
+			printline s
+		.next = now
+		
+
+
+
