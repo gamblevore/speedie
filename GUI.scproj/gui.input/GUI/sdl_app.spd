@@ -682,47 +682,34 @@ module GUI
 		SpdProcess.CheckAllAlive
 		
 		|| occured = .PreFrame
-//		|| X = 0
-//		if occured and !X and .IsBackground
-//			X = 1
-//			log "A"
-//			beep 
 		.ClearAlerts
 		.CheckKeyMods
 		.HandleAppResize
 		.PostLoads
 		occured |= .FrameAndEvents
-//		if occured and !X and .IsBackground
-//			X = 2
-//			log "B"
-//			beep 
 		occured |= .DrawForce!=0
-//		if occured and !X and .IsBackground
-//			X = 3
-//			log "C"
-//			beep 
 		require Occured isnt ExitOrTerminate
 			
 		.WindowFrameSteps
 		.PutDialogsInFront
 
-		// if this is too slow... we can do everything, except drawing.
+		// also needs to ALWAYS draw after a skip has finished
+		// AND needs to NOT draw too fast! even if we have a gui-touch.
+		// perhaps we can temporaily decraese the framelength? then slowly increase?
+		// and remove the frameskip?
+		if .DrawForce // happens during .WindowFrameSteps
+			.DrawForce--
+			occured |= sdlactivity.activity
+
 		|| Skip = .DrawSkips
 			.DrawSkips = (.DrawSkips|int| min 4) - 1
-		  else
-			if .DrawForce // happens during .WindowFrameSteps
-				.DrawForce--
-				occured |= sdlactivity.activity
-//				if occured and !X and .IsBackground
-//					X = 4
-//					log "D"
-//					beep 
-			if occured is activity
-				.DrawFrame
+		  elseif occured is activity
+			.DrawFrame
 		
 		|| durr = date.now - .FrameStart
 		if durr >= .DrawFrameLength
-			.DrawSkips = durr / .DrawFrameLength
+			if .DrawSkips == 0
+				.DrawSkips = durr / .DrawFrameLength
 		  else
 			.DoNapTime(durr)
 		
