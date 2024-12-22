@@ -30,6 +30,7 @@ module GUI
 
 	|date|						BlurBackgroundStart
 	|float|						Scale
+	|bool|						MouseMoveInited
 	|bool|						StartedProperly
 	|bool|						IsBackground
 	|bool|						FlashSelector
@@ -1002,7 +1003,7 @@ module GUI
 			return w.DoListViewNext(b.button == 4)|int| // assumes SDLActivity.activity == 1
 	
 		if t is MOUSEDOWN
-			return .mousedownevent(w, b)
+			return .MouseDownEvent(w, b)
 
 		if t is MULTIGESTURE
 			require !.IsBackground
@@ -1065,29 +1066,30 @@ module GUI
 
 
 	helper MouseMoveEvent (|?&SDL_MouseMotionEvent| ev, |window| w, |ivec2| XY, |int|)
-		// shouldn't occurr in background... unless we have a dragevent?
+		// shouldn't occur in background... unless we have a DragEvent?
 		|| OldXY = .CurrMouseXY
-		|| move = xy - OldXY
+		|ivec2| move
 		if ev
-			move = (ev.xrel, ev.yrel)
-		
-		require move
-		if .eventcount <= 4
-			return SDLActivity.Activity // or else we never get there
+			move = (ev.xrel, ev.yrel)		#require
+			.MouseMoveInited = true
+		  else
+			move = xy - OldXY				#require
+			if !.MouseMoveInited
+				return SDLActivity.Activity				// or else we never get there
 
 		|| MB = .MouseButtons
 		require MB or !.IsBackground
-	
-		if oldxy.x < 0
+		
+		if OldXY.x < 0
 			move = nil
 		.CurrMouseXY = xy
 		if !w.IsLiveAction
 			.ShowCursor
-		if .eventcount isa 8 // in case a window comes up or closes		
-			SDL_SetRelativeMouseMode(w.IsLiveAction) // don't do it every frame
+		if .EventCount isa 8							// in case a window comes up or closes		
+			SDL_SetRelativeMouseMode(w.IsLiveAction)	// don't do it every frame
 
-		if (.CanDrag >= mousedragging.Within) and (MB is left)
-			w.DoMouseDrag(xy, .CanDrag >= mousedragging.Beyond)
+		if (.CanDrag >= MouseDragging.Within) and (MB is left)
+			w.DoMouseDrag(xy, .CanDrag >= MouseDragging.Beyond)
 			return SDLActivity.activity
 		
 		|guicontrol--| PrevOver = w.MouseIsOver

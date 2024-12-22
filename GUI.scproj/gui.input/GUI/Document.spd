@@ -370,7 +370,8 @@ extend TextView
 			.ShowTypingplace(ty)
 
 		.GuessExpectsParse
-		.Clear(l.text, true)
+		self|guicontrol|.text = l.text
+//		.Clear(l.text, true)
 		if (reason == 0) and (ty.x1 > 0  and  d.scrollpos <= 0)
 			d.scrollpos = ty.x1
 		.TypingPlaceTry( ty, true, nil)

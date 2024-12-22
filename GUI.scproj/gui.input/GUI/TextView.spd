@@ -527,7 +527,7 @@ class TextView (GUIControl)
 		if mode is wantagoodview
 			back += before/2
 		|| lim = .MaxVisibleLines - back
-		if (i inrange lim) and (mode isnt wantagoodview)
+		if (i inrange (lim+1)) and (mode isnt wantagoodview)
 			return d
 		.StartLine(mode) = d.movecapped(-before) 
 		GUI.touch(self)
