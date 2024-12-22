@@ -519,18 +519,22 @@ class TextView (GUIControl)
 			.Doexplode(rz, 2.0)
 
 
-	helper ViewPos (|int| x, |int| before, |int| back, |TextViewJumpMode| Mode=0,   |TextViewLine|)
+	helper ViewPos (|int| x, |int| before, |int| back, |TextViewJumpMode| Mode=0, |TextViewLine|)
 		opt NoRefCounts
 		|| i	= 0
 		|| d	= .FindDrawInfo(x, i)
 		before = before.abs
 		if mode is wantagoodview
 			back += before/2
+		
 		|| lim = .MaxVisibleLines - back
-		if (i inrange (lim+1)) and (mode isnt wantagoodview)
-			return d
+		if mode isnt WantAGoodView
+			if i inrange (lim+1)
+				return d
+			|| vdiff = d.vline - ._Start.vline
+				before = (vdiff min lim) max 0
+			
 		.StartLine(mode) = d.movecapped(-before) 
-		GUI.touch(self)
 		return d
 
 
@@ -548,12 +552,12 @@ class TextView (GUIControl)
 				.bumpscroll
 		
 		
-	function Jump (|int| x, |int| Before=0, |bool|)
+	function MoveSelection (|int| x, |int| Before=0, |bool|)
 		// views X, and sets new typing place.
 		opt norefcounts		
 		|| t = ._typingplace
 		x = .Clamp(x)
-		|| d = .ViewPos(x, before, 2) // idk
+		|| d = .ViewPos(x, before, 1) // idk
 			
 		if keys.shift
 			t.x2 = x
@@ -590,11 +594,11 @@ class TextView (GUIControl)
 
 		if !page and Keys.Cmd
 			._PreferPrevLine = i < 0
-			.jump(x)
+			.MoveSelection(x)
 			._PreferPrevLine = i < 0
 			return true
 
-		.jump(bs.x)
+		.MoveSelection(bs.x)
 		._PreferPrevLine = bs.x2
 		return true
 	
@@ -669,8 +673,8 @@ class TextView (GUIControl)
 		if key is pagedown:			return .MoveSelLine( 1, 1)
 		if key is up:				return .MoveSelLine(-1, 0)
 		if key is down:				return .MoveSelLine( 1, 0)
-		if key is home:				return .jump(0)
-		if key is end:				return .jump(.text.length)
+		if key is home:				return .MoveSelection(0)
+		if key is end:				return .MoveSelection(.text.length)
 
 		if (key iscmd keys.c or keys.x) or (key is copy or cut)		// copy
 			return .DoCopy
@@ -945,7 +949,7 @@ class TextView (GUIControl)
 	
 	
 	helper ErrorJump (|int| pos)
-		.jump(pos, .MaxVisibleLines/2)
+		.MoveSelection(pos, .MaxVisibleLines/2)
 	
 	
 	function ErrorAt (|error| err)
@@ -1789,6 +1793,7 @@ class TextView (GUIControl)
 			|| doc = .document
 				doc.scrollpos = d.position
 			.ShowExtraInfo(GUI.mousexy, false)
+			GUI.touch(self)
 			
 	
 	helper Clear (|string| NewText, |bool| KeepStart=false, |bool|)
