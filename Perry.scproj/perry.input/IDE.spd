@@ -464,15 +464,14 @@ class PerryIDE (Window)
 		.ReadLog
 		.PopupDisplayFadeIn
 		
-		|| fc = GUI.FrameCount|int|
 		require .IsFront
-		if fc+1 isa 64
+		if .CurrFrameNum == 1
 			require !.ProjClosed
 			
 		if .UpdateMem 
 			.ShowLeftStats
 		
-		if fc isa 32
+		if .CurrFrameNum == 1
 			.CheckModified
 		
 		if GUIActive and !.DebugArgsList.HasFocus

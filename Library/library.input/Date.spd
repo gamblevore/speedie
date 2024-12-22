@@ -6,8 +6,6 @@
 
 datatype Date (int64)
 	// one second is 64K (64*1024)
-//	syntax cast (|bool|)
-//		return self|bool|
 
 	constants
 		Highest = 0x7FFFffffFFFFffff_
@@ -24,7 +22,6 @@ datatype Date (int64)
 	syntax cast (|Float64|)
 		cpp_Part CastDouble
 		return .Float64
-	
 	
 	function Seconds (|float|)
 		disabled "Use .float or .float64"
@@ -137,6 +134,7 @@ datatype Date (int64)
 			return .now.timeID
 			
 		function Ticks (|int64|)
+			description "64 ticks per second, not 60." 
 			return (.now>>10) //64KB-->64
 
 		function Now (|Date|)

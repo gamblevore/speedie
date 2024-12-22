@@ -2,12 +2,10 @@
 import "GUI"
 
 main
-	return Breakout().RunAsMain(2.0)
+	return Breakout().RunAsMain(2.0, 60)
 
-// wierd bug with evreything being hit.
-// remove explosions after a while, (make them explode)
-	// why do they disappear SOMEtIMES?
-	// block nudge... for vibration on hit
+
+// block nudge... for vibration on hit
 
 
 
@@ -15,11 +13,13 @@ class Breakout (Window)
 	|fpstextview|		FPS
 	|[vobject]|			Blocks
 	|vobject|			Bar
+	|date|				StartDate
 	|raytracer|			T
 	|[vobject]|			Balls
 	|[vobject]|			Explosions
 	|float|				BallSpeed
 	|int|				Hits
+	|int|				FrameCount
 	|[vobject]|			Spirals
 
 	constructor
@@ -108,20 +108,21 @@ class Breakout (Window)
 			if !pu
 				0 //
 			  elseif pu <= 2
-				|| b2 = .addballs(cn)
-				|| old = .Blocks.now!
-				b2.towards(old.pos, .BallSpeed)
+				if .Balls < 4
+					|| b2 = .addballs(cn)
+					|| old = .Blocks.now!
+					b2.towards(old.pos, .BallSpeed)
 			  elseif pu <= 5
 				|| b2 = vobject.sphere(ball.pos.xy_, (1+(pu-3))|float|*0.3)
 				b2.Color = colors.Red // 
 				.Explosions <~ b2
 			  elseif pu <= 7
 				ball.Radius += 16th
+				ball.radius = ball.radius min vec3(0.5)
 			  elseif pu == 8
-				|| b = (.Bar.radius.x + 8th) min 2.5
+				|| b = (.Bar.radius.x + 8th) min 2.0
 				.bar.radius.x = b
 		return hp <= 0
-// guidable flurry aura
 		
 	
 	function PowerUp (|float| n, |int|)
@@ -142,7 +143,11 @@ class Breakout (Window)
 	
 	
 	behaviour FrameStep
+		if !.FrameCount
+			.StartDate = gui.FrameStart
+		.FrameCount++
 		require GUIActive
+		// we want to draw the framecount... and the total number of seconds we have run...
 		|| MinSp = .BallSpeed/4
 		for (b.backwards in .explosions) (i)
 			b.Radius -= 0.03
@@ -178,14 +183,13 @@ class Breakout (Window)
 			if s.Radius.x < 0
 				.Spirals.Remove(i)
 		gui.Touch
-		.fps.update
 	
 	
 	behaviour Drawbackground
+		.fps.update
 		for x in .Width
 			|| Col = Colors.rainbow(x div .width, 1, 0.5)
 			where.DrawLineV((x,0), .height, col)
-		
 		
 		for b in .Blocks
 			|| H = (1.0-b.health)*12th
@@ -201,6 +205,12 @@ class Breakout (Window)
 		for (s in .Spirals) (i)
 			|| B = s.Screen
 			where.DrawSpiral(0.01*b.width|float|*vobject.drawscale, L, b.center, s.color, (3s+i*1s)())
+		.LiveActionFPS
+
+// drift seems low for now... we can fully stabilise it later...
+//		|| drift = (.framecount div .LiveActionFPS) - .startdate.guiago.float
+//		where.DrawText("drift: $drift", (8, where.height-40))
+
 
 
 function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| Col, |float| Pulse)

@@ -9,7 +9,6 @@ class TextView (GUIControl)
 	|bool| 						ShowLineNumbers
 	|bool|						CanSeeAllLines
 	|bool|						GroupSaveAll
-//	|bool| 						FastAppend
 	|bool|						PreferStayAtEnd
 	|byte|						SetsDebugLines
 	|byte|						LineNumWidth
@@ -300,6 +299,7 @@ class TextView (GUIControl)
 			.CanAutoComplete = 0
 			.autocompletestring = ""
 		._UncorrectedSel = result
+		gui.touch
 		return true
 
 	helper TypingPlaceTry (|IntRange| result, |bool| insert, |textviewline| d)
@@ -519,6 +519,14 @@ class TextView (GUIControl)
 			.Doexplode(rz, 2.0)
 
 
+	helper InRange (|int| pos, |bool|)
+		opt norefcounts
+		|| d = ._Start
+		require pos >= d.Position
+		|| d2 = d.movecapped(.MaxPartialVisibleLines)
+		return pos < d2.After
+	
+	
 	helper ViewPos (|int| x, |int| before, |int| back, |TextViewJumpMode| Mode=0, |TextViewLine|)
 		opt NoRefCounts
 		|| i	= 0
@@ -1686,8 +1694,14 @@ class TextView (GUIControl)
 		return c max 16
 
 
-	function MaxVisibleLines (|int|)	
-		return (.height / .lineheight|int|)
+	function MaxPartialVisibleLines (|int|)
+		|| h = .height
+		h += .LineHeight-3
+		return .height / .lineheight|int|
+	
+	function MaxVisibleLines (|int|)
+		|| h = .height
+		return .height / .lineheight|int|
 	
 	
 	behaviour MouseMove
@@ -1796,36 +1810,25 @@ class TextView (GUIControl)
 			GUI.touch(self)
 			
 	
-	helper Clear (|string| NewText, |bool| KeepStart=false, |bool|)
-		if super.textset(NewText)
-			.ClearSub(keepstart)
-			return true
-		if !._lines.hasany // in case we need to anyhow... usually for ""
-			.ClearSub(keepstart)
+	helper Clear (|string| NewText, |bool|)
+		rz = super.textset(NewText)
+		require rz or !._lines.hasany
 
-
-	helper ClearSub (|bool| NotYetFinished)
-		// why is newtext unused? ;_;
-		if !NotYetFinished
-			|| sel = (.text.length, 0)(.SingleLine) 
-			.TypingPlaceDirect((sel,sel))
+		|| sel = (.text.length, 0)(.SingleLine) 
+		.TypingPlaceDirect((sel,sel))
 		
 		.ScrollDrawTimer(0)
 		.TextAlteredForDraw |= 2	// This might not clear text?
 
-		//require !NotYetFinished	// Shouldn't these be done anyway?
-		._Start = ._lines			// right? just pass NotYetFinished to ReallySetStart
-		._lines.clear				// so it doesnt ruin the doc position
+		._Start = ._lines
+		._lines.clear
 
 		|| d = textviewline()
 		._lines <~ d
 		.ClearReclaim
 		d.tline = 1
 		d.position = -1
-		if NotYetFinished
-			._Start = d
-		  else
-			.ReallySetStart(D)
+		.ReallySetStart(D)
 
 
 	helper NextVline (|TextViewLine| place, |TextViewLine| curr, |int| p, |TextViewLine|)

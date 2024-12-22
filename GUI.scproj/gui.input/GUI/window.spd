@@ -4,19 +4,15 @@ class Window (GUIControl)
 	linkage
 		cpp_part Win
 	|bool|								FocusWasSet
-	|bool| 								IsLiveAction
+	|byte| 								LiveActionFPS
 	|bool|								IsDialog
 	|bool|								IsMainWindow
-	|byte|								_FlashSelf
-	|bool|								_BlockRecurseKeyDown
 	|GUIControl?|						Focus
 	|Guicontrol?|						InnerFocus
 	|GUIControl?|						CurrMouseDown
-	|GuiControl?|						SelBeforeMouseDown
 	|guicontrol?|						ToolTipControl
 	|guicontrol?|						DroppingInto
 	|guicontrol?|						MouseIsOver
-	|guicontrol?|						FocusAttempt
 	|guicontrol?|						InnerLostFocus
 	|InlineEditor|						InlineEditorPlace
 	|GUIMouseMoveEvent?|				OnMouseMove
@@ -26,10 +22,14 @@ class Window (GUIControl)
 	|date|								CreatedDate
 
 	visible false
-
+	|guicontrol?|						FocusAttempt
 	|float|								BlockScale
 	|vec2|								BlockMove
 	|byte|								BlockMode
+	|byte| 								CurrFrameNum
+	|byte|								_FlashSelf
+	|bool|								_BlockRecurseKeyDown
+	|GuiControl?|						SelBeforeMouseDown
 	
 	
 	constructor
@@ -103,10 +103,10 @@ class Window (GUIControl)
 	function SetMenu (|menu| m)
 		disabled "use openedmenu"
 
-	function RunAsMain (|float| Scaling = 1.0, |bool| LiveAction=false, |ErrorInt|)
+	function RunAsMain (|float| Scaling = 1.0, |int| LiveActionFPS=0, |ErrorInt|)
 		.show
 		.IsMainWindow = true
-		.IsLiveAction = LiveAction
+		.LiveActionFPS = LiveActionFPS
 		if gui.init(scaling)
 			gui.NukeCursor
 			.BlockScale ?= 20

@@ -10,7 +10,12 @@ module font
 		Height = 9 
 
 
-function image.DrawText (|string| Str, |image| Where, |ivec2| xy=(0,0), |vec4| Col = colors.clear, |bool| DrawInvis=false, |int|)
+function image.DrawText (|string| Str, |ivec2| xy, |vec4| Col = colors.clear, |bool| DrawInvis=false, |int|)
+	opt norefcounts
+	|| sf = font.small
+		return sf.DrawFont(str, xy, col, drawinvis, self)
+		
+function image.DrawFont (|string| Str, |ivec2| xy, |vec4| Col, |bool| DrawInvis, |image| Where, |int|)
 	opt min 3
 	require (str and Where.Pixels and .Pixels)
 	for c.codepoints in str
@@ -26,7 +31,7 @@ function image.DrawTextWrap (|string| Str, |image| Where, |ivec2| xy, |vec4| Col
 	opt min 3
 	|| lines = (H / 12) max 1
 	if lines <= 1
-		.DrawText(str, where, xy, col)
+		.Drawfont(str, xy, col, false, where)
 		return
 		
 	|| i	= 0
@@ -35,7 +40,7 @@ function image.DrawTextWrap (|string| Str, |image| Where, |ivec2| xy, |vec4| Col
 		|| p = i
 		i = str.wrapsub(mw, false, p)
 		|| ttt = str[p, i]
-		.DrawText(ttt, where, xy, col)
+		.DrawFont(ttt, xy, col, false, where)
 		xy.y -= 12
 		lines--
 

@@ -11,19 +11,17 @@ import "GUI"
 
 main
 	gui.init(3)
-	return RayScene().RunAsMain(True)
+	return RayScene().RunAsMain(60)
 
 
 
 class RayScene (window)
-	|date| 			LastDraw
 	|raytracer|		T
-	|textview| 		FPS
-	|date| 			LastFPSChange
+	|fpstextview| 	FPS
 
 	constructor
 		.t = RayTracer((1.6, 5.0, -22.0))
-		.FPS = TextView(self)
+		.FPS = fpstextview(self)
 		.fps.MakeInline
 		
 		|| L = 10.0
@@ -37,16 +35,6 @@ class RayScene (window)
 			.T.shapes <~ vobject.sphere(sh+( 12.0, 3.0, 24.0), 4, C)
 
 
-	function PrepareDraw
-		|| Ago = .LastDraw.ago
-		.LastDraw = date.now
-		.LastFPSChange ?= .LastDraw
-		if .LastFPSChange.ago > 0.5s
-			|| fps = (1.0/ago.Float).Render(1) + "fps"
-			.fps.text = fps
-			.LastFPSChange = .LastDraw
-		
-		
 	behaviour MouseMove
 		.t.pitch -= move.y|float| * 0.0001
 		.t.spin += Move.x|float| * 0.0005
@@ -54,7 +42,7 @@ class RayScene (window)
 	
 	behaviour Drawbackground
 		opt norefcounts
-		.PrepareDraw
+		.fps.Update
 		.T.RayTrace(where)
 		gui.Touch
 	

@@ -102,15 +102,6 @@ role ListViewRow (message)
 			super.remove
 
 
-	function ChangeSel (|bool| Newstate, |int|)
-		if NewState == (self is selected)
-			return 0
-		if NewState and (Self is disabled)
-			return 0
-		(self is selected) = newstate
-		return 1
-
-
 	function NextSelected (||)
 		opt norefcounts
 		|| f = .next

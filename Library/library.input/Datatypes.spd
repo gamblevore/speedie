@@ -529,6 +529,11 @@ datatype float
 	operator max (|float| other, |float|)
 		cpp_wrapper (fmaxf)
 
+	operator absmax (|float| other, |float|)
+		if .abs > other.abs
+			return self
+		return other
+
 	operator min (|float| other, |float|)
 		cpp_wrapper (fminf)
 

@@ -267,7 +267,7 @@ class ButtonView (GUIControl)
 		|| DrawInvis = (.align & listviewstate.DrawWhiteSpace)!=0
 		|| TextCol = colors.white
 		textcol.a = fader
-		pn.x = font.small!.DrawText(t,  Where,  Pn, TextCol, DrawInvis) + 2
+		pn.x = where.DrawText(t,  Pn, TextCol, DrawInvis) + 2
 		|| MI = MouseXInside and  (R.y1y2 contains M.y)
 			if  !disabled and .pressing  and  r.Width > 19  
 				(pn.x min= r.x2-2)
@@ -281,7 +281,7 @@ class ButtonView (GUIControl)
 				  elseif .MenuIsOpen
 					pn.y += 4
 //				where.noclip // hmmmm
-				font.small!.DrawText("\03", where, pn, TextCol, DrawInvis)
+				where.DrawText("\03", pn, TextCol, DrawInvis)
 		
 		
 	function ListViewRow.ButtonText (|string| Default, |string|)

@@ -4,7 +4,7 @@ class ProgressBar (GUIControl)
 	linkage
 		cpp_part Bar
 	|float|		Progress
-	|date|		LastDraw
+	|date|		NextUpdate
 	|bool|		Indefinite
 	|bool|		RandomStyle
 
@@ -14,11 +14,10 @@ class ProgressBar (GUIControl)
 		.indefinite = true
 
 	helper RandomData (|memory|)
-		if (GUI.FrameStart != .LastDraw)
-			.LastDraw = GUI.FrameStart
-			if gui.FrameCount isa 4
-				GUI.touch
-				RandomData.Temporal
+		if gui.FrameStart >= .NextUpdate
+			.NextUpdate = gui.FrameStart + 1s/16
+			GUI.touch
+			RandomData.Temporal
 		return RandomData
 		
 	behaviour Draw

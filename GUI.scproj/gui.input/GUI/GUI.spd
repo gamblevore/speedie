@@ -9,7 +9,6 @@ module GUI
 	|GUIPasteEvent|				AppDocumentOpen
 	|string|					LastSearch
 	|uint|						EventCount
-	|uint|						FrameCount
 
 	visible false
 	|SDL_Event|					Event
@@ -256,7 +255,6 @@ module GUI
 
 	
 	constants
-		EventFrameLength = 273 // 240th of a second
 		SDL_PIXELFORMAT_ARGB8888 = 372645892
 		SDL_PIXELFORMAT_RGBA8888 = 373694468
 		SDL_PIXELFORMAT_ABGR8888 = 376840196
@@ -368,6 +366,7 @@ module GUI
 			app.quit
 	
 	function NiceAppName (|string|)
+		opt norefcounts
 		with app.BuildConfig("selfname")
 			return it
 		with app.BuildConfig("name")
@@ -381,7 +380,7 @@ module GUI
 			disabled `Put "targets gui" in the app's conf section to use this!`
 		if .drawframelength
 			return true
-		.drawframelength = 60th.date
+		.drawframelength = 60th.date // could try changing this to 61th?
 
 		.GUICheck
 		pico.GlobalConfig.SuicideIfParentDies = false
@@ -449,8 +448,9 @@ module GUI
 			.MouseMoveEvent(nil, w, .MouseXY)
 	
 	
-	helper FrameAndEvents (|SDLActivity|) // frameevents
+	helper ActualEvents (|SDLActivity|) // frameevents
 		while .Event.Poll
+			.eventcount++
 			rz |= .CheckEvent(.event)
 			.Event.type = 0
 		if .NeedMouseMove
@@ -459,11 +459,7 @@ module GUI
 			rz = .StrongClose(Quitish) ||| SDLActivity.Activity 
 		.QuitReason = 0
 		if .NewSize
-			rz |= SDLActivity.activity
-
-		if rz is activity
-			.eventcount++
-			.framecount++
+			.TouchCount ?= 1
 	
 	
 	function DroppingInto (|guicontrol|)
@@ -478,7 +474,7 @@ module GUI
 		if !f and (w is editable)
 			AllowTyping = true	// allow type-through if the window is "editable". like to type secret codes in
 		if (f isa textview)
-			if (!f.SelRange.width)
+			if (!f.SelRange.width) and f.inrange(f.selrange.x)
 				GUI.TrySelectorFlash
 		
 		require .TextInputEnabled != AllowTyping
@@ -529,7 +525,7 @@ module GUI
 				window.all.first = w
 
 		
-	function PreFrame (|sdlactivity|)
+	helper PreFrame (|sdlactivity|)
 		opt norefcounts
 		if .FixScreenBug.Fired
 			.BumpSize
@@ -572,7 +568,7 @@ module GUI
 		|| x	= t.length*font.width
 		|| h	= font.height
 		|| P2	= (x, h)/2
-		font.small!.drawtext(t, img, P-P2, true)
+		img.drawtext(t, P-P2, true)
 
 
 	function DialogSorter (SorterComparerWindow)
@@ -593,6 +589,7 @@ module GUI
 		opt norefcounts
 		require .acontrolwasresized
 		.acontrolwasresized = false
+		.Touch
 		for w.fast in __modules__.window.all
 			w.reflow
 		for w.fast in notifications.Alerts
@@ -613,23 +610,16 @@ module GUI
 	
 	function StartDraw
 		opt norefcounts
-
-		// how to delay drawing?
-		// we actually want the draw to FINISH at a certain time!
-		// not start! So... we can start the draw always immediatly
-		// then finish when we think its a good time.
-		// of course, we don't redraw if theres already one redraw waiting.
-		// why not just draw right away?
-		// of course, we want to delay it, so we don't draw more than 60fps.
-		// its just enddraw that needs delaying, though!
-		|| w1 = .DrawWinFrom		#require
 		|| CanBlur = !app.prefs["noblur"]
 		
 		if !.DialogIsOpen
 			.BlurBackgroundStart = 0
 		
+		.TouchCount = 0
 		.DrawState = 2
 		.StartFrame(.Raw!)
+
+		|| w1 = .DrawWinFrom
 		while w1
 			if w1.IsViewable
 				if w1.IsDialog
@@ -640,11 +630,12 @@ module GUI
 		
 		notifications.Draw
 		.DoDrawDrag(window.front!)
-
+		if app.prefs["beep"]
+			beep // debug drawing!
 //		DrawStartCounter.Count("drawstart")
 
 
-	function BGBlurAmount (|float|)
+	helper BGBlurAmount (|float|)
 		.BlurBackgroundStart ?= gui.FrameStart
 		|| Scale = 7.0
 		|| ago = .BlurBackgroundStart.guiago.Float
@@ -654,24 +645,46 @@ module GUI
 		GUI.Touch
 
 
-	function WindowFrameSteps (|sdlactivity|)
-		opt norefcounts
-		notifications.CheckForDisappear		
-		.StartResize
-		|| Dlg = .DialogIsOpen
-		for w  in  window.all
-			w.RunMyTasks(false)
-			w.FixFocus
-			if !dlg or w.IsLiveAction // stop needless updates
-				w.__FrameStep__(!(dlg or w.OpenedMenu or .IsBackground))
-		.StartResize
+	helper window.FrameStepsNeeded (|int|)
+		// quite close, but arkanoid3d still reports a low drift overtime
+		// not sure why? its not like I paused the program?
+		// is this a mathematical drift? adding 1 to the framenum adds a little too much?
+		|uint| F = gui.FrameStart & 0xFFFF
+		|| CurrFrame = .CurrFrameNum
+		|| FPS = .LiveActionFPS ?? 10
+		|| L = ((F*FPS) >> 16)+1
+		|| L2 = L + FPS*(L < CurrFrame)
+		if CurrFrame != L2
+			.CurrFrameNum = L
+			rz = L2 - CurrFrame
 		
-		window.all.sort(DialogSorter|sortercomparer|)
+		
+	helper window.DoFrameStep (|bool| ChangeOK)
+		.RunMyTasks(false)
+		.FixFocus
+		.__FrameStep__(ChangeOK and !.OpenedMenu)
+	
+	
+	helper WindowFrameSteps
+		opt norefcounts
+		|| ChangeOK = !(.DialogIsOpen or .IsBackground)
+		|| any = 0
+		for  w  in  window.all
+			if ChangeOK or w.LiveActionFPS // stop needless updates
+				|| n = w.FrameStepsNeeded
+				any |= n
+				for n
+					w.DoFrameStep(ChangeOK)		
+		if any
+			window.all.sort(DialogSorter|sortercomparer|)
+			.StartResize
 
-		if .TouchCount // happens during .WindowFrameSteps
-			.TouchCount--
-			rz = SDLActivity.activity		
-
+// ideally we remove the whole concept of sorting windows
+// there is just one window... the main window.
+// it might have subwindows, though? games have invnetories and settings and stuff
+// maybe window.|[window]| SubWindows makes sense for games? kinda?
+// settings would just be a dialog window.
+// who knows? Also dialogs and the confirm window exist...
 
 	function Cycle (|duration| length, |Duration| Adjust=0, |float|)
 		opt inline
@@ -684,72 +697,71 @@ module GUI
 
 	
 	helper SingleFrame (|bool|)
+		if .SingleFrameNest <= 2
+			.SingleFrameNest++
+			rz = .SingleFrameSub
+			.SingleFrameNest--
+	
+	
+	helper SingleFrameSub (|bool|)
 		opt norefcounts
-		require .SingleFrameNest <= 2
-		.SingleFrameNest++
-		
-		|| occur = .HandleEvents
-		// we want to count evntes per second
-		// and draws too.
-		if occur isnt ExitOrTerminate
-			if occur is activity
-				.DrawState |= 1
-			if .DrawState == 1
-				.StartDraw
-			if .DrawState & 2
-				.EndDraw		// if its too early, we don't draw.
+		|| Now = .DelayEvents
+			.FrameStart = Now
+		|sdlactivity| occur = (.HandleEvents, 0)(Now or SDL_Event.HasAny)
+		require occur isnt ExitOrTerminate
+
+		.WindowFrameSteps
+		.DrawState |= (.TouchCount != 0)
+		if .DrawState == 1
+			.StartDraw
+		if .DrawState & 2
+			.EndDraw								// if its too early, we don't draw.
 			
-		.SingleFrameNest--
-		return occur isnt ExitOrTerminate
+		return true
 
 
 	helper EndDraw
+		// we could just draw immediately? but then delay the next drawstart?
+		// perhaps 1-frame faster reaction on screen?
 		|| d = date.now
 		|uint64| ago = d - .DrawFinish				// super dooper unsigned clock saver
 		|date| remain = .DrawFrameLength - ago
 		if remain > 0
-			if remain >= .EventFrameLength/2
+			if remain >= 128 // 512th of a second
 				return 
 			app.Sleep(remain)
-//		DrawEndCounter.Count("Drawend")
+//		DrawEndCounter.Count("DrawEnd")
 		.DrawState &= ~2
 		.DrawFinish = d
 		.EndFrame(.Raw!)
 
 
 	helper DelayEvents (|date|)
-		rz = date.now
-		|uint64| Ago = rz - .FrameStart				// unsigned, in case the clock goes backwards
-		|| L = .EventFrameLength
+		|| CanSleep = !SDL_Event.HasAny
+		|| L = 256 // 256th of a second
 		if .IsBackground and !.DroppingInto
 			l = .DrawFrameLength*9
 
+		rz = date.now
+		|uint64| Ago = rz - .FrameStart				// unsigned, in case the clock goes backwards
 		|date| Remain = L - ago
 		if Remain > 0
-			if Remain > 1
-				app.Sleep(Remain-1)
+			if CanSleep
+				app.Sleep(Remain)
 			return 0
-		
-//		if !sdl_event.HasAny
-//			app.Sleep(.EventFrameLength/2)
-//			return 0
 	
 	
 	helper HandleEvents (|SDLActivity|)
-		|| d = .DelayEvents()				#require
-//		EventCounter.Count("events")
-		.FrameStart = d
-		SpdProcess.CheckAllAlive
-		
-		rz = .PreFrame
-		.ClearAlerts
 		.CheckKeyMods
+		.StartResize
+		SpdProcess.CheckAllAlive
+		rz = .PreFrame
+
+		.ClearAlerts
 		.HandleAppResize
 		.PostLoads
-		rz |= .FrameAndEvents
-		rz |= .TouchCount!=0
-		if rz isnt ExitOrTerminate
-			rz |= .WindowFrameSteps
+		rz |= .ActualEvents
+		notifications.CheckForDisappear
 
 
 	helper CheckQuarantine
@@ -1083,10 +1095,10 @@ module GUI
 		if OldXY.x < 0
 			move = nil
 		.CurrMouseXY = xy
-		if !w.IsLiveAction
+		if !w.LiveActionFPS
 			.ShowCursor
-		if .EventCount isa 8							// in case a window comes up or closes		
-			SDL_SetRelativeMouseMode(w.IsLiveAction)	// don't do it every frame
+		if .EventCount isa 8								// in case a window comes up or closes		
+			SDL_SetRelativeMouseMode(w.LiveActionFPS > 0)	// don't do it every frame
 
 		if (.CanDrag >= MouseDragging.Within) and (MB is left)
 			w.DoMouseDrag(xy, .CanDrag >= MouseDragging.Beyond)

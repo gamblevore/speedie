@@ -100,12 +100,6 @@ class ListView (GUIControl) {
 		return true
 
 
-//	function ViewableRowCount (|int|)
-//		opt norefcounts
-//		for r.all in self
-//			rz++
-
-
 	function DistTo (|ListViewRow| a, |ivec2|)
 		opt norefcounts
 		for r.all in self
@@ -185,7 +179,7 @@ class ListView (GUIControl) {
 	
 	function TextWidth (|int|)
 		opt norefcounts
-		for row.viewable in self
+		for row.all in self
 			rz = rz max row.__text__.bounds.x
 		rz *= font.width
 	
@@ -269,6 +263,25 @@ class ListView (GUIControl) {
 		.DraggingRowTo	= .replaced(r, .DraggingRowTo)
 		.DraggingRowFrom= .replaced(r, .DraggingRowFrom)
 	
+
+	helper ChangeSel (|listviewrow| row, |bool| Newstate, |int|)
+		if NewState == (row is selected)
+			return 0
+		if NewState and (row is disabled)
+			return 0
+		if .RowIsViewable(row)
+			gui.touch
+		(row is selected) = newstate
+		return 1
+
+
+	function RowIsViewable (|listviewrow| row, |bool|)
+		opt norefcounts
+		require .isviewable
+		for s.Visible in self
+			if s == row
+				return true
+
 	
 	function RemoveRow (|ListViewrow| r, |bool| update=true)
 		.CheckRemoved(r)
@@ -279,7 +292,7 @@ class ListView (GUIControl) {
 		r|list|.remove
 		
 		if willsel
-			willsel.ChangeSel(true)
+			.ChangeSel(willsel,true)
 			.SelectedEvent( willsel )
 
 		GUI.touch(self)
@@ -954,7 +967,7 @@ class ListView (GUIControl) {
 		|| n		= i.abs + 1
 		for n
 			if (l isnt disabled)
-				modified += l.ChangeSel(true)
+				modified += .ChangeSel(l, true)
 			 l = .hierstep(l, i > 0)#loop
 
 		if modified
@@ -992,7 +1005,7 @@ class ListView (GUIControl) {
 			return .Select(m)
 		
 		if .multiselection and multi
-			if m.ChangeSel(state)
+			if .ChangeSel(m, state)
 				.SelectedEvent(m)
 		  else
 			.Select(m)
@@ -1020,7 +1033,7 @@ class ListView (GUIControl) {
 		.ExpandParents(s)
 		|| Modified = 0
 		for r.all in self
-			modified += r.ChangeSel(r == s)
+			modified += .ChangeSel(r, r == s)
 		
 		if modified or .AlwaysSendChangeEvent or mode is SendEvent
 			.SelectedEvent(s, mode)
@@ -1188,6 +1201,7 @@ class ListView (GUIControl) {
 	
 	
 	function LastVisible (|ListViewrow|)
+		opt norefcounts
 		for r.visible in self
 			rz = r
 
@@ -1452,12 +1466,6 @@ class ListView (GUIControl) {
 			yield f
 			f = f.nextselected
 
-
-	iterator Viewable
-		|| F = .start
-		while f
-			yield f
-			f = .Hiernext(f)
 
 	iterator Visible
 		.fixscroll

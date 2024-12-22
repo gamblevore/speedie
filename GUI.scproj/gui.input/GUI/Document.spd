@@ -351,7 +351,7 @@ extend TextView
 		u.current = m
 		
 		if .text != m.text
-			.usestate(m, u, pos, DocumentState.UndoOrRedo)
+			.UseState(m, u, pos, DocumentState.UndoOrRedo)
 
 
 	function UpdateModState (|document| D, |int| reason)
@@ -370,17 +370,16 @@ extend TextView
 			.ShowTypingplace(ty)
 
 		.GuessExpectsParse
-		self|guicontrol|.text = l.text
-//		.Clear(l.text, true)
-		if (reason == 0) and (ty.x1 > 0  and  d.scrollpos <= 0)
-			d.scrollpos = ty.x1
-		.TypingPlaceTry( ty, true, nil)
-
-		.GuessExpectsParse
-		if reason != DocumentState.typing 
-			.PrepareLinesOfText // Clear seems to be calling PrepareLinesOfText anyhow (Sometimes?)
-								// Please fix?? seems better to call it after.
-			.scrollpos = d.ScrollPos
+		if l.text
+			self|guicontrol|.text = l.text
+			if (reason == 0) and (ty.x1 > 0  and  d.scrollpos <= 0)
+				d.scrollpos = ty.x1
+			.TypingPlaceTry( ty, true, nil)
+			if reason != DocumentState.typing and DocumentState.UndoOrRedo
+				.PrepareLinesOfText
+				.scrollpos = d.ScrollPos
+		  else	
+			.Clear(l.text)		
 		
 		.UpdateModState(d, reason)
 	

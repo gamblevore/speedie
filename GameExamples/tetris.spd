@@ -2,7 +2,6 @@
 import "GUI"
 
 // todo:
-// framestep happening much faster now? and too fast? we want them to happen more stably...
 // ghost block should be a temporay powerup! its makes the game too easy.	
 // pink cloudy blocks with cute faces? and hearts/rainbows/stars as they disappear
 	// Clouds via overlapping volumetric spheres and edge detection post-processing
@@ -10,8 +9,16 @@ import "GUI"
 		// maybe speed the game up over time? then add it.
 	// frilly frames?
 
+
+// keys are buggered RN! we need a "keys" redesign
+// previously, it assumed we call .movement from framestep...
+// we should keep that. keys DOWN are OK, but what about key up?
+// if the key goes down and up... before the frame starts...
+// we should allow that? within .movement! 
+
+
 main
-	return TetrisWin().RunAsMain
+	return TetrisWin().RunAsMain(1.0, 60)
 
 
 datatype Tetronimo (uint64)
@@ -96,7 +103,7 @@ class TetrisWin (Window)
 			.grid.State = 2
 		if keys.SPACE or Keys.RETURN
 			.Grid.Restart		
-	
+
 	
 	behaviour FrameStep
 		require GUIActive
@@ -160,6 +167,7 @@ class Tetris (GridSection)
 				self[10()+1, y][] = 0
 		.NextShape()
 
+
 	syntax Access (|int| x, |int| y, |&Tetronimo|)
 		return .at(x + y*16)
 			
@@ -188,13 +196,16 @@ class Tetris (GridSection)
 		.move(-16)
 		return true
 
+
 	function SomethingIsBeneath (|bool|)
 		rz = .MoveIsBlocked(-16, Tetronimo.real)
 		.fail
+
 		
 	function HandleInput
 		|| f = (.framerate max 40)|float|*2048th
-		|| M = keys.Movement((3.0*f, 1.0*f, 3.0*f, 13.0*f))
+		|| M = (3.0, 1.0, 3.0, 13.0)*f
+		M = keys.Movement(M)
 		|| w = m.w
 		if w or m.z > 0
 			.rotate(w)

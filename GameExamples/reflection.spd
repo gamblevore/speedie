@@ -3,7 +3,7 @@ import "GUI"
 
 main
 	beep $"Hello"
-	return Breakout().RunAsMain(2.0)
+	return Breakout().RunAsMain(2.0, 60)
 
 // wierd bug with evreything being hit.
 // remove explosions after a while, (make them explode)
@@ -106,17 +106,19 @@ class Breakout (Window)
 			if !pu
 				0 //
 			  elseif pu <= 2
-				|| b2 = .addballs(cn)
-				|| old = .Blocks.now!
-				b2.towards(old.pos, .BallSpeed)
+				if .balls < 4
+					|| b2 = .addballs(cn)
+					|| old = .Blocks.now!
+					b2.towards(old.pos, .BallSpeed)
 			  elseif pu <= 5
 				|| b2 = vobject(ball.pos.xy, vec2(1+(pu-3))*0.3)
 				b2.Color = colors.Red // 
 				.Explosions <~ b2
 			  elseif pu <= 7
 				ball.Radius += 16th
+				ball.radius = ball.radius min vec3(0.5)
 			  elseif pu == 8
-				|| b = (.Bar.radius.x + 8th) min 2.5
+				|| b = (.Bar.radius.x + 8th) min 2.0
 				.bar.radius.x = b
 		return hp <= 0
 // guidable flurry aura
