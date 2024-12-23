@@ -152,6 +152,20 @@ class Breakout (Window)
 				return 
 	
 	
+	function MoveBar (|float| x)
+		require x
+		.bar.Pos.x += x
+		|| bl = .bar.left
+		if bl < 0
+			.bar.pos.x -= bl
+		bl = .bar.right
+		if bl > 20.0
+			.bar.pos.x -= (bl-20.0)
+
+	behaviour mousemove
+		.movebar(move.x|float|*0.02)
+//		.bar.Pos.x += keys.Movement.x.sign * 0.2
+		
 	behaviour FrameStep
 		if !.FrameCount
 			.StartDate = gui.FrameStart
@@ -180,13 +194,7 @@ class Breakout (Window)
 					.reset( "You failed")
 					exit
 		
-		.bar.Pos.x += keys.Movement.x.sign * 0.2
-		|| bl = .bar.left
-		if bl < 0
-			.bar.pos.x -= bl
-		bl = .bar.right
-		if bl > 20.0
-			.bar.pos.x -= (bl-20.0)
+		.movebar keys.Movement.x.sign * 0.2
 		
 		for (s.backwards in .Spirals) (i)
 			s.Radius -= 0.03

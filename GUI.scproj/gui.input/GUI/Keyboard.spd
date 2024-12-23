@@ -745,7 +745,7 @@ dataType Keys (int)
 struct GUIKeyRecord
 	|date| Date
 	|keys| Key
-	|byte| State
+	|int| State
 	
 	constants
 		Empty		= 0
@@ -753,8 +753,6 @@ struct GUIKeyRecord
 		ToAdd		= 2
 		NewlyAdded	= 3
 		Stable		= 4
-
-
 
 
 
