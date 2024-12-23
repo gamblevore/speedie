@@ -324,26 +324,26 @@ class ButtonView (GUIControl)
 
 			
 	function SearchMenu (|listviewrow| row=nil, |bool|)
-		|| sub = .openmenu(row)
+		|| sub = .OpenMenu(row)
 			sub.IsSearchMenu = true
-			//SlideMenuOpen(self, gui.FrameStart, 0.5s)
+			// SlideMenuOpen(self, gui.FrameStart, 0.5s)
 			return sub.typedstring("")
 
 
 	function MenuIsOpen (|bool|)
 		opt norefcounts
-		return .SubControl isa menu and .subcontrol is visible
+		return  .SubControl isa menu  and  .subcontrol is visible
 
 
 	function OpenMenu (|listviewrow| row=nil, |menu|)
 		|| m = .submenu						#require
-		expect m.listsource.hasany (beep)
+		expect m.ListSource.HasAny (beep)
 		|| w = .window
 		if w and .MouseIsDown
 			w.CurrMouseDown = m // right?
 		|| x = .XOfItem(row)
-		if !m.issearchmenu
-			m.stopfilter
+		if !m.IsSearchMenu
+			m.StopFilter
 		m.ShowCmm(self, 0, x)
 		return m
 

@@ -2,7 +2,6 @@
 import "GUI"
 
 // todo:
-// ghost block should be a temporay powerup! its makes the game too easy.	
 // pink cloudy blocks with cute faces? and hearts/rainbows/stars as they disappear
 	// Clouds via overlapping volumetric spheres and edge detection post-processing
 	// the ghost block kinda spoils the fun a bit... you end up staring at the bottom all the time.
@@ -10,15 +9,9 @@ import "GUI"
 	// frilly frames?
 
 
-// keys are buggered RN! we need a "keys" redesign
-// previously, it assumed we call .movement from framestep...
-// we should keep that. keys DOWN are OK, but what about key up?
-// if the key goes down and up... before the frame starts...
-// we should allow that? within .movement! 
-
 
 main
-	return TetrisWin().RunAsMain(1.0, 60)
+	return TetrisWin().RunAsMain(60)
 
 
 datatype Tetronimo (uint64)
@@ -101,7 +94,7 @@ class TetrisWin (Window)
 			.prefs["max"] = H
 			.prefs.save
 			.grid.State = 2
-		if keys.SPACE or Keys.RETURN
+		if keys.SPACE[] or Keys.RETURN[]
 			.Grid.Restart		
 
 	
@@ -210,12 +203,11 @@ class Tetris (GridSection)
 		if w or m.z > 0
 			.rotate(w)
 		|| x = m.x
-			.move(x.sign|int|)
+			.move(x.sign|int|)	
 		if (.FramesLeft <= 0) or (m.y > 0) or (m.z < 0)
 			.drop(m.y > 0)
 		  elseif .SomethingIsBeneath
 			.LockDelay--
-		
 		
 		(.Highest max= .Score)
 		.MakeGhost

@@ -209,6 +209,7 @@ class Memory
 
 	macro Next
 		(_0.ptr|&...|)[_0.NextIndex]
+	
 	macro SyntaxAccess
 		(_0.ptr|&...|)[_1]
 	

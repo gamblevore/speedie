@@ -105,7 +105,10 @@ function scdecl.MemAccess (|message| Access, |message| side,   |scdecl|)
 function scdecl.AccessToMemCpy (|message| exp, |message| side, |scdecl| type, |scdecl|)
 	opt norefcounts
 	
-	|| rel = exp.ancestor(@rel)    #expect    (rel, "AccessToMemCpy fail")
+	|| internal = type.internal
+	|| rel = exp.ancestor(@rel)
+	expect rel and internal    (rel, "AccessToMemCpy fail")
+	
 	|| F = rel.first!
 	rel.func = @func
 	|| Name = @thg + "memcpy"
@@ -120,7 +123,7 @@ function scdecl.AccessToMemCpy (|message| exp, |message| side, |scdecl| type, |s
 	  else
 		prms <~ prms.next
 	prms!.obj = compiler.XFunc(name.name)
-	|| msg = type.SizeOfQuery.msg
+	|| msg = internal.SizeOfQuery.msg
 	msg.obj = typeint!.typenormal
 	prms <~ msg
 	return Type
@@ -208,3 +211,22 @@ function SCDecl.MemAccessSub (|message| Exp, |message| side,  |scdecl|)
 */
 
 
+function ppppppoop
+	|GUIKeyRecord[4]| abc
+	abc[0] = abc[1] 
+
+struct GUIKeyRecord
+	|date| Date
+	|int| Key
+	|byte| State
+	
+	constants
+		Empty		= 0
+		ToRemove	= 1
+		ToAdd		= 2
+		NewlyAdded	= 3
+		Stable		= 4
+	
+	
+	
+	

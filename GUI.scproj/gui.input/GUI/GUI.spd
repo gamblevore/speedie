@@ -645,17 +645,23 @@ module GUI
 		GUI.Touch
 
 
-	helper window.FrameStepsNeeded (|int|)
+	helper window.FrameStepsNeeded (|bool| ChangeOK, |bool| Update, |int|)
+		require ChangeOK or .LiveActionFPS // stop needless updates
+
 		// quite close, but arkanoid3d still reports a low drift overtime
 		// not sure why? its not like I paused the program?
 		// is this a mathematical drift? adding 1 to the framenum adds a little too much?
+		// we just need a "nextwithinsecond" uint16... it has to add up properly...
 		|uint| F = gui.FrameStart & 0xFFFF
 		|| CurrFrame = .CurrFrameNum
-		|| FPS = .LiveActionFPS ?? 10
+		|| FPS = .LiveActionFPS|int| max 10
 		|| L = ((F*FPS) >> 16)+1
-		|| L2 = L + FPS*(L < CurrFrame)
+		|| L2 = L
+		if L < Currframe
+			L2++
 		if CurrFrame != L2
-			.CurrFrameNum = L
+			if update
+				.CurrFrameNum = L
 			rz = L2 - CurrFrame
 		
 		
@@ -667,15 +673,18 @@ module GUI
 	
 	helper WindowFrameSteps
 		opt norefcounts
+		|| wf = Window.all.last$
 		|| ChangeOK = !(.DialogIsOpen or .IsBackground)
-		|| any = 0
+		if wf.FrameStepsNeeded(changeOK, false)
+			keys.FlushKeys
+
+		|| Got = 0
 		for  w  in  window.all
-			if ChangeOK or w.LiveActionFPS // stop needless updates
-				|| n = w.FrameStepsNeeded
-				any |= n
-				for n
-					w.DoFrameStep(ChangeOK)		
-		if any
+			for w.FrameStepsNeeded(changeOK, true)
+				w.DoFrameStep(ChangeOK)
+				Got++
+
+		if Got
 			window.all.sort(DialogSorter|sortercomparer|)
 			.StartResize
 
@@ -1002,13 +1011,13 @@ module GUI
 			return .TextInputevent(ev, w)
 
 		if t is KEYDOWN
-			return .keydownevent(ev, w)
+			return .KeyDownEvent(ev, w)
 					
 		if t is KEYUP
-			return .keyupevent(ev)
+			return .KeyUpEvent(ev)
 
 		if t is MOUSEWHEEL
-			return .MousewheelEvent(ev,	w)
+			return .MouseWheelEvent(ev,	w)
 
 		|| b = ev.button
 		if (b.button >= 4) and (t is mousedown) // what about holding it?
@@ -1132,7 +1141,7 @@ module GUI
 
 
 	helper KeyUpEvent (|&SDL_Event| ev, |int|)
-		return keys.Removekey(ev.key.key)
+		keys.Removekey(ev.key.key), return sdlactivity.activity
 
 
 	helper MouseWheelEvent (|&SDL_Event| ev, |window| w,  |int|)
@@ -1231,7 +1240,7 @@ module GUI
 		|| w = r.window
 		require w and r and w.ToolTipControl != r
 		w.ToolTipControl = r
-		if  r.id  and  keys.Control  and  keys.LALT  and  keys.LGUI
+		if  r.id  and  keys.Control  and  keys.LALT[]  and  keys.LGUI[]
 			Notifications <~ r.ContainedName
 		
 		|| info = ""

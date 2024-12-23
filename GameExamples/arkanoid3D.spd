@@ -20,6 +20,7 @@ class Breakout (Window)
 	|float|				BallSpeed
 	|int|				Hits
 	|int|				FrameCount
+	|bool|				vsync
 	|[vobject]|			Spirals
 
 	constructor
@@ -29,6 +30,15 @@ class Breakout (Window)
 		.fps = fpstextview(self)
 		.fps.MakeInline()
 		.reset
+
+
+	behaviour keydown
+		if key is v
+			.vsync = !.vsync
+			app.say .vsync.render	// App seems to still have "unstable" frames? regardless
+									// We need to draw the "framegap" per frame to see if its stable.  
+			gui.vsync = .vsync
+
 
 	function AddBalls (|vec2| P, |vobject|)
 		Rz = vobject.sphere(P.xy_, 8th)
@@ -170,7 +180,7 @@ class Breakout (Window)
 					.reset( "You failed")
 					exit
 		
-		.bar.Pos.x += keys.movement.x.sign * 0.2
+		.bar.Pos.x += keys.Movement.x.sign * 0.2
 		|| bl = .bar.left
 		if bl < 0
 			.bar.pos.x -= bl
@@ -207,7 +217,8 @@ class Breakout (Window)
 			where.DrawSpiral(0.01*b.width|float|*vobject.drawscale, L, b.center, s.color, (3s+i*1s)())
 		.LiveActionFPS
 
-// drift seems low for now... we can fully stabilise it later...
+// drift seems low for now... we can fully stabilise it later... need "nextinsecond" number which is always stable
+// so for 10fps... it would be like 6553, 13107, 19660, 26214, 32K... etcetc
 //		|| drift = (.framecount div .LiveActionFPS) - .startdate.guiago.float
 //		where.DrawText("drift: $drift", (8, where.height-40))
 

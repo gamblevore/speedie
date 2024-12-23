@@ -493,7 +493,7 @@ class GUIControl (list)
 		require (self and text != .text)
 		.text = text
 		.TextAlteredForDraw |= 2
-		GUI.Touch(Self)
+		.Touch
 		return true	
 	
 	

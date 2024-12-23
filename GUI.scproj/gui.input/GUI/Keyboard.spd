@@ -74,50 +74,61 @@ struct SDL_Keysym
 
 
 
-dataType Keys (int) {
+dataType Keys (int)
 	linkage
 		wrapper
 		cpp_class SDL_Keycode
 		cpp_part Key
 	
-	function Eat 
-		|| i = keys.has(self)
-			keys.downdate[i] = 0
 
-	function HeldKey (|date| durr=0.05s, |bool|)
-		|| i = keys.has(self)
-			return keys.downdate[i].guiago >= durr
+	helper Record (|&guikeyrecord|)
+		for i in keys.MaxKeyRecord
+			|| g = keys.record[i]
+			if (g.key == self) and (self!=0)
+				return g
+
+
+	function Eat 
+		|| r = .record
+			r.date = 0
+
+	function IsEaten (|bool|)
+		|| r = .record
+			return !r.date
+
+	function HeldKey (|duration| durr=0.05s, |bool|)
+		|| r = .Record
+			return r.date.guiago >= durr
+	
 	
 	function IsFirstFrame (|bool|)
-		|| i = keys.has(self)
-			return keys.downdate[i] == GUI.framestart
-		
+		|| r = .Record
+			return r.state == GUIKeyRecord.NewlyAdded
+	
+	
 	function Length (|int| Plus,  |float| Limit,  |float|)
 		require Plus
-		|| i = keys.has(self) #require
-		|| D = Keys.DownDate[i]
+		|| i = .record						#require
+		|| D = i.date						#require
 		|| G = gui.FrameStart
 		rz = (((1+G)-D)*plus).float
-		if limit and d!=g
+		if limit and i.State == GUIKeyRecord.Stable
 			if rz.abs > limit
-				keys.downdate[i] = G
+				i.date = G
 			  else 
 				rz = 0
 
-	function IsEaten (|bool|)
-		|| i = keys.has(self)
-			return !keys.downdate[i]
-		
+
 	function Scan (|SDL_Scancode|)
 		cpp_wrapper SDL_GetScancodeFromKey
 			
 	function IsAccept (|bool|)
 		return (self is RETURN or RETURN2 or Enter or AC_FORWARD)
 	
-	operator IsCmd (|keys|s, |bool|)
+	operator IsCmd (|keys| s, |bool|)
 		return keys.cmd and self == s
 
-	function IsCMM  (|bool|shift=false, |bool|)
+	function IsCMM  (|bool| shift=false, |bool|)
 		if shift == (keys.shift or keys.option)
 			return self is section or MacBackQuote or backquote or APPLICATION or slash
 
@@ -149,72 +160,74 @@ dataType Keys (int) {
 		rz.w = .Length((self is e) - (self is q), l.w)
 				
 	syntax access (|bool|)
-		return keys.has(self)
-	
+		|| i = .record
+		if i and i.date and i.state >= guikeyrecord.newlyadded
+			return true
+
 	syntax cast (|bool|)
-		return keys.has(self)
+		disabled "use []"
 
 	syntax is (|keys| x, |bool|)
 		return self == x
 	
 	module
-		|keys[8]|				DownKeys
-		|date[8]|				DownDate
-		|int|					Count
+		|GUIKeyRecord[6]|		Record
+
 
 		function Clear
 			gui.keymod = 0
-			for i in 8
-				.downdate[i] = 0
-			.count = 0
-	
+			// .record = nil			// Could be allowed???? :O
+			for i in MaxKeyRecord
+				.record[i] = nil
+		
+//		function Print
+//			for i in MaxKeyRecord
+//				|| r = .record[i]
+//				|| k = r.Key
+//				if k!=0
+//					"$k ${r.Date.ago.float} ago"
+
 		function Movement (|vec4| Limiter=vec4(), |vec4|)
-			for i in .count
-				rz += .downkeys[i].Movement(limiter)
+			for i in MaxKeyRecord
+				rz += .record[i].key.Movement(limiter)
 		
 		function State (|&int| n, |&byte|)
 			cpp_Wrapper SDL_GetKeyboardState
 		
-		helper AddKey (|keys| K, |int|)
-			if (.count < 8) and !.exists(K)
-				|| i = .count++
-//				"adding $k ($i)"
-				.DownDate[i] = GUI.FrameStart
-				.DownKeys[i] = K
-				return SDLActivity.Activity
 		
-		helper ReCount (|int|)
-			for v in 8
-				|| b = .DownKeys[v] != 0
-				rz += b
-			.count = rz
-			
-		helper RemoveKey (|keys| K, |int|)
-			|| m = .recount
-			|| i = .Exists(k) #require
-//			"ask remove $k ($m) after ${.DownDate[i].ago.float}s"
-			
-			m--
-//			"remove"
-			.DownKeys[i] = .DownKeys[m]
-			.DownDate[i] = .DownDate[m]
-			.DownKeys[m] = 0
-			.DownDate[m] = 0
-			.count = m
+		helper Count (|int|)
+			for v in MaxKeyRecord
+				|| b = keys.Record[v]
+				rz += b.Key!=0
 
-			return SDLActivity.activity
-			
-		function Has (|keys| s, |ind|)
-			if s != 0
-				for i in 8
-					if (.downkeys[i] == s) and (.DownDate[i])
-						return i
 
-		helper Exists (|keys| s, |ind|)
-			if s != 0
-				for i in 8
-					if (.downkeys[i] == s)
-						return i
+		helper AddKey (|keys| K)
+			|| c = .count
+			require (c < MaxKeyRecord)
+			require !k.record
+			|| r = .record[c]               // "adding $k ($i)"
+			r.key = k
+			r.date = GUI.FrameStart
+			r.state = GUIKeyRecord.toadd
+			
+			
+		helper RemoveKey (|keys| K)
+			|| r = k.record
+				r.State = GUIKeyRecord.ToRemove
+		
+
+		helper FlushKeys
+			|| m = MaxKeyRecord
+			for i in m
+				|| r = .record[i]
+				|| s = r.state
+					if s == GUIKeyRecord.ToRemove
+						m--
+						.record[i] = .record[m]
+						.record[m] = nil
+					  elseif s < guikeyrecord.Stable
+						r.state = s + 1
+
 
 		function Cmd (|bool|)
 			if SDL_KeyMod.ctrl[]
@@ -245,7 +258,7 @@ dataType Keys (int) {
 			return SDL_KeyMod.shift[]		
 
 		function Cancel (|bool|) 
-			return (cancel_key or escape or AC_BACK)
+			return (cancel_key[] or escape[] or AC_BACK[])
 
 		function Option (|bool|) 
 			return SDL_KeyMod.option[]		
@@ -253,6 +266,8 @@ dataType Keys (int) {
 
 	constants
 		|int|
+		MaxKeyRecord = 6
+		
 		SDL_SCANCODE_CAPSLOCK = 57
 
 		SDL_SCANCODE_F1 = 58
@@ -473,7 +488,7 @@ dataType Keys (int) {
 
 
 
-	constants {
+	constants
 		|keys|
 
 		ESCAPE = '\1B'
@@ -723,8 +738,23 @@ dataType Keys (int) {
 
 		AUDIOREWIND = scan + SDL_SCANCODE_AUDIOREWIND
 		AUDIOFASTFORWARD = scan + SDL_SCANCODE_AUDIOFASTFORWARD
-	}
-}
 
 
-|| keylog = false
+
+
+struct GUIKeyRecord
+	|date| Date
+	|keys| Key
+	|byte| State
+	
+	constants
+		Empty		= 0
+		ToRemove	= 1
+		ToAdd		= 2
+		NewlyAdded	= 3
+		Stable		= 4
+
+
+
+
+
