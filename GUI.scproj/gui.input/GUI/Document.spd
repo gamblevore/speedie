@@ -378,6 +378,8 @@ extend TextView
 			if reason != DocumentState.typing and DocumentState.UndoOrRedo
 				.PrepareLinesOfText
 				.scrollpos = d.ScrollPos
+			 else
+				.viewpos(ty.x, 0, 0)
 		  else	
 			.Clear(l.text)		
 		

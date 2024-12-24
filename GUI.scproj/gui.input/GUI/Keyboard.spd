@@ -1,5 +1,6 @@
 
 
+
 datatype SDL_KeyMod (int)
 	linkage
 		wrapper
@@ -30,6 +31,7 @@ datatype SDL_KeyMod (int)
 		CMD		= LGUI	 + RGUI
 		Shift	= Lshift + Rshift
 		Option	= Lalt	 + Ralt
+
 
 
 dataType SDL_Scancode (int)
