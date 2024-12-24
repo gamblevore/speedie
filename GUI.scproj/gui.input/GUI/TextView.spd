@@ -537,10 +537,10 @@ class TextView (GUIControl)
 		
 		|| lim = .MaxVisibleLines - back
 		if mode isnt WantAGoodView
-			if i inrange (lim+1)
+			if i inrange lim
 				return d
 			|| vdiff = d.vline - ._Start.vline
-				before = (vdiff min lim) max 0
+				before = (vdiff min (lim-1)) max 0
 			
 		.StartLine(mode) = d.movecapped(-before) 
 		return d
@@ -1328,8 +1328,8 @@ class TextView (GUIControl)
 		p = .clamp(p)
 		|| Same = (p.width == s.length) and self[p.x, s] 
 		|| i	= (p.x + s.length, p.x2)(!Same)
-		if show
-			.show(i)
+//		if show
+//			.show(i)
 		
 		if !same
 			i = p.x + s.length
