@@ -533,6 +533,6 @@ class list (Saveable)
 
 
 
-module RingTree
-	function New ()
-		disabled "Use List() instead of ringtree()"
+//module RingTree
+//	function New ()
+//		disabled "Use List() instead of ringtree()"

@@ -1,0 +1,20 @@
+
+		
+// we need a root, also... but worry about that later?
+class SpaceTree (list)
+	contains Chunk
+	|chunk--[8]|		Segments
+	|SpaceTree--[3]|	Neighbours
+
+	module
+		|list of vobjectholder| Holders
+
+class Chunk (list)
+	|GridSection| Blocks
+	contains VObject
+	function Parent (|spacetree|)
+		return super.parent|&nil||spacetree|
+
+
+role VObjectHolder (list)
+	// .obj will be the vobject

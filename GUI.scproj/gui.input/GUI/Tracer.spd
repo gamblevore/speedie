@@ -25,7 +25,7 @@ class RayTracer
 	|vec2|			Scale
 	|vec2|			Adjust
 	//
-	|Vec3|			Dir
+	|Vec3|			_CamDir
 	|vec3|			iDir
 	|Mat4|			_LookAt
 	|Vec3|			_Camera
@@ -74,22 +74,45 @@ class RayTracer
 		opt min 3, opt norefcounts
 		.Color = nil
 		.Dist = float.max
-		XY = (xy + .adjust) * .scale
-		.dir = (xy, 1.0).Normal * ._LookAt
-		.idir = -1.0 / .dir
+		._CamDir = .Dir(xy)
+		.idir = -1.0 / ._CamDir
 		
 		for sp in .Shapes
-			|| t = (sp.Shape)(sp, .Camera, .dir, .idir)
+			|| t = (sp.Shape)(sp, .Camera, ._CamDir, .idir)
 			|| tx = t.x
 			if (tx > 0) and (tx < .Dist)
 				.Dist = t.x
-				|| P = .Camera + .dir*tx
+				|| P = .Camera + ._CamDir*tx
 				|| Norm = (P - sp.pos).normal
 				|| C = (norm.abs * sp.Color.xyz)
 				.color = (C, sp.shapeID|float|*255th)
 		return .Color
+	
 
-
+	function Dir (|int| X, |int| Y, |vec3|)
+		cpp_part DirInt
+		return .Dir((x,y).vec2)
+	
+	function Dir (|vec2| XY, |vec3|)
+		XY = (xy + .adjust) * .scale
+		return (xy, 1.0).Normal * ._LookAt
+	
+	
+	function Redivide (|bool|)
+		opt norefcounts,  opt min 3
+		
+		|| B = root init alloc(32)
+			b.Redivide(self)
+			for s in .shapes
+				.Place(s)
+	
+			
+	function Place (|vobject| v)
+		// we need it's largest bound... easiest to do as a sphere?
+		// boxes might be long and thin, though? thy could be done as lines... say 12 lines?
+		// its a lot of maths...
+	
+	
 	function RayTrace (|image| where, |float|)
 		// should allow alpha for drawing over prev images...
 		// meaning that the alpha can't be the ID!
@@ -98,9 +121,11 @@ class RayTracer
 		.size = where.size.vec2
 		.scale = 1.0/.size.xx
 		.adjust = .size * -0.5
+		require .Redivide()
 		|| P = vec2()
 		|| w = where.Width|float|
 		|| h = where.Height|float|
+		
 		
 		while p.y < h
 			|| PY = (0, p.y|int|)
@@ -127,15 +152,77 @@ class RayTracer
 			p.y++
 			p.x = 0
 		rz /= where.size.area|float|		
+	
+	
+	module
+		// 30x19 normally...
+		function Alloc (|int| px, |int| Size=4MB, |&RayBoost|)
+			|| root = memory.zalloc(size)|&RayBoost|$
+			px = 1<<px.log2
+			.Root = root
+			root.size.y2 = gui.Screen.height - 1
+			|| w = gui.Screen.Width
+			root.size.x2 = w - 1
+			|| D = w.ContaingPowerOfTwo - (px.log2 + 1)
+			return root.SubAllocate(root, D)
+			
+		|&RayBoost|			Root
+		|&RayTraceNode|		StartNodes
+		|&RayTraceNode|		EndNodes
 
 
-struct RayTracerCulling
-// for each division... we could get 3 points and find the "worst"? or perhaps theres always a worst point?
-// fractal circle based. Options?:
-	// * 9 levels, 0 == full, odd = within-quad, even = overlaps.
-		// * save as 4 bits, so we get 4 bits per level... 6 levels then sort an array.
-	// * Some screen-tree structure, with pointers, to do something similar?
-		// * can be improved. No need draw object in entire overlapping quads. usually only two small quads!
-		// * Put each object into tree individually??? OR put objs into "da curr level" of tree?
-	// * we need some kinda linked-list and memory-management for it.
 
+struct RayBoost
+	|vec4|					YDiv			
+	|vec4|					XDiv
+	|ivec4|					Size
+	|&RayBoost[4]|			Quad
+	|int|					Depth
+		
+	function Redivide (|raytracer| T)
+		opt norefcounts,  opt min 3
+		|| Q = .quad[0]
+		|| S = Q.size
+		|| D1 = t.Dir(S.x2, S.y1)
+		|| DM = t.Dir(S.x2, S.y2)
+		|| D3 = t.Dir(S.x1, S.y2)
+		.xdiv = Plane3D.normals(d3, dm, t._Camera) // now just use these... and then subdivide!
+		.ydiv = Plane3D.normals(d1, dm, t._Camera)
+
+		for i in 4
+			if .Depth > 0
+				.quad[i].redivide(t)
+			  else
+				.quad[i] = nil
+	
+	helper SubAllocate (|!&RayBoost| Last, |int| H, |!&RayBoost|)
+		.depth = H
+		for i in 4
+			.quad[i] = ++last
+
+		|| bounds = .Size
+		|| xy = bounds.xy
+		|| hh = 1<<H
+		|| LB = (xy,xy+hh-1)
+		for yy in 2	
+			for xx in 2
+				|| S = lb + (hh*xx, hh*yy, hh*xx, hh*yy)
+				|| Q = .Quad[xx+yy<<1]
+				q.size = s min bounds
+				if h > 0
+					last = Q.SubAllocate(last, H-1)
+		
+		return last
+
+
+
+struct RayTraceNode
+	|vobject--|				Curr
+	|&RayTraceNode|			Next
+
+
+
+function int.ContaingPowerOfTwo (|int|)
+	|| p = .log2
+	|| rem = self - p
+	return p + (rem!=0)

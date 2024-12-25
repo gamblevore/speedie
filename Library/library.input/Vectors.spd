@@ -241,6 +241,9 @@ datatype ivec4
 		cpp_part ContainsVec2
 		return .contains(v, 0)
 	
+	operator Min (|ivec4| v, |ivec4|)
+		return (.x min v.x, .y min v.y,  .z min v.z,  .w min v.w )
+	
 	operator contains (|ivec4| v, |bool|)
 		disabled "why?"
 		return .contains(v.x1y1) and .contains(v.x2y2)
@@ -850,6 +853,9 @@ function vecmix (|float|a, |vec2|b, |vec3|)
 function ivecmix (|ivec2|a, |ivec2|b, |ivec4|)
 	cpp_part imix22
 	return (a.x, a.y, b.x, b.y)
+function ivecmix (|ivec2|a, |int|b,|int|c, |ivec4|)
+	cpp_part imix211
+	return (a.x, a.y, b, c)
 function ivecmix (|int|a, |int|b, |ivec2|c, |ivec4|)
 	cpp_part imix112
 	return (a, b, c.x, c.y)
@@ -887,4 +893,17 @@ function ivec4.Center (|vec2|)
 
 function vec4.Center (|vec2|)
 	return (.x+.x2, .y+.y2)*0.5
+
+
+
+datatype Plane3D (vec4)
+	module
+		function New (|vec3| A, |vec3| B, |vec3| C, |vec4|)
+		    || N = ((B-A) x (C-B)).normal
+			return (N, N • A)
+
+		function Normals (|vec3| D1, |vec3| D2, |vec3| Start, |vec4|)
+		    || N = (-D1 x D2).normal
+			return (N, N • Start)
+
 

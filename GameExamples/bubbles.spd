@@ -21,7 +21,7 @@ class RayScene (window)
 
 	constructor
 		.t = RayTracer((1.6, 5.0, -22.0))
-		.FPS = fpstextview(self)
+		.FPS = FPSTextView(self)
 		.fps.MakeInline
 		
 		|| L = 10.0

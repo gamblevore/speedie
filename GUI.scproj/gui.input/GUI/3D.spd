@@ -47,11 +47,6 @@
 //
 //
 //
-//datatype Plane3D (vec4)
-//	module
-//		function New (|vec3| A, |vec3| B, |vec3| C, |vec4|)
-//		    || N = ((B-A) x (C-B)).normal
-//			return (N, N • A)
 //
 //
 //

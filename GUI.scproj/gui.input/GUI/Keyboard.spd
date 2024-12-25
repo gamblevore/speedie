@@ -210,7 +210,7 @@ dataType Keys (int)
 			|| r = .record[c]               // "adding $k ($i)"
 			r.key = k
 			r.date = GUI.FrameStart
-			r.state = GUIKeyRecord.toadd
+			r.state = GUIKeyRecord.toadd + (k is escape)
 			
 			
 		helper RemoveKey (|keys| K)

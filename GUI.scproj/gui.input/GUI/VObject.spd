@@ -2,7 +2,7 @@
 
 
 
-class VObject
+class VObject (list)
 	|vec3|		Pos
 	|vec3|		Radius
 	|vec3|		Velocity
@@ -71,6 +71,16 @@ class VObject
 	
 	syntax cast (|ivec4|)
 		return .Screen
+		
+	syntax is (|vobjectinfo| i, |bool|)
+		return (.position & i) == i
+	
+	syntax is (|vobjectinfo| i, assigns:|bool| value)
+		if value
+			.position |= i
+		  else
+			.position &= ~i
+		 
 	
 	module
 		|byte| ShapeIDs
@@ -126,6 +136,13 @@ class VObject
 			return V.iVec4|controlrect|
 
 ////
+
+
+datatype VObjectInfo (uint)
+	constants
+		Pellet
+		Dead			// to remove
+
 
 
 function controlsize.CalculateBlocks (|ivec4|)
