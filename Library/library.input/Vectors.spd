@@ -53,6 +53,10 @@ datatype vec4
 	operator Pow (|vec4| p, |vec4|)
 		return (.x pow p.x, .y.cos pow p.y, .z.cos pow p.z, .w.cos pow p.w)
 
+
+	operator Sign (|vec4| C, |vec4|)
+		return (.x.copysign(c.x), .y.copysign(c.y), .z.copysign(c.z), .w.copysign(c.w))
+
 	function iVec4 (|ivec4|)
 		return (.x|int|, .y|int|, .z|int|, .w|int|)	
 
@@ -310,7 +314,7 @@ datatype vec3
 	syntax cast (|bool|)
 		cpp_part Bool
 		return (self != vec3())
-
+	
 	function LookAt (|mat4|)
 		disabled "Not sure this function even makes sense originally."
 //	    || f = .normal

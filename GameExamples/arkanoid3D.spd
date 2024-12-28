@@ -5,6 +5,7 @@ main
 	return Breakout().RunAsMain(2.0, 60)
 
 
+// * aim AWAY from the block, not towards it!
 // block nudge... for vibration on hit
 
 

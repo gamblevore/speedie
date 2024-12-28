@@ -2,7 +2,7 @@
 
 // todo:
 // 1) Add screen cells and culling
-// 2) turn the spheres into chunks?
+// 2) Add space-partitions... (can add parent nodes... map can be the memorylayer of spacetree nodes)
 // 3) Optimisations around unmoving objects
 // 4) hit-detection? (surely its just chunk vs chunk anyhow?)
 // 5) 4 threads, each can do one quad.
@@ -20,10 +20,12 @@ class RayTracer
 	visible false
 	|vec4|			Color
 	|float|			Dist
+	|float|			MaxViewDistSq
 	//
-	|vec2|			Size
+	|vec4|			Size
 	|vec2|			Scale
 	|vec2|			Adjust
+	|vec4[4]|		Planes
 	//
 	|Vec3|			_CamDir
 	|vec3|			iDir
@@ -39,6 +41,7 @@ class RayTracer
 		// Default RayTracer constructor should use the block positioning system
 		// either by zpos or zoom
 		._LookAt.reset
+		.MaxViewDistSq = 1000.0.pow2
 		.Camera(Camera)
 	
 	
@@ -58,7 +61,7 @@ class RayTracer
 		return ._LookAt
 	
 			
-	function AntiAlias (|vec2| XY, |&imagepixel| pxl, |&imagepixel|)
+	helper AntiAlias (|vec2| XY, |&imagepixel| pxl, |&imagepixel|)
 		|| ID = pxl.a
 		|| C = pxl.Color
 		for i in 4
@@ -70,7 +73,7 @@ class RayTracer
 		return pxl
 	
 	
-	function GetColor (|vec2| XY, |vec4|)
+	helper GetColor (|vec2| XY, |vec4|)
 		opt min 3, opt norefcounts
 		.Color = nil
 		.Dist = float.max
@@ -89,28 +92,55 @@ class RayTracer
 		return .Color
 	
 
-	function Dir (|int| X, |int| Y, |vec3|)
+	helper Dir (|int| X, |int| Y, |vec3|)
 		cpp_part DirInt
 		return .Dir((x,y).vec2)
 	
-	function Dir (|vec2| XY, |vec3|)
+	helper Dir (|vec2| XY, |vec3|)
 		XY = (xy + .adjust) * .scale
 		return (xy, 1.0).Normal * ._LookAt
 	
 	
-	function Redivide (|bool|)
+	helper Plane (|vec4| P, |vec4|)
+		|| D1 = .Dir(P.xy)
+		|| D2 = .Dir(p.x2y2)
+		return Plane3D.normals(d1, d2, ._Camera)
+
+
+	helper InPlanes (|vobject| b, |bool|)
+		|| D = (b.pos - ._Camera).lengthsq
+		require D > 0.25 and D < .MaxViewDistSq
+		|| R = (b.radius, 0.0)
+		|| Pos = (b.pos, 1.0)
+		for i in 4
+			|| P = .planes[i]
+			|| PX = pos + (R sign P)
+			|| Q = p • PX
+			require Q > 0
+		// Could also (later) check if the nearest frustrum point is in the box.
+		// Need points[8] and a way to find which is the nearest to the box, or just check all?
+		return true
+			
+	
+	helper DoFrustrum
+		.Planes[0] = .plane(.size.x1y1x1y2) // 0001 // left
+		.Planes[1] = .plane(.size.x2y1x2y2) // 1011 // right
+		.Planes[2] = .plane(.size.x1y1x2y1) // 0010 // bottom
+		.Planes[3] = .plane(.size.x1y2x2y2) // 0111 // top
+	
+	
+	helper Redivide (|bool|)
 		opt norefcounts,  opt min 3
-		
+		if 1
+			return 1
 		|| B = root init alloc(32)
+			raytracer.currNode = raytracer.StartNodes
+			.DoFrustrum
 			b.Redivide(self)
 			for s in .shapes
-				.Place(s)
-	
-			
-	function Place (|vobject| v)
-		// we need it's largest bound... easiest to do as a sphere?
-		// boxes might be long and thin, though? thy could be done as lines... say 12 lines?
-		// its a lot of maths...
+				if .InPlanes(s)
+					b.Place(s)
+			return true
 	
 	
 	function RayTrace (|image| where, |float|)
@@ -118,14 +148,13 @@ class RayTracer
 		// meaning that the alpha can't be the ID!
 		opt norefcounts,  opt min 3
 		.ViewMat
-		.size = where.size.vec2
-		.scale = 1.0/.size.xx
-		.adjust = .size * -0.5
+		.size = where.size.__xy.vec4
+		.scale = 1.0/.size.x2x2
+		.adjust = .size.x2y2 * -0.5
 		require .Redivide()
 		|| P = vec2()
 		|| w = where.Width|float|
 		|| h = where.Height|float|
-		
 		
 		while p.y < h
 			|| PY = (0, p.y|int|)
@@ -164,10 +193,14 @@ class RayTracer
 			|| w = gui.Screen.Width
 			root.size.x2 = w - 1
 			|| D = w.ContaingPowerOfTwo - (px.log2 + 1)
-			return root.SubAllocate(root, D)
+			|| Last = root.InitialCreation(root, D)
+			StartNodes = last|&RayTraceNode|
+			EndNodes = (root|&byte| + Size)|&RayTraceNode|
+			return root
 			
 		|&RayBoost|			Root
 		|&RayTraceNode|		StartNodes
+		|&RayTraceNode|		CurrNode
 		|&RayTraceNode|		EndNodes
 
 
@@ -177,12 +210,51 @@ struct RayBoost
 	|vec4|					XDiv
 	|ivec4|					Size
 	|&RayBoost[4]|			Quad
-	|int|					Depth
+	|byte|					Depth	
+	|byte|					ThreadLock // in case I want to multi-thread
+	|uint16|				ID
 		
+	function SubPlace (|vobject| v, |int| i)
+		|| Q = .quad[i]
+		if .depth
+			return Q.place(v)
+		|&RayTraceNode| PP = Q|&RayTraceNode|
+		|| New = raytracer.currNode!++
+		PP[0] = New
+		New.Next = nil
+		New.Draw = V
+
+		
+	function Place (|vobject| v)
+		|| Rd = (v.radius, 0.0)
+		|| RX = Rd sign .xdiv
+		|| RY = Rd sign .ydiv
+		|| VP = (V.pos, 1.0)
+		|| L = .xdiv • (VP - RX) > 0
+		|| R = .xdiv • (VP + RX) > 0
+		|| B = .ydiv • (VP - RY) > 0
+		|| T = .ydiv • (VP + RY) > 0
+		
+		if (b|||t) & (l|||r)
+			if (L+R)+(B+T) == 2
+				return .SubPlace(V, R + (T<<1)) // tailcall
+			
+			if T
+				if L
+					.SubPlace(V, 0)
+				if R
+					.SubPlace(V, 1)
+			if B
+				if L
+					.SubPlace(V, 2)
+				if R
+					return .SubPlace(V, 3)
+
+
 	function Redivide (|raytracer| T)
 		opt norefcounts,  opt min 3
-		|| Q = .quad[0]
-		|| S = Q.size
+		.ID = (self - raytracer.root)
+		|| S = .quad[0].size
 		|| D1 = t.Dir(S.x2, S.y1)
 		|| DM = t.Dir(S.x2, S.y2)
 		|| D3 = t.Dir(S.x1, S.y2)
@@ -195,7 +267,8 @@ struct RayBoost
 			  else
 				.quad[i] = nil
 	
-	helper SubAllocate (|!&RayBoost| Last, |int| H, |!&RayBoost|)
+	
+	helper InitialCreation (|!&RayBoost| Last, |int| H, |!&RayBoost|)
 		.depth = H
 		for i in 4
 			.quad[i] = ++last
@@ -210,15 +283,15 @@ struct RayBoost
 				|| Q = .Quad[xx+yy<<1]
 				q.size = s min bounds
 				if h > 0
-					last = Q.SubAllocate(last, H-1)
+					last = Q.InitialCreation(last, H-1)
 		
 		return last
 
 
 
 struct RayTraceNode
-	|vobject--|				Curr
-	|&RayTraceNode|			Next
+	|vobject--|				Draw
+	|?&RayTraceNode|		Next
 
 
 

@@ -437,9 +437,9 @@ class PerryIDE (Window)
 
 	function SaveMemory
 		if .IsFront
-			|| d = PerryIDE.Effects.Duration
-				PerryIDE.Effects.Duration = 0
-				.LogOneAction(@emb + ("Image effect time: " + d.RenderDurr))
+//			|| d = PerryIDE.Effects.Duration
+//				PerryIDE.Effects.Duration = 0
+//				.LogOneAction(@emb + ("Image effect time: " + d.RenderDurr))
 			return 
 		require !.UsingSpdLib
 		|| f = .Feedback
@@ -680,11 +680,11 @@ class PerryIDE (Window)
 
 
 	module
-		|JeeboxEffects|				Effects
+//		|JeeboxEffects|				Effects
 		|bool|						DummyTest
 		|byte|						StatsMode
 		
-		Effects.Init()
+//		Effects.Init()
 
 //		syntax access (|int| i, |perryide|)
 //			opt norefcounts

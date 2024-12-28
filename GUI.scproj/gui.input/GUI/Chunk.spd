@@ -1,15 +1,24 @@
 
-		
-// we need a root, also... but worry about that later?
+
+
+class SpaceMap (memorylayer)
+	constructor (|&classData| cls)
+		super.constructor(cls)
+		.Use
+		.root = spacetree()
+	|SpaceTree| Root
+
+
 class SpaceTree (list)
-	contains Chunk
-	|chunk--[8]|		Segments
-	|SpaceTree--[3]|	Neighbours
+	contains SpaceChunk
+	|SpaceChunk--[8]|		Segments
+	|SpaceTree--[3]|		Neighbours
 
 	module
 		|list of vobjectholder| Holders
 
-class Chunk (list)
+
+class SpaceChunk (list)
 	|GridSection| Blocks
 	contains VObject
 	function Parent (|spacetree|)

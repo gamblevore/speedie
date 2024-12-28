@@ -3,13 +3,13 @@
 
 
 class VObject (list)
-	|vec3|		Pos
-	|vec3|		Radius
-	|vec3|		Velocity
-	|byte|		Nudge
-	|byte|		ShapeID
-	|vec4|		Color			// image pixel?
-	|float|		Health			// are ints better? I think so?
+	|vec3|			Pos
+	|vec3|			Radius
+	|vec3|			Velocity
+	|byte|			Nudge
+	|byte|			ShapeID
+	|vec4|			Color			// image pixel?
+	|float|			Health			// are ints better? I think so?
 	|DistanceFunction| Shape
 	
 	prototype DistanceFunction (|vec3| orig, |vec3| dir, |vec3| idir, |vec2|)
@@ -33,6 +33,9 @@ class VObject (list)
 		.Color = color
 		.Health = 256
 		.ShapeID = ++ShapeIDs
+	
+	function BigR (|float|)
+		return .radius.max
 		
 	function Towards (|vec3| P, |float| Speed)
 		.Velocity = (P - .pos).Normal * Speed

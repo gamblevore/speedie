@@ -8,9 +8,9 @@ function FileSepClicker (guiaction)
 
 function PerryIDE.UnusedFuncsFB (|message| stuff)
 	opt norefcounts
-	|| arg = stuff.last
+	|| arg = stuff.Last
 	require arg == @arg
-	|| where = stuff.firstname
+	|| where = stuff.FirstName
 	for tmp in arg
 		.UnusedFuncsSub(tmp, where)
 
