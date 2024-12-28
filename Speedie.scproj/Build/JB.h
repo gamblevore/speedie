@@ -121,6 +121,8 @@ typedef int PID_Int;
 
 typedef ivec4 ParserLineAndIndent;
 
+typedef vec4 Plane3D;
+
 typedef byte ProcessMode;
 
 typedef byte ProcessOwnerMode;
@@ -258,6 +260,8 @@ struct FatASM;
 struct FatRange;
 
 struct FloatRange;
+
+struct GUIKeyRecord;
 
 struct IntDownRange;
 
@@ -3037,6 +3041,16 @@ extern FP_NilTrackerFn SC__nil_NilTable[64];
 extern byte SC__nil_OldPrint;
 extern ArchonPurger SC__nil_T;
 #define JB__MzSt_All JB__.MzSt_All
+#define kSC__GUIKeyRecord_Empty ((int)0)
+
+#define kSC__GUIKeyRecord_NewlyAdded ((int)3)
+
+#define kSC__GUIKeyRecord_Stable ((int)4)
+
+#define kSC__GUIKeyRecord_ToAdd ((int)2)
+
+#define kSC__GUIKeyRecord_ToRemove ((int)1)
+
 extern IsaTester SC__IsaTester_T;
 
 #define JB__LD_ClassList JB__.LD_ClassList
@@ -3903,9 +3917,6 @@ int SC_PostIncrementNil__Init_();
 
 void SC_PostIncrementNil__SyntaxAppend(Message* Ch);
 
-
-
-// RingTree
 
 
 // SCGame3D
@@ -5708,6 +5719,9 @@ bool SC_OpMode_SyntaxIs(OpMode Self, OpMode X);
 // ParserLineAndIndent
 
 
+// Plane3D
+
+
 // ProcessMode
 bool JB_ProcessMode_SyntaxIs(uint /*ProcessMode*/ Self, uint /*ProcessMode*/ M);
 
@@ -6470,6 +6484,9 @@ void SC_FatRange_AllJumpTo(FatRange* Self, FatASM* Curr);
 
 
 // JB_FloatRange
+
+
+// JB_GUIKeyRecord
 
 
 // JB_GameFlyingMem

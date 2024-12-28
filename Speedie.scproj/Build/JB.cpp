@@ -3442,7 +3442,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[216]);
-	JB_FS_AppendInt32(_fsf0, (2024122013));
+	JB_FS_AppendInt32(_fsf0, (2024122822));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -6089,7 +6089,6 @@ void SC_PostIncrementNil__SyntaxAppend(Message* Ch) {
 	SC__PostIncrementNil_Msgs[S] = Ch;
 	SC__PostIncrementNil_Size = (S + 1);
 }
-
 
 
 int SC_SCGame3D__Init_() {
@@ -8871,7 +8870,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1683]);
-	JB_FS_AppendInt32(_fsf0, (2024122013));
+	JB_FS_AppendInt32(_fsf0, (2024122822));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -19122,6 +19121,7 @@ bool SC_OpMode_SyntaxIs(OpMode Self, OpMode X) {
 
 
 
+
 bool JB_ProcessMode_SyntaxIs(uint /*ProcessMode*/ Self, uint /*ProcessMode*/ M) {
 	return ((bool)(Self & M));
 }
@@ -21542,7 +21542,7 @@ bool SC_FAT_JumpImprove(FatASM* Self) {
 			continue;
 		}
 		iif (SC_FAT_OperatorIsa(D, kSC__ASM_RET)) {
-			memcpy(((Self)), ((D)), 8);
+			memcpy(((Self)), ((D)), 64);
 			Rz = true;
 		}
 		break;
@@ -21837,6 +21837,7 @@ void SC_FatRange_AllJumpTo(FatRange* Self, FatASM* Curr) {
 		};
 	};
 }
+
 
 
 
@@ -38363,7 +38364,7 @@ void SC_Msg_IntoVariable(Message* Self, SCNode* Name_space, NameAndMsg* Rz) {
 	Message* Block = SC_Msg_CreateOwnBlock(Self);
 	JB_Incr(Block);
 	iif (!Block) {
-		memzero((Rz), 8);
+		memzero((Rz), 24);
 		JB_Decr(Block);
 		JB_Decr(P);
 		return;
@@ -42952,8 +42953,9 @@ int JB_ID__ByID(JB_Object* A, JB_Object* B) {
 
 
 SCDecl* SC_Decl_AccessToMemCpy(SCDecl* Self, Message* Exp, Message* Side, SCDecl* Type) {
+	SCDecl* Internal = Type->Internal;
 	Message* Rel = JB_Msg_Ancestor(Exp, kJB_SyxRel);
-	iif (!Rel) {
+	iif (!(Rel and Internal)) {
 		JB_Msg_Fail(Rel, JB_LUB[908]);
 		return nil;
 	}
@@ -42973,7 +42975,7 @@ SCDecl* SC_Decl_AccessToMemCpy(SCDecl* Self, Message* Exp, Message* Side, SCDecl
 		JB_Tree_SyntaxAppend(Prms, ((Message*)JB_Ring_NextSib(Prms)));
 	}
 	JB_SetRef(Prms->Obj, SC_Comp__XFunc(Name->Name, nil));
-	Message* Msg = JB_int_Msg(SC_Decl_SizeOfQuery(Type));
+	Message* Msg = JB_int_Msg(SC_Decl_SizeOfQuery(Internal));
 	JB_SetRef(Msg->Obj, SC_TypeInt->TypeNormal);
 	JB_Tree_SyntaxAppend(Prms, Msg);
 	return Type;
@@ -55941,6 +55943,9 @@ SCDecl* SC_Func__Tran_AfterRel(Message* Msg, SCNode* Name_space, Message* Side) 
 		JB_Decr(Exp);
 		return nil;
 	}
+	iif (SC_Decl_SyntaxIs(Type, kSC__SCDeclInfo_Const)) {
+		JB_Msg_Fail(Msg, JB_LUB[1003]);
+	}
 	iif (Type->PointerCount > 0) {
 		iif ((Side)) {
 			JB_Msg_Fail(Msg, JB_LUB[1003]);
@@ -58449,4 +58454,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 5684588229272254473 6811618265152912683
+// 8676340083803744089 -8233655354878797091

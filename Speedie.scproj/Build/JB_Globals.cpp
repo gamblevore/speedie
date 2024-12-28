@@ -981,6 +981,11 @@ FP_NilTrackerFn SC__nil_NilTable[64];
 byte SC__nil_OldPrint;
 ArchonPurger SC__nil_T;
 ;
+
+
+
+
+
 IsaTester SC__IsaTester_T;
 
 ;
