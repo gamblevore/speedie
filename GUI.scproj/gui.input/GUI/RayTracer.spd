@@ -131,12 +131,13 @@ class RayTracer
 	
 	helper Redivide (|bool|)
 		opt norefcounts,  opt min 3
-		if 1
-			return 1
-		|| B = root init alloc(32)
+		target !__PROJECT_PERRY__
+			if 1
+				return 1
+		|| B = raytracer.GrabRoot(32)
 			raytracer.currNode = raytracer.StartNodes
 			.DoFrustrum
-			b.Redivide(self)
+			b.FillQuads(self)
 			for s in .shapes
 				if .InPlanes(s)
 					b.Place(s)
@@ -184,48 +185,58 @@ class RayTracer
 	
 	
 	module
-		// 30x19 normally...
-		function Alloc (|int| px, |int| Size=4MB, |&RayBoost|)
-			|| root = memory.zalloc(size)|&RayBoost|$
+		// 30x19 for my small screen...
+		helper GrabRoot (|int| px, |int| Size=4MB, |&RayBoost|)
+			|| h = gui.Screen.height - 1
+			|| w = gui.Screen.Width - 1
+			|| s2 = (0,0,w,h)
 			px = 1<<px.log2
-			.Root = root
-			root.size.y2 = gui.Screen.height - 1
-			|| w = gui.Screen.Width
-			root.size.x2 = w - 1
-			|| D = w.ContaingPowerOfTwo - (px.log2 + 1)
-			|| Last = root.InitialCreation(root, D)
+
+			|| root = .RootNode
+				if root.size == s2 and root.px == px
+					return root
+				
+			root = memory.Zalloc(size)|&RayBoost|$
+			.RootNode = root
+			root.px = px
+			root.size = s2
+			|| D = (w+1).ContainingPowerOfTwo - px.log2
+			|| Last = root.InitialCreation(root, D-1)
 			StartNodes = last|&RayTraceNode|
 			EndNodes = (root|&byte| + Size)|&RayTraceNode|
 			return root
 			
-		|&RayBoost|			Root
+		|&RayBoost|			RootNode
 		|&RayTraceNode|		StartNodes
 		|&RayTraceNode|		CurrNode
 		|&RayTraceNode|		EndNodes
-
 
 
 struct RayBoost
 	|vec4|					YDiv			
 	|vec4|					XDiv
 	|ivec4|					Size
-	|&RayBoost[4]|			Quad
+	|(&RayBoost)[4]|		Quad
 	|byte|					Depth	
 	|byte|					ThreadLock // in case I want to multi-thread
-	|uint16|				ID
-		
+	|byte|					PX
+	
+
 	function SubPlace (|vobject| v, |int| i)
 		|| Q = .quad[i]
 		if .depth
-			return Q.place(v)
+			return Q!.place(v)
 		|&RayTraceNode| PP = Q|&RayTraceNode|
 		|| New = raytracer.currNode!++
-		PP[0] = New
+		.quad[i] = New|&rayboost|
 		New.Next = nil
 		New.Draw = V
 
 		
 	function Place (|vobject| v)
+		real self
+		// for big chunks, we should also test that the quad corners are in the object.
+		// inigo quilez has a good article on this.
 		|| Rd = (v.radius, 0.0)
 		|| RX = Rd sign .xdiv
 		|| RY = Rd sign .ydiv
@@ -251,10 +262,10 @@ struct RayBoost
 					return .SubPlace(V, 3)
 
 
-	function Redivide (|raytracer| T)
+	function FillQuads (|raytracer| T)
 		opt norefcounts,  opt min 3
-		.ID = (self - raytracer.root)
-		|| S = .quad[0].size
+//		.ID = (self - raytracer.RootNode)
+		|| S = .quad[0]!.size
 		|| D1 = t.Dir(S.x2, S.y1)
 		|| DM = t.Dir(S.x2, S.y2)
 		|| D3 = t.Dir(S.x1, S.y2)
@@ -263,7 +274,7 @@ struct RayBoost
 
 		for i in 4
 			if .Depth > 0
-				.quad[i].redivide(t)
+				.quad[i].FillQuads(t)
 			  else
 				.quad[i] = nil
 	
@@ -280,7 +291,7 @@ struct RayBoost
 		for yy in 2	
 			for xx in 2
 				|| S = lb + (hh*xx, hh*yy, hh*xx, hh*yy)
-				|| Q = .Quad[xx+yy<<1]
+				|| Q = .Quad[xx+yy<<1]!
 				q.size = s min bounds
 				if h > 0
 					last = Q.InitialCreation(last, H-1)
@@ -295,7 +306,7 @@ struct RayTraceNode
 
 
 
-function int.ContaingPowerOfTwo (|int|)
+function int.ContainingPowerOfTwo (|int|)
 	|| p = .log2
 	|| rem = self - p
 	return p + (rem!=0)
