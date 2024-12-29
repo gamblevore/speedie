@@ -1316,6 +1316,7 @@ struct SCClass_Behaviour: SCBetterNode_Behaviour {
 
 JBClass ( SCClass , SCBetterNode , 
 	byte Depth;
+	byte Alignment;
 	byte MinOpt;
 	byte Behaviourness;
 	byte IsWrapper;
@@ -1342,17 +1343,17 @@ JBClass ( SCClass , SCBetterNode ,
 	SCFunction* FuncProto;
 	SCDecl* _NotConst;
 	SCDecl* Signed;
-	SCDecl* Contained;
-	SCDecl* TypeOptional;
 	SCDecl* TypeReal;
 	Array* Casts;
 	Array* Children;
+	SCDecl* Contained;
 	SCClass* Super;
 	Message* Defawlt;
 	Message* False;
 	SCModule* Modul;
 	Array* Properties;
 	SCDecl* TypeNormal;
+	SCDecl* TypeOptional;
 );
 
 struct SCFunction_Behaviour: SCBetterNode_Behaviour {
@@ -9755,7 +9756,11 @@ bool SC_Decl_CanUseDefault(SCDecl* Self);
 
 bool SC_Decl_CanWrap(SCDecl* Self);
 
+SCDecl* SC_Decl_CArrayInner(SCDecl* Self);
+
 int SC_Decl_CArraySize(SCDecl* Self);
+
+int SC_Decl_CArrayTotal(SCDecl* Self);
 
 void SC_Decl_CheckLibGlob(SCDecl* Self);
 

@@ -3442,7 +3442,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[216]);
-	JB_FS_AppendInt32(_fsf0, (2024122822));
+	JB_FS_AppendInt32(_fsf0, (2024122918));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8870,7 +8870,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1683]);
-	JB_FS_AppendInt32(_fsf0, (2024122822));
+	JB_FS_AppendInt32(_fsf0, (2024122918));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -43282,18 +43282,41 @@ bool SC_Decl_CanWrap(SCDecl* Self) {
 	return true;
 }
 
+SCDecl* SC_Decl_CArrayInner(SCDecl* Self) {
+	wwhile (SC_Decl_IsCArray(Self)) {
+		Self = Self->Internal;
+	};
+	return Self;
+}
+
 int SC_Decl_CArraySize(SCDecl* Self) {
+	int Mul = 1;
 	iif (SC_Decl_IsCArray(Self)) {
-		SCDecl* I = Self->Internal;
-		iif (I) {
-			return SC_Decl_CArraySize(I) * Self->C_Array;
-		}
+		Mul = SC_Decl_CArrayTotal(Self);
 	}
 	SCClass* T = Self->Type;
 	iif (SC_Class_IsObject(T) or Self->PointerCount) {
-		return JB_Platform__PointerBytes();
+		return JB_Platform__PointerBytes() * Mul;
 	}
-	return T->Size;
+	return T->Size * Mul;
+}
+
+int SC_Decl_CArrayTotal(SCDecl* Self) {
+	int Rz = 0;
+	Rz = 1;
+	while (true) {
+		int M = Self->C_Array;
+		iif ((!M)) {
+			break;
+		}
+		Rz = (Rz * M);
+		SCDecl* _tmPf0 = Self->Internal;
+		iif (!_tmPf0) {
+			break;
+		}
+		Self = _tmPf0;
+	};
+	return Rz;
 }
 
 void SC_Decl_CheckLibGlob(SCDecl* Self) {
@@ -44501,7 +44524,7 @@ int SC_Decl_PointerIncrement(SCDecl* Self) {
 		Rz = Self->Type->Size;
 	}
 	iif (SC_Decl_IsCArray(Self)) {
-		Rz = (Rz * Self->C_Array);
+		Rz = (Rz * SC_Decl_CArrayTotal(Self));
 	}
 	return Rz;
 }
@@ -44843,7 +44866,7 @@ int SC_Decl_SizeOfQuery(SCDecl* Self) {
 		N = Self->Type->Size;
 	}
 	iif (SC_Decl_IsCArray(Self)) {
-		N = (N * Self->C_Array);
+		N = (N * SC_Decl_CArrayTotal(Self));
 	}
 	return N;
 }
@@ -49198,10 +49221,12 @@ int SC_Class_CalculateSizeRaw(SCClass* Self, int Depth) {
 	}
 	iif (SC_Class_IsFunc(Self)) {
 		Self->Size = JB_Platform__PointerBytes();
+		Self->Alignment = JB_Platform__PointerBytes();
 		return Self->Size;
 	}
 	iif (SC_Class_IsDataTypeOnly(Self)) {
 		Self->Size = JB_TC_ByteCount(Self->TypeInfo);
+		Self->Alignment = Self->Size;
 		return Self->Size;
 	}
 	iif (Depth >= 16) {
@@ -49212,7 +49237,9 @@ int SC_Class_CalculateSizeRaw(SCClass* Self, int Depth) {
 		return 0;
 	}
 	int Count = 0;
+	int Align = 1;
 	iif (Self == SC_TypeObject) {
+		Align = 4;
 		Count = 4;
 	}
 	SCClass* S = Self->Super;
@@ -49223,6 +49250,7 @@ int SC_Class_CalculateSizeRaw(SCClass* Self, int Depth) {
 			JB_Decr(S);
 			return 0;
 		}
+		Align = S->Alignment;
 	}
 	JB_Decr(S);
 	int Bits = 0;
@@ -49242,6 +49270,7 @@ int SC_Class_CalculateSizeRaw(SCClass* Self, int Depth) {
 				JB_Decr(P);
 				break;
 			}
+			Align = JB_int_OperatorMin((JB_int_OperatorMax(Align, Curr)), 16);
 			iif ((SC_Decl_SyntaxIs(P, kSC__SCDeclInfo_Task)) and SC_Decl_IsObject(P)) {
 				Bits = JB_int_SyntaxAccessSet(Bits, (Count + (JB_Platform__PointerBytes() - 1)) >> 3, true);
 			}
@@ -49259,7 +49288,7 @@ int SC_Class_CalculateSizeRaw(SCClass* Self, int Depth) {
 	}
 	;
 	Self->SizeRaw = Count;
-	Self->Size = JB_int_OperatorAlign(Count, 4);
+	Self->Size = JB_int_OperatorAlign(Count, Align);
 	iif (SC_Class_IsTask(Self)) {
 		Self->TaskObjectCount = (Self->Super->TaskObjectCount | Bits);
 		iif (Self->Size > 128) {
@@ -49411,6 +49440,7 @@ SCClass* SC_Class_Constructor(SCClass* Self, Message* Node, bool HasPtrs, SCModu
 	}
 	SC_SCBetterNode_ConstructorWith0(Self);
 	Self->Depth = 0;
+	Self->Alignment = 0;
 	Self->MinOpt = 0;
 	Self->Behaviourness = 0;
 	Self->IsWrapper = 0;
@@ -49434,9 +49464,9 @@ SCClass* SC_Class_Constructor(SCClass* Self, Message* Node, bool HasPtrs, SCModu
 	Self->FuncProto = nil;
 	Self->_NotConst = nil;
 	Self->Signed = nil;
-	Self->Contained = nil;
 	JB_Incr2(Self->Casts, JB_Array_Constructor0(nil));
 	JB_Incr2(Self->Children, JB_Array_Constructor0(nil));
+	Self->Contained = nil;
 	Self->Super = nil;
 	Self->Defawlt = nil;
 	Self->False = nil;
@@ -49869,17 +49899,17 @@ void SC_Class_Destructor(SCClass* Self) {
 	JB_Clear(Self->FuncProto);
 	JB_Clear(Self->_NotConst);
 	JB_Clear(Self->Signed);
-	JB_Clear(Self->Contained);
-	JB_Clear(Self->TypeOptional);
 	JB_Clear(Self->TypeReal);
 	JB_Clear(Self->Casts);
 	JB_Clear(Self->Children);
+	JB_Clear(Self->Contained);
 	JB_Clear(Self->Super);
 	JB_Clear(Self->Defawlt);
 	JB_Clear(Self->False);
 	JB_Clear(Self->Modul);
 	JB_Clear(Self->Properties);
 	JB_Clear(Self->TypeNormal);
+	JB_Clear(Self->TypeOptional);
 	SC_SCBetterNode_Destructor(Self);
 }
 
@@ -50289,9 +50319,9 @@ int SC_Class_GetDepth(SCClass* Self) {
 			iif (P == nil) {
 				break;
 			}
-			SCClass* T = P->Type;
-			iif ((SC_Class_IsStruct(T)) and (P->PointerCount == 0)) {
-				(Rz = JB_int_OperatorMax(Rz, (SC_Class_GetDepth(T) + 1)));
+			SCDecl* T = SC_Decl_CArrayInner(P);
+			iif ((SC_Class_IsStruct(T->Type)) and (T->PointerCount == 0)) {
+				(Rz = JB_int_OperatorMax(Rz, (SC_Class_GetDepth(T->Type) + 1)));
 			}
 			(++_if0);
 		};
@@ -51139,7 +51169,9 @@ void SC_Class_Reach(SCClass* Self, SCNode* From, Message* Src) {
 			SC_Decl_TypeReach(D->Contains, Self, D->Source);
 			(++_if0);
 		};
-	};
+	}
+	;
+	SC_Class_ReachBehaviours(Self);
 }
 
 void SC_Class_ReachBehaviours(SCClass* Self) {
@@ -58454,4 +58486,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 8676340083803744089 -8233655354878797091
+// -971209246076946935 -8233655354878797091
