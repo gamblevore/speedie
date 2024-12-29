@@ -138,7 +138,6 @@ function CppFunc (|FastStringCpp| fs, |SCFunction| F) // function func (
 
 	.FuncStart(fs, f, FuncHeader)
 	f.Sourcearg!.Export( fs )
-
 	.OptEnd(fs, f.minopt)
 	fs <~ "\n\n"
 
@@ -200,7 +199,7 @@ function CodifyInlines
 function CodifyFuncs (|FastStringCpp| file, |[SCFunction]| list)
 	opt norefcounts
 	for (f in list)
-		if (f isnt inline) and .canexportfunc(f)
+		if (f isnt inline) and .CanExportFunc(f)
 			.cppfunc( file, f )
 	scfunction.CurrFunc = nil
 

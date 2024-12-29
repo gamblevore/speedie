@@ -93,6 +93,7 @@ function ReachFunc (|SCNode| from, |bool|)
 	
 	require !.MyReacher
 	.MyReacher = from
+		
 	Compiler.stReachedFunc++
 	if .IsSTDLib
 		Compiler.stLibFuncs++
@@ -147,6 +148,8 @@ function scclass.Reach (|SCNode| from, |message| src=nil)
 	for d in .Properties
 		d.TypeReach(self, d.source!)
 		d.contains!.TypeReach(self, d.source!)
+	
+	.ReachBehaviours
 
 
 function scclass.ReachBehaviours
