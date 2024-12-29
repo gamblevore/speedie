@@ -1057,21 +1057,35 @@ class SCDecl (SCNamed) {
 		if !.PointerCount
 			n = .type.Size
 		if .IsCArray
-			n *= .C_Array
+			n *= .CArrayTotal
 		return N
 
+
+	function CArrayTotal (|int|)
+		opt norefcounts
+		rz = 1
+		while (|| m = .c_Array)
+			rz *= m
+			self = .internal #loop
+			
+
+	function CArrayInner (|scdecl|)
+		opt norefcounts
+		while (.iscarray)
+			self = .internal
+		return self
+			
 
 	function CArraySize (|int|)
 		opt norefcounts
 		description "The size of the variable itself, in memory. Default carray size is 1. Objects use the pointer-size."
+		|| mul = 1
 		if .iscarray
-			|| i = .internal
-				return i.CArraySize * .c_array
-			debugger
+			mul = .CArrayTotal
 		|| T = .type
 		if T.IsObject or .PointerCount// or t.FuncProto
-			return platform.PointerBytes
-		return T.size
+			return platform.PointerBytes * mul
+		return T.size * mul
 
 
 	function TypeInfo (|DataTypeCode|)
@@ -1119,7 +1133,8 @@ class SCDecl (SCNamed) {
 		  else
 			rz = .type.size
 		if .IsCArray
-			rz *= .C_Array
+			// not true for carrays of carrays.
+			rz *= .CArrayTotal
 }
 
 
