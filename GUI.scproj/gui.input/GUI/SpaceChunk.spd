@@ -2,8 +2,8 @@
 
 
 class SpaceMap (memorylayer)
-	constructor (|&classData| cls)
-		super.constructor(cls)
+	constructor
+		super.constructor(SpaceTree)
 		.Use
 		.root = spacetree()
 	|SpaceTree| Root
@@ -12,16 +12,27 @@ class SpaceMap (memorylayer)
 class SpaceTree (list)
 	contains SpaceChunk
 	|SpaceChunk--[8]|		Segments
-	|SpaceTree--[3]|		Neighbours
-
+	|SpaceTree --[3]|		Neighbours
+	// to go right:
+		// if on the right, use neighbour[0]
+		// if on the left, look at our parent and use our pos but one step left.
+	
+	// perhaps we should just make a linked list of ALL vobjects in a map?
+	// then we can do all the moves+reinsertions first
+	// then go over it AGAIN to do the hit-detection.
+	// although thats not so great when we don't store the old position.
+	// this loses us the ability to "Go back to the previous position" in case
+	// a fast-moving object hits a wall.
+	// unless those moves are done at the time anyhow?
+	// and its just obj vs obj thats done secondly... 
 	module
-		|list of vobjectholder| Holders
+		|list of VObjectHolder| Holders
 
 
 class SpaceChunk (list)
 	|GridSection| Blocks
 	contains VObject
-	function Parent (|spacetree|)
+	function Parent (|SpaceTree|)
 		return super.parent|&nil||spacetree|
 
 

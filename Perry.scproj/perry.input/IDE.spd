@@ -377,10 +377,7 @@ class PerryIDE (Window)
 		
 		require !.CurrMouseDown 
 		if HideTabs == VisTabs
-//			if hidetabs	// we don't have the ability to fade in... actually.
-//				.ProjectTabs.declutternow = HideTabs
-//			  else
-				.ProjectTabs.declutter = HideTabs
+			.ProjectTabs.declutter = HideTabs
 			
 		if (hidetop == vistop)
 			.StartScreen.declutter = hidetop
@@ -390,7 +387,6 @@ class PerryIDE (Window)
 			|| HideBuilders = !ShowBuilders
 			.runbutton.declutter		= HideBuilders
 			.buildbutton.declutter		= HideBuilders
-//			.recentbutton.declutter		= HideBuilders
 			.Progress.Declutter			= HideBuilders
 		
 		if (hideside == visside)
@@ -437,9 +433,6 @@ class PerryIDE (Window)
 
 	function SaveMemory
 		if .IsFront
-//			|| d = PerryIDE.Effects.Duration
-//				PerryIDE.Effects.Duration = 0
-//				.LogOneAction(@emb + ("Image effect time: " + d.RenderDurr))
 			return 
 		require !.UsingSpdLib
 		|| f = .Feedback
@@ -680,20 +673,8 @@ class PerryIDE (Window)
 
 
 	module
-//		|JeeboxEffects|				Effects
 		|bool|						DummyTest
 		|byte|						StatsMode
-		
-//		Effects.Init()
-
-//		syntax access (|int| i, |perryide|)
-//			opt norefcounts
-//			for w in window.all
-//				if w isa perryide
-//					if i <= 0
-//						return w
-//					i--
-		
 		
 		function New (|string| path, |perryide|)
 			rz = PerryIDE(path.file)
@@ -987,7 +968,9 @@ function PerryIDE.IDECommand (|bool|)
 	  elseif cmd ~= "render" or "parse"
 		.editme.beep = s.parse.Render
 	  elseif cmd ~= "tetris"
-		TetrisWin()
+		|| w = Breakout()
+		w.LiveActionFPS = 60
+		w.BlockScale ?= 20//		TetrisWin()
 	  else
 		beep "unrecognised: " + cmd
 

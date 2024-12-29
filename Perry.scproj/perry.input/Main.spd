@@ -1,5 +1,5 @@
 
-import "GameExamples/tetris.spd"
+import "GameExamples/arkanoid3D.spd"
 
 main // main { 
 	if app.Yes("crash")
