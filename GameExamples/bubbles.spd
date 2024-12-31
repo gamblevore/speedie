@@ -5,6 +5,7 @@ import "GUI"
 	// 3d arkanoid with 3d balls?
 	// bubble-tank?
 	// bubble-bobble? (maybe not, needs sprite artwork)
+	// a snake-game with a funny walking/dancing snake that bites orbs
 	// that fruit-merging game?
 	// clouds dropping rain or fire or somthing and you have to burn people? (or tanks)
 
