@@ -57,7 +57,10 @@ function TypeOfType (ExprResolver) // typeoftypecast, typeofcast
 		error (exp, "Can’t cast between structs/carrays")
 
 	  elseif old.NumericCountWithBools != new.NumericCountWithBools
-		error (exp, "Vector cast mismatch")
+		|| O = old.NumericCountWithBools
+		|| N = new.NumericCountWithBools
+		ifn (O == 3 or 4) and (N == 3 or 4) // allow?
+			error (exp, "Vector cast mismatch")
 
 	  else
 		if exp0.isint and new.TypeSuffers

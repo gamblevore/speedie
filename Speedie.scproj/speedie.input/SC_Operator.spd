@@ -240,30 +240,30 @@ module {
 		return opp
 	
 	
-	function BuildOrder // reordering here
+	function BuildOrder // reordering , orderops, operator ordering, 
 		|| Strs = "
+<<
+>>
+>>>
 mod
 ^ pow
 / divide
 * multiply
 - minus
 + plus
-<<
->>
->>>
 &&& &
 ^^^ xor ^
 ||| | (|)
 to from custom
 by
+is isnt
+in
 <
 <=
 >
 >=
 ==
 !=
-is isnt
-in
 and
 or
 ="	
