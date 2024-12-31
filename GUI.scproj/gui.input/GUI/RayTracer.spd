@@ -1,17 +1,23 @@
 
 
-// todo:
-// 1) Add screen cells and culling
-// 2) Add space-partitions... (can add parent nodes... map can be the memorylayer of spacetree nodes)
-// 3) Optimisations around unmoving objects
-// 4) hit-detection? (surely its just chunk vs chunk anyhow?)
-// 5) 4 threads, each can do one quad.
-// 6) more shapes:
+// todo whenever its fun?
+// * 4 threads, each can do one quad.
+// * default RayTracer constructor uses block positioning system to match 2D/3D closely
+// * App seems to still have "unstable" frames? (we need to log the framegap to figure out whats going on)
+// * Eliminate drift by using "NextInSecond" number which is always stable
+	// so for 10fps... it would be like 6553, 13107, 19660, 26214, 32K... etcetc
+
+// advancements: (do AFTER we have perry+speedie in an awesome state)
+// 1) Make SpaceTree work
+// 2) Optimisations around unmoving objects
+// 3) hit-detection? (surely its just chunk vs chunk anyhow?)
+// 4) more shapes:
 	// * box    / sloped voxels / blends with neighbours
 	// * pipe   / half-pipes    / bends
 	// * sphere / capsule       / blobs
 	// * SDFs
 	// (All shapes: Provide raydist for drawing, nearest point for hit-detection)
+
 	
 
 
@@ -62,6 +68,7 @@ class RayTracer
 	
 			
 	helper AntiAlias (|vec2| XY, |!&raytracenode| curr, |&imagepixel| pxl)
+		opt min 3
 		|| ID = pxl.a
 		|| C = pxl.Color
 		for i in 4
@@ -94,9 +101,9 @@ class RayTracer
 		return .Color
 	
 
-	helper Dir (|int| X, |int| Y, |vec3|)
-		cpp_part DirInt
-		return .Dir((x,y).vec2)
+//	helper Dir (|int| X, |int| Y, |vec3|)
+//		cpp_part DirInt
+//		return .Dir((x,y).vec2)
 	
 	helper Dir (|vec2| XY, |vec3|)
 		XY = (xy + .adjust) * .scale
@@ -111,6 +118,7 @@ class RayTracer
 
 
 	helper InPlanes (|vobject| b, |bool|)
+		opt min 3
 		|| D = (b.pos - ._Camera).lengthSq // should use the radius if a sphere, or at least be able to ask for "the nearest point" from the function.
 		require D > 0.25 and D < .MaxViewDistSq
 		|| R = (b.radius, 0.0)
@@ -138,11 +146,7 @@ class RayTracer
 	
 	helper PlayQuidditch (|bool|)
 		opt norefcounts,  opt min 3
-		target !__PROJECT_PERRY__
-			if 1
-				return 1
 		|| B = raytracer.GrabRoot(32)
-			b.sanity
 			raytracer.currNode = raytracer.StartNodes
 			.DoFrustrum
 			if .CameraChangedSinceLastTrace
@@ -173,8 +177,9 @@ class RayTracer
 
 	helper TraceCell (|&raytracecell| cell)
 		// super-awesome system to reduce stack use
-		// it might seem like 7 vars is a lot, but it could easily be 14...
-		// due to how complex this is (or could be)
+		// it might seem like 6 vars is a lot, but it could easily be 14...
+		// if I didn't work miracles to reduce all this!
+		opt min 3
 		|| P = cell.xy
 		|| pxl = cell.pxl
 		|| pxl3 = pxl - cell.stride*cell.h
@@ -182,21 +187,22 @@ class RayTracer
 			|| pxl2 = pxl + cell.w
 			while pxl < pxl2
 				#! Main pixel color
+				cell.Aliased = false
 				pxl <~ .GetColor(P, cell.node!)
 				
-				|| Left = pxl-1 // could try to remove this by storing antialiasedness on the cell...
+				|| Left = pxl-1
 				if p.x and pxl.a != left.a
 					#! Anti-alias the left??
 					.AntiAlias(p-(1.0,0), cell.node!, left)
 					.AntiAlias(p, cell.node!, pxl)
-					left = nil
+					cell.Aliased = true
 				
 				if p.y
 					#! Maybe below too??
 					|| below = pxl + cell.stride
 					if pxl.a != below.a
 						.AntiAlias(p-(0,1.0), cell.node!, below)
-						if left
+						if !cell.Aliased
 							.AntiAlias(p, cell.node!, pxl)
 				pxl++
 				p.x++
@@ -264,8 +270,8 @@ struct RayBoost
 	helper Init 
 		for i in 4
 			.quad[i] = .InitCell(i&1, i>>1)|&rayboost|
-	
-	function PrintStats
+
+//	function PrintStats
 //		|| n = .area
 //		|| Total = 0
 //		for i in n
@@ -313,24 +319,9 @@ struct RayBoost
 					.Quadditch(V, 2)
 				if R
 					return .Quadditch(V, 3)
-		  //else
-			//debugger
-
-	function Sanity  /*
-		|| w = .chunkx|int|
-		|| h = .chunky|int|
-		for x in w
-			for y in h
-				|| c = .FindChunkSub(x,y)
-				for x2 in w
-					for y2 in h
-						if x2!=x or y2!=y
-							|| c2 = .FindChunkSub(x2,y2)
-							if c == c2
-*/
 
 	function FillQuads (|raytracer| T)
-		opt norefcounts,  opt min 3      // .ID = (self - raytracer.RootNode)
+		opt min 3
 		|| S = .size.vec4
 		require s.ispositive             // do nothing
 		|| Sh = .px+.depth
@@ -404,12 +395,13 @@ struct RayTraceCell
 	|uint16|					Stride
 	|byte|						H
 	|byte|						W
+	|bool|						Aliased
 	
-	function Count (|int|)
-		|| w = .node
-		while w
-			rz++
-			w = w.next
+//	function Count (|int|)
+//		|| w = .node
+//		while w
+//			rz++
+//			w = w.next
 
 
 function int.ContainingPowerOfTwo (|int|)

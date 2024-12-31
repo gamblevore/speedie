@@ -10,7 +10,7 @@ import "GUI"
 
 
 main
-	gui.init(3)
+//	gui.init(3)
 	return Bubbles().RunAsMain(60)
 
 

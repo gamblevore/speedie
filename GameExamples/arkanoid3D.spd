@@ -7,8 +7,6 @@ main
 
 // * aim AWAY from the block, not towards it!
 // * block nudge... for vibration on hit
-// * Eliminate drift by using "NextInSecond" number which is always stable
-	// so for 10fps... it would be like 6553, 13107, 19660, 26214, 32K... etcetc
 
 
 
@@ -28,7 +26,6 @@ class Breakout (Window)
 	|[vobject]|			Spirals
 
 	constructor
-		// want a default RayTracer constructor that uses the block positioning system
 		.t = RayTracer(vec3(10, 6.25, -20))
 		.bar = vobject.box(nil, nil)
 		.fps = fpstextview(self)
@@ -39,8 +36,7 @@ class Breakout (Window)
 	behaviour keydown
 		if key is v
 			.vsync = !.vsync
-			app.say .vsync.render	// App seems to still have "unstable" frames? regardless
-									// We need to draw the "framegap" per frame to see if its stable.  
+			app.say .vsync.render
 			gui.vsync = .vsync
 
 

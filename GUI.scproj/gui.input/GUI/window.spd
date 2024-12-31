@@ -110,7 +110,8 @@ class Window (GUIControl)
 		if gui.init(scaling)
 			gui.NukeCursor
 			.BlockScale ?= 20
-			return GUI.run
+			if !gui.singleframenest
+				return GUI.run
 
 		
 	syntax call (|ConfirmCanceller| Cancel=nil, |object?|)

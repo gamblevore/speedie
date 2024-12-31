@@ -229,7 +229,12 @@ module GUI
 		.Terminate
 		.sdl_quit
 		
-		return (!StdErr.OK)|int|
+		rz = (!StdErr.OK)|int|
+		if .singleframenest > 0
+			// we could get stuck in an inf-loop when they are trying to quit
+			// besides... the calling code will be in an invalid state...
+			// and can come from anywhere
+			app.quit(rz)
 
 	
 	helper PostLoads
@@ -449,7 +454,7 @@ module GUI
 	
 	
 	helper ActualEvents (|SDLActivity|) // frameevents
-		while .Event.Poll
+		while (.QuitReason isnt exitorterminate) and .Event.Poll
 			.eventcount++
 			rz |= .CheckEvent(.event)
 			.Event.type = 0
@@ -769,8 +774,8 @@ module GUI
 		.ClearAlerts
 		.HandleAppResize
 		.PostLoads
-		rz |= .ActualEvents
 		notifications.CheckForDisappear
+		rz |= .ActualEvents
 
 
 	helper CheckQuarantine
@@ -1055,9 +1060,7 @@ module GUI
 		|| wev = ev.window
 		|| wt = wev.event
 		if wt is CLOSE										// A request to close ANY window.
-			.QuitReason |= SDLActivity.StrongWindowClose
-			if keys.Shift or keys.Option
-				.QuitReason &= ~SDLActivity.exiting
+			.QuitReason |= SDLActivity.WindowClose
 			return SDLActivity.activity
 			
 		if wt is RESIZED
