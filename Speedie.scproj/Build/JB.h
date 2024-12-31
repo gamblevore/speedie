@@ -2613,9 +2613,9 @@ extern Dictionary* JB__TC_Types_Dict;
 
 #define kJB__FileDes_StdOut ((FileDes)1)
 
-#define kJB__FileMode_CanExec ((FileMode)281474976710656)
+#define kJB__FileMode_CanExec ((FileMode)73)
 
-#define kJB__FileMode_Data ((FileMode)6)
+#define kJB__FileMode_Data ((FileMode)416)
 
 #define kJB__FileMode_Group ((FileMode)56)
 
@@ -2623,7 +2623,7 @@ extern Dictionary* JB__TC_Types_Dict;
 
 #define kJB__FileMode_Owner ((FileMode)448)
 
-#define kJB__FileMode_Process ((FileMode)115968)
+#define kJB__FileMode_Process ((FileMode)493)
 
 #define kJB__FileResolveMode_AllowMissing ((bool)1)
 

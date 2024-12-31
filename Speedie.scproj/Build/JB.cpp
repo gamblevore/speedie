@@ -3442,7 +3442,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[216]);
-	JB_FS_AppendInt32(_fsf0, (2024122918));
+	JB_FS_AppendInt32(_fsf0, (2024123121));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8870,7 +8870,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1683]);
-	JB_FS_AppendInt32(_fsf0, (2024122918));
+	JB_FS_AppendInt32(_fsf0, (2024123121));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -14318,8 +14318,12 @@ SCObject* SC_TypeOfType(Message* Exp, SCNode* Name_space, Message* Side) {
 		}
 	}
 	 else iif (SC_Decl_NumericCountWithBools(Old) != SC_Decl_NumericCountWithBools(New)) {
-		iif (true) {
-			JB_Msg_Fail(Exp, JB_LUB[1712]);
+		int O = SC_Decl_NumericCountWithBools(Old);
+		int N = SC_Decl_NumericCountWithBools(New);
+		iif (!(((O == 3) or (O == 4)) and ((N == 3) or (N == 4)))) {
+			iif (true) {
+				JB_Msg_Fail(Exp, JB_LUB[1712]);
+			}
 		}
 	}
 	 else {
@@ -58486,4 +58490,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -971209246076946935 -8233655354878797091
+// 6914476025753897232 -1503207478439254083
