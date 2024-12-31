@@ -12,9 +12,18 @@ datatype vec4
 	syntax Equals (|vec4| v, |bool|Aware, |bool|)
 		return (.x == v.x) and (.y == v.y) and (.z == v.z) and (.w == v.w) 
 	
+	function Climp (|float| max=1.0, |vec4|)
+		return (.x.climp(max), .y.climp(max), .z.climp(max), .w.climp(max))
+	
 	function Clamp (|float| max=1.0, |vec4|)
 		return (.x.clamp(max), .y.clamp(max), .z.clamp(max), .w.clamp(max))
 	
+	function IsPositive (|bool|)
+		return (.x2 > .x) & (.y2 > .y)
+	
+	function IsNegative (|bool|)
+		return (.x2 < .x) ||| (.y2 < .y)
+
 	function Sqrt (|vec4|)
 		return (.x.sqrt, .y.sqrt, .z.sqrt, .w.sqrt) // oof
 		
@@ -99,11 +108,23 @@ datatype vec4
 		.w = .w.sign(sigma)
 		return self
 	
+	
+	function MakeSane (|vec4|)
+		.x = .x.MakeSane
+		.y = .y.MakeSane
+		.z = .z.MakeSane
+		.w = .w.MakeSane
+		return self
+
+
 	function Exists (|bool|)
 		return .width > 0 and .Height > 0
+
+	
 	function Posify (|vec4|)
 		description "Make this vector have positive area." 
 		return (.x1 min .x2, .y1 min .y2, .x1 max .x2, .y1 max .y2)
+
 	
 	render
 		fs <~ "(${.x}, ${.y}, ${.z}, ${.w})"
@@ -263,10 +284,10 @@ datatype ivec4
 		return .contains(v)
 	
 	function IsPositive (|bool|)
-		return (.x2 > .x) and (.y2 > .y)
+		return (.x2 > .x) & (.y2 > .y)
 	
 	function IsNegative (|bool|)
-		return (.x2 < .x) or (.y2 < .y)
+		return (.x2 < .x) ||| (.y2 < .y)
 		
 	syntax cast (|bool|)
 		cpp_part Bool
@@ -340,12 +361,6 @@ datatype vec3
 //		return (.y, .x, -.z)
 //	function RotateZRight (|vec3|)
 //		return (.y, -.x, .z)
-	
-	function MakeSane (|vec3|)
-		.x = .x.MakeSane
-		.y = .y.MakeSane
-		.z = .z.MakeSane
-		return self
 		
 	syntax Compare (|float| Other, |bool|Aware, |float|)
 		|| LSq = .lengthsq
@@ -903,11 +918,14 @@ function vec4.Center (|vec2|)
 datatype Plane3D (vec4)
 	module
 		function New (|vec3| A, |vec3| B, |vec3| C, |vec4|)
-		    || N = ((B-A) x (C-B)).normal
+		    || N = (B-A) x (C-B)
+		    n = n.normal
 			return (N, N • A)
 
 		function Normals (|vec3| D1, |vec3| D2, |vec3| Start, |vec4|)
-		    || N = (-D1 x D2).normal
-			return (N, N • Start)
+			|| N = D1 x D2
+			n = n|vec4|.climp(0.000001)|vec3|
+			n = n.normal
+			return (N, -(N • Start))
 
 

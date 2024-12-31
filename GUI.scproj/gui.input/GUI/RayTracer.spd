@@ -49,7 +49,7 @@ class RayTracer
 		return ._Camera
 
 	setter Camera (|vec3|)
-		._Camera = Value.MakeSane
+		._Camera = Value|vec4|.MakeSane|vec3|
 	
 	
 	helper ViewMat (|&mat4|)
@@ -91,6 +91,27 @@ class RayTracer
 				.color = (C, sp.shapeID|float|*255th)
 		return .Color
 	
+	helper GetColor2 (|vec2| XY, |!&raytracenode| RT, |vec4|)
+		opt min 3, opt norefcounts
+		.Color = nil
+		.Dist = float.max
+		._CamDir = .Dir(xy)
+		.idir = -1.0 / ._CamDir
+		
+		while
+			|| sp = rt.draw
+			rt = rt.next
+			loop rt and sp
+			|| t = (sp.Shape)(sp, .Camera, ._CamDir, .idir)
+			|| tx = t.x
+			if (tx > 0) and (tx < .Dist)
+				.Dist = t.x
+				|| P = .Camera + ._CamDir*tx
+				|| Norm = (P - sp.pos).normal
+				|| C = (norm.abs * sp.Color.xyz)
+				.color = (C, sp.shapeID|float|*255th)
+		return .Color
+	
 
 	helper Dir (|int| X, |int| Y, |vec3|)
 		cpp_part DirInt
@@ -104,43 +125,49 @@ class RayTracer
 	helper Plane (|vec4| P, |vec4|)
 		|| D1 = .Dir(P.xy)
 		|| D2 = .Dir(p.x2y2)
-		return Plane3D.normals(d1, d2, ._Camera)
+		|| C = ._Camera
+		return Plane3D.normals(d1, d2, C)
 
 
 	helper InPlanes (|vobject| b, |bool|)
-		|| D = (b.pos - ._Camera).lengthsq
+		|| D = (b.pos - ._Camera).lengthSq // should use the radius if a sphere, or at least be able to ask for "the nearest point" from the function.
 		require D > 0.25 and D < .MaxViewDistSq
 		|| R = (b.radius, 0.0)
 		|| Pos = (b.pos, 1.0)
+		
 		for i in 4
-			|| P = .planes[i]
-			|| PX = pos + (R sign P)
-			|| Q = p • PX
+			|| Q = .planes[i].BoxVsPlane(r, pos)
 			require Q > 0
 		// Could also (later) check if the nearest frustrum point is in the box.
 		// Need points[8] and a way to find which is the nearest to the box, or just check all?
 		return true
 			
 	
-	helper DoFrustrum
-		.Planes[0] = .plane(.size.x1y1x1y2) // 0001 // left
-		.Planes[1] = .plane(.size.x2y1x2y2) // 1011 // right
-		.Planes[2] = .plane(.size.x1y1x2y1) // 0010 // bottom
-		.Planes[3] = .plane(.size.x1y2x2y2) // 0111 // top
+	helper DoFrustrum 
+		.Planes[0] = -.plane(.size.x1y1x1y2) // 0001 // left
+		.Planes[1] =  .plane(.size.x2y1x2y2) // 1011 // right
+		.Planes[2] =  .plane(.size.x1y1x2y1) // 0010 // bottom
+		.Planes[3] = -.plane(.size.x1y2x2y2) // 0111 // top
 	
 	
-	helper Redivide (|bool|)
+	function CameraChangedSinceLastTrace (|bool|)
+		// return if campos+matrix is the same as last time...
+		return true
+	
+	
+	helper PlayQuidditch (|bool|)
 		opt norefcounts,  opt min 3
 		target !__PROJECT_PERRY__
 			if 1
 				return 1
 		|| B = raytracer.GrabRoot(32)
-			raytracer.currNode = raytracer.StartNodes
+			raytracer.currNode = raytracer.StartNodes + (b.chunkx*b.chunky)
 			.DoFrustrum
-			b.FillQuads(self)
+			if .CameraChangedSinceLastTrace
+				b.FillQuads(self)
 			for s in .shapes
 				if .InPlanes(s)
-					b.Place(s)
+					b.Quadditch(s)
 			return true
 	
 	
@@ -152,7 +179,13 @@ class RayTracer
 		.size = where.size.__xy.vec4
 		.scale = 1.0/.size.x2x2
 		.adjust = .size.x2y2 * -0.5
-		require .Redivide()
+		require .PlayQuidDitch
+		
+// we need to go across the chunks. shouldn't be too hard?
+//		|| curr = startnodes|&rayboost|
+//		|| Last = curr
+// we'll do a proper chunk lister... SOOOONNN
+
 		|| P = vec2()
 		|| w = where.Width|float|
 		|| h = where.Height|float|
@@ -163,13 +196,14 @@ class RayTracer
 			|| below = where[PY+(0,-1)]			
 			|| Left = pxl
 			while p.x < w
-				|| C = .GetColor(P)
+				|| curr = rootnode!.FindChunkSub(p.x|int|>>5, p.y|int|>>5)
+				|| C = .GetColor2(P, curr)
 				pxl <~ C
-				if pxl.a!=left.a
+				if pxl.a != left.a
 					left = .AntiAlias(p-(1.0,0), left)
 					pxl = .AntiAlias(p, pxl)
 					rz++
-				if pxl.a!=below.a
+				if pxl.a != below.a
 					below = .AntiAlias(p-(0,1.0), below)
 					if pxl.a==left.a
 						pxl = .AntiAlias(p, pxl)
@@ -185,11 +219,8 @@ class RayTracer
 	
 	
 	module
-		// 30x19 for my small screen...
 		helper GrabRoot (|int| px, |int| Size=4MB, |&RayBoost|)
-			|| h = gui.Screen.height - 1
-			|| w = gui.Screen.Width - 1
-			|| s2 = (0,0,w,h)
+			|| s2 = (0,0, gui.Screen.Width, gui.Screen.height)
 			px = 1<<px.log2
 
 			|| root = .RootNode
@@ -200,109 +231,144 @@ class RayTracer
 			.RootNode = root
 			root.px = px
 			root.size = s2
-			|| D = (w+1).ContainingPowerOfTwo - px.log2
-			|| Last = root.InitialCreation(root, D-1)
+			
+			|| D = s2.x2.ContainingPowerOfTwo
+			|| px2 = px.log2
+			|| s3 = (s2.x2y2+(px-1)) >> px2
+			root.chunkx = s3.x
+			root.chunky = s3.y
+			
+			|| Last = root.InitialCreation(root, D-1, px2)
 			StartNodes = last|&RayTraceNode|
 			EndNodes = (root|&byte| + Size)|&RayTraceNode|
 			return root
-			
+		
+		
 		|&RayBoost|			RootNode
 		|&RayTraceNode|		StartNodes
 		|&RayTraceNode|		CurrNode
 		|&RayTraceNode|		EndNodes
 
 
+
 struct RayBoost
-	|vec4|					YDiv			
 	|vec4|					XDiv
+	|vec4|					YDiv			
 	|ivec4|					Size
-	|(&RayBoost)[4]|		Quad
+	|(&RayBoost)[4]|		Quad			// rather shrink this.
+	|byte|					ThreadLock		// in case I want to multi-thread
 	|byte|					Depth	
-	|byte|					ThreadLock // in case I want to multi-thread
 	|byte|					PX
+	|byte|					ChunkX
+	|byte|					ChunkY
 	
 
-	function SubPlace (|vobject| v, |int| i)
-		|| Q = .quad[i]
-		if .depth
-			return Q!.place(v)
-		|&RayTraceNode| PP = Q|&RayTraceNode|
-		|| New = raytracer.currNode!++
-		.quad[i] = New|&rayboost|
-		New.Next = nil
-		New.Draw = V
-
-		
-	function Place (|vobject| v)
+	function Quadditch (|vobject| v, |int| i=-1)
 		real self
+		if (i < 0)
+			// do nothing
+		  elseif .depth
+			self = .quad[i]!
+		  else
+			|| Q = .quad[i]
+			|&raytracenode| RT 
+			|| Old = Q|&RayTraceNode|
+				RT = raytracer.currNode!++
+			  else
+				RT = .FindChunk(i&1, i>>1)
+			.quad[i] = RT|&rayboost|
+			RT.Next = Old
+			RT.Draw = V
+			return
+		
 		// for big chunks, we should also test that the quad corners are in the object.
 		// inigo quilez has a good article on this.
 		|| Rd = (v.radius, 0.0)
 		|| RX = Rd sign .xdiv
 		|| RY = Rd sign .ydiv
 		|| VP = (V.pos, 1.0)
-		|| L = .xdiv • (VP - RX) > 0
-		|| R = .xdiv • (VP + RX) > 0
-		|| B = .ydiv • (VP - RY) > 0
-		|| T = .ydiv • (VP + RY) > 0
+		|| L = .xdiv • (VP + RX) > 0
+		|| R = .xdiv • (VP - RX) < 0
+		|| B = .ydiv • (VP + RY) > 0
+		|| T = .ydiv • (VP - RY) < 0
 		
 		if (b|||t) & (l|||r)
 			if (L+R)+(B+T) == 2
-				return .SubPlace(V, R + (T<<1)) // tailcall
+				return .Quadditch(V, R + (T<<1)) // tailcall
 			
-			if T
-				if L
-					.SubPlace(V, 0)
-				if R
-					.SubPlace(V, 1)
 			if B
 				if L
-					.SubPlace(V, 2)
+					.Quadditch(V, 0)
 				if R
-					return .SubPlace(V, 3)
+					.Quadditch(V, 1)
+			if T	
+				if L
+					.Quadditch(V, 2)
+				if R
+					return .Quadditch(V, 3)
+		  else
+			debugger
 
 
 	function FillQuads (|raytracer| T)
-		opt norefcounts,  opt min 3
-//		.ID = (self - raytracer.RootNode)
-		|| S = .quad[0]!.size
-		|| D1 = t.Dir(S.x2, S.y1)
-		|| DM = t.Dir(S.x2, S.y2)
-		|| D3 = t.Dir(S.x1, S.y2)
-		.xdiv = Plane3D.normals(d3, dm, t._Camera) // now just use these... and then subdivide!
-		.ydiv = Plane3D.normals(d1, dm, t._Camera)
-
+		opt norefcounts,  opt min 3      // .ID = (self - raytracer.RootNode)
+		|| S = .size.vec4
+		require s.ispositive             // do nothing
+		|| Sh = .px+.depth
+		|| mid = s.xy+(1 << sh)|float|
+		.yDiv = t.plane((  s.x2, mid.y,   s.x, mid.y)).makesane
+		.xDiv = t.plane((mid.x,    s.y, mid.x,   s.y2)).makesane
+		
 		for i in 4
-			if .Depth > 0
+			if .Depth
 				.quad[i].FillQuads(t)
 			  else
 				.quad[i] = nil
 	
 	
-	helper InitialCreation (|!&RayBoost| Last, |int| H, |!&RayBoost|)
-		.depth = H
+	helper FindChunk (|int| x, |int| y, |&RayTraceNode|)
+		|| V = .size.xy >> .px
+		return .FindChunkSub(V.x + x, V.y + y)
+	
+	
+	helper FindChunkSub (|int| x, |int| y, |&RayTraceNode|)
+		|| w = .ChunkX
+		return RayTracer.StartNodes! + x + (y*w)
+	
+	
+	helper InitialCreation (|!&RayBoost| Last, |int| H, |int| px, |!&RayBoost|)
+		.depth = H-px
+		.px = px
+
+		if h <= px
+			return last
+
 		for i in 4
 			.quad[i] = ++last
-
+		
 		|| bounds = .Size
 		|| xy = bounds.xy
 		|| hh = 1<<H
-		|| LB = (xy,xy+hh-1)
-		for yy in 2	
-			for xx in 2
-				|| S = lb + (hh*xx, hh*yy, hh*xx, hh*yy)
-				|| Q = .Quad[xx+yy<<1]!
-				q.size = s min bounds
-				if h > 0
-					last = Q.InitialCreation(last, H-1)
+		|| LB = (xy, xy+hh)
+		for y in 2	
+			for x in 2
+				|| S = lb + hh * (x,y,x,y)
+				|| Q = .Quad[x + y<<1]!
+				Q.depth = 0
+				Q.size = s.clip(bounds)
+				q.chunkx = .chunkx
+				if q.size.ispositive
+					last = Q.InitialCreation(last, H-1, px)
 		
 		return last
 
 
 
 struct RayTraceNode
-	|vobject--|				Draw
-	|?&RayTraceNode|		Next
+	|?vobject--|				Draw
+	|?&RayTraceNode|			Next
+	// could be nice to put 3 items on here.
+	// this makes it cache nicely! faster memory :)
 
 
 
@@ -310,3 +376,12 @@ function int.ContainingPowerOfTwo (|int|)
 	|| p = .log2
 	|| rem = self - p
 	return p + (rem!=0)
+
+
+function Vec4.BoxVsPlane (|vec4| R, |vec4| Pos, |float|)
+	description "Pos.w must be 1.0,  r.w must be 0.0"
+	|| RB = R sign self
+	|| PX = pos + RB
+	|| Q = self • PX
+	return Q
+

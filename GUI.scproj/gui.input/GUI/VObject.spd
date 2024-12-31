@@ -26,7 +26,7 @@ class VObject (list)
 		.ShapeID = ++ShapeIDs
 
 	constructor (|vec3| Pos,  |vec3| Rad, |DistanceFunction| shape,   |vec4| Color=colors.white)
-		cpp_part ConstructorSphere
+		cpp_part ConstructorShape
 		.pos = pos
 		.Shape = shape
 		.Radius = rad
