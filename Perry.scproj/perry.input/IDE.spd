@@ -968,9 +968,11 @@ function PerryIDE.IDECommand (|bool|)
 	  elseif cmd ~= "render" or "parse"
 		.editme.beep = s.parse.Render
 	  elseif cmd ~= "tetris"
-		|| w = Breakout()
-		w.LiveActionFPS = 60
-		w.BlockScale ?= 20//		TetrisWin()
+		tetriswin().runasmain(60)
+	  elseif cmd ~= "breakout"
+		Breakout().runasmain(60)
+	  elseif cmd ~= "bubbles"
+		bubbles().runasmain(60)
 	  else
 		beep "unrecognised: " + cmd
 

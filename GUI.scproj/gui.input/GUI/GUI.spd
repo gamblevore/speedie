@@ -646,7 +646,7 @@ module GUI
 
 
 	helper window.FrameStepsNeeded (|bool| ChangeOK, |bool| Update, |int|)
-		require ChangeOK or .LiveActionFPS // stop needless updates
+		require ChangeOK or .SimulationFPS // stop needless updates
 
 		// quite close, but arkanoid3d still reports a low drift overtime
 		// not sure why? its not like I paused the program?
@@ -654,7 +654,7 @@ module GUI
 		// we just need a "nextwithinsecond" uint16... it has to add up properly...
 		|uint| F = gui.FrameStart & 0xFFFF
 		|| CurrFrame = .CurrFrameNum
-		|| FPS = .LiveActionFPS|int| max 10
+		|| FPS = .SimulationFPS|int| max 10
 		|| L = ((F*FPS) >> 16)+1
 		|| L2 = L
 		if L < Currframe
@@ -993,7 +993,10 @@ module GUI
 		if  t is WINDOWEVENT
 			return .windowevent(ev)
 
-		|| w = .EventWindow #require
+		|| w = .EventWindow
+		require w // and w.parent // why would w.parent be nil?
+				  // quitting the app during breakout in perry caused this, though
+				  // need to trap this event...
 
 		w.__Tickle__
 		if T is dropbegin
@@ -1104,10 +1107,10 @@ module GUI
 		if OldXY.x < 0
 			move = nil
 		.CurrMouseXY = xy
-		if !w.LiveActionFPS
+		if !w.SimulationFPS
 			.ShowCursor
 		if .EventCount isa 8								// in case a window comes up or closes		
-			SDL_SetRelativeMouseMode(w.LiveActionFPS > 0)	// don't do it every frame
+			SDL_SetRelativeMouseMode(w.SimulationFPS > 0)	// don't do it every frame
 
 		if (.CanDrag >= MouseDragging.Within) and (MB is left)
 			w.DoMouseDrag(xy, .CanDrag >= MouseDragging.Beyond)
@@ -1153,9 +1156,13 @@ module GUI
 		#!keydown!
 		|| kev = ev.keysym
 		|| key = kev.sym
+		if (key is q) and keys.cmd
 		if key.IsEaten or .CanDrag >= mousedragging.Within
 			return SDLActivity.nothing
-		if (key is w) and (keys.cmd) // checking for keys.cmd doesnt always work!!
+		if (key is w) and (keys.cmd)
+			// i think we could try eliminate this test.
+			// later... I mean... send an event of same type that is already sent
+			// so hopefully only 1 gets through?
 			return 0
 		beep.OK = 1
 		

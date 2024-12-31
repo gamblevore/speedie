@@ -61,26 +61,27 @@ class RayTracer
 		return ._LookAt
 	
 			
-	helper AntiAlias (|vec2| XY, |&imagepixel| pxl, |&imagepixel|)
+	helper AntiAlias (|vec2| XY, |!&raytracenode| curr, |&imagepixel| pxl)
 		|| ID = pxl.a
 		|| C = pxl.Color
 		for i in 4
 			|| sh = (i&1, i>>1).Vec2 - 0.5
-			c += .GetColor(XY + sh*0.8)
+			c += .GetColor(XY + sh*0.8, curr)
 		C *= 5th
 		C.a = ID|float|*255th
 		pxl <~ C
-		return pxl
 	
-	
-	helper GetColor (|vec2| XY, |vec4|)
+	helper GetColor (|vec2| XY, |!&raytracenode| Rt, |vec4|)
+		// Should allow alpha for drawing over prev images...
+		// Meaning that the alpha can't be the ID!
 		opt min 3, opt norefcounts
 		.Color = nil
 		.Dist = float.max
 		._CamDir = .Dir(xy)
 		.idir = -1.0 / ._CamDir
 		
-		for sp in .Shapes
+		while rt
+			|| sp = rt.draw!
 			|| t = (sp.Shape)(sp, .Camera, ._CamDir, .idir)
 			|| tx = t.x
 			if (tx > 0) and (tx < .Dist)
@@ -89,27 +90,7 @@ class RayTracer
 				|| Norm = (P - sp.pos).normal
 				|| C = (norm.abs * sp.Color.xyz)
 				.color = (C, sp.shapeID|float|*255th)
-		return .Color
-	
-	helper GetColor2 (|vec2| XY, |!&raytracenode| RT, |vec4|)
-		opt min 3, opt norefcounts
-		.Color = nil
-		.Dist = float.max
-		._CamDir = .Dir(xy)
-		.idir = -1.0 / ._CamDir
-		
-		while
-			|| sp = rt.draw
 			rt = rt.next
-			loop rt and sp
-			|| t = (sp.Shape)(sp, .Camera, ._CamDir, .idir)
-			|| tx = t.x
-			if (tx > 0) and (tx < .Dist)
-				.Dist = t.x
-				|| P = .Camera + ._CamDir*tx
-				|| Norm = (P - sp.pos).normal
-				|| C = (norm.abs * sp.Color.xyz)
-				.color = (C, sp.shapeID|float|*255th)
 		return .Color
 	
 
@@ -161,7 +142,8 @@ class RayTracer
 			if 1
 				return 1
 		|| B = raytracer.GrabRoot(32)
-			raytracer.currNode = raytracer.StartNodes + (b.chunkx*b.chunky)
+			b.sanity
+			raytracer.currNode = raytracer.StartNodes
 			.DoFrustrum
 			if .CameraChangedSinceLastTrace
 				b.FillQuads(self)
@@ -171,51 +153,57 @@ class RayTracer
 			return true
 	
 	
-	function RayTrace (|image| where, |float|)
-		// should allow alpha for drawing over prev images...
-		// meaning that the alpha can't be the ID!
-		opt norefcounts,  opt min 3
+	function RayTrace (|image| where)
+		opt min 3
 		.ViewMat
 		.size = where.size.__xy.vec4
 		.scale = 1.0/.size.x2x2
 		.adjust = .size.x2y2 * -0.5
-		require .PlayQuidDitch
-		
-// we need to go across the chunks. shouldn't be too hard?
-//		|| curr = startnodes|&rayboost|
-//		|| Last = curr
-// we'll do a proper chunk lister... SOOOONNN
+		if .PlayQuidditch
+			|| rn = rootnode!
+			|| C = Cells!
+			|| LastCell = C+rn.area
+			while C < LastCell
+				if c.node
+					c.Stride = where.width
+					c.pxl = where[c.xy.ivec2]
+					.TraceCell(C)
+				c++
 
-		|| P = vec2()
-		|| w = where.Width|float|
-		|| h = where.Height|float|
-		
-		while p.y < h
-			|| PY = (0, p.y|int|)
-			|| pxl = where[PY]
-			|| below = where[PY+(0,-1)]			
-			|| Left = pxl
-			while p.x < w
-				|| curr = rootnode!.FindChunkSub(p.x|int|>>5, p.y|int|>>5)
-				|| C = .GetColor2(P, curr)
-				pxl <~ C
-				if pxl.a != left.a
-					left = .AntiAlias(p-(1.0,0), left)
-					pxl = .AntiAlias(p, pxl)
-					rz++
-				if pxl.a != below.a
-					below = .AntiAlias(p-(0,1.0), below)
-					if pxl.a==left.a
-						pxl = .AntiAlias(p, pxl)
-					rz++
-				// :O
-				left = pxl
+
+	helper TraceCell (|&raytracecell| cell)
+		// super-awesome system to reduce stack use
+		// it might seem like 7 vars is a lot, but it could easily be 14...
+		// due to how complex this is (or could be)
+		|| P = cell.xy
+		|| pxl = cell.pxl
+		|| pxl3 = pxl - cell.stride*cell.h
+		while pxl > pxl3
+			|| pxl2 = pxl + cell.w
+			while pxl < pxl2
+				#! Main pixel color
+				pxl <~ .GetColor(P, cell.node!)
+				
+				|| Left = pxl-1 // could try to remove this by storing antialiasedness on the cell...
+				if p.x and pxl.a != left.a
+					#! Anti-alias the left??
+					.AntiAlias(p-(1.0,0), cell.node!, left)
+					.AntiAlias(p, cell.node!, pxl)
+					left = nil
+				
+				if p.y
+					#! Maybe below too??
+					|| below = pxl + cell.stride
+					if pxl.a != below.a
+						.AntiAlias(p-(0,1.0), cell.node!, below)
+						if left
+							.AntiAlias(p, cell.node!, pxl)
 				pxl++
-				below++
 				p.x++
+			pxl -= (cell.stride + cell.w)
 			p.y++
-			p.x = 0
-		rz /= where.size.area|float|		
+			p.x = cell.xy.x
+		cell.node = nil
 	
 	
 	module
@@ -229,25 +217,31 @@ class RayTracer
 				
 			root = memory.Zalloc(size)|&RayBoost|$
 			.RootNode = root
+			.EndNodes = (root|&byte| + Size)|&RayTraceNode|
 			root.px = px
 			root.size = s2
 			
 			|| D = s2.x2.ContainingPowerOfTwo
 			|| px2 = px.log2
 			|| s3 = (s2.x2y2+(px-1)) >> px2
-			root.chunkx = s3.x
-			root.chunky = s3.y
+			root.cellswide = s3.x
+			root.cellshigh = s3.y
 			
-			|| Last = root.InitialCreation(root, D-1, px2)
-			StartNodes = last|&RayTraceNode|
-			EndNodes = (root|&byte| + Size)|&RayTraceNode|
+			|| Last = root.InitialCreation(root+1, D-1, px2)
+			.cells = last|&Raytracecell|
+			.StartNodes = (.cells+root.area+1)|&RayTraceNode| // +1 for fakecell
+			while last-- > root
+				if !last.depth and last.px
+					last.init
 			return root
-		
+
 		
 		|&RayBoost|			RootNode
+		|&RayTraceCell|		Cells
 		|&RayTraceNode|		StartNodes
 		|&RayTraceNode|		CurrNode
 		|&RayTraceNode|		EndNodes
+
 
 
 
@@ -255,31 +249,44 @@ struct RayBoost
 	|vec4|					XDiv
 	|vec4|					YDiv			
 	|ivec4|					Size
-	|(&RayBoost)[4]|		Quad			// rather shrink this.
-	|byte|					ThreadLock		// in case I want to multi-thread
+	|!(&RayBoost)[4]|		Quad			// rather shrink Quad
 	|byte|					Depth	
 	|byte|					PX
-	|byte|					ChunkX
-	|byte|					ChunkY
+	|byte|					CellsWide		// shared with root
+	|byte|					CellsHigh		// shared with root
+	|byte|					ThreadLock		// In case I want to multi-thread
 	
 
-	function Quadditch (|vobject| v, |int| i=-1)
+	function Area (|int|)
+		return .CellsWide|int| * .CellsHigh|int|
+
+
+	helper Init 
+		for i in 4
+			.quad[i] = .InitCell(i&1, i>>1)|&rayboost|
+	
+	function PrintStats
+//		|| n = .area
+//		|| Total = 0
+//		for i in n
+//			Total += raytracer.startnodes![i].Count
+//		"$Total objects in $n chunks. (avg: ${total pc n}/chunk)"
+			
+
+	helper Quadditch (|vobject| v, |int| i=-1)
 		real self
-		if (i < 0)
-			// do nothing
-		  elseif .depth
+		if i >= 0
+			|| D = .depth
 			self = .quad[i]!
-		  else
-			|| Q = .quad[i]
-			|&raytracenode| RT 
-			|| Old = Q|&RayTraceNode|
-				RT = raytracer.currNode!++
-			  else
-				RT = .FindChunk(i&1, i>>1)
-			.quad[i] = RT|&rayboost|
-			RT.Next = Old
-			RT.Draw = V
-			return
+			if !D
+				|| Cell = self|&raytracecell|
+				|| RT = raytracer.currNode!++
+				|| Old = cell.node
+				cell.node = RT
+				RT.next = old
+				RT.Draw = V
+				return
+			require .PX
 		
 		// for big chunks, we should also test that the quad corners are in the object.
 		// inigo quilez has a good article on this.
@@ -306,9 +313,21 @@ struct RayBoost
 					.Quadditch(V, 2)
 				if R
 					return .Quadditch(V, 3)
-		  else
-			debugger
+		  //else
+			//debugger
 
+	function Sanity  /*
+		|| w = .chunkx|int|
+		|| h = .chunky|int|
+		for x in w
+			for y in h
+				|| c = .FindChunkSub(x,y)
+				for x2 in w
+					for y2 in h
+						if x2!=x or y2!=y
+							|| c2 = .FindChunkSub(x2,y2)
+							if c == c2
+*/
 
 	function FillQuads (|raytracer| T)
 		opt norefcounts,  opt min 3      // .ID = (self - raytracer.RootNode)
@@ -319,21 +338,25 @@ struct RayBoost
 		.yDiv = t.plane((  s.x2, mid.y,   s.x, mid.y)).makesane
 		.xDiv = t.plane((mid.x,    s.y, mid.x,   s.y2)).makesane
 		
-		for i in 4
-			if .Depth
+		if .Depth
+			for i in 4
 				.quad[i].FillQuads(t)
-			  else
-				.quad[i] = nil
 	
 	
-	helper FindChunk (|int| x, |int| y, |&RayTraceNode|)
-		|| V = .size.xy >> .px
-		return .FindChunkSub(V.x + x, V.y + y)
-	
-	
-	helper FindChunkSub (|int| x, |int| y, |&RayTraceNode|)
-		|| w = .ChunkX
-		return RayTracer.StartNodes! + x + (y*w)
+	helper InitCell (|int| x, |int| y, |&RayTraceCell|)
+		|| sz = .size
+		|| CellStart = sz.xy + ((x,y) << .px)
+		|| CellEnd = (CellStart + (1<<.px)) min sz.x2y2
+		|| D = CellEnd - CellStart
+		rz = RayTracer.Cells!
+		if d.x > 0 and d.y > 0
+			|| i = (CellStart>>.px)  fma  .CellsWide
+			rz  +=  i
+			rz.xy = CellStart.vec2
+			rz.w = d.x
+			rz.h = d.y
+		  else
+			rz  +=  .area // fake cell. should never be reached? but might be?
 	
 	
 	helper InitialCreation (|!&RayBoost| Last, |int| H, |int| px, |!&RayBoost|)
@@ -344,7 +367,7 @@ struct RayBoost
 			return last
 
 		for i in 4
-			.quad[i] = ++last
+			.quad[i] = last++
 		
 		|| bounds = .Size
 		|| xy = bounds.xy
@@ -356,9 +379,12 @@ struct RayBoost
 				|| Q = .Quad[x + y<<1]!
 				Q.depth = 0
 				Q.size = s.clip(bounds)
-				q.chunkx = .chunkx
+				q.CellsWide = .CellsWide
+				q.CellsHigh = .CellsHigh
 				if q.size.ispositive
 					last = Q.InitialCreation(last, H-1, px)
+				  else
+					q.px = 0 // unreachable
 		
 		return last
 
@@ -370,6 +396,20 @@ struct RayTraceNode
 	// could be nice to put 3 items on here.
 	// this makes it cache nicely! faster memory :)
 
+
+struct RayTraceCell
+	|vec2|						XY
+	|?&RayTraceNode|			Node
+	|&imagepixel|				pxl
+	|uint16|					Stride
+	|byte|						H
+	|byte|						W
+	
+	function Count (|int|)
+		|| w = .node
+		while w
+			rz++
+			w = w.next
 
 
 function int.ContainingPowerOfTwo (|int|)

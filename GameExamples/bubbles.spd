@@ -11,11 +11,11 @@ import "GUI"
 
 main
 	gui.init(3)
-	return RayScene().RunAsMain(60)
+	return Bubbles().RunAsMain(60)
 
 
 
-class RayScene (window)
+class Bubbles (window)
 	|raytracer|		T
 	|fpstextview| 	FPS
 

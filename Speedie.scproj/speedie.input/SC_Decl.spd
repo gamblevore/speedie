@@ -1144,7 +1144,7 @@ function IsPointerMath (|SCDecl| L, |SCDecl| R, |SCOperator| opp, |Message| exp,
 		if (L.PointerCount) and (R.IsNumeric == 1) // ptr - a,  ptr + a
 			return L
 		if (R.PointerCount) and (L.IsNumeric == 1) // a - ptr,  a + ptr
-			expect (opp isnt MakesSigned) (exp, "Can't do that. Perhaps you mean to swap sides? IDK otherwise.")
+			expect (opp isnt MakesSigned) (exp, "Can't subtract a pointer from a number.")
 			return R
 		if (R.PointerCount) and (L.PointerCount) and (opp == scoperator.subtract)
 			L.ExpectMatch(R, 0, exp)

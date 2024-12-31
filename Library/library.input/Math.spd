@@ -71,10 +71,10 @@ module Math
 	function float.Clamp (|float|H=1.0, |float|)
 		return .clamp(0,h)
 		
-	function float.climp (|float| X, |float|)
-		if .abs < x
-			return 0
-		return self
+//	function float.climp (|float| X, |float|)
+//		if .abs < x
+//			return 0
+//		return self
 		
 	function float.Cluster (|float|)
 		cpp_Wrapper JB_f_Cluster

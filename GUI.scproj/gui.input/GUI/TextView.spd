@@ -1669,7 +1669,6 @@ class TextView (GUIControl)
 						px.overlay(C.premul)
 						C.a -= 0.04
 
-
 		
 	helper DrawPreparedText (|image| where)
 		opt norefcounts
@@ -1678,6 +1677,7 @@ class TextView (GUIControl)
 		|| lc		= .LineNumColor
 		|| y		= (.lineheight|int| - font.height) + .lasttop
 		y -= 2
+//		y -= .isinline!=nil // not sure this works so well
 
 		|| yend		= .LastBottom
 		|| UseCol	= .UseColorAnyway

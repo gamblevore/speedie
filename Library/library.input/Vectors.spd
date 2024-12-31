@@ -12,8 +12,8 @@ datatype vec4
 	syntax Equals (|vec4| v, |bool|Aware, |bool|)
 		return (.x == v.x) and (.y == v.y) and (.z == v.z) and (.w == v.w) 
 	
-	function Climp (|float| max=1.0, |vec4|)
-		return (.x.climp(max), .y.climp(max), .z.climp(max), .w.climp(max))
+//	function Climp (|float| max=1.0, |vec4|)
+//		return (.x.climp(max), .y.climp(max), .z.climp(max), .w.climp(max))
 	
 	function Clamp (|float| max=1.0, |vec4|)
 		return (.x.clamp(max), .y.clamp(max), .z.clamp(max), .w.clamp(max))
@@ -630,8 +630,8 @@ datatype ivec2
 	operator min (|ivec2| o, |ivec2|)
 		return (o.x min .x, o.y min .y)
 		
-	operator fma (|int|a, |int|)
-		return .x + .y*a
+	operator fma (|int| w, |int|)
+		return .x + .y*w
 
 	operator inrange (|ivec2| p, |bool|)
 		return .x inrange p.x  and  .y inrange p.y
@@ -924,7 +924,7 @@ datatype Plane3D (vec4)
 
 		function Normals (|vec3| D1, |vec3| D2, |vec3| Start, |vec4|)
 			|| N = D1 x D2
-			n = n|vec4|.climp(0.000001)|vec3|
+//			n = n|vec4|.climp(0.000001)|vec3|
 			n = n.normal
 			return (N, -(N • Start))
 

@@ -4,7 +4,7 @@ class Window (GUIControl)
 	linkage
 		cpp_part Win
 	|bool|								FocusWasSet
-	|byte| 								LiveActionFPS
+	|byte| 								SimulationFPS
 	|bool|								IsDialog
 	|bool|								IsMainWindow
 	|GUIControl?|						Focus
@@ -103,10 +103,10 @@ class Window (GUIControl)
 	function SetMenu (|menu| m)
 		disabled "use openedmenu"
 
-	function RunAsMain (|float| Scaling = 1.0, |int| LiveActionFPS=0, |ErrorInt|)
+	function RunAsMain (|float| Scaling = 1.0, |int| SimulationFPS=0, |ErrorInt|)
 		.show
 		.IsMainWindow = true
-		.LiveActionFPS = LiveActionFPS
+		.SimulationFPS = SimulationFPS
 		if gui.init(scaling)
 			gui.NukeCursor
 			.BlockScale ?= 20
