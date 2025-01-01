@@ -5,10 +5,7 @@ main
 	beep $"Hello"
 	return Breakout().RunAsMain(2.0, 60)
 
-// wierd bug with evreything being hit.
-// remove explosions after a while, (make them explode)
-	// why do they disappear SOMEtIMES?
-	// block nudge... for vibration on hit
+// block nudge... for vibration on hit
 
 
 
@@ -141,6 +138,20 @@ class Breakout (Window)
 				return 
 	
 	
+	function MoveBar (|float| x)
+		require x
+		.bar.Pos.x += x
+		|| bl = .bar.left
+		if bl < 0
+			.bar.pos.x -= bl
+		bl = .bar.right
+		if bl > 20.0
+			.bar.pos.x -= (bl-20.0)
+
+	behaviour mousemove
+		.movebar(move.x|float|*0.02)
+		
+	
 	behaviour FrameStep
 		require GUIActive
 		|| MinSp = .BallSpeed/4
@@ -165,13 +176,7 @@ class Breakout (Window)
 					.reset( "You failed")
 					exit
 		
-		.bar.Pos.x += keys.movement.x.sign * 0.2
-		|| bl = .bar.left
-		if bl < 0
-			.bar.pos.x -= bl
-		bl = .bar.right
-		if bl > 20.0
-			.bar.pos.x -= (bl-20.0)
+		.movebar keys.Movement.x.sign * 0.2
 		
 		for (s.backwards in .Spirals) (i)
 			s.Radius -= 0.03
@@ -214,10 +219,7 @@ class Breakout (Window)
 			
 			while bx.Width >= 1.0
 				where.DrawSoftCircle((bx ± 2) - v*(sh*m), C, 2.0)
-				C.g -= 0.3
-				C.b -= 0.5
-				C.r -= 0.1
-				c = c.Clamp
+				c = (c - (0.1, 0.3, 0.5, 0.0)).clamp
 				bx = bx ± bx.width*0.1
 				m ++
 

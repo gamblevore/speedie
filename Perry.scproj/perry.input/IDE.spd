@@ -98,17 +98,17 @@ class PerryIDE (Window)
 	destructor
 		opt norefcounts
 		if !gui.isquitting
-			|| proj = .SharedProjectTabSource					#require
-			proj["pos"] = .editme.sel0
-			Perry.save
-	
-			|| n = proj.parent.slowcount
-			if n >= 2
-				.RemoveProjFromList
-			|| p = .prev
-			if p isa perryide
-				p.showide
-	
+			|| proj = .SharedProjectTabSource
+				proj["pos"] = .editme.sel0
+				Perry.save
+		
+				|| n = proj.parent.slowcount
+				if n >= 2
+					.RemoveProjFromList
+				|| p = .prev
+				if p isa perryide
+					p.showide
+
 	function UpdateStatusErrors
 		.EditStatus.text = .PerryStatus
 

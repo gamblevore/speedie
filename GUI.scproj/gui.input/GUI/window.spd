@@ -108,9 +108,9 @@ class Window (GUIControl)
 		.IsMainWindow = true
 		.SimulationFPS = SimulationFPS
 		if gui.init(scaling)
-			gui.NukeCursor
 			.BlockScale ?= 20
 			if !gui.singleframenest
+				gui.NukeCursor
 				return GUI.run
 
 		

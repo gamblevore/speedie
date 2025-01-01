@@ -154,12 +154,6 @@ dataType Keys (int)
 	
 	function IsCmd (|bool|)
 		return self is lgui or rgui
-		
-	helper Movement (|vec4| L, |vec4|)
-		rz.x = .Length((self is d or right) - (self is a or left), l.x)
-		rz.y = .Length((self is space) - (self is LCTRL or RCTRL), l.y)
-		rz.z = .Length((self is w or up) - (self is s or down), l.z)
-		rz.w = .Length((self is e) - (self is q), l.w)
 				
 	syntax access (|bool|)
 		|| i = .record
@@ -189,9 +183,47 @@ dataType Keys (int)
 //				if k!=0
 //					"$k ${r.Date.ago.float} ago"
 
+		|date[4]| _Limiters
+		function SpdLimit (|&int| P, |vec4| L, |int| i, |float|)
+			|| plus = P[i]
+			if !plus
+				._Limiters[i] = 0
+				return 0
+			
+			|| D = ._Limiters[i]
+			|| G = gui.FrameStart
+			if !D
+				._limiters[i] = G
+				return plus|float|
+
+			|| str = (((1+G)-D)*plus).float
+			|| Limit = L[i]
+			if !limit
+				return str
+
+			if str.abs >= limit
+				._limiters[i] = G
+				return str
+			
+			
 		function Movement (|vec4| Limiter=vec4(), |vec4|)
-			for i in MaxKeyRecord
-				rz += .record[i].key.Movement(limiter)
+			|int[4]| dirs
+			dirs[0] = (d[] or right[]) - (a[] or left[])
+			dirs[1] = space[] - (LCTRL[] or RCTRL[])
+			dirs[2] = (w[] or up[]) - (s[] or down[])
+			dirs[3] = e[] - q[]
+			// can get into a wierd state where s[] or w[]
+			// get buggered and it thinks it is up when
+			// its down. Not sure why. the problem isnt here.
+			// we need to figure out what or where releaseed
+			// w[] or s[] or didn't add them.
+			// this probably affects everything, even typing
+			// and command-keys
+//			if keys.shift
+//				printline "s: ${s[]},  w: ${w[]}"
+			for i in 4
+				rz[i] = .SpdLimit(dirs, Limiter, i)
+				
 		
 		function State (|&int| n, |&byte|)
 			cpp_Wrapper SDL_GetKeyboardState

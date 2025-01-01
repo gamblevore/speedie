@@ -206,9 +206,6 @@ class Breakout (Window)
 	behaviour Drawbackground
 		.fps.update
 		where.DrawRect(self, colors.black)
-//		for x in .Width
-//			|| Col = Colors.rainbow(x div .width, 1, 0.5)
-//			where.DrawLineV((x,0), .height, col)
 		
 		for b in .Blocks
 			|| H = (1.0-b.health)*12th

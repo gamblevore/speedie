@@ -1624,11 +1624,6 @@ function Tran_Fails (TranFunc)
 	expect (!node.islast) (node, "Put 'borks' before some code.") 
 
 
-
-//function TranFuncDummy (TranFunc) {
-//	// nothing
-//}
-
 function Tran_Visible (TranFunc)
 	expect (fn) (node, "Only use this on functions")
 	fn.LoadVisibility( node )
@@ -1640,7 +1635,7 @@ function Tran_Return (TranFunc)  // exitter
 	
 	expect (fn) (node, "Only use this on functions")
 	node.obj = fn.returntype
-	if !node.islast
+	ifn node.islast and (node in fn.sourcearg)
 		expect (fn isnt ConOrDes)   (node, "You can’t return in a constructor or destructor")
 
 	if fn.StructReturnPos // we can't return anything
@@ -1974,5 +1969,7 @@ function NeuLibrary (CollectFunc)
 
 }
 
-// did we remove the golang-like "Case affects visbiility" thing? i cant find it in the source-code?
-// it should be removed if we find it again!
+
+// Did we remove the golang-like "Case affects visbiility" thing? i cant find it in the source-code?
+// It should be removed if we find it again!
+

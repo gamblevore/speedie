@@ -294,7 +294,7 @@ module GUI
 		return .NativeWindow
 
 
-	helper vsync (assigns:|bool|)
+	function vsync (assigns:|bool|)
 		// Lowers frame-rate. We'll need a better option to resyncing.
 		// if we draw into our own buffer anyhow.
 		|| v = ("1", "0")(value)
@@ -831,7 +831,7 @@ module GUI
 
 
 	function IsQuitting (|bool|)
-		return .quitreason
+		return .quitreason is ExitOrTerminate
 
 
 	function Quit (|sdlactivity| Reason=0, |SDLActivity|)
@@ -990,10 +990,10 @@ module GUI
 			.quitreason |= SDLActivity.ExitOrTerminate
 			return sdlactivity.ExitOrTerminate
 		
-		if  t is QUIT
-			if !.Quitreason or !(keys.Shift or keys.Option)
+		if  t is QUIT // comes from cmd-w! this code is to block this bad SDL2 design.
+			if !.Quitreason
 				.Quitreason |= SDLActivity.Exiting
-			return sdlactivity.activity
+			return .Quitreason
 		
 		if  t is WINDOWEVENT
 			return .windowevent(ev)
@@ -1056,11 +1056,32 @@ module GUI
 			return w.__Gesture__(nil, rot*math.itau, pinch)|int|
 			
 		
+	helper WontCloseMainWindow (|window| w, |bool|)
+		opt norefcounts
+		if !w.ismainwindow
+			return true
+		for ww in window.all
+			if (w != ww) and ww.ismainwindow
+				return true
+		if .AskQuit
+			.quitreason |= sdlactivity.exiting
+			
+		
+		
 	helper WindowEvent (|&SDL_Event| ev, |int|)
+		opt norefcounts
 		|| wev = ev.window
 		|| wt = wev.event
 		if wt is CLOSE										// A request to close ANY window.
-			.QuitReason |= SDLActivity.WindowClose
+			|| w = window.front // should really be .frontvisible
+			if !w
+				return sdlactivity.exiting
+								// or .front should only return visible windows...
+			if !.WontCloseMainWindow(w)
+				return 0
+			.Quitreason |= SDLActivity.activity
+			w.Close(SDLActivity.WindowClose)
+			.Quitreason |= SDLActivity.activity
 			return SDLActivity.activity
 			
 		if wt is RESIZED
@@ -1159,7 +1180,6 @@ module GUI
 		#!keydown!
 		|| kev = ev.keysym
 		|| key = kev.sym
-		if (key is q) and keys.cmd
 		if key.IsEaten or .CanDrag >= mousedragging.Within
 			return SDLActivity.nothing
 		if (key is w) and (keys.cmd)

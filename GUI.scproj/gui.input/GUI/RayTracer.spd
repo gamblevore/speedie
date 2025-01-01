@@ -215,20 +215,26 @@ class RayTracer
 	module
 		helper GrabRoot (|int| px, |int| Size=4MB, |&RayBoost|)
 			|| s2 = (0,0, gui.Screen.Width, gui.Screen.height)
-			px = 1<<px.log2
+			|| px2 = px.log2
+			px = 1<<px2
 
 			|| root = .RootNode
-				if root.size == s2 and root.px == px
+				if root.size == s2 and root.px == px2
 					return root
-				
-			root = memory.Zalloc(size)|&RayBoost|$
+			
+			root = memory.realloc(root, size)|&rayboost|
+			if !root
+				memory.free(.rootnode)
+				.EndNodes = nil, .cells = nil, .StartNodes = nil, .currnode = nil, .rootnode = nil
+				return nil
+			memory.Zero(root, size)
+			"RayAlloc"
+			
 			.RootNode = root
 			.EndNodes = (root|&byte| + Size)|&RayTraceNode|
-			root.px = px
 			root.size = s2
 			
 			|| D = s2.x2.ContainingPowerOfTwo
-			|| px2 = px.log2
 			|| s3 = (s2.x2y2+(px-1)) >> px2
 			root.cellswide = s3.x
 			root.cellshigh = s3.y

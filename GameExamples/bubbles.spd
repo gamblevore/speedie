@@ -12,6 +12,7 @@ import "GUI"
 
 main
 //	gui.init(3)
+	gui.vsync() = true
 	return Bubbles().RunAsMain(60)
 
 
