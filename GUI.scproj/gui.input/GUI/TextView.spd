@@ -475,7 +475,7 @@ class TextView (GUIControl)
 			p = s
 	}
 
-	function ShowTypingPlace (|ivec2| r)
+	helper ShowTypingPlace (|ivec2| r)
 		|| i = (r.width>0)|int|
 		i = r[i]
 		.show(i)
@@ -500,19 +500,19 @@ class TextView (GUIControl)
 
 	
 	function Show (|int| x, |TextViewJumpMode| Mode=0,  |TextViewLine|)
-		return .ViewPos(x, .MaxVisibleLines/3, 0, mode)
+		return .ViewPos(x, .MaxVisibleLines/3, mode)
 	
 	
-	function MarkAsFound (|message| Where)
+	helper MarkAsFound (|message| Where)
 		opt norefcounts
 		|| D = .FindDrawInfo(Where.Position)
 		where.obj = D
 		.DoExplode(D, 4.0)
 
 
-	function ShowAndSel (|int| P, |int| length=0, |bool| Explode=false, |textviewline|)
+	helper ShowAndSel (|int| P, |int| length=0, |bool| Explode=false, |textviewline|)
 		opt NoRefCounts
-		rz = .show(P, textviewjumpmode.wantagoodview)
+		rz = .show(P)
 		.SelDirect((P, P + length), rz)
 
 		if explode
@@ -527,22 +527,19 @@ class TextView (GUIControl)
 		return pos < d2.After
 	
 	
-	helper ViewPos (|int| x, |int| before, |int| back, |TextViewJumpMode| Mode=0, |TextViewLine|)
+	helper ViewPos (|int| x, |int| before, |TextViewJumpMode| Mode=0, |TextViewLine|)
 		opt NoRefCounts
 		|| i	= 0
 		|| d	= .FindDrawInfo(x, i)
 		before = before.abs
-		if mode is wantagoodview
-			back += before/2
-		
-		|| lim = .MaxVisibleLines - back
-		if mode isnt WantAGoodView
-			if i inrange lim
-				return d
-			|| vdiff = d.vline - ._Start.vline
-				before = (vdiff min (lim-1)) max 0
+
+		|| lim = .MaxVisibleLines
+		if i inrange lim
+			return d
+		|| vdiff = d.vline - ._Start.vline
+			before = (vdiff min (lim-before)) max 0
 			
-		.StartLine(mode) = d.movecapped(-before) 
+		.StartLine(mode) = d.MoveCapped(-before) 
 		return d
 
 
@@ -565,7 +562,7 @@ class TextView (GUIControl)
 		opt norefcounts		
 		|| t = ._typingplace
 		x = .Clamp(x)
-		|| d = .ViewPos(x, before, 1) // idk
+		|| d = .ViewPos(x, before) // idk
 			
 		if keys.shift
 			t.x2 = x
@@ -632,7 +629,7 @@ class TextView (GUIControl)
 			require range.x >= 0
 		
 		.SelDirect(range, nil)
-		.ViewPos(range.x, .MaxVisibleLines/2, 2)
+		.ViewPos(range.x, .MaxVisibleLines/2)
 		return true
 			
 	

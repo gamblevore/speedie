@@ -379,7 +379,7 @@ extend TextView
 				.PrepareLinesOfText
 				.scrollpos = d.ScrollPos
 			 else
-				.viewpos(ty.x, 0, 0)
+				.viewpos(ty.x, 0)
 		  else	
 			.Clear(l.text)		
 		
