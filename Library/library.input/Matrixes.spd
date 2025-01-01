@@ -33,10 +33,12 @@ struct Mat4
 			fs <~ '\n'
 	
 	function Transpose (|mat4|)
+		opt min 3
 		for i in 4
 			rz.rows[i] = .columns(i)
 
 	operator mul (|mat4| B, |mat4|)
+		opt min 3
 		|| tmp = b.Transpose
 		|| r0 = .rows[0] // avoid smash inputs
 		|| r1 = .rows[1]
@@ -51,14 +53,16 @@ struct Mat4
 
 
 
-function vec4.operatormul (|mat4| M, |vec4|)
+function vec4.OperatorMul (|mat4| M, |vec4|)
+	opt min 3
 	rz[0] = self • m.rows[0]
 	rz[1] = self • m.rows[1]
 	rz[2] = self • m.rows[2]
 	rz[3] = self • m.rows[3]
 
 
-function vec3.operatormul (|mat4| M, |vec3|)
+function vec3.OperatorMul (|mat4| M, |vec3|)
+	opt min 3
 	|| s = (self, 1.0)
 	rz[0] = s • m.rows[0]
 	rz[1] = s • m.rows[1]

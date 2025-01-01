@@ -22,7 +22,7 @@ datatype int
 
 	operator In (|ivec2| i, |bool|)
 		return self >= i.x and self <= i.y
-		
+
 //	operator Bits (|int| n, |int|)
 //		return self & n.bits
 
@@ -95,18 +95,14 @@ datatype int
 	render (|int| zeros)
 		cpp_part RenderZeros
 		fs.appendintegerastext(self, zeros)
-
 	
 	operator Min (|int| other, |int|)
 		if self < other: return self
 		return other
 
-
 	operator AbsMin (|uint| Limit, |int|)
 		if .abs < Limit: return self
 		return Limit|int|.setsign(self<0)
-		
-
 
 	operator Max (|int| other, |int|)
 		if self > other: return self ////
@@ -283,7 +279,12 @@ datatype uint
 	operator max (|uint| other, |uint|)
 		if (self > other) { return self }
 		return other
-		
+	
+	operator Min (|uint| other, |uint|)
+		if self < other: return self
+		return other
+
+	
 	render
 		fs <~ self|int64|
 

@@ -18,6 +18,9 @@ datatype vec4
 	function Clamp (|float| max=1.0, |vec4|)
 		return (.x.clamp(max), .y.clamp(max), .z.clamp(max), .w.clamp(max))
 	
+	function abs (|vec4|)
+		return (.x.abs, .y.abs, .z.abs, .w.abs)
+	
 	function IsPositive (|bool|)
 		return (.x2 > .x) & (.y2 > .y)
 	

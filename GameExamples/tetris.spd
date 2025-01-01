@@ -427,8 +427,8 @@ class Tetris (GridSection)
 		  else
 			hu += 24th
 		if b is ghost
-			br = 0.1
-			br += gui.Cycle(5s, (x+y)*1s).pow8*0.05
+			br = 0.006 / c.lum
+			br += gui.Cycle(5s, (x+y)*1s).pow8*0.08
 			r+=(0,0,1,1)
 		C = colors.wheel(Hu, SA, br, 1.0)
 		where.DrawOutlineOnly(R, C)

@@ -12,6 +12,10 @@ import "GUI"
 
 main
 //	gui.init(3)
+//	for 20s
+// somthing like (1s*.framenumber) / .framerate
+// right?
+	
 	gui.vsync() = true
 	return Bubbles().RunAsMain(60)
 

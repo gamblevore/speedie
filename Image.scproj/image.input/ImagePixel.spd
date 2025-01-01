@@ -118,13 +118,19 @@ datatype ImagePixel (uint)
 		
 	syntax append (|&imagepixel| self, |vec4| V)
 		cpp_part AppendVec
-		v = (v.clamp * 255.0) + 0.25
-		|| b = v.iVec4
-		|| ugh = b.r|uint|		// more pipelineable
-		|| argh = b.b << 16		// to use two vars
-		ugh |= b.g << 8
-		argh |= b.a << 24
-		self[] = ugh|||argh
+		v = (v * 255.0) + 0.5
+		|| iv = v.iVec4
+		|| qt = self|&imagepixelstruct|
+		qt.r = iv.r._CB2
+		qt.g = iv.g._CB2
+		qt.b = iv.b._CB2
+		qt.a = iv.a._CB2
+				
+	helper int._CB2 (|byte|)
+		description "A secret ClampByte"
+	    self &= (self<0)-1	// clamp < 0
+	    self |= -(self>255)	// clamp > 255
+	    return self
 	
 	syntax append (|&imagepixel| self, |int| r, |int| g, |int| b, |int| a=255)
 		cpp_part AppendInts
