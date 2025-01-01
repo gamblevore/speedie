@@ -1630,6 +1630,7 @@ function Tran_Visible (TranFunc)
 
 
 function Tran_Return (TranFunc)  // exitter
+	opt norefcounts
 	require node.ASMType != ASMType.kreturn
 	node.ASMType = ASMType.kreturn
 	

@@ -3442,7 +3442,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[216]);
-	JB_FS_AppendInt32(_fsf0, (2024123121));
+	JB_FS_AppendInt32(_fsf0, (2025010113));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8870,7 +8870,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1683]);
-	JB_FS_AppendInt32(_fsf0, (2024123121));
+	JB_FS_AppendInt32(_fsf0, (2025010113));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -57572,7 +57572,7 @@ void SC_Func__Tran_Return(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 		return;
 	}
 	JB_SetRef(Node->Obj, Fn->ReturnType);
-	iif (!JB_Tree_IsLast(Node)) {
+	iif (!(JB_Tree_IsLast(Node) and (JB_Msg_InMsg(Node, SC_Func_SourceArg(Fn))))) {
 		iif (SC_Func_SyntaxIs(Fn, kSC__FunctionType_ConOrDes)) {
 			JB_Msg_Fail(Node, JB_LUB[1687]);
 			return;
@@ -57583,10 +57583,7 @@ void SC_Func__Tran_Return(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 	}
 	SC_Func_CheckReturnValue(Fn, Node, Name_space);
 	SC_Msg_LastInBlock(Node, kSC__SCBlockage_Return);
-	Message* _tmPf0 = SC_Func_SourceArg(Fn);
-	JB_Incr(_tmPf0);
-	SC_Msg_CheckNotInStateExpr(Node, _tmPf0);
-	JB_Decr(_tmPf0);
+	SC_Msg_CheckNotInStateExpr(Node, SC_Func_SourceArg(Fn));
 }
 
 void SC_Func__Tran_Sdt(Message* Exp) {
