@@ -732,14 +732,25 @@ class TextView (GUIControl)
 
 
 	helper NewLineSub (|int|extra, |bool|)
-		|| sr	= .selrange
+/		|| sr	= .selrange
 		|| ind  = 0
+		|| i = 0
 		if !.singleline and !keys.shift
 			|| b4 = self[sr.x - 1]
-			if !b4.istextline
+			if !b4.IsTextLine
 				ind = .IndentCount(sr.x2)
+				if !sr.width
+					while (|| c = self[sr.x+i])
+						if c == ' ' or '\t'
+							i++
+						  else
+							.selrange = sr.x+i
+							exit
+		
 		.UndoChecker = -1
 		.Typed("\n" + .improveindent(ind, extra))
+		if i
+			.selrange = .selrange.x-i
 		.UndoChecker = -1 // needed
 		return true
 	
@@ -762,7 +773,7 @@ class TextView (GUIControl)
 	
 	helper NewLine (|bool|)
 		if .SingleLine
-			return true //eat it
+			return true // eat it
 		|| extra = 0
 		if ((.onkeydown)(self, -10)?) and !keys.shift
 			.selrange = .ExtendToLineEnd(.sel1-1) // move sel to end of line
