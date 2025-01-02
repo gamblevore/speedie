@@ -230,7 +230,7 @@ module GUI
 		.sdl_quit
 		
 		rz = (!StdErr.OK)|int|
-		if .singleframenest > 0
+		if .SingleFrameNest > 0
 			// we could get stuck in an inf-loop when they are trying to quit
 			// besides... the calling code will be in an invalid state...
 			// and can come from anywhere
@@ -289,7 +289,7 @@ module GUI
 		.screenwindow = w
 		.SDL_SetWindowMaximumSize(w, 2K, 2K)
 		.SDL_SetWindowMinimumSize(w,  400,  200)
-//		.vsync = true
+		.vsync = true
 		.renderer = SDL_CreateRenderer(w, -1, 0)  #expect  "Can't init renderer"
 		return .NativeWindow
 
@@ -637,7 +637,6 @@ module GUI
 		.DoDrawDrag(window.front!)
 		if app.prefs["beep"]
 			beep // debug drawing!
-//		DrawStartCounter.Count("drawstart")
 
 
 	helper BGBlurAmount (|float|)
@@ -650,42 +649,69 @@ module GUI
 		GUI.Touch
 
 
-	helper window.FrameStepsNeeded (|bool| ChangeOK, |bool| Update, |int|)
-		require ChangeOK or .SimulationFPS // stop needless updates
+	helper window.AnyFrameStepsNeeded (|bool| ChangeOK, |ind|)
+//		if .SimulationFPS
+//			"${.class.name}: ${gui.FrameStart & 0xFFFF}"
+		if ChangeOK or .SimulationFPS							// Stop needless updates
+			|| Time = gui.FrameStart
+			|| Within = Time & 0xFFFF
+			|| Remain = ._FrameNext - Within
+			if Remain <= 0
+				if remain < -0.5s
+					return -1
+				return Within
+			if Remain >= 0.5s			// wrapped
+				return Within+1s
 
-		// quite close, but arkanoid3d still reports a low drift overtime
-		// not sure why? its not like I paused the program?
-		// is this a mathematical drift? adding 1 to the framenum adds a little too much?
-		// we just need a "nextwithinsecond" uint16... it has to add up properly...
-		|uint| F = gui.FrameStart & 0xFFFF
-		|| CurrFrame = .CurrFrameNum
-		|| FPS = .SimulationFPS|int| max 10
-		|| L = ((F*FPS) >> 16)+1
-		|| L2 = L
-		if L < Currframe
-			L2++
-		if CurrFrame != L2
-			if update
-				.CurrFrameNum = L
-			rz = L2 - CurrFrame
+
+	helper window.FrameStepsAmount (|int| ChangeOK, |int|)
+		|int| SN = ._framenext
+		|| Within = .AnyFrameStepsNeeded((ChangeOK&1)|bool|)		#require
+		|| fps = .SimulationFPS|int|
+		if fps < 10
+			fps = 10>>gui.IsBackground
 		
+		|int| i = ._FrameNum
+		if (i >= FPS)
+			i = 0
 		
+		|duration| Next 
+		while next <= Within
+			rz++
+			Next = (1s*(i+rz))/FPS
+		._FrameNext = Next
+		
+		i += rz
+		while i > fps
+			i -= fps
+
+		|| ST = gui.FrameStart
+		if (._LastTimeSeen - ST).abs > 0.5s					// Computer paused, or clock changed.  Just do 1 frame.
+			rz = 1
+		._LastTimeSeen = ST
+
+//		if .simulationfps
+//			|| Gap = next - SN
+//			"  i: ${._framenum|int|},  Time: $Within,  Next: $._framenext,  orignext: $SN,  gap: $gap,  rz: $rz"
+		._framenum = i
+
+
 	helper window.DoFrameStep (|bool| ChangeOK)
 		.RunMyTasks(false)
 		.FixFocus
 		.__FrameStep__(ChangeOK and !.OpenedMenu)
 	
 	
-	helper WindowFrameSteps
+	helper DoSimulation
 		opt norefcounts
-		|| wf = Window.all.last$
-		|| ChangeOK = !(.DialogIsOpen or .IsBackground)
-		if wf.FrameStepsNeeded(changeOK, false)
+		|| wf = Window.front$
+		|| ChangeOK = !.DialogIsOpen
+		if wf.AnyFrameStepsNeeded(ChangeOK)
 			keys.FlushKeys
 
 		|| Got = 0
 		for  w  in  window.all
-			for w.FrameStepsNeeded(changeOK, true)
+			for w.FrameStepsAmount(1)
 				w.DoFrameStep(ChangeOK)
 				Got++
 
@@ -721,10 +747,10 @@ module GUI
 		opt norefcounts
 		|| Now = .DelayEvents
 			.FrameStart = Now
-		|sdlactivity| occur = (.HandleEvents, 0)(Now or SDL_Event.HasAny)
-		require occur isnt ExitOrTerminate
+		|sdlactivity| Occur = (.HandleEvents, 0)(Now or SDL_Event.HasAny)
+		require Occur isnt ExitOrTerminate
 
-		.WindowFrameSteps
+		.DoSimulation
 		.DrawState |= (.TouchCount != 0)
 		if .DrawState == 1
 			.StartDraw
@@ -740,14 +766,12 @@ module GUI
 		|| d = date.now
 		|uint64| ago = d - .DrawFinish				// super dooper unsigned clock saver
 		|date| remain = .DrawFrameLength - ago
-		if remain > 0
-			if remain >= 128 // 512th of a second
-				return 
-			app.Sleep(remain)
-//		DrawEndCounter.Count("DrawEnd")
+		require remain < 128						// 512th of a second
 		.DrawState &= ~2
 		.DrawFinish = d
 		.EndFrame(.Raw!)
+		if remain > 0
+			app.Sleep(remain)
 
 
 	helper DelayEvents (|date|)
@@ -757,6 +781,13 @@ module GUI
 			l = .DrawFrameLength*9
 
 		rz = date.now
+
+//		opt norefcounts
+//		|| w = window.front
+//			if w.simulationfps
+//				"FFF: ${gui.framestart & 0xFFFF}  (${rz&0xFFFF})"
+
+
 		|uint64| Ago = rz - .FrameStart				// unsigned, in case the clock goes backwards
 		|date| Remain = L - ago
 		if Remain > 0

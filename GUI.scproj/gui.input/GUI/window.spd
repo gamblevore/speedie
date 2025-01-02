@@ -26,7 +26,9 @@ class Window (GUIControl)
 	|float|								BlockScale
 	|vec2|								BlockMove
 	|byte|								BlockMode
-	|byte| 								CurrFrameNum
+	|byte| 								_FrameNum
+	|uint16| 							_FrameNext
+	|date| 								_LastTimeSeen
 	|byte|								_FlashSelf
 	|bool|								_BlockRecurseKeyDown
 	|GuiControl?|						SelBeforeMouseDown
@@ -91,8 +93,10 @@ class Window (GUIControl)
 		opt norefcounts
 		return .innerfocus ?? .focus
 
+
 	setter OpenedMenu (|menu|)
-		.setinnerfocus(value)
+		.SetInnerFocus(value)
+
 
 	function OpenedMenu (|menu|)
 		opt norefcounts
@@ -100,8 +104,10 @@ class Window (GUIControl)
 		if f isa menu
 			return f 
 
+
 	function SetMenu (|menu| m)
 		disabled "use openedmenu"
+
 
 	function RunAsMain (|float| Scaling = 1.0, |int| SimulationFPS=0, |ErrorInt|)
 		.show

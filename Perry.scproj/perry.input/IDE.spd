@@ -458,13 +458,13 @@ class PerryIDE (Window)
 		.PopupDisplayFadeIn
 		
 		require .IsFront
-		if .CurrFrameNum == 1
+		if ._FrameNum == 1
 			require !.ProjClosed
 			
 		if .UpdateMem 
 			.ShowLeftStats
 		
-		if .CurrFrameNum == 1
+		if ._FrameNum == 1
 			.CheckModified
 		
 		if GUIActive and !.DebugArgsList.HasFocus
