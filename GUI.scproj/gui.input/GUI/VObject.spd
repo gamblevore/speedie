@@ -4,7 +4,7 @@
 
 class VObject (list)
 	|vec3|			Pos
-	|vec3|			Radius
+	|vec3|			Radius			// make it a vec4... for graphical aura size.
 	|vec3|			Velocity
 	|byte|			Nudge
 	|byte|			ShapeID
