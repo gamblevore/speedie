@@ -107,6 +107,7 @@ class Breakout (Window)
 					|| b2 = .addballs(cn)
 					|| old = .Blocks.now!
 					b2.towards(old.pos, .BallSpeed)
+					b2.Velocity = -b2.Velocity
 			  elseif pu <= 5
 				|| b2 = vobject(ball.pos.xy, vec2(1+(pu-3))*0.3)
 				b2.Color = colors.Red // 

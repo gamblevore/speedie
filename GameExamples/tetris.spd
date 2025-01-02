@@ -135,7 +135,7 @@ class Tetris (GridSection)
 		
 	function Restart
 		.FrameRate = 60
-		.FramesLeft = .FrameRate*2
+		.FramesLeft = .FrameRate
 		.State = 0
 		.Score = 0
 		.Level = 1
