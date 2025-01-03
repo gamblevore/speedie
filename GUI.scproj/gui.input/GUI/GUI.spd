@@ -649,24 +649,21 @@ module GUI
 		GUI.Touch
 
 
-	helper window.AnyFrameStepsNeeded (|bool| ChangeOK, |ind|)
-//		if .SimulationFPS
-//			"${.class.name}: ${gui.FrameStart & 0xFFFF}"
-		if ChangeOK or .SimulationFPS							// Stop needless updates
-			|| Time = gui.FrameStart
-			|| Within = Time & 0xFFFF
-			|| Remain = ._FrameNext - Within
-			if Remain <= 0
-				if remain < -0.5s
-					return -1
-				return Within
-			if Remain >= 0.5s			// wrapped
-				return Within+1s
+	helper window.AnyFrameStepsNeeded (|ind|)
+		|| Time = gui.FrameStart
+		|| Within = Time & 0xFFFF
+		|| Remain = ._FrameNext - Within
+		if Remain <= 0
+			if remain < -0.5s
+				return -1
+			return Within
+		if Remain >= 0.5s			// wrapped
+			return Within+1s
 
 
-	helper window.FrameStepsAmount (|int| ChangeOK, |int|)
+	helper window.FrameStepsAmount (|int|)
 		|int| SN = ._framenext
-		|| Within = .AnyFrameStepsNeeded((ChangeOK&1)|bool|)		#require
+		|| Within = .AnyFrameStepsNeeded()		#require
 		|| fps = .SimulationFPS|int|
 		if fps < 10
 			fps = 10>>gui.IsBackground
@@ -690,11 +687,6 @@ module GUI
 			rz = 1
 		._LastTimeSeen = ST
 
-//		if .simulationfps
-//			|| Gap = next - SN
-//			"  i: ${._framenum|int|},  Time: $Within,  Next: $._framenext,  orignext: $SN,  gap: $gap,  rz: $rz"
-		._framenum = i
-
 
 	helper window.DoFrameStep (|bool| ChangeOK)
 		.RunMyTasks(false)
@@ -705,14 +697,15 @@ module GUI
 	helper DoSimulation
 		opt norefcounts
 		|| wf = Window.front$
-		|| ChangeOK = !.DialogIsOpen
-		if wf.AnyFrameStepsNeeded(ChangeOK)
+		|| FrontIsDialog = .DialogIsOpen
+		if keys.escape[] and keys.shift
+		if FrontIsDialog or wf.AnyFrameStepsNeeded()
 			keys.FlushKeys
 
 		|| Got = 0
 		for  w  in  window.all
-			for w.FrameStepsAmount(1)
-				w.DoFrameStep(ChangeOK)
+			for w.FrameStepsAmount()
+				w.DoFrameStep(!FrontIsDialog)
 				Got++
 
 		if Got
@@ -1211,8 +1204,12 @@ module GUI
 		#!keydown!
 		|| kev = ev.keysym
 		|| key = kev.sym
-		if key.IsEaten or .CanDrag >= mousedragging.Within
+		
+		if key.IsEaten
 			return SDLActivity.nothing
+		if .CanDrag >= mousedragging.Within
+			return SDLActivity.nothing
+
 		if (key is w) and (keys.cmd)
 			// i think we could try eliminate this test.
 			// later... I mean... send an event of same type that is already sent
@@ -1220,7 +1217,6 @@ module GUI
 			return 0
 		beep.OK = 1
 		
-
 		keys.AddKey(key)
 		if !w.openedmenu and !.AllowKeyDown(kev)
 			return SDLActivity.nothing
@@ -1231,7 +1227,7 @@ module GUI
 			if w.__keydown__(key)
 				return SDLActivity.activity
 		
-		if (.singleframenest < 2) and keys.escape.HeldKey(0.75s)
+		if (.SingleFrameNest < 2) and keys.escape.HeldKey(0.75s)
 			keys.escape.eat
 			return  AppMenu.show
 		

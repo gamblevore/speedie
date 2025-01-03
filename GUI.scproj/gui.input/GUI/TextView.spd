@@ -732,8 +732,8 @@ class TextView (GUIControl)
 
 
 	helper NewLineSub (|int|extra, |bool|)
-/		|| sr	= .selrange
-		|| ind  = 0
+		|| sr = .selrange
+		|| ind = 0
 		|| i = 0
 		if !.singleline and !keys.shift
 			|| b4 = self[sr.x - 1]
@@ -1819,6 +1819,8 @@ class TextView (GUIControl)
 			
 	
 	helper Clear (|string| NewText, |bool|)
+//		target debug
+//			|| OldText = .text
 		rz = super.textset(NewText)
 		require rz or !._lines.hasany
 
@@ -1957,11 +1959,6 @@ class TextView (GUIControl)
 			rz++
 		return true
 
-		
-	helper FindStayAtEnd (|textviewline|) // findend
-		opt norefcounts
-		return ._lines.last!.movecapped(1 - .MaxVisibleLines, nil)
-
 
 	helper PrepareLinesOfText 
 		opt norefcounts
@@ -1979,7 +1976,7 @@ class TextView (GUIControl)
 		if .SingleLine
 			charw = 4KB
 	
-		|| ARGH = 0		// .ReclaimRestart(d) // disabled for now.
+		|| ARGH = 0 // .ReclaimRestart(d) // disabled for now.
 		|| t = d.tline
 		|| p = d.position
 		
@@ -2006,10 +2003,9 @@ class TextView (GUIControl)
 		d.RemoveAfter
 		._PreferPrevLine = false
 		if StayAtEnd
-			d = .FindStayAtEnd
-		if !StayAtEnd       // or !d
-			d = .FindDrawInfoSub2(pos, nil)
-		.StartWithoutScrollDraw = d
+			.StartWithoutScrollDraw( d.movecapped(1 - .MaxVisibleLines, nil))
+		  else
+			.StartWithoutScrollDraw(._Lines.first!)
 		.ClearReclaim	
 	
 	

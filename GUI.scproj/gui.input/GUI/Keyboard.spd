@@ -255,9 +255,9 @@ dataType Keys (int)
 			r.state = guikeyrecordinfo.toadd + (k is escape)
 			
 			
-		helper RemoveKey (|keys| K)
-			|| r = k.record
-				r.State = guikeyrecordinfo.ToRemove
+		helper RemoveKey (|keys| Key)
+			|| r = key.record
+				r.State = guiKeyRecordInfo.ToRemove
 		
 
 		helper FlushKeys
