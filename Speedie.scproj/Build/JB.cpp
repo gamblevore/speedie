@@ -3442,7 +3442,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[216]);
-	JB_FS_AppendInt32(_fsf0, (2025010113));
+	JB_FS_AppendInt32(_fsf0, (2025010222));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8870,7 +8870,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1683]);
-	JB_FS_AppendInt32(_fsf0, (2025010113));
+	JB_FS_AppendInt32(_fsf0, (2025010222));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -13805,7 +13805,7 @@ SCObject* SC_TypeOfQues(Message* Exp, SCNode* Name_space, Message* Side) {
 	iif (Prm) {
 		Type = SC_TypeOfExprModulesOK(Prm, Name_space, nil);
 	}
-	Message* M = SC_Msg_ReplaceInbuiltSub(Exp, Name_space, SC_Object_AsDecl(Type));
+	Message* M = SC_Msg_ReplaceInbuiltSub(Exp, SC_Object_AsDecl(Type));
 	iif (M) {
 		SC_Msg_SafeReplaceWith(Exp, M);
 	}
@@ -40844,7 +40844,7 @@ void JB_Msg_RenderWithSpaces(Message* Self, FastString* Fs, Message* Ch) {
 	};
 }
 
-Message* SC_Msg_ReplaceInbuiltSub(Message* Self, SCNode* Name_space, SCDecl* Self_decl) {
+Message* SC_Msg_ReplaceInbuiltSub(Message* Self, SCDecl* Self_decl) {
 	iif ((JB_Msg_SyntaxEquals(Self, JB_LUB[36], false))) {
 		return SC_Msg_FalsifyNil(Self);
 	}
@@ -58487,4 +58487,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 6914476025753897232 -1503207478439254083
+// 749619755757796169 -1503207478439254083

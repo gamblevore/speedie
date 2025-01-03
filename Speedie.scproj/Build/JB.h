@@ -9439,7 +9439,7 @@ JB_String* SC_Msg_RenderType(Message* Self);
 
 void JB_Msg_RenderWithSpaces(Message* Self, FastString* Fs, Message* Ch);
 
-Message* SC_Msg_ReplaceInbuiltSub(Message* Self, SCNode* Name_space, SCDecl* Self_decl);
+Message* SC_Msg_ReplaceInbuiltSub(Message* Self, SCDecl* Self_decl);
 
 Message* JB_Msg_ReplaceInto(Message* Self, Message* W);
 
