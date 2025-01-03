@@ -500,7 +500,7 @@ class TextView (GUIControl)
 
 	
 	function Show (|int| x, |TextViewJumpMode| Mode=0,  |TextViewLine|)
-		return .ViewPos(x, .MaxVisibleLines/3, mode)
+		return .ViewPos(x, (2*.MaxVisibleLines)/3, mode)
 	
 	
 	helper MarkAsFound (|message| Where)
@@ -1990,7 +1990,7 @@ class TextView (GUIControl)
 			if  true  or  !n  or  n.position < ._reclaim[1]
 				d = .nextvline(d, d, p)
 			  elseif p < ARGH
-				d = .nextvline(d, nil, p)
+				d = .NextVline(d, nil, p)
 			  else
 				d = d.ReclaimEnd(t, ._reclaim[2])
 				exit

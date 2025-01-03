@@ -283,7 +283,7 @@ class Window (GUIControl)
 					(f.onclicked)(f)?
 			return true
 		if (key is escape) and .IsDialog
-			if !.returnvalue and !.__cancelclose__
+			if !.ReturnValue and !.__cancelclose__
 				.CancelReturn
 			return true
 	

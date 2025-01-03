@@ -372,13 +372,11 @@ extend TextView
 		.GuessExpectsParse
 		if l.text
 			self|guicontrol|.text = l.text
-			if (reason == 0) and (ty.x1 > 0  and  d.scrollpos <= 0)
-				d.scrollpos = ty.x1
+			|| i = d.scrollpos
+			.PrepareLinesOfText
 			.TypingPlaceTry( ty, true, nil)
-			if reason != DocumentState.typing and DocumentState.UndoOrRedo
-				.PrepareLinesOfText
-				.scrollpos = d.ScrollPos
-			 else
+			.scrollpos = i
+			ifn reason != DocumentState.typing and DocumentState.UndoOrRedo
 				.viewpos(ty.x, 0)
 		  else	
 			.Clear(l.text)		
