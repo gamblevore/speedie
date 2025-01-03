@@ -342,7 +342,7 @@ function RelChangesDisowned (|Message| msg, |String| name, |bool|)
 
 
 
-function RefMarkAsDisturber (|Message| msg, |SCFunction| fn)
+function RefMarkAsDisturber (|SCFunction| fn)
 	opt norefcounts
 	|| r = fn.refs
 		|| ds = r.DisturbsGet
@@ -883,7 +883,7 @@ function SCFunction.RefsCheckPropertiesAltered
 			if ch and ch.IsProperty				
 				// (not on self, within constructor)
 				ifn  (self is Constructor) and ( ch.first IsThing "self" )				
-					SCRefs.RefMarkAsDisturber( ch, self )
+					SCRefs.RefMarkAsDisturber( self )
 
 
 

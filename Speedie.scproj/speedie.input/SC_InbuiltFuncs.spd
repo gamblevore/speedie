@@ -15,7 +15,7 @@ function scclass.Falsify (|message| ques, |message|)
 		return f.copy
 	ques.func = f.func
 	if f isthing "nil"
-		ques.obj = typenil
+		ques.obj = TypeNil
 	  else
 		ques.name = f.name
 
@@ -30,7 +30,7 @@ function Message.FalsifyNil (|message|)
 	.obj = typenil
 
 	
-function Message.ReplaceInbuiltSub (|SCNode| name_space, |scdecl?| self_decl, |message|)
+function Message.ReplaceInbuiltSub (|scdecl?| self_decl, |message|)
 	opt norefcounts
 	if (self == "nil")
 		return .FalsifyNil
@@ -54,7 +54,7 @@ function Message.ReplaceInbuiltSub (|SCNode| name_space, |scdecl?| self_decl, |m
 			f.name = f.name.Compress
 		.become(@bra)
 	  elseif (self == "taskvars")
-		|| cls = scfunction.currfunc!.cls #expect (self)
+		|| cls = scfunction.currfunc!.cls		#expect (self)
 		.become(cls.taskobjectcount)
 		
 	  elseif (self == "sizeof")
@@ -69,7 +69,7 @@ function Message.ReplaceInbuiltSub (|SCNode| name_space, |scdecl?| self_decl, |m
 
 
 function Message.InBuiltSizeOf (|scdecl| sulf, |message|)
-	return NewDeclNum(scdecl(TypeInt!), sulf.SizeOfQuery)
+	return NewDeclNum(SCDecl(TypeInt!), sulf.SizeOfQuery)
 
 
 function TypeOfQues (ExprResolver)
@@ -85,7 +85,7 @@ function TypeOfQues (ExprResolver)
 		// rather than collect it before, like I'm doing now.
 		type = TypeOfExprModulesOK(prm, name_space) // AsDeclAutoComplete isnt a good name
 	
-	|| m = exp.ReplaceInbuiltSub(name_space, type.AsDecl)
+	|| m = exp.ReplaceInbuiltSub(type.AsDecl)
 		exp.SafeReplaceWith(m)
 	if exp != @ques
 		return TypeOfExpr(exp, name_space)
