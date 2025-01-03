@@ -602,16 +602,18 @@ class PerryIDE (Window)
 				FuncMenu = true
 		if FuncMenu
 			.FileList.quickopen isnt visible
-			if .FunctionMenu.SearchMenu
-				return true
-			return .FileList.ShowQuickOpen
+			return .FunctionMenu.SearchMenu
+//			.FunctionMenu.SearchMenu
+//				return true
+//			return .FileList.ShowQuickOpen
 			
 		  else
 			|| sub = .FunctionMenu.SubMenu
 				sub.CloseMenu
-			if .FileList.ShowQuickOpen
-				return true
-			return .FunctionMenu.SearchMenu
+			return .FileList.ShowQuickOpen
+//			if .FileList.ShowQuickOpen
+//				return true
+//			return .FunctionMenu.SearchMenu
 			
 	
 	behaviour KeyDown

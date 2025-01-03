@@ -346,6 +346,8 @@ class ListView (GUIControl) {
 			return rz
 		rz = TextView(Self)
 		.Typingfilter = rz
+		.onpaste = ListPaste|guipasteevent|
+		.copypaste = copypasteflags.pastetext // what about copy?
 		rz.id = "filter"
 		rz.gnormal.bg = (0.1,0.1,0.1,1.0)
 		rz.gnormal.edge = .gnormal.edge
@@ -448,6 +450,14 @@ class ListView (GUIControl) {
 			return .UpdateFilter
 
 	
+
+	helper ListPaste (GUIPasteEvent)
+		opt norefcounts
+		|| w = .typingfilter
+			|| paster = w.onpaste
+				return (paster)(w, nil, data, purpose)
+
+
 	function DefaultCopy (GUICopyEvent)
 		|| fs = faststring()
 		for s.listsel in self
@@ -1139,6 +1149,8 @@ class ListView (GUIControl) {
 	function StopFilter
 		|| t = .typingfilter
 			t.remove
+			if .onpaste == ListPaste|guipasteevent|
+				.onpaste = nil
 			.typingfilter = nil
 		
 

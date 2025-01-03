@@ -337,7 +337,10 @@ class ButtonView (GUIControl)
 
 	function OpenMenu (|listviewrow| row=nil, |menu|)
 		|| m = .submenu						#require
-		expect m.ListSource.HasAny (beep)
+//		if !m.ListSource.HasAny
+//			|| filter = m.typingfilter
+//			beep
+//			return nil
 		|| w = .window
 		if w and .MouseIsDown
 			w.CurrMouseDown = m // right?

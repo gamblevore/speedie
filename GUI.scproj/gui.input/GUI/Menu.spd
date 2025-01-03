@@ -74,13 +74,17 @@ class Menu (ListView)
 		return moved or .SelJustChanged 
 		
 	
-	function ShowCmm (|GUIControl| Owner, |int| Y, |int| X = -1)
-		opt norefcounts
+	helper SizeCmm (|GUIControl| Owner, |int| X, |int| Y)
 		|| mw = owner.width min 140
 		|| W = owner.BestXForMenu(x, .TextWidth+14 max mw)
 		|| CP = ((Y)~up, ControlPoint.low)(Y)
 		|| H = CP back .DesiredHeight
 		.size = w by h
+	
+	
+	function ShowCmm (|GUIControl| Owner, |int| Y, |int| X = -1)
+		opt norefcounts
+		.sizecmm(owner, x, y)
 		.ShowMenu
 	
 	
@@ -139,14 +143,6 @@ class Menu (ListView)
 			|| w = .outerfocus
 				return w.__keydown__(key)
 
-
-	function guicontrol.OuterFocus (|guicontrol|)
-		opt norefcounts
-		|| w = .window
-			|| i = w.innerfocus
-			if i == self
-				return w.focus
-					
 
 	helper FindTypedRow (|string| input, |listviewrow|)
 		for s.all in self

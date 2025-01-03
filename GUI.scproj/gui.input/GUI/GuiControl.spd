@@ -398,6 +398,12 @@ class GUIControl (list)
 	function Vert (|intrange|)
 		return .lastrect.x1x2
 
+	function OuterFocus (|guicontrol|)
+		opt norefcounts
+		|| w = .window
+			|| i = w.innerfocus
+			if i == self
+				return w.focus
 
 	function HasFocus (|bool|)
 		opt norefcounts
