@@ -610,10 +610,10 @@ class PerryIDE (Window)
 		  else
 			|| sub = .FunctionMenu.SubMenu
 				sub.CloseMenu
-			return .FileList.ShowQuickOpen
-//			if .FileList.ShowQuickOpen
-//				return true
-//			return .FunctionMenu.SearchMenu
+//			return .FileList.ShowQuickOpen
+			if .FileList.ShowQuickOpen
+				return true
+			return .FunctionMenu.SearchMenu
 			
 	
 	behaviour KeyDown
