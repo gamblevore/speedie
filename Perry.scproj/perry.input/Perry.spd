@@ -226,11 +226,6 @@ function ShowCompileCutely (|bool| Always=false)
 		.AlreadyExpandedCompileTab = true
 	.ProductSep.Show
 
-	
-function ShowCompileTab (|object| tab) // showtab
-	.ShowCompileCutely           // OOOP. 
-	.CompileTabSelect(tab)
-
 
 function OutText (|textview|)
 	|| row = .CompileTabs.Selected

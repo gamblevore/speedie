@@ -463,6 +463,8 @@ module GUI
 		|| Quitish = .QuitReason &~ SDLActivity.Activity
 			rz = .StrongClose(Quitish) ||| SDLActivity.Activity 
 		.QuitReason = 0
+		.StartResize	// don't remove! causes delayed updates! resizes can happen here
+						// and the next thing that happens is a draw!
 		if .NewSize
 			.TouchCount ?= 1
 	

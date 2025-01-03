@@ -102,6 +102,12 @@ function ClickedCompileTabs (Guiaction)
 	.ide.CompileTabSelect(row)
 
 
+	
+function PerryIDE.ShowCompileTab (|object| tab) // showtab
+	.ShowCompileCutely           // OOOP. 
+	.CompileTabSelect(tab)
+
+
 function PerryIDE.CompileTabSelect (|object| Desired)	
 	opt norefcounts
 	for i in .CompileTabs.Items
