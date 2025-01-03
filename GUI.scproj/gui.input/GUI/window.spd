@@ -115,6 +115,7 @@ class Window (GUIControl)
 		.SimulationFPS = SimulationFPS
 		if gui.init(scaling)
 			.BlockScale ?= 20
+			.reflow
 			if !gui.singleframenest
 				gui.NukeCursor
 				return GUI.run
@@ -258,6 +259,7 @@ class Window (GUIControl)
 
 	helper KeyDownWin (|keys| key, |bool|)
 		opt norefcounts
+		
 		|| F = .realfocus
 		|| menu = .openedmenu
 			if menu isnt typethrough
