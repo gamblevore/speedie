@@ -165,7 +165,6 @@ class Breakout (Window)
 
 	behaviour mousemove
 		.movebar(move.x|float|*0.02)
-//		.bar.Pos.x += keys.Movement.x.sign * 0.2
 		
 	behaviour FrameStep
 		if !.FrameCount
