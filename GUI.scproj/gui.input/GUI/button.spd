@@ -61,7 +61,8 @@ class ButtonView (GUIControl)
 
 		|| sub = .SubControl
 			|| w = .window
-			require w and w.innerfocus != sub // we shouldn't get a mouseup if we opened a menu?
+				|| m = w.OpenedMenu()
+				require m != sub
 
 		|| Always = (p == (int.min, int.min)) 
 		require always or .lastrect contains p

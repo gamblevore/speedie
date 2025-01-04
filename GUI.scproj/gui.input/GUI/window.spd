@@ -13,7 +13,7 @@ class Window (GUIControl)
 	|guicontrol?|						ToolTipControl
 	|guicontrol?|						DroppingInto
 	|guicontrol?|						MouseIsOver
-	|guicontrol?|						InnerLostFocus
+//	|guicontrol?|						InnerLostFocus
 	|InlineEditor|						InlineEditorPlace
 	|GUIMouseMoveEvent?|				OnMouseMove
 	|list of TaskGUI|					Tasks
@@ -94,20 +94,19 @@ class Window (GUIControl)
 		return .innerfocus ?? .focus
 
 
-	setter OpenedMenu (|menu|)
+	helper OpenedMenu (assigns:|menu|)
 		.SetInnerFocus(value)
 
 
-	function OpenedMenu (|menu|)
+	helper OpenedMenu (|menu|)
 		opt norefcounts
 		|| f = .InnerFocus
 		if f isa menu
-			return f 
-
-
-	function SetMenu (|menu| m)
-		disabled "use openedmenu"
-
+			return f
+		f = f.parent
+		if f isa menu
+			return f
+		
 
 	function RunAsMain (|float| Scaling = 1.0, |int| SimulationFPS=0, |ErrorInt|)
 		.show
@@ -135,20 +134,21 @@ class Window (GUIControl)
 		.CloseDialog
 
 
-	setter Focus (|guicontrol|)
-		.SetFocus(value)
+//	setter Focus (|guicontrol|)
+//		.SetFocus(value)
 	
 
 	helper SetInnerFocus (|guicontrol| Focus)
 		|| old = .InnerFocus
 		require old != Focus
-		if old isa menu
-			(old isnt visible) // makes sense?
+		|| menu = .OpenedMenu // shares innerfocus
+			ifn focus in menu
+				(menu isnt visible) // makes sense?
 		.InnerFocus = focus
 		.finishfocus(focus)
 		focus.__GotFocus__?
 		old.__LostFocus__?
-		.InnerLostFocus = old
+//		.InnerLostFocus = old
 
 
 	helper FinishFocus (|guicontrol| focus)
@@ -235,7 +235,7 @@ class Window (GUIControl)
 		return L.doreturn
 	
 	
-	function MainlistView (|listview|)
+	helper MainlistView (|listview|)
 		opt norefcounts
 		|| s = .flatnext
 		|| e = .flatafter
@@ -261,16 +261,31 @@ class Window (GUIControl)
 		opt norefcounts
 		
 		|| F = .realfocus
-		|| menu = .openedmenu
-			if menu isnt typethrough
-				if key isnt tab
-					return menu.__keydown__(key)
-				menu.CloseMenu
-				
-			  elseif key isnt tab
-				return menu.__keydown__(key) or (f and f.__keydown__(key))
-		  elseif f and f.__keydown__(key)
-			return true
+			|| menu = .openedmenu
+			if !menu
+				if f.__keydown__(key)
+					return true
+			  elseif (key is tab)
+				if menu isnt typethrough
+					menu.closemenu
+					return true
+			  elseif key is escape
+				menu.closemenu
+				return true
+			  else
+				if menu.__keydown__(key)
+					return true
+				return (menu is typethrough or f in menu) and f.__keydown__(key)
+
+/*
+				if menu isnt typethrough
+					if key isnt tab
+						return menu.__keydown__(key)
+					menu.CloseMenu
+					
+				  elseif key isnt tab
+					return menu.__keydown__(key) or (f.__keydown__(key))
+*/
 		
 		if key is tab
 			f ?= .first
@@ -303,7 +318,8 @@ class Window (GUIControl)
 	function IsFullScreen (|bool|)
 		return .LastRect == All.lastrect
 
-	function DrawWindow (|image| where)
+
+	helper DrawWindow (|image| where)
 		where.window = self
 		._ReadjustBlock2D
 		.__drawbackground__(where)
@@ -318,50 +334,48 @@ class Window (GUIControl)
 		// do nothing... let children override
 
 
-	function DrawContents (|image| where)
+	helper DrawContents (|image| where)
 		opt norefcounts
 		where.window = self
-		|| menu = .InnerFocus
+		|| inner = .InnerFocus
 		|| lim = .LastRect.Soothe
 		
-		.DrawChildren(where, lim, menu)
-		|| i = .InnerFocus
+		.DrawChildren(where, lim, inner)
 		|| f = .Focus
-			|| str = (0.70, 1.0)(i)
+			|| str = (0.70, 1.0)(inner)
 			f.drawfocus(where, str)
-			
-		|| old = .InnerLostFocus
-		if old and !old.drawmenu(where)
-			.InnerLostFocus = nil
-		menu.DrawMenu(where)
-		
-		
-		where.ControlClip = self
-		i.DrawFocus(where)?
+	
+		|| m = .openedmenu
+			m.DrawInner(where)
+		  else
+			inner.DrawInner(where)
 
 		where.ResetBoundsToSize
 		if .AlphaFader and ._FlashSelf
 			.DrawFocusRect(Where, .LastRect, .FaintingEdgeSub)
 
 
-	helper guicontrol.DrawMenu (|image| where, |bool|)
+	helper guicontrol.DrawInner (|image| where, |bool|)
 		if .IsViewable
 			where.ControlClip = self
 			.__Draw__(Where)
 			.DrawChildren(where, .lastrect)
+			where.ControlClip = self
+			.DrawFocus(where)
 			return true
+
 
 	helper FixFocus
 		opt norefcounts
-		|| f = .realfocus
-		require f and f isnt visible
-		if f == .innerfocus
-			.SetInnerFocus(nil)
-		  else
-			.setfocus( nil)
+		|| f = .innerfocus
+			if f isnt visible
+				.SetInnerFocus(nil)
+		|| f2 = .focus
+			if f2 isnt visible
+				.SetFocus(nil)
 
 
-	function guicontrol.CanPasteInto (|guicontrol|dest, |guicontrol|)
+	helper guicontrol.CanPasteInto (|guicontrol|dest, |guicontrol|)
 		require dest != nil  and  dest != self
 		require dest is editable and enabled
 		|| copies = .Copypaste.CanCopy
@@ -369,14 +383,14 @@ class Window (GUIControl)
 			return dest
 	
 	
-	function ClearDrops
+	helper ClearDrops
 		GUI.candrag = 0
 		GUI.drawdrag = nil
 		.DroppingInto = nil
 		.currmousedown = nil
 
 
-	function DoDragAcrossControls (|ivec2| P, |guicontrol| r, |bool|)
+	helper DoDragAcrossControls (|ivec2| P, |guicontrol| r, |bool|)
 		GUI.drawdrag ?= r.CopyList
 		if GUI.drawdrag
 			|| dest = r.CanPasteInto(self[p, true])
@@ -387,7 +401,7 @@ class Window (GUIControl)
 				return true
 
 
-	function DoMouseDrag (|ivec2| P, |bool| Beyond)
+	helper DoMouseDrag (|ivec2| P, |bool| Beyond)
 		opt norefcounts
 		|| r = .CurrMouseDown$
 		require (r is visible) or (r == .openedmenu)
@@ -414,9 +428,9 @@ class Window (GUIControl)
 		if ForDrag
 			rz ?= .controlat(r, 10)
 	
-	syntax access (|ivec4| P, |guicontrol|)
-		opt norefcounts
-		return .controlat(p,  0)
+//	syntax access (|ivec4| P, |guicontrol|)
+//		opt norefcounts
+//		return .controlat(p,  0)
 
 
 	function guicontrol.ControlAt (|ivec4| P, |int| pad, |bool| clicks=false, |Guicontrol?|)
@@ -432,7 +446,7 @@ class Window (GUIControl)
 						return r
 						
 	
-	function OpenDialog
+	helper OpenDialog
 		.isdialog = true
 		window.all <~ self
 		is visible
@@ -462,14 +476,14 @@ class Window (GUIControl)
 		return reason
 
 	
-	function CloseDialog
+	helper CloseDialog
 		opt norefcounts
 		isnt visible
 		.ReturnValue ?= self
 		.remove
 	
 	
-	function DoMouseDown (|ivec2| P, |int| Clicks, |guicontrol|)
+	helper DoMouseDown (|ivec2| P, |int| Clicks, |guicontrol|)
 		.SelBeforeMouseDown = .focus
 		|| M = .openedmenu 
 			|| O = .focus
@@ -490,7 +504,7 @@ class Window (GUIControl)
 				return Found
 
 
-	function RunMyTasks (|bool| AnimationsOnly)
+	helper RunMyTasks (|bool| AnimationsOnly)
 		opt norefcounts
 		for p in .Tasks
 			if (p is animation) == AnimationsOnly
@@ -498,7 +512,7 @@ class Window (GUIControl)
 					p.Remove
 
 
-	function SmartRunTask (|taskgui| P,  |bool| Animated, |bool|)
+	helper SmartRunTask (|taskgui| P,  |bool| Animated, |bool|)
 		|| s = p.StartTime
 		|| e = s + p.duration
 		|| now = GUI.FrameStart
@@ -509,7 +523,7 @@ class Window (GUIControl)
 			(p is started)
 		  elseif P is WaitStillStart
 			return true
-
+		
 		|| Prog = p.progress(now)
 		|| ok = (p)(self, Prog)
 		if p is Animation
@@ -538,20 +552,11 @@ class Window (GUIControl)
 		|GUIControl|				ActiveControl
 		|guicontrol of Window|		All = guicontrol(nil)
 	
-		function Count (|int|)
-			return .all.SlowCount
+//		function Count (|int|)
+//			return .all.SlowCount
 		
 		function Front (|Window|)
 			return  .all.last
-		
-		function Back (|Window|)
-			return  .all.first
-
-		function DocumentCount (|int|)
-			opt norefcounts
-			for w in .all
-				if (w is visible) and !w.isdialog
-					rz++
 		
 
 

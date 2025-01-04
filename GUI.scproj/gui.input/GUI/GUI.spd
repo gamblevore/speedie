@@ -24,6 +24,7 @@ module GUI
 
 	|date|						DrawFinish
 	|date|						FrameStart = 1
+	|date|						FrameLastDelay = 1
 	|byte|						DrawState
 	|uint16|					DrawFrameLength
 
@@ -664,25 +665,28 @@ module GUI
 
 
 	helper window.FrameStepsAmount (|int|)
-		|int| SN = ._framenext
 		|| Within = .AnyFrameStepsNeeded()		#require
+
 		|| fps = .SimulationFPS|int|
 		if fps < 10
-			fps = 10>>gui.IsBackground
+			fps = (60, 10)(.Tasks.first)
+			fps >>= gui.IsBackground
 		
 		|int| i = ._FrameNum
 		if (i >= FPS)
 			i = 0
 		
 		|duration| Next 
-		while next <= Within
+		while 
+			next = (1s*(i+rz))/FPS
+			loop next <= Within
 			rz++
-			Next = (1s*(i+rz))/FPS
-		._FrameNext = Next
-		
+
+		._FrameNext = Next		
 		i += rz
 		while i > fps
 			i -= fps
+		._Framenum = i
 
 		|| ST = gui.FrameStart
 		if (._LastTimeSeen - ST).abs > 0.5s					// Computer paused, or clock changed.  Just do 1 frame.
@@ -690,7 +694,13 @@ module GUI
 		._LastTimeSeen = ST
 
 
-	helper window.DoFrameStep (|bool| ChangeOK)
+	helper date.printwithinsecond
+		|| x = self & 0xFFFF
+		|| y = x div 64K
+		"${y}s"
+		
+
+	helper window.DoFrameStep (|bool| ChangeOK, |int| N)
 		.RunMyTasks(false)
 		.FixFocus
 		.__FrameStep__(ChangeOK and !.OpenedMenu)
@@ -700,14 +710,14 @@ module GUI
 		opt norefcounts
 		|| wf = Window.front$
 		|| FrontIsDialog = .DialogIsOpen
-		if keys.escape[] and keys.shift
 		if FrontIsDialog or wf.AnyFrameStepsNeeded()
 			keys.FlushKeys
 
 		|| Got = 0
 		for  w  in  window.all
-			for w.FrameStepsAmount()
-				w.DoFrameStep(!FrontIsDialog)
+			|| N = w.FrameStepsAmount()
+			for n
+				w.DoFrameStep(!FrontIsDialog, n)
 				Got++
 
 		if Got
@@ -736,14 +746,14 @@ module GUI
 			.SingleFrameNest++
 			rz = .SingleFrameSub
 			.SingleFrameNest--
-	
-	
+
+
 	helper SingleFrameSub (|bool|)
 		opt norefcounts
-		|| Now = .DelayEvents
-			.FrameStart = Now
-		|sdlactivity| Occur = (.HandleEvents, 0)(Now or SDL_Event.HasAny)
-		require Occur isnt ExitOrTerminate
+		|| EnoughTime = .DelayEvents
+		if EnoughTime or SDL_Event.HasAny
+			|| Occur = .HandleEvents
+			require Occur isnt ExitOrTerminate
 
 		.DoSimulation
 		.DrawState |= (.TouchCount != 0)
@@ -751,7 +761,6 @@ module GUI
 			.StartDraw
 		if .DrawState & 2
 			.EndDraw								// if its too early, we don't draw.
-			
 		return true
 
 
@@ -769,26 +778,23 @@ module GUI
 			app.Sleep(remain)
 
 
-	helper DelayEvents (|date|)
+	helper DelayEvents (|bool|)
 		|| CanSleep = !SDL_Event.HasAny
-		|| L = 256 // 256th of a second
+		|| L = 256										// 256th of a second
 		if .IsBackground and !.DroppingInto
 			l = .DrawFrameLength*9
 
-		rz = date.now
+		|| d = date.now
+		.framestart = d		
 
-//		opt norefcounts
-//		|| w = window.front
-//			if w.simulationfps
-//				"FFF: ${gui.framestart & 0xFFFF}  (${rz&0xFFFF})"
-
-
-		|uint64| Ago = rz - .FrameStart				// unsigned, in case the clock goes backwards
+		|uint64| Ago = d - .FrameLastDelay				// Unsigned, in case the clock goes backwards
 		|date| Remain = L - ago
-		if Remain > 0
-			if CanSleep
-				app.Sleep(Remain)
-			return 0
+		if Remain <= 0
+			.FrameLastDelay = d
+			return true
+
+		if CanSleep
+			app.Sleep(Remain)
 	
 	
 	helper HandleEvents (|SDLActivity|)
@@ -954,6 +960,12 @@ module GUI
 				return w.DoListViewNext(true)
 			if (key is semicolon)
 				return w.DoListViewNext(false)
+			if (key is d) and  keys.Control
+				|| ov = w.MouseIsOver
+					Notifications <~ ov.ContainedName
+				  else
+					beep
+			
 		  
 		if (key is copy) or (cmd and key is c)
 			|| wf = w.focusattempt
@@ -1299,8 +1311,6 @@ module GUI
 		|| w = r.window
 		require w and r and w.ToolTipControl != r
 		w.ToolTipControl = r
-		if  r.id  and  keys.Control  and  keys.LALT[]  and  keys.LGUI[]
-			Notifications <~ r.ContainedName
 		
 		|| info = ""
 		ifn r isa textview  and  r is editable

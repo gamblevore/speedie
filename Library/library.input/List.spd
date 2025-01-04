@@ -145,6 +145,10 @@ class list (Saveable)
 		for s.up in r
 			if s == self
 				return true
+
+	operator In (|list| f, |bool|)
+		opt norefcounts
+		return .parent == f
 		
 	function Remove
 		.Parent = nil

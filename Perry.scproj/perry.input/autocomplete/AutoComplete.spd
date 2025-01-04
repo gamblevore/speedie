@@ -505,7 +505,7 @@ function message.OwningModclass (|bool| EndAtArg=true, |message|)
 	opt norefcounts
 	require self
 	rz = .owningSyntax(AutoComplete.owner, EndAtArg)
-	if .parent == nil
+	if !.parent
 		rz ?= @tmp+"root"
 	
 	

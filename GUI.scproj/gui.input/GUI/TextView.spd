@@ -1013,7 +1013,7 @@ class TextView (GUIControl)
 			is Animation
 		
 		run
-			require .d.parent == .upon._Lines
+			require .d in .upon._Lines
 			|| start = .upon.XY(.d)
 			|| Particles = 48 
 			|| S = .StartTime + .d.position
@@ -1518,10 +1518,9 @@ class TextView (GUIControl)
 		require GUI.FlashSelector and !.hasinline and .window.islast
 		if .hasfocus
 			return true
-		|| p = .parent
 		|| w = .Window
-		if w and p == w.InnerFocus
-			return true
+			if self in w.InnerFocus
+				return true
 	
 	
 	helper HasInline (|bool|)

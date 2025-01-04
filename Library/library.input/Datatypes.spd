@@ -930,10 +930,6 @@ datatype MoveCode (byte)
 
 	syntax is (|movecode| m, |bool|)
 		return (self & m) == m
-	
-	syntax call (|bool| same, |movecode|)
-		if same: return self
-		return .flip
 
 	function field (|int|)
 		if self & Vertical
@@ -941,8 +937,10 @@ datatype MoveCode (byte)
 		if self & Positive
 			rz |= 2
 	
-	function flip (|movecode|)
-		|| m = 0b01010101
-		|| m2 = m << 1
-		return ((self & m) << 1) ||| ((self & m2) >> 1)
+	function flip (|bool| same=false, |movecode|)
+		if !same
+			|| m = 0b01010101
+			|| m2 = m << 1
+			return ((self & m) << 1) ||| ((self & m2) >> 1)
+		return self
 

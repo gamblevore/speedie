@@ -23,7 +23,7 @@ function DebugArgsGotFocus (guiaction)
 		.InitDebugArgs
 		if !vis
 			.save
-	.SlideOpen(0.125s, (movecode.open)(vis) )
+	.SlideOpen(0.2s, movecode.open.flip(vis) )
 
 
 function textview.InitDebugArgs

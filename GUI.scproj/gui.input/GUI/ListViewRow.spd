@@ -43,7 +43,7 @@ role ListViewRow (message)
 		return !((.Indent)&(1<<i))
 		
 
-	function AllExpandState (|int|)
+	helper AllExpandState (|int|)
 		opt norefcounts
 		for r in self
 			if (r is expanded) and r.hasany
@@ -84,7 +84,7 @@ role ListViewRow (message)
 			require f
 		
 	
-	function ListView.DrawCell (|ListViewrow| R, |int| x, |ListViewcell|)
+	helper ListView.DrawCell (|ListViewrow| R, |int| x, |ListViewcell|)
 		// So... what are columns
 		// 0-100 --> 30, 60
 		// if x < a number, we are in that thing.
@@ -116,7 +116,7 @@ role ListViewRow (message)
 			f = f.next
 
 
-	function DrawSep (|ivec4| rect, |image| Where, |float| Str=1)
+	helper DrawSep (|ivec4| rect, |image| Where, |float| Str=1)
 		opt norefcounts
 		|| y = (rect.y + rect.y2+1)/2
 		rect = (rect.x+1, y, rect.x2, y+1)
@@ -125,18 +125,18 @@ role ListViewRow (message)
 		where.DrawRect(Rect, A) 
 	
 	
-	function DrawDividerH (|ivec4| z2, |image| Where, |ListView| p, |int| i)
+	helper DrawDividerH (|ivec4| z2, |image| Where, |int| i)
 		opt NoRefCounts
 		require (self isnt disabled) and (.prev isnt disabled)
 		|| Vis	= .vis(i)
 			Where.MarkLineH(z2.x1y2, z2.width, 1)
 
-	function DrawDividerV (|ivec4| z2, |image| Where)
+	helper DrawDividerV (|ivec4| z2, |image| Where)
 		Where.MarkLineV(z2.x1y2, 		z2.height, 1)
 		Where.MarkLineV(z2.x2y2+(1,0),	z2.height, 1)
 
 	
-	function ListRowDraw (|image| Where, |ivec4| Rect, |ListView| p, |int| depth)
+	helper ListRowDraw (|image| Where, |ivec4| Rect, |ListView| p, |int| depth)
 		opt NoRefCounts
 		require self and !p.decluttered
 		|| w	= p.window	
@@ -145,7 +145,7 @@ role ListViewRow (message)
 		|| str = p.Declutterer.Strength
 		where.controlclip = rect.clip(p.lastrect)
 		for i in p.DrawCols
-			rect.horz	= p.col(i, z2, self)
+			rect.horz	= p.ColBounds(i, z2, self)
 			rect.x	   += depth*font.width*2
 			.DrawRowColumn(rect, where,  p, depth, i, str) 
 
@@ -165,7 +165,7 @@ role ListViewRow (message)
 			where.DrawRect(z2, edge)
 
 
-	function DrawRowColumn (|ivec4| rect, |image| Where, |ListView| Parent, |int| Depth, |int| Column, |float| str)
+	helper DrawRowColumn (|ivec4| rect, |image| Where, |ListView| Parent, |int| Depth, |int| Column, |float| str)
 		opt NoRefCounts
 		
 		|| g		= parent.gnormal // unecessary? drawsep doesnt even use gnormal!
