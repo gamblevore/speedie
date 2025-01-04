@@ -12,7 +12,7 @@ datatype ImagePixel (uint)
 //	|byte| G
 //	|byte| B
 //	|byte| A
-// we should be able to define rgba like this... and have all these accessor functions auto-created.
+//  We should be able to define rgba like this... and have all these accessor functions auto-created.
 
 	linkage
 //		datatype true
@@ -82,8 +82,8 @@ datatype ImagePixel (uint)
 				v = 255
 			.parts[i] = v
 	
-	function Lum (|float|)
-		return .color.lum
+//	function Lum (|float|)
+//		return .color.lum
 	
 	function HasColor (|bool|)
 		return .r or .g or .b
