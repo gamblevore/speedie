@@ -93,6 +93,8 @@ typedef int PID_Int;
 
 typedef ivec4 ParserLineAndIndent;
 
+typedef vec4 Plane3D;
+
 typedef byte ProcessMode;
 
 typedef byte ProcessOwnerMode;
@@ -1066,9 +1068,9 @@ extern Dictionary* JB__TC_Types_Dict;
 
 #define kJB__FileDes_StdOut ((FileDes)1)
 
-#define kJB__FileMode_CanExec ((FileMode)281474976710656)
+#define kJB__FileMode_CanExec ((FileMode)73)
 
-#define kJB__FileMode_Data ((FileMode)6)
+#define kJB__FileMode_Data ((FileMode)416)
 
 #define kJB__FileMode_Group ((FileMode)56)
 
@@ -1076,7 +1078,7 @@ extern Dictionary* JB__TC_Types_Dict;
 
 #define kJB__FileMode_Owner ((FileMode)448)
 
-#define kJB__FileMode_Process ((FileMode)115968)
+#define kJB__FileMode_Process ((FileMode)493)
 
 #define kJB__FileResolveMode_AllowMissing ((bool)1)
 
@@ -1373,9 +1375,6 @@ void JB_Platform__Log(JB_String* S);
 
 JB_File* JB_Platform__OpenLog();
 
-
-
-// RingTree
 
 
 // __classes__
@@ -1889,6 +1888,9 @@ int JB_Rg_Width(IntRange Self);
 
 
 // ParserLineAndIndent
+
+
+// Plane3D
 
 
 // ProcessMode
@@ -2773,6 +2775,8 @@ void jdb2(JB_List* Self);
 
 void jdb3(JB_List* Self);
 
+bool JB_Tree_OperatorIn(JB_List* Self, JB_List* F);
+
 void JB_Tree_Remove(JB_List* Self);
 
 JB_String* JB_List_Render(JB_List* Self, FastString* Fs_in);
@@ -2919,8 +2923,6 @@ void JB_Msg_Nil__(Message* Self, FastString* Fs);
 void JB_Msg_Num__(Message* Self, FastString* Fs);
 
 void JB_Msg_Oat__(Message* Self, FastString* Fs);
-
-bool JB_Msg_InMsg(Message* Self, Message* F);
 
 bool JB_Msg_OperatorIn(Message* Self, Syntax F);
 

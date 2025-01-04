@@ -3442,7 +3442,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[216]);
-	JB_FS_AppendInt32(_fsf0, (2025010222));
+	JB_FS_AppendInt32(_fsf0, (2025010422));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -4920,7 +4920,7 @@ Message* SC_AC__MainAct(Message* Cmd, SCFile* My_file) {
 	iif ((!Thg) and (JB_Msg_SyntaxEquals(Cmd, JB_LUB[1360], false))) {
 		Thg = Fn->Source;
 	}
-	iif ((JB_Msg_EqualsSyx(Thg, kJB_SyxThg, false)) and (SC_Msg_IsBehaviour(Fn->Source) and JB_Msg_InMsg(Thg, Fn->Source))) {
+	iif ((JB_Msg_EqualsSyx(Thg, kJB_SyxThg, false)) and (SC_Msg_IsBehaviour(Fn->Source) and JB_Tree_OperatorIn(Thg, Fn->Source))) {
 		return SC_AC__Define_Behaviour(Fn, Cmd->Name);
 	}
 	iif (JB_Msg_OperatorStarts(Cmd, JB_LUB[1290]) or (JB_Msg_OperatorStarts(Cmd, JB_LUB[1256]) or JB_Msg_OperatorStarts(Cmd, JB_LUB[1360]))) {
@@ -8870,7 +8870,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1683]);
-	JB_FS_AppendInt32(_fsf0, (2025010222));
+	JB_FS_AppendInt32(_fsf0, (2025010422));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -29823,7 +29823,7 @@ Message* SC_PA_AddTestedParam(SCParamArray* Self, Message* Item, SCNode* Name_sp
 		JB_Msg_Fail(Item, JB_LUB[1068]);
 		return nil;
 	}
-	iif (JB_Msg_InMsg(Item, Pr)) {
+	iif (JB_Tree_OperatorIn(Item, Pr)) {
 		SC_PA_AddParam(Self, Item);
 		return ((Message*)JB_Ring_NextSib(Item));
 	}
@@ -32167,7 +32167,7 @@ Message* JB_SS_NextMsgExpect(StringReader* Self, Message* Parent, Syntax Fn, JB_
 	iif (!Rz) {
 		return nil;
 	}
-	iif (!(JB_Msg_Expect(Rz, Fn, Name) and (JB_Msg_InMsg(Rz, Parent)))) {
+	iif (!(JB_Msg_Expect(Rz, Fn, Name) and (JB_Tree_OperatorIn(Rz, Parent)))) {
 		JB_Msg_Fail(Rz, nil);
 		return nil;
 	}
@@ -34100,6 +34100,10 @@ __lib__ void jdb3(JB_List* Self) {
 	 else {
 		JB_PrintLine(JB_LUB[9]);
 	}
+}
+
+bool JB_Tree_OperatorIn(JB_List* Self, JB_List* F) {
+	return JB_Ring_Parent(Self) == F;
 }
 
 bool JB_Tree_OperatorLessOrEqual(JB_List* Self, int N) {
@@ -38240,7 +38244,7 @@ void SC_Msg_InsertAfter(Message* Self, Message* Ins, Message* After) {
 }
 
 void SC_Msg_InsertBefore(Message* Self, Message* J, Message* Ch) {
-	iif (JB_Msg_InMsg(Ch, Self)) {
+	iif (JB_Tree_OperatorIn(Ch, Self)) {
 		(JB_Ring_PrevSibSet(Ch, J));
 	}
 	 else {
@@ -40120,10 +40124,6 @@ bool JB_Msg_ContainsStr(Message* Self, JB_String* S) {
 	return ((bool)JB_Msg_FindNested(Self, kJB_SyxNil, S, false));
 }
 
-bool JB_Msg_InMsg(Message* Self, Message* F) {
-	return ((Message*)JB_Ring_Parent(Self)) == F;
-}
-
 bool JB_Msg_OperatorIn(Message* Self, Syntax F) {
 	Message* P = ((Message*)JB_Ring_Parent(Self));
 	iif (P) {
@@ -41313,7 +41313,7 @@ void SC_Msg_StructReturnCleanup(Message* Self, SCFunction* Fn, SCNode* Name_spac
 		return;
 	}
 	JB_FreeIfDead(SC_TypeOfExpr(R, Name_space, nil));
-	iif (!JB_Msg_InMsg(R, Self)) {
+	iif (!JB_Tree_OperatorIn(R, Self)) {
 		JB_Decr(R);
 		return;
 	}
@@ -46323,7 +46323,7 @@ void SC_Base_CollectFromNode(SCNode* Self, Message* AST, bool Visible, Message* 
 				JB_Decr(C);
 				break;
 			}
-			iif (JB_Msg_InMsg(C, AST)) {
+			iif (JB_Tree_OperatorIn(C, AST)) {
 				JB_Tree_SyntaxAppend(Dest, C);
 			}
 			JB_Decr(C);
@@ -52554,7 +52554,7 @@ void SC_Func_CheckConstructorAndDestructor(SCFunction* Self, Message* Root, bool
 						SCDecl* Pfdecl = ((SCDecl*)JB_Object_FastAs(Pf->Obj, &SCDeclData));
 						iif (SC_Func_SyntaxIs(Fn, kSC__FunctionType_Constructor) and SC_Decl_SyntaxIs(Pfdecl, kSC__SCDeclInfo_Self)) {
 							GotSuperConstructor = true;
-							iif (!JB_Msg_InMsg(Dot, Root)) {
+							iif (!JB_Tree_OperatorIn(Dot, Root)) {
 								JB_Msg_Fail(Dot, NoNesting);
 							}
 						}
@@ -52567,7 +52567,7 @@ void SC_Func_CheckConstructorAndDestructor(SCFunction* Self, Message* Root, bool
 				iif (T) {
 					bool IsSet = UsedAtAll == 1;
 					iif (!SC_Decl_IsNormalObject(T)) {
-						iif (!JB_Msg_InMsg(((Message*)JB_Ring_Parent(Dot)), Root)) {
+						iif (!JB_Tree_OperatorIn(((Message*)JB_Ring_Parent(Dot)), Root)) {
 							Dot = _N_f3;
 							continue;
 						}
@@ -52586,7 +52586,7 @@ void SC_Func_CheckConstructorAndDestructor(SCFunction* Self, Message* Root, bool
 							iif (SC_Decl_SyntaxIs(T, kSC__SCDeclInfo_PropertyWasConstructed)) {
 								JB_Msg_Fail(Dot, JB_LUB[1339]);
 							}
-							iif (!JB_Msg_InMsg(((Message*)JB_Ring_Parent(Dot)), Root)) {
+							iif (!JB_Tree_OperatorIn(((Message*)JB_Ring_Parent(Dot)), Root)) {
 								JB_Msg_Fail(Dot, NoNesting);
 							}
 						}
@@ -57572,7 +57572,7 @@ void SC_Func__Tran_Return(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 		return;
 	}
 	JB_SetRef(Node->Obj, Fn->ReturnType);
-	iif (!(JB_Tree_IsLast(Node) and (JB_Msg_InMsg(Node, SC_Func_SourceArg(Fn))))) {
+	iif (!(JB_Tree_IsLast(Node) and (JB_Tree_OperatorIn(Node, SC_Func_SourceArg(Fn))))) {
 		iif (SC_Func_SyntaxIs(Fn, kSC__FunctionType_ConOrDes)) {
 			JB_Msg_Fail(Node, JB_LUB[1687]);
 			return;
@@ -57827,7 +57827,7 @@ void SC_Func__Tran_Using(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 	JB_Tree_AppendBefore(Arg, Item, _tmPf5);
 	JB_Decr(Item);
 	JB_Decr(_tmPf5);
-	iif (JB_Msg_InMsg(Arg, Node)) {
+	iif (JB_Tree_OperatorIn(Arg, Node)) {
 		JB_SetRef(Node->Name, JB_LUB[180]);
 		Message* _tmPf6 = ((Message*)JB_Ring_First(Node));
 		JB_Incr(_tmPf6);
@@ -58487,4 +58487,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 749619755757796169 -1503207478439254083
+// -3401980623022726844 -1503207478439254083

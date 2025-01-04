@@ -8580,6 +8580,8 @@ void jdb2(JB_List* Self);
 
 void jdb3(JB_List* Self);
 
+bool JB_Tree_OperatorIn(JB_List* Self, JB_List* F);
+
 bool JB_Tree_OperatorLessOrEqual(JB_List* Self, int N);
 
 JB_List* JB_Tree_Pop(JB_List* Self);
@@ -9324,8 +9326,6 @@ void JB_Msg_Oat__(Message* Self, FastString* Fs);
 SCClass* SC_Msg_ObjCls(Message* Self);
 
 bool JB_Msg_ContainsStr(Message* Self, JB_String* S);
-
-bool JB_Msg_InMsg(Message* Self, Message* F);
 
 bool JB_Msg_OperatorIn(Message* Self, Syntax F);
 

@@ -458,7 +458,6 @@ JB_File* JB_Platform__OpenLog() {
 
 
 
-
 ErrorInt JB_Main() {
 	//visible;
 	return 0;
@@ -3223,6 +3222,7 @@ int JB_Rg_Width(IntRange Self) {
 
 
 
+
 bool JB_Syx_IsString(Syntax Self) {
 	return (Self >= kJB_SyxSStr) and (Self <= kJB_SyxStr);
 }
@@ -5500,7 +5500,7 @@ Message* JB_SS_NextMsgExpect(StringReader* Self, Message* Parent, Syntax Fn, JB_
 	if (!Rz) {
 		return nil;
 	}
-	if (!(JB_Msg_Expect(Rz, Fn, Name) and (JB_Msg_InMsg(Rz, Parent)))) {
+	if (!(JB_Msg_Expect(Rz, Fn, Name) and (JB_Tree_OperatorIn(Rz, Parent)))) {
 		JB_Msg_Fail(Rz, nil);
 		return nil;
 	}
@@ -6054,6 +6054,10 @@ __lib__ void jdb3(JB_List* Self) {
 	 else {
 		JB_PrintLine(JB_LUB[226]);
 	}
+}
+
+bool JB_Tree_OperatorIn(JB_List* Self, JB_List* F) {
+	return JB_Ring_Parent(Self) == F;
 }
 
 void JB_Tree_Remove(JB_List* Self) {
@@ -6980,10 +6984,6 @@ void JB_Msg_Num__(Message* Self, FastString* Fs) {
 void JB_Msg_Oat__(Message* Self, FastString* Fs) {
 	JB_FS_AppendByte(Fs, '%');
 	JB_Msg_RenderWithSpaces(Self, Fs, nil);
-}
-
-bool JB_Msg_InMsg(Message* Self, Message* F) {
-	return ((Message*)JB_Ring_Parent(Self)) == F;
 }
 
 bool JB_Msg_OperatorIn(Message* Self, Syntax F) {
@@ -8391,7 +8391,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2024121123);
+	return (2025010420);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8403,4 +8403,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 678996081711426330 596297647312558453
+// -2934619186805667969 1989346364238709283 596297647312558453
