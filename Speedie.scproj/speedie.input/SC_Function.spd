@@ -1915,7 +1915,7 @@ function NewDestructor (CollectFunc)
 
 
 function message.MainFix (|message|)
-	|| prms = self.first
+	|| prms = .first
 	if !prms
 		prms = .GiveArg
 		prms <~ "hello world"
