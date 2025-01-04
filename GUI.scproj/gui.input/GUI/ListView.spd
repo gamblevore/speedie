@@ -68,15 +68,6 @@ class ListView (GUIControl) {
 		.gnormal.solid		=  ((0,   0,   0,   0.65))
 		.gnormal.seps		<~ ((0.5, 0.5, 0.5, 0.65))
 			
-	helper guicontrol.BestXForMenu (|int|x, |int| width, |controlline|)
-		opt norefcounts
-		(width max= 64)
-		if x >= 0
-			return (x)~right for width
-		if .mousexy.x > .horz.mid
-			return the~right back width
-		return the~left for width
-
 	
 	helper TryRenameCellTo (|listviewcell!| cell, |string| value, |bool|)
 		opt NoRefCounts
@@ -137,16 +128,15 @@ class ListView (GUIControl) {
 		opt norefcounts
 		|| m = .cmm	
 			m.EditingRow = r
-			y = (y+2) - .lastbottom
-			y?=1
-			m.ShowCmm(self, y)
+			y = (y+2) - .LastBottom
+			y |= !y
+			m.ShowCmm(self, -1, y)
 
 
 	helper DesiredHeight (|int|)
 		opt norefcounts
 		rz = 2 + ((.ListSource.SlowCount max 2) * .RowHeight)
 		|| t = .typingfilter
-			if !t.parent
 			rz += t.height - 1 
 
 
@@ -187,7 +177,7 @@ class ListView (GUIControl) {
 	function NewCmm (|menu|)
 		rz = .cmm
 		if rz
-			rz.listsource.clear
+			rz.ListSource.Clear
 			return rz
 		rz = menu(self, nil, nil)
 		rz.clipmode = ControlClipMode.SlideBackInWindow
@@ -356,7 +346,6 @@ class ListView (GUIControl) {
 		opt norefcounts
 		rz = .TypingFilter
 		if rz
-			if !rz.parent
 			return rz
 		rz = TextView(Self)
 		.Typingfilter = rz
@@ -382,17 +371,17 @@ class ListView (GUIControl) {
 
 	helper UpdateFilter (|bool|)
 		opt norefcounts
-		|| t = .OnTypingFilter$
-		|| str = ""
-		|| tf = .typingfilter
-			if !tf.parent
-			str = tf.text
-		(t)(self, nil, str)
+		|| t = .OnTypingFilter
+		|| tf = .TypingFilter
+		require t and tf
+		(t)(self, nil, tf.text)
 		.touch
-		if tf and self isa menu
+		if self isa menu
 			.Sizer.g(1) = .DesiredHeight~long
-		if .selectablecount == 1
+			.sizer.g(2) = .CmmWidth(nil)~long
+		if .SelectableCount == 1
 			.SelectFirst
+		
 		return true
 	
 	
@@ -886,7 +875,7 @@ class ListView (GUIControl) {
 		return curr
 	
 	
-	function ClearSearch (|bool|)
+	helper ClearSearch (|bool|)
 		opt norefcounts
 		for s.all in self
 			if s is found
@@ -1031,6 +1020,7 @@ class ListView (GUIControl) {
 	function SelectNoShow (|ListViewRow| s)
 		.select(s, ListViewSelectMode.Noshow)
 	
+	
 	function SelectFast (|ListViewRow| s)
 		.select(s, ListViewSelectMode.Fast)
 		
@@ -1148,7 +1138,6 @@ class ListView (GUIControl) {
 	
 	function StopFilter (|bool|)
 		|| t = .typingfilter
-			if !t.parent
 			t.remove
 			.typingfilter = nil
 		return true
@@ -1163,8 +1152,7 @@ class ListView (GUIControl) {
 	helper ActualRect (|ivec4|)
 		opt norefcounts
 		rz = .lastrect
-		|| t = .typingfilter
-			if !t.parent
+		|| t = .TypingFilter
 			rz.y2 -= t.height-1
 		if .Headers
 			rz.y2 -= .HeaderHeight

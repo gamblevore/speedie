@@ -17,9 +17,9 @@ class TextView (GUIControl)
 	|MoveCode|					Alignment // centered, left, right
 	|int|						ClickedPos
 
-	|byte|						CanAutoComplete
-	|int|						AutoCompleteBack
-	|string|					AutoCompleteString
+	|byte|						_CanAutoComplete
+	|int|						_AutoCompleteBack
+	|string|					_AutoCompleteString
 	
 	|byte|						_CodeInsertionState
 	|uint16|					_LastDrawWidth
@@ -51,7 +51,7 @@ class TextView (GUIControl)
 		.TakesFocus = TakesFocusFlag.On
 		.OnClicked	= Clicked
 		.OnKeyDown	= keys
-		.CanAutoComplete = 2
+		._CanAutoComplete = 2
 		.LineHeight = font.Height + 4	// whatever
 		.SetsDebugLines = 10
 		.ExpectsParse = TextView.allowjeebox
@@ -295,7 +295,7 @@ class TextView (GUIControl)
 		require result != ._TypingPlace
 		.TypingPlaceReal = result
 		._PreferPrevLine = false
-		if .CanAutoComplete <= 1
+		if ._CanAutoComplete <= 1
 			.CanAutoComplete = 0
 			.autocompletestring = ""
 		._UncorrectedSel = result
@@ -866,17 +866,46 @@ class TextView (GUIControl)
 			.Insert("/*" + s + "*/", true)
 		return true
 	
-	 
+	
+	function CanAutoComplete (|int|)
+		opt inline
+		return ._CanAutoComplete
+
+	function AutoCompleteString (|string|)
+		opt inline
+		return ._AutoCompleteString
+	
+	
+	function AutoCompleteBack (|int|)
+		opt inline
+		return ._AutoCompleteBack
+
+
+	function CanAutoComplete (assigns:|byte|)
+		if ._CanAutoComplete != value
+			._CanAutoComplete = value
+			.touch
+
+	function AutoCompleteString (assigns:|string|)
+		if ._AutoCompleteString != value
+			._AutoCompleteString = value
+			.touch
+
+	function AutoCompleteBack (assigns:|int|)
+		if ._AutoCompleteBack != value
+			._AutoCompleteBack = value
+			.touch
+
 	helper InsertAutoComplete (|bool|)
-		require .CanAutoComplete == 1
-		|| c2 = .AutoCompleteString			#require
+		require ._CanAutoComplete == 1
+		|| c2 = ._AutoCompleteString			#require
 		|| trim = c2.InsertTrim
 		|| autostart = c2[0, trim.x]
 		|| ins = .sel0
-		|| old = self[ins - .autocompleteback, ins]
+		|| old = self[ins - ._autocompleteback, ins]
 		if old != c2
 			c2 = c2.DeleteTwoBytes(trim)
-			|| r = .selrange - (.autocompleteback, 0)
+			|| r = .selrange - (._autocompleteback, 0)
 			if (c2 endswith "()") and self[r.x2] == '('
 				c2 = c2[0, c2.length-2]
 			.undochecker = -1
@@ -1353,7 +1382,7 @@ class TextView (GUIControl)
 			|| u = .undoer
 				|| c = u.current
 					c.typingplace = p
-			if .CanAutoComplete <= 1
+			if ._CanAutoComplete <= 1
 				.CanAutoComplete = 0
 				.AutoCompleteString = ""
 			|| x = (p.x, p.x2)(s)

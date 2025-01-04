@@ -40,7 +40,19 @@ function PerryIDE.FindSelectedMenuItem (|message| result)
 	require result.hasany
 	|| fn = result.FuncAtPos(.editme.sel0 )
 	.FunctionMenu.submenu!.select(result)
-	
+
+
+function string.FuncListSep (|string|)
+	|| fs = faststring()
+	|| n = .length
+	|| missing = (24 - n)/2
+	fs <~ ('-', missing)
+	fs <~ '<'
+	fs <~ self
+	fs <~ '>'
+	fs <~ ('-', missing)
+	return fs
+
 	
 function PerryIDE.ImproveFuncList (|message| result)
 	opt NoRefCounts
@@ -49,7 +61,7 @@ function PerryIDE.ImproveFuncList (|message| result)
 		|| p = s[@nil][@nil]
 			if !p0 or !p.ShallowEquals(p0, true)
 				|| d = listviewrow()
-				d.name = "------<" + p.name + ">------"
+				d.name = p.name.funclistsep
 				(d is disabled)
 				s.prev = d
 			|| n = s.first!.name

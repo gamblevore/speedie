@@ -61,7 +61,7 @@ class Menu (ListView)
 			
 	
 	behaviour MouseMove
-		if state is leave or enter
+		if State is LEAVE or ENTER
 			return false // right? should have a different event for this
 		|| moved = super.mousemove(P, move, 0|SDL_WindowEventID|)
 		|| l = .FindClickedMenu(P.y)
@@ -70,21 +70,26 @@ class Menu (ListView)
 		.SelJustChanged = false
 		if (l isnt disabled)
 			.Select(l)
-			
 		return moved or .SelJustChanged 
-		
 	
-	helper SizeCmm (|GUIControl| Owner, |int| X, |int| Y)
-		|| mw = owner.width min 140
-		|| W = owner.BestXForMenu(x, .TextWidth+14 max mw)
+		
+	helper CmmWidth (|guicontrol?| owner, |int|)
+		|| mw = owner.width? min 140
+		mw = .TextWidth + 14 max mw
+		return mw max 64
+
+	
+	function ShowCmm (|GUIControl| Owner, |int| X, |int| Y)
+		opt norefcounts
+		|| mw = .CmmWidth(owner)
+		|| W = the~left for mw
+		if x >= 0
+			w = (x)~right for mw
+		  elseif .MouseXY.x > .Horz.mid
+			w = the~right back mw
 		|| CP = ((Y)~up, ControlPoint.low)(Y)
 		|| H = CP back .DesiredHeight
 		.size = w by h
-	
-	
-	function ShowCmm (|GUIControl| Owner, |int| Y, |int| X = -1)
-		opt norefcounts
-		.sizecmm(owner, x, y)
 		.ShowMenu
 	
 	
@@ -94,7 +99,7 @@ class Menu (ListView)
 		win.openedmenu = self
 		is visible
 		._Scroll = nil
-//		.slideopen(0.125s)
+//		.SlideOpen(0.125s)
 		.SelectFirst(ListViewSelectMode.InitialSelection)
 	
 	

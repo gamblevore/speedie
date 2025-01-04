@@ -427,14 +427,14 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 		prev = c
 	
 	if .AutoLim(d)
-		if (.CanAutoComplete != 2) or (!.text)
+		if (._CanAutoComplete != 2) or (!.text)
 			if d.islast				// last line draw too early with autocomplete
 				x += font.width		// but we shouldn't need this!
 			.DrawAuto(Where, d, x, y)
 
 
 helper TextView.AutoLim (|textviewline| d, |bool|)
-	if (.CanAutoComplete >= 1) and .AutoCompleteString
+	if (._CanAutoComplete >= 1) and ._AutoCompleteString
 		|| after = d.after
 		if d is last
 			after++ // ??
@@ -443,15 +443,15 @@ helper TextView.AutoLim (|textviewline| d, |bool|)
 
 
 helper TextView.FakeAutoComplete (|int|)
-	|| n = .autocompleteback
-	if .autocompletestring=="" or .autocompletestring.length == n
+	|| n = ._autocompleteback
+	if ._autocompletestring=="" or ._autocompletestring.length == n
 		return -1
 	return n
 
 
 helper TextView.DrawAuto (|image| where, |textviewline| d, |int| x, |int| y)
 	|| n = .FakeAutoComplete
-	|| str = (.autocompletestring[n, int.max], "...")(n>=0)
+	|| str = (._autocompletestring[n, int.max], "...")(n>=0)
 	where.drawtext(str, (x,y), colors.white(0.3))
 	
 

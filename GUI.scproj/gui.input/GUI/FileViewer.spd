@@ -631,16 +631,18 @@ function fileviewer.FindSearchWithin (|filerow|)
 		while (s isa filerow) and !s.AsDir
 			s = s.parent
 		return s
-	
+
+
 function fileviewer.ReturnFileList (GUIListEvent)
 	if self isa FileViewer
 		.Editme.SetFocus
 		return true
-	
+
+
 function fileviewer.RightClickFileList (GUIListEvent)
 	opt NoRefCounts
 	if self isa fileviewer
-		|| m = .newcmm
+		|| m = .NewCmm
 		m <~ ("Show In Desktop",	FileViewerCMMShow)
 		m <~ ("Copy File Path",		FileViewerCopyPath)
 		m <~ ("Rename File",		FileViewerRenameFile)

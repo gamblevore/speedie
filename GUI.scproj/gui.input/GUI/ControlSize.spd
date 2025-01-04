@@ -7,7 +7,7 @@ struct ControlSize
 		datatype true
 	|controlrect|				GSize
 	
-	setter G (|int| i, |ControlPoint|)
+	helper G (|int| i, assigns:|ControlPoint|)
 		if .gsize[i] != value
 			.GSize[i] = value
 			GUI.resized
