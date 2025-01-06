@@ -69,7 +69,6 @@ module Feedback
 		  else
 			// load from prefs unless overwritten by --flow
 			Options.GenFlowControlCode = app.prefs["self_flow"].yes
-			Options.GenFlowControlCode = app.prefs["self_flow"].yes
 		
 		
 
@@ -137,12 +136,12 @@ module Feedback
 				AskSelf = s
 		
 		if askself
-			.parseoption(askself) // we want this last.
+			.ParseOption(askself) // we want this last.
 		
 		if options.OperationCount <= 0
-			errorreceiver.newerror( "\nError: No operations requested.\n" )
+			errorreceiver.NewError( "\nError: No operations requested.\n" )
 		  elseif options.OperationCount >= 2
-			errorreceiver.newerror( "\nToo many operations requested.\n" )
+			errorreceiver.NewError( "\nToo many operations requested.\n" )
 
 		return StdErr.OK and Compiler.BaseProjectPath.Exists
 
@@ -152,8 +151,8 @@ module Feedback
 
 	function string.ResolveSpd (|string|)
 		if self[0, "@spd/"]
-			return (file.Speedie+self[5...]).resolve(fileResolveMode.allowmissing)
-		return .resolve(fileResolveMode.allowmissing)
+			return (file.Speedie+self[5...]).Resolve(FileResolveMode.AllowMissing)
+		return .Resolve(FileResolveMode.AllowMissing)
 
 
 	function TryUseProject (|String| path, |bool| IsScript=false, |string|)
@@ -184,7 +183,7 @@ module Feedback
 		if !options.SingleFileInput
 			F.mustexist
 
-		if exists and isspd and stderr.ok
+		if exists and IsSpd and StdErr.ok
 			return path
 	
 	
@@ -310,7 +309,6 @@ module Feedback
 			Explain(Purpose)$
 			options.IgnoreCantSaveErrors = true
 		
-
 		+"quiet" 
 			Explain(Purpose, "Prints less stuff")$
 			Options.PrintCompileString = false
@@ -320,23 +318,19 @@ module Feedback
 			Options.PrintCompileString = false
 			options.silent = true
 		
-		
 		+"stages"
 			Explain(Purpose, "Prints the stages")$
 			options.printstages = value.optionbool
-		
 		
 		+"print" 
 			Explain(Purpose)$
 			print Value
 			return true // does something, counts towards operationCount
 		
-		
 		+"directtest" 
 			explain(Purpose, "Allows me to test certain compiler features more easily.")
 			options.isdirecttest = value.OptionBool
 			SC_Targets["direct"] = options.isdirecttest
-		
 		
 		+"single" 
 			Explain(Purpose, "")$
@@ -355,7 +349,6 @@ module Feedback
 			feedback.TryUseProject( Compiler.SpeedieProj )
 			return true // does something, counts towards operationCount
 		
-			
 		+"crash"
 			explain(purpose, "Crashes speedie to test it's crash handlers.")$
 			app.crash
@@ -376,12 +369,10 @@ module Feedback
 				error "Use 'targetdebug' instead."
 			SC_Targets[value] = true
 
-		
 		+"warn"
 			Explain(Purpose, "Show warnings.")$
 			Options.Warnings = value.optionbool
 
-		
 		+"maxvars"
 			Explain(Purpose, "Reports maximum number of vars/funcs/args used in program.")$
 			Options.checkmaxvars = value.optionbool

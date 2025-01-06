@@ -311,22 +311,22 @@ function Tran_Print (TranFunc)
 
 
 function Tran_All (|SCFunction| fn, |Message| s, |SCNode!| p) // transform ()
-	require !stderr.TooMany
+	require !StdErr.TooMany
 	|| f = s.func
 	
 	if (f == @Arg)
 		|| pr = s.parent
 		require (pr != @bra and @type)
-		CollectDeclsFuncBody( s, p )
 		
 	  elseif (f == @Decl)
-//		s.CollectFromBody(p) // fix later
-// this seems to require I alter loads of other stuff to make this work.
-// tran_for will need fixing and probably other stuff toooooo :(
-// things strangely interact with each other... which I didn't expect but there you go.
-		s = DeclsDefault( s.last )
-		if s
-			Tran_All( Fn, s, p )
+		|| arg = s.parent
+		ifn arg in @bra or @type
+			s.CollectFromBody(p) // fix later
+	// this seems to require I alter loads of other stuff to make this work.
+	// tran_for will need fixing and probably other stuff toooooo :(
+			s = DeclsDefault( s.last )
+			if s
+				Tran_All( Fn, s, p )
 		Return
 		
 	  elseif (f == @Arr)
@@ -957,4 +957,5 @@ function scnode.AddNumericConst (|string| name, |int64| value, |message| where, 
 	NewDeclNum( SyxConst, value, name )
 	.TryAdd( where, SyxConst, SyxConst.Name )
 	return syxconst
+
 
