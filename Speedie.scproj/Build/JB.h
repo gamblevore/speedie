@@ -4392,8 +4392,6 @@ SCClass* SC_ClassOfObjForC(Message* Curr);
 
 SCNode* SC_ClsCollectTable_description(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
-void SC_CollectDeclsFuncBody(Message* Arg, SCNode* Scarg);
-
 void SC_CollectDeclsFuncBodyJustWhatWeNewlyMade(Message* Arg, SCNode* Scarg);
 
 void SC_CollectDeclsFuncBodyUnsureHowToRemove(Message* Arg, SCNode* Scarg);
@@ -8821,7 +8819,7 @@ Message* SC_Msg_CollectDclName(Message* Self);
 
 SCDecl* SC_Msg_CollectDecl(Message* Self, SCNode* P, SCNode* Recv, DeclMode Mode, SCClass* Cls, SCFunction* FuncPrmz);
 
-void SC_Msg_CollectFromBody(Message* Self, SCNode* Scarg);
+void SC_Msg_CollectFromBody(Message* Self, SCNode* SCArg);
 
 JB_String* SC_Msg_CollectFuncTableName(Message* Self);
 
