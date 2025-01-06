@@ -6,7 +6,6 @@
 class list (Saveable)
 	size 48
 	|ind|			Position
-//	|(&nil)![4]| 	__NEVER_ACCESS_THESE__ // never use these
 	|object?|		Obj
 	linkage
 		wrapper
@@ -24,6 +23,12 @@ class list (Saveable)
 	
 	constructor							{ cpp_wrapper JB_Ring_Constructor0 }
 	constructor (|| Parent)				{ cpp_wrapper JB_Ring_Constructor }
+
+	target debug2
+		constructor (|string| s)
+			.constructor
+			.Position = s.Length
+
 	destructor							{ cpp_wrapper JB_Ring_Destructor }
 	
 	function Parent (||)				{ cpp_wrapper JB_Ring_Parent, nil checker }
@@ -73,10 +78,10 @@ class list (Saveable)
 			return true
 
 	
-	syntax Compare (|int| n, |bool|Aware, |int|)
+	syntax Compare (|int| n, |bool| Aware, |int|)
 		return .SlowCount - n
 	
-	syntax Equals (|int| n, |bool|Aware, |bool|)
+	syntax Equals (|int| n, |bool| Aware, |bool|)
 		return .HasChildCount( n )
 	
 	syntax Equals (|byte| b, |bool|Aware, |bool|)
@@ -173,11 +178,6 @@ class list (Saveable)
 					
 	operator gt (|list| rt, |bool|)
 		return .fwddist(rt)
-
-//	operator min (|| rt, ||)
-//		if rt gt self
-//			return self
-//		return rt
 
 	operator plus (|int| n, ||)
 		disabled ".moveflat or .move?"
@@ -419,18 +419,6 @@ class list (Saveable)
 			if (fnc)(self, p)
 				return p
 			p--
-
-
-//	function Sort (|SorterComparer| fnc) // remove this func????
-//		opt NoRefCounts
-//		|| c = .second
-//		while c
-//			|| f = c
-//			c = c.next
-//			|| b = f.SortAfter(fnc)
-//				b.next = f
-//			  else
-//				.first = f
 
 
 	function Sort (|SorterComparer| fnc)

@@ -970,6 +970,18 @@ function scclass.RealClass (|scclass|)
 	return s! // roles always come from real classes
 
 
+
+function scfunction.IsOKConstructorCall (|scclass| c, |bool|)
+	opt norefcounts
+	|| fc = .cls
+	if fc == c.super
+		return true
+	if fc == c.realsuper
+		return true
+	if self is wrapper
+		return true				// OK?
+
+
 function CountCallsToParentAlloc (|Message| root, |message|)
 	opt norefcounts
 	|| FoundCount = 0
@@ -977,12 +989,10 @@ function CountCallsToParentAlloc (|Message| root, |message|)
 	for (curr in root)
 		|| f = curr.IsParentConCall
 			|| fcls = f.cls
-			expect  (f.cls == c.realsuper or c.super)   (curr, "Function should belong to parent class, but doesn't.")
+			expect  (f.IsOKConstructorCall(c))   (curr, "Function should belong to parent class, but doesn't.")
 			rz ?= curr
 			FoundCount++
-			expect  (FoundCount < 2)   (curr, "Multiple calls to parent constructor/destructor not allowed.")
-
-		
+			expect  (FoundCount < 2)  (curr, "Multiple calls to parent constructor/destructor not allowed.")		
 
 
 function Borked (|bool|)
