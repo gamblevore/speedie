@@ -10876,6 +10876,8 @@ bool SC_Func_IsConstructorOnModule(SCFunction* Self, SCFunction* Old);
 
 void SC_Func_IsCppInBuiltSet(SCFunction* Self, int Value);
 
+bool SC_Func_IsOKConstructorCall(SCFunction* Self, SCClass* C);
+
 bool SC_Func_IsReal(SCFunction* Self);
 
 Message* SC_Func_IsSimpleCast(SCFunction* Self);

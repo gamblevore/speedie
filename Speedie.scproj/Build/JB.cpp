@@ -3442,7 +3442,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[216]);
-	JB_FS_AppendInt32(_fsf0, (2025010616));
+	JB_FS_AppendInt32(_fsf0, (2025010617));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8863,7 +8863,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1683]);
-	JB_FS_AppendInt32(_fsf0, (2025010616));
+	JB_FS_AppendInt32(_fsf0, (2025010617));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -52931,7 +52931,7 @@ Message* SC_Func_CountCallsToParentAlloc(SCFunction* Self, Message* Root) {
 			SCFunction* F = SC_Msg_IsParentConCall(Curr);
 			iif (F) {
 				SCClass* Fcls = F->Cls;
-				iif (!((F->Cls == SC_Class_RealSuper(C)) or (F->Cls == C->Super))) {
+				iif (!SC_Func_IsOKConstructorCall(F, C)) {
 					JB_Msg_Fail(Curr, JB_LUB[798]);
 					return nil;
 				}
@@ -54149,6 +54149,20 @@ void SC_Func_IsCppInBuiltSet(SCFunction* Self, int Value) {
 		SC_Func_MakeParamsReal(Self);
 	}
 	Self->IsCppInBuilt = Value;
+}
+
+bool SC_Func_IsOKConstructorCall(SCFunction* Self, SCClass* C) {
+	SCClass* Fc = Self->Cls;
+	iif (Fc == C->Super) {
+		return true;
+	}
+	iif (Fc == SC_Class_RealSuper(C)) {
+		return true;
+	}
+	iif (SC_Func_SyntaxIs(Self, kSC__FunctionType_Wrapper)) {
+		return true;
+	}
+	return false;
 }
 
 bool SC_Func_IsReal(SCFunction* Self) {
@@ -58481,4 +58495,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -7360775561258789727 -1503207478439254083
+// -5684451338507080966 -1503207478439254083
