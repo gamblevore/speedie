@@ -151,7 +151,7 @@ class Document (list)
 		|| t = .SaveText(c)
 		|| KeepDate = false
 		rz = t.Length
-		if !t and !f.visible
+		|| Deleted = !t and !f.visible
 			if !f.delete
 				rz = -1
 		  else
@@ -160,10 +160,11 @@ class Document (list)
 				rz = -1
 		if rz
 			.original = c
-			if KeepDate
-				f.modified = .filedate
-			  else
-				f.modified = gui.FrameStart // just clear the subsecond bits
+			if !deleted
+				if KeepDate
+					f.modified = .filedate
+				  else
+					f.modified = gui.FrameStart // just clear the subsecond bits
 			.filedate = f.modified  // read it back to be sure its what we think it is.
 			.UpdateSavedState
 			
@@ -366,9 +367,6 @@ extend TextView
 	function UseState (|DocumentState| L,  |document| D,  |ivec2| ty,  |int| Reason)
 		require .parent
 		.UndoChecker = -1
-		if reason == DocumentState.UndoOrRedo
-			.ShowTypingplace(ty)
-
 		.GuessExpectsParse
 		if l.text
 			self|guicontrol|.text = l.text
@@ -376,8 +374,10 @@ extend TextView
 			.PrepareLinesOfText
 			.TypingPlaceTry( ty, true, nil)
 			.scrollpos = i
-			ifn reason != DocumentState.typing and DocumentState.UndoOrRedo
-				.viewpos(ty.x, 0)
+			if reason == DocumentState.typing
+				.ShowTypingPlace(ty)
+			  elseif reason == DocumentState.UndoOrRedo
+				.show(ty.x)
 		  else	
 			.Clear(l.text)		
 		

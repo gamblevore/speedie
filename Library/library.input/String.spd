@@ -629,7 +629,8 @@ class String
 					return (from, l)
 				++from
 		  else
-			from -= find.length
+			from--
+			// from -= find.length // already subtracted?
 			while from >= to
 				|| l = .StretchyFindSub(find, from)
 					return (from, l)

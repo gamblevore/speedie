@@ -476,9 +476,9 @@ class TextView (GUIControl)
 	}
 
 	helper ShowTypingPlace (|ivec2| r)
+		opt norefcounts
 		|| i = (r.width>0)|int|
-		i = r[i]
-		.show(i)
+		.ViewPos(r[i], 0)
 
 
 	function CurrLine (|int|)
@@ -500,7 +500,7 @@ class TextView (GUIControl)
 
 	
 	function Show (|int| x, |TextViewJumpMode| Mode=0,  |TextViewLine|)
-		return .ViewPos(x, (2*.MaxVisibleLines)/3, mode)
+		return .ViewPos(x, .MaxVisibleLines/3, mode)
 	
 	
 	helper MarkAsFound (|message| Where)
@@ -537,7 +537,8 @@ class TextView (GUIControl)
 		if i inrange lim
 			return d
 		|| vdiff = d.vline - ._Start.vline
-			before = (vdiff min (lim-before)) max 0
+		if vdiff > 0
+			before = (vdiff min (lim-(before+1))) max 0
 			
 		.StartLine(mode) = d.MoveCapped(-before) 
 		return d
@@ -618,7 +619,7 @@ class TextView (GUIControl)
 		|| r = .SelRange
 		|| range = (R.x2, .text.length)
 		if keys.shift
-			range = (R.x, 0)
+			range = (r.x, 0)
 		range = .text.stretchyfind(s, range.x, range.x2)
 			
 		if range.x < 0
@@ -1847,8 +1848,6 @@ class TextView (GUIControl)
 			
 	
 	helper Clear (|string| NewText, |bool|)
-//		target debug
-//			|| OldText = .text
 		rz = super.textset(NewText)
 		require rz or !._lines.hasany
 

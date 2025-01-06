@@ -176,6 +176,7 @@ dataType Keys (int)
 
 
 		function Clear
+			.KeyLogSub("Clear")
 			gui.keymod = 0
 			// .record = nil			// Could be allowed???? :O
 			for i in MaxKeyRecord
@@ -244,24 +245,49 @@ dataType Keys (int)
 				|| b = keys.Record[v]
 				rz += b.Key!=0
 
+		
+		helper KeyLog (|keys| k, |string| s)
+			target __PROJECT_PERRY__
+				if k.IsCmd
+					.keylogsub(s + " cmd")
 
+		helper KeyLogSub (|string| s)
+			target __PROJECT_PERRY__
+				|| w = window.front
+				if w isa perryide
+					w.LogOneAction(nil, s)
+					
+			
 		helper AddKey (|keys| K)
+			target __PROJECT_PERRY__
+				.KeyLog(k, "AddKeyStart")
+					
 			|| c = .count
-			require (c < MaxKeyRecord)
-			require !k.record
-			|| r = .record[c]               // "adding $k ($i)"
+			require (!k.record and c < MaxKeyRecord)
+			|| r = .record[c]
 			r.key = k
 			r.date = GUI.FrameStart
-			r.state = guikeyrecordinfo.toadd + (k is escape)
+			r.state = GUIKeyRecordInfo.ToAdd + (k is escape)		// escape starts as "newly added"
+			target __PROJECT_PERRY__
+				.KeyLog(k, "AddKeyEnd")
+					
 			
 			
 		helper RemoveKey (|keys| Key)
 			|| r = key.record
+				target __PROJECT_PERRY__
+					.KeyLog(k, "RemoveKeyOK")
 				r.State = guiKeyRecordInfo.ToRemove
+			  else
+				target __PROJECT_PERRY__
+					.KeyLog(k, "RemoveKeyFail")
+	
 		
 
 		helper FlushKeys
 			|| m = MaxKeyRecord
+			target __PROJECT_PERRY__
+				.KeyLog(k, "FlushKeys")
 			for i in m
 				|| r = .record[i]
 				|| s = r.state

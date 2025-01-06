@@ -519,8 +519,8 @@ extend PerryIDE
 		g.gnormal.seps.alpha *= 0.8
 		
 		g.OnKeyDown = LogAreaKeys
-		.logcomms = .AddBaseLog("-- speedie comms --")
-		.logactions = .AddBaseLog("-- perry actions --")
+		.LogComms = .AddBaseLog("-- speedie comms --")
+		.LogActions = .AddBaseLog("-- perry actions --")
 	
 	
 	function AddBaseLog (|string| s, |listviewrow|)
@@ -596,7 +596,7 @@ extend PerryIDE
 	function LoadProject (|bool|)
 		require .project.mustexist("load project")
 		.DuringLoad++
-		.LoadConfSub
+		.StartFileList
 		.DuringLoad--
 		require .StartProj
 
@@ -620,7 +620,7 @@ extend PerryIDE
 		// * need to alter the saved errors when the .perry file is altered...
 	
 	
-	function StartFiles
+	function StartFiles 
 		|| IsDir     = .project.isdir
 		|| ProjConf	 = .perryfile
 		error.SourceAdd(@tmp+projconf)
@@ -632,12 +632,16 @@ extend PerryIDE
 
 		|| f = .FileList
 		f.clear
+		f.AddRoot(.project, true)
+		f.FocusOn( .root! )
+		.LoadConfSub(conf)
+
+
+	function LoadConfSub (|message| conf)
+		|| f = .FileList
 		f.Excludes = dictionary()
 		for ex in conf..excludes
 			f.Excludes![ex.value] = "x"
-
-		f.addroot(.project, true)
-		f.FocusOn( .root! )
 		
 		if !conf and .projIsSpeedieCode
 			conf = templates.Roots.parse
@@ -656,7 +660,7 @@ extend PerryIDE
 					error (ro, "Can't find this project root. Please fix this path.")
 			error.SourceRemove
 		
-		f.checksize
+		f.CheckSize
 		error.SourceRemove
 
 
@@ -689,12 +693,11 @@ extend PerryIDE
 		return .project.child(".perry")
 	
 	
-	function LoadConfSub
+	function StartFileList
 		perry.AddProj(.project.path, self)
 		|| r = .root
 			.id = r.location
 		.nottodo = nil
 		.RecentFiles.clear
-		
 		.StartFiles
 	

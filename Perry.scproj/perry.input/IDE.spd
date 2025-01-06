@@ -865,17 +865,24 @@ So anything not 0 means "its OK"`
 
 
 	function UpdateActiveFile
-		|| d = .editme.Document$
-		|| l = d.Location.Resolve(true)$
-		if l ~= app.prefspath.resolve
-			.updateprefs
-		  elseif l ~= .perryfile
-			.updateperry
+		|| d = .editme.Document
+			|| l = d.Location.Resolve(true)
+			if l ~= app.PrefsPath.resolve
+				.UpdatePrefs
+			  else
+				|| p = .PerryFile
+				if l ~= p
+					.UpdatePerry(p)
 	
 	
-	function UpdatePerry
+	function UpdatePerry (|file| ProjConf)
 		.startuperrors.clear
-		.StartFiles
+		error.SourceAdd(@tmp+projconf)
+		if projconf.exists
+			|| conf = projconf.parse
+				|| root = .root
+				root.RemoveAfter
+				.LoadConfSub(conf)
 		.LoadStartupErrors
 	
 	

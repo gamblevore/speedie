@@ -997,6 +997,12 @@ module GUI
 		require .IsBackground != v // what? why is tihs happenin 
 		.IsBackground = v
 		beep.OK = 1
+		target __PROJECT_PERRY__
+			if v
+				keys.KeyLogSub("(IsBackGround)")
+			  else
+				keys.KeyLogSub("(IsForeGround)")
+		
 		gui.sdl_Resetkeyboard
 		keys.Clear
 		.FlashSelector = false

@@ -81,7 +81,7 @@ module Notifications
 		cpp_part Msg
 		|| s = note.name
 		if note.path
-			s += "\n\"" + note.path + "\""
+			s = (s + "\n\"") + (note.path + "\"")
 		|| w = .NewWindow(s)
 			w.tag = note
 			if note.IsError

@@ -196,8 +196,8 @@ extend PerryIDE
 				.say(str)
 				if db
 					.StartDebugging(f)
-					
-				
+
+
 	function Notify (|string| What, |message| response=nil)
 		|| c = what
 		if response
