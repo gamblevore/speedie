@@ -5,9 +5,9 @@ module ScrollInfo
 	|int|								InDrag_ = -1	// wanna remove this, its annoying
 	|bool|								JustClicked_	// this too.
 	
-	function EndDrag
+	function EndDrag									// its also not being called properly
 		if .InDrag_ >= 0 
-			.InDrag_ = -1
+			.InDrag_ = -1								// so it thinks its indrag when its not
 
 	
 helper ListView.SLH (|vec3|)
@@ -54,7 +54,7 @@ helper DrawScroll (|vec3| slh, |image| where)
 	if !.MouseNotDownOverOther
 		.noscroll
 		return
-
+	
 	.MouseMoveInScrollArea(.mousexy)
 	|| s = .DrawscrollStrength
 		|| scr = ¥.scroll
@@ -79,10 +79,7 @@ function InScrollArea (|ivec2| p, |bool|)
 
 
 helper MouseMoveInScrollArea (|ivec2| p, |bool|)
-//	if (!GUI.MouseButtons and .InScrollArea(.mousexy))
-//		.bumpscroll
-
-	if .HasFocus or !GUI.MouseButtons // or .ScrollIsVisible
+	if .HasFocus or !GUI.MouseButtons
 		if .InScrollArea(p)
 			.bumpscroll
 			return true
@@ -100,19 +97,20 @@ helper ScrollBarMove (|vec3| slh, |int| shift)
 helper ClickedScrollbar (|ivec2| P,  |int| Clicks,  |vec3| slh,  |bool|)
 	opt norefcounts
 	
-	require .MouseMoveInScrollArea(P)
 	|| r = .ScrollRect(slh)
 	|| y = (p.y - r.y)
 
 	if clicks == -1 // dragged
 		require (ScrollInfo.InDrag_ >= 0) 
 		.ScrollbarMove(slh, y - ScrollInfo.InDrag_)
-	  elseif r contains p
-		ScrollInfo.JustClicked_ = true
-		ScrollInfo.InDrag_ = y
 	  else
-		ScrollInfo.indrag_ = -1
-		return false
+		//require .MouseMoveInScrollArea(P)
+		if r contains p
+			ScrollInfo.JustClicked_ = true
+			ScrollInfo.InDrag_ = y
+		  else
+			ScrollInfo.indrag_ = -1
+			return false
 	.bumpscroll
 	return true
 
