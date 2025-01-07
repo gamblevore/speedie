@@ -502,7 +502,7 @@ class ListView (GUIControl) {
 		
 	
 	helper CheckDrawUpdate
-		if ._ScrollDrawTimer and !.inscrollarea(.mousexy)
+		if ._ScrollDrawTimer and !.inscrollarea(.MouseXY)
 			GUI.Touch(self)
 
 
@@ -515,7 +515,7 @@ class ListView (GUIControl) {
 			.ScrollDrawTimer(0)
 			return .HasFocus
 		
-		return .HandleMouseInScrollArea(P, ._ScrollDrawTimer)
+		return .HandleMouseInScrollArea(P)
 	
 	
 	behaviour LostFocus
@@ -1110,7 +1110,7 @@ class ListView (GUIControl) {
 
 	
 	helper ClickedScroll (|ivec2| P, |int| Clicks, |bool|)
-		return .ClickedScrollbar(P, Clicks, .slh, ._ScrollDrawTimer)
+		return .ClickedScrollbar(P, Clicks, .slh)
 
 
 	helper FindClicked (|ivec2| Search, |ListViewRow|)

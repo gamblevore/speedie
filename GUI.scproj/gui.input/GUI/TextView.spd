@@ -111,7 +111,7 @@ class TextView (GUIControl)
 
 		
 	helper ClickedScroll (|ivec2| P, |int| Clicks, |bool|)
-		return .ClickedScrollbar(P, Clicks, .slh, ._ScrollDrawTimer)
+		return .ClickedScrollbar(P, Clicks, .slh)
 	
 	setter ExpectsParse (|byte|)
 		.expectsparse = value
@@ -1743,7 +1743,7 @@ class TextView (GUIControl)
 	
 	behaviour MouseMove
 		.ShowExtraInfo(P, true)
-		return .HandleMouseInScrollArea(P, ._ScrollDrawTimer)
+		return .HandleMouseInScrollArea(P)
 	
 	
 	helper ShowNoExtra

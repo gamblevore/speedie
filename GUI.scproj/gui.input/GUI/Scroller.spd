@@ -98,10 +98,10 @@ function InScrollArea (|ivec2| p, |bool|)
 	return (xr contains p.x) and (self contains p)
 
 
-helper HandleMouseInScrollArea (|ivec2| p, |&uint| timer, |bool|)
-	if .HasFocus or timer[]
+helper HandleMouseInScrollArea (|ivec2| p, |bool|)
+	if .HasFocus or ._ScrollDrawTimer
 		if .InScrollArea(p)
-			timer[] = ScrollInfo.TimerStart + date.ticks
+			._ScrollDrawTimer = ScrollInfo.TimerStart + date.ticks
 			GUI.touch
 			return true
 
@@ -115,8 +115,8 @@ helper ScrollBarMove (|vec3| slh, |int| shift)
 			.StartLine = t
 
 
-helper ClickedScrollbar (|ivec2| P,  |int| Clicks,  |vec3| slh,  |&uint| Timer,  |bool|)
-	|| t = Timer[]
+helper ClickedScrollbar (|ivec2| P,  |int| Clicks,  |vec3| slh,  |bool|)
+	|| t = ._ScrollDrawTimer
 	if !t
 		return false
 	|| r = .ScrollRect(slh)				// need to figure out where in P it is...
@@ -131,7 +131,7 @@ helper ClickedScrollbar (|ivec2| P,  |int| Clicks,  |vec3| slh,  |&uint| Timer, 
 	  else
 		ScrollInfo.indrag_ = -1
 		return false
-	Timer[] = ScrollInfo.TimerStart + date.ticks
+	._ScrollDrawTimer = ScrollInfo.TimerStart + date.ticks
 	return true
 
 
