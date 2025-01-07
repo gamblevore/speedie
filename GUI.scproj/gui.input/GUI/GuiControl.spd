@@ -16,7 +16,6 @@ class GUIControl (list)
 	|GUIPasteEvent?|			OnPaste
 	|GUICopyEvent?|				OnCopy
 	|TimeFader|					Declutterer
-	|uint|						_ScrollDrawTimer
 	|ControlSize|				Sizer
 	|uint16|					TabIndex
 	|ControlClipMode|			ClipMode
@@ -220,27 +219,36 @@ class GUIControl (list)
 		opt norefcounts
 		if (Amount < 0) and gui.IsBackground
 			return 
-//		if gui.IsBackground or (keys.shift and amount < 1)
-//			if self
-//				log .ID
-//			  else
-//				log "unknown"
-//			log app.StackTrace
-//			log "-----"
-//			if Amount < 0
-//				beep 
 		Amount = amount.abs
 		if gui.TouchCount < amount
 			gui.TouchCount = amount
 
-	helper ScrollDrawTimer (|uint| value, |bool|)
-		if ._ScrollDrawTimer != value
-			._ScrollDrawTimer = value
-			if !gui.IsBackground
-				.touch(-1)
+//// SCROLL ////
+	task ScrollEvent (taskgui)
+		constructor
+			is animation
+		run
+			// do nothing
 
-	function BumpScroll (|int| extra = 0)
-		.ScrollDrawTimer(ScrollInfo.timer-extra)
+	helper NoScroll
+		opt norefcounts
+		|| scr = .myscroller
+			scr.Remove
+
+
+	helper BumpScroll
+		opt norefcounts
+		|| scr = .myscroller
+			scr.duration = 0.75s
+			scr.StartTime = gui.FrameStart
+			.addtask(scr)
+		  else
+			|| w = .window$
+			scr = ScrollEvent(self, 0.75s)
+			w._Scroller = scr
+		scr.starttime += 0.25s // start on full
+//// SCROLL END ////
+
 
 	function SizeFraction (assigns:|float|)
 		|| t = (value.clamp * 4.0K)|int|
@@ -541,11 +549,12 @@ class GUIControl (list)
 // programming or nested subtasks.
 
 	task TaskGUI ( |...!| Upon,  |duration| duration,  |date| StartTime = gui.framestart )
+		|float| PrevProgress
 		contains –parentclass			// super cool feature
 		constructor						// upon,  StartTime,  duration are automatically set
 			upon.addtask(self)
 		
-		function TaskProgress (|date| now, |float|)
+		function TaskProgress (|date| now=gui.framestart, |float|)
 			|| d = .duration
 				|| Over = ((Now - .StartTime) max 256)|duration|
 				if over < D
@@ -554,4 +563,9 @@ class GUIControl (list)
 				
 		run (|window| window, |float| progress, |ErrorInt|)
 			return -1
+		
+		function Remove
+			gui.touch
+			super.remove
+			
 

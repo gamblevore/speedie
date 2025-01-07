@@ -1,15 +1,9 @@
 
 
 
-module ScrollInfo
-	constants
-		TimerStart = 45
-	
-	|int|								InDrag_ = -1
-	|bool|								JustClicked_
-	
-	function Timer (|uint|)
-		return date.ticks
+module ScrollInfo	
+	|int|								InDrag_ = -1	// wanna remove this, its annoying
+	|bool|								JustClicked_	// this too.
 	
 	function EndDrag
 		if .InDrag_ >= 0 
@@ -28,7 +22,7 @@ helper ListView.SLH (|vec3|)
 	|| L = (1 + Total - .visiblerows) max 0
 	return (Found,  L,  .rowheight).vec3
 
-
+ 
 helper textview.SLH (|vec3|)
 	opt norefcounts
 	|| s = .StartLine
@@ -39,48 +33,34 @@ helper textview.SLH (|vec3|)
 
 
 extend guicontrol {
-helper CanDrawScroll (|bool|)
-	opt NoRefCounts
-	return (._ScrollDrawTimer > 1) or (!GUI.MouseButtons and .InScrollArea(.mousexy))
+helper MyScroller (|taskgui|)
+	opt norefcounts
+	|| w = .window
+		|| x = w._Scroller
+			if (x.Upon == self) and (x in w.tasks)
+				return x
+		
+
+helper DrawScrollStrength (|float|)
+	opt norefcounts
+	|| Scroll = .myscroller
+		rz = 1.0-scroll.taskprogress
+		//if rz > 0
+		//	beep
 
 
-helper DrawScroll (|vec3| slh, |image?| where=nil, |float|)
+helper DrawScroll (|vec3| slh, |image| where)
 	opt NoRefCounts
-	require .CanDrawScroll
-	
-	// needs rework...
-	// sending touch events even if the scroll strength didn't change
-	// also... its capable of drawing two scrolls... which isnt right
-	
-	|| t = ._ScrollDrawTimer
-	|| mb	= GUI.MouseButtons
 	if !.MouseNotDownOverOther
-		if where
-			.ScrollDrawTimer(0)
-		return 0
-	
-	|| now = ScrollInfo.timer
-	|| altered = false
-	if (t == 0) or .InScrollArea(.mousexy) or (mb)
-		if where
-			.ScrollDrawTimer(now)
-		t = now
-	|| R	= .ScrollRect(slh)
-	|| d	= (scrollinfo.TimerStart - (now - t))|float| max 0.0
-	|| s	= 1.0
-	|| range = 30.0
-	if d <= range
-		s = d / range
-	if !where
-		return s
-	if s
+		.noscroll
+		return
+
+	.MouseMoveInScrollArea(.mousexy)
+	|| s = .DrawscrollStrength
 		|| scr = ¥.scroll
 		using scr 
-		.touch(-1)
 		scr.Strengthen(s)
-		where.DrawRectStyled(R, scr)
-	  else
-		._ScrollDrawTimer = 0
+		where.DrawRectStyled(.ScrollRect(slh), scr)
 
 
 
@@ -98,11 +78,13 @@ function InScrollArea (|ivec2| p, |bool|)
 	return (xr contains p.x) and (self contains p)
 
 
-helper HandleMouseInScrollArea (|ivec2| p, |bool|)
-	if .HasFocus or ._ScrollDrawTimer
+helper MouseMoveInScrollArea (|ivec2| p, |bool|)
+//	if (!GUI.MouseButtons and .InScrollArea(.mousexy))
+//		.bumpscroll
+
+	if .HasFocus or !GUI.MouseButtons // or .ScrollIsVisible
 		if .InScrollArea(p)
-			._ScrollDrawTimer = ScrollInfo.TimerStart + date.ticks
-			GUI.touch
+			.bumpscroll
 			return true
 
 
@@ -116,10 +98,10 @@ helper ScrollBarMove (|vec3| slh, |int| shift)
 
 
 helper ClickedScrollbar (|ivec2| P,  |int| Clicks,  |vec3| slh,  |bool|)
-	|| t = ._ScrollDrawTimer
-	if !t
-		return false
-	|| r = .ScrollRect(slh)				// need to figure out where in P it is...
+	opt norefcounts
+	
+	require .MouseMoveInScrollArea(P)
+	|| r = .ScrollRect(slh)
 	|| y = (p.y - r.y)
 
 	if clicks == -1 // dragged
@@ -131,7 +113,7 @@ helper ClickedScrollbar (|ivec2| P,  |int| Clicks,  |vec3| slh,  |bool|)
 	  else
 		ScrollInfo.indrag_ = -1
 		return false
-	._ScrollDrawTimer = ScrollInfo.TimerStart + date.ticks
+	.bumpscroll
 	return true
 
 

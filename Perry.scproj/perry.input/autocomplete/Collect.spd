@@ -4,7 +4,6 @@ function PerryIDE.MaybeSendMessage (|string| cmd,  |message| where,  |string| na
 	#!sendmsg, msgsend, sendcmd, cmdsend
 	|| fn = where.Func
 	.SectionKeyTime = nil
-	if keys.shift
 	if (fn == @name) and cmd[0, "autocomplete"]
 		return nil
 	if (fn == @thg) and (where in @decl) and !where.isfirst

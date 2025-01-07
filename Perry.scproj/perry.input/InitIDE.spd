@@ -191,6 +191,7 @@ extend PerryIDE
 			.tooltip = "Displays Compile Errors. Press \1f< or \1f> to step in list."
 			.GNormal.Solid = LeftBG
 			.onpaste = ErrorListPaste
+			.OnKeyDown = DeleteableListKeys
 			.listsource = error()
 			.copypaste	   |= copypasteflags.pastetext
 			.copypaste	   |= copypasteflags.CopyText
@@ -282,7 +283,7 @@ extend PerryIDE
 			.tooltip		= self.SearchArea.Tooltip			
 			.OneAlwaysSelected = true
 			.UseColorScheme	= true
-			.OnKeyDown		= FoundListKeys
+			.OnKeyDown		= DeleteableListKeys
 			.ID				= "FoundList"
 			.size 			= the~width  by  the~bottom to 0~under 
 			.AlwaysSendChangeEvent = true

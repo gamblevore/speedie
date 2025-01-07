@@ -7,7 +7,7 @@ function DebugArgsKeyDown (GUIKeyEvent)
 		return true
 	
 
-function FoundListKeys (GuiKeyEvent)
+function DeleteableListKeys (GuiKeyEvent)
 	opt norefcounts
 	if key.IsDelete
 		if self isa ListView

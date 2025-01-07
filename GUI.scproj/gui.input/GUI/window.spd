@@ -13,10 +13,10 @@ class Window (GUIControl)
 	|guicontrol?|						ToolTipControl
 	|guicontrol?|						DroppingInto
 	|guicontrol?|						MouseIsOver
-//	|guicontrol?|						InnerLostFocus
 	|InlineEditor|						InlineEditorPlace
 	|GUIMouseMoveEvent?|				OnMouseMove
 	|list of TaskGUI|					Tasks
+//	|list of TaskGUI|					Animations // add this later!
 	|object?|							ReturnValue
 	|date|								AlphaFader
 	|date|								CreatedDate
@@ -31,12 +31,14 @@ class Window (GUIControl)
 	|date| 								_LastTimeSeen
 	|byte|								_FlashSelf
 	|bool|								_BlockRecurseKeyDown
-	|GuiControl?|						SelBeforeMouseDown
-	
+	|TaskGUI?|							_Scroller
+	|GuiControl?|						_SelBeforeMouseDown
+
 	
 	constructor
 		super.constructor(window.all)
 		.Tasks = list()
+//		.animations = list()
 		.subconstructor(the~area)
 		
 
@@ -44,6 +46,7 @@ class Window (GUIControl)
 		cpp_part ConstructorSize
 		super.constructor(window.all)
 		.Tasks = list()
+//		.animations = list()
 		.subconstructor(size)
 	
 	
@@ -327,7 +330,7 @@ class Window (GUIControl)
 		.__draw__(where)
 		|| gd = .GNormal.Drawer
 			(gd)(where, .LastRect, .GNormal, true)
-		.RunMyTasks(true)
+		.RunWindowTasks(true)
 
 
 	behaviour Draw
@@ -484,7 +487,7 @@ class Window (GUIControl)
 	
 	
 	helper DoMouseDown (|ivec2| P, |int| Clicks, |guicontrol|)
-		.SelBeforeMouseDown = .focus
+		._SelBeforeMouseDown = .focus
 		|| M = .openedmenu 
 			|| O = .focus
 			if (m contains p) and (m is enabled)
@@ -504,15 +507,13 @@ class Window (GUIControl)
 				return Found
 
 
-	helper RunMyTasks (|bool| WantAnims)
+	helper RunWindowTasks (|bool| WantAnims)
 		opt norefcounts
 		for p in .Tasks
 			|| IsAnim = p is animation 
 			if IsAnim == WantAnims
 				if !.SmartRunTask(p, WantAnims)
 					p.Remove
-			  elseif !WantAnims
-				gui.touch // we'll do these later.
 
 
 	helper SmartRunTask (|taskgui| P,  |bool| Animated, |bool|)
@@ -529,8 +530,6 @@ class Window (GUIControl)
 		
 		|| Prog = p.TaskProgress(now)
 		|| ok = (p)(self, Prog)
-		if p is Animation
-			GUI.touch
 		if p isnt Finished
 			return ok
 			 

@@ -616,6 +616,18 @@ module GUI
 		return .reflowdoc(bigrect, rect, bigrect)
 
 	
+	function CheckTaskAnimations
+		opt norefcounts
+		
+		for w in window.all
+			for t in w.tasks
+				if t is Animation
+					|| p = t.taskprogress
+					if p != t.prevprogress
+						t.PrevProgress = p
+						t.upon.touch(-1)
+
+	
 	function StartDraw
 		opt norefcounts
 		|| CanBlur = !app.prefs["noblur"]
@@ -701,7 +713,7 @@ module GUI
 		
 
 	helper window.DoFrameStep (|bool| ChangeOK, |int| N)
-		.RunMyTasks(false)
+		.RunWindowTasks(false)
 		.FixFocus
 		.__FrameStep__(ChangeOK and !.OpenedMenu)
 	
@@ -756,26 +768,30 @@ module GUI
 			require Occur isnt ExitOrTerminate
 
 		.DoSimulation
+		.CheckTaskAnimations
 		.DrawState |= (.TouchCount != 0)
+		
+		// draw waiting could be improved. Could simulate instead of sleeping?
+		// also drawtime could be variable...
 		if .DrawState == 1
 			.StartDraw
 		if .DrawState & 2
-			.EndDraw								// if its too early, we don't draw.
+			|| remain = .EndDraw
+			if remain > 2
+				app.Sleep(remain)
 		return true
 
 
-	helper EndDraw
+	helper EndDraw (|duration|)
 		// we could just draw immediately? but then delay the next drawstart?
 		// perhaps 1-frame faster reaction on screen?
 		|| d = date.now
 		|uint64| ago = d - .DrawFinish				// super dooper unsigned clock saver
-		|date| remain = .DrawFrameLength - ago
-		require remain < 128						// 512th of a second
+		rz = .DrawFrameLength - ago
+		require rz < 128							// 512th of a second
 		.DrawState &= ~2
 		.DrawFinish = d
 		.EndFrame(.Raw!)
-		if remain > 0
-			app.Sleep(remain)
 
 
 	helper DelayEvents (|bool|)
@@ -1222,12 +1238,13 @@ module GUI
 	
 	helper KeyDownEvent (|&SDL_Event| ev, |window| w, |int|)
 		#!keydown!
+		if .CanDrag >= mousedragging.Within
+			return SDLActivity.nothing
+
 		|| kev = ev.keysym
 		|| key = kev.sym
 		
 		if key.IsEaten
-			return SDLActivity.nothing
-		if .CanDrag >= mousedragging.Within
 			return SDLActivity.nothing
 
 		if (key is w) and (keys.cmd)

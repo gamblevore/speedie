@@ -483,7 +483,7 @@ class ListView (GUIControl) {
 
 
 	function VisibleRows (|int|)
-		|| h = .height + .scrollshift + .RowHeight - 1
+		|| h = .height + .scrollshift + (.RowHeight - 1)
 		|| r = .RowHeight
 		return h / r
 	
@@ -501,9 +501,9 @@ class ListView (GUIControl) {
 		return m
 		
 	
-	helper CheckDrawUpdate
-		if ._ScrollDrawTimer and !.inscrollarea(.MouseXY)
-			GUI.Touch(self)
+//	helper CheckDrawUpdate
+//		if ._ScrollDrawTimer and !.inscrollarea(.MouseXY)
+//			GUI.Touch(self)
 
 
 	function EnableDrag
@@ -512,10 +512,10 @@ class ListView (GUIControl) {
 
 	behaviour MouseMove
 		if .CanSeeAllLines
-			.ScrollDrawTimer(0)
+			.NoScroll
 			return .HasFocus
-		
-		return .HandleMouseInScrollArea(P)
+
+		return .MouseMoveInScrollArea(P)
 	
 	
 	behaviour LostFocus
@@ -536,7 +536,7 @@ class ListView (GUIControl) {
 		debug_require s != .listsource
 		._scroll = s
 		.ExpandParents(s)
-		.checkdrawupdate
+//		.checkdrawupdate
 		if .isediting and (s and !.VisFullyContains(s))
 			.ClearEdits
 
@@ -671,7 +671,7 @@ class ListView (GUIControl) {
 				require (L isnt disabled)
 				if (L is selected) and (.SelCount > 1)
 					.Select(l)
-				  elseif !keys.Cmd and (.window!.SelBeforeMouseDown == self)
+				  elseif !keys.Cmd and (.window!._SelBeforeMouseDown == self)
 					.DelayedRename(Lc)
 			
 
@@ -1411,10 +1411,10 @@ class ListView (GUIControl) {
 		where.DrawOutlineOnly(.lastrect, .gnormal.edge, .gnormal.bg, ~.FindAttachedEdge)
 
 		if .CanSeeAllLines
-			.ScrollDrawTimer(0)
+			.NoScroll
 		  else
-			if self isa menu
-				.ScrollDrawTimer(1)							// oooop
+//			if self isa menu
+//				.ScrollDrawTimer(true)							// oooop
 			.DrawScroll(.slh, where)
 
 

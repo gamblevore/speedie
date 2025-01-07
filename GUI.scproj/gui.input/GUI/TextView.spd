@@ -1677,7 +1677,7 @@ class TextView (GUIControl)
 			.DrawSel(where)
 		where.ControlClip = c			/// restore!
 
-		require  !.CanSeeAllLines and .CanDrawScroll
+		require  !.CanSeeAllLines and .DrawScrollStrength
 		if .MyError
 			.DrawScrollErrors(where)
 		if sel
@@ -1686,7 +1686,7 @@ class TextView (GUIControl)
 	
 	helper DrawScrollErrors (|image| where)
 		opt norefcounts
-		|| strength = .DrawScroll(.slh)
+		|| strength = .DrawScrollStrength
 		require strength > 0
 		|float| N = ._lines.last!.vline|float|
 		for s in ._lines
@@ -1743,7 +1743,7 @@ class TextView (GUIControl)
 	
 	behaviour MouseMove
 		.ShowExtraInfo(P, true)
-		return .HandleMouseInScrollArea(P)
+		return .MouseMoveInScrollArea(P)
 	
 	
 	helper ShowNoExtra
@@ -1854,7 +1854,7 @@ class TextView (GUIControl)
 		|| sel = (.text.length, 0)(.SingleLine) 
 		.TypingPlaceDirect((sel,sel))
 		
-		.ScrollDrawTimer(0)
+		.NoScroll
 		.TextAlteredForDraw |= 2	// This might not clear text?
 
 		._Start = ._lines
