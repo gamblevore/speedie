@@ -13,18 +13,24 @@ module ScrollInfo
 	
 	function EndDrag
 		if .InDrag_ >= 0 
-			.InDrag_ = -1	
+			.InDrag_ = -1
 
-
+	
 helper ListView.SLH (|vec3|)
-	|| D = .distto(._Scroll)
-	|| r = 1 + d.x - .visiblerows
-	return (d.y,  (r max 0),  .rowheight).vec3
+	opt norefcounts
+	|| Total = 0
+	|| Found = 0
+	|| ff = ._Scroll
+	for r.all in self
+		if r == ff
+			Found = Total
+		++Total
+	|| L = (1 + Total - .visiblerows) max 0
+	return (Found,  L,  .rowheight).vec3
 
 
 helper textview.SLH (|vec3|)
 	opt norefcounts
-	// whats the total number of lines? sigh... seems like we always need the entire thing?
 	|| s = .StartLine
 	|| ll = ._lines.last!
 	|| n = ll.vline - (.maxvisiblelines - 2)

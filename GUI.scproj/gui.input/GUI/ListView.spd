@@ -90,14 +90,6 @@ class ListView (GUIControl) {
 		return true
 
 
-	helper DistTo (|ListViewRow| a, |ivec2|)
-		opt norefcounts
-		for r.all in self
-			if r == a
-				rz.y = rz.x
-			++rz.x
-
-	
 	helper ColorRow (|int| Depth, |int| Column, |int| y, |imagepixel|)
 		(depth), (column) // one day i'll use it?
 		if y
