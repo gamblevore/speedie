@@ -69,7 +69,7 @@ struct TimeFader
 	|Date| 		Final
 	|float|		Scale
 	
-	function Strength (|date| now=date.now, |bool| touch=true, |float|)
+	function Strength (|date| now=gui.framestart, |bool| touch=true, |float|)
 		|| f = .final
 		if !f
 			return 1.0
@@ -83,14 +83,14 @@ struct TimeFader
 				.final = 0
 				.scale = 0
 	
-	function Finished (|date| now=date.now, |bool|)
+	function Finished (|date| now=gui.framestart, |bool|)
 		|| f = .final
 			return now >= f
 
 	function Value (assigns:|bool|)
 		GUI.touch
 		if value
-			.final = date.now
+			.final = gui.framestart
 			.scale = 1.0
 		  else
 			.final = 0
@@ -100,7 +100,7 @@ struct TimeFader
 	function Fire (|float| Seconds, |float| Delay = 0.0,  assigns:|bool|)
 		GUI.touch
 		if value
-			.final = date.now + (seconds+delay).date
+			.final = gui.framestart + (seconds+delay).date
 			.scale = 1.0 / seconds
 		  else
 			.final = 0

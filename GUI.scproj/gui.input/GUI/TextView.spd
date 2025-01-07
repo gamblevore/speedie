@@ -1035,7 +1035,7 @@ class TextView (GUIControl)
 		// or a different effect? maybe like a background warp-star-effect that only occurs within the textview?
 		|| w = .window
 			for i in 3
-				.SoftExplode(5s, date.now + 0.25s*i, (-10.0, 0), D, strength)
+				.SoftExplode(5s, gui.framestart + 0.25s*i, (-10.0, 0), D, strength)
 
 
 	task SoftExplode (taskgui, |vec2| V, |TextViewLine| D, |float| Strength)
@@ -1779,7 +1779,7 @@ class TextView (GUIControl)
 		|| dse = ._ErrorDelayer
 		if !dse or dse.err != err
 			.CancelDelayedError
-			._ErrorDelayer = DelayedShowError(self, 0.33s, date.now, err, P2)
+			._ErrorDelayer = DelayedShowError(self, 0.33s, gui.framestart, err, P2)
 				
 	
 	

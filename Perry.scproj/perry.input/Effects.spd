@@ -5,7 +5,7 @@ module Effects
 	function DoFirework (|float| strength)
 		opt NoRefCounts
 		for i in 3
-			.Fireworks(window.all, 5s, date.now + 0.25s*i, (-3.0, 0), (0,0), strength)
+			.Fireworks(window.all, 5s, gui.framestart + 0.25s*i, (-3.0, 0), (0,0), strength)
 
 
 	task Fireworks (guicontrol.taskgui, |vec2| V, |ivec2| Start, |float| Strength)

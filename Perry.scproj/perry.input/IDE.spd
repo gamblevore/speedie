@@ -848,7 +848,7 @@ So anything not 0 means "its OK"`
 			m.StopFilter
 		doc.CompareTreesOnSave = doc.ExpectJeebox
 		.ListAllFuncs
-		.CheckScrollErrors(0, date.now + 0.25s)		
+		.CheckScrollErrors(0, gui.framestart + 0.25s)		
 		|| it = .SharedProjectTabSource
 			if !.DuringLoad
 				it["edit"] = r.location

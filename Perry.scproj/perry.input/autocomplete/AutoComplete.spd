@@ -203,7 +203,7 @@ function PerryIDE.StartPopupVis (|bool| instant)
 	if !.PopupDateOn
 		// using GUITask would be better... sigh.
 		|| add = (-10.0s, 0.5s)(instant or keys.CmdAgo(2s))
-		.PopupDateOn = date.now + add
+		.PopupDateOn = gui.framestart + add
 	.PopupDisplayFadeIn
 
 
@@ -564,6 +564,9 @@ function message.OwningFullName (|syntax| prm, |message|)
 	
 	rz = @dot.msg(name)
 	|| modname = mod_class[0].name_
+	
+
+	// ModName needs to be able to handle module.class.func not just class.func
 	modname ?= "main"
 	rz.msg(fn, modname)
 	rz <~ prm

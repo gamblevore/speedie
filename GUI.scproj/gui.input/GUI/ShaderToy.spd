@@ -40,7 +40,7 @@ class ShaderToy (window)
 		opt min 3
 		.fps.Update
 		
-		.time = (date.now - .CreatedDate).Float
+		.time = (gui.framestart - .CreatedDate).Float
 		|| size = where.size.vec2
 		|| scale = 1.0/size.xx
 		|| adjust = size*-0.5	

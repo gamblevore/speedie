@@ -520,8 +520,9 @@ class GUIControl (list)
 
 	task SlideOpen (TaskGUI, |movecode| Dir = MoveCode.Open)
 		constructor
-			// is animation  // doing this seems to break the system? no idea why.
+			is animation  // doing this seems to break the system? no idea why.
 		run 
+			printline progress
 			|| hide = (progress >= 1.0 and .dir is close)
 			(.upon is visible) = !hide
 			if .dir is close
@@ -539,17 +540,17 @@ class GUIControl (list)
 // (which sucks anyhow). I guess we can worry about this when we make functional
 // programming or nested subtasks.
 
-	task TaskGUI ( |...!| Upon,  |date| duration,  |date| StartTime=date.now )
+	task TaskGUI ( |...!| Upon,  |duration| duration,  |date| StartTime = gui.framestart )
 		contains –parentclass			// super cool feature
 		constructor						// upon,  StartTime,  duration are automatically set
 			upon.addtask(self)
 		
-		function Progress (|date| now, |float|)
-			|| d = .duration|float|
-			if !D
-				return 1.0
-			|| Over = Now - .StartTime
-			return (Over)|float| / D
+		function TaskProgress (|date| now, |float|)
+			|| d = .duration
+				|| Over = ((Now - .StartTime) max 256)|duration|
+				if over < D
+					return Over.float / D.float
+			return 1.0
 				
 		run (|window| window, |float| progress, |ErrorInt|)
 			return -1

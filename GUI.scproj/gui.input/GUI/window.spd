@@ -504,12 +504,15 @@ class Window (GUIControl)
 				return Found
 
 
-	helper RunMyTasks (|bool| AnimationsOnly)
+	helper RunMyTasks (|bool| WantAnims)
 		opt norefcounts
 		for p in .Tasks
-			if (p is animation) == AnimationsOnly
-				if !.SmartRunTask(p, AnimationsOnly)
+			|| IsAnim = p is animation 
+			if IsAnim == WantAnims
+				if !.SmartRunTask(p, WantAnims)
 					p.Remove
+			  elseif !WantAnims
+				gui.touch // we'll do these later.
 
 
 	helper SmartRunTask (|taskgui| P,  |bool| Animated, |bool|)
@@ -524,7 +527,7 @@ class Window (GUIControl)
 		  elseif P is WaitStillStart
 			return true
 		
-		|| Prog = p.progress(now)
+		|| Prog = p.TaskProgress(now)
 		|| ok = (p)(self, Prog)
 		if p is Animation
 			GUI.touch
