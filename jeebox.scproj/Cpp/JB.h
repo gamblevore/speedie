@@ -570,7 +570,7 @@ struct Task_Behaviour: list_Behaviour {
 JBClass ( JB_Task , JB_List , 
 	void* _func;
 	int _Object;
-	TaskState State;
+	TaskState _State;
 );
 
 struct Error_Behaviour: Message_Behaviour {

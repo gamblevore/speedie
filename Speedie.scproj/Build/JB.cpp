@@ -3442,7 +3442,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[216]);
-	JB_FS_AppendInt32(_fsf0, (2025010617));
+	JB_FS_AppendInt32(_fsf0, (2025010716));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -4654,7 +4654,9 @@ SCFunction* SC_AC__GetFunc(Message* Cmd, SCFile* Myfile, int Ff, int N) {
 		Parent = SC_Comp__FindModuleOrClass(F, true);
 	}
 	iif (!Parent) {
-		JB_Str_Fail(JB_LUB[2096]);
+		iif (true) {
+			JB_Str_Fail(JB_LUB[2096]);
+		}
 		return nil;
 	}
 	iif ((Parent == SC__AC_AnonParent) and (JB_Msg_SyntaxEquals(Str, SC__AC_AnonText, false))) {
@@ -8863,7 +8865,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1683]);
-	JB_FS_AppendInt32(_fsf0, (2025010617));
+	JB_FS_AppendInt32(_fsf0, (2025010716));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -47972,7 +47974,7 @@ JB_Task* JB_Task_Constructor(JB_Task* Self, uint Obj, void* Func) {
 		Self = ((JB_Task*)JB_NewClass(&JB_TaskData));
 	}
 	JB_Ring_Constructor0(Self);
-	Self->State = 0;
+	Self->_State = 0;
 	Self->_Object = Obj;
 	Self->_func = Func;
 	return Self;
@@ -48004,10 +48006,10 @@ LessThan3* JB_Task_LessThan3_Constructor(LessThan3* Self, JB_String* A, int B, J
 
 void JB_Task_SyntaxIsSet(JB_Task* Self, uint /*TaskState*/ S, bool Value) {
 	iif (Value) {
-		Self->State = (Self->State | S);
+		Self->_State = (Self->_State | S);
 	}
 	 else {
-		Self->State = (Self->State & (~S));
+		Self->_State = (Self->_State & (~S));
 	}
 }
 
@@ -58495,4 +58497,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -5684451338507080966 -1503207478439254083
+// 1497145278235927189 -1503207478439254083
