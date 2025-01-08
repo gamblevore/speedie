@@ -1,11 +1,9 @@
 
 
 // todo whenever its fun?
+// * we should use • with the camdir and the vector
 // * 4 threads, each can do one quad.
 // * default RayTracer constructor uses block positioning system to match 2D/3D closely
-// * App seems to still have "unstable" frames? (we need to log the framegap to figure out whats going on)
-// * Eliminate drift by using "NextInSecond" number which is always stable
-	// so for 10fps... it would be like 6553, 13107, 19660, 26214, 32K... etcetc
 
 // advancements: (do AFTER we have perry+speedie in an awesome state)
 // 1) Make SpaceTree work
@@ -24,49 +22,74 @@
 
 class RayTracer
 	visible false
-	|vec4|			Color
-	|float|			Dist
-	|float|			MaxViewDistSq
+	|vec4|				Color
+	|float|				Dist
+	|float|				MaxViewDistSq
 	//
-	|vec4|			Size
-	|vec2|			Scale
-	|vec2|			Adjust
-	|vec4[4]|		Planes
+	|vec4|				Size
+	|vec2|				Scale
+	|vec2|				Adjust
+	|vec4[4]|			Planes
 	//
-	|Vec3|			_CamDir
-	|vec3|			iDir
-	|Mat4|			_LookAt
-	|Vec3|			_Camera
+	|Vec3|				_CamDir
+	|vec3|				iDir
+	|Mat4|				_LookAt
+
+	|Vec3|				Camera
+	|float|				Pitch
+	|float|				Spin
+	|byte|				_StillGood
+		
+	|?&RayBoost|		RootNode // make these not ?!
+	|?&RayTraceCell|	Cells
+	|?&RayTraceNode|	StartNodes
+	|?&RayTraceNode|	CurrNode
+	|?&RayTraceNode|	EndNodes
+	//
+	|?&pico[4]|			Workers //!!nice I guess we can send messages? or not?
+								// maybe easier to start/stop? or just spin on a value?
+								// we could reduce pico to "just a place to store a few data pointers"
 	//
 	visible true
-	|[vobject]|		Shapes
-	|float|			Pitch
-	|float|			Spin
+	|[vobject]|			Shapes
+	
 	
 	constructor (|vec3| Camera)
 		// Default RayTracer constructor should use the block positioning system
 		// either by zpos or zoom
-		._LookAt.reset
 		.MaxViewDistSq = 1000.0.pow2
-		.Camera(Camera)
+		.Camera = Camera
 	
-	
-	function Camera (|vec3|)
-		return ._Camera
 
 	setter Camera (|vec3|)
-		._Camera = Value|vec4|.MakeSane|vec3|
-	
+		Value = Value|vec4|.MakeSane|vec3|
+		if .Camera != value
+			.Camera = Value
+			._StillGood = 0
+
+
+	setter Pitch (|float|)
+		value = Value.Fract
+		if .pitch != value
+			.pitch = Value
+			._StillGood = 0
+
+
+	setter Spin (|float|)
+		Value = value.Fract
+		if .Spin != value
+			.Spin = Value
+			._StillGood = 0
 	
 	helper ViewMat (|&mat4|)
-		.spin = .spin.Fract
-		.Pitch = .Pitch.fract
-		._LookAt = .spin.SinCos.RotateAroundY	// could make a faster version that creates already transposed thing
-		|| M = .pitch.SinCos.RotateAroundX   	// or just creates needed values and applies directly
-		._LookAt *= M							// and only needs a "virtual" vec3
+		ifn ._StillGood&2
+			._StillGood |= 2
+			._LookAt = .spin.SinCos.RotateAroundY	// could make a faster version that creates already transposed thing
+			|| M = .pitch.SinCos.RotateAroundX   	// or just creates needed values and applies directly
+			._LookAt *= M							// and only needs a "virtual" vec3
 		return ._LookAt
 	
-			
+	
 	helper AntiAlias (|vec2| XY, |!&raytracenode| curr, |&imagepixel| pxl)
 		opt min 3
 		|| ID = pxl.a
@@ -77,6 +100,7 @@ class RayTracer
 		C *= 5th
 		C.a = ID|float|*255th
 		pxl <~ C
+	
 	
 	helper GetColor (|vec2| XY, |!&raytracenode| Rt, |vec4|)
 		// Should allow alpha for drawing over prev images...
@@ -100,10 +124,6 @@ class RayTracer
 			rt = rt.next
 		return .Color
 	
-
-//	helper Dir (|int| X, |int| Y, |vec3|)
-//		cpp_part DirInt
-//		return .Dir((x,y).vec2)
 	
 	helper Dir (|vec2| XY, |vec3|)
 		XY = (xy + .adjust) * .scale
@@ -113,13 +133,15 @@ class RayTracer
 	helper Plane (|vec4| P, |vec4|)
 		|| D1 = .Dir(P.xy)
 		|| D2 = .Dir(p.x2y2)
-		|| C = ._Camera
+		|| C = .Camera
 		return Plane3D.normals(d1, d2, C)
 
 
 	helper InPlanes (|vobject| b, |bool|)
 		opt min 3
-		|| D = (b.pos - ._Camera).lengthSq // should use the radius if a sphere, or at least be able to ask for "the nearest point" from the function.
+		// we should use • with the camdir and the vector
+		// then we don't even need lengthsq
+		|| D = (b.pos - .Camera).lengthSq // should use the radius if a sphere, or at least be able to ask for "the nearest point" from the function.
 		require D > 0.25 and D < .MaxViewDistSq
 		|| R = (b.radius, 0.0)
 		|| Pos = (b.pos, 1.0)
@@ -139,21 +161,17 @@ class RayTracer
 		.Planes[3] = -.plane(.size.x1y2x2y2) // 0111 // top
 	
 	
-	function CameraChangedSinceLastTrace (|bool|)
-		// return if campos+matrix is the same as last time...
-		return true
-	
-	
 	helper PlayQuidditch (|bool|)
 		opt norefcounts,  opt min 3
-		|| B = raytracer.GrabRoot(32)
-			raytracer.currNode = raytracer.StartNodes
+		|| B = .GrabRoot(32)
+			.currNode = .StartNodes
 			.DoFrustrum
-			if .CameraChangedSinceLastTrace
-				b.FillQuads(self)
+			ifn ._StillGood & 1
+				._StillGood |= 1
+				b.Divide(self)
 			for s in .shapes
 				if .InPlanes(s)
-					b.Quadditch(s)
+					.Quadditch(b, s)
 			return true
 	
 	
@@ -164,8 +182,8 @@ class RayTracer
 		.scale = 1.0/.size.x2x2
 		.adjust = .size.x2y2 * -0.5
 		if .PlayQuidditch
-			|| rn = rootnode!
-			|| C = Cells!
+			|| rn = .rootnode!
+			|| C = .Cells!
 			|| LastCell = C+rn.area
 			while C < LastCell
 				if c.node
@@ -176,7 +194,7 @@ class RayTracer
 
 
 	helper TraceCell (|&raytracecell| cell)
-		// super-awesome system to reduce stack use
+		// super-awesome system to reduce stack use (makes real difference!)
 		// it might seem like 6 vars is a lot, but it could easily be 14...
 		// if I didn't work miracles to reduce all this!
 		opt min 3
@@ -212,47 +230,42 @@ class RayTracer
 		cell.node = nil
 	
 	
-	module
-		helper GrabRoot (|int| px, |int| Size=4MB, |&RayBoost|)
-			|| s2 = (0,0, gui.Screen.Width, gui.Screen.height)
-			|| px2 = px.log2
-			px = 1<<px2
 
-			|| root = .RootNode
-				if root.size == s2 and root.px == px2
-					return root
-			
-			root = memory.realloc(root, size)|&rayboost|
-			if !root
-				memory.free(.rootnode)
-				.EndNodes = nil, .cells = nil, .StartNodes = nil, .currnode = nil, .rootnode = nil
-				return nil
-			memory.Zero(root, size)
-			"RayAlloc"
-			
-			.RootNode = root
-			.EndNodes = (root|&byte| + Size)|&RayTraceNode|
-			root.size = s2
-			
-			|| D = s2.x2.ContainingPowerOfTwo
-			|| s3 = (s2.x2y2+(px-1)) >> px2
-			root.cellswide = s3.x
-			root.cellshigh = s3.y
-			
-			|| Last = root.InitialCreation(root+1, D-1, px2)
-			.cells = last|&Raytracecell|
-			.StartNodes = (.cells+root.area+1)|&RayTraceNode| // +1 for fakecell
-			while last-- > root
-				if !last.depth and last.px
-					last.init
-			return root
+	helper GrabRoot (|int| px, |int| Size=4MB, |&RayBoost|)
+		// put this into the constructor! :O
+		|| s2 = (0,0, gui.Screen.Width, gui.Screen.height)
+		|| px2 = px.log2
+		px = 1<<px2
 
+		|| root = .RootNode
+			if root.size == s2 and root.px == px2
+				return root
 		
-		|&RayBoost|			RootNode
-		|&RayTraceCell|		Cells
-		|&RayTraceNode|		StartNodes
-		|&RayTraceNode|		CurrNode
-		|&RayTraceNode|		EndNodes
+		root = memory.realloc(root, size)|&rayboost|
+		if !root
+			memory.free(.rootnode)
+			.EndNodes = nil, .cells = nil, .StartNodes = nil, .currnode = nil, .rootnode = nil
+			return nil
+		memory.Zero(root, size)
+		"RayAlloc"
+		
+		._StillGood = 0
+		.RootNode = root
+		.EndNodes = (root|&byte| + Size)|&RayTraceNode|
+		root.size = s2
+		
+		|| D = s2.x2.log2p
+		|| s3 = (s2.x2y2+(px-1)) >> px2
+		root.cellswide = s3.x
+		root.cellshigh = s3.y
+		
+		|| Last = root.InitialCreation(root+1, D-1, px2)
+		.cells = last|&Raytracecell|
+		.StartNodes = (.cells+root.area+1)|&RayTraceNode| // +1 for fakecell
+		while last-- > root
+			if !last.depth and last.px
+				.initboost(last)
+		return root
 
 
 
@@ -273,60 +286,71 @@ struct RayBoost
 		return .CellsWide|int| * .CellsHigh|int|
 
 
-	helper Init 
+	helper raytracer.InitBoost (|rayboost| ff)
 		for i in 4
-			.quad[i] = .InitCell(i&1, i>>1)|&rayboost|
-
-//	function PrintStats
-//		|| n = .area
-//		|| Total = 0
-//		for i in n
-//			Total += raytracer.startnodes![i].Count
-//		"$Total objects in $n chunks. (avg: ${total pc n}/chunk)"
+			ff.quad[i] = .InitCell(ff, i&1, i>>1)|&rayboost|
 			
+	
+	helper raytracer.InitCell (|rayboost| ff, |int| x, |int| y, |&RayTraceCell|)
+		|| sz = ff.size
+		|| CellStart = sz.xy + ((x,y) << ff.px)
+		|| CellEnd = (CellStart + (1<<ff.px)) min sz.x2y2
+		|| D = CellEnd - CellStart
+		rz = .Cells!
+		if d.x > 0 and d.y > 0
+			|| i = (CellStart>>ff.px)  fma  ff.CellsWide
+			rz  +=  i
+			rz.xy = CellStart.vec2
+			rz.w = d.x
+			rz.h = d.y
+		  else
+			rz  +=  ff.area // fake cell. should never be reached? but might be?
+	
 
-	helper Quadditch (|vobject| v, |int| i=-1)
+	helper raytracer.Quadditch (|rayboost| ff, |vobject| v, |int| i=-1)
 		real self
 		if i >= 0
-			|| D = .depth
-			self = .quad[i]!
+			|| D = ff.depth
+			ff = ff.quad[i]!
 			if !D
-				|| Cell = self|&raytracecell|
-				|| RT = raytracer.currNode!++
-				|| Old = cell.node
-				cell.node = RT
-				RT.next = old
-				RT.Draw = V
-				return
-			require .PX
+				|| Cell = ff|&raytracecell|
+				|| RT = .currNode!++
+				if RT < .EndNodes	
+					|| Old = cell.node
+					cell.node = RT
+					RT.next = old
+					RT.Draw = V
+				return				
+			require ff.PX
 		
 		// for big chunks, we should also test that the quad corners are in the object.
 		// inigo quilez has a good article on this.
 		|| Rd = (v.radius, 0.0)
-		|| RX = Rd sign .xdiv
-		|| RY = Rd sign .ydiv
+		|| RX = Rd sign ff.xdiv
+		|| RY = Rd sign ff.ydiv
 		|| VP = (V.pos, 1.0)
-		|| L = .xdiv • (VP + RX) > 0
-		|| R = .xdiv • (VP - RX) < 0
-		|| B = .ydiv • (VP + RY) > 0
-		|| T = .ydiv • (VP - RY) < 0
+		|| L = ff.xdiv • (VP + RX) > 0
+		|| R = ff.xdiv • (VP - RX) < 0
+		|| B = ff.ydiv • (VP + RY) > 0
+		|| T = ff.ydiv • (VP - RY) < 0
 		
 		if (b|||t) & (l|||r)
 			if (L+R)+(B+T) == 2
-				return .Quadditch(V, R + (T<<1)) // tailcall
+				return .Quadditch(ff, V, R + (T<<1)) // tailcall
 			
 			if B
 				if L
-					.Quadditch(V, 0)
+					.Quadditch(ff, V, 0)
 				if R
-					.Quadditch(V, 1)
+					.Quadditch(ff, V, 1)
 			if T	
 				if L
-					.Quadditch(V, 2)
+					.Quadditch(ff, V, 2)
 				if R
-					return .Quadditch(V, 3)
+					return .Quadditch(ff, V, 3)
 
-	function FillQuads (|raytracer| T)
+	
+	function Divide (|raytracer| T)
 		opt min 3
 		|| S = .size.vec4
 		require s.ispositive             // do nothing
@@ -337,23 +361,7 @@ struct RayBoost
 		
 		if .Depth
 			for i in 4
-				.quad[i].FillQuads(t)
-	
-	
-	helper InitCell (|int| x, |int| y, |&RayTraceCell|)
-		|| sz = .size
-		|| CellStart = sz.xy + ((x,y) << .px)
-		|| CellEnd = (CellStart + (1<<.px)) min sz.x2y2
-		|| D = CellEnd - CellStart
-		rz = RayTracer.Cells!
-		if d.x > 0 and d.y > 0
-			|| i = (CellStart>>.px)  fma  .CellsWide
-			rz  +=  i
-			rz.xy = CellStart.vec2
-			rz.w = d.x
-			rz.h = d.y
-		  else
-			rz  +=  .area // fake cell. should never be reached? but might be?
+				.quad[i].Divide(t)
 	
 	
 	helper InitialCreation (|!&RayBoost| Last, |int| H, |int| px, |!&RayBoost|)
@@ -409,13 +417,7 @@ struct RayTraceCell
 //			rz++
 //			w = w.next
 
-
-function int.ContainingPowerOfTwo (|int|)
-	|| p = .log2
-	|| rem = self - p
-	return p + (rem!=0)
-
-
+ 
 function Vec4.BoxVsPlane (|vec4| R, |vec4| Pos, |float|)
 	description "Pos.w must be 1.0,  r.w must be 0.0"
 	|| RB = R sign self

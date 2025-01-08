@@ -118,6 +118,11 @@ datatype int
 	function Log2 (|int|)
 		cpp_wrapper JB_Int_Log2
 
+	function Log2P (|int|)
+		description "Same as log2, except it rounds up.  So (17).log2p == 5, because 4 won't be enough but 5 will!"
+		|| p = .log2
+		return p + (self!=1<<p)
+
 	function Ctz (|int|)
 		cpp_wrapper JB_Int_CTZ
 		
