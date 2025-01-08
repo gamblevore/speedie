@@ -13,7 +13,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	contains SpdProcess
 	|jbin|						Writer
 	|&pico|						Pico
-	|stringzeroterminated|		_DebugName
+	|stringzeroterminated|		DebugName
 	|?ThreadAsProcess|			SubProcess
 	|int| 						DeathLimit
 	|int|						DiedCount
@@ -25,7 +25,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		super.constructor(path) // <-- mode should be passed here
 		
 		.deathlimit = 12
-		._DebugName = path
+		.DebugName = path
 		.WeAreParent = path != "" or fn != nil
 		.args	= params
 		.SubProcess = fn
