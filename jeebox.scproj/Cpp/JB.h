@@ -593,18 +593,18 @@ JBClass ( JB_Error , Message ,
 #define JB__App__stdin JB__.App__stdin
 #define JB__App__StdOut JB__.App__StdOut
 #define JB__App_Usage JB__.App_Usage
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[552])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[551])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[553])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[552])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[554])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[553])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[551])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[550])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[554])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[553])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[555])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[554])
 
 #define JB__API_NilHappened_ JB__.API_NilHappened_
 #define JB__Constants__FuncArray JB__.Constants__FuncArray
@@ -663,7 +663,7 @@ JBClass ( JB_Error , Message ,
 #define JB__jBinNotJbin JB__.jBinNotJbin
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[556])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[555])
 
 #define JB_StdErr JB__.StdErr
 #define kJB_SyxAcc ((Syntax)29)
@@ -856,12 +856,12 @@ JBClass ( JB_Error , Message ,
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[559])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[558])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[558])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[557])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[557])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[556])
 
 #define kJB__byte_max ((byte)255)
 
@@ -1190,7 +1190,7 @@ extern Dictionary* JB__TC_Types_Dict;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[550])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[549])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -1960,7 +1960,10 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, 
 // SpdDeathActionFn
 
 
-// SpdMainFn
+// Thread
+
+
+// ThreadAsProcess
 
 
 // TokenHandler_fp

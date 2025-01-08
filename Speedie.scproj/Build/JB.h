@@ -557,7 +557,7 @@ typedef int (*FP_SorterComparer)(JB_Object* a, JB_Object* b);
 
 typedef int (*FP_SorterComparerFn)(SCFunction* a, SCFunction* b);
 
-typedef bool (*FP_SpdMainFn)(void* Obj, _cstring* args, PicoComms* Comms);
+typedef bool (*SpdProcess_ThreadAsProcess)(SpdProcess* self, PicoComms* Comms, int64 Data, _cstring* args);
 
 typedef JB_Object* (*TokenHandler_fp)(int Start, Message* Parent);
 
@@ -1248,7 +1248,7 @@ JBClass ( SpdProcess , ShellStream ,
 	JB_StringC* _DebugName;
 	PicoComms* Pico;
 	FastString* Writer;
-	FP_SpdMainFn SubProcess;
+	SpdProcess_ThreadAsProcess SubProcess;
 	int DiedCount;
 	int DeathLimit;
 	ProcessMode Mode;
@@ -6094,7 +6094,10 @@ void JB_SorterComparer_sort(FP_SorterComparer Self, Array* A);
 // SpdDeathActionFn
 
 
-// SpdMainFn
+// Thread
+
+
+// ThreadAsProcess
 
 
 // TokenHandler_fp
@@ -10288,7 +10291,7 @@ bool JB_Proc_ChildAlive(SpdProcess* Self);
 
 bool JB_Proc_CommsOpen(SpdProcess* Self);
 
-SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, FP_SpdMainFn Fn, PicoComms* Pico, Array* Params, uint /*ProcessMode*/ Mode);
+SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, SpdProcess_ThreadAsProcess Fn, PicoComms* Pico, Array* Params, uint /*ProcessMode*/ Mode);
 
 void JB_Proc_Destructor(SpdProcess* Self);
 
