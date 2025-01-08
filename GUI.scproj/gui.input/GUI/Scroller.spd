@@ -2,12 +2,12 @@
 
 
 module ScrollInfo	
-	|int|								InDrag_ = -1	// wanna remove this, its annoying
-	|bool|								JustClicked_	// this too.
+	|int|								InDrag_ = -1	// Wanna remove this, its annoying.
+	|bool|								JustClicked_	// This too.
 	
-	function EndDrag									// its also not being called properly
+	function EndDrag									// Its also not being called properly.
 		if .InDrag_ >= 0 
-			.InDrag_ = -1								// so it thinks its indrag when its not
+			.InDrag_ = -1								// So it thinks its indrag when its not.
 
 	
 helper ListView.SLH (|vec3|)
@@ -63,15 +63,6 @@ helper DrawScroll (|vec3| slh, |image| where)
 		where.DrawRectStyled(.ScrollRect(slh), scr)
 
 
-
-helper ScrollRectFind (|vec3| slh, |int| shift, |int|)
-	return .ScrollRect(slh, shift).x|int|
-
-
-helper ScrollRect (|vec3|slh, |ivec4|)
-	return .scrollrect(slh, 0).ivec4
-
-
 function InScrollArea (|ivec2| p, |bool|)
 	|| x  = .lastrect.x2
 	|| xr = (x-10, x)
@@ -87,7 +78,7 @@ helper MouseMoveInScrollArea (|ivec2| p, |bool|)
 
 helper ScrollBarMove (|vec3| slh, |int| shift)
 	if shift
-		|| t = .ScrollRectFind(slh, shift)
+		|| t = .ScrollRect(slh, shift).x
 		if self isa ListView
 			.ScrollMoveTo(t)
 		  elseif self isa textview
@@ -115,7 +106,7 @@ helper ClickedScrollbar (|ivec2| P,  |int| Clicks,  |vec3| slh,  |bool|)
 	return true
 
 
-function ScrollRect (|vec3| slh, |int| shift, |vec4|)
+helper ScrollRect (|vec3| slh, |int| shift=0, |ivec4|)
 	cpp_part ScrollRectSub
 	|| s  = slh[0]
 	|| l  = slh[1]
@@ -139,8 +130,8 @@ function ScrollRect (|vec3| slh, |int| shift, |vec4|)
 		p = y + d
 		f = unmix(si.y1|float|, si.y2|float|, p|float|)
 		s = (1.0-f) * l
-		return (s, s, s, s)
+		return (s, s, s, s).iVec4
 	
-	return (si.x2 - w,  y,  si.x2,  p + d+1).vec4
+	return (si.x2 - w,  y,  si.x2,  p + d+1)
 }
 
