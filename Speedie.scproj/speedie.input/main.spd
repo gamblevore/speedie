@@ -68,7 +68,9 @@ function compiler.SetupEnv
 
 
 target perrydbg
-	api Speedie_Main (|&pico| comms, |int| Mode, |&cstring| args, |ErrorInt|)
+	api Speedie_Main (|&pico| comms, |int64| Mode, |&cstring| args, |ErrorInt|)
+		// could this be a lib-func thats included with all compiles?
+		// so any app can be run as a lib? Maybe later!
 		cpp_name Speedie_Main 
 		pico.parent_ = comms // phew
 		rz = app.sp_run(args, mode&4)

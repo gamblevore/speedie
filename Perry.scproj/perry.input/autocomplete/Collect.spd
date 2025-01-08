@@ -88,7 +88,6 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 	|| f = .SharedProjectTabSource[@nil]$
 	|| name = .name
 	|| Noisy = false//SpdLibAlreadyInUse
-	if noisy
 		p <~ "--noisy"		
 
 	p <~ "--check"
@@ -102,7 +101,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 		if !.UsingSpdLib
 			.UsingSpdLib = true
 			f.name = name.TrimExt + "()"
-		spd = (Speedie_Main).SpawnThread(p)
+		spd = (Speedie_Main).Spawn(p, f.name)
 		}
 
 	if !spd?
@@ -145,5 +144,5 @@ function PerryIDE.ActualCompile (|string| operation)
 
 
 target debug
-	cpp_libwrapper Speedie_Main (SpdMainFn)
+	cpp_libwrapper Speedie_Main (spdprocess.AsThread)
 || SpdLibAlreadyInUse = false

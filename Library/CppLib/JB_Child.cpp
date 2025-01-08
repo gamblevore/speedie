@@ -16,7 +16,7 @@ extern "C" {
 #include <unistd.h>
 #include <errno.h>
 #include <signal.h>
-#include <pthread.h>
+//#include <pthread.h> // not needed?
 #include <execinfo.h>
 
 

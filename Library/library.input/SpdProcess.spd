@@ -14,14 +14,14 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	|jbin|						Writer
 	|&pico|						Pico
 	|stringzeroterminated|		_DebugName
-	|?SpdMainFn|				SubProcess
+	|?ThreadAsProcess|			SubProcess
 	|int| 						DeathLimit
 	|int|						DiedCount
 	|bool|						AlreadyWarnedDied
 	|bool|						WeAreParent
 	|ProcessMode|				Mode
 
-	constructor	(|string| path, |?SpdMainFn| fn, |pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.AutoPrintErrors)
+	constructor	(|string| path, |?ThreadAsProcess| fn, |pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.AutoPrintErrors)
 		super.constructor(path) // <-- mode should be passed here
 		
 		.deathlimit = 12
@@ -234,6 +234,27 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			rz = spdprocess(app.path, nil, p, nil, mode)
 			rz.pid = id
 
+	prototype ThreadAsProcess (|&pico| Comms, |int64| Data, |&cstring| args, |bool|)
+		function Spawn (|[string]| R = [], |string| ThreadName,  |SpdProcess|)
+			description `This is meant to run a "main-function" as if it were a subprocess. Its usually a wrapper around main(). Just needed this to debug speedie from within Perry.`
+			|| c_args = SpdProcess.CreateArgs("", r)
+			|| pico_fn = pico.new(threadname)
+				|| proc = SpdProcess(threadname, self, pico_fn, r)
+				if proc.pico.SpawnThread(self|picothreadfn|, 7|&nil|, c_args)
+					return proc
+			memory.free(c_args)
+
+
+
+prototype Thread (|pico| Comms, |int64| Data, |&nil| Argument, |bool|)
+	function Spawn (|pico| Comms, |int64| Data, |&nil| Argument,  |int| BuffBits=0, |pico|)
+		description "Just a wrapper around pico.thread" 
+		|| pico_out = pico.new(comms.config.name.str)
+			if BuffBits
+				pico_out.Config.Bits = BuffBits
+			if comms.SpawnThread(self|picothreadfn|, Data|&nil|, Argument|&cstring|)
+				return pico_out
+			pico_out.Close("")
 
 
 datatype ProcessMode (byte)
@@ -244,15 +265,6 @@ datatype ProcessMode (byte)
 
 	syntax is (|ProcessMode| M, |bool|)
 		return self&M
-
-
-prototype SpdMainFn	(|&nil| Obj, |&cstring| args, |&pico| Comms, |bool|)
-	function SpawnThread (|[string]| R = [],  |SpdProcess|)
-		|| c_args = SpdProcess.CreateArgs("", r)
-		|| pico_fn = pico.new("SpdMainFn()")
-			rz = SpdProcess("SpdMainFn()", self, pico_fn, r)
-			if !rz.pico.SpawnThread(self|picothreadfn|, 7|&nil|, c_args)
-				rz = nil
 
 
 

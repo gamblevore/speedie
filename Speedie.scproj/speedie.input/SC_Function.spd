@@ -1265,7 +1265,10 @@ function NewProtoTypeSub (|Message| node, |SCNode!| parent, |Message| ErrPlace, 
 	  else
 		require parent.ExpectModule(node)
 		
-	|| f = NewFunc( node, parent, ErrPlace )|SCFunction|		#require
+	|| f = NewFunc( node, parent, ErrPlace )|SCFunction|
+	expect (f isa scfunction) (node, "Can't extend a class with a prototype. (in this version)") // not yet anyhow.
+	// we'd have to process this later... not too bad, though? its just on compiler.ExtendList!
+		
 	Compiler.FuncList.Pop
 	
 	|| Using = node.SyntaxUsing

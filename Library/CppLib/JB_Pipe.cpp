@@ -63,7 +63,7 @@ static void pipe_close (int& fd) {
 
 
 void JB_App__SetThreadName(JB_String* self) {
-	require0(self);
+	require0(JB_Str_Length(self));
 	u8 CName[32];
 	auto tmp = (const char*)JB_FastFileString(self, CName);
 	
@@ -75,6 +75,17 @@ void JB_App__SetThreadName(JB_String* self) {
 #endif
 }
 
+
+//typedef void* (*PThread_Function)(void* Param);
+// // just use pico, can get the buffer size down to 256 bytes if I want...
+//int JB_App__Thread(void* Fn, void* Obj, JB_String* Name) {
+//	pthread_t T = 0;
+//	// pthread_setname_np sucks anyway ;-/
+//	if (!pthread_create(&T, nullptr, (PThread_Function)Fn, Obj) and !pthread_detach(T))
+//		return 0;
+//	return JB_ErrorHandleFileC(0, errno, "Starting pthread");
+//}
+//
 
 bool CanASMBKPT = true;
 int JB_Pipe__IgnoreBreakPoints() {
