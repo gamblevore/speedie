@@ -26,7 +26,7 @@ class Breakout (Window)
 	|[vobject]|			Spirals
 
 	constructor
-		.t = RayTracer(vec3(10, 6.25, -20))
+		.t = RayTracer(vec3(10, 6.25, -20))!
 		.bar = vobject.box(nil, nil)
 		.fps = fpstextview(self)
 		.fps.MakeInline()

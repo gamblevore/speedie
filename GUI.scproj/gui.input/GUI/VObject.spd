@@ -11,10 +11,13 @@ class VObject (list)
 	|vec4|			Color			// image pixel?
 	|float|			Health			// are ints better? I think so?
 	|DistanceFunction| Shape
+	visible false
+	|float|			_RayDist
+	|?VObject--|	_CellNext
+
+	visible true
 	
 	prototype DistanceFunction (|vec3| orig, |vec3| dir, |vec3| idir, |vec2|)
-		// this should become a more generalised "hitter"
-		// for shape, nearest point, and color and maybe even sound+energy/magic uses
 		
 	constructor (|vec2| Pos,  |vec2| Size,  |vec4| Color=colors.white)
 		cpp_part ConstructorBox2D
@@ -23,7 +26,7 @@ class VObject (list)
 		.Color = color
 		.Health = 256
 		.size = vec3(size,1.0)
-		.ShapeID = ++ShapeIDs
+		.ShapeID = nextID()
 
 	constructor (|vec3| Pos,  |vec3| Rad, |DistanceFunction| shape,   |vec4| Color=colors.white)
 		cpp_part ConstructorShape
@@ -32,7 +35,7 @@ class VObject (list)
 		.Radius = rad
 		.Color = color
 		.Health = 256
-		.ShapeID = ++ShapeIDs
+		.ShapeID = NextID()
 	
 	function BigR (|float|)
 		return .radius.max
@@ -90,9 +93,11 @@ class VObject (list)
 		|float| DrawScale
 		|vec2|  DrawMovement
 		
+		function NextID (|byte|)
+			rz = ++.ShapeIDs
+			if !rz
+				rz = ++.ShapeIDs
 
-	
-	module
 		function SphereShape (DistanceFunction)
 			opt min 3
 			|| L = .pos - orig
@@ -204,3 +209,4 @@ extend Window
 	
 	setter BlockWidth (|float|)
 		.Blockscale = Value.abs
+

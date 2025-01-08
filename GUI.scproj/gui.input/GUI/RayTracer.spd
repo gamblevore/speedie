@@ -1,7 +1,6 @@
 
 
 // todo whenever its fun?
-// * we should use • with the camdir and the vector
 // * 4 threads, each can do one quad.
 // * default RayTracer constructor uses block positioning system to match 2D/3D closely
 
@@ -22,8 +21,6 @@
 
 class RayTracer
 	visible false
-	|vec4|				Color
-	|float|				Dist
 	|float|				MaxViewDistSq
 	//
 	|vec4|				Size
@@ -38,7 +35,6 @@ class RayTracer
 
 	|Vec3|				Camera
 	|vec3|				Rotation // we can have yaw, pitch, and roll. I think roll (z) is mostly unused.
-//	|float|				Spin
 	|byte|				_StillGood
 		
 	|&RayBoost|			RootNode // make these not ?!
@@ -93,39 +89,49 @@ class RayTracer
 		return ._LookAt
 	
 	
-	helper AntiAlias (|vec2| XY, |!&raytracenode| curr, |&imagepixel| pxl)
+	helper AntiAlias (|vec2| XY, |raytracecell| cell, |&imagepixel| pxl)
 		opt min 3
 		|| ID = pxl.a
 		|| C = pxl.Color
 		for i in 4
 			|| sh = (i&1, i>>1).Vec2 - 0.5
-			c += .GetColor(XY + sh*0.8, curr)
+			c += .GetColor(XY + sh*0.8, cell)
 		C *= 5th
 		C.a = ID|float|*255th
 		pxl <~ C
 	
 	
-	helper GetColor (|vec2| XY, |!&raytracenode| Rt, |vec4|)
-		// Should allow alpha for drawing over prev images...
-		// Meaning that the alpha can't be the ID!
+	prototype Coloriser (|vobject| self, |raytracer| T, |&vec4| Color,  |bool|)
+		// For appearance and color
+		// how to test two objects? or an object vs a block?
+		// seems it needs a different function?
+		// what about sound+energy/magic uses? is that just objects bouncing around?
+
+		// what if instead of a raytracer, we just pass a shape?
+		// like that just happens to be a ray. Or another shape?
+		
+
+	helper GetColor (|vec2| XY, |raytracecell| Cell, |vec4|)
+		// * Need allow alpha for drawing over prev images... Alpha then need rework
 		opt min 3, opt norefcounts
-		.Color = nil
-		.Dist = float.max
+		|| sp = cell.Node!.draw!
 		._CamDir = .Dir(xy)
 		.idir = -1.0 / ._CamDir
-		
-		while rt
-			|| sp = rt.draw!
+		|vobject| Best
+
+		while
 			|| t = (sp.Shape)(sp, .Camera, ._CamDir, .idir)
 			|| tx = t.x
-			if (tx > 0) and (tx < .Dist)
-				.Dist = t.x
-				|| P = .Camera + ._CamDir*tx
-				|| Norm = (P - sp.pos).normal
-				|| C = (norm.abs * sp.Color.xyz)
-				.color = (C, sp.shapeID|float|*255th)
-			rt = rt.next
-		return .Color
+			if (tx > 0) and (!best or tx < best._rayDist)
+				Best = sp
+				best._RayDist = tx
+			sp = sp._CellNext #loop
+		
+		if best
+			|| P = .Camera + ._CamDir*best._RayDist
+			|| Norm = (P - Best.pos).normal // spherical color
+			|| C = (norm.abs * Best.Color.xyz)
+			return (C, Best.shapeID|float|*255th)
 	
 	
 	helper Dir (|vec2| XY, |vec3|)
@@ -139,22 +145,21 @@ class RayTracer
 		return Plane3D.normals(d1, d2, .Camera)
 
 	
+	helper PlaneOK (|vec4| R, |vec4| Pos, |int| i, |bool|)
+		opt inline
+		return .Planes[i].BoxVsPlane(r, pos) > 0
+	
+	
 	helper InPlanes (|VObject| b, |bool|)
 		opt min 3
 		|| ToObj = b.pos - .Camera
 		|| D = ToObj.LengthSq		// Should use the radius if a sphere, or at least be able to ask for "the nearest point" from the function.
-		require  ToObj • .Fwd > 0  and  D > 0.25  and  D < .MaxViewDistSq
-		
-		|| R = (b.radius, 0.0)
-		|| Pos = (b.pos, 1.0)
-		
-		for i in 4
-			|| Q = .planes[i].BoxVsPlane(r, pos)
-			require Q > 0
-
+		if  (D > 0.25)  and  (D < .MaxViewDistSq)  and  (ToObj • .Fwd > 0)
+			|| R = (b.radius, 0.0)
+			|| P = (b.pos,    1.0)
+			return .PlaneOK(r,p,0) and .PlaneOK(r,p,1) and .PlaneOK(r,p,2) and .PlaneOK(r,p,3)
 		// Could also (later) check if the nearest frustrum point is in the box.
 		// Need points[8] and a way to find which is the nearest to the box, or just check all?
-		return true
 		
 	
 	helper RemakeNodes (|int| S)
@@ -198,12 +203,25 @@ class RayTracer
 			yield C
 			C++
 
-
+	helper raytracecell.Link
+		opt min 3, opt norefcounts
+		|| curr = .Node!
+		while
+			|| obj = curr.Draw!
+			|| nxt = curr.Next
+				obj._CellNext = nxt.draw
+				curr = nxt
+			  else
+				obj._CellNext = nil
+				exit
+			
+		
 	helper TraceCell (|&raytracecell| cell)
 		// super-awesome system to reduce stack use (makes real difference!)
 		// it might seem like 6 vars is a lot, but it could easily be 14...
 		// if I didn't work miracles to reduce all this!
 		opt min 3
+		cell.Link
 		|| P = cell.xy
 		|| pxl = cell.pxl
 		|| pxl3 = pxl - cell.stride*cell.h
@@ -212,22 +230,22 @@ class RayTracer
 			while pxl < pxl2
 				#! Main pixel color
 				cell.Aliased = false
-				pxl <~ .GetColor(P, cell.node!)
+				pxl <~ .GetColor(P, cell)
 				
 				|| Left = pxl-1
 				if p.x and pxl.a != left.a
 					#! Anti-alias the left??
-					.AntiAlias(p-(1.0,0), cell.node!, left)
-					.AntiAlias(p, cell.node!, pxl)
+					.AntiAlias(p-(1.0,0), cell, left)
+					.AntiAlias(p, cell, pxl)
 					cell.Aliased = true
 				
 				if p.y
 					#! Maybe below too??
 					|| below = pxl + cell.stride
 					if pxl.a != below.a
-						.AntiAlias(p-(0,1.0), cell.node!, below)
+						.AntiAlias(p-(0,1.0), cell, below)
 						if !cell.Aliased
-							.AntiAlias(p, cell.node!, pxl)
+							.AntiAlias(p, cell, pxl)
 				pxl++
 				p.x++
 			pxl -= (cell.stride + cell.w)
@@ -410,3 +428,15 @@ function Vec4.BoxVsPlane (|vec4| R, |vec4| Pos, |float|)
 	|| RB = R sign self
 	return self • (pos + RB)
 
+
+
+
+datatype RaytraceQuery (Byte)
+	constants
+		|RaytraceQuery|
+		Ray
+		Color
+		Touch
+		
+	syntax is (|RaytraceQuery| Q, |bool|)
+		return self&Q
