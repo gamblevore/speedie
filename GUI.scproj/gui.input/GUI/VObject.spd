@@ -10,15 +10,22 @@ class VObject (list)
 	|byte|			ShapeID
 	|vec4|			Color			// image pixel?
 	|float|			Health			// are ints better? I think so?
-	|DistanceFunction| Shape
+	|Coloriser| 	Shape
 	visible false
 	|float|			_RayDist
 	|?VObject--|	_CellNext
 
 	visible true
 	
-	prototype DistanceFunction (|vec3| orig, |vec3| dir, |vec3| idir, |vec2|)
-		
+	prototype Coloriser (|raytracer| Ray, |?&vec4| Color,  |float|)
+		// For appearance and color
+		// how to test two objects? or an object vs a block?
+		// seems it needs a different function?
+		// what about sound+energy/magic uses? is that just objects bouncing around?
+
+		// what if instead of a raytracer, we just pass a shape?
+		// like that just happens to be a ray. Or another shape?
+	
 	constructor (|vec2| Pos,  |vec2| Size,  |vec4| Color=colors.white)
 		cpp_part ConstructorBox2D
 		.pos = (pos, 0.0)
@@ -28,7 +35,7 @@ class VObject (list)
 		.size = vec3(size,1.0)
 		.ShapeID = nextID()
 
-	constructor (|vec3| Pos,  |vec3| Rad, |DistanceFunction| shape,   |vec4| Color=colors.white)
+	constructor (|vec3| Pos,  |vec3| Rad, |Coloriser| shape, |vec4| Color=colors.white)
 		cpp_part ConstructorShape
 		.pos = pos
 		.Shape = shape
@@ -98,22 +105,35 @@ class VObject (list)
 			if !rz
 				rz = ++.ShapeIDs
 
-		function SphereShape (DistanceFunction)
+		function SphereShape (Coloriser)
 			opt min 3
-			|| L = .pos - orig
-			|| t = L • dir
+			if color
+				|| P = color[].xyz
+				|| Norm = (P - .pos).normal // spherical color
+				|| C = (norm.abs * .Color.xyz)
+				color[] = (C, 1.0)
+				return 0
+
+			|| L = .pos - Ray.Camera
+			|| t = L • Ray._CamDir
 			if t > 0
 				|| r = .Radius.x
 				|| h = ((r*r) + (t*t) - (L • L) ).Sqrt
-				return (t-h, t+h) // what about tca + h? or returning (tca,h)?
+				return t-h//, t+h) // what about tca + h? or returning (tca,h)?
 		
-		
-		function BoxShape (DistanceFunction)
+		function BoxShape (Coloriser)
 			opt min 3
+			if color
+				|| P = color[].xyz
+				|| Norm = (P - .pos).normal // spherical color
+				|| C = (norm.abs * .Color.xyz)
+				color[] = (C, 1.0)
+				return 0
 			
-			orig -= .pos
+			|| orig = Ray.camera - .pos
 			|| r = .Radius
-					
+			|| idir = ray.iDir
+			
 			|| p0 = (orig - r) * idir
 			|| p1 = (orig + r) * idir
 			
@@ -121,7 +141,7 @@ class VObject (list)
 			|| t2 = (P0 max P1).min
 			
 			if t2 >= t1
-				return (t1, t2)
+				return t1//, t2)
 
 		function Box (|vec3| Pos, |vec3| Radius, |vec4| Color=colors.white, |vobject|)
 			return VObject(pos, radius, BoxShape, color)

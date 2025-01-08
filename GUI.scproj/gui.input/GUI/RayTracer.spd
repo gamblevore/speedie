@@ -56,6 +56,7 @@ class RayTracer
 			|| root = memory.zalloc(Buff)|&rayboost|
 				return RayTracer(camera, buff, root)
 
+
 	constructor (|vec3| Camera, |int| Buff, |&rayboost| root)
 		// Default RayTracer constructor should use the block positioning system
 		// either by zpos or zoom
@@ -101,16 +102,6 @@ class RayTracer
 		pxl <~ C
 	
 	
-	prototype Coloriser (|vobject| self, |raytracer| T, |&vec4| Color,  |bool|)
-		// For appearance and color
-		// how to test two objects? or an object vs a block?
-		// seems it needs a different function?
-		// what about sound+energy/magic uses? is that just objects bouncing around?
-
-		// what if instead of a raytracer, we just pass a shape?
-		// like that just happens to be a ray. Or another shape?
-		
-
 	helper GetColor (|vec2| XY, |raytracecell| Cell, |vec4|)
 		// * Need allow alpha for drawing over prev images... Alpha then need rework
 		opt min 3, opt norefcounts
@@ -120,18 +111,19 @@ class RayTracer
 		|vobject| Best
 
 		while
-			|| t = (sp.Shape)(sp, .Camera, ._CamDir, .idir)
-			|| tx = t.x
+			|| tx = (sp.Shape)(sp, self, nil)
 			if (tx > 0) and (!best or tx < best._rayDist)
 				Best = sp
 				best._RayDist = tx
 			sp = sp._CellNext #loop
 		
 		if best
-			|| P = .Camera + ._CamDir*best._RayDist
-			|| Norm = (P - Best.pos).normal // spherical color
-			|| C = (norm.abs * Best.Color.xyz)
-			return (C, Best.shapeID|float|*255th)
+			// i think what it wants is two functions...
+			// its not that terrible.
+			|| rd = best._RayDist
+			rz = vec4(.Camera + ._CamDir*rd, rd)
+			(best.Shape)(best, self, rz)
+			rz.a = Best.shapeID|float|*255th
 	
 	
 	helper Dir (|vec2| XY, |vec3|)
@@ -193,8 +185,7 @@ class RayTracer
 		.PlayQuidditch(where.width)
 		for C in self
 			if c.node
-				c.pxl = where[c.xy.ivec2]
-				.TraceCell(C)
+				.TraceCell(C, where[c.xy.ivec2])
 	
 	iterator
 		|| C = .Cells!
@@ -216,14 +207,13 @@ class RayTracer
 				exit
 			
 		
-	helper TraceCell (|&raytracecell| cell)
+	helper TraceCell (|&raytracecell| cell, |!&imagepixel| pxl)
 		// super-awesome system to reduce stack use (makes real difference!)
 		// it might seem like 6 vars is a lot, but it could easily be 14...
 		// if I didn't work miracles to reduce all this!
 		opt min 3
 		cell.Link
 		|| P = cell.xy
-		|| pxl = cell.pxl
 		|| pxl3 = pxl - cell.stride*cell.h
 		while pxl > pxl3
 			|| pxl2 = pxl + cell.w
@@ -408,9 +398,10 @@ struct RayTraceNode
 
 
 struct RayTraceCell
+// if we thread this, the idir/dir has to go here.
+// or at least on some per-thread info.
 	|vec2|						XY
 	|?&RayTraceNode|			Node
-	|&imagepixel|				pxl
 	|uint16|					Stride
 	|byte|						H
 	|byte|						W
@@ -430,13 +421,3 @@ function Vec4.BoxVsPlane (|vec4| R, |vec4| Pos, |float|)
 
 
 
-
-datatype RaytraceQuery (Byte)
-	constants
-		|RaytraceQuery|
-		Ray
-		Color
-		Touch
-		
-	syntax is (|RaytraceQuery| Q, |bool|)
-		return self&Q
