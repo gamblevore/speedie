@@ -20,7 +20,7 @@ class Bubbles (window)
 	|fpstextview| 	FPS
 
 	constructor
-		.t = RayTracer((1.6, 5.0, -22.0))
+		.t = RayTracer((1.6, 5.0, -22.0))!
 		.FPS = FPSTextView(self)
 		.fps.MakeInline
 		
@@ -36,8 +36,7 @@ class Bubbles (window)
 
 
 	behaviour MouseMove
-		.t.pitch -= move.y|float| * 0.0001
-		.t.spin += Move.x|float| * 0.0005
+		.t.rotation += (move.y|float| * -0.0001,  Move.x|float| * 0.0005, 0.0)
 	
 	
 	behaviour Drawbackground
@@ -51,10 +50,10 @@ class Bubbles (window)
 	
 	behaviour FrameStep
 		|| m = keys.Movement
-			m = m.keyfix((0.6, 0.25, 5.0))
+			m = m.KeyFix((0.6, 0.25, 5.0))
 			|| P = m.xyz
 				.t.Camera += p.normal * .t.ViewMat
-			.t.spin += m.w*0.003
+			.t.Rotation += (0, m.w*0.003, 0)
 
 
 function float.KeyFix (|vec3| V, |float|)

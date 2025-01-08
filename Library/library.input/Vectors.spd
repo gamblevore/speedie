@@ -758,7 +758,7 @@ datatype vec2
 		if !.y
 			rz.y -= .y.IntegerToMod2
 	
-	syntax Equals (|vec2| v, |bool|Aware, |bool|)
+	syntax Equals (|vec2| v, |bool| Aware, |bool|)
 		return (.x == v.x) and (.y == v.y) 
 	
 	operator • (|vec2| other, |float|)
