@@ -42,6 +42,8 @@ class Bubbles (window)
 	
 	behaviour Drawbackground
 		opt norefcounts
+		if keys.shift
+			where.DrawRect(self, vec4(0.1, 1.0))
 		.fps.Update
 		.T.RayTrace(where)
 		gui.Touch
