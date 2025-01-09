@@ -32,7 +32,7 @@ module GUI
 	|float|						Scale
 	|bool|						MouseMoveInited
 	|bool|						StartedProperly
-	|bool|						IsBackground
+	|date|						ForeGroundTime
 	|bool|						FlashSelector
 	|sdlactivity|				QuitReason
 	|date|						FixScreenBug
@@ -387,11 +387,12 @@ module GUI
 		if .drawframelength
 			return true
 		.drawframelength = 60th.date // could try changing this to 61th?
-
+		
 		.GUICheck
 		pico.GlobalConfig.SuicideIfParentDies = false
 		pico.start
 		.openedfirst = date.now
+		.ForeGroundTime = .OpenedFirst
 		.CurrMouseXY = ivec2(-1)
 
 		AppMenu.GetAppMenu
@@ -418,6 +419,8 @@ module GUI
 	helper SetHint (|cstring| name, |cstring| value)
 		cpp_wrapper SDL_SetHint
 	
+	function IsBackground (|bool|)
+		return !.ForeGroundTime
 	
 	helper TrySelectorFlash
 		if !.IsBackground and (GUI.ChangeSelFlash.fired)
@@ -1009,12 +1012,16 @@ module GUI
 		return reason
 	
 	
-	function AppIsBackground (|bool| v, |int|)
-		require .IsBackground != v // what? why is tihs happenin 
-		.IsBackground = v
+	function AppIsBackground (|bool| back, |int|)
+		require .IsBackground != back
+		if back
+			.ForeGroundTime = 0
+		  else
+			.ForeGroundTime = gui.FrameStart
+
 		beep.OK = 1
 		target __PROJECT_PERRY__
-			if v
+			if back
 				keys.KeyLogSub("(IsBackGround)")
 			  else
 				keys.KeyLogSub("(IsForeGround)")
@@ -1024,13 +1031,18 @@ module GUI
 		.FlashSelector = false
 		if !.DialogIsOpen
 			for w in __modules__.window.all
-				w.__AppForegroundChanged__(!v)
+				w.__AppForegroundChanged__(!back)
 		.touch
 		return SDLActivity.activity
 		
 
 	function CheckKeyMods
-		.KeyMod = .SDL_GetModState
+		|| KM = .SDL_GetModState
+		// perhaps the cmdkey bug is an SDL bug
+		// if we get rid of key mods and just...
+		// use keys... this would work better?
+		// we already clear the keys on foreground change
+		.KeyMod = KM
 
 
 	helper EventWindow (|window--|)
