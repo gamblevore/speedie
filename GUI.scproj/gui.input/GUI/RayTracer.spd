@@ -31,13 +31,14 @@ class RayTracer
 	|Vec3|				_CamDir
 	|vec3|				iDir
 	|Mat4|				_LookAt
+	|vec2|				_RayDist
 	|vec3|				Fwd
 
 	|Vec3|				Camera
-	|vec3|				Rotation // we can have yaw, pitch, and roll. I think roll (z) is mostly unused.
+	|vec3|				Rotation	// we can have yaw, pitch, and roll. I think roll (z) is mostly unused.
 	|byte|				_StillGood
 		
-	|&RayBoost|			RootNode // make these not ?!
+	|&RayBoost|			RootNode	// make these not ?!
 	|&RayTraceNode|		EndNodes
 	|?&RayTraceCell|	Cells
 	|?&RayTraceNode|	StartNodes
@@ -102,7 +103,7 @@ class RayTracer
 		pxl <~ C
 	
 	
-	helper GetColor (|vec2| XY, |raytracecell| Cell, |vec4|)
+	helper GetColor (|vec2| XY, |RayTraceCell| Cell, |vec4|)
 		// * Need allow alpha for drawing over prev images... Alpha then need rework
 		opt min 3, opt norefcounts
 		|| sp = cell.Node!.draw!
@@ -111,18 +112,17 @@ class RayTracer
 		|vobject| Best
 
 		while
-			|| tx = (sp.Shape)(sp, self, nil)
-			if (tx > 0) and (!best or tx < best._rayDist)
+			|| t = (sp.Shape)(sp, self)
+			if (t.x > 0) and (!best or t.x < ._rayDist.x)
 				Best = sp
-				best._RayDist = tx
+				._RayDist = t
 			sp = sp._CellNext #loop
 		
 		if best
-			// i think what it wants is two functions...
-			// its not that terrible.
-			|| rd = best._RayDist
-			rz = vec4(.Camera + ._CamDir*rd, rd)
-			(best.Shape)(best, self, rz)
+			// I think what it wants is two functions... Its not that terrible.
+			|| rd = ._RayDist.x
+			|| P = .Camera + ._CamDir*rd
+			rz = (best.Coloriser)(best, P, ._raydist)
 			rz.a = Best.shapeID|float|*255th
 	
 	
@@ -254,7 +254,7 @@ class RayTracer
 			rz.cellswide = (s2.x2+((px)~bits)) >> px
 			rz.cellshigh = (s2.y2+((px)~bits)) >> px
 			
-			|| Last = rz.InitialCreation(rz+1, s2.x2.log2p-1, px)
+			|| Last = rz.InitialCreation(rz+1, s2.x2.Log2p-1, px)
 			._StillGood = 0
 			.cells = last|&Raytracecell|
 			.StartNodes = (.cells+rz.area+1)|&RayTraceNode| // +1 for fakecell
