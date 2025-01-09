@@ -480,7 +480,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 			exit								// Stop SCFunction.Byte looking up Main.Byte...
 		
 		if o isa SCDecl
-			if o.Hiderfunc.Hidermatch(paramsarray.HasSide) and (owning_cls != curr)
+			if  ((owning_cls != curr) or exp.isfuncdot) and  o.Hiderfunc.Hidermatch(paramsarray.HasSide) 
 				o = o.hiderfunc|scdecl|
 			  else
 				if o.Type.FuncProto
@@ -746,6 +746,12 @@ function SetExportName (|String| s, |bool| Explicit)
 
 function NeedsExport (|bool|)
 	Return  (.MyReacher)
+
+
+function message.IsFuncDot (|bool|)
+	opt norefcounts
+	|| l = .last
+	return l and (l.func == @prm)
 
 
 function message.InsideFunc (|SCFunction|) //owningfunc, infunc

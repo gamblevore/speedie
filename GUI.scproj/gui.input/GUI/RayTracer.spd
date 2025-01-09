@@ -21,6 +21,7 @@
 
 class RayTracer
 	visible false
+	linkage:cpp_part Ray
 	|float|				MaxViewDistSq
 	//
 	|vec4|				Size
@@ -61,10 +62,10 @@ class RayTracer
 	constructor (|vec3| Camera, |int| Buff, |&rayboost| root)
 		// Default RayTracer constructor should use the block positioning system
 		// either by zpos or zoom
-		.MaxViewDistSq = 1000.0.pow2
-		.Camera = Camera
+		.Camera() = Camera
 		.RootNode = root
 		.EndNodes = (root|&byte| + Buff)|&RayTraceNode|
+		.MaxViewDistSq = 1000.0.pow2
 	
 
 	setter Camera (|vec3|)
