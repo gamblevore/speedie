@@ -3442,7 +3442,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[216]);
-	JB_FS_AppendInt32(_fsf0, (2025010800));
+	JB_FS_AppendInt32(_fsf0, (2025010915));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8865,7 +8865,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1682]);
-	JB_FS_AppendInt32(_fsf0, (2025010800));
+	JB_FS_AppendInt32(_fsf0, (2025010915));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -38462,6 +38462,11 @@ bool SC_Msg_IsFirstOfSetRel(Message* Self) {
 	return JB_Tree_IsFirst(Self) and SC_Msg_IsSetRel(((Message*)JB_Ring_Parent(Self)));
 }
 
+bool SC_Msg_IsFuncDot(Message* Self) {
+	Message* L = ((Message*)JB_Ring_Last(Self));
+	return L and (L->Func == kJB_SyxPrm);
+}
+
 Message* SC_Msg_IsInDeclInBlock(Message* Self) {
 	iif ((JB_Msg_EqualsSyx(Self, kJB_SyxRel, false))) {
 		Message* P = SC_Msg_NiceParent(Self);
@@ -47011,7 +47016,7 @@ SCObject* SC_Base_LookUpSub(SCNode* Self, JB_String* OrigName, Message* Exp, SCN
 				break;
 			}
 			iif (JB_Object_FastIsa(O, &SCDeclData)) {
-				iif (SC_Func_HiderMatch(((SCDecl*)O)->HiderFunc, ParamsArray->HasSide) and (Owning_cls != Curr)) {
+				iif (((Owning_cls != Curr) or SC_Msg_IsFuncDot(Exp)) and SC_Func_HiderMatch(((SCDecl*)O)->HiderFunc, ParamsArray->HasSide)) {
 					JB_SetRef(O, ((SCDecl*)((SCDecl*)O)->HiderFunc));
 				}
 				 else {
@@ -47886,7 +47891,7 @@ SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, SpdProcess_Th
 	Self->DiedCount = 0;
 	Self->AlreadyWarnedDied = false;
 	Self->DeathLimit = 12;
-	JB_Incr2(Self->_DebugName, JB_Str_CastZero(Path));
+	JB_Incr2(Self->DebugName, JB_Str_CastZero(Path));
 	Self->WeAreParent = ((!JB_Str_Equals(Path, JB_LUB[0], false)) or (Fn != nil));
 	JB_Incr2(Self->Args, Params);
 	Self->SubProcess = Fn;
@@ -47900,7 +47905,7 @@ SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, SpdProcess_Th
 
 void JB_Proc_Destructor(SpdProcess* Self) {
 	PicoDestroy((&Self->Pico), JB_Str_SyntaxCast(JB_LUB[143]));
-	JB_Clear(Self->_DebugName);
+	JB_Clear(Self->DebugName);
 	JB_Clear(Self->Writer);
 	JB_Sh_Destructor(Self);
 }
@@ -58499,4 +58504,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -2166820518913828865 -9048580751000996527
+// 461760998126371454 -9048580751000996527

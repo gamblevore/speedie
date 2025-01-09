@@ -1245,7 +1245,7 @@ struct SpdProcess_Behaviour: Process_Behaviour {
 };
 
 JBClass ( SpdProcess , ShellStream , 
-	JB_StringC* _DebugName;
+	JB_StringC* DebugName;
 	PicoComms* Pico;
 	FastString* Writer;
 	SpdProcess_ThreadAsProcess SubProcess;
@@ -9117,6 +9117,8 @@ bool SC_Msg_IsBehaviour(Message* Self);
 bool SC_Msg_IsClassType(Message* Self);
 
 bool SC_Msg_IsFirstOfSetRel(Message* Self);
+
+bool SC_Msg_IsFuncDot(Message* Self);
 
 Message* SC_Msg_IsInDeclInBlock(Message* Self);
 
