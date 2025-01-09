@@ -82,15 +82,15 @@ datatype Date (int64)
 		if self != 0
 			return self < date.now
 	
-	function DayOfWeek (|int|)
-		return .Days mod 7
-	
 	function Days (|int64|)
 		return (.wholeSeconds / date.kSecondsPerDay)
 	
 	function Minutes (|int64|) // needs 48 bits!
 		return .wholeSeconds / 60
 
+	function DayOfWeekApprox (|int|)
+		return .Days mod 7
+	
 	function MonthsApprox (|int64|)
 		return (.wholeSeconds / date.kSecondsPerMonthApprox)
 	
