@@ -16,6 +16,7 @@ class ListView (GUIControl) {
 	|bool|							CanSeeAllLines
 	|bool|							OneAlwaysSelected
 	|bool| 							_BlockedDuringUse
+	|bool|							_DuringSelect
 	|bool|							AlwaysSendChangeEvent
 	|bool|							NoSeps
 	|bool|							IsTree
@@ -266,6 +267,7 @@ class ListView (GUIControl) {
 
 	
 	function RemoveRow (|ListViewrow| r, |bool| update=true)
+		opt norefcounts
 		.CheckRemoved(r)
 		
 		|ListViewrow| willsel
@@ -274,7 +276,7 @@ class ListView (GUIControl) {
 		r|list|.remove
 		
 		if willsel
-			.ChangeSel(willsel,true)
+			.ChangeSel(willsel, true)
 			.SelectedEvent( willsel )
 
 		GUI.touch(self)
@@ -930,7 +932,7 @@ class ListView (GUIControl) {
 		if .onealwaysselected
 			|| it = .start
 				(it is selected)
-				self.SelectedEvent( it )
+				.SelectedEvent( it )
 				return it
 
 
@@ -1019,6 +1021,7 @@ class ListView (GUIControl) {
 		
 	function Select (|ListViewRow?| s, |ListViewSelectMode| Mode = ListViewSelectMode.Normal)
 		opt norefcounts
+		require !._DuringSelect
 		require s and s != .ListSource
 		require .owns(s)
 		
@@ -1040,15 +1043,18 @@ class ListView (GUIControl) {
 		.Select(r)
 
 	
-	function SelectedEvent (|ListViewRow| s, |ListViewSelectMode| Mode=ListViewSelectMode.normal)
+	helper SelectedEvent (|ListViewRow| s, |ListViewSelectMode| Mode=ListViewSelectMode.normal)
 		opt norefcounts
+		require !._DuringSelect
 		.ClearEdits
 		.SelJustChanged = true
 		if s and (Mode isnt noshow)
 			.Show(s)
 
 		if (mode isnt noevent) and !._BlockedDuringUse
+			._DuringSelect = true
 			(.onselected)(self, s, mode)?
+			._DuringSelect = false
 
 
 	function ScrollByRows (|int| Rows)
