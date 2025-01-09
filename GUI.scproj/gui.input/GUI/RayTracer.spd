@@ -175,7 +175,7 @@ class RayTracer
 			if .InPlanes(s)
 				.Quadditch(.rootnode, s)
 	
-	
+	 
 	function RayTrace (|image| where)
 		opt min 3
 		.ViewMat
@@ -208,9 +208,7 @@ class RayTracer
 			
 		
 	helper TraceCell (|&raytracecell| cell, |!&imagepixel| pxl)
-		// super-awesome system to reduce stack use (makes real difference!)
-		// it might seem like 6 vars is a lot, but it could easily be 14...
-		// if I didn't work miracles to reduce all this!
+		// making it look easy
 		opt min 3
 		cell.Link
 		|| P = cell.xy

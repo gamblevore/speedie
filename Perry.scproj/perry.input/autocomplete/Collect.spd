@@ -122,7 +122,7 @@ function PerryIDE.ActualCompile (|string| operation)
 	
 	require .filelist.SaveAll(documentstate.saving)
 	|| IsSCProj  =  .name ~= "Speedie.scproj"
-	|| args = [.project, "--nocolor", ]
+	|| args = [.project, "--nocolor"]
 	if .DebugIsWaitingForCompile
 		args <~ "--usescriptloc"
 	if !IsSCProj
@@ -139,10 +139,10 @@ function PerryIDE.ActualCompile (|string| operation)
 	(.Progress is visible)
 
 	is active
-	.ShowCompileTab(.speedietext)//, IsSCProj)
+	.ShowCompileTab(.speedietext)
 	.ViewAsCurr
 
 
 target debug
-	cpp_libwrapper Speedie_Main (spdprocess.AsThread)
+	cpp_libwrapper Speedie_Main (spdprocess.ThreadAsProcess)
 || SpdLibAlreadyInUse = false
