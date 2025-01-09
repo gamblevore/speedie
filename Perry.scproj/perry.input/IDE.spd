@@ -969,6 +969,8 @@ function PerryIDE.IDECommand (|bool|)
 		.editme.beep = s.ReplaceAll("\r\n", "\r").ReplaceAll("\r", "\n")
 	  elseif cmd ~= "cr_use"
 		.editme.beep = s.ReplaceAll("\n", "\r\n")
+	  elseif cmd ~= "ascii"
+		beep string.ASCII_Chart
 	  elseif cmd ~= "str" or "string"
 		|| s2 = s.parse
 		if s2 == @arg
@@ -977,11 +979,11 @@ function PerryIDE.IDECommand (|bool|)
 	  elseif cmd ~= "render" or "parse"
 		.editme.beep = s.parse.Render
 	  elseif cmd ~= "tetris"
-		tetriswin().runasmain(60)
+		tetriswin().RunAsMain(60)
 	  elseif cmd ~= "breakout"
-		Breakout().runasmain(60)
+		Breakout().RunAsMain(60)
 	  elseif cmd ~= "bubbles"
-		bubbles().runasmain(60)
+		bubbles().RunAsMain(60)
 	  else
 		beep "unrecognised: " + cmd
 

@@ -172,6 +172,7 @@ dataType Keys (int)
 		return self == x
 	
 	module
+		|bool|					Debug
 		|GUIKeyRecord[6]|		Record
 
 
@@ -219,7 +220,7 @@ dataType Keys (int)
 				rz.trip = a is newlyadded
 		
 		
-		function Date.Trip (assigns:|bool| B, |date|)
+		helper Date.Trip (assigns:|bool| B, |date|)
 			return (self &~ 1) ||| B
 		
 		
@@ -249,8 +250,9 @@ dataType Keys (int)
 		helper KeyLog (|keys| k, |string| s)
 			target __PROJECT_PERRY__
 				if k.IsCmd
-					.keylogsub(s + " cmd")
+					.KeyLogSub(s + " cmd")
 
+		
 		helper KeyLogSub (|string| s)
 			target __PROJECT_PERRY__
 				|| w = window.front
@@ -258,29 +260,51 @@ dataType Keys (int)
 					w.LogOneAction(nil, s)
 					
 			
-		helper AddKey (|keys| K)
-			target __PROJECT_PERRY__
-				.KeyLog(k, "AddKeyStart")
-					
+		helper AddKey (|keys| Key)
 			|| c = .count
-			require (!k.record and c < MaxKeyRecord)
-			|| r = .record[c]
-			r.key = k
-			r.date = GUI.FrameStart
-			r.state = GUIKeyRecordInfo.ToAdd + (k is escape)		// escape starts as "newly added"
-			target __PROJECT_PERRY__
-				.KeyLog(k, "AddKeyEnd")
+			if (!key.record and c < MaxKeyRecord)
+				target __PROJECT_PERRY__
+					.KeyLog(key, "AddKeyOK")
+				target __PROJECT_KEYTEST__
+					if .Debug and !key.IsModifier
+						.dbg "add " + key|byte|.Render
+	
+				|| r = .record[c]
+				r.key = key
+				r.date = GUI.FrameStart
+				r.state = GUIKeyRecordInfo.ToAdd + (key is escape)		// escape starts as "newly added"
+			  else
+				target __PROJECT_PERRY__
+					.KeyLog(k, "AddKeyFail")
+				target __PROJECT_KEYTEST__
+					if .Debug and !key.IsModifier
+						.dbg "addfail " + key|byte|.Render
 					
 			
-			
+		helper dbg (|string| s)
+			printline s // would be nice to put this in an on-screen log area
+//			Notifications <~ s
+		
 		helper RemoveKey (|keys| Key)
 			|| r = key.record
 				target __PROJECT_PERRY__
-					.KeyLog(k, "RemoveKeyOK")
-				r.State = guiKeyRecordInfo.ToRemove
+					.KeyLog(key, "RemoveKeyOK")
+				if r.State >= guiKeyRecordInfo.ToAdd
+					target __PROJECT_KEYTEST__
+						if .Debug and !key.IsModifier
+							.dbg "rem " + key|byte|.Render
+					r.State = guiKeyRecordInfo.ToRemove
+				  else
+					target __PROJECT_KEYTEST__
+						if .Debug and !key.IsModifier
+							.dbg "rem2 " + key|byte|.Render
+					
 			  else
 				target __PROJECT_PERRY__
-					.KeyLog(k, "RemoveKeyFail")
+					.KeyLog(key, "RemoveKeyFail")
+				target __PROJECT_KEYTEST__
+					if .Debug and !key.IsModifier
+						.dbg "remfail " + key|byte|.Render
 	
 		
 
@@ -294,7 +318,7 @@ dataType Keys (int)
 					if s == guikeyrecordinfo.ToRemove
 						m--
 						.record[i] = .record[m]
-						.record[m] = nil
+						.record[m] = nil // clear totally
 					  elseif s < guikeyrecordinfo.Stable
 						r.state = s + 1
 

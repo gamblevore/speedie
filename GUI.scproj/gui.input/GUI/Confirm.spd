@@ -51,14 +51,14 @@ function string.Ask (|string| response="",  |string| Title="",  |stringthatwasre
 
 
 function guicontrol.VisText (assigns:|string|s)
-	.textset(s)
+	.TextSet(s)
 	(self is visible) = s.Length > 0
 
 
 function ConfirmWindow_.Resize (|string| s)
-	|| desired = .question.TextSize(s) + (12, 34)
+	|| desired = .question.TextSize(s) + (19, 34)
 	|| actual = desired max (200, 100)
-	actual = actual min (350, 450)
+	actual = actual min (450, 550)
 	actual = actual min (GUI.Screensize.x2y2 - 8)
 	.size = actual.layout
 
@@ -76,7 +76,7 @@ helper window.TryCloseDialog (|bool|)
 			return true
 
 
-function ConfirmIt (|string| Q,  |string| Title,  |[string]| answers,  |string| Response=string.byte(0), |ConfirmCanceller| Cancel = nil, |int|)
+function ConfirmIt (|string| Q,  |string| Title,  |[string]| Answers,  |string| Response=string.byte(0), |ConfirmCanceller| Cancel = nil, |int|)
 	|| w = ConfirmWindow_._asker init ConfirmWindow_()
 	if !q or w is visible		// recursive... sigh
 		if answers[2]

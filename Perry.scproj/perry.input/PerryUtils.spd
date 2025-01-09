@@ -7,3 +7,40 @@ function string.IsProj (|bool|)
 
 function string.PathIsCode (|bool|)
 	return .isproj or .isSource
+
+
+function @string.ASCII_Chart (|int| StartAt=32, |string|)
+	|| fs = FastString()
+	|| remain = 128-StartAt
+	|| mul = remain/4
+	for y in mul
+		for x in 4
+			|| c = StartAt+y+x*mul
+			
+			fs.AppendIntegerAsText(c, 3)
+			fs <~ '\1E'
+			fs <~ "x"
+			fs.AppendHex(c, 2)
+			fs <~ '\1E'
+
+			|| l = 2
+			if c == '\t' 
+				fs <~ `TB`
+			  elseif c == '\n'
+				fs <~ `NL`
+			  elseif c == '\r'
+				fs <~ `CR`
+			  elseif c == ' '
+				fs <~ `SP`
+			  else
+				if c <= 32
+					c = '\1E'
+				fs <~ c|byte|
+				l = 1
+			if x < 3
+				fs <~ ('\1E', 7-l)
+				
+		fs <~ '\n'
+	return fs
+
+		
