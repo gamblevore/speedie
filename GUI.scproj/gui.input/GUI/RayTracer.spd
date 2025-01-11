@@ -1,10 +1,10 @@
 
 
 // todo whenever its fun?
-// * 4 threads, each can do one quad.
+// * 4 threads, each can do one cell.
 // * default RayTracer constructor uses block positioning system to match 2D/3D closely
 // * modelling system? or at least someway to construct better shapes.
-// * Alpha fix
+// * 64pixel oldbuffer! (For alpha)
 
 // Advancements: (do AFTER we have perry+speedie in an awesome state)
 // 1) Make SpaceTree work
@@ -47,6 +47,7 @@ class RayTracer
 	|?&RayTraceNode|	StartNodes
 	|?&RayTraceNode|	CurrNode
 	//
+	|imagepixel[64]|	BackBuffer
 	|?&pico[4]|			Workers //!!nice I guess we can send messages? or not?
 								// maybe easier to start/stop? or just spin on a value?
 								// we could reduce pico to "just a place to store a few data pointers"
@@ -101,6 +102,7 @@ class RayTracer
 		|| C = Orig
 		// we really need the original color... BEFORE we drew our stuff
 		// could it be stored? in a buffer? two rows? only 256 bytes, right?
+		// the raytracer can store it?
 		for i in 4
 			|| sh = (i&1, i>>1).Vec2 - 0.5
 			|| B = .getobj(xy + sh*0.8, cell)
@@ -232,6 +234,10 @@ class RayTracer
 		cell.Link
 		|| P = cell.xy
 		|| pxl3 = pxl - cell.stride*cell.h
+		for i in 32 // assumes that cell.w == 32 // sigh
+			.BackBuffer[i] = pxl[i]
+			.BackBuffer[i+32] = pxl[i-cell.stride]
+		
 		while pxl > pxl3
 			|| pxl2 = pxl + cell.w
 			while pxl < pxl2

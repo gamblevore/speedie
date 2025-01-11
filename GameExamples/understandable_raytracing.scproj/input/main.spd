@@ -1,10 +1,10 @@
 
-https://www.scratchapixel.com // simple raytracing demo... based on code from here
+https://www.scratchapixel.com // simple raytracing demo... based on code from scratchapixel
 
 
 main
 	gui.init(2)
-	return RayScene().RunAsMain
+	return RayScene().RunAsMain(60)
 
 
 struct RayHit

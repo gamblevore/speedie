@@ -85,6 +85,11 @@ datatype byte
 	function In (|uint| a, |uint| b, |bool|)
 		return  self >= a  and  self <= b
 	
+	iterator
+		|| i = 0
+		while i < self
+			yield i
+	
 	module
 		function ZAlloc (|int| n, |?&byte|)
 			description "Returns allocated memory, and zeros it. Creates an error() if fails."

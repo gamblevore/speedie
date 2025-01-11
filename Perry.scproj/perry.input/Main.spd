@@ -4,9 +4,6 @@ import "GameExamples/bubbles.spd"
 import "GameExamples/tetris.spd"
 
 main // main { 
-//	gui.init(3)
-//	return Bubbles().RunAsMain(60)
-
 	if app.Yes("crash")
 		app.Crash
 	GUI.Init
