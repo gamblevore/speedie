@@ -189,7 +189,9 @@ class Array (saveable)
 			--i
 
 
+// prototype SorterComparer (|...| a, |...| b, |int|) // should be possible for prototypes
 prototype SorterComparer (|object| a, |object| b, |int|)
+	contains Object
 	function sort (|array| a)
 		a.sort(self)
 	
