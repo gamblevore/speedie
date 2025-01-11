@@ -1,9 +1,0 @@
-import "GUI"
-
-conf
-    name	FastRayTracing
-    targets gui
-    prefs "fray"
-	version	1.0
-	creator	jeebox
-    
