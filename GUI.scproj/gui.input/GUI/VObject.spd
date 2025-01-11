@@ -25,7 +25,7 @@ class VObject (list)
 		// what about a more generalised material system?
 		// do we want every object to decide how it surface colors?
 		// maybe this should be a "task". So the material info can be stored...
-		
+
 	prototype DistanceFunction (|raytracer| Ray,  |vec2|)
 		// how to test two objects? or an object vs a block?
 		// seems it needs a different function?
@@ -114,6 +114,7 @@ class VObject (list)
 			if !rz
 				rz = ++.ShapeIDs
 
+		function Black (ShaderFunction)
 		function NormalColor (ShaderFunction)
 			|| Norm = (P - .pos).normal.abs		// spherical color
 			return (norm, 1.0) * .Color

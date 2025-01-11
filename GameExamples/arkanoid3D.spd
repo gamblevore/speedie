@@ -25,6 +25,7 @@ class Breakout (Window)
 
 	constructor
 		.t = RayTracer(vec3(10, 6.25, -20))!
+		.t.background = raytracer.Rainbows
 		.bar = vobject.box(nil, nil)
 		.fps = fpstextview(self)
 		.fps.MakeInline()
@@ -162,9 +163,11 @@ class Breakout (Window)
 		if bl > 20.0
 			.bar.pos.x -= (bl-20.0)
 
-	behaviour mousemove
+
+	behaviour MouseMove
 		.movebar(move.x|float|*0.02)
-		
+	
+	
 	behaviour FrameStep
 		if !.FrameCount
 			.StartDate = gui.FrameStart
@@ -202,14 +205,12 @@ class Breakout (Window)
 		gui.Touch
 	
 	
+	function RayTracer.Rainbows (raytracer.BackgroundShader)
+		return Colors.Rainbow(P.x, 1, 0.5)
+	
+	
 	behaviour Drawbackground
 		.fps.update
-		if Keys.shift
-			for x in .Width
-				|| Col = Colors.rainbow(x div .width, 1, 0.5)
-				where.DrawLineV((x,0), .height, col, 0)
-		else 
-			where.DrawRect(self, colors.black)
 		
 		for b in .Blocks
 			|| H = (1.0-b.health)*12th

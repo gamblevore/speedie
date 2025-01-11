@@ -4,7 +4,6 @@
 // * 4 threads, each can do one cell.
 // * default RayTracer constructor uses block positioning system to match 2D/3D closely
 // * modelling system? or at least someway to construct better shapes.
-// * 64pixel oldbuffer! (For alpha)
 
 // Advancements: (do AFTER we have perry+speedie in an awesome state)
 // 1) Make SpaceTree work
@@ -47,7 +46,8 @@ class RayTracer
 	|?&RayTraceNode|	StartNodes
 	|?&RayTraceNode|	CurrNode
 	//
-	|imagepixel[64]|	BackBuffer
+	|BackgroundShader|	Background
+
 	|?&pico[4]|			Workers //!!nice I guess we can send messages? or not?
 								// maybe easier to start/stop? or just spin on a value?
 								// we could reduce pico to "just a place to store a few data pointers"
@@ -67,10 +67,14 @@ class RayTracer
 		// either by zpos or zoom
 		.Camera() = Camera
 		.RootNode = root
+		.Background = Black
 		.EndNodes = (root|&byte| + Buff)|&RayTraceNode|
 		.MaxViewDistSq = 1000.0.pow2
 	
-
+	
+	prototype BackgroundShader (|vec2| P, |vec4|) 	// really this should just be a task...?
+	function Black (BackgroundShader)
+		
 	setter Camera (|vec3|)
 		Value = Value|vec4|.MakeSane|vec3|
 		if .Camera != value
@@ -94,21 +98,24 @@ class RayTracer
 			.Fwd = (0.0, 0.0, 1.0) * ._LookAt
 		return ._LookAt
 	
+
+	helper BG (|vec2| P, |vec4|)
+		return (.Background)(self, (P + .adjust) * .scale)
 	
 	helper AntiAlias (|vec2| XY, |RayTraceCell| cell, |&imagepixel| pxl)
 		opt min 3
 		|| ID = pxl.a
-		|| Orig = pxl.Color
-		|| C = Orig
+		|| C = (pxl.Color, .bg(XY))(ID)
 		// we really need the original color... BEFORE we drew our stuff
 		// could it be stored? in a buffer? two rows? only 256 bytes, right?
 		// the raytracer can store it?
 		for i in 4
 			|| sh = (i&1, i>>1).Vec2 - 0.5
-			|| B = .getobj(xy + sh*0.8, cell)
-				c += .GetColor(B)
-			  //else		// need the TRUE old color.
-				//C += Orig*0.5 // assume black for now.
+			|| XY2 = xy + sh*0.8
+			|| B = .getobj(XY2, cell)
+				C += .GetColor(B)
+			  else
+				C += .BG(XY2)
 		pxl <~ C*5th
 		pxl.a = ID
 	
@@ -117,7 +124,8 @@ class RayTracer
 		opt min 3, opt norefcounts
 		._CamDir = .Dir(xy)
 		.idir = -1.0 / ._CamDir
-		|| sp = cell.Node!.draw!
+		|| node = cell.node$
+		|| sp = node.draw!
 		._RayDist = vec2(float.max)
 		while
 			|| t = (sp.Shape)(sp, self)
@@ -205,8 +213,8 @@ class RayTracer
 		.adjust = .size.x2y2 * -0.5
 		.PlayQuidditch(where.width)
 		for C in self
-			if c.node
-				.TraceCell(C, where[c.xy.ivec2])
+			.TraceCell(C, where[c.xy.ivec2])
+	
 	
 	iterator
 		|| C = .Cells!
@@ -217,15 +225,14 @@ class RayTracer
 
 	helper raytracecell.Link
 		opt min 3, opt norefcounts
-		|| curr = .Node!
-		while
+		|| curr = .Node
+		while curr
 			|| obj = curr.Draw!
 			|| nxt = curr.Next
 				obj._CellNext = nxt.draw
-				curr = nxt
 			  else
 				obj._CellNext = nil
-				exit
+			curr = nxt
 			
 		
 	helper TraceCell (|&raytracecell| cell, |!&imagepixel| pxl)
@@ -234,20 +241,18 @@ class RayTracer
 		cell.Link
 		|| P = cell.xy
 		|| pxl3 = pxl - cell.stride*cell.h
-		for i in 32 // assumes that cell.w == 32 // sigh
-			.BackBuffer[i] = pxl[i]
-			.BackBuffer[i+32] = pxl[i-cell.stride]
 		
 		while pxl > pxl3
 			|| pxl2 = pxl + cell.w
 			while pxl < pxl2
 				#! Main pixel color
 				cell.Aliased = false
-				pxl.a = 0
 				|| b = .GetObj(p, cell)
 					pxl.FastMix(.GetColor(B))
 					pxl.a = B._ShapeID
-				
+				  else
+					pxl <~ .bg(P)
+					pxl.a = 0
 				|| LeftAA = pxl-1
 				if p.x and pxl.a != leftaa.a
 					.AntiAlias(p-(1.0,0), cell, leftAA)
