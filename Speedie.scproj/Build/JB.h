@@ -1519,18 +1519,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2153])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2154])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2154])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2155])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2155])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2156])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2152])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2153])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2155])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2156])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2156])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2157])
 
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
@@ -1761,7 +1761,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2161])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2162])
 
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
@@ -1799,7 +1799,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2157])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2158])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1837,7 +1837,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2162])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2163])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2072,12 +2072,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2160])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2161])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2159])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2160])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2158])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2159])
 
 #define kJB__byte_max ((byte)255)
 
@@ -3091,7 +3091,7 @@ extern bool SC__Cpp_WroteAny;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2151])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2152])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -5544,7 +5544,7 @@ Dictionary* JB_TC__Types();
 // Date
 JB_Duration JB_Date_Ago(Date Self);
 
-int JB_Date_DayOfWeek(Date Self);
+int JB_Date_DayOfWeekApprox(Date Self);
 
 int64 JB_Date_Days(Date Self);
 
@@ -10007,7 +10007,7 @@ DataTypeCode SC_Decl_RegType(SCDecl* Self);
 
 JB_String* SC_Decl_Render(SCDecl* Self, FastString* Fs_in);
 
-JB_String* SC_Decl_RenderTypeAndName(SCDecl* Self, int Minimal);
+JB_String* SC_Decl_RenderTypeAndName(SCDecl* Self, int Minimal, FastString* Fs_in);
 
 JB_String* SC_Decl_RenderTypeName(SCDecl* Self, FastString* Fs_in);
 
@@ -11625,7 +11625,7 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 			Message* __varf1 = F->Source;
 			MessagePosition _usingf0 = ((MessagePosition){});
 			JB_Msg_SyntaxUsing(__varf1, (&_usingf0));
-			JB_Tree_SyntaxAppend(Self, (JB_Syx_Msg(kJB_SyxThg, JB_LUB[475])));
+			JB_Tree_SyntaxAppend(Self, (JB_Syx_Msg(kJB_SyxThg, JB_LUB[478])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0), __varf1);
 			JB_MsgPos_Destructor((&_usingf0));
 		}
@@ -11638,7 +11638,7 @@ inline void SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info) {
 
 inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
 	iif ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc, false))) {
-		JB_Msg_Fail(Self, JB_LUB[815]);
+		JB_Msg_Fail(Self, JB_LUB[816]);
 	}
 }
 

@@ -2160,3 +2160,4 @@
 "LibGlobs.h"
 "\nstruct JB_Globals {\n\t"
 "Can't extend a class with a prototype. (in this version)"
+". Expected: "
