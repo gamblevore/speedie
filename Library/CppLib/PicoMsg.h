@@ -45,7 +45,8 @@ struct 			PicoConfig  {
   int				ReadFailCount;	/// How many times reading failed.
   int				QueueSize;		/// The allowed combined-size for unread messages. There is no hard limit. 8MB default.
   int				Bits;			/// The buffer-size in 1<<Bits. Set before calling `PicoStart...()`
-  PicoGlobalConfig*	Realm;
+  void*				UserInfo;
+  int64_t			UserFlags;
 };
 
 
@@ -338,10 +339,10 @@ struct PicoComms {
 		QueueTail = &QueueHead;
 		Conf.Noise = noise;
 		Conf.SendTimeOut = 10.0f;
-		Conf.Realm = &pico_global_conf;
 
 		int B = 31 - __builtin_clz(Size);
-		if (B < 10) B = 10;
+		if (B < 8) B = 8;
+		if (B > 26) B = 26;
 		B += (1<<B < Size);
 		Conf.Bits = B;
 		Conf.QueueSize = 1<<(B+3);
