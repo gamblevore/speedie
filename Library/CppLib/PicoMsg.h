@@ -339,7 +339,7 @@ struct PicoComms {
 		QueueTail = &QueueHead;
 		Conf.Noise = noise;
 		Conf.SendTimeOut = 10.0f;
-		Conf.UserData = nil;
+		Conf.UserData = nullptr;
 		Conf.UserFlags = 0;
 				
 		int B = 31 - __builtin_clz(Size);
