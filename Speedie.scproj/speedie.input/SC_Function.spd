@@ -148,7 +148,10 @@ render RenderParams (|bool| ForErrors=true)
 		if (a.source)
 			fs <~ sep
 			sep = ", "
-			fs <~ a.source
+			if a.Source contains "..."
+				a.RenderTypeAndName(1, fs)			
+			  else
+				fs <~ a.source
 	
 	if !ForErrors and .ReturnType
 		fs <~ sep
@@ -539,18 +542,28 @@ function DescribeParamFail (|SCParamArray| params, |int| bad)
 	require !params.MadeError
 	|| UsesSelf = params.isdot and params.IsNotModule
 	|| Num = bad - UsesSelf
+	|| fs = FastString()
 	|| P = params[bad-1]
-		|| str = ("Wrong self: ",  "Wrong param ($num): ")(UsesSelf and bad==1)
-		|| Type = TypeOfExpr(P, nil)
-			str += Type.RenderTypeName
-			str += " "
-			str += type.Name
+		if UsesSelf and bad==1
+			fs <~ "Wrong self: "
 		  else
-			str += "(Unknown Type)"
-		error ( P, str )
+			fs <~ "Wrong param ($num): "
+		|| Type = TypeOfExpr(P, nil)
+			Type.RenderTypeName(fs)
+			if type.name
+				fs <~ " "
+				fs <~ type.Name
+		  else
+			fs <~ "(Unknown Type)"
 	  else
-		error ( params.exp, "Missing param $num: ${.args[bad-1]}" )
-	problem ( .Source, "to " + .RenderTitle )
+		p = params.exp
+		fs <~ "Missing param $num"
+	fs <~ ". Expected: "
+	.args[bad-1].rendertypename(fs)
+	error ( P, fs )
+	fs <~ "to "
+	.RenderTitle(fs)
+	problem ( .Source, fs )
 
 
 function int.IsSimpleOrPointerCast (|bool|)

@@ -1,6 +1,13 @@
 
 
 class Task (list)
+	// size 128
+	// it's size is always 128. Perhaps a bad idea?
+	// i could try to make it a more normal class?
+	// the idea is to allow all sorts of subclasss
+	// without fragmenting the allocation.
+	// but 128 per task could also be a waste of space?
+	// also limits the maximum amount of stuff you can put in one.
 	linkage
 		visible
 		cpp_class JB_Task

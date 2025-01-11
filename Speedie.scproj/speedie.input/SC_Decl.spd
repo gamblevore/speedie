@@ -382,8 +382,8 @@ class SCDecl (SCNamed) {
 		return «decl, .WriteType(minimal) »
 	
 
-	function RenderTypeAndName (|int| minimal, |string|)
-		return .WriteDeclTypeAndName("", minimal).render
+	render RenderTypeAndName (|int| minimal)
+		.WriteDeclTypeAndName("", minimal).Render(fs)
 	
 	
 	function WriteDeclTypeAndName (|String| Name, |int| minimal, |Message|)
