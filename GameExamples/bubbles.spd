@@ -11,7 +11,7 @@ import "GUI"
 
 
 main
-	return Bubbles().RunAsMain(60)
+	return Bubbles().RunAsMain(2, 60)
 
 
 

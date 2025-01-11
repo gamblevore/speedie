@@ -780,8 +780,9 @@ module GUI
 			.StartDraw
 		if .DrawState & 2
 			|| remain = .EndDraw
-			if remain > 2
-				app.Sleep(remain)
+			// do we need to sleep if vsync is on?
+//			if remain > 2
+//				app.Sleep(remain)
 		return true
 
 

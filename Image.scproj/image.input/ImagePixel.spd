@@ -157,6 +157,11 @@ datatype ImagePixel (uint)
 	function Overlay (|&imagepixel| self, |vec4| T)
 		disabled "Call .Premul on this first for great speed boost!"
 
+
+	helper FastMix (|&imagepixel| self, |vec4| C)
+		if C.a < 0.996 
+			C = mix(.color, C, C.a) // maybe better to do this with shift math. IDK.
+		self <~ C 
 		
 	function Overlay (|&imagepixel| self, |PreMultipliedColor| T)
 		|| R = .raw

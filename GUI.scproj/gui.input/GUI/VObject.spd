@@ -7,27 +7,29 @@ class VObject (list)
 	|vec3|			Radius			// make it a vec4... for graphical aura size.
 	|vec3|			Velocity
 	|byte|			Nudge
-	|byte|			ShapeID
 	|vec4|			Color			// image pixel?
 	|float|			Health			// are ints better? I think so?
 	|DistanceFunction| Shape
-	|ColoriserFunction| Coloriser
+	|ShaderFunction| Material
 
 	visible false
+	// ray acceleration
+	|byte|			_ShapeID
+	|float|			_ObjDist
 	|?VObject--|	_CellNext
+	
 	visible true
 	
-	prototype ColoriserFunction (|vec3| P, |vec2| Distance,  |vec4|)
+	prototype ShaderFunction (|vec3| P, |vec2| Distance,  |vec4|)
 		// what about a magical color system too?
 		// what about a more generalised material system?
 		// do we want every object to decide how it surface colors?
+		// maybe this should be a "task". So the material info can be stored...
 		
 	prototype DistanceFunction (|raytracer| Ray,  |vec2|)
-		// For appearance and color
 		// how to test two objects? or an object vs a block?
 		// seems it needs a different function?
 		// what about sound+energy/magic uses? is that just objects bouncing around?
-
 		// what if instead of a raytracer, we just pass a shape?
 		// like that just happens to be a ray. Or another shape?
 	
@@ -36,10 +38,10 @@ class VObject (list)
 		.pos = (pos, 0.0)
 		.Shape = BoxShape
 		.Color = color
-		.Coloriser = NormalColor
+		.material = NormalColor
 		.Health = 256
 		.size = vec3(size,1.0)
-		.ShapeID = nextID()
+		._ShapeID = nextID()
 
 	constructor (|vec3| Pos,  |vec3| Rad, |DistanceFunction| shape, |vec4| Color=colors.white)
 		cpp_part ConstructorShape
@@ -47,9 +49,9 @@ class VObject (list)
 		.Shape = shape
 		.Radius = rad
 		.Color = color
-		.Coloriser = NormalColor
+		.material = NormalColor
 		.Health = 256
-		.ShapeID = NextID()
+		._ShapeID = NextID()
 	
 	function BigR (|float|)
 		return .radius.max
@@ -112,9 +114,23 @@ class VObject (list)
 			if !rz
 				rz = ++.ShapeIDs
 
-		function NormalColor (ColoriserFunction)
+		function NormalColor (ShaderFunction)
 			|| Norm = (P - .pos).normal.abs		// spherical color
 			return (norm, 1.0) * .Color
+
+		function IceFudgeColor (ShaderFunction)
+			|| Norm = (P - .pos).normal
+			|| y = Norm.y.acos
+			|| x = Norm.z.abs.atan2(Norm.x)
+			|| str = 8.0
+			|| spd = 30s
+			|| grid = ((((x+y + gui.Cycle(spd))*str).fract - 0.5)*str).clamp*0.125 + 0.875
+			return (grid, grid, grid, 1.0)*.Color
+			
+		function WierdShape (DistanceFunction)
+			|| S = SphereShape(self, ray)
+			if S.x > 0
+			|| B = BoxShape(self, ray)
 			
 		function SphereShape (DistanceFunction)
 			opt min 3
@@ -122,8 +138,11 @@ class VObject (list)
 			|| t = L • Ray._CamDir
 			if t > 0
 				|| r = .Radius.x
-				|| h = ((r*r) + (t*t) - (L • L) ).Sqrt
-				return (t-h, t+h) // what about tca + h? or returning (tca,h)?
+				|| h = (r*r) + (t*t) - (L • L)
+				if h > 0
+					h = h.Sqrt
+					return (t-h, t+h)
+			return vec2(float.max)
 		
 		function BoxShape (DistanceFunction)
 			opt min 3
@@ -139,6 +158,7 @@ class VObject (list)
 			
 			if t2 >= t1
 				return (t1, t2)
+			return vec2(float.max)
 
 		function Box (|vec3| Pos, |vec3| Radius, |vec4| Color=colors.white, |vobject|)
 			return VObject(pos, radius, BoxShape, color)

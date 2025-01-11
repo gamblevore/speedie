@@ -262,13 +262,23 @@ class Image (memory)
 			px.a = mark
 
 	function MarkLineH  (|ivec2| P, |int| Width, |int| Mark)
-		.DrawLineH(P, width, nil, mark)
+		|| R = .clip(P.xyxy + (0,0,width,0))
+		|| sigh = self[R.xy]
+		for r.width
+			(sigh++).a = Mark
 
-	function MarkLineV (|ivec2| xy, |int| Height, |int| Mark)
-		.DrawLineV(xy, height, nil, mark)
+	function MarkLineV (|ivec2| P, |int| Height, |int| Mark)
+		|| iw = .width
+		|| R = .clip(P.xyxy + (0,0,0,height))
+		|| sigh	= self[R.xy]
+		|| px = .pixels
+		for r.height
+			sigh.a = Mark
+			sigh -= iw
+			require sigh >= px
 		
-	function DrawLineH  (|ivec2| P, |int| Width,  |imagepixel| Col, |int| Mark=-1)
-		require col.a or mark >= 0
+	function DrawLineH  (|ivec2| P, |int| Width,  |imagepixel| Col, |int| alpha=-1)
+		require col.a
 
 		|| R = .clip(P.xyxy + (0,0,width,0))
 		|| sigh = self[R.xy]
@@ -276,17 +286,17 @@ class Image (memory)
 		|| n = r.width
 		
 		for n
-			if mark >= 0
-				sigh.a = Mark
-			  elseif col.a == 255
+			if col.a == 255
 				sigh[0] = Col
 			  else
 				sigh.Overlay(ColV)
+			if alpha >= 0
+				sigh.a = alpha
 			sigh++
 				
 	
-	function DrawLineV (|ivec2| P, |int| Height, |imagepixel| Col, |int| Mark=-1)
-		require col.a or mark >= 0
+	function DrawLineV (|ivec2| P, |int| Height, |imagepixel| Col, |int| alpha=-1)
+		require col.a
 		|| iw	= .width
 		|| ColV = col.PreMul
 		|| R = .clip(P.xyxy + (0,0,0,height))
@@ -294,12 +304,12 @@ class Image (memory)
 		|| px = .pixels
 		|| n = r.height
 		for n
-			if mark >= 0
-				sigh.a = Mark
-			  elseif col.a == 255
+			if col.a == 255
 				sigh[0] = Col
 			  else
 				sigh.Overlay(ColV)
+			if alpha >= 0
+				sigh.a = alpha
 			sigh -= iw
 			require sigh >= px
 	

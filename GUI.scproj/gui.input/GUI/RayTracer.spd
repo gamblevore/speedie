@@ -3,18 +3,20 @@
 // todo whenever its fun?
 // * 4 threads, each can do one quad.
 // * default RayTracer constructor uses block positioning system to match 2D/3D closely
+// * modelling system? or at least someway to construct better shapes.
+// * Alpha fix
 
-// advancements: (do AFTER we have perry+speedie in an awesome state)
+// Advancements: (do AFTER we have perry+speedie in an awesome state)
 // 1) Make SpaceTree work
 // 2) Optimisations around unmoving objects
-// 3) hit-detection? (surely its just chunk vs chunk anyhow?)
+// 3) hit-detection
+	// * int positions within chunks
 // 4) more shapes:
 	// * box    / sloped voxels / blends with neighbours
 	// * pipe   / half-pipes    / bends
 	// * sphere / capsule       / blobs
 	// * SDFs
 	// (All shapes: Provide raydist for drawing, nearest point for hit-detection)
-
 	
 
 
@@ -54,7 +56,7 @@ class RayTracer
 	
 	
 	module
-		function New (|vec3| Camera, |int| Buff=4MB, |raytracer|)
+		function New (|vec3| Camera, |int| Buff=8MB, |raytracer|)
 			|| root = memory.zalloc(Buff)|&rayboost|
 				return RayTracer(camera, buff, root)
 
@@ -92,41 +94,44 @@ class RayTracer
 		return ._LookAt
 	
 	
-	helper AntiAlias (|vec2| XY, |raytracecell| cell, |&imagepixel| pxl)
+	helper AntiAlias (|vec2| XY, |RayTraceCell| cell, |&imagepixel| pxl)
 		opt min 3
 		|| ID = pxl.a
-		|| C = pxl.Color
+		|| Orig = pxl.Color
+		|| C = Orig
+		// we really need the original color... BEFORE we drew our stuff
+		// could it be stored? in a buffer? two rows? only 256 bytes, right?
 		for i in 4
 			|| sh = (i&1, i>>1).Vec2 - 0.5
-			c += .GetColor(XY + sh*0.8, cell)
-		C *= 5th
-		C.a = ID|float|*255th
-		pxl <~ C
+			|| B = .getobj(xy + sh*0.8, cell)
+				c += .GetColor(B)
+			  //else		// need the TRUE old color.
+				//C += Orig*0.5 // assume black for now.
+		pxl <~ C*5th
+		pxl.a = ID
 	
 	
-	helper GetColor (|vec2| XY, |RayTraceCell| Cell, |vec4|)
-		// * Need allow alpha for drawing over prev images... Alpha then need rework
+	helper GetObj (|vec2| XY, |RayTraceCell| Cell, |vobject|)
 		opt min 3, opt norefcounts
-		|| sp = cell.Node!.draw!
 		._CamDir = .Dir(xy)
 		.idir = -1.0 / ._CamDir
-		|vobject| Best
-
+		|| sp = cell.Node!.draw!
+		._RayDist = vec2(float.max)
 		while
 			|| t = (sp.Shape)(sp, self)
-			if (t.x > 0) and (!best or t.x < ._rayDist.x)
-				Best = sp
+			if t.x < ._rayDist.x
+				rz = sp
 				._RayDist = t
 			sp = sp._CellNext #loop
+	
+
+	helper GetColor (|vobject| B, |vec4|)
+		opt min 3
+		|| rd = ._RayDist.x
+		|| P = .Camera + ._CamDir*rd
+		return (B.material)(B, P, ._raydist)
 		
-		if best
-			// I think what it wants is two functions... Its not that terrible.
-			|| rd = ._RayDist.x
-			|| P = .Camera + ._CamDir*rd
-			rz = (best.Coloriser)(best, P, ._raydist)
-			rz.a = Best.shapeID|float|*255th
-	
-	
+		
 	helper Dir (|vec2| XY, |vec3|)
 		|| XY2 = (xy + .adjust) * .scale // -0.5 to +0.5
 		rz = (xy2, 1.0).Normal * ._LookAt
@@ -145,9 +150,7 @@ class RayTracer
 	
 	helper InPlanes (|VObject| b, |bool|)
 		opt min 3
-		|| ToObj = b.pos - .Camera
-		|| D = ToObj.LengthSq		// Should use the radius if a sphere, or at least be able to ask for "the nearest point" from the function.
-		if  (D > 0.25)  and  (D < .MaxViewDistSq)  and  (ToObj • .Fwd > 0)
+		if b._ObjDist
 			|| R = (b.radius, 0.0)
 			|| P = (b.pos,    1.0)
 			return .PlaneOK(r,p,0) and .PlaneOK(r,p,1) and .PlaneOK(r,p,2) and .PlaneOK(r,p,3)
@@ -169,11 +172,26 @@ class RayTracer
 			.rootnode.Divide(self)
 	
 	
+	helper FindCameraDist (|vobject| V)
+		|| ToObj = v.pos - .Camera // could subtract v's radius? do later
+		v._ObjDist = 0
+		|| D = ToObj.LengthSq
+		if  (D > 0.25)  and  (D < .MaxViewDistSq)
+			if ToObj • .Fwd > 0
+				v._ObjDist = D
+	
+	function @raytracer.DistanceSorter (sortercomparer)
+		return (b|&nil||vobject|._objdist < a|&nil||vobject|._objdist)|int|
+		
 	helper PlayQuidditch (|int| Stride)
 		opt norefcounts
-		.RemakeNodes(stride)				
+		.RemakeNodes(stride)
+		for s in .Shapes
+			.FindCameraDist(s)
+		.Shapes.Sort(DistanceSorter)
 		for s in .shapes
 			if .InPlanes(s)
+				// todo: if shape covers cell, mark cell as covered
 				.Quadditch(.rootnode, s)
 	
 	 
@@ -219,20 +237,21 @@ class RayTracer
 			while pxl < pxl2
 				#! Main pixel color
 				cell.Aliased = false
-				pxl <~ .GetColor(P, cell)
+				pxl.a = 0
+				|| b = .GetObj(p, cell)
+					pxl.FastMix(.GetColor(B))
+					pxl.a = B._ShapeID
 				
-				|| Left = pxl-1
-				if p.x and pxl.a != left.a
-					#! Anti-alias the left??
-					.AntiAlias(p-(1.0,0), cell, left)
+				|| LeftAA = pxl-1
+				if p.x and pxl.a != leftaa.a
+					.AntiAlias(p-(1.0,0), cell, leftAA)
 					.AntiAlias(p, cell, pxl)
 					cell.Aliased = true
 				
 				if p.y
-					#! Maybe below too??
-					|| below = pxl + cell.stride
-					if pxl.a != below.a
-						.AntiAlias(p-(0,1.0), cell, below)
+					|| belowAA = pxl + cell.stride
+					if pxl.a != belowAA.a
+						.AntiAlias(p-(0,1.0), cell, belowAA)
 						if !cell.Aliased
 							.AntiAlias(p, cell, pxl)
 				pxl++

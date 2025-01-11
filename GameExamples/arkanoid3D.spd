@@ -59,6 +59,7 @@ class Breakout (Window)
 			for x in 10.0
 				|| pos = (2.0+x*(16.0/9.0), 9.0+y*0.5) // 2 to 19, 9 to 11.5
 				|| block = vobject.box(pos.xy_,  br)
+				block.Material = &vobject.IceFudgeColor
 				block.Health = 1.0 + y
 				.Blocks <~ block
 	
@@ -203,7 +204,12 @@ class Breakout (Window)
 	
 	behaviour Drawbackground
 		.fps.update
-		where.DrawRect(self, colors.black)
+		if Keys.shift
+			for x in .Width
+				|| Col = Colors.rainbow(x div .width, 1, 0.5)
+				where.DrawLineV((x,0), .height, col, 0)
+		else 
+			where.DrawRect(self, colors.black)
 		
 		for b in .Blocks
 			|| H = (1.0-b.health)*12th
