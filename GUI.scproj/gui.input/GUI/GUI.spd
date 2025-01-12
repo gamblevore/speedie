@@ -12,7 +12,6 @@ module GUI
 
 	visible false
 	|SDL_Event|					Event
-	|SDL_KeyMod|				KeyMod
 	|[string]|					PendingAlerts
 	|array?|					DrawDrag = nil
 	|&SDL_Window|				ScreenWindow
@@ -80,8 +79,6 @@ module GUI
 	cpp_wrapper SDL_GetWindowPosition	(|&SDL_Window| w,  |&int| x, |&int| y)
 	cpp_wrapper SDL_GetWindowSize		(|&SDL_Window| w,  |&int| x, |&int| y)
 	cpp_wrapper SDL_SetWindowSize		(|&SDL_Window| window, |int| w, |int| h, |int|)
-	cpp_wrapper SDL_GetModState			(|SDL_KeyMod|)
-	cpp_wrapper SDL_SetModState			(|SDL_KeyMod| State) // can we use this to clear the cmd-key
 	cpp_wrapper SDL_SetRelativeMouseMode (|bool| Relative)
 	
 	cpp_wrapper SDL_ResetKeyboard		()
@@ -818,7 +815,6 @@ module GUI
 	
 	
 	helper HandleEvents (|SDLActivity|)
-		.CheckKeyMods
 		.StartResize
 		SpdProcess.CheckAllAlive
 		rz = .PreFrame
@@ -980,7 +976,7 @@ module GUI
 				return w.DoListViewNext(true)
 			if (key is semicolon)
 				return w.DoListViewNext(false)
-			if (key is d) and  keys.Control
+			if (key is d) and  keys.ctrl
 				|| ov = w.MouseIsOver
 					Notifications <~ ov.ContainedName
 				  else
@@ -1035,15 +1031,6 @@ module GUI
 				w.__AppForegroundChanged__(!back)
 		.touch
 		return SDLActivity.activity
-		
-
-	function CheckKeyMods
-		|| KM = .SDL_GetModState
-		// perhaps the cmdkey bug is an SDL bug
-		// if we get rid of key mods and just...
-		// use keys... this would work better?
-		// we already clear the keys on foreground change
-		.KeyMod = KM
 
 
 	helper EventWindow (|window--|)
@@ -1053,7 +1040,6 @@ module GUI
 	
 	helper CheckEvent (|&SDL_Event| ev, |int|)
 		visible
-		.CheckKeyMods
 		|| t = ev.type
 		 
 		if t is APP_DIDENTERFOREGROUND or APP_DIDENTERBACKGROUND
@@ -1317,7 +1303,7 @@ module GUI
 	
 	helper Window.MouseDownEvent (|int| bn,  |int| clicks,  |ivec2| xy, |bool|)
 		target osx
-			|| Ctrl = keys.control // only osx needs this
+			|| Ctrl = keys.ctrl // only osx needs this
 		  else
 			|| ctrl = false
 		|guicontrol--| clicked 

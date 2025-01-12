@@ -89,7 +89,7 @@ class TextView (GUIControl)
 	
 	behaviour MouseDown
 		.clickedpos = p.x // for selectin text
-		if (clicks == 1) and (keys.cmd or keys.control)
+		if (clicks == 1) and (keys.cmd or keys.ctrl)
 			.SendSpecialClick(p, !keys.PlatCmd)
 			return MouseDragging.handled
 		
@@ -590,7 +590,7 @@ class TextView (GUIControl)
 		if !page
 			page = (keys.Option)|int|
 			target osx
-				page |= (keys.Control)|int|
+				page |= (keys.ctrl)|int|
 			
 		|| x  = (.text.length, 0)(i > 0)
 		|| t  = ._TypingPlace

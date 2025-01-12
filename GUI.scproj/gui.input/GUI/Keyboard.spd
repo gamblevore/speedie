@@ -1,38 +1,4 @@
 
-// ForeGroundTime
-
-datatype SDL_KeyMod (int)
-	linkage
-		wrapper
-		cpp_class SDL_Keymod
-		cpp_part KM
-	
-	syntax access (|bool|)
-		return (self|uint|) & (GUI.keymod|uint|)
-
-	syntax is (|sdl_keymod| k, |bool|)
-		return (self & k) != 0
-		
-	constants
-		|SDL_KeyMod|
-		LSHIFT	= 0x0001
-		RSHIFT	= 0x0002
-		LCTRL	= 0x0040
-		RCTRL	= 0x0080
-		LALT	= 0x0100
-		RALT	= 0x0200
-		LGUI	= 0x0400
-		RGUI	= 0x0800
-		NUM		= 0x1000
-		CAPS	= 0x2000
-		MODE	= 0x4000
-
-		CTRL	= LCTRL	 + RCTRL
-		CMD		= LGUI	 + RGUI
-		Shift	= Lshift + Rshift
-		Option	= Lalt	 + Ralt
-
-
 
 dataType SDL_Scancode (int)
 	linkage
@@ -143,7 +109,7 @@ dataType Keys (int)
 		return (self is lgui or rgui or lctrl or rctrl or lalt or ralt or lshift or rshift)
 
 	function IsCancel (|bool|) 
-		return (self is cancel_key or escape or AC_BACK)
+		return (self is cancel_key or escape)
 
 	function IsDelete (|bool|)
 		return self is ForwardDELETE or DELETE or KP_DELETE
@@ -159,7 +125,7 @@ dataType Keys (int)
 	
 	function IsCmd (|bool|)
 		return self is lgui or rgui
-				
+
 	syntax access (|bool|)
 		|| i = .record
 		if i and i.date and i.state >= guikeyrecordinfo.newlyadded
@@ -178,7 +144,6 @@ dataType Keys (int)
 
 		function Clear
 			.KeyLogSub("Clear")
-			gui.keymod = 0
 			// .record = nil			// Could be allowed???? :O
 			for i in MaxKeyRecord
 				.record[i] = nil
@@ -322,40 +287,46 @@ dataType Keys (int)
 					  elseif s < guikeyrecordinfo.Stable
 						r.state = s + 1
 
+		helper FindTwo (|keys| A, |keys| B, |&guikeyrecord|)
+			for i in MaxKeyRecord
+				|| r = .Record[i]
+				if r.State >= GUIKeyRecordInfo.NewlyAdded
+					|| k = r.Key
+					if k == A or B
+						return r
+
+		function Ctrl (|bool|)
+			return .findtwo(lctrl, rctrl)
 
 		function Cmd (|bool|)
-			if SDL_KeyMod.ctrl[]
+			if .ctrl
 				return true
 			target osx
-				return SDL_KeyMod.cmd[]
+				return .gui
 			
 		function CmdAgo (|date| ago, |bool|)
-			require .cmd
 			if keys.LCTRL.HeldKey(ago) or keys.RCTRL.HeldKey(ago)
 				return true
 			target osx
 				return keys.LGUI.HeldKey(ago) or keys.RGUI.HeldKey(ago)
 
-		function RealCmd (|bool|)
-			return SDL_KeyMod.cmd[]
+		function GUI (|bool|)
+			return .findtwo(lgui, rgui)
 
 		function PlatCmd (|bool|yes=true,|bool|)
 			if platform.osx==yes
-				return SDL_KeyMod.cmd[]
+				return .gui
 			  else
-				return SDL_KeyMod.ctrl[]
-
-		function Control (|bool|)
-			return SDL_KeyMod.ctrl[]
+				return .ctrl
 
 		function Shift (|bool|) 
-			return SDL_KeyMod.shift[]		
+			return .findtwo(lshift, rshift)
 
 		function Cancel (|bool|) 
-			return (cancel_key[] or escape[] or AC_BACK[])
+			return .findtwo(cancel_key, escape) // ac_back too?
 
 		function Option (|bool|) 
-			return SDL_KeyMod.option[]		
+			return .findtwo(lalt, ralt)
 
 
 	constants
@@ -844,6 +815,7 @@ datatype GUIKeyRecordInfo (byte)
 		ToAdd		= 2
 		NewlyAdded	= 3
 		Stable		= 4
+
 
 struct GUIKeyRecord
 	|date| Date
