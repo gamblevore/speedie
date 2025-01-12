@@ -13,7 +13,7 @@ extend_module app
 	function Beep (|string?| q="")
 		if beep.OK.fired
 			.BeepSub
-			beep.OK = gui.FrameStart + (1s/12)
+			beep.OK = date.now + (1s/12) // really must be date.now, NOT framestart!
 		if q
 			.alert(q)
 	
