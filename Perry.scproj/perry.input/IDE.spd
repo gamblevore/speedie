@@ -517,9 +517,13 @@ class PerryIDE (Window)
 				return .editme.OpenSearch
 			return .ShowFind
 		if key is k
-			|| t = .outtext
-			if t and !super.keydown(key)
+			if super.KeyDown(key)
+				return true
+			|| t = .outtext 
+			if t and t.text
 				t.text = ""
+				return true
+			LogAreaKeys(.CommsLogList, key)
 			return true
 		if key is e
 			return .SaveAndShowErrors
