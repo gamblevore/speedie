@@ -215,6 +215,8 @@ class Breakout (Window)
 		for b in .Blocks
 			|| H = (1.0-b.health)*12th
 			b.Color = colors.wheel(H, 0.8, 0.5)
+			b.Color += (0.25-b.Color.lum)*0.5
+			b.Color.a = 1.0
 		.t.Shapes.Clear
 		.t.Shapes.append(.Blocks)
 		.t.Shapes <~ .bar
