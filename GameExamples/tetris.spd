@@ -433,6 +433,7 @@ class Tetris (GridSection)
 		C = colors.wheel(Hu, SA, br, 1.0)
 		where.DrawOutlineOnly(R, C)
 	
+	
 	function DrawRow (|image| where, |int| y, |float| h)
 		|| row = .at(y*16)
 		|| f = y >= (.Height-4)

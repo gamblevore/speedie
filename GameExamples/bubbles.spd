@@ -8,6 +8,8 @@ import "GUI"
 	// a snake-game with a funny walking/dancing snake that bites orbs
 	// that fruit-merging game?
 	// clouds dropping rain or fire or somthing and you have to burn people? (or tanks)
+		// hard code the car!
+	// 3D tetris? (and keep the 2D mode! allow switch)
 
 
 main

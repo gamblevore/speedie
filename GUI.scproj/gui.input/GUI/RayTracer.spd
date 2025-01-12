@@ -4,15 +4,17 @@
 // * 4 threads, each can do one cell.
 // * default RayTracer constructor uses block positioning system to match 2D/3D closely
 // * modelling system? or at least someway to construct better shapes.
-//     * a text + raytracer interface, text gets sliders for nums, mouse/keys for pos/rotation, color-slider, etc
-//     * composeable too. define subshapes in text.
-//     * How to do things like clouds? Only code can really specify it. Need speedie recompiles?
-	
+//		* a text + raytracer interface, text gets sliders for nums, mouse/keys for pos/rotation, color-slider, etc
+//		* Composeable too. define subshapes in text.
+//		* How to do things like clouds? Only code can really specify it. Need speedie recompiles?
+//		* I think a modeller should be as basic as a text-editor. Ubiquitous.
+// * anti-aliasing preserve average luminosity (gamma correction?)
+
+
 // Advancements: (do AFTER we have perry+speedie in an awesome state)
 // 1) Make SpaceTree work
 // 2) Optimisations around unmoving objects
-// 3) hit-detection
-	// * int positions within chunks
+// 3) hit-detection (float pos becomes chunk relative)
 // 4) more shapes:
 	// * box    / sloped voxels / blends with neighbours
 	// * pipe   / half-pipes    / bends
@@ -225,17 +227,6 @@ class RayTracer
 		while C < C2
 			yield C
 			C++
-
-	helper raytracecell.Link
-		opt min 3, opt norefcounts
-		|| curr = .Node
-		while curr
-			|| obj = curr.Draw!
-			|| nxt = curr.Next
-				obj._CellNext = nxt.draw
-			  else
-				obj._CellNext = nil
-			curr = nxt
 			
 		
 	helper TraceCell (|&raytracecell| cell, |!&imagepixel| pxl)
@@ -438,13 +429,18 @@ struct RayTraceCell
 	|byte|						H
 	|byte|						W
 	|bool|						Aliased
-	
-//	function Count (|int|)
-//		|| w = .node
-//		while w
-//			rz++
-//			w = w.next
 
+	helper Link
+		opt min 3, opt norefcounts
+		|| curr = .Node
+		while curr
+			|| obj = curr.Draw$
+			|| nxt = curr.Next
+				obj._CellNext = nxt.draw
+			  else
+				obj._CellNext = nil
+			curr = nxt
+	
  
 function Vec4.BoxVsPlane (|vec4| R, |vec4| Pos, |float|)
 	description "Pos.w must be 1.0,  r.w must be 0.0"
