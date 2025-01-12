@@ -56,7 +56,18 @@ dataType Keys (int)
 				if g.key == self
 					return g
 
-
+	function Name (|string|)
+		if .IsShift
+			return "shift"
+		if .IsCmd
+			return "cmd"
+		if .IsCtrl
+			return "ctrl"
+		if .IsOption
+			return "opt"
+		if self < 128
+			return self|byte|.Render
+	
 	function Eat 
 		|| r = .record
 			r.date = 0
@@ -126,13 +137,16 @@ dataType Keys (int)
 	function IsCmd (|bool|)
 		return self is lgui or rgui
 
+	function IsCtrl (|bool|)
+		return self is LCTRL or RCTRL
+
 	syntax access (|bool|)
 		|| i = .record
 		if i and i.date and i.state >= guikeyrecordinfo.newlyadded
 			return true
 
 	syntax cast (|bool|)
-		disabled "use []"
+		disabled "Use [] to test keydown. Use != 0 to test key is real"
 
 	syntax is (|keys| x, |bool|)
 		return self == x
@@ -143,10 +157,10 @@ dataType Keys (int)
 
 
 		function Clear
-			.KeyLogSub("Clear")
+			// .KeyLogSub("Clear")
 			// .record = nil			// Could be allowed???? :O
 			for i in MaxKeyRecord
-				.record[i] = nil
+				.record[i].Clear
 		
 //		function Print
 //			for i in MaxKeyRecord
@@ -207,15 +221,13 @@ dataType Keys (int)
 		
 		
 		helper Count (|int|)
-			for v in MaxKeyRecord
-				|| b = keys.Record[v]
-				rz += b.Key!=0
+			disabled "Keys can be disparate"
 
 		
 		helper KeyLog (|keys| k, |string| s)
 			target __PROJECT_PERRY__
-				if k.IsCmd
-					.KeyLogSub(s + " cmd")
+				if k.ismodifier or Debug
+					.KeyLogSub(s + " " + k.name)
 
 		
 		helper KeyLogSub (|string| s)
@@ -224,79 +236,75 @@ dataType Keys (int)
 				if w isa perryide
 					w.LogOneAction(nil, s)
 					
-			
+
+		helper EmptySlot (|keys| Key, |&guikeyrecord|)
+			require key!=0
+			for i in MaxKeyRecord
+				|| r = .Record[i]
+				if r.key == 0
+					rz = r
+				require r.key != key
+
+
 		helper AddKey (|keys| Key)
-			|| c = .count
-			if (!key.record and c < MaxKeyRecord)
+			|| r = .emptyslot(key)
+			if !r
 				target __PROJECT_PERRY__
-					.KeyLog(key, "AddKeyOK")
-				target __PROJECT_KEYTEST__
-					if .Debug and !key.IsModifier
-						.dbg "add " + key|byte|.Render
-	
-				|| r = .record[c]
-				r.key = key
-				r.date = GUI.FrameStart
-				r.state = GUIKeyRecordInfo.ToAdd + (key is escape)		// escape starts as "newly added"
-			  else
-				target __PROJECT_PERRY__
-					.KeyLog(k, "AddKeyFail")
-				target __PROJECT_KEYTEST__
-					if .Debug and !key.IsModifier
-						.dbg "addfail " + key|byte|.Render
+					.KeyLog(k, "AddFail")
+				return
+				
+			// we got a strange situation:
+			// we got an addkey. We seemed to add it ok (got in here)
+			// but the key did NOT get recognised as down... and we couldn't remove it. (RemFail)
+			// and no other logs inbetween... no foreground/background swaps, anything.
+			// this COULD be what is affecting bubbles with it's keys?
+			target __PROJECT_PERRY__
+				.KeyLog(key, "Add")
+			r.key = key
+			r.date = GUI.FrameStart
+			r.state = GUIKeyRecordInfo.ToAdd + (key is escape)		// escape starts as "newly added"
 					
 			
-		helper dbg (|string| s)
-			printline s // would be nice to put this in an on-screen log area
-//			Notifications <~ s
-		
 		helper RemoveKey (|keys| Key)
 			|| r = key.record
 				target __PROJECT_PERRY__
-					.KeyLog(key, "RemoveKeyOK")
-				if r.State >= guiKeyRecordInfo.ToAdd
-					target __PROJECT_KEYTEST__
-						if .Debug and !key.IsModifier
-							.dbg "rem " + key|byte|.Render
-					r.State = guiKeyRecordInfo.ToRemove
-				  else
-					target __PROJECT_KEYTEST__
-						if .Debug and !key.IsModifier
-							.dbg "rem2 " + key|byte|.Render
+					.KeyLog(key, "Rem")
+				r.State = guiKeyRecordInfo.ToRemove
 					
 			  else
 				target __PROJECT_PERRY__
-					.KeyLog(key, "RemoveKeyFail")
-				target __PROJECT_KEYTEST__
-					if .Debug and !key.IsModifier
-						.dbg "remfail " + key|byte|.Render
+					.KeyLog(key, "RemFail")
 	
 		
 
 		helper FlushKeys
 			|| m = MaxKeyRecord
 			target __PROJECT_PERRY__
-				.KeyLog(k, "FlushKeys")
+				.KeyLog(0, "FlushKeys")
+			// perhaps the bug is in here?
+			// seems so? if I HOLD right... then hold shift, then let go of right
+			// then while STILL HOLDING shift... i tap right... it seems
+			// that the shift has been deleted! this seems the only place?
+			// that could do it?
 			for i in m
 				|| r = .record[i]
 				|| s = r.state
 					if s == guikeyrecordinfo.ToRemove
-						m--
-						.record[i] = .record[m]
-						.record[m] = nil // clear totally
+						r.clear
 					  elseif s < guikeyrecordinfo.Stable
 						r.state = s + 1
 
-		helper FindTwo (|keys| A, |keys| B, |&guikeyrecord|)
+
+		helper FindTwoModifiers (|keys| A, |keys| B, |&guikeyrecord|)
 			for i in MaxKeyRecord
 				|| r = .Record[i]
-				if r.State >= GUIKeyRecordInfo.NewlyAdded
+				if r.State >= GUIKeyRecordInfo.ToAdd //
 					|| k = r.Key
 					if k == A or B
 						return r
 
 		function Ctrl (|bool|)
-			return .findtwo(lctrl, rctrl)
+			return .FindTwoModifiers(lctrl, rctrl)
 
 		function Cmd (|bool|)
 			if .ctrl
@@ -311,7 +319,7 @@ dataType Keys (int)
 				return keys.LGUI.HeldKey(ago) or keys.RGUI.HeldKey(ago)
 
 		function GUI (|bool|)
-			return .findtwo(lgui, rgui)
+			return .FindTwoModifiers(lgui, rgui)
 
 		function PlatCmd (|bool|yes=true,|bool|)
 			if platform.osx==yes
@@ -320,13 +328,13 @@ dataType Keys (int)
 				return .ctrl
 
 		function Shift (|bool|) 
-			return .findtwo(lshift, rshift)
+			return .FindTwoModifiers(lshift, rshift)
 
 		function Cancel (|bool|) 
-			return .findtwo(cancel_key, escape) // ac_back too?
+			return .FindTwoModifiers(cancel_key, escape) // ac_back too?
 
 		function Option (|bool|) 
-			return .findtwo(lalt, ralt)
+			return .FindTwoModifiers(lalt, ralt)
 
 
 	constants
@@ -806,7 +814,6 @@ dataType Keys (int)
 
 
 
-
 datatype GUIKeyRecordInfo (byte)
 	constants
 		|GUIKeyRecordInfo|  
@@ -822,6 +829,11 @@ struct GUIKeyRecord
 	|keys| Key
 	|GUIKeyRecordInfo| State
 
+	function Clear
+		.date = nil
+		.key = nil
+		.state = nil
+	
 	syntax is (|GUIKeyRecordInfo| V, |bool|)
 		return .state == v
 

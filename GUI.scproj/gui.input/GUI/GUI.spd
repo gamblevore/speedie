@@ -1016,13 +1016,7 @@ module GUI
 		  else
 			.ForeGroundTime = gui.FrameStart
 
-		beep.OK = 1
-		target __PROJECT_PERRY__
-			if back
-				keys.KeyLogSub("(IsBackGround)")
-			  else
-				keys.KeyLogSub("(IsForeGround)")
-		
+		beep.OK = 1		
 		gui.sdl_Resetkeyboard
 		keys.Clear
 		.FlashSelector = false
