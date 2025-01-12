@@ -4,7 +4,10 @@
 // * 4 threads, each can do one cell.
 // * default RayTracer constructor uses block positioning system to match 2D/3D closely
 // * modelling system? or at least someway to construct better shapes.
-
+//     * a text + raytracer interface, text gets sliders for nums, mouse/keys for pos/rotation, color-slider, etc
+//     * composeable too. define subshapes in text.
+//     * How to do things like clouds? Only code can really specify it. Need speedie recompiles?
+	
 // Advancements: (do AFTER we have perry+speedie in an awesome state)
 // 1) Make SpaceTree work
 // 2) Optimisations around unmoving objects
