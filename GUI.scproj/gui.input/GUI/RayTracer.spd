@@ -4,10 +4,7 @@
 // * 4 threads, each can do one cell.
 // * default RayTracer constructor uses block positioning system to match 2D/3D closely
 // * modelling system? or at least someway to construct better shapes.
-//		* a text + raytracer interface, text gets sliders for nums, mouse/keys for pos/rotation, color-slider, etc
-//		* Composeable too. define subshapes in text.
-//		* How to do things like clouds? Only code can really specify it. Need speedie recompiles?
-//		* I think a modeller should be as basic as a text-editor. Ubiquitous.
+// * Schlick's approximiation for materials? just hard-code a light somewhere
 // * anti-aliasing preserve average luminosity (gamma correction?)
 
 
