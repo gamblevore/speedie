@@ -1,0 +1,20 @@
+jmodel
+
+// example shape test file
+// Use unified syntax:  a.x(b) == a x b = x(a,b)
+// would be nice to have a plane-like shape thats a big sphere, for tron-like wheels
+// hopefully this will be easy to execute once preprocessed
+// or turn into good code? or both? Ideally we can live-edit this.
+
+body = block(2, 1, 1, 0.5) at (0,0,1)	// a block rounded by 0.5
+sphere = sphere(1) at (0,0,0)			// a sphere at 0,0,0
+pl = plane(0,0,1) at sphere				// a plane at sphere's position
+pl = dupe(pl, 0.25z)					// two planes. One will be reflected
+wheel = pl and wheel					// clip sphere into wheel
+
+body.mat = steel
+wheel.mat = rubber
+
+wheels = dupe(sphere, 1x, 0.5z)			// duplicate into 4 objects by these distances
+
+return wheels or body
