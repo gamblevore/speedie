@@ -359,6 +359,8 @@ struct TerminalCell_Behaviour;
 
 struct TokenHandler_Behaviour;
 
+struct aaaa_Behaviour;
+
 struct autoitem_Behaviour;
 
 struct xC2xB5Form_Behaviour;
@@ -465,6 +467,8 @@ struct SyntaxObj;
 
 struct TerminalCell;
 
+struct aaaa;
+
 struct autoitem;
 
 struct xC2xB5Form;
@@ -553,7 +557,7 @@ typedef void (*FP_SaverLoadClass)(JB_Class* cls, int8* Data);
 
 typedef bool (*FP_ShellOption)(JB_String* Name, JB_String* Value, FastString* Purpose);
 
-typedef int (*FP_SorterComparer)(JB_Object* a, JB_Object* b);
+typedef int (*FP_SorterComparer)(JB_Object* A, JB_Object* B);
 
 typedef int (*FP_SorterComparerFn)(SCFunction* a, SCFunction* b);
 
@@ -1519,18 +1523,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2154])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2155])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2155])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2156])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2156])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2157])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2153])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2154])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2156])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2157])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2157])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2158])
 
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
@@ -1761,7 +1765,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2162])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2163])
 
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
@@ -1799,7 +1803,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2158])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2159])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1837,7 +1841,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2163])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2164])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2072,12 +2076,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2161])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2162])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2160])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2161])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2159])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2160])
 
 #define kJB__byte_max ((byte)255)
 
@@ -3091,7 +3095,7 @@ extern bool SC__Cpp_WroteAny;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2152])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2153])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -3362,7 +3366,7 @@ JB_File* SC_Comp__CanTryModes();
 
 void SC_Comp__CheckIsGoodLibrary();
 
-int SC_Comp__ClassSorter(JB_Object* A, JB_Object* B);
+int SC_Comp__ClassSorter(SCClass* A, SCClass* B);
 
 void SC_Comp__ClearEnvs();
 
@@ -3456,7 +3460,7 @@ Message* SC_Comp__MakeMainFunc();
 
 void SC_Comp__MiniTests();
 
-int SC_Comp__ModulesSorter(JB_Object* A, JB_Object* B);
+int SC_Comp__ModulesSorter(SCModule* A, SCModule* B);
 
 void SC_Comp__NewConst(SCDecl* D);
 
@@ -4552,11 +4556,11 @@ bool SC_SettingMemory(Message* Rel);
 
 bool SC_SettingSelfProperty(Message* Rel);
 
-int SC_SimplestFirst(JB_Object* A, JB_Object* B);
+int SC_SimplestFirst(SCDecl* A, SCDecl* B);
 
-int SC_SmallestAlignedFirst(JB_Object* A, JB_Object* B);
+int SC_SmallestAlignedFirst(SCDecl* A, SCDecl* B);
 
-int SC_SmallestFirst(JB_Object* A, JB_Object* B);
+int SC_SmallestFirst(SCDecl* A, SCDecl* B);
 
 Array* SC_SortInitOrder(Array* Mods);
 
@@ -7059,6 +7063,9 @@ int SC_Pac__Init_();
 // JB_TokenHandler_Behaviour
 
 
+// JB_aaaa_Behaviour
+
+
 // JB_autoitem_Behaviour
 
 
@@ -7294,8 +7301,6 @@ void SC_Cpp_WriteHeader(Cpp_Export* Self);
 
 JB_File* SC_Cpp__APIHeader();
 
-void SC_Cpp__C_FSListComma(Message* Self, FastStringCpp* Fs);
-
 bool SC_Cpp__C_OneParamType(FastStringCpp* Fs, Message* Curr, SCDecl* D);
 
 void SC_Cpp__C_ParamsRender(Message* Self, FastStringCpp* Fs);
@@ -7344,7 +7349,7 @@ void SC_Cpp__C_RenderTyp(Message* Self, FastStringCpp* Fs);
 
 void SC_Cpp__C_RenderUnt(Message* Self, FastStringCpp* Fs);
 
-JB_String* SC_Cpp__CDotType(Message* Msg, SCDecl* Type, FastStringCpp* Fs);
+JB_String* SC_Cpp__CDotType(Message* Msg, SCDecl* Type, FastStringCpp* Fs, bool DoIt);
 
 JB_String* SC_Cpp__CppLicence();
 
@@ -7748,7 +7753,7 @@ bool SC_Imp__IsInputName(JB_String* Name);
 
 void SC_Imp__NoProj();
 
-int SC_Imp__Sorter(JB_Object* A, JB_Object* B);
+int SC_Imp__Sorter(SCFile* A, SCFile* B);
 
 
 
@@ -8189,7 +8194,7 @@ bool JB_Str_Yes(JB_String* Self, Message* Where);
 
 JB_String* JB_Str__FromPico(PicoMessage* M);
 
-int JB_Str__Sorter(JB_Object* A, JB_Object* B);
+int JB_Str__Sorter(JB_String* A, JB_String* B);
 
 JB_StringC* JB_Str__Wrap(_cstring Addr);
 
@@ -8284,6 +8289,9 @@ void JB_TerminalCell_Destructor(TerminalCell* Self);
 
 
 // JB_TokenHandler
+
+
+// JB_aaaa
 
 
 // JB_autoitem
@@ -8716,11 +8724,15 @@ void SC_Msg_BecomeWithFunc(Message* Self, SCFunction* Func);
 
 void SC_Msg_BecomeAppend(Message* Self, JB_String* S);
 
+void JB_Msg_BecomeCopy(Message* Self, Message* Src);
+
 void JB_Msg_BecomeMacro(Message* Self, Macro* M, Array* Prms);
 
 void SC_Msg_BecomeNil(Message* Self);
 
 void SC_Msg_BecomeSetRel(Message* Self);
+
+void JB_Msg_BecomeSub(Message* Self, Message* Src);
 
 void SC_Msg_BecomeTarget(Message* Self);
 
@@ -8868,7 +8880,7 @@ void SC_Msg_CopyAllBefore(Message* Self, Message* Before, Message* Copylayer);
 
 void SC_Msg_CopyAllBeforeInto(Message* Self, Message* Into, Message* Copylayer);
 
-void SC_Msg_CopyAllInto(Message* Self, Message* J);
+void JB_Msg_CopyAllInto(Message* Self, Message* J);
 
 JB_String* JB_Msg_CopyID(Message* Self);
 
@@ -9711,7 +9723,7 @@ void JB_ID_Destructor(MessageID* Self);
 
 JB_String* JB_ID_Render(MessageID* Self, FastString* Fs_in);
 
-int JB_ID__ByID(JB_Object* A, JB_Object* B);
+int JB_ID__ByID(MessageID* A, MessageID* B);
 
 
 
@@ -10067,9 +10079,9 @@ Message* SC_Decl_WriteNilDecl(SCDecl* Self);
 
 Message* SC_Decl_WriteNilRel(SCDecl* Self);
 
-Message* SC_Decl_WriteSimpleType(SCDecl* Self);
+Message* SC_Decl_WriteSimpleType(SCDecl* Self, bool Optionals);
 
-Message* SC_Decl_WriteType(SCDecl* Self, int Minimal);
+Message* SC_Decl_WriteType(SCDecl* Self, int Minimal, bool Optionals);
 
 Message* SC_Decl_WriteTypeCast(SCDecl* Self, Message* Msg);
 
@@ -10228,7 +10240,7 @@ JB_String* SC_Base_ReachedName(SCNode* Self);
 
 bool SC_Base_RehomeExport(SCNode* Self);
 
-SCDecl* SC_Base_RequireContained(SCNode* Self, Message* Exp);
+SCDecl* SC_Base_RequireContained(SCNode* Self, Message* Errplace);
 
 Message* SC_Base_Route(SCNode* Self, JB_String* Name);
 
@@ -10810,6 +10822,8 @@ Message* SC_Func_CountCallsToParentAlloc(SCFunction* Self, Message* Root);
 int SC_Func_CreateTypeCast(SCFunction* Self, SCDecl* MyType, Message* Exp, int Loss);
 
 void SC_Func_DeclsProtoCleanup(SCFunction* Self, SCClass* fpType, Message* Ch0, bool AssumeSelf, bool Late, Message* Route);
+
+void SC_Func_DeclsProtoCleanUpContainedness(SCFunction* Self, Message* P, Message* Ch0, SCClass* fpType);
 
 SCDecl* SC_Func_DeclsProtoTypeAdd(SCFunction* Self, SCClass* fpType);
 
@@ -11481,22 +11495,22 @@ inline JB_String* JB_FS_SyntaxCast(FastString* Self) {
 
 inline JB_String* JB_Object___Render__(JB_Object* Self, FastString* Fs_in) {
 	Object_Behaviour* Table = ((Object_Behaviour*)JB_ObjClassBehaviours(Self));
-	return (Table->render)(Self, Fs_in);
+	return (((__Object_Render__)(Table->render)))(Self, Fs_in);
 }
 
 inline void JB_Sav___LoadProperties__(Saveable* Self, ObjectLoader* Loader) {
 	Saveable_Behaviour* Table = ((Saveable_Behaviour*)JB_ObjClassBehaviours(Self));
-	return (Table->loadproperties)(Self, Loader);
+	return (((__Saveable_LoadProperties__)(Table->loadproperties)))(Self, Loader);
 }
 
 inline void JB_Sav___SaveCollect__(Saveable* Self, ObjectSaver* Saver) {
 	Saveable_Behaviour* Table = ((Saveable_Behaviour*)JB_ObjClassBehaviours(Self));
-	return (Table->savecollect)(Self, Saver);
+	return (((__Saveable_SaveCollect__)(Table->savecollect)))(Self, Saver);
 }
 
 inline void JB_Sav___SaveWrite__(Saveable* Self, ObjectSaver* Saver) {
 	Saveable_Behaviour* Table = ((Saveable_Behaviour*)JB_ObjClassBehaviours(Self));
-	return (Table->savewrite)(Self, Saver);
+	return (((__Saveable_SaveWrite__)(Table->savewrite)))(Self, Saver);
 }
 
 inline byte* JB_Str_Addr(JB_String* Self) {

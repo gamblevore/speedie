@@ -3314,12 +3314,12 @@ inline JB_String* JB_FS_SyntaxCast(FastString* Self) {
 
 inline JB_String* JB_Object___Render__(JB_Object* Self, FastString* Fs_in) {
 	Object_Behaviour* Table = ((Object_Behaviour*)JB_ObjClassBehaviours(Self));
-	return (Table->render)(Self, Fs_in);
+	return (((__Object_Render__)(Table->render)))(Self, Fs_in);
 }
 
 inline void JB_Sav___SaveCollect__(Saveable* Self, ObjectSaver* Saver) {
 	Saveable_Behaviour* Table = ((Saveable_Behaviour*)JB_ObjClassBehaviours(Self));
-	return (Table->savecollect)(Self, Saver);
+	return (((__Saveable_SaveCollect__)(Table->savecollect)))(Self, Saver);
 }
 
 inline byte* JB_Str_Addr(JB_String* Self) {
