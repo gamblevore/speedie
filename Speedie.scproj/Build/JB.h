@@ -139,6 +139,8 @@ typedef byte SCNodeType;
 
 typedef int SizeInt;
 
+typedef int SortComparison;
+
 typedef byte Syntax;
 
 typedef byte TaskState;
@@ -359,8 +361,6 @@ struct TerminalCell_Behaviour;
 
 struct TokenHandler_Behaviour;
 
-struct aaaa_Behaviour;
-
 struct autoitem_Behaviour;
 
 struct xC2xB5Form_Behaviour;
@@ -467,8 +467,6 @@ struct SyntaxObj;
 
 struct TerminalCell;
 
-struct aaaa;
-
 struct autoitem;
 
 struct xC2xB5Form;
@@ -557,7 +555,7 @@ typedef void (*FP_SaverLoadClass)(JB_Class* cls, int8* Data);
 
 typedef bool (*FP_ShellOption)(JB_String* Name, JB_String* Value, FastString* Purpose);
 
-typedef int (*FP_SorterComparer)(JB_Object* A, JB_Object* B);
+typedef SortComparison (*FP_SorterComparer)(JB_Object* A, JB_Object* B);
 
 typedef int (*FP_SorterComparerFn)(SCFunction* a, SCFunction* b);
 
@@ -3366,7 +3364,7 @@ JB_File* SC_Comp__CanTryModes();
 
 void SC_Comp__CheckIsGoodLibrary();
 
-int SC_Comp__ClassSorter(SCClass* A, SCClass* B);
+SortComparison SC_Comp__ClassSorter(SCClass* A, SCClass* B);
 
 void SC_Comp__ClearEnvs();
 
@@ -3460,7 +3458,7 @@ Message* SC_Comp__MakeMainFunc();
 
 void SC_Comp__MiniTests();
 
-int SC_Comp__ModulesSorter(SCModule* A, SCModule* B);
+SortComparison SC_Comp__ModulesSorter(SCModule* A, SCModule* B);
 
 void SC_Comp__NewConst(SCDecl* D);
 
@@ -4556,11 +4554,11 @@ bool SC_SettingMemory(Message* Rel);
 
 bool SC_SettingSelfProperty(Message* Rel);
 
-int SC_SimplestFirst(SCDecl* A, SCDecl* B);
+SortComparison SC_SimplestFirst(SCDecl* A, SCDecl* B);
 
-int SC_SmallestAlignedFirst(SCDecl* A, SCDecl* B);
+SortComparison SC_SmallestAlignedFirst(SCDecl* A, SCDecl* B);
 
-int SC_SmallestFirst(SCDecl* A, SCDecl* B);
+SortComparison SC_SmallestFirst(SCDecl* A, SCDecl* B);
 
 Array* SC_SortInitOrder(Array* Mods);
 
@@ -5761,6 +5759,9 @@ bool SC_SCNodeType_SyntaxIs(SCNodeType Self, SCNodeType D);
 
 
 // SizeInt
+
+
+// SortComparison
 
 
 // Syntax
@@ -7063,9 +7064,6 @@ int SC_Pac__Init_();
 // JB_TokenHandler_Behaviour
 
 
-// JB_aaaa_Behaviour
-
-
 // JB_autoitem_Behaviour
 
 
@@ -7753,7 +7751,7 @@ bool SC_Imp__IsInputName(JB_String* Name);
 
 void SC_Imp__NoProj();
 
-int SC_Imp__Sorter(SCFile* A, SCFile* B);
+SortComparison SC_Imp__Sorter(SCFile* A, SCFile* B);
 
 
 
@@ -8194,7 +8192,7 @@ bool JB_Str_Yes(JB_String* Self, Message* Where);
 
 JB_String* JB_Str__FromPico(PicoMessage* M);
 
-int JB_Str__Sorter(JB_String* A, JB_String* B);
+SortComparison JB_Str__Sorter(JB_String* A, JB_String* B);
 
 JB_StringC* JB_Str__Wrap(_cstring Addr);
 
@@ -8289,9 +8287,6 @@ void JB_TerminalCell_Destructor(TerminalCell* Self);
 
 
 // JB_TokenHandler
-
-
-// JB_aaaa
 
 
 // JB_autoitem
@@ -9723,7 +9718,7 @@ void JB_ID_Destructor(MessageID* Self);
 
 JB_String* JB_ID_Render(MessageID* Self, FastString* Fs_in);
 
-int JB_ID__ByID(MessageID* A, MessageID* B);
+SortComparison JB_ID__ByID(MessageID* A, MessageID* B);
 
 
 
@@ -11339,8 +11334,6 @@ inline void SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info);
 
 inline void SC_Msg_CheckFreeIfDeadValid(Message* Self);
 
-inline int64 JB_config_AsInt(Message* Self);
-
 inline bool SC_Pac_ConstCompareFloatSub(ASMState* Self, ASMReg L, ASMReg R, int Mode);
 
 inline bool SC_Pac_ConstCompareIntSub(ASMState* Self, ASMReg L, ASMReg R, int Mode);
@@ -11654,10 +11647,6 @@ inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
 	iif ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc, false))) {
 		JB_Msg_Fail(Self, JB_LUB[816]);
 	}
-}
-
-inline int64 JB_config_AsInt(Message* Self) {
-	return JB_Msg_Int(Self, 0);
 }
 
 inline bool SC_Pac_ConstCompareFloatSub(ASMState* Self, ASMReg L, ASMReg R, int Mode) {

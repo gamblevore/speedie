@@ -101,6 +101,8 @@ typedef byte ProcessOwnerMode;
 
 typedef int SizeInt;
 
+typedef int SortComparison;
+
 typedef byte Syntax;
 
 typedef byte TaskState;
@@ -1900,6 +1902,9 @@ int JB_Rg_Width(IntRange Self);
 
 
 // SizeInt
+
+
+// SortComparison
 
 
 // Syntax

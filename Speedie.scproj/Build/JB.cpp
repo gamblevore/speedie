@@ -533,7 +533,7 @@ void SC_Comp__CheckIsGoodLibrary() {
 	}
 }
 
-int SC_Comp__ClassSorter(SCClass* A, SCClass* B) {
+SortComparison SC_Comp__ClassSorter(SCClass* A, SCClass* B) {
 	return SC_Comp__ModulesSorter(A->Modul, B->Modul);
 }
 
@@ -2134,26 +2134,26 @@ void SC_Comp__MiniTests() {
 	SC_Comp__TestTask();
 }
 
-int SC_Comp__ModulesSorter(SCModule* A, SCModule* B) {
+SortComparison SC_Comp__ModulesSorter(SCModule* A, SCModule* B) {
 	SCClass* Ca = A->Cls;
 	SCClass* Cb = B->Cls;
 	iif ((!Ca) or (!Cb)) {
 		iif (Ca or Cb) {
-			return ((int)(Cb != nil));
+			return ((SortComparison)((int)(Cb != nil)));
 		}
 	}
 	 else {
 		SCNodeType Tt = Ca->BaseType;
 		int D = ((int)Cb->BaseType) - ((int)Tt);
 		iif (D) {
-			return D;
+			return ((SortComparison)D);
 		}
 		D = (((int)Cb->Depth) - ((int)Ca->Depth));
 		iif (D) {
-			return D;
+			return ((SortComparison)D);
 		}
 	}
-	return JB_Str_CompareStr(A->Name, B->Name, false) <= -1;
+	return ((SortComparison)(JB_Str_CompareStr(A->Name, B->Name, false) <= -1));
 }
 
 void SC_Comp__NewConst(SCDecl* D) {
@@ -2528,7 +2528,7 @@ void SC_Comp__SetConf(Message* Conf) {
 
 void SC_Comp__SetupEnv() {
 	SC_Comp__ClearEnvs();
-	SC__Options_Dev = JB_config_AsInt(JB_Msg_GetConf(JB_App__Prefs(), JB_LUB[1856], false));
+	SC__Options_Dev = JB_Msg_Int(JB_Msg_GetConf(JB_App__Prefs(), JB_LUB[1856], false), 0);
 	iif (!JB_App__IsMainThread()) {
 		(JB_App__SetThreadName(JB_LUB[1857]));
 	}
@@ -3440,7 +3440,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[219]);
-	JB_FS_AppendInt32(_fsf0, (2025011316));
+	JB_FS_AppendInt32(_fsf0, (2025011317));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8863,7 +8863,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1674]);
-	JB_FS_AppendInt32(_fsf0, (2025011316));
+	JB_FS_AppendInt32(_fsf0, (2025011317));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -12485,20 +12485,20 @@ bool SC_SettingSelfProperty(Message* Rel) {
 	return false;
 }
 
-int SC_SimplestFirst(SCDecl* A, SCDecl* B) {
+SortComparison SC_SimplestFirst(SCDecl* A, SCDecl* B) {
 	int BComp = SC_Decl_Complexity(B) - SC_Decl_Complexity(A);
 	iif (BComp) {
-		return BComp;
+		return ((SortComparison)BComp);
 	}
-	return SC_Decl_CArraySize(B) - SC_Decl_CArraySize(A);
+	return ((SortComparison)(SC_Decl_CArraySize(B) - SC_Decl_CArraySize(A)));
 }
 
-int SC_SmallestAlignedFirst(SCDecl* A, SCDecl* B) {
-	return SC_Decl_Alignment(B) - SC_Decl_Alignment(A);
+SortComparison SC_SmallestAlignedFirst(SCDecl* A, SCDecl* B) {
+	return ((SortComparison)(SC_Decl_Alignment(B) - SC_Decl_Alignment(A)));
 }
 
-int SC_SmallestFirst(SCDecl* A, SCDecl* B) {
-	return SC_Decl_CArraySize(B) - SC_Decl_CArraySize(A);
+SortComparison SC_SmallestFirst(SCDecl* A, SCDecl* B) {
+	return ((SortComparison)(SC_Decl_CArraySize(B) - SC_Decl_CArraySize(A)));
 }
 
 Array* SC_SortInitOrder(Array* Mods) {
@@ -19175,6 +19175,7 @@ bool SC_SCNodeType_SyntaxIs(SCNodeType Self, SCNodeType D) {
 
 
 
+
 void JB_Syx_ExportAddrSet(Syntax Self, FP_fpMsgRender Value) {
 	JB_Syx_Obj(Self)->ExportAddr = Value;
 }
@@ -24482,7 +24483,6 @@ int SC_Pac__Init_() {
 
 
 
-
 SCDecl* SC_Object_AsDecl(JB_Object* Self) {
 	iif (JB_Object_FastIsa(Self, &SCClassData)) {
 		return ((SCClass*)Self)->TypeNormal;
@@ -29168,12 +29168,12 @@ void SC_Imp__NoProj() {
 	JB_ClassData_Restore((&SCDeclData));
 }
 
-int SC_Imp__Sorter(SCFile* A, SCFile* B) {
+SortComparison SC_Imp__Sorter(SCFile* A, SCFile* B) {
 	int Lib = A->Proj->IsSTDLib - B->Proj->IsSTDLib;
 	iif (Lib) {
-		return Lib;
+		return ((SortComparison)Lib);
 	}
-	return JB_Str_CompareStr(((JB_String*)A), ((JB_String*)B), false) <= -1;
+	return ((SortComparison)(JB_Str_CompareStr(((JB_String*)A), ((JB_String*)B), false) <= -1));
 }
 
 
@@ -31898,8 +31898,8 @@ JB_String* JB_Str__FromPico(PicoMessage* M) {
 	return JB_LUB[0];
 }
 
-int JB_Str__Sorter(JB_String* A, JB_String* B) {
-	return JB_Str_CompareStr(B, A, false);
+SortComparison JB_Str__Sorter(JB_String* A, JB_String* B) {
+	return ((SortComparison)JB_Str_CompareStr(B, A, false));
 }
 
 JB_StringC* JB_Str__Wrap(_cstring Addr) {
@@ -32408,7 +32408,6 @@ TerminalCell* JB_TerminalCell_ConstructorAuto(TerminalCell* Self, int Color, JB_
 void JB_TerminalCell_Destructor(TerminalCell* Self) {
 	JB_Clear(Self->Text);
 }
-
 
 
 
@@ -42965,7 +42964,7 @@ JB_String* JB_ID_Render(MessageID* Self, FastString* Fs_in) {
 	return _tmPf1;
 }
 
-int JB_ID__ByID(MessageID* A, MessageID* B) {
+SortComparison JB_ID__ByID(MessageID* A, MessageID* B) {
 	int64 Diff = B->ID - A->ID;
 	iif (Diff) {
 		return Diff;
@@ -44978,10 +44977,12 @@ int SC_Decl_TryTypeCast(SCDecl* Self, SCDecl* O, Message* OExp, int TypeCast) {
 						iif (!(NoBools and (SC_Decl_IsBool(C->ReturnType)))) {
 							int Loss = SC_Decl_TypeMatch(Self, C->ReturnType, kJB_kTypeCastNumbers, nil);
 							iif (SC_int_IsNormalMatch(Loss)) {
-								// sigh;
-								// If theres one that doesnt need numeric cast... that should be considered a stronger match;
-								// C.CreateTypeCast should return the result, bitored with needscast.;
-								return SC_Func_CreateTypeCast(C, O, OExp, Loss);
+								iif ((Loss == kJB_kSimpleMatch) or (!SC_Class_IsDataTypeOnly(Self->Type))) {
+									// sigh;
+									// If theres one that doesnt need numeric cast... that should be considered a stronger match;
+									// C.CreateTypeCast should return the result, bitored with needscast.;
+									return SC_Func_CreateTypeCast(C, O, OExp, Loss);
+								}
 							}
 						}
 						(--_if1);
@@ -58562,4 +58563,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 6979792164526870596 -7335678687640629365
+// -1191896809371480808 -7335678687640629365

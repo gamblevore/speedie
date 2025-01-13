@@ -3223,6 +3223,7 @@ int JB_Rg_Width(IntRange Self) {
 
 
 
+
 bool JB_Syx_IsString(Syntax Self) {
 	return (Self >= kJB_SyxSStr) and (Self <= kJB_SyxStr);
 }
@@ -8404,4 +8405,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 -5659591766416957496 2135647296284023764
+// -2934619186805667969 -3364795963020818224 2135647296284023764
