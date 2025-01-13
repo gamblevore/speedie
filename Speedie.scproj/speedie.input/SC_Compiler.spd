@@ -752,16 +752,14 @@ function SortModulesAndClasses (|bool|)
 	return stderr.ok
 	
 
-function ClassSorter (SorterComparer)
-	return ModulesSorter(a|scclass|.modul, b|scclass|.modul)
+function ClassSorter (SorterComparer of scclass)
+	return ModulesSorter(a.modul, b.modul)
 
 
-function ModulesSorter (SorterComparer)
+function ModulesSorter (SorterComparer of scmodule)
 	opt norefcounts
-	|| aa = a|scmodule|
-	|| bb = b|scmodule|
-	|| ca = aa.cls
-	|| cb = bb.cls
+	|| ca = a.cls
+	|| cb = b.cls
 	
 	if !ca or !cb // a module
 		if ca or cb
@@ -775,7 +773,7 @@ function ModulesSorter (SorterComparer)
 		if D
 			return D
 		
-	return aa.name < bb.name
+	return a.name < b.name
 
 
 function SCFunction.ReachedDetect

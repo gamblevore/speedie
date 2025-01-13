@@ -627,16 +627,18 @@ function ImportFile (|SCFile| file)
 	file.Stop(old)
 
 
-function RequireContained (|Message| exp, |SCDecl|)
+function RequireContained (|Message| errplace, |SCDecl|)
 	opt norefcounts
 	|SCClass| cls
 	
 	if (self isa SCFunction)
 		cls = .Cls
 		if !cls
-			|| p = .parent as SCModule
-				cls = p.Cls
-		
+			cls = .ProtoType
+			if !cls
+				|| p = .parent as SCModule
+					cls = p.Cls
+
 	  elseif (self isa SCClass)
 		cls = self
 		
@@ -647,7 +649,7 @@ function RequireContained (|Message| exp, |SCDecl|)
 		|| f = .ParentFunc
 			cls = f.Cls
 	
-	expect (cls and cls.Contained)   (exp, "Can’t use '...' here, no contained type found.")
+	expect (cls and cls.Contained)   (errplace, "Can’t use '...' here, no contained type found.")
 	return cls.Contained
 
 

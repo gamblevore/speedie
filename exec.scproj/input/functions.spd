@@ -112,7 +112,8 @@ module Lib
 	function AddLibGlob (|?&nil| where, |string| name, |bool|)
 		opt norefcounts
 		expect (.GlobalCount++ < 1K) ("Too many globals")		// for detecting corrupt lib
-		.Globals.valuelower(name) = where!
+		// wait we can't store ptrs in a dict? was this a wrapper obj?
+//		.Globals.valuelower(name) = where!
 		return true
 	
 	

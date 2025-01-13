@@ -61,15 +61,13 @@ class MessageID (stringshared)
 		return Message(parent, .func, -1, .name, .name.length)
 
 	module
-		function ByID (SorterComparer)
+		function ByID (SorterComparer of messageid)
 			opt norefcounts
-			|| aa = a|MessageID|,   || bb = b|MessageID| 
-			|| diff = bb.ID  -  aa.ID
+			|| diff = b.ID  -  a.ID
 				return diff							// more frequent should have lower lengths
 				
-			return bb|uint64| - aa|uint64|
+			return b|uint64| - a|uint64|
 		
-		function ByFreq (SorterComparer)
+		function ByFreq (SorterComparer of messageid)
 			opt norefcounts
-			|| aa = a|MessageID|,   || bb = b|MessageID| 
-			return aa.Frequency - bb.Frequency
+			return a.Frequency - b.Frequency

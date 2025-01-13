@@ -192,8 +192,8 @@ class RayTracer
 			if ToObj • .Fwd > 0
 				v._ObjDist = D
 	
-	function @raytracer.DistanceSorter (sortercomparer)
-		return (b|&nil||vobject|._objdist < a|&nil||vobject|._objdist)|int|
+	function @raytracer.DistanceSorter (sortercomparer of vobject)
+		return (b._objdist < a._objdist)|int|
 		
 	helper PlayQuidditch (|int| Stride)
 		opt norefcounts

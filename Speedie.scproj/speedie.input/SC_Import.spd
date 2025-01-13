@@ -241,18 +241,11 @@ class SCImport
 			return compiler.program
 		
 		
-		function Sorter (SorterComparer)
+		function Sorter (SorterComparer of scfile)
 			opt norefcounts
-			|| aa = a|SCFile|
-			|| bb = b|SCFile|
-//			|| aastd = aa.Proj.IsSTDLib
-//			|| bbstd = bb.Proj.IsSTDLib
-//			if aa.isinternal or bb.isinternal
-			|| lib = aa.Proj.IsSTDLib - bb.Proj.IsSTDLib
+			|| lib = a.Proj.IsSTDLib - b.Proj.IsSTDLib
 				return lib
-//			|| intr = aa.isinternal - bb.isinternal
-//				return intr < 0 
-			return aa|string| < bb|string|
+			return a|string| < b|string|
 		
 		function FindImport (|string| s, |scimport|)
 			opt norefcounts

@@ -512,7 +512,10 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 	
 	depth++
 	if (f == @Decl)
-		Return ExtractDecl( c.first!, name_space, purpose, depth )
+		|| ty = ExtractDecl( c.first!, name_space, purpose, depth )
+			if purpose==declmode.ProtoParam 
+				ty.name = c.DeclName.name
+		return ty
 	
 	if (f == @Emb)
 		c.Expectempty

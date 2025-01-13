@@ -259,12 +259,12 @@ function FuncParamsLoadSub
 		.AddConstructorReturn(p)
 	
 	|| fc = p.first
-		if (fc.func == @thg or @dot)
+		if (fc.func == @thg or @dot or @rel)
 			.DeclsProtoTypeClass( fc )
 	
 	|| A = .SourceArg
 	|| space = a.SCArg(self)
-	
+
 	if (P==@List or @Bra or @prm)
 		p.Func = @prm
 		.CollectDeclsParams( P, space )
@@ -675,17 +675,20 @@ function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch
 	Return loss
 
 
-function DeclsPrototypeClass (|Message| ch0)
+function DeclsPrototypeClass (|Message!| ch0)
 	opt norefcounts
+	|| Ty = ch0
+	if ty == @rel
+		ty = ty.first!
 	|| p = .parent as scmodule											#require
-	|| fpType = p.FindClassMsg(ch0)										#require
+	|| fpType = p.FindClassMsg(Ty)										#require
 
 	|message| Route
 	if !fptype.funcproto
 		|| task = fptype.modul.FindClass("interface", nil, scnode.DontGoUp)
 			fpType = task
 			route = fptype.modul.parent.Route("interface")
-			
+		
 		|| task_proto = fptype.modul.findclass("prototype", nil, scnode.DontGoUp)
 			fptype = task_proto
 	
@@ -772,34 +775,50 @@ function DeclsProtoTypeAdd (|SCClass| fpType, |scdecl|)
 	return dcl
 
 
-function DeclsProtoCleanup (|SCClass| fpType, |Message| ch0, |bool| AssumeSelf, |bool| late, |message| Route=nil)
-	|| Proto = fpType.FuncProto										#expect (ch0, "This isn't a prototype!")
-	|| fProtoParams = Proto.Source[ @prm, 1 ]						#require
-	|| p = ch0.Parent!
+function DeclsProtoCleanUpContainedness (|message| P, |message| ch0, |scclass!| fpType)
+	opt norefcounts
+	for s in p
+		if s == @decl
+			|| ty = s.first!
+			if ty.func == @sthg
+				using s
+				if ch0 == @rel
+					ty.becomecopy(ch0.last!)
+				  else
+					|| ty2 = fptype.RequireContained(s)
+						ty.prev = ty2.writetype(0, false)
+						ty.remove
+	ch0.Remove
 
+
+function DeclsProtoCleanup (|SCClass| fpType, |Message| ch0, |bool| AssumeSelf, |bool| late, |message| Route=nil)
+	|| Proto = fpType.FuncProto									#expect (ch0, "This isn't a prototype!")
+	|| fProtoParams = Proto.Source[ @prm, 1 ]					#require
+	|| p = ch0.Parent!
 	p.Func = @prm
 
 	using (ch0)
 		fProtoParams.CopyAllInto( p )
 	
-	if route
+	if Route
 		|| nxt = ch0.next
 		|| first = nxt.first
 		if first.next isthing "self"
 			first.replacewith(route)
-		
-	ch0.Remove
+	
+	.DeclsProtoCleanUpContainedness(p, ch0, fptype)
 	
 	|| c = .cls														#require
 	if late
 		p.first.remove // ooof
 	
-	if (!AssumeSelf)
-		|| d    = p[@decl]
-		|| ch   = D[@nil]											#require
-		|| decl = ExtractDecl( ch, nil, declmode.ProtoParam )		#expect p
-		expect (decl matches c.TypeNormal)	   ( self, "Receiver must be same class as first param in function prototype." )
-		d.Remove
+	if !AssumeSelf
+		|| d = p[@decl]
+			|| decl = ExtractDecl( d, nil, declmode.ProtoParam )
+				check (decl matches c.TypeNormal)    (self, "Receiver must be same class as first param in function prototype.")
+				check (decl.name ~= "self") (self, "This prototyped function should be in module scope. (Not class).")
+				decl.name = ""
+				d.Remove
 
 
 function IsSimpleCast (|Message|)
@@ -1832,6 +1851,7 @@ function message.SlidePositions (|int| add)
 
 function SCFunction.Cleanupfunc (|message| s)
 	|| n = s.name
+	
 	using s
 	|| cls = .cls!.isnormalobject
 	if s ~= "constructor" or "destructor"
@@ -1878,15 +1898,16 @@ function SCFunction.SetBlindCasts (|SCNode| name_space)
 			.BlindCasts	= c.blindcast
 
 
-function SCFunction.Init_Sub (|message| node,  |SCNode| name_space)
+function SCFunction.Init_Sub (|message| node, |SCNode| name_space)
 	|| arg = node.NormaliseFunc
+
 	node.obj = self
 	if name_space
 		if node != "iterator"
 			Compiler.FuncList <~ self
 		.FLookup = name_space  // sets as a module even if parent is a class
 		.refs = name_space.SpaceModule$.defaultrefs
-		scfunction.currfunc = self
+		SCFunction.currfunc = self
 	
 	.ParseName( node )
 	using ErrorDelayer // not a terrible error but still an error 

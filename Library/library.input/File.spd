@@ -476,9 +476,9 @@ class File (String)
 					_speedie = "/usr/local/speedie/".Resolve(False)
 			return _speedie
 		
-		function SizeSorter (SorterComparer)
-			|| aa = a|file|.size
-			|| bb = b|file|.size
+		function SizeSorter (SorterComparer of file)
+			|| aa = a.size
+			|| bb = b.size
 			return bb - aa
 			
 		function string.NeatenPath (|string|)

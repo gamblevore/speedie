@@ -116,10 +116,10 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 		self = .Last
 		func.IsAssigns = 1
 		.addvalue(func)
-
-	require .Expect(@decl)
 	
-	|| dcl = .CollectDecl(func, recv, declmode.FuncParam, cls, func) #require
+	require .Expect(@decl)
+
+	|| dcl = .CollectDecl(func, recv, declmode.FuncParam, cls, func)		#require
 	if dcl.default isthing "nil"
 		dcl.NilDeclared = nilstate.optional
 	

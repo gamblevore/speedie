@@ -702,9 +702,9 @@ class SCDecl (SCNamed) {
 			return .Contains.MiniMatch(ty)
 		
 		
-	function WriteType (|int| minimal = 0, |Message!|)
+	function WriteType (|int| minimal = 0, |bool| Optionals=true,  |Message!|)
 		opt norefcounts
-		|| simple = .WriteSimpleType
+		|| simple = .WriteSimpleType(optionals)
 		|| c = .Contains
 		if !c or (minimal and .AlreadyContains)
 			return simple
@@ -712,19 +712,22 @@ class SCDecl (SCNamed) {
 		rz = @rel.msg
 		rz <~ simple
 		rz <~ (@opp, "of")
-		rz <~ c.writetype(minimal)
+		rz <~ c.writetype(minimal, optionals)
 		
 
-	function WriteSimpleType (|Message|)
+	function WriteSimpleType (|bool| optionals, |Message|)
 		opt norefcounts
-		rz = .writeverysimpletype
+		rz = .WriteVerySimpleType
 		if self is borrowed
 			rz = rz.wrapwith(@arel, "--")
-		if .TypeSuffers and .nilstated
+		if !optionals
+			rz = rz.wrapwith(@brel, "!")
+		  elseif .TypeSuffers and .nilstated
 			if .StatedOptional
-				rz = rz.wrapwith(@brel, "?")  // «brel "?", rz »
+				rz = rz.wrapwith(@brel, "?")
 			  elseif .StatedReal //and platform.isdebug
-				rz = rz.wrapwith(@brel, "!")  // «brel "!", rz »
+				rz = rz.wrapwith(@brel, "!")
+			
 
 
 	function WriteVerySimpleType (|Message|)
@@ -1158,10 +1161,9 @@ function scdecl.CheckMath (|message| exp, |scdecl|)
 
 
 function Message.RenderType (|string|)
-	opt norefcounts
-	|| D = .obj
+	|| D = .obj|object--|
 	if (D isa SCDecl)
-		return D.WriteSimpleType.Render
+		return D.WriteSimpleType(true).Render
 	if (D isa scmodule)
 		return d.name
 	return .Render
@@ -1183,8 +1185,8 @@ function int64.MsgForConst (|bool| AllowShift, |message|)
 	rz <~ newdeclnum(nil, .Log2)
 
 
-function SmallestFirst (SorterComparer)
-	return b|scdecl|.carraysize - a|scdecl|.carraysize
+function SmallestFirst (SorterComparer of scdecl)
+	return b.carraysize - a.carraysize
 	
 
 function scdecl.Complexity (|int|)
@@ -1195,13 +1197,13 @@ function scdecl.Complexity (|int|)
 	rz += T.IsStruct << 2
 	rz += .IsCarray << 3
 
-function SimplestFirst (SorterComparer)
-	|| BComp = b|scdecl|.Complexity - a|scdecl|.Complexity
+function SimplestFirst (SorterComparer of scdecl)
+	|| BComp = b.Complexity - a.Complexity
 		return BComp
-	return b|scdecl|.carraysize - a|scdecl|.carraysize
+	return b.carraysize - a.carraysize
 
-function SmallestAlignedFirst (SorterComparer)
-	return b|scdecl|.alignment - a|scdecl|.alignment
+function SmallestAlignedFirst (SorterComparer of scdecl)
+	return b.alignment - a.alignment
 
 
 function array.CArraySize (|[scdecl]| self, |int| size, |int|)

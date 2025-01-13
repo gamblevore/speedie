@@ -162,12 +162,12 @@ function Message.MsgDecl (|SCDecl|)
 
 function Message.DeclName (|Message|)
 	opt norefcounts
-	|| dcl = .DclExp
-	if dcl == @Rel
-		Return dcl[@thg]
-	if dcl == @Thg
-		Return dcl
-	expect !(dcl == @Emb) (self)
+	|| name = .DclExp
+	if name == @Rel
+		Return name[@thg]
+	if name == @Thg
+		Return name
+	expect !(name == @Emb) (self)
 
 
 function Message.VarName (|string|)
@@ -387,12 +387,6 @@ function Message.CopyAllAfter (|Message| after, |message| copylayer)
 
 
 // all these copyintos need to clear position
-function Message.CopyAllInto (|Message| j)
-	opt norefcounts
-	for c in self
-		j <~ c.Copy(j)			// Was .wipecopy. why did I do that?
-
-
 function Message.CopyAllBeforeInto (|Message| into, |Message| copylayer)
 	opt norefcounts
 	|| curr = .Prev

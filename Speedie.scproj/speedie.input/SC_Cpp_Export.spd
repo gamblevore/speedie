@@ -137,6 +137,7 @@ function CppFunc (|FastStringCpp| fs, |SCFunction| F) // function func (
 	.SetupFlow(F)
 
 	.FuncStart(fs, f, FuncHeader)
+	
 	f.Sourcearg!.Export( fs )
 	.OptEnd(fs, f.minopt)
 	fs <~ "\n\n"
@@ -1050,13 +1051,13 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function C_RenderDot (fpMsgRenderCpp)
 		opt norefcounts
-		|| obj = .DotMustBeProperty						#require
+		|| type = .DotMustBeProperty						#require
 		|| ch = .first!
 		
 		if (ch.obj isa SCModule)
-			obj.exportName.safe(fs)
+			type.exportName.safe(fs)
 		  else
-			|| CloseStr = cpp_export.CDotType( self, obj, fs )
+			|| CloseStr = cpp_export.CDotType( self, type, fs, type is upgradeablecontained )
 	
 			ch.Export( fs )
 			|| ch_decl = DeclOfObjForC( ch )
@@ -1065,7 +1066,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 				  else
 					fs <~ "->"
 
-			obj.exportName.safe(fs)
+			type.exportName.safe(fs)
 			fs <~ CloseStr
 	
 
@@ -1095,6 +1096,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			F.Export( fs )
 		
 		C_ParamsRender( ch1, fs )
+		
 		if PostBracket
 			fs <~ ')'
 		
@@ -1376,9 +1378,9 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			Return true
 
 
-	function CDotType (|Message| msg, |SCDecl| Type, |FastStringCpp| fs, |String|)
+	function CDotType (|Message| msg, |SCDecl| Type, |FastStringCpp| fs, |bool| DoIt, |String|)
 		opt norefcounts
-		require type Is UpgradeableContained
+		require type and (doit or type.type.funcproto)
 
 		if msg.IsFirstOfSetRel
 			return ""
@@ -1471,20 +1473,20 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		fs <~ '\''
 	
 
-	function C_ParamsRender (fpMsgRenderCpp)
+	function C_ParamsRender (|message| self,  |FastStringCpp| fs)
+		opt norefcounts
 		// assume we are an LST
 		fs <~ '('
-		C_FSListComma( self, fs )
-		fs <~ ')'
-	
-
-	function C_FSListComma (fpMsgRenderCpp)
-		opt norefcounts
 		for (item in self)
 			fs <~ ", "
 			start
+			|| ty2 = item.obj|scdecl|
+			|| CloseStr = cpp_export.CDotType( self, ty2, fs, false ) // what about setting this like a = b. should be done at the dot/thg level?
+				
 			item.Export( fs )
-
+			fs <~ CloseStr
+		fs <~ ')'
+	
 
 	function C_RenderSStr (fpMsgRenderCpp)
 		// so... convert it to an obj

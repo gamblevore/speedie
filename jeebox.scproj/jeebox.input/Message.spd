@@ -958,13 +958,24 @@ After that, you now have a tree-data-structure that represents your data. The Me
 		.func = @num
 		.name = num.render
 
-
 	function Become (|message| src)
 		cpp_part BecomeMsg
+		.BecomeSub(src)
+		.TakeAllFrom(src)
+	
+	helper BecomeSub (|message| src)
 		.func = src.func
 		.name = src.name
 		.clear
-		.TakeAllFrom(src)
+
+	function BecomeCopy (|message| src)
+		.BecomeSub(src)
+		src.CopyAllInto(self)
+
+	function CopyAllInto (|Message| j)
+		opt norefcounts
+		for c in self
+			j <~ c.Copy(j)
 
 	
 	function Next (|syntax| Need, |string| Name, |Message|)

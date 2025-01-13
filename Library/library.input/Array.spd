@@ -203,14 +203,13 @@ class Array (saveable)
 //	return ShouldNotBeReturnable
 
 
-// prototype SorterComparer (|...| a, |...| b, |int|) // should be possible for prototypes
-prototype SorterComparer (|object| a, |object| b, |int|)
+prototype SorterComparer (|...| a, |...| b, |int|)
 	contains Object
 	function sort (|array| a)
 		a.sort(self)
-	
 
-function @string.Sorter (SorterComparer)
-	return b|string|.syntaxcompare(a|string|, false)
+
+function @string.Sorter (SorterComparer of string)
+	return b.syntaxcompare(a, false)
 	
 

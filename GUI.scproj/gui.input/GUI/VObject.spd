@@ -103,20 +103,6 @@ class VObject (list)
 		  else
 			.position &= ~i
 		
-	target debug2 // can't find a/b ... should!
-		function DistanceSorter (sortercomparer)
-			return (b|&nil||vobject|._objdist < a|&nil||vobject|._objdist)|int|
-
-
-		// enable new prototype syntax!	
-		function DistanceSorter2 (sortercomparer of vobject)
-			return (b._objdist < a._objdist)|int|
-	
-		// Create IntOrBool type!
-		function DistanceSorter3 (sortercomparer of vobject)
-			return b._objdist < a._objdist
-
-	
 	
 	module
 		|byte| ShapeIDs
