@@ -85,7 +85,7 @@ class RangeCoder (list)
 			
 		
 	module
-		helper Sorter (SorterComparerBool)
+		helper Sorter (SorterComparer)
 			target debug
 				if a|RangeCoder|.freq == b|RangeCoder|.freq
 					return a|RangeCoder|.char > b|RangeCoder|.char

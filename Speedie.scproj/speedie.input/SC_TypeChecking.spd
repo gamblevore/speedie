@@ -157,7 +157,8 @@ function scdecl.TryTypeCastDeref (|SCDecl| O, |Message| exp, |int| TypeCast,  |i
 
 function scdecl.TryTypeCast (|SCDecl| O, |Message| OExp, |int| TypeCast,  |int|)
 	opt norefcounts
-
+	if "testargh".trap
+	
 	|| t = .type
 	|| ot = o.type
 	if (.PointerCount == O.PointerCount + 1)
@@ -191,10 +192,11 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| OExp, |int| TypeCast,  |int|)
 				ifn NoBools and (C.returnType.isbool)
 					|| Loss = .TypeMatch( C.ReturnType, kTypeCastNumbers )
 					if Loss.IsNormalMatch
-						#! sigh
-						#! If theres one that doesnt need numeric cast... that should be considered a stronger match
-						#! C.CreateTypeCast should return the result, bitored with needscast.
-						return C.CreateTypeCast( O, oexp, loss )
+						ifn (loss & kSuperClassMatch) and (.type.IsdatatypeOnly)
+							#! sigh
+							#! If theres one that doesnt need numeric cast... that should be considered a stronger match
+							#! C.CreateTypeCast should return the result, bitored with needscast.
+							return C.CreateTypeCast( O, oexp, loss )
 		
 		
 		|| IsaBool = (t == TypeBool) and (.IsNormal)
@@ -264,4 +266,5 @@ function scdecl.FloatCast (|scdecl| orig, |message| exp, |int|)
 	if .IsNormal
 		return exp.CastToClass(.type, nil)
 	.ExpectFail(orig, exp, nil)
+
 

@@ -189,24 +189,18 @@ class Array (saveable)
 			--i
 
 
-// adding this datatype makes the booltest below succeed, when it should fail.
-// can we make it cast to a type BUT NOT allow it for things that expect the subtype?
-// seems useful in general. If I cast to a codepoint, I probably mean exactly that and not an int.
-//datatype SortCompareResult (int)
-//	linkage
-//		numeric false
-//
-//function bool.syntaxcast (|SortCompareResult|)
-//
-//function BoolTest (|int|)
-//	|| ShouldNotBeReturnable = false
-//	return ShouldNotBeReturnable
 
-
-prototype SorterComparer (|...| a, |...| b, |int|)
+prototype SorterComparer (|...| a, |...| b, |SortComparison|)
 	contains Object
 	function sort (|array| a)
 		a.sort(self)
+
+
+datatype SortComparison (int) // 
+	function bool.syntaxcast (|SortComparison|)
+		return self|SortComparison|
+	function int.syntaxcast (|SortComparison|)
+		return self|SortComparison|
 
 
 function @string.Sorter (SorterComparer of string)

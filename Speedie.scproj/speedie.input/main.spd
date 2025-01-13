@@ -81,14 +81,3 @@ target perrydbg
 
 
 
-
-class aaaa
-	|int| x
-
-	module
-		target debug3
-			// Create IntOrBool type!
-			function DistanceSorter3 (sortercomparer2 of aaaa)
-				return b.x < a.x
-
-

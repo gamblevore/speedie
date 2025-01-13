@@ -193,7 +193,7 @@ class RayTracer
 				v._ObjDist = D
 	
 	function @raytracer.DistanceSorter (sortercomparer of vobject)
-		return (b._objdist < a._objdist)|int|
+		return b._objdist < a._objdist
 		
 	helper PlayQuidditch (|int| Stride)
 		opt norefcounts
