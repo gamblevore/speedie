@@ -668,7 +668,7 @@ extend PerryIDE
 	function DesiredStart (|filerow| projfol, |&int| pos,  |filerow|)
 		opt norefcounts
 		|| edit = .SharedProjectTabSource["edit"]
-			pos[] = .SharedProjectTabSource["pos"]
+			pos[] = .SharedProjectTabSource["pos"].int
 			|| n = edit.name
 				return self.filelist[n]
 		|| tod = .nottodo

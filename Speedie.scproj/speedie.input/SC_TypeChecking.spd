@@ -157,7 +157,6 @@ function scdecl.TryTypeCastDeref (|SCDecl| O, |Message| exp, |int| TypeCast,  |i
 
 function scdecl.TryTypeCast (|SCDecl| O, |Message| OExp, |int| TypeCast,  |int|)
 	opt norefcounts
-	if "testargh".trap
 	
 	|| t = .type
 	|| ot = o.type
@@ -192,7 +191,7 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| OExp, |int| TypeCast,  |int|)
 				ifn NoBools and (C.returnType.isbool)
 					|| Loss = .TypeMatch( C.ReturnType, kTypeCastNumbers )
 					if Loss.IsNormalMatch
-						ifn (loss & kSuperClassMatch) and (.type.IsdatatypeOnly)
+						if (loss == kSimpleMatch) or !.type.IsdatatypeOnly
 							#! sigh
 							#! If theres one that doesnt need numeric cast... that should be considered a stronger match
 							#! C.CreateTypeCast should return the result, bitored with needscast.
