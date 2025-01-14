@@ -1043,7 +1043,7 @@ class TextView (GUIControl)
 			|| mush = S|int|
 			|| color = (1.0, 1.0, 2.0, 1.0)
 			|| err = .d.LineError
-				color = (err.color-0.2)*2.5
+				color = (err.color-0.1)*2.0
 			
 			while h.x < h.x2
 				|| Rect = (h.x, Y, h.x, Y) ± -5.0

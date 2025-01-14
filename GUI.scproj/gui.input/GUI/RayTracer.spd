@@ -33,9 +33,9 @@ class RayTracer
 	|vec4[4]|			Planes
 	//
 	|Vec3|				_CamDir
+	|vec2|				_XY
 	|vec3|				iDir
 	|Mat4|				_LookAt
-	|vec4|				_RayHit
 	|vec3|				Fwd
 
 	|Vec3|				Camera
@@ -108,49 +108,63 @@ class RayTracer
 		opt min 3
 		|| ID = pxl.a
 		|| C = (pxl.Color, .bg(XY))(ID)
-		// object-anti-alising best done by storing one pixel row
+		// Object-anti-alising best done by storing one row width of 32-bit ints.
+		
 		for i in 4
 			|| sh = (i&1, i>>1).Vec2 - 0.5
-			|| XY2 = xy + sh*0.8
-			|| B = .FindBestObj(XY2, cell)
-				C += .GetColor(B)
+			.Prepare(xy + sh*0.8)
+			|| B = .FindBestObj(cell.obj)
+				C += .ShadePixel(B)
 			  else
-				C += .BG(XY2)
+				C += .BG(._XY)
 		pxl <~ C*5th
 		pxl.a = ID
 
 
-	helper FindBestObj (|vec2| XY, |RayTraceCell| Cell, |vobject|)
-		// how to stipple if inside the obj?  what if its right in front of us?
-		// what about volumetrics?
-	//			if t < 0: hit.y+=(t-0.001), t = 0.001 ????
-
-		opt min 3, opt norefcounts
+	helper Prepare (|vec2| XY)
 		._CamDir = .Dir(xy)
+		._XY = XY
 		.idir = -1.0 / ._CamDir
-		|| node = cell.node$
-		|| sp = node.draw!
-		._RayHit = vec4(float.max)
-		while
+	
+	
+	helper FindBestObj (|vobject?| sp, |vobject|)
+	// how to stipple if inside the obj?  what if its right in front of us?
+	// what about volumetrics?
+	//			if t < 0: hit.y+=(t-0.001), t = 0.001 ????
+		opt min 3,   opt norefcounts
+		|| Best = float.max
+		while sp
 			|| d = 0.0
 			|vec4| hit
+			sp._RayHit = vec4(float.max)
 			for 30 
 				Hit = (sp.Shape)(sp, self, .Camera + ._camdir*d)
 				if hit.y >= 0  or  hit.x <= 0: exit
 				d += (0.0001-hit.y)
+				// as far as transparent objects go...
+				// assuming they are all the same material
+				// and nothing inbetween... we can just... "add up the distance?"
+				// it makes sense!!  Unless each has some kind of glassy surface.
+				// works for clouds anyhow.  Just increase the first object's _rayhit.y
+				// Also... how can .shape know the material,  if the knowledge in .material?s
+				// Either the func should have it, or the object should have a fixed material.
+
+				// then we could use a "model" system... 
+				
+				// we lose our power. I think the func should know it. So... the func has to do the coloring too.
 			
-			|| t = hit.x
-			if t > 0 and t < ._rayhit.x
+			if  hit.x > 0  and  hit.x < Best
 				rz = sp
-				._Rayhit = hit
-			sp = sp._CellNext #loop
+				sp._Rayhit = hit
+				best = hit.x
+			sp = sp._CellNext
 /*
 	 x: dist                 (SDF nearest dist)
 	 y: thickness
 	 zw: material-info
 	
 	 if dist < 0... ignore. We missed it
-	 if dist = 0, we are inside of it. Stipple.  What about a minimum dist?
+	 if dist = 0, we are inside of it.
 	 if dist > 0, we *might* hit something
 		 if thickness < 0, move by -thickness, for sdf
 		 if thickness >= 0 end now.
@@ -158,11 +172,11 @@ class RayTracer
 			 = 0 is a surface
 */
 
-	helper GetColor (|vobject| B, |vec4|)
+	helper ShadePixel (|vobject| B, |vec4|)
 		opt min 3
-		|| rd = ._Rayhit.x
-		|| P = .Camera + ._CamDir*rd
-		return (B.material)(B, P, ._rayhit)
+		|| H = b._RayHit
+		|| P = .Camera + ._CamDir * H.x
+		return (B.material)(B, P, H)
 		
 		
 	helper Dir (|vec2| XY, |vec3|)
@@ -183,7 +197,7 @@ class RayTracer
 
 	helper InPlanes (|VObject| b, |bool|)
 		opt min 3
-		if b._ObjDist
+		if b._rayhit.x
 			|| R = (b.radius, 0.0)
 			|| P = (b.pos,    1.0)
 			return .PlaneOK(r,p,0) and .PlaneOK(r,p,1) and .PlaneOK(r,p,2) and .PlaneOK(r,p,3)
@@ -207,15 +221,15 @@ class RayTracer
 	
 	helper FindCameraDist (|vobject| V, |float| Max)
 		|| ToObj = v.pos - .Camera    // Could subtract v's radius? do later
-		v._ObjDist = 0
+		v._rayhit = nil
 		|| D = ToObj.LengthSq
 		if  (D > 0.25)  and  (D < Max)
 			if ToObj • .Fwd > 0
-				v._ObjDist = D
+				v._rayhit.x = D
 	
 	
 	function @raytracer.DistanceSorter (sortercomparer of vobject)
-		return b._objdist < a._objdist
+		return b._rayhit.x  <  a._rayhit.x
 		
 		
 	helper PlayQuidditch (|int| Stride)
@@ -255,31 +269,34 @@ class RayTracer
 		opt min 3
 		cell.Link
 		|| P = cell.xy
-		|| pxl3 = pxl - cell.stride*cell.h
+		|| pxl3 = pxl - cell.stride * cell.h
 		
 		while pxl > pxl3
 			|| pxl2 = pxl + cell.w
 			while pxl < pxl2
 				#! Main pixel color
 				cell.Aliased = false
-				|| b = .FindBestObj(p, cell)
-					pxl.FastMix(.GetColor(B))
+				.prepare(p)
+				|| b = .FindBestObj(cell.obj)
+					pxl.FastMix(.ShadePixel(B))
 					pxl.a = B._ShapeID
 				  else
-					pxl <~ .bg(P)
+					pxl <~ .BG(P)
 					pxl.a = 0
-				|| LeftAA = pxl-1
-				if p.x and pxl.a != leftaa.a
-					.AntiAlias(p-(1.0,0), cell, leftAA)
-					.AntiAlias(p, cell, pxl)
-					cell.Aliased = true
 				
-				if p.y
-					|| belowAA = pxl + cell.stride
-					if pxl.a != belowAA.a
-						.AntiAlias(p-(0,1.0), cell, belowAA)
-						if !cell.Aliased
-							.AntiAlias(p, cell, pxl)
+				if !keys.shift
+					|| LeftAA = pxl-1
+					if  p.x  and  pxl.a != leftaa.a
+						.AntiAlias(p-(1.0,0), cell, leftAA)
+						.AntiAlias(p, cell, pxl)
+						cell.Aliased = true
+					
+					if p.y
+						|| belowAA = pxl + cell.stride
+						if pxl.a != belowAA.a
+							.AntiAlias(p-(0,1.0), cell, belowAA)
+							if !cell.Aliased
+								.AntiAlias(p, cell, pxl)
 				pxl++
 				p.x++
 			pxl -= (cell.stride + cell.w)
@@ -450,6 +467,10 @@ struct RayTraceCell
 	|byte|						W
 	|bool|						Aliased
 
+	function Obj (|vobject|)
+		|| n = .node
+			return n.draw
+			
 	helper Link
 		opt min 3, opt norefcounts
 		|| curr = .Node

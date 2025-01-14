@@ -15,36 +15,10 @@ class VObject (list)
 	visible false
 	// ray acceleration
 	|byte|			_ShapeID
-	|float|			_ObjDist
 	|?VObject--|	_CellNext
+	|vec4|			_RayHit
 	
 	visible true
-	
-	prototype ShaderFunction (|vec3| P, |vec4| Distance,  |vec4|)
-		// what about a magical color system too?
-		// what about a more generalised material system?
-		// do we want every object to decide how it surface colors?
-		// maybe this should be a "task". So the material info can be stored...
-
-	prototype DistanceFunction (|raytracer| Ray,  |vec3| P,  |vec4|)
-		description "0: dist                 (SDF nearest dist)
-		 1: thickness
-		 2+3: material-info
-		
-		 if dist < 0... ignore. We missed it
-		 if dist == 0, we are inside of it. Stipple
-		 if dist > 0, we *might* hit something
-			 if thickness < 0, move by -thickness, for sdf
-			 if thickness >= 0 end now.
-				 > 0 is volumetric transparency
-				 == 0 is a surface
-"
-		// ideally we can pass a point...
-		// how to test two objects? or an object vs a block?
-		// seems it needs a different function?
-		// what about sound+energy/magic uses? is that just objects bouncing around?
-		// what if instead of a raytracer, we just pass a shape?
-		// like that just happens to be a ray. Or another shape?
 	
 	constructor (|vec2| Pos,  |vec2| Size,  |vec4| Color=colors.white)
 		cpp_part ConstructorBox2D
@@ -56,13 +30,13 @@ class VObject (list)
 		.size = vec3(size,1.0)
 		._ShapeID = nextID()
 
-	constructor (|vec3| Pos,  |vec3| Rad, |DistanceFunction| shape, |vec4| Color=colors.white)
+	constructor (|vec3| Pos,  |vec3| Rad, |DistanceFunction| shape, |shaderfunction| Shader,  |vec4| Color=colors.white)
 		cpp_part ConstructorShape
 		.pos = pos
 		.Shape = shape
 		.Radius = rad
 		.Color = color
-		.material = NormalColor
+		.material = Shader
 		.Health = 256
 		._ShapeID = NextID()
 	
@@ -128,6 +102,11 @@ class VObject (list)
 				rz = ++.ShapeIDs
 
 		function Black (ShaderFunction)
+		function CloudColor (ShaderFunction)
+			|| Norm = (P - .pos).normal.abs		// Spherical color
+			|| Str = 0.33*D.y / .Radius.x
+			return (1.0, 1.0, 1.0, Str) * .Color
+			
 		function NormalColor (ShaderFunction)
 			|| Norm = (P - .pos).normal.abs		// Spherical color
 			return (norm, 1.0) * .Color
@@ -179,12 +158,12 @@ class VObject (list)
 			return vec4(float.max)
 
 
-		function Box (|vec3| Pos, |vec3| Radius, |vec4| Color=colors.white, |vobject|)
-			return VObject(pos, radius, BoxShape, color)
+		function Box (|vec3| Pos, |vec3| Radius, |shaderfunction| Shader=&vobject.normalcolor, |vec4| Color=colors.white, |vobject|)
+			return VObject(pos, radius, BoxShape, shader, color)
 			
 
-		function Sphere (|vec3| Pos, |float| Radius,  |vec4| Color=colors.white, |vobject|)
-			return VObject(pos, vec3(radius), SphereShape, color)
+		function Sphere (|vec3| Pos, |float| Radius, |shaderfunction| Shader=&vobject.normalcolor, |vec4| Color=colors.white, |vobject|)
+			return VObject(pos, vec3(radius), SphereShape, shader, color)
 			
 // later: handle other ratios, for example (Add borders)
 // could we try to get closer to phi? say trim a few pixels off the top? to 865 pixels
@@ -196,17 +175,39 @@ class VObject (list)
 			if height < 0
 				y += height
 				height = height.abs
-			|| V = (x,y,x+width,y+height)*16.0
+			|| V = (x, y, x+width, y+height)*16.0
 			return V.iVec4|controlrect|
 
-////
+	prototype ShaderFunction (|vec3| P,  |vec4| D,  |vec4|)
+		// what about a magical color system too?
+		// what about a more generalised material system?
+		// do we want every object to decide how it surface colors?
+		// maybe this should be a "task". So the material info can be stored...
+
+	prototype DistanceFunction (|raytracer| Ray, |vec3| P,  |vec4|)
+		description "x: dist                 (SDF nearest dist)
+		 y: thickness
+		 zw: material-info
+		
+		 if dist < 0... ignore. We missed it
+		 if dist == 0, we are inside of it. Stipple
+		 if dist > 0, we *might* hit something
+			 if thickness < 0, move by -thickness, for sdf
+			 if thickness >= 0 end now.
+				 > 0 is volumetric transparency
+				 == 0 is a surface
+"
+		// how to test two objects? or an object vs a block?
+		// seems it needs a different function?
+		// what if instead of a raytracer, we just pass a shape?
+		// like that just happens to be a ray. Or another shape?
+
 
 
 datatype VObjectInfo (uint)
 	constants
 		Pellet
 		Dead			// to remove
-
 
 
 function controlsize.CalculateBlocks (|ivec4|)
