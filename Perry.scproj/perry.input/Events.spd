@@ -487,11 +487,11 @@ function PerryIDE.ClickedFind (|error| row)
 	|| last = .MoveError(f1, row.path,  1)
 
 	.editme.show(curr.position)
-	while curr
-		.editme.MarkAsFound(curr)
-		if curr == last
-			exit
-		curr++
+//	while curr
+//		.editme.MarkAsFound(curr)
+//		if curr == last
+//			exit
+//		curr++
 
 
 function ErrorListPaste (guipasteevent)
