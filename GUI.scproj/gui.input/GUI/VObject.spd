@@ -103,7 +103,8 @@ class VObject (list)
 
 		function Black (ShaderFunction)
 		function CloudColor (ShaderFunction)
-			|| Norm = (P - .pos).normal.abs		// Spherical color
+			// clouds aren't like this, they are more like aura-bulbs
+			// with particles that drift off them randomly
 			|| Str = 0.33*D.y / .Radius.x
 			return (1.0, 1.0, 1.0, Str) * .Color
 			

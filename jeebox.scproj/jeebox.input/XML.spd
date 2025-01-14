@@ -80,7 +80,7 @@ function Parser.FillXML (|message| XML, |ind| i, |message|)
 		.addXMLText(xml, s, prev, i) 
 		.nextstart = i
 		|| next = s[i+1] 
-		if next == '/'			
+		if next == '/'
 			return .CloseXML(XML, i, s)			// </abc>
 
 		if (next != '!')
