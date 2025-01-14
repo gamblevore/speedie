@@ -220,7 +220,6 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| OExp, |int| TypeCast,  |int|)
 		if sisnum and (o.isnil or TypeCast & kTypeCastFromzero)
 			Return kNumericMatch
 		
-		//beepw()
 		if Oisnum and sisNum
 			|| ff = o.IsFloat + .IsFloat
 			if ff == 0
