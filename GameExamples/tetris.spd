@@ -369,7 +369,7 @@ class Tetris (GridSection)
 		.Score += Score
 		if .Reached < .height-5
 			.NextShape(LevelChange)
-			keys.Clear
+			keys.Reset
 			return
 
 		beep "Game Over"

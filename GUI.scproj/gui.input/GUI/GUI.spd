@@ -775,7 +775,7 @@ module GUI
 		if EnoughTime or SDL_Event.HasAny
 			|| Occur = .HandleEvents
 			require Occur isnt ExitOrTerminate
-
+		
 		.DoSimulation
 		.CheckTaskAnimations
 		.DrawState |= (.TouchCount != 0)
@@ -824,6 +824,8 @@ module GUI
 	
 	
 	helper HandleEvents (|SDLActivity|)
+		if .ForeGroundTime.GuiAgo < 0.1s
+			keys.Reset
 		.StartResize
 		SpdProcess.CheckAllAlive
 		rz = .PreFrame
@@ -1027,8 +1029,7 @@ module GUI
 			.ForeGroundTime = gui.FrameStart
 
 		beep.OK = 1		
-		gui.sdl_Resetkeyboard
-		keys.Clear
+		keys.Reset
 		.FlashSelector = false
 		if !.DialogIsOpen
 			for w in __modules__.window.all

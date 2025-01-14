@@ -156,7 +156,7 @@ dataType Keys (int)
 		|GUIKeyRecord[6]|		Record
 
 
-		function Clear
+		helper Clear
 			// .KeyLogSub("Clear")
 			// .record = nil			// Could be allowed???? :O
 			for i in MaxKeyRecord
@@ -235,29 +235,26 @@ dataType Keys (int)
 				|| w = window.front
 				if w isa perryide
 					w.LogOneAction(nil, s)
-					
+		
+		function Reset
+			.Clear
+			gui.sdl_Resetkeyboard
 
 		helper EmptySlot (|keys| Key, |&guikeyrecord|)
-			require key!=0
-			for i in MaxKeyRecord
-				|| r = .Record[i]
-				if r.key == 0
-					rz = r
-				require r.key != key
+			if key!=0
+				for i in MaxKeyRecord
+					|| r = .Record[i]
+					if r.key == 0
+						rz = r
+					if r.Key == key // nooooo. this is bad
+						return r	// let it be-readded.
+			if !rz
+				target __PROJECT_PERRY__
+					.KeyLog(k, "AddFail")
 
 
 		helper AddKey (|keys| Key)
-			|| r = .emptyslot(key)
-			if !r
-				target __PROJECT_PERRY__
-					.KeyLog(k, "AddFail")
-				return
-				
-			// we got a strange situation:
-			// we got an addkey. We seemed to add it ok (got in here)
-			// but the key did NOT get recognised as down... and we couldn't remove it. (RemFail)
-			// and no other logs inbetween... no foreground/background swaps, anything.
-			// this COULD be what is affecting bubbles with it's keys?
+			|| r = .emptyslot(key)$
 			target __PROJECT_PERRY__
 				.KeyLog(key, "Add")
 			r.key = key

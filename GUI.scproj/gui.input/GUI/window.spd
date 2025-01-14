@@ -308,7 +308,7 @@ class Window (GUIControl)
 		
 	function Show  
 		opt norefcounts
-		keys.Clear
+		keys.Reset
 		is visible
 		is NewlyShown
 		window.all <~ self // why not?
