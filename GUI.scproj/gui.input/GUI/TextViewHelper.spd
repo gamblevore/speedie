@@ -302,7 +302,6 @@ class TextViewLine (list)
 		isnt last
 		return i
 
-
 	
 helper textview.DrawError (|image| Where, |int| y, |TextViewLine| D)
 	opt norefcounts
@@ -315,17 +314,9 @@ helper textview.DrawError (|image| Where, |int| y, |TextViewLine| D)
 	r.y	= y
 	r.y2 = y + .lineheight
 	|| lm= 0.225
-	|| v = (1.0, 0.1, 0.1, lm)
+	|| v = e.color(lm)
 	if e == .myerror
-		v = (1.0, 0.15, 0.1, 0.22)
-	|| sc = e.Severity.color // why not use this?
-	if e.severity == errorseverity.ok
-		v = (0.6, 0.6, 0.6, 0.25)
-	  elseif e.severity == errorseverity.problem
-		v.g = v.r*0.5
-		v.a = v.a*0.5
-	  elseif e.severity < errorseverity.problem
-		v = (0.6, 0.6, 0.1, 0.1)
+		v.a*=0.75
 
 	if d contains .sel1
 		.myerror = e
@@ -595,4 +586,13 @@ function message.FlatRange (|intrange|)
 			rz.x2 = rz.x2 max ss.x2
 
 
+function error.Color (|float| alpha=1.0, |vec4|)
+	if .severity == errorseverity.ok
+		return (0.6, 0.6, 0.6, alpha)
+	if .severity < errorseverity.problem
+		return (0.6, 0.6, 0.1, alpha)
+	|| v = (1.0, 0.1, 0.1, alpha)
+	if .severity == errorseverity.problem
+		v.g = v.r*0.5
+	return v
 

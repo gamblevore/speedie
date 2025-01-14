@@ -55,8 +55,17 @@ module GUI
 	cpp_wrapper SDL_CreateWindow		(|cstring| title, |int| x, |int| y, |int| w, |int| h, |uint| flags, |?&SDL_Window|) 
 	cpp_wrapper SDL_SetWindowTitle		(|&SDL_Window| win, |cstring| title) 
 	cpp_wrapper SDL_GetWindowTitle		(|&SDL_Window| win, |cstring|) 
+
+///
 	cpp_wrapper SDL_CaptureMouse		(|bool| state, |int|) 
-	
+	cpp_Wrapper SDL_GetMouseState		(|?&int| x, |?&int| y, |mousebutton|) 
+	cpp_wrapper SDL_SetRelativeMouseMode (|bool| Relative)
+	cpp_wrapper SDL_WarpMouseInWindow   (|&sdl_window| window, |int| x, |int| y)
+	cpp_wrapper SDL_ShowCursor			(|int| show=-1, |int|)
+	cpp_wrapper SDL_CreateCursor		(|&byte| data, |&byte| mask, |int| w, |int| h, |int| hot_x, |int| hot_y, |&SDL_Cursor|)
+	cpp_wrapper SDL_SetCursor			(|&SDL_Cursor| Cursor)
+///	
+
 	cpp_Wrapper SDL_CreateRenderer		(|&SDL_Window| window, |int| index, |Uint| flags, |?&SDL_renderer|)
 
 	cpp_Wrapper SDL_GetRendererOutputSize (|&SDL_Renderer| renderer, |&int| w, |&int| H, |int|)
@@ -64,12 +73,8 @@ module GUI
 	cpp_Wrapper SDL_GL_GetDrawableSize	(|&SDL_Window| window, |&int| w, |&int| h)
 	cpp_wrapper SDL_RenderCopy			(|&SDL_Renderer| renderer,  |&SDL_Texture| texture,  |?&SDL_Rect| srcrect, |&SDL_Rect| dstrect)
 	cpp_Wrapper SDL_RenderPresent		(|&SDL_Renderer| renderer)
-	cpp_Wrapper SDL_GetMouseState		(|?&int| x, |?&int| y, |mousebutton|) 
 	cpp_wrapper SDL_EventState			(|int| event, |int| enable, |byte|)
 	cpp_wrapper SDL_SetWindowPosition	(|&SDL_Window| w,  |int| x, |int| y)
-	cpp_wrapper SDL_ShowCursor			(|int| show=-1, |int|)
-	cpp_wrapper SDL_CreateCursor		(|&byte| data, |&byte| mask, |int| w, |int| h, |int| hot_x, |int| hot_y, |&SDL_Cursor|)
-	cpp_wrapper SDL_SetCursor			(|&SDL_Cursor| Cursor)
 	cpp_wrapper SDL_GetDisplayBounds	(|int| displayIndex, |&SDL_Rect| rect, |int|)
 	cpp_wrapper SDL_SetWindowMaximumSize (|&SDL_Window| window, |int| max_w, |int| max_h)
 	cpp_wrapper SDL_SetWindowMinimumSize (|&SDL_Window| window, |int| max_w, |int| max_h)
@@ -79,8 +84,6 @@ module GUI
 	cpp_wrapper SDL_GetWindowPosition	(|&SDL_Window| w,  |&int| x, |&int| y)
 	cpp_wrapper SDL_GetWindowSize		(|&SDL_Window| w,  |&int| x, |&int| y)
 	cpp_wrapper SDL_SetWindowSize		(|&SDL_Window| window, |int| w, |int| h, |int|)
-	cpp_wrapper SDL_SetRelativeMouseMode (|bool| Relative)
-	
 	cpp_wrapper SDL_ResetKeyboard		()
 	cpp_wrapper SDL_StartTextInput		()
 	cpp_wrapper SDL_StopTextInput		()
@@ -162,9 +165,15 @@ module GUI
 			return (place[0], place[1])
 
 
-	function NukeCursor
+	helper CenterCursor
+		|| sz = .Sizeorig/2
+		.SDL_WarpMouseInWindow(.screenwindow!, sz.x, sz.y)
+		
+	helper NukeCursor
+		|| w = .ScreenWindow$
 		|byte[1]| nothing
 		|| g_cursor = SDL_CreateCursor(&nothing[0], &nothing[0], 1, 1, 0, 0)
+		.CenterCursor
 		SDL_SetCursor(g_cursor)
 		.ShowCursor(false)
 						
@@ -899,6 +908,7 @@ module GUI
 	function Terminate (|sdlactivity|)
 		opt norefcounts
 		.SavePrefs // in case we crash during quit
+//		app.say "no"
 		SDL_SetRelativeMouseMode(false) // helpful
 		for w in window.all
 			.quitreason = SDLActivity.Terminating // in case of wierd events
@@ -1093,6 +1103,8 @@ module GUI
 
 		|| xy = b.xy
 		if t is MOUSEMOVE
+//			if .IsBackground
+//				Notifications<~ "Back"
 			require !.IsBackground or w.DroppingInto
 			return .MouseMoveEvent(ev.motion, w, xy)
 
@@ -1171,10 +1183,10 @@ module GUI
 		|| OldXY = .CurrMouseXY
 		|ivec2| move
 		if ev
-			move = (ev.xrel, ev.yrel)		#require
+			move = (ev.xrel, ev.yrel)
 			.MouseMoveInited = true
-		  else
-			move = xy - OldXY				#require
+		if !move
+			move = xy - OldXY		#require
 			if !.MouseMoveInited
 				return SDLActivity.Activity				// or else we never get there
 
@@ -1182,12 +1194,15 @@ module GUI
 		require MB or !.IsBackground
 		
 		if OldXY.x < 0
-			move = nil
+			move = nil // some bug work around?
+			
 		.CurrMouseXY = xy
 		if !w.SimulationFPS
 			.ShowCursor
-		if .EventCount isa 8								// in case a window comes up or closes		
-			SDL_SetRelativeMouseMode(w.SimulationFPS > 0)	// don't do it every frame
+		if .EventCount isa 8
+			|| contrain = w.SimulationFPS > 0
+				.CenterCursor
+			SDL_SetRelativeMouseMode(contrain)			// in case a window comes up or closes
 
 		if (.CanDrag >= MouseDragging.Within) and (MB is left)
 			w.DoMouseDrag(xy, .CanDrag >= MouseDragging.Beyond)
@@ -1203,7 +1218,7 @@ module GUI
 		
 		if (PrevOver != nil and Over) and (Down == nil or PrevOver)
 			PrevOver.__MouseMove__(xy, move, SDL_WindowEventID.leave)
-				
+						
 		if (down == Over or nil)
 			|| state = (SDL_WindowEventID.moved, SDL_WindowEventID.enter)(PrevOver == Over)
 			if !over

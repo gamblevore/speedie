@@ -502,13 +502,6 @@ class TextView (GUIControl)
 	function Show (|int| x, |TextViewJumpMode| Mode=0,  |TextViewLine|)
 		return .ViewPos(x, .MaxVisibleLines/3, mode)
 	
-	
-	helper MarkAsFound (|message| Where)
-		opt norefcounts
-		|| D = .FindDrawInfo(Where.Position)
-		where.obj = D
-		.DoExplode(D, 4.0)
-
 
 	helper ShowAndSel (|int| P, |int| length=0, |bool| Explode=false, |textviewline|)
 		opt NoRefCounts
@@ -516,7 +509,7 @@ class TextView (GUIControl)
 		.SelDirect((P, P + length), rz)
 
 		if explode
-			.Doexplode(rz, 2.0)
+			.Doexplode(rz)
 
 
 	helper InRange (|int| pos, |bool|)
@@ -1028,49 +1021,42 @@ class TextView (GUIControl)
 			return r
 
 
-	function DoExplode (|textviewline| D, |float| strength)
+	function DoExplode (|textviewline| D)
 		opt NoRefCounts
-		(D),(strength)
-		return // kinda annoying sometimes. can we make it nicer?
-		// or a different effect? maybe like a background warp-star-effect that only occurs within the textview?
 		|| w = .window
-			for i in 3
-				.SoftExplode(5s, gui.framestart + 0.25s*i, (-10.0, 0), D, strength)
+			.LineAttention(1.0s, gui.framestart, D)
 
 
-	task SoftExplode (taskgui, |vec2| V, |TextViewLine| D, |float| Strength)
+	task LineAttention (taskgui, |TextViewLine| D)
 		constructor
 			is Animation
 		
 		run
 			require .d in .upon._Lines
-			|| start = .upon.XY(.d)
-			|| Particles = 48 
-			|| S = .StartTime + .d.position
-			|| T = (progress*1.25).pow2
-			for P in particles
-				|| V2 = (S + P).RandomVec2 - 0.5
-				v2.x *= 5
-				|| A  = (S - P).RandomVec2 - 0.5
-				A.y *= 4.0
-				V2 = (V2 * 25.0) + .V * 250.0
-				.DrawParticle(V2, A, T, p|float|*0.4, start)
-
-
-		function DrawParticle (|vec2| V, |vec2| A, |float| T, |float| p, |ivec2| start)
-			|| str = 1.0
-			if .upon.SelectedLine != .D
-				str = 0.5
-			|| T2 = T - p * 0.0125
-			|| s = start.vec2 + (V*T2 + A)
-			|| FadeSpeed = 2.43
-			|| Alpha = (1.0-(T2*FadeSpeed)) * (1.0-T)
-			Alpha *= str * .Strength
-			|| C1 = (1.0, 1.0, 2.0, alpha)
-			|| Rect = (s-2.5, s+2.5)
-			rect.y1-=2
-			rect.y2-=2
-			GUI.Screen.DrawSoftCircle( Rect,  C1 )
+			|| LH = .upon.lineheight|float|
+			|| Y = .upon.Y(.d)|float| + LH*0.75
+			|| H = .upon.lastrect.x1x2.vec2
+			|| HM = (H.x+H.x2)/2.0
+			|| WH = 1.0/h.width
+			|| S = .StartTime
+			|| ago = s.ago.float
+			|| mush = S|int|
+			|| color = (1.0, 1.0, 2.0, 1.0)
+			|| err = .d.LineError
+				color = (err.color-0.2)*2.5
+			
+			while h.x < h.x2
+				|| Rect = (h.x, Y, h.x, Y) ± -5.0
+				|| vib = (s+(h.x*32191.23)|int|).ago.cycle(1s)
+				vib += (s+(h.x*3191.23)|int|).ago.cycle(0.27s)
+				vib += s.ago.float
+				|| middleness = 0.5-((h.x-hm).abs)*WH
+				rect = rect.up(vib*LH*0.15 + LH*-0.3 + ago*0.3)
+				|| str = (1.0-ago*0.7th)*0.5 max -0.01
+				color.a = str*middleness*2.5
+				GUI.Screen.DrawSoftCircle( Rect, color )
+				h.x += 10.0 - (mush.hash&1)|float|*2.3
+				mush++
 
 
 	helper message.LastAfter (|int| IgnoreAfter, |ind|)
@@ -1085,7 +1071,7 @@ class TextView (GUIControl)
 	helper textviewline.after_with_msg (|int|)
 		opt norefcounts
 		|| a = .after
-		|| la = .message.lastafter(a)
+		|| la = .message.LastAfter(a)
 			return la.clamp(.position, a)
 		return a
 	
@@ -1595,21 +1581,8 @@ class TextView (GUIControl)
 			c++
 	
 	
-	helper Y (|textviewline| D, |movecode| M,  |int|)
+	helper Y (|textviewline| D,  |int|)
 		rz = .lasttop - (D.vline - (._Start.vline-1)) * .lineheight|int|
-		rz += 2
-		ifn m & MoveCode.Vertical
-			rz += .lineheight / 2
-	
-	helper XY (|textviewline| D, |movecode| M=movecode.right,  |ivec2|)
-		rz.y = .y(d,m)
-		rz.x = .x(m)
-	
-	helper X (|movecode| M, |int|)
-		if m is right
-			return .Right
-		if m is left
-			return .left
 
 	helper XYOfChar (|ind| pos, |ivec2|)
 		opt norefcounts
