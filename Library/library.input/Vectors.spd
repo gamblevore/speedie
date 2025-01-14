@@ -781,6 +781,9 @@ datatype vec2
 	function LengthSq (|float|)
 		return (.x * .x)  +  (.y * .y)
 
+	function Width (|float|)
+		return .x2 - .x1
+	
 	function Length (|float|)
 		return .LengthSq.sqrt
 

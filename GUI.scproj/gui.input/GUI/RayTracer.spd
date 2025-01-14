@@ -25,7 +25,7 @@
 class RayTracer
 	visible false
 	linkage:cpp_part Ray
-	|float|				MaxViewDistSq
+	|float|				MaxViewDist
 	//
 	|vec4|				Size
 	|vec2|				Scale
@@ -35,7 +35,7 @@ class RayTracer
 	|Vec3|				_CamDir
 	|vec3|				iDir
 	|Mat4|				_LookAt
-	|vec2|				_RayDist
+	|vec4|				_RayHit
 	|vec3|				Fwd
 
 	|Vec3|				Camera
@@ -71,10 +71,10 @@ class RayTracer
 		.RootNode = root
 		.Background = Black
 		.EndNodes = (root|&byte| + Buff)|&RayTraceNode|
-		.MaxViewDistSq = 1000.0.pow2
+		.MaxViewDist = 1000.0
 	
 	
-	prototype BackgroundShader (|vec2| P, |vec4|) 	// really this should just be a task...?
+	prototype BackgroundShader (|vec2| P, |vec4|)
 	function Black (BackgroundShader)
 		
 	setter Camera (|vec3|)
@@ -108,40 +108,61 @@ class RayTracer
 		opt min 3
 		|| ID = pxl.a
 		|| C = (pxl.Color, .bg(XY))(ID)
-		// we really need the original color... BEFORE we drew our stuff
-		// could it be stored? in a buffer? two rows? only 256 bytes, right?
-		// the raytracer can store it?
+		// object-anti-alising best done by storing one pixel row
 		for i in 4
 			|| sh = (i&1, i>>1).Vec2 - 0.5
 			|| XY2 = xy + sh*0.8
-			|| B = .getobj(XY2, cell)
+			|| B = .FindBestObj(XY2, cell)
 				C += .GetColor(B)
 			  else
 				C += .BG(XY2)
 		pxl <~ C*5th
 		pxl.a = ID
-	
-	
-	helper GetObj (|vec2| XY, |RayTraceCell| Cell, |vobject|)
+
+
+	helper FindBestObj (|vec2| XY, |RayTraceCell| Cell, |vobject|)
+		// how to stipple if inside the obj?  what if its right in front of us?
+		// what about volumetrics?
+	//			if t < 0: hit.y+=(t-0.001), t = 0.001 ????
+
 		opt min 3, opt norefcounts
 		._CamDir = .Dir(xy)
 		.idir = -1.0 / ._CamDir
 		|| node = cell.node$
 		|| sp = node.draw!
-		._RayDist = vec2(float.max)
+		._RayHit = vec4(float.max)
 		while
-			|| t = (sp.Shape)(sp, self)
-			if t.x < ._rayDist.x
+			|| d = 0.0
+			|vec4| hit
+			for 30 
+				Hit = (sp.Shape)(sp, self, .Camera + ._camdir*d)
+				if hit.y >= 0  or  hit.x <= 0: exit
+				d += (0.0001-hit.y)
+			
+			|| t = hit.x
+			if t > 0 and t < ._rayhit.x
 				rz = sp
-				._RayDist = t
+				._Rayhit = hit
 			sp = sp._CellNext #loop
+/*
+	 x: dist                 (SDF nearest dist)
+	 y: thickness
+	 zw: material-info
 	
+	 if dist < 0... ignore. We missed it
+	 if dist = 0, we are inside of it. Stipple.  What about a minimum dist?
+	 if dist > 0, we *might* hit something
+		 if thickness < 0, move by -thickness, for sdf
+		 if thickness >= 0 end now.
+			 > 0 is volume
+			 = 0 is a surface
+*/
 
 	helper GetColor (|vobject| B, |vec4|)
 		opt min 3
-		|| rd = ._RayDist.x
+		|| rd = ._Rayhit.x
 		|| P = .Camera + ._CamDir*rd
-		return (B.material)(B, P, ._raydist)
+		return (B.material)(B, P, ._rayhit)
 		
 		
 	helper Dir (|vec2| XY, |vec3|)
@@ -154,12 +175,12 @@ class RayTracer
 		|| D2 = .Dir(p.x2y2)
 		return Plane3D.normals(d1, d2, .Camera)
 
-	
+
 	helper PlaneOK (|vec4| R, |vec4| Pos, |int| i, |bool|)
 		opt inline
 		return .Planes[i].BoxVsPlane(r, pos) > 0
-	
-	
+
+
 	helper InPlanes (|VObject| b, |bool|)
 		opt min 3
 		if b._ObjDist
@@ -181,29 +202,32 @@ class RayTracer
 			.Planes[1] =  .plane(.size.x2y1x2y2) // 1011 // right
 			.Planes[2] =  .plane(.size.x1y1x2y1) // 0010 // bottom
 			.Planes[3] = -.plane(.size.x1y2x2y2) // 0111 // top
-			.rootnode.Divide(self)
+			.RootNode.Divide(self)
 	
 	
-	helper FindCameraDist (|vobject| V)
-		|| ToObj = v.pos - .Camera // could subtract v's radius? do later
+	helper FindCameraDist (|vobject| V, |float| Max)
+		|| ToObj = v.pos - .Camera    // Could subtract v's radius? do later
 		v._ObjDist = 0
 		|| D = ToObj.LengthSq
-		if  (D > 0.25)  and  (D < .MaxViewDistSq)
+		if  (D > 0.25)  and  (D < Max)
 			if ToObj • .Fwd > 0
 				v._ObjDist = D
+	
 	
 	function @raytracer.DistanceSorter (sortercomparer of vobject)
 		return b._objdist < a._objdist
 		
+		
 	helper PlayQuidditch (|int| Stride)
 		opt norefcounts
 		.RemakeNodes(stride)
+		|| Max = .MaxViewDist.pow2
 		for s in .Shapes
-			.FindCameraDist(s)
+			.FindCameraDist(s, max)
+
 		.Shapes.Sort(DistanceSorter)
 		for s in .shapes
-			if .InPlanes(s)
-				// todo: if shape covers cell, mark cell as covered
+			if .InPlanes(s)   // todo: if shape covers cell, mark cell as covered
 				.Quadditch(.rootnode, s)
 	
 	 
@@ -238,7 +262,7 @@ class RayTracer
 			while pxl < pxl2
 				#! Main pixel color
 				cell.Aliased = false
-				|| b = .GetObj(p, cell)
+				|| b = .FindBestObj(p, cell)
 					pxl.FastMix(.GetColor(B))
 					pxl.a = B._ShapeID
 				  else
@@ -265,7 +289,7 @@ class RayTracer
 	
 	
 	helper InitAllCells (|&RayBoost|)
-		|| s2 = (0,0, gui.Screen.Width, gui.Screen.height)
+		|| s2 = (0, 0, gui.Screen.Width, gui.Screen.height)
 		rz = .RootNode
 		if rz.size != s2
 			rz.size = s2
@@ -295,7 +319,6 @@ struct RayBoost
 	|byte|					CellsWide		// shared with root
 	|byte|					CellsHigh		// shared with root
 	|byte|					ThreadLock		// In case I want to multi-thread
-	
 
 	function Area (|int|)
 		return .CellsWide|int| * .CellsHigh|int|
@@ -322,7 +345,7 @@ struct RayBoost
 			rz  +=  .area // fake cell. should never be reached? but might be?
 	
 
-	helper raytracer.Quadditch (|rayboost| ff, |vobject| v, |int| i=-1)
+	helper raytracer.Quadditch (|RayBoost| ff, |VObject| v, |int| i=-1)
 		real self,  opt min 3
 		if i >= 0
 			|| D = ff.depth
