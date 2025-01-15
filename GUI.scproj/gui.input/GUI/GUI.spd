@@ -713,12 +713,6 @@ module GUI
 		if (._LastTimeSeen - ST).abs > 0.5s					// Computer paused, or clock changed.  Just do 1 frame.
 			rz = 1
 		._LastTimeSeen = ST
-
-
-	helper date.printwithinsecond
-		|| x = self & 0xFFFF
-		|| y = x div 64K
-		"${y}s"
 		
 
 	helper window.DoFrameStep (|bool| ChangeOK, |int| N)

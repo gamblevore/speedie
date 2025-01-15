@@ -98,11 +98,11 @@ class ButtonView (GUIControl)
 	behaviour MouseMove
 		opt norefcounts
 		if (state is enter or leave)
-			GUI.touch
+			.touch
 		|| item = .itemat(P.x)
 		if .CurrOverItem != item
 			.CurrOverItem = item
-			GUI.touch
+			.touch
 			(.onover)(self, state|int|, item)?
 
 
@@ -167,6 +167,7 @@ class ButtonView (GUIControl)
 		if cl and clicks == -1		// drag
 			if D and D != cl
 				cl.moveto(D)
+				.touch
 				.PressingDone = true
 			if !.pressing or .PressingDone
 				return mousedragging.beyond
@@ -231,7 +232,7 @@ class ButtonView (GUIControl)
 		|| fader = 1.0
 		if i is Active
 			strength += (GUI.cycle(1.25s)*0.95)-0.2
-			GUI.Touch
+			.Touch
 		  else
 			fader = .declutterer.strength					#require
 			
@@ -277,7 +278,7 @@ class ButtonView (GUIControl)
 					if ago > 4	// perhaps something like soft-explode or at least half-pixels
 						ago = 4 // also the maths is wrong somehow...
 					  else
-						GUI.Touch
+						.Touch
 					pn.y -= (ago-4.0)|int|
 				  elseif .MenuIsOpen
 					pn.y += 4

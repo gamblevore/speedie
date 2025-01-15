@@ -148,7 +148,7 @@ class StretchDivider (GuiControl)
 			if .min > 0
 				(.onhide)(self, 0)?
 			  else
-				.collapse(true)
+				.Collapse(true)
 
 
 	task SlowShow (taskgui, |int| s)
@@ -215,7 +215,7 @@ class StretchDivider (GuiControl)
 		|| Out = MightBeOut and !(.lastrect contains P)
 		|| dateout = !.entered
 		if Out != dateout
-			GUI.touch(Self)
+			.touch
 			.Entered = (0, gui.FrameStart)(out)
 		if GUI.MouseButtons is left
 			|| d = gui.FrameStart-0.75s
@@ -236,37 +236,46 @@ class StretchDivider (GuiControl)
 		|| f = (diff.float - 0.6)*2.0
 		rz = f.clamp
 		if rz >= 0 and rz < 1.0
-			GUI.touch(Self)
+			.touch
 
 
 	behaviour Draw
 		opt norefcounts
 		require .MouseNotDownOverOther and .entered
-		|| rect = .lastrect
+		|| rect = .LastRect
 		|| xy   = rect.xy
 		require where contains xy
 
-		|| a    = .FadeAlpha
+		|| a = .FadeAlpha
 		|| scale = rect.size.Vec2
-		|| h    = scale[1-.d]
-		|| w	= scale[.d]
-		scale = 2.25/(w, h)
-		w = (3.0,2.0)(.collapsed) 
-		xy[.d]  += (4.0-w)|int|
-		|| add  = (.d, 1-.d)
-		||stride= (where.width, 1)(.d)
-		|| col  = .gnormal.edge.Color
-		|| center = (w,h)*0.5 - 0.5
+		|| h = scale[1-.d]
+		|| w = scale[.d]
+		scale = 2.25 / (w, h)
+		w = 3.0
+		xy[.d] += 1
+		|| add = (.d, 1-.d)
+		|| stride = (where.width, 1)(.d)
+		|| col = .gnormal.edge.Color
+		|| center = (w, h)*0.5 - 0.5
 
+		// not sure why I neeed these wierd adjustments...
+		if !.d
+			center.x += 2
+			scale.x *= 1.26th
+			scale.y *= 2th
+		  else
+			xy.y+=(!.collapsed)*3
+			scale.y *= 1.2th
+			scale.x *= 1th
+		
 		for j in h
 			|| p = where[xy]
 			for i in w
-				|| diff2 = (((i,j)-center)*scale).sum
-				col.a = (1.0 - diff2.Length)*a
+				|| diff2 = ((i,j)-center) * scale
+				col.a = (1.0 - diff2.abs.sum)*a
 				p.overlay(col.PreMul)
 				p += stride
 			xy += add
-
 
 function GuiControl.MouseNotDownOverOther (|bool|)
 	opt norefcounts
