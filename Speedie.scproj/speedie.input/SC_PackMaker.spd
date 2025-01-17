@@ -103,7 +103,6 @@ module PackMaker
 		fn = .testfn("SemiConst")
 		if fn
 			for i in 2
-				debugat
 				self[0] = i*16K
 				|| found = fn.test|&int|[]
 		
@@ -172,7 +171,7 @@ module PackMaker
 	function OrderGlobals (|[scdecl]| List, |int|)
 		opt norefcounts
 		list.sort(SmallestFirst)
-/		rz = 1				// rz = 1, so if .ExportPosition == 0 then something is wrong.
+		rz = 1				// rz = 1, so if .ExportPosition == 0 then something is wrong.
 		for (d in list)
 			|| s = d.CarraySize
 			|| s16 = s min 16
@@ -185,10 +184,8 @@ module PackMaker
 		opt norefcounts
 		|| mu = .asm
 			|| mu2 = mu.µTest
-				|| P = mu2.ptr
-				printline self
-				printline mu
-				return jb_vm.Run(p, mu2.length)
+				mu.debugprint
+				return jb_vm.Run(mu2.ptr, mu2.length)
 	
 	
 	syntax access (|int| v, assigns:|int64|)

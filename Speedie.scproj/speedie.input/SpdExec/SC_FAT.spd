@@ -77,6 +77,7 @@ struct FatASM
 			.r[1] = reg
 			return true
 
+
 	function SmartFatness (|int| reg, |maybebool|)
 		opt norefcounts
 		|| f = .form
@@ -146,10 +147,11 @@ struct FatASM
 			return s
 	
 	Syntax Expect (|string| Error)
-		|| err = Error(nil, error, ErrorSeverity.Error, .file)
+		|| f = .file|file--|
+		|| err = Error(nil, error, ErrorSeverity.Error, f)
 		err.position = .BytePos
-		target debug: asmstate.printprogress(nil)
 		nil|errorreceiver| <~ err
+		.DebugPrint
 	
 	function NumInput (|int| a, assigns:|int| v)
 		.r[a] = v
@@ -209,12 +211,17 @@ struct FatASM
 		return reg == .r2
 	
 	
-	function CheckHasOutput
-		opt inline
+	function CheckHasOutput 
+		opt inline, opt norefcounts
 		target debug
+			// why not use .outputs?
 			if .r[0]<<1 == 0
 				|| form = .form
-				check (form.params[0] isnt output) (.msg, "Missing ASM output")
+				// need some way to say that the output is optional
+				// also... the reg|1<<31 sucks...
+				// Perhaps 2 bits somewhere? like "optional out, always out, input reg, some numba" 
+				check !(form.params[0] is output) (self, "Missing ASM output")
+	
 	
 	function FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 		|| where = start+.ASMIndex
@@ -271,13 +278,45 @@ struct FatASM
 				exit
 		if (self isa asm.knst or asm.knsr)
 			.RendaKnst(fs, fs.mark-m)
+			fs <~ ' '
+		.rendamsg(fs, fs.mark-m)
 	
+	
+	function TmpRender (|faststring| fs, |message| msg)
+		|| arg = msg.Find(@arg)
+		if !arg
+			msg.Render(fs)
+			return 
+		
+		|| c = msg.copy
+		while arg
+			arg.Remove
+			arg = c.find(@arg)
+		c.Render(fs)
+			
 	
 	function RendaMsg (|faststring| fs, |int| sofar)
-		fs <~ (' ', 26-sofar)
-		fs <~ "/# "
-		fs <~ .msg.name
-		fs <~ " #/"
+		opt norefcounts
+		|| msg = .msg
+		if msg == @sheb
+			msg.render(fs)
+			return
+		fs <~ (' ', 47-sofar)
+		require msg != @arg
+
+		fs <~ "/* "
+		if msg == @prm
+			msg = msg.parent
+		  else
+			while msg == @num or @thg or @opp or @bra or @char
+				loop !(msg in @prm)
+				msg = msg.parent
+		if (msg == @tmp)
+			.TmpRender(fs, msg)
+		  else
+			msg.render(fs)
+		
+		fs <~ " */"
 	
 	
 	function RendaKnst (|faststring| fs, |int| sofar)

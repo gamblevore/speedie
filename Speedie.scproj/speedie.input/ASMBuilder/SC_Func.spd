@@ -55,11 +55,8 @@ class µFunc
 		return jb_vm.Run(.ptr, .length)|&int64|[]
 
 
-/// TEXTUAL STUFF		
-	function DebugPrint (|scfunction| fn)
-		printline fn
-		|| fs = faststring()
-		fs <~ "asm ${fn.name}\n"
+	render
+		fs <~ "asm ${.fn.name}\n"
 		|| bb = 0
 		for µ in self
 			if options.ASMRenderBlocks and µ.BlockNum != bb
@@ -68,6 +65,12 @@ class µFunc
 			fs <~ '\t'
 			µ.Renda(fs)
 			fs <~ '\n'
+
+/// TEXTUAL STUFF		
+	function DebugPrint
+		printline .fn
+		|| fs = faststring()
+		.render(fs)
 		printline fs
 
 

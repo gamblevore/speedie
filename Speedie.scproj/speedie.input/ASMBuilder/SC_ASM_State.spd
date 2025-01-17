@@ -227,6 +227,7 @@ struct ASMState
 
 		
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
+		description "Same as µOpen, except this closes temp vars for reuse." 
 		|| Closer = .OpenVars
 		rz = .µOpen(exp, dest)
 		.CloseVars(Closer)

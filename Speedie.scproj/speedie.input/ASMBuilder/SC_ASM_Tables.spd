@@ -74,13 +74,13 @@ function StatExpr (fn_asm)
 	opt norefcounts
 	for ch.fast in exp
 		if ch.islast
-			return .µ(ch, dest)
+			return .µopen(ch, dest)
 		.µ(ch, asmreg.Discard)
 
 	
 function First (fn_asm)
 	opt norefcounts
-	return .µ(exp.first!, dest)
+	return .µopen(exp.first!, dest)
 
 
 function Sheb (fn_asm)
@@ -114,7 +114,7 @@ function ReturnExp (|&ASMState| self, |message| f, |AsmReg|)
 	if f
 		|| V = .ExistingVar(f, true)
 			return V
-		return .µ(f)
+		return .µopen(f)
 	
 
 function Return (fn_asm)
@@ -147,7 +147,7 @@ function TypeCast (fn_asm)
 	opt norefcounts
 	|| f = exp.first!
 	dest.µtype = exp.asmdecl.datatype
-	|| freg = .µ(F, dest)
+	|| freg = .µopen(F, dest)
 	if freg.µtype == dest.µtype
 		return freg // already done!
 	return TypeCastSub(self, exp, dest, freg)
@@ -213,19 +213,22 @@ function ConstConvert  (|&asmstate| self, |message| exp, |ASMReg| dest, |ASMReg|
 
 function Decl (fn_asm)
 	opt norefcounts
-	exp = exp.last!
-	|| ty = exp.first!.fastdecl
-	dest = .DeclareMe(Exp, ty)
-	exp = exp.last!
+	|| rel = exp.last!
+	|| ty = exp.fastdecl
+	if !exp.obj
+		debugger
+		ty = rel.first!.fastdecl
+	dest = .DeclareMe(rel, ty)
+	|| item = rel.last!
 
-	if (ty is altered) or (ty isnt local) // its always local ???
-		return .µinto(exp, dest)
+	if ty isnt local // a carray or somthing?? idk
+	if (ty is altered) or (ty isnt local)
+		return .µinto(item, dest)
 
-	// we only want constants...
-	|| K = .µinto(exp, dest)
+	|| K = .µinto(item, dest)
 	if k is ConstOutput
 		|| f = k.fat
-			if ty isnt const//???
+//			if ty isnt const//???
 			(ty is const)
 			ty.exportposition = f._const
 			ty.FatConst = k.fatindex
@@ -378,16 +381,16 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 	
 
 function AddressOf (fn_asm)
-	rz = .µ(exp, dest as asmreg.addrneed)
+	rz = .µopen(exp, dest as asmreg.addrneed)
 	if (rz is ContainsAddr)
 		return rz
 	error (exp, "ASM fail")
-	.µ(exp, dest as asmreg.addrneed)
+	.µopen(exp, dest as asmreg.addrneed)
 
 
 function BoolNot (fn_asm)							// !a
 	dest = dest.negate
-	|| src = .µ(exp, dest)
+	|| src = .µopen(exp, dest)
 	if src is AlreadyNegated
 		return src
 	return .exists(dest, src, exp)
@@ -446,7 +449,7 @@ function IncrAmount (|asmreg| upon, |int| IsSubtract, |scdecl| D,  |int64|)
 function Incrementatulatorifier		(fn_asm)				// --a++
 	visible
 	opt	NoRefCounts
-	|| Src = .µ(exp, dest as asmreg.addrrequest)
+	|| Src = .µopen(exp, dest as asmreg.addrrequest)
 	|| Amount = IncrAmount(src, mode, exp.ASMDecl)
 	if src is ContainsAddr
 		return IncrOnAddr(self, exp, dest, mode, src, amount)
@@ -463,7 +466,7 @@ function ARel (fn_asm)
 	opt	NoRefCounts
 	|| F = exp.name[]
 	if F == '?' or '!'
-		return .µ(exp.first!, dest)
+		return .µopen(exp.first!, dest)
 	|| M = (F == '+')|int|
 	if dest isnt discard
 		M += IncrAfter
@@ -512,7 +515,7 @@ function Unexpected		(fn_asm)
 	if !exp.asmtype
 		|| f = exp.func|int|
 			exp.asmtype = f
-			return .µ(exp, dest)
+			return .µopen(exp, dest)
 	error  (exp, "bad ASMType")
 }
 
@@ -546,11 +549,12 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	|| ml = ASMReg()
 	|| mr = ASMReg()
 	if dest is SingleExpr
-		ml = .µ(exp, dest)
+		ml = .µopen(exp, dest)
 	  else
 		|| Closer = .OpenVars
 		|| discardmode = dest & AsmReg.Discard
 		|| Mode = discardmode with dest
+
 		ml = .µopen(exp.first!, mode)
 		mode = DiscardMode.with(dest, ml)
 		mr = .µ(exp.last!, mode)

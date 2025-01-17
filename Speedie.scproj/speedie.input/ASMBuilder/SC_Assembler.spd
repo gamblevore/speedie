@@ -69,6 +69,6 @@ module SpdAssembler
 	function GenerateASM (|scfunction| fn, |bool|) // memory safe ASM retrier
 		expect (.GenerateASMSub(fn) or (ASMState.ExpandJSM and .GenerateASMSub(fn))) "ASM is out of memory." 
 
-		fn.asm!.debugprint(fn)
+		fn.asm!.debugprint
 		return true
 
