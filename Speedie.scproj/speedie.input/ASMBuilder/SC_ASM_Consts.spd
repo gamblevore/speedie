@@ -81,7 +81,6 @@ extend ASMState
 				if k.r0 == dest.reg
 					.nop(k)
 		
-		if "semiconst".trap
 		|| fat = exp.KNST(dest, 0, 0, 0)
 		fat.Const = v
 		(dest is realconst)

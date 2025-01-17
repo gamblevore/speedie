@@ -6483,6 +6483,8 @@ bool SC_FAT_SyntaxIs(FatASM* Self, ASMReg Flags);
 
 void SC_FAT_SyntaxIsSet(FatASM* Self, ASMReg Flags, bool Value);
 
+void SC_FAT_TmpRender(FatASM* Self, FastString* Fs, Message* Msg);
+
 
 
 // JB_FatRange
@@ -8324,9 +8326,11 @@ xC2xB5Form* SC_xC2xB5Form__NeedForm(JB_String* Form, Message* M);
 // JB_µFunc
 FuncInASM* SC_FuncInASM_Constructor(FuncInASM* Self, SCFunction* Fn, FatASM* IR);
 
-void SC_FuncInASM_DebugPrint(FuncInASM* Self, SCFunction* Fn);
+void SC_FuncInASM_DebugPrint(FuncInASM* Self);
 
 void SC_FuncInASM_Destructor(FuncInASM* Self);
+
+JB_String* SC_FuncInASM_Render(FuncInASM* Self, FastString* Fs_in);
 
 ASM* SC_FuncInASM_xC2xB5Render(FuncInASM* Self, ASM* Where, ASM* After);
 
@@ -11645,7 +11649,7 @@ inline void SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info) {
 
 inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
 	iif ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc, false))) {
-		JB_Msg_Fail(Self, JB_LUB[816]);
+		JB_Msg_Fail(Self, JB_LUB[817]);
 	}
 }
 

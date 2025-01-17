@@ -304,7 +304,8 @@ struct FatASM
 		fs <~ (' ', 47-sofar)
 		require msg != @arg
 
-		fs <~ "/* "
+		fs <~ "/*"
+		fs <~ " "
 		if msg == @prm
 			msg = msg.parent
 		  else
@@ -316,7 +317,8 @@ struct FatASM
 		  else
 			msg.render(fs)
 		
-		fs <~ " */"
+		fs <~ " "
+		fs <~ "*/"
 	
 	
 	function RendaKnst (|faststring| fs, |int| sofar)
