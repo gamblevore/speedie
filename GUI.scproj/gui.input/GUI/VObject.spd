@@ -122,11 +122,10 @@ class VObject (list)
 			return (grid, grid, grid, 1.0)*.Color
 		
 		
-		function WierdShape (DistanceFunction)
-			|| S = SphereShape(self, ray, P)
-			if S.x > 0
-			|| B = BoxShape(self, ray, P)
-			// we could	return -dist as thickness for SDFs
+//		function WierdShape (DistanceFunction)
+//			|| S = SphereShape(self, ray, P)
+//			if S.x > 0
+//			|| B = BoxShape(self, ray, P)
 			
 			
 		function SphereShape (DistanceFunction)
@@ -180,7 +179,7 @@ class VObject (list)
 			return V.iVec4|controlrect|
 
 	prototype ShaderFunction (|vec3| P,  |vec4| D,  |vec4|)
-		// what about a magical color system too?
+		// what about a magical color system?
 		// what about a more generalised material system?
 		// do we want every object to decide how it surface colors?
 		// maybe this should be a "task". So the material info can be stored...
@@ -190,18 +189,18 @@ class VObject (list)
 		 y: thickness
 		 zw: material-info
 		
-		 if dist < 0... ignore. We missed it
-		 if dist == 0, we are inside of it. Stipple
-		 if dist > 0, we *might* hit something
-			 if thickness < 0, move by -thickness, for sdf
-			 if thickness >= 0 end now.
-				 > 0 is volumetric transparency
+		 dist < 0:				Ignore. We missed it
+		 dist == 0:				We are inside of it. Stipple
+		 dist > 0:				We *might* hit something
+			 thickness < 0:  	Move by -thickness, for sdf
+			 thickness >= 0: 	End now.
+				 > 0 is volumetric (for transparency?)
 				 == 0 is a surface
 "
 		// how to test two objects? or an object vs a block?
 		// seems it needs a different function?
 		// what if instead of a raytracer, we just pass a shape?
-		// like that just happens to be a ray. Or another shape?
+		// like that just happens to be a ray.
 
 
 

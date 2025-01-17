@@ -3,7 +3,6 @@
 // todo whenever its fun?
 // * 4 threads, each can do one cell.
 // * default RayTracer constructor uses block positioning system to match 2D/3D closely
-// * modelling system? or at least someway to construct better shapes.
 // * Schlick's approximiation for materials? just hard-code a light somewhere
 // * anti-aliasing preserve average luminosity (gamma correction?)
 
@@ -12,11 +11,14 @@
 // 1) Make SpaceTree work
 // 2) Optimisations around unmoving objects
 // 3) hit-detection (float pos becomes chunk relative)
-// 4) more shapes:
-	// * box    / sloped voxels / blends with neighbours
-	// * pipe   / half-pipes    / bends
-	// * sphere / capsule       / blobs
+// 4) modelling system? or at least someway to construct better shapes.
+// 5) more shapes:
+	
+	// * voxel  / sloped voxels
+	// * pipe   / half-pipes
+	// * sphere / block
 	// * SDFs
+		// * merge voxels, bend pipes, blobby spheres
 	// (All shapes: Provide raydist for drawing, nearest point for hit-detection)
 	
 
@@ -108,7 +110,7 @@ class RayTracer
 		opt min 3
 		|| ID = pxl.a
 		|| C = (pxl.Color, .bg(XY))(ID)
-		// Object-anti-alising best done by storing one row width of 32-bit ints.
+		// Object-anti-aliasing best done by storing one row width of 32-bit ints.
 		
 		for i in 4
 			|| sh = (i&1, i>>1).Vec2 - 0.5
