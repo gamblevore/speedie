@@ -91,7 +91,7 @@ function Sheb (fn_asm)
 function TryTail (fn_asm)
 	opt norefcounts
 	|| l = .Last
-	require l isa asm.FNC or asm.fnc3
+	require l isa asm.FNC or asm.FNC3
 	|| fn = l.Msg.obj as SCFunction					#debug_require
 	|| Prms = l.FuncPrmBits							#require
 
@@ -663,6 +663,9 @@ function Message.TypeCastDoesNothing (|bool|)
 
 
 function fatasm.FuncPrmBits (|uint64|)
+	// i don't really get this.
+	// its also only usd for tail, which is unused
+	// is this out of date code?
 	rz = .r2
 	|| r3 = .r3|uint64| << 32
 	rz |= r3

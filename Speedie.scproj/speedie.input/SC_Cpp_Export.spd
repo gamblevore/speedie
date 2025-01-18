@@ -50,7 +50,6 @@ function PreRun
 	fs <~ `// Globals put into a separate file to make things faster.
 #include "JB_Umbrella.hpp"
 #include "JB.h"
-#pragma GCC visibility push(hidden)
 
 const char* JB_CrashLogFileName = "/tmp/logs/`
 	fs <~ compiler.projectname
@@ -58,6 +57,9 @@ const char* JB_CrashLogFileName = "/tmp/logs/`
 	
 JB_Globals JB__;
 `
+
+	if !options.targetdebug
+		fs <~ "#pragma GCC visibility push(hidden) // hide\n"
 
 
 function FillLibGlobs (|faststringcpp| fs, |bool| simple=false)
@@ -637,19 +639,20 @@ function ExportSyx
 
 
 function FinalMergeOutputIntoACpp
-	|| fs = faststringcpp.new
+	|| fs = FastStringCpp.new
 	fs <~ "\n// Auto-generated file, by speedie.\n"
 	fs <~ Cpp_Export.CppLicence
 
 	fs.includeh "JB_Umbrella.hpp"
 	fs.includeh "JB.h"
-
+	
 	for h in Cpp_Export.H_PostInput
-		fs.includeh(h)
-
-
+		fs.IncludeH(h)
+	
+	if !options.TargetDebug
+		fs <~ "#pragma GCC visibility push(hidden) // hidden\n"
+	
 	fs <~ `
-#pragma GCC visibility push(hidden)
 extern "C" {
 
 `

@@ -92,7 +92,7 @@ extend asmstate
 		#! Disallow: if obj.X(),   when obj.X() is a disowner
 		#! Then we will never freeifdead within if-branch or other tests.
 		#! needs understanding of disowners!
-
+		
 		exp.RFAP(A, asmreg(), asmreg())
 		return a
 

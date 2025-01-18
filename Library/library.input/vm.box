@@ -232,13 +232,17 @@ forms
 		r2		r
 		Code	4
 
+	RefSet1
+		r1		r		// Small R
+		r2		r
+	
 	RefSet2
 		r1		r		// Small R
 		r2		r
 		Decr	1
 		Offset	l
 	RefSet3
-		r1		R		// Big r
+		r1		R		// Big R
 		r2		r
 		Decr	1
 		Offset	l
@@ -508,7 +512,7 @@ POS 5
 /**/ RFAP  (U3)
 		SetRefApart(r, Op)
 
-/**/ RFST  (U2)
+/**/ RFST  (RefSet1)
 		SetRefBasic(r, Op)		
 
 /**/ RFWR  (RefSet2)							// RefCount reg --> mem

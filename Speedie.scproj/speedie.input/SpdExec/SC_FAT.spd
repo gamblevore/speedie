@@ -82,7 +82,7 @@ struct FatASM
 		opt norefcounts
 		|| f = .form
 		for i in f.Count
-			if .r[i]&31==reg
+			if .Prm(i) == reg
 				|| p = f.Params[i]
 				if p.IsReg
 					return (p is Output)|maybebool|
@@ -211,35 +211,19 @@ struct FatASM
 		return reg == .r2
 	
 	
+	function Prm (|int| i, |int|)
+		return .r[i] & ~(1<<31) // remove tmpbit.
+		
 	function CheckHasOutput 
 		opt inline, opt norefcounts
 		target debug
 			// why not use .outputs?
-			if .r[0]<<1 == 0
-				|| form = .form
-				// need some way to say that the output is optional
-				// also... the reg|1<<31 sucks...
-				// Perhaps 2 bits somewhere? like "optional out, always out, input reg, some numba" 
-				check !(form.params[0] is output) (self, "Missing ASM output")
+			if !.Prm(0)
+				|| P = .form.params[0]
+				if  p is output//  and  p isnt optional 
+					error (self, "Missing ASM output")
 	
-	
-	function FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
-		|| where = start+.ASMIndex
-		target debug: debug_require  where >= start  and  where < after 
-	
-		|int| dest_fat = .r[reg]
-		|| fat = self + dest_fat
-		|| dest_asm = fat.asmindex
-		|| dest = start + dest_asm
-
-		target debug: debug_require dest >= start and dest <= after
-		|| amount = dest - where
-			.r[reg] = amount - 1
-		  else // WHAT?
-			error (self, "Invalid ASM generated (infinite loop)")
-		.µrenderinto(where, where+1) // rerender
-	
-	
+		
 	function µRenderInto (|!&asm| Where, |!&asm| After, |!&asm|)
 		opt inline
 		return (ASM.encoders[.op]!)(self, where, after)
@@ -248,7 +232,7 @@ struct FatASM
 	function Renda (|FastString| fs)
 		opt norefcounts
 		if (self isa asm.noop)  and  (.msg.func == @sheb)
-			.rendamsg(fs, 0)
+			.RendaMsg(fs, 0)
 			return 
 		
 		|| M = fs.mark
@@ -259,7 +243,8 @@ struct FatASM
 		|| GotAny = ""
 		|| Remain = 24
 		|| f = op.sizes
-
+		/// 
+		
 		for i in f.count
 			|| bs = f[i].BitSize
 			if bs and (remain > 0)
@@ -276,10 +261,12 @@ struct FatASM
 				remain += bs
 			if .op == asm.knst
 				exit
+		///
+		
 		if (self isa asm.knst or asm.knsr)
 			.RendaKnst(fs, fs.mark-m)
 			fs <~ ' '
-		.rendamsg(fs, fs.mark-m)
+		.RendaMsg(fs, fs.mark-m)
 	
 	
 	function TmpRender (|faststring| fs, |message| msg)
@@ -304,7 +291,7 @@ struct FatASM
 		fs <~ (' ', 47-sofar)
 		require msg != @arg
 
-		fs <~ "/*"
+		fs <~ "/*" // reuse /* string lol.
 		fs <~ " "
 		if msg == @prm
 			msg = msg.parent
@@ -317,7 +304,7 @@ struct FatASM
 		  else
 			msg.render(fs)
 		
-		fs <~ " "
+		fs <~ " " // reuse "*/" string
 		fs <~ "*/"
 	
 	

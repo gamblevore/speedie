@@ -181,6 +181,7 @@ render Describe
 
 
 Render
+	opt norefcounts
 	|| it = .source
 		return it.Render(fs_in)
 	return .describe(fs_in)
@@ -902,7 +903,6 @@ function CheckConstructorAndDestructor (|Message| root, |bool| IsConstructor)
 	|| Sooper = .cls$.super // will this fix it?
 		GotSuperConstructor  =  Sooper == typeobject  or  (typetask == Sooper.parent or Sooper)
 	|| NoNesting = "This should be at the function root. (not nested)."
-	if self ~= "SC_badthing_Constructor"
 	
 	for dot.flat in root
 		if dot == @func

@@ -8,7 +8,7 @@
 function FatASM.AddRegParam (|message| src, |int| write)
 	opt norefcounts
 	if write|uint| <= 6
-		.r[write] = src.regornum // what if it's the last one...
+		.r[write] = src.RegOrNum // what if it's the last one...
 	  else
 		debugger
 
@@ -22,7 +22,7 @@ datatype µParam (uint16)
 	
 	flags
 		|µparam|
-		(32)		// starting point
+		(32)		// Starting point
 		NonReg = [Jump, Number]
 		Signed
 		NoExpect
@@ -38,14 +38,14 @@ datatype µParam (uint16)
 
 
 function message.Reg (|int|)
-	|| reg = .int(1)
+	|| reg = .Int(1)
 	if (reg <= 31)
 		return reg|int|
 	error (self, "Expected register between r0 and r31")
 
 
 function message.RegOrNum (|int|)
-	if .name[].lowercase != 'r'
+	if .name[].LowerCase != 'r'
 		return .int
 	return .reg
 

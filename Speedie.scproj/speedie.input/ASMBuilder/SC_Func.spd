@@ -23,27 +23,46 @@ class µFunc
 		.testing = rz
 		rz.length = rz.buffersize
 		|| p = rz.ptr
-		|| after = .µRender(P, P+rz.length)
+		|| after = .MuRender(P, P+rz.length)
 		rz.size = after-p
 	
 	// cosmic lore unfold... into tales untold
 
-	function µRender (|!&ASM| Where, |!&asm| After, |!&asm|)
+	
+	function MuRender (|!&ASM| Where, |!&asm| After, |!&asm|)
 		|uint64| HasLabel
 		rz = where
 		for i in .length
 			|| fat = .ir+i
-			haslabel |= fat.jumpreg<<(i&63)
+			haslabel |= fat.jumpreg << (i&63)
 			fat.ASMIndex = rz - where
 			fat.CheckHasOutput
 			rz = fat.µrenderinto(rz, after)
 
-		if haslabel // Use this as a jump-map??? To skip huge sections?
-			for i in self
-				|| r = i.JumpReg
-					i.FillLabelRequest(where, rz, r-1)
+		if HasLabel // Use this as a jump-map??? To skip huge sections?
+			for fat in self
+				|| r = fat.JumpReg
+					fat.FillLabelRequest(where, rz, r-1)
 
 
+	function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
+		|| SelfOut = start + .ASMIndex
+		target debug: debug_require  SelfOut >= start  and  SelfOut < after 
+	
+		// this needs fixing.
+		|int| J = .r[reg]
+		|| OldDest = self + J + 1
+		|| DestOut = OldDest.asmindex
+		|| dest = start + DestOut
+
+		target debug: debug_require dest >= start and dest <= after
+		|| J2 = (dest - SelfOut) -1
+		check (J2 != -1) (self, "Invalid ASM generated (infinite loop)")
+		.r[reg] = J2
+		.µRenderInto(SelfOut, SelfOut+1) // rerender
+		.r[reg] = J						 // restore!
+	
+	
 	function memory.Run (|memory of asm| self, |&ivec4| Args = nil, |int| ArgCount=0, |int64|)
 		disabled
 		cpp_part RunArgs
