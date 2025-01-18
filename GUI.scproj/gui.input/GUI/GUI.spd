@@ -990,7 +990,7 @@ module GUI
 			
 		  
 		if (key is copy) or (cmd and key is c)
-			|| wf = w.focusattempt
+			|| wf = w._FocusAttempt
 			if !rf and wf isa textview
 				return wf.docopy
 			return gw.DoCopy
@@ -1038,7 +1038,7 @@ module GUI
 	
 	
 	helper CheckEvent (|&SDL_Event| ev, |int|)
-		visible
+		visible, opt norefcounts
 		|| t = ev.type
 		 
 		if t is APP_DIDENTERFOREGROUND or APP_DIDENTERBACKGROUND
@@ -1069,7 +1069,7 @@ module GUI
 		if t is DROPFILE or Droptext
 			return .FileDroppedIntoApp(w, ev.drop.filestr, t)
 		
-		if t is dropcomplete
+		if t is DropComplete
 			w.DroppingInto = nil
 			return SDLActivity.activity
 
@@ -1086,8 +1086,8 @@ module GUI
 			return .MouseWheelEvent(ev,	w)
 
 		|| b = ev.button
-		if (b.button >= 4) and (t is mousedown) // what about holding it?
-			return w.DoListViewNext(b.button == 4)|int| // assumes SDLActivity.activity == 1
+		if (b.button >= 4) and (t is mousedown)					// what about holding it?
+			return w.DoListViewNext(b.button == 4)|int|			// assumes SDLActivity.activity == 1
 	
 		if t is MOUSEDOWN
 			return .MouseDownEvent(w, b)
@@ -1098,8 +1098,6 @@ module GUI
 
 		|| xy = b.xy
 		if t is MOUSEMOVE
-//			if .IsBackground
-//				Notifications<~ "Back"
 			require !.IsBackground or w.DroppingInto
 			return .MouseMoveEvent(ev.motion, w, xy)
 
@@ -1211,15 +1209,16 @@ module GUI
 		if !Down and over
 			.SetToolTips(Over)
 		
-		if (PrevOver != nil and Over) and (Down == nil or PrevOver)
-			PrevOver.__MouseMove__(xy, move, SDL_WindowEventID.leave)
-						
-		if (down == Over or nil)
-			|| state = (SDL_WindowEventID.moved, SDL_WindowEventID.enter)(PrevOver == Over)
-			if !over
-				Over = w
-			if Over.__MouseMove__(xy, move, state)
-				rz = SDLActivity.activity
+		if w.createddate.guiago > 0.01s
+			if (PrevOver != nil and Over) and (Down == nil or PrevOver)
+				PrevOver.__MouseMove__(xy, move, SDL_WindowEventID.leave)
+							
+			if (down == Over or nil)
+				|| state = (SDL_WindowEventID.moved, SDL_WindowEventID.enter)(PrevOver == Over)
+				if !over
+					Over = w
+				if Over.__MouseMove__(xy, move, state)
+					rz = SDLActivity.activity
 
 
 	helper TextInputEvent (|&SDL_Event| ev, |window| w, |int|)
@@ -1275,7 +1274,7 @@ module GUI
 	helper Window.GetUserAttention
 		if !.Focus
 			._FlashSelf |= 1
-		.alphafader = gui.FrameStart
+		._alphafader = gui.FrameStart
 		beep
 	
 	

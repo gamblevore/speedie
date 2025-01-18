@@ -19,8 +19,8 @@ main
 
 
 class Bubbles (window)
-	|raytracer|		T
-	|fpstextview| 	FPS
+	|RayTracer|		T
+	|FPSTextView| 	FPS
 
 	constructor
 		.t = RayTracer((1.6, 5.0, -22.0))!

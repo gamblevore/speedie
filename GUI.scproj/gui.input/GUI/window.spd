@@ -3,7 +3,6 @@
 class Window (GUIControl)
 	linkage
 		cpp_part Win
-	|bool|								FocusWasSet
 	|byte| 								SimulationFPS
 	|bool|								IsDialog
 	|bool|								IsMainWindow
@@ -18,14 +17,15 @@ class Window (GUIControl)
 	|list of TaskGUI|					Tasks
 //	|list of TaskGUI|					Animations // add this later!
 	|object?|							ReturnValue
-	|date|								AlphaFader
 	|date|								CreatedDate
 
 	visible false
-	|guicontrol?|						FocusAttempt
+	|date|								_AlphaFader
+	|bool|								_FocusWasSet
 	|float|								BlockScale
 	|vec2|								BlockMove
 	|byte|								BlockMode
+	|guicontrol?|						_FocusAttempt
 	|byte| 								_FrameNum
 	|uint16| 							_FrameNext
 	|date| 								_LastTimeSeen
@@ -116,6 +116,7 @@ class Window (GUIControl)
 		.IsMainWindow = true
 		.SimulationFPS = SimulationFPS
 		if gui.init(scaling)
+			gui.CenterCursor
 			.BlockScale ?= 20
 			.reflow
 			if !gui.singleframenest
@@ -156,17 +157,17 @@ class Window (GUIControl)
 
 	helper FinishFocus (|guicontrol| focus)
 		if focus and .parent and focus isnt drawsfocus
-			.alphafader = gui.FrameStart
+			._alphafader = gui.FrameStart
 		  else
-			.alphafader = 0
+			._alphafader = 0
 		
-		.FocusWasSet = true // for stop mousedown bug
+		._FocusWasSet = true // for stop mousedown bug
 		GUI.UpdateTextFocus(self)
 		GUI.touch(Self)
 
 
 	helper SetFocus (|guicontrol| Focus)
-		.FocusAttempt = Focus
+		._FocusAttempt = Focus
 		if focus
 			require focus.Takesfocus.able	// and (focus is visible) // fixfocus will fix it.
 											// besides, important events could be missed, like a task
@@ -354,7 +355,7 @@ class Window (GUIControl)
 			inner.DrawInner(where)
 
 		where.ResetBoundsToSize
-		if .AlphaFader and ._FlashSelf
+		if ._AlphaFader and ._FlashSelf
 			.DrawFocusRect(Where, .LastRect, .FaintingEdgeSub)
 
 
@@ -498,11 +499,11 @@ class Window (GUIControl)
 			|| R = self[p]
 			require  r  and  r is opensmenu  and  r != O
 		
-		.FocusWasSet = false
+		._FocusWasSet = false
 		|| Found = .ControlAt(p.point, 0, true)
 			|| clicks2 = Found.__MouseDown__(p, clicks)
 				GUI.CanDrag = clicks2 * (clicks2 > mousedragging.handled)
-				if !.FocusWasSet and (found != .innerfocus)
+				if !._FocusWasSet and (found != .innerfocus)
 					.setfocus(Found)
 				return Found
 

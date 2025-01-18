@@ -468,7 +468,7 @@ class GUIControl (list)
 	helper FaintingEdgeSub (|float|)
 		opt norefcounts
 		|| w = .window!
-		|| f = w.AlphaFader				#require
+		|| f = w._AlphaFader				#require
 		|| delay = gui.FrameStart - f
 		|| remain = 1s - delay
 		if w._FlashSelf & 2
@@ -479,7 +479,7 @@ class GUIControl (list)
 			if w._FlashSelf&2
 				f2 *= 0.2
 			return f2
-		w.alphafader = 0
+		w._alphafader = 0
 		w._FlashSelf = 0
 	
 			
