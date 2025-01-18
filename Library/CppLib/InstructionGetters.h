@@ -478,6 +478,13 @@
 #define   RefSetCode_Lu_(x)   (((uint)((x)<<22))>>22)
 
 
+#define   RefSet1_Li       ((( int)((Op)<<18))>>18)
+#define   RefSet1_Li_(x)   ((( int)((x)<<18))>>18)
+
+#define   RefSet1_Lu       (((uint)((Op)<<18))>>18)
+#define   RefSet1_Lu_(x)   (((uint)((x)<<18))>>18)
+
+
 #define   RefSet2_Decri       ((( int)((Op)<<18))>>31)
 #define   RefSet2_Decri_(x)   ((( int)((x)<<18))>>31)
 

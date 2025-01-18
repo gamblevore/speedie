@@ -11,13 +11,17 @@ typedef void (*FFI_Fn)(void);
 extern "C" void* JB_ASM__Load (JB_StringC* S) {
     static void* MySelf;
     if (!MySelf) {
-		MySelf = dlopen(NULL, RTLD_LAZY);
+		MySelf = dlopen(0, RTLD_LAZY);
+//		MySelf = dlopen("/usr/local/speedie/Terminal/Speedie", RTLD_LAZY);
 		if (!MySelf) return 0;
 	}
-// we can't load funcs from the same C++ file (JB.cpp). Wierdly.
 	void* R = dlsym(MySelf, (const char*)(S->Addr));
-//	if (R)
-//		printf("// fn: %s\n", S->Addr);
+	if (!R) {
+//		debugger;
+		printf("// fn! %s\n", S->Addr);
+	} else {
+//		printf("// got %s\n", S->Addr);
+	}
 	return R;
 }
 
