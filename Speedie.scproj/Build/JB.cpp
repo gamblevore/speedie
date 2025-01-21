@@ -3440,7 +3440,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[220]);
-	JB_FS_AppendInt32(_fsf0, (2025011821));
+	JB_FS_AppendInt32(_fsf0, (2025012121));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8861,7 +8861,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1676]);
-	JB_FS_AppendInt32(_fsf0, (2025011821));
+	JB_FS_AppendInt32(_fsf0, (2025012121));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -14426,7 +14426,7 @@ SCObject* SC_TypeOfUnit(Message* Exp, SCNode* Name_space, Message* Side) {
 		JB_SetRef(Str, JB_int64_Render(((int64)Val), nil));
 	}
 	 else iif (CanFloat) {
-		JB_SetRef(Str, JB_dbl_RenderFloat(Val, nil));
+		JB_SetRef(Str, JB_dbl_Render(Val, 24, nil));
 		Float64 Big = ((Float64)(16.0f * (1024.0f * 1024.0f)));
 		iif ((Val >= Big) or (Val < (-Big))) {
 			JB_SetRef(D->Type, SC_TypeFloat64);
@@ -16994,10 +16994,10 @@ void JB_cstring_temp(_cstring Self, FakeJBString* Rz) {
 }
 
 
-JB_String* JB_dbl_RenderFloat(double Self, FastString* Fs_in) {
+JB_String* JB_dbl_Render(double Self, int Dp, FastString* Fs_in) {
 	FastString* Fs = JB_FS__FastNew(Fs_in);
 	JB_Incr(Fs);
-	JB_FS_AppendDoubleAsText(Fs, Self, 6, false, true);
+	JB_FS_AppendDoubleAsText(Fs, Self, Dp, true, true);
 	JB_String* _tmPf0 = JB_FS_SmartResult(Fs, Fs_in);
 	JB_Incr(_tmPf0);
 	JB_Decr(Fs);
@@ -58637,4 +58637,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 7598770535626560454 -912377802438272411
+// 664033701391422358 -912377802438272411

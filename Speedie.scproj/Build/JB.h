@@ -4989,7 +4989,7 @@ void JB_cstring_temp(_cstring Self, FakeJBString* Rz);
 
 
 // f64
-JB_String* JB_dbl_RenderFloat(double Self, FastString* Fs_in);
+JB_String* JB_dbl_Render(double Self, int Dp, FastString* Fs_in);
 
 
 
