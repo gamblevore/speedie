@@ -15,17 +15,18 @@ class VObject (list)
 	visible false
 	// ray acceleration
 	|byte|			_ShapeID
+	|float|			_MaxDist  
 	|?VObject--|	_CellNext
-	|vec4|			_RayHit
+	|vec4|			_RayHit   // seems removeable.
 	
 	visible true
 	
 	constructor (|vec2| Pos,  |vec2| Size,  |vec4| Color=colors.white)
 		cpp_part ConstructorBox2D
 		.pos = (pos, 0.0)
-		.Shape = BoxShape
+		.Shape = &VShapes.BoxShape
 		.Color = color
-		.material = NormalColor
+		.material = &Colors.normal
 		.Health = 256
 		.size = vec3(size,1.0)
 		._ShapeID = nextID()
@@ -89,7 +90,9 @@ class VObject (list)
 			.position |= i
 		  else
 			.position &= ~i
-		
+	
+	function ActualRadius (|float|)
+		return .Radius.Length
 	
 	module
 		|byte| ShapeIDs
@@ -100,74 +103,7 @@ class VObject (list)
 			rz = ++.ShapeIDs
 			if !rz
 				rz = ++.ShapeIDs
-
-		function Black (ShaderFunction)
-		function CloudColor (ShaderFunction)
-			// clouds aren't like this, they are more like aura-bulbs
-			// with particles that drift off them randomly
-			|| Str = 0.33*D.y / .Radius.x
-			return (1.0, 1.0, 1.0, Str) * .Color
-			
-		function NormalColor (ShaderFunction)
-			|| Norm = (P - .pos).normal.abs		// Spherical color
-			return (norm, 1.0) * .Color
-
-		function IceFudgeColor (ShaderFunction)
-			|| Norm = (P - .pos).normal
-			|| y = Norm.y.acos
-			|| x = Norm.z.abs.atan2(Norm.x)
-			|| str = 8.0
-			|| spd = 30s
-			|| grid = ((((x+y + gui.Cycle(spd))*str).fract - 0.5)*str).clamp*0.125 + 0.875
-			return (grid, grid, grid, 1.0)*.Color
-		
-		
-//		function WierdShape (DistanceFunction)
-//			|| S = SphereShape(self, ray, P)
-//			if S.x > 0
-//			|| B = BoxShape(self, ray, P)
-			
-			
-		function SphereShape (DistanceFunction)
-			opt min 3
-			|| L = .pos - P
-			|| t = L • Ray._CamDir
-			if t > 0
-				|| r = .Radius.x
-				|| h = (r*r) + (t*t) - (L • L)
-				if h >= 0
-					h = h.Sqrt
-					return (t-h, h*2, 0, 0)
-			return vec4(float.max)
-		
-		
-		function BoxShape (DistanceFunction)
-			opt min 3
-			|| orig = P - .pos
-			|| r = .Radius
-			|| idir = ray.iDir
-			
-			|| p0 = (orig - r) * idir
-			|| p1 = (orig + r) * idir
-			
-			|| t1 = (P0 min P1).max
-			|| t2 = (P0 max P1).min
-			
-			if t2 >= t1
-				return (t1, t2-t1, 0, 0)
-			return vec4(float.max)
-
-
-		function Box (|vec3| Pos, |vec3| Radius, |shaderfunction| Shader=&vobject.normalcolor, |vec4| Color=colors.white, |vobject|)
-			return VObject(pos, radius, BoxShape, shader, color)
-			
-
-		function Sphere (|vec3| Pos, |float| Radius, |shaderfunction| Shader=&vobject.normalcolor, |vec4| Color=colors.white, |vobject|)
-			return VObject(pos, vec3(radius), SphereShape, shader, color)
-			
-// later: handle other ratios, for example (Add borders)
-// could we try to get closer to phi? say trim a few pixels off the top? to 865 pixels
-
+					
 		function Size2D (|float| X, |float| Width, |float| Y, |float| Height, |controlrect|)
 			if Width < 0
 				x += Width
@@ -178,29 +114,6 @@ class VObject (list)
 			|| V = (x, y, x+width, y+height)*16.0
 			return V.iVec4|controlrect|
 
-	prototype ShaderFunction (|vec3| P,  |vec4| D,  |vec4|)
-		// what about a magical color system?
-		// what about a more generalised material system?
-		// do we want every object to decide how it surface colors?
-		// maybe this should be a "task". So the material info can be stored...
-
-	prototype DistanceFunction (|raytracer| Ray, |vec3| P,  |vec4|)
-		description "x: dist                 (SDF nearest dist)
-		 y: thickness
-		 zw: material-info
-		
-		 dist < 0:				Ignore. We missed it
-		 dist == 0:				We are inside of it. Stipple
-		 dist > 0:				We *might* hit something
-			 thickness < 0:  	Move by -thickness, for sdf
-			 thickness >= 0: 	End now.
-				 > 0 is volumetric (for transparency?)
-				 == 0 is a surface
-"
-		// how to test two objects? or an object vs a block?
-		// seems it needs a different function?
-		// what if instead of a raytracer, we just pass a shape?
-		// like that just happens to be a ray.
 
 
 

@@ -423,6 +423,9 @@ datatype vec3
 	function Min (|float|)
 		return .x min .y min .z
 		
+	operator Sign (|vec3| C, |vec3|)
+		return (self|vec4| sign C|vec4|)|vec3|
+
 	function iVec3 (|ivec3|)
 		return (.x|int|, .y|int|, .z|int|)
 

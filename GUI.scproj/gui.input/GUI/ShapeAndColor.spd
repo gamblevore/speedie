@@ -1,0 +1,149 @@
+
+module VShapes
+// https://www.youtube.com/watch?v=aNR4n0i2ZlM // a heart shape?
+
+	function smin (|float| a, |float| b, |float| k=0.125, |float|)
+	    k *= 4.0
+	    || h = ( k-(a-b).abs max 0.0 ) / k
+	    return (a min b) - h*h*k*0.25
+	
+
+	function SphereShape (DistanceFunction)
+		opt min 3
+		|| L = .pos - P
+		|| r = .Radius.x * p.w
+		if ray
+			|| t = L • Ray._CamDir
+			if t > 0
+				|| h = (r*r) + (t*t) - (L • L)
+				if h >= 0
+					h = h.Sqrt
+					return (t-h, h*2, 0, 0)
+			return vec4(float.max)
+		return vec4(L.Length-r, 0, 0, 0) // for SDF operations
+	
+
+	function Subtract (|vec4| S, |vec4| R, |vec4|)
+		// Analytic subtraction.
+		if r.x==float.max or s.x == float.max
+			return s
+		
+		if r.x > s.x // hit s first, so just use s.
+			return s // might need to adjust the thickness, but do that later.
+		
+		|| r2 = r.x + r.y
+		|| s2 = s.x + s.y
+		
+										// Now check if R is contained in S
+		if r2 >= s2
+			return vec4(float.max)		// cut right through
+
+		s.x = r2						// nice!
+		s.w = s.w max r.w				// material fixs
+		return s
+
+
+	function Add (|vec4| S, |vec4| R, |vec4|)
+		s.w = s.w max r.w
+		s.x = s.x min r.x
+		return s
+
+
+	function DebugShape (DistanceFunction)
+		p.w *= 0.5
+		if Keys.k[]
+			return BoxShape(self, ray, p)
+		if Keys.l[]
+			p.w *= 1.1
+			return SphereShape(self, ray, p)
+
+		// Seems CPU-side SDFs are impossible to do fast.
+		// At least using SDF-like techniques
+		// We need to stay purely analytical right now.
+		// Until we can upload speedie code to a GPU.
+		
+		rz = BoxShape(self, ray, p)
+		
+		p.w *= 1.1
+		rz = subtract(rz, SphereShape(self, ray, p + (0, 0, 1.0)))
+		rz = subtract(rz, SphereShape(self, ray, p - (0, 0, 1.0)))
+
+
+
+	function BoxShape (DistanceFunction)
+		opt min 3
+		|| orig = P - .pos
+		|| r = .Radius * p.w
+		if ray
+			|| idir = ray.iDir
+			
+			|| p0 = (orig - r) * idir
+			|| p1 = (orig + r) * idir
+			
+			|| PP = P0 max P1
+			|| PM = P0 min P1
+			|| t1 = PM.max
+			|| t2 = PP.min
+			
+			if t2 >= t1
+				return (t1, t2-t1, 0, 0)
+			return vec4(float.max)
+
+		|| P3 = orig.abs - R  max 0
+		return (P3.length, 0, 0, 0)
+
+
+
+function @VObject.Box (|vec3| Pos, |vec3| Radius, |shaderfunction| Shader=&colors.normal, |vec4| Color=colors.white, |vobject|)
+	return VObject(pos, radius, &VShapes.BoxShape, shader, color)
+		
+
+function @VObject.Sphere (|vec3| Pos, |float| Radius, |shaderfunction| Shader=&colors.normal, |vec4| Color=colors.white, |vobject|)
+	return VObject(pos, vec3(radius), &VShapes.sphereShape, shader, color)
+	
+function @VObject.Debug (|vec3| Pos, |float| Radius, |vobject|)
+	return VObject(pos, vec3(radius), &VShapes.DebugShape, &colors.normal, colors.white)
+	
+// later: handle other ratios, for example (Add borders)
+// could we try to get closer to phi? say trim a few pixels off the top? to 865 pixels
+
+
+prototype ShaderFunction (|vobject| self, |vec3| P,  |vec4| D,  |vec4|)
+	// what about a magical color system?
+	// what about a more generalised material system?
+	// do we want every object to decide how it surface colors?
+	// maybe this should be a "task". So the material info can be stored...
+
+
+prototype DistanceFunction (|vobject| self, |raytracer?| Ray, |vec3| P, |vec4|)
+	description "
+x: dist
+y: thickness
+z: reserved
+w: material-info
+
+If y == 0, then use an SDF to improve the distance.
+"
+
+
+function colors.TotalBlack (ShaderFunction)
+function colors.Cloud (ShaderFunction)
+	// clouds aren't like this, they are more like aura-bulbs
+	// with particles that drift off them randomly
+	|| Str = 0.33*D.y / .Radius.x
+	return (1.0, 1.0, 1.0, Str) * .Color
+	
+function colors.Normal (ShaderFunction)
+	|| Norm = (P - .pos).normal.abs		// Spherical color
+	return (norm, 1.0) * .Color
+
+function colors.IceFudge (ShaderFunction)
+	|| Norm = (P - .pos).normal
+	|| y = Norm.y.acos
+	|| x = Norm.z.abs.atan2(Norm.x)
+	|| str = 8.0
+	|| spd = 30s
+	|| grid = ((((x+y + gui.Cycle(spd))*str).fract - 0.5)*str).clamp*0.125 + 0.875
+	return (grid, grid, grid, 1.0)*.Color
+
+

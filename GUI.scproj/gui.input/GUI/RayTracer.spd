@@ -33,6 +33,8 @@ class RayTracer
 	|vec2|				Scale
 	|vec2|				Adjust
 	|vec4[4]|			Planes
+	|byte|				RayAccuracy
+	
 	//
 	|Vec3|				_CamDir
 	|vec2|				_XY
@@ -70,6 +72,7 @@ class RayTracer
 		// Default RayTracer constructor should use the block positioning system
 		// either by zpos or zoom
 		.Camera() = Camera
+		.RayAccuracy = 40
 		.RootNode = root
 		.Background = Black
 		.EndNodes = (root|&byte| + Buff)|&RayTraceNode|
@@ -126,53 +129,55 @@ class RayTracer
 	helper Prepare (|vec2| XY)
 		._CamDir = .Dir(xy)
 		._XY = XY
-		.idir = -1.0 / ._CamDir
+		.idir = (-1.0 / ._CamDir)//|vec4|.makesane|vec3|
 	
 	
+// How to stipple if inside the obj?  what if its right in front of us?
+// what about volumetrics?
+			
+// For transparent objects... if they are all the same material
+// and nothing inbetween... we can just... "add up the distance?"
+
+// I think the func should do the coloring too.
+// now, what if we passed the object? we need a maximum distance. like raydist+radius.
+
+
 	helper FindBestObj (|vobject?| sp, |vobject|)
-	// how to stipple if inside the obj?  what if its right in front of us?
-	// what about volumetrics?
-	//			if t < 0: hit.y+=(t-0.001), t = 0.001 ????
 		opt min 3,   opt norefcounts
 		|| Best = float.max
 		while sp
-			|| d = 0.0
-			|vec4| hit
 			sp._RayHit = vec4(float.max)
-			for 30 
-				Hit = (sp.Shape)(sp, self, .Camera + ._camdir*d)
-				if hit.y >= 0  or  hit.x <= 0: exit
-				d += (0.0001-hit.y)
-				// as far as transparent objects go...
-				// assuming they are all the same material
-				// and nothing inbetween... we can just... "add up the distance?"
-				// it makes sense!!  Unless each has some kind of glassy surface.
-				// works for clouds anyhow.  Just increase the first object's _rayhit.y
-				// Also... how can .shape know the material,  if the knowledge in .material?s
-				// Either the func should have it, or the object should have a fixed material.
-
-				// then we could use a "model" system... 
-				
-				// we lose our power. I think the func should know it. So... the func has to do the coloring too.
-			
-			if  hit.x > 0  and  hit.x < Best
+			|| Hit = .FindBestObjSub(sp)
+			if hit.x < Best  and  hit.z <= 1024th
 				rz = sp
 				sp._Rayhit = hit
 				best = hit.x
 			sp = sp._CellNext
-/*
-	 x: dist                 (SDF nearest dist)
-	 y: thickness
-	 zw: material-info
 	
-	 if dist < 0... ignore. We missed it
-	 if dist = 0, we are inside of it.
-	 if dist > 0, we *might* hit something
-		 if thickness < 0, move by -thickness, for sdf
-		 if thickness >= 0 end now.
-			 > 0 is volume
-			 = 0 is a surface
-*/
+	
+	helper FindBestObjSub (|vobject| sp, |vec4|)
+		opt min 3
+		|| P = .Camera, p.w = 1.0
+		|| hit = (sp.Shape)(sp, self, P)
+		if hit.y		// analytical shape.
+			hit.z = 0
+			return hit
+		
+		
+		|| d = hit.x
+		for .RayAccuracy
+			P = .Camera + ._camdir*d,  P.w = 1.0	// Scaling factor
+			Hit = (sp.Shape)(sp, self, P)
+			d += (hit.x + 4096th)
+			if  hit.y  or  hit.x <= 1024th
+				hit.z = hit.x
+				hit.x = d
+				return hit
+			
+			if  d >= sp._MaxDist
+				exit
+		return vec4(float.max)
+
 
 	helper ShadePixel (|vobject| B, |vec4|)
 		opt min 3
@@ -197,16 +202,6 @@ class RayTracer
 		return .Planes[i].BoxVsPlane(r, pos) > 0
 
 
-	helper InPlanes (|VObject| b, |bool|)
-		opt min 3
-		if b._rayhit.x
-			|| R = (b.radius, 0.0)
-			|| P = (b.pos,    1.0)
-			return .PlaneOK(r,p,0) and .PlaneOK(r,p,1) and .PlaneOK(r,p,2) and .PlaneOK(r,p,3)
-		// Could also (later) check if the nearest frustrum point is in the box.
-		// Need points[8] and a way to find which is the nearest to the box, or just check all?
-		
-	
 	helper RemakeNodes (|int| S)
 		.InitAllCells
 		for C in self
@@ -221,25 +216,47 @@ class RayTracer
 			.RootNode.Divide(self)
 	
 	
-	helper FindCameraDist (|vobject| V, |float| Max)
-		|| ToObj = v.pos - .Camera    // Could subtract v's radius? do later
-		v._rayhit = nil
-		|| D = ToObj.LengthSq
-		if  (D > 0.25)  and  (D < Max)
-			if ToObj • .Fwd > 0
-				v._rayhit.x = D
+	helper FindCameraDist (|vobject| obj, |float| Max)
+		// lets us find out the max/min SDF distance.		
+		|| V = obj.pos - .Camera
+		|| DMin = V.Length
+		|| DMax = DMin
+		|| R = obj.ActualRadius
+
+
+		if V • .Fwd < 0
+			dmax = R-Dmax
+			dmin = -r-dmin
+		  else
+			Dmax += R
+			Dmin -= R
+		
+		obj._RayHit = nil
+		obj._MaxDist = 0
+		if  (Dmax > 0.01)  and  (Dmin < Max)
+			obj._RayHit.x = Dmin				// Used by .InPlanes and .Sort only.
+			obj._MaxDist = Dmax
 	
 	
-	function @raytracer.DistanceSorter (sortercomparer of vobject)
+	helper InPlanes (|VObject| b, |bool|)
+		opt min 3
+		if b._rayhit.x
+			|| R = (b.radius, 0.0)
+			|| P = (b.pos,    1.0)
+			return .PlaneOK(r,p,0) and .PlaneOK(r,p,1) and .PlaneOK(r,p,2) and .PlaneOK(r,p,3)
+		// Could also (later) check if the nearest frustrum point is in the box.
+		// Need points[8] and a way to find which is the nearest to the box, or just check all?
+
+	
+	function @raytracer.DistanceSorter (SorterComparer of vobject)
 		return b._rayhit.x  <  a._rayhit.x
 		
 		
 	helper PlayQuidditch (|int| Stride)
 		opt norefcounts
 		.RemakeNodes(stride)
-		|| Max = .MaxViewDist.pow2
 		for s in .Shapes
-			.FindCameraDist(s, max)
+			.FindCameraDist(s, .MaxViewDist)
 
 		.Shapes.Sort(DistanceSorter)
 		for s in .shapes
@@ -283,7 +300,10 @@ class RayTracer
 					pxl.FastMix(.ShadePixel(B))
 					pxl.a = B._ShapeID
 				  else
-					pxl <~ .BG(P)
+					if cell.obj and Keys.shift
+						pxl <~ ivec4(90)
+					  else
+						pxl <~ .BG(P)
 					pxl.a = 0
 				
 				if !keys.shift

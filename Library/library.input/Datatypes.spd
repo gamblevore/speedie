@@ -529,8 +529,13 @@ datatype float
 		return self * (1.0 - a) + (y * a)
 
 	function SmoothStep (|float|)
-		|| x = .clamp - 0.5
+		|| x = .clamp// - 0.5
 		return x * x * (3.0 - 2.0 * x)
+	
+	function SmoothStep (|float| low, |float| high, |float|)
+		cpp_part SmoothStep2
+		|| t = ((self - low) / (high - low)).clamp
+		return t * t * (3.0 - 2.0 * t);
 
 	operator max (|float| other, |float|)
 		cpp_wrapper (fmaxf)
@@ -611,8 +616,8 @@ datatype f64
 	operator min (|Float64| other, |Float64|)
 		cpp_wrapper (fmin)
 
-	render (|int|dp=6)
-		fs.appenddouble(self, dp, true)
+	render (|int| dp=6)
+		fs.appenddouble(self, dp, true, true) // it needs the ".0" to be parsed as a float by C++.
 
 	render RenderFloat
 		fs.appenddouble(self, 6, false, true)

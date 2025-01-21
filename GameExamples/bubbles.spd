@@ -30,13 +30,12 @@ class Bubbles (window)
 		|| L = 10.0
 		for i in (-L to L)
 			|| sh = (i, 0.0, i.abs)*24.0
-			|| C = vec4((2.0-i)*0.5, 1, 1, 1)
-			|| N = &vobject.normalcolor //&vobject.cloudcolor
-			.T.shapes <~ vobject.sphere(sh+(-1.0, 1.5, 12.0), 2.0, N, C)
-			.T.shapes <~ vobject.sphere(sh+( 1.5, 2.5, 18.0), 3,  N, C)
-			.T.shapes <~ vobject.sphere(sh+( 7.0, 8.0, 18.0), 4,  N, C)
-			.T.shapes <~ vobject.sphere(sh+( -2.0, 9.0, 24.0), 6, N, C)
-			.T.shapes <~ vobject.sphere(sh+( 12.0, 3.0, 24.0), 4, N, C)
+			|| N = &colors.normal //&vobject.cloudcolor
+			.T.shapes <~ vobject.debug(sh+(-1.0, 1.5, 12.0),  2)
+			.T.shapes <~ vobject.debug(sh+( 1.5, 2.5, 18.0),  3)
+			.T.shapes <~ vobject.debug(sh+( 7.0, 8.0, 18.0),  4)
+			.T.shapes <~ vobject.debug(sh+( -2.0, 9.0, 24.0), 6)
+			.T.shapes <~ vobject.debug(sh+( 12.0, 3.0, 24.0), 4)
 
 
 	behaviour MouseMove
