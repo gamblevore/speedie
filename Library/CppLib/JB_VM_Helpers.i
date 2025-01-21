@@ -436,9 +436,9 @@ AlwaysInline ASM* Return2 (VMRegister*& ZeroPlace, ASM Op) {
 	VMRegister* stck = OldZero-1;
 	auto R1 = stck - stck->Stack.SavedReg;
 	auto Code = stck->Stack.Code;
-	auto V = RET_Valuei; // get before copy!
-	auto Src = OldZero+n1;
-	ZeroPlace = R1-1; // NewZero
+	auto V = RET_Valuei;		// get before copy!
+	auto Src = OldZero + n1;
+	ZeroPlace = R1-1;			// NewZero
 	stck = (VMRegister*)memcpy(stck, Src, RET_Countu<<4);
 	if (V)
 		stck->Uint |= V;
