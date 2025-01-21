@@ -411,7 +411,7 @@ function TypeOfUnit (ExprResolver)
 		str = val|int64|.render
 		
 	  elseif CanFloat
-		str = val.renderfloat
+		str = val.render(24)
 		|Float64| big = 16.0*1024.0*1024.0
 		if val >= big  or val < -big
 			D.type = typefloat64!
