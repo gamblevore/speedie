@@ -14,7 +14,7 @@ import "GUI"
 
 
 main
-	return Bubbles().RunAsMain(2, 60)
+	return Bubbles().RunAsMain(1.25, 60)
 
 
 
@@ -30,12 +30,16 @@ class Bubbles (window)
 		|| L = 10.0
 		for i in (-L to L)
 			|| sh = (i, 0.0, i.abs)*24.0
-			|| N = &colors.normal //&vobject.cloudcolor
-			.T.shapes <~ vobject.debug(sh+(-1.0, 1.5, 12.0),  2)
-			.T.shapes <~ vobject.debug(sh+( 1.5, 2.5, 18.0),  3)
-			.T.shapes <~ vobject.debug(sh+( 7.0, 8.0, 18.0),  4)
-			.T.shapes <~ vobject.debug(sh+( -2.0, 9.0, 24.0), 6)
-			.T.shapes <~ vobject.debug(sh+( 12.0, 3.0, 24.0), 4)
+			.T.shapes <~ (&vshapes.CloudBubble).new(sh+(-1.0, 1.5, 12.0),  2)
+			.T.shapes <~ (&vshapes.CloudBubble).new(sh+( 1.5, 2.5, 18.0),  3)
+			.T.shapes <~ (&vshapes.CloudBubble).new(sh+( 7.0, 8.0, 18.0),  4)
+			.T.shapes <~ (&vshapes.CloudBubble).new(sh+( -2.0, 9.0, 24.0), 6)
+			.T.shapes <~ (&vshapes.CloudBubble).new(sh+( 12.0, 3.0, 24.0), 4)
+		for (s in .t.shapes) (i)
+			s.color = vec4(1)
+			if i & 1
+				s.color.g = 0
+
 
 
 	behaviour MouseMove

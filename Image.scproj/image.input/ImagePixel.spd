@@ -126,6 +126,14 @@ datatype ImagePixel (uint)
 		qt.b = iv.b._CB2
 		qt.a = iv.a._CB2
 				
+	function AppendRGB (|&imagepixel| self, |vec3| V)
+		v = (v * 255.0) + 0.5
+		|| iv = v.iVec3
+		|| qt = self|&imagepixelstruct|
+		qt.r = iv.r._CB2
+		qt.g = iv.g._CB2
+		qt.b = iv.b._CB2
+				
 	helper int._CB2 (|byte|)
 		description "A secret ClampByte"
 	    self &= (self<0)-1	// clamp < 0

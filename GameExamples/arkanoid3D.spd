@@ -26,7 +26,7 @@ class Breakout (Window)
 	constructor
 		.t = RayTracer(vec3(10, 6.25, -20))!
 		.t.background = raytracer.Rainbows
-		.bar = vobject.box(nil, nil)
+		.bar = (&vshapes.box).new(nil, nil)
 		.fps = fpstextview(self)
 		.fps.MakeInline()
 		.reset
@@ -40,7 +40,7 @@ class Breakout (Window)
 
 
 	function AddBalls (|vec2| P, |vobject|)
-		Rz = vobject.sphere(P.xy_, 8th)
+		Rz = (&vshapes.sphere).new(P.xy_, 8th)
 		rz.Velocity = vec3(0, -.ballspeed, 0)
 		.balls <~ rz
 
@@ -59,8 +59,7 @@ class Breakout (Window)
 		for y in 5.0
 			for x in 10.0
 				|| pos = (2.0+x*(16.0/9.0), 9.0+y*0.5) // 2 to 19, 9 to 11.5
-				|| block = vobject.box(pos.xy_,  br)
-				block.Material = &colors.IceFudge
+				|| block = (&vshapes.FudgeBlock).new(pos.xy_,  br)
 				block.Health = 1.0 + y
 				.Blocks <~ block
 	
@@ -124,7 +123,7 @@ class Breakout (Window)
 					b2.towards(old.pos, .BallSpeed)
 					b2.Velocity = -b2.Velocity
 			  elseif pu <= 5
-				|| b2 = vobject.sphere(ball.pos.xy_, (1+(pu-3))|float|*0.3)
+				|| b2 = (&vshapes.sphere).new(ball.pos.xy_, (1+(pu-3))|float|*0.3)
 				b2.Color = colors.Red // 
 				.Explosions <~ b2
 			  elseif pu <= 7

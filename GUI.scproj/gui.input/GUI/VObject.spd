@@ -5,41 +5,35 @@
 class VObject (list)
 	|vec3|			Pos				// .w = graphical aura size
 	|vec3|			Radius			// .w = rounding
-	|vec3|			Velocity
-	|byte|			Nudge
+	|vec3|			Velocity		// .w = vibration, for struck objects
 	|vec4|			Color			// image pixel?
 	|float|			Health			// are ints better? I think so?
 	|DistanceFunction| Shape
-	|ShaderFunction| Material
 
 	visible false
 	// ray acceleration
 	|byte|			_ShapeID
 	|float|			_MaxDist  
+	|float|			_MinDist  
 	|?VObject--|	_CellNext
-	|vec4|			_RayHit   // seems removeable.
 	
 	visible true
 	
 	constructor (|vec2| Pos,  |vec2| Size,  |vec4| Color=colors.white)
 		cpp_part ConstructorBox2D
 		.pos = (pos, 0.0)
-		.Shape = &VShapes.BoxShape
+		.Shape = &VShapes.Box
 		.Color = color
-		.material = &Colors.normal
 		.Health = 256
 		.size = vec3(size,1.0)
-		._ShapeID = nextID()
 
-	constructor (|vec3| Pos,  |vec3| Rad, |DistanceFunction| shape, |shaderfunction| Shader,  |vec4| Color=colors.white)
+	constructor (|vec3| Pos,  |vec3| Rad, |DistanceFunction| shape,  |vec4| Color=colors.white)
 		cpp_part ConstructorShape
 		.pos = pos
 		.Shape = shape
 		.Radius = rad
 		.Color = color
-		.material = Shader
 		.Health = 256
-		._ShapeID = NextID()
 	
 	function BigR (|float|)
 		return .radius.max
@@ -95,14 +89,16 @@ class VObject (list)
 		return .Radius.Length
 	
 	module
-		|byte| ShapeIDs
-		|float| DrawScale
-		|vec2|  DrawMovement
+		function NewParticle (|vobject|)
+			visible
+			// This will us let ALL drawn objects be vobjects, even particles
+			// we could pre-allocate 1000 or something, or just allocate on demand and keep them.
+			// then reset per-frame. Then we can send all vobjects to the GPU.
+			return ._Particles.Next
+		|[vobject]| 	_Particles
+		|float|			DrawScale
+		|vec2|			DrawMovement
 		
-		function NextID (|byte|)
-			rz = ++.ShapeIDs
-			if !rz
-				rz = ++.ShapeIDs
 					
 		function Size2D (|float| X, |float| Width, |float| Y, |float| Height, |controlrect|)
 			if Width < 0

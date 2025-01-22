@@ -1,4 +1,54 @@
 
+
+datatype RayInfo (vec4)
+	module
+		|| Miss = vec4(float.max, 0, 0, 0)
+	
+	operator Subtract (|rayinfo| R, |rayinfo|)
+		// Analytic subtraction.
+		if r.x==float.max or .x == float.max
+			return self
+		
+		if r.x > .x // hit s first, so just use s.
+			return self // might need to adjust the thickness, but do that later.
+		
+		|| r2 = r.x + r.y
+		|| s2 =  .x +  .y
+		
+		if r2 >= s2
+			return Miss		// cut right through
+	
+		.x = r2 max .x					// nice!
+		.w = .w max r.w					// material fixs
+		return self
+	
+	
+	operator Add (|rayinfo| R, |rayinfo|)
+		.x = .x min r.x
+
+		|| r1 = r.x
+		|| r2 = r1 + r.y
+		|| s1 = .x
+		|| s2 = s1 + .y
+		|| extra = 0.0
+/*		if r1 >= s2 or r2 <= s1 // beyond, just add
+			extra = r.y
+		  elseif r1 < s2 and r1 > s1 // start inside
+			extra = r2 - s2
+		  elseif r2 < s2 and r2 > s1 // end inside
+			extra = s1 - r1
+
+		if extra > 0
+			.y += extra
+		*/
+		.y = .y max r.y
+		.w = .w max r.w
+		return self
+	
+	function vec4.syntaxcast (|rayinfo|)
+		return self|rayinfo|
+
+
 module VShapes
 // https://www.youtube.com/watch?v=aNR4n0i2ZlM // a heart shape?
 
@@ -8,8 +58,10 @@ module VShapes
 	    return (a min b) - h*h*k*0.25
 	
 
-	function SphereShape (DistanceFunction)
+	function Sphere (DistanceFunction)
 		opt min 3
+		if D
+			return NormalColor(self, ray, p, D)
 		|| L = .pos - P
 		|| r = .Radius.x * p.w
 		if ray
@@ -19,59 +71,49 @@ module VShapes
 				if h >= 0
 					h = h.Sqrt
 					return (t-h, h*2, 0, 0)
-			return vec4(float.max)
+			return rayinfo.miss
 		return vec4(L.Length-r, 0, 0, 0) // for SDF operations
-	
-
-	function Subtract (|vec4| S, |vec4| R, |vec4|)
-		// Analytic subtraction.
-		if r.x==float.max or s.x == float.max
-			return s
-		
-		if r.x > s.x // hit s first, so just use s.
-			return s // might need to adjust the thickness, but do that later.
-		
-		|| r2 = r.x + r.y
-		|| s2 = s.x + s.y
-		
-										// Now check if R is contained in S
-		if r2 >= s2
-			return vec4(float.max)		// cut right through
-
-		s.x = r2						// nice!
-		s.w = s.w max r.w				// material fixs
-		return s
 
 
-	function Add (|vec4| S, |vec4| R, |vec4|)
-		s.w = s.w max r.w
-		s.x = s.x min r.x
-		return s
-
-
-	function DebugShape (DistanceFunction)
+	function Debug (DistanceFunction)
 		p.w *= 0.5
+		if D
+			return NormalColor(self, ray, p, D)
 		if Keys.k[]
-			return BoxShape(self, ray, p)
+			return Box(self, ray, p)
 		if Keys.l[]
 			p.w *= 1.1
-			return SphereShape(self, ray, p)
+			return Sphere(self, ray, p)
 
 		// Seems CPU-side SDFs are impossible to do fast.
 		// At least using SDF-like techniques
 		// We need to stay purely analytical right now.
 		// Until we can upload speedie code to a GPU.
 		
-		rz = BoxShape(self, ray, p)
+		rz = Box(self, ray, p)
 		
-		p.w *= 1.1
-		rz = subtract(rz, SphereShape(self, ray, p + (0, 0, 1.0)))
-		rz = subtract(rz, SphereShape(self, ray, p - (0, 0, 1.0)))
+		p.w *= 1.2
+		rz = rz subtract Sphere(self, ray, p)
 
 
+	function CloudBubble (DistanceFunction)
+		// clouds aren't like this, they are more like aura-bulbs
+		// with particles that drift off them randomly
 
-	function BoxShape (DistanceFunction)
+		p.w *= 0.5
+		|| r = .Radius.x * p.w
+		if D
+			|| Str = 0.1 * D.y / r
+			return (1.0, 1.0, 1.0, Str) * .Color
+			
+		return Sphere(self, ray, p + (0,0,r)) add Sphere(self, ray, p - (0,r,0)) add Sphere(self, ray, p + (r,0,0))
+			
+
+
+	function Box (DistanceFunction)
 		opt min 3
+		if D
+			return NormalColor(self, ray, p, D)
 		|| orig = P - .pos
 		|| r = .Radius * p.w
 		if ray
@@ -87,63 +129,46 @@ module VShapes
 			
 			if t2 >= t1
 				return (t1, t2-t1, 0, 0)
-			return vec4(float.max)
+			return rayinfo.miss
 
 		|| P3 = orig.abs - R  max 0
 		return (P3.length, 0, 0, 0)
 
 
-
-function @VObject.Box (|vec3| Pos, |vec3| Radius, |shaderfunction| Shader=&colors.normal, |vec4| Color=colors.white, |vobject|)
-	return VObject(pos, radius, &VShapes.BoxShape, shader, color)
+	function NormalColor (DistanceFunction)
+		|| Norm = (P - .pos).normal.abs		// Spherical color
+		return (norm, 1.0) * .Color
+	
+	
+	function FudgeBlock (DistanceFunction)
+		if !D
+			return box(self, ray, P, D)
+		return IceFudgeColor(self, ray, P, D)
+	
 		
+	function IceFudgeColor (DistanceFunction)
+		|| Norm = (P - .pos).normal
+		|| y = Norm.y.acos
+		|| x = Norm.z.abs.atan2(Norm.x)
+		|| str = 8.0
+		|| spd = 30s
+		|| grid = ((((x+y + gui.Cycle(spd))*str).fract - 0.5)*str).clamp*0.125 + 0.875
+		return (grid, grid, grid, 1.0)*.Color
 
-function @VObject.Sphere (|vec3| Pos, |float| Radius, |shaderfunction| Shader=&colors.normal, |vec4| Color=colors.white, |vobject|)
-	return VObject(pos, vec3(radius), &VShapes.sphereShape, shader, color)
 	
-function @VObject.Debug (|vec3| Pos, |float| Radius, |vobject|)
-	return VObject(pos, vec3(radius), &VShapes.DebugShape, &colors.normal, colors.white)
-	
-// later: handle other ratios, for example (Add borders)
-// could we try to get closer to phi? say trim a few pixels off the top? to 865 pixels
 
-
-prototype ShaderFunction (|vobject| self, |vec3| P,  |vec4| D,  |vec4|)
-	// what about a magical color system?
-	// what about a more generalised material system?
-	// do we want every object to decide how it surface colors?
-	// maybe this should be a "task". So the material info can be stored...
-
-
-prototype DistanceFunction (|vobject| self, |raytracer?| Ray, |vec3| P, |vec4|)
+prototype DistanceFunction (|vobject| self, |raytracer?| Ray, |vec3| P, |rayinfo| D=vec4(), |rayinfo|)
 	description "
 x: dist
 y: thickness
 z: reserved
 w: material-info
 
-If y == 0, then use an SDF to improve the distance.
+If y == 0, then an SDF-engine is used to call this again until its good enough.
 "
-
-
-function colors.TotalBlack (ShaderFunction)
-function colors.Cloud (ShaderFunction)
-	// clouds aren't like this, they are more like aura-bulbs
-	// with particles that drift off them randomly
-	|| Str = 0.33*D.y / .Radius.x
-	return (1.0, 1.0, 1.0, Str) * .Color
-	
-function colors.Normal (ShaderFunction)
-	|| Norm = (P - .pos).normal.abs		// Spherical color
-	return (norm, 1.0) * .Color
-
-function colors.IceFudge (ShaderFunction)
-	|| Norm = (P - .pos).normal
-	|| y = Norm.y.acos
-	|| x = Norm.z.abs.atan2(Norm.x)
-	|| str = 8.0
-	|| spd = 30s
-	|| grid = ((((x+y + gui.Cycle(spd))*str).fract - 0.5)*str).clamp*0.125 + 0.875
-	return (grid, grid, grid, 1.0)*.Color
-
+	function New (|vec3| Pos, |vec3| Radius, |vec4| color=vec4(1),   |vobject|)
+		return VObject(pos, radius, self, color)
+	function New (|vec3| Pos, |float| Radius, |vec4| color=vec4(1),   |vobject|)
+		cpp_part NewSphere
+		return VObject(pos, vec3(radius), self, color)
 

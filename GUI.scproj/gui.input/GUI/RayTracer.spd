@@ -5,6 +5,7 @@
 // * default RayTracer constructor uses block positioning system to match 2D/3D closely
 // * Schlick's approximiation for materials? just hard-code a light somewhere
 // * anti-aliasing preserve average luminosity (gamma correction?)
+		// * Object-anti-aliasing best done by storing one row width of 32-bit ints.
 
 
 // Advancements: (do AFTER we have perry+speedie in an awesome state)
@@ -45,6 +46,7 @@ class RayTracer
 	|Vec3|				Camera
 	|vec3|				Rotation	// we can have yaw, pitch, and roll. I think roll (z) is mostly unused.
 	|byte|				_StillGood
+	|vec4|				_RayHit
 		
 	|&RayBoost|			RootNode	// make these not ?!
 	|&RayTraceNode|		EndNodes
@@ -110,20 +112,21 @@ class RayTracer
 		return (.Background)(self, (P + .adjust) * .scale)
 	
 	helper AntiAlias (|vec2| XY, |RayTraceCell| cell, |&imagepixel| pxl)
-		opt min 3
-		|| ID = pxl.a
-		|| C = (pxl.Color, .bg(XY))(ID)
-		// Object-anti-aliasing best done by storing one row width of 32-bit ints.
-		
+		opt min 3, opt norefcounts
+		|vec4| C
 		for i in 4
 			|| sh = (i&1, i>>1).Vec2 - 0.5
 			.Prepare(xy + sh*0.8)
 			|| B = .FindBestObj(cell.obj)
 				C += .ShadePixel(B)
-			  else
-				C += .BG(._XY)
-		pxl <~ C*5th
-		pxl.a = ID
+		.write(xy, C*0.25, pxl)
+	
+	
+	helper Write (|vec2| XY, |vec4| C, |&imagepixel| pxl)
+		|| a = C.a
+		if a <= 0.996
+			C = mix(.bg(XY), c, a)
+		pxl.AppendRGB(C|vec3|)
 
 
 	helper Prepare (|vec2| XY)
@@ -142,24 +145,42 @@ class RayTracer
 // now, what if we passed the object? we need a maximum distance. like raydist+radius.
 
 
+	helper ObjColor (|vobject!| B, |vec2| P, |vec4|)
+		opt min 3,   opt norefcounts
+		|| C = .ShadePixel(B)
+		if c.a <= 256th			// Weak
+			return .bg(p)
+		if c.a > 0.996			// Strong
+			return C
+		
+		// Simple 2-obj coloring
+		|| B2 = .FindBestObj(B._CellNext)
+			|| C2 = .ShadePixel(B2)
+			C = (C+C2)*0.5
+//			C = mix(C2, C, C.a)
+		if c.a > 0.996
+			return C
+		return mix(.bg(P), C, c.a)
+
+		
 	helper FindBestObj (|vobject?| sp, |vobject|)
 		opt min 3,   opt norefcounts
 		|| Best = float.max
+		._RayHit = rayinfo.miss
 		while sp
-			sp._RayHit = vec4(float.max)
-			|| Hit = .FindBestObjSub(sp)
+			|| Hit = .FindSub(sp)
 			if hit.x < Best  and  hit.z <= 1024th
 				rz = sp
-				sp._Rayhit = hit
+				._Rayhit = hit
 				best = hit.x
 			sp = sp._CellNext
 	
 	
-	helper FindBestObjSub (|vobject| sp, |vec4|)
+	helper FindSub (|vobject| sp, |vec4|)
 		opt min 3
 		|| P = .Camera, p.w = 1.0
 		|| hit = (sp.Shape)(sp, self, P)
-		if hit.y		// analytical shape.
+		if hit.y or hit.x >= float.max // analytical shape.
 			hit.z = 0
 			return hit
 		
@@ -176,14 +197,16 @@ class RayTracer
 			
 			if  d >= sp._MaxDist
 				exit
-		return vec4(float.max)
+		return rayinfo.miss
 
 
-	helper ShadePixel (|vobject| B, |vec4|)
+	helper ShadePixel (|vobject!| B, |vec4|)
 		opt min 3
-		|| H = b._RayHit
+		|| H = ._RayHit
 		|| P = .Camera + ._CamDir * H.x
-		return (B.material)(B, P, H)
+		p.w = 1.0
+		return (B.shape)(B, self, P, H)
+		
 		
 		
 	helper Dir (|vec2| XY, |vec3|)
@@ -231,16 +254,16 @@ class RayTracer
 			Dmax += R
 			Dmin -= R
 		
-		obj._RayHit = nil
+		obj._MinDist = 0
 		obj._MaxDist = 0
-		if  (Dmax > 0.01)  and  (Dmin < Max)
-			obj._RayHit.x = Dmin				// Used by .InPlanes and .Sort only.
+		if  (Dmax > 128th)  and  (Dmin < Max)
+			obj._MinDist = Dmin
 			obj._MaxDist = Dmax
 	
 	
 	helper InPlanes (|VObject| b, |bool|)
 		opt min 3
-		if b._rayhit.x
+		if b._maxdist
 			|| R = (b.radius, 0.0)
 			|| P = (b.pos,    1.0)
 			return .PlaneOK(r,p,0) and .PlaneOK(r,p,1) and .PlaneOK(r,p,2) and .PlaneOK(r,p,3)
@@ -249,7 +272,7 @@ class RayTracer
 
 	
 	function @raytracer.DistanceSorter (SorterComparer of vobject)
-		return b._rayhit.x  <  a._rayhit.x
+		return b._MinDist  <  a._MinDist // biggest dist first. We also store in reverse. So we store nearest first.
 		
 		
 	helper PlayQuidditch (|int| Stride)
@@ -259,10 +282,16 @@ class RayTracer
 			.FindCameraDist(s, .MaxViewDist)
 
 		.Shapes.Sort(DistanceSorter)
+		
+		|| id = 1
 		for s in .shapes
 			if .InPlanes(s)   // todo: if shape covers cell, mark cell as covered
+				if id >= 256
+					id = 1 
+				s._ShapeID = id++
+				
 				.Quadditch(.rootnode, s)
-	
+
 	 
 	function RayTrace (|image| where)
 		opt min 3
@@ -285,7 +314,7 @@ class RayTracer
 		
 	helper TraceCell (|&raytracecell| cell, |!&imagepixel| pxl)
 		// making it look easy
-		opt min 3
+		opt min 3, opt norefcounts
 		cell.Link
 		|| P = cell.xy
 		|| pxl3 = pxl - cell.stride * cell.h
@@ -297,16 +326,16 @@ class RayTracer
 				cell.Aliased = false
 				.prepare(p)
 				|| b = .FindBestObj(cell.obj)
-					pxl.FastMix(.ShadePixel(B))
-					pxl.a = B._ShapeID
-				  else
-					if cell.obj and Keys.shift
-						pxl <~ ivec4(90)
+					if 1 //or keys.shift
+						pxl <~ .ObjColor(b, P)
 					  else
-						pxl <~ .BG(P)
-					pxl.a = 0
+						|| C = .ShadePixel(B)
+						.write(P, C, pxl)
+					pxl.a = b._shapeid
+				  else
+					pxl <~ .BG(P)
 				
-				if !keys.shift
+				if 1
 					|| LeftAA = pxl-1
 					if  p.x  and  pxl.a != leftaa.a
 						.AntiAlias(p-(1.0,0), cell, leftAA)

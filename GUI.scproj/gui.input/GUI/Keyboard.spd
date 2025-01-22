@@ -152,7 +152,7 @@ dataType Keys (int)
 		return self == x
 	
 	module
-		|bool|					Debug
+		|bool|					Debug = true
 		|GUIKeyRecord[6]|		Record
 
 
@@ -254,7 +254,10 @@ dataType Keys (int)
 
 
 		helper AddKey (|keys| Key)
-			|| r = .emptyslot(key)$
+			|| r = .EmptySlot(key)
+			if  !r  or  r.key == key  and  r.state >=  GUIKeyRecordInfo.ToAdd
+				return
+			
 			target __PROJECT_PERRY__
 				.KeyLog(key, "Add")
 			r.key = key
@@ -275,21 +278,20 @@ dataType Keys (int)
 		
 
 		helper FlushKeys
-			|| m = MaxKeyRecord
-			target __PROJECT_PERRY__
-				.KeyLog(0, "FlushKeys")
-			// perhaps the bug is in here?
-			// seems so? if I HOLD right... then hold shift, then let go of right
-			// then while STILL HOLDING shift... i tap right... it seems
-			// that the shift has been deleted! this seems the only place?
-			// that could do it?
+			|| m = .MaxKeyRecord
+			|| Any = false
 			for i in m
 				|| r = .record[i]
 				|| s = r.state
 					if s == guikeyrecordinfo.ToRemove
 						r.clear
+						any = true
 					  elseif s < guikeyrecordinfo.Stable
 						r.state = s + 1
+						any = true
+			if any
+				target __PROJECT_PERRY__
+					.KeyLog(0, "FlushKeys")
 
 
 		helper FindTwoModifiers (|keys| A, |keys| B, |&guikeyrecord|)
