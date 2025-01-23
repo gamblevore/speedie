@@ -119,14 +119,24 @@ struct Random
 	syntax access (|Float64|)
 		return .Float64
 		
+	function Temporal (|!&byte| Start, |!&byte| After)
+		cpp_part TemporalBytes
+		require after > Start
+		|| N2 = (After-Start)&~7
+		|| After2 = Start+N2
+		while Start < after2
+			Start|&uint64|[] = .int
+			Start+=8
+		while Start < after
+			Start++[] = .int
 
 	function Temporal (|Memory| mem)
 		description "seems not temporal... needs upgrade."
-		|| p = mem.ptr|&uint64|
-		|| after = (mem.ptr + mem.ByteCapacity - 7)|&uint64|
-		while p < after
-			p++[] = .int
-		mem.Length = mem.buffersize
+		|| P = mem.ptr
+		if p?
+			.temporal(P, P + mem.ByteCapacity)
+			mem.Length = mem.buffersize
+
 	
 	function Init
 		if !.store

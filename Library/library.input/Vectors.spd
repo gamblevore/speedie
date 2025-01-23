@@ -338,33 +338,7 @@ datatype vec3
 	syntax cast (|bool|)
 		cpp_part Bool
 		return (self != vec3())
-	
-	function LookAt (|mat4|)
-		disabled "Not sure this function even makes sense originally."
-//	    || f = .normal
-//	    || u = vec3(0,1,0)
-//	    || s = (f x u).normal
-//	    u = s x f
-//	    rz.rows[0] = (s,  -(s • self))
-//	    rz.rows[1] = (u,  -(u • self))
-//	    rz.rows[2] = (f,  -(f • self))
-//		rz[3,3] = 1.0
-
-//	function RotateXLeft (|vec3|)
-//		return (.x, .z, -.y)
-//	function RotateXRight (|vec3|)
-//		return (.x, -.z, .y)
-//		
-//	function RotateYLeft (|vec3|)
-//		return (.z, .y, -.x)
-//	function RotateYRight (|vec3|)
-//		return (.z, -.y, .x)
-//		
-//	function RotateZLeft (|vec3|)
-//		return (.y, .x, -.z)
-//	function RotateZRight (|vec3|)
-//		return (.y, -.x, .z)
-		
+			
 	syntax Compare (|float| Other, |bool|Aware, |float|)
 		|| LSq = .lengthsq
 		|| Osq = other*other
@@ -466,7 +440,7 @@ datatype vec3
 	    rz.z = .x * v.y - .y * v.x
 
 	render
-		fs <~ "${.x}, ${.y}, ${.z}"
+		fs <~ "(${.x}, ${.y}, ${.z})"
 	
 	module
 		function New (|vec3|)
@@ -580,8 +554,14 @@ datatype ivec2
 	function LengthSq (|float|)
 		return (.x * .x)|float| + (.y * .y)|float| 
 
+	function Hash (|ivec2|)
+		return (.x.hash, .y.hash)
+		
 	function Width (|int|)
 		return .x2 - .x
+	
+	operator Sign (|ivec2| C, |ivec2|)
+		return (.x.copysign(c.x), .y.copysign(c.y))
 
 	syntax Compare (|float| Other, |bool|Aware, |int|)
 		|| LSq = .lengthsq
@@ -635,6 +615,10 @@ datatype ivec2
 
 	operator min (|ivec2| o, |ivec2|)
 		return (o.x min .x, o.y min .y)
+		
+	operator min (|int| o, |ivec2|)
+		cpp_part MinInt
+		return (o min .x, o min .y)
 		
 	operator fma (|int| w, |int|)
 		return .x + .y*w
@@ -705,7 +689,7 @@ datatype ivec2
 
 datatype vec2
 	render
-		fs <~ "${.x}, ${.y}"
+		fs <~ "(${.x}, ${.y})"
 
 	function iVec2 (|ivec2|)
 		return (.x|int|, .y|int|)
@@ -938,3 +922,46 @@ datatype Plane3D (vec4)
 			return (N, -(N • Start))
 
 
+
+
+
+struct DDA_Caster
+	|ivec2|		Goal
+	|int|		Steps
+	|int|		i
+	|vec2|		Curr
+	|vec2|		Add
+
+	function ivec2.RayCast (|DDA_Caster|)
+		rz.goal = self
+		|| A = .vec2.abs					// Using fixed math would be faster AND more reliable!
+		|| Vy = (a.y+1.0) / (a.x+1.0)		// no rounding errors or at least predictable ones.
+		|| Vx = (a.x+1.0) / (a.y+1.0)
+		|| D = (a.x <= a.y)|int|
+		rz.add = (vx, vy)
+		rz.add[D] = 1.0
+		rz.Steps = a[D]|int|*2
+	
+	function Next (|ivec2|)
+		|| C = .curr
+		|| P = C.iVec2
+		|| i = .i
+		|| g = .goal
+		while i++ < .Steps
+			c[i&1] += .add[i&1]
+			
+			|| C2 = C.iVec2
+			if C2 != p
+				.Curr = c
+				c2 = c2 sign g
+				if c2 == g
+					.Steps = 0 // finish
+				.i = i
+				return C2
+
+	iterator
+		while
+			|| cc = .next
+			if !cc: exit
+			yield (cc) (.i)
+		

@@ -171,9 +171,10 @@ function Mix (|vec2| A, |float| F, |float|)
 
 
 function int.CopySign (|int| From, |int|)
-	if (self.signbit == from.signbit)
-		return self 
-	return -self
+	self = .abs
+	if from < 0
+		return -self
+	return self
 
 
 extend int
@@ -225,7 +226,7 @@ extend float
 	
 	function IsNormal (|bool|)
 		disabled "Not a good function, as it flags zero and subnormals as 'bad'"
-		cpp_wrapper (__isnormalf)
+
 	
 	function RangeConvert (|float| lfrom, |float| hfrom, |float| lto, |float| hto, |float| )
 		|| fr = hfrom - lfrom
@@ -241,12 +242,16 @@ extend float
 		
 		
 	function Sanity (|bool|)
+		if .IsSane
+			return true
+		debugger
+		
+	function IsSane (|bool|)
 		ifn .isnan or .isinf
 			return true
-		debugger 
 	
 	function MakeSane (|float|)
-		if .Sanity
+		if .IsSane
 			return self
 	
 	function IsInf (|bool|)

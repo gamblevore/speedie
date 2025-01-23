@@ -72,6 +72,8 @@ syntax access (|string| name, |string|)
 			rz = R.argvalue
 			exit
 
+syntax expect (|string| s=nil)
+	.quit(s, -1)
 
 function Options (|[string]|)
 	disabled "Use switches"
@@ -204,7 +206,7 @@ function exit (|int| Code=0)
 	disabled "Use app.quit instead (to avoid confusion with the 'exit' statement, which exits loops!)"
 
 
-function Quit (|string| Err = "", |int| Code=0)
+function Quit (|string?| Err = nil, |int| Code=0)
 	cpp_wrapper JB_App__Quit
 
 function ErrorNumber (|&byte|)
