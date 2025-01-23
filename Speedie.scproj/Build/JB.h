@@ -255,6 +255,8 @@ struct ArgArrayCounter;
 
 struct CompressionStats;
 
+struct DDA_Caster;
+
 struct FakeJBString;
 
 struct FastBuff;
@@ -6353,6 +6355,9 @@ int JB_MzSt__Init_();
 
 
 
+// JB_DDA_Caster
+
+
 // JB_FakeJBString
 
 
@@ -8141,6 +8146,8 @@ JB_String* SC_Str_ScriptContainer(JB_String* Self, JB_String* Container);
 
 JB_String* SC_Str_ScriptLocation(JB_String* Self, JB_String* Container);
 
+JB_String* JB_Str_Shorten(JB_String* Self, int N);
+
 JB_String* JB_Str_Sibling(JB_String* Self, JB_String* Name);
 
 ExitCode JB_Str_SilentExecute(JB_String* Self, Array* Args, FastString* Out, FastString* Errs, Date Timeout);
@@ -8168,8 +8175,6 @@ void JB_Str_Fail(JB_String* Self);
 JB_String* JB_Str_TitleCase(JB_String* Self, FastString* Fs_in);
 
 bool SC_Str_trap(JB_String* Self, Message* Msg);
-
-JB_String* JB_Str_Shorten(JB_String* Self, int N);
 
 JB_String* JB_Str_TrimExtAndPath(JB_String* Self, bool KeepPath);
 
