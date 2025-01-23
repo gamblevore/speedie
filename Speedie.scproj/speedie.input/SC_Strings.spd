@@ -72,7 +72,7 @@ function GetFileString (|Message| msg, |string| name, |message|)
 	expect (msg ~= "file" or "img") (msg)
 	
 	|| OK = name.Last == '?'
-		name = name.Trim(1)
+		name = name.shorten(1)
 	
 	|| data = ""
 	|| f = compiler.InputFile(nil, name, msg)

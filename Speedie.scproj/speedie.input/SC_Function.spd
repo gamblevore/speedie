@@ -1076,9 +1076,9 @@ function FixCnjSub (|Message| exp) {
 	|| ch = exp.first!
 	|| name = ch.Next!.Name
 	|| CreatesError = (name == "expect" or "check")
-	|| DoesReturn =   (name != "loop" and "check")
+	|| DoesReturn =   (name != "loop" and "check" and "quit")
 	
-	ifn (CreatesError or (name == "debug_require" or "require" or "continue" or "loop"))
+	ifn (CreatesError or (name == "debug_require" or "require" or "continue" or "loop" or "quit"))
 		error (exp, "Must be: 'require/expect/continue/loop' .")
 		ch.name = "require"
 		name = "require"		// just make autocomplete more reliable.
@@ -1122,13 +1122,13 @@ function FixCnjSub (|Message| exp) {
 	|Message|	pp
 	|Message|	RemoveMe
 	|bool|		UsePrev
-	if (ch isbrel "++") and (ch in @arg) and (ch.first == @thg) {
+	if (ch isbrel "++") and (ch in @arg) and (ch.first == @thg)
 		// ++ch #require // just an opt.
 		// Actually I didn't implement the general case yet :) haha.
 		Thg = @thg + ch.first!.name
 		pp = ch
 		
-	} else {
+	  else
 		pp = ch.NiceParent!
 		|| Done = false
 		if ((ch.UnBra == @thg)) or ((pp == @arg) and !CreatesError)
@@ -1155,15 +1155,6 @@ function FixCnjSub (|Message| exp) {
 			
 			pp = SCFunction.TempMoveOut( ch )!
 			Thg = @thg + pp.DeclName!.Name
-	}
-	
-	// || tmp = func()
-	//	  -->
-	// || tmp = func()
-	// if (!tmp) {
-	//	 .SyntaxExpect(x, y), return
-	// }
-	// || x = tmp
 	
 	
 	|| arg = @arg.msg
@@ -1179,11 +1170,18 @@ function FixCnjSub (|Message| exp) {
 	if (name == "debug_require")
 		arg <~ (@tmp, "debugger")
 
-	if (name == "continue") and pp.WithinLoop( .SourceArg )
-		arg <~ (@tmp, "continue")
+	if (name == "continue")
+		if pp.WithinLoop( .SourceArg )
+			arg <~ (@tmp, "continue")
 		
-	  elseif (name == "loop") and pp.WithinLoop( .SourceArg )
-		arg <~ (@tmp, "exit")
+	  elseif (name == "loop")
+		if pp.WithinLoop( .SourceArg )
+			arg <~ (@tmp, "exit")
+
+	  elseif name == "quit"
+		|| Q = arg.msg(@dot, "quit") 
+		Q <~ (@thg, "app")
+		Q <~ @prm
 		
 	  elseif (DoesReturn)
 		arg.msg(@tmp, "return") <~ (@ques,"nil")

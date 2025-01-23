@@ -241,15 +241,13 @@ class String
 			return self
 		Return self[0,1].Uppercase + self[1...]
 	
-	function Trim (|int| n, |string|)
-		cpp_part Shorten
+	function Shorten (|int| n, |string|)
 		return self[0, .length-n]
 
 	function Trim (|charset| cs = nil, |string|)
 		nil self
 		cpp_wrapper JB_Str_Trim
 	
-
 	function TrimStart (|string| s, |bool| All=false,  |string|)
 		|| i = 0
 		while self[i, s]
@@ -393,7 +391,7 @@ class String
 			pos = p+1
 			++rz
 			
-	operator plus (|string| other, |string|)
+	operator Plus (|string| other, |string|)
 		cpp_wrapper JB_Str_OperatorPlus
 			
 	helper Append (|string| b, |string| c, |string| d="")
@@ -511,6 +509,10 @@ class String
 	syntax Access (|int| start, |int| after, |string|)
 		cpp_wrapper JB_Str_Range // technically it does nil check but its in a slow-path doesnt like it
 		
+	function Right (|int| N, |string|)
+		|| L = .length
+		return self[L-N, L]
+	
 	function Codepoint (|bool| Strict=true, |codepoint|)
 		cpp_wrapper JB_Str_UTF8Value
 		
