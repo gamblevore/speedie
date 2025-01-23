@@ -1,0 +1,123 @@
+#!/usr/local/bin/spd
+import "GUI"
+
+main
+	return SandSimulator().RunAsMain(20)
+
+
+struct Particle
+	|ParticleType| Type
+	|int8| VX
+	|int8| VY
+	|uint| Start
+
+	function Color (|vec4|)
+		return .type.color
+
+	syntax is (|ParticleType| T, assigns:|bool|)
+		.type = T, (value)
+	
+	function MoveTo (|?&particle| P, |bool|)
+		if p.Empty
+			P[0] = self[0]
+			.Type = 0
+			return true
+	
+	function Empty (|bool|)
+		nil checker
+		return self!=nil and (.type == 0 or .type >= ParticleType.Max)
+
+	function Liquid (|bool|)
+		nil checker
+		return self!=nil and (.type >= ParticleType.water and .type <= ParticleType.Acid)
+		
+	function Gravity (|bool|)
+		nil checker
+		return self!=nil and (.type isnt wood and stone)
+
+
+datatype ParticleType (byte)
+	constants: Empty, Sand, Stone, Water, Lava, Acid, Air, Wood, Max
+	syntax is (|ParticleType| T, |bool|)
+		return self == T
+
+	function Color (|vec4|)
+		if self is sand:	return vec4(0.5, 0.35, 0.1, 1.0)
+		if self is stone:	return vec4(0.5, 1.0)
+		if self is Water:	return vec4(0.1, 0.4, 1.0, 1.0)
+		if self is air:		return vec4(0.25, 1.0, 1.0, 0.4)
+		if self is Lava:	return vec4(1.0, 0.5, 0.2, 0.5)
+		if self is wood:	return colors.brown
+		if self is acid:	return colors.Green
+		
+
+class SandSimulator (Window)
+	|flatgridmap of particle|	Sand
+
+	constructor 
+		.sand = FlatGridMap(400,300)
+		.reset
+		
+	
+	function Reset
+		for s in .sand
+			s[0] = nil
+			s.Type = Random.shared.int
+			if s.Type > 200
+				(s is water)
+		
+		
+	function Gravity (|!&particle| P, |ivec2| O, |&particle|)
+		|| V = (p.vx, p.vy)
+		for CC in v.RayCast()
+			|| P2 = .sand[O+CC]
+				if p.MoveTo(p2)
+					rz = p2
+					p = p2
+		
+		
+	behaviour FrameStep
+		require GUIActive
+		.Touch
+		
+		|| rnd = 64K()
+		for (s in .sand) (V)
+			if s.empty: continue
+			if s.Gravity
+				s.vy = (s.vy - 1) max -5
+				|| D = .Gravity(S, V)
+				if !D
+					s.vy = 1-s.vy
+					rnd = rnd.hash
+					|| R = (Rnd&2) - 1
+					if s.MoveTo(.sand[V-(R,1)])
+						0
+					  elseif s.MoveTo(.sand[V-(-R,1)])
+						0
+					  elseif s.liquid
+						  if s.MoveTo(.sand[V-(R,0)])
+							0
+						  elseif s.MoveTo(.sand[V-(-R,0)])
+							0
+
+	
+	function DrawParticles (|image| where)
+		|| w = .sand.width
+		|| ws = (where.Width-(w*2))/2
+		|| base = 40
+		for (s in .sand) (V)
+			if s
+				|| R = V*2 + (ws,base)
+				where.DrawRect((R, R+2), s.color)
+	
+	
+	
+	behaviour keydown
+		if key is space
+			.reset
+			return true	
+	
+	behaviour Drawbackground
+		where.DrawRect(Self, colors.black)
+		.drawparticles(Where)
+

@@ -45,17 +45,13 @@ class GridSection
 
 class FlatGridMap
 	contains uint64
-	|[[gridsection of ...]]| Map
+	|&...| Map
 	|int| Width
 	|int| Height
 	constructor (|uint| W, |uint| H)
 		.width = w
 		.height = h
-		for y in (h+15)/16
-			|| Line = Array.new|[gridsection]|
-			.map <~ Line
-			for x in (w+15)/16
-				line <~ GridSection(16, 16, 2)
+		.map = Memory.zalloc(w*h*8)|&uint64| #quit
 	
 	syntax Access (|ivec2| V, |&...|)
 		cpp_part AccessVec
@@ -63,16 +59,16 @@ class FlatGridMap
 	
 	syntax Access (|int| x, |int| y, |&...|)
 		opt norefcounts
-		if x >= 0 and y >= 0
-			|| G = .map[y/16][x/16]
-				return g.at((x&15) + (y&15)*16)
+		if x inrange .width and y inrange .Height
+			return .map[x+y*.width]
 		
 	iterator
+		|| ptr = .map
 		|| y = 0
 		while y < .height
 			|| x = 0
 			while x < .width
-				|| s = self[x,y]
-				yield (s) ((x,y))
+				yield (ptr) ((x,y))
 				x++
+				ptr++
 			y++
