@@ -463,18 +463,15 @@ function Tran_ForSub (TranFunc)					// :3
 	|| IterName = ""
 
 	list = list.unbra
-	if (list == @rel)
+	|| scnd = list.second
+	if (list == @rel and scnd isopp "in")
 		value = list.First
-		|| opp = value.next
-		if opp isopp "in"
-			list = opp.next
-			bad +=! list
-			if value == @Dot
-				IterName = value.Name
-				value = value[@thg]
-				bad +=! value
-		  else
-			bad++
+		list = scnd.next(@nil)
+		bad +=! list
+		if value == @Dot
+			IterName = value.Name
+			value = value[@thg]
+			bad +=! value
 	
 	
 				////////  GET ITERATOR
