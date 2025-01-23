@@ -80,7 +80,7 @@ module Perry
 
 	function BuildAppMenu
 		appmenu.addsep
-//		|| extra = platform.isdebug or app.pref("dev").Yes
+//		|| extra = platform.isdebug or app.prefs["dev"].Yes
 //			appmenu <~ ("Prepare Upload",   ClickedMakeArchiveMenu)
 //			appmenu <~ ("Uninstall",   		ClickedUninstallMenu)
 		appmenu <~ ("Edit Preferences", ClickedEditPrefs)

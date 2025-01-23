@@ -161,7 +161,7 @@ function PerryIDE.CompileTab (|int| i, |listviewrow|) // for autocomplete
 
 function PerryIDE.AddProductErr (|string| err)
 	if err
-		.ProductErrors <~ err
+		.ProductErrors.log(err)
 		|| t = .CompileTab(3)$
 		if .ProductSep.iscollapsed or t is hidden
 			.ShowText(.ProductErrors, nil, true)
@@ -171,7 +171,7 @@ function PerryIDE.AddProductErr (|string| err)
 function PerryIDE.UpdateProductText (|process| r)
 	|| rout = r.Output
 	if rout and rout.length
-		.ProductOut <~ rout
+		.ProductOut.Log(rout, 256K)
 		if !(r.userflags&1)
 			.ShowCompileTab(.productout)
 			r.userflags |= 1 // remove userflags next time and use OutputShouldOpenWithinDebug?/??
@@ -195,13 +195,13 @@ function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 	.AddProductErr(r.ErrorOutput)
 	
 	if kill
-		.ProductOut <~ "\n(--Process Killed--)"
+		.ProductOut.log("\n(--Process Killed--)")
 	  elseif !x.IsRunning
 		|| exitcode = "\n(--Exit OK--)"
 		if x > 0
 			exitcode = "\n(--Exit Error: ${x}--)"
 			.addProductErr(exitcode)
-		.ProductOut <~ exitcode
+		.ProductOut.log(exitcode)
 	
 	return !kill
 		
