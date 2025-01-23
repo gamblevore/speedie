@@ -18,6 +18,7 @@ class Window (GUIControl)
 //	|list of TaskGUI|					Animations // add this later!
 	|object?|							ReturnValue
 	|date|								CreatedDate
+	|uint64|							FrameCount
 
 	visible false
 	|date|								_AlphaFader
@@ -115,6 +116,8 @@ class Window (GUIControl)
 		.show
 		.IsMainWindow = true
 		.SimulationFPS = SimulationFPS
+		if SimulationFPS > 0
+			(fpsView(self))
 		if gui.init(scaling)
 			gui.CenterCursor
 			.BlockScale ?= 20

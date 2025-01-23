@@ -20,12 +20,9 @@ main
 
 class Bubbles (window)
 	|RayTracer|		T
-	|FPSTextView| 	FPS
 
 	constructor
 		.t = RayTracer((1.6, 5.0, -22.0))!
-		.FPS = FPSTextView(self)
-		.fps.MakeInline
 		
 		|| L = 10.0
 		for i in (-L to L)
@@ -48,7 +45,6 @@ class Bubbles (window)
 	
 	behaviour Drawbackground
 		opt norefcounts
-		.fps.Update
 		.T.RayTrace(where)
 		gui.Touch
 	

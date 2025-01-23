@@ -14,7 +14,7 @@ helper ListView.SLH (|vec3|)
 	opt norefcounts
 	|| Total = 0
 	|| Found = 0
-	|| ff = ._Scroll
+	|| ff = .scrollstart
 	for r.all in self
 		if r == ff
 			Found = Total

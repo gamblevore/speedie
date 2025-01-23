@@ -8,21 +8,27 @@ prototype ShaderToyFunc (|ShaderToy| self,  |vec2| Resolution,  |vec2| Pos,  |ve
 		return win.RunAsMain(60)
 
 
-class FPSTextView (textview)
+class FPSView (guicontrol)
 	|date| 			LastDraw
 	|date| 			LastFPSChange
 
-	function Update
+	constructor (|guicontrol| parent)
+		super.constructor(parent)
+		.Size = (3~right for 89)  by  (17~down for 14)
+
+	behaviour Draw
 		|| Ago = .LastDraw.guiago
 		.LastDraw = gui.FrameStart
 		.LastFPSChange ?= .LastDraw
 		if .LastFPSChange.guiago > 0.5s
 			.text = (1.0/ago.float).Render(1) + "fps"
 			.LastFPSChange = .LastDraw
+		Where.DrawRect(self, vec4(0,0.25))
+		Where.DrawText(.text, .lastrect.xy+(5,3))
+
 
 
 class ShaderToy (window)
-	|fpstextview| 	FPS
 	|vec3|			cam
 	|float|			Time
 	|ShaderToyFunc| Shader
@@ -30,15 +36,12 @@ class ShaderToy (window)
 
 	constructor (|ShaderToyFunc| fn)
 		.Shader = fn
-		.FPS = fpsTextView(self)
-		.fps.MakeInline()
 		.GNormal.clear // black background
 	
 	
 	behaviour Drawbackground
 		opt norefcounts
 		opt min 3
-		.fps.Update
 		
 		.time = (gui.framestart - .CreatedDate).Float
 		|| size = where.size.vec2

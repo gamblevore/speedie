@@ -10,33 +10,21 @@ main
 
 
 class Breakout (Window)
-	|fpstextview|		FPS
 	|[vobject]|			Blocks
 	|vobject|			Bar
-	|date|				StartDate
 	|raytracer|			T
 	|[vobject]|			Balls
 	|[vobject]|			Explosions
 	|float|				BallSpeed
 	|int|				Hits
-	|int|				FrameCount
-	|bool|				vsync
 	|[vobject]|			Spirals
 
 	constructor
 		.t = RayTracer(vec3(10, 6.25, -20))!
 		.t.background = raytracer.Rainbows
 		.bar = (&vshapes.box).new(nil, nil)
-		.fps = fpstextview(self)
-		.fps.MakeInline()
+		(fpsview(self))
 		.reset
-
-
-	behaviour keydown
-		if key is v
-			.vsync = !.vsync
-			app.say .vsync.render
-			gui.vsync = .vsync
 
 
 	function AddBalls (|vec2| P, |vobject|)
@@ -168,9 +156,6 @@ class Breakout (Window)
 	
 	
 	behaviour FrameStep
-		if !.FrameCount
-			.StartDate = gui.FrameStart
-		.FrameCount++
 		require GUIActive
 		// we want to draw the framecount... and the total number of seconds we have run...
 		|| MinSp = .BallSpeed/4
@@ -209,8 +194,6 @@ class Breakout (Window)
 	
 	
 	behaviour Drawbackground
-		.fps.update
-		
 		for b in .Blocks
 			|| H = (1.0-b.health)*12th
 			b.Color = colors.wheel(H, 0.8, 0.5)

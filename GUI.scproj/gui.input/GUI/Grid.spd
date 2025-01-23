@@ -8,8 +8,11 @@ class GridSection
 	constants
 		CellMax = 512
 
-	constructor
-		(&.Dimensions)|&int|[] = 0
+	constructor (|int| W=16, |int| H=16, |int| D=1)
+		.Dimensions[0] = W
+		.Dimensions[1] = H
+		.Dimensions[2] = D
+		.Dimensions[3] = 1
 		.Fill(0)
 
 	function Width (|int|)
@@ -20,8 +23,13 @@ class GridSection
 
 	function Depth (|int|)
 		return .Dimensions[2]
+		
+	function Temporal
+		|| P = (&.cells[0])|&byte|
+		|| N = CellMax * –sizeof uint64
+		random.shared.temporal(P, P + N)
 
-	function at (|uint| i=0, |&...|)
+	function At (|uint| i=0, |&...|)
 		if i < 512
 			return .Cells[i]
 		return Dummy
@@ -33,3 +41,38 @@ class GridSection
 	module
 		|...| Dummy
 
+
+
+class FlatGridMap
+	contains uint64
+	|[[gridsection of ...]]| Map
+	|int| Width
+	|int| Height
+	constructor (|uint| W, |uint| H)
+		.width = w
+		.height = h
+		for y in (h+15)/16
+			|| Line = Array.new|[gridsection]|
+			.map <~ Line
+			for x in (w+15)/16
+				line <~ GridSection(16, 16, 2)
+	
+	syntax Access (|ivec2| V, |&...|)
+		cpp_part AccessVec
+		return self[v.x, v.y]
+	
+	syntax Access (|int| x, |int| y, |&...|)
+		opt norefcounts
+		if x >= 0 and y >= 0
+			|| G = .map[y/16][x/16]
+				return g.at((x&15) + (y&15)*16)
+		
+	iterator
+		|| y = 0
+		while y < .height
+			|| x = 0
+			while x < .width
+				|| s = self[x,y]
+				yield (s) ((x,y))
+				x++
+			y++

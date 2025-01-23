@@ -76,7 +76,7 @@ role ListViewRow (message)
 	
 	function InView (|listview| Of, |bool|)
 		opt norefcounts
-		|| f = of._Scroll$
+		|| f = of.scrollstart$
 		for of.VisibleRows
 			if f == self
 				return true

@@ -25,7 +25,7 @@ class ListView (GUIControl) {
 	|byte|							CommandSelectRow
 
 	|ListViewRow?|					DraggingRowTo
-	|ListViewrow?|					_Scroll
+	|ListViewrow?|					_ScrollStart
 	|ListViewCell?|					EditDelayed
 	|ListViewCell?|					MouseDownCell
 	|ListViewrow?|					DraggingRowFrom
@@ -212,9 +212,10 @@ class ListView (GUIControl) {
 	
 	function Clear
 		.listsource.clear
-		._Scroll		= nil
+		._scrollstart	= nil
 		.DraggingRowTo	= nil
 		.DraggingRowFrom= nil
+		.touch
 	
 
 	helper InlineCell (|bool| always = false, |&InlineEditor|)
@@ -242,7 +243,7 @@ class ListView (GUIControl) {
 	
 	
 	helper CheckRemoved (|ListViewrow| r)
-		._Scroll		= .replaced(r, ._Scroll)
+		.scrollstart	= .replaced(r, ._Scrollstart)
 		.DraggingRowTo	= .replaced(r, .DraggingRowTo)
 		.DraggingRowFrom= .replaced(r, .DraggingRowFrom)
 	
@@ -536,7 +537,7 @@ class ListView (GUIControl) {
 		.scrollshift = 0
 		.ScrollRealigner = 0
 		debug_require s != .listsource
-		._scroll = s
+		.scrollstart = s
 		.ExpandParents(s)
 //		.checkdrawupdate
 		if .isediting and (s and !.VisFullyContains(s))
@@ -560,10 +561,10 @@ class ListView (GUIControl) {
 
 	helper ScrollProtect
 		opt norefcounts
-		|| s	= ._scroll
+		|| s	= .scrollstart
 		ifn .listsource contains s
 			s = .start
-			._scroll = s
+			.scrollstart = s
 		require s
 		|| last = .end
 		for .VisibleRowsGap
@@ -714,9 +715,9 @@ class ListView (GUIControl) {
 
 
 	function FixScroll (|bool|)
-		if !._scroll
+		if !.scrollstart
 			.scrollset(.start)
-			return ._scroll
+			return .scrollstart
 		return true
 
 
@@ -749,7 +750,7 @@ class ListView (GUIControl) {
 				WantsTo = .listsource
 				|| top = .lasttop
 				if (p.y+p2.y > .lasttop)
-					|| s = ._Scroll
+					|| s = .scrollstart
 						WantsTo = .bmove(s, -1)
 					.ScrollByRows(-1)
 					
@@ -896,7 +897,7 @@ class ListView (GUIControl) {
 			.Select(sel)
 			Force = true
 		if sel != .listsource
-			if (!Expand and sel contains ._Scroll)
+			if (!Expand and sel contains .scrollstart)
 				.showfast(sel)
 		if !force and !expand and (sel.AllExpandState & 2)
 			for r in sel
@@ -1058,7 +1059,7 @@ class ListView (GUIControl) {
 
 
 	function ScrollByRows (|int| Rows)
-		|| s = ._Scroll
+		|| s = .scrollstart
 			.scrollset( .bmove(s, rows) )
 			.bumpscroll
 
@@ -1129,7 +1130,7 @@ class ListView (GUIControl) {
 		if y <= .lastBottom
 			return .bmove(.LastVisible$, 1)
 		if y > .lastTop
-			return .bmove(._scroll$, -1)
+			return .bmove(.scrollstart$, -1)
 		|| c = .FindClickedCell((0,y))
 			return c.row
 	
@@ -1258,7 +1259,7 @@ class ListView (GUIControl) {
 	helper CellBounds (|ListViewCell| cell,  |ivec4|)
 		opt norefcounts
 		|| sc = cell.row!
-		|| B = .RowBounds(._scroll, sc, .rowheight)			#require
+		|| B = .RowBounds(.scrollstart, sc, .rowheight)			#require
 		B.horz = .ColBounds(cell.column, B, sc)
 		B.x += sc.depth(self) * font.width*2
 		return (B down .lastbottom) left .lastleft 
@@ -1353,7 +1354,7 @@ class ListView (GUIControl) {
 	helper ScrollPixelsSub (|int| rem, |bool|)
 		rem += .scrollShift
 		|| cmp = (.start, .scrollend)(rem < 0) 
-		if cmp == ._scroll
+		if cmp == .scrollstart
 			rem = 0
 		
 		while (rem < 0)
@@ -1373,6 +1374,13 @@ class ListView (GUIControl) {
 			rect.y2 = .lastrect.y2
 			l.ListRowDraw(Where, rect, self, 0)
 
+	function ScrollStart (|listviewrow|)
+		return ._ScrollStart
+	
+	function ScrollStart (assigns:|listviewrow|)
+		if ._ScrollStart!=value
+			._ScrollStart = value
+			.touch
 
 	behaviour Draw
 		opt NoRefCounts
@@ -1398,15 +1406,15 @@ class ListView (GUIControl) {
 			|| D = (r.depth(self), 0)(.IsTree)
 			r.ListRowDraw(Where, rect, self, D)
 			rect.y2 = rect.y
-			if (r == end) and .start == ._scroll
+			if (r == end) and .start == .scrollstart
 				.CanSeeAllLines = (rect.y >= .lastrect.y)
 
 		where.controlclip = clip
 		where.horz = .lastrect.h // redundant?
 		|| cmm = .cmm
-			.RowBorderDraw(._scroll, cmm.EditingRow, .RowHeight, where, ¥.border)
+			.RowBorderDraw(.scrollstart, cmm.EditingRow, .RowHeight, where, ¥.border)
 
-		|| re = .RowBounds(._scroll, .DraggingRowTo, 1)
+		|| re = .RowBounds(.scrollstart, .DraggingRowTo, 1)
 			re = re up .rowheight
 			if !.draggingrowto.prev
 				re = re down 2
@@ -1468,7 +1476,7 @@ class ListView (GUIControl) {
 
 	iterator Visible
 		.fixscroll
-		|| F = ._scroll
+		|| F = ._scrollstart
 		|| n = .VisibleRows
 		while f and n >= 1
 			yield f
@@ -1478,7 +1486,7 @@ class ListView (GUIControl) {
 
 	iterator FullyVisible
 		.fixscroll
-		|| F = ._scroll
+		|| F = ._scrollstart
 		|| n = .FullyVisibleRows
 		while f and n >= 1
 			yield f

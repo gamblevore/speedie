@@ -776,11 +776,14 @@ class TextView (GUIControl)
 		return true
 	
 	
-	syntax append (|string| s)
+	function Log (|string| s, |int| Max=128K)
 		require s
-//		if !.FastAppend
-		.text += s
-//			return 
+
+		if s >= max
+			.Text = s.right(max)
+			return
+		
+		.text = .Text.Right(max - s.Length) + s
 	
 //		|| L = 0
 		// use d.FindWhereLineBreaks(.text,  CharW,  .singleline,  p) isntead

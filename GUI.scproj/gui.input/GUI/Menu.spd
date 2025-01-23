@@ -98,7 +98,8 @@ class Menu (ListView)
 		win.inline.clear
 		win.openedmenu = self
 		is visible
-		._Scroll = nil
+		._Scrollstart = nil
+		.touch
 //		.SlideOpen(0.125s)
 		.SelectFirst(ListViewSelectMode.InitialSelection)
 	

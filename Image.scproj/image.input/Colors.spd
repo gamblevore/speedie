@@ -79,6 +79,8 @@ module Colors
 		return vec4(0.5, 0.0, 1.0, alpha)
 	function Magenta (|float| alpha=1.0, |vec4|)
 		return vec4(1.0, 0.0, 1.0, alpha)
+	function Brown (|float| alpha=1.0, |vec4|)
+		return vec4(1.0, 0.5, 0.25, alpha)
 	function Clear (|vec4|)
 		0 // lol
 

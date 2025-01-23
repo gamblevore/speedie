@@ -55,6 +55,7 @@ module GUI
 	cpp_wrapper SDL_CreateWindow		(|cstring| title, |int| x, |int| y, |int| w, |int| h, |uint| flags, |?&SDL_Window|) 
 	cpp_wrapper SDL_SetWindowTitle		(|&SDL_Window| win, |cstring| title) 
 	cpp_wrapper SDL_GetWindowTitle		(|&SDL_Window| win, |cstring|) 
+	cpp_wrapper SDL_RaiseWindow			(|&SDL_Window| win) 
 
 ///
 	cpp_wrapper SDL_CaptureMouse		(|bool| state, |int|) 
@@ -715,9 +716,10 @@ module GUI
 		._LastTimeSeen = ST
 		
 
-	helper window.DoFrameStep (|bool| ChangeOK, |int| N)
+	helper window.DoFrameStep (|bool| ChangeOK)
 		.RunWindowTasks(false)
 		.FixFocus
+		.FrameCount++
 		.__FrameStep__(ChangeOK and !.OpenedMenu)
 	
 	
@@ -732,7 +734,7 @@ module GUI
 		for  w  in  window.all
 			|| N = w.FrameStepsAmount()
 			for n
-				w.DoFrameStep(!FrontIsDialog, n)
+				w.DoFrameStep(!FrontIsDialog)
 				Got++
 
 		if Got
@@ -1015,11 +1017,19 @@ module GUI
 		return reason
 	
 	
-	function AppIsBackground (|bool| back, |int|)
-		require .IsBackground != back
+	helper BackgroundChanged (|bool| back, |int|)
+		|| same = .IsBackground == back
+
+//		if app.prefs["dev"].Yes // what is up with these *&(&@$ keys!??
+//			|| msg = "unchanged." * same
+//			|| dest = ("back", "fore")(back)
+//			app.say "to $dest. $msg"
+			
+		require !same
 		if back
 			.ForeGroundTime = 0
 		  else
+			SDL_RaiseWindow(.ScreenWindow!) // work around crappy SDL/MacOSX event issues?
 			.ForeGroundTime = gui.FrameStart
 
 		beep.OK = 1		
@@ -1042,7 +1052,7 @@ module GUI
 		|| t = ev.type
 		 
 		if t is APP_DIDENTERFOREGROUND or APP_DIDENTERBACKGROUND
-			return .AppIsBackground(t is APP_DIDENTERBACKGROUND)
+			return .BackgroundChanged(t is APP_DIDENTERBACKGROUND)
 		
 		if  t is APP_TERMINATING
 			.quitreason |= SDLActivity.ExitOrTerminate
@@ -1147,10 +1157,10 @@ module GUI
 			return SDLActivity.activity
 		
 		if wt is FOCUS_GAINED
-			return .AppIsBackground(false)
+			return .BackgroundChanged(false)
 		
 		if wt is FOCUS_LOST
-			return .AppIsBackground(true)
+			return .BackgroundChanged(true)
 
 
 	helper MouseUpEvent (|window| w, |ivec2| XY, |int| Button,  |int|)
@@ -1240,6 +1250,10 @@ module GUI
 	
 	helper KeyDownEvent (|&SDL_Event| ev, |window| w, |int|)
 		#!keydown!
+		if .ForeGroundTime.GuiAgo < 0.1s
+			beep 
+			Notifications <~ "oof"
+			return SDLActivity.nothing
 		if .CanDrag >= mousedragging.Within
 			return SDLActivity.nothing
 
