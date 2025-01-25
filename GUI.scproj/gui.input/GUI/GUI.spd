@@ -56,8 +56,9 @@ module GUI
 	cpp_wrapper SDL_SetWindowTitle		(|&SDL_Window| win, |cstring| title) 
 	cpp_wrapper SDL_GetWindowTitle		(|&SDL_Window| win, |cstring|) 
 	cpp_wrapper SDL_RaiseWindow			(|&SDL_Window| win) 
-
+	cpp_wrapper SDL_GetWindowFlags		(|&SDL_Window| win, |uint64|)
 ///
+
 	cpp_wrapper SDL_CaptureMouse		(|bool| state, |int|) 
 	cpp_Wrapper SDL_GetMouseState		(|?&int| x, |?&int| y, |mousebutton|) 
 	cpp_wrapper SDL_SetRelativeMouseMode (|bool| Relative)
@@ -393,12 +394,12 @@ module GUI
 			disabled `Put "targets gui" in the app's conf section to use this!`
 		if .drawframelength
 			return true
-		.drawframelength = 60th.date // could try changing this to 61th?
+		.DrawFrameLength = 60th.date // could try changing this to 61th?
 		
 		.GUICheck
 		pico.GlobalConfig.SuicideIfParentDies = false
 		pico.start
-		.openedfirst = date.now
+		.OpenedFirst = date.now
 		.ForeGroundTime = .OpenedFirst
 		.CurrMouseXY = ivec2(-1)
 
@@ -465,8 +466,8 @@ module GUI
 	
 	
 	helper ActualEvents (|SDLActivity|) // frameevents
-		while (.QuitReason isnt exitorterminate) and .Event.Poll
-			.eventcount++
+		while (.QuitReason isnt ExitOrTerminate) and .Event.Poll
+			.EventCount++
 			rz |= .CheckEvent(.event)
 			.Event.type = 0
 		if .NeedMouseMove
@@ -749,11 +750,13 @@ module GUI
 // who knows? Also dialogs and the confirm window exist...
 
 	function Cycle (|duration| length, |Duration| Adjust=0, |float|)
+		description "Returns a number between 0 and 1. This number cycles back and forth in a sinusoidal fashion."
 		opt inline
 		return (.FrameStart+adjust).cycle(length)
 
 
 	function Loop (|duration| length, |float|)
+		description "Returns a number between 0 and 1. This number increases linearly."
 		opt inline
 		return .FrameStart.loop(length)
 
@@ -767,6 +770,8 @@ module GUI
 
 	helper SingleFrameSub (|bool|)
 		opt norefcounts
+		if .ForeGroundTime.GuiAgo < 0.1s
+			keys.Reset
 		|| EnoughTime = .DelayEvents
 		if EnoughTime or SDL_Event.HasAny
 			|| Occur = .HandleEvents
@@ -820,8 +825,6 @@ module GUI
 	
 	
 	helper HandleEvents (|SDLActivity|)
-		if .ForeGroundTime.GuiAgo < 0.1s
-			keys.Reset
 		.StartResize
 		SpdProcess.CheckAllAlive
 		rz = .PreFrame
@@ -1018,9 +1021,12 @@ module GUI
 	
 	
 	helper BackgroundChanged (|bool| back, |int|)
+		keys.Reset
 		|| same = .IsBackground == back
-
+		
+		
 //		if app.prefs["dev"].Yes // what is up with these *&(&@$ keys!??
+//			beep 
 //			|| msg = "unchanged." * same
 //			|| dest = ("back", "fore")(back)
 //			app.say "to $dest. $msg"
@@ -1033,7 +1039,6 @@ module GUI
 			.ForeGroundTime = gui.FrameStart
 
 		beep.OK = 1		
-		keys.Reset
 		.FlashSelector = false
 		if !.DialogIsOpen
 			for w in __modules__.window.all
@@ -1050,7 +1055,8 @@ module GUI
 	helper CheckEvent (|&SDL_Event| ev, |int|)
 		visible, opt norefcounts
 		|| t = ev.type
-		 
+//		printline "event $t ${SDL_GetWindowFlags(.screenwindow!)}"
+		
 		if t is APP_DIDENTERFOREGROUND or APP_DIDENTERBACKGROUND
 			return .BackgroundChanged(t is APP_DIDENTERBACKGROUND)
 		
@@ -1088,7 +1094,7 @@ module GUI
 
 		if t is KEYDOWN
 			return .KeyDownEvent(ev, w)
-					
+
 		if t is KEYUP
 			return .KeyUpEvent(ev)
 
@@ -1240,7 +1246,10 @@ module GUI
 
 
 	helper KeyUpEvent (|&SDL_Event| ev, |int|)
-		keys.Removekey(ev.key.key), return sdlactivity.activity
+		|| key = ev.key.key
+		if key.iscmd and app.prefs["dev"].Yes // what is up with these *&(&@$ keys!??
+			beep 
+		keys.Removekey(key), return sdlactivity.activity
 
 
 	helper MouseWheelEvent (|&SDL_Event| ev, |window| w,  |int|)
@@ -1251,8 +1260,8 @@ module GUI
 	helper KeyDownEvent (|&SDL_Event| ev, |window| w, |int|)
 		#!keydown!
 		if .ForeGroundTime.GuiAgo < 0.1s
-			beep 
-			Notifications <~ "oof"
+//			beep 
+//			Notifications <~ "oof"
 			return SDLActivity.nothing
 		if .CanDrag >= mousedragging.Within
 			return SDLActivity.nothing

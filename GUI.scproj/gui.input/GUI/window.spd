@@ -40,24 +40,25 @@ class Window (GUIControl)
 		super.constructor(window.all)
 		.Tasks = list()
 //		.animations = list()
-		.subconstructor(the~area)
+		.subconstructor(the~area, true)
 		
 
-	constructor (|ControlRect| Size)
+	constructor (|ControlRect| Size, |bool| Show=true)
 		cpp_part ConstructorSize
 		super.constructor(window.all)
 		.Tasks = list()
 //		.animations = list()
-		.subconstructor(size)
+		.subconstructor(size, show)
 	
 	
-	helper SubConstructor (|ControlRect| Size)
+	helper SubConstructor (|ControlRect| Size, |bool| show)
 		.size = Size
 		.createddate = gui.FrameStart
 		.CreatedDate ?= date.now
 		.InlineEditorPlace.Init(self)
 		.reflow
-		.show
+		if show
+			.show
 
 	
 	destructor

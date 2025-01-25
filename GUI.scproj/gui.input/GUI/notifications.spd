@@ -94,12 +94,13 @@ module Notifications
 		|| last = .alerts.last
 			if last.text ~= s
 				return nil // sigh
-		rz = Window()
+			
+		|| sz = (width)~left  by  (0~up back height)
+		rz = Window(sz, false)
 		.Alerts <~ rz
 		(rz isnt visible)
 		rz.id = "note"
 		rz.text = s
-		rz.size = (width)~left by 0~up back (height) 
 		|| txt = TextView(rz)
 		txt.id = "note"
 		txt.size = the~area
