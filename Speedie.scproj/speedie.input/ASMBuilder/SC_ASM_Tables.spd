@@ -129,17 +129,17 @@ function Return (fn_asm)
 		
 	|| amount = (f!=nil)|int|
 	|| D0 = .SafeDecr
+		if d0.reg != V.reg // problem
 	|| D1 = .decr
 	|| D2 = .decr
-	if d0
-		if d0.reg != V.reg // problem
-		return exp.RETO(D0, D1, D2, .decr) * asmreg()
+		
+	|| fat = exp.RET(V, D1, D2, (D0!=nil)|int|, 0)
+	if !D0
+		|| K = .Const(V, 8, true) // return true, or -1, etc
+			fat.r[4] = K
+			fat.r[0] = 0
 	
-	|| K = .Const(V, 6, true) // return true, or -1, etc
-		V = asmreg()
-	  else
-		k = 0
-	return exp.RET(V, D1, D2, amount, K) * asmreg()
+	return fat * asmreg()
 	
 
 

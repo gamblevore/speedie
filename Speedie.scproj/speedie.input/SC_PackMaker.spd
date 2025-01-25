@@ -90,16 +90,14 @@ module PackMaker
 		return true
 	
 
-	function TestFn (|string| s, |scfunction|)
+	function TestFn (|string| s, |scfunction--|)
 		opt norefcounts
 		|| mod = compiler.program.FindModule("ASMExamples")
 			return mod.Findfunction(s)
 	
 	
 	function RunAFewTests 
-		opt norefcounts
-		
-		|scfunction| fn
+		|scfunction--| fn
 		fn = .testfn("SemiConst")
 		if fn
 			for i in 2
@@ -183,7 +181,6 @@ module PackMaker
 	function SCFunction.TestObesity (|?&ivec4|)
 		opt norefcounts
 		|| mu = .asm
-			if self ~= "ForeignFuncs"
 			|| mu2 = mu.µTest
 				mu.debugprint
 				return jb_vm.Run(mu2.ptr, mu2.length)
