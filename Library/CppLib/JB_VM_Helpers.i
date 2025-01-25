@@ -423,42 +423,24 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 //	Stack->Stack.Alloc = vm.Env.AllocCurr;
 //	return Stack+1;
 
-AlwaysInline ASM* Return2 (VMRegister*& ZeroPlace, ASM Op) {
-// safedecr!
-//	RETObj				// keep simple for speed
-//		r1		r		// return reg
-//		r2		r		// decr
-//		r3		r		// decr
-//		r4		r		// decr
-//		Count	3		// amount of returned registers
-//		SafeDecr 1
-	auto OldZero = ZeroPlace;
-	VMRegister* stck = OldZero-1;
+
+AlwaysInline ASM* ReturnFromFunc (VMRegister*& r, ASM Op) {
+	JB_Decr(o2);
+	JB_Decr(o3);
+	VMRegister* stck = r-1;
 	auto R1 = stck - stck->Stack.SavedReg;
 	auto Code = stck->Stack.Code;
-	auto V = RET_Valuei;		// get before copy!
-	auto Src = OldZero + n1;
-	ZeroPlace = R1-1;			// NewZero
-	stck = (VMRegister*)memcpy(stck, Src, RET_Countu<<4);
-	if (V)
-		stck->Uint |= V;
+	auto Imm = RET_Valuei; // get before copy!
+	auto Src = r+n1;
+	
+	*stck = *Src;
+	stck->Uint |= Imm; // immediate
+	if (RET_SafeDecru)
+		JB_SafeDecr(o1);
+	r = R1-1; // NewZero
+	*r = {};
 	return Code;
 }
-
-AlwaysInline ASM* Return1 (VMRegister*& ZeroPlace, ASM Op) {
-	auto OldZero = ZeroPlace;
-	VMRegister* stck = OldZero-1;
-	auto R1 = stck - stck->Stack.SavedReg;
-	auto Code = stck->Stack.Code;
-	auto V = RET_Valuei; // get before copy!
-	auto Src = OldZero+n1;
-	ZeroPlace = R1-1; // NewZero
-	stck = (VMRegister*)memcpy(stck, Src, RET_Countu<<4);
-	if (V)
-		stck->Uint |= V;
-	return Code;
-}
-
 
 #define Transfer(Input,Shift)  (r[((Input)>>((Shift)*5))&31])
 #define Transfer3(num)         case num: Zero[num] = Transfer(Code, num)

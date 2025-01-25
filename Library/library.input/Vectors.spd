@@ -932,6 +932,18 @@ struct DDA_Caster
 	|vec2|		Curr
 	|vec2|		Add
 
+// Not sure this matches up with the mathematical line?
+// Worry about the fine-details later? A ray is rarely casted for a pixel to pixel.
+// Its normally a pixel to a block. So we'd have to create a test for that first.
+
+// If its OK, then for optimisation, this could use a loop in a loop, and
+// just update each slot individually.
+// Could store the sign on .add, and store the remaining steps in add.w
+// and both would be vec4s
+
+// I could also use this for drawing line in the GUI
+// perhaps add some Anti-aliasing too?
+
 	function ivec2.RayCast (|DDA_Caster|)
 		rz.goal = self
 		|| A = .vec2.abs					// Using fixed math would be faster AND more reliable!

@@ -430,7 +430,7 @@ struct ASMState
 		|| l = .last
 		if !l.IsFinisher
 			expect (!.fn.returntype) ("ASMReturn".internal) // why?
-			.fn.SourceArg!.RET(asmreg(), asmreg(), asmreg(), 1, 0)
+			.fn.SourceArg!.RET(asmreg(), asmreg(), asmreg(), 0, asmreg())
 		.SetLength
 		.ImproveJumps
 
@@ -652,5 +652,5 @@ function @ASMState.ExpandJSM (|bool|)
 
 function fatasm.IsFinisher (|bool|)
 	|| o = .op|asm|
-	return o == asm.ret or asm.trap or asm.reto or asm.TAIL
+	return o == asm.ret or asm.trap or asm.TAIL
 

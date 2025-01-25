@@ -24,7 +24,7 @@ struct Random
 		cpp_part RndInt
 		|| s = ++.state
 		rz = (.store + s).hash
-		.store = rz		
+		.store = rz
 		
 	setter Seed (|uint64|) 
 		.store = value

@@ -146,18 +146,12 @@ forms
 		r2		r
 		Mode	4
 		
-	RET					// keep simple for speed
-		r1		r		// return reg
+	RET
+		r1		r		// return reg1
 		r2		r		// decr
 		r3		r		// decr
-		Value	6
-		Count	3		// amount of returned registers
-		
-	RETObj				// keep simple for speed
-		r1		r		// safedecr
-		r2		r		// decr
-		r3		r		// decr
-		r4		r		// decr
+		SafeDecr 1
+		Value	8
 
 	REQ
 		r1		r		// 
@@ -290,12 +284,7 @@ forms
 
 /**/ RET (Ret)				// ret: 
 		__ 
-		Code = Return1(r, Op)
-		___
-
-/**/ RETO (RETObj)			// ret: 
-		__ 
-		Code = Return2(r, Op)
+		Code = ReturnFromFunc(r, Op)
 		___
 
 POS 2

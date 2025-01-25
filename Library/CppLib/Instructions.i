@@ -40,11 +40,7 @@
 	u3 = (uint64)(&u4);
 ı RET: 
 	__;
-	Code = Return1(r, Op);
-	___;
-ı RETO: 
-	__;
-	Code = Return2(r, Op);
+	Code = ReturnFromFunc(r, Op);
 	___;
 ı ALLO: _
 	AllocStack(vm, r, Op);
