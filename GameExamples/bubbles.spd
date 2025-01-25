@@ -23,15 +23,17 @@ class Bubbles (window)
 
 	constructor
 		.t = RayTracer((1.6, 5.0, -22.0))!
+		.t.Background = RayTracer.rainbows
 		
 		|| L = 10.0
 		for i in (-L to L)
 			|| sh = (i, 0.0, i.abs)*24.0
-			.T.shapes <~ (&vshapes.CloudBubble).new(sh+(-1.0, 1.5, 12.0),  2)
-			.T.shapes <~ (&vshapes.CloudBubble).new(sh+( 1.5, 2.5, 18.0),  3)
-			.T.shapes <~ (&vshapes.CloudBubble).new(sh+( 7.0, 8.0, 18.0),  4)
-			.T.shapes <~ (&vshapes.CloudBubble).new(sh+( -2.0, 9.0, 24.0), 6)
-			.T.shapes <~ (&vshapes.CloudBubble).new(sh+( 12.0, 3.0, 24.0), 4)
+			|| C = &vshapes.CloudBubble
+			.T.shapes <~ C.new(sh+(-1.0, 1.5, 12.0),  2)
+			.T.shapes <~ C.new(sh+( 1.5, 2.5, 18.0),  3)
+			.T.shapes <~ C.new(sh+( 7.0, 8.0, 18.0),  4)
+			.T.shapes <~ C.new(sh+( -2.0, 9.0, 24.0), 6)
+			.T.shapes <~ C.new(sh+( 12.0, 3.0, 24.0), 4)
 		for (s in .t.shapes) (i)
 			s.color = vec4(1)
 			if i & 1
@@ -42,7 +44,20 @@ class Bubbles (window)
 	behaviour MouseMove
 		.t.rotation += (move.y|float| * -0.0001,  Move.x|float| * 0.0005, 0.0)
 	
-	
+	behaviour keydown
+		if key is RIGHTBRACKET
+			raytracer.AdjustmentFinder += 0.1
+		  elseif key is leftBRACKET
+			raytracer.AdjustmentFinder -= 0.1
+		  elseif key is RETURN
+			|| ss = "new sh?".ask
+				raytracer.AdjustmentFinder = ss.float
+		  else 
+			return false
+				
+		notifications <~ raytracer.AdjustmentFinder.Render
+		return true
+		
 	behaviour Drawbackground
 		opt norefcounts
 		.T.RayTrace(where)

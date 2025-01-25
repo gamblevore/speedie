@@ -6,23 +6,31 @@ import "GUI"
 
 class Demo (Window)
 	|ivec2| D
+	|ivec2| D2
 	
 	behaviour FrameStep
-		.d = (256(), 256())
+		if .FrameCount isa 4
+			.d = (256(), 256())
+		.d2 = (256(), 256())
 		gui.Touch
-		
+	
 	behaviour Draw
 		Where.DrawRect(self, colors.black)
 		|| M = where.Size/2
 		|| D = .d
+		|| D2 = .d2
 		for 9
 			d = (d.hash&255)-128
+			d2 = (d2.hash&255)-128
 			for cc in d.RayCast		//		<---- all the magic is in the .raycast function
+				|| DD = ((Cc, Cc+1)*6) + M
+				Where.DrawRect(DD, colors.red(0.5))
+			for cc in d2.RayCast
 				|| DD = ((Cc, Cc+1)*6) + M
 				Where.DrawRect(DD, colors.blue(0.5))
 
 main
-	demo().RunAsMain(20)
+	demo().RunAsMain(5)
 
 
 

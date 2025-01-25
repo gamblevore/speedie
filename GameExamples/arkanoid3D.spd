@@ -1,11 +1,9 @@
 #!/usr/local/bin/spd
 import "GUI"
 
+
 main
 	return Breakout().RunAsMain(60)
-
-// * block nudge... for vibration on hit
-
 
 
 
@@ -48,7 +46,7 @@ class Breakout (Window)
 			for x in 10.0
 				|| pos = (2.0+x*(16.0/9.0), 9.0+y*0.5) // 2 to 19, 9 to 11.5
 				|| block = (&vshapes.FudgeBlock).new(pos.xy_,  br)
-				block.Health = 1.0 + y
+				block.Health = (2.0 + y)
 				.Blocks <~ block
 	
 	
@@ -90,7 +88,7 @@ class Breakout (Window)
 		|| R2 = bl.OverlapsRect(R)
 		require r2.exists
 		|| Cn = r2.Center
-		.spirals <~ vobject(cn, vec2(6), bl.Color)
+		bl.Velocity.w = 1.0
 		
 		if r2.Height > r2.Width
 			ball.Velocity.x = -ball.Velocity.x
@@ -98,7 +96,7 @@ class Breakout (Window)
 			ball.Velocity.y = -ball.Velocity.y
 		ball.Velocity = ball.Velocity.Normal * .incr
 
-		|| hp = bl.Health - ball.box2d.Width*8
+		|| hp = bl.Health - ball.box2d.Width*4
 		bl.Health = hp
 		if (hp <= 0) or 0.5[]
 			|| pu = .PowerUp(8)
@@ -120,7 +118,9 @@ class Breakout (Window)
 			  elseif pu == 8
 				|| b = (.Bar.radius.x + 8th) min 2.0
 				.bar.radius.x = b
-		return hp <= 0
+		if hp <= 0
+			.spirals <~ vobject.box(cn, vec2(6), bl.Color)
+			return true
 		
 	
 	function PowerUp (|float| n, |int|)
@@ -158,13 +158,16 @@ class Breakout (Window)
 	behaviour FrameStep
 		require GUIActive
 		// we want to draw the framecount... and the total number of seconds we have run...
-		|| MinSp = .BallSpeed/4
+		|| MinSp = .BallSpeed/4.0
 		for (b.backwards in .explosions) (i)
 			b.Radius -= 0.03
 			if b.Radius <= 0.02
 				.explosions.fastRemove(i)
 			  else 
 				.Dohits(b)
+
+		for (b in .blocks)
+			b.Velocity.w = (b.Velocity.w - 90th) max 0
 		
 		for (b.backwards in .balls) (i)
 			|| y = b.Velocity.y
@@ -188,11 +191,7 @@ class Breakout (Window)
 				.Spirals.Remove(i)
 		gui.Touch
 	
-	
-	function RayTracer.Rainbows (raytracer.BackgroundShader)
-		return Colors.Rainbow(P.x, 1, 0.5)
-	
-	
+		
 	behaviour Drawbackground
 		for b in .Blocks
 			|| H = (1.0-b.health)*12th
@@ -209,7 +208,7 @@ class Breakout (Window)
 		|| L = 24s()
 		for (s in .Spirals) (i)
 			|| B = s.Screen
-			where.DrawSpiral(0.01*b.width|float|*vobject.drawscale, L, b.center, s.color, (3s+i*1s)())
+			where.DrawSpiral(0.01*b.width|float|*VObject.drawscale, L, b.center, s.color, (3s+i*1s)())
 
 
 function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| Col, |float| Pulse)
@@ -231,5 +230,3 @@ function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| Col, |f
 	
 		.DrawSoftCircle(Circle, C)
 
-
-// copy your favourite arkanoid examples. (any on sega megadrive?)

@@ -7,25 +7,19 @@ class VObject (list)
 	|vec3|			Radius			// .w = rounding
 	|vec3|			Velocity		// .w = vibration, for struck objects
 	|vec4|			Color			// image pixel?
-	|float|			Health			// are ints better? I think so?
+	|float|			Health
+	|int|			ID
 	|DistanceFunction| Shape
 
 	visible false
 	// ray acceleration
-	|byte|			_ShapeID
+	|byte|			_DrawID
 	|float|			_MaxDist  
 	|float|			_MinDist  
 	|?VObject--|	_CellNext
 	
 	visible true
 	
-	constructor (|vec2| Pos,  |vec2| Size,  |vec4| Color=colors.white)
-		cpp_part ConstructorBox2D
-		.pos = (pos, 0.0)
-		.Shape = &VShapes.Box
-		.Color = color
-		.Health = 256
-		.size = vec3(size,1.0)
 
 	constructor (|vec3| Pos,  |vec3| Rad, |DistanceFunction| shape,  |vec4| Color=colors.white)
 		cpp_part ConstructorShape
@@ -34,6 +28,7 @@ class VObject (list)
 		.Radius = rad
 		.Color = color
 		.Health = 256
+		.id = ++ObjID
 	
 	function BigR (|float|)
 		return .radius.max
@@ -85,19 +80,35 @@ class VObject (list)
 		  else
 			.position &= ~i
 	
+	function AdjustedPos (|vec3|)
+		// this is a little ugly...
+		// i wonder if this value can be cached somwehre
+		// or at least the old value can be?
+		|| P = .pos
+		|| V = .Velocity
+		|| w = v.w
+			|| scale = (w min 1)*0.125
+			P.x += (gui.Cycle(0.07s)-0.5)*scale
+		return P
+	
+	
 	function ActualRadius (|float|)
 		return .Radius.Length
 	
 	module
+		function Box (|vec2| Pos,  |vec2| Size,  |vec4| Color=colors.white, |vobject|)
+			rz = VObject((pos, 0.0), vec3(size,1.0), &VShapes.Box, color)
 		function NewParticle (|vobject|)
 			visible
 			// This will us let ALL drawn objects be vobjects, even particles
 			// we could pre-allocate 1000 or something, or just allocate on demand and keep them.
 			// then reset per-frame. Then we can send all vobjects to the GPU.
 			return ._Particles.Next
+		
 		|[vobject]| 	_Particles
 		|float|			DrawScale
 		|vec2|			DrawMovement
+		|int|			ObjID
 		
 					
 		function Size2D (|float| X, |float| Width, |float| Y, |float| Height, |controlrect|)

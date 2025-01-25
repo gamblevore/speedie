@@ -130,6 +130,7 @@ class Tetris (GridSection)
 	|int|				Highest
 	|int|				LockDelay
 
+	
 	constructor
 		super.constructor(21,24)
 		.restart

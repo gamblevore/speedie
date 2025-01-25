@@ -65,6 +65,7 @@ class RayTracer
 	
 	
 	module
+		|float| AdjustmentFinder = 0.8
 		function New (|vec3| Camera, |int| Buff=8MB, |raytracer|)
 			|| root = memory.zalloc(Buff)|&rayboost|
 				return RayTracer(camera, buff, root)
@@ -83,6 +84,9 @@ class RayTracer
 	
 	prototype BackgroundShader (|vec2| P, |vec4|)
 	function Black (BackgroundShader)
+	function RayTracer.Rainbows (raytracer.BackgroundShader)
+		return Colors.Rainbow(P.x, 1, 0.5)
+	
 		
 	setter Camera (|vec3|)
 		Value = Value|vec4|.MakeSane|vec3|
@@ -108,33 +112,26 @@ class RayTracer
 		return ._LookAt
 	
 
-	helper BG (|vec2| P, |vec4|)
-		return (.Background)(self, (P + .adjust) * .scale)
+	helper BG (|vec4|)
+		return (.Background)(self, (._xy + .adjust) * .scale)
+	
 	
 	helper AntiAlias (|vec2| XY, |RayTraceCell| cell, |&imagepixel| pxl)
 		opt min 3, opt norefcounts
-		|vec4| C
+		|| C = pxl.color
 		for i in 4
-			|| sh = (i&1, i>>1).Vec2 - 0.5
-			.Prepare(xy + sh*0.8)
+			|| sh = ((i&1, i>>1).Vec2 - 0.5) * 0.70711
+			.Prepare(xy + sh)
 			|| B = .FindBestObj(cell.obj)
-				C += .ShadePixel(B)
-		.write(xy, C*0.25, pxl)
+			C += .ObjColor(B, cell.obj)
+		pxl.AppendRGB((C*0.2)|vec3|)
 	
-	
-	helper Write (|vec2| XY, |vec4| C, |&imagepixel| pxl)
-		|| a = C.a
-		if a <= 0.996
-			C = mix(.bg(XY), c, a)
-		pxl.AppendRGB(C|vec3|)
-
 
 	helper Prepare (|vec2| XY)
 		._CamDir = .Dir(xy)
 		._XY = XY
 		.idir = (-1.0 / ._CamDir)//|vec4|.makesane|vec3|
-	
-	
+
 // How to stipple if inside the obj?  what if its right in front of us?
 // what about volumetrics?
 			
@@ -144,35 +141,42 @@ class RayTracer
 // I think the func should do the coloring too.
 // now, what if we passed the object? we need a maximum distance. like raydist+radius.
 
+	helper ColorSub (|vobject| B, |vec4|)
+		|| H = ._RayHit
+		|| P = .Camera + ._CamDir * H.x
+		p.w = 1.0
+		return (B.shape)(B, self, P, H)
 
-	helper ObjColor (|vobject!| B, |vec2| P, |vec4|)
+
+	helper ObjColor (|vobject?| B, |vobject| S, |vec4|)
 		opt min 3,   opt norefcounts
-		|| C = .ShadePixel(B)
-		if c.a <= 256th			// Weak
-			return .bg(p)
-		if c.a > 0.996			// Strong
-			return C
-		
-		// Simple 2-obj coloring
-		|| B2 = .FindBestObj(B._CellNext)
-			|| C2 = .ShadePixel(B2)
-			C = (C+C2)*0.5
-//			C = mix(C2, C, C.a)
-		if c.a > 0.996
-			return C
-		return mix(.bg(P), C, c.a)
+		if B
+			|| C = .colorsub(b)
+			if c.a >= 0.996
+				return c
+			|| b2 = .FindBestObj(S, b)
+			if !b2
+				return mix(.BG, c, c.a)
+
+			|| C2 = .colorsub(b2)
+			if c2.a < 0.996
+				c2 = mix(.BG, c2, c2.a)
+
+			return mix(C2, c, c.a)
+		return .bg
 
 		
-	helper FindBestObj (|vobject?| sp, |vobject|)
+	helper FindBestObj (|vobject?| sp, |vobject?| ignore=nil,  |vobject|)
 		opt min 3,   opt norefcounts
 		|| Best = float.max
 		._RayHit = rayinfo.miss
 		while sp
-			|| Hit = .FindSub(sp)
-			if hit.x < Best  and  hit.z <= 1024th
-				rz = sp
-				._Rayhit = hit
-				best = hit.x
+			if sp != ignore
+				|| Hit = .FindSub(sp)
+				if  hit.x < Best  and  hit.z <= 1024th
+					rz = sp
+					._Rayhit = hit
+					best = hit.x
 			sp = sp._CellNext
 	
 	
@@ -198,15 +202,6 @@ class RayTracer
 			if  d >= sp._MaxDist
 				exit
 		return rayinfo.miss
-
-
-	helper ShadePixel (|vobject!| B, |vec4|)
-		opt min 3
-		|| H = ._RayHit
-		|| P = .Camera + ._CamDir * H.x
-		p.w = 1.0
-		return (B.shape)(B, self, P, H)
-		
 		
 		
 	helper Dir (|vec2| XY, |vec3|)
@@ -238,10 +233,10 @@ class RayTracer
 			.Planes[3] = -.plane(.size.x1y2x2y2) // 0111 // top
 			.RootNode.Divide(self)
 	
-	
+		
 	helper FindCameraDist (|vobject| obj, |float| Max)
 		// lets us find out the max/min SDF distance.		
-		|| V = obj.pos - .Camera
+		|| V = obj.AdjustedPos - .Camera
 		|| DMin = V.Length
 		|| DMax = DMin
 		|| R = obj.ActualRadius
@@ -265,7 +260,7 @@ class RayTracer
 		opt min 3
 		if b._maxdist
 			|| R = (b.radius, 0.0)
-			|| P = (b.pos,    1.0)
+			|| P = (b.AdjustedPos,  1.0)
 			return .PlaneOK(r,p,0) and .PlaneOK(r,p,1) and .PlaneOK(r,p,2) and .PlaneOK(r,p,3)
 		// Could also (later) check if the nearest frustrum point is in the box.
 		// Need points[8] and a way to find which is the nearest to the box, or just check all?
@@ -285,10 +280,10 @@ class RayTracer
 		
 		|| id = 1
 		for s in .shapes
-			if .InPlanes(s)   // todo: if shape covers cell, mark cell as covered
+			if .InPlanes(s)   // Todo: if shape covers cell, mark cell as covered
 				if id >= 256
 					id = 1 
-				s._ShapeID = id++
+				s._DrawID = id++
 				
 				.Quadditch(.rootnode, s)
 
@@ -324,18 +319,13 @@ class RayTracer
 			while pxl < pxl2
 				#! Main pixel color
 				cell.Aliased = false
-				.prepare(p)
+				.Prepare(p)
+				pxl.a = 0
 				|| b = .FindBestObj(cell.obj)
-					if 1 //or keys.shift
-						pxl <~ .ObjColor(b, P)
-					  else
-						|| C = .ShadePixel(B)
-						.write(P, C, pxl)
-					pxl.a = b._shapeid
-				  else
-					pxl <~ .BG(P)
+					pxl.a = b._DrawID
+				pxl.appendrgb(.ObjColor(B, cell.obj)|vec3|)
 				
-				if 1
+				if !keys.l[]
 					|| LeftAA = pxl-1
 					if  p.x  and  pxl.a != leftaa.a
 						.AntiAlias(p-(1.0,0), cell, leftAA)
@@ -434,7 +424,7 @@ struct RayBoost
 		|| Rd = (v.radius, 0.0)
 		|| RX = Rd sign ff.xdiv
 		|| RY = Rd sign ff.ydiv
-		|| VP = (V.pos, 1.0)
+		|| VP = (v.AdjustedPos, 1.0)
 		|| L = ff.xdiv • (VP + RX) > 0
 		|| R = ff.xdiv • (VP - RX) < 0
 		|| B = ff.ydiv • (VP + RY) > 0

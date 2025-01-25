@@ -1,6 +1,7 @@
 
 
 datatype RayInfo (vec4)
+	default vec4(float.max, 0, 0, 0)
 	module
 		|| Miss = vec4(float.max, 0, 0, 0)
 	
@@ -62,7 +63,7 @@ module VShapes
 		opt min 3
 		if D
 			return NormalColor(self, ray, p, D)
-		|| L = .pos - P
+		|| L = .AdjustedPos - P
 		|| r = .Radius.x * p.w
 		if ray
 			|| t = L • Ray._CamDir
@@ -102,19 +103,24 @@ module VShapes
 
 		p.w *= 0.5
 		|| r = .Radius.x * p.w
+		p.y+=gui.Cycle(5s, (.id.hash&255)*2s)*0.5
 		if D
-			|| Str = 0.1 * D.y / r
-			return (1.0, 1.0, 1.0, Str) * .Color
+			|| Y = 0.15 * (D.y+0.01) / r
+			|| Str = (0.75 + y).Clamp()
+			if !keys.k[]
+				|| ss = (0.4 + y).Clamp()
+				return vec4(ss, Str) * .Color
+			return .Color
 			
 		return Sphere(self, ray, p + (0,0,r)) add Sphere(self, ray, p - (0,r,0)) add Sphere(self, ray, p + (r,0,0))
-			
+	
 
 
 	function Box (DistanceFunction)
 		opt min 3
 		if D
 			return NormalColor(self, ray, p, D)
-		|| orig = P - .pos
+		|| orig = P - .AdjustedPos
 		|| r = .Radius * p.w
 		if ray
 			|| idir = ray.iDir
@@ -136,7 +142,7 @@ module VShapes
 
 
 	function NormalColor (DistanceFunction)
-		|| Norm = (P - .pos).normal.abs		// Spherical color
+		|| Norm = (P - .AdjustedPos).normal.abs		// Spherical color
 		return (norm, 1.0) * .Color
 	
 	
@@ -147,7 +153,7 @@ module VShapes
 	
 		
 	function IceFudgeColor (DistanceFunction)
-		|| Norm = (P - .pos).normal
+		|| Norm = (P - .AdjustedPos).normal
 		|| y = Norm.y.acos
 		|| x = Norm.z.abs.atan2(Norm.x)
 		|| str = 8.0

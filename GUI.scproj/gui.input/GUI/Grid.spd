@@ -1,58 +1,45 @@
 
+
+// We should have its own memory-allocator, at least for fixed-size allocations.
 class GridSection
-	|...[512]|  Cells
-	|uint64|    State
-	|byte[4]|	Dimensions
+	contains uint64
+	|&...|		Map
 	|object--?| Owner
-	contains uint64
-	constants
-		CellMax = 512
+	|int|		Width
+	|int|		Height
+	|int|		Depth
+	|uint64|    State
 
-	constructor (|int| W=16, |int| H=16, |int| D=1)
-		.Dimensions[0] = W
-		.Dimensions[1] = H
-		.Dimensions[2] = D
-		.Dimensions[3] = 1
-		.Fill(0)
-
-	function Width (|int|)
-		return .Dimensions[0]
-
-	function Height (|int|)
-		return .Dimensions[1]
-
-	function Depth (|int|)
-		return .Dimensions[2]
-		
-	function Temporal
-		|| P = (&.cells[0])|&byte|
-		|| N = CellMax * –sizeof uint64
-		random.shared.temporal(P, P + N)
-
-	function At (|uint| i=0, |&...|)
-		if i < 512
-			return .Cells[i]
-		return Dummy
-	
-	function Fill (|uint64| V)
-		|| C = .at
-		for i in CellMax
-			C[i] = v
-	module
-		|...| Dummy
-
-
-
-class FlatGridMap
-	contains uint64
-	|&...| Map
-	|int| Width
-	|int| Height
-	constructor (|uint| W, |uint| H)
+	constructor (|int| W, |int| H, |int| D=1)
+		w = w max 1,  h = h max 1,  d = d max 1
+		|| M = Memory.zalloc(w*h*d*8)|&uint64|
+		if !M
+			w = 0
+			h = 0
+			d = 0
+			m = nil|&uint64|! // sigh
+		.map = m
 		.width = w
 		.height = h
-		.map = Memory.zalloc(w*h*8)|&uint64| #quit
+		.depth = D
+
+
+	destructor
+		Memory.free(.map)
 	
+	function Total (|uint|)
+		return .Width*.Depth*.Height
+	
+	function Fill (|uint64| V)
+		|| C = .map
+		for i in .total
+			C[i] = v
+
+	function At (|int| i=0, |&...|)
+		if i|uint| < .total
+			return .map+i
+		return Dummy
+		
 	syntax Access (|ivec2| V, |&...|)
 		cpp_part AccessVec
 		return self[v.x, v.y]
@@ -61,6 +48,8 @@ class FlatGridMap
 		opt norefcounts
 		if x inrange .width and y inrange .Height
 			return .map[x+y*.width]
+	module
+		|...| Dummy
 		
 	iterator
 		|| ptr = .map

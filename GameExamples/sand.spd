@@ -2,7 +2,7 @@
 import "GUI"
 
 main
-	return SandSimulator().RunAsMain(20)
+	return SandSimulator().RunAsMain(60)
 
 
 struct Particle
@@ -15,25 +15,31 @@ struct Particle
 		return .type.color
 
 	syntax is (|ParticleType| T, assigns:|bool|)
-		.type = T, (value)
+		if Value
+			.type = T
 	
+	syntax is (|ParticleType| T, |bool|)
+		return .type == T
+	
+	function Swap (|&particle| P)
+		|particle| T
+		T = P[0]
+		P[0] = self[0]
+		self[0] = (&T)[0]
+		
 	function MoveTo (|?&particle| P, |bool|)
-		if p.Empty
+		if p and (p.type == 0 or p.type >= ParticleType.Max)
 			P[0] = self[0]
 			.Type = 0
 			return true
 	
-	function Empty (|bool|)
-		nil checker
-		return self!=nil and (.type == 0 or .type >= ParticleType.Max)
-
-	function Liquid (|bool|)
+	function IsLiquid (|bool|)
 		nil checker
 		return self!=nil and (.type >= ParticleType.water and .type <= ParticleType.Acid)
 		
-	function Gravity (|bool|)
+	function HasGravity (|bool|)
 		nil checker
-		return self!=nil and (.type isnt wood and stone)
+		return self!=nil and (self isnt wood and stone)
 
 
 datatype ParticleType (byte)
@@ -52,65 +58,66 @@ datatype ParticleType (byte)
 		
 
 class SandSimulator (Window)
-	|flatgridmap of particle|	Sand
+	|GridSection of particle|	Particles
 
 	constructor 
-		.sand = FlatGridMap(400,300)
+		.Particles = GridSection(400,300)|gridsection of particle|#quit
 		.reset
-		
 	
 	function Reset
-		for s in .sand
+		|| h = Random.shared.int
+		for s in .Particles
+			h = h.hash
 			s[0] = nil
-			s.Type = Random.shared.int
-			if s.Type > 200
-				(s is water)
+			s.Type = h
+			|| h2 = h&255
+			(s is water) = h2 > 200
+			(s is sand) = h2 > 240
 		
 		
-	function Gravity (|!&particle| P, |ivec2| O, |&particle|)
+	function DoGravity (|!&particle| P, |ivec2| O, |&particle|)
 		|| V = (p.vx, p.vy)
+//		if o.y == 0
+//			return p
 		for CC in v.RayCast()
-			|| P2 = .sand[O+CC]
-				if p.MoveTo(p2)
-					rz = p2
-					p = p2
+			|| D = .Particles[O+CC]
+				if p.MoveTo(D)
+					rz = D
+					p = D
+				  elseif D.isliquid // adding this causes infinite rain. no idea why.
+					if !p.IsLiquid
+						D.swap(p)
+						D.vy = D.vy|int| max -3
+//					  else 
+//						p2.vy = p.vy
+//						p2.vx = p.vx
+//						p.vx = 0
+//						p.vy = 0
+//					exit
 		
 		
 	behaviour FrameStep
-		require GUIActive
+		require GUIActive // and (.FrameCount+1) isa 16
 		.Touch
 		
 		|| rnd = 64K()
-		for (s in .sand) (V)
-			if s.empty: continue
-			if s.Gravity
+		for (s in .Particles) (V)
+			if s.HasGravity
 				s.vy = (s.vy - 1) max -5
-				|| D = .Gravity(S, V)
+				|| D = .DoGravity(S, V)
 				if !D
 					s.vy = 1-s.vy
 					rnd = rnd.hash
 					|| R = (Rnd&2) - 1
-					if s.MoveTo(.sand[V-(R,1)])
+					if s.MoveTo(.Particles[V-(R,1)])
 						0
-					  elseif s.MoveTo(.sand[V-(-R,1)])
+					  elseif s.MoveTo(.Particles[V-(-R,1)])
 						0
-					  elseif s.liquid
-						  if s.MoveTo(.sand[V-(R,0)])
+					  elseif s.Isliquid
+						  if s.MoveTo(.Particles[V-(R,0)])
 							0
-						  elseif s.MoveTo(.sand[V-(-R,0)])
+						  elseif s.MoveTo(.Particles[V-(-R,0)])
 							0
-
-	
-	function DrawParticles (|image| where)
-		|| w = .sand.width
-		|| ws = (where.Width-(w*2))/2
-		|| base = 40
-		for (s in .sand) (V)
-			if s
-				|| R = V*2 + (ws,base)
-				where.DrawRect((R, R+2), s.color)
-	
-	
 	
 	behaviour keydown
 		if key is space
@@ -119,5 +126,11 @@ class SandSimulator (Window)
 	
 	behaviour Drawbackground
 		where.DrawRect(Self, colors.black)
-		.drawparticles(Where)
+		|| w = .Particles.width
+		|| ws = (where.Width-(w*2))/2
+		|| base = 40
+		for (s in .Particles) (V)
+			if s
+				|| R = V*2 + (ws,base)
+				where.DrawRect((R, R+2), s.color)
 
