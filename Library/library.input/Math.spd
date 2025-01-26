@@ -297,6 +297,13 @@ extend float
 		rz *= rz
 		rz *= rz
 
+	function Pow32 (|float|)
+		rz = self * self
+		rz *= rz
+		rz *= rz
+		rz *= rz
+		rz *= rz
+
 function math.RangeConvert (|float| low_from, |float| high_from, |float| low_to, |float| high_to, |FloatRangeConverter|)
 	description "Converts numbers from one range, to another range. Turns something awkward into something simple" 
 	cpp_part RangeConv4
