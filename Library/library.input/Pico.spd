@@ -1,7 +1,8 @@
 
 
 prototype PicoThreadFn (|pico| Comms, |&nil| Obj, |&cstring| Args=nil, |bool|)
-
+// todo: pico could use shared memory, instead of pipes. This actually reduces memory use!
+// To under half the memory.
 
 
 struct PicoMessage
