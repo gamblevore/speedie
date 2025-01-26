@@ -13,7 +13,7 @@ extend PerryIDE
 		.SearchArea			= guicontrol(self) 
 		.ViewButtons		= guicontrol(self) 
 		.RBorder			= guicontrol(self)
-		.StdOutBorder		= guicontrol(self)
+		.CompileAndJBArea	= guicontrol(self)
 		.Toolbar			= buttonview(self,		ClickedToolBar)
 		.RunButton			= buttonview(.Toolbar,	ClickedDebug,			PressingDebug, nil, PressingDebug)
 		.BuildButton		= buttonview(.Toolbar,	Clickedcompile)
@@ -41,7 +41,7 @@ extend PerryIDE
 		.SpeedieText		= TextView(self)
 		.ProductOut			= TextView(self)
 		.ProductErrors		= TextView(self)
-		.CompileTabs		= ButtonView(.StdOutBorder,		ClickedCompileTabs) 
+		.CompileTabs		= ButtonView(.CompileAndJBArea,		ClickedCompileTabs) 
 		.UnNeededLabel		= TextView(self,		ClickedNoNeed)
 		.AutoComplete		= menu(self, 			nil,					AutoCompleteInsertText)
 		.ViewFiles			= ButtonView(.ViewButtons,		ClickedAView)
@@ -371,8 +371,9 @@ extend PerryIDE
 		with .ProductSep
 			is enabled
 			.size = the~area
+			.div.defaultFraction = 0.125
 			.ID	= "edit+stdout"
-			.AddLow  self.StdOutBorder
+			.AddLow  self.CompileAndJBArea
 			.addhigh self.rborder
 			.addhigh self.editme
 			.addhigh self.drawme
@@ -406,7 +407,7 @@ extend PerryIDE
 		.ProjectTabs.ExpandOnMouseOver = 2
 
 		
-		with .StdOutBorder
+		with .CompileAndJBArea
 			.ID				= "OutBorder"
 			.size 			= the~width  by  18~down
 			.gnormal.solid	= vec4(0.087, 0.95)

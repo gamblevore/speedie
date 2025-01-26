@@ -13,7 +13,7 @@ class PerryIDE (Window)
 	|Guicontrol|				Debugger
 	|Guicontrol|				SearchArea
 	|Guicontrol|				rborder
-	|guicontrol| 				StdOutBorder
+	|guicontrol| 				CompileAndJBArea
 	
 	|FileRow?|					NotTodo
 	|message?|					SharedProjectTabSource
