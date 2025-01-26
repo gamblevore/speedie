@@ -53,9 +53,7 @@ datatype SCDeclInfo (int)
 		Const
 		UnknownConst
 		NumberConst = DirectNumber + Const	// const: x = 7
-		Static
 		UpgradeableContained
-		NewlyCreated
 		TypeImprove
 		UsedByCode
 		API
@@ -66,7 +64,6 @@ datatype SCDeclInfo (int)
 		Body
 		Property
 		Global
-		Marked
 		Return
 		Altered
 		GameFlyingMem
@@ -76,14 +73,15 @@ datatype SCDeclInfo (int)
 		SetTo					// a var sets it... like: rz = obj
 		Hidden					// internal global... should not be exposed to non-lib stuff
 		Grabbed
+		NoRegAddrs
 		PostIncremented
 		ReturnedStruct
 		ReturnedVar
-		IntendedAsReturn // were at 31... cant reach 33. Speedie should also warn if theres too many. (it wasnt!)
+		IntendedAsReturn // were at 31... Speedie should also warn if theres too many. (it wasnt!)
 		Swappable	 = Param + Body + Global + Property
 		Local		 = Body + Param
 		SelfImplicit = Self + local // local is set by CollectOneParam, anyhow?
-		DclCopied    = altered + stayborrowed + static + api + UpgradeableContained + compilercreated + body// need more too? do later
+		DclCopied    = altered + stayborrowed + api + UpgradeableContained + compilercreated + body// need more too? do later
 
 
 	function Set (|SCDeclInfo| d, |bool| b, |SCDeclInfo|)

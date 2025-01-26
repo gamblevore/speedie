@@ -136,23 +136,26 @@ function UseChildAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason,
 
 
 function UseAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason, |NilState|) 	// a.b, *a, a[0], (a)()
-	return .useasrealsub(msg, test, reason, msg.fastdecl)
+	return .UseAsRealSub(msg, test, reason, msg.fastdecl)
 
 
 function UseAsRealSub (|message| ch, |nilcheckmode| test, |nilreason| reason, |scdecl| dcl, |NilState|) 	// a.b, *a, a[0], (a)()
 	opt norefcounts
-	|| actual = .Jump(ch)
+	|| chmode  = NilCheckMode.WithinAccess * (reason is accessing)
+	|| actual = .Jump(ch, chmode)
 	if actual is nilish
 		|| ddd = dcl.hiderfunc
 		if ddd and (reason is property) and !ddd.isassigns and (test isnt assigns)				// OK... 
 			return .PropertyToFunc(ch.parent!, ddd)
 			
 		.BecomeReal(ch.FastDecl, ch, reason)
-	|| nd = dcl.nildeclared
+
+	|| nd = dcl.NilDeclared
 	if  test isnt active  or  test is soft
 		return nd
 	if nd.statedreal and dcl.typesuffers
 		return ch.RedundantDeclare(nd)
+
 	return nd
 
 
@@ -218,6 +221,17 @@ function String (niltrackerfn)
 	return .RealBool(!msg.length)
 
 
+function NoRegAddrs
+	visible
+	|int| b
+	NoRegAddrs2(b)
+
+
+function NoRegAddrs2 (|!&int| a)
+	a = a + 1
+	a[] = 2
+	
+
 function Function (NilTrackerFn)
 	opt norefcounts
 	test &=~ NilCheckMode.Disappears
@@ -226,14 +240,13 @@ function Function (NilTrackerFn)
 	
 	|| fn = prms.obj|SCFunction|
 	if !fn
-//		expect (fp.func == @bra) (prms, errorreceiver.NonFatal) // no longer true.
 		fn = fp.GetFunctionPointer$
 		fp = fp.unbra
 		require .UseAsReal(fp, 0, nilreason.accessing)					// (abc)()
 
-	expect ((fn != scfunction.currfunc) or t.anyreturns or t.nestdepth > 0) (msg, "Recursion bug. !!!!!!! QUICKLY DELETE THIS.")
+	expect ((fn != scfunction.currfunc) or t.anyreturns or t.nestdepth > 0) (msg, "Recursion fail: This would freeze on call.")
 	
-	if (test is active) and fn.IsNilChecker
+	if (Test is Active) and fn.IsNilChecker
 		if fn.isnilchecker != 3
 			Test |= NilCheckMode.Soft
 		if t.FnAbleToNilCheck
@@ -252,7 +265,10 @@ function Function (NilTrackerFn)
 		if rz and !(v is FnBecomesNilCh) and p!.isfirst
 			rz = 0 // can't work
 		|| sent = p!.FastDecl
-		HasAddrs ?= sent.CanUpgradeInternalPointer
+		|| infernal = sent.internal
+			HasAddrs ?= sent.CanUpgradeInternalPointer
+			if (infernal is local) and (recv is NoRegAddrs)
+				problem (p, "OML why")
 		if (v is nilish) // and recv.NilReg	
 			.NilParamPass(recv, sent, p!, fn, v)
 
@@ -504,13 +520,16 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 	if !dcl.NilReg
 		return dcl.nildeclared
 	
-	|| Y = dcl.NilCurr
 	|| Unknown = dcl.IsUnknownParam 
+	if (dcl is param) and (test isnt WithinAccess) and dcl.PointerCount
+		(dcl is NoRegAddrs)
+		
 	if Unknown and (test isnt soft and disappears)
 		if test isnt Active							// set var A to unknown prm B, so default to real
 			return .BecomeReal(dcl, msg, NilReason.Reading)
 		dcl.NilDeclared = nilstate.optional
 
+	|| Y = dcl.NilCurr
 	if  test isnt active  or  test is soft and Negative
 		return Y
 
@@ -522,12 +541,12 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 
 function StatExpr (Niltrackerfn)
 	opt norefcounts
-	return argument(msg.first, test)
+	return Argument(msg.first, test)
  
 
 function Argument (Niltrackerfn)
 	opt norefcounts
-	|| v = .value.depthofvars + 1
+	|| v = .value.DepthOfVars + 1
 	for s.fast in msg
 		|| t = test & -s.islast
 		if (rz is borked) and !stderr.ok
@@ -566,6 +585,7 @@ function Type (NilTrackerFn)
 	return d.nildeclared // we created new suffering, so lets pass that back.
 
 
+// remove? what about kpointer? its replaced with @acc?
 function Pointer (Niltrackerfn)
 	return .UseChildAsReal(msg, test, nilreason.accessing)				// *abc
 
@@ -574,7 +594,8 @@ function Brel (Niltrackerfn)
 	opt norefcounts
 	|| b = msg.name[]
 	if b == '*'
-		return pointer(msg, test)				// *abc
+		error  (msg, "bad ASMType")	
+//		return Pointer(msg, test)				// *abc
 
 	|| ch = msg.first!
 	if b == '-' or '+'							// for ++ or --

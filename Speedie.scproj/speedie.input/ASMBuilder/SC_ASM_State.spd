@@ -510,6 +510,13 @@ struct ASMState
 	
 	
 	function TryInline (|message| prms, |asmreg| dest, |µFunc| asm, |bool|)
+	// what if this function has no return value?
+	// or takes the address of a register?
+	// registers have no address, until they get called!
+	// we'd want to alter the var directly, but ALSO dissallow
+	// using the pointer to do any math on it, or store it, or do anything
+	// else than get/set.
+	
 		opt norefcounts
 		|| fn = asm.fn
 		require .fn.ExportName contains "Inline_"
@@ -525,7 +532,7 @@ struct ASMState
 		|fatrange| LL 
 		LL.Start = .curr
 		|| OK = .TryInlineSub(prms, dest, fn)
-		LL.AllJumpTo(.curr)
+		LL.AllJumpTo
 
 		.ReturnDest = Olddest
 		.fn = oldFunc

@@ -42,6 +42,7 @@ datatype NilCheckMode (int)
 		Disappears
 		Assigns
 		ForBools
+		WithinAccess
 		IfPos = Positive ||| ForBools 
 		IfNeg = Negative ||| ForBools 
 		WhilePos = IfPos ||| while

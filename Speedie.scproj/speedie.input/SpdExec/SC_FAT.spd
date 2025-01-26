@@ -160,10 +160,15 @@ struct FatASM
 		.r[a] = v
 		.jumpreg = a + 1
 		ASMState.sh.BasicBlock++
-		
+	
+	function Jump (|int|)
+		|| j = .jumpreg
+			return .r[j]
+
 	function JumpTo (|&fatasm|)
 		|| j = .jumpreg
 			return self + 1 + .r[j-1]
+	
 	
 	function JumpTo (assigns:|&fatasm|)
 		|| j = .jumpreg

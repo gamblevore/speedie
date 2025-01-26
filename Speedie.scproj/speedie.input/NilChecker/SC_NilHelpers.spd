@@ -137,27 +137,6 @@ function scdecl.CanUpgradeInternalPointer (|scdecl|)
 		return infernal
 
 
-/*
-function scdecl.PrmStateMsg (|string| Err = "Please state", |scfunction| f=nil, |string|)
-	|| fs = faststring()
-	fs <~ Err
-	fs <~ ' '
-	if self is self
-		fs <~ "self"
-	  else
-		fs <~ "param "
-		fs <~ .name
-	fs <~ "'s nilness"
-	if f
-		if f is recursive
-			fs <~ ", on recursive function "
-		  else
-			fs <~ ", to function "
-		f.rendertitle(fs)
-	return fs
-*/
-
-
 function scdecl.PrmStateMsg (|string| Needed, |scfunction| f=nil, |string|)
 	|| fs = faststring()
 	fs <~ "Please state "
@@ -173,11 +152,6 @@ function scdecl.PrmStateMsg (|string| Needed, |scfunction| f=nil, |string|)
 
 function scdecl.NilPrmFail (|scfunction| f)
 	error (f.Source, .PrmStateMsg("", f))
-/*	|| fs = faststring()
-	fs <~ .PrmStateMsg("", f)
-	if f is recursive
-		fs <~ ", on recursive function."
-*/
 
 
 function message.IsNowNil (|int|)

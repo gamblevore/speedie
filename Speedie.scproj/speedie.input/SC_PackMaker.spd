@@ -60,9 +60,10 @@ module PackMaker
 			|| Table = (jb_vm.vm.InitTable(list.length+31), nil)(test)
 		(test)
 		list.sort(SCFuncSorter)
-		|| id = 0
+
+		|| ID = 0
 		while
-			|scfunction--| f = list[id] #loop
+			|scfunction--| f = list[id]		#loop
 			f.TableID = ++id
 			target debug
 				if Table
@@ -82,9 +83,8 @@ module PackMaker
 	function ActualASMCompile (|bool|)
 		opt norefcounts
 		for fn in .Packfuncs
-			if fn.tableid
-				if fn.parent.name ~= "ASMExamples"
-					require SpdAssembler.GenerateASM(fn) // memory safe
+			if !fn.tableid
+			require SpdAssembler.GenerateASM(fn) // memory safe
 		
 		.RunAFewTests
 		return true
@@ -201,13 +201,13 @@ module PackMaker
 		j.tmp("fncs")
 		for f in compiler.funclist
 			if f.tableid
-					|| asm = f.ASM 
-						j.Add(@tmp, f.ExportName, true)
-						j.add(asm)
-						j.exit
-						"OK: ${f.name}"
-					  else
-						error (f, "no asm generated for: " + f.name)
+				|| asm = f.ASM 
+					j.Add(@tmp, f.ExportName, true)
+					j.add(asm)
+					j.exit
+					"OK: ${f.name}"
+				  else
+					error (f, "no asm generated for: " + f.name)
 					
 		j.Exit(2)
 		

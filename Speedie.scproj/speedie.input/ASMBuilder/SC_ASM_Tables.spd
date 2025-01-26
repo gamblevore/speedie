@@ -104,6 +104,7 @@ function TryTail (fn_asm)
 
 function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest,  |AsmReg|)
 	opt norefcounts
+	// what about getting the address of registers?
 	|| f = exp.first
 		dest = .µinto(f, dest)
 	exp.JUMP(0)
@@ -115,7 +116,7 @@ function ReturnExp (|&ASMState| self, |message| f, |AsmReg|)
 		|| V = .ExistingVar(f, true)
 			return V
 		return .µopen(f)
-	
+
 
 function Return (fn_asm)
 	opt norefcounts
@@ -249,7 +250,7 @@ function Arg (fn_asm)
 
 
 
-function Access (fn_asm)								// a[b], struct.mem[b]
+function Access (fn_asm)									// a[b], struct.mem[b]
 	opt	NoRefCounts
 	if dest isnt set
 		dest = .TempTyped(exp, dest)
@@ -258,9 +259,14 @@ function Access (fn_asm)								// a[b], struct.mem[b]
 	target debug
 		|| d = f.asmdecl
 		if !d.pointercount and !d.iscarray
-	|| base = .µopen(f)					// x = a.b[0]
-	|| sc = exp.second.first!
-	|| vara = .µopen(sc)
+	|| base = .µOpen(f, asmreg.WithinAccess)				// x = a.b[0]
+	|| sc = exp.Second.first!
+
+	|| vara = .µOpen(sc)
+//		// what if this isn't used on a register?
+//		// its just the param that is unregisterable.
+//		.Fn.CantBeInlined |= 1 
+		
 	if dest isnt AddrRequest
 		dest.µType = exp.ASMDecl.DataType
 		return .ReadOrWrite(Dest, exp, base, vara)
@@ -272,7 +278,7 @@ function Access (fn_asm)								// a[b], struct.mem[b]
 	
 
 
-function Dot (fn_asm)									// a.b
+function Dot (fn_asm)										// a.b
 	opt	NoRefCounts
 	if dest isnt set
 		dest = .TempTyped(exp, dest)
@@ -307,9 +313,9 @@ function SetRel (fn_asm)	// function relset (
 	|| B = exp.last!
 	|| X = .ExistingVar(A)
 	if X.reg
-		return .µinto(B, X)
+		return .µInto(B, X)
 	
-	dest = .µopen(B, X) asnt ASMReg.realconst		// why remove these?
+	dest = .µOpen(B, X) asnt ASMReg.realconst		// why remove these?
 	return .µ(A, dest as AsmReg.set)
 
 

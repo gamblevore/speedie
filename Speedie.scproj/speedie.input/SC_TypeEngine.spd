@@ -618,7 +618,7 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 function SCDecl.MakeStatic (|Message| wrap, |SCNode| Name_Space, |declmode| Purpose, |bool|)
 	|| R = ExtractDecl( wrap, name_space, purpose )
 		R.CopyTypeInfoTo(self)
-		is static
+//		is static
 		return true
 
 
@@ -737,7 +737,7 @@ function LowlevelArrayTransform (|Message| exp, |SCClass| Cls, |SCDecl|)
 	
 	|| MemWrapper = TypeOfExpr(exp, compiler.program)	#require
 	MemWrapper = MemWrapper.copydecl // cos we gonna alter it.
-	(memwrapper is newlycreated)
+//	(memwrapper is newlycreated)
 	memwrapper.contains = cls.TypeOptional
 	
 	return MemWrapper

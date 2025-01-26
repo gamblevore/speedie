@@ -32,7 +32,7 @@ function IfEmpty (|message| cond, |message| other, |asmreg|)
 	if b.never
 		return ASMReg() // assume SubJumps are sorted out.
 	.ArgOrIf(other)
-	B.AllJumpTo(.curr)
+	B.AllJumpTo
 	return asmreg()
 
 
@@ -51,11 +51,12 @@ function If (fn_asm)
 
 	ASMType.arg(self, arg1)
 	if b.always or !other
-		B.AllJumpTo(.curr)
+		B.AllJumpTo
 		.BasicBlock++
 		return asmreg()						// were done!
 
-	B.AllJumpTo(.curr+1)
+	if .curr.op != asm.eror
+	B.AllJumpTo // why curr+1?
 	|| AfterFirst = arg1.jump(0)
 	.ArgOrIf(other)
 	AfterFirst.jumpto = .curr
@@ -88,7 +89,7 @@ function While (fn_asm)
 		return asmreg()
 	
 	BEGIN.jumpto = LOOP_Test.start
-	LOOP_TEST.AllJumpTo(BEGIN+1)
+	LOOP_TEST.AllJumpTo(BEGIN+1, true)
 	.loopfill(begin, LOOP_Test.start, LOOP_Test.After)
 	
 	return asmreg()
@@ -136,7 +137,7 @@ function Ternary		(fn_asm)
 	  else
 		.µInto(A, dest)
 		|| Exit = exp.jump(0)
-		TernTest.AllJumpTo(.curr)
+		TernTest.AllJumpTo
 		rz = .µInto(B, dest)
 		Exit.jumpto = .curr
 
@@ -336,7 +337,7 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	
 	|fatrange| Br2
 	|| second = .Branch(B, dest is negate, Br2)
-	OrTest.AllJumpTo(.curr)
+	OrTest.AllJumpTo
 
 	if Br2.always
 		// a or 1
@@ -376,11 +377,17 @@ Struct FatRange
 			curr--
 			yield curr
 	
-	function AllJumpTo (|&fatasm| curr)
+	function AllJumpTo (|&fatasm| curr = .curr, |bool| Strip = true)
+		|| A = asmstate.sh
 		for s in self
 			if s is CondAnswer
 				(s isnt CondAnswer)
 				s.jumpto = curr
+				if strip and s == Curr - 1
+					curr--
+					A.nop(s)
+					
+
 
 function @asmstate.PrintProgress (|message| exp=nil)
 	target debug {
