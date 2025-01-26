@@ -40,9 +40,9 @@ role StretchControl (GuiControl)
 	helper div (|stretchdivider!|)
 		return .last|stretchdivider|!
 	
-	function Show
+	function Show 
 		opt norefcounts
-		.div.show	
+		.div.show
 		
 	module
 		function Horz (|guicontrol| p, |controlpoint| start, |int| min=0, |int| max=0, |stretchcontrol|)
@@ -75,12 +75,14 @@ class StretchDivider (GuiControl)
 	|controlpoint|				Start
 	|date|						Entered
 	|int|						d
+	|float|						DefaultFraction
 
 
 	constructor (|guicontrol| p,  |int| d)
 		super.constructor(p)
 		isnt drawsfocus
 		.d = d
+		.DefaultFraction = 0.333
 		.takesfocus = 0
 		.gnormal.solid = (0.65, 0.75, 0.0, 1.0)
 
@@ -174,7 +176,7 @@ class StretchDivider (GuiControl)
 		require .ActiveEnd.length < 10
 		|| s = .start.length
 		if s < 10
-			s = mix(pr[.d]|float|, pr[.d+2]|float|, 0.333)|int|
+			s = mix(pr[.d]|float|, pr[.d+2]|float|, .defaultFraction)|int|
 		if anim
 			.slowshow(0.75s, s)
 		  else

@@ -1,4 +1,4 @@
-
+	
 
 // todo whenever its fun?
 // * 4 threads, each can do one cell.
@@ -37,16 +37,18 @@ class RayTracer
 	|byte|				RayAccuracy
 	
 	//
+	|vec3|				_HalfWay
 	|Vec3|				_CamDir
 	|vec2|				_XY
-	|vec3|				iDir
+	|vec3|				_iDir
 	|Mat4|				_LookAt
-	|vec3|				Fwd
+	|vec4|				_RayHit
+	|vec3|				_Fwd
 
+	|Vec3|				MainLight
 	|Vec3|				Camera
 	|vec3|				Rotation	// we can have yaw, pitch, and roll. I think roll (z) is mostly unused.
 	|byte|				_StillGood
-	|vec4|				_RayHit
 		
 	|&RayBoost|			RootNode	// make these not ?!
 	|&RayTraceNode|		EndNodes
@@ -54,7 +56,7 @@ class RayTracer
 	|?&RayTraceNode|	StartNodes
 	|?&RayTraceNode|	CurrNode
 	//
-	|BackgroundShader|	Background
+	|DistanceFunction|	Background
 
 	|?&pico[4]|			Workers //!!nice I guess we can send messages? or not?
 								// maybe easier to start/stop? or just spin on a value?
@@ -77,17 +79,15 @@ class RayTracer
 		.Camera() = Camera
 		.RayAccuracy = 40
 		.RootNode = root
-		.Background = Black
+		.MainLight = vec3(5, 20, -10).Normal
+		.Background = &vshapes.Black
 		.EndNodes = (root|&byte| + Buff)|&RayTraceNode|
 		.MaxViewDist = 1000.0
 	
-	
-	prototype BackgroundShader (|vec2| P, |vec4|)
-	function Black (BackgroundShader)
-	function RayTracer.Rainbows (raytracer.BackgroundShader)
-		return Colors.Rainbow(P.x, 1, 0.5)
-	
 		
+	setter MainLight (|vec3|)
+		.MainLight = Value.normal|vec4|.makesane|vec3|
+	
 	setter Camera (|vec3|)
 		Value = Value|vec4|.MakeSane|vec3|
 		if .Camera != value
@@ -108,12 +108,18 @@ class RayTracer
 			._LookAt = .Rotation.y.SinCos.RotateAroundY
 			|| M = .Rotation.x.SinCos.RotateAroundX
 			._LookAt *= M
-			.Fwd = (0.0, 0.0, 1.0) * ._LookAt
+			._Fwd = (0.0, 0.0, 1.0) * ._LookAt
 		return ._LookAt
 	
 
 	helper BG (|vec4|)
-		return (.Background)(self, (._xy + .adjust) * .scale)
+//(|vobject| self, |raytracer?| Ray, |vec3| P, |rayinfo| D=vec4(), |rayinfo|)		
+		|| P = .Camera
+		p.w = 1.0
+		|vec2| D
+		D = (._xy + .adjust) * .scale
+		|| V = 0
+		return (.Background)(v|vobject!|, self, P, (D,D))
 	
 	
 	helper AntiAlias (|vec2| XY, |RayTraceCell| cell, |&imagepixel| pxl)
@@ -128,9 +134,10 @@ class RayTracer
 	
 
 	helper Prepare (|vec2| XY)
-		._CamDir = .Dir(xy)
 		._XY = XY
-		.idir = (-1.0 / ._CamDir)//|vec4|.makesane|vec3|
+		._CamDir = .Dir(xy)
+		._HalfWay = (._camdir - .MainLight).normal
+		._idir = (-1.0 / ._CamDir)//|vec4|.makesane|vec3|
 
 // How to stipple if inside the obj?  what if its right in front of us?
 // what about volumetrics?
@@ -154,15 +161,17 @@ class RayTracer
 			|| C = .colorsub(b)
 			if c.a >= 0.996
 				return c
-			|| b2 = .FindBestObj(S, b)
-			if !b2
-				return mix(.BG, c, c.a)
+			return mix(.BG, c, c.a)
+			// seems very slow. We will need opencl first.
+//			|| b2 = .FindBestObj(S, b)
+//			if !b2
+//				return mix(.BG, c, c.a)
+//
+//			|| C2 = .colorsub(b2)
+//			if c2.a < 0.996
+//				c2 = mix(.BG, c2, c2.a)
 
-			|| C2 = .colorsub(b2)
-			if c2.a < 0.996
-				c2 = mix(.BG, c2, c2.a)
-
-			return mix(C2, c, c.a)
+//			return mix(C2, c, c.a)
 		return .bg
 
 		
@@ -242,7 +251,7 @@ class RayTracer
 		|| R = obj.ActualRadius
 
 
-		if V • .Fwd < 0
+		if V • ._Fwd < 0
 			dmax = R-Dmax
 			dmin = -r-dmin
 		  else

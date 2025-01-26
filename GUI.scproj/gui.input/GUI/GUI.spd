@@ -111,7 +111,7 @@ module GUI
 
 	function ScreenSize (|ivec4|)
 		cpp_Part GetScreen
-		return (.ScreenOrig.vec4 / .scale).iVec4
+		return (.Screenraw.vec4 / .scale).iVec4
 
 	function NativeWindow (|&nil|)
 		|SDL_SysWMinfo| data
@@ -131,12 +131,12 @@ module GUI
 		.ChangeSelFlash = 1
 
 
-	helper ScreenOrig (|ivec4|)
-		|| P = .ScreenPosOrig
-		return (p, p + .SizeOrig)
+	helper ScreenRaw (|ivec4|)
+		|| P = .ScreenPosRaw
+		return (p, p + .SizeRaw)
 
 
-	helper SizeOrig (|ivec2|)
+	helper SizeRaw (|ivec2|)
 		|ivec2[1]| place
 		|| s = .ScreenWindow
 			|| p0 = (&place[0])|&int|
@@ -144,10 +144,10 @@ module GUI
 			return place[0]
 
 
-	helper SizeOrig (assigns:|ivec2|)
-		|| p = .ScreenPosOrig
+	helper SizeRaw (assigns:|ivec2|)
+		|| p = .ScreenPosRaw
 		|| r = (p, p + value)
-		.ScreenOrig(r)
+		.Screenraw(r)
 
 
 	function Title (|string|)
@@ -160,7 +160,7 @@ module GUI
 			SDL_SetWindowTitle(s, value.cstr)
 
 
-	helper ScreenPosOrig (|ivec2|)
+	helper ScreenPosRaw (|ivec2|)
 		|int[2]| place
 		|| s = .ScreenWindow
 			.SDL_GetWindowPosition(s,  place[0],  place[1])
@@ -168,7 +168,7 @@ module GUI
 
 
 	helper CenterCursor
-		|| sz = .Sizeorig/2
+		|| sz = .Sizeraw/2
 		.SDL_WarpMouseInWindow(.screenwindow!, sz.x, sz.y)
 		
 	helper NukeCursor
@@ -188,25 +188,25 @@ module GUI
 		return SDL_ShowCursor()
 
 
-	helper ScreenOrig (assigns:|ivec4| result, |bool|)
+	helper Screenraw (assigns:|ivec4| result, |bool|)
 		require .ScreenWindow
 		if (result.x <= 0) and (result.y <= 0)
 			|| n = .NativeWindow
 				.SDL_FullScreen(n)
 			return true
-		|| Old = .SizeOrig
+		|| Old = .SizeRaw
 		|| aligned = .scale * (1.0+.IsHighDPI)
 		|| wh = result.size-1
 		if aligned > 1.0
 			 wh = wh align aligned|int|
 		.SDL_SetWindowSize(.screenwindow!, wh.x, wh.y)
-		if .SizeOrig != wh
+		if .Sizeraw != wh
 			.TryResizeLater = wh
 		if result.xy
 			.SDL_SetWindowPosition(.ScreenWindow!, result.x, result.y)
 
-		if old != .SizeOrig
-			.NewSize = .SizeOrig
+		if old != .Sizeraw
+			.NewSize = .Sizeraw
 		return true
 		
 	
@@ -250,7 +250,7 @@ module GUI
 		opt norefcounts
 		|| s = .TryResizeLater
 			.TryResizeLater = nil // clear... in case of inf loop
-			.SizeOrig = s
+			.Sizeraw = s
 
 		for w in window.all
 			if !w.PostLoaded
@@ -317,7 +317,7 @@ module GUI
 
 	function SavePrefs
 		if app._prefs
-			app.prefs["screen"] = GUI.ScreenOrig.List
+			app.prefs["screen"] = GUI.Screenraw.List
 			app.PrefsSave
 
 
@@ -346,7 +346,7 @@ module GUI
 			.SDL_FullScreen(n, (value<<1)-1)
 		
 	function IsFullScreen (|bool|)
-		return .CurrDisplaySize.y <= .ScreenOrig.size.y
+		return .CurrDisplaySize.y <= .Screenraw.size.y
 		
 		
 	helper BumpSize
@@ -361,7 +361,7 @@ module GUI
 	
 	function Scaling (assigns:|float| scale)
 		scale = scale.clamp(1.0, 8.0)
-		|| v1 = .SizeOrig.vec2
+		|| v1 = .Sizeraw.vec2
 		|| v2 = v1 / scale
 		|| bigPx = v2.ivec2
 		.Screen.sizeinfo = bigPx
@@ -844,7 +844,7 @@ module GUI
 	helper ReScale (|float| NewScale, |bool|)
 		if (NewScale >= 1.0 and NewScale <= 8.0)
 			.scale = NewScale
-			.NewSize = .SizeOrig
+			.NewSize = .Sizeraw
 		  else
 			beep
 		return true
@@ -1055,7 +1055,6 @@ module GUI
 	helper CheckEvent (|&SDL_Event| ev, |int|)
 		visible, opt norefcounts
 		|| t = ev.type
-//		printline "event $t ${SDL_GetWindowFlags(.screenwindow!)}"
 		
 		if t is APP_DIDENTERFOREGROUND or APP_DIDENTERBACKGROUND
 			return .BackgroundChanged(t is APP_DIDENTERBACKGROUND)
@@ -1259,16 +1258,17 @@ module GUI
 	
 	helper KeyDownEvent (|&SDL_Event| ev, |window| w, |int|)
 		#!keydown!
+		|| kev = ev.keysym
+		|| key = kev.sym
+		
+		|| fl = SDL_GetWindowFlags(.screenwindow!) & (SDL_Window.OCCLUDED ||| SDL_Window.HIDDEN)
+		printline "key: $key (${key|int|}),  flags: $fl,  size: $.SizeRaw"
+
 		if .ForeGroundTime.GuiAgo < 0.1s
-//			beep 
-//			Notifications <~ "oof"
 			return SDLActivity.nothing
 		if .CanDrag >= mousedragging.Within
 			return SDLActivity.nothing
 
-		|| kev = ev.keysym
-		|| key = kev.sym
-		
 		if key.IsEaten
 			return SDLActivity.nothing
 
@@ -1375,7 +1375,7 @@ module GUI
 function guicontrol.Description (|string|)
 	return .tooltip // :)
 	
-	
+
 datatype SDLActivity (byte)
 	flags
 		|SDLActivity|

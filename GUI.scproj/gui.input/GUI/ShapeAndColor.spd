@@ -97,6 +97,52 @@ module VShapes
 		rz = rz subtract Sphere(self, ray, p)
 
 
+	function PhotoMetricR0 (|float| n2, |float| n1, |float|)
+		return ((n1-n2)/(n1+n2)).pow2
+	
+    function PhotoMetricR0 (|float| n2, |float|)
+        cpp_Part PhotoMetricAir
+        return ((1.0-n2)/(1.0+n2)).pow2
+	
+	
+	function PhotoMetric (|float| R0, |float| dot, |float|)
+		|| s = 1.0 - dot // improved schlick equation...
+						 // no idea how to use it.
+		return r0 + (s - R0) * s.pow4
+	
+	
+	function PlasticBall (DistanceFunction)
+		if !D or !ray
+			return Sphere(self, ray, p)
+		
+		|| Flux = 4.0
+		|| Normal = (P - .AdjustedPos).Normal
+
+	    || Kd = 0.072
+	    || Ks = 0.04
+		|| dir = ray._camdir
+		
+							// Diffuse
+		|| LightDir = ray.MainLight
+        || Light = kd * Flux * ((Normal • lightDir).pow2 + 1.3)
+
+        if 1				// Phong
+			|| R = LightDir.reflect(Normal)
+			light += ks * Flux * (((R • dir) max 0.0).pow8)
+
+		  elseif 0			// Schlick
+			|| r0 = PhotoMetricR0(1.5)
+			light += ks*PhotoMetric(r0, Normal • -lightDir) // doesnt look right
+
+		  else				// Blinn-phong
+			|| NdotH = (normal • -ray._halfway).clamp // can't get this to work... sadly.
+			|| SpecularIntensity = NdotH.pow8
+			light += ks * Flux * SpecularIntensity*10
+		
+		rz = light * .Color
+		rz.a = .Color.a
+	
+	
 	function CloudBubble (DistanceFunction)
 		// clouds aren't like this, they are more like aura-bulbs
 		// with particles that drift off them randomly
@@ -123,7 +169,7 @@ module VShapes
 		|| orig = P - .AdjustedPos
 		|| r = .Radius * p.w
 		if ray
-			|| idir = ray.iDir
+			|| idir = ray._iDir
 			
 			|| p0 = (orig - r) * idir
 			|| p1 = (orig + r) * idir
@@ -161,6 +207,9 @@ module VShapes
 		|| grid = ((((x+y + gui.Cycle(spd))*str).fract - 0.5)*str).clamp*0.125 + 0.875
 		return (grid, grid, grid, 1.0)*.Color
 
+	function Black (DistanceFunction)
+	function Rainbows (DistanceFunction)
+		return Colors.Rainbow(D.x, 1, 0.5)
 	
 
 prototype DistanceFunction (|vobject| self, |raytracer?| Ray, |vec3| P, |rayinfo| D=vec4(), |rayinfo|)

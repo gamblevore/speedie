@@ -573,7 +573,10 @@ struct SDL_Window
 		cpp_wrapper SDL_DestroyWindow
 	cpp_wrapper SDL_GetWindowWMInfo (|&SDL_SysWMinfo| info, |bool|)
 
-
+	constants
+		OCCLUDED	=	4
+		HIDDEN		=	8	/* Not mapped to desktop or taskbar/dock/window list; use SDL_ShowWindow() to make visible */
+	
 
 
 
