@@ -1370,6 +1370,7 @@ JBClass ( SCFunction , SCBetterNode ,
 	byte IsAssigns;
 	byte IsCppInBuilt;
 	bool CurrentlyInlining;
+	byte CantBeInlined;
 	ErrorSeverity BlindCasts;
 	byte IsNilChecker;
 	byte Badness;
@@ -1381,7 +1382,6 @@ JBClass ( SCFunction , SCBetterNode ,
 	u16 TableId;
 	u16 AltersParams;
 	FunctionType FuncInfo;
-	Array* LinkTo;
 	Array* Args;
 	SCClass* Cls;
 	CppRefs* Refs;
@@ -1393,6 +1393,7 @@ JBClass ( SCFunction , SCBetterNode ,
 	SCDecl* ReturnType;
 	SCFunction* DepthFinder;
 	Macro* IsMacro;
+	Array* LinkTo;
 );
 
 struct SCModule_Behaviour: SCBetterNode_Behaviour {
@@ -1523,18 +1524,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2155])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2156])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2156])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2157])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2157])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2158])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2154])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2155])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2157])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2158])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2158])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2159])
 
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
@@ -1765,7 +1766,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2163])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2164])
 
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
@@ -1803,7 +1804,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2159])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2160])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1841,7 +1842,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2164])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2165])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2076,12 +2077,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2162])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2163])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2161])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2162])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2160])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2161])
 
 #define kJB__byte_max ((byte)255)
 
@@ -2282,11 +2283,11 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__ASM_WR8U ((ASM_Write)96)
 
-#define kSC__Reg_AddrForceRequest ((ASMReg)34359738368)
+#define kSC__Reg_AddrForceRequest ((ASMReg)68719476736)
 
-#define kSC__Reg_AddrNeed ((ASMReg)51539607552)
+#define kSC__Reg_AddrNeed ((ASMReg)103079215104)
 
-#define kSC__Reg_AddrRequest ((ASMReg)17179869184)
+#define kSC__Reg_AddrRequest ((ASMReg)34359738368)
 
 #define kSC__Reg_AlreadyNegated ((ASMReg)524288)
 
@@ -2296,9 +2297,9 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__Reg_CondRequest ((ASMReg)1073741824)
 
-#define kSC__Reg_ConstInput ((ASMReg)4294967296)
+#define kSC__Reg_ConstInput ((ASMReg)8589934592)
 
-#define kSC__Reg_ConstOutput ((ASMReg)8589934592)
+#define kSC__Reg_ConstOutput ((ASMReg)17179869184)
 
 #define kSC__Reg_ConstRequest ((ASMReg)536870912)
 
@@ -2316,9 +2317,9 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__Reg_Param ((ASMReg)131072)
 
-#define kSC__Reg_RealConst ((ASMReg)12884901888)
+#define kSC__Reg_RealConst ((ASMReg)25769803776)
 
-#define kSC__Reg_RemoveableOutput ((ASMReg)8606711808)
+#define kSC__Reg_RemoveableOutput ((ASMReg)17196646400)
 
 #define kSC__Reg_Set ((ASMReg)4194304)
 
@@ -2328,9 +2329,11 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__Reg_Textual ((ASMReg)268435456)
 
-#define kSC__Reg_Zero ((ASMReg)12885033016)
+#define kSC__Reg_WithinAccess ((ASMReg)4294967296)
 
-#define kSC__Reg_ZeroParam ((ASMReg)8590065664)
+#define kSC__Reg_Zero ((ASMReg)25769934904)
+
+#define kSC__Reg_ZeroParam ((ASMReg)17180000256)
 
 #define kSC__ASMType_IncrAfter ((int)2)
 
@@ -2785,6 +2788,8 @@ extern Dictionary* JB__TC_Types_Dict;
 
 #define kSC__khalai_WhilePos ((NilCheckMode)290)
 
+#define kSC__khalai_WithinAccess ((NilCheckMode)512)
+
 #define kSC__NilReason_Accessing ((NilReason)0)
 
 #define kSC__NilReason_Passing ((NilReason)4)
@@ -2912,79 +2917,75 @@ extern Array* SC__NilReason_values;
 
 #define kSC__SCBlockage_Return ((int)192)
 
-#define kSC__SCDeclInfo_Altered ((SCDeclInfo)1048576)
+#define kSC__SCDeclInfo_Altered ((SCDeclInfo)131072)
 
-#define kSC__SCDeclInfo_API ((SCDeclInfo)1024)
+#define kSC__SCDeclInfo_API ((SCDeclInfo)256)
 
-#define kSC__SCDeclInfo_Body ((SCDeclInfo)32768)
+#define kSC__SCDeclInfo_Body ((SCDeclInfo)8192)
 
 #define kSC__SCDeclInfo_Borrowed ((SCDeclInfo)1)
 
-#define kSC__SCDeclInfo_ClassObj ((SCDeclInfo)2048)
+#define kSC__SCDeclInfo_ClassObj ((SCDeclInfo)512)
 
-#define kSC__SCDeclInfo_CompilerCreated ((SCDeclInfo)4096)
+#define kSC__SCDeclInfo_CompilerCreated ((SCDeclInfo)1024)
 
 #define kSC__SCDeclInfo_Const ((SCDeclInfo)8)
 
-#define kSC__SCDeclInfo_DclCopied ((SCDeclInfo)1086562)
+#define kSC__SCDeclInfo_DclCopied ((SCDeclInfo)140578)
 
 #define kSC__SCDeclInfo_DirectNumber ((SCDeclInfo)4)
 
-#define kSC__SCDeclInfo_GameFlyingMem ((SCDeclInfo)2097152)
+#define kSC__SCDeclInfo_GameFlyingMem ((SCDeclInfo)262144)
 
-#define kSC__SCDeclInfo_Global ((SCDeclInfo)131072)
+#define kSC__SCDeclInfo_Global ((SCDeclInfo)32768)
 
-#define kSC__SCDeclInfo_Grabbed ((SCDeclInfo)134217728)
+#define kSC__SCDeclInfo_Grabbed ((SCDeclInfo)16777216)
 
-#define kSC__SCDeclInfo_Hidden ((SCDeclInfo)67108864)
+#define kSC__SCDeclInfo_Hidden ((SCDeclInfo)8388608)
 
-#define kSC__SCDeclInfo_IntendedAsReturn ((SCDeclInfo)2147483648)
+#define kSC__SCDeclInfo_IntendedAsReturn ((SCDeclInfo)536870912)
 
-#define kSC__SCDeclInfo_Local ((SCDeclInfo)49152)
+#define kSC__SCDeclInfo_Local ((SCDeclInfo)12288)
 
-#define kSC__SCDeclInfo_Marked ((SCDeclInfo)262144)
-
-#define kSC__SCDeclInfo_NewlyCreated ((SCDeclInfo)128)
+#define kSC__SCDeclInfo_NoRegAddrs ((SCDeclInfo)33554432)
 
 #define kSC__SCDeclInfo_NumberConst ((SCDeclInfo)12)
 
-#define kSC__SCDeclInfo_Param ((SCDeclInfo)16384)
+#define kSC__SCDeclInfo_Param ((SCDeclInfo)4096)
 
-#define kSC__SCDeclInfo_PostIncremented ((SCDeclInfo)268435456)
+#define kSC__SCDeclInfo_PostIncremented ((SCDeclInfo)67108864)
 
-#define kSC__SCDeclInfo_Property ((SCDeclInfo)65536)
+#define kSC__SCDeclInfo_Property ((SCDeclInfo)16384)
 
-#define kSC__SCDeclInfo_PropertyWasConstructed ((SCDeclInfo)8192)
+#define kSC__SCDeclInfo_PropertyWasConstructed ((SCDeclInfo)2048)
 
-#define kSC__SCDeclInfo_ReadFrom ((SCDeclInfo)16777216)
+#define kSC__SCDeclInfo_ReadFrom ((SCDeclInfo)2097152)
 
-#define kSC__SCDeclInfo_Return ((SCDeclInfo)524288)
+#define kSC__SCDeclInfo_Return ((SCDeclInfo)65536)
 
-#define kSC__SCDeclInfo_ReturnedStruct ((SCDeclInfo)536870912)
+#define kSC__SCDeclInfo_ReturnedStruct ((SCDeclInfo)134217728)
 
-#define kSC__SCDeclInfo_ReturnedVar ((SCDeclInfo)1073741824)
+#define kSC__SCDeclInfo_ReturnedVar ((SCDeclInfo)268435456)
 
-#define kSC__SCDeclInfo_Self ((SCDeclInfo)8388608)
+#define kSC__SCDeclInfo_Self ((SCDeclInfo)1048576)
 
-#define kSC__SCDeclInfo_SelfImplicit ((SCDeclInfo)8437760)
+#define kSC__SCDeclInfo_SelfImplicit ((SCDeclInfo)1060864)
 
-#define kSC__SCDeclInfo_SetTo ((SCDeclInfo)33554432)
-
-#define kSC__SCDeclInfo_Static ((SCDeclInfo)32)
+#define kSC__SCDeclInfo_SetTo ((SCDeclInfo)4194304)
 
 #define kSC__SCDeclInfo_StayBorrowed ((SCDeclInfo)2)
 
-#define kSC__SCDeclInfo_Swappable ((SCDeclInfo)245760)
+#define kSC__SCDeclInfo_Swappable ((SCDeclInfo)61440)
 
-#define kSC__SCDeclInfo_Task ((SCDeclInfo)4194304)
+#define kSC__SCDeclInfo_Task ((SCDeclInfo)524288)
 
-#define kSC__SCDeclInfo_TypeImprove ((SCDeclInfo)256)
+#define kSC__SCDeclInfo_TypeImprove ((SCDeclInfo)64)
 
 #define kSC__SCDeclInfo_UnknownConst ((SCDeclInfo)16)
 
-#define kSC__SCDeclInfo_UpgradeableContained ((SCDeclInfo)64)
+#define kSC__SCDeclInfo_UpgradeableContained ((SCDeclInfo)32)
 
-#define kSC__SCDeclInfo_UsedByCode ((SCDeclInfo)512)
+#define kSC__SCDeclInfo_UsedByCode ((SCDeclInfo)128)
 
 #define kSC__SCNodeFindMode_DontGoUp ((SCNodeFindMode)2)
 
@@ -3093,7 +3094,7 @@ extern bool SC__Cpp_WroteAny;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2153])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2154])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -3667,6 +3668,11 @@ void SC_FB__SetFlow();
 void SC_FB__StopStripping();
 
 JB_String* SC_FB__TryUseProject(JB_String* Path, bool IsScript);
+
+
+
+// ImageHelper
+JB_String* JB_ImageHelper__ConvertPNGToVOI(JB_String* P);
 
 
 
@@ -4358,11 +4364,6 @@ void SC_VM_Builder__VMLine(Message* Line, FastString* Vm);
 
 
 // __modules__
-
-
-// image
-JB_String* SC_image__ConvertPNGToVOI(JB_String* P);
-
 
 
 // main
@@ -6257,6 +6258,10 @@ NilState SC_nil__List(Message* Msg, NilCheckMode Test);
 
 void SC_nil__NilParamPass(SCDecl* Recv, SCDecl* Sent, Message* Where, SCFunction* F, uint /*NilState*/ V);
 
+void SC_nil__NoRegAddrs();
+
+void SC_nil__NoRegAddrs2(int* A);
+
 NilState SC_nil__Not(Message* Msg, NilCheckMode Test);
 
 NilState SC_nil__Number(Message* Msg, NilCheckMode Test);
@@ -6493,7 +6498,7 @@ void SC_FAT_TmpRender(FatASM* Self, FastString* Fs, Message* Msg);
 
 
 // JB_FatRange
-void SC_FatRange_AllJumpTo(FatRange* Self, FatASM* Curr);
+void SC_FatRange_AllJumpTo(FatRange* Self, FatASM* Curr, bool Strip);
 
 
 
