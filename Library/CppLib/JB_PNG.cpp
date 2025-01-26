@@ -23,7 +23,6 @@
 
 
 extern "C" {
-
 void JB_ErrorHandleC(const char* Desc, bool CanFreeDesc);
 
 uint8* JB_Img__LoadQOI(uint8* data, int len, int* Size) {
@@ -50,8 +49,7 @@ uint8* JB_Img__WriteQOI(uint8* data, int w, int h, int* len) {
 	return 0;
 }
 
-
-
+// I'd rather strip png support, cos it needs gz.  But I can't for now. Sadly.
 uint8* JB_Img__LoadPNG(uint8* data, int len, int* x, int* y, int* comp) {
 	uint8* img = stbi_load_from_memory(data, len, x, y, comp, 4);
 	if (img)
@@ -59,10 +57,7 @@ uint8* JB_Img__LoadPNG(uint8* data, int len, int* x, int* y, int* comp) {
 	JB_ErrorHandleC(stbi__g_failure_reason, false);
 	return 0;
 }
-
 }
-
-
 
 #else
 // stop linker errors.
