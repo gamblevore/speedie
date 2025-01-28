@@ -41,6 +41,8 @@ Terry (RIP), the brilliant programmer he was, tragically was blighted by schizop
 
 It is a shame that the first thing some people think of when they hear "programmer who did a lot of stuff himself" is "Terry Davis". For a more balanced view on "programmers who did a lot of stuff by themself" have a look at [https://www.reddit.com/r/ProgrammingLanguages/](https://www.reddit.com/r/ProgrammingLanguages/) you'll find hundreds of people who have made their own programming language. If you want, you can write a post there and tell them that anyone who made their own language must all be Terry Davis. See how they respond.
 
+In short: No.
+
 
 ### Whats with the MMI interest?
 
