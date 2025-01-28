@@ -20,7 +20,7 @@ Currently Speedie transpiles to C++, but almost entirely the C part of it. I am 
 
 Of course. However the array class stores objects only. Speedie will wrap `ints` / `floats` / `pointers`  before storing in an array.
 
-Theres also a memory class, and even also C-arrays. You can even `malloc, but then you have to take care of memory issues yourself.
+Theres also a `memory` class, and even also C-arrays. You can even `malloc`, but then you have to take care of memory issues yourself.
 
 In general, you should ALWAYS stick to high-level design. (Use objects, not pointers.) Even for me, messing around with pointers and structs and carrays is always less productive than simply sticking to objects. And generally leads to less powerful code. And thats ONCE you get past the bugs!
 
