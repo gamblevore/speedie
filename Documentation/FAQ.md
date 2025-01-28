@@ -18,7 +18,7 @@ Currently Speedie transpiles to C++, but almost entirely the C part of it. I am 
 
 ### Does Speedie have runtime-sized arrays?
 
-Of course. However the array class stores for objects only. Speedie will wrap `ints` / `floats` / `pointers`  before storing in an array.
+Of course. However the array class stores objects only. Speedie will wrap `ints` / `floats` / `pointers`  before storing in an array.
 
 Theres also a memory class, and even also C-arrays. You can even `malloc, but then you have to take care of memory issues yourself.
 
