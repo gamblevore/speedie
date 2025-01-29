@@ -141,7 +141,7 @@ function UseAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason, |Nil
 
 function UseAsRealSub (|message| ch, |nilcheckmode| test, |nilreason| reason, |scdecl| dcl, |NilState|) 	// a.b, *a, a[0], (a)()
 	opt norefcounts
-	|| chmode  = NilCheckMode.WithinAccess * (reason is accessing)
+	|| chmode  = NilCheckMode.AllowRegisterAddr * (reason is accessing)
 	|| actual = .Jump(ch, chmode)
 	if actual is nilish
 		|| ddd = dcl.hiderfunc
@@ -207,7 +207,7 @@ function RealBool (|bool| b, |nilstate|)
 	rz |= nilstate.truevalue >> b
 
 
-function Number (niltrackerfn)
+function Number (NilTrackerFn)
 	return .RealBool(msg.name.iszero)
 
 
@@ -221,16 +221,16 @@ function String (niltrackerfn)
 	return .RealBool(!msg.length)
 
 
-function NoRegAddrs
-	visible
-	|int| b
-	NoRegAddrs2(b)
+//function NoRegAddrs
+//	visible
+//	|int| b
+//	NoRegAddrs2(b)
+//
+//
+//function NoRegAddrs2 (|!&int| a)
+//	a = a + 1
+//	a[] = 2
 
-
-function NoRegAddrs2 (|!&int| a)
-	a = a + 1
-	a[] = 2
-	
 
 function Function (NilTrackerFn)
 	opt norefcounts
@@ -261,14 +261,15 @@ function Function (NilTrackerFn)
 			test |= nilcheckmode.Soft
 			
 		expect (p) (msg, "Compiler did not fully type this function.") 
+		test |= nilcheckmode.AllowRegisterAddr
 		|| v = .Jump(p!, test)
 		if rz and !(v is FnBecomesNilCh) and p!.isfirst
 			rz = 0 // can't work
 		|| sent = p!.FastDecl
 		|| infernal = sent.internal
 			HasAddrs ?= sent.CanUpgradeInternalPointer
-			if (infernal is local) and (recv is NoRegAddrs)
-				problem (p, "OML why")
+			if (infernal.isproperlylocal) and (recv is NoRegAddrs)
+				problem (p, "Can't pass register to function that does wierd stuff with it.")
 		if (v is nilish) // and recv.NilReg	
 			.NilParamPass(recv, sent, p!, fn, v)
 
@@ -293,6 +294,7 @@ function Function (NilTrackerFn)
 	|| ret = fn.ReturnType
 		rz |= ret.NilDeclared
 		check ((rz is stated) or !ret.TypeSuffers) (msg, "Nil-decoration needed on return type of function: " + fn.RenderName)
+
 
 
 function Rejoin (NilTrackerFn)
@@ -521,7 +523,8 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 		return dcl.nildeclared
 	
 	|| Unknown = dcl.IsUnknownParam 
-	if (dcl is param) and (test isnt WithinAccess) and dcl.PointerCount
+	if (dcl is param) and (test isnt AllowRegisterAddr) and dcl.PointerCount
+		if "ParseWithError".trap
 		(dcl is NoRegAddrs)
 		
 	if Unknown and (test isnt soft and disappears)
@@ -788,4 +791,13 @@ function message.Trueness (|nilstate| found, |maybebool|)
 		if rtf and self and self matches rtf
 			return maybebool.Known(false)
 	// return maybe
+
+
+function scdecl.IsProperlyLocal (|bool|)
+	require self is local
+	if .isbarestruct
+		return false
+	// what about a struct?
+	return true
+
 

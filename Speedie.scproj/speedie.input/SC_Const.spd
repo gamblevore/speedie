@@ -296,7 +296,7 @@ function message.ConstIntValue (|SCNode| name_space, |&int64| v, |bool|)
 	if .ConstIntValueSub(v)
 		return true
 
-	|| t = typeofexpr(self, name_space)
+	|| t = TypeOfExpr(self, name_space)
 		|| d = t.default
 			// error (d is const) (itm, "We need a constant for the index") // not neeeded
 			return d.constintvaluesub(v)
@@ -321,7 +321,7 @@ struct ArgArrayCounter
 			.IsItem = true
 			|| key = item[@nil]
 				|int64| v
-				if key.ConstIntValue(name_space, v) #check (item, "Can't load constant.")
+				if key.ConstIntValue(name_space, v)			#check (item, "Can't load constant.")
 					(.max max= v)
 				arr <~ key
 				value = item.first

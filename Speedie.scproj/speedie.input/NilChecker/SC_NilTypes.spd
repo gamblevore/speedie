@@ -42,9 +42,9 @@ datatype NilCheckMode (int)
 		Disappears
 		Assigns
 		ForBools
-		WithinAccess
-		IfPos = Positive ||| ForBools 
-		IfNeg = Negative ||| ForBools 
+		AllowRegisterAddr
+		IfPos = Positive ||| ForBools ||| AllowRegisterAddr
+		IfNeg = Negative ||| ForBools ||| AllowRegisterAddr
 		WhilePos = IfPos ||| while
 		WhileNeg = IfNeg ||| while
 		Active  = Positive ||| Negative

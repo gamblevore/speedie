@@ -253,7 +253,7 @@ helper IsQuarantined (|bool|)
 
 helper Configure (assigns:|string|)
 	|error| err
-	._conf  = Value.parsewitherror(err)
+	._conf  = Value.ParseWithError(err)
 	if err
 		printline err.render
 	._conf ?= message()

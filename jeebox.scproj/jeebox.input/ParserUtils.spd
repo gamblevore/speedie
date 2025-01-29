@@ -50,7 +50,8 @@ function String.ParseWithError (|&Error| rec, |MessageRoot|)
 	rz = .parse
 	if !rz
 		|| r = stderr.pop
-		if rec: rec[] = r 
+		if rec
+			rec[] = r 
 
 
 helper String.IsJbin (|ind|)
