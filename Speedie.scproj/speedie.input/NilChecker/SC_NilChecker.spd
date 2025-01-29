@@ -524,7 +524,6 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 	
 	|| Unknown = dcl.IsUnknownParam 
 	if (dcl is param) and (test isnt AllowRegisterAddr) and dcl.PointerCount
-		if "ParseWithError".trap
 		(dcl is NoRegAddrs)
 		
 	if Unknown and (test isnt soft and disappears)

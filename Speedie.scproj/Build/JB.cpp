@@ -3440,7 +3440,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[220]);
-	JB_FS_AppendInt32(_fsf0, (2025012621));
+	JB_FS_AppendInt32(_fsf0, (2025012916));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8885,7 +8885,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1675]);
-	JB_FS_AppendInt32(_fsf0, (2025012621));
+	JB_FS_AppendInt32(_fsf0, (2025012916));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -20494,6 +20494,7 @@ NilState SC_nil__Function(Message* Msg, NilCheckMode Test) {
 				JB_Msg_Fail(Msg, JB_LUB[2148]);
 				return 0;
 			}
+			Test = (Test | kSC__khalai_AllowRegisterAddr);
 			uint V = SC_nil__FlowJump(P, Test);
 			iif (Rz and ((!(SC_NilState_SyntaxIs(V, kSC__NilState_FnBecomesNilCh))) and JB_Tree_IsFirst(P))) {
 				Rz = 0;
@@ -20504,7 +20505,7 @@ NilState SC_nil__Function(Message* Msg, NilCheckMode Test) {
 				iif (!HasAddrs) {
 					HasAddrs = ((bool)SC_Decl_CanUpgradeInternalPointer(Sent));
 				}
-				iif ((SC_Decl_SyntaxIs(Infernal, kSC__SCDeclInfo_Local)) and (SC_Decl_SyntaxIs(Recv, kSC__SCDeclInfo_NoRegAddrs))) {
+				iif ((SC_Decl_IsProperlyLocal(Infernal)) and (SC_Decl_SyntaxIs(Recv, kSC__SCDeclInfo_NoRegAddrs))) {
 					(JB_Msg_SyntaxProblem(P, JB_LUB[2149]));
 				}
 			}
@@ -20720,17 +20721,6 @@ void SC_nil__NilParamPass(SCDecl* Recv, SCDecl* Sent, Message* Where, SCFunction
 	 else iif ((!SC_Decl_NilStated(Recv)) and (F != SC_Func__CurrFunc())) {
 		SC_Decl_NilPrmFail(Recv, F);
 	}
-}
-
-void SC_nil__NoRegAddrs() {
-	//visible;
-	int B = 0;
-	SC_nil__NoRegAddrs2((&B));
-}
-
-void SC_nil__NoRegAddrs2(int* A) {
-	A = (A + 1);
-	A[0] = 2;
 }
 
 NilState SC_nil__Not(Message* Msg, NilCheckMode Test) {
@@ -20953,7 +20943,7 @@ NilState SC_nil__ThingSub(Message* Msg, NilCheckMode Test, SCDecl* Dcl) {
 		return Dcl->NilDeclared;
 	}
 	bool Unknown = SC_Decl_IsUnknownParam(Dcl);
-	iif ((SC_Decl_SyntaxIs(Dcl, kSC__SCDeclInfo_Param)) and (((!SC_khalai_SyntaxIs(Test, kSC__khalai_WithinAccess))) and Dcl->PointerCount)) {
+	iif ((SC_Decl_SyntaxIs(Dcl, kSC__SCDeclInfo_Param)) and (((!SC_khalai_SyntaxIs(Test, kSC__khalai_AllowRegisterAddr))) and Dcl->PointerCount)) {
 		(SC_Decl_SyntaxIsSet(Dcl, kSC__SCDeclInfo_NoRegAddrs, true));
 	}
 	iif (Unknown and ((!SC_khalai_SyntaxIs(Test, kSC__khalai_Soft)) and (!SC_khalai_SyntaxIs(Test, kSC__khalai_Disappears)))) {
@@ -21010,7 +21000,7 @@ NilState SC_nil__UseAsReal(Message* Msg, NilCheckMode Test, uint /*NilReason*/ R
 }
 
 NilState SC_nil__UseAsRealSub(Message* Ch, NilCheckMode Test, uint /*NilReason*/ Reason, SCDecl* Dcl) {
-	NilCheckMode Chmode = kSC__khalai_WithinAccess * (SC_NilReason_SyntaxIs(Reason, kSC__NilReason_Accessing));
+	NilCheckMode Chmode = kSC__khalai_AllowRegisterAddr * (SC_NilReason_SyntaxIs(Reason, kSC__NilReason_Accessing));
 	uint Actual = SC_nil__FlowJump(Ch, Chmode);
 	iif (SC_NilState_SyntaxIs(Actual, kSC__NilState_Nilish)) {
 		SCFunction* Ddd = Dcl->HiderFunc;
@@ -38023,6 +38013,9 @@ int SC_Msg_GetAddressOf(Message* Self, SCDecl* Type, bool WasCArray) {
 	iif (!Self) {
 		return kJB_kNeedsAddressOf;
 	}
+	//using;
+	MessagePosition _usingf0 = ((MessagePosition){});
+	JB_Msg_SyntaxUsing(Self, (&_usingf0));
 	Message* Addr = JB_Syx_OperatorPlus(kJB_SyxBRel, JB_LUB[48]);
 	JB_Incr(Addr);
 	Message* Inside = Self;
@@ -38030,30 +38023,32 @@ int SC_Msg_GetAddressOf(Message* Self, SCDecl* Type, bool WasCArray) {
 	JB_FreeIfDead(SC_Msg_ReplaceWith(Self, Addr));
 	iif (WasCArray) {
 		JB_SetRef(Inside, ({
-			Message* __imPf0 = (JB_Syx_Msg(kJB_SyxAcc, JB_LUB[0]));
-			JB_Incr(__imPf0);
-			JB_Tree_SyntaxAppend(__imPf0, Self);
-			Message* _tmPf2 = ({
-				Message* __imPf1 = (JB_Syx_Msg(kJB_SyxArr, JB_LUB[0]));
-				JB_Incr(__imPf1);
-				Message* _tmPf3 = JB_Syx_Msg(kJB_SyxNum, JB_LUB[271]);
-				JB_Incr(_tmPf3);
-				JB_Tree_SyntaxAppend(__imPf1, (_tmPf3));
-				JB_Decr(_tmPf3);
-				JB_SafeDecr(__imPf1);
-				 __imPf1;
+			Message* __imPf1 = (JB_Syx_Msg(kJB_SyxAcc, JB_LUB[0]));
+			JB_Incr(__imPf1);
+			JB_Tree_SyntaxAppend(__imPf1, Self);
+			Message* _tmPf3 = ({
+				Message* __imPf2 = (JB_Syx_Msg(kJB_SyxArr, JB_LUB[0]));
+				JB_Incr(__imPf2);
+				Message* _tmPf4 = JB_Syx_Msg(kJB_SyxNum, JB_LUB[271]);
+				JB_Incr(_tmPf4);
+				JB_Tree_SyntaxAppend(__imPf2, (_tmPf4));
+				JB_Decr(_tmPf4);
+				JB_SafeDecr(__imPf2);
+				 __imPf2;
 			});
-			JB_Incr(_tmPf2);
-			JB_Tree_SyntaxAppend(__imPf0, _tmPf2);
-			JB_Decr(_tmPf2);
-			JB_SafeDecr(__imPf0);
-			 __imPf0;
+			JB_Incr(_tmPf3);
+			JB_Tree_SyntaxAppend(__imPf1, _tmPf3);
+			JB_Decr(_tmPf3);
+			JB_SafeDecr(__imPf1);
+			 __imPf1;
 		}));
 	}
 	JB_Tree_SyntaxAppend(Addr, Inside);
 	JB_Decr(Inside);
 	JB_SetRef(Addr->Obj, Type);
 	JB_Decr(Addr);
+	JB_MsgPos_SyntaxUsingComplete((&_usingf0), Self);
+	JB_MsgPos_Destructor((&_usingf0));
 	return kJB_kAddressOfMatch;
 }
 
@@ -44148,6 +44143,16 @@ int SC_Decl_IsNumeric(SCDecl* Self) {
 
 bool SC_Decl_IsObject(SCDecl* Self) {
 	return SC_Class_IsObject(Self->Type) and (!SC_Decl_IsCArray(Self));
+}
+
+bool SC_Decl_IsProperlyLocal(SCDecl* Self) {
+	iif (!SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Local)) {
+		return nil;
+	}
+	iif (SC_Decl_IsBareStruct(Self)) {
+		return false;
+	}
+	return true;
 }
 
 bool SC_Decl_IsReffable(SCDecl* Self, bool SetOnly) {
@@ -58635,4 +58640,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -179992155342563914 -8026877545723617339
+// -8234970269337614173 -3235390166558491620

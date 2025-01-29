@@ -2162,4 +2162,4 @@
 "Can't extend a class with a prototype. (in this version)"
 ". Expected: "
 "This prototyped function should be in module scope. (Not class)."
-"OML why"
+"Can't pass register to function that does wierd stuff with it."

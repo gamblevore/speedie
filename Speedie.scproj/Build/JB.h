@@ -2758,6 +2758,8 @@ extern Dictionary* JB__TC_Types_Dict;
 
 #define kSC__khalai_Active ((NilCheckMode)3)
 
+#define kSC__khalai_AllowRegisterAddr ((NilCheckMode)512)
+
 #define kSC__khalai_And ((NilCheckMode)8)
 
 #define kSC__khalai_Assigns ((NilCheckMode)128)
@@ -2768,9 +2770,9 @@ extern Dictionary* JB__TC_Types_Dict;
 
 #define kSC__khalai_ForBools ((NilCheckMode)256)
 
-#define kSC__khalai_IfNeg ((NilCheckMode)257)
+#define kSC__khalai_IfNeg ((NilCheckMode)769)
 
-#define kSC__khalai_IfPos ((NilCheckMode)258)
+#define kSC__khalai_IfPos ((NilCheckMode)770)
 
 #define kSC__khalai_Negative ((NilCheckMode)1)
 
@@ -2784,11 +2786,9 @@ extern Dictionary* JB__TC_Types_Dict;
 
 #define kSC__khalai_While ((NilCheckMode)32)
 
-#define kSC__khalai_WhileNeg ((NilCheckMode)289)
+#define kSC__khalai_WhileNeg ((NilCheckMode)801)
 
-#define kSC__khalai_WhilePos ((NilCheckMode)290)
-
-#define kSC__khalai_WithinAccess ((NilCheckMode)512)
+#define kSC__khalai_WhilePos ((NilCheckMode)802)
 
 #define kSC__NilReason_Accessing ((NilReason)0)
 
@@ -6257,10 +6257,6 @@ void SC_nil__LaunchMothershipSub(JB_ErrorReceiver* Old);
 NilState SC_nil__List(Message* Msg, NilCheckMode Test);
 
 void SC_nil__NilParamPass(SCDecl* Recv, SCDecl* Sent, Message* Where, SCFunction* F, uint /*NilState*/ V);
-
-void SC_nil__NoRegAddrs();
-
-void SC_nil__NoRegAddrs2(int* A);
 
 NilState SC_nil__Not(Message* Msg, NilCheckMode Test);
 
@@ -9911,6 +9907,8 @@ bool SC_Decl_IsNormalObject(SCDecl* Self);
 int SC_Decl_IsNumeric(SCDecl* Self);
 
 bool SC_Decl_IsObject(SCDecl* Self);
+
+bool SC_Decl_IsProperlyLocal(SCDecl* Self);
 
 bool SC_Decl_IsReffable(SCDecl* Self, bool SetOnly);
 
