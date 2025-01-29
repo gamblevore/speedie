@@ -7,8 +7,18 @@
 */
 
 #include "JB_Umbrella.hpp"
+#define __spdsort_type__ JB_Object*
+#define __spdsort_func__(fp,b,c)  (((ArraySorterComparerInt)fp)(b, c))
+#define __spdsort_swap__ JB_Swap
+#include "spdsort/spdsort.h"
 
 extern "C" {
+void JB_Array_Sort ( Array* self, ArraySorterComparerInt fp) {
+	int N = JB_Array_Size(self);
+	if (fp and N >= 2) // remove the check for fp? nilchecker should find it.
+		SpdSort((void*)fp, self->_Ptr, self->_Ptr+N-1);
+}
+
 
 #ifndef ENV64BIT
     #define kArrayLengthMax (1024*1024*512) // 512MB
@@ -268,18 +278,6 @@ void JB_Array_Shuffle( Array* self ) {
 	}
 }
 #endif
-
-
-#define __spdsort_type__ JB_Object*
-#define __spdsort_func__(fp,b,c)  (((ArraySorterComparerInt)fp)(b, c))
-
-#include "spdsort/spdsort.h"
-
-void JB_Array_Sort ( Array* self, ArraySorterComparerInt fp) {
-	int N = JB_Array_Size(self);
-	if (fp and N >= 2) // remove the check for fp? nilchecker should find it.
-		SpdSort((void*)fp, self->_Ptr, self->_Ptr+N-1);
-}
 
 
 } // 

@@ -1,9 +1,9 @@
 
-// spdsort.h  http://gamblevore.org, by theodore h. smith, public domain software
-// basically... just testing some sorting algorithms...
+// spdsort.h  http://gamblevore.org, by Theodore h. Smith.   Public domain software.
+// Basically... just testing some sorting algorithms...
 
-// my spdsort is like a normal quicksort, but it has better characteristics:
-	// 1) handles invalid sort functions. You need this if you are making a programming language, cos you don't want some kid making his first game to crash his computer just cos the sort function is a little bit off. Garbage in = garbage out... thats all we want. C++ sorts will actually crash your app with invalid sort functions.
+// Spdsort is like a normal quicksort, but with better characteristics:
+	// 1) Handles invalid sort functions. You need this if you are making a programming language, cos you don't want some kid making his first game to crash his computer just cos the sort function is a little bit off. Garbage in = garbage out... thats all we want. C++ sorts will actually crash your app with invalid sort functions.
 	// 2) Seems a lil faster?
 	// 3) Handles sorted and reverse sorted arrays very fast
 	// 4) Code is available and not too big. (unlike C++ sort)
@@ -22,7 +22,6 @@ extern "C" void SpdSort(void* dat__, __spdsort_type__* low, __spdsort_type__* hi
 
 #ifndef __SPD_SORT__
 #define __SPD_SORT__
-#include <algorithm>
 
 
 #ifndef __spdsort_func__
@@ -30,6 +29,11 @@ extern "C" void SpdSort(void* dat__, __spdsort_type__* low, __spdsort_type__* hi
 	inline int SpdDemoSort (void* dat__, __spdsort_type__ a, __spdsort_type__ b) {
 		return b-a;
 	}
+#endif
+
+#ifndef __spdsort_swap__
+#define __spdsort_swap__ std::swap
+#include <algorithm>
 #endif
 
 static __spdsort_type__* SortABit(void* dat__, __spdsort_type__* low, __spdsort_type__* high) {
@@ -42,8 +46,10 @@ static __spdsort_type__* SortABit(void* dat__, __spdsort_type__* low, __spdsort_
 
 	auto i = low - 2;
     while (low < high) {
-        if (__spdsort_func__(dat__, pivot, *low) <= 0)
-            std::swap(*++i, *low);
+        if (__spdsort_func__(dat__, pivot, *low) <= 0) {
+			i++;
+            __spdsort_swap__(*i, *low);
+		}
 		low++;
 	}
 	return i+1;
@@ -52,7 +58,7 @@ static __spdsort_type__* SortABit(void* dat__, __spdsort_type__* low, __spdsort_
 
 static void QuickReverse(__spdsort_type__* low, __spdsort_type__* high) {
 	do {
-		std::swap(*low, *high);
+		__spdsort_swap__(*low, *high);
 	} while (++low < --high);
 }
 
@@ -60,7 +66,7 @@ static void QuickReverse(__spdsort_type__* low, __spdsort_type__* high) {
 extern "C" void SpdSort(void* dat__, __spdsort_type__* low, __spdsort_type__* high) {
 	if (high == low+1) { // reduce comparisons...
 		if (__spdsort_func__(dat__, *low, *high) <= 0)	
-			std::swap(*high, *low);
+			__spdsort_swap__(*high, *low);
 		return;
 	}
     auto p = SortABit(dat__, low, high);
@@ -77,7 +83,7 @@ extern "C" void SpdSort(void* dat__, __spdsort_type__* low, __spdsort_type__* hi
 					return QuickReverse(low, high);
 			p = low;
 		}
-		std::swap(*p, *high);
+		__spdsort_swap__(*p, *high);
 	}
 	
     if (low < p - 1) {
