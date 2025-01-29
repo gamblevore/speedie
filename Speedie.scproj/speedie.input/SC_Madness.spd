@@ -77,7 +77,8 @@ function Message.GetAddressOf (|SCDecl| Type, |bool| WasCArray = false, |int|)
 	if !self
 		Return kNeedsAddressOf
 	
-	|| Addr = @brel +"&"
+	using self
+	|| Addr = @brel + "&"
 	|| inside = self
 	.ReplaceWith( Addr )
 	if WasCArray
