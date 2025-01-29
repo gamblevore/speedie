@@ -2,11 +2,11 @@
 // Globals put into a separate file to make things faster.
 #include "JB_Umbrella.hpp"
 #include "JB.h"
-#pragma GCC visibility push(hidden)
 
 const char* JB_CrashLogFileName = "/tmp/logs/jeebox.fail.txt";
 	
 JB_Globals JB__;
+#pragma GCC visibility push(hidden) // hide
 ;
 ;
 ;

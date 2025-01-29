@@ -117,6 +117,8 @@ typedef Date HumanDate;
 
 struct CompressionStats;
 
+struct DDA_Caster;
+
 struct FakeJBString;
 
 struct FastBuff;
@@ -1333,6 +1335,9 @@ int JB_ErrorColors__Init_();
 
 
 
+// ImageHelper
+
+
 // API
 Message* JB_API__Errors();
 
@@ -2023,6 +2028,9 @@ CompressionStats* JB_MzSt_Start(CompressionStats* Self);
 
 int JB_MzSt__Init_();
 
+
+
+// JB_DDA_Caster
 
 
 // JB_FakeJBString

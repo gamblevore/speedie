@@ -23,8 +23,8 @@
 */
 #include "JB_Umbrella.hpp"
 #include "JB.h"
+#pragma GCC visibility push(hidden) // hidden
 
-#pragma GCC visibility push(hidden)
 extern "C" {
 
 extern JB_StringC* JB_LUB[559];
@@ -152,6 +152,7 @@ int JB_ErrorColors__Init_() {
 	;
 	return 0;
 }
+
 
 
 Message* JB_API__Errors() {
@@ -3375,6 +3376,7 @@ int JB_MzSt__Init_() {
 	;
 	return 0;
 }
+
 
 
 
@@ -8393,7 +8395,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2025011316);
+	return (2025012916);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8405,4 +8407,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 -3364795963020818224 2135647296284023764
+// -2934619186805667969 8715385753164445590 -7927198289486668452
