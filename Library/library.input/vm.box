@@ -35,15 +35,7 @@ forms
 	
 	Jump
 		JUMP	j
-	
-	MinMax		// max:
-		r1		R
-		r2		r
-		r3		r
-		Sign	1
-		// So... we need to compare
-		// but how? We want the biggest item
-	
+		
 	RotateConst	// RotateConst:
 		r1		R
 		Rot		6
@@ -378,21 +370,21 @@ POS 5
 /**/ DIVV (Div)
 		DivMath(r, Op)
 /**/ DIV2 (Div2)
-	if (i2 < 0)
-		i1 = (i2+((1<<Div2_Addu)-1)) >> Div2_Shu	// quick divide by power of 2
-	else
-		i1 = i2 >> Div2_Shu
-/**/ MAX (MinMax)
-		if (MinMax_Signu)
-			i1 = std_max(i2, i3)
+		if (i2 < 0)
+			i1 = (i2+((1<<Div2_Addu)-1)) >> Div2_Shu	// quick divide by power of 2
 		else
-			u1 = std_max(u2, u3)
-/**/ MIN (MinMax)
-		if (MinMax_Signu)
-			i1 = std_min(i2, i3)
-		else
-			u1 = std_min(u2, u3)
+			i1 = i2 >> Div2_Shu
+/**/ CLAM (U4)
+		i1 = (i2 max i3) min i4
+/**/ CLUM (U4)
+		u1 = (u2 max u3) min u4
 
+/*
+	x = (y max L) min H
+
+	x = clamp(y, y, H) // min
+	x = clamp(y, L, L) // max
+*/
 
 
 #!						 (((((Bitops)))))
@@ -617,14 +609,8 @@ POS 5
 		else
 			f1 = (f2 - floor(f2)) * f3
 
-/**/ FMAX  (Float)
+/**/ FCLM (Float)
 		if (Float_Du)
-			d1 = std_max(d2, d3)
+			d1 = (d2 max D3) min d4
 		else
-			f1 = std_max(f2, f3)
-
-/**/ FMIN  (Float)
-		if (Float_Du)
-			d1 = std_min(d2, d3)
-		else
-			f1 = std_min(f2, f3)
+			f1 = (f2 max f3) min f4
