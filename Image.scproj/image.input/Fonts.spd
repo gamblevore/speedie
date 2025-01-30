@@ -129,20 +129,18 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |
 				if (ww-1 inrange 4) and y-1 inrange 6
 					sz = imagepixel.char(missingchar)
 					MissingChar>>=1
-					
 			
-			if sz
-				if drawmode > 0
-					|| A = (sz.a + 1) * DrawMode
-					if A >= 64K									
-						dz <~ col								// opaque pixel
-					  else
-						|| f = A|float| * 65536th
-						dz <~ mix(dz.color, col, f)				// transparent pixel
-				  elseif drawmode < 0
-					dz <~ sz									// emoji direct
-				  else
-					dz <~ mix(sz.color, col, col.a)				// emoji darkened
+			if drawmode > 0
+				|| A = (sz.a + 1) * DrawMode
+				|| c2 = col
+				if A < 64K									
+					|| f = A|float| * 65536th
+					c2 = mix(dz.color, c2, f)				// transparent pixel
+				dz <~ c2
+			  elseif drawmode < 0
+				dz <~ sz									// emoji direct
+			  else
+				dz <~ mix(sz.color, col, col.a)				// emoji darkened
 			sz++
 			dz++
 		clip.y++
