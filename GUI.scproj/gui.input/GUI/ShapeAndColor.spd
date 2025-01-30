@@ -53,17 +53,48 @@ datatype RayInfo (vec4)
 module VShapes
 // https://www.youtube.com/watch?v=aNR4n0i2ZlM // a heart shape?
 
-	function smin (|float| a, |float| b, |float| k=0.125, |float|)
+	function OpSmooth (|float| a, |float| b, |float| k=0.125, |float|)
 	    k *= 4.0
 	    || h = ( k-(a-b).abs max 0.0 ) / k
 	    return (a min b) - h*h*k*0.25
 	
 
+	function OpRepLim (|vec3| p, |float| spacing, |vec3| lima, |vec3| limb, |vec3|)
+	    return p - spacing*((p / spacing).round.clamp(lima, limb)) // from inigo. Doesnt quite work yet?
+	
+	// this is just not my thing lol.
+	// i dont konw how to do it.
+	function Heart (DistanceFunction)
+		p.w *= 0.5
+		p.y += gui.Cycle(5s, (.id.hash&255)*2s)*0.5
+		if hit
+			return PlasticBall(self, ray, p, hit)
+		
+		
+		|| r = .Radius.x * p.w
+		|| L = P - .Pos
+//		L.Z *= 1.01
+//		|| sq = (2.0, 1.0, 1.0)
+		
+		l.x = l.x.abs
+		|| r2 = r * 0.75
+		if l.x < r2 and l.y < 0
+			l.x = 0
+		  else 
+			l.x -= r2
+		if l.y < 0
+			l.x = (l.x - l.y)
+		|| d = L.Length - r
+		
+		
+		return (D, 0, 0, 0)
+		
+		
 	function Sphere (DistanceFunction)
 		opt min 3
-		if D
-			return NormalColor(self, ray, p, D)
-		|| L = .AdjustedPos - P
+		if Hit
+			return NormalColor(self, ray, p, Hit)
+		|| L = .Pos - P
 		|| r = .Radius.x * p.w
 		if ray
 			|| t = L • Ray._CamDir
@@ -78,8 +109,8 @@ module VShapes
 
 	function Debug (DistanceFunction)
 		p.w *= 0.5
-		if D
-			return NormalColor(self, ray, p, D)
+		if Hit
+			return NormalColor(self, ray, p, Hit)
 		if Keys.k[]
 			return Box(self, ray, p)
 		if Keys.l[]
@@ -112,11 +143,14 @@ module VShapes
 	
 	
 	function PlasticBall (DistanceFunction)
-		if !D or !ray
+		if !Hit or !ray
 			return Sphere(self, ray, p)
+		return plasticColor(self, ray, p, hit)
 		
+
+	function PlasticColor (ColorFunction)
 		|| Flux = 4.0
-		|| Normal = (P - .AdjustedPos).Normal
+		|| Normal = (P - .Pos).Normal
 
 	    || Kd = 0.072
 	    || Ks = 0.04
@@ -143,30 +177,33 @@ module VShapes
 		rz.a = .Color.a
 	
 	
-	function CloudBubble (DistanceFunction)
+	function CloudColor (ColorFunction)
 		// clouds aren't like this, they are more like aura-bulbs
 		// with particles that drift off them randomly
 
-		p.w *= 0.5
 		|| r = .Radius.x * p.w
+		|| Y = 0.15 * (hit.y+0.01) / r
+		|| Str = (0.75 + y).Clamp
+		|| ss = (0.4 + y).Clamp
+		return vec4(ss, Str) * .Color
+
+
+	function CloudBubble (DistanceFunction)
+		p.w *= 0.5
 		p.y+=gui.Cycle(5s, (.id.hash&255)*2s)*0.5
-		if D
-			|| Y = 0.15 * (D.y+0.01) / r
-			|| Str = (0.75 + y).Clamp()
-			if !keys.k[]
-				|| ss = (0.4 + y).Clamp()
-				return vec4(ss, Str) * .Color
-			return .Color
+		if hit
+			return cloudcolor(self, ray, p, hit)
 			
+		|| r = .Radius.x * p.w
 		return Sphere(self, ray, p + (0,0,r)) add Sphere(self, ray, p - (0,r,0)) add Sphere(self, ray, p + (r,0,0))
 	
 
 
 	function Box (DistanceFunction)
 		opt min 3
-		if D
-			return NormalColor(self, ray, p, D)
-		|| orig = P - .AdjustedPos
+		if hit
+			return NormalColor(self, ray, p, hit)
+		|| orig = P - .Pos
 		|| r = .Radius * p.w
 		if ray
 			|| idir = ray._iDir
@@ -187,19 +224,19 @@ module VShapes
 		return (P3.length, 0, 0, 0)
 
 
-	function NormalColor (DistanceFunction)
-		|| Norm = (P - .AdjustedPos).normal.abs		// Spherical color
+	function NormalColor (ColorFunction)
+		|| Norm = (P - .Pos).normal.abs		// Spherical color
 		return (norm, 1.0) * .Color
 	
 	
 	function FudgeBlock (DistanceFunction)
-		if !D
-			return box(self, ray, P, D)
-		return IceFudgeColor(self, ray, P, D)
+		if !Hit
+			return box(self, ray, P, hit)
+		return IceFudgeColor(self, ray, P, hit)
 	
 		
-	function IceFudgeColor (DistanceFunction)
-		|| Norm = (P - .AdjustedPos).normal
+	function IceFudgeColor (ColorFunction)
+		|| Norm = (P - .Pos).normal
 		|| y = Norm.y.acos
 		|| x = Norm.z.abs.atan2(Norm.x)
 		|| str = 8.0
@@ -207,12 +244,13 @@ module VShapes
 		|| grid = ((((x+y + gui.Cycle(spd))*str).fract - 0.5)*str).clamp*0.125 + 0.875
 		return (grid, grid, grid, 1.0)*.Color
 
-	function Black (DistanceFunction)
-	function Rainbows (DistanceFunction)
-		return Colors.Rainbow(D.x, 1, 0.5)
+	function Black (ColorFunction)
+	function Rainbows (ColorFunction)
+		return Colors.Rainbow(hit.x, 1, 0.5)
 	
 
-prototype DistanceFunction (|vobject| self, |raytracer?| Ray, |vec3| P, |rayinfo| D=vec4(), |rayinfo|)
+prototype ColorFunction (|vobject| self, |raytracer| Ray, |vec3| P, |rayinfo| Hit=vec4(), |rayinfo|)
+prototype DistanceFunction (|vobject| self, |raytracer?| Ray, |vec3| P, |rayinfo| Hit=vec4(), |rayinfo|)
 	description "
 x: dist
 y: thickness

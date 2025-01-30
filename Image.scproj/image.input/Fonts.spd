@@ -131,7 +131,7 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |
 					MissingChar>>=1
 					
 			
-			if sz.uint
+			if sz
 				if drawmode > 0
 					|| A = (sz.a + 1) * DrawMode
 					if A >= 64K									

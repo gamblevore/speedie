@@ -1,10 +1,43 @@
 
 
 struct ImagePixelStruct
+	linkage
+		cpp_part Pxst
 	|byte| R
 	|byte| G
 	|byte| B
 	|byte| A
+
+	helper AppendVec4 (|vec4| V)
+		v = (v * 255.0) + 0.5
+		|| iv = v.iVec4
+		.r = iv.r._CB2
+		.g = iv.g._CB2
+		.b = iv.b._CB2
+		.a = iv.a._CB2
+
+	helper AppendVec3 (|vec3| V)
+		v = (v * 255.0) + 0.5
+		|| iv = v.iVec3
+		.r = iv.r._CB2
+		.g = iv.g._CB2
+		.b = iv.b._CB2
+				
+	helper ivec4._CB (|ivec4|)
+		// test if this is faster.
+		description "A secret ClampByte"
+		|| L = ivec4((.x<0)|int|,   (.y<0)|int|,   (.z<0)|int|,   (.w<0)|int|)
+		|| H = ivec4((.x>255)|int|, (.y>255)|int|, (.z>255)|int|, (.w>255)|int|)
+	    self &= L-1			// clamp < 0
+	    self |= -H			// clamp > 255
+	    return self
+	
+	helper int._CB2 (|byte|)
+		description "A secret ClampByte"
+	    self &= (self<0)-1	// clamp < 0
+	    self |= -(self>255)	// clamp > 255
+	    return self
+
 
 
 datatype ImagePixel (uint)
@@ -16,7 +49,7 @@ datatype ImagePixel (uint)
 
 	linkage
 //		datatype true
-		cpp_part pix
+		cpp_part Pxl
 		opt min 3
 
 	function a (|int|):							return (self >> 24)
@@ -74,13 +107,14 @@ datatype ImagePixel (uint)
 	function Load (|&imagepixel| self, |string| s)
 		if s[0, "0c"]
 			s = s[2...]
+		|| parts = self|&byte|
 		for i in 4
 			|| v = 0
 			|| c = s[i*2, i*2+2]
 				v = c.parsehex|int|
 			  elseif i == 3
 				v = 255
-			.parts[i] = v
+			parts[i] = v
 	
 //	function Lum (|float|)
 //		return .color.lum
@@ -95,7 +129,7 @@ datatype ImagePixel (uint)
 		cpp_part Exists
 		return self and .a
 	
-	operator in (|image| src, |bool|)
+	operator in (|&imagepixel| self, |image| src, |bool|)
 		return src contains self
 
 	syntax cast (|vec4|)
@@ -106,9 +140,6 @@ datatype ImagePixel (uint)
 		cpp_part CastPremul
 		return .PreMul
 
-	function Equals (|imagepixel|p, |bool|)
-		return .uint == p.uint
-	
 	function AddAlpha (|&imagepixel| self, |float| v)
 		v += .Alpha
 		.Alpha = v
@@ -118,27 +149,10 @@ datatype ImagePixel (uint)
 		
 	syntax append (|&imagepixel| self, |vec4| V)
 		cpp_part AppendVec
-		v = (v * 255.0) + 0.5
-		|| iv = v.iVec4
-		|| qt = self|&imagepixelstruct|
-		qt.r = iv.r._CB2
-		qt.g = iv.g._CB2
-		qt.b = iv.b._CB2
-		qt.a = iv.a._CB2
-				
+		self|&imagepixelstruct|.AppendVec4(v)
+
 	function AppendRGB (|&imagepixel| self, |vec3| V)
-		v = (v * 255.0) + 0.5
-		|| iv = v.iVec3
-		|| qt = self|&imagepixelstruct|
-		qt.r = iv.r._CB2
-		qt.g = iv.g._CB2
-		qt.b = iv.b._CB2
-				
-	helper int._CB2 (|byte|)
-		description "A secret ClampByte"
-	    self &= (self<0)-1	// clamp < 0
-	    self |= -(self>255)	// clamp > 255
-	    return self
+		self|&imagepixelstruct|.AppendVec3(v)
 	
 	syntax append (|&imagepixel| self, |int| r, |int| g, |int| b, |int| a=255)
 		cpp_part AppendInts
@@ -147,16 +161,12 @@ datatype ImagePixel (uint)
 		.b = b.clamp(255)
 		.a = a.clamp(255)
 	
-	syntax append (|&imagepixel| self, |float| v)
-		disabled "Use a vector?"
-		cpp_part AppendFloat
-		self <~ ((v,v,v,1.0))
-		
+	syntax append (|float| v)
+		disabled "Use a vector instead."
+	
 	syntax append (|&imagepixel| self, |float| r, |float| g, |float| b, |float| a=255)
 		cpp_part AppendFloats
-		disabled "Just make a vector out of this and pass that instead"
-
-
+		disabled "Just make a vector instead."
 		
 	function Add (|&imagepixel| self, |vec4| c)
 		cpp_part AddVec
@@ -165,18 +175,16 @@ datatype ImagePixel (uint)
 	function Overlay (|&imagepixel| self, |vec4| T)
 		disabled "Call .Premul on this first for great speed boost!"
 
-
-	helper FastMix (|&imagepixel| self, |vec4| C)
-		if C.a < 0.996 
-			C = mix(.color, C, C.a) // maybe better to do this with shift math. IDK.
-		self <~ C 
+//	helper FastMix (|&imagepixel| self, |vec4| C)
+//		if C.a < 0.996 
+//			C = mix(.color, C, C.a) // maybe better to do this with shift math. IDK.
+//		self <~ C 
 		
 	function Overlay (|&imagepixel| self, |PreMultipliedColor| T)
 		|| R = .raw
 		|| D = ((R * t.a)>>16)+T
 		D.a = r.a
 		.raw = D
-		
 
 	function Underlay (|&imagepixel| self, |vec4| b) 
 		|| Old = .color
@@ -196,13 +204,7 @@ datatype ImagePixel (uint)
 		.g = value.g
 		.b = value.b
 		.a = value.a
-	
-	function Uint (|uint|) // delete this!
-		return self|uint|
-		
-	function Parts (|&imagepixel| self, |&byte|)
-		// delete this!
-		return self|&byte|
+			
 	
 	module 
 		function New (|imagepixel|)

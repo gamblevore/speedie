@@ -14,12 +14,7 @@ datatype int8 // aka char
 		|int8|
 		max = 127
 		min = -128
-//	syntax cast (|bool|)
-//		return self|bool|
-
-
-//datatype char (int8) // no need
-
+	
 
 
 datatype byte
@@ -33,9 +28,6 @@ datatype byte
 	function Equals (|string| B, |bool|)
 		cpp_part EqualsByte
 		return b.length == 1 and b[] == self
-
-//	syntax cast (|bool|)
-//		return self|bool|
 	
 	render
 		if (!fs_in)
@@ -94,6 +86,7 @@ datatype byte
 		function ZAlloc (|int| n, |?&byte|)
 			description "Returns allocated memory, and zeros it. Creates an error() if fails."
 			cpp_wrapper JB_zalloc
+
 
 
 datatype cstring

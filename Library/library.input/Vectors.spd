@@ -16,7 +16,15 @@ datatype vec4
 //		return (.x.climp(max), .y.climp(max), .z.climp(max), .w.climp(max))
 	
 	function Clamp (|float| max=1.0, |vec4|)
-		return (.x.clamp(max), .y.clamp(max), .z.clamp(max), .w.clamp(max))
+		cpp_Part MiniClamp
+		return .clamp(0, max)
+	
+	function Clamp (|vec4| A, |vec4| B, |vec4|)
+		cpp_Part ClampVec
+		return (self min B) max A
+	
+	function Clamp (|float| A, |float| B, |vec4|)
+		return (self min vec4(B)) max vec4(A)
 	
 	function abs (|vec4|)
 		return (.x.abs, .y.abs, .z.abs, .w.abs)
@@ -58,6 +66,9 @@ datatype vec4
 
 	operator max (|vec4| M, |vec4|)
 		return (.x max m.x, .y max m.y, .z max m.z, .w max m.w)
+	
+	operator min (|vec4| M, |vec4|)
+		return (.x min m.x, .y min m.y, .z min m.z, .w min m.w)
 	
 	function CosR (|vec4|)
 		return (self * math.iTau).cos
@@ -402,6 +413,16 @@ datatype vec3
 
 	function iVec3 (|ivec3|)
 		return (.x|int|, .y|int|, .z|int|)
+
+	function Clamp (|float| min=0.0, |float| max=1.0, |vec3|)
+		return self|vec4|.clamp(min, max)|vec3|
+	
+	function Clamp (|vec3| min=0.0, |vec3| max=1.0, |vec3|)
+		cpp_part ClampVec
+		return self|vec4|.clamp(min|vec4|, max|vec4|)|vec3|
+	
+	function Round (|vec3|)
+		return (.x.round, .y.round, .z.round)
 
 	function Length (|float|)
 		return .lengthsq.sqrt

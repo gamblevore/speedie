@@ -80,16 +80,12 @@ class VObject (list)
 		  else
 			.position &= ~i
 	
-	function AdjustedPos (|vec3|)
-		// this is a little ugly...
-		// i wonder if this value can be cached somwehre
-		// or at least the old value can be?
-		|| P = .pos
-		|| V = .Velocity
-		|| w = v.w
-			|| scale = (w min 1)*0.125
-			P.x += (gui.Cycle(0.07s)-0.5)*scale
-		return P
+	function AdjustPos (|float| scale, |vec3|)
+		rz = .pos
+		|| w = .Velocity.w
+			scale *= w * 0.125
+			rz.x += (gui.Cycle(0.07s)-0.5)*scale
+			.pos = rz
 	
 	
 	function ActualRadius (|float|)

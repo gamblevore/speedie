@@ -244,8 +244,8 @@ class RayTracer
 	
 		
 	helper FindCameraDist (|vobject| obj, |float| Max)
-		// lets us find out the max/min SDF distance.		
-		|| V = obj.AdjustedPos - .Camera
+		// lets us find out the max/min SDF distance.
+		|| V = obj.adjustpos(1) - .Camera
 		|| DMin = V.Length
 		|| DMax = DMin
 		|| R = obj.ActualRadius
@@ -269,7 +269,7 @@ class RayTracer
 		opt min 3
 		if b._maxdist
 			|| R = (b.radius, 0.0)
-			|| P = (b.AdjustedPos,  1.0)
+			|| P = (b.Pos,  1.0)
 			return .PlaneOK(r,p,0) and .PlaneOK(r,p,1) and .PlaneOK(r,p,2) and .PlaneOK(r,p,3)
 		// Could also (later) check if the nearest frustrum point is in the box.
 		// Need points[8] and a way to find which is the nearest to the box, or just check all?
@@ -306,6 +306,9 @@ class RayTracer
 		.PlayQuidditch(where.width)
 		for C in self
 			.TraceCell(C, where[c.xy.ivec2])
+		for s in .Shapes
+			s.AdjustPos(-1)
+
 	
 	
 	iterator
@@ -433,7 +436,7 @@ struct RayBoost
 		|| Rd = (v.radius, 0.0)
 		|| RX = Rd sign ff.xdiv
 		|| RY = Rd sign ff.ydiv
-		|| VP = (v.AdjustedPos, 1.0)
+		|| VP = (v.Pos, 1.0)
 		|| L = ff.xdiv • (VP + RX) > 0
 		|| R = ff.xdiv • (VP - RX) < 0
 		|| B = ff.ydiv • (VP + RY) > 0
