@@ -112,6 +112,9 @@ bool JB_Str__Terminate(Array* strs) {
 
 
 void JB_Flow__ReportStringData(u8* Addr, int Length, u8* Name, int NameLen);
+#ifndef ARG_MAX
+	#define ARG_MAX 128 * 1024
+#endif
 const char** JB_Proc__CreateArgs(JB_String* self, Array* R) {
 	int N = JB_Array_Size(R);
 	int Strs = JB_Str_Length(self) + 1;
