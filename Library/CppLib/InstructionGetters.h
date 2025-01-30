@@ -75,19 +75,6 @@
 #define   Jump_JUMPu_(x)   (((uint)((x)<<8))>>8)
 
 
-#define   MinMax_Signi       ((( int)((Op)<<23))>>31)
-#define   MinMax_Signi_(x)   ((( int)((x)<<23))>>31)
-
-#define   MinMax_Signu       (((uint)((Op)<<23))>>31)
-#define   MinMax_Signu_(x)   (((uint)((x)<<23))>>31)
-
-#define   MinMax_Li       ((( int)((Op)<<24))>>24)
-#define   MinMax_Li_(x)   ((( int)((x)<<24))>>24)
-
-#define   MinMax_Lu       (((uint)((Op)<<24))>>24)
-#define   MinMax_Lu_(x)   (((uint)((x)<<24))>>24)
-
-
 #define   RotateConst_Roti       ((( int)((Op)<<13))>>26)
 #define   RotateConst_Roti_(x)   ((( int)((x)<<13))>>26)
 

@@ -79,20 +79,10 @@
 	else 
 	i1 = i2 >> Div2_Shu
 ;
-ı MAX: _
-	if (MinMax_Signu) 
-	i1 = std_max(i2, i3)
-;
-	else 
-	u1 = std_max(u2, u3)
-;
-ı MIN: _
-	if (MinMax_Signu) 
-	i1 = std_min(i2, i3)
-;
-	else 
-	u1 = std_min(u2, u3)
-;
+ı CLAM: _
+	i1 = (i2 max i3) min i4;
+ı CLUM: _
+	u1 = (u2 max u3) min u4;
 ı BXOR: _
 	u1 = u2 ^ (u3 | Shift_Shu);
 ı BSHS: _
@@ -276,19 +266,12 @@
 	else 
 	f1 = (f2 - floor(f2)) * f3
 ;
-ı FMAX: _
+ı FCLM: _
 	if (Float_Du) 
-	d1 = std_max(d2, d3)
+	d1 = (d2 max D3) min d4
 ;
 	else 
-	f1 = std_max(f2, f3)
-;
-ı FMIN: _
-	if (Float_Du) 
-	d1 = std_min(d2, d3)
-;
-	else 
-	f1 = std_min(f2, f3)
+	f1 = (f2 max f3) min f4
 ;
 ı 
 
