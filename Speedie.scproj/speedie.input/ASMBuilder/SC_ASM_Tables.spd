@@ -261,12 +261,11 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 		if !d.pointercount and !d.iscarray
 	|| base = .µOpen(f, asmreg.WithinAccess)				// x = a.b[0]
 	|| sc = exp.Second.first!
+	if base is InlinedAccess
+/		return base
 
 	|| vara = .µOpen(sc)
-//		// what if this isn't used on a register?
-//		// its just the param that is unregisterable.
-//		.Fn.CantBeInlined |= 1 
-		
+	
 	if dest isnt AddrRequest
 		dest.µType = exp.ASMDecl.DataType
 		return .ReadOrWrite(Dest, exp, base, vara)
@@ -342,7 +341,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
 	|| d = exp.ASMDecl
 	if d is local
-		|| T = d.wholetype
+		|| T = d.WholeType
 		(t is param) = (d is param) // unused?
 		if (d isnt altered and param)
 			|| fi = d.FatConst
@@ -351,6 +350,9 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 					(T is ConstOutput)
 					t.FatIndex = fi
 		if dest isnt addrneed
+			return T
+		if dest is ForInline
+			(t is InlinedAccess)
 			return T
 		return exp.addr(dest, t, dest, t) * dest.HaveAddr
 	
@@ -363,7 +365,6 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	if dest isnt ConstRequest
 		check (d is global) (Exp)
 		return DoGlobal(self, exp, dest, d)
-	return nil
 
 
 function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |asmreg|)

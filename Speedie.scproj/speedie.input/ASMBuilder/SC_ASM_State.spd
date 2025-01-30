@@ -510,12 +510,7 @@ struct ASMState
 	
 	
 	function TryInline (|message| prms, |asmreg| dest, |µFunc| asm, |bool|)
-	// what if this function has no return value?
-	// or takes the address of a register?
-	// registers have no address, until they get called!
-	// we'd want to alter the var directly, but ALSO dissallow
-	// using the pointer to do any math on it, or store it, or do anything
-	// else than get/set.
+	// how to do addr of reg?
 	
 		opt norefcounts
 		|| fn = asm.fn
@@ -553,7 +548,7 @@ struct ASMState
 					continue 
 			
 			v = .DeclareMe(a.source, a)
-			.µInto(p!, v)
+			.µInto(p!, v as asmreg.ForInline)
 			p++
 		
 		ASMType.arg(self, fn.SourceArg!, ASMReg())
