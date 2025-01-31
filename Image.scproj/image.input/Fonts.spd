@@ -114,6 +114,7 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |
 	
 	|| X2  		= C|int| * font.Width
 	|| v0		= (X2, 0) - xy
+	if (c < 32) and keys.shift
 	if (c < 32) and (col == vec4(1) or drawmode == 1)
 		drawmode = -1
 	  elseif drawmode == 1
@@ -130,17 +131,18 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |
 					sz = imagepixel.char(missingchar)
 					MissingChar>>=1
 			
-			if drawmode > 0
-				|| A = (sz.a + 1) * DrawMode
-				|| c2 = col
-				if A < 64K									
-					|| f = A|float| * 65536th
-					c2 = mix(dz.color, c2, f)				// transparent pixel
-				dz <~ c2
-			  elseif drawmode < 0
-				dz <~ sz									// emoji direct
-			  else
-				dz <~ mix(sz.color, col, col.a)				// emoji darkened
+			if sz[]
+				if drawmode > 0
+					|| A = (sz.a + 1) * DrawMode
+					|| c2 = col
+					if A < 64K									
+						|| f = A|float| * 65536th
+						c2 = mix(dz.color, c2, f)				// transparent pixel
+					dz <~ c2
+				  elseif drawmode < 0
+					dz <~ sz									// emoji direct
+				  else
+					dz <~ mix(sz.color, col, col.a)				// emoji darkened
 			sz++
 			dz++
 		clip.y++

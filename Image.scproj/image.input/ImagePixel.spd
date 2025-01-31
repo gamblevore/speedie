@@ -124,11 +124,7 @@ datatype ImagePixel (uint)
 
 	function HasAny (|bool|)
 		return (self != 0)
-			
-	syntax cast (|&imagepixel| self, |bool|)
-		cpp_part Exists
-		return self and .a
-	
+		
 	operator in (|&imagepixel| self, |image| src, |bool|)
 		return src contains self
 
