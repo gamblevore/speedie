@@ -80,9 +80,9 @@
 	i1 = i2 >> Div2_Shu
 ;
 ı CLAM: _
-	i1 = (i2 max i3) min i4;
+	i1 = (std_min(std_max(i2, i3), i4));
 ı CLUM: _
-	u1 = (u2 max u3) min u4;
+	u1 = (std_min(std_max(u2, u3), u4));
 ı BXOR: _
 	u1 = u2 ^ (u3 | Shift_Shu);
 ı BSHS: _
@@ -268,10 +268,10 @@
 ;
 ı FCLM: _
 	if (Float_Du) 
-	d1 = (d2 max D3) min d4
+	d1 = (std_min(std_max(d2, d3), d4))
 ;
 	else 
-	f1 = (f2 max f3) min f4
+	d1 = (std_min(std_max(d2, d3), d4))
 ;
 ı 
 
