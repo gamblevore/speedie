@@ -223,7 +223,7 @@ class SCDecl (SCNamed) {
 				
 			if (s &~ datatypecode.sign) == (t &~ datatypecode.sign)
 				return self
-		|| cls = s.better_numeric_sub(t, Mode, left, right)!
+		|| cls = .better_numeric_sub(o, Mode, left, right)!
 		if cls.typeinfo == s
 			return self					// in case of: || x = (date(), 0)(test)
 		if cls.typeinfo == t
@@ -231,29 +231,60 @@ class SCDecl (SCNamed) {
 		return cls.typenormal
 
 
-	function SCDecl.IsFloat (|bool|)
+	function IsFloat (|bool|)
 		return .type.typeinfo.isfloat
-	function SCDecl.IsInt (|bool|)
+
+	function IsInt (|bool|)
 		return .type.typeinfo.isint
 
 
-	function datatypecode.Better_Numeric_Sub (|datatypecode| t, |opmode| Op, |message!| Left, |message!| Right, |SCClass|)
-		opt norefcounts
-		|| bme = .itembitcount
+	function BestFloat (|scdecl| OT, |int|)
+		|| t = ot.type.typeinfo
 		|| bt = t.itembitcount
-		|| bits	= bme max bt		// what about a float + an int? f64 right?
+		if self is const
+			return bt
+		
+		|| s = .type.typeinfo
+		|| bme = s.itembitcount
+		if ot is const
+			return bme
+		
+		return bme max bt		// what about a float + an int? f64 right?
+
+
+	function Better_Numeric_Sub (|scdecl| ot, |opmode| Op, |message!| Left, |message!| Right, |SCClass|)
+		opt norefcounts
+		|| s = .type.typeinfo
+		|| t = ot.type.typeinfo
+			
 		if .isfloat or t.isfloat
+			|| KS = self is const
+			|| OS = ot is const
+			if KS and OS
+				if s.itembitcount <= t.itembitcount
+					return .type
+				return ot.type
+			if KS != OS
+				if OS
+					return .type
+				  else
+					return ot.type
+
+			|| bits = .bestfloat(ot)
 			|| FF = (datatypecode.double.floatness, datatypecode.float.floatness)(bits > 32)
 			|| dest = (TypeFloat64!, TypeFloat!)(bits > 32)
-			if .floatness != FF
+			if s.floatness != FF
 				left.CastToClass(dest)
 			if t.floatness != FF
 				right.CastToClass(dest)
 			return dest
 		
+		|| bme = s.itembitcount
+		|| bt = t.itembitcount
+		|| bits	= bme max bt		// what about a float + an int? f64 right?
 		if Op
 			if Op is MakesSigned				// -
-				|| bits2 = (bme + !.issigned) max (bt + !t.issigned)
+				|| bits2 = (bme + !s.issigned) max (bt + !t.issigned)
 				if bits2 > 32
 					return typeint64
 				return typeint
@@ -266,7 +297,7 @@ class SCDecl (SCNamed) {
 			  elseif (Op is mathlike) and bits < 32
 				bits = 32
 		
-		|| Signed = .issigned
+		|| Signed = s.issigned
 		if Op isnt ShiftOnly
 			 signed ?= t.issigned
 		if bits > 32
