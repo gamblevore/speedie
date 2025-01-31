@@ -5500,8 +5500,6 @@ bool JB_TC_ASMUseIntRegs(uint /*DataTypeCode*/ Self);
 
 DataTypeCode JB_TC_Basictype(uint /*DataTypeCode*/ Self);
 
-SCClass* SC_TC_Better_Numeric_Sub(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ T, OpMode Op, Message* Left, Message* Right);
-
 int JB_TC_BitCount(uint /*DataTypeCode*/ Self);
 
 int JB_TC_ByteCount(uint /*DataTypeCode*/ Self);
@@ -9743,7 +9741,11 @@ JB_String* SC_Decl_AutoCompleteName(SCDecl* Self);
 
 void SC_Decl_BecomeReal(SCDecl* Self);
 
+int SC_Decl_BestFloat(SCDecl* Self, SCDecl* OT);
+
 SCDecl* SC_Decl_Better_Numeric(SCDecl* Self, SCDecl* O, OpMode Mode, Message* Left, Message* Right);
+
+SCClass* SC_Decl_Better_Numeric_Sub(SCDecl* Self, SCDecl* Ot, OpMode Op, Message* Left, Message* Right);
 
 ASMReg SC_Decl_CalculateASMType(SCDecl* Self);
 

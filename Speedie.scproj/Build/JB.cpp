@@ -3440,7 +3440,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[220]);
-	JB_FS_AppendInt32(_fsf0, (2025013018));
+	JB_FS_AppendInt32(_fsf0, (2025013116));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8885,7 +8885,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1673]);
-	JB_FS_AppendInt32(_fsf0, (2025013018));
+	JB_FS_AppendInt32(_fsf0, (2025013116));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -14382,19 +14382,19 @@ SCObject* SC_TypeOfUnit(Message* Exp, SCNode* Name_space, Message* Side) {
 			Type = SC_TypeFloat64;
 		}
 		 else iif (SC_Msg_UnitMatch(Exp, JB_LUB[1149], JB_LUB[1150])) {
-			Mul = (((Float64)86400.0f) * S4);
+			Mul = (86400.0f * S4);
 		}
 		 else iif (SC_Msg_UnitMatch(Exp, JB_LUB[1151], JB_LUB[1152])) {
-			Mul = (((Float64)604800.0f) * S4);
+			Mul = (604800.0f * S4);
 		}
 		 else iif (SC_Msg_UnitMatch(Exp, JB_LUB[1153], JB_LUB[1154])) {
-			Mul = (((Float64)31536000.0f) * S4);
+			Mul = (31536000.0f * S4);
 		}
 		 else iif (SC_Msg_UnitMatch(Exp, JB_LUB[1155], JB_LUB[933])) {
-			Mul = (((Float64)60.0f) * S4);
+			Mul = (60.0f * S4);
 		}
 		 else iif (SC_Msg_UnitMatch(Exp, JB_LUB[1156], JB_LUB[1157])) {
-			Mul = (((Float64)3600.0f) * S4);
+			Mul = (3600.0f * S4);
 		}
 		 else {
 			iif (true) {
@@ -14404,7 +14404,7 @@ SCObject* SC_TypeOfUnit(Message* Exp, SCNode* Name_space, Message* Side) {
 	}
 	Float64 Val = JB_Msg_Float(It);
 	iif (!Mul) {
-		Val = (((Float64)1.0f) / Val);
+		Val = (1.0f / Val);
 		Type = SC_Typefloat;
 	}
 	 else {
@@ -18587,60 +18587,6 @@ DataTypeCode JB_TC_Basictype(uint /*DataTypeCode*/ Self) {
 	return Self & (128 + (8 + 3));
 }
 
-SCClass* SC_TC_Better_Numeric_Sub(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ T, OpMode Op, Message* Left, Message* Right) {
-	int Bme = JB_TC_ItemBitCount(Self);
-	int Bt = JB_TC_ItemBitCount(T);
-	int Bits = JB_int_OperatorMax(Bme, Bt);
-	iif (JB_TC_IsFloat(Self) or JB_TC_IsFloat(T)) {
-		int FF = JB_Ternaryy(Bits > 32, JB_TC_Floatness(kJB__TC_Double), JB_TC_Floatness(kJB__TC_Float));
-		SCClass* Dest = ((SCClass*)JB_Ternaryy(Bits > 32, SC_TypeFloat64, SC_Typefloat));
-		iif (JB_TC_Floatness(Self) != FF) {
-			SC_Msg_CastToClass(Left, Dest, nil);
-		}
-		iif (JB_TC_Floatness(T) != FF) {
-			SC_Msg_CastToClass(Right, Dest, nil);
-		}
-		return Dest;
-	}
-	iif (Op) {
-		iif (SC_OpMode_SyntaxIs(Op, kSC__OpMode_MakesSigned)) {
-			int Bits2 = JB_int_OperatorMax((Bme + (!JB_TC_IsSigned(Self))), (Bt + (!JB_TC_IsSigned(T))));
-			iif (Bits2 > 32) {
-				return SC_TypeInt64;
-			}
-			return SC_TypeInt;
-		}
-		iif (SC_OpMode_SyntaxIs(Op, kSC__OpMode_LoseBits)) {
-			Bits = JB_int_OperatorMin(Bme, Bt);
-		}
-		 else iif (SC_OpMode_SyntaxIs(Op, kSC__OpMode_ShiftOnly)) {
-			Bits = Bme;
-		}
-		 else iif (SC_OpMode_SyntaxIs(Op, kSC__OpMode_NoExtraBits)) {
-			0;
-		}
-		 else iif ((SC_OpMode_SyntaxIs(Op, kSC__OpMode_MathLike)) and (Bits < 32)) {
-			Bits = 32;
-		}
-	}
-	bool Signed = JB_TC_IsSigned(Self);
-	iif (!SC_OpMode_SyntaxIs(Op, kSC__OpMode_ShiftOnly)) {
-		iif (!Signed) {
-			Signed = JB_TC_IsSigned(T);
-		}
-	}
-	iif (Bits > 32) {
-		return ((SCClass*)JB_Ternaryy(Signed, SC_TypeInt64, SC_TypeuInt64));
-	}
-	iif (Bits > 16) {
-		return ((SCClass*)JB_Ternaryy(Signed, SC_TypeInt, SC_TypeuInt));
-	}
-	iif (Bits > 8) {
-		return ((SCClass*)JB_Ternaryy(Signed, SC_TypeInt16, SC_TypeuInt16));
-	}
-	return ((SCClass*)JB_Ternaryy(Signed, SC_TypeChar, SC_TypeByte));
-}
-
 int JB_TC_BitCount(uint /*DataTypeCode*/ Self) {
 	return (JB_TC_Count(Self) << JB_TC__Shift(Self)) << 3;
 }
@@ -18836,7 +18782,7 @@ int64 JB_Date_Days(Date Self) {
 }
 
 Float64 JB_Date_Float64(Date Self) {
-	return ((Float64)Self) * ((Float64)kJB__Date_kOneStep);
+	return ((Float64)Self) * kJB__Date_kOneStep;
 }
 
 JB_Duration JB_Date_OperatorMinus(Date Self, Date D) {
@@ -22349,7 +22295,7 @@ Float64 JB_Rnd_Float64(Random* Self) {
 	};
 	double* F = ((double*)((&C[0])));
 	C[0] = ((I >> 12) | 4607182418800017408);
-	return F[0] - ((Float64)1.0f);
+	return F[0] - 1.0f;
 }
 
 int64 JB_Rnd_RndInt(Random* Self) {
@@ -43223,6 +43169,20 @@ void SC_Decl_BecomeReal(SCDecl* Self) {
 	}
 }
 
+int SC_Decl_BestFloat(SCDecl* Self, SCDecl* OT) {
+	uint T = OT->Type->TypeInfo;
+	int Bt = JB_TC_ItemBitCount(T);
+	iif (SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Const)) {
+		return Bt;
+	}
+	uint S = Self->Type->TypeInfo;
+	int Bme = JB_TC_ItemBitCount(S);
+	iif (SC_Decl_SyntaxIs(OT, kSC__SCDeclInfo_Const)) {
+		return Bme;
+	}
+	return JB_int_OperatorMax(Bme, Bt);
+}
+
 SCDecl* SC_Decl_Better_Numeric(SCDecl* Self, SCDecl* O, OpMode Mode, Message* Left, Message* Right) {
 	uint S = Self->Type->TypeInfo;
 	uint T = O->Type->TypeInfo;
@@ -43239,7 +43199,7 @@ SCDecl* SC_Decl_Better_Numeric(SCDecl* Self, SCDecl* O, OpMode Mode, Message* Le
 			return Self;
 		}
 	}
-	SCClass* Cls = SC_TC_Better_Numeric_Sub(S, T, Mode, Left, Right);
+	SCClass* Cls = SC_Decl_Better_Numeric_Sub(Self, O, Mode, Left, Right);
 	iif (Cls->TypeInfo == S) {
 		return Self;
 	}
@@ -43247,6 +43207,79 @@ SCDecl* SC_Decl_Better_Numeric(SCDecl* Self, SCDecl* O, OpMode Mode, Message* Le
 		return O;
 	}
 	return Cls->TypeNormal;
+}
+
+SCClass* SC_Decl_Better_Numeric_Sub(SCDecl* Self, SCDecl* Ot, OpMode Op, Message* Left, Message* Right) {
+	uint S = Self->Type->TypeInfo;
+	uint T = Ot->Type->TypeInfo;
+	iif (SC_Decl_IsFloat(Self) or JB_TC_IsFloat(T)) {
+		bool KS = SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Const);
+		bool OS = SC_Decl_SyntaxIs(Ot, kSC__SCDeclInfo_Const);
+		iif (KS and OS) {
+			iif (JB_TC_ItemBitCount(S) <= JB_TC_ItemBitCount(T)) {
+				return Self->Type;
+			}
+			return Ot->Type;
+		}
+		iif (KS != OS) {
+			iif (OS) {
+				return Self->Type;
+			}
+			 else {
+				return Ot->Type;
+			}
+		}
+		int Bits = SC_Decl_BestFloat(Self, Ot);
+		int FF = JB_Ternaryy(Bits > 32, JB_TC_Floatness(kJB__TC_Double), JB_TC_Floatness(kJB__TC_Float));
+		SCClass* Dest = ((SCClass*)JB_Ternaryy(Bits > 32, SC_TypeFloat64, SC_Typefloat));
+		iif (JB_TC_Floatness(S) != FF) {
+			SC_Msg_CastToClass(Left, Dest, nil);
+		}
+		iif (JB_TC_Floatness(T) != FF) {
+			SC_Msg_CastToClass(Right, Dest, nil);
+		}
+		return Dest;
+	}
+	int Bme = JB_TC_ItemBitCount(S);
+	int Bt = JB_TC_ItemBitCount(T);
+	int Bits = JB_int_OperatorMax(Bme, Bt);
+	iif (Op) {
+		iif (SC_OpMode_SyntaxIs(Op, kSC__OpMode_MakesSigned)) {
+			int Bits2 = JB_int_OperatorMax((Bme + (!JB_TC_IsSigned(S))), (Bt + (!JB_TC_IsSigned(T))));
+			iif (Bits2 > 32) {
+				return SC_TypeInt64;
+			}
+			return SC_TypeInt;
+		}
+		iif (SC_OpMode_SyntaxIs(Op, kSC__OpMode_LoseBits)) {
+			Bits = JB_int_OperatorMin(Bme, Bt);
+		}
+		 else iif (SC_OpMode_SyntaxIs(Op, kSC__OpMode_ShiftOnly)) {
+			Bits = Bme;
+		}
+		 else iif (SC_OpMode_SyntaxIs(Op, kSC__OpMode_NoExtraBits)) {
+			0;
+		}
+		 else iif ((SC_OpMode_SyntaxIs(Op, kSC__OpMode_MathLike)) and (Bits < 32)) {
+			Bits = 32;
+		}
+	}
+	bool Signed = JB_TC_IsSigned(S);
+	iif (!SC_OpMode_SyntaxIs(Op, kSC__OpMode_ShiftOnly)) {
+		iif (!Signed) {
+			Signed = JB_TC_IsSigned(T);
+		}
+	}
+	iif (Bits > 32) {
+		return ((SCClass*)JB_Ternaryy(Signed, SC_TypeInt64, SC_TypeuInt64));
+	}
+	iif (Bits > 16) {
+		return ((SCClass*)JB_Ternaryy(Signed, SC_TypeInt, SC_TypeuInt));
+	}
+	iif (Bits > 8) {
+		return ((SCClass*)JB_Ternaryy(Signed, SC_TypeInt16, SC_TypeuInt16));
+	}
+	return ((SCClass*)JB_Ternaryy(Signed, SC_TypeChar, SC_TypeByte));
 }
 
 ASMReg SC_Decl_CalculateASMType(SCDecl* Self) {
@@ -58613,4 +58646,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -8147542450981065047 -4221578997843614527
+// 9185827208915986033 -4221578997843614527
