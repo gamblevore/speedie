@@ -45,7 +45,7 @@ module package
 		.linkage		= app.arg("link", true)
 
 		|| g = app.int
-		check (G > 0 and g <= 256MB) ("Globals must be >= 1 and <= 256MB")
+		check (G > 0 and g <= 256MB) ("Globals must be between 1 byte and 256MB")
 		.glob(g)
 		
 		return stderr.ok

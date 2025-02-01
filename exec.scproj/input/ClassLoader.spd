@@ -97,10 +97,11 @@ class Class
 				return class[ch]
 			return class.new(ch, parent)
 		
+		
 		helper LoadAppClassSub (|message| arg, |class| parent, |bool|)
 			opt norefcounts
 			for ch in arg
-				|| c = Class.give(ch, parent)#require
+				|| c = Class.give(ch, parent)	#require
 				|| arg2 = ch.last
 				if arg2 == @arg
 					.LoadAppClassSub(arg2, c)

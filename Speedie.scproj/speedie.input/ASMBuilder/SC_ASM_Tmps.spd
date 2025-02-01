@@ -21,7 +21,6 @@ datatype ASMType (uint16)
 	constants
 		|ASMType|
 		kUnusedFirst = 47 // other values come after 
-		kPointer
 		kTern
 		kStatExpr
 		kIf

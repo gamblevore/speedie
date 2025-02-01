@@ -44,7 +44,6 @@ extend_module ArchonPurger {
 		(ASMType.kReturn):		Return
 		(ASMType.kTern):		Tern
 		(ASMType.kStatExpr): 	StatExpr
-		(ASMType.kPointer):		Pointer
 		(ASMType.kIgnore):		Ignore
 		(ASMType.krejoin):		Rejoin
 		(ASMType.kFail):		Fail
@@ -595,11 +594,6 @@ function Type (NilTrackerFn)
 		return ns
 	
 	return d.nildeclared // we created new suffering, so lets pass that back.
-
-
-// remove? what about kpointer? its replaced with @acc?
-function Pointer (Niltrackerfn)
-	return .UseChildAsReal(msg, test, nilreason.accessing)				// *abc
 
 
 function Brel (Niltrackerfn)
