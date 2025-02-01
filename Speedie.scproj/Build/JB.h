@@ -5075,6 +5075,8 @@ void JB_int64_RenderSizePart(int64 Self, FastString* Fs, int Size, JB_String* Su
 
 JB_String* JB_int64_StrSize(int64 Self, FastString* Fs_in);
 
+int64 SC_int64_ValueTrap(int64 Self, int64 L, int64 H);
+
 
 
 // int8
@@ -6910,6 +6912,8 @@ int SC_Pac_RegOfMsg(ASMState* Self, Message* S);
 void SC_Pac_RegsBitClear(ASMState* Self, Message* Exp, int RegAddrs, SCFunction* Fn);
 
 ASMReg SC_Pac_SafeDecr(ASMState* Self);
+
+void SC_Pac_Sanity(ASMState* Self);
 
 ASMReg SC_Pac_SelfDivide(ASMState* Self, ASMReg Dest, Message* Exp);
 
@@ -9779,9 +9783,9 @@ bool SC_Decl_CompareUnclear(SCDecl* Self, SCDecl* D, bool MakesSenseVsZero);
 
 int SC_Decl_Complexity(SCDecl* Self);
 
-bool SC_Decl_ConstInRange(SCDecl* Self, Message* RN, SCDecl* Rt, bool WasHex);
+void SC_Decl_ConstInRange(SCDecl* Self, Message* RN, SCDecl* Rt, bool WasHex);
 
-bool SC_Decl_ConstInRangeSub(SCDecl* Self, int64 Value, bool WasHex);
+int64 SC_Decl_ConstInRangeSub(SCDecl* Self, int64 Value, bool WasHex);
 
 SCDecl* SC_Decl_Constructor(SCDecl* Self, SCClass* Type);
 
@@ -9793,7 +9797,7 @@ bool SC_Decl_ContainsMatch(SCDecl* Self, SCDecl* O, int TypeCast);
 
 SCDecl* SC_Decl_CopyDecl(SCDecl* Self, bool ForNewVariable);
 
-SCDecl* SC_Decl_CopyDeclsStructFixer(SCDecl* Self, Message* Src, DeclMode Mode);
+SCDecl* SC_Decl_CopyDeclsStructFixer(SCDecl* Self, Message* Src, DeclMode Mode, Message* Type);
 
 void SC_Decl_CopyTypeInfoTo(SCDecl* Self, SCDecl* Dcl);
 
@@ -11532,8 +11536,10 @@ inline bool SC_FatRange_Never(FatRange* Self) {
 }
 
 inline ASMReg SC_Pac_GetASM(ASMState* Self, Message* Exp, ASMReg Dest) {
+	SC_Pac_Sanity(Self);
 	fn_asm Fn = SC_fn_asm_table[SC_Msg_ASMType(Exp)];
 	ASMReg Ss = (Fn)(Self, Exp, Dest, 0);
+	SC_Pac_Sanity(Self);
 	return Ss;
 }
 
@@ -11646,7 +11652,7 @@ inline void SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info) {
 
 inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
 	iif ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc, false))) {
-		JB_Msg_Fail(Self, JB_LUB[818]);
+		JB_Msg_Fail(Self, JB_LUB[817]);
 	}
 }
 
