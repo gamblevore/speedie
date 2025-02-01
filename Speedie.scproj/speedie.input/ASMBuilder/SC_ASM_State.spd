@@ -242,8 +242,10 @@ struct ASMState
 		  else
 			opt inline
 
+		.sanity
 		|| fn = fn_asm_table[exp.ASMType]!
 		|| ss = (fn)(self, exp, dest)
+		.sanity
 
 		target debug
 			if !ss.tmpcheck
@@ -261,6 +263,14 @@ struct ASMState
 					(fn)(self, exp, dest)
 		return ss
 
+
+	function Sanity
+		opt norefcounts
+//		|| x1 = .fn.asm
+//			|| x2 = x1.fn
+//			|| x3 = x2.asm
+//				|| x4 = x3.fn
+	
 
 	function FuncPrm (|message| prm, |asmreg|)
 		|| r = .ExistingVar(prm)
@@ -379,7 +389,9 @@ struct ASMState
 		check (v < 32) (exp, "Too many registers in use. No space for result.")
 		dest.reg = v
 		dest.µtype = fn.RegType
-		return Dest.Simplify
+		rz = Dest.Simplify
+		if !rz.reg
+			(rz is constoutput)
 
 
 	function PackMakerInit (|bool|)

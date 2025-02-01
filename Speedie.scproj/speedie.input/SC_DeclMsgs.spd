@@ -239,14 +239,9 @@ function CollectDeclsFuncBodyUnsureHowToRemove (|Message| arg, |SCNode| scarg)
 	CollectDeclsFuncBodyJustWhatWeNewlyMade(arg, scarg)
 
 
-// definitely remove this!
-function CollectDeclsFuncBody (|Message| arg, |SCNode| scarg)
-	CollectDeclsFuncBodyJustWhatWeNewlyMade(arg, scarg)
-
-
 function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |scclass| cls=nil, |scfunction| FuncPrmz=nil,  |scdecl|)
-	|| Type = .first!
-	|| Name = type.Next
+	|message--| Type = .first!
+	|message--| Name = type.Next
 	
 	expect (FuncPrmz or Name)  (self, "No name found.")
 	|| Default = DeclsDefault( name )
@@ -254,7 +249,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 	if !sdcl  and  !default  and  (P isa SCArg)
 		sdcl = P.ParentFunc!.ReturnType
 
-	|| NameItm = name.CollectDclName
+	|message--| NameItm = name.CollectDclName
 	|SCDecl--| DefaultDcl
 	if FuncPrmz
 		0
@@ -282,7 +277,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 	if sdcl.NeedsContainedfix
 		sdcl = sdcl.Containedfix
 	
-	|| dcl = Sdcl.CopyDeclsStructFixer(self, mode * !!nameitm?)
+	|| dcl = Sdcl.CopyDeclsStructFixer(self, mode * (nameitm!=nil), type)
 	dcl.source = self
 	if !NameItm
 		check (.islast) ( self, "Parameter is missing a name." )

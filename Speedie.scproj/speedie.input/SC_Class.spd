@@ -915,6 +915,7 @@ function MakeClassType (|scdecl| d, |scdecl|)
 	i.nildeclared = nilstate.real
 	C.Contains = d
 	(c is ClassObj)
+	(c is global)
 
 	return c
 

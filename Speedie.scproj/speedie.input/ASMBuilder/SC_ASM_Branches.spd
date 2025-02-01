@@ -56,7 +56,8 @@ function If (fn_asm)
 		return asmreg()						// were done!
 
 	if .curr.op != asm.eror
-	B.AllJumpTo // why curr+1?
+	 #! why curr+1?
+	B.AllJumpTo
 	|| AfterFirst = arg1.jump(0)
 	.ArgOrIf(other)
 	AfterFirst.jumpto = .curr
@@ -85,7 +86,7 @@ function While (fn_asm)
 	|fatrange| LOOP_TEST
 	|| LT = .Branch(exp.first!, true, loop_test)
 	if loop_test.never
-/		.Nop(begin, loop_Test.start)
+/		.nop(begin, loop_Test.start)
 		return asmreg()
 	
 	BEGIN.jumpto = LOOP_Test.start
@@ -370,12 +371,6 @@ Struct FatRange
 	function Never (|bool|)
 		opt inline
 		return .constness.KnownFalse
-				
-	iterator
-		|| curr = .after!
-		while (curr > .start)
-			curr--
-			yield curr
 	
 	function AllJumpTo (|&fatasm| curr = .curr, |bool| Strip = true)
 		|| A = asmstate.sh
@@ -387,6 +382,12 @@ Struct FatRange
 					curr--
 					A.nop(s)
 					
+	iterator
+		|| curr = .after!
+		while (curr > .start)
+			curr--
+			yield curr
+	
 
 
 function @asmstate.PrintProgress (|message| exp=nil)

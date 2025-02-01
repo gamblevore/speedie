@@ -307,6 +307,7 @@ function Rejoin (NilTrackerFn)
 	return .jump(msg.first!, Test) 
 
 
+
 function DetectStillChecks (|message| first, |nilstate|)
 	require first
 	rz = .jump(first)
@@ -325,6 +326,7 @@ function DetectStillChecks (|message| first, |nilstate|)
 		t.FnAbleToNilCheck = false			// Nilcheckers require only return true if self is not nil!
 
 
+
 function Return (NilTrackerFn)
 	opt norefcounts
 	|| v = .DetectStillChecks(msg.first)
@@ -341,13 +343,16 @@ function Return (NilTrackerFn)
 		ret.NilPrint("return")
 
 
+
 function Exit (NilTrackerFn)
 	.loops.ExitRecord |= .EndBlock
 	.loops.hasEscape = true
 
 
+
 function Continue (NilTrackerFn)
 	.loops.ContRecord |= .EndBlock
+
 
 
 function While (NilTrackerFn)

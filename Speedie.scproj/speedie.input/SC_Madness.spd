@@ -79,18 +79,17 @@ function Message.GetAddressOf (|SCDecl| Type, |bool| WasCArray = false, |int|)
 	
 	using self
 	|| Addr = @brel + "&"
-	|| inside = self
+	Addr.obj = Type
 	.ReplaceWith( Addr )
 	if WasCArray
-		inside = «acc 
-			self
-			«arr 
-				«num "0"»
-			»
+		|| Acc = addr.msg(@acc)
+		acc <~ self
+		acc <~ «arr 
+			«num "0"»
 		»
+	  else
+		addr <~ self
 	
-	Addr <~ inside
-	Addr.obj = Type
 	Return kAddressOfMatch
 
 

@@ -65,11 +65,11 @@ function SCNode.CalculateConstRel (|message!| value, |&datatypecode| Ty, |uint64
 	if lg == 2
 		if n == '<'
 			|| T = L << R
-			expect ((T >> R) == L) (value, "Loses numeric info. [3]")
+			expect ((T >> R) == L) (value, "Loses numeric info.")
 			return T
 		if n == '>'
 			|| T = L >> R
-			expect ((T << R) == L) (value, "Loses numeric info. [2]")
+			expect ((T << R) == L) (value, "Loses numeric info.")
 			return T
 	
 	error (value)

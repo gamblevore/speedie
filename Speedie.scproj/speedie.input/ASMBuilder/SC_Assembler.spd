@@ -54,7 +54,7 @@ module SpdAssembler
 		opt norefcounts
 		ASMState.Sh.InitAndStartFunc(fn)
 		|| A = fn.SourceArg!
-		ASMType.arg(ASmState.Sh, A, ASMReg())
+		ASMType.arg(ASMState.Sh, A, ASMReg())
 		ASMState.Sh.FinishASM
 		.Guard
 		return ASMState.Sh.ok
@@ -66,7 +66,7 @@ module SpdAssembler
 		(compiler.InternalFile.ast!).EROR(A,A,A,A,0)
 	
 	
-	function GenerateASM (|scfunction| fn, |bool|) // memory safe ASM retrier
+	function GenerateASM (|scfunction| fn, |bool|) // memory safe ASM reattempt
 		expect (.GenerateASMSub(fn) or (ASMState.ExpandJSM and .GenerateASMSub(fn))) "ASM is out of memory." 
 
 		fn.asm!.debugprint

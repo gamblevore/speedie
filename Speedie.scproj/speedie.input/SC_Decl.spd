@@ -185,11 +185,19 @@ class SCDecl (SCNamed) {
 		return !.SpecialRegs 
 		
 
-	function CopyDeclsStructFixer (|message| src, |declmode| mode, |SCDecl|)
+	function CopyDeclsStructFixer (|message| src, |declmode| mode, |message| Type, |SCDecl|)
+		opt norefcounts
 		if mode is funcparam
 			check (!.IsCarray) (Src, "No c-arrays in function parameters")
 			if .IsBareStruct
 				return .GetAddress
+		  elseif type == @emb
+			if .IsBareStruct
+				|| V = src.last.last // right?
+				|| ty2 = .GetAddress
+				V.GetAddressOf(ty2)
+				return ty2
+	
 		if .RefCount == 1
 			return self // nice
 		return .CopyDecl

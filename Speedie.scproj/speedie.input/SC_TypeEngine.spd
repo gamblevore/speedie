@@ -1037,7 +1037,7 @@ function message.DeclAddNumbInt (|int64| num, |scnode| name_space)
 	numb.obj = TypeOfNum(Numb, name_Space)
 
 
-function TypeOfSwizzle (|message| Exp, |scdecl| Type, |SCNode| name_space, |message| side, |int| swiz, |scdecl|)
+function TypeOfSwizzle (|message--| Exp, |scdecl| Type, |SCNode--| name_space, |message| side, |int| swiz, |scdecl|)
 	// So... we are getting like: v.z --> v[2]	
 	|| Count = swiz >> 16
 	|| W = type.type.NumericCount
@@ -1047,7 +1047,7 @@ function TypeOfSwizzle (|message| Exp, |scdecl| Type, |SCNode| name_space, |mess
 		w = 4
 	
 	|| prms = exp.last!
-	|| T = VecType(!type.IsInteger, count).notconst
+	|scdecl--| T = VecType(!type.IsInteger, count).notconst
 	if (count == 1)
 		swiz &= 7
 		expect (swiz < W) (prms, "Vector access is too large.")
@@ -1076,9 +1076,9 @@ function TypeOfSwizzle (|message| Exp, |scdecl| Type, |SCNode| name_space, |mess
 
 		for (i in count)
 			|| field = (swiz >> (i*3)) & 7
-			|message| item
+			|message--| item
 			if field == 4
-				item = «num "0" »
+				item = exp.msg(@num,"0")
 			  else
 				expect (field < W) (exp, "Vector access is too large.")
 				|| thg = «thg tmp » 
@@ -1088,8 +1088,8 @@ function TypeOfSwizzle (|message| Exp, |scdecl| Type, |SCNode| name_space, |mess
 						«num field »
 					»
 				»
+				exp <~ item
 			typeofexpr(item, name_space)
-			exp <~ item 
 		
 	return T
 	
@@ -1382,42 +1382,53 @@ function error.FromSamePlace (|message| s, |bool|)
 				return true
 
 
-function scdecl.ConstInRangeSub (|int64| Value, |bool| WasHex, |bool|)
+function int64.ValueTrap (|int64| L, |int64| H, |int64|)
+	if self < L
+		return L
+	if self > H
+		return H
+	return 0
+
+
+function scdecl.ConstInRangeSub (|int64| Value, |bool| WasHex, |int64|)
 	|| T = .type.typeinfo
+	require t.IsInt
+
 	|| S = t.ByteCount
-	if (S == 8) or !t.IsInt
-		return true
-	|| ign = t.issigned
+	|| sign = t.issigned
 	if S == 4
-		if ign and !WasHex
-			return (value >= int.min) and (value <= int.max)
-		return (value >= -1) and (value <= 0xFFFFffff)
+		if sign and !WasHex
+			return value.ValueTrap(int.min, int.max)
+		return value.ValueTrap(-1, 0xFFFFffff)
 			
 	if S == 2
-		if ign and !WasHex
-			return value >= int16.min and value <= int16.max
-		return (value >= -1) and (value <= 0xFFFF)
+		if sign and !WasHex
+			return value.ValueTrap(int16.min, int16.max)
+		return value.ValueTrap(-1, 0xFFFF)
 
 	if S == 1
-		if ign and !WasHex
-			return (value >= int8.min) and (value <= int8.max)
-		return (value >= -1) and (value <= 0xFF)
-	return true
+		if sign and !WasHex
+			return value.ValueTrap(int8.min, int8.max)
+		return value.ValueTrap(-1, 0xFF)
 
 
-function scdecl.ConstInRange (|message| RN, |scdecl| rt, |bool| WasHex,  |bool|)
+function scdecl.ConstInRange (|message| RN, |scdecl| rt, |bool| WasHex)
 	opt norefcounts
+	|int64| N
 	if RN == @num	
 		if rn.isint 
-			return .ConstInRangeSub(rn.int, washex)
+			n = rn.int
 	
 	  elseif (rn == @thg) and (rt is NumberConst) and rt.isnormalnumber and rt.isinteger
-		return .ConstInRangeSub(rt.exportposition, washex)
+		n = rt.ExportPosition
+		
+	if n
+		|| Bad = .ConstInRangeSub(n, washex)
+			error (RN, "Loses numeric info: $n is beyond $bad")
 
 	// if RN == @num... check the type of self big enough
 	// if RN == @thg and is a const... check the type of self big enough
 	// if num == -1 then... allow into unsigned... otherwise no negative consts.
-	return true
 
 
 function SCDecl.AssignabilityCheck (|message?| ln, |message!| RN, |scdecl| rc, |bool| WasHex=false,  |bool|)
@@ -1437,7 +1448,7 @@ function SCDecl.AssignabilityCheck (|message?| ln, |message!| RN, |scdecl| rc, |
 		error (rn, "Not assignable.")
 
 	if rc is const
-		return (.ConstInRange(RN, rc, washex))		#expect (RN, "Loses numeric info [1]") 
+		.ConstInRange(RN, rc, washex)
 	return true
 
 
@@ -1506,7 +1517,7 @@ function TypeOfRel (ExprResolver)
 	  else 
 		LC = TypeOfExpr( LN, name_space )
 		RC = TypeOfExprNeeded( RN, name_space )
-
+	
 	if !rc or !lc or (exp != @rel) or (side and !LC.AssignabilityCheck(LN, RN, rc))
 		if rc and !lc
 			error (LN, "Can’t find the type of this.")
