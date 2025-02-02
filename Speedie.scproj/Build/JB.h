@@ -167,6 +167,8 @@ typedef ASM ASM_CNTC;
 
 typedef ASM ASM_CmpB;
 
+typedef ASM ASM_ConstGlobal;
+
 typedef ASM ASM_ConstStretchy;
 
 typedef ASM ASM_Convert;
@@ -1415,6 +1417,7 @@ JBClass ( Task2 , LessThan3 ,
 	vec2 V;
 	float Strength;
 );
+extern int SC__ASMExamples_Glob;
 #define JB__App__Conf JB__.App__Conf
 #define JB__App__OldArgs JB__.App__OldArgs
 #define JB__App__Path JB__.App__Path
@@ -1522,18 +1525,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2154])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2156])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2155])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2157])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2156])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2158])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2153])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2155])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2156])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2158])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2157])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2159])
 
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
@@ -1764,7 +1767,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2162])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2164])
 
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
@@ -1802,7 +1805,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2158])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2160])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1840,7 +1843,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2163])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2165])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2075,12 +2078,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2161])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2163])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2160])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2162])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2159])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2161])
 
 #define kJB__byte_max ((byte)255)
 
@@ -2118,41 +2121,39 @@ extern SCClass* SC_TypeWrapper;
 
 #define kSC__ASM_ALLO ((ASM_Alloc)36)
 
-#define kSC__ASM_BAND ((ASM_Shift)56)
+#define kSC__ASM_BAND ((ASM_Shift)55)
 
-#define kSC__ASM_BFLG ((ASM_BFLD)61)
+#define kSC__ASM_BFLG ((ASM_BFLD)60)
 
-#define kSC__ASM_BNAN ((ASM_Shift)58)
+#define kSC__ASM_BNAN ((ASM_Shift)57)
 
-#define kSC__ASM_BNOR ((ASM_Shift)59)
+#define kSC__ASM_BNOR ((ASM_Shift)58)
 
-#define kSC__ASM_BNOT ((ASM_Shift)60)
+#define kSC__ASM_BNOT ((ASM_Shift)59)
 
-#define kSC__ASM_BOR ((ASM_Shift)57)
+#define kSC__ASM_BOR ((ASM_Shift)56)
 
-#define kSC__ASM_BSHL ((ASM_Shift)55)
+#define kSC__ASM_BSHL ((ASM_Shift)54)
 
-#define kSC__ASM_BSHR ((ASM_Shift)54)
+#define kSC__ASM_BSHR ((ASM_Shift)53)
 
-#define kSC__ASM_BSHS ((ASM_Shift)53)
+#define kSC__ASM_BSHS ((ASM_Shift)52)
 
-#define kSC__ASM_BSTT ((ASM_U4)62)
+#define kSC__ASM_BSTT ((ASM_U4)61)
 
-#define kSC__ASM_BXOR ((ASM_Shift)52)
+#define kSC__ASM_BXOR ((ASM_Shift)51)
 
-#define kSC__ASM_CLAM ((ASM_U4)50)
+#define kSC__ASM_CLAM ((ASM_Float)50)
 
-#define kSC__ASM_CLUM ((ASM_U4)51)
+#define kSC__ASM_CMPB ((ASM_CmpB)62)
 
-#define kSC__ASM_CMPB ((ASM_CmpB)63)
+#define kSC__ASM_CMPF ((ASM_JCmpF)65)
 
-#define kSC__ASM_CMPF ((ASM_JCmpF)66)
+#define kSC__ASM_CMPI ((ASM_JCmpI)64)
 
-#define kSC__ASM_CMPI ((ASM_JCmpI)65)
+#define kSC__ASM_CNTC ((ASM_CNTC)97)
 
-#define kSC__ASM_CNTC ((ASM_CNTC)98)
-
-#define kSC__ASM_CNTD ((ASM_CNTC)99)
+#define kSC__ASM_CNTD ((ASM_CNTC)98)
 
 #define kSC__ASM_CONV ((ASM_Convert)40)
 
@@ -2163,19 +2164,19 @@ extern SCClass* SC_TypeWrapper;
 extern ASM_Encoder SC__ASM_Encoders[256];
 #define kSC__ASM_EROR ((ASM_HALT)0)
 
-#define kSC__ASM_FADD ((ASM_Float)101)
+#define kSC__ASM_FADD ((ASM_Float)100)
 
-#define kSC__ASM_FADK ((ASM_FloatConst)102)
+#define kSC__ASM_FADK ((ASM_FloatConst)101)
 
-#define kSC__ASM_FCLM ((ASM_Float)107)
+#define kSC__ASM_FCLM ((ASM_Float)106)
 
-#define kSC__ASM_FDIV ((ASM_Float)105)
+#define kSC__ASM_FDIV ((ASM_Float)104)
 
-#define kSC__ASM_FFRC ((ASM_Float)106)
+#define kSC__ASM_FFRC ((ASM_Float)105)
 
-#define kSC__ASM_FMLK ((ASM_FloatConst)104)
+#define kSC__ASM_FMLK ((ASM_FloatConst)103)
 
-#define kSC__ASM_FMUL ((ASM_Float)103)
+#define kSC__ASM_FMUL ((ASM_Float)102)
 
 #define kSC__ASM_FNC ((ASM_Func)24)
 
@@ -2186,25 +2187,27 @@ extern ASM_Encoder SC__ASM_Encoders[256];
 #define kSC__ASM_FNCX3 ((ASM_ForeignFunc)27)
 
 extern ASM_Encoder SC__ASM_Forms[128];
-#define kSC__ASM_GSTR ((ASM_Table)83)
+#define kSC__ASM_GMEM ((ASM_ConstGlobal)6)
 
-#define kSC__ASM_GTAB ((ASM_Table)84)
+#define kSC__ASM_GSTR ((ASM_Table)82)
 
-#define kSC__ASM_JBAN ((ASM_Bra)74)
+#define kSC__ASM_GTAB ((ASM_Table)83)
 
-#define kSC__ASM_JBOR ((ASM_Bra)73)
+#define kSC__ASM_JBAN ((ASM_Bra)73)
 
-#define kSC__ASM_JMPE ((ASM_JCmpEq)71)
+#define kSC__ASM_JBOR ((ASM_Bra)72)
 
-#define kSC__ASM_JMPF ((ASM_JCmpF)70)
+#define kSC__ASM_JMPE ((ASM_JCmpEq)70)
 
-#define kSC__ASM_JMPI ((ASM_JCmpI)69)
+#define kSC__ASM_JMPF ((ASM_JCmpF)69)
 
-#define kSC__ASM_JMPN ((ASM_JCmpEq)72)
+#define kSC__ASM_JMPI ((ASM_JCmpI)68)
 
-#define kSC__ASM_JSWI ((ASM_JCmpEq)67)
+#define kSC__ASM_JMPN ((ASM_JCmpEq)71)
 
-#define kSC__ASM_JUMP ((ASM_Jump)68)
+#define kSC__ASM_JSWI ((ASM_JCmpEq)66)
+
+#define kSC__ASM_JUMP ((ASM_Jump)67)
 
 #define kSC__ASM_KNSR ((ASM_RotateConst)41)
 
@@ -2214,11 +2217,11 @@ extern ASM_Encoder SC__ASM_Forms[128];
 
 #define kSC__ASM_KNST3 ((ASM_ConstStretchy)5)
 
-#define kSC__ASM_LUPD ((ASM_Loop)75)
+#define kSC__ASM_LUPD ((ASM_Loop)74)
 
-#define kSC__ASM_LUPU ((ASM_Loop)76)
+#define kSC__ASM_LUPU ((ASM_Loop)75)
 
-#define kSC__ASM_MEMU ((ASM_MemUtil)100)
+#define kSC__ASM_MEMU ((ASM_MemUtil)99)
 
 #define kSC__ASM_MULT ((ASM_U4)47)
 
@@ -2227,37 +2230,37 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__ASM_PRNT ((ASM_U1)38)
 
-#define kSC__ASM_RALO ((ASM_U2)82)
+#define kSC__ASM_RALO ((ASM_U2)81)
 
 #define kSC__ASM_RARE ((ASM_U2)39)
 
-#define kSC__ASM_RD16 ((ASM_Read)92)
+#define kSC__ASM_RD16 ((ASM_Read)91)
 
-#define kSC__ASM_RD1S ((ASM_Read)86)
+#define kSC__ASM_RD1S ((ASM_Read)85)
 
-#define kSC__ASM_RD1U ((ASM_Read)85)
+#define kSC__ASM_RD1U ((ASM_Read)84)
 
-#define kSC__ASM_RD2S ((ASM_Read)88)
+#define kSC__ASM_RD2S ((ASM_Read)87)
 
-#define kSC__ASM_RD2U ((ASM_Read)87)
+#define kSC__ASM_RD2U ((ASM_Read)86)
 
-#define kSC__ASM_RD4S ((ASM_Read)90)
+#define kSC__ASM_RD4S ((ASM_Read)89)
 
-#define kSC__ASM_RD4U ((ASM_Read)89)
+#define kSC__ASM_RD4U ((ASM_Read)88)
 
-#define kSC__ASM_RD8U ((ASM_Read)91)
+#define kSC__ASM_RD8U ((ASM_Read)90)
 
 #define kSC__ASM_RET ((ASM_RET)35)
 
-#define kSC__ASM_RFAP ((ASM_U3)77)
+#define kSC__ASM_RFAP ((ASM_U3)76)
 
-#define kSC__ASM_RFDC ((ASM_RefDecrMem)81)
+#define kSC__ASM_RFDC ((ASM_RefDecrMem)80)
 
-#define kSC__ASM_RFRD ((ASM_RefSet3)80)
+#define kSC__ASM_RFRD ((ASM_RefSet3)79)
 
-#define kSC__ASM_RFST ((ASM_RefSet1)78)
+#define kSC__ASM_RFST ((ASM_RefSet1)77)
 
-#define kSC__ASM_RFWR ((ASM_RefSet2)79)
+#define kSC__ASM_RFWR ((ASM_RefSet2)78)
 
 #define kSC__ASM_SUB ((ASM_Shift)46)
 
@@ -2265,19 +2268,19 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__ASM_TAIL ((ASM_Tail)2)
 
-#define kSC__ASM_TERN ((ASM_U4)64)
+#define kSC__ASM_TERN ((ASM_U4)63)
 
 #define kSC__ASM_TRAP ((ASM_Trap)33)
 
-#define kSC__ASM_WR16 ((ASM_Write)97)
+#define kSC__ASM_WR16 ((ASM_Write)96)
 
-#define kSC__ASM_WR1U ((ASM_Write)93)
+#define kSC__ASM_WR1U ((ASM_Write)92)
 
-#define kSC__ASM_WR2U ((ASM_Write)94)
+#define kSC__ASM_WR2U ((ASM_Write)93)
 
-#define kSC__ASM_WR4U ((ASM_Write)95)
+#define kSC__ASM_WR4U ((ASM_Write)94)
 
-#define kSC__ASM_WR8U ((ASM_Write)96)
+#define kSC__ASM_WR8U ((ASM_Write)95)
 
 #define kSC__Reg_AddrForceRequest ((ASMReg)274877906944)
 
@@ -2319,6 +2322,8 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__Reg_RealConst ((ASMReg)103079215104)
 
+#define kSC__Reg_RealDiscard ((ASMReg)103081312256)
+
 #define kSC__Reg_RemoveableOutput ((ASMReg)68736253952)
 
 #define kSC__Reg_Set ((ASMReg)4194304)
@@ -2339,37 +2344,35 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__ASMType_IncrBefore ((int)0)
 
-#define kSC__ASMType_kContinue ((ASMType)53)
+#define kSC__ASMType_kContinue ((ASMType)52)
 
-#define kSC__ASMType_kDebugger ((ASMType)60)
+#define kSC__ASMType_kDebugger ((ASMType)59)
 
-#define kSC__ASMType_kExit ((ASMType)54)
+#define kSC__ASMType_kExit ((ASMType)53)
 
 #define kSC__ASMType_kFail ((ASMType)63)
 
-#define kSC__ASMType_kIf ((ASMType)51)
+#define kSC__ASMType_kIf ((ASMType)50)
 
-#define kSC__ASMType_kIgnore ((ASMType)59)
+#define kSC__ASMType_kIgnore ((ASMType)58)
 
-#define kSC__ASMType_kPointer ((ASMType)48)
+#define kSC__ASMType_kRefCount ((ASMType)60)
 
-#define kSC__ASMType_kRefCount ((ASMType)61)
+#define kSC__ASMType_kRejoin ((ASMType)55)
 
-#define kSC__ASMType_kRejoin ((ASMType)56)
+#define kSC__ASMType_kReturn ((ASMType)54)
 
-#define kSC__ASMType_kReturn ((ASMType)55)
+#define kSC__ASMType_kSetRel ((ASMType)57)
 
-#define kSC__ASMType_kSetRel ((ASMType)58)
+#define kSC__ASMType_kStatExpr ((ASMType)49)
 
-#define kSC__ASMType_kStatExpr ((ASMType)50)
+#define kSC__ASMType_kSwap ((ASMType)56)
 
-#define kSC__ASMType_kSwap ((ASMType)57)
-
-#define kSC__ASMType_kTern ((ASMType)49)
+#define kSC__ASMType_kTern ((ASMType)48)
 
 #define kSC__ASMType_kUnusedFirst ((ASMType)47)
 
-#define kSC__ASMType_kWhile ((ASMType)52)
+#define kSC__ASMType_kWhile ((ASMType)51)
 
 extern ASM_Read SC__ASMType_ReadASM[10];
 extern ASM_Write SC__ASMType_WriteASM[5];
@@ -3094,7 +3097,7 @@ extern bool SC__Cpp_WroteAny;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2152])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2154])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -3274,6 +3277,11 @@ extern JB_Globals JB__;
 
 
 //// HEADER JB.h
+
+
+
+// ASMExamples
+int SC_ASMExamples__Init_();
 
 
 
@@ -5158,6 +5166,10 @@ ASM SC_ASM_CNTC_offsetSet(ASM Self, uint Value);
 
 ASM SC_ASM_CNTC_sizeSet(ASM Self, uint Value);
 
+ASM SC_ASM_ConstGlobal_LSet(ASM Self, uint Value);
+
+ASM SC_ASM_ConstGlobal_ValueSet(ASM Self, uint Value);
+
 ASM SC_ASM_ConstStretchy_CondSet(ASM Self, uint Value);
 
 ASM SC_ASM_ConstStretchy_InvSet(ASM Self, uint Value);
@@ -5854,6 +5866,11 @@ ASM* JB_ASM_CmpB__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
+// ASM_ConstGlobal
+ASM* JB_ASM_ConstGlobal__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+
+
+
 // ASM_ConstStretchy
 ASM* JB_ASM_ConstStretchy__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
@@ -6252,8 +6269,6 @@ void SC_nil__NilParamPass(SCDecl* Recv, SCDecl* Sent, Message* Where, SCFunction
 NilState SC_nil__Not(Message* Msg, NilCheckMode Test);
 
 NilState SC_nil__Number(Message* Msg, NilCheckMode Test);
-
-NilState SC_nil__Pointer(Message* Msg, NilCheckMode Test);
 
 NilState SC_nil__Property(Message* Msg, NilCheckMode Test);
 
@@ -8808,13 +8823,11 @@ void SC_Msg_CheckNotInStateExpr(Message* Self, Message* Top);
 
 void SC_Msg_CheckSuperDotSave(Message* Self, JB_String* Name, bool ShouldBe);
 
-FatASM* JB_Msg_CLAM(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4);
+FatASM* JB_Msg_CLAM(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
 
 void SC_Msg_Clean(Message* Self, bool Erl);
 
 int JB_Msg_CleanIndent(Message* Self);
-
-FatASM* JB_Msg_CLUM(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4);
 
 Message* SC_Msg_CmdImprove(Message* Self);
 
@@ -9071,6 +9084,8 @@ Message* SC_Msg_GetMarker(Message* Self, JB_String* S);
 Message* SC_Msg_GetTypeLimiter(Message* Self);
 
 Message* JB_Msg_GiveArg(Message* Self);
+
+FatASM* JB_Msg_GMEM(Message* Self, ASMReg R1, int Value);
 
 Message* JB_Msg_GoIntoInvisArg(Message* Self, Message* Tmp, int Pos);
 
@@ -10760,6 +10775,8 @@ void SC_Func_AddSelfPrm(SCFunction* Self, SCClass* Cls);
 void SC_Func_AddSelfToFunc(SCFunction* Self, SCClass* Cls, SCNode* Space);
 
 void SC_Func_AddTypeInfo(SCFunction* Self, SCDecl* Dcl);
+
+bool SC_Func_AMiniTest(SCFunction* Self);
 
 void SC_Func_AnalyseRefs(SCFunction* Self, Array* List);
 
