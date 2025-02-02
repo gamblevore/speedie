@@ -79,14 +79,22 @@ module PackMaker
 			j.Add(@thg, f.exportname)
 		j.Exit
 
-		
+	
+	function scfunction.AMiniTest (|bool|)
+		return (self in "ASMExamples")
+	
+	
 	function ActualASMCompile (|bool|)
 		opt norefcounts
 		for fn in .Packfuncs
-			if !fn.tableid
-			require SpdAssembler.GenerateASM(fn) // memory safe
-		
+			if fn.AMiniTest
+				require SpdAssembler.GenerateASM(fn)
 		.RunAFewTests
+
+		for fn in .Packfuncs
+			if !fn.AMiniTest
+				require SpdAssembler.GenerateASM(fn)
+		
 		return true
 	
 
@@ -97,7 +105,11 @@ module PackMaker
 	
 	
 	function RunAFewTests 
-		|scfunction--| fn
+/		|scfunction--| fn
+		fn = .testfn("TestAtomic")
+		if fn
+			|| atomic = fn.TestObesity|&int|[]
+			printline atomic
 		fn = .testfn("SemiConst")
 		if fn
 			for i in 2
@@ -247,7 +259,7 @@ module PackMaker
 				return true
 			if c.HasPackChildren
 				return true
-
+	
 	function SCClass.PackClassChildren (|jbin| j)
 		opt norefcounts
 		require .HasPackChildren

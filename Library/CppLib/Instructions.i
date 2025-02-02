@@ -11,6 +11,8 @@
 ı KNST3: _
 	LoadConst(r, Op, *((uint64 *)(Code)));
 	Code += 2;
+ı GMEM: _
+	LoadGConst(r, Op, *Code++);
 ı FNC: 
 	__;
 	Code = BumpStack(vm, r, Code + 1, Op, *Code);
@@ -80,9 +82,12 @@
 	i1 = i2 >> Div2_Shu
 ;
 ı CLAM: _
-	i1 = (std_min(std_max(i2, i3), i4));
-ı CLUM: _
-	u1 = (std_min(std_max(u2, u3), u4));
+	if (Float_Du) 
+	i1 = (std_min(std_max(i2, i3), i4))
+;
+	else 
+	u1 = (std_min(std_max(u2, u3), u4))
+;
 ı BXOR: _
 	u1 = u2 ^ (u3 | Shift_Shu);
 ı BSHS: _

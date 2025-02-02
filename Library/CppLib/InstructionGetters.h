@@ -380,6 +380,19 @@
 #define   ConstStretchy_Valueu_(x)   (((uint)((x)<<15))>>15)
 
 
+#define   ConstGlobal_Valuei       ((( int)((Op)<<13))>>15)
+#define   ConstGlobal_Valuei_(x)   ((( int)((x)<<13))>>15)
+
+#define   ConstGlobal_Valueu       (((uint)((Op)<<13))>>15)
+#define   ConstGlobal_Valueu_(x)   (((uint)((x)<<13))>>15)
+
+#define   ConstGlobal_Li       ((( int)((Op)<<30))>>30)
+#define   ConstGlobal_Li_(x)   ((( int)((x)<<30))>>30)
+
+#define   ConstGlobal_Lu       (((uint)((Op)<<30))>>30)
+#define   ConstGlobal_Lu_(x)   (((uint)((x)<<30))>>30)
+
+
 #define   AddK_Ki       ((( int)((Op)<<18))>>18)
 #define   AddK_Ki_(x)   ((( int)((x)<<18))>>18)
 

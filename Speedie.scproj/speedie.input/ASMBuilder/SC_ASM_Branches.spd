@@ -26,7 +26,7 @@ function ArgOrIfSub (|message?| other, |asmreg|)
 
 function IfEmpty (|message| cond, |message| other, |asmreg|)
 	if !other
-/		return .µ(cond, asmreg.Discard)							// if (x())    -->   x()
+/		return .µ(cond, asmreg.RealDiscard)							// if (x())    -->   x()
 	|fatrange| B
 /	.Branch(cond, true, B)
 	if b.never

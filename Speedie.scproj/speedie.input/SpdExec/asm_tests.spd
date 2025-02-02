@@ -1,6 +1,7 @@
 
 
 module ASMExamples {
+|int| Glob
 target pack { 
 
 
@@ -274,6 +275,13 @@ function ConstRemovals (|message| a, |string|)
 	#!---
 	if a.Length * 0
 		x2 = a.Length * 0
+
+
+function TestAtomic (|int|)
+	for i in 100
+		Glob++
+		Glob += i&1
+	return Glob
 
 
 function ConstRemovals2 (|message| a, |string|)

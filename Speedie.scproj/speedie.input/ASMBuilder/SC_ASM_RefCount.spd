@@ -24,7 +24,7 @@ extend asmstate
 /			return exp.RFWR(A, nil, 1, offset)						// reg to mem
 
 		if fn == Compiler.RefSetRef
-			|| Out = .µopen(prms.first!, ASMReg.AddrRequest)
+			|| Out = .µGetASM(prms.first!, ASMReg.AddrRequest)
 			|| From = .µ(prms.second!, ASMReg.AddrRequest)
 			if out.reg == from.reg
 				return exp.noop // wat?

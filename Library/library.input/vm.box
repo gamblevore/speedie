@@ -182,6 +182,10 @@ forms
 		Inv		1
 		Value	17
 		
+	ConstGlobal
+		r1		R
+		Value	17
+		
 	AddK
 		r1		R
 		r2		r
@@ -270,6 +274,7 @@ forms
 #!						 (((((FUNC)))))
 
 
+
 /**/ ADDR (U4) 
 		u1 = (uint64)(&u2)
 		u3 = (uint64)(&u4)
@@ -344,7 +349,7 @@ POS 27
 
 POS 4
 	KNST2 (ConstStretchy)
-		LoadConst(r, Op, *Code++)   // would be better to do:   (uint64)(*Code++) << 17
+		LoadConst(r, Op, *Code++)   // would be better to do:   ((uint64)(*Code++) << 17) >> 17
 									// thats 49 bits at least!
 									// LoadConst(r, Op, ConstStretchy_Valueu) --> LoadConst(r, Op, 0)
 POS 5
@@ -353,6 +358,10 @@ POS 5
 									// perhaps to set simd values!
 		LoadConst(r, Op, *((uint64*)(Code)))
 		Code+=2
+
+POS 6
+	GMEM (ConstGlobal) // for global memory adresses
+		LoadGConst(r, Op, *Code++)
 
 
 #!						 (((((Math)))))
@@ -374,14 +383,12 @@ POS 5
 			i1 = (i2+((1<<Div2_Addu)-1)) >> Div2_Shu	// quick divide by power of 2
 		else
 			i1 = i2 >> Div2_Shu
-/**/ CLAM (U4)
-		i1 = (std_min(std_max(i2,i3),i4))
-/**/ CLUM (U4)
-		u1 = (std_min(std_max(u2,u3),u4))
-
+/**/ CLAM (Float)
+		if (Float_Du)
+			i1 = (std_min(std_max(i2,i3),i4))
+		else
+			u1 = (std_min(std_max(u2,u3),u4))
 /*
-	x = (y max L) min H
-
 	x = clamp(y, y, H) // min
 	x = clamp(y, L, L) // max
 */

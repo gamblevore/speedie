@@ -227,13 +227,13 @@ struct ASMState
 
 		
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
-		description "Same as µOpen, except this closes temp vars for reuse." 
+		description "Same as µGetASM, except this closes temp vars for reuse." 
 		|| Closer = .OpenVars
-		rz = .µOpen(exp, dest)
+		rz = .µGetASM(exp, dest)
 		.CloseVars(Closer)
 
 
-	function µOpen (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
+	function µGetASM (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		opt norefcounts
 		cpp_part GetASM 
 		target debug
@@ -275,7 +275,7 @@ struct ASMState
 	function FuncPrm (|message| prm, |asmreg|)
 		|| r = .ExistingVar(prm)
 			return r
-		return .µOpen(prm)
+		return .µGetASM(prm)
 
 
 	function ReadOrWrite (|ASMReg| dest, |message| m, |asmreg| base, |asmreg| varadd, |int| index=0, |asmreg|)

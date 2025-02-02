@@ -694,12 +694,14 @@ function message.Autocomplete_State (|int|)
 	rz += (s contains 'L')<<3
 	
 
+
 function AllTmps (|message|)
 	opt norefcounts
-	if .all_tmp_src.cleaned
-		return .all_tmp_src.Source
-	.all_tmp_src.cleaned = true
-	rz = .all_tmp_src.Source
+	|| X = .all_tmp_src
+	if X.cleaned
+		return X.Source
+	X.cleaned = true
+	rz = X.Source
 	
 	|| state = 0
 	for ch in rz

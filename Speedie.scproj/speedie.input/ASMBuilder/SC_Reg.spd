@@ -38,6 +38,7 @@ datatype ASMReg (uint64)
 		RemoveableOutput = ConstOutput|||Temp
 		Zero	   = RealConst ||| 56 ||| param		// 56 == datatypecode.uint64
 		ZeroParam  = ConstOutput ||| param
+		RealDiscard = RealConst ||| discard
 	
 
 	render

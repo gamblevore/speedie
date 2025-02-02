@@ -74,13 +74,13 @@ function StatExpr (fn_asm)
 	opt norefcounts
 	for ch.fast in exp
 		if ch.islast
-			return .µopen(ch, dest)
+			return .µGetASM(ch, dest)
 		.µ(ch, asmreg.Discard)
 
 	
 function First (fn_asm)
 	opt norefcounts
-	return .µopen(exp.first!, dest)
+	return .µGetASM(exp.first!, dest)
 
 
 function Sheb (fn_asm)
@@ -115,7 +115,7 @@ function ReturnExp (|&ASMState| self, |message| f, |AsmReg|)
 	if f
 		|| V = .ExistingVar(f, true)
 			return V
-		return .µopen(f)
+		return .µGetASM(f)
 
 
 function Return (fn_asm)
@@ -148,7 +148,7 @@ function TypeCast (fn_asm)
 	opt norefcounts
 	|| f = exp.first!
 	dest.µtype = exp.asmdecl.datatype
-	|| freg = .µopen(F, dest)
+	|| freg = .µGetASM(F, dest)
 	if freg.µtype == dest.µtype
 		return freg // already done!
 	return TypeCastSub(self, exp, dest, freg)
@@ -241,9 +241,9 @@ function Arg (fn_asm)
 	|| Closer = .OpenVars // dcl ooffer
 	for ch.fast in exp
 		if ch.func == @decl
-			asmtype.decl(self, ch, AsmReg.Discard)
+			asmtype.decl(self, ch, AsmReg.RealDiscard)
 		  else
-			.µ(ch, AsmReg.Discard)
+			.µ(ch, AsmReg.RealDiscard)
 
 	.Closevars(Closer)
 	return asmreg()
@@ -259,12 +259,12 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 	target debug
 		|| d = f.asmdecl
 		if !d.pointercount and !d.iscarray
-	|| base = .µOpen(f, asmreg.WithinAccess)				// x = a.b[0]
+	|| base = .µGetASM(f, asmreg.WithinAccess)				// x = a.b[0]
 	|| sc = exp.Second.first!
 	if base is InlinedAccess
 /		return base
 
-	|| vara = .µOpen(sc)
+	|| vara = .µGetASM(sc)
 	
 	if dest isnt AddrRequest
 		dest.µType = exp.ASMDecl.DataType
@@ -279,16 +279,16 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 
 function Dot (fn_asm)										// a.b
 	opt	NoRefCounts
-	if dest isnt set
+	|asmreg| SubDest // fool around with optimising this
+	if dest isnt set // **once** everything is working
 		dest = .TempTyped(exp, dest)
+		subdest = dest
+	
 	|| prop = exp.ASMDecl
 	if prop is global
 		return DoGlobal(self, exp, dest, prop)
-	|| F = exp.first!
-	target debug
-		if f.obj isa scmodule // should never happen
-		 
-	|| Obj = .µopen(F, dest)
+	|| F = exp.first!		 
+	|| Obj = .µGetASM(F, subdest)
 	|| T = prop.typeinfo
 	dest.µtype = T
 	
@@ -301,7 +301,6 @@ function Dot (fn_asm)										// a.b
 			dest.µtype = datatypecode._voidptr
 		dest = dest.haveaddr
 		return .AddToReg(exp, dest, obj as ASMReg.NoScale, pos)
-
 	
 	return .ReadOrWrite(Dest, exp, obj, ASMReg(), pos)
 		
@@ -314,7 +313,7 @@ function SetRel (fn_asm)	// function relset (
 	if X.reg
 		return .µInto(B, X)
 	
-	dest = .µOpen(B, X) asnt ASMReg.realconst		// why remove these?
+	dest = .µGetASM(B, X) asnt ASMReg.realconst	// try remove this removal. see if anything breaks.
 	return .µ(A, dest as AsmReg.set)
 
 
@@ -378,6 +377,8 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 	expect (iTable > 0)          (exp, "No global address".internal)
 	expect (iTable <= 18~bits)   (exp, "Used over 256K of global data")
 	
+	// should be "hoistable" out of loop or containing block... and reused.
+	// after all... GTAB won't change.
 	|| table = exp.GTAB(dest,  (!d.IsLib)|int|,  iTable)
 	if dest is AddrRequest
 		Dest.µtype = DataTypeCode._voidptr
@@ -388,16 +389,16 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 	
 
 function AddressOf (fn_asm)
-	rz = .µopen(exp, dest as asmreg.addrneed)
+	rz = .µGetASM(exp, dest as asmreg.addrneed)
 	if (rz is ContainsAddr)
 		return rz
 	error (exp, "ASM fail")
-	.µopen(exp, dest as asmreg.addrneed)
+	.µGetASM(exp, dest as asmreg.addrneed)
 
 
 function BoolNot (fn_asm)							// !a
 	dest = dest.negate
-	|| src = .µopen(exp, dest)
+	|| src = .µGetASM(exp, dest)
 	if src is AlreadyNegated
 		return src
 	return .exists(dest, src, exp)
@@ -433,7 +434,7 @@ function IncrOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |
 		return IncrSlowOnAddr(self, f, dest, mode, Addr, amount)
 	|| bc  = dest.µtype.ByteCount
 	|| log = bc.Log2
-	if dest.BitCount * (1<<log) != bc // hmm? maths bug?
+	if dest.BitCount * (1<<log) != bc<<3 // hmm? maths bug?
 	|| fat = f.CNTC(Addr, dest, 1, amount, log)
 	if mode & IncrAfter
 		fat.op = asm.cntd
@@ -456,7 +457,7 @@ function IncrAmount (|asmreg| upon, |int| IsSubtract, |scdecl| D,  |int64|)
 function Incrementatulatorifier		(fn_asm)				// --a++
 	visible
 	opt	NoRefCounts
-	|| Src = .µopen(exp, dest as asmreg.addrrequest)
+	|| Src = .µGetASM(exp, dest as asmreg.addrrequest)
 	|| Amount = IncrAmount(src, mode, exp.ASMDecl)
 	if src is ContainsAddr
 		return IncrOnAddr(self, exp, dest, mode, src, amount)
@@ -473,7 +474,7 @@ function ARel (fn_asm)
 	opt	NoRefCounts
 	|| F = exp.name[]
 	if F == '?' or '!'
-		return .µopen(exp.first!, dest)
+		return .µGetASM(exp.first!, dest)
 	|| M = (F == '+')|int|
 	if dest isnt discard
 		M += IncrAfter
@@ -522,7 +523,7 @@ function Unexpected		(fn_asm)
 	if !exp.asmtype
 		|| f = exp.func|int|
 			exp.asmtype = f
-			return .µopen(exp, dest)
+			return .µGetASM(exp, dest)
 	error  (exp, "bad ASMType")
 }
 
@@ -556,13 +557,13 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	|| ml = ASMReg()
 	|| mr = ASMReg()
 	if dest is SingleExpr
-		ml = .µopen(exp, dest)
+		ml = .µGetASM(exp, dest)
 	  else
 		|| Closer = .OpenVars
 		|| discardmode = dest & AsmReg.Discard
 		|| Mode = discardmode with dest
 
-		ml = .µopen(exp.first!, mode)
+		ml = .µGetASM(exp.first!, mode)
 		mode = DiscardMode.with(dest, ml)
 		mr = .µ(exp.last!, mode)
 		.CloseVars(Closer)

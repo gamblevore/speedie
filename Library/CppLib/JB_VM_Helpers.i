@@ -103,6 +103,13 @@ double FloatSh2 (uint64 u, int S) {
 }
 
 
+
+AlwaysInline void LoadGConst (VMRegister* r, ASM Op, int64 Value) {
+	Value = (Value << 32) >> 13;
+	Value |= ConstGlobal_Valueu;
+	r[n1].Int = Value;
+}
+
 AlwaysInline void LoadConst (VMRegister* r, ASM Op, uint64 Value) {
 	int N = n1;
 	if (!ConstStretchy_Condu or !r[N].Int) {
