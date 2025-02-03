@@ -6341,6 +6341,7 @@ Message* JB_Msg_ConstructorCopy(Message* Self, Message* Other) {
 		Self = ((Message*)JB_NewClass(&MessageData));
 	}
 	JB_Ring_Constructor0(Self);
+	(++JB__Tk_CountStats);
 	Self->Position = Other->Position;
 	JB_Incr2(Self->Name, Other->Name);
 	Self->Func = Other->Func;
@@ -6359,6 +6360,7 @@ Message* JB_Msg_ConstructorEmpty(Message* Self) {
 	JB_Ring_Constructor0(Self);
 	JB_Incr2(Self->Name, JB_LUB[0]);
 	Self->Indent = 0;
+	(++JB__Tk_CountStats);
 	Self->Func = kJB_SyxArg;
 	Self->Position = JB__Tk_Using.Position;
 	Self->Flags = JB__Tk_Using.Flags;
@@ -6373,6 +6375,7 @@ Message* JB_Msg_ConstructorNormal(Message* Self, Syntax Func, JB_String* Name) {
 	}
 	JB_Ring_Constructor0(Self);
 	Self->Indent = 0;
+	(++JB__Tk_CountStats);
 	JB_Incr2(Self->Name, Name);
 	Self->Func = Func;
 	Self->Position = JB__Tk_Using.Position;
@@ -6388,6 +6391,7 @@ Message* JB_Msg_ConstructorRange(Message* Self, Message* Parent, Syntax Func, in
 	}
 	JB_Ring_Constructor(Self, Parent);
 	Self->Indent = 0;
+	(++JB__Tk_CountStats);
 	JB_Incr2(Self->Name, Name);
 	Self->Position = BytePos;
 	Self->Func = Func;
@@ -8395,7 +8399,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2025012916);
+	return (2025020312);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8407,4 +8411,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 8715385753164445590 -7927198289486668452
+// -2934619186805667969 5707609593970855686 -1440462103731673564
