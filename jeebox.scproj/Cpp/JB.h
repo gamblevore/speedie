@@ -786,6 +786,7 @@ JBClass ( JB_Error , Message ,
 #define JB__Tk__EndOfLineMarker JB__.Tk__EndOfLineMarker
 #define JB__Tk__ErrorNames JB__.Tk__ErrorNames
 #define JB__Tk__StopBars JB__.Tk__StopBars
+#define JB__Tk_CountStats JB__.Tk_CountStats
 #define kJB__Tk_kAdjectiveOp ((int)1)
 
 #define kJB__Tk_kAllow ((bool)false)
@@ -1254,8 +1255,8 @@ struct JB_Globals {
 	u16 Tk__StopBars;
 	u16 API_NilHappened_;
 	int Syx_CurrFuncID_;
+	uint Tk_CountStats;
 	Float64 Rec_Progress;
-	Dictionary* Constants_UnEscapeStr;
 	Dictionary* Constants_JS_UnEscapeStr;
 	Dictionary* Constants_XML_UnEscapeStr;
 	Dictionary* Constants_EscapeChr;
@@ -1275,14 +1276,15 @@ struct JB_Globals {
 	JB_ErrorReceiver* StdErr;
 	JB_String* JbinHeader;
 	JB_String* jBinNotJbin;
+	Dictionary* Constants_XML_EscapeStr;
 	Message* Tk__EndOfLineMarker;
 	Dictionary* Constants__SyxDict;
 	Message* App__Conf;
 	Array* ErrorSeverity__names;
-	Dictionary* Constants_XML_EscapeStr;
+	Dictionary* Constants_JS_EscapeStr;
 	Dictionary* LD_ClassList;
 	SaverClassInfo* Saver_SaveableList;
-	Dictionary* Constants_JS_EscapeStr;
+	Dictionary* Constants_UnEscapeStr;
 	FlowControl* Flow_Flow;
 	Message* App__Prefs;
 	JB_String* App__Path;
@@ -3374,8 +3376,8 @@ struct JB_Globals {
 	u16 Tk__StopBars;
 	u16 API_NilHappened_;
 	int Syx_CurrFuncID_;
+	uint Tk_CountStats;
 	Float64 Rec_Progress;
-	JB_Object* Constants_UnEscapeStr;
 	JB_Object* Constants_JS_UnEscapeStr;
 	JB_Object* Constants_XML_UnEscapeStr;
 	JB_Object* Constants_EscapeChr;
@@ -3395,14 +3397,15 @@ struct JB_Globals {
 	JB_Object* StdErr;
 	JB_Object* JbinHeader;
 	JB_Object* jBinNotJbin;
+	JB_Object* Constants_XML_EscapeStr;
 	JB_Object* Tk__EndOfLineMarker;
 	JB_Object* Constants__SyxDict;
 	JB_Object* App__Conf;
 	JB_Object* ErrorSeverity__names;
-	JB_Object* Constants_XML_EscapeStr;
+	JB_Object* Constants_JS_EscapeStr;
 	JB_Object* LD_ClassList;
 	JB_Object* Saver_SaveableList;
-	JB_Object* Constants_JS_EscapeStr;
+	JB_Object* Constants_UnEscapeStr;
 	JB_Object* Flow_Flow;
 	JB_Object* App__Prefs;
 	JB_Object* App__Path;

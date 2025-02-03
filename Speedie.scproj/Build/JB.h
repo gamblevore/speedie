@@ -1525,18 +1525,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2156])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2157])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2157])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2158])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2158])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2159])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2155])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2156])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2158])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2159])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2159])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2160])
 
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
@@ -1767,7 +1767,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2164])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2165])
 
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
@@ -1805,7 +1805,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2160])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2161])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1843,7 +1843,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2165])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2166])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2004,6 +2004,7 @@ extern SCClass* SC_TypeWrapper;
 #define JB__Tk__EndOfLineMarker JB__.Tk__EndOfLineMarker
 #define JB__Tk__ErrorNames JB__.Tk__ErrorNames
 #define JB__Tk__StopBars JB__.Tk__StopBars
+#define JB__Tk_CountStats JB__.Tk_CountStats
 #define kJB__Tk_kAdjectiveOp ((int)1)
 
 #define kJB__Tk_kAllow ((bool)false)
@@ -2078,12 +2079,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2163])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2164])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2162])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2163])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2161])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2162])
 
 #define kJB__byte_max ((byte)255)
 
@@ -3097,7 +3098,7 @@ extern bool SC__Cpp_WroteAny;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2154])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2155])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -3218,10 +3219,10 @@ struct JB_Globals {
 	bool Err_KeepStackTrace;
 	u16 Tk__StopBars;
 	u16 API_NilHappened_;
+	uint Tk_CountStats;
 	int Syx_CurrFuncID_;
 	Date Terminal_LastDisplay;
 	Float64 Rec_Progress;
-	Dictionary* Constants_JS_UnEscapeStr;
 	Dictionary* Constants_XML_UnEscapeStr;
 	Dictionary* Constants_EscapeChr;
 	CharSet* Constants_CSWordMiddle;
@@ -3242,14 +3243,15 @@ struct JB_Globals {
 	JB_ErrorReceiver* StdErr;
 	JB_String* JbinHeader;
 	JB_String* jBinNotJbin;
+	Dictionary* Constants_JS_EscapeStr;
 	Message* Tk__EndOfLineMarker;
 	Dictionary* Constants__SyxDict;
 	Message* App__Conf;
 	Array* ErrorSeverity__names;
-	Dictionary* Constants_JS_EscapeStr;
+	Dictionary* Constants_UnEscapeStr;
 	Dictionary* LD_ClassList;
 	SaverClassInfo* Saver_SaveableList;
-	Dictionary* Constants_UnEscapeStr;
+	Dictionary* Constants_JS_UnEscapeStr;
 	FlowControl* Flow_Flow;
 	Message* App__Prefs;
 	JB_String* App__Path;
@@ -11669,7 +11671,7 @@ inline void SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info) {
 
 inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
 	iif ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc, false))) {
-		JB_Msg_Fail(Self, JB_LUB[817]);
+		JB_Msg_Fail(Self, JB_LUB[818]);
 	}
 }
 
@@ -11754,10 +11756,10 @@ struct JB_Globals {
 	bool Err_KeepStackTrace;
 	u16 Tk__StopBars;
 	u16 API_NilHappened_;
+	uint Tk_CountStats;
 	int Syx_CurrFuncID_;
 	Date Terminal_LastDisplay;
 	Float64 Rec_Progress;
-	JB_Object* Constants_JS_UnEscapeStr;
 	JB_Object* Constants_XML_UnEscapeStr;
 	JB_Object* Constants_EscapeChr;
 	JB_Object* Constants_CSWordMiddle;
@@ -11778,14 +11780,15 @@ struct JB_Globals {
 	JB_Object* StdErr;
 	JB_Object* JbinHeader;
 	JB_Object* jBinNotJbin;
+	JB_Object* Constants_JS_EscapeStr;
 	JB_Object* Tk__EndOfLineMarker;
 	JB_Object* Constants__SyxDict;
 	JB_Object* App__Conf;
 	JB_Object* ErrorSeverity__names;
-	JB_Object* Constants_JS_EscapeStr;
+	JB_Object* Constants_UnEscapeStr;
 	JB_Object* LD_ClassList;
 	JB_Object* Saver_SaveableList;
-	JB_Object* Constants_UnEscapeStr;
+	JB_Object* Constants_JS_UnEscapeStr;
 	JB_Object* Flow_Flow;
 	JB_Object* App__Prefs;
 	JB_Object* App__Path;
