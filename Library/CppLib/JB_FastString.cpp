@@ -427,11 +427,14 @@ void JB_FS_AppendDoubleAsText(FastString* self, double D, int dp, bool CanExp, b
 
 	if (Dot or (Frac and dp > 0)) {
 		JB_FS_AppendByte(self, '.');
-		while (dp-- > 0) {
+		bool GotNum = false;
+		while (dp-- > 0 or !GotNum) {
 			Frac *= 10;
 			double Num = floor(Frac);
 			Frac -= Num;
-			JB_FS_AppendByte(self, '0'+Num);
+			byte B = (byte)Num;
+			GotNum |= (B!=0);
+			JB_FS_AppendByte(self, '0'+B);
 			if (!Frac)
 				break;
 		}
