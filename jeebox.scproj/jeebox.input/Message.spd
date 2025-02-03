@@ -31,6 +31,7 @@ After that, you now have a tree-data-structure that represents your data. The Me
 		cpp_part ConstructorCopy
 		super.constructor
 		
+		parser.CountStats++
 		.Position	= other.Position
 		.Name		= other.Name
 		.func		= other.func
@@ -43,6 +44,7 @@ After that, you now have a tree-data-structure that represents your data. The Me
 
 	constructor
 		cpp_part ConstructorEmpty
+		parser.CountStats++
 		.func = @arg
 		.Position	= parser.Using.position
 		.flags		= parser.using.Flags
@@ -52,6 +54,7 @@ After that, you now have a tree-data-structure that represents your data. The Me
 			
 	constructor (|Syntax| Func=1|Syntax|, |string| Name="")
 		cpp_part ConstructorNormal
+		parser.CountStats++
 		.name		= name
 		.func		= func
 		.Position	= parser.Using.Position
@@ -64,6 +67,7 @@ After that, you now have a tree-data-structure that represents your data. The Me
 		cpp_part ConstructorRange
 		super.constructor(Parent)
 		
+		parser.CountStats++
 		.name		= name
 		.Position	= BytePos
 		.func		= func
