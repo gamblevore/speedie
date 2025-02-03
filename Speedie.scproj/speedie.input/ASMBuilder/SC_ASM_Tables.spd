@@ -366,27 +366,48 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 		return DoGlobal(self, exp, dest, d)
 
 
+
 function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |asmreg|)
 	opt	NoRefCounts
 	|| d2 = exp.asmdecl
-	if !d.minimatch(d2) // isnt this the same as d?
+	if !d.minimatch(d2) // Remove d2. it the same as D.
 	if dest isnt set								// a = glob
-		dest = .TempTyped(exp, dest) // no neede type if we have D?
+		dest = .TempTyped(exp, dest) // no need type if we have D?
 
 	|int64| iTable = d.ExportPosition
 	expect (iTable > 0)          (exp, "No global address".internal)
 	expect (iTable <= 18~bits)   (exp, "Used over 256K of global data")
 	
-	// should be "hoistable" out of loop or containing block... and reused.
-	// after all... GTAB won't change.
+	// OK how to do this?
+	// We could make a score. Collect a score for each gtab.
+	// honestly... it sems complex. A lot of mental work i'd rather not do.
+	// can I do something else? just... move things down?
+	// what can go wrong? just jumps, right?
+	// there are things tht jump back, and things that jump forward.
+	// We'd be moving everything that
+	
+	// Should be "hoistable" out of loop or containing block... and reused.
+	// We can pre-allocate GTAB space with NOPs, and then just use them.
+	// seems fair? I guess it needs to be a "Total-space" in-case they get
+	// hoisted twice?
+	/*
+		// gtab here
+		while y
+			if y&2
+				glob++
+			else
+				glob--
+	*/
+	
 	|| table = exp.GTAB(dest,  (!d.IsLib)|int|,  iTable)
 	if dest is AddrRequest
 		Dest.µtype = DataTypeCode._voidptr
 		return (table * dest).HaveAddr
 	
 	dest.µtype = d2.DataType
-	return .ReadOrWrite(dest, Exp, dest, asmreg(), 0)
+	return .ReadOrWrite(dest, Exp, dest, ASMReg(), 0)
 	
+
 
 function AddressOf (fn_asm)
 	rz = .µGetASM(exp, dest as asmreg.addrneed)
