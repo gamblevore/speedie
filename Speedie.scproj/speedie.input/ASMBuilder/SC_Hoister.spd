@@ -1,0 +1,49 @@
+
+
+struct SC_Hoister
+	linkage
+		cpp_part Hoi
+	|SCDecl--[6]|	Items
+	|uint64|		Closer
+	|int|			Count
+		
+	function HoistReg (|message| prop,  |scdecl| decl)
+		opt NoRefCounts
+		|| dest = asmstate.sh.DeclareMe(prop, decl)		// Pre-declare var, for glob.
+		decl.NilReg = dest.reg ||| 128					// Store! Inlines can see it too!
+		.Items[.Count++] = decl
+		// what about branches?
+	
+	function Unhoist (|asmreg|)
+		opt NoRefCounts
+		for d in .Items
+			loop d
+			d.nilreg = 0
+		return ASMState.sh.CloseVars(.Closer)
+	
+	function PreCheck (|message| exp, |int| Score = 0)
+		opt norefcounts
+		if score > 0
+			|| fn = exp.func
+			if (fn == @dot or @thg) and (.Count < 5)
+				|| prop = exp.ASMDecl
+				if prop.CanHoist
+					.HoistReg(exp, prop)
+	
+		// We need to pre-search... So... how? So... lets go through it
+		// So we find a while. We increase the score... then? we have to go through them again?
+		// or store it?
+		for ch.fast in exp
+			|| add = 0
+			if ch.func == @tmp
+				|| ty = ch.ASMType
+				add += (ty is kWhile) * asmstate.MinHoistScore
+				add -= (ty is kIf)
+				
+			.PreCheck(ch, add + score)
+
+
+function scdecl.CanHoist (|bool|)
+	ifn .NilReg & 128
+		return (self is Global) and (self isnt const)
+

@@ -3,10 +3,10 @@
 struct ASMState
 	linkage: cpp_part Pac
 	|uint16| 					BasicBlock
+	|DataTypeCode|				ReturnASM
 
 	|byte|						VDecls
 	|byte|						VTmps
-	|datatypecode|				ReturnASM
 	|bool|						OK    
 	|bool|						Inited
 	|byte|						ReturnDest
@@ -15,18 +15,20 @@ struct ASMState
 		|&fatasm|				LastProgress
 	|µFunc|						Out      
 	|&FatASM|					FuncStart
+	// we need to use indexes.
+	// So .curr and .start and .end are now all ints!
 	|&FatASM|					Start		// a "slice" feature would be nice    
-	|scfunction!|				Fn    
-	|scdecl--[32]|				Vars
 	|&FatASM|					Curr    
 	|&FatASM|					End    
+	|scfunction!|				Fn    
+	|scdecl--[32]|				Vars
 // constants...
 	|FATASM| 					Zero
-//	|int[32]|					NeverAltered // use .vars instead?
 
 	constants
-		kContinue = 254
-		kExit = 255
+		kContinue		= 254
+		kExit			= 255
+		MinHoistScore	= 3
 	
 
 	module
@@ -38,7 +40,7 @@ struct ASMState
 	function OpenVars (|uint64|)
 		rz = (.VDecls|uint64| << 32) ||| (.vtmps << 0)
 		
-	function CloseVars (|uint64| V)
+	function CloseVars (|uint64| V, |asmreg|)
 		|| top = .vdecls
 		|| d = v.high
 		while top > d
@@ -404,6 +406,8 @@ struct ASMState
 		return .alloc(ASMState.JSMSpace)
 
 
+	// we need to use indexes.
+	// So .curr and .start and .end are now all ints!
 	function Alloc (|memory of fatasm| j, |bool|)
 		if j.SetSize(4MB)
 			.start = j.ptr

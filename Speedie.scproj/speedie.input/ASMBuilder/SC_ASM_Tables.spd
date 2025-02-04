@@ -232,21 +232,22 @@ function Decl (fn_asm)
 //			if ty isnt const//???
 			(ty is const)
 			ty.exportposition = f._const
-			ty.FatConst = k.fatindex
-
+			ty.FatConstIndex = k.fatindex	
 
 
 function Arg (fn_asm)
 	opt norefcounts
-	|| Closer = .OpenVars // dcl ooffer
+	|sc_hoister| H 
+	h.Closer = .OpenVars
+	h.PreCheck(exp)
+	
 	for ch.fast in exp
 		if ch.func == @decl
-			asmtype.decl(self, ch, AsmReg.RealDiscard)
+			asmtype.Decl(self, ch, AsmReg.RealDiscard)
 		  else
 			.µ(ch, AsmReg.RealDiscard)
 
-	.Closevars(Closer)
-	return asmreg()
+	return H.Unhoist
 
 
 
@@ -343,7 +344,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 		|| T = d.WholeType
 		(t is param) = (d is param) // unused?
 		if (d isnt altered and param)
-			|| fi = d.FatConst
+			|| fi = d.FatConstIndex
 				|| f = fi|uint|.fat
 				if f is ConstOutput
 					(T is ConstOutput)
@@ -422,7 +423,7 @@ function BoolNot (fn_asm)							// !a
 	|| src = .µGetASM(exp, dest)
 	if src is AlreadyNegated
 		return src
-	return .exists(dest, src, exp)
+	return .Exists(dest, src, exp)
 	
 
 function BitNot (fn_asm)							// ~a
@@ -531,8 +532,6 @@ function DoMath (fn_asm)
 			return .DoMathSub(exp, dest, fn)
 	error (op, "No ASM for this operator?")
 	debugger // what?
-		
-
 
 
 
@@ -545,7 +544,7 @@ function Unexpected		(fn_asm)
 		|| f = exp.func|int|
 			exp.asmtype = f
 			return .µGetASM(exp, dest)
-	error  (exp, "bad ASMType")
+	error (exp, "bad ASMType")
 }
 
 
@@ -561,7 +560,6 @@ function ExistingVar (|message| m, |bool| ForReturn=false,  |asmreg|)
 		fn = m.func
 	if fn == @thg
 		return .ASMLocal(m, forreturn, ASMReg.FromExistingVar)
-	
 
 
 function Str (fn_asm)
@@ -570,7 +568,6 @@ function Str (fn_asm)
 	|| real = exp.name|messageid|
 	dest.µtype = datatypecode._voidptr
 	return exp.gstr(dest, 0, real.ID) * dest // seems good!
-
 
 
 helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
@@ -607,7 +604,7 @@ function ASMLocal (|message| s, |bool| ForReturn, |asmreg| extra, |asmreg|)
 	|| d = s.ASMDecl
 	if d is local
 		rz = d.WholeType as extra
-		if forreturn and d isnt ReturnedVar
+		if ForReturn and d isnt ReturnedVar
 			.fn.ReturnedVars++
 			(d is ReturnedVar)
 }
@@ -617,12 +614,12 @@ function ASMLocal (|message| s, |bool| ForReturn, |asmreg| extra, |asmreg|)
 function message.HasAsmStuff (|bool|)
 	opt norefcounts
 	for ch in self
-		|| fn = ch.brafunc
+		|| fn = ch.BraFunc
 		if fn != @sheb and @num and @char
 			return true
 
 
-function message.brafunc (|syntax|)
+function message.BraFunc (|syntax|)
 	opt norefcounts
 	while self
 		|| fn = .func
@@ -707,4 +704,3 @@ function fatasm.FuncPrmBits (|uint64|)
 			exit
 	// ffff(r4, r3, r2, r1)
 	
-

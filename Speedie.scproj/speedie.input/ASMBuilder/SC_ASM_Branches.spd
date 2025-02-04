@@ -16,7 +16,7 @@ function ArgOrIfSub (|message?| other, |asmreg|)
 		|| T = other.asmtype
 		if T != asmtype.kif
 			if other != @arg
-				other = other.first
+				other = other.first!
 			  else
 				debugger
 			return ASMType.ARG(self, other)
@@ -81,7 +81,7 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 function While (fn_asm)
 	opt norefcounts
 	|| BEGIN = exp.JUMP(0)							// jump to end... THEN EMIT arg and jump back.
-	ASMType.arg(self, exp.second)					// arg
+	ASMType.arg(self, exp.second!)					// arg
 
 	|fatrange| LOOP_TEST
 	|| LT = .Branch(exp.first!, true, loop_test)

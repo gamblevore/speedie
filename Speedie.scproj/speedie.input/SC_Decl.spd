@@ -83,7 +83,6 @@ datatype SCDeclInfo (int)
 		SelfImplicit = Self + local // local is set by CollectOneParam, anyhow?
 		DclCopied    = altered + stayborrowed + api + UpgradeableContained + compilercreated + body// need more too? do later
 
-
 	function Set (|SCDeclInfo| d, |bool| b, |SCDeclInfo|)
 		if b
 			return self ||| d
@@ -113,7 +112,7 @@ class SCDecl (SCNamed) {
 	|Byte|				PointerCount
 	|byte| 				NilReg
 	|byte| 				NilAllocDepth
-	|int|				FatConst
+	|int|				FatConstIndex
 
 	
 	constructor (|scclass| type)
