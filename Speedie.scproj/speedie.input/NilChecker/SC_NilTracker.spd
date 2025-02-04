@@ -290,9 +290,13 @@ struct ArchonPurger
 			.LaunchMothershipSub(old)
 			SCFunction.currfunc = nil
 		
-		function LaunchMothershipSub (|errorreceiver| old)
+		function LaunchMothershipSub (|ErrorReceiver| old)
 			opt norefcounts
 			|| Rec = ErrorReceiver()
+			|| On = compiler.confmsg["nil_check"].Yes(True)
+			if !on
+				rec.LowerErrorsTo = ErrorSeverity.Warning
+
 			using rec
 				for (xoxo in compiler.funclist) (i)
 					.ExterminateZergBugs(xoxo)

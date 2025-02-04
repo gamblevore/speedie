@@ -293,6 +293,8 @@ struct Random;
 
 struct RetroFloat;
 
+struct SC_Hoister;
+
 struct SpeedTester;
 
 struct StringDigitIterator;
@@ -775,6 +777,12 @@ struct Random {
 	uint64 State;
 };
 
+struct SC_Hoister {
+	SCDecl* Items[6];
+	uint64 Closer;
+	int Count;
+};
+
 struct StructSaveTest {
 	Saveable* Sav;
 	int64 Intt;
@@ -783,19 +791,19 @@ struct StructSaveTest {
 
 struct ASMState {
 	u16 BasicBlock;
+	DataTypeCode ReturnASM;
 	byte VDecls;
 	byte VTmps;
-	DataTypeCode ReturnASM;
 	bool OK;
 	bool Inited;
 	byte ReturnDest;
 	FuncInASM* Out;
 	FatASM* FuncStart;
 	FatASM* Start;
-	SCFunction* Fn;
-	SCDecl* Vars[32];
 	FatASM* Curr;
 	FatASM* End;
+	SCFunction* Fn;
+	SCDecl* Vars[32];
 	FatASM Zero;
 };
 
@@ -848,17 +856,17 @@ struct ErrorReceiver_Behaviour: Object_Behaviour {
 };
 
 JBClass ( JB_ErrorReceiver , JB_Object , 
-	int LowerErrorsTo;
+	int MaxErrors;
 	JB_Object* _LogObj;
 	JB_String* Source;
-	JB_Error* Errors;
 	FP_fnErrorLogger _LogFunc;
-	int MaxErrors;
-	int MaxProblems;
-	int ErrorCount;
-	int ProblemCount;
+	JB_Error* Errors;
 	int WarnCount;
+	int ProblemCount;
+	int ErrorCount;
+	int MaxProblems;
 	bool BlockErrors;
+	ErrorSeverity LowerErrorsTo;
 );
 
 struct FastString_Behaviour: Object_Behaviour {
@@ -1185,7 +1193,7 @@ JBClass ( SCDecl , SCNamed ,
 	DataTypeCode DataType;
 	SCDeclInfo Info;
 	int C_Array;
-	int FatConst;
+	int FatConstIndex;
 	SCClass* Type;
 	uint64 ExportPosition;
 	SCFunction* HiderFunc;
@@ -1525,18 +1533,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2157])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2158])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2158])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2159])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2159])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2160])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2156])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2157])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2159])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2160])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2160])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2161])
 
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
@@ -1627,6 +1635,7 @@ extern bool SC__Options_ModeCpp;
 extern bool SC__Options_ModePack;
 #define kSC__Options_native ((int)1)
 
+extern byte SC__Options_NilStrength;
 extern bool SC__Options_NilTestAllocNeverFails;
 extern byte SC__Options_OperationCount;
 extern byte SC__Options_Optimise;
@@ -1767,7 +1776,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2165])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2166])
 
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
@@ -1805,7 +1814,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2161])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2162])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1843,7 +1852,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2166])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2167])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2079,12 +2088,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2164])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2165])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2163])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2164])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2162])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2163])
 
 #define kJB__byte_max ((byte)255)
 
@@ -3073,6 +3082,8 @@ extern MWrap* SC__Pac_JSMSpace;
 
 #define kSC__Pac_kExit ((int)255)
 
+#define kSC__Pac_MinHoistScore ((int)3)
+
 extern ASMState SC__Pac_Sh;
 extern Array* SC__Cpp_Cpp_Includes;
 extern Array* SC__Cpp_Cpp_Input;
@@ -3098,7 +3109,7 @@ extern bool SC__Cpp_WroteAny;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2155])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2156])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -6684,6 +6695,15 @@ int JB_Rnd__InitCode_();
 // JB_RetroFloat
 
 
+// JB_SC_Hoister
+void SC_Hoi_HoistReg(SC_Hoister* Self, Message* Prop, SCDecl* Decl);
+
+void SC_Hoi_PreCheck(SC_Hoister* Self, Message* Exp, int Score);
+
+ASMReg SC_Hoi_Unhoist(SC_Hoister* Self);
+
+
+
 // JB_SpeedTester
 
 
@@ -6768,7 +6788,7 @@ ASMReg SC_Pac_CallFunc(ASMState* Self, Message* Exp, ASMReg Dest, SCFunction* Fn
 
 bool SC_Pac_CanReuseInput(ASMState* Self, Message* Prms, ASMReg Dest, int Vr);
 
-void SC_Pac_CloseVars(ASMState* Self, uint64 V);
+ASMReg SC_Pac_CloseVars(ASMState* Self, uint64 V);
 
 ASMReg SC_Pac_Compare(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp, int Mode);
 
@@ -7502,7 +7522,7 @@ int JB_Rec__Init_();
 
 void JB_Rec__NewErrorWithNode(Message* Node, JB_String* Desc, JB_String* Path);
 
-void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, int Sev);
+void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, uint /*ErrorSeverity*/ Sev);
 
 void JB_Rec__NewProblem(Message* Node, JB_String* Desc, JB_String* Path);
 
@@ -8777,7 +8797,7 @@ void JB_Msg_Bra__(Message* Self, FastString* Fs);
 
 SCDecl* SC_Msg_BraDeclfind(Message* Self);
 
-Syntax SC_Msg_brafunc(Message* Self);
+Syntax SC_Msg_BraFunc(Message* Self);
 
 void JB_Msg_BRel__(Message* Self, FastString* Fs);
 
@@ -9773,6 +9793,8 @@ ASMReg SC_Decl_CalculateASMType(SCDecl* Self);
 int SC_Decl_CalculateSize(SCDecl* Self, int Depth);
 
 bool SC_Decl_CanCompare(SCDecl* Self, SCDecl* Against, bool AsEquals);
+
+bool SC_Decl_CanHoist(SCDecl* Self);
 
 bool SC_Decl_CanNilCheck(SCDecl* Self);
 

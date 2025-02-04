@@ -11,10 +11,10 @@ extend_module ErrorReceiver
 		cpp_part NewErrorWithNode
 		.NewErrorSub(node, desc, path, ErrorSeverity.Error)
 
-	helper NewErrorSub (|Message| node, |string?| Desc, |string?| path, |int| sev)
+	helper NewErrorSub (|Message| node, |string?| Desc, |string?| path, |errorseverity| sev)
 		opt norefcounts
 		|| Lower = stderr.LowerErrorsTo
-			sev = lower min sev
+			sev = lower|int| min sev
 		if stderr.CanAddMore(sev)
 			if desc == nil
 				desc = node.MiniName("Unexpected ")

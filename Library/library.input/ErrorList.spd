@@ -21,7 +21,7 @@ class ErrorReceiver
 	|int|					ErrorCount
 	|int|					ProblemCount
 	|int|					WarnCount
-	|int|					LowerErrorsTo
+	|ErrorSeverity|			LowerErrorsTo
 	|bool|					BlockErrors
 	|string|				Source
 

@@ -44,6 +44,7 @@ module Options
 	|byte|	OperationCount			= 0
 	|byte|	PerryOutput				= 0
 	|byte|	UseScriptLoc			= 0
+	|byte|  NilStrength				= errorseverity.error
 	
 	function Color (assigns:|bool|)
 		ErrorColors.enabled = Value
