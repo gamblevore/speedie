@@ -446,7 +446,7 @@ function Message.BunchlessFix
 
 function Create_JeeboxTest (|Message| msg)
 	using (ErrorReceiver.new)
-		|| f = Compiler.InputFile( "self_test.txt", nil )
+		|| f = Compiler.InputFile("self_test.txt", nil )
 		expect (f!=nil) "self_test.txt can’t be found."
 		|| s = f.ReadAll
 		if msg ~= "__SELF_TEST_JBIN__"

@@ -127,12 +127,18 @@ struct FatASM
 
 	function asmreg.treg (|uint|)
 		return .reg ||| ((self is Temp)<<31)
+
+	function RegInput (|int| a, assigns:|asmreg| info)
+		cpp_part Prm
+		opt inline
+		.r[a] = info.treg
+//		|| Src = info.fat
+//			Src.LinkedFrom(self) // what?
 	
 	
 	function Dest (|uint| a, |asmreg| info)
 		opt inline
 		.reginput(A) = info
-		.outputs |= 1<<a
 	
 	
 	function File (|string|)
@@ -147,12 +153,6 @@ struct FatASM
 		nil|errorreceiver| <~ err
 		.DebugPrint
 	
-
-	function RegInput (|int| a, assigns:|asmreg| info)
-		cpp_part Prm
-		opt inline
-		.r[a] = info.treg
-
 	function NumInput (|int| a, assigns:|int| v)
 		.r[a] = v
 

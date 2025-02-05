@@ -80,6 +80,49 @@ struct ASMState
 				.NopConst(r)
 				return v.Log2+1
 
+
+	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
+		if dest isnt discard
+			dest = .TempTyped(exp, dest)
+		if togrow.isint and value.CanStoreAsIntImmediate
+			return exp.ADPK(dest, ToGrow, Value) * Dest
+		.Assign(dest, ToGrow, exp)
+		rz = .IncrPre(exp, togrow, ToGrow, value)
+
+
+	function AddToReg (|message| exp, |asmreg| Dest, |asmreg| Orig, |int64| Amount, |asmreg|)
+		if !dest or dest == asmreg()
+			dest.µtype = orig.µtype
+		dest = .temponly(exp, dest)
+		|| Where = orig • dest
+		(where is realconst)
+		|| K = .NumToReg(exp, amount, where, orig.µtype)
+		return .Plus(dest, Orig, K, exp)
+	
+	
+	function IncrPre (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
+		if !src.reg // what?
+		if !dest.reg
+			dest = src
+		src = .addtoreg(exp, src, src, value) 
+		if dest.reg==src.reg
+			return src
+		return .Assign(dest, src, exp)
+
+
+	syntax append (|int| code, |message| dbg, |&FatASM|)
+		cpp_part RequestOp
+		|| p = .curr
+		if p < .end
+			.curr = p + 1
+			P.op = code
+			p.debug = dbg
+			p.BlockNum = .BasicBlock
+			return p
+		.OK = false
+		return .start
+
+
 	syntax expect (|message?| where=nil, |string| msg)
 		cpp_part Fail
 		|| f = scfunction.currfunc!.asm
@@ -128,7 +171,6 @@ struct ASMState
 		(t isnt realconst) // why would it be?
 		(t is temp)
 		return t
-
 	
 	function Nop (|asmreg| R)
 		|| f = r.fat
@@ -160,30 +202,31 @@ struct ASMState
 		if R == C
 			.curr = C // nice
 
+//	function Nop (|fatrange| R)
+//		.nop(r.start, r.after!)
+
 
 	function Nop (|fatasm| Start, |fatasm| After)
 		while start < After
 			.nop(--after)
-
+			
+		
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	function µBoolInto (|message| exp, |AsmReg| Dest, |asmreg|)
-		target ASMNightmare {
 		|| X = .ExistingVar(Exp)
 		X ?= .µInto(exp, dest)
 		if  (X.µtype isnt bool)  or  (dest is negate  and  X isnt AlreadyNegated)
 			return .exists(dest as (X bitand asmreg.fromexistingvar), X, exp)
 		return .Assign(dest, X, exp)
-		}
 
 
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
-		target ASMNightmare {
-
 		|| rz = .µ(Exp, dest)
 		|| dest2 = rz.reg(dest)
 		(dest2 is temp) = (dest is temp)
 		return .Assign(Dest2, rz, exp)
-		}
+
 		
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		description "Same as µGetASM, except this closes temp vars for reuse." 
@@ -231,38 +274,6 @@ struct ASMState
 //				|| x4 = x3.fn
 	
 
-	target ASMNightmare {
-	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
-		if dest isnt discard
-			dest = .TempTyped(exp, dest)
-		if ToGrow.isint and value.CanStoreAsIntImmediate
-			return exp.ADPK(dest, ToGrow, Value) * Dest
-		.Assign(dest, ToGrow, exp)
-		rz = .IncrPre(exp, togrow, ToGrow, value)
-
-
-	function AddToReg (|message| exp, |asmreg| Dest, |asmreg| Orig, |int64| Amount, |asmreg|)
-		if !dest or dest == asmreg()
-			dest.µtype = orig.µtype
-		dest = .temponly(exp, dest)
-		|| Where = orig • dest
-		(where is realconst)
-		|| K = .NumToReg(exp, amount, where, orig.µtype)
-		return .Plus(dest, Orig, K, exp)
-	
-	
-	function IncrPre (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
-		if !src.reg // what?
-		if !dest.reg
-			dest = src
-		src = .addtoreg(exp, src, src, value) 
-		if dest.reg==src.reg
-			return src
-		return .Assign(dest, src, exp)
-
-		
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 	function FuncPrm (|message| prm, |asmreg|)
 		|| r = .ExistingVar(prm)
 			return r
@@ -302,16 +313,13 @@ struct ASMState
 			base = .AddToReg(exp, asmreg(), base as asmreg.noscale, index)
 			index = 0
 		
-		target ASMNightmare {
 		rz = exp.RD4U(dest, base, varadd, index, 0)
 		if dest is set
 			rz.op = ASMType.WriteASM[bytes]
 		  else
 			|| B = (bytes<<1) + t.issigned
 			rz.op = ASMType.ReadASM[b]
-		} else {
-			rz = ASMState.sh.Zero
-		}
+
 
 	function Read (|asmreg| dest, |message| exp,  |asmreg| ptr,  |asmreg| varadd,  |int| index=0,  |&fatasm|)
 		opt inline
@@ -386,7 +394,7 @@ struct ASMState
 		rz = Dest.Simplify
 		if !rz.reg
 			(rz is constoutput)
-	}
+
 
 	function PackMakerInit (|bool|)
 		opt norefcounts
@@ -438,9 +446,7 @@ struct ASMState
 		|| l = .last
 		if !l.IsFinisher
 			expect (!.fn.returntype) ("ASMReturn".internal) // why?
-			target ASMNightmare {
-			|| fat = .fn.SourceArg!.RET(asmreg(), asmreg(), asmreg(), 0, asmreg())
-			}
+			.fn.SourceArg!.RET(asmreg(), asmreg(), asmreg(), 0, asmreg())
 		.SetLength
 		.ImproveJumps
 
@@ -501,26 +507,23 @@ struct ASMState
 
 
 	function IsASMConst (|message| exp, |bool|)
-		target ASMNightmare {
 		|| fn = exp.func
 		if fn == @num
 			return true
 		if fn == @thg // now what?
 			return ASMType.ThgSub(self, exp, ASMReg.ConstRequest)
-		}
 	
 	
 	function CanReuseInput (|message| Prms, |asmreg| Dest, |int| vr,  |bool|)
 		opt norefcounts
-		target ASMNightmare {
+	
 		require (dest.reg == vr)
 		for p.fast in prms
 			// check for the address of the same var?
 			if .ExistingVar(p).reg == vr
 				require !rz
 				rz = true
-		}
-		
+	
 	
 	function TryInline (|message| prms, |asmreg| dest, |µFunc| asm, |bool|)
 	// how to do addr of reg?
@@ -549,7 +552,6 @@ struct ASMState
 	
 		
 	function TryInlineSub (|message| prms, |asmreg| dest, |scfunction| fn, |bool|)
-		target ASMNightmare {
 		opt norefcounts
 		|| p = prms.first
 		for a in fn.Args
@@ -566,7 +568,6 @@ struct ASMState
 			p++
 		
 		ASMType.arg(self, fn.SourceArg!, ASMReg())
-		}
 		return true
 	
 	
@@ -613,7 +614,6 @@ function SCFunction.HasCVersion (|bool|)
 	return true
 
 
-target ASMNightmare {
 
 function asmstate.RegsBitClear (|message| exp, |int| RegAddrs, |scfunction| fn)
 	opt norefcounts
@@ -651,7 +651,6 @@ function @ASMType.DoFunction (fn_asm)
 		.RegsBitClear(exp, RegAddrs, fn)
 		
 	return fat * dest
-}
 
 
 // Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:4

@@ -54,9 +54,7 @@ extend_module ArchonPurger {
 	function TrackerDummies
 		for i in 64
 			NilTable[i]     ?= &Dummy
-			target ASMNightmare {
 			fn_asm_table[i] ?= &ASMType.unexpected
-			}
 
 
 
@@ -122,9 +120,10 @@ function PropertyToFunc (|message!| dot, |scfunction!| fn, |nilstate|)
 	dot.memorylayer.use
 	dot.First = message(nil, @thg, dot.position, fn.exportname, 0)
 	return nilstate.real
+	
 
 
-function UseChildAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason, |NilState|) 	// a.b, a[0], (a)()
+function UseChildAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason, |NilState|) 	// a.b, *a, a[0], (a)()
 	opt norefcounts
 
 	|| dcl = msg.FastDecl
@@ -135,16 +134,16 @@ function UseChildAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason,
 	debugger // what?
 
 
-function UseAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason, |NilState|) 		// a.b, a[0], (a)()
+function UseAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason, |NilState|) 	// a.b, *a, a[0], (a)()
 	return .UseAsRealSub(msg, test, reason, msg.fastdecl)
 
 
 function UseAsRealSub (|message| ch, |nilcheckmode| test, |nilreason| reason, |scdecl| dcl, |NilState|) 	// a.b, *a, a[0], (a)()
 	opt norefcounts
-	|| ChMode = NilCheckMode.AllowRegisterAddr * (reason is accessing)
+	|| chmode  = NilCheckMode.AllowRegisterAddr * (reason is accessing)
 	|| actual = .Jump(ch, chmode)
 	if actual is nilish
-		|| ddd = dcl.HiderFunc
+		|| ddd = dcl.hiderfunc
 		if ddd and (reason is property) and !ddd.isassigns and (test isnt assigns)				// OK... 
 			return .PropertyToFunc(ch.parent!, ddd)
 			
@@ -153,8 +152,9 @@ function UseAsRealSub (|message| ch, |nilcheckmode| test, |nilreason| reason, |s
 	|| nd = dcl.NilDeclared
 	if  test isnt active  or  test is soft
 		return nd
-	if nd.StatedReal and dcl.TypeSuffers
+	if nd.statedreal and dcl.typesuffers
 		return ch.RedundantDeclare(nd)
+
 	return nd
 
 

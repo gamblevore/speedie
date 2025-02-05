@@ -1,5 +1,4 @@
 
-target ASMNightmare {
 
 function fatasm.NOOP_Encoder (Asm_encoder)
 	curr[] = asm.noop << 24
@@ -263,12 +262,4 @@ function ConstifyBitSHL (fn_ASMConstifier)
 	return l.const|uint64| << r.const|uint64|
 
 
-} else {
-
-extend asmstate 
-	function SetConst (|message| exp, |int64| value, |asmreg| ml, |asmreg| Dest, |asmreg|)
-	function NumToReg (|message| exp, |int64| V, |asmreg| Reg, |datatypecode| SrcType, |asmreg|)
-
-
-}
 

@@ -29,9 +29,362 @@ function µfunc.Sanity
 	|| length = .length
 	if curr[-1].op or curr[length-1].op // bad
 
+	
+function SpdAssembler.Optimise (|µfunc| raw, |bool|)
+	// would be better if this actually kept track of if the overallsize
+	// is decreasing or not. If it is decreasing... we should allow limitless optimisation.
+	// because its already limited, by the size. Assuming we have the size.
+	// we'd need to do that by removing NOOPs and then calculating the new size.
+	raw.Sanity
+	|| Curr = raw.IR
+	.MarkBlocks(Curr, raw.length)
+	|| opts = 0
+	|| last = curr + raw.Length
+	while curr < last
+		|| x = .µOpt[curr.op]
+			|| p = curr.prev
+			|| n = curr.next
+			if (n or p) and (x)(curr, p, n)
+				opts++
+	raw.Sanity
+	return opts
+
 
 extend SpdAssembler {
 |int| 			OptPathCount
 |int[64]|		OptPaths
 |message[64]|	OptPathNames
+
+
+dispatch µOpt (|&fatasm| self, |?&fatasm| P, |?&fatasm| N, |bool|)
+	(ASM.FNC):		OptFunc
+//	(ASM.FNC3):		OptFunc
+		
+	(ASM.CNTC):		OptCount
+	(ASM.GTAB):		OptTabl
+
+	(ASM.SUB):		OptSubI
+	(ASM.ADD):		OptAddI
+	(ASM.FADD):		OptAddF
+	(ASM.FADK):		OptFADK
+	
+	(ASM.RET):		OptRet
+	(ASM.TERN):		OptTern
+	(ASM.BFLG):		OptBFLG
+	(ASM.BSHR):		OptShifting
+	(ASM.BSHS):		OptShifting
+	(ASM.BSHL):		OptShifting
+	(ASM.BAND):		OptBitAnd
+	(ASM.BOR ):		OptBitOr
+	(ASM.BNOT):		OptBitNot
+	(ASM.CMPF):		OptCompare
+	(ASM.CMPI):		OptCompare
+	
+	(ASM.JUMP):		OptJump // control flow?
+	(ASM.JMPI):		OptJumpC
+	(ASM.JMPF):		OptJumpC
+	(ASM.JMPN):		OptJumpE
+	(ASM.JMPE):		OptJumpE
+	(ASM.JBOR):		OptBra
+	(ASM.JBAN):		OptBra
+	255:		  OptNothing
+
+
+function OptNothing (fn_µopt) // do nothing
+
+
+function OptFunc (Fn_µOpt)
+	// TAILCALL
+	require N isa asm.ret
+	|| RetResult = N.r0
+	|| FuncResult = .r0
+	if RetResult == FuncResult // Return the result of this function
+		.op = asm.tail
+		OptPath "tail"
+		return n.optnop // what if something jumps to this?
+
+
+function OptSubI (Fn_µOpt)
+	if p 
+		|| op = p.op
+		if op == asm.bflg or asm.SUB or asm.ADD
+			return OptAddI(self, p, n)
+
+
+function OptAddI (Fn_µOpt)
+	|| out = .r0
+	if .match3_2(0)
+		if out == .r1 // a = a + 0
+			OptPath "add->nop"
+			return .optnop
+		
+		// a = b + 0
+		OptPath "add->boar"
+		.op = asm.bor // u1 = (u2|||u3)&~u4
+		.r4 = 0 // nice
+		return true
+	
+	require  p  and  !.r3
+	|| pout = p.r0
+	require (pout == .r1)
+
+	// c = d << k,  a = b + c  -->  a = b + (d << k)
+	if (p isa asm.BFLG)
+		require p.r4 and .match3_2(pout)			// unsigned
+		OptPath "add+bflg"
+		.r3 = p.r2
+		.r2 = p.r1
+		return true
+
+	if p isa asm.MULT // needs refcounts
+		// x2 = x1 * x1,  a = b + x2   -->   a = x1 * x1 + b
+		require .match3_2(pout)
+		OptPath "add+mult"
+		.op = asm.MULT
+		.r3 = .r1
+		.r2 = p.r2
+		.r1 = p.r1
+		return true
+
+
+function OptAddF (Fn_µOpt)
+	|| mout = .r0
+	|| a4 = .r3
+	// a = b + (c - c),   (a = b + 0 - 0)
+	if (a4 == .r2)	or (.match3_2(0) and !a4)
+		if mout == .r1 // a = a + 0
+			OptPath "fadd_nop"
+			return .optnop
+		
+		// a = b + 0
+		OptPath "fadd+0"
+		.op = asm.bor // u1 = (u2|||u3)&~u4
+		.r3 = 0 // nice
+		return true
+
+    // a*b + c --> MUL
+	require p  and  p.r4 == .r4		// Both are 64.  or both are 32
+	|| pout = p.r0
+	if p isa asm.FADD
+		require .match3_2(pout)
+		if !p.r3 and !.r2				// pa = p2 + p3,   f1 = pa - f4   <--   f1 = p2 + p3 - f4
+			OptPath "fadd+1"
+			.r2 = p.r2
+			.r1 = p.r1
+			return true
+		if !p.r2 and !.r3				// pa = p2 - p4,   f1 = pa + f3   <--   f1 = p2 + f3 - p4
+			OptPath "fadd+2"
+			.r3 = p.r3
+			.r1 = p.r1
+			return true
+
+	require !.r3
+	if p isa asm.FMUL				// x2 = x1 * x1,  a = b + x2   -->   a = x1 * x1 + b
+		require !.match3_2(pout)
+		OptPath "fmul"
+		.op = asm.FMUL
+		.r3 = .r1
+		.r2 = p.r2
+		.r1 = p.r1
+		return true
+
+
+// a1 = a2 << (a3+k4)
+function OptShifting (fn_µopt)   // can't really opt this unless registers contain consts...
+								 // I will rework to use refcounts+Consts
+	// we need to combine a bflg with this.
+	// bflg(same side only) + shift --> shift
+	|| k = .r2
+	require k.IsConst and !.r3
+	|| v = k.ConstValue
+	require v.IsPow2
+	|| l = v.log2
+	if l >= 63
+		|| o = .op
+		if o == asm.BSHL		// left
+			OptPath "BSHL"
+			.r2 = 0
+			.r3 = l
+		  else
+			OptPath "BSHR"
+			.r2 = l
+			.r3 = 0
+		.r4 = (o == asm.BSHS)|int|
+		.op = asm.BFLG
+		return true
+
+
+function OptBitNot (fn_µopt)
+	require (p isa ASM.bnot) and (n isa asm.band) and !n.r3
+	require !(.r2 ||| p.r2)
+
+	// this is such a pain... actually. to do at all.
+
+	|| nl = n.r1
+	|| nr = n.r2
+	|| x = p.r0
+	|| y = .r0
+	require  n.match3_2(x)  and  n.r1 == y
+	
+	if .has(x,y) or p.has(x,y)
+		|| a = p.r1
+		|| b = .r1
+		if x == a and y == b
+			//  x = ~y,  y = ~x		-->		z = ~y & ~~y	-->		z = 0
+			OptPath "bitnot_0"
+			n.op = asm.bor
+			n.r1 = 0
+			n.r2 = 0
+			return true
+		if x == a and y == a
+			//  x = ~x,  x = ~x		-->		Entire thing is a nop. Any other changes would corrupt.
+			OptPath "bitnot_nop"
+			p.optnop
+			.optnop
+			n.optnop
+			return true
+		
+		if x != y  and  y == a and b
+			//  x = ~y,  y = ~y		-->		z = ~~y & ~~y		-->		z = y
+			OptPath "bitnot_set"
+			n.op = asm.bor
+			n.r1 = y
+			n.r2 = 0
+			return true
+		
+		return false
+	
+	OptPath "bitnot_combine"	//  x = ~a,  y = ~b,  z = x & y 	-->		z = ~a & ~b
+	.r2 = p.r1
+	return true
+
+	// if the inputs are altered... they must be nopped, or else we get input corruption.
+	// nopping requres that nothing else uses it. refcount is 1.
+	// just dont do for now!
+	//  x = ~x,  y = ~y		-->		z = ~x & ~y		// need nop xy
+	//  x = ~a,  y = ~y		-->		z = ~a & ~y		// need nop y
+	//  x = ~x,  y = ~b		-->		z = ~x & ~b		// need nop x
+
+	//  x = ~x,  y = ~x		-->		z = ~x & ~x		// ?????
+
+	//  x = ~y,  y = ~b		-->		z = ~x & ~y		// ?????
+	
+	
+
+
+function OptBitAnd (fn_µopt)
+//  x = a & contig_k2 --> bflg(a,k2)   // optimises well
+	// lets find if one is a const...
+	require p
+	|| pout = p.r0
+
+
+function OptTern (fn_µopt)
+	if .r1 // if this reg is a const... then we can opt it to a BOAR
+
+
+
+function OptCompare (fn_µopt)
+
+
+
+//	* if x: {return a}, return b --> y = TERN(x,a,b)
+//		* also just with setting
+function OptJump (fn_µopt)
+// flowcontrol
+
+
+
+function OptJumpC (fn_µopt)
+// flowcontrol
+// if x: return true/false --> conditional return 
+// LUPU/LUPD
+
+function OptJumpE (fn_µopt)
+// flowcontrol
+// if x: return true/false --> conditional return 
+// LUPU/LUPD
+
+
+function OptBra (fn_µopt)
+// flowcontrol
+// if x: return true/false --> conditional return 
+// LUPU/LUPD
+
+
+function OptRet (fn_µopt)
+	// maybe easier to do from the ret?
+// flowcontrol
+// if x: return true/false --> conditional return 
+// LUPU/LUPD
+
+
+//	BFLD
+//		r1		r
+//		r2		r
+//		up		6
+//		down	6
+function OptBFLG (fn_µopt)
+// can merge two bflg... just add up + down!  Works with refcounts.  (if sign matches)
+//////  BFLG
+//	if (BFLD_Lu)
+//		i1 = ((i2 << up) >> down)
+//	  else
+//		u1 = ((u2 << up) >> down)
+
+
+function OptBitOr (fn_µopt)
+	require p			
+//	|| rr = r.reg,  || ll = l.reg
+//	if ll == 0							// swap
+//		swap (ll) (rr)
+//	  elseif (ll == rr)
+//		rr = 0							// same thing
+//	if rr == 0 and dd == ll
+//		debugger // we need to return the left asm. how to get it?
+//		return dest.fat						// no need
+	// boar:   u1  = (u2|||u3)&~u4
+
+
+
+function OptCount (Fn_µOpt)
+	// (addr+=n), cntc(addr, 0) --> cntc(addr, n)
+
+
+function OptTabl (Fn_µOpt)
+	// Glob = glob + 1-127 // --> cntc
+	
+
+function OptFADK (Fn_µOpt)	
+	// a = b + k1 + k2   -->   a = b + k3
+//	require p isa asm.fadk
+//	|| pout = p.out
+//	|| myin = .a
+//	if pout == myin
+//		OptPath "fadk()"
+//		|| add2 = p.b|int|.asfloat + .a|int|.asfloat
+//		// is this how we store consts in fadk? not just as a raw-const?
+//		// and what if the consts dont fit?
+//		// seems better to just add the raw numbers?
+//		.a = add2.AsInt
+//		return true
+
 }
+
+
+// a dead-code finder will remove old ops.
+
+// inlining do separately. opts better if we call .µ on inlinedfn... but within our range.
+// i guess returns can be replaced with sets... or turned to jumps, or eliminated
+
+
+// dead code removal... IDK?
+// we need to also opt a+0 into a
+// basically most of the quickopts I already did... need to be redone??
+// if (a+b==x)
+	//// do nothing
+// a = b
+
+
+///// And/OR can be optimised also... many tricks. Including terns, BAND, BOR, etc.
+/////

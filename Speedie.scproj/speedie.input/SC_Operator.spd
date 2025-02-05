@@ -130,7 +130,7 @@ module {
 	|scoperator|						And
 	|scoperator|						Or
 	|scoperator|						Assigns
-	|scoperator|						Negative= SCOperator.new(&asmstate.minus, opmode.Subtraction)	// -b... not a-b!
+	|scoperator| 						Negative= SCOperator.new(&asmstate.minus, opmode.Subtraction)	// -b... not a-b!
 	|scoperator| 						Subtract														// a-b!!
 	|scoperator| 						Bnot	= SCOperator.new(&asmstate.BitNot, opmode.Bit)
 	|scoperator|						LeftShift

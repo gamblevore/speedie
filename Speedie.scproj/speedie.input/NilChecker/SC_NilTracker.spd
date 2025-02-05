@@ -293,7 +293,8 @@ struct ArchonPurger
 		function LaunchMothershipSub (|ErrorReceiver| old)
 			opt norefcounts
 			|| Rec = ErrorReceiver()
-			if !compiler.ConfBool("nil_check")
+			|| On = compiler.confmsg["nil_check"].Yes(True)
+			if !on
 				rec.LowerErrorsTo = ErrorSeverity.Warning
 
 			using rec
