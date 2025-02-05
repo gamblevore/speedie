@@ -795,7 +795,8 @@ function CheckIsGoodLibrary
 function InputFile (|String| s, |message| where,  |File|)
 	expect !(s contains "../") (where, "Insecure path")
 	return .InputFileAlways(s)
-	
+
+
 function InputFileAlways (|String| s,  |File|)
 	opt norefcounts
 	// find the "highest" file...

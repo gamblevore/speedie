@@ -10,7 +10,6 @@ datatype TextLineFlags (uint16)
 		Last
 		AvoidLastChar
 		FakeMsg
-//		Selected
 
 
 class TextViewLine (list)
@@ -55,7 +54,6 @@ class TextViewLine (list)
 				pos -= name.length - 1
 				require .Text[pos, name]
 				rz = '\n'
-				
 		
 	function DrawRange (|ivec2|)
 		|| p = .position
@@ -128,15 +126,6 @@ class TextViewLine (list)
 			is fakemsg
 	
 	
-//	function @textviewline.FindLeak ()
-//		|| h = WhoLeakedme
-//			|| r = []
-//			JB_FindLeakedObject(r, r)
-//			if r
-//				printline r
-//				debugger
-
-	
 	helper range (|intrange|)
 		return (.position, .after)
 
@@ -150,7 +139,7 @@ class TextViewLine (list)
 		opt norefcounts
 		rz = .ColoriseSub2(srch)
 		|| r = rz
-		if !r or r.startsafter(.range)
+		if !r or r.StartsAfter(.range)
 			r = srch
 			while r
 				r = r.parent
@@ -302,8 +291,28 @@ class TextViewLine (list)
 		isnt last
 		return i
 
+
+helper textview.DrawErrorMark (|image| where, |textviewline| s, |vec4| C)
+	|| v = s.vline|float|
+	|float| N = ._lines.last!.vline|float|
+	|| Y = 1.0 - (v/n)
+	require y >= 0 and y <= 1.0
 	
-helper textview.DrawError (|image| Where, |int| y, |TextViewLine| D)
+	Y *= .height|float|
+	|| p = ivec2(.right - 5, .lastrect.y + Y|int|)
+	|| strength = .DrawScrollStrength
+	for i in -1 to 1
+		C.a = 0.4 * Strength
+		if i == 0
+			C.a = 0.8 * Strength
+		for xx in (p.x+4) downto (p.x-4)
+			|| px = where[xx,p.y+i]
+			px.overlay(C.premul)
+			C.a -= 0.04
+
+
+
+helper textview.DrawErrorBackground (|image| Where, |int| y, |TextViewLine| D)
 	opt norefcounts
 	|| e = d.LineError$
 	if (e is parse) and .ParsedMessage			// obviously it parsed ok.
@@ -316,7 +325,7 @@ helper textview.DrawError (|image| Where, |int| y, |TextViewLine| D)
 	|| lm= 0.225
 	|| v = e.color(lm)
 	if e == .myerror
-		v.a*=0.75
+		v.a *= 0.75
 
 	if d contains .sel1
 		.myerror = e
@@ -327,15 +336,6 @@ helper textview.DrawError (|image| Where, |int| y, |TextViewLine| D)
 		v.a = alpa min lm
 	where.DrawRect(r, v.px)
 
-
-//helper textview.DrawFound (|image| Where, |int| y, |TextViewLine| D)
-//	opt norefcounts
-//	|| r = .lastrect
-//	r.y	= y
-//	r.y2 = y + 2
-//	|| add = (0.15, 0.0)(d is currfound)
-//	|| v = (0.6+Add, 0.5+Add, 0.1+Add, 0.4).px
-//	where.DrawRect(r, v)
 
 
 helper textview.DrawLighter (|image| Where, |int| y)
@@ -385,7 +385,7 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 	|| GoUp = (7 - .lineheight)/2
 	if d.LineError
 		if .myerror 
-			.drawerror(where, y+GoUp, d)
+			.DrawErrorBackground(where, y+GoUp, d)
 		  else
 			d.LineError = nil // sigh. crappy bug fix
 
@@ -397,7 +397,7 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 
 	|| x	 = .DrawLineNumber(where, d, y, lc)-1
 	|| state = MsgTextDrawState(x, d)
-	|| NoDrawFirst = self is CodeEditor and d is breakpoint
+	|| NoDrawFirst =  self is CodeEditor  and  d is breakpoint
 		state.font.DrawChar('\18', Where, (x, y), nil)
 	
 	|codepoint| Prev
@@ -435,7 +435,7 @@ helper TextView.AutoLim (|textviewline| d, |bool|)
 
 helper TextView.FakeAutoComplete (|int|)
 	|| n = ._autocompleteback
-	if ._autocompletestring=="" or ._autocompletestring.length == n
+	if ._AutoCompleteString=="" or ._AutoCompleteString.length == n
 		return -1
 	return n
 

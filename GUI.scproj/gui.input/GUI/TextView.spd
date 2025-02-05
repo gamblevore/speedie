@@ -1649,39 +1649,26 @@ class TextView (GUIControl)
 		
 		.PrepareLinesOfText
 		.DrawPreparedText(where)
-		|| Sel = self is editable or alwaysscrollable
+		|| Sel = self is Editable or AlwaysScrollable
 			.DrawSel(where)
 		where.ControlClip = c			/// restore!
 
 		require  !.CanSeeAllLines and .DrawScrollStrength
-		if .MyError
-			.DrawScrollErrors(where)
+		if .MyError or (._Lines is breakpoint)
+			.DrawScrollMarks(where)
 		if sel
 			.DrawScroll(.slh, where)
 	
 	
-	helper DrawScrollErrors (|image| where)
+	helper DrawScrollMarks (|image| where)
 		opt norefcounts
-		|| strength = .DrawScrollStrength
-		require strength > 0
-		|float| N = ._lines.last!.vline|float|
+		require .DrawScrollStrength
 		for s in ._lines
 			|| E = s.LineError
-				|| v = s.vline|float|
-				|| Y = 1.0 - (v/n)
-				Y *= .height|float|
-				|| p = ivec2(.right - 5, .lastrect.y + Y|int|)
-				|| C = E.Severity.color
-				for i in -1 to 1
-					C.a = 0.4 * Strength
-					if i == 0
-						C.a = 0.8 * Strength
-					for xx in (p.x+4) downto (p.x-4)		// in 5
-						// || xx = p.x + j*((B*2)-1)
-						|| px = where[xx,p.y+i]
-						px.overlay(C.premul)
-						C.a -= 0.04
-
+				.DrawErrorMark(where, s, E.Severity.color)
+			  elseif s is BreakPoint
+				.DrawErrorMark(where, s, colors.purple)
+		
 		
 	helper DrawPreparedText (|image| where)
 		opt norefcounts
@@ -1690,7 +1677,6 @@ class TextView (GUIControl)
 		|| lc		= .LineNumColor
 		|| y		= (.lineheight|int| - font.height) + .lasttop
 		y -= 2
-//		y -= .isinline!=nil // not sure this works so well
 
 		|| yend		= .LastBottom
 		|| UseCol	= .UseColorAnyway
@@ -1982,14 +1968,18 @@ class TextView (GUIControl)
 		|| ARGH = 0 // .ReclaimRestart(d) // disabled for now.
 		|| t = d.tline
 		|| p = d.position
+		(._Lines isnt breakpoint)
 		
 		while
 			p = d.FindWhereLineBreaks(.text,  CharW,  .singleline!=0,  p)
 			t = d.InitDefaults(self, t)
 			if expect >= allowJeebox // didn't I use to have it on allowjeebox?
 				msg = d.colorise(msg, ParsedOK)
+			if d is breakpoint
+				(._Lines is breakpoint)
 			loop p >= 0
 			|| n = d.next
+				
 			if  true  or  !n  or  n.position < ._reclaim[1]
 				d = .nextvline(d, d, p)
 			  elseif p < ARGH
@@ -2003,6 +1993,7 @@ class TextView (GUIControl)
 
 	function EndPrepare (|TextViewLine| d, |bool| StayAtEnd, |int| pos)
 		opt norefcounts
+		(pos)
 		d.RemoveAfter
 		._PreferPrevLine = false
 		if StayAtEnd
