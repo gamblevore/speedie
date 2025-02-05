@@ -399,9 +399,9 @@ function @asmstate.PrintProgress (|message| exp=nil)
 	if exp
 		printline exp
 	  else
-		s.LastProgress = s.funcstart
-	|| Curr = s.LastProgress
+		s.LastDebug = s.funcstart
+	|| Curr = s.LastDebug
 	while curr < s.curr
 		curr.debugprint
 		curr++
-	s.LastProgress = curr
+	s.LastDebug = curr

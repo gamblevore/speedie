@@ -9,17 +9,19 @@ struct ASMState
 	|byte|						VTmps
 	|bool|						Inited
 	|byte|						ReturnDest
+
 	|µFunc|						Out
-	|&FatASM|					FuncStart
-	|&fatasm|					LastProgress
+	|scfunction!|				Fn    
+
 	|memory of fatasm|			JSM
+	|&FatASM|					FuncStart
+	|&fatasm|					LastDebug
 	|&FatASM|					Start		// a "slice" feature would be nice    
 	|&FatASM|					Curr    
 	|&FatASM|					End    
-	|scfunction!|				Fn    
+
 	|scdecl--[32]|				Vars
-// constants...
-	|FATASM| 					Zero
+	|FatASM| 					Zero
 
 	constants
 		kContinue		= 254
@@ -39,8 +41,6 @@ struct ASMState
 		|| top = .vdecls
 		|| d = v.high
 		while top > d
-			// remove NeverAltered and use .vars?
-//			.NeverAltered[top] = 0
 			.Vars[top] = nil
 			top--
 			
@@ -407,7 +407,7 @@ struct ASMState
 		.end = j.NeedSpare(64K, j.itemcount)
 		.start = j.ptr + j.Length
 		.curr = .start
-		.LastProgress = .curr
+		.LastDebug = .curr
 		.FuncStart = .curr
 		.out = fn.asm ?? µfunc(fn)
 		.fn = fn
@@ -460,6 +460,7 @@ struct ASMState
 
 	function SetLength
 		.out.length = .curr - .FuncStart
+		.jsm.ItemCount = .start - .curr
 		
 		
 	function SmartSecretFat (|asmreg| Thg, |&fatasm|)

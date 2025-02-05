@@ -13,7 +13,7 @@ class Memory
 	|int|				ItemCount
 	|int|				Length
 	|&byte|				_Ptr
-	|uint16|			ItemSize
+	|uint|				ItemSize
 	|byte|				DeathAction
 	contains byte
 	

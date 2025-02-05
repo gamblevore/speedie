@@ -797,13 +797,13 @@ struct ASMState {
 	bool Inited;
 	byte ReturnDest;
 	FuncInASM* Out;
-	FatASM* FuncStart;
-	FatASM* LastProgress;
+	SCFunction* Fn;
 	MWrap* JSM;
+	FatASM* FuncStart;
+	FatASM* LastDebug;
 	FatASM* Start;
 	FatASM* Curr;
 	FatASM* End;
-	SCFunction* Fn;
 	SCDecl* Vars[32];
 	FatASM Zero;
 };
@@ -916,10 +916,10 @@ struct Memory_Behaviour: Object_Behaviour {
 };
 
 JBClass ( MWrap , JB_Object , 
-	int Length;
+	uint ItemSize;
 	byte* _Ptr;
 	int ItemCount;
-	u16 ItemSize;
+	int Length;
 	byte DeathAction;
 );
 

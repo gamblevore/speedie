@@ -23055,8 +23055,8 @@ ASMReg SC_Pac_Decr(ASMState* Self) {
 
 void SC_Pac_Destructor(ASMState* Self) {
 	JB_Clear(Self->Out);
-	JB_Clear(Self->JSM);
 	JB_Clear(Self->Fn);
+	JB_Clear(Self->JSM);
 }
 
 ASMReg SC_Pac_DivFloat(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp) {
@@ -23362,7 +23362,7 @@ void SC_Pac_InitAndStartFunc(ASMState* Self, SCFunction* Fn) {
 	Self->End = ((FatASM*)JB_Mrap_NeedSpare(J, 65536, J->ItemCount));
 	Self->Start = (((FatASM*)JB_Mrap_Ptr(J)) + J->Length);
 	Self->Curr = Self->Start;
-	Self->LastProgress = Self->Curr;
+	Self->LastDebug = Self->Curr;
 	Self->FuncStart = Self->Curr;
 	JB_SetRef(Self->Out, Fn->ASM);
 	iif (!Self->Out) {
@@ -24153,6 +24153,7 @@ bool SC_Pac_TextConst(ASMState* Self, Message* List, Message* Orig) {
 
 void SC_Pac_SetLength(ASMState* Self) {
 	Self->Out->Length = (Self->Curr - Self->FuncStart);
+	(JB_Mrap_ItemCountSet(Self->JSM, Self->Start - Self->Curr));
 }
 
 ASMReg SC_Pac_SHL(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp) {
@@ -58706,4 +58707,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 522133231545961806 -7287126166546990374
+// -2405519422846671456 -7287126166546990374
