@@ -794,11 +794,12 @@ struct ASMState {
 	DataTypeCode ReturnASM;
 	byte VDecls;
 	byte VTmps;
-	bool OK;
 	bool Inited;
 	byte ReturnDest;
 	FuncInASM* Out;
 	FatASM* FuncStart;
+	FatASM* LastProgress;
+	MWrap* JSM;
 	FatASM* Start;
 	FatASM* Curr;
 	FatASM* End;
@@ -917,7 +918,7 @@ struct Memory_Behaviour: Object_Behaviour {
 JBClass ( MWrap , JB_Object , 
 	int Length;
 	byte* _Ptr;
-	int BufferSize;
+	int ItemCount;
 	u16 ItemSize;
 	byte DeathAction;
 );
@@ -1098,9 +1099,8 @@ struct xC2xB5Func_Behaviour: Object_Behaviour {
 
 JBClass ( FuncInASM , JB_Object , 
 	int Length;
-	MWrap* Testing;
 	SCFunction* Fn;
-	FatASM* IR;
+	int Start;
 	bool OK;
 );
 
@@ -1533,18 +1533,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2159])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2160])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2160])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2161])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2161])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2162])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2158])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2159])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2161])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2162])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2162])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2163])
 
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
@@ -1776,7 +1776,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2167])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2168])
 
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
@@ -1814,7 +1814,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2163])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2164])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1852,7 +1852,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2168])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2169])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2088,12 +2088,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2166])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2167])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2165])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2166])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2164])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2165])
 
 #define kJB__byte_max ((byte)255)
 
@@ -3076,7 +3076,6 @@ extern IsaTester SC__IsaTester_T;
 #define JB__Saver_SaveableList JB__.Saver_SaveableList
 #define JB__Pico_Parent_ JB__.Pico_Parent_
 #define JB__Rnd_Shared JB__.Rnd_Shared
-extern Array* SC__Pac_Ancients;
 extern MWrap* SC__Pac_JSMSpace;
 #define kSC__Pac_kContinue ((int)254)
 
@@ -3109,7 +3108,7 @@ extern bool SC__Cpp_WroteAny;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2157])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2158])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -4110,8 +4109,6 @@ void SC_SC_Targets__SyntaxAccessSet(JB_String* Name, bool Value);
 
 // SpdAssembler
 bool SC_SpdAssembler__GenerateASM(SCFunction* Fn);
-
-bool SC_SpdAssembler__GenerateASMSub(SCFunction* Fn);
 
 void SC_SpdAssembler__Guard();
 
@@ -6740,8 +6737,6 @@ void SC_Pac_AddLabel(ASMState* Self, Message* Ch);
 
 ASMReg SC_Pac_AddToReg(ASMState* Self, Message* Exp, ASMReg Dest, ASMReg Orig, int64 Amount);
 
-bool SC_Pac_Alloc(ASMState* Self, MWrap* J);
-
 ASMReg SC_Pac_ArgOrIf(ASMState* Self, Message* Other);
 
 ASMReg SC_Pac_ArgOrIfSub(ASMState* Self, Message* Other);
@@ -6854,6 +6849,8 @@ ASMReg SC_Pac_IncrPost(ASMState* Self, Message* Exp, ASMReg Dest, ASMReg ToGrow,
 
 ASMReg SC_Pac_IncrPre(ASMState* Self, Message* Exp, ASMReg Dest, ASMReg Src, int64 Value);
 
+int SC_Pac_Index(ASMState* Self);
+
 void SC_Pac_InitAndStartFunc(ASMState* Self, SCFunction* Fn);
 
 bool SC_Pac_InlineAddK(ASMState* Self, ASMReg L, int64 R, ASMReg Dest);
@@ -6920,7 +6917,7 @@ ASMReg SC_Pac_NumToReg(ASMState* Self, Message* Exp, int64 V, ASMReg Reg, uint /
 
 uint64 SC_Pac_OpenVars(ASMState* Self);
 
-bool SC_Pac_PackMakerInit(ASMState* Self);
+void SC_Pac_PackMakerInit(ASMState* Self);
 
 ASMReg SC_Pac_Plus(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
@@ -6978,7 +6975,7 @@ ASMReg SC_Pac_Str(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
 ASMReg SC_Pac_Subtract(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
-FatASM* SC_Pac_RequestOp(ASMState* Self, int Code, Message* Dbg);
+FatASM* SC_Pac_RequestOp(ASMState* Self, ASM Code, Message* Dbg);
 
 void SC_Pac_Fail(ASMState* Self, Message* Where, JB_String* Msg);
 
@@ -7011,8 +7008,6 @@ ASMReg SC_Pac_xC2xB5(ASMState* Self, Message* Exp, ASMReg Dest);
 ASMReg SC_Pac_xC2xB5BoolInto(ASMState* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_Pac_xC2xB5Into(ASMState* Self, Message* Exp, ASMReg Dest);
-
-bool SC_Pac__ExpandJSM();
 
 int SC_Pac__Init_();
 
@@ -7711,13 +7706,15 @@ MWrap* JB_Mrap_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Pt
 
 void JB_Mrap_Destructor(MWrap* Self);
 
+void JB_Mrap_ItemCountSet(MWrap* Self, int Value);
+
 void JB_Mrap_LengthSet(MWrap* Self, int Value);
+
+byte* JB_Mrap_NeedSpare(MWrap* Self, int ReqItems, int Extra);
 
 byte* JB_Mrap_Ptr(MWrap* Self);
 
-bool JB_Mrap_SetSize(MWrap* Self, int Value);
-
-void JB_Mrap_SizeSet(MWrap* Self, int Value);
+bool JB_Mrap_SetCount(MWrap* Self, int ItemCount);
 
 Array* JB_Mrap__CollectLeaks_(JB_Object* Self);
 
@@ -8366,11 +8363,13 @@ xC2xB5Form* SC_xC2xB5Form__NeedForm(JB_String* Form, Message* M);
 
 
 // JB_µFunc
-FuncInASM* SC_FuncInASM_Constructor(FuncInASM* Self, SCFunction* Fn, FatASM* IR);
+FuncInASM* SC_FuncInASM_Constructor(FuncInASM* Self, SCFunction* Fn);
 
 void SC_FuncInASM_DebugPrint(FuncInASM* Self);
 
 void SC_FuncInASM_Destructor(FuncInASM* Self);
+
+FatASM* SC_FuncInASM_IR(FuncInASM* Self);
 
 ASM* SC_FuncInASM_MuRender(FuncInASM* Self, ASM* Where, ASM* After);
 

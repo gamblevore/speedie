@@ -16,7 +16,7 @@ class Image (memory)
 		cpp_Part ConstructorPointer
 		super.constructor(s.area, 4, P)
 		.name = name
-		.length = .buffersize 
+		.length = .itemcount 
 		.SizeInfo = s
 	
 
@@ -129,14 +129,14 @@ class Image (memory)
 	
 	function ResizeTo (|ivec2| value, |bool|)
 		|| N = value.area
-		if .buffersize == n // same already
+		if .itemcount == n // same already
 			.length = n
 			.sizeinfo = value
 			return true
 		
 		// !.deathaction means our memory is externally managed, so we assume its already been resized.
-		if !.deathaction  or .setsize(N)
-			.buffersize = n // setcap might not be called if !.deathaction
+		if !.deathaction  or .setcount(N)
+			.itemcount = n // setcap might not be called if !.deathaction
 			.length = n
 			.SizeInfo = value
 			return true
@@ -179,7 +179,7 @@ class Image (memory)
 	function Colorise (|Memory| data, |float| strength=1)
 		require strength > 0
 		|| in = data.ptr
-		|| after = data.after
+		|| after = data.Next
 		|| w = ((strength)~gray).PreMul
 		|premultipliedcolor| c
 		|| Top = .ControlClip.y2 & 1
@@ -384,7 +384,7 @@ class Image (memory)
 	
 	function LoadEmpty (|int| W, |int| H, |bool|)
 		if (.size.x != W or .size.y != h)
-			.buffersize = w * h
+			.itemcount = w * h
 			.SizeInfo = (w,h)
 		return .Pixels
 	

@@ -11,7 +11,6 @@ function message.operatormul (|asm| op, |&fatasm|)
 		p.BlockNum = a.BasicBlock
 		return p
 	error (self, "Function too large (over 64K)")
-	a.OK = false
 	return a.start
 
 

@@ -5,35 +5,33 @@ class µFunc
 		cpp_class FuncInASM
 		cpp_part FuncInASM 
 	|scfunction|			Fn
-	|&FatASM|				IR
-	|?memory of asm|		Testing
+//	|&FatASM|				IR
+	|int|					Start
 	|int|					Length
 	|bool|					OK
 
-	constructor (|SCFunction| fn, |&FatASM| IR)
+	constructor (|SCFunction| fn)
 		.fn = fn
-		.IR = ir
+		.start = ASMState.sh.Index
 		fn.asm = self
 
 	function µTest (|memory of asm|)
 		description "Generate some code (only for testing)."
-		if .testing
-			return .testing
-		rz = asm[.length*3]$
-		.testing = rz
-		rz.length = rz.buffersize
+		rz = asm[.length*3]!
 		|| p = rz.ptr
-		|| after = .MuRender(P, P+rz.length)
-		rz.size = after-p
+		|| after = .MuRender(P, P+rz.itemCount)
+		rz.itemcount = after-p
+		rz.length = rz.itemcount
 	
 	// cosmic lore unfold... into tales untold
 
+	function IR (|&fatasm|)
+		return ASMState.sh.start + .start
 	
 	function MuRender (|!&ASM| Where, |!&asm| After, |!&asm|)
 		|uint64| HasLabel
 		rz = where
-		for i in .length
-			|| fat = .ir+i
+		for (fat in self) (i)
 			haslabel |= fat.jumpreg << (i&63)
 			fat.ASMIndex = rz - where
 			fat.CheckHasOutput
@@ -94,10 +92,11 @@ class µFunc
 
 
 	iterator
-		|| CurrInst = .IR
+		|| FirstInst = .IR
+		|| CurrInst = FirstInst
 		|| AfterInst = Currinst + .length
 		while currinst < Afterinst
-			yield currinst
+			yield currinst (CurrInst - FirstInst)
 			++currinst
 
 

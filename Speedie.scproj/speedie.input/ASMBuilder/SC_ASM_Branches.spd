@@ -391,7 +391,6 @@ Struct FatRange
 
 
 function @asmstate.PrintProgress (|message| exp=nil)
-	target debug {
 	cpp_name adb
 	opt norefcounts
 	"---"
@@ -406,4 +405,3 @@ function @asmstate.PrintProgress (|message| exp=nil)
 		curr.debugprint
 		curr++
 	s.LastProgress = curr
-	}

@@ -24,7 +24,7 @@ class Memory
 		cpp_class MWrap
 		pragma noearlyfree
 	
-	|int|				BufferSize
+	|int|				ItemCount
 	|int|				Length
 	|&byte|				_Ptr
 	|uint16|			ItemSize
@@ -35,7 +35,7 @@ class Memory
 	constructor (|int| ItemCount, |int| ItemSize, |&byte| ptr, |byte| DeathAction=DataObject.kfree)
 		cpp_part ConstructorPtr
 		.ItemSize = ItemSize
-		.buffersize = itemcount
+		.ItemCount = itemcount
 		.deathaction = deathaction
 		.length = 0
 		._ptr = ptr
@@ -43,7 +43,7 @@ class Memory
 	
 	function UseExternalPointer (|&nil| P, |int| ItemCount, |int| ItemSize)
 		.ItemSize = ItemSize
-		.buffersize = itemcount
+		.ItemCount = itemcount
 		if .deathaction == dataobject.kfree
 			Memory.free(._ptr)
 		.deathaction = 0
@@ -53,21 +53,18 @@ class Memory
 	function Ptr (|&...|)
 		return ._ptr|&...|
 		
-	function After (|&...|)
+	function Next (|&...|)
 		return (._ptr + .BytesUsed)|&...|
 		
 	setter Length (|int|)
-		if Value > .buffersize
-			value = .buffersize
+		if Value > .itemCount
+			value = .ItemCount
 		  elseif Value < 0
 			value = 0
 		.length = Value
 	
 	operator plus (|int|n, |&...|)
 		return (._ptr + .itemsize*n)|&...|
-	
-	function Place (|&...|)
-		return .operatorplus(.length)
 	
 	function Copy (|string| Src, |int|)
 		|| cap = .ByteCapacity min src.Length
@@ -99,7 +96,7 @@ class Memory
 		
 	function AppendPlace (|&...|)
 		|| L = .length
-		if (L >= .buffersize)
+		if (L >= .itemCount)
 			// try grow
 			|| NewSize = .itemsize*L*2
 			|| P2 = Memory.realloc(._ptr, NewSize)
@@ -116,35 +113,41 @@ class Memory
 	function Temporal
 		random.shared.temporal(self)
 	
-		
-	setter Size	(|int|)
-		.setsize(value) // shouldn't be necesary!!
-		// image(class) is setting .capacity but not coming here, even when called like: .capacity(n)
-
+	function Count (|int|)
+		debugger "Use .ItemCount"
 	
-	function SetSize (|int| value, |bool|)
+	setter ItemCount (|int|)
+		.SetCount(value)
+	
+	helper SetCount (|int| ItemCount, |bool|)
 		require .deathaction == DataObject.kfree
 		|| S = .itemsize|int|
-		|| old = S * .buffersize
-		|| New = S * value
+		|| old = S * .itemCount
+		|| New = S * ItemCount
 		if new == old
 			return true // right?
 		|| Mem = Memory.realloc(._ptr, New)
 			._ptr = mem
-			.buffersize = Value
-			if value < .length
-				.length = value
+			.itemCount = ItemCount
+			if ItemCount < .length
+				.length = ItemCount
 			if New > Old
 				memory.Zero((mem+old), New-Old)
 			return true
 		error (self, "Can't allocate enough bytes: " + new.render)
 
+	function NeedSpare (|int| ReqItems, |int| Extra = 0,  |&...|)
+		|| Q = .length + reqitems
+		if .ItemCount < Q
+			require .SetCount(Q+Extra)
+		return (.ptr + .ItemCount*.itemsize)|&...|
+
+
 	function HasSpare (|bool|)
-		return .Length < .buffersize
+		return .Length < .itemCount
 	
 	function ByteCapacity (|int|)
-		return .ItemSize|int|*.buffersize|int|
-	
+		return .ItemSize|int|*.ItemCount|int|
 	
 	function BytesUsed (|int|)
 		return .ItemSize|int|*.Length|int|

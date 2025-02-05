@@ -7,16 +7,12 @@ struct ASMState
 
 	|byte|						VDecls
 	|byte|						VTmps
-	|bool|						OK    
 	|bool|						Inited
 	|byte|						ReturnDest
-
-	target debug
-		|&fatasm|				LastProgress
-	|µFunc|						Out      
+	|µFunc|						Out
 	|&FatASM|					FuncStart
-	// we need to use indexes.
-	// So .curr and .start and .end are now all ints!
+	|&fatasm|					LastProgress
+	|memory of fatasm|			JSM
 	|&FatASM|					Start		// a "slice" feature would be nice    
 	|&FatASM|					Curr    
 	|&FatASM|					End    
@@ -33,7 +29,6 @@ struct ASMState
 
 	module
 		|FatASM[]|					JSMSpace = FatASM[0]!
-		|[memory of fatasm]|		Ancients
 		|ASMState|					Sh
 
 
@@ -57,7 +52,10 @@ struct ASMState
 		for a in fn.Args
 			(a is param) // reset
 			.DeclareMe(a.source, a)
-
+	
+	function Index (|int|)
+		return .curr - .start
+	
 	function Last (|&FatASM|)
 		return .curr - 1
 
@@ -387,47 +385,34 @@ struct ASMState
 			(rz is constoutput)
 
 
-	function PackMakerInit (|bool|)
+	function PackMakerInit
 		opt norefcounts
-		if .Inited
-			return true
-		.inited = true
-		VM_Builder.JustDefineInstructions
-		SpdAssembler.InitAss
-		return .alloc(ASMState.JSMSpace)
-
-
-	// we need to use indexes.
-	// So .curr and .start and .end are now all ints!
-	function Alloc (|memory of fatasm| j, |bool|)
-		if j.SetSize(4MB)
-			.start = j.ptr
-			.curr = .start
-			.end = j.buffersize + .start
-			spdassembler.Guard
-			Ancients <~ j
-			return true
-
-
+		if !.Inited
+			.inited = true
+			VM_Builder.JustDefineInstructions
+			SpdAssembler.InitAss
+	
+	
 	function InitAndStartFunc (|scfunction| fn)
-		if fn.ASM
-			.out = fn.asm!
-		  else
-			.out = µfunc(fn, .curr)
-		.zero = nil
-		.zero.info = AsmReg()
-		memory.Fill((&.vars[0])|&byte|, 32*8, 0)
-		.FuncStart = .curr
-		target debug
-			.LastProgress = .curr
-		.fn = fn
-		scfunction.currfunc = fn
-		.ReturnASM = fn.ReturnType.regtype
-		.OK = true
+		opt norefcounts
 		.ReturnDest = nil
 		.BasicBlock = 0
 		.VDecls = 0
 		.VTmps = 32
+		.zero = nil
+		.zero.info = AsmReg()
+		memory.Fill((&.vars[0])|&byte|, 32*8, 0)
+
+		|| j = .JSM init FatASM[256K]
+		.end = j.NeedSpare(64K, j.itemcount)
+		.start = j.ptr + j.Length
+		.curr = .start
+		.LastProgress = .curr
+		.FuncStart = .curr
+		.out = fn.asm ?? µfunc(fn)
+		.fn = fn
+		scfunction.currfunc = fn
+		.ReturnASM = fn.ReturnType.regtype
 		.AddFuncParams(fn)
 
 
@@ -647,15 +632,6 @@ function @ASMType.DoFunction (fn_asm)
 // Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:4
 // There are only 4 above 6!, only 14 above 5, 75 above 4
 // almost all lib functions have 4 or less. 5 is for proj funcs.
-		
-
-
-function @ASMState.ExpandJSM (|bool|)
-	require .Ancients < 16
-	|| j = FatASM[4MB]
-		.Ancients <~ .JSMSpace
-		.JSMSpace = j
-		return sh.Alloc(j)
 	
 
 

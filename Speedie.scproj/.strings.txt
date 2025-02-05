@@ -496,7 +496,7 @@
 "ADDK"
 "saverloadclass"
 "API.cpp"
-"ASM is out of memory."
+"Function too large (over 64K)"
 "ASM_"
 "AST"
 "libspeedie.dylib"
@@ -2166,3 +2166,4 @@
 "Register out of bounds"
 "no_print_args true\nnil_check false\nprefs \"klinkerhoppen.speedie\"\nfun_and_fashion \"tasks_function_correctly\"\n"
 "compare_speedie"
+"---"

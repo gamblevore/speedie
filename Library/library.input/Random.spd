@@ -135,7 +135,7 @@ struct Random
 		|| P = mem.ptr
 		if p?
 			.temporal(P, P + mem.ByteCapacity)
-			mem.Length = mem.buffersize
+			mem.Length = mem.ItemCount
 
 	
 	function Init

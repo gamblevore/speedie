@@ -50,16 +50,6 @@ module SpdAssembler
 			return f.ASM					#expect (m, "This function has no ASM")
 						
 
-	function GenerateASMSub (|scfunction| fn, |bool|)
-		opt norefcounts
-		ASMState.Sh.InitAndStartFunc(fn)
-		|| A = fn.SourceArg!
-		ASMType.arg(ASMState.Sh, A, ASMReg())
-		ASMState.Sh.FinishASM
-		.Guard
-		return ASMState.Sh.ok
-
-
 	function Guard
 		opt norefcounts
 		|| A = asmreg()
@@ -67,12 +57,15 @@ module SpdAssembler
 	
 	
 	function GenerateASM (|scfunction| fn, |bool|) // memory safe ASM reattempt
-		if !fn.tableid // oof
-		rz = .GenerateASMSub(fn)
-		if !rz
-			if ASMState.ExpandJSM
-				rz = .GenerateASMSub(fn)
-			check (rz) (fn, "ASM is out of memory.")
+		opt norefcounts
 
-		fn.asm!.debugprint
+		if !fn.tableid // oof
+		ASMState.Sh.InitAndStartFunc(fn)
+		|| A = fn.SourceArg!
+		ASMType.arg(ASMState.Sh, A, ASMReg())
+		ASMState.Sh.FinishASM
+		.Guard
+		if StdErr.ok
+			fn.asm!.debugprint
+			return true
 

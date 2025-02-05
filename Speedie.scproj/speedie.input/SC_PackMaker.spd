@@ -158,7 +158,7 @@ module PackMaker
 	
 	function MakePack 
 		if (–sizeof FatASM) != 64
-		require ASMState.Sh.PackMakerInit			// fn_asm_table[@arg]
+		ASMState.Sh.PackMakerInit			// fn_asm_table[@arg]
 		PackMaker.AddAll
 		|| pg = .OrderGlobals(.PackGlobs)
 		require .ActualASMCompile
