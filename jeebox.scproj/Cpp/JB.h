@@ -428,17 +428,17 @@ struct ErrorReceiver_Behaviour: Object_Behaviour {
 };
 
 JBClass ( JB_ErrorReceiver , JB_Object , 
-	int LowerErrorsTo;
+	int MaxErrors;
 	JB_Object* _LogObj;
 	JB_String* Source;
-	JB_Error* Errors;
 	FP_fnErrorLogger _LogFunc;
-	int MaxErrors;
-	int MaxProblems;
-	int ErrorCount;
-	int ProblemCount;
+	JB_Error* Errors;
 	int WarnCount;
+	int ProblemCount;
+	int ErrorCount;
+	int MaxProblems;
 	bool BlockErrors;
+	ErrorSeverity LowerErrorsTo;
 );
 
 struct FastString_Behaviour: Object_Behaviour {
@@ -2368,7 +2368,7 @@ int JB_Rec__Init_();
 
 void JB_Rec__NewErrorWithNode(Message* Node, JB_String* Desc, JB_String* Path);
 
-void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, int Sev);
+void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, uint /*ErrorSeverity*/ Sev);
 
 
 

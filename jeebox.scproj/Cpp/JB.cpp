@@ -3898,14 +3898,14 @@ JB_ErrorReceiver* JB_Rec_Constructor(JB_ErrorReceiver* Self) {
 	if (Self == nil) {
 		Self = ((JB_ErrorReceiver*)JB_NewClass(&JB_ErrorReceiverData));
 	}
-	Self->LowerErrorsTo = 0;
 	Self->_LogObj = nil;
 	JB_Incr2(Self->Source, JB_LUB[0]);
 	Self->_LogFunc = nil;
-	Self->ErrorCount = 0;
-	Self->ProblemCount = 0;
 	Self->WarnCount = 0;
+	Self->ProblemCount = 0;
+	Self->ErrorCount = 0;
 	Self->BlockErrors = false;
+	Self->LowerErrorsTo = 0;
 	JB_Incr2(Self->Errors, JB_Err_ConstructorNothing(nil));
 	Self->MaxErrors = 512;
 	Self->MaxProblems = 64;
@@ -4088,10 +4088,10 @@ void JB_Rec__NewErrorWithNode(Message* Node, JB_String* Desc, JB_String* Path) {
 	JB_Rec__NewErrorSub(Node, Desc, Path, kJB__ErrorSeverity_Error);
 }
 
-void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, int Sev) {
-	int Lower = JB_StdErr->LowerErrorsTo;
+void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, uint /*ErrorSeverity*/ Sev) {
+	uint Lower = JB_StdErr->LowerErrorsTo;
 	if (Lower) {
-		Sev = JB_int_OperatorMin(Lower, Sev);
+		Sev = JB_int_OperatorMin(((int)Lower), Sev);
 	}
 	if (JB_Rec_CanAddMore(JB_StdErr, Sev)) {
 		if (Desc == nil) {
@@ -8399,7 +8399,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2025020312);
+	return (2025020422);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8411,4 +8411,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 5707609593970855686 -1440462103731673564
+// -2934619186805667969 5748435351067053150 -1440462103731673564
