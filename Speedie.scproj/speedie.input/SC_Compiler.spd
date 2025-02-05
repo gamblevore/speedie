@@ -370,6 +370,10 @@ function ImportProj
 		.SetConf(conf)
 
 
+function ConfBool (|string| name, |bool| Default=true, |bool|)
+	return .ConfMsg[name].Yes(Default)
+
+
 function PrepareAST 
 	opt norefcounts
 	for rz in .ImportedList
