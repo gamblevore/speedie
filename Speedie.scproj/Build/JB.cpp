@@ -20685,8 +20685,7 @@ void SC_nil__LaunchMothership() {
 
 void SC_nil__LaunchMothershipSub(JB_ErrorReceiver* Old) {
 	JB_ErrorReceiver* Rec = JB_Rec_Constructor(nil);
-	bool On = JB_Msg_Yes(JB_Msg_GetConf(SC__Comp_ConfMsg, JB_LUB[1730], false), true);
-	iif (!On) {
+	iif (!SC_Comp__ConfBool(JB_LUB[1730], true)) {
 		Rec->LowerErrorsTo = kJB__ErrorSeverity_Warning;
 	}
 	iif (true) {
