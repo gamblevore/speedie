@@ -206,7 +206,7 @@ class SCParamArray
 			return s == fn and name
 		
 		
-	function StructLover (|SCDecl| type, |scfunction| fn)
+	function StructReturner (|SCDecl| type, |scfunction| fn)
 		|| s = .exp$
 		|| Rel = s.UseNonRefChangers(True)
 		|| f = Rel.func

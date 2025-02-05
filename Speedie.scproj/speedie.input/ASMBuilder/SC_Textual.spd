@@ -93,7 +93,7 @@ extend ASMState
 		d.valuelower(ch.name) = .curr.index
 
 
-	function TextFuncSub (|message| m, |bool|)
+	function TextFuncSub (|message| m)
 		opt NoRefCounts
 		.vdecls = 31 // no other choice. Register requester will fail... otherwise.
 					 // i forgot how this helps. WHAT GOES WRONGGG????
@@ -102,6 +102,4 @@ extend ASMState
 				.addlabel(ch)
 			  else
 				.TextOp(ch)
-		.SetLength
-		return .LoadLabelJumps
 

@@ -110,7 +110,7 @@ class Memory
 	function NeedSpare (|int| ReqItems, |int| Extra = 0,  |&...|)
 		|| Q = .length + reqitems
 		if .ItemCount < Q
-			require .SetCount(Q+Extra)
+/			require .SetCount(Q+Extra)
 		return (.ptr + .ItemCount*.itemsize)|&...|
 
 

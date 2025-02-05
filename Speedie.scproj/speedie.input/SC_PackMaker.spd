@@ -86,6 +86,8 @@ module PackMaker
 	
 	function ActualASMCompile (|bool|)
 		opt norefcounts
+		|| j = asmstate.sh.jsm
+			j.length = 0
 		for fn in .Packfuncs
 			if fn.AMiniTest
 				require SpdAssembler.GenerateASM(fn)

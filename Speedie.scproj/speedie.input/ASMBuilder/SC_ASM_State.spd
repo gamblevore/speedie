@@ -405,8 +405,8 @@ struct ASMState
 
 		|| j = .JSM init FatASM[256K]
 		.end = j.NeedSpare(64K, j.itemcount)
-		.start = j.ptr + j.Length
-		.curr = .start
+		.start = j.ptr
+		.curr = .start + j.Length
 		.LastDebug = .curr
 		.FuncStart = .curr
 		.out = fn.asm ?? µfunc(fn)
@@ -421,10 +421,14 @@ struct ASMState
 		if .zero.Const // what?
 		|| l = .last
 		if !l.IsFinisher
-			expect (!.fn.returntype) ("ASMReturn".internal) // why?
-			.fn.SourceArg!.RET(asmreg(), asmreg(), asmreg(), 0, asmreg())
-		.SetLength
+			debugger !.fn.returntype
+			.fn.SourceArg.RET(asmreg(), asmreg(), asmreg(), 0, asmreg())
 		.ImproveJumps
+
+		.out.length = .curr - .FuncStart
+		|| A = asmreg()										// GUARD
+		.fn.sourcearg.EROR(A,A,A,A,0)
+		.jsm.length = .curr - .start 
 
 
 	function fatasm.JumpImprove (|bool|)
@@ -444,14 +448,14 @@ struct ASMState
 			exit
 
 
-	function ImproveJumps
+	function ImproveJumps 
 		|| A = .Curr
 		|| J = .funcstart
-		|| C = 0
+		|| C = false
 		// jumps of 0 can be rendered as a nop
 		while A > J
 			if J isa asm.jump
-				C += J.JumpImprove
+				C |= J.JumpImprove
 			J++
 		target debug
 			if C
@@ -460,7 +464,7 @@ struct ASMState
 
 	function SetLength
 		.out.length = .curr - .FuncStart
-		.jsm.ItemCount = .start - .curr
+		.jsm.length = .curr - .start 
 		
 		
 	function SmartSecretFat (|asmreg| Thg, |&fatasm|)

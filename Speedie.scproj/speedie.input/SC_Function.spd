@@ -405,7 +405,7 @@ function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming,
 					d.markasaltered
 		
 		|| ft = rz.StructReturned
-			incoming.StructLover(ft.aslocal, self)
+			incoming.StructReturner(ft.aslocal, self)
 		  elseif rz.returntype is returnedstruct // remove this? its always the prev?
 			incoming.StructExtract(rz.returntype)
 
