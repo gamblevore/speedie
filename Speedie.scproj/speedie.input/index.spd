@@ -7,7 +7,8 @@ linkage
 
 conf 
 	no_print_args	true
-	nil_check		false
+	compare_speedie	true
+//	nil_check false
 	prefs			"klinkerhoppen.speedie"
 	fun_and_fashion "tasks_function_correctly"
 
@@ -18,10 +19,13 @@ compile_linking
 
 
 ignore // better append syntax?
-	WriteTo <~ { tmp "ello"
-		thg "you"
-		opp "are"
-		thg "awesome"
+	WriteTo <~ {
+		tmp "ello"
+			thg "you"
+			opp "are"
+			thg "awesome"
 	}
 
 // simpler... cleaner.
+
+

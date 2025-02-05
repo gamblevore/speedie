@@ -1,6 +1,7 @@
 
 
 extend asmstate
+	target ASMNightmare {
 	function InlineOffset (|asmreg| base, |int| pow2, |&int| index, |int| maximum, |asmreg|)
 		if base is temp// and containsaddr
 			|| bs = base.fat
@@ -95,7 +96,7 @@ extend asmstate
 		
 		exp.RFAP(A, asmreg(), asmreg())
 		return a
-
+}
 
 function ASMState.Decr (|asmreg|)
 	|| fat = .last(asm.rfst)

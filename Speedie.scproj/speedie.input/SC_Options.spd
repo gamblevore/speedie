@@ -10,9 +10,7 @@ module Options
 	||		Variant					= ""
 	|| 		Arch					= "" // targetarchitecture
 	||		SingleCppOutput			= true
-	|| 		NilTestAllocNeverFails	= true
 	|| 		Beep					= false
-	|| 		Dev						= 0
 
 	||		ModeCpp					= true
 	||		ModePack				= false
@@ -23,7 +21,6 @@ module Options
 	||		TargetDebug				= false
 	||		PrintLibraries			= false
 	||		GenFlowControlCode		= false
-	||		KeepAllErrors			= false
 	||		Scripting				= false
 	||		CheckMaxVars			= false
 	||		ForceRecompile			= false
@@ -39,12 +36,17 @@ module Options
 	||		Warnings				= false
 	||		ExternalCompile			= false
 	||		ASMRenderBlocks			= false
+	
+	|byte|	Dev						= 0
 	|byte|	Optimise				= 1
 	|bool|	SelfReplacement			= 0
 	|byte|	OperationCount			= 0
 	|byte|	PerryOutput				= 0
 	|byte|	UseScriptLoc			= 0
+
 	|byte|  NilStrength				= errorseverity.error
+	||		KeepAllErrors			= false
+	|| 		NilTestAllocNeverFails	= true
 	
 	function Color (assigns:|bool|)
 		ErrorColors.enabled = Value

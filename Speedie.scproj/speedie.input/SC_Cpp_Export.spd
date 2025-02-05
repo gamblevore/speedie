@@ -872,7 +872,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	|| CppLicenceStr = ""
 	function CppLicence (|string|)
 		if !.CppLicenceStr
-			|| f = compiler.InputFile(nil, "licence.txt", nil)
+			|| f = compiler.InputFile("licence.txt", nil)
 				.Cpplicencestr = f.readall(16KB, true)
 			.CppLicenceStr ?= " "
 		return .CppLicenceStr

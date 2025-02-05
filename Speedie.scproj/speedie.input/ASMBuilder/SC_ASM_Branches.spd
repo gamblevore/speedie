@@ -5,6 +5,7 @@
 
 extend ASMState {
 
+target ASMNightmare {
 function ArgOrIf (|message?| other, |asmreg|)
 	rz = .ArgOrIfSub(other)
 	.BasicBlock++
@@ -56,12 +57,11 @@ function If (fn_asm)
 		return asmreg()						// were done!
 
 	if .curr.op != asm.eror
-	 #! why curr+1?
 	B.AllJumpTo
+	
 	|| AfterFirst = arg1.jump(0)
 	.ArgOrIf(other)
 	AfterFirst.jumpto = .curr
-	
 	return asmreg()
 
 
@@ -92,7 +92,7 @@ function While (fn_asm)
 	BEGIN.jumpto = LOOP_Test.start
 	LOOP_TEST.AllJumpTo(BEGIN+1, true)
 	.loopfill(begin, LOOP_Test.start, LOOP_Test.After)
-	
+
 	return asmreg()
 
 
@@ -116,7 +116,7 @@ function BackCond (|fatasm| start)
 
 function Ternary		(fn_asm)
 	opt norefcounts
-	
+
 	|| prms = exp.second
 	|| cond = prms.first!
 	|| A = cond.next!
@@ -149,7 +149,6 @@ function SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond,
 	|| mc = (ASMReg(), dest)(dr == ma.reg or mb.reg)
 	|| µ = .µ(cond, mc)
 	return cond.TERN(dest, µ, ma, mb) * dest
-
 
 function Branch (|message| Cond,  |bool| Neg = false,  |fatrange| Range, |asmreg|)
 	range.Start = .curr
@@ -334,7 +333,6 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 		// 1 or b
 		(first is condanswer)
 		return fake*first.boolanswer						// only way around this. Cos we got asm-reg(0)
-
 	
 	|fatrange| Br2
 	|| second = .Branch(B, dest is negate, Br2)
@@ -354,7 +352,7 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	// a or b
 	
 	return first
-
+}
 }
 
 
@@ -373,6 +371,7 @@ Struct FatRange
 		return .constness.KnownFalse
 	
 	function AllJumpTo (|&fatasm| curr = .curr, |bool| Strip = true)
+		target ASMNightmare {
 		|| A = asmstate.sh
 		for s in self
 			if s is CondAnswer
@@ -381,6 +380,7 @@ Struct FatRange
 				if strip and s == Curr - 1
 					curr--
 					A.nop(s)
+		}
 					
 	iterator
 		|| curr = .after!

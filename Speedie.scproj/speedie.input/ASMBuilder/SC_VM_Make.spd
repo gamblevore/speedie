@@ -11,6 +11,7 @@ module VM_Builder {
 |byte| 			XType
 |byte|			NormalPos = 0
 |uint|			FreeMultiASM = ~1
+|faststring|	FatFile
 
 
 function DefineGetSub (|string| fname,  |int| up,  |int| down,  |byte| c,  |byte| c2)
@@ -141,7 +142,7 @@ function CppLibFile (|string| ch, |file|)
 	
 
 function VMBox (|message|)
-	|| v = Compiler.InputFile( nil, "vm.box", nil )
+	|| v = Compiler.InputFile( "vm.box", nil )
 		.vm_file = v
 		rz = v.parse
 		if rz
@@ -159,20 +160,31 @@ function JustDefineInstructions (|bool|)
 		.FillEncoders(vmdef, false)
 
 
+function FatGen
+	|| fat_dest = Compiler.InputFileAlways( "speedie.input/ASMBuilder/FatGen.spd")
+	FatFile = Compiler.InputFileAlways( "speedie.input/ASMBuilder/FatGen.box").out
+
+
 function BuildFiles (|bool|)
-	|| vmdef = .VMBox							#require
-	|| forms = vmdef.find("forms")
+	|| VMDef = .VMBox							#require
+
+	.FatGen
+	
+	|| Forms = vmdef.find("forms")
 	forms.remove
 
-	|| code = faststring()
-	|| jump = faststring()
+	|| Code = FastString()
+	|| Jump = FastString()
 
-	.Clean(vmdef)
+	.Clean(VMDef)
 	.DataTypeModule
 	.GenerateForms(forms, true)
-	.FillEncoders(vmdef)
+	.FillEncoders(VMDef)
 	.VMCpp(code, jump)
 
+	
+	|| fs = FatFile
+		fs.Flush
 	.SafeWrite("InstructionGetters.h", form_h)
 	.SafeWrite("Instructions.i",       code)
 	.SafeWrite("InstructionList.h",    jump)
@@ -260,8 +272,6 @@ function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true)
 		R <~ (@thg+"EROR",  256)
 	.vm_FillPos(list, r)
 	.VM_NewInstructions(list, false, R)
-//	.VM_NewInstructions(list, 3, R)
-//	.VM_NewInstructions(list, 2, R)
 	.VM_NewInstructions(list, true, R)
 	for i in 256
 		asm.encoders[i] ?= badencoder
@@ -307,6 +317,9 @@ function message.VMBits (|int|)
 // vmmake
 function VM_MakeInstructionSub (|message| tmp,  |bool| Ask,  |[message]?| ActuallyMakeTheVM, |int| ForceID)
 	opt norefcounts
+
+	// We need to actually write to a file... that we can hand-modify.
+	
 	// could be simplified but i dont care anymore. i dont wanna deal with this code.
 	|| prms = tmp.first
 	|| FoundBits = prms.VMBits
@@ -325,7 +338,7 @@ function VM_MakeInstructionSub (|message| tmp,  |bool| Ask,  |[message]?| Actual
 		.ModuleArg <~ NewDecl(name)
 	++.Total
 	
-	.MakeMsgCreator(tmp.name, form)
+	.MakeFatCreator(tmp.name, form)
 	if forceid
 		.FreeMultiASM &=~ (1<<forceid)
 		if .OKBoomer(tmp, forceid, formenc, ActuallyMakeTheVM)
@@ -341,8 +354,6 @@ function VM_MakeInstructionSub (|message| tmp,  |bool| Ask,  |[message]?| Actual
 		if .OKBoomer(tmp, x, formenc, ActuallyMakeTheVM) and !done
 			.AddµOp(tmp.name, X)
 			done = true
-			///if ask > 1
-				///.AddµOp(tmp.name+(extra+1).render, X)
 
 
 function OKBoomer (|message| tmp,  |int| x,  |asm_encoder| formenc,  |array?| R,  |bool|)
@@ -359,16 +370,24 @@ helper message.VMMsgArgName (|int| i, |string|)
 	return string.byte('a' + i)
 
 
-function MakeMsgCreator (|string| name, |µform| form)
-	|| fn = icecream.run(@thg+name)
-	Compiler.ExtendList <~ fn
+function MakeFatCreator (|string| name, |µform| form)
+	opt norefcounts
+	|| fn = .FatCreatorSub(name, form)
+	|| fs = FatFile!
+	fs <~ "\n"
+	fn.Render(fs)
+	fs <~ "\n"
+//	Compiler.ExtendList <~ fn
+
+
+function FatCreatorSub (|string| name, |µform| form, |message|)
+	|| fn = IceCream.run(@thg+name)
 	|| arg = fn.Last!
 	|| prm = arg.prev!
 	|| FatDecl = prm.last!
-	|| r = [arg,arg]
+	|| r = [arg, arg]
 	|| f = form.src.first.first
 	
-	|| o = 0
 	for (p in form) (i)
 		|| ty = ("asmreg", "int")(p.isreg)
 		|| pname = f.VMMsgArgName(i)
@@ -382,10 +401,8 @@ function MakeMsgCreator (|string| name, |µform| form)
 			|| size = 32 - p.bitsize
 			r[1] = @num+size
 			arg <~ ohio.run(r)
-		o |= (p is Output)<<i
 		f++
-	if o
-		arg <~ outputs.run(@num+o)
+	return fn
 		
 
 function µparam.Which (|macro!--|)
@@ -398,9 +415,9 @@ function µparam.Which (|macro!--|)
 	return vm_builder.arms
 	
 
-|| icecream = `function message._0 (|&fatasm|) {
+|| icecream = `function message._0 (,|&fatasm|) {
 	visible
-	rz = asmstate.sh.syntaxappend(asm._0, self)
+	rz = self * asm._0
 }`.macro
 
 
@@ -431,7 +448,6 @@ return curr
 || legs    = "rz.numinput(_0) = _1".macro
 || arms    = "rz.reginput(_0) = _1".macro
 || skibidy = "rz.dest(_0, _1)".macro
-|| outputs = "rz.outputs = _0".macro
 
 
 || ASM_Datatype = "datatype _0 (ASM) 

@@ -24,6 +24,7 @@ extend asmreg
 
 
 extend ASMState
+	target ASMNightmare {
 	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asmreg|)
 		|| negate = dest is negate
 		|| Res = dest.BoolAnswer						// Hmmm... so what should it be?
@@ -322,7 +323,7 @@ extend ASMState
 			if l isnt alternate								// x = lptr + r*12
 				fat = exp.MULT(dest, R, V, L)
 			  else											// x = (lptr - rptr)/12
-				exp.SUB(dest, L, R, ASMReg())
+				fat = exp.SUB(dest, L, R, ASMReg())
 				|| uinttype = 0, debugger
 				fat = exp.DIVV(dest, ASMReg(), dest, V, uinttype)  
 			  
@@ -457,7 +458,7 @@ extend ASMState
 		if dest is ConstOutput
 			return .MakeConst2(dest, L, R, exp, Constifyfloatmod)
 		|| big = dest.IsBig|int|
-		exp.fdiv(dest, L, R, asmreg(), big)
+		|| fat = exp.fdiv(dest, L, R, asmreg(), big)
 		return exp.FFRC(dest, asmreg(), dest, R, big) * dest
 	
 	
@@ -616,7 +617,28 @@ extend ASMState
 		if r.IsConst(-1)
 			.nopconst(r)
 			return true
-	
+} else {
+	function Minus (fn_opasm)
+	function Bitnot (fn_opasm)
+	function equals (fn_opasm)
+	function less (fn_opasm)
+	function lesseq (fn_opasm)
+	function moreeq (fn_opasm)
+	function noteq (fn_opasm)
+	function more (fn_opasm)
+	function Mod (fn_opasm)
+	function Plus (fn_opasm)
+	function Subtract (fn_opasm)
+	function Multiply (fn_opasm)
+	function Divide (fn_opasm)
+	function SHR (fn_opasm)
+	function SHL (fn_opasm)
+	function BitOr (fn_opasm)
+	function BitAnd (fn_opasm)
+	function bitxor (fn_opasm)
+}
+
+
 	
 function int64.Fits (|int| amount, |bool| signed=true,  |bool|)
 	|| sh = 64 - amount

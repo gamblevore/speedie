@@ -465,7 +465,8 @@ function TestNewCompiler (|bool|) // self_test, selftest, testself, test_self, t
 	printline
 	
 	require cpp2.mustexist and cpp3.mustexist
-	require (Cpp2.CompareFile(Cpp3,cpp3))
+	if compiler.ConfBool("compare_speedie")
+		require (Cpp2.CompareFile(Cpp3,cpp3))
 
 	return Test2.TestBatch and stderr.OK
 

@@ -1,6 +1,7 @@
 
 
 
+target ASMNightmare {
 dispatch fn_asm_table (fn_asm)
 	@arg:  ASMType.Arg
 	@decl: ASMType.decl
@@ -38,8 +39,10 @@ dispatch fn_asm_table (fn_asm)
 	(ASMType.kFail):		ASMType.Ignore
 
 	63:						ASMType.unexpected
-
-
+} else {
+dispatch fn_asm_table (fn_asm)
+	@arg : {}
+}
 
 extend_module ASMType {
 constants
@@ -64,6 +67,7 @@ function InitAccess
 	R++[] = ASM.RD16	
 
 
+target ASMNightmare {
 function Debugger (fn_asm)
 	if Options.targetdebug
 		return exp.TRAP(asmreg(), 0, 2)*asmreg() // 2 == sigint
@@ -288,6 +292,7 @@ function Dot (fn_asm)										// a.b
 	|| prop = exp.ASMDecl
 	if prop is global
 		return DoGlobal(self, exp, dest, prop)
+	
 	|| F = exp.first!		 
 	|| Obj = .µGetASM(F, subdest)
 	|| T = prop.typeinfo
@@ -546,11 +551,13 @@ function Unexpected		(fn_asm)
 			return .µGetASM(exp, dest)
 	error (exp, "bad ASMType")
 }
+}
 
 
 
 extend ASMState {
 
+target ASMNightmare {
 function ExistingVar (|message| m, |bool| ForReturn=false,  |asmreg|)
 	opt	norefcounts
 	real self
@@ -607,6 +614,7 @@ function ASMLocal (|message| s, |bool| ForReturn, |asmreg| extra, |asmreg|)
 		if ForReturn and d isnt ReturnedVar
 			.fn.ReturnedVars++
 			(d is ReturnedVar)
+}
 }
 
 

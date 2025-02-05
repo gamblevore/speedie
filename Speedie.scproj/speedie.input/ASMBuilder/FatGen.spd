@@ -1,0 +1,870 @@
+
+function message.operatormul (|asm| op, |&fatasm|)
+	cpp_part RequestOp
+	|| sh = asmstate.sh
+	rz = sh.curr++
+	rz.op = op
+	rz.debug = self
+	rz.BlockNum = sh.BasicBlock
+
+
+function message.TAIL (|int| JUMP, |int| Prm1, |&fatasm|) {
+	visible
+	rz = self * asm.TAIL
+	rz.numinput(0) = JUMP
+	rz.numinput(1) = Prm1
+}
+
+
+function message.FNC (|asmreg| r1, |int| JUMP, |int| Prm1, |int| Prm2, |&fatasm|) {
+	visible
+	rz = self * asm.FNC
+	rz.dest(0, r1)
+	rz.numinput(1) = JUMP
+	rz.numinput(2) = Prm1
+	rz.numinput(3) = Prm2
+}
+
+
+function message.FNC3 (|asmreg| r1, |int| JUMP, |int| Prm1, |int| Prm2, |&fatasm|) {
+	visible
+	rz = self * asm.FNC3
+	rz.dest(0, r1)
+	rz.numinput(1) = JUMP
+	rz.numinput(2) = Prm1
+	rz.numinput(3) = Prm2
+}
+
+
+function message.FNCX (|asmreg| r1, |int| Table, |int| Prm1, |int| Prm2, |&fatasm|) {
+	visible
+	rz = self * asm.FNCX
+	rz.dest(0, r1)
+	rz.numinput(1) = Table
+	rz.numinput(2) = Prm1
+	rz.numinput(3) = Prm2
+}
+
+
+function message.FNCX3 (|asmreg| r1, |int| Table, |int| Prm1, |int| Prm2, |&fatasm|) {
+	visible
+	rz = self * asm.FNCX3
+	rz.dest(0, r1)
+	rz.numinput(1) = Table
+	rz.numinput(2) = Prm1
+	rz.numinput(3) = Prm2
+}
+
+
+function message.KNST2 (|asmreg| r1, |int| Cond, |int| Inv, |int| Value, |&fatasm|) {
+	visible
+	rz = self * asm.KNST2
+	rz.dest(0, r1)
+	rz.numinput(1) = Cond
+	rz.numinput(2) = Inv
+	rz.numinput(3) = Value
+}
+
+
+function message.KNST3 (|asmreg| r1, |int| Cond, |int| Inv, |int| Value, |&fatasm|) {
+	visible
+	rz = self * asm.KNST3
+	rz.dest(0, r1)
+	rz.numinput(1) = Cond
+	rz.numinput(2) = Inv
+	rz.numinput(3) = Value
+}
+
+
+function message.GMEM (|asmreg| r1, |int| Value, |&fatasm|) {
+	visible
+	rz = self * asm.GMEM
+	rz.dest(0, r1)
+	rz.numinput(1) = Value
+}
+
+
+function message.EROR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| IsOK, |&fatasm|) {
+	visible
+	rz = self * asm.EROR
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = IsOK
+}
+
+
+function message.NOOP (|&fatasm|, ) {
+	visible
+	rz = self * asm.NOOP
+}
+
+
+function message.TRAP (|asmreg| r1, |int| Mode, |int| Signal, |&fatasm|) {
+	visible
+	rz = self * asm.TRAP
+	rz.reginput(0) = r1
+	rz.numinput(1) = Mode
+	rz.numinput(2) = Signal
+}
+
+
+function message.ADDR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+	visible
+	rz = self * asm.ADDR
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+}
+
+
+function message.RET (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| SafeDecr, |int| Value, |&fatasm|) {
+	visible
+	rz = self * asm.RET
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = SafeDecr
+	rz.numinput(4) = Value
+}
+
+
+function message.ALLO (|asmreg| r1, |int| Align, |int| Amount, |&fatasm|) {
+	visible
+	rz = self * asm.ALLO
+	rz.dest(0, r1)
+	rz.numinput(1) = Align
+	rz.numinput(2) = Amount
+}
+
+
+function message.SWAP (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+	visible
+	rz = self * asm.SWAP
+	rz.dest(0, r1)
+	rz.dest(1, r2)
+	rz.dest(2, r3)
+	rz.dest(3, r4)
+}
+
+
+function message.PRNT (|asmreg| r1, |&fatasm|) {
+	visible
+	rz = self * asm.PRNT
+	rz.dest(0, r1)
+}
+
+
+function message.RARE (|asmreg| r1, |asmreg| r2, |&fatasm|) {
+	visible
+	rz = self * asm.RARE
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+}
+
+
+function message.CONV (|asmreg| r1, |asmreg| r2, |int| Mode, |&fatasm|) {
+	visible
+	rz = self * asm.CONV
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = Mode
+}
+
+
+function message.KNSR (|asmreg| r1, |int| Rot, |int| Inv, |int| Value, |&fatasm|) {
+	visible
+	rz = self * asm.KNSR
+	rz.dest(0, r1)
+	rz.numinput(1) = Rot
+	rz.numinput(2) = Inv
+	rz.numinput(3) = Value
+}
+
+
+function message.KNST (|asmreg| r1, |int| Cond, |int| Inv, |int| Value, |&fatasm|) {
+	visible
+	rz = self * asm.KNST
+	rz.dest(0, r1)
+	rz.numinput(1) = Cond
+	rz.numinput(2) = Inv
+	rz.numinput(3) = Value
+}
+
+
+function message.ADDK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+	visible
+	rz = self * asm.ADDK
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = K
+}
+
+
+function message.ADPK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+	visible
+	rz = self * asm.ADPK
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = K
+}
+
+
+function message.ADD (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.ADD
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.SUB (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.SUB
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.MULT (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+	visible
+	rz = self * asm.MULT
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+}
+
+
+function message.DIVV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Kind, |&fatasm|) {
+	visible
+	rz = self * asm.DIVV
+	rz.dest(0, r1)
+	rz.dest(1, r2)
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = Kind
+}
+
+
+function message.DIV2 (|asmreg| r1, |asmreg| r2, |int| Sh, |int| Add, |&fatasm|) {
+	visible
+	rz = self * asm.DIV2
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = Sh
+	rz.numinput(3) = Add
+}
+
+
+function message.CLAM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+	visible
+	rz = self * asm.CLAM
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = D
+}
+
+
+function message.BXOR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.BXOR
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.BSHS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.BSHS
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.BSHR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.BSHR
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.BSHL (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.BSHL
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.BAND (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.BAND
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.BOR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.BOR
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.BNAN (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.BNAN
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.BNOR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.BNOR
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.BNOT (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.BNOT
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.BFLG (|asmreg| r1, |asmreg| r2, |int| up, |int| down, |int| sign, |&fatasm|) {
+	visible
+	rz = self * asm.BFLG
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = up
+	rz.numinput(3) = down
+	rz.numinput(4) = sign
+}
+
+
+function message.BSTT (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+	visible
+	rz = self * asm.BSTT
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+}
+
+
+function message.CMPB (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Inv, |&fatasm|) {
+	visible
+	rz = self * asm.CMPB
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Inv
+}
+
+
+function message.TERN (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+	visible
+	rz = self * asm.TERN
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+}
+
+
+function message.CMPI (|asmreg| r1, |asmreg| r2, |int| Cmp, |int| Jmp, |&fatasm|) {
+	visible
+	rz = self * asm.CMPI
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.numinput(2) = Cmp
+	rz.jumpinput(3) = Jmp
+	if (((Jmp << 21) >> 21) != Jmp) {
+		error (self, `Jumped too far`)
+	}
+}
+
+
+function message.CMPF (|asmreg| r1, |asmreg| r2, |int| Cmp, |int| Jmp, |&fatasm|) {
+	visible
+	rz = self * asm.CMPF
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.numinput(2) = Cmp
+	rz.jumpinput(3) = Jmp
+	if (((Jmp << 21) >> 21) != Jmp) {
+		error (self, `Jumped too far`)
+	}
+}
+
+
+function message.JSWI (|asmreg| r1, |asmreg| r2, |int| Jmp, |&fatasm|) {
+	visible
+	rz = self * asm.JSWI
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.jumpinput(2) = Jmp
+	if (((Jmp << 18) >> 18) != Jmp) {
+		error (self, `Jumped too far`)
+	}
+}
+
+
+function message.JUMP (|int| JUMP, |&fatasm|) {
+	visible
+	rz = self * asm.JUMP
+	rz.jumpinput(0) = JUMP
+	if (((JUMP << 8) >> 8) != JUMP) {
+		error (self, `Jumped too far`)
+	}
+}
+
+
+function message.JMPI (|asmreg| r1, |asmreg| r2, |int| Cmp, |int| Jmp, |&fatasm|) {
+	visible
+	rz = self * asm.JMPI
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.numinput(2) = Cmp
+	rz.jumpinput(3) = Jmp
+	if (((Jmp << 21) >> 21) != Jmp) {
+		error (self, `Jumped too far`)
+	}
+}
+
+
+function message.JMPF (|asmreg| r1, |asmreg| r2, |int| Cmp, |int| Jmp, |&fatasm|) {
+	visible
+	rz = self * asm.JMPF
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.numinput(2) = Cmp
+	rz.jumpinput(3) = Jmp
+	if (((Jmp << 21) >> 21) != Jmp) {
+		error (self, `Jumped too far`)
+	}
+}
+
+
+function message.JMPE (|asmreg| r1, |asmreg| r2, |int| Jmp, |&fatasm|) {
+	visible
+	rz = self * asm.JMPE
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.jumpinput(2) = Jmp
+	if (((Jmp << 18) >> 18) != Jmp) {
+		error (self, `Jumped too far`)
+	}
+}
+
+
+function message.JMPN (|asmreg| r1, |asmreg| r2, |int| Jmp, |&fatasm|) {
+	visible
+	rz = self * asm.JMPN
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.jumpinput(2) = Jmp
+	if (((Jmp << 18) >> 18) != Jmp) {
+		error (self, `Jumped too far`)
+	}
+}
+
+
+function message.JBOR (|asmreg| r1, |int| Jmp, |&fatasm|) {
+	visible
+	rz = self * asm.JBOR
+	rz.reginput(0) = r1
+	rz.jumpinput(1) = Jmp
+	if (((Jmp << 13) >> 13) != Jmp) {
+		error (self, `Jumped too far`)
+	}
+}
+
+
+function message.JBAN (|asmreg| r1, |int| Jmp, |&fatasm|) {
+	visible
+	rz = self * asm.JBAN
+	rz.reginput(0) = r1
+	rz.jumpinput(1) = Jmp
+	if (((Jmp << 13) >> 13) != Jmp) {
+		error (self, `Jumped too far`)
+	}
+}
+
+
+function message.LUPD (|asmreg| r1, |asmreg| r2, |int| Jmp, |&fatasm|) {
+	visible
+	rz = self * asm.LUPD
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.jumpinput(2) = Jmp
+	if (((Jmp << 18) >> 18) != Jmp) {
+		error (self, `Jumped too far`)
+	}
+}
+
+
+function message.LUPU (|asmreg| r1, |asmreg| r2, |int| Jmp, |&fatasm|) {
+	visible
+	rz = self * asm.LUPU
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.jumpinput(2) = Jmp
+	if (((Jmp << 18) >> 18) != Jmp) {
+		error (self, `Jumped too far`)
+	}
+}
+
+
+function message.RFAP (|asmreg| r1, |asmreg| r2, |asmreg| r3, |&fatasm|) {
+	visible
+	rz = self * asm.RFAP
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+}
+
+
+function message.RFST (|asmreg| r1, |asmreg| r2, |&fatasm|) {
+	visible
+	rz = self * asm.RFST
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+}
+
+
+function message.RFWR (|asmreg| r1, |asmreg| r2, |int| Decr, |int| Offset, |&fatasm|) {
+	visible
+	rz = self * asm.RFWR
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.numinput(2) = Decr
+	rz.numinput(3) = Offset
+}
+
+
+function message.RFRD (|asmreg| r1, |asmreg| r2, |int| Decr, |int| Offset, |&fatasm|) {
+	visible
+	rz = self * asm.RFRD
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = Decr
+	rz.numinput(3) = Offset
+}
+
+
+function message.RFDC (|asmreg| r1, |int| Count, |int| Offset, |&fatasm|) {
+	visible
+	rz = self * asm.RFDC
+	rz.reginput(0) = r1
+	rz.numinput(1) = Count
+	rz.numinput(2) = Offset
+}
+
+
+function message.RALO (|asmreg| r1, |asmreg| r2, |&fatasm|) {
+	visible
+	rz = self * asm.RALO
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+}
+
+
+function message.GSTR (|asmreg| r1, |int| Mode, |int| Add, |&fatasm|) {
+	visible
+	rz = self * asm.GSTR
+	rz.dest(0, r1)
+	rz.numinput(1) = Mode
+	rz.numinput(2) = Add
+}
+
+
+function message.GTAB (|asmreg| r1, |int| Mode, |int| Add, |&fatasm|) {
+	visible
+	rz = self * asm.GTAB
+	rz.dest(0, r1)
+	rz.numinput(1) = Mode
+	rz.numinput(2) = Add
+}
+
+
+function message.RD1U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+	visible
+	rz = self * asm.RD1U
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Offset
+	rz.numinput(4) = move
+}
+
+
+function message.RD1S (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+	visible
+	rz = self * asm.RD1S
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Offset
+	rz.numinput(4) = move
+}
+
+
+function message.RD2U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+	visible
+	rz = self * asm.RD2U
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Offset
+	rz.numinput(4) = move
+}
+
+
+function message.RD2S (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+	visible
+	rz = self * asm.RD2S
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Offset
+	rz.numinput(4) = move
+}
+
+
+function message.RD4U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+	visible
+	rz = self * asm.RD4U
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Offset
+	rz.numinput(4) = move
+}
+
+
+function message.RD4S (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+	visible
+	rz = self * asm.RD4S
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Offset
+	rz.numinput(4) = move
+}
+
+
+function message.RD8U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+	visible
+	rz = self * asm.RD8U
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Offset
+	rz.numinput(4) = move
+}
+
+
+function message.RD16 (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+	visible
+	rz = self * asm.RD16
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Offset
+	rz.numinput(4) = move
+}
+
+
+function message.WR1U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+	visible
+	rz = self * asm.WR1U
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Offset
+	rz.numinput(4) = move
+}
+
+
+function message.WR2U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+	visible
+	rz = self * asm.WR2U
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Offset
+	rz.numinput(4) = move
+}
+
+
+function message.WR4U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+	visible
+	rz = self * asm.WR4U
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Offset
+	rz.numinput(4) = move
+}
+
+
+function message.WR8U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+	visible
+	rz = self * asm.WR8U
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Offset
+	rz.numinput(4) = move
+}
+
+
+function message.WR16 (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+	visible
+	rz = self * asm.WR16
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Offset
+	rz.numinput(4) = move
+}
+
+
+function message.CNTC (|asmreg| r1, |asmreg| r2, |int| offset, |int| cnst, |int| size, |&fatasm|) {
+	visible
+	rz = self * asm.CNTC
+	rz.dest(0, r1)
+	rz.dest(1, r2)
+	rz.numinput(2) = offset
+	rz.numinput(3) = cnst
+	rz.numinput(4) = size
+}
+
+
+function message.CNTD (|asmreg| r1, |asmreg| r2, |int| offset, |int| cnst, |int| size, |&fatasm|) {
+	visible
+	rz = self * asm.CNTD
+	rz.dest(0, r1)
+	rz.dest(1, r2)
+	rz.numinput(2) = offset
+	rz.numinput(3) = cnst
+	rz.numinput(4) = size
+}
+
+
+function message.MEMU (|asmreg| r1, |asmreg| r2, |int| Op, |int| N, |&fatasm|) {
+	visible
+	rz = self * asm.MEMU
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = Op
+	rz.numinput(3) = N
+}
+
+
+function message.FADD (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+	visible
+	rz = self * asm.FADD
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = D
+}
+
+
+function message.FADK (|asmreg| r1, |asmreg| r2, |int| High, |&fatasm|) {
+	visible
+	rz = self * asm.FADK
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = High
+}
+
+
+function message.FMUL (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+	visible
+	rz = self * asm.FMUL
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = D
+}
+
+
+function message.FMLK (|asmreg| r1, |asmreg| r2, |int| High, |&fatasm|) {
+	visible
+	rz = self * asm.FMLK
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = High
+}
+
+
+function message.FDIV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+	visible
+	rz = self * asm.FDIV
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = D
+}
+
+
+function message.FFRC (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+	visible
+	rz = self * asm.FFRC
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = D
+}
+
+
+function message.FCLM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+	visible
+	rz = self * asm.FCLM
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = D
+}
+

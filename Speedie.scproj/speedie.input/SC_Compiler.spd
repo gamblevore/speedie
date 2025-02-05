@@ -663,6 +663,10 @@ syntax access (|Message| name, |SCClass|)
 		return compiler.program.FindClassMsg( name, 0 )
 
 
+function ConfBool (|string| name, |bool| Default=true, |bool|)
+	return .confmsg[name].Yes(default)
+
+
 function FindClassType (|message| n, |scdecl|)
 	opt norefcounts
 	|| m = SCModule.curr
@@ -792,28 +796,26 @@ function CheckIsGoodLibrary
 		expect compiler.api_place ("No 'main' or 'export_api' found. Create 'export_api' to make this a library, create 'main' to make this an app.")
 
 
-function InputFile (|File| Default, |String| s, |message| where,  |File|)
-	opt norefcounts
+function InputFile (|String| s, |message| where,  |File|)
 	expect !(s contains "../") (where, "Insecure path")
-	// find the "highest" file...
+	return .InputFileAlways(s)
+
+
+function InputFileAlways (|String| s, |File|)
+	opt norefcounts
 	|| c = SCImport.Curr
 		|| found = c.Resources.ValueLower(s)
 			return found
 			
+	// find the "highest" file...
 	|| best = int.max
 	for (imp in .ImportedList)
 		if (imp.depth < best)
 			|| f = imp.Resources.ValueLower(s)
 				rz = f
 				best = imp.Depth
-	if rz
-		return rz
-
-	rz = Compiler.BaseProjectPath![s]
-	if (Default != nil) and !rz.Exists
-		rz = default[s]
-		if !rz.exists
-			rz = nil
+	if !rz
+		rz = Compiler.BaseProjectPath![s]
 
 
 function AddGlobalConstNum (|string| name, |SCClass| c, |int64| value)
