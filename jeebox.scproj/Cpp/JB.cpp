@@ -4490,7 +4490,7 @@ MWrap* JB_Mrap_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Pt
 		Self = ((MWrap*)JB_NewClass(&MWrapData));
 	}
 	Self->ItemSize = ItemSize;
-	Self->BufferSize = ItemCount;
+	Self->ItemCount = ItemCount;
 	Self->DeathAction = DeathAction;
 	Self->Length = 0;
 	Self->_Ptr = Ptr;
@@ -8399,7 +8399,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2025020515);
+	return (2025020517);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8411,4 +8411,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 5748435351067053150 -1440462103731673564
+// -2934619186805667969 -6482526104229380676 -1440462103731673564

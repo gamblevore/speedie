@@ -468,7 +468,7 @@ struct Memory_Behaviour: Object_Behaviour {
 JBClass ( MWrap , JB_Object , 
 	int Length;
 	byte* _Ptr;
-	int BufferSize;
+	int ItemCount;
 	u16 ItemSize;
 	byte DeathAction;
 );

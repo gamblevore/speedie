@@ -1907,7 +1907,7 @@
 "Unknown class."
 "Bad data found."
 "This class has no loader for it."
-"Can't allocate enough bytes: "
+"Can't allocate bytes: "
 "LibGlobs.h"
 ", but found "
 "Not a string"

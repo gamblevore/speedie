@@ -28540,15 +28540,15 @@ byte* JB_Mrap_Ptr(MWrap* Self) {
 }
 
 bool JB_Mrap_SetCount(MWrap* Self, int ItemCount) {
+	iif (ItemCount == Self->ItemCount) {
+		return true;
+	}
 	iif (Self->DeathAction != kJB__Wrap_kFree) {
 		return nil;
 	}
 	int S = ((int)Self->ItemSize);
 	int Old = S * Self->ItemCount;
 	int New = S * ItemCount;
-	iif (New == Old) {
-		return true;
-	}
 	byte* Mem = JB_realloc(Self->_Ptr, New);
 	iif (Mem) {
 		Self->_Ptr = Mem;
@@ -28557,7 +28557,7 @@ bool JB_Mrap_SetCount(MWrap* Self, int ItemCount) {
 			Self->Length = ItemCount;
 		}
 		iif (New > Old) {
-			memzero((Mem + Old), New - Old);
+			memzero(Mem + Old, New - Old);
 		}
 		return true;
 	}
@@ -58706,4 +58706,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 522133231545961806 -7863331004848650586
+// 522133231545961806 -7287126166546990374
