@@ -377,7 +377,6 @@ function MakeFatCreator (|string| name, |µform| form)
 	fs <~ "\n"
 	fn.Render(fs)
 	fs <~ "\n"
-//	Compiler.ExtendList <~ fn
 
 
 function FatCreatorSub (|string| name, |µform| form, |message|)
