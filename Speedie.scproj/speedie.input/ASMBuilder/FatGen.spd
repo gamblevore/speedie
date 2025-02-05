@@ -2,11 +2,17 @@
 
 function message.operatormul (|asm| op, |&fatasm|)
 	cpp_part RequestOp
-	|| sh = asmstate.sh
-	rz = sh.curr++
-	rz.op = op
-	rz.debug = self
-	rz.BlockNum = sh.BasicBlock
+	|| a = ASMState.sh
+	|| p = a.curr
+	if p < a.end
+		a.curr = p + 1
+		P.op = op
+		p.debug = self
+		p.BlockNum = a.BasicBlock
+		return p
+	error (self, "Function too large (over 64K)")
+	a.OK = false
+	return a.start
 
 
 function message.TAIL (|int| JUMP, |int| Prm1, |&fatasm|) {

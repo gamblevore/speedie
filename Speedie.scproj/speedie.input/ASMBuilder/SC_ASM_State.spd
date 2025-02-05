@@ -110,18 +110,9 @@ struct ASMState
 		return .Assign(dest, src, exp)
 
 
-	syntax append (|int| code, |message| dbg, |&FatASM|)
+	syntax append (|asm| code, |message| dbg, |&FatASM|)
 		cpp_part RequestOp
-		|| p = .curr
-		if p < .end
-			.curr = p + 1
-			P.op = code
-			p.debug = dbg
-			p.BlockNum = .BasicBlock
-			return p
-		.OK = false
-		return .start
-
+		return dbg * code
 
 	syntax expect (|message?| where=nil, |string| msg)
 		cpp_part Fail
