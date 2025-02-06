@@ -12,7 +12,10 @@ function DeleteableListKeys (GuiKeyEvent)
 	if key.IsDelete
 		if self isa ListView
 			|| s = .FirstSelected
+				|| p = s.parent
 				.RemoveRow(s)
+				if !p.HasAny
+					.RemoveRow(p)
 		return true
 
 

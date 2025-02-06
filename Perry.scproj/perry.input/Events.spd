@@ -351,7 +351,7 @@ function PerryIDE.MassSearch (|bool|)
 
 			
 	
-function PerryIDE.DoReplacement (|error| File, |string| r)
+function PerryIDE.DoReplacement (|error| File, |string| r, |int|)
 	|| fs = faststring()
 	|| t = .EditMe.Text
 	|| First = file.first!.position
@@ -362,9 +362,20 @@ function PerryIDE.DoReplacement (|error| File, |string| r)
 		curr.position = fs.length
 		curr.rangelength = R.Length
 		fs <~ R
+		rz++
 
 	.editme.InsertSub(fs, (first, last), false, false)
-	
+
+
+function PerryIDE.DidReplace (|int| n, |string| dest)
+	Notifications <~ "Replaced $n matches with: $dest"
+
+
+function PerryIDE.CanReplace (|string| r,  |listviewrow| root,  |string| src,  |bool|)
+	|| n = 0
+	for f in root
+		n += f.SlowCount
+	return "Replace $n matches of: \"$src\"\n\nWith: \"$r\" ?".Confirm
 
 
 function PerryIDE.DoReplacements (|bool|)
@@ -372,12 +383,19 @@ function PerryIDE.DoReplacements (|bool|)
 	if .FoundList.isempty
 		.MassSearch
 	|| r = .massreplacefield.text
-	|| f = .FoundList.ListSource.first
+	|| l = .FoundList.ListSource
+	|| f = l.first
+	|| src = .MassSearchField.text
+	require .CanReplace(r, l, src)
+
+	|| n = 0
 	while  f
 		|| fr = f.obj as FileRow
-		if f.hasany and .EditFile(fr) and f isa error
-			.DoReplacement(f, r)
+		if f.HasAny and .EditFile(fr) and f isa error
+			n += .DoReplacement(f, r)
 		f++
+	
+	.DidReplace(n, r)
 	return true
 	
 
