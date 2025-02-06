@@ -1,0 +1,101 @@
+import "GUI"
+
+class Piece
+	|ivec2|		Pos
+	|vec4|		Color
+
+class SnakeWin (window)
+	|[Piece]|					Snake
+	|ivec2|						Speed
+	|Piece|						Food
+	|int|						Score
+    |random|					Rng
+	constants: GridSize = 16
+	
+	constructor
+		.food = Piece((0,0), colors.white)
+		gui.title = "Snake"
+		.restart
+	
+	function Restart
+		.Score = 0
+		.Snake.Clear
+		.Snake <~ Piece((12,12), colors.green)
+		.Speed = (1,0)
+		.GimmeFood
+
+	function HitSnake (|ivec2| P, |bool|)
+		for V in .Snake
+			if V.pos == p
+				return true
+	
+	function GimmeFood
+	    for 100
+	        || xy = .rng[(GridSize, gridsize)]
+	        if !.HitSnake(xy)
+				.food = Piece(xy, colors.red)
+				exit
+	
+	function OK (|ivec2| P, |bool|)
+		return  p.x InRange GridSize  and  p.y InRange GridSize
+	
+	behaviour Draw
+		where.DrawRect(self, colors.black)
+		Where.DrawText("Score: $.score", where.size-(60,13))
+		for V in .snake
+			.DrawThing(where, v)
+		.DrawThing(where, .food)
+
+	function DrawThing (|image|where, |Piece| P)
+		|| CZ = 18
+		|| IZ = ivec2(GridSize * CZ)
+		|| adjust = (Where.size - iz)/2
+		|| xy = p.pos*CZ + adjust
+		Where.DrawRect((xy, xy+CZ), p.Color)
+		
+	function Head (|ivec2|)
+		return .Snake.Last!.pos
+		
+	behaviour FrameStep
+		require GUIActive
+		|| D2 = keys.Movement.Sign.xz.iVec2
+			if d2.x: d2.y = 0
+			|| H2 = .head+d2
+			if .ok(h2) and !.HitSnake(H2)
+				.Speed = D2
+		
+		|| H = .Head
+		|| D = .Speed
+		|| H2 = H + D
+		if !.OK(h2)
+			|| G = gridsize/2
+			if D.y
+				D = ((G > H.x)*2-1, 0)
+			  else
+				D = (0, (G > H.y)*2-1)
+			H2 = H + D
+			expect .OK(h2) ("holy fuck")
+			.Speed = D
+		
+		if .HitSnake(h2)
+			.food.pos = h2
+			.food.Color = colors.blue
+			beep "Died!"
+			return .Restart
+		
+		if h2 == .food.pos
+			.GimmeFood
+			.Score++
+			.Snake <~ Piece(h2, colors.green)
+		  else
+			for (P in .Snake) (i)
+				|| P2 = .Snake[i+1]
+					P.pos = P2.pos
+				  else
+					p.pos = h2
+		gui.touch
+
+
+
+main
+	return SnakeWin().RunAsMain(2.0, 10)
