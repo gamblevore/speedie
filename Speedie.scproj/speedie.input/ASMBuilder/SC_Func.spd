@@ -5,7 +5,6 @@ class µFunc
 		cpp_class FuncInASM
 		cpp_part FuncInASM 
 	|scfunction|			Fn
-//	|&FatASM|				IR
 	|int|					Start
 	|int|					Length
 	|bool|					OK
@@ -82,6 +81,7 @@ class µFunc
 			fs <~ '\t'
 			µ.Renda(fs)
 			fs <~ '\n'
+
 
 /// TEXTUAL STUFF		
 	function DebugPrint

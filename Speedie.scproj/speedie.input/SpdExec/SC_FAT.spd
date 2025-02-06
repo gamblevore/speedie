@@ -281,6 +281,7 @@ struct FatASM
 			return 
 		
 		|| c = msg.copy
+		arg = c.find(@arg)!
 		while arg
 			arg.Remove
 			arg = c.find(@arg)

@@ -46,6 +46,7 @@ struct ASMState
 			
 		.VDecls = d
 		.VTmps = v.low
+		return asmreg.zero()
 			
 	function AddFuncParams (|SCFunction| fn)
 		opt norefcounts
@@ -255,12 +256,7 @@ struct ASMState
 		return ss
 
 
-	function Sanity
-		opt norefcounts
-//		|| x1 = .fn.asm
-//			|| x2 = x1.fn
-//			|| x3 = x2.asm
-//				|| x4 = x3.fn
+	function Sanity 
 	
 
 	function FuncPrm (|message| prm, |asmreg|)
@@ -451,15 +447,16 @@ struct ASMState
 	function ImproveJumps 
 		|| A = .Curr
 		|| J = .funcstart
-		|| C = false
+		|| DbgCount = 0
+		if .fn ~= "jump_improvements"
 		// jumps of 0 can be rendered as a nop
 		while A > J
 			if J isa asm.jump
-				C |= J.JumpImprove
+				DbgCount += J.JumpImprove
 			J++
 		target debug
-			if C
-				PrintProgress(nil)
+			if DbgCount
+/				PrintProgress(nil)
 
 
 	function SetLength

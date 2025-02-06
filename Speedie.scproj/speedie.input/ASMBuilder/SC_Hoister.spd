@@ -23,12 +23,15 @@ struct SC_Hoister
 	
 	function PreCheck (|message| exp, |int| Score = 0)
 		opt norefcounts
-		if score > 0
-			|| fn = exp.func
-			if (fn == @dot or @thg) and (.Count < 5)
-				|| prop = exp.ASMDecl
-				if prop.CanHoist
-					.HoistReg(exp, prop)
+		|| fn = exp.func
+		if fn == @type
+			exp = exp.first // no go into the type!
+		  elseif fn == @func
+			exp = exp.second
+		if  (score > 0)  and  (fn == @dot or @thg)  and  (.Count < 5)
+			|| prop = exp.ASMDecl
+			if prop.CanHoist
+				.HoistReg(exp, prop)
 	
 		// We need to pre-search... So... how? So... lets go through it
 		// So we find a while. We increase the score... then? we have to go through them again?

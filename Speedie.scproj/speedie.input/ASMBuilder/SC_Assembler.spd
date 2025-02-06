@@ -55,10 +55,12 @@ module SpdAssembler
 		opt norefcounts
 
 		if !fn.tableid // oof
+		if fn ~= "func26"
 		ASMState.Sh.InitAndStartFunc(fn)
 		|| A = fn.SourceArg!
 		ASMType.arg(ASMState.Sh, A, ASMReg())
 		ASMState.Sh.FinishASM
+
 		if StdErr.ok
 			fn.asm!.debugprint
 			return true
