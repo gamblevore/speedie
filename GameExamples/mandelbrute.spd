@@ -2,17 +2,16 @@
 import "GUI"
 
 // Copy of a seed7 mandelbrot example.
-// Probably this would be better using fixed-point int math.
 // Mine is more readable... and has less lines of code.
-// Also added keyboard/mouse handling, which was missing from
-// their demo
+// Also added keyboard/mouse handling, which was missing from theirs.
+// Probably this would be better using fixed-point int math.
 
 |vec4[256]| ColorTable
 main
     for col in 256
 		|| C = vec4(2609, 5003, 257, 0)
-		|| F = col|float| / 64K|float|
-		C = 1.0-(C*F).fract
+		|| F = Col|float| / 64K|float|
+		C = 1.0 - (C*F).fract
 		colorTable[col] = C
 	return Mandelbroat().RunAsMain(1.0, 1)
 
@@ -41,7 +40,7 @@ class Mandelbroat (window)
 				|| c = colorTable[.iterate(z0)]
 				where[(x,y)+adjust+pix] <~ C
 
-	// Extra mouse/keyboard handling, not in original, added here.
+	// Extra mouse/keyboard handling. Not in original.
 	behaviour Gesture
 		if Wheel.y > 0
 			.zoom /= 0.9
