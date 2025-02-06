@@ -137,10 +137,10 @@ datatype int
 			return (self+i) min 0
 	
 	
-	operator InRange (|int| d, |bool|)
+	operator InRange (|int| Length, |bool|)
 		opt inline
-		if d > 0 // can fail otherwise
-			return (self|uint| < d|uint|)
+		if Length >= 0 // can fail otherwise
+			return (self|uint| < Length|uint|)
 
 	
 	operator Align (|int| To, |int|)
@@ -658,9 +658,10 @@ datatype int64
 	function AlignUp (|int64| To, |int64|)
 		return self + (-self|uint64| mod to) // ???
 
-	operator InRange (|int64| d, |bool|)
+	operator InRange (|int64| Length, |bool|)
 		opt inline
-		return (self|uint64| < d|uint64|)
+		if Length >= 0 // can fail otherwise
+			return (self|uint64| < Length|uint64|)
 
 	operator Div (|int64| D, |float64|)
 		return self|float64| / d|float64|
@@ -938,6 +939,12 @@ datatype MoveCode (byte)
 		All = 63
 		Center = 63
 
+	function ivec2.MoveCode (|movecode|)
+		|| x = .x
+			rz |= movecode.right << (x < 0)
+		|| y = .y
+			rz |= movecode.Up << (y < 0)
+			
 	syntax is (|movecode| m, |bool|)
 		return (self & m) == m
 

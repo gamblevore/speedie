@@ -12,13 +12,13 @@ struct Random
 	
 	saveas struct
 
+	function Int (|int64| b, |int64|)
+		cpp_part IntTo
+		return .int(0, b)
+	
 	function Int (|int64| a, |int64| b, |int64|)
-		cpp_part RndIntRange
-		|| n = b-a
-		return .int(n|float64|) + n
-
-	function Int (|Float64| n, |int64|) 
-		return (.Float64 * n)|int64|
+		cpp_part IntRange
+		return (.Float64 * ((b-a)|float64|) + a|float64|)|int64|
 
 	function Int (|int64|)
 		cpp_part RndInt
@@ -99,6 +99,14 @@ struct Random
 		
 	function Vec4 (|vec4|)
 		return (.float, .float, .float, .float)
+		
+	syntax access (|ivec2| Lim, |ivec2|)	
+		cpp_part AccessIVec2
+		return ivec2(.int(lim.x), .int(lim.y))
+		
+	syntax access (|int| To, |int|) 
+		cpp_part AccessTo
+		return .int(0, to)
 		
 	syntax access (|float| To, |float|) 
 		cpp_part AccessScale

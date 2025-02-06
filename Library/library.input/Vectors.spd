@@ -101,6 +101,10 @@ datatype vec4
 	function Floor (|vec4|)
 		return (.x.floor, .y.floor, .z.floor, .w.floor)
 	
+	function Fract (|vec4|)
+		return (.x.fract, .y.fract, .z.fract, .w.fract)
+		
+	
 	function Sum (|float|)
 		return .x + .y + .z + .w
 	
@@ -730,6 +734,11 @@ datatype vec2
 		rz[1,1] =  .y, rz[2,1] = .x
 		rz[1,2] = -.x, rz[2,2] = .y
 
+	function OperatorCMul (|vec2| v, |vec2|)
+		description "Complex number multiply" 
+	    rz.x = (.x * v.x) - (.y * v.y)
+	    rz.y = (.y * v.x) + (.x * v.y)
+	
 	function Normal (|vec2|)
 		return self / .Length
 	
