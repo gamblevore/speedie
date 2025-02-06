@@ -1,0 +1,60 @@
+#!/usr/local/bin/spd
+import "GUI"
+
+// Copy of a seed7 mandelbrot example.
+// Probably this would be better using fixed-point int math.
+// Mine is more readable... and has less lines of code.
+// Also added keyboard/mouse handling, which was missing from
+// their demo
+
+|vec4[256]| ColorTable
+main
+    for col in 256
+		|| C = vec4(2609, 5003, 257, 0)
+		|| F = col|float| / 64K|float|
+		C = 1.0-(C*F).fract
+		colorTable[col] = C
+	return Mandelbroat().RunAsMain(1.0, 1)
+
+
+class Mandelbroat (window)
+	|float|     zoom = 1.3
+	|vec2|		center = (-0.75, 0.0)
+	
+	function Iterate (|vec2| z0, |int|)
+		rz++
+	    || z = z0
+	    while (z.lengthsq < 4.0) and (rz < 256)
+			(z cmul= z)
+			z += z0
+			rz++
+		
+	behaviour draw
+		Where.DrawRect(self, colors.black)
+		|| pix = (where.height/2)-1
+		|| zoom = .zoom / pix|float|
+	    || z0 = vec2()
+		|| adjust = (Where.Size-pix*2)/2
+	    for x in -pix to pix
+			for y in -pix to pix
+				z0 = .center + vec2(x,y)*zoom
+				|| c = colorTable[.iterate(z0)]
+				where[(x,y)+adjust+pix] <~ C
+
+	// Extra mouse/keyboard handling, not in original, added here.
+	behaviour Gesture
+		if Wheel.y > 0
+			.zoom /= 0.9
+			gui.touch
+		  elseif Wheel.y < 0
+			.zoom *= 0.9
+			gui.touch
+	
+	behaviour keydown
+		.center += keys.Movement.sign.xz*0.05*.zoom
+		gui.touch
+	
+	behaviour MouseMove
+		.center += move.Vec2*(1.0, -1.0)*0.0025*.zoom
+		gui.touch
+		
