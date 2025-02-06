@@ -108,10 +108,6 @@ module PackMaker
 	
 	function RunAFewTests 
 /		|scfunction--| fn
-		fn = .testfn("TestAtomic")
-		if fn
-			|| atomic = fn.TestObesity|&int|[]
-			printline atomic
 		fn = .testfn("SemiConst")
 		if fn
 			for i in 2
@@ -156,6 +152,10 @@ module PackMaker
 				self[0] = i&1,   self[1] = (i&2)>>1
 				|| AndOr2 = fn.TestObesity|&int64|[]
 			
+		fn = .testfn("TestAtomic")
+		if fn
+			|| atomic = fn.TestObesity|&int|[]
+			printline atomic
 	
 	
 	function MakePack 

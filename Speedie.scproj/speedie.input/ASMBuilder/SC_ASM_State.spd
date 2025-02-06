@@ -447,16 +447,11 @@ struct ASMState
 	function ImproveJumps 
 		|| A = .Curr
 		|| J = .funcstart
-		|| DbgCount = 0
-		if .fn ~= "jump_improvements"
 		// jumps of 0 can be rendered as a nop
 		while A > J
 			if J isa asm.jump
-				DbgCount += J.JumpImprove
+				J.JumpImprove
 			J++
-		target debug
-			if DbgCount
-/				PrintProgress(nil)
 
 
 	function SetLength
