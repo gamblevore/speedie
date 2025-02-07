@@ -197,7 +197,7 @@ This is useful for file-paths. Compared to this, its perfect:
     </dict>
 
 #### Not Fiddly
-JSON is notoriously fiddly. Extra or missing "," mess everything up. Jeebox doesn't care. You don't need any ",", but they are treated as lines, so you can add them if you want.
+JSON is notoriously fiddly. Extra or missing "," mess everything up. Jeebox doesn't care. You don't need any "," but they are treated as lines, so you can add them if you want.
 
     {
       "userlist": {
