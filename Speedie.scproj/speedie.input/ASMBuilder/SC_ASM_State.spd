@@ -430,7 +430,7 @@ struct ASMState
 			expect (n < 30) (.msg)
 			D = D.jumpto			#require
 			if d isa asm.jump
-/				.jumpto = D
+/				.jumpto(D, asmstate.sh)
 				rz = true
 				continue
 			if d isa asm.ret
@@ -494,15 +494,11 @@ struct ASMState
 	
 	
 	function TryInline (|message| prms, |asmreg| dest, |µFunc| asm, |bool|)
-	// how to do addr of reg?
-	
 		opt norefcounts
 		|| fn = asm.fn
 		require .fn.ExportName contains "Inline_"
-		require !fn.CurrentlyInlining	
-		fn.CurrentlyInlining = true
 		
-		|| oldFunc = .fn
+		|| OldFunc = .fn
 		|| OldDest = .ReturnDest
 	
 		.fn = fn
@@ -511,11 +507,11 @@ struct ASMState
 		|fatrange| LL 
 		LL.Start = .curr
 		|| OK = .TryInlineSub(prms, dest, fn)
-		LL.AllJumpTo
+		ll.after = .curr
+/		LL.AllJumpTo
 
 		.ReturnDest = Olddest
 		.fn = oldFunc
-		fn.CurrentlyInlining=false
 		return OK
 	
 		
@@ -523,6 +519,7 @@ struct ASMState
 		opt norefcounts
 		|| p = prms.first
 		for a in fn.Args
+			if p.asmdecl is const // why isnt this working?
 			|| v = .ExistingVar(p!) 
 				|| vr = v.reg
 				if (a isnt Altered) or .CanReuseInput(prms, dest, vr)
@@ -601,6 +598,7 @@ function @ASMType.DoFunction (fn_asm)
 	|| fn = prms.asfunc!
 	
 	dest = .CallFunc(exp, dest, fn)
+//	if "Inline_Consts".trap
 	if .AskForInline(prms, dest, fn)
 		return dest
 

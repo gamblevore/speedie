@@ -60,9 +60,7 @@ function If (fn_asm)
 	B.AllJumpTo
 	|| AfterFirst = arg1.jump(0)
 	.ArgOrIf(other)
-	AfterFirst.jumpto = .curr
-	
-	return asmreg()
+	return AfterFirst.jumpto(.curr, asmstate.sh)
 
 
 function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
@@ -72,9 +70,9 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 		if op >= kContinue
 			C.op = ASM.Jump
 			if op == kContinue			// continue
-				C.JumpTo = S
+				C.JumpTo(S, asmstate.sh)
 			  else       				// exit
-				C.JumpTo = A
+				C.JumpTo(A, asmstate.sh)
 		C++
 
 
@@ -93,7 +91,7 @@ function While (fn_asm)
 /		.nop(begin, loop_Test.start)
 		return asmreg()
 	
-	BEGIN.jumpto = LOOP_Test.start
+	BEGIN.jumpto(LOOP_Test.start, self)
 	LOOP_TEST.AllJumpTo(BEGIN+1, true)
 	.loopfill(begin, LOOP_Test.start, LOOP_Test.After)
 	
@@ -144,7 +142,7 @@ function Ternary		(fn_asm)
 		|| Exit = exp.jump(0)
 		TernTest.AllJumpTo
 		rz = .µInto(B, dest)
-		Exit.jumpto = .curr
+		Exit.jumpto(.curr, self)
 
 
 function SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond, |asmreg|)
@@ -264,7 +262,7 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 		.NOP(jump) //opp, first, Second, B
 		return .BoolConst2(second, dest, opp, b, first).boolanswer
 
-	JUMP.JumpTo = .curr
+	JUMP.JumpTo(.curr, self)
 	
 	if first.IsBool and Second.IsBool
 		return dest.boolanswer
@@ -381,7 +379,7 @@ Struct FatRange
 		for s in self
 			if s is CondAnswer
 				(s isnt CondAnswer)
-				s.jumpto = curr
+				s.jumpto(curr,A)
 				if strip and s == Curr - 1
 					curr--
 					A.nop(s)
@@ -395,12 +393,12 @@ Struct FatRange
 
 
 function @asmstate.PrintProgress (|message| exp=nil)
-	cpp_name adb
+	cpp_name adb 
 	visible
 	opt norefcounts
 	"---"
-	|| s = ASMState.sh
-	printline s.fn
+	printline scfunction.currfunc
+	|| s = asmstate.sh
 	if exp
 		printline exp
 	  else

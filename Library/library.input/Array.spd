@@ -192,8 +192,8 @@ class Array (saveable)
 
 prototype SorterComparer (|...| a, |...| b, |SortComparison|)
 	contains Object
-	function sort (|array| a)
-		a.sort(self)
+	function Sort (|array of ...| items)
+		items.sort(self)
 
 
 datatype SortComparison (int) // 

@@ -170,13 +170,16 @@ struct FatASM
 			return self + 1 + .r[j-1]
 	
 	
-	function JumpTo (assigns:|&fatasm|)
+	function JumpTo (|&fatasm| value, |&asmstate| A, |asmreg|)
 		|| j = .jumpreg
 			|| D = (value - self) - 1
-			check (D != 0 and -1) (self, "bad jump")
+			check (D != -1) (self, "bad jump")
 			.r[j-1] = D
+			if d == 0
+				a.nop(self)
 		  else
 			debugger
+		return asmreg()
 
 	function r0 (|uint|): return .r[0]
 	function r0 (assigns:|asmreg|): .r[0] = value.treg

@@ -86,6 +86,7 @@ module PackMaker
 	
 	function ActualASMCompile (|bool|)
 		opt norefcounts
+		.Packfuncs.sort(&CodeSorter.LeafFunctionsSorter)
 		|| j = asmstate.sh.jsm
 			j.length = 0
 		for fn in .Packfuncs

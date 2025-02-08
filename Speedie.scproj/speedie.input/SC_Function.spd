@@ -76,7 +76,6 @@ linkage
 |Byte|					MinOpt
 |Byte|					IsAssigns
 |byte|					IsCppInBuilt
-|bool|					CurrentlyInlining
 |byte|					CantBeInlined
 |errorseverity|			BlindCasts
 |byte|					IsNilChecker
@@ -550,7 +549,7 @@ function DescribeParamFail (|SCParamArray| params, |int| bad)
 		if UsesSelf and bad==1
 			fs <~ "Wrong self: "
 		  else
-			fs <~ "Wrong param ($num): "
+			fs <~ "Wrong param ($num): Got "
 		|| Type = TypeOfExpr(P, nil)
 			Type.RenderTypeName(fs)
 			if type.name
