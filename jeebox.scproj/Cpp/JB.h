@@ -466,10 +466,10 @@ struct Memory_Behaviour: Object_Behaviour {
 };
 
 JBClass ( MWrap , JB_Object , 
-	int Length;
+	uint ItemSize;
 	byte* _Ptr;
 	int ItemCount;
-	u16 ItemSize;
+	int Length;
 	byte DeathAction;
 );
 
