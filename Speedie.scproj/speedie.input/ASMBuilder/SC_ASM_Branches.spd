@@ -80,11 +80,15 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 
 function While (fn_asm)
 	opt norefcounts
+	|sc_hoister| H 
+	h.Closer = .OpenVars
+	h.PreCheck(exp.first, 1<<30)
+	
 	|| BEGIN = exp.JUMP(0)							// jump to end... THEN EMIT arg and jump back.
 	ASMType.arg(self, exp.second!)					// arg
 
 	|fatrange| LOOP_TEST
-	|| LT = .Branch(exp.first!, true, loop_test)
+	|| LT = .Branch(exp.first, true, loop_test)
 	if loop_test.never
 /		.nop(begin, loop_Test.start)
 		return asmreg()
@@ -93,7 +97,7 @@ function While (fn_asm)
 	LOOP_TEST.AllJumpTo(BEGIN+1, true)
 	.loopfill(begin, LOOP_Test.start, LOOP_Test.After)
 	
-	return asmreg()
+	return h.Unhoist
 
 
 function Exit			(fn_asm)
@@ -392,6 +396,7 @@ Struct FatRange
 
 function @asmstate.PrintProgress (|message| exp=nil)
 	cpp_name adb
+	visible
 	opt norefcounts
 	"---"
 	|| s = ASMState.sh

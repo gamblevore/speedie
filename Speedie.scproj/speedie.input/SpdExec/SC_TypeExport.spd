@@ -1,5 +1,13 @@
 
 
+datatype NilReg (byte)
+	constants
+		|nilreg|
+		Hoisted = 128
+	syntax is (|NilReg| type, |bool|)
+		return self&type
+
+
 datatype NilState (byte) // Exec.scproj needs this here
 	constants
 		|nilstate|

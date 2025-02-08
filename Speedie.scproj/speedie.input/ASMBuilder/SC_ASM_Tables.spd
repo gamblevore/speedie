@@ -235,11 +235,23 @@ function Decl (fn_asm)
 			ty.FatConstIndex = k.fatindex	
 
 
-function Arg (fn_asm)
-	opt norefcounts
+function HoistedArg (fn_asm)
 	|sc_hoister| H 
 	h.Closer = .OpenVars
 	h.PreCheck(exp)
+	argsub(self, exp)
+	return H.Unhoist
+
+
+function Arg (fn_asm)
+	|| O = .OpenVars
+	argsub(self, exp)
+	return .CloseVars(O)
+	
+
+
+function ArgSub (fn_asm)
+	opt norefcounts
 	
 	for ch.fast in exp
 		if ch.func == @decl
@@ -247,7 +259,6 @@ function Arg (fn_asm)
 		  else
 			.µ(ch, AsmReg.RealDiscard)
 
-	return H.Unhoist
 
 
 
@@ -324,6 +335,11 @@ function Num (fn_asm)
 	|| T = d.typeonly
 	dest.µtype = T
 	(dest is RealConst)
+	
+	if d.nilreg is hoisted
+		Dest.reg = d.nilreg&31
+		return Dest
+	
 	return .NumToReg(exp, d.ExportPosition, dest, T)
 
 
@@ -359,7 +375,9 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	if d is const
 		(dest is RealConst)
 		if dest isnt ConstRequest
-			return .NumToReg(exp, d.exportposition, dest, dest.µtype)
+			if d.nilreg isnt hoisted
+				return .NumToReg(exp, d.exportposition, dest, dest.µtype)
+/			Dest.reg = d.nilreg&31
 		return dest
 
 	if dest isnt ConstRequest
@@ -367,46 +385,32 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 		return DoGlobal(self, exp, dest, d)
 
 
+function GlobAddr (|scdecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
+	if d.NilReg is Hoisted
+		Dest = d.nilreg|int|.asm
+	  else
+		|int64| iTable = d.ExportPosition
+		expect (iTable > 0)          (exp, "No global address".internal)
+		expect (iTable <= 18~bits)   (exp, "Used over 256K of global data")
+		Dest = exp.GTAB(dest,  (!d.IsLib)|int|,  iTable) * dest
+	dest.µtype = DataTypeCode._voidptr
+	return dest.HaveAddr
+
 
 function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |asmreg|)
 	opt	NoRefCounts
 	|| d2 = exp.asmdecl
 	if !d.minimatch(d2) // Remove d2. it the same as D.
-	if dest isnt set								// a = glob
-		dest = .TempTyped(exp, dest) // no need type if we have D?
-
-	|int64| iTable = d.ExportPosition
-	expect (iTable > 0)          (exp, "No global address".internal)
-	expect (iTable <= 18~bits)   (exp, "Used over 256K of global data")
+	if dest isnt set
+		dest = .TempTyped(exp, dest)
 	
-	// OK how to do this?
-	// We could make a score. Collect a score for each gtab.
-	// honestly... it sems complex. A lot of mental work i'd rather not do.
-	// can I do something else? just... move things down?
-	// what can go wrong? just jumps, right?
-	// there are things tht jump back, and things that jump forward.
-	// We'd be moving everything that
-	
-	// Should be "hoistable" out of loop or containing block... and reused.
-	// We can pre-allocate GTAB space with NOPs, and then just use them.
-	// seems fair? I guess it needs to be a "Total-space" in-case they get
-	// hoisted twice?
-	/*
-		// gtab here
-		while y
-			if y&2
-				glob++
-			else
-				glob--
-	*/
-	
-	|| table = exp.GTAB(dest,  (!d.IsLib)|int|,  iTable)
-	if dest is AddrRequest
-		Dest.µtype = DataTypeCode._voidptr
-		return (table * dest).HaveAddr
-	
-	dest.µtype = d2.DataType
-	return .ReadOrWrite(dest, Exp, dest, ASMReg(), 0)
+	|| addr = GlobAddr(d, exp, dest)
+		if dest is AddrRequest
+			return addr
+		
+		dest.µtype = d2.DataType
+		dest = dest asnt asmreg.ContainsAddr
+		return .ReadOrWrite(dest, Exp, addr, ASMReg(), 0)
 	
 
 

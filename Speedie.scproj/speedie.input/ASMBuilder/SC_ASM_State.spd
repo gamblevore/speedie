@@ -26,7 +26,6 @@ struct ASMState
 	constants
 		kContinue		= 254
 		kExit			= 255
-		MinHoistScore	= 3
 	
 
 	module
@@ -243,10 +242,6 @@ struct ASMState
 			if !ss.tmpcheck
 				(fn)(self, exp, dest)
 			check (ss) (self, exp, "µInto failed")
-			if (ss is RealConst) and ss.reg
-				if !ss.fat
-					debugger
-					(fn)(self, exp, dest)
 			if dest is set or ss is set
 				return ss // no need test.
 			if !ss.reg and (ss isnt condanswer)

@@ -545,6 +545,7 @@ function DescribeParamFail (|SCParamArray| params, |int| bad)
 	|| UsesSelf = params.isdot and params.IsNotModule
 	|| Num = bad - UsesSelf
 	|| fs = FastString()
+	|| badarg = .args[bad-1]
 	|| P = params[bad-1]
 		if UsesSelf and bad==1
 			fs <~ "Wrong self: "
@@ -559,9 +560,9 @@ function DescribeParamFail (|SCParamArray| params, |int| bad)
 			fs <~ "(Unknown Type)"
 	  else
 		p = params.exp
-		fs <~ "Missing param $num"
+		fs <~ "Missing param $num (${badarg.name})"
 	fs <~ ". Expected: "
-	.args[bad-1].rendertypename(fs)
+	badarg.rendertypename(fs)
 	error ( P, fs )
 	fs <~ "to "
 	.RenderTitle(fs)

@@ -1,18 +1,47 @@
 
 
+/*
+	OK... how do we do this?
+	Last attempt was a bit of a debacle. But it will work this time!
+	
+	* So... we want to do this before a loop.
+		* Loop comparison ints/floats need hoisting
+	
+	|| x = glob
+	|| y = glob
+	while 1
+		|| z = glob
+	
+	OK... what do I do?
+	
+	
+*/
+
+
+
 struct SC_Hoister
 	linkage
 		cpp_part Hoi
 	|SCDecl--[6]|	Items
 	|uint64|		Closer
 	|int|			Count
-		
-	function HoistReg (|message| prop,  |scdecl| decl)
+	
+	constants
+		MinHoistScore	= 3
+
+	function HoistGlobal (|message| prop,  |scdecl| decl)
 		opt NoRefCounts
-		|| dest = asmstate.sh.DeclareMe(prop, decl)		// Pre-declare var, for glob.
-		decl.NilReg = dest.reg ||| 128					// Store! Inlines can see it too!
+		|| dest = ASMState.sh.DeclareMe(prop, decl)		// Pre-declare glob.
+		ASMType.GlobAddr(decl, prop, dest)
+		decl.NilReg = dest.reg ||| nilreg.Hoisted
 		.Items[.Count++] = decl
-		// what about branches?
+
+	function HoistConst (|message| prop,  |scdecl| decl)
+		opt NoRefCounts
+		|| dest = ASMState.sh.DeclareMe(prop, decl)		// Pre-declare glob.
+		asmstate.sh.NumToReg(prop, decl.exportposition, dest, dest.µtype)
+		decl.NilReg = dest.reg ||| nilreg.Hoisted
+		.Items[.Count++] = decl
 	
 	function Unhoist (|asmreg|)
 		opt NoRefCounts
@@ -28,25 +57,21 @@ struct SC_Hoister
 			exp = exp.first // no go into the type!
 		  elseif fn == @func
 			exp = exp.second
-		if  (score > 0)  and  (fn == @dot or @thg)  and  (.Count < 5)
+		if  (score >= 0)  and  (fn == @dot or @thg or @num)  and  (.Count < –count .items)
 			|| prop = exp.ASMDecl
-			if prop.CanHoist
-				.HoistReg(exp, prop)
+			if prop.nilreg isnt hoisted
+				if prop is const
+					if (score >= 1<<29) and prop.exportposition
+						.hoistConst(exp, prop)
+				  elseif prop is Global
+					.HoistGlobal(exp, prop)
 	
-		// We need to pre-search... So... how? So... lets go through it
-		// So we find a while. We increase the score... then? we have to go through them again?
-		// or store it?
 		for ch.fast in exp
 			|| add = 0
 			if ch.func == @tmp
 				|| ty = ch.ASMType
-				add += (ty is kWhile) * asmstate.MinHoistScore
+				add += (ty is kWhile) * MinHoistScore
 				add -= (ty is kIf)
 				
 			.PreCheck(ch, add + score)
-
-
-function scdecl.CanHoist (|bool|)
-	ifn .NilReg & 128
-		return (self is Global) and (self isnt const)
 

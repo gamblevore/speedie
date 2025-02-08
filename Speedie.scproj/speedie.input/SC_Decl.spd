@@ -110,7 +110,7 @@ class SCDecl (SCNamed) {
 	|Datatypecode|		DataType
 	|NilState|			NilDeclared
 	|Byte|				PointerCount
-	|byte| 				NilReg
+	|nilreg|			NilReg
 	|byte| 				NilAllocDepth
 	|int|				FatConstIndex
 
