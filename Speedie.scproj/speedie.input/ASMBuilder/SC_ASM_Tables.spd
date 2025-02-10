@@ -619,27 +619,24 @@ function ASMLocal (|message| s, |VarUseMode| mode, |asmreg| extra, |asmreg|)
 function MakeConstFromASM (|scdecl| decl, |asmreg| K)
 	opt NoRefCounts
 	|| f = k.fat
-//	if (k is ConstOutput) and (decl isnt AlteredInBranch)
-//		if f
-//			(decl is const)
-//			// || k = 1, k = 2, k = k + 3
-//			decl.ExportPosition = f._const
-//			if !k.FatIndex
-//			decl.FatConstIndex = k.fatindex
-//			return 
-//		debugger 
-//
-//// || k = 1, k = X	// clear here
-//// y = k			// nice.
-//	if f
-//		if f
-//	if !f
-//	if decl is Const
-//		(decl isnt const)
-//		decl.ExportPosition = 0
-//		decl.FatConstIndex = 0
-//		if !f.FatRefCount
-//			.nop(f)
+	if (k is ConstOutput) and (decl isnt AlteredInBranch)
+		if f
+			(decl is const)
+			// || k = 1, k = 2, k = k + 3
+			decl.ExportPosition = f._const
+			if !k.FatIndex
+			decl.FatConstIndex = k.fatindex
+			return 
+		debugger 
+
+// || k = 1, k = X	// clear here
+// y = k			// nice.
+	if decl is Const
+		(decl isnt const)
+		decl.ExportPosition = 0
+		decl.FatConstIndex = 0
+		if f and !f.FatRefCount
+			.nop(f)
 }
 
 

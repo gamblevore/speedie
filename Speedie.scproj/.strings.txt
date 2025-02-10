@@ -2164,5 +2164,5 @@
 "No ASM for this operator?"
 "Can't increment temporary value."
 "Register out of bounds"
-"no_print_args true\nnil_check false\nprefs \"klinkerhoppen.speedie\"\nfun_and_fashion \"tasks_function_correctly\"\n"
+"no_print_args true\nprefs \"klinkerhoppen.speedie\"\nfun_and_fashion \"tasks_function_correctly\"\n"
 "sort_properties"

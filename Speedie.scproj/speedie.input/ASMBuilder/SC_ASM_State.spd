@@ -543,7 +543,7 @@ struct ASMState
 			p++
 	
 
-	function RestoreParameters (|message| prms, |asmreg| dest, |SCFunction| fn)
+	function RestoreParameters (|message| prms, |SCFunction| fn)
 		opt norefcounts
 		|| p = prms.first
 		for a in fn.Args
@@ -554,7 +554,7 @@ struct ASMState
 		opt norefcounts
 		.InlineParameters(prms, dest, fn)
 		ASMType.arg(self, fn.SourceArg!, ASMReg())
-		.RestoreParameters(prms, dest, fn)
+		.RestoreParameters(prms, fn)
 		return true
 	
 	

@@ -6856,6 +6856,8 @@ ASMReg SC_Pac_MakeConst(ASMState* Self, FatASM* Fat, ASMReg Reg);
 
 ASMReg SC_Pac_MakeConst2(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp, fn_ASMConstifier Fn);
 
+void SC_Pac_MakeConstFromASM(ASMState* Self, SCDecl* Decl, ASMReg K);
+
 ASMReg SC_Pac_Minus(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
 ASMReg SC_Pac_Mod(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
@@ -6922,7 +6924,7 @@ FatASM* SC_Pac_RefCountSub(ASMState* Self, Message* Exp, Message* Prms, SCFuncti
 
 void SC_Pac_RegsBitClear(ASMState* Self, Message* Exp, int RegAddrs, SCFunction* Fn);
 
-void SC_Pac_RestoreParameters(ASMState* Self, Message* Prms, ASMReg Dest, SCFunction* Fn);
+void SC_Pac_RestoreParameters(ASMState* Self, Message* Prms, SCFunction* Fn);
 
 ASMReg SC_Pac_SafeDecr(ASMState* Self);
 
@@ -9946,8 +9948,6 @@ SCDecl* SC_Decl_MakeAsObject(SCDecl* Self, SCDecl* Container, Message* ErrPlace)
 
 SCDecl* SC_Decl_MakeBorrowed(SCDecl* Self, bool StayBorrowed);
 
-void SC_Decl_MakeConstFromASM(SCDecl* Self, ASMReg K);
-
 void SC_Decl_MakeContainedObject(SCDecl* Self, Message* ErrPlace);
 
 SCDecl* SC_Decl_MakeContainedOptional(SCDecl* Self);
@@ -10940,6 +10940,8 @@ JB_String* SC_Func_MakeProtoClassName(SCFunction* Self, JB_String* Start);
 
 void SC_Func_MarkRecursive(SCFunction* Self, SCFunction* EndAt);
 
+FuncInASM* SC_Func_NeedxC2xB5Func(SCFunction* Self);
+
 Message* SC_Func_NewDefaultRel(SCFunction* Self, Message* Place, SCDecl* D);
 
 void SC_Func_NilSelff(SCFunction* Self, Message* Where, uint /*NilState*/ V);
@@ -11662,8 +11664,8 @@ inline JB_String* JB_config_AsString(Message* Self) {
 inline void SC_FAT_PrmWithIntReg(FatASM* Self, int A, ASMReg Input) {
 	uint I = SC_Reg_FatIndex(Input);
 	Self->R[A] = (SC_Reg_treg(Input) | (I << 15));
-	FatASM* Src = SC_uint_FAT(I);
-	iif (Src) {
+	iif (I) {
+		FatASM* Src = SC_uint_FAT(I);
 		Self->RegFromFat = (Self->RegFromFat | (1 << A));
 		(++Src->FatRefCount);
 	}
