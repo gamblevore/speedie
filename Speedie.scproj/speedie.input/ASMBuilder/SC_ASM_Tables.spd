@@ -229,7 +229,7 @@ function Decl (fn_asm)
 
 	|| K = .µinto(item, dest)
 	if k is ConstOutput
-		ty.MakeConstFromASM(k)
+		.MakeConstFromASM(ty, k)
 
 
 function HoistedArg (fn_asm)
@@ -321,7 +321,7 @@ function SimpleSet (|&asmstate| self, |message| A, |message| B, |asmreg|)
 	
 	|| D = a.ASMDecl	
 	|| become = .µInto(B, X)
-	d.MakeConstFromASM(become)
+	.MakeConstFromASM(d, become)
 	return X
 
 
@@ -614,6 +614,32 @@ function ASMLocal (|message| s, |VarUseMode| mode, |asmreg| extra, |asmreg|)
 		if mode is Return
 			.fn.TrackReturns(d)
 		rz = d.ThgASM as extra
+
+
+function MakeConstFromASM (|scdecl| decl, |asmreg| K)
+	opt NoRefCounts
+	|| f = k.fat
+//	if (k is ConstOutput) and (decl isnt AlteredInBranch)
+//		if f
+//			(decl is const)
+//			// || k = 1, k = 2, k = k + 3
+//			decl.ExportPosition = f._const
+//			if !k.FatIndex
+//			decl.FatConstIndex = k.fatindex
+//			return 
+//		debugger 
+//
+//// || k = 1, k = X	// clear here
+//// y = k			// nice.
+//	if f
+//		if f
+//	if !f
+//	if decl is Const
+//		(decl isnt const)
+//		decl.ExportPosition = 0
+//		decl.FatConstIndex = 0
+//		if !f.FatRefCount
+//			.nop(f)
 }
 
 
@@ -716,26 +742,6 @@ function fatasm.FuncPrmBits (|uint64|)
 			rz |= (1|uint64|<<31)
 			exit
 	// ffff(r4, r3, r2, r1)
-	
-
-
-function scdecl.MakeConstFromASM (|asmreg| K)
-	opt norefcounts
-	if (k is ConstOutput) and (self isnt alteredinbranch)
-		|| f = k.fat
-			is const
-			// || k = 1, k = 2, k = k + 3
-			.exportposition = f._const
-			if !k.FatIndex
-			.FatConstIndex = k.fatindex
-			return 
-		debugger 
-
-// || k = 1, k = X	// clear here
-// y = k			// nice.
-	(self isnt const)
-	.exportposition = 0
-	.FatConstIndex = 0	
 
 
 function SCDecl.ThgASM (|asmreg|)

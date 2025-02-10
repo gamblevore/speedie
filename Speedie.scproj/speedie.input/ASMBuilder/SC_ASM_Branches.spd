@@ -79,13 +79,13 @@ function While (fn_asm)
 	opt norefcounts
 	|sc_hoister| H 
 	h.Closer = .OpenVars
-	h.hoistloop(exp.first)
+	h.hoistloop(exp.first!)
 	
 	|| BEGIN = exp.JUMP(0)							// jump to end... THEN EMIT arg and jump back.
 	ASMType.arg(self, exp.second!)					// arg
 
 	|fatrange| LOOP_TEST
-	|| LT = .Branch(exp.first, true, loop_test)
+	|| LT = .Branch(exp.first!, true, loop_test)
 	if loop_test.never
 /		.noprange(begin, loop_Test.start)
 		return asmreg()
@@ -397,7 +397,7 @@ function @asmstate.PrintProgress (|message| exp=nil)
 	visible
 	opt norefcounts
 	"---"
-	printline scfunction.currfunc
+	printline scfunction.currfunc!
 	|| s = asmstate.sh
 	if exp
 		printline exp

@@ -97,7 +97,7 @@ datatype ASMReg (uint64)
 	function FatIndex (assigns:|uint|, |asmreg|)
 		return (((self|uint64| << 16) >> 16) ||| (value|uint64| << 48))|asmreg|
 	
-	function FAT (|&fatasm|)
+	function FAT (|?&fatasm|)
 		|| i = .FatIndex
 			return i.fat
 	

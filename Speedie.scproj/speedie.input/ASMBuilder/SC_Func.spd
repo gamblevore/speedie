@@ -22,6 +22,10 @@ class µFunc
 		rz.itemcount = after-p
 		rz.length = rz.itemcount
 	
+	function scfunction.NeedµFunc (|µfunc|)
+		opt norefcounts
+		return .asm init µfunc(self)
+		
 	// cosmic lore unfold... into tales untold
 
 	function IR (|&fatasm|)

@@ -7,7 +7,7 @@ linkage
 
 conf 
 	no_print_args	true
-	nil_check		false
+	//nil_check		false
 	prefs			"klinkerhoppen.speedie"
 	fun_and_fashion "tasks_function_correctly"
 

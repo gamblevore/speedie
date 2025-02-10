@@ -16,7 +16,6 @@ struct FatASM
 	|uint|				ASMIndex	
 	|uint16| 			BlockNum
 	|uint16|			FatRefCount
-//	|uint| 				Dummy1
 	
 	function BaseOp (|int|)
 		rz = .op
@@ -128,7 +127,8 @@ struct FatASM
 		
 		|| i = input.FatIndex
 		.r[a] = input.treg ||| (i << 15)
-		|| src = i.fat
+		if i
+			|| src = i.fat
 			.RegFromFat |= 1<<a
 			// We can do phi-nodes later. This is good enough for inlining-consts 
 			src.FatRefCount++

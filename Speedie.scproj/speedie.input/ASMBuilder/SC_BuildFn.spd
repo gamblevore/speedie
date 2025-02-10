@@ -11,8 +11,8 @@ extend_module ASM
 		textassembler.assemble(list)
 		|| fn = SpdAssembler[testname]
 			|| ff = fn.µTest
-				jb_vm.vm.Registers(true)
-				|| result = jb_vm.Run(ff.ptr, ff.length)
+			jb_vm.vm.Registers(true)
+			|| result = jb_vm.Run(ff.ptr, ff.length)
 
 
 	function TestASM 

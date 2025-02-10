@@ -88,6 +88,7 @@ module PackMaker
 		opt norefcounts
 		.Packfuncs.sort(&CodeSorter.LeafFunctionsSorter)
 		|| j = asmstate.sh.jsm
+		if j?
 			j.length = 0
 		for fn in .Packfuncs
 			if fn.AMiniTest
@@ -197,8 +198,8 @@ module PackMaker
 		opt norefcounts
 		|| mu = .asm
 			|| mu2 = mu.µTest
-				mu.debugprint
-				return jb_vm.Run(mu2.ptr, mu2.length)
+			mu.debugprint
+			return jb_vm.Run(mu2.ptr, mu2.length)
 	
 	
 	syntax access (|int| v, assigns:|int64|)

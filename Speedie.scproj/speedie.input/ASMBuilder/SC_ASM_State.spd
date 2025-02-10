@@ -395,13 +395,16 @@ struct ASMState
 		.zero.info = AsmReg()
 		memory.Fill((&.vars[0])|&byte|, 32*8, 0)
 
-		|| j = .JSM init FatASM[256K]
+		|| j = .JSM
+		if !j?
+			j = FatASM[256K]!
+			.jsm = j
 		.end = j.NeedSpare(64K, j.itemcount)
 		.start = j.ptr
 		.curr = .start + j.Length
 		.LastDebug = .curr
 		.FuncStart = .curr
-		.out = fn.asm ?? µfunc(fn)
+		.out = fn.NeedµFunc
 		.fn = fn
 		scfunction.currfunc = fn
 		.ReturnASM = fn.ReturnType.regtype
@@ -414,12 +417,12 @@ struct ASMState
 		|| l = .last
 		if !l.IsFinisher
 			debugger !.fn.returntype
-			.fn.SourceArg.RET(asmreg(), asmreg(), asmreg(), 0, asmreg())
+			.fn.SourceArg!.RET(asmreg(), asmreg(), asmreg(), 0, asmreg())
 		.ImproveJumps
 
 		.out.length = .curr - .FuncStart
 		|| A = asmreg()										// GUARD
-		.fn.sourcearg.EROR(A,A,A,A,0)
+		.fn.sourcearg!.EROR(A,A,A,A,0)
 		.jsm.length = .curr - .start 
 
 
@@ -536,7 +539,7 @@ struct ASMState
 			if !v
 				v = .DeclareMe(a.source, a)
 				v = .µInto(p!, v as asmreg.DeclareInlineParam)
-			a.MakeConstFromASM(V)
+			.MakeConstFromASM(a, V)
 			p++
 	
 
@@ -544,7 +547,7 @@ struct ASMState
 		opt norefcounts
 		|| p = prms.first
 		for a in fn.Args
-			a.MakeConstFromASM(asmreg()) // parameters can never be const anyhow
+			.MakeConstFromASM(a, asmreg()) // parameters can never be const anyhow
 
 	
 	function TryInlineSub (|message| prms, |asmreg| dest, |SCFunction| fn, |bool|)
