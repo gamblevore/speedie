@@ -58,6 +58,7 @@ If you'd like to support the ongoing development of Speedie, consider [sponsorin
 That said, there are challenges to overcome, that will probably mean a lot of people who are already interested, would not use Speedie:
 
 * Adding a good debugger, VM and executable-format!
+* GPU acceleration. (OpenCL perhaps?)
 
 Unfortunately I am one person who has created a very large piece of work. Things will take much longer than we would have liked.
 
