@@ -401,12 +401,12 @@ function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming,
 			for (b.bits in altered) (i)
 				|| m = incoming.items[i]
 					|| d = m.obj as scdecl
-					d.markasaltered
+					d.MarkAsAltered
 		
 		|| ft = rz.StructReturned
-			incoming.StructReturner(ft.aslocal, self)
+			incoming.StructReturner(ft.AsLocal, self)
 		  elseif rz.returntype is returnedstruct // remove this? its always the prev?
-			incoming.StructExtract(rz.returntype)
+			incoming.StructExtract(rz.ReturnType)
 
 
 function StructReturned (|scdecl|)
@@ -627,7 +627,8 @@ function ArgsMatch2 (|SCDecl| base, |int| TypeCast, |SCNode| name_space, |SCPara
 
 
 function FLookup (assigns:|SCNode|)
-	if (Value isa SCClass)
+	opt norefcounts
+	if Value isa SCClass
 		.Cls = Value
 		.parent = value.Modul
 	  else
@@ -1068,7 +1069,7 @@ function FixCnj (|Message| exp)
 	.FixCnjSub(exp)
 
 
-function FixCnjSub (|Message| exp) {
+function FixCnjSub (|Message| exp)
 	if exp == @ARel					// x$ --> x#require
 		exp.become(@TRel)
 		exp <~ (@opp, "require")
@@ -1199,22 +1200,26 @@ function FixCnjSub (|Message| exp) {
 	
 
 	RemoveMe.Remove
-}
+
 
 	
 function RegType (|datatypecode|)
 	if self
-		return .returntype.regtype
+		return .ReturnType.regtype
 
 
-function scdecl.MarkAsAltered 
+function SCDecl.MarkAsAltered 
 	opt norefcounts
 	if self is local
 		(self is altered)
+		if SCFunction.InBranch
+			(self is alteredinbranch)
 		if self is TypeImprove
 			|| orig = .IsLookupOnly
-			if orig isa scdecl
+			if orig isa SCDecl
 				(orig is altered)
+				if SCFunction.InBranch
+					(orig is alteredinbranch)
 
 
 
@@ -1243,6 +1248,8 @@ iterator
 
 module {
 ||				DisabledPoints = 0
+||				InBranch = 0
+||				OnceCount = 0
 |SCFunction|	_CurrFunc
 |int[12]|		FuncStats
 |int[8]|		FuncArgAndReturnTypes
@@ -1538,7 +1545,6 @@ function scdecl.IsConstOf (|scdecl| b, |bool|)
 	return .default$.Obj==b
 
 
-|| OnceCount = 0
 function Tran_Once (TranFunc)
 	// once: "abc" --> if !globaltmp: "abc"
 	|| arg = node[@arg]$ // needs arg... don't embed statements! cozz it sucksssss
@@ -1563,7 +1569,9 @@ function Tran_Once (TranFunc)
 
 function Tran_If (TranFunc) 
 	node.ASMType = ASMType.kIf // for the ASM
+	SCFunction.InBranch++
 	Tran_IfSub(node, name_space)
+	SCFunction.InBranch--
 
 
 function message.Blocks (|SCBlockage|)

@@ -56,7 +56,6 @@ function If (fn_asm)
 		return asmreg()						// were done!
 
 	if .curr.op != asm.eror
-	 #! why curr+1?
 	B.AllJumpTo
 	|| AfterFirst = arg1.jump(0)
 	.ArgOrIf(other)
@@ -80,7 +79,7 @@ function While (fn_asm)
 	opt norefcounts
 	|sc_hoister| H 
 	h.Closer = .OpenVars
-	h.PreCheck(exp.first, 1<<30)
+	h.hoistloop(exp.first)
 	
 	|| BEGIN = exp.JUMP(0)							// jump to end... THEN EMIT arg and jump back.
 	ASMType.arg(self, exp.second!)					// arg
@@ -196,7 +195,7 @@ function asmreg.IsBoolV (|bool|)
 
 helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
 	opt norefcounts // 😵‍💫 // 😵‍💫 // 😵‍💫 // 😵‍💫
-	dest.µtype = datatypecode.bool
+	dest.µtype = DataTypeCode.bool
 	
 	|| A = exp.first!
 	|| B = exp.last!
@@ -220,18 +219,19 @@ helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |AS
 	return .BoolValue(A, dest, opp, b)
 	
 
-function FoundReg (|message| A, |int| R, |bool|)
+function FoundReg (|message| All, |int| R, |bool|)
 	opt norefcounts
-	for s.flat in A
+	for s.flat in All
 		if s == @thg
-			|| sr = .RegOfMsg(s)
+			|| a = .ASMLocal(s, 0, nil)
+			|| sr = a.reg
 			if sr == r
 				return true
 
 
 function Unchanged (|message| A, |asmreg| dest, |message| B, |bool|)
 	|| Dr = dest.reg
-	return !.foundreg(a,dr) or !.foundreg(b,dr)
+	return !.FoundReg(a,dr) or !.FoundReg(b,dr)
 
 
 function UniqueLocation (|message| A, |asmreg| dest, |message| B, |asmreg|)

@@ -16,8 +16,6 @@ function compiler.PrintCompileTime (|date| durr)
 	fs <~ ")"
 	if VM_Builder.Total
 		fs.normal  "µCodes",			fs <~ VM_Builder.Total
-	if spdassembler.OptPathCount
-		fs.normal  "µOpts",				fs <~ SpDAssembler.OptPathCount
 	fs.normal  "Total Elapsed",	durr.renderdurr(fs), fs <~ "s"
 	fs.normal  "Input Src",		Compiler.stTotalSourceSize.strsize(fs)
 	if options.color

@@ -49,3 +49,17 @@ function scdecl.CalculateASMType (|asmreg|)
 	return I|asmreg|
 
 
+
+datatype VarUseMode (int)
+	Flags
+		Return
+		Set	// unused so far
+		ExistingVar
+	syntax is (|varusemode| v, |bool|)
+		return self&v
+	syntax is (|varusemode| v, assigns:|bool|, |varusemode|)
+		if value
+			return self|||v
+		return self&~v
+
+

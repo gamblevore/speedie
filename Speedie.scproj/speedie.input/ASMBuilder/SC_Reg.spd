@@ -30,7 +30,7 @@ datatype ASMReg (uint64)
 		CondRequest
 		CondAnswer
 		WithinAccess
-		ForInline
+		DeclareInlineParam
 		InlinedAccess
 		RealConst  = [ConstInput, ConstOutput]
 		AddrNeed   = [AddrRequest, AddrForceRequest]

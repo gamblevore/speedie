@@ -603,7 +603,7 @@ extend ASMState
 		if sr == dr
 			return dest								// hmmm... we are already there
 		if !sr
-			return ._num(exp, 0, dest, src.µtype)	// force zero. More readable
+			return ._num(exp, 0, dest)	// force zero. More readable
 
 		if dest isnt temp
 			|| improve = .CanImproveAssign(dest, src)

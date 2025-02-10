@@ -71,7 +71,7 @@ extend ASMState
 			if back!=.const // oof
 	
 	
-	function NumToFat (|message| exp, |int64| V, |asmreg| Dest, |datatypecode| SrcType, |&fatasm|)
+	function NumToFat (|message| exp, |int64| V, |asmreg| Dest, |&fatasm|)
 		dest = .temponly(exp, dest)
 		target debug
 			if !dest.reg and v // waaaaitttt
@@ -99,13 +99,13 @@ extend ASMState
 		ml.NeedFAT // sigh
 
 
-	function _Num (|message| exp, |int64| V, |asmreg| Reg, |datatypecode| SrcType, |asmreg|)
-		return .NumToFat(exp, v, reg, SrcType).info
+	function _Num (|message| exp, |int64| V, |asmreg| Reg, |asmreg|)
+		return .NumToFat(exp, v, reg).info
 		
 
 	function NumToReg (|message| exp, |int64| V, |asmreg| Reg, |datatypecode| SrcType, |asmreg|)
 		if v // or (reg.reg)
-			return ._Num(exp, v, reg, SrcType)
+			return ._Num(exp, v, reg)
 
 		rz = asmreg.ZeroParam as (reg & asmreg.ConstInput)
 		rz.µType = SrcType

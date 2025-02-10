@@ -37,7 +37,6 @@ dispatch TemporalStatements (TranFunc)
 	printerror				(Tran_Print)
 	log						(Tran_Log)
 	beep					(Tran_Beep)
-	optpath					(Tran_OptPath)
 	
 	ignore					{(node.remove)}
 
@@ -238,11 +237,19 @@ function Tran_Swap (TranFunc)
 		RC.ExpectRelMatch( LC, LN, nil, node )
 		Tran_PrintSub(fn, node, name_space)
 		node.last!.obj = compiler.swapfunc
-		node.obj = typevoidptr
+		node.obj = TypeVoidPtr
 		node.ASMType = ASMType.kSwap	
 
 
+
 function Tran_While (TranFunc)
+	SCFunction.InBranch++
+	Tran_WhileSub(fn, node, name_space)
+	SCFunction.InBranch--
+
+
+
+function Tran_WhileSub (TranFunc)
 	if node.ASMType == ASMType.kwhile
 		return
 

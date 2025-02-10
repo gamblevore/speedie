@@ -20,7 +20,6 @@ module Macros {
 
 
 
-|| OptPath = `OptPaths[_0]++`.macro
 || MultiDecr = `JB_DecrMulti(_0, _1)`.macro
 
 || ConstructorNew = `if self == nil {

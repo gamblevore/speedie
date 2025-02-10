@@ -24,24 +24,29 @@ struct SC_Hoister
 		cpp_part Hoi
 	|SCDecl--[6]|	Items
 	|uint64|		Closer
-	|int|			Count
+	|byte|			Count
+	|byte|			Spare
 	
 	constants
 		MinHoistScore	= 3
 
-	function HoistGlobal (|message| prop,  |scdecl| decl)
+	helper GotGlobal (|message| prop,  |scdecl| decl)
 		opt NoRefCounts
 		|| dest = ASMState.sh.DeclareMe(prop, decl)		// Pre-declare glob.
 		ASMType.GlobAddr(decl, prop, dest)
+		.got(dest, Decl)
+
+	helper Got (|asmreg| dest, |scdecl| decl)
+		opt NoRefCounts
 		decl.NilReg = dest.reg ||| nilreg.Hoisted
 		.Items[.Count++] = decl
+		.spare--
 
-	function HoistConst (|message| prop,  |scdecl| decl)
+	helper GotConst (|message| prop,  |scdecl| decl)
 		opt NoRefCounts
 		|| dest = ASMState.sh.DeclareMe(prop, decl)		// Pre-declare glob.
 		asmstate.sh.NumToReg(prop, decl.exportposition, dest, dest.µtype)
-		decl.NilReg = dest.reg ||| nilreg.Hoisted
-		.Items[.Count++] = decl
+		.got(dest, Decl)
 	
 	function Unhoist (|asmreg|)
 		opt NoRefCounts
@@ -49,22 +54,30 @@ struct SC_Hoister
 			loop d
 			d.nilreg = 0
 		return ASMState.sh.CloseVars(.Closer)
-	
-	function PreCheck (|message| exp, |int| Score = 0)
+
+	function HoistNormal (|message| exp)
+		.spare = –count .items
+		.run(exp, 0)
+		
+	function HoistLoop (|message| exp)
+		.spare = 2
+		.run(exp, 1<<20)
+
+	helper Run (|message| exp, |int| Score)
 		opt norefcounts
 		|| fn = exp.func
 		if fn == @type
 			exp = exp.first // no go into the type!
 		  elseif fn == @func
 			exp = exp.second
-		if  (score >= 0)  and  (fn == @dot or @thg or @num)  and  (.Count < –count .items)
+		if  (score >= 0)  and  (fn == @dot or @thg or @num)  and  (.spare > 0)
 			|| prop = exp.ASMDecl
 			if prop.nilreg isnt hoisted
 				if prop is const
 					if (score >= 1<<29) and prop.exportposition
-						.hoistConst(exp, prop)
+						.GotConst(exp, prop)
 				  elseif prop is Global
-					.HoistGlobal(exp, prop)
+					.GotGlobal(exp, prop)
 	
 		for ch.fast in exp
 			|| add = 0
@@ -73,5 +86,5 @@ struct SC_Hoister
 				add += (ty is kWhile) * MinHoistScore
 				add -= (ty is kIf)
 				
-			.PreCheck(ch, add + score)
+			.Run(ch, add + score)
 

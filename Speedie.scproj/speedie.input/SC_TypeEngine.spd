@@ -215,8 +215,8 @@ function TypeOfBRel (ExprResolver)
 	|| SubType = TypeOfExpr( F, name_space )			#require
 	
 	if n == '-' and name == 1 // minus
-		expect (subtype.IsNearlyNormalNumber or subtype.isbool) (exp, "Expected a number.") 
-		Return subtype
+		expect (SubType.IsNearlyNormalNumber or SubType.isbool) (exp, "Expected a number.") 
+		Return SubType
 		
 	if n == '&'
 		if Subtype.type.funcproto

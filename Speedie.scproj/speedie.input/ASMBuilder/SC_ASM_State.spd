@@ -206,7 +206,7 @@ struct ASMState
 		|| X = .ExistingVar(Exp)
 		X ?= .µInto(exp, dest)
 		if  (X.µtype isnt bool)  or  (dest is negate  and  X isnt AlreadyNegated)
-			return .exists(dest as (X bitand asmreg.fromexistingvar), X, exp)
+			return .exists(dest as (X bitand ASMReg.FromExistingVar), X, exp)
 		return .Assign(dest, X, exp)
 
 
@@ -482,7 +482,7 @@ struct ASMState
 			return ASMType.ThgSub(self, exp, ASMReg.ConstRequest)
 	
 	
-	function CanReuseInput (|message| Prms, |asmreg| Dest, |int| vr,  |bool|)
+	function CanReuseParam (|message| Prms, |asmreg| Dest, |int| vr,  |bool|)
 		opt norefcounts
 	
 		require (dest.reg == vr)
@@ -508,31 +508,49 @@ struct ASMState
 		LL.Start = .curr
 		|| OK = .TryInlineSub(prms, dest, fn)
 		ll.after = .curr
-/		LL.AllJumpTo
+		LL.AllJumpTo
 
 		.ReturnDest = Olddest
 		.fn = oldFunc
 		return OK
 	
-		
-	function TryInlineSub (|message| prms, |asmreg| dest, |scfunction| fn, |bool|)
+	
+	
+	function InlineParameters (|message| prms, |asmreg| dest, |SCFunction| fn)
 		opt norefcounts
 		|| p = prms.first
+		if "Inline_Consts".trap and .fn ~= "gggTest1"
+
 		for a in fn.Args
-			if p.asmdecl is const // why isnt this working?
-			|| v = .ExistingVar(p!) 
+			|| v = .ExistingVar(p!)
+				if v is constoutput // hmm?
 				|| vr = v.reg
-				if (a isnt Altered) or .CanReuseInput(prms, dest, vr)
+				if (a isnt Altered) or .CanReuseParam(prms, dest, vr)
 					|| T = a.WholeType.reg(vr)
 					a.DataType = t|datatypecode|
 					(a is param) = (v is param)
-					continue 
+				  else
+					v = nil
 			
-			v = .DeclareMe(a.source, a)
-			.µInto(p!, v as asmreg.ForInline)
+			if !v
+				v = .DeclareMe(a.source, a)
+				v = .µInto(p!, v as asmreg.DeclareInlineParam)
+			a.MakeConstFromASM(V)
 			p++
-		
+	
+
+	function RestoreParameters (|message| prms, |asmreg| dest, |SCFunction| fn)
+		opt norefcounts
+		|| p = prms.first
+		for a in fn.Args
+			a.MakeConstFromASM(asmreg()) // parameters can never be const anyhow
+
+	
+	function TryInlineSub (|message| prms, |asmreg| dest, |SCFunction| fn, |bool|)
+		opt norefcounts
+		.InlineParameters(prms, dest, fn)
 		ASMType.arg(self, fn.SourceArg!, ASMReg())
+		.RestoreParameters(prms, dest, fn)
 		return true
 	
 	
@@ -598,7 +616,6 @@ function @ASMType.DoFunction (fn_asm)
 	|| fn = prms.asfunc!
 	
 	dest = .CallFunc(exp, dest, fn)
-//	if "Inline_Consts".trap
 	if .AskForInline(prms, dest, fn)
 		return dest
 

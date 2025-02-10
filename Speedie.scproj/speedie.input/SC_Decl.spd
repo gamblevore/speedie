@@ -61,11 +61,11 @@ datatype SCDeclInfo (int)
 		CompilerCreated
 		PropertyWasConstructed
 		Param
-		Body
 		Property
 		Global
 		Return
 		Altered
+		AlteredInBranch
 		GameFlyingMem
 		Task
 		Self
@@ -77,7 +77,8 @@ datatype SCDeclInfo (int)
 		PostIncremented
 		ReturnedStruct
 		ReturnedVar
-		IntendedAsReturn // were at 31... Speedie should also warn if theres too many. (it wasnt!)
+		IntendedAsReturn
+		Body // were at 31... Speedie should also warn if theres too many. (it wasnt!)
 		Swappable	 = Param + Body + Global + Property
 		Local		 = Body + Param
 		SelfImplicit = Self + local // local is set by CollectOneParam, anyhow?

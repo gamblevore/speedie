@@ -114,7 +114,7 @@ function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest,  |AsmReg
 
 function ReturnExp (|&ASMState| self, |message| f, |AsmReg|)
 	if f
-		|| V = .ExistingVar(f, true)
+		|| V = .ExistingVar(f, varusemode.return)
 			return V
 		return .µGetASM(f)
 
@@ -229,17 +229,13 @@ function Decl (fn_asm)
 
 	|| K = .µinto(item, dest)
 	if k is ConstOutput
-		|| f = k.fat
-//			if ty isnt const//???
-			(ty is const)
-			ty.exportposition = f._const
-			ty.FatConstIndex = k.fatindex	
+		ty.MakeConstFromASM(k)
 
 
 function HoistedArg (fn_asm)
 	|sc_hoister| H 
 	h.Closer = .OpenVars
-	h.PreCheck(exp)
+	h.hoistnormal(exp)
 	argsub(self, exp)
 	return H.Unhoist
 
@@ -305,10 +301,10 @@ function Dot (fn_asm)										// a.b
 	|| T = prop.typeinfo
 	dest.µtype = T
 	
-	|int64| Pos = prop.exportposition
+	|int64| Pos = prop.ExportPosition
 	if (pos < 0 or pos > 1K) // what?
 	
-	if (dest is AddrRequest) or prop.iscarray
+	if (dest is AddrRequest) or prop.IsCarray
 		pos *= t.ByteCount
 		if prop.iscarray
 			dest.µtype = datatypecode._voidptr
@@ -316,18 +312,29 @@ function Dot (fn_asm)										// a.b
 		return .AddToReg(exp, dest, obj as ASMReg.NoScale, pos)
 	
 	return .ReadOrWrite(Dest, exp, obj, ASMReg(), pos)
-		
 
-function SetRel (fn_asm)	// function relset (
-	opt	norefcounts									//   x[func()] = y++
+
+function SimpleSet (|&asmstate| self, |message| A, |message| B, |asmreg|)	
+	|| X = .ExistingVar(A, VarUseMode.set)
+	if !X.reg
+		return nil
+	
+	|| D = a.ASMDecl	
+	|| become = .µInto(B, X)
+	d.MakeConstFromASM(become)
+	return X
+
+
+function SetRel (fn_asm)						// function relset (
+	opt	norefcounts								//     x[func()] = y++
 	|| A = exp.first!
 	|| B = exp.last!
-	|| X = .ExistingVar(A)
-	if X.reg
-		return .µInto(B, X)
+	|| X = SimpleSet(self, A, B)
+		return X
 	
-	dest = .µGetASM(B, X) asnt ASMReg.realconst	// try remove this removal. see if anything breaks.
-	return .µ(A, dest as AsmReg.set)
+	dest = .µGetASM(B, asmreg()) 
+	dest = (dest asnt ASMReg.RealConst) as AsmReg.set
+	return .µ(A, dest)
 
 
 function Num (fn_asm)
@@ -337,7 +344,7 @@ function Num (fn_asm)
 	dest.µtype = T
 	(dest is RealConst)
 	
-	if d.nilreg is hoisted
+	if d.NilReg is hoisted
 		Dest.reg = d.nilreg&31
 		return Dest
 	
@@ -356,19 +363,13 @@ function Thg (fn_asm)
 
 function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
+	if "Inline_Consts".trap and .fn ~= "gggTest1"
 	|| d = exp.ASMDecl
 	if d is local
-		|| T = d.WholeType
-		(t is param) = (d is param) // unused?
-		if (d isnt altered and param)
-			|| fi = d.FatConstIndex
-				|| f = fi|uint|.fat
-				if f is ConstOutput
-					(T is ConstOutput)
-					t.FatIndex = fi
+		|| T = d.ThgASM
 		if dest isnt addrneed
 			return T
-		if dest is ForInline
+		if dest is DeclareInlineParam // &A
 			(t is InlinedAccess)
 			return T
 		return exp.addr(dest, t, dest, t) * dest.HaveAddr
@@ -556,7 +557,7 @@ function Unexpected		(fn_asm)
 
 extend ASMState {
 
-function ExistingVar (|message| m, |bool| ForReturn=false,  |asmreg|)
+function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
 	opt	norefcounts
 	real self
 	|| fn = m.func 
@@ -564,17 +565,18 @@ function ExistingVar (|message| m, |bool| ForReturn=false,  |asmreg|)
 		m = m.first!
 		fn = m.func
 	if fn == @thg
-		return .ASMLocal(m, forreturn, ASMReg.FromExistingVar)
-	if fn == @num
-		|| d = m.asmdecl
-		if d.nilreg is hoisted
-			rz = d.nilreg|int|.asm
-			rz.µtype = d.DataType
+		return .ASMLocal(m, mode, ASMReg.FromExistingVar)
+	if fn != @num
+		return nil
+	|| d = m.ASMDecl
+	if d.nilreg is hoisted
+		rz = d.nilreg|int|.asm
+		rz.µtype = d.DataType
 
 
 function Str (fn_asm)
 	opt	norefcounts
-	dest = .temponly(exp, dest)
+	dest = .TempOnly(exp, dest)
 	|| real = exp.name|messageid|
 	dest.µtype = datatypecode._voidptr
 	return exp.gstr(dest, 0, real.ID) * dest // seems good!
@@ -605,20 +607,21 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	rz.µtype = dest.µtype
 
 
-function RegOfMsg (|message| s, |int|)
-	return .asmlocal(s, false, nil).reg
-
-
-function ASMLocal (|message| s, |bool| ForReturn, |asmreg| extra, |asmreg|)
+function ASMLocal (|message| s, |VarUseMode| mode, |asmreg| extra, |asmreg|)
 	opt	norefcounts
 	|| d = s.ASMDecl
 	if d is local
-		rz = d.WholeType as extra
-		if ForReturn and d isnt ReturnedVar
-			.fn.ReturnedVars++
-			(d is ReturnedVar)
+		if mode is Return
+			.fn.TrackReturns(d)
+		rz = d.ThgASM as extra
 }
 
+
+
+function SCFunction.TrackReturns (|scdecl| D)
+	if d isnt ReturnedVar
+		.ReturnedVars++
+		(d is ReturnedVar)	
 
 
 function message.HasAsmStuff (|bool|)
@@ -713,4 +716,37 @@ function fatasm.FuncPrmBits (|uint64|)
 			rz |= (1|uint64|<<31)
 			exit
 	// ffff(r4, r3, r2, r1)
+	
+
+
+function scdecl.MakeConstFromASM (|asmreg| K)
+	opt norefcounts
+	if (k is ConstOutput) and (self isnt alteredinbranch)
+		|| f = k.fat
+			is const
+			// || k = 1, k = 2, k = k + 3
+			.exportposition = f._const
+			if !k.FatIndex
+			.FatConstIndex = k.fatindex
+			return 
+		debugger 
+
+// || k = 1, k = X	// clear here
+// y = k			// nice.
+	(self isnt const)
+	.exportposition = 0
+	.FatConstIndex = 0	
+
+
+function SCDecl.ThgASM (|asmreg|)
+	|| T = .WholeType
+	(t is param) = (self is param) // unused?
+	if (self isnt alteredinbranch)
+		|| fi = .FatConstIndex
+			|| f = fi|uint|.fat
+			if f is ConstOutput
+				(T is ConstOutput)
+				t.FatIndex = fi
+	return T
+	
 	
