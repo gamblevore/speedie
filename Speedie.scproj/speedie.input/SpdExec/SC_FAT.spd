@@ -3,18 +3,20 @@
 struct FatASM 
 	linkage
 		cpp_part FAT
+		sort_properties true
+	
+	|byte|				RegFromFat
+	|byte|				Op
+	|byte|				JumpReg
+	|byte| 				Outputs
 	|ASMReg| 			Info
 	|message--| 		Msg
 	|uint64| 			_Const
-	|uint[7]|			R
+	|uint[6]|			R
 	|uint|				ASMIndex	
 	|uint16| 			BlockNum
-	|byte| 				Outputs
-	|byte| 				Nothing
-	|uint16|			RefCount
-	|byte|				Op
-	|byte|				JumpReg
-	
+	|uint16|			FatRefCount
+//	|uint| 				Dummy1
 	
 	function BaseOp (|int|)
 		rz = .op
@@ -116,24 +118,20 @@ struct FatASM
 			(.info as= flags)
 		  else
 			(.info asnt= flags)
-		
-	function OptNop (|bool|)
-		.op = asm.noop
-		.JumpReg = 0
-		return true
-	
-	function LinkedFrom (|fatasm| New)
-		.refcount++
-
+			
 	function asmreg.treg (|uint|)
 		return .reg ||| ((self is Temp)<<31)
 
-	function RegInput (|int| a, assigns:|asmreg| info)
+	function RegInput (|int| a, assigns:|asmreg| Input)
 		cpp_part Prm
 		opt inline
-		.r[a] = info.treg
-//		|| Src = info.fat
-//			Src.LinkedFrom(self) // what?
+		
+		|| i = input.FatIndex
+		.r[a] = input.treg ||| (i << 15)
+		|| src = i.fat
+			.RegFromFat |= 1<<a
+			// We can do phi-nodes later. This is good enough for inlining-consts 
+			src.FatRefCount++
 	
 	
 	function Dest (|uint| a, |asmreg| info)
@@ -188,9 +186,7 @@ struct FatASM
 	function r2 (|uint|): return .r[2]
 	function r2 (assigns:|uint|): .r[2] = value
 	function r3 (|uint|): return .r[3]
-	function r3 (assigns:|uint|): .r[3] = value
-	function r4 (|uint|): return .r[4]
-	function r4 (assigns:|uint|): .r[4] = value
+
 
 	function Swap (|int| a, |int| b)
 		swap (.r[a-1]) (.r[b-1])

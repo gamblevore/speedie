@@ -161,7 +161,7 @@ struct ASMState
 		(t is temp)
 		return t
 	
-	function Nop (|asmreg| R)
+	function NopReg (|asmreg| R)
 		|| f = r.fat
 			return .Nop(f)
 		if r.reg and r isnt param
@@ -184,18 +184,19 @@ struct ASMState
 			|| f = r.fat
 				.Nop(f)
 	
-	function Nop (|FATASM| R) //!!
-		r.op = asm.noop
-		r.jumpreg = 0
+	function Nop (|FATASM| Fat) //!!
 		|| C = .curr - 1
-		if R == C
+		if fat == C
 			.curr = C // nice
+		|| n = fat.RegFromFat|int|
+		for (b.bits in n) (i)
+			|| r = fat.r[i]
+			|| src = r.FAT
+				src.FatRefCount--
+		Memory.Zero(fat, –sizeof fatasm)
+		fat.op = asm.noop
 
-//	function Nop (|fatrange| R)
-//		.nop(r.start, r.after!)
-
-
-	function Nop (|fatasm| Start, |fatasm| After)
+	function NopRange (|fatasm| Start, |fatasm| After)
 		while start < After
 			.nop(--after)
 			

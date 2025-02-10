@@ -87,7 +87,7 @@ function While (fn_asm)
 	|fatrange| LOOP_TEST
 	|| LT = .Branch(exp.first, true, loop_test)
 	if loop_test.never
-/		.nop(begin, loop_Test.start)
+/		.noprange(begin, loop_Test.start)
 		return asmreg()
 	
 	BEGIN.jumpto(LOOP_Test.start, self)
@@ -279,7 +279,7 @@ function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asm
 									// x = 5 or  2	 --> x = true
 									// x = 0 and 2	 --> x = false
 	
-	.nop(ml)						// x = 0 or y()  --> x = y()
+	.nopreg(ml)						// x = 0 or y()  --> x = y()
 									// x = 7 and y() --> x = y()
 	|| mr = .µ(B, dest)
 	if mr is ConstOutput
@@ -295,12 +295,12 @@ function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asm
 function BoolConst2 (|asmreg| mr, |asmreg| Dest,  |opmode| Opp, |message| exp, |asmreg| ml, |asmreg|)
 	|| V = mr.const!=0
 	if v == (opp is AND)
-		.nop(mr)
+		.nopreg(mr)
 		ml.µtype = datatypecode.bool
 		return ml
 	
 	if ml is FromExistingVar // why not?
-		.Nop(ml)
+		.Nopreg(ml)
 	mr.µtype = DataTypeCode.bool
 	return .SetConst(exp, v|int|, mr, dest)
 

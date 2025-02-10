@@ -132,6 +132,10 @@ dispatch ClassLinkageTable (TranFunc)
 	+"visible"				{} // (SCFunction.Tran_Visible)
 	+"ignore"				{}
 	+"noearlyfree"			{}
+	+"sort_properties"      {
+		if name_space isa scclass
+			(name_Space is SortsProperties) = node.first.yes(true)
+	}
 	
 	+"tighten"
 		if name_space isa scclass

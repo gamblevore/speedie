@@ -6,7 +6,7 @@
 class µForm
 	|int|			Count
 	|string|		Name
-	|µParam[7]|		Params
+	|µParam[6]|		Params
 	|message| 		src
 	|int|			TotalBits
 	|int| 			Outputs

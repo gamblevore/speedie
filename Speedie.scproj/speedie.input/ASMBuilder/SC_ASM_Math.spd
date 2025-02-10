@@ -225,7 +225,7 @@ extend ASMState
 			|| x = r.const
 			|| y = x >> 18
 			if x == y << 18
-				.nop(r)
+				.NopReg(r)
 				return exp.FMLK(dest, l, x) * Dest
 
 	
