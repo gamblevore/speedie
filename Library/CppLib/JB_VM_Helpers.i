@@ -281,8 +281,8 @@ bool CompI_ (VMRegister* r, ASM Op) {
 	auto A = i1;
 	auto B = i2;
 	switch (JCmpI_Cmpu) {
-		CmpSub(0,  A >   B); // b >= min  -->  jump
-		CmpSub(1,  A <=  B); // min <= b  -->  jump
+		CmpSub(0,  A >   B);
+		CmpSub(1,  A <=  B);
 		CmpSub(2,  A ==  B);
 		CmpSub(3,  A !=  B);
 		CmpSub(4, (u64)A >  (u64)B);
