@@ -2325,6 +2325,8 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__Reg_NoScale ((ASMReg)67108864)
 
+#define kSC__Reg_NotUnConst ((ASMReg)34360000512)
+
 #define kSC__Reg_Param ((ASMReg)131072)
 
 #define kSC__Reg_RealConst ((ASMReg)103079215104)
@@ -5303,6 +5305,10 @@ bool SC_Reg_CanAddK(ASMReg Self, int64 T);
 
 int64 SC_Reg_Const(ASMReg Self);
 
+bool SC_Reg_ConstEnough(ASMReg Self);
+
+ASMReg SC_Reg_ConstInputFromMath(ASMReg Self, ASMReg L, ASMReg R);
+
 float SC_Reg_F32(ASMReg Self);
 
 Float64 SC_Reg_F64(ASMReg Self);
@@ -6718,7 +6724,7 @@ ASMReg SC_Pac_ASMBoolBadnessMadness(ASMState* Self, Message* Exp, ASMReg Dest, O
 
 ASMReg SC_Pac_ASMBoolShrink(ASMState* Self, Message* Exp, ASMReg Dest, ASMReg Ml);
 
-ASMReg SC_Pac_ASMLocal(ASMState* Self, Message* S, VarUseMode Mode, ASMReg Extra);
+ASMReg SC_Pac_ASMLocal(ASMState* Self, Message* S, VarUseMode Mode);
 
 ASMReg SC_Pac_Assign(ASMState* Self, ASMReg Dest, ASMReg Src, Message* Exp);
 
@@ -11696,40 +11702,47 @@ inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
 
 inline bool SC_Pac_ConstCompareFloatSub(ASMState* Self, ASMReg L, ASMReg R, int Mode) {
 	iif (!(Mode & 4)) {
+		float A = SC_Reg_F32(L);
+		float B = SC_Reg_F32(R);
 		iif (Mode <= 1) {
 			iif (Mode == 0) {
-				return SC_Reg_F32(L) > SC_Reg_F32(R);
+				return A > B;
 			}
-			return SC_Reg_F32(L) <= SC_Reg_F32(R);
+			return A <= B;
 		}
 		iif (Mode == 2) {
-			return SC_Reg_F32(L) == SC_Reg_F32(R);
+			return A == B;
 		}
-		return SC_Reg_F32(L) != SC_Reg_F32(R);
+		return A != B;
 	}
-	iif (Mode <= 5) {
-		iif (Mode == 4) {
-			return SC_Reg_F64(L) > SC_Reg_F64(R);
+	Float64 A = SC_Reg_F64(L);
+	Float64 B = SC_Reg_F64(R);
+	Mode = (Mode - 4);
+	iif (Mode <= 1) {
+		iif (Mode == 0) {
+			return A > B;
 		}
-		return SC_Reg_F64(L) <= SC_Reg_F64(R);
+		return A <= B;
 	}
-	iif (Mode == 6) {
-		return SC_Reg_F64(L) == SC_Reg_F64(R);
+	iif (Mode == 2) {
+		return A == B;
 	}
-	return SC_Reg_F64(L) != SC_Reg_F64(R);
+	return A != B;
 }
 
 inline bool SC_Pac_ConstCompareIntSub(ASMState* Self, ASMReg L, ASMReg R, int Mode) {
+	int64 A = SC_Reg_Const(L);
+	int64 B = SC_Reg_Const(R);
 	iif (Mode <= 1) {
 		iif (Mode == 0) {
-			return SC_Reg_F32(L) > SC_Reg_F32(R);
+			return A > B;
 		}
-		return SC_Reg_F32(L) <= SC_Reg_F32(R);
+		return A <= B;
 	}
 	iif (Mode == 2) {
-		return SC_Reg_F32(L) == SC_Reg_F32(R);
+		return A == B;
 	}
-	return SC_Reg_F32(L) != SC_Reg_F32(R);
+	return A != B;
 }
 
 inline ASMReg SC_Pac_Exists(ASMState* Self, ASMReg Dest, ASMReg L, Message* Exp) {
