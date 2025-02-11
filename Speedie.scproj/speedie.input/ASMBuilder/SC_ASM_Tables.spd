@@ -107,8 +107,16 @@ function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest,  |AsmReg
 	// what about getting the address of registers?
 	|| f = exp.first
 		dest = .µinto(f, dest)
-	|| fat = exp.JUMP(0)
-	(fat is condanswer)
+
+	debugger // the jump may always be done. but do we know at this point?
+	// can we tell? Should we tell the caller that it is always done?
+	// the "if" branch should return that it is a "blocker", right? Makes sense?
+	// this if branch always happned, so nothing further happened...
+	// hmmm
+	
+	if exp != .fn.sourcearg.last
+		|| fat = exp.JUMP(0)
+		(fat is condanswer)
 	return Dest
 
 
@@ -565,7 +573,7 @@ function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
 		m = m.first!
 		fn = m.func
 	if fn == @thg
-		return .ASMLocal(m, mode, ASMReg.FromExistingVar)
+		return .ASMLocal(m, mode)
 	if fn != @num
 		return nil
 	|| d = m.ASMDecl
@@ -599,21 +607,29 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 		.CloseVars(Closer)
 	
 	dest = .TempTyped(exp, dest)
-	(dest isnt realconst)
-	(dest as= ml & mr & asmreg.realconst)
-	
+	(dest is constoutput) = (ml&mr is constoutput)
 	rz = (fn)(self, dest, ml, mr, exp.second!)
-	(rz is constinput) = dest & ASMReg.ConstInput				// reset
+	rz = rz.ConstInputFromMath(ml, mr)
 	rz.µtype = dest.µtype
 
 
-function ASMLocal (|message| s, |VarUseMode| mode, |asmreg| extra, |asmreg|)
+function asmreg.ConstInputFromMath (|asmreg| L, |asmreg| R, |asmreg|)
+	if self is constoutput
+		(self is constinput) = l.ConstEnough & r.ConstEnough
+	return self
+
+
+function asmreg.ConstEnough (|bool|)
+	return self|uint64| & asmreg.NotUnConst|uint64|
+
+
+function ASMLocal (|message| s, |VarUseMode| mode, |asmreg|)
 	opt	norefcounts
 	|| d = s.ASMDecl
 	if d is local
 		if mode is Return
 			.fn.TrackReturns(d)
-		rz = d.ThgASM as extra
+		rz = d.ThgASM
 
 
 function MakeConstFromASM (|scdecl| decl, |asmreg| K)
@@ -742,7 +758,7 @@ function fatasm.FuncPrmBits (|uint64|)
 
 
 function SCDecl.ThgASM (|asmreg|)
-	|| T = .WholeType
+	|| T = .WholeType as ASMReg.FromExistingVar
 	(t is param) = (self is param) // unused?
 	if (self isnt alteredinbranch)
 		|| fi = .FatConstIndex

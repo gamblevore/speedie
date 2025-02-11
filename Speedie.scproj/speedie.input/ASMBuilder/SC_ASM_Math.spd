@@ -76,7 +76,9 @@ extend ASMState
 
 	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
 		mode |= !r.signed<<2
-		mode ^= dest isnt Negate
+		//if dest is negate
+		mode ^= dest is Negate
+		#!do this AFTER? We lose condanswer otherwise
 		dest = dest.BoolAnswer
 		if l is constoutput and r is constoutput
 			return .ConstCompareInt(dest, L, R, exp, Mode)
@@ -94,21 +96,26 @@ extend ASMState
 	function ConstCompareFloatSub (|asmreg| L, |asmreg| R, |int| Mode, |bool|)
 		opt inline
 		ifn mode & 4
+			|| A = L.f32
+			|| B = R.f32
 			if mode <= 1
 				if mode == 0
-					return L.f32 >  R.f32
-				return L.f32 <= R.f32
+					return A >  B
+				return A <= B
 			if mode == 2
-				return L.f32 == R.f32
-			return L.f32 != R.f32
+				return A == B
+			return A != B
 
-		if mode <= 5
-			if mode == 4
-				return L.f64 >  R.f64
-			return L.f64 <= R.f64
-		if mode == 6
-			return L.f64 == R.f64
-		return L.f64 != R.f64
+		|| A = L.f64
+		|| B = R.f64
+		mode -= 4
+		if mode <= 1
+			if mode == 0
+				return A >  B
+			return A <= B
+		if mode == 2
+			return A == B
+		return A != B
 
 
 	function ConstCompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
@@ -119,18 +126,21 @@ extend ASMState
 		
 	function ConstCompareIntSub (|asmreg| L, |asmreg| R, |int| Mode, |bool|)
 		opt inline
+		|| A = L.Const
+		|| B = R.Const
 		if mode <= 1
 			if mode == 0
-				return L.f32 >  R.f32
-			return L.f32 <= R.f32
+				return A >  B
+			return A <= B
 		if mode == 2
-			return L.f32 == R.f32
-		return L.f32 != R.f32
+			return A == B
+		return A != B
 
 
 	function CompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
 		mode |= r.IsBig<<2
-		mode ^= dest isnt Negate
+		if dest is negate
+		mode ^= dest is Negate
 		dest = dest.BoolAnswer
 		if (l is constoutput and r is constoutput) // needs to handle this!
 			return .ConstCompareFloat(dest, L, R, exp, Mode)

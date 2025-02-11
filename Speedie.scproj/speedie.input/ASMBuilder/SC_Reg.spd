@@ -39,6 +39,7 @@ datatype ASMReg (uint64)
 		Zero	   = RealConst ||| 56 ||| param		// 56 == datatypecode.uint64
 		ZeroParam  = ConstOutput ||| param
 		RealDiscard = RealConst ||| discard
+		NotUnConst = fromexistingvar ||| ConstInput
 	
 
 	render

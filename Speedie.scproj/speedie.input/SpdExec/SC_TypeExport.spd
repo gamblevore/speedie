@@ -29,7 +29,7 @@ datatype NilState (byte) // Exec.scproj needs this here
 		Killer			= 255
 	
 	function RawName (|string|)
-		description "'Raw', cos does not include whether its stated or not." 
+		description "Raw: (Does not include whether its stated or other wierd things.)" 
 		if self is either
 			return "optional"
 		if self is nilish

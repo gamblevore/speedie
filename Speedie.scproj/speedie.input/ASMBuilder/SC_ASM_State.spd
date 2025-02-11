@@ -184,7 +184,8 @@ struct ASMState
 			|| f = r.fat
 				.Nop(f)
 	
-	function Nop (|FATASM| Fat) //!!
+	function Nop (|FATASM| Fat)
+		opt norefcounts
 		|| C = .curr - 1
 		if fat == C
 			.curr = C // nice
@@ -193,7 +194,9 @@ struct ASMState
 			|| r = fat.r[i]
 			|| src = r.FAT
 				src.FatRefCount--
+		|| M = fat.msg
 		Memory.Zero(fat, –sizeof fatasm)
+		fat.msg = m // for @sheb rendering
 		fat.op = asm.noop
 
 	function NopRange (|fatasm| Start, |fatasm| After)
@@ -523,7 +526,7 @@ struct ASMState
 	function InlineParameters (|message| prms, |asmreg| dest, |SCFunction| fn)
 		opt norefcounts
 		|| p = prms.first
-		if "Inline_Consts".trap and .fn ~= "gggTest1"
+//		if "Inline_Consts".trap and .fn ~= "gggTest1"
 
 		for a in fn.Args
 			|| v = .ExistingVar(p!)
@@ -565,7 +568,7 @@ struct ASMState
 		|| Gain = 5	- (A.Length-1)				// assume that functions have 5 instruction overhead.
 		Gain += (fn is inline) * 24				// sigh...
 		
-		|| Grace = 8
+		|| Grace = 9
 		for p.fast in prms
 			Grace += .IsASMConst(p)<<2
 	

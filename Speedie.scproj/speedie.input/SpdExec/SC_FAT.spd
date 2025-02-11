@@ -256,11 +256,8 @@ struct FatASM
 				GotAny = ", "
 				|int| v = .r[i]
 				if f[i].isreg
-					if v & (1<<31)
-						v &=~ (1<<31)
-						fs <~ 't'
-					  else
-						fs <~ 'r'
+					fs <~ ('r' + v|uint| >> 30)|byte|
+					v &= 31
 				fs <~ v
 				remain += bs
 			if .op == asm.knst

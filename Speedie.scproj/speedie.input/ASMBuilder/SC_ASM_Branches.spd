@@ -223,7 +223,7 @@ function FoundReg (|message| All, |int| R, |bool|)
 	opt norefcounts
 	for s.flat in All
 		if s == @thg
-			|| a = .ASMLocal(s, 0, nil)
+			|| a = .ASMLocal(s, 0)
 			|| sr = a.reg
 			if sr == r
 				return true
