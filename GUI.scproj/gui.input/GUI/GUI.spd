@@ -1262,7 +1262,8 @@ module GUI
 		|| key = kev.sym
 		
 		|| fl = SDL_GetWindowFlags(.screenwindow!) & (SDL_Window.OCCLUDED ||| SDL_Window.HIDDEN)
-		printline "key: $key (${key|int|}),  flags: $fl,  size: $.SizeRaw"
+		// why cant i debug this?
+		// printline "key: $key (${key|int|}),  flags: $fl,  size: $.SizeRaw"
 
 		if .ForeGroundTime.GuiAgo < 0.1s
 			return SDLActivity.nothing
