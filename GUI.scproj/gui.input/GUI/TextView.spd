@@ -1967,7 +1967,7 @@ class TextView (GUIControl)
 	
 		|| ARGH = 0 // .ReclaimRestart(d) // disabled for now.
 		|| t = d.tline
-		|| p = d.position
+		|| p = d.position // surely that is always 0?
 		(._Lines isnt breakpoint)
 		
 		while
@@ -1989,6 +1989,8 @@ class TextView (GUIControl)
 				exit
 
 		.EndPrepare(d, StayAtEnd, pos)
+		if changed == 1 // size changed
+			.ScrollPos = pos
 
 
 	function EndPrepare (|TextViewLine| d, |bool| StayAtEnd, |int| pos)

@@ -114,7 +114,6 @@ function image.DrawChar (|CodePoint| C, |image| Where, |ivec2| XY, |vec4| Col, |
 	
 	|| X2  		= C|int| * font.Width
 	|| v0		= (X2, 0) - xy
-	if (c < 32) and keys.shift
 	if (c < 32) and (col == vec4(1) or drawmode == 1)
 		drawmode = -1
 	  elseif drawmode == 1
