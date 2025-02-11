@@ -637,6 +637,7 @@ byte SC__ASM_NoisyASM;
 
 
 
+
 ASM_Read SC__ASMType_ReadASM[10];
 ASM_Write SC__ASMType_WriteASM[5];
 

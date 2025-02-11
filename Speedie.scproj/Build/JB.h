@@ -2289,11 +2289,11 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__ASM_WR8U ((ASM_Write)95)
 
-#define kSC__Reg_AddrForceRequest ((ASMReg)274877906944)
+#define kSC__Reg_AddrForceRequest ((ASMReg)549755813888)
 
-#define kSC__Reg_AddrNeed ((ASMReg)412316860416)
+#define kSC__Reg_AddrNeed ((ASMReg)824633720832)
 
-#define kSC__Reg_AddrRequest ((ASMReg)137438953472)
+#define kSC__Reg_AddrRequest ((ASMReg)274877906944)
 
 #define kSC__Reg_AlreadyNegated ((ASMReg)524288)
 
@@ -2303,9 +2303,9 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__Reg_CondRequest ((ASMReg)1073741824)
 
-#define kSC__Reg_ConstInput ((ASMReg)34359738368)
+#define kSC__Reg_ConstInput ((ASMReg)68719476736)
 
-#define kSC__Reg_ConstOutput ((ASMReg)68719476736)
+#define kSC__Reg_ConstOutput ((ASMReg)137438953472)
 
 #define kSC__Reg_ConstRequest ((ASMReg)536870912)
 
@@ -2325,15 +2325,17 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__Reg_NoScale ((ASMReg)67108864)
 
-#define kSC__Reg_NotUnConst ((ASMReg)34360000512)
+#define kSC__Reg_NotUnConst ((ASMReg)68719738880)
 
 #define kSC__Reg_Param ((ASMReg)131072)
 
-#define kSC__Reg_RealConst ((ASMReg)103079215104)
+#define kSC__Reg_RealConst ((ASMReg)206158430208)
 
-#define kSC__Reg_RealDiscard ((ASMReg)103081312256)
+#define kSC__Reg_RealDiscard ((ASMReg)206160527360)
 
-#define kSC__Reg_RemoveableOutput ((ASMReg)68736253952)
+#define kSC__Reg_RemoveableOutput ((ASMReg)137455730688)
+
+#define kSC__Reg_Returns ((ASMReg)34359738368)
 
 #define kSC__Reg_Set ((ASMReg)4194304)
 
@@ -2345,9 +2347,9 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__Reg_WithinAccess ((ASMReg)4294967296)
 
-#define kSC__Reg_Zero ((ASMReg)103079346232)
+#define kSC__Reg_Zero ((ASMReg)206158561336)
 
-#define kSC__Reg_ZeroParam ((ASMReg)68719607808)
+#define kSC__Reg_ZeroParam ((ASMReg)137439084544)
 
 #define kSC__ASMType_IncrAfter ((int)2)
 
@@ -4991,6 +4993,8 @@ float JB_f_Fract(float Self);
 
 float JB_f_Pow(float Self, int N);
 
+bool JB_f_SyntaxAccess(float Self);
+
 
 
 // hfloat
@@ -6485,7 +6489,7 @@ void SC_FAT_TmpRender(FatASM* Self, FastString* Fs, Message* Msg);
 
 
 // JB_FatRange
-void SC_FatRange_AllJumpTo(FatRange* Self, FatASM* Curr, bool Strip);
+void SC_FatRange_AllJumpTo(FatRange* Self, FatASM* Curr, ASM Also);
 
 
 
@@ -6644,6 +6648,8 @@ void JB_Pico__FromFS(FastString* Fs, PicoMessage* Rz);
 
 
 // JB_Random
+float JB_Rnd_Float(Random* Self);
+
 Float64 JB_Rnd_Float64(Random* Self);
 
 int64 JB_Rnd_RndInt(Random* Self);
@@ -6766,7 +6772,7 @@ ASMReg SC_Pac_CallFunc(ASMState* Self, Message* Exp, ASMReg Dest, SCFunction* Fn
 
 bool SC_Pac_CanReuseParam(ASMState* Self, Message* Prms, ASMReg Dest, int Vr);
 
-ASMReg SC_Pac_CloseVars(ASMState* Self, uint64 V);
+void SC_Pac_CloseVars(ASMState* Self, uint64 V);
 
 ASMReg SC_Pac_Compare(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp, int Mode);
 
@@ -6970,7 +6976,7 @@ void SC_Pac_TextOp(ASMState* Self, Message* M);
 
 bool SC_Pac_TextOpSub(ASMState* Self, Message* M);
 
-bool SC_Pac_TryInline(ASMState* Self, Message* Prms, ASMReg Dest, FuncInASM* Asm);
+bool SC_Pac_TryInline(ASMState* Self, Message* Prms, ASMReg Dest, FuncInASM* xC2xB5);
 
 bool SC_Pac_TryInlineSub(ASMState* Self, Message* Prms, ASMReg Dest, SCFunction* Fn);
 
@@ -9238,6 +9244,8 @@ FatASM* SC_Msg_KNST3(Message* Self, ASMReg R1, int Cond, int Inv, int Value);
 Message* JB_Msg_Last(Message* Self, Syntax Need);
 
 void SC_Msg_LastInBlock(Message* Self, SCBlockage Reason);
+
+void SC_Msg_LastTest(Message* Self);
 
 Message* SC_Msg_LastUsedFix(Message* Self);
 
