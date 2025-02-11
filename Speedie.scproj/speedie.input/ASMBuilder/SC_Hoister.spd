@@ -53,7 +53,7 @@ struct SC_Hoister
 		for d in .Items
 			loop d
 			d.nilreg = 0
-		return ASMState.sh.CloseVars(.Closer)
+		ASMState.sh.CloseVars(.Closer)
 
 	function HoistNormal (|message| exp)
 		.spare = –count .items

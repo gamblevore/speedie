@@ -49,10 +49,12 @@ function If (fn_asm)
 	if b.never
 		return .ArgOrIf(other)
 
-	ASMType.arg(self, arg1)
+	|| Arg1Return = ASMType.arg(self, arg1)
 	if b.always or !other
 		B.AllJumpTo
 		.BasicBlock++
+		if b.Always
+			return Arg1Return
 		return asmreg()						// were done!
 
 	if .curr.op != asm.eror
@@ -91,10 +93,11 @@ function While (fn_asm)
 		return asmreg()
 	
 	BEGIN.jumpto(LOOP_Test.start, self)
-	LOOP_TEST.AllJumpTo(BEGIN+1, true)
+	LOOP_TEST.AllJumpTo(BEGIN+1)
 	.loopfill(begin, LOOP_Test.start, LOOP_Test.After)
 	
-	return h.Unhoist
+	h.Unhoist
+	return ASMReg()
 
 
 function Exit			(fn_asm)
@@ -374,13 +377,13 @@ Struct FatRange
 		opt inline
 		return .constness.KnownFalse
 	
-	function AllJumpTo (|&fatasm| curr = .curr, |bool| Strip = true)
-		|| A = asmstate.sh
+	function AllJumpTo (|&fatasm| curr = .curr, |asm| Also=nil)
+		|| A = ASMState.sh
 		for s in self
-			if s is CondAnswer
+			if (s is CondAnswer) or (s.op == Also)
 				(s isnt CondAnswer)
-				s.jumpto(curr,A)
-				if strip and s == Curr - 1
+				s.JumpTo(curr, A)
+				if s == Curr - 1
 					curr--
 					A.nop(s)
 					

@@ -99,7 +99,7 @@ function TryTail (fn_asm)
 	l.R[0] = l.r[1]
 	l.r[1] = prms
 	
-	return ASMReg()
+	return ASMReg.Returns
 
 
 function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest,  |AsmReg|)
@@ -115,9 +115,10 @@ function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest,  |AsmReg
 	// hmmm
 	
 	if exp != .fn.sourcearg.last
-		|| fat = exp.JUMP(0)
+		|| fat = exp.RET(asmreg(), asmreg(), asmreg(), 0, 0)
 		(fat is condanswer)
-	return Dest
+		(fat is Returns)
+	return Dest as ASMReg.Returns
 
 
 function ReturnExp (|&ASMState| self, |message| f, |AsmReg|)
@@ -149,7 +150,7 @@ function Return (fn_asm)
 			fat.r[4] = K
 			fat.r[0] = 0
 	
-	return fat * asmreg()
+	return fat * asmreg.Returns
 	
 
 
@@ -250,8 +251,8 @@ function HoistedArg (fn_asm)
 
 function Arg (fn_asm)
 	|| O = .OpenVars
-	argsub(self, exp)
-	return .CloseVars(O)
+	rz = argsub(self, exp)
+	.CloseVars(O)
 	
 
 
@@ -262,8 +263,9 @@ function ArgSub (fn_asm)
 		if ch.func == @decl
 			asmtype.Decl(self, ch, AsmReg.RealDiscard)
 		  else
-			.µ(ch, AsmReg.RealDiscard)
-
+			|| What = .µ(ch, AsmReg.RealDiscard)
+			if what is Returns
+				return what									// for if-branch that get consted, always that just returns.
 
 
 

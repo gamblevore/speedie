@@ -36,7 +36,7 @@ struct ASMState
 	function OpenVars (|uint64|)
 		rz = (.VDecls|uint64| << 32) ||| (.vtmps << 0)
 		
-	function CloseVars (|uint64| V, |asmreg|)
+	function CloseVars (|uint64| V)
 		|| top = .vdecls
 		|| d = v.high
 		while top > d
@@ -45,7 +45,6 @@ struct ASMState
 			
 		.VDecls = d
 		.VTmps = v.low
-		return asmreg.zero()
 			
 	function AddFuncParams (|SCFunction| fn)
 		opt norefcounts
@@ -500,9 +499,9 @@ struct ASMState
 				rz = true
 	
 	
-	function TryInline (|message| prms, |asmreg| dest, |µFunc| asm, |bool|)
+	function TryInline (|message| prms, |asmreg| dest, |µFunc| µ, |bool|)
 		opt norefcounts
-		|| fn = asm.fn
+		|| fn = µ.fn
 		require .fn.ExportName contains "Inline_"
 		
 		|| OldFunc = .fn
@@ -515,7 +514,7 @@ struct ASMState
 		LL.Start = .curr
 		|| OK = .TryInlineSub(prms, dest, fn)
 		ll.after = .curr
-		LL.AllJumpTo
+		LL.AllJumpTo(.curr, asm.ret)
 
 		.ReturnDest = Olddest
 		.fn = oldFunc

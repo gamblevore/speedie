@@ -78,6 +78,15 @@ function SCBlockage.BlockCombine (|SCBlockage| B, |int|)
 	return SCBlockage.Continue 	// continue is weaker than exit, so return continue?
 
 
+function LastTest
+	visible
+	if 0.5[]
+		return
+	else
+		return
+	"hello"
+
+
 function LastInBlock (|SCBlockage| Reason)
 	opt norefcounts
 	.RemoveAfter
@@ -93,13 +102,13 @@ function LastInBlock (|SCBlockage| Reason)
 			Reason = Reason.BlockCombine(B)
 
 			test = arg.parent!
-			if test.ASMType is kif // what about kElseIf? does this already handle that
-				return test.LastInBlock(reason) // bubble up :O
+			if test.ASMType is kif					// what about kElseIf? does this already handle that
+				return test.LastInBlock(reason)		// bubble up :O
 			  else
 				test.Blocks = Reason
 	
 	if (reason == scblockage.quit) and (self == @func) and scfunction.currfunc!.returntype
-		|| ret = arg.msg(@tmp, "return") // make cleaner c++
+		|| ret = arg.msg(@tmp, "return")			// make cleaner c++
 		ret.ASMType = ASMType.kreturn 
 		ret <~ ret.CreateNil
 }
