@@ -6440,7 +6440,7 @@ void SC_FAT_JumpInputSet(FatASM* Self, int A, int V);
 
 FatASM* SC_FAT_JumpToWith0(FatASM* Self);
 
-ASMReg SC_FAT_JumpToWithFatPac(FatASM* Self, FatASM* Value, ASMState* A);
+void SC_FAT_JumpToWithFatPac(FatASM* Self, FatASM* Value, ASMState* A);
 
 ASM* SC_FAT_KNST_Encoder(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
@@ -6720,10 +6720,6 @@ void SC_Pac_AddLabel(ASMState* Self, Message* Ch);
 
 ASMReg SC_Pac_AddToReg(ASMState* Self, Message* Exp, ASMReg Dest, ASMReg Orig, int64 Amount);
 
-ASMReg SC_Pac_ArgOrIf(ASMState* Self, Message* Other);
-
-ASMReg SC_Pac_ArgOrIfSub(ASMState* Self, Message* Other);
-
 bool SC_Pac_AskForInline(ASMState* Self, Message* Prms, ASMReg Dest, SCFunction* Fn);
 
 ASMReg SC_Pac_ASMBoolBadnessMadness(ASMState* Self, Message* Exp, ASMReg Dest, OpMode Opp);
@@ -6762,7 +6758,7 @@ FatASM* SC_Pac_BoolTestAndJump(ASMState* Self, Message* Exp, ASMReg Req, OpMode 
 
 ASMReg SC_Pac_BoolValue(ASMState* Self, Message* A, ASMReg Dest, OpMode Opp, Message* B);
 
-ASMReg SC_Pac_Branch(ASMState* Self, Message* Cond, bool Neg, FatRange* Range);
+ASMReg SC_Pac_Branch(ASMState* Self, Message* Cond, FatRange* Range, bool Neg);
 
 ASMReg SC_Pac_BranchAnd(ASMState* Self, Message* A, Message* B, ASMReg Dest);
 
@@ -6802,6 +6798,10 @@ ASMReg SC_Pac_DivInt(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* E
 
 ASMReg SC_Pac_DoMathSub(ASMState* Self, Message* Exp, ASMReg Dest, fn_OpASM Fn);
 
+ASMReg SC_Pac_Else(ASMState* Self, Message* Other);
+
+ASMReg SC_Pac_ElseSub(ASMState* Self, Message* Other);
+
 ASMReg SC_Pac_Equals(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
 ASMReg SC_Pac_EqualsInt(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
@@ -6823,8 +6823,6 @@ bool SC_Pac_FoundReg(ASMState* Self, Message* All, int R);
 ASMReg SC_Pac_FuncPrm(ASMState* Self, Message* Prm);
 
 ASMReg SC_Pac_If(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
-
-ASMReg SC_Pac_IfEmpty(ASMState* Self, Message* Cond, Message* Other);
 
 void SC_Pac_ImproveJumps(ASMState* Self);
 
@@ -6939,8 +6937,6 @@ void SC_Pac_RegsBitClear(ASMState* Self, Message* Exp, int RegAddrs, SCFunction*
 void SC_Pac_RestoreParameters(ASMState* Self, Message* Prms, SCFunction* Fn);
 
 ASMReg SC_Pac_SafeDecr(ASMState* Self);
-
-void SC_Pac_Sanity(ASMState* Self);
 
 ASMReg SC_Pac_SelfDivide(ASMState* Self, ASMReg Dest, Message* Exp);
 
@@ -8789,8 +8785,6 @@ void JB_Msg_Bra__(Message* Self, FastString* Fs);
 
 SCDecl* SC_Msg_BraDeclfind(Message* Self);
 
-Syntax SC_Msg_BraFunc(Message* Self);
-
 void JB_Msg_BRel__(Message* Self, FastString* Fs);
 
 FatASM* SC_Msg_BSHL(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Sh);
@@ -9106,8 +9100,6 @@ Message* JB_Msg_GoIntoInvisArg(Message* Self, Message* Tmp, int Pos);
 FatASM* SC_Msg_GSTR(Message* Self, ASMReg R1, int Mode, int Add);
 
 FatASM* SC_Msg_GTAB(Message* Self, ASMReg R1, int Mode, int Add);
-
-bool SC_Msg_HasAsmStuff(Message* Self);
 
 Message* SC_Msg_HasOwnBlock(Message* Self);
 
@@ -11582,10 +11574,8 @@ inline bool SC_FatRange_Never(FatRange* Self) {
 }
 
 inline ASMReg SC_Pac_GetASM(ASMState* Self, Message* Exp, ASMReg Dest) {
-	SC_Pac_Sanity(Self);
 	fn_asm Fn = SC_fn_asm_table[SC_Msg_ASMType(Exp)];
 	ASMReg Ss = (Fn)(Self, Exp, Dest, 0);
-	SC_Pac_Sanity(Self);
 	return Ss;
 }
 

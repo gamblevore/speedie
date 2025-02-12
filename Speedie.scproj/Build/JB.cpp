@@ -3453,7 +3453,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[220]);
-	JB_FS_AppendInt32(_fsf0, (2025021121));
+	JB_FS_AppendInt32(_fsf0, (2025021213));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8635,7 +8635,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1677]);
-	JB_FS_AppendInt32(_fsf0, (2025021121));
+	JB_FS_AppendInt32(_fsf0, (2025021213));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -17874,6 +17874,7 @@ ASMReg SC_ASMType__DoFunction(ASMState* Self, Message* Exp, ASMReg Dest, int Mod
 	iif (RegAddrs) {
 		SC_Pac_RegsBitClear(Self, Exp, RegAddrs, Fn);
 	}
+	Dest = (SC_Reg_SyntaxIsSet(Dest, kSC__Reg_Returns, SC_Func_SyntaxIs(Fn, kSC__FunctionType_Killer)));
 	return SC_FAT_AsReg(Fat, Dest);
 }
 
@@ -21322,7 +21323,7 @@ FatASM* SC_FAT_JumpToWith0(FatASM* Self) {
 	return nil;
 }
 
-ASMReg SC_FAT_JumpToWithFatPac(FatASM* Self, FatASM* Value, ASMState* A) {
+void SC_FAT_JumpToWithFatPac(FatASM* Self, FatASM* Value, ASMState* A) {
 	uint J = Self->JumpReg;
 	iif (J) {
 		int D = (Value - Self) - 1;
@@ -21336,7 +21337,6 @@ ASMReg SC_FAT_JumpToWithFatPac(FatASM* Self, FatASM* Value, ASMState* A) {
 	}
 	 else {
 	}
-	return SC_Reg__New();
 }
 
 ASM* SC_FAT_KNST_Encoder(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo) {
@@ -22287,29 +22287,6 @@ ASMReg SC_Pac_AddToReg(ASMState* Self, Message* Exp, ASMReg Dest, ASMReg Orig, i
 	return SC_Pac_Plus(Self, Dest, Orig, K, Exp);
 }
 
-ASMReg SC_Pac_ArgOrIf(ASMState* Self, Message* Other) {
-	ASMReg Rz = ((ASMReg)0);
-	Rz = SC_Pac_ArgOrIfSub(Self, Other);
-	(++Self->BasicBlock);
-	return Rz;
-}
-
-ASMReg SC_Pac_ArgOrIfSub(ASMState* Self, Message* Other) {
-	iif (Other) {
-		uint T = SC_Msg_ASMType(Other);
-		iif (T != kSC__ASMType_kIf) {
-			iif (!JB_Msg_EqualsSyx(Other, kJB_SyxArg, false)) {
-				Other = ((Message*)JB_Ring_First(Other));
-			}
-			 else {
-			}
-			return SC_ASMType__Arg(Self, Other, SC_Reg__New(), 0);
-		}
-		return SC_Pac_If(Self, Other, SC_Reg__New(), 0);
-	}
-	return SC_Reg__New();
-}
-
 bool SC_Pac_AskForInline(ASMState* Self, Message* Prms, ASMReg Dest, SCFunction* Fn) {
 	FuncInASM* A = Fn->ASM;
 	iif (!(A and (!SC_Func_HasCVersion(Fn)))) {
@@ -22612,7 +22589,7 @@ ASMReg SC_Pac_BoolValue(ASMState* Self, Message* A, ASMReg Dest, OpMode Opp, Mes
 	return SC_Pac_Exists(Self, Dest, Dest, ((Message*)JB_Ring_NextSib(A)));
 }
 
-ASMReg SC_Pac_Branch(ASMState* Self, Message* Cond, bool Neg, FatRange* Range) {
+ASMReg SC_Pac_Branch(ASMState* Self, Message* Cond, FatRange* Range, bool Neg) {
 	ASMReg Rz = ((ASMReg)0);
 	Range->Start = Self->Curr;
 	ASMReg Mode = SC_Reg_Negate(kSC__Reg_CondRequest, Neg);
@@ -22635,11 +22612,11 @@ ASMReg SC_Pac_Branch(ASMState* Self, Message* Cond, bool Neg, FatRange* Range) {
 
 ASMReg SC_Pac_BranchAnd(ASMState* Self, Message* A, Message* B, ASMReg Dest) {
 	FatRange AndTest = ((FatRange){});
-	ASMReg First = SC_Pac_Branch(Self, A, SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate), (&AndTest));
+	ASMReg First = SC_Pac_Branch(Self, A, (&AndTest), SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate));
 	iif (SC_FatRange_Never((&AndTest))) {
 		return First;
 	}
-	ASMReg Second = SC_Pac_Branch(Self, B, SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate), (&AndTest));
+	ASMReg Second = SC_Pac_Branch(Self, B, (&AndTest), SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate));
 	iif (!SC_Reg_SyntaxIs(First, kSC__Reg_RealConst)) {
 		return First;
 	}
@@ -22648,7 +22625,7 @@ ASMReg SC_Pac_BranchAnd(ASMState* Self, Message* A, Message* B, ASMReg Dest) {
 
 ASMReg SC_Pac_BranchOr(ASMState* Self, Message* A, Message* B, ASMReg Dest) {
 	FatRange OrTest = ((FatRange){});
-	ASMReg First = SC_Pac_Branch(Self, A, (!SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate)), (&OrTest));
+	ASMReg First = SC_Pac_Branch(Self, A, (&OrTest), (!SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate)));
 	MaybeBool KF = JB_MaybeBool_Negate(OrTest.Constness);
 	iif (JB_MaybeBool_KnownTrue(KF)) {
 		FatASM* Fake = SC_Msg_NOOP(A);
@@ -22657,7 +22634,7 @@ ASMReg SC_Pac_BranchOr(ASMState* Self, Message* A, Message* B, ASMReg Dest) {
 		return SC_FAT_AsReg(Fake, SC_Reg_BoolAnswer(First));
 	}
 	FatRange Br2 = ((FatRange){});
-	ASMReg Second = SC_Pac_Branch(Self, B, SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate), (&Br2));
+	ASMReg Second = SC_Pac_Branch(Self, B, (&Br2), SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate));
 	SC_FatRange_AllJumpTo((&OrTest), Self->Curr, nil);
 	iif (SC_FatRange_Always((&Br2))) {
 		return Second;
@@ -22881,6 +22858,29 @@ ASMReg SC_Pac_DoMathSub(ASMState* Self, Message* Exp, ASMReg Dest, fn_OpASM Fn) 
 	return Rz;
 }
 
+ASMReg SC_Pac_Else(ASMState* Self, Message* Other) {
+	ASMReg Rz = ((ASMReg)0);
+	Rz = SC_Pac_ElseSub(Self, Other);
+	(++Self->BasicBlock);
+	return Rz;
+}
+
+ASMReg SC_Pac_ElseSub(ASMState* Self, Message* Other) {
+	iif (!Other) {
+		return SC_Reg__New();
+	}
+	uint T = SC_Msg_ASMType(Other);
+	iif (T == kSC__ASMType_kIf) {
+		return SC_Pac_If(Self, Other, SC_Reg__New(), 0);
+	}
+	iif (!JB_Msg_EqualsSyx(Other, kJB_SyxArg, false)) {
+		Other = ((Message*)JB_Ring_First(Other));
+	}
+	 else {
+	}
+	return SC_ASMType__Arg(Self, Other, SC_Reg__New(), 0);
+}
+
 ASMReg SC_Pac_Equals(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp) {
 	ASMReg Rz = ((ASMReg)0);
 	int Rr = SC_Reg_Reg(R);
@@ -23031,48 +23031,37 @@ ASMReg SC_Pac_FuncPrm(ASMState* Self, Message* Prm) {
 }
 
 ASMReg SC_Pac_If(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
+	ASMReg Rz = ((ASMReg)0);
 	Message* Cond = ((Message*)JB_Ring_First(Exp));
 	Message* Arg1 = ((Message*)JB_Ring_NextSib(Cond));
 	Message* Other = ((Message*)JB_Ring_NextSib(Arg1));
-	iif (!SC_Msg_HasAsmStuff(Arg1)) {
-		return SC_Pac_IfEmpty(Self, Cond, Other);
-	}
+	FatASM* IfStart = Self->Curr;
 	FatRange B = ((FatRange){});
-	SC_Pac_Branch(Self, Cond, false, (&B));
+	SC_Pac_Branch(Self, Cond, (&B), false);
+	FatASM* ArgStart = Self->Curr;
 	iif (SC_FatRange_Never((&B))) {
-		return SC_Pac_ArgOrIf(Self, Other);
+		JB_DoAt(1);
+		return SC_Pac_Else(Self, Other);
 	}
 	ASMReg Arg1Return = SC_ASMType__Arg(Self, Arg1, SC_Reg__New(), 0);
 	iif (SC_FatRange_Always((&B)) or (!Other)) {
+		JB_DoAt(1);
 		SC_FatRange_AllJumpTo((&B), Self->Curr, nil);
 		(++Self->BasicBlock);
-		iif (SC_FatRange_Always((&B))) {
-			return Arg1Return;
-		}
-		return SC_Reg__New();
+		return SC_Reg_OperatorMul(Arg1Return, SC_FatRange_Always((&B)));
+	}
+	iif (ArgStart == Self->Curr) {
+		JB_DoAt(1);
+		SC_Pac_NopRange(Self, IfStart, ArgStart);
+		SC_Pac_Branch(Self, Cond, (&B), true);
 	}
 	iif (Self->Curr->Op != kSC__ASM_EROR) {
 	}
 	SC_FatRange_AllJumpTo((&B), Self->Curr, nil);
 	FatASM* AfterFirst = SC_Msg_JUMP(Arg1, 0);
-	SC_Pac_ArgOrIf(Self, Other);
-	return SC_FAT_JumpToWithFatPac(AfterFirst, Self->Curr, (&SC__Pac_Sh));
-}
-
-ASMReg SC_Pac_IfEmpty(ASMState* Self, Message* Cond, Message* Other) {
-	iif (!Other) {
-		JB_DoAt(1);
-		return SC_Pac_xC2xB5(Self, Cond, kSC__Reg_RealDiscard);
-	}
-	FatRange B = ((FatRange){});
-	JB_DoAt(1);
-	SC_Pac_Branch(Self, Cond, true, (&B));
-	iif (SC_FatRange_Never((&B))) {
-		return SC_Reg__New();
-	}
-	SC_Pac_ArgOrIf(Self, Other);
-	SC_FatRange_AllJumpTo((&B), Self->Curr, nil);
-	return SC_Reg__New();
+	Rz = SC_Reg_OperatorBitand(SC_Pac_Else(Self, Other), Arg1Return);
+	SC_FAT_JumpToWithFatPac(AfterFirst, Self->Curr, (&SC__Pac_Sh));
+	return Rz;
 }
 
 void SC_Pac_ImproveJumps(ASMState* Self) {
@@ -23964,9 +23953,6 @@ ASMReg SC_Pac_SafeDecr(ASMState* Self) {
 	return Rz;
 }
 
-void SC_Pac_Sanity(ASMState* Self) {
-}
-
 ASMReg SC_Pac_SelfDivide(ASMState* Self, ASMReg Dest, Message* Exp) {
 	iif (SC_Reg_IsInt(Dest)) {
 		return SC_Pac_NumToReg(Self, Exp, 1, Dest, kJB__TC_Int);
@@ -24129,7 +24115,7 @@ ASMReg SC_Pac_Ternary(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
 	}
 	Dest = SC_Pac_TempTyped(Self, Exp, Dest);
 	FatRange TernTest = ((FatRange){});
-	ASMReg TT = SC_Pac_Branch(Self, Cond, false, (&TernTest));
+	ASMReg TT = SC_Pac_Branch(Self, Cond, (&TernTest), false);
 	MaybeBool KK = TernTest.Constness;
 	iif (JB_MaybeBool_IsKnown(KK)) {
 		Message* Which = ((Message*)JB_Ternaryy(JB_MaybeBool_Default(KK), A, B));
@@ -24275,20 +24261,20 @@ ASMReg SC_Pac_While(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
 	SC_Hoister H = ((SC_Hoister){});
 	H.Closer = SC_Pac_OpenVars(Self);
 	SC_Hoi_HoistLoop((&H), ((Message*)JB_Ring_First(Exp)));
-	FatASM* BEGIN = SC_Msg_JUMP(Exp, 0);
-	SC_ASMType__Arg(Self, ((Message*)JB_Tree_Second(Exp)), SC_Reg__New(), 0);
-	FatRange LOOP_TEST = ((FatRange){});
-	ASMReg LT = SC_Pac_Branch(Self, ((Message*)JB_Ring_First(Exp)), true, (&LOOP_TEST));
-	iif (SC_FatRange_Never((&LOOP_TEST))) {
+	FatASM* Begin = SC_Msg_JUMP(Exp, 0);
+	ASMReg Returns = SC_ASMType__Arg(Self, ((Message*)JB_Tree_Second(Exp)), SC_Reg__New(), 0);
+	FatRange Loop_test = ((FatRange){});
+	ASMReg LT = SC_Pac_Branch(Self, ((Message*)JB_Ring_First(Exp)), (&Loop_test), true);
+	iif (SC_FatRange_Never((&Loop_test))) {
 		JB_DoAt(1);
-		SC_Pac_NopRange(Self, BEGIN, LOOP_TEST.Start);
+		SC_Pac_NopRange(Self, Begin, Loop_test.Start);
 		return SC_Reg__New();
 	}
-	SC_FAT_JumpToWithFatPac(BEGIN, LOOP_TEST.Start, Self);
-	SC_FatRange_AllJumpTo((&LOOP_TEST), BEGIN + 1, nil);
-	SC_Pac_LoopFill(Self, BEGIN, LOOP_TEST.Start, LOOP_TEST.After);
+	SC_FAT_JumpToWithFatPac(Begin, Loop_test.Start, Self);
+	SC_FatRange_AllJumpTo((&Loop_test), Begin + 1, nil);
+	SC_Pac_LoopFill(Self, Begin, Loop_test.Start, Loop_test.After);
 	SC_Hoi_Unhoist((&H));
-	return SC_Reg__New();
+	return SC_Reg_OperatorMul(Returns, SC_FatRange_Always((&Loop_test)));
 }
 
 ASMReg SC_Pac_Zeros(ASMState* Self, ASMReg Dest) {
@@ -35036,17 +35022,6 @@ SCDecl* SC_Msg_BraDeclfind(Message* Self) {
 	return Rz;
 }
 
-Syntax SC_Msg_BraFunc(Message* Self) {
-	wwhile (Self) {
-		Syntax Fn = Self->Func;
-		iif (Fn != kJB_SyxBra) {
-			return Fn;
-		}
-		Self = ((Message*)JB_Ring_First(Self));
-	};
-	return nil;
-}
-
 void JB_Msg_BRel__(Message* Self, FastString* Fs) {
 	JB_FS_AppendString(Fs, Self->Name);
 	Message* _tmPf0 = ((Message*)JB_Ring_First(Self));
@@ -37988,23 +37963,6 @@ FatASM* SC_Msg_GTAB(Message* Self, ASMReg R1, int Mode, int Add) {
 	(SC_FAT_NumInputSet(Rz, 1, Mode));
 	(SC_FAT_NumInputSet(Rz, 2, Add));
 	return Rz;
-}
-
-bool SC_Msg_HasAsmStuff(Message* Self) {
-	{
-		Message* Ch = ((Message*)JB_Ring_First(Self));
-		wwhile (Ch) {
-			Message* _Nf1 = (((Message*)JB_Ring_NextSib(Ch)));
-			Syntax Fn = SC_Msg_BraFunc(Ch);
-			iif ((Fn != kJB_SyxSheb) and ((Fn != kJB_SyxNum) and (Fn != kJB_SyxChar))) {
-				return true;
-			}
-			Ch = _Nf1;
-		};
-		;
-	}
-	;
-	return false;
 }
 
 Message* SC_Msg_HasOwnBlock(Message* Self) {
@@ -58593,4 +58551,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -1745995746111523036 2852784355592874311
+// -65402956651415317 2852784355592874311
