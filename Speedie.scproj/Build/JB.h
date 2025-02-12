@@ -547,13 +547,13 @@ struct SCModule;
 
 struct Task2;
 
-typedef ASM* (*ASM_Encoder)(FatASM* self, ASM* Curr, ASM* After, int64 ExtraInfo);
+typedef ASM* (*ASM_Encoder)(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
-typedef SCNode* (*FP_CollectFunc)(Message* node, SCNode* name_space, Message* ErrPlace);
+typedef SCNode* (*FP_CollectFunc)(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
-typedef SCObject* (*FP_ExprResolver)(Message* Exp, SCNode* name_space, Message* Side);
+typedef SCObject* (*FP_ExprResolver)(Message* Exp, SCNode* Name_space, Message* Side);
 
-typedef NilState (*FP_NilTrackerFn)(Message* msg, NilCheckMode Test);
+typedef NilState (*FP_NilTrackerFn)(Message* Msg, NilCheckMode Test);
 
 typedef Message* (*FP_ParseHandler)(int Start, Message* Parent);
 
@@ -569,41 +569,41 @@ typedef bool (*SpdProcess_ThreadAsProcess)(SpdProcess* self, PicoComms* Comms, i
 
 typedef JB_Object* (*TokenHandler_fp)(int Start, Message* Parent);
 
-typedef void (*FP_TranFunc)(SCFunction* Fn, Message* node, SCNode* name_space);
+typedef void (*FP_TranFunc)(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
-typedef JB_String* (*__Message_CopyID__)(Message* self);
+typedef JB_String* (*__Message_CopyID__)(Message* Self);
 
-typedef void (*__Saveable_LoadProperties__)(Saveable* self, ObjectLoader* Loader);
+typedef void (*__Saveable_LoadProperties__)(Saveable* Self, ObjectLoader* Loader);
 
-typedef JB_String* (*__Object_Render__)(JB_Object* self, FastString* Fs_in);
+typedef JB_String* (*__Object_Render__)(JB_Object* Self, FastString* Fs_in);
 
-typedef void (*__Saveable_SaveCollect__)(Saveable* self, ObjectSaver* Saver);
+typedef void (*__Saveable_SaveCollect__)(Saveable* Self, ObjectSaver* Saver);
 
-typedef void (*__Saveable_SaveWrite__)(Saveable* self, ObjectSaver* Saver);
+typedef void (*__Saveable_SaveWrite__)(Saveable* Self, ObjectSaver* Saver);
 
-typedef bool (*__Message_TextSet__)(Message* self, int I, JB_String* V);
+typedef bool (*__Message_TextSet__)(Message* Self, int I, JB_String* V);
 
-typedef JB_String* (*__Message_Text__)(Message* self, int I);
+typedef JB_String* (*__Message_Text__)(Message* Self, int I);
 
 typedef int (*autosort_fn)(autoitem* a, autoitem* b);
 
-typedef void (*FP_fnErrorLogger)(JB_ErrorReceiver* self, JB_String* Data);
+typedef void (*FP_fnErrorLogger)(JB_ErrorReceiver* Self, JB_String* Data);
 
 typedef JB_String* (*FP_fnIDGenerator)(int Start, int End, Syntax F);
 
-typedef bool (*FP_fnPreReader)(SCFunction* self, Message* msg);
+typedef bool (*FP_fnPreReader)(SCFunction* Self, Message* Msg);
 
 typedef int64 (*fn_ASMConstifier)(ASMReg L, ASMReg R);
 
-typedef ASMReg (*fn_OpASM)(ASMState* self, ASMReg Dest, ASMReg L, ASMReg R, Message* exp);
+typedef ASMReg (*fn_OpASM)(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
-typedef ASMReg (*fn_asm)(ASMState* self, Message* exp, ASMReg Dest, int Mode);
+typedef ASMReg (*fn_asm)(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
-typedef void (*FP_fpMsgRender)(Message* self, FastString* fs);
+typedef void (*FP_fpMsgRender)(Message* Self, FastString* Fs);
 
 typedef void (*FP_fpMsgRenderCpp)(Message* self, FastStringCpp* fs);
 
-typedef bool (*Task_LessThan3_interface_prototype)(JB_Task* self, int I);
+typedef bool (*Task_LessThan3_interface_prototype)(JB_Task* Self, int I);
 
 //// HEADER SyntaxConstants.h
 #define kSyxNil 0

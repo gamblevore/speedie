@@ -277,25 +277,25 @@ typedef Message* (*FP_ParseHandler)(int Start, Message* Parent);
 
 typedef JB_Object* (*TokenHandler_fp)(int Start, Message* Parent);
 
-typedef JB_String* (*__Message_CopyID__)(Message* self);
+typedef JB_String* (*__Message_CopyID__)(Message* Self);
 
-typedef void (*__Saveable_LoadProperties__)(Saveable* self, ObjectLoader* Loader);
+typedef void (*__Saveable_LoadProperties__)(Saveable* Self, ObjectLoader* Loader);
 
-typedef JB_String* (*__Object_Render__)(JB_Object* self, FastString* Fs_in);
+typedef JB_String* (*__Object_Render__)(JB_Object* Self, FastString* Fs_in);
 
-typedef void (*__Saveable_SaveCollect__)(Saveable* self, ObjectSaver* Saver);
+typedef void (*__Saveable_SaveCollect__)(Saveable* Self, ObjectSaver* Saver);
 
-typedef void (*__Saveable_SaveWrite__)(Saveable* self, ObjectSaver* Saver);
+typedef void (*__Saveable_SaveWrite__)(Saveable* Self, ObjectSaver* Saver);
 
-typedef bool (*__Message_TextSet__)(Message* self, int I, JB_String* V);
+typedef bool (*__Message_TextSet__)(Message* Self, int I, JB_String* V);
 
-typedef JB_String* (*__Message_Text__)(Message* self, int I);
+typedef JB_String* (*__Message_Text__)(Message* Self, int I);
 
-typedef void (*FP_fnErrorLogger)(JB_ErrorReceiver* self, JB_String* Data);
+typedef void (*FP_fnErrorLogger)(JB_ErrorReceiver* Self, JB_String* Data);
 
 typedef JB_String* (*FP_fnIDGenerator)(int Start, int End, Syntax F);
 
-typedef void (*FP_fpMsgRender)(Message* self, FastString* fs);
+typedef void (*FP_fpMsgRender)(Message* Self, FastString* Fs);
 
 //// HEADER SyntaxConstants.h
 #define kSyxNil 0
