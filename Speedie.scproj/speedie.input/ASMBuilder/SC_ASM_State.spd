@@ -160,16 +160,19 @@ struct ASMState
 		(t is temp)
 		return t
 	
+	
 	function NopReg (|asmreg| R)
 		|| f = r.fat
 			return .Nop(f)
 		if r.reg and r isnt param
 			debugat // bad!
 	
+	
 	function Nop2Consts (|asmreg| A, |asmreg| B)
 		.nopconst(A)
 		.nopconst(B)
 		.nopconst(A) // in case of swapped order
+	
 	
 	function Const (|asmreg| R, |int| bits, |bool| signed, |ind|)
 		if R is ConstOutput
@@ -178,10 +181,12 @@ struct ASMState
 				.nopconst(R)
 				return k|uint64|.trim(bits)
 
+
 	function NopConst (|asmreg| R)
 		if (r is RemoveableOutput) or (r is realconst)
 			|| f = r.fat
 				.Nop(f)
+	
 	
 	function Nop (|FATASM| Fat)
 		opt norefcounts
@@ -197,6 +202,7 @@ struct ASMState
 		Memory.Zero(fat, –sizeof fatasm)
 		fat.msg = m // for @sheb rendering
 		fat.op = asm.noop
+
 
 	function NopRange (|fatasm| Start, |fatasm| After)
 		while start < After
@@ -233,22 +239,21 @@ struct ASMState
 		target debug
 			dest.tmpcheck
 			debugat 0 // keep this
+			.sanity
 		  else
 			opt inline
 
-		.sanity
 		|| fn = fn_asm_table[exp.ASMType]!
 		|| ss = (fn)(self, exp, dest)
-		.sanity
 
 		target debug
+			.sanity
 			if !ss.tmpcheck
 				(fn)(self, exp, dest)
-			check (ss) (self, exp, "µInto failed")
-			if dest is set or ss is set
+			if !ss or dest is set or ss is set
 				return ss // no need test.
 			if !ss.reg and (ss isnt condanswer)
-				if (ss isnt constoutput)
+				if (ss isnt returns) and (ss isnt constoutput)
 					debugger
 					(fn)(self, exp, dest)
 		return ss
@@ -638,7 +643,8 @@ function @ASMType.DoFunction (fn_asm)
 	
 	if RegAddrs
 		.RegsBitClear(exp, RegAddrs, fn)
-		
+
+	(dest is Returns) = fn is Killer
 	return fat * dest
 
 

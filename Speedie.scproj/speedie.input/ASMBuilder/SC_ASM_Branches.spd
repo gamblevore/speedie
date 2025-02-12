@@ -5,35 +5,23 @@
 
 extend ASMState {
 
-function ArgOrIf (|message?| other, |asmreg|)
-	rz = .ArgOrIfSub(other)
+function Else (|message?| other, |asmreg|)
+	rz = .ElseSub(other)
 	.BasicBlock++
 
 
-function ArgOrIfSub (|message?| other, |asmreg|)
+function ElseSub (|message?| other, |asmreg|)
 	opt norefcounts
-	if other
-		|| T = other.asmtype
-		if T != asmtype.kif
-			if other != @arg
-				other = other.first!
-			  else
-				debugger
-			return ASMType.ARG(self, other)
-		return .IF(other, asmreg())
-	return asmreg()
-
-
-function IfEmpty (|message| cond, |message| other, |asmreg|)
 	if !other
-/		return .µ(cond, asmreg.RealDiscard)							// if (x())    -->   x()
-	|fatrange| B
-/	.Branch(cond, true, B)
-	if b.never
-		return ASMReg() // assume SubJumps are sorted out.
-	.ArgOrIf(other)
-	B.AllJumpTo
-	return asmreg()
+		return asmreg()
+	|| T = other.ASMType
+	if T == ASMType.kif
+		return .IF(other, asmreg())
+	if other != @arg
+		other = other.first!
+	  else
+		debugger
+	return ASMType.ARG(self, other)
 
 
 function If (fn_asm)
@@ -41,27 +29,30 @@ function If (fn_asm)
 	
 	|| cond = exp.first!,  || arg1 = cond.next!
 	|| Other = arg1.next
-	if !arg1.HasAsmStuff
-		return .IfEmpty(cond, other)
+	|| IfStart = .curr
 
 	|FATRange| B
 	.Branch(cond, B)
-	if b.never
-		return .ArgOrIf(other)
+	|| ArgStart = .curr
+	if b.Never
+/		return .Else(other)								// ^^^ if k0 {b()} else {return}
 
 	|| Arg1Return = ASMType.arg(self, arg1)
 	if b.always or !other
-		B.AllJumpTo
+/		B.AllJumpTo
 		.BasicBlock++
-		if b.Always
-			return Arg1Return
-		return asmreg()						// were done!
+		return Arg1Return * b.always					// ^^^ if k1: return 
 
+	if ArgStart == .curr
+/		.NopRange(ifstart, argstart)
+		.Branch(cond, b, true)
+		
 	if .curr.op != asm.eror
 	B.AllJumpTo
 	|| AfterFirst = arg1.jump(0)
-	.ArgOrIf(other)
-	return AfterFirst.jumpto(.curr, asmstate.sh)
+	rz = .Else(other) & Arg1Return						// ^^^ if x {return} else {return}
+	AfterFirst.jumpto(.curr, asmstate.sh)
+	
 
 
 function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
@@ -83,21 +74,21 @@ function While (fn_asm)
 	h.Closer = .OpenVars
 	h.hoistloop(exp.first!)
 	
-	|| BEGIN = exp.JUMP(0)							// jump to end... THEN EMIT arg and jump back.
-	ASMType.arg(self, exp.second!)					// arg
+	|| begin = exp.JUMP(0)											// test goes after loop
+	|| Returns = ASMType.arg(self, exp.second!)						// arg
 
-	|fatrange| LOOP_TEST
-	|| LT = .Branch(exp.first!, true, loop_test)
+	|FatRange| loop_test
+	|| LT = .Branch(exp.first!, loop_test, true)
 	if loop_test.never
-/		.noprange(begin, loop_Test.start)
-		return asmreg()
+/		.NopRange(begin, loop_Test.start)
+		return ASMReg()
 	
-	BEGIN.jumpto(LOOP_Test.start, self)
-	LOOP_TEST.AllJumpTo(BEGIN+1)
-	.loopfill(begin, LOOP_Test.start, LOOP_Test.After)
+	begin.JumpTo(loop_test.start, self)
+	loop_test.AllJumpTo(begin+1)
+	.loopfill(begin, loop_test.start, loop_test.After)
 	
 	h.Unhoist
-	return ASMReg()
+	return returns * loop_test.Always
 
 
 function Exit			(fn_asm)
@@ -155,7 +146,7 @@ function SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond,
 	return cond.TERN(dest, µ, ma, mb) * dest
 
 
-function Branch (|message| Cond,  |bool| Neg = false,  |fatrange| Range, |asmreg|)
+function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmreg|)
 	range.Start = .curr
 	|| mode = asmreg.CondRequest.Negate(neg)
 
@@ -310,11 +301,11 @@ function BoolConst2 (|asmreg| mr, |asmreg| Dest,  |opmode| Opp, |message| exp, |
 
 function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	|fatrange| AndTest
-	|| First = .Branch(A, dest is negate, andtest)
+	|| First = .Branch(A, andtest, dest is negate)
 	if AndTest.never
 		return first
 
-	|| Second = .Branch(B, dest is negate, AndTest)
+	|| Second = .Branch(B, AndTest, dest is negate)
 	if  first isnt RealConst
 		// a and b
 		// a and 1
@@ -329,7 +320,7 @@ function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 
 function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	|FatRange| OrTest
-	|| First = .Branch(A, dest isnt negate, OrTest)
+	|| First = .Branch(A, OrTest, dest isnt negate)
 	|| KF = OrTest.Constness.negate
 	if kf.knowntrue
 		|| fake = A.noop
@@ -342,7 +333,7 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 
 	
 	|fatrange| Br2
-	|| second = .Branch(B, dest is negate, Br2)
+	|| second = .Branch(B, Br2, dest is negate)
 	OrTest.AllJumpTo
 
 	if Br2.always

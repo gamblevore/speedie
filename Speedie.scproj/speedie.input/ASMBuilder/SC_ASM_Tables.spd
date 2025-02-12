@@ -108,11 +108,7 @@ function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest,  |AsmReg
 	|| f = exp.first
 		dest = .µinto(f, dest)
 
-	debugger // the jump may always be done. but do we know at this point?
-	// can we tell? Should we tell the caller that it is always done?
-	// the "if" branch should return that it is a "blocker", right? Makes sense?
-	// this if branch always happned, so nothing further happened...
-	// hmmm
+	debugger
 	
 	if exp != .fn.sourcearg.last
 		|| fat = exp.RET(asmreg(), asmreg(), asmreg(), 0, 0)
@@ -261,7 +257,7 @@ function ArgSub (fn_asm)
 	
 	for ch.fast in exp
 		if ch.func == @decl
-			asmtype.Decl(self, ch, AsmReg.RealDiscard)
+			ASMType.Decl(self, ch, AsmReg.RealDiscard)
 		  else
 			|| What = .µ(ch, AsmReg.RealDiscard)
 			if what is Returns
