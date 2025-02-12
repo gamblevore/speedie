@@ -35,11 +35,11 @@ function If (fn_asm)
 	.Branch(cond, B)
 	|| ArgStart = .curr
 	if b.Never
-/		return .Else(other)								// ^^^ if k0 {b()} else {return}
+		return .Else(other)								// ^^^ if k0 {b()} else {return}
 
 	|| Arg1Return = ASMType.arg(self, arg1)
 	if b.always or !other
-/		B.AllJumpTo
+		B.AllJumpTo
 		.BasicBlock++
 		return Arg1Return * b.always					// ^^^ if k1: return 
 
@@ -373,6 +373,9 @@ Struct FatRange
 		for s in self
 			if (s is CondAnswer) or (s.op == Also)
 				(s isnt CondAnswer)
+				if s.op == also
+					s.op = asm.jump
+					s.jumpreg = 1
 				s.JumpTo(curr, A)
 				if s == Curr - 1
 					curr--

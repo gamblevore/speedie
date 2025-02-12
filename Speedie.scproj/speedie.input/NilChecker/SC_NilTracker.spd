@@ -193,6 +193,7 @@ struct ArchonPurger
 		.CheckNilCheck(F)
 		
 		for d in f.args
+			d.Paramfix
 			.DeclareSub(d, d.nildeclared)
 
 		target debugnil

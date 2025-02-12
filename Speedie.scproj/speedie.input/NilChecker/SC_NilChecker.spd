@@ -18,7 +18,7 @@ extend_module ArchonPurger {
 		@thg:	Thing
 		@bra:	Bracket
 		@type:	Type
-		@func:	Function
+		@func:	NilFunction
 		@tmp:   StatementJump
 		@dot:	Property
 		@acc:	Access
@@ -47,7 +47,7 @@ extend_module ArchonPurger {
 		(ASMType.kIgnore):		Ignore
 		(ASMType.krejoin):		Rejoin
 		(ASMType.kFail):		Fail
-		(ASMType.kRefCount):	Function // sigh
+		(ASMType.kRefCount):	NilFunction // sigh
 
 	
 	TrackerDummies()
@@ -236,7 +236,7 @@ function String (niltrackerfn)
 //	a[] = 2
 
 
-function Function (NilTrackerFn)
+function NilFunction (NilTrackerFn)
 	opt norefcounts
 	test &=~ NilCheckMode.Disappears
 	|| fp = msg.first!
@@ -260,7 +260,10 @@ function Function (NilTrackerFn)
 	
 	|| P = prms.first
 	|| HasAddrs = false
+	// if fn ~= "LLL2"
 	for recv in fn.args
+		recv.Paramfix
+		
 		if (recv.nildeclared is optional) and (fn.IsNilChecker != 3)
 			test |= nilcheckmode.Soft
 			
@@ -803,4 +806,7 @@ function scdecl.IsProperlyLocal (|bool|)
 	// what about a struct?
 	return true
 
+function scdecl.Paramfix
+	(self is param)
+	(self isnt body)
 

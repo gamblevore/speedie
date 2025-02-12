@@ -237,9 +237,9 @@ struct ASMState
 		opt norefcounts
 		cpp_part GetASM 
 		target debug
+			.sanity
 			dest.tmpcheck
 			debugat 0 // keep this
-			.sanity
 		  else
 			opt inline
 
@@ -530,16 +530,15 @@ struct ASMState
 	function InlineParameters (|message| prms, |asmreg| dest, |SCFunction| fn)
 		opt norefcounts
 		|| p = prms.first
-//		if "Inline_Consts".trap and .fn ~= "gggTest1"
-
+		
 		for a in fn.Args
 			|| v = .ExistingVar(p!)
-				if v is constoutput // hmm?
 				|| vr = v.reg
 				if (a isnt Altered) or .CanReuseParam(prms, dest, vr)
 					|| T = a.WholeType.reg(vr)
 					a.DataType = t|datatypecode|
 					(a is param) = (v is param)
+					(a is body) = (v isnt param)
 				  else
 					v = nil
 			
@@ -550,38 +549,55 @@ struct ASMState
 			p++
 	
 
-	function RestoreParameters (|message| prms, |SCFunction| fn)
+	function RestoreParameters (|SCFunction| fn)
 		opt norefcounts
-		|| p = prms.first
-		for a in fn.Args
+		for a.backwards in fn.Args
 			.MakeConstFromASM(a, asmreg()) // parameters can never be const anyhow
+			a.paramfix
 
 	
 	function TryInlineSub (|message| prms, |asmreg| dest, |SCFunction| fn, |bool|)
 		opt norefcounts
+		// check what fats we made.
+		// So... basically check if the input parameters are unused.
+		// what if I did somthing like this:	.inline(f() + 1 + g())
+		// what about:							.inline(f(1))
+		
+		// now... if the final result is unused... I mean I can't be bothered to remove all those additions
+		// we still need f() and g()
+		// Either way... we should chcek for them. So how do we know which one is the last one, the output?
+		// it would be the last one per... something? perhaps just remove consts? like fatconsts?
+		
 		.InlineParameters(prms, dest, fn)
 		ASMType.arg(self, fn.SourceArg!, ASMReg())
-		.RestoreParameters(prms, fn)
+		.RestoreParameters(fn)
 		return true
+	
+
+	function CurrGain (|&fatasm| Start, |int|)
+		|| C = .curr
+		while Start < C
+			rz += start.exists
+			start++ 
+			
 	
 	
 	function AskForInline (|message| prms, |asmreg| dest, |SCFunction| fn, |bool|)
 		opt norefcounts
 		|| A = fn.ASM
 		require A and !fn.HasCVersion
-		|| Gain = 5	- (A.Length-1)				// assume that functions have 5 instruction overhead.
-		Gain += (fn is inline) * 24				// sigh...
+		|| AllowedGain = 5 + (fn is inline) * 24		// assume that functions have 5 instruction overhead.
 		
 		|| Grace = 9
 		for p.fast in prms
 			Grace += .IsASMConst(p)<<2
 	
-		require Gain + Grace > 0
+		require (allowedGain + Grace) > a.length
 	
 		|| Start = .curr
 		if .TryInline(prms, dest, A)
-			|| Grown = .curr - start
-			if Grown < gain
+			|| Grown = .CurrGain(start)
+			if Grown <= allowedgain
 				return true
 		.curr = start
 	
@@ -621,7 +637,7 @@ function asmstate.RegsBitClear (|message| exp, |int| RegAddrs, |scfunction| fn)
 					exp.BFLG(i.asm, i.asm, S, S, 0)
 
 
-function @ASMType.DoFunction (fn_asm)
+function @ASMType.ASMFunction (fn_asm)
 	opt norefcounts
 	|| prms = exp.last!
 	|| fn = prms.asfunc!

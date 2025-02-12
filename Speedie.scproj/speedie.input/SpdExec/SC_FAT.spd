@@ -234,14 +234,18 @@ struct FatASM
 	
 	function Renda (|FastString| fs)
 		opt norefcounts
-		if (self isa asm.noop)  and  (.msg.func == @sheb)
+		if (!.exists)  and  (.msg.func == @sheb)
 			.RendaMsg(fs, 0)
 			return 
 		
 		|| M = fs.mark
 		|| op = instruction.typelist[.baseop]!
-		fs <~ op.name
-		fs <~ ':'
+		|| NL = op.name.length
+		if .baseop == asm.noop
+			NL = -1
+		  else
+			fs <~ op.name
+			fs <~ ':'
 		fs <~ (' ', 5-op.name.length)
 		|| GotAny = ""
 		|| Remain = 24
@@ -268,6 +272,10 @@ struct FatASM
 			fs <~ ' '
 		.RendaMsg(fs, fs.mark-m)
 	
+
+	function Exists (|bool|)
+		return .op != asm.noop
+
 	
 	function TmpRender (|faststring| fs, |message| msg)
 		|| arg = msg.Find(@arg)

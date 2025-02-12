@@ -12,7 +12,7 @@ dispatch fn_asm_table (fn_asm)
 	@sstr: ASMState.Str
 	@list: // vectors
 		debugger
-	@func: ASMType.DoFunction
+	@func: ASMType.ASMFunction
 	@dot:  ASMType.Dot
 	@acc:  ASMType.Access
 	@brel: ASMType.Brel		// ++, --, -, &
@@ -107,8 +107,6 @@ function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest,  |AsmReg
 	// what about getting the address of registers?
 	|| f = exp.first
 		dest = .µinto(f, dest)
-
-	debugger
 	
 	if exp != .fn.sourcearg.last
 		|| fat = exp.RET(asmreg(), asmreg(), asmreg(), 0, 0)
@@ -219,6 +217,16 @@ function ConstConvert  (|&asmstate| self, |message| exp, |ASMReg| dest, |ASMReg|
 
 
 function Decl (fn_asm)
+	if options.Optimise >= 4
+		return declsub(self, exp)
+		
+	rz = declsub(self, exp)
+	|| fat = rz.fat
+		fat.fatrefcount++		// Keep vars viewable for debugging
+								// Actually its not an issue for even release builds!
+								// just don't add vars you don't need!
+	
+function DeclSub (fn_asm)
 	opt norefcounts
 	|| rel = exp.last!
 	|| ty = exp.fastdecl
@@ -228,13 +236,14 @@ function Decl (fn_asm)
 	dest = .DeclareMe(rel, ty)
 	|| item = rel.last!
 
-	if ty isnt local // a carray or somthing?? idk
+	if ty isnt local							// a carray or somthing?? idk
 	if (ty is altered) or (ty isnt local)
 		return .µinto(item, dest)
 
 	|| K = .µinto(item, dest)
 	if k is ConstOutput
 		.MakeConstFromASM(ty, k)
+	return k
 
 
 function HoistedArg (fn_asm)
@@ -369,7 +378,7 @@ function Thg (fn_asm)
 
 function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
-	if "Inline_Consts".trap and .fn ~= "gggTest1"
+//	if "Inline_Consts".trap and .fn ~= "gggTest1"
 	|| d = exp.ASMDecl
 	if d is local
 		|| T = d.ThgASM
@@ -633,7 +642,7 @@ function ASMLocal (|message| s, |VarUseMode| mode, |asmreg|)
 function MakeConstFromASM (|scdecl| decl, |asmreg| K)
 	opt NoRefCounts
 	|| f = k.fat
-	if (k is ConstOutput) and (decl isnt AlteredInBranch)
+	if k.reg and (k is ConstOutput) and (decl isnt AlteredInBranch)
 		if f
 			(decl is const)
 			// || k = 1, k = 2, k = k + 3
@@ -647,10 +656,14 @@ function MakeConstFromASM (|scdecl| decl, |asmreg| K)
 // y = k			// nice.
 	if decl is Const
 		(decl isnt const)
-		decl.ExportPosition = 0
-		decl.FatConstIndex = 0
 		if f and !f.FatRefCount
 			.nop(f)
+		decl.ExportPosition = 0
+		|| dclfat = decl.FatConstIndex|uint|
+			decl.FatConstIndex = 0
+			f = dclfat.fat
+			if !f.fatrefcount 
+				.nop(f)
 }
 
 
