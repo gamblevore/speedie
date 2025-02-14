@@ -2164,3 +2164,4 @@
 "No ASM for this operator?"
 "Can't increment temporary value."
 "Register out of bounds"
+"Function too large (>= 256K compiled)"
