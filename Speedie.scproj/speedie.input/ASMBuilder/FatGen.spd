@@ -1,19 +1,5 @@
 
 
-function message.operatormul (|asm| op, |&fatasm|)
-	cpp_part RequestOp
-	|| a = ASMState.sh
-	|| p = a.curr
-	if p < a.end
-		a.curr = p + 1
-		P.op = op
-		p.debug = self
-		p.BlockNum = a.BasicBlock
-		return p
-	error (self, "Function too large (over 64K)")
-	return a.start
-
-
 function message.TAIL (|int| JUMP, |int| Prm1, |&fatasm|) {
 	visible
 	rz = self * asm.TAIL

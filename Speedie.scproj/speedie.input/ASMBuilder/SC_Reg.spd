@@ -32,7 +32,7 @@ datatype ASMReg (uint64)
 		WithinAccess
 		DeclareInlineParam
 		InlinedAccess
-		Returns
+		ExitFunction
 		RealConst  = [ConstInput, ConstOutput]
 		AddrNeed   = [AddrRequest, AddrForceRequest]
 		// don't go above 47

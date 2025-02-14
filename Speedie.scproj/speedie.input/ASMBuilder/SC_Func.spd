@@ -36,7 +36,10 @@ class µFunc
 		rz = where
 		for (fat in self) (i)
 			haslabel |= fat.jumpreg << (i&63)
-			fat.ASMIndex = rz - where
+			|| n = rz - where
+			if n >= 64K
+				error (.fn.source, "Function too large (>= 256K compiled)")
+			fat.ASMIndex = n
 			fat.CheckHasOutput
 			rz = fat.µrenderinto(rz, after)
 

@@ -68,7 +68,7 @@ extend asmstate
 			if fn == Compiler.RefDecr
 				|| P = .last(asm.rfst)
 					if (p.r1 == a.reg) and (p.r0 == 0)
-						p.op = asm.rfap
+						p._op = asm.RFAP
 						p.r[0] = p.r[1]
 						p.r1 = 0
 						return p

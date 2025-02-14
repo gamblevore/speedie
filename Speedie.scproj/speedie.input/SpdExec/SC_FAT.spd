@@ -5,18 +5,41 @@ struct FatASM
 		cpp_part FAT
 		sort_properties true
 	
+	// phi-nodes can actually be don simply by linking one fat to the prev
 	|byte|				RegFromFat
-	|byte|				Op
+	|byte|				_Op
 	|byte|				JumpReg
 	|byte| 				Outputs
 	|ASMReg| 			Info
 	|message--| 		Msg
 	|uint64| 			_Const
 	|uint[6]|			R
-	|uint|				ASMIndex	
+	|uint16|			ASMIndex
 	|uint16| 			BlockNum
-	|uint16|			FatRefCount
+	|uint16|			µRefCount
 	
+	
+	function Op (|byte|)
+		return ._op
+	
+	setter Op (|byte|)
+		opt norefcounts
+		|| n = .RegFromFat|int|
+			for (b.bits in n) (i)
+				|| src = .input(i)
+					src.µRefCount = src.µRefCount - 1
+		|| M = .msg
+		.clear
+		.msg = m	// for @sheb rendering
+		._op = value
+	
+	function Clear
+		Memory.Zero(self, –sizeof fatasm)
+	
+	function Input (|int| i, |&fatasm|)
+		|| r = (.r[i] << 1) >> 16
+			return r.fat
+		
 	function BaseOp (|int|)
 		rz = .op
 		if rz == asm.FNCX3
@@ -30,6 +53,7 @@ struct FatASM
 			return i.Sizes
 		debugger
 		return instruction.typelist[0]!.Sizes
+
 
 	operator mul (|asmreg| info, |asmreg|)
 		cpp_part AsReg
@@ -88,6 +112,11 @@ struct FatASM
 				if p.IsReg
 					return (p is Output)|maybebool|
 
+	syntax equals (|int| ID, |bool| aware, |bool|)
+		return .id == ID
+	
+	function ID (|uint|)
+		return self - asmstate.sh.start
 
 	function Index (|uint|)
 		opt inline
@@ -124,14 +153,15 @@ struct FatASM
 	function RegInput (|int| a, assigns:|asmreg| Input)
 		cpp_part Prm
 		opt inline
+//		if self ~= 631
 		
 		|| i = input.FatIndex
 		.r[a] = input.treg ||| (i << 15)
 		if i
 			|| src = i.fat
 			.RegFromFat |= 1<<a
-			// We can do phi-nodes later. This is good enough for inlining-consts 
-			src.FatRefCount++
+			src.µRefCount++
+//		.debugprint
 	
 	
 	function Dest (|uint| a, |asmreg| info)
@@ -176,15 +206,21 @@ struct FatASM
 			if d == 0
 				a.nop(self)
 		  else
+			j = .id
 			debugger
 
 	function r0 (|uint|): return .r[0]
+	function r0 (assigns:|uint|): .r[0] = value
 	function r0 (assigns:|asmreg|): .r[0] = value.treg
 	function r1 (|uint|): return .r[1]
 	function r1 (assigns:|uint|): .r[1] = value
+	function r1 (assigns:|asmreg|): .r[1] = value.treg
 	function r2 (|uint|): return .r[2]
 	function r2 (assigns:|uint|): .r[2] = value
+	function r2 (assigns:|asmreg|): .r[2] = value.treg
 	function r3 (|uint|): return .r[3]
+	function r3 (assigns:|uint|): .r[3] = value
+	function r3 (assigns:|asmreg|): .r[3] = value.treg
 
 
 	function Swap (|int| a, |int| b)
@@ -288,7 +324,7 @@ struct FatASM
 		while arg
 			arg.Remove
 			arg = c.find(@arg)
-		c.Render(fs)
+		fs <~ c.Render.replaceall( "\n", ": " )
 			
 	
 	function RendaMsg (|faststring| fs, |int| sofar)

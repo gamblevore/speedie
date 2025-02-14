@@ -9,6 +9,8 @@ struct ASMState
 	|byte|						VTmps
 	|bool|						Inited
 	|byte|						ReturnDest
+	|byte|						InlineDepth
+	|bool|						UnbrokenReturn
 
 	|µFunc|						Out
 	|scfunction!|				Fn    
@@ -17,7 +19,7 @@ struct ASMState
 	|&FatASM|					FuncStart
 	|&fatasm|					LastDebug
 	|&FatASM|					Start		// a "slice" feature would be nice    
-	|&FatASM|					Curr    
+	|&FatASM|					_Curr    
 	|&FatASM|					End    
 
 	|scdecl--[32]|				Vars
@@ -32,6 +34,10 @@ struct ASMState
 		|FatASM[]|					JSMSpace = FatASM[0]!
 		|ASMState|					Sh
 
+
+	
+	function Curr (|&fatasm|)
+		return ._curr
 
 	function OpenVars (|uint64|)
 		rz = (.VDecls|uint64| << 32) ||| (.vtmps << 0)
@@ -53,13 +59,13 @@ struct ASMState
 			.DeclareMe(a.source, a)
 	
 	function Index (|int|)
-		return .curr - .start
+		return ._curr - .start
 	
 	function Last (|&FatASM|)
-		return .curr - 1
+		return ._curr - 1
 
 	function Last (|asm| type, |&FatASM|)
-		|| L = .curr - 1
+		|| L = ._curr - 1
 		if l isa type
 			if l.blocknum == .basicblock
 				return L
@@ -189,21 +195,16 @@ struct ASMState
 	
 	
 	function Nop (|FATASM| Fat)
-		opt norefcounts
 		|| C = .curr - 1
 		if fat == C
-			.curr = C // nice
-		|| n = fat.RegFromFat|int|
-		for (b.bits in n) (i)
-			|| r = fat.r[i]
-			|| src = r.FAT
-				src.FatRefCount--
-		|| M = fat.msg
-		Memory.Zero(fat, –sizeof fatasm)
-		fat.msg = m // for @sheb rendering
+			._curr = C // nice
 		fat.op = asm.noop
 
 
+	function Rewind (|fatasm| start)
+		.NopRange(start, .curr)
+	
+	
 	function NopRange (|fatasm| Start, |fatasm| After)
 		while start < After
 			.nop(--after)
@@ -220,10 +221,12 @@ struct ASMState
 
 
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
-		|| rz = .µ(Exp, dest)
-		|| dest2 = rz.reg(dest)
+		|| r = .µ(Exp, dest)
+		if r.reg == dest.reg
+			return r
+		|| dest2 = r.reg(dest)
 		(dest2 is temp) = (dest is temp)
-		return .Assign(Dest2, rz, exp)
+		return .Assign(Dest2, r, exp)
 
 		
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
@@ -253,7 +256,7 @@ struct ASMState
 			if !ss or dest is set or ss is set
 				return ss // no need test.
 			if !ss.reg and (ss isnt condanswer)
-				if (ss isnt returns) and (ss isnt constoutput)
+				if (ss isnt ExitFunction) and (ss isnt constoutput)
 					debugger
 					(fn)(self, exp, dest)
 		return ss
@@ -303,10 +306,10 @@ struct ASMState
 		
 		rz = exp.RD4U(dest, base, varadd, index, 0)
 		if dest is set
-			rz.op = ASMType.WriteASM[bytes]
+			rz._op = ASMType.WriteASM[bytes]
 		  else
 			|| B = (bytes<<1) + t.issigned
-			rz.op = ASMType.ReadASM[b]
+			rz._op = ASMType.ReadASM[b]
 
 
 	function Read (|asmreg| dest, |message| exp,  |asmreg| ptr,  |asmreg| varadd,  |int| index=0,  |&fatasm|)
@@ -372,16 +375,13 @@ struct ASMState
 				addrs[] |= v.Log2
 
 
-	function CallFunc (|message| exp, |asmreg| dest, |scfunction| fn,  |asmreg|)
+	function CallFunc (|message| exp, |asmreg| dest,  |asmreg|)
 		|| v = .VDecls
 		v += (dest.reg < v) // NOICE
 		.vdecls = v
 		check (v < 32) (exp, "Too many registers in use. No space for result.")
 		dest.reg = v
-		dest.µtype = fn.RegType
-		rz = Dest.Simplify
-		if !rz.reg
-			(rz is constoutput)
+		return dest
 
 
 	function PackMakerInit
@@ -395,6 +395,8 @@ struct ASMState
 	function InitAndStartFunc (|scfunction| fn)
 		opt norefcounts
 		.ReturnDest = nil
+		.inlinedepth = 0
+		.unbrokenreturn = true
 		.BasicBlock = 0
 		.VDecls = 0
 		.VTmps = 32
@@ -408,7 +410,7 @@ struct ASMState
 			.jsm = j
 		.end = j.NeedSpare(64K, j.itemcount)
 		.start = j.ptr
-		.curr = .start + j.Length
+		._curr = .start + j.Length
 		.LastDebug = .curr
 		.FuncStart = .curr
 		.out = fn.NeedµFunc
@@ -493,9 +495,10 @@ struct ASMState
 			return ASMType.ThgSub(self, exp, ASMReg.ConstRequest)
 	
 	
-	function CanReuseParam (|message| Prms, |asmreg| Dest, |int| vr,  |bool|)
+	function CanReuseParam (|message| Prms, |asmreg| Dest, |scdecl| A, |int| vr, |bool|)
 		opt norefcounts
-	
+		if a isnt altered
+			return true
 		require (dest.reg == vr)
 		for p.fast in prms
 			// check for the address of the same var?
@@ -504,37 +507,50 @@ struct ASMState
 				rz = true
 	
 	
-	function TryInline (|message| prms, |asmreg| dest, |µFunc| µ, |bool|)
+	function TryInline (|message| prms, |asmreg| dest, |µFunc| A, |asmreg|)
 		opt norefcounts
-		|| fn = µ.fn
-		require .fn.ExportName contains "Inline_"
-		
+		|| fn = A.fn
 		|| OldFunc = .fn
 		|| OldDest = .ReturnDest
 	
+		if .InlineDepth == 0
+			.UnbrokenReturn = true
+		  elseif dest isnt ExitFunction
+			.UnbrokenReturn = false
+		.InlineDepth++
 		.fn = fn
 		.ReturnDest = dest.reg ||| 128
-	
-		|fatrange| LL 
-		LL.Start = .curr
-		|| OK = .TryInlineSub(prms, dest, fn)
-		ll.after = .curr
-		LL.AllJumpTo(.curr, asm.ret)
 
+		rz = .TryInlineSub(prms, dest, A)
+
+		.InlineDepth--
 		.ReturnDest = Olddest
 		.fn = oldFunc
-		return OK
 	
 	
+	function TryInlineSub (|message| prms, |asmreg| dest, |µFunc| µ, |asmreg|)
+		opt norefcounts
+		|| fn = µ.fn
 	
-	function InlineParameters (|message| prms, |asmreg| dest, |SCFunction| fn)
+		|fatrange| LL
+		LL.Start = .curr
+		
+		// now what?
+		.InlineParameters(prms, dest)
+		ASMType.arg(self, fn.SourceArg!, ASMReg())
+		.RestoreParameters
+		ll.after = .curr
+		return ll.InlineFinish
+	
+	
+	function InlineParameters (|message| prms, |asmreg| dest)
 		opt norefcounts
 		|| p = prms.first
 		
-		for a in fn.Args
+		for a in .fn.Args
 			|| v = .ExistingVar(p!)
 				|| vr = v.reg
-				if (a isnt Altered) or .CanReuseParam(prms, dest, vr)
+				if .CanReuseParam(prms, dest, a, vr)
 					|| T = a.WholeType.reg(vr)
 					a.DataType = t|datatypecode|
 					(a is param) = (v is param)
@@ -549,43 +565,26 @@ struct ASMState
 			p++
 	
 
-	function RestoreParameters (|SCFunction| fn)
+	function RestoreParameters
 		opt norefcounts
-		for a.backwards in fn.Args
+		for a.backwards in .fn.Args
 			.MakeConstFromASM(a, asmreg()) // parameters can never be const anyhow
 			a.paramfix
 
 	
-	function TryInlineSub (|message| prms, |asmreg| dest, |SCFunction| fn, |bool|)
-		opt norefcounts
-		// check what fats we made.
-		// So... basically check if the input parameters are unused.
-		// what if I did somthing like this:	.inline(f() + 1 + g())
-		// what about:							.inline(f(1))
-		
-		// now... if the final result is unused... I mean I can't be bothered to remove all those additions
-		// we still need f() and g()
-		// Either way... we should chcek for them. So how do we know which one is the last one, the output?
-		// it would be the last one per... something? perhaps just remove consts? like fatconsts?
-		
-		.InlineParameters(prms, dest, fn)
-		ASMType.arg(self, fn.SourceArg!, ASMReg())
-		.RestoreParameters(fn)
-		return true
-	
-
 	function CurrGain (|&fatasm| Start, |int|)
 		|| C = .curr
 		while Start < C
 			rz += start.exists
 			start++ 
 			
-	
-	
-	function AskForInline (|message| prms, |asmreg| dest, |SCFunction| fn, |bool|)
+
+	function AskForInline (|message| prms, |asmreg| dest, |SCFunction| fn, |asmreg|)
 		opt norefcounts
 		|| A = fn.ASM
+		require .InlineDepth < 8
 		require A and !fn.HasCVersion
+		require .fn.ExportName contains "Inline_"
 		|| AllowedGain = 5 + (fn is inline) * 24		// assume that functions have 5 instruction overhead.
 		
 		|| Grace = 9
@@ -595,11 +594,11 @@ struct ASMState
 		require (allowedGain + Grace) > a.length
 	
 		|| Start = .curr
-		if .TryInline(prms, dest, A)
+		|| I = .TryInline(prms, dest, A)
 			|| Grown = .CurrGain(start)
 			if Grown <= allowedgain
-				return true
-		.curr = start
+				return I
+		.Rewind(start)
 	
 			
 
@@ -637,30 +636,43 @@ function asmstate.RegsBitClear (|message| exp, |int| RegAddrs, |scfunction| fn)
 					exp.BFLG(i.asm, i.asm, S, S, 0)
 
 
-function @ASMType.ASMFunction (fn_asm)
+function asmreg.Functionify (|scfunction| fn, |asmreg|)
+	.µtype = fn.RegType
+	self = .Simplify
+	if !.reg
+		is constoutput
+	return self
+	
+
+function @ASMType.ASMFunction (fn_asm) // dofunction function
 	opt norefcounts
 	|| prms = exp.last!
 	|| fn = prms.asfunc!
 	
-	dest = .CallFunc(exp, dest, fn)
-	if .AskForInline(prms, dest, fn)
-		return dest
+	dest = dest.Functionify(fn)
+	|| MiniDest = .AskForInline(prms, dest, fn)
+		return MiniDest
+	dest = .CallFunc(exp, dest)
 
 	|| Closer = .OpenVars
 	|uint| RegAddrs
 	|| P = .PrmCollect(prms, fn, RegAddrs)
 	.CloseVars(Closer)
 	
+	|| ID = fn.TableId + 31
 	|| PExt = P >> 32
-	|| fat = prms.FNC(dest, fn.TableID+31, P,  PExt)
+	if !PExt and (dest is ExitFunction) and !fn.HasCVersion
+		return prms.TAIL(ID, P) * dest
+		
+	|| fat = prms.FNC(dest, ID, P,  PExt)
 	if fn.HasCVersion
-		fat.op = asm.FNCX
-	fat.op += PExt > 0
+		fat._op = asm.FNCX
+	fat._op += PExt > 0
 	
 	if RegAddrs
 		.RegsBitClear(exp, RegAddrs, fn)
 
-	(dest is Returns) = fn is Killer
+	(dest is ExitFunction) = fn is Killer
 	return fat * dest
 
 

@@ -46,8 +46,10 @@ constants
 	IncrAfter = 2
 	IncrBefore = 0
 	
-|asm_Read[10]| ReadASM
-|asm_Write[5]| WriteASM
+|asm_Read[10]|	ReadASM
+|asm_Write[5]|	WriteASM
+|message--|		LastDebugMark
+
 
 function InitAccess
 	|| R = &ASMType.ReadASM[0]
@@ -85,41 +87,22 @@ function First (fn_asm)
 
 function Sheb (fn_asm)
 	opt norefcounts
-	return exp.noop*asmreg()
-
-
-function TryTail (fn_asm)
-	opt norefcounts
-	|| l = .Last
-	require l isa asm.FNC or asm.FNC3
-	|| fn = l.Msg.obj as SCFunction					#debug_require
-	|| Prms = l.FuncPrmBits							#require
-
-	L.op = asm.tail
-	l.R[0] = l.r[1]
-	l.r[1] = prms
-	
-	return ASMReg.Returns
+	LastDebugMark = exp
+	return exp.noop * asmreg()
 
 
 function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest,  |AsmReg|)
 	opt norefcounts
-	// what about getting the address of registers?
+	// What about getting the address of registers?
 	|| f = exp.first
-		dest = .µinto(f, dest)
+		dest = .µinto(f, dest as asmreg.ExitFunction * .UnbrokenReturn)
 	
-	if exp != .fn.sourcearg.last
-		|| fat = exp.RET(asmreg(), asmreg(), asmreg(), 0, 0)
-		(fat is condanswer)
-		(fat is Returns)
-	return Dest as ASMReg.Returns
+	|| fat = exp.RET(Dest, asmreg(), asmreg(), 0, 0)
+	fat.µRefCount = 1
+	(fat is CondAnswer)
+	(fat is ExitFunction)
+	return fat*Dest
 
-
-function ReturnExp (|&ASMState| self, |message| f, |AsmReg|)
-	if f
-		|| V = .ExistingVar(f, varusemode.return)
-			return V
-		return .µGetASM(f)
 
 
 function Return (fn_asm)
@@ -127,10 +110,11 @@ function Return (fn_asm)
 	|int| L = .ReturnDest		// can remove constants, so try first
 		return InlinedReturn(self, exp, (l&31).asm)
 
+	|asmreg| V 
 	|| f = exp.first
-	|| V = ReturnExp(self, f)
-	|| T = TryTail(self, exp)
-		return T
+		V = .ExistingVar(f, VarUseMode.return)
+		if !v
+			v = .µGetASM(f, ASMReg.ExitFunction)
 		
 	|| amount = (f!=nil)|int|
 	|| D0 = .SafeDecr
@@ -139,12 +123,13 @@ function Return (fn_asm)
 	|| D2 = .decr
 		
 	|| fat = exp.RET(V, D1, D2, (D0!=nil)|int|, 0)
+	fat.µRefCount = 1
 	if !D0
 		|| K = .Const(V, 8, true) // return true, or -1, etc
 			fat.r[4] = K
 			fat.r[0] = 0
 	
-	return fat * asmreg.Returns
+	return fat * asmreg.ExitFunction
 	
 
 
@@ -222,7 +207,7 @@ function Decl (fn_asm)
 		
 	rz = declsub(self, exp)
 	|| fat = rz.fat
-		fat.fatrefcount++		// Keep vars viewable for debugging
+		fat.µRefCount++		// Keep vars viewable for debugging
 								// Actually its not an issue for even release builds!
 								// just don't add vars you don't need!
 	
@@ -269,7 +254,7 @@ function ArgSub (fn_asm)
 			ASMType.Decl(self, ch, AsmReg.RealDiscard)
 		  else
 			|| What = .µ(ch, AsmReg.RealDiscard)
-			if what is Returns
+			if what is ExitFunction
 				return what									// for if-branch that get consted, always that just returns.
 
 
@@ -330,6 +315,7 @@ function Dot (fn_asm)										// a.b
 
 
 function SimpleSet (|&asmstate| self, |message| A, |message| B, |asmreg|)	
+	opt norefcounts
 	|| X = .ExistingVar(A, VarUseMode.set)
 	if !X.reg
 		return nil
@@ -378,7 +364,6 @@ function Thg (fn_asm)
 
 function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
-//	if "Inline_Consts".trap and .fn ~= "gggTest1"
 	|| d = exp.ASMDecl
 	if d is local
 		|| T = d.ThgASM
@@ -480,7 +465,7 @@ function IncrOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |
 	if dest.BitCount * (1<<log) != bc<<3 // hmm? maths bug?
 	|| fat = f.CNTC(Addr, dest, 1, amount, log)
 	if mode & IncrAfter
-		fat.op = asm.cntd
+		fat._op = asm.cntd
 	return fat * dest
 
 
@@ -607,7 +592,7 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 		|| Closer = .OpenVars
 		|| discardmode = dest & AsmReg.Discard
 		|| Mode = discardmode with dest
-
+		
 		ml = .µGetASM(exp.first!, mode)
 		mode = DiscardMode.with(dest, ml)
 		mr = .µ(exp.last!, mode)
@@ -656,13 +641,13 @@ function MakeConstFromASM (|scdecl| decl, |asmreg| K)
 // y = k			// nice.
 	if decl is Const
 		(decl isnt const)
-		if f and !f.FatRefCount
+		if f and !f.µRefCount
 			.nop(f)
 		decl.ExportPosition = 0
 		|| dclfat = decl.FatConstIndex|uint|
 			decl.FatConstIndex = 0
 			f = dclfat.fat
-			if !f.fatrefcount 
+			if !f.µRefCount 
 				.nop(f)
 }
 
@@ -780,3 +765,5 @@ function SCDecl.ThgASM (|asmreg|)
 	return T
 	
 	
+function string.trip (|bool|)
+	return asmtype.lastdebugmark ~= self 

@@ -60,10 +60,10 @@ extend ASMState
 		
 		|| ramount = 63-LBS.y 
 		V = V rotl ramount
-		.op = asm.knsr							// easier to debug
-		.r[1] = ramount
-		.r[2] = inv|int|
-		.r[3] = v
+		._op = asm.knsr							// easier to debug
+		.r1 = ramount
+		.r2 = inv|int|
+		.r3 = v|uint|
 		target debug
 			|| back = .r[3]|uint64| rotr .r[1]|uint64|
 			if .r[2]

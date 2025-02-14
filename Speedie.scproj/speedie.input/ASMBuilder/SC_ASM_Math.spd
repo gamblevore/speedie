@@ -325,8 +325,7 @@ extend ASMState
 		|&fatasm| fat
 		if lmul.ispow2		  								// x = int1 + int2
 			fat = exp.ADD(dest, L, R, lmul.log2)			// x = lptr + r<<3
-			if l is alternate
-				fat.op ++
+			fat._op+=(l is alternate)
 		  else
 			|| v = .NumToReg(exp, lmul, asmreg(), datatypecode.uint)
 			if l isnt alternate								// x = lptr + r*12
@@ -553,7 +552,7 @@ extend ASMState
 		  else
 			k = 0
 		|| fat = exp.BAND(dest, L, R, k) 
-		fat.op = op
+		fat._op = op
 		return fat * Dest
 
 

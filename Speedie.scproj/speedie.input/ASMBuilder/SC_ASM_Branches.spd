@@ -62,9 +62,9 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 		if op >= kContinue
 			C.op = ASM.Jump
 			if op == kContinue			// continue
-				C.JumpTo(S, asmstate.sh)
+				C.JumpTo(S, ASMState.sh)
 			  else       				// exit
-				C.JumpTo(A, asmstate.sh)
+				C.JumpTo(A, ASMState.sh)
 		C++
 
 
@@ -341,7 +341,7 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 		// 0 or 1
 		return second
 
-	if kf.knownfalse
+	if kf.KnownFalse
 		// 0 or 0
 		// 0 or b
 		return second
@@ -350,8 +350,8 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	// a or b
 	
 	return first
-
 }
+
 
 
 
@@ -362,24 +362,42 @@ Struct FatRange
 	
 	function Always (|bool|)
 		opt inline
-		return .constness.KnownTrue
+		return .Constness.KnownTrue
 	
 	function Never (|bool|)
 		opt inline
-		return .constness.KnownFalse
+		return .Constness.KnownFalse
 	
-	function AllJumpTo (|&fatasm| curr = .curr, |asm| Also=nil)
-		|| A = ASMState.sh
+	function InlineFinish (|ASMReg|)
+		|| curr = asmstate.sh.curr
 		for s in self
-			if (s is CondAnswer) or (s.op == Also)
-				(s isnt CondAnswer)
-				if s.op == also
-					s.op = asm.jump
-					s.jumpreg = 1
-				s.JumpTo(curr, A)
-				if s == Curr - 1
-					curr--
-					A.nop(s)
+			if s isa asm.ret
+				if rz
+					rz = rz.simplify
+				  else
+					|| dest = s.input(0)
+						rz = dest.info 
+					  else
+						rz = (s.r[0] & 31).asm
+				s.op = asm.jump
+				s.JumpReg = 1
+				curr = s.JumpFix(curr)
+
+					
+	function Fatasm.JumpFix (|&fatasm| curr, |&fatasm|)
+		isnt CondAnswer
+		|| A = ASMState.sh
+		.JumpTo(curr, A)
+		if self == Curr - 1
+			curr--
+			A.nop(self)
+		return curr 
+	
+	
+	function AllJumpTo (|!&fatasm| curr = .curr)
+		for s in self
+			if (s is CondAnswer) and !(s isa asm.knst)
+				curr = s.jumpfix(curr)
 					
 	iterator
 		|| curr = .after!
