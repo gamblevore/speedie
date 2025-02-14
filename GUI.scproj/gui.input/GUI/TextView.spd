@@ -130,7 +130,7 @@ class TextView (GUIControl)
 		GUI.SelChanged
 		super.gotfocus
 
-
+ 
 	behaviour Gesture
 		if (self is editable or AlwaysScrollable) and !.singleline
 			.StartLine = .StartLine.movecapped(wheel.y)
@@ -2055,11 +2055,11 @@ class TextView (GUIControl)
 
 
 	function LoadDocument (|document| D, |bool| Show, |bool|)
-		debug_require d
 		|| old = .document
 			require .GroupSaveAll or old.DocClose
 			.UnloadDoc(old)
 		
+		d.SimpleUpdateFromDisk
 		if d.load
 			.document = d
 			.MyError = nil
