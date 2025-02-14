@@ -166,7 +166,7 @@ class PerryIDE (Window)
 		|| R = .FindPath(path)
 		|| P = .MainProjFol
 		if R and P and r.location[0, p.location]
-			return r			// what do i wanna do?
+			return r
 			
 
 	function FindPath (|string| path, |filerow|)
@@ -183,6 +183,7 @@ class PerryIDE (Window)
 
 	behaviour AppForeGroundChanged
 		.CheckModified
+		.Recheck(true)
 		.PopupHide
 		if !.focus
 			.setfocus(.editme)
