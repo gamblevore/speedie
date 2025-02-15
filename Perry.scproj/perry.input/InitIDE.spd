@@ -228,7 +228,7 @@ extend PerryIDE
 
 
 		with .SearchArea 
-			.tooltip		= "Searches stuff. Press \1f< or \1f> to step in list."
+			.tooltip		= "Searches stuff. Press \1f; or \1f' to step in list."
 			.takesfocus 	= takesfocusflag.CanFocus
 			.ID				= "SearchArea"
 			.size 			= the~width by the~bottom to 15~down

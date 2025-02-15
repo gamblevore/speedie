@@ -4,10 +4,10 @@ datatype ASM (uint)
 	function Print
 		visible
 		cpp_name ASMPrint
-
+	 
 
 	function Length (|int|)
-		|| op = .decodeop
+		|| op = .DecodeOp
 		if op >= 32
 			return 1
 		return (op&3)+1
@@ -16,7 +16,7 @@ datatype ASM (uint)
 		|| op = .decodeop
 		|| ins = instruction.TypeList[op]
 			"$op ${ins.name} (${ins.formname})"
-		  else
+		  else 
 			"$op ???"
 		
 	function DecodeOp (|int|)

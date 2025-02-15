@@ -1050,7 +1050,7 @@ class TextView (GUIControl)
 			
 			while h.x < h.x2
 				|| Rect = (h.x, Y, h.x, Y) ± -5.0
-				|| vib = (s+(h.x*32191.23)|int|).ago.cycle(1s) - 0.5
+				|| vib = (s+(h.x*32191.23)|int|).ago.cycle(1s) - 2.5
 				vib += (s+(h.x*3191.23)|int|).ago.cycle(0.27s)
 				vib += s.ago.float
 				|| middleness = 0.5-((h.x-hm).abs)*WH
