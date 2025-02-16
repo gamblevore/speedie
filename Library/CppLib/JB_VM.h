@@ -1,6 +1,12 @@
 
 #define std_swap std::swap
-#define RegVar(x,n) register auto x asm (#n)
+#if __CPU_TYPE__ == __CPU_ARM__
+	#define RegVar(x,n) register auto x asm (#n)
+#else
+	#define RegVar(x,n) auto x
+#endif
+
+
 
 // // // // // // // // // // // //  
 

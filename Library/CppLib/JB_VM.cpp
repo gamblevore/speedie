@@ -54,7 +54,9 @@ jb_vm* vm;
 
 ivec4* RunVM (jb_vm& pvm) {		// vm_run, vm__run, vmrun, run_vm
     const static void* jumptable[] = {
+#if __CPU_TYPE__ == __CPU_ARM__
         #include "InstructionList.h"
+#endif
     };
 	RegVar(&vm,			r19) = pvm;
     RegVar(Code,		r20) = vm.Env.CodeBase;
@@ -66,9 +68,11 @@ ivec4* RunVM (jb_vm& pvm) {		// vm_run, vm__run, vmrun, run_vm
 	Stack.SavedReg = 0;
 	Stack.Alloc = VMGuardValue;		  	// Env.AllocCurr gets set to this on exit. // Quite harmless
     r[0] = {};							// seems these regs don't contain the values I want (during debug?)
+#if __CPU_TYPE__ == __CPU_ARM__
 	ı;
 	#include "Instructions.i"
-	ı 
+	ı
+#endif
 	EXIT:;
 
     return &pvm.Registers[0].Ivec;
