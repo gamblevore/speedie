@@ -227,7 +227,7 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 		rz.appendwords( "-arch x86_64" )
 		if options.optimise >= 3 // sigh
 			rz.AppendWords( " -march=core2  -mfpmath=sse  -mmmx  -msse  -msse2  -msse4.1  -msse4.2 " )
-	  else
+	  elseif platform.CPU_ARM
 		rz.appendwords( "-arch arm64" )
 
 	if platform.OSX
