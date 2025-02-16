@@ -403,9 +403,21 @@ struct PicoComms {
 		return std::atoi(x);
 	}
 	
+	void TextNumber (int N, char* S) {
+		int C = (int)log10( (double)N ) + 1;
+		
+		S += C;
+		*S = 0;
+		for (int i = 0; i < C; i++) {
+			int P = N % 10;
+			N = N / 10;
+			*--S = ('0' + P);
+		}
+	}
+	
 	pid_t StealSock (int Succ, pid_t pid) {
 		char Data[8];
-		*std::to_chars(Data, Data+sizeof(Data), Succ).ptr = 0;
+		TextNumber(Succ, Data);
 		setenv("__PicoSock__", Data, 1);
 		return pid;
 	}
