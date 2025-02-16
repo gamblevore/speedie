@@ -144,8 +144,11 @@ datatype int
 
 	
 	operator Align (|int| To, |int|)
-		|| Missing = (self mod To)
-			return self + (To - Missing)
+		if to
+			|| Missing = (self mod To)
+				return self + (To - Missing)
+			return self
+		debugger
 		return self
 
 	
@@ -535,7 +538,7 @@ datatype float
 	function SmoothStep (|float| low, |float| high, |float|)
 		cpp_part SmoothStep2
 		|| t = ((self - low) / (high - low)).clamp
-		return t * t * (3.0 - 2.0 * t);
+		return t * t * (3.0 - 2.0 * t)
 
 	operator max (|float| other, |float|)
 		cpp_wrapper (fmaxf)

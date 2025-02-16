@@ -251,7 +251,7 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 		count = 4 // refcount
 	|| s = .super
 		Count = s.CalculateSizeRaw								#DEBUG_REQUIRE
-		align = s.Alignment
+		align = align max s.Alignment
 	
 	|| bits = 0
 	for p in .properties
