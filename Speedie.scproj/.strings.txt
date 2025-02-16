@@ -2165,6 +2165,3 @@
 "Can't increment temporary value."
 "Register out of bounds"
 "Function too large (>= 256K compiled)"
-"def"
-":  "
-"Missing ASM output"
