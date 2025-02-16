@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AC1050012D61EF6C00BB929B /* FF_Intel.S in Sources */ = {isa = PBXBuildFile; fileRef = AC1050002D61EF6C00BB929B /* FF_Intel.S */; };
+		AC1050022D61EF6C00BB929B /* FF_Intel.S in Sources */ = {isa = PBXBuildFile; fileRef = AC1050002D61EF6C00BB929B /* FF_Intel.S */; };
+		AC1050032D61EF6C00BB929B /* FF_Intel.S in Sources */ = {isa = PBXBuildFile; fileRef = AC1050002D61EF6C00BB929B /* FF_Intel.S */; };
+		AC1050042D61EF6C00BB929B /* FF_Intel.S in Sources */ = {isa = PBXBuildFile; fileRef = AC1050002D61EF6C00BB929B /* FF_Intel.S */; };
 		AC33F7B92B4F9D18009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7B82B4F9D18009A1156 /* JB_Pico.cpp */; };
 		AC33F7BA2B4F9D18009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7B82B4F9D18009A1156 /* JB_Pico.cpp */; };
 		AC33F7BB2B4F9D18009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7B82B4F9D18009A1156 /* JB_Pico.cpp */; };
@@ -234,6 +238,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AC1050002D61EF6C00BB929B /* FF_Intel.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = FF_Intel.S; path = ../Library/CppLib/FF_Intel.S; sourceTree = "<group>"; };
 		AC33F7B82B4F9D18009A1156 /* JB_Pico.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Pico.cpp; path = ../Library/CppLib/JB_Pico.cpp; sourceTree = "<group>"; };
 		AC421B342BDBDE2B00CD0216 /* JB_Globals.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Globals.cpp; path = BuildTest/JB_Globals.cpp; sourceTree = "<group>"; };
 		AC421B352BDBDE2B00CD0216 /* JB.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB.cpp; path = BuildTest/JB.cpp; sourceTree = "<group>"; };
@@ -425,6 +430,7 @@
 				AC7D3C7B29A27C1D00148ADB /* JB_Compress.cpp */,
 				ACB3785C29A5026400795F00 /* JB_DivSufSort.cpp */,
 				AC6AB9262CB1AEB800555461 /* FF_ARM64.S */,
+				AC1050002D61EF6C00BB929B /* FF_Intel.S */,
 				AC7D3C8D29A27C1D00148ADB /* JB_Date.cpp */,
 				AC7D3C8F29A27C1D00148ADB /* JB_Dictionary.cpp */,
 				AC7D3C8229A27C1D00148ADB /* JB_DirReaderUnix.cpp */,
@@ -719,6 +725,7 @@
 				AC7D3CB129A27C7700148ADB /* JB_Alloc.cpp in Sources */,
 				AC7D3CB329A27C7700148ADB /* JB_File.cpp in Sources */,
 				AC33F7B92B4F9D18009A1156 /* JB_Pico.cpp in Sources */,
+				AC1050012D61EF6C00BB929B /* FF_Intel.S in Sources */,
 				AC7D3CAD29A27C7700148ADB /* JB_DirReaderUnix.cpp in Sources */,
 				AC7D3C9D29A27C7700148ADB /* JB_DirReaderWin32.cpp in Sources */,
 				AC7D3CAA29A27C7700148ADB /* JB_Math.cpp in Sources */,
@@ -761,6 +768,7 @@
 				AC7D3D9329A280A700148ADB /* JB_Alloc.cpp in Sources */,
 				AC7D3D9429A280A700148ADB /* JB_File.cpp in Sources */,
 				AC33F7BA2B4F9D18009A1156 /* JB_Pico.cpp in Sources */,
+				AC1050042D61EF6C00BB929B /* FF_Intel.S in Sources */,
 				AC7D3D9529A280A700148ADB /* JB_DirReaderUnix.cpp in Sources */,
 				AC7D3D9729A280A700148ADB /* JB_DirReaderWin32.cpp in Sources */,
 				AC7D3D9829A280A700148ADB /* JB_Math.cpp in Sources */,
@@ -801,6 +809,7 @@
 				AC7D3DC129A2816600148ADB /* JB_Array.cpp in Sources */,
 				AC7D3DC229A2816600148ADB /* JB_VM.cpp in Sources */,
 				AC7D3DC329A2816600148ADB /* JB_Errors.cpp in Sources */,
+				AC1050022D61EF6C00BB929B /* FF_Intel.S in Sources */,
 				AC7D3E0829A2822B00148ADB /* JB_Globals.cpp in Sources */,
 				AC7D3DC429A2816600148ADB /* JB_Alloc.cpp in Sources */,
 				AC33F7BB2B4F9D18009A1156 /* JB_Pico.cpp in Sources */,
@@ -844,6 +853,7 @@
 				AC7D3DE929A2816700148ADB /* JB_Main.cpp in Sources */,
 				AC534D742C58F90800F0D6C5 /* JB_Temporal.cpp in Sources */,
 				AC7D3DEA29A2816700148ADB /* JB_Array.cpp in Sources */,
+				AC1050032D61EF6C00BB929B /* FF_Intel.S in Sources */,
 				AC7D3DEB29A2816700148ADB /* JB_VM.cpp in Sources */,
 				AC7D3DEC29A2816700148ADB /* JB_Errors.cpp in Sources */,
 				AC7D3E0929A2822B00148ADB /* JB_Globals.cpp in Sources */,
@@ -951,7 +961,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = /usr/local/include;
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1009,7 +1019,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = /usr/local/include;
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_CFLAGS = (
@@ -1024,6 +1034,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				PRODUCT_NAME = Speedie;
 			};
 			name = Debug;
@@ -1032,6 +1043,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				PRODUCT_NAME = Speedie;
 			};
 			name = Release;
