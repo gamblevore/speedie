@@ -168,9 +168,9 @@ struct CompressionStats
 	function Print (|bool| Compression)
 		printline .Report(Compression)
 		
-	function LiveUpdate (|int| inn, |int| outt, |bool| Compress)
-		.in += inn
-		.out += outt
+	function LiveUpdate (|int| in, |int| out, |bool| Compress)
+		.in += in
+		.out += out
 		if .live
 			.print(compress)
 	
