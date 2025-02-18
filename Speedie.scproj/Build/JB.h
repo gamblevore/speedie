@@ -537,7 +537,11 @@ struct Message;
 
 struct JB_Task;
 
+struct JB_Task;
+
 struct LessThan3;
+
+struct ParserCallBack;
 
 struct SCClass;
 
@@ -602,6 +606,8 @@ typedef ASMReg (*fn_asm)(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 typedef void (*FP_fpMsgRender)(Message* Self, FastString* Fs);
 
 typedef void (*FP_fpMsgRenderCpp)(Message* self, FastStringCpp* fs);
+
+typedef void (*StringReader_ParserCallBack_interface_prototype)(JB_Task* Self, Message* Msg);
 
 typedef bool (*Task_LessThan3_interface_prototype)(JB_Task* Self, int I);
 
@@ -1045,7 +1051,8 @@ JBClass ( StringReader , JB_Object ,
 	int StartFrom;
 	JB_File* File;
 	FastBuff Data;
-	JB_Object* UserObj;
+	ParserCallBack* CallBack;
+	JB_Object* _Object;
 	int Length;
 	int ChunkSize;
 	bool _NoMoreChunks;
@@ -1326,6 +1333,10 @@ JBClass ( LessThan3 , JB_Task ,
 	JB_String* a;
 	int b;
 	JB_String* c;
+);
+
+JBClass ( ParserCallBack , JB_Task , 
+	StringReader* Upon;
 );
 
 struct SCClass_Behaviour: SCBetterNode_Behaviour {
@@ -6183,6 +6194,9 @@ void JB_SorterComparer_Sort(FP_SorterComparer Self, Array* Items);
 // prototype
 
 
+// prototype
+
+
 // JB_ArchonPurger
 void SC_nil_BecomeRealSub(ArchonPurger* Self, SCDecl* V);
 
@@ -6345,7 +6359,7 @@ float JB_MzSt_Durr(CompressionStats* Self);
 
 void JB_MzSt_End(CompressionStats* Self);
 
-void JB_MzSt_LiveUpdate(CompressionStats* Self, int Inn, int Outt, bool Compress);
+void JB_MzSt_LiveUpdate(CompressionStats* Self, int In, int Out, bool Compress);
 
 void JB_MzSt_Print(CompressionStats* Self, bool Compression);
 
@@ -8279,6 +8293,8 @@ int JB_SS_NonZeroByte(StringReader* Self);
 
 Message* JB_SS_ParseJbin(StringReader* Self, int64 Remain);
 
+ParserCallBack* JB_SS_ParserCallBack_Constructor(ParserCallBack* Self, StringReader* Upon);
+
 int64 JB_SS_Position(StringReader* Self);
 
 void JB_SS_PositionSet(StringReader* Self, int64 Value);
@@ -8293,7 +8309,7 @@ void JB_SS_Reset(StringReader* Self, JB_String* Data);
 
 JB_String* JB_SS_Str(StringReader* Self, int N, int Skip);
 
-JB_String* JB_SS_StrNoAdvance(StringReader* Self, int N, int Skip);
+JB_String* JB_SS_StrNoAdvance(StringReader* Self, int N);
 
 void JB_SS_Fail(StringReader* Self, JB_String* Error);
 
@@ -8457,7 +8473,7 @@ Message* JB_File_Config(JB_File* Self, int Lim);
 
 ErrorInt JB_File_CopyAll(JB_File* Self, JB_String* Dest, bool AttrOnly);
 
-ErrorInt JB_File_DeleteAll(JB_File* Self);
+ErrorInt JB_File_DeleteAll(JB_File* Self, bool KeepSelf);
 
 bool JB_File_DirectoryContains(JB_File* Self, JB_String* Path);
 
@@ -8524,7 +8540,7 @@ void JB_bin_AddInt(FastString* Self, int64 Name);
 
 jbinLeaver JB_bin_AddMemory(FastString* Self, Syntax Type, uint64 L, bool GoIn, byte* Data);
 
-void JB_bin_CloseSection(FastString* Self, int C);
+void JB_bin_CloseSection(FastString* Self, int C, int R, Syntax Type);
 
 FastString* JB_bin_Constructor(FastString* Self, Syntax Type, JB_String* Name);
 
@@ -8532,9 +8548,11 @@ FastString* JB_bin_Constructor0(FastString* Self, int N);
 
 jbinLeaver JB_bin_Enter(FastString* Self, Syntax Type, JB_String* Name);
 
+void JB_bin_Exit0(FastString* Self);
+
 void JB_bin_Exit(FastString* Self, int Amount);
 
-int JB_bin_OpenSection(FastString* Self);
+ivec2 JB_bin_OpenSection(FastString* Self);
 
 void JB_bin_Sheb(FastString* Self, JB_String* Name);
 
@@ -10504,8 +10522,18 @@ bool JB_Task_LessThan3_interface_SyntaxCall(JB_Task* Self, int I);
 
 
 
+// JB_interface
+void JB_SS_ParserCallBack_interface_SyntaxCall(JB_Task* Self, Message* Msg);
+
+
+
 // JB_LessThan3
 bool JB_Task_LessThan3_run(LessThan3* Self, int I);
+
+
+
+// JB_ParserCallBack
+void JB_SS_ParserCallBack_run(ParserCallBack* Self, Message* Msg);
 
 
 
