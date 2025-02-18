@@ -273,6 +273,10 @@ struct Message;
 
 struct Message;
 
+struct JB_Task;
+
+struct ParserCallBack;
+
 typedef Message* (*FP_ParseHandler)(int Start, Message* Parent);
 
 typedef JB_Object* (*TokenHandler_fp)(int Start, Message* Parent);
@@ -296,6 +300,8 @@ typedef void (*FP_fnErrorLogger)(JB_ErrorReceiver* Self, JB_String* Data);
 typedef JB_String* (*FP_fnIDGenerator)(int Start, int End, Syntax F);
 
 typedef void (*FP_fpMsgRender)(Message* Self, FastString* Fs);
+
+typedef void (*StringReader_ParserCallBack_interface_prototype)(JB_Task* Self, Message* Msg);
 
 //// HEADER SyntaxConstants.h
 #define kSyxNil 0
@@ -509,7 +515,8 @@ JBClass ( StringReader , JB_Object ,
 	int StartFrom;
 	JB_File* File;
 	FastBuff Data;
-	JB_Object* UserObj;
+	ParserCallBack* CallBack;
+	JB_Object* _Object;
 	int Length;
 	int ChunkSize;
 	bool _NoMoreChunks;
@@ -589,6 +596,10 @@ JBClass ( JB_Error , Message ,
 	JB_String* StackTrace;
 	ErrorFlags ErrorFlags;
 	ErrorSeverity Severity;
+);
+
+JBClass ( ParserCallBack , JB_Task , 
+	StringReader* Upon;
 );
 #define JB__App__Conf JB__.App__Conf
 #define JB__App__OldArgs JB__.App__OldArgs
@@ -2014,6 +2025,9 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, 
 // fpMsgRender
 
 
+// prototype
+
+
 // JB_ClassData
 JB_MemoryLayer* JB_ClassData_CreateUseLayer(JB_Class* Self, JB_Object* Obj, JB_Object* Obj2);
 
@@ -2665,6 +2679,8 @@ int JB_SS_NonZeroByte(StringReader* Self);
 
 Message* JB_SS_ParseJbin(StringReader* Self, int64 Remain);
 
+ParserCallBack* JB_SS_ParserCallBack_Constructor(ParserCallBack* Self, StringReader* Upon);
+
 int64 JB_SS_Position(StringReader* Self);
 
 void JB_SS_PositionSet(StringReader* Self, int64 Value);
@@ -2679,7 +2695,7 @@ void JB_SS_Reset(StringReader* Self, JB_String* Data);
 
 JB_String* JB_SS_Str(StringReader* Self, int N, int Skip);
 
-JB_String* JB_SS_StrNoAdvance(StringReader* Self, int N, int Skip);
+JB_String* JB_SS_StrNoAdvance(StringReader* Self, int N);
 
 void JB_SS_Fail(StringReader* Self, JB_String* Error);
 
@@ -2755,7 +2771,7 @@ void JB_bin_AddInt(FastString* Self, int64 Name);
 
 jbinLeaver JB_bin_AddMemory(FastString* Self, Syntax Type, uint64 L, bool GoIn, byte* Data);
 
-void JB_bin_CloseSection(FastString* Self, int C);
+void JB_bin_CloseSection(FastString* Self, int C, int R, Syntax Type);
 
 FastString* JB_bin_Constructor0(FastString* Self, int N);
 
@@ -2763,7 +2779,7 @@ jbinLeaver JB_bin_Enter(FastString* Self, Syntax Type, JB_String* Name);
 
 void JB_bin_Exit(FastString* Self, int Amount);
 
-int JB_bin_OpenSection(FastString* Self);
+ivec2 JB_bin_OpenSection(FastString* Self);
 
 void JB_bin_Sheb(FastString* Self, JB_String* Name);
 
@@ -3076,6 +3092,8 @@ void JB_Proc__InitOwner();
 
 
 // JB_Task
+JB_Task* JB_Task_Constructor(JB_Task* Self, uint Obj, void* Func);
+
 void JB_Task_Destructor(JB_Task* Self);
 
 
@@ -3126,6 +3144,16 @@ int JB_Err__Init_();
 
 
 // JB_config
+
+
+// JB_interface
+void JB_SS_ParserCallBack_interface_SyntaxCall(JB_Task* Self, Message* Msg);
+
+
+
+// JB_ParserCallBack
+void JB_SS_ParserCallBack_run(ParserCallBack* Self, Message* Msg);
+
 inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self);
 
 inline bool JB_FastBuff_AppendU8(FastBuff* Self, uint /*byte*/ V);

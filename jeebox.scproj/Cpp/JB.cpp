@@ -3038,9 +3038,12 @@ int JB_int_LowestBit(int Self) {
 }
 
 int JB_int_OperatorAlign(int Self, int To) {
-	int Missing = (Self % To);
-	if (Missing) {
-		return Self + (To - Missing);
+	if (To) {
+		int Missing = (Self % To);
+		if (Missing) {
+			return Self + (To - Missing);
+		}
+		return Self;
 	}
 	return Self;
 }
@@ -3311,6 +3314,7 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, 
 	JB_Decr(Result);
 	return ((Syntax)ID);
 }
+
 
 
 
@@ -5005,7 +5009,7 @@ Message* JB_Str_Parse(JB_String* Self, Syntax Owner, bool AllowDecomp) {
 	Ind J2 = JB_Str_IsJbin(Data);
 	if (JB_Ind_SyntaxCast(J2)) {
 		JB_SetRef(Data, JB_Str_Range(Data, J2, JB_int__Max()));
-		JB_SetRef(Rz, JB_Str_ParseJbin(Data, kJB__int64_max));
+		JB_SetRef(Rz, JB_Str_ParseJbin(Data, 1073741824));
 	}
 	 else {
 		JB_SetRef(Rz, JB_Str_ParseSub(Data, Owner));
@@ -5307,6 +5311,7 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 		return;
 	}
 	St = JB_MzSt_Start(St);
+	;
 	JB_FS_AppendString(J, JB__JbinHeader);
 	JB_bin_Enter(J, kJB_SyxTmp, JB_LUB[482]);
 	JB_bin_AddInt(J, Self->Length);
@@ -5314,10 +5319,10 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 	while (JB_SS_HasAny(Self)) {
 		JB_String* Str = JB_SS_Str(Self, 1048576, 0);
 		JB_Incr(Str);
-		int Place = JB_bin_OpenSection(J);
+		ivec2 Place = JB_bin_OpenSection(J);
 		JB_Str_CompressChunk(J, Str);
-		JB_bin_CloseSection(J, Place);
-		JB_MzSt_LiveUpdate(St, JB_Str_Length(Str), J->Length - Place, true);
+		JB_bin_CloseSection(J, Place[0], Place[1], kJB_SyxBin);
+		JB_MzSt_LiveUpdate(St, JB_Str_Length(Str), J->Length - Place[0], true);
 		JB_Decr(Str);
 		if (!JB_SS_NoMoreChunks(Self)) {
 			JB_FS_Flush(J);
@@ -5337,7 +5342,8 @@ StringReader* JB_SS_Constructor(StringReader* Self, JB_String* Data) {
 	Self->StartFrom = 0;
 	Self->File = nil;
 	Self->Data = ((FastBuff){});
-	Self->UserObj = nil;
+	Self->CallBack = nil;
+	Self->_Object = nil;
 	Self->Length = 0;
 	Self->ChunkSize = 0;
 	Self->_NoMoreChunks = false;
@@ -5427,6 +5433,7 @@ bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, Compress
 void JB_SS_Destructor(StringReader* Self) {
 	JB_Clear(Self->File);
 	JB_FastBuff_Destructor((&Self->Data));
+	JB_Clear(Self->CallBack);
 }
 
 bool JB_SS_ExpectJbin(StringReader* Self) {
@@ -5471,7 +5478,7 @@ int64 JB_SS_hInt(StringReader* Self) {
 }
 
 bool JB_SS_IsCompressed(StringReader* Self) {
-	JB_String* Str = JB_SS_StrNoAdvance(Self, 16, 0);
+	JB_String* Str = JB_SS_StrNoAdvance(Self, 16);
 	JB_Incr(Str);
 	bool _tmPf0 = JB_Str_IsCompressed(Str);
 	JB_Decr(Str);
@@ -5516,7 +5523,7 @@ Message* JB_SS_NextMsg(StringReader* Self) {
 }
 
 uint64 JB_SS_NextMsgInfo(StringReader* Self) {
-	Message* Msg = ((Message*)Self->UserObj);
+	Message* Msg = ((Message*)Self->_Object);
 	int Info = 0;
 	while (true) {
 		Info = JB_SS_NonZeroByte(Self);
@@ -5524,7 +5531,7 @@ uint64 JB_SS_NextMsgInfo(StringReader* Self) {
 			break;
 		}
 		Msg = ((Message*)JB_Tree_Upward(Msg, Info - 239));
-		Self->UserObj = Msg;
+		Self->_Object = Msg;
 		if (!Msg) {
 			return 0;
 		}
@@ -5533,11 +5540,15 @@ uint64 JB_SS_NextMsgInfo(StringReader* Self) {
 	if ((T < kJB_Syxmax) and (T > kJB_SyxNil)) {
 		Msg = JB_Msg_Msg(Msg, T, JB_SS_Str(Self, JB_SS_hInt(Self), 0));
 		if (Info & 1) {
-			Self->UserObj = Msg;
+			Self->_Object = Msg;
+		}
+		ParserCallBack* Cb = Self->CallBack;
+		if (Cb) {
+			JB_SS_ParserCallBack_interface_SyntaxCall((Cb), Msg);
 		}
 		return ((uint64)Msg);
 	}
-	Self->UserObj = nil;
+	Self->_Object = nil;
 	if (Info >= 0) {
 		if (T <= kJB_SyxNil) {
 			JB_SS_Fail(Self, JB_LUB[483]);
@@ -5581,7 +5592,7 @@ Message* JB_SS_ParseJbin(StringReader* Self, int64 Remain) {
 		JB_Decr(Rz);
 		return nil;
 	}
-	Self->UserObj = nil;
+	Self->_Object = nil;
 	JB_SetRef(Rz, JB_SS_NextMsg(Self));
 	while ((--Remain) > 0) {
 		if (!JB_SS_NextMsgInfo(Self)) {
@@ -5593,6 +5604,15 @@ Message* JB_SS_ParseJbin(StringReader* Self, int64 Remain) {
 	}
 	JB_SafeDecr(Rz);
 	return Rz;
+}
+
+ParserCallBack* JB_SS_ParserCallBack_Constructor(ParserCallBack* Self, StringReader* Upon) {
+	if (Self == nil) {
+		Self = ((ParserCallBack*)JB_Task_Constructor(nil, 256, ((void*)(&JB_SS_ParserCallBack_run))));
+	}
+	JB_Incr2(Self->Upon, Upon);
+	//task;
+	return Self;
 }
 
 int64 JB_SS_Position(StringReader* Self) {
@@ -5665,7 +5685,7 @@ JB_String* JB_SS_Str(StringReader* Self, int N, int Skip) {
 	return R;
 }
 
-JB_String* JB_SS_StrNoAdvance(StringReader* Self, int N, int Skip) {
+JB_String* JB_SS_StrNoAdvance(StringReader* Self, int N) {
 	JB_String* Rz = JB_LUB[0];
 	JB_Incr(Rz);
 	int64 P = JB_SS_Position(Self);
@@ -5676,7 +5696,7 @@ JB_String* JB_SS_StrNoAdvance(StringReader* Self, int N, int Skip) {
 }
 
 void JB_SS_Fail(StringReader* Self, JB_String* Error) {
-	Self->UserObj = nil;
+	Self->_Object = nil;
 	if (Self->Data.WentBad) {
 		return;
 	}
@@ -5951,10 +5971,11 @@ jbinLeaver JB_bin_AddMemory(FastString* Self, Syntax Type, uint64 L, bool GoIn, 
 	if (Data) {
 		JB_FS_AppendMem_(Self, Data, ((int)L));
 	}
+	Self->Indent = (Self->Indent + ((int)GoIn));
 	return ((int)GoIn);
 }
 
-void JB_bin_CloseSection(FastString* Self, int C) {
+void JB_bin_CloseSection(FastString* Self, int C, int R, Syntax Type) {
 	int CurrLen = Self->Length;
 	if (CurrLen < C) {
 		JB_Object_FailStr(Self, JB_LUB[447]);
@@ -5972,10 +5993,13 @@ void JB_bin_CloseSection(FastString* Self, int C) {
 		}
 	};
 	JB_FS_AppendMultiByte(Self, ((byte)0), Blen);
-	JB_FS_AppendByte(Self, ((byte)(((int)kJB_SyxBin) << 1)));
+	JB_FS_AppendByte(Self, ((byte)(((int)Type) << 1)));
 	JB_FS_hInt(Self, C);
 	Self->Length = CurrLen;
-	(--Self->NoFlush);
+	int Nf = (--Self->NoFlush);
+	if ((!Nf) and (Self->Length >= (R >> 1))) {
+		JB_FS_Flush(Self);
+	}
 }
 
 FastString* JB_bin_Constructor0(FastString* Self, int N) {
@@ -6001,10 +6025,10 @@ void JB_bin_Exit(FastString* Self, int Amount) {
 	};
 }
 
-int JB_bin_OpenSection(FastString* Self) {
+ivec2 JB_bin_OpenSection(FastString* Self) {
 	(++Self->NoFlush);
 	Self->Length = (Self->Length + 6);
-	return Self->Length;
+	return ivec2{Self->Length, Self->Reserved};
 }
 
 void JB_bin_Sheb(FastString* Self, JB_String* Name) {
@@ -6784,7 +6808,7 @@ void JB_Msg_Item__(Message* Self, FastString* Fs) {
 bool JB_Msg_jbinTest(Message* Self) {
 	JB_String* _tmPf0 = JB_Msg_RenderJbin(Self, JB_LUB[0], nil);
 	JB_Incr(_tmPf0);
-	Message* Msg = JB_Str_ParseJbin(_tmPf0, kJB__int64_max);
+	Message* Msg = JB_Str_ParseJbin(_tmPf0, 1073741824);
 	JB_Incr(Msg);
 	JB_Decr(_tmPf0);
 	bool _tmPf1 = JB_Msg__TreeCompare(Self, Msg, false);
@@ -7781,6 +7805,17 @@ void JB_Proc__InitOwner() {
 }
 
 
+JB_Task* JB_Task_Constructor(JB_Task* Self, uint Obj, void* Func) {
+	if (Self == nil) {
+		Self = ((JB_Task*)JB_NewClass(&JB_TaskData));
+	}
+	JB_Ring_Constructor0(Self);
+	Self->_State = 0;
+	Self->_Object = Obj;
+	Self->_func = Func;
+	return Self;
+}
+
 void JB_Task_Destructor(JB_Task* Self) {
 	//visible;
 	JB_Object** Curr = ((JB_Object**)Self);
@@ -8064,6 +8099,15 @@ int JB_Err__Init_() {
 
 
 
+
+
+void JB_SS_ParserCallBack_interface_SyntaxCall(JB_Task* Self, Message* Msg) {
+	return ((StringReader_ParserCallBack_interface_prototype)Self->_func)(Self, Msg);
+}
+
+
+void JB_SS_ParserCallBack_run(ParserCallBack* Self, Message* Msg) {
+}
 
 
 
@@ -8399,7 +8443,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2025020817);
+	return (2025021816);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8411,4 +8455,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 -7954516600708050848 -4336414815684837428
+// -2934619186805667969 7675667901263233710 -4336414815684837428

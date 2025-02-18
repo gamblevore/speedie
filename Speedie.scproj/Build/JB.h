@@ -6378,6 +6378,8 @@ int JB_MzSt__Init_();
 
 
 // JB_FastBuff
+bool JB_FastBuff_Alloc(FastBuff* Self, int N);
+
 byte JB_FastBuff_Byte(FastBuff* Self);
 
 byte* JB_FastBuff_Clip(FastBuff* Self, int V, int Reduce);
@@ -6391,6 +6393,8 @@ bool JB_FastBuff_Has(FastBuff* Self, int N);
 bool JB_FastBuff_HasAny(FastBuff* Self);
 
 int JB_FastBuff_Length(FastBuff* Self);
+
+bool JB_FastBuff_NeedAlloc(FastBuff* Self, int N);
 
 int JB_FastBuff_Position(FastBuff* Self);
 
@@ -7626,6 +7630,8 @@ FastString* JB_FS__Use(JB_Object* Other);
 // JB_FlowControl
 void JB_Flow_AddByte(FlowControl* Self, uint /*byte*/ Value);
 
+FlowControl* JB_Flow_Constructor(FlowControl* Self, JB_String* OutPath, JB_String* InPath);
+
 void JB_Flow_Destructor(FlowControl* Self);
 
 void JB_Flow_Fail(FlowControl* Self, JB_String* Found, JB_String* Expected, JB_String* InputName);
@@ -7633,6 +7639,10 @@ void JB_Flow_Fail(FlowControl* Self, JB_String* Found, JB_String* Expected, JB_S
 void JB_Flow_Flush(FlowControl* Self);
 
 bool JB_Flow_TestByte(FlowControl* Self, uint /*byte*/ Value);
+
+FlowControlStopper JB_Flow__Activate(JB_String* Name);
+
+JB_String* JB_Flow__AskPath(JB_String* Name, bool WantValidate);
 
 FlowControlStopper JB_Flow__Attempt(JB_String* Name);
 
@@ -7735,6 +7745,8 @@ int JB_Mrap__Init_();
 MWrap* JB_Mrap__Object(int Count, int ItemSize);
 
 void jbl(JB_Object* Self);
+
+byte* JB_Mrap__Zalloc(int N);
 
 
 
@@ -8055,6 +8067,8 @@ int JB_Str_FindTrailingSlashes(JB_String* Self);
 
 Float64 JB_Str_Float(JB_String* Self);
 
+StringReader* JB_Str_In(JB_String* Self, JB_String* Header, int ChunkSize);
+
 int64 JB_Str_Int(JB_String* Self);
 
 JB_String* SC_Str_InterfaceToBehaviour(JB_String* Self);
@@ -8263,6 +8277,8 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 
 StringReader* JB_SS_Constructor(StringReader* Self, JB_String* Data);
 
+StringReader* JB_SS_ConstructorFile(StringReader* Self, JB_File* File, int ChunkSize);
+
 JB_String* JB_SS_Decompress(StringReader* Self, int Lim, CompressionStats* St, bool Multi);
 
 bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, CompressionStats* St);
@@ -8312,6 +8328,8 @@ JB_String* JB_SS_Str(StringReader* Self, int N, int Skip);
 JB_String* JB_SS_StrNoAdvance(StringReader* Self, int N);
 
 void JB_SS_Fail(StringReader* Self, JB_String* Error);
+
+bool JB_SS_Test(StringReader* Self, JB_String* Header);
 
 
 
@@ -11441,28 +11459,28 @@ inline bool JB_Ind_SyntaxCast(Ind Self) {
 }
 
 inline Syntax JB_Msg_Func(Message* Self) {
-	if (Self) {
+	iif (Self) {
 		return Self->Func;
 	}
 	return nil;
 }
 
 inline JB_String* JB_Msg_Name(Message* Self) {
-	if (Self) {
+	iif (Self) {
 		return Self->Name;
 	}
 	return JB_LUB[0];
 }
 
 inline JB_String* JB_Msg_Name_(Message* Self) {
-	if (Self) {
+	iif (Self) {
 		return Self->Name;
 	}
 	return JB_LUB[0];
 }
 
 inline int JB_Sel_ID(Selector* Self) {
-	if (Self) {
+	iif (Self) {
 		return Self->ID;
 	}
 	return 0;
@@ -11481,7 +11499,7 @@ inline bool JB_int64_IsPow2(int64 Self) {
 }
 
 inline bool JB_int64_OperatorInRange(int64 Self, int64 Length) {
-	if (Length >= 0) {
+	iif (Length >= 0) {
 		return (((uint64)Self) < ((uint64)Length));
 	}
 	return false;
@@ -11496,7 +11514,7 @@ inline float JB_int_OperatorDiv(int Self, int D) {
 }
 
 inline bool JB_int_OperatorInRange(int Self, int Length) {
-	if (Length >= 0) {
+	iif (Length >= 0) {
 		return (((uint)Self) < ((uint)Length));
 	}
 	return false;
@@ -11514,7 +11532,7 @@ inline bool SC_FailableInt_SyntaxCast(FailableInt Self) {
 }
 
 inline JB_String* SC_Named_Name(SCNamed* Self) {
-	if (Self) {
+	iif (Self) {
 		return Self->Name;
 	}
 	return JB_LUB[9];
@@ -11641,7 +11659,7 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState
 }
 
 inline void SC_nil__DeclKill() {
-	if (!SC_nil_NestDepth((&SC__nil_T))) {
+	iif (!SC_nil_NestDepth((&SC__nil_T))) {
 		SC__nil_T.RootReturned = true;
 	}
 	(SC_nil_ValueSet((&SC__nil_T), kSC__NilState_Basic));
@@ -11649,7 +11667,7 @@ inline void SC_nil__DeclKill() {
 
 inline NilState SC_nil__JumpSub(Message* Msg, NilCheckMode Test) {
 	uint T = SC_Msg_ASMType(Msg);
-	if (T) {
+	iif (T) {
 		return (SC__nil_NilTable[T])(Msg, Test);
 	}
 	T = ((ASMType)Msg->Func);
@@ -11670,12 +11688,12 @@ inline bool SC_Decl_IsUnknownParam(SCDecl* Self) {
 }
 
 inline FatASM* SC_Pac_CanImproveAssign(ASMState* Self, ASMReg Dest, ASMReg Src) {
-	if (SC_Reg_SyntaxIs(Src, kSC__Reg_Temp)) {
+	iif (SC_Reg_SyntaxIs(Src, kSC__Reg_Temp)) {
 		return SC_Reg_FAT(Src);
 	}
-	if (SC_Reg_Reg(Src) > Self->VDecls) {
+	iif (SC_Reg_Reg(Src) > Self->VDecls) {
 		FatASM* F = SC_Reg_FAT(Src);
-		if (F == SC_Pac_LastWith0(Self)) {
+		iif (F == SC_Pac_LastWith0(Self)) {
 			return F;
 		}
 	}
@@ -11694,7 +11712,7 @@ inline NilRecord SC_nil__EndBlock() {
 }
 
 inline JB_String* JB_config_AsString(Message* Self) {
-	if (Self) {
+	iif (Self) {
 		return JB_Msg_Value(Self);
 	}
 	return JB_LUB[0];
@@ -11703,7 +11721,7 @@ inline JB_String* JB_config_AsString(Message* Self) {
 inline void SC_FAT_PrmWithIntReg(FatASM* Self, int A, ASMReg Input) {
 	uint I = SC_Reg_FatIndex(Input);
 	Self->R[A] = (SC_Reg_treg(Input) | (I << 15));
-	if (I) {
+	iif (I) {
 		FatASM* Src = SC_uint_FAT(I);
 		Self->RegFromFat = (Self->RegFromFat | (1 << A));
 		(++Src->xC2xB5RefCount);
@@ -11711,8 +11729,8 @@ inline void SC_FAT_PrmWithIntReg(FatASM* Self, int A, ASMReg Input) {
 }
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
-	if (!JB_Ring_HasChildCount(Self, 2)) {
-		if (true) {
+	iif (!JB_Ring_HasChildCount(Self, 2)) {
+		iif (true) {
 			Message* __varf1 = F->Source;
 			MessagePosition _usingf0 = ((MessagePosition){});
 			JB_Msg_SyntaxUsing(__varf1, (&_usingf0));
@@ -11728,22 +11746,22 @@ inline void SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info) {
 }
 
 inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
-	if ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc, false))) {
+	iif ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc, false))) {
 		JB_Msg_Fail(Self, JB_LUB[815]);
 	}
 }
 
 inline bool SC_Pac_ConstCompareFloatSub(ASMState* Self, ASMReg L, ASMReg R, int Mode) {
-	if (!(Mode & 4)) {
+	iif (!(Mode & 4)) {
 		float A = SC_Reg_F32(L);
 		float B = SC_Reg_F32(R);
-		if (Mode <= 1) {
-			if (Mode == 0) {
+		iif (Mode <= 1) {
+			iif (Mode == 0) {
 				return A > B;
 			}
 			return A <= B;
 		}
-		if (Mode == 2) {
+		iif (Mode == 2) {
 			return A == B;
 		}
 		return A != B;
@@ -11751,13 +11769,13 @@ inline bool SC_Pac_ConstCompareFloatSub(ASMState* Self, ASMReg L, ASMReg R, int 
 	Float64 A = SC_Reg_F64(L);
 	Float64 B = SC_Reg_F64(R);
 	Mode = (Mode - 4);
-	if (Mode <= 1) {
-		if (Mode == 0) {
+	iif (Mode <= 1) {
+		iif (Mode == 0) {
 			return A > B;
 		}
 		return A <= B;
 	}
-	if (Mode == 2) {
+	iif (Mode == 2) {
 		return A == B;
 	}
 	return A != B;
@@ -11766,13 +11784,13 @@ inline bool SC_Pac_ConstCompareFloatSub(ASMState* Self, ASMReg L, ASMReg R, int 
 inline bool SC_Pac_ConstCompareIntSub(ASMState* Self, ASMReg L, ASMReg R, int Mode) {
 	int64 A = SC_Reg_Const(L);
 	int64 B = SC_Reg_Const(R);
-	if (Mode <= 1) {
-		if (Mode == 0) {
+	iif (Mode <= 1) {
+		iif (Mode == 0) {
 			return A > B;
 		}
 		return A <= B;
 	}
-	if (Mode == 2) {
+	iif (Mode == 2) {
 		return A == B;
 	}
 	return A != B;
@@ -11794,9 +11812,9 @@ inline FatASM* SC_Pac_Write(ASMState* Self, ASMReg Dest, Message* Exp, ASMReg Pt
 
 inline SCDecl* SC_TypeOfSwiz(Message* Exp, SCNode* Name_space, Message* Side, SCDecl* class_Space) {
 	int W = SC_Class_NumericCount(class_Space->Type);
-	if ((W > 1) and (!JB_Ring_HasChildren(((Message*)JB_Ring_Last(Exp))))) {
+	iif ((W > 1) and (!JB_Ring_HasChildren(((Message*)JB_Ring_Last(Exp))))) {
 		int Swz = SC_Str_IsSwizzle(Exp->Name, W);
-		if (Swz) {
+		iif (Swz) {
 			return SC_TypeOfSwizzle(Exp, class_Space, Name_space, Side, Swz);
 		}
 	}
