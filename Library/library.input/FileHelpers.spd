@@ -280,7 +280,7 @@ extend String
 		|| before = .find('/', last, 0)+1
 		return self[before...]
 
-	function String.FindSlash (|int| from, |ind|)
+	helper String.FindSlash (|int| from, |ind|)
 		if from < .length
 			rz = .find('/', from)
 			if !rz
