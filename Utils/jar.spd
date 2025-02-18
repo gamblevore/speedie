@@ -6,19 +6,33 @@ Pass just the archive and no files, to decompress.
 
 Pass the archive and some files, to compress."
 
+
+// todo:
+	// why does it start with '/' when using 1 file?
+	// corrupt mz files when decomp from my large test
+	// chunk files
+	// why are some errors created on large test
+		// errors in large test should come with a file-path
+	// large jbin viewer would be nice. Read from part of a file? Don't load entire thing.
+
+
 main (|file| archive, |[file]| files)
 	if files
 		require archive.OpenEmpty
 		using "Archiving `$archive`"
-			archive.Archive(files)
+			archive.Archive(files, app.excludes)
 	  else
-		using "Unarching `$archive`"
+		using "Unarchiving `$archive`"
 			|| dir = app.cwd
 			archive.Unarchive
 			app.cwd = dir
 
+function app.excludes (|[string]|)
+	for s in .Switches
+		if s.ArgName ~= "x"
+			rz <~ s.ArgValue
 
-module Archiver
+module µzArchiver
 	task Decompressor (stringreader.ParserCallBack)
 		|compressionstats| Stats
 		run
@@ -27,7 +41,7 @@ module Archiver
 			|| path = p.name
 			"	$path"
 			msg.name.decompressinto(path.out, .stats)
-			msg.name = ""
+			msg.name = "" // save RAM
 			p.prev.remove
 
 	helper FindTop (|[string]| self, |int|)
@@ -44,19 +58,34 @@ module Archiver
 		j.Enter(@tmp, name)
 		j.AddComp(f.in, stats)
 		j.exit(1)
-	
+
+
+	helper ArchiveSub (|jbin| self, |file| f, |int| n, |[string]| x,  |compressionstats| stats)
+		require f.Visible
+		if f globs x or f.name globs x
+			"// Excluding: $f"
+			return 
+		if f.IsDir
+			if f.IsLink
+				"// Skipping link: $f"
+				return 
+			for c.files in f
+				archivesub(self, c, n, x, stats)
+		  else
+			addfile(self, f, n, Stats)
+
 	
 function file.Unarchive
 	|| in = .in$
 	|| fol = (.TrimExt + ".decomp").file
 	require fol.MakeDir and fol.DeleteAll(true) and app.cwd(fol)
-	|| d = Archiver.Decompressor(in)
+	|| d = µzArchiver.Decompressor(in)
 	in.CallBack = d
 	in.ParseJbin
 	d.Stats.Print(true) // why is it true both ways? is it always true?
 
 
-function file.Archive (|[file]| files)
+function file.Archive (|[file]| files, |[string]| x)
 	|jbin| j = jbin(@tmp, "jarc")
 	|compressionstats| Stats
 	j.File = self
@@ -64,22 +93,12 @@ function file.Archive (|[file]| files)
 	j.add(@str, "v1")
 	j.Enter
 	
-	|| n = archiver.FindTop(files)
+	|| n = µzArchiver.FindTop(files)
 	j.Tmp("files")
 	
 	for f in files
-		j.archivesub(f,n,stats)
+		µzArchiver.archivesub(j,f,n,x,stats)
 	j.exit
 	
 	stats.print(True)
 
-
-helper jbin.ArchiveSub (|file| f, |int| n, |compressionstats| stats)
-	if f.IsDir
-		if f.IsLink
-			"// Skipping link: $f"
-			return 
-		for c.files in f
-			.archivesub(c, n, stats)
-	  else
-		archiver.addfile(self, f, n, Stats)

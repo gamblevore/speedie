@@ -31,6 +31,14 @@ extend String
 				.child(ch).fileglobsub2(parts, result, i)
 	
 	
+	operator globs (|[string]| txt, |bool|)
+		cpp_part GlobMany
+		opt norefcounts
+		for s in txt
+			if self globs s
+				return true
+	
+	
 	operator globs (|string| txt, |bool|)
 		real self
 		|&byte| text_backup
