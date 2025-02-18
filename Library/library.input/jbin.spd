@@ -62,14 +62,10 @@ role JBin (Faststring)
 		return .addmemory(Type, fs.length, into, fs.Resultptr)
 
 
-	function AddComp (|faststring| fs, |int| strength=mzlab.strongest)
-		if strength > 0
-			|| Place = .OpenSection
-			fs.compressinto(self, strength)
-			.CloseSection(Place)
-		  else
-			.add(@str, fs)
-			CompressionStats.all.LiveUpdate(fs.length, fs.length, true)
+	function AddComp (|stringreader| str,  |syntax| Type=@bin, |compressionstats| Stats,   |int| strength=mzlab.strongest)
+		|| Place = .OpenSection		
+		str.compressinto(self, strength, stats)
+		.CloseSection(Place, Type)
 
 		
 	function Sheb		(|string| name)
@@ -78,7 +74,14 @@ role JBin (Faststring)
 		self <~ name
 		self <~ '\n' // noice
 
-	function Exit (|int| amount = 1)
+	function Exit
+		cpp_Part Exit0
+		|| n = .indent
+		.Indent = 0
+		.Exit(n)
+	
+	
+	function Exit (|int| amount)
 		|| add = 239
 		while amount > 0
 			|| B  = (add + amount)  min  (255)
@@ -94,15 +97,16 @@ role JBin (Faststring)
 		.hint(L)
 		if data
 			.AppendMemory(data, L|int|)
+		.Indent += GoIn|int|
 		return goin|int|
 
 
-	function OpenSection  (|int|)				// openstream 
-		++ .NoFlush
+	function OpenSection  (|int|)							// openstream 
+		.NoFlush = .Reserved
 		.length += 6
 		return .length
 
-	function CloseSection (|int| c)			// closestream
+	function CloseSection (|int| c, |syntax| Type)			// closestream
 		|| CurrLen = .length
 		expect (CurrLen >= c) (self, "Unable to close section")
 		.length = c - 6
@@ -115,10 +119,13 @@ role JBin (Faststring)
 		} (Actual)
 
 		self <~ (0|byte|, blen) 
-		self <~ (@bin|int|<<1)|byte|
+		self <~ (Type|int|<<1)|byte|
 		.hint(c)
 		.length = CurrLen
-		--.NoFlush
+		|| n = .NoFlush
+		.NoFlush = 0
+		if .Length >= n>>1 // 50%
+			.flush
 
 
 
@@ -154,22 +161,24 @@ helper StringReader.NextMsg (|message|)
 
 helper StringReader.NextMsgInfo (|uint64|)
 	opt norefcounts
-	|| Msg = .UserObj|message|
+	|| Msg = ._Object|message|
 	|int| info
 	while 
 		info = .NonZeroByte
 		loop info > 239
 		msg = Msg.upward(info - 239)
-		.userobj = msg, require msg
+		._Object = msg, require msg
 
 	|| T = (info >> 1)|syntax|
 	if (t < @max and T > @nil) // 01 --> T=@nil
 		msg = msg.msg(t, .str(.hInt))			
 		if info & 1
-			.userobj = msg
+			._Object = msg
+		|| cb = .CallBack
+			(cb)(msg)
 		return msg|uint64|
 
-	.userobj = nil
+	._Object = nil
 	if info >= 0
 		expect (T > @nil) (self, "StringReader.IsJBin was not called.")
 		error (self, "Corrupted jbin")
@@ -185,9 +194,9 @@ function StringReader.ExpectJbin (|bool|)
 	error (Self, _jBinNotJbin)
 
 
-function StringReader.ParseJbin (|int64| Remain=int64.max, |MessageRoot|)	
+function StringReader.ParseJbin (|int64| Remain=1G, |MessageRoot|)	
 	require .ExpectJbin
-	.UserObj = nil
+	._Object = nil
 	rz = .NextMsg
 	while --Remain > 0
 		loop .NextMsginfo
@@ -196,7 +205,7 @@ function StringReader.ParseJbin (|int64| Remain=int64.max, |MessageRoot|)
 		rz = nil // be consistant with .parse!
 	
 
-function string.ParseJbin (|int64| max=int64.max, |messageroot|)
+function string.ParseJbin (|int64| max=1G, |messageroot|)
 	return .Stream.ParseJbin(max)
 
 

@@ -4,6 +4,7 @@ function StringReader.CompressInto (|object| dest, |int| Strength=mzlab.default,
 	expect (self!=nil) ("Nil object given to CompressInto")
 	|jbin| j = faststring.use(dest)				#require
 	st = st.start
+	(strength)
 	j <~ _JbinHeader
 	j.enter(@tmp, "µz")
 	j.addint(.length)
@@ -12,7 +13,7 @@ function StringReader.CompressInto (|object| dest, |int| Strength=mzlab.default,
 		|| str = .str(1MB)
 		|| Place = j.OpenSection
 		j.CompressChunk(str)
-		j.CloseSection(Place)
+		j.CloseSection(Place, @bin)
 		st.LiveUpdate(str.length, j.length - place, true)
 		if !.NoMoreChunks
 			j.flush // we are calling it after anyhow	

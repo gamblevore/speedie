@@ -351,7 +351,7 @@ class File (String)
 		description "Does something with file permissions. If we are sudo, it makes this file not need sudo" 
 		cpp_Wrapper JB_File_RelaxPath
 	
-	function DeleteAll (|ErrorInt|)
+	function DeleteAll (|bool| KeepSelf=false, |ErrorInt|)
 		if super == "/" or ""
 			return -1
 		if .IsDir
@@ -359,7 +359,7 @@ class File (String)
 				|| tmp = C.DeleteAll
 				if rz == 0
 					rz = tmp
-		if rz == 0
+		if !KeepSelf and rz == 0
 			rz = .Delete
 
 

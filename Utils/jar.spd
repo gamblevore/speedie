@@ -1,0 +1,85 @@
+#!/usr/local/bin/spd
+
+app.usage = "Compress many files into one archive. Or decompress.
+
+Pass just the archive and no files, to decompress.
+
+Pass the archive and some files, to compress."
+
+main (|file| archive, |[file]| files)
+	if files
+		require archive.OpenEmpty
+		using "Archiving `$archive`"
+			archive.Archive(files)
+	  else
+		using "Unarching `$archive`"
+			|| dir = app.cwd
+			archive.Unarchive
+			app.cwd = dir
+
+
+module Archiver
+	task Decompressor (stringreader.ParserCallBack)
+		|compressionstats| Stats
+		run
+			require msg == @bin
+			|| p = msg.parent
+			|| path = p.name
+			"	$path"
+			msg.name.decompressinto(path.out, .stats)
+			msg.name = ""
+			p.prev.remove
+
+	helper FindTop (|[string]| self, |int|)
+		|| a = self[0] #require
+		for s in self
+			rz ?= a.Length
+			|| d = a.DiffAt(s)
+			if d >= 0
+				rz = rz min d
+
+	helper AddFile (|jbin| j, |file| f, |int| n, |CompressionStats| stats)
+		|| name = f[n...]
+		"	$name"
+		j.Enter(@tmp, name)
+		j.AddComp(f.in, stats)
+		j.exit(1)
+	
+	
+function file.Unarchive
+	|| in = .in$
+	|| fol = (.TrimExt + ".decomp").file
+	require fol.MakeDir and fol.DeleteAll(true) and app.cwd(fol)
+	|| d = Archiver.Decompressor(in)
+	in.CallBack = d
+	in.ParseJbin
+	d.Stats.Print(true) // why is it true both ways? is it always true?
+
+
+function file.Archive (|[file]| files)
+	|jbin| j = jbin(@tmp, "jarc")
+	|compressionstats| Stats
+	j.File = self
+	
+	j.add(@str, "v1")
+	j.Enter
+	
+	|| n = archiver.FindTop(files)
+	j.Tmp("files")
+	
+	for f in files
+		j.archivesub(f,n,stats)
+	j.exit
+	
+	stats.print(True)
+
+
+helper jbin.ArchiveSub (|file| f, |int| n, |compressionstats| stats)
+	if f.IsDir
+		if f.IsLink
+			"// Skipping link: $f"
+			return 
+		for c.files in f
+			.archivesub(c, n, stats)
+	  else
+		archiver.addfile(self, f, n, Stats)
