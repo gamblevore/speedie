@@ -41,21 +41,21 @@
 		#define q2  	%xmm2
 		#define q1  	%xmm1
 		#define q0  	%xmm0 // edi, esi, edx, ecx, r8d, r9d
-#if 0
+#if 1
 		movq		data, %rdi
-		sarq		data, 12					// data = DATA>>12	// 12 is "invalid operand for instruction". why?
-		movq		flj, .floats				// I know this is wrong but it compiles
-		movq		inj, .ints					// Compiles even with "movq    inj, .DeFiNiTeLyNoTaLABEL"
+		sarq		$12, data					// data = DATA>>12
+		leaq		.Floats(%rip), flj
+		leaq		.Ints(%rip), inj
 
 		movq		fn,  x1						// fn    = FN
 		movq		r,   x2						// r     = R
 
 		movq		dest, r						// n <<= 4; dest = r+n
-        salq		x3, 4						// fail // 4 is "invalid operand for instruction"
+        salq		$4, x3
         addq		dest, x3
 
 		movq		j8, x4
-		sarq		j8, 6						// fail // 6 is "invalid operand for instruction"?
+		sarq		$6, j8
 		andq		j8, 31						// j8    = (DATA>>6)&31
 
 		movq		j9, x4
@@ -67,81 +67,96 @@
 
 		leaq		(flj,j8,2), j8				// j8 adapt
 		leaq		(inj,j9,2), j9				// j9 adapt
+
+		jmpq *j8
 		
-		jmpq		j8							//  "invalid operand for instruction"?
-	.floats:
-											// float-7
-/*		ubfiz   x7, data, 4, 5				// x7 = (data&31) << 4
-		lsr     data, data,  5				// data = data >> 5
-		ldr     q7,  [r, x7]				// q7 = r[x7]
+	.Floats:
+		.long .F7-.Floats
+		.long .F6-.Floats
+		.long .F5-.Floats
+		.long .F4-.Floats
+		.long .F3-.Floats
+		.long .F2-.Floats
+		.long .F1-.Floats
+		.long .F0-.Floats		
+	.Ints:
+		.long .I7-.Ints
+		.long .I6-.Ints
+		.long .I5-.Ints
+		.long .I4-.Ints
+		.long .I3-.Ints
+		.long .I2-.Ints
+		.long .I1-.Ints
+		.long .I0-.Ints		
+	.F7:								// x7 = (data&31) << 4
+		movq data, x7					// x7 = data
+		andq x7, 31						// x7 &= 31
+        salq $4, x7						// x7 <<= 4
+        salq $5, x7						// data = data >> 5
+        movaps (r,x7), q7				// q7 = r[x7]
+			
+	.F6:								// x6 = (data&31) << 4
+		movq data, x6					// x6 = data
+		andq x6, 31						// x6 &= 31
+        salq $4, x6						// x6 <<= 4
+        salq $5, x6						// data = data >> 5
+        movaps (r,x6), q6				// q6 = r[x6]
+	.F5:
+		movq data, x7
+	.F4:
+		movq data, x7
+	.F3:
+		movq data, x7
+	.F2:
+		movq data, x7
+	.F1:
+		movq data, x7
+	.F0:
+		movq data, x7
+	
 
-		ubfiz   x6, data, 4, 5				// float-6
-		lsr     data, data,  5	
-		ldr     q6,  [r, x6]		
+	.I7:
+		decl %esi
+		addq $4, %rdi
 
-		ubfiz   x5, data, 4, 5				// float-5
-		lsr     data, data,  5	
-		ldr     q5,  [r, x5]		
-
-		ubfiz   x4, data, 4, 5				// float-4
-		lsr     data, data,  5	
-		ldr     q4,  [r, x4]		
-
-		ubfiz   x3, data, 4, 5				// float-3
-		lsr     data, data,  5	
-		ldr     q3,  [r, x3]		
-
-		ubfiz   x2, data, 4, 5				// float-2
-		lsr     data, data,  5	
-		ldr     q2,  [r, x2]		
-
-		ubfiz   x1, data, 4, 5				// float-1
-		lsr     data, data,  5	
-		ldr     q1,  [r, x1]		
-
-		ubfiz   x0, data, 4, 5				// float-0
-		lsr     data, data,  5	
-		ldr     q0,  [r, x0]		
-
+/*
 		br j9
-		nop
-		nop
 */
 
-	.ints:
+//	ubfiz   x7, data, 4, 5				// x7 = (data&31) << 4
+//	lsr     data, data,  5				// data = data >> 5
+//	ldr     q7,  [r, x7]				// q7 = r[x7]
+			
+	.I6:
+		movl (%rdi), %ecx
+		cmpq $4, %rcx
+		ja .F7
+	.I5:
+		movl (%rdi), %ecx
+		cmpq $4, %rcx
+		ja .F7
+	.I4:
+		movl (%rdi), %ecx
+		cmpq $4, %rcx
+		ja .F7
+	.I3:
+		movl (%rdi), %ecx
+		cmpq $4, %rcx
+		ja .F7
+	.I2:
+		movl (%rdi), %ecx
+		cmpq $4, %rcx
+		ja .F7
+	.I1:
+		movl (%rdi), %ecx
+		cmpq $4, %rcx
+		ja .F7
+	.I0:
+		movl (%rdi), %ecx
+		cmpq $4, %rcx
+		ja .F7
+
 /*
-											// int-7
-		ubfiz   x7, data, 4, 5				// x7 = (data&31) << 4
-		lsr     data, data,  5				// data = data >> 5
-		ldr     x7,  [r, x7]				// x7 = r[x7]
-			
-		ubfiz   x6, data, 4, 5				// int-6
-		lsr     data, data,  5
-		ldr     x6,  [r, x6]
-			
-		ubfiz   x5, data, 4, 5				// int-5
-		lsr     data, data,  5
-		ldr     x5,  [r, x5]
-			
-		ubfiz   x4, data, 4, 5				// int-4
-		lsr     data, data,  5
-		ldr     x4,  [r, x4]
-			
-		ubfiz   x3, data, 4, 5				// int-3
-		lsr     data, data,  5
-		ldr     x3,  [r, x3]
-			
-		ubfiz   x2, data, 4, 5				// int-2
-		lsr     data, data,  5
-		ldr     x2,  [r, x2]
-			
-		ubfiz   x1, data, 4, 5				// int-1
-		lsr     data, data,  5
-		ldr     x1,  [r, x1]
-		
-		ubfiz   x0, data, 4, 5				// int-0
-		ldr     x0,  [r, x0]
-		nop
 		
 			// **STACK MANAGEMENT HERE**
 		stp     fp, lr, [sp, -32]!			// save fp and lr 
@@ -174,12 +189,7 @@
 /*
 Observations so far:
  	* Use godbolt.org... its simpler than understanding the documentation. (The docs seem wrong too)
- 	* Both ARM and x86 only have two register files! Despite what the docs say.
-		* Both do it the same way. General/int in one place, and SIMD+FP in another.
-		* x87/MMX is unused on x86.
+	* x87/MMX is unused on x86.
 	* x86 has 6 regs for passing ints, the other two have to be done on the stack
-	* the FP/SIMD are also just done in order
-		* we have enough regs on ARM&X86
-	* You can't specify registers in C++, not reliably.
 */
 
