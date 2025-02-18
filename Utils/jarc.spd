@@ -44,13 +44,20 @@ module µzArchiver
 			msg.name = "" // save RAM
 			p.prev.remove
 
-	helper FindTop (|[string]| self, |int|)
-		|| a = self[0] #require
-		for s in self
-			rz ?= a.Length
-			|| d = a.DiffAt(s)
-			if d >= 0
-				rz = rz min d
+	helper FindTop (|[file]| self, |int|)
+		|file| a
+		for (c in self) (i)
+			if c.IsDir
+				c = c.PathDir.file // what about a/bbc, a/bdc
+				self[i] = c
+			if !a
+				a = c
+				rz = a.path.length
+			  else
+				|| d = a.DiffAt(c)
+				if d >= 0
+					d = a.Find('/', d, 0)
+					rz = rz min d
 
 	helper AddFile (|jbin| j, |file| f, |int| n, |CompressionStats| stats)
 		|| name = f[n...]
@@ -94,6 +101,7 @@ function file.Archive (|[file]| files, |[string]| x)
 	j.Enter
 	
 	|| n = µzArchiver.FindTop(files)
+	printline files[0]![0,n]
 	j.Tmp("files")
 	
 	for f in files
