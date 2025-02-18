@@ -8,7 +8,6 @@ Pass the archive and some files, to compress."
 
 
 // todo:
-	// why does it start with '/' when using 1 file?
 	// corrupt mz files when decomp from my large test
 	// chunk files
 	// why are some errors created on large test
