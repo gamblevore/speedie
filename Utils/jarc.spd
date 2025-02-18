@@ -1,10 +1,8 @@
 #!/usr/local/bin/spd
 
-app.usage = "Compress many files into one archive. Or decompress.
-
-Pass just the archive and no files, to decompress.
-
-Pass the archive and some files, to compress."
+app.usage = "Archives and unarchives files.
+To archive: Pass the archive and some files.
+To Dearchive: Pass just the archive, nothing else."
 
 
 // todo:
@@ -47,7 +45,7 @@ module µzArchiver
 		|file| a
 		for (c in self) (i)
 			if c.IsDir
-				c = c.PathDir.file // what about a/bbc, a/bdc
+				c = c.PathDir.file
 				self[i] = c
 			if !a
 				a = c
@@ -84,11 +82,11 @@ module µzArchiver
 function file.Unarchive
 	|| in = .in$
 	|| fol = (.TrimExt + ".decomp").file
-	require fol.MakeDir and fol.DeleteAll(true) and app.cwd(fol)
-	|| d = µzArchiver.Decompressor(in)
-	in.CallBack = d
-	in.ParseJbin
-	d.Stats.Print(true) // why is it true both ways? is it always true?
+	if fol.MakeDir and fol.DeleteAll(true) and app.cwd(fol)
+		|| d = µzArchiver.Decompressor(in)
+		in.CallBack = d
+		in.ParseJbin
+		d.Stats.Print(true) // why is it true both ways? is it always true?
 
 
 function file.Archive (|[file]| files, |[string]| x)
@@ -100,7 +98,6 @@ function file.Archive (|[file]| files, |[string]| x)
 	j.Enter
 	
 	|| n = µzArchiver.FindTop(files)
-	printline files[0]![0,n]
 	j.Tmp("files")
 	
 	for f in files
