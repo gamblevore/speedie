@@ -101,12 +101,12 @@ role JBin (Faststring)
 		return goin|int|
 
 
-	function OpenSection  (|ivec2|)							// openstream 
+	helper OpenSection  (|ivec2|)							// openstream 
 		++.NoFlush
 		.length += 6
 		return (.length, .reserved)
 
-	function CloseSection (|int| c, |int| r, |syntax| Type)			// closestream
+	helper CloseSection (|int| c, |int| r, |syntax| Type)	// closestream
 		|| CurrLen = .length
 		expect (CurrLen >= c) (self, "Unable to close section")
 		.length = c - 6
