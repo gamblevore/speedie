@@ -160,10 +160,10 @@ static CompState& alloc_compress(JB_String* self, FastString* fs) {
 	CompState& C		= sigh;
 
 	int Total			= self->Length;
-	int CB				= max(ChunkLen_(Total),12);
+	int CB				= max(ChunkLen_(Total+1024),12);
 	int ChunkLength		= 1<<CB;
 
-	C.Write = JB_FS_NeedSpare(fs, ChunkLength+1024);
+	C.Write = JB_FS_NeedSpare(fs, ChunkLength+1024*16);
 	C.WriteStart = C.Write;
 	C.WriteEnd = C.Write + ChunkLength;
 	C.WriteByte(CB-12);
