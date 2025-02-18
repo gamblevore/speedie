@@ -13,8 +13,8 @@ function StringReader.CompressInto (|object| dest, |int| Strength=mzlab.default,
 		|| str = .str(1MB)
 		|| Place = j.OpenSection
 		j.CompressChunk(str)
-		j.CloseSection(Place, @bin)
-		st.LiveUpdate(str.length, j.length - place, true)
+		j.CloseSection(Place.x, place.y, @bin)
+		st.LiveUpdate(str.length, j.length - place.x, true)
 		if !.NoMoreChunks
 			j.flush // we are calling it after anyhow	
 	j.exit(2)

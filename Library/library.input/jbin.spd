@@ -65,7 +65,7 @@ role JBin (Faststring)
 	function AddComp (|stringreader| str,  |syntax| Type=@bin, |compressionstats| Stats,   |int| strength=mzlab.strongest)
 		|| Place = .OpenSection		
 		str.compressinto(self, strength, stats)
-		.CloseSection(Place, Type)
+		.CloseSection(Place.x, place.y, Type)
 
 		
 	function Sheb		(|string| name)
@@ -101,12 +101,12 @@ role JBin (Faststring)
 		return goin|int|
 
 
-	function OpenSection  (|int|)							// openstream 
-		.NoFlush = .Reserved
+	function OpenSection  (|ivec2|)							// openstream 
+		++.NoFlush
 		.length += 6
-		return .length
+		return (.length, .reserved)
 
-	function CloseSection (|int| c, |syntax| Type)			// closestream
+	function CloseSection (|int| c, |int| r, |syntax| Type)			// closestream
 		|| CurrLen = .length
 		expect (CurrLen >= c) (self, "Unable to close section")
 		.length = c - 6
@@ -122,9 +122,8 @@ role JBin (Faststring)
 		self <~ (Type|int|<<1)|byte|
 		.hint(c)
 		.length = CurrLen
-		|| n = .NoFlush
-		.NoFlush = 0
-		if .Length >= n>>1 // 50%
+		|| nf = --.NoFlush
+		if !nf and .Length >= r>>1 // 50%
 			.flush
 
 
