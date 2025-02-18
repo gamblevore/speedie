@@ -11,7 +11,7 @@
 	/*** Nativeize(u64 DATA, void* FN, Register* R, int n) ***/
 	.text
 	.global _Nativeize
-	.align 4
+	.balign 4
 
 	_Nativeize:								
 		r		.req x15
@@ -20,8 +20,8 @@
 		dest	.req x12
 		fn		.req x11
 		data	.req x10
-		j8		.req x8
 		j9		.req x9
+		j8		.req x8
 
 		lsr     data, x0, 12				// data  = DATA>>12
 		adr		flj, .floats
