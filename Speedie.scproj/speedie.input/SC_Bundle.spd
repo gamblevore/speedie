@@ -8,8 +8,8 @@ function compiler.Bundle
 		require !Compiler.IsTest and !Options.ExternalCompile
 		require SC_Targets..gui
 		|| Pd = .productfile
-		|| Pj = .BaseProjectPath.path
-			.AppleBuildApp(pd)
+		|| Pj = .BaseProjectPath
+			.AppleBuildApp(pd, pj)
 
 	
 function compiler.WrongConf (CollectFunc)
@@ -40,7 +40,7 @@ function compiler.AppBuildLibs (|file| inner)
 			.AppBuildOneLib(inner, lib)
 
 
-function compiler.AppleBuildApp (|file| product)
+function compiler.AppleBuildApp (|file| product, |file| project)
 	target OSX
 		|| dest = product.linksto
 			error (dest, "This should not be a link")
@@ -49,18 +49,17 @@ function compiler.AppleBuildApp (|file| product)
 		Compiler.stage("Create MacOSX Package")
 		|| name			= .idealname
 		|| prefered_name=name + ".app"
-		|| prefered_app	= product.sibling(prefered_name)
-		|| xcode_place	= prefered_app.sibling("Release/"+prefered_name)
-		|| final_app	= (xcode_place, prefered_app)(xcode_place.fileexists)
+		|| final_app	= product.sibling(prefered_name)
+		|| copy_from	= project.child("OSX/"+prefered_name)
 		|| inner		= final_app["Contents/MacOS/"+name]!
+		if copy_from.exists
+			/copy_from.copyall(Final_app)
 		if product.moveto( inner )
 			options.exe_path = inner
 			.AppBuildLibs(inner)
 			.CodeSign(final_app)
-			if prefered_app != final_app
-				prefered_app.linkto = final_app
-			options.output_path = prefered_app
-			prefered_app.touch
+			options.output_path = final_app
+			final_app.touch
 
 
 
