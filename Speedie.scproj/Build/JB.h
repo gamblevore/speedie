@@ -804,11 +804,11 @@ struct ASMState {
 	byte VDecls;
 	byte VTmps;
 	bool Inited;
-	byte ReturnDest;
 	byte InlineDepth;
-	bool UnbrokenReturn;
+	bool TailInlineable;
 	FuncInASM* Out;
 	SCFunction* Fn;
+	ASMReg ReturnDest;
 	MWrap* JSM;
 	FatASM* FuncStart;
 	FatASM* LastDebug;
@@ -1548,18 +1548,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2158])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2159])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2159])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2160])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2160])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2161])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2157])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2158])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2160])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2161])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2161])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2162])
 
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
@@ -1786,7 +1786,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2166])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2167])
 
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
@@ -1824,7 +1824,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2162])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2163])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1862,7 +1862,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2167])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2168])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2098,12 +2098,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2165])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2166])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2164])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2165])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2163])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2164])
 
 #define kJB__byte_max ((byte)255)
 
@@ -3133,7 +3133,7 @@ extern bool SC__Cpp_WroteAny;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2156])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2157])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -5408,6 +5408,8 @@ ASMReg SC_ASMType__Arg(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
 ASMReg SC_ASMType__ArgSub(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
+ASMReg SC_ASMType__ASMConst(ASMState* Self, Message* Exp, ASMReg Dest, SCDecl* D);
+
 ASMReg SC_ASMType__ASMFunction(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
 ASMReg SC_ASMType__BitNot(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
@@ -6378,8 +6380,6 @@ int JB_MzSt__Init_();
 
 
 // JB_FastBuff
-bool JB_FastBuff_Alloc(FastBuff* Self, int N);
-
 byte JB_FastBuff_Byte(FastBuff* Self);
 
 byte* JB_FastBuff_Clip(FastBuff* Self, int V, int Reduce);
@@ -6393,8 +6393,6 @@ bool JB_FastBuff_Has(FastBuff* Self, int N);
 bool JB_FastBuff_HasAny(FastBuff* Self);
 
 int JB_FastBuff_Length(FastBuff* Self);
-
-bool JB_FastBuff_NeedAlloc(FastBuff* Self, int N);
 
 int JB_FastBuff_Position(FastBuff* Self);
 
@@ -7630,8 +7628,6 @@ FastString* JB_FS__Use(JB_Object* Other);
 // JB_FlowControl
 void JB_Flow_AddByte(FlowControl* Self, uint /*byte*/ Value);
 
-FlowControl* JB_Flow_Constructor(FlowControl* Self, JB_String* OutPath, JB_String* InPath);
-
 void JB_Flow_Destructor(FlowControl* Self);
 
 void JB_Flow_Fail(FlowControl* Self, JB_String* Found, JB_String* Expected, JB_String* InputName);
@@ -7639,10 +7635,6 @@ void JB_Flow_Fail(FlowControl* Self, JB_String* Found, JB_String* Expected, JB_S
 void JB_Flow_Flush(FlowControl* Self);
 
 bool JB_Flow_TestByte(FlowControl* Self, uint /*byte*/ Value);
-
-FlowControlStopper JB_Flow__Activate(JB_String* Name);
-
-JB_String* JB_Flow__AskPath(JB_String* Name, bool WantValidate);
 
 FlowControlStopper JB_Flow__Attempt(JB_String* Name);
 
@@ -7745,8 +7737,6 @@ int JB_Mrap__Init_();
 MWrap* JB_Mrap__Object(int Count, int ItemSize);
 
 void jbl(JB_Object* Self);
-
-byte* JB_Mrap__Zalloc(int N);
 
 
 
@@ -8067,8 +8057,6 @@ int JB_Str_FindTrailingSlashes(JB_String* Self);
 
 Float64 JB_Str_Float(JB_String* Self);
 
-StringReader* JB_Str_In(JB_String* Self, JB_String* Header, int ChunkSize);
-
 int64 JB_Str_Int(JB_String* Self);
 
 JB_String* SC_Str_InterfaceToBehaviour(JB_String* Self);
@@ -8277,8 +8265,6 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 
 StringReader* JB_SS_Constructor(StringReader* Self, JB_String* Data);
 
-StringReader* JB_SS_ConstructorFile(StringReader* Self, JB_File* File, int ChunkSize);
-
 JB_String* JB_SS_Decompress(StringReader* Self, int Lim, CompressionStats* St, bool Multi);
 
 bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, CompressionStats* St);
@@ -8328,8 +8314,6 @@ JB_String* JB_SS_Str(StringReader* Self, int N, int Skip);
 JB_String* JB_SS_StrNoAdvance(StringReader* Self, int N);
 
 void JB_SS_Fail(StringReader* Self, JB_String* Error);
-
-bool JB_SS_Test(StringReader* Self, JB_String* Header);
 
 
 
@@ -11459,28 +11443,28 @@ inline bool JB_Ind_SyntaxCast(Ind Self) {
 }
 
 inline Syntax JB_Msg_Func(Message* Self) {
-	iif (Self) {
+	if (Self) {
 		return Self->Func;
 	}
 	return nil;
 }
 
 inline JB_String* JB_Msg_Name(Message* Self) {
-	iif (Self) {
+	if (Self) {
 		return Self->Name;
 	}
 	return JB_LUB[0];
 }
 
 inline JB_String* JB_Msg_Name_(Message* Self) {
-	iif (Self) {
+	if (Self) {
 		return Self->Name;
 	}
 	return JB_LUB[0];
 }
 
 inline int JB_Sel_ID(Selector* Self) {
-	iif (Self) {
+	if (Self) {
 		return Self->ID;
 	}
 	return 0;
@@ -11499,7 +11483,7 @@ inline bool JB_int64_IsPow2(int64 Self) {
 }
 
 inline bool JB_int64_OperatorInRange(int64 Self, int64 Length) {
-	iif (Length >= 0) {
+	if (Length >= 0) {
 		return (((uint64)Self) < ((uint64)Length));
 	}
 	return false;
@@ -11514,7 +11498,7 @@ inline float JB_int_OperatorDiv(int Self, int D) {
 }
 
 inline bool JB_int_OperatorInRange(int Self, int Length) {
-	iif (Length >= 0) {
+	if (Length >= 0) {
 		return (((uint)Self) < ((uint)Length));
 	}
 	return false;
@@ -11532,7 +11516,7 @@ inline bool SC_FailableInt_SyntaxCast(FailableInt Self) {
 }
 
 inline JB_String* SC_Named_Name(SCNamed* Self) {
-	iif (Self) {
+	if (Self) {
 		return Self->Name;
 	}
 	return JB_LUB[9];
@@ -11659,7 +11643,7 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState
 }
 
 inline void SC_nil__DeclKill() {
-	iif (!SC_nil_NestDepth((&SC__nil_T))) {
+	if (!SC_nil_NestDepth((&SC__nil_T))) {
 		SC__nil_T.RootReturned = true;
 	}
 	(SC_nil_ValueSet((&SC__nil_T), kSC__NilState_Basic));
@@ -11667,7 +11651,7 @@ inline void SC_nil__DeclKill() {
 
 inline NilState SC_nil__JumpSub(Message* Msg, NilCheckMode Test) {
 	uint T = SC_Msg_ASMType(Msg);
-	iif (T) {
+	if (T) {
 		return (SC__nil_NilTable[T])(Msg, Test);
 	}
 	T = ((ASMType)Msg->Func);
@@ -11688,12 +11672,12 @@ inline bool SC_Decl_IsUnknownParam(SCDecl* Self) {
 }
 
 inline FatASM* SC_Pac_CanImproveAssign(ASMState* Self, ASMReg Dest, ASMReg Src) {
-	iif (SC_Reg_SyntaxIs(Src, kSC__Reg_Temp)) {
+	if (SC_Reg_SyntaxIs(Src, kSC__Reg_Temp)) {
 		return SC_Reg_FAT(Src);
 	}
-	iif (SC_Reg_Reg(Src) > Self->VDecls) {
+	if (SC_Reg_Reg(Src) > Self->VDecls) {
 		FatASM* F = SC_Reg_FAT(Src);
-		iif (F == SC_Pac_LastWith0(Self)) {
+		if (F == SC_Pac_LastWith0(Self)) {
 			return F;
 		}
 	}
@@ -11712,7 +11696,7 @@ inline NilRecord SC_nil__EndBlock() {
 }
 
 inline JB_String* JB_config_AsString(Message* Self) {
-	iif (Self) {
+	if (Self) {
 		return JB_Msg_Value(Self);
 	}
 	return JB_LUB[0];
@@ -11721,7 +11705,7 @@ inline JB_String* JB_config_AsString(Message* Self) {
 inline void SC_FAT_PrmWithIntReg(FatASM* Self, int A, ASMReg Input) {
 	uint I = SC_Reg_FatIndex(Input);
 	Self->R[A] = (SC_Reg_treg(Input) | (I << 15));
-	iif (I) {
+	if (I) {
 		FatASM* Src = SC_uint_FAT(I);
 		Self->RegFromFat = (Self->RegFromFat | (1 << A));
 		(++Src->xC2xB5RefCount);
@@ -11729,8 +11713,8 @@ inline void SC_FAT_PrmWithIntReg(FatASM* Self, int A, ASMReg Input) {
 }
 
 inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
-	iif (!JB_Ring_HasChildCount(Self, 2)) {
-		iif (true) {
+	if (!JB_Ring_HasChildCount(Self, 2)) {
+		if (true) {
 			Message* __varf1 = F->Source;
 			MessagePosition _usingf0 = ((MessagePosition){});
 			JB_Msg_SyntaxUsing(__varf1, (&_usingf0));
@@ -11746,22 +11730,22 @@ inline void SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info) {
 }
 
 inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
-	iif ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc, false))) {
+	if ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc, false))) {
 		JB_Msg_Fail(Self, JB_LUB[815]);
 	}
 }
 
 inline bool SC_Pac_ConstCompareFloatSub(ASMState* Self, ASMReg L, ASMReg R, int Mode) {
-	iif (!(Mode & 4)) {
+	if (!(Mode & 4)) {
 		float A = SC_Reg_F32(L);
 		float B = SC_Reg_F32(R);
-		iif (Mode <= 1) {
-			iif (Mode == 0) {
+		if (Mode <= 1) {
+			if (Mode == 0) {
 				return A > B;
 			}
 			return A <= B;
 		}
-		iif (Mode == 2) {
+		if (Mode == 2) {
 			return A == B;
 		}
 		return A != B;
@@ -11769,13 +11753,13 @@ inline bool SC_Pac_ConstCompareFloatSub(ASMState* Self, ASMReg L, ASMReg R, int 
 	Float64 A = SC_Reg_F64(L);
 	Float64 B = SC_Reg_F64(R);
 	Mode = (Mode - 4);
-	iif (Mode <= 1) {
-		iif (Mode == 0) {
+	if (Mode <= 1) {
+		if (Mode == 0) {
 			return A > B;
 		}
 		return A <= B;
 	}
-	iif (Mode == 2) {
+	if (Mode == 2) {
 		return A == B;
 	}
 	return A != B;
@@ -11784,13 +11768,13 @@ inline bool SC_Pac_ConstCompareFloatSub(ASMState* Self, ASMReg L, ASMReg R, int 
 inline bool SC_Pac_ConstCompareIntSub(ASMState* Self, ASMReg L, ASMReg R, int Mode) {
 	int64 A = SC_Reg_Const(L);
 	int64 B = SC_Reg_Const(R);
-	iif (Mode <= 1) {
-		iif (Mode == 0) {
+	if (Mode <= 1) {
+		if (Mode == 0) {
 			return A > B;
 		}
 		return A <= B;
 	}
-	iif (Mode == 2) {
+	if (Mode == 2) {
 		return A == B;
 	}
 	return A != B;
@@ -11812,9 +11796,9 @@ inline FatASM* SC_Pac_Write(ASMState* Self, ASMReg Dest, Message* Exp, ASMReg Pt
 
 inline SCDecl* SC_TypeOfSwiz(Message* Exp, SCNode* Name_space, Message* Side, SCDecl* class_Space) {
 	int W = SC_Class_NumericCount(class_Space->Type);
-	iif ((W > 1) and (!JB_Ring_HasChildren(((Message*)JB_Ring_Last(Exp))))) {
+	if ((W > 1) and (!JB_Ring_HasChildren(((Message*)JB_Ring_Last(Exp))))) {
 		int Swz = SC_Str_IsSwizzle(Exp->Name, W);
-		iif (Swz) {
+		if (Swz) {
 			return SC_TypeOfSwizzle(Exp, class_Space, Name_space, Side, Swz);
 		}
 	}
