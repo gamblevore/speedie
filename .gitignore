@@ -5,7 +5,6 @@ cpp.hidden
 xcuserdata/
 *nogit
 *.mz
-*.hol
 *.note
 *(ignored)*
 **/.gitignore
