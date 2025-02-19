@@ -20,15 +20,12 @@ class RayScene (window)
 	|float|			G
 	|date| 			LastDraw
 	|[shape]|		Shapes
-	|textview| 		FPS
 	|date| 			LastFPSChange
 	|vec3|			cam
 
 	constructor
 		.g = 0.006
 		.cam = (1.6, 5.0, -22.0)
-		.FPS = TextView(self)
-		.fps.MakeInline
 		.GNormal.clear // black background
 		
 		.shapes <~ Sphere((-1.0, 1.5, 12.0), 2)
@@ -42,11 +39,6 @@ class RayScene (window)
 		opt min 3
 		|| Ago = .LastDraw.ago
 		.LastDraw = date.now
-		.LastFPSChange ?= .LastDraw
-		if .LastFPSChange.ago > 0.5s
-			|| fps = (1.0/ago.Float64).Render(1) + "fps"
-			.fps.text = fps
-			.LastFPSChange = .LastDraw
 		
 		|| size = where.size.vec2
 		|| scale = 1.0/size.xx

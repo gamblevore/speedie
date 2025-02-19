@@ -38,11 +38,12 @@ class ShaderToy (window)
 		.Shader = fn
 		.GNormal.clear // black background
 	
+		
 	behaviour Drawbackground
 		opt norefcounts
 		opt min 3
 		
-		.time = (gui.framestart - .CreatedDate).Float
+		.time = (gui.FrameStart - .CreatedDate).Float
 		|| size = where.size.vec2
 		|| scale = 1.0/size.xx
 		|| adjust = size*-0.5	
@@ -51,6 +52,7 @@ class ShaderToy (window)
 			|| XY = (pv + adjust) * scale
 			|| Col = (.Shader)(self, size, pv, XY)
 			c <~ col
+		gui.Touch
 
 	behaviour FrameStep
 		|| m = keys.Movement.sign

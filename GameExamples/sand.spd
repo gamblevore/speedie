@@ -61,7 +61,7 @@ class SandSimulator (Window)
 	|GridSection of particle|	Particles
 
 	constructor 
-		.Particles = GridSection(400,300)|gridsection of particle|#quit
+		.Particles = GridSection(400,300)|gridsection of particle|//#quit
 		.reset
 	
 	function Reset

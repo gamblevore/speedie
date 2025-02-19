@@ -50,7 +50,9 @@ class Mandelbroat (window)
 			gui.touch
 	
 	behaviour keydown
-		.center += keys.Movement.sign.xz*0.05*.zoom
+		|| M = keys.Movement.sign
+		.center += M.xz*0.05*.zoom
+//		.zoom += m.y
 		gui.touch
 	
 	behaviour MouseMove

@@ -10,7 +10,7 @@ main
 
 
 class Breakout (Window)
-	|fpstextview|		FPS
+	|fpsview|			FPS
 	|[vobject]|			Blocks
 	|vobject|			Bar
 	|[vobject]|			Balls
@@ -20,13 +20,12 @@ class Breakout (Window)
 	|[vobject]|			Spirals
 
 	constructor
-		.bar = vobject(nil, nil)
-		.fps = fpstextview(self)
-		.fps.MakeInline()
+		.bar = vobject.Box(nil, nil)
+		.fps = fpsview(self)
 		.reset
 
 	function AddBalls (|vec2| P, |vobject|)
-		Rz = vobject(P, (16th,  16th))
+		Rz = vobject.Box(P, (16th,  16th))
 		rz.Velocity = vec3(0, -.ballspeed, 0)
 		.balls <~ rz
 
@@ -45,7 +44,7 @@ class Breakout (Window)
 			|| y2 = -1.0 + y*3th
 			for x in 10.0
 				|| pos = (2.0+x*(16.0/9.0), 9.0+y*0.5)
-				|| bl = vobject(pos,  (0.75, 0.2)*2.0)
+				|| bl = vobject.Box(pos,  (0.75, 0.2)*1.0)
 				bl.Health = 1.0 + y
 				.Blocks <~ bl
 	
@@ -88,7 +87,7 @@ class Breakout (Window)
 		|| R2 = bl.OverlapsRect(R)
 		require r2.exists
 		|| Cn = r2.Center
-		.spirals <~ vobject(cn, vec2(6), bl.Color)
+		.spirals <~ vobject.Box(cn, vec2(6), bl.Color)
 		
 		if r2.Height > r2.Width
 			ball.Velocity.x = -ball.Velocity.x
@@ -109,7 +108,7 @@ class Breakout (Window)
 					b2.towards(old.pos, .BallSpeed)
 					b2.Velocity = -b2.Velocity
 			  elseif pu <= 5
-				|| b2 = vobject(ball.pos.xy, vec2(1+(pu-3))*0.3)
+				|| b2 = vobject.Box(ball.pos.xy, vec2(1+(pu-3))*0.3)
 				b2.Color = colors.Red // 
 				.Explosions <~ b2
 			  elseif pu <= 7
@@ -184,7 +183,6 @@ class Breakout (Window)
 			if s.Radius.x < 0
 				.Spirals.Remove(i)
 		gui.Touch
-		.fps.update
 	
 	
 	behaviour Drawbackground
