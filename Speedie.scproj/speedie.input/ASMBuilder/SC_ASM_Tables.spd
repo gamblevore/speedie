@@ -91,13 +91,13 @@ function Sheb (fn_asm)
 	return exp.noop * asmreg()
 
 
-function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest,  |AsmReg|)
+function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest,   |AsmReg|)
 	opt norefcounts
 	// What about getting the address of registers?
 	|| f = exp.first
-		dest = .µinto(f, dest as asmreg.ExitFunction * .UnbrokenReturn)
+		dest = .µinto(f, dest as asmreg.ExitFunction * .TailInlineable)
 	
-	|| fat = exp.RET(Dest, asmreg(), asmreg(), 0, 0)
+	|| fat = exp.reT(Dest, asmreg(), asmreg(), 0, 0)
 	fat.µRefCount = 1
 	(fat is CondAnswer)
 	(fat is ExitFunction)
@@ -107,8 +107,8 @@ function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest,  |AsmReg
 
 function Return (fn_asm)
 	opt norefcounts
-	|int| L = .ReturnDest		// can remove constants, so try first
-		return InlinedReturn(self, exp, (l&31).asm)
+	|| L = .returndest		// can remove constants, so try first
+		return InlinedReturn(self, exp, L)
 
 	|asmreg| V 
 	|| f = exp.first
@@ -294,6 +294,8 @@ function Dot (fn_asm)										// a.b
 		subdest = dest
 	
 	|| prop = exp.ASMDecl
+	if prop is const // wait? don't these all get pre-transformed? SHOULD they be?
+		return ASMConst(self, exp, dest, prop)
 	if prop is global
 		return DoGlobal(self, exp, dest, prop)
 	|| F = exp.first!		 
@@ -362,6 +364,15 @@ function Thg (fn_asm)
 	error (exp, "Register out of bounds")
 
 
+function ASMConst (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
+	(dest is RealConst)
+	if dest isnt ConstRequest
+		if d.nilreg isnt hoisted
+			return .NumToReg(exp, d.exportposition, dest, dest.µtype)
+/		Dest.reg = d.nilreg&31
+	return dest
+
+
 function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
 	|| d = exp.ASMDecl
@@ -375,12 +386,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 		return exp.addr(dest, t, dest, t) * dest.HaveAddr
 	
 	if d is const
-		(dest is RealConst)
-		if dest isnt ConstRequest
-			if d.nilreg isnt hoisted
-				return .NumToReg(exp, d.exportposition, dest, dest.µtype)
-/			Dest.reg = d.nilreg&31
-		return dest
+		return ASMConst(self, exp, dest, d)
 
 	if dest isnt ConstRequest
 		check (d is global) (Exp)

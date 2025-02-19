@@ -521,6 +521,7 @@ extend ASMState
 				return l
 			if r.isconst(-1)
 				return r
+		if !dest.reg
 		return .BitMakerSwap(dest, l, r, exp, asm.bor)
 
 			
@@ -609,6 +610,7 @@ extend ASMState
 	function Assign (|asmreg| dest, |asmreg| src, |message| exp, |asmreg|)  // assigns (
 		|| sr = src.reg
 		|| dr = dest.reg
+		if !dr //?:O
 		if sr == dr
 			return dest								// hmmm... we are already there
 		if !sr

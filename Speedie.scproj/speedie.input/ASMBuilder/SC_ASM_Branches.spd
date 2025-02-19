@@ -216,7 +216,7 @@ helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |AS
 function FoundReg (|message| All, |int| R, |bool|)
 	opt norefcounts
 	for s.flat in All
-		if s == @thg
+		if (s == @thg) and !(s in @func)
 			|| a = .ASMLocal(s, 0)
 			|| sr = a.reg
 			if sr == r
@@ -262,6 +262,39 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 		return dest.boolanswer
 
 	return .Exists(dest, dest, A.next!)
+
+
+/*
+// hmmmm... does this need optimisation?
+function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMReg|)
+	opt norefcounts
+	dest = .UniqueLocation(a, dest, B)
+	(dest is condrequest)
+
+	|| mode = ASMReg.CondRequest.negate(opp is OR)
+	|| first = .µBoolInto(A, (dest asnt asmreg.negate) as mode)
+	if first is ConstOutput
+		return .BoolConst1(b, dest, opp, first).boolanswer			// x = 5 or Y() --> x = Y()
+	
+	|| JUMP = first.fat
+	if jump and first is condanswer
+	if first isnt condanswer
+		jump = .Exists(mode, dest, a).fat!						// AND/OR
+	  else
+		expect jump
+		
+	|| Second = .µBoolInto(B, dest)
+	if Second is ConstOutput
+		.NOP(jump) //opp, first, Second, B
+		return .BoolConst2(second, dest, opp, b, first).boolanswer
+
+	JUMP.JumpTo(.curr, self)
+	
+	if first.IsBool and Second.IsBool
+		return dest.boolanswer
+
+	return .Exists(dest, dest, A.next!)
+*/
 
 
 function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asmreg|)

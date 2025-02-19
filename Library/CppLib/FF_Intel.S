@@ -92,27 +92,63 @@
 		movq data, x7					// x7 = data
 		andq x7, 31						// x7 &= 31
         salq $4, x7						// x7 <<= 4
-        salq $5, x7						// data = data >> 5
+        salq $5, data					// data = data >> 5
         movaps (r,x7), q7				// q7 = r[x7]
 			
 	.F6:								// x6 = (data&31) << 4
 		movq data, x6					// x6 = data
 		andq x6, 31						// x6 &= 31
         salq $4, x6						// x6 <<= 4
-        salq $5, x6						// data = data >> 5
+        salq $5, data					// data = data >> 5
         movaps (r,x6), q6				// q6 = r[x6]
-	.F5:
-		movq data, x7
-	.F4:
-		movq data, x7
-	.F3:
-		movq data, x7
-	.F2:
-		movq data, x7
-	.F1:
-		movq data, x7
-	.F0:
-		movq data, x7
+
+	.F5:								// x5 = (data&31) << 4
+		movq data, x5					// x5 = data
+		andq x5, 31						// x5 &= 31
+        salq $4, x5						// x5 <<= 4
+        salq $5, data					// data = data >> 5
+        movaps (r,x5), q5				// q5 = r[x5]
+
+	.F4:								// x4 = (data&31) << 4
+		movq data, x4					// x4 = data
+		andq x4, 31						// x4 &= 31
+        salq $4, x4						// x4 <<= 4
+        salq $5, data					// data = data >> 5
+        movaps (r,x4), q4				// q4 = r[x4]
+
+	.F3:								// x3 = (data&31) << 4
+		movq data, x3					// x3 = data
+		andq x3, 31						// x3 &= 31
+        salq $4, x3						// x3 <<= 4
+        salq $5, data					// data = data >> 5
+        movaps (r,x3), q3				// q3 = r[x3]
+
+	#undef xx
+	#define xx x2
+	.F2:								// x2 = (data&31) << 4
+		movq data, xx					// x2 = data
+		andq xx, 31						// x2 &= 31
+        salq $4, xx						// x2 <<= 4
+        salq $5, data					// data = data >> 5
+        movaps (r,xx), q2				// q2 = r[x2]
+
+	#undef xx
+	#define xx x1
+	.F1:								// x1 = (data&31) << 4
+		movq data, xx					// x1 = data
+		andq xx, 31						// x1 &= 31
+        salq $4, xx						// x1 <<= 4
+        salq $5, data					// data = data >> 5
+        movaps (r,xx), q1				// q1 = r[x1]
+
+	#undef xx
+	#define xx x0
+	.F0:								// x0 = (data&31) << 4
+		movq data, xx					// x0 = data
+		andq xx, 31						// x0 &= 31
+        salq $4, xx						// x0 <<= 4
+        salq $5, data					// data = data >> 5
+        movaps (r,xx), q0				// q0 = r[x0]
 	
 
 	.I7:
@@ -144,17 +180,25 @@
 		cmpq $4, %rcx
 		ja .F7
 	.I2:
-		movl (%rdi), %ecx
-		cmpq $4, %rcx
-		ja .F7
-	.I1:
-		movl (%rdi), %ecx
-		cmpq $4, %rcx
-		ja .F7
-	.I0:
-		movl (%rdi), %ecx
-		cmpq $4, %rcx
-		ja .F7
+		movq data, x2					// x2 = data
+		andq x2, 31						// x2 &= 31
+        salq $4, x2						// x2 <<= 4
+        salq $5, data					// data = data >> 5
+        movq (r,x2), x2					// x2 = r[x2]
+
+	.I1:								// x1 = (data&31) << 4
+		movq data, x1					// x1 = data
+		andq x1, 31						// x1 &= 31
+        salq $4, x1						// x1 <<= 4
+        salq $5, data					// data = data >> 5
+        movq (r,x1), x1					// x1 = r[x1]
+
+	.I0:								// x0 = (data&31) << 4
+		movq data, x0					// x0 = data
+		andq x0, 31						// x0 &= 31
+        salq $4, x0						// x0 <<= 4
+        salq $5, data					// data = data >> 5
+        movq (r,x0), x0					// x0 = r[x0]
 
 /*
 		

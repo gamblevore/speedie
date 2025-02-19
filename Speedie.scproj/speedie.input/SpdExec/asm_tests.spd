@@ -36,10 +36,13 @@ function gggFunc (|int| A, |int|)
 		return 5
 	return compiler.ConfMsg.SlowCount
 
+function IB2 (|scdecl| x, |bool|)
+	opt inline
+	return (!x.nilstated) and (x is param)
 
 function Inline_Branch2 (|scdecl| D)
 	// what about inlining more complex expressions into branches?
-	require D.IsUnknownParam
+	require IB2(d)
 	|| x = 0
 	if hhhMaybeConst(7)
 		x = 1

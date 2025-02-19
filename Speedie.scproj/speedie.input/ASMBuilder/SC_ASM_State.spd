@@ -8,13 +8,13 @@ struct ASMState
 	|byte|						VDecls
 	|byte|						VTmps
 	|bool|						Inited
-	|byte|						ReturnDest
 	|byte|						InlineDepth
-	|bool|						UnbrokenReturn
+	|bool|						TailInlineable
 
 	|µFunc|						Out
 	|scfunction!|				Fn    
 
+	|asmreg|					ReturnDest
 	|memory of fatasm|			JSM
 	|&FatASM|					FuncStart
 	|&fatasm|					LastDebug
@@ -130,7 +130,7 @@ struct ASMState
 		|| t = Type.CalculateASMType
 		// if we have a var, that we are returning, and we are an inline.
 		if .ReturnDest and (type is ReturnedVar) and (.fn.ReturnedVars == 1)
-			t.reg = .ReturnDest
+			t = .ReturnDest
 			Type.wholetype = t|DataTypeCode|
 			return t
 		
@@ -258,6 +258,7 @@ struct ASMState
 			if !ss.reg and (ss isnt condanswer)
 				if (ss isnt ExitFunction) and (ss isnt constoutput)
 					debugger
+					PrintProgress()
 					(fn)(self, exp, dest)
 		return ss
 
@@ -396,7 +397,7 @@ struct ASMState
 		opt norefcounts
 		.ReturnDest = nil
 		.inlinedepth = 0
-		.unbrokenreturn = true
+		.TailInlineable = true
 		.BasicBlock = 0
 		.VDecls = 0
 		.VTmps = 32
@@ -426,7 +427,7 @@ struct ASMState
 		|| l = .last
 		if !l.IsFinisher
 			debugger !.fn.returntype
-			.fn.SourceArg!.RET(asmreg(), asmreg(), asmreg(), 0, asmreg())
+			.fn.SourceArg!.rEt(asmreg(), asmreg(), asmreg(), 0, asmreg())
 		.ImproveJumps
 
 		.out.length = .curr - .FuncStart
@@ -512,14 +513,23 @@ struct ASMState
 		|| fn = A.fn
 		|| OldFunc = .fn
 		|| OldDest = .ReturnDest
-	
-		if .InlineDepth == 0
-			.UnbrokenReturn = true
-		  elseif dest isnt ExitFunction
-			.UnbrokenReturn = false
+		if !dest.reg and fn.ReturnType
+			if dest is discard
+				debugger // hmm?
+			  else
+				Dest = .TempOnly(prms, dest)
+		
+		if dest is ExitFunction
+			if .InlineDepth == 0
+				.TailInlineable = true
+		  else
+			//if .InlineDepth == 0
+			.TailInlineable = false
+		
 		.InlineDepth++
 		.fn = fn
-		.ReturnDest = dest.reg ||| 128
+		dest.µtype = fn.RegType
+		.ReturnDest = dest
 
 		rz = .TryInlineSub(prms, dest, A)
 
@@ -537,6 +547,7 @@ struct ASMState
 		
 		// now what?
 		.InlineParameters(prms, dest)
+		if fn ~= "gggFunc"
 		ASMType.arg(self, fn.SourceArg!, ASMReg())
 		.RestoreParameters
 		ll.after = .curr
@@ -638,10 +649,7 @@ function asmstate.RegsBitClear (|message| exp, |int| RegAddrs, |scfunction| fn)
 
 function asmreg.Functionify (|scfunction| fn, |asmreg|)
 	.µtype = fn.RegType
-	self = .Simplify
-	if !.reg
-		is constoutput
-	return self
+	return .Simplify
 	
 
 function @ASMType.ASMFunction (fn_asm) // dofunction function
@@ -653,6 +661,9 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	|| MiniDest = .AskForInline(prms, dest, fn)
 		return MiniDest
 	dest = .CallFunc(exp, dest)
+	if !fn.returntype
+		(dest is constoutput)
+	
 
 	|| Closer = .OpenVars
 	|uint| RegAddrs

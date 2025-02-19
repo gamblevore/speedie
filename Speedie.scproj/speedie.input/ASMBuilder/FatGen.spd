@@ -318,6 +318,7 @@ function message.BAND (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 
 function message.BOR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
 	visible
+	if !r1.reg
 	rz = self * asm.BOR
 	rz.dest(0, r1)
 	rz.reginput(1) = r2

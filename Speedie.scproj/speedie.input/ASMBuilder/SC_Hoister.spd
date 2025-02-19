@@ -1,22 +1,12 @@
 
-
 /*
-	OK... how do we do this?
-	Last attempt was a bit of a debacle. But it will work this time!
+	I think... we could "premark" things... that is, actually add syntax to the code
+	So we say "gtab xyz"  and it will know to gtab it, at that point.
 	
-	* So... we want to do this before a loop.
-		* Loop comparison ints/floats need hoisting
+	Then we don't over gtab things!
 	
-	|| x = glob
-	|| y = glob
-	while 1
-		|| z = glob
-	
-	OK... what do I do?
-	
-	
+	Its a bit of an exception, but it should be OK. Perhaps do it with a sheb or something.
 */
-
 
 
 struct SC_Hoister
