@@ -1,5 +1,4 @@
 
-
 function message.TAIL (|int| JUMP, |int| Prm1, |&fatasm|) {
 	visible
 	rz = self * asm.TAIL
@@ -318,7 +317,6 @@ function message.BAND (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 
 function message.BOR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
 	visible
-	if !r1.reg
 	rz = self * asm.BOR
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
@@ -491,6 +489,19 @@ function message.JMPN (|asmreg| r1, |asmreg| r2, |int| Jmp, |&fatasm|) {
 	rz.reginput(1) = r2
 	rz.jumpinput(2) = Jmp
 	if (((Jmp << 18) >> 18) != Jmp) {
+		error (self, `Jumped too far`)
+	}
+}
+
+
+function message.JMPK (|asmreg| r1, |int| Neg, |int| K, |int| Jmp, |&fatasm|) {
+	visible
+	rz = self * asm.JMPK
+	rz.reginput(0) = r1
+	rz.numinput(1) = Neg
+	rz.numinput(2) = K
+	rz.jumpinput(3) = Jmp
+	if (((Jmp << 21) >> 21) != Jmp) {
 		error (self, `Jumped too far`)
 	}
 }
