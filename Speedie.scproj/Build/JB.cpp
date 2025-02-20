@@ -3450,7 +3450,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[220]);
-	JB_FS_AppendInt32(_fsf0, (2025022019));
+	JB_FS_AppendInt32(_fsf0, (2025022023));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8632,7 +8632,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1680]);
-	JB_FS_AppendInt32(_fsf0, (2025022019));
+	JB_FS_AppendInt32(_fsf0, (2025022023));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -21119,10 +21119,6 @@ int SC_FAT_BytePos(FatASM* Self) {
 	return Self->Msg->Position;
 }
 
-void SC_FAT_Clear(FatASM* Self) {
-	memzero(Self, (64));
-}
-
 int64 SC_FAT_Const(FatASM* Self) {
 	return Self->_Const;
 }
@@ -21400,10 +21396,22 @@ void SC_FAT_OpSet(FatASM* Self, uint /*byte*/ Value) {
 			};
 		};
 	}
-	Message* M = Self->Msg;
-	SC_FAT_Clear(Self);
-	Self->Msg = M;
+	//clear;
+	Self->RegFromFat = 0;
 	Self->_Op = Value;
+	Self->JumpReg = 0;
+	Self->Outputs = 0;
+	{
+		int I = 0;
+		while (I < 6) {
+			Self->R[I] = 0;
+			(++I);
+		};
+	}
+	;
+	Self->ASMIndex = 0;
+	Self->BlockNum = 0;
+	Self->xC2xB5RefCount = 0;
 }
 
 bool SC_FAT_OperatorIsa(FatASM* Self, int M) {
@@ -40100,7 +40108,7 @@ FatASM* SC_Msg_RequestOp(Message* Self, ASM Op) {
 	ASMState* A = (&SC__Pac_Sh);
 	FatASM* P = SC_Pac_Curr(A);
 	if (P < A->End) {
-		SC_FAT_Clear(P);
+		memzero((P), 64);
 		A->_Curr = (P + 1);
 		P->_Op = Op;
 		(SC_FAT_DebugSet(P, Self));
@@ -58641,4 +58649,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 6699369014640074835 -8723110080986865552
+// -3611904660263917371 -8723110080986865552

@@ -6435,8 +6435,6 @@ int SC_FAT_BaseOp(FatASM* Self);
 
 int SC_FAT_BytePos(FatASM* Self);
 
-void SC_FAT_Clear(FatASM* Self);
-
 int64 SC_FAT_Const(FatASM* Self);
 
 void SC_FAT_ConstSet(FatASM* Self, int64 Value);
