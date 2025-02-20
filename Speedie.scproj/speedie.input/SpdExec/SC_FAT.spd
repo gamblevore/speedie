@@ -28,13 +28,18 @@ struct FatASM
 			for (b.bits in n) (i)
 				|| src = .input(i)
 					src.µRefCount = src.µRefCount - 1
-		|| M = .msg
-		.clear
-		.msg = m	// for @sheb rendering
+		
+		#!clear
+		.regfromfat = 0
 		._op = value
-	
-	function Clear
-		Memory.Zero(self, –sizeof fatasm)
+		.jumpreg = 0
+		.outputs = 0
+		// leave info, msg, and _const. Other things may need them still.
+		for i in –count .r
+			.r[i] = 0
+		.asmindex = 0
+		.blocknum = 0
+		.µrefcount = 0
 	
 	function Input (|int| i, |&fatasm|)
 		|| r = (.r[i] << 1) >> 16
