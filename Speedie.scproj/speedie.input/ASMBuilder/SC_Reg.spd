@@ -32,7 +32,7 @@ datatype ASMReg (uint64)
 		WithinAccess
 		DeclareInlineParam
 		InlinedAccess
-		ExitFunction
+		Exit = [ExitFunction, ExitAtAll]
 		RealConst  = [ConstInput, ConstOutput]
 		AddrNeed   = [AddrRequest, AddrForceRequest]
 		// don't go above 47
@@ -43,6 +43,10 @@ datatype ASMReg (uint64)
 		NotUnConst = fromexistingvar ||| ConstInput
 	
 
+	function testbit
+		|| x = ExitAtAll
+
+		
 	render
 		fs <~ "r"
 		fs <~ .reg
@@ -75,7 +79,7 @@ datatype ASMReg (uint64)
 		|| F = .FAT
 			return f.const
 		if self isnt param
-			.needfat
+			.NeedFAT
 
 	function Const (assigns:|int64|)
 		.needfat.const = value

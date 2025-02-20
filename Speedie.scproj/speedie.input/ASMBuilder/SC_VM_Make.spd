@@ -408,7 +408,7 @@ function µparam.Which (|macro!--|)
 	return vm_builder.arms
 	
 
-|| icecream = `function message._0 (,|fatasm--|) {
+|| icecream = `function message._0 (,|&fatasm|) {
 	visible
 	rz = self * asm._0
 }`.macro

@@ -27,6 +27,7 @@ function ElseSub (|message?| other, |asmreg|)
 function If (fn_asm)
 	opt norefcounts
 	
+	if "Inline_More".trap
 	|| cond = exp.first!,  || arg1 = cond.next!
 	|| Other = arg1.next
 	|| IfStart = .curr
@@ -69,11 +70,16 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 
 
 function While (fn_asm)
-	opt norefcounts
 	|sc_hoister| H 
-	h.Closer = .OpenVars
-	h.hoistloop(exp.first!)
-	
+	|| OV = .OpenVars
+	h.HoistLoop(exp.first!)
+	rz = .Whilesub(exp, dest)
+	.CloseVars(OV)
+	h.Unhoist
+
+
+function WhileSub (fn_asm)
+	opt norefcounts
 	|| begin = exp.JUMP(0)											// test goes after loop
 	|| Returns = ASMType.arg(self, exp.second!)						// arg
 
@@ -87,7 +93,6 @@ function While (fn_asm)
 	loop_test.AllJumpTo(begin+1)
 	.loopfill(begin, loop_test.start, loop_test.After)
 	
-	h.Unhoist
 	return returns * loop_test.Always
 
 

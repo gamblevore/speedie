@@ -1,19 +1,8 @@
 
-/*
-	I think... we could "premark" things... that is, actually add syntax to the code
-	So we say "gtab xyz"  and it will know to gtab it, at that point.
-	
-	Then we don't over gtab things!
-	
-	Its a bit of an exception, but it should be OK. Perhaps do it with a sheb or something.
-*/
-
-
 struct SC_Hoister
 	linkage
 		cpp_part Hoi
 	|SCDecl--[6]|	Items
-	|uint64|		Closer
 	|byte|			Count
 	|byte|			Spare
 	
@@ -43,17 +32,16 @@ struct SC_Hoister
 		for d in .Items
 			loop d
 			d.nilreg = 0
-		ASMState.sh.CloseVars(.Closer)
 
 	function HoistNormal (|message| exp)
 		.spare = –count .items
-		.run(exp, 0)
+		.Hoist(exp, 0)
 		
 	function HoistLoop (|message| exp)
 		.spare = 2
-		.run(exp, 1<<20)
+		.Hoist(exp, 1<<20)
 
-	helper Run (|message| exp, |int| Score)
+	helper Hoist (|message| exp, |int| Score)
 		opt norefcounts
 		|| fn = exp.func
 		if fn == @type
@@ -76,5 +64,5 @@ struct SC_Hoister
 				add += (ty is kWhile) * MinHoistScore
 				add -= (ty is kIf)
 				
-			.Run(ch, add + score)
+			.Hoist(ch, add + score)
 

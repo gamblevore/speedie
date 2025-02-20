@@ -43,9 +43,7 @@ function compiler.AppBuildLibs (|file| inner)
 
 function compiler.AppleBuildApp (|file| product, |file| project)
 	target OSX
-		|| dest = product.linksto
-			error (dest, "This should not be a link")
-			return
+		|| dest = product.linksto			#expect (dest, "This should not be a link")
 		
 		Compiler.stage("Create MacOSX Package")
 		|| name			= .idealname

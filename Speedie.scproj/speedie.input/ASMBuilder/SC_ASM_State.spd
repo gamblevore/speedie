@@ -546,9 +546,9 @@ struct ASMState
 		LL.Start = .curr
 		
 		// now what?
+		//if fn ~= "gggFunc"
 		.InlineParameters(prms, dest)
-		if fn ~= "gggFunc"
-		ASMType.arg(self, fn.SourceArg!, ASMReg())
+		asmtype.HoistedArg(fn.SourceArg!)
 		.RestoreParameters
 		ll.after = .curr
 		return ll.InlineFinish
@@ -562,6 +562,7 @@ struct ASMState
 			|| v = .ExistingVar(p!)
 				|| vr = v.reg
 				if .CanReuseParam(prms, dest, a, vr)
+					|| f = v.fat
 					|| T = a.WholeType.reg(vr)
 					a.DataType = t|datatypecode|
 					(a is param) = (v is param)
@@ -579,6 +580,7 @@ struct ASMState
 	function RestoreParameters
 		opt norefcounts
 		for a.backwards in .fn.Args
+			a.fatconstindex = 0
 			.MakeConstFromASM(a, asmreg()) // parameters can never be const anyhow
 			a.paramfix
 
@@ -673,7 +675,7 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	|| ID = fn.TableId + 31
 	|| PExt = P >> 32
 	if !PExt and (dest is ExitFunction) and !fn.HasCVersion
-		return prms.TAIL(ID, P) * dest
+		return prms.TAIL(ID, P) * (dest as asmreg.exit)
 		
 	|| fat = prms.FNC(dest, ID, P,  PExt)
 	if fn.HasCVersion
@@ -683,7 +685,7 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	if RegAddrs
 		.RegsBitClear(exp, RegAddrs, fn)
 
-	(dest is ExitFunction) = fn is Killer
+	(dest is Exit) = fn is Killer
 	return fat * dest
 
 
