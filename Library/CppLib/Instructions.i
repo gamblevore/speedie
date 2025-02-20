@@ -148,6 +148,10 @@
 	__;
 	Code = JumpNeq(r, Op, Code);
 	___;
+ı JMPK: 
+	__;
+	Code = JumpK(r, Op, Code);
+	___;
 ı JBOR: 
 	__;
 	if (i1) 

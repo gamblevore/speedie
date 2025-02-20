@@ -283,12 +283,12 @@ bool CompI_ (VMRegister* r, ASM Op) {
 	switch (JCmpI_Cmpu) {
 		CmpSub(0,  A >   B);
 		CmpSub(1,  A <=  B);
-		CmpSub(2,  A ==  B);
-		CmpSub(3,  A !=  B);
+		CmpSub(2,  A ==  B);			// seems like these 4 should come out
+		CmpSub(3,  A !=  B);			// they can be done by jumpeq
 		CmpSub(4, (u64)A >  (u64)B);
 		CmpSub(5, (u64)A <= (u64)B);
-		CmpSub(6, (u64)A == (u64)B); default:;
-		CmpSub(7, (u64)A != (u64)B);
+		CmpSub(6, (u64)A == (u64)B); default:;	// also
+		CmpSub(7, (u64)A != (u64)B);			// also
 	};
 }
 
@@ -352,6 +352,11 @@ AlwaysInline ASM* JumpNeq (VMRegister* r, ASM Op, ASM* Code) {
 	if (u1 != u2)
 		return Code;
 	return Code + JCmpEq_Jmpi;
+}
+
+AlwaysInline ASM* JumpK (VMRegister* r, ASM Op, ASM* Code) {
+	auto K = JCmpK_Ki;
+	return Code + JCmpK_Jmpi * (JCmpK_Negu == i1 > K);
 }
 
 #define shu(x) ((((x)<<Shift_Shu))>>Shift_Shu)
