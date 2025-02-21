@@ -631,7 +631,7 @@ function ASMLocal (|message| s, |VarUseMode| mode, |asmreg|)
 		rz = d.ThgASM
 
 
-function SetConst (|scdecl| decl, |asmreg| Initial, |&fatasm| f, |bool|)
+function SetDeclToConst (|scdecl| decl, |asmreg| Initial, |&fatasm| f, |bool|)
 	if (Initial is ConstOutput) and (decl isnt AlteredInBranch)
 		if f
 			(decl is const)
@@ -644,10 +644,14 @@ function SetConst (|scdecl| decl, |asmreg| Initial, |&fatasm| f, |bool|)
 
 
 function MakeConstFromASM (|scdecl| decl, |asmreg| Initial, |asmreg| NewValue)
+	description "Marks Decl as a const, if it definitely is a const. And NOT CONST, if we don't know that. also nops unused consts. Also updates new const value."
+	
+	// uncompleted code?
+
 	opt NoRefCounts
 	|| f = Initial.fat
 	if initial
-		require !.SetConst(decl, initial, f)
+		require !.SetDeclToConst(decl, initial, f)
 
 // || k = 1, k = X	// clear here
 // y = k			// nice.
@@ -660,7 +664,7 @@ function MakeConstFromASM (|scdecl| decl, |asmreg| Initial, |asmreg| NewValue)
 			.softnop(DK.fat)
 	
 	if NewValue
-/		.SetConst(decl, newvalue, newvalue.fat)
+/		.SetDeclToConst(decl, newvalue, newvalue.fat)
 }
 
 
