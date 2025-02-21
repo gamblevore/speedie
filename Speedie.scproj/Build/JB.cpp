@@ -439,7 +439,7 @@ void SC_Comp__AppendCompilerTime(JB_String* S, int Durr) {
 void SC_Comp__AppleBuildApp(JB_File* Product, JB_File* Project) {
 	JB_String* Dest = JB_File_LinkToGet(Product);
 	JB_Incr(Dest);
-	if (!JB_Str_Exists(Dest)) {
+	if ((((JB_String*)JB_Str_Exists(Dest)))) {
 		JB_Object_FailStr(Dest, JB_LUB[1895]);
 		JB_Decr(Dest);
 		return;
@@ -465,7 +465,6 @@ void SC_Comp__AppleBuildApp(JB_File* Product, JB_File* Project) {
 	JB_Incr(Inner);
 	JB_Decr(_tmPf1);
 	if (JB_File_Exists(Copy_from)) {
-		JB_DoAt(1);
 		JB_File_CopyAll(Copy_from, Final_app, false);
 	}
 	JB_Decr(Copy_from);
