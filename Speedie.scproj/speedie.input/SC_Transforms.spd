@@ -4,7 +4,7 @@
 */
 
 
-prototype TranFunc (|SCFunction?| fn, |Message| node, |SCNode| name_space)
+prototype TranFunc (|SCFunction?| fn, |Message| node, |SCNode| name_space, |bool|)
 
 extend_module SCFunction {
 
@@ -94,7 +94,7 @@ function Tran_Expect (TranFunc)
 			arg.msg(@tmp, "return") <~ (@ques, "nil")
 
 
-function Tran_Temporal (|SCFunction| fn, |Message| s, |SCNode| name_space)
+function Tran_Temporal (|SCFunction| fn, |Message| s, |SCNode| name_space, |bool|)
 	opt norefcounts
 	|| TmpInt = TemporalStatements[s.name]
 		return (TmpInt[])( FN, s, name_space )
@@ -241,17 +241,26 @@ function Tran_Swap (TranFunc)
 		node.ASMType = ASMType.kSwap	
 
 
+function Tran_If (TranFunc) 
+	node.ASMType = ASMType.kIf // for the ASM
+	SCFunction.InBranch++
+	Tran_IfSub(node, name_space)
+	Tran_All_Final(fn, node, name_space, @arg)
+	SCFunction.InBranch--
+	return true // Stop caller redoing Tran_All_Final!
+
 
 function Tran_While (TranFunc)
 	SCFunction.InBranch++
 	Tran_WhileSub(fn, node, name_space)
+	Tran_All_Final(fn, node, name_space, @arg)
 	SCFunction.InBranch--
-
+	return true // Stop caller redoing Tran_All_Final!
 
 
 function Tran_WhileSub (TranFunc)
 	if node.ASMType == ASMType.kwhile
-		return
+		return false
 
 	node.name = "while"
 	node.ASMType = ASMType.kWhile
@@ -313,11 +322,12 @@ function Tran_PrintSub (TranFunc)
 	
 
 function Tran_Print (TranFunc)
-	tran_printsub(fn, node, name_space)
+	Tran_PrintSub(fn, node, name_space)
 	TypeOfExpr( node, name_space )
 
 
-function Tran_All (|SCFunction| fn, |Message| s, |SCNode!| p) // transform ()
+function Tran_All (|SCFunction?| fn, |Message| s, |SCNode!| p) // transform ()
+	opt norefcounts
 	require !StdErr.TooMany
 	|| f = s.func
 	
@@ -328,9 +338,7 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCNode!| p) // transform ()
 	  elseif (f == @Decl)
 		|| arg = s.parent
 		ifn arg in @bra or @type
-			s.CollectFromBody(p) // fix later
-	// this seems to require I alter loads of other stuff to make this work.
-	// tran_for will need fixing and probably other stuff toooooo :(
+			s.CollectFromBody(p)
 			s = DeclsDefault( s.last )
 			if s
 				Tran_All( Fn, s, p )
@@ -344,8 +352,7 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCNode!| p) // transform ()
 		Return
 		
 	  elseif (f == @Tmp)
-		Tran_Temporal( fn, s, p )
-		if s == "ignore"
+		if Tran_Temporal( fn, s, p ) or (s == "ignore")
 			return
 		
 	  elseif (f == @list)
@@ -363,16 +370,18 @@ function Tran_All (|SCFunction| fn, |Message| s, |SCNode!| p) // transform ()
 	  elseif f == @unit
 		return  // units have internal structure that can be damaged
 	
+	
+	Tran_All_Final(fn, s, p, f)
+
+
+function Tran_All_Final (|SCFunction?| fn, |Message| s, |SCNode!| p, |syntax| f) // transform ()
 	if (s == @arg) and (f != @arg)
 		p = s.scarg(p)! // Resync
 	
 	|| ch = s.first
 	while (ch)
 		if ch is BreakPoint and ch in @arg
-			using ch
-				|| dbg = @tmp + "DebugAt"
-				ch.prev = dbg
-				Tran_DebugAt( fn, dbg, p )
+			Tran_Breakpoint(fn, p, ch)
 		|| n = ch.next
 		if (ch == @Arg)
 			Tran_All( fn, ch, ch.scarg(p, s)! )
@@ -444,8 +453,12 @@ function CanKeepAsValue (|sciterator| iter, |Message| arg, |scdecl| dcl, |Messag
 
 function Tran_For (TranFunc)
 	using (node)
-		name_space = node.scarg( name_space )
+		name_space = node.scarg( name_space )!
+		SCFunction.InBranch++
 		tran_ForSub(fn, node, name_space)
+		SCFunction.InBranch--
+		Tran_All_Final(fn, node, name_space, @arg)
+	return true // Stop caller redoing Tran_All_Final!
 
 
 function Tran_ForSub (TranFunc)					// :3
@@ -602,6 +615,7 @@ function Tran_ForSub (TranFunc)					// :3
 	// what about nested args
 	|| p2 = arg.SCArgNested( node, name_space )    // :) Allow variable capture to work!! :D
 	if !p2
+		EndLoopMarker.Remove
 		error (arg, "Can't create argument") // should never happen
 	  else
 		if (index)
@@ -619,8 +633,8 @@ function Tran_ForSub (TranFunc)					// :3
 		CollectDeclsFuncBodyJustWhatWeNewlyMade( node, name_space ) // now an arg. Treat as an arg, as above!
 		// what if we just collect only the decls we added?
 	
-		Tran_While( fn, node2, p2 )
-	EndLoopMarker.Remove
+		EndLoopMarker.Remove
+		rz = Tran_WhileSub( fn, node2, p2 )
 
 
 function Tran_Sdt (|Message| exp)
