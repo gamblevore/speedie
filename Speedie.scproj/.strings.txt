@@ -2165,6 +2165,7 @@
 "Can't increment temporary value."
 "Register out of bounds"
 "Function too large (>= 256K compiled)"
-"Inline_More"
+"inline_more"
 "jcmpk"
 "JMPK"
+"ConstRemovals"
