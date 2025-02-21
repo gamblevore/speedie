@@ -43,7 +43,8 @@ function compiler.AppBuildLibs (|file| inner)
 
 function compiler.AppleBuildApp (|file| product, |file| project)
 	target OSX
-		|| dest = product.linksto			#expect (dest, "This should not be a link")
+		|| dest = product.linksto			
+		expect (!dest) (dest, "This should not be a link")
 		
 		Compiler.stage("Create MacOSX Package")
 		|| name			= .idealname
@@ -52,7 +53,7 @@ function compiler.AppleBuildApp (|file| product, |file| project)
 		|| copy_from	= project.child("OSX/"+prefered_name)
 		|| inner		= final_app["Contents/MacOS/"+name]!
 		if copy_from.exists
-			/copy_from.copyall(Final_app)
+			copy_from.copyall(Final_app)
 		if product.moveto( inner )
 			options.exe_path = inner
 			.AppBuildLibs(inner)

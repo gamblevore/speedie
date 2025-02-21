@@ -463,9 +463,9 @@ struct ASMState
 			J++
 
 
-	function SetLength
-		.out.length = .curr - .FuncStart
-		.jsm.length = .curr - .start 
+//	function SetLength
+//		.out.length = .curr - .FuncStart
+//		.jsm.length = .curr - .start 
 		
 		
 	function SmartSecretFat (|asmreg| Thg, |&fatasm|)
