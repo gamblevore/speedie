@@ -184,22 +184,34 @@ struct ASMState
 		if R is ConstOutput
 			|| k = R.const
 			if k.fits(bits, signed)
-				.nopconst(R)
+				.NopConst(R)
 				return k|uint64|.trim(bits)
-
 
 	function NopConst (|asmreg| R)
 		if (r is RemoveableOutput) or (r is realconst)
 			|| f = r.fat
 				.Nop(f)
 	
-	
 	function Nop (|FATASM| Fat)
 		|| C = .curr - 1
 		if fat == C
 			._curr = C // nice
-		fat.op = asm.noop
 
+		|| n = fat.InputFats|int|
+			for (b.bits in n) (i)
+				.decr fat.input(i)
+
+		fat.setop = asm.noop
+
+	function SoftNop (|?&fatasm| f)
+		if f and f.µRefCount <= 0
+			.nop(f)
+	
+	function Decr (|?&fatasm| f)
+		if f and --f.µRefCount <= 0
+			f.debugprint
+			debugger 
+			.Nop(f)
 
 	function Rewind (|fatasm| start)
 		.NopRange(start, .curr)
@@ -519,18 +531,17 @@ struct ASMState
 			  else
 				Dest = .TempOnly(prms, dest)
 		
-		if dest is ExitFunction
-			if .InlineDepth == 0
-				.TailInlineable = true
-		  else
-			//if .InlineDepth == 0
+		if dest isnt ExitFunction
 			.TailInlineable = false
+		  elseif .InlineDepth == 0
+			.TailInlineable = true
 		
 		.InlineDepth++
 		.fn = fn
 		dest.µtype = fn.RegType
 		.ReturnDest = dest
-
+		
+		if "inline_more".trap
 		rz = .TryInlineSub(prms, dest, A)
 
 		.InlineDepth--
@@ -545,13 +556,12 @@ struct ASMState
 		|fatrange| LL
 		LL.Start = .curr
 		
-		// now what?
-		//if fn ~= "gggFunc"
 		.InlineParameters(prms, dest)
-		asmtype.HoistedArg(fn.SourceArg!)
+		fn.GenASM
 		.RestoreParameters
 		ll.after = .curr
-		return ll.InlineFinish
+		if dest&asmreg.exit
+		return ll.InlineFinish(dest&asmreg.exit)
 	
 	
 	function InlineParameters (|message| prms, |asmreg| dest)
@@ -573,15 +583,15 @@ struct ASMState
 			if !v
 				v = .DeclareMe(a.source, a)
 				v = .µInto(p!, v as asmreg.DeclareInlineParam)
-			.MakeConstFromASM(a, V)
+			.MakeConstFromASM(a, V, nil)
 			p++
 	
 
 	function RestoreParameters
 		opt norefcounts
 		for a.backwards in .fn.Args
+			.MakeConstFromASM(a, nil, nil) // parameters can never be const anyhow
 			a.fatconstindex = 0
-			.MakeConstFromASM(a, asmreg()) // parameters can never be const anyhow
 			a.paramfix
 
 	

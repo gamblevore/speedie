@@ -221,7 +221,7 @@ function SetRel (fn_asm)						// function relset (
 	|| X = .ExistingVar(A, VarUseMode.set)
 		dest = .µInto(B, X)
 		|| D = a.ASMDecl
-		.MakeConstFromASM(d, dest)
+		.MakeConstFromASM(d, nil, dest)
 		return dest
 
 	// probably x.y = z, or x[y] = z 
@@ -246,14 +246,9 @@ function DeclSub (fn_asm)
 
 	|| K = .µinto(item, dest)
 	if k is ConstOutput
-		.MakeConstFromASM(ty, k)
+		.MakeConstFromASM(ty, k, nil)
 	return k
 
-
-function HoistedArg (|message| exp)
-	|SC_Hoister| H 
-	ArgSub(ASMState.Sh, exp, H)
-	h.Unhoist
 
 	
 function ArgSub (|&ASMState| self, |message| exp, |&sc_hoister| H, |AsmReg|)
@@ -611,6 +606,7 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	
 	dest = .TempTyped(exp, dest)
 	(dest is constoutput) = (ml&mr is constoutput)
+	if "ConstRemovals".trap
 	rz = (fn)(self, dest, ml, mr, exp.second!)
 	rz = rz.ConstInputFromMath(ml, mr)
 	rz.µtype = dest.µtype
@@ -635,31 +631,36 @@ function ASMLocal (|message| s, |VarUseMode| mode, |asmreg|)
 		rz = d.ThgASM
 
 
-function MakeConstFromASM (|scdecl| decl, |asmreg| K)
-	opt NoRefCounts
-	|| f = k.fat
-	if k.reg and (k is ConstOutput) and (decl isnt AlteredInBranch)
+function SetConst (|scdecl| decl, |asmreg| Initial, |&fatasm| f, |bool|)
+	if (Initial is ConstOutput) and (decl isnt AlteredInBranch)
 		if f
 			(decl is const)
 			// || k = 1, k = 2, k = k + 3
 			decl.ExportPosition = f._const
-			if !k.FatIndex
-			decl.FatConstIndex = k.fatindex
-			return 
+			if !Initial.FatIndex
+			decl.FatConstIndex = Initial.fatindex
+			return true
 		debugger 
+
+
+function MakeConstFromASM (|scdecl| decl, |asmreg| Initial, |asmreg| NewValue)
+	opt NoRefCounts
+	|| f = Initial.fat
+	if initial
+		require !.SetConst(decl, initial, f)
 
 // || k = 1, k = X	// clear here
 // y = k			// nice.
 	if decl is Const
 		(decl isnt const)
-		if f and !f.µRefCount
-			.nop(f)
+		.SoftNop(f)
 		decl.ExportPosition = 0
-		|| dclfat = decl.FatConstIndex|uint|
+		|| DK = decl.FatConstIndex|uint|
 			decl.FatConstIndex = 0
-			f = dclfat.fat
-			if !f.µRefCount 
-				.nop(f)
+			.softnop(DK.fat)
+	
+	if NewValue
+/		.SetConst(decl, newvalue, newvalue.fat)
 }
 
 
@@ -778,3 +779,4 @@ function SCDecl.ThgASM (|asmreg|)
 	
 function string.trip (|bool|)
 	return asmtype.lastdebugmark ~= self 
+

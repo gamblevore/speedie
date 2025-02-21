@@ -6,7 +6,7 @@ struct FatASM
 		sort_properties true
 	
 	// phi-nodes can actually be don simply by linking one fat to the prev
-	|byte|				RegFromFat
+	|byte|				InputFats
 	|byte|				_Op
 	|byte|				JumpReg
 	|byte| 				Outputs
@@ -16,21 +16,15 @@ struct FatASM
 	|uint[6]|			R
 	|uint16|			ASMIndex
 	|uint16| 			BlockNum
-	|uint16|			µRefCount
+	|int16|				µRefCount
 	
 	
 	function Op (|byte|)
 		return ._op
 	
-	setter Op (|byte|)
+	setter SetOp (|byte| value)
 		opt norefcounts
-		|| n = .RegFromFat|int|
-			for (b.bits in n) (i)
-				|| src = .input(i)
-					src.µRefCount = src.µRefCount - 1
-		
-		#!clear
-		.regfromfat = 0
+		.InputFats = 0
 		._op = value
 		.jumpreg = 0
 		.outputs = 0
@@ -158,20 +152,18 @@ struct FatASM
 	function RegInput (|int| a, assigns:|asmreg| Input)
 		cpp_part Prm
 		opt inline
-//		if self ~= 631
 		
 		|| i = input.FatIndex
 		.r[a] = input.treg ||| (i << 15)
 		if i
-			|| src = i.fat
-			.RegFromFat |= 1<<a
+			|| src = i.fat // we refcount dests too. shouldn't!
+			.InputFats |= 1<<a
 			src.µRefCount++
-//		.debugprint
 	
 	
 	function Dest (|uint| a, |asmreg| info)
 		opt inline
-		.reginput(A) = info
+		.r[a] = info.treg
 	
 	
 	function File (|string|)

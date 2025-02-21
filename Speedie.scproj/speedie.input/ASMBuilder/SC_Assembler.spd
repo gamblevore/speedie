@@ -56,8 +56,7 @@ module SpdAssembler
 
 		if !fn.tableid // oof
 		ASMState.Sh.InitAndStartFunc(fn)
-		|| A = fn.SourceArg!
-		ASMType.HoistedArg(A)
+		fn.GenASM
 		ASMState.Sh.FinishASM
 
 		if StdErr.ok
