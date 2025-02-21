@@ -2,7 +2,6 @@
 import "GUI"
 
 main
-	beep $"Hello"
 	return Breakout().RunAsMain(2.0, 60)
 
 // block nudge... for vibration on hit
@@ -201,7 +200,7 @@ class Breakout (Window)
 		|| L = 24s()
 		for (s in .Spirals) (i)
 			|| B = s.Screen
-			where.DrawSpiral(0.01*b.width|float|*vobject.drawscale, L, b.center, s.color, (3s+i*1s)())
+			where.DrawSpiral(0.005*b.width|float|*vobject.drawscale, L, b.center, s.color, (3s+i*1s)())
 		.BallDraw(where, .balls)
 		.BallDraw(where, .explosions)
 	
@@ -235,7 +234,7 @@ function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| Col, |f
 		|| closeness = (i - Pulse + 4.0() ).abs
 		|| strength = (-0.005*closeness.pow2).Exp * 5.0
 
-		|| P = R*(50.0+i+strength) + XY
+		|| P = R*(30.0+i+strength) + XY
 		|| Circle = (P-4.0, P+4.0)
 		|| A = ((Max-i)*2.0)/max
 		|| C = (i*0.005, 0, 0, A)+Col
