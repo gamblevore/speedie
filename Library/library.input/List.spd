@@ -24,11 +24,6 @@ class list (Saveable)
 	constructor							{ cpp_wrapper JB_Ring_Constructor0 }
 	constructor (|| Parent)				{ cpp_wrapper JB_Ring_Constructor }
 
-	target debug2
-		constructor (|string| s)
-			.constructor
-			.Position = s.Length
-
 	destructor							{ cpp_wrapper JB_Ring_Destructor }
 	
 	function Parent (||)				{ cpp_wrapper JB_Ring_Parent, nil checker }

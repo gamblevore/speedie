@@ -22,6 +22,8 @@ datatype ClassInfo (int)
 		DefaultsToReal
 		IsRole
 		IsTask
+		Stateless
+		Stateful
 		Builtin
 		SortsProperties
 		NumericReduction = [Symbol, Fixed, Flags]
@@ -968,6 +970,8 @@ module
 		if base is Object
 			(cls is SortsProperties)
 			cls.typeinfo = datatypecode._Voidptr
+		if cls.IsDataTypeOrFP
+			(cls is stateless)
 		cls.IsRole = (node ~= "role")|int|
 
 		|| SA = cls.SourceArg
@@ -1017,7 +1021,7 @@ module
 			Return M
 	
 	
-	function DataType (CollectFunc)
+	function NewDataType (CollectFunc)
 		return .DataTypeSub(node, name_space, errplace, "", SCNodetype.datatype)
 	
 

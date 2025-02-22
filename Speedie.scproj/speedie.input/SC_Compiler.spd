@@ -178,7 +178,7 @@ function CompileAll (|bool|)
 	.DoRefAnalysis				// do actual refcounts.
 
 	require .Stage( "String Correction" )
-	StringCorrector.Correctconsts
+	StringCorrector.CorrectConsts
 	
 	if Options.ModePack
 		.Timer( "Export Pack" )
@@ -511,6 +511,7 @@ function ImportAll
 	for f in .FuncList
 		f.FuncParamsLoad
 		f.LoadExportName
+		f.CheckOofifier
 		require !stderr.TooMany
 	scfunction.currfunc = nil
 

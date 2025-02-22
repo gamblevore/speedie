@@ -980,7 +980,7 @@ dispatch RootCollectTable (CollectFunc)
 	+"syntax"				SCClass.LoadSyntax
 	+"linkage"				CppRefs.Linkage
 	+"struct"				SCClass.newstruct
-	+"datatype"				SCClass.DataType
+	+"datatype"				SCClass.NewDataType
 	+"extend"				SCClass.StoreExtend
 	+"extend_module"		SCClass.StoreExtendModule
 	+"extends"				{ error (node, "I think you mean 'extend'"), return compiler.program }

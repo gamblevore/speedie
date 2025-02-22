@@ -8,6 +8,7 @@ class FastString {
 	linkage
 		wrapper
 		cpp_part FS
+		stateful
 
 // Fast appends and tools for building data formats
 

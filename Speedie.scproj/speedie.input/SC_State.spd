@@ -1,0 +1,9 @@
+
+
+function SCFunction.CheckOofifier
+	opt norefcounts
+	|| c = .cls$
+	require c is Stateless
+	for p in .args
+		require p.Type is Stateless
+	is Stateless

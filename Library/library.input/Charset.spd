@@ -2,7 +2,7 @@
 /*
 	Jeebox internals. By Theodore H. Smith...
 */
-// need to upgrade dis...
+// replace this with charproperties datatype???
 // so we can have multiple classes
 // ' \n\r\t' should be whitespace class
 // abcd... should be letterclass
@@ -15,6 +15,7 @@ class Charset
 		wrapper
 		cpp_class CharSet
 		cpp_part CS
+		stateless
 
 	constructor (|string| Chars, |bool| UseRange = false)
 		cpp_wrapper JB_CS_Constructor

@@ -9,6 +9,8 @@ class String
 		cpp_class JB_String
 		cpp_part Str
 		visible true
+		stateless
+		
 
 	cpp_refs
 		Disturbs		nil
@@ -191,7 +193,7 @@ class String
 	function Hex (|int|Spaces=0, |faststring| fs=nil, |string|)
 		cpp_wrapper JB_Str_Hex
 
-	function UnHex (|faststring| fs=nil,|string|)
+	function UnHex (|faststring| fs=nil, |string|)
 		cpp_wrapper JB_Str_UnHex
 
 	function ParseInt (|int| Start, |message| where, |int64|)

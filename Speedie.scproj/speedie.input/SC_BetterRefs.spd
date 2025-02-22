@@ -154,6 +154,17 @@ dispatch ClassLinkageTable (TranFunc)
 					name_space.iswrapper = 2
 				  else
 					error (f)
+	
+	+"stateless"
+		if name_space isa scclass
+			(name_space is stateless)
+			name_space.CheckStateful(node)
+
+	+"stateful"
+		if name_space isa scclass
+			(name_space is stateful)
+			name_space.CheckStateful(node)
+		
 
 	+"datatype"
 		if name_space isa SCClass
@@ -188,3 +199,6 @@ function SCNode.ProcessLinkage (|message| node, |dictionary of tranfunc| Table, 
 
 	return compiler.program
 
+
+function scclass.CheckStateful (|message| node)
+	expect (self isnt stateful or self isnt stateless) (node, "Can't be both stateful and stateless")
