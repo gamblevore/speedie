@@ -115,6 +115,7 @@ module Feedback
 				"".debugprint // stop from being stripped
 				asmstate.PrintProgress
 				nil|message|.jdb2
+				nil|asmreg|.DebugPrint
 				nil|message|.PrintLocate
 				fdb(nil|[scfunction]|)
 				nil|DataTypeCode|.DebugPrint

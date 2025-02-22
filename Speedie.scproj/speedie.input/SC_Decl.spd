@@ -113,6 +113,7 @@ class SCDecl (SCNamed) {
 	|Byte|				PointerCount
 	|nilreg|			NilReg
 	|byte| 				NilAllocDepth
+	|byte|				BranchDepth
 	|int|				FatConstIndex
 
 	
