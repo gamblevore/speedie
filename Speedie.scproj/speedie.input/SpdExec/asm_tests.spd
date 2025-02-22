@@ -267,17 +267,18 @@ function ForeignFuncs (|string?| x, |string?| y, |string|)
 	return x6 + x7 // fails?
 
 
-function ConstRemovals (|message| a, |string|)
+function ConstRemovals (|message| AAA, |string|)
 	|| x2 = 2
-	x2 = a.length + 0
+	x2 = aaa.length + 0
+	#!zero
 	if x2 // will not be removed :)
-		x2 = a.Length
-	#!---
-	if a.Length & 0
-		x2 = a.Length & 0
-	#!---
-	if a.Length * 0
-		x2 = a.Length * 0
+		x2 = aaA.Length
+	#!One
+	if aAa.Length & 0
+		x2 = aAA.Length & 0
+	#!Two
+	if Aaa.Length * 0
+		x2 = AaA.Length * 0
 
 
 function TestAtomic (|int|)
@@ -366,7 +367,7 @@ function AndOr2 (|bool| c, |bool| d, |int|)
 		
 
 
-target debug2 {
+target false {
 // case 1
 	
 function No1 (|int| a, |int| b, |int| c, |int|)

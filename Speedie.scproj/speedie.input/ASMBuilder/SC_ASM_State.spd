@@ -9,6 +9,7 @@ struct ASMState
 	|byte|						VTmps
 	|bool|						Inited
 	|byte|						InlineDepth
+	|byte|						BranchDepth
 	|bool|						TailInlineable
 
 	|µFunc|						Out
@@ -76,11 +77,14 @@ struct ASMState
 		if r is ConstOutput
 			|| v = r.const
 			if v == -1
+				if sub
 				.NopConst(r)
 				return v
 			v -= Sub
 			if v.IsPow2
 				.NopConst(r)
+				if !v
+					return 0
 				return v.Log2+1
 
 
@@ -409,6 +413,7 @@ struct ASMState
 		opt norefcounts
 		.ReturnDest = nil
 		.inlinedepth = 0
+		.BranchDepth = 0
 		.TailInlineable = true
 		.BasicBlock = 0
 		.VDecls = 0

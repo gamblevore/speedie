@@ -39,6 +39,10 @@ struct FatASM
 		|| r = (.r[i] << 1) >> 16
 			return r.fat
 		
+	function IsFunc (|bool|)
+		|| b = .baseop
+		return b == asm.fncx or asm.fnc
+	
 	function BaseOp (|int|)
 		rz = .op
 		if rz == asm.FNCX3
@@ -88,11 +92,25 @@ struct FatASM
 	setter Debug (|message|)
 		.msg = Value
 
-	function has (|int| a, |int| b, |bool|)
-		|| out = .r0
-		return out == a or b
+//	function has (|int| a, |int| b, |bool|)
+//		|| out = .r0
+//		return out == a or b
 	
+	function ResetFunc (|int| reg, |bool|)
+		// we will be the last instruction
+		// so how can we reset this? I thinkonly by comparing the
+		// state's vdecls. Temps will disappear.
+		|| v = ASMState.sh.VDecls
+		if v == reg and v == (.r0 - 1)
+			.Outputs = v|int|.log2
+			.r[0] = v
+			return true
+		/0
+		
 	function ResetOutput (|int| reg, |bool|)
+		if .IsFunc
+			return .ResetFunc(reg)
+		
 		|| o = .Outputs
 		if (o&1) and .r[0]
 			.r[0] = reg
@@ -164,6 +182,7 @@ struct FatASM
 	function Dest (|uint| a, |asmreg| info)
 		opt inline
 		.r[a] = info.treg
+		.Outputs |= a|int|.log2
 	
 	
 	function File (|string|)
@@ -186,9 +205,9 @@ struct FatASM
 		.jumpreg = a + 1
 		ASMState.sh.BasicBlock++
 	
-	function Jump (|int|)
-		|| j = .jumpreg
-			return .r[j]
+//	function Jump (|int|)
+//		|| j = .jumpreg
+//			return .r[j]
 
 	function JumpTo (|&fatasm|)
 		|| j = .jumpreg

@@ -221,6 +221,14 @@ datatype ASMReg (uint64)
 			.reg = dest.reg
 		return self
 	
+	
+	function DebugPrint
+		target debug
+			|| f = .fat
+				f.DebugPrint
+			  else
+				printline "r" + .reg.render
+	
 	function TmpCheck (|bool|)
 		|| R = .reg
 		|| IsTmp = self is temp

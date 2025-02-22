@@ -25,6 +25,12 @@ function ElseSub (|message?| other, |asmreg|)
 
 
 function If (fn_asm)
+	.BranchDepth++
+	rz = .ifsub(exp, dest, mode)
+	.BranchDepth--
+
+
+function IfSub (fn_asm)
 	opt norefcounts
 	
 	|| cond = exp.first!,  || arg1 = cond.next!
@@ -73,7 +79,9 @@ function While (fn_asm)
 	|sc_hoister| H 
 	|| OV = .OpenVars
 	h.HoistLoop(exp.first!)
+	.BranchDepth++
 	rz = .Whilesub(exp, dest)
+	.BranchDepth--
 	.CloseVars(OV)
 	h.Unhoist
 

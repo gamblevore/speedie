@@ -9,7 +9,7 @@ class µForm
 	|µParam[6]|		Params
 	|message| 		src
 	|int|			TotalBits
-	|int| 			Outputs
+	|int| 			RegsAltered
 	|int|			Index
 	|int|			RegForJump // remove jumpreg and use forms count
 	
@@ -72,7 +72,7 @@ class µForm
 			.AddP(5)
 		  elseif p == 'R'
 			.AddP(5, µparam.Output)
-			.Outputs++
+			.RegsAltered++
 		  elseif p == 'x' // for 64/96/128 sized instructions
 			.AddP(32, µparam.Number)
 		  elseif p == 'n'

@@ -14,6 +14,7 @@ forms
 		JUMP	l
 		Prm1	x
 		Prm2	x
+
 // func needs the reg/return wierdness defined also, but as an "ignored" value
 // so it comes after the prm info. Like 3 prms takes 15 bits, then 3 more bits for wierdness
 // using 32-bits, we can fit 5 regs leaving 7 bits for the total info with 1 bit left to spare.
@@ -84,7 +85,7 @@ forms
 	Loop
 		r1		R
 		r2		r
-		Jmp	j
+		Jmp		j
 	
 	Table
 		r1		R
@@ -131,13 +132,6 @@ forms
 		r2		r
 		r3		r
 		Inv		3
-
-//	BClear
-//		r1		R
-//		r2		R
-//		Shift1	6
-//		Shift2	6
-//		Sign	2
 	
 	Convert
 		r1		R
@@ -231,6 +225,11 @@ forms
 	RefSet1
 		r1		r		// Small R
 		r2		r
+
+	RefSetApart
+		r1		r
+		r2		r
+		r3		r
 	
 	RefSet2
 		r1		r		// Small R
@@ -507,7 +506,7 @@ POS 6
 
 
 #!						 (((((Refs)))))
-/**/ RFAP  (U3)
+/**/ RFAP  (RefSetApart)
 		SetRefApart(r, Op)
 
 /**/ RFST  (RefSet1)

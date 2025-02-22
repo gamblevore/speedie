@@ -237,6 +237,7 @@ function DeclSub (fn_asm)
 	if !exp.obj
 		debugger
 		ty = rel.first!.fastdecl
+	ty.BranchDepth = .BranchDepth
 	dest = .DeclareMe(rel, ty)
 	|| item = rel.last!
 
@@ -606,7 +607,6 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	
 	dest = .TempTyped(exp, dest)
 	(dest is constoutput) = (ml&mr is constoutput)
-	if "ConstRemovals".trap
 	rz = (fn)(self, dest, ml, mr, exp.second!)
 	rz = rz.ConstInputFromMath(ml, mr)
 	rz.µtype = dest.µtype
@@ -644,7 +644,7 @@ function SetDeclToConst (|scdecl| decl, |asmreg| Initial, |&fatasm| f, |bool|)
 
 
 function MakeConstFromASM (|scdecl| decl, |asmreg| Initial, |asmreg| NewValue)
-	description "Marks Decl as a const, if it definitely is a const. And NOT CONST, if we don't know that. also nops unused consts. Also updates new const value."
+	description "Marks Decl as a const, if it definitely is a const. Otherwise marks as NOT CONST. Also nops unused consts. Also updates new const value."
 	
 	// uncompleted code?
 
@@ -664,7 +664,7 @@ function MakeConstFromASM (|scdecl| decl, |asmreg| Initial, |asmreg| NewValue)
 			.softnop(DK.fat)
 	
 	if NewValue
-/		.SetDeclToConst(decl, newvalue, newvalue.fat)
+		.SetDeclToConst(decl, newvalue, newvalue.fat)
 }
 
 

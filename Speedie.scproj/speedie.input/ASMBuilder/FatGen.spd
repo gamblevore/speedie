@@ -556,7 +556,7 @@ function message.LUPU (|asmreg| r1, |asmreg| r2, |int| Jmp, |&fatasm|) {
 function message.RFAP (|asmreg| r1, |asmreg| r2, |asmreg| r3, |&fatasm|) {
 	visible
 	rz = self * asm.RFAP
-	rz.dest(0, r1)
+	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 }
