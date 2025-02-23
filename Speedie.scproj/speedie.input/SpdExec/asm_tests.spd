@@ -38,6 +38,7 @@ function gggFunc (|int| A, |int|)
 
 function IB2 (|scdecl| x, |bool|)
 	opt inline
+	|| y = scdeclinfo.param
 	return (!x.nilstated) and (x is param)
 
 function Inline_Branch2 (|scdecl| D)
