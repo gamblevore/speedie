@@ -47,28 +47,7 @@ helper __junktest_19__
 	|| w = message()
 	with w
 		.name = ""
-	
 
-
-module __junktest_5__
-	constants
-		a
-		b
-		c
-	|| x = {a, b, c}
-
-	function Def (|bool| g)
-		visible
-		|| x = (0, 0|byte|)
-		
-		if 1234 == 1 or 2
-		__modules__.__junktest_6__.abcvis
-		if g
-			once
-				"abc"
-		  else
-			once
-				"def"
 
 
 
