@@ -12,7 +12,7 @@ datatype ASM (uint)
 			return 1
 		return (op&3)+1
 	
-	function DebugPrint
+	function DebugPrint 
 		|| op = .decodeop
 		|| ins = instruction.TypeList[op]
 			"$op ${ins.name} (${ins.formname})"

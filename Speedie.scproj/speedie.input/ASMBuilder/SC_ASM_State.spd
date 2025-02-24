@@ -393,20 +393,30 @@ struct ASMState
 			if .Last isa asm.addr
 				addrs[] |= v.Log2
 
+
 	function VDeclsExit (|asmreg| dest, |int|)
 		if (dest is exitatall) and .returndest
 			return .VDeclsInlineStart
 		return .VDecls
 			
+
 	function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
 		|| v = .VDeclsExit(Dest)
-		v += (dest.reg < v) // NOICE
+
+		// needs fix
+		// So... if the dest is in a temp location (r31)... well... we can't put it there.
+		// So we can put it in the last, or after the last. Thats all.
+		// So it seems like unless it is equal to the last one... we have to increment it.
+		// Also... I think this can't be a temp, because we literally moved up the vdecls.
+		// 
+		
+		v += (dest.reg != v)
 		.vdecls = v
 		check (v < 32) (exp, "Too many registers in use. No space for result.")
 		dest.reg = v
 		dest.µtype = fn.RegType
-		dest = dest.Simplify
-		return dest
+//		dest isnt 
+		return dest.ReallySimplify
 
 
 	function PackMakerInit
@@ -553,8 +563,10 @@ struct ASMState
 		
 		.InlineDepth++
 		.fn = fn
+		dest.tmpcheck
 		dest = dest.simplify
 		dest.µtype = fn.RegType
+		dest.tmpcheck
 		.ReturnDest = dest
 		.VDeclsInlineStart = .vdecls
 		.branchdepth = 0

@@ -74,6 +74,9 @@ datatype ASMReg (uint64)
 			return f.f32|float64|
 
 	function Simplify (|asmreg|)
+		return .ReallySimplify as (self & temp)
+
+	function ReallySimplify (|asmreg|)
 		return self|uint16||asmreg|
 	
 	function CopyConst (|asmreg| Src, |asmreg|)
@@ -226,12 +229,18 @@ datatype ASMReg (uint64)
 		return self
 	
 	
-	function DebugPrint
+	function DebugPrint 
 		target debug
+			if self is temp
+				print "t"
+			else
+				print "r"
+			print .reg.render
 			|| f = .fat
+				print " - "
 				f.DebugPrint
 			  else
-				printline "r" + .reg.render
+				""
 	
 	function TmpCheck (|bool|)
 		|| R = .reg
