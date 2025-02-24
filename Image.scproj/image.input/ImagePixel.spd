@@ -157,6 +157,11 @@ datatype ImagePixel (uint)
 		.b = b.clamp(255)
 		.a = a.clamp(255)
 	
+	function CopyFrom (|&imagepixel| self, |&imagepixel| src, |int| N, |&imagepixel|)
+		if (src != self)
+			Memory.Copy(self, src, N*4)
+		return src - N
+		
 	syntax append (|float| v)
 		disabled "Use a vector instead."
 	

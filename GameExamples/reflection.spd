@@ -185,9 +185,14 @@ class Breakout (Window)
 	
 	
 	behaviour Drawbackground
+		|| w = where.Width
+		|| src = where[0,0]
 		for x in .Width
-			|| Col = Colors.rainbow(x div .width, 1, 0.5)
-			where.DrawLineV((x,0), .height, col)
+			src[] = Colors.rainbow(x div w, 1, 0.5)
+			src++
+		src = where[0,0]
+		for h in where.Height
+			(src - h*w).CopyFrom(src, w)
 		
 		for b in .Blocks
 			|| H = (1.0-b.health)*12th
