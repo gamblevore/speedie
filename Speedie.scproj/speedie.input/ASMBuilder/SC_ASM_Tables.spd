@@ -227,7 +227,7 @@ function SetRel (fn_asm)						// function relset (
 	// probably x.y = z, or x[y] = z 
 	dest = .µGetASM(B, asmreg()) 
 	dest = (dest asnt ASMReg.RealConst) as AsmReg.set
-	return .µ(A, dest)
+	return .µ(A, dest as asmreg.AlwaysSet)
 
 
 function DeclSub (fn_asm)
@@ -470,9 +470,9 @@ function IncrOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |
 	return fat * dest
 
 
-function IncrAmount (|asmreg| upon, |int| IsSubtract, |scdecl| D,  |int64|)
+function IncrAmount (|asmreg| upon, |int| IsPlus, |scdecl| D,  |int64|)
 	opt norefcounts
-	rz = (1,-1)(IsSubtract & 1)
+	rz = (1,-1)(IsPlus & 1)
 	if upon.isfloat
 		if upon.FourBytes
 			rz = rz|float|.asint

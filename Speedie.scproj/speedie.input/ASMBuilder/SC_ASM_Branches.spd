@@ -144,10 +144,17 @@ function Ternary		(fn_asm)
 		|| which = (A, B)(KK.Default)
 		rz = .µInto(which, dest)
 	  else
-		.µInto(A, dest)
+		|| µA = .µInto(A, dest)
 		|| Exit = exp.jump(0)
 		TernTest.AllJumpTo
 		rz = .µInto(B, dest)
+		
+		|| fa = µa.fat
+		|| fB = rz.fat
+			fb.RegInput(5, µa)	// link µA from µB... so now B refers to A.
+		  elseif fa				// Filling an unused param. No instruction use it!
+/			fa.µRefCount++	//just in case
+							
 		Exit.jumpto(.curr, self)
 
 
@@ -177,10 +184,12 @@ function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmre
 	range.after = .curr
 
 
-helper ASMBoolShrink (|message| exp,  |ASMReg| Dest,  |ASMReg| ml,  |ASMReg|)
-	if (ml.IsBool) and (dest isnt Negate) and (dest isnt CondRequest)
-		return ml.BoolAnswer								// x = a or a   -->  x = a
-	return .Exists(dest, ml, exp)							// if  a or a   -->  if a
+helper ASMBoolShrink (|message| exp,  |ASMReg| Dest,  |ASMReg| BothSame,  |ASMReg|)
+	if bothsame.isbool and (dest isnt Negate)
+		if (dest is CondRequest)								// if  a or a   -->  if a
+			return BothSame.BoolAnswer							
+		return bothsame											// x = a or a   -->  x = a
+	return .Exists(dest, BothSame, exp)							// x = int1 or int1
 
 
 helper BoolFromBools (|message| exp, |ASMReg| Dest, |opmode| opp, |ASMReg| ml, |ASMReg| mr, |ASMReg|)
@@ -414,9 +423,9 @@ Struct FatRange
 		opt inline
 		return .Constness.KnownFalse
 	
-	function InlineFinish (|ASMReg| Exit, |ASMReg|)
-		|| curr = asmstate.sh.curr
-		for s in self
+	function asmstate.InlineFinish (|fatrange| R, |ASMReg| Exit, |ASMReg|)
+		|| curr = .curr
+		for s in R
 			if s isa asm.ret
 				if rz
 					rz = rz.simplify
@@ -428,9 +437,18 @@ Struct FatRange
 				s.setop = asm.jump
 				s.JumpReg = 1
 				curr = s.JumpFix(curr)
+			  elseif s isa asm.KNST
+				curr = s.TrimConst(Curr)
+			
 		rz &= ~asmreg.exit
 		(rz as= Exit)
 	
+
+	function Fatasm.TrimConst (|&fatasm| curr, |&fatasm|)
+		|| A = ASMState.sh
+		if a.SoftNop(self) and self == Curr - 1
+			return curr-1
+		return curr 
 
 	function Fatasm.JumpFix (|&fatasm| curr, |&fatasm|)
 		isnt CondAnswer
@@ -439,7 +457,7 @@ Struct FatRange
 		if self == Curr - 1
 			curr--
 			A.nop(self)
-		return curr 
+		return curr
 	
 	
 	function AllJumpTo (|!&fatasm| curr = .curr)

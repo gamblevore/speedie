@@ -48,21 +48,25 @@ struct SC_Hoister
 			exp = exp.first! // no go into the type!
 		  elseif fn == @func
 			exp = exp.second!
-		if  (score >= 0)  and  (fn == @dot or @thg or @num)  and  (.spare > 0)
+		
+		|| GoIn = true
+		if  (fn == @dot or @thg or @num)  and  (.spare > 0)
 			|| prop = exp.ASMDecl
-			if prop.nilreg isnt hoisted
+			GoIn = prop isnt const and global
+			if (score >= 0)  and  prop.nilreg isnt hoisted
 				if prop is const
 					if (score >= 1<<29) and prop.exportposition
 						.GotConst(exp, prop)
 				  elseif prop is Global
 					.GotGlobal(exp, prop)
 	
-		for ch.fast in exp
-			|| add = 0
-			if ch.func == @tmp
-				|| ty = ch.ASMType
-				add += (ty is kWhile) * MinHoistScore
-				add -= (ty is kIf)
-				
-			.Hoist(ch, add + score)
+		if goin
+			for ch.fast in exp
+				|| add = 0
+				if ch.func == @tmp
+					|| ty = ch.ASMType
+					add += (ty is kWhile) * MinHoistScore
+					add -= (ty is kIf)
+					
+				.Hoist(ch, add + score)
 

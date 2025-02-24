@@ -452,31 +452,6 @@
 #define   Swap_Lu_(x)   (((uint)((x)<<28))>>28)
 
 
-#define   RefSet_Incri       ((( int)((Op)<<18))>>31)
-#define   RefSet_Incri_(x)   ((( int)((x)<<18))>>31)
-
-#define   RefSet_Incru       (((uint)((Op)<<18))>>31)
-#define   RefSet_Incru_(x)   (((uint)((x)<<18))>>31)
-
-#define   RefSet_Movei       ((( int)((Op)<<19))>>31)
-#define   RefSet_Movei_(x)   ((( int)((x)<<19))>>31)
-
-#define   RefSet_Moveu       (((uint)((Op)<<19))>>31)
-#define   RefSet_Moveu_(x)   (((uint)((x)<<19))>>31)
-
-#define   RefSet_Freei       ((( int)((Op)<<20))>>31)
-#define   RefSet_Freei_(x)   ((( int)((x)<<20))>>31)
-
-#define   RefSet_Freeu       (((uint)((Op)<<20))>>31)
-#define   RefSet_Freeu_(x)   (((uint)((x)<<20))>>31)
-
-#define   RefSet_Decri       ((( int)((Op)<<21))>>31)
-#define   RefSet_Decri_(x)   ((( int)((x)<<21))>>31)
-
-#define   RefSet_Decru       (((uint)((Op)<<21))>>31)
-#define   RefSet_Decru_(x)   (((uint)((x)<<21))>>31)
-
-
 #define   RefSetCode_Codei       ((( int)((Op)<<18))>>28)
 #define   RefSetCode_Codei_(x)   ((( int)((x)<<18))>>28)
 

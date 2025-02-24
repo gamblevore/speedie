@@ -5,6 +5,7 @@ struct ASMState
 	|uint16| 					BasicBlock
 	|DataTypeCode|				ReturnASM
 
+	|byte|						VDeclsInlineStart 
 	|byte|						VDecls
 	|byte|						VTmps
 	|bool|						Inited
@@ -40,18 +41,18 @@ struct ASMState
 	function Curr (|&fatasm|)
 		return ._curr
 
-	function OpenVars (|uint64|)
-		rz = (.VDecls|uint64| << 32) ||| (.vtmps << 0)
+	function OpenVars (|uint|)
+		rz = (.VDecls|uint| << 8) ||| (.vtmps << 0)
 		
-	function CloseVars (|uint64| V)
+	function CloseVars (|uint| V)
 		|| top = .vdecls
-		|| d = v.high
+		|| d = (v>>8)&255
 		while top > d
 			.Vars[top] = nil
 			top--
 			
 		.VDecls = d
-		.VTmps = v.low
+		.VTmps = v&255
 			
 	function AddFuncParams (|SCFunction| fn)
 		opt norefcounts
@@ -207,9 +208,10 @@ struct ASMState
 
 		fat.setop = asm.noop
 
-	function SoftNop (|?&fatasm| f)
+	function SoftNop (|?&fatasm| f, |bool|)
 		if f and f.µRefCount <= 0
 			.nop(f)
+			return true
 	
 	function Decr (|?&fatasm| f)
 		if f and --f.µRefCount <= 0
@@ -391,13 +393,19 @@ struct ASMState
 			if .Last isa asm.addr
 				addrs[] |= v.Log2
 
-
-	function CallFunc (|message| exp, |asmreg| dest,  |asmreg|)
-		|| v = .VDecls
+	function VDeclsExit (|asmreg| dest, |int|)
+		if (dest is exitatall) and .returndest
+			return .VDeclsInlineStart
+		return .VDecls
+			
+	function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
+		|| v = .VDeclsExit(Dest)
 		v += (dest.reg < v) // NOICE
 		.vdecls = v
 		check (v < 32) (exp, "Too many registers in use. No space for result.")
 		dest.reg = v
+		dest.µtype = fn.RegType
+		dest = dest.Simplify
 		return dest
 
 
@@ -530,6 +538,8 @@ struct ASMState
 		|| fn = A.fn
 		|| OldFunc = .fn
 		|| OldDest = .ReturnDest
+		|| OldStart = .VDeclsInlineStart
+		|| OldBranchDepth = .BranchDEpth
 		if !dest.reg and fn.ReturnType
 			if dest is discard
 				debugger // hmm?
@@ -543,15 +553,20 @@ struct ASMState
 		
 		.InlineDepth++
 		.fn = fn
+		dest = dest.simplify
 		dest.µtype = fn.RegType
 		.ReturnDest = dest
+		.VDeclsInlineStart = .vdecls
+		.branchdepth = 0
 		
-		if "inline_more".trap
 		rz = .TryInlineSub(prms, dest, A)
 
 		.InlineDepth--
-		.ReturnDest = Olddest
+
 		.fn = oldFunc
+		.ReturnDest = Olddest
+		.VDeclsInlineStart = oldstart
+		.branchdepth = oldbranchdepth
 	
 	
 	function TryInlineSub (|message| prms, |asmreg| dest, |µFunc| µ, |asmreg|)
@@ -565,8 +580,7 @@ struct ASMState
 		fn.GenASM
 		.RestoreParameters
 		ll.after = .curr
-		if dest&asmreg.exit
-		return ll.InlineFinish(dest&asmreg.exit)
+		return .InlineFinish(ll,dest&asmreg.exit)
 	
 	
 	function InlineParameters (|message| prms, |asmreg| dest)
@@ -664,24 +678,17 @@ function asmstate.RegsBitClear (|message| exp, |int| RegAddrs, |scfunction| fn)
 					exp.BFLG(i.asm, i.asm, S, S, 0)
 
 
-function asmreg.Functionify (|scfunction| fn, |asmreg|)
-	.µtype = fn.RegType
-	return .Simplify
-	
-
 function @ASMType.ASMFunction (fn_asm) // dofunction function
 	opt norefcounts
 	|| prms = exp.last!
-	|| fn = prms.asfunc!
+	|| fn = prms.AsFunc!
 	
-	dest = dest.Functionify(fn)
 	|| MiniDest = .AskForInline(prms, dest, fn)
 		return MiniDest
-	dest = .CallFunc(exp, dest)
+	dest = .CallFunc(exp, dest, fn)
 	if !fn.returntype
 		(dest is constoutput)
 	
-
 	|| Closer = .OpenVars
 	|uint| RegAddrs
 	|| P = .PrmCollect(prms, fn, RegAddrs)
@@ -699,7 +706,8 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	
 	if RegAddrs
 		.RegsBitClear(exp, RegAddrs, fn)
-
+	
+	fat.µrefcount += fn isnt stateless
 	(dest is Exit) = fn is Killer
 	return fat * dest
 

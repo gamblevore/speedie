@@ -68,6 +68,17 @@ function gggAlter (|int| A, |int| B, |int|)
 	return B-1
 
 
+function Const_Branching (|int| x, |int|)
+	|| k = 1
+	|| y = 0
+	if x
+		y = 3
+	  else
+		y = k
+	y++
+	return y
+
+
 function Inline_More
 	|| y = 1
 	y = gggFunc(y)
@@ -79,7 +90,7 @@ function Inline_More
 	#! Just alter Y
 	y = gggAlter(y, 2)
 
-	#!Y Needs separate regs for A and B
+	#!Y Separate
 	y = gggAlter(y, y)
 	
 	#! IDK
@@ -208,16 +219,18 @@ function AndOrRest (|int| a, |int| b, |bool| x3, |bool| x4, |int|) // stragglers
 	|| x10 = !(x3 and x4)
 	#!BBBB
 	x3 = (0 or b)+1				// x3 = b+1
+	#!CCCC
 	x3 = x4 or x4
-	x4 = !(a and b)
 	#!DDDD
+	x4 = !(a and b)
+	#!EEEE
 	x4 = a or b					// old bool logic
 	x3 = a and b
 	x4 = !(!a or b)
 	x3 = !(a or b)				// new bool logic
 	x4 = (a and !b)
 	x3 = !(a or !b)
-	#!CCCC
+	#!FFFF
 	return x9 + x10
 
 	

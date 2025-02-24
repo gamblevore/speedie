@@ -91,10 +91,6 @@ struct FatASM
 		
 	setter Debug (|message|)
 		.msg = Value
-
-//	function has (|int| a, |int| b, |bool|)
-//		|| out = .r0
-//		return out == a or b
 	
 	function ResetFunc (|int| reg, |bool|)
 		// we will be the last instruction

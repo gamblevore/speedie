@@ -32,6 +32,7 @@ datatype ASMReg (uint64)
 		WithinAccess
 		DeclareInlineParam
 		InlinedAccess
+		AlwaysSet = Textual  // reuse const
 		Exit = [ExitFunction, ExitAtAll]
 		RealConst  = [ConstInput, ConstOutput]
 		AddrNeed   = [AddrRequest, AddrForceRequest]
@@ -44,7 +45,7 @@ datatype ASMReg (uint64)
 	
 
 	function testbit
-		|| x = ExitAtAll
+		|| x = AddrForceRequest
 
 		
 	render
@@ -74,6 +75,9 @@ datatype ASMReg (uint64)
 
 	function Simplify (|asmreg|)
 		return self|uint16||asmreg|
+	
+	function CopyConst (|asmreg| Src, |asmreg|)
+		return (self &~ realconst) as (src & realconst)
 		
 	function Const (|int64|)
 		|| F = .FAT

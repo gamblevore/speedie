@@ -517,30 +517,33 @@ extend ASMState
 			return r
 		if !r.reg
 			return l
-		return .BitMakerSwap(dest, l, r, exp, asm.bxor)
+		return .BitMaker2(dest, l, r, exp, asm.bxor)
 
 
 	function BitOr (fn_opasm)
+		if !dest.reg
+		
 		if dest is ConstOutput
 			return .MakeConst2(dest, l, r, exp, ConstifyBitOr)
+		
 		|| ll = l.reg
 		|| rr = r.reg
-		// we should use the type... of dest?
-		// that or domath should call us?
-		if (ll == rr)
-			return l
-		if l is constoutput
-			if !l.reg
-				return r
-			if l.isconst(-1)
+
+		if dest isnt Textual
+			if (ll == rr)
 				return l
-		if r is constoutput
-			if !r.reg
-				return l
-			if r.isconst(-1)
-				return r
-		if !dest.reg
-		return .BitMakerSwap(dest, l, r, exp, asm.bor)
+			if l is constoutput
+				if !l.reg
+					return r
+				if l.isconst(-1)
+					return l
+			if r is constoutput
+				if !r.reg
+					return l
+				if r.isconst(-1)
+					return r
+		
+		return .BitMaker2(dest, l, r, exp, asm.bor)
 
 			
 	function BitAnd (fn_opasm)		
@@ -556,16 +559,18 @@ extend ASMState
 			return r
 		if .nopminusone(r)
 			return l
-		return .BitMakerSwap(dest, l, r, exp, asm.band)
+		return .BitMaker2(dest, l, r, exp, asm.band)
 
 
-	function BitMakerSwap (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
+	function BitMaker2 (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
 		if (l is ConstOutput)
 			swap (l) (r)
 		return .BitMaker(Dest, l, r, exp, op)
 	
 	
 	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
+//		if "Const_Branching".trap
+//		if "CCCC".trip
 		|| k = .const(R, 9, op!=asm.bor)
 			r = asmreg()
 		  else
@@ -631,14 +636,17 @@ extend ASMState
 		if !dr //?:O
 		if sr == dr
 			return dest								// hmmm... we are already there
-		if !sr
-			return ._num(exp, 0, dest)	// force zero. More readable
+			
+		if !sr										// must be assigning zero
+			return ._num(exp, 0, dest)				// More readable ASM.
 
 		if dest isnt temp
 			|| improve = .CanImproveAssign(dest, src)
 				if improve.ResetOutput(dr)
 					return dest
-		return .BitMakerSwap(dest, src, asmreg(), exp, asm.bor) //
+		
+		dest = dest.CopyConst(Src)
+		return .BitOr(dest as asmreg.textual, src, asmreg(), exp)
 
 
 	function NopMinusOne (|asmreg| r, |bool|)

@@ -27,7 +27,7 @@ forms
 	
 	Tail
 		JUMP	l
-		Prm1	x // also
+		Prm1	x
 		
 	Alloc
 		r1		R
@@ -209,14 +209,6 @@ forms
 		r3		R
 		r4		R
 
-	RefSet
-		r1		R
-		r2		r
-		Incr	1
-		Move	1
-		Free	1
-		Decr	1
-
 	RefSetCode
 		r1		R
 		r2		r
@@ -236,11 +228,13 @@ forms
 		r2		r
 		Decr	1
 		Offset	l
+	
 	RefSet3
 		r1		R		// Big R
 		r2		r
 		Decr	1
 		Offset	l
+	
 	RefDecrMem
 		r1		r
 		Count	7
