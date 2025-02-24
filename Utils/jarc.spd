@@ -14,6 +14,9 @@ To Dearchive: Pass just the archive, nothing else."
 
 
 main (|file| archive, |[file]| files)
+	if !files and archive.IsDir
+		files <~ archive
+		archive = archive.AddExt("jarc").File
 	if files
 		require archive.OpenEmpty
 		using "Archiving `$archive`"
