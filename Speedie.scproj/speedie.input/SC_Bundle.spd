@@ -25,20 +25,26 @@ function compiler.IdealName (|string|)
 	return TransCompiler.ProductBaseName.TrimExtAndPath
 
 
-
-function compiler.AppBuildOneLib (|file| inner, |message| lib)
-	|| ldest = inner.parent.sibling("Frameworks/" + lib.name)
+function compiler.AppBuildOneLib (|file| inner, |string| name)
+	|| ldest = inner.parent.sibling("Frameworks/" + name)
 	if ldest.exists
 		ldest.Delete
-	|| dir = "/usr/local/lib/".file
-	Dir[lib.name]!.HardLinkTo(ldest)
+	if !.TryCopyLib(ldest, name, file.speedie.child("/Library"))
+		.TryCopyLib(ldest, name, "/usr/local/lib")
+
+
+function Compiler.TryCopyLib (|file| ldest, |string| name, |string| Base, |bool|)
+	|| lib = base.Child(name).File
+	if lib.Exists
+		lib.HardLinkTo(ldest)
+		rz = true
 
 
 function compiler.AppBuildLibs (|file| inner)
 	opt norefcounts
 	for lib in linkage.osxframeworks 
 		if lib.expect(@str)				// ok so... hard-link it?
-			.AppBuildOneLib(inner, lib)
+			.AppBuildOneLib(inner, lib.name)
 
 
 function compiler.AppleBuildApp (|file| product, |file| project)
