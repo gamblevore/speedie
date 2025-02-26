@@ -6,7 +6,7 @@ function string.IsProj (|bool|)
 	return self isa "scproj" or "uwuz"
 
 function string.PathIsCode (|bool|)
-	return .isproj or .isSource
+	return .isproj or .isspd
 
 
 function @string.ASCII_Chart (|int| StartAt=32, |string|)

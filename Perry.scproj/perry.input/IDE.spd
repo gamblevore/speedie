@@ -384,7 +384,7 @@ class PerryIDE (Window)
 			.StartScreen.declutter = hidetop
 			if HideTop
 				(.DebugArgsList isnt visible)			// better to declutter
-			|| ShowBuilders = !HideTop and (!.istextonly or .path.isSource)
+			|| ShowBuilders = !HideTop and (!.istextonly or .path.isspd)
 			|| HideBuilders = !ShowBuilders
 			.runbutton.declutter		= HideBuilders
 			.buildbutton.declutter		= HideBuilders
@@ -663,7 +663,7 @@ class PerryIDE (Window)
 	function file.NeedsOwnWindow (|bool|)
 		if .IsProj
 			return true
-		if .isSource
+		if .isspd
 			rz = .parse.Find(@tmp, "main")
 
 

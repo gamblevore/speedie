@@ -139,7 +139,7 @@ function file.FindProjectMain (|file|)
 	if best.exists
 		return best
 	for c.files in inp
-		if c.isSource
+		if c.isspd
 			return c
 
 
@@ -603,7 +603,7 @@ function FileViewerCountCode (GuiMenuEvent)
 	|| Size = 0
 	for c.flat in row
 		|| L = c.ReadFrom
-		if l.isSource
+		if l.isspd
 			|| f = l.file
 				|| p = f.parse
 					FileCount++

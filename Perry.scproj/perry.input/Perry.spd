@@ -175,8 +175,7 @@ function SetTab2Name (|message| old)
 function ProjIsSpeedieCode (|bool|)
 	opt norefcounts
 	// why not just use .project?
-	|| r = .filelist.listsource.First as filerow
-		return r.location.PathIsCode
+	return .Project.PathIsCode
 	
 
 function View (|ButtonView| btn, |bool| CanChangeFocus=true)

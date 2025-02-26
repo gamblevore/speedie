@@ -216,9 +216,10 @@ extend PerryIDE
 	
 	function RenableAfterCompile
 		.DebugIsWaitingForCompile = false
-		(.buildbutton is enabled)
+		|| code = .ProjIsSpeedieCode
+		(.buildbutton is enabled) = code
+		(.runbutton is enabled) = code
 		(.buildbutton is visible)
-		(.runbutton is enabled)
 		(.progress isnt visible)
 		.HideStuff
 		isnt active
