@@ -7046,9 +7046,9 @@ void SC_Pac_TextOp(ASMState* Self, Message* M);
 
 bool SC_Pac_TextOpSub(ASMState* Self, Message* M);
 
-ASMReg SC_Pac_TryInline(ASMState* Self, Message* Prms, ASMReg Dest, FuncInASM* A);
+ASMReg SC_Pac_TryInline(ASMState* Self, Message* Prms, ASMReg Dest, FuncInASM* A, int AllowedGain);
 
-ASMReg SC_Pac_TryInlineSub(ASMState* Self, Message* Prms, ASMReg Dest, FuncInASM* xC2xB5);
+ASMReg SC_Pac_TryInlineSub(ASMState* Self, Message* Prms, ASMReg Dest, FuncInASM* xC2xB5, int AllowedGain);
 
 bool SC_Pac_Unchanged(ASMState* Self, Message* A, ASMReg Dest, Message* B);
 

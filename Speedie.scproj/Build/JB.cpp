@@ -17653,6 +17653,7 @@ ASMReg SC_Reg_OperatorMul(ASMReg Self, bool B) {
 ASMReg SC_Reg_OperatorWith(ASMReg Self, ASMReg Dest) {
 	if (SC_Reg_SyntaxIs(Dest, kSC__Reg_Declaration)) {
 		Self = SC_Reg_RegSet(Self, SC_Reg_Reg(Dest));
+		Self = (SC_Reg_SyntaxIsSet(Self, kSC__Reg_Temp, (SC_Reg_SyntaxIs(Dest, kSC__Reg_Temp))));
 	}
 	return Self;
 }
@@ -17777,10 +17778,11 @@ uint SC_Reg_treg(ASMReg Self) {
 ASMReg SC_Reg_with(ASMReg Self, ASMReg Dest, ASMReg InUse) {
 	if (SC_Reg_Reg(InUse) == SC_Reg_Reg(Dest)) {
 		Self = SC_Reg_RegSet(Self, 0);
+		Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_Temp, (!true));
+		return Self;
 	}
-	 else {
-		Self = SC_Reg_RegSet(Self, SC_Reg_Reg(Dest));
-	}
+	Self = SC_Reg_RegSet(Self, SC_Reg_Reg(Dest));
+	Self = (SC_Reg_SyntaxIsSet(Self, kSC__Reg_Temp, (SC_Reg_SyntaxIs(Dest, kSC__Reg_Temp))));
 	return Self;
 }
 
@@ -22422,14 +22424,13 @@ ASMReg SC_Pac_AddToReg(ASMState* Self, Message* Exp, ASMReg Dest, ASMReg Orig, i
 }
 
 ASMReg SC_Pac_AskForInline(ASMState* Self, Message* Prms, ASMReg Dest, SCFunction* Fn) {
+	if (SC_Str_trap(JB_LUB[1902], nil)) {
+	}
 	FuncInASM* A = Fn->ASM;
 	if (Self->InlineDepth >= 8) {
 		return nil;
 	}
 	if (!(A and (!SC_Func_HasCVersion(Fn)))) {
-		return nil;
-	}
-	if (!JB_Str_ContainsString(Self->Fn->ExportName, JB_LUB[1902])) {
 		return nil;
 	}
 	int AllowedGain = 5 + ((SC_Func_SyntaxIs(Fn, kSC__FunctionType_Inline)) * 24);
@@ -22447,12 +22448,9 @@ ASMReg SC_Pac_AskForInline(ASMState* Self, Message* Prms, ASMReg Dest, SCFunctio
 		return nil;
 	}
 	FatASM* Start = SC_Pac_Curr(Self);
-	ASMReg I = SC_Pac_TryInline(Self, Prms, Dest, A);
+	ASMReg I = SC_Pac_TryInline(Self, Prms, Dest, A, AllowedGain);
 	if (I) {
-		int Grown = SC_Pac_CurrGain(Self, Start);
-		if (Grown <= AllowedGain) {
-			return I;
-		}
+		return I;
 	}
 	SC_Pac_Rewind(Self, Start);
 	return ((ASMReg)0);
@@ -24476,7 +24474,7 @@ bool SC_Pac_TextOpSub(ASMState* Self, Message* M) {
 	return _tmPf0;
 }
 
-ASMReg SC_Pac_TryInline(ASMState* Self, Message* Prms, ASMReg Dest, FuncInASM* A) {
+ASMReg SC_Pac_TryInline(ASMState* Self, Message* Prms, ASMReg Dest, FuncInASM* A, int AllowedGain) {
 	ASMReg Rz = ((ASMReg)0);
 	SCFunction* Fn = A->Fn;
 	SCFunction* OldFunc = Self->Fn;
@@ -24505,7 +24503,7 @@ ASMReg SC_Pac_TryInline(ASMState* Self, Message* Prms, ASMReg Dest, FuncInASM* A
 	Self->ReturnDest = Dest;
 	Self->VDeclsInlineStart = Self->VDecls;
 	Self->BranchDepth = 0;
-	Rz = SC_Pac_TryInlineSub(Self, Prms, Dest, A);
+	Rz = SC_Pac_TryInlineSub(Self, Prms, Dest, A, AllowedGain);
 	(--Self->InlineDepth);
 	JB_SetRef(Self->Fn, OldFunc);
 	Self->ReturnDest = OldDest;
@@ -24514,15 +24512,21 @@ ASMReg SC_Pac_TryInline(ASMState* Self, Message* Prms, ASMReg Dest, FuncInASM* A
 	return Rz;
 }
 
-ASMReg SC_Pac_TryInlineSub(ASMState* Self, Message* Prms, ASMReg Dest, FuncInASM* xC2xB5) {
+ASMReg SC_Pac_TryInlineSub(ASMState* Self, Message* Prms, ASMReg Dest, FuncInASM* xC2xB5, int AllowedGain) {
 	SCFunction* Fn = xC2xB5->Fn;
 	FatRange LL = ((FatRange){});
 	LL.Start = SC_Pac_Curr(Self);
 	SC_Pac_InlineParameters(Self, Prms, Dest);
+	FatASM* RealStart = SC_Pac_Curr(Self);
 	SC_Func_GenASM(Fn);
 	SC_Pac_RestoreParameters(Self);
 	LL.After = SC_Pac_Curr(Self);
-	return SC_Pac_InlineFinish(Self, (&LL), SC_Reg_OperatorBitand(Dest, kSC__Reg_Exit));
+	ASMReg Result = SC_Pac_InlineFinish(Self, (&LL), SC_Reg_OperatorBitand(Dest, kSC__Reg_Exit));
+	int Grown = SC_Pac_CurrGain(Self, RealStart);
+	if (Grown <= AllowedGain) {
+		return Result;
+	}
+	return ((ASMReg)0);
 }
 
 bool SC_Pac_Unchanged(ASMState* Self, Message* A, ASMReg Dest, Message* B) {
@@ -36815,10 +36819,10 @@ void SC_Msg_DenyPreviousUse(Message* Self, Message* Msg) {
 	if (!Decl) {
 		return;
 	}
-	Message* P = ((Message*)JB_Ring_Parent(Self));
 	{
-		Message* Ch = P;
-		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(P));
+		Message* _LoopSrcf3 = ((Message*)JB_Ring_Parent(Self));
+		Message* Ch = _LoopSrcf3;
+		Message* _afterf1 = ((Message*)JB_Ring_FlatAfter(_LoopSrcf3));
 		while ((Ch) and (Ch != _afterf1)) {
 			Message* _N_f2 = ((Message*)JB_Ring_FlatNext0(Ch));
 			if (Ch == Self) {
@@ -58932,4 +58936,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 2713715246366735338 -566070858425640260
+// 1714661461396254680 -1816826226392623175
