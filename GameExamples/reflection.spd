@@ -188,11 +188,11 @@ class Breakout (Window)
 		|| w = where.Width
 		|| src = where[0,0]
 		for x in .Width
-			src[] = Colors.rainbow(x div w, 1, 0.5)
-			src++
+			src++[] = Colors.rainbow(x div w, 1, 0.5)
 		src = where[0,0]
+		|| dest = src
 		for h in where.Height
-			(src - h*w).CopyFrom(src, w)
+			Dest = dest.CopyFrom(src, w)
 		
 		for b in .Blocks
 			|| H = (1.0-b.health)*12th
