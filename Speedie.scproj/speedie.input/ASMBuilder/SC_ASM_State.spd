@@ -537,7 +537,7 @@ struct ASMState
 				rz = true
 	
 	
-	function TryInline (|message| prms, |asmreg| dest, |µFunc| A, |asmreg|)
+	function TryInline (|message| prms, |asmreg| dest, |µFunc| A, |int| AllowedGain,  |asmreg|)
 		opt norefcounts
 		|| fn = A.fn
 		|| OldFunc = .fn
@@ -565,7 +565,7 @@ struct ASMState
 		.VDeclsInlineStart = .vdecls
 		.branchdepth = 0
 		
-		rz = .TryInlineSub(prms, dest, A)
+		rz = .TryInlineSub(prms, dest, A, AllowedGain)
 
 		.InlineDepth--
 
@@ -574,19 +574,25 @@ struct ASMState
 		.VDeclsInlineStart = oldstart
 		.branchdepth = oldbranchdepth
 	
+//		|| Start = .curr
+//			|| Grown = .CurrGain(start)
+//			if Grown <= allowedgain
 	
-	function TryInlineSub (|message| prms, |asmreg| dest, |µFunc| µ, |asmreg|)
+	function TryInlineSub (|message| prms, |asmreg| dest, |µFunc| µ, |int| AllowedGain,  |asmreg|)
 		opt norefcounts
 		|| fn = µ.fn
-	
+		
 		|fatrange| LL
 		LL.Start = .curr
-		
 		.InlineParameters(prms, dest)
+		|| RealStart = .curr // params need to be done anyhow... so don't count them.
 		fn.GenASM
 		.RestoreParameters
 		ll.after = .curr
-		return .InlineFinish(ll,dest&asmreg.exit)
+		|| Result = .InlineFinish(ll, dest&asmreg.exit)
+		|| Grown = .CurrGain(RealStart)
+		if Grown <= AllowedGain
+			return Result
 	
 	
 	function InlineParameters (|message| prms, |asmreg| dest)
@@ -629,10 +635,10 @@ struct ASMState
 
 	function AskForInline (|message| prms, |asmreg| dest, |SCFunction| fn, |asmreg|)
 		opt norefcounts
+		if "hhhMaybeConst".trap
 		|| A = fn.ASM
 		require .InlineDepth < 8
 		require A and !fn.HasCVersion
-		require .fn.ExportName contains "Inline_"
 		|| AllowedGain = 5 + (fn is inline) * 24		// assume that functions have 5 instruction overhead.
 		
 		|| Grace = 9
@@ -642,10 +648,8 @@ struct ASMState
 		require (allowedGain + Grace) > a.length
 	
 		|| Start = .curr
-		|| I = .TryInline(prms, dest, A)
-			|| Grown = .CurrGain(start)
-			if Grown <= allowedgain
-				return I
+		|| I = .TryInline(prms, dest, A, allowedgain)
+			return I
 		.Rewind(start)
 	
 			
