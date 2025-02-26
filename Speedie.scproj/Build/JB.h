@@ -3082,6 +3082,8 @@ extern Array* SC__NilReason_values;
 
 #define kSC__VarUseMode_Set ((int)2)
 
+#define kSC__VarUseMode_Sometimes ((int)8)
+
 #define kSC__xC2xB5Param_Jump ((ASMParam)32)
 
 #define kSC__xC2xB5Param_NoExpect ((ASMParam)256)
@@ -3413,7 +3415,7 @@ Dictionary* SC_Comp__Adj(Message* F);
 
 void SC_Comp__AppBuildLibs(JB_File* Inner);
 
-void SC_Comp__AppBuildOneLib(JB_File* Inner, Message* Lib);
+void SC_Comp__AppBuildOneLib(JB_File* Inner, JB_String* Name);
 
 void SC_Comp__AppendCompilerTime(JB_String* S, int Durr);
 
@@ -3592,6 +3594,8 @@ void SC_Comp__Timer(JB_String* Name);
 void SC_Comp__TimerSub(JB_String* S, int Durr);
 
 bool SC_Comp__TimeTest(Date Elapsed);
+
+bool SC_Comp__TryCopyLib(JB_File* Ldest, JB_String* Name, JB_String* Base);
 
 bool SC_Comp__TryVariousStartModes();
 
@@ -6879,8 +6883,6 @@ ASMReg SC_Pac_FloatMul(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message*
 ASMReg SC_Pac_FloatPlus(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
 bool SC_Pac_FoundReg(ASMState* Self, Message* All, int R);
-
-ASMReg SC_Pac_FuncPrm(ASMState* Self, Message* Prm);
 
 ASMReg SC_Pac_If(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
@@ -11787,7 +11789,7 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 
 inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
 	if ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc, false))) {
-		JB_Msg_Fail(Self, JB_LUB[815]);
+		JB_Msg_Fail(Self, JB_LUB[818]);
 	}
 }
 

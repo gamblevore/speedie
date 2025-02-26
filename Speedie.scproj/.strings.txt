@@ -425,7 +425,7 @@
 "win"
 "lin"
 "/usr/local/include/PicoMsg/PicoMsg.h"
-"/usr/local/lib/"
+"/usr/local/lib"
 "newfloat"
 "PicoMsg.h"
 "the"
