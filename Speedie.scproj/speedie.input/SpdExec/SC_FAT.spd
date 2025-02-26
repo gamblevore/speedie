@@ -35,6 +35,12 @@ struct FatASM
 		.blocknum = 0
 		.µrefcount = 0
 	
+	function Out (|int|)
+		|| a = .Outputs|int|.LowestBit
+			a = a.log2
+			if a != 0 // asm.div?
+			return .r[a]		
+		
 	function Input (|int| i, |&fatasm|)
 		|| r = (.r[i] << 1) >> 16
 			return r.fat

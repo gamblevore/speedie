@@ -219,13 +219,17 @@ datatype ASMReg (uint64)
 	operator with (|asmreg| dest, |asmreg|)
 		if dest is Declaration
 			.reg = dest.reg
+			(self is temp) = (Dest is temp)
 		return self
 
 	function with (|asmreg| dest, |asmreg| InUse, |asmreg|)
 		if InUse.reg == dest.reg				// dest is in use!
 			.reg = 0
-		  else									// dest is free!
-			.reg = dest.reg
+			isnt temp
+			return self
+												// dest is free!
+		.reg = dest.reg
+		(self is temp) = (Dest is temp)
 		return self
 	
 	
@@ -233,7 +237,7 @@ datatype ASMReg (uint64)
 		target debug
 			if self is temp
 				print "t"
-			else
+			  else
 				print "r"
 			print .reg.render
 			|| f = .fat
