@@ -805,6 +805,7 @@ function scdecl.IsProperlyLocal (|bool|)
 	// what about a struct?
 	return true
 
+
 function scdecl.Paramfix
 	(self is param)
 	(self isnt body)
@@ -833,8 +834,8 @@ function message.DenyPreviousUse (|message| msg)
 	|| thg = msg.first!.UnBra
 	require thg.func == @thg
 	|| decl = thg.obj #require
-	|| p = .parent
-	for ch.flat in p
+
+	for ch.flat in .parent
 		if ch == self
 			return 
 		if ch.obj == decl
