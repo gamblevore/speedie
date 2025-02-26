@@ -260,10 +260,9 @@ function NilFunction (NilTrackerFn)
 	
 	|| P = prms.first
 	|| HasAddrs = false
-	// if fn ~= "LLL2"
 	for recv in fn.args
 		recv.Paramfix
-		
+		p.VariableParamSafety
 		if (recv.nildeclared is optional) and (fn.IsNilChecker != 3)
 			test |= nilcheckmode.Soft
 			
@@ -790,7 +789,7 @@ function message.Trueness (|nilstate| found, |maybebool|)
 		if found & nilstate.knownValue
 			return maybebool.Known(found is TrueValue)
 
-	  elseif Ret.isdatatypeonly and d.isdatatypeonly // nothing special
+	  elseif Ret.IsDataTypeOnly and d.IsDataTypeOnly // nothing special
 		while self == @arg or @bra
 			self = self.last
 		|| rtf = ret.type.false
@@ -801,7 +800,7 @@ function message.Trueness (|nilstate| found, |maybebool|)
 
 function scdecl.IsProperlyLocal (|bool|)
 	require self is local
-	if .isbarestruct
+	if .IsBareStruct
 		return false
 	// what about a struct?
 	return true
@@ -809,4 +808,41 @@ function scdecl.IsProperlyLocal (|bool|)
 function scdecl.Paramfix
 	(self is param)
 	(self isnt body)
+
+
+function message.VariableParamSafety
+	opt norefcounts
+	require .HasAny
+	|| fn = .func
+	if fn == @brel or @arel
+		|| s = .name[]
+		if s == '-' or '+'
+			// we are altering this... so we wanna check PREVIOUS uses of the var
+			return .DenyPreviousUse(self)
+	  else
+		for ch.flat in self
+			fn = ch.func
+			if fn == @brel or @arel
+				|| s = ch.name[]
+				if s == '&' or '-' or '+'
+					.DenyPreviousUse(ch)
+
+
+function message.DenyPreviousUse (|message| msg)
+	opt norefcounts
+	|| thg = msg.first!.UnBra
+	require thg.func == @thg
+	|| decl = thg.obj #require
+	|| p = .parent
+	for ch.flat in p
+		if ch == self
+			return 
+		if ch.obj == decl
+			error (ch, "Unsafe var passing. (Altered later in expression)")
+	
+	
+	
+	
+	
+
 
