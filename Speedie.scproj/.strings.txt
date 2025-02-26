@@ -425,7 +425,7 @@
 "win"
 "lin"
 "/usr/local/include/PicoMsg/PicoMsg.h"
-"/usr/local/lib/"
+"/usr/local/lib"
 "newfloat"
 "PicoMsg.h"
 "the"
@@ -2170,3 +2170,4 @@
 "JMPK"
 "Can't be both stateful and stateless"
 "stateless"
+"Unsafe var passing. (Altered later in expression)"

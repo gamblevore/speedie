@@ -1552,18 +1552,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2163])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2164])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2164])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2165])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2165])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2166])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2162])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2163])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2165])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2166])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2166])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2167])
 
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
@@ -1790,7 +1790,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2171])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2172])
 
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
@@ -1828,7 +1828,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2167])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2168])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1866,7 +1866,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2172])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2173])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2102,12 +2102,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2170])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2171])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2169])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2170])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2168])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2169])
 
 #define kJB__byte_max ((byte)255)
 
@@ -3082,6 +3082,8 @@ extern Array* SC__NilReason_values;
 
 #define kSC__VarUseMode_Set ((int)2)
 
+#define kSC__VarUseMode_Sometimes ((int)8)
+
 #define kSC__xC2xB5Param_Jump ((ASMParam)32)
 
 #define kSC__xC2xB5Param_NoExpect ((ASMParam)256)
@@ -3151,7 +3153,7 @@ extern bool SC__Cpp_WroteAny;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2161])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2162])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -3413,7 +3415,7 @@ Dictionary* SC_Comp__Adj(Message* F);
 
 void SC_Comp__AppBuildLibs(JB_File* Inner);
 
-void SC_Comp__AppBuildOneLib(JB_File* Inner, Message* Lib);
+void SC_Comp__AppBuildOneLib(JB_File* Inner, JB_String* Name);
 
 void SC_Comp__AppendCompilerTime(JB_String* S, int Durr);
 
@@ -3592,6 +3594,8 @@ void SC_Comp__Timer(JB_String* Name);
 void SC_Comp__TimerSub(JB_String* S, int Durr);
 
 bool SC_Comp__TimeTest(Date Elapsed);
+
+bool SC_Comp__TryCopyLib(JB_File* Ldest, JB_String* Name, JB_String* Base);
 
 bool SC_Comp__TryVariousStartModes();
 
@@ -6880,8 +6884,6 @@ ASMReg SC_Pac_FloatPlus(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message
 
 bool SC_Pac_FoundReg(ASMState* Self, Message* All, int R);
 
-ASMReg SC_Pac_FuncPrm(ASMState* Self, Message* Prm);
-
 ASMReg SC_Pac_If(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
 ASMReg SC_Pac_IfSub(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
@@ -8997,6 +8999,8 @@ bool JB_Msg_DeepEquals(Message* Self, Message* B, bool Aware);
 
 Message* SC_Msg_Deepest(Message* Self, Syntax Tmp, JB_String* Name);
 
+void SC_Msg_DenyPreviousUse(Message* Self, Message* Msg);
+
 int SC_Msg_DeprecatedClassOption(Message* Self, JB_String* Name, JB_String* Kind);
 
 void JB_Msg_Destructor(Message* Self);
@@ -9740,6 +9744,8 @@ void JB_Msg_url__(Message* Self, FastString* Fs);
 Message* SC_Msg_UseNonRefChangers(Message* Self, bool Parent);
 
 JB_String* JB_Msg_Value(Message* Self);
+
+void SC_Msg_VariableParamSafety(Message* Self);
 
 JB_String* SC_Msg_VarName(Message* Self);
 
@@ -11787,7 +11793,7 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 
 inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
 	if ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc, false))) {
-		JB_Msg_Fail(Self, JB_LUB[815]);
+		JB_Msg_Fail(Self, JB_LUB[818]);
 	}
 }
 

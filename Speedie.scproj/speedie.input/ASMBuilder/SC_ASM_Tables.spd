@@ -566,6 +566,10 @@ function message.ASMUnbra (|message|)
 		fn = .func
 	return self
 
+// would be nice to allow --X or ++X
+// however, what if its being passed to a function?
+// and the function is inline?
+// in fact, what if it isnt inline? I think we need tests for those?
 function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
 	opt	norefcounts
 	real self
