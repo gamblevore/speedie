@@ -284,12 +284,6 @@ struct ASMState
 	function Sanity 
 	
 
-	function FuncPrm (|message| prm, |asmreg|)
-		|| r = .ExistingVar(prm)
-			return r
-		return .µGetASM(prm)
-
-
 	function ReadOrWrite (|ASMReg| dest, |message| m, |asmreg| base, |asmreg| varadd, |int| index=0, |asmreg|)
 		return .ReadOrWriteSub(dest, m, base, varadd, index) * dest
 
@@ -355,7 +349,7 @@ struct ASMState
 			while p
 				|| ty = p.ASMDecl
 				if ty.SpecialRegs|int| != Ints // should get .specialregs from message somehow?
-					|| v = .FuncPrm(p!).reg
+					|| v = .µGetASM(p!).reg
 					rz  |=  v << sh
 					sh += 5
 					ic += ints
@@ -385,7 +379,7 @@ struct ASMState
 		// we'd like to collect bits on the SIMD/normal register file
 		// for nativisation. 6 - bits per thing. Still counts as a 64-bit number
 		// FuncPrmBits() also would need upgrading.
-			|| v = .FuncPrm(p!).reg
+			|| v = .µGetASM(p!).reg
 			rz  |=  v << sh
 			sh += 5
 			rz++								// Send-count (4 bits max)

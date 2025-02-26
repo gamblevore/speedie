@@ -74,11 +74,12 @@ datatype VarUseMode (int)
 		Return
 		Set	// unused so far
 		ExistingVar
+		Sometimes
 	syntax is (|varusemode| v, |bool|)
 		return self&v
-	syntax is (|varusemode| v, assigns:|bool|, |varusemode|)
-		if value
-			return self|||v
-		return self&~v
+//	syntax is (|varusemode| v, assigns:|bool|, |varusemode|)
+//		if value
+//			return self|||v
+//		return self&~v
 
 

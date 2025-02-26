@@ -29,7 +29,8 @@ function compiler.AppBuildOneLib (|file| inner, |string| name)
 	|| ldest = inner.parent.sibling("Frameworks/" + name)
 	if ldest.exists
 		ldest.Delete
-	if !.TryCopyLib(ldest, name, file.speedie.child("/Library"))
+	|| prefered = file.speedie.child("/Library")
+	if !.TryCopyLib(ldest, name, prefered)
 		.TryCopyLib(ldest, name, "/usr/local/lib")
 
 

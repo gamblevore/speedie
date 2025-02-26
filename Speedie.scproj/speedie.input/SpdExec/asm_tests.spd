@@ -30,6 +30,14 @@ function Inline_Branch1
 	if hhhMaybeConst(0)
 		x = 2
 
+function MultiSpd (|int| x, |int| y, |int| z)
+function MultiC (|int| x, |int| y, |int| z)
+	cpp_wrapper IDK
+	
+function MultiInlineTests (|int| x)
+	multispd(x, ++x, x)
+	multic(x, ++x, x)
+	
 
 function gggFunc (|int| A, |int|)
 	if A > 1
