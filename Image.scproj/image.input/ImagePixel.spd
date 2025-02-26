@@ -160,7 +160,7 @@ datatype ImagePixel (uint)
 	function CopyFrom (|&imagepixel| self, |&imagepixel| src, |int| N, |&imagepixel|)
 		if (src != self)
 			Memory.Copy(self, src, N*4)
-		return src - N
+		return self - N
 		
 	syntax append (|float| v)
 		disabled "Use a vector instead."
