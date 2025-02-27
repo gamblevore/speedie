@@ -286,9 +286,9 @@ extend String
 			if !rz
 				rz = .length		
 			
-	function CopyFileTo (|String| Dest, |bool| AttrOnly=false, |ErrorInt|)
-		return .file.copyto(dest.file, attronly)
-	
+//	function CopyFileTo (|String| Dest, |bool| AttrOnly=false, |ErrorInt|)
+//		return .file.copyto(dest.file, attronly)
+//	
 // "/a/b/c" becomes "/a", "/a/b", "/a/b/c"
 // "a/b/c"  becomes "a",  "a/b",  "a/b/c"
 
