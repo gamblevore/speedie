@@ -208,7 +208,10 @@ struct ASMState
 			.decr(f)
 
 		fat.setop = asm.noop
-
+	
+	function SofterNop (|FATASM| Fat)
+		fat.setop = asm.noop
+	
 	function AskSoftNop (|fatasm| f)
 		if f.µRefCount <= 0
 			.softnop(f)

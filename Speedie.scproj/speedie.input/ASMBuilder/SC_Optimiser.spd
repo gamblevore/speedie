@@ -35,9 +35,9 @@ function fatasm.OptBor (|asmstate| A)
 	|| n = .next
 	require p and n
 	require p.Out SameReg input
-	require n.ReplaceReg(dest&31, input)
+	require n.ReplaceReg(dest, input)
 	// what do I do now that we found this match? how to opt it?
-	a.nop(Self)
+	a.softernop(Self)
 	print "OptBor "
 	.DebugPrint
 	
