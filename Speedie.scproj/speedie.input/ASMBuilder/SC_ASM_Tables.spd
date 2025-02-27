@@ -122,13 +122,12 @@ function Return (fn_asm)
 		if d0.reg != V.reg // problem
 	|| D1 = .decr
 	|| D2 = .decr
-		
+	|| K = (.Const(V, 8, true), -1)(!D0)
 	|| fat = exp.RET(V, D1, D2, (D0!=nil)|int|, 0)
 	fat.µRefCount = 1
-	if !D0
-		|| K = .Const(V, 8, true) // return true, or -1, etc
-			fat.r[4] = K
-			fat.r[0] = 0
+	if K
+		fat.r[4] = K
+		fat.r[0] = 0
 	
 	return fat * asmreg.Exit
 	
@@ -661,11 +660,12 @@ function MakeConstFromASM (|scdecl| decl, |asmreg| Initial, |asmreg| NewValue)
 // y = k			// nice.
 	if decl is Const
 		(decl isnt const)
-		.SoftNop(f)
+		if f
+			.AskNop(f)
 		decl.ExportPosition = 0
 		|| DK = decl.FatConstIndex|uint|
 			decl.FatConstIndex = 0
-			.softnop(DK.fat)
+			.AskNop(DK.fat)
 	
 	if NewValue
 		.SetDeclToConst(decl, newvalue, newvalue.fat)

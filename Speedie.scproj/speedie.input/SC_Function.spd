@@ -72,6 +72,7 @@ linkage
 |uint16|				TmpCounter
 |uint16|				TableId
 |uint16|				AltersParams
+|uint16|				ReturnCount
 |nilstate|				NilSelf
 |byte|					ReturnedVars
 |Byte|					MinOpt
@@ -856,6 +857,7 @@ function EqualOrMoreSpecific (|SCFunction| f, |bool|)
 
 
 function CheckReturnValue (|Message| msg, |scnode| name_space)
+	.ReturnCount++
 	|| c = msg.first
 	
 	if (!c)

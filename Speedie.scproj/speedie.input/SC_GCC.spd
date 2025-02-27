@@ -503,11 +503,11 @@ function BackupCompiler (|bool|)
 		return true
 
 	.ReplaceOld( product, b )
-	Product.CopyFileTo( backup1 )
+	Product.CopyTo( backup1 )
 
 	|| DailyProduct = .MakeDailyProductPath( B )
 	|| path = DailyProduct.TrimExtAndPath
-	Product.CopyFileTo( DailyProduct )
+	Product.CopyTo( DailyProduct.file )
 	Cpp_Export.CppProduct.Copyall( path + ".cpp" )
 	Cpp_Export.HProduct.Copyall( path + ".h" )
 

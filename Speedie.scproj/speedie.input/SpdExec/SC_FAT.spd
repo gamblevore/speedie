@@ -7,6 +7,7 @@ struct FatASM
 	
 	// phi-nodes can actually be don simply by linking one fat to the prev
 	|byte|				InputFats
+	|byte|				InputRegs
 	|byte|				_Op
 	|byte|				JumpReg
 	|byte| 				Outputs
@@ -35,7 +36,7 @@ struct FatASM
 		.blocknum = 0
 		.µrefcount = 0
 	
-	function Out (|int|)
+	function Out (|uint|)
 		|| a = .Outputs|int|.LowestBit
 			a = a.log2
 			if a != 0 // asm.div?
@@ -79,13 +80,13 @@ struct FatASM
 		opt norefcounts
 		._const = value
 
-	function F32 (assigns:|float|)
-		if !value: value = 0			// rationalise
-		.const = value.AsInt
-
-	function F64 (assigns:|Float64|)
-		if !value: value = 0			// rationalise
-		.const = value.AsInt
+//	function F32 (assigns:|float|)
+//		if !value: value = 0			// rationalise
+//		.const = value.AsInt
+//
+//	function F64 (assigns:|Float64|)
+//		if !value: value = 0			// rationalise
+//		.const = value.AsInt
 		
 	function F32 (|float|)
 		rz = ((&._const)|&float|)[]
@@ -98,27 +99,27 @@ struct FatASM
 	setter Debug (|message|)
 		.msg = Value
 	
-	function ResetFunc (|int| reg, |bool|)
+	function ResetFunctionCall (|int| reg, |bool|)
 		// we will be the last instruction
 		// so how can we reset this? I thinkonly by comparing the
 		// state's vdecls. Temps will disappear.
 		|| v = ASMState.sh.VDecls
 		if v == reg and v == (.r0 - 1)
 			.Outputs = v|int|.log2
-			.r[0] = v
+			.r0 = v
 			return true
 		/0
 		
 	function ResetOutput (|int| reg, |bool|)
 		if .IsFunc
-			return .ResetFunc(reg)
+			return .ResetFunctionCall(reg)
 		
 		|| o = .Outputs
 		if (o&1) and .r[0]
-			.r[0] = reg
+			.r0 = reg
 			return true
 		if (o&2) and .r[1]
-			.r[1] = reg
+			.r1 = reg
 			return true
 
 
@@ -132,7 +133,7 @@ struct FatASM
 					return (p is Output)|maybebool|
 
 	syntax equals (|int| ID, |bool| aware, |bool|)
-		return .id == ID
+		(aware), return .id == ID
 	
 	function ID (|uint|)
 		return self - asmstate.sh.start
@@ -169,12 +170,20 @@ struct FatASM
 	function asmreg.treg (|uint|)
 		return .reg ||| ((self is Temp)<<31)
 
+	function CopyFrom (|fatasm| D)
+		(self)[0] = (d)[0]
+		for i.FatInputs in self
+			if i 
+				i.µRefCount++
+			
+		
 	function RegInput (|int| a, assigns:|asmreg| Input)
 		cpp_part Prm
 		opt inline
 		
 		|| i = input.FatIndex
 		.r[a] = input.treg ||| (i << 15)
+		.InputRegs |= 1<<a
 		if i
 			|| src = i.fat // we refcount dests too. shouldn't!
 			.InputFats |= 1<<a
@@ -216,6 +225,7 @@ struct FatASM
 			return self + 1 + .r[j-1]
 	
 	
+
 	function JumpTo (|&fatasm| value, |&asmstate| A)
 		|| j = .jumpreg
 			|| D = (value - self) - 1
@@ -228,21 +238,24 @@ struct FatASM
 			debugger
 
 	function r0 (|uint|): return .r[0]
-	function r0 (assigns:|uint|): .r[0] = value
-	function r0 (assigns:|asmreg|): .r[0] = value.treg
 	function r1 (|uint|): return .r[1]
-	function r1 (assigns:|uint|): .r[1] = value
-	function r1 (assigns:|asmreg|): .r[1] = value.treg
 	function r2 (|uint|): return .r[2]
-	function r2 (assigns:|uint|): .r[2] = value
-	function r2 (assigns:|asmreg|): .r[2] = value.treg
 	function r3 (|uint|): return .r[3]
+
+	function r0 (assigns:|uint|): .r[0] = value
+	function r1 (assigns:|uint|): .r[1] = value
+	function r2 (assigns:|uint|): .r[2] = value
 	function r3 (assigns:|uint|): .r[3] = value
+
+	function r0 (assigns:|asmreg|): .r[0] = value.treg
+	function r1 (assigns:|asmreg|): .r[1] = value.treg
+	function r2 (assigns:|asmreg|): .r[2] = value.treg
 	function r3 (assigns:|asmreg|): .r[3] = value.treg
 
 
-	function Swap (|int| a, |int| b)
-		swap (.r[a-1]) (.r[b-1])
+//	function Swap (|int| a, |int| b)
+//		swap (.r[a-1]) (.r[b-1])
+// doesnt take fatinputs or other inputs into account anyhow
 	
 	helper Step (|int| dir, |&FatASM|)
 		real self
@@ -260,12 +273,6 @@ struct FatASM
 		opt inline
 		return .step(1)
 
-	function match3_2 (|int| reg, |bool|)
-		// prefers the value to be at 3.
-		if reg == .r1
-			.swap(2, 3)
-			return true
-		return reg == .r2
 	
 	
 	function Prm (|int| i, |int|)
@@ -324,7 +331,12 @@ struct FatASM
 		if (self isa asm.knst or asm.knsr)
 			.RendaKnst(fs, fs.mark-m)
 			fs <~ ' '
-		.RendaMsg(fs, fs.mark-m)
+		|| n = fs.mark - m
+		if n <= 2
+			fs.length--
+			fs <~ "..."
+			n += 2
+		.RendaMsg(fs, n)
 	
 
 	function Exists (|bool|)
@@ -397,5 +409,24 @@ struct FatASM
 			|| fs = faststring()
 			.Renda(fs)
 			printline fs
+			
+	iterator RegInputs
+		|| ir = .InputRegs
+		|| i = 0
+		while (i < –count .r)
+			ifn ir & (1 << i)
+				i++
+				continue
+			yield i
+			i++
+			
+	iterator FatInputs
+		|| ir = .InputFats
+		|| i = 0
+		while (i < –count .r)
+			ifn ir & (1 << i)
+				continue
+			yield (.input(i))
+			i++
 
  

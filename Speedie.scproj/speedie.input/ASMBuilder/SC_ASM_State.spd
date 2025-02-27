@@ -201,17 +201,21 @@ struct ASMState
 		|| C = .curr - 1
 		if fat == C
 			._curr = C // nice
-
-		|| n = fat.InputFats|int|
-			for (b.bits in n) (i)
-				.decr fat.input(i)
+		return .softnop(fat)
+		
+	function SoftNop (|FATASM| Fat)
+		for f.fatinputs in fat
+			.decr(f)
 
 		fat.setop = asm.noop
 
-	function SoftNop (|?&fatasm| f, |bool|)
-		if f and f.µRefCount <= 0
+	function AskSoftNop (|fatasm| f)
+		if f.µRefCount <= 0
+			.softnop(f)
+	
+	function AskNop (|fatasm| f)
+		if f.µRefCount <= 0
 			.nop(f)
-			return true
 	
 	function Decr (|?&fatasm| f)
 		if f and --f.µRefCount <= 0
@@ -253,6 +257,11 @@ struct ASMState
 		rz = .µGetASM(exp, dest)
 		.CloseVars(Closer)
 
+
+	function µReffed (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
+		rz = .µGetASM(exp, dest)
+		|| f = rz.fat
+			f.µRefCount++
 
 	function µGetASM (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		opt norefcounts
@@ -349,7 +358,7 @@ struct ASMState
 			while p
 				|| ty = p.ASMDecl
 				if ty.SpecialRegs|int| != Ints // should get .specialregs from message somehow?
-					|| v = .µGetASM(p!).reg
+					|| v = .µReffed(p!).reg
 					rz  |=  v << sh
 					sh += 5
 					ic += ints
@@ -379,7 +388,7 @@ struct ASMState
 		// we'd like to collect bits on the SIMD/normal register file
 		// for nativisation. 6 - bits per thing. Still counts as a 64-bit number
 		// FuncPrmBits() also would need upgrading.
-			|| v = .µGetASM(p!).reg
+			|| v = .µReffed(p!).reg
 			rz  |=  v << sh
 			sh += 5
 			rz++								// Send-count (4 bits max)
@@ -457,7 +466,7 @@ struct ASMState
 		if !l.IsFinisher
 			debugger !.fn.returntype
 			.fn.SourceArg!.rEt(asmreg(), asmreg(), asmreg(), 0, asmreg())
-		.ImproveJumps
+		.Optimise
 
 		.out.length = .curr - .FuncStart
 		|| A = asmreg()										// GUARD
@@ -466,37 +475,23 @@ struct ASMState
 
 
 	function fatasm.JumpImprove (|bool|)
-		|| D = self
+		|| D0 = .jumpto!
+		|| D = D0
 		|| n = 0
-		while
-			n++
-			expect (n < 30) (.msg)
-			D = D.jumpto			#require
-			if d isa asm.jump
-/				.jumpto(D, asmstate.sh)
-				rz = true
-				continue
-			if d isa asm.ret
-				(self)[0] = (d)[0]
-				rz = true
-			exit
-
-
-	function ImproveJumps 
-		|| A = .Curr
-		|| J = .funcstart
-		// jumps of 0 can be rendered as a nop
-		while A > J
-			if J isa asm.jump
-				J.JumpImprove
-			J++
-
-
-//	function SetLength
-//		.out.length = .curr - .FuncStart
-//		.jsm.length = .curr - .start 
+		while d isa asm.jump
+			d = d.JumpTo!
+			expect (++n < 30) (.msg)
 		
+		if  (d isa asm.ret or d isa asm.tail)  and  (self isa asm.jump)
+/			.CopyFrom(d) // always jumping into an exit.
+			return true
 		
+		if D!=D0 // faster jump
+/			.JumpTo(D, ASMState.sh)
+			return true
+		
+
+	
 	function SmartSecretFat (|asmreg| Thg, |&fatasm|)
 		|| F = thg.fat
 			return F
@@ -560,7 +555,7 @@ struct ASMState
 		dest.tmpcheck
 		dest = dest.simplify
 		dest.µtype = fn.RegType
-		dest.tmpcheck
+		dest.TmpCheck
 		.ReturnDest = dest
 		.VDeclsInlineStart = .vdecls
 		.branchdepth = 0
@@ -574,9 +569,6 @@ struct ASMState
 		.VDeclsInlineStart = oldstart
 		.branchdepth = oldbranchdepth
 	
-//		|| Start = .curr
-//			|| Grown = .CurrGain(start)
-//			if Grown <= allowedgain
 	
 	function TryInlineSub (|message| prms, |asmreg| dest, |µFunc| µ, |int| AllowedGain,  |asmreg|)
 		opt norefcounts
@@ -635,7 +627,6 @@ struct ASMState
 
 	function AskForInline (|message| prms, |asmreg| dest, |SCFunction| fn, |asmreg|)
 		opt norefcounts
-		if "hhhMaybeConst".trap
 		|| A = fn.ASM
 		require .InlineDepth < 8
 		require A and !fn.HasCVersion
@@ -708,7 +699,15 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	|| PExt = P >> 32
 	if !PExt and (dest is ExitFunction) and !fn.HasCVersion
 		return prms.TAIL(ID, P) * (dest as asmreg.exit)
-		
+	
+	// OK... So when Inline_Branch1 calls hhhMaybeConst,
+	// the first const is removed, so there is only one remaining return point
+	// from that, we can simply allow the returner, to use whatever reg it wants
+	// this allows us to NOT use a BOR instruction to move the result.
+	// we could perhaps even better... simply do a post-sweep. seems better
+	// or else we'll be figuring everyhting out, forever.
+	
+	if "Inline_Branch1".trap
 	|| fat = prms.FNC(dest, ID, P,  PExt)
 	if fn.HasCVersion
 		fat._op = asm.FNCX
@@ -732,3 +731,44 @@ function fatasm.IsFinisher (|bool|)
 	|| o = .op|asm|
 	return o == asm.ret or asm.trap or asm.TAIL
 
+
+
+ignore
+
+	// how can we optimise this.
+	// the BOR can be removed
+	// how to remove it?
+	// we could "just do it", but what problems might that create?
+	// it depends on what we are doing with our dest...
+	
+	if x == 1
+		tmp = fnc()
+	  elseif x == 2
+		tmp = fnc2()
+	  else
+		tmp = 3
+	
+	// now what? how can we do this? well... we can't.
+	
+	// but can we easily detect this case.
+	
+	if func()
+	
+	// well... its putting it, into a temp. So that temp, is never shared
+	
+	
+	
+	asm Inline_Branch1
+		KNST: r1                  /# 0 #/              /* x = 0 */
+		KNST: r1                  /# 1 #/              /* x = 1 */
+		...                                            /* 0 */
+		KNST: t30                 /# 0.5f #/           /* 0.5 */
+		FNCX: r2, 1225, 123336, 0                      /* JB_f_SyntaxAccess(0.5) */
+		BOR:  t31, r2, r0, 0                           /* JB_f_SyntaxAccess(0.5) */
+		JBAN: t31, 1                                   /* hhhMaybeConst(0) */
+		KNST: r1                  /# 2 #/              /* x = 2 */
+		RET:  r0, r0, r0, 0, 0                         
+	
+
+	
+	
