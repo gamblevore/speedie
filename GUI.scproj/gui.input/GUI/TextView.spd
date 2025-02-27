@@ -1265,9 +1265,11 @@ class TextView (GUIControl)
 				.selrange = sel2+1
 				return true				// sigh could simplify this. cant be bothered
 			return false
-
+		
 		if (t.length == 1) and counterparts.find(t)  // stop awkward things like: " --> (")
 			require (s == "'" or "\"") and (s != t)
+		
+		// what about ' within a comment. its quite frustrating.
 			
 		|| Other = CounterParts2[c]
 		if other.equals(s) and other==after
