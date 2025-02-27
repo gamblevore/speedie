@@ -1554,18 +1554,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2166])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2165])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2167])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2166])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2168])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2167])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2165])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2164])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2168])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2167])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2169])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2168])
 
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
@@ -1792,7 +1792,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2174])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2173])
 
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
@@ -1830,7 +1830,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2170])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2169])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1868,7 +1868,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2175])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2174])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2104,12 +2104,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2173])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2172])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2172])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2171])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2171])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2170])
 
 #define kJB__byte_max ((byte)255)
 
@@ -3155,7 +3155,7 @@ extern bool SC__Cpp_WroteAny;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2164])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2163])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
