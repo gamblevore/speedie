@@ -483,11 +483,11 @@ struct ASMState
 			expect (++n < 30) (.msg)
 		
 		if  (d isa asm.ret or d isa asm.tail)  and  (self isa asm.jump)
-/			.CopyFrom(d) // always jumping into an exit.
+			.CopyFrom(d) // always jumping into an exit.
 			return true
 		
 		if D!=D0 // faster jump
-/			.JumpTo(D, ASMState.sh)
+			.JumpTo(D, ASMState.sh)
 			return true
 		
 
@@ -707,7 +707,6 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	// we could perhaps even better... simply do a post-sweep. seems better
 	// or else we'll be figuring everyhting out, forever.
 	
-	if "Inline_Branch1".trap
 	|| fat = prms.FNC(dest, ID, P,  PExt)
 	if fn.HasCVersion
 		fat._op = asm.FNCX
@@ -716,6 +715,7 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	if RegAddrs
 		.RegsBitClear(exp, RegAddrs, fn)
 	
+	if "Inline_Branch1".trap
 	fat.µrefcount += fn isnt stateless
 	(dest is Exit) = fn is Killer
 	return fat * dest

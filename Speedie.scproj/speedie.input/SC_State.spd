@@ -2,8 +2,9 @@
 
 function SCFunction.CheckOofifier
 	opt norefcounts
-	|| c = .cls$
-	require c is Stateless
+	require self is cpp
+	|| c = .cls
+	require c and c is Stateless
 	for p in .args
 		require p.Type is Stateless
 	is Stateless

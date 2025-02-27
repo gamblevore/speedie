@@ -222,10 +222,9 @@ struct FatASM
 
 	function JumpTo (|&fatasm|)
 		|| j = .jumpreg
-			return self + 1 + .r[j-1]
+			return self + 1 + .r[j-1]|int|
 	
 	
-
 	function JumpTo (|&fatasm| value, |&asmstate| A)
 		|| j = .jumpreg
 			|| D = (value - self) - 1

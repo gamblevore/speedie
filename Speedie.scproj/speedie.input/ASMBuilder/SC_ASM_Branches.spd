@@ -392,19 +392,15 @@ Struct FatRange
 		opt inline
 		return .Constness.KnownFalse
 	
-	
-	// it seems like we need to do this in two passes?
-	// there are also two cases... either we jump to asmstate.curr
-	// or we are jumping backwards.
-	
-	// even if jumping backwards, the .curr can be moved back, it just doesn't change what we are jump to.
-	// But if we are jumping forwards... and we remove 3 things off the end...
-	// however, that can't happen when interupted.
-	
-	// So we won't get it twice. It seems safe to alter the curr!
-	
-	
-	function asmstate.InlineFinish (|fatrange| R, |ASMReg| Exit, |ASMReg|)
+	iterator
+		|| curr = .after!
+		while (curr > .start)
+			curr--
+			yield curr
+
+
+extend asmstate
+	function InlineFinish (|fatrange| R, |ASMReg| Exit, |ASMReg|)
 		for s in R
 			if s isa asm.ret
 				if rz
@@ -421,29 +417,21 @@ Struct FatRange
 				ASMState.sh.AskNop(s)
 		rz &= ~ASMReg.Exit
 		(rz as= Exit)
-
-
-	function asmstate.JumpFix (|fatasm| s, |?&fatasm| curr=nil)
+	
+	
+	function JumpFix (|fatasm| s, |?&fatasm| curr=nil)
 		(s isnt CondAnswer)
 		if !curr
 			curr = .curr
 		s.JumpTo(curr, self)
 	
 	
-	function asmstate.AllJumpTo (|FatRange| range, |?&FatAsm| curr = nil)
-		if "Const_Branching".trap
+	function AllJumpTo (|FatRange| range, |?&FatAsm| curr = nil)
 		for s in range
 			if (s is CondAnswer) and !(s isa asm.knst)
 				.JumpFix(s, curr)
-
-
-	iterator
-		|| curr = .after!
-		while (curr > .start)
-			curr--
-			yield curr
 	
-
+	
 
 function @asmstate.PrintProgress (|message| exp=nil)
 	cpp_name adb 
