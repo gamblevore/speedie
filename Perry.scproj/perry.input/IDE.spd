@@ -283,10 +283,12 @@ class PerryIDE (Window)
 		|| t = .Editme.Text
 		|| sel0 = .editme.sel0
 		|| sel = .EditMe.SelText
-		|| n = sel.linecount-1			
+		|| sel2 = sel
+		if sel2.last.IsTextLine
+			sel2 = sel2.Shorten(1)
 		fs <~ "ln "
 		fs <~ t[0, sel0].LineCount
-		if n
+		|| n = sel2.linecount-1			
 			fs <~ "+"
 			fs <~ n+1
 		fs.PadTo 9
