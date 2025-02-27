@@ -553,9 +553,10 @@ module StringCorrector
 		
 		.IDsort(HasAnything)
 		
-		|| fs = where.Out
-			.WriteTable(fs)
-	
+		target !debug
+			|| fs = where.Out
+				.WriteTable(fs)
+
 	
 	function WriteTable (|faststring| fs)
 		opt norefcounts
