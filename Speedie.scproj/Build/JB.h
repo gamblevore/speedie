@@ -1554,18 +1554,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2165])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2164])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2166])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2165])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2167])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2166])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2164])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2163])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2167])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2166])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2168])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2167])
 
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
@@ -1792,7 +1792,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2173])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2172])
 
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
@@ -1830,7 +1830,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2169])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2168])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1868,7 +1868,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2174])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2173])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2104,12 +2104,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2172])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2171])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2171])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2170])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2170])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2169])
 
 #define kJB__byte_max ((byte)255)
 
@@ -2140,8 +2140,6 @@ extern SCClass* SC_TypeWrapper;
 #define kSC__ASM_ADD ((ASM_Shift)45)
 
 #define kSC__ASM_ADDK ((ASM_AddK)43)
-
-#define kSC__ASM_ADDR ((ASM_U4)34)
 
 #define kSC__ASM_ADPK ((ASM_AddK)44)
 
@@ -2214,6 +2212,8 @@ extern ASM_Encoder SC__ASM_Encoders[256];
 
 extern ASM_Encoder SC__ASM_Forms[128];
 #define kSC__ASM_GMEM ((ASM_ConstGlobal)6)
+
+#define kSC__ASM_GRAB ((ASM_U4)34)
 
 #define kSC__ASM_GSTR ((ASM_Table)83)
 
@@ -3155,7 +3155,7 @@ extern bool SC__Cpp_WroteAny;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2163])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2162])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -4285,7 +4285,7 @@ int SC_Ext__NeedNewObjForSrc(JB_String* Cpp, JB_File* Objects);
 
 int SC_Ext__NoGoodObject(JB_String* Cpp, JB_File* H, JB_File* O);
 
-void SC_Ext__PrintProduct(JB_String* S);
+void SC_Ext__PrintProduct(JB_String* S, bool ActualCompile);
 
 JB_String* SC_Ext__ProductBaseName();
 
@@ -7046,6 +7046,8 @@ ASMReg SC_Pac_SimpleTernary(ASMState* Self, ASMReg Dest, ASMReg Ma, ASMReg Mb, M
 
 FatASM* SC_Pac_SmartSecretFat(ASMState* Self, ASMReg Thg);
 
+void SC_Pac_SofterNop(ASMState* Self, FatASM* Fat);
+
 void SC_Pac_SoftNop(ASMState* Self, FatASM* Fat);
 
 ASMReg SC_Pac_Str(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
@@ -8751,8 +8753,6 @@ void SC_Msg_AddBefore(Message* Self, Message* Before, Message* NewItem);
 
 FatASM* SC_Msg_ADDK(Message* Self, ASMReg R1, ASMReg R2, int K);
 
-FatASM* SC_Msg_ADDR(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4);
-
 void JB_Msg_Adj__(Message* Self, FastString* Fs);
 
 FatASM* SC_Msg_ADPK(Message* Self, ASMReg R1, ASMReg R2, int K);
@@ -9190,6 +9190,8 @@ Message* JB_Msg_GiveArg(Message* Self);
 FatASM* SC_Msg_GMEM(Message* Self, ASMReg R1, int Value);
 
 Message* JB_Msg_GoIntoInvisArg(Message* Self, Message* Tmp, int Pos);
+
+FatASM* SC_Msg_GRAB(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4);
 
 FatASM* SC_Msg_GSTR(Message* Self, ASMReg R1, int Mode, int Add);
 
