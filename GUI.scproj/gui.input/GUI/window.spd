@@ -241,7 +241,7 @@ class Window (GUIControl)
 			item = l.SearchStep(item, fwd)
 		if item
 			L.select(item)
-		return L.doreturn
+		return L.PressReturnKey
 	
 	
 	helper MainlistView (|listview|)
