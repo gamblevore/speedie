@@ -11,7 +11,6 @@
 		AC1050142D6205ED00BB929B /* libSDL2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC1050122D6205EC00BB929B /* libSDL2.dylib */; };
 		AC15C8EF29A7852100468248 /* JB_DivSufSort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC15C8ED29A7852100468248 /* JB_DivSufSort.cpp */; };
 		AC15C8F029A7852100468248 /* JB_DivSufSort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC15C8ED29A7852100468248 /* JB_DivSufSort.cpp */; };
-		AC259FB32660E1AC0026C303 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC259FAD2660E1AC0026C303 /* Assets.xcassets */; };
 		AC33F7BE2B4FA499009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */; };
 		AC33F7C02B4FA499009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */; };
 		AC33F7C12B4FA499009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */; };
@@ -80,6 +79,7 @@
 		AC528F172961FB32005EFB9D /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC528F132961F9F0005EFB9D /* AVFoundation.framework */; };
 		AC534D772C592A2900F0D6C5 /* JB_Temporal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC534D762C592A2900F0D6C5 /* JB_Temporal.cpp */; };
 		AC534D792C592A2900F0D6C5 /* JB_Temporal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC534D762C592A2900F0D6C5 /* JB_Temporal.cpp */; };
+		AC8EA6B92D726C6F00158029 /* libSpeedie.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC8EA6B82D726C6F00158029 /* libSpeedie.dylib */; };
 		ACB2D24F29BCCAB70070E60F /* JB_Vectors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528EBF2961F9B2005EFB9D /* JB_Vectors.cpp */; };
 		ACB2D25029BCCAB70070E60F /* JB_Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528E7D2961F946005EFB9D /* JB_Globals.cpp */; };
 		ACB2D25129BCCAB70070E60F /* JB_OSX.m in Sources */ = {isa = PBXBuildFile; fileRef = AC528ED32961F9B3005EFB9D /* JB_OSX.m */; };
@@ -113,8 +113,6 @@
 		ACB2D26E29BCCAB70070E60F /* JB_String.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528EC82961F9B3005EFB9D /* JB_String.cpp */; };
 		ACB2D26F29BCCAB70070E60F /* JB_Dictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528ECF2961F9B3005EFB9D /* JB_Dictionary.cpp */; };
 		ACB2D27129BCCAB70070E60F /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC528F132961F9F0005EFB9D /* AVFoundation.framework */; };
-		ACB2D27429BCCAB70070E60F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AC259FAD2660E1AC0026C303 /* Assets.xcassets */; };
-		ACB2D27E29BCF4AD0070E60F /* libSpeedie.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC61010E2798768C00278BEF /* libSpeedie.dylib */; };
 		ACE7CA482ACAF58A005244E2 /* JB_ProcessOwner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE7CA472ACAF58A005244E2 /* JB_ProcessOwner.cpp */; };
 		ACE7CA4A2ACAF58A005244E2 /* JB_ProcessOwner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE7CA472ACAF58A005244E2 /* JB_ProcessOwner.cpp */; };
 		ACE7CA4B2ACAF58A005244E2 /* JB_ProcessOwner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ACE7CA472ACAF58A005244E2 /* JB_ProcessOwner.cpp */; };
@@ -185,8 +183,6 @@
 		AC0F6154233BA87000382DA7 /* Jeebox.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Jeebox.input; path = ../jeebox.scproj/Jeebox.input; sourceTree = "<group>"; };
 		AC1050122D6205EC00BB929B /* libSDL2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSDL2.dylib; path = ../Library/libSDL2.dylib; sourceTree = "<group>"; };
 		AC15C8ED29A7852100468248 /* JB_DivSufSort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_DivSufSort.cpp; path = ../Library/CppLib/JB_DivSufSort.cpp; sourceTree = "<group>"; };
-		AC259FAD2660E1AC0026C303 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		AC259FB22660E1AC0026C303 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AC259FBF2660EF610026C303 /* image.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = image.input; path = ../Image.scproj/image.input; sourceTree = "<group>"; };
 		AC28D04B2638AAE700635A66 /* perry.input */ = {isa = PBXFileReference; lastKnownFileType = folder; path = perry.input; sourceTree = SOURCE_ROOT; };
 		AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Pico.cpp; path = ../Library/CppLib/JB_Pico.cpp; sourceTree = "<group>"; };
@@ -261,6 +257,7 @@
 		AC534D7A2C592A3400F0D6C5 /* JB_Temporal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Temporal.cpp; path = ../Library/CppLib/JB_Temporal.cpp; sourceTree = "<group>"; };
 		AC61010E2798768C00278BEF /* libSpeedie.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libSpeedie.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC78080D256C065000ED647E /* library.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = library.input; path = ../Library/library.input; sourceTree = "<group>"; };
+		AC8EA6B82D726C6F00158029 /* libSpeedie.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSpeedie.dylib; path = Build/Debug/libSpeedie.dylib; sourceTree = "<group>"; };
 		ACB2D27929BCCAB70070E60F /* PerryDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PerryDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACB86AF9260BB58900555758 /* Perry.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Perry.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACE7CA472ACAF58A005244E2 /* JB_ProcessOwner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_ProcessOwner.cpp; path = ../Library/CppLib/JB_ProcessOwner.cpp; sourceTree = "<group>"; };
@@ -278,8 +275,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AC8EA6B92D726C6F00158029 /* libSpeedie.dylib in Frameworks */,
 				ACB2D27129BCCAB70070E60F /* AVFoundation.framework in Frameworks */,
-				ACB2D27E29BCF4AD0070E60F /* libSpeedie.dylib in Frameworks */,
 				AC1050132D6205ED00BB929B /* libSDL2.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -299,8 +296,6 @@
 		AC259FAA2660E1AC0026C303 /* OSX */ = {
 			isa = PBXGroup;
 			children = (
-				AC259FAD2660E1AC0026C303 /* Assets.xcassets */,
-				AC259FB22660E1AC0026C303 /* Info.plist */,
 			);
 			path = OSX;
 			sourceTree = "<group>";
@@ -402,6 +397,7 @@
 				AC259FAA2660E1AC0026C303 /* OSX */,
 				AC528F132961F9F0005EFB9D /* AVFoundation.framework */,
 				AC1050122D6205EC00BB929B /* libSDL2.dylib */,
+				AC8EA6B82D726C6F00158029 /* libSpeedie.dylib */,
 				AC9E1722233A859B003B433F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -585,7 +581,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ACB2D27429BCCAB70070E60F /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -593,7 +588,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AC259FB32660E1AC0026C303 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -889,6 +883,7 @@
 					"$(inherited)",
 					/usr/local/include,
 				);
+				LD_RUNPATH_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/usr/local/lib,
@@ -954,6 +949,7 @@
 					"$(inherited)",
 					/usr/local/include,
 				);
+				LD_RUNPATH_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/usr/local/lib,
@@ -1011,14 +1007,16 @@
 				FRAMEWORK_SEARCH_PATHS = $BUILT_PRODUCTS_DIR;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				INFOPLIST_FILE = OSX/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
+					"$(PROJECT_DIR)/Build/Debug",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Build/Release/Perry.app/Contents/Frameworks",
+					"$(PROJECT_DIR)/Build/Debug",
 				);
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -1055,14 +1053,16 @@
 				FRAMEWORK_SEARCH_PATHS = $BUILT_PRODUCTS_DIR;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				INFOPLIST_FILE = OSX/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
+					"$(PROJECT_DIR)/Build/Debug",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Build/Release/Perry.app/Contents/Frameworks",
+					"$(PROJECT_DIR)/Build/Debug",
 				);
 				MTL_FAST_MATH = YES;
 				OBJROOT = /tmp/build;
