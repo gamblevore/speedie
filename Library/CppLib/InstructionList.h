@@ -32,7 +32,7 @@
 &&EROR,
 &&NOOP,
 &&TRAP,
-&&ADDR,
+&&GRAB,
 &&RET,
 &&ALLO,
 &&SWAP,

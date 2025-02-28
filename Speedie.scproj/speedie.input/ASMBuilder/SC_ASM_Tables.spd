@@ -376,7 +376,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 		if dest is DeclareInlineParam // &A
 			(t is InlinedAccess)
 			return T
-		return exp.addr(dest, t, dest, t) * dest.HaveAddr
+		return exp.GRAB(dest, t, dest, t) * dest.HaveAddr
 	
 	if d is const
 		return ASMConst(self, exp, dest, d)

@@ -37,7 +37,7 @@
 
 ı TRAP: _
 	JB_App__SelfSignal(Trap_Signalu);
-ı ADDR: _
+ı GRAB: _
 	u1 = (uint64)(&u2);
 	u3 = (uint64)(&u4);
 ı RET: 

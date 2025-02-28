@@ -366,7 +366,7 @@ struct ASMState
 					sh += 5
 					ic += ints
 					fc += !ints
-					if .Last isa asm.addr
+					if .Last isa asm.GRAB
 						addrs[] |= v.Log2
 				p--
 		
@@ -396,7 +396,7 @@ struct ASMState
 			sh += 5
 			rz++								// Send-count (4 bits max)
 			p++
-			if .Last isa asm.addr
+			if .Last isa asm.GRAB
 				addrs[] |= v.Log2
 
 

@@ -101,9 +101,9 @@ function message.TRAP (|asmreg| r1, |int| Mode, |int| Signal, |&fatasm|) {
 }
 
 
-function message.ADDR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+function message.GRAB (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
 	visible
-	rz = self * asm.ADDR
+	rz = self * asm.GRAB
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
