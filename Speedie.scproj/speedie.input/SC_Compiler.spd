@@ -914,10 +914,10 @@ function Stage (|string| name, |bool|)
 	return true
 
 
-function @transcompiler.PrintProduct (|string| s)
+function @transcompiler.PrintProduct (|string| s, |bool| ActualCompile)
 	print s
 	print " `"
-	if .shouldtranscomp
+	if ActualCompile
 		print compiler.ProductPath
 	  else
 		print cpp_export.CppProduct

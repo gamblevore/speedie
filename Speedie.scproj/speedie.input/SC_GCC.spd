@@ -319,7 +319,7 @@ function IsCompilerAndNeedsInstall (|bool|)
 
 
 function ExportAndInstall (|date| elapsed)
-	if .shouldtranscomp and options.ModeCpp
+	|| ActualCompile = .shouldtranscomp and options.ModeCpp
 		if Options.ModeCpp
 			.RunCppCompile~quietly
 			|| CanInstall = compiler.TimeTest(elapsed)
@@ -329,7 +329,7 @@ function ExportAndInstall (|date| elapsed)
 		if stderr.ok
 			compiler.Bundle
 	if stderr.ok and !options.scripting
-		.PrintProduct("Product")
+		.PrintProduct("Product", ActualCompile)
 
 
 // copy this... by hard-linking. this is because xcode goes around fucking up all my files
@@ -356,7 +356,7 @@ function RunCppCompile
 	require (StdErr.OK)
 
 	if !options.silent
-		.PrintProduct("\nCompiling c++ to")
+		.PrintProduct("\nCompiling c++ to", true)
 	
 	|| CppLib = compiler.SpeedieDir("Library/CppLib/")
 	.TestNewestLib(cpplib)
