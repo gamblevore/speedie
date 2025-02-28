@@ -204,7 +204,7 @@ class ListView (GUIControl) {
 			.openmenu(sels, y - .lastbottom)
 		
 	
-	function DoReturn (|bool|)
+	function PressReturnKey (|bool|)
 		|| r = .OnReturn$
 		(r)(self, .FirstSelected)
 		return true
@@ -393,7 +393,7 @@ class ListView (GUIControl) {
 			return true
 
 		if key.IsAccept
-			return .doreturn
+			return .PressReturnKey
 		
 		if key.iscancel
 			if .DraggingRowFrom

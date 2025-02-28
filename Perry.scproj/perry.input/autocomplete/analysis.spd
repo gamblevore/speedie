@@ -71,6 +71,19 @@ function PerryIDE.ImproveFuncList (|message| result)
 			p0 = p
 
 
+function perryide.DoSuperAutoComplete (|listviewrow| row)
+	opt norefcounts
+	|| msg = .editme.MessageAtSel$
+	|| fn = msg.OwningFunc
+		.editme.ShowAndSel(fn.Position, true)
+		.SectionKeyTime = .MaybeSendMessage("callfrom", fn)
+		
+
+function PerrySuperAutoComplete (guilistevent)
+	opt norefcounts
+	.ide.DoSuperAutoComplete(row)
+	return true
+
 
 function PerryAutoCompleteSelected (GUIListEvent)
 	opt norefcounts
