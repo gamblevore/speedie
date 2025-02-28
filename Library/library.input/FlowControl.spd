@@ -183,7 +183,7 @@ class FlowControl
 				print "validation at: "
 			  else
 				if .Active >= Validate
-					name += "Debug"
+					name += "debug"
 				print "logging at: "
 			rz = "/tmp/Speedie/FlowControl".child( name + ".txt" )
 			printline 
