@@ -319,7 +319,7 @@ function IsCompilerAndNeedsInstall (|bool|)
 
 
 function ExportAndInstall (|date| elapsed)
-	if .ShouldTransComp and options.ModeCpp
+	if .shouldtranscomp and options.ModeCpp
 		if Options.ModeCpp
 			.RunCppCompile~quietly
 			|| CanInstall = compiler.TimeTest(elapsed)
@@ -329,7 +329,7 @@ function ExportAndInstall (|date| elapsed)
 		if stderr.ok
 			compiler.Bundle
 	if stderr.ok and !options.scripting
-		 .PrintProduct("Product")
+		.PrintProduct("Product")
 
 
 // copy this... by hard-linking. this is because xcode goes around fucking up all my files

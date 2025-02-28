@@ -368,7 +368,7 @@ module Feedback
 		
 		+"target"
 			Explain(Purpose, "Set names used by preprocessor. --target=AnyName")$
-			if value == "debug"
+			if value ~= "debug"
 				error "Use 'targetdebug' instead."
 			SC_Targets[value] = true
 
