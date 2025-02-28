@@ -244,7 +244,7 @@ struct MessagePosition
 	function SyntaxUsingComplete (|object| idk=nil)
 
 
-api list.JDB2
+helper list.JDB2
 	cpp_name jdb2
 	visible
 	if (Self)
@@ -253,7 +253,7 @@ api list.JDB2
 	    "(nil)"
 
 
-api list.JDB3
+helper list.JDB3
 	cpp_name jdb3
 	visible
 	if (Self)
