@@ -350,10 +350,6 @@ helper @file.OSXMaxCaseWarnings (|&int|)
 	cpp_Wrapper JB_File__Compar
 
 
-//helper file.RelaxSudo (|int| Amount = 0, |int|)
-//	cpp_wrapper
-		
-
 function string.ShellPath (|string|)
 	return .replaceall(" ", `\ `)
 
