@@ -1975,6 +1975,7 @@ function NewDestructor (CollectFunc)
 
 
 function message.MainFix (|message|)
+	using self
 	|| prms = .first
 	if !prms
 		prms = .GiveArg
@@ -2001,7 +2002,9 @@ function message.MainFix (|message|)
 
 		src_arg.Remove
 		inc_arg.TakeAllFrom( src_arg )
-		return fn_Src
+	  else
+		fn_src = nil
+	return fn_Src
 
 
 function NeuMain (CollectFunc)
