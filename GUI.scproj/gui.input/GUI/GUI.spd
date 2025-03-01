@@ -1024,13 +1024,6 @@ module GUI
 		keys.Reset
 		|| same = .IsBackground == back
 		
-		
-//		if app.prefs["dev"].Yes // what is up with these *&(&@$ keys!??
-//			beep 
-//			|| msg = "unchanged." * same
-//			|| dest = ("back", "fore")(back)
-//			app.say "to $dest. $msg"
-			
 		require !same
 		if back
 			.ForeGroundTime = 0
@@ -1246,9 +1239,8 @@ module GUI
 
 	helper KeyUpEvent (|&SDL_Event| ev, |int|)
 		|| key = ev.key.key
-		if key.iscmd and app.prefs["dev"].Yes // what is up with these *&(&@$ keys!??
-			beep 
-		keys.Removekey(key), return sdlactivity.activity
+		keys.Removekey(key)
+		return sdlactivity.activity
 
 
 	helper MouseWheelEvent (|&SDL_Event| ev, |window| w,  |int|)

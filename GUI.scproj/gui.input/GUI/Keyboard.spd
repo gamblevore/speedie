@@ -222,19 +222,6 @@ dataType Keys (int)
 		
 		helper Count (|int|)
 			disabled "Keys can be disparate"
-
-		
-		helper KeyLog (|keys| k, |string| s)
-			target __PROJECT_PERRY__
-				if k.ismodifier or Debug
-					.KeyLogSub(s + " " + k.name)
-
-		
-		helper KeyLogSub (|string| s)
-			target __PROJECT_PERRY__
-				|| w = window.front
-				if w isa perryide
-					w.LogOneAction(nil, s)
 		
 		function Reset
 			.Clear
@@ -248,9 +235,6 @@ dataType Keys (int)
 						rz = r
 					if r.Key == key // nooooo. this is bad
 						return r	// let it be-readded.
-			if !rz
-				target __PROJECT_PERRY__
-					.KeyLog(k, "AddFail")
 
 
 		helper AddKey (|keys| Key)
@@ -258,8 +242,6 @@ dataType Keys (int)
 			if  !r  or  r.key == key  and  r.state >=  GUIKeyRecordInfo.ToAdd
 				return
 			
-			target __PROJECT_PERRY__
-				.KeyLog(key, "Add")
 			r.key = key
 			r.date = GUI.FrameStart
 			r.state = GUIKeyRecordInfo.ToAdd + (key is escape)		// escape starts as "newly added"
@@ -267,31 +249,19 @@ dataType Keys (int)
 			
 		helper RemoveKey (|keys| Key)
 			|| r = key.record
-				target __PROJECT_PERRY__
-					.KeyLog(key, "Rem")
 				r.State = guiKeyRecordInfo.ToRemove
-					
-			  else
-				target __PROJECT_PERRY__
-					.KeyLog(key, "RemFail")
 	
 		
 
 		helper FlushKeys
 			|| m = .MaxKeyRecord
-			|| Any = false
 			for i in m
 				|| r = .record[i]
 				|| s = r.state
 					if s == guikeyrecordinfo.ToRemove
 						r.clear
-						any = true
 					  elseif s < guikeyrecordinfo.Stable
 						r.state = s + 1
-						any = true
-			if any
-				target __PROJECT_PERRY__
-					.KeyLog(0, "FlushKeys")
 
 
 		helper FindTwoModifiers (|keys| A, |keys| B, |&guikeyrecord|)
