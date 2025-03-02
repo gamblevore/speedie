@@ -318,23 +318,26 @@ function IsCompilerAndNeedsInstall (|bool|)
 	FlowControl.DisabledIncr(-1)
 
 
-function ExportAndInstall (|date| elapsed)
-	|| ActualCompile = .shouldtranscomp and options.ModeCpp
+function ExportAndInstall (|date| Elapsed)
+	|| ActualCompile = .ShouldTransComp and options.ModeCpp
 		if Options.ModeCpp
 			.RunCppCompile~quietly
 			|| CanInstall = compiler.TimeTest(elapsed)
 			if CanInstall and .IsCompilerAndNeedsInstall
 				.InstallCompiler
 		.ClearThis~quietly
-		if stderr.ok
+		if StdErr.OK
 			compiler.Bundle
+	
 	if stderr.ok and !options.scripting
-		.PrintProduct("Product", ActualCompile)
+		.PrintProduct("Product", ActualCompile or Options.Compile)
 
 
-// copy this... by hard-linking. this is because xcode goes around fucking up all my files
+// Copy this... by hard-linking. this is because xcode goes around fucking up all my files
 // I can't just hard-link it myself... xcode UNHARD-LINKS IT!! Now I get separate versions
 // cos xcode fucks up my shit for me. So I have to do this to work around it's stupidity.
+// only solution is to make pico a sub-git-project which is actually more complex than these
+// few lines of code.
 function CollectPico (|string| lib)
 	|| OfficialLocation = "/usr/local/include/PicoMsg/PicoMsg.h".file
 	require OfficialLocation.exists
@@ -349,7 +352,6 @@ function TestNewestLib (|file| cpplib)
 	for s in cpplib.listfiles
 		if s.visible and !s.IsDir
 			(LatestLibDate max= s.Modified)
-//	printline LatestLibDate.LocalTime
 	
 
 function RunCppCompile
@@ -398,7 +400,7 @@ function LinkOK (|file| p, |file|) // or just not a link
 function ShouldTransComp (|bool|)
 	if options.Scripting
 		return true // if were here... its cos the scripting code wants it
-	require Options.Compile  
+	require Options.Compile
 
 	if options.ForceRecompile
 		return true
