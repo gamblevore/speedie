@@ -128,7 +128,7 @@ ivec4* JB_ASM__Run(u32* Code, u32 CodeLength) {
 void*	JB_ASM__Load		(JB_StringC* S) {
 	return 0;
 }
-void** JB_ASM_InitTable(jb_vm* vm, int n) {
+void** JB_ASM_InitTable(jb_vm* vm, int n, int g) {
 	return 0;
 }
 ivec4* JB_ASM__Registers(jb_vm* V, bool i) {
