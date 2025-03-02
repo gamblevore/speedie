@@ -18,12 +18,12 @@ module PackMaker
 			.PackFuncs <~ f
 
 		
-	function AddAll
+	function AddAll (|int|)
 		opt norefcounts
 		for f in Compiler.FuncList
 			if f.CanLibLoad
 				.addfunc(f)
-		.SortAll
+		return .SortAll
 	
 	
 	// we want to always create libglobs?
@@ -42,7 +42,7 @@ module PackMaker
 		lib.exit
 
 
-	function SortAll 
+	function SortAll (|int|)
 		opt norefcounts
 		|| FnInit = compiler.xfunc("JB_Init_") // we need app and pack inits separately
 		|| FnMain = compiler.xfunc("JB_Main")
@@ -51,14 +51,15 @@ module PackMaker
 		fninit.tableid = 1 // put init and main first!
 		fnmain.tableid = 2
 
-		.SortSub(.libfuncs, true)
-		.SortSub(.Packfuncs, false)
+		.SortASMFuncs(.Packfuncs, 0)
+		|| pg = .OrderGlobals(.PackGlobs)
+		return .SortASMFuncs(.libfuncs, pg)
 	
 	
-	helper SortSub (|[scfunction]| list, |bool| test)
+	helper SortASMFuncs (|[scfunction]| list, |int| PackGlobalSpace, |int|)
 		target debug
-			|| Table = (jb_vm.vm.InitTable(list.length+31), nil)(test)
-		(test)
+			|| Table = (jb_vm.vm.InitTable(list.length+31,PackGlobalSpace), nil)(PackGlobalSpace)
+		(PackGlobalSpace)
 		list.sort(SCFuncSorter)
 
 		|| ID = 0
@@ -68,6 +69,7 @@ module PackMaker
 			target debug
 				if Table
 					Table[id+31] = jb_vm.Load(f.exportname)
+		return PackGlobalSpace
 
 	
 	function WriteLibFuncs (|jbin!| j)
@@ -108,8 +110,12 @@ module PackMaker
 			return mod.Findfunction(s)
 	
 	
+	function AllocateGlobsForSelfTest (|int| G)
+		
+		
 	function RunAFewTests 
-/		|scfunction--| fn
+		target debug {
+		|scfunction--| fn
 		fn = .testfn("SemiConst")
 		if fn
 			for i in 2
@@ -156,16 +162,17 @@ module PackMaker
 			
 		fn = .testfn("TestAtomic")
 		if fn
-			|| atomic = fn.TestObesity|&int|[]
+			/|| atomic = fn.TestObesity|&int|[]
 			printline atomic
-	
+		}
 	
 	function MakePack 
 		if (–sizeof FatASM) != 64
 		ASMState.Sh.PackMakerInit			// fn_asm_table[@arg]
-		PackMaker.AddAll
-		|| pg = .OrderGlobals(.PackGlobs)
+		|| pg = PackMaker.AddAll
 		require .ActualASMCompile
+		target debug
+			.AllocateGlobsForSelfTest(pg)
 
 		|| j = jbin(@tmp, "xpd")
 		j.enter
@@ -190,7 +197,7 @@ module PackMaker
 			|| s = d.CarraySize
 			|| s16 = s min 16
 			rz = rz align s16
-			d.ExportPosition = rz / s16
+			d.ExportPosition = rz
 			rz += s
 
 	
@@ -198,9 +205,15 @@ module PackMaker
 		opt norefcounts
 		|| mu = .asm
 			|| mu2 = mu.µTest
+//			scfunction.currfunc = self
+//			asmstate.sh.start = mu.IR
+//			asmstate.sh._Curr = mu.ir + mu.Length
 			mu.debugprint
 			return jb_vm.Run(mu2.ptr, mu2.length)
 	
+	
+	function µfunc.DebugASM
+			
 	
 	syntax access (|int| v, assigns:|int64|)
 		|| r = jb_vm.vm.Registers(false)+v

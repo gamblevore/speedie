@@ -176,9 +176,9 @@ datatype ASMReg (uint64)
 		K.µtype = self
 		return K
 	
-	function Fatasm.HaveAddr (|&fatasm|)
-		.info = .info.HaveAddr
-		return self
+//	function Fatasm.HaveAddr (|&fatasm|)
+//		.info = .info.HaveAddr
+//		return self
 		
 	function HaveAddr (|asmreg|)
 		rz = self asnt AddrNeed
@@ -189,14 +189,12 @@ datatype ASMReg (uint64)
 	
 	function Reg (assigns:|int|, |AsmReg|)
 		self &= ~(31<<11)|asmreg|
-		(self as= (value << 11)|asmreg|)
+		(self as= ((value&31) << 11)|asmreg|)
+		(self is temp) = (value >> 31)
 		return self
 	
 	operator mul (|bool| b, |asmreg|)
 		return (self, nil)(b)
-	
-//	syntax cast (|bool|)
-//		return self|bool|
 	
 	syntax cast (|int|)
 		cpp_part ToInt

@@ -5,7 +5,7 @@
 
 
 main // speedie main {
-	Compiler.SetupEnv	
+	Compiler.SetupEnv
 	Compiler.MiniTests
 	Compiler.Main
 	Compiler.PrintResults
@@ -29,8 +29,8 @@ function Compiler.PrintResults
 	if SpdProcess.parent != nil
 		"Exiting Speedie ${app.id}"
 
-	if options.selfreplacement and filedes.stdout.isterminal
-		if .variantsuffix ~= "Test"
+	if options.SelfReplacement and FileDes.StdOut.IsTerminal
+		if .VariantSuffix ~= "Test"
 			|| msg = ("Success", "Failed")(ok)
 			app.say(msg, false)
 	if Options.Beep

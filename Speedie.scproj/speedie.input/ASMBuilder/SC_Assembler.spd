@@ -53,7 +53,7 @@ module SpdAssembler
 
 	function GenerateASM (|scfunction| fn, |bool|) // memory safe ASM reattempt
 		opt norefcounts
-
+		
 		if !fn.tableid // oof
 		ASMState.Sh.InitAndStartFunc(fn)
 		fn.GenASM

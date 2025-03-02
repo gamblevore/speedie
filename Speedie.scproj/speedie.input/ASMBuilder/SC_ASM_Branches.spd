@@ -25,9 +25,9 @@ function ElseSub (|message?| other, |asmreg|)
 
 
 function If (fn_asm)
-	.BranchDepth++
+	.state.BranchDepth++
 	rz = .ifsub(exp, dest, mode)
-	.BranchDepth--
+	.state.BranchDepth--
 
 
 function IfSub (fn_asm)
@@ -45,7 +45,7 @@ function IfSub (fn_asm)
 
 	.BasicBlock++
 	|| Arg1Return = ASMType.arg(self, arg1)
-	if b.always or !other
+	if b.always or !other.HasAsmStuff
 		.AllJumpTo(b)
 		.BasicBlock++
 		return Arg1Return * b.always					// ^^^ if k1: return 
@@ -79,17 +79,17 @@ function While (fn_asm)
 	|sc_hoister| H 
 	|| OV = .OpenVars
 	h.HoistLoop(exp.first!)
-	.BranchDepth++
-	rz = .Whilesub(exp, dest)
-	.BranchDepth--
+	.state.BranchDepth++
+	rz = .WhileSub(exp, h)
+	.state.BranchDepth--
 	.CloseVars(OV)
 	h.Unhoist
 
 
-function WhileSub (fn_asm)
+function WhileSub (|message| exp,  |sc_hoister| H,  |asmreg|)
 	opt norefcounts
-	|| begin = exp.JUMP(0)											// test goes after loop
-	|| Returns = ASMType.arg(self, exp.second!)						// arg
+	|| begin = exp.JUMP(0)												// test goes after loop
+	|| Returns = ASMType.argsub(self, exp.second!, H)					// arg
 
 	|FatRange| loop_test
 	|| LT = .Branch(exp.first!, loop_test, true)
@@ -400,7 +400,7 @@ Struct FatRange
 
 
 extend asmstate
-	function InlineFinish (|fatrange| R, |ASMReg| Exit, |ASMReg|)
+	function InlineFinishWithConsts (|fatrange| R, |ASMReg|)
 		for s in R
 			if s isa asm.ret
 				if rz
@@ -409,14 +409,15 @@ extend asmstate
 					|| dest = s.input(0)
 						rz = dest.info 
 					  else
-						rz = (s.r[0] & 31).asm
+						rz = s.r[0]|int|.asm
 				s.SetOp = asm.jump
 				s.JumpReg = 1
 				.JumpFix(s)
 			  elseif s isa asm.KNST
 				ASMState.sh.AskNop(s)
+		
 		rz &= ~ASMReg.Exit
-		(rz as= Exit)
+		(rz as= .state.return&asmreg.exit)
 	
 	
 	function JumpFix (|fatasm| s, |?&fatasm| curr=nil)

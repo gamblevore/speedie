@@ -108,7 +108,7 @@ function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest,   |AsmRe
 
 function Return (fn_asm)
 	opt norefcounts
-	|| L = .returndest		// can remove constants, so try first
+	|| L = .state.return		// can remove constants, so try first
 		return InlinedReturn(self, exp, L)
 
 	|asmreg| V 
@@ -236,7 +236,7 @@ function DeclSub (fn_asm)
 	if !exp.obj
 		debugger
 		ty = rel.first!.fastdecl
-	ty.BranchDepth = .BranchDepth
+	ty.BranchDepth = .state.BranchDepth
 	dest = .DeclareMe(rel, ty)
 	|| item = rel.last!
 
@@ -393,7 +393,8 @@ function GlobAddr (|scdecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 		|int64| iTable = d.ExportPosition
 		expect (iTable > 0)          (exp, "No global address".internal)
 		expect (iTable <= 18~bits)   (exp, "Used over 256K of global data")
-		Dest = exp.GTAB(dest,  (!d.IsLib)|int|,  iTable) * dest
+//		if "TestAtomic".trap
+		Dest = exp.GTAB(dest,  (d.IsLib)|int|,  iTable) * dest
 	dest.µtype = DataTypeCode._voidptr
 	return dest.HaveAddr
 
@@ -565,6 +566,7 @@ function message.ASMUnbra (|message|)
 		fn = .func
 	return self
 
+
 // would be nice to allow --X or ++X
 // however, what if its being passed to a function?
 // and the function is inline?
@@ -682,18 +684,10 @@ function SCFunction.TrackReturns (|scdecl| D)
 function message.HasAsmStuff (|bool|)
 	opt norefcounts
 	for ch in self
-		|| fn = ch.BraFunc
+		|| chh = ch.ASMUnbra
+		|| fn = chh.func
 		if fn != @sheb and @num and @char
 			return true
-
-
-function message.BraFunc (|syntax|)
-	opt norefcounts
-	while self
-		|| fn = .func
-		if fn != @bra
-			return fn
-		self = .first
 
 
 function FatASM.FloatConvConst (|int| DestBitSize, |int64|)

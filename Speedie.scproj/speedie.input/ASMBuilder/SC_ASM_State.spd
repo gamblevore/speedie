@@ -1,22 +1,28 @@
 
 
+struct InlineBlock
+	|scfunction!--|	Fn    
+	|asmreg|		Return
+	|byte|			VDecls
+	|byte|			BranchDepth
+	|byte|			InlineDepth
+
+
 struct ASMState
 	linkage: cpp_part Pac
 	|uint16| 					BasicBlock
 	|DataTypeCode|				ReturnASM
 
-	|byte|						VDeclsInlineStart 
+	|InlineBlock|				State
+	|byte|						DeepestInline
+	|byte|						InlineLimit
 	|byte|						VDecls
 	|byte|						VTmps
 	|bool|						Inited
-	|byte|						InlineDepth
-	|byte|						BranchDepth
 	|bool|						TailInlineable
 
 	|µFunc|						Out
-	|scfunction!|				Fn    
 
-	|asmreg|					ReturnDest
 	|memory of fatasm|			JSM
 	|&FatASM|					FuncStart
 	|&fatasm|					LastDebug
@@ -37,7 +43,8 @@ struct ASMState
 		|ASMState|					Sh
 
 
-	
+	function fn (|scfunction!--|)
+		return .state.fn
 	function Curr (|&fatasm|)
 		return ._curr
 
@@ -134,8 +141,8 @@ struct ASMState
 	function DeclareMe (|Message| where,  |scdecl| Type,  |asmreg|)
 		|| t = Type.CalculateASMType
 		// if we have a var, that we are returning, and we are an inline.
-		if .ReturnDest and (type is ReturnedVar) and (.fn.ReturnedVars == 1)
-			t = .ReturnDest
+		if .state.Return and (type is ReturnedVar) and (.state.fn.ReturnedVars == 1)
+			t = .state.Return
 			Type.wholetype = t|DataTypeCode|
 			return t
 		
@@ -401,8 +408,8 @@ struct ASMState
 
 
 	function VDeclsExit (|asmreg| dest, |int|)
-		if (dest is exitatall) and .returndest
-			return .VDeclsInlineStart
+		if (dest is ExitAtAll) and .state.return
+			return .state.VDecls
 		return .VDecls
 			
 
@@ -435,10 +442,11 @@ struct ASMState
 	
 	function InitAndStartFunc (|scfunction| fn)
 		opt norefcounts
-		.ReturnDest = nil
-		.inlinedepth = 0
-		.BranchDepth = 0
+		.state.Return = nil
+		.state.inlinedepth = 0
+		.state.BranchDepth = 0
 		.TailInlineable = true
+		.InlineLimit = 8
 		.BasicBlock = 0
 		.VDecls = 0
 		.VTmps = 32
@@ -456,7 +464,7 @@ struct ASMState
 		.LastDebug = .curr
 		.FuncStart = .curr
 		.out = fn.NeedµFunc
-		.fn = fn
+		.state.fn = fn
 		scfunction.currfunc = fn
 		.ReturnASM = fn.ReturnType.regtype
 		.AddFuncParams(fn)
@@ -523,11 +531,11 @@ struct ASMState
 			return ASMType.ThgSub(self, exp, ASMReg.ConstRequest)
 	
 	
-	function CanReuseParam (|message| Prms, |asmreg| Dest, |scdecl| A, |int| vr, |bool|)
+	function CanReuseParam (|message| Prms, |scdecl| A, |int| vr, |bool|)
 		opt norefcounts
 		if a isnt altered
 			return true
-		require (dest.reg == vr)
+		require (.state.return.reg == vr)
 		for p.fast in prms
 			// check for the address of the same var?
 			if .ExistingVar(p).reg == vr
@@ -537,11 +545,9 @@ struct ASMState
 	
 	function TryInline (|message| prms, |asmreg| dest, |µFunc| A, |int| AllowedGain,  |asmreg|)
 		opt norefcounts
+		|| Start = .curr
 		|| fn = A.fn
-		|| OldFunc = .fn
-		|| OldDest = .ReturnDest
-		|| OldStart = .VDeclsInlineStart
-		|| OldBranchDepth = .BranchDEpth
+		|inlineblock| Old = .state
 		if !dest.reg and fn.ReturnType
 			if dest is discard
 				debugger // hmm?
@@ -550,54 +556,50 @@ struct ASMState
 		
 		if dest isnt ExitFunction
 			.TailInlineable = false
-		  elseif .InlineDepth == 0
+		  elseif .state.InlineDepth == 0
 			.TailInlineable = true
 		
-		.InlineDepth++
-		.fn = fn
-		dest.tmpcheck
+		|int| D = ++.state.InlineDepth
+		.DeepestInline = D max .DeepestInline
+		.state.fn = fn
 		dest = dest.simplify
 		dest.µtype = fn.RegType
-		dest.TmpCheck
-		.ReturnDest = dest
-		.VDeclsInlineStart = .vdecls
-		.branchdepth = 0
+		.state.Return = dest
+		.state.VDecls = .vdecls
+		.state.branchdepth = 0
 		
-		rz = .TryInlineSub(prms, dest, A, AllowedGain)
-
-		.InlineDepth--
-
-		.fn = oldFunc
-		.ReturnDest = Olddest
-		.VDeclsInlineStart = oldstart
-		.branchdepth = oldbranchdepth
+		rz = .TryInlineSub(prms, A, AllowedGain)
 	
+		.state = old
+		if !rz
+			.Rewind(start)
+
 	
-	function TryInlineSub (|message| prms, |asmreg| dest, |µFunc| µ, |int| AllowedGain,  |asmreg|)
+	function TryInlineSub (|message| prms, |µFunc| µ, |int| AllowedGain,  |asmreg|)
 		opt norefcounts
 		|| fn = µ.fn
 		
 		|fatrange| LL
 		LL.Start = .curr
-		.InlineParameters(prms, dest)
-		|| RealStart = .curr // params need to be done anyhow... so don't count them.
+		.InlineParameters(prms)
+		|| RealStart = .curr		// Params need to be done anyhow... so don't count them.
 		fn.GenASM
 		.RestoreParameters
 		ll.after = .curr
-		|| Result = .InlineFinish(ll, dest&asmreg.exit)
+		|| Result = .InlineFinishWithConsts(ll)
 		|| Grown = .CurrGain(RealStart)
 		if Grown <= AllowedGain
 			return Result
 	
 	
-	function InlineParameters (|message| prms, |asmreg| dest)
+	function InlineParameters (|message| prms)
 		opt norefcounts
 		|| p = prms.first
 		
 		for a in .fn.Args
 			|| v = .ExistingVar(p!)
 				|| vr = v.reg
-				if .CanReuseParam(prms, dest, a, vr)
+				if .CanReuseParam(prms, a, vr)
 					|| f = v.fat
 					|| T = a.WholeType.reg(vr)
 					a.DataType = t|datatypecode|
@@ -628,25 +630,30 @@ struct ASMState
 			start++ 
 			
 
-	function AskForInline (|message| prms, |asmreg| dest, |SCFunction| fn, |asmreg|)
+	function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 		opt norefcounts
 		|| A = fn.ASM
-		require .InlineDepth < 8
+		require .state.InlineDepth < .InlineLimit
 		require A and !fn.HasCVersion
-		|| AllowedGain = 5 + (fn is inline) * 24		// assume that functions have 5 instruction overhead.
-		
+		|| AllowedGain = 5 + (fn is inline) * 23		// assume that functions have 5 instruction overhead.
 		|| Grace = 9
+		
 		for p.fast in prms
 			Grace += .IsASMConst(p)<<2
 	
-		require (allowedGain + Grace) > a.length
+		require (AllowedGain + Grace) > a.length
 	
-		|| Start = .curr
-		|| I = .TryInline(prms, dest, A, allowedgain)
-			return I
-		.Rewind(start)
-	
-			
+
+		if !.state.InlineDepth
+			.InlineLimit = 8
+			.DeepestInline = 0
+		|| I = .TryInline(prms, dest, A, AllowedGain)
+			return I		
+		if !.state.inlinedepth and .DeepestInline > 1
+/			.InlineLimit = 1
+			i = .TryInline(prms, dest, A, AllowedGain)
+			if i
+				return i
 
 	
 function SCFunction.HasCVersion (|bool|)
@@ -703,13 +710,6 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	if !PExt and (dest is ExitFunction) and !fn.HasCVersion
 		return prms.TAIL(ID, P) * (dest as asmreg.exit)
 	
-	// OK... So when Inline_Branch1 calls hhhMaybeConst,
-	// the first const is removed, so there is only one remaining return point
-	// from that, we can simply allow the returner, to use whatever reg it wants
-	// this allows us to NOT use a BOR instruction to move the result.
-	// we could perhaps even better... simply do a post-sweep. seems better
-	// or else we'll be figuring everyhting out, forever.
-	
 	|| fat = prms.FNC(dest, ID, P,  PExt)
 	if fn.HasCVersion
 		fat._op = asm.FNCX
@@ -718,7 +718,6 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	if RegAddrs
 		.RegsBitClear(exp, RegAddrs, fn)
 	
-	if "Inline_Branch1".trap
 	fat.µrefcount += fn isnt stateless
 	(dest is Exit) = fn is Killer
 	return fat * dest

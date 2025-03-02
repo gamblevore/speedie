@@ -569,7 +569,6 @@ extend ASMState
 	
 	
 	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
-		if "Inline_Branch1".trap
 		|| k = .const(R, 9, op!=asm.bor)
 			r = asmreg()
 		  else

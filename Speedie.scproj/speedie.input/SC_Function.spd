@@ -1961,7 +1961,7 @@ function NewFunc (CollectFunc)
 function NewConstructor (CollectFunc)
 	node.name = "function"
 	using (node)
-	node.first = @Thg+ "Constructor"
+	node.first = @Thg + "Constructor"
 	return SCFunction.NewFunc( node, name_space, ErrPlace )
 
 
@@ -1970,7 +1970,7 @@ function NewDestructor (CollectFunc)
 		expect !(name_space.IsRole) (node, "destructors aren't allowed on roles")
 		node.name = "function"
 		using node
-			node.first = @Thg+ "Destructor"
+			node.first = @Thg + "Destructor"
 		return SCFunction.NewFunc( node, name_space, ErrPlace )
 
 

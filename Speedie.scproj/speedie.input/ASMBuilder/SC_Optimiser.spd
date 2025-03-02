@@ -17,10 +17,6 @@ function asmstate.Optimise
 function uint.IsTemp (|bool|)
 	return self & 1<<31
 
-	FNCX: r2, 1225, 123336, 0                      /* JB_f_SyntaxAccess(0.5) */
-	BOR:  t31, r2, r0, 0                           /* JB_f_SyntaxAccess(0.5) */
-	JBAN: t31, 1                                   /* hhhMaybeConst(0) */
-
 
 function uint.OperatorSameReg (|uint| R, |bool|)
 	return self&31 == R&31

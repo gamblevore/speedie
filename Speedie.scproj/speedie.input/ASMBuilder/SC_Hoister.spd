@@ -38,7 +38,7 @@ struct SC_Hoister
 		.Hoist(exp, 0)
 		
 	function HoistLoop (|message| exp)
-		.spare = 2
+		.spare = 3
 		.Hoist(exp, 1<<20)
 
 	helper Hoist (|message| exp, |int| Score)
