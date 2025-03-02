@@ -206,7 +206,7 @@ if __ArgCount == 0
 function compiler.AddFunny (|message| msg)	// autoimport
 	require !.HasFunny
 	.HasFunny = true
-	msg.msg(@tmp, "import") <~ "LeFunny" // hehe
+	msg.msg(@tmp, "import") <~ ".Funny" // hehe
 
 
 
