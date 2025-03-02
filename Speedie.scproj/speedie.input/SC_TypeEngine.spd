@@ -1921,7 +1921,7 @@ function TypeOfArgArr (ExprResolver)
 			Count++
 	
 	exp.obj = result						#expect (exp, "Can't get the type of this.")
-	result = result.getcarray(Count)
+	result = result.GetCArray(Count)
 	Tran_ArgArray(exp, name_space, result)
 	return result
 
