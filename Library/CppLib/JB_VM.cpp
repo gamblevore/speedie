@@ -88,9 +88,6 @@ void** JB_ASM_InitTable(jb_vm* vm, int n, int g) {
 	return (void**)(vm->Env.Cpp);
 }
 
-bool JB_ASM__AllocatePackGlobals(int G) {
-	return true;
-}
 
 jb_vm* JB_ASM__VM() {
 	dbgexpect2 (sizeof(ASM)==4);
