@@ -79,11 +79,17 @@ ivec4* RunVM (jb_vm& pvm) {		// vm_run, vm__run, vmrun, run_vm
 }
 
 
-void** JB_ASM_InitTable(jb_vm* vm, int n) {
+void** JB_ASM_InitTable(jb_vm* vm, int n, int g) {
 	free(vm->Env.Cpp);
-	auto Result = calloc(n, sizeof(void*));
-	vm->Env.Cpp = (Fn0*)Result;
-	return (void**)Result;
+	auto Result = (byte*)calloc(n*sizeof(void*) + g, 1);
+	bool OK = Result!=0;
+	vm->Env.Cpp = (Fn0*)(Result+g*OK);
+	vm->Env.PackGlobs = Result;
+	return (void**)(vm->Env.Cpp);
+}
+
+bool JB_ASM__AllocatePackGlobals(int G) {
+	return true;
 }
 
 jb_vm* JB_ASM__VM() {
