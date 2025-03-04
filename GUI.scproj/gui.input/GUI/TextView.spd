@@ -729,7 +729,7 @@ class TextView (GUIControl)
 		|| sr = .selrange
 		|| ind = 0
 		|| i = 0
-		if !.singleline and !keys.shift
+		if !.SingleLine and !keys.shift
 			|| b4 = self[sr.x - 1]
 			if !b4.IsTextLine
 				ind = .IndentCount(sr.x2)
@@ -853,7 +853,7 @@ class TextView (GUIControl)
 		
 	
 	helper CommentSlash (|bool| star, |bool|)
-		require !.singleline
+		require !.SingleLine
 		ifn keys.shift or star
 			if !.DeSlashcomment
 				.tabindent(1, "//", true)
@@ -869,12 +869,12 @@ class TextView (GUIControl)
 		return ._CanAutoComplete
 
 	function AutoCompleteString (|string|)
-		opt inline
+		opt inline, visible
 		return ._AutoCompleteString
 	
 	
 	function AutoCompleteBack (|int|)
-		opt inline
+		opt inline, visible
 		return ._AutoCompleteBack
 
 
@@ -1494,7 +1494,7 @@ class TextView (GUIControl)
 		|| i = .XYOfChar(pos) + (-1,1)	
 		|| i2 = (1, .lineheight+1)
 		rz = (i, i+i2)
-		ifn .singleline
+		if !.singleline
 			rz.y++
 
 
@@ -1523,11 +1523,15 @@ class TextView (GUIControl)
 		return .lastleft + 2 + .LineNumWidth*font.width
 
 
-	helper DrawSel (|image| where)
+	helper DrawSel (|image| where, |ivec4| c)
 		opt norefcounts
 		|| r = .SelRange
 		if R.width
-			|| g = (¥.TextSelection, ¥.TextSelectionUnfocus)(.hasanyfocus)
+			if .SingleLine
+				c.y--
+				c.y2--
+				where.ControlClip = c
+			|| g = (¥.TextSelection, ¥.TextSelectionUnfocus)(.HasAnyFocus)
 			.DrawSelRange(Where, r, g)
 		  elseif .ShouldDrawSel
 			|| Cp = (1.0, 1.0, 1.0, 0.666).px
@@ -1652,7 +1656,7 @@ class TextView (GUIControl)
 		.PrepareLinesOfText
 		.DrawPreparedText(where)
 		|| Sel = self is Editable or AlwaysScrollable
-			.DrawSel(where)
+			.DrawSel(where, c)
 		where.ControlClip = c			/// restore!
 
 		require  !.CanSeeAllLines and .DrawScrollStrength
@@ -1682,6 +1686,8 @@ class TextView (GUIControl)
 
 		|| yend		= .LastBottom
 		|| UseCol	= .UseColorAnyway
+		if .SingleLine
+			y-- // argh?
 		while (y > yend) and (d)
 			y -= .LineHeight
 			.DrawOneLine(where, D, y, usecol, lc)
