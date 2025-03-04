@@ -67,8 +67,8 @@ function InitAccess
 
 
 function Debugger (fn_asm)
-	if Options.targetdebug
-		return exp.TRAP(asmreg(), 0, 2)*asmreg() // 2 == sigint
+	if Options.TargetDebug
+		return exp.TRAP(asmreg(), 0, 2) * ASMReg() // 2 == sigint
 	return asmreg()
 	
 
@@ -538,7 +538,7 @@ function DoMath (fn_asm)
 
 
 function Ignore			(fn_asm)
-	return asmreg()
+	return ASMReg()
 
 
 function Unexpected		(fn_asm)
@@ -585,7 +585,7 @@ function Str (fn_asm)
 	opt	norefcounts
 	dest = .TempOnly(exp, dest)
 	|| real = exp.name|messageid|
-	dest.µtype = datatypecode._voidptr
+	dest.µtype = DataTypeCode._voidptr
 	return exp.gstr(dest, 0, real.ID) * dest // seems good!
 
 
@@ -612,13 +612,13 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	rz.µtype = dest.µtype
 
 
-function asmreg.ConstInputFromMath (|asmreg| L, |asmreg| R, |asmreg|)
+function ASMReg.ConstInputFromMath (|asmreg| L, |asmreg| R, |asmreg|)
 	if self is constoutput
 		(self is constinput) = l.ConstEnough & r.ConstEnough
 	return self
 
 
-function asmreg.ConstEnough (|bool|)
+function ASMReg.ConstEnough (|bool|)
 	return self|uint64| & asmreg.NotUnConst|uint64|
 
 
@@ -687,9 +687,9 @@ function message.HasAsmStuff (|bool|)
 
 function FatASM.FloatConvConst (|int| DestBitSize, |int64|)
 	|| f = &._Const
-	if DestBitSize == 64				// f32 to f64
+	if DestBitSize == 64						// f32 to f64
 		return (f|&float|[]|Float64|).asint
-										// f64 to f32
+												// f64 to f32
 	return f|&f64|[]|float|.asint
 
 
@@ -715,8 +715,8 @@ function FatASM.FloatIntConvConst (|datatypecode| src, |datatypecode| dest, |int
 	
 	|| f64 = f|&f64|
 	if dest.IsSigned
-		return f64|int64|					// f32 to i
-	return f64|uint64|						// f32 to u
+		return f64|int64|						// f32 to i
+	return f64|uint64|							// f32 to u
 
 
 function DataTypecode.ASMConv (|Datatypecode| To, |int|)
@@ -740,8 +740,8 @@ function Message.TypeCastDoesNothing (|bool|)
 
 	|| BytesLost = Input.ByteCount - Output.ByteCount
 	if output.isfloat
-		return byteslost == 0
-	require byteslost <= 0
+		return BytesLost == 0
+	require BytesLost <= 0
 
 
 
