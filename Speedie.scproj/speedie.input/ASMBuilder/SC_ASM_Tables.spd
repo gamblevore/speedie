@@ -249,7 +249,6 @@ function DeclSub (fn_asm)
 		.MakeConstFromASM(ty, k, nil)
 	return k
 
-
 	
 function ArgSub (|&ASMState| self, |message| exp, |&sc_hoister| H, |AsmReg|)
 	opt norefcounts
@@ -268,12 +267,8 @@ function ArgSub (|&ASMState| self, |message| exp, |&sc_hoister| H, |AsmReg|)
 	.CloseVars(OV)
 	
 
-
-
 function Arg (fn_asm)
 	return ArgSub(self, exp, nil)
-
-
 
 
 function Access (fn_asm)									// a[b], struct.mem[b]
@@ -393,7 +388,6 @@ function GlobAddr (|scdecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 		|int64| iTable = d.ExportPosition
 		expect (iTable > 0)          (exp, "No global address".internal)
 		expect (iTable <= 18~bits)   (exp, "Used over 256K of global data")
-//		if "TestAtomic".trap
 		Dest = exp.GTAB(dest,  (d.IsLib)|int|,  iTable) * dest
 	dest.µtype = DataTypeCode._voidptr
 	return dest.HaveAddr
@@ -413,7 +407,7 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 		
 		dest.µtype = d.DataType
 		dest = dest asnt asmreg.ContainsAddr
-		return .ReadOrWrite(dest, Exp, addr, ASMReg(), 0)
+/		return .ReadOrWrite(dest, Exp, addr, ASMReg(), 0)
 	
 
 
@@ -486,6 +480,7 @@ function IncrAmount (|asmreg| upon, |int| IsPlus, |scdecl| D,  |int64|)
 function Incrementatulatorifier		(fn_asm)				// --a++
 	visible
 	opt	NoRefCounts
+	//if "TestAtomic".trap
 	|| Src = .µGetASM(exp, dest as asmreg.addrrequest)
 	|| Amount = IncrAmount(src, mode, exp.ASMDecl)
 	if src is ContainsAddr

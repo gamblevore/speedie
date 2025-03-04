@@ -326,7 +326,7 @@ struct ASMState
 				index += cc.const
 				varadd = asmreg()
 
-		base = .InlineOffset(Base, bytes, index, 127)
+		base = .InlineOffsetOpt(Base, bytes, index, 127)
 /*
 	ADDK: bs, r1, 4
 	RD1U: r2, bs, value, 4, 0

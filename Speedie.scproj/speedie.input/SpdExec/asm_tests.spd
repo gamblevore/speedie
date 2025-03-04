@@ -1,6 +1,7 @@
 
 module ASMExamples {
 |int| Glob
+|int| Bolg
 target pack { 
 
 
@@ -313,6 +314,7 @@ function TestAtomic (|int|)
 	for i in 100
 		Glob++
 		Glob += i&1
+		bolg--
 	return Glob
 
 

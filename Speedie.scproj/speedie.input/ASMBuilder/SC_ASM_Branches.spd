@@ -86,15 +86,16 @@ function While (fn_asm)
 	h.Unhoist
 
 
+// while loops are already hoisted, right? by the argbase. // So what hoisting does it need?
 function WhileSub (|message| exp,  |sc_hoister| H,  |asmreg|)
 	opt norefcounts
 	|| begin = exp.JUMP(0)												// test goes after loop
-	|| Returns = ASMType.argsub(self, exp.second!, H)					// arg
+	|| Returns = ASMType.argsub(self, exp.second!, nil)					// arg
 
 	|FatRange| loop_test
-	|| LT = .Branch(exp.first!, loop_test, true)
+/	|| LT = .Branch(exp.first!, loop_test, false)
 	if loop_test.never
-/		.NopRange(begin, loop_Test.start)
+		.NopRange(begin, loop_Test.start)
 		return ASMReg()
 	
 	begin.JumpTo(loop_test.start, self)

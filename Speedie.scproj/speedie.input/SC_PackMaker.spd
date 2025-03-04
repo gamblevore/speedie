@@ -205,9 +205,6 @@ module PackMaker
 		opt norefcounts
 		|| mu = .asm
 			|| mu2 = mu.µTest
-//			scfunction.currfunc = self
-//			asmstate.sh.start = mu.IR
-//			asmstate.sh._Curr = mu.ir + mu.Length
 			mu.debugprint
 			return jb_vm.Run(mu2.ptr, mu2.length)
 	

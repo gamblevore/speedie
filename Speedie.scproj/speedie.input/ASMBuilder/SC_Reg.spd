@@ -49,7 +49,10 @@ datatype ASMReg (uint64)
 
 		
 	render
-		fs <~ "r"
+		if self is temp
+			fs <~ "t"
+		  else
+			fs <~ "r"
 		fs <~ .reg
 		fs <~ "("
 		.µtype.render(Fs)
@@ -233,11 +236,7 @@ datatype ASMReg (uint64)
 	
 	function DebugPrint 
 		target debug
-			if self is temp
-				print "t"
-			  else
-				print "r"
-			print .reg.render
+			print .render
 			|| f = .fat
 				print " - "
 				f.DebugPrint

@@ -38,7 +38,7 @@ struct SC_Hoister
 		.Hoist(exp, 0)
 		
 	function HoistLoop (|message| exp)
-		.spare = 3
+		.spare = 2
 		.Hoist(exp, 1<<20)
 
 	helper Hoist (|message| exp, |int| Score)
@@ -55,7 +55,7 @@ struct SC_Hoister
 			GoIn = prop isnt const and global
 			if (score >= 0)  and  prop.nilreg isnt hoisted
 				if prop is const
-					if (score >= 1<<29) and prop.exportposition
+					if (score >= 1<<20) and prop.exportposition
 						.GotConst(exp, prop)
 				  elseif prop is Global
 					.GotGlobal(exp, prop)
