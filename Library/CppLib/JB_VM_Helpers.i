@@ -313,7 +313,7 @@ bool CompF_ (VMRegister* r, ASM Op) {
 
 
 AlwaysInline ASM* JumpI (VMRegister* r, ASM Op, ASM* Code) {
-	return Code + CompI_(r, Op)*JCmpI_Jmpu;
+	return Code + CompI_(r, Op)*JCmpI_Jmpi;
 }
 		
 AlwaysInline void CompI (VMRegister* r, ASM Op) {
@@ -321,7 +321,7 @@ AlwaysInline void CompI (VMRegister* r, ASM Op) {
 }
 
 AlwaysInline ASM* JumpF (VMRegister* r, ASM Op, ASM* Code) {
-	return Code + CompF_(r, Op)*JCmpF_Jmpu;
+	return Code + CompF_(r, Op)*JCmpF_Jmpi;
 }
 
 AlwaysInline void CompF (VMRegister* r, ASM Op) {
