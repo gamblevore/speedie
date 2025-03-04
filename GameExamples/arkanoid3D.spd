@@ -208,7 +208,7 @@ class Breakout (Window)
 		|| L = 24s()
 		for (s in .Spirals) (i)
 			|| B = s.Screen
-			where.DrawSpiral(0.01*b.width|float|*VObject.drawscale, L, b.center, s.color, (3s+i*1s)())
+			where.DrawSpiral(0.002*b.width|float|*VObject.drawscale, L, b.center, s.color, (3s+i*1s)())
 
 
 function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| Col, |float| Pulse)
