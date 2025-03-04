@@ -230,6 +230,7 @@ extend ASMState
 
 
 	function QuickIntMul    (fn_OpASM)
+		require r is constoutput
 		|| Pow2 = .IntPowerOfTwo(r)
 			if Pow2 <= 1
 				return .Quick1Or1Sub(dest, l, Pow2, exp)
@@ -237,6 +238,11 @@ extend ASMState
 
 		|| five = .IntPowerOfTwo(r, 1) // 5 or 9 or 17 or 33, etc
 			return exp.ADD(dest, l, l, five-1) * dest
+		
+		|| RR = r.const
+		if r.CanAddK(RR)								// a - 1,  a + 1
+			.NopConst(r)
+			return exp.MULK(dest, L, RR) * dest
 
 
 	function QuickFloatMul    (fn_OpASM)
@@ -462,6 +468,7 @@ extend ASMState
 		
 
 	function QuickIntDiv    (fn_opasm)
+		require r is ConstOutput
 		|| PToi = .IntPowerOftwo(r)
 			if ptoi <= 1											//   x/1  x/0  x/-1
 				if ptoi == 0

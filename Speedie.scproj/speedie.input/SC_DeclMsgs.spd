@@ -199,14 +199,13 @@ function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
 			dcl.nildeclared = nilstate.real			// in case of something like |object| x = real()
 	(dcl is property)
 	(dcl is Global)
-
-//	|| A = .Indent == 255
+	
+	if dcl.type == TypeJBClass
 	|| B = '_' == dcl.name[]
 	|| C = '_' == dcl.name.Last
 	if B|||C
 		(dcl is hidden)
 	if dcl.islib
-//		if (dcl isnt hidden) // and (Options.MakeInterpreter or options.ModePack)
 		PackMaker.LibGlobs <~ dcl
 	  else
 		if options.ModePack

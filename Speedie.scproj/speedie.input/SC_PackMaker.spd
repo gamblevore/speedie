@@ -11,7 +11,7 @@ module PackMaker
 
 	helper AddFunc (|scfunction| f)
 		opt norefcounts
-		if f.IsStdLib
+		if f.IsLibrary
 			if f.needsexport or options.MakeInterpreter
 				.LibFuncs <~ f
 		  elseif f.NeedsExport or (f in "ASMExamples")
@@ -52,6 +52,7 @@ module PackMaker
 		fnmain.tableid = 2
 
 		.SortASMFuncs(.Packfuncs, 0)
+		typeobject!.PackClassChildren(nil)
 		|| pg = .OrderGlobals(.PackGlobs)
 		return .SortASMFuncs(.libfuncs, pg)
 	
@@ -162,7 +163,7 @@ module PackMaker
 			
 		fn = .testfn("TestAtomic")
 		if fn
-			/|| atomic = fn.TestObesity|&int|[]
+			|| atomic = fn.TestObesity|&int|[]
 			printline atomic
 		}
 	
@@ -181,7 +182,7 @@ module PackMaker
 		j.enter
 		.ListPackFuncs(j)
 		.DumpStrings(j)
-		.PackClass(j)
+		.PackClasses(j)
 		.FuncLink(j)
 		.GlobLink(j)
 
@@ -191,7 +192,7 @@ module PackMaker
 
 	function OrderGlobals (|[scdecl]| List, |int|)
 		opt norefcounts
-		list.sort(SmallestFirst)
+		list.sort(GlobalsSorter)
 		rz = 1				// rz = 1, so if .ExportPosition == 0 then something is wrong.
 		for (d in list)
 			|| s = d.CarraySize
@@ -199,7 +200,6 @@ module PackMaker
 			rz = rz align s16
 			d.ExportPosition = rz
 			rz += s
-
 	
 	function SCFunction.TestObesity (|?&ivec4|)
 		opt norefcounts
@@ -245,7 +245,7 @@ module PackMaker
 		j.exit(2)
 
 
-	function PackClass (|jbin| j)
+	function PackClasses (|jbin| j)
 		j.enter(@tmp, "clss")
 		typeobject!.PackClassChildren(j)
 		j.exit
@@ -269,34 +269,42 @@ module PackMaker
 	function SCClass.HasPackChildren (|bool|)
 		opt norefcounts
 		for c in .children
-			if !c.isrole and !c.isstdlib
+			if !c.isrole and !c.IsLibrary
 				return true
 			if c.HasPackChildren
 				return true
 	
-	function SCClass.PackClassChildren (|jbin| j)
+	function SCClass.PackClassChildren (|jbin?| j)
 		opt norefcounts
 		require .HasPackChildren
-		j.enter
+		if j
+			j.enter
 		for c in .children
 			if !c.isrole
 				c.packexport(j)
-		j.exit
+		if j
+			j.exit
 	
 	
-	function SCClass.PackExport (|jbin| j)
+	function SCClass.PackExport (|jbin?| j)
 		opt norefcounts
-		require .HasPackChildren or !.isstdlib
+		require .HasPackChildren or !.IsLibrary
 
-		j.enter(@tmp, .name)
-		if !.IsSTDLib
-			.DescribeInPack(j)
-		.PackClassChildren(j)
-		j.exit
+		if j
+			j.enter(@tmp, .name)
+			if !.IsLibrary
+				.DescribeInPack(j)
+			.PackClassChildren(j)
+			j.exit
+		  else
+			if !.IsLibrary
+				packmaker.packglobs <~ .ClassType
+			.PackClassChildren(j)
 		
 		
 	function SCClass.DescribeInPack (|jbin| j)
 		opt norefcounts
+		packmaker.packglobs <~ .ClassType
 		|| sz = (0, .size)(.iswrapper)
 		j.addint(sz)
 		

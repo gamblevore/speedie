@@ -66,6 +66,8 @@
 ı ADPK: _
 	i1 = i2;
 	i2 = i2 + U2_Li;
+ı MULK: _
+	i1 = i2 * U2_Li;
 ı ADD: _
 	i1 = i2 + (i3 << Shift_Shu);
 ı SUB: _

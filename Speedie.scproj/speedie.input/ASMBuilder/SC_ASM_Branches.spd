@@ -93,7 +93,7 @@ function WhileSub (|message| exp,  |sc_hoister| H,  |asmreg|)
 	|| Returns = ASMType.argsub(self, exp.second!, nil)					// arg
 
 	|FatRange| loop_test
-/	|| LT = .Branch(exp.first!, loop_test, false)
+	|| LT = .Branch(exp.first!, loop_test, false)
 	if loop_test.never
 		.NopRange(begin, loop_Test.start)
 		return ASMReg()

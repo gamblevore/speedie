@@ -221,7 +221,7 @@ function Char (niltrackerfn)
 
 function String (niltrackerfn)
 	opt norefcounts
-	StringCorrector.CollectString(msg, scfunction.currfunc!.isstdlib)
+	StringCorrector.CollectString(msg, scfunction.currfunc!.IsLibrary)
 	return .RealBool(!msg.length)
 
 

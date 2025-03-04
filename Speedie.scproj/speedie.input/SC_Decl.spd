@@ -1223,8 +1223,12 @@ function int64.MsgForConst (|bool| AllowShift, |message|)
 	rz <~ newdeclnum(nil, .Log2)
 
 
-function SmallestFirst (SorterComparer of scdecl)
-	return b.carraysize - a.carraysize
+function GlobalsSorter (SorterComparer of scdecl)
+	rz = b.carraysize - a.carraysize
+	if !rz
+		rz = (b.type == typejbclass) - (a.type == typejbclass)
+	if !rz
+		rz = b.name.syntaxcompare(a.name, true)
 	
 
 function scdecl.Complexity (|int|)

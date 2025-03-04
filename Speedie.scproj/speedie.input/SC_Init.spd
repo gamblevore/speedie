@@ -133,8 +133,8 @@ function message.AlmostAppend (|message| v)
 function SCModule.DelayedInitFuncTransform
 //	if .InitVarsArg contains "RenderInsides" or .InitCodeArg contains "RenderInsides" 
 	|| v = .InitVarsArg
-	|| DestVars = (Compiler.program.InitVarsArg, compiler.appinitglobals)(.isstdlib)
-	|| DestCode = (Compiler.program.InitCodeArg, compiler.appinitcode)(.isstdlib)
+	|| DestVars = (Compiler.program.InitVarsArg, compiler.appinitglobals)(.IsLibrary)
+	|| DestCode = (Compiler.program.InitCodeArg, compiler.appinitcode)(.IsLibrary)
 	
 	|| it = v.first
 		for (msg in it)

@@ -200,7 +200,7 @@ AlwaysInline void SetRefApart(VMRegister* r, ASM Op) {
 
 #define mem0(t)				({ (u2) ? ((t*)u2)[u3+Read_Offsetu] : 0; }) // safely read.
 #define mem1(t)				((t*)u2)[u3+Read_Offsetu]
-#define mem2(t)				(u2 = (u64)((t*)u2 + Read_moveu-1))
+#define mem2(t)				(u2 = (u64)((t*)u2 - Read_movei))
 
 AlwaysInline JB_Object* alloc(void* o) {
 	// we need a class table, and look it up from there.
@@ -347,7 +347,6 @@ AlwaysInline ASM* JumpEq (VMRegister* r, ASM Op, ASM* Code) {
 	return Code + JCmpEq_Jmpi;
 }
 
-
 AlwaysInline ASM* JumpNeq (VMRegister* r, ASM Op, ASM* Code) {
 	if (u1 != u2)
 		return Code;
@@ -358,6 +357,7 @@ AlwaysInline ASM* JumpK (VMRegister* r, ASM Op, ASM* Code) {
 	auto K = JCmpK_Ki;
 	return Code + JCmpK_Jmpi * (JCmpK_Negu == i1 > K);
 }
+
 
 #define shu(x) ((((x)<<Shift_Shu))>>Shift_Shu)
 
@@ -394,37 +394,32 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 	int Size = CNTC_sizeu;
 	int Off  = ((int)(CNTC_offsetu))-1;
 	int Add  = CNTC_cnsti;
-	auto PP = p1(u8);
+	auto PP = (uint*)(p1(u8) + (Off << Size));
 	auto ni = n2;
 	auto Result = &(r[ni].Uint);
-	if (PP) {
-		uint64 Old;
-		uint64 New;
-		PP += Off << Size;
-		switch (Size) {
-		case 0:
-			Old = *PP;         New = Old+Add;
-			*PP = New;
-			break;
-		case 1:
-			Old = *((u16*)PP); New = Old+Add;
-			*((u16*)PP) = New;
-			break;
-		case 2:
-			Old = *((u32*)PP); New = Old+Add;
-			*((u32*)PP) = (u32)(New);
-			break;
-		default:
-		case 3:
-			Old = *((u64*)PP); New = Old+Add;
-			*((u64*)PP) = New;
-			break;
-		}
-		if (ni)
-			*Result = UseOld?Old:New;
-	} else if (ni) {
-		*Result = !UseOld;
+	uint64 Old;
+	uint64 New;
+	switch (Size) {
+	case 0:
+		Old = *((u8* )PP); New = Old+Add;
+		*((u8* )PP) = New;
+		break;
+	case 1:
+		Old = *((u16*)PP); New = Old+Add;
+		*((u16*)PP) = New;
+		break;
+	case 2:
+		Old = *((u32*)PP); New = Old+Add;
+		*((u32*)PP) = (u32)(New);
+		break;
+	default:
+	case 3:
+		Old = *((u64*)PP); New = Old+Add;
+		*((u64*)PP) = New;
+		break;
 	}
+	if (ni)
+		*Result = UseOld?Old:New;
 }
 
 

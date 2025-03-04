@@ -203,6 +203,15 @@ function message.ADPK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
 }
 
 
+function message.MULK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+	visible
+	rz = self * asm.MULK
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = K
+}
+
+
 function message.ADD (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
 	visible
 	rz = self * asm.ADD

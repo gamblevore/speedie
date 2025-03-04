@@ -18,7 +18,7 @@ linkage
 //|byte|							Depth // maybe modules should have a depth too.
 
 
-function IsSTDLib (|bool|) // .islib, .isprojlib, .isproject, .isntproject, .isntlib
+function IsLibrary (|bool|) // .islib, .isprojlib, .isproject, .isntproject, .isntlib
 	opt norefcounts
 	return .Project.IsSTDLib?
 
@@ -698,7 +698,7 @@ function UniquifyExport (|String| s, |string|)
 
 
 function RehomeExport (|bool|)
-	check (!.IsSTDLib) (self, "Can't rehome a std lib function. Use cpp_part to give a unique name.")
+	check (!.IsLibrary) (self, "Can't rehome a std lib function. Use cpp_part to give a unique name.")
 	|| newhome = .UniquifyExport(.exportname)			#require
 	compiler.ExportNames[.exportname] = nil
 	compiler.ExportNames[newhome] = self

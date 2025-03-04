@@ -82,18 +82,17 @@ struct ASMState
 	function IntPowerOfTwo (|asmreg| r, |int| Sub=0, |FailableInt|)
 		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
 		// this is used for multiplication mostly. like x*-1, or x*0, or x*1
-		if r is ConstOutput
-			|| v = r.const
-			if v == -1
-				if sub
-				.NopConst(r)
-				return v
-			v -= Sub
-			if v.IsPow2
-				.NopConst(r)
-				if !v
-					return 0
-				return v.Log2+1
+		|| v = r.const
+		if v == -1
+			if sub
+			.NopConst(r)
+			return v
+		v -= Sub
+		if v.IsPow2
+			.NopConst(r)
+			if !v
+				return 0
+			return v.Log2+1
 
 
 	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
@@ -325,12 +324,17 @@ struct ASMState
 					.nop(cc)
 				index += cc.const
 				varadd = asmreg()
-
+		//  ADDK: bs, r1, 4
+		//  RD1U: r2, bs, value, 4, 0
 		base = .InlineOffsetOpt(Base, bytes, index, 127)
+
 /*
-	ADDK: bs, r1, 4
-	RD1U: r2, bs, value, 4, 0
-*/					
+	// these need to be opted. Not always happening? InlineOffsetOpt seems to only do ADDK, not ADPK
+	ADPK: t30, r2, 4                               /* R++ */
+	WR4U: t31, t30, r0, 0, 0                       /* R++[0] */	
+*/
+
+
 		if index >= 128												// read/write only allows up to 127
 			index <<= bytes
 			base = .AddToReg(exp, asmreg(), base as asmreg.noscale, index)
@@ -657,7 +661,7 @@ struct ASMState
 
 	
 function SCFunction.HasCVersion (|bool|)
-	if .isstdlib
+	if .IsLibrary
 		return true
 	require self is wrapper
 

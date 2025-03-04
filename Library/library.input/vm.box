@@ -369,6 +369,8 @@ POS 6
 /**/ ADPK (AddK) // post-increment
 		i1 = i2
 		i2 = i2 + U2_Li
+/**/ MULK  (AddK)
+		i1 = i2 * U2_Li
 /**/ ADD  (Shift)
 		i1 = i2 + (i3 << Shift_Shu)
 /**/ SUB  (Shift)              					// must come after ADD

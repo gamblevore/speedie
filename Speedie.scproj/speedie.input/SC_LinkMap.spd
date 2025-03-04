@@ -95,7 +95,7 @@ function ReachFunc (|SCNode| from, |bool|)
 	.MyReacher = from
 		
 	Compiler.stReachedFunc++
-	if .IsSTDLib
+	if .IsLibrary
 		Compiler.stLibFuncs++
 
 	.cls.Reach(self)?

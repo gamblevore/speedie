@@ -47,7 +47,7 @@ extend asmstate
 
 
 		if fn == Compiler.RefIncr2
-			|| A = .µ(prms.first!, asmreg.addrrequest)
+			|| A = .µ(prms.first!, asmreg.AddrRequest)
 			target debug: if a isnt ContainsAddr					// always memory
 			|| offset = 0
 			A = .InlineOffsetOpt(A, 3, offset, 13~bits)
