@@ -1687,7 +1687,7 @@ class TextView (GUIControl)
 
 		|| yend		= .LastBottom
 		|| UseCol	= .UseColorAnyway
-		if .SingleLine
+		if .SingleLine and self isnt Editable
 			y-- // argh?
 		while (y > yend) and (d)
 			y -= .LineHeight
