@@ -306,7 +306,7 @@ struct ASMState
 		return .ReadOrWriteSub(dest, m, base, varadd, index) * dest
 
 
-	function ReadOrWriteSub (|ASMReg| dest, |message| exp, |asmreg| base, |asmreg| varadd, |int| index, |&fatasm|)
+	function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |int| Index, |&fatasm|)
 		if dest is containsaddr
 			#!wait?? this is meant to be an addrrequest? not a response.
 			debugger
@@ -326,7 +326,7 @@ struct ASMState
 				varadd = asmreg()
 		//  ADDK: bs, r1, 4
 		//  RD1U: r2, bs, value, 4, 0
-		base = .InlineOffsetOpt(Base, bytes, index, 127)
+		base = .InlineOffsetOpt(Base, bytes, &index, 127)
 
 /*
 	// these need to be opted. Not always happening? InlineOffsetOpt seems to only do ADDK, not ADPK
@@ -334,7 +334,8 @@ struct ASMState
 	WR4U: t31, t30, r0, 0, 0                       /* R++[0] */	
 */
 
-
+		
+//		|| Move = .TryAddPKMemory(base) // how is this different to inlineoffsetopt?
 		if index >= 128												// read/write only allows up to 127
 			index <<= bytes
 			base = .AddToReg(exp, asmreg(), base as asmreg.noscale, index)

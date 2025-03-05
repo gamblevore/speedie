@@ -2,9 +2,9 @@
 
 extend asmstate
 	function InlineOffsetOpt (|asmreg| base, |int| pow2, |&int| index, |int| maximum, |asmreg|)
-		if base is temp// and containsaddr
+		if base is temp
 			|| bs = base.fat
-			if bs isa asm.addk
+			if bs isa asm.ADDK
 				|| CC = bs.r[2]
 				|| CC2 = CC >> pow2
 				if (CC2 <= maximum) and (CC2<<pow2 == CC)
@@ -32,7 +32,7 @@ extend asmstate
 			|| offset = 0
 			if Out isnt ContainsAddr
 				if From is ContainsAddr
-					from = .InlineOffsetOpt(from, 3, offset, 13~bits)
+					from = .InlineOffsetOpt(from, 3, &offset, 13~bits)
 					return exp.RFRD(Out, From, 1, offset)			// mem to reg
 				return exp.RFST(Out, From)							// reg to reg
 			

@@ -163,7 +163,7 @@ module PackMaker
 			
 		fn = .testfn("TestAtomic")
 		if fn
-			|| atomic = fn.TestObesity|&int|[]
+/			|| atomic = fn.TestObesity|&int|[]
 			printline atomic
 		}
 	
