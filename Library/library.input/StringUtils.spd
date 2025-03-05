@@ -231,14 +231,14 @@ helper String.TabsToSpacesSub (|faststring| fs)
 			i++
 
 
-helper String.TabbifySub (|faststring| fs)
-	|| Sp = .OutByte(' ') ?? .length
-	if Sp == 0
-		fs <~ self
-	  else
-		sp = Sp.AlignDown(4)
-		fs <~ ('\t', Sp>>2)
-		fs.appendRange(self, sp, int.max)
+//helper String.TabbifySub (|faststring| fs)
+//	|| Sp = .OutByte(' ') ?? .length
+//	if Sp == 0
+//		fs <~ self
+//	  else
+//		sp = Sp.AlignDown(4)
+//		fs <~ ('\t', Sp>>2)
+//		fs.appendRange(self, sp, int.max)
 	
 
 

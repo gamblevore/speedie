@@ -911,21 +911,10 @@ class TextView (GUIControl)
 			rz = true
 
 
-	helper backspaces (|int| i, |int|)
-		|byte| c
-		while
-			c = self[--i]
-			loop c == ' '
-		if c.istextline or c == '\t' 
-			return i+1
-				
-		
 	helper TypeTab (|bool|)
 		|| sr = .SelRange
 		if !sr.width and .IsJeeboxMode
-			|| i = sr.x
-			|| bs = .backspaces(i)
-				.selrange = (bs, i)
+			return .TabIndent(1, "\t")
 		return .typed("\t")
 
 	helper CanTypeTab (|bool|)
@@ -1131,33 +1120,45 @@ class TextView (GUIControl)
 		return true
 	
 	
-	helper string.TabIndent (|int| n, |string| mark, |string|)
-		if n > 0
-			return mark + self
-		if self[0, mark]
-			return self[mark.length...]
-			
-		if mark == "\t"
-			|| c = 0
-			for i in 4
-				if self[i] != ' '
-					exit
-				c = i + 1
-			return self[c...]
-		return self
-	
+	helper string.FindTabInfo (|ivec3|)
+		rz.z = .Length
+		for (c in self) (i)
+			if c == '\t'
+				rz.x = (rz.x+1).alignup(4)
+			  elseif c == ' '
+				rz.x++
+			  elseif (c == '/') and (self[i+1] != '/')
+				rz.y++
+				rz.x++
+			  else
+				rz.z = i
+				exit
+		
+	helper string.GUITabIndent (|int| n, |string| mark, |string|)
+		if n < 0 and mark != "\t"
+			return self
+
+		|| br = .FindTabInfo
+		|| fs = FastString()
+		if br.y
+			fs <~ '/'
+		if br.x&3==1
+			br.x = (br.x-1).AlignUp(4)
+		br.x += n*4
+		br.x = br.x max 0
+		fs <~ ('\t', br.x/4)
+		fs <~ (' ', br.x&3)
+		fs.AppendRange(self, br.z)
+		return fs
+
 	
 	helper TabIndentAll (|int| dir, |string| mark, |string| txt,  |string|)
 		|| fs = faststring()
 		for (l.lines in txt) (p)
-			fs <~ l.TabIndent(dir, mark)
+			fs <~ l.GUITabIndent(dir, mark)
 			if p
 				fs <~ txt[p]
 		return fs
-	
-	
-	helper TextSet (|string| s)
-		disabled "use .text instead"
 	
 
 	function CancelEditing (|bool|)
