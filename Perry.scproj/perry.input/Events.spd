@@ -520,7 +520,7 @@ function ErrorListPaste (guipasteevent)
 		if e == @tmp
 			L <~ error.from(e)
 	i.UpdateErrorCount
-	i.noneed
+	i.NoNeed
 	
 	
 function ClickedError (GUIListEvent)
@@ -532,14 +532,14 @@ function ClickedError (GUIListEvent)
 			ide.ClickedFind(row)
 	  elseif GUI.event is mousedown
 		if !.Start and ide.filelist isnt visible
-			clickedaview(ide.ViewFiles)
+			ClickedAView(ide.ViewFiles)
 	return true
 
 
 function LogAreaKeys (GuiKeyEvent)
 	if key iscmd keys.k
-		|| s1 = .ide.LogComms!
-		|| s2 = .ide.LogActions!
+		|| s1 = .ide.LogComms
+		|| s2 = .ide.LogActions
 		|| c = s1.slowcount + s2.SlowCount
 			if "Clear log?\n\nContains $c items.".confirm
 				s1.clear
