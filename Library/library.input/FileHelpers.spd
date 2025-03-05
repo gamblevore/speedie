@@ -353,6 +353,7 @@ helper @file.OSXMaxCaseWarnings (|&int|)
 function string.ShellPath (|string|)
 	return .replaceall(" ", `\ `)
 
+
 target !minilib {
 extend file
 	function UploadTo (|string| url, |ExitCode|) // move to the network module
