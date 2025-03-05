@@ -41,7 +41,7 @@ main
 		  else
 			app.useone(r.file)
 	
-	if (stderr.ok) and (!conv.done) and (conv.dest isnt report)
+	if (StdErr.ok) and (!conv.done) and (conv.dest isnt report)
 		"Nothing to do. All files already in destination format."
 
 
@@ -201,13 +201,13 @@ module Conv
 		expect (!.DestPath) ("Can't specify a dest-path!")
 
 		.CompressOnly(false)
-		require stderr.ok
+		require StdErr.ok
 
 		.in = .out
 		.out = (.in! + ".back")
 
 		.CompressOnly(true)
-		require stderr.ok
+		require StdErr.ok
 		
 		.out!.CompareFile(Orig, Orig)
 
