@@ -10,12 +10,11 @@ class TextView (GUIControl)
 	|bool|						CanSeeAllLines
 	|bool|						GroupSaveAll
 	|bool|						PreferStayAtEnd
-	|byte|						SetsDebugLines
 	|byte|						LineNumWidth
 	|byte|						LineHeight
 	|byte|						ExpectsParse
 	|MoveCode|					Alignment // centered, left, right
-	|int|						ClickedPos
+//	|int|						ClickedPos
 
 	|byte|						_CanAutoComplete
 	|int|						_AutoCompleteBack
@@ -53,7 +52,6 @@ class TextView (GUIControl)
 		.OnKeyDown	= keys
 		._CanAutoComplete = 2
 		.LineHeight = font.Height + 4	// whatever
-		.SetsDebugLines = 10
 		.ExpectsParse = TextView.allowjeebox
 		.CopyPaste = CopyPasteFlags.CopyText ||| CopyPasteFlags.PasteText
 		.onpaste = textPaste|GUIPasteEvent|
@@ -88,7 +86,7 @@ class TextView (GUIControl)
 	
 	
 	behaviour MouseDown
-		.clickedpos = p.x // for selectin text
+//		.clickedpos = p.x // for selectin text
 		if (clicks == 1) and (keys.cmd or keys.ctrl)
 			.SendSpecialClick(p, !keys.PlatCmd)
 			return MouseDragging.handled
@@ -256,7 +254,6 @@ class TextView (GUIControl)
 	behaviour RightClick
 		.SendSpecialClick(p, true)
 
-
 	function Sel (assigns:|int|)
 		disabled "Use selrange"
 		
@@ -272,9 +269,9 @@ class TextView (GUIControl)
 		
 	helper Sel0 (|int|)
 		return .selrange.x
+	
 	helper Sel1 (|int|)
 		return .selrange.y
-
 
 	helper SelDirect (|IntRange| value, |TextViewLine| d)
 		.TypingPlaceTry(value, false, d)
@@ -437,7 +434,7 @@ class TextView (GUIControl)
 			x = .FindDrawLineEdge(t2, i)
 			LineEnd = true
 			fwd = (i > 0)
-		  elseif keys.option or keys.platcmd(false)						// word by word
+		  elseif keys.option or keys.platcmd(false)		// word by word
 			x = .WordMove(x, i)
 		  elseif (!t.width) or keys.shift
 			x = .text.MoveCodePoint(x, i)
@@ -1135,8 +1132,10 @@ class TextView (GUIControl)
 				exit
 		
 	helper string.GUITabIndent (|int| n, |string| mark, |string|)
-		if n < 0 and mark != "\t"
-			return self
+		if mark != "\t"
+			if n < 0
+				return self
+			return mark + self
 
 		|| br = .FindTabInfo
 		|| fs = FastString()
@@ -1687,7 +1686,7 @@ class TextView (GUIControl)
 
 		|| yend		= .LastBottom
 		|| UseCol	= .UseColorAnyway
-		if .SingleLine and self isnt Editable
+		if .SingleLine and self is Editable
 			y-- // argh?
 		while (y > yend) and (d)
 			y -= .LineHeight
