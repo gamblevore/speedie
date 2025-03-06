@@ -853,7 +853,7 @@ class TextView (GUIControl)
 		require !.SingleLine
 		ifn keys.shift or star
 			if !.DeSlashcomment
-				.tabindent(1, "//", true)
+				.tabindent(1, "//")
 		  elseif !.decomment
 			|| s = .SelText
 			s ?= "\n\n"
@@ -911,7 +911,7 @@ class TextView (GUIControl)
 	helper TypeTab (|bool|)
 		|| sr = .SelRange
 		if !sr.width and .IsJeeboxMode
-			return .TabIndent(1, "\t")
+			return .TabIndent(1, "\t", true)
 		return .typed("\t")
 
 	helper CanTypeTab (|bool|)
@@ -1101,9 +1101,9 @@ class TextView (GUIControl)
 		return  t
 
 
-	helper TabIndent (|int| dir, |string| mark, |bool| Mirror = false, |bool|)
-		|| t = .commentablerange
-		if mirror and .text[t.x, mark]
+	helper TabIndent (|int| dir, |string| mark, |bool| IsTypingLike=false,  |bool|)
+		|| t = .CommentableRange
+		if (mark != "\t") and .text[t.x, mark]
 			dir = -dir
 		
 		|| old = self[t]
@@ -1113,7 +1113,7 @@ class TextView (GUIControl)
 			return true
 		
 		.TypingPlaceReal = t
-		.InsertSub(Tabbed, t, true)
+		.InsertSub(Tabbed, t, !IsTypingLike)
 		return true
 	
 	
@@ -1131,14 +1131,16 @@ class TextView (GUIControl)
 				rz.z = i
 				exit
 		
-	helper string.GUITabIndent (|int| n, |string| mark, |string|)
+	helper string.GUITabIndent (|int| n, |string| mark, |faststring| fs)
 		if mark != "\t"
 			if n < 0
-				return self
-			return mark + self
+				fs <~ self
+				return
+			fs <~ mark
+			fs <~ self
+			return
 
 		|| br = .FindTabInfo
-		|| fs = FastString()
 		if br.y
 			fs <~ '/'
 		if br.x&3==1
@@ -1148,15 +1150,22 @@ class TextView (GUIControl)
 		fs <~ ('\t', br.x/4)
 		fs <~ (' ', br.x&3)
 		fs.AppendRange(self, br.z)
-		return fs
 
 	
 	helper TabIndentAll (|int| dir, |string| mark, |string| txt,  |string|)
 		|| fs = faststring()
-		for (l.lines in txt) (p)
-			fs <~ l.GUITabIndent(dir, mark)
-			if p
-				fs <~ txt[p]
+		|| curr = -1
+		while curr < txt
+			|| next = txt.find(jeebox.csline, curr+1)
+			if !next
+				next = txt.length
+			
+			|| l = txt[curr+1, next]
+			l.GUITabIndent(Dir, mark, fs)
+			curr = next
+			|| ch = txt[curr]
+				fs <~ ch
+			
 		return fs
 	
 
