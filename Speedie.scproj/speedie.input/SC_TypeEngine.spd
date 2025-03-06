@@ -296,7 +296,7 @@ function TypeOfThg (ExprResolver)
 
 
 function TypeOfBra (ExprResolver)
-//	opt norefcounts // needs to stay. typeofdot can destroy nodes???
+	opt norefcounts
 	|| c0 = exp.first
 	if (c0 == @arg)
 		return typeofBlock(c0, name_space, side)

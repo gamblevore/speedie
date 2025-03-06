@@ -1816,12 +1816,7 @@ function SCFunction.PreProcessExpects
 			Tran_Expect(self, ch, nil)
 		
 	for ch in list
-		if ch == "timetest"
-			ch.name = "using"
-			|| w = ch.first
-			w ?= ch.msg(@str, "Time")
-			w.needbra
-		  elseif ch=="using"
+		if ch=="using"
 			tran_using(self, ch, nil)
 
 
