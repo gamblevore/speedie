@@ -114,7 +114,6 @@ I still prefer Xcode sometimes. I'm actually going to continue to improve Perry,
 * Smooth fonts are nice in Xcode. Perry has a low-res pixel-art font thats great on a low-res screen. But not ideal on high-DPI monitors. Smooth fonts would fix this.
 * Needs a debugger and VM
 * Needs skinning and themes
-* Maybe we could animate the text or add explosions or animations into Perry. That would be cool.
 
 ## Combining IDEs Is A Good Idea
 
