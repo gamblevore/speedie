@@ -187,7 +187,7 @@ So why is it different when dealing with the "main" function? _"Well... it just 
     main (|[file]| Files)
         expect (files) ("No files passed!")
         for f in files
-            printline "$f: ${f.size}"
+            printline "$f: ${f.size.strsize}"
 
 Try calling this with a few files, from the terminal: `/usr/local/speedie/Examples/main.spd /usr/local/speedie/Library/*`
 
@@ -204,8 +204,7 @@ You can specify a few things with main's arguments. Not everything, but some nic
     #!/usr/local/bin/spd
     main (|int| Count, |string| Msg, |float| Fraction)
         for Count
-            printline Msg
-            printline "$Fraction * 2 = ${Fraction*2}"
+            "$Msg: $Fraction * $i = ${Fraction*i|float64|}"
 
 Runing this you should see:
 
