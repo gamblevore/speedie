@@ -1,7 +1,6 @@
 #!/usr/local/bin/speedie
 
 
-
 app.Usage = "Usage: jz File1 [File2...]
 Convert files between jbin, box, xml formats. Additionally can compress or decompress.
 
@@ -21,7 +20,7 @@ examples:
 	jz -c   A.xml						// compress A.xml into A.xml.mz
 	jz      A.txt.mz					// decompress A.txt.mz to A.txt
 	jz -bin A.box						// jeebox to jbin
-".tabstospaces
+".TabsToSpaces
 
 	
 main
@@ -39,7 +38,7 @@ main
 			app.useall(app.cwd.file)
 			GotAll = true
 		  else
-			app.useone(r.file)
+			app.UseOne(r.file)
 	
 	if (StdErr.ok) and (!conv.done) and (conv.dest isnt report)
 		"Nothing to do. All files already in destination format."
