@@ -174,16 +174,15 @@ struct CompressionStats
 		if .live
 			.print(compress)
 	
-	function Durr (|float|)
-		|| d = .duration
-		if d < 0
-			d += date.now
-		return d.Float
+	function Durr (|duration|)
+		rz = .duration
+		if rz < 0
+			rz += date.now
 	
 	render Report (|bool| Compression)
 		|| a = (.in, .out)(Compression)
 		|| b = (.in, .out)(!Compression)
-		fs.RenderSpeed(.durr, A, b, "")
+		fs.RenderSpeed("", A, .durr, B)
 	
 	module
 		|CompressionStats| All // noice

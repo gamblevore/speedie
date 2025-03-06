@@ -130,10 +130,10 @@ function file.CLOC
 		msg.RenderAST(app.stdout.out)
 		printline
 	  elseif counts.ParseSpeed
-		app.stdout.out!.RenderSpeed(durr.float, data.length, 0, "Parsed")
+		app.stdout.out!.RenderSpeed("Parsed", data.length, durr)
 		printline
 	(msg)
-		
+	
 
 
 function file.CountAll (|bool| force=false)

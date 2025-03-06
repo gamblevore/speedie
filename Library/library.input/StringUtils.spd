@@ -264,8 +264,8 @@ function String.SpacesToTabs (|string|)
 
 
 		
-		
-function faststring.RenderSpeed (|float| seconds, |int64| BytesIn, |int64| BytesOut, |string| Name)
+
+function faststring.RenderSpeed (|string| Name, |int64| BytesIn, |duration| Duration, |int64| BytesOut=0)
 	if name
 		self <~ Name
 		self <~ ": "
@@ -281,6 +281,7 @@ function faststring.RenderSpeed (|float| seconds, |int64| BytesIn, |int64| Bytes
 
 	self <~ " in "
 
+	|| seconds = duration.float
 	|| small = seconds < 0.01
 		seconds *= 1000.0
 
@@ -288,7 +289,8 @@ function faststring.RenderSpeed (|float| seconds, |int64| BytesIn, |int64| Bytes
 	if small
 		self <~ 'm'
 	self <~ 's'
-		
+	
+	// could move unit-conversion out into its own thingy. like fs.AppendSize
 	require seconds
 	|| scale = 1.0MB
 	|| unit = 'M'
