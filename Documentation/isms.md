@@ -176,6 +176,15 @@ Or more simply:
 
 Its not a hard thing for anyone to code without the '`of`' operator. But its so awkward that people normally don't bother. The real trick is that I made it simple and convenient.
 
+---
+### Printing Strings
+
+Speedie lets you print strings, without a printline statement. Quite handy. Our prophet Terry Davis taught us this, and we should respect his holy wisdom.
+
+    main
+        "hello you cutie-pie ❤️ 🥰 😘" // prints to stdout
+
+
 ---    
 ### main
 
@@ -187,7 +196,7 @@ So why is it different when dealing with the "main" function? _"Well... it just 
     main (|[file]| Files)
         expect (files) ("No files passed!")
         for f in files
-            printline "$f: ${f.size.strsize}"
+            "$f: ${f.size.strsize}"
 
 Try calling this with a few files, from the terminal: `/usr/local/speedie/Examples/main.spd /usr/local/speedie/Library/*`
 
