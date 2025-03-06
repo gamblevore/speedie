@@ -1,0 +1,5 @@
+#!/usr/local/bin/spd
+
+main (|int| Count, |string| Msg, |float| Fraction)
+	for i in Count
+		"$Msg: $Fraction * $i = ${Fraction*i|float64|}"

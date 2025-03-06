@@ -1,0 +1,6 @@
+#!/usr/local/bin/spd
+
+main (|[file]| Files)
+	expect (files) ("No files passed!")
+	for f in files
+		printline "$f: ${f.size.strsize}"

@@ -8,7 +8,9 @@ As long as you write generally good code in the first place, your code in Speedi
 
 [Error-handling](Errors.md) is described in it's own file.
 
----
+---    
+
+
 ### 'Syntax' Functions
 These are special functions. They work like any other function, but are called via syntactic sugars. For example:
 
@@ -173,7 +175,57 @@ Or more simply:
     "The folder $fol has $substr"
 
 Its not a hard thing for anyone to code without the '`of`' operator. But its so awkward that people normally don't bother. The real trick is that I made it simple and convenient.
+
+---    
+### main
+
+Speedie has an interesting way of working with the "main" function. Speedie understands, that usually, what people want to do, is work with functions. Functions are good, because they specify the inputs and outputs. If you pass the wrong inputs and outputs, your program doesn't compile. Thats normal.
+
+So why is it different when dealing with the "main" function? _"Well... it just is?"_. But in Speedie, things work better. You can define inputs for the main function. This functions by validating input before your code runs.
+
+    #!/usr/local/bin/spd
+    main (|[file]| Files)
+        expect (files) ("No files passed!")
+        for f in files
+            printline "$f: ${f.size}"
+
+Try calling this with a few files, from the terminal: `/usr/local/speedie/Examples/main.spd /usr/local/speedie/Library/*`
+
+You should see this output:
     
+    /usr/local/speedie/Library/CppLib: 3.0KB
+    /usr/local/speedie/Library/UnicodeLetters.txt: 33.2KB
+    /usr/local/speedie/Library/funcs.jbin: 62.7KB
+    /usr/local/speedie/Library/libSDL2.dylib: 3.0MB
+    /usr/local/speedie/Library/library.input: 2.1KB
+
+You can specify a few things with main's arguments. Not everything, but some nice ones. `string`, `int`, `float`, `file`, `message` and arrays of these. You can only use array **once** and it must come **last**.
+
+    #!/usr/local/bin/spd
+    main (|int| Count, |string| Msg, |float| Fraction)
+        for Count
+            printline Msg
+            printline "$Fraction * 2 = ${Fraction*2}"
+
+Runing this you should see:
+
+    /usr/local/speedie/Examples/main2.spd 3 "hello" 1.3
+    hello: 1.3 * 0 = 0
+    hello: 1.3 * 1 = 1.3
+    hello: 1.3 * 2 = 2.6
+
+You might wonder: _"Is it even worth adding this feature?"_ Well... its great for demos! Short simple demos to demonstrate how to use speedie! It just cuts out all the clutter. And for more professional use, it standardises input and how things work. It also gives useful error messages:
+
+    /usr/local/speedie/Examples/main2.spd 3 "hello"    
+    error: Missing Fraction (float).
+
+This is a purely compile-time feature made from syntactic-sugar. So if its not used, it adds nothing to your app.
+
+As a "bonus feature", Speedie lets you write super-short "hello world" apps.
+
+    main
+
+Yes, that itself will output "hello world". I mean... why not? "Hello world" is a good test of "can I even use this £@!#*%! languge?" Why not make it easy?
 
     
 ---
