@@ -911,7 +911,8 @@ class TextView (GUIControl)
 	helper TypeTab (|bool|)
 		|| sr = .SelRange
 		if !sr.width and .IsJeeboxMode
-			return .TabIndent(1, "\t", true)
+			if .TabIndent(1, "\t", true)
+				return true
 		return .typed("\t")
 
 	helper CanTypeTab (|bool|)
@@ -1100,9 +1101,22 @@ class TextView (GUIControl)
 		t.x2++ // whatever... just for now
 		return  t
 
-
+	
+	helper PrevIsTabbable (|int| R, |bool|)
+		|| s = .SelRange
+		require !s.Width
+		|| i = s.x
+		while R < i
+			|| c = self[r]
+			require (c == '/') or c.IsWhite
+			r++
+		return true
+		
+		
 	helper TabIndent (|int| dir, |string| mark, |bool| IsTypingLike=false,  |bool|)
 		|| t = .CommentableRange
+		if Istypinglike and !.PrevIsTabbable(t.x)
+			return false
 		if (mark != "\t") and .text[t.x, mark]
 			dir = -dir
 		
@@ -1112,8 +1126,11 @@ class TextView (GUIControl)
 			beep
 			return true
 		
+		|| s = .sel0
 		.TypingPlaceReal = t
 		.InsertSub(Tabbed, t, !IsTypingLike)
+		if istypinglike
+			.selrange = s + (dir > 0)
 		return true
 	
 	
@@ -1130,7 +1147,8 @@ class TextView (GUIControl)
 			  else
 				rz.z = i
 				exit
-		
+	
+	
 	helper string.GUITabIndent (|int| n, |string| mark, |faststring| fs)
 		if mark != "\t"
 			if n < 0
