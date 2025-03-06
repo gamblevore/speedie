@@ -1,0 +1,38 @@
+#!/usr/local/bin/spd
+
+main (|[file]| files)
+	if !files
+		"Simple utility to speed-test Jeebox parsing speed. Pass file paths to test the speed."
+		return 0
+	
+	|[string]| data
+	|| fs = FastString()
+
+	|| Start = date.now
+	|| n = 0
+	for f in files
+		if !f.IsDir
+			|| s = f.readall(false)
+				n += s.Length
+				data <~ s
+
+	expect (data) ("No readable files found.")
+		
+	fs.RenderSpeed("Read", n, date.now-Start)
+	|[message]| msgs
+
+	Start = date.now
+	for d in data
+		msgs <~ d.parse
+	StdErr.clear
+	fs <~ "\n"
+	fs.RenderSpeed("Parse", n, date.now-Start)
+	fs <~ "\n"
+
+	Start = date.now
+	msgs.clear
+	fs.RenderSpeed("Dispose", n, date.now-Start)
+	
+	printline fs
+
+
