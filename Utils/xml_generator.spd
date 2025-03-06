@@ -16,8 +16,8 @@ main (|FileSizeInt| Amount) {
 
 	    xml <~ "
 	<Book>
-	    <Title>${(caps)(16)}</Title>
-	    <Author alive=\"${alive}\">${(low)(8)} ${(low)(2)}</Author>
+	    <Title>${caps.text(16)}</Title>
+	    <Author alive=\"${alive}\">${low.text(8)} ${low.text(2)}</Author>
 	</Book>"
 	
 	xml <~ `
