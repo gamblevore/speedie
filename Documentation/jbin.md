@@ -78,6 +78,8 @@ So you get back a `Message` object, containing the parsed result of that string.
     // Reads MyFile.box at compile-time, then parses and converts to a jbin string
     // finally, at run-time, the jbin string gets parsed.
 	printline msg
+
+Another great thing about digesting Jeebox, is that the documents are "pre-parsed" and therefor, checked at compile-time. That is a potential source of bugs eliminated. Quite cool!
     
 
 #### Jbin advantages over Jeebox
