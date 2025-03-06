@@ -163,7 +163,6 @@ extend PerryIDE
 			.ID				= "EditMe"
 			.GroupSaveAll	= true
 			.size = the~width by the~bottom to 0~before 
-			.SetsDebugLines = 13
 			.OnTextChanged	= EditMeModified
 			.OnShowExtraInfo = OnShowExtraInfo
 			.takesfocus		= takesfocusflag.On
