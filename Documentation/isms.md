@@ -188,9 +188,9 @@ Speedie lets you print strings, without a printline statement. Quite handy. Our 
 ---    
 ### main
 
-Speedie has an interesting way of working with the "main" function. Speedie understands, that usually, what people want to do, is work with functions. Functions are good, because they specify the inputs and outputs. If you pass the wrong inputs and outputs, your program doesn't compile. Thats normal.
+Speedie has an interesting way of working with the `main` function. Speedie understands, that usually, what people want to do, is work with functions. Functions are good, because they specify the inputs and outputs. If you pass the wrong inputs and outputs, your program doesn't compile. Thats normal.
 
-So why is it different when dealing with the "main" function? _"Well... it just is?"_. But in Speedie, things work better. You can define inputs for the main function. This functions by validating input before your code runs.
+So why is it different when dealing with the `main` function? _"Well... it just is?"_. But in Speedie, things work better. You can define inputs for the `main` function. This validates input before your code runs.
 
     #!/usr/local/bin/spd
     main (|[file]| Files)
@@ -208,7 +208,7 @@ You should see this output:
     /usr/local/speedie/Library/libSDL2.dylib: 3.0MB
     /usr/local/speedie/Library/library.input: 2.1KB
 
-You can specify a few things with main's arguments. Not everything, but some nice ones. `string`, `int`, `float`, `file`, `message` and arrays of these. You can only use array **once** and it must come **last**.
+You can't specify the output, as `main` always returns an `int`. You can specify a few things with `main`'s arguments. Not everything, but some nice ones. `string`, `int`, `float`, `file`, `message` and arrays of these. You can only use array **once** and it must come **last**.
 
     #!/usr/local/bin/spd
     main (|int| Count, |string| Msg, |float| Fraction)
@@ -228,6 +228,11 @@ You might wonder: _"Is it even worth adding this feature?"_ Well... its great fo
     error: Missing Fraction (float).
 
 This is a purely compile-time feature made from syntactic-sugar. So if its not used, it adds nothing to your app.
+
+You can also specify that your app **should not** take any parameters
+
+    main () // creates an error if any params are passed
+        "No params passed! Phew!"
 
 As a "bonus feature", Speedie lets you write super-short "hello world" apps.
 
@@ -352,6 +357,7 @@ Quite often you have some kind of config file, and you want to access it as if i
 You should find this example in `/usr/local/speedie/examples/config_reader.spd`
 
 Treating `message` class as a config, is done by accessing it with `msg[string]`. Config files probably need their own documentation file, as there some details, but mostly its just there to enable short-simple code.
+
 
 
 
