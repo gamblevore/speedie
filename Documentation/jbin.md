@@ -60,11 +60,27 @@ There's not much you can say about the 15 lines of (speedie) parsing code it tak
 
 jbin is always parseable by jeebox. So you have nothing to lose and no extra steps to do, just to parse some jbin. You literally call the same `string.parse` and jeebox will recognise the `jbin` header and parse it. 
 
+
+### Digests
+
+Speedie has the ability to "Digest" strings, and even files as jbin. This basically converts some data into jbin and stores it within your program. Making it faster to parse when you want to parse it. I'll give an example:
+
+    || Msg = `Hello here
+    is a very long
+    multi-line string` ~ parse
+    // pretend this is a long string.
+    printline msg.render 
+
+So you get back a `Message` object, containing the parsed result of that string. And it will parse faster than if it were a jeebox string.
+
+    
+
 #### Jbin advantages to Jeebox
 
-* Faster parse and render
-* **Amazingly** smaller when storing binary files
+* Faster parse and render (2-3x)
+* **Greatly** smaller when storing binary files
 * Really easy to write parsers for in other languages, like javascript.
+* Less likely to ever change than Jeebox.
 
 #### Jbin disadvantages
 * Not human readable
@@ -86,4 +102,4 @@ jbin could literally be used as a superior movie and audio container format... i
 * Smaller. 2 bytes overhead per node, vs 12 to 24 bytes.
 * Entire tree is visible. QuickTime's format relies on you knowing each "type" (4 byte string codes) and whether or not it has children. Which is impossible for vendor-defined codes.
 * Can be streamed when generating it... because we don't need to know the entire **combined** length of a node and all it's children, ahead of time. You can't "streamedly generate" something if you require "pre-knowledge" of things that haven't been created yet, can you!
-* More generic. QuickTime's format can either have children, or a name, but not both. Jeebox can have both.
+* More generic. QuickTime's format can either have children, or a name, but not both. Jeebox (and jbin along with it) can have both.
