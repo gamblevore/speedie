@@ -258,6 +258,20 @@ this expands to:
     
 Obviously the first version looks better. So don't worry about appending strings with embedded expressions! Its pre-optimised.
 
+Also, appending single byte strings are optimised:
+
+    || fs = faststring()
+    fs <~ "A"
+    fs <~ "B"
+    
+    // gets converted to:
+    || fs = faststring()
+    fs <~ 'A' // a single byte
+    fs <~ 'B' // same
+
+Appending a byte is always faster than appending a string that happens to be of one length.
+
+
 ---
 ### Extending classes and modules
 Sometimes you want to add a function to a class or module, without altering the file it is defined in.
