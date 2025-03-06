@@ -56,6 +56,7 @@ There really isn't much more to it than that! All you need to do is call `messag
 
 There's not much you can say about the 15 lines of (speedie) parsing code it takes to parse jbin, really. (35 lines in C++). Jbin is so simple. And thats what so great about it.
 
+
 ### Transparent binary handling
 
 jbin is always parseable by jeebox. So you have nothing to lose and no extra steps to do, just to parse some jbin. You literally call the same `string.parse` and jeebox will recognise the `jbin` header and parse it. 
@@ -71,26 +72,26 @@ Speedie has the ability to "Digest" strings, and even files as jbin. This basica
     // pretend this is a long string.
     printline msg.render 
 
-So you get back a `Message` object, containing the parsed result of that string. And it will parse faster than if it were a jeebox string. You can even digest files, that were originally in textual-jeebox.
+So you get back a `Message` object, containing the parsed result of that string. And it will parse faster than if it were a jeebox string. You can even digest files, that were originally in Jeebox.
 
 	|| msg = file://MyFile.box ~ parse
     // Reads MyFile.box at compile-time, then parses and converts to a jbin string
     // finally, at run-time, the jbin string gets parsed.
 	printline msg
-
-
     
 
-#### Jbin advantages to Jeebox
+#### Jbin advantages over Jeebox
 
 * Faster parse and render (2-3x)
 * **Greatly** smaller when storing binary files
 * Really easy to write parsers for in other languages, like javascript.
 * Less likely to ever change than Jeebox.
 
-#### Jbin disadvantages
+
+#### Jbin disadvantages from Jeebox
 * Not human readable
 * Does not store formatting, or comments
+
 
 #### History
 
@@ -101,6 +102,9 @@ So, I had to parse a quick-time file. This is the "`moov`" or "`atom`" format. I
 Actually jbin is nothing like `m4a`, except being binary. Thats how much I changed.
 
 jbin could literally be used as a superior movie and audio container format... if anyone wanted to. Its not just for jeebox.
+
+This isn't just a streaming issue. Its also an issue of reliability. If your camera is recording a video, and the computer crashes, the .m4a file is corrupted or just never created (because the format starts with the file's final length). With jbin, you don't get this. (Assuming someone made a video-format based on jbin.)
+
 
 #### Jbin Compared to Apple's atom (quicktime) format
 
