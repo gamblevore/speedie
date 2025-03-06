@@ -71,7 +71,13 @@ Speedie has the ability to "Digest" strings, and even files as jbin. This basica
     // pretend this is a long string.
     printline msg.render 
 
-So you get back a `Message` object, containing the parsed result of that string. And it will parse faster than if it were a jeebox string.
+So you get back a `Message` object, containing the parsed result of that string. And it will parse faster than if it were a jeebox string. You can even digest files, that were originally in textual-jeebox.
+
+	|| msg = file://MyFile.box ~ parse
+    // Reads MyFile.box at compile-time, then parses and converts to a jbin string
+    // finally, at run-time, the jbin string gets parsed.
+	printline msg
+
 
     
 
