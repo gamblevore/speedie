@@ -188,7 +188,7 @@ Speedie lets you print strings, without a printline statement. Quite handy. Our 
 ---    
 ### main
 
-Speedie has an interesting way of working with the `main` function. Speedie understands, that usually, what people want to do, is work with functions. Functions are good, because they specify the inputs and outputs. If you pass the wrong inputs and outputs, your program doesn't compile. Thats normal.
+`main` is the first function your program runs. Speedie has a neat way of working with `main`. Speedie understands, that usually, what people want to do, is work with functions. Functions are good, because they specify the inputs and outputs. If you pass the wrong inputs and outputs, your program doesn't compile. Thats normal.
 
 So why is it different when dealing with the `main` function? _"Well... it just is?"_. But in Speedie, things work better. You can define inputs for the `main` function. This validates input before your code runs.
 
@@ -208,7 +208,7 @@ You should see this output:
     /usr/local/speedie/Library/libSDL2.dylib: 3.0MB
     /usr/local/speedie/Library/library.input: 2.1KB
 
-You can't specify the output, as `main` always returns an `int`. You can specify a few things with `main`'s arguments. Not everything, but some nice ones. `string`, `int`, `float`, `file`, `message` and arrays of these. You can only use array **once** and it must come **last**.
+You can't specify the output, as `main` always returns an `int`. You can specify a few things with `main`'s arguments. Not everything, but some basic ones: `string`, `int`, `float`, `file`, `message` and arrays of these. You can only use array **once** and it must come **last**.
 
     #!/usr/local/bin/spd
     main (|int| Count, |string| Msg, |float| Fraction)
@@ -229,16 +229,7 @@ You might wonder: _"Is it even worth adding this feature?"_ Well... its great fo
 
 This is a purely compile-time feature made from syntactic-sugar. So if its not used, it adds nothing to your app.
 
-You can also specify that your app **should not** take any parameters
-
-    main () // creates an error if any params are passed
-        "No params passed! Phew!"
-
-As a "bonus feature", Speedie lets you write super-short "hello world" apps.
-
-    main
-
-Yes, that itself will output "hello world". I mean... why not? "Hello world" is a good test of "can I even use this £@!#*%! languge?" Why not make it easy?
+As an easter egg, try writing just `main` as your entire program. Nothing else. See what happens.
 
     
 ---
@@ -256,20 +247,7 @@ this expands to:
      fs <~ " and my age is "
      fs <~ age
     
-Obviously the first version looks better. So don't worry about appending strings with embedded expressions! Its pre-optimised.
-
-Also, appending single byte strings are optimised:
-
-    || fs = faststring()
-    fs <~ "A"
-    fs <~ "B"
-    
-    // gets converted to:
-    || fs = faststring()
-    fs <~ 'A' // a single byte
-    fs <~ 'B' // same
-
-Appending a byte is always faster than appending a string that happens to be of one length.
+Obviously the first version looks better. So don't worry about appending strings with embedded expressions! Its pre-optimised. (Also appending a string constant of 1 byte long, is optimised into appending a byte-number.)
 
 
 ---
