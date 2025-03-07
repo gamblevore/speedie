@@ -76,7 +76,7 @@ function file.cloc
 		""
 	  elseif counts.ParseSpeed
 		|| fs = app.stdout.out!
-		fs.RenderSpeed(durr.float, data.length, 0, "Parsed")
+		fs.RenderSpeed("Parsed", data.length, durr)
 		fs <~ "\n"
 	(msg)
 		
