@@ -1,0 +1,44 @@
+
+// get this data, and put it into the stack.
+ignore {
+stack Speedie
+	line <(`/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd`)> "ConfirmWindow_.SetResponse" 123
+	line <(`/usr/local/speedie/GUI.scproj/gui.input/GUI/FileViewer.spd`)> "FileViewer.ShowQuickOpen" 456
+
+
+variables
+	line <(`/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd`)> "true" 123     // a bool
+	line <(`/usr/local/speedie/GUI.scproj/gui.input/GUI/FileViewer.spd`)> "hello" 456 // a string
+
+asm
+	function "Abc" "/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd"
+	file <(`/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd`)>
+	+"MULK: r2, r1, 13" 123
+	+"JBRA: r2, 12" 456
+	file <(`/usr/local/speedie/GUI.scproj/gui.input/GUI/inlines.spd`)>
+	+"JBRA: r1, 13" 555
+
+
+
+cpp 
+	function "Abc" "/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd"
+	function abc (|int| x, |int|)
+		pos 10
+		|| y = x * 13
+		file <(`/usr/local/speedie/GUI.scproj/gui.input/GUI/inlines.spd`)>
+		pos 130
+		if y
+			pos 140
+			def()
+			pos 150
+			...
+		else
+			pos 160
+			xyz()
+			pos 170
+			...
+		pos 180
+		return y
+
+}
+

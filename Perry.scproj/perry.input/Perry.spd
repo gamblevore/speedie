@@ -252,8 +252,6 @@ function CheckViewWorthIt (|buttonview| old)
 	|| s = ""
 	if (.errorlist is visible) and .errorlist.isempty
 		s = .CompileOKString
-	  elseif (.debugger is visible) and !.attachedProgram
-		s = "No program active"
 	.noneed(s, old)
 
 

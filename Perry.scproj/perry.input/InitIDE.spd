@@ -1,5 +1,4 @@
 
-
 extend PerryIDE  
     constructor (|file| project)
 		super.constructor 
@@ -10,6 +9,8 @@ extend PerryIDE
 		.RecentFiles 		= message()
 		.id					= "IDE"
 		.Debugger			= GUIControl(self)
+		.AppInfo			= TextView(.debugger)
+		.Stack				= listview(.debugger, ClickedStack, ReturnStack)
 		.SearchArea			= guicontrol(self) 
 		.ViewButtons		= guicontrol(self) 
 		.RBorder			= guicontrol(self)
@@ -27,7 +28,7 @@ extend PerryIDE
 		.FunctionMenu		= ButtonView(.RBorder,	MenuAllFuncs,	 nil,	ReturnAllFuncs) 
 		.MassSearchField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
 		.MassReplaceField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
-		.SubFindCheckBox	= ButtonView(.searcharea, PressedSearchWithin   	)
+		.SubFindCheckBox	= ButtonView(.searcharea, PressedSearchWithin)
 		.FoundList			= ListView(.SearchArea,	ClickedError,			ReturnErrorList) 
 		.ErrorList			= ListView(self,		ClickedError,			ReturnErrorList) 
 		.CommsLogList		= ListView(self,		nil,					nil)
@@ -52,6 +53,7 @@ extend PerryIDE
 		.Views				= [.filelist,  .errorlist,  .debugger,  .searcharea,  .CommsLogList]
 		.filesep			= StretchControl.horz(self, 175~right, 110, 110)
 		.ProductSep			= StretchControl.vert(self, 0~right,     0,   100)
+		.VariablesSep		= StretchControl.Horz(self, 0~left, 0, 0)
 		.PopupDisplay		= textview(self)
 		.DebugArgsList		= textview(self)
 		.AttachedProgram	= ""
@@ -291,6 +293,35 @@ extend PerryIDE
 			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.Solid = LeftBG
 			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
+
+
+		with .stack
+			is   visible
+			is   UnSearchable
+			isnt DrawsFocus
+			.IsMainListView = true
+			.RowHeight		= .rowheight + 3
+			.NoSeps			= true
+			.tooltip		= self.debugger.Tooltip
+			.UseColorScheme	= true
+			.ID				= "Stack"
+			.size 			= the~width  by  the~bottom to 0~under 
+			.AlwaysSendChangeEvent = true
+			.TakesFocus		= takesfocusflag.On
+			.gnormal		= self.FileList.GNormal.copy
+			.GNormal.Solid = LeftBG
+			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
+			
+
+		with .appinfo
+			is   visible
+			isnt drawsfocus
+			.Alignment		= MoveCode.Center
+			.tooltip		= self.debugger.Tooltip
+			.ID				= "Application Info"
+			.size 			= 3~inside  by  2~down back 40
+			.takesfocus		= takesfocusflag.On
+			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
 
 			
 		with .progress
@@ -609,7 +640,17 @@ extend PerryIDE
 		.ShowIDE
 		.ViewAsbetter
 		.LoadStartupErrors
+		.StartupDebugArea
 		return true
+	
+	
+	function StartupDebugArea
+		|| m = `
+		line "/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd" "ConfirmWindow_.SetResponse" 123
+		line "/usr/local/speedie/GUI.scproj/gui.input/GUI/FileViewer.spd" "FileViewer.ShowQuickOpen" 456
+` ~ parse
+		.Stack.use(m as listviewrow)
+		.appinfo.text = "Speedie\n(Inactive)"
 	
 	
 	function RelistStartupErrors
@@ -618,7 +659,6 @@ extend PerryIDE
 				log "RelistStartupErrors bug"
 			.errorlist <~ err
 			is broken
-
 		// * need to alter the saved errors when the .perry file is altered...
 	
 	
