@@ -10,6 +10,7 @@ extend PerryIDE
 		.id					= "IDE"
 		.Debugger			= GUIControl(self)
 		.AppInfo			= TextView(.debugger)
+		.DebugBtns			= guicontrol(.debugger)
 		.Variables			= listview(.debugger, ClickedVariables, ReturnVariables)
 		.Stack				= listview(.debugger, ClickedStack, ReturnStack)
 		.SearchArea			= guicontrol(self) 
@@ -292,8 +293,7 @@ extend PerryIDE
 			isnt visible
 			.gnormal		= self.errorlist.gnormal
 
-
-
+		
 		with .appinfo
 			is   visible
 			isnt drawsfocus
@@ -302,6 +302,19 @@ extend PerryIDE
 			.ID				= "Application Info"
 			.size 			= the~width  by  1~down back 40
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
+
+
+		with .DebugBtns
+			is   visible
+			isnt drawsfocus
+			.ID = "DebugButtons"
+			.tooltip		= self.debugger.Tooltip
+			.size 			= the~width  by  1~under back 18
+			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
+			self.AddDebugButtons(DebugStepOver, "\02", "Step Over")
+			self.AddDebugButtons(DebugStepIn,   "\03", "Step In")
+			self.AddDebugButtons(DebugStepOut,  "\04", "Step Out")
+			self.AddDebugButtons(DebugStepRun,  "\15", "Run")
 
 
 		with .variables
@@ -545,6 +558,7 @@ extend PerryIDE
 
 
 	function textview.SetupOut (|string| name, |int| Parse=TextView.probablyjeebox)
+//		printline name
 		opt norefcounts
 		is enabled
 		is alwaysscrollable
@@ -557,6 +571,7 @@ extend PerryIDE
 		.expectsparse	= Parse
 		.PreferStayAtEnd= true
 		.ide.productsep.addleft(self)
+//		"--"
 		
 		
 	function SetupLogArea
@@ -642,6 +657,17 @@ extend PerryIDE
 			btn.gnormal.solid = (f, f, f, opacity)
 	
 
+	function AddDebugButtons (|GUIAction| action, |string| icon, |string| id)
+		|| btn = buttonview(.DebugBtns, action)
+		btn.size = 5~after for 22  by  3~inside
+		btn.id = id
+		btn.Tooltip = id
+		btn.Text = icon
+		|| opacity = 0.93
+		|| f	   = 0.15 / opacity
+		btn.gnormal.solid = (f, f, f, opacity)
+		
+		
 	function LoadProject (|bool|)
 		require .project.mustexist("load project")
 		.DuringLoad++
@@ -671,7 +697,7 @@ extend PerryIDE
 ` ~ parse
 		.Stack.use(m as listviewrow)
 		.Variables.use(v as listviewrow)
-		.appinfo.text = "Speedie\n(Inactive)\n**OOF**"
+		.appinfo.text = "Speedie\n(Inactive)"
 	
 	
 	function RelistStartupErrors

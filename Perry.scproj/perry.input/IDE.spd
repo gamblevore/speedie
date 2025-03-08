@@ -13,6 +13,7 @@ class PerryIDE (Window)
 	|Guicontrol|				Debugger
 	|listview|					Stack
 	|textview|					AppInfo
+	|Guicontrol|				DebugBtns
 	|Guicontrol|				SearchArea
 	|ListView|					Variables
 	|Guicontrol|				rborder
@@ -53,7 +54,7 @@ class PerryIDE (Window)
 	|ButtonView|				FunctionMenu
 	|buttonview|				Toolbar
 	|Buttonview|				ProjectTabs
-	|buttonview| 				CompileTabs // compilertabs
+	|buttonview|				CompileTabs // compilertabs
 	|buttonview|				SubFindCheckBox    
 	|Buttonview|				ViewErrors
 	|Buttonview|				ViewFiles

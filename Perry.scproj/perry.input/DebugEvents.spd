@@ -231,5 +231,15 @@ function ReturnVariables (GUIListEvent)
 	return ClickedStack(self, row)
 	
 	
+function DebugStepOver (guiaction)
+	beep "over"
 	
+function DebugStepIn (guiaction)
+	beep "in"
+	
+function DebugStepOut (guiaction)
+	beep "out"
+	
+function DebugStepRun (guiaction)
+	beep "run"
 	
