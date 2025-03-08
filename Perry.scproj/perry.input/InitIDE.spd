@@ -314,7 +314,7 @@ extend PerryIDE
 			self.AddDebugButtons(DebugStepOver, "\02", "Step Over")
 			self.AddDebugButtons(DebugStepIn,   "\03", "Step In")
 			self.AddDebugButtons(DebugStepOut,  "\04", "Step Out")
-			self.AddDebugButtons(DebugStepRun,  "\15", "Run")
+			self.AddDebugButtons(DebugStepRun,  "\02\02", "Run")
 
 
 		with .variables
