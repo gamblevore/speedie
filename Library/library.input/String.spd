@@ -364,9 +364,6 @@ class String
 
 	render Reverse
 		cpp_wrapper
-		
-	render StrSize
-		return .Length.StrSize(Fs_in)
 	
 	function Rotate (|int| n, |string|)
 		if !n
