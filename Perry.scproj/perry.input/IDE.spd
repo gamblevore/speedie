@@ -16,7 +16,7 @@ class PerryIDE (Window)
 	|Guicontrol|				SearchArea
 	|ListView|					Variables
 	|Guicontrol|				rborder
-	|guicontrol| 			CompileArea
+	|guicontrol| 				CompileArea
 	
 	|FileRow?|					NotTodo
 	|message?|					SharedProjectTabSource
@@ -43,8 +43,6 @@ class PerryIDE (Window)
 	|listviewrow?|				LogComms
 	|listviewrow?|				LogActions
 	|menu|						AutoComplete
-//	|ListView|					Variables		// ... todo
-//	|ListView|					Stack			// ... todo
 	|ListView|					ErrorList
 	|listview|					CommsLogList
 	|ListView|					FoundList
@@ -66,7 +64,6 @@ class PerryIDE (Window)
 	|Buttonview|				GoPrev
 	|Buttonview|				StartScreen
 	|Buttonview|				BuildButton
-//	|Buttonview|				RecentButton
 	|Buttonview|				RunButton
 	|Process?| 					Talker
 	|message|					RecentFiles
@@ -89,7 +86,7 @@ class PerryIDE (Window)
 	|bool|						CanAskingAboutMissing
 	|bool|						DuringMsgFB  // canloadfile, canupdate, .disable 
 	|int8|						DuringNextPrev
-	|bool|						IsTextOnly
+	|bool|						IsTextMode
 	|bool|						UsingSpdLib
 	|bool| 						DebugIsWaitingForCompile
 	|bool|						InConstructor
@@ -112,6 +109,7 @@ class PerryIDE (Window)
 				if p isa perryide
 					p.showide
 
+	
 	function UpdateStatusErrors
 		.EditStatus.text = .PerryStatus
 
@@ -367,7 +365,7 @@ class PerryIDE (Window)
 		
 		|| HideTop  = (m.y < LB)
 		|| HideSide = (m.x > LF)
-		|| HideTabs = HideTop or .IsTextOnly
+		|| HideTabs = HideTop or .IsTextMode
 		|| VisSide  = !.filelist.decluttering
 		|| VisTop   = !.StartScreen.decluttering
 		|| VisTabs  = !.ProjectTabs.Decluttering
@@ -389,7 +387,7 @@ class PerryIDE (Window)
 			.StartScreen.declutter = hidetop
 			if HideTop
 				(.DebugArgsList isnt visible)			// better to declutter
-			|| ShowBuilders = !HideTop and (!.istextonly or .path.isspd)
+			|| ShowBuilders = !HideTop and (!.IsTextMode or .path.isspd)
 			|| HideBuilders = !ShowBuilders
 			.runbutton.declutter		= HideBuilders
 			.buildbutton.declutter		= HideBuilders
@@ -574,40 +572,35 @@ class PerryIDE (Window)
 		if  key is s  and  .editme is visible
 			.SaveEditing(documentstate.saving)
 			return true
+		if key is j
+			return .FlipJeeboxField
 		|| NumKey = key.IsNumber
-			if NumKey == 0
-				.ViewAsSwap
-				return true
 			if NumKey == 9
-				.flip(.ProductOut)
-				return true
-			if key is num8 or j
-				if .flip(.JeeboxText)
-					.UpdateJeeboxField
-				return true
-			if NumKey == 7
-				.flip(.SpeedieText)
-				return true
-			if NumKey == 6
-				.view(.ViewLog)
-				return true
-			if NumKey == 5
-				.view(.ViewDebugger)
-				return true
-			if NumKey == 4
-				.view(.Viewerrors)
-				return true
-			if NumKey == 3
-				.view(.ViewSearch)
-				return true
-			if NumKey == 2
-				.view(.ViewFiles)
-				return true
-			if NumKey == 1
 				.RunButton.dopressing(nil)
 				return true
+			if NumKey == 8
+				.flip(.ProductOut)
+				return true
+			if NumKey == 7
+				return .FlipJeeboxField
+			if NumKey == 6
+				.flip(.SpeedieText)
+				return true
+			if NumKey == 5
+				return .strongview(.ViewLog)
+			if NumKey == 4
+				return .strongview(.ViewDebugger)
+			if NumKey == 3
+				return .strongview(.Viewerrors)
+			if NumKey == 2
+				return .strongview(.ViewSearch)
+			if NumKey == 1
+				return .strongview(.ViewFiles)
+			if NumKey == 0
+				.ViewTextModeSwap
+				return true
 		if key is p or backslash
-			return .idecommand
+			return .IDECommand
 			
 
 	function Flip (|textview| s, |bool|)
