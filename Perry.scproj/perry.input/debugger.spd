@@ -1,10 +1,6 @@
 
 // get this data, and put it into the stack.
 ignore {
-stack Speedie
-	line <(`/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd`)> "ConfirmWindow_.SetResponse" 123
-	line <(`/usr/local/speedie/GUI.scproj/gui.input/GUI/FileViewer.spd`)> "FileViewer.ShowQuickOpen" 456
-
 
 variables
 	line <(`/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd`)> "true" 123     // a bool

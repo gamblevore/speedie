@@ -206,7 +206,8 @@ function ReturnProjectPath (GUIListEvent)
 	if row isa filerow
 		row.location.reveal
 	return true
-	
+
+
 function ReturnRecents (GUIListEvent)
 	perry.IdeAddProj(row.name)
 	return true
@@ -239,7 +240,7 @@ function PerryIDE.SaveAndShowErrors (|bool|) // checkerrors recheckforerrors
 	.Recheck
 	|| t = .istextonly
 	.ViewAsProject
-	if t and .isviewing(.errorlist)
+	if t and .IsViewing(.errorlist)
 		return true
 	if .ShowErrors
 		return true

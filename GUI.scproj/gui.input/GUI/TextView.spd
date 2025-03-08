@@ -2063,7 +2063,10 @@ class TextView (GUIControl)
 		
 	
 	helper TextCopy (GUICopyEvent)
-		return .SelText
+		if .SelRange
+			return .SelText
+		if self isnt editable
+			return .text
 	
 	
 	function ScrollPos (|int|)

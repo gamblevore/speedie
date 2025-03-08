@@ -132,7 +132,7 @@ class ConfirmWindow_ (Window)
 		.response		= textview(self, nil)
 		.Question		= textview(self, nil)
 		.gnormal        = ¥.systemstyle 
-		.fullscreen		= (300, 150)
+		.FullScreen		= (300, 150)
 		.AddButton(.yes, "Yes", true)
 		.AddButton(.No,	 "No" , false)
 		.AddButton(.Cancel, "Cancel", false)

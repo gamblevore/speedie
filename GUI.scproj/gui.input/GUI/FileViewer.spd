@@ -113,7 +113,7 @@ class FileViewer (ListView)
 		opt norefcounts
 		|| f = .listsource
 		if f isa filerow
-			f.dirsize(.sizecheckers)
+			f.DirSize(.SizeCheckers)
 	
 		
 	function ShowQuickOpen (|bool|)
@@ -131,12 +131,6 @@ class FileViewer (ListView)
 		q.SelectAll
 		.OpenQuickRelist(q.text)
 		return true
-
-
-//	function SavedFileData (|string| path, |string|)
-//		opt norefcounts
-//		|| f = self[path]
-//			return f.savedfiledata
 
 			
 	function AddRoot (|file| fol, |bool| IsMainProj = false, |filerow|)
@@ -156,11 +150,6 @@ class FileViewer (ListView)
 		f.FillFilesSub(fol, .excludes, .folfile, c)
 		return f
 
-
-//	function Conf (|string|)
-//		opt NoRefCounts
-//		return (.start as filerow)$.location.child(.folfile)
-	
 	
 	function FolFile (|string|)
 		return .listsource.name
@@ -374,11 +363,11 @@ class FileViewer (ListView)
 		return .BatchFindReplace(str, 0, false)
 		
 
-	function BatchFindReplace (|string| str,  |uint| FindID, |bool| ForReplace,  |message|)
+	function BatchFindReplace (|string| str,  |uint| FindID,  |bool| ForReplace,  |message|)
 		|| All = error()
 		if !str
 			return all
-		.BatchFindSub(str, all, findid, ForReplace)
+		.BatchFindSub(str, all, FindID, ForReplace)
 		all.ExtractRecent(rz)				// Split into recent and not recent
 		rz.sort(ErrorSearchSorter)			// recent
 		all.sort(ErrorSearchSorter)			// not recent

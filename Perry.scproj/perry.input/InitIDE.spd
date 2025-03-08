@@ -106,14 +106,12 @@ extend PerryIDE
 		with .DebugArgsList
 			isnt visible
 			is editable
-//			is TrapVisibleChange
 			.size =  the~left+4 for 360  by  15~down back 150
 			.id = "debugargs"
 			.OnFocus = DebugArgsGotFocus
 			.gnormal.solid  = (0.05, 0.05, 0.05, 0.95)
 			.gnormal.edge = (0.0, 0.0, 0.0, 0.125)
 			.OnKeyDown = DebugArgsKeyDown
-//			.ontextchanged = ArgValidation 
 			.expectsparse = textview.AlwaysJeebox
 			.attachedfrom = movecode.top
 			.ClickOutsideCloses = true		
@@ -219,16 +217,6 @@ extend PerryIDE
 			.gnormal.clear 
 
 
-		with .debugger 
-			.tooltip		= "Debugger area"
-			.takesfocus 	= takesfocusflag.CanFocus
-			.ID				= "DebuggerArea"
-			.size 			= the~width by the~bottom to 15~down
-			isnt drawsfocus
-			isnt visible
-			.gnormal		= self.errorlist.gnormal
-
-
 		with .SearchArea 
 			.tooltip		= "Searches stuff. Press \1f; or \1f' to step in list."
 			.takesfocus 	= takesfocusflag.CanFocus
@@ -293,6 +281,16 @@ extend PerryIDE
 			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.Solid = LeftBG
 			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
+
+
+		with .debugger 
+			.tooltip		= "Debugger area"
+			.takesfocus 	= takesfocusflag.CanFocus
+			.ID				= "DebuggerArea"
+			.size 			= the~width by the~bottom to 15~down
+			isnt drawsfocus
+			isnt visible
+			.gnormal		= self.errorlist.gnormal
 
 
 		with .stack
@@ -646,11 +644,11 @@ extend PerryIDE
 	
 	function StartupDebugArea
 		|| m = `
-		line "/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd" "ConfirmWindow_.SetResponse" 123
-		line "/usr/local/speedie/GUI.scproj/gui.input/GUI/FileViewer.spd" "FileViewer.ShowQuickOpen" 456
+		line "/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd" "ConfirmWindow_.SetResponse" 3362
+		line "/usr/local/speedie/GUI.scproj/gui.input/GUI/FileViewer.spd" "FileViewer.ShowQuickOpen" 2529
 ` ~ parse
 		.Stack.use(m as listviewrow)
-		.appinfo.text = "Speedie\n(Inactive)"
+		.appinfo.text = "Speedie\n(Inactive)\n**OOF**"
 	
 	
 	function RelistStartupErrors

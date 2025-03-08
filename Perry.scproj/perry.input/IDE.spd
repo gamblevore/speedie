@@ -633,8 +633,9 @@ class PerryIDE (Window)
 			return .autocomplete.doreturn
 		if super.keydown(key)
 			return true
-		if .openedmenu or key.IsModifier
+		if .OpenedMenu or key.IsModifier
 			return false
+		require !keys.cmd
 		if .focus isnt editable
 			.Editme.SetFocus
 			return .editme.__KeyDown__(key)
