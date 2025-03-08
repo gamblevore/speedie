@@ -5,7 +5,6 @@ function FileSepClicker (guiaction)
 	.ide.ViewAsSwap
 
 
-
 function PerryIDE.UnusedFuncsFB (|message| stuff)
 	opt norefcounts
 	|| arg = stuff.Last
@@ -47,7 +46,7 @@ function Perry.CreateProj (|string| path)
 		if path isa "spd"
 			proj.data = main
 	  else
-		expect (!path.fileexists) (path, "Can't create over existing project.")
+		expect (!path.FileExists) (path, "Can't create over existing project.")
 
 		proj.child("input/main.spd").data(Main) #require
 
@@ -583,7 +582,6 @@ function PerrySearchWithin (GUIListEvent)
 	opt NoRefCounts
 	.ide.SubFindCheckBox is visible
 	.ide.ShowFind
-	
 
 
 function PerryFileViewRightClick (GuiListEvent)
