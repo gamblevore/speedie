@@ -39,7 +39,7 @@ main (|[existingfile]| files)
 	if app.No("quiet") and app.no("q")
 		for f in found
 			"${f.trimstart(remover)} --> ${f.size.strsize}"
-	"Total: ${Total.strsize}"
+	"Total: ${Total.strsize} in ${found.length} files"
 
 
 function App.FindRemover (|string|)
