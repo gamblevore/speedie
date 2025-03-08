@@ -139,7 +139,7 @@ class ConfirmWindow_ (Window)
 		
 		isnt visible
 		.init
-		
+	
 
 	function SetResponse (|string| response)
 		opt norefcounts

@@ -63,6 +63,8 @@ typedef byte ErrorSeverity;
 
 typedef int ExitCode;
 
+typedef int FailableInt;
+
 typedef int FileDes;
 
 typedef int FileMode;
@@ -1078,6 +1080,8 @@ extern Dictionary* JB__TC_Types_Dict;
 
 #define kJB__ErrorSeverity_Warning ((ErrorSeverity)2)
 
+#define kJB__FailableInt_Fail ((int)2147483648)
+
 #define kJB__FileDes_StdErr ((FileDes)2)
 
 #define kJB__FileDes_StdIn ((FileDes)0)
@@ -1858,6 +1862,9 @@ Array* JB_ErrorSeverity__InitNames();
 
 
 // ExitCode
+
+
+// FailableInt
 
 
 // FileDes

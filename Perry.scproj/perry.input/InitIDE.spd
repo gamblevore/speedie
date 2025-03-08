@@ -300,7 +300,7 @@ extend PerryIDE
 			.Alignment		= MoveCode.Center
 			.tooltip		= self.debugger.Tooltip
 			.ID				= "Application Info"
-			.size 			= the~width  by  2~down back 40
+			.size 			= the~width  by  1~down back 40
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
 
 
@@ -314,7 +314,7 @@ extend PerryIDE
 			.tooltip		= "The variables in the current function"
 			.UseColorScheme	= true
 			.ID				= "Variables"
-			.size 			= the~width  by  -90~pc to 0~under
+			.size 			= the~width  by  33~pc to 0~under
 			.AlwaysSendChangeEvent = true
 			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.Solid = LeftBG
@@ -330,7 +330,7 @@ extend PerryIDE
 			.tooltip		= "The function call stack"
 			.UseColorScheme	= true
 			.ID				= "Stack"
-			.size 			= the~width  by  the~bottom to 0~under 
+			.size 			= the~width  by  the~bottom to 1~under 
 			.AlwaysSendChangeEvent = true
 //			.TakesFocus		= takesfocusflag.On
 			.gnormal		= self.FileList.GNormal.copy
