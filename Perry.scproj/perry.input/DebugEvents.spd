@@ -209,3 +209,19 @@ function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
 	return !kill
 		
 
+function ClickedStack (GUIListEvent)
+	require row
+	|| path = row.firstname
+	|| i = .ide	
+
+	i.EditPath(path, false)
+	i.editme.ShowAndSel(row.last.int, true)
+	return true
+
+
+function ReturnStack (guilistevent) // show ASM?
+	return ClickedStack(self, row)
+	
+	
+	
+	
