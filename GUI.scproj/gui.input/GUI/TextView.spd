@@ -13,6 +13,7 @@ class TextView (GUIControl)
 	|byte|						LineNumWidth
 	|byte|						LineHeight
 	|byte|						ExpectsParse
+	|int8|						YAdjust
 	|MoveCode|					Alignment // centered, left, right
 //	|int|						ClickedPos
 
@@ -1713,8 +1714,7 @@ class TextView (GUIControl)
 
 		|| yend		= .LastBottom
 		|| UseCol	= .UseColorAnyway
-		if .SingleLine and self is Editable
-			y-- // argh?
+		y += .YAdjust
 		while (y > yend) and (d)
 			y -= .LineHeight
 			.DrawOneLine(where, D, y, usecol, lc)
