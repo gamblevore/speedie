@@ -12,7 +12,7 @@ constants
 prototype fnPreReader (|scfunction| self, |message| msg, |bool|)
 
 function SCFunction.PreRead (|message| Arg)
-	opt norefcounts
+	opt NoRefCounts
 	for s in arg
 		if s == @tmp
 			|| fn = FuncPreReader[s.name]

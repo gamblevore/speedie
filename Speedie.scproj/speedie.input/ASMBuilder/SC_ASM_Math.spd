@@ -5,12 +5,12 @@ prototype fn_ASMConstifier  (|asmreg| L, |asmreg| R, |int64|)
 
 
 extend asmreg
-	function CondAnswer (|asmreg|)
-		.µtype = DataTypeCode.bool
-		is AlreadyNegated
-		is CondAnswer
-		isnt negate
-		return self
+//	function CondAnswer (|asmreg|)
+//		.µtype = DataTypeCode.bool
+//		is AlreadyNegated
+//		is CondAnswer
+//		isnt negate
+//		return self
 
 	function BoolAnswer (|asmreg|)
 		.µtype = DataTypeCode.bool

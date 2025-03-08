@@ -1,15 +1,5 @@
 
 
-datatype FailableInt (int) // useful when you want most numbers, even negatives, and zero but still want AN error code
-	constants
-		|int| 
-		Fail = 0x8000_0000
-	default FailableInt.fail
-	false   FailableInt.fail
-	syntax cast (|bool|)
-		return self != fail|int|
-
-
 function message.ASMDecl (|SCDecl!|)
 	opt norefcounts
 	rz = .fastdecl

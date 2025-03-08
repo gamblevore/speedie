@@ -3,7 +3,7 @@
 	Jeebox internals. By Theodore H. Smith...
 */
  
-//
+
 class SCArg (SCNode)
 	linkage
 		cpp_part		Arg
