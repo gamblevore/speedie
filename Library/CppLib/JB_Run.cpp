@@ -221,7 +221,7 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
 
 
 
-int JB_SP_Run (_cstring* C, int Mode)	{
+int JB_SP_Run (_cstring* C, int Mode)	{ // JB_SP_Main
 	if (JB_Active)
 		return EALREADY;
 	JB_Active = 1 | (Mode&4);
