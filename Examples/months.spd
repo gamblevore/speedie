@@ -7,10 +7,6 @@ datatype AnyMonth (uint16)
     module
         || Names = "January,February,March,April,May,June,July,August,September,October,November,December"/','
     
-    // would be better if a name-array could be auto-created...
-    // or at least a function to turn ints to names
-    // also would be better if I didn't need .render on plantmyseeds. :[
-    
     render
         || NeedSep = false
         for i in 16
