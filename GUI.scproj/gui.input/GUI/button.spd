@@ -18,6 +18,7 @@ class ButtonView (GUIControl)
 	|byte|						ClickCount
 	|bool|						PressingDone
 	|bool|						PressMakesLighter
+	|bool|						CanReOrderButtons
 	|bool|						MouseDownDoesClick
 	|bool| 						NoDrawClicked
 	|ListViewState|				Align
@@ -158,20 +159,21 @@ class ButtonView (GUIControl)
 	behaviour MouseDown
 		opt norefcounts
 		.clickcount = clicks
-		|| D = .itemat(P.x)
+		|| D = .ItemAt(P.x)
 			if (d isnt active)  and  .Decluttered
 				d = nil
 		
 		|| ret = MouseDragging.Ignored
-		|| cl = .ClickedItem
-		if cl and clicks == -1		// drag
-			if D and D != cl
-				cl.moveto(D)
-				.touch
-				.PressingDone = true
-			if !.pressing or .PressingDone
-				return mousedragging.beyond
-			ret = mousedragging.EvenIfNoMovement // ?
+		if .CanReOrderButtons
+			|| cl = .ClickedItem
+			if cl and clicks == -1		// drag
+				if D and D != cl
+					cl.moveto(D)
+					.touch
+					.PressingDone = true
+				if !.pressing or .PressingDone
+					return mousedragging.beyond
+				ret = mousedragging.EvenIfNoMovement // ?
 		
 		if keys.option and .pressing
 			.DoPressing(D)

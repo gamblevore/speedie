@@ -10,11 +10,12 @@ extend PerryIDE
 		.id					= "IDE"
 		.Debugger			= GUIControl(self)
 		.AppInfo			= TextView(.debugger)
+		.Variables			= listview(.debugger, ClickedVariables, ReturnVariables)
 		.Stack				= listview(.debugger, ClickedStack, ReturnStack)
 		.SearchArea			= guicontrol(self) 
 		.ViewButtons		= guicontrol(self) 
 		.RBorder			= guicontrol(self)
-		.CompileAndJBArea	= guicontrol(self)
+		.CompileArea	    = StretchControl.horz(self, 0~right, 0, 100)
 		.Toolbar			= buttonview(self,		ClickedToolBar)
 		.RunButton			= buttonview(.Toolbar,	ClickedDebug,			PressingDebug, nil, PressingDebug)
 		.BuildButton		= buttonview(.Toolbar,	Clickedcompile)
@@ -42,7 +43,7 @@ extend PerryIDE
 		.SpeedieText		= TextView(self)
 		.ProductOut			= TextView(self)
 		.ProductErrors		= TextView(self)
-		.CompileTabs		= ButtonView(.CompileAndJBArea,		ClickedCompileTabs) 
+		.CompileTabs		= ButtonView(.CompileArea,		ClickedCompileTabs) 
 		.UnNeededLabel		= TextView(self,		ClickedNoNeed)
 		.AutoComplete		= menu(self, 			nil,					AutoCompleteInsertText)
 		.ViewFiles			= ButtonView(.ViewButtons,		ClickedAView)
@@ -51,9 +52,8 @@ extend PerryIDE
 		.ViewErrors			= ButtonView(.ViewButtons,		ClickedAView)
 		.viewlog			= ButtonView(.ViewButtons,		clickedaview)
 		.Views				= [.filelist,  .errorlist,  .debugger,  .searcharea,  .CommsLogList]
-		.filesep			= StretchControl.horz(self, 175~right, 110, 110)
-		.ProductSep			= StretchControl.vert(self, 0~right,     0,   100)
-		.VariablesSep		= StretchControl.Horz(self, 0~left, 0, 0)
+		.FileSep			= StretchControl.horz(self, 175~right, 110, 110)
+		.ProductSep			= StretchControl.vert(self, 0~right, 0, 100)
 		.PopupDisplay		= textview(self)
 		.DebugArgsList		= textview(self)
 		.AttachedProgram	= ""
@@ -165,7 +165,7 @@ extend PerryIDE
 			.size = the~width by the~bottom to 0~before 
 			.OnTextChanged	= EditMeModified
 			.OnShowExtraInfo = OnShowExtraInfo
-			.takesfocus		= takesfocusflag.On
+//			.takesfocus		= takesfocusflag.On
 			.gnormal.solid	= vec4(0.1, 0.974)
 			.OnSelChanged   = EditMeSelChange
 			.OnSelError		= EditMeSelError
@@ -235,7 +235,7 @@ extend PerryIDE
 			.SingleLine		= TextView.SingleLine
 			.ID				= "find"
 			.size 			= 3~inside  by  2~down back 15
-			.takesfocus		= takesfocusflag.On
+//			.takesfocus		= takesfocusflag.On
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
 			.autocompletestring = "Find..."
 
@@ -248,7 +248,7 @@ extend PerryIDE
 			.SingleLine		= TextView.SingleLine
 			.ID				= "replace"
 			.size 			= 3~inside  by  2~under back 15
-			.takesfocus		= takesfocusflag.On
+//			.takesfocus		= takesfocusflag.On
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
 			.autocompletestring = "Replace..."
 
@@ -277,7 +277,7 @@ extend PerryIDE
 			.ID				= "FoundList"
 			.size 			= the~width  by  the~bottom to 0~under 
 			.AlwaysSendChangeEvent = true
-			.takesfocus		= takesfocusflag.On
+//			.takesfocus		= takesfocusflag.On
 			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.Solid = LeftBG
 			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
@@ -293,23 +293,6 @@ extend PerryIDE
 			.gnormal		= self.errorlist.gnormal
 
 
-		with .stack
-			is   visible
-			is   UnSearchable
-			isnt DrawsFocus
-			.IsMainListView = true
-			.RowHeight		= .rowheight + 3
-			.NoSeps			= true
-			.tooltip		= self.debugger.Tooltip
-			.UseColorScheme	= true
-			.ID				= "Stack"
-			.size 			= the~width  by  the~bottom to 0~under 
-			.AlwaysSendChangeEvent = true
-			.TakesFocus		= takesfocusflag.On
-			.gnormal		= self.FileList.GNormal.copy
-			.GNormal.Solid = LeftBG
-			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
-			
 
 		with .appinfo
 			is   visible
@@ -317,10 +300,43 @@ extend PerryIDE
 			.Alignment		= MoveCode.Center
 			.tooltip		= self.debugger.Tooltip
 			.ID				= "Application Info"
-			.size 			= 3~inside  by  2~down back 40
-			.takesfocus		= takesfocusflag.On
+			.size 			= the~width  by  2~down back 40
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
 
+
+		with .variables
+			is   visible
+			is   UnSearchable
+			isnt DrawsFocus
+			.IsMainListView = true
+			.RowHeight		= .rowheight + 3
+			.NoSeps			= true
+			.tooltip		= "The variables in the current function"
+			.UseColorScheme	= true
+			.ID				= "Variables"
+			.size 			= the~width  by  -90~pc to 0~under
+			.AlwaysSendChangeEvent = true
+			.gnormal		= self.FileList.GNormal.copy
+			.GNormal.Solid = LeftBG
+			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
+
+
+		with .stack
+			is   visible
+			is   UnSearchable
+			isnt DrawsFocus
+			.RowHeight		= .rowheight + 3
+			.NoSeps			= true
+			.tooltip		= "The function call stack"
+			.UseColorScheme	= true
+			.ID				= "Stack"
+			.size 			= the~width  by  the~bottom to 0~under 
+			.AlwaysSendChangeEvent = true
+//			.TakesFocus		= takesfocusflag.On
+			.gnormal		= self.FileList.GNormal.copy
+			.GNormal.Solid = LeftBG
+			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
+			
 			
 		with .progress
 			isnt visible
@@ -344,7 +360,7 @@ extend PerryIDE
 			isnt drawsfocus
 			.ID				= "DrawMe"
 			.size = the~width by the~bottom to 0~before 
-			.takesfocus		= takesfocusflag.On
+//			.takesfocus		= takesfocusflag.On
 			.gnormal.bg		= vec4(0.0, 0.81)
 			.gnormal.edge   = vec4(0.2, 1.0)
 			.gnormal.seps	= vec4(0.4, 1.0)
@@ -382,15 +398,15 @@ extend PerryIDE
 			is enabled
 			.ID	= "filesep"
 			.size = the~width by 14~up to 20~down
-			.addHigh self.Rborder
-			.addHigh self.ProductSep
-			.addlow  self.ViewButtons
-			.addlow  self.ErrorList
-			.addlow  self.CommsLogList
-			.addlow  self.debugger
-			.addlow  self.SearchArea
-			.addlow  self.FileList
-			.addlow  self.UnNeededLabel
+			.addright self.Rborder
+			.addright self.ProductSep
+			.addleft  self.ViewButtons
+			.addleft  self.ErrorList
+			.addleft  self.CommsLogList
+			.addleft  self.debugger
+			.addleft  self.SearchArea
+			.addleft  self.FileList
+			.addleft  self.UnNeededLabel
 		
 		with .filesep.div
 			.onhide = FileSepClicker
@@ -402,7 +418,7 @@ extend PerryIDE
 			.size = the~area
 			.div.defaultFraction = 0.125
 			.ID	= "edit+stdout"
-			.AddLow  self.CompileAndJBArea
+			.AddLow  self.CompileArea
 			.addhigh self.rborder
 			.addhigh self.editme
 			.addhigh self.drawme
@@ -412,7 +428,6 @@ extend PerryIDE
 		.SpeedieText.SetupOut("speedie")
 		.ProductOut.SetupOut("product", TextView.AllowJeebox)
 		.ProductErrors.SetupOut("errors")
-		
 
 		.AddIDEButton(.RunButton,		"\02", "Debug Project", "debug")
 		.AddIDEButton(.buildbutton,		"\1C", "Build Project", "compile")
@@ -436,15 +451,18 @@ extend PerryIDE
 		.ProjectTabs.ExpandOnMouseOver = 2
 
 		
-		with .CompileAndJBArea
+		with .CompileArea
 			.ID				= "OutBorder"
 			.size 			= the~width  by  18~down
 			.gnormal.solid	= vec4(0.087, 0.95)
+//			.AddLeft(self.CompileTabs)
+//			.AddRight(self.Variables)
 
 		with .ProjectTabs
 			.id = "Tabs"
 			.size = 10~after to the~right  by  3~inside
 			.itemwidth = 84
+			.CanReOrderButtons = true
 			.items = perry.projects
 			|| pf = perry.projects.first 
 				 (pf is selected)
@@ -455,7 +473,7 @@ extend PerryIDE
 
 		with .CompileTabs
 			.id = "CompileTabs"
-			.size = the~area
+			.size = the~width by 18~down
 			.itemwidth = 101
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)
 			.items = ("Speedie, Jeebox, '', Errors"~parse)|listviewrow|
@@ -534,11 +552,11 @@ extend PerryIDE
 		isnt drawsfocus
 		.ID				= name
 		.size 			= the~width by the~bottom to 0~under
-		.takesfocus		= takesfocusflag.On
+//		.takesfocus		= takesfocusflag.On
 		.gnormal.solid	= vec4(0.077, 0.95)
 		.expectsparse	= Parse
 		.PreferStayAtEnd= true
-		.ide.ProductSep.addlow(self)
+		.ide.productsep.addleft(self)
 		
 		
 	function SetupLogArea
@@ -647,7 +665,12 @@ extend PerryIDE
 		line "/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd" "ConfirmWindow_.SetResponse" 3362
 		line "/usr/local/speedie/GUI.scproj/gui.input/GUI/FileViewer.spd" "FileViewer.ShowQuickOpen" 2529
 ` ~ parse
+		|| v = `
+		line "/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd" "|TextView| R" 3414
+		line "/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd" "|bool| Vis" 3433
+` ~ parse
 		.Stack.use(m as listviewrow)
+		.Variables.use(v as listviewrow)
 		.appinfo.text = "Speedie\n(Inactive)\n**OOF**"
 	
 	

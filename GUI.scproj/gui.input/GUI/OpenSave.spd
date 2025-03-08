@@ -106,7 +106,6 @@ class OpenSaveDialog (Window)
 			isnt DrawsFocus
 			.singleline = TextView.SingleLine
 			.id			= id
-			.takesfocus	= takesfocusflag.On
 			.gnormal.solid= ((0.0, 0.0, 0.0, 0.1))
 	
 	

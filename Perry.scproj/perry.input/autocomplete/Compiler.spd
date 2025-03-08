@@ -102,12 +102,7 @@ extend PerryIDE
 	function ExpandCompileSep (|bool|)
 		|| coll = .ProductSep.div.Collapsed
 			.ShowCompileTab(.SpeedieText)
-			// doent seem to work all the time... ? strange.
-		|| coll2 = .ProductSep.div.Collapsed
-		
-//		beep "sep collapsed from $coll to $coll2"
-		if coll and !coll2
-			return true
+			return !.ProductSep.div.Collapsed
 
 
 	function Compile (|string| operation)

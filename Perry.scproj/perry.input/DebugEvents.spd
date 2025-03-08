@@ -222,6 +222,14 @@ function ClickedStack (GUIListEvent)
 function ReturnStack (guilistevent) // show ASM?
 	return ClickedStack(self, row)
 	
+
+function ClickedVariables (GUIListEvent)
+	return ClickedStack(self, row)
+	
+
+function ReturnVariables (GUIListEvent)
+	return ClickedStack(self, row)
+	
 	
 	
 	

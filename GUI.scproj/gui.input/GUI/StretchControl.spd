@@ -33,6 +33,12 @@ role StretchControl (GuiControl)
 		opt norefcounts
 		.div.high <~ g
 		
+    function AddLeft (|guicontrol| G)
+        .AddLow(g)
+
+    function AddRight (|guicontrol| G)
+        .AddHigh(g)
+        
 	function AddLow (|guicontrol| G)
 		opt norefcounts
 		.div.low <~ g

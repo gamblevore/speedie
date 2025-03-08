@@ -47,7 +47,7 @@ class FileViewer (ListView)
 			.size 			= 400~wide by 15~high
 			.OnKeyDown		= QuickOpenKey
 			.OnTextChanged	= QuickOpenModified
-			.takesfocus		= takesfocusflag.On
+//			.takesfocus		= takesfocusflag.On
 			.onfocus		= QuickOpenFocus
 			.SingleLine		= TextView.SingleLine
 			.gnormal.solid	= (0.0, 0.1, 0.0, 0.90)

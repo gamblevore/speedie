@@ -103,8 +103,14 @@ datatype ControlPoint (int)
 		return (self|int|, high|int|)|ControlLine|
 	operator for (|int| n, |controlline|)
 		return (self|int|, ((n)~long)|int|)|ControlLine|
+	operator for (|controlpoint| pc, |controlline|)
+		cpp_Part ForPoint
+		return (self|int|, pc|int|)|ControlLine|
 	operator back (|int| n, |controlline|)
 		return (((n)~long)|int|, self|int|)|ControlLine|
+	operator back (|controlpoint| cp, |controlline|)
+		cpp_Part BackPoint
+		return (cp|int|, self|int|)|ControlLine|
 	operator by (|ControlPoint| B, |controlRect|)
 		cpp_part ByPoint
 		return .expand by b.expand

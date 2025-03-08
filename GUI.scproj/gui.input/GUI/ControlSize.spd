@@ -66,9 +66,10 @@ struct ControlSize
 	function Calculate (|ivec4| Parent, |ivec4| Prev, |ivec4| Window, |guicontrol| upon, |ivec4|)
 		|| UseBlocks = upon is blocksized
 			return .CalculateBlocks
+		if keys.shift and upon ~= "Variables"
 //		|| dbg = upon.clipmode is debug
 //			"---------------"
-		|| pc = parent.size >> 1
+		|| PS = parent.size
 		for i in 4
 			|| sz = .size(i)
 			|| m = .Mode(i)
@@ -79,12 +80,12 @@ struct ControlSize
 				  elseif m == ControlPoint.Before or ControlPoint.After
 					d = Prev[d]
 				  elseif m == ControlPoint.Centered
-					d = pc[i&1]
+					d = PS[i&1]>>1
 				rz[i] = d + sz
 //				if dbg
 //					.PrintExplain(i, d, rz)
-			  elseif m == controlpoint.Percent
-				rz[i] = ((pc[i&1] * sz) + 32K) / 64K
+			  elseif m == controlpoint.Percent // ~pc
+/				rz[i] = (Sz * PS[i&1]) / (64K*100) 
 //				if dbg
 //					.PrintExplain(i, 0, rz)
 		
