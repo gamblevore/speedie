@@ -47,7 +47,7 @@ extend_module perry
 		|| monthly = .monthly_name(now)
 		|| daily_fol = "~/Backups/perry".file
 		|| monthly_fol = "~/Backups/perry_monthly".file
-		|| latest_local = file.speedie["Terminal/Backup"][latest.name]
+		|| latest_local = file.speediedir["Terminal/Backup"][latest.name]
 		
 		rz = latest_local.file
 		zip.copyto(rz)
@@ -129,7 +129,7 @@ extend_module perry
 		
 		
 	function TestInstall (|string|)
-		|| where = file.speedie.file
+		|| where = file.speediedir.file
 		if !where.exists
 			return " * Install Speedie (compiler and libs).\n\n"
 		|| items = "GUI.scproj Image.scproj jeebox.scproj Library network.scproj Speedie.scproj Terminal" / ' '
@@ -205,7 +205,7 @@ extend_module perry
 			
 	helper GenerateArchiveSub (|bool|)
 		|| outpath = .install_path
-		|| p = file.speedie
+		|| p = file.speediedir
 		|| f = p.FileThatExists("generate archive")
 		require f and outpath
 		
@@ -299,7 +299,7 @@ extend_module perry
 	function Install (|bool| DoInstall, |bool| DoLinks, |bool|)
 		stderr.clear
 		|| msg = ""
-		|| f   = file.speedie.file
+		|| f   = file.speediedir.file
 		if doinstall
 			msg += .install_files(f)
 		if dolinks
@@ -312,7 +312,7 @@ extend_module perry
 	function UnInstall
 		|| fs = FastString()
 		|| per = app.Idealpath
-		|| fol = file.speedie
+		|| fol = file.speediedir
 		if speedie.exists and speedie.delete
 			fs <~ "Deleted Link at: $speedie"
 		if per.FileExists and per.MoveToTrash

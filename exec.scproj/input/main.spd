@@ -1,11 +1,69 @@
 
+|| speedie = "/usr/local/bin/speedie"
+|SpdProcess| Compiler
+
 
 main 	  	  	  	 // exec main {
-	opt norefcounts
+	opt NoRefCounts
+	return app.DebugProj
+	
+
 	error.AutoPrint = 1
 	require Lib.LoadLib
 	require package.LoadPack
 	
 	debugger.load
 	return apptable.RunMain
+
+
+function App.ActAsSpeedie (|ErrorInt|)
+	|| Proj = app.args[0].FileThatExists #require
+	|| SpdArgs = [Proj, "--nocolor", "--usescriptloc", "--perry=bin"]
+	Compiler = SpdProcess.Spawn(speedie, SpdArgs, processmode.PassThrough)
+	
+
+function App.RespondToParent
+	opt norefcounts
+	|| p = SpdProcess.Parent
+	// now what?
+	// we need to respond to a few things:
+		// pause
+		// run
+		// step over
+		// step in
+		// step out
+		// ask for vars
+		// ask for stack
+		// hit breakpoints and stop!
+		// deal with crashes.
+
+	// of course... we can't actually do these.
+	// not without the xpd file
+	// So... lets say they press pause. what do we do? well... we can't do anything
+	// so what are we doing? Testing?
+	// planning?
+	// preparing?
+	// lets pretend we paused. then send back some messages.
+	// send back... variables, and stack
+	
+	// what about asking for ASM? That goes through speedie.
+	// So might as well do that first?
+
+	
+
+function App.DebugProj (|ErrorInt|)
+	|| ProjArgs = app.args
+	|| Proj = projargs[0].FileThatExists$
+	ProjArgs.Remove(0)
+	|| proc = SpdProcess.Spawn(Proj, ProjArgs, processmode.PassThrough)$
+	while proc.IsOpen
+		app.RespondToParent
+		...
+	return proc.Status
+	
+	// exec abc.spd p1 p2 p3
+	
+	// Lets try simply launching the fucker.
+	// Later, we can actually run the thing in a VM, no spawning
+
 

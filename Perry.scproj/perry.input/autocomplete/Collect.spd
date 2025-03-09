@@ -107,7 +107,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 	if !spd?
 		|| proc = speedie.resolve
 		target debug
-			proc = file.speedie.child("Speedie.scproj/Build/Products/Debug/Speedie")
+			proc = file.speediedir.child("Speedie.scproj/Build/Products/Debug/Speedie")
 		if proc
 			|| Mode = ProcessMode.CaptureAll * !noisy
 			spd = SpdProcess.spawn(Proc, p, .project.name, mode)
@@ -130,6 +130,7 @@ function PerryIDE.ActualCompile (|string| operation)
 	  else
 		args <~ "--perry"
 
+	.LogOneAction(@emb + speedie + " " + args.render)
 	.compilr = process.Stream(speedie, args)		#require
 	.SpeedieText.text = ""
 	

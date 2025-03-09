@@ -202,7 +202,7 @@ class OpenSaveDialog (Window)
 				if (f == '/' or '~')
 					w.RelistFiles(t, false)
 				  elseif f == '@' or 0
-					p.text = file.Speedie
+					p.text = file.Speediedir
 					w.RelistFiles(p.text, false)
 				  else
 					beep

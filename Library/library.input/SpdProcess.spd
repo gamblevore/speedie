@@ -263,6 +263,7 @@ datatype ProcessMode (byte)
 	flags
 		CaptureStdOut
 		CaptureOrPrintErrors = [CaptureErrors, AutoPrintErrors]
+		PassThrough = AutoPrintErrors // idk? why capture errors just to print them? what is it doing?
 		CaptureAll = CaptureStdOut ||| AutoPrintErrors
 
 	syntax is (|ProcessMode| M, |bool|)

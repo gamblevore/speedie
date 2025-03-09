@@ -254,7 +254,7 @@ function compiler.FindModuleOrClass (|message| mod, |bool| retry, |SCNode|)
 	rz ?= module
 
 
-function Backup_Define (|SCFile| myfile,  |int| f,  |message| thg,  |string| purpose,  |message|)
+function Define_Something (|SCFile| myfile,  |int| f,  |message| thg,  |string| purpose,  |message|)
 	opt norefcounts
 	thg ?= myfile.GetMsg(f)
 	expect thg "nomsg"
@@ -399,8 +399,8 @@ function MainAct (|Message| cmd, |scfile| my_file, |message|)
 		thg = fn.source
 	if  thg == @thg  and  fn.source!.isbehaviour  and  thg in fn.source
 		return .define_behaviour(fn, cmd.name)
-	if cmd starts "define" or "display" or "callfrom"
-		return .backup_define(my_file, f, thg, cmd.name)
+	if cmd starts "define" or "display" or "callfrom" or "asm"
+		return .Define_Something(my_file, f, thg, cmd.name)
 
 	expect (thg)                       ("nomsg")
 	expect (cmd starts "autocomplete") ("badcmd")
@@ -953,7 +953,60 @@ function Define (|message--!| msg,  |string| purpose,  |object| found=nil,  |mes
 	error "nosource"
 
 
+function CppASM (|string| purpose,  |object| found,  |message|)
+	opt norefcounts
+	|| fn = found as scfunction
+		require fn.source
+		rz = @tmp.msg(purpose)
+		rz.msg(@thg, fn.name)
+		|| arg = rz.msg(@arg)
+		|| path = arg.File #expect (arg, "No file")
+		arg <~ path
+		if purpose ~= "cpp"
+			.ASM(arg, fn)
+		  else
+			.cpp(arg, fn)
+		
+	
+
+function Message.AddLinePositions
+// would be nice to tag the result with... stuff.
+	opt norefcounts
+	|message| path
+	for s.flat in self
+		if s in @arg
+			|string| sp = s.file
+			if path != sp
+				path = s.FileMark
+				s.prev = path
+			s.prev = s.Position.msg
+/*
+	cpp abc
+		file "/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd"
+		pos 10
+		x++
+*/
+
+function message.FileMark (|message|)
+	opt norefcounts
+	|| path = .File
+		rz = .msg(@tmp, "file")
+		rz <~ path
+
+
+function Cpp (|message| rz,  |SCFunction| found)
+	|| msg = found.Source!.Copy
+	msg.AddLinePositions()
+	rz <~ msg
+	
+	
+function ASM (|message| rz,  |SCFunction| found)
+	// ... try to compile this! we also need to free/init stuff. Can do cpp also one day. Actually why not now?
+	
+		
 function DefineOrCall (|message| msg,  |string| purpose,  |object| found=nil,  |message|)
+	if purpose ~= "asm" or "cpp"
+		return .CppASM(purpose, found)
 	if  purpose starts "callfrom"
 		return .Callfrom(msg, found)
 	return .define(msg, purpose, found)

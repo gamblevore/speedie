@@ -468,7 +468,7 @@ class File (String)
 		|| DebugExecute = false
 		|string| _Speedie
 				
-		function Speedie (|string|)
+		function SpeedieDir (|string|)
 			if !_speedie
 				|| paths = app.exepath.resolve(false).parent
 				|| srch = "/speedie/"

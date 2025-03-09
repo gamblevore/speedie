@@ -100,7 +100,7 @@ Module MZLab
 
 
 	function TestCompression
-		|| d = file.speedie.child("Speedie.scproj/speedie.input/ASMBuilder/").file
+		|| d = file.speediedir.child("Speedie.scproj/speedie.input/ASMBuilder/").file
 		require d.exists
 		|[string]| Inputs
 		for ch in d.ListFiles

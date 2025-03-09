@@ -46,7 +46,7 @@
 
 
 function Compiler.SpeedieDir (|string| s, |file|)
-	return file.Speedie.Child(s).file
+	return file.Speediedir.Child(s).file
 	
 
 module Compiler {
@@ -197,7 +197,7 @@ function CompileAll (|bool|)
 
 
 function Projects (|String|)
-	return ._projects init file.Speedie
+	return ._projects init file.Speediedir
 
 
 function SpeedieProj (|String|)

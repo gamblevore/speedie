@@ -98,9 +98,9 @@ function Compiler.RenderErrors (|errorreceiver| stderr, |errorseverity| MinSev, 
 	return msg
 
 
-function Message.FileLocation (|string|)
-	opt norefcounts
-	return .file$.path
+//function Message.FileLocation (|string|)
+//	opt norefcounts
+//	return .file$.path
 
 
 function Error.Improve					// sc_improve 
@@ -176,7 +176,9 @@ extend Error
 
 
 	function SCOriginalPath (|string|)
-		return .node.filelocation ?? .path
+		|string| str = .node.file
+		str ?= .path
+		return str
 
 
 	function SCLineCount (|int|)

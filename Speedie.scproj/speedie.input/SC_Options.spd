@@ -154,7 +154,7 @@ module Feedback
 
 	function string.ResolveSpd (|string|)
 		if self[0, "@spd/"]
-			return (file.Speedie+self[5...]).Resolve(FileResolveMode.AllowMissing)
+			return (file.Speediedir+self[5...]).Resolve(FileResolveMode.AllowMissing)
 		return .Resolve(FileResolveMode.AllowMissing)
 
 
@@ -274,7 +274,7 @@ module Feedback
 
 		+"usescriptloc"
 			Explain(Purpose, "")$
-			options.usescriptloc = maybebool.Known(true)
+			options.UseScriptLoc = maybebool.Known(true)
 
 		+"check"
 			Explain(Purpose, "Check only. same as --nocompile --cpp=0")$

@@ -820,8 +820,8 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function HProduct (|File|)
 		return Compiler.GeneratedCppsFolder[ "JB.h" ]!
 
-	function LibGlobProduct (|File|)
-		return Compiler.GeneratedCppsFolder[ "LG.h" ]!
+//	function LibGlobProduct (|File|)
+//		return Compiler.GeneratedCppsFolder[ "LG.h" ]!
 
 
 	function Product (|string| name, |File|)
@@ -833,7 +833,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| ForLib = arg.find(@tmp, "libraryname")[@str]
 			|| FolName = arg.find(@tmp, "exportplace")[@str]
 				|| Fol = Compiler.BaseProjectPath![ FolName.name ]
-				if fol.mustexist("Create API-Header for API: ${arg.filelocation}")
+				if fol.mustexist("Create API-Header for API: ${arg.file}")
 					rz = Fol[compiler.ProjectName + "_api.h"]
 	
 	
