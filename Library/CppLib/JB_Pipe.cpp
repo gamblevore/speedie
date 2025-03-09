@@ -197,7 +197,7 @@ int StartProcessSub(ShellStream& Sh, JB_String* path, Array* Args, PicoComms* C,
 	
 	if (!(Mode&1) or Sh.Output)
 		pipe(Sh.CaptureOut);
-	pipe(Sh.CaptureErr);
+	pipe(Sh.CaptureErr); // we might want to pass errors through? right?
 	Unblock(Sh.CaptureErr[RD]); // should never block
 	Unblock(Sh.CaptureOut[RD]); // even this blocking at all is kinda sus...
 	
@@ -282,7 +282,7 @@ ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastStr
 	if (FSOut and !(Mode & 1)) // why would there be no mode?
 		Mode &= ~1;
 	rz->Output = JB_Incr(FSOut);
-	rz->ErrorOutput = JB_Incr(JB_FS__FastNew(FSErrIn));
+	rz->ErrorOutput = JB_Incr(JB_FS__FastNew(FSErrIn)); // shouldn't we allow a nil FSErrIn to mean passthrough errors?
 	rz->Args = JB_Incr(Args);
 	byte Error = JB_Sh_StartProcess(rz, self, Args, 0, Mode);
 	if (Error) {
@@ -295,7 +295,7 @@ ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastStr
 // mode was bool StdOutFlowThru
 int JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, int Mode, Date TimeOut) {
 	auto Sh = ShellStart(self, R, FSOut, FSErrIn, Mode);
-	if (!Sh) return errno+!errno;
+	if (!Sh) return errno|!errno;
 	
 	Date ExitAfter = 0;
 	if (TimeOut > 0)
