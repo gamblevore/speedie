@@ -127,7 +127,7 @@ class Document (list)
 	function DocClose (|bool|)
 		if !.IsModified
 			return true
-		|| Answer = AskSaveOrCancel("Save file " + .Location.name + "?") 
+		|| Answer = ("Save file " + .Location.name + "?").AskSaveOrCancel()
 		if answer >= 1		// save
 			return .save(DocumentState.Closing)
 		return answer == 0	// don't
@@ -195,7 +195,7 @@ class Document (list)
 			return true
 
 		|| Options	= ["Save", "Reload"]
-		|| Answer	= ConfirmIt("The file ${.location.name} has been externally modified. Reload or resave?", "", Options) 
+		|| Answer	= confirmationdialog.ask("The file ${.location.name} has been externally modified. Reload or resave?", "", Options) 
 		if answer >=  1			// save
 			.save(DocumentState.Saving)
 		if answer ==  0			// reload

@@ -19,55 +19,42 @@ extend_module app
 	
 	function Alert (|string| Q)
 		if GUI.StartedProperly
-			ConfirmIt(q, "", ["OK"])
+			confirmationdialog.ask(q, "", ["OK"])
 		  else
 			GUI.PendingAlerts <~ q
 
 
-function ConfirmCancel (|string| Q,  |string| Title="",  |int|)
+function String.ConfirmOrCancel (|string| Q,  |string| Title="",  |int|)
 	|| Answers = ["Yes", "No", "Cancel"]
-	return ConfirmIt(q, title, answers)
+	return confirmationdialog.ask(q, title, answers)
 
 
-function AskSaveOrCancel (|string| Q,  |string| Title="",  |int|)
+function string.AskSaveOrCancel (|string| Title="",  |int|)
 	|| Answers = ["Save", "Dont", "Cancel"]
-	return ConfirmIt(q, title, Answers)
+	return confirmationdialog.ask(self, title, Answers)
 
 
 function string.Confirm (|string| Title="", |ConfirmCanceller| Canceller=nil, |bool|)
 	|| Answers = ["Yes", "No"]
-	return ConfirmIt(self, title, Answers, Canceller) == 1
+	return confirmationdialog.ask(self, title, Answers, Canceller) == 1
 
 
 function string.Ask_Named (|string| Answers,  |int|)
-	return ConfirmIt(self, "", Answers.Components)
+	return confirmationdialog.ask(self, "", Answers.Components)
 
 
 function string.Ask (|string| response="",  |string| Title="",  |stringthatwasreadsafely|)
 	|| Answers = ["OK", "Cancel"]
-	if ConfirmIt(self, title, Answers, response) == 1
-		return ConfirmWindow_._asker!.response.text
+	if confirmationdialog.ask(self, title, Answers, response) == 1
+		return ConfirmationDialog._asker!.response.text
 	return String.Error
-
-
-function guicontrol.VisText (assigns:|string|s)
-	.TextSet(s)
-	(self is visible) = s.Length > 0
-
-
-function ConfirmWindow_.Resize (|string| s)
-	|| desired = .question.TextSize(s) + (19, 34)
-	|| actual = desired max (200, 100)
-	actual = actual min (450, 550)
-	actual = actual min (GUI.Screensize.x2y2 - 8)
-	.size = actual.layout
 
 
 helper window.TryCloseDialog (|bool|)
 	opt norefcounts
 	.cancelreturn
 	|| count = 0
-	if self isa ConfirmWindow_
+	if self isa ConfirmationDialog
 		for b in .Buttons
 			if b is visible
 				count++
@@ -76,8 +63,8 @@ helper window.TryCloseDialog (|bool|)
 			return true
 
 
-function ConfirmIt (|string| Q,  |string| Title,  |[string]| Answers,  |string| Response=string.byte(0), |ConfirmCanceller| Cancel = nil, |int|)
-	|| w = ConfirmWindow_._asker init ConfirmWindow_()
+function @confirmationdialog.Ask (|string| Q,  |string| Title,  |[string]| Answers,  |string| Response=string.byte(0), |ConfirmCanceller| Cancel = nil, |int|)
+	|| w = ConfirmationDialog._asker init ConfirmationDialog()
 	if !q or w is visible		// recursive... sigh
 		if answers[2]
 			return -1			// cancel
@@ -112,7 +99,7 @@ function ConfirmIt (|string| Q,  |string| Title,  |[string]| Answers,  |string| 
 
 	
 	
-class ConfirmWindow_ (Window)
+class ConfirmationDialog (Window)
 	linkage
 		cpp_part cwin
     |textview|			Question
@@ -133,13 +120,20 @@ class ConfirmWindow_ (Window)
 		.Question		= textview(self, nil)
 		.gnormal        = ¥.systemstyle 
 		.FullScreen		= (300, 150)
-		.AddButton(.yes, "Yes", true)
-		.AddButton(.No,	 "No" , false)
-		.AddButton(.Cancel, "Cancel", false)
+		.AddButton(.yes, "Yes")
+		.AddButton(.No,	 "No" )
+		.AddButton(.Cancel, "Cancel")
 		
 		isnt visible
 		.init
 	
+	function Resize (|string| s)
+		|| desired = .question.TextSize(s) + (19, 34)
+		|| actual = desired max (200, 100)
+		actual = actual min (450, 550)
+		actual = actual min (GUI.Screensize.x2y2 - 8)
+		.size = actual.layout
+
 
 	function SetResponse (|string| response)
 		opt norefcounts
@@ -189,14 +183,14 @@ class ConfirmWindow_ (Window)
 		return super.keydown(key)
 
 
-	function AddButton (|ButtonView| BTN, |string| Oof, |bool| first)
+	function AddButton (|ButtonView| BTN, |string| Oof)
 		.Buttons <~ btn
 		btn.ExpandOnMouseOver = 2
 		btn.Text			= Oof
 		btn.gnormal.solid	= (0.15, 0.15,0.15,1.0)
 	
 	module	
-		|ConfirmWindow_| _asker
+		|ConfirmationDialog| _asker
 
 
 

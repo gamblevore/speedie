@@ -1254,8 +1254,6 @@ module GUI
 		|| key = kev.sym
 		
 		|| fl = SDL_GetWindowFlags(.screenwindow!) & (SDL_Window.OCCLUDED ||| SDL_Window.HIDDEN)
-		// why cant i debug this?
-		// printline "key: $key (${key|int|}),  flags: $fl,  size: $.SizeRaw"
 
 		if .ForeGroundTime.GuiAgo < 0.1s
 			return SDLActivity.nothing
@@ -1391,35 +1389,3 @@ function Duration.syntaxcall (|float|)
 // CVDisplayLink could be used to make vsyncing possible? Its a lot of per-platform work though.
 // Linux/Win have their own alternatives.
 
-//
-//
-//
-//struct FPSCounter
-//	|date|   Next
-//	|int|  Amount
-//
-//	function Count (|string| name="")
-//		.Amount++
-//		|| now = date.now
-//		require now >= .Next
-//
-//		now += 1s
-//		if .Next
-//			|| durr = now - .next
-//			|| rate = .Amount|float| / durr.Float
-//			|| fs = FastString()
-//			fs <~ name
-//			fs <~ " fps = "
-//			fs.AppendFloat(rate)
-//			fs <~ " : "
-//			fs <~ .amount
-//			.Amount = 1
-//			|| s = fs.GetResult
-//			log s
-//			printline s
-//		.next = now
-//
-//
-//|FPSCounter| DrawStartCounter
-//|FPSCounter| DrawEndCounter
-//|FPSCounter| EventCounter

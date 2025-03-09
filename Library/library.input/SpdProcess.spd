@@ -97,7 +97,8 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		|| Bad = !.Status.crashed
 		.DiedCount += Bad
 		if (.ErrorOutput!=nil) and (.mode is AutoPrintErrors)
-			printline .ErrorOutput.GetResult
+			|| s = .ErrorOutput.GetResult
+				printline s
 		.Disconnect(.status.name) // removes us from the check-list
 
 

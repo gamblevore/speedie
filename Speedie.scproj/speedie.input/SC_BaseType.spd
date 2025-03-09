@@ -15,6 +15,7 @@ datatype SCNodeType (byte)
 	)
 	syntax is (|SCNodetype| d, |bool|)
 		return self == d
+	
 	function HasPtrs (|bool|)
 		return self|int| & 1
 

@@ -239,7 +239,7 @@ class FileViewer (ListView)
 			fs <~ "\n"
 			fs <~ m0.readname
 		
-		|| answer = AskSaveOrCancel(fs)
+		|| answer = fs.render.AskSaveOrCancel
 		if answer >= 1  // save
 			return .saveall(documentstate.saving)
 		return answer == 0	// don't

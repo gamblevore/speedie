@@ -12,7 +12,6 @@ unused_lib_funcs
 
 /*
 Bloat fix plan:
-	* use macros! get rid of loads of stuff
 	* ({block-code}) refcounts like crazy! reduce
 	* remove dictionary, use fixeddict (needs leaf/stems)
 	* string append instead of faststring where possible

@@ -92,8 +92,8 @@ class OpenSaveDialog (Window)
 		.id				= "opensave"
 		isnt visible
 		.path.onpaste = nil// nice
-		.AddButton(.accept, "Open", true)
-		.AddButton(.Cancel,	"Cancel", false)
+		.AddButton(.accept, "Open")
+		.AddButton(.Cancel,	"Cancel")
 		.init
 	
 	
@@ -173,7 +173,8 @@ class OpenSaveDialog (Window)
 				return true
 		return super.keydown(key)
  
-	function AddButton (|ButtonView| BTN,  |string| Name,  |bool| first)
+
+	function AddButton (|ButtonView| BTN,  |string| Name)
 		btn.ExpandOnMouseOver = 2
 		btn.size = (44~long to 4~before) by (4~up for 16)
 		btn.Text = Name

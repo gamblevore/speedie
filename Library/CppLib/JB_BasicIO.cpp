@@ -15,7 +15,14 @@
 extern "C" {
 
 #ifndef AS_LIBRARY
+//void JB_PrintStackTrace();
 static void SendToStdOut(uint8* d, int N) {
+//	static bool InPrint;
+//	if (!InPrint) {
+//		InPrint = true;
+//		JB_PrintStackTrace();
+//		InPrint = false;
+//	}
 	JB_Write( STDOUT_FILENO, d, N );
 }
 

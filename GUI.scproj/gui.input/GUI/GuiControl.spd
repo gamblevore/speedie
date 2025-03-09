@@ -263,7 +263,12 @@ class GUIControl (list)
 			return value >> 12
 		return value
 	
-		
+
+	function VisText (assigns:|string|s)
+		.TextSet(s)
+		(self is visible) = s.Length > 0
+	
+	
 	setter Visible (|bool|)
 		(self is visible) = value
 
