@@ -956,16 +956,16 @@ function Define (|message--!| msg,  |string| purpose,  |object| found=nil,  |mes
 function CppASM (|string| purpose,  |object| found,  |message|)
 	opt norefcounts
 	|| fn = found as scfunction
-		require fn.source
+		|| src = fn.source #expect (fn)
+		|| path = src.File #expect (src)
 		rz = @tmp.msg(purpose)
 		rz.msg(@thg, fn.name)
-		|| arg = rz.msg(@arg)
-		|| path = arg.File #expect (arg, "No file")
-		arg <~ path
+		|| rzarg = rz.msg(@arg)
+		rzarg <~ path
 		if purpose ~= "cpp"
-			.ASM(arg, fn)
+			.Cpp(rzarg, fn)
 		  else
-			.cpp(arg, fn)
+			.ASM(rzarg, fn)
 		
 	
 
