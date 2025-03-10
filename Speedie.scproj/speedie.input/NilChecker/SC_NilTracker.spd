@@ -305,10 +305,10 @@ struct ArchonPurger
 
 
 			
-function message.OrigRender	(|string|)
+function message.OrigRender	(|faststring| fs_in=nil, |string|)
 	opt norefcounts
 	|| n  = .OrigMsg
-	|| fs = faststring()
+	|| fs = faststring(fs_in)
 
 	if n and n != self
 		n.Render(fs)
@@ -320,7 +320,8 @@ function message.OrigRender	(|string|)
 	  else
 		.Render(fs)
 	
-	return fs
+	if !fs_in
+		return fs
 
 
 

@@ -1004,7 +1004,7 @@ function ASM (|message| rz,  |SCFunction| found)
 		j.Length = 0
 	require SpdAssembler.GenerateASM(found)
 
-	for fat in found.asm!
+	for fat.fat in found
 		
 	
 	

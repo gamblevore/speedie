@@ -67,7 +67,7 @@ extend ASMState
 
 	function LoadLabelJumps (|bool|)
 		opt norefcounts
-		for A in .out
+		for A.fat in .out
 			require textassembler.GetLabel(a)
 		return true
 	

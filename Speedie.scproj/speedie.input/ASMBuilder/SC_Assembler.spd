@@ -44,11 +44,10 @@ module SpdAssembler
 		TextAssembler.RequestTable	?= array()
 
 
-	syntax access (|message| m, |µFunc|)
+	syntax access (|message| m, |scfunction|)
 		cpp_part AccessStr
 		opt norefcounts
-		|| f = compiler.XFunc(m.name, m)
-			return f.ASM					#expect (m, "This function has no ASM")
+		return compiler.XFunc(m.name, m)	#expect (m, "This function has no ASM")
 						
 
 	function GenerateASM (|scfunction| fn, |bool|) // memory safe ASM reattempt
@@ -60,6 +59,6 @@ module SpdAssembler
 		ASMState.Sh.FinishASM
 
 		if StdErr.ok
-			fn.asm!.debugprint
+			fn.debugprint
 			return true
 

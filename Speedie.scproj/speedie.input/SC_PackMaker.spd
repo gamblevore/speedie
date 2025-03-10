@@ -203,13 +203,13 @@ module PackMaker
 	
 	function SCFunction.TestObesity (|?&ivec4|)
 		opt norefcounts
-		|| mu = .asm
-			|| mu2 = mu.µTest
-			mu.debugprint
+		|| mu = .µLength
+			|| mu2 = .µTest
+			.debugprint
 			return jb_vm.Run(mu2.ptr, mu2.length)
 	
 	
-	function µfunc.DebugASM
+//	function µfunc.DebugASM
 			
 	
 	syntax access (|int| v, assigns:|int64|)
@@ -227,9 +227,9 @@ module PackMaker
 		j.tmp("fncs")
 		for f in compiler.funclist
 			if f.tableid
-				|| asm = f.ASM 
+				|| asm = f.µLength
 					j.Add(@tmp, f.ExportName, true)
-					j.add(asm)
+					j.add(f)
 					j.exit
 					"OK: ${f.name}"
 				  else

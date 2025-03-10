@@ -21,8 +21,19 @@ function RedundantVar (|scdecl| dcl,  |nilcheckmode| Test,  |nilstate|)
 		return Test & nilstate.either
 
 	if ArchonPurger.loops.NestDepth == 0
-		|| str = .OrigRender + " redundantly tested. Currently is: " + dcl.nilcurr.RawName
-		error (self, str)
+		// if .origrender is multi-line, put the string first.
+		|| fs = FastString()
+		|| render = .OrigRender(Fs)
+		|| OOf = render contains Jeebox.CSLine
+			fs <~ "Redundant test."
+		  else
+			fs <~ "$render redundantly tested."
+		fs <~  "Currently is: "
+		fs <~ dcl.nilcurr.RawName
+		if oof
+			fs <~ " on $render"
+		
+		error (self, render)
 	return Test & nilstate.either
 
 

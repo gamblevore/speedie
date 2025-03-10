@@ -21,7 +21,7 @@ struct ASMState
 	|bool|						Inited
 	|bool|						TailInlineable
 
-	|µFunc|						Out
+	|scfunction|				Out
 
 	|memory of fatasm|			JSM
 	|&FatASM|					FuncStart
@@ -118,7 +118,7 @@ struct ASMState
 		if !src.reg // what?
 		if !dest.reg
 			dest = src
-		src = .addtoreg(exp, src, src, value) 
+		src = .AddToReg(exp, src, src, value) 
 		if dest.reg==src.reg
 			return src
 		return .Assign(dest, src, exp)
@@ -130,9 +130,9 @@ struct ASMState
 
 	syntax expect (|message?| where=nil, |string| msg)
 		cpp_part Fail
-		|| f = scfunction.currfunc!.asm
-			f.length = .curr - .funcstart
-			printline f.render
+		|| f = SCFunction.currfunc!
+		f.µlength = .curr - .funcstart
+		printline f.µrender
 		debugger
 		error (where, msg)
 
@@ -468,7 +468,8 @@ struct ASMState
 		._curr = .start + j.Length
 		.LastDebug = .curr
 		.FuncStart = .curr
-		.out = fn.NeedµFunc
+		fn.StartASM
+		.out = fn
 		.state.fn = fn
 		SCFunction.CurrFunc = fn
 		.ReturnASM = fn.ReturnType.regtype
@@ -484,7 +485,7 @@ struct ASMState
 			.fn.SourceArg!.rEt(asmreg(), asmreg(), asmreg(), 0, asmreg())
 		.Optimise
 
-		.out.length = .curr - .FuncStart
+		.out.µlength = .curr - .FuncStart
 		|| A = asmreg()										// GUARD
 		.fn.sourcearg!.EROR(A,A,A,A,0)
 		.jsm.length = .curr - .start 
@@ -548,10 +549,9 @@ struct ASMState
 				rz = true
 	
 	
-	function TryInline (|message| prms, |asmreg| dest, |µFunc| A, |int| AllowedGain,  |asmreg|)
+	function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| AllowedGain,  |asmreg|)
 		opt norefcounts
 		|| Start = .curr
-		|| fn = A.fn
 		|inlineblock| Old = .state
 		if !dest.reg and fn.ReturnType
 			if dest is discard
@@ -573,17 +573,15 @@ struct ASMState
 		.state.VDecls = .vdecls
 		.state.branchdepth = 0
 		
-		rz = .TryInlineSub(prms, A, AllowedGain)
+		rz = .TryInlineSub(prms, fn, AllowedGain)
 	
 		.state = old
 		if !rz
 			.Rewind(start)
 
 	
-	function TryInlineSub (|message| prms, |µFunc| µ, |int| AllowedGain,  |asmreg|)
+	function TryInlineSub (|message| prms, |scfunction| fn, |int| AllowedGain,  |asmreg|)
 		opt norefcounts
-		|| fn = µ.fn
-		
 		|fatrange| LL
 		LL.Start = .curr
 		.InlineParameters(prms)
@@ -637,26 +635,25 @@ struct ASMState
 
 	function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 		opt norefcounts
-		|| A = fn.ASM
 		require .state.InlineDepth < .InlineLimit
-		require A and !fn.HasCVersion
+		require fn.µlength and !fn.HasCVersion
 		|| AllowedGain = 5 + (fn is inline) * 23		// assume that functions have 5 instruction overhead.
 		|| Grace = 9
 		
 		for p.fast in prms
 			Grace += .IsASMConst(p)<<2
 	
-		require (AllowedGain + Grace) > a.length
+		require (AllowedGain + Grace) > fn.µlength
 	
 
 		if !.state.InlineDepth
 			.InlineLimit = 8
 			.DeepestInline = 0
-		|| I = .TryInline(prms, dest, A, AllowedGain)
+		|| I = .TryInline(prms, dest, fn, AllowedGain)
 			return I		
 		if !.state.inlinedepth and .DeepestInline > 1
 /			.InlineLimit = 1
-			i = .TryInline(prms, dest, A, AllowedGain)
+			i = .TryInline(prms, dest, fn, AllowedGain)
 			if i
 				return i
 
