@@ -1,12 +1,5 @@
 
-
-/// seems we can just merge this into SCFunction?
-extend scfunction
-//	linkage
-//		cpp_class FuncInASM
-//		cpp_part FuncInASM 
-//	|scfunction|			Fn
-
+extend SCFunction
 	function StartASM
 		.µstart = ASMState.sh.Index
 
@@ -53,12 +46,11 @@ extend scfunction
 
 
 /// TEXTUAL STUFF		
-	function DebugPrint
+	function µPrint
 		printline self
 		|| fs = faststring()
 		.µRender(fs)
 		printline fs
-
 
 	iterator fat
 		|| FirstInst = .IR
@@ -67,7 +59,6 @@ extend scfunction
 		while currinst < Afterinst
 			yield currinst (CurrInst - FirstInst)
 			++currinst
-
 
 
 function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
@@ -88,18 +79,18 @@ function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 	.r[reg] = J						 // restore!
 
 
-function memory.Run (|memory of asm| self, |&ivec4| Args = nil, |int| ArgCount=0, |int64|)
-	disabled
-	cpp_part RunArgs
-	|| r = jb_vm.vm.Registers(true)
-	if args
-		for i in argcount
-			r[i] = args[i] 
-	
-	return jb_vm.Run(.ptr, .length)|&int64|[]
+//function memory.Run (|memory of asm| self, |&ivec4| Args = nil, |int| ArgCount=0, |int64|)
+//	disabled
+//	cpp_part RunArgs
+//	|| r = jb_vm.vm.Registers(true)
+//	if args
+//		for i in argcount
+//			r[i] = args[i] 
+//	
+//	return jb_vm.Run(.ptr, .length)|&int64|[]
 
 
-function JBin.Add (|scfunction| fn)
+function JBin.Add (|SCFunction| fn)
 	.AddMemory(@bin, fn.µlength*4)
 	for i.fat in fn
 		.AppendInt(i.Encode)
