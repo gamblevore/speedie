@@ -910,7 +910,7 @@ class ListView (GUIControl) {
 		return true
 
 
-	function SelectAtleastFirst	
+	function SelectAtLeastFirst	
 		if !.firstselected
 			.select(.start)
 
