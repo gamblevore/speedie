@@ -189,6 +189,12 @@ Render
 	return .describe(fs_in)
 
 
+	
+function NeedµFunc (|µfunc|)
+	opt norefcounts
+	return .asm init µfunc(self)
+
+
 function Message.TestFuncName (|bool|)
 	opt norefcounts
 	|| fn = .func

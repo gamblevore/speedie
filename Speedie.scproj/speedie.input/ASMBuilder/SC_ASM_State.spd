@@ -470,7 +470,7 @@ struct ASMState
 		.FuncStart = .curr
 		.out = fn.NeedµFunc
 		.state.fn = fn
-		scfunction.currfunc = fn
+		SCFunction.CurrFunc = fn
 		.ReturnASM = fn.ReturnType.regtype
 		.AddFuncParams(fn)
 

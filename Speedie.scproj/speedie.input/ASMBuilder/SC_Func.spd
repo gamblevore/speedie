@@ -1,5 +1,6 @@
 
 
+/// seems we can just merge this into SCFunction?
 class µFunc 
 	linkage
 		cpp_class FuncInASM
@@ -21,10 +22,6 @@ class µFunc
 		|| after = .MuRender(P, P+rz.itemCount)
 		rz.itemcount = after-p
 		rz.length = rz.itemcount
-	
-	function scfunction.NeedµFunc (|µfunc|)
-		opt norefcounts
-		return .asm init µfunc(self)
 		
 	// cosmic lore unfold... into tales untold
 

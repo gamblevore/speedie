@@ -5,6 +5,7 @@
 
 main 	  	  	  	 // exec main {
 	opt NoRefCounts
+	
 	return app.DebugProj
 	
 
@@ -19,8 +20,29 @@ main 	  	  	  	 // exec main {
 function App.ActAsSpeedie (|ErrorInt|)
 	|| Proj = app.args[0].FileThatExists #require
 	|| SpdArgs = [Proj, "--nocolor", "--usescriptloc", "--perry=bin"]
-	Compiler = SpdProcess.Spawn(speedie, SpdArgs, processmode.PassThrough)
+	|| c = SpdProcess.Spawn(speedie, SpdArgs, ProcessMode.PassThrough)
+		Compiler = c
+		while c.IsOpen
+			...
+		return c.Status
+
+
+function App.DebugProj (|ErrorInt|)
+	|| ProjArgs = app.args
+	|| Proj = ProjArgs[0].FileThatExists #require
+	ProjArgs.Remove(0)
+	|| proc = SpdProcess.Spawn(Proj, ProjArgs, ProcessMode.PassThrough)$
+	while proc.IsOpen
+		app.RespondToParent
+		...
+	return proc.Status
 	
+	// exec abc.spd p1 p2 p3
+	
+	// Lets try simply launching the fucker.
+	// Later, we can actually run the thing in a VM, no spawning
+
+
 
 function App.RespondToParent
 	opt norefcounts
@@ -50,20 +72,3 @@ function App.RespondToParent
 	// So might as well do that first?
 
 	
-
-function App.DebugProj (|ErrorInt|)
-	|| ProjArgs = app.args
-	|| Proj = projargs[0].FileThatExists$
-	ProjArgs.Remove(0)
-	|| proc = SpdProcess.Spawn(Proj, ProjArgs, processmode.PassThrough)$
-	while proc.IsOpen
-		app.RespondToParent
-		...
-	return proc.Status
-	
-	// exec abc.spd p1 p2 p3
-	
-	// Lets try simply launching the fucker.
-	// Later, we can actually run the thing in a VM, no spawning
-
-

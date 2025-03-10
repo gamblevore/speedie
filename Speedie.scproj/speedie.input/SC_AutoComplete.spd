@@ -88,7 +88,7 @@ function InitedOK (|bool|)
 
 
 
-function PerryTalk (|spdprocess| perry) // ReturnsWhenPerryClosesUs
+function PerryTalk (|SPDProcess| perry) // ReturnsWhenPerryClosesUs
 	.CompiledOK = Compiler.CompileAll
 	.ParserRestore
 	perry <~ .check(@tmp + "check")
@@ -969,8 +969,11 @@ function CppASM (|string| purpose,  |object| found,  |message|)
 		
 	
 
-function Message.AddLinePositions
-// would be nice to tag the result with... stuff.
+function Message.AddLinePositions	/*
+	cpp abc
+		file "/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd"
+		pos 10
+		x++         */
 	opt norefcounts
 	|message| path
 	for s.flat in self
@@ -980,12 +983,7 @@ function Message.AddLinePositions
 				path = s.FileMark
 				s.prev = path
 			s.prev = s.Position.msg
-/*
-	cpp abc
-		file "/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd"
-		pos 10
-		x++
-*/
+
 
 function message.FileMark (|message|)
 	opt norefcounts
@@ -996,11 +994,21 @@ function message.FileMark (|message|)
 
 function Cpp (|message| rz,  |SCFunction| found)
 	|| msg = found.Source!.Copy
-	msg.AddLinePositions()
 	rz <~ msg
+	msg.AddLinePositions
 	
 	
 function ASM (|message| rz,  |SCFunction| found)
+	|| j = ASMState.JSMSpace
+	if !j?
+		j.Length = 0
+	require SpdAssembler.GenerateASM(found)
+
+	for fat in found.asm!
+		
+	
+	
+	
 	// ... try to compile this! we also need to free/init stuff. Can do cpp also one day. Actually why not now?
 	
 		
