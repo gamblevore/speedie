@@ -23,7 +23,7 @@ struct ASMState
 
 	|scfunction|				Out
 
-	|memory of fatasm|			JSM
+	|?memory of fatasm|			JSM
 	|&FatASM|					FuncStart
 	|&fatasm|					LastDebug
 	|&FatASM|					Start		// a "slice" feature would be nice    
@@ -39,7 +39,7 @@ struct ASMState
 	
 
 	module
-		|FatASM[]|					JSMSpace = FatASM[0]!
+//		|FatASM[]|					JSMSpace = FatASM[0]!
 		|ASMState|					Sh
 
 
@@ -453,7 +453,7 @@ struct ASMState
 		TextAssembler.RequestTable	?= array()
 	
 	
-	function InitAndStartFunc (|scfunction| fn)
+	function InitAndStartFunc (|scfunction| fn, |bool|)
 		opt norefcounts
 		.out = fn
 		.state.fn = fn
@@ -470,10 +470,8 @@ struct ASMState
 		.zero.info = AsmReg()
 		memory.Fill((&.vars[0])|&byte|, 32*8, 0)
 
-		|| j = .JSM
-		if !j?
-			j = FatASM[256K]!
-			.jsm = j
+		|| j = .jsm init FatASM[256K]
+		require j
 		.end = j.NeedSpare(64K, j.itemcount)
 		.start = j.ptr
 		._curr = .start + j.Length
@@ -483,6 +481,7 @@ struct ASMState
 		.FuncStart = .curr
 		.ReturnASM = fn.ReturnType.regtype
 		.AddFuncParams(fn)
+		return true
 
 
 	function FinishASM
@@ -495,7 +494,7 @@ struct ASMState
 		.Optimise
 
 		.out.µlength = .curr - .FuncStart
-		.jsm.length = .curr - .start 
+		.jsm!.length = .curr - .start 
 
 
 	function Guard

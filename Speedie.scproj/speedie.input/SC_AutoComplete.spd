@@ -999,8 +999,7 @@ function Cpp (|message| rz,  |SCFunction| found)
 	
 function ASM (|message| rz,  |SCFunction| found)
 	asmstate.sh.PackMakerInit
-	|| j = ASMState.JSMSpace
-	if j?
+	|| j = ASMState.sh.JSM
 		j.Length = 0
 	require SpdAssembler.GenerateASM(found)
 

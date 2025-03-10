@@ -7,7 +7,7 @@ module TextAssembler
 	function TextFunc (|message| msg, |bool|) // assemble a function from text
 		|| fn = SCFunction.new
 		fn.source = msg
-		ASmState.Sh.InitAndStartfunc(fn)
+		require ASmState.Sh.InitAndStartfunc(fn)
 		ASMState.Sh.TextFuncSub(msg)
 		compiler.exportnames[fn.exportname] = fn
 		ASmState.Sh.FinishASM
@@ -32,7 +32,6 @@ module TextAssembler
 module SpdAssembler
 	|[scfunction]|				PackFuncs
 
-
 	syntax access (|message| m, |scfunction|)
 		cpp_part AccessStr
 		opt norefcounts
@@ -42,7 +41,7 @@ module SpdAssembler
 	function GenerateASM (|scfunction| fn, |bool|) // memory safe ASM reattempt
 		opt norefcounts
 		
-		ASMState.Sh.InitAndStartFunc(fn)
+		require ASMState.Sh.InitAndStartFunc(fn)
 		fn.GenASM
 		ASMState.Sh.FinishASM
 

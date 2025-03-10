@@ -174,6 +174,7 @@ extend PerryIDE
 //			.ColoriseAsRoot = autocomplete.functions
 
 		with .ASMView
+			isnt visible
 			.tooltip		= "Displays ASM"
 			.takesfocus 	= takesfocusflag.CanFocus
 			.ID				= "ASMView"
@@ -241,6 +242,7 @@ extend PerryIDE
 			is   editable
 			is   visible
 			isnt drawsfocus
+			.YAdjust = -1
 			.tooltip		= self.SearchArea.Tooltip			
 			.SingleLine		= TextView.SingleLine
 			.ID				= "find"
@@ -254,6 +256,7 @@ extend PerryIDE
 			is   editable
 			is   visible
 			isnt drawsfocus
+			.YAdjust = -1
 			.tooltip		= self.SearchArea.Tooltip			
 			.SingleLine		= TextView.SingleLine
 			.ID				= "replace"
@@ -454,15 +457,11 @@ extend PerryIDE
 
 		.AddIDEButton(.RunButton,		"\02", "Debug Project", "debug")
 		.AddIDEButton(.buildbutton,		"\1C", "Build Project", "compile")
-//		.AddIDEButton(.recentbutton,	"\11", "Recents", "recent")
 		.buildbutton.next = .Progress
 		.AddIDEButton(.progress,	"", "", "progress")
 		.runbutton.size =   5~after for 22  by  3~inside
 		.buildbutton.size = 5~after for 22  by  3~inside
 		.StartScreen.size = 7~left back 22  by  3~down back 14
-//		.RecentButton.size = 33~left back 22  by  3~down back 14
-//		.StartScreen.next = .RecentButton
-//		.RecentButton.size = 5~before back 22  by  3~down back 14
 		
 		.progress.size =    0~before for 60  by  3~inside
 		
@@ -544,7 +543,7 @@ extend PerryIDE
 			.gnormal = self.startscreen.gnormal
 			.id = "asm"
 			.tooltip = "ASM-Viewer (Inbuilt GodBolt)"
-			.size = 5~left back 25  by  the~same
+			.size = 6~left back 23  by  the~same
 			.text = "\1d"
 		
 		with .FunctionMenu.submenu

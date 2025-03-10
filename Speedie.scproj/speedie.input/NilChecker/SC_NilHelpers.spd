@@ -39,7 +39,8 @@ function RedundantVar (|scdecl| dcl,  |nilcheckmode| Test,  |nilstate|)
 
 function FastDecl (|SCDecl!|)
 	opt norefcounts
-	|| obj = .obj|SCDecl|
+	|| obj = .obj
+	if obj isa scdecl // seems easier to just test
 		|| l = obj.IsLookupOnly
 		if !l
 			return obj // faster
