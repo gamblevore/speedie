@@ -32,6 +32,7 @@ class PerryIDE (Window)
 	|TextView|					MassSearchField
 	|TextView|					MassReplaceField
 	|TextView|					EditMe
+    |listview|                	ASMView
 	|GraphicsEditor| 			DrawMe
 	|TextView|					EditStatus
 	|TextView|					ProjectInfo
@@ -51,6 +52,7 @@ class PerryIDE (Window)
 	|Guicontrol of buttonview|	ViewButtons
 	|buttonview?--|				PrevView
 	|ButtonView|				CurrFileName
+	|Buttonview|                ASMButton
 	|ButtonView|				FunctionMenu
 	|buttonview|				Toolbar
 	|Buttonview|				ProjectTabs
@@ -386,6 +388,7 @@ class PerryIDE (Window)
 			
 		if (hidetop == vistop)
 			.StartScreen.declutter = hidetop
+			.ASMButton.Declutter = Hidetop
 			if HideTop
 				(.DebugArgsList isnt visible)			// better to declutter
 			|| ShowBuilders = !HideTop and (!.IsTextMode or .path.isspd)

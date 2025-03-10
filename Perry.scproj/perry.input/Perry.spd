@@ -343,5 +343,6 @@ function ViewAsVis (|bool| AsProject)
 function FileListersInside (|guicontrol| dest)
 	dest <~ .currfilename
 	dest <~ .functionmenu
+	dest <~ .asmbutton
 }
 

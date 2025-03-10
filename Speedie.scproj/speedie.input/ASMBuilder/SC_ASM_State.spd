@@ -439,14 +439,25 @@ struct ASMState
 
 	function PackMakerInit
 		opt norefcounts
-		if !.Inited
-			.inited = true
-			VM_Builder.JustDefineInstructions
-			SpdAssembler.InitAss
+		require !.Inited
+		.inited = true
+		VM_Builder.JustDefineInstructions
+		instruction.InstructionInit
+		ASMType.InitAccess
+		Instruction[asm.KNSR].Const
+		Instruction[asm.KNST].Const
+		asm.encoders[asm.KNST] = fatasm.KNST_Encoder
+		asm.encoders[asm.noop] = fatasm.NOOP_Encoder
+		return 
+		TextAssembler.Requests		?= dictionary()
+		TextAssembler.RequestTable	?= array()
 	
 	
 	function InitAndStartFunc (|scfunction| fn)
 		opt norefcounts
+		.out = fn
+		.state.fn = fn
+		SCFunction.CurrFunc = fn
 		.state.Return = nil
 		.state.inlinedepth = 0
 		.state.BranchDepth = 0
@@ -466,12 +477,10 @@ struct ASMState
 		.end = j.NeedSpare(64K, j.itemcount)
 		.start = j.ptr
 		._curr = .start + j.Length
+		.Guard
+		fn.StartASM
 		.LastDebug = .curr
 		.FuncStart = .curr
-		fn.StartASM
-		.out = fn
-		.state.fn = fn
-		SCFunction.CurrFunc = fn
 		.ReturnASM = fn.ReturnType.regtype
 		.AddFuncParams(fn)
 
@@ -486,11 +495,15 @@ struct ASMState
 		.Optimise
 
 		.out.µlength = .curr - .FuncStart
-		|| A = asmreg()										// GUARD
-		.fn.sourcearg!.EROR(A,A,A,A,0)
 		.jsm.length = .curr - .start 
 
 
+	function Guard
+		opt norefcounts
+		|| A = asmreg()										// GUARD
+		.fn.sourcearg!.EROR(A,A,A,A,0)
+
+	
 	function fatasm.JumpImprove (|bool|)
 		|| D0 = .jumpto!
 		|| D = D0

@@ -28,12 +28,12 @@ function RedundantVar (|scdecl| dcl,  |nilcheckmode| Test,  |nilstate|)
 			fs <~ "Redundant test."
 		  else
 			fs <~ "$render redundantly tested."
-		fs <~  "Currently is: "
+		fs <~  " Currently is: "
 		fs <~ dcl.nilcurr.RawName
 		if oof
-			fs <~ " on $render"
+			fs <~ " on ${render.Trim}"
 		
-		error (self, render)
+		error (self, fs)
 	return Test & nilstate.either
 
 

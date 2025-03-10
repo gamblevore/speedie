@@ -399,7 +399,7 @@ function MainAct (|Message| cmd, |scfile| my_file, |message|)
 		thg = fn.source
 	if  thg == @thg  and  fn.source!.isbehaviour  and  thg in fn.source
 		return .define_behaviour(fn, cmd.name)
-	if cmd starts "define" or "display" or "callfrom" or "asm"
+	if cmd starts "define" or "display" or "callfrom" or "asm" or "cpp"
 		return .Define_Something(my_file, f, thg, cmd.name)
 
 	expect (thg)                       ("nomsg")
@@ -893,12 +893,9 @@ function Message.AutoMsgFuncFn (|SCFunction|)
 	if tmp == @tmp
 		|| fn = tmp.asfunc
 			return fn
-
-
-function Message.AutoMsgFunc (|SCFunction|)
-	opt norefcounts
+	
 	rz = .MsgFunc
-	rz?=.parent.MsgFunc
+	rz ?= .parent.MsgFunc
 
 
 function CallFromDefine (|message| msg, |scfunction| fn,  |object| found, |message|)
@@ -914,11 +911,8 @@ function CallFrom (|message| msg, |object| found=nil,  |message|)
 	opt norefcounts
 	
 	|| fn = msg.AutoMsgFuncFn
-	fn ?= msg.AutoMsgFunc
-	require fn
-	
-	rz = .CallFromDefine(msg, fn, found)
-	.CallFromSub(rz.first, fn)
+		rz = .CallFromDefine(msg, fn, found)
+		.CallFromSub(rz.first, fn)
 
 
 function CallFromSub (|message| arg, |scfunction| fn)
@@ -953,21 +947,29 @@ function Define (|message--!| msg,  |string| purpose,  |object| found=nil,  |mes
 	error "nosource"
 
 
-function CppASM (|string| purpose,  |object| found,  |message|)
+function CppASM (|message| msg, |string| purpose,  |object| found,  |message|)
 	opt norefcounts
-	|| fn = found as scfunction
+	|| fn = msg.AutoMsgFuncFn
 		|| src = fn.source #expect (fn)
 		|| path = src.File #expect (src)
 		rz = @tmp.msg(purpose)
 		rz.msg(@thg, fn.name)
 		|| rzarg = rz.msg(@arg)
-		rzarg <~ path
 		if purpose ~= "cpp"
 			.Cpp(rzarg, fn)
 		  else
 			.ASM(rzarg, fn)
 		
 	
+
+function Message.NextPath (|message| Before, |message?| path, |message|)
+	opt norefcounts
+	|string| sp = .file
+	if path.firstname != sp
+		path = .FileMark
+		Before.prev = path
+	return path
+
 
 function Message.AddLinePositions	/*
 	cpp abc
@@ -978,10 +980,7 @@ function Message.AddLinePositions	/*
 	|message| path
 	for s.flat in self
 		if s in @arg
-			|string| sp = s.file
-			if path != sp
-				path = s.FileMark
-				s.prev = path
+			path = s.nextpath(s, path)
 			s.prev = s.Position.msg
 
 
@@ -999,22 +998,28 @@ function Cpp (|message| rz,  |SCFunction| found)
 	
 	
 function ASM (|message| rz,  |SCFunction| found)
+	asmstate.sh.PackMakerInit
 	|| j = ASMState.JSMSpace
-	if !j?
+	if j?
 		j.Length = 0
 	require SpdAssembler.GenerateASM(found)
 
+	|| bb = 0
+	|message| path 
 	for fat.fat in found
-		
-	
-	
-	
-	// ... try to compile this! we also need to free/init stuff. Can do cpp also one day. Actually why not now?
+		if options.ASMRenderBlocks and fat.BlockNum != bb
+			bb = fat.BlockNum
+			rz <~ bb
+		|| fs = faststring()
+		fat.Renda(fs, true)
+		|| tmp = rz.msg(@tmp, fs.GetResult)
+		tmp <~ fat.msg.Position
+		path = fat.msg.nextpath(tmp, path)
 	
 		
 function DefineOrCall (|message| msg,  |string| purpose,  |object| found=nil,  |message|)
 	if purpose ~= "asm" or "cpp"
-		return .CppASM(purpose, found)
+		return .CppASM(msg, purpose, found)
 	if  purpose starts "callfrom"
 		return .Callfrom(msg, found)
 	return .define(msg, purpose, found)

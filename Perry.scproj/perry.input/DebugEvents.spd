@@ -243,3 +243,28 @@ function DebugStepOut (guiaction)
 function DebugStepRun (guiaction)
 	beep "run"
 	
+
+function SelectedASM (guilistevent)
+
+
+function ClickedASMButton (guiaction)
+	opt norefcounts
+	|| i = .ide
+	|| v = i.ASMView
+	v.clear
+	if v is Visible
+		(v isnt visible)
+		return true
+
+	expect (i.UpdateASM) (beep)
+	(v is visible)
+	v.ListSource <~ ListViewRow("Displaying ASM...", listviewstate.Grayed)
+
+
+function perryide.UpdateASM (|bool|)
+	opt norefcounts
+	|| fn = .CurrSelFunc
+	return fn and .MaybeSendMessage("asm", fn)
+	
+	
+	

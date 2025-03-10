@@ -93,25 +93,27 @@ module PackMaker
 		|| j = asmstate.sh.jsm
 		if j?
 			j.length = 0
-		for fn in .Packfuncs
-			if fn.AMiniTest
-				require SpdAssembler.GenerateASM(fn)
-		.RunAFewTests
-
-		for fn in .Packfuncs
-			if !fn.AMiniTest
-				require SpdAssembler.GenerateASM(fn)
+		
+		for MiniTestOnly in 2
+			for fn in .Packfuncs
+				if fn.AMiniTest|int| == MiniTestOnly
+					if !fn.tableid // oof
+					require SpdAssembler.GenerateASM(fn)
+			asmstate.sh.Guard
+			
+			if MiniTestOnly
+				.RunAFewTests
 		
 		return true
 	
 
+	
+	target debug {
 	function TestFn (|string| s, |scfunction--|)
 		opt norefcounts
 		|| mod = compiler.program.FindModule("ASMExamples")
 			return mod.Findfunction(s)
-	
-	
-	function AllocateGlobsForSelfTest (|int| G)
+	}	
 		
 		
 	function RunAFewTests 
@@ -172,8 +174,6 @@ module PackMaker
 		ASMState.Sh.PackMakerInit			// fn_asm_table[@arg]
 		|| pg = PackMaker.AddAll
 		require .ActualASMCompile
-		target debug
-			.AllocateGlobsForSelfTest(pg)
 
 		|| j = jbin(@tmp, "xpd")
 		j.enter

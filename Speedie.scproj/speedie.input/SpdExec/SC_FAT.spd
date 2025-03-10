@@ -292,7 +292,7 @@ struct FatASM
 		return (ASM.encoders[.op]!)(self, where, after)
 
 	
-	function Renda (|FastString| fs)
+	function Renda (|FastString| fs, |bool| Simpler=false)
 		opt norefcounts
 		if (!.exists)  and  (.msg.func == @sheb)
 			.RendaMsg(fs, 0)
@@ -335,7 +335,8 @@ struct FatASM
 			fs.length--
 			fs <~ "..."
 			n += 2
-		.RendaMsg(fs, n)
+		if !Simpler
+			.RendaMsg(fs, n)
 	
 
 	function Exists (|bool|)

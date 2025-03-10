@@ -26,8 +26,9 @@ extend PerryIDE
 		.Progress			= ProgressBar(.Toolbar,	ClickedCancel)
 		.GoPrev				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
 		.GoNext				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
-		.CurrFileName		= ButtonView(.RBorder,	OpenProjectPath, nil,	ReturnProjectPath) 
+		.CurrFileName		= ButtonView(.RBorder,	OpenProjectPath, nil,	ReturnProjectPath)
 		.FunctionMenu		= ButtonView(.RBorder,	MenuAllFuncs,	 nil,	ReturnAllFuncs) 
+		.ASMButton			= ButtonView(.rborder,  ClickedASMButton)
 		.MassSearchField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
 		.MassReplaceField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
 		.SubFindCheckBox	= ButtonView(.searcharea, PressedSearchWithin)
@@ -35,6 +36,7 @@ extend PerryIDE
 		.ErrorList			= ListView(self,		ClickedError,			ReturnErrorList) 
 		.CommsLogList		= ListView(self,		nil,					nil)
 		.EditMe				= TextView(self,		JumpToDefinition,		PressedEditKeys)
+		.ASMView			= Listview(self,        SelectedASM, SelectedASM)
 		.DrawMe				= GraphicsEditor(self)
 		.FileList			= FileViewer(self,		SelectedFile,			nil, .editme) 
 		.EditStatus			= TextView(self,		ClickedStatus)
@@ -166,12 +168,19 @@ extend PerryIDE
 			.size = the~width by the~bottom to 0~before 
 			.OnTextChanged	= EditMeModified
 			.OnShowExtraInfo = OnShowExtraInfo
-//			.takesfocus		= takesfocusflag.On
 			.gnormal.solid	= vec4(0.1, 0.974)
 			.OnSelChanged   = EditMeSelChange
 			.OnSelError		= EditMeSelError
 //			.ColoriseAsRoot = autocomplete.functions
 
+		with .ASMView
+			.tooltip		= "Displays ASM"
+			.takesfocus 	= takesfocusflag.CanFocus
+			.ID				= "ASMView"
+			.size 			= the~right back 50~pc by the~bottom to 0~before
+			is NoSearch
+			.GNormal.Solid = LeftBG
+			.UseColorScheme	= true
 
 		with .autocomplete
 			.OnRightClick   = PerrySuperAutoComplete
@@ -434,6 +443,7 @@ extend PerryIDE
 			.AddLow  self.CompileArea
 			.addhigh self.rborder
 			.addhigh self.editme
+			.addhigh self.ASMView
 			.addhigh self.drawme
 
 
@@ -494,9 +504,9 @@ extend PerryIDE
 			(C is selected)
 			C.Obj = self.SpeedieText
 			self.SpeedieText.tag = c.obj
-			c = c.next(self.JeeboxText)
-			c = c.next(self.ProductOut)
-			c = c.next(self.ProductErrors)
+			c = c.IDESetNext(self.JeeboxText)
+			c = c.IDESetNext(self.ProductOut)
+			c = c.IDESetNext(self.ProductErrors)
 			(c is hidden)
 			(c is Broken)
 			
@@ -521,14 +531,21 @@ extend PerryIDE
 			.MouseDownDoesClick	= true
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)
 			.id = "CurrFileName"
-			.tooltip   = "Show File Path"
+			.tooltip = "Show File Path"
 
 		with .FunctionMenu
 			.MouseDownDoesClick	= true
 			.gnormal = self.currfilename.gnormal
 			.id = "AllFuncs"
-			.tooltip   = "List Functions In File"
+			.tooltip = "List Functions In File"
 			.size = 4~after for 40 by the~same
+
+		with .ASMButton
+			.gnormal = self.startscreen.gnormal
+			.id = "asm"
+			.tooltip = "ASM-Viewer (Inbuilt GodBolt)"
+			.size = 5~left back 25  by  the~same
+			.text = "\1d"
 		
 		with .FunctionMenu.submenu
 			isnt drawsfocus
@@ -548,9 +565,8 @@ extend PerryIDE
 		.SetupLogArea
 		.ReTextSubFind
 		.CompileTabSelect(.SpeedieText)
-	
-	
-	function listviewrow.Next (|guicontrol| obj, |Message!|)
+		
+	function listviewrow.IDESetNext (|guicontrol| obj, |Message!|)
 		opt inline
 		rz = .next!
 		rz.obj = obj

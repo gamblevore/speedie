@@ -86,7 +86,6 @@ linkage
 |byte|					IntPrmCount
 |uint16|				µStart
 |uint16|				µLength
-|bool|					µOK
 
 
 

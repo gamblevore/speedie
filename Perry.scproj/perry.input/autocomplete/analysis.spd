@@ -71,23 +71,23 @@ function PerryIDE.ImproveFuncList (|message| result)
 			p0 = p
 
 
-function perryide.DoSuperAutoComplete (|listviewrow| row)
+function perryide.CurrSelFunc (|message|)
 	opt norefcounts
-	|| msg = .editme.MessageAtSel$
-	|| fn = msg.OwningFunc
-		.editme.ShowAndSel(fn.Position, true)
-		.SectionKeyTime = .MaybeSendMessage("callfrom", fn)
-		
-
+	|| msg = .EditMe.MessageAtSel
+		return msg.OwningFunc
+	
 function PerrySuperAutoComplete (guilistevent)
 	opt norefcounts
-	.ide.DoSuperAutoComplete(row)
+	|| i = .ide
+	|| fn = i.CurrSelFunc
+		i.editme.ShowAndSel(fn.Position, true)
+		i.SectionKeyTime = i.MaybeSendMessage("callfrom", fn)
 	return true
 
 
 function PerryAutoCompleteSelected (GUIListEvent)
 	opt norefcounts
-	require mode isnt initialselection
+	require mode isnt InitialSelection
 
 	|| i = .ide
 	i.DuringTempView++

@@ -319,6 +319,9 @@ function EditMeModified (guitextevent)
 		(msg is modified) = Mod
 		|| sub = i.CurrFileName.SubMenu
 			(sub.ListSource is modified) = Mod
+	
+	if i.ASMView is Visible
+		i.UpdateASM
 
 
 function PerryIDE.ShowStats

@@ -367,10 +367,10 @@ helper message.VMMsgArgName (|int| i, |string|)
 function MakeFatCreator (|string| name, |µform| form)
 	opt norefcounts
 	|| fn = .FatCreatorSub(name, form)
-	|| fs = FatFile!
-	fs <~ "\n"
-	fn.Render(fs)
-	fs <~ "\n"
+	|| fs = .FatFile
+		fs <~ "\n"
+		fn.Render(fs)
+		fs <~ "\n"
 
 
 function FatCreatorSub (|string| name, |µform| form, |message|)

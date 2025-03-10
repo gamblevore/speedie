@@ -51,14 +51,15 @@ struct SC_Hoister
 		
 		|| GoIn = true
 		if  (fn == @dot or @thg or @num)  and  (.spare > 0)
-			|| prop = exp.ASMDecl
-			GoIn = prop isnt const and global
-			if (score >= 0)  and  prop.nilreg isnt hoisted
-				if prop is const
-					if (score >= 1<<20) and prop.exportposition
-						.GotConst(exp, prop)
-				  elseif prop is Global
-					.GotGlobal(exp, prop)
+			if fn != @dot or exp.obj isa scdecl
+				|| prop = exp.ASMDecl
+				GoIn = prop isnt const and global
+				if (score >= 0)  and  prop.nilreg isnt hoisted
+					if prop is const
+						if (score >= 1<<20) and prop.exportposition
+							.GotConst(exp, prop)
+					  elseif prop is Global
+						.GotGlobal(exp, prop)
 	
 		if goin
 			for ch.fast in exp
