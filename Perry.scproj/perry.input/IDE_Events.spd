@@ -431,6 +431,7 @@ function PressedSearchKeys (GUIKeyEvent)
 function EditMeSelChange (GUITextEvent)
 	opt norefcounts
 	|| i = .ide
+	i.TryUpdateASM
 	if i.ProductSep.IsOpen and i.jeeboxtext is visible
 		i.UpdateJeeboxField
 	i.PopupHide

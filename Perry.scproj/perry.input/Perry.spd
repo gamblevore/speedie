@@ -322,7 +322,7 @@ function ViewAsVis (|bool| AsProject)
 	(.filesep.div is visible) = AsProject
 		
 	(.UnNeededLabel is visible)  = .UnNeededLabel.text and AsProject and (.FileList isnt visible)
-	(.searcharea is visible)		= AsProject and (.searcharea is visible) 
+	(.searcharea is visible)	= AsProject and (.searcharea is visible) 
 
 	if AsProject
 		.CurrFileName.size = 8 ~ after for 140 by 1~inside

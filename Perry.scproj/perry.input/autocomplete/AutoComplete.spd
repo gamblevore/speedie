@@ -285,6 +285,8 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 			0 //
 		  elseif msg starts "callfrom"
 			.CallFromFB(msg)
+	      elseif msg starts "asm"
+			.GotASM(msg)
 		  elseif msg starts "check"
 			.ErrorListFB(msg)
 		  elseif msg starts "define"
@@ -300,7 +302,7 @@ function EditMeKeyDown (guitextevent)
 
 function EditMeModified (guitextevent)
 	|| i = .ide
-	i.lastsendtime = 0
+	i.LastSendTime = 0
 	require i.SharedProjectTabSource
 	EditMeKeyDown(self, 0, false)
 	
@@ -320,8 +322,8 @@ function EditMeModified (guitextevent)
 		|| sub = i.CurrFileName.SubMenu
 			(sub.ListSource is modified) = Mod
 	
-	if i.ASMView is Visible
-		i.UpdateASM
+	i.CurrASMFunc = nil
+	i.TryUpdateASM
 
 
 function PerryIDE.ShowStats

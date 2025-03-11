@@ -7,6 +7,17 @@ function DebugArgsKeyDown (GUIKeyEvent)
 		return true
 	
 
+// asm DebugArgsKeyDown {
+//	file "/usr/local/speedie/Perry.scproj/perry.input/DebugEvents.spd"
+//	+"FNCX: r3, 31, 9216, 0" 75
+//	+"JBAN: r3, 3" 66
+//	+"FNCX: r4, 31, 5120, 0" 85
+//	+"FNCX: r3, 31, 525248, 0" 95
+//	+"RET:  r0, r0, r0, 0, 1" 103
+//	+"RET:  r0, r0, r0, 0, 0" 121
+//}
+
+	
 function DeleteableListKeys (GuiKeyEvent)
 	opt norefcounts
 	if key.IsDelete
@@ -244,7 +255,6 @@ function DebugStepRun (guiaction)
 	beep "run"
 	
 
-function SelectedASM (guilistevent)
 
 
 function ClickedASMButton (guiaction)
@@ -253,18 +263,76 @@ function ClickedASMButton (guiaction)
 	|| v = i.ASMView
 	v.clear
 	if v is Visible
-		(v isnt visible)
+		i.hideasm
 		return true
 
+	i.CurrASMFunc = nil
 	expect (i.UpdateASM) (beep)
 	(v is visible)
-	v.ListSource <~ ListViewRow("Displaying ASM...", listviewstate.Grayed)
+	v.AddFail "Displaying ASM..."
+
+
+function perryide.TryUpdateASM (|bool|)
+	require .ASMView is Visible
+	return .UpdateASM
+
+
+function perryide.HideASM
+	(.ASMView isnt visible)
+	.ASMView.clear
+	.CurrASMFunc = nil
 
 
 function perryide.UpdateASM (|bool|)
 	opt norefcounts
 	|| fn = .CurrSelFunc
-	return fn and .MaybeSendMessage("asm", fn)
+	if fn != .CurrASMFunc
+		.CurrASMFunc = fn
+		return fn and .MaybeSendMessage("asm", fn)
 	
+
+function ListView.AddFail (|string| s)
+	|| D = listviewstate.disabled ||| listviewstate.aligncenter ||| listviewstate.Disabled
+	self <~ ListViewRow(s, D)
+
+
+function perryide.GotASM (|message| asm)
+	|listviewrow| name = asm.first$
+	|| l = .ASMView
+	l.clear
+	.CurrASMFunc = nil
+	|| src = l.ListSource
+	(name is AlignCenter)
+	src <~ name
+	|| arg = asm.last
+	if !arg.HasAny
+		l.AddFail "--(ASM Unavailable)--"
 	
-	
+	|| n = 0
+	|message| file
+	for s in arg
+		if s == "file"
+			file = s.first
+		  else
+			n++
+			|| cpy = s.copy
+			src <~ cpy
+			cpy.obj = file.name
+	name.name = "function " + name.name + " (" + n.render + ")"
+
+
+function ASMViewKeys (guikeyevent)
+	if key.IsCancel
+		(self isnt visible)
+
+
+function SelectedASM (guilistevent)
+	require row
+	|| file = row.obj as string				#require
+	|| n = row.first.int
+	|| i = .ide
+	i.EditPath(file.name, false)
+	i.editme.ShowAndSel(n, true)
+
+
+

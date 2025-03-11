@@ -165,7 +165,7 @@ extend PerryIDE
 			isnt drawsfocus
 			.ID				= "EditMe"
 			.GroupSaveAll	= true
-			.size = the~width by the~bottom to 0~before 
+			.size = the~width  by  the~bottom to 0~before 
 			.OnTextChanged	= EditMeModified
 			.OnShowExtraInfo = OnShowExtraInfo
 			.gnormal.solid	= vec4(0.1, 0.974)
@@ -176,12 +176,13 @@ extend PerryIDE
 		with .ASMView
 			isnt visible
 			.tooltip		= "Displays ASM"
-			.takesfocus 	= takesfocusflag.CanFocus
+			.TakesFocus 	= TakesFocusFlag.CanFocus
 			.ID				= "ASMView"
-			.size 			= the~right back 50~pc by the~bottom to 0~before
+			.size 			= the~right back 500  by  the~same
 			is NoSearch
 			.GNormal.Solid = LeftBG
 			.UseColorScheme	= true
+			.OnKeyDown = ASMViewKeys
 
 		with .autocomplete
 			.OnRightClick   = PerrySuperAutoComplete

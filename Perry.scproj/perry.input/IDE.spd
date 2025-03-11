@@ -20,6 +20,7 @@ class PerryIDE (Window)
 	|guicontrol| 				CompileArea
 	
 	|FileRow?|					NotTodo
+	|message?|					CurrASMFunc
 	|message?|					SharedProjectTabSource
 	|message?| 					LostFunks
 	|[guicontrol]|				Views
@@ -576,8 +577,6 @@ class PerryIDE (Window)
 		if  key is s  and  .editme is visible
 			.SaveEditing(documentstate.saving)
 			return true
-		if key is j
-			return .FlipJeeboxField
 		|| NumKey = key.IsNumber
 			if NumKey == 9
 				.RunButton.dopressing(nil)
@@ -591,15 +590,15 @@ class PerryIDE (Window)
 				.flip(.SpeedieText)
 				return true
 			if NumKey == 5
-				return .strongview(.ViewLog)
+				return .StrongView(.ViewLog)
 			if NumKey == 4
-				return .strongview(.ViewDebugger)
+				return .StrongView(.ViewDebugger)
 			if NumKey == 3
-				return .strongview(.Viewerrors)
+				return .StrongView(.Viewerrors)
 			if NumKey == 2
-				return .strongview(.ViewSearch)
+				return .StrongView(.ViewSearch)
 			if NumKey == 1
-				return .strongview(.ViewFiles)
+				return .StrongView(.ViewFiles)
 			if NumKey == 0
 				.ViewTextModeSwap
 				return true
@@ -817,6 +816,8 @@ So anything not 0 means "its OK"`
 			.DuringLoad++
 			.ViewAsCurr
 			.DuringLoad--
+		if !r.Name.PathIsCode
+			.HideASM
 		|| ok = (.EditDraw(r), .EditText(r))(g)
 		if ok != 1
 			return ok

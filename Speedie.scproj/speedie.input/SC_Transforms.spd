@@ -408,8 +408,12 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |SCNode| space)
 		r_z.NotNilRZ(f.ReturnType!, space)
 
 	ifn (src.blocks is return) or (src.last istmp "return") 
+		|| last = Src.DeepLast
+		using last
+		
+		parser.using.position = last.After+1
 		|| ret = src.msg(@tmp, "return")
-		ret.ASMType = ASMType.kreturn 
+		ret.ASMType = ASMType.kReturn
 		if used
 			ret.msg(@thg, "rz").obj = d 
 		  else
@@ -976,4 +980,13 @@ function scnode.AddNumericConst (|string| name, |int64| value, |message| where, 
 	.TryAdd( where, SyxConst, SyxConst.Name )
 	return syxconst
 
+
+
+function Message.DeepLast (|message|) 
+	opt norefcounts
+	while
+		|| l = .last #loop
+		self = l
+	return self
+	
 
