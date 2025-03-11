@@ -16,6 +16,11 @@ module SC_Saver {
 	
 
 	function SCFunction.ValidateSaver (|string| name)
+		using .source!
+			.ValidateSaverSub(name)
+		
+	
+	function SCFunction.ValidateSaverSub (|string| name)
 		opt norefcounts
 		// So... now? Let's look at a real saver...
 		// first, let's check if we NEED to call the super.

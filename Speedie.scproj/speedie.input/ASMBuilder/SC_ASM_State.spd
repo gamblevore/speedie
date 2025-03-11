@@ -500,7 +500,11 @@ struct ASMState
 	function Guard
 		opt norefcounts
 		|| A = asmreg()										// GUARD
-		.fn.sourcearg!.EROR(A,A,A,A,0)
+		|| arg = .fn.sourcearg!
+		target debug
+			if arg.position < 0
+				arg.position = 0 // skip error detection
+		Arg.EROR(A,A,A,A,0)
 
 	
 	function fatasm.JumpImprove (|bool|)

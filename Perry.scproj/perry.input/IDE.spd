@@ -579,7 +579,7 @@ class PerryIDE (Window)
 			return true
 		|| NumKey = key.IsNumber
 			if NumKey == 9
-				.RunButton.dopressing(nil)
+				.ASMButton.Click
 				return true
 			if NumKey == 8
 				.flip(.ProductOut)
@@ -816,8 +816,7 @@ So anything not 0 means "its OK"`
 			.DuringLoad++
 			.ViewAsCurr
 			.DuringLoad--
-		if !r.Name.PathIsCode
-			.HideASM
+		.HideASM
 		|| ok = (.EditDraw(r), .EditText(r))(g)
 		if ok != 1
 			return ok

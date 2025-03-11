@@ -253,7 +253,6 @@ function Message.CastedParent (|Message|)
 
 ///////////// ///////////// ///////////// MOVING ///////////// ///////////// ///////////// 
 
-
 function Message.ReplaceWith (|message!| j, |Message!|)
 	.Prev = j
 	.Remove
@@ -340,29 +339,12 @@ function Message.NeedMarker (|String| s, |bool| b, |Message|)
 		.First = rz
 
 
-function message.WipeCopy (|message?| oof, |Message!|)
-	cpp_part LayerWipeCopy
-	if !oof
-		return .wipecopy
-	|| old = (message).layer
-	oof.memorylayer.use
-	rz = .wipecopy
-	old.use
-
-	
-function message.WipeCopy (|Message!|)
-	opt norefcounts
-	rz = Message(self)
-	rz.position = -1
-	for v in self
-		rz <~ v.wipeCopy
-
 
 function Message.CopyAllAfterBefore (|Message| Before, |message| copylayer)
 	opt norefcounts
 	|| exp = .Next
 	While exp
-		before.Prev = exp.wipeCopy(copylayer)
+		before.Prev = exp.Copy(copylayer)
 		exp++
 
 
@@ -380,7 +362,7 @@ function Message.CopyAllAfter (|Message| after, |message| copylayer)
 	opt norefcounts
 	|| curr = .next
 	While curr
-		|| cpy = curr.WipeCopy(copylayer)
+		|| cpy = curr.Copy(copylayer)
 		after.Next = cpy
 		after = cpy
 		curr++
@@ -403,8 +385,8 @@ function Message.CopyAllAfterInto (|Message| into, |Message| copylayer)
 		curr++
 
 
-///////////// ///////////// ///////////// CREATING ///////////// ///////////// ///////////// 
 
+///////////// ///////////// ///////////// CREATING ///////////// ///////////// ///////////// 
 
 function Message.GetMarker (|String| s, |Message|)
 	opt norefcounts
@@ -494,10 +476,6 @@ function message.IsAlwaysBool (|maybebool|)
 			return false|maybebool|
 		if d.IsConstOf(truebool)
 			return true|maybebool|
-
-
-//function message.IsAlwaysTrue (|bool|)
-//	return .IsAlwaysBool.Knowntrue
 
 
 function message.IsAlwaysFalse (|bool|)

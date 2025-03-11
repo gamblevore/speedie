@@ -1038,7 +1038,8 @@ module
 			.typeinfo = datatypecode._void
 			return
 
-		|| node = .Source
+		|| node = .Source!
+		using node
 		|| sup = .super
 			.Size = sup.Size
 			.TypeInfo = sup.TypeInfo

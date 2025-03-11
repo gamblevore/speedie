@@ -122,6 +122,7 @@ function RC_Rel (|Message| rel)
 	if first.func == @thg and first.obj == last.obj // oof
 		return // do nothing!
 	
+	parser.using.position = rel.position
 	|| result = RefMsg0( "JB_SetRef", Compiler.RefSetRef! )
 	|| lst = result.Last!
 	lst <~ first
@@ -144,8 +145,10 @@ function RC_IgnoreReturn (|Message| msg)
 	require msg.func == @func
 	|| fn = msg.last!.obj|scfunction|
 	if fn isnt constructor	
+		parser.using.position = msg.position
 		|| free_if_dead = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead! )
 		msg.FuncWrap( free_if_dead )
+		parser.using.position = -1
 
 
 function RefDecr (|Message| msg, |Message| place, |int| Basis)
@@ -179,7 +182,10 @@ function DecrMulti (|scdecl| d, |message| m, |message|)
 
 
 function RefDecrMsg (|Message| msg, |Message|)
-	return RefMsg( msg, "JB_Decr", Compiler.RefDecr! )
+	parser.using.position = -2 // just to bypass my bug-catching attempt. Not needed.
+	rz = RefMsg( msg, "JB_Decr", Compiler.RefDecr! )
+	parser.using.position = -1
+	
 
 
 function RefClearMsg (|Message| msg, |Message|)
@@ -196,10 +202,12 @@ function RefMsg (|Message| msg, |String| name, |SCFunction| func, |Message|)
 
 function SCFunction.RefFunc (|message| prm, |message!| after)
 	opt norefcounts
+	parser.using.position = after.position
 	|| rz = SCRefs.RefMsg0(.ExportName, Compiler.RefIncr!)
 	after.next = rz
 	rz.last <~ prm
 	rz.obj = prm.obj
+	parser.using.position = -1
 
 
 function RefIncr (|Message| msg, |Message| Place, |bool| IsJustAnArg=false)
@@ -351,6 +359,7 @@ function RefMarkAsDisturber (|SCFunction| fn)
 
 function RefSafeDecr (|Message| msg, |Message| place)
 	// a = nil   ->   a = nil, JB_decr(a)
+	parser.using.position = msg.position
 	if (place == @Arg)
 		place <~ SafeDecrMsg( msg )
 	  else
@@ -472,7 +481,8 @@ function RefMsg0 (|String| name, |SCFunction| func, |Message|)
 
 
 function message.Become (|scfunction| func)
-	.position = -1
+	//.position = -1
+	// clearing this loses good positions that we set in the refcounter
 	.second!.obj = func
 	.obj = func.ReturnType
 	.ASMType = ASMType.kRefCount
@@ -607,6 +617,8 @@ function SafeDecrMsg (|Message| msg, |Message|)
 
 function RC_DeclArg (|scdecl| AR, |scfunction| fn)
 	opt norefcounts
+	|| src = ar.source
+		parser.using.position = src.position
 	|| dcl = AR.WriteNilDecl
 	fn.SourceArg.First = dcl
 	.DeclInit( dcl, fn, true )
@@ -676,6 +688,12 @@ function RC_NeedsOwnBlock (|message| msg, |message| pp, |bool|)
 
 	
 function RC_HandleDisappearing (|Message| msg, |int| Basis)
+	parser.using.position = msg.position
+	.RC_HandleDisappearingSub(msg, basis)
+	parser.using.position = -1
+
+
+function RC_HandleDisappearingSub (|Message| msg, |int| Basis)
 	|| ch = msg.UseNonRefChangers
 	if Basis & kBasisDestructable or kBasisTempStruct
 		if msg != @func

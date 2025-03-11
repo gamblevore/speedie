@@ -56,8 +56,11 @@ class DrawStyle
 		return DrawStyle(self)
 	
 	function Solid (assigns:|vec4|c)
-		.bg <~ c
+		.inside = c
 		.edge = .bg
+		
+	function Inside (assigns:|vec4|c)
+		.bg <~ c
 		.seps = .bg
 		
 	function SafeEdge (|imagepixel|)

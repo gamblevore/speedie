@@ -178,10 +178,9 @@ extend PerryIDE
 			.tooltip		= "Displays ASM"
 			.TakesFocus 	= TakesFocusFlag.CanFocus
 			.ID				= "ASMView"
-			.size 			= the~right back 500  by  the~same
+			.size 			= the~right back 250  by  the~same
 			is NoSearch
-			.GNormal.Solid = LeftBG
-			.UseColorScheme	= true
+			.GNormal.inside =  LeftBG
 			.OnKeyDown = ASMViewKeys
 
 		with .autocomplete

@@ -93,14 +93,14 @@ module PackMaker
 		|| j = asmstate.sh.jsm
 			j.length = 0
 		
-		for MiniTestOnly in 2
+		for DoMainStuff in 2
 			for fn in .Packfuncs
-				if fn.AMiniTest|int| == MiniTestOnly
+				if fn.AMiniTest|int| != DoMainStuff
 					if !fn.tableid // oof
 					require SpdAssembler.GenerateASM(fn)
 			asmstate.sh.Guard
 			
-			if MiniTestOnly
+			if !DoMainStuff
 				.RunAFewTests
 		
 		return true
@@ -164,7 +164,7 @@ module PackMaker
 			
 		fn = .testfn("TestAtomic")
 		if fn
-/			|| atomic = fn.TestObesity|&int|[]
+			|| atomic = fn.TestObesity|&int|[]
 			printline atomic
 		}
 	

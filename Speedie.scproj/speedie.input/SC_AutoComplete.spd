@@ -998,6 +998,12 @@ function Cpp (|message| rz,  |SCFunction| found)
 	
 	
 function ASM (|message| rz,  |SCFunction| found)
+	|| fs = FastString()
+	.asmsub(rz, found, fs)
+
+
+function ASMSub (|message| rz,  |SCFunction| found, |faststring| fs)
+	opt norefcounts
 	asmstate.sh.PackMakerInit
 	|| j = ASMState.sh.JSM
 		j.Length = 0
@@ -1005,14 +1011,18 @@ function ASM (|message| rz,  |SCFunction| found)
 
 	|| bb = 0
 	|message| path 
+	|| lp = 0
 	for fat.fat in found
 		if options.ASMRenderBlocks and fat.BlockNum != bb
 			bb = fat.BlockNum
 			rz <~ bb
-		|| fs = faststring()
 		fat.Renda(fs, true)
 		|| tmp = rz.msg(@tmp, fs.GetResult)
-		tmp <~ fat.msg.Position
+		|| p = fat.msg.Position
+		if p <= 0
+			p = lp
+		tmp <~ p
+		lp = p
 		path = fat.msg.nextpath(tmp, path)
 	
 		

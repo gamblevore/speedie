@@ -3,20 +3,9 @@
 function DebugArgsKeyDown (GUIKeyEvent)
 	opt norefcounts
 	if key.IsCancel
-		.window!.setfocus(nil)
+		.window!.SetFocus(nil)
 		return true
 	
-
-// asm DebugArgsKeyDown {
-//	file "/usr/local/speedie/Perry.scproj/perry.input/DebugEvents.spd"
-//	+"FNCX: r3, 31, 9216, 0" 75
-//	+"JBAN: r3, 3" 66
-//	+"FNCX: r4, 31, 5120, 0" 85
-//	+"FNCX: r3, 31, 525248, 0" 95
-//	+"RET:  r0, r0, r0, 0, 1" 103
-//	+"RET:  r0, r0, r0, 0, 0" 121
-//}
-
 	
 function DeleteableListKeys (GuiKeyEvent)
 	opt norefcounts
@@ -335,4 +324,7 @@ function SelectedASM (guilistevent)
 	i.editme.ShowAndSel(n, true)
 
 
-
+// so whats left?
+	// why do we lose the row selection
+	// no updates either! as we alter the text!
+	// use a stretch-control!
