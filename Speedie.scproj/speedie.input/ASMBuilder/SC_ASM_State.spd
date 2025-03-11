@@ -500,14 +500,14 @@ struct ASMState
 	function Guard
 		opt norefcounts
 		|| A = asmreg()										// GUARD
-		|| arg = .fn.sourcearg!
+		|| arg = .fn.SourceArg!
 		target debug
 			if arg.position < 0
 				arg.position = 0 // skip error detection
 		Arg.EROR(A,A,A,A,0)
 
 	
-	function fatasm.JumpImprove (|bool|)
+	function FatASM.JumpImprove (|bool|)
 		|| D0 = .jumpto!
 		|| D = D0
 		|| n = 0
@@ -519,7 +519,7 @@ struct ASMState
 			.CopyFrom(d) // always jumping into an exit.
 			return true
 		
-		if D!=D0 // faster jump
+		if D != D0 // faster jump
 			.JumpTo(D, ASMState.sh)
 			return true
 		

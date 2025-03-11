@@ -1,5 +1,16 @@
 
 
+function DebugABC1
+	|| n = "abc".length
+	n++
+
+
+function DebugABC2
+	|| n = "def".length
+	|| i = 2
+	n*=2
+
+
 function DebugArgsKeyDown (GUIKeyEvent)
 	opt norefcounts
 	if key.IsCancel
@@ -277,6 +288,7 @@ function perryide.UpdateASM (|bool|)
 	|| fn = .CurrSelFunc
 	if fn != .CurrASMFunc
 		.CurrASMFunc = fn
+		if keys.shift
 		return fn and .MaybeSendMessage("asm", fn)
 	
 
@@ -289,7 +301,6 @@ function perryide.GotASM (|message| asm)
 	|listviewrow| name = asm.first$
 	|| l = .ASMView
 	l.clear
-	.CurrASMFunc = nil
 	|| src = l.ListSource
 	(name is AlignCenter)
 	src <~ name
@@ -323,8 +334,3 @@ function SelectedASM (guilistevent)
 	i.EditPath(file.name, false)
 	i.editme.ShowAndSel(n, true)
 
-
-// so whats left?
-	// why do we lose the row selection
-	// no updates either! as we alter the text!
-	// use a stretch-control!
