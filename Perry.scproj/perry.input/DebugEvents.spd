@@ -3,9 +3,10 @@
 
 || DebugGUI = false
 
-function DebugABC1
-	|| n = "abc".length
+function DebugABC1 (|int| i, |int|)
+	|| n = i*9
 	n++
+	return n
 
 
 function DebugABC2

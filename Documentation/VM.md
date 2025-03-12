@@ -35,6 +35,17 @@ Speedie ASM should be 2x/3x smaller than ARM, on average. <small>(This is just a
 **Only needs approx-100 instructions (once finished). I have 77 so far but SIMD is missing. ARM needs over 1000!**
 
 
+### Inbuilt ASM-Viewer
+
+People who have used [godbolt.org](http://godbolt.org) know how useful this tool can be. It is used for all sorts of things, but mostly to check if your code compiles to code that is as good as you know it can be. Or to avoid disasterous compiler-bugs that lower efficiency unexpectedly. Such as refusing to use SIMD when it should.
+
+Well... Perry has an inbuilt ASM-Viewer! Just press Command-9 (Ctrl-9 on Linux) to view the ASM for any function you are editing. Speedie already optimises it's code "tastefully", to make a good balance of debuggability and speed.
+
+And considering that Speedie only has one compile-target (release builds ARE debug-builds), this means you can easily check the final output of your code.
+
+Using Perry's inbuilt godbolt.org... this gives speed-freaks an extra advantage, it is instant unlike godbolt.org!
+
+
 ### Other nice things to know abou:
 
 • Within 1.5 years of community acceptance, an ARM-JIT will be created. This will run speedie apps on ARM-CPUs at full native speed.
