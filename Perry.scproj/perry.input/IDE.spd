@@ -67,6 +67,7 @@ class PerryIDE (Window)
 	|Buttonview|				GoNext
 	|Buttonview|				GoPrev
 	|Buttonview|				StartScreen
+	|Buttonview|				DebugSwitcher
 	|Buttonview|				BuildButton
 	|Buttonview|				RunButton
 	|Process?| 					Talker
@@ -186,7 +187,7 @@ class PerryIDE (Window)
 		return it.findapath("./input/", r)  ??  it.findapath("./*.input/", r) 
 
 
-	behaviour AppForeGroundChanged
+	behaviour AppForeGroundChange
 		.CheckModified
 		.Recheck(true)
 		.PopupHide
@@ -389,6 +390,7 @@ class PerryIDE (Window)
 			
 		if (hidetop == vistop)
 			.StartScreen.declutter = hidetop
+			.DebugSwitcher.declutter = hidetop
 			.ASMButton.Declutter = Hidetop
 			if HideTop
 				(.DebugArgsList isnt visible)			// better to declutter
@@ -1000,6 +1002,8 @@ function PerryIDE.IDECommand (|bool|)
 		if s2 == @arg
 			s2 = s2.first
 		.editme.beep = s2.name
+	  elseif cmd ~= "note"
+		notifications <~ "ascii"
 	  elseif cmd ~= "render" or "parse"
 		.editme.beep = s.parse.Render
 	  elseif cmd ~= "tetris"

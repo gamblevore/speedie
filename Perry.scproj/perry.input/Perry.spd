@@ -334,7 +334,7 @@ function ViewAsVis (|bool| AsProject)
 	|| IsPic = .IsGraphics
 	(.editme is visible) = !IsPic
 	(.drawme is visible) = IsPic
-	.reflow
+	.reflow(true, true)
 	if !.Focus.IsViewable
 		.editme.SetFocus
 	

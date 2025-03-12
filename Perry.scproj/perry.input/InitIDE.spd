@@ -22,6 +22,7 @@ extend PerryIDE
 		.BuildButton		= buttonview(.Toolbar,	Clickedcompile)
 		.ProjectTabs		= ButtonView(.Toolbar,	ClickedTabs,    	 PressingTabs, 	ReturnProjectPath,  RightClickedTabs) 
 		.StartScreen		= ButtonView(.Toolbar,	&StartupWindow.open, ClickedOpenRecent, ReturnRecents)
+		.DebugSwitcher		= ButtonView(.Toolbar,	DebugSwitch)
 //		.RecentButton		= buttonview(.Toolbar,	ClickedOpenRecent, ClickedOpenRecent,  ReturnRecents)
 		.Progress			= ProgressBar(.Toolbar,	ClickedCancel)
 		.GoPrev				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
@@ -462,7 +463,6 @@ extend PerryIDE
 		.runbutton.size =   5~after for 22  by  3~inside
 		.buildbutton.size = 5~after for 22  by  3~inside
 		.StartScreen.size = 7~left back 22  by  3~down back 14
-		
 		.progress.size =    0~before for 60  by  3~inside
 		
 		.RunButton.ExpandOnMouseOver = 1
@@ -471,8 +471,12 @@ extend PerryIDE
 		.currfilename.ExpandOnMouseOver = 1
 		.FunctionMenu.ExpandOnMouseOver = 1
 		.ProjectTabs.ExpandOnMouseOver = 2
-
-		
+	
+		with .DebugSwitcher
+			.size = 31~left back 22  by  3~down back 14
+			.id = "switch"
+			
+			
 		with .CompileArea
 			.ID				= "OutBorder"
 			.size 			= the~width  by  18~down
