@@ -1,5 +1,8 @@
 
 
+
+|| DebugGUI = false
+
 function DebugABC1
 	|| n = "abc".length
 	n++
@@ -7,8 +10,8 @@ function DebugABC1
 
 function DebugABC2
 	|| n = "def".length
-	|| i = 2
-	n*=2
+	|| i = 2 * 3
+	n *= n + 3
 
 
 function DebugArgsKeyDown (GUIKeyEvent)
@@ -16,18 +19,23 @@ function DebugArgsKeyDown (GUIKeyEvent)
 	if key.IsCancel
 		.window!.SetFocus(nil)
 		return true
-	
-	
+
+
+function DebugSwitch (guiaction)
+	DebugGUI = !DebugGUI
+	return true
+
+
 function DeleteableListKeys (GuiKeyEvent)
 	opt norefcounts
-	if key.IsDelete
-		if self isa ListView
-			|| s = .FirstSelected
-				|| p = s.parent
-				.RemoveRow(s)
-				if !p.HasAny
-					.RemoveRow(p)
-		return true
+	require key.IsDelete
+	if self isa ListView
+		|| s = .FirstSelected
+			|| p = s.parent
+			.RemoveRow(s)
+			if !p.HasAny
+				.RemoveRow(p)
+	return true
 
 
 function DebugArgsGotFocus (guiaction)
