@@ -124,6 +124,7 @@ class StretchDivider (GuiControl)
 		.size = W by H
 		(.OnStretch)(self)?
 
+
 	behaviour Resized
 		.InTest(GUI.mousexy, true)
 		
@@ -203,8 +204,9 @@ class StretchDivider (GuiControl)
 	
 	setter ActiveEnd (|controlpoint|)
 		opt NoRefCounts
-		.low$.sizer.g(2+.d) = value
+		.low$.sizer.g(2+.d, self) = value
 		.InitDiv
+
 		
 	behaviour MouseDown
 		require .InTest(P, false)

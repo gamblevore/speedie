@@ -214,8 +214,11 @@ module GUI
 		modified.touch
 
 	
-	function Resized (|guicontrol| modified=nil)
+	function Resized (|guicontrol| modified)
+		opt norefcounts
 		.AControlWasResized = true
+		|| w = modified.window
+			w._NeedsResize = true
 		.Touch(modified)
 
 	
@@ -604,42 +607,50 @@ module GUI
 		return window.all.first
 
 
-	function StartResize
+	function StartResize (|bool| Force=false)
 		opt norefcounts
 		require .acontrolwasresized
 		.acontrolwasresized = false
 		.Touch
 		for w.fast in __modules__.window.all
-			w.reflow
+			w.reflow(force, true)
 		for w.fast in notifications.Alerts
-			w.reflow(false)
+			w.reflow(force, false)
 
 
-	helper Window.Reflow (|bool| UsePrev = true, |ivec4|)
+	helper Window.Reflow (|bool| Force, |bool| UsePrev)
 		opt norefcounts
+		require ._NeedsResize or force
+		._NeedsResize = false
+
 		|| p = .parent ?? window.all
 		|| D = GUI.Screen
 		|| BigRect = d.rect
 		|| rect = (0,0,0,0)
-		|| b = .prev
-		if b and UsePrev
-			rect = b.lastrect
-		return .reflowdoc(bigrect, rect, bigrect)
+		if UsePrev
+			|| b = .prev
+				rect = b.lastrect
+		.reflowdoc(bigrect, rect, bigrect)
 
 	
-	function CheckTaskAnimations
+	helper CheckTaskAnimations
 		opt norefcounts
 		
-		for w in window.all
+		for w.fast in window.all
 			for t in w.tasks
 				if t is Animation
-					|| p = t.taskprogress
-					if p != t.prevprogress
-						t.PrevProgress = p
-						t.upon.touch(-1)
-
+					.animate(t)
 	
-	function StartDraw
+	
+	helper Animate (|guicontrol.taskgui| t)
+		opt norefcounts
+		|| p = t.taskprogress
+		if p != t.prevprogress
+			t.PrevProgress = p
+			t.upon.touch(-1)
+		
+		
+	helper StartDraw
 		opt norefcounts
 		|| CanBlur = !app.prefs["noblur"]
 		
@@ -850,11 +861,12 @@ module GUI
 		return true
 	
 	
-	helper HandleAppResize
+	helper HandleAppResize  // handleresized
 		if !.NewSize
 			if .ResizedCounter
 				.ResizedCounter--
 			return
+
 		.ResizedCounter = 4
 		
 		|| r = .raw
@@ -865,7 +877,7 @@ module GUI
 		.Raw = SDL_CreateTexture(.renderer!, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, v.x, v.y)
 
 		window.all.FullScreen = v
-		.StartResize
+		.StartResize(true)
 
 
 	function StartFrame (|&SDL_Texture| T)
@@ -1035,7 +1047,7 @@ module GUI
 		.FlashSelector = false
 		if !.DialogIsOpen
 			for w in __modules__.window.all
-				w.__AppForegroundChanged__(!back)
+				w.__AppForegroundChange__(!back)
 		.touch
 		return SDLActivity.activity
 

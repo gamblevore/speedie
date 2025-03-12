@@ -80,7 +80,7 @@ class FileViewer (ListView)
 				s.TryReload(self)
 	
 	
-	behaviour AppForegroundChanged
+	behaviour AppForeGroundChange
 		.TryReloadPath
 	
 	

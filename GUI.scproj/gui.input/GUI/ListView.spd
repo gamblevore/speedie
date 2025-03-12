@@ -372,8 +372,8 @@ class ListView (GUIControl) {
 		(t)(self, nil, tf.text)
 		.touch
 		if self isa menu
-			.Sizer.g(1) = .DesiredHeight~long
-			.sizer.g(2) = .CmmWidth(nil)~long
+			.Sizer.g(1, self) = .DesiredHeight~long
+			.sizer.g(2, self) = .CmmWidth(nil)~long
 		if .SelectableCount == 1
 			.SelectFirst
 		

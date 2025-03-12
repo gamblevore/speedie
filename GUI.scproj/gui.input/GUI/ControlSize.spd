@@ -7,15 +7,15 @@ struct ControlSize
 		datatype true
 	|controlrect|				GSize
 	
-	helper G (|int| i, assigns:|ControlPoint|)
+	helper G (|int| i, |guicontrol| g, assigns:|ControlPoint|)
 		if .gsize[i] != value
 			.GSize[i] = value
-			GUI.resized
+			GUI.resized(g)
 	
-	function SetSize (|controlrect| GSize) // only one we need, right?
+	function SetSize (|guicontrol| g, |controlrect| GSize) // only one we need, right?
 		ifn .gsize equals gsize
 			.GSize = gsize
-			GUI.resized
+			GUI.resized(g)
 	
 	function ivec4.OperatorEquals (|ivec4| v, |bool|) // sigh
 		for i in 4
@@ -24,10 +24,6 @@ struct ControlSize
 
 	syntax access (|int| i, |ControlPoint|)
 		return .GSize[i]|controlpoint|
-		
-//	setter TrySetLength (|int| i, |int|)
-//		if .mode(i) == ControlPoint.Length
-//			.g(i) = (value)~long
 				
 	function Mode (|int|i, |int|)
 		return .GSize[i]&15
@@ -35,14 +31,14 @@ struct ControlSize
 	function Size (|int| i,  |int|)
 		return .GSize[i]>>4
 
-	helper sett (|int|i, |ivec2| value, |int| mode) // remove?
-		.g(i)   = ((value.x << 4) ||| mode)|controlpoint|
-		.g(i+1) = ((value.y << 4) ||| mode)|controlpoint|
-
 	setter guicontrol.FullScreen (|ivec2|) // for full-screen windows
 		.lastrect = (0,0,value)
-		.sizer.sett(0, (0,0), ControlPoint.low)
-		.sizer.sett(2, value, ControlPoint.length)
+
+		.sizer.g(0, self) = ControlPoint.low
+		.sizer.g(1, self) = ControlPoint.low
+
+		.sizer.g(2, self) = ((value.x << 4) ||| ControlPoint.length|int|)|controlpoint|
+		.sizer.g(3, self) = ((value.y << 4) ||| ControlPoint.length|int|)|controlpoint|
 
 
 	helper guicontrol.ReflowDoc (|ivec4| Parent, |ivec4| Prev, |ivec4| Hard, |ivec4|) // resizecontrol, recalculatesize
@@ -66,7 +62,7 @@ struct ControlSize
 	function Calculate (|ivec4| Parent, |ivec4| Prev, |ivec4| Window, |guicontrol| upon, |ivec4|)
 		|| UseBlocks = upon is blocksized
 			return .CalculateBlocks
-//		if keys.shift and upon ~= "Variables"
+		if keys.shift and upon ~= "switch"
 //		|| dbg = upon.clipmode is debug
 //			"---------------"
 		|| PS = parent.size

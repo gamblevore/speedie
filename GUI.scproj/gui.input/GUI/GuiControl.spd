@@ -82,7 +82,7 @@ class GUIControl (list)
 		(.OnFocus)(self, 1)?
 	virtual LostFocus (|bool|)
 		return (.OnFocus)(self, 0)?
-	virtual AppForegroundChanged (|bool| IsForeGround)
+	virtual AppForeGroundChange (|bool| IsForeGround)
 		0
 	virtual Resized
 		0
@@ -103,14 +103,14 @@ class GUIControl (list)
 		return .lastrect.size
 
 	setter Size (|controlrect|)
-		.sizer.setsize(value)
+		.sizer.setsize(self, value)
 		if value.IsBasic
 			.MiniSizeSet(value.basicsize)
 
 	function BlockSize (|float| X, |float| Width, |float| Y, |float| Height)
 		is blocksized
 		|| Sz = VObject.Size2d(x, width, y, height)
-		.sizer.setsize(sz)
+		.sizer.setsize(self, sz)
 
 
 	function MiniSizeSet (|ivec4| Rect)
@@ -121,7 +121,9 @@ class GUIControl (list)
 			if p isa window
 				l = l.soothe
 			rect += l.xyxy
-			.LastRect = rect // right?
+			if .lastrect != rect
+				.LastRect = rect // right?
+				gui.Resized(self)
 
 		
 	helper Reflow (|ivec4| mine, |ivec4| Hard) 
@@ -343,15 +345,15 @@ class GUIControl (list)
 	function Width (|int|)
 		return .lastrect.width
 	setter Width (|controlline|)
-		.sizer.g(0) = value[0]|controlpoint|
-		.sizer.g(2) = value[1]|controlpoint|
+		.sizer.g(0, self) = value[0]|controlpoint|
+		.sizer.g(2, self) = value[1]|controlpoint|
 
 	function Height (|int|)
 		return .lastrect.Height
 	// dreams... of dance, fun, youth! healinggggg...
 	setter Height (|controlline|)
-		.sizer.g(1) = value[0]|controlpoint|
-		.sizer.g(3) = value[1]|controlpoint|
+		.sizer.g(1, self) = value[0]|controlpoint|
+		.sizer.g(3, self) = value[1]|controlpoint|
 
 	helper DoCopy (|object| item=nil, |bool|)
 		|| S = .getcopy
@@ -378,7 +380,7 @@ class GUIControl (list)
 	
 	setter Size (|int| i, |ControlPoint|)
 		cpp_Part SizePart
-		.sizer.g(i) = value
+		.sizer.g(i, self) = value
 	
 	function Right (|int|)			// these are not synced but i dont know what to do.....
 		return .lastrect.x2			// set a controlpoint, but get a lastrect int?

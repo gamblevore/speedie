@@ -324,7 +324,7 @@ class ButtonView (GUIControl)
 	function TrimWidth
 		|| n = .items.slowcount max 1
 		|| w = n * (.itemwidth + .itemgap) - .ItemGap
-		.sizer.g(2)	= (w) ~ long
+		.sizer.g(2, self)	= (w) ~ long
 
 			
 	function SearchMenu (|listviewrow| row=nil, |bool|)
