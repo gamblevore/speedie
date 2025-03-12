@@ -119,7 +119,13 @@ void JB_PID_Register(ProcessOwner* self) {
 void JB_PID_Destructor(ProcessOwner* self) {
 	JB_PID_UnRegister(self);
 	if (!self->LeaveOrphaned)
+#ifndef AS_LIBRARY
 		JB_Kill(self->PID);
+#else
+		
+		(0); // kill(self->PID, SIGKILL);
+#endif
+
 }
 
 void JB_PID_UnRegister(ProcessOwner* self) {
