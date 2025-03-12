@@ -1176,11 +1176,21 @@ extern Dictionary* JB__TC_Types_Dict;
 
 #define kJB__ProcessMode_CaptureStdOut ((int)1)
 
+#define kJB__ProcessMode_PassThrough ((int)4)
+
 #define kJB__PIDM_Default ((ProcessOwnerMode)0)
 
 #define kJB__PIDM_OwnGroup ((ProcessOwnerMode)2)
 
-#define kJB__PIDM_StdOutFlowsThroughUs ((ProcessOwnerMode)1)
+#define kJB__PIDM_Silence ((ProcessOwnerMode)40)
+
+#define kJB__PIDM_StdErrPassThru ((ProcessOwnerMode)16)
+
+#define kJB__PIDM_StdErrSilence ((ProcessOwnerMode)32)
+
+#define kJB__PIDM_StdOutPassThru ((ProcessOwnerMode)4)
+
+#define kJB__PIDM_StdOutSilence ((ProcessOwnerMode)8)
 
 #define JB__Syx_CurrFuncID_ JB__.Syx_CurrFuncID_
 #define kJB__TaskState_Animation ((TaskState)16)

@@ -3213,6 +3213,7 @@ Array* JB_ErrorSeverity__InitNames() {
 
 
 
+
 int JB_Rg_Width(IntRange Self) {
 	return Self[1] - Self[0];
 }
@@ -3969,7 +3970,10 @@ ErrorMarker JB_Rec_Mark(JB_ErrorReceiver* Self) {
 }
 
 bool JB_Rec_OK(JB_ErrorReceiver* Self) {
-	return Self and (!Self->ErrorCount);
+	if (Self) {
+		return (!Self->ErrorCount);
+	}
+	return (!JB_StdErr->ErrorCount);
 }
 
 int JB_Rec_PrintErrorsMain(JB_ErrorReceiver* Self, uint /*ErrorSeverity*/ Level, bool PrintCount, bool Shell) {
@@ -6058,7 +6062,7 @@ bool JB_Tree_HasOneChild(JB_List* Self) {
 	return JB_Ring_HasChildCount(Self, 1);
 }
 
-__lib__ void jdb2(JB_List* Self) {
+void jdb2(JB_List* Self) {
 	//visible;
 	if (Self) {
 		JB_String* _tmPf0 = JB_Msg_JDB_(((Message*)Self), nil, 1);
@@ -6071,7 +6075,7 @@ __lib__ void jdb2(JB_List* Self) {
 	}
 }
 
-__lib__ void jdb3(JB_List* Self) {
+void jdb3(JB_List* Self) {
 	//visible;
 	if (Self) {
 		JB_String* _tmPf0 = JB_Msg_JDB_(((Message*)Self), nil, 3);
@@ -8443,7 +8447,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2025022517);
+	return (2025031219);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8455,4 +8459,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 7675667901263233710 -4336414815684837428
+// -2934619186805667969 -4686370684608625110 3557405736846811113
