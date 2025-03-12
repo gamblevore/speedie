@@ -84,25 +84,26 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 			return c
 		return nil // ded?
 
-	|| p = [.project, "--perry=bin", "--nocolor"]
 	|| f = .SharedProjectTabSource[@nil]$
+	|| p = [.project, "--perry=bin", "--nocolor"]
 	|| name = .name
-	|| Noisy = false//SpdLibAlreadyInUse
-		p <~ "--noisy"		
+	|| Noisy = SpdLibAlreadyInUse
+		"--sending noise--"
+		p <~ "--noisy"
 
 	p <~ "--check"
 	
-	// 
+
 	|SpdProcess| spd 
 	
-	if !SpdLibAlreadyInUse
-		SpdLibAlreadyInUse = true
-		target debug {
-		if !.UsingSpdLib
-			.UsingSpdLib = true
-			f.name = name.TrimExt + "()"
-		spd = (Speedie_Main).Spawn(p, f.name)
-		}
+	target debug
+		if !SpdLibAlreadyInUse
+			SpdLibAlreadyInUse = true
+			target debug
+				if !.UsingSpdLib
+					.UsingSpdLib = true
+					f.name = name.TrimExt + "()"
+				spd = (Speedie_Main).Spawn(p, f.name)
 
 	if !spd?
 		|| proc = speedie.resolve
@@ -111,8 +112,8 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 		if proc
 			|| Mode = ProcessMode.CaptureAll * !noisy
 			spd = SpdProcess.spawn(Proc, p, .project.name, mode)
-	if noisy and spd
-		spd.pico.config.noise = -1
+//	if noisy and spd
+//		spd.pico.config.noise = -1
 	return spd
 
 

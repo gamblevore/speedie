@@ -10,11 +10,12 @@ extend PerryIDE
 		|| lf = .LostFunks
 			unused <~ lf.copy
 		.SendFeedbackMsg(unused)
-		
+	
+	
 	function ForceRecheck
 		.ModifiedForCompile = false
-		.Feedback = nil
 		if .projIsSpeedieCode and !.UsingSpdLib
+			.Feedback = nil
 			.AskCheck
 	
 	function AskCheck

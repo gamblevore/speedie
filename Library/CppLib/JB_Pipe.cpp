@@ -28,6 +28,15 @@
 #endif
 
 
+#define kStdOutPassThru 4
+#define kStdOutSilence  8
+#define kStdOutNil      12
+#define kStdErrPassThru 16
+#define kStdErrSilence  32
+#define kStdErrSilence  32
+#define kStdErrNil      48
+
+
 extern "C" {
 JBClassPlace( ProcessOwner,   JB_PID_UnRegister,     JB_AsClass(JB_Object),      0 );
 }
@@ -152,12 +161,17 @@ const char** JB_Proc__CreateArgs(JB_String* self, Array* R) {
 }
 
 
-int JB_Kill(int PID) { // don't you normally want to kill an entire group?
+int JB_Kill(int PID) {
 	if (PID <= 0)
 		return -1;
-	if (killpg(PID, SIGKILL)==0)
-		return 0;
-	return errno;
+
+	int ch_pg = getpgid(PID);
+	int err = 0;
+	if (getpgid(0) == ch_pg) // don't kill self!
+		err = kill(PID, SIGKILL);
+	  else
+		err = killpg(ch_pg, SIGKILL); // better to kill entire group.
+	return errno & err; // err will be -1 or 0
 }
 
 
@@ -190,29 +204,44 @@ static void CheckStillAlive (ShellStream* Sh) {
 }
 
 
-int StartProcessSub(ShellStream& Sh, JB_String* path, Array* Args, PicoComms* C, int Mode) {
-// fcntl,Fork,execvp,Pipe,Dup2,Waitid,Errno,Close,Eintr,_exit // far too much stuff in unix.
+int JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, int Mode) {
+// fcntl,Fork,execvp,Pipe,Dup2,Waitid,Errno,close,Eintr,_exit // far too much stuff in unix.
+	auto& Sh = *self;
 	auto argv = JB_Proc__CreateArgs(path, Args);
 	if (!argv) return E2BIG;
 	
-	if (!(Mode&1) or Sh.Output)
+	if (Sh.Output) {
 		pipe(Sh.CaptureOut);
-	pipe(Sh.CaptureErr); // we might want to pass errors through? right?
-	Unblock(Sh.CaptureErr[RD]); // should never block
-	Unblock(Sh.CaptureOut[RD]); // even this blocking at all is kinda sus...
+		Unblock(Sh.CaptureOut[RD]); // should never block
+	}
+	if (Sh.ErrorOutput) {
+		pipe(Sh.CaptureErr);
+		Unblock(Sh.CaptureErr[RD]); // even this blocking at all is kinda sus...
+	}
 	
 	int PID = PicoStartFork(C, true);
-
 	if (PID == 0) { // CHILD
-		if (Mode&2)
+		if (Mode&2) {
+			//setsid
 			setpgid(getpid(), getpid());
-		Dup2_( Sh.CaptureOut[WR], STDOUT_FILENO );
-		pipe_close(Sh.CaptureOut[WR]);
-		pipe_close(Sh.CaptureOut[RD]);
+		}
 		
-		Dup2_( Sh.CaptureErr[WR], STDERR_FILENO );
-		pipe_close(Sh.CaptureErr[WR]);
-		pipe_close(Sh.CaptureErr[RD]);
+		if (Mode&kStdOutSilence) {
+			close(STDOUT_FILENO);
+		} else {
+			Dup2_( Sh.CaptureOut[WR], STDOUT_FILENO );
+			pipe_close(Sh.CaptureOut[WR]);
+			pipe_close(Sh.CaptureOut[RD]);
+		}
+		
+		if (Mode&kStdErrSilence) {
+			close(STDERR_FILENO);
+		} else {
+			Dup2_( Sh.CaptureErr[WR], STDERR_FILENO );
+			pipe_close(Sh.CaptureErr[WR]);
+			pipe_close(Sh.CaptureErr[RD]);
+		}
+		
 		execvp(argv[0], (char* const*)argv);
 		_exit(errno-!errno); // in case execvp fails
 	}
@@ -233,12 +262,6 @@ int StartProcessSub(ShellStream& Sh, JB_String* path, Array* Args, PicoComms* C,
 	JB_FreeIfDead(path);
 	free(argv);
 	return Result;
-}
-
-
-// Mode was bool CaptureStdOut
-int JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComms* C, int Mode) {
-	return StartProcessSub(*self, path, Args, C, Mode);
 }
 
 
@@ -276,25 +299,8 @@ void JB_FEPDWEE_Finish(ShellStream& Sh) {
 }
 
 
-// Mode was bool StdOutFlowThru
-ShellStream* ShellStart(JB_String* self, Array* Args, FastString* FSOut, FastString* FSErrIn, int Mode) {
-	auto rz = JB_Sh_Constructor(0, self);
-	if (FSOut and !(Mode & 1)) // why would there be no mode?
-		Mode &= ~1;
-	rz->Output = JB_Incr(FSOut);
-	rz->ErrorOutput = JB_Incr(JB_FS__FastNew(FSErrIn)); // shouldn't we allow a nil FSErrIn to mean passthrough errors?
-	rz->Args = JB_Incr(Args);
-	byte Error = JB_Sh_StartProcess(rz, self, Args, 0, Mode);
-	if (Error) {
-		JB_SetRef(rz, 0);
-	}
-	return rz;
-}
-
-
-// mode was bool StdOutFlowThru
 int JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, int Mode, Date TimeOut) {
-	auto Sh = ShellStart(self, R, FSOut, FSErrIn, Mode);
+	auto Sh = JB_Sh__Stream(self, R, FSOut, FSErrIn, Mode);
 	if (!Sh) return errno|!errno;
 	
 	Date ExitAfter = 0;
@@ -326,12 +332,24 @@ int JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* FS
 	JB_FreeIfDead(Sh);
 	if (Exit>128)			// died from a signal // usually its what we want, despite being mixed up
 		JB_ErrorHandleFile(self, nil, Exit, "crashed", "running");
-	return Exit; // ivec2 specifier needed for linux
+	return Exit;
 }
 
 
-ShellStream* JB_Sh__Stream(JB_String* self, Array* R, FastString* FSOut, FastString* FSErrIn, int Mode) {
-	return ShellStart(self, R, FSOut, FSErrIn, Mode);
+ShellStream* JB_Sh__Stream(JB_String* self, Array* Args, FastString* FSOut, FastString* FSErrIn, int Mode) {
+	auto rz = JB_Sh_Constructor(0, self);
+	if (FSOut) // cleanup
+		Mode &= ~kStdOutNil;
+	if (FSErrIn)
+		Mode &= ~kStdErrNil;
+	rz->Output = JB_Incr(FSOut);
+	rz->ErrorOutput = JB_Incr(FSErrIn);
+	rz->Args = JB_Incr(Args);
+	byte Error = JB_Sh_StartProcess(rz, self, Args, 0, Mode);
+	if (Error) {
+		JB_SetRef(rz, 0);
+	}
+	return rz;
 }
 
 

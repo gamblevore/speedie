@@ -331,7 +331,7 @@ struct PicoComms {
 	PicoBuff*					Sending;
 	volatile int				FinalGuard;
 	
-	PicoComms (int noise, bool isparent, int Size) { // constructor
+	PicoComms (int noise, bool isparent, int Size, const char* Name) { // constructor
 		memset(this, 0, sizeof(*this));
 		ID = -1; Status = -1; IsParent = isparent;
 		Guard = 0xB00BE355;
@@ -346,6 +346,8 @@ struct PicoComms {
 		if (B < 8) B = 8;
 		if (B > 26) B = 26;
 		B += (1<<B < Size);
+		if (!Name) Name = "";
+		Conf.Name = strdup(Name);
 		Conf.Bits = B;
 		Conf.QueueSize = 1<<(B+3);
 	}
@@ -357,6 +359,8 @@ struct PicoComms {
 			io_close(); // io will close it first.
 		}
 		
+		free((void*)Conf.Name);
+		Conf.Name = 0;
 		for (auto M = QueueHead; M.Data; M = pico_next_msg(M))
 			free(M.Data);
 		if (Sending) Sending->Decr();
@@ -368,7 +372,7 @@ struct PicoComms {
 
 	bool InitThread (int Noise, void* Self, PicoThreadFn fn, const char** Args) {
 		if (!pico_list or !alloc_buffs()) return false;
-		PicoComms* C = new PicoComms(Noise, false, 1<<Conf.Bits);
+		PicoComms* C = new PicoComms(Noise, false, 1<<Conf.Bits, "Thread");
 		Sending->RefCount++;     Reading->RefCount++;  Socket = -1; 
 		C->Sending = Reading; C->Reading = Sending; C->Socket = -1;
 		
@@ -381,7 +385,7 @@ struct PicoComms {
 		if (!pico_list) return nullptr;
 		int Socks[2] = {};
 		if (!get_pair_of(Socks)) return nullptr;
-		PicoComms* Rz = new PicoComms(Noise, false, 1<<Conf.Bits);
+		PicoComms* Rz = new PicoComms(Noise, false, 1<<Conf.Bits, "Pair");
 		add_conn(Socks[0]);
 		Rz->add_conn(Socks[1]);
 		return Rz;
@@ -488,17 +492,17 @@ struct PicoComms {
 		return nullptr;
 	}
 
-	inline bool CanSayDebug () {return Conf.Noise & (PicoNoiseDebugChild << IsParent);}
+	inline bool 	CanSayDebug () {return Conf.Noise & (PicoNoiseDebugChild << IsParent);}
 	
 	void* Say (const char* A, const char* B="", int Iter=0) {
-		const char* S = IsParent?"Us":"Them";
+		const char* S = IsParent?"Parent":"Child";
 		const char* P = Conf.Name;
 		if (!P or !strlen(P))
 			P = IsParent ? "Parent" : "Child";
 		if (Iter)
-			printf("%s.%s: %s %s %i\n", S, P, A, B, Iter);
+			printf("%s->%s: %s %s %i\n", S, P, A, B, Iter);
 		  else
-			printf("%s.%s: %s %s\n", S, P, A, B);
+			printf("%s->%s: %s %s\n", S, P, A, B);
 		
 		return nullptr;
 	}
@@ -753,6 +757,8 @@ struct PicoComms {
 	}
 	
 	void io () {
+		if (Conf.Name[0] != '/')
+			Conf.Name = Conf.Name;
 		if (!Socket or !guard_ok()) return;
 		InUse++;
 		do_reading();
@@ -851,10 +857,10 @@ static void* pico_worker (void* Dummy) {
 
 /// C-API ///
 /// **Initialisation / Destruction** ///
-extern "C" PicoComms* PicoCreate ()  _pico_code_ (
+extern "C" PicoComms* PicoCreate (const char* Name)  _pico_code_ (
 /// Creates your message-passer.
 	if (!pico_list) return nullptr;
-	return new PicoComms(PicoNoiseEvents, true, PicoDefaultInitSize);
+	return new PicoComms(PicoNoiseEvents, true, PicoDefaultInitSize, Name);
 )
 
 extern "C" void PicoDestroy (PicoComms** Ref, const char* Why=0) _pico_code_ (

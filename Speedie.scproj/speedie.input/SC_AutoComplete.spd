@@ -65,6 +65,7 @@ function EnterAutoComplete (|bool|)
 		"(AsLib)"
 	app.ClearCaches
 	if options.PrintLibraries
+		"(Noisy)"
 		perry.pico.config.noise = -1
 
 	|| Realm = pico.GlobalConfig
@@ -97,7 +98,7 @@ function PerryTalk (|SPDProcess| perry) // ReturnsWhenPerryClosesUs
 		if cmd and !.CmdWrap(cmd)
 			exit
 
-	pico.SleepForSend
+	"StartExit"
 	perry.Disconnect					// calls close, which uses SO_LINGER, to allow sending.
 
 
@@ -399,7 +400,9 @@ function MainAct (|Message| cmd, |scfile| my_file, |message|)
 		thg = fn.source
 	if  thg == @thg  and  fn.source!.isbehaviour  and  thg in fn.source
 		return .define_behaviour(fn, cmd.name)
-	if cmd starts "define" or "display" or "callfrom" or "asm" or "cpp"
+	if cmd starts "asm" or "cpp"
+		return .CppASM(cmd, fn)
+	if cmd starts "define" or "display" or "callfrom"
 		return .Define_Something(my_file, f, thg, cmd.name)
 
 	expect (thg)                       ("nomsg")
@@ -947,18 +950,20 @@ function Define (|message--!| msg,  |string| purpose,  |object| found=nil,  |mes
 	error "nosource"
 
 
-function CppASM (|message| msg, |string| purpose,  |object| found,  |message|)
+function CppASM (|message| msg,  |scfunction| fn,  |message|)
 	opt norefcounts
-	|| fn = msg.AutoMsgFuncFn
-		|| src = fn.source #expect (fn)
-		|| path = src.File #expect (src)
-		rz = @tmp.msg(purpose)
-		rz.msg(@thg, fn.name)
-		|| rzarg = rz.msg(@arg)
-		if purpose ~= "cpp"
-			.Cpp(rzarg, fn)
-		  else
-			.ASM(rzarg, fn)
+	require stderr.ok and fn.CanNil
+	// what should we do if its a wrapper or a macro?
+	
+	|| src = fn.source #expect (fn)
+	|| path = src.File #expect (src)
+	rz = @tmp.msg(msg.name)
+	rz.msg(@thg, fn.name)
+	|| rzarg = rz.msg(@arg)
+	if msg ~= "cpp"
+		.Cpp(rzarg, fn)
+	  else
+		.ASM(rzarg, fn)
 		
 	
 
@@ -998,15 +1003,16 @@ function Cpp (|message| rz,  |SCFunction| found)
 	
 	
 function ASM (|message| rz,  |SCFunction| found)
+	asmstate.sh.PackMakerInit
 	|| fs = FastString()
 	.asmsub(rz, found, fs)
 
 
 function ASMSub (|message| rz,  |SCFunction| found, |faststring| fs)
 	opt norefcounts
-	asmstate.sh.PackMakerInit
 	|| j = ASMState.sh.JSM
 		j.Length = 0
+//	debugger
 	require SpdAssembler.GenerateASM(found)
 
 	|| bb = 0
@@ -1023,12 +1029,10 @@ function ASMSub (|message| rz,  |SCFunction| found, |faststring| fs)
 			p = lp
 		tmp <~ p
 		lp = p
-		path = fat.msg.nextpath(tmp, path)
+		path = fat.msg.NextPath(tmp, path)
 	
 		
 function DefineOrCall (|message| msg,  |string| purpose,  |object| found=nil,  |message|)
-	if purpose ~= "asm" or "cpp"
-		return .CppASM(msg, purpose, found)
 	if  purpose starts "callfrom"
 		return .Callfrom(msg, found)
 	return .define(msg, purpose, found)

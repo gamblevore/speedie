@@ -1,6 +1,6 @@
 
 
-class ProcessOwner
+class ProcessOwner 
 // merge this with process!
 	size 32
 	linkage
@@ -45,8 +45,12 @@ datatype ProcessOwnerMode (byte)
 	flags
 		|ProcessOwnerMode| 
 		Default=0
-		StdOutFlowsThroughUs=1
 		OwnGroup=2
+		StdOutPassThru = 4
+		StdOutSilence = 8
+		StdErrPassThru = 16
+		StdErrSilence = 32
+		Silence = StdOutSilence|||StdErrSilence
 	
 // the signal constants are different per-platform
 

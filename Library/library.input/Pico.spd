@@ -138,7 +138,7 @@ struct Pico
 		function HasParentSocket (|bool|)
 			cpp_wrapper PicoHasParentSocket
 			
-		function Create (|?&pico|)
+		function Create (|cstring| Name, |?&pico|)
 			cpp_wrapper PicoCreate
 
 		function Fork (|stringzeroterminated| name="", |int| Noise=0,   |&pico|)
@@ -149,9 +149,8 @@ struct Pico
 				p.close(nil)
 		
 		function New  (|stringzeroterminated| name="", |int| Noise=0,   |&pico|)
-			|| p = pico.Create
+			|| p = pico.Create(name)
 				|| c = p.config
-				c.name = name
 				c.bits = 16
 				c.Noise = noise
 				return p

@@ -12,6 +12,7 @@ extern "C" {
 JBClass( ProcessOwner, JB_RingList,
 	volatile int		_Status;
 	bool				KillOnExit;
+	bool				LeaveOrphaned;
 );
 
 void JB_PID_Start();

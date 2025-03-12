@@ -40,13 +40,21 @@ class ErrorReceiver
 	
 	
 	function OK (|bool|)
-		Return self and !.errorcount
+		if self
+			Return !.errorcount
+		return !stderr.errorcount
 	
 	function HasProblems (|bool|) // totallyok
-		Return self and (.errorcount ||| .problemcount)
+		opt norefcounts
+		if !self
+			self = stderr!
+		Return (.errorcount ||| .problemcount)
 	
 	function HasAnything (|bool|) // totallyok
-		Return self and (.errorcount ||| .problemcount ||| .warncount)
+		opt norefcounts
+		if !self
+			self = stderr!
+		Return (.errorcount ||| .problemcount ||| .warncount)
 	
 	syntax append (|Error| Err)
 		cpp_part AppendErr

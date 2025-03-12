@@ -133,7 +133,6 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		.ClosePipes
 		if .alive and !why and .CommsOpen
 			why = "UnknownReason"
-			debugger
 		.pico!.close(Why)
 
 
@@ -251,7 +250,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 prototype Thread (|pico| Comms, |int64| Data, |&nil| Argument, |bool|)
 	function Spawn (|pico| Comms, |int64| Data, |&nil| Argument,  |int| BuffBits=0, |pico|)
 		description "Just a wrapper around pico.thread" 
-		|| pico_out = pico.new(comms.config.name.str)
+		|| pico_out = pico.new(comms.config.name.str, -1)
 			if BuffBits
 				pico_out.Config.Bits = BuffBits
 			if comms.SpawnThread(self|picothreadfn|, Data|&nil|, Argument|&cstring|)

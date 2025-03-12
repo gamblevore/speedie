@@ -554,9 +554,9 @@ function file.TestBatch (|bool|)
 		if c.visible and c isa "spd"
 			if printed
 				print ", "
+			.SilentExecute([c, "--nocompile", "--perry"])
 			printed = true
 			print c.Name
-			.SilentExecute([c, "--nocompile", "--perry"])
 	printline
 	
 	for c in batch.ListFiles

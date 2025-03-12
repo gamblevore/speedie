@@ -39,8 +39,6 @@ void JB_SigChild (int signum) {
 
 
 int JB_PID_Status (ProcessOwner* F) {
-// this conflicts with CheckStillAlive
-// only one caller of waitpid should exist!
 	while (SigChildOutStanding > 0) {
 		while (true) {
 			int ExitCode = 0;
@@ -97,6 +95,7 @@ ProcessOwner* JB_PID_Constructor(ProcessOwner* self) {
 	JB_Helper_SelfLink((JB_RingList*)self);
 	self->_Status = -2;
 	self->KillOnExit = true;
+	self->LeaveOrphaned = false;
 	return self;
 }
 
@@ -119,6 +118,8 @@ void JB_PID_Register(ProcessOwner* self) {
 
 void JB_PID_Destructor(ProcessOwner* self) {
 	JB_PID_UnRegister(self);
+	if (!self->LeaveOrphaned)
+		JB_Kill(self->PID);
 }
 
 void JB_PID_UnRegister(ProcessOwner* self) {

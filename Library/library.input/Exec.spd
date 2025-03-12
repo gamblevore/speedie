@@ -72,11 +72,11 @@ datatype ErrorInt (int) // useful for unix-functions which has 0 == success
 
 target !minilib {
 extend string	
-	function Execute (|[string]?| Args = [],  |faststring?| Out = nil, |faststring?| Errs = nil, |ProcessOwnerMode| Mode=ProcessOwnerMode.StdOutFlowsThroughUs, |date| timeout=0, |ExitCode|)
+	function Execute (|[string]?| Args = [],  |faststring?| Out = nil, |faststring?| Errs = nil, |ProcessOwnerMode| Mode=ProcessOwnerMode.StdOutPassThru, |date| timeout=0, |ExitCode|)
 		cpp_wrapper JB_Str_Execute
 
 	function SilentExecute (|[string]?| Args = [],  |faststring?| Out = nil, |faststring?| Errs = nil, |date| timeout=0,  |ExitCode|)
-		return .execute(args, out, errs, nil, timeout)
+		return .execute(args, out, errs, ProcessOwnerMode.Silence, timeout)
 
 	function ExecuteStr (|[string]| Args=nil, |string|)
 		|| fs = faststring()
