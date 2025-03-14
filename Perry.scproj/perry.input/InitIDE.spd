@@ -38,6 +38,7 @@ extend PerryIDE
 		.CommsLogList		= ListView(self,		nil,					nil)
 		.EditMe				= TextView(self,		JumpToDefinition,		PressedEditKeys)
 		.ASMView			= Listview(self,        SelectedASM, SelectedASM)
+		.ASMStretch			= StretchControl.horz(self, 200~left, 110, 110)
 		.DrawMe				= GraphicsEditor(self)
 		.FileList			= FileViewer(self,		SelectedFile,			nil, .editme) 
 		.EditStatus			= TextView(self,		ClickedStatus)
@@ -172,17 +173,18 @@ extend PerryIDE
 			.gnormal.solid	= vec4(0.1, 0.974)
 			.OnSelChanged   = EditMeSelChange
 			.OnSelError		= EditMeSelError
-//			.ColoriseAsRoot = autocomplete.functions
+
 
 		with .ASMView
 			isnt visible
 			.tooltip		= "Displays ASM"
 			.TakesFocus 	= TakesFocusFlag.CanFocus
 			.ID				= "ASMView"
-			.size 			= the~right back 250  by  the~same
+			.size 			= the~area
 			is NoSearch
-			.GNormal.inside =  LeftBG
+			.GNormal.solid =  LeftBG
 			.OnKeyDown = ASMViewKeys
+
 
 		with .autocomplete
 			.OnRightClick   = PerrySuperAutoComplete
@@ -447,10 +449,15 @@ extend PerryIDE
 			.AddLow  self.CompileArea
 			.addhigh self.rborder
 			.addhigh self.editme
-			.addhigh self.ASMView
+			.addhigh self.ASMStretch
 			.addhigh self.drawme
-
-
+		
+		with .asmstretch
+			.id = "ASMStretch"
+			.size = the~width by the~bottom to 18~down
+			.div.defaultFraction = 0.7
+			.AddRight(self.asmview)
+	
 		.JeeboxText.SetupOut("jeebox")
 		.SpeedieText.SetupOut("speedie")
 		.ProductOut.SetupOut("product", TextView.AllowJeebox)

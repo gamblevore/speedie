@@ -5,10 +5,12 @@ role StretchControl (GuiControl)
 	linkage
 		cpp_part SC
 	
-	helper Add (|string| name)
+	helper AddPane (|string| name)
+		opt norefcounts
 		|| rz = guicontrol(self)
 		rz.ID = name
-		
+		(rz is clickthrough)
+	
 	setter IsCollapsed (|bool|)
 		opt norefcounts
 		.div.setcollapsed(false, value)
@@ -58,10 +60,10 @@ role StretchControl (GuiControl)
 			return .Build(p, start, min, max, 1)
 
 		function Build (|guicontrol| p, |controlpoint| start, |int| min, |int| max, |int| d, |stretchcontrol|)
-			cpp_part It
 			|StretchControl| sG    = StretchControl(p)
-			sG.add(("bottom", "left" )(d))
-			sG.add(("top",    "right")(d))
+			(sg is clickthrough)
+			sG.AddPane(("bottom", "left" )(d))
+			sG.AddPane(("top",    "right")(d))
 			|| SD   = stretchdivider(sG, d) 
 			SD.start= start
 			SD.min  = min
