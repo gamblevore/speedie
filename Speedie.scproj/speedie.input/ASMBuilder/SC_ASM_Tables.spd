@@ -590,7 +590,7 @@ function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
 function Str (fn_asm)
 	opt	norefcounts
 	dest = .TempOnly(exp, dest)
-	|| real = exp.name|messageid|
+	|| real = exp.name|MessageID|
 	dest.µtype = DataTypeCode._voidptr
 	return exp.gstr(dest, 0, real.ID) * dest // seems good!
 

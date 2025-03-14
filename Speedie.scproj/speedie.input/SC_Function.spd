@@ -253,12 +253,13 @@ function FuncParamsLoad
 	scfunction.CurrFunc = self // perhaps this should set the curr proj along with it.
 	|| old = scimport.curr
 	.project.use
-	.FuncParamsLoadSub
+	.args.clear
+	|| P = .Source.second
+		.SubFuncParamsLoad(P)
 	scimport.curr = old
 
 
-function FuncParamsLoadSub 
-	|| P = .Source.second				#require
+function SubFuncParamsLoad (|message| P)
 	if self is constructor
 		.AddConstructorReturn(p)
 	
@@ -1879,7 +1880,7 @@ function message.MainFix2
 		.become(m)
 
 
-function SCFunction.UpdateSourceSub (|message| src, |bool|)
+function SCFunction.UpdateSourceSub (|message| src, |[message]| list, |bool|)
 	opt norefcounts
 	if src ~= @tmp and "main"
 		src.MainFix2
@@ -1890,10 +1891,18 @@ function SCFunction.UpdateSourceSub (|message| src, |bool|)
 		f.clear
 	rz = StdErr.ok				// awesome! dont delete this!
 	.Init_Sub(src, nil)
-	rz = stderr.ok 
+	rz = stderr.ok
+
+	// what about link collection? this affects the nil-checker's order.
+	// technically... theres no order as we are just doing this now.
+	// the others are already done?
 	if rz
 		.FuncParamsLoad
 		.Transform
+		archonpurger.ExterminateZergBugs(self)
+		list.clear
+		.AnalyseRefs(list)
+		
 		stderr.clear			// lol
 
 

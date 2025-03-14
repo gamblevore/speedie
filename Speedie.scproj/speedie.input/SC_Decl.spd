@@ -84,6 +84,10 @@ datatype SCDeclInfo (int)
 		SelfImplicit = Self + local // local is set by CollectOneParam, anyhow?
 		DclCopied    = altered + stayborrowed + api + UpgradeableContained + compilercreated + body// need more too? do later
 
+	function abc
+		|| x = Body
+	
+	
 	function Set (|SCDeclInfo| d, |bool| b, |SCDeclInfo|)
 		if b
 			return self ||| d

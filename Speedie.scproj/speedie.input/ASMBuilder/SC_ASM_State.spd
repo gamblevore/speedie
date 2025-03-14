@@ -147,15 +147,19 @@ struct ASMState
 		
 		|| d = .VDecls|int| + 1
 		t.reg = d
-		Type.wholetype = t|DataTypeCode|
+		Type.WholeType = t|DataTypeCode|
 		if (d < .vtmps)
 			.Vars[d] = Type
-			.vdecls = d
+			.Vdecls = d
 			target debug: Type.ASMSanity
 			return t
 		error (self, where, "No free local variables.")
 
 
+	function TempTyped (|Message| where, |asmreg| T, |scdecl| Type,  |asmreg|)
+		t.µtype = type.datatype
+		return .TempOnly(where, t)
+		
 	function TempTyped (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)				// .needreg
 		opt norefcounts
 		if t isnt textual
@@ -426,14 +430,12 @@ struct ASMState
 		// So we can put it in the last, or after the last. Thats all.
 		// So it seems like unless it is equal to the last one... we have to increment it.
 		// Also... I think this can't be a temp, because we literally moved up the vdecls.
-		// 
 		
 		v += (dest.reg != v)
-		.vdecls = v
+		.Vdecls = v
 		check (v < 32) (exp, "Too many registers in use. No space for result.")
 		dest.reg = v
 		dest.µtype = fn.RegType
-//		dest isnt 
 		return dest.ReallySimplify
 
 
@@ -455,6 +457,10 @@ struct ASMState
 	
 	function InitAndStartFunc (|scfunction| fn, |bool|)
 		opt norefcounts
+		
+		target debug
+			asm.noisyasm = 3
+		
 		.out = fn
 		.state.fn = fn
 		SCFunction.CurrFunc = fn

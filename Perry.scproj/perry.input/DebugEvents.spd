@@ -297,7 +297,6 @@ function perryide.UpdateASM (|bool|)
 	|| fn = .CurrSelFunc
 	if fn != .CurrASMFunc
 		.CurrASMFunc = fn
-		if keys.shift
 		return fn and .MaybeSendMessage("asm", fn)
 	
 

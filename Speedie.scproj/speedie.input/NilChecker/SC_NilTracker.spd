@@ -179,7 +179,7 @@ struct ArchonPurger
 
 	function StartNil (|SCFunction| f, |message|)
 		opt norefcounts
-		require f.CanNil
+		require f.HasProperSpeedieCode
 
 		SCFunction.CurrFunc = f
 		.rows[0] = nilstate.Basic
@@ -277,7 +277,7 @@ struct ArchonPurger
 			t.value = nilstate.Basic
 		
 
-		function ExterminateZergBugs (|scfunction| f)
+		function ExterminateZergBugs (|SCFunction| f)
 			opt norefcounts
 			|| arg = t.Startnil(f)
 				Argument(arg)
@@ -288,12 +288,13 @@ struct ArchonPurger
 		
 		function LaunchMothership
 			|| Old = stderr
-			.LaunchMothershipSub(old)
-			SCFunction.currfunc = nil
-		
-		function LaunchMothershipSub (|ErrorReceiver| old)
-			opt norefcounts
 			|| Rec = ErrorReceiver()
+			.LaunchMothershipSub(old, rec)
+			SCFunction.currfunc = nil
+	
+	
+		function LaunchMothershipSub (|ErrorReceiver| old, |errorreceiver| rec)
+			opt norefcounts
 			if !compiler.ConfBool("nil_check")
 				rec.LowerErrorsTo = ErrorSeverity.Warning
 

@@ -60,18 +60,24 @@ extend asmstate
 
 			if fn == Compiler.RefIncr
 				|| P = .last(asm.gstr)
-					if (p.r0 == a.reg) and p.r1 == 0
+					if (p.r0 samereg a.reg) and p.r1 == 0
 						p.r1 = 1
 						return p
 				return exp.rfst(asmreg(), a)
 
 			if fn == Compiler.RefDecr
-				|| P = .last(asm.rfst)
-					if (p.r1 == a.reg) and (p.r0 == 0)
+				|| P = .last
+				#! what
+				if (p isa asm.rfst)
+					if (p.r1 samereg a.reg) and (p.r0 == 0)
 						p._op = asm.RFAP
 						p.r0 = p.r[1]
 						p.r1 = 0
 						return p
+				  elseif (p isa asm.gstr)
+					if p.r0 samereg a.reg and p.r1 == 1
+						p.r1 = 0
+						/return exp.noop
 				return exp.RFST(a, asmreg())
 	
 			if fn == Compiler.RefSafeDecr

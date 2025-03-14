@@ -32,7 +32,8 @@ extend ASMState
 			|| num = ((l.const==r.const)!=negate)|int|
 			return .NumToReg(exp, num, res, datatypecode.bool)
 		if dest isnt CondRequest
-			return exp.CMPB(dest, L, R, negate|int| xor 1) * res
+			dest = .TempTyped(exp, dest, typebool!.typenormal)
+			return exp.CMPB(dest, L, R, negate|int| xor 1) * dest
 
 		if l.reg
 			if negate

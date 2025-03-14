@@ -808,8 +808,6 @@ function FirstDestructor (|SCFunction|)
 
 function SCFunction.AddSelfToFunc (|scclass| cls, |SCNode| space)
 	opt norefcounts
-//	if self is constructor
-//		require cls.isobject
 	|| sl = cls.SelfDecl					// for my nil-checker
 	if sl.TypeSuffers						// refcounting will set MarkAsRefAltered
 		sl = sl.copydecl

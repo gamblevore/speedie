@@ -89,10 +89,10 @@ function InitedOK (|bool|)
 
 
 
-function PerryTalk (|SPDProcess| perry) // ReturnsWhenPerryClosesUs
+function PerryTalk (|SpdProcess| perry) // ReturnsWhenPerryClosesUs
 	.CompiledOK = Compiler.CompileAll
 	.ParserRestore
-	perry <~ .check(@tmp + "check")
+	perry <~ .check
 	
 	for cmd in perry
 		if cmd and !.CmdWrap(cmd)
@@ -206,7 +206,13 @@ function SCFunction.CheckUnused (|message| feedback)
 					ErrName <~ Src.position
 
 
-function Check (|message| cmd, |message|)
+function Check (|message| cmd=nil, |message|)
+	if cmd
+		return .Checksub(cmd)
+	return .checksub(@tmp + "check")
+
+
+function CheckSub (|message| cmd, |message|)
 	if .errors.HasProblems
 		return cmd.SendPerryErrors
 	cmd.name = "check"
@@ -336,7 +342,8 @@ function SCFunction.Update_Source (|int| start, |string| text, |SCObject| orig, 
 		.source = source
 		.Cleanupfunc(Source)
 		parser.using.Flags = MsgParseFlags.Inserted
-		rz = .UpdateSourceSub(source)
+		|[message]| list
+		rz = .UpdateSourceSub(source, list)
 		source.obj = orig.disambiguate(source)
 	parser.using.Flags = 0
 	parser.using.Tag = 0
@@ -952,7 +959,8 @@ function Define (|message--!| msg,  |string| purpose,  |object| found=nil,  |mes
 
 function CppASM (|message| msg,  |scfunction| fn,  |message|)
 	opt norefcounts
-	require stderr.ok and fn.CanNil
+	require stderr.ok
+		
 	// what should we do if its a wrapper or a macro?
 	
 	|| src = fn.source #expect (fn)
@@ -960,7 +968,9 @@ function CppASM (|message| msg,  |scfunction| fn,  |message|)
 	rz = @tmp.msg(msg.name)
 	rz.msg(@thg, fn.name)
 	|| rzarg = rz.msg(@arg)
-	if msg ~= "cpp"
+	if !fn.HasProperSpeedieCode
+		.Nothing(rzarg, fn)
+	  elseif msg ~= "cpp"
 		.Cpp(rzarg, fn)
 	  else
 		.ASM(rzarg, fn)
@@ -1001,24 +1011,47 @@ function Cpp (|message| rz,  |SCFunction| found)
 	rz <~ msg
 	msg.AddLinePositions
 	
+ignore: check {
+	error {
+		"Unexpected statement “s”"
+		pos 22528
+		file "/usr/local/speedie/Speedie.scproj/speedie.input/SC_AutoComplete.spd"
+		severity 4
+	}
+}
 	
-function ASM (|message| rz,  |SCFunction| found)
+function Nothing (|message| rz,  |SCFunction| fn)
+	if fn.IsMacro
+//		s
+		rz <~ "This is a macro, and has no real code"
+	  elseif fn Is Wrapper
+		rz <~ "This is a cpp_wrapper function"
+	  elseif fn is disabled
+		rz <~ "This function is disabled"
+
+
+function ASM (|message| rz,  |SCFunction| fn)
 	asmstate.sh.PackMakerInit
 	|| fs = FastString()
-	.asmsub(rz, found, fs)
+	if !.asmsub(rz, fn, fs)
+		|| err = stderr.LastError
+			rz <~ err.render
+		SpdProcess.parent! <~ .check
+			
+	
 
 
-function ASMSub (|message| rz,  |SCFunction| found, |faststring| fs)
+function ASMSub (|message| rz,  |SCFunction| fn, |faststring| fs, |bool|)
 	opt norefcounts
 	|| j = ASMState.sh.JSM
 		j.Length = 0
-//	debugger
-	require SpdAssembler.GenerateASM(found)
+
+	require SpdAssembler.GenerateASM(fn)
 
 	|| bb = 0
 	|message| path 
 	|| lp = 0
-	for fat.fat in found
+	for fat.fat in fn
 		if options.ASMRenderBlocks and fat.BlockNum != bb
 			bb = fat.BlockNum
 			rz <~ bb
@@ -1030,6 +1063,8 @@ function ASMSub (|message| rz,  |SCFunction| found, |faststring| fs)
 		tmp <~ p
 		lp = p
 		path = fat.msg.NextPath(tmp, path)
+
+	return true
 	
 		
 function DefineOrCall (|message| msg,  |string| purpose,  |object| found=nil,  |message|)
