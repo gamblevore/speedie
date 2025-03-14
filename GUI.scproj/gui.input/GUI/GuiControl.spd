@@ -61,7 +61,6 @@ class GUIControl (list)
 		
 	
 	virtual Search		(|string| s, |bool|JustUpdate, |bool|)
-//	virtual MouseWheel	(|ivec2| P, |bool|)
 	virtual MouseMove	(|ivec2| P,  |ivec2| Move,   |SDL_WindowEventID| State, |bool|)
 	virtual Gesture	    (|ivec2| Wheel, |float| Rotate, |float| Pinch,  |bool|)
 	virtual MouseDown	(|ivec2| P,  |int| Clicks, |int|)
@@ -90,7 +89,6 @@ class GUIControl (list)
 
 	behaviour Search
 	behaviour MouseMove
-//	behaviour MouseWheel
 	behaviour Gesture
 	behaviour KeyDown
 	behaviour RightClick
@@ -101,6 +99,11 @@ class GUIControl (list)
 
 	function Size (|ivec2|)
 		return .lastrect.size
+
+	setter Size (|ivec2|)
+		cpp_part Size2
+		.lastrect = value.rect
+		.size = .lastrect.layout
 
 	setter Size (|controlrect|)
 		.sizer.setsize(self, value)

@@ -90,11 +90,7 @@ class Window (GUIControl)
 	virtual Tickle
 		description "Called when an mouse or keyboard event arrives. Can be used to wakeup sleeping threads for greater responsivity." 
 	
-	setter Size (|ivec2|)
-		cpp_Part Size2
-		.lastrect = value.rect
-		.size = .lastrect.layout
- 
+
 	helper RealFocus (|guicontrol?|)
 		opt norefcounts
 		return .innerfocus ?? .focus
@@ -416,7 +412,7 @@ class Window (GUIControl)
 		require (r is visible) or (r == .openedmenu)
 		
 		if keys.cancel
-			.cleardrops
+			.ClearDrops
 			return
 		
 		if r contains p
@@ -436,12 +432,9 @@ class Window (GUIControl)
 		rz = .controlat(r,  0)
 		if ForDrag
 			rz ?= .controlat(r, 10)
-	
-//	syntax access (|ivec4| P, |guicontrol|)
-//		opt norefcounts
-//		return .controlat(p,  0)
 
 
+// passthru always true?
 	function guicontrol.ControlAt (|ivec4| P, |int| pad, |bool| PassThru=true, |Guicontrol?|)
 		opt norefcounts
 		for R.reverse in self
@@ -505,7 +498,7 @@ class Window (GUIControl)
 			require  r  and  r is opensmenu  and  r != O
 		
 		._FocusWasSet = false
-		|| Found = .ControlAt(p.point, 0, true)
+		|| Found = .ControlAt(p.point, 0)
 			|| clicks2 = Found.__MouseDown__(p, clicks)
 				GUI.CanDrag = clicks2 * (clicks2 > mousedragging.handled)
 				if !._FocusWasSet and (found != .innerfocus)
