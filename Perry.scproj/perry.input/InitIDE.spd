@@ -454,7 +454,7 @@ extend PerryIDE
 		
 		with .asmstretch
 			.id = "ASMStretch"
-			.size = the~width by the~bottom to 18~down
+			.size = the~width by the~bottom to 15~down
 			.div.defaultFraction = 0.7
 			.AddRight(self.asmview)
 	
