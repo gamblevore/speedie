@@ -3,16 +3,20 @@
 module LinkMap 
 	|int| 			CurrID
 
-	function SCFunction.CanLinkTo (|SCNode| To, |bool|)
+	function SCObject.CanLinkTo (|SCObject| To, |bool|)
 		if to.LinkedFrom < LinkMap.CurrID
 			to.LinkedFrom = LinkMap.CurrID
 			return true
 			
-	function SCFunction.DoLinkTo (|SCNode| To)
+	function SCFunction.DoLinkTo (|SCObject| To)
 		if .canlinkto(to)
 			linkmap.Store(.linkto, To)
 	
-	function SCFunction.DoLinkBoth (|SCNode| To)
+	function scfunction.DoLinkFrom (|SCObject| To)
+		if compiler.InPerry and .canlinkto(to)
+			linkmap.store(To.linkfrom, self)
+
+	function scfunction.DoLinkBoth (|SCObject| To)
 		if .canlinkto(to)
 			linkmap.Store(.linkto, to)
 			if compiler.InPerry
@@ -67,13 +71,17 @@ function CollectLinks (|object!| obj)
 	
 	while 
 		if obj isa SCFunction
+			if !Compiler.InPerry
+				return .DoLinkto( obj )
 			return .DoLinkBoth( obj )
 	
 		if obj isa SCClass
 			return .DoLinkTo( obj )
 		
 		if obj isa SCDecl
-			.DoLinkTo( obj.type )
+			.DoLinkto( obj.type )
+			if compiler.InPerry
+				.DoLinkFrom( obj )
 			obj = obj.IsLookupOnly|scdecl| #require
 		  else
 			return
