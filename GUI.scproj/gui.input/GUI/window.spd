@@ -442,16 +442,16 @@ class Window (GUIControl)
 //		return .controlat(p,  0)
 
 
-	function guicontrol.ControlAt (|ivec4| P, |int| pad, |bool| clicks=false, |Guicontrol?|)
+	function guicontrol.ControlAt (|ivec4| P, |int| pad, |bool| PassThru=true, |Guicontrol?|)
 		opt norefcounts
 		for R.reverse in self
 			if (r is visible and enabled) and !r.decluttering
 				|| rr = r.lastrect ± -pad 
 				if rr overlaps p
 					if r > 0
-						|| it = r.controlat(p, pad, clicks)
+						|| it = r.controlat(p, pad, PassThru)
 							return it
-					if !clicks or r isnt clickthrough
+					if !PassThru or r isnt PassThru
 						return r
 						
 	

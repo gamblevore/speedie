@@ -52,7 +52,7 @@ datatype GuiControlFlags (uint)
 		CodeEditor
 		NoSearch
 		TypeThrough
-		ClickThrough
+		PassThru
 		Spacer
 		AlwaysScrollable
 		Modified

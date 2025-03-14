@@ -9,7 +9,7 @@ role StretchControl (GuiControl)
 		opt norefcounts
 		|| rz = guicontrol(self)
 		rz.ID = name
-		(rz is clickthrough)
+		(rz is PassThru)
 	
 	setter IsCollapsed (|bool|)
 		opt norefcounts
@@ -61,7 +61,7 @@ role StretchControl (GuiControl)
 
 		function Build (|guicontrol| p, |controlpoint| start, |int| min, |int| max, |int| d, |stretchcontrol|)
 			|StretchControl| sG    = StretchControl(p)
-			(sg is clickthrough)
+			(sg is PassThru)
 			sG.AddPane(("bottom", "left" )(d))
 			sG.AddPane(("top",    "right")(d))
 			|| SD   = stretchdivider(sG, d) 

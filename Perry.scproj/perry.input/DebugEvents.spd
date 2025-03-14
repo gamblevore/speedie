@@ -311,6 +311,7 @@ function perryide.GotASM (|message| asm)
 	l.clear
 	|| src = l.ListSource
 	(name is AlignCenter)
+	(name is disabled)
 	src <~ name
 	|| arg = asm.last
 	if !arg.HasAny
