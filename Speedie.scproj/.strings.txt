@@ -2165,3 +2165,6 @@
 " on "
 "StartExit"
 "(Noisy)"
+"This is a macro, and has no real code"
+"This is a cpp_wrapper function"
+"This function is disabled"

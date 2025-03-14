@@ -1550,18 +1550,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2158])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2161])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2159])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2162])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2160])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2163])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2157])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2160])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2160])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2163])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2161])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2164])
 
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
@@ -1788,7 +1788,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2166])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2169])
 
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
@@ -1826,7 +1826,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2162])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2165])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1864,7 +1864,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2167])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2170])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2100,12 +2100,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2165])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2168])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2164])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2167])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2163])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2166])
 
 #define kJB__byte_max ((byte)255)
 
@@ -3162,7 +3162,7 @@ extern bool SC__Cpp_WroteAny;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2156])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2159])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -3769,9 +3769,9 @@ void SC_AC__ActualDefine(Message* Rz, Message* S);
 
 Message* SC_AC__AllTmps();
 
-void SC_AC__ASM(Message* Rz, SCFunction* Found);
+void SC_AC__ASM(Message* Rz, SCFunction* Fn);
 
-void SC_AC__ASMSub(Message* Rz, SCFunction* Found, FastString* Fs);
+bool SC_AC__ASMSub(Message* Rz, SCFunction* Fn, FastString* Fs);
 
 Message* SC_AC__AutoComplete(Message* Ff, JB_String* Name, JB_String* Purpose);
 
@@ -3792,6 +3792,8 @@ void SC_AC__CallFromSub(Message* Arg, SCFunction* Fn);
 bool SC_AC__CanUseName(SCNode* L);
 
 Message* SC_AC__Check(Message* Cmd);
+
+Message* SC_AC__CheckSub(Message* Cmd);
 
 Message* SC_AC__CmdCleanUp(Message* Arg);
 
@@ -3844,6 +3846,8 @@ Message* SC_AC__LocateDefinitionSub(Message* Msg, SCObject* Already_defined, SCD
 Message* SC_AC__MainAct(Message* Cmd, SCFile* My_file);
 
 Message* SC_AC__MainActAutoComplete(Message* Thg, JB_String* Str, Message* Cmd);
+
+void SC_AC__Nothing(Message* Rz, SCFunction* Fn);
 
 void SC_AC__ParserRestore();
 
@@ -6320,7 +6324,7 @@ NilState SC_nil__JumpWithinBool(Message* Msg, NilCheckMode Test);
 
 void SC_nil__LaunchMothership();
 
-void SC_nil__LaunchMothershipSub(JB_ErrorReceiver* Old);
+void SC_nil__LaunchMothershipSub(JB_ErrorReceiver* Old, JB_ErrorReceiver* Rec);
 
 NilState SC_nil__List(Message* Msg, NilCheckMode Test);
 
@@ -7072,7 +7076,9 @@ void SC_Pac_Fail(ASMState* Self, Message* Where, JB_String* Msg);
 
 ASMReg SC_Pac_TempOnly(ASMState* Self, Message* Where, ASMReg T);
 
-ASMReg SC_Pac_TempTyped(ASMState* Self, Message* Where, ASMReg T);
+ASMReg SC_Pac_TempTypedWithMsgRegDecl(ASMState* Self, Message* Where, ASMReg T, SCDecl* Type);
+
+ASMReg SC_Pac_TempTypedWithMsgReg(ASMState* Self, Message* Where, ASMReg T);
 
 ASMReg SC_Pac_Ternary(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
@@ -7913,6 +7919,8 @@ JB_String* SC_SCObject_CallFromName(SCObject* Self);
 JB_String* SC_SCObject_CanAuto(SCObject* Self, JB_String* Search);
 
 JB_String* SC_SCObject_CanAutoSub(SCObject* Self, JB_String* Search);
+
+bool SC_SCObject_CanLinkTo(SCObject* Self, SCObject* To);
 
 SCObject* SC_SCObject_Constructor(SCObject* Self);
 
@@ -10928,10 +10936,6 @@ bool SC_Func_CanCompareAgainst(SCFunction* Self, SCDecl* Against);
 
 bool SC_Func_CanLibLoad(SCFunction* Self);
 
-bool SC_Func_CanLinkTo(SCFunction* Self, SCNode* To);
-
-bool SC_Func_CanNil(SCFunction* Self);
-
 void SC_Func_CheckConstructorAndDestructor(SCFunction* Self, Message* Root, bool IsConstructor);
 
 void SC_Func_CheckNotBadName(SCFunction* Self);
@@ -10982,9 +10986,11 @@ void SC_Func_Destructor(SCFunction* Self);
 
 SCFunction* SC_Func_Disambiguate(SCFunction* Self, Message* Src);
 
-void SC_Func_DoLinkBoth(SCFunction* Self, SCNode* To);
+void SC_Func_DoLinkBoth(SCFunction* Self, SCObject* To);
 
-void SC_Func_DoLinkTo(SCFunction* Self, SCNode* To);
+void SC_Func_DoLinkFrom(SCFunction* Self, SCObject* To);
+
+void SC_Func_DoLinkTo(SCFunction* Self, SCObject* To);
 
 void SC_Func_DontWantSameReturnType(SCFunction* Self, SCFunction* F);
 
@@ -11018,11 +11024,11 @@ bool SC_Func_FoundOneCpp(SCFunction* Self, JB_String* N);
 
 void SC_Func_FuncParamsLoad(SCFunction* Self);
 
-void SC_Func_FuncParamsLoadSub(SCFunction* Self);
-
 void SC_Func_GenASM(SCFunction* Self);
 
 bool SC_Func_HasCVersion(SCFunction* Self);
+
+bool SC_Func_HasProperSpeedieCode(SCFunction* Self);
 
 bool SC_Func_HiderMatch(SCFunction* Self, bool IsAssigns);
 
@@ -11118,6 +11124,8 @@ void SC_Func_StartASM(SCFunction* Self);
 
 SCDecl* SC_Func_StructReturned(SCFunction* Self);
 
+void SC_Func_SubFuncParamsLoad(SCFunction* Self, Message* P);
+
 bool SC_Func_SyntaxEquals(SCFunction* Self, JB_String* Name, bool Aware);
 
 bool SC_Func_SyntaxIs(SCFunction* Self, FunctionType K);
@@ -11136,7 +11144,7 @@ SCFunction* SC_Func_TryKeepBetter(SCFunction* Self, int OldMatch, SCFunction* F,
 
 bool SC_Func_Update_Source(SCFunction* Self, int Start, JB_String* Text, SCObject* Orig);
 
-bool SC_Func_UpdateSourceSub(SCFunction* Self, Message* Src);
+bool SC_Func_UpdateSourceSub(SCFunction* Self, Message* Src, Array* List);
 
 bool SC_Func_UseCppName(SCFunction* Self, JB_String* CppName);
 
@@ -11836,7 +11844,7 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 
 inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
 	if ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc, false))) {
-		JB_Msg_Fail(Self, JB_LUB[818]);
+		JB_Msg_Fail(Self, JB_LUB[821]);
 	}
 }
 
