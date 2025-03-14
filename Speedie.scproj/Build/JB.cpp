@@ -3467,7 +3467,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[220]);
-	JB_FS_AppendInt32(_fsf0, (2025031418));
+	JB_FS_AppendInt32(_fsf0, (2025031419));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8669,7 +8669,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1673]);
-	JB_FS_AppendInt32(_fsf0, (2025031418));
+	JB_FS_AppendInt32(_fsf0, (2025031419));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -34071,10 +34071,12 @@ jbinLeaver JB_bin_Tmp(FastString* Self, JB_String* Name) {
 
 
 MaterialsLol* SC_MaterialsLol_Constructor(MaterialsLol* Self, Selector* Next, Selector** Place, JB_String* Name1) {
+	JB_Incr(Name1);
 	if (Self == nil) {
 		Self = ((MaterialsLol*)JB_NewClass(&MaterialsLolData));
 	}
 	JB_Sel_Constructor(Self, Next, Place, Name1);
+	JB_Decr(Name1);
 	JB_Incr2(Self->oof, JB_LUB[0]);
 	return Self;
 }
@@ -34085,10 +34087,8 @@ void SC_MaterialsLol_Destructor(MaterialsLol* Self) {
 }
 
 void SC_MaterialsLol____LoadSel(MaterialsLol** Place, JB_String* Name) {
-	JB_Incr(Name);
 	//visible;
 	JB_SetRef(SC__MaterialsLol___First, SC_MaterialsLol_Constructor(nil, SC__MaterialsLol___First, ((Selector**)Place), Name));
-	JB_Decr(Name);
 }
 
 int SC_MaterialsLol__Init_() {
@@ -36277,7 +36277,8 @@ bool SC_Msg_CollectOneParam(Message* Self, SCFunction* Func, SCNode* Recv, SCCla
 		Dcl->NilDeclared = kSC__NilState_Optional;
 	}
 	if (Dcl->PointerCount) {
-		Func->AltersParams = (Func->AltersParams | (1 << JB_Array_Size(Func->Args)));
+		int N = (JB_Array_Size(Func->Args) + (SC_Func_SyntaxIs(Func, kSC__FunctionType_Constructor)));
+		Func->AltersParams = (Func->AltersParams | (1 << N));
 	}
 	JB_Array_SyntaxAppend(Func->Args, Dcl);
 	if (JB_Array_SyntaxCompare(Func->Args, 8, false) >= 1) {
