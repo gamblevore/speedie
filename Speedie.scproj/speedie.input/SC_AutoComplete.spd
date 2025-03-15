@@ -156,11 +156,15 @@ function CmdWrap (|Message| arg, |bool|)
 	return !.WillExit
 
 
+function MiniErrors (|errorreceiver| L, |message|)
+	return compiler.RenderErrors(L, errorseverity.warning).parse
+
+
 function ErrorsToPerry (|message|)
 	if !.Cleaned
 		.errors!.PrePrintErrors
 		.Cleaned = true
-	return compiler.RenderErrors(.errors!, errorseverity.warning).parse
+	return .MiniErrors(.errors!)
 
 
 function UnusedFuncs (|message| cmd, |message|)
@@ -209,7 +213,7 @@ function SCFunction.CheckUnused (|message| feedback)
 function Check (|message| cmd=nil, |message|)
 	if cmd
 		return .Checksub(cmd)
-	return .checksub(@tmp + "check")
+	return .CheckSub(@tmp + "check")
 
 
 function CheckSub (|message| cmd, |message|)
@@ -1022,7 +1026,6 @@ ignore: check {
 	
 function Nothing (|message| rz,  |SCFunction| fn)
 	if fn.IsMacro
-//		s
 		rz <~ "This is a macro, and has no real code"
 	  elseif fn Is Wrapper
 		rz <~ "This is a cpp_wrapper function"
@@ -1035,10 +1038,10 @@ function ASM (|message| rz,  |SCFunction| fn)
 	|| fs = FastString()
 	if !.asmsub(rz, fn, fs)
 		|| err = stderr.LastError
-			rz <~ err.render
-		SpdProcess.parent! <~ .check
-			
-	
+			rz <~ err.name
+			|| errtmp = @tmp + "check"
+			errtmp <~ Interact.MiniErrors(stderr)
+			SpdProcess.parent! <~ errtmp
 
 
 function ASMSub (|message| rz,  |SCFunction| fn, |faststring| fs, |bool|)

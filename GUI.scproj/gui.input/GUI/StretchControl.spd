@@ -262,7 +262,7 @@ class StretchDivider (GuiControl)
 		|| scale = rect.size.Vec2
 		|| h = scale[1-.d]
 		|| w = scale[.d]
-		scale = 2.25 / (w, h)
+		scale = 2.5 / (w, h)
 		w = 3.0
 		xy[.d] += 1
 		|| add = (.d, 1-.d)

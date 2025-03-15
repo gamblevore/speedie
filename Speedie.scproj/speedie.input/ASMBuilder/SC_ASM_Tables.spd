@@ -363,7 +363,8 @@ function ASMConst (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| d, |
 	if dest isnt ConstRequest
 		if d.nilreg isnt hoisted
 			return .NumToReg(exp, d.exportposition, dest, dest.µtype)
-/		Dest.reg = d.nilreg&31
+		dest.fatindex = d.fatconstindex
+		Dest.reg = d.nilreg&31
 	return dest
 
 
@@ -687,6 +688,7 @@ function SCFunction.TrackReturns (|scdecl| D)
 
 function message.HasAsmStuff (|bool|)
 	opt norefcounts
+	nil checker
 	for ch in self
 		|| chh = ch.ASMUnbra
 		|| fn = chh.func

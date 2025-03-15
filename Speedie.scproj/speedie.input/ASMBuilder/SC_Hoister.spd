@@ -13,10 +13,11 @@ struct SC_Hoister
 		opt NoRefCounts
 		|| dest = ASMState.sh.DeclareMe(prop, decl)		// Pre-declare glob.
 		|| Addr = ASMType.GlobAddr(decl, prop, dest)
-		.got(dest, Decl)
+		.got(dest, Decl, addr)
 
-	helper Got (|asmreg| dest, |scdecl| decl)
+	helper Got (|asmreg| dest, |scdecl| decl, |asmreg| K)
 		opt NoRefCounts
+		decl.FatConstIndex = K.FatIndex
 		decl.NilReg = dest.reg ||| nilreg.Hoisted
 		.Items[.Count++] = decl
 		.spare--
@@ -25,7 +26,7 @@ struct SC_Hoister
 		opt NoRefCounts
 		|| dest = ASMState.sh.DeclareMe(prop, decl)		// Pre-declare glob.
 		|| K = asmstate.sh.NumToReg(prop, decl.exportposition, dest, dest.µtype)
-		.got(dest, Decl)
+		.got(dest, Decl, k)
 	
 	function Unhoist (|asmreg|)
 		opt NoRefCounts

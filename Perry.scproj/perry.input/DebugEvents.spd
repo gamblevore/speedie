@@ -12,7 +12,16 @@ function DebugABC1 (|int| i, |int|)
 function DebugABC2
 	|| n = "def".length
 	|| i = 2 * 3
-	n *= n + 3
+	for 4
+		n *= n + 3
+
+function DebugABC2 (|int| x, |int|)
+	|| n = 1
+	if x
+		n = 2
+	  else
+		n = 3
+	return n + 1
 
 
 function DebugArgsKeyDown (GUIKeyEvent)

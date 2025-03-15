@@ -735,7 +735,7 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	.CloseVars(Closer)
 	
 	if !TableID
-		tableid = fn.tableid ?? 0xFFFF
+		tableid = fn.tableid ?? 0xFFFF // 0xffff means unknown?
 		TableID += 31
 	|| PExt = P >> 32
 	if !PExt and (dest is ExitFunction) and !fn.HasCVersion

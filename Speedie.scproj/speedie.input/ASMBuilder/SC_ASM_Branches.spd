@@ -55,7 +55,7 @@ function IfSub (fn_asm)
 		.Branch(cond, b, true)
 		
 	if .curr.op != asm.eror
-	|| AfterFirst = arg1.jump(0)
+	|| AfterFirst = other.jump(0)
 	.AllJumpTo(b)
 	rz = .Else(other) & Arg1Return						// ^^^ if x {return} else {return}
 	AfterFirst.jumpto(.curr, asmstate.sh)
@@ -80,14 +80,13 @@ function While (fn_asm)
 	|| OV = .OpenVars
 	h.HoistLoop(exp.first!)
 	.state.BranchDepth++
-	rz = .WhileSub(exp, h)
+	rz = .WhileSub(exp)
 	.state.BranchDepth--
 	.CloseVars(OV)
 	h.Unhoist
 
 
-// while loops are already hoisted, right? by the argbase. // So what hoisting does it need?
-function WhileSub (|message| exp,  |sc_hoister| H,  |asmreg|)
+function WhileSub (|message| exp,  |asmreg|)
 	opt norefcounts
 	|| begin = exp.JUMP(0)												// test goes after loop
 	|| Returns = ASMType.argsub(self, exp.second!, nil)					// arg
