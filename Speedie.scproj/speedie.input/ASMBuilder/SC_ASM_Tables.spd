@@ -613,7 +613,10 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	
 	dest = .TempTyped(exp, dest)
 	(dest is constoutput) = (ml&mr is constoutput)
-	rz = (fn)(self, dest, ml, mr, exp.second!)
+	
+	|| op = exp.second
+	op ?= exp
+	rz = (fn)(self, dest, ml, mr, op)
 	rz = rz.ConstInputFromMath(ml, mr)
 	rz.µtype = dest.µtype
 

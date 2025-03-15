@@ -201,7 +201,6 @@ function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
 	(dcl is property)
 	(dcl is Global)
 	
-	if dcl.type == TypeJBClass
 	|| B = '_' == dcl.name[]
 	|| C = '_' == dcl.name.Last
 	if B|||C
@@ -209,7 +208,7 @@ function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
 	if dcl.islib
 		PackMaker.LibGlobs <~ dcl
 	  else
-		if options.ModePack
+		if options.ModePack or compiler.inperry
 			packmaker.PackGlobs <~ dcl
 
 	return true

@@ -12,7 +12,7 @@ struct SC_Hoister
 	helper GotGlobal (|message| prop,  |scdecl| decl)
 		opt NoRefCounts
 		|| dest = ASMState.sh.DeclareMe(prop, decl)		// Pre-declare glob.
-		ASMType.GlobAddr(decl, prop, dest)
+		|| Addr = ASMType.GlobAddr(decl, prop, dest)
 		.got(dest, Decl)
 
 	helper Got (|asmreg| dest, |scdecl| decl)
@@ -24,7 +24,7 @@ struct SC_Hoister
 	helper GotConst (|message| prop,  |scdecl| decl)
 		opt NoRefCounts
 		|| dest = ASMState.sh.DeclareMe(prop, decl)		// Pre-declare glob.
-		asmstate.sh.NumToReg(prop, decl.exportposition, dest, dest.µtype)
+		|| K = asmstate.sh.NumToReg(prop, decl.exportposition, dest, dest.µtype)
 		.got(dest, Decl)
 	
 	function Unhoist (|asmreg|)

@@ -180,15 +180,17 @@ function CompileAll (|bool|)
 	require .Stage( "String Correction" )
 	StringCorrector.CorrectConsts
 	
-	if Options.ModePack
-		.Timer( "Export Pack" )
-		PackMaker.MakePack	
+	target debug
+		if compiler.inperry or Options.ModePack
+			.Timer( "Export Pack" )
+			PackMaker.MakePack	
 	
-	if Options.ModeCpp
-		.Timer( "Export Cpp" )
-		Cpp_Export.ExportAllSource
+	if !compiler.inperry
+		if Options.ModeCpp
+			.Timer( "Export Cpp" )
+			Cpp_Export.ExportAllSource
 
-	SCImport.ExportShaders
+		SCImport.ExportShaders
 
 	require .Stage( "Finished" )
 	.TimerSub("Parse", .stParseTimeTotal)

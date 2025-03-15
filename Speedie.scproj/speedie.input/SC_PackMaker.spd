@@ -87,23 +87,27 @@ module PackMaker
 		return (self in "ASMExamples")
 	
 	
+	function CompileSomeFunctions (|bool| MiniTest, |bool|)
+		opt norefcounts
+		for fn in .Packfuncs
+			if fn.AMiniTest == MiniTest
+				require SpdAssembler.GenerateASM(fn)
+		asmstate.sh.Guard
+		
+		if minitest
+			.RunAFewTests
+		return true
+
+	
 	function ActualASMCompile (|bool|)
 		opt norefcounts
 		.Packfuncs.sort(&CodeSorter.LeafFunctionsSorter)
 		|| j = asmstate.sh.jsm
 			j.length = 0
 		
-		for DoMainStuff in 2
-			for fn in .Packfuncs
-				if fn.AMiniTest|int| != DoMainStuff
-					if !fn.tableid // oof
-					require SpdAssembler.GenerateASM(fn)
-			asmstate.sh.Guard
-			
-			if !DoMainStuff
-				.RunAFewTests
-		
-		return true
+		if !compiler.inperry
+			require .CompileSomeFunctions(true)
+		return .CompileSomeFunctions(false)
 	
 
 	
@@ -172,8 +176,11 @@ module PackMaker
 		if (–sizeof FatASM) != 64
 		ASMState.Sh.PackMakerInit			// fn_asm_table[@arg]
 		|| pg = PackMaker.AddAll
-		require .ActualASMCompile
-
+		if .ActualASMCompile and Options.pack
+			.WritePackToDisk(pg)
+	
+	
+	function WritePackToDisk (|int| pg)
 		|| j = jbin(@tmp, "xpd")
 		j.enter
 		j.enter(@tmp, "app")

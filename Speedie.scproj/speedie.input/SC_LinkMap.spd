@@ -13,8 +13,8 @@ module LinkMap
 			linkmap.Store(.linkto, To)
 	
 	function scfunction.DoLinkFrom (|SCObject| To)
-		if compiler.InPerry and .canlinkto(to)
-			linkmap.store(To.linkfrom, self)
+		if compiler.InPerry and .CanLinkTo(to)
+			linkmap.Store(To.linkfrom, self)
 
 	function scfunction.DoLinkBoth (|SCObject| To)
 		if .canlinkto(to)

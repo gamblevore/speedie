@@ -76,8 +76,7 @@ extend asmstate
 						return p
 				  elseif (p isa asm.gstr)
 					if p.r0 samereg a.reg and p.r1 == 1
-						p.r1 = 0
-						/return exp.noop
+						return nil
 				return exp.RFST(a, asmreg())
 	
 			if fn == Compiler.RefSafeDecr
@@ -92,7 +91,9 @@ extend asmstate
 		|| prms = exp.last!
 		|| fn = prms.obj|SCFunction|!
 		if fn != Compiler.RefFreeIfDead
-			return .RefCountSub(exp, prms, fn) * asmreg()
+			|| fat = .RefCountSub(exp, prms, fn)
+				return fat * asmreg()
+			return nil
 		|| A = .µ(prms.first!)
 
 		#! Disallow: if obj.X(),   when obj.X() is a disowner

@@ -181,7 +181,7 @@ function Message.InitRootDecl (|Message| before, |SCNode| name_space, |bool|) {
 			NewDefault.Obj = nil // just keep doing what it used to do
 	
 	if newdefault
-		if !newdefault.IsNilOrZero and !(options.modepack and decl.islib)
+		if !newdefault.IsNilOrZero // and !(options.modepack and decl.islib)
 			before.Prev = NewRel( «thg .name », NewDefault, "=" )
 	Return true
 }

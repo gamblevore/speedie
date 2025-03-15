@@ -62,7 +62,7 @@ struct ControlSize
 	function Calculate (|ivec4| Parent, |ivec4| Prev, |ivec4| Window, |guicontrol| upon, |ivec4|)
 		|| UseBlocks = upon is blocksized
 			return .CalculateBlocks
-		if keys.shift and upon ~= "switch"
+//		if keys.shift and upon ~= "switch"
 //		|| dbg = upon.clipmode is debug
 //			"---------------"
 		|| PS = parent.size

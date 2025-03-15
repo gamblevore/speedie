@@ -280,7 +280,6 @@ struct ASMState
 		opt norefcounts
 		cpp_part GetASM 
 		target debug
-			.sanity
 			dest.tmpcheck
 			debugat 0 // keep this
 		  else
@@ -290,7 +289,6 @@ struct ASMState
 		|| ss = (fn)(self, exp, dest)
 
 		target debug
-			.sanity
 			if !ss.tmpcheck
 				(fn)(self, exp, dest)
 			if !ss or dest is set or ss is set
@@ -301,9 +299,6 @@ struct ASMState
 					PrintProgress()
 					(fn)(self, exp, dest)
 		return ss
-
-
-	function Sanity 
 	
 
 	function ReadOrWrite (|ASMReg| dest, |message| m, |asmreg| base, |asmreg| varadd, |int| index=0, |asmreg|)
@@ -716,10 +711,20 @@ function asmstate.RegsBitClear (|message| exp, |int| RegAddrs, |scfunction| fn)
 function @ASMType.ASMFunction (fn_asm) // dofunction function
 	opt norefcounts
 	|| prms = exp.last!
-	|| fn = prms.AsFunc!
-	
-	|| MiniDest = .AskForInline(prms, dest, fn)
-		return MiniDest
+	|| TableID = 0
+	|| fn = prms.AsFunc
+		|| MiniDest = .AskForInline(prms, dest, fn)
+			return MiniDest
+	  else
+		|| f = exp.first!
+		TableID = .µ(f).Reg
+		|| dcl = f.asmdecl
+		// need to execute exp.first
+/		fn = dcl.Type.FuncProto			#expect (exp)
+
+	// We can put the var into a reg... if its its a FuncPointer and use that reg, as the TableID
+	// we also need to get the fn from exp.first.obj
+
 	dest = .CallFunc(exp, dest, fn)
 	if !fn.returntype
 		(dest is constoutput)
@@ -729,12 +734,14 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	|| P = .PrmCollect(prms, fn, RegAddrs)
 	.CloseVars(Closer)
 	
-	|| ID = fn.TableId + 31
+	if !TableID
+		tableid = fn.tableid ?? 0xFFFF
+		TableID += 31
 	|| PExt = P >> 32
 	if !PExt and (dest is ExitFunction) and !fn.HasCVersion
-		return prms.TAIL(ID, P) * (dest as asmreg.exit)
+		return prms.TAIL(TableID, P) * (dest as asmreg.exit)
 	
-	|| fat = prms.FNC(dest, ID, P,  PExt)
+	|| fat = prms.FNC(dest, TableID, P,  PExt)
 	if fn.HasCVersion
 		fat._op = asm.FNCX
 	fat._op += PExt > 0

@@ -706,7 +706,7 @@ function Tran_Syx (|Message| msg, |Message|)
 	|| ArgPlace = msg.Ancestor(@Arg).Ancestor(@Arg)
 	Compiler.SyxArray <~ OldName
 
-	if !Options.ModePack
+	if !Options.ModePack // why cant packs use these? should I reenable it?
 		|| dotnew = argplace.msg(@dot, "StdNew")
 		dotnew <~ (@thg, "syntax")
 		|| prm = dotnew.msg(@prm)

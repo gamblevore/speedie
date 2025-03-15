@@ -393,6 +393,7 @@ module Feedback
 			options.ModeCpp = value.optionbool
 			if options.ModeCpp
 				options.modepack = false
+				SC_Targets["pack"] = false
 				
 		+"output_path"
 			explain(purpose, "Specifies the build product path")$
