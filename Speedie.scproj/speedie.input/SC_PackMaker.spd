@@ -280,6 +280,7 @@ module PackMaker
 			if c.HasPackChildren
 				return true
 	
+	
 	function SCClass.PackClassChildren (|jbin?| j)
 		opt norefcounts
 		require .HasPackChildren
@@ -294,7 +295,8 @@ module PackMaker
 	
 	function SCClass.PackExport (|jbin?| j)
 		opt norefcounts
-		require .HasPackChildren or !.IsLibrary
+		|| Output = !.IsLibrary or .IsReached
+		require output or .HasPackChildren
 
 		if j
 			j.enter(@tmp, .name)
@@ -303,14 +305,14 @@ module PackMaker
 			.PackClassChildren(j)
 			j.exit
 		  else
-			if !.IsLibrary
+			if Output
 				packmaker.packglobs <~ .ClassType
 			.PackClassChildren(j)
 		
 		
 	function SCClass.DescribeInPack (|jbin| j)
 		opt norefcounts
-		packmaker.packglobs <~ .ClassType
+//		packmaker.packglobs <~ .ClassType // wait, we do this twice?
 		|| sz = (0, .size)(.iswrapper)
 		j.addint(sz)
 		

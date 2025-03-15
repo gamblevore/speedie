@@ -23,6 +23,8 @@ function IsLibrary (|bool|) // .islib, .isprojlib, .isproject, .isntproject, .is
 	return .Project.IsSTDLib?
 
 
+function IsReached (|bool|)
+	return .MyReacher
 
 function CollectFromNode (|Message| AST, |bool| Visible, |message| dest=nil)
 	.Source ?= AST // not good! Considering that one "project" module covers multiple files!

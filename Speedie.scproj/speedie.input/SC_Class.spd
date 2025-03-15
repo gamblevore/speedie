@@ -378,7 +378,7 @@ function LoadSuperClass
 	
 	if (S)
 		.Super = S
-		if Options.MakeInterpreter or options.modepack
+		if Options.MakeInterpreter or options.modepack or compiler.inperry
 			s.Children <~ self
 		if !.IsRole
 			(s is HasSubClass)

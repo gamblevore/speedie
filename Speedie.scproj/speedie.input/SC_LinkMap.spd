@@ -135,7 +135,6 @@ function message.HateUnusedFuncs
 		.expect(.func, "Can't find project")
 
 
-
 function scclass.Reach (|SCNode| from, |message| src=nil)
 	opt norefcounts
 	flow off

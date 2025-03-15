@@ -1015,14 +1015,6 @@ function Cpp (|message| rz,  |SCFunction| found)
 	rz <~ msg
 	msg.AddLinePositions
 	
-ignore: check {
-	error {
-		"Unexpected statement “s”"
-		pos 22528
-		file "/usr/local/speedie/Speedie.scproj/speedie.input/SC_AutoComplete.spd"
-		severity 4
-	}
-}
 	
 function Nothing (|message| rz,  |SCFunction| fn)
 	if fn.IsMacro
@@ -1047,6 +1039,7 @@ function ASM (|message| rz,  |SCFunction| fn)
 function ASMSub (|message| rz,  |SCFunction| fn, |faststring| fs, |bool|)
 	opt norefcounts
 	|| j = ASMState.sh.JSM
+		j.zero
 		j.Length = 0
 
 	require SpdAssembler.GenerateASM(fn)
