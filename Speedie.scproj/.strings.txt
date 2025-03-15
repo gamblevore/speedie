@@ -752,7 +752,7 @@
 "Expected this for a struct"
 "RFAP"
 "Export Cpp"
-"Export Pack"
+"This function is disabled"
 "Export-name conflict: "
 "FADD"
 "FDIV"
@@ -2167,4 +2167,3 @@
 "(Noisy)"
 "This is a macro, and has no real code"
 "This is a cpp_wrapper function"
-"This function is disabled"
