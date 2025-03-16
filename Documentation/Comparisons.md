@@ -257,15 +257,15 @@ package main
 Heres the same in speedie:
 
     function ReadFile (|string| path, |StringThatWasReadSafely|)
-    	expect (path) ("Path is empty")
-    	|| f = path.file
-    	require f.OpenForRead   // creates an error
-    	return f.ReadAll(false) // also creates errors
+        expect (path) ("Path is empty")
+        || f = path.file
+        require f.OpenForRead   // creates an error
+        return f.ReadAll(false) // also creates errors
     		
     
     main
-    	|| f = ReadFile("file.txt")
-    		printline f
+        || f = ReadFile("file.txt")
+            printline f
 
 Its a little different, because the file functions already create errors, and we don't want **two** errors created per-operation. Also, our standard `.open` function actually **creates** files if they don't exist, so we use `f.OpenForRead` instead which expects an existing file to exist, and only uses it for reading. So now it does the same as the Go code.
 
@@ -274,8 +274,8 @@ Also, no need to print the error to stderr, as Speedie already does that on exit
 Or we can just this:
 
     main
-    	|| f = "file.txt".ReadFile(false) // builtin function
-    		printline f
+        || f = "file.txt".ReadFile(false) // builtin function
+            printline f
 
 We can use be standard builtin `string.ReadFile` function. We pass `false` to disable ignoring of missing-files. Errors are created successfully if any happen.
 
