@@ -323,7 +323,8 @@ function EditMeModified (guitextevent)
 			(sub.ListSource is modified) = Mod
 	
 	i.CurrASMFunc = nil
-	i.TryUpdateASM
+	if i.ASMView is Visible
+		i.UpdateASM
 
 
 function PerryIDE.ShowStats

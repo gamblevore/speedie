@@ -87,6 +87,7 @@ class PerryIDE (Window)
 	|int|						ShowProductIfMoreOutput
 	|byte|						DuringLoad
 	|byte| 						DuringTempView
+	|bool|						DuringASMEvent
 	|bool|						AlreadyExpandedCompileTab
 	|bool| 						StillJumping
 	|bool|						CanAskingAboutMissing

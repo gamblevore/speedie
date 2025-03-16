@@ -290,11 +290,23 @@ function ClickedASMButton (guiaction)
 	v.AddFail "Displaying ASM..."
 
 
-function perryide.TryUpdateASM (|bool|)
-	require .ASMView is Visible
-	return .UpdateASM
+
+function perryide.TryReselectASM (|bool|)
+	require !.DuringASMEvent and (.ASMView is Visible)
+	.DuringASMEvent = true
+	.UpdateASM
+	.ReselectASM(.editme.SelectedLine.Position)
+	.DuringASMEvent = false
 
 
+function perryide.ReselectASM (|int| i)
+	opt norefcounts
+	for s in .ASMView.ListSource
+		if !s.name[0, "JUMP:", true] and s.first.int >= i
+			.ASMView.Select(s)
+			exit
+	
+	
 function perryide.HideASM
 	(.ASMView isnt visible)
 	.ASMView.clear
@@ -312,6 +324,7 @@ function perryide.UpdateASM (|bool|)
 function ListView.AddFail (|string| s)
 	|| D = listviewstate.disabled ||| listviewstate.aligncenter ||| listviewstate.Disabled
 	self <~ ListViewRow(s, D)
+
 
 
 function perryide.GotASM (|message| asm)
@@ -346,9 +359,12 @@ function ASMViewKeys (guikeyevent)
 
 function SelectedASM (guilistevent)
 	require row
+	|| i = .ide
+	require !i.DuringASMEvent
 	|| file = row.obj as string				#require
 	|| n = row.first.int
-	|| i = .ide
+	i.DuringASMEvent = true
 	i.EditPath(file.name, false)
 	i.editme.ShowAndSel(n, true)
+	i.DuringASMEvent = false
 
