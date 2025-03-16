@@ -324,7 +324,7 @@ extend String
 		return self.Child(ch).file
 	
 	target !minilib {
-	function OpenFile (|ExitCode|)
+	function OpenInEditor (|ExitCode|)
 		|| p = .pathfix
 			return "/usr/bin/open".SilentExecute([p], NIL, nil)
 	
