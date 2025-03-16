@@ -4049,9 +4049,8 @@ int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* Self) {
 }
 
 void JB_Rec_AppendErr(JB_ErrorReceiver* Self, JB_Error* Err) {
-	JB_Incr(Self);
 	if (!Self) {
-		JB_SetRef(Self, JB_StdErr);
+		Self = JB_StdErr;
 	}
 	bool CanPrint = false;
 	JB_Rec_Incr(Self, Err, true);
@@ -4082,7 +4081,6 @@ void JB_Rec_AppendErr(JB_ErrorReceiver* Self, JB_Error* Err) {
 	if (JB__Err_AutoPrint != kJB__ErrorFlags_PrintAndRemove) {
 		JB_Tree_SyntaxAppend(Self->Errors, Err);
 	}
-	JB_Decr(Self);
 }
 
 int JB_Rec__Init_() {
@@ -8447,7 +8445,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2025031219);
+	return (2025031616);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {

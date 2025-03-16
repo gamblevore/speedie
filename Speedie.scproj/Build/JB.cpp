@@ -3466,7 +3466,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[219]);
-	JB_FS_AppendInt32(_fsf0, (2025031521));
+	JB_FS_AppendInt32(_fsf0, (2025031616));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8423,7 +8423,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1674]);
-	JB_FS_AppendInt32(_fsf0, (2025031521));
+	JB_FS_AppendInt32(_fsf0, (2025031616));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -27501,9 +27501,8 @@ int JB_Rec_ShellPrintErrors(JB_ErrorReceiver* Self) {
 }
 
 void JB_Rec_AppendErr(JB_ErrorReceiver* Self, JB_Error* Err) {
-	JB_Incr(Self);
 	if (!Self) {
-		JB_SetRef(Self, JB_StdErr);
+		Self = JB_StdErr;
 	}
 	bool CanPrint = false;
 	//"Speedie" // useful marker for debugging...;
@@ -27535,7 +27534,6 @@ void JB_Rec_AppendErr(JB_ErrorReceiver* Self, JB_Error* Err) {
 	if (JB__Err_AutoPrint != kJB__ErrorFlags_PrintAndRemove) {
 		JB_Tree_SyntaxAppend(Self->Errors, Err);
 	}
-	JB_Decr(Self);
 }
 
 JB_ErrorReceiver* JB_Rec_SyntaxUsing(JB_ErrorReceiver* Self) {
