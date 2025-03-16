@@ -13,6 +13,9 @@ datatype FileDes (int)
 
 	function IsTerminal (|bool|)
 		cpp_wrapper JB_IsTerminal
+		
+	syntax cast (|bool|)
+		return self >= 0
 
 
 
@@ -39,7 +42,7 @@ datatype ExitCode (int)
 		description "Completed successfully." 
 		return  self == 0
 	syntax cast (|bool|)
-		disabled "Do you mean self != 0, or .isok, or .successful"
+		disabled "Do you mean self != 0, or .successful"
 
 	function Name (|string|)
 		description "The name of the error (if any)." 

@@ -56,7 +56,7 @@ class ErrorReceiver
 			self = stderr!
 		Return (.errorcount ||| .problemcount ||| .warncount)
 	
-	syntax append (|Error| Err)
+	syntax append (|errorreceiver--|self, |Error| Err)
 		cpp_part AppendErr
 		if !self
 			self = StdErr!
@@ -72,7 +72,6 @@ class ErrorReceiver
 		err.path ?= .source
 		if Error.KeepStackTrace
 			err.StackTrace ?= app.StackTrace
-		
 		|| log = ._logfunc 
 			(log)(self, err.render)
 		if CanPrint and err.IsBad
@@ -178,7 +177,7 @@ class ErrorReceiver
 
 		|| fs    = faststring()
 		|| Count = rec.rendererrors(fs, level, shell)$
-		printerror fs.getresult
+		printerror fs.GetResult
 		fs.problemsfound(count)
 		PrintError fs.getresult
 		if Count

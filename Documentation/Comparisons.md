@@ -144,7 +144,7 @@ Nope!
 Speedie realises that `F` might not exist. And so this code won't compile. Speedie is very intelligent around figuring out what vars can be `nil` or not. So you literally get all the safety with none of the nightmare overhead of Rust.
 
 
-### C Comparison
+## C Comparison
 
 #### **Student passcode checking Assignment**
 
@@ -211,4 +211,74 @@ As an added bonus, you are writing in a fast language (Speedie). So this isn't l
 Often speedie is faster than C code, because it has better libraries that look as if they were designed by people who are the elite of elites.
 
 The fact that there are no wierd issues by including the "\n" in the string via `app.input`... helps demonstrate this.
+
+
+## Go Comparison
+
+Of all the languages, Go is one of them.
+
+Heres an example of error-handling with files in Go:
+
+package main
+
+    import (
+    	"errors"
+    	"fmt"
+    	"io"
+    	"os"
+    )
+    
+    func ReadFile(path string) ([]byte, error) {
+    	if path == "" {
+    		return nil, errors.New("path is empty")
+    	}
+    	f, err := os.Open(path)
+    	if err != nil {
+    		return nil, fmt.Errorf("open failed: %w", err)
+    	}
+    	defer f.Close()
+    
+    	buf, err := io.ReadAll(f)
+    	if err != nil {
+    		return nil, fmt.Errorf("read failed: %w", err)
+    	}
+    	return buf, nil
+    }
+    
+    func main() {
+    	f, err := ReadFile("file.txt")
+    	if err != nil {
+    		fmt.Fprintln(os.Stderr, err)
+    		return
+    	}
+    	fmt.Println(f)
+    }
+
+Heres the same in speedie:
+
+    function ReadFile (|string| path, |StringThatWasReadSafely|)
+    	expect (path) ("Path is empty")
+    	|| f = path.file
+    	require f.OpenForRead   // creates an error
+    	return f.ReadAll(false) // also creates errors
+    		
+    
+    main
+    	|| f = ReadFile("file.txt")
+    		printline f
+
+Its a little different, because the file functions already create errors, and we don't want **two** errors created per-operation. Also, our standard `.open` function actually **creates** files if they don't exist, so we use `f.OpenForRead` instead which expects an existing file to exist, and only uses it for reading. So now it does the same as the Go code.
+
+Also, no need to print the error to stderr, as Speedie already does that on exit!
+
+Or we can just this:
+
+    main
+    	|| f = "file.txt".ReadFile(false) // builtin function
+    		printline f
+
+We can use be standard builtin `string.ReadFile` function. We pass `false` to disable ignoring of missing-files. Errors are created successfully if any happen.
+
+Neat huh?
+
 
