@@ -219,8 +219,8 @@ Of all the languages, Go is one of them.
 
 Heres an example of error-handling with files in Go:
 
-package main
-
+    package main
+    
     import (
     	"errors"
     	"fmt"
