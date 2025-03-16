@@ -406,13 +406,13 @@ class TextView (GUIControl)
 				if pos
 					pos = s.find(textview.csantiWords!, pos, 0)
 					if pos
-						pos = pos max .FindLine(orig-1, pos)
+						pos = pos max .FindLineSeperator(orig-1, pos)
 						return pos + 1
 		  else
 			pos = s.OutCharSet(textview.csantiWords!, pos...)
 			if pos
 				pos = s.find(textview.csantiWords!, pos...)
-				|| t2 = .FindLine(pos, orig+1)
+				|| t2 = .FindLineSeperator(pos, orig+1)
 					pos = pos min t2
 			pos ?= s.length
 			return pos
@@ -954,11 +954,11 @@ class TextView (GUIControl)
 		
 		if self[s.x].istextline and self[s.x-1].istextline and !s.width
 			return s
-		|| A = .findline(s.x, 0 )
+		|| A = .FindLineSeperator(s.x, 0 )
 		|ind| b = s.x2
 		b += self[b-1].istextline
 			
-		B = .findline(b) ?? .text.length
+		B = .FindLineSeperator(b) ?? .text.length
 		return (A+1, b) // don't include the line.
 
 	
@@ -1463,17 +1463,17 @@ class TextView (GUIControl)
 		return .text.length
 
 	
-	function FindLine (|int|start=0, |int|end=int.max, |ind|)
+	function FindLineSeperator (|int|start=0, |int|end=int.max, |ind|)
 		return .text.find(jeebox.CSLine, start, End )
 
 
 	helper ProperSelectLine (|intrange|)
 		|| r = .SelRange
-		|ind| A = .FindLine(r.x, 0)+1
+		|ind| A = .FindLineSeperator(r.x, 0)+1
 		|ind| B = r.x2
 		if (b > a) and self[b-1].istextline
 			b-- 
-		|| b2 = .findline(b)
+		|| b2 = .FindLineSeperator(b)
 			return (a, b2+1)
 		return (a, .length+1) 
 	
