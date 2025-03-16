@@ -134,7 +134,7 @@ function PerryIDE.DebugActual (|file| f, |[string]| args) // actuallyruncompiled
 	|| out = .DebugAppCallArgsDisplay(F, args)
 	.LogOneAction(@emb + out.Copy)
 	out <~ ("\n", 2)
-	|| r = Process.stream(f, args, out, nil, ProcessOwnerMode.OwnGroup)
+	|| r = Process.stream(f, args, out, faststring(), ProcessOwnerMode.OwnGroup)
 	.RunCompiledApp = r
 	if r and r.PID
 		.ShowProductIfMoreOutput = out.Length
