@@ -80,8 +80,8 @@ struct ControlSize
 				rz[i] = d + sz
 //				if dbg
 //					.PrintExplain(i, d, rz)
-			  elseif m == controlpoint.Percent // ~pc
-				rz[i] = ((Sz * PS[i&1]) / (64K*100)) + parent[i&1]
+//			  elseif m == controlpoint.Percent // ~pc
+//				rz[i] = ((Sz * PS[i&1]) / (64K*100)) + parent[i&1]
 //				if dbg
 //					.PrintExplain(i, 0, rz)
 		
