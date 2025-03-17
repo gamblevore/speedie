@@ -1,0 +1,15 @@
+
+
+main (|file| input_file)
+	for f in input_file
+		printline f
+
+/*
+// java version
+String[] list = new File("directory").list();
+if (list != null) {
+    for (String name : list) {
+        System.out.println(name);
+    }
+}
+*/
