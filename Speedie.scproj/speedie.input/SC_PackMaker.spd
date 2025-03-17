@@ -23,7 +23,6 @@ module PackMaker
 		for f in Compiler.FuncList
 			if f.CanLibLoad
 				.addfunc(f)
-		return .SortAll
 	
 	
 	// we want to always create libglobs?
@@ -42,7 +41,7 @@ module PackMaker
 		lib.exit
 
 
-	function SortAll (|int|)
+	function SortFuncsAndBuildGlobs (|int|)
 		opt norefcounts
 		|| FnInit = compiler.xfunc("JB_Init_") // we need app and pack inits separately
 		|| FnMain = compiler.xfunc("JB_Main")
@@ -175,9 +174,12 @@ module PackMaker
 	function MakePack 
 		if (–sizeof FatASM) != 64
 		ASMState.Sh.PackMakerInit			// fn_asm_table[@arg]
-		|| pg = PackMaker.AddAll
+		PackMaker.AddAll
+		|| pg = .SortFuncsAndBuildGlobs
+		target debug {
 		if .ActualASMCompile and Options.pack
 			.WritePackToDisk(pg)
+		}
 	
 	
 	function WritePackToDisk (|int| pg)

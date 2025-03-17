@@ -1036,6 +1036,13 @@ function ASM (|message| rz,  |SCFunction| fn)
 			SpdProcess.parent! <~ errtmp
 
 
+function message.AsmIndent (|message| top, |int|)
+	opt norefcounts
+	while self and self != top
+		rz += (self == @arg)
+		self = .parent
+
+
 function ASMSub (|message| rz,  |SCFunction| fn, |faststring| fs, |bool|)
 	opt norefcounts
 	|| j = ASMState.sh.JSM
@@ -1047,10 +1054,12 @@ function ASMSub (|message| rz,  |SCFunction| fn, |faststring| fs, |bool|)
 	|| bb = 0
 	|message| path 
 	|| lp = 0
+	|| top = fn.SourceArg
 	for fat.fat in fn
 		if options.ASMRenderBlocks and fat.BlockNum != bb
 			bb = fat.BlockNum
 			rz <~ bb
+		fs <~ (' ', fat.msg.asmindent(top)*2)
 		fat.Renda(fs, true)
 		|| tmp = rz.msg(@tmp, fs.GetResult)
 		|| p = fat.msg.Position

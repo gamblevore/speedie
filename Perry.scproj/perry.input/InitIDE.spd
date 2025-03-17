@@ -342,7 +342,7 @@ extend PerryIDE
 			.tooltip		= "The variables in the current function"
 			.UseColorScheme	= true
 			.ID				= "Variables"
-			.size 			= the~width  by  33~pc to 0~under
+			.size 			= the~width  by  400 to 0~under
 			.AlwaysSendChangeEvent = true
 			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.Solid = LeftBG

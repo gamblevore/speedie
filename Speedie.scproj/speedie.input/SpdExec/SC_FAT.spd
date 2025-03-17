@@ -291,7 +291,10 @@ struct FatASM
 		opt inline
 		return (ASM.encoders[.op]!)(self, where, after)
 
-	
+
+	function ArgsRender (|faststring| fs)
+		
+		
 	function Renda (|FastString| fs, |bool| Simpler=false)
 		opt norefcounts
 		if (!.exists)  and  (.msg.func == @sheb)
@@ -318,10 +321,13 @@ struct FatASM
 				fs <~ GotAny
 				GotAny = ", "
 				|int| v = .r[i]
-				if f[i].isreg
-					fs <~ ('r' + v|uint| >> 30)|byte|
-					v &= 31
-				fs <~ v
+				if .IsFunc and (i == 2 or 3)
+					.ArgsRender(fs)
+				  else
+					if f[i].isreg
+						fs <~ ('r' + v|uint| >> 30)|byte|
+						v &= 31
+					fs <~ v
 				remain += bs
 			if .op == asm.knst
 				exit

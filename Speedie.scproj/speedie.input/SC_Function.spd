@@ -503,8 +503,9 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 			Return kNoMatch
 			
 		  elseif (ThisAlter)	// we need to put something in exp
-			|| def = FuncArg.Default!.Copy
-			Incoming.exp.last!.InsertBefore( def, PArg_Ch )
+			|| prms = Incoming.exp.last!
+			|| def = FuncArg.Default!.Copy(prms)
+			prms.InsertBefore( def, PArg_Ch )
 			TypeOfExpr( def, Name_Space )
 
 		  else

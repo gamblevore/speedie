@@ -180,10 +180,9 @@ function CompileAll (|bool|)
 	require .Stage( "String Correction" )
 	StringCorrector.CorrectConsts
 	
-	target debug
-		if compiler.inperry or Options.ModePack
-			.Timer( "Export Pack" )
-			PackMaker.MakePack	
+	if compiler.inperry or Options.ModePack
+		.Timer( "Export Pack" )
+		PackMaker.MakePack	
 	
 	if !compiler.inperry
 		if Options.ModeCpp

@@ -8,6 +8,9 @@ function DebugABC1 (|int| i, |int|)
 	n++
 	return n
 
+function DebugABC11 (|int| i, |int|)
+	return i*9 + 1
+
 
 function DebugABC2
 	|| n = "def".length
@@ -295,14 +298,15 @@ function perryide.TryReselectASM (|bool|)
 	require !.DuringASMEvent and (.ASMView is Visible)
 	.DuringASMEvent = true
 	.UpdateASM
-	.ReselectASM(.editme.SelectedLine.Position)
+	.ReselectASM
 	.DuringASMEvent = false
 
 
-function perryide.ReselectASM (|int| i)
+function perryide.ReselectASM
 	opt norefcounts
+	|| i = .editme.SelectedLine.Position
 	for s in .ASMView.ListSource
-		if !s.name[0, "JUMP:", true] and s.first.int >= i
+		if !(s.name contains "JUMP: ") and (s.first.int >= i)
 			.ASMView.Select(s)
 			exit
 	
@@ -328,12 +332,19 @@ function ListView.AddFail (|string| s)
 
 
 function perryide.GotASM (|message| asm)
+	.DuringASMEvent = true
+	.GotASMSub(asm)
+	.ReselectASM
+	.DuringASMEvent = false
+
+
+function perryide.GotASMSub (|message| asm)
 	|listviewrow| name = asm.first$
 	|| l = .ASMView
 	l.clear
 	|| src = l.ListSource
 	(name is AlignCenter)
-	(name is disabled)
+//	(name is disabled) // nice to copy the name
 	src <~ name
 	|| arg = asm.last
 	if !arg.HasAny
@@ -350,6 +361,7 @@ function perryide.GotASM (|message| asm)
 			src <~ cpy
 			cpy.obj = file.name
 	name.name = "function " + name.name + " (" + n.render + ")"
+	
 
 
 function ASMViewKeys (guikeyevent)
