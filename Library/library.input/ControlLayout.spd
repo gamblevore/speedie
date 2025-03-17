@@ -30,7 +30,7 @@ insertion
 	above	ControlPoint.After.layout(_0)
 	under	ControlPoint.Before.layout(-(_0))
 	long	ControlPoint.length.layout(_0) 
-	pc		Controlpoint.percent.layout(_0*64K)
+//	pc		Controlpoint.percent.layout(_0*64K)
 	
 
 
@@ -144,8 +144,8 @@ datatype ControlPoint (int)
 			fs <~ "after"
 		  elseif centered|int| == type
 			fs <~ "centered"
-		  elseif percent|int| == type
-			fs <~ "percent"
+//		  elseif percent|int| == type
+//			fs <~ "percent"
 		  elseif length|int| == type
 			fs <~ "length"
 		  else
@@ -158,7 +158,7 @@ datatype ControlPoint (int)
 		Before	= 4 
 		After   = 6
 		Centered = 7
-		Percent = 8
+//		Percent = 8
 		Length	= 10
 
 
