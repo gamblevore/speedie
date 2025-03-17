@@ -157,7 +157,7 @@ datatype int
 		while (i < self)
 			yield i (i)
 			++i
-
+	
 	iterator down
 		|| i = self - 1
 		while (i >= 0)
