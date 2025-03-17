@@ -44,8 +44,6 @@ datatype Tetronimo (uint64)
 	"dDd\nd"
 	"dDd\n  d"
 	"eEe\n e"
-//	"tttTttt\n"*3 haha
-	// I could add 0 bombs. like a shape with a hole in it, to punish players lol.
 ]
 
 || TrollShapes = [
@@ -216,7 +214,6 @@ class Tetris (GridSection)
 		.FramesLeft--
 		if .TotalFrames++ isa 300
 			.FrameRate = .FrameRate-1 max 22
-//			printline .FrameRate
 		
 	
 	function NextShape (|bool| Troll=false)
