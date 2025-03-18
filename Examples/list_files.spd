@@ -1,15 +1,23 @@
 
 
-main (|file| input_file)
-	for f in input_file
-		printline f
+main
+	|| dir = "directory".FileThatExists
+		for f in dir
+			printline f
 
 /*
 // java version
-String[] list = new File("directory").list();
-if (list != null) {
-    for (String name : list) {
-        System.out.println(name);
+import java.io.File;
+
+class Main {
+    public static void main(String[] args) {
+        String[] list = new File("directory").list();
+        if (list != null) {
+            for (String name : list) {
+               System.out.println(name);
+            }
+        } else {
+            System.out.println("Cant find folder 'directory'");
+        }
     }
-}
-*/
+}*/
