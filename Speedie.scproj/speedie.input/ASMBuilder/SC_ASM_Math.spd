@@ -276,7 +276,7 @@ extend ASMState
 		opt norefcounts
 		|| fn = exp.Func
 		if fn == @opp
-/			if swapped
+			if swapped
 				exp = exp.next!
 			  else
 				exp = exp.prev!

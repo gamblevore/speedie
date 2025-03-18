@@ -444,7 +444,7 @@ class SCDecl (SCNamed) {
 		if !def or (.pointercount and minimal < 2)
 			def = «thg "nil"»
 		  else
-			def = def.copy
+			def = def.copy(.source)
 		
 		|| c = .Contains
 			def = «type ":)"
@@ -1162,14 +1162,14 @@ class SCDecl (SCNamed) {
 			return datatypecode._void
 		
 		|| Ty = .type
-		DEBUG_REQUIRE !(.c_array ||| ty.IsStruct)
-		
 		if ty.IsObject
 			return datatypecode.cstring
 		rz = ty.typeinfo
 		if .pointercount
 			rz = datatypecode._voidptr // what about carrays?
-
+		  else
+			DEBUG_REQUIRE !(.c_array ||| ty.IsStruct)
+		
 		
 	function PointerIncrement (|int|)
 		// only called on pointers

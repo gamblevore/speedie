@@ -436,11 +436,11 @@ function BoolNot (fn_asm)							// !a
 	
 
 function BitNot (fn_asm)							// ~a
-	return .DoMathSub(exp, dest as asmreg.SingleExpr, scoperator.bnot.asm!)
+	return .DoMathSub(exp, dest, scoperator.bnot.asm!)
 
 
 function Negative (fn_asm)							// -a
-	return .DoMathSub(exp, dest as asmreg.singleexpr, scoperator.Negative.asm!)
+	return .DoMathSub(exp, dest, scoperator.Negative.asm!)
 
 
 ///   ///
@@ -600,14 +600,15 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	opt norefcounts
 	|| ml = ASMReg()
 	|| mr = ASMReg()
-	if dest is SingleExpr
+	|| First = exp.first!
+	if First.islast
 		ml = .µGetASM(exp, dest)
 	  else
 		|| Closer = .OpenVars
 		|| discardmode = dest & AsmReg.Discard
 		|| Mode = discardmode with dest
 		
-		ml = .µGetASM(exp.first!, mode)
+		ml = .µGetASM(First, mode)
 		mode = DiscardMode.with(dest, ml)
 		mr = .µ(exp.last!, mode)
 		.CloseVars(Closer)

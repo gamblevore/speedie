@@ -34,8 +34,8 @@ function message.OperatorMul (|asm| op, |&fatasm|)
 
 
 target debug
-	function scdecl.ASMSanity
-		ifn .iscarray or .pointercount or .isobject
+	function scdecl.ASMSanity 
+		ifn .iscarray or .pointercount or .isobject or .isbarestruct
 			|| size = .type.Size
 			if size != .typeonly.bytecount // sigh. what?
 				#!"Should we have set the dtype when the decl was created? or at least verified in the nil-checker?"

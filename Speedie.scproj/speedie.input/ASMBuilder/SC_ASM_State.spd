@@ -16,6 +16,7 @@ struct ASMState
 	|InlineBlock|				State
 	|byte|						DeepestInline
 	|byte|						InlineLimit
+	|byte|						StackSize
 	|byte|						VDecls
 	|byte|						VTmps
 	|bool|						Inited
@@ -282,6 +283,8 @@ struct ASMState
 		target debug
 			dest.tmpcheck
 			debugat 0 // keep this
+			if ++.stacksize > 50 // ugh
+				
 		  else
 			opt inline
 
@@ -289,6 +292,7 @@ struct ASMState
 		|| ss = (fn)(self, exp, dest)
 
 		target debug
+			.stacksize--
 			if !ss.tmpcheck
 				(fn)(self, exp, dest)
 			if !ss or dest is set or ss is set
@@ -460,6 +464,7 @@ struct ASMState
 		.state.fn = fn
 		SCFunction.CurrFunc = fn
 		.state.Return = nil
+		.StackSize = 0
 		.state.inlinedepth = 0
 		.state.BranchDepth = 0
 		.TailInlineable = true

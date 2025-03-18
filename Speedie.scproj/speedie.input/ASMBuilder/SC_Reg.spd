@@ -22,7 +22,6 @@ datatype ASMReg (uint64)
 		Set
 		Declaration
 		Temp
-		SingleExpr
 		NoScale
 		ContainsAddr
 		Textual
