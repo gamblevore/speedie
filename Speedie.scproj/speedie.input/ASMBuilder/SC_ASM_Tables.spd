@@ -670,9 +670,9 @@ function MakeConstFromASM (|scdecl| decl, |asmreg| Initial, |asmreg| NewValue)
 		if f
 			.AskNop(f)
 		decl.ExportPosition = 0
-		|| DK = decl.FatConstIndex|uint|
+		|| fat = decl.fat
 			decl.FatConstIndex = 0
-			.AskNop(DK.fat)
+			.AskNop(fat)
 	
 	if NewValue
 		.SetDeclToConst(decl, newvalue, newvalue.fat)

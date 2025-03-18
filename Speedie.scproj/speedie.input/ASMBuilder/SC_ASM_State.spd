@@ -232,8 +232,8 @@ struct ASMState
 	
 	function Decr (|?&fatasm| f)
 		if f and --f.µRefCount <= 0
-			f.debugprint
-			debugger 
+			//f.debugprint
+			//debugger 
 			.Nop(f)
 
 	function Rewind (|fatasm| start)

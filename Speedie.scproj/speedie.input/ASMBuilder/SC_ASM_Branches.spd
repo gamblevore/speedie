@@ -52,10 +52,10 @@ function IfSub (fn_asm)
 
 	if ArgStart == .curr
 /		.NopRange(ifstart, argstart)
-		.Branch(cond, b, true)
+		.Branch(cond, B, true)
 		
 	if .curr.op != asm.eror
-	|| AfterFirst = other.jump(0)
+	|| AfterFirst = other.jump
 	.AllJumpTo(b)
 	rz = .Else(other) & Arg1Return						// ^^^ if x {return} else {return}
 	AfterFirst.jumpto(.curr, asmstate.sh)
@@ -67,7 +67,7 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 		#!ClearExits
 		|| op = C.Op
 		if op >= kContinue
-			C.setop = ASM.Jump
+			C._op = ASM.Jump
 			if op == kContinue			// continue
 				C.JumpTo(S, self)
 			  else       				// exit
@@ -88,30 +88,44 @@ function While (fn_asm)
 
 function WhileSub (|message| exp,  |asmreg|)
 	opt norefcounts
-	|| begin = exp.JUMP(0)												// test goes after loop
-	|| Returns = ASMType.argsub(self, exp.second!, nil)					// arg
+	|| InitialJump = exp.JUMP												// test goes after loop
+	|| Returns = ASMType.argsub(self, exp.second!, nil)						// arg
 
 	|FatRange| loop_test
-	|| LT = .Branch(exp.first!, loop_test, false)
+	// how to step into this? Into the while-true
+	|| LT = .Branch(exp.first!, loop_test)
 	if loop_test.never
-		.NopRange(begin, loop_Test.start)
+		.NopRange(InitialJump, loop_Test.start)
 		return ASMReg()
 	
-	begin.JumpTo(loop_test.start, self)
-	.AllJumpTo(loop_test,begin+1)
-	.loopfill(begin, loop_test.start, loop_test.After)
+	if loop_test.always
+		.Nop(InitialJump)
+		if  loop_test.after != loop_Test.start  //  EH?
+			debugger
+			.NopRange(loop_Test.start, loop_Test.after)
+		
+		// now what?
+		exp.JUMP.jumpto(initialjump+1, self)
+		loop_test.after++
+	  else
+		InitialJump.JumpTo(loop_test.start, self)
+		.AllJumpTo(loop_test, InitialJump+1)
+
+	.loopfill(InitialJump+1 /*loop_start*/,  loop_test.start /*continue*/,  loop_test.After /*exit*/)
 	
 	return returns * loop_test.Always
 
 
 function Exit			(fn_asm)
 	opt norefcounts
-	self <~ (kexit, exp)											// request jump fwd
+	|| J = exp.jump											// request jump to exit
+	J._op = kexit
 
 
 function Continue		(fn_asm)
 	opt norefcounts
-	self <~ (kcontinue, exp)										// request jump fwd a little less
+	|| J = exp.jump											// request jump to continue
+	J._op = kcontinue
 
 
 function BackCond (|fatasm| start)
@@ -145,7 +159,7 @@ function Ternary		(fn_asm)
 		rz = .µInto(which, dest)
 	  else
 		|| µA = .µInto(A, dest)
-		|| Exit = exp.jump(0)
+		|| Exit = exp.jump
 		.AllJumpTo(TernTest)
 		rz = .µInto(B, dest)
 		
@@ -450,3 +464,7 @@ function @asmstate.PrintProgress (|message| exp=nil)
 		curr.debugprint
 		curr++
 	s.LastDebug = curr
+
+
+function message.Jump (|&Fatasm|)
+	return .jump(0)

@@ -196,8 +196,11 @@ function SCFunction.CheckUnused (|message| feedback)
 			if .linkfrom != nil
 				str = "()'s callers are unused"
 			feedback.msg(@tmp, .name + str) <~ src.position
+	
+	require self isnt cpp
+	.CheckUnusedCode(feedback)
 
-	require !.HasProto and self isnt cpp
+	require !.HasProto
 	|message| ErrName
 	for arg in .args
 		if arg isnt readfrom
@@ -965,10 +968,10 @@ function CppASM (|message| msg,  |scfunction| fn,  |message|)
 	opt norefcounts
 	require stderr.ok
 		
-	// what should we do if its a wrapper or a macro?
+	// What should we do if its a wrapper or a macro?
 	
-	|| src = fn.source #expect (fn)
-	|| path = src.File #expect (src)
+	|| src = fn.source				#expect (fn)
+	|| path = src.File				#expect (src)
 	rz = @tmp.msg(msg.name)
 	rz.msg(@thg, fn.name)
 	|| rzarg = rz.msg(@arg)
@@ -978,8 +981,8 @@ function CppASM (|message| msg,  |scfunction| fn,  |message|)
 		.Cpp(rzarg, fn)
 	  else
 		.ASM(rzarg, fn)
-		
-	
+
+
 
 function Message.NextPath (|message| Before, |message?| path, |message|)
 	opt norefcounts
@@ -1071,6 +1074,12 @@ function ASMSub (|message| rz,  |SCFunction| fn, |faststring| fs, |bool|)
 
 	return true
 	
+
+function SCFunction.CheckUnusedCode (|message| feedback)
+	for f.fat in self
+		if f.IsUnused
+			feedback.msg(@tmp, "Unused code") <~ f.msg.position
+
 		
 function DefineOrCall (|message| msg,  |string| purpose,  |object| found=nil,  |message|)
 	if  purpose starts "callfrom"

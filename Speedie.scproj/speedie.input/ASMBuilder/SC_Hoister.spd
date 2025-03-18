@@ -22,11 +22,23 @@ struct SC_Hoister
 		.Items[.Count++] = decl
 		.spare--
 
-	helper GotConst (|message| prop,  |scdecl| decl)
+	helper WriteConst (|message| prop,  |scdecl| decl)
 		opt NoRefCounts
 		|| dest = ASMState.sh.DeclareMe(prop, decl)		// Pre-declare glob.
 		|| K = asmstate.sh.NumToReg(prop, decl.exportposition, dest, dest.µtype)
 		.got(dest, Decl, k)
+
+	helper ReuseConst (|message| prop,  |scdecl| decl)
+		opt NoRefCounts
+		|| k = decl.ExportPosition
+		for i in .Count
+			|| Old = .items[i]!
+			if old.ExportPosition == K
+				old.fat!.µRefCount++
+				decl.FatConstIndex = old.FatConstIndex
+				decl.NilReg = old.NilReg
+				return
+		.WriteConst(prop, decl)
 	
 	function Unhoist (|asmreg|)
 		opt NoRefCounts
@@ -42,32 +54,41 @@ struct SC_Hoister
 		.spare = 2
 		.Hoist(exp, 1<<20)
 
-	helper Hoist (|message| exp, |int| Score)
+	function TryHoist (|message| exp, |int| Score, |scdecl| prop)
+		if prop.nilreg isnt hoisted
+			if prop is const
+				if (score >= 1<<20) and prop.exportposition
+					.ReuseConst(Exp, prop)
+			  elseif prop is Global
+				.GotGlobal(exp, prop)
+		  else
+			|| fat = prop.fat
+				fat.µRefCount++
+	
+	
+	function Hoist (|message| exp, |int| Score)
 		opt norefcounts
 		|| fn = exp.func
 		if fn == @type
 			exp = exp.first! // no go into the type!
-		  elseif fn == @func
+			fn = exp.func
+		if fn == @func
 			exp = exp.second!
+			fn = exp.func
 		
-		|| GoIn = true
 		if  (fn == @dot or @thg or @num)  and  (.spare > 0)
 			|| prop = exp.ASMDecl
-			GoIn = prop isnt const and global
-			if (score >= 0)  and  prop.nilreg isnt hoisted
-				if prop is const
-					if (score >= 1<<20) and prop.exportposition
-						.GotConst(exp, prop)
-				  elseif prop is Global
-					.GotGlobal(exp, prop)
+			if (score >= 0)
+				.TryHoist(exp, score, prop)
+			if prop is const or global
+				return
 	
-		if goin
-			for ch.fast in exp
-				|| add = 0
-				if ch.func == @tmp
-					|| ty = ch.ASMType
-					add += (ty is kWhile) * MinHoistScore
-					add -= (ty is kIf)
-					
-				.Hoist(ch, add + score)
+		for ch.fast in exp
+			|| add = 0
+			if ch.func == @tmp
+				|| ty = ch.ASMType
+				add += (ty is kWhile) * MinHoistScore
+				add -= (ty is kIf)
+				
+			.Hoist(ch, add + score)
 

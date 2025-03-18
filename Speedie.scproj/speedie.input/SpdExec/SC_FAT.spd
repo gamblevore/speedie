@@ -50,6 +50,9 @@ struct FatASM
 		|| b = .baseop
 		return b == asm.fncx or asm.fnc
 	
+	function IsUnused (|bool|)
+		return .µrefcount == 0
+	
 	function BaseOp (|int|)
 		rz = .op
 		if rz == asm.FNCX3
@@ -142,6 +145,10 @@ struct FatASM
 		opt inline
 		return 1 + self - asmstate.sh.funcstart
 
+	function SCdecl.Fat (|&fatasm|)
+		|| K = .FatConstIndex|uint|
+			return K.fat
+
 	function uint.FAT (|&FATASM|)
 		opt inline
 		return asmstate.sh.funcstart + (self - 1)
@@ -214,6 +221,7 @@ struct FatASM
 	function JumpInput (|int| a, assigns:|int| v)
 		.r[a] = v
 		.jumpreg = a + 1
+		.µrefcount = 1 max .µrefcount // control flow is always used?
 		ASMState.sh.BasicBlock++
 	
 //	function Jump (|int|)
@@ -226,6 +234,7 @@ struct FatASM
 	
 	
 	function JumpTo (|&fatasm| value, |&asmstate| A)
+		cpp_Part JumpToSet
 		|| j = .jumpreg
 			|| D = (value - self) - 1
 			check (D != -1) (self, "bad jump")
@@ -272,8 +281,6 @@ struct FatASM
 		opt inline
 		return .step(1)
 
-	
-	
 	function Prm (|int| i, |int|)
 		return .r[i] & ~(1<<31) // remove tmpbit.
 		
