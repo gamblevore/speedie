@@ -1,0 +1,43 @@
+#!/usr/local/bin/spd
+
+app.usage = "Pass a file to count the frequency of bytes occuring. Useful to detect corrupt video files, or other files that might be too large to inspect manually."
+
+class ByteFrequency
+	|int64|  Freq
+	|byte|   Char
+	
+	render
+		|| c = .char
+		fs <~ "$.freq of "
+		if (c > 32) and c.CanPrintAsNormalChar
+			fs <~ C
+		  else
+			fs <~ "'"
+			fs.appendescape string.byte(c)
+			fs <~ "'"
+
+	syntax sort
+		return .freq > b.freq
+
+
+|int64[256]| Freq
+main (|existingfile| input, |int| Limit = 100MB)
+	|| s = input.in$
+	
+	"Counting bytes in file $input (${input.size.strsize})"
+	for (ch in s) (n)
+		if n isa 512KB
+			"$n bytes"
+		loop n < limit
+		freq[ch]++
+	
+	|[ByteFrequency]| output
+	for i in 256
+		output <~ ByteFrequency(freq[i], i)
+	output.sort(ByteFrequency.syntaxsort)
+	
+	""
+	for o in output
+		if o.freq
+			"$o"
+		
