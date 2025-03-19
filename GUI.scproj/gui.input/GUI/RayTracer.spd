@@ -276,7 +276,7 @@ class RayTracer
 
 	
 	function @raytracer.DistanceSorter (SorterComparer of vobject)
-		return b._MinDist  <  a._MinDist // biggest dist first. We also store in reverse. So we store nearest first.
+		return b._MinDist  <  ._MinDist // biggest dist first. We also store in reverse. So we store nearest first.
 		
 		
 	helper PlayQuidditch (|int| Stride)

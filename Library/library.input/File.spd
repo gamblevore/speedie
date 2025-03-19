@@ -479,7 +479,7 @@ class File (String)
 			return _speedie
 		
 		function SizeSorter (SorterComparer of file)
-			|| aa = a.size
+			|| aa = .size
 			|| bb = b.size
 			return bb - aa
 			

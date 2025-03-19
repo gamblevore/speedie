@@ -243,9 +243,9 @@ class SCImport
 		
 		function Sorter (SorterComparer of scfile)
 			opt norefcounts
-			|| lib = a.Proj.IsSTDLib - b.Proj.IsSTDLib
+			|| lib = .Proj.IsSTDLib - b.Proj.IsSTDLib
 				return lib
-			return a|string| < b|string|
+			return self|string| < b|string|
 		
 		function FindImport (|string| s, |scimport|)
 			opt norefcounts

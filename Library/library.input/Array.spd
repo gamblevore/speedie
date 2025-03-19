@@ -101,6 +101,10 @@ class Array (saveable)
 		|| p = .pop
 			self[pos] = P
 
+//	macro Sort
+//	// need a better macro? or alternative? to allow array.sort
+//		{|| tmp = _0, (tmp.sort(&–contained(tmp).__sorter__)), rejoin 0}
+	
 	function Sort (|SorterComparer| Compare)
 		cpp_wrapper JB_Array_Sort
 	
@@ -190,7 +194,7 @@ class Array (saveable)
 
 
 
-prototype SorterComparer (|...| a, |...| b, |SortComparison|)
+prototype SorterComparer (|...| self , |...| b, |SortComparison|)
 	contains Object
 	function Sort (|array of ...| items)
 		items.sort(self)
@@ -204,6 +208,6 @@ datatype SortComparison (int) //
 
 
 function @string.Sorter (SorterComparer of string)
-	return b.syntaxcompare(a, false)
+	return b.syntaxcompare(self, false)
 	
 

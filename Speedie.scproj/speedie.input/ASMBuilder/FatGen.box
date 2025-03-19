@@ -503,14 +503,25 @@ function message.JMPN (|asmreg| r1, |asmreg| r2, |int| Jmp, |&fatasm|) {
 }
 
 
-function message.JMPK (|asmreg| r1, |int| Neg, |int| K, |int| Jmp, |&fatasm|) {
+function message.JMPK (|asmreg| r1, |int| K, |int| Jmp, |&fatasm|) {
 	visible
 	rz = self * asm.JMPK
 	rz.reginput(0) = r1
-	rz.numinput(1) = Neg
-	rz.numinput(2) = K
-	rz.jumpinput(3) = Jmp
-	if (((Jmp << 21) >> 21) != Jmp) {
+	rz.numinput(1) = K
+	rz.jumpinput(2) = Jmp
+	if (((Jmp << 22) >> 22) != Jmp) {
+		error (self, `Jumped too far`)
+	}
+}
+
+
+function message.JMPC (|asmreg| r1, |int| K, |int| Jmp, |&fatasm|) {
+	visible
+	rz = self * asm.JMPC
+	rz.reginput(0) = r1
+	rz.numinput(1) = K
+	rz.jumpinput(2) = Jmp
+	if (((Jmp << 22) >> 22) != Jmp) {
 		error (self, `Jumped too far`)
 	}
 }

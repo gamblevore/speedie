@@ -134,23 +134,17 @@
 #define   JCmpI_Jmpu_(x)   (((uint)((x)<<21))>>21)
 
 
-#define   JCmpK_Negi       ((( int)((Op)<<13))>>31)
-#define   JCmpK_Negi_(x)   ((( int)((x)<<13))>>31)
+#define   JCmpK_Ki       ((( int)((Op)<<13))>>23)
+#define   JCmpK_Ki_(x)   ((( int)((x)<<13))>>23)
 
-#define   JCmpK_Negu       (((uint)((Op)<<13))>>31)
-#define   JCmpK_Negu_(x)   (((uint)((x)<<13))>>31)
+#define   JCmpK_Ku       (((uint)((Op)<<13))>>23)
+#define   JCmpK_Ku_(x)   (((uint)((x)<<13))>>23)
 
-#define   JCmpK_Ki       ((( int)((Op)<<14))>>25)
-#define   JCmpK_Ki_(x)   ((( int)((x)<<14))>>25)
+#define   JCmpK_Jmpi       ((( int)((Op)<<22))>>22)
+#define   JCmpK_Jmpi_(x)   ((( int)((x)<<22))>>22)
 
-#define   JCmpK_Ku       (((uint)((Op)<<14))>>25)
-#define   JCmpK_Ku_(x)   (((uint)((x)<<14))>>25)
-
-#define   JCmpK_Jmpi       ((( int)((Op)<<21))>>21)
-#define   JCmpK_Jmpi_(x)   ((( int)((x)<<21))>>21)
-
-#define   JCmpK_Jmpu       (((uint)((Op)<<21))>>21)
-#define   JCmpK_Jmpu_(x)   (((uint)((x)<<21))>>21)
+#define   JCmpK_Jmpu       (((uint)((Op)<<22))>>22)
+#define   JCmpK_Jmpu_(x)   (((uint)((x)<<22))>>22)
 
 
 #define   BraBytes_Bytesi       ((( int)((Op)<<13))>>30)

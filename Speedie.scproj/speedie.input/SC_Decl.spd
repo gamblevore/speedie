@@ -1228,11 +1228,11 @@ function int64.MsgForConst (|bool| AllowShift, |message|)
 
 
 function GlobalsSorter (SorterComparer of scdecl)
-	rz = b.carraysize - a.carraysize
+	rz = b.carraysize - .carraysize
 	if !rz
-		rz = (b.type == typejbclass) - (a.type == typejbclass)
+		rz = (b.type == typejbclass) - (.type == typejbclass)
 	if !rz
-		rz = b.name.syntaxcompare(a.name, true)
+		rz = b.name.syntaxcompare(.name, true)
 	
 
 function scdecl.Complexity (|int|)
@@ -1244,12 +1244,12 @@ function scdecl.Complexity (|int|)
 	rz += .IsCarray << 3
 
 function SimplestFirst (SorterComparer of scdecl)
-	|| BComp = b.Complexity - a.Complexity
+	|| BComp = b.Complexity - .Complexity
 		return BComp
-	return b.carraysize - a.carraysize
+	return b.carraysize - .carraysize
 
 function SmallestAlignedFirst (SorterComparer of scdecl)
-	return b.alignment - a.alignment
+	return b.alignment - .alignment
 
 
 function array.CArraySize (|[scdecl]| self, |int| size, |int|)

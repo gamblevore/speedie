@@ -44,7 +44,7 @@ function Message.ReplaceInbuiltSub (|scdecl?| self_decl, |message|)
 			|| IsOK = stderr.mark
 			using self
 				f.name = f.name.digest
-				if !IsOK and stderr.canaddmore
+				if !IsOK and stderr.CanAddMore
 					|| err = stderr.errors.last
 						err.shiftposition(f.position)
 				
@@ -54,19 +54,48 @@ function Message.ReplaceInbuiltSub (|scdecl?| self_decl, |message|)
 		|| f = self[@sstr]
 			f.name = f.name.Compress
 		.become(@bra)
+	
 	  elseif (self == "taskvars")
 		|| cls = scfunction.currfunc!.cls		#expect (self)
-		.become(cls.taskobjectcount)
+		.become(cls.TaskObjectCount)
 		
 	  elseif (self == "sizeof")
 		expect (self_decl) (self, "Unable to get size")
 		return .InbuiltSizeOf(self_decl)
+		
+	  elseif (self == "typeof" or "contained")
+		expect (self_decl) (self, "Unable to get type")
+		if self ~= "typeof"
+			return .InbuiltTypeOf(self_decl)
+		return .InbuiltContained(self_decl)
+		
 
 	  elseif (self == "SELF_TEST_JBIN" or "SELF_TEST_NATURAL")
 		Create_JeeboxTest( self )
 
 	  else
 		error (self)
+
+
+target false
+	function Message.InBuiltTypeOf (|scdecl| dcl, |string| Kind, |message|)
+		opt norefcounts
+		if kind != "typeof"
+			dcl = dcl.contains #expect (self, "No contained type") // shouldn't fail but does? nilbug!
+		return @thg + dcl.type.Name
+		
+
+function Message.InBuiltContained (|scdecl| dcl, |message|)
+	opt norefcounts
+	|| cnt = dcl.contains #expect (self, "No contained type")
+	return @thg + cnt.type.Name
+
+
+function Message.InBuiltTypeOf (|scdecl| dcl, |message|)
+	opt norefcounts
+	return @thg + dcl.type.Name
+		
+		
 
 
 function Message.InBuiltSizeOf (|scdecl| sulf, |message|)

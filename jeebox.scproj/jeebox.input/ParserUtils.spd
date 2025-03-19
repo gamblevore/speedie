@@ -146,7 +146,7 @@ extend Parser
 	            err <~ "Unexpected "
 			  else
 	            for (5) { // 5, in case there is a bug causing infinite loop.
-	                ExpectedBits = MessageErrorSub( err, ExpectedBits, Realbits )
+	                ExpectedBits = MessageErrorSub( err, ExpectedBits )
 	            } (ExpectedBits)
 	            err <~ " but found "
 
@@ -188,7 +188,7 @@ extend Parser
 				return i
 
 
-	function MessageErrorSub (|FastString| fs, |int| num, |int| ButFound, |int|)
+	function MessageErrorSub (|FastString| fs, |int| num, |int|)
 		|| e = ._ErrorNames
 		if !e
 			e = Dictionary()
@@ -268,9 +268,8 @@ function byte.CanPrintAsNormalChar (|bool|)
 
 // remove tokenhandler_fp, its just parsehandler!
 prototype ParseHandler			(|int| Start, |message?| Parent=nil, |Message?|)
-prototype TokenHandler_fp		(|int| Start, |message?| parent=nil, |Object?|)
-prototype fnIDGenerator			(|int| Start, |int| End, |syntax| f,   |String|)
-prototype SorterComparerMsg		(|message| a, |message| b, |int|)
+prototype TokenHandler_fp		(|int| Start, |message?| Parent=nil, |Object?|)
+prototype fnIDGenerator			(|int| Start, |int| End, |syntax| f, |String|)
 
 
 

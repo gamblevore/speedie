@@ -211,7 +211,7 @@ class StringReader
         while
 		    || _b = .byte
 			if (_b < 0): exit
-			yield _b
+			yield (_b) (.Position)
 		
 	syntax expect (|string| Error)
 		opt norefcounts

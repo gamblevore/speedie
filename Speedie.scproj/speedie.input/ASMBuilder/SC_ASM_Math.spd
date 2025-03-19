@@ -84,10 +84,13 @@ extend ASMState
 			mode ^= 1
 		|| f = r.fat
 			|| k = f.const
-			if k.fits(7, true)	
+			if k.fits(9, true)	
 				.NopConst(R)
-				k = k|uint64|.trim(7)
-				return exp.JMPK(l, swapped|int|, k, 0) * dest
+				k = k|uint64|.trim(9)
+				|| fat = exp.JMPK(l, k, 0) 
+				if swapped
+					fat._op = asm.jmpc
+				return fat * dest
 
 
 	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)

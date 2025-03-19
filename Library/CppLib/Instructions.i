@@ -154,6 +154,10 @@
 	__;
 	Code = JumpK(r, Op, Code);
 	___;
+ı JMPC: 
+	__;
+	Code = JumpK(r, Op, Code);
+	___;
 ı JBOR: 
 	__;
 	if (i1) 

@@ -69,8 +69,7 @@ forms
 
 	JCmpK	// cmp:
 		r1		r
-		Neg		1
-		K		7
+		K		9
 		Jmp		j
 
 	BraBytes	// BraBytes:
@@ -475,6 +474,10 @@ POS 6
 		Code = JumpNeq(r, Op, Code)
 		___
 /**/ JMPK  (JCmpK)
+		__
+		Code = JumpK(r, Op, Code)
+		___
+/**/ JMPC  (JCmpK)
 		__
 		Code = JumpK(r, Op, Code)
 		___

@@ -1075,13 +1075,26 @@ module
 				keymsg.name = key
 				Return compiler[ keymsg ]
 		
-
+	
+	function message.SortImprove (|scnode| name_space)
+		opt norefcounts
+		if name_space.MustBe(SCClass, self)
+			|| L = .GiveArg
+			require l.ExpectLast
+			|| prm = @prm.msg
+			l.prev = prm
+			prm <~ NewRel(@thg + "SorterComparer", @thg+name_space.name, "of") 
+			
+		
 	function LoadSyntax (CollectFunc)
 		|| name = node.name.UpperFirst
 		|| AlreadyName = node[@thg] 		#require
 
 		node.name = "function"
+		if alreadyname ~= "sort"
+			node.SortImprove(name_space)
 		AlreadyName.name = name + AlreadyName.name.UpperFirst
+			
 
 		Return SCFunction.NewFunc( node, name_space, ErrPlace )
 

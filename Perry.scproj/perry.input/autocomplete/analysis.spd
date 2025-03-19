@@ -113,9 +113,9 @@ function PerryFuncMenuSelected (GUIListEvent)
 		e._Start = obj
 
 
-function FuncListSorter (SorterComparerMsg)
+function FuncListSorter (SorterComparer of message)
 	opt norefcounts
-	|| aa = a[]
+	|| aa = self[]
 	|| bb = b[]
 	if (!aa or !bb)
 		return (aa < bb)|int|

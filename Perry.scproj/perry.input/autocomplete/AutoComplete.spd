@@ -44,13 +44,13 @@ function message.DefineToLine (|int| count)
 		l.name = " - Called From " + s + " - "
 		
 
-function CallFromSorter (SorterComparerMsg)
+function CallFromSorter (SorterComparer of message)
 	opt norefcounts
 
-	|| aa = a.second
+	|| aa = .second
 	|| bb = b.second
 	if !aa and !bb
-		return a.Position - b.position
+		return .Position - b.position
 	if !aa or !bb
 		return (aa!=nil)|int|
 	return (bb.name < aa.name)|int|
