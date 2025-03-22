@@ -76,6 +76,7 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 
 
 function While (fn_asm)
+	opt norefcounts
 	|sc_hoister| H 
 	|| OV = .OpenVars
 	h.HoistLoop(exp.first!)
@@ -83,7 +84,7 @@ function While (fn_asm)
 	rz = .WhileSub(exp)
 	.state.BranchDepth--
 	.CloseVars(OV)
-	h.Unhoist
+	.Unhoist(h)
 
 
 function WhileSub (|message| exp,  |asmreg|)

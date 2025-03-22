@@ -769,13 +769,13 @@ function ModulesSorter (SorterComparer of scmodule)
 	
 	if !ca or !cb // a module
 		if ca or cb
-			return (cb!=nil)|int|
+			return (cb!=nil)
 	  else
 		|| tt = ca.basetype
 		|| D = cb.basetype|int| - tt|int|
 			return D
 		
-		D = cb.depth|int| - ca.depth|int|
+		D = cb.depth - ca.depth
 		if D
 			return D
 		

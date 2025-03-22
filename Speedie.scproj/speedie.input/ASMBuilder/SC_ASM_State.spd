@@ -364,29 +364,30 @@ struct ASMState
 		return .ReadOrWriteSub(dest, exp, ptr, varadd, index)
 
 
-	function PrmCollectC (|message| prms, |SCFunction| fn, |&uint| Addrs, |uint64|)
+	function PrmCollectC (|message| prms,  |SCFunction| fn,  |&uint| Addrs,  |uint64|)
 		// we need to do ints last, and also collect these backwards.
 		opt norefcounts
-		|| sh = 0
+		if fn ~= "JB_Str_WhiteSpace"
+		|int64| sh = 64
 		|| fc = 0
 		|| ic = 0
 		|| n = fn.args.Length
 		for Ints in 2
-			|| p = prms.last
+			|| p = prms.first
 			while p
 				|| ty = p.ASMDecl
-				if ty.SpecialRegs|int| != Ints // should get .specialregs from message somehow?
-					|| v = .µReffed(p!).reg
+				if ty.SpecialRegs|int| != Ints		// should get .SpecialRegs from message somehow?
+					|int64| v = .µReffed(p!).reg
+					sh -= 5
 					rz  |=  v << sh
-					sh += 5
 					ic += ints
 					fc += !ints
 					if .Last isa asm.GRAB
 						addrs[] |= v.Log2
-				p--
+				p++
 		
+		rz >>= 64-((n*5)+12)
 		if fc>8 or ic>8			// hmmm
-		rz <<= 12
 		rz |= fn.ReturnType.SpecialRegs << 11
 		if fc
 			rz |= (8-fc) << 6
@@ -403,7 +404,7 @@ struct ASMState
 		|| sh = 7
 		|| p = prms.first
 		for FnArg in fn.args
-		// we'd like to collect bits on the SIMD/normal register file
+		// We'd like to collect bits on the SIMD/normal register file
 		// for nativisation. 6 - bits per thing. Still counts as a 64-bit number
 		// FuncPrmBits() also would need upgrading.
 			|| v = .µReffed(p!).reg
@@ -723,7 +724,7 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	  else
 		|| f = exp.first!
 		TableID = .µ(f).Reg
-		|| dcl = f.asmdecl
+		|| dcl = f.ASMDecl
 		// need to execute exp.first
 /		fn = dcl.Type.FuncProto			#expect (exp)
 
@@ -754,12 +755,12 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	if RegAddrs
 		.RegsBitClear(exp, RegAddrs, fn)
 	
-	fat.µrefcount += fn isnt stateless
+	fat.µRefCount += fn isnt stateless
 	(dest is Exit) = fn is Killer
 	return fat * dest
 
 
-// Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:4
+// Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:4, 8:0
 // There are only 4 above 6!, only 14 above 5, 75 above 4
 // almost all lib functions have 4 or less. 5 is for proj funcs.
 	

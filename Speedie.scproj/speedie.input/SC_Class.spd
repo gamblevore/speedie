@@ -74,7 +74,7 @@ linkage
 
 
 |byte|						IsRole
-|SCNodetype| 				BaseType
+|SCNodeType| 				BaseType
 
 
 constructor (|Message| node, |bool| HasPtrs, |scmodule| m)

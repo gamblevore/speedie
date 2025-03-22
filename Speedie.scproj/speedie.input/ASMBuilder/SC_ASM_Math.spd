@@ -75,22 +75,21 @@ extend ASMState
 		return .Equals(dest.negate, l, r, exp)
 
 
-	function KKompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |uint| Mode, |asmreg|)
+	function KompareIntK (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |uint| Mode, |asmreg|)
 		require mode <= 1
 		|| swapped = l is ConstOutput
-			swap (l) (r)
-			//  1 >  a   --> a <  1  -->  a <= 0  // subtract 1
-			//  1 <= a  -->  a >= 1  -->  a > 0   // same
-			mode ^= 1
-		|| f = r.fat
-			|| k = f.const
-			if k.fits(9, true)	
-				.NopConst(R)
-				k = k|uint64|.trim(9)
-				|| fat = exp.JMPK(l, k, 0) 
-				if swapped
-					fat._op = asm.jmpc
-				return fat * dest
+			swap (l) (r)					// 10 > x   -->  x <  10  -->  x <= 9
+			mode ^= 1						// 10 <= x  -->  x >= 10  -->  x >  9
+		|| f = r.fat$
+
+		|| k = f.const - swapped
+		require k.fits(9, true)	
+		.NopConst(R)
+		k = k|uint64|.trim(9)
+		|| J = exp.JMPK(l, k, 0) 
+		if mode&1
+			J._op = asm.jmpc
+		return J * dest
 
 
 	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
@@ -103,8 +102,8 @@ extend ASMState
 		if Dest isnt CondAnswer
 			return exp.CMPI(dest, L, R, mode) * dest
 
-		if (mode <= 1 or (l.bitcount >= 32 and r.bitcount >= 32)) and (l is realconst or r is realconst) // only one is a const
-			|| kk = .KKompareInt(dest, l, r, exp, mode&~4)
+		if (mode <= 1 or (l.bitcount >= 32 and r.bitcount >= 32)) and (l is RealConst or r is RealConst) // only one is a const
+			|| kk = .KompareIntK(dest, l, r, exp, mode&~4)
 				return kk
 		return exp.JMPI(L, R, mode, 0) * dest
 

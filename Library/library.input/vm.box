@@ -479,7 +479,7 @@ POS 6
 		___
 /**/ JMPC  (JCmpK)
 		__
-		Code = JumpK(r, Op, Code)
+		Code = JumpC(r, Op, Code)
 		___
 /**/ JBOR  (Bra)
 		__

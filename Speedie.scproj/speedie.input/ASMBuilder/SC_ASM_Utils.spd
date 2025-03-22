@@ -12,7 +12,7 @@ function scfunction.GenASM
 	opt norefcounts
 	|SC_Hoister| H 
 	asmtype.ArgSub(ASMState.Sh, .SourceArg!, H)
-	h.Unhoist
+	ASMState.Sh.Unhoist(h)
 
 
 function message.OperatorMul (|asm| op, |&fatasm|)

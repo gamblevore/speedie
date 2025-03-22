@@ -285,9 +285,9 @@ function Incr (|int| x, |int| y, |int|)
 
 
 function ForeignFuncs (|string?| x, |string?| y, |string|)
-	|| x3 = x.Length
-	|| x4 = x._Addr
-	|| x5 = x._white(12345, 98765, true)
+	|| x3 = x._white(12345, 98765, true)
+	|| x4 = x.Length
+	|| x5 = x._Addr
 	|| x6 = x! + y!
 	|| x7 = string.char(0xb16b00b5)
 	|| x8 = Message()

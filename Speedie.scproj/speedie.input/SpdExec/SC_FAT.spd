@@ -299,9 +299,27 @@ struct FatASM
 		return (ASM.encoders[.op]!)(self, where, after)
 
 
-	function ArgsRender (|faststring| fs)
+	function PrmCollectCounterPart (|FastString| fs)
+		opt norefcounts
+		|| prms = .msg
+		// This doesn't take floats/simds into account.
+		// code to do that needs to follow asmstate.PrmCollectC, and be much more complex.
+		// good enough for now.
+		|| fn = prms.Obj as SCFunction 		#require
+		if fn ~= "JB_Str_WhiteSpace"
 		
+		|| regs = (.r2|uint64| ||| (.r3|uint64| << 32)) >> 12
+		fs <~ "("
 		
+		|| n = fn.Args.Length
+		while n
+			fs <~ 'r'
+			fs <~ (regs>>((--n)*5))&31
+			if n > 0
+				fs <~ ", "
+		fs <~ ")"
+	
+	
 	function Renda (|FastString| fs, |bool| Simpler=false)
 		opt norefcounts
 		if (!.exists)  and  (.msg.func == @sheb)
@@ -329,7 +347,8 @@ struct FatASM
 				GotAny = ", "
 				|int| v = .r[i]
 				if .IsFunc and (i == 2 or 3)
-					.ArgsRender(fs)
+					if i == 2
+						.PrmCollectCounterPart(fs)
 				  else
 					if f[i].isreg
 						fs <~ ('r' + v|uint| >> 30)|byte|

@@ -245,7 +245,7 @@ class SCImport
 			opt norefcounts
 			|| lib = .Proj.IsSTDLib - b.Proj.IsSTDLib
 				return lib
-			return self|string| < b|string|
+			return self < b
 		
 		function FindImport (|string| s, |scimport|)
 			opt norefcounts

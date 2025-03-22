@@ -355,7 +355,12 @@ AlwaysInline ASM* JumpNeq (VMRegister* r, ASM Op, ASM* Code) {
 
 AlwaysInline ASM* JumpK (VMRegister* r, ASM Op, ASM* Code) {
 	auto K = JCmpK_Ki;
-	return Code + JCmpK_Jmpi * (JCmpK_Negu == i1 > K);
+	return Code + JCmpK_Jmpi * (i1 > K);
+}
+
+AlwaysInline ASM* JumpC (VMRegister* r, ASM Op, ASM* Code) {
+	auto K = JCmpK_Ki;
+	return Code + JCmpK_Jmpi * (i1 <= K);
 }
 
 

@@ -343,6 +343,7 @@ function Num (fn_asm)
 	
 	if d.NilReg is hoisted
 		Dest.reg = d.nilreg&31
+		dest.fatindex = D.fatconstindex
 		return Dest
 	
 	return .NumToReg(exp, d.ExportPosition, dest, T)

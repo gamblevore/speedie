@@ -40,11 +40,15 @@ struct SC_Hoister
 				return
 		.WriteConst(prop, decl)
 	
-	function Unhoist (|asmreg|)
+	function asmstate.Unhoist (|sc_hoister| H, |asmreg|)
 		opt NoRefCounts
-		for d in .Items
+		for d in h.Items
 			loop d
 			d.nilreg = 0
+			|| f = d.fat
+				if f.isunused
+					.nop(f)
+					
 
 	function HoistNormal (|message| exp)
 		.spare = –count .items
