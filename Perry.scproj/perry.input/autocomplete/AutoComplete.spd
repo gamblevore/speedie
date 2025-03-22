@@ -52,8 +52,8 @@ function CallFromSorter (SorterComparer of message)
 	if !aa and !bb
 		return .Position - b.position
 	if !aa or !bb
-		return (aa!=nil)|int|
-	return (bb.name < aa.name)|int|
+		return (aa!=nil)
+	return (bb.name < aa.name)
 
 
 function string.LowerDiffAt (|string| A, |ind|)

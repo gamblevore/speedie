@@ -118,7 +118,7 @@ function FuncListSorter (SorterComparer of message)
 	|| aa = self[]
 	|| bb = b[]
 	if (!aa or !bb)
-		return (aa < bb)|int|
+		return (aa < bb)
 	if aa.func != bb.func
 		return bb.func|int| - aa.func|int|
 	
@@ -129,7 +129,7 @@ function FuncListSorter (SorterComparer of message)
 	|| af = aa[]
 	|| bf = bb[]
 	if (!af or !bf)
-		return (af < bf)|int|
+		return (af < bf)
 	|| an = af.name
 	|| bn = bf.name
 	|| cmp = an.SyntaxCompare(bn, true)
