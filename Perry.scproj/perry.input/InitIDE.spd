@@ -23,7 +23,6 @@ extend PerryIDE
 		.ProjectTabs		= ButtonView(.Toolbar,	ClickedTabs,    	 PressingTabs, 	ReturnProjectPath,  RightClickedTabs) 
 		.StartScreen		= ButtonView(.Toolbar,	&StartupWindow.open, ClickedOpenRecent, ReturnRecents)
 		.DebugSwitcher		= ButtonView(.Toolbar,	DebugSwitch)
-//		.RecentButton		= buttonview(.Toolbar,	ClickedOpenRecent, ClickedOpenRecent,  ReturnRecents)
 		.Progress			= ProgressBar(.Toolbar,	ClickedCancel)
 		.GoPrev				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
 		.GoNext				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
@@ -57,7 +56,7 @@ extend PerryIDE
 		.ViewErrors			= ButtonView(.ViewButtons,		ClickedAView)
 		.viewlog			= ButtonView(.ViewButtons,		clickedaview)
 		.Views				= [.filelist,  .errorlist,  .debugger,  .searcharea,  .CommsLogList]
-		.FileSep			= StretchControl.horz(self, 175~right, 110, 110)
+		.FileSep			= StretchControl.horz(self, 175~right, 110, 210)
 		.ProductSep			= StretchControl.vert(self, 0~right, 0, 100)
 		.PopupDisplay		= textview(self)
 		.DebugArgsList		= textview(self)
