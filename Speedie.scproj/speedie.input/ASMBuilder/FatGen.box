@@ -892,3 +892,44 @@ function message.FCLM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int|
 	rz.numinput(4) = D
 }
 
+
+function message.VGET (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Ind, |&fatasm|) {
+	visible
+	rz = self * asm.VGET
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Ind
+}
+
+
+function message.VSET (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Ind, |&fatasm|) {
+	visible
+	rz = self * asm.VSET
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Ind
+}
+
+
+function message.VBLD (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| r5, |&fatasm|) {
+	visible
+	rz = self * asm.VBLD
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = r5
+}
+
+
+function message.VSWZ (|asmreg| r1, |asmreg| r2, |int| Fields, |int| Clear, |&fatasm|) {
+	visible
+	rz = self * asm.VSWZ
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = Fields
+	rz.numinput(3) = Clear
+}
+

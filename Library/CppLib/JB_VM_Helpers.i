@@ -139,6 +139,30 @@ AlwaysInline u64 bitstats(u64 R2, u64 R3, u64 Mode) { // rotate
 }
 
 
+///
+
+
+AlwaysInline vec4 VBuild (VMRegister* r, ASM Op) {
+	return vec4{f2, f3, f4, f5};
+}
+
+
+AlwaysInline vec4 VSwiz (VMRegister* r, ASM Op) {
+	auto Input = v2;
+	vec4 Output;
+	auto F = VecSwizzle_Fieldsu;
+	auto C = VecSwizzle_Clearu;
+	Output[0] = Input[(F>>0)&3]*((C>>0)&1);
+	Output[1] = Input[(F>>2)&3]*((C>>1)&1);
+	Output[2] = Input[(F>>4)&3]*((C>>2)&1);
+	Output[3] = Input[(F>>6)&3]*((C>>3)&1);
+	return Output;
+}
+
+///
+
+
+
 #define incr(o)					JB_Incr((JB_Object*)o)
 #define freeifdead(o)			JB_FreeIfDead((JB_Object*)o)
 #define decr(o)					JB_Decr((JB_Object*)o)

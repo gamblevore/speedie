@@ -247,6 +247,28 @@ forms
 		Mode	3 // only 6 actual cases. Only list possible entries.
 
 
+	VecGet
+		r1		R
+		r2		r
+		r3		r
+		Ind		2
+	
+	
+	VecBuild
+		r1		R
+		r2		r
+		r3		r
+		r4		r
+		r5		4
+
+
+	VecSwizzle
+		r1		R
+		r2		r
+		Fields	8
+		Clear	4
+		
+	
 // this file:
 // 1) builds the c++ codes, and the jump-table, and the ASM accessor functions
 // 2) builds the instruction-info speedie uses exec can just include this file too.
@@ -629,3 +651,21 @@ POS 6
 			d1 = (std_min(std_max(d2,d3),d4))
 		else
 			d1 = (std_min(std_max(d2,d3),d4))
+
+
+/**/ VGET (VecGet)
+	i1 = iv2[n3+u4]
+
+
+/**/ VSET (VecGet)
+	iv1[n3+u4] = i2
+
+
+/**/ VBLD (VecBuild)
+	v1 = VBuild(r, Op)
+
+
+/**/ VSWZ (VecSwizzle)
+	v1 = VSwiz(r, Op)
+
+

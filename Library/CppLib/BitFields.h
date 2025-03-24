@@ -15,6 +15,7 @@
 #define n2      ((Op<<13)>>27)
 #define n3      ((Op<<18)>>27)
 #define n4      ((Op<<23)>>27)
+#define n5      ((Op<<28)>>27) // loses 1 bit!
 #define i1      (r[n1].Int)
 #define i2      (r[n2].Int)
 #define i3      (r[n3].Int)
@@ -31,6 +32,7 @@
 #define f2      (r[n2].Float)
 #define f3      (r[n3].Float)
 #define f4      (r[n4].Float)
+#define f5      (r[n5].Float)
 #define d1      (r[n1].Double)
 #define d2      (r[n2].Double)
 #define d3      (r[n3].Double)
@@ -39,6 +41,14 @@
 #define o2      (r[n2].Obj)
 #define o3      (r[n3].Obj)
 #define o4      (r[n4].Obj)
+#define v1      (r[n1].Vec)
+#define v2      (r[n2].Vec)
+#define v3      (r[n3].Vec)
+#define v4      (r[n4].Vec)
+#define iv1     (r[n1].Ivec)
+#define iv2     (r[n2].Ivec)
+#define iv3     (r[n3].Ivec)
+#define iv4     (r[n4].Ivec)
 
 #define std_max std::max
 #define std_min std::min

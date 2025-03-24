@@ -193,8 +193,11 @@ struct FatASM
 		.InputRegs |= 1<<a
 		if i
 			|| src = i.fat // we refcount dests too. shouldn't!
-			.InputFats |= 1<<a
-			src.µRefCount++
+			if src != self
+				.InputFats |= 1<<a
+				src.µRefCount++
+			  else
+				debugger // what?
 	
 	
 	function Dest (|uint| a, |asmreg| info)
@@ -301,13 +304,10 @@ struct FatASM
 
 	function PrmCollectCounterPart (|FastString| fs)
 		opt norefcounts
-		|| prms = .msg
 		// This doesn't take floats/simds into account.
 		// code to do that needs to follow asmstate.PrmCollectC, and be much more complex.
 		// good enough for now.
-		|| fn = prms.Obj as SCFunction 		#require
-		if fn ~= "JB_Str_WhiteSpace"
-		
+		|| fn = .msg.Obj as SCFunction 		#require		
 		|| regs = (.r2|uint64| ||| (.r3|uint64| << 32)) >> 12
 		fs <~ "("
 		
@@ -349,6 +349,8 @@ struct FatASM
 				if .IsFunc and (i == 2 or 3)
 					if i == 2
 						.PrmCollectCounterPart(fs)
+					  else
+						fs.Length-=2
 				  else
 					if f[i].isreg
 						fs <~ ('r' + v|uint| >> 30)|byte|

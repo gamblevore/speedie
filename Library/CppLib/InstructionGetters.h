@@ -524,3 +524,42 @@
 #define   VecMix_Lu       (((uint)((Op)<<31))>>31)
 #define   VecMix_Lu_(x)   (((uint)((x)<<31))>>31)
 
+
+#define   VecGet_Indi       ((( int)((Op)<<23))>>30)
+#define   VecGet_Indi_(x)   ((( int)((x)<<23))>>30)
+
+#define   VecGet_Indu       (((uint)((Op)<<23))>>30)
+#define   VecGet_Indu_(x)   (((uint)((x)<<23))>>30)
+
+#define   VecGet_Li       ((( int)((Op)<<25))>>25)
+#define   VecGet_Li_(x)   ((( int)((x)<<25))>>25)
+
+#define   VecGet_Lu       (((uint)((Op)<<25))>>25)
+#define   VecGet_Lu_(x)   (((uint)((x)<<25))>>25)
+
+
+#define   VecBuild_r5i       ((( int)((Op)<<28))>>28)
+#define   VecBuild_r5i_(x)   ((( int)((x)<<28))>>28)
+
+#define   VecBuild_r5u       (((uint)((Op)<<28))>>28)
+#define   VecBuild_r5u_(x)   (((uint)((x)<<28))>>28)
+
+
+#define   VecSwizzle_Fieldsi       ((( int)((Op)<<18))>>24)
+#define   VecSwizzle_Fieldsi_(x)   ((( int)((x)<<18))>>24)
+
+#define   VecSwizzle_Fieldsu       (((uint)((Op)<<18))>>24)
+#define   VecSwizzle_Fieldsu_(x)   (((uint)((x)<<18))>>24)
+
+#define   VecSwizzle_Cleari       ((( int)((Op)<<26))>>28)
+#define   VecSwizzle_Cleari_(x)   ((( int)((x)<<26))>>28)
+
+#define   VecSwizzle_Clearu       (((uint)((Op)<<26))>>28)
+#define   VecSwizzle_Clearu_(x)   (((uint)((x)<<26))>>28)
+
+#define   VecSwizzle_Li       ((( int)((Op)<<30))>>30)
+#define   VecSwizzle_Li_(x)   ((( int)((x)<<30))>>30)
+
+#define   VecSwizzle_Lu       (((uint)((Op)<<30))>>30)
+#define   VecSwizzle_Lu_(x)   (((uint)((x)<<30))>>30)
+

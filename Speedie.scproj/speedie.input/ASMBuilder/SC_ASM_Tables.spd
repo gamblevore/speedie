@@ -128,12 +128,13 @@ function Return (fn_asm)
 		if d0.reg != V.reg // problem
 	|| D1 = .decr
 	|| D2 = .decr
-	|| K = (.Const(V, 8, true), -1)(!D0)
-	|| fat = exp.RET(V, D1, D2, (D0!=nil)|int|, 0)
-	fat.µRefCount = 1
-	if K
-		fat.r[4] = K
-		fat.r[0] = 0
+	|| K = -1
+	if !D0
+		K = .Const(V, 8, true)
+		if K
+			V = asmreg()
+	|| fat = exp.RET(V, D1, D2, (D0!=nil)|int|, K)
+	fat.µRefCount++
 	
 	return fat * asmreg.Exit
 	
@@ -211,11 +212,11 @@ function Decl (fn_asm)
 	if options.Optimise >= 4
 		return declsub(self, exp)
 		
-	rz = declsub(self, exp)
+	rz = DeclSub(self, exp)
 	|| fat = rz.fat
 		fat.µRefCount++		// Keep vars viewable for debugging
-								// Actually its not an issue for even release builds!
-								// just don't add vars you don't need!
+							// Actually its not an issue for even release builds!
+							// just don't add vars you don't need!
 	
 
 
@@ -271,7 +272,7 @@ function ArgSub (|&ASMState| self, |message| exp, |&sc_hoister| H, |AsmReg|)
 				rz = what
 				exit							// for if-branch that get consted, always that just returns.
 	.CloseVars(OV)
-	
+
 
 function Arg (fn_asm)
 	return ArgSub(self, exp, nil)
@@ -283,9 +284,12 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 		dest = .TempTyped(exp, dest)
 	
 	|| f = exp.first!
+	|| d = f.asmdecl
+	if d.TypeInfo.VecCount > 1
+		"unimplemented SIMD"
+		return ASMReg() // for now
 	target debug
-		|| d = f.asmdecl
-		if !d.pointercount and !d.iscarray
+		if !d.PointerCount and !d.IsCarray
 	|| base = .µGetASM(f, asmreg.WithinAccess)				// x = a.b[0]
 	|| sc = exp.Second.first!
 	if base is InlinedAccess
@@ -327,7 +331,7 @@ function Dot (fn_asm)										// a.b
 	if (dest is AddrRequest) or prop.IsCarray
 		pos *= t.ByteCount
 		if prop.iscarray
-			dest.µtype = datatypecode._voidptr
+			dest.µtype = DataTypeCode._voidptr
 		dest = dest.haveaddr
 		return .AddToReg(exp, dest, obj as ASMReg.NoScale, pos)
 	
@@ -436,14 +440,6 @@ function BoolNot (fn_asm)							// !a
 	return .Exists(dest, src, exp)
 	
 
-function BitNot (fn_asm)							// ~a
-	return .DoMathSub(exp, dest, scoperator.bnot.asm!)
-
-
-function Negative (fn_asm)							// -a
-	return .DoMathSub(exp, dest, scoperator.Negative.asm!)
-
-
 ///   ///
 
 function IncrSlowOnAddr (|&ASMState| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |ASMReg|)	
@@ -516,16 +512,18 @@ function ARel (fn_asm)
 
 function BRel (fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 	opt	NoRefCounts
-	|| n = exp.name[]
-	|| F = exp.first!
-	if n == '&'
-		return AddressOf(self, f, dest)
+	|| S = exp.name
+	|| n = S[]
 	if n == '~'
-		return BitNot(self, f, dest)
+		return .DoMathSub(exp, dest, scoperator.bnot.asm!)
+	if n == '-' and S == 1								// -a
+		return .DoMathSub(exp, dest, scoperator.Negative.asm!)
+
+	|| F = exp.first!
 	if n == '!'
 		return BoolNot(self, F, dest)
-	if exp.name == 1								// -a
-		return Negative(Self, f, dest)
+	if n == '&'
+		return AddressOf(self, f, dest)
 	
 	|| IsPlusPlus = n == '+'						// ++a, --a
 	return Incrementatulatorifier(self, F, dest, IsPlusPlus|int|)
@@ -603,7 +601,7 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	|| mr = ASMReg()
 	|| First = exp.first!
 	if First.islast
-		ml = .µGetASM(exp, dest)
+		ml = .µGetASM(first, dest)
 	  else
 		|| Closer = .OpenVars
 		|| discardmode = dest & AsmReg.Discard
@@ -746,7 +744,7 @@ function Message.TypeCastDoesNothing (|bool|)
 	opt norefcounts
 	|| Output = .ASMDecl.typeonly
 	|| Input = .first!.ASMDecl.typeonly
-	require  Output.Count    == Input.Count				// vectors
+	require  Output.VecCount == Input.VecCount				// vectors
 	require  Output.IsFloat  == Input.isfloat			// floatness
 	|| BoolOut = Output is bool
 	require (BoolOut) == (Input is bool)				// boolness
@@ -758,21 +756,21 @@ function Message.TypeCastDoesNothing (|bool|)
 
 
 
-function fatasm.FuncPrmBits (|uint64|)
-	// i don't really get this.
-	// its also only usd for tail, which is unused
-	// is this out of date code?
-	rz = .r2
-	|| r3 = .r3|uint64| << 32
-	rz |= r3
-	rz >>= 7	
-	require !(rz>>31)
-	for i in 6
-		|| p = (rz >> (5*i)) & 31
-		if p > i
-			rz |= (1|uint64|<<31)
-			exit
-	// ffff(r4, r3, r2, r1)
+//function fatasm.FuncPrmBits (|uint64|)
+//	// i don't really get this.
+//	// its also only usd for tail, which is unused
+//	// is this out of date code?
+//	rz = .r2
+//	|| r3 = .r3|uint64| << 32
+//	rz |= r3
+//	rz >>= 7	
+//	require !(rz>>31)
+//	for i in 6
+//		|| p = (rz >> (5*i)) & 31
+//		if p > i
+//			rz |= (1|uint64|<<31)
+//			exit
+//	// ffff(r4, r3, r2, r1)
 
 
 function SCDecl.ThgASM (|asmreg|)

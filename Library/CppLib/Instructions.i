@@ -288,5 +288,13 @@
 	else 
 	d1 = (std_min(std_max(d2, d3), d4))
 ;
+ı VGET: _
+	i1 = iv2[n3 + u4];
+ı VSET: _
+	iv1[n3 + u4] = i2;
+ı VBLD: _
+	v1 = VBuild(r, Op);
+ı VSWZ: _
+	v1 = VSwiz(r, Op);
 ı 
 

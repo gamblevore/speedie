@@ -37,7 +37,10 @@ target debug
 	function scdecl.ASMSanity 
 		ifn .iscarray or .pointercount or .isobject or .isbarestruct
 			|| size = .type.Size
-			if size != .typeonly.bytecount // sigh. what?
+			|| T = .TypeOnly
+			if T is Vec3 or ivec3
+				size = 12
+			if size != T.bytecount // sigh. what?
 				#!"Should we have set the dtype when the decl was created? or at least verified in the nil-checker?"
 				#!"We could change it if it is only 112."
 				debugger

@@ -502,7 +502,7 @@ class SCDecl (SCNamed) {
 		require (!.IsCArray) and (!.PointerCount)
 		if (.Type.NumericCount == 1)
 			return true
-		if scnode.ConstantsLoadingOverride and (self is const) and .typeinfo.count == 1 
+		if scnode.ConstantsLoadingOverride and (self is const) and .typeinfo.VecCount == 1 
 			return true
 
 	function IsNearlyNormalNumber (|bool|)

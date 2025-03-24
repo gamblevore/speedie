@@ -400,9 +400,9 @@ extend ASMState
 
 	function Minus (fn_opasm)					// x = -b
 		// not the same as negative, which is an fn_asm... that means it works on the exp
-		// where as fn_opasms work on the op.
-		(l is alternate)
-		return .plus(dest, l, r, exp)
+		if r != asmreg()
+		(r is alternate)
+		return .plus(dest, r, l, exp)
 
 
 	function FloatMul (fn_opasm)

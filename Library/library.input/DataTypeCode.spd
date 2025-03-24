@@ -119,7 +119,7 @@ datatype DataTypeCode (uint16)
 	function ASMUseIntRegs (|bool|)
 		if .IsPointer // pointers, bascially, are ints
 			return true
-		if .isint and .count <= 1
+		if .isint and .VecCount <= 1
 			return true
 
 	
@@ -134,7 +134,7 @@ datatype DataTypeCode (uint16)
 	
 	function NumericCount (|int|)
 		if (self & numeric)
-			return .count
+			return .VecCount
 	
 	function SetSigned (|bool| b, |DataTypeCode|)
 		if b
@@ -149,12 +149,12 @@ datatype DataTypeCode (uint16)
 		return (self >> 4) & 3
 
 	function ByteCount (|int|)
-		return .Count << ._Shift
+		return .VecCount << ._Shift
 
 	function BitCount (|int|)
-		return (.Count << ._Shift) << 3
+		return (.VecCount << ._Shift) << 3
 
-	function Count (|int|)
+	function VecCount (|int|)
 		return (self & 0x03) + 1
 	
 	function SameBasicType (|DataTypeCode| b, |bool|)

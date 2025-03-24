@@ -208,34 +208,36 @@ struct ASMState
 			|| f = r.fat
 				.Nop(f)
 	
-	function Nop (|FATASM| Fat)
+	function Nop (|FATASM| Fat, |int| Depth=0)
+		if depth > 5
 		|| C = .curr - 1
 		if fat == C
 			._curr = C // nice
-		return .softnop(fat)
+		return .SoftNop(fat, depth+1)
 		
-	function SoftNop (|FATASM| Fat)
+	function SoftNop (|FATASM| Fat, |int| Depth=0)
+		if depth > 5
 		for f.fatinputs in fat
-			.decr(f)
-
+			.decr(f, depth+1)
 		fat.setop = asm.noop
+	
+	function Decr (|?&fatasm| f, |int| Depth=0)
+		if depth > 5
+		if f and --f.µRefCount <= 0
+			//f.debugprint
+			//debugger 
+			.Nop(f, depth+1)
 	
 	function SofterNop (|FATASM| Fat)
 		fat.setop = asm.noop
 	
-	function AskSoftNop (|fatasm| f)
-		if f.µRefCount <= 0
-			.softnop(f)
+//	function AskSoftNop (|fatasm| f)
+//		if f.µRefCount <= 0
+//			.softnop(f)
 	
 	function AskNop (|fatasm| f)
 		if f.µRefCount <= 0
 			.nop(f)
-	
-	function Decr (|?&fatasm| f)
-		if f and --f.µRefCount <= 0
-			//f.debugprint
-			//debugger 
-			.Nop(f)
 
 	function Rewind (|fatasm| start)
 		.NopRange(start, .curr)
@@ -277,13 +279,14 @@ struct ASMState
 		|| f = rz.fat
 			f.µRefCount++
 
+
 	function µGetASM (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		opt norefcounts
 		cpp_part GetASM 
 		target debug
-			dest.tmpcheck
+			dest.TmpCheck
 			debugat 0 // keep this
-			if ++.stacksize > 50 // ugh
+			if ++.stacksize > 20 // ugh
 				
 		  else
 			opt inline
@@ -367,7 +370,6 @@ struct ASMState
 	function PrmCollectC (|message| prms,  |SCFunction| fn,  |&uint| Addrs,  |uint64|)
 		// we need to do ints last, and also collect these backwards.
 		opt norefcounts
-		if fn ~= "JB_Str_WhiteSpace"
 		|int64| sh = 64
 		|| fc = 0
 		|| ic = 0
