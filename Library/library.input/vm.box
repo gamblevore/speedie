@@ -261,12 +261,16 @@ forms
 		r4		r
 		r5		4
 
-
 	VecSwizzle
 		r1		R
 		r2		r
 		Fields	8
 		Clear	4
+		
+	VecConst
+		r1		R
+		K1		l
+		K2		x
 		
 	
 // this file:
@@ -600,9 +604,8 @@ POS 6
 /**/ CNTD  (CNTC)
 		IncrementAddr(r, Op, 0)
 
-/**/ MEMU  (MemUtil)
-		#! copy/fill/endian/xor
-		MemStuff((u32*)u1, (u32*)u2, n3, L3)
+/**/ MEMZ  (ConstGlobal)	// zero
+		memzero((void*)u1, L1)
 
 
 #!						(((((Float)))))

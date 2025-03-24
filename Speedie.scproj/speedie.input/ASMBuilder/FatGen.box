@@ -810,13 +810,11 @@ function message.CNTD (|asmreg| r1, |asmreg| r2, |int| offset, |int| cnst, |int|
 }
 
 
-function message.MEMU (|asmreg| r1, |asmreg| r2, |int| Op, |int| N, |&fatasm|) {
+function message.MEMZ (|asmreg| r1, |int| Value, |&fatasm|) {
 	visible
-	rz = self * asm.MEMU
+	rz = self * asm.MEMZ
 	rz.dest(0, r1)
-	rz.reginput(1) = r2
-	rz.numinput(2) = Op
-	rz.numinput(3) = N
+	rz.numinput(1) = Value
 }
 
 

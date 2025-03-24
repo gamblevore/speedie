@@ -100,7 +100,7 @@
 &&WR16,
 &&CNTC,
 &&CNTD,
-&&MEMU,
+&&MEMZ,
 &&FADD,
 &&FADK,
 &&FMUL,

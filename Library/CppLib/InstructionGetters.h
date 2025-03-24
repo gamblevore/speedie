@@ -563,3 +563,10 @@
 #define   VecSwizzle_Lu       (((uint)((Op)<<30))>>30)
 #define   VecSwizzle_Lu_(x)   (((uint)((x)<<30))>>30)
 
+
+#define   VecConst_K1i       ((( int)((Op)<<13))>>13)
+#define   VecConst_K1i_(x)   ((( int)((x)<<13))>>13)
+
+#define   VecConst_K1u       (((uint)((Op)<<13))>>13)
+#define   VecConst_K1u_(x)   (((uint)((x)<<13))>>13)
+

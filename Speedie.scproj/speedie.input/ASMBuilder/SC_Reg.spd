@@ -16,6 +16,7 @@ datatype ASMReg (uint64)
 		Negate      // dont put anything before we test for (x << 16)
 		Param
 		FromExistingVar
+		FromZeroMemory
 		AlreadyNegated
 		Alternate
 		Discard

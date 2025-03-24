@@ -308,15 +308,29 @@ struct ASMState
 		return ss
 	
 
-	function ReadOrWrite (|ASMReg| dest, |message| m, |asmreg| base, |asmreg| varadd, |int| index=0, |asmreg|)
-		return .ReadOrWriteSub(dest, m, base, varadd, index) * dest
+	function ReadOrWrite (|ASMReg| dest, |message| m, |asmreg| base, |asmreg| VarAdd, |scdecl| Ty,  |int| index=0, |asmreg|)
+		if dest is FromZeroMemory
+			(dest is realconst) // make compiler happy
+		return .ReadOrWriteSub(dest, m, base, VarAdd, ty, index) * dest
 
 
-	function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |int| Index, |&fatasm|)
+	function ZeroMemory (|int| Index, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl| D, |&fatasm|)
+		check (d and !index and !varadd.reg) (exp)
+		if d
+			index = d.SizeOfQuery
+			check (index < 512K and index > 0) (exp, "Can't zero that much memory")
+		return exp.MEMZ(base, index)
+	
+	
+	function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl| D,  |int| Index, |&fatasm|)
 		if dest is containsaddr
 			#!wait?? this is meant to be an addrrequest? not a response.
 			debugger
-
+		
+		if dest is FromZeroMemory
+			return .ZeroMemory(index, exp, base, varadd, D)
+		
+		
 		(dest asnt= asmreg.AddrRequest)
 		|| T = dest.µtype
 		|| bytes = t.ByteCount.log2
@@ -358,13 +372,13 @@ struct ASMState
 	function Read (|asmreg| dest, |message| exp,  |asmreg| ptr,  |asmreg| varadd,  |int| index=0,  |&fatasm|)
 		opt inline
 		(dest isnt set)
-		return .ReadOrWriteSub(dest, exp, ptr, varadd, index)
+		return .ReadOrWriteSub(dest, exp, ptr, varadd, nil, index)
 		
 
 	function Write (|asmreg| dest, |message| exp,  |asmreg| ptr,  |asmreg| varadd,  |int| index=0,  |&fatasm|)
 		opt inline
 		(dest is set)
-		return .ReadOrWriteSub(dest, exp, ptr, varadd, index)
+		return .ReadOrWriteSub(dest, exp, ptr, varadd, nil, index)
 
 
 	function PrmCollectC (|message| prms,  |SCFunction| fn,  |&uint| Addrs,  |uint64|)

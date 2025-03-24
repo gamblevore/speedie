@@ -226,6 +226,7 @@ AlwaysInline void SetRefApart(VMRegister* r, ASM Op) {
 #define mem1(t)				((t*)u2)[u3+Read_Offsetu]
 #define mem2(t)				(u2 = (u64)((t*)u2 - Read_movei))
 
+
 AlwaysInline JB_Object* alloc(void* o) {
 	// we need a class table, and look it up from there.
 	// we don't have dynamicly created classes anyhow...
@@ -408,14 +409,15 @@ void bswap64 (u64* Start, uint Count) {
 
 void MemStuff(u32* A, u32* B, u32 Operation, u32 L) {
 	// operation = xor/endian/fill/copy
+	L++;
 	if (Operation == 0 or 1)
-		std::fill(A, A+((1+L)<<2), -Operation);
+		std::fill(A, A+L, -Operation);
 	  else if (Operation == 2)
-		memcpy(A, B, 1+L);
+		memcpy(A, B, L);
 	  else if (Operation == 3)
-		bswap32(A, 1+L);
+		bswap32(A, L);
 	  else if (Operation == 4)
-		bswap64((u64*)A, 1+L);
+		bswap64((u64*)A, L);
 }
 
 

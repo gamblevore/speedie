@@ -245,10 +245,8 @@
 	IncrementAddr(r, Op, 1);
 ı CNTD: _
 	IncrementAddr(r, Op, 0);
-ı MEMU: _
-	//  copy/fill/endian/xor
-
-	MemStuff((u32 *) u1, (u32 *) u2, n3, L3);
+ı MEMZ: _
+	memzero((void *) u1, L1);
 ı FADD: _
 	if (Float_Du) 
 	d1 = d2 + d3 - d4
