@@ -22,7 +22,6 @@ extend PerryIDE
 		.BuildButton		= buttonview(.Toolbar,	Clickedcompile)
 		.ProjectTabs		= ButtonView(.Toolbar,	ClickedTabs,    	 PressingTabs, 	ReturnProjectPath,  RightClickedTabs) 
 		.StartScreen		= ButtonView(.Toolbar,	&StartupWindow.open, ClickedOpenRecent, ReturnRecents)
-		.DebugSwitcher		= ButtonView(.Toolbar,	DebugSwitch)
 		.Progress			= ProgressBar(.Toolbar,	ClickedCancel)
 		.GoPrev				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
 		.GoNext				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
@@ -331,7 +330,7 @@ extend PerryIDE
 			self.AddDebugButtons(DebugStepRun,  "\02\02", "Run")
 
 
-		with .variables
+		with .variables // not showing up anymore?
 			is   visible
 			is   UnSearchable
 			isnt DrawsFocus
@@ -478,10 +477,6 @@ extend PerryIDE
 		.FunctionMenu.ExpandOnMouseOver = 1
 		.ProjectTabs.ExpandOnMouseOver = 2
 	
-		with .DebugSwitcher
-			.size = 31~left back 22  by  3~down back 14
-			.id = "switch"
-			
 			
 		with .CompileArea
 			.ID				= "OutBorder"

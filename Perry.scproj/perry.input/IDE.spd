@@ -68,7 +68,6 @@ class PerryIDE (Window)
 	|Buttonview|				GoNext
 	|Buttonview|				GoPrev
 	|Buttonview|				StartScreen
-	|Buttonview|				DebugSwitcher
 	|Buttonview|				BuildButton
 	|Buttonview|				RunButton
 	|Process?| 					Talker
@@ -393,7 +392,6 @@ class PerryIDE (Window)
 			
 		if (hidetop == vistop)
 			.StartScreen.declutter = hidetop
-			.DebugSwitcher.declutter = hidetop
 			.ASMButton.Declutter = Hidetop
 			if HideTop
 				(.DebugArgsList isnt visible)			// better to declutter
@@ -1015,6 +1013,8 @@ function PerryIDE.IDECommand (|bool|)
 		Breakout().RunAsMain(60)
 	  elseif cmd ~= "bubbles"
 		bubbles().RunAsMain(60)
+	  elseif cmd ~= "DebugSwitch"
+		DebugGUI = !DebugGUI
 	  else
 		beep "unrecognised: " + cmd
 

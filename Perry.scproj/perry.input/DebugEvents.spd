@@ -34,11 +34,6 @@ function DebugArgsKeyDown (GUIKeyEvent)
 		return true
 
 
-function DebugSwitch (guiaction)
-	DebugGUI = !DebugGUI
-	return true
-
-
 function DeleteableListKeys (GuiKeyEvent)
 	opt norefcounts
 	require key.IsDelete
