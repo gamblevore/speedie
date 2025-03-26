@@ -101,7 +101,7 @@ function ClickedDebug (GUIAction)
 
 function PressingDebug (GUIAction)
 	opt norefcounts
-	|| db = .ide.DebugArgsList
+	|| db = .ide.DebugArgsText
 	if db.HasAnyFocus
 		db.ClearFocus
 	  else
@@ -154,8 +154,8 @@ function PerryIDE.DebugPath (|message| conf)
 function PerryIDE.StartDebugging (|file!| f)
 	require f.MustExist and StdErr.ok
 
-	.DebugArgsList.InitDebugArgs
-	|| DebugArgs = .DebugArgslist.text.parse		#require
+	.DebugArgsText.InitDebugArgs
+	|| DebugArgs = .DebugArgsText.text.parse		#require
 	|| ArgMsg = DebugArgs["args"]					#require
 	ArgMsg = ArgMsg.Copy
 	for a in ArgMsg
@@ -179,7 +179,7 @@ function PerryIDE.StartDebugging (|file!| f)
 	.DebugActual(f, args)
 
 	if !StdErr.ok
-		.DebugArgsList.FillErrors(StdErr)
+		.DebugArgsText.FillErrors(StdErr)
 		|| err = StdErr.LastError
 			Notifications <~ err
 	app.cwd = old
@@ -251,7 +251,7 @@ function ReturnStack (guilistevent) // show ASM?
 	
 
 function ClickedVariables (GUIListEvent)
-	return ClickedStack(self, row)
+//	return ClickedStack(self, row)
 	
 
 function ReturnVariables (GUIListEvent)

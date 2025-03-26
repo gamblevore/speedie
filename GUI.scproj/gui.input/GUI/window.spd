@@ -57,7 +57,7 @@ class Window (GUIControl)
 		if .CreatedDate < 16
 			.CreatedDate = date.now
 		.InlineEditorPlace.Init(self)
-		.reflow(true, true)
+		.CalculateWindowSize(true, true)
 		if show
 			.show
 
@@ -119,7 +119,7 @@ class Window (GUIControl)
 		if gui.init(scaling)
 			gui.CenterCursor
 			.BlockScale ?= 20
-			.reflow(true, true)
+			.CalculateWindowSize(true, true)
 			if !gui.singleframenest
 				gui.NukeCursor
 				return GUI.run

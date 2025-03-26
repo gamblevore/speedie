@@ -613,12 +613,12 @@ module GUI
 		.acontrolwasresized = false
 		.Touch
 		for w.fast in __modules__.window.all
-			w.reflow(force, true)
+			w.CalculateWindowSize(force, true)
 		for w.fast in notifications.Alerts
-			w.reflow(force, false)
+			w.CalculateWindowSize(force, false)
 
 
-	helper Window.Reflow (|bool| Force, |bool| UsePrev)
+	helper Window.CalculateWindowSize (|bool| Force, |bool| UsePrev)
 		opt norefcounts
 		require ._NeedsResize or force
 		._NeedsResize = false
@@ -630,7 +630,7 @@ module GUI
 		if UsePrev
 			|| b = .prev
 				rect = b.lastrect
-		.reflowdoc(bigrect, rect, bigrect)
+		.CalculateSize(BigRect, rect, BigRect)
 
 	
 	helper CheckTaskAnimations

@@ -8,15 +8,16 @@ extend PerryIDE
 		.CanAskingAboutMissing = true
 		.RecentFiles 		= message()
 		.id					= "IDE"
-		.Debugger			= GUIControl(self)
-		.AppInfo			= TextView(.debugger)
-		.DebugBtns			= guicontrol(.debugger)
-		.Variables			= listview(.debugger, ClickedVariables, ReturnVariables)
-		.Stack				= listview(.debugger, ClickedStack, ReturnStack)
+//		.Debugger			= GUIControl(self) // remove and replace with simply the slider?
+		.Debugger			= StretchControl.vert(self, 200~up, 60, 100)
+		.AppInfo			= TextView(self)
+		.DebugBtns			= guicontrol(self)
+		.Variables			= listview(self, ClickedVariables, ReturnVariables)
+		.Stack				= listview(self, ClickedStack, ReturnStack)
 		.SearchArea			= guicontrol(self) 
 		.ViewButtons		= guicontrol(self) 
 		.RBorder			= guicontrol(self)
-		.CompileArea	    = StretchControl.horz(self, 0~right, 0, 100)
+		.CompileArea	    = guicontrol(self)
 		.Toolbar			= buttonview(self,		ClickedToolBar)
 		.RunButton			= buttonview(.Toolbar,	ClickedDebug,			PressingDebug, nil, PressingDebug)
 		.BuildButton		= buttonview(.Toolbar,	Clickedcompile)
@@ -58,7 +59,7 @@ extend PerryIDE
 		.FileSep			= StretchControl.horz(self, 175~right, 110, 210)
 		.ProductSep			= StretchControl.vert(self, 0~right, 0, 100)
 		.PopupDisplay		= textview(self)
-		.DebugArgsList		= textview(self)
+		.DebugArgsText		= textview(self)
 		.AttachedProgram	= ""
 		
 		.init
@@ -106,7 +107,7 @@ extend PerryIDE
 			.NoDrawClicked  = true
 		
 		
-		with .DebugArgsList
+		with .DebugArgsText
 			isnt visible
 			is editable
 			.size =  the~left+4 for 360  by  15~down back 150
@@ -243,7 +244,7 @@ extend PerryIDE
 			is   editable
 			is   visible
 			isnt drawsfocus
-			.YAdjust = -1
+//			.YAdjust = -1
 			.tooltip		= self.SearchArea.Tooltip			
 			.SingleLine		= TextView.SingleLine
 			.ID				= "find"
@@ -257,7 +258,7 @@ extend PerryIDE
 			is   editable
 			is   visible
 			isnt drawsfocus
-			.YAdjust = -1
+//			.YAdjust = -1
 			.tooltip		= self.SearchArea.Tooltip			
 			.SingleLine		= TextView.SingleLine
 			.ID				= "replace"
@@ -297,14 +298,27 @@ extend PerryIDE
 			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
 
 
+//		with .DebugStretch
+//			.size = the~area
+//			.div.DefaultFraction = 0.25
+//			.ID = "DebugStretch"
+//			.AddLow(self.Stack)
+//			.addhigh(self.AppInfo)
+//			.addhigh(self.DebugBtns)
+//			.AddHigh(self.variables)
+		
 		with .debugger 
+			is enabled
+			.div.DefaultFraction = 0.25
 			.tooltip		= "Debugger area"
 			.takesfocus 	= takesfocusflag.CanFocus
-			.ID				= "DebuggerArea"
+			.ID				= "Debugger area"
 			.size 			= the~width by the~bottom to 15~down
-			isnt drawsfocus
-			isnt visible
 			.gnormal		= self.errorlist.gnormal
+			.AddLow(self.Stack)
+			.addhigh(self.AppInfo)
+			.addhigh(self.DebugBtns)
+			.AddHigh(self.variables)
 
 		
 		with .appinfo
@@ -340,7 +354,7 @@ extend PerryIDE
 			.tooltip		= "The variables in the current function"
 			.UseColorScheme	= true
 			.ID				= "Variables"
-			.size 			= the~width  by  400 to 0~under
+			.size 			= the~width by 0~up to 1~under
 			.AlwaysSendChangeEvent = true
 			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.Solid = LeftBG
@@ -356,11 +370,10 @@ extend PerryIDE
 			.tooltip		= "The function call stack"
 			.UseColorScheme	= true
 			.ID				= "Stack"
-			.size 			= the~width  by  the~bottom to 1~under 
+			.size 			= the~area
 			.AlwaysSendChangeEvent = true
-//			.TakesFocus		= takesfocusflag.On
 			.gnormal		= self.FileList.GNormal.copy
-			.GNormal.Solid = LeftBG
+			.GNormal.Solid = vec4(0.13, 0.125, 0.115, 0.975)
 			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
 			
 			

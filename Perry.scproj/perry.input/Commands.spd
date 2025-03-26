@@ -1,0 +1,56 @@
+
+
+dispatch PerryCommands (|perryide| self, |string| s)
+	+"beep"
+		for 2s: beep
+
+	+"cr_fix"
+		.editme.beep = s.ReplaceAll("\r\n", "\r").ReplaceAll("\r", "\n")
+	
+	+"cr_use"
+		.editme.beep = s.ReplaceAll("\n", "\r\n")
+		
+	+"ascii"
+		app.alert string.ASCII_Chart
+		
+	+"string"
+		|| s2 = s.parse
+		if s2 == @arg
+			s2 = s2.first
+		.editme.beep = s2.name
+
+	+"note"
+		notifications <~ "ascii"
+
+	+"render" // "parse"
+		.editme.beep = s.parse.Render
+		
+	+"tetris"
+		tetriswin().RunAsMain(60)
+	
+	+"breakout"
+		Breakout().RunAsMain(60)
+
+	+"bubbles"
+		bubbles().RunAsMain(60)
+
+	+"DebugSwitch"
+		DebugGUI = !DebugGUI
+
+
+|| LastCommand = "tetris"
+function PerryIDE.IDECommand (|bool|)
+	// this should be a window really!
+	|| cmd = "Enter Command".ask(LastCommand)
+		LastCommand = cmd
+		|| fn = PerryCommands[cmd]					#expect (beep, "unrecognised: " + cmd)
+		(fn[])(self, .editme.SelText)
+
+
+
+function textview.beep (assigns:|string| s)
+	expect (.text != s) (beep)
+	.SelText = s
+
+PerryCommands["parse"] = PerryCommands["render"]
+

@@ -10,12 +10,15 @@ class PerryIDE (Window)
 	|string|					CompileOKString
 	|[error]|					StartupErrors
 	|FileViewer|				FileList
-	|Guicontrol|				Debugger
+
+//	|Guicontrol|				Debugger
 	|listview|					Stack
+	|ListView|					Variables
+	|stretchcontrol|			Debugger
+
 	|textview|					AppInfo
 	|Guicontrol|				DebugBtns
 	|Guicontrol|				SearchArea
-	|ListView|					Variables
 	|Guicontrol|				rborder
 	|guicontrol| 				CompileArea
 	
@@ -50,7 +53,7 @@ class PerryIDE (Window)
 	|ListView|					ErrorList
 	|listview|					CommsLogList
 	|ListView|					FoundList
-	|textview| 					DebugArgsList
+	|textview| 					DebugArgsText
 	|Guicontrol of buttonview|	ViewButtons
 	|buttonview?--|				PrevView
 	|ButtonView|				CurrFileName
@@ -394,7 +397,7 @@ class PerryIDE (Window)
 			.StartScreen.declutter = hidetop
 			.ASMButton.Declutter = Hidetop
 			if HideTop
-				(.DebugArgsList isnt visible)			// better to declutter
+				(.DebugArgsText isnt visible)			// better to declutter
 			|| ShowBuilders = !HideTop and (!.IsTextMode or .path.isspd)
 			|| HideBuilders = !ShowBuilders
 			.runbutton.declutter		= HideBuilders
@@ -479,7 +482,7 @@ class PerryIDE (Window)
 		if ._FrameNum == 1
 			.CheckModified
 		
-		if GUIActive and !.DebugArgsList.HasFocus
+		if GUIActive and !.DebugArgsText.HasFocus
 			.HideStuff
 
 
@@ -984,41 +987,3 @@ function string.GetSpeedieProj (|string|)
 	while rz and !(rz isa "scproj")
 		rz = rz.parent
 
-
-function PerryIDE.IDECommand (|bool|)
-	// this should be a window really!
-	|| cmd = "Enter Command".ask("tetris") $
-	|| s = .editme.SelText
-	if cmd ~= "beep"
-		for 2s
-			beep
-      elseif cmd ~= "cr_fix" // "line_fix"
-		.editme.beep = s.ReplaceAll("\r\n", "\r").ReplaceAll("\r", "\n")
-	  elseif cmd ~= "cr_use"
-		.editme.beep = s.ReplaceAll("\n", "\r\n")
-	  elseif cmd ~= "ascii"
-		beep string.ASCII_Chart
-	  elseif cmd ~= "str" or "string"
-		|| s2 = s.parse
-		if s2 == @arg
-			s2 = s2.first
-		.editme.beep = s2.name
-	  elseif cmd ~= "note"
-		notifications <~ "ascii"
-	  elseif cmd ~= "render" or "parse"
-		.editme.beep = s.parse.Render
-	  elseif cmd ~= "tetris"
-		tetriswin().RunAsMain(60)
-	  elseif cmd ~= "breakout"
-		Breakout().RunAsMain(60)
-	  elseif cmd ~= "bubbles"
-		bubbles().RunAsMain(60)
-	  elseif cmd ~= "DebugSwitch"
-		DebugGUI = !DebugGUI
-	  else
-		beep "unrecognised: " + cmd
-
-
-function textview.beep (assigns:|string| s)
-	expect (.text != s) (beep)
-	.SelText = s

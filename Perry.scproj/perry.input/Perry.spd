@@ -184,13 +184,13 @@ function StrongView (|ButtonView| btn, |bool|)
 	.view(btn)
 	return true
 
+
 function View (|ButtonView| btn, |bool| CanChangeFocus=true)
 	opt norefcounts
 	require !.IsTextMode
 	|| g		= btn.tag as guicontrol #require
 	
 	|| changed	= g isnt visible
-	
 	|| old = .viewing
 	if btn != old
 		.PrevView = old
@@ -206,14 +206,16 @@ function View (|ButtonView| btn, |bool| CanChangeFocus=true)
 	// visable
 	for g2 in .views
 		(g2 is visible) = g == g2
-		
+	
 	// consistancy
-	if (btn == .viewsearch)
-		.MassSearchField.setfocus
-		.masssearchfield.text = GUI.LastSearch
-		changed = false
-	  elseif (btn == .viewerrors)
+	if (btn == .ViewSearch)
+		g = .MassSearchField
+		g.text = GUI.LastSearch
+	  elseif (btn == .ViewErrors)
 		.SwitchedToErrors
+	  elseif (btn == .ViewDebugger)
+		g = .stack
+	
 	if changed
 		if CanChangeFocus
 			g.setfocus
@@ -314,7 +316,7 @@ function ViewAsVis (|bool| AsProject)
 	if AsProject and !AnyViews
 		.viewfiles.click(nil)
 
-	.filesep.isCollapsed = !AsProject
+	.FileSep.isCollapsed = !AsProject
 	(.gonext is visible)	= AsProject
 	(.goPrev is visible)	= AsProject
 	(.rborder is visible)	= AsProject
@@ -334,7 +336,7 @@ function ViewAsVis (|bool| AsProject)
 	|| IsPic = .IsGraphics
 	(.editme is visible) = !IsPic
 	(.drawme is visible) = IsPic
-	.reflow(true, true)
+	.CalculateWindowSize(true, true)
 	if !.Focus.IsViewable
 		.editme.SetFocus
 	

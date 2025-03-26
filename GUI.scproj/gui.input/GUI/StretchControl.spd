@@ -1,10 +1,14 @@
 
 
-role StretchControl (GuiControl)
+class StretchControl (GuiControl)
 	contains stretchdivider
 	linkage
 		cpp_part SC
 	
+	behaviour Resized
+		if Initial
+			.reset
+		
 	helper AddPane (|string| name)
 		opt norefcounts
 		|| rz = guicontrol(self)
@@ -73,6 +77,7 @@ role StretchControl (GuiControl)
 
 
 
+
 class StretchDivider (GuiControl)
 	linkage:cpp_part Div
 	|guiAction?|				OnHide 
@@ -84,7 +89,6 @@ class StretchDivider (GuiControl)
 	|date|						Entered
 	|int|						d
 	|float|						DefaultFraction
-
 
 	constructor (|guicontrol| p,  |int| d)
 		super.constructor(p)
@@ -111,11 +115,11 @@ class StretchDivider (GuiControl)
 					 // down/up controls split by horz-line
 			A.size = W  by  the~bottom	to  s
 			C.size = W  by  the~rest
-		.initdiv
+		.InitDivider
 
 
-	function InitDiv	
-		|| W = 3~before  for 6
+	function InitDivider
+		|| W = 3~before for 6
 		if .collapsed
 			W = 0~before for 4
 		|| H = W
@@ -165,7 +169,6 @@ class StretchDivider (GuiControl)
 	task SlowShow (taskgui, |int| s)
 		constructor
 			is Animation
-		
 		run
 			// now what?
 			|| p = .upon.parent$
@@ -176,16 +179,20 @@ class StretchDivider (GuiControl)
 					|| d = .upon.d
 					s = mix(pr[d]|float|, pr[d+2]|float|, 0.333)|int|
 				.upon.ActiveEnd = (.s)~up
-	
-	
+
+
+	helper DefaultEnd (|guicontrol| P, |int|)
+		|| pr = p.lastrect
+		return mix(pr[.d]|float|, pr[.d+2]|float|, .DefaultFraction)|int|	
+
+
 	function Show (|bool| anim=false)
 		opt norefcounts
 		|| p = .parent$
-		|| pr = p.lastrect
 		require .ActiveEnd.length < 10
 		|| s = .start.length
 		if s < 10
-			s = mix(pr[.d]|float|, pr[.d+2]|float|, .defaultFraction)|int|
+			s = .DefaultEnd(p)
 		if anim
 			.slowshow(0.75s, s)
 		  else
@@ -202,25 +209,33 @@ class StretchDivider (GuiControl)
 
 	function ActiveEnd (|controlpoint|)
 		opt NoRefCounts
-		return .low$.sizer[2+.d]
+		|| l = .low
+			return l.sizer[2+.d]
 	
 	setter ActiveEnd (|controlpoint|)
 		opt NoRefCounts
-		.low$.sizer.g(2+.d, self) = value
-		.InitDiv
-
-		
+		|| l = .low
+			l.sizer.g(2+.d, self) = value
+			.InitDivider
+	
 	behaviour MouseDown
 		require .InTest(P, false)
 		if keys.cmd or (clicks == 2)
 			.SlowFlip
 			return mousedragging.handled
-		|| pr = .parent!.lastrect ± 1
-		|| x  = p[.d] - pr[.d]
-		(x max= .min)
-		(x min= pr.size[.d]-.max) 
-		.ActiveEnd = (x)~up
+		
+		.MoveTo(p)
 		return mousedragging.Beyond
+
+
+	function MoveTo (|ivec2| P)
+		opt norefcounts
+		|| pr = .parent!.lastrect ± 1
+		|| d = .d
+		|| x  = p[d] - pr[d]
+		(x max= .min)
+		(x min= pr.size[d]-.max) 
+		.ActiveEnd = (x)~up
 
 
 	helper InTest (|ivec2| P, |bool| MightBeOut, |bool|)
@@ -288,6 +303,8 @@ class StretchDivider (GuiControl)
 				p.overlay(col.PreMul)
 				p += stride
 			xy += add
+
+
 
 function GuiControl.MouseNotDownOverOther (|bool|)
 	opt norefcounts

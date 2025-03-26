@@ -83,7 +83,7 @@ class GUIControl (list)
 		return (.OnFocus)(self, 0)?
 	virtual AppForeGroundChange (|bool| IsForeGround)
 		0
-	virtual Resized
+	virtual Resized (|bool| Initial)
 		0
 	
 
@@ -133,7 +133,7 @@ class GUIControl (list)
 		opt norefcounts
 		|| prev = mine.x2y2x1y1 // noice
 		for R in self
-			|| curr = R.ReflowDoc(mine, prev, hard)
+			|| curr = R.CalculateSize(mine, prev, hard)
 			if r is visible or Spacer
 				prev = Curr
 

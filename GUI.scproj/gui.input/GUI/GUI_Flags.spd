@@ -44,7 +44,7 @@ datatype GuiControlFlags (uint)
 	linkage
 		cpp_part GCF
 	flags
-		|guicontrolflags| 
+		|GuiControlFlags| 
 		Visible
 		Enabled
 		Editable
@@ -61,6 +61,7 @@ datatype GuiControlFlags (uint)
 		NewlyShown
 		TrapVisibleChange
 		BlockSized
+		HasBeenSized
 		DrawsFocus // showborder, showsborder, hasborder, drawborder
 
 
