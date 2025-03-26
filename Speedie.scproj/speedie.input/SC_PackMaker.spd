@@ -31,15 +31,27 @@ module PackMaker
 	// we can make our own internal tables anyhow.
 	
 	
-	function DoLibGlobs (|jbin| lib)
+	function DoLibGlobs (|jbin| lib) // SortLibGlobs
 		opt norefcounts
-//		.LibGlobs.sort(NodeSorter)
+		.LibGlobs.sort(GlobalsSorter)
 		
 /		lib.enter(@arr)
 		for (f in LibGlobs)
 			lib.Add(@thg, f.ExportName)
 		lib.exit
 
+
+	function OrderGlobals (|[scdecl]| List, |int|)
+		opt norefcounts
+		list.sort(GlobalsSorter)
+		rz = 1				// rz = 1, so if .ExportPosition == 0 then something is wrong.
+		for (d in list)
+			|| s = d.CarraySize
+			|| s16 = s min 16
+			rz = rz align s16
+			d.ExportPosition = rz
+			rz += s
+	
 
 	function SortFuncsAndBuildGlobs (|int|)
 		opt norefcounts
@@ -50,16 +62,25 @@ module PackMaker
 		fninit.tableid = 1 // put init and main first!
 		fnmain.tableid = 2
 
-		.SortASMFuncs(.Packfuncs, 0)
-		typeobject!.PackClassChildren(nil)
-		|| pg = .OrderGlobals(.PackGlobs)
-		return .SortASMFuncs(.libfuncs, pg)
+		.SortASMFuncs(.PackFuncs, nil)
+		TypeObject!.PackClassChildren(nil)
+		
+		rz = .OrderGlobals(.PackGlobs)
+		.SortLibStuff(rz)
 	
 	
-	helper SortASMFuncs (|[scfunction]| list, |int| PackGlobalSpace, |int|)
-		target debug
-			|| Table = (jb_vm.vm.InitTable(list.length+31,PackGlobalSpace), nil)(PackGlobalSpace)
-		(PackGlobalSpace)
+	function SortLibStuff (|int| pg)
+		|&&nil| Table
+		if platform.isdebug and pg
+			Table = jb_vm.vm.InitTable(.libfuncs.length+31, pg)
+		.SortASMFuncs(.libfuncs, Table)
+		.LibGlobs.sort(GlobalsSorter)
+
+		for (g in .libglobs) (i)		// lib globs are asked for, so we'll ask for them by name.
+			g.exportposition = i + 1
+	
+	
+	helper SortASMFuncs (|[scfunction]| list, |?&&nil| Table)
 		list.sort(SCFuncSorter)
 
 		|| ID = 0
@@ -69,7 +90,6 @@ module PackMaker
 			target debug
 				if Table
 					Table[id+31] = jb_vm.Load(f.exportname)
-		return PackGlobalSpace
 
 	
 	function WriteLibFuncs (|jbin!| j)
@@ -196,19 +216,6 @@ module PackMaker
 
 		Compiler.ProductFile.SmartData = j
 
-
-
-	function OrderGlobals (|[scdecl]| List, |int|)
-		opt norefcounts
-		list.sort(GlobalsSorter)
-		rz = 1				// rz = 1, so if .ExportPosition == 0 then something is wrong.
-		for (d in list)
-			|| s = d.CarraySize
-			|| s16 = s min 16
-			rz = rz align s16
-			d.ExportPosition = rz
-			rz += s
-	
 	
 	function SCFunction.TestObesity (|?&ivec4|)
 		opt norefcounts
@@ -346,10 +353,9 @@ module PackMaker
 
 
 function SCFunction.WrappedName (|string|)
-	if .iscppinbuilt
-		return .exportname + "Wrap"
-	  else
-		return .exportname
+	if !.iscppinbuilt
+		return .ExportName
+	return .ExportName + "Wrap"
 
 
 function SCFunction.CanLibLoad (|bool|)

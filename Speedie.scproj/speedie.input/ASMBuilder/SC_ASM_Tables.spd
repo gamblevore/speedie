@@ -5,6 +5,7 @@ dispatch fn_asm_table (fn_asm)
 	@arg:  ASMType.Arg
 	@decl: ASMType.decl
 	@num:  ASMType.num
+	@char: ASMType.char
 	@rel:  ASMType.DoMath
 	@thg:  ASMType.Thg
 	@bra:  ASMType.First
@@ -278,7 +279,7 @@ function ArgSub (|&ASMState| self, |message| exp, |&sc_hoister| H, |AsmReg|)
 	.CloseVars(OV)
 
 
-function Arg (fn_asm)
+function Arg (fn_asm) // argument 
 	return ArgSub(self, exp, nil)
 
 
@@ -342,6 +343,10 @@ function Dot (fn_asm)										// a.b
 	return .ReadOrWrite(Dest, exp, obj, ASMReg(), prop, pos)
 
 
+function Char (fn_asm)
+/	return num(self, exp, dest, mode) // its just a num, right?
+
+
 function Num (fn_asm)
 	opt norefcounts
 	|| d = exp.ASMDecl
@@ -354,7 +359,7 @@ function Num (fn_asm)
 		dest.fatindex = D.fatconstindex
 		return Dest
 	
-	return .NumToReg(exp, d.ExportPosition, dest, T)
+	return .NumToReg(exp, d.exportposition, dest, T)
 
 
 function Thg (fn_asm)
@@ -465,8 +470,10 @@ function IncrSlowOnAddr (|&ASMState| self, |message| f, |ASMReg| Dest, |int| Mod
 function IncrOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |asmreg|)
 	ifn  dest.isint  and  amount.fits(7)
 		return IncrSlowOnAddr(self, f, dest, mode, Addr, Amount)
-	|| bc  = dest.µtype.ByteCount.log2
-	|| fat = f.CNTC(Addr, dest, 1, amount, bc)
+	|| bc = dest.µtype.ByteCount.log2
+	|| offset = 0
+	addr = .InlineOffsetOpt(addr, bc, &offset, 5~bits)
+	|| fat = f.CNTC(Addr, dest, offset, amount, bc)
 	if mode & IncrAfter
 		fat._op = asm.cntd
 	return fat * dest
@@ -491,14 +498,18 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 	// if "TestAtomic".trap
 	|| Src = .µGetASM(exp, dest as ASMReg.AddrRequest)
 	|| Amount = IncrAmount(src, mode, exp.ASMDecl)
+	if !dest.reg and dest isnt Discard
+		dest = .TempTyped(exp, dest)
+	
+	|| p = exp.parent! // better positions
 	if src is ContainsAddr
 		dest.µType = src.µType
-		return IncrOnAddr(self, exp, dest, mode, src, amount)
+		return IncrOnAddr(self, p, dest, mode, src, amount)
 	
-	check (src isnt temp) (exp, "Can't increment temporary value.")
+	check (src isnt temp) (p, "Can't increment temporary value.")
 	if mode & IncrAfter
-		return .IncrPost(exp, dest, src, amount)			// x++,	 y = x++
-	return .IncrPre(exp, dest, src, Amount)					// ++x,	 y = ++x
+		return .IncrPost(p, dest, src, amount)				// x++,	 y = x++
+	return .IncrPre(p, dest, src, Amount)					// ++x,	 y = ++x
 
 
 

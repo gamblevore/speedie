@@ -316,16 +316,19 @@ function TypeOfSString (ExprResolver)
 
 |dictionary of scdecl| CodePointTable
 function TypeOfChar (ExprResolver)
-	if exp.length == 1
-		return TypeByte!.typenormal
-	|| cp = exp.name.codepoint|ind| 		#expect (exp, "Invalid codepoint")
+	|ind| cp
+	|| IsByte = exp.name == 1
+		cp = exp.name[]	
+	  else	
+		cp = exp.name.codepoint|ind| 		#expect (exp, "Invalid codepoint")
 	
 	|| d = CodePointTable init Dictionary()
 	|| str = cp.Render
 	|| place = d.MakePlace(str)
 	|| char_decl = place[]
 	if !char_decl
-		char_decl = TypeCodePoint!.typenormal.CopyDecl
+		|| type = (typebyte!, TypeCodePoint!)(IsByte)
+		char_decl = type.typenormal.CopyDecl
 		place[] = char_decl
 		(char_decl is const)			//	compiler.NewConst(char_decl) // no!
 		char_decl.ExportPosition = cp	// nice!

@@ -3,7 +3,7 @@
 
 function DeclsDefault (|Message| def, |Message|)
 	opt norefcounts
-	if def.issetrel
+	if def.IsSetRel
 		return def.Last
 
 
@@ -147,7 +147,6 @@ function scclass.CollectProp (|Message| msg, |bool|)
 		(dcl is property)
 		dcl.becomereal
 		return true
-
 
 
 // remove these... but later.

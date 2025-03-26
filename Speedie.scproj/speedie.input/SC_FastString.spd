@@ -50,6 +50,7 @@ function String (|Message| str)
 	|| B  =  ._bytefunc  init  compiler.XFunc("JB_FS_AppendByte")
 	str.parent!.obj = b
 	str.func = @char
+	TypeOfChar(str, nil)
 	.StrRemoved++
 }
 

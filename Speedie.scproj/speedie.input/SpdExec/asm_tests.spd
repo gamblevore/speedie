@@ -20,10 +20,16 @@ FNCX: r2, 1226, 127432, 0                      /* JB_f_SyntaxAccess(0.5) */
 RET:  r2, r0, r0, 0, 0                         /* return JB_f_SyntaxAccess(0.5) */
 */
 
+function FS
+	|| fs = FastString()
+	fs <~ ":"
+	
+
 function ggg_const (|int| A, |int|)
 	if A > 0
 		return 1
 	return -1
+
 
 function hhhMaybeConst (|int| A, |bool|)
 	if ggg_const(A) > 0

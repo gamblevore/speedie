@@ -8,16 +8,16 @@ extend asmstate
 				|| CC = bs.r[2]
 				|| CC2 = CC >> pow2
 				if (CC2 <= maximum) and (CC2<<pow2 == CC)
-					.nop(bs)
 					index[] += CC2
 					|| R = bs.r[1]
 					base.reg = R
 					(base is temp) = (R >> 31)
 					base.fatindex = 0
+					.nop(bs)
 		return base
 
 
-	function RefCountSub (|message| exp, |message| prms,  |scfunction| fn, |&FatASM|)	// JB_SetRef(a, b)
+	function RefCountSub (|message| exp, |message| prms, |scfunction| fn, |&FatASM|)	// JB_SetRef(a, b)
 		opt	NoRefCounts
 		if fn == compiler.RefClear
 			|| offset = 0
@@ -34,7 +34,7 @@ extend asmstate
 			|| offset = 0
 			if Out isnt ContainsAddr
 				if From is ContainsAddr
-					from = .InlineOffsetOpt(from, 3, &offset, 13~bits)
+					from = .InlineOffsetOpt(from, 2, &offset, 13~bits)
 					return exp.RFRD(Out, From, 1, offset)			// mem to reg
 				return exp.RFST(Out, From)							// reg to reg
 			
@@ -44,7 +44,7 @@ extend asmstate
 				where.µtype = datatypecode._voidptr
 				From = .Read(where, P, From, nil) * where			// (mem to reg)?
 
-			out = .InlineOffsetOpt(Out, 3, offset, 13~bits)
+			out = .InlineOffsetOpt(Out, 2, offset, 13~bits)
 			return exp.RFWR(Out, From, 1, offset)					// reg to mem
 
 
@@ -52,7 +52,7 @@ extend asmstate
 			|| A = .µ(prms.first!, asmreg.AddrRequest)
 			target debug: if a isnt ContainsAddr					// always memory
 			|| offset = 0
-			A = .InlineOffsetOpt(A, 3, offset, 13~bits)
+			A = .InlineOffsetOpt(A, 2, offset, 13~bits)
 			|| B = .µ(prms.second!)
 			target debug: if b is ContainsAddr						// always reg
 			debugger

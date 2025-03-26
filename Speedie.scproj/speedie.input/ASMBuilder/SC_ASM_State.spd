@@ -97,8 +97,6 @@ struct ASMState
 
 
 	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
-		if dest isnt discard
-			dest = .TempTyped(exp, dest)
 		if togrow.isint and value.CanStoreAsIntImmediate
 			return exp.ADPK(dest, ToGrow, Value) * Dest
 		.Assign(dest, ToGrow, exp)
@@ -160,7 +158,8 @@ struct ASMState
 	function TempTyped (|Message| where, |asmreg| T, |scdecl| Type,  |asmreg|)
 		t.µtype = type.datatype
 		return .TempOnly(where, t)
-		
+	
+	
 	function TempTyped (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)				// .needreg
 		opt norefcounts
 		if t isnt textual
@@ -309,7 +308,7 @@ struct ASMState
 	
 
 	function ReadOrWrite (|ASMReg| dest, |message| m, |asmreg| base, |asmreg| VarAdd, |scdecl| Ty,  |int| index=0, |asmreg|)
-		if dest is FromZeroMemory
+		if dest is FromZeroMemory or set
 			(dest is realconst) // make compiler happy
 		return .ReadOrWriteSub(dest, m, base, VarAdd, ty, index) * dest
 
