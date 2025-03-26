@@ -53,7 +53,8 @@ function DebugArgsGotFocus (guiaction)
 		.InitDebugArgs
 		if !vis
 			.save
-	.SlideOpen(0.2s, movecode.open.flip(vis) )
+	|| Durr = movecode.open.flip(vis)
+	.SlideOpen(0.2s, Durr)
 
 
 function textview.InitDebugArgs

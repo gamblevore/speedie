@@ -8,7 +8,6 @@ extend PerryIDE
 		.CanAskingAboutMissing = true
 		.RecentFiles 		= message()
 		.id					= "IDE"
-//		.Debugger			= GUIControl(self) // remove and replace with simply the slider?
 		.Debugger			= StretchControl.vert(self, 200~up, 60, 100)
 		.AppInfo			= TextView(self)
 		.DebugBtns			= guicontrol(self)
