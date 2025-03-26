@@ -104,8 +104,9 @@ class list (Saveable)
 		return .parent.next.first
 
 			
-	function FlatLast (||)
+	function FlatLast (|...!|) // deepest
 		opt norefcounts
+		real self
 		rz = self
 		while
 			rz = rz.last	#loop
@@ -123,7 +124,7 @@ class list (Saveable)
 	function FlatPrev (||)
 		opt norefcounts
 		|| p = .prev
-			return p.FlatLast ?? p
+			return p.FlatLast
 		return .parent
 	
 	function FlatNextDepth  (|&int| Depth, |bool| Down=true, ||)
