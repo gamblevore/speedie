@@ -429,10 +429,9 @@ function Tran_Result (|SCFunction| f, |message|)
 	|| Src  = f.SourceArg
 	require  type  and  src  and  !(Src.Last IsTmp "return")
 
-	|| errs = src.last ?? src
-	using (errs)
-	parser.Using.Position = -1
-	
+	|| p = src.FlatLast
+	using p
+	Parser.Using.Position = p.After + 1
 	|| ret = type.WriteDeclFull("rz")
 	src.first = ret
 	return ret

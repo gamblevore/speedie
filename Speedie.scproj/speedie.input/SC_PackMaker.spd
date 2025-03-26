@@ -35,7 +35,7 @@ module PackMaker
 		opt norefcounts
 //		.LibGlobs.sort(NodeSorter)
 		
-		lib.enter(@arr)
+/		lib.enter(@arr)
 		for (f in LibGlobs)
 			lib.Add(@thg, f.ExportName)
 		lib.exit
@@ -209,6 +209,7 @@ module PackMaker
 			d.ExportPosition = rz
 			rz += s
 	
+	
 	function SCFunction.TestObesity (|?&ivec4|)
 		opt norefcounts
 		|| mu = .µLength
@@ -269,7 +270,7 @@ module PackMaker
 	function GlobLink (|jbin| j)
 		opt norefcounts
 		j.tmp("blnk")
-		for linked in .LibGlobs
+/		for linked in .LibGlobs
 			j.add(@thg, linked.ExportName)
 		j.exit(2)
 
@@ -340,7 +341,7 @@ module PackMaker
 	function BuildInterpreter (|string|)
 		|| pack = jbin()
 		.WriteLibFuncs(pack)
-		.DoLibGlobs(pack)
+/		.DoLibGlobs(pack)
 		return pack
 
 

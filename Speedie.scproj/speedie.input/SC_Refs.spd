@@ -618,6 +618,9 @@ function SafeDecrMsg (|Message| msg, |Message|)
 function RC_DeclArg (|scdecl| AR, |scfunction| fn)
 	opt norefcounts
 	|| src = ar.source
+	if !src
+		src = fn.sourcearg
+	if src
 		parser.using.position = src.position
 	|| dcl = AR.WriteNilDecl
 	fn.SourceArg.First = dcl

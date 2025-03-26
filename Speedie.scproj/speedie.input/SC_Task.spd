@@ -161,8 +161,8 @@ function Message.BuildRunTask (|message| fields, |int| level, |bool|)
 		brah <~ (@thg, "interface")
 		.first = brah
 		|| pr = .parent!
-		pr.AppendMacro(sctasks.TaskMacro, [prms])
-		|| callprms = pr.flatlast
+		pr.AppendMacro(SCTasks.TaskMacro, [prms])
+		|| CallPrms = pr.FlatLast
 		callprms <~ (@thg, "self")
 		for p in prms
 			|| ty = p.second

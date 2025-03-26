@@ -150,6 +150,11 @@ class SCDecl (SCNamed) {
 
 	function IsTypeImprove (assigns:|bool|)
 		.info = .info.set(SCDeclInfo.TypeImprove, Value)		
+	
+	
+	syntax Compare (|string| s, |bool| aware, |int|)
+		return .name.syntaxcompare(s, aware)
+		
 		
 	syntax is (|SCDeclInfo| d, |bool|)
 		if self
