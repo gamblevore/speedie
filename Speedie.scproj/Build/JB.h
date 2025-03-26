@@ -595,8 +595,6 @@ typedef bool (*__Message_TextSet__)(Message* Self, int I, JB_String* V);
 
 typedef JB_String* (*__Message_Text__)(Message* Self, int I);
 
-typedef int (*autosort_fn)(autoitem* a, autoitem* b);
-
 typedef void (*FP_fnErrorLogger)(JB_ErrorReceiver* Self, JB_String* Data);
 
 typedef JB_String* (*FP_fnIDGenerator)(int Start, int End, Syntax F);
@@ -3790,7 +3788,7 @@ bool SC_AC__ASMSub(Message* Rz, SCFunction* Fn, FastString* Fs);
 
 Message* SC_AC__AutoComplete(Message* Ff, JB_String* Name, JB_String* Purpose);
 
-int SC_AC__AutoCompleteSorter(autoitem* A, autoitem* B);
+SortComparison SC_AC__AutoCompleteSorter(autoitem* Self, autoitem* B);
 
 Message* SC_AC__AutoJump(Message* Cmd);
 
@@ -3973,9 +3971,11 @@ void SC_PackMaker__MakePack();
 
 int SC_PackMaker__OrderGlobals(Array* List);
 
-int SC_PackMaker__SortASMFuncs(Array* List, int PackGlobalSpace);
+void SC_PackMaker__SortASMFuncs(Array* List, void** Table);
 
 int SC_PackMaker__SortFuncsAndBuildGlobs();
+
+void SC_PackMaker__SortLibStuff(int Pg);
 
 void SC_PackMaker__WriteLibFuncs(FastString* J);
 
@@ -5474,6 +5474,8 @@ ASMReg SC_ASMType__BoolNot(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
 ASMReg SC_ASMType__BRel(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
+ASMReg SC_ASMType__Char(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
+
 ASMReg SC_ASMType__ConstConvert(ASMState* Self, Message* Exp, ASMReg Dest, ASMReg From, uint /*DataTypeCode*/ Old, uint /*DataTypeCode*/ New);
 
 ASMReg SC_ASMType__Debugger(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
@@ -6224,9 +6226,6 @@ void JB_SorterComparer_Sort(FP_SorterComparer Self, Array* Items);
 
 
 // __Text__
-
-
-// autosort_fn
 
 
 // fnErrorLogger
@@ -10653,12 +10652,12 @@ Message* JB_config__Create(JB_String* Path);
 
 
 // JB_interface
-bool JB_Task_LessThan3_interface_SyntaxCall(JB_Task* Self, int I);
+void JB_SS_ParserCallBack_interface_SyntaxCall(JB_Task* Self, Message* Msg);
 
 
 
 // JB_interface
-void JB_SS_ParserCallBack_interface_SyntaxCall(JB_Task* Self, Message* Msg);
+bool JB_Task_LessThan3_interface_SyntaxCall(JB_Task* Self, int I);
 
 
 
