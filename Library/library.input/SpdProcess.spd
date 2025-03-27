@@ -185,14 +185,16 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 
 
 	module
+		|bool|		 CheckedParent
 		|SpdProcess| _Parent
 		
 		function app.Parent (|spdprocess|)
 			opt norefcounts
-			|| p = SpdProcess._parent
-				return p
+			if spdprocess.CheckedParent
+				return spdprocess._parent
+			spdprocess.CheckedParent = true
 			|| pico = pico.parent 
-				p = SpdProcess("", nil, pico)
+				|| p = SpdProcess("", nil, pico)
 				SpdProcess._parent = p
 				return p
 

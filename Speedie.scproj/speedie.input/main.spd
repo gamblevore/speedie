@@ -52,6 +52,7 @@ function compiler.ClearEnvs
 
 function compiler.SetupEnv
 	opt norefcounts
+	app.parent // sigh. do this before clearenvs
 	.ClearEnvs
 	options.dev = app.prefs["dev"].int
 	if !app.IsMainThread
