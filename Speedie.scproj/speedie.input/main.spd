@@ -45,8 +45,9 @@ function Compiler.MiniTests
 function compiler.ClearEnvs
 	// osx freaks out sometimes otherwise
 	// it's only specific flag that needs clearing tho... better to just find and remove it
+	|| strs = "HOME LOGNAME PATH PWD SUDO_USER __PicoSock__" / ' '
 	for (v in app.env) (k)
-		if k ~!= "HOME" and "LOGNAME" and "PATH" and "PWD" and "SUDO_USER" and "__PicoSock__"
+		ifn k in strs
 			app.childenv(k) = nil
 
 
