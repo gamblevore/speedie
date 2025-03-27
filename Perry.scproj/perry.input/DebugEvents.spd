@@ -340,7 +340,6 @@ function perryide.GotASMSub (|message| asm)
 	l.clear
 	|| src = l.ListSource
 	(name is AlignCenter)
-//	(name is disabled) // nice to copy the name
 	src <~ name
 	|| arg = asm.last
 	if !arg.HasAny
@@ -375,4 +374,13 @@ function SelectedASM (guilistevent)
 	i.EditPath(file.name, false)
 	i.editme.ShowAndSel(n, true)
 	i.DuringASMEvent = false
+
+
+
+
+function Char (|int| x, |int|) // tab after here
+
+	return 0
+
+
 

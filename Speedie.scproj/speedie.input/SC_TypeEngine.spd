@@ -680,7 +680,7 @@ function TypeOfExprSub (|Message| Exp, |SCNode| name_space, |Message?| side = ni
 			exp.obj = obj
 		return obj|SCObject|
 
-	if !SpdProcess.parent
+	if !app.parent
 		error (Exp, "Failed to get type of this.")
 
 

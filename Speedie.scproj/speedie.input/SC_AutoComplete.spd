@@ -57,7 +57,7 @@ function ParserRestore
 
 
 function EnterAutoComplete (|bool|)
-	|| perry = spdprocess.parent
+	|| perry = app.parent
 	require stderr.ok and perry.isopen
 	app.AllowInteruptCrash = false			// to debug perry, which runs debug speedie
 	"RespondingToCommands"					// Don't delete this... too annoying to miss.
@@ -150,7 +150,7 @@ function CmdWrap (|Message| arg, |bool|)
 
 	if cmd != response
 		cmd.ReplaceWith(response)
-	SpdProcess.parent! <~ arg
+	app.parent! <~ arg
 	stderr.clear						// super-important!!!
 	
 	return !.WillExit
@@ -1036,7 +1036,7 @@ function ASM (|message| rz,  |SCFunction| fn)
 			rz <~ err.name
 			|| errtmp = @tmp + "check"
 			errtmp <~ Interact.MiniErrors(stderr)
-			SpdProcess.parent! <~ errtmp
+			app.parent! <~ errtmp
 
 
 function message.AsmIndent (|message| top, |int|)

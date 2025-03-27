@@ -612,7 +612,7 @@ function InitCompiler
 	////////////////////////////////////////////////
 	
 	if options.SingleFileInput
-		if SpdProcess.parent
+		if app.parent
 			._BuildFolder = compiler.originalinputpath.ScriptContainer.file
 		  else
 			._BuildFolder = .BaseProjectPath

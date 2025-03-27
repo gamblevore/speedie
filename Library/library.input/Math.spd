@@ -49,6 +49,9 @@ module Math
 		if rz < 0.0
 			rz ++
 
+	function vec2.Rotation (|float|)
+		return .y.atan2(.x)
+	
 	function int.Abs (|int|)
 		cpp_wrapper (abs)
 	

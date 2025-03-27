@@ -24,6 +24,11 @@ function FS
 	|| fs = FastString()
 	fs <~ ":"
 	
+function CheckSize
+	opt norefcounts
+	|| f = FastString()
+	if f isa list
+		"1"
 
 function ggg_const (|int| A, |int|)
 	if A > 0
@@ -83,6 +88,10 @@ function gggAlter (|int| A, |int| B, |int|)
 	return B-1
 
 
+function Tail (|int| x, |int|)
+	return const_branching(x+1)
+
+
 function Const_Branching (|int| x, |int|)
 	|| k = 1
 	|| y = 0
@@ -91,6 +100,9 @@ function Const_Branching (|int| x, |int|)
 	  else
 		y = k
 	y++
+	y*=3
+	y^=9
+	y <<= 2
 	return y
 
 

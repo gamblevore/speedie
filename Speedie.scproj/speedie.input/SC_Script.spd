@@ -30,7 +30,7 @@ function compiler.ScriptRecompile (|file| f, |file|script_build, |bool|)
 
 function compiler.CanTryModes (|file|)
 	opt norefcounts
-	require !spdprocess.parent
+	require !app.parent
 	require !app["perry"] and !app["nocompile"]
 	|| p = app.rawargs[0]
 	if p and !p.argname

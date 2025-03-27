@@ -1096,8 +1096,8 @@ class TextView (GUIControl)
 		|| r	= sel.width and self[sel.x2 - 1].istextline
 		|| r2	= (0, r|int|)
 		|| t	= .LineExpand(sel - r2)
-		if t.width > 0
-			t.x2 -= self[t.x2].istextline
+		//if t.width > 0
+		t.x2 -= self[t.x2].istextline
 		t.x2++ // whatever... just for now
 		return  t
 

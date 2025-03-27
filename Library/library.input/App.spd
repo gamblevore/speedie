@@ -65,6 +65,7 @@ function Crash (|string| reason="")
 function CrashLog (|cstring| value)
 	cpp_wrapper JB_Rec__CrashLog
 
+
 syntax access (|string| name, |string|)
 	opt norefcounts
 	for R in .rawargs
@@ -72,11 +73,14 @@ syntax access (|string| name, |string|)
 			rz = R.argvalue
 			exit
 
+
 syntax expect (|string| s=nil)
 	.quit(s, -1)
 
+
 function Options (|[string]|)
 	disabled "Use switches"
+
 
 function Switches (|[string]|)
 	opt norefcounts
@@ -84,10 +88,12 @@ function Switches (|[string]|)
 		if R.ArgName
 			rz <~ R
 	
+
 helper args_ (|[string]|)
 	for R in .rawargs
 		if R.argname ~= ""
 			rz <~ r
+
 
 function Args (|[string]|)
 	cpp_part ArgsArray
@@ -97,11 +103,14 @@ function Args (|[string]|)
 		rz = .args_
 		._OldArgs = rz
 
+
 function CrashPrint
 	cpp_wrapper JB_CrashTracer
 
+
 function exepath (|string|)
 	cpp_wrapper JB_App__Path
+
 
 function Path (|string|)
 	cpp_part OrigPath

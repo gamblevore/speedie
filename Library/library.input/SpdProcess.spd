@@ -185,13 +185,17 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 
 
 	module
-		InitOwner()
-		|SpdProcess| Parent = nil
+		|SpdProcess| _Parent
 		
-		function InitOwner
-			target !minilib
-				|| p = pico.parent 
-					.parent = SpdProcess("", nil, p)
+		function app.Parent (|spdprocess|)
+			opt norefcounts
+			|| p = SpdProcess._parent
+				return p
+			|| pico = pico.parent 
+				p = SpdProcess("", nil, pico)
+				SpdProcess._parent = p
+				return p
+
 
 		function CheckAllAlive
 			opt norefcounts
@@ -213,6 +217,10 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			cpp_wrapper JB_App__BackTrace
 
 
+		function string.Spawn (|[string]| Params, |spdprocess|)
+			return SpdProcess.Spawn(self, params)		
+		
+		
 		function Spawn (|string| app_path, |[string]| params=[], |string| DebugName="", |ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
 			require app_path.file.mustexist
 			|| pico = pico.new(app_path)
@@ -256,6 +264,7 @@ prototype Thread (|pico| Comms, |int64| Data, |&nil| Argument, |bool|)
 			if comms.SpawnThread(self|picothreadfn|, Data|&nil|, Argument|&cstring|)
 				return pico_out
 			pico_out.Close("")
+
 
 
 datatype ProcessMode (byte)

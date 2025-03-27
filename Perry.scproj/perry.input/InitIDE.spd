@@ -243,12 +243,10 @@ extend PerryIDE
 			is   editable
 			is   visible
 			isnt drawsfocus
-//			.YAdjust = -1
 			.tooltip		= self.SearchArea.Tooltip			
 			.SingleLine		= TextView.SingleLine
 			.ID				= "find"
 			.size 			= 3~inside  by  2~down back 15
-//			.takesfocus		= takesfocusflag.On
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
 			.autocompletestring = "Find..."
 
@@ -257,12 +255,10 @@ extend PerryIDE
 			is   editable
 			is   visible
 			isnt drawsfocus
-//			.YAdjust = -1
 			.tooltip		= self.SearchArea.Tooltip			
 			.SingleLine		= TextView.SingleLine
 			.ID				= "replace"
 			.size 			= 3~inside  by  2~under back 15
-//			.takesfocus		= takesfocusflag.On
 			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
 			.autocompletestring = "Replace..."
 
@@ -291,20 +287,10 @@ extend PerryIDE
 			.ID				= "FoundList"
 			.size 			= the~width  by  the~bottom to 0~under 
 			.AlwaysSendChangeEvent = true
-//			.takesfocus		= takesfocusflag.On
 			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.Solid = LeftBG
 			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
 
-
-//		with .DebugStretch
-//			.size = the~area
-//			.div.DefaultFraction = 0.25
-//			.ID = "DebugStretch"
-//			.AddLow(self.Stack)
-//			.addhigh(self.AppInfo)
-//			.addhigh(self.DebugBtns)
-//			.AddHigh(self.variables)
 		
 		with .debugger 
 			is enabled
@@ -372,7 +358,7 @@ extend PerryIDE
 			.size 			= the~area
 			.AlwaysSendChangeEvent = true
 			.gnormal		= self.FileList.GNormal.copy
-			.GNormal.Solid = vec4(0.13, 0.125, 0.115, 0.975)
+			.GNormal.Solid = vec4(0.13, 0.135, 0.120, 0.975)
 			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
 			
 			
@@ -384,7 +370,6 @@ extend PerryIDE
 		with .PopupDisplay
 			isnt visible
 			is PassThru
-//			.alignment		= MoveCode.Center // can be multi-line, so no
 			.clipmode = ControlClipMode.SlideBackInWindow
 			.ID				= "PopupDisplay"
 			.size 			= the~area
@@ -398,7 +383,6 @@ extend PerryIDE
 			isnt drawsfocus
 			.ID				= "DrawMe"
 			.size = the~width by the~bottom to 0~before 
-//			.takesfocus		= takesfocusflag.On
 			.gnormal.bg		= vec4(0.0, 0.81)
 			.gnormal.edge   = vec4(0.2, 1.0)
 			.gnormal.seps	= vec4(0.4, 1.0)
@@ -494,8 +478,6 @@ extend PerryIDE
 			.ID				= "OutBorder"
 			.size 			= the~width  by  18~down
 			.gnormal.solid	= vec4(0.087, 0.95)
-//			.AddLeft(self.CompileTabs)
-//			.AddRight(self.Variables)
 
 		with .ProjectTabs
 			.id = "Tabs"

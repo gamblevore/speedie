@@ -282,15 +282,15 @@ struct ASMState
 	function µGetASM (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		opt norefcounts
 		cpp_part GetASM 
+
+		|| fn = fn_asm_table[exp.ASMType]!
 		target debug
 			dest.TmpCheck
-			debugat 0 // keep this
 			if ++.stacksize > 20 // ugh
+			debugat 753 // keep this
 				
 		  else
 			opt inline
-
-		|| fn = fn_asm_table[exp.ASMType]!
 		|| ss = (fn)(self, exp, dest)
 
 		target debug
@@ -759,9 +759,6 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 		tableid = fn.tableid ?? 0xFFFF // 0xffff means unknown?
 		TableID += 31
 	|| PExt = P >> 32
-	if !PExt and (dest is ExitFunction) and !fn.HasCVersion
-		return prms.TAIL(TableID, P) * (dest as asmreg.exit)
-	
 	|| fat = prms.FNC(dest, TableID, P,  PExt)
 	if fn.HasCVersion
 		fat._op = asm.FNCX

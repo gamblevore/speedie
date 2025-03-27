@@ -46,7 +46,7 @@ function App.DebugProj (|ErrorInt|)
 
 function App.RespondToParent
 	opt norefcounts
-	|| p = SpdProcess.Parent
+	|| p = app.Parent
 	// now what?
 	// we need to respond to a few things:
 		// pause

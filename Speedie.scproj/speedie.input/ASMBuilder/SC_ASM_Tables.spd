@@ -98,7 +98,21 @@ function Sheb (fn_asm)
 	return exp.noop * asmreg()
 
 
-function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest,   |AsmReg|)
+function TryTail (|&ASMState| self, |asmreg| dest, |bool|)
+	if "tail".trap
+	|| l = .last
+	require l isa asm.FNC or asm.FNC3
+	require !l.r[3] // no pExt
+	debugger 
+	l.r[0] = l.r[1]
+	l.r[1] = l.r[2]
+	l._op = asm.tail
+	l.Outputs = 0
+	l.info = dest			// (l * asmreg.exit)
+	return l.BlockNum == .BasicBlock
+
+	
+function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest, |AsmReg|)
 	opt norefcounts
 	// What about getting the address of registers?
 	dest = dest as asmreg.ExitFunction * .TailInlineable
@@ -106,11 +120,13 @@ function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest,   |AsmRe
 	|| f = exp.first
 		dest = .µinto(f, dest)
 	
-	|| fat = exp.reT(Dest, asmreg(), asmreg(), 0, 0)
+	if .TailInlineable and TryTail(self, dest)
+		return dest
+	
+	|| fat = exp.RET(Dest, asmreg(), asmreg(), 0, 0)
 	fat.µRefCount = 1
 	(fat is CondAnswer)
 	return fat*Dest
-
 
 
 function Return (fn_asm)
@@ -124,11 +140,15 @@ function Return (fn_asm)
 		if !v
 			v = .µGetASM(f, ASMReg.ExitFunction)
 		
+	if trytail(self, dest)
+		return asmreg.exit
+	
 	|| amount = (f!=nil)|int|
 	|| D0 = .SafeDecr
 		if d0.reg != V.reg // problem
 	|| D1 = .decr
 	|| D2 = .decr
+	
 	|ind| K = -1
 	if !D0
 		K = .Const(V, 8, true)
@@ -214,14 +234,12 @@ function ConstConvert  (|&asmstate| self, |message| exp, |ASMReg| dest, |ASMReg|
 
 
 function Decl (fn_asm)
-	if options.Optimise >= 4
-		return declsub(self, exp)
-		
 	rz = DeclSub(self, exp)
-	|| fat = rz.fat
-		fat.µRefCount++		// Keep vars viewable for debugging
-							// Actually its not an issue for even release builds!
-							// just don't add vars you don't need!
+	if options.Optimise < 4
+		|| fat = rz.fat
+			fat.µRefCount++		// Keep vars viewable for debugging
+								// Actually its not an issue for even release builds!
+								// just don't add vars you don't need!
 	
 
 
@@ -344,7 +362,7 @@ function Dot (fn_asm)										// a.b
 
 
 function Char (fn_asm)
-/	return num(self, exp, dest, mode) // its just a num, right?
+	return num(self, exp, dest, mode) // its just a num, right?
 
 
 function Num (fn_asm)
@@ -386,7 +404,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
 	|| d = exp.ASMDecl
 	if d is local
-		|| T = d.ThgASM
+		|| T = .ThgASM(d)
 		if dest isnt addrneed
 			return T
 		if dest is DeclareInlineParam // &A
@@ -648,13 +666,29 @@ function ASMReg.ConstEnough (|bool|)
 	return self|uint64| & asmreg.NotUnConst|uint64|
 
 
+function ThgASM (|scdecl| d, |asmreg|)
+	|| T = d.WholeType as ASMReg.FromExistingVar
+	(t is param) = (d is param) // unused?
+	if (d isnt alteredinbranch)
+		|| fi = d.FatConstIndex
+			|| f = fi|uint|.fat
+			if f is ConstOutput
+				(T is ConstOutput)
+				t.FatIndex = fi
+	|| rr = T.reg
+		|| Ret = .State.Return
+		if rr and rr == ret.reg
+			(T is temp = ret is temp)
+	return T
+
+
 function ASMLocal (|message| s, |VarUseMode| mode, |asmreg|)
 	opt	norefcounts
 	|| d = s.ASMDecl
 	if d is local
 		if mode is Return
 			.fn.TrackReturns(d)
-		rz = d.ThgASM
+		rz = .ThgASM(d)
 
 
 function SetDeclToConst (|scdecl| decl, |asmreg| Initial, |&fatasm| f, |bool|)
@@ -787,18 +821,6 @@ function Message.TypeCastDoesNothing (|bool|)
 //			rz |= (1|uint64|<<31)
 //			exit
 //	// ffff(r4, r3, r2, r1)
-
-
-function SCDecl.ThgASM (|asmreg|)
-	|| T = .WholeType as ASMReg.FromExistingVar
-	(t is param) = (self is param) // unused?
-	if (self isnt alteredinbranch)
-		|| fi = .FatConstIndex
-			|| f = fi|uint|.fat
-			if f is ConstOutput
-				(T is ConstOutput)
-				t.FatIndex = fi
-	return T
 	
 	
 function string.trip (|bool|)
