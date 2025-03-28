@@ -58,7 +58,16 @@ function ParserRestore
 
 function EnterAutoComplete (|bool|)
 	|| perry = app.parent
-	require stderr.ok and perry.isopen
+	
+	// platform.log "CC"
+	require stderr.ok
+	// platform.log "DD"
+	if !perry
+		// platform.log "NIL"
+	else
+		// platform.log "REAL"
+	require perry.isopen
+	// platform.log "EE"
 	app.AllowInteruptCrash = false			// to debug perry, which runs debug speedie
 	"RespondingToCommands"					// Don't delete this... too annoying to miss.
 	if !app.ismainthread
