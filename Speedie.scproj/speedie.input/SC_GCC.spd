@@ -271,9 +271,12 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 
 
 function ExecuteGCC (|[string]| Commands, |bool|)
-	if CppCompilerPath.Execute(Commands).Successful
+	|| Result = CppCompilerPath.Execute(Commands) 
+	if Result.Successful
 		return true
-	error ("C++ compiler failed to compile source code. Command:\n\n " + commands.join(" "))
+	
+	|| Start = "C++ compiler failed to compile source code. Command:\n\n " + CppCompilerPath + " "
+	error (Start + commands.join(" "))
 	CppCompilerPath.Execute(Commands)		
 	
 
