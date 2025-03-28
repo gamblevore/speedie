@@ -245,8 +245,11 @@ module VShapes
 		return (grid, grid, grid, 1.0)*.Color
 
 	function Black (ColorFunction)
+	
 	function Rainbows (ColorFunction)
-		return Colors.Rainbow(hit.x, 1, 0.5)
+		|| r = 0.0
+//		|| r = ray.Rotation.x*300 // can't quite get this right.
+		return Colors.Rainbow(hit.x+r, 1, 0.5)
 	
 
 prototype ColorFunction (|vobject| self, |raytracer| Ray, |vec3| P, |rayinfo| Hit=vec4(), |rayinfo|)
