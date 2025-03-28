@@ -96,18 +96,17 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 
 	|SpdProcess| spd 
 	
-	target debug
+	target notdebug
 		if !SpdLibAlreadyInUse
 			SpdLibAlreadyInUse = true
-			target debug
-				if !.UsingSpdLib
-					.UsingSpdLib = true
-					f.name = name.TrimExt + "()"
-				spd = (Speedie_Main).Spawn(p, f.name)
+			if !.UsingSpdLib
+				.UsingSpdLib = true
+				f.name = name.TrimExt + "()"
+			spd = (Speedie_Main).Spawn(p, f.name)
 
 	if !spd?
 		|| proc = speedie.resolve
-		target debug
+		target notdebug
 			proc = file.speediedir.child("Speedie.scproj/Build/Products/Debug/Speedie")
 		if proc
 			|| Mode = ProcessMode.CaptureAll * !noisy
