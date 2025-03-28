@@ -19,7 +19,13 @@ function Compiler.Main
 
 
 function Compiler.EnterCompile (|bool|)
-	return  !.TryVariousStartModes  and  FeedBack.ParseArgs  and  !interact.EnterAutoComplete
+	// platform.log "X1"
+	if !.TryVariousStartModes
+		// platform.log "X2"
+		if FeedBack.ParseArgs
+			// platform.log "X3"
+			if !interact.EnterAutoComplete
+				return true
 
 
 function Compiler.PrintResults
@@ -45,9 +51,9 @@ function Compiler.MiniTests
 function compiler.ClearEnvs
 	// osx freaks out sometimes otherwise
 	// it's only specific flag that needs clearing tho... better to just find and remove it
-	|| strs = "HOME LOGNAME PATH PWD SUDO_USER __PicoSock__" / ' '
+	|| Allowed = "HOME LOGNAME PATH PWD SUDO_USER __PicoSock__" / ' '
 	for (v in app.env) (k)
-		ifn k in strs
+		ifn k in Allowed
 			app.childenv(k) = nil
 
 
@@ -63,7 +69,9 @@ function compiler.SetupEnv
 	error.AutoPrint = 1
 	pico.GlobalConfig.DesiredThreadCount = 1
 	
-	if pico.parent
+	// platform.log "00"
+	if app.parent
+		// platform.log "11"
 		error.AutoPrint = 0
 		ErrorColors.enabled = false
 
@@ -74,8 +82,8 @@ target perrydbg
 		// could this be a lib-func thats included with all compiles?
 		// so any app can be run as a lib? Maybe later!
 		cpp_name Speedie_Main 
-		pico.parent_ = comms // phew
 		rz = app.sp_run(args, mode&4)
+		app.parent(comms) // phew
 		comms.config.name = "Speedie"
 		
 		if rz == 0
