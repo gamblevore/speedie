@@ -1555,18 +1555,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2173])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2172])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2174])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2173])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2175])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2174])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2172])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2171])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2175])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2174])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2176])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2175])
 
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
@@ -1793,7 +1793,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2181])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2180])
 
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
@@ -1831,7 +1831,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2177])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2176])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1869,7 +1869,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2182])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2181])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2105,12 +2105,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2180])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2179])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2179])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2178])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2178])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2177])
 
 #define kJB__byte_max ((byte)255)
 
@@ -3142,7 +3142,6 @@ extern IsaTester SC__IsaTester_T;
 #define kJB__Saver_RefMark ((int)1073741824)
 
 #define JB__Saver_SaveableList JB__.Saver_SaveableList
-#define JB__Pico_Parent_ JB__.Pico_Parent_
 #define JB__Rnd_Shared JB__.Rnd_Shared
 #define kSC__Hoi_MinHoistScore ((int)3)
 
@@ -3175,7 +3174,7 @@ extern bool SC__Cpp_WroteAny;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2171])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2170])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -3346,11 +3345,10 @@ struct JB_Globals {
 	Array* App__OldArgs;
 	Dictionary* Tk__ErrorNames;
 	FP_fnIDGenerator Tk_Splitter;
-	PicoComms* Pico_Parent_;
-	Random Rnd_Shared;
 	Random zalgo_R;
-	CompressionStats MzSt_All;
+	Random Rnd_Shared;
 	MessagePosition Tk_Using;
+	CompressionStats MzSt_All;
 	uint64 Mrap_MDummy_[2];
 	CharProp CharProp_Item[256];
 	SyntaxObj* Constants__FuncArray[64];
@@ -3388,7 +3386,7 @@ bool JB_App__IsMainThread();
 
 bool JB_App__No(JB_String* Name);
 
-SpdProcess* JB_App__Parent();
+SpdProcess* JB_App__Parent(PicoComms* Comms, bool Expect);
 
 JB_String* JB_App__OrigPath();
 
@@ -6740,11 +6738,7 @@ bool JB_Pico_SendMsg(PicoComms* Self, PicoMessage* A, bool Wait);
 
 bool JB_Pico_SendFS(PicoComms* Self, FastString* Fs, bool Wait);
 
-int JB_Pico__Init_();
-
 PicoComms* JB_Pico__New(JB_StringC* Name, int Noise);
-
-PicoComms* JB_Pico__Parent();
 
 
 
@@ -11896,7 +11890,7 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 			Message* __varf1 = F->Source;
 			MessagePosition _usingf0 = ((MessagePosition){});
 			JB_Msg_SyntaxUsing(__varf1, (&_usingf0));
-			JB_Tree_SyntaxAppend(Self, (JB_Syx_Msg(kJB_SyxThg, JB_LUB[471])));
+			JB_Tree_SyntaxAppend(Self, (JB_Syx_Msg(kJB_SyxThg, JB_LUB[472])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0), __varf1);
 			JB_MsgPos_Destructor((&_usingf0));
 		}
