@@ -230,6 +230,8 @@ int JB_SP_Run (_cstring* C, int Mode)	{ // JB_SP_Main
 	} else {
 		if (!App_Args and C) {
 			AddError(JB_SP_Init(C, Mode&4), "jb.initlib");
+			if (JB_ErrorNumber)
+				return JB_ErrorNumber;
 			AddError(JB_SP_AppInit(), "jb.initapp");
 		}
 		
