@@ -267,9 +267,8 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	if linkage.vm
 		rz.AppendWords( "-D __VM__" )
 		
+
 	
-
-
 function ExecuteGCC (|[string]| Commands, |bool|)
 	|| Result = CppCompilerPath.Execute(Commands) 
 	if Result.Successful
