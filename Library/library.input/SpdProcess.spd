@@ -40,7 +40,9 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		pico.destroy(.pico, "destructor")
 			
 	function CommsOpen (|bool|)
-		return self and .pico.status == 0
+		if self
+			// platform.log "y1: ${.pico.status.render}"
+			return .pico.status == 0
 
 	helper Alive (|bool|)
 		if self != nil
@@ -155,9 +157,13 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	
 	function IsOpen (|bool|)
 		nil checker // shouldn't be necessary
+		// platform.log "r1"
 		require .CommsOpen
+		// platform.log "r2"
 		if .WeAreParent
+			// platform.log "r3"
 			return .subprocess or .status.isrunning
+		// platform.log "r4"
 		return app.ParentID > 1
 			
 	function Deactivate (|int| ExitCode)
@@ -188,15 +194,29 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		|bool|		 CheckedParent
 		|SpdProcess| _Parent
 		
-		function app.Parent (|spdprocess|)
+		function app.Parent (|&pico| comms=nil, |bool| Expect=false, |spdprocess|)
 			opt norefcounts
 			if spdprocess.CheckedParent
 				return spdprocess._parent
 			spdprocess.CheckedParent = true
-			|| pico = pico.parent 
-				|| p = SpdProcess("", nil, pico)
+
+			// platform.log "A"
+			if pico.HasParentSocket and !comms
+				// platform.log "B"
+				comms = pico.new
+			// platform.log "C"
+			if comms
+				require comms.CompleteExec
+				// platform.log "D"
+				|| p = SpdProcess("", nil, comms)
 				SpdProcess._parent = p
 				return p
+
+			// platform.log "E"
+
+			if expect
+				error "Application parent lost connection"
+
 
 
 		function CheckAllAlive
