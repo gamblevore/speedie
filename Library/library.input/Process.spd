@@ -24,7 +24,7 @@ class Process (ProcessOwner)
 	destructor:							cpp_wrapper JB_Sh_Destructor
 
 	render
-		fs <~ "PID: $.pid,  ${.path.name} $.args"
+		fs <~ "PID: $.pid\n${.path} $.args" // full path makes more sense, really.
 	
 	function ClosePipes
 		cpp_wrapper JB_Sh_ClosePipes
