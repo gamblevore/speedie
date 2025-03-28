@@ -102,17 +102,6 @@ struct Pico
 	
 
 	module
-		|?&pico| Parent_
-		function Parent (|&pico|)
-			|| p = .Parent_
-				return p
-			require .HasParentSocket
-			rz = pico.new
-			.Parent_ = rz
-			if rz
-				rz.CompleteExec
-
-
 		function GlobalConfig (|&PicoGlobalConfig|)
 			cpp_wrapper PicoGlobalConf
 			
@@ -144,7 +133,7 @@ struct Pico
 					return p
 				p.close(nil)
 		
-		function New  (|stringzeroterminated| name="", |int| Noise=0,   |&pico|)
+		function New (|stringzeroterminated| name="", |int| Noise=0,   |&pico|)
 			|| p = pico.Create(name)
 				|| c = p.config
 				c.bits = 16
