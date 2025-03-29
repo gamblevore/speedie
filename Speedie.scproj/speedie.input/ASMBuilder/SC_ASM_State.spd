@@ -287,7 +287,7 @@ struct ASMState
 		target debug
 			dest.TmpCheck
 			if ++.stacksize > 20 // ugh
-			debugat 753 // keep this
+			debugat 0 // keep this
 				
 		  else
 			opt inline

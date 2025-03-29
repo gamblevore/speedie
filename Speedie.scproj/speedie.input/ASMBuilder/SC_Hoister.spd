@@ -72,8 +72,12 @@ struct SC_Hoister
 	
 	function Hoist (|message| exp, |int| Score)
 		opt norefcounts
+//		debugat 5626
 		|| fn = exp.func
-		if fn == @type
+		if fn == @decl
+			exp = exp.second!
+			fn = exp.func
+		while fn == @type
 			exp = exp.first! // no go into the type!
 			fn = exp.func
 		if fn == @func

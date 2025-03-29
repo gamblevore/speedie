@@ -38,7 +38,7 @@ module SpdAssembler
 		return compiler.XFunc(m.name, m)	#expect (m, "This function has no ASM")
 						
 
-	function GenerateASM (|scfunction| fn, |bool|) // memory safe ASM reattempt
+	function GenerateASM (|scfunction| fn, |int| i=0,  |bool|) // memory safe ASM reattempt
 		opt norefcounts
 		
 		if fn ~= "DebugAppCallArgsDisplay"
@@ -48,6 +48,6 @@ module SpdAssembler
 
 		if StdErr.ok
 			target debug
-				fn.µprint
+				fn.µprint(i)
 			return true
 

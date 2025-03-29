@@ -8,7 +8,7 @@ function compiler.Bundle
 		require !Compiler.IsTest and !Options.ExternalCompile
 		require SC_Targets..gui
 		|| Pd = .productfile
-		|| Pj = .BaseProjectPath
+		|| Pj = .BaseProjectPath 
 			.AppleBuildApp(pd, pj)
 
 	

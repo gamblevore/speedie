@@ -108,9 +108,9 @@ module PackMaker
 	
 	function CompileSomeFunctions (|bool| MiniTest, |bool|)
 		opt norefcounts
-		for fn in .Packfuncs
+		for (fn in .Packfuncs) (i)
 			if fn.AMiniTest == MiniTest
-				require SpdAssembler.GenerateASM(fn)
+				require SpdAssembler.GenerateASM(fn, i)
 		asmstate.sh.Guard
 		
 		if minitest
@@ -221,7 +221,7 @@ module PackMaker
 		opt norefcounts
 		|| mu = .µLength
 			|| mu2 = .µTest
-			.µprint
+			.µprint(0)
 			return jb_vm.Run(mu2.ptr, mu2.length)
 	
 	

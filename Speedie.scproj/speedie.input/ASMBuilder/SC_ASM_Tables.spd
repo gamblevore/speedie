@@ -99,11 +99,11 @@ function Sheb (fn_asm)
 
 
 function TryTail (|&ASMState| self, |asmreg| dest, |bool|)
-	if "tail".trap
+//	if "tail".trap
 	|| l = .last
 	require l isa asm.FNC or asm.FNC3
 	require !l.r[3] // no pExt
-	debugger 
+//	debugger 
 	l.r[0] = l.r[1]
 	l.r[1] = l.r[2]
 	l._op = asm.tail
@@ -510,6 +510,14 @@ function IncrAmount (|asmreg| upon, |int| IsPlus, |scdecl| D,  |int64|)
 
 
 
+function NotTemp (|&asmstate| self, |asmreg| Src, |message| p)
+	|| r = .state.return.reg
+	if r and r == src.reg
+		return
+	check (src isnt temp) (p, "Can't increment temporary value.")
+
+
+
 function Incrementatulatorifier		(fn_asm)				// --a++
 	visible
 	opt	NoRefCounts
@@ -524,7 +532,7 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 		dest.µType = src.µType
 		return IncrOnAddr(self, p, dest, mode, src, amount)
 	
-	check (src isnt temp) (p, "Can't increment temporary value.")
+	NotTemp(self, src, p)
 	if mode & IncrAfter
 		return .IncrPost(p, dest, src, amount)				// x++,	 y = x++
 	return .IncrPre(p, dest, src, Amount)					// ++x,	 y = ++x

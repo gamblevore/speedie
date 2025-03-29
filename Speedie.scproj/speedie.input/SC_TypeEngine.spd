@@ -306,6 +306,7 @@ function TypeOfBra (ExprResolver)
 
 function TypeOfStr (ExprResolver)
 	opt norefcounts
+	using exp
 	scfunction.String_Expand(exp, exp.MsgOwningFunc)
 	Return TypeStringzero!.TypeReal
 

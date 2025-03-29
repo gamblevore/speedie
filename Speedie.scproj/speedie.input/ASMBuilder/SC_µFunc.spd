@@ -46,9 +46,12 @@ extend SCFunction
 
 
 /// TEXTUAL STUFF		
-	function µPrint
+	function µPrint (|int| i)
 		printline self
 		|| fs = faststring()
+		if i 
+			|| n = PackMaker.packfuncs.length>>1
+			fs <~ "($i / $n) "
 		.µRender(fs)
 		printline fs
 

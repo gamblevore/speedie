@@ -98,6 +98,7 @@ function Tran_Strings (|Message| start, |SCFunction| fn)
 	for msg.flat in start		
 		|| f = msg.Func
 		if (f == @Str)
+			using msg
 			String_Expand( msg, fn )
 
 
