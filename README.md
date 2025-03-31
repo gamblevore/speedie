@@ -2,6 +2,7 @@
 # Speedie - Fun is the main goal #
 ## Beautiful, Modern, Fast, Expressive, Empowering ##
 
+
 * `Creator:` [@gamblevore](http://github.com/gamblevore/)
 * `Contact:` [theo@jeebox.org](mailto:theo@jeebox.org)
 * `Forum:` [t.me/speedie_dev](http://t.me/speedie_dev) (telegram)
@@ -44,7 +45,6 @@ If you'd like to support the ongoing development of Speedie, consider [sponsorin
 * [Speedie Is Fast](Documentation/Speed.md) _(Why use a lang if its not fast?)_
 
 
-
 # Power Features #
 * Has an awesome nil-checker and type-safety system! Write safe code while having an easy time of doing it!
 * Integrates with C easily, so you can call C-library functions easily, if you need to, with no overhead.
@@ -63,6 +63,16 @@ That said, there are challenges to overcome, that will probably mean a lot of pe
 Unfortunately I am one person who has created a very large piece of work. Things will take much longer than we would have liked.
 
 
+# Downsides #
+*Is speedie like some magical programming land where everything is better?* **Well... no.** There are downsides! And Speedie's downsides may be heavy enough that other languages are a better choice.
+
+The biggest downside is that the community is (currently) tiny, and lack of 3rd party libs or examples. For some people this isn't a problem, as they want to write all the code, or want to create a lib for speedie for others to use.
+
+But for others, this is a deciding factor. For some, without existing code to include, it will slow down your development too much. For others, it will slow down development, but Speedie will be still good overall.
+
+For a student or someone who enjoys learning new things, in fact the fact that we don't have a large amount of 3rd party libs or projects, doesn't affect you, as you will just want to explore. And speedie does have a nice bunch of example projects already, to learn from.
+
+
 # Goals #
 I have a lot of long-term goals... Overall, I want to make programming a whole lot more fun. Here goes for a partial-list of goals!
 
@@ -75,7 +85,6 @@ I have a lot of long-term goals... Overall, I want to make programming a whole l
 * Perhaps visualisation of data-structures within a game-engine could be cool? As a way to explore your data and debug things.
 
 On a personal level, outside of Speedie, I'd love to work on anything helping to restore nature or make technology less harmful. Such as helping retune wifi or EM-emissions of tech to **not** drain our health.
-
 
 
 # Installation #
