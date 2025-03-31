@@ -64,13 +64,21 @@ Unfortunately I am one person who has created a very large piece of work. Things
 
 
 # Downsides #
-*Is speedie like some magical programming land where everything is better?* **Well... no.** There are downsides! And Speedie's downsides may be heavy enough that other languages are a better choice.
+*Is speedie like some magical programming land where everything is better?* **Well... no.** There are downsides! Speedie's downsides are heavy enough that, for many people, other languages are a better choice.
 
-The biggest downside is that the community is (currently) tiny, and lack of 3rd party libs or examples. For some people this isn't a problem, as they want to write all the code, or want to create a lib for speedie for others to use.
+The biggest downsides are:
 
-But for others, this is a deciding factor. For some, without existing code to include, it will slow down your development too much. For others, it will slow down development, but Speedie will be still good overall.
+* The community is (currently) tiny
+* Lack of 3rd party libs or examples
 
-For a student or someone who enjoys learning new things, in fact the fact that we don't have a large amount of 3rd party libs or projects, doesn't affect you, as you will just want to explore. And speedie does have a nice bunch of example projects already, to learn from.
+There are other possible reasons not to use speedie, including: "We don't want to learn a new language" or worry that "Speedie doesn't have enough funding".
+    
+For some people, the small community isn't a problem. Some people prefer to write all their own code and have been doing that for their most successful products in the past anyhow. Others might want to create libs, and Speedie might be a good environment to do it in. (Speedie can compile libs with C-APIs!)
+
+But for others, the small community is the largest factor. For some, without existing code to include, it will slow down your development too much. For others, a small community will slow down development, but not too much.
+
+And some may prefer a small community. Perhaps a student or someone who enjoys learning new things. You will just want to explore. And speedie does have a nice bunch of [example projects](Examples/) already, to learn from.
+
 
 
 # Goals #
