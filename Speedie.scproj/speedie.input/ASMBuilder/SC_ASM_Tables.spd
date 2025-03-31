@@ -93,23 +93,45 @@ function First (fn_asm)
 
 
 function Sheb (fn_asm)
-	opt norefcounts
+	opt NoRefCounts
 	LastDebugMark = exp
 	return exp.noop * asmreg()
 
 
-function TryTail (|&ASMState| self, |asmreg| dest, |bool|)
-//	if "tail".trap
+function PreRetOpt (|&ASMState| self, |asmreg| Returned, |bool|)
 	|| l = .last
-	require l isa asm.FNC or asm.FNC3
+	while l isa asm.BOR
+		Returned = PreRetBOR(l, Returned) #require
+		l--
+
+	if l isa asm.fnc or asm.fnc3
+		return PreRetFnc(self, Returned, l)
+
+
+function PreRetBOR (|FATASM| l, |asmreg| Returned, |ASMReg|)
+	require !l.r[2]						// x = b ||| 0  -->  x = b
+	require Returned.reg == l.Prm(0)	// return x
+	|| Input = l.r1|int|.asm
+	l._op = asm.ret
+	l.Outputs = 0
+	l.r0 = Input
+	l.r1 = 0
+	l.r2 = 0
+	l.r3 = 0	
+	l.info = Returned					// (l * asmreg.exit)
+	return Input
+
+
+function PreRetFnc (|&ASMState| self, |asmreg| Returned, |FATASM| l, |bool|)
 	require !l.r[3] // no pExt
-//	debugger 
 	l.r[0] = l.r[1]
 	l.r[1] = l.r[2]
+	l.r[2] = 0
 	l._op = asm.tail
+	// l.InputRegs needs to be moved...
 	l.Outputs = 0
-	l.info = dest			// (l * asmreg.exit)
-	return l.BlockNum == .BasicBlock
+	l.info = Returned			// (l * asmreg.exit)
+	return (l.BlockNum == .BasicBlock)
 
 	
 function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest, |AsmReg|)
@@ -120,7 +142,12 @@ function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest, |AsmReg|
 	|| f = exp.first
 		dest = .µinto(f, dest)
 	
-	if .TailInlineable and TryTail(self, dest)
+	// don't we want to always do the tail, and then the ret?
+	// in case of jumps or whatever? well... it already knows about the blocknum
+	// so its ok.
+	// the thing is... we also want to "post-opt" stuff. So... we could just nop
+	// the ret? Sigh. Lets do the other one first, then we know what to do here.
+	if .TailInlineable and PreRetOpt(self, dest)
 		return dest
 	
 	|| fat = exp.RET(Dest, asmreg(), asmreg(), 0, 0)
@@ -140,7 +167,7 @@ function Return (fn_asm)
 		if !v
 			v = .µGetASM(f, ASMReg.ExitFunction)
 		
-	if trytail(self, dest)
+	if PreRetOpt(self, dest)
 		return asmreg.exit
 	
 	|| amount = (f!=nil)|int|
@@ -278,6 +305,7 @@ function DeclSub (fn_asm)
 	if k is ConstOutput
 		.MakeConstFromASM(ty, k, nil)
 	return k
+
 
 	
 function ArgSub (|&ASMState| self, |message| exp, |&sc_hoister| H, |AsmReg|)
@@ -812,25 +840,7 @@ function Message.TypeCastDoesNothing (|bool|)
 		return BytesLost == 0
 	require BytesLost <= 0
 
-
-
-//function fatasm.FuncPrmBits (|uint64|)
-//	// i don't really get this.
-//	// its also only usd for tail, which is unused
-//	// is this out of date code?
-//	rz = .r2
-//	|| r3 = .r3|uint64| << 32
-//	rz |= r3
-//	rz >>= 7	
-//	require !(rz>>31)
-//	for i in 6
-//		|| p = (rz >> (5*i)) & 31
-//		if p > i
-//			rz |= (1|uint64|<<31)
-//			exit
-//	// ffff(r4, r3, r2, r1)
 	
-	
-function string.trip (|bool|)
+function string.Trip (|bool|)
 	return asmtype.lastdebugmark ~= self 
 

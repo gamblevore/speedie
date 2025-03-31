@@ -23,13 +23,15 @@ function uint.OperatorSameReg (|uint| R, |bool|)
 
 
 function fatasm.OptBor (|asmstate| A)
+	require !.r2 and !.r3
 	|| dest = .r0
 	|| input = .r1
-	require dest.IsTemp and !input.istemp and !.r2 and !.r3
-	// Now what? its a temp. We wanna check the prev and next.
 	|| p = .prev
-	|| n = .next
-	require p and n
+	|| n = .next #require
+	// do other bor opts?
+	
+	require dest.IsTemp and !input.istemp and p
+	// Now what? its a temp. We wanna check the prev and next.
 	require p.Out SameReg input
 	require n.ReplaceReg(dest, input)
 	// what do I do now that we found this match? how to opt it?

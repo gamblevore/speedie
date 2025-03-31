@@ -111,7 +111,7 @@ struct FatASM
 			.Outputs = v|int|.log2
 			.r0 = v
 			return true
-		/0
+
 		
 	function ResetOutput (|int| reg, |bool|)
 		if .IsFunc

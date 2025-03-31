@@ -631,6 +631,7 @@ extend ASMState
 	
 	function CanImproveAssign (|asmreg| dest, |asmreg| src, |&fatasm|)
 		opt inline
+		require dest isnt temp
 		if  src is temp
 			return src.fat
 		if  src.reg > .vdecls
@@ -639,6 +640,7 @@ extend ASMState
 				return f
 	
 	function Assign (|asmreg| dest, |asmreg| src, |message| exp, |asmreg|)  // assigns (
+		debugat 105 
 		|| sr = src.reg
 		|| dr = dest.reg
 		if !dr //?:O
@@ -648,10 +650,9 @@ extend ASMState
 		if !sr										// must be assigning zero
 			return ._num(exp, 0, dest)				// More readable ASM.
 
-		if dest isnt temp
-			|| improve = .CanImproveAssign(dest, src)
-				if improve.ResetOutput(dr)
-					return dest
+		|| improve = .CanImproveAssign(dest, src)
+			if improve.ResetOutput(dr)
+				return dest
 		
 		dest = dest.CopyConst(Src)
 		return .BitOr(dest as asmreg.textual, src, asmreg(), exp)
