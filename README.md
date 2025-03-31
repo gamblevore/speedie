@@ -69,7 +69,7 @@ Unfortunately I am one person who has created a very large piece of work. Things
 The biggest downsides are:
 
 * The community is (currently) tiny
-* Lack of 3rd party libs or examples
+* Lack of 3rd party libs or 3rd party examples
 
 There are other possible reasons not to use speedie, including: "We don't want to learn a new language" or worry that "Speedie doesn't have enough funding".
     
