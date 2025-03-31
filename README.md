@@ -64,7 +64,7 @@ Unfortunately I am one person who has created a very large piece of work. Things
 
 
 # Downsides #
-*Is speedie like some magical programming land where everything is better?* **Well... no.** There are downsides! Speedie's downsides are heavy enough that, for many people, other languages are a better choice.
+*Is Speedie some magical land where all coding-projects become better?* **Well... no.** There are downsides! Speedie's downsides are heavy enough that, for many people, other languages are a better choice.
 
 The biggest downsides are:
 
