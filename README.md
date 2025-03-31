@@ -77,7 +77,7 @@ For some people, the small community isn't a problem. Some people prefer to writ
 
 But for others, the small community is the largest factor. For some, without existing code to include, it will slow down your development too much. For others, a small community will slow down development, but not too much.
 
-And some may prefer a small community. Perhaps a student or someone who enjoys learning new things. You will just want to explore. And speedie does have a nice bunch of [example] (Examples/) - [projects](GameExamples/) already, to learn from.
+And some may prefer a small community. Perhaps a student or someone who enjoys learning new things. You will just want to explore. And speedie does have a nice bunch of [example](Examples/) - [projects](GameExamples/) already, to learn from.
 
 
 
