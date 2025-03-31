@@ -71,7 +71,7 @@ The biggest downsides are:
 * The community is (currently) tiny
 * Lack of 3rd party libs or 3rd party examples
 
-There are other possible reasons not to use speedie, including: "We don't want to learn a new language" or worry that "Speedie doesn't have enough funding".
+There are other possible reasons not to use speedie, including: "We don't want to learn a new language" or "our existing code-base is in lang-XYZ".
     
 For some people, the small community isn't a problem. Some people prefer to write all their own code and have been doing that for their most successful products in the past anyhow. Others might want to create libs, and Speedie might be a good environment to do it in. (Speedie can compile libs with C-APIs! For example [jeebox_api.h](jeebox.scproj/Examples/jeebox_api.h))
 
