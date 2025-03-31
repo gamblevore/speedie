@@ -380,16 +380,17 @@ struct ASMState
 		return .ReadOrWriteSub(dest, exp, ptr, varadd, nil, index)
 
 
-	function PrmCollectC (|message| prms,  |SCFunction| fn,  |&uint| Addrs,  |uint64|)
-		// we need to do ints last, and also collect these backwards.
+	function PrmCollect (|message| prms,  |SCFunction| fn,  |&uint| Addrs,  |uint64|)
+		// we'll collect SpecialRegs even for SPD-ASM, 5 prms is enough for 99.9% functions
+		// And we'll want to ARMify these funcs later in a JIT!
+		
 		opt norefcounts
 		|int64| sh = 64
 		|| fc = 0
 		|| ic = 0
 		|| n = fn.args.Length
 		for Ints in 2
-			|| p = prms.first
-			while p
+			for p.fast in prms
 				|| ty = p.ASMDecl
 				if ty.SpecialRegs|int| != Ints		// should get .SpecialRegs from message somehow?
 					|int64| v = .µReffed(p!).reg
@@ -399,7 +400,6 @@ struct ASMState
 					fc += !ints
 					if .Last isa asm.GRAB
 						addrs[] |= v.Log2
-				p++
 		
 		rz >>= 64-((n*5)+12)
 		if fc>8 or ic>8			// hmmm
@@ -409,26 +409,6 @@ struct ASMState
 			rz |= (8-ic) << 0
 		  else
 			rz |= (17-ic) << 6
-
-
-	function PrmCollect (|message| prms, |scfunction| fn, |&uint| Addrs,  |uint64|)
-		opt norefcounts
-		if fn.HasCVersion
-			return .PrmCollectC(prms, fn, addrs)
-		
-		|| sh = 7
-		|| p = prms.first
-		for FnArg in fn.args
-		// We'd like to collect bits on the SIMD/normal register file
-		// for nativisation. 6 - bits per thing. Still counts as a 64-bit number
-		// FuncPrmBits() also would need upgrading.
-			|| v = .µReffed(p!).reg
-			rz  |=  v << sh
-			sh += 5
-			rz++								// Send-count (4 bits max)
-			p++
-			if .Last isa asm.GRAB
-				addrs[] |= v.Log2
 
 
 	function VDeclsExit (|asmreg| dest, |int|)

@@ -211,6 +211,17 @@ struct FatASM
 		|| s = scimport.allfiles[.filenum]
 			return s
 	
+	syntax Using (|&fatasm|)
+		// this is losing the blocknumber. needs to be saved also. Sigh.
+		// save one number that includes the blocknum and the current-index
+		rz = ASMState.sh.curr
+		ASMState.sh._curr = self
+		
+	syntax UsingComplete (|&nil| idk)
+		// could/should deref the old thing (after copying it?)
+		ASMState.sh._curr = self, (idk)
+	
+	
 	Syntax Expect (|string| Error)
 		|| f = .file|file--|
 		|| err = Error(nil, error, ErrorSeverity.Error, f)
@@ -302,13 +313,16 @@ struct FatASM
 		return (ASM.encoders[.op]!)(self, where, after)
 
 
+	function FuncPrms (|uint64|)
+		if self isa asm.tail
+			return (.r1) >> 12		
+		  else
+			return (.r2|uint64| ||| (.r3|uint64| << 32)) >> 12
+	
 	function PrmCollectCounterPart (|FastString| fs)
 		opt norefcounts
-		// This doesn't take floats/simds into account.
-		// code to do that needs to follow asmstate.PrmCollectC, and be much more complex.
-		// good enough for now.
 		|| fn = .msg.Obj as SCFunction 		#require		
-		|| regs = (.r2|uint64| ||| (.r3|uint64| << 32)) >> 12
+		|| regs = .funcprms
 		fs <~ "("
 		
 		|| n = fn.Args.Length
@@ -346,8 +360,8 @@ struct FatASM
 				fs <~ GotAny
 				GotAny = ", "
 				|int| v = .r[i]
-				if .IsFunc and (i == 2 or 3)
-					if i == 2
+				if (.IsFunc and (i == 2 or 3)) or (self isa asm.tail and i == 1)
+					if i != 3
 						.PrmCollectCounterPart(fs)
 					  else
 						fs.Length-=2

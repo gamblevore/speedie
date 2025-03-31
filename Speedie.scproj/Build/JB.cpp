@@ -3507,7 +3507,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[214]);
-	JB_FS_AppendInt32(_fsf0, (2025033112));
+	JB_FS_AppendInt32(_fsf0, (2025033119));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8611,7 +8611,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1693]);
-	JB_FS_AppendInt32(_fsf0, (2025033112));
+	JB_FS_AppendInt32(_fsf0, (2025033119));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -18211,11 +18211,12 @@ void SC_ASMType__InitAccess() {
 ASMReg SC_ASMType__InlinedReturn(ASMState* Self, Message* Exp, ASMReg Dest) {
 	Dest = SC_Reg_OperatorAs(Dest, SC_Reg_OperatorMul(kSC__Reg_ExitFunction, Self->TailInlineable));
 	Dest = SC_Reg_OperatorAs(Dest, kSC__Reg_ExitAtAll);
+	uint Bb = Self->BasicBlock;
 	Message* F = ((Message*)JB_Ring_First(Exp));
 	if (F) {
 		Dest = SC_Pac_xC2xB5Into(Self, F, Dest);
 	}
-	if (Self->TailInlineable and SC_ASMType__PreRetOpt(Self, Dest)) {
+	if (Self->TailInlineable and SC_ASMType__ReturnOpt(Self, SC_Reg_ToInt(Dest), Bb)) {
 		return Dest;
 	}
 	FatASM* Fat = SC_Msg_RET(Exp, Dest, SC_Reg__New(), SC_Reg__New(), 0, 0);
@@ -18247,48 +18248,36 @@ ASMReg SC_ASMType__Num(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
 	return SC_Pac_NumToReg(Self, Exp, D->ExportPosition, Dest, T);
 }
 
-ASMReg SC_ASMType__PreRetBOR(FatASM* L, ASMReg Returned) {
+int SC_ASMType__PreOptBOR(ASMState* Self, FatASM* L, int Ret) {
+	int Rz = 0;
+	;
 	if (L->R[2]) {
-		return nil;
+		return 0;
 	}
-	if (SC_Reg_Reg(Returned) != SC_FAT_PrmWithInt(L, 0)) {
-		return nil;
+	if (Ret != SC_FAT_PrmWithInt(L, 0)) {
+		return 0;
 	}
-	ASMReg Input = SC_int_ToASM(((int)SC_FAT_r1(L)));
-	L->_Op = kSC__ASM_RET;
-	L->Outputs = 0;
-	(SC_FAT_r0SetWithReg(L, Input));
-	(SC_FAT_r1SetWithUint(L, 0));
-	(SC_FAT_r2SetWithUint(L, 0));
-	(SC_FAT_r3SetWithUint(L, 0));
-	L->Info = Returned;
-	return Input;
+	Rz = SC_FAT_r1(L);
+	if (true) {
+		FatASM* _usingf0 = SC_FAT_SyntaxUsing(L);
+		SC_Msg_RET(L->Msg, SC_int_ToASM(Rz), SC_Reg__New(), SC_Reg__New(), 0, 0);
+		SC_FAT_AsReg(L, kSC__Reg_Exit);
+		SC_FAT_SyntaxUsingComplete(_usingf0, L);
+	}
+	Rz = (Rz & 31);
+	return Rz;
 }
 
-bool SC_ASMType__PreRetFnc(ASMState* Self, ASMReg Returned, FatASM* L) {
-	if (L->R[3]) {
+bool SC_ASMType__PreOptFnc(ASMState* Self, FatASM* L, int Bb) {
+	if (SC_FAT_r3(L)) {
 		return nil;
 	}
-	L->R[0] = L->R[1];
-	L->R[1] = L->R[2];
-	L->R[2] = 0;
-	L->_Op = kSC__ASM_TAIL;
-	L->Outputs = 0;
-	L->Info = Returned;
-	return (L->BlockNum == Self->BasicBlock);
-}
-
-bool SC_ASMType__PreRetOpt(ASMState* Self, ASMReg Returned) {
-	FatASM* L = SC_Pac_LastWith0(Self);
-	while (SC_FAT_OperatorIsa(L, kSC__ASM_BOR)) {
-		Returned = SC_ASMType__PreRetBOR(L, Returned);
-		if (!Returned) {
-			return nil;
-		}
-		(--L);
-	};
-	if (SC_FAT_OperatorIsa(L, kSC__ASM_FNC) or SC_FAT_OperatorIsa(L, kSC__ASM_FNC3)) {
-		return SC_ASMType__PreRetFnc(Self, Returned, L);
+	if (true) {
+		FatASM* _usingf0 = SC_FAT_SyntaxUsing(L);
+		SC_Msg_TAIL(L->Msg, SC_FAT_r1(L), SC_FAT_r2(L));
+		SC_FAT_AsReg(L, kSC__Reg_Exit);
+		SC_FAT_SyntaxUsingComplete(_usingf0, L);
+		return Bb == Self->BasicBlock;
 	}
 	return false;
 }
@@ -18298,33 +18287,50 @@ ASMReg SC_ASMType__Return(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
 	if (L) {
 		return SC_ASMType__InlinedReturn(Self, Exp, L);
 	}
-	ASMReg V = ((ASMReg)0);
 	Message* F = ((Message*)JB_Ring_First(Exp));
 	if (F) {
-		V = SC_Pac_ExistingVar(Self, F, kSC__VarUseMode_Return);
-		if (!V) {
-			V = SC_Pac_GetASM(Self, F, kSC__Reg_ExitFunction);
+		uint Bb = Self->BasicBlock;
+		Dest = SC_Pac_ExistingVar(Self, F, kSC__VarUseMode_Return);
+		if (!Dest) {
+			Dest = SC_Pac_GetASM(Self, F, kSC__Reg_ExitFunction);
+		}
+		if (SC_ASMType__ReturnOpt(Self, SC_Reg_ToInt(Dest), Bb)) {
+			return kSC__Reg_Exit;
 		}
 	}
-	if (SC_ASMType__PreRetOpt(Self, Dest)) {
-		return kSC__Reg_Exit;
+	 else {
+		Dest = SC_Reg__New();
 	}
-	int Amount = ((int)(F != nil));
 	ASMReg D0 = SC_Pac_SafeDecr(Self);
 	if (D0) {
-		if (SC_Reg_Reg(D0) != SC_Reg_Reg(V)) {
+		if (SC_Reg_Reg(D0) != SC_Reg_Reg(Dest)) {
 		}
 	}
 	ASMReg D1 = SC_Pac_DecrWith0(Self);
 	ASMReg D2 = SC_Pac_DecrWith0(Self);
 	Ind K = -1;
 	if (!D0) {
-		K = SC_Pac_Const(Self, V, 8, true);
+		K = SC_Pac_Const(Self, Dest, 8, true);
 	}
 	bool HasK = K >= 0;
-	FatASM* Fat = SC_Msg_RET(Exp, SC_Reg_OperatorMul(V, (!HasK)), D1, D2, ((int)(D0 != nil)), K * HasK);
+	FatASM* Fat = SC_Msg_RET(Exp, SC_Reg_OperatorMul(Dest, (!HasK)), D1, D2, ((int)(D0 != nil)), K * HasK);
 	(++Fat->xC2xB5RefCount);
 	return SC_FAT_AsReg(Fat, kSC__Reg_Exit);
+}
+
+bool SC_ASMType__ReturnOpt(ASMState* Self, int Ret, int Bb) {
+	FatASM* L = SC_Pac_LastWith0(Self);
+	while (SC_FAT_OperatorIsa(L, kSC__ASM_BOR)) {
+		Ret = SC_ASMType__PreOptBOR(Self, L, Ret);
+		if (!Ret) {
+			return nil;
+		}
+		(--L);
+	};
+	if (SC_FAT_OperatorIsa(L, kSC__ASM_FNC) or SC_FAT_OperatorIsa(L, kSC__ASM_FNC3)) {
+		return SC_ASMType__PreOptFnc(Self, L, Bb);
+	}
+	return false;
 }
 
 ASMReg SC_ASMType__SetRel(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
@@ -21479,6 +21485,15 @@ xC2xB5Form* SC_FAT_Form(FatASM* Self) {
 	return SC__Instruction_TypeList[0]->Sizes;
 }
 
+uint64 SC_FAT_FuncPrms(FatASM* Self) {
+	if (SC_FAT_OperatorIsa(Self, kSC__ASM_TAIL)) {
+		return (SC_FAT_r1(Self)) >> 12;
+	}
+	 else {
+		return (((uint64)SC_FAT_r2(Self)) | (((uint64)SC_FAT_r3(Self)) << 32)) >> 12;
+	}
+}
+
 uint SC_FAT_ID(FatASM* Self) {
 	return Self - SC__Pac_Sh.Start;
 }
@@ -21665,7 +21680,7 @@ void SC_FAT_PrmCollectCounterPart(FatASM* Self, FastString* Fs) {
 	if (!Fn) {
 		return;
 	}
-	uint64 Regs = (((uint64)SC_FAT_r2(Self)) | (((uint64)SC_FAT_r3(Self)) << 32)) >> 12;
+	uint64 Regs = SC_FAT_FuncPrms(Self);
 	JB_FS_AppendByte(Fs, '(');
 	int N = JB_Array_Size(Fn->Args);
 	while (N) {
@@ -21710,10 +21725,6 @@ uint SC_FAT_r3(FatASM* Self) {
 	return Self->R[3];
 }
 
-void SC_FAT_r3SetWithUint(FatASM* Self, uint Value) {
-	Self->R[3] = Value;
-}
-
 void SC_FAT_Renda(FatASM* Self, FastString* Fs, bool Simpler) {
 	if (((!SC_FAT_Exists(Self))) and (Self->Msg->Func == kJB_SyxSheb)) {
 		SC_FAT_RendaMsg(Self, Fs, 0);
@@ -21742,8 +21753,8 @@ void SC_FAT_Renda(FatASM* Self, FastString* Fs, bool Simpler) {
 				JB_FS_AppendString(Fs, GotAny);
 				GotAny = JB_LUB[10];
 				int V = Self->R[I];
-				if (SC_FAT_IsFunc(Self) and ((I == 2) or (I == 3))) {
-					if (I == 2) {
+				if ((SC_FAT_IsFunc(Self) and ((I == 2) or (I == 3))) or (SC_FAT_OperatorIsa(Self, kSC__ASM_TAIL) and (I == 1))) {
+					if (I != 3) {
 						SC_FAT_PrmCollectCounterPart(Self, Fs);
 					}
 					 else {
@@ -21961,6 +21972,18 @@ void SC_FAT_SyntaxIsSet(FatASM* Self, ASMReg Flags, bool Value) {
 	 else {
 		(Self->Info = SC_Reg_OperatorAsnt(Self->Info, Flags));
 	}
+}
+
+FatASM* SC_FAT_SyntaxUsing(FatASM* Self) {
+	FatASM* Rz = nil;
+	Rz = SC_Pac_Curr((&SC__Pac_Sh));
+	SC__Pac_Sh._Curr = Self;
+	return Rz;
+}
+
+void SC_FAT_SyntaxUsingComplete(FatASM* Self, void* Idk) {
+	SC__Pac_Sh._Curr = Self;
+	;
 }
 
 void SC_FAT_TmpRender(FatASM* Self, FastString* Fs, Message* Msg) {
@@ -22760,7 +22783,6 @@ ASMReg SC_Pac_ASMLocal(ASMState* Self, Message* S, VarUseMode Mode) {
 }
 
 ASMReg SC_Pac_Assign(ASMState* Self, ASMReg Dest, ASMReg Src, Message* Exp) {
-	JB_DoAt(105);
 	int Sr = SC_Reg_Reg(Src);
 	int Dr = SC_Reg_Reg(Dest);
 	if (!Dr) {
@@ -24120,36 +24142,6 @@ ASMReg SC_Pac_Plus(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp
 
 uint64 SC_Pac_PrmCollect(ASMState* Self, Message* Prms, SCFunction* Fn, uint* Addrs) {
 	uint64 Rz = 0;
-	if (SC_Func_HasCVersion(Fn)) {
-		return SC_Pac_PrmCollectC(Self, Prms, Fn, Addrs);
-	}
-	int Sh = 7;
-	Message* P = ((Message*)JB_Ring_First(Prms));
-	{
-		Array* _LoopSrcf2 = Fn->Args;
-		int _if0 = 0;
-		while (true) {
-			SCDecl* FnArg = ((SCDecl*)JB_Array_Value(_LoopSrcf2, _if0));
-			if (FnArg == nil) {
-				break;
-			}
-			int V = SC_Reg_Reg(SC_Pac_xC2xB5Reffed(Self, P, SC_Reg__New()));
-			Rz = (Rz | (V << Sh));
-			Sh = (Sh + 5);
-			(++Rz);
-			P = ((Message*)JB_Ring_NextSib(P));
-			if (SC_FAT_OperatorIsa(SC_Pac_LastWith0(Self), kSC__ASM_GRAB)) {
-				Addrs[0] = (Addrs[0] | JB_Int_Log2(V));
-			}
-			(++_if0);
-		};
-	}
-	;
-	return Rz;
-}
-
-uint64 SC_Pac_PrmCollectC(ASMState* Self, Message* Prms, SCFunction* Fn, uint* Addrs) {
-	uint64 Rz = 0;
 	int64 Sh = 64;
 	int Fc = 0;
 	int Ic = 0;
@@ -24157,21 +24149,25 @@ uint64 SC_Pac_PrmCollectC(ASMState* Self, Message* Prms, SCFunction* Fn, uint* A
 	{
 		int Ints = 0;
 		while (Ints < 2) {
-			Message* P = ((Message*)JB_Ring_First(Prms));
-			while (P) {
-				SCDecl* Ty = SC_Msg_ASMDecl(P);
-				if (((int)SC_Decl_SpecialRegs(Ty)) != Ints) {
-					int64 V = SC_Reg_Reg(SC_Pac_xC2xB5Reffed(Self, P, SC_Reg__New()));
-					Sh = (Sh - 5);
-					Rz = (Rz | (V << Sh));
-					Ic = (Ic + Ints);
-					Fc = (Fc + (!Ints));
-					if (SC_FAT_OperatorIsa(SC_Pac_LastWith0(Self), kSC__ASM_GRAB)) {
-						Addrs[0] = (Addrs[0] | JB_int64_Log2(V));
+			{
+				Message* P = ((Message*)JB_Ring_First(Prms));
+				while (P) {
+					SCDecl* Ty = SC_Msg_ASMDecl(P);
+					if (((int)SC_Decl_SpecialRegs(Ty)) != Ints) {
+						int64 V = SC_Reg_Reg(SC_Pac_xC2xB5Reffed(Self, P, SC_Reg__New()));
+						Sh = (Sh - 5);
+						Rz = (Rz | (V << Sh));
+						Ic = (Ic + Ints);
+						Fc = (Fc + (!Ints));
+						if (SC_FAT_OperatorIsa(SC_Pac_LastWith0(Self), kSC__ASM_GRAB)) {
+							Addrs[0] = (Addrs[0] | JB_int64_Log2(V));
+						}
 					}
-				}
-				P = ((Message*)JB_Ring_NextSib(P));
-			};
+					P = ((Message*)JB_Ring_NextSib(P));
+				};
+				;
+			}
+			;
 			(++Ints);
 		};
 	}
@@ -40704,7 +40700,7 @@ FatASM* SC_Msg_RequestOp(Message* Self, ASM Op) {
 	if (P < A->End) {
 		if (Self->Position == -1) {
 		}
-		if (SC_FAT_ID(P) == 1146000) {
+		if (SC_FAT_ID(P) == 33700) {
 		}
 		memzero((P), 64);
 		A->_Curr = (P + 1);
@@ -59528,4 +59524,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -4120785506500750410 7163034162008762483
+// -8232085140372980154 7163034162008762483

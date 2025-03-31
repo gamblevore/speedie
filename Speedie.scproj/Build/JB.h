@@ -5516,13 +5516,13 @@ void SC_ASMType__NotTemp(ASMState* Self, ASMReg Src, Message* P);
 
 ASMReg SC_ASMType__Num(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
-ASMReg SC_ASMType__PreRetBOR(FatASM* L, ASMReg Returned);
+int SC_ASMType__PreOptBOR(ASMState* Self, FatASM* L, int Ret);
 
-bool SC_ASMType__PreRetFnc(ASMState* Self, ASMReg Returned, FatASM* L);
-
-bool SC_ASMType__PreRetOpt(ASMState* Self, ASMReg Returned);
+bool SC_ASMType__PreOptFnc(ASMState* Self, FatASM* L, int Bb);
 
 ASMReg SC_ASMType__Return(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
+
+bool SC_ASMType__ReturnOpt(ASMState* Self, int Ret, int Bb);
 
 ASMReg SC_ASMType__SetRel(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
@@ -6522,6 +6522,8 @@ int64 SC_FAT_FloatIntConvConst(FatASM* Self, uint /*DataTypeCode*/ Src, uint /*D
 
 xC2xB5Form* SC_FAT_Form(FatASM* Self);
 
+uint64 SC_FAT_FuncPrms(FatASM* Self);
+
 uint SC_FAT_ID(FatASM* Self);
 
 FatASM* SC_FAT_Input(FatASM* Self, int I);
@@ -6578,8 +6580,6 @@ void SC_FAT_r2SetWithUint(FatASM* Self, uint Value);
 
 uint SC_FAT_r3(FatASM* Self);
 
-void SC_FAT_r3SetWithUint(FatASM* Self, uint Value);
-
 void SC_FAT_Renda(FatASM* Self, FastString* Fs, bool Simpler);
 
 void SC_FAT_RendaKnst(FatASM* Self, FastString* Fs, int Sofar);
@@ -6603,6 +6603,10 @@ void SC_FAT_SyntaxExpect(FatASM* Self, JB_String* Error);
 bool SC_FAT_SyntaxIs(FatASM* Self, ASMReg Flags);
 
 void SC_FAT_SyntaxIsSet(FatASM* Self, ASMReg Flags, bool Value);
+
+FatASM* SC_FAT_SyntaxUsing(FatASM* Self);
+
+void SC_FAT_SyntaxUsingComplete(FatASM* Self, void* Idk);
 
 void SC_FAT_TmpRender(FatASM* Self, FastString* Fs, Message* Msg);
 
@@ -7046,8 +7050,6 @@ void SC_Pac_PackMakerInit(ASMState* Self);
 ASMReg SC_Pac_Plus(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
 uint64 SC_Pac_PrmCollect(ASMState* Self, Message* Prms, SCFunction* Fn, uint* Addrs);
-
-uint64 SC_Pac_PrmCollectC(ASMState* Self, Message* Prms, SCFunction* Fn, uint* Addrs);
 
 ASMReg SC_Pac_Quick1Or1Sub(ASMState* Self, ASMReg Dest, ASMReg L, int Ptoi, Message* Exp);
 

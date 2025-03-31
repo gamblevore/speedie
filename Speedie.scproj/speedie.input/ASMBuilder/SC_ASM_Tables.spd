@@ -98,40 +98,42 @@ function Sheb (fn_asm)
 	return exp.noop * asmreg()
 
 
-function PreRetOpt (|&ASMState| self, |asmreg| Returned, |bool|)
+function ReturnOpt (|&ASMState| self, |int| Ret, |int| bb, |bool|)
 	|| l = .last
+
+	// the basicblock thing isnt perfect.
+	// what if... the bor gets jumped to and we turn it into a ret?
+	// well that is OK? seems OK?
+
+	// but then what about the fnc behind it?
+	// wierd. IDK. maybe its ok. 
+	// needs a few tests written to be sure!
+	
 	while l isa asm.BOR
-		Returned = PreRetBOR(l, Returned) #require
+		Ret = PreOptBOR(self, l, Ret) #require
 		l--
 
 	if l isa asm.fnc or asm.fnc3
-		return PreRetFnc(self, Returned, l)
+		return PreOptFnc(self, l, bb)
 
 
-function PreRetBOR (|FATASM| l, |asmreg| Returned, |ASMReg|)
+function PreOptBOR (|&ASMState| self, |FATASM| l, |int| Ret, |int|)
+	(self)
 	require !l.r[2]						// x = b ||| 0  -->  x = b
-	require Returned.reg == l.Prm(0)	// return x
-	|| Input = l.r1|int|.asm
-	l._op = asm.ret
-	l.Outputs = 0
-	l.r0 = Input
-	l.r1 = 0
-	l.r2 = 0
-	l.r3 = 0	
-	l.info = Returned					// (l * asmreg.exit)
-	return Input
+	require Ret == l.Prm(0)	// return x
+	rz = l.r1
+	using L // syntaxusingcomplete needs upgrade to deref?
+		l.msg.ret(rz.asm, asmreg(), asmreg(), 0, 0)
+		l.Operatormul(asmreg.exit)
+	rz&=31
 
 
-function PreRetFnc (|&ASMState| self, |asmreg| Returned, |FATASM| l, |bool|)
-	require !l.r[3] // no pExt
-	l.r[0] = l.r[1]
-	l.r[1] = l.r[2]
-	l.r[2] = 0
-	l._op = asm.tail
-	// l.InputRegs needs to be moved...
-	l.Outputs = 0
-	l.info = Returned			// (l * asmreg.exit)
-	return (l.BlockNum == .BasicBlock)
+function PreOptFnc (|&ASMState| self, |FATASM| l, |int| bb, |bool|)
+	require !l.r3 // no pExt
+	using L
+		l.msg.tail(l.r1, l.r2) // syntaxusingcomplete needs upgrade to deref?
+		L.OperatorMul(asmreg.exit)
+		return bb == .basicblock // no blocks occured
 
 	
 function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest, |AsmReg|)
@@ -139,6 +141,7 @@ function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest, |AsmReg|
 	// What about getting the address of registers?
 	dest = dest as asmreg.ExitFunction * .TailInlineable
 	dest = dest as asmreg.ExitAtAll
+	|| bb = .BasicBlock
 	|| f = exp.first
 		dest = .µinto(f, dest)
 	
@@ -147,7 +150,8 @@ function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest, |AsmReg|
 	// so its ok.
 	// the thing is... we also want to "post-opt" stuff. So... we could just nop
 	// the ret? Sigh. Lets do the other one first, then we know what to do here.
-	if .TailInlineable and PreRetOpt(self, dest)
+	
+	if .TailInlineable and ReturnOpt(self, dest, bb)
 		return dest
 	
 	|| fat = exp.RET(Dest, asmreg(), asmreg(), 0, 0)
@@ -161,26 +165,26 @@ function Return (fn_asm)
 	|| L = .state.return		// can remove constants, so try first
 		return InlinedReturn(self, exp, L)
 
-	|asmreg| V 
 	|| f = exp.first
-		V = .ExistingVar(f, VarUseMode.return)
-		if !v
-			v = .µGetASM(f, ASMReg.ExitFunction)
-		
-	if PreRetOpt(self, dest)
-		return asmreg.exit
+		|| bb = .BasicBlock
+		dest = .ExistingVar(f, VarUseMode.return)
+		if !dest
+			dest = .µGetASM(f, ASMReg.ExitFunction)
+		if ReturnOpt(self, dest, bb)
+			return asmreg.exit
+	  else
+		dest = asmreg()
 	
-	|| amount = (f!=nil)|int|
 	|| D0 = .SafeDecr
-		if d0.reg != V.reg // problem
+		if d0.reg != dest.reg // problem
 	|| D1 = .decr
 	|| D2 = .decr
 	
 	|ind| K = -1
 	if !D0
-		K = .Const(V, 8, true)
+		K = .Const(dest, 8, true)
 	|| HasK = K>=0
-	|| fat = exp.RET(V*!HasK, D1, D2, (D0!=nil)|int|, K * HasK)
+	|| fat = exp.RET(dest*!HasK, D1, D2, (D0!=nil)|int|, K * HasK)
 	fat.µRefCount++
 	
 	return fat * asmreg.Exit

@@ -640,7 +640,6 @@ extend ASMState
 				return f
 	
 	function Assign (|asmreg| dest, |asmreg| src, |message| exp, |asmreg|)  // assigns (
-		debugat 105 
 		|| sr = src.reg
 		|| dr = dest.reg
 		if !dr //?:O
