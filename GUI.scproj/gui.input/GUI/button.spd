@@ -35,6 +35,7 @@ class ButtonView (GUIControl)
 
 	helper InitMenu (|GUIListEvent| ret,  |menu|)
 		if ret
+			.MouseDownDoesClick = true
 			rz = menu(self, nil, ret)
 
 
