@@ -6598,6 +6598,8 @@ MaybeBool SC_FAT_SmartFatness(FatASM* Self, int Reg);
 
 FatASM* SC_FAT_Step(FatASM* Self, int Dir);
 
+bool SC_FAT_SyntaxEquals(FatASM* Self, int ID, bool Aware);
+
 void SC_FAT_SyntaxExpect(FatASM* Self, JB_String* Error);
 
 bool SC_FAT_SyntaxIs(FatASM* Self, ASMReg Flags);
@@ -11879,7 +11881,7 @@ inline JB_String* JB_config_AsString(Message* Self) {
 
 inline void SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info) {
 	Self->R[A] = SC_Reg_treg(Info);
-	Self->Outputs = (Self->Outputs | JB_Int_Log2(((int)A)));
+	Self->Outputs = (Self->Outputs | (1 << A));
 }
 
 inline void SC_FAT_PrmWithIntReg(FatASM* Self, int A, ASMReg Input) {

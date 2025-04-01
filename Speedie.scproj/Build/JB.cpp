@@ -3507,7 +3507,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[214]);
-	JB_FS_AppendInt32(_fsf0, (2025033119));
+	JB_FS_AppendInt32(_fsf0, (2025040119));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8611,7 +8611,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1693]);
-	JB_FS_AppendInt32(_fsf0, (2025033119));
+	JB_FS_AppendInt32(_fsf0, (2025040119));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -21948,6 +21948,11 @@ FatASM* SC_FAT_Step(FatASM* Self, int Dir) {
 	};
 }
 
+bool SC_FAT_SyntaxEquals(FatASM* Self, int ID, bool Aware) {
+	;
+	return SC_FAT_ID(Self) == ID;
+}
+
 void SC_FAT_SyntaxExpect(FatASM* Self, JB_String* Error) {
 	JB_File* F = ((JB_File*)SC_FAT_File(Self));
 	JB_Error* Err = JB_Err_Constructor(nil, nil, Error, kJB__ErrorSeverity_Error, F);
@@ -22720,7 +22725,6 @@ ASMReg SC_Pac_AskForInline(ASMState* Self, Message* Prms, ASMReg Dest, SCFunctio
 		return I;
 	}
 	if ((!Self->State.InlineDepth) and (Self->DeepestInline > 1)) {
-		JB_DoAt(1);
 		Self->InlineLimit = 1;
 		I = SC_Pac_TryInline(Self, Prms, Dest, Fn, AllowedGain);
 		if (I) {
@@ -23226,10 +23230,8 @@ ASMReg SC_Pac_DeclareMe(ASMState* Self, Message* Where, SCDecl* Type) {
 }
 
 void SC_Pac_DecrWithFatInt(ASMState* Self, FatASM* F, int Depth) {
-	if (Depth > 5) {
-	}
 	if (F and ((--F->xC2xB5RefCount) <= 0)) {
-		SC_Pac_Nop(Self, F, Depth + 1);
+		SC_Pac_Nop(Self, F, Depth);
 	}
 }
 
@@ -23500,6 +23502,7 @@ ASMReg SC_Pac_IfSub(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
 	Message* Arg1 = ((Message*)JB_Ring_NextSib(Cond));
 	Message* Other = ((Message*)JB_Ring_NextSib(Arg1));
 	FatASM* IfStart = SC_Pac_Curr(Self);
+	JB_DoAt(202);
 	FatRange B = ((FatRange){});
 	SC_Pac_Branch(Self, Cond, (&B), false);
 	FatASM* ArgStart = SC_Pac_Curr(Self);
@@ -24004,13 +24007,11 @@ ASMReg SC_Pac_Multiply(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message*
 }
 
 void SC_Pac_Nop(ASMState* Self, FatASM* Fat, int Depth) {
-	if (Depth > 5) {
-	}
 	FatASM* C = SC_Pac_Curr(Self) - 1;
 	if (Fat == C) {
 		Self->_Curr = C;
 	}
-	return SC_Pac_SoftNop(Self, Fat, Depth + 1);
+	return SC_Pac_SoftNop(Self, Fat, Depth);
 }
 
 void SC_Pac_Nop2Consts(ASMState* Self, ASMReg A, ASMReg B) {
@@ -24375,6 +24376,7 @@ FatASM* SC_Pac_RefCountSub(ASMState* Self, Message* Exp, Message* Prms, SCFuncti
 	if (Fn == SC__Comp_RefClear) {
 		int Offset = 0;
 		ASMReg A = SC_Pac_xC2xB5(Self, ((Message*)JB_Ring_First(Prms)), kSC__Reg_AddrRequest);
+		A = SC_Pac_InlineOffsetOpt(Self, A, 2, (&Offset), ((1 << 13) - 1));
 		return SC_Msg_RFWR(Exp, A, nil, 1, Offset);
 	}
 	if (Fn == SC__Comp_RefSetRef) {
@@ -24609,7 +24611,8 @@ void SC_Pac_SofterNop(ASMState* Self, FatASM* Fat) {
 }
 
 void SC_Pac_SoftNop(ASMState* Self, FatASM* Fat, int Depth) {
-	if (Depth > 5) {
+	(++Depth);
+	if (Depth > 7) {
 	}
 	{
 		uint _irf0 = Fat->InputFats;
@@ -24620,12 +24623,13 @@ void SC_Pac_SoftNop(ASMState* Self, FatASM* Fat, int Depth) {
 				continue;
 			}
 			FatASM* F = (SC_FAT_Input(Fat, _if1));
-			SC_Pac_DecrWithFatInt(Self, F, Depth + 1);
+			SC_Pac_DecrWithFatInt(Self, F, Depth);
 			(++_if1);
 		};
 	}
 	;
-	(SC_FAT_SetOpSet(Fat, kSC__ASM_NOOP));
+	ASM_U0 Type = kSC__ASM_NOOP * (Fat < Self->_Curr);
+	(SC_FAT_SetOpSet(Fat, Type));
 }
 
 ASMReg SC_Pac_Str(ASMState* Self, Message* Exp, ASMReg Dest, int Mode) {
@@ -40700,7 +40704,7 @@ FatASM* SC_Msg_RequestOp(Message* Self, ASM Op) {
 	if (P < A->End) {
 		if (Self->Position == -1) {
 		}
-		if (SC_FAT_ID(P) == 33700) {
+		if (SC_FAT_SyntaxEquals(P, 239400, false)) {
 		}
 		memzero((P), 64);
 		A->_Curr = (P + 1);
@@ -51196,11 +51200,10 @@ SCIterator* SC_Class_GetIteratorAny(SCClass* Self, JB_String* Name, Message* Nod
 }
 
 SCClass* SC_Class_GoUpTo(SCClass* Self, int D) {
-	SCClass* S = Self;
-	while (S and (S->Depth > D)) {
-		S = S->Super;
+	while (Self and (Self->Depth > D)) {
+		Self = Self->Super;
 	};
-	return S;
+	return Self;
 }
 
 void SC_Class_GrabRemaining(SCClass* Self, Array* Dest) {
@@ -59524,4 +59527,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -8232085140372980154 7163034162008762483
+// -5452165843906296211 7163034162008762483
