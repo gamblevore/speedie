@@ -19,11 +19,8 @@ function Compiler.Main
 
 
 function Compiler.EnterCompile (|bool|)
-	// platform.log "X1"
 	if !.TryVariousStartModes
-		// platform.log "X2"
 		if FeedBack.ParseArgs
-			// platform.log "X3"
 			if !interact.EnterAutoComplete
 				return true
 
