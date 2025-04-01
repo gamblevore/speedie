@@ -208,24 +208,22 @@ struct ASMState
 				.Nop(f)
 	
 	function Nop (|FATASM| Fat, |int| Depth=0)
-		if depth > 5
 		|| C = .curr - 1
 		if fat == C
 			._curr = C // nice
-		return .SoftNop(fat, depth+1)
+		return .SoftNop(fat, depth)
 		
 	function SoftNop (|FATASM| Fat, |int| Depth=0)
-		if depth > 5
+		depth++
+		if depth > 7
 		for f.fatinputs in fat
-			.decr(f, depth+1)
-		fat.setop = asm.noop
+			.decr(f, depth)
+		|| Type = asm.noop * (fat < ._curr)
+		fat.setop = Type
 	
 	function Decr (|?&fatasm| f, |int| Depth=0)
-		if depth > 5
 		if f and --f.µRefCount <= 0
-			//f.debugprint
-			//debugger 
-			.Nop(f, depth+1)
+			.Nop(f, depth)
 	
 	function SofterNop (|FATASM| Fat)
 		fat.setop = asm.noop

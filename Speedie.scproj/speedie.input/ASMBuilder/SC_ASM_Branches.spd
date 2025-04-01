@@ -36,7 +36,8 @@ function IfSub (fn_asm)
 	|| cond = exp.first!,  || arg1 = cond.next!
 	|| Other = arg1.next
 	|| IfStart = .curr
-
+	
+	debugat 202
 	|FATRange| B
 	.Branch(cond, B)
 	|| ArgStart = .curr

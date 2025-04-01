@@ -574,10 +574,10 @@ class SCDecl (SCNamed) {
 	
 	function SCClass.GoUpTo (|int| d, |SCClass|)
 		opt norefcounts
-		|| s = self
-		while (s and s.depth > d)
-			s = s.super
-		return s
+		real self
+		while (self and .depth > d)
+			self = .super
+		return self
 	
 
 	function HighestArrayContainMatch (|SCDecl| Other, |SCDecl|)

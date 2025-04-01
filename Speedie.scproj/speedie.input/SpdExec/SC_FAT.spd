@@ -203,7 +203,7 @@ struct FatASM
 	function Dest (|uint| a, |asmreg| info)
 		opt inline
 		.r[a] = info.treg
-		.Outputs |= a|int|.log2
+		.Outputs |= 1<<a
 	
 	
 	function File (|string|)
@@ -212,13 +212,10 @@ struct FatASM
 			return s
 	
 	syntax Using (|&fatasm|)
-		// this is losing the blocknumber. needs to be saved also. Sigh.
-		// save one number that includes the blocknum and the current-index
 		rz = ASMState.sh.curr
 		ASMState.sh._curr = self
 		
 	syntax UsingComplete (|&nil| idk)
-		// could/should deref the old thing (after copying it?)
 		ASMState.sh._curr = self, (idk)
 	
 	
