@@ -390,7 +390,8 @@ class String
 			pos = p+1
 			++rz
 			
-	operator Plus (|string| other, |string|)
+	operator Plus (|string?| other, |string|)
+		nil safe
 		cpp_wrapper JB_Str_OperatorPlus
 			
 	helper Append (|string| b, |string| c, |string| d="")

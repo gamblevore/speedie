@@ -323,4 +323,5 @@ function string.UnPrintable (|int|)
 
 function String.Spin (|int| f, |byte|)
 	return `|/-\`[f&3] // useful for printing "processing" things to stdout
-
+	
+	
