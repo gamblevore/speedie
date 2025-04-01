@@ -59,6 +59,7 @@ class PerryIDE (Window)
 	|ButtonView|				CurrFileName
 	|Buttonview|                ASMButton
 	|ButtonView|				FunctionMenu
+	|ButtonView|				CommandsMenu
 	|buttonview|				Toolbar
 	|Buttonview|				ProjectTabs
 	|buttonview|				CompileTabs // compilertabs
@@ -609,7 +610,8 @@ class PerryIDE (Window)
 				.ViewTextModeSwap
 				return true
 		if key is p or backslash
-			return .IDECommand
+			.CommandsMenu.Click
+			return true
 			
 
 	function Flip (|textview| s, |bool|)
@@ -631,14 +633,10 @@ class PerryIDE (Window)
 		if FuncMenu
 			.FileList.quickopen isnt visible
 			return .FunctionMenu.SearchMenu
-//			.FunctionMenu.SearchMenu
-//				return true
-//			return .FileList.ShowQuickOpen
 			
 		  else
 			|| sub = .FunctionMenu.SubMenu
 				sub.CloseMenu
-//			return .FileList.ShowQuickOpen
 			if .FileList.ShowQuickOpen
 				return true
 			return .FunctionMenu.SearchMenu

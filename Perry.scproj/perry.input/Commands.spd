@@ -10,6 +10,12 @@ dispatch PerryCommands (|perryide| self, |string| s)
 	+"cr_use"
 		.editme.beep = s.ReplaceAll("\n", "\r\n")
 		
+	+"lower"
+		.editme.beep = s.lowercase
+		
+	+"upper"
+		.editme.beep = s.Uppercase
+		
 	+"ascii"
 		app.alert string.ASCII_Chart
 		
@@ -20,7 +26,7 @@ dispatch PerryCommands (|perryide| self, |string| s)
 		.editme.beep = s2.name
 
 	+"note"
-		notifications <~ "ascii"
+		notifications <~ "Notification Test"
 
 	+"render" // "parse"
 		.editme.beep = s.parse.Render
@@ -38,13 +44,34 @@ dispatch PerryCommands (|perryide| self, |string| s)
 		DebugGUI = !DebugGUI
 
 
-|| LastCommand = "tetris"
-function PerryIDE.IDECommand (|bool|)
-	// this should be a window really!
-	|| cmd = "Enter Command".ask(LastCommand)
-		LastCommand = cmd
-		|| fn = PerryCommands[cmd]					#expect (beep, "unrecognised: " + cmd)
-		(fn[])(self, .editme.SelText)
+|listviewrow| _PerryCommandsMenu
+function PerryCommandsMenu (|listviewrow|)
+	|| L = _PerryCommandsMenu
+		return L
+	L = ListViewRow()
+	for (v in perrycommands) (k)
+		|| M = @str + k
+		m.obj = v
+		L <~ M
+	_PerryCommandsMenu = L
+	return L
+	
+
+
+function MenuCommands (GUIAction)
+	opt norefcounts
+	if self isa buttonview
+		|| s = .SubMenu
+			.OpenMenu
+
+
+function ReturnCommands (GUIListEvent)
+	require row
+	|DataObject of Fn_PerryCommands| o = row.obj as DataObject	#require
+	|| fn = o[]
+	|| i = .ide
+	|| s = i.editme.SelText
+	(fn)(i, s)
 
 
 
@@ -52,5 +79,4 @@ function textview.beep (assigns:|string| s)
 	expect (.text != s) (beep)
 	.SelText = s
 
-PerryCommands["parse"] = PerryCommands["render"]
 

@@ -27,6 +27,7 @@ extend PerryIDE
 		.GoNext				= ButtonView(.RBorder,	ClickedPrevNext, RightClickNext, ChosePrevItem, RightClickNext)
 		.CurrFileName		= ButtonView(.RBorder,	OpenProjectPath, nil,	ReturnProjectPath)
 		.FunctionMenu		= ButtonView(.RBorder,	MenuAllFuncs,	 nil,	ReturnAllFuncs) 
+		.CommandsMenu		= ButtonView(.RBorder,	MenuCommands,	 nil,	ReturnCommands) 
 		.ASMButton			= ButtonView(.rborder,  ClickedASMButton)
 		.MassSearchField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
 		.MassReplaceField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
@@ -526,17 +527,33 @@ extend PerryIDE
 		.gonext.SubControl = .GoPrev.SubControl
 		
 		with .CurrFileName
-			.MouseDownDoesClick	= true
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)
 			.id = "CurrFileName"
 			.tooltip = "Show File Path"
 
 		with .FunctionMenu
-			.MouseDownDoesClick	= true
 			.gnormal = self.currfilename.gnormal
 			.id = "AllFuncs"
 			.tooltip = "List Functions In File"
 			.size = 4~after for 40 by the~same
+		
+		with .FunctionMenu.submenu
+			isnt drawsfocus
+			.ID = "AllFuncsMenu"
+			.OnSelected = PerryFuncMenuSelected
+			.OnTypingFilter = PerryFuncListFilter
+
+		with .CommandsMenu
+			.gnormal = self.currfilename.gnormal
+			.id = "Commands"
+			.text = "Commands"
+			.tooltip = "Available Commands"
+			.size = 4~after for 70 by the~same
+		
+		with .CommandsMenu.submenu
+			isnt drawsfocus
+			.ID = "CommandsMenu"
+			.ListSource = PerryCommandsMenu()
 
 		with .ASMButton
 			.gnormal = self.startscreen.gnormal
@@ -544,12 +561,6 @@ extend PerryIDE
 			.tooltip = "ASM-Viewer (Inbuilt GodBolt)"
 			.size = 6~left back 23  by  the~same
 			.text = "\1d"
-		
-		with .FunctionMenu.submenu
-			isnt drawsfocus
-			.ID = "AllFuncsMenu"
-			.OnSelected = PerryFuncMenuSelected
-			.OnTypingFilter = PerryFuncListFilter
 
 		with .startscreen.submenu
 			isnt drawsfocus
