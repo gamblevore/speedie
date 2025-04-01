@@ -22,7 +22,7 @@ extend asmstate
 		if fn == compiler.RefClear
 			|| offset = 0
 			|| A = .µ(prms.first!, ASMReg.AddrRequest)
-			debugger
+			A = .InlineOffsetOpt(A, 2, &offset, 13~bits)
 			return exp.RFWR(A, nil, 1, offset)						// reg to mem
 
 		if fn == Compiler.RefSetRef

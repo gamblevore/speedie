@@ -670,7 +670,7 @@ struct ASMState
 		|| I = .TryInline(prms, dest, fn, AllowedGain)
 			return I		
 		if !.state.inlinedepth and .DeepestInline > 1
-/			.InlineLimit = 1
+			.InlineLimit = 1
 			i = .TryInline(prms, dest, fn, AllowedGain)
 			if i
 				return i
