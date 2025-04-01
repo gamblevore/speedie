@@ -18,6 +18,7 @@ main
 	using flowcontrol.Attempt("maybe")
 		app.TestSyntax
 
+
 function PrintNum (|int64| b1)
 	"${B1.strsize} = $B1"
 
@@ -26,7 +27,7 @@ function app.TestSyntax
 	printnum(60GB)
 	printnum(7.9MB|int|)
 	printnum(9524600)
-	
+		
     || P = person(12, "fred")
     P.age = -2 // try to corrupt the age 
     "$p" // see if it worked or not?
@@ -39,26 +40,26 @@ function app.TestSyntax
 	|| L = "(a,b,c,d)".parse
 	if L == 4
 	    "The list $L has four items!"
-    || z = 0
+    || zz = 0
     for i in 1 to 6
         if i isa 2
             "$i is even"
-            z[i] = true
+            zz[i] = true
           else
             "$i is odd"
-    "z is $z"
+    "zz is $zz"
     
 
-	FlowControl.Disabled++
+	FlowControl.DisabledIncr(1)
 	for 4
 	    || fn = (mesayer, shesayer)(0.5[])
-	    (fn)(app.args[0])
-	FlowControl.Disabled--
+	    (fn)(app.args[0] ?? "hello")
+	FlowControl.DisabledIncr(-1)
 
 	bug()
 
 
-function bug (|fn_doaction!|)
+function Bug (|fn_doaction!|)
 	opt norefcounts
     || G = RPGHero("fred")
     |dictionary of fn_doaction| dict
