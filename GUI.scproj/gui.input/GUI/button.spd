@@ -39,10 +39,10 @@ class ButtonView (GUIControl)
 			rz = menu(self, nil, ret)
 
 
-	function Attach (|guicontrol| p)
-		.SubControl = p
-		self <~ p
-		p.ClickOutsideCloses = true
+//	function Attach (|guicontrol| p)
+//		.SubControl = p
+//		self <~ p
+//		p.ClickOutsideCloses = true
 	
 	
 	function SubMenu (|menu|)
