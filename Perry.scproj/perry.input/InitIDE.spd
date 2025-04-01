@@ -174,8 +174,18 @@ extend PerryIDE
 			.OnSelError		= EditMeSelError
 
 
+		with .DrawMe
+			is   enabled
+			is   editable
+			isnt drawsfocus
+			.ID				= "DrawMe"
+			.size = the~width by the~bottom to 0~before 
+			.gnormal.bg		= vec4(0.0, 0.81)
+			.gnormal.edge   = vec4(0.2, 1.0)
+			.gnormal.seps	= vec4(0.4, 1.0)
+
+
 		with .ASMView
-			isnt visible
 			.tooltip		= "Displays ASM"
 			.TakesFocus 	= TakesFocusFlag.CanFocus
 			.ID				= "ASMView"
@@ -183,6 +193,7 @@ extend PerryIDE
 			is NoSearch
 			.GNormal.solid =  LeftBG
 			.OnKeyDown = ASMViewKeys
+		.ASMVis = false
 
 
 		with .autocomplete
@@ -378,17 +389,6 @@ extend PerryIDE
 			.expectsparse	= TextView.probablyjeebox
 
 
-		with .DrawMe
-			is   enabled
-			is   editable
-			isnt drawsfocus
-			.ID				= "DrawMe"
-			.size = the~width by the~bottom to 0~before 
-			.gnormal.bg		= vec4(0.0, 0.81)
-			.gnormal.edge   = vec4(0.2, 1.0)
-			.gnormal.seps	= vec4(0.4, 1.0)
-
-
 		with .EditStatus 
 			.ID				= "Status And Errors"
 			.alignment		= MoveCode.Center
@@ -444,8 +444,8 @@ extend PerryIDE
 			.AddLow  self.CompileArea
 			.addhigh self.rborder
 			.addhigh self.editme
-			.addhigh self.ASMStretch
 			.addhigh self.drawme
+			.addhigh self.ASMStretch
 		
 		with .asmstretch
 			.id = "ASMStretch"

@@ -335,6 +335,9 @@ function ViewAsVis (|bool| AsProject)
 	
 	|| IsPic = .IsGraphics
 	(.editme is visible) = !IsPic
+	(.ASMButton is visible) = !ispic
+	(.CommandsMenu is visible) = !IsPic
+	(.FunctionMenu is visible) = !IsPic and .FunctionMenu.ListSource.HasAny
 	(.drawme is visible) = IsPic
 	.CalculateWindowSize(true, true)
 	if !.Focus.IsViewable

@@ -323,7 +323,7 @@ function EditMeModified (guitextevent)
 			(sub.ListSource is modified) = Mod
 	
 	i.CurrASMFunc = nil
-	if i.ASMView is Visible
+	if i.ASMVis
 		i.UpdateASM
 
 

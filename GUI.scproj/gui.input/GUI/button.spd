@@ -266,8 +266,8 @@ class ButtonView (GUIControl)
 			g.Strengthen(fader)
 			Where.DrawRectStyled(Grow, G)
 		
-		if !i and .SubMenu
-			i = .SubMenu!.ListSource // allow these text to be added.
+		if !i
+			i = .ListSource // allow these text to be added.
 		|| t = i.ButtonText(.text)
 		|| Pn = R.TextCorner(g,  t,  .align) + (0, 1)
 		|| DrawInvis = (.align & listviewstate.DrawWhiteSpace)!=0
@@ -340,6 +340,10 @@ class ButtonView (GUIControl)
 		opt norefcounts
 		return  .SubControl isa menu  and  .subcontrol is visible
 
+	function ListSource (|ListViewRow|)
+		opt norefcounts
+		|| m = .SubMenu
+			return m.ListSource
 
 	function OpenMenu (|listviewrow| row=nil, |menu|)
 		|| m = .SubMenu						#require

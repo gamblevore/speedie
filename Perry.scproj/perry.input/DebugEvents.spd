@@ -273,25 +273,32 @@ function DebugStepRun (guiaction)
 	
 
 
+function Perryide.ASMVis (|bool|)
+	return .ASMStretch is Visible
+
+
+function Perryide.ASMVis (assigns:|bool|)
+	(.ASMStretch is Visible) = Value
+	
 
 function ClickedASMButton (guiaction)
 	opt norefcounts
 	|| i = .ide
 	|| v = i.ASMView
 	v.clear
-	if v is Visible
+	if i.ASMVis
 		i.hideasm
 		return true
 
 	i.CurrASMFunc = nil
 	expect (i.UpdateASM) (beep)
-	(v is visible)
+	i.asmvis = true
 	v.AddFail "Displaying ASM..."
 
 
 
 function perryide.TryReselectASM (|bool|)
-	require !.DuringASMEvent and (.ASMView is Visible)
+	require !.DuringASMEvent and (.ASMVis)
 	.DuringASMEvent = true
 	.UpdateASM
 	.ReselectASM
@@ -308,7 +315,7 @@ function perryide.ReselectASM
 	
 	
 function perryide.HideASM
-	(.ASMView isnt visible)
+	.ASMVis = false
 	.ASMView.clear
 	.CurrASMFunc = nil
 
