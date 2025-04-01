@@ -31,11 +31,12 @@ class ButtonView (GUIControl)
 		.OnRightClick = OnRightClick
 		.StepDuration = 0.75s
 		.align = ListViewState.aligncenter 
-		.subcontrol = .InitMenu(ret)
+		.subcontrol = .InitMenu(ret, pressing)
 
-	helper InitMenu (|GUIListEvent| ret,  |menu|)
+	helper InitMenu (|GUIListEvent| ret, |guiaction| Pressing,   |menu|)
 		if ret
-			.MouseDownDoesClick = true
+			if !pressing
+				.MouseDownDoesClick = true
 			rz = menu(self, nil, ret)
 
 
