@@ -6534,6 +6534,8 @@ bool SC_FAT_IsFunc(FatASM* Self);
 
 bool SC_FAT_IsUnused(FatASM* Self);
 
+int SC_FAT_Jump(FatASM* Self);
+
 bool SC_FAT_JumpImprove(FatASM* Self);
 
 void SC_FAT_JumpInputSet(FatASM* Self, int A, int V);
@@ -7029,7 +7031,7 @@ void SC_Pac_Nop(ASMState* Self, FatASM* Fat, int Depth);
 
 void SC_Pac_Nop2Consts(ASMState* Self, ASMReg A, ASMReg B);
 
-void SC_Pac_NopConst(ASMState* Self, ASMReg R);
+bool SC_Pac_NopConst(ASMState* Self, ASMReg R, bool Ask);
 
 bool SC_Pac_NopMinusOne(ASMState* Self, ASMReg R);
 
@@ -9060,6 +9062,8 @@ Message* SC_Msg_DclExp(Message* Self);
 
 void JB_Msg_Decl__(Message* Self, FastString* Fs);
 
+Message* SC_Msg_Declable(Message* Self);
+
 void SC_Msg_DeclAddNumbInt(Message* Self, int64 Num, SCNode* Name_space);
 
 Message* SC_Msg_DeclName(Message* Self);
@@ -9135,6 +9139,8 @@ Message* SC_Msg_FailOrCopy(Message* Self, Message* P);
 Message* SC_Msg_FalsifyNil(Message* Self);
 
 SCDecl* SC_Msg_FastDecl(Message* Self);
+
+SCDecl* SC_Msg_FastDeclSafe(Message* Self);
 
 FatASM* SC_Msg_FCLM(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int D);
 
@@ -11890,6 +11896,8 @@ inline void SC_FAT_PrmWithIntReg(FatASM* Self, int A, ASMReg Input) {
 	Self->InputRegs = (Self->InputRegs | (1 << A));
 	if (I) {
 		FatASM* Src = SC_uint_FAT(I);
+		if (SC_FAT_SyntaxEquals(Self, 3099, true)) {
+		}
 		if (Src != Self) {
 			Self->InputFats = (Self->InputFats | (1 << A));
 			(++Src->xC2xB5RefCount);
