@@ -220,14 +220,18 @@ function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCNode| scarg)
 			item.CollectFromBody(scarg) // keep on going even if one failed. good for autocomplete
 
 
+function scdecl.AsBody
+	is body
+	isnt altered
+	isnt NumberConst
+
+
 function Message.CollectFromBody (|SCNode| SCArg)
 	opt norefcounts
 	if .obj
 		return
 	|| dcl = .CollectDecl(SCArg, SCArg, declmode.FunctionBody)
-		(dcl is body)
-		(dcl isnt altered)
-		(dcl isnt NumberConst)
+		dcl.AsBody
 		SCParamArray.PostStructFix
 		|| def = dcl.Default
 			check (def != @thg  or  def.name ~!= dcl.name) (def, "Same name!")

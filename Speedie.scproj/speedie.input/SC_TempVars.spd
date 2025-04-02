@@ -202,6 +202,8 @@ extend_module scfunction
 		|| OldDcl = msg.AsDecl
 			insert.obj = OldDcl
 			|| Dcl2 = OldDcl.copydecl // no difference, its a temp
+			dcl2.AsBody
+			
 			Dcl2.Name = name
 			|| relname = dcl.last.first 
 				relname.obj = Dcl2

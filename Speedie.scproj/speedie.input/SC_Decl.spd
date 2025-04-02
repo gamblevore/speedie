@@ -79,10 +79,10 @@ datatype SCDeclInfo (int)
 		ReturnedVar
 		IntendedAsReturn
 		Body // were at 31... Speedie should also warn if theres too many. (it wasnt!)
-		Swappable	 = Param + Body + Global + Property
-		Local		 = Body + Param
-		SelfImplicit = Self + local // local is set by CollectOneParam, anyhow?
-		DclCopied    = altered + stayborrowed + api + UpgradeableContained + compilercreated + body// need more too? do later
+		Swappable	 = Param ||| Body ||| Global ||| Property
+		Local		 = Body ||| Param
+		SelfImplicit = Self ||| local // local is set by CollectOneParam, anyhow?
+		DclCopied    = altered ||| stayborrowed ||| api ||| UpgradeableContained ||| compilercreated ||| body // need more too? do later
 
 	function abc
 		|| x = Body
