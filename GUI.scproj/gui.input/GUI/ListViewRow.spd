@@ -27,14 +27,12 @@ role ListViewRow (message)
 
 	syntax is (|ListViewState| s, assigns:|bool| b)
 		|| t = .state
-		|| t2 = t
-		if b
-			t |= s
-		  else
-			t &= ~s
+		|| t2 = t ||| s
+		if !b
+			t2 = t&~s
 		if t2 != t
 			gui.touch
-			.state = t
+			.state = t2
 
 
 	helper Vis (|int|i, |bool|)
