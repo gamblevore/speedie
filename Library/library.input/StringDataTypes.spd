@@ -81,6 +81,7 @@ datatype byte
 		|| i = 0
 		while i < self
 			yield i
+			++i
 	
 	module
 		function ZAlloc (|int| n, |?&byte|)

@@ -37,7 +37,6 @@ function IfSub (fn_asm)
 	|| Other = arg1.next
 	|| IfStart = .curr
 	
-	debugat 202
 	|FATRange| B
 	.Branch(cond, B)
 	|| ArgStart = .curr
@@ -160,16 +159,19 @@ function Ternary		(fn_asm)
 		|| which = (A, B)(KK.Default)
 		rz = .µInto(which, dest)
 	  else
+		.basicblock++
 		|| µA = .µInto(A, dest)
-		|| Exit = exp.jump
 		.AllJumpTo(TernTest)
+		|| Exit = exp.jump
+		.basicblock++
 		rz = .µInto(B, dest)
+		.basicblock++
 		
 		|| fa = µa.fat
-		|| fB = rz.fat
-			fb.RegInput(5, µa)	// link µA from µB... so now B refers to A.
-		  elseif fa				// Filling an unused param. No instruction use it!
-/			fa.µRefCount++	//just in case
+		|| fB = rz.fat		
+			fb.RegInput(5, µa)	// B now refers to A. Not sure if we need this though???
+		  elseif fa
+/			fa.µRefCount++		// just in case
 							
 		Exit.jumpto(.curr, self)
 
@@ -251,14 +253,21 @@ helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |AS
 	return .BoolValue(A, dest, opp, b)
 	
 
+
 function FoundReg (|message| All, |int| R, |bool|)
 	opt norefcounts
-	for s.flat in All
-		if (s == @thg) and !(s in @func)
-			|| a = .ASMLocal(s, 0)
-			|| sr = a.reg
-			if sr == r
+	all = all.Declable
+	
+	if all == @thg or @num // nums can be hoisted
+		|| d = all.FastDeclSafe
+		if d is local
+			|| v = .ThgASM(d)
+			if v.reg == r
 				return true
+		
+	for s.fast in All
+		if .FoundReg(s, r)
+			return true
 
 
 function Unchanged (|message| A, |asmreg| dest, |message| B, |bool|)
@@ -415,7 +424,7 @@ Struct FatRange
 			yield curr
 
 
-extend asmstate
+extend ASMState
 	function InlineFinishWithConsts (|fatrange| R, |ASMReg|)
 		for s in R
 			if s isa asm.ret

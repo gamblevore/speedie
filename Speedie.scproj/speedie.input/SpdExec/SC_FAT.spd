@@ -193,6 +193,7 @@ struct FatASM
 		.InputRegs |= 1<<a
 		if i
 			|| src = i.fat // we refcount dests too. shouldn't!
+			if self ~= 3099
 			if src != self
 				.InputFats |= 1<<a
 				src.µRefCount++
@@ -231,16 +232,18 @@ struct FatASM
 
 	function JumpInput (|int| a, assigns:|int| v)
 		.r[a] = v
-		.jumpreg = a + 1
-		.µrefcount = 1 max .µrefcount // control flow is always used?
+		.JumpReg = a + 1
+		.µRefCount = 1 max .µRefCount // control flow is always used?
 		ASMState.sh.BasicBlock++
 	
-//	function Jump (|int|)
-//		|| j = .jumpreg
-//			return .r[j]
+	
+	function Jump (|int|)
+		|| j = .JumpReg
+			return .r[j-1]
+
 
 	function JumpTo (|&fatasm|)
-		|| j = .jumpreg
+		|| j = .JumpReg
 			return self + 1 + .r[j-1]|int|
 	
 	

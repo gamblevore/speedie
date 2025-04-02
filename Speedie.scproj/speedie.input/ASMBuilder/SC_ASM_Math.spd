@@ -283,10 +283,7 @@ extend ASMState
 			  else
 				exp = exp.prev!
 			
-		  elseif fn == @arel or @brel
-/			exp = exp.first! // merge after testing this
-		
-		  elseif fn == @acc
+		  elseif fn == @arel or @brel or @acc
 			exp = exp.first!
 			
 		  elseif fn == @dot // obj.Prop // requires pointermul on .prop cos of prev props

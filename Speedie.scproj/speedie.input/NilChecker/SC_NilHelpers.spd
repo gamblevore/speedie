@@ -37,6 +37,16 @@ function RedundantVar (|scdecl| dcl,  |nilcheckmode| Test,  |nilstate|)
 	return Test & nilstate.either
 
 
+function FastDeclSafe (|SCDecl|)
+	opt norefcounts
+	|| d = .obj
+	if d isa scdecl
+		|| l = d.IsLookupOnly
+		ifn l isa scdecl
+			return d
+		return l|scdecl|
+
+
 function FastDecl (|SCDecl!|)
 	opt norefcounts
 	|| obj = .obj

@@ -70,20 +70,24 @@ struct SC_Hoister
 				fat.µRefCount++
 	
 	
+	function message.Declable (|message!|)
+		opt norefcounts
+		|| fn = .func
+		if fn == @decl
+			self = .second!
+			fn = .func
+		while fn == @type
+			self = .first! // no go into the type!
+			fn = .func
+		if fn == @func
+			return .second!
+		return self
+	
+	
 	function Hoist (|message| exp, |int| Score)
 		opt norefcounts
-//		debugat 5626
+		exp = exp.Declable
 		|| fn = exp.func
-		if fn == @decl
-			exp = exp.second!
-			fn = exp.func
-		while fn == @type
-			exp = exp.first! // no go into the type!
-			fn = exp.func
-		if fn == @func
-			exp = exp.second!
-			fn = exp.func
-		
 		if  (fn == @dot or @thg or @num)  and  (.spare > 0)
 			|| prop = exp.ASMDecl
 			if (score >= 0)

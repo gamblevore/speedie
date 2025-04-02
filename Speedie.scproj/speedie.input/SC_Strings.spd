@@ -46,8 +46,8 @@ function Tran_RenderSub (|Message| msg, |SCClass| Cls, |bool|)
 		SCStrings.RenderNewParams.CopyAllInto(params)
 	
 	if msg.FindNested( @thg, "fs" )
-		SCStrings.RenderFinish.CopyAllBeforeInto( arg, nil )
-		SCStrings.RenderFinish.CopyAllAfterInto( arg, nil )
+		SCStrings.RenderFinish.CopyAllBeforeInto( arg, arg )
+		SCStrings.RenderFinish.CopyAllAfterInto( arg, arg )
 	if msg.isbehaviour
 		msg.second.remove
 		return true

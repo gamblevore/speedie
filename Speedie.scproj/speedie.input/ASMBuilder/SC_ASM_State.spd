@@ -190,22 +190,31 @@ struct ASMState
 	
 	
 	function Nop2Consts (|asmreg| A, |asmreg| B)
-		.nopconst(A)
-		.nopconst(B)
-		.nopconst(A) // in case of swapped order
+		|| Further = a.FatIndex > b.FatIndex
+			.NopConst(A)
+		.NopConst(B)
+		if !Further
+			.NopConst(A) // in case of swapped order
 	
 	
 	function Const (|asmreg| R, |int| bits, |bool| signed, |ind|)
 		if R is ConstOutput
 			|| k = R.const
-			if k.fits(bits, signed)
-				.NopConst(R)
+			if k.fits(bits, signed) and .NopConst(R, true)
 				return k|uint64|.trim(bits)
 
-	function NopConst (|asmreg| R)
-		if (r is RemoveableOutput) or (r is realconst)
+
+	function NopConst (|asmreg| R, |bool| Ask=false,   |bool|)
+		// This is used all over. can we make this bool result used all over?
+		// Sigh. So much analysis just to see if we can rework anything
+		// What about temps? (temps can come multiple blocks (ternaries))
+		
+		if (r is RemoveableOutput) or (r is RealConst)
 			|| f = r.fat
-				.Nop(f)
+				if !ask or f.BlockNum == .BasicBlock
+					.Nop(f)
+					return true
+	
 	
 	function Nop (|FATASM| Fat, |int| Depth=0)
 		|| C = .curr - 1
@@ -758,7 +767,10 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 
 function fatasm.IsFinisher (|bool|)
 	|| o = .op|asm|
-	return o == asm.ret or asm.trap or asm.TAIL
+	if o == asm.ret or asm.trap or asm.TAIL
+		return true
+	if o == asm.jump
+		return .jump < 0
 
 
 

@@ -181,6 +181,7 @@ function Return (fn_asm)
 	|| D2 = .decr
 	
 	|ind| K = -1
+	// we shouldn't be able to inline consts from other blocks!
 	if !D0
 		K = .Const(dest, 8, true)
 	|| HasK = K>=0

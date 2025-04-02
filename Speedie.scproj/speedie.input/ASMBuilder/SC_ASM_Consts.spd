@@ -107,7 +107,7 @@ extend ASMState
 		if v // or (reg.reg)
 			return ._Num(exp, v, reg)
 
-		rz = asmreg.ZeroParam as (reg & asmreg.ConstInput)
+		rz = asmreg.ZeroParam as (reg & ASMReg.ConstInput)
 		rz.µType = SrcType
 	
 	
