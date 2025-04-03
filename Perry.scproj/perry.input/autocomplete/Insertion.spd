@@ -9,7 +9,16 @@ helper textview.RangeCheck (|int| r, |message| func_name, |message| prms, |bool|
 	return r in (l, a) // allow a little lee-way
 	
 
-function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange, |&int| state, |message|)
+helper Message.IsTextFuncLike (|bool|)
+	opt norefcounts
+	|| a = .first
+	require a == @thg or @dot
+	|| b = a.next
+	require b == @bra or @list
+	|| c = b.next
+	return !c or c == @arg
+	
+function TextView.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| InRange, |&int| state, |message|)
 	visible
 	opt norefcounts
 	
@@ -58,7 +67,10 @@ function textview.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| inrange
 			state[] = 3
 			return msg0
 		
-		state[] = 10
+		if msg.IsTextFuncLike
+			state[] = 3
+		  else
+			state[] = 10
 		return msg
 	
 	|| ConstructorLike = msg ~= "constructor" or "render"
@@ -386,7 +398,7 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 		require state != 10 
 		if !s.width
 			require !self[s.x-1].istextline
-		if (state >= 4)  and  !s.width 
+		if (state >= 3)  and  !s.width 
 			return (s.x <= i2)|int|
 		if (state == 2)
 			if s.width
