@@ -5377,8 +5377,6 @@ int SC_Reg_BitCount(ASMReg Self);
 
 ASMReg SC_Reg_BoolAnswer(ASMReg Self);
 
-bool SC_Reg_CanAddK(ASMReg Self, int64 T);
-
 int64 SC_Reg_Const(ASMReg Self);
 
 bool SC_Reg_ConstEnough(ASMReg Self);
@@ -5412,6 +5410,8 @@ int SC_Reg_LeftScore(ASMReg Self);
 FatASM* SC_Reg_NeedFAT(ASMReg Self);
 
 ASMReg SC_Reg_Negate(ASMReg Self, bool Neg);
+
+bool SC_Reg_Normalness(ASMReg Self);
 
 ASMReg SC_Reg_OperatorAs(ASMReg Self, ASMReg A);
 
@@ -6490,6 +6490,8 @@ void SC_FAT_AddLabelRequest(FatASM* Self, Message* P, int Pos);
 
 void SC_FAT_AddRegParam(FatASM* Self, Message* Src, int Write);
 
+uint SC_FAT_Altered(FatASM* Self);
+
 int SC_FAT_BaseOp(FatASM* Self);
 
 int SC_FAT_BytePos(FatASM* Self);
@@ -6839,7 +6841,7 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 
 
 // JB_ASMState
-ASMReg SC_Pac__Num(ASMState* Self, Message* Exp, int64 V, ASMReg Reg);
+ASMReg SC_Pac__Num(ASMState* Self, Message* Exp, int64 V, ASMReg Dest);
 
 void SC_Pac_AddFuncParams(ASMState* Self, SCFunction* Fn);
 
@@ -6896,6 +6898,8 @@ ASMReg SC_Pac_BranchAnd(ASMState* Self, Message* A, Message* B, ASMReg Dest);
 ASMReg SC_Pac_BranchOr(ASMState* Self, Message* A, Message* B, ASMReg Dest);
 
 ASMReg SC_Pac_CallFunc(ASMState* Self, Message* Exp, ASMReg Dest, SCFunction* Fn);
+
+bool SC_Pac_CanAddK(ASMState* Self, ASMReg R, int64 T);
 
 bool SC_Pac_CanReuseParam(ASMState* Self, Message* Prms, SCDecl* A, int Vr);
 
@@ -7041,9 +7045,9 @@ void SC_Pac_NopReg(ASMState* Self, ASMReg R);
 
 ASMReg SC_Pac_NotEq(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
-FatASM* SC_Pac_NumToFat(ASMState* Self, Message* Exp, int64 V, ASMReg Dest);
-
 ASMReg SC_Pac_NumToReg(ASMState* Self, Message* Exp, int64 V, ASMReg Reg, uint /*DataTypeCode*/ SrcType);
+
+ASMReg SC_Pac_OldNum(ASMState* Self, int64 V, ASMReg Dest);
 
 uint SC_Pac_OpenVars(ASMState* Self);
 
@@ -9935,6 +9939,8 @@ int SC_Decl_Alignment(SCDecl* Self);
 
 bool SC_Decl_AlreadyContains(SCDecl* Self);
 
+void SC_Decl_AsBody(SCDecl* Self);
+
 uint64 SC_Decl_AsConst(SCDecl* Self, Message* Value, DataTypeCode* Ty);
 
 SCDecl* SC_Decl_AsLocal(SCDecl* Self);
@@ -10232,6 +10238,8 @@ JB_String* SC_Decl_RenderTypeNameNicer(SCDecl* Self, FastString* Fs_in);
 bool SC_Decl_SafelyWrappable(SCDecl* Self);
 
 bool SC_Decl_SameForReplace(SCDecl* Self, SCDecl* C);
+
+void SC_Decl_sanity(SCDecl* Self);
 
 int SC_Decl_SizeOfQuery(SCDecl* Self);
 
@@ -11896,8 +11904,6 @@ inline void SC_FAT_PrmWithIntReg(FatASM* Self, int A, ASMReg Input) {
 	Self->InputRegs = (Self->InputRegs | (1 << A));
 	if (I) {
 		FatASM* Src = SC_uint_FAT(I);
-		if (SC_FAT_SyntaxEquals(Self, 3099, true)) {
-		}
 		if (Src != Self) {
 			Self->InputFats = (Self->InputFats | (1 << A));
 			(++Src->xC2xB5RefCount);
