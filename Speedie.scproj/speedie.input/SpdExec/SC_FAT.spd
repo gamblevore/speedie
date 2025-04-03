@@ -5,7 +5,7 @@ struct FatASM
 		cpp_part FAT
 		sort_properties true
 	
-	// phi-nodes can actually be don simply by linking one fat to the prev
+	// phi-nodes can actually be done simply by linking one fat to the prev
 	|byte|				InputFats
 	|byte|				InputRegs
 	|byte|				_Op
@@ -14,36 +14,37 @@ struct FatASM
 	|ASMReg| 			Info
 	|message--| 		Msg
 	|uint64| 			_Const
-	|uint[6]|			R // Rename to P for prm? not a register. fat.r[0] might be confused for r0
+	|uint[6]|			Prms
 	|uint16|			ASMIndex
-	|uint16| 			BlockNum
+	|uint16| 			BasicBlock
 	|int16|				µRefCount
 	
-	
+
 	function Op (|byte|)
 		return ._op
 	
 	setter SetOp (|byte| value)
 		opt norefcounts
 		.InputFats = 0
+		.InputRegs = 0
 		._op = value
 		.jumpreg = 0
 		.outputs = 0
 		// leave info, msg, and _const. Other things may need them still.
-		for i in –count .r
-			.r[i] = 0
+		for i in –count .prms
+			.prms[i] = 0
 		.asmindex = 0
-		.blocknum = 0
+		.BasicBlock = 0
 		.µrefcount = 0
 	
 	function Out (|uint|)
 		|| a = .Outputs|int|.LowestBit
 			a = a.log2
 			if a != 0 // asm.div?
-			return .r[a]		
+			return .prms[a]		
 		
 	function Input (|int| i, |&fatasm|)
-		|| r = (.r[i] << 1) >> 16
+		|| r = (.prms[i] << 1) >> 16
 			return r.fat
 		
 	function IsFunc (|bool|)
@@ -51,7 +52,7 @@ struct FatASM
 		return b == asm.fncx or asm.fnc
 	
 	function IsUnused (|bool|)
-		return .µrefcount == 0
+		return .µRefCount == 0
 	
 	function BaseOp (|int|)
 		rz = .op
@@ -118,10 +119,10 @@ struct FatASM
 			return .ResetFunctionCall(reg)
 		
 		|| o = .Outputs
-		if (o&1) and .r[0]
+		if (o&1) and .prms[0]
 			.r0 = reg
 			return true
-		if (o&2) and .r[1]
+		if (o&2) and .prms[1]
 			.r1 = reg
 			return true
 
@@ -189,7 +190,7 @@ struct FatASM
 		opt inline
 		
 		|| i = input.FatIndex
-		.r[a] = input.treg ||| (i << 15)
+		.prms[a] = input.treg ||| (i << 15)
 		.InputRegs |= 1<<a
 		if i
 			|| src = i.fat // we refcount dests too. shouldn't!
@@ -203,7 +204,7 @@ struct FatASM
 	
 	function Dest (|uint| a, |asmreg| info)
 		opt inline
-		.r[a] = info.treg
+		.prms[a] = info.treg
 		.Outputs |= 1<<a
 
 	
@@ -233,10 +234,10 @@ struct FatASM
 		.DebugPrint
 	
 	function NumInput (|int| a, assigns:|int| v)
-		.r[a] = v
+		.prms[a] = v
 
 	function JumpInput (|int| a, assigns:|int| v)
-		.r[a] = v
+		.prms[a] = v
 		.JumpReg = a + 1
 		.µRefCount = 1 max .µRefCount // control flow is always used?
 		ASMState.sh.BasicBlock++
@@ -244,12 +245,12 @@ struct FatASM
 	
 	function Jump (|int|)
 		|| j = .JumpReg
-			return .r[j-1]
+			return .prms[j-1]
 
 
 	function JumpTo (|&fatasm|)
 		|| j = .JumpReg
-			return self + 1 + .r[j-1]|int|
+			return self + 1 + .prms[j-1]|int|
 	
 	
 	function JumpTo (|&fatasm| value, |&asmstate| A)
@@ -257,40 +258,40 @@ struct FatASM
 		|| j = .jumpreg
 			|| D = (value - self) - 1
 			check (D != -1) (self, "bad jump")
-			.r[j-1] = D
+			.prms[j-1] = D
 			if d == 0
 				a.nop(self)
 		  else
 			j = .id
 			debugger
 
-	function r0 (|uint|): return .r[0]
-	function r1 (|uint|): return .r[1]
-	function r2 (|uint|): return .r[2]
-	function r3 (|uint|): return .r[3]
+	function r0 (|uint|): return .prms[0]
+	function r1 (|uint|): return .prms[1]
+	function r2 (|uint|): return .prms[2]
+	function r3 (|uint|): return .prms[3]
 
-	function r0 (assigns:|uint|): .r[0] = value
-	function r1 (assigns:|uint|): .r[1] = value
-	function r2 (assigns:|uint|): .r[2] = value
-	function r3 (assigns:|uint|): .r[3] = value
+	function r0 (assigns:|uint|): .prms[0] = value
+	function r1 (assigns:|uint|): .prms[1] = value
+	function r2 (assigns:|uint|): .prms[2] = value
+	function r3 (assigns:|uint|): .prms[3] = value
 
-	function r0 (assigns:|asmreg|): .r[0] = value.treg
-	function r1 (assigns:|asmreg|): .r[1] = value.treg
-	function r2 (assigns:|asmreg|): .r[2] = value.treg
-	function r3 (assigns:|asmreg|): .r[3] = value.treg
+	function r0 (assigns:|asmreg|): .prms[0] = value.treg
+	function r1 (assigns:|asmreg|): .prms[1] = value.treg
+	function r2 (assigns:|asmreg|): .prms[2] = value.treg
+	function r3 (assigns:|asmreg|): .prms[3] = value.treg
 
 
 //	function Swap (|int| a, |int| b)
-//		swap (.r[a-1]) (.r[b-1])
+//		swap (.prms[a-1]) (.prms[b-1])
 // doesnt take fatinputs or other inputs into account anyhow
 	
 	helper Step (|int| dir, |&FatASM|)
 		real self
-		|| b = .blocknum
+		|| b = .BasicBlock
 		while
 			self += dir
 			if .op != asm.noop
-				return (self, nil)(b == .BlockNum)
+				return (self, nil)(b == .BasicBlock)
 		
 	function Prev (|&FatASM|)
 		opt inline
@@ -301,7 +302,7 @@ struct FatASM
 		return .step(1)
 
 	function Prm (|int| i, |int|)
-		return .r[i] & ~(1<<31) // remove tmpbit.
+		return .prms[i] & ~(1<<31) // remove tmpbit.
 		
 	function CheckHasOutput 
 		opt inline, opt norefcounts
@@ -364,7 +365,7 @@ struct FatASM
 			if bs and (remain > 0)
 				fs <~ GotAny
 				GotAny = ", "
-				|int| v = .r[i]
+				|int| v = .prms[i]
 				if (.IsFunc and (i == 2 or 3)) or (self isa asm.tail and i == 1)
 					if i != 3
 						.PrmCollectCounterPart(fs)
@@ -466,7 +467,7 @@ struct FatASM
 	iterator RegInputs
 		|| ir = .InputRegs
 		|| i = 0
-		while (i < –count .r)
+		while (i < –count .prms)
 			ifn ir & (1 << i)
 				i++
 				continue
@@ -476,7 +477,7 @@ struct FatASM
 	iterator FatInputs
 		|| ir = .InputFats
 		|| i = 0
-		while (i < –count .r)
+		while (i < –count .prms)
 			ifn ir & (1 << i)
 				continue
 			yield (.input(i))
@@ -487,6 +488,6 @@ struct FatASM
 		while oo
 			|| i = oo.lowestbit
 			oo &=~ i
-			yield .r[i.log2]
+			yield .prms[i.log2]
 
  

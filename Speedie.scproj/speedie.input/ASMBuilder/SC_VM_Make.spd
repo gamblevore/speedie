@@ -423,15 +423,15 @@ return curr
 || double_rizzler = "
 if curr < after+2
 	curr++[] = rz 
-	curr++[] = .r[_0]
-	|| p2 = .r[_0+1]
+	curr++[] = .prms[_0]
+	|| p2 = .prms[_0+1]
 	if p2
 		curr++[] = p2
 	
 return curr
 ".macro
 
-|macro|     Ooof  = `rz._0 = .r[_1]`.macro
+|macro|     Ooof  = `rz._0 = .prms[_1]`.macro
 
 |macro|		Ugh = `function asm._0 (assigns:|uint|, |asm|): return self ||| ((value << _1) >> _2)`.macro
 

@@ -5,11 +5,11 @@ extend asmstate
 		if base is temp
 			|| bs = base.fat
 			if bs isa asm.ADDK
-				|| CC = bs.r[2]
+				|| CC = bs.prms[2]
 				|| CC2 = CC >> pow2
 				if (CC2 <= maximum) and (CC2<<pow2 == CC)
 					index[] += CC2
-					|| R = bs.r[1]
+					|| R = bs.prms[1]
 					base.reg = R
 					(base is temp) = (R >> 31)
 					base.fatindex = 0
@@ -73,7 +73,7 @@ extend asmstate
 				if (p isa asm.rfst)
 					if (p.r1 samereg a.reg) and (p.r0 == 0)
 						p._op = asm.RFAP
-						p.r0 = p.r[1]
+						p.r0 = p.prms[1]
 						p.r1 = 0
 						return p
 				  elseif (p isa asm.gstr)
@@ -108,16 +108,16 @@ extend asmstate
 
 function ASMState.Decr (|asmreg|)
 	|| fat = .last(asm.rfst)
-		|| upon = fat.r[0]
-			if !fat.r[1] and !fat.r[2]
+		|| upon = fat.prms[0]
+			if !fat.prms[1] and !fat.prms[2]
 				.nop(fat)
 				rz.reg = upon
 
 
 function ASMState.SafeDecr (|asmreg|)
 	|| fat = .last(asm.rfap)
-		|| upon = fat.r[1]
-		if upon and !fat.r[0] and !fat.r[2]
+		|| upon = fat.prms[1]
+		if upon and !fat.prms[0] and !fat.prms[2]
 			.nop(fat)
 			rz.reg = upon
 	

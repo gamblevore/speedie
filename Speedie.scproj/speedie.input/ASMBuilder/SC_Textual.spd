@@ -81,7 +81,7 @@ extend ASMState
 		i--
 		|| name = jumper.msg.first[i]
 			|| dest_index = textassembler.Labels.valuelower(name.name) #expect (name, "arg")
-			jumper.r[i] = dest_index[] - jumper.index
+			jumper.prms[i] = dest_index[] - jumper.index
 			return true
 				
 		error (jumper, "No label found")

@@ -37,8 +37,8 @@ extend SCFunction
 		fs <~ "asm ${.name}\n"
 		|| bb = 0
 		for µ.fat in self
-			if options.ASMRenderBlocks and µ.BlockNum != bb
-				bb = µ.BlockNum
+			if options.ASMRenderBlocks and µ.BasicBlock != bb
+				bb = µ.BasicBlock
 				fs <~ "//$bb\n"
 			fs <~ '\t'
 			µ.Renda(fs)
@@ -69,7 +69,7 @@ function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 	target debug: debug_require  SelfOut >= start  and  SelfOut < after 
 
 	// this needs fixing.
-	|int| J = .r[reg]
+	|int| J = .prms[reg]
 	|| OldDest = self + J + 1
 	|| DestOut = OldDest.asmindex
 	|| dest = start + DestOut
@@ -77,9 +77,9 @@ function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 	target debug: debug_require dest >= start and dest <= after
 	|| J2 = (dest - SelfOut) -1
 	check (J2 != -1) (self, "Invalid ASM generated (infinite loop)")
-	.r[reg] = J2
+	.prms[reg] = J2
 	.µRenderInto(SelfOut, SelfOut+1) // rerender
-	.r[reg] = J						 // restore!
+	.prms[reg] = J						 // restore!
 
 
 //function memory.Run (|memory of asm| self, |&ivec4| Args = nil, |int| ArgCount=0, |int64|)

@@ -1068,8 +1068,8 @@ function ASMSub (|message| rz,  |SCFunction| fn, |faststring| fs, |bool|)
 	|| lp = 0
 	|| top = fn.SourceArg
 	for fat.fat in fn
-		if options.ASMRenderBlocks and fat.BlockNum != bb
-			bb = fat.BlockNum
+		if options.ASMRenderBlocks and fat.BasicBlock != bb
+			bb = fat.BasicBlock
 			rz <~ bb
 		fs <~ (' ', fat.msg.asmindent(top)*2)
 		fat.Renda(fs, true)

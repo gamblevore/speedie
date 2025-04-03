@@ -14,7 +14,7 @@ function fatasm.KNST_Encoder (Asm_encoder)
 		v = ~v	  					// Opportunity to reclaim the top bit. I'll do it later.
 	|asm| knst
 	|| Mode = asm.knst << 24
-	knst.R1 = .R[0]
+	knst.R1 = .prms[0]
 	knst.ConstStretchy_Inv = inv
 	knst.ConstStretchy_Value = v
 	v >>= 17
@@ -65,8 +65,8 @@ extend ASMState
 		.r2 = inv|int|
 		.r3 = v|uint|
 		target debug
-			|| back = .r[3]|uint64| rotr .r[1]|uint64|
-			if .r[2]
+			|| back = .prms[3]|uint64| rotr .prms[1]|uint64|
+			if .prms[2]
 				back = ~back
 			if back!=.const // oof
 	
@@ -84,13 +84,13 @@ extend ASMState
 
 	function OldNum (|int64| V, |asmreg| Dest, |asmreg|)
 		|| l = .last
-		|| b = l.blocknum
+		|| b = l.BasicBlock
 		|| s = .funcstart
 		|| Altered = 0
 		|| normal = dest.Normalness
 		
 		while --l >= s
-			loop l.blocknum == b
+			loop l.BasicBlock == b
 			if l isa asm.knst
 				|uint| i = l.Out&31
 				|uint| o = 1 << i

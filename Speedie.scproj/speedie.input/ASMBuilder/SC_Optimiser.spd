@@ -43,8 +43,8 @@ function fatasm.OptBor (|asmstate| A)
 function FatASM.ReplaceReg (|uint| Dest, |uint| New, |bool|)
 	dest &= 31
 	for i.reginputs in self
-		if .r[i] & 31 == dest
-			.r[i] = new
+		if .prms[i] & 31 == dest
+			.prms[i] = new
 			rz = true
 			.InputFats &=~ (1<<i) // not sure what the fat of New is? Its not an ASMReg is it?
 

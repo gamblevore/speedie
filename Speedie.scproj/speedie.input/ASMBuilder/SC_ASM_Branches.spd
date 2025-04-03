@@ -440,7 +440,7 @@ extend ASMState
 					|| dest = s.input(0)
 						rz = dest.info 
 					  else
-						rz = s.r[0]|int|.asm
+						rz = s.prms[0]|int|.asm
 				s.SetOp = asm.jump
 				s.JumpReg = 1
 				.JumpFix(s)

@@ -77,7 +77,7 @@ struct ASMState
 	function Last (|asm| type, |&FatASM|)
 		|| L = ._curr - 1
 		if l isa type
-			if l.blocknum == .basicblock
+			if l.BasicBlock == .basicblock
 				return L
 	
 	function IntPowerOfTwo (|asmreg| r, |int| Sub=0, |FailableInt|)
@@ -212,7 +212,7 @@ struct ASMState
 		
 		if (r is RemoveableOutput) or (r is RealConst)
 			|| f = r.fat
-				if !ask or f.BlockNum == .BasicBlock
+				if !ask or f.BasicBlock == .BasicBlock
 					.Nop(f)
 					return true
 	
@@ -500,7 +500,8 @@ struct ASMState
 		|| l = .last
 		if !l.IsFinisher
 			debugger !.fn.returntype
-			.fn.SourceArg!.rEt(asmreg(), asmreg(), asmreg(), 0, asmreg())
+			if !ASMType.ReturnOpt(self, 0, 0)
+				.fn.SourceArg!.RET(asmreg(), asmreg(), asmreg(), 0, asmreg())
 		.Optimise
 
 		.out.µlength = .curr - .FuncStart
@@ -543,7 +544,7 @@ struct ASMState
 		|| Start = .FuncStart
 		|| reg = thg.reg
 		while  where >= start
-			require where.BlockNum == .BasicBlock
+			require where.BasicBlock == .BasicBlock
 			|| X = where.SmartFatness(reg)
 			require !X.KnownFalse
 			if X.knowntrue

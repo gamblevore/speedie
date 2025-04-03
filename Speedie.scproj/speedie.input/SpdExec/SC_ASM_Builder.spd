@@ -8,7 +8,7 @@
 function FatASM.AddRegParam (|message| src, |int| write)
 	opt norefcounts
 	if write|uint| <= 6
-		.r[write] = src.RegOrNum // what if it's the last one...
+		.prms[write] = src.RegOrNum // what if it's the last one...
 	  else
 		debugger
 

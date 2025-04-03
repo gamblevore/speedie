@@ -27,7 +27,7 @@ function message.OperatorMul (|asm| op, |&fatasm|)
 		a._curr = p + 1
 		P._op = op
 		p.debug = self
-		p.BlockNum = a.BasicBlock
+		p.BasicBlock = a.BasicBlock
 		return p
 
 	error (self, "Function too large (over 64K)")

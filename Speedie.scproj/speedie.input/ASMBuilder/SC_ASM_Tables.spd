@@ -118,7 +118,7 @@ function ReturnOpt (|&ASMState| self, |int| Ret, |int| bb, |bool|)
 
 function PreOptBOR (|&ASMState| self, |FATASM| l, |int| Ret, |int|)
 	(self)
-	require !l.r[2]						// x = b ||| 0  -->  x = b
+	require !l.prms[2]						// x = b ||| 0  -->  x = b
 	require Ret == l.Prm(0)	// return x
 	rz = l.r1
 	using L // syntaxusingcomplete needs upgrade to deref?

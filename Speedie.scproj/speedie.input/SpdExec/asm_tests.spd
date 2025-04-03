@@ -24,7 +24,7 @@ function IfEmpty (|int| x)
 	if x
 		0
 	  else
-		printline "hello"
+		.fs
 
 
 function FS
