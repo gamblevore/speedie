@@ -11,7 +11,8 @@ function message.ASMDecl (|SCDecl!|)
 function scfunction.GenASM
 	opt norefcounts
 	|SC_Hoister| H 
-	asmtype.ArgSub(ASMState.Sh, .SourceArg!, H)
+	|| a = .sourcearg!
+	asmtype.ArgSub(ASMState.Sh, A, H)
 	ASMState.Sh.Unhoist(h)
 
 

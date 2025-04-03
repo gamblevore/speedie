@@ -200,7 +200,8 @@ struct ASMState
 	function Const (|asmreg| R, |int| bits, |bool| signed, |ind|)
 		if R is ConstOutput
 			|| k = R.const
-			if k.fits(bits, signed) and .NopConst(R, true)
+			if k.fits(bits, signed)
+				.NopConst(R, true)
 				return k|uint64|.trim(bits)
 
 
@@ -294,7 +295,7 @@ struct ASMState
 		target debug
 			dest.TmpCheck
 			if ++.stacksize > 20 // ugh
-			debugat 0 // keep this
+			//debugat 9107 // keep this
 				
 		  else
 			opt inline
@@ -471,7 +472,7 @@ struct ASMState
 		.state.inlinedepth = 0
 		.state.BranchDepth = 0
 		.TailInlineable = true
-		.InlineLimit = 8
+		.InlineLimit = 3
 		.BasicBlock = 0
 		.VDecls = 0
 		.VTmps = 32
@@ -672,7 +673,7 @@ struct ASMState
 	
 
 		if !.state.InlineDepth
-			.InlineLimit = 8
+			.InlineLimit = 3
 			.DeepestInline = 0
 		|| I = .TryInline(prms, dest, fn, AllowedGain)
 			return I		

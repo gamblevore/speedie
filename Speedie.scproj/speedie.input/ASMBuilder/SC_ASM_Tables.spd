@@ -51,7 +51,6 @@ constants
 |asm_Write[5]|	WriteASM
 |message--|		LastDebugMark
 
-
 function InitAccess
 	|| R = &ASMType.ReadASM[0]
 	|| W = &ASMType.WriteASM[0]
@@ -756,17 +755,19 @@ function MakeConstFromASM (|scdecl| decl, |asmreg| Initial, |asmreg| NewValue)
 
 // || k = 1, k = X	// clear here
 // y = k			// nice.
+	|| NewFat = newvalue.fat
 	if decl is Const
 		(decl isnt const)
 		if f
 			.AskNop(f)
 		decl.ExportPosition = 0
 		|| fat = decl.fat
+		if fat and newfat != fat
 			decl.FatConstIndex = 0
 			.AskNop(fat)
 	
 	if NewValue
-		.SetDeclToConst(decl, newvalue, newvalue.fat)
+		.SetDeclToConst(decl, newvalue, Newfat)
 }
 
 

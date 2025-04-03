@@ -58,8 +58,12 @@ datatype ASMReg (uint64)
 		.µtype.render(Fs)
 		fs <~ ")"
 		
-	function Floatness (|int|)
-		return .µtype.floatness
+//	function Floatness (|int|)
+//		return .µtype.floatness
+	
+	function Normalness (|bool|)
+		return .µType.ASMUseIntRegs
+	
 	
 	function F32 (|float|)
 		if .reg

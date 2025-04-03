@@ -243,8 +243,7 @@ extend ASMState
 			return exp.ADD(dest, l, l, five-1) * dest
 		
 		|| RR = r.const
-		if r.CanAddK(RR)								// a - 1,  a + 1
-			.NopConst(r)
+		if .CanAddK(r,RR)								// a - 1,  a + 1
 			return exp.MULK(dest, L, RR) * dest
 
 
@@ -340,8 +339,7 @@ extend ASMState
 			if l is alternate
 				RR = -RR
 			rr *= lmul
-			if r.CanAddK(RR)								// a - 1,  a + 1
-				.nopconst(r)
+			if .CanAddK(r,RR)								// a - 1,  a + 1
 				if .InlineAddK(l, rr, dest)
 					return dest
 				return exp.ADDK(dest, L, RR) * dest
@@ -661,11 +659,11 @@ extend ASMState
 	
 	
 function int64.Fits (|int| amount, |bool| signed=true,  |bool|)
-	|| sh = 64 - amount
+	|int64| sh = 64 - amount
 	|| x = self << sh
 	if signed
 		x >>= sh
 	  else
-		x = self|uint64| >> sh
+		x = X|uint64| >> sh
 	return x == self
 

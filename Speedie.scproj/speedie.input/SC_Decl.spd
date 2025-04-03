@@ -78,7 +78,7 @@ datatype SCDeclInfo (int)
 		ReturnedStruct
 		ReturnedVar
 		IntendedAsReturn
-		Body // were at 31... Speedie should also warn if theres too many. (it wasnt!)
+		Body
 		Swappable	 = Param ||| Body ||| Global ||| Property
 		Local		 = Body ||| Param
 		SelfImplicit = Self ||| local // local is set by CollectOneParam, anyhow?
@@ -146,10 +146,14 @@ class SCDecl (SCNamed) {
 		return .DataType|asmreg|
 	
 	syntax append (|SCDeclInfo| d)
+		.sanity
 		.info |= d
+		.sanity
 
 	function IsTypeImprove (assigns:|bool|)
+		.sanity
 		.info = .info.set(SCDeclInfo.TypeImprove, Value)		
+		.sanity
 	
 	
 	syntax Compare (|string| s, |bool| aware, |int|)
@@ -161,8 +165,12 @@ class SCDecl (SCNamed) {
 			return .info & d
 
 	syntax is (|SCDeclInfo| d, assigns:|bool|)
+		.sanity
 		.info = .info.set(d, Value)			
+		.sanity
 
+	function sanity
+	
 
 	function IsNil (|bool|)
 		return self == typenil
@@ -367,6 +375,7 @@ class SCDecl (SCNamed) {
 		|| cpyflags		= scdeclinfo.DclCopied
 		dcl.info &= ~cpyflags
 		dcl.Info |= .info & cpyflags
+		dcl.sanity
 		dcl.C_array		= .C_array
 		dcl.NilDeclared = .NilDeclared
 		

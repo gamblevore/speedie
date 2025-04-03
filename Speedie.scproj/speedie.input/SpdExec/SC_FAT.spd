@@ -14,7 +14,7 @@ struct FatASM
 	|ASMReg| 			Info
 	|message--| 		Msg
 	|uint64| 			_Const
-	|uint[6]|			R
+	|uint[6]|			R // Rename to P for prm? not a register. fat.r[0] might be confused for r0
 	|uint16|			ASMIndex
 	|uint16| 			BlockNum
 	|int16|				µRefCount
@@ -56,9 +56,9 @@ struct FatASM
 	function BaseOp (|int|)
 		rz = .op
 		if rz == asm.FNCX3
-/			rz = asm.FNCX
+			rz = asm.FNCX
 		  elseif rz == asm.FNC3
-/			rz = asm.FNC
+			rz = asm.FNC
 
 	
 	function Form (|µform|)
@@ -193,7 +193,7 @@ struct FatASM
 		.InputRegs |= 1<<a
 		if i
 			|| src = i.fat // we refcount dests too. shouldn't!
-			if self ~= 3099
+			//if self ~= 4644
 			if src != self
 				.InputFats |= 1<<a
 				src.µRefCount++
@@ -205,6 +205,11 @@ struct FatASM
 		opt inline
 		.r[a] = info.treg
 		.Outputs |= 1<<a
+
+	
+	function Altered (|uint|) 
+		for prm.regoutputs in self
+			rz |= 1<<(prm&31)
 	
 	
 	function File (|string|)
@@ -476,5 +481,12 @@ struct FatASM
 				continue
 			yield (.input(i))
 			i++
+			
+	iterator RegOutputs
+		|| oo = .outputs|int|
+		while oo
+			|| i = oo.lowestbit
+			oo &=~ i
+			yield .r[i.log2]
 
  
