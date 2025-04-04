@@ -36,7 +36,7 @@ struct			PicoGlobalConfig;
 struct			PicoMessage { char* Data; int Length;   operator bool () {return Data;}; };
 
 struct 			PicoConfig  {
-  const char* 		Name;			/// Used for reporting events to stdout.
+  char 				Name[32];		/// Used for reporting events to stdout.
   PicoDate			LastRead;		/// The date of the last Read. This is a signed 64-bit number. The lower 16-bits used for sub-second resolution, and the upper 47-bits are for seconds. 1 bit used for the sign.
   PicoDate			LastSend;		/// The date of the last send.
   int 				Noise;			/// How much printing to stdout that PicoMsg does. Anything from PicoSilent to PicoNoiseAll.
@@ -347,7 +347,7 @@ struct PicoComms {
 		if (B > 26) B = 26;
 		B += (1<<B < Size);
 		if (!Name) Name = "";
-		Conf.Name = strdup(Name);
+		strncpy(Conf.Name, Name, sizeof(Conf.Name)-1);
 		Conf.Bits = B;
 		Conf.QueueSize = 1<<(B+3);
 	}
@@ -359,8 +359,6 @@ struct PicoComms {
 			io_close(); // io will close it first.
 		}
 		
-		free((void*)Conf.Name);
-		Conf.Name = 0;
 		for (auto M = QueueHead; M.Data; M = pico_next_msg(M))
 			free(M.Data);
 		if (Sending) Sending->Decr();
@@ -757,8 +755,6 @@ struct PicoComms {
 	}
 	
 	void io () {
-		if (Conf.Name[0] != '/')
-			Conf.Name = Conf.Name;
 		if (!Socket or !guard_ok()) return;
 		InUse++;
 		do_reading();

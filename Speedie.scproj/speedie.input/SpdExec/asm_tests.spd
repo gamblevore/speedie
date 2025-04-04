@@ -11,15 +11,6 @@ class LargeClass2 {
 }
 
 
-/*
-// ideal...
-JMPI: r1, r0, 0, 1                             /* A > 0 */
-RET:  r0, r0, r0, 0, 1                         /* return true */
-KNST: t31                 /# 0.5f #/           /* 0.5 */
-FNCX: r2, 1226, 127432, 0                      /* JB_f_SyntaxAccess(0.5) */
-RET:  r2, r0, r0, 0, 0                         /* return JB_f_SyntaxAccess(0.5) */
-*/
-
 function IfEmpty (|int| x)
 	if x
 		0

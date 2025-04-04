@@ -158,7 +158,7 @@ module PicoNoise
 struct PicoConfig
 	linkage: wrapper
 	constants
-	|cstring|					Name
+	|byte[32]|					Name
 	|Date|						LastRead
 	|Date|						LastSend
 	|int|						Noise
@@ -172,7 +172,6 @@ struct PicoConfig
 
 struct PicoGlobalConfig
 	linkage: wrapper
-	|cstring| 					Name
 	|Date|						LastActivity
 	|Date|						TimeOut
 	|int|						ExitCode

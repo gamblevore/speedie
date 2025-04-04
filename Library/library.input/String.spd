@@ -438,6 +438,20 @@ class String
 	
 	function CStr (|stringZeroTerminated|)
 		cpp_Wrapper JB_Str_MakeC
+	
+	function CopyTo (|&byte| Where, |bool|)
+		cpp_Part CopyToHopeful
+		return .copyto(where, .length+1)
+		
+	function CopyTo (|&byte| Where, |int| Buff, |bool|)
+		|| n = .length
+		|| n2 = n min buff-1
+		where[n2] = 0
+		|| addr = .addr
+		for i in n2
+			where[i] = addr[i]
+		return n == n2
+
 
 	module
 		function New (|int| n, |string|)

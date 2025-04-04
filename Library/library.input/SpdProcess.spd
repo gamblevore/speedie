@@ -200,19 +200,14 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 				return spdprocess._parent
 			spdprocess.CheckedParent = true
 
-			// platform.log "A"
 			if pico.HasParentSocket and !comms
-				// platform.log "B"
 				comms = pico.new
-			// platform.log "C"
 			if comms
-				require comms.CompleteExec
-				// platform.log "D"
+				if !app.IsThreadedAsLib
+					require comms.CompleteExec
 				|| p = SpdProcess("", nil, comms)
 				SpdProcess._parent = p
 				return p
-
-			// platform.log "E"
 
 			if expect
 				error "Application parent lost connection"
@@ -280,7 +275,8 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 prototype Thread (|pico| Comms, |int64| Data, |&nil| Argument, |bool|)
 	function Spawn (|pico| Comms, |int64| Data, |&nil| Argument,  |int| BuffBits=0, |pico|)
 		description "Just a wrapper around pico.thread" 
-		|| pico_out = pico.new(comms.config.name.str, -1)
+		|| name = (&comms.config.name[0])|cstring|
+		|| pico_out = pico.new(name.str, -1)
 			if BuffBits
 				pico_out.Config.Bits = BuffBits
 			if comms.SpawnThread(self|picothreadfn|, Data|&nil|, Argument|&cstring|)

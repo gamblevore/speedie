@@ -74,7 +74,7 @@ JB_StringC*         ErrorString_;
 JBObject_Behaviour  JB_Object_FuncTable_;
 JB_Class*           ClassList;
 byte				JB_ErrorNumber;
-byte				JB_Active = 0;
+thread_local byte	JB_Active = 0;
 extern char**		environ;
 uint				Flow_Disabled;
 static Array*		App_Args;
@@ -222,7 +222,7 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
 
 
 int JB_SP_Run (_cstring* C, int Mode)	{ // JB_SP_Main
-	if (JB_Active)
+	if (JB_Active & 1)
 		return EALREADY;
 	JB_Active = 1 | (Mode&4);
 	if (JB_LibIsShutdown()) {
@@ -241,7 +241,7 @@ int JB_SP_Run (_cstring* C, int Mode)	{ // JB_SP_Main
 		if ((Mode & 2) and App_Args)
 			JB_FinalEvents();
 	}
-	JB_Active = 0;
+	JB_Active &= ~1;
 	
 	byte b = JB_ErrorNumber;
 	if (b >= 128)

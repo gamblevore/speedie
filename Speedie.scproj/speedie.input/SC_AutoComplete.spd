@@ -59,15 +59,8 @@ function ParserRestore
 function EnterAutoComplete (|bool|)
 	|| perry = app.parent
 	
-	// platform.log "CC"
 	require stderr.ok
-	// platform.log "DD"
-	if !perry
-		// platform.log "NIL"
-	else
-		// platform.log "REAL"
 	require perry.isopen
-	// platform.log "EE"
 	app.AllowInteruptCrash = false			// to debug perry, which runs debug speedie
 	"RespondingToCommands"					// Don't delete this... too annoying to miss.
 	if !app.ismainthread
@@ -79,11 +72,11 @@ function EnterAutoComplete (|bool|)
 
 	|| Realm = pico.GlobalConfig
 	Realm.TimeOut = 30s
-	realm.Name = "Speedie"
 	compiler.InPerry = true
 	.PerryTalk(perry)
 	"ExitingCommands"						// this also
 	return true
+
 
 
 function InitedOK (|bool|)

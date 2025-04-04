@@ -96,7 +96,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 
 	|SpdProcess| spd 
 	
-	target notdebug
+	target debug
 		if !SpdLibAlreadyInUse
 			SpdLibAlreadyInUse = true
 			if !.UsingSpdLib
