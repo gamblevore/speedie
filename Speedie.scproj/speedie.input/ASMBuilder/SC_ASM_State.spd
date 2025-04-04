@@ -295,7 +295,7 @@ struct ASMState
 		target debug
 			dest.TmpCheck
 			if ++.stacksize > 20 // ugh
-			//debugat 9107 // keep this
+			debugat 0 // keep this
 				
 		  else
 			opt inline
@@ -581,9 +581,7 @@ struct ASMState
 		|| Start = .curr
 		|inlineblock| Old = .state
 		if !dest.reg and fn.ReturnType
-			if dest is discard
-				debugger // hmm?
-			  else
+			if dest isnt discard
 				Dest = .TempOnly(prms, dest)
 		
 		if dest isnt ExitFunction

@@ -142,7 +142,10 @@ function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest, |AsmReg|
 	dest = dest as asmreg.ExitAtAll
 	|| bb = .BasicBlock
 	|| f = exp.first
-		dest = .µinto(f, dest)
+		if dest.reg
+			dest = .µinto(f, dest)
+		  else
+			dest = .µ(f, asmreg.discard)
 	
 	// don't we want to always do the tail, and then the ret?
 	// in case of jumps or whatever? well... it already knows about the blocknum

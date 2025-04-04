@@ -70,6 +70,7 @@ module PackMaker
 	
 	
 	function SortLibStuff (|int| pg)
+		opt norefcounts
 		|&&nil| Table
 		if platform.isdebug and pg
 			Table = jb_vm.vm.InitTable(.libfuncs.length+31, pg)
@@ -293,8 +294,8 @@ module PackMaker
 	
 	function SCClass.PackClassChildren (|jbin?| j)
 		opt norefcounts
-		require .HasPackChildren
 		if j
+			require .HasPackChildren
 			j.enter
 		for c in .children
 			if !c.isrole
@@ -305,18 +306,22 @@ module PackMaker
 	
 	function SCClass.PackExport (|jbin?| j)
 		opt norefcounts
-		|| Output = !.IsLibrary or .IsReached
-		require output or .HasPackChildren
+		|| Output = .IsReached
 
 		if j
+			require output or .HasPackChildren
 			j.enter(@tmp, .name)
 			if !.IsLibrary
 				.DescribeInPack(j)
 			.PackClassChildren(j)
 			j.exit
 		  else
-			if Output
-				packmaker.packglobs <~ .ClassType
+			if !output
+				0
+			  elseif .islibrary
+				packmaker.libglobs <~ .classtype
+			  else
+				packmaker.packglobs <~ .classtype
 			.PackClassChildren(j)
 		
 		
