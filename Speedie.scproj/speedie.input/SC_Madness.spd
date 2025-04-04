@@ -50,6 +50,7 @@ function Message.CastToType (|string| TypeName, |SCClass| type, |SCNode| name_sp
 		if (self == @type) and (FoundType.isnormal and foundtype.type == type)
 			return kSimpleMatch			// done.
 
+	using self
 	|| cst = «type ":)" »
 	.prev = cst
 	cst <~ self
@@ -155,13 +156,15 @@ function SCDecl.MemAccessNonStorable (|message| Exp, |message| side, |scdecl|)
 			debugger
 			return self
 		
+		using exp
 		|| NewExp = exp.GetAddrButNicer
 		|| i = .GetAddress
 		NewExp.obj = i
 		if side
-			return .AccessToMemCpy(newexp, side, i)
-		if IsAcc
-			SCFunction.TempMoveOut(newExp, "", i)
+			i = .AccessToMemCpy(newexp, side, i)
+		  else
+			if IsAcc
+				SCFunction.TempMoveOut(newExp, "", i)
 		return i
 	return self
 
@@ -177,10 +180,6 @@ function SCDecl.MemAccessSub (|message| Exp, |message| side,  |scdecl|)
 		return i
 	return i.MemAccessNonStorable(exp, side)
 	
-//	i = i.Internal! // double-internal:   x is &byte[10]  -->  x[] is byte
-//	if i.IsCarray	// we can't have carray values lying around. So its actually the address of a carray
-//		return i.MemAccessNonStorable(exp, side)
-//	return i
 
 
 /*

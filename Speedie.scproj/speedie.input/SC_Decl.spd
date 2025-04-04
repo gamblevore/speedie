@@ -800,8 +800,9 @@ class SCDecl (SCNamed) {
 		|| Curr = exp
 		While (curr == @bra)
 			Curr.obj = self
-			curr = curr.first
+			curr = curr.first!
 
+		using curr
 		rz = @type.msg(":)")
 		// (s) --> (s|bool|)
 		

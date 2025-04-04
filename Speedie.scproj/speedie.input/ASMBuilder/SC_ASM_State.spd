@@ -125,7 +125,7 @@ struct ASMState
 
 	syntax append (|asm| code, |message| dbg, |&FatASM|)
 		cpp_part RequestOp
-		return dbg * code
+		return dbg.operatormul(code)
 
 	syntax expect (|message?| where=nil, |string| msg)
 		cpp_part Fail
@@ -501,7 +501,10 @@ struct ASMState
 		if !l.IsFinisher
 			debugger !.fn.returntype
 			if !ASMType.ReturnOpt(self, 0, 0)
-				.fn.SourceArg!.RET(asmreg(), asmreg(), asmreg(), 0, asmreg())
+				|| OOF = .fn.SourceArg!.DeepLast
+				OOF.RET(asmreg(), asmreg(), asmreg(), 0, asmreg())
+				// We could even add a message() object? and set it's position to the next line in the src.
+				// cos FatASM needs a message for it's position
 		.Optimise
 
 		.out.µlength = .curr - .FuncStart
