@@ -101,7 +101,7 @@ datatype int
 		return other
 
 	operator AbsMin (|uint| Limit, |int|)
-		if .abs < Limit: return self
+		if .abs|uint| < Limit: return self
 		return Limit|int|.setsign(self<0)
 
 	operator Max (|int| other, |int|)

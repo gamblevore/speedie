@@ -100,6 +100,14 @@ datatype DataTypeCode (uint16)
 	function Basictype (|DataTypeCode|) // compares floatness, vector-size, and "isnumericness"
 		return self & (128 + 8 + 3)		// ignores bit-size and signedness.
 	
+	function OK (|bool|)
+		return !(self&failed)
+	
+	function Has (|datatypecode| M, |bool|)
+		opt inline
+		return self&PossibleBits&M
+	
+		
 	syntax is (|datatypecode| M, |bool|) // this seems buggered. just remove it?
 									     // we need to be clear about what we are doing!
 		opt inline
