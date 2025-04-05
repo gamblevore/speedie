@@ -458,7 +458,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 function GlobAddr (|scdecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
 	if d.NilReg is Hoisted
-		Dest = d.nilreg|int|.asm
+		Dest = d.hoisted
 	  else
 		|int64| iTable = d.ExportPosition
 		expect (iTable > 0)          (exp, "No global address".internal)

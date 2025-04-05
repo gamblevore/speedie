@@ -122,8 +122,8 @@ datatype ASMReg (uint64)
 			return i.fat
 	
 	function NeedFAT (|&fatasm|)
-		|| i = .FatIndex
-			return i.fat
+		|| f = .fatindex.fat
+			return f
 		error "anorexic register"
 		return asmstate.sh.zero
 

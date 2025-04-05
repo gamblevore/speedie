@@ -227,6 +227,7 @@ struct ASMState
 		
 	function SoftNop (|FATASM| Fat, |int| Depth=0)
 		depth++
+		if fat ~= asm.gtab
 		if depth > 7
 		for f.fatinputs in fat
 			.decr(f, depth)
@@ -297,7 +298,7 @@ struct ASMState
 		target debug
 			dest.TmpCheck
 			if ++.stacksize > 20 // ugh
-			debugat 0 // keep this
+			 debugat 0 // keep this
 				
 		  else
 			opt inline
@@ -622,6 +623,8 @@ struct ASMState
 		|| Result = .InlineFinishWithConsts(ll)
 		|| Grown = .CurrGain(RealStart)
 		if Grown <= AllowedGain
+			if !result // returns void. datatypecode._void is actually 0 anyhow, so no good either.
+				(result is ConstOutput) // no longer 0
 			return Result
 	
 	

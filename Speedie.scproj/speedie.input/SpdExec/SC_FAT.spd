@@ -25,6 +25,7 @@ struct FatASM
 	
 	setter SetOp (|byte| value)
 		opt norefcounts
+		if self ~= asm.gtab
 		.InputFats = 0
 		.InputRegs = 0
 		._op = value
@@ -52,7 +53,7 @@ struct FatASM
 		return b == asm.fncx or asm.fnc
 	
 	function IsUnused (|bool|)
-		return .µRefCount == 0
+		return (.µRefCount|int16|)|int| <= 0
 	
 	function BaseOp (|int|)
 		rz = .op
@@ -148,11 +149,12 @@ struct FatASM
 
 	function SCdecl.Fat (|&fatasm|)
 		|| K = .FatConstIndex|uint|
-			return K.fat
+		return K.fat
 
 	function uint.FAT (|&FATASM|)
 		opt inline
-		return asmstate.sh.funcstart + (self - 1)
+		if self
+			return asmstate.sh.funcstart + (self - 1)
 	
 	function FileNum (|int|)
 		return .msg.filenum & 0x4095
@@ -194,10 +196,10 @@ struct FatASM
 		.InputRegs |= 1<<a
 		if i
 			|| src = i.fat // we refcount dests too. shouldn't!
-			//if self ~= 4644
 			if src != self
 				.InputFats |= 1<<a
-				src.µRefCount++
+				if src
+					src.µRefCount++
 			  else
 				debugger // what?
 	

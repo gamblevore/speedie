@@ -7,7 +7,9 @@ struct SC_Hoister
 	|byte|			Spare
 	
 	constants
-		MinHoistScore	= 3
+		MinHoistScore = 3
+		AsLoop = 1<<20
+		
 
 	helper GotGlobal (|message| prop,  |scdecl| decl)
 		opt NoRefCounts
@@ -15,18 +17,21 @@ struct SC_Hoister
 		|| Addr = ASMType.GlobAddr(decl, prop, dest)
 		.got(dest, Decl, addr)
 
-	helper Got (|asmreg| dest, |scdecl| decl, |asmreg| K)
-		opt NoRefCounts
-		decl.FatConstIndex = K.FatIndex
-		decl.NilReg = dest.reg ||| nilreg.Hoisted
-		.Items[.Count++] = decl
-		.spare--
-
 	helper WriteConst (|message| prop,  |scdecl| decl)
 		opt NoRefCounts
 		|| dest = ASMState.sh.DeclareMe(prop, decl)		// Pre-declare glob.
 		|| K = asmstate.sh.NumToReg(prop, decl.exportposition, dest, dest.µtype)
 		.got(dest, Decl, k)
+
+	helper Got (|asmreg| dest, |scdecl| decl, |asmreg| K)
+		opt NoRefCounts
+		|| I = k.fatindex
+		|| F = I.fat
+			f.µrefcount++
+		decl.FatConstIndex = I
+		decl.NilReg = dest.reg ||| nilreg.Hoisted
+		.Items[.Count++] = decl
+		.spare--
 
 	helper ReuseConst (|message| prop,  |scdecl| decl)
 		opt NoRefCounts
@@ -40,12 +45,14 @@ struct SC_Hoister
 				return
 		.WriteConst(prop, decl)
 	
+	
 	function asmstate.Unhoist (|sc_hoister| H, |asmreg|)
 		opt NoRefCounts
 		for d in h.Items
 			loop d
 			d.nilreg = 0
 			|| f = d.fat
+				f.µrefcount--
 				if f.isunused
 					.nop(f)
 					
@@ -56,12 +63,12 @@ struct SC_Hoister
 		
 	function HoistLoop (|message| exp)
 		.spare = 2
-		.Hoist(exp, 1<<20)
+		.Hoist(exp, AsLoop)
 
 	function TryHoist (|message| exp, |int| Score, |scdecl| prop)
 		if prop.nilreg isnt hoisted
 			if prop is const
-				if (score >= 1<<20) and prop.exportposition
+				if (score >= AsLoop) and prop.exportposition
 					.ReuseConst(Exp, prop)
 			  elseif prop is Global
 				.GotGlobal(exp, prop)
@@ -88,6 +95,8 @@ struct SC_Hoister
 		opt norefcounts
 		exp = exp.Declable
 		|| fn = exp.func
+		//if fn == @arg and Score < AsLoop // should work but doesn't
+		//	return // fix this later.
 		if  (fn == @dot or @thg or @num)  and  (.spare > 0)
 			|| prop = exp.ASMDecl
 			if (score >= 0)
@@ -104,3 +113,8 @@ struct SC_Hoister
 				
 			.Hoist(ch, add + score)
 
+
+function scdecl.Hoisted (|asmreg|)
+	rz = .datatype|asmreg|
+	rz.reg = .nilreg
+	rz.fatindex = .fatconstindex
