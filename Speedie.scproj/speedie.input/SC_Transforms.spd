@@ -400,6 +400,7 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |SCNode| space)
 		require f.returnsobject
 	|| Src = f.SourceArg!
 	|| d = r_z.MsgDecl
+		(d is CompilerCreated)
 	|| Used = (d and d is usedbycode)
 	src.StartUsingAfter
 	if !used

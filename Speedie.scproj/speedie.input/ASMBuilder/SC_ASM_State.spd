@@ -56,6 +56,8 @@ struct ASMState
 		|| top = .vdecls
 		|| d = (v>>8)&255
 		while top > d
+			|| r = .vars[top]
+				.TryNopUnusedDecl(r)
 			.Vars[top] = nil
 			top--
 			

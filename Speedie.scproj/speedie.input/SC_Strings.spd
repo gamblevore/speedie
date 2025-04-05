@@ -124,8 +124,6 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 	
 	if InbuiltFunc(msg, "digest")
 		msg.name = msg.name.digest
-//	  elseif InBuiltFunc(msg, "compress")
-//		msg.name = msg.name.Compress
 	  elseif P == @arg
 		msg.wrapwith(@tmp, "printline")
 		
@@ -304,6 +302,7 @@ function message.Tran_Isnt (|string| name)
 
 
 function message.FixElseif
+	opt norefcounts
 	|| curr = .next
 	|| f = .first // cond
 	|| needarg = f and (f.next != @arg)

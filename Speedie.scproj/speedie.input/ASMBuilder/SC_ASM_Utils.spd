@@ -48,6 +48,12 @@ target debug
 				debugger
 
 
+function asmstate.TryNopUnusedDecl (|scdecl| d)
+	if d is compilercreated
+		|| f = d.fat
+			.AskNop(f)
+
+
 function scdecl.CalculateASMType (|asmreg|)
 	opt norefcounts
 	if .pointercount or .iscarray

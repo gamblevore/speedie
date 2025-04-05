@@ -10,11 +10,10 @@ function DeclsDefault (|Message| def, |Message|)
 function MakeDecl (|string| Type, |string| Name, |Message| Value, |SCDeclInfo| Purpose=0, |Message!|)
 	opt norefcounts
 	rz = «decl »
-	|| f = rz.msg(@arg),    todo "this should change... I don't like @arg types."
+	|| f = rz.msg(@name)
 	
 	if (Type)
-		(f is style2)
-		f <~ (@thg, type)
+		f.name = type
 	  else
 		f.func = @emb
 	

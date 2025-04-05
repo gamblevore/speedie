@@ -572,14 +572,9 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 			error (c)
 		return r
 
-	if (F == @name)												// use instead of below!
+	if (F == @name)
 		c.func = @thg
-		|| d = ExtractDecl(c, name_Space, purpose, depth)						#require
-		(d is compilercreated)
-		return d
-
-	if (F == @arg)												// a bit ugly... |{\n\tfaststring\n}|
-		|| d = ExtractDecl(c.first!, name_Space, purpose, depth)$
+		|| d = ExtractDecl(c, name_Space, purpose, depth)$
 		(d is compilercreated)
 		return d
 
