@@ -95,8 +95,8 @@ struct SC_Hoister
 		opt norefcounts
 		exp = exp.Declable
 		|| fn = exp.func
-		//if fn == @arg and Score < AsLoop // should work but doesn't
-		//	return // fix this later.
+		if fn == @arg and Score < AsLoop // should work but doesn't
+			return // fix this later.
 		if  (fn == @dot or @thg or @num)  and  (.spare > 0)
 			|| prop = exp.ASMDecl
 			if (score >= 0)
