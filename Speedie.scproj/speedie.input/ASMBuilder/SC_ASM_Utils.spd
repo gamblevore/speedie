@@ -8,7 +8,7 @@ function message.ASMDecl (|SCDecl!|)
 	target debug: rz.ASMSanity
 
 
-function scfunction.GenASM
+function SCFunction.GenASM
 	opt norefcounts
 	|SC_Hoister| H 
 	|| a = .sourcearg!
@@ -21,7 +21,7 @@ function message.OperatorMul (|asm| op, |&fatasm|)
 	|| a = ASMState.sh
 	|| p = a.Curr
 	if p < a.End
-		if  .Position == -1
+		if  .Position < 0
 		if  p == 239400
 		p[0] = nil
 		a._curr = p + 1
@@ -70,6 +70,12 @@ function scdecl.CalculateASMType (|asmreg|)
 	return I|asmreg|
 
 
+function SCFunction.ASMReturn (|scdecl|)
+	opt norefcounts
+	|| T = .returntype
+	if t isnt ReturnedStruct
+		return T
+	
 
 datatype VarUseMode (int)
 	Flags

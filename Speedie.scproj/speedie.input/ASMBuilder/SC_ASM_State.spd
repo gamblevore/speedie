@@ -413,7 +413,7 @@ struct ASMState
 		
 		rz >>= 64-((n*5)+12)
 		if fc>8 or ic>8			// hmmm
-		rz |= fn.ReturnType.SpecialRegs << 11
+		rz |= fn.ASMReturn.SpecialRegs << 11
 		if fc
 			rz |= (8-fc) << 6
 			rz |= (8-ic) << 0
@@ -491,7 +491,7 @@ struct ASMState
 		fn.StartASM
 		.LastDebug = .curr
 		.FuncStart = .curr
-		.ReturnASM = fn.ReturnType.regtype
+		.returnasm = fn.ASMReturn.regtype
 		.AddFuncParams(fn)
 		return true
 
@@ -501,7 +501,7 @@ struct ASMState
 		if .zero.Const // what?
 		|| l = .last
 		if !l.IsFinisher
-			debugger !.fn.returntype
+			debugger !.fn.ASMReturn
 			if !ASMType.ReturnOpt(self, 0, 0)
 				|| OOF = .fn.SourceArg!.DeepLast
 				OOF.RET(asmreg(), asmreg(), asmreg(), 0, asmreg())
@@ -585,7 +585,7 @@ struct ASMState
 		opt norefcounts
 		|| Start = .curr
 		|inlineblock| Old = .state
-		if !dest.reg and fn.ReturnType
+		if !dest.reg and fn.ASMReturn
 			if dest isnt discard
 				Dest = .TempOnly(prms, dest)
 		
@@ -739,7 +739,7 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	// we also need to get the fn from exp.first.obj
 
 	dest = .CallFunc(exp, dest, fn)
-	if !fn.returntype
+	if !fn.ASMReturn
 		(dest is constoutput)
 	
 	|| Closer = .OpenVars

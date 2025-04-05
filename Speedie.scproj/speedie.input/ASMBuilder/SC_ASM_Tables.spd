@@ -556,7 +556,6 @@ function NotTemp (|&asmstate| self, |asmreg| Src, |message| p)
 function Incrementatulatorifier		(fn_asm)				// --a++
 	visible
 	opt	NoRefCounts
-	// if "TestAtomic".trap
 	|| Src = .µGetASM(exp, dest as ASMReg.AddrRequest)
 	|| Amount = IncrAmount(src, mode, exp.ASMDecl)
 	if !dest.reg and dest isnt Discard
