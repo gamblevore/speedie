@@ -284,17 +284,17 @@ class SCDecl (SCNamed) {
 		|| t = ot.type.typeinfo
 			
 		if .isfloat or t.isfloat
-			|| KS = self is const
-			|| OS = ot is const
-			if KS and OS
-				if s.itembitcount <= t.itembitcount
-					return .type
-				return ot.type
-			if KS != OS
-				if OS
-					return .type
-				  else
-					return ot.type
+//			|| KS = self is const
+//			|| KO = ot is const
+//			if KS and KO
+//				if s.itembitcount <= t.itembitcount
+//					return .type
+//				return ot.type
+//			if KS != KO
+//				if KO
+//					return .type
+//				  else
+//					return ot.type
 
 			|| bits = .bestfloat(ot)
 			|| FF = (datatypecode.double.floatness, datatypecode.float.floatness)(bits > 32)

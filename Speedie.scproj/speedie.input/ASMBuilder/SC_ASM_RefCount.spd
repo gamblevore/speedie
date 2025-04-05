@@ -1,12 +1,12 @@
 
 
 extend asmstate
-	function InlineOffsetOpt (|asmreg| base, |int| pow2, |&int| index, |int| maximum, |asmreg|)
+	function InlineOffsetOpt (|asmreg| base, |int| pow2, |&int| index, |uint| maximum, |asmreg|)
 		if base is temp
 			|| bs = base.fat
 			if bs isa asm.ADDK
-				|| CC = bs.prms[2]
-				|| CC2 = CC >> pow2
+				|uint| CC = bs.prms[2]
+				|uint| CC2 = CC >> pow2
 				if (CC2 <= maximum) and (CC2<<pow2 == CC)
 					index[] += CC2
 					|| R = bs.prms[1]
