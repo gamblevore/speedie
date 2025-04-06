@@ -828,7 +828,6 @@ function message.HasSelfAsFirst (|bool|)
 
 
 function SCNode.ReachedName (|string|)
-	opt norefcounts
 	|| c = .MyReacher
 	rz = "    via: " + .name
 	if c.class == SCNode
