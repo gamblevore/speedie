@@ -376,16 +376,19 @@ function ExprNeedsTemping (|Message| child, |Message| name, |bool|)
 			Return true
 
 
-function Destructable (|Message| Blocker, |Message| arg, |Message| name)
+function Destructable (|Message| Blocker, |Message?| arg, |Message| name)
 	opt norefcounts
 	|| type = TypeOfExpr(name, nil, nil)
 	require (type isa SCDecl)
 	
+	|| src = blocker ?? arg!.DeepLast
+	using src
 	|| fn		= type.type.destructorfunc!
 	|| FnMsg	= RefMsg0(fn.exportname, fn)
 	|| brel = fnmsg.last.msg(@brel, "&")
 	|| NewThg = brel.msg(@thg, name.name)
-	//newthg.resetasm
+
+	brel.obj = type.getaddress
 	newthg.obj = name.obj // needed
 	if (Blocker)
 		Blocker.Prev = Fnmsg
@@ -482,11 +485,13 @@ function RefMsg0 (|String| name, |SCFunction| func, |Message|)
 
 
 function message.Become (|scfunction| func)
+	opt norefcounts
 	//.position = -1
 	// clearing this loses good positions that we set in the refcounter
 	.second!.obj = func
 	.obj = func.ReturnType
-	.ASMType = ASMType.kRefCount
+	ifn func is Destructor
+		.ASMType = ASMType.kRefCount
 
 
 function Message.IsProperty (|bool|)

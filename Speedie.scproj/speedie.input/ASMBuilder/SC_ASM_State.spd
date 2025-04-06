@@ -15,7 +15,7 @@ struct ASMState
 
 	|InlineBlock|				State
 	|byte|						DeepestInline
-	|byte|						InlineLimit
+	|byte|						InlineDepthLimit
 	|byte|						StackSize
 	|byte|						VDecls
 	|byte|						VTmps
@@ -25,6 +25,7 @@ struct ASMState
 	|scfunction|				Out
 
 	|?memory of fatasm|			JSM
+	|?&FatASM|					InlineEnd
 	|&FatASM|					FuncStart
 	|&fatasm|					LastDebug
 	|&FatASM|					Start		// a "slice" feature would be nice    
@@ -297,7 +298,8 @@ struct ASMState
 		|| fn = fn_asm_table[exp.ASMType]!
 		target debug
 			dest.TmpCheck
-			if ++.stacksize > 20 // ugh
+			|| StartStackSize = ++.stacksize
+			if StartStackSize > 20 // ugh
 			debugat 0 // keep this
 				
 		  else
@@ -441,7 +443,7 @@ struct ASMState
 		.Vdecls = v
 		check (v < 32) (exp, "Too many registers in use. No space for result.")
 		dest.reg = v
-		dest.µtype = fn.RegType
+		dest.µtype = fn.ASMRegType
 		return dest.ReallySimplify
 
 
@@ -475,7 +477,7 @@ struct ASMState
 		.state.inlinedepth = 0
 		.state.BranchDepth = 0
 		.TailInlineable = true
-		.InlineLimit = 3
+		.InlineDepthLimit = 3
 		.BasicBlock = 0
 		.VDecls = 0
 		.VTmps = 32
@@ -582,7 +584,7 @@ struct ASMState
 				rz = true
 	
 	
-	function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| AllowedGain,  |asmreg|)
+	function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| AllowedGain, |asmreg|)
 		opt norefcounts
 		|| Start = .curr
 		|inlineblock| Old = .state
@@ -597,9 +599,10 @@ struct ASMState
 		
 		|int| D = ++.state.InlineDepth
 		.DeepestInline = D max .DeepestInline
+		
 		.state.fn = fn
 		dest = dest.simplify
-		dest.µtype = fn.RegType
+		dest.µtype = fn.ASMRegType
 		.state.Return = dest
 		.state.VDecls = .vdecls
 		.state.branchdepth = 0
@@ -607,6 +610,8 @@ struct ASMState
 		rz = .TryInlineSub(prms, fn, AllowedGain)
 	
 		.state = old
+		if .state.InlineDepth == 0
+			.InlineEnd = nil
 		if !rz
 			.Rewind(start)
 
@@ -623,7 +628,7 @@ struct ASMState
 		|| Result = .InlineFinishWithConsts(ll)
 		|| Grown = .CurrGain(RealStart)
 		if Grown <= AllowedGain
-			if !result // returns void. datatypecode._void is actually 0 anyhow, so no good either.
+			if !result
 				(result is ConstOutput) // no longer 0
 			return Result
 	
@@ -668,10 +673,15 @@ struct ASMState
 
 	function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 		opt norefcounts
-		require .state.InlineDepth < .InlineLimit
-		require fn.µlength and !fn.HasCVersion
+		require .state.InlineDepth < .InlineDepthLimit
+		|| N = fn.µlength
+		require N and !fn.HasCVersion
 		|| AllowedGain = 5 + (fn is inline) * 23		// assume that functions have 5 instruction overhead.
 		|| Grace = 9
+
+		|| MaxEnd = .inlineend
+			require .curr + (N / 3) < maxend
+		AllowedGain -= .State.inlinedepth
 		
 		for p.fast in prms
 			Grace += .IsASMConst(p)<<2
@@ -680,12 +690,13 @@ struct ASMState
 	
 
 		if !.state.InlineDepth
-			.InlineLimit = 3
+			.InlineDepthLimit = 3
 			.DeepestInline = 0
+			.InlineEnd = .curr + allowedgain
 		|| I = .TryInline(prms, dest, fn, AllowedGain)
 			return I		
 		if !.state.inlinedepth and .DeepestInline > 1
-			.InlineLimit = 1
+			.InlineDepthLimit = 1
 			i = .TryInline(prms, dest, fn, AllowedGain)
 			if i
 				return i
@@ -763,8 +774,12 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 		.RegsBitClear(exp, RegAddrs, fn)
 	
 	fat.µRefCount += fn isnt stateless
-	(dest is Exit) = fn is Killer
-	return fat * dest
+	if fn is Killer // return just to be safe
+		fat = exp.RET(asmreg(), asmreg(), asmreg(), 0, 0)
+		fat.µRefCount++
+		dest = asmreg.exit
+	return fat*dest
+		
 
 
 // Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:4, 8:0

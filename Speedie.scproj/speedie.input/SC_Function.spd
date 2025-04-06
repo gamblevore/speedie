@@ -1209,9 +1209,9 @@ function FixCnjSub (|Message| exp)
 
 
 	
-function RegType (|datatypecode|)
+function ASMRegType (|datatypecode|)
 	if self
-		return .ReturnType.regtype
+		return .asmreturn.regtype
 
 
 function SCDecl.MarkAsAltered 

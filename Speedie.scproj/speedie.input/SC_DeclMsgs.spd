@@ -91,11 +91,9 @@ function SCFunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 
 	|| r = .returntype
 		if r.isbarestruct
-			(r is returnedstruct)
+			(r is ReturnedStruct)
 		if self is HidesProperties
-			.ReturnType = r.makereal
-			
-			
+			.ReturnType = r.makereal			
 
 
 function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cls, |bool|)
@@ -296,10 +294,10 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 			return nil
 
 
-		(dcl is returnedstruct)
+		(dcl is ReturnedStruct)
 		dcl = dcl.getaddress
 		nameitm = .msg(@thg,"rz")
-		(dcl is intendedasreturn)
+		(dcl is IntendedAsReturn)
 		funcprmz.StructReturnPos = funcprmz.args.Length+1 // sheesh a lot of work!
 
 

@@ -82,12 +82,14 @@ module PackMaker
 	
 	
 	helper SortASMFuncs (|[scfunction]| list, |?&&nil| Table)
+		opt norefcounts
 		list.sort(SCFuncSorter)
 
 		|| ID = 0
-		while
-			|scfunction--| f = list[id]		#loop
+		while (|| f = list[id])
 			f.TableID = ++id
+			|| proto = f.hasproto
+				proto.exportposition = id
 			target debug
 				if Table
 					Table[id+31] = jb_vm.Load(f.exportname)

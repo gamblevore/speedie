@@ -90,10 +90,14 @@ datatype ASMReg (uint64)
 		return (self &~ realconst) as (src & realconst)
 		
 	function Const (|int64|)
+		// every single caller must check for constoutput (and does!)
 		|| F = .FAT
 			return f.const
+		if .reg == 0
+			return 0
 		if self isnt param
 			.NeedFAT
+		
 
 	function Const (assigns:|int64|)
 		.needfat.const = value
@@ -277,4 +281,5 @@ function int.asm (|asmreg|)
 function int.TextASM (|asmreg|)
 	rz.reg = self // (self - 1)&31 // would be better?
 	(rz is textual)
+
 

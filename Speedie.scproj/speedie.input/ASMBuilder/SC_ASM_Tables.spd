@@ -80,7 +80,7 @@ function Debugger (fn_asm)
 
 function StatExpr (fn_asm)
 	opt norefcounts
-	for ch.fast in exp
+	for ch.fast in exp.first
 		if ch.islast
 			return .µGetASM(ch, dest)
 		.µ(ch, asmreg.Discard)
@@ -189,7 +189,6 @@ function Return (fn_asm)
 	|| HasK = K>=0
 	|| fat = exp.RET(dest*!HasK, D1, D2, (D0!=nil)|int|, K * HasK)
 	fat.µRefCount++
-	
 	return fat * asmreg.Exit
 	
 
@@ -375,8 +374,10 @@ function Dot (fn_asm)										// a.b
 	
 	|| prop = exp.ASMDecl
 	if prop is const // wait? don't these all get pre-transformed? SHOULD they be?
-		if !prop.islookuponly
-			return ASMConst(self, exp, dest, prop)
+		|| fn = prop.islookuponly
+		if fn isa scfunction
+			return DoGlobal(self, exp, dest, prop)
+		return ASMConst(self, exp, dest, prop)
 	if prop is global
 		return DoGlobal(self, exp, dest, prop)
 	|| F = exp.first!		 
@@ -490,7 +491,6 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 
 
 function AddressOf (fn_asm)
-	debugat 31
 	rz = .µGetASM(exp, dest as asmreg.addrneed)
 	if (rz is ContainsAddr)
 		return rz
