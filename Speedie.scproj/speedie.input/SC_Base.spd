@@ -1044,8 +1044,8 @@ dispatch ClsCollectTable (CollectFunc)
 
 datatype SCNodeInfo (int)
 	constants
-		ExplicitExport
-		Visible
+		ExplicitExport = 1
+		Visible = 2
 		
 
 

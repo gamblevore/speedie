@@ -140,11 +140,11 @@ struct ASMState
 
 	function DeclareMe (|Message| where,  |scdecl| Type,  |asmreg|)
 		|| t = Type.CalculateASMType
-		// if we have a var, that we are returning, and we are an inline.
-		if .state.Return and (type is ReturnedVar) and (.state.fn.ReturnedVars == 1)
-			t = .state.Return
-			Type.wholetype = t|DataTypeCode|
-			return t
+		|| ret = .state.return
+		if ret.reg and (type is ReturnedVar) and (.state.fn.ReturnedVars == 1)
+			ret.µtype = T|datatypecode|
+			Type.wholetype = ret|DataTypeCode|
+			return ret
 		
 		|| d = .VDecls|int| + 1
 		t.reg = d

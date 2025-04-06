@@ -35,11 +35,17 @@ class SCObject
 //				return c.sourcearg
 
 	syntax is (|SCNodeInfo| i, |bool|)
+		return .NodeInfo&i
+
+	function TestASM (|SCNodeInfo| i, |bool|)
 		return .NodeInfo[i]
 	
 	syntax is (|SCNodeInfo| i, assigns:|bool|)
-		|int| x = .NodeInfo
-		x[i] = value
+		|| x = .NodeInfo
+		if value
+			x |= i
+		  else
+			x &=~ i
 		.NodeInfo = x
 
 	function IsVisible (|bool|)

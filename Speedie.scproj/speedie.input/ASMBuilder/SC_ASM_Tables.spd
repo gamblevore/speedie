@@ -375,7 +375,8 @@ function Dot (fn_asm)										// a.b
 	
 	|| prop = exp.ASMDecl
 	if prop is const // wait? don't these all get pre-transformed? SHOULD they be?
-		return ASMConst(self, exp, dest, prop)
+		if !prop.islookuponly
+			return ASMConst(self, exp, dest, prop)
 	if prop is global
 		return DoGlobal(self, exp, dest, prop)
 	|| F = exp.first!		 
@@ -428,6 +429,7 @@ function Thg (fn_asm)
 function ASMConst (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
 	(dest is RealConst)
 	if dest isnt ConstRequest
+		dest.µtype = d.datatype
 		if d.nilreg isnt hoisted
 			return .NumToReg(exp, d.exportposition, dest, dest.µtype)
 		dest.fatindex = d.fatconstindex
@@ -488,6 +490,7 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 
 
 function AddressOf (fn_asm)
+	debugat 31
 	rz = .µGetASM(exp, dest as asmreg.addrneed)
 	if (rz is ContainsAddr)
 		return rz
