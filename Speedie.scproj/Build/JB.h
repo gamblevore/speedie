@@ -718,9 +718,9 @@ struct FastBuff {
 };
 
 struct FatASM {
-	uint R[6];
+	uint Prms[6];
 	u16 ASMIndex;
-	u16 BlockNum;
+	u16 BasicBlock;
 	uint64 _Const;
 	Message* Msg;
 	ASMReg Info;
@@ -815,7 +815,7 @@ struct ASMState {
 	DataTypeCode ReturnASM;
 	InlineBlock State;
 	byte DeepestInline;
-	byte InlineLimit;
+	byte InlineDepthLimit;
 	byte StackSize;
 	byte VDecls;
 	byte VTmps;
@@ -823,6 +823,7 @@ struct ASMState {
 	bool TailInlineable;
 	SCFunction* Out;
 	MWrap* JSM;
+	FatASM* InlineEnd;
 	FatASM* FuncStart;
 	FatASM* LastDebug;
 	FatASM* Start;
@@ -3068,9 +3069,9 @@ extern Array* SC__NilReason_values;
 
 #define kSC__SCNodeFindMode_WantAType ((SCNodeFindMode)4)
 
-#define kSC__SCNodeInfo_ExplicitExport ((int)0)
+#define kSC__SCNodeInfo_ExplicitExport ((int)1)
 
-#define kSC__SCNodeInfo_Visible ((int)1)
+#define kSC__SCNodeInfo_Visible ((int)2)
 
 #define kSC__SCNodeType_DataType ((SCNodeType)2)
 
@@ -3143,6 +3144,8 @@ extern IsaTester SC__IsaTester_T;
 
 #define JB__Saver_SaveableList JB__.Saver_SaveableList
 #define JB__Rnd_Shared JB__.Rnd_Shared
+#define kSC__Hoi_AsLoop ((int)1048576)
+
 #define kSC__Hoi_MinHoistScore ((int)3)
 
 #define kSC__Pac_kContinue ((int)254)
@@ -5089,8 +5092,6 @@ JB_String* JB_int_RenderFS(int Self, FastString* Fs_in);
 
 JB_String* JB_int_RenderSize(int Self, FastString* Fs_in);
 
-bool JB_int_SyntaxAccess(int Self, int Bit);
-
 int JB_int_SyntaxAccessSet(int Self, int Bit, bool Value);
 
 int JB_int_TabsWidth(int Self);
@@ -5611,6 +5612,8 @@ int JB_TC_ItemBitCount(uint /*DataTypeCode*/ Self);
 int JB_TC_NumericCount(uint /*DataTypeCode*/ Self);
 
 int SC_TC_NumericCountBoolsToo(uint /*DataTypeCode*/ Self, SCDecl* D);
+
+bool JB_TC_OK(uint /*DataTypeCode*/ Self);
 
 bool JB_TC_SameBasicType(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ B);
 
@@ -6981,7 +6984,7 @@ bool SC_Pac_InlineAddK(ASMState* Self, ASMReg L, int64 R, ASMReg Dest);
 
 ASMReg SC_Pac_InlineFinishWithConsts(ASMState* Self, FatRange* R);
 
-ASMReg SC_Pac_InlineOffsetOpt(ASMState* Self, ASMReg Base, int Pow2, int* Index, int Maximum);
+ASMReg SC_Pac_InlineOffsetOpt(ASMState* Self, ASMReg Base, int Pow2, int* Index, uint Maximum);
 
 void SC_Pac_InlineParameters(ASMState* Self, Message* Prms);
 
@@ -7136,6 +7139,8 @@ ASMReg SC_Pac_ThgASM(ASMState* Self, SCDecl* D);
 ASMReg SC_Pac_TryInline(ASMState* Self, Message* Prms, ASMReg Dest, SCFunction* Fn, int AllowedGain);
 
 ASMReg SC_Pac_TryInlineSub(ASMState* Self, Message* Prms, SCFunction* Fn, int AllowedGain);
+
+void SC_Pac_TryNopUnusedDecl(ASMState* Self, SCDecl* D);
 
 bool SC_Pac_Unchanged(ASMState* Self, Message* A, ASMReg Dest, Message* B);
 
@@ -10067,6 +10072,8 @@ SCDecl* SC_Decl_HighestArrayContainMatch(SCDecl* Self, SCDecl* Other);
 
 SCDecl* SC_Decl_HighestMatch(SCDecl* Self, SCDecl* Other);
 
+ASMReg SC_Decl_Hoisted(SCDecl* Self);
+
 bool SC_Decl_IntRegs(SCDecl* Self);
 
 bool SC_Decl_IntsOnly(SCDecl* Self, Message* Exp);
@@ -10997,6 +11004,10 @@ SCFunction* SC_Func_ArgsMatch2(SCFunction* Self, SCDecl* Base, int TypeCast, SCN
 
 int SC_Func_ArgsMatch3(SCFunction* Self, int TypeCast, SCDecl* Base, bool ThisAlter, SCNode* Name_space, SCParamArray* Incoming);
 
+DataTypeCode SC_Func_ASMRegType(SCFunction* Self);
+
+SCDecl* SC_Func_ASMReturn(SCFunction* Self);
+
 bool SC_Func_Borked(SCFunction* Self);
 
 void SC_Func_BuildConstructorDestructor(SCFunction* Self);
@@ -11178,8 +11189,6 @@ void SC_Func_ReachedDetect(SCFunction* Self);
 bool SC_Func_ReachFunc(SCFunction* Self, SCNode* From);
 
 void SC_Func_RefFunc(SCFunction* Self, Message* Prm, Message* After);
-
-DataTypeCode SC_Func_RegType(SCFunction* Self);
 
 JB_String* SC_Func_Render(SCFunction* Self, FastString* Fs_in);
 
@@ -11719,7 +11728,10 @@ inline void SC_nil_ValueSet(ArchonPurger* Self, NilRecord Dest) {
 }
 
 inline FatASM* SC_uint_FAT(uint Self) {
-	return SC__Pac_Sh.FuncStart + (Self - 1);
+	if (Self) {
+		return SC__Pac_Sh.FuncStart + (Self - 1);
+	}
+	return nil;
 }
 
 inline bool JB_Array_SyntaxCast(Array* Self) {
@@ -11894,19 +11906,21 @@ inline JB_String* JB_config_AsString(Message* Self) {
 }
 
 inline void SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info) {
-	Self->R[A] = SC_Reg_treg(Info);
+	Self->Prms[A] = SC_Reg_treg(Info);
 	Self->Outputs = (Self->Outputs | (1 << A));
 }
 
 inline void SC_FAT_PrmWithIntReg(FatASM* Self, int A, ASMReg Input) {
 	uint I = SC_Reg_FatIndex(Input);
-	Self->R[A] = (SC_Reg_treg(Input) | (I << 15));
+	Self->Prms[A] = (SC_Reg_treg(Input) | (I << 15));
 	Self->InputRegs = (Self->InputRegs | (1 << A));
 	if (I) {
 		FatASM* Src = SC_uint_FAT(I);
 		if (Src != Self) {
 			Self->InputFats = (Self->InputFats | (1 << A));
-			(++Src->xC2xB5RefCount);
+			if (Src) {
+				(++Src->xC2xB5RefCount);
+			}
 		}
 		 else {
 		}
