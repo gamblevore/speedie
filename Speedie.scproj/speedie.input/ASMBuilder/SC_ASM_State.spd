@@ -228,6 +228,7 @@ struct ASMState
 		
 	function SoftNop (|FATASM| Fat, |int| Depth=0)
 		depth++
+//		if "SCArgNested".trap
 		if fat ~= asm.gtab
 		if depth > 7
 		for f.fatinputs in fat
@@ -236,8 +237,12 @@ struct ASMState
 		fat.setop = Type
 	
 	function Decr (|?&fatasm| f, |int| Depth=0)
-		if f and --f.µRefCount <= 0
-			.Nop(f, depth)
+		if f
+			|| C = f.µrefcount
+			C -= (C > 0)
+			f.µrefcount = C
+			if C <= 0
+				.Nop(f, depth)
 	
 	function SofterNop (|FATASM| Fat)
 		fat.setop = asm.noop
@@ -300,7 +305,7 @@ struct ASMState
 			dest.TmpCheck
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
-			debugat 0 // keep this
+			debugat 43577 // keep this
 				
 		  else
 			opt inline
@@ -765,7 +770,7 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 		tableid = fn.tableid ?? 0xFFFF // 0xffff means unknown?
 		TableID += 31
 	|| PExt = P >> 32
-	|| fat = prms.FNC(dest, TableID, P,  PExt)
+	|| fat = prms.FNC(dest, TableID, P,  PExt) // prms.fncx
 	if fn.HasCVersion
 		fat._op = asm.FNCX
 	fat._op += PExt > 0

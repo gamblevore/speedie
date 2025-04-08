@@ -137,10 +137,12 @@ function Continue		(fn_asm)
 
 function BackCond (|fatasm| start)
 	|| l = .last
-	if l >= start
+	require l >= start
+	|| bb = l.basicblock
+	.nop(l)
+	--l
+	if l.basicblock == bb  and  l >= start  and  l is RealConst
 		.nop(l)
-		if --l >= start and l is RealConst
-			.nop(l)
 
 
 function Ternary		(fn_asm)

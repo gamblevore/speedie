@@ -409,10 +409,12 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |SCNode| space)
 		r_z.NotNilRZ(f.ReturnType!, space)
 
 	ifn (src.blocks is return) or (src.last istmp "return") 
-		|| last = Src.DeepLast
+	
+		|| last = Src.DeepLast // surely src.StartUsingAfter already does this?
 		using last
+		parser.using.position = last.After+1 // same?
+		// also this doesn't even seem to work reliably, at least DebugAppCallArgsDisplay has a wierd ret pos
 		
-		parser.using.position = last.After+1
 		|| ret = src.msg(@tmp, "return")
 		ret.ASMType = ASMType.kReturn
 		if used

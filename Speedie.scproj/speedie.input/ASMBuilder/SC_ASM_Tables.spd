@@ -435,6 +435,7 @@ function ASMConst (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| d, |
 			return .NumToReg(exp, d.exportposition, dest, dest.µtype)
 		dest.fatindex = d.fatconstindex
 		Dest.reg = d.nilreg&31
+		(dest isnt constinput)
 	return dest
 
 
