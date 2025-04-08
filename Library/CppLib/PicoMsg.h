@@ -52,9 +52,6 @@ struct 			PicoConfig  {
 
 struct PicoGlobalConfig {
 ///
-	const char*				Name;  
-// Just for debug.
-
 	PicoDate				TimeOut;
 /// Quits the app, if the app doesn't receive a "keep alive" signal for too long.
 /// Set TimeOut to zero, to remove the self-quit ability.
@@ -893,7 +890,7 @@ extern "C" int PicoStartFork (PicoComms* M, bool WillExec=false) _pico_code_ (
 
 /// **Communications** ///
 extern "C" bool PicoSend (PicoComms* M, const char* Msg, int Length, int Policy=PicoSendGiveUp) _pico_code_ (
-/// Sends the message. The data is copied to internal buffers so you do not need to hold onto it after send. If `CanWait` is false and there is no buffer space, this function returns `false`. If `CanWait` is true, it will block until the timeout is reached. See the ["configuration"](#Configuration) section about how to change the timeout.
+/// Sends the message. The data is copied to internal buffers so you do not need to hold onto it after send. If Policy==`PicoSendGiveUp` and there is no buffer space, this function returns `false`. If Policy==`PicoSendCanTimeOut`, and there is no buffer space, PicoSend will block until the timeout is reached. See the ["configuration"](#Configuration) section about how to change the timeout. (You probably should design your programs to slurp up data so fast that blocking isn't necessary.)
 	return M->QueueSend(Msg, Length, Policy);
 )
 
