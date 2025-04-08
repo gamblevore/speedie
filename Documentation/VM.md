@@ -8,16 +8,17 @@ I'm expecting that code compiled for the virtual-machine, will be about 2x small
 
 Speedie doesn't require a VM to run it's code, in fact currently it is outputting C++ and compiling that. This is such a useful property to have, that I will keep it. However, it makes debugging very hard, as you would have to debug the C++.
 
-So that is the main reason that a VM is necessary, to make debugging possible, easy and fun. But it can do a lot more.
+The VM will enable these possibilites:
 
-* Enable single-distributables to run anywhere. Any platform with speedie installed.
-* Protect against changes in the language speedie. For example if a change in speedie made some of your code not compile anymore.
 * Make debugging possible, easy and fun.
+* Single-distributables can run anywhere. Any platform with speedie installed.
 * Some "[temporal](#user-content-temporal)" magic and mystery. (optional)
+* Write portable ASM yourself!
+* Compile Speedie without needing a C compiler.
 
 
 ### Small and fast
-Speedie ASM should be 2x/3x smaller than ARM, on average. <small>(This is just a wild guess, as its not finished yet! But this is my hope!)</small>
+Speedie ASM should be 2x smaller than ARM, on average. <small>(This is just a wild guess, as its not finished yet! But this is my hope!)</small> In addition, compiles will link against SpeedieLib, cutting down compile size dramatically.
 
 *If I say (2 v 13), that means Speedie takes 2 instructions to do something, and ARM would take 13 to do the same.*
 
@@ -32,7 +33,7 @@ Speedie ASM should be 2x/3x smaller than ARM, on average. <small>(This is just a
 * Branching (1 vs 2)
 * Loop specific instructions do in (1 vs 3-4).
 
-**Only needs approx-100 instructions (once finished). I have 77 so far but SIMD is missing. ARM needs over 1000!**
+**Only needs approx-100 instructions (once finished). I have 87 so far but SIMD is missing. ARM needs over 1000!**
 
 
 ### Inbuilt ASM-Viewer
@@ -67,11 +68,7 @@ Using Perry's inbuilt godbolt.org... this gives speed-freaks an extra advantage,
 This makes debugging your apps much simpler, as you are less likely to get a difference between your "release" and "Debug" version. Usually, they can just be the same program!
 
 
-### Future Possibilities
-
-
-
-### Temporal
+### Future Possibility: Temporal
 
 What if we made a "temporal VM". This is where we basically use our code for art... mystery and magic, or anything kind of dreamy or intuitive. You can see it as "divination", like reading tea-leaves or reading tarot-cards.
 
