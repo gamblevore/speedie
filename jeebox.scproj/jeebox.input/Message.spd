@@ -82,17 +82,17 @@ After that, you now have a tree-data-structure that represents your data. The Me
 		opt norefcounts
 		rz = pos_msg ?? self
 		using rz
-			rz = .copysub(pos_msg)
+			rz = .CopyWithoutUsing(pos_msg)
 	
 	
-	helper CopySub (|message?| P = nil, |Message!|)
+	function CopyWithoutUsing (|message?| P = nil, |Message!|)
 		opt norefcounts
 		rz = message(self)
 		if P
 			rz.position = P.position
 			rz.rangelength = P.rangelength
 		for v in self
-			rz <~ v.CopySub(P)
+			rz <~ v.CopyWithoutUsing(P)
 
 
 	operator matches (|message| m, |bool|)

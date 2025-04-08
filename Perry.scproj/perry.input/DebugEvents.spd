@@ -379,10 +379,12 @@ function SelectedASM (guilistevent)
 	|| i = .ide
 	require !i.DuringASMEvent
 	|| file = row.obj as string				#require
-	|| n = row.first.int
+	|| f = row.first
+	|| n = f.int
 	i.DuringASMEvent = true
 	i.EditPath(file.name, false)
-	i.editme.ShowAndSel(n, true)
+	if f
+		i.editme.ShowAndSel(n, true)
 	i.DuringASMEvent = false
 
 

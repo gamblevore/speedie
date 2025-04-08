@@ -30,6 +30,7 @@ function FS
 	|| x = asm_test_obj()
 	x.i++
 	(fs)
+	x.i++
 	
 function CheckSize
 	opt norefcounts

@@ -154,14 +154,13 @@ function RC_IgnoreReturn (|Message| msg)
 function message.RefMsgToUse (|message|)
 	opt norefcounts
 	if self == @arg
-		return .deeplast!
+		return .last!
 	return self!
 
 
 function RefDecr (|Message| msg, |Message| place, |int| Basis)
 	// a = nil   ->   JB_decr(a),  a = nil 
 	opt norefcounts
-//	if "FS".trap
 	
 	|| OldPrev = place.Prev
 	if (OldPrev) and (OldPrev == @Func) and (OldPrev.first ~= "JB_SafeDecr")
@@ -207,9 +206,9 @@ function RefClearMsg (|Message| msg, |Message|)
 
 function RefMsg (|Message| msg, |String| name, |SCFunction| func, |Message|)
 	opt norefcounts
-	using msg
+	if parser.using.position < 0
 	rz = SCRefs.RefMsg0(name, func)
-	rz.Last! <~ msg.Copy
+	rz.Last! <~ msg.CopyWithoutUsing(rz)
 	rz.obj = func.returntype ?? typevoid
 
 
