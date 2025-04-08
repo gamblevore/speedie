@@ -46,7 +46,7 @@ Well... Perry has an inbuilt ASM-Viewer! Just press Command-9 (Ctrl-9 on Linux) 
 
 And considering that Speedie only has one compile-target (release builds ARE debug-builds), this means you can easily check the final output of your code.
 
-Using Perry's inbuilt godbolt.org... this gives speed-freaks an extra advantage, it is instant unlike godbolt.org!
+Perry's inbuilt ASM-viewer... has an extra advantage, it is instant! (Unlike godbolt.org)
 
 
 ### Other nice things to know abou:
