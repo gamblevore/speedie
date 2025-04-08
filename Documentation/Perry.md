@@ -58,6 +58,13 @@ In Perry, you'll find that finding is fast, text-editing is fast, autocomplete i
 I find Perry takes surprisingly little RAM. When I open Perry I see I have 6 projects open (3 are large projects). Yet I am only taking 1.5MB of memory for all the objects, 87KB for the strings, and 1.7MB for the screen. Its an ultra-light-weight design. Xcode will take hundreds of megabytes for just one project, and gigabytes to compile.
 
 
+## Inbuilt Godbolt.org (ASM Viewer)
+
+Perry has an inbuilt ASM-Viewer. This lets you optimise your code easily, or at least get an idea of what is going on. You don't need to use the ASM viewer just to debug, but its always nice to get a good view on performance critical code.
+
+![](godbolt.png)
+
+
 ## Comparisons
 
 #### BBEdit & Xcode

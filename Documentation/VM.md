@@ -42,6 +42,8 @@ People who have used [godbolt.org](http://godbolt.org) know how useful this tool
 
 Well... Perry has an inbuilt ASM-Viewer! Just press Command-9 (Ctrl-9 on Linux) to view the ASM for any function you are editing. Speedie already optimises it's code "tastefully", to make a good balance of debuggability and speed.
 
+![InBuilt ASM View](godbolt.png)
+
 And considering that Speedie only has one compile-target (release builds ARE debug-builds), this means you can easily check the final output of your code.
 
 Using Perry's inbuilt godbolt.org... this gives speed-freaks an extra advantage, it is instant unlike godbolt.org!
