@@ -140,7 +140,8 @@ class GraphicsEditor (GuiControl)
 		|| data = path.ReadFile								#require
 		if path isa "png"
 			data = imagehelper.ConvertPNGToVOI(data)		#require
-		.LoadImage(data, path)
+		return .LoadImage(data, path)
+		
 
 
 	helper LoadImage (|string| data, |string| path, |bool|)

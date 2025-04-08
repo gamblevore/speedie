@@ -822,7 +822,6 @@ So anything not 0 means "its OK"`
 			.DuringLoad++
 			.ViewAsCurr
 			.DuringLoad--
-		.HideASM
 		|| ok = (.EditDraw(r), .EditText(r))(g)
 		if ok != 1
 			return ok
@@ -843,16 +842,20 @@ So anything not 0 means "its OK"`
 		
 		.PopupHide
 		.AddToJumpHistory
-		if  !g  and  .IsEditingSource
+/		if  !g  and  .IsEditingSource
 			.Recheck
+			.TryReselectASM
+		  else
+			.HideASM
 		.DuringLoad--
 		
 		return 1
 			
 
 	function EditDraw (|FileRow| r, |int|)
-		if .drawme.LoadFile(r.location)
-			return 1
+		require .drawme.LoadFile(r.location)
+		.HideASM
+		return 1
 		
 
 	task CheckScrollErrors (taskgui)
