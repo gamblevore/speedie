@@ -1108,7 +1108,7 @@ function string.IsSwizzle (|int| Width, |int|)
 	
 	|| HasLetter = false
 	while (i < N)
-		|| d  = self[i++].lowercase
+		|| d  = self[i++]//.lowercase
 		if (d != '_')
 			HasLetter = true
 			require (!c) or ((d >= 'w') == (dold >= 'w')) or (dold == '_')

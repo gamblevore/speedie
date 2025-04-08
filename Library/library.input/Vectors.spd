@@ -518,7 +518,7 @@ datatype IntRange (ivec2)
 	function Width (|int|)
 		return .x2 - .x
 	operator Inside (|ivec4| R, |bool|)
-		return R.Contains(.X, .Y)
+		return R.Contains(.x, .y)
 
 	operator overlaps (|intrange| r, |bool|)
 		return r.x1 < .x2 and r.x2 > .x1
@@ -546,21 +546,21 @@ datatype IntRange (ivec2)
 //	function Mix (|float|f, |float|)
 //		return mix(.x1, .x2, f)
 	function LimitTo (|int| i, |ivec2|)
-		if (.X  < 0):		.X  = 0
-		if (.X2 < 0):		.X2 = 0
-		if (.X  > i):		.X  = i
-		if (.X2 > i):		.X2 = i
+		if (.x  < 0):		.x  = 0
+		if (.x2 < 0):		.x2 = 0
+		if (.x  > i):		.x  = i
+		if (.x2 > i):		.x2 = i
 		return self
 
 	operator Contains (|int| i, |bool|)
 		cpp_part Contains1
-		return (i >= .X) and (i < .X2)
+		return (i >= .x) and (i < .x2)
 	operator Contains (|ivec2| i, |bool|)
 		cpp_part Contains2
 		return self contains i.x and i.x2
 
 	syntax Equals (|int| i, |bool|)
-		return .X==i and .X2==i
+		return .x==i and .x2==i
 
 	iterator
 		|| _End = .x2
