@@ -556,10 +556,7 @@ function ImportAll
 
 	.Stage( "Creating Exportnames For Function Prototypes" )
 	for f in .FuncList
-		|| p = f.HasProto
-			p.Name = f.ExportName
-		  else
-			f.AddConstructorReturn2
+		f.BeforeTransform
 	
 	.Stage( "Checking Iterators" )
 	for c in .ClassList

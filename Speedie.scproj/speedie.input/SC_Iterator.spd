@@ -94,6 +94,7 @@ class SCIterator (SCNamed)
 		|| msg = "iterator iter_test () {for yield_test$dot in self {(yield_test)}}".parseclean
 		|| fnc = SCFunction.NewFunc( msg, cls, .source )|SCFunction|
 			fnc.FuncParamsLoad
+			fnc.BeforeTransform
 			fnc.Transform
 
 

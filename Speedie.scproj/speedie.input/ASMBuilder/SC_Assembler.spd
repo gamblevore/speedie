@@ -38,10 +38,9 @@ module SpdAssembler
 		return compiler.XFunc(m.name, m)	#expect (m, "This function has no ASM")
 						
 
-	function GenerateASM (|scfunction| fn, |int| i=0,  |bool|) // memory safe ASM reattempt
+	function GenerateASM (|scfunction| fn, |int| i=0,  |bool|) // asmgen
 		opt norefcounts
 		
-		if fn ~= "DebugAppCallArgsDisplay"
 		require ASMState.Sh.InitAndStartFunc(fn)
 		fn.GenASM
 		ASMState.Sh.FinishASM

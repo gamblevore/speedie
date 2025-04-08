@@ -842,7 +842,7 @@ So anything not 0 means "its OK"`
 		
 		.PopupHide
 		.AddToJumpHistory
-/		if  !g  and  .IsEditingSource
+		if  !g  and  .IsEditingSource
 			.Recheck
 			.TryReselectASM
 		  else

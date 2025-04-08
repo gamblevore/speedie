@@ -771,23 +771,24 @@ function Tran_FuncTable (|Message| msg, |bool|) // tran_Dispatch
 	|| ProtoFirst	= protomsg.first!
 	|| name			= namemsg.name
 	|| protoName	= ProtoFirst.name
-	if (protofirst != @thg)								// seems to work???
+	if true
 		using msg
-		protomsg.replacewith( «thg protoname » )
-		protoname = "Fn_" + name
-		protomsg.func = @prm
-		|| protoMsg2 = «tmp "prototype"
-			«thg ProtoName »
-			protomsg
-		»
-		msg.next = protomsg2	
-	
-	items.name = "dispatch"
-	items.Func = @arr
-	msg.clear
-	msg.func = @decl
-	msg <~ «emb »
-	msg <~ NewEqRel( «thg name », items )
+		if (protofirst != @thg)								// seems to work???
+			protomsg.replacewith( «thg protoname » )
+			protoname = "Fn_" + name
+			protomsg.func = @prm
+			|| protoMsg2 = «tmp "prototype"
+				«thg ProtoName »
+				protomsg
+			»
+			msg.next = protomsg2	
+		
+		items.name = "dispatch"
+		items.Func = @arr
+		msg.clear
+		msg.func = @decl
+		msg <~ «emb »
+		msg <~ NewEqRel( «thg name », items )
 	
 	for I in items
 		|| item_value	= I.Last

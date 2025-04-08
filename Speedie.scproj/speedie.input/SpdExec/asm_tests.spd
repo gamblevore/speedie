@@ -1,4 +1,10 @@
 
+class asm_test_obj
+	|int| i
+	constructor
+		visible
+		.i = 0
+
 module ASMExamples {
 |int| Glob
 |int| Bolg
@@ -21,6 +27,9 @@ function IfEmpty (|int| x)
 function FS
 	|| fs = FastString()
 	fs <~ ":"
+	|| x = asm_test_obj()
+	x.i++
+	(fs)
 	
 function CheckSize
 	opt norefcounts

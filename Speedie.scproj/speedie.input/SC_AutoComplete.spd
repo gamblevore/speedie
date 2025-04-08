@@ -1074,6 +1074,8 @@ function ASMSub (|message| rz,  |SCFunction| fn, |faststring| fs, |bool|)
 		lp = p
 		path = fat.msg.NextPath(tmp, path)
 
+	rz.msg(@tmp, "")
+	rz.msg(@tmp, fn.render) // C-view
 	return true
 	
 

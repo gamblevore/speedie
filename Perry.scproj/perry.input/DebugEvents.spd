@@ -355,6 +355,9 @@ function perryide.GotASMSub (|message| asm)
 	|| n = 0
 	|message| file
 	for s in arg
+		if !s.name
+			(s|listviewrow| is disabled)
+			(s|listviewrow| is active)
 		if s == "file"
 			file = s.first
 		  else
@@ -383,6 +386,11 @@ function SelectedASM (guilistevent)
 	i.DuringASMEvent = false
 
 
+
+class asm_test_obj
+	|int| i
+	constructor	
+		.i = 0
 
 
 function Char (|int| x, |int|) // tab after here

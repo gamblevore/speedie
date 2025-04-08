@@ -151,14 +151,24 @@ function RC_IgnoreReturn (|Message| msg)
 		parser.using.position = -1
 
 
+function message.RefMsgToUse (|message|)
+	opt norefcounts
+	if self == @arg
+		return .deeplast!
+	return self!
+
+
 function RefDecr (|Message| msg, |Message| place, |int| Basis)
 	// a = nil   ->   JB_decr(a),  a = nil 
 	opt norefcounts
+//	if "FS".trap
 	
 	|| OldPrev = place.Prev
 	if (OldPrev) and (OldPrev == @Func) and (OldPrev.first ~= "JB_SafeDecr")
 		place = OldPrev // safedecr always comes last
 	
+//	debugat 13
+	using place.refmsgtouse
 	|message| what 
 	if basis & kBasisCArray
 		what = DecrMulti( msg.parent!.asdecl!, msg.copy )
@@ -182,9 +192,11 @@ function DecrMulti (|scdecl| d, |message| m, |message|)
 
 
 function RefDecrMsg (|Message| msg, |Message|)
-	parser.using.position = -2			// just to bypass my bug-catching attempt. Not needed.
+//	if "FS".trap
+	if parser.using.position < 0
+	//parser.using.position = -2			// just to bypass my bug-catching attempt. Not needed.
 	rz = RefMsg( msg, "JB_Decr", Compiler.RefDecr! )
-	parser.using.position = -1
+	//parser.using.position = -1
 	
 
 
@@ -457,11 +469,12 @@ function ReturnHandle (|Message| Blocker, |Message?| arg, |Message| name, |int| 
 
 function RC_RelInit (|Message| rel)
 	opt norefcounts
-	|| func = rel.WrapWith(@func)
-	func.first = @thg + "JB_Incr2"
-	rel.second.remove
-	rel.func = @prm
-	func.become(compiler.RefIncr2!)
+	using rel
+		|| func = rel.WrapWith(@func)
+		func.first = @thg + "JB_Incr2"
+		rel.second.remove
+		rel.func = @prm
+		func.become(compiler.RefIncr2!)
 
 
 function RC_RelConstructor (|Message| rel)
@@ -866,6 +879,7 @@ function SCFunction.AnalyseRefs (|[message]| list)
 				SCRefs.RC_DeclArg(ar, self)
 
 	for (msg.backwards in list)
+		parser.using.position = -1
 		|| f = msg.func
 		if (f == @Rel)
 			if (IsConstructor and SettingSelfProperty( msg ))

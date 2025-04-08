@@ -465,7 +465,14 @@ function CreateEmptyConstructors (|scfunction|)
 			rz ?= f2
 
 
-function SCFunction.AddConstructorReturn2
+function scfunction.BeforeTransform
+	opt norefcounts
+	|| p = .HasProto
+		p.Name = .ExportName
+	  else
+		.AddConstructorReturn2
+
+function SCFunction.AddConstructorReturn2 
 	|| c = .cls
 	require c  and  self Isnt Wrapper  and  self is newnew
 	|| args = .source![@arg, 2]
