@@ -259,7 +259,7 @@ int JB_Sh_StartProcess(ShellStream* self, JB_String* path, Array* Args, PicoComm
 		JB_ErrorHandleFile(path, nil, Result, nil, "run");
 	}
 
-	JB_FreeIfDead(path);
+//	JB_FreeIfDead(path);
 	free(argv);
 	return Result;
 }
