@@ -10,6 +10,7 @@ module Perry
 	|listviewrow|					RecentProjects=message()
     |bool|							Checked	
     |bool|							FinishedStartUp
+    |byte|							WindowNumber
     |byte| 							FindID
 	
 	constants
@@ -116,7 +117,7 @@ module Perry
 
 		if filedes.StdOut.IsTerminal
 			app.AllowInteruptCrash = true // fails with 0 params... sigh whatever
-
+		
 		if !.LoadWindowsFromArgs and !.LoadWindowsSub()
 			startupwindow.show
 		  else

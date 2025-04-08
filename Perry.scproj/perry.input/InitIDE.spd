@@ -1,6 +1,6 @@
 
 extend PerryIDE  
-    constructor (|file| project)
+    constructor (|file| project, |bool| Dummy)
 		super.constructor 
 		.IsMainWindow		= true
 		.Project			= project

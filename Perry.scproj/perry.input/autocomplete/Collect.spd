@@ -110,7 +110,12 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 			proc = file.speediedir.child("Speedie.scproj/Build/Products/Debug/Speedie")
 		if proc
 			|| Mode = ProcessMode.CaptureAll * !noisy
-			spd = SpdProcess.spawn(Proc, p, .project.name, mode)
+			|duration| Delay = 0
+			if !Perry.FinishedStartUp
+				Delay = 0.125s * Perry.WindowNumber
+			spd = SpdProcess.spawn(Proc, p, .project.name, mode, delay)
+				
+			
 //	if noisy and spd
 //		spd.pico.config.noise = -1
 	return spd

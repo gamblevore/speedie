@@ -1,6 +1,6 @@
 
 function ClickedEditPrefs (GUIMenuEvent)
-	PerryIDE.New(app.prefspath)
+	PerryIDE.New(app.prefspath.file)
 
 function string.IsProj (|bool|)
 	return self isa "scproj" or "uwuz"

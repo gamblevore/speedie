@@ -705,10 +705,12 @@ class PerryIDE (Window)
 		|bool|						DummyTest
 		|byte|						StatsMode
 		
-		function New (|string| path, |perryide|)
-			rz = PerryIDE(path.file)
+		function New (|file| path, |perryide!|)
+			rz = PerryIDE(path, false)
 			rz.LoadProject
 			rz.EditMe.SetFocus
+			if !Perry.FinishedStartUp
+				Perry.WindowNumber++
 		
 		
 		function EmptyBase (|perryide|)
