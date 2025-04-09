@@ -720,8 +720,10 @@ extend PerryIDE
 		line "/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd" "|TextView| R" 3414
 		line "/usr/local/speedie/GUI.scproj/gui.input/GUI/Confirm.spd" "|bool| Vis" 3433
 ` ~ parse
-		.Stack.use(m as listviewrow)
-		.Variables.use(v as listviewrow)
+		|| stk = m as listviewrow
+			.Stack.use(stk)
+		|| vars = v as listviewrow
+			.Variables.use(vars)
 		.appinfo.text = "Speedie\n(Inactive)"
 	
 	
