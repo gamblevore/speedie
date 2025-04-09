@@ -409,26 +409,6 @@ class SCDecl (SCNamed) {
 		.nildeclared = nilstate.realish
 
 
-/*	
-	function AccessSub (|message| Exp, |message| side, |scdecl|)
-		opt norefcounts
-		|| i = .Internal$
-		if .IsCArray //or i.isbarestruct
-			if i.TypeSuffers
-				return i.MakeNewOptional
-			if !side and i.IsMemoryOnly 
-				|| P = Exp.niceparent
-				if (p == @brel) and (p == "&")
-					return i
-					
-				// carrays are a total bastard...
-//				if (p == @rel)
-//					|| L = p.last
-//					if  exp == L  or  exp in L
-				// opting structs around this buggers them up too.
-*/
-
-
 	function WriteDeclFull (|String| DeclName = "", |int| minimal = 0, |Message|)
 		DeclName ?= .Name
 		expect DeclName or !.default

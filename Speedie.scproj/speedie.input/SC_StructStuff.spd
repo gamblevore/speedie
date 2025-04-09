@@ -164,3 +164,11 @@ module StructStuff
 				s.obj = orig.obj
 		.FixMe.clear
 	
+
+function message.TryAddBareStruct (|scnode| name_space, |scdecl| dcl)
+	opt norefcounts
+	require dcl.IsBareStruct
+	|| fn = name_space.OwningFunc
+//		if ++fn.barestructs > 1
+//			printline self
+		fn.BumpStruct(dcl)

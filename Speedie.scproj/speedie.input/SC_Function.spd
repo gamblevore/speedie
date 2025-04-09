@@ -76,6 +76,7 @@ linkage
 |nilstate|				NilSelf
 |byte|					ReturnedVars
 |Byte|					MinOpt
+|byte|					BareStructs
 |Byte|					IsAssigns
 |byte|					IsCppInBuilt
 |byte|					CantBeInlined
@@ -304,8 +305,13 @@ function @scfunction.TransformAll
 	for f in compiler.FuncList
 		require !stderr.TooMany
 		f.Transform
+//		if f.BareStructs > 1
+//			f.PrintBareStructs
 
 
+//function scfunction.PrintBareStructs
+//	"$.ExportName has ${.barestructs|int|} barestructs"
+	
 function Transform ()
 	opt norefcounts
 

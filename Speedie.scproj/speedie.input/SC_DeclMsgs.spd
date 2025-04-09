@@ -224,20 +224,18 @@ function scdecl.AsBody
 	isnt NumberConst
 
 
-function Message.CollectFromBody (|SCNode| SCArg)
+function Message.CollectFromBody (|SCNode| Name_space)
 	opt norefcounts
 	if .obj // when does this happen? hopefully not on anything that escaped .collectdecl?
 		return
 
-	|| dcl = .CollectDecl(SCArg, SCArg, declmode.FunctionBody)
+	|| dcl = .CollectDecl(Name_space, Name_space, declmode.FunctionBody)
 		decltracker.obj(self) = dcl
 		dcl.AsBody
 		StructStuff.DelayedFix
 		|| def = dcl.Default
 			check (def != @thg  or  def.name ~!= dcl.name) (def, "Same name!")
-		if dcl.IsBareStruct
-			|| fn = SCArg.OwningFunc
-				fn.BumpStruct(dcl)
+		.TryAddBareStruct(name_space, dcl)
 
 
 function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |scclass| cls=nil, |scfunction| FuncPrmz=nil,  |scdecl|)
