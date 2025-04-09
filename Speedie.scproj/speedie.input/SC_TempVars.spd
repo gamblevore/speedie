@@ -179,7 +179,8 @@ extend_module scfunction
 
 
 	function TempMoveOut (|Message| msg, |string| name="", |scdecl| type=nil, |Message!|)
-		cpp_part TypedTempMoveOut
+		cpp_part TypedTempMoveOut 
+		//debugat 58
 		// a.b.c -> || tmp1 = a.b.c
 	
 		|| Using = msg.SyntaxUsing
@@ -201,8 +202,8 @@ extend_module scfunction
 			msg.obj = type
 		|| OldDcl = msg.AsDecl
 			insert.obj = OldDcl
-			|| Dcl2 = OldDcl.copydecl // no difference, its a temp
-			if OldDcl.IsBareStruct // oof? what about scfunction.StackAlloc
+			|| Dcl2 = OldDcl.copydecl	// no difference, its a temp
+			if OldDcl.IsBareStruct		// oof? what about scfunction.StackAllocGuess
 			dcl2.AsBody
 			
 			Dcl2.Name = name

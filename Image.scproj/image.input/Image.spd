@@ -258,7 +258,8 @@ class Image (memory)
 	
 	
 	function Mark (|ivec4| R,  |byte| Mark=1)
-		for px in self[r]
+		|| range = self[r]
+		for px in range
 			px.a = mark
 
 	function MarkLineH  (|ivec2| P, |int| Width, |int| Mark)
@@ -319,7 +320,8 @@ class Image (memory)
 		|| vb = b.PreMul
 		|| vc = c.PreMul
 		|| vd = d.PreMul
-		for sighs in self[r]
+		|| range = self[r]
+		for sighs in range
 			|| i = sighs.a
 			if i == 0
 				sighs.overlay(va)
@@ -405,13 +407,14 @@ class Image (memory)
 		|| ClippedShit = where.clip(up) // clip the shit
 		|| BackDown = ClippedShit - D	// move the shit back down
 		
+		|| range = self[BackDown]
 		if !g
-			for (P in self[BackDown]) (V)
+			for (P in range) (V)
 				where[v+d] <~ p
 		  else
 			|| b1 = g.seps
 			|| b2 = g.edge
-			for (P in self[BackDown]) (V)
+			for (P in range) (V)
 				|| pp = p[0]
 				if (v.x>>4) + (v.y>>4) isa 2
 					pp.underlay(b1)
@@ -468,7 +471,8 @@ class Image (memory)
 		|| i = 0
 		if color.a != 255
 			|| c = color.PreMul
-			for (sigh in self[rect]) (v)
+			|| range = self[rect]
+			for (sigh in range) (v)
 				if sigh == imagepixel.white or imagepixel.clear or imagepixel.bad
 				ifn self contains sigh
 				sigh.Overlay(C)
@@ -476,7 +480,8 @@ class Image (memory)
 		  elseif Rect == .rect
 			memory.fillint(.ptr|&int|, .length, px)
 		  else
-			for (sigh in self[rect]) (v)
+			|| range = self[rect]
+			for (sigh in range) (v)
 				if sigh == imagepixel.white or imagepixel.clear or imagepixel.bad
 				ifn self contains sigh
 				sigh[0] = px

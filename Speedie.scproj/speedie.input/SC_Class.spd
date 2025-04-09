@@ -310,7 +310,7 @@ function GrabRemaining (|[scdecl]| dest)
 			.alignsub(dest, s)
 
 
-function FindPropAlignedTo (|int| align, |[scdecl]| dest, |scdecl|)
+function FindPropAlignedTo (|int| align, |scdecl|)
 	opt norefcounts
 	for s in .properties
 		if (s isnt Grabbed) and (align == s.alignment)
@@ -322,7 +322,7 @@ function AlignSub (|[scdecl]| dest, |scdecl| D, |bool|)
 	opt norefcounts
 	dest <~ d
 	|| al = d.alignment
-	|| size = .sizeraw|int| align al
+	|| size = .SizeRaw|int| align al
 	size += d.carraysize
 	.sizeraw = size
 	return true
@@ -334,7 +334,7 @@ function AlignTo (|[scdecl]| dest, |int| Bits)
 	
 	while Bits-- > 0
 		while .sizeraw & AlignBits
-			|| d = .FindPropAlignedTo(1<<Bits, dest)
+			|| d = .FindPropAlignedTo(1<<Bits)
 				.alignsub(dest, d)
 			  else
 				exit

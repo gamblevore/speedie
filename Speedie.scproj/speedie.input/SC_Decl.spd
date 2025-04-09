@@ -1155,19 +1155,21 @@ class SCDecl (SCNamed) {
 		if .iscarray
 			return .internal!.typeinfo
 		return .Type.typeinfo				// perhaps this is already set correctly.
-
-
-	function Alignment (|int|)
-		if .isobject or .pointercount
+		
+		
+	function Alignment (|bool| PutStructsAfter=false, |int|)
+		if .IsObject or .PointerCount
 			return platform.pointerbytes
-		if .iscarray
+		if .IsCarray
 			return .internal!.Alignment
 		|| T = .type
 		if T.isstruct
-			return 32 // put them after other things
-					  // we might not have that info yet?
-//		if t.FuncProto
-//			return platform.pointerbytes
+			if PutStructsAfter
+				return 32
+			|| al = t.Alignment
+				return al
+			return 32 // sigh // fallback
+		// CalculateSizeRaw sets function prototype sizes to platform.pointerbytes
 		return t.size
 	
 
@@ -1264,7 +1266,7 @@ function SimplestFirst (SorterComparer of scdecl)
 	return b.carraysize - .carraysize
 
 function SmallestAlignedFirst (SorterComparer of scdecl)
-	return b.alignment - .alignment
+	return b.Alignment(true) - .alignment(True)
 
 
 function array.CArraySize (|[scdecl]| self, |int| size, |int|)

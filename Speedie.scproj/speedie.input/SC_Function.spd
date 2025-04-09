@@ -72,7 +72,7 @@ linkage
 |uint16|				TableId
 |uint16|				AltersParams
 |uint16|				ReturnCount
-|int|					StackAlloc
+|int|					StackAllocGuess
 |nilstate|				NilSelf
 |byte|					ReturnedVars
 |Byte|					MinOpt
@@ -408,18 +408,7 @@ function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming,
 					|| d = m.obj as scdecl
 					d.MarkAsAltered
 		
-		|| ft = rz.StructReturned
-			incoming.StructReturner(ft.AsLocal, self)
-		  elseif rz.returntype is returnedstruct // remove this? its always the prev?
-			incoming.StructExtract(rz.ReturnType)
-
-
-function StructReturned (|scdecl|)
-	opt norefcounts
-	|| p = .StructReturnPos
-		|| f = .args[p-1]
-		if f is intendedasreturn
-			return f
+		return .StructImprove(rz, incoming)
 
 
 function ArgsMatch1 (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming, |int| Cast, |SCFunction|)

@@ -376,7 +376,8 @@ class Tetris (GridSection)
 	
 	
 	function Reached (|int|)
-		for y in 23 downto 1
+		|| range = 23 downto 1
+		for y in range
 			for x in 10
 				if self[x+1,y][] is Real
 					return y

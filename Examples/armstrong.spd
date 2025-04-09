@@ -12,7 +12,8 @@ main
 
 
 function int.IsArmStrong (|int| exp = 3, |bool|)
-	for d in .digits
+	|| dig = .Digits()
+	for d in dig
 		self -= d pow exp
 	return self == 0
 

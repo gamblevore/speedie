@@ -1,6 +1,12 @@
 
 
 function scfunction.BumpStruct (|scdecl| D)
+	|| qq = d.SizeOfQuery
+	|| al = d.Alignment
+	|| stack = .StackAllocGuess
+	stack = stack.AlignUp(al)
+	stack += qq
+	.StackAllocGuess = stack
 	
 	
 function scdecl.CanRemoveArgOnReturn (|message| r, |bool|)
@@ -46,7 +52,25 @@ function Tran_Rejoin (TranFunc)  // exitter
 //	node.LastInBlock(0) // makes no sense
 	
 	
-	
+
+
+function scfunction.StructImprove (|scfunction| fn, |scparamarray| incoming, |scfunction|)
+	opt norefcounts
+	|| ft = fn.StructReturned
+		incoming.StructReturner(ft.AsLocal, self)
+	  elseif fn.returntype is returnedstruct // remove this? its always the prev?
+		incoming.StructExtract(fn.ReturnType)
+	return fn
+
+
+function scfunction.StructReturned (|scdecl|)
+	opt norefcounts
+	|| p = .StructReturnPos
+		|| f = .args[p-1]
+		if f is intendedasreturn
+			return f
+
+
 function scparamarray.StructExtract (|scdecl| type)
 	// remove this?
 	debugat
@@ -58,19 +82,25 @@ function scparamarray.StructExtract (|scdecl| type)
 
 
 function scparamarray.StructReturner (|SCDecl| type, |scfunction| fn)
-	|| s = .exp$
-	|| Rel = s.UseNonRefChangers(True)
+	|message--| s = .exp$
+	|message--| Rel = s.UseNonRefChangers(True)
 	|| f = Rel.func
-
-	if (f == @prm) or ((f == @rel) and !rel.secondis(@opp, "="))
-		|| tmped = SCFunction.TempMoveOut(s, type.internal)
-		|| dcl2 = tmped.obj|scdecl|
-		|| name_space = tmped.parent!.obj as scnode
-			name_space.tryadd(rel, dcl2, dcl2.name)
-		Rel = tmped.second!
-		f = Rel.func			/*   .TestAccept(YY.new)   -->   || tmp = YY.new, .TestAccept(tmp)   */
 		
-	  elseif  (Rel.ASMType is kreturn)
+	if (f == @prm) or ((f == @rel) and !rel.secondis(@opp, "="))
+// how can I do this more easily. Just syntactically. Then call collectfrombody
+//		|| tmped = SCFunction.TempMoveOut(s, type.internal)
+//		|| dcl2 = tmped.obj|scdecl|
+//		|| name_space = tmped.parent!.obj as scnode
+//			name_space.tryadd(rel, dcl2, dcl2.name)
+//		Rel = tmped.second!
+//		f = Rel.func			/*   .TestAccept(YY.new)   -->   || tmp = YY.new, .TestAccept(tmp)   */		
+
+		error (rel, "Can't pass structs this way")
+		return
+		// what about struct allocation? collectFromBody handles the struct allocation... but we'll miss it.
+		/*   .TestAccept(YY.new)   -->   || tmp = YY.new, .TestAccept(tmp)   */
+		
+	if  (Rel.ASMType is kreturn)
         /* return YY.new  --> yy.new(rz), return */
 		|| prm = s.last
 			prm.func = @prm

@@ -55,7 +55,8 @@ struct Pico
 
 	syntax append (|faststring| fs, |bool| Wait=false, |bool|)
 		cpp_part SendFS
-		rz = .send(picomessage.Fromfs(fs), wait)
+		|| msg = picomessage.Fromfs(fs)
+		rz = .send(msg, wait)
 		fs.length = 0
 		
 	helper _Send (|?&int8| msg, |int| Length, |bool| Wait=false, |bool|)

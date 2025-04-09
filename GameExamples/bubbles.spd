@@ -28,8 +28,9 @@ class Bubbles (window)
 		|| L = 10.0
 		|| xx = 1
 		|| CC = [&vshapes.CloudBubble,  &vshapes.PlasticBall,  &vshapes.Sphere,  &vshapes.cloudbubble]
-
-		for i in (-L to L)
+		
+		|| range = (-L to L)
+		for i in range
 			xx = xx.hash
 			|| sh = (i, 0.0, i.abs)*24.0
 			|| C = CC[(xx&3)]![]

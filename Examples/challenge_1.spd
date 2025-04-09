@@ -4,7 +4,8 @@ https://www.youtube.com/watch?v=pxHd8tLI65Q
 
 main (|float| nn)
 	|| n = nn|float|
-	for a in (0.0 to n)
+	|| range = 0.0 to n
+	for a in range
 		|| i = 2.0*(n*a).sqrt
 		|| b = n - i + a
 		if !b.fract

@@ -227,8 +227,10 @@ function scdecl.AsBody
 function Message.CollectFromBody (|SCNode| SCArg)
 	opt norefcounts
 	if .obj // when does this happen? hopefully not on anything that escaped .collectdecl?
-/		return
+		return
+
 	|| dcl = .CollectDecl(SCArg, SCArg, declmode.FunctionBody)
+		decltracker.obj(self) = dcl
 		dcl.AsBody
 		StructStuff.DelayedFix
 		|| def = dcl.Default
@@ -388,3 +390,6 @@ datatype DeclMode (int)
 	syntax is (|DeclMode|o, |bool|)
 		return self == o
 
+
+
+|dictionary of scdecl| decltracker = dictionary() 

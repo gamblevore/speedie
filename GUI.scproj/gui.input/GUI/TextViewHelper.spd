@@ -307,7 +307,8 @@ helper textview.DrawErrorMark (|image| where, |textviewline| s, |vec4| C)
 		C.a = 0.4 * Strength
 		if i == 0
 			C.a = 0.8 * Strength
-		for xx in (p.x+4) downto (p.x-4)
+		|| range = (p.x+4) downto (p.x-4)
+		for xx in Range
 			|| px = where[xx,p.y+i]
 			px.overlay(C.premul)
 			C.a -= 0.04
