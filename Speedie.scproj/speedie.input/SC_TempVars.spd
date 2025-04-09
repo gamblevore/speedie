@@ -202,6 +202,7 @@ extend_module scfunction
 		|| OldDcl = msg.AsDecl
 			insert.obj = OldDcl
 			|| Dcl2 = OldDcl.copydecl // no difference, its a temp
+			if OldDcl.IsBareStruct // oof? what about scfunction.StackAlloc
 			dcl2.AsBody
 			
 			Dcl2.Name = name

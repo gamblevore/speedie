@@ -409,12 +409,10 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |SCNode| space)
 		r_z.NotNilRZ(f.ReturnType!, space)
 
 	ifn (src.blocks is return) or (src.last istmp "return") 
-	
-		|| last = Src.DeepLast // surely src.StartUsingAfter already does this?
+		|| last = Src.DeepLast
 		using last
-		parser.using.position = last.After+1 // same?
-		// also this doesn't even seem to work reliably, at least DebugAppCallArgsDisplay has a wierd ret pos
 		
+		parser.using.position = last.After+1
 		|| ret = src.msg(@tmp, "return")
 		ret.ASMType = ASMType.kReturn
 		if used
@@ -636,7 +634,7 @@ function Tran_ForSub (TranFunc)					// :3
 			FirstInLoop.Prev = MakeDeclOrRel( arg, Value, iter.Value!.copy(value) )
 	
 					//////////// finish off...
-		CollectDeclsFuncBodyJustWhatWeNewlyMade( node, name_space ) // now an arg. Treat as an arg, as above!
+		CollectManyDeclsFromBody( node, name_space ) // now an arg. Treat as an arg, as above!
 		// what if we just collect only the decls we added?
 	
 		EndLoopMarker.Remove

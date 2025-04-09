@@ -211,7 +211,7 @@ function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
 	return true
 
 
-function CollectDeclsFuncBodyJustWhatWeNewlyMade (|Message| arg, |SCNode| scarg) 	// remove later... :)
+function CollectManyDeclsFromBody (|Message| arg, |SCNode| scarg) 	// remove later... :)
 	opt norefcounts	// basically... the caller needs fixing.
 	for item in arg
 		if item == @decl
@@ -226,17 +226,16 @@ function scdecl.AsBody
 
 function Message.CollectFromBody (|SCNode| SCArg)
 	opt norefcounts
-	if .obj
-		return
+	if .obj // when does this happen? hopefully not on anything that escaped .collectdecl?
+/		return
 	|| dcl = .CollectDecl(SCArg, SCArg, declmode.FunctionBody)
 		dcl.AsBody
-		SCParamArray.PostStructFix
+		StructStuff.DelayedFix
 		|| def = dcl.Default
 			check (def != @thg  or  def.name ~!= dcl.name) (def, "Same name!")
-
-
-function CollectDeclsFuncBodyUnsureHowToRemove (|Message| arg, |SCNode| scarg)
-	CollectDeclsFuncBodyJustWhatWeNewlyMade(arg, scarg)
+		if dcl.IsBareStruct
+			|| fn = SCArg.OwningFunc
+				fn.BumpStruct(dcl)
 
 
 function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |scclass| cls=nil, |scfunction| FuncPrmz=nil,  |scdecl|)

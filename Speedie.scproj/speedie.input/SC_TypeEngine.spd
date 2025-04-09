@@ -251,7 +251,7 @@ function TypeOfBlock (ExprResolver)
 	exp.Parent!.statementexpr = p
 	|| fn = p.owningfunc! // isnt this the same as scfunction.currfunc
 	
-	CollectDeclsFuncBodyUnsureHowToRemove( exp, p ) // hard to remove these. might take an hour or 2 just on removing this.
+	CollectManyDeclsFromBody( exp, p ) // hard to remove these. might take an hour or 2 just on removing this.
 	
 //	SCFunction.Tran_All( fn, exp, p ) // should be enough... not working for some odd reason.
 

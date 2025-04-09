@@ -94,7 +94,8 @@ struct FatASM
 //		.const = value.AsInt
 		
 	function F32 (|float|)
-		rz = ((&._const)|&float|)[]
+		|&uint64| A = &._Const 
+		rz = (A|&float|)[]
 		if !rz: rz = 0					// rationalise
 
 	function F64 (|Float64|)

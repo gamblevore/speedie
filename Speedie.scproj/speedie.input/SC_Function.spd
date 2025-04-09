@@ -72,6 +72,7 @@ linkage
 |uint16|				TableId
 |uint16|				AltersParams
 |uint16|				ReturnCount
+|int|					StackAlloc
 |nilstate|				NilSelf
 |byte|					ReturnedVars
 |Byte|					MinOpt
@@ -1708,48 +1709,6 @@ function Tran_Return (TranFunc)  // exitter
 	node.CheckNotInStateExpr(fn.SourceArg)
 	
 
-function scdecl.CanRemoveArgOnReturn (|message| r, |bool|)
-	opt norefcounts
-	if !self: return true
-	if self is intendedasreturn
-		return self == r.fastdecl
-
-
-function message.StructReturnCleanup (|scfunction| fn, |scnode| name_space)
-	// Should just write directly into the thing...  Requires more "sleuthing" to do that!!!!
-	|| R = .first$
-	typeofexpr(r, name_Space)
-	require r in self // may get fixed already
-	
-	|| arg = fn.args[fn.structreturnpos-1]
-	
-	if arg.CanRemoveArgOnReturn(r)
-		r.remove
-	  else
-		using self
-			|| rel = NewEqRel(arg!.MakeAccess0, r)
-			.prev = rel
-			typeofexpr(rel, name_space)
-
-
-function message.CheckNotInStateExpr (|message| top)
-	opt norefcounts
-	|| node = self
-	while node and node != top
-		check (!node.IsStatementExpr) (self, "Statement expressions don't allow: " + .name)
-		node = node.parent
-
-
-function Tran_Rejoin (TranFunc)  // exitter
-	node.ASMType = ASMType.kRejoin
-	|| p = node.first
-	if p == @arg
-		|| arg = p.AsArg
-		expect (arg and arg.IsStatementExpr) (node, "Can't use this here.")
-		|| n = p.next
-		expect !n (node, "Blocks should end with 'rejoin'")
-//	node.LastInBlock(0) // makes no sense
-	
 
 function NewCppWrapper (CollectFunc)
 	|| name = node[@thg]$
@@ -1857,7 +1816,6 @@ function message.SlidePositions (|int| add)
 	for s.flat in self
 		if s.position >= 0
 			s.position += add
-
 
 
 function SCFunction.Cleanupfunc (|message| s)

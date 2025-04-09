@@ -10,8 +10,9 @@ struct InlineBlock
 
 struct ASMState
 	linkage: cpp_part Pac
-	|uint16| 					BasicBlock
 	|DataTypeCode|				ReturnASM
+	|uint16| 					BasicBlock
+	|int|						ScopeIncrease
 
 	|InlineBlock|				State
 	|byte|						DeepestInline
@@ -47,24 +48,31 @@ struct ASMState
 
 	function fn (|scfunction!--|)
 		return .state.fn
+	
 	function Curr (|&fatasm|)
 		return ._curr
 
 	function OpenVars (|uint|)
 		rz = (.VDecls|uint| << 8) ||| (.vtmps << 0)
 		
-	function CloseVars (|uint| V)
-		|| top = .vdecls
+	function CloseVars (|uint| V, |message| exp = nil)
+		|| top = .VDecls
 		|| d = (v>>8)&255
 		while top > d
 			|| r = .vars[top]
 				.TryNopUnusedDecl(r)
+				if r.IsBareStruct
+					.UnAlloc(r, exp)
 			.Vars[top] = nil
 			top--
 			
 		.VDecls = d
 		.VTmps = v&255
-			
+	
+	
+	function UnAlloc (|scdecl| r, |message| exp)
+		
+	
 	function AddFuncParams (|SCFunction| fn)
 		opt norefcounts
 		for a in fn.Args
@@ -305,7 +313,7 @@ struct ASMState
 			dest.TmpCheck
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
-			debugat 43577 // keep this
+			debugat 0 // keep this
 				
 		  else
 			opt inline

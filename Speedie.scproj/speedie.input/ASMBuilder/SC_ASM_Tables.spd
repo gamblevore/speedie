@@ -292,8 +292,44 @@ function SetRel (fn_asm)						// function relset (
 	return .µ(A, dest as asmreg.AlwaysSet)
 
 
+
+function AllocStruct (|&asmstate| self, |message| exp, |asmreg| dest, |scdecl| ty, |asmreg|)
+	// How does tail work with stack? We do need to deallocate stuff.
+	// Lets see.
+	// So we gotta preallocate, right? we can't allocate in a loop anyhow.
+	// we'd need to deallocate each one.
+	// jsut do the entire thing... lol.
+	// hoisted?
+	// figuring out what goes where won't be so easy?
+	// if we hoist it, that means we pull it towards us
+	// doing it earlier
+	// then what?
+	/*
+		OK, lets list approaches:
+		
+		* Preallocate at func-start
+			* Then we gotta add a number to the start number, to get each sub-alloc
+
+		* Hoist each one. Allocate at the same, but hoisted. Deallocate at end (inbuilt)
+		
+		* Allocate and de-allocate each one individually. Useful if you have many structs, scattered.
+			* bad if we have a loop.
+		
+		The last one perhaps is better.
+		
+	
+	*/
+	
+	|| size = ty.SizeOfQuery
+	|| Struct = exp.ALLO(dest, 1, size)
+	.ScopeIncrease += size
+	return struct * dest
+	
+	
 function DeclSub (fn_asm)
 	opt norefcounts
+	if "Tran_PrintSub".trap
+	
 	|| rel = exp.last!
 	|| ty = exp.fastdecl
 	if !exp.obj
@@ -301,22 +337,35 @@ function DeclSub (fn_asm)
 		ty = rel.first!.fastdecl
 	ty.BranchDepth = .state.BranchDepth
 	dest = .DeclareMe(rel, ty)
+	if ty.IsBareStruct
+		return AllocStruct(self, exp, dest, ty)
+		
 	|| item = rel.last!
 
 	if ty isnt local							// a carray or somthing?? idk
 	if (ty is alteredinbranch) or (ty isnt local)
-		return .µinto(item, dest)
+		return .µInto(item, dest)
 
-	|| K = .µinto(item, dest)
+	|| K = .µInto(item, dest)
 	if k is ConstOutput
 		.MakeConstFromASM(ty, k, nil)
 	return k
 
 
+//function CloseStack (|&ASMState| self, |message| exp,  |int| Stack)
+//	opt norefcounts
+//	|| Diff = .ScopeIncrease - Stack #require
+//	expect (Diff > 0) (exp)
+//	for s.reverse in exp
+//		if s.func == @decl
+//	exp.ALLO(asmreg(), 1, diff)
+//	.ScopeIncrease = Stack
+	
 	
 function ArgSub (|&ASMState| self, |message| exp, |&sc_hoister| H, |AsmReg|)
 	opt norefcounts
 	|| OV = .OpenVars
+	|| Stack = .ScopeIncrease
 	
 	for ch.fast in exp
 		if h
@@ -327,8 +376,10 @@ function ArgSub (|&ASMState| self, |message| exp, |&sc_hoister| H, |AsmReg|)
 			|| What = .µ(ch, AsmReg.RealDiscard)
 			if what & asmreg.exit
 				rz = what
-				exit							// for if-branch that get consted, always that just returns.
-	.CloseVars(OV)
+				exit
+	
+//	CloseStack(self, exp, Stack)
+	.CloseVars(OV, exp)
 
 
 function Arg (fn_asm) // argument 
@@ -370,7 +421,7 @@ function Dot (fn_asm)										// a.b
 	|asmreg| SubDest // fool around with optimising this
 	if dest isnt set // **once** everything is working
 		dest = .TempTyped(exp, dest)
-		subdest = dest
+		subdest = subdest.usereg(dest)
 	
 	|| prop = exp.ASMDecl
 	if prop is const // wait? don't these all get pre-transformed? SHOULD they be?
@@ -449,6 +500,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 		if dest is DeclareInlineParam // &A
 			(t is InlinedAccess)
 			return T
+/		dest = .temptyped(exp, dest, d)
 		return exp.GRAB(dest, t, dest, t) * dest.HaveAddr
 	
 	if d is const
@@ -511,7 +563,7 @@ function BoolNot (fn_asm)							// !a
 
 function IncrSlowOnAddr (|&ASMState| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |ASMReg|)	
 	opt	NoRefCounts									// *a, x = *(a.b)
-	|| TmpCloser = .OpenVars
+	|| TmpCloser = .OpenVars // remove this open/close? We CAN remove??? OOF
 	.Read(Dest, F, dest, addr)						// READ
 
 	|| NewValue = (.Temptyped(f), dest)(mode & IncrAfter)

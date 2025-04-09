@@ -84,7 +84,7 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 function While (fn_asm)
 	opt norefcounts
 	|sc_hoister| H 
-	|| OV = .OpenVars
+	|| OV = .OpenVars // remove open and close?? its within an arg?
 	h.HoistLoop(exp.first!)
 	.state.BranchDepth++
 	rz = .WhileSub(exp)

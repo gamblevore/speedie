@@ -1,0 +1,136 @@
+
+
+function scfunction.BumpStruct (|scdecl| D)
+	
+	
+function scdecl.CanRemoveArgOnReturn (|message| r, |bool|)
+	opt norefcounts
+	if !self: return true
+	if self is intendedasreturn
+		return self == r.fastdecl
+
+
+function message.StructReturnCleanup (|scfunction| fn, |scnode| name_space)
+	// Should just write directly into the thing...  Requires more "sleuthing" to do that!!!!
+	|| R = .first$
+	typeofexpr(r, name_Space)
+	require r in self // may get fixed already
+	
+	|| arg = fn.args[fn.structreturnpos-1]
+	
+	if arg.CanRemoveArgOnReturn(r)
+		r.remove
+	  else
+		using self
+			|| rel = NewEqRel(arg!.MakeAccess0, r)
+			.prev = rel
+			typeofexpr(rel, name_space)
+
+
+function message.CheckNotInStateExpr (|message| top)
+	opt norefcounts
+	|| node = self
+	while node and node != top
+		check (!node.IsStatementExpr) (self, "Statement expressions don't allow: " + .name)
+		node = node.parent
+
+
+function Tran_Rejoin (TranFunc)  // exitter
+	node.ASMType = ASMType.kRejoin
+	|| p = node.first
+	if p == @arg
+		|| arg = p.AsArg
+		expect (arg and arg.IsStatementExpr) (node, "Can't use this here.")
+		|| n = p.next
+		expect !n (node, "Blocks should end with 'rejoin'")
+//	node.LastInBlock(0) // makes no sense
+	
+	
+	
+function scparamarray.StructExtract (|scdecl| type)
+	// remove this?
+	debugat
+	|| s = .exp
+		|| where = s.UseNonRefChangers(True)!
+		|| fn = where.func
+		if fn != @rel
+			scfunction.TempMoveOut(s, type)
+
+
+function scparamarray.StructReturner (|SCDecl| type, |scfunction| fn)
+	|| s = .exp$
+	|| Rel = s.UseNonRefChangers(True)
+	|| f = Rel.func
+
+	if (f == @prm) or ((f == @rel) and !rel.secondis(@opp, "="))
+		|| tmped = SCFunction.TempMoveOut(s, type.internal)
+		|| dcl2 = tmped.obj|scdecl|
+		|| name_space = tmped.parent!.obj as scnode
+			name_space.tryadd(rel, dcl2, dcl2.name)
+		Rel = tmped.second!
+		f = Rel.func			/*   .TestAccept(YY.new)   -->   || tmp = YY.new, .TestAccept(tmp)   */
+		
+	  elseif  (Rel.ASMType is kreturn)
+        /* return YY.new  --> yy.new(rz), return */
+		|| prm = s.last
+			prm.func = @prm
+			|| subrz = prm.msg(@thg, "rz")			// we need to add rz.
+			subrz.obj = SCFunction.currfunc!.StructReturned // right?
+			rel.prev = rel.first
+			f = @nil
+		  else
+			debugger 
+	
+	if  f == @rel
+		|| name = Rel.first!
+		|| op = name.next!
+		if  Rel in @decl				/*	|| x = YY.new   -->   |YY| x,  YY.new(&x)  */
+			op.become(@thg, name.name)
+			|| Dcl = Rel.parent!
+			|| dcltype = dcl.first
+				dcltype.become(@thg, type.type.name)
+			dcl.next = s
+			dcl <~ Neweqrel(name, type.internal!.CreateStructNil(name))
+		  else
+			op.become(@bra)
+			op.obj = nil
+			op <~ name
+			op = name
+			Rel.next = s
+		
+		|| prm = s.last!				/*  y = YY.new --> YY.new(&y)  */
+		if fn.StructReturnPos==1
+			prm.first = Rel
+		  else
+			prm.last = rel
+		prm.func = @prm
+		Rel.become(@brel, "&")
+		Rel.obj = type
+		if op != name
+			op.obj = name.obj
+			if !op.obj
+				op.obj = name
+				StructStuff.FixMe <~ op
+	
+	  elseif f
+		error (s, "Not sure how to handle this.")
+
+	// returns need further processing!
+	// we do returns via params, right? the thing is... we want to keep the returns
+	// as returns... so that we can do more logic with it. at least... it will make things simpler.
+	
+	// in this case... we could expect the C++ renderer to do it, but thats quite lame.
+	// i think we could just post-process it? makes sense, right?! Do it after transform...
+	// probably do this before the nil-checker?
+
+
+module StructStuff
+	|[message]| FixMe
+	
+	function DelayedFix
+		opt norefcounts
+		for s in .FixMe
+			|| orig = s.obj as message
+				s.obj = orig.obj
+		.FixMe.clear
+	

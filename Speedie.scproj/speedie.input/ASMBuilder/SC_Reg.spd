@@ -57,9 +57,7 @@ datatype ASMReg (uint64)
 		fs <~ "("
 		.µtype.render(Fs)
 		fs <~ ")"
-		
-//	function Floatness (|int|)
-//		return .µtype.floatness
+	
 	
 	function Normalness (|bool|)
 		return .µType.ASMUseIntRegs
@@ -107,10 +105,6 @@ datatype ASMReg (uint64)
 	
 	function Negate (|bool| Neg=true, |asmreg|)
 		return (self|uint64| xor (neg << 16)|uint64|)|asmreg|
-	
-//	function Expect (|message| where)
-//		opt inline
-//		check (.reg) (asmstate.sh, where, "Internal ASM Error: Setting to register 0")
 	
 	function BitCount (|int|)
 		return .µtype.bitcount
@@ -227,19 +221,22 @@ datatype ASMReg (uint64)
 
 	operator with (|asmreg| dest, |asmreg|)
 		if dest is Declaration
-			.reg = dest.reg
-			(self is temp) = (Dest is temp)
+			self = .UseReg(dest)
 		return self
 
+	function UseReg (|asmreg| dest, |asmreg|)
+		opt norefcounts
+		.reg = dest.reg
+		(self is temp) = (Dest is temp)
+		return self
+	
 	function with (|asmreg| dest, |asmreg| InUse, |asmreg|)
 		if InUse.reg == dest.reg				// dest is in use!
 			.reg = 0
 			isnt temp
 			return self
 												// dest is free!
-		.reg = dest.reg
-		(self is temp) = (Dest is temp)
-		return self
+		return .usereg(dest)
 	
 	
 	function DebugPrint 
