@@ -4,7 +4,7 @@
 ;
 ı TAIL: 
 	__;
-	TailStack(r, Code, Op);
+	TailStack(vm, r, Code, Op);
 	___;
 ı KNST2: _
 	LoadConst(r, Op, *Code++);
@@ -42,7 +42,7 @@
 	u3 = (uint64)(&u4);
 ı RET: 
 	__;
-	Code = ReturnFromFunc(r, Op);
+	Code = ReturnFromFunc(vm, r, Op);
 	___;
 ı ALLO: _
 	AllocStack(vm, r, Op);

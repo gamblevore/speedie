@@ -454,20 +454,14 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 }
 
 
-//  Require can be a different instruction. // keep this thing fast.
-//	VMRegister* Stack = r  +  ++Save;
-//	Stack->Stack.Code = CodePtr;
-//	Stack->Stack.SavedReg = Save;
-//	Stack->Stack.Alloc = vm.Env.AllocCurr;
-//	return Stack+1;
 
-
-AlwaysInline ASM* ReturnFromFunc (VMRegister*& r, ASM Op) {
+AlwaysInline ASM* ReturnFromFunc (jb_vm& vm, VMRegister*& r, ASM Op) {
 	JB_Decr(o2);
 	JB_Decr(o3);
 	VMRegister* stck = r-1;
 	auto R1 = stck - stck->Stack.SavedReg;
 	auto Code = stck->Stack.Code;
+	vm.Env.AllocCurr = stck->Stack.Alloc;
 	auto Imm = RET_Valuei; // get before copy!
 	auto Src = r+n1;
 	
@@ -493,7 +487,9 @@ AlwaysInline void AllocStack (jb_vm& vm, VMRegister* r, ASM Op) {
 	r[n1].Int = (uint64)(B);
 	if (Amount > 0) {
 		auto Up = (-((uint64)B) & (Align-1));
-		B += Up+Amount;
+		Amount += Up;
+		memzero(B, Amount);
+		B += Amount;
 	} else {
 		debugger; // We need to de-align after
 		B -= Amount;
@@ -503,7 +499,9 @@ AlwaysInline void AllocStack (jb_vm& vm, VMRegister* r, ASM Op) {
 }
 
 
-AlwaysInline ASM* TailStack (VMRegister* r, ASM* Code, ASM Op) {
+AlwaysInline ASM* TailStack (jb_vm& vm, VMRegister* r, ASM* Code, ASM Op) {
+	VMRegister* stck = r-1;
+	vm.Env.AllocCurr = stck->Stack.Alloc;
 	ASM Code2 = Code[0];
 	// What if this overwrites params that we mean to read from?
 	

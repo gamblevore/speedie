@@ -110,6 +110,7 @@ forms
 		r2		r
 		Op		3
 		N		l
+	
 
 	CNTC
 		r1		R
@@ -305,13 +306,13 @@ forms
 
 /**/ RET (Ret)				// ret: 
 		__ 
-		Code = ReturnFromFunc(r, Op)
+		Code = ReturnFromFunc(vm, r, Op)
 		___
 
 POS 2
 	TAIL (Tail)
 		__
-		TailStack(r, Code, Op)
+		TailStack(vm, r, Code, Op)
 		___
 
 
@@ -345,7 +346,6 @@ POS 27
 /**/ ALLO (Alloc)
 		AllocStack(vm, r, Op)
 	
-
 
 #!						 (((((Utils)))))
 
