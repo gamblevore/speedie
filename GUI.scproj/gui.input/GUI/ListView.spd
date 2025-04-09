@@ -1100,9 +1100,8 @@ class ListView (GUIControl) {
 //		return Srch.contains(Search)
 	
 	
-	function Use (|ListViewrow| PL, |bool| SendClickEvent=false)
+	function Use (|ListViewrow!| PL, |bool| SendClickEvent=false)
 		opt norefcounts
-		debug_require pl
 		require pl != .listsource
 		._BlockedDuringUse = !SendClickEvent
 		.listsource = pl
