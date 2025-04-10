@@ -5205,8 +5205,6 @@ uint64 JB_uint64_Trim(uint64 Self, int B);
 // ASM
 ASM SC_ASM_AddK_KSet(ASM Self, uint Value);
 
-ASM SC_ASM_Alloc_AlignSet(ASM Self, uint Value);
-
 ASM SC_ASM_Alloc_AmountSet(ASM Self, uint Value);
 
 ASM SC_ASM_BFLD_downSet(ASM Self, uint Value);
@@ -5487,7 +5485,7 @@ ASMReg SC_ASMType__Access(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
 ASMReg SC_ASMType__AddressOf(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
-ASMReg SC_ASMType__AllocBearStruct(ASMState* Self, Message* Exp, ASMReg Dest, SCDecl* Ty, int Dir);
+ASMReg SC_ASMType__AllocBearStruct(ASMState* Self, Message* Exp, int V, SCDecl* Ty, int Dir);
 
 ASMReg SC_ASMType__ARel(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
@@ -6934,7 +6932,7 @@ bool SC_Pac_CanAddK(ASMState* Self, ASMReg R, int64 T);
 
 bool SC_Pac_CanReuseParam(ASMState* Self, Message* Prms, SCDecl* A, int Vr);
 
-Message* SC_Pac_CloseOneVar(ASMState* Self, SCDecl* D, Message* Exp, ASMReg V);
+Message* SC_Pac_CloseOneVar(ASMState* Self, SCDecl* D, Message* Exp, int V);
 
 void SC_Pac_CloseVars(ASMState* Self, uint V, Message* Exp);
 
@@ -6955,6 +6953,8 @@ ASMReg SC_Pac_Continue(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 FatASM* SC_Pac_Curr(ASMState* Self);
 
 int SC_Pac_CurrGain(ASMState* Self, FatASM* Start);
+
+void SC_Pac_DeallocStack(ASMState* Self);
 
 ASMReg SC_Pac_DeclareMe(ASMState* Self, Message* Where, SCDecl* Type);
 
@@ -7172,7 +7172,7 @@ ASMReg SC_Pac_TryInlineSub(ASMState* Self, Message* Prms, SCFunction* Fn, int Al
 
 bool SC_Pac_Unchanged(ASMState* Self, Message* A, ASMReg Dest, Message* B);
 
-ASMReg SC_Pac_Unhoist(ASMState* Self, SC_Hoister* H);
+void SC_Pac_Unhoist(ASMState* Self, SC_Hoister* H);
 
 ASMReg SC_Pac_UniqueLocation(ASMState* Self, Message* A, ASMReg Dest, Message* B);
 
@@ -8851,7 +8851,7 @@ int JB_Msg_After(Message* Self);
 
 void JB_Msg_AfterSet(Message* Self, int Value);
 
-FatASM* SC_Msg_ALLO(Message* Self, ASMReg R1, int Align, int Amount);
+FatASM* SC_Msg_ALLO(Message* Self, ASMReg R1, int Amount);
 
 bool SC_Msg_AllowedMoveToInit(Message* Self);
 
@@ -9697,7 +9697,9 @@ JB_Object* JB_Msg_RestoreLoad(Message* Self);
 
 Message* SC_Msg_Resync(Message* Self, Message* Parent);
 
-FatASM* SC_Msg_RET(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int SafeDecr, int Value);
+FatASM* SC_Msg_RETWithRegRegRegIntInt(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int SafeDecr, int Value);
+
+FatASM* SC_Msg_RETWithReg(Message* Self, ASMReg R1);
 
 FatASM* SC_Msg_RFAP(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3);
 
