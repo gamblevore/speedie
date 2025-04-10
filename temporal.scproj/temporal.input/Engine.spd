@@ -52,14 +52,14 @@ class SteveMachine
 	function Refresh
 		require self
 		|| p = .Samples.ptr
-		|| a = p + .Samples.Capacity
+		|| a = p + .Samples.ItemCount
 		.Samples.Length = 0 // So that .samples.next works properly.
 		(.Create.Steve)(p, a, 0, .reps)
 		
 	function Hash
 		|uint64| H
 		|| p = .Samples.ptr
-		|| n = .Samples.Capacity
+		|| n = .Samples.ItemCount
 		for i in n
 			H = (H xor p[i]).Hash
 		
