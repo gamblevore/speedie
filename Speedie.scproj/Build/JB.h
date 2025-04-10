@@ -817,7 +817,6 @@ struct StructSaveTest {
 struct ASMState {
 	DataTypeCode ReturnASM;
 	u16 BasicBlock;
-	int ScopeIncrease;
 	InlineBlock State;
 	byte DeepestInline;
 	byte InlineDepthLimit;
@@ -1570,18 +1569,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2175])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2174])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2176])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2175])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2177])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2176])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2174])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2173])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2177])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2176])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2178])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2177])
 
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
@@ -1809,12 +1808,11 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2183])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2182])
 
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
 extern CharSet* SC_CSNum;
-extern Dictionary* SC_decltracker;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern FP_ExprResolver SC_ExprFuncs[64];
 extern SCDecl* SC_FalseBool;
@@ -1848,7 +1846,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2179])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2178])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1886,7 +1884,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2184])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2183])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2122,12 +2120,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2182])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2181])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2181])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2180])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2180])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2179])
 
 #define kJB__byte_max ((byte)255)
 
@@ -3021,7 +3019,7 @@ extern Array* SC__NilReason_values;
 
 #define kSC__SCDeclInfo_Const ((SCDeclInfo)8)
 
-#define kSC__SCDeclInfo_DclCopied ((SCDeclInfo)1073808674)
+#define kSC__SCDeclInfo_DclCopied ((SCDeclInfo)1073841442)
 
 #define kSC__SCDeclInfo_DirectNumber ((SCDeclInfo)4)
 
@@ -3055,8 +3053,6 @@ extern Array* SC__NilReason_values;
 
 #define kSC__SCDeclInfo_ReturnedStruct ((SCDeclInfo)134217728)
 
-#define kSC__SCDeclInfo_ReturnedVar ((SCDeclInfo)268435456)
-
 #define kSC__SCDeclInfo_Self ((SCDeclInfo)1048576)
 
 #define kSC__SCDeclInfo_SelfImplicit ((SCDeclInfo)1074794496)
@@ -3076,6 +3072,8 @@ extern Array* SC__NilReason_values;
 #define kSC__SCDeclInfo_UpgradeableContained ((SCDeclInfo)32)
 
 #define kSC__SCDeclInfo_UsedByCode ((SCDeclInfo)128)
+
+#define kSC__SCDeclInfo_VarThatGotReturned ((SCDeclInfo)268435456)
 
 #define kSC__SCNodeFindMode_DontGoUp ((SCNodeFindMode)2)
 
@@ -3193,7 +3191,7 @@ extern bool SC__Cpp_WroteAny;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2173])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2172])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -5489,7 +5487,7 @@ ASMReg SC_ASMType__Access(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
 ASMReg SC_ASMType__AddressOf(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
-ASMReg SC_ASMType__AllocStruct(ASMState* Self, Message* Exp, ASMReg Dest, SCDecl* Ty);
+ASMReg SC_ASMType__AllocBearStruct(ASMState* Self, Message* Exp, ASMReg Dest, SCDecl* Ty, int Dir);
 
 ASMReg SC_ASMType__ARel(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
@@ -5500,6 +5498,8 @@ ASMReg SC_ASMType__ArgSub(ASMState* Self, Message* Exp, SC_Hoister* H);
 ASMReg SC_ASMType__ASMConst(ASMState* Self, Message* Exp, ASMReg Dest, SCDecl* D);
 
 ASMReg SC_ASMType__ASMFunction(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
+
+ASMReg SC_ASMType__BearStrooct(ASMState* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_ASMType__BoolNot(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
@@ -6934,6 +6934,8 @@ bool SC_Pac_CanAddK(ASMState* Self, ASMReg R, int64 T);
 
 bool SC_Pac_CanReuseParam(ASMState* Self, Message* Prms, SCDecl* A, int Vr);
 
+Message* SC_Pac_CloseOneVar(ASMState* Self, SCDecl* D, Message* Exp, ASMReg V);
+
 void SC_Pac_CloseVars(ASMState* Self, uint V, Message* Exp);
 
 ASMReg SC_Pac_Compare(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp, int Mode);
@@ -7116,7 +7118,7 @@ void SC_Pac_RegsBitClear(ASMState* Self, Message* Exp, int RegAddrs, SCFunction*
 
 void SC_Pac_RestoreParameters(ASMState* Self);
 
-void SC_Pac_Rewind(ASMState* Self, FatASM* Start);
+void SC_Pac_RewindInline(ASMState* Self, FatASM* Start);
 
 ASMReg SC_Pac_SafeDecr(ASMState* Self);
 
@@ -7167,10 +7169,6 @@ ASMReg SC_Pac_ThgASM(ASMState* Self, SCDecl* D);
 ASMReg SC_Pac_TryInline(ASMState* Self, Message* Prms, ASMReg Dest, SCFunction* Fn, int AllowedGain);
 
 ASMReg SC_Pac_TryInlineSub(ASMState* Self, Message* Prms, SCFunction* Fn, int AllowedGain);
-
-void SC_Pac_TryNopUnusedDecl(ASMState* Self, SCDecl* D);
-
-void SC_Pac_UnAlloc(ASMState* Self, SCDecl* R, Message* Exp);
 
 bool SC_Pac_Unchanged(ASMState* Self, Message* A, ASMReg Dest, Message* B);
 
@@ -9041,7 +9039,7 @@ Message* SC_Msg_CollectDclName(Message* Self);
 
 SCDecl* SC_Msg_CollectDecl(Message* Self, SCNode* P, SCNode* Recv, DeclMode Mode, SCClass* Cls, SCFunction* FuncPrmz);
 
-void SC_Msg_CollectFromBody(Message* Self, SCNode* SCArg);
+void SC_Msg_CollectFromBody(Message* Self, SCNode* Name_space);
 
 JB_String* SC_Msg_CollectFuncTableName(Message* Self);
 
@@ -9852,6 +9850,8 @@ void JB_Msg_Tril__(Message* Self, FastString* Fs);
 MaybeBool SC_Msg_Trueness(Message* Self, uint /*NilState*/ Found);
 
 bool SC_Msg_TrueOrFalse(Message* Self);
+
+void SC_Msg_TryAddBareStruct(Message* Self, SCNode* Name_space, SCDecl* Dcl);
 
 int SC_Msg_TryImproveShiftConstants(Message* Self, SCDecl* LC, SCDecl* RC);
 
@@ -11229,6 +11229,8 @@ bool SC_Func_Reach(SCFunction* Self);
 void SC_Func_ReachedDetect(SCFunction* Self);
 
 bool SC_Func_ReachFunc(SCFunction* Self, SCNode* From);
+
+SCDecl* SC_Func_RealReturnType(SCFunction* Self);
 
 void SC_Func_RefFunc(SCFunction* Self, Message* Prm, Message* After);
 

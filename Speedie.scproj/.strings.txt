@@ -2180,5 +2180,4 @@
 "vecget"
 "VGET"
 ") "
-"Tran_PrintSub"
 "Can't pass structs this way"
