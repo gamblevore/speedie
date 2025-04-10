@@ -54,6 +54,7 @@ class SCImport
 	
 	
 	function ImportMsgSub (|Message| j)
+		opt norefcounts
 		|| l	= J.last(@str)$
 		|| Name = l.name
 		|| P	= Compiler.FindProject(Name)
@@ -212,15 +213,14 @@ class SCImport
 	
 	function string.IsOKForImport (|bool|)
 		|| X = self
-		if (self starts "Library/")
-			return self[6...].IsOKForImport
-			
 		while X[] == '/'
 			X = X[1...]
 		
-		if (!X or Jeebox.CSWordStart[X[]])
-			return true
-		error  (x, "Invalid path")
+		|| x0 = x[]
+		if (X0 == 0) or (x0 == '.') or Jeebox.CSWordStart[x0]
+			rz = true
+		  else
+			error  (x, "Invalid path")
 
 
 	module
@@ -276,6 +276,7 @@ class SCImport
 		
 		
 		function ImportPath (|string| path, |file!| f, |int| ImportDepth, |bool| Builtin, |scimport?|)
+			|| name = f.name
 			require f.mustexist and path.IsOKForImport
 	
 			|| fpl = f.Path.lowercase

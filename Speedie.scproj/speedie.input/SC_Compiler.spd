@@ -933,7 +933,10 @@ function VariantSuffix (|string|)
 
 
 function AddSCProj (|string| Path, |string|)
-	if (path.name contains '.')
+	|| name = path.name
+	|| dot = name.find('.', int.max, 0)
+	
+	if (dot > 0)
 		return path
 	return path + ".scproj"
 
