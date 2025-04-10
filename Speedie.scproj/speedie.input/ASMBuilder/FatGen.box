@@ -122,12 +122,11 @@ function message.RET (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| SafeDecr, |in
 }
 
 
-function message.ALLO (|asmreg| r1, |int| Align, |int| Amount, |&fatasm|) {
+function message.ALLO (|asmreg| r1, |int| Amount, |&fatasm|) {
 	visible
 	rz = self * asm.ALLO
 	rz.dest(0, r1)
-	rz.numinput(1) = Align
-	rz.numinput(2) = Amount
+	rz.numinput(1) = Amount
 }
 
 

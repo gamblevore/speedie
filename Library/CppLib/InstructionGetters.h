@@ -55,17 +55,11 @@
 #define   Tail_JUMPu_(x)   (((uint)((x)<<8))>>8)
 
 
-#define   Alloc_Aligni       ((( int)((Op)<<13))>>29)
-#define   Alloc_Aligni_(x)   ((( int)((x)<<13))>>29)
+#define   Alloc_Amounti       ((( int)((Op)<<13))>>13)
+#define   Alloc_Amounti_(x)   ((( int)((x)<<13))>>13)
 
-#define   Alloc_Alignu       (((uint)((Op)<<13))>>29)
-#define   Alloc_Alignu_(x)   (((uint)((x)<<13))>>29)
-
-#define   Alloc_Amounti       ((( int)((Op)<<16))>>16)
-#define   Alloc_Amounti_(x)   ((( int)((x)<<16))>>16)
-
-#define   Alloc_Amountu       (((uint)((Op)<<16))>>16)
-#define   Alloc_Amountu_(x)   (((uint)((x)<<16))>>16)
+#define   Alloc_Amountu       (((uint)((Op)<<13))>>13)
+#define   Alloc_Amountu_(x)   (((uint)((x)<<13))>>13)
 
 
 #define   Jump_JUMPi       ((( int)((Op)<<8))>>8)

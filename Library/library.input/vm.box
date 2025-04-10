@@ -31,7 +31,6 @@ forms
 		
 	Alloc
 		r1		R
-		Align	3 // 1 << align
 		Amount	l
 	
 	Jump

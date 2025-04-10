@@ -460,13 +460,45 @@ struct FatASM
 		fs <~ " #/"
 
 
+	function JumpImprove (|bool|)
+		|| D0 = .jumpto!
+		|| D = D0
+		|| n = 0
+		while d isa asm.jump
+			d = d.JumpTo!
+			expect (++n < 30) (.msg)
+		
+		if  (d isa asm.ret or d isa asm.tail)  and  (self isa asm.jump)
+			.CopyFrom(d) // always jumping into an exit.
+			return true
+		
+		if D != D0 // faster jump
+			.JumpTo(D, ASMState.sh)
+			return true
+		
+		
+	function IsReturn (|bool|)
+		|| o = .op|asm|
+		if o == asm.ret or asm.TAIL
+			return true
+	
+
+	function IsFinisher (|bool|)
+		|| o = .op|asm|
+		if o == asm.ret or asm.trap or asm.TAIL
+			return true
+		if o == asm.jump
+			return .jump < 0
+
+
 	function DebugPrint 
 		visible
 		if asm.NoisyASM >= 3
 			|| fs = faststring()
 			.Renda(fs)
 			printline fs
-			
+
+
 	iterator RegInputs
 		|| ir = .InputRegs
 		|| i = 0

@@ -41,7 +41,6 @@ struct ASMState
 	
 
 	module
-//		|FatASM[]|					JSMSpace = FatASM[0]!
 		|ASMState|					Sh
 
 
@@ -59,17 +58,14 @@ struct ASMState
 		|int| top = .VDecls
 		|| d = (v>>8)&255
 		while top > d
-			|| r = .vars[top] // remove test?
-				exp = .CloseOneVar(r, exp, top.asm)
-			  else
-				debugger // remove test
+			|| r = .vars[top]!
+			exp = .CloseOneVar(r, exp, top.asm)
 			.Vars[top] = nil
 			top--
 			
 		.VDecls = d
 		.VTmps = v&255
-	
-		
+
 	function AddFuncParams (|SCFunction| fn)
 		opt norefcounts
 		for a in fn.Args
@@ -233,7 +229,6 @@ struct ASMState
 		
 	function SoftNop (|FATASM| Fat, |int| Depth=0)
 		depth++
-//		if "SCArgNested".trap
 		if fat ~= asm.gtab
 		if depth > 7
 		for f.fatinputs in fat
@@ -251,10 +246,7 @@ struct ASMState
 	
 	function SofterNop (|FATASM| Fat)
 		fat.setop = asm.noop
-	
-//	function AskSoftNop (|fatasm| f)
-//		if f.µRefCount <= 0
-//			.softnop(f)
+
 	
 	function AskNop (|fatasm| f)
 		if f.µRefCount <= 0
@@ -441,7 +433,6 @@ struct ASMState
 			
 
 	function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
-		//debugat 8
 		|| v = .VDeclsExit(Dest)
 		// If we increase .vdecls... then what about .vars[]?		
 		
@@ -517,11 +508,9 @@ struct ASMState
 		|| l = .last
 		if !l.IsFinisher
 			debugger !.fn.ASMReturn
+			.DeallocStack
 			if !ASMType.ReturnOpt(self, 0, 0)
-				|| OOF = .fn.SourceArg!.DeepLast
-				OOF.RET(asmreg(), asmreg(), asmreg(), 0, asmreg())
-				// We could even add a message() object? and set it's position to the next line in the src.
-				// cos FatASM needs a message for it's position
+				.fn.Source!.DeepLast.RET()
 		.Optimise
 
 		.out.µlength = .curr - .FuncStart
@@ -536,24 +525,6 @@ struct ASMState
 			if arg.position < 0
 				arg.position = 0 // skip error detection
 		Arg.EROR(A,A,A,A,0)
-
-	
-	function FatASM.JumpImprove (|bool|)
-		|| D0 = .jumpto!
-		|| D = D0
-		|| n = 0
-		while d isa asm.jump
-			d = d.JumpTo!
-			expect (++n < 30) (.msg)
-		
-		if  (d isa asm.ret or d isa asm.tail)  and  (self isa asm.jump)
-			.CopyFrom(d) // always jumping into an exit.
-			return true
-		
-		if D != D0 // faster jump
-			.JumpTo(D, ASMState.sh)
-			return true
-		
 
 	
 	function SmartSecretFat (|asmreg| Thg, |&fatasm|)
@@ -574,7 +545,6 @@ struct ASMState
 
 
 /* The .asint/.asfloat functions should be recognised as working on constants? Or is that just a general case of inline functions? Technically, its an inline func that does nothing, just returns the original... with a different type. */
-
 
 	function IsASMConst (|message| exp, |bool|)
 		|| fn = exp.func
@@ -600,7 +570,6 @@ struct ASMState
 		opt norefcounts
 		|| Start = .curr
 		|| Old = .state
-		// So like, what about the ScopeIncrease thing?
 		if !dest.reg and fn.ASMReturn
 			if dest isnt discard
 				Dest = .TempOnly(prms, dest)
@@ -642,7 +611,7 @@ struct ASMState
 		|| Grown = .CurrGain(RealStart)
 		if Grown <= AllowedGain
 			if !result
-				(result is ConstOutput) // no longer 0
+				(result is ConstOutput) // no longer zero
 			return Result
 	
 	
@@ -700,7 +669,6 @@ struct ASMState
 			Grace += .IsASMConst(p)<<2
 	
 		require (AllowedGain + Grace) > fn.µlength
-	
 
 		if !.state.InlineDepth
 			.InlineDepthLimit = 3
@@ -762,9 +730,6 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 		// need to execute exp.first
 /		fn = dcl.Type.FuncProto			#expect (exp)
 
-	// We can put the var into a reg... if its its a FuncPointer and use that reg, as the TableID
-	// we also need to get the fn from exp.first.obj
-
 	dest = .CallFunc(exp, dest, fn)
 	if !fn.ASMReturn
 		(dest is constoutput)
@@ -788,64 +753,15 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	
 	fat.µRefCount += fn isnt stateless
 	if fn is Killer // return just to be safe
-		fat = exp.RET(asmreg(), asmreg(), asmreg(), 0, 0)
+		fat = exp.RET()
 		fat.µRefCount++
 		dest = asmreg.exit
 	return fat*dest
 		
-
 
 // Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:4, 8:0
 // There are only 4 above 6!, only 14 above 5, 75 above 4
 // almost all lib functions have 4 or less. 5 is for proj funcs.
 	
 
-
-function fatasm.IsFinisher (|bool|)
-	|| o = .op|asm|
-	if o == asm.ret or asm.trap or asm.TAIL
-		return true
-	if o == asm.jump
-		return .jump < 0
-
-
-
-ignore
-
-	// how can we optimise this.
-	// the BOR can be removed
-	// how to remove it?
-	// we could "just do it", but what problems might that create?
-	// it depends on what we are doing with our dest...
-	
-	if x == 1
-		tmp = fnc()
-	  elseif x == 2
-		tmp = fnc2()
-	  else
-		tmp = 3
-	
-	// now what? how can we do this? well... we can't.
-	
-	// but can we easily detect this case.
-	
-	if func()
-	
-	// well... its putting it, into a temp. So that temp, is never shared
-	
-	
-	
-	asm Inline_Branch1
-		KNST: r1                  /# 0 #/              /* x = 0 */
-		KNST: r1                  /# 1 #/              /* x = 1 */
-		...                                            /* 0 */
-		KNST: t30                 /# 0.5f #/           /* 0.5 */
-		FNCX: r2, 1225, 123336, 0                      /* JB_f_SyntaxAccess(0.5) */
-		BOR:  t31, r2, r0, 0                           /* JB_f_SyntaxAccess(0.5) */
-		JBAN: t31, 1                                   /* hhhMaybeConst(0) */
-		KNST: r1                  /# 2 #/              /* x = 2 */
-		RET:  r0, r0, r0, 0, 0                         
-	
-
-	
 	

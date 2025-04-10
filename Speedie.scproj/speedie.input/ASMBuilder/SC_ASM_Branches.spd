@@ -84,10 +84,12 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 function While (fn_asm)
 	opt norefcounts
 	|sc_hoister| H 
-	|| OV = .OpenVars // remove open and close?? its within an arg?
+	|| OV = .OpenVars				// We open/close because the hoister may add stuff.
 	h.HoistLoop(exp.first!)
 	.state.BranchDepth++
+	
 	rz = .WhileSub(exp)
+	
 	.state.BranchDepth--
 	.CloseVars(OV)
 	.Unhoist(h)
@@ -112,7 +114,7 @@ function WhileSub (|message| exp,  |asmreg|)
 			.NopRange(loop_Test.start, loop_Test.after)
 		
 		// now what?
-		exp.JUMP.jumpto(initialjump+1, self)
+		exp.JUMP.JumpTo(initialjump+1, self)
 		loop_test.after++
 	  else
 		InitialJump.JumpTo(loop_test.start, self)

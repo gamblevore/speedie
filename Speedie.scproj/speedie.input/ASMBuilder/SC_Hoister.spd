@@ -46,7 +46,7 @@ struct SC_Hoister
 		.WriteConst(prop, decl)
 	
 	
-	function asmstate.Unhoist (|sc_hoister| H, |asmreg|)
+	function asmstate.Unhoist (|sc_hoister| H)
 		opt NoRefCounts
 		for d in h.Items
 			loop d

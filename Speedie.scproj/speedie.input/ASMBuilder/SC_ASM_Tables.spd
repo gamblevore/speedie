@@ -95,23 +95,16 @@ function Sheb (fn_asm)
 	opt NoRefCounts
 	LastDebugMark = exp
 	return exp.noop * asmreg()
-
-
+	
+	
 function ReturnOpt (|&ASMState| self, |int| Ret, |int| bb, |bool|)
 	|| l = .last
-
-	// the basicblock thing isnt perfect.
-	// what if... the bor gets jumped to and we turn it into a ret?
-	// well that is OK? seems OK?
-
-	// but then what about the fnc behind it?
-	// wierd. IDK. maybe its ok. 
-	// needs a few tests written to be sure!
 	
+	// seems the wrong order... it is:   bor, bor, bor, func.   Not:   func, bor, bor, bor
 	while l isa asm.BOR
 		Ret = PreOptBOR(self, l, Ret) #require
 		l--
-
+		
 	if l isa asm.fnc or asm.fnc3
 		return PreOptFnc(self, l, bb)
 
@@ -121,8 +114,8 @@ function PreOptBOR (|&ASMState| self, |FATASM| l, |int| Ret, |int|)
 	require !l.prms[2]						// x = b ||| 0  -->  x = b
 	require Ret == l.Prm(0)	// return x
 	rz = l.r1
-	using L // syntaxusingcomplete needs upgrade to deref?
-		l.msg.ret(rz.asm, asmreg(), asmreg(), 0, 0)
+	using L // SyntaxUsingComplete needs upgrade to deref?
+		l.msg.ret(rz.asm)
 		l.Operatormul(asmreg.exit)
 	rz&=31
 
@@ -147,19 +140,29 @@ function InlinedReturn (|&ASMState| self, |message| exp, |asmreg| dest, |AsmReg|
 		  else
 			dest = .µ(f, asmreg.discard)
 	
-	// don't we want to always do the tail, and then the ret?
-	// in case of jumps or whatever? well... it already knows about the blocknum
-	// so its ok.
-	// the thing is... we also want to "post-opt" stuff. So... we could just nop
-	// the ret? Sigh. Lets do the other one first, then we know what to do here.
-	
+	.DeallocStack
 	if .TailInlineable and ReturnOpt(self, dest, bb)
 		return dest
 	
-	|| fat = exp.RET(Dest, asmreg(), asmreg(), 0, 0)
+	|| fat = exp.RET(Dest)
 	fat.µRefCount = 1
 	(fat is CondAnswer)
 	return fat*Dest
+
+	
+/*
+Can this occur? From what C code? Can I block it?
+
+	ALLOC(1)
+	FUNC // just de-alloc before the optimise thingy.
+	ALLOC(-1)
+	RET
+
+function abc
+	|struct| WorkSpace
+	.func(WorkSpace)
+	return
+*/
 
 
 function Return (fn_asm)
@@ -167,15 +170,17 @@ function Return (fn_asm)
 	|| L = .state.return		// can remove constants, so try first
 		return InlinedReturn(self, exp, L)
 
+	|| bb = .BasicBlock
 	|| f = exp.first
-		|| bb = .BasicBlock
 		dest = .ExistingVar(f, VarUseMode.return)
 		if !dest
 			dest = .µGetASM(f, ASMReg.ExitFunction)
-		if ReturnOpt(self, dest, bb)
-			return asmreg.exit
 	  else
 		dest = asmreg()
+	
+	.DeallocStack
+	if ReturnOpt(self, dest, bb)
+		return asmreg.exit
 	
 	|| D0 = .SafeDecr
 		if d0.reg != dest.reg // problem
@@ -300,18 +305,12 @@ function SetRel (fn_asm)						// function relset (
 
 
 
-function AllocBearStruct (|&asmstate| self, |message| exp, |asmreg| dest, |scdecl| ty, |int| dir, |asmreg|)
-	/*
-		for now... just allocate/decallocate per-scope. Anything else is too hard. We can optimise LATER.
-		just get this shit working! Fuck loops, fuck everyting.
-		Rewinding... may fuck things too.
-	*/
-	
+function AllocBearStruct (|&asmstate| self, |message| exp, |int| v, |scdecl| ty, |int| dir, |asmreg|)
 	(self)
-	|| size = ty.SizeOfQuery * dir
-	|| al = ty.Alignment.log2
-	|| Struct = exp.ALLO(dest, al, size)
-	return struct * dest
+	|| size = ty.SizeOfQuery
+	size = (size+15)>>4
+	|| dest = v.asm
+	return exp.ALLO(dest, size*dir) * dest
 	
 	
 	
@@ -351,10 +350,12 @@ function ArgSub (|&ASMState| self, |message| exp, |&sc_hoister| H, |AsmReg|)
 			ASMType.Decl(self, ch, AsmReg.RealDiscard)
 		  else
 			|| What = .µ(ch, AsmReg.RealDiscard)
-			if what & asmreg.exit
+			if what & asmreg.exit // what is exit
 				rz = what
 				exit
-	
+
+	if rz & asmreg.exit
+		exp = nil // don't AllocBearStruct(-1) 
 	.CloseVars(OV, exp)
 
 
@@ -804,6 +805,19 @@ function MakeConstFromASM (|scdecl| decl, |asmreg| Initial, |asmreg| NewValue)
 	
 	if NewValue
 		.SetDeclToConst(decl, newvalue, Newfat)
+
+
+function DeallocStack
+	opt norefcounts
+	|int| top = .VDecls
+	|| exp = .Last.msg
+	while top > 0
+		|| d = .vars[top]!
+		if d.IsBareStruct
+			exp = exp.DeepLast
+			ASMType.AllocBearStruct(self, exp, top, d, -1)
+		top--
+	
 }
 
 
