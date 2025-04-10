@@ -2390,7 +2390,7 @@ void JB_Rec_AppendErr(JB_ErrorReceiver* Self, JB_Error* Err);
 
 int JB_Rec__Init_();
 
-void JB_Rec__NewErrorWithNode(Message* Node, JB_String* Desc, JB_String* Path);
+void JB_Rec__Latchkum(Message* Node, JB_String* Desc, JB_String* Path);
 
 void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, uint /*ErrorSeverity*/ Sev);
 

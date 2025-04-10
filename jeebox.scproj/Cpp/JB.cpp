@@ -3769,10 +3769,10 @@ void JB_Object_SaveTryCollect(JB_Object* Self, ObjectSaver* Saver) {
 void JB_Object_FailStr(JB_Object* Self, JB_String* Error) {
 	//visible;
 	if (JB_Object_Isa(Self, &MessageData)) {
-		JB_Rec__NewErrorWithNode(((Message*)Self), Error, nil);
+		JB_Rec__Latchkum(((Message*)Self), Error, nil);
 	}
 	 else {
-		JB_Rec__NewErrorWithNode(nil, Error, nil);
+		JB_Rec__Latchkum(nil, Error, nil);
 	}
 }
 
@@ -4080,7 +4080,7 @@ int JB_Rec__Init_() {
 	return 0;
 }
 
-void JB_Rec__NewErrorWithNode(Message* Node, JB_String* Desc, JB_String* Path) {
+void JB_Rec__Latchkum(Message* Node, JB_String* Desc, JB_String* Path) {
 	JB_Rec__NewErrorSub(Node, Desc, Path, kJB__ErrorSeverity_Error);
 }
 
@@ -5156,7 +5156,7 @@ StringReader* JB_Str_Stream(JB_String* Self) {
 
 void JB_Str_Fail(JB_String* Self) {
 	//visible;
-	JB_Rec__NewErrorWithNode(nil, Self, nil);
+	JB_Rec__Latchkum(nil, Self, nil);
 }
 
 JB_String* JB_Str_TrimFirst(JB_String* Self, uint /*byte*/ B) {
@@ -5701,7 +5701,7 @@ void JB_SS_Fail(StringReader* Self, JB_String* Error) {
 			Error = JB_LUB[374];
 		}
 	}
-	JB_Rec__NewErrorWithNode(nil, Error, Self->File);
+	JB_Rec__Latchkum(nil, Error, Self->File);
 }
 
 
@@ -5929,7 +5929,7 @@ void JB_File_SyntaxAppend(JB_File* Self, JB_String* Data) {
 }
 
 void JB_File_Fail(JB_File* Self, JB_String* Error) {
-	JB_Rec__NewErrorWithNode(nil, Error, ((JB_String*)JB_Ternary(((bool)Self), ((JB_String*)JB_File_Path(Self)), ((JB_String*)JB_LUB[0]))));
+	JB_Rec__Latchkum(nil, Error, ((JB_String*)JB_Ternary(((bool)Self), ((JB_String*)JB_File_Path(Self)), ((JB_String*)JB_LUB[0]))));
 }
 
 int JB_File__Init_() {
@@ -6189,7 +6189,7 @@ void JB_Msg_CantFind(Message* Self, Syntax S, JB_String* Name, Message* Found) {
 	JB_String* _tmPf3 = JB_FS_GetResult(Fs);
 	JB_Incr(_tmPf3);
 	JB_Decr(Fs);
-	JB_Rec__NewErrorWithNode(Found, _tmPf3, nil);
+	JB_Rec__Latchkum(Found, _tmPf3, nil);
 	JB_Decr(_tmPf3);
 	JB_Decr(Found);
 }
@@ -7378,7 +7378,7 @@ bool JB_Msg_EqualsSyx(Message* Self, Syntax X, bool Aware) {
 }
 
 void JB_Msg_Fail(Message* Self, JB_String* Error) {
-	JB_Rec__NewErrorWithNode(Self, Error, nil);
+	JB_Rec__Latchkum(Self, Error, nil);
 }
 
 bool JB_Msg_SyntaxIs(Message* Self, uint /*MsgParseFlags*/ F) {
@@ -8301,7 +8301,7 @@ __lib__ void jb_msg_error(Message* Self, JB_String* ErrorMsg) {
 	if (!JB_Msg_NilCheck(Self)) {
 		return;
 	}
-	JB_Rec__NewErrorWithNode(Self, ErrorMsg, nil);
+	JB_Rec__Latchkum(Self, ErrorMsg, nil);
 }
 
 __lib__ Message* jb_msg_expect(Message* Self, Syntax Type, JB_String* Name, Message* ErrPlace) {
@@ -8431,7 +8431,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2025040920);
+	return (2025041019);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
@@ -8443,4 +8443,4 @@ __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {
 //// API END! ////
 }
 
-// -2934619186805667969 1175407378816773414 6041677727492640846
+// -2934619186805667969 -1291485182881723570 6041677727492640846
