@@ -121,6 +121,25 @@ function PerryIDE.ShowAuto (|bool|)
 		return true
 	a.ListSource.obj = nil
 	a.closemenu
+
+
+
+function AutoCompleteKeys (guikeyEvent)
+	opt norefcounts
+	require key.IsDelete
+	if self isa ListView
+		|| row = .FirstSelected
+			|| n = row.next
+			|| p = row.prev
+				row.Remove
+				if p isnt Disabled
+					.Select(p)
+				  else
+					.Select(n)
+				.Touch // well its nice to be able to remove items?
+				return true
+			beep
+	
 	
 
 function AutoCompleteInsertText (GuiListEvent)

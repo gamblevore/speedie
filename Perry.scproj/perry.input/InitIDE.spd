@@ -49,7 +49,7 @@ extend PerryIDE
 		.ProductErrors		= TextView(self)
 		.CompileTabs		= ButtonView(.CompileArea,		ClickedCompileTabs) 
 		.UnNeededLabel		= TextView(self,		ClickedNoNeed)
-		.AutoComplete		= menu(self, 			nil,					AutoCompleteInsertText)
+		.AutoComplete		= menu(self,			AutoCompleteKeys,		AutoCompleteInsertText)
 		.ViewFiles			= ButtonView(.ViewButtons,		ClickedAView)
 		.ViewSearch			= ButtonView(.ViewButtons,		ClickedAView)
 		.ViewDebugger		= ButtonView(.ViewButtons,		ClickedAView)
