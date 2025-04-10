@@ -480,20 +480,17 @@ AlwaysInline ASM* ReturnFromFunc (jb_vm& vm, VMRegister*& r, ASM Op) {
 
 AlwaysInline void AllocStack (jb_vm& vm, VMRegister* r, ASM Op) {
 	debugger; // do this later. We we need a separate stack for these?
-	uint BEEETS = Alloc_Alignu;
-	uint Align = 1 << BEEETS;
-	int Amount = Alloc_Amounti << BEEETS;
+	int Amount = Alloc_Amounti << 4;
 	auto B = vm.Env.AllocBase;
-	r[n1].Int = (uint64)(B);
+	int n = n1;
+	if (n)
+		r[n].Int = (uint64)(B);
 	if (Amount > 0) {
-		auto Up = (-((uint64)B) & (Align-1));
-		Amount += Up;
 		memzero(B, Amount);
 		B += Amount;
 	} else {
-		debugger; // We need to de-align after
+		debugger;
 		B -= Amount;
-		B -= (-((uint64)B) & (Align-1));
 	}
 	vm.Env.AllocBase = B;
 }
