@@ -8,7 +8,7 @@ extend_module ErrorReceiver
 		.NewErrorSub(node, desc, path, ErrorSeverity.problem)
 
 	function NewError (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
-		cpp_part NewErrorWithNode
+		cpp_part Latchkum
 		.NewErrorSub(node, desc, path, ErrorSeverity.Error)
 
 	helper NewErrorSub (|Message| node, |string?| Desc, |string?| path, |errorseverity| sev)

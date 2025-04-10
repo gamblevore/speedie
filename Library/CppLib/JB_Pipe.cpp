@@ -52,7 +52,7 @@ const int RD = 0; const int WR = 1;
 JBClassPlace( ShellStream,    JB_Sh_Destructor,      JB_AsClass(ProcessOwner),   0 );
 
 
-void JB_Rec__NewErrorWithNode (Message* node, JB_String* Desc, JB_Object* Source);
+void JB_Rec__Latchkum (Message* node, JB_String* Desc, JB_Object* Source);
 bool JB_Dup2 (int, int);
 
 
@@ -326,7 +326,7 @@ int JB_Str_Execute (JB_String* self, Array* R, FastString* FSOut, FastString* FS
 
 	auto ShErr = Sh->ErrorOutput;
 	if (!FSErrIn and JB_FS_Length(ShErr)) {
-		JB_Rec__NewErrorWithNode(nil, JB_FS_GetResult(ShErr), nil);
+		JB_Rec__Latchkum(nil, JB_FS_GetResult(ShErr), nil);
 	}
 	int Exit = Sh->_Status;
 	JB_FreeIfDead(Sh);
