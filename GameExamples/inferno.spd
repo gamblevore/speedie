@@ -19,7 +19,8 @@ function MainImage (shadertoyfunc)
 	|| ip = (2.0*Pos-r.xy, 0.0) / r.y
 	|| p2 = ip • ip
 	
-	for i in (1.0, 0.0) by (-0.02)
+	|| range = (1.0, 0.0) by (-0.02)
+	for i in range
 		|| p = ip
 		|| z = i - p2
 		z = (z max (z/-10000.0)).sqrt

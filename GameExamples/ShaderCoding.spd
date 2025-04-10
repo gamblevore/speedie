@@ -18,7 +18,8 @@ function MainImage ( ShaderToyFunc )
 	|| lexp = (-L).Exp
 	|| cam = 1.5 + .cam.xz * 0.2
 	
-	for i in (0.0 to 4.0)
+	|| range = (0.0 to 4.0)
+	for i in range
 		uv *= cam
 		uv = uv.fract - 0.5
 

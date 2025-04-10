@@ -79,7 +79,8 @@ class SandSimulator (Window)
 		|| V = (p.vx, p.vy)
 //		if o.y == 0
 //			return p
-		for CC in v.RayCast()
+		|| range = v.RayCast()
+		for CC in range
 			|| D = .Particles[O+CC]
 				if p.MoveTo(D)
 					rz = D
