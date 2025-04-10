@@ -76,13 +76,13 @@ datatype SCDeclInfo (int)
 		NoRegAddrs
 		PostIncremented
 		ReturnedStruct
-		ReturnedVar
+		VarThatGotReturned
 		IntendedAsReturn
 		Body
 		Swappable	 = Param ||| Body ||| Global ||| Property
 		Local		 = Body ||| Param
 		SelfImplicit = Self ||| local // local is set by CollectOneParam, anyhow?
-		DclCopied    = altered ||| stayborrowed ||| api ||| UpgradeableContained ||| compilercreated ||| body // need more too? do later
+		DclCopied    = altered ||| stayborrowed ||| api ||| UpgradeableContained ||| CompilerCreated ||| body ||| return // need more too? do later
 
 	function abc
 		|| x = Body
@@ -1138,6 +1138,7 @@ class SCDecl (SCNamed) {
 		
 		
 	function Alignment (|bool| PutStructsAfter=false, |int|)
+		opt norefcounts
 		if .IsObject or .PointerCount
 			return platform.pointerbytes
 		if .IsCarray

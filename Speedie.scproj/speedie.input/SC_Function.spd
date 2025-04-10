@@ -76,7 +76,7 @@ linkage
 |nilstate|				NilSelf
 |byte|					ReturnedVars
 |Byte|					MinOpt
-|byte|					BareStructs
+//|byte|					BareStructs
 |Byte|					IsAssigns
 |byte|					IsCppInBuilt
 |byte|					CantBeInlined

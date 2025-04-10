@@ -12,7 +12,6 @@ struct ASMState
 	linkage: cpp_part Pac
 	|DataTypeCode|				ReturnASM
 	|uint16| 					BasicBlock
-	|int|						ScopeIncrease
 
 	|InlineBlock|				State
 	|byte|						DeepestInline
@@ -56,23 +55,21 @@ struct ASMState
 		rz = (.VDecls|uint| << 8) ||| (.vtmps << 0)
 		
 	function CloseVars (|uint| V, |message| exp = nil)
-		|| top = .VDecls
+		opt norefcounts
+		|int| top = .VDecls
 		|| d = (v>>8)&255
 		while top > d
-			|| r = .vars[top]
-				.TryNopUnusedDecl(r)
-				if r.IsBareStruct
-					.UnAlloc(r, exp)
+			|| r = .vars[top] // remove test?
+				exp = .CloseOneVar(r, exp, top.asm)
+			  else
+				debugger // remove test
 			.Vars[top] = nil
 			top--
 			
 		.VDecls = d
 		.VTmps = v&255
 	
-	
-	function UnAlloc (|scdecl| r, |message| exp)
 		
-	
 	function AddFuncParams (|SCFunction| fn)
 		opt norefcounts
 		for a in fn.Args
@@ -150,7 +147,7 @@ struct ASMState
 	function DeclareMe (|Message| where,  |scdecl| Type,  |asmreg|)
 		|| t = Type.CalculateASMType
 		|| ret = .state.return
-		if ret.reg and (type is ReturnedVar) and (.state.fn.ReturnedVars == 1)
+		if ret.reg and (type is VarThatGotReturned) and (.state.fn.ReturnedVars == 1)
 			ret.µtype = T|datatypecode|
 			Type.wholetype = ret|DataTypeCode|
 			return ret
@@ -263,7 +260,7 @@ struct ASMState
 		if f.µRefCount <= 0
 			.nop(f)
 
-	function Rewind (|fatasm| start)
+	function RewindInline (|fatasm| start)
 		.NopRange(start, .curr)
 	
 	
@@ -444,15 +441,17 @@ struct ASMState
 			
 
 	function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
+		//debugat 8
 		|| v = .VDeclsExit(Dest)
-
-		// needs fix
-		// So... if the dest is in a temp location (r31)... well... we can't put it there.
-		// So we can put it in the last, or after the last. Thats all.
-		// So it seems like unless it is equal to the last one... we have to increment it.
-		// Also... I think this can't be a temp, because we literally moved up the vdecls.
+		// If we increase .vdecls... then what about .vars[]?		
 		
 		v += (!v or dest.reg != v)
+		|| diff = v - .VDecls
+		if diff > 1			// hmmm, vDeclsExit? Probably OK but I just want to see this in act.
+		if diff == 1 // shouldn't we fill in the .vars[]?
+			.vars[v] = fn.RealReturnType
+			if .vars[v] isnt Return and .vars[v] != typevoid
+		
 		.Vdecls = v
 		check (v < 32) (exp, "Too many registers in use. No space for result.")
 		dest.reg = v
@@ -600,7 +599,8 @@ struct ASMState
 	function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| AllowedGain, |asmreg|)
 		opt norefcounts
 		|| Start = .curr
-		|inlineblock| Old = .state
+		|| Old = .state
+		// So like, what about the ScopeIncrease thing?
 		if !dest.reg and fn.ASMReturn
 			if dest isnt discard
 				Dest = .TempOnly(prms, dest)
@@ -626,7 +626,7 @@ struct ASMState
 		if .state.InlineDepth == 0
 			.InlineEnd = nil
 		if !rz
-			.Rewind(start)
+			.RewindInline(start)
 
 	
 	function TryInlineSub (|message| prms, |scfunction| fn, |int| AllowedGain,  |asmreg|)

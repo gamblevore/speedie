@@ -172,3 +172,4 @@ function message.TryAddBareStruct (|scnode| name_space, |scdecl| dcl)
 //		if ++fn.barestructs > 1
 //			printline self
 		fn.BumpStruct(dcl)
+

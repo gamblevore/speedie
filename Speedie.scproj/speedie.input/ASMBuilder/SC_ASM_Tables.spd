@@ -203,13 +203,20 @@ function TypeCast (fn_asm)
 	return TypeCastSub(self, exp, dest, freg)
 
 
+function BearStrooct (|&asmstate| self, |message| exp, |ASMReg| dest, |ASMReg|)
+	opt norefcounts
+	|| inner = exp.first
+	expect ((inner == @arg) and !inner.hasany) (exp) // nil
+	|| zzeerrooo = asmreg() as asmreg.FromZeroMemory
+	zzeerrooo.reg = dest.reg
+	return .temponly(exp, zzeerrooo)
+
+
 function TypeCastSub (|&asmstate| self, |message| exp, |ASMReg| dest, |ASMReg| from, |ASMReg|)
 	opt norefcounts
 	|| NewDecl = exp.ASMDecl
 	if newdecl.isbarestruct
-		|| inner = exp.first
-		expect ((inner == @arg) and !inner.hasany) (exp) // nil
-		return asmreg() as asmreg.FromZeroMemory
+		return bearstrooct(self, exp, dest)
 		
 	|| NewType = NewDecl.regtype
 	if !from.Reg												// x = 0|float|
@@ -293,42 +300,23 @@ function SetRel (fn_asm)						// function relset (
 
 
 
-function AllocStruct (|&asmstate| self, |message| exp, |asmreg| dest, |scdecl| ty, |asmreg|)
-	// How does tail work with stack? We do need to deallocate stuff.
-	// Lets see.
-	// So we gotta preallocate, right? we can't allocate in a loop anyhow.
-	// we'd need to deallocate each one.
-	// jsut do the entire thing... lol.
-	// hoisted?
-	// figuring out what goes where won't be so easy?
-	// if we hoist it, that means we pull it towards us
-	// doing it earlier
-	// then what?
+function AllocBearStruct (|&asmstate| self, |message| exp, |asmreg| dest, |scdecl| ty, |int| dir, |asmreg|)
 	/*
-		OK, lets list approaches:
-		
-		* Preallocate at func-start
-			* Then we gotta add a number to the start number, to get each sub-alloc
-
-		* Hoist each one. Allocate at the same, but hoisted. Deallocate at end (inbuilt)
-		
-		* Allocate and de-allocate each one individually. Useful if you have many structs, scattered.
-			* bad if we have a loop.
-		
-		The last one perhaps is better.
-		
-	
+		for now... just allocate/decallocate per-scope. Anything else is too hard. We can optimise LATER.
+		just get this shit working! Fuck loops, fuck everyting.
+		Rewinding... may fuck things too.
 	*/
 	
-	|| size = ty.SizeOfQuery
-	|| Struct = exp.ALLO(dest, 1, size)
-	.ScopeIncrease += size
+	(self)
+	|| size = ty.SizeOfQuery * dir
+	|| al = ty.Alignment.log2
+	|| Struct = exp.ALLO(dest, al, size)
 	return struct * dest
+	
 	
 	
 function DeclSub (fn_asm)
 	opt norefcounts
-	if "Tran_PrintSub".trap
 	
 	|| rel = exp.last!
 	|| ty = exp.fastdecl
@@ -338,7 +326,7 @@ function DeclSub (fn_asm)
 	ty.BranchDepth = .state.BranchDepth
 	dest = .DeclareMe(rel, ty)
 	if ty.IsBareStruct
-		return AllocStruct(self, exp, dest, ty)
+		return AllocBearStruct(self, exp, dest, ty, 1)
 		
 	|| item = rel.last!
 
@@ -351,21 +339,10 @@ function DeclSub (fn_asm)
 		.MakeConstFromASM(ty, k, nil)
 	return k
 
-
-//function CloseStack (|&ASMState| self, |message| exp,  |int| Stack)
-//	opt norefcounts
-//	|| Diff = .ScopeIncrease - Stack #require
-//	expect (Diff > 0) (exp)
-//	for s.reverse in exp
-//		if s.func == @decl
-//	exp.ALLO(asmreg(), 1, diff)
-//	.ScopeIncrease = Stack
-	
 	
 function ArgSub (|&ASMState| self, |message| exp, |&sc_hoister| H, |AsmReg|)
 	opt norefcounts
 	|| OV = .OpenVars
-	|| Stack = .ScopeIncrease
 	
 	for ch.fast in exp
 		if h
@@ -378,7 +355,6 @@ function ArgSub (|&ASMState| self, |message| exp, |&sc_hoister| H, |AsmReg|)
 				rz = what
 				exit
 	
-//	CloseStack(self, exp, Stack)
 	.CloseVars(OV, exp)
 
 
@@ -500,6 +476,8 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 		if dest is DeclareInlineParam // &A
 			(t is InlinedAccess)
 			return T
+		if d.isbarestruct // it already has the address
+			return T.haveaddr
 /		dest = .temptyped(exp, dest, d)
 		return exp.GRAB(dest, t, dest, t) * dest.HaveAddr
 	
@@ -831,9 +809,9 @@ function MakeConstFromASM (|scdecl| decl, |asmreg| Initial, |asmreg| NewValue)
 
 
 function SCFunction.TrackReturns (|scdecl| D)
-	if d isnt ReturnedVar
+	if d isnt VarThatGotReturned
 		.ReturnedVars++
-		(d is ReturnedVar)	
+		(d is VarThatGotReturned)	
 
 
 function message.HasAsmStuff (|bool|)

@@ -229,8 +229,7 @@ function Message.CollectFromBody (|SCNode| Name_space)
 	if .obj // when does this happen? hopefully not on anything that escaped .collectdecl?
 		return
 
-	|| dcl = .CollectDecl(Name_space, Name_space, declmode.FunctionBody)
-		decltracker.obj(self) = dcl
+	|| dcl = .CollectDecl(Name_space, Name_space, DeclMode.FunctionBody)
 		dcl.AsBody
 		StructStuff.DelayedFix
 		|| def = dcl.Default
@@ -290,6 +289,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 		FuncPrmz.ReturnType = dcl // we need the copy
 		if !dcl.isbarestruct or funcprmz is constructor
 			funcprmz.AddTypeInfo(dcl)
+			(dcl is return)
 			return nil
 
 
@@ -388,6 +388,3 @@ datatype DeclMode (int)
 	syntax is (|DeclMode|o, |bool|)
 		return self == o
 
-
-
-|dictionary of scdecl| decltracker = dictionary() 

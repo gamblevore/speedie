@@ -266,6 +266,7 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 		|| Mul = P.c_Array ?? 1
 		rz += Curr * Mul 
 
+	.alignment = align
 	.SizeRaw = rz
 	.Size = rz align align
 	if .istask
@@ -471,6 +472,7 @@ function scfunction.BeforeTransform
 		p.Name = .ExportName
 	  else
 		.AddConstructorReturn2
+
 
 function SCFunction.AddConstructorReturn2 
 	|| c = .cls

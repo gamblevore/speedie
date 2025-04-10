@@ -204,7 +204,7 @@ extend_module scfunction
 			insert.obj = OldDcl
 			|| Dcl2 = OldDcl.copydecl	// no difference, its a temp
 			if OldDcl.IsBareStruct		// oof? what about scfunction.StackAllocGuess
-			dcl2.AsBody
+			dcl2.AsBody					// can we just use collectfrombody?
 			
 			Dcl2.Name = name
 			|| relname = dcl.last.first 

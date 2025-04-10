@@ -34,7 +34,6 @@ function message.OperatorMul (|asm| op, |&fatasm|)
 	return a.start
 
 
-
 target debug
 	function scdecl.ASMSanity 
 		ifn .iscarray or .pointercount or .isobject or .isbarestruct
@@ -48,10 +47,18 @@ target debug
 				debugger
 
 
-function asmstate.TryNopUnusedDecl (|scdecl| d)
-	if d is compilercreated
-		|| f = d.fat
-			.AskNop(f)
+function asmstate.CloseOneVar (|scdecl| d, |message?| exp, |asmreg| v, |message?|)
+	opt norefcounts
+	if  d isnt return  and  d isnt global
+		if d is compilercreated
+			|| f = d.fat
+				.AskNop(f)
+		if d.IsBareStruct
+			debug_require exp
+			exp = exp.DeepLast
+			
+			ASMType.AllocBearStruct(self, exp, v, d, -1)
+	return exp
 
 
 function scdecl.CalculateASMType (|asmreg|)
@@ -75,7 +82,15 @@ function SCFunction.ASMReturn (|scdecl|)
 	|| T = .returntype
 	if t isnt ReturnedStruct
 		return T
-	
+
+
+function SCFunction.RealReturnType (|scdecl|)
+	opt norefcounts
+	|| T = .returntype
+	if t and t isnt ReturnedStruct
+		return T
+	return TypeVoid
+
 
 datatype VarUseMode (int)
 	Flags
@@ -85,9 +100,4 @@ datatype VarUseMode (int)
 		Sometimes
 	syntax is (|varusemode| v, |bool|)
 		return self&v
-//	syntax is (|varusemode| v, assigns:|bool|, |varusemode|)
-//		if value
-//			return self|||v
-//		return self&~v
-
 
