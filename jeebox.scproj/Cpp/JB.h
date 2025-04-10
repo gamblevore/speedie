@@ -610,18 +610,18 @@ JBClass ( ParserCallBack , JB_Task ,
 #define JB__App__stdin JB__.App__stdin
 #define JB__App__StdOut JB__.App__StdOut
 #define JB__App_Usage JB__.App_Usage
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[551])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[549])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[552])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[550])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[553])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[551])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[550])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[548])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[553])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[551])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[554])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[552])
 
 #define JB__API_NilHappened_ JB__.API_NilHappened_
 #define JB__Constants__FuncArray JB__.Constants__FuncArray
@@ -680,7 +680,7 @@ JBClass ( ParserCallBack , JB_Task ,
 #define JB__jBinNotJbin JB__.jBinNotJbin
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[555])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[553])
 
 #define JB_StdErr JB__.StdErr
 #define kJB_SyxAcc ((Syntax)29)
@@ -874,12 +874,12 @@ JBClass ( ParserCallBack , JB_Task ,
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[558])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[556])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[557])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[555])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[556])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[554])
 
 #define kJB__byte_max ((byte)255)
 
@@ -947,8 +947,6 @@ JBClass ( ParserCallBack , JB_Task ,
 #define kJB__CL1_Length ((ControlPoint)10)
 
 #define kJB__CL1_Low ((ControlPoint)0)
-
-#define kJB__CL1_Percent ((ControlPoint)8)
 
 #define kJB__TC__void ((DataTypeCode)0)
 
@@ -1212,7 +1210,6 @@ extern Dictionary* JB__TC_Types_Dict;
 #define kJB__Saver_RefMark ((int)1073741824)
 
 #define JB__Saver_SaveableList JB__.Saver_SaveableList
-
 #define JB__Rnd_Shared JB__.Rnd_Shared
 #define kJB__Wrap_kDelete ((int)2)
 
@@ -1220,7 +1217,7 @@ extern Dictionary* JB__TC_Types_Dict;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[549])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[547])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -1262,6 +1259,7 @@ extern Dictionary* JB__TC_Types_Dict;
 #define kJB__File_O_WRONLY ((int)1)
 
 
+#define JB__Proc_CheckedParent JB__.Proc_CheckedParent
 #define JB__Err_AutoPrint JB__.Err_AutoPrint
 #define JB__Err_CurrSource_ JB__.Err_CurrSource_
 #define JB__Err_KeepStackTrace JB__.Err_KeepStackTrace
@@ -1275,6 +1273,7 @@ struct JB_Globals {
 	bool Flow_BreakOnFail;
 	byte Flow_Active;
 	bool File_DebugExecute;
+	bool Proc_CheckedParent;
 	byte Err_AutoPrint;
 	bool Err_KeepStackTrace;
 	u16 Tk__StopBars;
@@ -1282,7 +1281,6 @@ struct JB_Globals {
 	int Syx_CurrFuncID_;
 	uint Tk_CountStats;
 	Float64 Rec_Progress;
-	Dictionary* Constants_JS_UnEscapeStr;
 	Dictionary* Constants_XML_UnEscapeStr;
 	Dictionary* Constants_EscapeChr;
 	CharSet* Constants_CSWordMiddle;
@@ -1301,15 +1299,15 @@ struct JB_Globals {
 	JB_ErrorReceiver* StdErr;
 	JB_String* JbinHeader;
 	JB_String* jBinNotJbin;
-	Dictionary* Constants_XML_EscapeStr;
+	Dictionary* Constants_JS_EscapeStr;
 	Message* Tk__EndOfLineMarker;
-	Dictionary* Constants__SyxDict;
+	Dictionary* Constants_EscapeStr;
 	Message* App__Conf;
 	Array* ErrorSeverity__names;
-	Dictionary* Constants_JS_EscapeStr;
+	Dictionary* Constants_UnEscapeStr;
 	Dictionary* LD_ClassList;
 	SaverClassInfo* Saver_SaveableList;
-	Dictionary* Constants_UnEscapeStr;
+	Dictionary* Constants_JS_UnEscapeStr;
 	FlowControl* Flow_Flow;
 	Message* App__Prefs;
 	JB_String* App__Path;
@@ -1317,17 +1315,17 @@ struct JB_Globals {
 	Array* Macro_TmpPrms_;
 	JB_File* App__stdin;
 	JB_String* File__Speedie;
-	Array* Err_CurrSource_;
 	JB_String* App_Usage;
-	Dictionary* Constants_EscapeStr;
+	SpdProcess* Proc__Parent;
+	Array* Err_CurrSource_;
+	Dictionary* Constants_XML_EscapeStr;
+	Dictionary* Constants__SyxDict;
 	Array* App__OldArgs;
 	Dictionary* Tk__ErrorNames;
-	SpdProcess* Proc_Parent;
 	FP_fnIDGenerator Tk_Splitter;
 	CompressionStats MzSt_all;
-	PicoComms* Pico_Parent_;
-	Random Rnd_Shared;
 	Random zalgo_R;
+	Random Rnd_Shared;
 	MessagePosition Tk_Using;
 	uint64 Mrap_MDummy_[2];
 	CharProp CharProp_Item[256];
@@ -1628,7 +1626,7 @@ Message* JB_Tk__MakeInvisArg(Message* Tmp, int Indent);
 
 Message* JB_Tk__MakeRel(Message* First, int Bits);
 
-int JB_Tk__MessageErrorSub(FastString* Fs, int Num, int ButFound);
+int JB_Tk__MessageErrorSub(FastString* Fs, int Num);
 
 bool JB_Tk__NeedName(Message* Thg);
 
@@ -1994,9 +1992,6 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender Msg, JB_String* Name, JB_String* LongName, 
 // SorterComparer
 
 
-// SorterComparerMsg
-
-
 // SpdDeathActionFn
 
 
@@ -2163,8 +2158,6 @@ int JB_Saver__Init_();
 
 
 // JB_Pico
-int JB_Pico__Init_();
-
 
 
 // JB_PicoConfig
@@ -2899,7 +2892,7 @@ Message* JB_Msg_Copy(Message* Self, Message* Pos_msg);
 
 JB_String* JB_Msg_CopyID(Message* Self);
 
-Message* JB_Msg_CopySub(Message* Self, Message* P);
+Message* JB_Msg_CopyWithoutUsing(Message* Self, Message* P);
 
 void JB_Msg_Decl__(Message* Self, FastString* Fs);
 
@@ -3102,9 +3095,7 @@ void JB_sci_Destructor(SaverClassInfo* Self);
 
 
 // JB_SpdProcess
-int JB_Proc__InitCode_();
-
-void JB_Proc__InitOwner();
+int JB_Proc__Init_();
 
 
 
@@ -3416,6 +3407,7 @@ struct JB_Globals {
 	bool Flow_BreakOnFail;
 	byte Flow_Active;
 	bool File_DebugExecute;
+	bool Proc_CheckedParent;
 	byte Err_AutoPrint;
 	bool Err_KeepStackTrace;
 	u16 Tk__StopBars;
@@ -3423,7 +3415,6 @@ struct JB_Globals {
 	int Syx_CurrFuncID_;
 	uint Tk_CountStats;
 	Float64 Rec_Progress;
-	JB_Object* Constants_JS_UnEscapeStr;
 	JB_Object* Constants_XML_UnEscapeStr;
 	JB_Object* Constants_EscapeChr;
 	JB_Object* Constants_CSWordMiddle;
@@ -3442,15 +3433,15 @@ struct JB_Globals {
 	JB_Object* StdErr;
 	JB_Object* JbinHeader;
 	JB_Object* jBinNotJbin;
-	JB_Object* Constants_XML_EscapeStr;
+	JB_Object* Constants_JS_EscapeStr;
 	JB_Object* Tk__EndOfLineMarker;
-	JB_Object* Constants__SyxDict;
+	JB_Object* Constants_EscapeStr;
 	JB_Object* App__Conf;
 	JB_Object* ErrorSeverity__names;
-	JB_Object* Constants_JS_EscapeStr;
+	JB_Object* Constants_UnEscapeStr;
 	JB_Object* LD_ClassList;
 	JB_Object* Saver_SaveableList;
-	JB_Object* Constants_UnEscapeStr;
+	JB_Object* Constants_JS_UnEscapeStr;
 	JB_Object* Flow_Flow;
 	JB_Object* App__Prefs;
 	JB_Object* App__Path;
@@ -3458,12 +3449,13 @@ struct JB_Globals {
 	JB_Object* Macro_TmpPrms_;
 	JB_Object* App__stdin;
 	JB_Object* File__Speedie;
-	JB_Object* Err_CurrSource_;
 	JB_Object* App_Usage;
-	JB_Object* Constants_EscapeStr;
+	JB_Object* Proc__Parent;
+	JB_Object* Err_CurrSource_;
+	JB_Object* Constants_XML_EscapeStr;
+	JB_Object* Constants__SyxDict;
 	JB_Object* App__OldArgs;
 	JB_Object* Tk__ErrorNames;
-	JB_Object* Proc_Parent;
 };
 extern JB_Globals JB__;
 

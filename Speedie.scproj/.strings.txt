@@ -885,7 +885,7 @@
 "Lib"
 "Lib at: "
 "Library"
-"Library/"
+"Can't pass structs this way"
 "Library/CppLib"
 "LoadProperties"
 "RFDC"
@@ -2180,4 +2180,3 @@
 "vecget"
 "VGET"
 ") "
-"Can't pass structs this way"
