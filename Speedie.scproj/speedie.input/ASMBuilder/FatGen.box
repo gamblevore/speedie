@@ -231,9 +231,9 @@ function message.SUB (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|
 }
 
 
-function message.MULT (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+function message.MUL (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
 	visible
-	rz = self * asm.MULT
+	rz = self * asm.MUL
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
@@ -241,9 +241,9 @@ function message.MULT (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fat
 }
 
 
-function message.DIVV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Kind, |&fatasm|) {
+function message.DIV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Kind, |&fatasm|) {
 	visible
-	rz = self * asm.DIVV
+	rz = self * asm.DIV
 	rz.dest(0, r1)
 	rz.dest(1, r2)
 	rz.reginput(2) = r3
@@ -259,6 +259,47 @@ function message.DIV2 (|asmreg| r1, |asmreg| r2, |int| Sh, |int| Add, |&fatasm|)
 	rz.reginput(1) = r2
 	rz.numinput(2) = Sh
 	rz.numinput(3) = Add
+}
+
+
+function message.ADD32 (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.ADD32
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.SUB32 (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.SUB32
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.MUL32 (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+	visible
+	rz = self * asm.MUL32
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+}
+
+
+function message.DIV32 (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Kind, |&fatasm|) {
+	visible
+	rz = self * asm.DIV32
+	rz.dest(0, r1)
+	rz.dest(1, r2)
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = Kind
 }
 
 
@@ -283,9 +324,9 @@ function message.BXOR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.BSHS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.BRSS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
 	visible
-	rz = self * asm.BSHS
+	rz = self * asm.BRSS
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
@@ -293,9 +334,9 @@ function message.BSHS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.BSHR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.BRSH (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
 	visible
-	rz = self * asm.BSHR
+	rz = self * asm.BRSH
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
@@ -303,9 +344,9 @@ function message.BSHR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.BSHL (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.BLSH (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
 	visible
-	rz = self * asm.BSHL
+	rz = self * asm.BLSH
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3

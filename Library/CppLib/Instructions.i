@@ -72,9 +72,9 @@
 	i1 = i2 + (i3 << Shift_Shu);
 ı SUB: _
 	i1 = (i2 - i3) >> Shift_Shu;
-ı MULT: _
+ı MUL: _
 	i1 = (i2 * i3) + i4;
-ı DIVV: _
+ı DIV: _
 	DivMath(r, Op);
 ı DIV2: _
 	if (i2 < 0) 
@@ -83,6 +83,14 @@
 	else 
 	i1 = i2 >> Div2_Shu
 ;
+ı ADD32: _
+	ii1 = ii2 + (ii3 << Shift_Shu);
+ı SUB32: _
+	ii1 = (ii2 - ii3) >> Shift_Shu;
+ı MUL32: _
+	ii1 = (ii2 * ii3) + ii4;
+ı DIV32: _
+	DivMath32(r, Op);
 ı CLAM: _
 	if (Float_Du) 
 	i1 = (std_min(std_max(i2, i3), i4))
@@ -92,12 +100,12 @@
 ;
 ı BXOR: _
 	u1 = u2 ^ (u3 | Shift_Shu);
-ı BSHS: _
-	i1 = i2 >> (u3 + Shift_Shu);
-ı BSHR: _
-	u1 = u2 >> (u3 + Shift_Shu);
-ı BSHL: _
-	u1 = u2 << (u3 + Shift_Shu);
+ı BRSS: _
+	i1 = (i2 << Shift_Shu) >> i3;
+ı BRSH: _
+	u1 = ((u2 << Shift_Shu) >> u3) >> Shift_Shu;
+ı BLSH: _
+	u1 = ((u2 << u3) << Shift_Shu) >> Shift_Shu;
 ı BAND: _
 	u1 = u2 & (u3 | Shift_Shu);
 ı BOR: _

@@ -240,7 +240,9 @@ extend ASMState
 			return exp.BFLG(dest, l,  Pow2-1, 0, 0) * Dest	// y = x * 4  -->  y = x << 2
 
 		|| five = .IntPowerOfTwo(r, 1) // 5 or 9 or 17 or 33, etc
-			return exp.ADD(dest, l, l, five-1) * dest
+			if dest.IsBig
+				return exp.ADD(dest, l, l, five-1) * dest
+			return  exp.add32(dest, l, l, five-1) * dest
 		
 		|| RR = r.const
 		if .CanAddK(r,RR)								// a - 1,  a + 1
@@ -351,11 +353,11 @@ extend ASMState
 		  else
 			|| v = .NumToReg(exp, lmul, asmreg(), datatypecode.uint)
 			if l isnt alternate								// x = lptr + r*12
-				fat = exp.MULT(dest, R, V, L)
+				fat = exp.MUL(dest, R, V, L)
 			  else											// x = (lptr - rptr)/12
 				exp.SUB(dest, L, R, ASMReg())
 				|| uinttype = 0, debugger
-				fat = exp.DIVV(dest, ASMReg(), dest, V, uinttype)  
+				fat = exp.DIV(dest, ASMReg(), dest, V, uinttype)  
 			  
 		return fat * Dest
 	
@@ -417,7 +419,7 @@ extend ASMState
 		if rz == nil
 			rz = .QuickIntMul(dest, L, R, exp)
 			if rz == nil
-				rz = exp.MULT(dest, L, R, asmreg()) * Dest
+				rz = exp.MUL(dest, L, R, asmreg()) * Dest
 
 
 	function BoolMul (|asmreg| dest, |asmreg| Bule, |asmreg| V, |message| exp, |asmreg|)		
@@ -482,7 +484,7 @@ extend ASMState
 			return .MakeConst2(dest, L, R, exp, ConstifyIntDiv)
 		|| q = .QuickIntDiv(dest, l, r, exp)
 			return q
-		return exp.DIVV(dest, ASMReg(), l, r, dest.IntDivType) * dest
+		return exp.DIV(dest, ASMReg(), l, r, dest.IntDivType) * dest
 	
 	
 	function ModFloat    (fn_opasm)
@@ -496,7 +498,7 @@ extend ASMState
 	function ModInt    (fn_opasm)
 		if dest is ConstOutput
 			return .MakeConst2(dest, L, R, exp, ConstifyIntMod)
-		return exp.DIVV(asmreg(), dest, L, R, dest.IntDivType) * Dest
+		return exp.DIV(asmreg(), dest, L, R, dest.IntDivType) * Dest
 	
 	
 	function Mod    (fn_opasm)
@@ -510,7 +512,7 @@ extend ASMState
 		if r.reg // what?
 		if dest is ConstOutput
 			return .makeconst2(dest, l, asmreg(), exp, ConstifyBitNot)
-		return .BitMaker(dest, l, asmreg(), exp, asm.bnot)
+		return .BitConstMaker(dest, l, asmreg(), exp, asm.bnot)
 
 
 	function BitXor (fn_opasm)
@@ -570,10 +572,10 @@ extend ASMState
 	function BitMaker2 (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
 		if (l is ConstOutput)
 			swap (l) (r)
-		return .BitMaker(Dest, l, r, exp, op)
+		return .BitConstMaker(Dest, l, r, exp, op)
 	
 	
-	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
+	function BitConstMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
 		|| k = .const(R, 9, op!=asm.bor)
 			r = asmreg()
 		  else
@@ -589,9 +591,11 @@ extend ASMState
 		|| K = .const(R, 6, false)
 			return .BFLG_Const(exp, dest, l, 0, k)
 		
-		|| op = (asm.BSHS, asm.BSHR)(l.signed)
-		return .BitMaker(dest, l, r, exp, op)
-	
+		|| fat = exp.BRSH(dest, L, R, 0)
+		if l.Signed
+			fat._op = asm.brss
+		return fat * dest	
+
 
 	function SHL  (fn_opasm)
 		if dest is ConstOutput
@@ -599,12 +603,12 @@ extend ASMState
 		|| K = .const(R, 6, false)
 			return .BFLG_Const(exp, dest, l,  K, 0)
 		
-		return .BitMaker(dest, l, r, exp, asm.bshl)
+		return exp.BLSH(dest, L, R, 0) * dest
 
 
 	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| Src, |uint| up, |uint| down, |asmreg|)
-		|uint| srcbits = src.BitCount
-		if up > srcbits or down > srcbits			// wierd?
+		|uint| SrcBits = src.BitCount
+		if up > srcbits or down > SrcBits			// wierd?
 			problem (exp, "Shift too far")
 		if !up and !down
 			return .assign(dest, src, exp)

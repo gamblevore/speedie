@@ -388,6 +388,10 @@ POS 6
 
 
 #!						 (((((Math)))))
+
+// How to do these in a bitcorrect way?
+// Do I make 3 more funcs? BSHL needs fixing.
+
 /**/ ADDK (AddK)
 		i1 = i2 + U2_Li
 /**/ ADPK (AddK) // post-increment
@@ -395,39 +399,51 @@ POS 6
 		i2 = i2 + U2_Li
 /**/ MULK  (AddK)
 		i1 = i2 * U2_Li
+
+
 /**/ ADD  (Shift)
 		i1 = i2 + (i3 << Shift_Shu)
 /**/ SUB  (Shift)              					// must come after ADD
 		i1 = (i2 - i3) >> Shift_Shu
-/**/ MULT  (U4)
+/**/ MUL  (U4)
 		i1 = (i2 * i3) + i4
-/**/ DIVV (Div)
+/**/ DIV (Div)
 		DivMath(r, Op)
 /**/ DIV2 (Div2)
 		if (i2 < 0)
 			i1 = (i2+((1<<Div2_Addu)-1)) >> Div2_Shu	// quick divide by power of 2
 		else
 			i1 = i2 >> Div2_Shu
-/**/ CLAM (Float)
+
+/**/ ADD32  (Shift)
+		ii1 = ii2 + (ii3 << Shift_Shu)
+/**/ SUB32  (Shift)              					// must come after ADD
+		ii1 = (ii2 - ii3) >> Shift_Shu
+/**/ MUL32  (U4)
+		ii1 = (ii2 * ii3) + ii4
+/**/ DIV32 (Div)
+		DivMath32(r, Op)
+
+/**/ CLAM (Float) // not really a float
 		if (Float_Du)
 			i1 = (std_min(std_max(i2,i3),i4))
 		else
 			u1 = (std_min(std_max(u2,u3),u4))
 /*
-	x = clamp(y, y, H) // min
-	x = clamp(y, L, L) // max
+	min(y,H) --> clamp(y, y, H)
+	max(y,L) --> clamp(y, L, L)
 */
 
 
 #!						 (((((Bitops)))))
 /**/ BXOR  (Shift)
 		u1 = u2 ^     (u3|||Shift_Shu)
-/**/ BSHS  (Shift)
-		i1 = i2 >>    (u3+Shift_Shu)
-/**/ BSHR  (Shift)
-		u1 = u2 >>    (u3+Shift_Shu)
-/**/ BSHL  (Shift) 
-		u1 = u2 <<    (u3+Shift_Shu)
+/**/ BRSS  (Shift)
+		i1 = (i2 << Shift_Shu) >> i3
+/**/ BRSH  (Shift)
+		u1 = ((u2 << Shift_Shu) >> u3) >> Shift_Shu
+/**/ BLSH  (Shift) 
+		u1 = ((u2 << u3) << Shift_Shu) >> Shift_Shu
 /**/ BAND  (Shift)
 		u1 = u2 &     (u3|||Shift_Shu)
 /**/ BOR   (Shift)
@@ -445,15 +461,6 @@ POS 6
 			u1 = ((u2 << BFLD_upu) >> BFLD_downu)	
 /**/ BSTT  (U4)
 		i1 = 0 // bitstats(u2, u3, u4)
-///**/ BCLR  (BClear)
-//		BitClear(r, Op)
-
-///**/ BFLS  (BFLD) // seems useless?
-//		BFLS(r, Op)
-///**/ BROL  (U3) // just make these functions or rare instructions?
-//		i1 = JB_u64_RotL(u2, u3 + L3)
-///**/ BROR  (U3)
-//		i1 = JB_u64_RotR(u2, u3 + L3)
 
 
 

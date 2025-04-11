@@ -32,32 +32,37 @@ AlwaysInline void DivMath(VMRegister* r, ASM Op) {
 	uint A = n1;
 	uint B = n2;
 	
-	switch (Div_Kindu & 3) { // so there are 4 possible divisions we can do
-	  case 0:
+	if (Div_Kindu) {
 		if (A) // on ARM, % does not come for free along with  /
 			   // so its better not to do % unless we explicitly need it.
 			r[A].Int = R3 / R4;
 		if (B)
 			r[B].Int = R3 % R4;
-		return;
-	  case 1:
+	} else {
 		if (A)
 			r[A].Int = (u64)R3 / (u64)R4;
 		if (B)
 			r[B].Int = (u64)R3 % (u64)R4;
-		return;
-	  case 2:
+	}
+}
+
+
+AlwaysInline void DivMath32(VMRegister* r, ASM Op) {
+	auto R3 = i3;
+	auto R4 = i4;
+	uint A = n1;
+	uint B = n2;
+	
+	if (Div_Kindu) {
 		if (A)
 			r[A].Int = (int64)((int)R3 / (int)R4);
 		if (B)
 			r[B].Int = (int64)((int)R3 % (int)R4);
-		return;
-	  case 3:
+	} else {
 		if (A)
 			r[A].Int = (uint)R3 /(uint)R4;
 		if (B)
 			r[B].Int = (uint)R3 %(uint)R4;
-		return;
 	}
 }
 
