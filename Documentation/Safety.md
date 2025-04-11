@@ -111,9 +111,9 @@ The `as` operator:
 
     function def (|object| o)
         || m = o as message #require
-            // (o as message) creates an error if o is not a message
-            // #require will return nil if "o as message" returns nil.
-            // combined: This just returns nothing, if o isnt a message.
+        // (o as message) creates an error if 'o' is not a message, then returns nil.
+        // #require returns nil if "o as message" returns nil.
+        // combined: Returns nothing, if o isnt a message.
         printline m.name
 
 And the `mustbe` operator.
