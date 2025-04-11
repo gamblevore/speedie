@@ -110,7 +110,9 @@ Speedie is type-safe... this works like you'd expect in most languages. We have 
 The `as` operator:
 
     function def (|object| o)
-        || m = o as message #require // creates an error if o is not a message, and then returns nil.
+        || m = o as message #require
+            // (o as message) creates an error if o is not a message
+            // #require will return nil if "o as message" returns nil.
         printline m.name
 
 And the `mustbe` operator.
