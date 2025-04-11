@@ -55,7 +55,7 @@ Here are some things I've (practically) used Jeebox for, so far:
 
 ## Walkthrough of creating a Book Searcher
 
-OK, in this walk-through, we are gonna create a small program. You should use the example files, at `/usr/local/speedie/examples/books_xml` that will be in the github repo.
+OK, in this walk-through, we are gonna create a small program. You should use the example files, at `/usr/local/speedie/Examples/books_xml` that will be in the github repo.
 
 Let's start with an XML data-bank, the first thing we want to do is convert it to Jeebox. You should find the file `books.xml` in the examples folder.
 
