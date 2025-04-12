@@ -208,7 +208,7 @@ function TypeCast (fn_asm)
 	return TypeCastSub(self, exp, dest, freg)
 
 
-function BearStrooct (|&asmstate| self, |message| exp, |ASMReg| dest, |ASMReg|)
+function NilStrooct (|&asmstate| self, |message| exp, |ASMReg| dest, |ASMReg|)
 	opt norefcounts
 	|| inner = exp.first
 	expect ((inner == @arg) and !inner.hasany) (exp) // nil
@@ -221,7 +221,7 @@ function TypeCastSub (|&asmstate| self, |message| exp, |ASMReg| dest, |ASMReg| f
 	opt norefcounts
 	|| NewDecl = exp.ASMDecl
 	if newdecl.isbarestruct
-		return bearstrooct(self, exp, dest)
+		return nilstrooct(self, exp, dest)
 		
 	|| NewType = NewDecl.regtype
 	if !from.Reg												// x = 0|float|
@@ -234,18 +234,9 @@ function TypeCastSub (|&asmstate| self, |message| exp, |ASMReg| dest, |ASMReg| f
 			return from
 		return .NotEq(dest, asmreg(), from, exp)
 
-	|| OC = OldType.BitCount
-	|| NC = NewType.BitCount
-	|| IsInt = NewType.IsInt
-
-	|| Floatness = (NewType.IsFloat<<1) + oldtype.isfloat
-	if Floatness == 0 or 3
-		if (nc == oc) and (oldtype.IsSigned == newtype.IsSigned)
-			from.µtype = newtype								// same all. maybe quicker to test in one go?
-			return from
-		if isint  and  (nc > oc  or  oc == 64)
-			from.µtype = NewType
-			return from
+	if  (NewType.BitCount == OldType.BitCount)  and  NewType.IsFloat == oldtype.isfloat
+		from.µtype = newtype
+		return from
 	
 	dest = .TempOnly(exp, dest)
 	dest.µType = NewType
@@ -254,7 +245,7 @@ function TypeCastSub (|&asmstate| self, |message| exp, |ASMReg| dest, |ASMReg| f
 		
 	if oldtype.isfloat or newtype.isfloat
 		return exp.CONV(dest, from, oldtype.asmconv(newtype))*dest
-	|| sh2 = 64 - oc
+	|| sh2 = 64 - OldType.BitCount
 	return exp.BFLG(dest, from, sh2, sh2, from.signed|int|) * dest
 
 
@@ -696,6 +687,8 @@ function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
 	if d.nilreg is hoisted
 		rz = d.nilreg|int|.asm
 		rz.µtype = d.DataType
+	if (d is const) and !d.exportposition
+		return .NumToReg(m, 0, asmreg(), d.DataType)
 
 
 function Str (fn_asm)
@@ -809,6 +802,7 @@ function MakeConstFromASM (|scdecl| decl, |asmreg| Initial, |asmreg| NewValue)
 
 function DeallocStack
 	opt norefcounts
+	require !.istextual
 	|int| top = .VDecls
 	|| exp = .Last.msg
 	while top > 0

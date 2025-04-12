@@ -18,6 +18,7 @@ struct ASMState
 	|byte|						InlineDepthLimit
 	|byte|						StackSize
 	|byte|						VDecls
+	|bool|						IsTextual
 	|byte|						VTmps
 	|bool|						Inited
 	|bool|						TailInlineable
@@ -483,6 +484,7 @@ struct ASMState
 		.InlineDepthLimit = 3
 		.BasicBlock = 0
 		.VDecls = 0
+		.IsTextual = false
 		.VTmps = 32
 		.zero = nil
 		.zero.info = AsmReg()

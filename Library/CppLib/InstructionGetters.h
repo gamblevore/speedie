@@ -88,11 +88,17 @@
 #define   RotateConst_Valueu_(x)   (((uint)((x)<<20))>>20)
 
 
-#define   JCmpEq_Jmpi       ((( int)((Op)<<18))>>18)
-#define   JCmpEq_Jmpi_(x)   ((( int)((x)<<18))>>18)
+#define   JCmpEq_Bigi       ((( int)((Op)<<18))>>31)
+#define   JCmpEq_Bigi_(x)   ((( int)((x)<<18))>>31)
 
-#define   JCmpEq_Jmpu       (((uint)((Op)<<18))>>18)
-#define   JCmpEq_Jmpu_(x)   (((uint)((x)<<18))>>18)
+#define   JCmpEq_Bigu       (((uint)((Op)<<18))>>31)
+#define   JCmpEq_Bigu_(x)   (((uint)((x)<<18))>>31)
+
+#define   JCmpEq_Jmpi       ((( int)((Op)<<19))>>19)
+#define   JCmpEq_Jmpi_(x)   ((( int)((x)<<19))>>19)
+
+#define   JCmpEq_Jmpu       (((uint)((Op)<<19))>>19)
+#define   JCmpEq_Jmpu_(x)   (((uint)((x)<<19))>>19)
 
 
 #define   HALT_IsOKi       ((( int)((Op)<<28))>>28)
@@ -115,17 +121,17 @@
 #define   JCmpF_Jmpu_(x)   (((uint)((x)<<21))>>21)
 
 
-#define   JCmpI_Cmpi       ((( int)((Op)<<18))>>29)
-#define   JCmpI_Cmpi_(x)   ((( int)((x)<<18))>>29)
+#define   JCmpI_Cmpi       ((( int)((Op)<<18))>>30)
+#define   JCmpI_Cmpi_(x)   ((( int)((x)<<18))>>30)
 
-#define   JCmpI_Cmpu       (((uint)((Op)<<18))>>29)
-#define   JCmpI_Cmpu_(x)   (((uint)((x)<<18))>>29)
+#define   JCmpI_Cmpu       (((uint)((Op)<<18))>>30)
+#define   JCmpI_Cmpu_(x)   (((uint)((x)<<18))>>30)
 
-#define   JCmpI_Jmpi       ((( int)((Op)<<21))>>21)
-#define   JCmpI_Jmpi_(x)   ((( int)((x)<<21))>>21)
+#define   JCmpI_Jmpi       ((( int)((Op)<<20))>>20)
+#define   JCmpI_Jmpi_(x)   ((( int)((x)<<20))>>20)
 
-#define   JCmpI_Jmpu       (((uint)((Op)<<21))>>21)
-#define   JCmpI_Jmpu_(x)   (((uint)((x)<<21))>>21)
+#define   JCmpI_Jmpu       (((uint)((Op)<<20))>>20)
+#define   JCmpI_Jmpu_(x)   (((uint)((x)<<20))>>20)
 
 
 #define   JCmpK_Ki       ((( int)((Op)<<13))>>23)
@@ -141,24 +147,17 @@
 #define   JCmpK_Jmpu_(x)   (((uint)((x)<<22))>>22)
 
 
-#define   BraBytes_Bytesi       ((( int)((Op)<<13))>>30)
-#define   BraBytes_Bytesi_(x)   ((( int)((x)<<13))>>30)
+#define   Bra_Bytezi       ((( int)((Op)<<13))>>30)
+#define   Bra_Bytezi_(x)   ((( int)((x)<<13))>>30)
 
-#define   BraBytes_Bytesu       (((uint)((Op)<<13))>>30)
-#define   BraBytes_Bytesu_(x)   (((uint)((x)<<13))>>30)
+#define   Bra_Bytezu       (((uint)((Op)<<13))>>30)
+#define   Bra_Bytezu_(x)   (((uint)((x)<<13))>>30)
 
-#define   BraBytes_Jmpi       ((( int)((Op)<<15))>>15)
-#define   BraBytes_Jmpi_(x)   ((( int)((x)<<15))>>15)
+#define   Bra_Jmpi       ((( int)((Op)<<15))>>15)
+#define   Bra_Jmpi_(x)   ((( int)((x)<<15))>>15)
 
-#define   BraBytes_Jmpu       (((uint)((Op)<<15))>>15)
-#define   BraBytes_Jmpu_(x)   (((uint)((x)<<15))>>15)
-
-
-#define   Bra_Jmpi       ((( int)((Op)<<13))>>13)
-#define   Bra_Jmpi_(x)   ((( int)((x)<<13))>>13)
-
-#define   Bra_Jmpu       (((uint)((Op)<<13))>>13)
-#define   Bra_Jmpu_(x)   (((uint)((x)<<13))>>13)
+#define   Bra_Jmpu       (((uint)((Op)<<15))>>15)
+#define   Bra_Jmpu_(x)   (((uint)((x)<<15))>>15)
 
 
 #define   Loop_Jmpi       ((( int)((Op)<<18))>>18)

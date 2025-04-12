@@ -95,6 +95,7 @@ extend ASMState
 
 	function TextFuncSub (|message| m)
 		opt NoRefCounts
+		.IsTextual = true
 		.vdecls = 31 // no other choice. Register requester will fail... otherwise.
 					 // i forgot how this helps. WHAT GOES WRONGGG????
 		for ch in .LoadTitle(m)

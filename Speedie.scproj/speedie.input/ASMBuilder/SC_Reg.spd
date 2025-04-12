@@ -101,13 +101,16 @@ datatype ASMReg (uint64)
 		.needfat.const = value
 
 	function IsConst (|int64| val, |bool|)
-		return  (self is constoutput) and (.const == val)
+		return  (self is ConstOutput) and (.const == val)
 	
 	function Negate (|bool| Neg=true, |asmreg|)
 		return (self|uint64| xor (neg << 16)|uint64|)|asmreg|
 	
 	function BitCount (|int|)
 		return .µtype.bitcount
+		
+	function Bytes (|int|)
+		return .µType._shift
 	
 	function FatIndex (|uint|)
 		return self|uint64| >> 48
@@ -145,9 +148,7 @@ datatype ASMReg (uint64)
 		return self|datatypecode|.isint
 
 	function IntDivType (|int|)
-		|| FourBytes = .µtype._shift == 2
-			rz = 2
-		rz += !.signed
+		return (!.signed)|int|
 	
 	function Signed (|bool|)
 		return self|DataTypeCode|.issigned

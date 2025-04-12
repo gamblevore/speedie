@@ -1,0 +1,6 @@
+
+
+function message.RET (|asmreg| r1=asmreg(), |&fatasm|)
+	return .RET(r1, asmreg(), asmreg(), 0, 0)
+
+

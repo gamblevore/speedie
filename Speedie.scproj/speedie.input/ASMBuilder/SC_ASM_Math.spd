@@ -5,13 +5,6 @@ prototype fn_ASMConstifier  (|asmreg| L, |asmreg| R, |int64|)
 
 
 extend asmreg
-//	function CondAnswer (|asmreg|)
-//		.µtype = DataTypeCode.bool
-//		is AlreadyNegated
-//		is CondAnswer
-//		isnt negate
-//		return self
-
 	function BoolAnswer (|asmreg|)
 		.µtype = DataTypeCode.bool
 		
@@ -27,31 +20,38 @@ extend ASMState
 	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asmreg|)
 		|| negate = dest is negate
 		|| Res = dest.BoolAnswer						// Hmmm... so what should it be?
-		if  L is constoutput  and  R is constoutput
+		if  L is ConstOutput  and  R is ConstOutput
 			.Nop2Consts(r, l)
 			|| num = ((l.const==r.const)!=negate)|int|
-			return .NumToReg(exp, num, res, datatypecode.bool)
+			return .NumToReg(exp, num, res, DataTypeCode.bool)
+		
 		if dest isnt CondRequest
-			dest = .TempTyped(exp, dest, typebool!.typenormal)
+			dest = .TempTyped(exp, dest, TypeBool!.typenormal)
 			return exp.CMPB(dest, L, R, negate|int| xor 1) * dest
-
+		
+		|| RBig = r.isbig|int|
+		target debug
+			if r.reg and l.reg
+				if rbig != l.isbig|int| // sigh
 		if l.reg
 			if negate
-				return exp.JMPN(r,l,0) * res
-			return exp.JMPE(r,l,0) * res
+				return exp.JMPN(r, l, RBig, 0) * res
+			return exp.JMPE(r, l, RBig, 0) * res
+		
+		|| rb = r.bytes
 		if negate
-			return exp.JBAN(r,0) * res
-		return exp.JBOR(r,0) * res
+			return exp.JBAN(r, rb, 0) * res
+		return exp.JBOR(r, rb, 0) * res
 
 	
-	function Exists (|asmreg| dest, |asmreg| L, |message| exp, |asmreg|)
+	function Exists (|ASMReg| dest, |ASMReg| L, |message| exp, |ASMReg|)
 		opt inline
-		return .Equals(dest.negate, l, asmreg(), exp)
+		return .Equals(dest.negate, l, ASMReg(), exp)
 
 
 	function EqualsSame (fn_opasm)
 		|| num = (dest isnt negate)|int|
-		return .NumToReg(exp, num, dest, datatypecode.bool).BoolAnswer
+		return .NumToReg(exp, num, dest, DataTypeCode.bool).BoolAnswer
 	
 	
 	function Equals (fn_opasm)
@@ -83,29 +83,37 @@ extend ASMState
 		|| f = r.fat$
 
 		|| k = f.const - swapped
-		require k.fits(9, true)	
+		require !r.isbig and k.fits(9, true)	
 		.NopConst(R)
 		k = k|uint64|.trim(9)
 		|| J = exp.JMPK(l, k, 0) 
-		if mode&1
-			J._op = asm.jmpc
+		j._op += mode&1						// jmpkn
 		return J * dest
 
 
 	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
-		mode |= !r.signed<<2
+//		CmpSub(0,  A >   B);
+//		CmpSub(1,  A <=  B);
+//		CmpSub(2, (u64)A >  (u64)B); default:;
+//		CmpSub(3, (u64)A <= (u64)B);
+		if mode > 1 // wat?
+		mode |= !r.signed<<1
 		mode ^= dest is Negate
 		#!do this AFTER? We lose CondAnswer otherwise
 		dest = dest.BoolAnswer
 		if l is ConstOutput and r is ConstOutput
 			return .ConstCompareInt(dest, L, R, exp, Mode)
 		if Dest isnt CondAnswer
-			return exp.CMPI(dest, L, R, mode) * dest
+			|| fat = exp.CMPI(dest, L, R, mode)
+			fat._op += !l.isbig
+			return fat * dest
 
 		if (mode <= 1 or (l.bitcount >= 32 and r.bitcount >= 32)) and (l is RealConst or r is RealConst) // only one is a const
 			|| kk = .KompareIntK(dest, l, r, exp, mode&~4)
 				return kk
-		return exp.JMPI(L, R, mode, 0) * dest
+		|| fat = exp.JMPI(L, R, mode, 0)
+		fat._op += !l.isbig
+		return fat * dest
 
 
 	function ConstCompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
@@ -171,8 +179,8 @@ extend ASMState
 
 
 	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |int| Mode,  |asmreg|)
-/*	 (A >  B)    (A <= B)    (A == B)    (A != B)	*/
-		if dest.IsInt
+/*	 (A >  B)    (A <= B)	*/
+		if l.IsInt
 			return .CompareInt(dest, l, r, exp, mode)
 		return .CompareFloat(dest, l, r, exp, mode)
 	
@@ -240,13 +248,11 @@ extend ASMState
 			return exp.BFLG(dest, l,  Pow2-1, 0, 0) * Dest	// y = x * 4  -->  y = x << 2
 
 		|| five = .IntPowerOfTwo(r, 1) // 5 or 9 or 17 or 33, etc
-			if dest.IsBig
-				return exp.ADD(dest, l, l, five-1) * dest
-			return  exp.add32(dest, l, l, five-1) * dest
-		
+			return exp.add(Dest, l, l, five-1) * dest
+
 		|| RR = r.const
 		if .CanAddK(r,RR)								// a - 1,  a + 1
-			return exp.MULK(dest, L, RR) * dest
+			return exp.MULK(dest, L, RR) * dest			// what about 32-bit overflow? we need a new mulk?
 
 
 	function QuickFloatMul    (fn_OpASM)
@@ -353,11 +359,11 @@ extend ASMState
 		  else
 			|| v = .NumToReg(exp, lmul, asmreg(), datatypecode.uint)
 			if l isnt alternate								// x = lptr + r*12
-				fat = exp.MUL(dest, R, V, L)
+				fat = exp.MUL(dest, R, V, L)				// always pointer-sized
 			  else											// x = (lptr - rptr)/12
-				exp.SUB(dest, L, R, ASMReg())
+				exp.SUB(dest, L, R, ASMReg())				// always pointer-sized
 				|| uinttype = 0, debugger
-				fat = exp.DIV(dest, ASMReg(), dest, V, uinttype)  
+				fat = exp.DIV(dest, ASMReg(), dest, V, uinttype)  // same
 			  
 		return fat * Dest
 	
@@ -591,7 +597,7 @@ extend ASMState
 		|| K = .const(R, 6, false)
 			return .BFLG_Const(exp, dest, l, 0, k)
 		
-		|| fat = exp.BRSH(dest, L, R, 0)
+		|| fat = exp.BRSH(dest, L, R, 64-l.bitcount)
 		if l.Signed
 			fat._op = asm.brss
 		return fat * dest	
@@ -603,7 +609,7 @@ extend ASMState
 		|| K = .const(R, 6, false)
 			return .BFLG_Const(exp, dest, l,  K, 0)
 		
-		return exp.BLSH(dest, L, R, 0) * dest
+		return exp.BLSH(dest, L, R, 64-l.bitcount) * dest
 
 
 	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| Src, |uint| up, |uint| down, |asmreg|)

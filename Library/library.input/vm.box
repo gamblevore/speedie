@@ -45,39 +45,36 @@ forms
 	JCmpEq	// cmpeq:
 		r1		r
 		r2		r
+		Big		1
 		Jmp		j
 
-	HALT	// cmpeq:
+	HALT
 		r1		r
 		r2		r
 		r3		r
 		r4		r
 		IsOK	4
 
-	JCmpF	// cmp:
+	JCmpF
 		r1		r
 		r2		r
 		Cmp		3
 		Jmp		j
 
-	JCmpI	// cmp:
+	JCmpI
 		r1		r
 		r2		r
-		Cmp		3
+		Cmp		2
 		Jmp		j
 
-	JCmpK	// cmp:
+	JCmpK	 // still needs the big/small thing. do later.
 		r1		r
 		K		9
 		Jmp		j
 
-	BraBytes	// BraBytes:
-		r1		r
-		Bytes	2
-		Jmp		j
-
 	Bra		// bra:
 		r1		r
+		Bytez	2
 		Jmp		j
 	
 	Loop
@@ -415,15 +412,6 @@ POS 6
 		else
 			i1 = i2 >> Div2_Shu
 
-/**/ ADD32  (Shift)
-		ii1 = ii2 + (ii3 << Shift_Shu)
-/**/ SUB32  (Shift)              					// must come after ADD
-		ii1 = (ii2 - ii3) >> Shift_Shu
-/**/ MUL32  (U4)
-		ii1 = (ii2 * ii3) + ii4
-/**/ DIV32 (Div)
-		DivMath32(r, Op)
-
 /**/ CLAM (Float) // not really a float
 		if (Float_Du)
 			i1 = (std_min(std_max(i2,i3),i4))
@@ -441,7 +429,7 @@ POS 6
 /**/ BRSS  (Shift)
 		i1 = (i2 << Shift_Shu) >> i3
 /**/ BRSH  (Shift)
-		u1 = ((u2 << Shift_Shu) >> u3) >> Shift_Shu
+		u1 = ((u2 << Shift_Shu) >> Shift_Shu) >> u3
 /**/ BLSH  (Shift) 
 		u1 = ((u2 << u3) << Shift_Shu) >> Shift_Shu
 /**/ BAND  (Shift)
@@ -477,63 +465,54 @@ POS 6
 /**/ CMPI  (JCmpI)
 	CompI(r, Op)
 
+/**/ CMPIS  (JCmpI)
+	CompIS(r, Op)
+
 /**/ CMPF  (JCmpF)
 	CompF(r, Op)
 
 
 
 #!						 (((((Branches)))))
-/**/ JSWI (jcmpeq)
+/**/ JSWI (JCmpEq)
 		Code += n1+n2+JCmpEq_Jmpi
 
 /**/ JUMP (jump)
 		Code += l0
 
 /**/ JMPI  (JCmpI)
-		__
 		Code = JumpI(r, Op, Code)
-		___
+
+/**/ JMPIS  (JCmpI)
+		Code = JumpIS(r, Op, Code)
+
 /**/ JMPF  (JCmpF)
-		__
 		Code = JumpF(r, Op, Code)
-		___
+
 /**/ JMPE  (JCmpEq)
-		__
 		Code = JumpEq(r, Op, Code)
-		___
+
 /**/ JMPN  (JCmpEq)
-		__
 		Code = JumpNeq(r, Op, Code)
-		___
-/**/ JMPK  (JCmpK)
-		__
+
+/**/ JMPK  (JCmpK) // still needs the big/small thing
 		Code = JumpK(r, Op, Code)
-		___
-/**/ JMPC  (JCmpK)
-		__
-		Code = JumpC(r, Op, Code)
-		___
+
+/**/ JMPKN  (JCmpK)
+		Code = JumpKN(r, Op, Code)
+	
 /**/ JBOR  (Bra)
-		__
-		if (i1)
+		if (u1<<(64-(8<<Bra_Bytezu)))
 			Code += Bra_Jmpi
-		___
-/**/ JBAN  (Bra)					
-		__
-		if (!i1)
+/**/ JBAN  (Bra)				
+		if (!(u1<<(64-(8<<Bra_Bytezu))))
 			Code += Bra_Jmpi
-		___
 /**/ LUPD  (Loop)			 	// same
-		__
 		if (i1-- > i2)
 			Code += Loop_Jmpi
-		___
 /**/ LUPU  (Loop)				// assume uint64
-		__
 		if (i1++ < i2)
 			Code += Loop_Jmpi
-		___
-
 
 
 #!						 (((((Refs)))))

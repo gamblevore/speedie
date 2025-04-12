@@ -288,7 +288,24 @@ function AndOrRest2 (|int| a, |int| b) // more stragglers
 		x4 = (a and a)|int|
 
 	if 0 or a: a = 3
-	
+
+
+function Nill (|int| a, |int| b,  |bool|)
+	if a == nil
+		return true
+	if b == 0
+		return true
+
+function Floats (|float| A, |float| B, |bool|)
+	if A < B
+		return true
+	return A > B
+
+
+function Floats2 (|float64| A, |float64| B, |bool|)
+	if A < B
+		return true
+	return A > B
 
 
 function Consts (|float64|)

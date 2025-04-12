@@ -313,12 +313,19 @@ bool CompI_ (VMRegister* r, ASM Op) {
 	switch (JCmpI_Cmpu) {
 		CmpSub(0,  A >   B);
 		CmpSub(1,  A <=  B);
-		CmpSub(2,  A ==  B);			// seems like these 4 should come out
-		CmpSub(3,  A !=  B);			// they can be done by jumpeq
-		CmpSub(4, (u64)A >  (u64)B);
-		CmpSub(5, (u64)A <= (u64)B);
-		CmpSub(6, (u64)A == (u64)B); default:;	// also
-		CmpSub(7, (u64)A != (u64)B);			// also
+		CmpSub(2, (u64)A >  (u64)B); default:;
+		CmpSub(3, (u64)A <= (u64)B);
+	};
+}
+
+bool CompIS_ (VMRegister* r, ASM Op) {
+	auto A = ii1;
+	auto B = ii2;
+	switch (JCmpI_Cmpu) {
+		CmpSub(0,  A >   B);
+		CmpSub(1,  A <=  B);
+		CmpSub(2, (u32)A >  (u64)B); default:;
+		CmpSub(3, (u32)A <= (u64)B);
 	};
 }
 
@@ -350,6 +357,15 @@ AlwaysInline void CompI (VMRegister* r, ASM Op) {
 	r[JCmpI_Jmpu].Int = CompI_(r, Op);
 }
 
+
+AlwaysInline ASM* JumpIS (VMRegister* r, ASM Op, ASM* Code) {
+	return Code + CompIS_(r, Op)*JCmpI_Jmpi;
+}
+		
+AlwaysInline void CompIS (VMRegister* r, ASM Op) {
+	r[JCmpI_Jmpu].Int = CompIS_(r, Op);
+}
+
 AlwaysInline ASM* JumpF (VMRegister* r, ASM Op, ASM* Code) {
 	return Code + CompF_(r, Op)*JCmpF_Jmpi;
 }
@@ -362,11 +378,11 @@ AlwaysInline uint64 BitComp (VMRegister* r, ASM Op) { // cmpb
 	auto i = CmpB_Invu;
 	auto A = u2;
 	auto B = u3;
-	if (i&2)	// do we even need these? just remove?
+	if (i&2)								// do we even need these? just remove?
 		A = ~A;
-	if (i&4)	// seems like we should remove these...
+	if (i&4)								// seems like we should remove these...
 		B = ~B;
-	return (A!=B) xor (i&1); // keep this though...
+	return (A!=B) xor (i&1);				// keep this though...
 	// the first two could be "future upgrades"...?
 }
 
@@ -385,12 +401,12 @@ AlwaysInline ASM* JumpNeq (VMRegister* r, ASM Op, ASM* Code) {
 
 AlwaysInline ASM* JumpK (VMRegister* r, ASM Op, ASM* Code) {
 	auto K = JCmpK_Ki;
-	return Code + JCmpK_Jmpi * (i1 > K);
+	return Code + JCmpK_Jmpi * (ii1 > K);
 }
 
-AlwaysInline ASM* JumpC (VMRegister* r, ASM Op, ASM* Code) {
+AlwaysInline ASM* JumpKN (VMRegister* r, ASM Op, ASM* Code) {
 	auto K = JCmpK_Ki;
-	return Code + JCmpK_Jmpi * (i1 <= K);
+	return Code + JCmpK_Jmpi * (ii1 <= K);
 }
 
 

@@ -34,10 +34,6 @@ function message.OperatorMul (|asm| op, |&fatasm|)
 	return a.start
 
 
-function message.RET (|asmreg| r1=asmreg(), |&fatasm|)
-	return .ret(r1, asmreg(), asmreg(), 0, 0)
-
-
 target debug
 	function scdecl.ASMSanity 
 		ifn .iscarray or .pointercount or .isobject or .isbarestruct

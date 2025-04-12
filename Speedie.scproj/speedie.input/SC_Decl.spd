@@ -310,6 +310,9 @@ class SCDecl (SCNamed) {
 		|| bits	= bme max bt		// what about a float + an int? f64 right?
 		if Op
 			if Op is MakesSigned				// -
+				if bme == 32 and bt == 32		// int - uint should stay as int. Or else its surprising! 
+					return typeint
+				// 
 				|| bits2 = (bme + !s.issigned) max (bt + !t.issigned)
 				if bits2 > 32
 					return typeint64

@@ -83,14 +83,6 @@
 	else 
 	i1 = i2 >> Div2_Shu
 ;
-ı ADD32: _
-	ii1 = ii2 + (ii3 << Shift_Shu);
-ı SUB32: _
-	ii1 = (ii2 - ii3) >> Shift_Shu;
-ı MUL32: _
-	ii1 = (ii2 * ii3) + ii4;
-ı DIV32: _
-	DivMath32(r, Op);
 ı CLAM: _
 	if (Float_Du) 
 	i1 = (std_min(std_max(i2, i3), i4))
@@ -103,7 +95,7 @@
 ı BRSS: _
 	i1 = (i2 << Shift_Shu) >> i3;
 ı BRSH: _
-	u1 = ((u2 << Shift_Shu) >> u3) >> Shift_Shu;
+	u1 = ((u2 << Shift_Shu) >> Shift_Shu) >> u3;
 ı BLSH: _
 	u1 = ((u2 << u3) << Shift_Shu) >> Shift_Shu;
 ı BAND: _
@@ -136,60 +128,44 @@
 ;
 ı CMPI: _
 	CompI(r, Op);
+ı CMPIS: _
+	CompIS(r, Op);
 ı CMPF: _
 	CompF(r, Op);
 ı JSWI: _
 	Code += n1 + n2 + JCmpEq_Jmpi;
 ı JUMP: _
 	Code += l0;
-ı JMPI: 
-	__;
+ı JMPI: _
 	Code = JumpI(r, Op, Code);
-	___;
-ı JMPF: 
-	__;
+ı JMPIS: _
+	Code = JumpIS(r, Op, Code);
+ı JMPF: _
 	Code = JumpF(r, Op, Code);
-	___;
-ı JMPE: 
-	__;
+ı JMPE: _
 	Code = JumpEq(r, Op, Code);
-	___;
-ı JMPN: 
-	__;
+ı JMPN: _
 	Code = JumpNeq(r, Op, Code);
-	___;
-ı JMPK: 
-	__;
+ı JMPK: _
 	Code = JumpK(r, Op, Code);
-	___;
-ı JMPC: 
-	__;
-	Code = JumpC(r, Op, Code);
-	___;
-ı JBOR: 
-	__;
-	if (i1) 
+ı JMPKN: _
+	Code = JumpKN(r, Op, Code);
+ı JBOR: _
+	if (u1 << (64 - (8 << Bra_Bytezu))) 
 	Code += Bra_Jmpi
 ;
-	___;
-ı JBAN: 
-	__;
-	if (!i1) 
+ı JBAN: _
+	if (!(u1 << (64 - (8 << Bra_Bytezu)))) 
 	Code += Bra_Jmpi
 ;
-	___;
-ı LUPD: 
-	__;
+ı LUPD: _
 	if (i1-- > i2) 
 	Code += Loop_Jmpi
 ;
-	___;
-ı LUPU: 
-	__;
+ı LUPU: _
 	if (i1++ < i2) 
 	Code += Loop_Jmpi
 ;
-	___;
 ı RFAP: _
 	SetRefApart(r, Op);
 ı RFST: _
