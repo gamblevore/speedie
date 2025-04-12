@@ -301,42 +301,30 @@ forms
 		u3 = (uint64)(&u4)
 
 /**/ RET (Ret)				// ret: 
-		__ 
 		Code = ReturnFromFunc(vm, r, Op)
-		___
 
 POS 2
 	TAIL (Tail)
-		__
 		TailStack(vm, r, Code, Op)
-		___
 
 
 POS 24 // force position
 	FNC (Func)			// func: 
-		__
 		Code = BumpStack(vm, r, Code+1, Op, *Code)
-		___
 
 POS 25
 	FNC3 (Func)
-		__
 		Code = BumpStack(vm, r, Code+2, Op, Code64)
-		___
 
 POS 26
 	FNCX (ForeignFunc)
-		__
 		ForeignFunc(vm, Code, r, Op, *Code)
 		Code++ 
-		___
 
 POS 27
 	FNCX3 (ForeignFunc)
-		__
 		ForeignFunc(vm, Code, r, Op, Code64) 
 		Code += 2
-		___
 
 
 /**/ ALLO (Alloc)

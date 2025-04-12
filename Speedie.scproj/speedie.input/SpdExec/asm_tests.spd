@@ -8,6 +8,20 @@ class asm_test_obj
 module ASMExamples {
 |int| Glob
 |int| Bolg
+
+function Grab
+	|| b = '1'
+	.grab2(&b)
+	
+function grab2 (|?&byte| b, |int|)
+	|| fs = FastString()
+	fs <~ ":"
+	|| x = asm_test_obj()
+	x.i++
+	(fs)
+	x.i++
+	return (x.i + 10)*10
+
 target pack { 
 
 
@@ -21,16 +35,12 @@ function IfEmpty (|int| x)
 	if x
 		0
 	  else
-		.fs
+		.fs(nil)
+	
+function AddStuff (|int64| A, |int| B, |int64|)
+	|| X = A-B // shouldn't rely on B being bit-correct.
+	return A+B
 
-
-function FS
-	|| fs = FastString()
-	fs <~ ":"
-	|| x = asm_test_obj()
-	x.i++
-	(fs)
-	x.i++
 	
 function CheckSize
 	opt norefcounts

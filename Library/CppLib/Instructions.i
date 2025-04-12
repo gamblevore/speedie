@@ -2,10 +2,8 @@
 	if (u2 == u1 and u3 == u4) 
 	VMFinish
 ;
-ı TAIL: 
-	__;
+ı TAIL: _
 	TailStack(vm, r, Code, Op);
-	___;
 ı KNST2: _
 	LoadConst(r, Op, *Code++);
 ı KNST3: _
@@ -13,24 +11,16 @@
 	Code += 2;
 ı GMEM: _
 	LoadGConst(r, Op, *Code++);
-ı FNC: 
-	__;
+ı FNC: _
 	Code = BumpStack(vm, r, Code + 1, Op, *Code);
-	___;
-ı FNC3: 
-	__;
+ı FNC3: _
 	Code = BumpStack(vm, r, Code + 2, Op, Code64);
-	___;
-ı FNCX: 
-	__;
+ı FNCX: _
 	ForeignFunc(vm, Code, r, Op, *Code);
 	Code++;
-	___;
-ı FNCX3: 
-	__;
+ı FNCX3: _
 	ForeignFunc(vm, Code, r, Op, Code64);
 	Code += 2;
-	___;
 ı NOOP: _
 	i1 = i1;
 	// NOOP
@@ -40,10 +30,8 @@
 ı GRAB: _
 	u1 = (uint64)(&u2);
 	u3 = (uint64)(&u4);
-ı RET: 
-	__;
+ı RET: _
 	Code = ReturnFromFunc(vm, r, Op);
-	___;
 ı ALLO: _
 	AllocStack(vm, r, Op);
 ı SWAP: _
