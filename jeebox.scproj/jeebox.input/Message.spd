@@ -10,9 +10,9 @@ class Message (list)
 		cpp_part Msg
 		visible true
 
-	description "The Message class is used like this: First you parse a string to create a tree of nodes.
+	description "Usage: Parse a string, get back a tree of nodes.
 
-After that, you now have a tree-data-structure that represents your data. The Message class is similar to XML or JSON or even a sourcecode-AST. But superior to all of them.
+The tree-data-structure represents your data. The Message class is similar to XML or JSON or even a sourcecode-AST. But superior to all of them.
 	"
 ////////////////////////////////
 	contains Message
