@@ -136,7 +136,7 @@ function PerryIDE.ActualCompile (|string| operation)
 		args <~ "--perry"
 
 	.LogOneAction(@emb + speedie + " " + args.render)
-	.compilr = process.Stream(speedie, args)		#require
+	.compilr = process.Stream(speedie, args, faststring(), faststring())		#require
 	.SpeedieText.text = ""
 	
 	(.BuildButton isnt enabled)

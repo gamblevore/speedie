@@ -416,11 +416,6 @@ class PerryIDE (Window)
 					fl.SmartName = "file".pluralize(fl.LastFileCount)
 
 
-	function TestCompilerAlive (|bool|)
-		.CheckNotCrashed((&.feedback)|&process|, "feedback")
-		return .CheckNotCrashed(.compilr,  "compiler")
-
-
 	function CheckNotCrashed (|&Process| pp, |string| what, |bool|)
 		|| p = (pp[])|process--|
 		require p
@@ -465,7 +460,10 @@ class PerryIDE (Window)
 			if !.focus
 				.setfocus(.editme) // shouldn't need this... why doesn't .focus setter get called?
 		.UpdateDebuggedApp(false)
-		.TestCompilerAlive
+
+		.CheckNotCrashed((&.feedback)|&process|, "feedback")
+		.CheckNotCrashed(.compilr,  "compiler")
+
 		|| f = .feedback
 			.SpeedieMsgReceive(f)
 		.UpdateSearchText

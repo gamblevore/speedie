@@ -156,7 +156,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			require pico.replace(.pico)
 		
 		if delay > 0
-/			.DelaySpawnTill = date.now + delay
+			.DelaySpawnTill = date.now + delay
 			return true
 		return .Start_
 
