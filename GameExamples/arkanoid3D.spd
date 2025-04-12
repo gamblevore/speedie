@@ -50,7 +50,7 @@ class Breakout (Window)
 				.Blocks <~ block
 	
 	
-	function BounceBar (|vobject| bar, |vobject| B,  |bool|)
+	function BounceBar (|vobject| bar, |vobject| B)
 		|| Hit = bar.OverlapsBlock(B)
 		require hit.Exists
 		|| v = b.Velocity
@@ -59,8 +59,7 @@ class Breakout (Window)
 		|| D = math.RangeConvert(rr.x1, rr.x2, -1, 1).Convert(b.pos.x).spow2
 		v.y = -v.y
 		v.x = D*.ballspeed
-		b.Velocity = v.Normal*.ballspeed
-		return true
+		b.Velocity = v.Normal * .ballspeed
 
 
 	function Bounds (|vobject| b)
