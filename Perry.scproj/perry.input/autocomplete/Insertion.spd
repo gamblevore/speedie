@@ -1,5 +1,4 @@
 
-
 helper textview.RangeCheck (|int| r, |message| func_name, |message| prms, |bool|)
 	|| l = func_name.position
 	|| a = func_name.after 
@@ -11,6 +10,8 @@ helper textview.RangeCheck (|int| r, |message| func_name, |message| prms, |bool|
 
 helper Message.IsTextFuncLike (|bool|)
 	opt norefcounts
+	|| fn = .owningfunc(true)
+		return false
 	|| a = .first
 	require a == @thg or @dot
 	|| b = a.next

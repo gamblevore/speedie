@@ -468,7 +468,7 @@ struct FatASM
 			d = d.JumpTo!
 			expect (++n < 30) (.msg)
 		
-		if  (d isa asm.ret or d isa asm.tail)  and  (self isa asm.jump)
+		if  (d isa asm.ret or (d isa asm.tail and options.optimise >= 4))  and  (self isa asm.jump)
 			.CopyFrom(d) // always jumping into an exit.
 			return true
 		
