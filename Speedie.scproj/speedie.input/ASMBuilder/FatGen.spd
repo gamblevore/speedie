@@ -356,6 +356,16 @@ function message.BLSH (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
+function message.BSTT (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+	visible
+	rz = self * asm.BSTT
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+}
+
+
 function message.BAND (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
 	visible
 	rz = self * asm.BAND
@@ -376,9 +386,9 @@ function message.BXOR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.BOR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.BORR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
 	visible
-	rz = self * asm.BOR
+	rz = self * asm.BORR
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
@@ -396,13 +406,39 @@ function message.BNOT (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.BSTT (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+function message.BANDK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
 	visible
-	rz = self * asm.BSTT
+	rz = self * asm.BANDK
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.reginput(3) = r4
+	rz.numinput(2) = K
+}
+
+
+function message.BXORK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+	visible
+	rz = self * asm.BXORK
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = K
+}
+
+
+function message.BORRK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+	visible
+	rz = self * asm.BORRK
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = K
+}
+
+
+function message.BNOTK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+	visible
+	rz = self * asm.BNOTK
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = K
 }
 
 

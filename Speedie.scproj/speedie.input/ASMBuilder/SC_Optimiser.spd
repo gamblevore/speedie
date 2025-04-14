@@ -51,7 +51,7 @@ function FatASM.ReplaceReg (|uint| Dest, |uint| New, |bool|)
 
 function fatasm.MiniOpt (|asmstate| A)
 // we aren't doing a full optimiser. A few mini-opts could be nice
-	if self isa asm.bor
+	if self isa asm.borr
 		.OptBor(A)
 
 

@@ -580,7 +580,7 @@ extend ASMState
 					return r
 		if (l is ConstOutput)
 			swap (l) (r)
-		return .BitMaker(dest, l, r, exp, asm.bor)
+		return .BitMaker(dest, l, r, exp, asm.borr)
 
 			
 	function BitAnd (fn_opasm)		
@@ -602,11 +602,19 @@ extend ASMState
 	
 	
 	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
-		|| k = .Const(R, 9, op!=asm.bor)
-			r = asmreg()
-		  else
-			k = 0
-		|| fat = exp.BAND(dest, L, R, k) 
+		if asm.BORRK!=asm.borr+4 // what?
+
+		|| k = .Const(R, 14, op!=asm.BORR)
+		if k > 0 // easier to optimise bor than bork?
+			|| fat = exp.BANDK(dest, L, K) 
+			fat._op = op+4
+			return fat * Dest
+
+		|| Clear = l.BitCount - r.BitCount
+		if Clear < 0
+			swap (l) (r)
+			clear = -clear
+		|| fat = exp.BAND(dest, L, R, Clear max 0) 
 		fat._op = op
 		return fat * Dest
 

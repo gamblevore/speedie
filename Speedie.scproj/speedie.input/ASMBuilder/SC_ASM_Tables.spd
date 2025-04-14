@@ -101,7 +101,7 @@ function ReturnOpt (|&ASMState| self, |int| Ret, |int| bb, |bool|)
 	|| l = .last
 	
 	// seems the wrong order... it is:   bor, bor, bor, func.   Not:   func, bor, bor, bor
-	while l isa asm.BOR
+	while l isa asm.BORR
 		Ret = PreOptBOR(self, l, Ret) #require
 		l--
 		

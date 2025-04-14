@@ -445,16 +445,25 @@ POS 6
 
 
 #!						 (((((BitOps)))))
-/**/ BAND  (Shift)
-		u1 = (u2 & (u3 << Shift_Shu) >> Shift_Shu)
-/**/ BXOR  (Shift)
-		u1 = (u2 ^ (u3 << Shift_Shu) >> Shift_Shu)
-/**/ BOR   (Shift)
-		u1 = (u2|||(u3 << Shift_Shu) >> Shift_Shu)
-/**/ BNOT  (Shift)
-		u1 = (~u2&(~u3 << Shift_Shu) >> Shift_Shu)
 /**/ BSTT  (U4)
 		i1 = 0 // bitstats(u2, u3, u4)
+
+/**/ BAND  (Shift)
+		u1 = (u2  &  ((u3 << Shift_Shu) >> Shift_Shu))
+/**/ BXOR  (Shift)
+		u1 = (u2  ^  ((u3 << Shift_Shu) >> Shift_Shu))
+/**/ BORR  (Shift)
+		u1 = (u2 ||| ((u3 << Shift_Shu) >> Shift_Shu))
+/**/ BNOT  (Shift)
+		u1 = (~u2 & ((~u3 << Shift_Shu) >> Shift_Shu))
+/**/ BANDK  (AddK)
+		u1 = (u2  &  U2_Li)
+/**/ BXORK  (AddK)
+		u1 = (u2  ^  U2_Li)
+/**/ BORRK   (AddK)
+		u1 = (u2 ||| U2_Lu) // unsigned!
+/**/ BNOTK  (AddK)
+		u1 = (~u2 & U2_Li)
 
 
 

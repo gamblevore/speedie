@@ -94,16 +94,24 @@
 	u1 = ((u2 << Shift_Shu) >> Shift_Shu) >> u3;
 ı BLSH: _
 	u1 = ((u2 << u3) << Shift_Shu) >> Shift_Shu;
-ı BAND: _
-	u1 = (u2 & (u3 << Shift_Shu) >> Shift_Shu);
-ı BXOR: _
-	u1 = (u2 ^ (u3 << Shift_Shu) >> Shift_Shu);
-ı BOR: _
-	u1 = (u2 | (u3 << Shift_Shu) >> Shift_Shu);
-ı BNOT: _
-	u1 = (~u2 & (~u3 << Shift_Shu) >> Shift_Shu);
 ı BSTT: _
 	i1 = 0;
+ı BAND: _
+	u1 = (u2 & ((u3 << Shift_Shu) >> Shift_Shu));
+ı BXOR: _
+	u1 = (u2 ^ ((u3 << Shift_Shu) >> Shift_Shu));
+ı BORR: _
+	u1 = (u2 | ((u3 << Shift_Shu) >> Shift_Shu));
+ı BNOT: _
+	u1 = (~u2 & ((~u3 << Shift_Shu) >> Shift_Shu));
+ı BANDK: _
+	u1 = (u2 & U2_Li);
+ı BXORK: _
+	u1 = (u2 ^ U2_Li);
+ı BORRK: _
+	u1 = (u2 | U2_Lu);
+ı BNOTK: _
+	u1 = (~u2 & U2_Li);
 ı CMPB: _
 	u1 = BitComp(r, Op);
 ı TERN: _
