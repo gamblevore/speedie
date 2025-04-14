@@ -252,34 +252,77 @@ function message.DIV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| 
 }
 
 
-function message.DIV2 (|asmreg| r1, |asmreg| r2, |int| Sh, |int| Add, |&fatasm|) {
+function message.DIVS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Kind, |&fatasm|) {
+	visible
+	rz = self * asm.DIVS
+	rz.dest(0, r1)
+	rz.dest(1, r2)
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = Kind
+}
+
+
+function message.DIV2 (|asmreg| r1, |asmreg| r2, |int| Sh, |int| Clear, |&fatasm|) {
 	visible
 	rz = self * asm.DIV2
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
 	rz.numinput(2) = Sh
-	rz.numinput(3) = Add
+	rz.numinput(3) = Clear
 }
 
 
-function message.CLAM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+function message.CLAMI (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Clear, |&fatasm|) {
 	visible
-	rz = self * asm.CLAM
+	rz = self * asm.CLAMI
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.reginput(3) = r4
-	rz.numinput(4) = D
+	rz.numinput(4) = Clear
 }
 
 
-function message.BXOR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.CLAMU (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Clear, |&fatasm|) {
 	visible
-	rz = self * asm.BXOR
+	rz = self * asm.CLAMU
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = Clear
+}
+
+
+function message.ADDM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.ADDM
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.numinput(3) = Sh
+}
+
+
+function message.SUBM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.SUBM
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.BFLG (|asmreg| r1, |asmreg| r2, |int| up, |int| down, |int| sign, |&fatasm|) {
+	visible
+	rz = self * asm.BFLG
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = up
+	rz.numinput(3) = down
+	rz.numinput(4) = sign
 }
 
 
@@ -323,29 +366,19 @@ function message.BAND (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
+function message.BXOR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.BXOR
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
 function message.BOR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
 	visible
 	rz = self * asm.BOR
-	rz.dest(0, r1)
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.numinput(3) = Sh
-}
-
-
-function message.BNAN (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
-	visible
-	rz = self * asm.BNAN
-	rz.dest(0, r1)
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.numinput(3) = Sh
-}
-
-
-function message.BNOR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
-	visible
-	rz = self * asm.BNOR
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
@@ -360,17 +393,6 @@ function message.BNOT (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.numinput(3) = Sh
-}
-
-
-function message.BFLG (|asmreg| r1, |asmreg| r2, |int| up, |int| down, |int| sign, |&fatasm|) {
-	visible
-	rz = self * asm.BFLG
-	rz.dest(0, r1)
-	rz.reginput(1) = r2
-	rz.numinput(2) = up
-	rz.numinput(3) = down
-	rz.numinput(4) = sign
 }
 
 
@@ -394,13 +416,14 @@ function message.CMPB (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Inv, |&fatas
 }
 
 
-function message.TERN (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+function message.TERN (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Clear, |&fatasm|) {
 	visible
 	rz = self * asm.TERN
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.reginput(3) = r4
+	rz.numinput(4) = Clear
 }
 
 

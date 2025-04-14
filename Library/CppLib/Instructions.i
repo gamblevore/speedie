@@ -64,38 +64,23 @@
 	i1 = (i2 * i3) + i4;
 ı DIV: _
 	DivMath(r, Op);
+ı DIVS: _
+	DivMath32(r, Op);
 ı DIV2: _
 	if (i2 < 0) 
-	i1 = (i2 + ((1 << Div2_Addu) - 1)) >> Div2_Shu
+	i1 = (((i2 << Div2_Clearu) >> Div2_Clearu) + ((1 << Div2_Shu) - 1)) >> Div2_Shu
 ;
 	else 
-	i1 = i2 >> Div2_Shu
+	i1 = ((i2 << Div2_Clearu) >> Div2_Clearu) >> Div2_Shu
 ;
-ı CLAM: _
-	if (Float_Du) 
-	i1 = (std_min(std_max(i2, i3), i4))
-;
-	else 
-	u1 = (std_min(std_max(u2, u3), u4))
-;
-ı BXOR: _
-	u1 = u2 ^ (u3 | Shift_Shu);
-ı BRSS: _
-	i1 = (i2 << Shift_Shu) >> i3;
-ı BRSH: _
-	u1 = ((u2 << Shift_Shu) >> Shift_Shu) >> u3;
-ı BLSH: _
-	u1 = ((u2 << u3) << Shift_Shu) >> Shift_Shu;
-ı BAND: _
-	u1 = u2 & (u3 | Shift_Shu);
-ı BOR: _
-	u1 = u2 | (u3 | Shift_Shu);
-ı BNAN: _
-	u1 = u2 & ~(u3 | Shift_Shu);
-ı BNOR: _
-	u1 = u2 | ~(u3 | Shift_Shu);
-ı BNOT: _
-	u1 = ~u2 & ~(u3 | Shift_Shu);
+ı CLAMI: _
+	i1 = (std_min(std_max(btc(i2), btc(i3)), btc(i4)));
+ı CLAMU: _
+	u1 = (std_min(std_max(btc(u2), btc(u3)), btc(u4)));
+ı ADDM: _
+	i1 = i2 + (ii3 << AddOrSubM_Shu);
+ı SUBM: _
+	i1 = (i2 - ii3) >> AddOrSubM_Shu;
 ı BFLG: _
 	if (BFLD_signu) 
 	i1 = ((i2 << BFLD_upu) >> BFLD_downu)
@@ -103,12 +88,26 @@
 	else 
 	u1 = ((u2 << BFLD_upu) >> BFLD_downu)
 ;
+ı BRSS: _
+	i1 = (i2 << Shift_Shu) >> i3;
+ı BRSH: _
+	u1 = ((u2 << Shift_Shu) >> Shift_Shu) >> u3;
+ı BLSH: _
+	u1 = ((u2 << u3) << Shift_Shu) >> Shift_Shu;
+ı BAND: _
+	u1 = (u2 & (u3 << Shift_Shu) >> Shift_Shu);
+ı BXOR: _
+	u1 = (u2 ^ (u3 << Shift_Shu) >> Shift_Shu);
+ı BOR: _
+	u1 = (u2 | (u3 << Shift_Shu) >> Shift_Shu);
+ı BNOT: _
+	u1 = (~u2 & (~u3 << Shift_Shu) >> Shift_Shu);
 ı BSTT: _
 	i1 = 0;
 ı CMPB: _
 	u1 = BitComp(r, Op);
 ı TERN: _
-	if (u2) 
+	if (btc(u2)) 
 	r[n1] = r[n3]
 ;
 	else 

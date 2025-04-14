@@ -56,4 +56,4 @@
 
 #define std_max std::max
 #define std_min std::min
-
+#define btc(x) ((x)<<(Compare4_Shiftu<<3))

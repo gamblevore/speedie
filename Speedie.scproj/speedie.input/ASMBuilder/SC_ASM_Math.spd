@@ -83,7 +83,7 @@ extend ASMState
 		|| f = r.fat$
 
 		|| k = f.const - swapped
-		require !r.isbig and k.fits(9, true)	
+		require !l.isbig and k.fits(9, true)	
 		.NopConst(R)
 		k = k|uint64|.trim(9)
 		|| J = exp.JMPK(l, k, 0) 
@@ -245,13 +245,13 @@ extend ASMState
 		|| Pow2 = .IntPowerOfTwo(r)
 			if Pow2 <= 1
 				return .Quick1Or1Sub(dest, l, Pow2, exp)
-			return exp.BFLG(dest, l,  Pow2-1, 0, 0) * Dest	// y = x * 4  -->  y = x << 2
+			return exp.BFLG(dest, L,  Pow2-1, 0, 0) * Dest	// y = x * 4  -->  y = x << 2
 
 		|| five = .IntPowerOfTwo(r, 1) // 5 or 9 or 17 or 33, etc
-			return exp.add(Dest, l, l, five-1) * dest
+			return exp.ADD(Dest, L, L, five-1) * dest
 
 		|| RR = r.const
-		if .CanAddK(r,RR)								// a - 1,  a + 1
+		if .CanAddK(r, RR)								// a - 1,  a + 1
 			return exp.MULK(dest, L, RR) * dest			// what about 32-bit overflow? we need a new mulk?
 
 
@@ -331,7 +331,7 @@ extend ASMState
 		if  l.LeftScore < r.LeftScore // put consts into R
 			if l is alternate
 				target debug
-					if r.µtype.IsPointer				// 1 - ptr??? we blocked this already.
+					if r.µtype.IsPointer						// 1 - ptr??? we blocked this already.
 			  else
 				swapped = 1
 				swap (l) (r) // a+b == b+a
@@ -339,7 +339,7 @@ extend ASMState
 		if !r.reg // add or subtract zero
 			return .Assign(dest, l, exp)
 		
-		|| lmul = 1
+		|| LMul = 1
 		if (l isnt noscale) and l.SomePointer
 			lmul = l.PointerMul(exp, swapped)
 		if r is ConstOutput
@@ -347,26 +347,37 @@ extend ASMState
 			if l is alternate
 				RR = -RR
 			rr *= lmul
-			if .CanAddK(r,RR)								// a - 1,  a + 1
+			if .CanAddK(r, RR)									// a - 1,  a + 1
 				if .InlineAddK(l, rr, dest)
 					return dest
 				return exp.ADDK(dest, L, RR) * dest
 
 		|&fatasm| fat
-		if lmul.ispow2		  								// x = int1 + int2
-			fat = exp.ADD(dest, L, R, lmul.log2)			// x = lptr + r<<3
-			fat._op+=(l is alternate)
-		  else
-			|| v = .NumToReg(exp, lmul, asmreg(), datatypecode.uint)
-			if l isnt alternate								// x = lptr + r*12
-				fat = exp.MUL(dest, R, V, L)				// always pointer-sized
-			  else											// x = (lptr - rptr)/12
-				exp.SUB(dest, L, R, ASMReg())				// always pointer-sized
-				|| uinttype = 0, debugger
-				fat = exp.DIV(dest, ASMReg(), dest, V, uinttype)  // same
+		if LMul.IsPow2			  								// x = int1 + int2
+			fat = exp.ADD_(dest, L, R, LMul.log2)				// x = lptr + r<<3
+			if fat
+				fat._op += (l is alternate)
+		
+		if !fat
+			|| v = .NumToReg(exp,  LMul,  ASMReg(),  DataTypeCode.uint)
+			if l isnt alternate									// x = lptr + r*12
+				fat = .MUL_(dest, R, V, L, exp)					// L is always big
+			  else												// x = (lptr - rptr)/12
+				fat = exp.ADD_(dest, L, R, ASMReg())!			// L is always pointer-sized
+				fat._op++
+				debugger
+				return .DivInt(dest, dest, v, exp)
 			  
 		return fat * Dest
 	
+	
+	function SmallToBig (|ASMReg| Src, |ASMReg| Cmp, |message| exp, |ASMReg|)
+		if !src.IsBig and cmp.IsBig
+			cmp.reg = 0
+			|| dest = .TempOnly(exp, cmp)
+			return exp.BFLG(dest, src, 32, 32, 0) * dest
+		return src
+		
 
 	function FloatPlus (fn_opasm)
 		if dest is ConstOutput
@@ -425,7 +436,7 @@ extend ASMState
 		if rz == nil
 			rz = .QuickIntMul(dest, L, R, exp)
 			if rz == nil
-				rz = exp.MUL(dest, L, R, asmreg()) * Dest
+				rz = .MUL_(dest, L, R, asmreg(), exp) * Dest
 
 
 	function BoolMul (|asmreg| dest, |asmreg| Bule, |asmreg| V, |message| exp, |asmreg|)		
@@ -433,7 +444,7 @@ extend ASMState
 			return .MakeConst2(dest, Bule, V, exp, ConstifyBoolMul)
 		rz = .QuickIntMul(dest, Bule, V, exp)
 		if !rz
-/			rz = exp.TERN(dest, Bule, V, asmreg()) * Dest				// TERN
+/			rz = exp.TERN(dest, Bule, V, asmreg(), 64-bule.BitCount) * Dest				// TERN
 
 
 	function Multiply (fn_opasm)
@@ -469,9 +480,9 @@ extend ASMState
 		if dest.IsInt
 			return .NumToReg(exp, 1, dest, datatypecode.int) // x/x=1
 		if !dest.Isbig
-			return .NumToReg(exp, 0x3f800000 /*1.0*/, dest, datatypecode.float)
-		return .NumToReg(exp, 0x3ff0000000000000 /*1.0 double*/, dest, datatypecode.f64)
-		
+			return .NumToReg(exp, 0x3f800000 /*1.0*/, dest, DataTypeCode.float)
+		return .NumToReg(exp, 0x3ff0000000000000 /*1.0 double*/, dest, DataTypeCode.f64)
+
 
 	function QuickIntDiv    (fn_opasm)
 		require r is ConstOutput
@@ -483,29 +494,39 @@ extend ASMState
 			if !l.Signed
 				return exp.BFLG(dest, l, 0, ptoi-1, 0) * Dest		// u / 2 --> u >> 1
 			return exp.DIV2(dest, l, ptoi-1, ptoi-1) * Dest			// nice
-	
-	
+
+
 	function DivInt    (fn_opasm)
 		if dest is ConstOutput
 			return .MakeConst2(dest, L, R, exp, ConstifyIntDiv)
 		|| q = .QuickIntDiv(dest, l, r, exp)
 			return q
-		return exp.DIV(dest, ASMReg(), l, r, dest.IntDivType) * dest
-	
-	
+
+		// Dividing a big one by a small one, then?     bad.   We use 64-bit divide. But the small has garbage
+
+		if l.isbig and !dest.isbig		// what?		
+		if l.IsBig and !r.IsBig         // Sigh.  Small has garbage, but were doing a 64-bit divide.
+			r = .SmallToBig(r, l, exp)
+		
+		|| fat = exp.DIV(dest, ASMReg(), l, r, dest.IntDivType)
+		if !dest.IsBig
+			fat._op = asm.divs			// now what?
+		return fat * dest
+
+
+	function ModInt    (fn_opasm)
+		if dest is ConstOutput
+			return .MakeConst2(dest, L, R, exp, ConstifyIntMod)
+		return exp.DIV(asmreg(), dest, L, R, dest.IntDivType) * Dest
+
+
 	function ModFloat    (fn_opasm)
 		if dest is ConstOutput
 			return .MakeConst2(dest, L, R, exp, Constifyfloatmod)
 		|| big = dest.IsBig|int|
 		exp.fdiv(dest, L, R, asmreg(), big)
 		return exp.FFRC(dest, asmreg(), dest, R, big) * dest
-	
-	
-	function ModInt    (fn_opasm)
-		if dest is ConstOutput
-			return .MakeConst2(dest, L, R, exp, ConstifyIntMod)
-		return exp.DIV(asmreg(), dest, L, R, dest.IntDivType) * Dest
-	
+
 	
 	function Mod    (fn_opasm)
 		if dest.isint
@@ -518,7 +539,7 @@ extend ASMState
 		if r.reg // what?
 		if dest is ConstOutput
 			return .makeconst2(dest, l, asmreg(), exp, ConstifyBitNot)
-		return .BitConstMaker(dest, l, asmreg(), exp, asm.bnot)
+		return .BitMaker(dest, l, asmreg(), exp, asm.bnot)
 
 
 	function BitXor (fn_opasm)
@@ -530,7 +551,9 @@ extend ASMState
 			return r
 		if !r.reg
 			return l
-		return .BitMaker2(dest, l, r, exp, asm.bxor)
+		if (l is ConstOutput)
+			swap (l) (r)
+		return .BitMaker(dest, l, r, exp, asm.bxor)
 
 
 	function BitOr (fn_opasm)
@@ -555,8 +578,9 @@ extend ASMState
 					return l
 				if r.isconst(-1)
 					return r
-		
-		return .BitMaker2(dest, l, r, exp, asm.bor)
+		if (l is ConstOutput)
+			swap (l) (r)
+		return .BitMaker(dest, l, r, exp, asm.bor)
 
 			
 	function BitAnd (fn_opasm)		
@@ -568,21 +592,17 @@ extend ASMState
 			return l
 		if !ll or !rr
 			return .Zeros(dest)
-		if .nopminusone(l)
+		if .NopMinusOne(l)
 			return r
-		if .nopminusone(r)
+		if .NopMinusOne(r)
 			return l
-		return .BitMaker2(dest, l, r, exp, asm.band)
-
-
-	function BitMaker2 (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
 		if (l is ConstOutput)
 			swap (l) (r)
-		return .BitConstMaker(Dest, l, r, exp, op)
+		return .BitMaker(dest, l, r, exp, asm.band)
 	
 	
-	function BitConstMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
-		|| k = .const(R, 9, op!=asm.bor)
+	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
+		|| k = .Const(R, 9, op!=asm.bor)
 			r = asmreg()
 		  else
 			k = 0
@@ -643,6 +663,7 @@ extend ASMState
 			|| f = src.fat
 			if f == .last
 				return f
+	
 	
 	function Assign (|asmreg| dest, |asmreg| src, |message| exp, |asmreg|)  // assigns (
 		|| sr = src.reg

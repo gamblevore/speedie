@@ -81,16 +81,8 @@ class Menu (ListView)
 	
 	function ShowCmm (|GUIControl| Owner, |int| X, |int| Y)
 		opt norefcounts
-		.LastRect.x = x
-		.LastRect.y = y
-		.AutoSize(owner)
-	
-	
-	function AutoSize (|GUIControl| Owner)
 		|| mw = .CmmWidth(owner)
 		|| W = the~left for mw
-		|| x = .LastRect.x
-		|| y = .LastRect.y
 		if x >= 0
 			w = (x)~right for mw
 		  elseif .MouseXY.x > .Horz.mid

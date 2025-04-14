@@ -55,6 +55,19 @@ forms
 		r4		r
 		IsOK	4
 
+	Compare4
+		r1		R
+		r2		r
+		r3		r
+		r4		r
+		Clear	3
+
+	AddOrSubM
+		r1		R
+		r2		r
+		r3		r
+		Sh		6
+
 	JCmpF
 		r1		r
 		r2		r
@@ -190,8 +203,8 @@ forms
 	Div2
 		r1		R
 		r2		r
-		Sh		6 // could be used to add other numbers...
-		Add		6 // in case we don't JUST wanna div by a power of 2
+		Sh		6   // 6 bits left unused? Oh well?
+		Clear	3
 	
 	Shift
 		r1		R
@@ -385,7 +398,6 @@ POS 6
 /**/ MULK  (AddK)
 		i1 = i2 * U2_Li
 
-
 /**/ ADD  (Shift)
 		i1 = i2 + (i3 << Shift_Shu)
 /**/ SUB  (Shift)              					// must come after ADD
@@ -394,47 +406,53 @@ POS 6
 		i1 = (i2 * i3) + i4
 /**/ DIV (Div)
 		DivMath(r, Op)
+/**/ DIVS (Div)
+		DivMath32(r, Op)
 /**/ DIV2 (Div2)
 		if (i2 < 0)
-			i1 = (i2+((1<<Div2_Addu)-1)) >> Div2_Shu	// quick divide by power of 2
+			i1 = (((i2 << Div2_Clearu) >> Div2_Clearu)+((1<<Div2_Shu)-1)) >> Div2_Shu	// quick divide by power of 2
 		else
-			i1 = i2 >> Div2_Shu
+			i1 = ((i2 << Div2_Clearu) >> Div2_Clearu) >> Div2_Shu
 
-/**/ CLAM (Float) // not really a float
-		if (Float_Du)
-			i1 = (std_min(std_max(i2,i3),i4))
+/**/ CLAMI (Compare4)
+		i1 = (std_min(std_max(btc(i2),btc(i3)),btc(i4)))
+/*			min(y,H) --> clamp(y, y, H)
+			max(y,L) --> clamp(y, L, L)			*/
+/**/ CLAMU (Compare4)
+		u1 = (std_min(std_max(btc(u2),btc(u3)),btc(u4)))
+
+// Mixed 64-bit 32-bit adds. mixed mul/div/etc needs to be cleared separately
+/**/ ADDM (AddOrSubM)
+	i1 = i2 + (ii3 << AddOrSubM_Shu)
+/**/ SUBM (AddOrSubM)								// if i2 is small, we must clear first
+	i1 = (i2 - ii3) >> AddOrSubM_Shu
+
+
+
+#!						 (((((Bitshifts)))))
+/**/ BFLG  (BFLD) // perhaps sign can allow for SIMD opts?
+		if (BFLD_signu)
+			i1 = ((i2 << BFLD_upu) >> BFLD_downu)
 		else
-			u1 = (std_min(std_max(u2,u3),u4))
-/*
-	min(y,H) --> clamp(y, y, H)
-	max(y,L) --> clamp(y, L, L)
-*/
-
-
-#!						 (((((Bitops)))))
-/**/ BXOR  (Shift)
-		u1 = u2 ^     (u3|||Shift_Shu)
+			u1 = ((u2 << BFLD_upu) >> BFLD_downu)	
 /**/ BRSS  (Shift)
 		i1 = (i2 << Shift_Shu) >> i3
 /**/ BRSH  (Shift)
 		u1 = ((u2 << Shift_Shu) >> Shift_Shu) >> u3
 /**/ BLSH  (Shift) 
 		u1 = ((u2 << u3) << Shift_Shu) >> Shift_Shu
+
+
+
+#!						 (((((BitOps)))))
 /**/ BAND  (Shift)
-		u1 = u2 &     (u3|||Shift_Shu)
+		u1 = (u2 & (u3 << Shift_Shu) >> Shift_Shu)
+/**/ BXOR  (Shift)
+		u1 = (u2 ^ (u3 << Shift_Shu) >> Shift_Shu)
 /**/ BOR   (Shift)
-		u1  = u2 |||  (u3|||Shift_Shu)
-/**/ BNAN  (Shift)
-		u1 = u2 &    ~(u3|||Shift_Shu)
-/**/ BNOR  (Shift)
-		u1  = u2 ||| ~(u3|||Shift_Shu)
+		u1 = (u2|||(u3 << Shift_Shu) >> Shift_Shu)
 /**/ BNOT  (Shift)
-		u1 = ~u2  &  ~(u3|||Shift_Shu)
-/**/ BFLG  (BFLD) // perhaps sign can allow for SIMD opts?
-		if (BFLD_signu)
-			i1 = ((i2 << BFLD_upu) >> BFLD_downu)
-		else
-			u1 = ((u2 << BFLD_upu) >> BFLD_downu)	
+		u1 = (~u2&(~u3 << Shift_Shu) >> Shift_Shu)
 /**/ BSTT  (U4)
 		i1 = 0 // bitstats(u2, u3, u4)
 
@@ -444,8 +462,8 @@ POS 6
 /**/ CMPB  (CmpB)
 		u1 = BitComp(r, Op)
 
-/**/ TERN  (U4) // could give this a compare mode, like i2 >= 0, or whatever
-	if (u2)
+/**/ TERN  (Compare4)
+	if (btc(u2))
 		r[n1] = r[n3]
 	else
 		r[n1] = r[n4]
@@ -483,7 +501,7 @@ POS 6
 /**/ JMPN  (JCmpEq)
 		Code = JumpNeq(r, Op, Code)
 
-/**/ JMPK  (JCmpK) // still needs the big/small thing
+/**/ JMPK  (JCmpK)
 		Code = JumpK(r, Op, Code)
 
 /**/ JMPKN  (JCmpK)

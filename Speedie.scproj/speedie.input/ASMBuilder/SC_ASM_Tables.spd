@@ -165,6 +165,16 @@ function abc
 */
 
 
+
+function NilStrooct (|&asmstate| self, |message| exp, |ASMReg| dest, |ASMReg|)
+	opt norefcounts
+	|| inner = exp.first
+	expect ((inner == @arg) and !inner.hasany) (exp) // nil
+	|| zzeerrooo = asmreg() as asmreg.FromZeroMemory
+	zzeerrooo.reg = dest.reg
+	return .temponly(exp, zzeerrooo)
+
+
 function Return (fn_asm)
 	opt norefcounts
 	|| L = .state.return		// can remove constants, so try first
@@ -202,19 +212,10 @@ function TypeCast (fn_asm)
 	opt norefcounts
 	|| f = exp.first!
 	dest.µtype = exp.asmdecl.datatype
-	|| freg = .µGetASM(F, dest)
-	if freg.µtype == dest.µtype
-		return freg // already done!
+	|| fReg = .µGetASM(F, dest)
+	if fReg.µtype == dest.µtype
+		return fReg // already done!
 	return TypeCastSub(self, exp, dest, freg)
-
-
-function NilStrooct (|&asmstate| self, |message| exp, |ASMReg| dest, |ASMReg|)
-	opt norefcounts
-	|| inner = exp.first
-	expect ((inner == @arg) and !inner.hasany) (exp) // nil
-	|| zzeerrooo = asmreg() as asmreg.FromZeroMemory
-	zzeerrooo.reg = dest.reg
-	return .temponly(exp, zzeerrooo)
 
 
 function TypeCastSub (|&asmstate| self, |message| exp, |ASMReg| dest, |ASMReg| from, |ASMReg|)
@@ -244,7 +245,7 @@ function TypeCastSub (|&asmstate| self, |message| exp, |ASMReg| dest, |ASMReg| f
 		return ConstConvert(self, exp, dest, from, oldtype, newtype)
 		
 	if oldtype.isfloat or newtype.isfloat
-		return exp.CONV(dest, from, oldtype.asmconv(newtype))*dest
+		return exp.CONV(dest, from, oldtype.ASMConv(newtype))*dest
 	|| sh2 = 64 - OldType.BitCount
 	return exp.BFLG(dest, from, sh2, sh2, from.signed|int|) * dest
 
@@ -468,7 +469,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 		if dest is DeclareInlineParam // &A
 			(t is InlinedAccess)
 			return T
-		if d.isbarestruct // it already has the address
+		if d.IsbareStruct // it already has the address
 			return T.haveaddr
 /		dest = .temptyped(exp, dest, d)
 		return exp.GRAB(dest, t, dest, t) * dest.HaveAddr

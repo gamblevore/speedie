@@ -108,6 +108,32 @@
 #define   HALT_IsOKu_(x)   (((uint)((x)<<28))>>28)
 
 
+#define   Compare4_Cleari       ((( int)((Op)<<28))>>29)
+#define   Compare4_Cleari_(x)   ((( int)((x)<<28))>>29)
+
+#define   Compare4_Clearu       (((uint)((Op)<<28))>>29)
+#define   Compare4_Clearu_(x)   (((uint)((x)<<28))>>29)
+
+#define   Compare4_Li       ((( int)((Op)<<31))>>31)
+#define   Compare4_Li_(x)   ((( int)((x)<<31))>>31)
+
+#define   Compare4_Lu       (((uint)((Op)<<31))>>31)
+#define   Compare4_Lu_(x)   (((uint)((x)<<31))>>31)
+
+
+#define   AddOrSubM_Shi       ((( int)((Op)<<23))>>26)
+#define   AddOrSubM_Shi_(x)   ((( int)((x)<<23))>>26)
+
+#define   AddOrSubM_Shu       (((uint)((Op)<<23))>>26)
+#define   AddOrSubM_Shu_(x)   (((uint)((x)<<23))>>26)
+
+#define   AddOrSubM_Li       ((( int)((Op)<<29))>>29)
+#define   AddOrSubM_Li_(x)   ((( int)((x)<<29))>>29)
+
+#define   AddOrSubM_Lu       (((uint)((Op)<<29))>>29)
+#define   AddOrSubM_Lu_(x)   (((uint)((x)<<29))>>29)
+
+
 #define   JCmpF_Cmpi       ((( int)((Op)<<18))>>29)
 #define   JCmpF_Cmpi_(x)   ((( int)((x)<<18))>>29)
 
@@ -412,17 +438,17 @@
 #define   Div2_Shu       (((uint)((Op)<<18))>>26)
 #define   Div2_Shu_(x)   (((uint)((x)<<18))>>26)
 
-#define   Div2_Addi       ((( int)((Op)<<24))>>26)
-#define   Div2_Addi_(x)   ((( int)((x)<<24))>>26)
+#define   Div2_Cleari       ((( int)((Op)<<24))>>29)
+#define   Div2_Cleari_(x)   ((( int)((x)<<24))>>29)
 
-#define   Div2_Addu       (((uint)((Op)<<24))>>26)
-#define   Div2_Addu_(x)   (((uint)((x)<<24))>>26)
+#define   Div2_Clearu       (((uint)((Op)<<24))>>29)
+#define   Div2_Clearu_(x)   (((uint)((x)<<24))>>29)
 
-#define   Div2_Li       ((( int)((Op)<<30))>>30)
-#define   Div2_Li_(x)   ((( int)((x)<<30))>>30)
+#define   Div2_Li       ((( int)((Op)<<27))>>27)
+#define   Div2_Li_(x)   ((( int)((x)<<27))>>27)
 
-#define   Div2_Lu       (((uint)((Op)<<30))>>30)
-#define   Div2_Lu_(x)   (((uint)((x)<<30))>>30)
+#define   Div2_Lu       (((uint)((Op)<<27))>>27)
+#define   Div2_Lu_(x)   (((uint)((x)<<27))>>27)
 
 
 #define   Shift_Shi       ((( int)((Op)<<23))>>23)
