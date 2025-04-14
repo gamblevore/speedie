@@ -444,7 +444,7 @@ extend ASMState
 			return .MakeConst2(dest, Bule, V, exp, ConstifyBoolMul)
 		rz = .QuickIntMul(dest, Bule, V, exp)
 		if !rz
-/			rz = exp.TERN(dest, Bule, V, asmreg(), 64-bule.BitCount) * Dest				// TERN
+/			rz = exp.TERN(dest, Bule, V, asmreg(), bule.bitloss) * Dest				// TERN
 
 
 	function Multiply (fn_opasm)
@@ -493,7 +493,7 @@ extend ASMState
 				return .Quick1Or1Sub(dest, l, ptoi, exp)
 			if !l.Signed
 				return exp.BFLG(dest, l, 0, ptoi-1, 0) * Dest		// u / 2 --> u >> 1
-			return exp.DIV2(dest, l, ptoi-1, ptoi-1) * Dest			// nice
+			return exp.DIV2(dest, l, l.Bitloss, ptoi-1) * Dest		// nice
 
 
 	function DivInt    (fn_opasm)
@@ -617,7 +617,7 @@ extend ASMState
 		|| K = .const(R, 6, false)
 			return .BFLG_Const(exp, dest, l, 0, k)
 		
-		|| fat = exp.BRSH(dest, L, R, 64-l.bitcount)
+		|| fat = exp.BRSH(dest, L, R, l.bitloss)
 		if l.Signed
 			fat._op = asm.brss
 		return fat * dest	
@@ -629,7 +629,7 @@ extend ASMState
 		|| K = .const(R, 6, false)
 			return .BFLG_Const(exp, dest, l,  K, 0)
 		
-		return exp.BLSH(dest, L, R, 64-l.bitcount) * dest
+		return exp.BLSH(dest, L, R, l.bitloss) * dest
 
 
 	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| Src, |uint| up, |uint| down, |asmreg|)

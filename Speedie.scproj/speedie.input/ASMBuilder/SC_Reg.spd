@@ -153,8 +153,8 @@ datatype ASMReg (uint64)
 	function Signed (|bool|)
 		return self|DataTypeCode|.issigned
 		
-//	function GapBits (|int|)
-//		return 64 - .bitcount
+	function BitLoss (|int|)
+		return 64 - .bitcount
 	
 	function IsBool (|bool|)
 		opt inline
