@@ -564,17 +564,11 @@
 #define   VecBuild_r5u_(x)   (((uint)((x)<<28))>>28)
 
 
-#define   VecSwizzle_Fieldsi       ((( int)((Op)<<18))>>24)
-#define   VecSwizzle_Fieldsi_(x)   ((( int)((x)<<18))>>24)
+#define   VecSwizzle_Fieldsi       ((( int)((Op)<<18))>>20)
+#define   VecSwizzle_Fieldsi_(x)   ((( int)((x)<<18))>>20)
 
-#define   VecSwizzle_Fieldsu       (((uint)((Op)<<18))>>24)
-#define   VecSwizzle_Fieldsu_(x)   (((uint)((x)<<18))>>24)
-
-#define   VecSwizzle_Cleari       ((( int)((Op)<<26))>>28)
-#define   VecSwizzle_Cleari_(x)   ((( int)((x)<<26))>>28)
-
-#define   VecSwizzle_Clearu       (((uint)((Op)<<26))>>28)
-#define   VecSwizzle_Clearu_(x)   (((uint)((x)<<26))>>28)
+#define   VecSwizzle_Fieldsu       (((uint)((Op)<<18))>>20)
+#define   VecSwizzle_Fieldsu_(x)   (((uint)((x)<<18))>>20)
 
 #define   VecSwizzle_Li       ((( int)((Op)<<30))>>30)
 #define   VecSwizzle_Li_(x)   ((( int)((x)<<30))>>30)

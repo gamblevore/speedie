@@ -123,7 +123,8 @@ function scdecl.AccessToMemCpy (|message| exp, |message| side, |scdecl| type, |s
 		name.name = "memzero"
 	  else
 		prms <~ prms.next
-	prms!.obj = compiler.XFunc(name.name)
+	prms.obj = compiler.XFunc(name.name)
+	if !prms.obj
 	|| msg = internal.SizeOfQuery.msg
 	msg.obj = typeint!.typenormal
 	prms <~ msg

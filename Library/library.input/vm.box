@@ -274,8 +274,7 @@ forms
 	VecSwizzle
 		r1		R
 		r2		r
-		Fields	8
-		Clear	4
+		Fields	12
 		
 	VecConst
 		r1		R
@@ -385,10 +384,8 @@ POS 6
 		LoadGConst(r, Op, *Code++)
 
 
-#!						 (((((Math)))))
 
-// How to do these in a bitcorrect way?
-// Do I make 3 more funcs? BSHL needs fixing.
+#!						 (((((Math)))))
 
 /**/ ADDK (AddK)
 		i1 = i2 + U2_Li
@@ -400,7 +397,7 @@ POS 6
 
 /**/ ADD  (Shift)
 		i1 = i2 + (i3 << Shift_Shu)
-/**/ SUB  (Shift)              					// must come after ADD
+/**/ SUB  (Shift)              						// must come after ADD
 		i1 = (i2 - i3) >> Shift_Shu
 /**/ MUL  (U4)
 		i1 = (i2 * i3) + i4
@@ -415,13 +412,13 @@ POS 6
 			i1 = ((i2 << Div2_Clearu) >> Div2_Clearu) >> Div2_Shu
 
 /**/ CLAMI (Compare4)
-		i1 = (std_min(std_max(btc(i2),btc(i3)),btc(i4)))
+		i1 = (std_min(std_max(btc(i2), btc(i3)), btc(i4)))
 /*			min(y,H) --> clamp(y, y, H)
 			max(y,L) --> clamp(y, L, L)			*/
 /**/ CLAMU (Compare4)
-		u1 = (std_min(std_max(btc(u2),btc(u3)),btc(u4)))
+		u1 = (std_min(std_max(btc(u2), btc(u3)), btc(u4)))
 
-// Mixed 64-bit 32-bit adds. mixed mul/div/etc needs to be cleared separately
+// Mixed 64-bit 32-bit adds.
 /**/ ADDM (AddOrSubM)
 	i1 = i2 + (ii3 << AddOrSubM_Shu)
 /**/ SUBM (AddOrSubM)								// if i2 is small, we must clear first
@@ -461,9 +458,9 @@ POS 6
 /**/ BXORK  (AddK)
 		u1 = (u2  ^  U2_Li)
 /**/ BORRK   (AddK)
-		u1 = (u2 ^ U2_Li)
+		u1 = (u2  ^  U2_Li)
 /**/ BNOTK  (AddK)
-		u1 = (~u2 & U2_Li)
+		u1 = (~u2 &  U2_Li)
 
 
 

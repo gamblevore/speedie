@@ -5,6 +5,7 @@ class asm_test_obj
 		visible
 		.i = 0
 
+
 module ASMExamples {
 |int| Glob
 |int| Bolg
@@ -22,8 +23,8 @@ function grab2 (|?&byte| b, |int|)
 	x.i++
 	return (x.i + 10)*10
 
-target pack { 
 
+target pack { 
 
 class LargeClass2 {
 	|byte[100]|   a
@@ -35,7 +36,7 @@ function IfEmpty (|int| x)
 	if x
 		0
 	  else
-		.fs(nil)
+		.grab2(nil)
 	
 function AddStuff (|int64| A, |int| B, |int64|)
 	|| X = A-B // shouldn't rely on B being bit-correct.

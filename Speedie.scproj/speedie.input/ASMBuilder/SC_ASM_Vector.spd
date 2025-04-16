@@ -1,0 +1,57 @@
+
+
+
+extend ASMState
+	function VecSwizzle (fn_asm)
+		opt norefcounts
+		dest = .temptyped(exp, dest)
+		|int| Swiz = exp.Indent
+		|| src_msg = exp.first.first!
+		|| src = .µ(src_msg, dest)
+		|| fat = exp.VSWZ(dest, src, swiz)
+		return fat * dest
+	
+		
+	function VecAccess (|message| exp,  |AsmReg| Dest,  |asmreg| base,  |AsmReg| vara,  |asmreg|)
+		|| k = .Const(vara, 8, false)
+			vara = asmreg()
+		  else
+			k = 0
+
+		if dest isnt set
+			if !dest.reg // dest should be already set
+			return exp.VGET(dest, base, vara, k) * dest
+
+		return exp.VSET(base, dest, vara, k) * dest
+		
+
+	function VectorLoad (fn_asm)
+		opt	norefcounts
+		|| Closer = .OpenVars
+		|asmreg[4]| VV
+		|| Count = 0
+		for s.fast in exp
+			vv[Count++] = .µGetASM(s)
+		
+		|| T = vv[0].µType
+		Count += (count == 3)
+		
+		t.VecCount = Count
+		t &= ~48
+		t |= 32
+		dest.µType = T
+		
+/		dest = .TempOnly(exp, dest)
+		.CloseVars(Closer)
+
+		|| fat = exp * asm.VBLD
+		fat.dest(0, dest)
+		fat.RegInput(1) = vv[0]
+		fat.RegInput(2) = vv[1]
+		fat.RegInput(3) = vv[2]
+		|| v3 = vv[3]
+		if v3.reg >= 16 // move missing thing in
+			exp.VSET(dest, v3, asmreg(), 3)
+
+		return fat*dest
+

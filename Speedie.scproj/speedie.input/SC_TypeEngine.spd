@@ -1037,7 +1037,7 @@ function message.DeclAddNumbInt (|int64| num, |scnode| name_space)
 	numb.obj = TypeOfNum(Numb, name_Space)
 
 
-function TypeOfSwizzle (|message--| Exp, |scdecl| Type, |SCNode--| name_space, |message| side, |int| swiz, |scdecl|)
+function TypeOfSwizSub (|message--| Exp, |scdecl| Type, |SCNode--| name_space, |message| side, |int| swiz, |scdecl|)
 	// So... we are getting like: v.z --> v[2]	
 	|| Count = swiz >> 16
 	|| W = type.type.NumericCount
@@ -1073,6 +1073,7 @@ function TypeOfSwizzle (|message--| Exp, |scdecl| Type, |SCNode--| name_space, |
 			exp.obj = T
 			
 		exp.become(@list)
+		exp.indent = swiz // ASM >:3
 
 		for (i in count)
 			|| field = (swiz >> (i*3)) & 7
@@ -1098,7 +1099,7 @@ function TypeOfSwizzle (|message--| Exp, |scdecl| Type, |SCNode--| name_space, |
 
 
 function string.IsSwizzle (|int| Width, |int|)
-	|| N      = .length
+	|| N      = .Length
 	|| Total  = 0
 	|| i      = 0
 	|| shift  = 0
@@ -1108,7 +1109,7 @@ function string.IsSwizzle (|int| Width, |int|)
 	
 	|| HasLetter = false
 	while (i < N)
-		|| d  = self[i++]//.lowercase
+		|| d  = self[i++]
 		if (d != '_')
 			HasLetter = true
 			require (!c) or ((d >= 'w') == (dold >= 'w')) or (dold == '_')
@@ -1127,7 +1128,7 @@ function string.IsSwizzle (|int| Width, |int|)
 			c = 4
 
 		if i < n
-			|int| c2 = self[i].lowercase
+			|int| c2 = self[i]
 			if c2 == '1'
 				i++
 			  elseif c2 == '2'
@@ -1136,6 +1137,11 @@ function string.IsSwizzle (|int| Width, |int|)
 				c += (Width>>1)
 		require (c <= 4 and c >= 0)
 		total  |= (c << (shift++ * 3))
+	if shift > 1
+		if shift == 2
+			total |= 4<<6
+		if shift <= 3
+			total |= 4<<9
 
 	if HasLetter
 		return total ||| (shift<<16)
@@ -1160,13 +1166,13 @@ function message.DotSpace (|SCNode| name_space, |SCObject|)
 	.obj = rz
 
 
-function TypeOfSwiz (|message| exp, |SCNode| name_space, |message| side, |scdecl| class_Space, |scdecl|)
+function TypeOfSwizzle (|message| exp, |SCNode| name_space, |message| side, |scdecl| class_Space, |scdecl|)
 	opt inline
 	opt norefcounts
 	|| W = Class_Space.type.NumericCount 
 	if (W > 1) and !exp.last.hasany
 		|| swz = exp.name.isSwizzle(W)
-			return TypeOfSwizzle(exp, Class_Space, name_space, side, swz)   // 
+			return TypeOfSwizSub(exp, Class_Space, name_space, side, swz)   // 
 
 
 function TypeOfDot (ExprResolver)
@@ -1177,7 +1183,7 @@ function TypeOfDot (ExprResolver)
 
 	|SCDecl| contains
 	|| DotVarIsaDecl = (DotVar isa SCDecl) 
-		|| swiz = TypeOfSwiz(exp, name_space, side, DotVar|scdecl|)
+		|| swiz = TypeOfSwizzle(exp, name_space, side, DotVar|scdecl|)
 			return swiz
 			
 		contains = DotVar|scdecl|.Contains

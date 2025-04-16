@@ -108,8 +108,7 @@ datatype DataTypeCode (uint16)
 		return self&PossibleBits&M
 	
 		
-	syntax is (|datatypecode| M, |bool|) // this seems buggered. just remove it?
-									     // we need to be clear about what we are doing!
+	syntax is (|datatypecode| M, |bool|)
 		opt inline
 		return self&PossibleBits == M&PossibleBits
 	
@@ -162,6 +161,9 @@ datatype DataTypeCode (uint16)
 	function BitCount (|int|)
 		return (.VecCount << ._Shift) << 3
 
+	function VecCount (assigns:|int|, |datatypecode|)
+		return (self &~ 3) ||| (Value-1)
+	
 	function VecCount (|int|)
 		return (self & 0x03) + 1
 	

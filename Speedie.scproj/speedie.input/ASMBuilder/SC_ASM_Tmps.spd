@@ -16,6 +16,7 @@ function Message.ASMType (assigns:|ASMType|)
 
 datatype ASMType (uint16)
 	syntax is (|ASMType| t, |bool|)
+		(krefcount)
 		return self == t
 
 	constants
@@ -30,6 +31,7 @@ datatype ASMType (uint16)
 		kReturn
 		kRejoin
 		kSwap
+		kSwizzle
 		kSetRel
 		kIgnore
 		kDebugger

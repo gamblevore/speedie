@@ -676,7 +676,7 @@ extend ASMState
 	function Assign (|asmreg| dest, |asmreg| src, |message| exp, |asmreg|)  // assigns (
 		|| sr = src.reg
 		|| dr = dest.reg
-		if !dr //?:O
+		if !dr // ?:O
 		if sr == dr
 			return dest								// hmmm... we are already there
 			
@@ -688,7 +688,7 @@ extend ASMState
 				return dest
 		
 		dest = dest.CopyConst(Src)
-		return .BitOr(dest as asmreg.textual, src, asmreg(), exp)
+		return .BitOr(dest as asmreg.textual, src, ASMReg(), exp)
 
 
 	function NopMinusOne (|asmreg| r, |bool|)

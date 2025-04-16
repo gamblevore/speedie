@@ -156,11 +156,10 @@ AlwaysInline vec4 VSwiz (VMRegister* r, ASM Op) {
 	auto Input = v2;
 	vec4 Output;
 	auto F = VecSwizzle_Fieldsu;
-	auto C = VecSwizzle_Clearu;
-	Output[0] = Input[(F>>0)&3]*((C>>0)&1);
-	Output[1] = Input[(F>>2)&3]*((C>>1)&1);
-	Output[2] = Input[(F>>4)&3]*((C>>2)&1);
-	Output[3] = Input[(F>>6)&3]*((C>>3)&1);
+	Output[0] = Input[(F>>0)&2]*((F>>2 )&1);
+	Output[1] = Input[(F>>3)&2]*((F>>5 )&1);
+	Output[2] = Input[(F>>6)&2]*((F>>8 )&1);
+	Output[3] = Input[(F>>9)&2]*((F>>11)&1);
 	return Output;
 }
 

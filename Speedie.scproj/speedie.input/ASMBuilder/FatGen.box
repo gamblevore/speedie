@@ -1009,12 +1009,11 @@ function message.VBLD (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int|
 }
 
 
-function message.VSWZ (|asmreg| r1, |asmreg| r2, |int| Fields, |int| Clear, |&fatasm|) {
+function message.VSWZ (|asmreg| r1, |asmreg| r2, |int| Fields, |&fatasm|) {
 	visible
 	rz = self * asm.VSWZ
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
 	rz.numinput(2) = Fields
-	rz.numinput(3) = Clear
 }
 

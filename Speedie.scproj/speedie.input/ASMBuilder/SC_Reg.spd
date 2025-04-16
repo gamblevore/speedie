@@ -29,7 +29,6 @@ datatype ASMReg (uint64)
 		ConstRequest
 		CondRequest
 		CondAnswer
-		WithinAccess
 		DeclareInlineParam
 		InlinedAccess
 		AlwaysSet = Textual  // reuse const

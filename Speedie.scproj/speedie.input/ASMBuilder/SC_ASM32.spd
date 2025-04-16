@@ -3,9 +3,6 @@
 function message.RET (|asmreg| r1=asmreg(), |&fatasm|)
 	return .RET(r1, asmreg(), asmreg(), 0, 0)
 
-// function message.BitsAreFucked
-//     error (self, "Please use only 64-bit numbers or only 32-bit. Can't create good ASM for mixed bits here.")
-
 
 function message.ADD_ (|ASMReg| r1, |ASMReg| r2, |ASMReg| r3, |int| Sh, |&fatasm|)
 	|| Big3 = r3.IsBig
@@ -17,16 +14,11 @@ function message.ADD_ (|ASMReg| r1, |ASMReg| r2, |ASMReg| r3, |int| Sh, |&fatasm
 		Big3 = false
 		
 	if !big3							// r1 = big + small << sh
-		return .ADDM(r1, r2, r3, sh)	
-//	.BitsAreFucked						// r1 = small + big << sh
+		return .ADDM(r1, r2, r3, sh)
 
 
 function asmstate.MUL_ (|ASMReg| dest, |ASMReg| A, |ASMReg| B, |asmreg| Add, |message| exp, |&fatasm|)
 	|| A2 = .SmallToBig(A, B, exp)
 	|| B2 = .SmallToBig(B, A, exp)
 	return exp.MUL(Dest, A, B, add)
-
-
-//function message.DIV_ (|ASMReg| r1, |ASMReg| r2, |ASMReg| r3, |ASMReg| r4, |int| Kind, |&fatasm|)
-//	return .div(r1, r2, r3, r4, kind)
 

@@ -11,8 +11,7 @@ dispatch fn_asm_table (fn_asm)
 	@bra:  ASMType.First
 	@sheb: ASMType.Sheb
 	@sstr: ASMState.Str
-	@list: // vectors
-		debugger
+	@list: ASMState.VectorLoad
 	@func: ASMType.ASMFunction
 	@dot:  ASMType.Dot
 	@acc:  ASMType.Access
@@ -34,7 +33,7 @@ dispatch fn_asm_table (fn_asm)
 	(ASMType.kSetRel):		ASMType.SetRel
 	(ASMType.kStatExpr): 	ASMType.StatExpr
 	(asmtype.kRefCount):	asmstate.RefCount
-
+	(asmtype.kSwizzle):		asmstate.VecSwizzle
 	(ASMType.kIgnore):		ASMType.Ignore
 	(ASMType.kFail):		ASMType.Ignore
 
@@ -277,7 +276,6 @@ function Decl (fn_asm)
 			fat.µRefCount++		// Keep vars viewable for debugging
 								// Actually its not an issue for even release builds!
 								// just don't add vars you don't need!
-	
 
 
 function SetRel (fn_asm)						// function relset (
@@ -362,17 +360,19 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 	
 	|| f = exp.first!
 	|| d = f.asmdecl
-	if d.TypeInfo.VecCount > 1
-		"unimplemented SIMD"
-		return ASMReg() // for now
-	target debug
-		if !d.PointerCount and !d.IsCarray
-	|| base = .µGetASM(f, asmreg.WithinAccess)				// x = a.b[0]
+
+	|| base = .µGetASM(f)									// x = a.b[0]
 	|| sc = exp.Second.first!
 	if base is InlinedAccess
 /		return base
 
 	|| vara = .µGetASM(sc)
+
+	if d.TypeInfo.VecCount > 1
+		return .VecAccess(exp, dest, base, vara)
+
+	target debug
+		if !d.PointerCount and !d.IsCarray
 	
 	if dest isnt AddrRequest
 		dest.µType = exp.ASMDecl.DataType
@@ -471,8 +471,8 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 			return T
 		if d.IsbareStruct // it already has the address
 			return T.haveaddr
-/		dest = .temptyped(exp, dest, d)
-		return exp.GRAB(dest, t, dest, t) * dest.HaveAddr
+		dest = .TempTyped(exp, dest, d)
+		return exp.GRAB(dest, t) * dest.HaveAddr
 	
 	if d is const
 		return ASMConst(self, exp, dest, d)
@@ -881,10 +881,10 @@ function Message.TypeCastDoesNothing (|bool|)
 	opt norefcounts
 	|| Output = .ASMDecl.typeonly
 	|| Input = .first!.ASMDecl.typeonly
-	require  Output.VecCount == Input.VecCount				// vectors
-	require  Output.IsFloat  == Input.isfloat			// floatness
+	require  Output.VecCount == Input.VecCount			// Vectors
+	require  Output.IsFloat  == Input.isfloat			// Floatness
 	|| BoolOut = Output is bool
-	require (BoolOut) == (Input is bool)				// boolness
+	require (BoolOut) == (Input is bool)				// Boolness
 
 	|| BytesLost = Input.ByteCount - Output.ByteCount
 	if output.isfloat
@@ -893,5 +893,5 @@ function Message.TypeCastDoesNothing (|bool|)
 
 	
 function string.Trip (|bool|)
-	return asmtype.lastdebugmark ~= self 
+	return asmtype.LastDebugMark ~= self 
 
