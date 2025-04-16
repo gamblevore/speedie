@@ -620,7 +620,9 @@ class TextView (GUIControl)
 			require range.x >= 0
 		
 		.SelDirect(range, nil)
-		.ViewPos(range.x, .MaxVisibleLines/2)
+		|| D = .ViewPos(range.x, .MaxVisibleLines/2)
+		.Doexplode(D)
+
 		return true
 			
 	
