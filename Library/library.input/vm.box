@@ -309,9 +309,9 @@ forms
 
 
 
-/**/ GRAB (U4) 
+/**/ GRAB (U2) 
 		u1 = (uint64)(&u2)
-		u3 = (uint64)(&u4)
+//		u3 = (uint64)(&u4)
 
 /**/ RET (Ret)				// ret: 
 		Code = ReturnFromFunc(vm, r, Op)
@@ -461,7 +461,7 @@ POS 6
 /**/ BXORK  (AddK)
 		u1 = (u2  ^  U2_Li)
 /**/ BORRK   (AddK)
-		u1 = (u2 ||| U2_Lu) // unsigned!
+		u1 = (u2 ^ U2_Li)
 /**/ BNOTK  (AddK)
 		u1 = (~u2 & U2_Li)
 
@@ -528,6 +528,7 @@ POS 6
 /**/ LUPU  (Loop)				// assume uint64
 		if (i1++ < i2)
 			Code += Loop_Jmpi
+
 
 
 #!						 (((((Refs)))))
@@ -609,14 +610,6 @@ POS 6
 
 
 #!						(((((Float)))))
-
-/*
-/**/ FEXK  (FloatAddExp)
-		if FloatAddExp_Du
-			f1 = FloatSh2(u2, FloatAddExp_Sh2i) + FloatSh2(u3, FloatAddExp_Sh3i)
-		else
-			f1 = FloatSh1(u2, FloatAddExp_Sh2i) + FloatSh1(u3, FloatAddExp_Sh3i)
-*/		
 
 /**/ FADD  (Float)
 		if (Float_Du)

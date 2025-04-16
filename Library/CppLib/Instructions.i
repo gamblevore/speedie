@@ -29,7 +29,6 @@
 	JB_App__SelfSignal(Trap_Signalu);
 ı GRAB: _
 	u1 = (uint64)(&u2);
-	u3 = (uint64)(&u4);
 ı RET: _
 	Code = ReturnFromFunc(vm, r, Op);
 ı ALLO: _
@@ -109,7 +108,7 @@
 ı BXORK: _
 	u1 = (u2 ^ U2_Li);
 ı BORRK: _
-	u1 = (u2 | U2_Lu);
+	u1 = (u2 ^ U2_Li);
 ı BNOTK: _
 	u1 = (~u2 & U2_Li);
 ı CMPB: _

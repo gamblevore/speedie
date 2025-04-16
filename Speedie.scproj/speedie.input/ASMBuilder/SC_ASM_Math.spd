@@ -604,7 +604,7 @@ extend ASMState
 	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
 		if asm.BORRK!=asm.borr+4 // what?
 
-		|| k = .Const(R, 14, op!=asm.BORR)
+		|| k = .Const(R, 14, true)
 		if k > 0 // easier to optimise bor than bork?
 			|| fat = exp.BANDK(dest, L, K) 
 			fat._op = op+4
@@ -614,7 +614,7 @@ extend ASMState
 		if Clear < 0
 			swap (l) (r)
 			clear = -clear
-		|| fat = exp.BAND(dest, L, R, Clear max 0) 
+		|| fat = exp.BAND(dest, L, R, Clear)
 		fat._op = op
 		return fat * Dest
 
