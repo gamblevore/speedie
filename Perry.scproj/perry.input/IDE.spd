@@ -590,10 +590,10 @@ class PerryIDE (Window)
 				.flip(.ProductOut)
 				return true
 			if NumKey == 7
-				return .FlipJeeboxField
-			if NumKey == 6
 				.flip(.SpeedieText)
 				return true
+			if NumKey == 6
+				return .FlipJeeboxField			
 			if NumKey == 5
 				return .StrongView(.ViewLog)
 			if NumKey == 4

@@ -447,22 +447,22 @@ extend PerryIDE
 			.addhigh self.drawme
 			.addhigh self.ASMStretch
 		
-		with .asmstretch
+		with .ASMStretch
 			.id = "ASMStretch"
 			.size = the~width by the~bottom to 15~down
 			.div.defaultFraction = 0.7
 			.AddRight(self.asmview)
 	
-		.JeeboxText.SetupOut("jeebox")
-		.SpeedieText.SetupOut("speedie")
-		.ProductOut.SetupOut("product", TextView.AllowJeebox)
-		.ProductErrors.SetupOut("errors")
+		.JeeboxText.SetupOut("Jeebox")
+		.SpeedieText.SetupOut("Speedie")
+		.ProductOut.SetupOut("Product", TextView.AllowJeebox)
+		.ProductErrors.SetupOut("Errors")
 
 		.AddIDEButton(.RunButton,		"\02", "Debug Project", "debug")
 		.AddIDEButton(.buildbutton,		"\1C", "Build Project", "compile")
-		.buildbutton.next = .Progress
+		.BuildButton.next = .Progress
 		.AddIDEButton(.progress,	"", "", "progress")
-		.runbutton.size =   5~after for 22  by  3~inside
+		.RunButton.size =   5~after for 22  by  3~inside
 		.buildbutton.size = 5~after for 22  by  3~inside
 		.StartScreen.size = 7~left back 22  by  3~down back 14
 		.progress.size =    0~before for 60  by  3~inside
@@ -498,14 +498,12 @@ extend PerryIDE
 			.size = the~width by 18~down
 			.itemwidth = 101
 			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)
-			.items = ("Speedie, Jeebox, '', Errors"~parse)|listviewrow|
-			|| C = .items.first!
-			(C is selected)
-			C.Obj = self.SpeedieText
-			self.SpeedieText.tag = c.obj
-			c = c.IDESetNext(self.JeeboxText)
-			c = c.IDESetNext(self.ProductOut)
-			c = c.IDESetNext(self.ProductErrors)
+			.items = message()   // ("Jeebox, Speedie, '', Errors"~parse)|listviewrow|
+			self.IDESetNext(self.JeeboxText,  .items)
+			self.IDESetNext(self.SpeedieText, .items)
+			self.IDESetNext(self.ProductOut,  .items)
+			|| c = self.IDESetNext(self.ProductErrors, .items)
+
 			(c is hidden)
 			(c is Broken)
 			
@@ -574,16 +572,20 @@ extend PerryIDE
 		.SetupLogArea
 		.ReTextSubFind
 		.CompileTabSelect(.SpeedieText)
-		
-	function listviewrow.IDESetNext (|guicontrol| obj, |Message!|)
-		opt inline
-		rz = .next!
+	
+	
+	function IDESetNext (|guicontrol| obj, |listviewrow| root, |listviewrow!|)
+		opt norefcounts
+		rz = listviewrow()
+		if !root.first
+			(rz is selected)
+		rz.name = obj.id
+		root <~ rz
 		rz.obj = obj
 		obj.tag = rz
 
 
 	function textview.SetupOut (|string| name, |int| Parse=TextView.probablyjeebox)
-//		printline name
 		opt norefcounts
 		is enabled
 		is alwaysscrollable
@@ -596,7 +598,6 @@ extend PerryIDE
 		.expectsparse	= Parse
 		.PreferStayAtEnd= true
 		.ide.productsep.addleft(self)
-//		"--"
 		
 		
 	function SetupLogArea
