@@ -160,7 +160,7 @@ extend PerryIDE
 				.ShowCompileErrors(p, true)
 			// Notifications will pick up the err otherwise!
 		  elseif OK
-/			|| msg = @tmp + "compile"
+			|| msg = @tmp + "compile"
 			msg <~ (@thg, "ok")
 			.ShowCompileErrors(msg, false)
 			.CompiledOK
