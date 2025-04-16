@@ -305,18 +305,18 @@ class SCDecl (SCNamed) {
 				right.CastToClass(dest)
 			return dest
 		
-		|| bme = s.itembitcount
-		|| bt = t.itembitcount
+		|| bme = s.ItemBitCount
+		|| bt = t.ItemBitCount
 		|| bits	= bme max bt		// what about a float + an int? f64 right?
 		if Op
 			if Op is MakesSigned				// -
 				if bme == 32 and bt == 32		// int - uint should stay as int. Or else its surprising! 
 					return typeint
 				// 
-				|| bits2 = (bme + !s.issigned) max (bt + !t.issigned)
+				|| bits2 = (bme + !s.IsSigned) max (bt + !t.IsSigned)
 				if bits2 > 32
-					return typeint64
-				return typeint
+					return TypeInt64
+				return TypeInt
 			if Op is LoseBits					// &
 				bits = bme min bt
 			  elseif Op is ShiftOnly			// >>, rotr, rotl
@@ -326,9 +326,9 @@ class SCDecl (SCNamed) {
 			  elseif (Op is mathlike) and bits < 32
 				bits = 32
 		
-		|| Signed = s.issigned
+		|| Signed = s.IsSigned
 		if Op isnt ShiftOnly
-			 signed ?= t.issigned
+			 signed ?= t.IsSigned
 		if bits > 32
 			return (typeint64, typeuint64)(signed)
 		if bits > 16

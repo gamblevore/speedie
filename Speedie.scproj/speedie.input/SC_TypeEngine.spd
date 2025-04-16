@@ -1664,9 +1664,8 @@ function TypeOfList (ExprResolver)
 	|| Count = 0
 	|| HasBig = false
 	|| Numeric = true
-	
 	for (s in exp)
-		|| typ = typeofexpr(s, name_space) #require
+		|| typ = TypeOfExpr(s, name_space) #require
 		|| N = typ.IsNumeric
 		if !n
 			numeric = false
