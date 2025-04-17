@@ -6,6 +6,9 @@
 #include "JB_Umbrella.h"
 #include "PicoMsg.h"
 
+#define STDFUN_FILENO 3
+#define STDPICO_FILENO 4
+
 extern "C" {
 
 

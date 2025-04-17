@@ -53,7 +53,6 @@ JBClassPlace( ShellStream,    JB_Sh_Destructor,      JB_AsClass(ProcessOwner),  
 
 
 void JB_Rec__Latchkum (Message* node, JB_String* Desc, JB_Object* Source);
-bool JB_Dup2 (int, int);
 
 
 JB_String* JB_App__Readline() {
