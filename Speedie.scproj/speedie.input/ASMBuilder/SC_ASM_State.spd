@@ -396,11 +396,28 @@ struct ASMState
 		return .ReadOrWriteSub(dest, exp, ptr, varadd, nil, index)
 
 
-	function PrmCollect (|message| prms,  |SCFunction| fn,  |&uint| Addrs,  |uint64|)
-		// we'll collect SpecialRegs even for SPD-ASM, 5 prms is enough for 99.9% functions
-		// And we'll want to ARMify these funcs later in a JIT!
-		
+	function PrmCollectSpd (|message| prms,  |SCFunction| fn,  |&uint| Addrs,  |uint64|) // paramcollect
 		opt norefcounts
+		|int64| sh = 64
+		for p.fast in prms
+			|int64| v = .µReffed(p!).reg
+			sh -= 5
+			rz  |=  v << sh
+			if .Last isa asm.GRAB
+				addrs[] |= v.Log2
+		
+		|| n = fn.args.Length
+		rz >>= 64-((n*5)+12)
+		rz |= (17-n) << 6
+
+		
+	function PrmCollect (|message| prms,  |SCFunction| fn,  |&uint| Addrs,  |uint64|) // paramcollect
+		// We want a simple param order for speedie. Only sensible way to do things.
+		// So we can't share the prmcollector.
+		opt norefcounts
+		
+		if !fn.HasCVersion
+			return .PrmCollectSpd(prms, fn, addrs)
 		|int64| sh = 64
 		|| fc = 0
 		|| ic = 0
@@ -738,6 +755,9 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	
 	|| Closer = .OpenVars
 	|uint| RegAddrs
+	if fn.HasCVersion
+		if "DetectInsecureWords".trap
+			debugat 3
 	|| P = .PrmCollect(prms, fn, RegAddrs)
 	.CloseVars(Closer)
 	

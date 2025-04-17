@@ -191,11 +191,8 @@ function DecrMulti (|scdecl| d, |message| m, |message|)
 
 
 function RefDecrMsg (|Message| msg, |Message|)
-//	if "FS".trap
-	if parser.using.position < 0
-	//parser.using.position = -2			// just to bypass my bug-catching attempt. Not needed.
+	if parser.using.position < 0			// just to bypass my bug-catching attempt. Not needed.
 	rz = RefMsg( msg, "JB_Decr", Compiler.RefDecr! )
-	//parser.using.position = -1
 	
 
 

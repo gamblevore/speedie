@@ -345,6 +345,10 @@ struct FatASM
 	
 	function Renda (|FastString| fs, |bool| Simpler=false)
 		opt norefcounts
+		|| obj = .msg.obj
+//		if obj isa scfunction
+//			if obj ~= "JB_Msg_RangeSet"
+		
 		if (!.exists)  and  (.msg.func == @sheb)
 			.RendaMsg(fs, 0)
 			return 
@@ -382,11 +386,11 @@ struct FatASM
 				remain += bs
 			if .op == asm.knst
 				exit
-		///
 		
 		if (self isa asm.knst or asm.knsr)
 			.RendaKnst(fs, fs.mark-m)
 			fs <~ ' '
+		
 		|| n = fs.mark - m
 		if n <= 2
 			fs.length--

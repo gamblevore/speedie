@@ -123,15 +123,6 @@ class SCFile (file)
 
 
 
-//function app.CodeSign (|file|)
-//	|| sign = app.prefs[codesign_native] // code
-//		|| me = app.apppath.file
-//		me.codesign(sign.value)
-//		return me
-//
-//	errorreceiver.newproblem( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign self." )
-
-
 function file.CodeSign (|string| sign, |ExitCode|)
 	target osx
 		if !platform.osx
@@ -146,25 +137,25 @@ function file.CodeSign (|string| sign, |ExitCode|)
 		args <~ sign.cstr
 		args <~ self.cstr
 
-		rz = "/usr/bin/codesign".DebugExecute(args) // creates unnecesssary errors
+		|| errs = FastString()
+		|| f = "/usr/bin/codesign".file
+		rz = f.Execute(args, nil, errs)
+
+		// Seems we are getting rz.successful and yet errs contains useless results.
 
 		args = []
 		args <~ "--verify"
 		if options.PrintCompileString
 			args <~ "--verbose"
 		args <~ self
+		
 		if rz.Successful
-			rz = "/usr/bin/codesign".DebugExecute(args)
+			rz = "/usr/bin/codesign".Execute(args, nil, errs)
 		if rz.Successful
 			args[0] = "-a"
-			rz = "/usr/sbin/spctl".DebugExecute(args)
+			rz = "/usr/sbin/spctl".Execute(args, nil, errs)
+		  else
+			error (f, errs.GetResult)
 
-
-function string.DebugExecute (|[string]?| Args=nil, |faststring|Out=nil, |faststring| Errs=nil, |ExitCode|)
-	if file.DebugExecute // shouldnt be default!
-		print self
-		print " "
-		printline args.Render
-	return .Execute(args, out, errs)
 	
 

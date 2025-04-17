@@ -32,8 +32,8 @@ dispatch fn_asm_table (fn_asm)
 
 	(ASMType.kSetRel):		ASMType.SetRel
 	(ASMType.kStatExpr): 	ASMType.StatExpr
-	(asmtype.kRefCount):	asmstate.RefCount
-	(asmtype.kSwizzle):		asmstate.VecSwizzle
+	(asmtype.kRefCount):	ASMstate.RefCount
+	(asmtype.kSwizzle):		ASMstate.VecSwizzle
 	(ASMType.kIgnore):		ASMType.Ignore
 	(ASMType.kFail):		ASMType.Ignore
 
