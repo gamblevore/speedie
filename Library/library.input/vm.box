@@ -401,13 +401,11 @@ POS 6
 		i1 = (i2 * i3) + i4
 /**/ DIV (Div)
 		DivMath(r, Op)
-/**/ DIVS (Div)
-		DivMath32(r, Op)
 /**/ DIV2 (Div2)
-		if (i2 < 0)
-			i1 = (((i2 << Div2_Clearu) >> Div2_Clearu)+((1<<Div2_Shu)-1)) >> Div2_Shu	// quick divide by power of 2
+		if (i2 < 0)	// quick divide by power of 2 on a signed int
+			i1 = (((i2+((1<<Div2_Shu)-1)) >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
 		else
-			i1 = ((i2 << Div2_Clearu) >> Div2_Clearu) >> Div2_Shu
+			i1 = ((i2 >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
 
 /**/ CLAMI (Compare4)
 		i1 = (std_min(std_max(btc(i2), btc(i3)), btc(i4)))
@@ -416,11 +414,28 @@ POS 6
 /**/ CLAMU (Compare4)
 		u1 = (std_min(std_max(btc(u2), btc(u3)), btc(u4)))
 
-// Mixed 64-bit 32-bit adds.
-/**/ ADDM (AddOrSubM)
+
+
+#!					((((((((32-bit math))))))))
+/**/ ADDM (AddOrSubM) // mixed math
 		i1 = i2 + (ii3 << AddOrSubM_Shu)
-/**/ SUBM (AddOrSubM)								// if i2 is small, we must clear first
+/**/ SUBM (AddOrSubM)
 		i1 = (i2 - ii3) >> AddOrSubM_Shu
+/**/ DIVS (Div)
+		DivMath32(r, Op)
+/**/ ADKS (AddK)
+		i1 = ii2 + U2_Li
+/**/ APKS (AddK) // post-increment
+		i1 = ii2
+		i2 = ii2 + U2_Li
+/**/ MLKS  (AddK)
+		i1 = ii2 * U2_Li
+/**/ ADDS  (Shift)
+		i1 = ii2 + (ii3 << Shift_Shu)
+/**/ SUBS  (Shift)              						// must come after ADD
+		i1 = (ii2 - ii3) >> Shift_Shu
+/**/ MULS  (U4)
+		i1 = (ii2 * ii3) + ii4
 
 
 
@@ -431,7 +446,7 @@ POS 6
 		else
 			u1 = ((u2 << BFLD_upu) >> BFLD_downu)	
 /**/ BRSS  (Shift)
-		i1 = (i2 << Shift_Shu) >> i3
+		i1 = ((i2 << Shift_Shu) >> Shift_Shu) >> i3
 /**/ BRSH  (Shift)
 		u1 = ((u2 << Shift_Shu) >> Shift_Shu) >> u3
 /**/ BLSH  (Shift) 
@@ -444,21 +459,21 @@ POS 6
 		i1 = 0 // bitstats(u2, u3, u4)
 
 /**/ BAND  (Shift)
-		u1 = (u2  &  ((u3 << Shift_Shu) >> Shift_Shu))
+		u1 = u2  &  ((u3 << Shift_Shu) >> Shift_Shu)
 /**/ BXOR  (Shift)
-		u1 = (u2  ^  ((u3 << Shift_Shu) >> Shift_Shu))
+		u1 = u2  ^  ((u3 << Shift_Shu) >> Shift_Shu)
 /**/ BORR  (Shift)
-		u1 = (u2 ||| ((u3 << Shift_Shu) >> Shift_Shu))
+		u1 = u2 ||| ((u3 << Shift_Shu) >> Shift_Shu)
 /**/ BNOT  (Shift)
-		u1 = (~u2 & ((~u3 << Shift_Shu) >> Shift_Shu))
+		u1 = ~u2 & ((~u3 << Shift_Shu) >> Shift_Shu)
 /**/ BANDK  (AddK)
-		u1 = (u2  &  U2_Li)
+		u1 = u2  &  U2_Li
 /**/ BXORK  (AddK)
-		u1 = (u2  ^  U2_Li)
+		u1 = u2  ^  U2_Li
 /**/ BORRK   (AddK)
-		u1 = (u2  ^  U2_Li)
+		u1 = u2 ||| U2_Li
 /**/ BNOTK  (AddK)
-		u1 = (~u2 &  U2_Li)
+		u1 = ~u2 & ~U2_Li
 
 
 
@@ -640,9 +655,9 @@ POS 6
 
 /**/ FCLM (Float)
 		if (Float_Du)
-			d1 = (std_min(std_max(d2,d3),d4))
+			d1 = std_min(std_max(d2,d3),d4)
 		else
-			f1 = (std_min(std_max(f2,f3),f4))
+			f1 = std_min(std_max(f2,f3),f4)
 
 
 
@@ -656,6 +671,9 @@ POS 6
 		v1 = VBuild(r, Op)
 /**/ VSWZ (VecSwizzle)
 		v1 = VSwiz(r, Op)
+/**/ VMOV (U4)
+		iv1 = iv2
+		iv3 = iv4
 
 
 

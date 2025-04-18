@@ -700,6 +700,11 @@ function Str (fn_asm)
 	return exp.gstr(dest, 0, real.ID) * dest // seems good!
 
 
+helper Vectorise (|asmreg| Src, |message| exp,  |asmreg|)
+	|| T = .TempOnly(exp, src.BasicVec)
+	return exp.VSWZ(T, src, 0) * T
+
+
 helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	opt norefcounts
 	|| ml = ASMReg()
@@ -716,6 +721,13 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 		mode = DiscardMode.with(dest, ml)
 		mr = .µ(exp.last!, mode)
 		.CloseVars(Closer)
+		if ml.IsVec != mr.IsVec
+			if ml.IsVec
+				mr = .Vectorise(mr, exp)
+			  else
+				ml = .Vectorise(ml, exp)
+				
+			
 	
 	dest = .TempTyped(exp, dest)
 	(dest is constoutput) = (ml&mr is constoutput)
@@ -723,6 +735,9 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	|| op = exp.second
 	op ?= exp
 	rz = (fn)(self, dest, ml, mr, op)
+
+	if rz.IsVec != ml.IsVec			// argh?
+	
 	rz = rz.ConstInputFromMath(ml, mr)
 	rz.µtype = dest.µtype
 

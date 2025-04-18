@@ -250,17 +250,6 @@ function message.DIV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| 
 }
 
 
-function message.DIVS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Kind, |&fatasm|) {
-	visible
-	rz = self * asm.DIVS
-	rz.dest(0, r1)
-	rz.dest(1, r2)
-	rz.reginput(2) = r3
-	rz.reginput(3) = r4
-	rz.numinput(4) = Kind
-}
-
-
 function message.DIV2 (|asmreg| r1, |asmreg| r2, |int| Sh, |int| Clear, |&fatasm|) {
 	visible
 	rz = self * asm.DIV2
@@ -310,6 +299,74 @@ function message.SUBM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.numinput(3) = Sh
+}
+
+
+function message.DIVS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Kind, |&fatasm|) {
+	visible
+	rz = self * asm.DIVS
+	rz.dest(0, r1)
+	rz.dest(1, r2)
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = Kind
+}
+
+
+function message.ADKS (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+	visible
+	rz = self * asm.ADKS
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = K
+}
+
+
+function message.APKS (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+	visible
+	rz = self * asm.APKS
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = K
+}
+
+
+function message.MLKS (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+	visible
+	rz = self * asm.MLKS
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = K
+}
+
+
+function message.ADDS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.ADDS
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.SUBS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.SUBS
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.MULS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+	visible
+	rz = self * asm.MULS
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
 }
 
 
@@ -1015,6 +1072,16 @@ function message.VSWZ (|asmreg| r1, |asmreg| r2, |int| Fields, |&fatasm|) {
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
 	rz.numinput(2) = Fields
+}
+
+
+function message.VMOV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+	visible
+	rz = self * asm.VMOV
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
 }
 
 

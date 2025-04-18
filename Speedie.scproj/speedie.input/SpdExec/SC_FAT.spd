@@ -70,11 +70,29 @@ struct FatASM
 		return instruction.typelist[0]!.Sizes
 
 
-	function Vectorise (|asmreg| Dest, |asm| Op,  |asmreg|)
+	function Vectorise (|asmreg| Dest, |asm| VOpp,  |asmreg|)
 		dest.FatIndex = .index
 		.info = dest
 		if dest.IsVec
-			._op = op
+			._op = VOpp
+		return dest
+	
+	function VectoriseSmall (|asmreg| Dest, |asm| VOpp, |asm| SOpp, |asmreg|)
+		dest.FatIndex = .index
+		.info = dest
+		if dest.IsVec
+			if !vopp // oof?
+			._op = VOpp
+		  elseif !dest.isbig
+/			._op = sopp
+		return dest
+	
+	
+	function Small (|asmreg| Dest, |asm| SOpp, |asmreg|)
+		dest.FatIndex = .index
+		.info = dest
+		if !dest.isbig
+/			._op = sopp
 		return dest
 	
 

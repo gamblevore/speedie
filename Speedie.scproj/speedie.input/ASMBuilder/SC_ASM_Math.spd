@@ -211,8 +211,8 @@ extend ASMState
 		|| k = r.Const|uint64|
 		k ^= (l is Alternate)<<31
 		require (k >> 18) << 18 == k
-		.nopconst(r)
-		return exp.FADK(dest, l, k) * Dest
+		.NopConst(r)
+		return exp.FADK(dest, l, k).Vectorise(dest, asm.vadk)
 
 
 	function message.DivByZero
@@ -248,11 +248,11 @@ extend ASMState
 			return exp.BFLG(dest, L,  Pow2-1, 0, 0).Vectorise(Dest, asm.QFLG) // y = x * 4  -->  y = x << 2
 			
 		|| five = .IntPowerOfTwo(r, 1) // 5 or 9 or 17 or 33, etc
-			return exp.ADD(Dest, L, L, five-1).Vectorise(dest, asm.QADD	)
+			return exp.ADD(Dest, L, L, five-1).VectoriseSmall(dest, asm.QADD, asm.ADDS)
 
 		|| RR = r.const
-		if .CanAddK(r, RR)								// a - 1,  a + 1
-			return exp.MULK(dest, L, RR).vectorise(dest, asm.VMLK)			 // what about 32-bit issues? overflow? ;_;
+		if !dest.isvec and .CanAddK(r, RR)								// a - 1,  a + 1
+			return exp.MULK(dest, L, RR).Small(dest, asm.MLKS)
 
 
 	function QuickFloatMul    (fn_OpASM)
@@ -270,7 +270,7 @@ extend ASMState
 			|| y = x >> 18
 			if x == y << 18
 				.NopReg(r)
-				return exp.FMLK(dest, l, x) * Dest
+				return exp.FMLK(dest, l, x).Vectorise(dest, asm.vmlk)
 
 	
 	function ASMReg.SomePointer (|bool|)
@@ -310,6 +310,7 @@ extend ASMState
 		// but thats all, and it does a lot of effort to achieve this.
 		// we can't make the same effort all over for every opt we wanna make
 		// Allow as a once-off, to prove a point. Its possible but not the right way.
+		if dest.IsVec // now what?
 		
 		if (l is temp) or (dest.reg == l.reg)
 			|| fat = .SmartSecretFat(l)
@@ -350,25 +351,26 @@ extend ASMState
 			if .CanAddK(r, RR)									// a - 1,  a + 1
 				if .InlineAddK(l, rr, dest)
 					return dest
-				return exp.ADDK(dest, L, RR).Vectorise(dest, asm.qadk)
+				return exp.ADDK(dest, L, RR).Vectorise(dest, asm.QADK)
 
 		if LMul.IsPow2			  								// x = int1 + int2
 			|| fat = exp.ADD_(dest, L, R, LMul.log2)			// x = lptr + r<<3
-				dest = fat.Vectorise(dest, asm.qadd)
+				dest = fat.Vectorise(dest, asm.QADD)
 				fat._op += (l is alternate)
 				return dest
 		
+		
+		// LMUL isn't 1, 2, 4, 8, etc. And we are doing PLUS!!
+		// So... L is definitely a pointer, and not a vec.
 		|| v = .NumToReg(exp,  LMul,  ASMReg(),  DataTypeCode.uint)
-		|&fatasm| fat
-		if l isnt alternate										// x = lptr + r*12
-			fat = .MUL_(dest, R, V, L, exp)						// L is always big
-		  else													// x = (lptr - rptr)/12
-			fat = exp.ADD_(dest, L, R, ASMReg())!				// L is always pointer-sized
+		if l is Alternate										// x = (lptr - rptr)/12
+			|| fat = exp.ADD_(dest, L, R, ASMReg())!
 			fat._op++
 			debugger
 			return .DivInt(dest, dest, v, exp)
-			  
-		return fat * Dest
+
+																// x = lptr + r*12
+		return .MUL_(dest, R, V, L, exp) * dest
 	
 	
 	function SmallToBig (|ASMReg| Src, |ASMReg| Cmp, |message| exp, |ASMReg|)
@@ -381,7 +383,7 @@ extend ASMState
 
 	function FloatPlus (fn_opasm)
 		if dest is ConstOutput
-			return .makeconst2(dest, l, r, exp, ConstifyFloatPlus)
+			return .MakeConst2(dest, l, r, exp, ConstifyFloatPlus)
 
 		|| IsF32 = dest.FourBytes
 			|| qq = .QuickFloat32Plus(dest, l, r, exp)
@@ -389,7 +391,7 @@ extend ASMState
 
 		|| ss = (l is alternate)
 		|| rr = r.reg
-		return exp.fADD(dest, l, r*!ss, r*ss, 1-IsF32) * Dest
+		return exp.fADD(dest, l, r*!ss, r*ss, 1-IsF32).Vectorise(dest, asm.vadd)
 
 
 	function Plus (fn_opasm) // add (
@@ -486,14 +488,14 @@ extend ASMState
 
 	function QuickIntDiv    (fn_opasm)
 		require r is ConstOutput
-		|| PToi = .IntPowerOftwo(r)
-			if ptoi <= 1											//   x/1  x/0  x/-1
-				if ptoi == 0
-					exp.DivByZero
-				return .Quick1Or1Sub(dest, l, ptoi, exp)
-			if !l.Signed
-				return exp.BFLG(dest, l, 0, ptoi-1, 0) * Dest		// u / 2 --> u >> 1
-			return exp.DIV2(dest, l, l.Bitloss, ptoi-1) * Dest		// nice
+		|| PToi = .IntPowerOftwo(r)$
+		if ptoi <= 1																//   x/1  x/0  x/-1
+			if ptoi == 0
+				exp.DivByZero
+			return .Quick1Or1Sub(dest, l, ptoi, exp)
+		if !l.Signed
+			return exp.BFLG(dest, l, 0, ptoi-1, 0).vectorise(Dest, asm.QFLG)		// u / 2 --> u >> 1
+		return exp.DIV2(dest, l, l.Bitloss, ptoi-1) * Dest		// nice
 
 
 	function DivInt    (fn_opasm)
@@ -508,10 +510,7 @@ extend ASMState
 		if l.IsBig and !r.IsBig         // Sigh.  Small has garbage, but were doing a 64-bit divide.
 			r = .SmallToBig(r, l, exp)
 		
-		|| fat = exp.DIV(dest, ASMReg(), l, r, dest.IntDivType)
-		if !dest.IsBig
-			fat._op = asm.divs			// now what?
-		return fat * dest
+		return exp.DIV(dest, ASMReg(), l, r, dest.IntDivType).VectoriseSmall(dest, asm.qdiv, asm.divs)
 
 
 	function ModInt    (fn_opasm)
@@ -673,15 +672,20 @@ extend ASMState
 				return f
 	
 	
-	function Assign (|asmreg| dest, |asmreg| src, |message| exp, |asmreg|)  // assigns (
-		// assign can't work on vectors...
-		
+	function Assign (|asmreg| dest, |asmreg| src, |message| exp, |asmreg|)  // assigns (		
 		|| sr = src.reg
 		|| dr = dest.reg
 		if !dr // ?:O
 		if sr == dr
 			return dest								// hmmm... we are already there
-			
+
+		if (dest.IsVec != src.IsVec) and src.reg
+		if dest.IsVec
+			return exp.vmov(dest, src, asmreg(), asmreg()) * dest		
+
+
+		// perhaps all assigns should use 16-byte vector assign.
+		
 		if !sr										// must be assigning zero
 			return ._num(exp, 0, dest)				// More readable ASM.
 

@@ -63,14 +63,12 @@
 	i1 = (i2 * i3) + i4;
 ı DIV: _
 	DivMath(r, Op);
-ı DIVS: _
-	DivMath32(r, Op);
 ı DIV2: _
 	if (i2 < 0) 
-	i1 = (((i2 << Div2_Clearu) >> Div2_Clearu) + ((1 << Div2_Shu) - 1)) >> Div2_Shu
+	i1 = (((i2 + ((1 << Div2_Shu) - 1)) >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
 ;
 	else 
-	i1 = ((i2 << Div2_Clearu) >> Div2_Clearu) >> Div2_Shu
+	i1 = ((i2 >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
 ;
 ı CLAMI: _
 	i1 = (std_min(std_max(btc(i2), btc(i3)), btc(i4)));
@@ -80,6 +78,21 @@
 	i1 = i2 + (ii3 << AddOrSubM_Shu);
 ı SUBM: _
 	i1 = (i2 - ii3) >> AddOrSubM_Shu;
+ı DIVS: _
+	DivMath32(r, Op);
+ı ADKS: _
+	i1 = ii2 + U2_Li;
+ı APKS: _
+	i1 = ii2;
+	i2 = ii2 + U2_Li;
+ı MLKS: _
+	i1 = ii2 * U2_Li;
+ı ADDS: _
+	i1 = ii2 + (ii3 << Shift_Shu);
+ı SUBS: _
+	i1 = (ii2 - ii3) >> Shift_Shu;
+ı MULS: _
+	i1 = (ii2 * ii3) + ii4;
 ı BFLG: _
 	if (BFLD_signu) 
 	i1 = ((i2 << BFLD_upu) >> BFLD_downu)
@@ -88,7 +101,7 @@
 	u1 = ((u2 << BFLD_upu) >> BFLD_downu)
 ;
 ı BRSS: _
-	i1 = (i2 << Shift_Shu) >> i3;
+	i1 = ((i2 << Shift_Shu) >> Shift_Shu) >> i3;
 ı BRSH: _
 	u1 = ((u2 << Shift_Shu) >> Shift_Shu) >> u3;
 ı BLSH: _
@@ -96,21 +109,21 @@
 ı BSTT: _
 	i1 = 0;
 ı BAND: _
-	u1 = (u2 & ((u3 << Shift_Shu) >> Shift_Shu));
+	u1 = u2 & ((u3 << Shift_Shu) >> Shift_Shu);
 ı BXOR: _
-	u1 = (u2 ^ ((u3 << Shift_Shu) >> Shift_Shu));
+	u1 = u2 ^ ((u3 << Shift_Shu) >> Shift_Shu);
 ı BORR: _
-	u1 = (u2 | ((u3 << Shift_Shu) >> Shift_Shu));
+	u1 = u2 | ((u3 << Shift_Shu) >> Shift_Shu);
 ı BNOT: _
-	u1 = (~u2 & ((~u3 << Shift_Shu) >> Shift_Shu));
+	u1 = ~u2 & ((~u3 << Shift_Shu) >> Shift_Shu);
 ı BANDK: _
-	u1 = (u2 & U2_Li);
+	u1 = u2 & U2_Li;
 ı BXORK: _
-	u1 = (u2 ^ U2_Li);
+	u1 = u2 ^ U2_Li;
 ı BORRK: _
-	u1 = (u2 ^ U2_Li);
+	u1 = u2 | U2_Li;
 ı BNOTK: _
-	u1 = (~u2 & U2_Li);
+	u1 = ~u2 & ~U2_Li;
 ı CMPB: _
 	u1 = BitComp(r, Op);
 ı TERN: _
@@ -259,10 +272,10 @@
 ;
 ı FCLM: _
 	if (Float_Du) 
-	d1 = (std_min(std_max(d2, d3), d4))
+	d1 = std_min(std_max(d2, d3), d4)
 ;
 	else 
-	f1 = (std_min(std_max(f2, f3), f4))
+	f1 = std_min(std_max(f2, f3), f4)
 ;
 ı VGET: _
 	i1 = iv2[n3 + u4];
@@ -272,6 +285,9 @@
 	v1 = VBuild(r, Op);
 ı VSWZ: _
 	v1 = VSwiz(r, Op);
+ı VMOV: _
+	iv1 = iv2;
+	iv3 = iv4;
 ı VADD: _
 	v1 = v2 + v3 - v4;
 ı VADK: _

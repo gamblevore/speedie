@@ -191,15 +191,6 @@ function message.ADDK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
 }
 
 
-function message.QADK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
-	visible
-	rz = self * asm.ADDK
-	rz.dest(0, r1)
-	rz.reginput(1) = r2
-	rz.numinput(2) = K
-}
-
-
 function message.ADPK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
 	visible
 	rz = self * asm.ADPK
@@ -259,17 +250,6 @@ function message.DIV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| 
 }
 
 
-function message.DIVS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Kind, |&fatasm|) {
-	visible
-	rz = self * asm.DIVS
-	rz.dest(0, r1)
-	rz.dest(1, r2)
-	rz.reginput(2) = r3
-	rz.reginput(3) = r4
-	rz.numinput(4) = Kind
-}
-
-
 function message.DIV2 (|asmreg| r1, |asmreg| r2, |int| Sh, |int| Clear, |&fatasm|) {
 	visible
 	rz = self * asm.DIV2
@@ -319,6 +299,74 @@ function message.SUBM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.numinput(3) = Sh
+}
+
+
+function message.DIVS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Kind, |&fatasm|) {
+	visible
+	rz = self * asm.DIVS
+	rz.dest(0, r1)
+	rz.dest(1, r2)
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = Kind
+}
+
+
+function message.ADKS (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+	visible
+	rz = self * asm.ADKS
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = K
+}
+
+
+function message.APKS (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+	visible
+	rz = self * asm.APKS
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = K
+}
+
+
+function message.MLKS (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+	visible
+	rz = self * asm.MLKS
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = K
+}
+
+
+function message.ADDS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.ADDS
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.SUBS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.SUBS
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.MULS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+	visible
+	rz = self * asm.MULS
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
 }
 
 
@@ -1018,11 +1066,237 @@ function message.VBLD (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int|
 }
 
 
+
 function message.VSWZ (|asmreg| r1, |asmreg| r2, |int| Fields, |&fatasm|) {
 	visible
 	rz = self * asm.VSWZ
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
 	rz.numinput(2) = Fields
+}
+
+
+function message.VMOV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+	visible
+	rz = self * asm.VMOV
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+}
+
+
+function message.VADD (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+	visible
+	rz = self * asm.VADD
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = D
+}
+
+
+function message.VADK (|asmreg| r1, |asmreg| r2, |int| High, |&fatasm|) {
+	visible
+	rz = self * asm.VADK
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = High
+}
+
+
+function message.VMUL (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+	visible
+	rz = self * asm.VMUL
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = D
+}
+
+
+function message.VMLK (|asmreg| r1, |asmreg| r2, |int| High, |&fatasm|) {
+	visible
+	rz = self * asm.VMLK
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = High
+}
+
+
+function message.VDIV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+	visible
+	rz = self * asm.VDIV
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = D
+}
+
+
+function message.VFRC (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+	visible
+	rz = self * asm.VFRC
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = D
+}
+
+
+function message.VCLM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+	visible
+	rz = self * asm.VCLM
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = D
+}
+
+
+function message.QADD (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.QADD
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.QSUB (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.QSUB
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.QMUL (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+	visible
+	rz = self * asm.QMUL
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+}
+
+
+function message.QDIV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Kind, |&fatasm|) {
+	visible
+	rz = self * asm.QDIV
+	rz.dest(0, r1)
+	rz.dest(1, r2)
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = Kind
+}
+
+
+function message.QCLM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Clear, |&fatasm|) {
+	visible
+	rz = self * asm.QCLM
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+	rz.numinput(4) = Clear
+}
+
+
+function message.QADK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+	visible
+	rz = self * asm.QADK
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = K
+}
+
+
+function message.QFLG (|asmreg| r1, |asmreg| r2, |int| up, |int| down, |int| sign, |&fatasm|) {
+	visible
+	rz = self * asm.QFLG
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = up
+	rz.numinput(3) = down
+	rz.numinput(4) = sign
+}
+
+
+function message.QRSS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.QRSS
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.QRSH (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.QRSH
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.QLSH (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.QLSH
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.QAND (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.QAND
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.QXOR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.QXOR
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.QORR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.QORR
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
+}
+
+
+function message.QNOT (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+	visible
+	rz = self * asm.QNOT
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.numinput(3) = Sh
 }
 

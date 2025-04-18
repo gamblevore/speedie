@@ -152,6 +152,18 @@ AlwaysInline vec4 VBuild (VMRegister* r, ASM Op) {
 }
 
 
+AlwaysInline vec4 VBuild2 (VMRegister* r, ASM Op) {
+	auto F = f2;
+	uint Bits = Alloc_Amountu; 
+	return vec4{
+		F * ((Bits>>0)&1),
+		F * ((Bits>>1)&1),
+		F * ((Bits>>2)&1),
+		F * ((Bits>>3)&1)
+	};
+}
+
+
 AlwaysInline vec4 VSwiz (VMRegister* r, ASM Op) {
 	auto Input = v2;
 	vec4 Output;

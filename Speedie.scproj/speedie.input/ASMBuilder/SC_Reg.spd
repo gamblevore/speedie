@@ -134,6 +134,13 @@ datatype ASMReg (uint64)
 		opt inline
 		return self|datatypecode|._shift == 2
 
+	function BasicVec (|asmreg|)
+		if .IsFloat
+			.µType = DataTypeCode.Vec4
+		  else
+			.µType = DataTypeCode.iVec4
+		return self
+		
 	function IsVec (|bool|)
 		return self|datatypecode| & 0x03
 		
