@@ -70,6 +70,14 @@ struct FatASM
 		return instruction.typelist[0]!.Sizes
 
 
+	function Vectorise (|asmreg| Dest, |asm| Op,  |asmreg|)
+		dest.FatIndex = .index
+		.info = dest
+		if dest.IsVec
+			._op = op
+		return dest
+	
+
 	operator mul (|asmreg| info, |asmreg|)
 		cpp_part AsReg
 		
@@ -186,7 +194,7 @@ struct FatASM
 		for i.FatInputs in self
 			if i 
 				i.µRefCount++
-			
+	
 		
 	function RegInput (|int| a, assigns:|asmreg| Input)
 		cpp_part Prm
@@ -322,32 +330,42 @@ struct FatASM
 		return (ASM.encoders[.op]!)(self, where, after)
 
 
-	function FuncPrms (|uint64|)
+	function FuncPrms (|scfunction| fn, |uint64|)
 		if self isa asm.tail
-			return (.r1) >> 12		
-		  else
-			return (.r2|uint64| ||| (.r3|uint64| << 32)) >> 12
+			return .r1 >> 5
+
+		|| R = .r2|uint64| ||| (.r3|uint64| << 32)
+		if !fn.hascversion
+			return R >> 5
+		return R >> 12
+
 	
 	function PrmCollectCounterPart (|FastString| fs)
 		opt norefcounts
 		|| fn = .msg.Obj as SCFunction 		#require		
-		|| regs = .funcprms
-		fs <~ "("
-		
+		|| regs = .FuncPrms(fn)
 		|| n = fn.Args.Length
+
+		fs <~ "("
+
 		while n
 			fs <~ 'r'
-			fs <~ (regs>>((--n)*5))&31
+			if fn.HasCVersion
+				fs <~ (regs>>((--n)*5))&31
+			  else
+				fs <~ regs & 31
+				regs >>= 5
+				n--
 			if n > 0
 				fs <~ ", "
+		
+		
 		fs <~ ")"
 	
 	
 	function Renda (|FastString| fs, |bool| Simpler=false)
 		opt norefcounts
 		|| obj = .msg.obj
-//		if obj isa scfunction
-//			if obj ~= "JB_Msg_RangeSet"
 		
 		if (!.exists)  and  (.msg.func == @sheb)
 			.RendaMsg(fs, 0)

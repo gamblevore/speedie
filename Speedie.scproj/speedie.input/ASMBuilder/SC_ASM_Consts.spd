@@ -37,6 +37,7 @@ extend ASMState
 	// would be better if each scop... knew it's constifier
 	// then the ops themselves don't need to call this... just DoMath can
 	function MakeConst2 (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |fn_ASMConstifier| fn,  |asmreg|)
+		// how to vectorise this? sigh...
 		|| K = (fn)(l, r)
 		.Nop2Consts(r, l)
 		return .NumToReg(exp, k, dest, dest.µtype)

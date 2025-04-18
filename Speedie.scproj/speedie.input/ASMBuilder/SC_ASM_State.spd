@@ -396,22 +396,20 @@ struct ASMState
 		return .ReadOrWriteSub(dest, exp, ptr, varadd, nil, index)
 
 
-	function PrmCollectSpd (|message| prms,  |SCFunction| fn,  |&uint| Addrs,  |uint64|) // paramcollect
+	function PrmCollectSpd (|message| prms,  |SCFunction| fn,  |&uint| Addrs,  |uint64|) // paramcollect, paramscollect
 		opt norefcounts
-		|int64| sh = 64
+		|int64| sh
 		for p.fast in prms
 			|int64| v = .µReffed(p!).reg
-			sh -= 5
-			rz  |=  v << sh
+			sh += 5
+			rz |= v << sh
 			if .Last isa asm.GRAB
 				addrs[] |= v.Log2
 		
-		|| n = fn.args.Length
-		rz >>= 64-((n*5)+12)
-		rz |= (17-n) << 6
+		rz |= fn.args.Length
 
 		
-	function PrmCollect (|message| prms,  |SCFunction| fn,  |&uint| Addrs,  |uint64|) // paramcollect
+	function PrmCollect (|message| prms,  |SCFunction| fn,  |&uint| Addrs,  |uint64|)
 		// We want a simple param order for speedie. Only sensible way to do things.
 		// So we can't share the prmcollector.
 		opt norefcounts
@@ -755,9 +753,6 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	
 	|| Closer = .OpenVars
 	|uint| RegAddrs
-	if fn.HasCVersion
-		if "DetectInsecureWords".trap
-			debugat 3
 	|| P = .PrmCollect(prms, fn, RegAddrs)
 	.CloseVars(Closer)
 	

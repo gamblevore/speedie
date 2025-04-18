@@ -134,6 +134,9 @@ datatype ASMReg (uint64)
 		opt inline
 		return self|datatypecode|._shift == 2
 
+	function IsVec (|bool|)
+		return self|datatypecode| & 0x03
+		
 	function IsBig (|bool|)
 		opt inline
 		return self|datatypecode|._shift == 3
@@ -153,6 +156,8 @@ datatype ASMReg (uint64)
 		return self|DataTypeCode|.issigned
 		
 	function BitLoss (|int|)
+		if .isbool
+			return 63
 		return 64 - .bitcount
 	
 	function IsBool (|bool|)

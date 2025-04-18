@@ -262,7 +262,7 @@
 	d1 = (std_min(std_max(d2, d3), d4))
 ;
 	else 
-	d1 = (std_min(std_max(d2, d3), d4))
+	f1 = (std_min(std_max(f2, f3), f4))
 ;
 ı VGET: _
 	i1 = iv2[n3 + u4];
@@ -272,5 +272,47 @@
 	v1 = VBuild(r, Op);
 ı VSWZ: _
 	v1 = VSwiz(r, Op);
+ı VADD: _
+	v1 = v2 + v3 - v4;
+ı VADK: _
+	v1 += v2 + FloatIncr1(Op);
+ı VMUL: _
+	v1 = (v2 * v3) + v4;
+ı VMLK: _
+	v1 = v2 * FloatIncr1(Op);
+ı VDIV: _
+	v1 = v2 / v3;
+ı VFRC: _
+	v1 = (v2 - VFloor(v2)) * v3;
+ı VCLM: _
+	v1 = VMin(VMax(v2, v3), v4);
+ı QADD: _
+	iv1 = iv2 + (iv3 << Shift_Shu);
+ı QSUB: _
+	iv1 = (iv2 - iv3) >> Shift_Shu;
+ı QMUL: _
+	iv1 = (iv2 * iv3) + iv4;
+ı QDIV: _
+	iv1 = iv2 / iv3;
+ı QCLM: _
+	iv1 = QMin(QMax(iv2, iv3), iv4);
+ı QADK: _
+	iv1 = iv2 + U2_Li;
+ı QFLG: _
+	iv1 = ((iv2 << BFLD_upu) >> BFLD_downu);
+ı QRSS: _
+	iv1 = (iv2 >> Shift_Shu) >> iv3;
+ı QRSH: _
+	uv1 = (uv2 >> Shift_Shu) >> uv3;
+ı QLSH: _
+	uv1 = (uv2 << uv3) << Shift_Shu;
+ı QAND: _
+	uv1 = uv2 & (uv3 | Shift_Shu);
+ı QXOR: _
+	uv1 = uv2 ^ (uv3 | Shift_Shu);
+ı QORR: _
+	uv1 = uv2 | (uv3 | Shift_Shu);
+ı QNOT: _
+	uv1 = ~uv2 & ~(uv3 | Shift_Shu);
 ı 
 

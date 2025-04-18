@@ -234,7 +234,7 @@ extend ASMState
 	// from 1 to -1
 	function Quick1Or1Sub (|&ASMState| self, |asmreg| dest, |asmreg| L, |int| ptoi, |message| exp, |asmreg|)
 		if ptoi == -1										//   x * -1  -->  0-x 
-			return .subtract(dest, asmreg(), l, exp)
+			return .Subtract(dest, ASMReg(), l, exp)
 		if ptoi == 1										//   x * 1   -->  x 
 			return l
 		return dest.µtype.zero								//   x * 0   -->  0
@@ -245,14 +245,14 @@ extend ASMState
 		|| Pow2 = .IntPowerOfTwo(r)
 			if Pow2 <= 1
 				return .Quick1Or1Sub(dest, l, Pow2, exp)
-			return exp.BFLG(dest, L,  Pow2-1, 0, 0) * Dest	// y = x * 4  -->  y = x << 2
-
+			return exp.BFLG(dest, L,  Pow2-1, 0, 0).Vectorise(Dest, asm.QFLG) // y = x * 4  -->  y = x << 2
+			
 		|| five = .IntPowerOfTwo(r, 1) // 5 or 9 or 17 or 33, etc
-			return exp.ADD(Dest, L, L, five-1) * dest
+			return exp.ADD(Dest, L, L, five-1).Vectorise(dest, asm.QADD	)
 
 		|| RR = r.const
 		if .CanAddK(r, RR)								// a - 1,  a + 1
-			return exp.MULK(dest, L, RR) * dest			// what about 32-bit overflow? we need a new mulk?
+			return exp.MULK(dest, L, RR).vectorise(dest, asm.VMLK)			 // what about 32-bit issues? overflow? ;_;
 
 
 	function QuickFloatMul    (fn_OpASM)
@@ -324,7 +324,7 @@ extend ASMState
 	function IntPlus     (fn_opasm)
 		//		a - 1,		a + 1		//
 		//		1 - a,		1 + a		//
-		if dest is constoutput // perhaps we can do this in domathsub?
+		if dest is ConstOutput // perhaps we can do this in domathsub?
 			return .MakeConst2(dest, l, r, exp, ConstifyIntPlus)
 
 		|| swapped = 0
@@ -350,23 +350,23 @@ extend ASMState
 			if .CanAddK(r, RR)									// a - 1,  a + 1
 				if .InlineAddK(l, rr, dest)
 					return dest
-				return exp.ADDK(dest, L, RR) * dest
+				return exp.ADDK(dest, L, RR).Vectorise(dest, asm.qadk)
 
-		|&fatasm| fat
 		if LMul.IsPow2			  								// x = int1 + int2
-			fat = exp.ADD_(dest, L, R, LMul.log2)				// x = lptr + r<<3
-			if fat
+			|| fat = exp.ADD_(dest, L, R, LMul.log2)			// x = lptr + r<<3
+				dest = fat.Vectorise(dest, asm.qadd)
 				fat._op += (l is alternate)
+				return dest
 		
-		if !fat
-			|| v = .NumToReg(exp,  LMul,  ASMReg(),  DataTypeCode.uint)
-			if l isnt alternate									// x = lptr + r*12
-				fat = .MUL_(dest, R, V, L, exp)					// L is always big
-			  else												// x = (lptr - rptr)/12
-				fat = exp.ADD_(dest, L, R, ASMReg())!			// L is always pointer-sized
-				fat._op++
-				debugger
-				return .DivInt(dest, dest, v, exp)
+		|| v = .NumToReg(exp,  LMul,  ASMReg(),  DataTypeCode.uint)
+		|&fatasm| fat
+		if l isnt alternate										// x = lptr + r*12
+			fat = .MUL_(dest, R, V, L, exp)						// L is always big
+		  else													// x = (lptr - rptr)/12
+			fat = exp.ADD_(dest, L, R, ASMReg())!				// L is always pointer-sized
+			fat._op++
+			debugger
+			return .DivInt(dest, dest, v, exp)
 			  
 		return fat * Dest
 	
@@ -409,7 +409,7 @@ extend ASMState
 
 	function Subtract (fn_opasm)				// x = a - b
 		(l is alternate)						// the logic ismostly shared...
-		return .plus(dest, l, r, exp)
+		return .Plus(dest, l, r, exp)
 
 
 	function Minus (fn_opasm)					// x = -b
@@ -426,7 +426,7 @@ extend ASMState
 		if rz == nil
 			rz = .QuickFloatMul(dest, L, R, exp)
 			if rz == nil
-				rz = exp.FMUL(dest, L, R, asmreg(), l.IsBig|int|) * Dest
+				rz = exp.FMUL(dest, L, R, asmreg(), l.IsBig|int|).Vectorise(dest, asm.vmul)
 
 
 	function IntMul (fn_opasm)
@@ -436,7 +436,7 @@ extend ASMState
 		if rz == nil
 			rz = .QuickIntMul(dest, L, R, exp)
 			if rz == nil
-				rz = .MUL_(dest, L, R, asmreg(), exp) * Dest
+				rz = .MUL_(dest, L, R, asmreg(), exp).Vectorise(dest, asm.qmul)
 
 
 	function BoolMul (|asmreg| dest, |asmreg| Bule, |asmreg| V, |message| exp, |asmreg|)		
@@ -444,7 +444,7 @@ extend ASMState
 			return .MakeConst2(dest, Bule, V, exp, ConstifyBoolMul)
 		rz = .QuickIntMul(dest, Bule, V, exp)
 		if !rz
-/			rz = exp.TERN(dest, Bule, V, asmreg(), bule.bitloss) * Dest				// TERN
+			rz = exp.TERN(dest, Bule, V, asmreg(), bule.bitloss) * Dest				// TERN
 
 
 	function Multiply (fn_opasm)
@@ -674,6 +674,8 @@ extend ASMState
 	
 	
 	function Assign (|asmreg| dest, |asmreg| src, |message| exp, |asmreg|)  // assigns (
+		// assign can't work on vectors...
+		
 		|| sr = src.reg
 		|| dr = dest.reg
 		if !dr // ?:O

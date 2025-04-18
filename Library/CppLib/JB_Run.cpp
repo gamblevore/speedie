@@ -13,6 +13,7 @@ Hidden Caches:
 	* 256 byte block! speeds up splitting when the length = 1!! for .Mid
 */
 
+#include <experimental/simd>
 
 #include "JB_Umbrella.hpp"
 #include <vector>
@@ -224,6 +225,7 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
 
 
 
+//using std::experimental::simd; // xcode is too garbage to use this.
 int JB_SP_Run (_cstring* C, int Mode)	{ // JB_SP_Main
 	if (JB_Active & 1)
 		return EALREADY;

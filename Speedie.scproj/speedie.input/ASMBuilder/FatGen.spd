@@ -191,6 +191,15 @@ function message.ADDK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
 }
 
 
+function message.QADK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+	visible
+	rz = self * asm.ADDK
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.numinput(2) = K
+}
+
+
 function message.ADPK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
 	visible
 	rz = self * asm.ADPK

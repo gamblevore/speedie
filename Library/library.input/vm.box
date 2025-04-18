@@ -18,7 +18,6 @@ forms
 // func needs the reg/return wierdness defined also, but as an "ignored" value
 // so it comes after the prm info. Like 3 prms takes 15 bits, then 3 more bits for wierdness
 // using 32-bits, we can fit 5 regs leaving 7 bits for the total info with 1 bit left to spare.
-// this will let us convert our ASM to ARM... without needing extra info.
 	ForeignFunc
 		r1		R
 		Table	l			// functions in registers use the first 32 values...
@@ -305,9 +304,6 @@ forms
 
 // needs ASM-text: rare, MEMM
 #!						 (((((FUNC)))))
-
-
-
 /**/ GRAB (U2) 
 		u1 = (uint64)(&u2)
 //		u3 = (uint64)(&u4)
@@ -341,7 +337,8 @@ POS 27
 
 /**/ ALLO (Alloc)
 		AllocStack(vm, r, Op)
-	
+
+
 
 #!						 (((((Utils)))))
 
@@ -359,6 +356,8 @@ POS 27
 					// we can just do:	double from double --> int64reg = F64reg 
 					//					int64  from int64  --> F64Reg = int64
 					// floats or other size ints shouldn't be affected.
+
+
 
 #!						 (((((Consts)))))
 /**/ KNSR (RotateConst)
@@ -394,7 +393,6 @@ POS 6
 		i2 = i2 + U2_Li
 /**/ MULK  (AddK)
 		i1 = i2 * U2_Li
-
 /**/ ADD  (Shift)
 		i1 = i2 + (i3 << Shift_Shu)
 /**/ SUB  (Shift)              						// must come after ADD
@@ -420,9 +418,9 @@ POS 6
 
 // Mixed 64-bit 32-bit adds.
 /**/ ADDM (AddOrSubM)
-	i1 = i2 + (ii3 << AddOrSubM_Shu)
+		i1 = i2 + (ii3 << AddOrSubM_Shu)
 /**/ SUBM (AddOrSubM)								// if i2 is small, we must clear first
-	i1 = (i2 - ii3) >> AddOrSubM_Shu
+		i1 = (i2 - ii3) >> AddOrSubM_Shu
 
 
 
@@ -469,19 +467,19 @@ POS 6
 		u1 = BitComp(r, Op)
 
 /**/ TERN  (Compare4)
-	if (btc(u2))
-		r[n1] = r[n3]
-	else
-		r[n1] = r[n4]
+		if (btc(u2))
+			r[n1] = r[n3]
+		else
+			r[n1] = r[n4]
 
 /**/ CMPI  (JCmpI)
-	CompI(r, Op)
+		CompI(r, Op)
 
 /**/ CMPIS  (JCmpI)
-	CompIS(r, Op)
+		CompIS(r, Op)
 
 /**/ CMPF  (JCmpF)
-	CompF(r, Op)
+		CompF(r, Op)
 
 
 
@@ -606,6 +604,7 @@ POS 6
 		memzero((void*)u1, L1)
 
 
+
 #!						(((((Float)))))
 
 /**/ FADD  (Float)
@@ -643,22 +642,76 @@ POS 6
 		if (Float_Du)
 			d1 = (std_min(std_max(d2,d3),d4))
 		else
-			d1 = (std_min(std_max(d2,d3),d4))
+			f1 = (std_min(std_max(f2,f3),f4))
 
+
+
+#!						(((((Vectors)))))
 
 /**/ VGET (VecGet)
-	i1 = iv2[n3+u4]
-
-
+		i1 = iv2[n3+u4]
 /**/ VSET (VecGet)
-	iv1[n3+u4] = i2
-
-
+		iv1[n3+u4] = i2
 /**/ VBLD (VecBuild)
-	v1 = VBuild(r, Op)
-
-
+		v1 = VBuild(r, Op)
 /**/ VSWZ (VecSwizzle)
-	v1 = VSwiz(r, Op)
+		v1 = VSwiz(r, Op)
 
+
+
+#!						(((((Float VecMath)))))
+/**/ VADD  (Float)
+		v1 = v2 + v3 - v4
+/**/ VADK (FloatConst)
+		v1 += v2 + FloatIncr1(Op)
+/**/ VMUL  (Float)
+		v1 = (v2 * v3)+v4
+/**/ VMLK  (FloatConst)
+		v1 = v2 * FloatIncr1(Op)
+/**/ VDIV  (float)
+		v1 = v2 / v3
+/**/ VFRC  (Float)
+		v1 = (v2 - VFloor(v2)) * v3
+/**/ VCLM (Float)
+		v1 = VMin(VMax(v2,v3),v4)
+
+
+
+#!						(((((Integer VecMath)))))
+/**/ QADD  (Shift)
+		iv1 = iv2 + (iv3 << Shift_Shu)
+/**/ QSUB  (Shift)              						// must come after ADD
+		iv1 = (iv2 - iv3) >> Shift_Shu
+/**/ QMUL  (U4)
+		iv1 = (iv2 * iv3) + iv4
+/**/ QDIV (Div)
+		iv1 = iv2 / iv3
+/**/ QCLM (Compare4)
+		iv1 = QMin(QMax(iv2,iv3),iv4)
+/**/ QADK (AddK)
+		iv1 = iv2 + U2_Li
+
+
+
+#!						 (((((Vector Bitshifts)))))
+/**/ QFLG  (BFLD)
+		iv1 = ((iv2 << BFLD_upu) >> BFLD_downu)
+/**/ QRSS  (Shift)
+		iv1 = (iv2 >> Shift_Shu) >> iv3
+/**/ QRSH  (Shift)
+		uv1 = (uv2 >> Shift_Shu) >> uv3
+/**/ QLSH  (Shift) 
+		uv1 = (uv2 << uv3) << Shift_Shu
+
+
+
+#!						 (((((Vector BitOps)))))
+/**/ QAND  (Shift)
+		uv1 = uv2  &  (uv3 ||| Shift_Shu)
+/**/ QXOR  (Shift)
+		uv1 = uv2  ^  (uv3 ||| Shift_Shu)
+/**/ QORR  (Shift)
+		uv1 = uv2 ||| (uv3 ||| Shift_Shu)
+/**/ QNOT  (Shift)
+		uv1 = ~uv2 & ~(uv3 ||| Shift_Shu)
 

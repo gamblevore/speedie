@@ -53,6 +53,10 @@
 #define iv2     (r[n2].Ivec)
 #define iv3     (r[n3].Ivec)
 #define iv4     (r[n4].Ivec)
+#define uv1     (r[n1].Ivec)
+#define uv2     (r[n2].Ivec)
+#define uv3     (r[n3].Ivec)
+#define uv4     (r[n4].Ivec)
 
 #define std_max std::max
 #define std_min std::min
