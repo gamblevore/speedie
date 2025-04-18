@@ -291,7 +291,6 @@
 		AC7D3E0F29A2844100148ADB /* JB_Umbrella.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = JB_Umbrella.hpp; path = ../Library/CppLib/JB_Umbrella.hpp; sourceTree = "<group>"; };
 		AC7D3E1029A2844100148ADB /* JB_Saveable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_Saveable.h; path = ../Library/CppLib/JB_Saveable.h; sourceTree = "<group>"; };
 		AC7D3E1229A2844100148ADB /* JB_SafeIncludes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_SafeIncludes.h; path = ../Library/CppLib/JB_SafeIncludes.h; sourceTree = "<group>"; };
-		AC7D3E1329A2844100148ADB /* JB_Log.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_Log.h; path = ../Library/CppLib/JB_Log.h; sourceTree = "<group>"; };
 		AC7D3E1429A2844100148ADB /* JB_VM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_VM.h; path = ../Library/CppLib/JB_VM.h; sourceTree = "<group>"; };
 		AC7D3E1529A2844100148ADB /* JB_GameAll.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_GameAll.h; path = ../Library/CppLib/JB_GameAll.h; sourceTree = "<group>"; };
 		AC7D3E1629A2844100148ADB /* JB_MSR.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_MSR.h; path = ../Library/CppLib/JB_MSR.h; sourceTree = "<group>"; };
@@ -323,7 +322,6 @@
 		AC7D3E3229A2844200148ADB /* StringFunctionsLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = StringFunctionsLib.h; path = ../Library/CppLib/StringFunctionsLib.h; sourceTree = "<group>"; };
 		AC7D3E3329A2844200148ADB /* BitFields.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BitFields.h; path = ../Library/CppLib/BitFields.h; sourceTree = "<group>"; };
 		AC7D3E3429A2844200148ADB /* JB_Vectors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_Vectors.h; path = ../Library/CppLib/JB_Vectors.h; sourceTree = "<group>"; };
-		AC7D3E3529A2844200148ADB /* JB_RingTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_RingTree.h; path = ../Library/CppLib/JB_RingTree.h; sourceTree = "<group>"; };
 		AC7D3E3629A2844200148ADB /* JB_File.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_File.h; path = ../Library/CppLib/JB_File.h; sourceTree = "<group>"; };
 		AC7D3E3729A2844200148ADB /* JB_Compress.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_Compress.h; path = ../Library/CppLib/JB_Compress.h; sourceTree = "<group>"; };
 		AC7D3E3829A2844200148ADB /* JB_GameSmall.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_GameSmall.h; path = ../Library/CppLib/JB_GameSmall.h; sourceTree = "<group>"; };
@@ -507,14 +505,12 @@
 				AC7D3E3029A2844200148ADB /* JB_LibTypes.h */,
 				AC7D3E2229A2844200148ADB /* JB_Linkage.h */,
 				AC7D3E2029A2844200148ADB /* JB_List.h */,
-				AC7D3E1329A2844100148ADB /* JB_Log.h */,
 				AC7D3E2D29A2844200148ADB /* JB_Math.h */,
 				AC7D3E1929A2844200148ADB /* JB_MemUtils.h */,
 				AC7D3E1629A2844100148ADB /* JB_MSR.h */,
 				AC7D3E1E29A2844200148ADB /* JB_ObjArray.h */,
 				AC7D3E2829A2844200148ADB /* JB_OSX.h */,
 				AC7D3E2F29A2844200148ADB /* JB_Pipe.h */,
-				AC7D3E3529A2844200148ADB /* JB_RingTree.h */,
 				AC7D3E1229A2844100148ADB /* JB_SafeIncludes.h */,
 				AC7D3E1029A2844100148ADB /* JB_Saveable.h */,
 				AC7D3E2329A2844200148ADB /* JB_String.h */,
@@ -946,6 +942,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_FAST_MATH = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -968,6 +965,7 @@
 				OTHER_CFLAGS = (
 					"-Wno-return-type-c-linkage",
 					"-D__vm__",
+					"-fexperimental-library",
 				);
 				SDKROOT = macosx;
 			};
@@ -1008,6 +1006,7 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_FAST_MATH = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "__VM__=1";
@@ -1025,6 +1024,7 @@
 				OTHER_CFLAGS = (
 					"-Wno-return-type-c-linkage",
 					"-D__vm__",
+					"-fexperimental-library",
 				);
 				SDKROOT = macosx;
 			};
@@ -1164,8 +1164,6 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -1177,8 +1175,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
