@@ -66,6 +66,7 @@ struct VMRegister {
 		float			Float;
 		double			Double;
 		ivec4			Ivec;
+		uvec4			Uvec;
 		vec4			Vec;
 		int				Int32;
 		uint			Uint32;

@@ -2,15 +2,16 @@
 #ifndef __JB_VECTOR__
 #define __JB_VECTOR__
 
-typedef int   ivec4 __attribute__ ((vector_size (16)));
-typedef float  vec4 __attribute__ ((vector_size (16)));
-typedef unsigned char  bytevec4 __attribute__ ((vector_size (4), aligned (4))); // shouldn't they all be aligned?
+typedef unsigned int	uvec4	__attribute__ ((vector_size (16)));
+typedef int				ivec4	__attribute__ ((vector_size (16)));
+typedef float			vec4	__attribute__ ((vector_size (16)));
+typedef unsigned char	bytevec4 __attribute__ ((vector_size (4), aligned (4))); // shouldn't they all be aligned?
 
-typedef int   ivec3 __attribute__ ((vector_size (16)));
-typedef float  vec3 __attribute__ ((vector_size (16)));
+typedef int				ivec3	__attribute__ ((vector_size (16)));
+typedef float			vec3	__attribute__ ((vector_size (16)));
 
-typedef int   ivec2 __attribute__ ((vector_size (8)));
-typedef float  vec2 __attribute__ ((vector_size (8)));
+typedef int				ivec2	__attribute__ ((vector_size (8)));
+typedef float			vec2	__attribute__ ((vector_size (8)));
 
 inline ivec4 JB_ivec4_Load(unsigned char* data) {
 	return ivec4{data[0], data[1], data[2], data[3]};
