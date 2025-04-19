@@ -326,7 +326,7 @@ helper textview.DrawErrorBackground (|image| Where, |int| y, |TextViewLine| D)
 	r.y	= y
 	r.y2 = y + .lineheight
 	|| lm= 0.225
-	|| v = e.color(lm)
+	|| v = e.Textcolor(lm)
 	if e == .myerror
 		v.a *= 0.75
 
@@ -589,13 +589,21 @@ function message.FlatRange (|intrange|)
 			rz.x2 = rz.x2 max ss.x2
 
 
-function error.Color (|float| alpha=1.0, |vec4|)
-	if .severity == errorseverity.ok
-		return (0.6, 0.6, 0.6, alpha)
-	if .severity < errorseverity.problem
-		return (0.6, 0.6, 0.1, alpha)
-	|| v = (1.0, 0.1, 0.1, alpha)
-	if .severity == errorseverity.problem
-		v.g = v.r*0.5
-	return v
+
+function error.TextColor (|float| alpha=1.0, |vec4|)
+	rz = .Severity.Color(alpha)
+	if .Severity <= ErrorSeverity.Problem
+		rz *= (0.6, 0.6, 0.6, 1.0)
+	if .Severity <= ErrorSeverity.Hint
+		rz.a *= 0.5
+
+//	
+//	if .severity == errorseverity.ok
+//		return (0.6, 0.6, 0.6, alpha)
+//	if .severity < errorseverity.problem
+//		return (0.6, 0.6, 0.1, alpha)
+//	|| v = (1.0, 0.1, 0.1, alpha)
+//	if .severity == errorseverity.problem
+//		v.g = v.r*0.5
+//	return v
 

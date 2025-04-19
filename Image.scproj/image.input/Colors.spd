@@ -105,12 +105,17 @@ function vec4.PreMul (|PreMultipliedColor|)
 	return m.ivec4|PreMultipliedColor|
 
 
-function errorseverity.color (|vec4|)
-	if self == ErrorSeverity.Warning
-		return colors.yellow
+function errorseverity.Color (|float| alpha=1.0, |vec4|)
+	if self == ErrorSeverity.Error
+		return colors.red(alpha)
 	if self == ErrorSeverity.Problem
-		return Colors.Orange
-	if self < ErrorSeverity.Warning
-		return colors.White
-	return colors.red
-	
+		return Colors.Orange(alpha)
+	if self == ErrorSeverity.Warning
+		return colors.yellow(alpha)
+	if self == ErrorSeverity.Hint
+		return vec4(1.0, 1.0, 0.5, alpha)
+	if self == ErrorSeverity.OK
+		return colors.White(alpha)
+	return colors.Magenta(alpha)
+
+

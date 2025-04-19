@@ -15,7 +15,11 @@ function PerryIDE.UnusedFuncsFB (|message| stuff)
 
 
 function PerryIDE.UnusedFuncsSub (|message| tmp, |string| where)
-	|| err = error(nil, tmp.name, ErrorSeverity.warning, where )
+	|| Level = ErrorSeverity.Hint
+	if tmp.name contains "() is unused"
+		Level = ErrorSeverity.warning
+	
+	|| err = error(nil, tmp.name, level, where)
 	err.position = tmp.first.int
 	.editme.LineErrorAdd(err)
 
