@@ -34,10 +34,6 @@
 ı SWAP: _
 	JB_Swap(r[n1], r[n2]);
 	JB_Swap(r[n3], r[n4]);
-ı PRNT: _
-	printf("%lli\n", i1);
-	// better to print this also as float/double/signed/unsigned...
-
 ı RARE: _
 	Rare_(r, Op);
 ı CONV: _
@@ -69,9 +65,9 @@
 	i1 = ((i2 >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
 ;
 ı CLAMI: _
-	i1 = (std_min(std_max(btc(i2), btc(i3)), btc(i4)));
+	i1 = std_min(std_max(i2, i3), i4);
 ı CLAMU: _
-	u1 = (std_min(std_max(btc(u2), btc(u3)), btc(u4)));
+	u1 = std_min(std_max(u2, u3), u4);
 ı ADDM: _
 	i1 = i2 + (ii3 << AddOrSubM_Shu);
 ı SUBM: _
@@ -125,7 +121,7 @@
 ı CMPB: _
 	u1 = BitComp(r, Op);
 ı TERN: _
-	if (btc(u2)) 
+	if (u2) 
 	r[n1] = r[n3]
 ;
 	else 
@@ -133,8 +129,6 @@
 ;
 ı CMPI: _
 	CompI(r, Op);
-ı CMPIS: _
-	CompIS(r, Op);
 ı CMPF: _
 	CompF(r, Op);
 ı JSWI: _
@@ -143,8 +137,6 @@
 	Code += l0;
 ı JMPI: _
 	Code = JumpI(r, Op, Code);
-ı JMPIS: _
-	Code = JumpIS(r, Op, Code);
 ı JMPF: _
 	Code = JumpF(r, Op, Code);
 ı JMPE: _
@@ -156,19 +148,19 @@
 ı JMPKN: _
 	Code = JumpKN(r, Op, Code);
 ı JBOR: _
-	if (u1 << (64 - (8 << Bra_Bytezu))) 
+	if (u1) 
 	Code += Bra_Jmpi
 ;
 ı JBAN: _
-	if (!(u1 << (64 - (8 << Bra_Bytezu)))) 
+	if (!u1) 
 	Code += Bra_Jmpi
-;
-ı LUPD: _
-	if (i1-- > i2) 
-	Code += Loop_Jmpi
 ;
 ı LUPU: _
 	if (i1++ < i2) 
+	Code += Loop_Jmpi
+;
+ı LUPD: _
+	if (i1-- > i2) 
 	Code += Loop_Jmpi
 ;
 ı RFAP: _

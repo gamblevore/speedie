@@ -20,6 +20,7 @@ struct ASMState
 	|byte|						VDecls
 	|bool|						IsTextual
 	|byte|						VTmps
+	|int|						CurrFuncGrab
 	|bool|						Inited
 	|bool|						TailInlineable
 
@@ -397,26 +398,25 @@ struct ASMState
 		return .ReadOrWriteSub(dest, exp, ptr, varadd, nil, index)
 
 
-	function PrmCollectSpd (|message| prms,  |SCFunction| fn,  |&uint| Addrs,  |uint64|) // paramcollect, paramscollect
+	function PrmCollectSpd (|message| prms,  |SCFunction| fn,  |uint64|) // paramcollect, paramscollect
 		opt norefcounts
 		|int64| sh
 		for p.fast in prms
 			|int64| v = .µReffed(p!).reg
 			sh += 5
 			rz |= v << sh
-			if .Last isa asm.GRAB
-				addrs[] |= v.Log2
 		
 		rz |= fn.args.Length
 
 		
-	function PrmCollect (|message| prms,  |SCFunction| fn,  |&uint| Addrs,  |uint64|)
+	function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 		// We want a simple param order for speedie. Only sensible way to do things.
 		// So we can't share the prmcollector.
 		opt norefcounts
 		
+		if "Grab".trap
 		if !fn.HasCVersion
-			return .PrmCollectSpd(prms, fn, addrs)
+			return .PrmCollectSpd(prms, fn)
 		|int64| sh = 64
 		|| fc = 0
 		|| ic = 0
@@ -430,8 +430,6 @@ struct ASMState
 					rz  |=  v << sh
 					ic += ints
 					fc += !ints
-					if .Last isa asm.GRAB
-						addrs[] |= v.Log2
 		
 		rz >>= 64-((n*5)+12)
 		if fc>8 or ic>8			// hmmm
@@ -722,16 +720,23 @@ function SCFunction.HasCVersion (|bool|)
 
 
 
-function asmstate.RegsBitClear (|message| exp, |int| RegAddrs, |scfunction| fn)
+function asmstate.RegClear (|message| exp, |&fatasm| C, |int| i)
+	c.prms[5] = 0
+	|| L = c.Const
+	|| signed = L < 0
+		L = -L
+	exp.BFLG(i.asm, i.asm, L, L, signed|int|)
+
+
+function asmstate.RegsBitClear (|message| exp, |&fatasm| Start)
 	opt norefcounts
-	for (b.bits in RegAddrs) (i)
-		|| arg = fn.args[i]
-		if arg and arg.PointerCount == 1
-			|| in = arg.Internal
-			if in and in.IsNormal and !in.IsFloat
-				|| S = 64 - in.SizeOfQuery
-				if S >= 0
-					exp.BFLG(i.asm, i.asm, S, S, 0)
+	|| c = .Last
+	while C > Start
+		if (c isa asm.GRAB)
+			|| id = c.Prms[5]
+			if id == .CurrFuncGrab
+				.RegClear(exp, c, c.reg(0))
+		c--
 
 
 function @ASMType.ASMFunction (fn_asm) // dofunction function
@@ -752,9 +757,10 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	if !fn.ASMReturn
 		(dest is constoutput)
 	
+	|| Start = .curr
+	++.CurrFuncGrab
 	|| Closer = .OpenVars
-	|uint| RegAddrs
-	|| P = .PrmCollect(prms, fn, RegAddrs)
+	|| P = .PrmCollect(prms, fn)
 	.CloseVars(Closer)
 	
 	if !TableID
@@ -766,19 +772,17 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 		fat._op = asm.FNCX
 	fat._op += PExt > 0
 	
-	if 0
-		prms.FNC3(dest, TableID, P,  PExt) // MARK USED
-		prms.FNCX(dest, TableID, P,  PExt) // MARK USED
-		prms.FNCX3(dest, TableID, P, PExt) // MARK USED
+	if 0: prms.FNC3, prms.FNCX, prms.FNCX3 // MARK USED
 
-	if RegAddrs
-		.RegsBitClear(exp, RegAddrs, fn)
+	.RegsBitClear(exp, Start)
 	
 	fat.µRefCount += fn isnt stateless
 	if fn is Killer // return just to be safe
 		fat = exp.RET()
 		fat.µRefCount++
 		dest = asmreg.exit
+	
+	.CurrFuncGrab--
 	return fat*dest
 		
 

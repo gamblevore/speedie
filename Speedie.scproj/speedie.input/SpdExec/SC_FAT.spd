@@ -93,7 +93,7 @@ struct FatASM
 		dest.FatIndex = .index
 		.info = dest
 		if !dest.isbig
-			._op = sopp
+/			._op = sopp
 		return dest
 	
 
@@ -160,7 +160,7 @@ struct FatASM
 		opt norefcounts
 		|| f = .form
 		for i in f.Count
-			if .Prm(i) == reg
+			if .Reg(i) == reg
 				|| p = f.Params[i]
 				if p.IsReg
 					return (p is Output)|maybebool|
@@ -331,14 +331,14 @@ struct FatASM
 		opt inline
 		return .step(1)
 
-	function Prm (|int| i, |int|)
-		return .prms[i] & ~(1<<31) // remove tmpbit.
+	function Reg (|int| i, |int|)
+		return .prms[i] & 31 // remove tmpbit + fatindex
 		
 	function CheckHasOutput 
 		opt inline, opt norefcounts
 		target debug
 			// why not use .outputs?
-			if !.Prm(0)
+			if !.Reg(0)
 				|| P = .form.params[0]
 				if  p is output//  and  p isnt optional 
 					error (self, "Missing ASM output")

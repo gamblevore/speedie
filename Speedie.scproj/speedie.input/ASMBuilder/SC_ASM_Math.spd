@@ -30,9 +30,6 @@ extend ASMState
 			return exp.CMPB(dest, L, R, negate|int| xor 1) * dest
 		
 		|| RBig = r.isbig|int|
-		target debug
-			if r.reg and l.reg
-				if rbig != l.isbig|int| // sigh
 		if l.reg
 			if negate
 				return exp.JMPN(r, l, RBig, 0) * res
@@ -40,8 +37,8 @@ extend ASMState
 		
 		|| rb = r.bytes
 		if negate
-			return exp.JBAN(r, rb, 0) * res
-		return exp.JBOR(r, rb, 0) * res
+			return exp.JBAN(r, 0) * res
+		return exp.JBOR(r, 0) * res
 
 	
 	function Exists (|ASMReg| dest, |ASMReg| L, |message| exp, |ASMReg|)
@@ -358,7 +355,7 @@ extend ASMState
 
 		if LMul.IsPow2			  								// x = int1 + int2
 			|| fat = exp.ADD_(dest, L, R, LMul.log2)			// x = lptr + r<<3
-				if 0: exp.adds, exp.QADD
+				if 0: exp.adds, exp.QADD, exp.subs
 				dest = fat.Vectorisesmall(dest, asm.QADD, asm.adds)
 				fat._op += (l is alternate)
 				return dest
@@ -442,7 +439,8 @@ extend ASMState
 		if rz == nil
 			rz = .QuickIntMul(dest, L, R, exp)
 			if rz == nil
-				rz = .MUL_(dest, L, R, asmreg(), exp).Vectorise(dest, asm.qmul)
+				if 0: exp.qmul, exp.muls
+				rz = .MUL_(dest, L, R, asmreg(), exp).VectoriseSmall(dest, asm.qmul, asm.MULS)
 
 
 	function BoolMul (|asmreg| dest, |asmreg| Bule, |asmreg| V, |message| exp, |asmreg|)		
@@ -450,7 +448,7 @@ extend ASMState
 			return .MakeConst2(dest, Bule, V, exp, ConstifyBoolMul)
 		rz = .QuickIntMul(dest, Bule, V, exp)
 		if !rz
-			rz = exp.TERN(dest, Bule, V, asmreg(), bule.bitloss) * Dest				// TERN
+			rz = exp.TERN(dest, Bule, V, asmreg(), /*bule.bitloss*/) * Dest				// TERN
 
 
 	function Multiply (fn_opasm)
@@ -559,6 +557,7 @@ extend ASMState
 			return l
 		if (l is ConstOutput)
 			swap (l) (r)
+		if 0: exp.BXOR
 		return .BitMaker(dest, l, r, exp, asm.bxor)
 
 
@@ -633,6 +632,7 @@ extend ASMState
 		
 		|| fat = exp.BRSH(dest, L, R, l.bitloss)
 		if l.Signed
+			if 0: exp.brss
 			fat._op = asm.brss
 		return fat * dest	
 

@@ -197,7 +197,6 @@ function UseASM
 	opt norefcounts
 	require 0
 	|| m = Message()
-	m.PRNT(asmreg())
 	m.RARE(asmreg(), asmreg())
 		
 function MakeTheVM (|bool|)

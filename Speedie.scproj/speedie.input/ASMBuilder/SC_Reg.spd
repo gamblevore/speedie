@@ -263,7 +263,7 @@ datatype ASMReg (uint64)
 	function TmpCheck (|bool|)
 		|| R = .reg
 		|| IsTmp = self is temp
-		|| Big = R >= 24
+		|| Big = R >= 26
 		if big == IsTmp // bad?
 			return true
 		if big

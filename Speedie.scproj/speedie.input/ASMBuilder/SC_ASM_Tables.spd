@@ -121,7 +121,7 @@ function ReturnOpt (|&ASMState| self, |int| Ret, |int| bb, |bool|)
 function PreOptBOR (|&ASMState| self, |FATASM| l, |int| Ret, |int|)
 	(self)
 	require !l.prms[2]						// x = b ||| 0  -->  x = b
-	require Ret == l.Prm(0)	// return x
+	require Ret == l.Reg(0)	// return x
 
 	rz = l.r1
 	using L // SyntaxUsingComplete needs upgrade to deref?
@@ -474,6 +474,20 @@ function ASMConst (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| d, |
 	return dest
 
 
+function Grab (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg| T, |asmreg|)
+	dest = .TempTyped(exp, dest, d)
+
+	|| fat = exp.GRAB(dest, t)
+	|| i = d.Internal						# debug_require
+	if i.IsInt and !i.IsBool
+		|| L = t.BitLoss
+			|| bastard = .CurrFuncGrab.setSign(t.Signed)|int64|
+			fat.Prms[5] = bastard
+			fat.const = L
+
+	return fat * dest.HaveAddr
+
+
 function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
 	|| d = exp.ASMDecl
@@ -486,8 +500,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 			return T
 		if d.IsbareStruct // it already has the address
 			return T.haveaddr
-		dest = .TempTyped(exp, dest, d)
-		return exp.GRAB(dest, t) * dest.HaveAddr
+		return Grab(self, exp, dest, d, t)
 	
 	if d is const
 		return ASMConst(self, exp, dest, d)

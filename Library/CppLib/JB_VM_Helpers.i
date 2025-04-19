@@ -293,11 +293,13 @@ AlwaysInline void RegConv (VMRegister* r, ASM Op) {
 
 AlwaysInline void Rare_ (VMRegister* r, ASM Op) {
 	auto r1 = i1;
-	auto r2 = i2;
+	auto r2 = n2;
 	if (r2 == 1) {		// time
 		r[r1].Uint = RDTSC();
 	} else if (r2 == 2) {
 		JB_Date__Sleep(1);
+	} else if (r2 == 3) {
+		printf("%lli\n", r1);
 	}
 }
 
@@ -329,16 +331,16 @@ bool CompI_ (VMRegister* r, ASM Op) {
 	};
 }
 
-bool CompIS_ (VMRegister* r, ASM Op) {
-	auto A = ii1;
-	auto B = ii2;
-	switch (JCmpI_Cmpu) {
-		CmpSub(0,  A >   B);
-		CmpSub(1,  A <=  B);
-		CmpSub(2, (u32)A >  (u64)B); default:;
-		CmpSub(3, (u32)A <= (u64)B);
-	};
-}
+//bool CompIS_ (VMRegister* r, ASM Op) {
+//	auto A = ii1;
+//	auto B = ii2;
+//	switch (JCmpI_Cmpu) {
+//		CmpSub(0,  A >   B);
+//		CmpSub(1,  A <=  B);
+//		CmpSub(2, (u32)A >  (u64)B); default:;
+//		CmpSub(3, (u32)A <= (u64)B);
+//	};
+//}
 
 
 bool CompF_ (VMRegister* r, ASM Op) {
@@ -369,13 +371,13 @@ AlwaysInline void CompI (VMRegister* r, ASM Op) {
 }
 
 
-AlwaysInline ASM* JumpIS (VMRegister* r, ASM Op, ASM* Code) {
-	return Code + CompIS_(r, Op)*JCmpI_Jmpi;
-}
+//AlwaysInline ASM* JumpIS (VMRegister* r, ASM Op, ASM* Code) {
+//	return Code + CompIS_(r, Op)*JCmpI_Jmpi;
+//}
 		
-AlwaysInline void CompIS (VMRegister* r, ASM Op) {
-	r[JCmpI_Jmpu].Int = CompIS_(r, Op);
-}
+//AlwaysInline void CompIS (VMRegister* r, ASM Op) {
+//	r[JCmpI_Jmpu].Int = CompIS_(r, Op);
+//}
 
 AlwaysInline ASM* JumpF (VMRegister* r, ASM Op, ASM* Code) {
 	return Code + CompF_(r, Op)*JCmpF_Jmpi;

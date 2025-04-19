@@ -108,19 +108,6 @@
 #define   HALT_IsOKu_(x)   (((uint)((x)<<28))>>28)
 
 
-#define   Compare4_Cleari       ((( int)((Op)<<28))>>29)
-#define   Compare4_Cleari_(x)   ((( int)((x)<<28))>>29)
-
-#define   Compare4_Clearu       (((uint)((Op)<<28))>>29)
-#define   Compare4_Clearu_(x)   (((uint)((x)<<28))>>29)
-
-#define   Compare4_Li       ((( int)((Op)<<31))>>31)
-#define   Compare4_Li_(x)   ((( int)((x)<<31))>>31)
-
-#define   Compare4_Lu       (((uint)((Op)<<31))>>31)
-#define   Compare4_Lu_(x)   (((uint)((x)<<31))>>31)
-
-
 #define   AddOrSubM_Shi       ((( int)((Op)<<23))>>26)
 #define   AddOrSubM_Shi_(x)   ((( int)((x)<<23))>>26)
 
@@ -173,17 +160,11 @@
 #define   JCmpK_Jmpu_(x)   (((uint)((x)<<22))>>22)
 
 
-#define   Bra_Bytezi       ((( int)((Op)<<13))>>30)
-#define   Bra_Bytezi_(x)   ((( int)((x)<<13))>>30)
+#define   Bra_Jmpi       ((( int)((Op)<<13))>>13)
+#define   Bra_Jmpi_(x)   ((( int)((x)<<13))>>13)
 
-#define   Bra_Bytezu       (((uint)((Op)<<13))>>30)
-#define   Bra_Bytezu_(x)   (((uint)((x)<<13))>>30)
-
-#define   Bra_Jmpi       ((( int)((Op)<<15))>>15)
-#define   Bra_Jmpi_(x)   ((( int)((x)<<15))>>15)
-
-#define   Bra_Jmpu       (((uint)((Op)<<15))>>15)
-#define   Bra_Jmpu_(x)   (((uint)((x)<<15))>>15)
+#define   Bra_Jmpu       (((uint)((Op)<<13))>>13)
+#define   Bra_Jmpu_(x)   (((uint)((x)<<13))>>13)
 
 
 #define   Loop_Jmpi       ((( int)((Op)<<18))>>18)
