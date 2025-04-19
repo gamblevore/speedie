@@ -156,7 +156,7 @@ function BuildFolder (|file|)
 
 
 
-function CompileAll (|bool|)
+function CompileAll (|int|)
 	require .stage("Compilation")
 	.InitCompiler
 	.ImportAll
@@ -180,6 +180,7 @@ function CompileAll (|bool|)
 	require .Stage( "String Correction" )
 	StringCorrector.CorrectConsts
 	
+	rz += stderr.ok
 	if compiler.inperry or Options.ModePack
 		.Timer( "Export Pack" )
 		PackMaker.MakePack	
@@ -191,11 +192,10 @@ function CompileAll (|bool|)
 
 		SCImport.ExportShaders
 
-	require .Stage( "Finished" )
-	.TimerSub("Parse", .stParseTimeTotal)
-	.Timer( "" )
-	return StdErr.ok
-
+		if .Stage( "Finished" )
+			.TimerSub("Parse", .stParseTimeTotal)
+			.Timer( "" )
+	rz += stderr.ok
 
 function Projects (|String|)
 	return ._projects init file.Speediedir

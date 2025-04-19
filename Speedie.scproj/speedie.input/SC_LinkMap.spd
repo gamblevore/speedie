@@ -87,11 +87,11 @@ function CollectLinks (|object!| obj)
 			return
 
 
-function Reach (|bool|)
-	return .ReachFunc(Compiler.VisibleFuncs!)
+function Reach
+	.ReachFunc(Compiler.VisibleFuncs!)
 
 
-function ReachFunc (|SCNode| from, |bool|)
+function ReachFunc (|SCNode| from)
 	opt norefcounts
 	flow off // memory order dependant!
 	
@@ -99,7 +99,10 @@ function ReachFunc (|SCNode| from, |bool|)
 		error (.source,    "Borked function reached!")
 		error (from.source, from.ReachedName)
 	
-	require !.MyReacher
+	|| MR = .MyReacher
+		if mr == Compiler.VisibleFuncs
+			.MyReacher = from
+		return
 	.MyReacher = from
 		
 	Compiler.stReachedFunc++
@@ -113,7 +116,6 @@ function ReachFunc (|SCNode| from, |bool|)
 			//
 		  elseif (o isa SCFunction)
 			o.ReachFunc(self)
-			rz = true
 		  elseif (o isa SCClass)
 			o.Reach(self)
 	
@@ -122,8 +124,15 @@ function IsUnused (|bool|)
 	opt norefcounts
 	|| p = .project
 		require p.WarnUnusedFuncs
-	if !.myreacher
-		return !.isvisible and (self isnt ConOrDes) and !.IsAllocOrNew
+
+	|| MR = .MyReacher
+	if MR and MR != Compiler.VisibleFuncs
+		return false
+	
+	if .isvisible and .islibrary
+		return false
+
+	return (self isnt ConOrDes) and !.IsAllocOrNew
 
 }
 

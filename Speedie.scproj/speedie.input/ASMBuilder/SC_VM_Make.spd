@@ -193,8 +193,16 @@ function SafeWrite (|String| name, |FastString| data)
 		.CppLibFile(name)!.SmartData = data
 
 
+function UseASM
+	opt norefcounts
+	require 0
+	|| m = Message()
+	m.PRNT(asmreg())
+	m.RARE(asmreg(), asmreg())
+		
 function MakeTheVM (|bool|)
 	compiler.Project.use
+	.UseASM
 	if .BuildFiles	
 		asm.TestASM
 	return stderr.ok
@@ -384,7 +392,8 @@ function FatCreatorSub (|string| name, |µform| form, |message|)
 	for (p in form) (i)
 		|| ty = ("asmreg", "int")(p.isreg)
 		|| pname = f.VMMsgArgName(i)
-		|| dcl = NewDecl(ty, pname)
+		|| rel = NewRel(@thg + pname, @thg + "nil", "=")
+		|| dcl = NewDecl(ty, rel)
 		fatdecl.prev = dcl
 		r[0] = i.msg
 		r[1] = @thg + pname

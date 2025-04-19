@@ -28,6 +28,7 @@ dispatch fn_asm_table (fn_asm)
 
 	(ASMType.kDebugger):	ASMType.Debugger
 	(ASMType.krejoin):		ASMType.First
+	(asmtype.kswap):		ASMType.Swap
 	(ASMType.kreturn):		ASMType.return
 
 	(ASMType.kSetRel):		ASMType.SetRel
@@ -75,7 +76,16 @@ function Debugger (fn_asm)
 	if Options.TargetDebug
 		return exp.TRAP(asmreg(), 0, 2) * ASMReg() // 2 == sigint
 	return asmreg()
-	
+
+
+function Swap (fn_asm)
+	opt norefcounts
+	|| prms = exp.last
+	|| A = .existingvar(prms.first!)
+	|| B = .existingvar(prms.second!)
+	expect (A.reg and B.reg) (exp)
+	return exp.swap(A, B, asmreg(), asmreg())*A
+
 
 function StatExpr (fn_asm)
 	opt norefcounts
@@ -112,18 +122,23 @@ function PreOptBOR (|&ASMState| self, |FATASM| l, |int| Ret, |int|)
 	(self)
 	require !l.prms[2]						// x = b ||| 0  -->  x = b
 	require Ret == l.Prm(0)	// return x
+
 	rz = l.r1
 	using L // SyntaxUsingComplete needs upgrade to deref?
+		|| nn = l.µRefCount
 		l.msg.ret(rz.asm)
 		l.Operatormul(asmreg.exit)
-	rz&=31
+		l.µRefCount = nn
+	rz &= 31
 
 
 function PreOptFnc (|&ASMState| self, |FATASM| l, |int| bb, |bool|)
 	require !l.r3 // no pExt
 	using L
-		l.msg.tail(l.r1, l.r2) // syntaxusingcomplete needs upgrade to deref?
-		L.OperatorMul(asmreg.exit)
+		|| nn = l.µRefCount
+		l.msg.TAIL(l.r1, l.r2) // SyntaxUsingComplete needs upgrade to deref?
+		L.OperatorMul(ASMReg.exit)
+		l.µRefCount = nn
 		return bb == .basicblock // no blocks occured
 
 	

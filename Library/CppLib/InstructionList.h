@@ -4,7 +4,7 @@
 &&EROR,
 &&KNST2,
 &&KNST3,
-&&GMEM,
+&&EROR,
 &&EROR,
 &&EROR,
 &&EROR,

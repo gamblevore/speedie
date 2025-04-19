@@ -9,8 +9,6 @@
 ı KNST3: _
 	LoadConst(r, Op, *((uint64 *)(Code)));
 	Code += 2;
-ı GMEM: _
-	LoadGConst(r, Op, *Code++);
 ı FNC: _
 	Code = BumpStack(vm, r, Code + 1, Op, *Code);
 ı FNC3: _

@@ -92,7 +92,7 @@ function InitedOK (|bool|)
 
 
 function PerryTalk (|SpdProcess| perry) // ReturnsWhenPerryClosesUs
-	.CompiledOK = Compiler.CompileAll
+	.CompiledOK = Compiler.CompileAll >= 1
 	.ParserRestore
 	perry <~ .check
 	
@@ -1080,9 +1080,11 @@ function ASMSub (|message| rz,  |SCFunction| fn, |faststring| fs, |bool|)
 	
 
 function SCFunction.CheckUnusedCode (|message| feedback)
+	opt norefcounts
 	for f.fat in self
-		if f.IsUnused
-			feedback.msg(@tmp, "Unused code") <~ f.msg.position
+		if f.IsUnused and f!=asm.NOOP
+			|| m = f.msg
+				feedback.msg(@tmp, "Unused code") <~ m.position
 
 		
 function DefineOrCall (|message| msg,  |string| purpose,  |object| found=nil,  |message|)

@@ -19,6 +19,11 @@ function fatasm.KNST_Encoder (Asm_encoder)
 	knst.ConstStretchy_Value = v
 	v >>= 17
 
+	if 0
+		.msg.KNSR(asmreg(), 0,0,0) // mark used
+		.msg.KNST2(asmreg(),0,0,0)
+		.msg.KNST3(asmreg(),0,0,0)
+
 	if v
 		curr++[] = v
 		mode = asm.knst2 << 24

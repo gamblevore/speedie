@@ -94,6 +94,7 @@ extend asmstate
 		|| fn = prms.obj|SCFunction|!
 		if fn != Compiler.RefFreeIfDead
 			|| fat = .RefCountSub(exp, prms, fn)
+				fat.µrefcount++
 				return fat * asmreg()
 			return nil
 		|| A = .µ(prms.first!)

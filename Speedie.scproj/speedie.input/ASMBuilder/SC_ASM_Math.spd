@@ -248,10 +248,12 @@ extend ASMState
 			return exp.BFLG(dest, L,  Pow2-1, 0, 0).Vectorise(Dest, asm.QFLG) // y = x * 4  -->  y = x << 2
 			
 		|| five = .IntPowerOfTwo(r, 1) // 5 or 9 or 17 or 33, etc
+			if 0: exp.ADDS, exp.QADD
 			return exp.ADD(Dest, L, L, five-1).VectoriseSmall(dest, asm.QADD, asm.ADDS)
 
 		|| RR = r.const
 		if !dest.isvec and .CanAddK(r, RR)								// a - 1,  a + 1
+			if 0: exp.MLKS
 			return exp.MULK(dest, L, RR).Small(dest, asm.MLKS)
 
 
@@ -351,11 +353,13 @@ extend ASMState
 			if .CanAddK(r, RR)									// a - 1,  a + 1
 				if .InlineAddK(l, rr, dest)
 					return dest
-				return exp.ADDK(dest, L, RR).Vectorise(dest, asm.QADK)
+				if 0: exp.ADKS, exp.QADK
+				return exp.ADDK(dest, L, RR).Vectorisesmall(dest, asm.QADK, asm.ADKS)
 
 		if LMul.IsPow2			  								// x = int1 + int2
 			|| fat = exp.ADD_(dest, L, R, LMul.log2)			// x = lptr + r<<3
-				dest = fat.Vectorise(dest, asm.QADD)
+				if 0: exp.adds, exp.QADD
+				dest = fat.Vectorisesmall(dest, asm.QADD, asm.adds)
 				fat._op += (l is alternate)
 				return dest
 		
@@ -494,7 +498,7 @@ extend ASMState
 				exp.DivByZero
 			return .Quick1Or1Sub(dest, l, ptoi, exp)
 		if !l.Signed
-			return exp.BFLG(dest, l, 0, ptoi-1, 0).vectorise(Dest, asm.QFLG)		// u / 2 --> u >> 1
+			return exp.BFLG(dest, l, 0, ptoi-1, 0).Vectorise(Dest, asm.QFLG)		// u / 2 --> u >> 1
 		return exp.DIV2(dest, l, l.Bitloss, ptoi-1) * Dest		// nice
 
 
@@ -510,6 +514,9 @@ extend ASMState
 		if l.IsBig and !r.IsBig         // Sigh.  Small has garbage, but were doing a 64-bit divide.
 			r = .SmallToBig(r, l, exp)
 		
+		if 0
+			exp.DIVS(ASMReg(), ASMReg(), ASMReg(), ASMReg(), 0)
+			exp.QDIV(ASMReg(), ASMReg(), ASMReg(), ASMReg(), 0)
 		return exp.DIV(dest, ASMReg(), l, r, dest.IntDivType).VectoriseSmall(dest, asm.qdiv, asm.divs)
 
 

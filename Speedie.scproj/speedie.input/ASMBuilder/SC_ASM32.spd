@@ -1,20 +1,18 @@
 
 
-function message.RET (|asmreg| r1=asmreg(), |&fatasm|)
-	return .RET(r1, asmreg(), asmreg(), 0, 0)
-
-
-function message.ADD_ (|ASMReg| r1, |ASMReg| r2, |ASMReg| r3, |int| Sh, |&fatasm|)
+function message.ADD_ (|ASMReg| dest, |ASMReg| r2, |ASMReg| r3, |int| Sh, |&fatasm|)
 	|| Big3 = r3.IsBig
 	if r2.IsBig == Big3
-		return .add(r1, r2, r3, sh)
+		IF 0: .SUB
+		return .add(dest, r2, r3, sh)
 
 	if !sh and big3
 		swap (r2) (r3)				    // r1 = small + big
 		Big3 = false
 		
 	if !big3							// r1 = big + small << sh
-		return .ADDM(r1, r2, r3, sh)
+		IF 0: .SUBM
+		return .ADDM(dest, r2, r3, sh)
 
 
 function asmstate.MUL_ (|ASMReg| dest, |ASMReg| A, |ASMReg| B, |asmreg| Add, |message| exp, |&fatasm|)

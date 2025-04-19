@@ -102,8 +102,9 @@ struct ASMState
 
 
 	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
-		if togrow.isint and value.CanStoreAsIntImmediate
-			return exp.ADPK(dest, ToGrow, Value) * Dest
+		if togrow.isint and value.CanStoreAsIntImmediate and !dest.IsVec
+			if 0: exp.APKS
+			return exp.ADPK(dest, ToGrow, Value).Small(dest, asm.APKS)
 		.Assign(dest, ToGrow, exp)
 		rz = .IncrPre(exp, togrow, ToGrow, value)
 
@@ -765,6 +766,11 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 		fat._op = asm.FNCX
 	fat._op += PExt > 0
 	
+	if 0
+		prms.FNC3(dest, TableID, P,  PExt) // MARK USED
+		prms.FNCX(dest, TableID, P,  PExt) // MARK USED
+		prms.FNCX3(dest, TableID, P, PExt) // MARK USED
+
 	if RegAddrs
 		.RegsBitClear(exp, RegAddrs, fn)
 	

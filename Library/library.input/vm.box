@@ -378,9 +378,9 @@ POS 5
 		LoadConst(r, Op, *((uint64*)(Code)))
 		Code+=2
 
-POS 6
-	GMEM (ConstGlobal) // for global memory adresses
-		LoadGConst(r, Op, *Code++)
+//POS 6
+//	GMEM (ConstGlobal) // for global memory adresses
+//		LoadGConst(r, Op, *Code++)
 
 
 

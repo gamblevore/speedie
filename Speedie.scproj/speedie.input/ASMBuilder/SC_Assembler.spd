@@ -38,7 +38,7 @@ module SpdAssembler
 		return compiler.XFunc(m.name, m)	#expect (m, "This function has no ASM")
 						
 
-	function GenerateASM (|scfunction| fn, |int| i=0,  |bool|) // asmgen
+	function GenerateASM (|scfunction| fn, |int| i=0,  |bool|) // asmgenerate
 		opt norefcounts
 		
 		require ASMState.Sh.InitAndStartFunc(fn)

@@ -77,6 +77,7 @@ struct FatASM
 			._op = VOpp
 		return dest
 	
+	
 	function VectoriseSmall (|asmreg| Dest, |asm| VOpp, |asm| SOpp, |asmreg|)
 		dest.FatIndex = .index
 		.info = dest
@@ -84,7 +85,7 @@ struct FatASM
 			if !vopp // oof?
 			._op = VOpp
 		  elseif !dest.isbig
-/			._op = sopp
+			._op = sopp
 		return dest
 	
 	
@@ -92,7 +93,7 @@ struct FatASM
 		dest.FatIndex = .index
 		.info = dest
 		if !dest.isbig
-/			._op = sopp
+			._op = sopp
 		return dest
 	
 

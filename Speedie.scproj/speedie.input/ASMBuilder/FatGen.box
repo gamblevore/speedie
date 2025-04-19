@@ -1,5 +1,5 @@
 
-function message.TAIL (|int| JUMP, |int| Prm1, |&fatasm|) {
+function message.TAIL (|int| JUMP = nil, |int| Prm1 = nil, |&fatasm|) {
 	visible
 	rz = self * asm.TAIL
 	rz.numinput(0) = JUMP
@@ -7,7 +7,7 @@ function message.TAIL (|int| JUMP, |int| Prm1, |&fatasm|) {
 }
 
 
-function message.FNC (|asmreg| r1, |int| JUMP, |int| Prm1, |int| Prm2, |&fatasm|) {
+function message.FNC (|asmreg| r1 = nil, |int| JUMP = nil, |int| Prm1 = nil, |int| Prm2 = nil, |&fatasm|) {
 	visible
 	rz = self * asm.FNC
 	rz.dest(0, r1)
@@ -17,7 +17,7 @@ function message.FNC (|asmreg| r1, |int| JUMP, |int| Prm1, |int| Prm2, |&fatasm|
 }
 
 
-function message.FNC3 (|asmreg| r1, |int| JUMP, |int| Prm1, |int| Prm2, |&fatasm|) {
+function message.FNC3 (|asmreg| r1 = nil, |int| JUMP = nil, |int| Prm1 = nil, |int| Prm2 = nil, |&fatasm|) {
 	visible
 	rz = self * asm.FNC3
 	rz.dest(0, r1)
@@ -27,7 +27,7 @@ function message.FNC3 (|asmreg| r1, |int| JUMP, |int| Prm1, |int| Prm2, |&fatasm
 }
 
 
-function message.FNCX (|asmreg| r1, |int| Table, |int| Prm1, |int| Prm2, |&fatasm|) {
+function message.FNCX (|asmreg| r1 = nil, |int| Table = nil, |int| Prm1 = nil, |int| Prm2 = nil, |&fatasm|) {
 	visible
 	rz = self * asm.FNCX
 	rz.dest(0, r1)
@@ -37,7 +37,7 @@ function message.FNCX (|asmreg| r1, |int| Table, |int| Prm1, |int| Prm2, |&fatas
 }
 
 
-function message.FNCX3 (|asmreg| r1, |int| Table, |int| Prm1, |int| Prm2, |&fatasm|) {
+function message.FNCX3 (|asmreg| r1 = nil, |int| Table = nil, |int| Prm1 = nil, |int| Prm2 = nil, |&fatasm|) {
 	visible
 	rz = self * asm.FNCX3
 	rz.dest(0, r1)
@@ -47,7 +47,7 @@ function message.FNCX3 (|asmreg| r1, |int| Table, |int| Prm1, |int| Prm2, |&fata
 }
 
 
-function message.KNST2 (|asmreg| r1, |int| Cond, |int| Inv, |int| Value, |&fatasm|) {
+function message.KNST2 (|asmreg| r1 = nil, |int| Cond = nil, |int| Inv = nil, |int| Value = nil, |&fatasm|) {
 	visible
 	rz = self * asm.KNST2
 	rz.dest(0, r1)
@@ -57,7 +57,7 @@ function message.KNST2 (|asmreg| r1, |int| Cond, |int| Inv, |int| Value, |&fatas
 }
 
 
-function message.KNST3 (|asmreg| r1, |int| Cond, |int| Inv, |int| Value, |&fatasm|) {
+function message.KNST3 (|asmreg| r1 = nil, |int| Cond = nil, |int| Inv = nil, |int| Value = nil, |&fatasm|) {
 	visible
 	rz = self * asm.KNST3
 	rz.dest(0, r1)
@@ -67,15 +67,7 @@ function message.KNST3 (|asmreg| r1, |int| Cond, |int| Inv, |int| Value, |&fatas
 }
 
 
-function message.GMEM (|asmreg| r1, |int| Value, |&fatasm|) {
-	visible
-	rz = self * asm.GMEM
-	rz.dest(0, r1)
-	rz.numinput(1) = Value
-}
-
-
-function message.EROR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| IsOK, |&fatasm|) {
+function message.EROR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| IsOK = nil, |&fatasm|) {
 	visible
 	rz = self * asm.EROR
 	rz.reginput(0) = r1
@@ -92,7 +84,7 @@ function message.NOOP (|&fatasm|, ) {
 }
 
 
-function message.TRAP (|asmreg| r1, |int| Mode, |int| Signal, |&fatasm|) {
+function message.TRAP (|asmreg| r1 = nil, |int| Mode = nil, |int| Signal = nil, |&fatasm|) {
 	visible
 	rz = self * asm.TRAP
 	rz.reginput(0) = r1
@@ -101,7 +93,7 @@ function message.TRAP (|asmreg| r1, |int| Mode, |int| Signal, |&fatasm|) {
 }
 
 
-function message.GRAB (|asmreg| r1, |asmreg| r2, |&fatasm|) {
+function message.GRAB (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 	visible
 	rz = self * asm.GRAB
 	rz.dest(0, r1)
@@ -109,7 +101,7 @@ function message.GRAB (|asmreg| r1, |asmreg| r2, |&fatasm|) {
 }
 
 
-function message.RET (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| SafeDecr, |int| Value, |&fatasm|) {
+function message.RET (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| SafeDecr = nil, |int| Value = nil, |&fatasm|) {
 	visible
 	rz = self * asm.RET
 	rz.reginput(0) = r1
@@ -120,7 +112,7 @@ function message.RET (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| SafeDecr, |in
 }
 
 
-function message.ALLO (|asmreg| r1, |int| Amount, |&fatasm|) {
+function message.ALLO (|asmreg| r1 = nil, |int| Amount = nil, |&fatasm|) {
 	visible
 	rz = self * asm.ALLO
 	rz.dest(0, r1)
@@ -128,7 +120,7 @@ function message.ALLO (|asmreg| r1, |int| Amount, |&fatasm|) {
 }
 
 
-function message.SWAP (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+function message.SWAP (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
 	visible
 	rz = self * asm.SWAP
 	rz.dest(0, r1)
@@ -138,14 +130,14 @@ function message.SWAP (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fat
 }
 
 
-function message.PRNT (|asmreg| r1, |&fatasm|) {
+function message.PRNT (|asmreg| r1 = nil, |&fatasm|) {
 	visible
 	rz = self * asm.PRNT
 	rz.dest(0, r1)
 }
 
 
-function message.RARE (|asmreg| r1, |asmreg| r2, |&fatasm|) {
+function message.RARE (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 	visible
 	rz = self * asm.RARE
 	rz.dest(0, r1)
@@ -153,7 +145,7 @@ function message.RARE (|asmreg| r1, |asmreg| r2, |&fatasm|) {
 }
 
 
-function message.CONV (|asmreg| r1, |asmreg| r2, |int| Mode, |&fatasm|) {
+function message.CONV (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Mode = nil, |&fatasm|) {
 	visible
 	rz = self * asm.CONV
 	rz.dest(0, r1)
@@ -162,7 +154,7 @@ function message.CONV (|asmreg| r1, |asmreg| r2, |int| Mode, |&fatasm|) {
 }
 
 
-function message.KNSR (|asmreg| r1, |int| Rot, |int| Inv, |int| Value, |&fatasm|) {
+function message.KNSR (|asmreg| r1 = nil, |int| Rot = nil, |int| Inv = nil, |int| Value = nil, |&fatasm|) {
 	visible
 	rz = self * asm.KNSR
 	rz.dest(0, r1)
@@ -172,7 +164,7 @@ function message.KNSR (|asmreg| r1, |int| Rot, |int| Inv, |int| Value, |&fatasm|
 }
 
 
-function message.KNST (|asmreg| r1, |int| Cond, |int| Inv, |int| Value, |&fatasm|) {
+function message.KNST (|asmreg| r1 = nil, |int| Cond = nil, |int| Inv = nil, |int| Value = nil, |&fatasm|) {
 	visible
 	rz = self * asm.KNST
 	rz.dest(0, r1)
@@ -182,7 +174,7 @@ function message.KNST (|asmreg| r1, |int| Cond, |int| Inv, |int| Value, |&fatasm
 }
 
 
-function message.ADDK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+function message.ADDK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	rz = self * asm.ADDK
 	rz.dest(0, r1)
@@ -191,7 +183,7 @@ function message.ADDK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
 }
 
 
-function message.ADPK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+function message.ADPK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	rz = self * asm.ADPK
 	rz.dest(0, r1)
@@ -200,7 +192,7 @@ function message.ADPK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
 }
 
 
-function message.MULK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+function message.MULK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	rz = self * asm.MULK
 	rz.dest(0, r1)
@@ -209,7 +201,7 @@ function message.MULK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
 }
 
 
-function message.ADD (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.ADD (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.ADD
 	rz.dest(0, r1)
@@ -219,7 +211,7 @@ function message.ADD (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|
 }
 
 
-function message.SUB (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.SUB (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.SUB
 	rz.dest(0, r1)
@@ -229,7 +221,7 @@ function message.SUB (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|
 }
 
 
-function message.MUL (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+function message.MUL (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
 	visible
 	rz = self * asm.MUL
 	rz.dest(0, r1)
@@ -239,7 +231,7 @@ function message.MUL (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fata
 }
 
 
-function message.DIV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Kind, |&fatasm|) {
+function message.DIV (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Kind = nil, |&fatasm|) {
 	visible
 	rz = self * asm.DIV
 	rz.dest(0, r1)
@@ -250,7 +242,7 @@ function message.DIV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| 
 }
 
 
-function message.DIV2 (|asmreg| r1, |asmreg| r2, |int| Sh, |int| Clear, |&fatasm|) {
+function message.DIV2 (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Sh = nil, |int| Clear = nil, |&fatasm|) {
 	visible
 	rz = self * asm.DIV2
 	rz.dest(0, r1)
@@ -260,7 +252,7 @@ function message.DIV2 (|asmreg| r1, |asmreg| r2, |int| Sh, |int| Clear, |&fatasm
 }
 
 
-function message.CLAMI (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Clear, |&fatasm|) {
+function message.CLAMI (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Clear = nil, |&fatasm|) {
 	visible
 	rz = self * asm.CLAMI
 	rz.dest(0, r1)
@@ -271,7 +263,7 @@ function message.CLAMI (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int
 }
 
 
-function message.CLAMU (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Clear, |&fatasm|) {
+function message.CLAMU (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Clear = nil, |&fatasm|) {
 	visible
 	rz = self * asm.CLAMU
 	rz.dest(0, r1)
@@ -282,7 +274,7 @@ function message.CLAMU (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int
 }
 
 
-function message.ADDM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.ADDM (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.ADDM
 	rz.dest(0, r1)
@@ -292,7 +284,7 @@ function message.ADDM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.SUBM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.SUBM (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.SUBM
 	rz.dest(0, r1)
@@ -302,7 +294,7 @@ function message.SUBM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.DIVS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Kind, |&fatasm|) {
+function message.DIVS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Kind = nil, |&fatasm|) {
 	visible
 	rz = self * asm.DIVS
 	rz.dest(0, r1)
@@ -313,7 +305,7 @@ function message.DIVS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int|
 }
 
 
-function message.ADKS (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+function message.ADKS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	rz = self * asm.ADKS
 	rz.dest(0, r1)
@@ -322,7 +314,7 @@ function message.ADKS (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
 }
 
 
-function message.APKS (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+function message.APKS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	rz = self * asm.APKS
 	rz.dest(0, r1)
@@ -331,7 +323,7 @@ function message.APKS (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
 }
 
 
-function message.MLKS (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+function message.MLKS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	rz = self * asm.MLKS
 	rz.dest(0, r1)
@@ -340,7 +332,7 @@ function message.MLKS (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
 }
 
 
-function message.ADDS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.ADDS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.ADDS
 	rz.dest(0, r1)
@@ -350,7 +342,7 @@ function message.ADDS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.SUBS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.SUBS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.SUBS
 	rz.dest(0, r1)
@@ -360,7 +352,7 @@ function message.SUBS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.MULS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+function message.MULS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
 	visible
 	rz = self * asm.MULS
 	rz.dest(0, r1)
@@ -370,7 +362,7 @@ function message.MULS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fat
 }
 
 
-function message.BFLG (|asmreg| r1, |asmreg| r2, |int| up, |int| down, |int| sign, |&fatasm|) {
+function message.BFLG (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |int| down = nil, |int| sign = nil, |&fatasm|) {
 	visible
 	rz = self * asm.BFLG
 	rz.dest(0, r1)
@@ -381,7 +373,7 @@ function message.BFLG (|asmreg| r1, |asmreg| r2, |int| up, |int| down, |int| sig
 }
 
 
-function message.BRSS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.BRSS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.BRSS
 	rz.dest(0, r1)
@@ -391,7 +383,7 @@ function message.BRSS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.BRSH (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.BRSH (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.BRSH
 	rz.dest(0, r1)
@@ -401,7 +393,7 @@ function message.BRSH (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.BLSH (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.BLSH (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.BLSH
 	rz.dest(0, r1)
@@ -411,7 +403,7 @@ function message.BLSH (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.BSTT (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+function message.BSTT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
 	visible
 	rz = self * asm.BSTT
 	rz.dest(0, r1)
@@ -421,7 +413,7 @@ function message.BSTT (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fat
 }
 
 
-function message.BAND (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.BAND (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.BAND
 	rz.dest(0, r1)
@@ -431,7 +423,7 @@ function message.BAND (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.BXOR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.BXOR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.BXOR
 	rz.dest(0, r1)
@@ -441,7 +433,7 @@ function message.BXOR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.BORR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.BORR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.BORR
 	rz.dest(0, r1)
@@ -451,7 +443,7 @@ function message.BORR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.BNOT (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.BNOT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.BNOT
 	rz.dest(0, r1)
@@ -461,7 +453,7 @@ function message.BNOT (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.BANDK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+function message.BANDK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	rz = self * asm.BANDK
 	rz.dest(0, r1)
@@ -470,7 +462,7 @@ function message.BANDK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
 }
 
 
-function message.BXORK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+function message.BXORK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	rz = self * asm.BXORK
 	rz.dest(0, r1)
@@ -479,7 +471,7 @@ function message.BXORK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
 }
 
 
-function message.BORRK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+function message.BORRK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	rz = self * asm.BORRK
 	rz.dest(0, r1)
@@ -488,7 +480,7 @@ function message.BORRK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
 }
 
 
-function message.BNOTK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+function message.BNOTK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	rz = self * asm.BNOTK
 	rz.dest(0, r1)
@@ -497,7 +489,7 @@ function message.BNOTK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
 }
 
 
-function message.CMPB (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Inv, |&fatasm|) {
+function message.CMPB (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Inv = nil, |&fatasm|) {
 	visible
 	rz = self * asm.CMPB
 	rz.dest(0, r1)
@@ -507,7 +499,7 @@ function message.CMPB (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Inv, |&fatas
 }
 
 
-function message.TERN (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Clear, |&fatasm|) {
+function message.TERN (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Clear = nil, |&fatasm|) {
 	visible
 	rz = self * asm.TERN
 	rz.dest(0, r1)
@@ -518,7 +510,7 @@ function message.TERN (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int|
 }
 
 
-function message.CMPI (|asmreg| r1, |asmreg| r2, |int| Cmp, |int| Jmp, |&fatasm|) {
+function message.CMPI (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Cmp = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.CMPI
 	rz.reginput(0) = r1
@@ -531,7 +523,7 @@ function message.CMPI (|asmreg| r1, |asmreg| r2, |int| Cmp, |int| Jmp, |&fatasm|
 }
 
 
-function message.CMPIS (|asmreg| r1, |asmreg| r2, |int| Cmp, |int| Jmp, |&fatasm|) {
+function message.CMPIS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Cmp = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.CMPIS
 	rz.reginput(0) = r1
@@ -544,7 +536,7 @@ function message.CMPIS (|asmreg| r1, |asmreg| r2, |int| Cmp, |int| Jmp, |&fatasm
 }
 
 
-function message.CMPF (|asmreg| r1, |asmreg| r2, |int| Cmp, |int| Jmp, |&fatasm|) {
+function message.CMPF (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Cmp = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.CMPF
 	rz.reginput(0) = r1
@@ -557,7 +549,7 @@ function message.CMPF (|asmreg| r1, |asmreg| r2, |int| Cmp, |int| Jmp, |&fatasm|
 }
 
 
-function message.JSWI (|asmreg| r1, |asmreg| r2, |int| Big, |int| Jmp, |&fatasm|) {
+function message.JSWI (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Big = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.JSWI
 	rz.reginput(0) = r1
@@ -570,7 +562,7 @@ function message.JSWI (|asmreg| r1, |asmreg| r2, |int| Big, |int| Jmp, |&fatasm|
 }
 
 
-function message.JUMP (|int| JUMP, |&fatasm|) {
+function message.JUMP (|int| JUMP = nil, |&fatasm|) {
 	visible
 	rz = self * asm.JUMP
 	rz.jumpinput(0) = JUMP
@@ -580,7 +572,7 @@ function message.JUMP (|int| JUMP, |&fatasm|) {
 }
 
 
-function message.JMPI (|asmreg| r1, |asmreg| r2, |int| Cmp, |int| Jmp, |&fatasm|) {
+function message.JMPI (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Cmp = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.JMPI
 	rz.reginput(0) = r1
@@ -593,7 +585,7 @@ function message.JMPI (|asmreg| r1, |asmreg| r2, |int| Cmp, |int| Jmp, |&fatasm|
 }
 
 
-function message.JMPIS (|asmreg| r1, |asmreg| r2, |int| Cmp, |int| Jmp, |&fatasm|) {
+function message.JMPIS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Cmp = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.JMPIS
 	rz.reginput(0) = r1
@@ -606,7 +598,7 @@ function message.JMPIS (|asmreg| r1, |asmreg| r2, |int| Cmp, |int| Jmp, |&fatasm
 }
 
 
-function message.JMPF (|asmreg| r1, |asmreg| r2, |int| Cmp, |int| Jmp, |&fatasm|) {
+function message.JMPF (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Cmp = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.JMPF
 	rz.reginput(0) = r1
@@ -619,7 +611,7 @@ function message.JMPF (|asmreg| r1, |asmreg| r2, |int| Cmp, |int| Jmp, |&fatasm|
 }
 
 
-function message.JMPE (|asmreg| r1, |asmreg| r2, |int| Big, |int| Jmp, |&fatasm|) {
+function message.JMPE (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Big = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.JMPE
 	rz.reginput(0) = r1
@@ -632,7 +624,7 @@ function message.JMPE (|asmreg| r1, |asmreg| r2, |int| Big, |int| Jmp, |&fatasm|
 }
 
 
-function message.JMPN (|asmreg| r1, |asmreg| r2, |int| Big, |int| Jmp, |&fatasm|) {
+function message.JMPN (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Big = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.JMPN
 	rz.reginput(0) = r1
@@ -645,7 +637,7 @@ function message.JMPN (|asmreg| r1, |asmreg| r2, |int| Big, |int| Jmp, |&fatasm|
 }
 
 
-function message.JMPK (|asmreg| r1, |int| K, |int| Jmp, |&fatasm|) {
+function message.JMPK (|asmreg| r1 = nil, |int| K = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.JMPK
 	rz.reginput(0) = r1
@@ -657,7 +649,7 @@ function message.JMPK (|asmreg| r1, |int| K, |int| Jmp, |&fatasm|) {
 }
 
 
-function message.JMPKN (|asmreg| r1, |int| K, |int| Jmp, |&fatasm|) {
+function message.JMPKN (|asmreg| r1 = nil, |int| K = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.JMPKN
 	rz.reginput(0) = r1
@@ -669,7 +661,7 @@ function message.JMPKN (|asmreg| r1, |int| K, |int| Jmp, |&fatasm|) {
 }
 
 
-function message.JBOR (|asmreg| r1, |int| Bytez, |int| Jmp, |&fatasm|) {
+function message.JBOR (|asmreg| r1 = nil, |int| Bytez = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.JBOR
 	rz.reginput(0) = r1
@@ -681,7 +673,7 @@ function message.JBOR (|asmreg| r1, |int| Bytez, |int| Jmp, |&fatasm|) {
 }
 
 
-function message.JBAN (|asmreg| r1, |int| Bytez, |int| Jmp, |&fatasm|) {
+function message.JBAN (|asmreg| r1 = nil, |int| Bytez = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.JBAN
 	rz.reginput(0) = r1
@@ -693,7 +685,7 @@ function message.JBAN (|asmreg| r1, |int| Bytez, |int| Jmp, |&fatasm|) {
 }
 
 
-function message.LUPD (|asmreg| r1, |asmreg| r2, |int| Jmp, |&fatasm|) {
+function message.LUPD (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.LUPD
 	rz.dest(0, r1)
@@ -705,7 +697,7 @@ function message.LUPD (|asmreg| r1, |asmreg| r2, |int| Jmp, |&fatasm|) {
 }
 
 
-function message.LUPU (|asmreg| r1, |asmreg| r2, |int| Jmp, |&fatasm|) {
+function message.LUPU (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.LUPU
 	rz.dest(0, r1)
@@ -717,7 +709,7 @@ function message.LUPU (|asmreg| r1, |asmreg| r2, |int| Jmp, |&fatasm|) {
 }
 
 
-function message.RFAP (|asmreg| r1, |asmreg| r2, |asmreg| r3, |&fatasm|) {
+function message.RFAP (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |&fatasm|) {
 	visible
 	rz = self * asm.RFAP
 	rz.reginput(0) = r1
@@ -726,7 +718,7 @@ function message.RFAP (|asmreg| r1, |asmreg| r2, |asmreg| r3, |&fatasm|) {
 }
 
 
-function message.RFST (|asmreg| r1, |asmreg| r2, |&fatasm|) {
+function message.RFST (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 	visible
 	rz = self * asm.RFST
 	rz.reginput(0) = r1
@@ -734,7 +726,7 @@ function message.RFST (|asmreg| r1, |asmreg| r2, |&fatasm|) {
 }
 
 
-function message.RFWR (|asmreg| r1, |asmreg| r2, |int| Decr, |int| Offset, |&fatasm|) {
+function message.RFWR (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Decr = nil, |int| Offset = nil, |&fatasm|) {
 	visible
 	rz = self * asm.RFWR
 	rz.reginput(0) = r1
@@ -744,7 +736,7 @@ function message.RFWR (|asmreg| r1, |asmreg| r2, |int| Decr, |int| Offset, |&fat
 }
 
 
-function message.RFRD (|asmreg| r1, |asmreg| r2, |int| Decr, |int| Offset, |&fatasm|) {
+function message.RFRD (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Decr = nil, |int| Offset = nil, |&fatasm|) {
 	visible
 	rz = self * asm.RFRD
 	rz.dest(0, r1)
@@ -754,7 +746,7 @@ function message.RFRD (|asmreg| r1, |asmreg| r2, |int| Decr, |int| Offset, |&fat
 }
 
 
-function message.RFDC (|asmreg| r1, |int| Count, |int| Offset, |&fatasm|) {
+function message.RFDC (|asmreg| r1 = nil, |int| Count = nil, |int| Offset = nil, |&fatasm|) {
 	visible
 	rz = self * asm.RFDC
 	rz.reginput(0) = r1
@@ -763,7 +755,7 @@ function message.RFDC (|asmreg| r1, |int| Count, |int| Offset, |&fatasm|) {
 }
 
 
-function message.RALO (|asmreg| r1, |asmreg| r2, |&fatasm|) {
+function message.RALO (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 	visible
 	rz = self * asm.RALO
 	rz.dest(0, r1)
@@ -771,7 +763,7 @@ function message.RALO (|asmreg| r1, |asmreg| r2, |&fatasm|) {
 }
 
 
-function message.GSTR (|asmreg| r1, |int| Mode, |int| Add, |&fatasm|) {
+function message.GSTR (|asmreg| r1 = nil, |int| Mode = nil, |int| Add = nil, |&fatasm|) {
 	visible
 	rz = self * asm.GSTR
 	rz.dest(0, r1)
@@ -780,7 +772,7 @@ function message.GSTR (|asmreg| r1, |int| Mode, |int| Add, |&fatasm|) {
 }
 
 
-function message.GTAB (|asmreg| r1, |int| Mode, |int| Add, |&fatasm|) {
+function message.GTAB (|asmreg| r1 = nil, |int| Mode = nil, |int| Add = nil, |&fatasm|) {
 	visible
 	rz = self * asm.GTAB
 	rz.dest(0, r1)
@@ -789,7 +781,7 @@ function message.GTAB (|asmreg| r1, |int| Mode, |int| Add, |&fatasm|) {
 }
 
 
-function message.RD1U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+function message.RD1U (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Offset = nil, |int| move = nil, |&fatasm|) {
 	visible
 	rz = self * asm.RD1U
 	rz.dest(0, r1)
@@ -800,7 +792,7 @@ function message.RD1U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int
 }
 
 
-function message.RD1S (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+function message.RD1S (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Offset = nil, |int| move = nil, |&fatasm|) {
 	visible
 	rz = self * asm.RD1S
 	rz.dest(0, r1)
@@ -811,7 +803,7 @@ function message.RD1S (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int
 }
 
 
-function message.RD2U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+function message.RD2U (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Offset = nil, |int| move = nil, |&fatasm|) {
 	visible
 	rz = self * asm.RD2U
 	rz.dest(0, r1)
@@ -822,7 +814,7 @@ function message.RD2U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int
 }
 
 
-function message.RD2S (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+function message.RD2S (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Offset = nil, |int| move = nil, |&fatasm|) {
 	visible
 	rz = self * asm.RD2S
 	rz.dest(0, r1)
@@ -833,7 +825,7 @@ function message.RD2S (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int
 }
 
 
-function message.RD4U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+function message.RD4U (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Offset = nil, |int| move = nil, |&fatasm|) {
 	visible
 	rz = self * asm.RD4U
 	rz.dest(0, r1)
@@ -844,7 +836,7 @@ function message.RD4U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int
 }
 
 
-function message.RD4S (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+function message.RD4S (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Offset = nil, |int| move = nil, |&fatasm|) {
 	visible
 	rz = self * asm.RD4S
 	rz.dest(0, r1)
@@ -855,7 +847,7 @@ function message.RD4S (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int
 }
 
 
-function message.RD8U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+function message.RD8U (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Offset = nil, |int| move = nil, |&fatasm|) {
 	visible
 	rz = self * asm.RD8U
 	rz.dest(0, r1)
@@ -866,7 +858,7 @@ function message.RD8U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int
 }
 
 
-function message.RD16 (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+function message.RD16 (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Offset = nil, |int| move = nil, |&fatasm|) {
 	visible
 	rz = self * asm.RD16
 	rz.dest(0, r1)
@@ -877,7 +869,7 @@ function message.RD16 (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int
 }
 
 
-function message.WR1U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+function message.WR1U (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Offset = nil, |int| move = nil, |&fatasm|) {
 	visible
 	rz = self * asm.WR1U
 	rz.reginput(0) = r1
@@ -888,7 +880,7 @@ function message.WR1U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int
 }
 
 
-function message.WR2U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+function message.WR2U (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Offset = nil, |int| move = nil, |&fatasm|) {
 	visible
 	rz = self * asm.WR2U
 	rz.reginput(0) = r1
@@ -899,7 +891,7 @@ function message.WR2U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int
 }
 
 
-function message.WR4U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+function message.WR4U (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Offset = nil, |int| move = nil, |&fatasm|) {
 	visible
 	rz = self * asm.WR4U
 	rz.reginput(0) = r1
@@ -910,7 +902,7 @@ function message.WR4U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int
 }
 
 
-function message.WR8U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+function message.WR8U (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Offset = nil, |int| move = nil, |&fatasm|) {
 	visible
 	rz = self * asm.WR8U
 	rz.reginput(0) = r1
@@ -921,7 +913,7 @@ function message.WR8U (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int
 }
 
 
-function message.WR16 (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int| move, |&fatasm|) {
+function message.WR16 (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Offset = nil, |int| move = nil, |&fatasm|) {
 	visible
 	rz = self * asm.WR16
 	rz.reginput(0) = r1
@@ -932,7 +924,7 @@ function message.WR16 (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Offset, |int
 }
 
 
-function message.CNTC (|asmreg| r1, |asmreg| r2, |int| offset, |int| cnst, |int| size, |&fatasm|) {
+function message.CNTC (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| offset = nil, |int| cnst = nil, |int| size = nil, |&fatasm|) {
 	visible
 	rz = self * asm.CNTC
 	rz.dest(0, r1)
@@ -943,7 +935,7 @@ function message.CNTC (|asmreg| r1, |asmreg| r2, |int| offset, |int| cnst, |int|
 }
 
 
-function message.CNTD (|asmreg| r1, |asmreg| r2, |int| offset, |int| cnst, |int| size, |&fatasm|) {
+function message.CNTD (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| offset = nil, |int| cnst = nil, |int| size = nil, |&fatasm|) {
 	visible
 	rz = self * asm.CNTD
 	rz.dest(0, r1)
@@ -954,7 +946,7 @@ function message.CNTD (|asmreg| r1, |asmreg| r2, |int| offset, |int| cnst, |int|
 }
 
 
-function message.MEMZ (|asmreg| r1, |int| Value, |&fatasm|) {
+function message.MEMZ (|asmreg| r1 = nil, |int| Value = nil, |&fatasm|) {
 	visible
 	rz = self * asm.MEMZ
 	rz.dest(0, r1)
@@ -962,7 +954,7 @@ function message.MEMZ (|asmreg| r1, |int| Value, |&fatasm|) {
 }
 
 
-function message.FADD (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+function message.FADD (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
 	visible
 	rz = self * asm.FADD
 	rz.dest(0, r1)
@@ -973,7 +965,7 @@ function message.FADD (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int|
 }
 
 
-function message.FADK (|asmreg| r1, |asmreg| r2, |int| High, |&fatasm|) {
+function message.FADK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| High = nil, |&fatasm|) {
 	visible
 	rz = self * asm.FADK
 	rz.dest(0, r1)
@@ -982,7 +974,7 @@ function message.FADK (|asmreg| r1, |asmreg| r2, |int| High, |&fatasm|) {
 }
 
 
-function message.FMUL (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+function message.FMUL (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
 	visible
 	rz = self * asm.FMUL
 	rz.dest(0, r1)
@@ -993,7 +985,7 @@ function message.FMUL (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int|
 }
 
 
-function message.FMLK (|asmreg| r1, |asmreg| r2, |int| High, |&fatasm|) {
+function message.FMLK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| High = nil, |&fatasm|) {
 	visible
 	rz = self * asm.FMLK
 	rz.dest(0, r1)
@@ -1002,7 +994,7 @@ function message.FMLK (|asmreg| r1, |asmreg| r2, |int| High, |&fatasm|) {
 }
 
 
-function message.FDIV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+function message.FDIV (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
 	visible
 	rz = self * asm.FDIV
 	rz.dest(0, r1)
@@ -1013,7 +1005,7 @@ function message.FDIV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int|
 }
 
 
-function message.FFRC (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+function message.FFRC (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
 	visible
 	rz = self * asm.FFRC
 	rz.dest(0, r1)
@@ -1024,7 +1016,7 @@ function message.FFRC (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int|
 }
 
 
-function message.FCLM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+function message.FCLM (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
 	visible
 	rz = self * asm.FCLM
 	rz.dest(0, r1)
@@ -1035,7 +1027,7 @@ function message.FCLM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int|
 }
 
 
-function message.VGET (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Ind, |&fatasm|) {
+function message.VGET (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Ind = nil, |&fatasm|) {
 	visible
 	rz = self * asm.VGET
 	rz.dest(0, r1)
@@ -1045,7 +1037,7 @@ function message.VGET (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Ind, |&fatas
 }
 
 
-function message.VSET (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Ind, |&fatasm|) {
+function message.VSET (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Ind = nil, |&fatasm|) {
 	visible
 	rz = self * asm.VSET
 	rz.dest(0, r1)
@@ -1055,7 +1047,7 @@ function message.VSET (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Ind, |&fatas
 }
 
 
-function message.VBLD (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| r5, |&fatasm|) {
+function message.VBLD (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| r5 = nil, |&fatasm|) {
 	visible
 	rz = self * asm.VBLD
 	rz.dest(0, r1)
@@ -1066,7 +1058,7 @@ function message.VBLD (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int|
 }
 
 
-function message.VSWZ (|asmreg| r1, |asmreg| r2, |int| Fields, |&fatasm|) {
+function message.VSWZ (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Fields = nil, |&fatasm|) {
 	visible
 	rz = self * asm.VSWZ
 	rz.dest(0, r1)
@@ -1075,7 +1067,7 @@ function message.VSWZ (|asmreg| r1, |asmreg| r2, |int| Fields, |&fatasm|) {
 }
 
 
-function message.VMOV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+function message.VMOV (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
 	visible
 	rz = self * asm.VMOV
 	rz.dest(0, r1)
@@ -1085,7 +1077,7 @@ function message.VMOV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fat
 }
 
 
-function message.VADD (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+function message.VADD (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
 	visible
 	rz = self * asm.VADD
 	rz.dest(0, r1)
@@ -1096,7 +1088,7 @@ function message.VADD (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int|
 }
 
 
-function message.VADK (|asmreg| r1, |asmreg| r2, |int| High, |&fatasm|) {
+function message.VADK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| High = nil, |&fatasm|) {
 	visible
 	rz = self * asm.VADK
 	rz.dest(0, r1)
@@ -1105,7 +1097,7 @@ function message.VADK (|asmreg| r1, |asmreg| r2, |int| High, |&fatasm|) {
 }
 
 
-function message.VMUL (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+function message.VMUL (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
 	visible
 	rz = self * asm.VMUL
 	rz.dest(0, r1)
@@ -1116,7 +1108,7 @@ function message.VMUL (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int|
 }
 
 
-function message.VMLK (|asmreg| r1, |asmreg| r2, |int| High, |&fatasm|) {
+function message.VMLK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| High = nil, |&fatasm|) {
 	visible
 	rz = self * asm.VMLK
 	rz.dest(0, r1)
@@ -1125,7 +1117,7 @@ function message.VMLK (|asmreg| r1, |asmreg| r2, |int| High, |&fatasm|) {
 }
 
 
-function message.VDIV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+function message.VDIV (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
 	visible
 	rz = self * asm.VDIV
 	rz.dest(0, r1)
@@ -1136,7 +1128,7 @@ function message.VDIV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int|
 }
 
 
-function message.VFRC (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+function message.VFRC (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
 	visible
 	rz = self * asm.VFRC
 	rz.dest(0, r1)
@@ -1147,7 +1139,7 @@ function message.VFRC (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int|
 }
 
 
-function message.VCLM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| D, |&fatasm|) {
+function message.VCLM (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| D = nil, |&fatasm|) {
 	visible
 	rz = self * asm.VCLM
 	rz.dest(0, r1)
@@ -1158,7 +1150,7 @@ function message.VCLM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int|
 }
 
 
-function message.QADD (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.QADD (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.QADD
 	rz.dest(0, r1)
@@ -1168,7 +1160,7 @@ function message.QADD (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.QSUB (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.QSUB (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.QSUB
 	rz.dest(0, r1)
@@ -1178,7 +1170,7 @@ function message.QSUB (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.QMUL (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fatasm|) {
+function message.QMUL (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
 	visible
 	rz = self * asm.QMUL
 	rz.dest(0, r1)
@@ -1188,7 +1180,7 @@ function message.QMUL (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |&fat
 }
 
 
-function message.QDIV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Kind, |&fatasm|) {
+function message.QDIV (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Kind = nil, |&fatasm|) {
 	visible
 	rz = self * asm.QDIV
 	rz.dest(0, r1)
@@ -1199,7 +1191,7 @@ function message.QDIV (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int|
 }
 
 
-function message.QCLM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int| Clear, |&fatasm|) {
+function message.QCLM (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Clear = nil, |&fatasm|) {
 	visible
 	rz = self * asm.QCLM
 	rz.dest(0, r1)
@@ -1210,7 +1202,7 @@ function message.QCLM (|asmreg| r1, |asmreg| r2, |asmreg| r3, |asmreg| r4, |int|
 }
 
 
-function message.QADK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
+function message.QADK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	rz = self * asm.QADK
 	rz.dest(0, r1)
@@ -1219,7 +1211,7 @@ function message.QADK (|asmreg| r1, |asmreg| r2, |int| K, |&fatasm|) {
 }
 
 
-function message.QFLG (|asmreg| r1, |asmreg| r2, |int| up, |int| down, |int| sign, |&fatasm|) {
+function message.QFLG (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |int| down = nil, |int| sign = nil, |&fatasm|) {
 	visible
 	rz = self * asm.QFLG
 	rz.dest(0, r1)
@@ -1230,7 +1222,7 @@ function message.QFLG (|asmreg| r1, |asmreg| r2, |int| up, |int| down, |int| sig
 }
 
 
-function message.QRSS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.QRSS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.QRSS
 	rz.dest(0, r1)
@@ -1240,7 +1232,7 @@ function message.QRSS (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.QRSH (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.QRSH (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.QRSH
 	rz.dest(0, r1)
@@ -1250,7 +1242,7 @@ function message.QRSH (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.QLSH (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.QLSH (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.QLSH
 	rz.dest(0, r1)
@@ -1260,7 +1252,7 @@ function message.QLSH (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.QAND (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.QAND (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.QAND
 	rz.dest(0, r1)
@@ -1270,7 +1262,7 @@ function message.QAND (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.QXOR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.QXOR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.QXOR
 	rz.dest(0, r1)
@@ -1280,7 +1272,7 @@ function message.QXOR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.QORR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.QORR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.QORR
 	rz.dest(0, r1)
@@ -1290,7 +1282,7 @@ function message.QORR (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm
 }
 
 
-function message.QNOT (|asmreg| r1, |asmreg| r2, |asmreg| r3, |int| Sh, |&fatasm|) {
+function message.QNOT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
 	visible
 	rz = self * asm.QNOT
 	rz.dest(0, r1)
