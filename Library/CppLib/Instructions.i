@@ -105,8 +105,6 @@
 	u1 = u2 ^ U2_Li;
 ı BORRK: _
 	u1 = u2 | U2_Li;
-ı BNOTK: _
-	u1 = ~u2 & ~U2_Li;
 ı CMPB: _
 	u1 = BitComp(r, Op);
 ı TERN: _

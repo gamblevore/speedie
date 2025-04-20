@@ -469,8 +469,8 @@ POS 5
 		u1 = u2  ^  U2_Li
 /**/ BORRK   (AddK)
 		u1 = u2 ||| U2_Li
-/**/ BNOTK  (AddK)
-		u1 = ~u2 & ~U2_Li
+///**/ BNOTK  (AddK)
+//		u1 = ~u2 & ~U2_Li
 
 
 
