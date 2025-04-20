@@ -296,63 +296,6 @@ function message.DIVS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-//function message.ADKS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
-//	visible
-//	rz = self * asm.ADKS
-//	rz.dest(0, r1)
-//	rz.reginput(1) = r2
-//	rz.numinput(2) = K
-//}
-//
-//
-//function message.APKS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
-//	visible
-//	rz = self * asm.APKS
-//	rz.dest(0, r1)
-//	rz.reginput(1) = r2
-//	rz.numinput(2) = K
-//}
-//
-//
-//function message.MLKS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
-//	visible
-//	rz = self * asm.MLKS
-//	rz.dest(0, r1)
-//	rz.reginput(1) = r2
-//	rz.numinput(2) = K
-//}
-//
-//
-//function message.ADDS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
-//	visible
-//	rz = self * asm.ADDS
-//	rz.dest(0, r1)
-//	rz.reginput(1) = r2
-//	rz.reginput(2) = r3
-//	rz.numinput(3) = Sh
-//}
-//
-//
-//function message.SUBS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
-//	visible
-//	rz = self * asm.SUBS
-//	rz.dest(0, r1)
-//	rz.reginput(1) = r2
-//	rz.reginput(2) = r3
-//	rz.numinput(3) = Sh
-//}
-//
-//
-//function message.MULS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
-//	visible
-//	rz = self * asm.MULS
-//	rz.dest(0, r1)
-//	rz.reginput(1) = r2
-//	rz.reginput(2) = r3
-//	rz.reginput(3) = r4
-//}
-
-
 function message.BFLG (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |int| down = nil, |int| sign = nil, |&fatasm|) {
 	visible
 	rz = self * asm.BFLG
@@ -470,14 +413,6 @@ function message.BORRK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&f
 	rz.numinput(2) = K
 }
 
-
-function message.BNOTK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
-	visible
-	rz = self * asm.BNOTK
-	rz.dest(0, r1)
-	rz.reginput(1) = r2
-	rz.numinput(2) = K
-}
 
 
 function message.CMPB (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Inv = nil, |&fatasm|) {

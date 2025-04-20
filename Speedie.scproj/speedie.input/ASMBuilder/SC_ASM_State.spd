@@ -377,6 +377,11 @@ struct ASMState
 			base = .AddToReg(exp, asmreg(), base as asmreg.noscale, index)
 			index = 0
 		
+
+		if 0: exp.RD1U, exp.RD1S, exp.RD2U, exp.RD2S, exp.RD4S, exp.RD8U, exp.RD16
+		if 0: exp.WR1U, exp.WR2U, exp.WR4U, exp.WR8U, exp.WR16
+ 
+			
 		rz = exp.RD4U(dest, base, varadd, index, 0)
 		if dest is set
 			rz._op = ASMType.WriteASM[bytes]

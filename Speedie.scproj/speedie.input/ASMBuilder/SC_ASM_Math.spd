@@ -83,7 +83,8 @@ extend ASMState
 		require !l.isbig and k.fits(9, true)	
 		.NopConst(R)
 		k = k|uint64|.trim(9)
-		|| J = exp.JMPK(l, k, 0) 
+		|| J = exp.JMPK(l, k, 0)
+		if 0: exp.JMPKN
 		j._op += mode&1						// jmpkn
 		return J * dest
 
@@ -209,6 +210,7 @@ extend ASMState
 		k ^= (l is Alternate)<<31
 		require (k >> 18) << 18 == k
 		.NopConst(r)
+		if 0: exp.VADK
 		return exp.FADK(dest, l, k).Vectorise(dest, asm.vadk)
 
 
@@ -242,10 +244,11 @@ extend ASMState
 		|| Pow2 = .IntPowerOfTwo(r)
 			if Pow2 <= 1
 				return .Quick1Or1Sub(dest, l, Pow2, exp)
+			if 0: exp.QFLG
 			return exp.BFLG(dest, L,  Pow2-1, 0, 0).Vectorise(Dest, asm.QFLG) // y = x * 4  -->  y = x << 2
 			
 		|| five = .IntPowerOfTwo(r, 1) // 5 or 9 or 17 or 33, etc
-			if 0: exp.QADD
+			if 0: exp.QADD, exp.QSUB
 			return exp.ADD(Dest, L, L, five-1).Vectorise(dest, asm.QADD)
 
 		|| RR = r.const
@@ -268,7 +271,8 @@ extend ASMState
 			|| y = x >> 18
 			if x == y << 18
 				.NopReg(r)
-				return exp.FMLK(dest, l, x).Vectorise(dest, asm.vmlk)
+				if 0: exp.VMLK
+				return exp.FMLK(dest, l, x).Vectorise(dest, asm.VMLK)
 
 	
 	function ASMReg.SomePointer (|bool|)
@@ -354,7 +358,6 @@ extend ASMState
 
 		if LMul.IsPow2			  								// x = int1 + int2
 			|| fat = exp.ADD_(dest, L, R, LMul.log2)			// x = lptr + r<<3
-				if 0: exp.QADD
 				dest = fat.Vectorise(dest, asm.QADD)
 				fat._op += (l is alternate)
 				return dest
@@ -391,6 +394,7 @@ extend ASMState
 
 		|| ss = (l is alternate)
 		|| rr = r.reg
+		if 0: exp.VADD
 		return exp.fADD(dest, l, r*!ss, r*ss, 1-IsF32).Vectorise(dest, asm.vadd)
 
 
@@ -428,6 +432,7 @@ extend ASMState
 		if rz == nil
 			rz = .QuickFloatMul(dest, L, R, exp)
 			if rz == nil
+				if 0: exp.VMUL
 				rz = exp.FMUL(dest, L, R, asmreg(), l.IsBig|int|).Vectorise(dest, asm.vmul)
 
 
@@ -476,7 +481,8 @@ extend ASMState
 			return .MakeConst2(dest, l, r, exp, ConstifyFloatDiv)
 		rz = .QuickFloatDiv(dest, L, R, exp)
 		if rz == nil
-			rz = exp.FDIV(dest,  L,  R,  asmreg(), dest.isbig|int|) * dest
+			if 0: exp.VDIV
+			rz = exp.FDIV(dest,  L,  R,  asmreg(), dest.isbig|int|).Vectorise(dest, asm.VDIV)
 
 
 	function SelfDivide (|asmreg| dest, |message| exp, |asmreg|)
@@ -527,8 +533,9 @@ extend ASMState
 		if dest is ConstOutput
 			return .MakeConst2(dest, L, R, exp, Constifyfloatmod)
 		|| big = dest.IsBig|int|
-		exp.fdiv(dest, L, R, asmreg(), big)
-		return exp.FFRC(dest, asmreg(), dest, R, big) * dest
+		exp.fdiv(dest, L, R, asmreg(), big).Vectorise(dest, asm.VDIV)
+		if 0: exp.vfrc
+		return exp.FFRC(dest, asmreg(), dest, R, big).Vectorise(dest, asm.VFRC)
 
 	
 	function Mod    (fn_opasm)
@@ -542,7 +549,8 @@ extend ASMState
 		if r.reg // what?
 		if dest is ConstOutput
 			return .makeconst2(dest, l, asmreg(), exp, ConstifyBitNot)
-		return .BitMaker(dest, l, asmreg(), exp, asm.bnot)
+		if 0: exp.BNOT, exp.qnot
+		return .BitMaker(dest, l, asmreg(), exp, asm.bnot, asm.qnot)
 
 
 	function BitXor (fn_opasm)
@@ -556,8 +564,8 @@ extend ASMState
 			return l
 		if (l is ConstOutput)
 			swap (l) (r)
-		if 0: exp.BXOR
-		return .BitMaker(dest, l, r, exp, asm.bxor)
+		if 0: exp.BXOR, exp.qxor
+		return .BitMaker(dest, l, r, exp, asm.bxor, asm.qxor)
 
 
 	function BitOr (fn_opasm)
@@ -584,7 +592,8 @@ extend ASMState
 					return r
 		if (l is ConstOutput)
 			swap (l) (r)
-		return .BitMaker(dest, l, r, exp, asm.borr)
+		if 0: exp.BORR, exp.qorr
+		return .BitMaker(dest, l, r, exp, asm.borr, asm.qorr)
 
 			
 	function BitAnd (fn_opasm)		
@@ -602,24 +611,27 @@ extend ASMState
 			return l
 		if (l is ConstOutput)
 			swap (l) (r)
-		return .BitMaker(dest, l, r, exp, asm.band)
+		if 0: exp.qand
+		return .BitMaker(dest, l, r, exp, asm.band, asm.QAND)
 	
 	
-	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Op, |asmreg|)
+	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Opp, |asm| VOpp,   |asmreg|)
 		if asm.BORRK!=asm.borr+4 // what?
 
-		|| k = .Const(R, 14, true)
-		if k > 0 // easier to optimise bor than bork?
-			|| fat = exp.BANDK(dest, L, K) 
-			fat._op = op+4
-			return fat * Dest
+		if (opp != asm.bnot) and !dest.IsVec
+			|| k = .Const(R, 14, true)
+			if k > 0 // easier to optimise bor than bork?
+				if 0:  exp.BORRK,  exp.BXORK
+				|| fat = exp.BANDK(dest, L, K) 
+				fat._op = opp+4
+				return fat * Dest
 
 		|| Clear = l.BitCount - r.BitCount
 		if Clear < 0
 			swap (l) (r)
 			clear = -clear
 		|| fat = exp.BAND(dest, L, R, Clear)
-		fat._op = op
+		fat._op = opp
 		return fat * Dest
 
 
@@ -630,9 +642,10 @@ extend ASMState
 			return .BFLG_Const(exp, dest, l, 0, k)
 		
 		|| fat = exp.BRSH(dest, L, R, l.bitloss)
+		fat.Vectorise(dest, asm.QRSS)
 		if l.Signed
-			if 0: exp.brss
-			fat._op = asm.brss
+			if 0: exp.brss, exp.QRSS, exp.QRSH
+			fat._op--
 		return fat * dest	
 
 
@@ -642,7 +655,8 @@ extend ASMState
 		|| K = .const(R, 6, false)
 			return .BFLG_Const(exp, dest, l,  K, 0)
 		
-		return exp.BLSH(dest, L, R, l.bitloss) * dest
+		if 0: exp.QLSH
+		return exp.BLSH(dest, L, R, l.bitloss).Vectorise(Dest, asm.QLSH)
 
 
 	function BFLG_Const  (|message| exp, |asmreg| dest, |asmreg| Src, |uint| up, |uint| down, |asmreg|)

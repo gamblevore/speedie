@@ -576,14 +576,15 @@ function IncrSlowOnAddr (|&ASMState| self, |message| f, |ASMReg| Dest, |int| Mod
 	return fat * Dest
 
 
-function IncrOnAddr (|&ASMState| self, |message| f, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |asmreg|)
+function IncrOnAddr (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |asmreg|)
 	ifn  dest.isint  and  amount.fits(7)
-		return IncrSlowOnAddr(self, f, dest, mode, Addr, Amount)
+		return IncrSlowOnAddr(self, exp, dest, mode, Addr, Amount)
 	|| bc = dest.µtype.ByteCount.log2
 	|| offset = 0
 	addr = .InlineOffsetOpt(addr, bc, &offset, 5~bits)
-	|| fat = f.CNTC(Addr, dest, offset, amount, bc)
+	|| fat = exp.CNTC(Addr, dest, offset, amount, bc)
 	if mode & IncrAfter
+		if 0: exp.CNTD
 		fat._op = asm.cntd
 	return fat * dest
 

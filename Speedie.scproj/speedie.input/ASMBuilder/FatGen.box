@@ -424,15 +424,6 @@ function message.BORRK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&f
 }
 
 
-function message.BNOTK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
-	visible
-	rz = self * asm.BNOTK
-	rz.dest(0, r1)
-	rz.reginput(1) = r2
-	rz.numinput(2) = K
-}
-
-
 function message.CMPB (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Inv = nil, |&fatasm|) {
 	visible
 	rz = self * asm.CMPB

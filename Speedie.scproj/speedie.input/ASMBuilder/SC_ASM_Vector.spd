@@ -43,7 +43,8 @@ extend ASMState
 		
 		dest = .TempOnly(exp, dest)
 		.CloseVars(Closer)
-
+		
+		if 0: exp.VBLD
 		|| fat = exp * asm.VBLD
 		fat.dest(0, dest)
 		fat.RegInput(1) = vv[0]
