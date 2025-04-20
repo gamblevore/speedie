@@ -116,6 +116,6 @@ function errorseverity.Color (|float| alpha=1.0, |vec4|)
 		return vec4(1.0, 1.0, 0.5, alpha)
 	if self == ErrorSeverity.OK
 		return colors.White(alpha)
-	return colors.Magenta(alpha)
+	return vec4(1.0, 0.0, 0.5, alpha)
 
 

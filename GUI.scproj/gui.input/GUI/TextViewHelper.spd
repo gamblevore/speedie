@@ -302,11 +302,10 @@ helper textview.DrawErrorMark (|image| where, |textviewline| s, |vec4| C)
 	
 	Y *= .height|float|
 	|| p = ivec2(.right - 5, .lastrect.y + Y|int|)
-	|| strength = .DrawScrollStrength
+	|| strength = .DrawScrollStrength * c.a * 0.35
 	for i in -1 to 1
-		C.a = 0.4 * Strength
-		if i == 0
-			C.a = 0.8 * Strength
+		C.a = Strength
+		C.a += Strength * !i
 		|| range = (p.x+4) downto (p.x-4)
 		for xx in Range
 			|| px = where[xx,p.y+i]

@@ -1700,7 +1700,11 @@ class TextView (GUIControl)
 		require .DrawScrollStrength
 		for s in ._lines
 			|| E = s.LineError
-				.DrawErrorMark(where, s, E.Severity.color)
+				|| Sev = E.Severity
+				|| c = Sev.color(1.0)
+				if sev == ErrorSeverity.Hint
+					c.a *= 0.6
+				.DrawErrorMark(where, s, C)
 			  elseif s is BreakPoint
 				.DrawErrorMark(where, s, colors.purple)
 		
