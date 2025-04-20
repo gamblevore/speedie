@@ -38,7 +38,8 @@ struct LoopInfo
 			// not really a nil-operation though is it?
 			// maybe its ok :) quite rare!
 		*/
-
+	
+		using ErrorSeverity.Critical
 		|| Ex = .ExitRecord						#check (msg, "Loop never exits.")
 		if !.HasEscape and !msg.islast
 			msg.KinderRemoveAfter

@@ -248,7 +248,8 @@ function NilFunction (NilTrackerFn)
 		fp = fp.unbra
 		require .UseAsReal(fp, 0, nilreason.accessing)					// (abc)()
 
-	expect ((fn != scfunction.currfunc) or t.anyreturns or t.nestdepth > 0) (msg, "Recursion fail: This would freeze on call.")
+	using ErrorSeverity.Critical
+		expect ((fn != scfunction.currfunc) or t.anyreturns or t.nestdepth > 0) (msg, "Recursion fail: This would freeze on call.")
 	
 	if (Test is Active) and fn.IsNilChecker
 		if fn.isnilchecker != 3

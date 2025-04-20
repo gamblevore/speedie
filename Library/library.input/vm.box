@@ -69,21 +69,24 @@ forms
 	JCmpI
 		r1		r
 		r2		r
-		Cmp		2
+		Cmp		4
 		Jmp		j
 
 	JCmpK	 // still needs the big/small thing. do later.
 		r1		r
+		Big		1
 		K		9
 		Jmp		j
 
 	Bra		// bra:
 		r1		r
+		Big		1
 		Jmp		j
 	
 	Loop
 		r1		R
 		r2		r
+		Big		1
 		Jmp		j
 	
 	Table
@@ -416,19 +419,20 @@ POS 5
 		i1 = (i2 - ii3) >> AddOrSubM_Shu
 /**/ DIVS (Div)
 		DivMath32(r, Op)
-/**/ ADKS (AddK)
-		i1 = ii2 + U2_Li
-/**/ APKS (AddK)										// post-increment
-		i1 = ii2
-		i2 = ii2 + U2_Li
-/**/ MLKS  (AddK)
-		i1 = ii2 * U2_Li
-/**/ ADDS  (Shift)
-		i1 = ii2 + (ii3 << Shift_Shu)
-/**/ SUBS  (Shift)              						// must come after ADD
-		i1 = (ii2 - ii3) >> Shift_Shu
 /**/ MULS  (U4)
 		i1 = (ii2 * ii3) + ii4
+///**/ ADKS (AddK)
+//		i1 = ii2 + U2_Li
+///**/ APKS (AddK)										// post-increment
+//		i1 = ii2
+//		i2 = ii2 + U2_Li
+///**/ MLKS  (AddK)
+//		i1 = ii2 * U2_Li
+///**/ ADDS  (Shift)
+//		i1 = ii2 + (ii3 << Shift_Shu)
+///**/ SUBS  (Shift)              						// must come after ADD
+//		i1 = (ii2 - ii3) >> Shift_Shu
+
 
 
 
@@ -458,7 +462,7 @@ POS 5
 /**/ BORR  (Shift)
 		u1 = u2 ||| ((u3 << Shift_Shu) >> Shift_Shu)
 /**/ BNOT  (Shift)
-		u1 = ~u2 & ((~u3 << Shift_Shu) >> Shift_Shu)
+		u1 = ~u2 &  ((u3 << Shift_Shu) >> Shift_Shu)
 /**/ BANDK  (AddK)
 		u1 = u2  &  U2_Li
 /**/ BXORK  (AddK)
@@ -471,11 +475,11 @@ POS 5
 
 
 #!						 (((((MiniCompare)))))
-/**/ CMPB  (CmpB)
+/**/ CMPB  (CmpB) // do we need this now? If everything is 32-bit correct at least?
 		u1 = BitComp(r, Op)
 
 /**/ TERN  (U4)
-		if (u2) // All are bit-correct?
+		if (u2) // needs a shift
 			r[n1] = r[n3]
 		else
 			r[n1] = r[n4]
@@ -489,8 +493,8 @@ POS 5
 
 
 #!						 (((((Branches)))))
-/**/ JSWI (JCmpEq)
-		Code += n1+n2+JCmpEq_Jmpi
+///**/ JSWI (JCmpEq)
+//		Code += n1+n2+JCmpEq_Jmpi
 
 /**/ JUMP (jump)
 		Code += l0

@@ -475,10 +475,11 @@ function ASMConst (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| d, |
 
 
 function Grab (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg| T, |asmreg|)
+	opt norefcounts
 	dest = .TempTyped(exp, dest, d)
 
 	|| fat = exp.GRAB(dest, t)
-	|| i = d.Internal						# debug_require
+	|| i = d.Internal											#debug_require
 	if i.IsInt and !i.IsBool
 		|| L = t.BitLoss
 			|| bastard = .CurrFuncGrab.setSign(t.Signed)|int64|

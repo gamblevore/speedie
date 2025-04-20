@@ -245,13 +245,12 @@ extend ASMState
 			return exp.BFLG(dest, L,  Pow2-1, 0, 0).Vectorise(Dest, asm.QFLG) // y = x * 4  -->  y = x << 2
 			
 		|| five = .IntPowerOfTwo(r, 1) // 5 or 9 or 17 or 33, etc
-			if 0: exp.ADDS, exp.QADD
-			return exp.ADD(Dest, L, L, five-1).VectoriseSmall(dest, asm.QADD, asm.ADDS)
+			if 0: exp.QADD
+			return exp.ADD(Dest, L, L, five-1).Vectorise(dest, asm.QADD)
 
 		|| RR = r.const
 		if !dest.isvec and .CanAddK(r, RR)								// a - 1,  a + 1
-			if 0: exp.MLKS
-			return exp.MULK(dest, L, RR).Small(dest, asm.MLKS)
+			return exp.MULK(dest, L, RR) * dest
 
 
 	function QuickFloatMul    (fn_OpASM)
@@ -350,13 +349,13 @@ extend ASMState
 			if .CanAddK(r, RR)									// a - 1,  a + 1
 				if .InlineAddK(l, rr, dest)
 					return dest
-				if 0: exp.ADKS, exp.QADK
-				return exp.ADDK(dest, L, RR).Vectorisesmall(dest, asm.QADK, asm.ADKS)
+				if 0: exp.QADK
+				return exp.ADDK(dest, L, RR).Vectorise(dest, asm.QADK)
 
 		if LMul.IsPow2			  								// x = int1 + int2
 			|| fat = exp.ADD_(dest, L, R, LMul.log2)			// x = lptr + r<<3
-				if 0: exp.adds, exp.QADD, exp.subs
-				dest = fat.Vectorisesmall(dest, asm.QADD, asm.adds)
+				if 0: exp.QADD
+				dest = fat.Vectorise(dest, asm.QADD)
 				fat._op += (l is alternate)
 				return dest
 		
@@ -439,8 +438,8 @@ extend ASMState
 		if rz == nil
 			rz = .QuickIntMul(dest, L, R, exp)
 			if rz == nil
-				if 0: exp.qmul, exp.muls
-				rz = .MUL_(dest, L, R, asmreg(), exp).VectoriseSmall(dest, asm.qmul, asm.MULS)
+				if 0: exp.qmul
+				rz = .MUL_(dest, L, R, asmreg(), exp).Vectorise(dest, asm.qmul)
 
 
 	function BoolMul (|asmreg| dest, |asmreg| Bule, |asmreg| V, |message| exp, |asmreg|)		
@@ -515,7 +514,7 @@ extend ASMState
 		if 0
 			exp.DIVS(ASMReg(), ASMReg(), ASMReg(), ASMReg(), 0)
 			exp.QDIV(ASMReg(), ASMReg(), ASMReg(), ASMReg(), 0)
-		return exp.DIV(dest, ASMReg(), l, r, dest.IntDivType).VectoriseSmall(dest, asm.qdiv, asm.divs)
+		return exp.DIV(dest, ASMReg(), l, r, dest.IntDivType).Vectorise(dest, asm.qdiv)
 
 
 	function ModInt    (fn_opasm)

@@ -538,8 +538,6 @@ class PerryIDE (Window)
 				return true
 			LogAreaKeys(.CommsLogList, key)
 			return true
-		if key is e
-			return .SaveAndShowErrors
 		if key is i
 			FileViewerCountCode(.filelist, nil, .filelist.LastSelected.cell)
 			return true
@@ -598,7 +596,7 @@ class PerryIDE (Window)
 			if NumKey == 4
 				return .StrongView(.ViewDebugger)
 			if NumKey == 3
-				return .StrongView(.Viewerrors)
+				return .SaveAndShowErrors
 			if NumKey == 2
 				return .StrongView(.ViewSearch)
 			if NumKey == 1

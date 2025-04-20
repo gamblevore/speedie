@@ -74,17 +74,6 @@
 	i1 = (i2 - ii3) >> AddOrSubM_Shu;
 ı DIVS: _
 	DivMath32(r, Op);
-ı ADKS: _
-	i1 = ii2 + U2_Li;
-ı APKS: _
-	i1 = ii2;
-	i2 = ii2 + U2_Li;
-ı MLKS: _
-	i1 = ii2 * U2_Li;
-ı ADDS: _
-	i1 = ii2 + (ii3 << Shift_Shu);
-ı SUBS: _
-	i1 = (ii2 - ii3) >> Shift_Shu;
 ı MULS: _
 	i1 = (ii2 * ii3) + ii4;
 ı BFLG: _
@@ -109,7 +98,7 @@
 ı BORR: _
 	u1 = u2 | ((u3 << Shift_Shu) >> Shift_Shu);
 ı BNOT: _
-	u1 = ~u2 & ((~u3 << Shift_Shu) >> Shift_Shu);
+	u1 = ~u2 & ((u3 << Shift_Shu) >> Shift_Shu);
 ı BANDK: _
 	u1 = u2 & U2_Li;
 ı BXORK: _
@@ -131,8 +120,6 @@
 	CompI(r, Op);
 ı CMPF: _
 	CompF(r, Op);
-ı JSWI: _
-	Code += n1 + n2 + JCmpEq_Jmpi;
 ı JUMP: _
 	Code += l0;
 ı JMPI: _

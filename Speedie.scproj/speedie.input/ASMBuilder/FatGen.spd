@@ -296,61 +296,61 @@ function message.DIVS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.ADKS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
-	visible
-	rz = self * asm.ADKS
-	rz.dest(0, r1)
-	rz.reginput(1) = r2
-	rz.numinput(2) = K
-}
-
-
-function message.APKS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
-	visible
-	rz = self * asm.APKS
-	rz.dest(0, r1)
-	rz.reginput(1) = r2
-	rz.numinput(2) = K
-}
-
-
-function message.MLKS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
-	visible
-	rz = self * asm.MLKS
-	rz.dest(0, r1)
-	rz.reginput(1) = r2
-	rz.numinput(2) = K
-}
-
-
-function message.ADDS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
-	visible
-	rz = self * asm.ADDS
-	rz.dest(0, r1)
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.numinput(3) = Sh
-}
-
-
-function message.SUBS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
-	visible
-	rz = self * asm.SUBS
-	rz.dest(0, r1)
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.numinput(3) = Sh
-}
-
-
-function message.MULS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
-	visible
-	rz = self * asm.MULS
-	rz.dest(0, r1)
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.reginput(3) = r4
-}
+//function message.ADKS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+//	visible
+//	rz = self * asm.ADKS
+//	rz.dest(0, r1)
+//	rz.reginput(1) = r2
+//	rz.numinput(2) = K
+//}
+//
+//
+//function message.APKS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+//	visible
+//	rz = self * asm.APKS
+//	rz.dest(0, r1)
+//	rz.reginput(1) = r2
+//	rz.numinput(2) = K
+//}
+//
+//
+//function message.MLKS (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+//	visible
+//	rz = self * asm.MLKS
+//	rz.dest(0, r1)
+//	rz.reginput(1) = r2
+//	rz.numinput(2) = K
+//}
+//
+//
+//function message.ADDS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
+//	visible
+//	rz = self * asm.ADDS
+//	rz.dest(0, r1)
+//	rz.reginput(1) = r2
+//	rz.reginput(2) = r3
+//	rz.numinput(3) = Sh
+//}
+//
+//
+//function message.SUBS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Sh = nil, |&fatasm|) {
+//	visible
+//	rz = self * asm.SUBS
+//	rz.dest(0, r1)
+//	rz.reginput(1) = r2
+//	rz.reginput(2) = r3
+//	rz.numinput(3) = Sh
+//}
+//
+//
+//function message.MULS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
+//	visible
+//	rz = self * asm.MULS
+//	rz.dest(0, r1)
+//	rz.reginput(1) = r2
+//	rz.reginput(2) = r3
+//	rz.reginput(3) = r4
+//}
 
 
 function message.BFLG (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |int| down = nil, |int| sign = nil, |&fatasm|) {
@@ -526,17 +526,17 @@ function message.CMPF (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Cmp = nil, |i
 }
 
 
-function message.JSWI (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Big = nil, |int| Jmp = nil, |&fatasm|) {
-	visible
-	rz = self * asm.JSWI
-	rz.reginput(0) = r1
-	rz.reginput(1) = r2
-	rz.numinput(2) = Big
-	rz.jumpinput(3) = Jmp
-	if (((Jmp << 19) >> 19) != Jmp) {
-		error (self, `Jumped too far`)
-	}
-}
+//function message.JSWI (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Big = nil, |int| Jmp = nil, |&fatasm|) {
+//	visible
+//	rz = self * asm.JSWI
+//	rz.reginput(0) = r1
+//	rz.reginput(1) = r2
+//	rz.numinput(2) = Big
+//	rz.jumpinput(3) = Jmp
+//	if (((Jmp << 19) >> 19) != Jmp) {
+//		error (self, `Jumped too far`)
+//	}
+//}
 
 
 function message.JUMP (|int| JUMP = nil, |&fatasm|) {

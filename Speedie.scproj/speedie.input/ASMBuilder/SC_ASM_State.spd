@@ -104,8 +104,7 @@ struct ASMState
 
 	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
 		if togrow.isint and value.CanStoreAsIntImmediate and !dest.IsVec
-			if 0: exp.APKS
-			return exp.ADPK(dest, ToGrow, Value).Small(dest, asm.APKS)
+			return exp.ADPK(dest, ToGrow, Value) * Dest
 		.Assign(dest, ToGrow, exp)
 		rz = .IncrPre(exp, togrow, ToGrow, value)
 
