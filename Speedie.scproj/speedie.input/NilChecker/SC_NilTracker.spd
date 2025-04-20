@@ -38,12 +38,14 @@ struct LoopInfo
 			// not really a nil-operation though is it?
 			// maybe its ok :) quite rare!
 		*/
-	
-		using ErrorSeverity.Critical
-		|| Ex = .ExitRecord						#check (msg, "Loop never exits.")
+		
+		|| Ex = .ExitRecord
+		ArchonPurger.t.value = Ex
+		if !ex
+			ErrorReceiver.NewCriticalError(msg, "Loop never exits.")
+
 		if !.HasEscape and !msg.islast
 			msg.KinderRemoveAfter
-		ArchonPurger.t.value = Ex
 	
 	
 	function NextLoop 
