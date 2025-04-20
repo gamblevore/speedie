@@ -143,7 +143,7 @@ struct JB_Object {
 
 
 struct JB_RingList : JB_Object { // a list that does not own its items... unlike JB_List
-	uint					PID;
+	uint					Dummy;
     JB_RingList*			Next;
     JB_RingList*			Prev;
 };
@@ -257,11 +257,6 @@ JBStructData(JB_Object);
 struct Array;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void JB_Helper_SelfLink(JB_RingList* New);
-void JB_Helper_PutBefore(JB_RingList* Old, JB_RingList* New);
-void JB_Helper_PutAfter(JB_RingList* Old, JB_RingList* New);
-void JB_Helper_Unlink(JB_RingList* Curr);
 
 JB_MemoryWorld* JB_MemStandardWorld();
 JB_MemoryLayer* JB_Mem__New( JB_Class* Cls );

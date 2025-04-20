@@ -134,44 +134,62 @@
 #define   JCmpF_Jmpu_(x)   (((uint)((x)<<21))>>21)
 
 
-#define   JCmpI_Cmpi       ((( int)((Op)<<18))>>30)
-#define   JCmpI_Cmpi_(x)   ((( int)((x)<<18))>>30)
+#define   JCmpI_Cmpi       ((( int)((Op)<<18))>>28)
+#define   JCmpI_Cmpi_(x)   ((( int)((x)<<18))>>28)
 
-#define   JCmpI_Cmpu       (((uint)((Op)<<18))>>30)
-#define   JCmpI_Cmpu_(x)   (((uint)((x)<<18))>>30)
+#define   JCmpI_Cmpu       (((uint)((Op)<<18))>>28)
+#define   JCmpI_Cmpu_(x)   (((uint)((x)<<18))>>28)
 
-#define   JCmpI_Jmpi       ((( int)((Op)<<20))>>20)
-#define   JCmpI_Jmpi_(x)   ((( int)((x)<<20))>>20)
+#define   JCmpI_Jmpi       ((( int)((Op)<<22))>>22)
+#define   JCmpI_Jmpi_(x)   ((( int)((x)<<22))>>22)
 
-#define   JCmpI_Jmpu       (((uint)((Op)<<20))>>20)
-#define   JCmpI_Jmpu_(x)   (((uint)((x)<<20))>>20)
-
-
-#define   JCmpK_Ki       ((( int)((Op)<<13))>>23)
-#define   JCmpK_Ki_(x)   ((( int)((x)<<13))>>23)
-
-#define   JCmpK_Ku       (((uint)((Op)<<13))>>23)
-#define   JCmpK_Ku_(x)   (((uint)((x)<<13))>>23)
-
-#define   JCmpK_Jmpi       ((( int)((Op)<<22))>>22)
-#define   JCmpK_Jmpi_(x)   ((( int)((x)<<22))>>22)
-
-#define   JCmpK_Jmpu       (((uint)((Op)<<22))>>22)
-#define   JCmpK_Jmpu_(x)   (((uint)((x)<<22))>>22)
+#define   JCmpI_Jmpu       (((uint)((Op)<<22))>>22)
+#define   JCmpI_Jmpu_(x)   (((uint)((x)<<22))>>22)
 
 
-#define   Bra_Jmpi       ((( int)((Op)<<13))>>13)
-#define   Bra_Jmpi_(x)   ((( int)((x)<<13))>>13)
+#define   JCmpK_Bigi       ((( int)((Op)<<13))>>31)
+#define   JCmpK_Bigi_(x)   ((( int)((x)<<13))>>31)
 
-#define   Bra_Jmpu       (((uint)((Op)<<13))>>13)
-#define   Bra_Jmpu_(x)   (((uint)((x)<<13))>>13)
+#define   JCmpK_Bigu       (((uint)((Op)<<13))>>31)
+#define   JCmpK_Bigu_(x)   (((uint)((x)<<13))>>31)
+
+#define   JCmpK_Ki       ((( int)((Op)<<14))>>23)
+#define   JCmpK_Ki_(x)   ((( int)((x)<<14))>>23)
+
+#define   JCmpK_Ku       (((uint)((Op)<<14))>>23)
+#define   JCmpK_Ku_(x)   (((uint)((x)<<14))>>23)
+
+#define   JCmpK_Jmpi       ((( int)((Op)<<23))>>23)
+#define   JCmpK_Jmpi_(x)   ((( int)((x)<<23))>>23)
+
+#define   JCmpK_Jmpu       (((uint)((Op)<<23))>>23)
+#define   JCmpK_Jmpu_(x)   (((uint)((x)<<23))>>23)
 
 
-#define   Loop_Jmpi       ((( int)((Op)<<18))>>18)
-#define   Loop_Jmpi_(x)   ((( int)((x)<<18))>>18)
+#define   Bra_Bigi       ((( int)((Op)<<13))>>31)
+#define   Bra_Bigi_(x)   ((( int)((x)<<13))>>31)
 
-#define   Loop_Jmpu       (((uint)((Op)<<18))>>18)
-#define   Loop_Jmpu_(x)   (((uint)((x)<<18))>>18)
+#define   Bra_Bigu       (((uint)((Op)<<13))>>31)
+#define   Bra_Bigu_(x)   (((uint)((x)<<13))>>31)
+
+#define   Bra_Jmpi       ((( int)((Op)<<14))>>14)
+#define   Bra_Jmpi_(x)   ((( int)((x)<<14))>>14)
+
+#define   Bra_Jmpu       (((uint)((Op)<<14))>>14)
+#define   Bra_Jmpu_(x)   (((uint)((x)<<14))>>14)
+
+
+#define   Loop_Bigi       ((( int)((Op)<<18))>>31)
+#define   Loop_Bigi_(x)   ((( int)((x)<<18))>>31)
+
+#define   Loop_Bigu       (((uint)((Op)<<18))>>31)
+#define   Loop_Bigu_(x)   (((uint)((x)<<18))>>31)
+
+#define   Loop_Jmpi       ((( int)((Op)<<19))>>19)
+#define   Loop_Jmpi_(x)   ((( int)((x)<<19))>>19)
+
+#define   Loop_Jmpu       (((uint)((Op)<<19))>>19)
+#define   Loop_Jmpu_(x)   (((uint)((x)<<19))>>19)
 
 
 #define   Table_Modei       ((( int)((Op)<<13))>>31)

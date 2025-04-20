@@ -83,16 +83,11 @@ void JB_PID_Start() {
 	JB_PID_Constructor(&PSRoot);
 }
 
-void JB_Helper_SelfLink(JB_RingList* New) {
-	New->PID = 0; // using this for the allocblock instead of just here... causes problemsssss
-    New->Prev = New;
-    New->Next = New;
-}
-
-
 ProcessOwner* JB_PID_Constructor(ProcessOwner* self) {
 	JB_New2(ProcessOwner);
-	JB_Helper_SelfLink((JB_RingList*)self);
+	self->PID = 0;
+    self->Prev = self;
+    self->Next = 0;
 	self->_Status = -2;
 	self->KillOnExit = true;
 	self->LeaveOrphaned = false;
@@ -110,9 +105,41 @@ JB_StringC* JB_Err_Name (int Err) {
 	return JB_StrC(strerror(Err));
 }
 
+void JB_PID_Sanity() {
+#if DEBUG
+	ProcessOwner* F = PSRoot.Next;
+	if (!F) return;
+	ProcessOwner* M = F;
+	while (M) {
+		auto N = M->Next;
+		if (N)
+			if (N->Prev!=M)
+				debugger; // fuck
+		if (N == M or N == F) {
+			debugger;
+			return;
+		}
+		M = N;
+	};
+#endif
+}
+
 
 void JB_PID_Register(ProcessOwner* self) {
-	JB_Helper_PutAfter((JB_RingList*)(&PSRoot), (JB_RingList*)self);
+	JB_PID_Sanity();
+
+	if (self->Prev != self) { // Already registered? theres only one list???
+		debugger;
+		return;
+	}
+	ProcessOwner* Old = &PSRoot;
+	ProcessOwner* Last = (ProcessOwner*)Old->Prev;
+	Old->Prev = self;
+	Last->Next = self;
+	self->Prev = Last;
+	self->Next = 0;
+
+	JB_PID_Sanity();
 }
 
 
@@ -126,20 +153,30 @@ void JB_PID_Destructor(ProcessOwner* self) {
 #endif
 }
 
+
 void JB_PID_UnRegister(ProcessOwner* self) {
-	JB_Helper_Unlink((JB_RingList*)self);
+	JB_PID_Sanity();
+    ProcessOwner* N = self->Next;
+    ProcessOwner* P = self->Prev;
+    P->Next = N;
+    if (N)
+		N->Prev = P;
+	else
+		N = P;
+    if (P->Prev == self)
+		P->Prev = N;
+    self->Next = 0;
+    self->Prev = self;
+	JB_PID_Sanity();
 }
 
 ProcessOwner* JB_PID_Next(ProcessOwner* self) {
-	auto Result = (ProcessOwner*)(self->Next);
-	if (Result != &PSRoot) {
-		return Result;
-	}
-	return 0;
+	return self->Next;
 }
 
 ProcessOwner* JB_PID__First() {
-	return JB_PID_Next((ProcessOwner*)&PSRoot);
+	JB_PID_Sanity();
+	return PSRoot.Next;
 }
 
 int JB_Signal(int PID, int sig) {

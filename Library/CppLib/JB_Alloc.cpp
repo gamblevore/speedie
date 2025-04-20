@@ -486,14 +486,6 @@ void JB_Helper_PutBefore(JB_RingList* Old, JB_RingList* New) {
 }
 
 
-void JB_Helper_PutAfter(JB_RingList* Old, JB_RingList* New) {
-	JB_RingList* N = Old->Next;
-	N->Prev = New;
-	New->Next = N;
-	New->Prev = Old;
-	Old->Next = New;
-}
-
 
 void JB_Helper_Unlink(JB_RingList* Curr) {
     JB_RingList* N = Curr->Next;

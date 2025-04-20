@@ -12,7 +12,10 @@
 extern "C" {
 
 
-JBClass( ProcessOwner, JB_RingList,
+JBClass( ProcessOwner, JB_Object,	// should this be a ringtree isntead?
+	uint				PID;		// we want to remove jb_ringlist. its bad.
+    ProcessOwner*		Next;
+    ProcessOwner*		Prev;
 	volatile int		_Status;
 	bool				KillOnExit;
 	bool				LeaveOrphaned;
