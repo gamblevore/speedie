@@ -2,7 +2,6 @@
 
 
 Bugs:
-	* x = int64 << int32 // c++ fails if int32 >= 32! we need to add a cast to int64!
 	* function (|object!| x = nil) // which is it? should complain. Currently it becomes optional.
 	* &uint... allow &int in c++ gen
 	* vector constants
