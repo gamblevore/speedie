@@ -434,13 +434,14 @@ function message.CMPB (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.TERN (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
+function message.TERN (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Small = nil, |&fatasm|) {
 	visible
 	rz = self * asm.TERN
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.reginput(3) = r4
+	rz.numinput(4) = Small
 }
 
 

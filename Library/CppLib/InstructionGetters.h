@@ -140,6 +140,19 @@
 #define   JCmpF_Jmpu_(x)   (((uint)((x)<<21))>>21)
 
 
+#define   TERN_Smalli       ((( int)((Op)<<28))>>31)
+#define   TERN_Smalli_(x)   ((( int)((x)<<28))>>31)
+
+#define   TERN_Smallu       (((uint)((Op)<<28))>>31)
+#define   TERN_Smallu_(x)   (((uint)((x)<<28))>>31)
+
+#define   TERN_Li       ((( int)((Op)<<29))>>29)
+#define   TERN_Li_(x)   ((( int)((x)<<29))>>29)
+
+#define   TERN_Lu       (((uint)((Op)<<29))>>29)
+#define   TERN_Lu_(x)   (((uint)((x)<<29))>>29)
+
+
 #define   JCmpI_Cmpi       ((( int)((Op)<<18))>>28)
 #define   JCmpI_Cmpi_(x)   ((( int)((x)<<18))>>28)
 

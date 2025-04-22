@@ -29,10 +29,10 @@ extend ASMState
 			dest = .TempTyped(exp, dest, TypeBool!.TypeNormal)
 			return exp.CMPB(dest, L, R, negate|int| xor 1) * dest
 		
-		|| RS = r.small|int|
+		|| RS = r.small
 		|&fatasm| fat
 		if l.reg
-			|| LS = L.Small|int|
+			|| LS = L.Small
 			if negate
 				fat = exp.JMPN(l, r, LS, RS, 0)
 			  else
@@ -452,7 +452,7 @@ extend ASMState
 			return .MakeConst2(dest, Bule, V, exp, ConstifyBoolMul)
 		rz = .QuickIntMul(dest, Bule, V, exp)
 		if !rz
-			rz = exp.TERN(dest, Bule, V, asmreg(), /*bule.bitloss*/) * Dest				// TERN
+			rz = exp.TERN(dest, Bule, V, asmreg(), bule.small) * Dest				// TERN
 
 
 	function Multiply (fn_opasm)

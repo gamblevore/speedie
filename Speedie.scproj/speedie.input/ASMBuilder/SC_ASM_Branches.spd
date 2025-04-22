@@ -191,7 +191,7 @@ function SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond,
 	|| dr = dest.reg
 	|| mc = (ASMReg(), dest)(dr == ma.reg or mb.reg)
 	|| µ = .µ(cond, mc)
-	return cond.TERN(dest, µ, ma, mb, /*µ.bitloss*/) * dest
+	return cond.TERN(dest, µ, ma, mb, µ.small) * dest
 
 
 function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmreg|)

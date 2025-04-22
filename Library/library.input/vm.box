@@ -67,6 +67,13 @@ forms
 		Cmp		3
 		Jmp		j
 
+	TERN
+		r1		R
+		r2		r
+		r3		r
+		r4		r
+		Small	1
+		
 	JCmpI
 		r1		r
 		r2		r
@@ -484,7 +491,7 @@ POS 5
 /**/ CMPB  (CmpB) // do we need this now? If everything is 32-bit correct at least?
 		u1 = BitComp(r, Op)
 
-/**/ TERN  (U4)
+/**/ TERN  (TERN)
 		if (u2) // needs a shift
 			r[n1] = r[n3]
 		else

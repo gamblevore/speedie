@@ -74,7 +74,6 @@ function message.GetAddrButNicer (|message|)
 	rz <~ self
 
 
-
 function Message.GetAddressOf (|SCDecl| Type, |bool| WasCArray = false, |int|)
 	if !self
 		Return kNeedsAddressOf
