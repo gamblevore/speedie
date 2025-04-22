@@ -474,15 +474,14 @@ function ASMConst (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| d, |
 	return dest
 
 
-function Grab (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg| T, |asmreg|)
+function GrabAddr (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg| T, |asmreg|)
 	opt norefcounts
 	dest = .TempTyped(exp, dest, d)
 
 	|| fat = exp.GRAB(dest, t)
-	|| i = d.Internal											#debug_require
-	if i.IsInt and !i.IsBool
+	if d.IsInt and !d.IsBool
 		|| L = t.BitLoss
-			|| bastard = .CurrFuncGrab.setSign(t.Signed)|int64|
+			|| bastard = .CurrFuncGrab.SetSign(t.Signed)|int64|
 			fat.Prms[5] = bastard
 			fat.const = L
 
@@ -496,12 +495,12 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 		|| T = .ThgASM(d)
 		if dest isnt addrneed
 			return T
-		if dest is DeclareInlineParam // &A
+		if dest is DeclareInlineParam		// &A
 			(t is InlinedAccess)
 			return T
-		if d.IsbareStruct // it already has the address
+		if d.IsBareStruct					// it already has the address
 			return T.haveaddr
-		return Grab(self, exp, dest, d, t)
+		return GrabAddr(self, exp, dest, d, T)
 	
 	if d is const
 		return ASMConst(self, exp, dest, d)

@@ -418,7 +418,6 @@ struct ASMState
 		// So we can't share the prmcollector.
 		opt norefcounts
 		
-		if "Grab".trap
 		if !fn.HasCVersion
 			return .PrmCollectSpd(prms, fn)
 		|int64| sh = 64
@@ -734,8 +733,8 @@ function asmstate.RegClear (|message| exp, |&fatasm| C, |int| i)
 
 function asmstate.RegsBitClear (|message| exp, |&fatasm| Start)
 	opt norefcounts
-	|| c = .Last
-	while C > Start
+	|| c = .Last-1
+	while C >= Start
 		if (c isa asm.GRAB)
 			|| id = c.Prms[5]
 			if id == .CurrFuncGrab
@@ -775,10 +774,10 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	if fn.HasCVersion
 		fat._op = asm.FNCX
 	fat._op += PExt > 0
+	.RegsBitClear(exp, Start)
 	
 	if 0: prms.FNC3, prms.FNCX, prms.FNCX3 // MARK USED
 
-	.RegsBitClear(exp, Start)
 	
 	fat.µRefCount += fn isnt stateless
 	if fn is Killer // return just to be safe

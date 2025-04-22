@@ -74,6 +74,7 @@ function message.GetAddrButNicer (|message|)
 	rz <~ self
 
 
+
 function Message.GetAddressOf (|SCDecl| Type, |bool| WasCArray = false, |int|)
 	if !self
 		Return kNeedsAddressOf
@@ -90,7 +91,6 @@ function Message.GetAddressOf (|SCDecl| Type, |bool| WasCArray = false, |int|)
 		»
 	  else
 		addr <~ self
-	
 	Return kAddressOfMatch
 
 
@@ -214,9 +214,6 @@ function SCDecl.MemAccessSub (|message| Exp, |message| side,  |scdecl|)
 */
 
 
-function ppppppoop
-	|GUIKeyRecord[4]| abc
-	abc[0] = abc[1] 
 
 struct GUIKeyRecord
 	|date| Date

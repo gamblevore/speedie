@@ -26,19 +26,23 @@ extend ASMState
 			return .NumToReg(exp, num, res, DataTypeCode.bool)
 		
 		if dest isnt CondRequest
-			dest = .TempTyped(exp, dest, TypeBool!.typenormal)
+			dest = .TempTyped(exp, dest, TypeBool!.TypeNormal)
 			return exp.CMPB(dest, L, R, negate|int| xor 1) * dest
 		
-		|| RBig = r.isbig|int|
+		|| RS = r.small|int|
+		|&fatasm| fat
 		if l.reg
+			|| LS = L.Small|int|
 			if negate
-				return exp.JMPN(r, l, RBig, 0) * res
-			return exp.JMPE(r, l, RBig, 0) * res
-		
-		|| rb = r.bytes
-		if negate
-			return exp.JBAN(r, 0) * res
-		return exp.JBOR(r, 0) * res
+				fat = exp.JMPN(l, r, LS, RS, 0)
+			  else
+				fat = exp.JMPE(l, r, LS, RS, 0)
+		  else
+			if negate
+				fat = exp.JBAN(r, RS, 0)
+			  else
+				fat = exp.JBOR(r, RS, 0)
+		return fat * res
 
 	
 	function Exists (|ASMReg| dest, |ASMReg| L, |message| exp, |ASMReg|)
@@ -73,17 +77,17 @@ extend ASMState
 
 
 	function KompareIntK (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |uint| Mode, |asmreg|)
-		require mode <= 1
+		require  l is ConstOutput  or  r is ConstOutput
 		|| swapped = l is ConstOutput
 			swap (l) (r)					// 10 > x   -->  x <  10  -->  x <= 9
 			mode ^= 1						// 10 <= x  -->  x >= 10  -->  x >  9
 		|| f = r.fat$
 
 		|| k = f.const - swapped
-		require !l.isbig and k.fits(9, true)	
+		require l.small and k.fits(9, true)	
 		.NopConst(R)
 		k = k|uint64|.trim(9)
-		|| J = exp.JMPK(l, k, 0)
+		|| J = exp.JMPK(l, k)
 		if 0: exp.JMPKN
 		j._op += mode&1						// jmpkn
 		return J * dest
@@ -97,21 +101,21 @@ extend ASMState
 		if mode > 1 // wat?
 		mode |= !r.signed<<1
 		mode ^= dest is Negate
-		#!do this AFTER? We lose CondAnswer otherwise
-		dest = dest.BoolAnswer
+		dest = dest.BoolAnswer // strips negate off dest
+
 		if l is ConstOutput and r is ConstOutput
 			return .ConstCompareInt(dest, L, R, exp, Mode)
-		if Dest isnt CondAnswer
-			|| fat = exp.CMPI(dest, L, R, mode)
-			fat._op += !l.isbig
-			return fat * dest
 
-		if (mode <= 1 or (l.bitcount >= 32 and r.bitcount >= 32)) and (l is RealConst or r is RealConst) // only one is a const
-			|| kk = .KompareIntK(dest, l, r, exp, mode&~4)
-				return kk
-		|| fat = exp.JMPI(L, R, mode, 0)
-		fat._op += !l.isbig
-		return fat * dest
+		mode |= l.small << 2
+		mode |= R.small << 3		
+
+		if Dest isnt CondAnswer
+			return exp.CMPI(dest, L, R, mode) * dest
+
+		|| kk = .KompareIntK(dest, l, r, exp, mode)
+			return kk
+		
+		return exp.JMPI(L, R, mode, 0) * dest
 
 
 	function ConstCompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
@@ -357,18 +361,14 @@ extend ASMState
 				return exp.ADDK(dest, L, RR).Vectorise(dest, asm.QADK)
 
 		if LMul.IsPow2			  								// x = int1 + int2
-			|| fat = exp.ADD_(dest, L, R, LMul.log2)			// x = lptr + r<<3
-				dest = fat.Vectorise(dest, asm.QADD)
-				fat._op += (l is alternate)
-				return dest
+			return exp.ADD_(dest, L, R, LMul.log2) * dest		// x = lptr + r<<3
 		
 		
 		// LMUL isn't 1, 2, 4, 8, etc. And we are doing PLUS!!
 		// So... L is definitely a pointer, and not a vec.
 		|| v = .NumToReg(exp,  LMul,  ASMReg(),  DataTypeCode.uint)
 		if l is Alternate										// x = (lptr - rptr)/12
-			|| fat = exp.ADD_(dest, L, R, ASMReg())!
-			fat._op++
+			exp.ADD_(dest, L, R, ASMReg())!
 			debugger
 			return .DivInt(dest, dest, v, exp)
 
@@ -377,7 +377,7 @@ extend ASMState
 	
 	
 	function SmallToBig (|ASMReg| Src, |ASMReg| Cmp, |message| exp, |ASMReg|)
-		if !src.IsBig and cmp.IsBig
+		if src.small and cmp.IsBig
 			cmp.reg = 0
 			|| dest = .TempOnly(exp, cmp)
 			return exp.BFLG(dest, src, 32, 32, 0) * dest
@@ -488,7 +488,7 @@ extend ASMState
 	function SelfDivide (|asmreg| dest, |message| exp, |asmreg|)
 		if dest.IsInt
 			return .NumToReg(exp, 1, dest, datatypecode.int) // x/x=1
-		if !dest.Isbig
+		if dest.small
 			return .NumToReg(exp, 0x3f800000 /*1.0*/, dest, DataTypeCode.float)
 		return .NumToReg(exp, 0x3ff0000000000000 /*1.0 double*/, dest, DataTypeCode.f64)
 
@@ -513,8 +513,8 @@ extend ASMState
 
 		// Dividing a big one by a small one, then?     bad.   We use 64-bit divide. But the small has garbage
 
-		if l.isbig and !dest.isbig		// what?		
-		if l.IsBig and !r.IsBig         // Sigh.  Small has garbage, but were doing a 64-bit divide.
+		if l.isbig and dest.small		// what?		
+		if l.IsBig and r.small         // Sigh.  Small has garbage, but were doing a 64-bit divide.
 			r = .SmallToBig(r, l, exp)
 		
 		if 0

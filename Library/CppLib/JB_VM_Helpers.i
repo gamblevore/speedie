@@ -242,7 +242,6 @@ AlwaysInline void SetRefApart(VMRegister* r, ASM Op) {
 #define mem1(t)				((t*)u2)[u3+Read_Offsetu]
 #define mem2(t)				(u2 = (u64)((t*)u2 - Read_movei))
 
-
 AlwaysInline JB_Object* alloc(void* o) {
 	// we need a class table, and look it up from there.
 	// we don't have dynamicly created classes anyhow...
@@ -320,27 +319,29 @@ AlwaysInline void Rare_ (VMRegister* r, ASM Op) {
 #define CmpSub(Mode, Cmp) case Mode: return (Cmp);
 
 
-bool CompI_ (VMRegister* r, ASM Op) {
-	auto A = i1;
-	auto B = i2;
-	switch (JCmpI_Cmpu) {
-		CmpSub(0,  A >   B);
-		CmpSub(1,  A <=  B);
-		CmpSub(2, (u64)A >  (u64)B); default:;
-		CmpSub(3, (u64)A <= (u64)B);
+bool CompI_ (int64 A, int64 B, uint Mode) {
+	switch (Mode) {
+		CmpSub(0,  (int64) A  >  (int64)B );
+		CmpSub(1,  (int64) A  <= (int64)B );
+		CmpSub(2,    (u64) A  >  (u64)  B );
+		CmpSub(3,    (u64) A  <= (u64)  B );
+		
+		CmpSub(4,    (int) A  >  (int64)B );
+		CmpSub(5,    (int) A  <= (int64)B );
+		CmpSub(6,    (uint)A  >  (u64)  B );
+		CmpSub(7,    (uint)A  <= (u64)  B );
+		
+		CmpSub(8,  (int64) A  >  (int)  B );
+		CmpSub(9,  (int64) A  <= (int)  B );
+		CmpSub(10,   (u64) A  >  (uint) B );
+		CmpSub(11,   (u64) A  <= (uint) B );
+		
+		CmpSub(12,   (int) A  >   (int) B );
+		CmpSub(13,   (int) A  <=  (int) B );
+		CmpSub(14,   (uint)A  >  (uint) B ); default:;
+		CmpSub(15,   (uint)A  <= (uint) B );
 	};
 }
-
-//bool CompIS_ (VMRegister* r, ASM Op) {
-//	auto A = ii1;
-//	auto B = ii2;
-//	switch (JCmpI_Cmpu) {
-//		CmpSub(0,  A >   B);
-//		CmpSub(1,  A <=  B);
-//		CmpSub(2, (u32)A >  (u64)B); default:;
-//		CmpSub(3, (u32)A <= (u64)B);
-//	};
-//}
 
 
 bool CompF_ (VMRegister* r, ASM Op) {
@@ -363,21 +364,12 @@ bool CompF_ (VMRegister* r, ASM Op) {
 
 
 AlwaysInline ASM* JumpI (VMRegister* r, ASM Op, ASM* Code) {
-	return Code + CompI_(r, Op)*JCmpI_Jmpi;
+	return Code + CompI_(i1, i2, JCmpI_Cmpu)*JCmpI_Jmpi;
 }
 		
 AlwaysInline void CompI (VMRegister* r, ASM Op) {
-	r[JCmpI_Jmpu].Int = CompI_(r, Op);
+	r[i1].Int = CompI_(i2, i3, CmpI_Cmpu);
 }
-
-
-//AlwaysInline ASM* JumpIS (VMRegister* r, ASM Op, ASM* Code) {
-//	return Code + CompIS_(r, Op)*JCmpI_Jmpi;
-//}
-		
-//AlwaysInline void CompIS (VMRegister* r, ASM Op) {
-//	r[JCmpI_Jmpu].Int = CompIS_(r, Op);
-//}
 
 AlwaysInline ASM* JumpF (VMRegister* r, ASM Op, ASM* Code) {
 	return Code + CompF_(r, Op)*JCmpF_Jmpi;
@@ -400,27 +392,34 @@ AlwaysInline uint64 BitComp (VMRegister* r, ASM Op) { // cmpb
 }
 
 
+inline uint64 clip (uint64 x, uint64 s) {
+	return (x << s) >> s;
+}
+
 AlwaysInline ASM* JumpEq (VMRegister* r, ASM Op, ASM* Code) {
-	if (u1 == u2)
+	if (clip(u1, JCmpEq_LSmallu<<5) == clip(u2, JCmpEq_RSmallu<<5))
 		return Code;
 	return Code + JCmpEq_Jmpi;
 }
 
 AlwaysInline ASM* JumpNeq (VMRegister* r, ASM Op, ASM* Code) {
-	if (u1 != u2)
+	if (clip(u1, JCmpEq_LSmallu<<5) != clip(u2, JCmpEq_RSmallu<<5))
 		return Code;
 	return Code + JCmpEq_Jmpi;
 }
 
 AlwaysInline ASM* JumpK (VMRegister* r, ASM Op, ASM* Code) {
 	auto K = JCmpK_Ki;
-	return Code + JCmpK_Jmpi * (ii1 > K);
+	auto J = JCmpK_Jmpi * (ii1 > K);
+	return Code + J;
 }
 
 AlwaysInline ASM* JumpKN (VMRegister* r, ASM Op, ASM* Code) {
 	auto K = JCmpK_Ki;
-	return Code + JCmpK_Jmpi * (ii1 <= K);
+	auto J = JCmpK_Jmpi * (ii1 <= K);
+	return Code + J;
 }
+
 
 
 #define shu(x) ((((x)<<Shift_Shu))>>Shift_Shu)

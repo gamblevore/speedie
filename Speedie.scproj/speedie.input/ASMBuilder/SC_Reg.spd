@@ -148,6 +148,10 @@ datatype ASMReg (uint64)
 		opt inline
 		return self|datatypecode|._shift == 3
 
+	function Small (|bool|)
+		opt inline
+		return self|datatypecode|._shift < 3
+
 	function IsFloat (|bool|)
 		opt inline
 		return self|datatypecode|.isfloat

@@ -44,7 +44,8 @@ forms
 	JCmpEq	// cmpeq:
 		r1		r
 		r2		r
-		Big		1
+		LSmall	1
+		RSmall	1
 		Jmp		j
 
 	HALT
@@ -72,21 +73,26 @@ forms
 		Cmp		4
 		Jmp		j
 
-	JCmpK	 // still needs the big/small thing. do later.
+	CmpI
+		r1		R
+		r2		r
+		r3		r
+		Cmp		4
+
+	JCmpK // assume signed?
 		r1		r
-		Big		1
 		K		9
 		Jmp		j
 
 	Bra		// bra:
 		r1		r
-		Big		1
+		Small	1
 		Jmp		j
 	
 	Loop
-		r1		R
+		r1		R // assume one is an int64?
 		r2		r
-		Big		1
+		Small	1
 		Jmp		j
 	
 	Table
@@ -484,7 +490,7 @@ POS 5
 		else
 			r[n1] = r[n4]
 
-/**/ CMPI  (JCmpI)
+/**/ CMPI  (CmpI)
 		CompI(r, Op)
 
 /**/ CMPF  (JCmpF)
@@ -493,9 +499,6 @@ POS 5
 
 
 #!						 (((((Branches)))))
-///**/ JSWI (JCmpEq)
-//		Code += n1+n2+JCmpEq_Jmpi
-
 /**/ JUMP (jump)
 		Code += l0
 
@@ -518,15 +521,18 @@ POS 5
 		Code = JumpKN(r, Op, Code)
 	
 /**/ JBOR  (Bra)
-		if (u1)
+		if (u1<<(Bra_Smallu<<5))
 			Code += Bra_Jmpi
+
 /**/ JBAN  (Bra)				
-		if (!u1)
+		if (!(u1<<(Bra_Smallu<<5)))
 			Code += Bra_Jmpi
-/**/ LUPU  (Loop)				// need LUPUS
+
+/**/ LUPU  (Loop)								// Need LUPUS
 		if (i1++ < i2)
 			Code += Loop_Jmpi
-/**/ LUPD  (Loop)			 	// need LUPDS
+
+/**/ LUPD  (Loop)			 					// Need LUPDS
 		if (i1-- > i2)
 			Code += Loop_Jmpi
 

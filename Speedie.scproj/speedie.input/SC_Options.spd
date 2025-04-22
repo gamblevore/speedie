@@ -117,7 +117,7 @@ module Feedback
 				nil|message|.jdb2
 				nil|asmreg|.DebugPrint
 				nil|message|.PrintLocate
-				fdb(nil|[scfunction]|)
+//				fdb(nil|[scfunction]|)
 				nil|DataTypeCode|.DebugPrint
 				|fatasm| X
 				X.DebugPrint

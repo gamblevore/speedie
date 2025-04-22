@@ -1,22 +1,40 @@
 
 
-function message.ADD_ (|ASMReg| dest, |ASMReg| r2, |ASMReg| r3, |int| Sh, |&fatasm|)
-	|| Big3 = r3.IsBig
-	if r2.IsBig == Big3
-		IF 0: .SUB
-		return .add(dest, r2, r3, sh)
 
-	if !sh and big3
-		swap (r2) (r3)				    // r1 = small + big
-		Big3 = false
-		
-	if !big3							// r1 = big + small << sh
-		IF 0: .SUBM
-		return .ADDM(dest, r2, r3, sh)
+function message.ExpandBits (|asmreg| Src, |Datatypecode| Type,  |asmreg|)
+	|| sh = ASMState.sh
+	|| closer = sh.OpenVars
+	|| Where = sh.TempOnly(self, Type|asmreg|)
+	rz = .BFLG(where, Src, 32, 32, Src.Signed|int|) * Where
+	sh.CloseVars(Closer)
+	
+	
+function message.ADD_ (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fatasm|)
+	if dest.IsVec							// Extra bits get clipped if we do:    ivec4 + big
+		if l is Alternate
+			return .QSUB(dest, l, r, sh)
+		return .QADD(dest, l, r, sh)
+			
+	|| BigLast = R.IsBig
+	if L.IsBig != BigLast
+		if  BigLast  and  (sh == 0  and  l isnt Alternate)
+			swap (L) (R)				    // r1 = small + big --> r1 = big + small
+			BigLast = false
+		if !BigLast							// r1 = big + small << sh
+			if l isnt Alternate
+				return .ADDM(dest, L, R, sh)
+			return .SUBM(dest, L, R, sh)
+/		l = .ExpandBits(L, r.µtype)
+	
+	if L isnt Alternate
+		return .ADD(dest, L, R, sh)
+	return .SUB(dest, L, R, sh)		
+
 
 
 function asmstate.MUL_ (|ASMReg| dest, |ASMReg| A, |ASMReg| B, |asmreg| Add, |message| exp, |&fatasm|)
 	|| A2 = .SmallToBig(A, B, exp)
 	|| B2 = .SmallToBig(B, A, exp)
 	return exp.MUL(Dest, A, B, add)
+
 

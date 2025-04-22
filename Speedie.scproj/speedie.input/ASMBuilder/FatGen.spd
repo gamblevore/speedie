@@ -296,6 +296,16 @@ function message.DIVS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
+function message.MULS (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
+	visible
+	rz = self * asm.MULS
+	rz.dest(0, r1)
+	rz.reginput(1) = r2
+	rz.reginput(2) = r3
+	rz.reginput(3) = r4
+}
+
+
 function message.BFLG (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| up = nil, |int| down = nil, |int| sign = nil, |&fatasm|) {
 	visible
 	rz = self * asm.BFLG
@@ -414,7 +424,6 @@ function message.BORRK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&f
 }
 
 
-
 function message.CMPB (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Inv = nil, |&fatasm|) {
 	visible
 	rz = self * asm.CMPB
@@ -435,16 +444,13 @@ function message.TERN (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.CMPI (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Cmp = nil, |int| Jmp = nil, |&fatasm|) {
+function message.CMPI (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Cmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.CMPI
-	rz.reginput(0) = r1
+	rz.dest(0, r1)
 	rz.reginput(1) = r2
-	rz.numinput(2) = Cmp
-	rz.jumpinput(3) = Jmp
-	if (((Jmp << 20) >> 20) != Jmp) {
-		error (self, `Jumped too far`)
-	}
+	rz.reginput(2) = r3
+	rz.numinput(3) = Cmp
 }
 
 
@@ -459,19 +465,6 @@ function message.CMPF (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Cmp = nil, |i
 		error (self, `Jumped too far`)
 	}
 }
-
-
-//function message.JSWI (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Big = nil, |int| Jmp = nil, |&fatasm|) {
-//	visible
-//	rz = self * asm.JSWI
-//	rz.reginput(0) = r1
-//	rz.reginput(1) = r2
-//	rz.numinput(2) = Big
-//	rz.jumpinput(3) = Jmp
-//	if (((Jmp << 19) >> 19) != Jmp) {
-//		error (self, `Jumped too far`)
-//	}
-//}
 
 
 function message.JUMP (|int| JUMP = nil, |&fatasm|) {
@@ -491,7 +484,7 @@ function message.JMPI (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Cmp = nil, |i
 	rz.reginput(1) = r2
 	rz.numinput(2) = Cmp
 	rz.jumpinput(3) = Jmp
-	if (((Jmp << 20) >> 20) != Jmp) {
+	if (((Jmp << 22) >> 22) != Jmp) {
 		error (self, `Jumped too far`)
 	}
 }
@@ -510,27 +503,29 @@ function message.JMPF (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Cmp = nil, |i
 }
 
 
-function message.JMPE (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Big = nil, |int| Jmp = nil, |&fatasm|) {
+function message.JMPE (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| LSmall = nil, |int| RSmall = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.JMPE
 	rz.reginput(0) = r1
 	rz.reginput(1) = r2
-	rz.numinput(2) = Big
-	rz.jumpinput(3) = Jmp
-	if (((Jmp << 19) >> 19) != Jmp) {
+	rz.numinput(2) = LSmall
+	rz.numinput(3) = RSmall
+	rz.jumpinput(4) = Jmp
+	if (((Jmp << 20) >> 20) != Jmp) {
 		error (self, `Jumped too far`)
 	}
 }
 
 
-function message.JMPN (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Big = nil, |int| Jmp = nil, |&fatasm|) {
+function message.JMPN (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| LSmall = nil, |int| RSmall = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.JMPN
 	rz.reginput(0) = r1
 	rz.reginput(1) = r2
-	rz.numinput(2) = Big
-	rz.jumpinput(3) = Jmp
-	if (((Jmp << 19) >> 19) != Jmp) {
+	rz.numinput(2) = LSmall
+	rz.numinput(3) = RSmall
+	rz.jumpinput(4) = Jmp
+	if (((Jmp << 20) >> 20) != Jmp) {
 		error (self, `Jumped too far`)
 	}
 }
@@ -560,47 +555,51 @@ function message.JMPKN (|asmreg| r1 = nil, |int| K = nil, |int| Jmp = nil, |&fat
 }
 
 
-function message.JBOR (|asmreg| r1 = nil, |int| Jmp = nil, |&fatasm|) {
+function message.JBOR (|asmreg| r1 = nil, |int| Small = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.JBOR
 	rz.reginput(0) = r1
-	rz.jumpinput(1) = Jmp
-	if (((Jmp << 13) >> 13) != Jmp) {
+	rz.numinput(1) = Small
+	rz.jumpinput(2) = Jmp
+	if (((Jmp << 14) >> 14) != Jmp) {
 		error (self, `Jumped too far`)
 	}
 }
 
 
-function message.JBAN (|asmreg| r1 = nil, |int| Jmp = nil, |&fatasm|) {
+function message.JBAN (|asmreg| r1 = nil, |int| Small = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.JBAN
 	rz.reginput(0) = r1
-	rz.jumpinput(1) = Jmp
-	if (((Jmp << 13) >> 13) != Jmp) {
+	rz.numinput(1) = Small
+	rz.jumpinput(2) = Jmp
+	if (((Jmp << 14) >> 14) != Jmp) {
 		error (self, `Jumped too far`)
 	}
 }
 
 
-function message.LUPU (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Jmp = nil, |&fatasm|) {
+function message.LUPU (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Small = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.LUPU
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
-	rz.jumpinput(2) = Jmp
-	if (((Jmp << 18) >> 18) != Jmp) {
+	rz.numinput(2) = Small
+	rz.jumpinput(3) = Jmp
+	if (((Jmp << 19) >> 19) != Jmp) {
 		error (self, `Jumped too far`)
 	}
 }
 
 
-function message.LUPD (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Jmp = nil, |&fatasm|) {
+function message.LUPD (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Small = nil, |int| Jmp = nil, |&fatasm|) {
 	visible
 	rz = self * asm.LUPD
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
-	rz.jumpinput(2) = Jmp
-	if (((Jmp << 18) >> 18) != Jmp) {
+	rz.numinput(2) = Small
+	rz.jumpinput(3) = Jmp
+	if (((Jmp << 19) >> 19) != Jmp) {
 		error (self, `Jumped too far`)
 	}
 }

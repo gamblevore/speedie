@@ -153,18 +153,17 @@ datatype SCBlockage (int)
 	
 		Quit		= Return		// for now
 	
-	
 	syntax is (|SCBlockage| b, |bool|)
 		return self == b
 	
 	
-	
-function fdb (|[scfunction]| r)
-	opt norefcounts
-	cpp_name fdb
-	visible
-	for f in r
-		printline f.Exportname
+
+//function fdb (|[scfunction]| r)
+//	opt norefcounts
+//	cpp_name fdb
+//	visible
+//	for f in r
+//		printline f.Exportname
 
 
 function @scfunction.PrintStats (|faststring| fs)

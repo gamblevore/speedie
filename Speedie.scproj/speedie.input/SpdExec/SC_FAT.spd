@@ -84,7 +84,7 @@ struct FatASM
 		if dest.IsVec
 			if !vopp // oof?
 			._op = VOpp
-		  elseif !dest.isbig
+		  elseif dest.small
 			._op = sopp
 		return dest
 	
@@ -92,7 +92,7 @@ struct FatASM
 	function Small (|asmreg| Dest, |asm| SOpp, |asmreg|)
 		dest.FatIndex = .index
 		.info = dest
-		if !dest.isbig
+		if dest.small
 /			._op = sopp
 		return dest
 	

@@ -129,7 +129,7 @@ module PackMaker
 		|| j = asmstate.sh.jsm
 			j.length = 0
 		
-		if !compiler.inperry
+		if !compiler.InPerry
 			require .CompileSomeFunctions(true)
 		return .CompileSomeFunctions(false)
 	

@@ -133,11 +133,11 @@
 ı JMPKN: _
 	Code = JumpKN(r, Op, Code);
 ı JBOR: _
-	if (u1) 
+	if (u1 << (Bra_Smallu << 5)) 
 	Code += Bra_Jmpi
 ;
 ı JBAN: _
-	if (!u1) 
+	if (!(u1 << (Bra_Smallu << 5))) 
 	Code += Bra_Jmpi
 ;
 ı LUPU: _

@@ -7,7 +7,7 @@ function Message.HasOwnBlock (|Message|)
 	require (arg == @decl) 
 	arg = arg.parent
 	require (arg == @arg)
-	|| obj = arg.asarg
+	|| obj = arg.AsArg
 	if (obj and obj.TmpMovedOutFor == self)
 		return arg
 

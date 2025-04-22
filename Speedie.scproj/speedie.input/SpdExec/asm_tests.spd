@@ -1,4 +1,6 @@
 
+
+
 class asm_test_obj
 	|int| i
 	constructor
@@ -14,15 +16,6 @@ function Swap
 	|| x = 1
 	|| y = 2
 	swap (x) (y)
-	
-function Either (|&nil|)
-	if 0.5[] // returns nil either way? remove jban?
-		return nil
-
-//function message.ZERO (|ASMReg| dest, |ASMReg| r2, |ASMReg| r3, |int| Sh, |&fatasm|)
-//	|| Big3 = r3.IsBig
-//	if !big3							// r1 = big + small << sh
-//		return .ADDM(dest, r2, r3, sh)
 
 function Grab
 	|| b = '1'
@@ -432,7 +425,7 @@ function Mul (|int| a, |int| b, |int| c, |int| d, |int|)
 function Math (|int| a, |int| b, |int|)
 	return ((a + b) / 2) - ((a / b) * 2)
 
-function AndOr (|int| a, |int| b, |bool| c, |bool| d, |int|)
+function AndOr (|int| a, |int| b, |bool| c, |int|)
 	visible
 	|| five = 5, || min = -1
 	if b < min and b > five
