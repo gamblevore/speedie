@@ -105,7 +105,7 @@
 	u1 = u2 ^ U2_Li;
 ı BORRK: _
 	u1 = u2 | U2_Li;
-ı CMPB: _
+ı EQUL: _
 	u1 = BitComp(r, Op);
 ı TERN: _
 	if (u2) 
@@ -141,11 +141,11 @@
 	Code += Bra_Jmpi
 ;
 ı LUPU: _
-	if (i1++ < i2) 
+	if (ii1++ < ii2) 
 	Code += Loop_Jmpi
 ;
 ı LUPD: _
-	if (i1-- > i2) 
+	if (ii1-- > ii2) 
 	Code += Loop_Jmpi
 ;
 ı RFAP: _

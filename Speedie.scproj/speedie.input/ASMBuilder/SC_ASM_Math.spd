@@ -27,7 +27,11 @@ extend ASMState
 		
 		if dest isnt CondRequest
 			dest = .TempTyped(exp, dest, TypeBool!.TypeNormal)
-			return exp.CMPB(dest, L, R, negate|int| xor 1) * dest
+			|| Mode = negate|int| xor 1
+			mode |= l.Small << 2
+			mode |= R.Small << 3
+			return exp.EQUL(dest, L, R, mode) * dest
+		
 		
 		|| RS = r.small
 		|&fatasm| fat
@@ -94,10 +98,10 @@ extend ASMState
 
 
 	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
-//		CmpSub(0,  A >   B);
-//		CmpSub(1,  A <=  B);
-//		CmpSub(2, (u64)A >  (u64)B); default:;
-//		CmpSub(3, (u64)A <= (u64)B);
+//		CmpSub(0,  A >   B)
+//		CmpSub(1,  A <=  B)
+//		CmpSub(2, (u64)A >  (u64)B)
+//		CmpSub(3, (u64)A <= (u64)B)
 		if mode > 1 // wat?
 		mode |= !r.signed<<1
 		mode ^= dest is Negate
@@ -361,18 +365,17 @@ extend ASMState
 				return exp.ADDK(dest, L, RR).Vectorise(dest, asm.QADK)
 
 		if LMul.IsPow2			  								// x = int1 + int2
+			// if its a normal add a = b + c, then LMUL==1, which comes through here.
 			return exp.ADD_(dest, L, R, LMul.log2) * dest		// x = lptr + r<<3
 		
-		
-		// LMUL isn't 1, 2, 4, 8, etc. And we are doing PLUS!!
-		// So... L is definitely a pointer, and not a vec.
+		// L is now a POINTER.
 		|| v = .NumToReg(exp,  LMul,  ASMReg(),  DataTypeCode.uint)
 		if l is Alternate										// x = (lptr - rptr)/12
 			exp.ADD_(dest, L, R, ASMReg())!
 			debugger
 			return .DivInt(dest, dest, v, exp)
 
-																// x = lptr + r*12
+		// L is still a pointer.								// x = lptr + r*12
 		return .MUL_(dest, R, V, L, exp) * dest
 	
 	
@@ -444,7 +447,7 @@ extend ASMState
 			rz = .QuickIntMul(dest, L, R, exp)
 			if rz == nil
 				if 0: exp.qmul
-				rz = .MUL_(dest, L, R, asmreg(), exp).Vectorise(dest, asm.qmul)
+				rz = .MUL_(dest, L, R, asmreg(), exp).Vectorisesmall(dest, asm.muls, asm.qmul)
 
 
 	function BoolMul (|asmreg| dest, |asmreg| Bule, |asmreg| V, |message| exp, |asmreg|)		
@@ -520,7 +523,7 @@ extend ASMState
 		if 0
 			exp.DIVS(ASMReg(), ASMReg(), ASMReg(), ASMReg(), 0)
 			exp.QDIV(ASMReg(), ASMReg(), ASMReg(), ASMReg(), 0)
-		return exp.DIV(dest, ASMReg(), l, r, dest.IntDivType).Vectorise(dest, asm.qdiv)
+		return exp.DIV(dest, ASMReg(), l, r, dest.IntDivType).Vectorisesmall(dest, asm.divs, asm.qdiv)
 
 
 	function ModInt    (fn_opasm)

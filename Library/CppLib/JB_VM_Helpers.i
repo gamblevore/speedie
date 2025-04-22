@@ -60,9 +60,9 @@ AlwaysInline void DivMath32(VMRegister* r, ASM Op) {
 			r[B].Int = (int64)((int)R3 % (int)R4);
 	} else {
 		if (A)
-			r[A].Int = (uint)R3 /(uint)R4;
+			r[A].Int =(uint64)((uint)R3 /(uint)R4);
 		if (B)
-			r[B].Int = (uint)R3 %(uint)R4;
+			r[B].Int =(uint64)((uint)R3 %(uint)R4);
 	}
 }
 
@@ -379,22 +379,19 @@ AlwaysInline void CompF (VMRegister* r, ASM Op) {
 	r[JCmpF_Jmpu].Int = CompF_(r, Op);
 }
 
-AlwaysInline uint64 BitComp (VMRegister* r, ASM Op) { // cmpb
-	auto i = CmpB_Invu;
-	auto A = u2;
-	auto B = u3;
-	if (i&2)								// do we even need these? just remove?
-		A = ~A;
-	if (i&4)								// seems like we should remove these...
-		B = ~B;
-	return (A!=B) xor (i&1);				// keep this though...
+inline uint64 clip (uint64 x, uint64 s) {
+	return (x << s) >> s;
+}
+
+AlwaysInline uint64 BitComp (VMRegister* r, ASM Op) {	// cmpb
+	auto i = CmpI_Cmpu;
+	auto A = clip(u2, (i&4)<<3);
+	auto B = clip(u3, (i&2)<<4);
+	return (A!=B) xor (i&1);							// keep this though...
 	// the first two could be "future upgrades"...?
 }
 
 
-inline uint64 clip (uint64 x, uint64 s) {
-	return (x << s) >> s;
-}
 
 AlwaysInline ASM* JumpEq (VMRegister* r, ASM Op, ASM* Code) {
 	if (clip(u1, JCmpEq_LSmallu<<5) == clip(u2, JCmpEq_RSmallu<<5))

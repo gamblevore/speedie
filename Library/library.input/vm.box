@@ -23,7 +23,7 @@ forms
 		Table	l			// functions in registers use the first 32 values...
 		Prm1	x
 		Prm2	x
-	
+		
 	Tail
 		JUMP	l
 		Prm1	x
@@ -143,12 +143,6 @@ forms
 		down	6
 		sign	1
 
-	CmpB	// cmpb:
-		r1		R
-		r2		r
-		r3		r
-		Inv		3
-	
 	Convert
 		r1		R
 		r2		r
@@ -434,18 +428,6 @@ POS 5
 		DivMath32(r, Op)
 /**/ MULS  (U4)
 		i1 = (ii2 * ii3) + ii4
-///**/ ADKS (AddK)
-//		i1 = ii2 + U2_Li
-///**/ APKS (AddK)										// post-increment
-//		i1 = ii2
-//		i2 = ii2 + U2_Li
-///**/ MLKS  (AddK)
-//		i1 = ii2 * U2_Li
-///**/ ADDS  (Shift)
-//		i1 = ii2 + (ii3 << Shift_Shu)
-///**/ SUBS  (Shift)              						// must come after ADD
-//		i1 = (ii2 - ii3) >> Shift_Shu
-
 
 
 
@@ -482,13 +464,11 @@ POS 5
 		u1 = u2  ^  U2_Li
 /**/ BORRK   (AddK)
 		u1 = u2 ||| U2_Li
-///**/ BNOTK  (AddK)
-//		u1 = ~u2 & ~U2_Li
 
 
 
 #!						 (((((MiniCompare)))))
-/**/ CMPB  (CmpB) // do we need this now? If everything is 32-bit correct at least?
+/**/ EQUL  (CmpI)
 		u1 = BitComp(r, Op)
 
 /**/ TERN  (TERN)
@@ -536,11 +516,11 @@ POS 5
 			Code += Bra_Jmpi
 
 /**/ LUPU  (Loop)								// Need LUPUS
-		if (i1++ < i2)
+		if (ii1++ < ii2)
 			Code += Loop_Jmpi
 
 /**/ LUPD  (Loop)			 					// Need LUPDS
-		if (i1-- > i2)
+		if (ii1-- > ii2)
 			Code += Loop_Jmpi
 
 

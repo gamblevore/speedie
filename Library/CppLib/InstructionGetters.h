@@ -314,19 +314,6 @@
 #define   BFLD_Lu_(x)   (((uint)((x)<<31))>>31)
 
 
-#define   CmpB_Invi       ((( int)((Op)<<23))>>29)
-#define   CmpB_Invi_(x)   ((( int)((x)<<23))>>29)
-
-#define   CmpB_Invu       (((uint)((Op)<<23))>>29)
-#define   CmpB_Invu_(x)   (((uint)((x)<<23))>>29)
-
-#define   CmpB_Li       ((( int)((Op)<<26))>>26)
-#define   CmpB_Li_(x)   ((( int)((x)<<26))>>26)
-
-#define   CmpB_Lu       (((uint)((Op)<<26))>>26)
-#define   CmpB_Lu_(x)   (((uint)((x)<<26))>>26)
-
-
 #define   Convert_Modei       ((( int)((Op)<<18))>>28)
 #define   Convert_Modei_(x)   ((( int)((x)<<18))>>28)
 

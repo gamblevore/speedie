@@ -424,13 +424,13 @@ function message.BORRK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&f
 }
 
 
-function message.CMPB (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Inv = nil, |&fatasm|) {
+function message.EQUL (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Cmp = nil, |&fatasm|) {
 	visible
-	rz = self * asm.CMPB
+	rz = self * asm.EQUL
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
-	rz.numinput(3) = Inv
+	rz.numinput(3) = Cmp
 }
 
 

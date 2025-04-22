@@ -66,7 +66,7 @@
 &&BANDK,
 &&BXORK,
 &&BORRK,
-&&CMPB,
+&&EQUL,
 &&TERN,
 &&CMPI,
 &&CMPF,
