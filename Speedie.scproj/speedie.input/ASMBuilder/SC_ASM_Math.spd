@@ -447,7 +447,7 @@ extend ASMState
 			rz = .QuickIntMul(dest, L, R, exp)
 			if rz == nil
 				if 0: exp.qmul
-				rz = .MUL_(dest, L, R, asmreg(), exp).Vectorisesmall(dest, asm.muls, asm.qmul)
+				rz = .MUL_(dest, L, R, asmreg(), exp).Vectorisesmall(dest, asm.qmul, asm.muls)
 
 
 	function BoolMul (|asmreg| dest, |asmreg| Bule, |asmreg| V, |message| exp, |asmreg|)		
@@ -523,7 +523,7 @@ extend ASMState
 		if 0
 			exp.DIVS(ASMReg(), ASMReg(), ASMReg(), ASMReg(), 0)
 			exp.QDIV(ASMReg(), ASMReg(), ASMReg(), ASMReg(), 0)
-		return exp.DIV(dest, ASMReg(), l, r, dest.IntDivType).Vectorisesmall(dest, asm.divs, asm.qdiv)
+		return exp.DIV(dest, ASMReg(), l, r, dest.IntDivType).Vectorisesmall(dest, asm.qdiv, asm.divs)
 
 
 	function ModInt    (fn_opasm)
@@ -621,18 +621,22 @@ extend ASMState
 	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Opp, |asm| VOpp,   |asmreg|)
 		if asm.BORRK!=asm.borr+4 // what?
 
-		if (opp != asm.bnot) and !dest.IsVec
+		if r.reg and (opp != asm.bnot) and !dest.IsVec
 			|| k = .Const(R, 14, true)
-			if k > 0 // easier to optimise bor than bork?
 				if 0:  exp.BORRK,  exp.BXORK
 				|| fat = exp.BANDK(dest, L, K) 
 				fat._op = opp+4
 				return fat * Dest
-
+				
 		|| Clear = l.BitCount - r.BitCount
 		if Clear < 0
 			swap (l) (r)
 			clear = -clear
+		
+		if Clear and r.signed and l.reg
+			r = exp.ExpandBits(r, l.µtype) // wat a shame.
+			clear = 0
+			
 		|| fat = exp.BAND(dest, L, R, Clear)
 		fat._op = opp
 		return fat * Dest
