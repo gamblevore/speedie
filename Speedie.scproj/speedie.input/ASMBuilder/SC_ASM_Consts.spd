@@ -113,7 +113,7 @@ extend ASMState
 			dest = .oldnum(v, dest)
 			if dest.reg
 				return dest
-		dest = .temponly(exp, dest)
+		dest = .TempOnly(exp, dest)
 		target debug
 			if !dest.reg and v // waaaaitttt
 		
@@ -173,18 +173,8 @@ function uint64.LongestBitStretch (|ivec2|)
 
 
 // needs refcount upgrade.
-function uint.isconst (|bool|)
-	debugger
-
-
-function uint.ConstValue (|int64|)
-	debugger
 
 function int64.CanStoreAsIntImmediate (|bool|)
-	return ((self << 50)>>50) == self
-
-
-function uint64.CanStoreAsFloatImmediate (|bool|)
 	return ((self << 50)>>50) == self
 
 

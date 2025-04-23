@@ -131,8 +131,8 @@ forms
 	CNTC
 		r1		R
 		r2		R
-		offset	5
-		cnst	7
+		offset	6
+		cnst	6
 		size	2 // 1, 2, 4, 8
 		// *p1[offset] += cnst
 

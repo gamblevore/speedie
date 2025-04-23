@@ -71,7 +71,7 @@ struct ASMState
 	function AddFuncParams (|SCFunction| fn)
 		opt norefcounts
 		for a in fn.Args
-			(a is param) // reset
+			(a is param)			// reset
 			.DeclareMe(a.source, a)
 	
 	function Index (|int|)
@@ -231,7 +231,6 @@ struct ASMState
 		
 	function SoftNop (|FATASM| Fat, |int| Depth=0)
 		depth++
-		if fat ~= asm.gtab
 		if depth > 7
 		for f.fatinputs in fat
 			.decr(f, depth)
@@ -339,6 +338,9 @@ struct ASMState
 	
 	
 	function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl| D,  |int| Index, |&fatasm|)
+	
+		if "TestAtomic".trap
+		
 		if dest is containsaddr
 			#!wait?? this is meant to be an addrrequest? not a response.
 			debugger

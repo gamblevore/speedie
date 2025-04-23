@@ -1,4 +1,5 @@
 
+
 struct SC_Hoister
 	linkage
 		cpp_part Hoi
@@ -10,18 +11,8 @@ struct SC_Hoister
 		MinHoistScore = 3
 		AsLoop = 1<<20
 		
-
-	helper GotGlobal (|message| prop,  |scdecl| decl)
-		opt NoRefCounts
-		|| dest = ASMState.sh.DeclareMe(prop, decl)		// Pre-declare glob.
-		|| Addr = ASMType.GlobAddr(decl, prop, dest)
-		.got(dest, Decl, addr)
-
-	helper WriteConst (|message| prop,  |scdecl| decl)
-		opt NoRefCounts
-		|| dest = ASMState.sh.DeclareMe(prop, decl)		// Pre-declare glob.
-		|| K = asmstate.sh.NumToReg(prop, decl.exportposition, dest, dest.µtype)
-		.got(dest, Decl, k)
+// It would be better to check for the global state, gtabs basically.
+// Then check for "ishoisted". So basically, we can use any decl.
 
 	helper Got (|asmreg| dest, |scdecl| decl, |asmreg| K)
 		opt NoRefCounts
@@ -32,6 +23,21 @@ struct SC_Hoister
 		decl.NilReg = dest.reg ||| nilreg.Hoisted
 		.Items[.Count++] = decl
 		.spare--
+
+
+	helper GotGlobal (|message| prop,  |scdecl| decl)
+		opt NoRefCounts
+		|| dest = ASMState.sh.DeclareMe(prop, decl)			// Pre-declare glob.
+		|| Addr = ASMType.GlobAddr(decl, prop, dest)
+		.Got(dest, Decl, addr)
+
+
+	helper WriteConst (|message| prop,  |scdecl| decl)
+		opt NoRefCounts
+		|| dest = ASMState.sh.DeclareMe(prop, decl)			// Pre-declare glob.
+		|| K = asmstate.sh.NumToReg(prop, decl.ExportPosition, dest, dest.µtype)
+		.got(dest, Decl, k)
+
 
 	helper ReuseConst (|message| prop,  |scdecl| decl)
 		opt NoRefCounts
@@ -60,6 +66,7 @@ struct SC_Hoister
 	function HoistNormal (|message| exp)
 		.spare = –count .items
 		.Hoist(exp, 0)
+		
 		
 	function HoistLoop (|message| exp)
 		.spare = 2
@@ -117,4 +124,4 @@ struct SC_Hoister
 function scdecl.Hoisted (|asmreg|)
 	rz = .datatype|asmreg|
 	rz.reg = .nilreg
-	rz.fatindex = .fatconstindex
+	rz.fatindex = .FatConstIndex

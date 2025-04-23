@@ -9,6 +9,7 @@ class SCModule (SCBetterNode) {
 linkage
 	cpp_part		Mod
 
+|int|						ModuleNum
 |SCClass?|					Cls
 |Message?|					InitVarsArg
 |Message?|					InitCodeArg
@@ -150,6 +151,7 @@ function GetTheNewer (|SCObject|)
 		|| cls = .cls #require
 		require cls.isrole
 		self = .supermod
+
 
 
 module

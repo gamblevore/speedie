@@ -36,7 +36,7 @@ function message.OperatorMul (|asm| op, |&fatasm|)
 
 target debug
 	function scdecl.ASMSanity 
-		ifn .iscarray or .pointercount or .isobject or .isbarestruct
+		ifn .IsCarray or .PointerCount or .IsObject or .IsBareStruct
 			|| size = .type.Size
 			|| T = .TypeOnly
 			if T is Vec3 or ivec3
@@ -50,7 +50,7 @@ target debug
 function asmstate.CloseOneVar (|scdecl| d, |message?| exp, |int| v, |message?|)
 	opt norefcounts
 	if  d isnt return  and  d isnt global
-		if d is compilercreated
+		if d is CompilerCreated
 			|| f = d.fat
 				.AskNop(f)
 		if exp and d.IsBareStruct
@@ -93,7 +93,7 @@ function SCFunction.RealReturnType (|scdecl|)
 datatype VarUseMode (int)
 	Flags
 		Return
-		Set	// unused so far
+		Set						// unused so far
 		ExistingVar
 		Sometimes
 	syntax is (|varusemode| v, |bool|)

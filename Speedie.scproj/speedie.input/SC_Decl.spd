@@ -104,8 +104,8 @@ class SCDecl (SCNamed) {
 	|uint64|			ExportPosition	// also can store numeric constants float/int up to 64-bits
 	|SCFunction--?|		HiderFunc		// todo: replace the .StringData/hider thing with this.
 	|Object?|			IsLookupOnly
-	|string|			StringData		// 3 special objects. Aren't they exclusive? Write some code to see if they are.
-	|SCDecl?|			Internal		// only for pointers :)
+	|string|			StringData		// 2 special objects. Aren't they exclusive? Write some code to see if they are.
+	|SCDecl?|			Internal
 	
 	//|SCDecl|			NextContains // for multiple contains
 	|SCDecl?|			Contains
@@ -116,17 +116,19 @@ class SCDecl (SCNamed) {
 	|NilState|			NilDeclared
 	|Byte|				PointerCount
 	|nilreg|			NilReg
+	|uint16| 			ModuleNum
 	|byte| 				NilAllocDepth
 	|byte|				BranchDepth
 	|int|				FatConstIndex
 
 	
 	constructor (|scclass| type)
+		opt norefcounts
 		.type = type
 		.NilDeclared = NilState.Either
 		.info = scdeclinfo.altered // why? surely it should only be if its ACTUALLY altered??? sigh.
-		target debug
-			if !.project
+		|| m = SCModule.curr
+			.ModuleNum = m.ModuleNum
 
 	setter Name (|string|)
 		super.exportname = value
@@ -1224,16 +1226,19 @@ function int64.MsgForConst (|bool| AllowShift, |message|)
 	rz = @rel.msg
 	rz <~ newdeclnum(nil, 1)
 	|| op = rz.msg(@opp, "<<")
-	op.obj = scoperator.lookup(op) 
-	rz <~ newdeclnum(nil, .Log2)
+	op.obj = SCOperator.lookup(op) 
+	rz <~ NewDeclNum(nil, .Log2)
 
 
 function GlobalsSorter (SorterComparer of scdecl)
+	opt norefcounts
 	rz = b.carraysize - .carraysize
 	if !rz
 		rz = (b.type == typejbclass) - (.type == typejbclass)
 	if !rz
-		rz = b.name.syntaxcompare(.name, true)
+		rz = b.ModuleNum - .ModuleNum // keep commonly accessed stuff together
+	if !rz
+		rz = b.name.SyntaxCompare(.name, true)
 	
 
 function scdecl.Complexity (|int|)

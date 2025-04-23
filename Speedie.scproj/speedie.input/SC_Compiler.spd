@@ -751,6 +751,8 @@ function SortModulesAndClasses (|bool|)
 		c.GetDepth
 	
 	.ModuleList.sort(ModulesSorter)
+	for (m in .modulelist) (i)
+		m.ModuleNum = i+1
 	.ClassList.sort(ClassSorter)
 	return stderr.ok
 	

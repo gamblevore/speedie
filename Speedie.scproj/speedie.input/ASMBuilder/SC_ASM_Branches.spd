@@ -85,12 +85,15 @@ function While (fn_asm)
 	opt norefcounts
 	|sc_hoister| H 
 	|| OV = .OpenVars				// We open/close because the hoister may add stuff.
+
 	h.HoistLoop(exp.first!)
+	h.Spare += 2
+	h.hoist(exp.last!, SC_Hoister.AsLoop)
+
 	.state.BranchDepth++
-	
 	rz = .WhileSub(exp)
-	
 	.state.BranchDepth--
+
 	.CloseVars(OV)
 	.Unhoist(h)
 

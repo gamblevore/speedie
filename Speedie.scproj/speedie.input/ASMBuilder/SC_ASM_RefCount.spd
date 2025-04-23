@@ -2,18 +2,28 @@
 
 extend asmstate
 	function InlineOffsetOpt (|asmreg| base, |int| pow2, |&int| index, |uint| maximum, |asmreg|)
-		if base is temp
-			|| bs = base.fat
-			if bs isa asm.ADDK
-				|uint| CC = bs.prms[2]
-				|uint| CC2 = CC >> pow2
-				if (CC2 <= maximum) and (CC2<<pow2 == CC)
-					index[] += CC2
-					|| R = bs.prms[1]
-					base.reg = R
-					(base is temp) = (R >> 31)
-					base.fatindex = 0
-					.nop(bs)
+		|| bs = base.fat
+		if bs isa asm.GTAB
+			|| lost = bs.const & 63
+			|| i = index[] + lost
+			if i > maximum|int|		// sigh. we need to addk.
+				|| temp = .TempOnly(bs.msg, base)
+				temp = bs.msg.ADDK(temp, base, i) * temp
+				i = 0
+				base = temp
+			index[] = i
+				
+				
+		  elseif  base is temp  and  bs isa asm.ADDK
+			|uint| CC = bs.prms[2]
+			|uint| CC2 = CC >> pow2
+			if (CC2 <= maximum) and (CC2<<pow2 == CC)
+				index[] += CC2
+				|| R = bs.prms[1]
+				base.reg = R
+				(base is temp) = (R >> 31)
+				base.fatindex = 0
+				.nop(bs)
 		return base
 
 

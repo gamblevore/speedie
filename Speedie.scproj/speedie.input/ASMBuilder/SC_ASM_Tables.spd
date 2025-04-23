@@ -449,7 +449,7 @@ function Num (fn_asm)
 		dest.fatindex = D.fatconstindex
 		return Dest
 	
-	return .NumToReg(exp, d.exportposition, dest, T)
+	return .NumToReg(exp, d.ExportPosition, dest, T)
 
 
 function Thg (fn_asm)
@@ -458,7 +458,7 @@ function Thg (fn_asm)
 	if (reg-1)|uint| < 31							// what?
 		return thg
 	if reg == 0  and  thg is RealConst
-		return thg // its still ok.   nil/false
+		return thg									// Its still ok.   nil/false
 	error (exp, "Register out of bounds")
 
 
@@ -510,15 +510,28 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 		return DoGlobal(self, exp, dest, d)
 
 
+function TryGetGlob (|scdecl| D, |asmreg|)
+	if d.NilReg is Hoisted
+		rz = d.hoisted
+		rz.µtype = DataTypeCode._voidptr
+		rz = rz.HaveAddr
+	
+
 function GlobAddr (|scdecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
-	if d.NilReg is Hoisted
-		Dest = d.hoisted
-	  else
-		|int64| iTable = d.ExportPosition
-		expect (iTable > 0)          (exp, "No global address".internal)
-		expect (iTable <= 18~bits)   (exp, "Used over 256K of global data")
-		Dest = exp.GTAB(dest,  (d.IsLib)|int|,  iTable) * dest
+	
+	if "GlobAddr".trap
+	
+	|| Glob = .TryGetGlob(D)
+		return Glob
+
+	|int64| iTable = d.ExportPosition
+	expect (iTable > 0)          (exp, "No global address".internal)
+	expect (iTable <= 24~bits)   (exp, "Used over 16MB of global data")
+
+	|| fat = exp.GTAB(dest,  (d.IsLib)|int|,  iTable>>6)
+	fat.Const = iTable
+	Dest = fat * dest
 	dest.µtype = DataTypeCode._voidptr
 	return dest.HaveAddr
 
@@ -576,11 +589,11 @@ function IncrSlowOnAddr (|&ASMState| self, |message| f, |ASMReg| Dest, |int| Mod
 
 
 function IncrOnAddr (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |asmreg|)
-	ifn  dest.isint  and  amount.fits(7)
+	ifn  dest.isint  and  amount.fits(6)
 		return IncrSlowOnAddr(self, exp, dest, mode, Addr, Amount)
 	|| bc = dest.µtype.ByteCount.log2
 	|| offset = 0
-	addr = .InlineOffsetOpt(addr, bc, &offset, 5~bits)
+	addr = .InlineOffsetOpt(addr, bc, &offset, 6~bits)
 	|| fat = exp.CNTC(Addr, dest, offset, amount, bc)
 	if mode & IncrAfter
 		if 0: exp.CNTD

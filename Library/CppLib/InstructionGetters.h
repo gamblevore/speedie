@@ -270,17 +270,17 @@
 #define   MemUtil_Nu_(x)   (((uint)((x)<<21))>>21)
 
 
-#define   CNTC_offseti       ((( int)((Op)<<18))>>27)
-#define   CNTC_offseti_(x)   ((( int)((x)<<18))>>27)
+#define   CNTC_offseti       ((( int)((Op)<<18))>>26)
+#define   CNTC_offseti_(x)   ((( int)((x)<<18))>>26)
 
-#define   CNTC_offsetu       (((uint)((Op)<<18))>>27)
-#define   CNTC_offsetu_(x)   (((uint)((x)<<18))>>27)
+#define   CNTC_offsetu       (((uint)((Op)<<18))>>26)
+#define   CNTC_offsetu_(x)   (((uint)((x)<<18))>>26)
 
-#define   CNTC_cnsti       ((( int)((Op)<<23))>>25)
-#define   CNTC_cnsti_(x)   ((( int)((x)<<23))>>25)
+#define   CNTC_cnsti       ((( int)((Op)<<24))>>26)
+#define   CNTC_cnsti_(x)   ((( int)((x)<<24))>>26)
 
-#define   CNTC_cnstu       (((uint)((Op)<<23))>>25)
-#define   CNTC_cnstu_(x)   (((uint)((x)<<23))>>25)
+#define   CNTC_cnstu       (((uint)((Op)<<24))>>26)
+#define   CNTC_cnstu_(x)   (((uint)((x)<<24))>>26)
 
 #define   CNTC_sizei       ((( int)((Op)<<30))>>30)
 #define   CNTC_sizei_(x)   ((( int)((x)<<30))>>30)
