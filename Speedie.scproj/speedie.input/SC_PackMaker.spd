@@ -41,7 +41,7 @@ module PackMaker
 		lib.exit
 
 
-	function OrderGlobals (|[scdecl]| List, |int|)
+	function OrderGlobals (|[scdecl]| List, |int|) // sortglobals, globalssort
 		opt norefcounts
 		list.sort(GlobalsSorter)
 		rz = 1				// rz = 1, so if .ExportPosition == 0 then something is wrong.

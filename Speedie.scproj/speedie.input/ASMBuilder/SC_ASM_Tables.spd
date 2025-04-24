@@ -444,8 +444,8 @@ function Num (fn_asm)
 	dest.µtype = T
 	(dest is RealConst)
 	
-	if d.NilReg is hoisted
-		Dest.reg = d.nilreg&31
+	|| n = .HoistedToReg(d)
+		Dest.reg = n&31
 		dest.fatindex = D.fatconstindex
 		return Dest
 	
@@ -466,10 +466,11 @@ function ASM_ConstNumber (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdec
 	(dest is RealConst)
 	if dest isnt ConstRequest
 		dest.µtype = d.datatype
-		if d.nilreg isnt hoisted
+		|| n = .HoistedToReg(d)
+		if n >= 0
 			return .NumToReg(exp, d.exportposition, dest, dest.µtype)
 		dest.fatindex = d.fatconstindex
-		Dest.reg = d.nilreg&31
+		Dest.reg = n
 		(dest isnt constinput)
 	return dest
 
@@ -508,13 +509,6 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	if dest isnt ConstRequest
 		check (d is global) (Exp)
 		return DoGlobal(self, exp, dest, d)
-
-
-function TryGetGlob (|scdecl| D, |asmreg|)
-	if d.NilReg is Hoisted
-		rz = d.hoisted
-		rz.µtype = DataTypeCode._voidptr
-		rz = rz.HaveAddr
 	
 
 function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |ASMReg|)
@@ -525,7 +519,7 @@ function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |
 	if dest isnt set
 		dest = .TempTyped(exp, dest)
 	
-	|| addr = GlobAddr(d, exp, dest)
+	|| addr = .GlobAddr(d, exp, dest)
 		if dest is AddrRequest
 			addr.µtype = d.DataType
 			return addr.HaveAddr
@@ -701,6 +695,11 @@ function message.ASMUnbra (|message|)
 // however, what if its being passed to a function?
 // and the function is inline?
 // in fact, what if it isnt inline? I think we need tests for those?
+
+function HoistedToReg (|scdecl| d, |ind|)
+	
+	
+
 function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
 	opt	norefcounts
 	real self
@@ -711,8 +710,8 @@ function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
 	if fn != @num
 		return nil
 	|| d = m.ASMDecl
-	if d.nilreg is hoisted
-		rz = d.nilreg|int|.asm
+	|| n = .HoistedToReg(d)
+		rz = n.asm
 		rz.µtype = d.DataType
 	if (d is const) and !d.exportposition
 		return .NumToReg(m, 0, asmreg(), d.DataType)

@@ -313,6 +313,14 @@ datatype uint
 		while i < self
 			yield i
 			++i
+
+	iterator bits
+		|| curr = self|uint|
+		while curr
+			|| lowest = curr.lowestbit
+			yield Lowest (Lowest|int|.log2)
+			curr = curr &~ Lowest
+	
 	
 	 
 	iterator flags

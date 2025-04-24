@@ -28,6 +28,7 @@ struct ASMState
 
 	|?memory of fatasm|			JSM
 	|?&FatASM|					InlineEnd
+	|uint|						HoistMap
 	|int|						HoistStart
 	|int|						HoistEnd
 	|&FatASM|					FuncStart
@@ -37,6 +38,7 @@ struct ASMState
 	|&FatASM|					End    
 
 	|scdecl--[32]|				Vars
+	|(?&FATASM)[32]|			Hoisted
 	|FatASM| 					Zero
 
 	constants
@@ -704,6 +706,15 @@ struct ASMState
 			if i
 				return i
 
+	iterator
+		|| h = .hoistmap
+		while h
+			|| h2 = h.LowestBit
+			yield .hoisted[h2|int|.log2]!
+			h &= ~h2
+	
+	
+	
 	
 function SCFunction.HasCVersion (|bool|)
 	if .IsLibrary

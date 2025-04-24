@@ -94,7 +94,7 @@ function While (fn_asm)
 	.state.BranchDepth--
 	
 	.CloseVars(OV)
-	.Unhoist(h)
+	h.Unhoist
 
 
 function WhileSub (|message| exp,  |asmreg|)
