@@ -412,7 +412,7 @@ function Dot (fn_asm)										// a.b
 		|| fn = prop.islookuponly
 		if fn isa scfunction
 			return DoGlobal(self, exp, dest, prop)
-		return ASMConst(self, exp, dest, prop)
+		return ASM_ConstNumber(self, exp, dest, prop)
 	if prop is global
 		return DoGlobal(self, exp, dest, prop)
 	|| F = exp.first!		 
@@ -462,7 +462,7 @@ function Thg (fn_asm)
 	error (exp, "Register out of bounds")
 
 
-function ASMConst (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
+function ASM_ConstNumber (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
 	(dest is RealConst)
 	if dest isnt ConstRequest
 		dest.µtype = d.datatype
@@ -503,7 +503,7 @@ function ThgSub (|&ASMState| self, |message| exp, |AsmReg| Dest, |asmreg|)
 		return GrabAddr(self, exp, dest, d, T)
 	
 	if d is const
-		return ASMConst(self, exp, dest, d)
+		return ASM_ConstNumber(self, exp, dest, d)
 
 	if dest isnt ConstRequest
 		check (d is global) (Exp)
@@ -516,25 +516,6 @@ function TryGetGlob (|scdecl| D, |asmreg|)
 		rz.µtype = DataTypeCode._voidptr
 		rz = rz.HaveAddr
 	
-
-function GlobAddr (|scdecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
-	opt norefcounts
-	
-	if "GlobAddr".trap
-	
-	|| Glob = .TryGetGlob(D)
-		return Glob
-
-	|int64| iTable = d.ExportPosition
-	expect (iTable > 0)          (exp, "No global address".internal)
-	expect (iTable <= 24~bits)   (exp, "Used over 16MB of global data")
-
-	|| fat = exp.GTAB(dest,  (d.IsLib)|int|,  iTable>>6)
-	fat.Const = iTable
-	Dest = fat * dest
-	dest.µtype = DataTypeCode._voidptr
-	return dest.HaveAddr
-
 
 function DoGlobal (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| D, |ASMReg|)
 	opt	NoRefCounts
@@ -594,7 +575,10 @@ function IncrOnAddr (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode,
 	|| bc = dest.µtype.ByteCount.log2
 	|| offset = 0
 	addr = .InlineOffsetOpt(addr, bc, &offset, 6~bits)
-	|| fat = exp.CNTC(Addr, dest, offset, amount, bc)
+	|| fat = exp.CNTC(Addr, dest, offset >> bc, amount, bc)
+
+	fat.RegInput(0) = addr // the output is also an input!
+	
 	if mode & IncrAfter
 		if 0: exp.CNTD
 		fat._op = asm.cntd
