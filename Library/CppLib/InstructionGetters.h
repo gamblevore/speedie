@@ -179,6 +179,19 @@
 #define   CmpI_Lu_(x)   (((uint)((x)<<27))>>27)
 
 
+#define   Compare4_Smalli       ((( int)((Op)<<28))>>31)
+#define   Compare4_Smalli_(x)   ((( int)((x)<<28))>>31)
+
+#define   Compare4_Smallu       (((uint)((Op)<<28))>>31)
+#define   Compare4_Smallu_(x)   (((uint)((x)<<28))>>31)
+
+#define   Compare4_Li       ((( int)((Op)<<29))>>29)
+#define   Compare4_Li_(x)   ((( int)((x)<<29))>>29)
+
+#define   Compare4_Lu       (((uint)((Op)<<29))>>29)
+#define   Compare4_Lu_(x)   (((uint)((x)<<29))>>29)
+
+
 #define   JCmpK_Ki       ((( int)((Op)<<13))>>23)
 #define   JCmpK_Ki_(x)   ((( int)((x)<<13))>>23)
 
