@@ -29,11 +29,10 @@ typedef u64 (*Fn11)(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64, u64);
 typedef u64 (*Fn12)(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64, u64, u64);
 
 
-struct Function {
-	u16				NameLength;			// can we use jbin names instead? where to store names even?				
-	u16				InstructionCount;	// after the code?
+struct Function {	// I guess this can just be the address of the jbin's string. :)
+					// So the length is... a jbin length. 
 	uint			CallCount;
-	byte			Code[];
+	ASM				Code[];
 };
 
 
@@ -42,7 +41,8 @@ struct vm_globs {
     byte*			PackGlobs;
     JB_String**		PackStrs;
     Fn0*			Cpp;
-    Function**		DebugFuncTable;
+    Function*		PackCallbacks;
+    Function*		LibCallbacks;
     byte*			AllocBase;
     int				AllocCurr;
     ASM* 			CodeBase;

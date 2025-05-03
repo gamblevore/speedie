@@ -29,6 +29,8 @@
 	u1 = (uint64)(&u2);
 ı RET: _
 	Code = ReturnFromFunc(vm, r, Op);
+ı AFNC: _
+	i1 = FuncAddr(vm, Op);
 ı ALLO: _
 	AllocStack(vm, r, Op);
 ı SWAP: _

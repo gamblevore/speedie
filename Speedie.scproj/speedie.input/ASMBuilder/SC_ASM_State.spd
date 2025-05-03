@@ -310,7 +310,7 @@ struct ASMState
 			dest.TmpCheck
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
-			debugat 0 // keep this
+			debugat 296 // keep this
 				
 		  else
 			opt inline

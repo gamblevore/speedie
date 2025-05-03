@@ -467,7 +467,7 @@ function ASM_ConstNumber (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdec
 	if dest isnt ConstRequest
 		dest.µtype = d.datatype
 		|| n = .HoistedToReg(d)
-		if n >= 0
+		if n < 0
 			return .NumToReg(exp, d.exportposition, dest, dest.µtype)
 		dest.fatindex = d.fatconstindex
 		Dest.reg = n

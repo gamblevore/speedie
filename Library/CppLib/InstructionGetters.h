@@ -55,6 +55,19 @@
 #define   Tail_JUMPu_(x)   (((uint)((x)<<8))>>8)
 
 
+#define   FuncAddr_Libraryi       ((( int)((Op)<<13))>>31)
+#define   FuncAddr_Libraryi_(x)   ((( int)((x)<<13))>>31)
+
+#define   FuncAddr_Libraryu       (((uint)((Op)<<13))>>31)
+#define   FuncAddr_Libraryu_(x)   (((uint)((x)<<13))>>31)
+
+#define   FuncAddr_Indexi       ((( int)((Op)<<14))>>14)
+#define   FuncAddr_Indexi_(x)   ((( int)((x)<<14))>>14)
+
+#define   FuncAddr_Indexu       (((uint)((Op)<<14))>>14)
+#define   FuncAddr_Indexu_(x)   (((uint)((x)<<14))>>14)
+
+
 #define   Alloc_Amounti       ((( int)((Op)<<13))>>13)
 #define   Alloc_Amounti_(x)   ((( int)((x)<<13))>>13)
 

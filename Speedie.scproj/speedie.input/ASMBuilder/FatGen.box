@@ -112,6 +112,15 @@ function message.RET (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |
 }
 
 
+function message.AFNC (|asmreg| r1 = nil, |int| Library = nil, |int| Index = nil, |&fatasm|) {
+	visible
+	rz = self * asm.AFNC
+	rz.dest(0, r1)
+	rz.numinput(1) = Library
+	rz.numinput(2) = Index
+}
+
+
 function message.ALLO (|asmreg| r1 = nil, |int| Amount = nil, |&fatasm|) {
 	visible
 	rz = self * asm.ALLO

@@ -9,7 +9,7 @@ forms
 	U4:		r1 R,  r2 r,  r3 r,  r4 r
 
 
-	Func	// func: fnc:
+	Func
 		r1		R
 		JUMP	l
 		Prm1	x
@@ -28,6 +28,11 @@ forms
 		JUMP	l
 		Prm1	x
 		
+	FuncAddr
+		r1		R
+		Library 1
+		Index	l
+
 	Alloc
 		r1		R
 		Amount	l
@@ -35,13 +40,13 @@ forms
 	Jump
 		JUMP	j
 		
-	RotateConst	// RotateConst:
+	RotateConst
 		r1		R
 		Rot		6
 		Inv		1
 		Value	12
 
-	JCmpEq	// cmpeq:
+	JCmpEq
 		r1		r
 		r2		r
 		LSmall	1
@@ -115,14 +120,14 @@ forms
 		Mode	1
 		Add		l
 	
-	Read			// mem:
+	Read
 		r1		R	// dest (big r!)
 		r2		r	// Base
 		r3		r	// VarAdd
 		Offset	7	// Const A
 		move	2
 
-	Write		// mem:
+	Write
 		r1		r	// Src (small r!)
 		r2		r	// Base
 		r3		r	// VarAdd
@@ -343,6 +348,9 @@ POS 27
 	FNCX3 (ForeignFunc)
 		ForeignFunc(vm, Code, r, Op, Code64) 
 		Code += 2
+
+AFNC (FuncAddr)
+	i1 = FuncAddr(vm, Op)
 
 
 /**/ ALLO (Alloc)
