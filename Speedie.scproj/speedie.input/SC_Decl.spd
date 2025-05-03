@@ -1140,6 +1140,13 @@ class SCDecl (SCNamed) {
 		if .iscarray
 			return .internal!.typeinfo
 		return .Type.typeinfo				// perhaps this is already set correctly.
+	
+	
+	function GlobInfo (|DataTypeCode|)
+		opt norefcounts
+		if .pointercount
+			return datatypecode._voidptr
+		return .Type.typeinfo
 		
 		
 	function Alignment (|bool| PutStructsAfter=false, |int|)

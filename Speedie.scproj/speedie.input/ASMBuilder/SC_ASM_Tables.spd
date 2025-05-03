@@ -563,12 +563,12 @@ function IncrSlowOnAddr (|&ASMState| self, |message| f, |ASMReg| Dest, |int| Mod
 	return fat * Dest
 
 
-function IncrOnAddr (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |asmreg|)
+function IncrOnAddr (|&ASMState| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |scdecl| Glob, |asmreg|)
 	ifn  dest.isint  and  amount.fits(6)
 		return IncrSlowOnAddr(self, exp, dest, mode, Addr, Amount)
 	|| bc = dest.µtype.ByteCount.log2
 	|| offset = 0
-	addr = .InlineOffsetOpt(addr, bc, &offset, 6~bits)
+	addr = .InlineOffsetOpt(addr, bc, &offset, 6~bits, glob)
 	|| fat = exp.CNTC(Addr, dest, offset >> bc, amount, bc)
 
 	fat.RegInput(0) = addr // the output is also an input!
@@ -604,14 +604,15 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 	visible
 	opt	NoRefCounts
 	|| Src = .µGetASM(exp, dest as ASMReg.AddrRequest)
-	|| Amount = IncrAmount(src, mode, exp.ASMDecl)
+	|| D = exp.ASMDecl
+	|| Amount = IncrAmount(src, mode, D)
 	if !dest.reg and dest isnt Discard
 		dest = .TempTyped(exp, dest)
 	
 	|| p = exp.parent! // better positions
 	if src is ContainsAddr
 		dest.µType = src.µType
-		return IncrOnAddr(self, p, dest, mode, src, amount)
+		return IncrOnAddr(self, p, dest, mode, src, amount, D)
 	
 	NotTemp(self, src, p)
 	if mode & IncrAfter

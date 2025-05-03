@@ -13,7 +13,7 @@ function SCFunction.GenASM
 	|SC_Hoister| H 
 	|| a = .sourcearg!
 	asmtype.ArgSub(ASMState.Sh, A, H)
-	h.Unhoist
+	h.Unhoist(asmstate.sh)
 
 
 function message.OperatorMul (|asm| op, |&fatasm|)

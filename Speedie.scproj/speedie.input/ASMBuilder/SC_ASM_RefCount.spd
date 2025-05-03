@@ -1,10 +1,12 @@
 
 
 extend asmstate
-	function InlineOffsetOpt (|asmreg| base, |int| pow2, |&int| index, |uint| maximum, |asmreg|)
+	function InlineOffsetOpt (|asmreg| base, |int| pow2, |&int| index, |uint| maximum, |scdecl?| Glob, |asmreg|)
 		|| bs = base.fat
 		if bs isa asm.GTAB
-			|| lost = bs.const & 63
+			expect (glob)			// oof if not glob
+			|| lost = glob.exportposition - bs.const
+			expect lost >= 0		// oof if negative!!
 			|| i = index[] + lost
 			if i > maximum|int|		// sigh. we need to addk.
 				|| temp = .TempOnly(bs.msg, base)
@@ -32,7 +34,7 @@ extend asmstate
 		if fn == compiler.RefClear
 			|| offset = 0
 			|| A = .µ(prms.first!, ASMReg.AddrRequest)
-			A = .InlineOffsetOpt(A, 3, &offset, 13~bits)
+			A = .InlineOffsetOpt(A, 3, &offset, 13~bits, nil)
 			return exp.RFWR(A, nil, 1, offset)						// reg to mem
 
 		if fn == Compiler.RefSetRef
@@ -44,7 +46,7 @@ extend asmstate
 			|| offset = 0
 			if Out isnt ContainsAddr
 				if From is ContainsAddr
-					from = .InlineOffsetOpt(from, 3, &offset, 13~bits)
+					from = .InlineOffsetOpt(from, 3, &offset, 13~bits, nil)
 					return exp.RFRD(Out, From, 1, offset)			// mem to reg
 				return exp.RFST(Out, From)							// reg to reg
 			
@@ -54,7 +56,7 @@ extend asmstate
 				where.µtype = datatypecode._voidptr
 				From = .Read(where, P, From, nil) * where			// (mem to reg)?
 
-			out = .InlineOffsetOpt(Out, 3, offset, 13~bits)
+			out = .InlineOffsetOpt(Out, 3, offset, 13~bits, nil)
 			return exp.RFWR(Out, From, 1, offset)					// reg to mem
 
 
@@ -62,7 +64,7 @@ extend asmstate
 			|| A = .µ(prms.first!, asmreg.AddrRequest)
 			target debug: if a isnt ContainsAddr					// always memory
 			|| offset = 0
-			A = .InlineOffsetOpt(A, 3, offset, 13~bits)
+			A = .InlineOffsetOpt(A, 3, offset, 13~bits, nil)
 			|| B = .µ(prms.second!)
 			target debug: if b is ContainsAddr						// always reg
 			return exp.RFWR(a, b, 0, offset)

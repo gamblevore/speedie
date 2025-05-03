@@ -86,16 +86,22 @@ function While (fn_asm)
 	opt norefcounts
 	|SC_Hoister| H
 	
-	|| OV = H.PreHoist(self, 5)
-	h.HoistLoop(exp)
+	|| OV = .OpenVars
+	h.HoistLoop(ASMState.sh, exp, ov)
 	
+	rz = .WhileWrap(exp)
+	
+	// seems the gtab closer has to go into closevars.
+	// or else... the arg wrapper will close this.
+	OV = h.Unhoist(self, OV)
+	.CloseVars(OV)
+
+
+function WhileWrap (|message| exp, |asmreg|)
 	.state.BranchDepth++
 	rz = .WhileSub(exp)
 	.state.BranchDepth--
 	
-	.CloseVars(OV)
-	h.Unhoist
-
 
 function WhileSub (|message| exp,  |asmreg|)
 	opt norefcounts

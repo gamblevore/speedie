@@ -1,12 +1,19 @@
 
 
+/*
+	what was left to do?
+	* using globs! they are shifted 6
+	* Leaving globs after? (what about glob order? like glob2 is unused but glob1 is used?)
+	
+*/
+
 
 struct SC_Hoister
 	linkage
 		cpp_part Hoi
 	|uint|				Bits
-	|int|				OldHoistStart
-	|int|				OldHoistEnd
+//	|int|				OldHoistStart
+//	|int|				OldHoistEnd
 	|byte|				Count
 	|byte|				Spare
 	
@@ -16,19 +23,20 @@ struct SC_Hoister
 
 
 	function ASMState.GlobAddr (|scdecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
-		opt norefcounts
-		
-		if "GlobAddr".trap
-		
 		|| Glob = .TryGetGlob(D)
 			return Glob
+		return .GlobAddrsub(d, exp, dest)
 	
+	
+	function ASMState.GlobAddrSub (|scdecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
+		opt norefcounts
+
 		|int64| iTable = d.ExportPosition
 		expect (iTable > 0)          (exp, "No global address".internal)
 		expect (iTable <= 24~bits)   (exp, "Used over 16MB of global data")
-	
+		
 		|| fat = exp.GTAB(dest,  (d.IsLib)|int|,  iTable>>6)
-		fat.Const = iTable
+		fat.Const = iTable&~63
 		Dest = fat * dest
 		dest.µtype = DataTypeCode._voidptr
 		return dest.HaveAddr
@@ -53,11 +61,20 @@ struct SC_Hoister
 		.Spare--
 
 
+	helper HoistLoop (|asmstate| sh, |message| exp, |uint| OV)
+		opt norefcounts
+		.Spare = 3
+		.HoistRecursive(sh, exp.last! , sc_hoister.AsLoop)
+		.Spare = 2
+		.HoistRecursive(sh, exp.first!, sc_hoister.AsLoop)
+		
+
 	helper HoistGlobal (|asmstate| sh, |message| prop, |SCDecl| decl)
 		opt NoRefCounts
+//		debugat 5
 		require !sh.TryGetGlob(decl)
 		|| dest = sh.DeclareMe(prop, decl)
-		|| Addr = sh.GlobAddr(decl, prop, dest)
+		|| Addr = sh.GlobAddrSub(decl, prop, dest)
 		.HoistComplete(dest, Decl, addr, sh)
 
 
@@ -79,49 +96,38 @@ struct SC_Hoister
 				return true
 
 
+	
 	function ASMState.TryGetGlob (|SCDecl| D, |asmreg|)
-		|| find = d.ExportPosition & ~63
+		|uint64| find = d.ExportPosition
+		|uint64| range = 128 * d.globInfo.ByteCount
 		for old in ASMState.sh
 			if old isa asm.gtab
-				|| k = old.const
-				if k == find or (find - 64)
-					return old.reg(0).asm
+				|uint64| Addr = old.const
+				if Addr <= find and addr + range > find
+					return old.info
 			
 	
-	function Unhoist
+	function Unhoist (|asmstate| sh, |uint| OV=0, |uint|)
 		opt NoRefCounts
-		|| sh = asmstate.sh
+		|| Count = 0
 		for (b.bits in .bits) (i)
 			|| f = sh.Hoisted[i]!
 			sh.Hoisted[i] = nil
 			f.µRefCount--
 			if f.IsUnused
 				sh.nop(f)
+			  elseif  Count == 0  and  f isa asm.GTAB
+				ov += 1<<8 // keep one. To keep two, do Count <= 1
+			Count++
 			
 		sh.HoistMap &= ~.bits
+		return OV
 					
 
 	function HoistNormal (|message| exp)
 		.spare = 6
 		.HoistRecursive(asmstate.sh, exp, 0)
-		
-		
-	function HoistLoop (|message| exp)
-		.spare = 2
-		.HoistRecursive(asmstate.sh, exp.first!, AsLoop)
-		.Spare += 2
-		.HoistRecursive(asmstate.sh, exp.last!, AsLoop)
 
-
-	function PreHoist (|asmstate| sh, |int| Amount, |int|)
-		.OldHoistStart = sh.HoistStart
-		.OldHoistEnd = sh.HoistEnd
-		sh.HoistStart = sh.CurrIndex
-		sh.HoistEnd = sh.HoistStart + Amount
-		for amount
-			(sh._Curr++)._op = asm.noop
-		return sh.OpenVars
-	
 
 	function TryHoistOne (|asmstate| sh, |message| exp, |scdecl| prop, |int| Score)
 		if prop is const
@@ -147,9 +153,9 @@ struct SC_Hoister
 	
 	
 	function CanHoist (|asmstate| sh, |bool|)
-		require .spare > 0
-		|| Start = sh.HoistStart
-		return start < sh.Hoistend		
+		return .spare > 0
+//		|| Start = sh.HoistStart
+//		return start < sh.Hoistend		
 	
 	
 	function HoistRecursive (|asmstate| sh, |message| exp, |int| Score, |bool|)

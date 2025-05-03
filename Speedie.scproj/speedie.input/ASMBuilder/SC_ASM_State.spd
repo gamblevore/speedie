@@ -29,8 +29,8 @@ struct ASMState
 	|?memory of fatasm|			JSM
 	|?&FatASM|					InlineEnd
 	|uint|						HoistMap
-	|int|						HoistStart
-	|int|						HoistEnd
+//	|int|						HoistStart
+//	|int|						HoistEnd
 	|&FatASM|					FuncStart
 	|&FatASM|					LastDebug
 	|&FatASM|					Start		// a "slice" feature would be nice    
@@ -310,7 +310,7 @@ struct ASMState
 			dest.TmpCheck
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
-			debugat 296 // keep this
+			debugat 0 // keep this
 				
 		  else
 			opt inline
@@ -344,7 +344,8 @@ struct ASMState
 		return exp.MEMZ(base, index)
 	
 	
-	function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl| D,  |int| Index, |&fatasm|)
+	function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl| D, |int| Index, |&fatasm|)
+//		if "testatomic".trap // we also need to handle: x = &glob, gtab doesn't give byte-aligned stuff!
 		if dest is containsaddr
 			#!wait?? this is meant to be an addrrequest? not a response.
 			debugger
@@ -367,15 +368,15 @@ struct ASMState
 				varadd = asmreg()
 		//  ADDK: bs, r1, 4
 		//  RD1U: r2, bs, value, 4, 0
-		base = .InlineOffsetOpt(Base, bytes, &index, 127)
+		base = .InlineOffsetOpt(Base, bytes, &index, 127, d)
 
 /*
 	// these need to be opted. Not always happening? InlineOffsetOpt seems to only do ADDK, not ADPK
 	ADPK: t30, r2, 4                               /* R++ */
 	WR4U: t31, t30, r0, 0, 0                       /* R++[0] */	
+	|| Move = .TryAddPKMemory(base) // how is this different to inlineoffsetopt?
 */
 
-//		|| Move = .TryAddPKMemory(base) // how is this different to inlineoffsetopt?
 		if index >= 128												// read/write only allows up to 127
 			index <<= bytes
 			base = .AddToReg(exp, asmreg(), base as asmreg.noscale, index)
@@ -518,8 +519,8 @@ struct ASMState
 		fn.StartASM
 		.LastDebug = .curr
 		.InlineEnd = nil
-		.HoistStart = nil
-		.HoistEnd = nil
+//		.HoistStart = nil
+//		.HoistEnd = nil
 		.FuncStart = .curr
 		.returnasm = fn.ASMReturn.regtype
 		.AddFuncParams(fn)

@@ -424,7 +424,7 @@ struct FatASM
 			if .op == asm.knst
 				exit
 		
-		if (self isa asm.knst or asm.knsr)
+		if (self isa asm.knst or asm.knsr or asm.gtab)
 			.RendaKnst(fs, fs.mark-m)
 			fs <~ ' '
 		
