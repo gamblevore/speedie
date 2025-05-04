@@ -487,7 +487,7 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 
 
 AlwaysInline ASM* ReturnFromFunc (jb_vm& vm, VMRegister*& r, ASM Op) {
-	JB_Decr(o2);
+	JB_Decr(o2); // broken somewhere
 	JB_Decr(o3);
 	VMRegister* stck = r-1;
 	auto R1 = stck - stck->Stack.SavedReg;

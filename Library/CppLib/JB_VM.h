@@ -29,8 +29,8 @@ typedef u64 (*Fn11)(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64, u64);
 typedef u64 (*Fn12)(u64, u64, u64, u64, u64, u64, u64, u64, u64, u64, u64, u64);
 
 
-struct Function {	// I guess this can just be the address of the jbin's string. :)
-					// So the length is... a jbin length. 
+struct Function { 
+	uint8			JbinStart; // bytes backward to the jbin string
 	uint			CallCount;
 	ASM				Code[];
 };

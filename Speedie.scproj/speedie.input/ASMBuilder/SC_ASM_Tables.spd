@@ -102,7 +102,7 @@ function First (fn_asm)
 
 function Sheb (fn_asm)
 	opt NoRefCounts
-	LastDebugMark = exp
+	// LastDebugMark = exp
 	return exp.noop * asmreg()
 	
 	
@@ -441,14 +441,12 @@ function Num (fn_asm)
 	opt norefcounts
 	|| d = exp.ASMDecl
 	|| T = d.typeonly
+	|| H = .HoistedToReg(d)
+		H.µType = T
+		return H
+	
 	dest.µtype = T
 	(dest is RealConst)
-	
-	|| n = .HoistedToReg(d)
-		Dest.reg = n&31
-		dest.fatindex = D.fatconstindex
-		return Dest
-	
 	return .NumToReg(exp, d.ExportPosition, dest, T)
 
 
@@ -465,13 +463,11 @@ function Thg (fn_asm)
 function ASM_ConstNumber (|&ASMState| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
 	(dest is RealConst)
 	if dest isnt ConstRequest
+		|| H = .HoistedToReg(d)
+			(H isnt constinput)
+			return H
 		dest.µtype = d.datatype
-		|| n = .HoistedToReg(d)
-		if n < 0
-			return .NumToReg(exp, d.exportposition, dest, dest.µtype)
-		dest.fatindex = d.fatconstindex
-		Dest.reg = n
-		(dest isnt constinput)
+		return .NumToReg(exp, d.exportposition, dest, dest.µtype)
 	return dest
 
 
@@ -692,15 +688,6 @@ function message.ASMUnbra (|message|)
 	return self
 
 
-// would be nice to allow --X or ++X
-// however, what if its being passed to a function?
-// and the function is inline?
-// in fact, what if it isnt inline? I think we need tests for those?
-
-function HoistedToReg (|scdecl| d, |ind|)
-	
-	
-
 function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
 	opt	norefcounts
 	real self
@@ -711,9 +698,9 @@ function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
 	if fn != @num
 		return nil
 	|| d = m.ASMDecl
-	|| n = .HoistedToReg(d)
-		rz = n.asm
-		rz.µtype = d.DataType
+	|| H = .HoistedToReg(d)
+		H.µtype = d.DataType
+		return H
 	if (d is const) and !d.exportposition
 		return .NumToReg(m, 0, asmreg(), d.DataType)
 
@@ -804,15 +791,22 @@ function ASMLocal (|message| s, |VarUseMode| mode, |asmreg|)
 
 
 function SetDeclToConst (|scdecl| decl, |asmreg| Initial, |&fatasm| f, |bool|)
-	if (Initial is ConstOutput) and (decl isnt AlteredInBranch)
-		if f
-			(decl is const)
-			// || k = 1, k = 2, k = k + 3
-			decl.ExportPosition = f._const
-			if !Initial.FatIndex
-			decl.FatConstIndex = Initial.fatindex
-			return true
-		debugger 
+	require  (Initial is ConstOutput) and (decl isnt AlteredInBranch)
+
+	(decl is const)
+	if f
+		// || k = 1, k = 2, k = k + 3
+		decl.ExportPosition = f._const
+		if !Initial.FatIndex
+		decl.FatConstIndex = Initial.fatindex
+		return true
+
+	if !initial.reg
+		decl.exportposition = 0
+		decl.FatConstIndex = 0
+		return true
+		
+	debugger // ooof? 
 
 
 function MakeConstFromASM (|scdecl| decl, |asmreg| Initial, |asmreg| NewValue)
@@ -933,6 +927,6 @@ function Message.TypeCastDoesNothing (|bool|)
 	require BytesLost <= 0
 
 	
-function string.Trip (|bool|)
-	return asmtype.LastDebugMark ~= self 
+//function string.Trip (|bool|)
+//	return asmtype.LastDebugMark ~= self 
 

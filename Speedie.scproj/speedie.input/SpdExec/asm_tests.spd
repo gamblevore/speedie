@@ -191,11 +191,12 @@ function Inline_LLL
 
 
 function Inline_Consts (|int| A)
-	#!BBB
+/*	#!BBB
 	|| B = gggTest1(1, 2)
 	#!CCC
 	|| C = gggTest1(-1, 2)
 	#!DDD
+*/
 	|| D = gggTest1(-1, 0)
 	#!EEE
 	|| E = A+gggTest1(-1, 0)
@@ -369,6 +370,11 @@ function ConstRemovals (|message| AAA, |string|)
 	#!Two
 	if Aaa.Length * 0
 		x2 = AaA.Length * 0
+
+
+function TestGlob (|int|)
+	|| g = &Glob // sigh
+	g[]++
 
 
 function TestAtomic (|int|)

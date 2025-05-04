@@ -91,21 +91,20 @@ void** JB_ASM_InitTable(jb_vm* vm, int n, int g) {
 
 jb_vm* JB_ASM__VM() {
 	dbgexpect2 (sizeof(ASM)==4);
-	if (vm) return vm;
+	auto v = vm;
+	if (v) return v;
 	
-	int StackSize  = 256*1024;			// Around 1600 ~fns deep. 
-	vm             = (jb_vm*)calloc(StackSize, 1);
-	if (!vm)
+	int StackSize  = 1024*1024;			// Around 6400 ~fns deep. 
+	v             = (jb_vm*)calloc(StackSize, 1);
+	if (!v)
 		return 0;
-	
-	auto& v = *vm;
-
-	v.EXIT[0] = 1;					// Halt cleanly
+	vm = v;
+	v->EXIT[0] = 1;					// Halt cleanly
 //	v.Env.AllocCurr = 0;			// calloc did this already
 //	v.EXIT[1] = 0;					// Halt with error
 
-	v.StackSize  = (StackSize - sizeof(jb_vm))/sizeof(VMRegister);
-	return vm;
+	v->StackSize  = (StackSize - sizeof(jb_vm))/sizeof(VMRegister);
+	return v;
 }
 
 

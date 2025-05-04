@@ -345,7 +345,7 @@ struct ASMState
 	
 	
 	function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl| D, |int| Index, |&fatasm|)
-//		if "testatomic".trap // we also need to handle: x = &glob, gtab doesn't give byte-aligned stuff!
+		#! We need to handle:   x = &glob, gtab doesn't give byte-aligned stuff!
 		if dest is containsaddr
 			#!wait?? this is meant to be an addrrequest? not a response.
 			debugger
@@ -527,7 +527,7 @@ struct ASMState
 		return true
 
 
-	function FinishASM
+	function FinishASM 
 		opt norefcounts
 		if .zero.Const // what?
 		|| l = .last
@@ -594,7 +594,7 @@ struct ASMState
 	function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| AllowedGain, |asmreg|)
 		opt norefcounts
 		|| Start = .curr
-		|| Old = .state
+		|inlineblock| Old = .state
 		if !dest.reg and fn.ASMReturn
 			if dest isnt discard
 				Dest = .TempOnly(prms, dest)
@@ -646,15 +646,16 @@ struct ASMState
 		
 		for a in .fn.Args
 			|| v = .ExistingVar(p!)
-				|| vr = v.reg
-				if .CanReuseParam(prms, a, vr)
-					|| f = v.fat
-					|| T = a.WholeType.reg(vr)
-					a.DataType = t|datatypecode|
-					(a is param) = (v is param)
-					(a is body) = (v isnt param)
-				  else
-					v = nil
+			|| vr = v.reg
+			if !vr
+				0
+			  elseif .CanReuseParam(prms, a, vr)
+				|| T = a.WholeType.reg(vr)
+				a.DataType = t|datatypecode|
+				(a is param) = (v is param)
+				(a is body) = (v isnt param)
+			  else
+				v = nil
 			
 			if !v
 				v = .DeclareMe(a.source, a)

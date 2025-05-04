@@ -1,10 +1,8 @@
 
 
 /*
-	what was left to do?
-	* using globs! they are shifted 6
-	* Leaving globs after? (what about glob order? like glob2 is unused but glob1 is used?)
-	
+	* closevars still needs to handle gtab keeping.
+	* HoistedToReg needs completing
 */
 
 
@@ -12,8 +10,6 @@ struct SC_Hoister
 	linkage
 		cpp_part Hoi
 	|uint|				Bits
-//	|int|				OldHoistStart
-//	|int|				OldHoistEnd
 	|byte|				Count
 	|byte|				Spare
 	
@@ -61,7 +57,7 @@ struct SC_Hoister
 		.Spare--
 
 
-	helper HoistLoop (|asmstate| sh, |message| exp, |uint| OV)
+	helper HoistLoop (|asmstate| sh, |message| exp)
 		opt norefcounts
 		.Spare = 3
 		.HoistRecursive(sh, exp.last! , sc_hoister.AsLoop)
@@ -71,7 +67,6 @@ struct SC_Hoister
 
 	helper HoistGlobal (|asmstate| sh, |message| prop, |SCDecl| decl)
 		opt NoRefCounts
-//		debugat 5
 		require !sh.TryGetGlob(decl)
 		|| dest = sh.DeclareMe(prop, decl)
 		|| Addr = sh.GlobAddrSub(decl, prop, dest)
@@ -96,6 +91,8 @@ struct SC_Hoister
 				return true
 
 
+	function ASMState.HoistedToReg (|scdecl| D, |asmreg|)
+		
 	
 	function ASMState.TryGetGlob (|SCDecl| D, |asmreg|)
 		|uint64| find = d.ExportPosition
@@ -154,8 +151,6 @@ struct SC_Hoister
 	
 	function CanHoist (|asmstate| sh, |bool|)
 		return .spare > 0
-//		|| Start = sh.HoistStart
-//		return start < sh.Hoistend		
 	
 	
 	function HoistRecursive (|asmstate| sh, |message| exp, |int| Score, |bool|)
