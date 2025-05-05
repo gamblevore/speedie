@@ -89,7 +89,7 @@ extend ASMState
 					return info asnt asmreg.ConstInput
 			
 	
-	function FeelingNumb (|message| exp, |int64| V, |asmreg| Dest, |asmreg|)
+	function LoadNumber (|message| exp, |int64| V, |asmreg| Dest, |asmreg|)
 		if !Dest.reg
 			|| Found = .MegaNumFinder(v, dest.µtype)
 				return Found
@@ -102,15 +102,15 @@ extend ASMState
 		
 		|| fat = exp.KNST(dest, 0, 0, 0)
 		fat.Const = v
-		if dest isnt Temp and textual and NoHoist
-			.Hoist(fat, dest.reg)
 		(dest is realconst)
-		return fat * dest
+		rz = fat*dest
+		if  (dest isnt Temp and textual)  and  (dest is CanHoist)
+			.Hoist(fat, dest.reg)
 		
 
 	function NumToReg (|message| exp, |int64| V, |asmreg| Reg, |datatypecode| SrcType, |asmreg|)
 		if v // or (reg.reg)
-			return .FeelingNumb(exp, v, reg)
+			return .LoadNumber(exp, v, reg)
 
 		rz = asmreg.ZeroParam as (reg & ASMReg.ConstInput)
 		rz.µType = SrcType

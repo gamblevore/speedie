@@ -290,11 +290,9 @@ function SetRel (fn_asm)						// function relset (
 	|| B = exp.last!
 	|| X = .ExistingVar(A, VarUseMode.set)
 		|| D = a.ASMDecl
-		if d is AlteredInBranch
-			(x is nohoist)
 		dest = .µInto(B, X)
-		if x isnt NoHoist
-			.MakeConstFromASM(d, nil, dest)
+		if x is CanHoist
+			.MarkDeclAsConst(d, nil, dest)
 		return dest
 
 	// probably x.y = z, or x[y] = z 
@@ -330,12 +328,12 @@ function Decl (fn_asm)
 
 	if ty isnt local							// a carray or somthing?? idk
 	if (ty is alteredinbranch) or (ty isnt local)
-		(dest is nohoist)
+		(dest isnt canhoist)
 		return .µInto(item, dest)
 
 	|| K = .µInto(item, dest)
 	if k is ConstOutput
-		.MakeConstFromASM(ty, k, nil)
+		.MarkDeclAsConst(ty, k, nil)
 	return k
 
 	
@@ -759,13 +757,12 @@ function ThgASM (|scdecl| d, |asmreg|)
 	
 	(t is param) = (d is param) // unused?
 	if  d isnt alteredinbranch
+		(t is CanHoist)
 		|| fi = d.FatConstIndex
 			|| f = fi|uint|.fat
 			if f is ConstOutput
 				(T is ConstOutput)
 				t.FatIndex = fi
-	  else
-		(t is nohoist)
 	
 	|| rr = T.reg
 		|| Ret = .State.Return
@@ -794,7 +791,7 @@ function SetDeclToConst (|scdecl| decl, |asmreg| Initial, |&fatasm| f, |bool|)
 	debugger // ooof? 
 
 
-function MakeConstFromASM (|scdecl| decl, |asmreg| Initial, |asmreg| NewValue)
+function MarkDeclAsConst (|scdecl| decl, |asmreg| Initial, |asmreg| NewValue)
 	description "Marks Decl as a const, if it definitely is a const. Otherwise marks as NOT CONST. Also nops unused consts. Also updates new const value."
 	opt NoRefCounts
 	|| f = Initial.fat

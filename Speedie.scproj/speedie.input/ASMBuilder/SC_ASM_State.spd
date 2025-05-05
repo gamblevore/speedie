@@ -59,7 +59,6 @@ struct ASMState
 
 
 	function CloseVars (|uint16| Orig, |message| exp = nil, |asmreg| Return=nil, |asmreg|)
-		// This needs to close hoists also. All hoists are in the vdecls.
 		opt NoRefCounts
 		
 		|| OrigDecls = Orig >> 8
@@ -239,10 +238,17 @@ struct ASMState
 		if fat == C
 			._curr = C // nice
 
+		for v.regoutputs in fat
+			v&=31
+			.KnownValues[v] = nil
+			.HoistMap &=~ (1<<v)
+
 		depth++
 		if depth > 7
 		for f.fatinputs in fat
 			.decr(f, depth)
+
+		// why is this coming after? maybe better before? try?
 		|| Type = asm.noop * (fat < ._curr)
 		fat.setop = Type
 	
@@ -665,14 +671,14 @@ struct ASMState
 			if !v
 				v = .DeclareMe(a.source, a)
 				v = .µInto(p!, v as asmreg.DeclareInlineParam)
-			.MakeConstFromASM(a, V, nil)
+			.MarkDeclAsConst(a, V, nil)
 			p++
 	
 
 	function RestoreParameters
 		opt norefcounts
 		for a.backwards in .fn.Args
-			.MakeConstFromASM(a, nil, nil) // parameters can never be const anyhow
+			.MarkDeclAsConst(a, nil, nil) // parameters can never be const anyhow
 			a.fatconstindex = 0
 			a.paramfix
 

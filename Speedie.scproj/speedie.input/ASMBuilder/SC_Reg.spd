@@ -23,7 +23,7 @@ datatype ASMReg (uint64)
 		Set
 		Declaration
 		Temp
-		NoHoist
+		CanHoist
 		NoScale
 		ContainsAddr
 		Textual
@@ -240,7 +240,7 @@ datatype ASMReg (uint64)
 		opt norefcounts
 		.reg = dest.reg
 		(self is temp) = (Dest is temp)
-		is NoHoist
+		isnt CanHoist
 		return self
 	
 	function with (|asmreg| dest, |asmreg| InUse, |asmreg|)

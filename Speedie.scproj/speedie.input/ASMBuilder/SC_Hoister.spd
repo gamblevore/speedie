@@ -33,11 +33,11 @@ struct SC_Hoister
 	
 	
 	function ASMState.Hoist (|?&fatasm| fat, |int| n)
-		if "AndOrConsts".trap
+		if "SemiConst".trap
 		target debug
 			if sh.HoistMap & (1<<n)		// what?
 			if sh.knownvalues[n]		// what?
-			if fat is NoHoist			// what?
+			if fat isnt CanHoist		// what?
 
 		if fat
 			fat.µRefCount++

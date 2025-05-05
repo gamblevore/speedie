@@ -714,7 +714,7 @@ extend ASMState
 		// perhaps all assigns should use 16-byte vector assign.
 		
 		if !sr										// must be assigning zero
-			return .FeelingNumb(exp, 0, dest)		// More readable ASM.
+			return .LoadNumber(exp, 0, dest)		// More readable ASM.
 
 		|| improve = .CanImproveAssign(dest, src)
 			if improve.ResetOutput(dr)

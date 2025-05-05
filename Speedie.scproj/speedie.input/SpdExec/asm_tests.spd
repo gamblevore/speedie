@@ -243,6 +243,10 @@ function VarConst (|int| a)
 
 
 function SemiConst (|int| f1, |int|)
+	|| y6 = 1 or  f1
+	y6 = 1 or  f1
+
+function SemiConst2 (|int| f1, |int|)
 	visible
 	|| x2 = f1 or  1
 	|| x3 = f1 or  0

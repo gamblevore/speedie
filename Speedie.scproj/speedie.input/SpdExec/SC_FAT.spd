@@ -239,9 +239,9 @@ struct FatASM
 		.Outputs |= 1<<a
 
 	
-	function Altered (|uint|) 
-		for prm.regoutputs in self
-			rz |= 1<<(prm&31)
+//	function Altered (|uint|) 
+//		for prm.regoutputs in self
+//			rz |= 1<<(prm&31)
 	
 	
 	function File (|string|)
