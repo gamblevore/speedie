@@ -345,7 +345,7 @@ function DeclSub (fn_asm)
 
 	
 function ArgSub (|&ASMState| self, |message| exp, |&sc_hoister| H, |AsmReg|)
-	opt norefcounts
+	opt NoRefCounts
 	|| OV = .OpenVars
 	
 	for ch.fast in exp
@@ -355,13 +355,10 @@ function ArgSub (|&ASMState| self, |message| exp, |&sc_hoister| H, |AsmReg|)
 			ASMType.Decl(self, ch, AsmReg.RealDiscard)
 		  else
 			|| What = .µ(ch, AsmReg.RealDiscard)
-			if what & asmreg.exit // what is exit
-				rz = what
-				exit
+			if what & asmreg.exit							// .exit has two bits but "is" requires both
+				return .Closevars(ov, nil, what)
 
-	if rz & asmreg.exit
-		exp = nil // don't AllocBearStruct(-1) 
-	.CloseVars(OV, exp)
+	return .CloseVars(OV, exp)
 
 
 function Arg (fn_asm) // argument 
@@ -405,7 +402,7 @@ function Dot (fn_asm)										// a.b
 	|asmreg| SubDest // fool around with optimising this
 	if dest isnt set // **once** everything is working
 		dest = .TempTyped(exp, dest)
-		subdest = subdest.usereg(dest)
+		subdest = subdest.ReUseRegInPlace(dest)
 	
 	|| prop = exp.ASMDecl
 	if prop is const // wait? don't these all get pre-transformed? SHOULD they be?
@@ -546,7 +543,7 @@ function BoolNot (fn_asm)							// !a
 
 function IncrSlowOnAddr (|&ASMState| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |ASMReg|)	
 	opt	NoRefCounts									// *a, x = *(a.b)
-	|| TmpCloser = .OpenVars // remove this open/close? We CAN remove??? OOF
+	|| TmpCloser = .OpenVars
 	.Read(Dest, F, dest, addr)						// READ
 
 	|| NewValue = (.Temptyped(f), dest)(mode & IncrAfter)
@@ -727,10 +724,13 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 		ml = .µGetASM(first, dest)
 	  else
 		|| Closer = .OpenVars
-		|| discardmode = dest & AsmReg.Discard
-		|| Mode = discardmode with dest
+		|| DiscardMode = dest & AsmReg.Discard
+		|| Mode = discardmode
+		if dest is Declaration
+			mode = mode.ReUseRegInPlace(dest)
 		
 		ml = .µGetASM(First, mode)
+	
 		mode = DiscardMode.with(dest, ml)
 		mr = .µ(exp.last!, mode)
 		.CloseVars(Closer)
@@ -739,8 +739,6 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 				mr = .Vectorise(mr, exp)
 			  else
 				ml = .Vectorise(ml, exp)
-				
-			
 	
 	dest = .TempTyped(exp, dest)
 	(dest is constoutput) = (ml&mr is constoutput)

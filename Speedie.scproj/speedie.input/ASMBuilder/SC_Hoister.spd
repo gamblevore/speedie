@@ -1,7 +1,6 @@
 
 
 /*
-	* closevars still needs to handle gtab keeping.
 	* HoistedToReg needs completing
 */
 
@@ -38,21 +37,27 @@ struct SC_Hoister
 		return dest.HaveAddr
 	
 	
+	function ASMState.Hoist (|?&fatasm| fat, |int| n)
+		target debug
+			if sh.HoistMap & (1<<n)		// what?
+			if sh.knownvalues[n]		// what?
+
+		if fat
+			fat.µRefCount++
+		
+		sh.KnownValues[n] = fat
+		sh.HoistMap |= 1<<n
+		
+	
 	helper HoistComplete (|asmreg| dest, |SCDecl| decl, |asmreg| K, |asmstate| sh)
 		opt NoRefCounts
 		|| I = k.fatindex
 		|| Fat = k.fat
-			fat.µRefCount++
 		decl.FatConstIndex = I
 
 		|| n = dest.reg
-		target debug
-			if sh.HoistMap & (1<<n)		// what?
-			if .bits & (1<<n)  			// what?
-			if sh.hoisted[n]			// what?
-
-		sh.hoisted[n] = fat
-		sh.HoistMap |= 1<<n
+		sh.hoist(fat, n)
+		if .bits & (1<<n)  			// what?
 		.Bits |= 1<<n
 		.Spare--
 
@@ -92,7 +97,7 @@ struct SC_Hoister
 
 
 	function ASMState.HoistedToReg (|scdecl| D, |asmreg|)
-		
+		// isnt this the same as .oldnum?
 	
 	function ASMState.TryGetGlob (|SCDecl| D, |asmreg|)
 		|uint64| find = d.ExportPosition
@@ -102,23 +107,6 @@ struct SC_Hoister
 				|uint64| Addr = old.const
 				if Addr <= find and addr + range > find
 					return old.info
-			
-	
-	function Unhoist (|asmstate| sh, |uint| OV=0, |uint|)
-		opt NoRefCounts
-		|| Count = 0
-		for (b.bits in .bits) (i)
-			|| f = sh.Hoisted[i]!
-			sh.Hoisted[i] = nil
-			f.µRefCount--
-			if f.IsUnused
-				sh.nop(f)
-			  elseif  Count == 0  and  f isa asm.GTAB
-				ov += 1<<8 // keep one. To keep two, do Count <= 1
-			Count++
-			
-		sh.HoistMap &= ~.bits
-		return OV
 					
 
 	function HoistNormal (|message| exp)

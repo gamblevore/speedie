@@ -336,7 +336,7 @@ extend ASMState
 		//		a - 1,		a + 1		//
 		//		1 - a,		1 + a		//
 		if dest is ConstOutput // perhaps we can do this in domathsub?
-			return .MakeConst2(dest, l, r, exp, ConstifyIntPlus)
+			return .MakeConstFromTwo(dest, l, r, exp, ConstifyIntPlus)
 
 		|| swapped = 0
 		if  l.LeftScore < r.LeftScore // put consts into R
@@ -389,7 +389,7 @@ extend ASMState
 
 	function FloatPlus (fn_opasm)
 		if dest is ConstOutput
-			return .MakeConst2(dest, l, r, exp, ConstifyFloatPlus)
+			return .MakeConstFromTwo(dest, l, r, exp, ConstifyFloatPlus)
 
 		|| IsF32 = dest.FourBytes
 			|| qq = .QuickFloat32Plus(dest, l, r, exp)
@@ -430,7 +430,7 @@ extend ASMState
 
 	function FloatMul (fn_opasm)
 		if dest is ConstOutput
-			return .makeconst2(dest, l, r, exp, ConstifyFloatMul)
+			return .MakeConstFromTwo(dest, l, r, exp, ConstifyFloatMul)
 		rz = .QuickFloatMul(dest, R, L, exp)
 		if rz == nil
 			rz = .QuickFloatMul(dest, L, R, exp)
@@ -441,7 +441,7 @@ extend ASMState
 
 	function IntMul (fn_opasm)
 		if dest is ConstOutput
-			return .MakeConst2(dest, l, r, exp, ConstifyIntMul)
+			return .MakeConstFromTwo(dest, l, r, exp, ConstifyIntMul)
 		rz = .QuickIntMul(dest, R, L, exp)
 		if rz == nil
 			rz = .QuickIntMul(dest, L, R, exp)
@@ -452,7 +452,7 @@ extend ASMState
 
 	function BoolMul (|asmreg| dest, |asmreg| Bule, |asmreg| V, |message| exp, |asmreg|)		
 		if dest is ConstOutput
-			return .MakeConst2(dest, Bule, V, exp, ConstifyBoolMul)
+			return .MakeConstFromTwo(dest, Bule, V, exp, ConstifyBoolMul)
 		rz = .QuickIntMul(dest, Bule, V, exp)
 		if !rz
 			rz = exp.TERN(dest, Bule, V, asmreg(), bule.small) * Dest				// TERN
@@ -481,7 +481,7 @@ extend ASMState
 
 	function DivFloat    (fn_opasm)
 		if (dest is ConstOutput) and (l isnt alternate)
-			return .MakeConst2(dest, l, r, exp, ConstifyFloatDiv)
+			return .MakeConstFromTwo(dest, l, r, exp, ConstifyFloatDiv)
 		rz = .QuickFloatDiv(dest, L, R, exp)
 		if rz == nil
 			if 0: exp.VDIV
@@ -510,7 +510,7 @@ extend ASMState
 
 	function DivInt    (fn_opasm)
 		if dest is ConstOutput
-			return .MakeConst2(dest, L, R, exp, ConstifyIntDiv)
+			return .MakeConstFromTwo(dest, L, R, exp, ConstifyIntDiv)
 		|| q = .QuickIntDiv(dest, l, r, exp)
 			return q
 
@@ -528,13 +528,13 @@ extend ASMState
 
 	function ModInt    (fn_opasm)
 		if dest is ConstOutput
-			return .MakeConst2(dest, L, R, exp, ConstifyIntMod)
+			return .MakeConstFromTwo(dest, L, R, exp, ConstifyIntMod)
 		return exp.DIV(asmreg(), dest, L, R, dest.IntDivType) * Dest
 
 
 	function ModFloat    (fn_opasm)
 		if dest is ConstOutput
-			return .MakeConst2(dest, L, R, exp, Constifyfloatmod)
+			return .MakeConstFromTwo(dest, L, R, exp, Constifyfloatmod)
 		|| big = dest.IsBig|int|
 		exp.fdiv(dest, L, R, asmreg(), big).Vectorise(dest, asm.VDIV)
 		if 0: exp.vfrc
@@ -551,14 +551,14 @@ extend ASMState
 	function BitNot (fn_opasm)
 		if r.reg // what?
 		if dest is ConstOutput
-			return .makeconst2(dest, l, asmreg(), exp, ConstifyBitNot)
+			return .MakeConstFromTwo(dest, l, asmreg(), exp, ConstifyBitNot)
 		if 0: exp.BNOT, exp.qnot
 		return .BitMaker(dest, l, asmreg(), exp, asm.bnot, asm.qnot)
 
 
 	function BitXor (fn_opasm)
 		if dest is ConstOutput
-			return .MakeConst2(dest, l, r, exp, ConstifyBitXor)
+			return .MakeConstFromTwo(dest, l, r, exp, ConstifyBitXor)
 		if (l.reg == r.reg)
 			return .Zeros(dest)
 		if !l.reg
@@ -575,7 +575,7 @@ extend ASMState
 		if !dest.reg
 		
 		if dest is ConstOutput
-			return .MakeConst2(dest, l, r, exp, ConstifyBitOr)
+			return .MakeConstFromTwo(dest, l, r, exp, ConstifyBitOr)
 		
 		|| ll = l.reg
 		|| rr = r.reg
@@ -601,7 +601,7 @@ extend ASMState
 			
 	function BitAnd (fn_opasm)		
 		if dest is ConstOutput
-			return .MakeConst2(dest, l, r, exp, ConstifyBitAnd)
+			return .MakeConstFromTwo(dest, l, r, exp, ConstifyBitAnd)
 		|| ll = l.reg
 		|| rr = r.reg
 		if (ll == rr)
@@ -644,7 +644,7 @@ extend ASMState
 
 	function SHR  (fn_opasm)
 		if dest is ConstOutput
-			return .MakeConst2(dest, l, r, exp, (ConstifyBitSHS, ConstifyBitSHR)(l.signed))
+			return .MakeConstFromTwo(dest, l, r, exp, (ConstifyBitSHS, ConstifyBitSHR)(l.signed))
 		|| K = .const(R, 6, false)
 			return .BFLG_Const(exp, dest, l, 0, k)
 		
@@ -658,7 +658,7 @@ extend ASMState
 
 	function SHL  (fn_opasm)
 		if dest is ConstOutput
-			return .MakeConst2(dest, l, r, exp, ConstifyBitSHL)
+			return .MakeConstFromTwo(dest, l, r, exp, ConstifyBitSHL)
 		|| K = .const(R, 6, false)
 			return .BFLG_Const(exp, dest, l,  K, 0)
 		
@@ -714,7 +714,7 @@ extend ASMState
 		// perhaps all assigns should use 16-byte vector assign.
 		
 		if !sr										// must be assigning zero
-			return ._num(exp, 0, dest)				// More readable ASM.
+			return .num_(exp, 0, dest)				// More readable ASM.
 
 		|| improve = .CanImproveAssign(dest, src)
 			if improve.ResetOutput(dr)

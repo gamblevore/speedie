@@ -89,12 +89,11 @@ function While (fn_asm)
 	|| OV = .OpenVars
 	h.HoistLoop(self, exp)
 	
-	rz = .WhileWrap(exp)
+	|| v = .WhileWrap(exp)
 	
 	// seems the gtab closer has to go into closevars.
 	// or else... the arg wrapper will close this.
-	OV = h.Unhoist(self, OV)
-	.CloseVars(OV)
+	return .CloseVars(OV, v)
 
 
 function WhileWrap (|message| exp, |asmreg|)

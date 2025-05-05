@@ -18,8 +18,8 @@ struct ASMState
 	|byte|						InlineDepthLimit
 	|byte|						StackSize
 	|byte|						VDecls
+	|byte|						VTemps
 	|bool|						IsTextual
-	|byte|						VTmps
 	|int|						CurrFuncGrab
 	|bool|						Inited
 	|bool|						TailInlineable
@@ -29,8 +29,6 @@ struct ASMState
 	|?memory of fatasm|			JSM
 	|?&FatASM|					InlineEnd
 	|uint|						HoistMap
-//	|int|						HoistStart
-//	|int|						HoistEnd
 	|&FatASM|					FuncStart
 	|&FatASM|					LastDebug
 	|&FatASM|					Start		// a "slice" feature would be nice    
@@ -38,7 +36,7 @@ struct ASMState
 	|&FatASM|					End    
 
 	|scdecl--[32]|				Vars
-	|(?&FATASM)[32]|			Hoisted
+	|(?&FATASM)[32]|			KnownValues
 	|FatASM| 					Zero
 
 	constants
@@ -56,42 +54,50 @@ struct ASMState
     function Curr (|&fatasm|)
         return ._curr
 
-    function CurrIndex (|int|)
-        return ._curr - .FuncStart
+//    function CurrIndex (|int|)
+//        return ._curr - .FuncStart
 
-	function OpenVars (|uint|)
-		rz = (.VDecls|uint| << 8) ||| (.vtmps << 0)
+	function OpenVars (|uint16|)
+		return (.VDecls|uint| << 8) ||| (.VTemps << 0)
+
+
+	function CloseVars (|uint16| Orig, |message| exp = nil, |asmreg| Return=nil, |asmreg|)
+		// This closes hoists also
+		opt NoRefCounts
 		
-	function CloseVars (|uint| V, |message| exp = nil)
-		opt norefcounts
-		|int| top = .VDecls
-		|| d = (v>>8)&255
-		while top > d
-			|| r = .vars[top]!
-			exp = .CloseOneVar(r, exp, top.asm)
-			.Vars[top] = nil
-			top--
-			
-		.VDecls = d
-		.VTmps = v&255
+		|| OrigDecls = Orig >> 8
+		|| OrigTemps = orig & 255
+
+		while .VDecls > OrigDecls
+			exp = .CloseOneVar(exp, OrigDecls)
+
+		while .VTemps < OrigTemps
+			exp = .CloseOneVar(exp, -1)
+
+		return Return
+
 
 	function AddFuncParams (|SCFunction| fn)
-		opt norefcounts
+		opt NoRefCounts
 		for a in fn.Args
 			(a is param)			// reset
 			.DeclareMe(a.source, a)
 	
+	
 	function Index (|int|)
 		return ._curr - .start
 	
+	
 	function Last (|&FatASM|)
 		return ._curr - 1
+
 
 	function Last (|asm| type, |&FatASM|)
 		|| L = ._curr - 1
 		if l isa type
 			if l.BasicBlock == .basicblock
 				return L
+	
 	
 	function IntPowerOfTwo (|asmreg| r, |int| Sub=0, |FailableInt|)
 		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
@@ -140,6 +146,7 @@ struct ASMState
 		cpp_part RequestOp
 		return dbg.operatormul(code)
 
+
 	syntax expect (|message?| where=nil, |string| msg)
 		cpp_part Fail
 		|| f = SCFunction.currfunc!
@@ -153,14 +160,14 @@ struct ASMState
 		|| t = Type.CalculateASMType
 		|| ret = .state.return
 		if ret.reg and (type is VarThatGotReturned) and (.state.fn.ReturnedVars == 1)
-			ret.µtype = T|datatypecode|
+			ret.µtype = T|DataTypeCode|
 			Type.wholetype = ret|DataTypeCode|
 			return ret
 		
 		|| d = .VDecls|int| + 1
 		t.reg = d
 		Type.WholeType = t|DataTypeCode|
-		if (d < .vtmps)
+		if (d < .VTemps)
 			.Vars[d] = Type
 			.Vdecls = d
 			target debug: Type.ASMSanity
@@ -186,10 +193,10 @@ struct ASMState
 		opt norefcounts
 		if t.reg
 			return t
-		|| r = .vtmps - 1
+		|| r = .VTemps - 1
 		check (r > .vdecls) (where, "No free local variables.")
 		t.reg = r
-		.vtmps = r
+		.VTemps = r
 		(t isnt realconst) // why would it be?
 		(t is temp)
 		return t
@@ -234,9 +241,9 @@ struct ASMState
 		|| C = .curr - 1
 		if fat == C
 			._curr = C // nice
-		return .SoftNop(fat, depth)
+		return .DeepNop(fat, depth)
 		
-	function SoftNop (|FATASM| Fat, |int| Depth=0)
+	function DeepNop (|FATASM| Fat, |int| Depth=0)
 		depth++
 		if depth > 7
 		for f.fatinputs in fat
@@ -291,8 +298,8 @@ struct ASMState
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		description "Same as µGetASM, except this closes temp vars for reuse." 
 		|| Closer = .OpenVars
-		rz = .µGetASM(exp, dest)
-		.CloseVars(Closer)
+		|| v = .µGetASM(exp, dest)
+		return .CloseVars(Closer, nil, v)
 
 
 	function µReffed (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
@@ -505,7 +512,7 @@ struct ASMState
 		.BasicBlock = 0
 		.VDecls = 0
 		.IsTextual = false
-		.VTmps = 32
+		.VTemps = 32
 		.zero = nil
 		.zero.info = AsmReg()
 		memory.Fill((&.vars[0])|&byte|, 32*8, 0)
@@ -519,8 +526,6 @@ struct ASMState
 		fn.StartASM
 		.LastDebug = .curr
 		.InlineEnd = nil
-//		.HoistStart = nil
-//		.HoistEnd = nil
 		.FuncStart = .curr
 		.returnasm = fn.ASMReturn.regtype
 		.AddFuncParams(fn)
@@ -702,7 +707,7 @@ struct ASMState
 			.InlineEnd = .curr + allowedgain
 		|| I = .TryInline(prms, dest, fn, AllowedGain)
 			return I		
-		if !.state.inlinedepth and .DeepestInline > 1
+		if !.state.InlineDepth and .DeepestInline > 1
 			.InlineDepthLimit = 1
 			i = .TryInline(prms, dest, fn, AllowedGain)
 			if i
@@ -712,7 +717,7 @@ struct ASMState
 		|| h = .hoistmap
 		while h
 			|| h2 = h.LowestBit
-			yield .hoisted[h2|int|.log2]!
+			yield .KnownValues[h2|int|.log2]!
 			h &= ~h2
 	
 	

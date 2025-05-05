@@ -5,8 +5,8 @@ function message.ExpandBits (|asmreg| Src, |Datatypecode| Type,  |asmreg|)
 	|| sh = ASMState.sh
 	|| closer = sh.OpenVars
 	|| Where = sh.TempOnly(self, Type|asmreg|)
-	rz = .BFLG(where, Src, 32, 32, Src.Signed|int|) * Where
-	sh.CloseVars(Closer)
+	|| dest = .BFLG(where, Src, 32, 32, Src.Signed|int|) * Where
+	return sh.CloseVars(Closer, dest)
 	
 	
 function message.ADD_ (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fatasm|)

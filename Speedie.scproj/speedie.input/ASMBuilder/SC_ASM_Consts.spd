@@ -39,19 +39,13 @@ function fatasm.KNST_Encoder (Asm_encoder)
 
 
 extend ASMState
-	function MakeConst2 (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |fn_ASMConstifier| fn,  |asmreg|)
+	function MakeConstFromTwo (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |fn_ASMConstifier| fn,  |asmreg|)
 		// how to vectorise this? sigh...
 		|| K = (fn)(l, r)
 		.Nop2Consts(r, l)
 		return .NumToReg(exp, k, dest, dest.µtype)
 
 
-	function MakeConst (|&fatasm| fat, |asmreg| reg, |asmreg|)
-//		Fat.TryRotateConst		// shouldn't we do this later?
-		(reg is RealConst)		// just before export?
-		return fat*reg			// or the exporter itself should do it!
-
-	
 	function fatasm.TryRotateConst
 		|| v = .const|uint64|
 		|| OtherInv = (~v, v)(v>>63)
@@ -86,7 +80,21 @@ extend ASMState
 		ml.NeedFAT // sigh
 
 
-	function OldNum (|int64| V, |asmreg| Dest, |asmreg|)
+	function OldNum (|int64| V, |ASMReg| Dest, |ASMReg|)
+		// Can we use ALL the consts? any previously made
+		// From parent blocks even. Let's assume their branchdepth
+		// is greater or equal, and the value is never altered in a branch.
+		// it might even be better than this code!
+		
+		// Now, heres the question. Do we store this in a hoistmap?
+		
+		// its the same kinda thing? OR do we store it in a different map?
+		// Or... just go over the vdecls and vtemps? or just vdecls, I think vtemps
+		// isnt the answer. they can be opted away.
+		
+		// We could just go over the vtemps... And then have a consts reg thing?
+		
+		
 		|| l = .last
 		|| b = l.BasicBlock
 		|| s = .funcstart
@@ -108,30 +116,31 @@ extend ASMState
 		return dest
 			
 	
-	function _Num (|message| exp, |int64| V, |asmreg| Dest, |asmreg|)
-		if !dest.reg
-			dest = .oldnum(v, dest)
-			if dest.reg
+	function Num_ (|message| exp, |int64| V, |asmreg| Dest, |asmreg|)
+		if !Dest.reg
+			dest = .OldNum(v, dest)
+			if Dest.reg
 				return dest
-		dest = .TempOnly(exp, dest)
-		target debug
-			if !dest.reg and v // waaaaitttt
 		
-		if dest isnt textual
-			|| K = .last(asm.knst)
+		dest = .TempOnly(exp, dest)		
+		if dest isnt Textual
+			|| K = .Last(asm.knst)
 				if k.r0 == dest.reg
 					.nop(k)
 		
 		|| fat = exp.KNST(dest, 0, 0, 0)
 		fat.Const = v
+		if dest isnt Temp and textual and SortaTemp
+			.Hoist(fat, dest.reg)
+			// this needs to be unhoisted, also.
+			// So I guess... closevars has to unhoist things now.
 		(dest is realconst)
-		.MakeConst(fat, dest)
-		return fat.info
+		return fat * dest
 		
 
 	function NumToReg (|message| exp, |int64| V, |asmreg| Reg, |datatypecode| SrcType, |asmreg|)
 		if v // or (reg.reg)
-			return ._Num(exp, v, reg)
+			return .Num_(exp, v, reg)
 
 		rz = asmreg.ZeroParam as (reg & ASMReg.ConstInput)
 		rz.µType = SrcType

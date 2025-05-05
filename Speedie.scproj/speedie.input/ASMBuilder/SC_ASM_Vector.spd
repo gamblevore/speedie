@@ -41,8 +41,8 @@ extend ASMState
 		t |= 32
 		dest.µType = T
 		
-		dest = .TempOnly(exp, dest)
 		.CloseVars(Closer)
+		dest = .TempOnly(exp, dest)
 		
 		if 0: exp.VBLD
 		|| fat = exp * asm.VBLD

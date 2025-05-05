@@ -23,6 +23,7 @@ datatype ASMReg (uint64)
 		Set
 		Declaration
 		Temp
+		SortaTemp
 		NoScale
 		ContainsAddr
 		Textual
@@ -235,15 +236,11 @@ datatype ASMReg (uint64)
 			return dest.µtype.zero
 		return dest
 
-	operator with (|asmreg| dest, |asmreg|)
-		if dest is Declaration
-			self = .UseReg(dest)
-		return self
-
-	function UseReg (|asmreg| dest, |asmreg|)
+	function ReUseRegInPlace (|asmreg| dest, |asmreg|)
 		opt norefcounts
 		.reg = dest.reg
 		(self is temp) = (Dest is temp)
+		is SortaTemp
 		return self
 	
 	function with (|asmreg| dest, |asmreg| InUse, |asmreg|)
@@ -252,7 +249,7 @@ datatype ASMReg (uint64)
 			isnt temp
 			return self
 												// dest is free!
-		return .usereg(dest)
+		return .ReUseRegInPlace(dest)
 	
 	
 	function DebugPrint 
