@@ -123,7 +123,7 @@ datatype DataTypeCode (uint16)
 	function IsPointer (|bool|)
 		return !.isnumeric and (self isnt bool) // for now
 		
-	function ASMUseIntRegs (|bool|)
+	function IsIntReg (|bool|)
 		if .IsPointer // pointers, bascially, are ints
 			return true
 		if .isint and .VecCount <= 1

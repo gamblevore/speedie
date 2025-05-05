@@ -24,9 +24,8 @@ struct ASMState
 	|bool|						Inited
 	|bool|						TailInlineable
 
-	|scfunction|				Out
+	|scfunction--|				Out
 
-	|?memory of fatasm|			JSM
 	|?&FatASM|					InlineEnd
 	|uint|						HoistMap
 	|&FatASM|					FuncStart
@@ -46,6 +45,7 @@ struct ASMState
 
 	module
 		|ASMState|					Sh
+		|?memory of fatasm|			JSM
 
 
 	function fn (|scfunction!--|)
@@ -54,15 +54,12 @@ struct ASMState
     function Curr (|&fatasm|)
         return ._curr
 
-//    function CurrIndex (|int|)
-//        return ._curr - .FuncStart
-
 	function OpenVars (|uint16|)
 		return (.VDecls|uint| << 8) ||| (.VTemps << 0)
 
 
 	function CloseVars (|uint16| Orig, |message| exp = nil, |asmreg| Return=nil, |asmreg|)
-		// This closes hoists also
+		// This needs to close hoists also. All hoists are in the vdecls.
 		opt NoRefCounts
 		
 		|| OrigDecls = Orig >> 8
@@ -241,9 +238,7 @@ struct ASMState
 		|| C = .curr - 1
 		if fat == C
 			._curr = C // nice
-		return .DeepNop(fat, depth)
-		
-	function DeepNop (|FATASM| Fat, |int| Depth=0)
+
 		depth++
 		if depth > 7
 		for f.fatinputs in fat
@@ -495,10 +490,18 @@ struct ASMState
 	
 	
 	function InitAndStartFunc (|scfunction| fn, |bool|) // init 
+		// can't we just zero the entire thing?
 		opt norefcounts
 		
 		target debug
 			asm.noisyasm = 3
+
+		|| j = jsm init FatASM[256K]
+		require j
+		.end = j.NeedSpare(64K, j.itemcount)
+		.start = j.ptr
+		._curr = .start + j.Length
+		// after zeroing, we could just set everything normally? It seems ._curr is set from the jsm.
 		
 		.out = fn
 		.state.fn = fn
@@ -515,17 +518,14 @@ struct ASMState
 		.VTemps = 32
 		.zero = nil
 		.zero.info = AsmReg()
-		memory.Fill((&.vars[0])|&byte|, 32*8, 0)
+//		.vars = nil // C++ doesn't get right code... should be memory.fill
+		memory.Fill((&.vars[0])|&byte|, 64*8, 0)
 
-		|| j = .jsm init FatASM[256K]
-		require j
-		.end = j.NeedSpare(64K, j.itemcount)
-		.start = j.ptr
-		._curr = .start + j.Length
 		.Guard
 		fn.StartASM
 		.LastDebug = .curr
 		.InlineEnd = nil
+		.hoistmap = nil
 		.FuncStart = .curr
 		.returnasm = fn.ASMReturn.regtype
 		.AddFuncParams(fn)
@@ -544,7 +544,7 @@ struct ASMState
 		.Optimise
 
 		.out.µlength = .curr - .FuncStart
-		.jsm!.length = .curr - .start 
+		jsm!.length = .curr - .start 
 
 
 	function Guard

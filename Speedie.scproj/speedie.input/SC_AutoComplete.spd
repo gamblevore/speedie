@@ -1050,7 +1050,7 @@ function message.AsmIndent (|message| top, |int|)
 
 function ASMSub (|message| rz,  |SCFunction| fn, |faststring| fs, |bool|)
 	opt norefcounts
-	|| j = ASMState.sh.JSM
+	|| j = ASMState.JSM
 		j.zero
 		j.Length = 0
 

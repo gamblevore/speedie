@@ -23,7 +23,7 @@ datatype ASMReg (uint64)
 		Set
 		Declaration
 		Temp
-		SortaTemp
+		NoHoist
 		NoScale
 		ContainsAddr
 		Textual
@@ -59,8 +59,8 @@ datatype ASMReg (uint64)
 		fs <~ ")"
 	
 	
-	function Normalness (|bool|)
-		return .µType.ASMUseIntRegs
+//	function Normalness (|bool|)
+//		return .µType.ASMUseIntRegs
 	
 	
 	function F32 (|float|)
@@ -240,7 +240,7 @@ datatype ASMReg (uint64)
 		opt norefcounts
 		.reg = dest.reg
 		(self is temp) = (Dest is temp)
-		is SortaTemp
+		is NoHoist
 		return self
 	
 	function with (|asmreg| dest, |asmreg| InUse, |asmreg|)

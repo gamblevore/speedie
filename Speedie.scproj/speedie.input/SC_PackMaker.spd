@@ -126,7 +126,7 @@ module PackMaker
 	function ActualASMCompile (|bool|)
 		opt norefcounts
 		.Packfuncs.sort(&CodeSorter.LeafFunctionsSorter)
-		|| j = asmstate.sh.jsm
+		|| j = asmstate.jsm
 			j.length = 0
 		
 		if !compiler.InPerry

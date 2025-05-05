@@ -191,12 +191,11 @@ function Inline_LLL
 
 
 function Inline_Consts (|int| A)
-/*	#!BBB
+	#!BBB
 	|| B = gggTest1(1, 2)
 	#!CCC
 	|| C = gggTest1(-1, 2)
 	#!DDD
-*/
 	|| D = gggTest1(-1, 0)
 	#!EEE
 	|| E = A+gggTest1(-1, 0)

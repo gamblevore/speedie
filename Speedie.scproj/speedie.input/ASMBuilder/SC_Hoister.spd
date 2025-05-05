@@ -1,10 +1,5 @@
 
 
-/*
-	* HoistedToReg needs completing
-*/
-
-
 struct SC_Hoister
 	linkage
 		cpp_part Hoi
@@ -38,9 +33,11 @@ struct SC_Hoister
 	
 	
 	function ASMState.Hoist (|?&fatasm| fat, |int| n)
+		if "AndOrConsts".trap
 		target debug
 			if sh.HoistMap & (1<<n)		// what?
 			if sh.knownvalues[n]		// what?
+			if fat is NoHoist			// what?
 
 		if fat
 			fat.µRefCount++
@@ -51,13 +48,11 @@ struct SC_Hoister
 	
 	helper HoistComplete (|asmreg| dest, |SCDecl| decl, |asmreg| K, |asmstate| sh)
 		opt NoRefCounts
-		|| I = k.fatindex
-		|| Fat = k.fat
-		decl.FatConstIndex = I
+		decl.FatConstIndex = k.fatindex
 
 		|| n = dest.reg
-		sh.hoist(fat, n)
-		if .bits & (1<<n)  			// what?
+		sh.hoist(k.fat, n)
+		if .bits & (1<<n)  				// what?
 		.Bits |= 1<<n
 		.Spare--
 
@@ -95,9 +90,6 @@ struct SC_Hoister
 				decl.FatConstIndex = old.Index
 				return true
 
-
-	function ASMState.HoistedToReg (|scdecl| D, |asmreg|)
-		// isnt this the same as .oldnum?
 	
 	function ASMState.TryGetGlob (|SCDecl| D, |asmreg|)
 		|uint64| find = d.ExportPosition
@@ -137,13 +129,13 @@ struct SC_Hoister
 		return self
 	
 	
-	function CanHoist (|asmstate| sh, |bool|)
+	function CanHoist (|bool|)
 		return .spare > 0
 	
 	
 	function HoistRecursive (|asmstate| sh, |message| exp, |int| Score, |bool|)
 		opt norefcounts
-		require .CanHoist(sh)
+		require .CanHoist
 		exp = exp.Declable
 		|| fn = exp.func
 		if fn == @arg and Score < AsLoop
@@ -154,7 +146,7 @@ struct SC_Hoister
 			if prop is const or global
 				if score >= 0
 					.TryHoistOne(sh, exp, prop, score)
-					return .CanHoist(sh)
+					return .CanHoist
 				return true
 	
 		for ch.fast in exp

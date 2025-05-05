@@ -115,10 +115,10 @@ class SCDecl (SCNamed) {
 	|Datatypecode|		DataType
 	|NilState|			NilDeclared
 	|Byte|				PointerCount
-	|nilreg|			NilReg
+	|byte|				NilReg
 	|uint16| 			ModuleNum
 	|byte| 				NilAllocDepth
-	|byte|				BranchDepth
+	|byte|				DepthOfBranch
 	|int|				FatConstIndex
 
 	
@@ -199,7 +199,7 @@ class SCDecl (SCNamed) {
 		return (self is local) and !(.IsBareStruct or .IsCArray)
 	
 	function SpecialRegs (|bool|)
-		return self and !.datatype.ASMUseIntRegs
+		return self and !.datatype.IsIntReg
 	
 	function IntRegs (|bool|)
 		return !.SpecialRegs 

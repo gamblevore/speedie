@@ -223,6 +223,7 @@ function scdecl.AsBody
 	is body
 	isnt altered
 	isnt NumberConst
+	.DepthOfBranch = SCFunction.InBranch
 
 
 function Message.CollectFromBody (|SCNode| Name_space)

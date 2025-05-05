@@ -256,6 +256,8 @@ function FuncParamsLoad
 	|| old = scimport.curr
 	.project.use
 	.args.clear
+	if InBranch // oof?
+	InBranch = 0
 	|| P = .Source.second
 		.SubFuncParamsLoad(P)
 	scimport.curr = old
@@ -1199,7 +1201,6 @@ function FixCnjSub (|Message| exp)
 		pp.Prev = if_
 	  else
 		pp.Next = if_
-	
 
 	RemoveMe.Remove
 
@@ -1207,20 +1208,21 @@ function FixCnjSub (|Message| exp)
 	
 function ASMRegType (|datatypecode|)
 	if self
-		return .asmreturn.regtype
+		return .ASMReturn.regtype
 
 
 function SCDecl.MarkAsAltered 
 	opt norefcounts
 	if self is local
 		(self is altered)
-		if SCFunction.InBranch
-			(self is alteredinbranch)
+		if SCFunction.InBranch > .DepthOfBranch
+			is alteredinbranch
+		if SCFunction.InBranch < .DepthOfBranch // how??
 		if self is TypeImprove
 			|| orig = .IsLookupOnly
 			if orig isa SCDecl
 				(orig is altered)
-				if SCFunction.InBranch
+				if self is AlteredInBranch
 					(orig is alteredinbranch)
 
 
