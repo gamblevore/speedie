@@ -6,10 +6,12 @@
 // and the cost-detector.
 // * i should also add a "next item differs at" thing to the suffixes...
 // * and maybe a "strength" that allows further checking of suffixes?
+// * should also make the compressor NOT use jbin, for each chunk, store the length info normally.
 
 // merge my two branches into one? So there is just the mz compressor
 // and the offsets can be stored in different approaches?
 // Like just start with an offsetbyte, to switch modes.
+
 
 #define kExtend 0x70
 
