@@ -1,0 +1,33 @@
+#!/usr/local/bin/spd
+
+/*
+def fib(n: int) -> int:
+    if n <= 1:
+        return n
+    a = 0
+    b = 1
+    for _ in range(2, n + 1):
+        a, b = b, a + b
+    return b
+*/    
+
+function fib (|int| n, |int64|)
+    if n <= 1
+        return n
+
+    || a
+    rz = 1
+
+    for n - 1
+		|| c = a + rz
+		a = rz
+		rz = c
+		
+
+main (|int| n = 10)
+	for i in 1 to n
+		|| x = fib(i)
+		if !x|float64|.Sqrt.Fract
+			print "square: "
+		printline fib(i)
+
