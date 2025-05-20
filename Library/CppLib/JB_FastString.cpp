@@ -166,7 +166,7 @@ void JB_FS_AppendLine( FastString* self, JB_String* u ) {
 
 
 void JB_FS_AppendRange(FastString* self, JB_String* Data, int Start, int After) {
-	if ( Data) {
+	if (Data) {
 		if (Start < 0)
 			Start = 0;
 		if (After > Data->Length)
