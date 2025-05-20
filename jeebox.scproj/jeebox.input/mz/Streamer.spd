@@ -39,7 +39,8 @@ helper StringReader.DecompressInto (|object| dest,  |int| lim=int.max,  |&compre
 	  else
 		st = st.start
 		while (|| c = .NextMsg(arg, @bin))
-			|| Expected = fs.DecompressChunk(c.name) #loop
+			|| expected = remaining min 1MB
+			Expected = fs.DecompressChunk(c.name, expected) #loop
 			Remaining -= Expected
 			fs.Flush
 			st.LiveUpdate(c.length, Expected, false)
@@ -54,6 +55,6 @@ helper faststring.CompressChunk (|string?| Input, |int| level = 2)
 	cpp_wrapper JB_Str_CompressChunk
 
 
-helper faststring.DecompressChunk (|string| Input, |int|) 
+helper faststring.DecompressChunk (|string| Input, |int| Expected, |int|) 
 	cpp_wrapper JB_Str_DecompressChunk
 

@@ -1,6 +1,7 @@
 
 #include "JB_Compress.h"
 
+
 #define scint   static const int
 scint W_BITS     = 21; // Window size (17..23)
 scint HASH1_BITS = 21;
@@ -25,7 +26,7 @@ scint F_BITS = 5;			// 000001 xxxxx
 scint G_BITS = 5;			// 0000001 xxxxx
 scint H_BITS = 7;			// 00000001 xxxxxxx
 scint I_BITS = 8;			// 000000001 xxxxxxxx
-scint J_BITS = W_BITS;		// 0000000001 xxxxxxxxxxxxxxxxxxxxx
+scint J_BITS = W_BITS;		// 0000000001 xxxxxxxxxxxxxxxxxxxxx // 31 bits!
 
 scint A_ = (1<<A_BITS)+00;
 scint B_ = (1<<B_BITS)+A_;
@@ -125,7 +126,7 @@ struct Compression {
 	}
 	
 	bool StartCompress (FastString* fs, JB_String* In) {
-		int N = (HASH1_SIZE + HASH2_SIZE + W_SIZE /* +256*256*/) * sizeof(int);
+		int N = (HASH1_SIZE + HASH2_SIZE + W_SIZE +256*256*0) * sizeof(int);
 		if (!CompSpace) {
 			CompSpace = (u8*)calloc(N,1);
 			if (!CompSpace)
@@ -201,7 +202,7 @@ struct Compression {
 	inline int GetOffset (Decomp& In) {
 		const int log = GetBits(In, SLOT_BITS) + W_MINUS;
 		if (log > W_MINUS)
-			return GetBits(In, log)+(1<<log);
+			return GetBits(In, log) + (1<<log);
 		  else
 			return GetBits(In, W_MINUS+1);
 	}
@@ -410,16 +411,18 @@ extern "C" void JB_Str_CompressChunk (FastString* fs, JB_String* self, int Level
 	fs->Length += Actual - Req;
 }
 
+
 // should return the consumed length. in case str had multiple compressed chunks appended.
 
-extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self) {
-	int N = JB_Str_Length(self);
-	require(N);
+extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self, int Dummy) {
+	int StrLen = JB_Str_Length(self);
+	require(StrLen);
 
 	u8* A = JB_Str_Address(self);
-	Decomp In = {(u32*)A, (u32*)(A + N)};
+	Decomp In = {(u32*)A, (u32*)(A + StrLen)};
 
 	uint Size = In.Read4();
+	require (Size < 4*1024*1024);
 	Compression Cmp = {};
 	auto Write = JB_FS_WriteAlloc_(fs, Size+7);
 	require (Write);
@@ -432,6 +435,7 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self) {
 		int s = p - ago;
 		if (!ago) {
 			int n = Cmp.GetLength(In);
+			if (!n) break; // incase of bad data.
 			Cmp.HeaderBits(In); // clear
 			for (int i = 0; i < n; i++)
 				Write[p++] = Cmp.GetBits(In, 8);
