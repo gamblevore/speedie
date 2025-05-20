@@ -9,8 +9,10 @@ function StringReader.CompressInto (|object| dest, |int| Strength=mzlab.default,
 	j.enter(@tmp, "µz")
 	j.addint(.length)
 	j.enter(@arg)
+	// this is too annoying, actually.
+	// can we do this in a simpler way?
 	while .hasany
-		|| str = .str(1MB)
+		|| str = .str(4MB)
 		|| Place = j.OpenSection
 		j.CompressChunk(str)
 		j.CloseSection(Place.x, place.y, @bin)
@@ -34,27 +36,29 @@ helper StringReader.DecompressInto (|object| dest,  |int| lim=int.max,  |&compre
 	|| Remaining = .NextMsg(mz, @num).int
 	|| arg = .NextMsg(mz, @arg)
 
-	ifn (Remaining > 0) and (Remaining <= lim) and (arg)
-		error (self, ("mz would decompress too large", "Invalid mz header")(Remaining > lim))
-	  else
+	if (Remaining > 0) and (Remaining <= lim) and (arg)
 		st = st.start
 		while (|| c = .NextMsg(arg, @bin))
-			|| expected = remaining min 1MB
-			Expected = fs.DecompressChunk(c.name, expected) #loop
+			|| Expected = fs.DecompressChunk(c.name) #loop
 			Remaining -= Expected
 			fs.Flush
 			st.LiveUpdate(c.length, Expected, false)
 			c.remove
 		st.end
+	  elseif Remaining > lim
+		error (self, "mz would decompress too large")
+	  else
+		error (self, "Invalid mz header")
+	
 	return !.Data.WentBad
 
 		
 helper faststring.CompressChunk (|string?| Input, |int| level = 2) 
-	description "Passing nil Inputnil, free the internal buffers" 
+	description "Passing nil Input, frees the internal buffers" 
 	nil self
 	cpp_wrapper JB_Str_CompressChunk
 
 
-helper faststring.DecompressChunk (|string| Input, |int| Expected, |int|) 
+helper faststring.DecompressChunk (|string| Input, |int| Expected=0, |int|) 
 	cpp_wrapper JB_Str_DecompressChunk
 

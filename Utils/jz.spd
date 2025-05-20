@@ -135,7 +135,7 @@ function App.GetActions (|Type|)
 		  elseif name ~= "c"
 			rz |= type.compressed
 			if v!="true"
-				conv.DefaultStrength = v.int|int| max MZLab.Fastest
+				conv.DefaultStrength = v.int|int| max MZLab.Strong
 				v="true"
 		  elseif name ~= "json"
 			conv.detected |= type.json
@@ -184,7 +184,7 @@ module Conv
 		|| OrigOut = .out
 		require OrigIn and origout and OrigIn.MustExist("test compression")
 		.done++
-		.DefaultStrength = MZLab.Fast
+		.DefaultStrength = MZLab.Strong
 
 		.TestSub(origIn)
 

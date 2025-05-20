@@ -5312,7 +5312,7 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 		JB_String* Str = JB_SS_Str(Self, 1048576, 0);
 		JB_Incr(Str);
 		ivec2 Place = JB_bin_OpenSection(J);
-		JB_Str_CompressChunk(J, Str);
+		JB_Str_CompressChunk(J, Str, 2);
 		JB_bin_CloseSection(J, Place[0], Place[1], kJB_SyxBin);
 		JB_MzSt_LiveUpdate(St, JB_Str_Length(Str), J->Length - Place[0], true);
 		JB_Decr(Str);
@@ -5322,7 +5322,7 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 	};
 	JB_bin_Exit(J, 2);
 	JB_FS_Flush(J);
-	JB_Str_CompressChunk(J, nil);
+	JB_Str_CompressChunk(J, nil, 2);
 	JB_Decr(J);
 	JB_MzSt_End(St);
 }
@@ -5370,29 +5370,29 @@ bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, Compress
 		return nil;
 	}
 	if (!JB_SS_IsCompressed(Self)) {
-		JB_String* _tmPf0 = JB_SS_ReadAll(Self);
-		JB_Incr(_tmPf0);
-		JB_FS_AppendString(Fs, _tmPf0);
-		JB_Decr(_tmPf0);
+		JB_String* _tmPf1 = JB_SS_ReadAll(Self);
+		JB_Incr(_tmPf1);
+		JB_FS_AppendString(Fs, _tmPf1);
+		JB_Decr(_tmPf1);
 		JB_Decr(Fs);
 		return true;
 	}
 	JB_SS_ExpectJbin(Self);
 	Message* Mz = JB_SS_NextMsgExpect(Self, nil, kJB_SyxTmp, nil);
 	JB_Incr(Mz);
-	Message* _tmPf1 = JB_SS_NextMsgExpect(Self, Mz, kJB_SyxNum, nil);
-	JB_Incr(_tmPf1);
-	int64 Remaining = JB_Msg_Int(_tmPf1, 0);
-	JB_Decr(_tmPf1);
+	Message* _tmPf2 = JB_SS_NextMsgExpect(Self, Mz, kJB_SyxNum, nil);
+	JB_Incr(_tmPf2);
+	int64 Remaining = JB_Msg_Int(_tmPf2, 0);
+	JB_Decr(_tmPf2);
 	Message* Arg = JB_SS_NextMsgExpect(Self, Mz, kJB_SyxArg, nil);
 	JB_Incr(Arg);
 	JB_Decr(Mz);
 	if (!((Remaining > 0) and ((Remaining <= Lim) and (Arg)))) {
 		if (true) {
-			JB_StringC* _tmPf2 = ((JB_StringC*)JB_Ternary(Remaining > Lim, JB_LUB[494], JB_LUB[495]));
-			JB_Incr(_tmPf2);
-			JB_SS_Fail(Self, _tmPf2);
-			JB_Decr(_tmPf2);
+			JB_StringC* _tmPf3 = ((JB_StringC*)JB_Ternary(Remaining > Lim, JB_LUB[494], JB_LUB[495]));
+			JB_Incr(_tmPf3);
+			JB_SS_Fail(Self, _tmPf3);
+			JB_Decr(_tmPf3);
 		}
 	}
 	 else {
@@ -5405,10 +5405,12 @@ bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, Compress
 				break;
 			}
 			int64 Expected = JB_int64_OperatorMin(Remaining, 1048576);
-			if (!JB_Str_DecompressChunk(Fs, C->Name, Expected)) {
+			int _tmPf0 = JB_Str_DecompressChunk(Fs, C->Name, Expected);
+			if (!_tmPf0) {
 				JB_Decr(C);
 				break;
 			}
+			Expected = _tmPf0;
 			Remaining = (Remaining - Expected);
 			JB_FS_Flush(Fs);
 			JB_MzSt_LiveUpdate(St, JB_Msg_Length(C), Expected, false);
@@ -8431,7 +8433,7 @@ __lib__ int jb_shutdown() {
 }
 
 __lib__ int jb_version() {
-	return (2025041217);
+	return (2025052017);
 }
 
 __lib__ JB_String* jb_readfile(_cstring Path, bool AllowMissingFile) {

@@ -18,6 +18,6 @@ module ImageHelper
 		|| img = .LoadPNG( p.addr, p.length, &x, &y, &comp )
 			|| n = 0
 			|| qoi = .WriteQOI(img, x, y, n)
-				rz = string.Own(qoi, n).compress(mzlab.Fast)
+				rz = string.Own(qoi, n).compress(mzlab.strong)
 		memory.free(img!)
 

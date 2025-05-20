@@ -189,14 +189,20 @@ struct Compression {
 	
 	inline int HeaderBits (Decomp& BS) {
 		auto Missing = BitCount;
-		auto B = BitBuff; // assumes previous getbits call. Which always leaves at least 32-bits
+		auto B = BitBuff;
+		if (Missing > 0) {
+			auto In = (uint64_t)BS.Read4();
+			B = (B << 32)|In;
+			Missing -= 32;
+			BitBuff = B;
+		}
 		B <<= 32+Missing;
 		if (B) {
 			int Zeros = __builtin_clzll(B);
 			BitCount = Missing + (Zeros + 1);
 			return Zeros;
 		}
-		return 0; /// ooof
+		return 0;			/// Ooof
 	}
 
 	inline int GetOffset (Decomp& In) {
@@ -231,9 +237,9 @@ struct Compression {
 		int log = std::max(31-__builtin_clz(offset), W_MINUS);
 		PutBits(SLOT_BITS, log-W_MINUS);
 		if (log > W_MINUS)
-			PutBits(log, offset-(1<<log));	// removes the highest bit only. neatly stores the rest.
+			PutBits(log, offset-(1<<log));		// removes the highest bit only. Neatly stores the rest.
 		  else
-			PutBits(W_MINUS+1, offset);		// Requires 6 bits, and stores numbers 0 to 63
+			PutBits(W_MINUS+1, offset);			// Requires 6 bits, and stores numbers 0 to 63
 	}
 	
 	inline void PutLength (uint l) {
@@ -407,7 +413,7 @@ extern "C" void JB_Str_CompressChunk (FastString* fs, JB_String* self, int Level
 	Fnd.PutBits(31, 0);
 	auto Size = Fnd.Size;
 	int Req = (Size+16) + (Size>>6);
-	int Actual = (Fnd.CmpOut - Fnd.CmpOutStart)*4;
+	int Actual = (uint)(Fnd.CmpOut - Fnd.CmpOutStart)*4;
 	fs->Length += Actual - Req;
 }
 
@@ -427,9 +433,7 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self, int Dum
 	auto Write = JB_FS_WriteAlloc_(fs, Size+7);
 	require (Write);
 	
-	Cmp.BitBuff = In.Read4();
-	// what if we read too far?
-	
+	Cmp.BitBuff = In.Read4();	
 	for (int p = 0; p < Size; ) {
 		int ago = Cmp.GetOffset(In);
 		int s = p - ago;

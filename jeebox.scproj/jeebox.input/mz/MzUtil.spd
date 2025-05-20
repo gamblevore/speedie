@@ -3,7 +3,7 @@
 extend string
 	function Compress (|int|Strength=mzlab.default, |?&compressionstats| st = nil, |string|) 
 		|| j = jbin(0)
-		.CompressInto(j, Strength, st)
+		.Stream.CompressInto(j, strength, st)
 		return j
 		
 	function CompressInto (|object| fs, |int| Strength = mzlab.default, |?&compressionstats| st=nil) 
@@ -20,12 +20,11 @@ extend string
 		return .stream.Decompress(lim, st)
 
 
-function StringReader.Decompress (|int|lim=256MB, |?&compressionstats| st=nil, |bool| Multi=true,  |StringThatWasReadSafely|)
+function StringReader.Decompress (|int|lim=256MB, |?&compressionstats| st=nil,  |StringThatWasReadSafely|)
 	|| fs = faststring()
 	while .HasAny
 		if !.Decompressinto(fs, lim, st)
-			return string.error
-		if !multi
+			fs.Length = 0
 			exit
 	return fs
 
@@ -45,10 +44,8 @@ function FastString.CompressInto (|object| fs, |int|Strength=mzlab.default, |?&c
 Module MZLab 
 	constants
 		None      = 0			// none
-		Fastest   = 1			// lz
-		Fast      = 2			// lz harder
-		Strong    = 3			// rolz
-		Strongest = 4			// rolz harder
+		Strong    = 2			// 
+		Strongest = 3			// 
 		Default   = strong		// its good enough!
 		
 	function TestMz (|string| path, |bool|)
@@ -60,7 +57,7 @@ Module MZLab
 		if which & 1
 			require .CompressTestSub(mzlab.strong, report)
 		if which & 2
-			require .CompressTestSub(mzlab.fast, report)
+			require .CompressTestSub(mzlab.strongest, report)
 		return true
 	
 	
