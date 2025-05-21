@@ -111,12 +111,13 @@ int JB_ErrorHandleFile(JB_String* self, JB_String* other, int errnum, const char
 }
 
 
-void JB_ErrorHandleC(const char* Desc, JB_String* path, bool CanFreeDesc) {
+int64_t JB_ErrorHandleC(const char* Desc, JB_String* path, bool CanFreeDesc) {
     JB_Error* Err = JB_Err_Constructor(nil, 0, nil, 4, path);
     if (Err) {
 		JB_Err_Fill(Err, nil, FreeableStr_(Desc, CanFreeDesc)); 
 		JB_Rec_AppendErr(nil, Err);
 	}
+	return 0;
 }
 
 

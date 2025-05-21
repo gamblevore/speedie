@@ -172,6 +172,10 @@ module Conv
 		|| s = .speed.GetResult
 			printline s
 		.in = nil
+		|| o = .realout
+			o.close
+		.realout = nil
+		.out = nil // same
 		.data = ""
 		.start = nil
 		.ast = nil
@@ -244,10 +248,9 @@ module Conv
 			src.DecompressInto(d)
 			.Time("Decompress(streamed )", true)
 		  else 
-			|| typ = ("µz", "ro")(.defaultstrength < mzlab.strong)
 			.size = .in!.size|float|
 			src.CompressInto(d, DefaultStrength) 
-			.time("Compress(streamed $typ)", true)
+			.time("Compress(streamed µz)", true)
 		if dest is selfreplace
 			.RealOut!.MoveTo(.out!)
 	

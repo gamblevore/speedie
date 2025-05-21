@@ -81,9 +81,10 @@ role JBin (Faststring)
 		.Exit(n)
 	
 	
-	function Exit (|int| amount)
+	function Exit (|int| amount, |int|)
 		|| add = 239
 		while amount > 0
+			rz++
 			|| B  = (add + amount)  min  (255)
 			self    <~ B|byte|
 			amount  -= (B-add)

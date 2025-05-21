@@ -165,10 +165,8 @@ inline bool PrepareMove_( JB_List* place, JB_List* mover ) {
         }
     }
 
-    JB_ErrorHandleC("Error: moved a JB_List node to the wrong place", 0, false);
 	JB_DoAt(1);
-
-    return false;
+    return JB_ErrorHandleC("Error: moved a JB_List node to the wrong place", 0, false);
 }
 
 

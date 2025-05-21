@@ -1,21 +1,23 @@
 
 #include "JB_Compress.h"
-#include "divsufsort.h" // Runs 5x (!!) faster than a plain quicksort or even my spdsort
+//#include "divsufsort.h" // Runs 5x (!!) faster than a plain quicksort or even my spdsort
 
+
+#if 0
 
 #define kExtend 0x70
-#if kExtend
+// not sure if I should keep both? i should use one match-finder, not both.
 struct CompState : FastBuff {
 	int                                     LastOut;
-	int*                            Suffixes;
-	int*                            SortPositionAtByte;     
+	int*                            		Suffixes;
+	int*                            		SortPositionAtByte;     
 	int                                     B;
 	
 	
 	bool TestOneCost (u8* Find,  u8* E,  int G,  MatchFound& Best, int Esc) {
 		int N           = Suffixes[G];
 		u8* Text        = E - N;
-		N                       = (Text < Find) ? (int)(E-Find) : 2; // we just want to know if any good ones remain.
+		N               = (Text < Find) ? (int)(E-Find) : 2; // we just want to know if any good ones remain.
 		int i           = 0;
 		for (; i < N; i++)
 			if (Find[i] != Text[i]) break;
@@ -46,7 +48,7 @@ struct CompState : FastBuff {
 		int L           = Self - 1;
 		int H           = Self + 1;
 		int B           = 0;
-		B                       = max(0, L-250);                // Actually lowers compresion! seem like we are reading A LOT.
+		B                       = max(0, L-250);        // Actually lowers compresion! seem like we are reading A LOT.
 		Last            = min(Last, H+250);             // the "next/prev endgaps.changesat[i]" opt would help!
 		int Esc         = (R != LastOut)*0x20;
 		u8* SelfTest= Read + R;
@@ -162,8 +164,8 @@ static CompState& alloc_compress(JB_String* self, FastString* fs) {
 	
 	if (CB > C.B) {
 		C.B = CB;
-		C.Suffixes                              = (int*)JB_realloc(C.Suffixes,       2*ChunkLength*sizeof(int)+16);
-		C.SortPositionAtByte    = (int*)JB_realloc(C.SortPositionAtByte,             ChunkLength*sizeof(int));
+		C.Suffixes              	= (int*)JB_realloc(C.Suffixes,       2*ChunkLength*sizeof(int)+16);
+		C.SortPositionAtByte		= (int*)JB_realloc(C.SortPositionAtByte,             ChunkLength*sizeof(int));
 	}
 	
 	C.Expected                      = Total;
@@ -279,8 +281,8 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self,  int Ex
 	}
 	
 	require (Addr != ErrP);
-	DReq(Addr == AddrEnd,                                           "Chunk read overflow",               0);
-	DReq(fb.Expected == fb.Length(),                        "Chunk write-length error",  0);
+	DReq(Addr == AddrEnd,									"Chunk read overflow",       0);
+	DReq(fb.Expected == fb.Length(),						"Chunk write-length error",  0);
 	fs->Length += fb.Expected;
 	return fb.Expected;
 }
@@ -743,10 +745,13 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self, int Dum
 	Decomp In = {(u32*)A, (u32*)(A + StrLen)};
 
 	uint Size = In.Read4();
-	require (Size < 4*1024*1024);
+	if (Size > 16*1024*1024)
+		return JB_ErrorHandleC("Size field corrupt", 0, false);
+	
 	Compression Cmp = {};
 	auto Write = JB_FS_WriteAlloc_(fs, Size+7);
-	require (Write);
+	if (!Write)
+		return JB_ErrorHandleC("Size field corrupt", 0, false);
 	
 	Cmp.BitBuff = In.Read4();	
 	for (int p = 0; p < Size; ) {

@@ -23,15 +23,16 @@
 
 
 extern "C" {
-void JB_ErrorHandleC(const char* Desc, bool CanFreeDesc);
+int64_t JB_ErrorHandleC(const char* Desc, bool CanFreeDesc);
 
 uint8* JB_Img__LoadQOI(uint8* data, int len, int* Size) {
-	qoi_desc desc;
+	qoi_desc desc = {};
 	auto pixels = (uint8*)qoi_decode(data, len, &desc, 4);
-	if (!pixels)
-		JB_ErrorHandleC("qoi could not decode", false);
 	Size[0] = desc.width;
 	Size[1] = desc.height;
+	if (!pixels) {
+		return (uint8*)JB_ErrorHandleC("qoi could not decode", false);
+	}
 	return pixels;
 }
 
@@ -45,8 +46,7 @@ uint8* JB_Img__WriteQOI(uint8* data, int w, int h, int* len) {
 	if (qoi)
 		return qoi;
 		
-	JB_ErrorHandleC("qoi could not encode", false);
-	return 0;
+	return (uint8*)JB_ErrorHandleC("qoi could not encode", false);
 }
 
 // I'd rather strip png support, cos it needs gz.  But I can't for now. Sadly.
@@ -54,8 +54,7 @@ uint8* JB_Img__LoadPNG(uint8* data, int len, int* x, int* y, int* comp) {
 	uint8* img = stbi_load_from_memory(data, len, x, y, comp, 4);
 	if (img)
 		return img;
-	JB_ErrorHandleC(stbi__g_failure_reason, false);
-	return 0;
+	return (uint8*)JB_ErrorHandleC(stbi__g_failure_reason, false);
 }
 }
 

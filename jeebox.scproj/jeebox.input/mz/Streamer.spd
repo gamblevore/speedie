@@ -9,19 +9,19 @@ function StringReader.CompressInto (|object| dest, |int| Strength=mzlab.default,
 	j.enter(@tmp, "µz")
 	j.addint(.length)
 	j.enter(@arg)
-	// this is too annoying, actually.
-	// can we do this in a simpler way?
+	st.Out += j.StreamLength
 	while .hasany
 		|| str = .str(4MB)
+		|| A = j.StreamLength
 		|| Place = j.OpenSection
 		j.CompressChunk(str)
 		j.CloseSection(Place.x, place.y, @bin)
-		st.LiveUpdate(str.length, j.length - place.x, true)
+		st.LiveUpdate(str.length, j.streamlength - A, true)
 		if !.NoMoreChunks
 			j.flush // we are calling it after anyhow	
-	j.exit(2)
+	st.out += j.exit(2)
 	j.flush			// we definitely need to flush it.  Im serious!
-	j.CompressChunk(nil)						// cleanup
+	// j.CompressChunk(nil)						// cleanup
 	st.end
 
 
@@ -39,7 +39,8 @@ helper StringReader.DecompressInto (|object| dest,  |int| lim=int.max,  |&compre
 	if (Remaining > 0) and (Remaining <= lim) and (arg)
 		st = st.start
 		while (|| c = .NextMsg(arg, @bin))
-			|| Expected = fs.DecompressChunk(c.name) #loop
+			|| Expected = 4MB min remaining
+			fs.DecompressChunk(c.name, expected) #loop
 			Remaining -= Expected
 			fs.Flush
 			st.LiveUpdate(c.length, Expected, false)

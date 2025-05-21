@@ -552,6 +552,7 @@ bool JB_FS_Flush(FastString* fs) {
             fs->WrittenLength += N;
             fs->Length = 0;
         }
+		JB_File_Flush(File);
 		return true;
     }
     return false;

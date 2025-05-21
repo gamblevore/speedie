@@ -116,8 +116,7 @@ ivec4* JB_ASM__Run(u32* Code, u32 CodeLength) {
 		return RunVM(*V);
 	}
 
-	JB_ErrorHandleC("Can't allocate VM", JB_Str__Empty(), false);
-	return 0;
+	return (ivec4*)JB_ErrorHandleC("Can't allocate VM", JB_Str__Empty(), false);
 }
 
 #else

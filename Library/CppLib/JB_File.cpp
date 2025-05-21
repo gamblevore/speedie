@@ -750,8 +750,13 @@ int JB_File_Write( JB_File* self, JB_String* Data ) {
 
 
 void JB_File_Flush(JB_File* self) {
-    if ( HasFD(self) )
-        ErrorHandle_( fsync( self->Descriptor ), self, nil, "flushing" );
+    if ( HasFD(self) ) {
+		int err = 0;
+//		err = fflush(self->Descriptor);
+//		if (!err)
+			err = fsync( self->Descriptor );
+		ErrorHandle_( err, self, nil, "flushing" );
+	}
 }
 
 
