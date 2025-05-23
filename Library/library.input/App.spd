@@ -145,7 +145,6 @@ render StackTrace (|int| skip = 2)
 function Restart
 	.turninto(.path, .rawargs)
 
-
 function ThreadName (assigns:|string|)
 	cpp_Wrapper JB_App__SetThreadName
 
@@ -173,13 +172,7 @@ function OtherMemory (|int64|)
 	cpp_wrapper JB_MemUsedOther
 
 function SuicideIfParentDies (assigns:|bool|)
-	cpp_wrapper
-//function Expired (|date| period, |date| From = __now__, |date|)
-//	|| expiry = period + from
-//	if gui.FrameStart > expiry
-//		return expiry
-	
-
+	cpp_wrapper JB_App__SuicideIfParentDies
 	
 function Env (|dictionary of string|)
 	cpp_wrapper JB_App__Env
