@@ -274,7 +274,6 @@ class FastString {
 	function AppendLocalTime (|Date| D)
 		cpp_wrapper JB_FS_AppendLocalTime
 
-
 	syntax Append (|Float| F)
 		cpp_name JB_FS_AppendFloatAsText
 		self <~ F|Float64|

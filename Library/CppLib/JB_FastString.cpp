@@ -416,9 +416,9 @@ void JB_FS_AppendDoubleAsText (FastString* self, double D, int dp, bool CanExp, 
 
 	if (Frac and dp > 0) {
 		auto Write = JB_FS_WriteAlloc_(self, 64)-1;
-		char fmt[] = {'%', '0', '.', '0', '0', 'f' , 0};
-		fmt[3] += dp / 10;
-		fmt[4] += dp % 10;
+		static char fmt[] = {'%', '0', '.', '0', '0', 'f' , 0};
+		fmt[3] = '0' + (dp / 10);
+		fmt[4] = '0' + (dp % 10);
 		N = snprintf((char*)Write, 64, fmt, Frac);
 		Write[0] = Last;
 		while (N > 3) {

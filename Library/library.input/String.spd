@@ -246,6 +246,14 @@ class String
 	function Shorten (|int| n, |string|)
 		return self[0, .length-n]
 
+	function Trim (|int| A, |int| B, |string|)
+		cpp_part TrimMiddle
+		|| fs = FastString(.length - ((B-A) max 0))
+		fs.AppendRange(self, 0, A)
+		fs.AppendRange(self, B, int.max)
+		return fs
+		
+		
 	function Trim (|charset| cs = nil, |string|)
 		nil self
 		cpp_wrapper JB_Str_Trim

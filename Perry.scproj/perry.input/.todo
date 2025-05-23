@@ -2,7 +2,6 @@
 
                                                        Todo
 
-* breakpoints on click line num
 * click on ch to view bytes.
 * caller list should select current func?
 
@@ -32,11 +31,9 @@
 
 
 // Perry do later
-* use stringstream for compression! not jbin!
 * leaking (Check if it happens with non-code files)
 * prev/next for search area. Save previous lists! up to 10?
 * Last 5 (or so) files in the file-tab area could be nice.
-
 
 // Speedie Do later
 * shrink history https://passingcuriosity.com/2017/truncating-git-history/

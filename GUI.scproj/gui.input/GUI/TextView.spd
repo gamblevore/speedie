@@ -10,7 +10,6 @@ class TextView (GUIControl)
 	|bool|						CanSeeAllLines
 	|bool|						GroupSaveAll
 	|bool|						PreferStayAtEnd
-	|byte|						LineNumWidth
 	|byte|						LineHeight
 	|byte|						ExpectsParse
 	|int8|						YAdjust
@@ -20,6 +19,7 @@ class TextView (GUIControl)
 	|int|						_AutoCompleteBack
 	|string|					_AutoCompleteString
 	
+	|byte|						_LineNumWidth
 	|byte|						_CodeInsertionState
 	|uint16|					_LastDrawWidth
 	|byte|						_ClicksDown
@@ -86,18 +86,19 @@ class TextView (GUIControl)
 	
 	
 	behaviour MouseDown
-//		.clickedpos = p.x // for selectin text
 		if (clicks == 1) and (keys.cmd or keys.ctrl)
 			.SendSpecialClick(p, !keys.PlatCmd)
 			return MouseDragging.handled
 		
 		if .ClickedScroll(P, clicks)
 			return MouseDragging.Within
+		if .ClickedLineNum(P)
+			return MouseDragging.Handled
 		
 		if self is editable or AlwaysScrollable
-			if clicks >= 1
+			if clicks >= 1 // remove this test?
 				._ClicksDown = clicks
-			|| x = .EditClick(p, clicks, false)
+			|| x = .EditClickText(p, clicks, false)
 				return x
 
 		|| onc = .onclicked
@@ -107,12 +108,62 @@ class TextView (GUIControl)
 			return MouseDragging.Within // used to be 4, now 2?
 		return MouseDragging.handled
 
+	
+	helper LineNumRight (|int|)
+		return 5 + .lastleft + ._LineNumWidth*font.width
+	
+	
+	helper string._FindBreakpoint (|int|)
+		for (c in self) (i)
+			if c == '/'
+				c = self[i+1]
+				if c == '/' or '*'
+					return int.max
+				return i
+			if !c.IsWhite
+				exit
+		return -1
+			
+			
+	helper string._TextLineClickedBreakpoint (|string|)
+		|| i = ._FindBreakpoint
+		require i < int.max
+		if i == -1 // ok... this means that the thing isn't found, so we can add it.
+			return "/" + self
+		// are these two branches the same? test later.
+		
+		// we did find one! but it might be in the middle!
+		return .trim(i, i+1)
+
+		
+	helper ClickedLineNum (|ivec2| P, |bool|)
+		require p.x < .LineNumRight
+		|| bs = (0, 0)
+		|| d = .ByteAtXY(p, bs)
+		require d is StartsNormally
+		
+		|| Restore = .selrange
+		// so now we are within the area, and have a valid line. we can now alter the text!
+		|| txt = d.Text._TextLineClickedBreakpoint
+		
+		// adjust position first
+		if Restore.x > d.position
+			Restore += txt.length - d.text.length
+		
+		// now insert it		
+		.InsertSub(txt, d.Range, false)
+
+		.selrange = Restore
+		return true	
+		
 		
 	helper ClickedScroll (|ivec2| P, |int| Clicks, |bool|)
 		return .ClickedScrollbar(P, Clicks, .slh)
 	
+	
 	setter ExpectsParse (|byte|)
-		.expectsparse = value
+		.ExpectsParse = value
+		
 		
 	behaviour LostFocus
 		.isinline.clear(False)?
@@ -181,16 +232,12 @@ class TextView (GUIControl)
 		t.x2 = d2.ooof(m.x2 <  m.x1)
 		return t
 		
-
-	helper XAdjust (|ivec2| p, |int|)
-		if p.y < .lasttop
-			return p.x - (.lastleft+.LineNumWidth*font.width+5)			
-		
 		
 	helper ByteAtXY (|ivec2| p, |!&ivec2| v, |textviewline|)
 		opt norefcounts
 		|| D = .LineAtY(p.y)
-			v[] = .LastLineFix(d, .xadjust(p))
+			|| x = p.x - .LineNumRight
+			v[] = .LastLineFix(d, x)
 			return d
 		
 		if p.y < .lasttop
@@ -217,7 +264,7 @@ class TextView (GUIControl)
 		return t
 
 
-	function EditClick (|ivec2| p, |int| clicks, |bool| CmdKey, |int|)
+	function EditClickText (|ivec2| p, |int| clicks, |bool| CmdKey, |int|)
 		opt norefcounts
 		|ivec2| bs
 		|| d = .ByteAtXY(p, bs)
@@ -244,7 +291,7 @@ class TextView (GUIControl)
 
 
 	function SendSpecialClick (|ivec2| p, |bool| IsRightClick)
-		.EditClick(p, 0, !IsRightClick)
+		.EditClickText(p, 0, !IsRightClick)
 		if IsRightClick and .__keydown__(keys.section)
 			return
 		|| Code = (-1, -2)(IsRightClick)
@@ -1549,7 +1596,7 @@ class TextView (GUIControl)
 	
 
 	function TextLeft (|int|)
-		return .lastleft + 2 + .LineNumWidth*font.width
+		return .lastleft + 2 + ._LineNumWidth*font.width
 
 
 	helper DrawSel (|image| where, |ivec4| c)
@@ -1610,7 +1657,7 @@ class TextView (GUIControl)
 			|| n = d.next
 			if d == s
 				c = 0
-			if !n or .FoundInfo(d.DrawRange, char)
+			if !n or .FoundInfo(d.Range, char)
 				if vline
 					vline[] = c
 //				_LastVLine = c
@@ -1642,7 +1689,7 @@ class TextView (GUIControl)
 			x2++
 		
 		|| d = .FindDrawInfo(x2)
-		|| r = d.drawrange
+		|| r = d.range
 		x2 = r.x2
 		if (i > 0) and (keys.shift) and (d is avoidlastchar) and !d.endswithline
 			//
@@ -2000,9 +2047,9 @@ class TextView (GUIControl)
 		|| Pos	 	  = .StartPos
 		|| d		  = .NeedFirst
 		|| StayAtEnd  = .EndGap
-		.LineNumWidth = (.text.TextLineCount.LineNumWidth, 0)(.ShowLineNumbers or Expect >= 3)
+		._LineNumWidth = (.text.TextLineCount.LineNumWidth, 0)(.ShowLineNumbers or Expect >= 3)
 		
-		|int| CharW	= ._LastDrawWidth - .LineNumWidth
+		|int| CharW	= ._LastDrawWidth - ._LineNumWidth
 		if .SingleLine
 			charw = 4KB
 	

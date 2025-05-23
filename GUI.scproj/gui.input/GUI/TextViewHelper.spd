@@ -8,6 +8,7 @@ datatype TextLineFlags (uint16)
 		Found
 		CurrFound
 		Last
+		StartsNormally
 		AvoidLastChar
 		FakeMsg
 
@@ -55,20 +56,16 @@ class TextViewLine (list)
 				require .Text[pos, name]
 				rz = '\n'
 		
-	function DrawRange (|ivec2|)
-		|| p = .position
-		|| L = .text.length
-		return (P, P+L)
-		
 
 	operator contains (|ind| b, |bool|)
-		|| d = .drawrange
+		|| d = .range
 		if self isnt last
 			d.x2 -= 1 
 		return d contains b
 
 	syntax is (|TextLineFlags| F, |bool|)
-		return .state&F
+		if self
+			return .state&F
 	
 	syntax is (|TextLineFlags|F, assigns:|bool|)
 		if value
@@ -126,8 +123,10 @@ class TextViewLine (list)
 			is fakemsg
 	
 	
-	helper range (|intrange|)
-		return (.position, .after)
+	function Range (|intrange|)
+		|| p = .position
+		|| L = .text.length
+		return (P, P+L)
 
 	
 	helper EmptyLine (|bool|)
@@ -217,7 +216,7 @@ class TextViewLine (list)
 
 	function DrawSelSub (|image| where,  |ivec2| R,  |textview| parent,  |int| vline,  |drawstyle| g)
 		opt min 3
-		|| M = .DrawRange
+		|| M = .Range
 		require (r.x <= m.x2) and (r.x2 >= m.x)
 		|| Start  = .SquaresAtByte(R.x1 max M.x1)
 		|| Finish = .SquaresAtByte(R.x2 min M.x2)
@@ -275,6 +274,7 @@ class TextViewLine (list)
 	
 	
 	function FindWhereLineBreaks (|string| txt, |int| MaxWidth, |bool| IsInline, |ind| p, |ind|)
+		(self is StartsNormally) = txt[p-1].IsTextLine
 		.position = p
 		if .vline > 1000K
 			return .TakeEntireText(txt, p)					// just give up wrapping
@@ -351,7 +351,7 @@ helper textview.DrawLighter (|image| Where, |int| y)
 helper TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,  |imagepixel| lc,  |int|)
 	opt norefcounts
 	|| x = .DrawOneStartLine(d.text) 
-	|| big		    = .LineNumWidth
+	|| big		    = ._LineNumWidth
 		|| P		= (x-3, y)
 		|| shift	= big - d.tline.LineNumWidth
 		|byte[8]|   buff

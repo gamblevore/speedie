@@ -4,13 +4,8 @@
 */
 
 
-//import "Utils/jz.spd"
 
-main // speedie main {
-//	|| orig = "~/Compression/SF.xml.mz".file
-//	conv.Detected |= type.compressed
-///	app.UseOne(orig)
-	
+main // speedie main {	
 	Compiler.SetupEnv
 	Compiler.MiniTests
 	Compiler.Main
