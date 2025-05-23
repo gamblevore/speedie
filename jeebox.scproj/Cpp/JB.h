@@ -644,17 +644,13 @@ JBClass ( ParserCallBack , JB_Task ,
 #define JB__Constants_XML_EscapeStr JB__.Constants_XML_EscapeStr
 #define JB__Constants_XML_UnEscapeStr JB__.Constants_XML_UnEscapeStr
 #define JB__Constants_XMLWordMiddle JB__.Constants_XMLWordMiddle
-#define kJB__MZLab_Default ((int)3)
-
-#define kJB__MZLab_Fast ((int)2)
-
-#define kJB__MZLab_Fastest ((int)1)
+#define kJB__MZLab_Default ((int)2)
 
 #define kJB__MZLab_None ((int)0)
 
-#define kJB__MZLab_Strong ((int)3)
+#define kJB__MZLab_Strong ((int)2)
 
-#define kJB__MZLab_Strongest ((int)4)
+#define kJB__MZLab_Strongest ((int)3)
 
 #define kJB__Math_E (2.7182818284590452353602874713526f)
 
@@ -1773,8 +1769,6 @@ int JB_int__Max();
 
 
 // int64
-int64 JB_int64_OperatorMin(int64 Self, int64 D);
-
 JB_String* JB_int64_Render(int64 Self, FastString* Fs_in);
 
 
@@ -2543,8 +2537,6 @@ JB_String* JB_Str_Child(JB_String* Self, JB_String* Cname);
 
 JB_String* JB_Str_Compress(JB_String* Self, int Strength, CompressionStats* St);
 
-void JB_Str_CompressInto(JB_String* Self, JB_Object* Fs, int Strength, CompressionStats* St);
-
 int JB_Str_Count(JB_String* Self, uint /*byte*/ B);
 
 JB_String* JB_Str_Decompress(JB_String* Self, int Lim, CompressionStats* St);
@@ -2659,7 +2651,7 @@ void JB_SS_CompressInto(StringReader* Self, JB_Object* Dest, int Strength, Compr
 
 StringReader* JB_SS_Constructor(StringReader* Self, JB_String* Data);
 
-JB_String* JB_SS_Decompress(StringReader* Self, int Lim, CompressionStats* St, bool Multi);
+JB_String* JB_SS_Decompress(StringReader* Self, int Lim, CompressionStats* St);
 
 bool JB_SS_DecompressInto(StringReader* Self, JB_Object* Dest, int Lim, CompressionStats* St);
 
