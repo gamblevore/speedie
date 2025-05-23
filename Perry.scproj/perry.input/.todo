@@ -2,8 +2,6 @@
 
                                                        Todo
 
-* jz -d /Users/theodore/Compression/SF.xml.mz // fail
-* small floats printing wrong
 * breakpoints on click line num
 * click on ch to view bytes.
 * caller list should select current func?

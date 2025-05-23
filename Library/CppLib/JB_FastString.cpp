@@ -382,8 +382,9 @@ static bool DoubleIsNormal (double D){
 	return  D <= DBL_MAX  &&  D >= -DBL_MAX ;
 }
 
-void JB_FS_AppendDoubleAsText(FastString* self, double D, int dp, bool CanExp, bool Dot) {
+void JB_FS_AppendDoubleAsText (FastString* self, double D, int dp, bool CanExp, bool Dot) {
 // need a "mode" really... what about if we want no exp but DO want the full length?
+// i think we should just use sprintf
     if_rare (!(DoubleIsNormal(D)))
 		return JB_FS_AppendCString(self, "nan");
 	// -+inf would freeze us otherwise
@@ -407,38 +408,32 @@ void JB_FS_AppendDoubleAsText(FastString* self, double D, int dp, bool CanExp, b
 	double F = floor(D);
 	JB_FS_AppendIntegerAsText(self, F, 1);
 	double Frac = D - F;
+	int N = self->Length;
+	if (N <= 0) // oof. out of memory.
+		return;
+	char Last = self->ResultPtr[N - 1];
 
 
 	if (Frac and dp > 0) {
-		int MaxDP = 1;
-		for (int i = 1; i < dp; i++) {
-			Frac *= 10;
-			double Num = floor(Frac);
-			if (Num)
-				MaxDP = i;
-			Frac -= Num;
-			if (!Frac)
+		auto Write = JB_FS_WriteAlloc_(self, 64)-1;
+		char fmt[] = {'%', '0', '.', '0', '0', 'f' , 0};
+		fmt[3] += dp / 10;
+		fmt[4] += dp % 10;
+		N = snprintf((char*)Write, 64, fmt, Frac);
+		Write[0] = Last;
+		while (N > 3) {
+			if (Write[--N] != '0')
 				break;
+			Write[N] = 0; // cleanup
 		}
-		dp = MaxDP;
-		Frac = D - F;
+		if (!Dot and N == 3 and Write[N-1] == '0')
+			N = 0;
+		JB_FS_AdjustLength_( self, 64, N );
+		
+	} else if (Dot) {
+		JB_FS_AppendCString(self, ".0");
 	}
-
-
-	if (Dot or (Frac and dp > 0)) {
-		JB_FS_AppendByte(self, '.');
-		bool GotNum = false;
-		while (dp-- > 0 or !GotNum) {
-			Frac *= 10;
-			double Num = floor(Frac);
-			Frac -= Num;
-			byte B = (byte)Num;
-			GotNum |= (B!=0);
-			JB_FS_AppendByte(self, '0'+B);
-			if (!Frac)
-				break;
-		}
-	}
+	
 	if (ActualExp) {
 		JB_FS_AppendByte(self, 'e');
 		JB_FS_AppendIntegerAsText(self, ActualExp, 1);
