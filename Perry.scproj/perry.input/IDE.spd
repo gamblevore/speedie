@@ -545,26 +545,33 @@ class PerryIDE (Window)
 			return ClickedPrevNext(.goprev)
 		if key is period
 			return ClickedPrevNext(.gonext)
+		if key is b
+			Clickedcompile(.buildbutton)
+			key.eat
+			return true
 		if key is r
 			if keys.Shift
 				PressingDebug(.runbutton)
 			  else
 				ClickedDebug(.runButton)
+			key.Eat
 			return true
 		if key is o
 			if keys.shift
 				clickedopenfile(self)
 			  else
 				clickedopenproj(self)
+			key.eat
 			return true
 		if key is n
 			if keys.shift
 				clickedCreatefile(self)
 			  else
 				clickedCreateproj(self)
+			key.eat
 			return true
-		if key is m
-			return .markup()
+//		if key is m
+//			return .markup()
 		if key is l // l = file list
 			if keys.option or keys.Shift
 				RightClickNext(.goprev)
@@ -573,9 +580,6 @@ class PerryIDE (Window)
 				return .ShowQuickStuff(true)
 		if key is d
 			return .ShowQuickStuff(false)
-		if key is b
-			Clickedcompile(.buildbutton)
-			return true
 		if  key is s  and  .editme is visible
 			.SaveEditing(documentstate.saving)
 			return true
