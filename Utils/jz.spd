@@ -152,6 +152,7 @@ function App.GetActions (|Type|)
 	check ((rz & type.actions).CountBits <= 1) ("Too many actions.")
 
 
+
 module Conv
 	|string|		Data
 	|file|			In
@@ -399,27 +400,18 @@ module Conv
 		return str.file
 	
 	
-	function FormatInfo (|&int| Size=0, |string|)
+	function FormatInfo (|&int| Size = 0, |string|)
 		|| str = .in!.Section(0, 64)
 			if str == string.error
 				return str
 		
-		|| T = str.IsJbin						#require
-		|| mz = str.ParseJbin(3)
-		if !mz
-			|| err = StdErr.pop
-				printline err
+		if str.IsCompressed
+			|| addr = str.addr|&uint|
+			size[] = addr[1]
+			check (size[] < 16MB) (.in, "Corrupt mz. Too much data.")
+			.Detected |= type.compressed
+			return "µz"
 
-		ifn mz == @tmp and "µz"
+		if str.IsJbin
 			.Detected |= type.jbin
-			return ""
-
-		|| num = mz[@num]
-		|| arg = num.next(@arg)
-			arg.ExpectLast
-			size[] = num.int
-			if size[]
-				.Detected |= type.compressed
-				return "µz"
-		return string.error
 
