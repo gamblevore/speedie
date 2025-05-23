@@ -85,26 +85,7 @@ class StringReader
 		return .data.position + .StartFrom
 	setter Position (|int64|)
 		.data.position = value - .StartFrom
-
-	function bInt (|int|n=4, |int64|)
-		for n
-			|| b = .byte
-			loop b >= 0
-			rz <<= 8
-			rz |= b
-		
-	function bInt0 (|int|n=3, |int64|)
-		disabled  "No need?"
-		// 0-3 works better for bit-math
-		return .bint(n+1)
-
-	function lInt0 (|int|n=3, |int64|)
-		disabled  "No need?"
-		for i in n+1
-			|| b = .byte
-			loop b >= 0
-			rz |= b << i << 3
-		
+			
 	function hInt (|int64|)
 		|| sh = 0
 		|| v  = 0

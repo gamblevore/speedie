@@ -35,6 +35,10 @@ struct			PicoComms;
 struct			PicoGlobalConfig;
 struct			PicoMessage { char* Data; int Length;   operator bool () {return Data;}; };
 
+typedef bool	(*PicoThreadFn)(PicoComms* M, void* self, const char** Args);
+typedef int		(*PicoObserverFn)();
+
+
 struct 			PicoConfig  {
   char 				Name[32];		/// Used for reporting events to stdout.
   PicoDate			LastRead;		/// The date of the last Read. This is a signed 64-bit number. The lower 16-bits used for sub-second resolution, and the upper 47-bits are for seconds. 1 bit used for the sign.
@@ -57,8 +61,9 @@ struct PicoGlobalConfig {
 /// Set TimeOut to zero, to remove the self-quit ability.
 
 ///
-	bool					SuicideIfParentDies;
-/// Name is self-explanatory. Pico will exit your app with exit()... if the parent dies.
+	PicoObserverFn			Observer;
+/// Allows your callback function to be called, repeatedly inbetween pico's own self-checks.
+/// Return -1 to signify that you want to exit the program, and Pico will call exit() 
 
 ///
 	int						ExitCode;
@@ -81,8 +86,6 @@ struct PicoGlobalStats {
 	int			OpenPicos;
 };
 
-
-typedef bool (*PicoThreadFn)(PicoComms* M, void* self, const char** Args);
 
 #ifndef PICO_IMPLEMENTATION
 	#define _pico_code_(x) ;
@@ -115,13 +118,10 @@ static PicoMessage pico_next_msg (PicoMessage M) {
 struct PicoTrousers { // only one person can wear them at a time.
 	std::atomic_bool Value;
 	PicoTrousers  () {Value = false;}
-	operator bool () {return Value;}
-	void operator = (bool b) {Value = b;}
 	bool enter () {
 		bool Expected = false;
 		return Value.compare_exchange_weak(Expected, true);
 	}
-
 	void unlock () {
 		Value = false;
 	}
@@ -542,7 +542,6 @@ struct PicoComms {
 		pthread_t T = 0;   ;;;/*_*/;;;   // creeping upwards!!
 		auto D = (PicoThreadData*)malloc(sizeof(PicoThreadData));
 		D->C = C; D->fn = fn; D->Self = Self; D->Args = Args;
-		auto &G = pico_global_conf;
 		if (!pthread_create(&T, nullptr, pico_thread_wrapper, D) and !pthread_detach(T))
 			return true;
 		C->Destroy("ThreadFailed");
@@ -770,7 +769,7 @@ static void pico_cleanup () {
 
 
 static bool pico_try_exit () {
-	if (pico_global_conf.SuicideIfParentDies and getppid() <= 1)
+	if (pico_global_conf.Observer and (pico_global_conf.Observer)() < 0)
 		return true;
 
 	if (!pico_global_conf.TimeOut)

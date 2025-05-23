@@ -1,6 +1,6 @@
 
 #include "JB_Compress.h"
-//#include "divsufsort.h" // Runs 5x (!!) faster than a plain quicksort or even my spdsort
+//#include "divsufsort.h"
 // this still seems a lot SLOWER than the original! Despite all my opts!
 // could it be because the original perhaps used... registers? and mine isn't?
 // sigh. That will suck, to change.
@@ -492,10 +492,6 @@ struct Compression {
 		
 		Size = JB_Str_Length(In);
 		
-		// MAYBE better to make the caller store the original write pos...
-		// then it can store the compressed length. less vars in here.
-		// also it allocates space.
-		
 		CmpOut = (uint*)JB_FS_WriteAlloc_(fs, (Size+20) + (Size>>6)); // might expand a little.
 		if (!CmpOut)
 			return false;
@@ -787,7 +783,7 @@ extern "C" int JB_Str_CompressChunk (FastString* fs, JB_String* self, int Level)
 
 
 
-// should return the consumed length. in case str had multiple compressed chunks appended.
+// Should return the consumed length. in case str had multiple compressed chunks appended.
 
 extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self) {
 	int StrLen = JB_Str_Length(self);

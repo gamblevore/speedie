@@ -222,6 +222,8 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
     int Err = JB_Init_();
 	if (Err)
 		return Err;
+	
+	PicoStart();
     #if DEBUG
 	JB_TotalSanity(true);
 	#endif
