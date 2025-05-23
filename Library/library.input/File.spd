@@ -125,9 +125,8 @@ class File (String)
 		// normally allowmissing is good, but here it is bad.
 		// file.parse keeps track of the source+path
 		|| f = .Resolve(allowmissing).file
-		|| S = f.readall(lim, allowmissing)
-		if s.IsCompressed
-			s = s.Decompress(lim, nil)
+		|| S = f.ReadAll(lim, allowmissing)
+		s = s.Decompress(lim, nil)
 		if s
 			|memorylayer--| L = (Message).CreateUseLayer(f, s) 
 			rz = S.parse(@arg, false) // already decompressed.
@@ -162,8 +161,8 @@ class File (String)
 			if WasClosed
 				.close
 		
-	function IsCompressed (|bool|)
-		return .section(0,16).iscompressed
+//	function IsCompressed (|bool|)
+//		return .section(0, 4).iscompressed
 
 
 	function RelFile (|file|)

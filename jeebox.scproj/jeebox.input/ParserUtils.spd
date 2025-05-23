@@ -72,9 +72,9 @@ function String.Parse (|syntax| owner = @arg, |bool| AllowDecomp=true,  |Message
 		data = data.decompress(int.max)
 	|| j2 = data.isjbin
 		data = data[j2, int.max]
-		rz = data.parsejbin
+		rz = data.ParseJbin
 	  else
-		rz = data.parsesub(owner)
+		rz = data.ParseSub(owner)
 		
 
 

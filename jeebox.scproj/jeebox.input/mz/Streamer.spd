@@ -29,16 +29,16 @@ function StringReader.DecompressInto (|object| dest,  |uint| Limit=512MB,  |&com
 helper StringReader.DecompressIntoSub (|faststring| fs,  |int| OutLim,  |&compressionstats| st, |int| OutRemain, |bool|)
 	while OutRemain > 0
 		|| InSize = .UInt(4) - 4
-		expect (InSize < 16MB) 						(self, "mz chunk too large")
+		expect (InSize < 16MB) 							(self, "mz chunk too large")
 		|| ChunkData = .str(InSize)
-		expect (ChunkData == InSize) 				(self, "mz input too short")
-		|| OutSize = fs.DecompressChunk(ChunkData)	#loop
+		expect (ChunkData == InSize) 					(self, "mz input too short")
+		|| OutSize = fs.DecompressChunk(ChunkData)		#loop
 		OutRemain -= OutSize
 		fs.Flush
 		st.LiveUpdate(InSize+4, OutSize, false)
 	st.end
 	
-	return !OutRemain						#expect (self, "mz output too big" )
+	return !OutRemain							#expect (self, "mz output too big" )
 			
 		
 helper faststring.CompressChunk (|string| Input, |int| level, |int|) 
