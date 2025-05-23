@@ -246,11 +246,11 @@ module Conv
 		if Decomp
 			.size = d.File.size|float|
 			src.DecompressInto(d)
-			.Time("Decompress(streamed )", true)
+			.Time("Decompress", true)
 		  else 
 			.size = .in!.size|float|
 			src.CompressInto(d, DefaultStrength) 
-			.time("Compress(streamed µz)", true)
+			.time("Compress", true)
 		if dest is selfreplace
 			.RealOut!.MoveTo(.out!)
 	
@@ -350,7 +350,7 @@ module Conv
 		  else
 			.start = date.now
 			.ConvertDataFormat(nil)
-			.data.Compressinto(fs, .DefaultStrength)
+			.data.stream.Compressinto(fs, .DefaultStrength)
 			.time("Compress")
 		
 		fs = nil

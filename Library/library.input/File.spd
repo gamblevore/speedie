@@ -400,7 +400,7 @@ class File (String)
 		|| f = .file
 		if f.mustexist("stream")
 			rz = StringReader(f, chunkSize)
-			if !rz.test(Header)
+			if !rz.HasHeader(Header)
 				rz = nil
 	
 	function Copy (|File| Dest, |bool| AttrOnly=false, |ErrorInt|)

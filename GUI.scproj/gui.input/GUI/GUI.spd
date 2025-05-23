@@ -233,11 +233,8 @@ module GUI
 		expect (window.all.HasAny) "Create a window first, then call GUI.run"
 			
 		require .init
-		app.ClearCaches
-		|uint| n 
 		while .SingleFrame
-			if n++ isa 512
-				app.ClearCaches //  :)
+			0
 		.Terminate
 		.sdl_quit
 		

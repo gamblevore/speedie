@@ -65,7 +65,6 @@ function EnterAutoComplete (|bool|)
 	"RespondingToCommands"					// Don't delete this... too annoying to miss.
 	if !app.ismainthread
 		"(AsLib)"
-	app.ClearCaches
 	if options.PrintLibraries
 		"(Noisy)"
 		perry.pico.config.noise = -1

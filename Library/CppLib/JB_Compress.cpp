@@ -1,6 +1,38 @@
 
 #include "JB_Compress.h"
 //#include "divsufsort.h" // Runs 5x (!!) faster than a plain quicksort or even my spdsort
+// this still seems a lot SLOWER than the original! Despite all my opts!
+// could it be because the original perhaps used... registers? and mine isn't?
+// sigh. That will suck, to change.
+// it could be the myscore operation, though.
+// either way, this could get a lot faster.
+// if it gets faster without registers, then so will my original mz too.
+
+
+struct DateLocker {
+	atomic_int64_t Value;
+	DateLocker  () {Value = 0;}
+	void unlock () {
+		Value &= ~1;
+	}
+	void lock () {
+		Date Now = JB_Date__Now()|1;
+		Date Expected;
+		do {
+			Expected = Value &~ 1;
+		} while (!Value.compare_exchange_weak(Expected, Now));
+	}
+	bool start_clear (int Duration) {
+		auto D = (Date)Value;
+		require(D and !(D&1));						// its been used but not in-use
+		require(JB_Date__Now() > D + Duration);		// enough time passed
+		return Value.compare_exchange_weak(D, -1);
+	}
+	void cleared () {
+		Value = 0;
+	}
+};
+
 
 
 #if 0
@@ -376,7 +408,7 @@ static inline int update_hash2 (int h, int c) {
 
 extern "C" inline int MyScore (uint len, uint offset) {
     uint offbits = std::max(SLOT_BITS+31-__builtin_clz(offset), W_MINUS+1+SLOT_BITS);
-	
+	// could simplify. longer lengths are always better?
     uint l = len - MIN_MATCH;
     uint ln = 0;
     if (l<A_) {
@@ -409,7 +441,19 @@ extern "C" inline int MyScore (uint len, uint offset) {
 
 
 
-static u8* CompSpace;
+static DateLocker		CompAllocator;
+static u8*				CompSpace;
+
+
+extern "C" void JB_CompFreer() {
+	if (CompAllocator.start_clear(10*64*1024)) {	// 10s ago!
+		free(CompSpace);
+		CompSpace = 0;
+		CompAllocator.cleared();
+	}
+}
+
+
 struct Decomp {
 	u32* Curr;
 	u32* After;
@@ -442,16 +486,17 @@ struct Compression {
 	}
 	
 	bool StartCompress (FastString* fs, JB_String* In) {
-		int N = (HASH1_SIZE + HASH2_SIZE + W_SIZE +256*256*0) * sizeof(int);
-		if (!CompSpace) {
-			CompSpace = (u8*)calloc(N,1);
-			if (!CompSpace)
-				return false;
-		}
+		int N = (HASH1_SIZE + HASH2_SIZE + W_SIZE +256*256*0) * sizeof(int); //256*256 is for TwoByte
+		if (!CompSpace and !(CompSpace = (u8*)calloc(N,1)))
+			return false;
 		
 		Size = JB_Str_Length(In);
 		
-		CmpOut = (uint*)JB_FS_WriteAlloc_(fs, (Size+16) + (Size>>6)); // might expand a little.
+		// MAYBE better to make the caller store the original write pos...
+		// then it can store the compressed length. less vars in here.
+		// also it allocates space.
+		
+		CmpOut = (uint*)JB_FS_WriteAlloc_(fs, (Size+20) + (Size>>6)); // might expand a little.
 		if (!CmpOut)
 			return false;
 		CmpOutStart = CmpOut;
@@ -461,11 +506,12 @@ struct Compression {
 //		TwoByte = Prev+W_SIZE;
 		Read = JB_Str_Address(In);
 
+		Write4(-1);
 		Write4(Size);
 		memset(Head, -1, N);
-		for (int i=0; i<HASH1_LEN; ++i)
+		for (int i = 0; i < HASH1_LEN; ++i)
 			h1 = update_hash1(h1, Read[i]);
-		for (int i=0; i<HASH2_LEN; ++i)
+		for (int i = 0; i < HASH2_LEN; ++i)
 			h2 = update_hash2(h2, Read[i]);
 		return true;
 	}
@@ -700,20 +746,16 @@ struct Compression {
 
 
 
-
-extern "C" void JB_Str_CompressChunk (FastString* fs, JB_String* self, int Level) {
-	if (!self or !fs)
-		return JB_unalloc((void**)&CompSpace);
-		
+int CompressStrong (FastString* fs, JB_String* self, int Level) {
 	Compression Fnd = {};
+	Level = (std::max(std::min(Level, 30), 20) + 5) / 10;
 	Fnd.Level = Level;
-	Fnd.StartCompress(fs, self);
+	require (Fnd.StartCompress(fs, self));
 	
 	int LastOut = 0;
 	int p = Fnd.InsertSubStrings(0, 4);
 	while (p < Fnd.Size) {
 		auto [Len, Offset, _] = Fnd.FindMatch(p);	
-		
 		if (Len >= MIN_MATCH) {
 			Fnd.Escape(LastOut, p);
 			Fnd.PutOffset(Offset);
@@ -728,16 +770,26 @@ extern "C" void JB_Str_CompressChunk (FastString* fs, JB_String* self, int Level
 	Fnd.Escape(LastOut, Fnd.Size);
 	Fnd.PutBits(31, 0);
 	auto Size = Fnd.Size;
-	int Req = (Size+16) + (Size>>6);
-	int Actual = (uint)(Fnd.CmpOut - Fnd.CmpOutStart)*4;
+	int Req = (Size+20) + (Size>>6);
+	int Actual = (Fnd.CmpOut - Fnd.CmpOutStart) << 2;
+	*Fnd.CmpOutStart = Actual;
 	fs->Length += Actual - Req;
+	return Actual;
+}
+
+
+extern "C" int JB_Str_CompressChunk (FastString* fs, JB_String* self, int Level) {
+	CompAllocator.lock();
+	int rz = CompressStrong(fs, self, Level);
+	CompAllocator.unlock();
+	return rz;
 }
 
 
 
 // should return the consumed length. in case str had multiple compressed chunks appended.
 
-extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self, int Dummy) {
+extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self) {
 	int StrLen = JB_Str_Length(self);
 	require(StrLen);
 
@@ -771,7 +823,7 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self, int Dum
 			int len = Cmp.GetLength(In) + MIN_MATCH;
 			len = std::min(len, (int)(Size-p));
 
-			if (ago >= 8) { // much faster :)
+			if (ago >= 8) {				// much faster :)
 				int L8 = (len + 7) >> 3;
 				auto W = (u64*)(Write + p);
 				auto R = (u64*)(Write + s);
@@ -779,7 +831,7 @@ extern "C" int JB_Str_DecompressChunk (FastString* fs,  JB_String* self, int Dum
 					*W++ = *R++;
 				p += len;
 			
-			} else while (len--)
+			} else while (len--)		// RLE.
 				Write[p++] = Write[s++];
 		}
 	}

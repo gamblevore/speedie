@@ -11,12 +11,15 @@
 * clami/clamu 32-bit
 * debug info! in pack
 
+* jz -d /Users/theodore/Compression/SF.xml.mz // fail
 * Perry exec
 	* exec send back debug-info
 * small floats printing wrong
 * "debug mode" VM
 * Check for funcs in the lib that need removing (ASM)
 * Save ClassProperty hash per-class in exec-lib... for when properties change!
+* breakpoints on click line num
+* click on ch to view bytes.
 
 
 * // Perry Release
@@ -30,6 +33,7 @@
 
 
 // Perry do later
+* use stringstream for compression! not jbin!
 * leaking (Check if it happens with non-code files)
 * prev/next for search area. Save previous lists! up to 10?
 * Last 5 (or so) files in the file-tab area could be nice.

@@ -179,11 +179,16 @@ void	JB_App__CrashInstall();
 int		JB_SP_AppInit();
 
 
+int JB_CareTaker() {
+	void JB_CompFreer(); JB_CompFreer();
+	return -(getppid() <= 1);
+}
+
+
 int JB_SP_Init (_cstring* R, bool IsThread) {
 	JB_ErrorNumber = 0;
 	JB_TaskData.Size = 128;
 	Flow_Disabled = 0x7fffFFFF;
-	
 
 	static_assert((sizeof(ivec3) == 16 and sizeof(ivec4)==16 and sizeof(ivec2)==8) and sizeof(vec3) == 16 and sizeof(vec4)==16 and sizeof(vec2)==8 and sizeof(int) == 4  and  sizeof(int64) == 8, "sizeof type");
     if (JB_MemStandardWorld()->CurrSuper)
@@ -198,8 +203,8 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
 			if (!IsThread) {
 				JB_App__CrashInstall();
 				if (getppid() > 1)
-					PicoGlobalConf()->SuicideIfParentDies = true;
-				// default Pico to suicide, if run. GUI.init will reset this.
+					PicoGlobalConf()->Observer = JB_CareTaker;
+				// GUI.init should reset this. (Does it?)
 			}
 			atexit(JB_KillChildrenOnExit);
 			

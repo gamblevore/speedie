@@ -1,65 +1,50 @@
 
 	
 function StringReader.CompressInto (|object| dest, |int| Strength=mzlab.default, |?&compressionstats| st=nil) 
-	expect (self!=nil) ("Nil object given to CompressInto")
-	|jbin| j = faststring.use(dest)				#require
+	|| fs = faststring.UseAsOutput(dest)				#require
 	st = st.start
-	(strength)
-	j <~ _JbinHeader
-	j.enter(@tmp, "µz")
-	j.addint(.length)
-	j.enter(@arg)
-	st.Out += j.StreamLength
-	while .hasany
+	fs <~ "mz\n\02"
+	fs.AppendInt(.length)
+	st.Out += 8
+	while .HasAny
 		|| str = .str(4MB)
-		|| A = j.StreamLength
-		|| Place = j.OpenSection
-		j.CompressChunk(str)
-		j.CloseSection(Place.x, place.y, @bin)
-		st.LiveUpdate(str.length, j.streamlength - A, true)
-		if !.NoMoreChunks
-			j.flush // we are calling it after anyhow	
-	st.out += j.exit(2)
-	j.flush			// we definitely need to flush it.  Im serious!
-	// j.CompressChunk(nil)						// cleanup
+		|| O = fs.CompressChunk(str, strength)
+		|| N = str.length
+		st.LiveUpdate(N, O, true)
+		fs.flush
 	st.end
 
 
-helper StringReader.DecompressInto (|object| dest,  |int| lim=int.max,  |&compressionstats| st=nil,  |bool|)
-	|| fs = faststring.use(dest)				#require
-	if !.IsCompressed
-		fs <~ .readall
-		return true
-
-	.ExpectJbin
-	|| mz = .NextMsg(@tmp)
-	|| Remaining = .NextMsg(mz, @num).int
-	|| arg = .NextMsg(mz, @arg)
-
-	if (Remaining > 0) and (Remaining <= lim) and (arg)
-		st = st.start
-		while (|| c = .NextMsg(arg, @bin))
-			|| Expected = 4MB min remaining
-			fs.DecompressChunk(c.name, expected) #loop
-			Remaining -= Expected
-			fs.Flush
-			st.LiveUpdate(c.length, Expected, false)
-			c.remove
-		st.end
-	  elseif Remaining > lim
-		error (self, "mz would decompress too large")
-	  else
-		error (self, "Invalid mz header")
-	
-	return !.Data.WentBad
-
 		
-helper faststring.CompressChunk (|string?| Input, |int| level = 2) 
-	description "Passing nil Input, frees the internal buffers" 
-	nil self
+function StringReader.DecompressInto (|object| dest,  |uint| Limit=512MB,  |&compressionstats| st=nil,  |bool|)
+	|| header = .str(4)
+	expect (header.IsCompressed)					(self, "Can't decompress non-mz data")
+	|| Remain = .UInt(4)
+	expect (Remain <= Limit)						(self, "mz would decompress too large")
+	
+	|| fs = FastString.UseAsOutput(dest)
+		rz = .DecompressIntoSub(fs, Limit, st.start, Remain)
+			
+
+helper StringReader.DecompressIntoSub (|faststring| fs,  |int| OutLim,  |&compressionstats| st, |int| OutRemain, |bool|)
+	while OutRemain > 0
+/		|| InSize = .UInt(4) - 4
+		expect (InSize < 16MB) 						(self, "mz chunk too large")
+		|| ChunkData = .str(InSize)
+		expect (ChunkData == InSize) 				(self, "mz input too short")
+		|| OutSize = fs.DecompressChunk(ChunkData)	#loop
+		OutRemain -= OutSize
+		fs.Flush
+		st.LiveUpdate(InSize+4, OutSize, false)
+	st.end
+	
+	return !OutRemain						#expect (self, "mz output too big" )
+			
+		
+helper faststring.CompressChunk (|string| Input, |int| level, |int|) 
 	cpp_wrapper JB_Str_CompressChunk
 
 
-helper faststring.DecompressChunk (|string| Input, |int| Expected=0, |int|) 
+helper faststring.DecompressChunk (|string| Input, |int|) 
 	cpp_wrapper JB_Str_DecompressChunk
 

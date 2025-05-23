@@ -172,9 +172,6 @@ function StringMemory (|int64|)
 function OtherMemory (|int64|)
 	cpp_wrapper JB_MemUsedOther
 
-function ClearCaches
-	(nil|faststring|).CompressChunk(nil)
-
 //function Expired (|date| period, |date| From = __now__, |date|)
 //	|| expiry = period + from
 //	if gui.FrameStart > expiry

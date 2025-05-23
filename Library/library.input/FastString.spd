@@ -130,7 +130,7 @@ class FastString {
 
 
 	module
-		function Use (|object| other, |FastString|)
+		function UseAsOutput (|object| other, |FastString|)
 			if other isa FastString
 				return other
 			if other isa string

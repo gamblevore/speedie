@@ -1,42 +1,24 @@
 
 
-extend string
-	function Compress (|int|Strength=mzlab.default, |?&compressionstats| st = nil, |string|) 
-		|| j = jbin(0)
-		.Stream.CompressInto(j, strength, st)
-		return j
-		
-	function CompressInto (|object| fs, |int| Strength = mzlab.default, |?&compressionstats| st=nil) 
-		.Stream.CompressInto(fs, strength, st)
-	
-	function IsCompressed (|bool|)
-		return .isjbin and self[_jbinheader.length, "\0B\03µz"]
-	
-	function DecompressInto (|object| fs, |int| lim=256MB,  |?&compressionstats| st=nil, |bool|)
-		cpp_part DecompressInto
-		return .stream.Decompressinto(fs, lim, st)
-	
-	function Decompress (|int|lim=256MB, |?&compressionstats| st=nil,  |StringThatWasReadSafely|)
-		return .stream.Decompress(lim, st)
-
-
-function StringReader.Decompress (|int|lim=256MB, |?&compressionstats| st=nil,  |StringThatWasReadSafely|)
+function string.Compress (|int|Strength=mzlab.default, |?&compressionstats| st = nil, |string|) 
 	|| fs = faststring()
-	while .HasAny
-		if !.Decompressinto(fs, lim, st)
-			fs.Length = 0
-			exit
+	.Stream.CompressInto(fs, strength, st)
 	return fs
+	
+
+function string.Decompress (|int|lim=256MB, |?&compressionstats| st=nil,  |StringThatWasReadSafely|)
+	if !.iscompressed
+		return self
+	|| err = string.error
+	|| fs = faststring()
+	if .stream.Decompressinto(fs, lim, st)
+		err = fs
+	return err
 
 
-function StringReader.IsCompressed (|bool|)
-	|| str = .StrNoAdvance(16)
-	return str.IsCompressed	
+function string.IsCompressed (|bool|)
+	return self[0, "mz\n\02"]
 
-
-function FastString.CompressInto (|object| fs, |int|Strength=mzlab.default, |?&compressionstats| st=nil)
-	|| str = string.fromptr(.resultptr, .length)
-	str.CompressInto(fs, Strength, st)
 
 
 	
@@ -44,9 +26,10 @@ function FastString.CompressInto (|object| fs, |int|Strength=mzlab.default, |?&c
 Module MZLab 
 	constants
 		None      = 0			// none
-		Strong    = 2			// 
-		Strongest = 3			// 
-		Default   = strong		// its good enough!
+		Fast	  = 10			// old mz?
+		Strong    = 20			// 
+		Strongest = 30			// 
+		Default   = strong		// its fast enough!
 		
 	function TestMz (|string| path, |bool|)
 		if path
@@ -97,23 +80,15 @@ Module MZLab
 
 
 	function TestCompression
-		|| d = file.speediedir.child("Speedie.scproj/speedie.input/ASMBuilder/").file
-		require d.exists
-		|[string]| Inputs
-		for ch in d.ListFiles
+		|| f = file.speediedir.child("Speedie.scproj/speedie.input/ASMBuilder/").file
+		require f.exists
+		for ch in f.ListFiles
 			if ch.visible
-				inputs <~ ch.ReadAll
-	
-		|| total = 0
-		|| fs = FastString()
-		for str in inputs
-			total += str.length
-			str.CompressInto(fs)
-		
-		|| back = fs.GetResult.stream
-		for orig in inputs
-			expect orig == back.decompress
-		expect (back.NoMoreChunks) and !back.Decompress.length
+				|| s = ch.ReadAll
+				|| c = s.compress
+				|| d = c.Decompress
+				expect s == d
+
 		"TestCompression passed."
 
 

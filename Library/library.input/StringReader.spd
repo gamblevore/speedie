@@ -94,32 +94,17 @@ class StringReader
 			rz |= b
 		
 	function bInt0 (|int|n=3, |int64|)
+		disabled  "No need?"
 		// 0-3 works better for bit-math
 		return .bint(n+1)
 
 	function lInt0 (|int|n=3, |int64|)
+		disabled  "No need?"
 		for i in n+1
 			|| b = .byte
 			loop b >= 0
 			rz |= b << i << 3
-
-
-	function Small (|uint64|)
-		|| b = .byte
-		if b < 224
-			return b
-		return 32 + ((.hint<<5) ||| (b-224))
-
-
-	function faststring.AppendSmall (|uint64| n)
-		if n < 224
-			self <~ n|byte|
-		  else
-			n -= 32
-			self <~ (224+(n & 31))|byte|
-			.hInt(n>>5)
-
-
+		
 	function hInt (|int64|)
 		|| sh = 0
 		|| v  = 0
@@ -132,7 +117,7 @@ class StringReader
 			sh += 7
 			expect (sh <= 57) (self, "Corrupted hInt")
 	
-	function DString (|byte| split, |string|)
+	function DelimitedString (|byte| split, |string|)
 		// this function doesn't work with streaming...
 		// its not ideal. but none of my code needs this streamed!
 		// they just read the entire file in. So I don't need it!
@@ -142,17 +127,23 @@ class StringReader
 			return .data[p, zpos] // don't call .section, seeing as its not streaming.
 
 	function CString (|string|)
-		return .dstring(0)
+		return .DelimitedString(0)
 	
 	function UpTo (|int| end, |int|)
 		return end - .position
 	
-	function UInt (|int| size, |int| mult=256, |uint64|) // mult used by selftools id3 decoder, passes 128.
-		for size
-			|| b = .byte
-			loop b >= 0
-			rz *= mult
-			rz += b
+	function Int32BE (|int|)
+		return .uintbe(4)
+
+	function UIntBE (|int| Size, |uint64|)
+		for Size
+			rz <<= 8
+			rz += .byte max 0
+
+	function UInt (|int| size, |uint64|)
+		for i in size
+			|| b = .byte max 0
+			rz += b << (i<<3)
 	
 	function Trim (|int| n, |string|)
 		return .str(n).Trim
@@ -165,7 +156,7 @@ class StringReader
 		rz = .str(n)
 		.Position = p
 	
-	function NoMoreChunks (|bool|)
+	function NoMoreChunksToRead (|bool|)
 		if ._NoMoreChunks
 			return true
 		if .data.Remaining <= 0
@@ -177,7 +168,7 @@ class StringReader
 	 function Str (|int| n, |int| skip = 0, |string|)
 		ifn n > 0 and skip < n
 			return ""
-		if (.data.has(n)) or (.NoMoreChunks)
+		if (.data.has(n)) or (.NoMoreChunksToRead)
 			(n min= .remaining)
 			|| pos = .data.position		// no need use the .startfrom
 			.data.position = n + pos
@@ -196,16 +187,11 @@ class StringReader
 				 exit
 		return r
 	
-	function UTF8 (|int|n, |int|skip=0, |string|)
-		return  .str(n,skip).utf16to8(2)
-
-	function Test (|string| Header, |bool|)
+	function HasHeader (|string| Header, |bool|)
 		if !Header
 			return true
 		return Header == .str(Header.length)
 	
-	function UInt16 (|uint16|)
-		disabled "use .uint(2)"
 
 	iterator
         while
@@ -238,7 +224,7 @@ class StringReader
 function string.Stream (|string| Header, |stringreader|)
 	cpp_part StreamWithHeader
 	rz = StringReader(self)
-	if !rz.test(Header)
+	if !rz.HasHeader(Header)
 		rz = nil
 
 	
