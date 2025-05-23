@@ -2,8 +2,14 @@
 
                                                        Todo
 
+* jz -d /Users/theodore/Compression/SF.xml.mz // fail
+* small floats printing wrong
+* breakpoints on click line num
+* click on ch to view bytes.
+* caller list should select current func?
+
+
 // VM
-* OldNum needs Refresh
 * Intrinsics
 * SIMD
 * opt ReadOrWriteSub for ADPK.
@@ -11,19 +17,14 @@
 * clami/clamu 32-bit
 * debug info! in pack
 
-* jz -d /Users/theodore/Compression/SF.xml.mz // fail
 * Perry exec
 	* exec send back debug-info
-* small floats printing wrong
 * "debug mode" VM
 * Check for funcs in the lib that need removing (ASM)
 * Save ClassProperty hash per-class in exec-lib... for when properties change!
-* breakpoints on click line num
-* click on ch to view bytes.
 
 
 * // Perry Release
-* caller list should select current func?
 * step into func... ignoring param funcs
 * TextView error/find resync (make both options work side by side then detect first difference. also script a few events?)
 * scroll no longer saved for fwd/backward! undo system needs to set it on doc/load but not type/undo

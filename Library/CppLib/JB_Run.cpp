@@ -163,12 +163,22 @@ void JB_Str__LoadGlobals () {
 	if (Read != ReadEnd) {JB_Load_StrError(2);}
 }
 
+
 void JB_FinalEvents() {
 	AddError(JB_Rec_ShellPrintErrors(nil),	"jb.stderr");
 	JB_LibShutdown();
 	JB_RemoveHandlers(); // some wierd systems call signals after we exit??
 	JB_KillChildrenOnExit();
 }
+
+
+void JB_CompFreer();
+int JB_CareTaker() {
+	JB_CompFreer();
+	return -(getppid() <= 1);
+}
+
+
 
 Array*	JB_App__Args()						{ return App_Args; }
 JB_StringC*	JB_App__CallPath()				{ return JB_StrC(App_CallPath); }
@@ -177,12 +187,8 @@ bool	JB_LibIsShutdown()					{ return JB_MemStandardWorld()->Shutdown; }
 bool	JB_LibIsThreaded()					{ return JB_Active & 4; }
 void	JB_App__CrashInstall();
 int		JB_SP_AppInit();
+void	JB_App__SuicideIfParentDies(bool Die)	{ PicoGlobalConf()->Observer = Die?JB_CareTaker:JB_CareTaker; }
 
-
-int JB_CareTaker() {
-	void JB_CompFreer(); JB_CompFreer();
-	return -(getppid() <= 1);
-}
 
 
 int JB_SP_Init (_cstring* R, bool IsThread) {

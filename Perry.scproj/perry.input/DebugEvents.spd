@@ -262,7 +262,15 @@ function ReturnVariables (GUIListEvent)
 function DebugStepOver (guiaction)
 	beep "over"
 	
+	
+function DebugStepInCutely (guiaction)
+	// goes in a function IGNORING the functions in params
+	beep "cutely in"
+	
+	
 function DebugStepIn (guiaction)
+	if keys.Shift
+		return DebugStepInCutely(self, state, row, prev)
 	beep "in"
 	
 function DebugStepOut (guiaction)

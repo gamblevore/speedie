@@ -177,7 +177,6 @@ struct PicoGlobalConfig
 	|Date|						TimeOut
 	|int|						ExitCode
 	|int|						DesiredThreadCount
-	|bool|						SuicideIfParentDies
 	
 
 struct PicoGlobalStats

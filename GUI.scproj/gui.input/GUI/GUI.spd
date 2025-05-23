@@ -397,7 +397,7 @@ module GUI
 		.DrawFrameLength = 60th.date // could try changing this to 61th?
 		
 		.GUICheck
-		pico.GlobalConfig.SuicideIfParentDies = false
+		app.SuicideIfParentDies = false
 		pico.start
 		.OpenedFirst = date.now
 		.ForeGroundTime = .OpenedFirst
