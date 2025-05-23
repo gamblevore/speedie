@@ -445,12 +445,13 @@ static DateLocker		CompAllocator;
 static u8*				CompSpace;
 
 
-extern "C" void JB_CompFreer() {
+extern "C" int JB_CompFreer() {
 	if (CompAllocator.start_clear(10*64*1024)) {	// 10s ago!
 		free(CompSpace);
 		CompSpace = 0;
 		CompAllocator.cleared();
 	}
+	return 0;
 }
 
 

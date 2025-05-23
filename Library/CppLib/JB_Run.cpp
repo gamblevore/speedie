@@ -172,7 +172,7 @@ void JB_FinalEvents() {
 }
 
 
-void JB_CompFreer();
+int JB_CompFreer();
 int JB_CareTaker() {
 	JB_CompFreer();
 	return -(getppid() <= 1);
@@ -187,7 +187,7 @@ bool	JB_LibIsShutdown()					{ return JB_MemStandardWorld()->Shutdown; }
 bool	JB_LibIsThreaded()					{ return JB_Active & 4; }
 void	JB_App__CrashInstall();
 int		JB_SP_AppInit();
-void	JB_App__SuicideIfParentDies(bool Die)	{ PicoGlobalConf()->Observer = Die?JB_CareTaker:JB_CareTaker; }
+bool	JB_App__SuicideIfParentDies(bool Die)	{ PicoGlobalConf()->Observer = Die?JB_CareTaker:JB_CompFreer; return 0; }
 
 
 

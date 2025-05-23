@@ -34,7 +34,7 @@ bool JB_LibIsThreaded();
 
 // APP
 void JB_App__Beep ();
-void JB_App__SuicideIfParentDies(bool Die);
+bool JB_App__SuicideIfParentDies(bool Die);
 void JB_App__SetIcon (const char* Path);
 void JB_App__InitStuff ();
 void JB_SDL_RemoveWindowBorder (void* window);

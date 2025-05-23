@@ -171,7 +171,7 @@ function StringMemory (|int64|)
 function OtherMemory (|int64|)
 	cpp_wrapper JB_MemUsedOther
 
-function SuicideIfParentDies (assigns:|bool|)
+function SuicideIfParentDies (assigns:|bool|, |bool|)
 	cpp_wrapper JB_App__SuicideIfParentDies
 	
 function Env (|dictionary of string|)
