@@ -201,8 +201,10 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
         return EADDRINUSE;
     if (!(EmptyString_ = emptystr()))
         return ENOMEM;
+        
 	if (R) {
 		App_CallPath = *R;
+		
 		#ifndef AS_LIBRARY
 			int err = dup2( STDOUT_FILENO, STDFUN_FILENO );	// reserve StdFUN
 			err = dup2( STDOUT_FILENO, STDPICO_FILENO );	// reserve StdPico
@@ -210,12 +212,11 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
 				JB_App__CrashInstall();
 				if (getppid() > 1)
 					PicoGlobalConf()->Observer = JB_CareTaker;
-				// GUI.init should reset this. (Does it?)
 			}
 			atexit(JB_KillChildrenOnExit);
-			
 		#endif
 	}
+	
 	App_Args = JB_Incr(JB_Str_ArgV(R));	// allow caller to remove their c-string data.
     
     ErrorString_ = emptystr();
