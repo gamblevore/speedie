@@ -4,6 +4,7 @@ module Interact { // module autocomplete
 cpp_part AC
 
 |scfunction|		AnonFn
+|scobject|			OrigFn
 |string|			AnonText
 |SCNode|			AnonParent
 |errorreceiver|		Errors
@@ -328,16 +329,16 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 		return nil
 	if parent == .AnonParent and str == .anontext
 		return fn
-	|| orig = fn.InsertIn(parent, src.name)
+	OrigFn = fn.InsertIn(parent, src.name)
 	|| pos = mpos.int
 	parser._dotinsertallow = true
-	if fn.update_source(pos, str.name, orig)
+	if fn.update_source(pos, str.name)
 		.AnonParent = parent
 		.anontext = str.name
 		return fn
 
 
-function SCFunction.Update_Source (|int| start, |string| text, |SCObject| orig, |bool|)
+function SCFunction.Update_Source (|int| start, |string| text, |bool|)
 	scfunction.currfunc = self
 	parser.using.position = -1
 	parser.using.Flags = 0 // oop
@@ -352,7 +353,7 @@ function SCFunction.Update_Source (|int| start, |string| text, |SCObject| orig, 
 		parser.using.Flags = MsgParseFlags.Inserted
 		|[message]| list
 		rz = .UpdateSourceSub(source, list)
-		source.obj = orig.disambiguate(source)
+		source.obj = interact.OrigFn.disambiguate(source)
 	parser.using.Flags = 0
 	parser.using.Tag = 0
 
@@ -916,16 +917,16 @@ function Message.AutoMsgFuncFn (|SCFunction|)
 	rz ?= .parent.MsgFunc
 
 
-function CallFromDefine (|message| msg, |scfunction| fn,  |object| found, |message|)
+function CallFromDefine (|message| msg, |scfunction| fn, |object| found, |message|)
 	rz = @tmp + "callfrom"
 	|| arg = rz.msg(@arg)
-	|| define = .define(msg, "define", found)
+	|| define = .Define(msg, "define", found)
 	define ?= @tmp + "nodefine"
 	define <~ fn.name
 	arg <~ define
 
 
-function CallFrom (|message| msg, |object| found=nil,  |message|)
+function CallFrom (|message| msg, |object| found=nil, |message|)
 	opt norefcounts
 	
 	|| fn = msg.AutoMsgFuncFn
@@ -942,7 +943,9 @@ function CallFromSub (|message| arg, |scfunction| fn)
 				item <~ (@sstr, f)
 				item <~ call_point.CallFromName
 				item <~ s.FuncPos(fn)
-
+				if call_point == OrigFn
+					item <~ (@char, "curr")			
+			
 
 helper Message.FuncPos (|scfunction| fn, |int|)				
 	opt norefcounts

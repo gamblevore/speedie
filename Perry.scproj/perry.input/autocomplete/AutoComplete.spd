@@ -13,6 +13,15 @@ function message.PrependHeader (|string| name, |int| pos)
 	(header is Disabled)
 
 
+function PerryIDE.CallFromSelect (|listviewrow| list)
+	opt norefcounts
+	for s in list
+		|| mark = s.last
+		|| IsCurr = mark == @char and "curr"
+		(s is Active) = iscurr
+		(s is selected) = iscurr
+
+
 function PerryIDE.CallFromFB (|message| list, |bool|)
 	.ClearAutoComplete
 	list = list.last
@@ -24,13 +33,13 @@ function PerryIDE.CallFromFB (|message| list, |bool|)
 	
 	list.sort(CallFromSorter)
 //	.ImproveFuncList(list) // the lists are too different. I'd need to reorganise it
-	list.prependheader("", 1)
+	list.PrependHeader("", 1)
 	list.first = define
-
 	.autocomplete.listsource = list!
 	.SetAutoPoint(.editme.sel0)
-	.showauto
+	.ShowAuto
 	(.AutoComplete isnt typethrough)
+	.CallFromSelect(list)
 
 
 function message.DefineToLine (|int| count)

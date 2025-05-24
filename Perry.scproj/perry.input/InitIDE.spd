@@ -42,7 +42,8 @@ extend PerryIDE
 		.FileList			= FileViewer(self,		SelectedFile,			nil, .editme) 
 		.EditStatus			= TextView(self,		ClickedStatus)
 		.ProjectInfo		= TextView(self,		ClickedProjectInfo)
-		.SelInfo			= TextView(self,		PressedSelInfo)
+		.CharInfo			= TextView(self,		PressedCharInfo)
+		.LineInfo			= TextView(self,		PressedLineInfo)
 		.JeeboxText			= TextView(self)
 		.SpeedieText		= TextView(self)
 		.ProductOut			= TextView(self)
@@ -407,14 +408,22 @@ extend PerryIDE
 			.size 			= the~left for 400  by  0 to 13
 			.gnormal.clear
 
-
-		with .SelInfo 
-			.ID				= "SelInfo"
-			.alignment		= MoveCode.MiddleRight
+		with .CharInfo 
+			.ID				= "CharInfo"
+			.alignment		= MoveCode.Center
 			.SingleLine		= TextView.singleline
 			isnt editable
 			.takesfocus		= 0
-			.size 			= the~right back 180  by  0 to 13
+			.size 			= 2~left back 92  by  0 to 13
+			.gnormal.clear
+
+		with .LineInfo 
+			.ID				= "LineInfo"
+			.alignment		= MoveCode.Center
+			.SingleLine		= TextView.singleline
+			isnt editable
+			.takesfocus		= 0
+			.size 			= 5~before back 75  by  0 to 13
 			.gnormal.clear
 
 		with .FileSep

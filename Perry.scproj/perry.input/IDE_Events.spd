@@ -323,13 +323,19 @@ function PerryIDE.BatchPhind (|string| text,  |uint| ID,  |bool| DoReplace,  |bo
 	return found.hasany
 
 
-function PressedSelInfo (GUIaction)
+function PressedLineInfo (GUIaction)
 	opt norefcounts
 	|| i = .ide
 	|| q = i.filelist.quickopen
 	q.text = "line " + i.editme.CurrLine.Render
 	i.filelist.showquickopen
 
+
+function PressedCharInfo (GUIaction)
+	opt norefcounts
+	|| i = .ide
+	i.BytesInfoMode = !i.BytesInfoMode
+	i.ShowRightStats
 
 
 function PressedSearchWithin (Guiaction)

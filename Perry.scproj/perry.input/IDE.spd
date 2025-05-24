@@ -40,7 +40,8 @@ class PerryIDE (Window)
 	|GraphicsEditor| 			DrawMe
 	|TextView|					EditStatus
 	|TextView|					ProjectInfo
-	|TextView|					SelInfo
+	|TextView|					LineInfo
+	|TextView|					CharInfo
 	|TextView|					UnNeededLabel
 	|TextView|					PopupDisplay
 	|message?|					LastExtraInfo
@@ -89,6 +90,7 @@ class PerryIDE (Window)
 	|int|						ShowProductIfMoreOutput
 	|byte|						DuringLoad
 	|byte| 						DuringTempView
+	|bool|						BytesInfoMode
 	|bool|						DuringASMEvent
 	|bool|						AlreadyExpandedCompileTab
 	|bool| 						StillJumping
@@ -286,10 +288,11 @@ class PerryIDE (Window)
 
 	function ShowRightStats
 		if .isgraphics
-			(.selinfo isnt visible)
+			(.charinfo isnt visible)
 			return
 		
-		(.selinfo is visible)
+		(.charinfo is visible)
+		(.lineinfo is visible)
 		|| fs = FastString()
 		|| t = .Editme.Text
 		|| sel0 = .editme.sel0
@@ -302,15 +305,19 @@ class PerryIDE (Window)
 		|| n = sel2.linecount-1			
 			fs <~ "+"
 			fs <~ n+1
-		fs.PadTo 9
-		fs <~ " ch "
-		fs <~ t.charcount(0, sel0)
-		n = sel.CharCount
+		.LineInfo.text = fs
+		
+		if .BytesInfoMode
+			fs <~ "byte $sel0"
+			n = sel.Length
+		  else
+			fs <~ "ch ${t.charcount(0, sel0)}"
+			n = sel.CharCount
 		if n
 			fs <~ "+"
-			fs <~ sel.CharCount
-		fs.padto 25
-		.SelInfo.text = fs	
+			fs <~ n
+
+		.charInfo.text = fs	
 
 	
 	function ProjName (|string|)

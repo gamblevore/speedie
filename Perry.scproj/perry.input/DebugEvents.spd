@@ -18,6 +18,7 @@ function DebugABC2
 	for 4
 		n *= n + 3
 
+
 function DebugABC2 (|int| x, |int|)
 	|| n = 1
 	if x
@@ -341,7 +342,6 @@ function ListView.AddFail (|string| s)
 	self <~ ListViewRow(s, D)
 
 
-
 function perryide.GotASM (|message| asm)
 	.DuringASMEvent = true
 	.GotASMSub(asm)
@@ -397,7 +397,6 @@ function SelectedASM (guilistevent)
 	i.DuringASMEvent = false
 
 
-
 class asm_test_obj
 	|int| i
 	constructor	
@@ -405,7 +404,6 @@ class asm_test_obj
 
 
 function Char (|int| x, |int|) // tab after here
-
 	return 0
 
 

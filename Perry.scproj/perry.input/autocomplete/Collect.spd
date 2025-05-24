@@ -122,18 +122,18 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 
 
 function PerryIDE.ActualCompile (|string| operation)
-	(operation) // i guess we'll use this later. debug vs compile
+	(Operation) // i guess we'll use this later. debug vs compile
 	if .compilr: return app.beep // wah?
 	
-	require .filelist.SaveAll(documentstate.saving)
-	|| IsSCProj  =  .name ~= "Speedie.scproj"
+	require .FileList.SaveAll(documentstate.saving)
+	|| IsSCProj = .name ~= "Speedie.scproj"
 	|| args = [.project, "--nocolor"]
 	if .DebugIsWaitingForCompile
 		args <~ "--usescriptloc"
-	if !IsSCProj
-		args <~ "--perry=bin"
-	  else
+	if IsSCProj
 		args <~ "--perry"
+	  else
+		args <~ "--perry=bin"
 
 	.LogOneAction(@emb + speedie + " " + args.render)
 	.compilr = process.Stream(speedie, args, faststring(), faststring())		#require
@@ -145,10 +145,11 @@ function PerryIDE.ActualCompile (|string| operation)
 	(.Progress is visible)
 
 	is active
-	.ShowCompileTab(.speedietext)
+	.ShowCompileTab(.SpeedieText)
 	.ViewAsCurr
 
 
 target debug
 	cpp_libwrapper Speedie_Main (spdprocess.ThreadAsProcess)
 || SpdLibAlreadyInUse = false
+
