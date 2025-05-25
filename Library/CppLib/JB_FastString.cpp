@@ -428,7 +428,7 @@ void JB_FS_AppendDoubleAsText (FastString* self, double D, int dp, bool CanExp, 
 		}
 		if (!Dot and N == 3 and Write[N-1] == '0')
 			N = 0;
-		JB_FS_AdjustLength_( self, 64, N-1 );
+		JB_FS_AdjustLength_( self, 64, N );
 		
 	} else if (Dot) {
 		JB_FS_AppendCString(self, ".0");
