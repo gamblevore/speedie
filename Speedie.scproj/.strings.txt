@@ -1965,7 +1965,7 @@
 "memzero"
 "Can't re-activate process without a path."
 "Can't decompress non-mz data"
-"SemiConst"
+"curr"
 "StringReader.IsJBin was not called."
 "Corrupted jbin"
 "Can’t use temporals like this."

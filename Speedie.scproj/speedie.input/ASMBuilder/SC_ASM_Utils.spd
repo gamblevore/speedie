@@ -48,7 +48,7 @@ target debug
 
 
 
-function asmstate.CloseOneVar (|message?| exp, |int| OriginalDecls,  |message?|)
+function asmstate.CloseOneVar (|message?| exp, |int| OriginalDecls, |&bool| DoMore,   |message?|)
 	opt norefcounts
 	
 										  /// READ TABLE ///
@@ -59,11 +59,13 @@ function asmstate.CloseOneVar (|message?| exp, |int| OriginalDecls,  |message?|)
 	
 										   /// UNHOIST ///
 	|| k = .KnownValues[v]
-		if k.µRefCount <= 1 // HoistComplete did +1 on it's refcount earlier. So it is unused.
-			.Nop(k)
+		|| DebugView = !.state.inlinedepth  and  originaldecls >= 0  and  options.optimise < 4
+		if !DebugView  and  k.µRefCount <= 1 // HoistComplete did +1 on it's refcount earlier. So it is unused.
+			.Nop(k) 
 		  else
 			if (k isa asm.gtab) and (v == OriginalDecls + 1) // this happens to be the first gtab and it is used.
-/				return exp // keep it
+				DoMore[] = false
+				return nil // keep it
 			k.µRefCount-- // restore :)
 		.KnownValues[v] = nil
 	.HoistMap &=~ (1<<v)

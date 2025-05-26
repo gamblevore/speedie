@@ -458,9 +458,7 @@ function CanKeepAsValue (|sciterator| iter, |Message| arg, |scdecl| dcl, |Messag
 function Tran_For (TranFunc)
 	using (node)
 		name_space = node.scarg( name_space )!
-		SCFunction.InBranch++
 		tran_ForSub(fn, node, name_space)
-		SCFunction.InBranch--
 		Tran_All_Final(fn, node, name_space, @arg)
 	return true // Stop caller redoing Tran_All_Final!
 
@@ -638,7 +636,9 @@ function Tran_ForSub (TranFunc)					// :3
 		// what if we just collect only the decls we added?
 	
 		EndLoopMarker.Remove
+		SCFunction.InBranch++
 		rz = Tran_WhileSub( fn, node2, p2 )
+		SCFunction.InBranch--
 
 
 function Tran_Sdt (|Message| exp)

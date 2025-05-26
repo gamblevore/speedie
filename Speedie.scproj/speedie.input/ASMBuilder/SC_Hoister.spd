@@ -27,13 +27,16 @@ struct SC_Hoister
 		
 		|| fat = exp.GTAB(dest,  (d.IsLib)|int|,  iTable>>6)
 		fat.Const = iTable&~63
+		(dest is CanHoist)
 		Dest = fat * dest
 		dest.µtype = DataTypeCode._voidptr
 		return dest.HaveAddr
 	
 	
 	function ASMState.Hoist (|?&fatasm| fat, |int| n)
-		if "SemiConst".trap
+		if fat == sh.KnownValues[n]
+			return // already done. Probably a number.
+		
 		target debug
 			if sh.HoistMap & (1<<n)		// what?
 			if sh.knownvalues[n]		// what?
@@ -77,6 +80,7 @@ struct SC_Hoister
 		opt NoRefCounts
 		require !.CanReuseConst(decl)
 		|| dest = sh.DeclareMe(prop, decl)
+		(dest is canhoist)
 		|| K = sh.NumToReg(prop, decl.ExportPosition, dest, dest.µtype)
 		.HoistComplete(dest, Decl, k, sh)
 

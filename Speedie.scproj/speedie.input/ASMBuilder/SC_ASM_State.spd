@@ -64,11 +64,13 @@ struct ASMState
 		|| OrigDecls = Orig >> 8
 		|| OrigTemps = orig & 255
 
-		while .VDecls > OrigDecls
-			exp = .CloseOneVar(exp, OrigDecls)
-
+		|| DoMore = true
 		while .VTemps < OrigTemps
-			exp = .CloseOneVar(exp, -1)
+			exp = .CloseOneVar(exp, -1, DoMore)
+
+		while DoMore and .VDecls > OrigDecls
+			exp = .CloseOneVar(exp, OrigDecls, DoMore)
+			loop DoMore
 
 		return Return
 

@@ -1351,7 +1351,6 @@ function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side,  |SC
 
 	expect (msg == "--" or "++") (msg)
 	
-	|| P = msg.parent
 	Using (exp)
 	|message| exp_copy
 	if exp != @thg

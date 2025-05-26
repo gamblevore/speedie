@@ -308,29 +308,28 @@ function AllocBearStruct (|&asmstate| self, |message| exp, |int| v, |scdecl| ty,
 	size = (size+15)>>4
 	|| dest = v.asm
 	return exp.ALLO(dest, size*dir) * dest
-	
-	
-	
+
+
 function Decl (fn_asm)
 	opt norefcounts
 	
 	|| rel = exp.last!
 	|| ty = exp.fastdecl
-	if !exp.obj
-		debugger
-		ty = rel.first!.fastdecl
-	ty.DepthOfBranch = .state.BranchDepth		// Number scheme is different. ASM doesn't use .DepthOfBranch though?
+	ty.DepthOfBranch = .state.BranchDepth			// Number scheme is different. ASM doesn't use .DepthOfBranch though?
 	dest = .DeclareMe(rel, ty)
+
+	if !exp.obj or dest is CanHoist					// Huh?
 	if ty.IsBareStruct
 		return AllocBearStruct(self, exp, dest, ty, 1)
-		
-	|| item = rel.last!
+	
+	|| item = rel.Last!
 
-	if ty isnt local							// a carray or somthing?? idk
-	if (ty is alteredinbranch) or (ty isnt local)
-		(dest isnt canhoist)
+	if ty isnt local								// A carray or somthing?? idk
+	if (ty is AlteredInBranch) or (ty isnt local)
+//		(dest isnt canhoist)
 		return .µInto(item, dest)
 
+//	(dest is canhoist)								// We want to actually see the value, though?
 	|| K = .µInto(item, dest)
 	if k is ConstOutput
 		.MarkDeclAsConst(ty, k, nil)
@@ -791,17 +790,17 @@ function SetDeclToConst (|scdecl| decl, |asmreg| Initial, |&fatasm| f, |bool|)
 	debugger // ooof? 
 
 
-function MarkDeclAsConst (|scdecl| decl, |asmreg| Initial, |asmreg| NewValue)
+function MarkDeclAsConst (|scdecl| Decl, |asmreg| Initial, |asmreg| NewValue)
 	description "Marks Decl as a const, if it definitely is a const. Otherwise marks as NOT CONST. Also nops unused consts. Also updates new const value."
 	opt NoRefCounts
 	|| f = Initial.fat
 	if initial
-		require !.SetDeclToConst(decl, initial, f)
+		require !.SetDeclToConst(Decl, initial, f)
 
-// || k = 1, k = X	// clear here
-// y = k			// nice.
-	|| NewFat = newvalue.fat
-	if decl is Const
+// || k = 1, k = X	 // clear k=1
+
+	|| NewFat = NewValue.fat
+	if decl is Const // Clear old const avalue.
 		(decl isnt const)
 		if f
 			.AskNop(f)

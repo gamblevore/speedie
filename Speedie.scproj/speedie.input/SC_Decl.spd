@@ -168,7 +168,10 @@ class SCDecl (SCNamed) {
 
 	syntax is (|SCDeclInfo| d, assigns:|bool|)
 		.sanity
-		.info = .info.set(d, Value)			
+		.info = .info.set(d, Value)	
+		if self is const
+			if .objectid == 58733806
+			
 		.sanity
 
 	function sanity
