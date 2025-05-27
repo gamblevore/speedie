@@ -278,6 +278,23 @@ function string.CountLines (|int|)
 ````
 
 ---
+
+### Random Numbers
+
+Sometimes you just want a random number. Perhaps for a test or demo project. If thats all you want, and you don't want to make your own random number generator object instead... try this:
+
+    || x = 6()        // Returns an int from 0 to 5.
+    || y = (x+6)()    // Returns a number from 6 to 11.
+
+Quite handy, and cute for little demos. As for generating booleans, you can do this:
+
+    || Passed = 0.5[]          // One in 2 chance of returning true
+    || Third = 0.3333333[]     // One in 3 chance of returning true
+    || Sixth = 6th[]           // One in 6 chance...
+
+
+---
+
 ### Bools
 Bools have special treatment. You can add or even multiply them with numbers. The above `rz` example demonstrates adding a bool.
 
