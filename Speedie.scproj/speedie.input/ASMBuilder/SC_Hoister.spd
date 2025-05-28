@@ -18,7 +18,7 @@ struct SC_Hoister
 		return .GlobAddrsub(d, exp, dest)
 	
 	
-	function ASMState.GlobAddrSub (|scdecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
+	function ASMState.GlobAddrSub (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 		opt norefcounts
 
 		|int64| iTable = d.ExportPosition

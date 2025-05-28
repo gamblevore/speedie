@@ -3,7 +3,7 @@
 struct InlineBlock
 	|scfunction!--|	Fn    
 	|asmreg|		Return
-	|byte|			VDecls
+	|byte|			ParentVDecls
 	|byte|			BranchDepth
 	|byte|			InlineDepth
 
@@ -254,6 +254,7 @@ struct ASMState
 		|| Type = asm.noop * (fat < ._curr)
 		fat.setop = Type
 	
+	
 	function Decr (|?&fatasm| f, |int| Depth=0)
 		if f
 			|| C = f.µrefcount
@@ -262,17 +263,15 @@ struct ASMState
 			if C <= 0
 				.Nop(f, depth)
 	
+	
 	function SofterNop (|FATASM| Fat)
-		fat.setop = asm.noop
+		fat.SetOp = asm.noop
 
 	
 	function AskNop (|fatasm| f)
 		if f.µRefCount <= 0
-			.nop(f)
+			.nop(f)	
 
-	function RewindInline (|fatasm| start)
-		.NopRange(start, .curr)
-	
 	
 	function NopRange (|fatasm| Start, |fatasm| After)
 		while start < After
@@ -455,27 +454,21 @@ struct ASMState
 			rz |= (8-ic) << 0
 		  else
 			rz |= (17-ic) << 6
-
-
-	function VDeclsExit (|asmreg| dest, |int|)
-		if (dest is ExitAtAll) and .state.return
-			return .state.VDecls
-		return .VDecls
 			
 
 	function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
-		|| v = .VDeclsExit(Dest)
-		// If we increase .vdecls... then what about .vars[]?		
-		
+		|| v = .VDecls					// Exit(Dest)
 		v += (!v or dest.reg != v)
 		|| diff = v - .VDecls
-		if diff > 1			// hmmm, vDeclsExit? Probably OK but I just want to see this in act.
-		if diff == 1 // shouldn't we fill in the .vars[]?
+		if diff == 1
 			.vars[v] = fn.RealReturnType
 			if .vars[v] isnt Return and .vars[v] != typevoid
 		
 		.Vdecls = v
+		
 		check (v < 32) (exp, "Too many registers in use. No space for result.")
+		if (dest is ExitAtAll) and .state.return
+			v = .state.parentvdecls
 		dest.reg = v
 		dest.µtype = fn.ASMRegType
 		return dest.ReallySimplify
@@ -607,7 +600,9 @@ struct ASMState
 	function TryInline (|message| prms, |asmreg| dest, |scfunction| fn, |int| AllowedGain, |asmreg|)
 		opt norefcounts
 		|| Start = .curr
-		|inlineblock| Old = .state
+		|| OV = .OpenVars
+		
+		|inlineblock| Old = .State			// can't use implicit types for barestructs
 		if !dest.reg and fn.ASMReturn
 			if dest isnt discard
 				Dest = .TempOnly(prms, dest)
@@ -620,12 +615,12 @@ struct ASMState
 		|int| D = ++.state.InlineDepth
 		.DeepestInline = D max .DeepestInline
 		
-		.state.fn = fn
 		dest = dest.simplify
 		dest.µtype = fn.ASMRegType
+		.state.fn = fn
 		.state.Return = dest
-		.state.VDecls = .vdecls
-		.state.branchdepth = 0
+		.state.ParentVDecls = .VDecls
+		.state.BranchDepth = 0
 		
 		rz = .TryInlineSub(prms, fn, AllowedGain)
 	
@@ -633,7 +628,8 @@ struct ASMState
 		if .state.InlineDepth == 0
 			.InlineEnd = nil
 		if !rz
-			.RewindInline(start)
+			.NopRange(start, .curr) // rewind
+		.CloseVars(OV)
 
 	
 	function TryInlineSub (|message| prms, |scfunction| fn, |int| AllowedGain,  |asmreg|)
@@ -712,14 +708,17 @@ struct ASMState
 		if !.state.InlineDepth
 			.InlineDepthLimit = 3
 			.DeepestInline = 0
-			.InlineEnd = .curr + allowedgain
+			.InlineEnd = .curr + AllowedGain
+		
 		|| I = .TryInline(prms, dest, fn, AllowedGain)
-			return I		
-		if !.state.InlineDepth and .DeepestInline > 1
-			.InlineDepthLimit = 1
-			i = .TryInline(prms, dest, fn, AllowedGain)
-			if i
-				return i
+			return I
+		
+		// try weaker inline
+		require !.state.InlineDepth and .DeepestInline > 1
+
+		.InlineDepthLimit = 1
+		return .TryInline(prms, dest, fn, AllowedGain)
+
 
 	iterator
 		|| h = .hoistmap

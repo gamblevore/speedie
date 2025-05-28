@@ -74,10 +74,8 @@ function asmstate.CloseOneVar (|message?| exp, |int| OriginalDecls, |&bool| DoMo
 										/// NOP UNUSED VARS ///
 	if d is CompilerCreated
 		|| f = d.fat
-			if f == k // ???
-				debugger 
-			  else
-				.AskNop(f)
+			if  f.µrefcount == 1  and  f isa asm.allo // oof
+			.AskNop(f)
 
 
 									  /// DEALLOCATE STRUCTS ///

@@ -75,11 +75,6 @@ function Inline_Branch1
 	if hhhMaybeConst(0)
 		x = 2
 
-function gggFunc (|int| A, |int|)
-	if A > 1
-		return 5
-	return compiler.ConfMsg.SlowCount
-
 
 function IB2 (|scdecl| x, |bool|)
 	opt inline
@@ -99,6 +94,12 @@ function Inline_Branch2 (|scdecl| D)
 		x = 3
 	if gggFunc(1) > 4
 		x = 4
+
+
+function gggFunc (|int| A, |int|)
+	if A > 1
+		return 5
+	return compiler.ConfMsg.SlowCount
 
 
 function gggTest1 (|int| A, |int| B, |int|)

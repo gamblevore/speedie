@@ -350,6 +350,7 @@ function ArgSub (|&ASMState| self, |message| exp, |&sc_hoister| H, |AsmReg|)
 			if what & asmreg.exit							// .exit has two bits but "is" requires both
 				return .Closevars(ov, nil, what)
 
+	debugat 57
 	return .CloseVars(OV, exp)
 
 
