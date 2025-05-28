@@ -347,7 +347,7 @@ Obviously, these are in power of 2, so 1KB = 1024. Reporting sizes can be done n
 
     "${x.strsize} ${x2.strsize} ${x3.strsize}" // prints: "1024 2MB 1.5MB"
     
- <small>_(We reject the utterly retarded ISO kibble-bytes. We are proudly believe that 1024 is a kilobyte, and that everyone at ISO is a freaking moron who does not understand programming.)_</small>
+ <small>_(We reject the utterly retarded ISO kibble-bytes. We are proudly believe that 1024 bytes is a kilobyte, and that everyone at ISO is a freaking moron who does not understand programming.)_</small>
 
 ---
 ### Parsing
