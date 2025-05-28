@@ -210,10 +210,9 @@ You should see this output:
 
 You can't specify the output, as `main` always returns an `int`. You can specify a few things with `main`'s arguments. Not everything, but some basic ones: `string`, `int`, `float`, `file`, `message` and arrays of these. You can only use array **once** and it must come **last**.
 
-    #!/usr/local/bin/spd
     main (|int| Count, |string| Msg, |float| Fraction)
-        for Count
-            "$Msg: $Fraction * $i = ${Fraction*i|float64|}"
+    for i in Count
+        "$Msg: $Fraction * $i = ${Fraction*i|float64|}"
 
 Running this you should see:
 
