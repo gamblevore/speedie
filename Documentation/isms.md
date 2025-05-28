@@ -215,7 +215,7 @@ You can't specify the output, as `main` always returns an `int`. You can specify
         for Count
             "$Msg: $Fraction * $i = ${Fraction*i|float64|}"
 
-Runing this you should see:
+Running this you should see:
 
     /usr/local/speedie/Examples/main2.spd 3 "hello" 1.3
     hello: 1.3 * 0 = 0
