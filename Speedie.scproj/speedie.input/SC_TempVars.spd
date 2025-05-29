@@ -180,7 +180,6 @@ extend_module scfunction
 
 	function TempMoveOut (|Message| msg, |string| name="", |scdecl| type=nil, |Message!|)
 		cpp_part TypedTempMoveOut 
-		//debugat 58
 		// a.b.c -> || tmp1 = a.b.c
 	
 		|| Using = msg.SyntaxUsing

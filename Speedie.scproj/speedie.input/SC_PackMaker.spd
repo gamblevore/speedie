@@ -139,6 +139,7 @@ module PackMaker
 	function TestFn (|string| s, |scfunction--|)
 		opt norefcounts
 		|| mod = compiler.program.FindModule("ASMExamples")
+			|| regs = jb_vm.vm.registers(true) // clears
 			return mod.Findfunction(s)
 	}	
 		
@@ -174,7 +175,7 @@ module PackMaker
 				
 		fn = .testfn("Mul")
 		if fn
-			self[0] = 8725, self[2] = 4, self[1] = 275, self[3] = 2	
+			self[0] = 8725, self[1] = 275, self[2] = 4, self[3] = 2	
 			|| num = fn.TestObesity|&int64|[]
 			if num != 18000
 			
@@ -229,9 +230,6 @@ module PackMaker
 			.µprint(0)
 			return jb_vm.Run(mu2.ptr, mu2.length)
 	
-	
-//	function µfunc.DebugASM
-			
 	
 	syntax access (|int| v, assigns:|int64|)
 		|| r = jb_vm.vm.Registers(false)+v

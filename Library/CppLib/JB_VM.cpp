@@ -26,9 +26,9 @@ ivec4* JB_ASM_Registers(jb_vm* V, bool Clear) {
 		return 0;
 	auto Ret = V->Registers;
 	if (Clear) {
-		memset(Ret, 0xFE, sizeof(VMRegister)*34);
+		memset(Ret, 0xFE, sizeof(VMRegister)*35);
 	}
-	return (ivec4*)(Ret+2);
+	return (ivec4*)(Ret+3);
 }
 
 #ifdef __vm__
@@ -75,7 +75,7 @@ ivec4* RunVM (jb_vm& pvm) {				// vm_run, vm__run, vmrun, run_vm
 #endif
 	EXIT:;
 
-    return &pvm.Registers[0].Ivec;
+    return &pvm.Registers[1].Ivec;
 }
 
 

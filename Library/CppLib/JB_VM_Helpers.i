@@ -60,9 +60,9 @@ AlwaysInline void DivMath32(VMRegister* r, ASM Op) {
 			r[B].Int = (int64)((int)R3 % (int)R4);
 	} else {
 		if (A)
-			r[A].Int =(uint64)((uint)R3 /(uint)R4);
+			r[A].Int = (uint64)((uint)R3 /(uint)R4);
 		if (B)
-			r[B].Int =(uint64)((uint)R3 %(uint)R4);
+			r[B].Int = (uint64)((uint)R3 %(uint)R4);
 	}
 }
 
