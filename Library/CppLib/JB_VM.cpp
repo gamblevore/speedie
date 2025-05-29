@@ -39,20 +39,14 @@ jb_vm* vm;
 #include "JB_VM_Helpers.i"
 
 
-#define ı         Op = *Code++;   goto *JumpTable[Op>>24]; // goto *Next;
-#define ___     ; // Op = *Code++;   goto *JumpTable[Op>>24];
-#define __      ; // Op  = Op2;      ASMPrint(Op);
-#define _       ;  __   ___
+#define ı		Op = *Code++;   goto *JumpTable[Op>>24]; // goto *Next;
+#define _		;
 
 // more optimised system... but needs debugging for multi-asm instructions
-//#define ı         goto *Next;
-//#define ___       Op2 = *Code++;  Next = JumpTable[Op2>>24];
-//#define __      ; Op  = Op2;      ASMPrint(Op);
-//#define _         __   ___
 #define JumpLeaf(Addr)         LeafCode = Code;     Code = (Addr);
 #define VMGuardValue 1234567890
 
-ivec4* RunVM (jb_vm& pvm) {		// vm_run, vm__run, vmrun, run_vm
+ivec4* RunVM (jb_vm& pvm) {				// vm_run, vm__run, vmrun, run_vm
     const static void* jumptable[] = {
 #if __CPU_TYPE__ == __CPU_ARM__
         #include "InstructionList.h"
@@ -60,14 +54,20 @@ ivec4* RunVM (jb_vm& pvm) {		// vm_run, vm__run, vmrun, run_vm
     };
 	RegVar(&vm,			r19) = pvm;
     RegVar(Code,		r20) = vm.Env.CodeBase;
-    RegVar(r,			r21) = vm.Registers+1;	// space for stack + zeroreg
+    RegVar(r,			r21) = vm.Registers+2;	// space for stack + zeroreg
     RegVar(Op,			r22) = (ASM)-1;
     RegVar(JumpTable,	r23) = jumptable;
-	RegVar(& Stack,		r24) = vm.Registers[0].Stack;
-	Stack.Code = &vm.EXIT[0];
-	Stack.SavedReg = 0;
-	Stack.Alloc = VMGuardValue;		  	// Env.AllocCurr gets set to this on exit. // Quite harmless
-    r[0] = {};							// seems these regs don't contain the values I want (during debug?)
+    if ('_') {
+		vm.Registers[2] = {};
+		auto& Stack = vm.Registers[1].Stack;
+		Stack.Code = &vm.EXIT[0];
+		vm.EXIT[0] = 1; // just in case it got corrupted.
+		Stack.SavedReg = 0;
+		Stack.Alloc = 0;
+		Stack.Marker = 12345;
+		Stack.Marker2 = 123;
+	}
+    r[0] = {};
 #if __CPU_TYPE__ == __CPU_ARM__
 	ı;
 	#include "Instructions.i"
@@ -94,15 +94,11 @@ jb_vm* JB_ASM__VM() {
 	auto v = vm;
 	if (v) return v;
 	
-	int StackSize  = 1024*1024;			// Around 6400 ~fns deep. 
+	int StackSize = 1024*1024;			// Around 6400 ~fns deep. 
 	v             = (jb_vm*)calloc(StackSize, 1);
 	if (!v)
 		return 0;
 	vm = v;
-	v->EXIT[0] = 1;					// Halt cleanly
-//	v.Env.AllocCurr = 0;			// calloc did this already
-//	v.EXIT[1] = 0;					// Halt with error
-
 	v->StackSize  = (StackSize - sizeof(jb_vm))/sizeof(VMRegister);
 	return v;
 }

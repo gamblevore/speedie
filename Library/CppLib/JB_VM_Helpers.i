@@ -486,23 +486,28 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 
 
 
+// EXITCODES  REG00  STACK  REG00  REG01						// fn1 {fn2()}
+// EXITCODES  REG00  STACK  REG00  STACK  REG00  REG01			// fn2 
+// EXITCODES  REG00  STACK  REG00  00000 
+
 AlwaysInline ASM* ReturnFromFunc (jb_vm& vm, VMRegister*& r, ASM Op) {
-	JB_Decr(o2); // broken somewhere
+	JB_Decr(o2);
 	JB_Decr(o3);
-	VMRegister* stck = r-1;
-	auto R1 = stck - stck->Stack.SavedReg;
-	auto Code = stck->Stack.Code;
+	auto stck	= r - 1;
+	auto R1		= stck - stck->Stack.SavedReg;
+	auto Code	= stck->Stack.Code;
 	vm.Env.AllocCurr = stck->Stack.Alloc;
-	auto Imm = RET_Valuei; // get before copy!
-	auto Src = r+n1;
+	auto Imm	= RET_Valuei; // get before copy!
+	auto Src	= r + n1;
 	
-	*stck = *Src;
+	*stck		= *Src;
 	stck->Uint |= Imm; // immediate
 	if (RET_SafeDecru)
 		JB_SafeDecr(o1);
-	r = R1-1; // NewZero
-	*r = {};
-	return Code;
+	r			= R1 - 1; // NewZero
+	*r			= {};
+	
+	return Code - 1;
 }
 
 #define Transfer(Input,Shift)  (r[((Input)>>((Shift)*5))&31])

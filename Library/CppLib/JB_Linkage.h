@@ -54,7 +54,9 @@ int JB_SP_Init (const char** R, bool IsThread);
 struct VMStack {
 	u32*		Code;
 	uint		Alloc;			
+	byte		Marker2;
 	byte		SavedReg;
+	u16			Marker;
 };
 
 
