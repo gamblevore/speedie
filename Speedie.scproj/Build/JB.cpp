@@ -3517,7 +3517,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[215]);
-	JB_FS_AppendInt32(_fsf0, (2025052620));
+	JB_FS_AppendInt32(_fsf0, (2025052918));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8650,7 +8650,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1722]);
-	JB_FS_AppendInt32(_fsf0, (2025052620));
+	JB_FS_AppendInt32(_fsf0, (2025052918));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -22964,14 +22964,11 @@ ASMReg SC_Pac_AskForInline(ASMState* Self, Message* Prms, ASMReg Dest, SCFunctio
 	if (I) {
 		return I;
 	}
-	if ((!Self->State.InlineDepth) and (Self->DeepestInline > 1)) {
-		Self->InlineDepthLimit = 1;
-		I = SC_Pac_TryInline(Self, Prms, Dest, Fn, AllowedGain);
-		if (I) {
-			return I;
-		}
+	if (!((!Self->State.InlineDepth) and (Self->DeepestInline > 1))) {
+		return nil;
 	}
-	return ((ASMReg)0);
+	Self->InlineDepthLimit = 1;
+	return SC_Pac_TryInline(Self, Prms, Dest, Fn, AllowedGain);
 }
 
 void SC_Pac_AskNop(ASMState* Self, FatASM* F) {
@@ -23344,11 +23341,9 @@ ASMReg SC_Pac_BranchOr(ASMState* Self, Message* A, Message* B, ASMReg Dest) {
 }
 
 ASMReg SC_Pac_CallFunc(ASMState* Self, Message* Exp, ASMReg Dest, SCFunction* Fn) {
-	int V = SC_Pac_VDeclsExit(Self, Dest);
+	uint V = Self->VDecls;
 	V = (V + ((!V) or (SC_Reg_Reg(Dest) != V)));
 	int Diff = V - Self->VDecls;
-	if (Diff > 1) {
-	}
 	if (Diff == 1) {
 		Self->Vars[V] = SC_Func_RealReturnType(Fn);
 		if ((!SC_Decl_SyntaxIs(Self->Vars[V], kSC__SCDeclInfo_Return)) and (Self->Vars[V] != SC_TypeVoid)) {
@@ -23357,6 +23352,9 @@ ASMReg SC_Pac_CallFunc(ASMState* Self, Message* Exp, ASMReg Dest, SCFunction* Fn
 	Self->VDecls = V;
 	if (V >= 32) {
 		JB_Msg_Fail(Exp, JB_LUB[933]);
+	}
+	if ((SC_Reg_SyntaxIs(Dest, kSC__Reg_ExitAtAll)) and Self->State.Return) {
+		V = Self->State.ParentVDecls;
 	}
 	Dest = SC_Reg_RegSet(Dest, V);
 	Dest = SC_Reg_xC2xB5TypeSet(Dest, SC_Func_ASMRegType(Fn));
@@ -23425,11 +23423,9 @@ Message* SC_Pac_CloseOneVar(ASMState* Self, Message* Exp, int OriginalDecls, boo
 	if (SC_Decl_SyntaxIs(D, kSC__SCDeclInfo_CompilerCreated)) {
 		FatASM* F = SC_Decl_Fat(D);
 		if (F) {
-			if (F == K) {
+			if ((F->xC2xB5RefCount == 1) and SC_FAT_OperatorIsa(F, kSC__ASM_ALLO)) {
 			}
-			 else {
-				SC_Pac_AskNop(Self, F);
-			}
+			SC_Pac_AskNop(Self, F);
 		}
 	}
 	if (D and Exp) {
@@ -25084,10 +25080,6 @@ void SC_Pac_RestoreParameters(ASMState* Self) {
 	};
 }
 
-void SC_Pac_RewindInline(ASMState* Self, FatASM* Start) {
-	SC_Pac_NopRange(Self, Start, SC_Pac_Curr(Self));
-}
-
 ASMReg SC_Pac_SafeDecr(ASMState* Self) {
 	ASMReg Rz = ((ASMReg)0);
 	FatASM* Fat = SC_Pac_LastWithAsm(Self, kSC__ASM_RFAP);
@@ -25468,6 +25460,7 @@ ASMReg SC_Pac_TryGetGlob(ASMState* Self, SCDecl* D) {
 ASMReg SC_Pac_TryInline(ASMState* Self, Message* Prms, ASMReg Dest, SCFunction* Fn, int AllowedGain) {
 	ASMReg Rz = ((ASMReg)0);
 	FatASM* Start = SC_Pac_Curr(Self);
+	uint OV = SC_Pac_OpenVars(Self);
 	InlineBlock Old = Self->State;
 	if ((!SC_Reg_Reg(Dest)) and SC_Func_ASMReturn(Fn)) {
 		if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_Discard)) {
@@ -25482,11 +25475,11 @@ ASMReg SC_Pac_TryInline(ASMState* Self, Message* Prms, ASMReg Dest, SCFunction* 
 	}
 	int D = (++Self->State.InlineDepth);
 	Self->DeepestInline = JB_int_OperatorMax(D, Self->DeepestInline);
-	Self->State.Fn = Fn;
 	Dest = SC_Reg_Simplify(Dest);
 	Dest = SC_Reg_xC2xB5TypeSet(Dest, SC_Func_ASMRegType(Fn));
+	Self->State.Fn = Fn;
 	Self->State.Return = Dest;
-	Self->State.VDecls = Self->VDecls;
+	Self->State.ParentVDecls = Self->VDecls;
 	Self->State.BranchDepth = 0;
 	Rz = SC_Pac_TryInlineSub(Self, Prms, Fn, AllowedGain);
 	Self->State = Old;
@@ -25494,8 +25487,9 @@ ASMReg SC_Pac_TryInline(ASMState* Self, Message* Prms, ASMReg Dest, SCFunction* 
 		Self->InlineEnd = nil;
 	}
 	if (!Rz) {
-		SC_Pac_RewindInline(Self, Start);
+		SC_Pac_NopRange(Self, Start, SC_Pac_Curr(Self));
 	}
+	SC_Pac_CloseVars(Self, OV, nil, nil);
 	return Rz;
 }
 
@@ -25534,13 +25528,6 @@ ASMReg SC_Pac_UniqueLocation(ASMState* Self, Message* A, ASMReg Dest, Message* B
 	Rz = (SC_Reg_SyntaxIsSet(Rz, kSC__Reg_Negate, (SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate))));
 	Rz = SC_Reg_xC2xB5TypeSet(Rz, SC_Reg_xC2xB5Type(Dest));
 	return Rz;
-}
-
-int SC_Pac_VDeclsExit(ASMState* Self, ASMReg Dest) {
-	if ((SC_Reg_SyntaxIs(Dest, kSC__Reg_ExitAtAll)) and Self->State.Return) {
-		return Self->State.VDecls;
-	}
-	return Self->VDecls;
 }
 
 ASMReg SC_Pac_VecAccess(ASMState* Self, Message* Exp, ASMReg Dest, ASMReg Base, ASMReg Vara) {
@@ -60557,4 +60544,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 3387826620070428932 -2259351219561626655
+// 8057160440109695901 -2259351219561626655
