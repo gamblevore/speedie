@@ -281,12 +281,12 @@ class FastString {
 	syntax Append (|Float64| D)
 		cpp_wrapper JB_FS_AppendDoubleAsText0
 	
-	function AppendDouble (|Float64| D, |int| dp=1, |bool| CanExp=false, |bool| Dot=false)
+	function AppendDouble (|Float64| D, |int| dp=1, |bool| CanExp=false)
 		cpp_wrapper JB_FS_AppendDoubleAsText
 	
-	function AppendFloat (|float| D, |int| dp=1, |bool| CanExp=false, |bool| Dot=false)
+	function AppendFloat (|float| D, |int| dp=1, |bool| CanExp=false)
 		opt inline
-		.AppendDouble(D|Float64|, dp, canexp, dot)
+		.AppendDouble(D|Float64|, dp, canexp)
 	
 	syntax Append (|bool| B)
 		cpp_name JB_FS_AppendBool

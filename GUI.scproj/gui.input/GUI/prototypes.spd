@@ -1,27 +1,26 @@
 
 
 // prototypes
+	
+prototype GUIDrawBackground		(|object|      self,  |image| where)
+prototype GUIApplicationInit	(|Object?| Anything = nil, |errorint|)
+prototype GUIParticleEffect		(|image|       self,  |ivec4| Rect, |vec2| V)
 
-prototype GUIDrawBackground	   (|object|      self,  |image| where)
-prototype GUIApplicationInit   (|Object?| Anything = nil, |errorint|)
-prototype GUIDrawEvent		   (|Image|       self,  |ivec4| Rect, |drawstyle| G, |bool| EdgeOnly)
-prototype GUIParticleEffect    (|image|       self,  |ivec4| Rect, |vec2| V)
+prototype GUIListDragEvent		(|ListView|    self,  |ListViewrow?| Before, |ListViewrow?| Into, |bool|)
+prototype GUIListEvent			(|ListView|    self,  |ListViewrow?| Row, |listviewselectmode| Mode = ListViewSelectMode.normal, |bool|)
+prototype GUIListEditEvent		(|ListView|    self,  |ListViewcell?| Cell, |string| Value, |bool|)
+prototype ListViewRowDraw		(|ListViewrow| self,  |int| rowy, |int| texty, |image| where, |ListView| Parent, |int| col, |float| strength,   |ivec2|)
 
-prototype GUIListDragEvent	   (|ListView|    self,  |ListViewrow?| Before, |ListViewrow?| Into, |bool|)
-prototype GUIListEvent		   (|ListView|    self,  |ListViewrow?| Row, |listviewselectmode| Mode = ListViewSelectMode.normal, |bool|)
-prototype GUIListEditEvent	   (|ListView|    self,  |ListViewcell?| Cell, |string| Value, |bool|)
-prototype ListViewRowDraw	   (|ListViewrow| self,  |int| rowy, |int| texty, |image| where, |ListView| Parent, |int| col, |float| strength,   |ivec2|)
+prototype GUIAction				(|GUIControl|  self,  |int| State=0, |ListViewrow?| Row=nil, |ListViewrow?| Prev=nil, |bool|)
+prototype GUIMenuEvent			(|GUIControl|  self,  |menuitem| menu, |ListViewcell?| Clicked)
+prototype GUIKeyEvent			(|GUIControl|  self,  |keys| Key, |bool|)
+prototype GUIPasteEvent			(|GUIControl?| self,  |ListViewrow?| After, |string| Data, |CopyPasteFlags| purpose, |object|)
+prototype GUICopyEvent			(|GUIControl|  self,  |object?| item, |string|)
 
-prototype GUIAction			   (|GUIControl|  self,  |int| State=0, |ListViewrow?| Row=nil, |ListViewrow?| Prev=nil, |bool|)
-prototype GUIMenuEvent		   (|GUIControl|  self,  |menuitem| menu, |ListViewcell?| Clicked)
-prototype GUIKeyEvent		   (|GUIControl|  self,  |keys| Key, |bool|)
-prototype GUIPasteEvent		   (|GUIControl?| self,  |ListViewrow?| After, |string| Data, |CopyPasteFlags| purpose, |object|)
-prototype GUICopyEvent		   (|GUIControl|  self,  |object?| item, |string|)
-
-prototype GUITextEvent		   (|textview|    self,  |int| Reason, |bool| TextWasAltered)
-prototype GUITextErrorSelected (|textview|    self,  |textviewline| Error)
-prototype GUITextShowEvent	   (|TextView|    self,  |ivec2| LeftCorner, |message?| Msg, |error?| err, |string| reason, |bool| WasDelayed)
-prototype SorterComparerWindow (|window|      A,     |window| B, |int|)
+prototype GUITextEvent			(|textview|    self,  |int| Reason, |bool| TextWasAltered)
+prototype GUITextErrorSelected	(|textview|    self,  |textviewline| Error)
+prototype GUITextShowEvent		(|TextView|    self,  |ivec2| LeftCorner, |message?| Msg, |error?| err, |string| reason, |bool| WasDelayed)
+prototype SorterComparerWindow	(|window|      A,     |window| B, |int|)
 
 
 ///

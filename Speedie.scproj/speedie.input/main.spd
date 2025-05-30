@@ -5,7 +5,7 @@
 
 
 
-main // speedie main {	
+main // speedie main {
 	Compiler.SetupEnv
 	Compiler.MiniTests
 	Compiler.Main

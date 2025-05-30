@@ -494,7 +494,7 @@ struct FatASM
 				num = .F32
 			  else
 				num = .f64
-			fs.AppendDouble(num, 9, true, true)
+			fs.AppendDouble(num, 9, true)
 			if ty.ByteCount == 4
 				fs <~ "f"
 			  else

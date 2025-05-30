@@ -50,7 +50,7 @@ class SCImport
 	function ImportMsg (|Message| j)
 		error.sourceadd(j)
 		.ImportMsgSub(j)
-		error.sourceremove
+		error.SourceRemove
 	
 	
 	function ImportMsgSub (|Message| j)
@@ -127,7 +127,7 @@ class SCImport
 			arg.remove
 			compiler.ConfMsg = arg
 			// check Options.SelfReplacement, in case I alter how jbin works 
-			|| str = (arg.render, arg.renderjbin)(Options.SelfReplacement)
+			|| str = (arg.Render, arg.RenderJbin)(Options.SelfReplacement)
 			|| x = MakeDecl("", "__AppConfString", @str+str)
 			conf.become(x)
 			compiler.program.MoveToInitFunc(conf)
@@ -197,10 +197,12 @@ class SCImport
 				0 //
 			  elseif (c.IsDir)
 				.ImportDir( c )
+			
 			  elseif (cname.IsSpeedieSrc)
 				|| B = .ImportSpd(c)
 				if cName ~= "index.spd"
 					rz = B
+				
 			  elseif ext == "vert" or "frag" or "shad" or "sdf"
 				Shaders ?= dictionary.new
 				shaders![ cName ] = c
@@ -247,15 +249,18 @@ class SCImport
 				return lib
 			return self < b
 		
+		
 		function FindImport (|string| s, |scimport|)
 			opt norefcounts
 			for imp in compiler.importedlist
 				if s ~= imp.where
 					return imp
 		
+		
 		function IsInputName (|string| name, |bool|)
 			if  name ~= "input"  or  name isa "input"
 				return true
+		
 		
 		function NoProj
 			.curr = nil
@@ -277,7 +282,7 @@ class SCImport
 		
 		function ImportPath (|string| path, |file!| f, |int| ImportDepth, |bool| Builtin, |scimport?|)
 			|| name = f.name
-			require f.mustexist and path.IsOKForImport
+			require f.MustExist and path.IsOKForImport
 	
 			|| fpl = f.Path.lowercase
 			|| old = Compiler.ImportedNames[fpl]
@@ -285,14 +290,17 @@ class SCImport
 			
 			rz = SCImport(f, builtin)
 			Compiler.ImportedList <~ rz
+			
 			rz.Depth = ImportDepth
 			Compiler.ImportedNames[fpl] = rz
+			|| subname = fpl.TrimExtAndPath
+			SC_Targets["__IMPORT_" + subname + "__"] = true
 			
-			|scfile| conf
+			|SCFile| conf
 			if (options.SingleFileInput and !path)
 				conf = rz.ImportSpd( options.SingleFileInput.file )
 			  elseif !f.isdir
-				conf = rz.importspd( f )
+				conf = rz.ImportSpd( f )
 			  else
 				ifn (path contains "/") and (path[0] != '/')   // import "lib/items"
 					f = FindInputFolder(f)

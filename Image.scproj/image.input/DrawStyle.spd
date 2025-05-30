@@ -1,19 +1,21 @@
 
 
+prototype ImageDrawStyleEvent (|Image| self,  |ivec4| Rect, |drawstyle| G, |bool| EdgeOnly)
+
 class DrawStyle
 	linkage
 		cpp_part Sty
 	default DrawStyle.new 
-	|imagePixel|			BG
-	|imagePixel|			Edge
-	|imagePixel|			Seps
-	|imagePixel|			Text
-	|imagePixel|			_BG
-	|imagePixel|			_Edge
-	|GUIDrawEvent?|			Drawer
-	|Byte|					CornerSize
-	|byte| 					CornersCut
-	|Byte|					LineWidth
+	|imagePixel|				BG
+	|imagePixel|				Edge
+	|imagePixel|				Seps
+	|imagePixel|				Text
+	|imagePixel|				_BG
+	|imagePixel|				_Edge
+	|ImageDrawStyleEvent?|		Drawer
+	|Byte|						CornerSize
+	|byte| 						CornersCut
+	|Byte|						LineWidth
 
 		
 	constructor

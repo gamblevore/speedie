@@ -177,13 +177,13 @@ extend String
 		disabled "Just use .trimext"
 		return .TrimExtAndPath(false)
 
-	function TrimExtAndPath (|bool| KeepPath=true, |string|)
+	function TrimExtAndPath (|bool| RemovePath=true, |string|)
 		Description "already does .name, no need for .name.trimext"
 		|| N	 = .FindTrailingSlashes
 		|| slash = .find('/', n-1, 0) + 1
 		|| dot	 = .find('.', n-1, slash)
 		dot ?= n
-		if !KeepPath
+		if !RemovePath
 			slash = 0
 		return self[slash, dot]
 	

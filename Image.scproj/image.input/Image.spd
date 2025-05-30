@@ -41,10 +41,11 @@ class Image (memory)
 			memory.Copy(rz.ptr, .ptr, rz.ByteCapacity)
 	
 	
-	function Window (assigns:|window| W)
-		|| s = w.LastRect
-		.windowbase = s.xy
-		.ControlClip = s.Soothe
+	target __IMPORT_GUI__
+		function Window (assigns:|window| W)
+			|| s = w.LastRect
+			.windowbase = s.xy
+			.ControlClip = s.Soothe
 
 
 	function ControlClip (assigns:|ivec4| R)
@@ -63,14 +64,13 @@ class Image (memory)
 	
 	function ControlClip (|ivec4|)
 		return ._ControlClip
+		
 	
-//	function Tile (|int| t, |imagetiler|)
-//		return .tile((t,t))
-	
-	function Tile (|ivec2| t, |imagetiler|)
-		cpp_Part Tile2
-		rz.tile = t
-		rz.bounds = ._Controlclip
+	target __IMPORT_GUI__
+		function Tile (|ivec2| t, |imagetiler|)
+			cpp_Part Tile2
+			rz.tile = t
+			rz.bounds = ._Controlclip
 	
 	function Rect (|ivec4|)
 		return .size.rect
@@ -246,11 +246,10 @@ class Image (memory)
 		return .SyntaxAccess(p)[].Color
 	
 		
-	function SavePNG (|file| f) // writetofile
-		disabled "unfinished code"
-		return
-		if f.openEmpty
-			f.RawWritePng(.wh.x, .wh.y, .ptr|&byte|)
+//	function SavePNG (|file| f) // writetofile
+//		disabled "Unfinished"
+//		if f.openEmpty
+//			f.RawWritePng(.size.x, .size.y, .ptr|&byte|)
 	
 		
 	function ClearMarks (|ivec4| R)

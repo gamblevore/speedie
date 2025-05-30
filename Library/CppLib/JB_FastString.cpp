@@ -50,7 +50,6 @@ uint8* JB_FS_WriteAlloc_(FastString* fs, int GrowBy) {
 	return JB_FS_WriteAlloc_Inline_(fs, GrowBy);
 }
 
-
 int JB_FS_FreeSize(FastString* fs) {
 	return fs->Reserved - fs->Length;
 }
@@ -62,7 +61,6 @@ uint8* JB_FS_NeedSpare(FastString* fs, int Extra) { //JB_FS_FreeSizeSet
 			return 0;
     return fs->ResultPtr + fs->Length;
 }
-
 
 void JB_FS_AppendLocalTime (FastString* fs, Date self) {
     time_t t = self >> 16; // lol
@@ -88,24 +86,6 @@ bool JB_FS_ResizeTo_(FastString* fs, int NewLength) {
     }
 
 	auto S = fs->Result;
-//	if (S) {
-//		int OldLength = S->Length;
-//		if (NewLength < OldLength and JB_RefCount(S) > 1) {
-//			JB_BA_Realloc_(S, fs->Length);
-			// OK... this is an interesting issue. We have a wierd sharing behaviour. We need to just...
-			// let go of it? or something? but at least shrink it down to the OldLength
-
-			// lets say we have a big buffer
-			// and a small portion of it shared
-			// then we append something huge, so we need a HUGER buffer
-			// we cant keep the old buffer... so we gotta make a new one
-			// But we can't realloc the old one, right? It could MOVE in memory. Easily it can.
-			// especially if it becomes very short. So... if it becomes short and moved...
-			// then everything that uses it... becomes fucked. So we need to NOT realloc it.
-			// so that means we need to keep the huge buffer.
-			// seems better to just copy the buffer?
-//		}
-//	}
 	if (!S) {
 		if (fs->ResultPtr) {fs->Failed = true; return 0;}; // direct memory write.
 		S = JB_Incr(JB_New( JB_String ));
@@ -359,12 +339,16 @@ void JB_FS_AppendIntegerAsText(FastString* self, int64 LeftOver, int RoundTo) {
 
 
 void JB_FS_AppendDurr(FastString* self, Date D) {
-    JB_FS_AppendDoubleAsText(self, ((double)D) / ((double)0x10000), 3, false, false);
+	auto Amount = ((double)D) / ((double)0x10000);
+	if (floor(Amount)!=Amount)
+		JB_FS_AppendDoubleAsText(self, Amount, 3, false);
+	  else
+		JB_FS_AppendIntegerAsText(self, Amount, 1);
 }
 
 
 void JB_FS_AppendDoubleAsText0(FastString* self, double D) {
-    JB_FS_AppendDoubleAsText(self, D, 9, true, false);
+    JB_FS_AppendDoubleAsText(self, D, 9, true);
 }
 
 
@@ -379,65 +363,74 @@ bool HasDot (uint8* self, int Used) {
 
 
 static bool DoubleIsNormal (double D){
-	return  D <= DBL_MAX  &&  D >= -DBL_MAX ;
+	return  D <= DBL_MAX  &&  D >= -DBL_MAX;
 }
 
-void JB_FS_AppendDoubleAsText (FastString* self, double D, int dp, bool CanExp, bool Dot) {
-// need a "mode" really... what about if we want no exp but DO want the full length?
-// i think we should just use sprintf
-    if_rare (!(DoubleIsNormal(D)))
-		return JB_FS_AppendCString(self, "nan");
-	// -+inf would freeze us otherwise
-	
-    dp = Max(dp, 0);
+
+void JB_FS_AppendDoubleAsText (FastString* self, double D, int dp, int ActualExp) {
+	if (!D or !DoubleIsNormal(D))
+		return JB_FS_AppendCString(self, "0.0");
+
+    dp = Max(dp, 1);
     dp = Min(dp, 16);
     
-    if (D < 0) {
-		D = -D;
+    if (D < 0)
 		JB_FS_AppendByte(self, '-');
-	}
-    int ActualExp = 0;
-    if (CanExp and D) {
-		double exp = log10(D);
-		if (exp > 16.0 or exp < -9) {
-			ActualExp = (int)floor(exp);
-			D *= JB_Pow0_1(ActualExp);
+	D = fabs(D);
+
+    if (ActualExp) {
+		auto e = log10(D);
+		if (fabs(e) > 7) {
+			ActualExp = (int)floor(e);
+			if (ActualExp <= -200)
+				debugger;
+			D = JB_Pow10(D, -ActualExp);
+		} else {
+			ActualExp = 0;
 		}
 	}
     
-	double F = floor(D);
+    auto DP2 = JB_Pow10(0.5001, -dp);
+    D = fabs(D) + DP2;
+    
+	auto F = floor(D);
 	JB_FS_AppendIntegerAsText(self, F, 1);
-	double Frac = D - F;
-	int N = self->Length;
-	if (N <= 0) // oof. out of memory.
-		return;
-	char Last = self->ResultPtr[N - 1];
 
+	auto Write = JB_FS_WriteAlloc_(self, 64);  self->Length -= 64;
+	auto Start = Write;
+	*Write++ = '.';
 
-	if (Frac and dp > 0) {
-		auto Write = JB_FS_WriteAlloc_(self, 64)-1;
-		static char fmt[] = {'%', '0', '.', '0', '0', 'f' , 0};
-		fmt[3] = '0' + (dp / 10);
-		fmt[4] = '0' + (dp % 10);
-		N = snprintf((char*)Write, 64, fmt, Frac);
-		Write[0] = Last;
-		while (N > 3) {
-			if (Write[--N] != '0')
-				break;
-			Write[N] = 0; // cleanup
-		}
-		if (!Dot and N == 3 and Write[N-1] == '0')
-			N = 0;
-		JB_FS_AdjustLength_( self, 64, N );
-		
-	} else if (Dot) {
-		JB_FS_AppendCString(self, ".0");
+	auto Frac = D - F;
+	while (Frac and dp-- > 0) {
+		Frac *= 10;
+		auto Whole = floor(Frac);
+		*Write++ = (int)Whole + '0';
+		Frac -= Whole;
 	}
+		
+	while (*--Write == '0')
+		*Write = 0;
+	
+	if (*Write == '.')
+		*++Write = '0';
 	
 	if (ActualExp) {
-		JB_FS_AppendByte(self, 'e');
-		JB_FS_AppendIntegerAsText(self, ActualExp, 1);
+		*++Write = 'e';
+		if (ActualExp < 0) {
+			ActualExp = -ActualExp;
+			*++Write = '-';
+		}
+		bool Active = false;
+		for (int i = 100; i >= 1; i/=10) {
+			Active |= (ActualExp >= i  or  i == 1);
+			if (Active) {
+				*++Write = '0' + (ActualExp / i);
+				ActualExp = ActualExp % i;
+			}
+		}
 	}
+		
+	self->Length += 1 + Write - Start;
 }
 
 

@@ -78,20 +78,15 @@ extern "C" {
 //		return res + copysignf(pi, y) * (x < 0.0f);
 //	}
 
-	double JB_Pow10(int x) {
-		if (x > 350) x = 350;
-		double rz = 1.0;
-		for_(x) {
-			rz *= 10.0;
-		}
-		return rz;
-	}
-	
-	double JB_Pow0_1(int x) {
-		if (x > 350) x = 350;
-		double rz = 1.0;
-		for_(x) {
-			rz *= 0.1;
+	double JB_Pow10(double rz, int x) {
+		x = Min(x, 350);
+		x = Max(x,-350);
+		if (x < 0) {
+			for_(-x)
+				rz *= 0.1;
+		} else {
+			for_(x)
+				rz *= 10.0;
 		}
 		return rz;
 	}

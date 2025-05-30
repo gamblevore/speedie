@@ -1,5 +1,5 @@
 
-function image.RoundRectDrawer (GUIDrawEvent)
+function image.RoundRectDrawer (ImageDrawStyleEvent)
 	require !EdgeOnly
     || Col = g.bg.PreMul
     || Edge = g.edge.Color
@@ -31,7 +31,7 @@ function image.RoundRectDrawer (GUIDrawEvent)
             W++
 
 
-function image.ClippedRectDrawer (GUIDrawEvent)
+function image.ClippedRectDrawer (ImageDrawStyleEvent)
 	require !EdgeOnly
 	rect.y2-- // seems to draw too high? not sure why.
 	|| Col = g.bg.PreMul
@@ -76,7 +76,7 @@ extend_module Image
 
 // So... edge draws last. rework so edge draws last. no need to drawbg then.
 // not in here?
-function image.CurlieQueDrawer (GUIDrawEvent)
+function image.CurlieQueDrawer (ImageDrawStyleEvent)
 	|| BG = g.bg.PreMul
 	|| Edge = vec4(1).premul  //g.edge.Color.PreMul
 	|| Nothing = vec4(0).PreMul

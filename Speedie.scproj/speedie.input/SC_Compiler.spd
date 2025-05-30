@@ -810,7 +810,7 @@ function InputFileAlways (|String| s,  |File|)
 			return found
 			
 	|| best = int.max
-	for (imp in .ImportedList)
+	for imp in .ImportedList
 		if (imp.depth < best)
 			|| f = imp.Resources.ValueLower(s)
 				rz = f

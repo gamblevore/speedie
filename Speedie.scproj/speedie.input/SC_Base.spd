@@ -325,16 +325,16 @@ function SCFunction.ExportNameBuilder (|string|CppPart="", |string| )
 			cppPart = "Constructor" + CppPart
 	  else
 		|| L = .parent
-		if (L isa SCModule)
+		if L isa SCModule
 			if L.CppPart
 				SubSection = L.CppPath
 				AfterSub = "__"
 
-	|| P = .project // never nil but whatever
+	|| P = .Project		// never nil but whatever
 		|| wanted = p.mod.exportname
 		if wanted != subsection
 			rz = (wanted + "_")
-	rz += (Subsection + AfterSub + CppPart)
+	rz += (SubSection + AfterSub + CppPart)
 
 
 function scmodule.CppPath (|string|)

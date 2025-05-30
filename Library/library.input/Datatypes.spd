@@ -390,7 +390,7 @@ datatype float
 			fs <~ (m+0.5)|int|
 			fs <~ 'm'
 			fs <~ ' '
-		fs.AppendFloat(s, 1+2*ms, false, ms)
+		fs.AppendFloat(s, 1+2*ms, false)
 		fs <~ 's'
 	
 	render (|int| dp)
@@ -628,10 +628,10 @@ datatype f64
 		cpp_wrapper (fmin)
 
 	render (|int| dp=6)
-		fs.appenddouble(self, dp, true, true) // it needs the ".0" to be parsed as a float by C++.
+		fs.appenddouble(self, dp, true)
 
 	render RenderFloat
-		fs.appenddouble(self, 6, false, true)
+		fs.appenddouble(self, 6, false)
 
 	function Date (|date|)
 		return (self * 64.0K)|date|

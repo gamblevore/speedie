@@ -60,7 +60,7 @@ module Notifications
 	function Draw  // drawnotifications, drawnote
 		opt norefcounts
 		for w in .Alerts
-			w.drawwindow(GUI.Screen)
+			w.DrawWindow(GUI.Screen)
 
 
 	function CheckForDisappear
