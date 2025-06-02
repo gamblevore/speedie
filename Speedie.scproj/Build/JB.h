@@ -811,6 +811,7 @@ struct SC_Hoister {
 	uint Bits;
 	byte Count;
 	byte Spare;
+	Message* Consts[6];
 };
 
 struct StructSaveTest {
@@ -1579,18 +1580,18 @@ extern SCNode* SC__Comp_VisibleFuncs;
 
 #define kSC__CustomOps_TypeCastToSmaller ((int)64)
 
-#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2202])
+#define kJB__ErrorColors_bold ((JB_StringC*)JB_LUB[2203])
 
 #define JB__ErrorColors_Enabled JB__.ErrorColors_Enabled
-#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2203])
+#define kJB__ErrorColors_error ((JB_StringC*)JB_LUB[2204])
 
-#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2204])
+#define kJB__ErrorColors_good ((JB_StringC*)JB_LUB[2205])
 
-#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2201])
+#define kJB__ErrorColors_normal ((JB_StringC*)JB_LUB[2202])
 
-#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2204])
+#define kJB__ErrorColors_underline ((JB_StringC*)JB_LUB[2205])
 
-#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2205])
+#define kJB__ErrorColors_warn ((JB_StringC*)JB_LUB[2206])
 
 extern SCFunction* SC__FastStringOpts__ByteFunc;
 extern int SC__FastStringOpts_FSRemoved;
@@ -1817,7 +1818,7 @@ extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2210])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[2211])
 
 extern Dictionary* SC_CppRefTable;
 extern CharSet* SC_CSHex;
@@ -1855,7 +1856,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kSaverEnd ((JB_StringC*)JB_LUB[0])
 
-#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2206])
+#define kJB_kSaverStart1 ((JB_StringC*)JB_LUB[2207])
 
 #define kJB_kSimpleMatch ((int)4194304)
 
@@ -1893,7 +1894,7 @@ extern Dictionary* SC_FuncPreReader;
 
 #define kJB_kUseDefaultParams ((int)33554432)
 
-#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2211])
+#define kJB_kUsingStr ((JB_StringC*)JB_LUB[2212])
 
 #define kJB_kVoidPtrMatch ((int)20971520)
 
@@ -2129,12 +2130,12 @@ extern SCClass* SC_TypeWrapper;
 
 #define JB__Tk_Splitter JB__.Tk_Splitter
 #define JB__Tk_Using JB__.Tk_Using
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2209])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2210])
 
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2208])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2209])
 
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2207])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2208])
 
 #define kJB__byte_max ((byte)255)
 
@@ -3229,6 +3230,7 @@ extern MWrap* SC__Pac_JSM;
 #define kSC__Pac_kExit ((int)255)
 
 extern ASMState SC__Pac_Sh;
+extern SC_Hoister SC__Pac_WhileHoister;
 extern Array* SC__Cpp_Cpp_Includes;
 extern Array* SC__Cpp_Cpp_Input;
 extern JB_String* SC__Cpp_CppLicenceStr;
@@ -3253,7 +3255,7 @@ extern bool SC__Cpp_WroteAny;
 
 #define kJB__Wrap_kNothing ((int)0)
 
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2200])
+#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2201])
 
 #define JB__Rec_Progress JB__.Rec_Progress
 #define kJB__fix_TypeDict ((int)3)
@@ -5502,8 +5504,6 @@ Float64 SC_Reg_float(ASMReg Self);
 
 ASMReg SC_Reg_HaveAddr(ASMReg Self);
 
-int SC_Reg_IntDivType(ASMReg Self);
-
 bool SC_Reg_IsBoolV(ASMReg Self);
 
 bool SC_Reg_IsConst(ASMReg Self, int64 Val);
@@ -6924,13 +6924,13 @@ int JB_Rnd__InitCode_();
 
 
 // JB_SC_Hoister
+void SC_Hoi_Added(SC_Hoister* Self, ASMState* Sh, ASMReg Dest, SCDecl* Decl, ASMReg K);
+
 bool SC_Hoi_CanHoist(SC_Hoister* Self);
 
-bool SC_Hoi_CanReuseConst(SC_Hoister* Self, SCDecl* Decl);
+bool SC_Hoi_DidReuseConst(SC_Hoister* Self, SCDecl* Decl);
 
-void SC_Hoi_HoistComplete(SC_Hoister* Self, ASMReg Dest, SCDecl* Decl, ASMReg K, ASMState* Sh);
-
-void SC_Hoi_HoistConst(SC_Hoister* Self, ASMState* Sh, Message* Prop, SCDecl* Decl);
+void SC_Hoi_FillConsts(SC_Hoister* Self);
 
 void SC_Hoi_HoistGlobal(SC_Hoister* Self, ASMState* Sh, Message* Prop, SCDecl* Decl);
 
@@ -6940,7 +6940,9 @@ void SC_Hoi_HoistNormal(SC_Hoister* Self, Message* Exp);
 
 bool SC_Hoi_HoistRecursive(SC_Hoister* Self, ASMState* Sh, Message* Exp, int Score);
 
-void SC_Hoi_TryHoistOne(SC_Hoister* Self, ASMState* Sh, Message* Exp, SCDecl* Prop, int Score);
+void SC_Hoi_PostRunConst(SC_Hoister* Self, ASMState* Sh, Message* Prop, SCDecl* Decl);
+
+void SC_Hoi_TryHoistOne(SC_Hoister* Self, ASMState* Sh, Message* Exp, SCDecl* Decl, int Score);
 
 
 
@@ -6987,6 +6989,8 @@ ASMReg SC_Pac_Assign(ASMState* Self, ASMReg Dest, ASMReg Src, Message* Exp);
 void SC_Pac_BackCond(ASMState* Self, FatASM* Start);
 
 ASMReg SC_Pac_BFLG_Const(ASMState* Self, Message* Exp, ASMReg Dest, ASMReg Src, uint Up, uint Down);
+
+ASMReg SC_Pac_BigWhile(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
 ASMReg SC_Pac_BitAnd(ASMState* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp);
 
@@ -7285,8 +7289,6 @@ ASMReg SC_Pac_VectorLoad(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 ASMReg SC_Pac_While(ASMState* Self, Message* Exp, ASMReg Dest, int Mode);
 
 ASMReg SC_Pac_WhileSub(ASMState* Self, Message* Exp);
-
-ASMReg SC_Pac_WhileWrap(ASMState* Self, Message* Exp);
 
 FatASM* SC_Pac_ZeroMemory(ASMState* Self, int Index, Message* Exp, ASMReg Base, ASMReg VarAdd, SCDecl* D);
 
