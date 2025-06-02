@@ -1,19 +1,22 @@
 
 
+// if the globs fill up, we won't get any consts!
+// i do want both, though? Which are more important?
+// Depends, on the code, right? Sigh... I guess
+// lets leave this for now.
+
 struct SC_Hoister
 	linkage
 		cpp_part Hoi
 	|uint|				Bits
 	|byte|				Count
 	|byte|				Spare
-	|message--[6]|		Collection
-	|uint--[6]|			Scores
+	|message--[6]|		Consts
 	
 	
 	constants
 		MinHoistScore = 3
 		AsLoop = 1<<20
-		AsGlobal = 1<<31
 
 
 	function ASMState.GlobAddr (|scdecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
@@ -52,67 +55,40 @@ struct SC_Hoister
 		sh.KnownValues[n] = fat
 		sh.HoistMap |= 1<<n
 		
+
+	function HoistNormal (|message| exp)
+		.spare = 4
+		.HoistRecursive(asmstate.sh, exp, 0)
+		.FillConsts
+
+
+	function HoistLoop (|asmstate| sh, |message| exp)
+		.Spare = 5
+		.HoistRecursive(sh, exp, asloop)
+		.FillConsts
+		
+
+	helper FillConsts
+		opt norefcounts
+		for i in .count
+			|| prop = .consts[i]!
+			.PostRunConst(asmstate.sh, prop, prop.asmdecl)
+
 	
-	helper HoistComplete (|asmreg| dest, |SCDecl| decl, |asmreg| K, |asmstate| sh)
-		opt NoRefCounts
+	helper Added (|asmstate| sh, |asmreg| Dest, |scdecl| decl, |asmreg| K)
 		decl.FatConstIndex = k.fatindex
 
 		|| n = dest.reg
 		sh.hoist(k.fat, n)
 		if .bits & (1<<n)  				// what?
 		.Bits |= 1<<n
-		.Spare--
-
-
-	function HoistNormal (|message| exp)
-		.spare = 6
-		.HoistRecursive(asmstate.sh, exp, 0)
-		.PostRun(asmstate.sh)
-
-
-	helper HoistLoop (|asmstate| sh, |message| exp)
-		opt norefcounts
-		.Spare = 3
-		.HoistRecursive(sh, exp.last! , sc_hoister.AsLoop)
-		.Spare = 2
-		.HoistRecursive(sh, exp.first!, sc_hoister.AsLoop)
-		.PostRun(asmstate.sh)
-		
-
-	helper MarkExp (|message| exp, |int| Score)
-		|| i = .count++
-		target debug: if i >= 6 // what?
-		.collection[i] = exp
-		.scores[i] = score
-			
-	
-	helper PostRun  (|asmstate| sh)
-		// do the highest one first.
-		// gtabs should come first.
-		for i in .count
-			|| prop = .collection[i]!
-			.PostRunOne(sh, prop, prop.asmdecl, (.scores[i] >> 31)|bool|)
 
 	
-	helper PostRunOne  (|asmstate| sh, |message| prop, |scdecl| decl, |bool| IsGlobal)
-		|| dest = sh.DeclareMe(prop, decl)
-		|asmreg| K
-		if IsGlobal
-			K = sh.GlobAddrSub(decl, prop, dest)
-		  else
-			(dest is canhoist)
-			K = sh.NumToReg(prop, decl.ExportPosition, dest, dest.µtype)
-		.HoistComplete(dest, Decl, k, sh)
-			
-
-	helper CanReuseConst (|SCDecl| decl, |bool|)
-		opt NoRefCounts
-		|| k = decl.ExportPosition$
-		for old in ASMState.sh
-			if old._Const == K
-				old.µRefCount++
-				decl.FatConstIndex = old.Index
-				return true
+	helper HoistGlobal (|asmstate| sh, |message| prop, |scdecl| decl)
+		if !sh.TryGetGlob(decl)
+			|| dest = sh.DeclareMe(prop, decl)
+			|| K = sh.GlobAddrSub(decl, prop, dest)
+			.Added(sh, dest, decl, K)
 
 	
 	function ASMState.TryGetGlob (|SCDecl| D, |asmreg|)
@@ -125,28 +101,41 @@ struct SC_Hoister
 					return old.info
 					
 
-	function TryHoistOne (|asmstate| sh, |message| exp, |scdecl| prop, |int| Score)
-		if prop is const
-			if (score >= AsLoop) and .CanReuseConst(prop)
-				.MarkExp(exp, score)
-					
-		  elseif prop is Global
-			if sh.TryGetGlob(prop)
-				.MarkExp(exp, score ||| asglobal)
-	
-	
-	function message.Declable (|message!|)
-		opt norefcounts
-		|| fn = .func
-		if fn == @decl
-			self = .second!
-			fn = .func
-		while fn == @type
-			self = .first! // no go into the type!
-			fn = .func
-		if fn == @func
-			return .second!
-		return self
+	function TryHoistOne (|asmstate| sh, |message| exp, |scdecl| decl, |int| Score)
+		if decl is Global // hoist straight off
+			return .HoistGlobal(sh, exp, decl)
+		
+		// do consts later
+		require (score >= AsLoop)  and  (decl is const)
+		if !.DidReuseConst(decl)
+			|| i = .count++
+			.spare--
+			target debug: if i >= 6 // what?
+			.Consts[i] = exp
+			decl.FatConstIndex = -1 // mark as done.
+
+
+	helper PostRunConst  (|asmstate| sh, |message| prop, |scdecl| decl)
+		|| dest = sh.DeclareMe(prop, decl)
+		(dest is canhoist)
+		|| K = sh.NumToReg(prop, decl.ExportPosition, dest, dest.µtype)
+		.Added(sh, dest, decl, K)
+			
+
+	// maybe just store the numbers in a list?
+	// so check against OUR number? IDK?
+	// And what if its pre-hoisted?
+	helper DidReuseConst (|SCDecl| decl, |bool|)
+		opt NoRefCounts
+/		|| k = decl.ExportPosition
+		if !k
+			return true
+		for old in ASMState.sh
+			if old._Const == K
+				old.µRefCount++
+				decl.FatConstIndex = old.Index
+				return true
+
 	
 	
 	function CanHoist (|bool|)
@@ -179,3 +168,18 @@ struct SC_Hoister
 			require .HoistRecursive(sh, ch, add + score)
 		return true
 		
+
+	
+function message.Declable (|message!|)
+	opt norefcounts
+	|| fn = .func
+	if fn == @decl
+		self = .second!
+		fn = .func
+	while fn == @type
+		self = .first! // no go into the type!
+		fn = .func
+	if fn == @func
+		return .second!
+	return self
+
