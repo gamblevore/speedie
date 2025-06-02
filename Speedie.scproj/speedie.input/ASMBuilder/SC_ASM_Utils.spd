@@ -59,6 +59,9 @@ function asmstate.CloseOneVar (|message?| exp, |int| OriginalDecls, |&bool| DoMo
 	
 										   /// UNHOIST ///
 	|| k = .KnownValues[v]
+		target debug
+			if d and d.fat and d.fat != k // are these always the same? then remove one?
+		
 		|| DebugView = !.state.inlinedepth  and  originaldecls >= 0  and  options.optimise < 4
 		if !DebugView  and  k.µRefCount <= 1 // HoistComplete did +1 on it's refcount earlier. So it is unused.
 			.Nop(k) 

@@ -6,10 +6,14 @@ struct SC_Hoister
 	|uint|				Bits
 	|byte|				Count
 	|byte|				Spare
+	|message--[6]|		Collection
+	|uint--[6]|			Scores
+	
 	
 	constants
 		MinHoistScore = 3
 		AsLoop = 1<<20
+		AsGlobal = 1<<31
 
 
 	function ASMState.GlobAddr (|scdecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
@@ -26,7 +30,7 @@ struct SC_Hoister
 		expect (iTable <= 24~bits)   (exp, "Used over 16MB of global data")
 		
 		|| fat = exp.GTAB(dest,  (d.IsLib)|int|,  iTable>>6)
-		fat.Const = iTable&~63
+		fat.Const = iTable &~ 63
 		(dest is CanHoist)
 		Dest = fat * dest
 		dest.µtype = DataTypeCode._voidptr
@@ -60,30 +64,46 @@ struct SC_Hoister
 		.Spare--
 
 
+	function HoistNormal (|message| exp)
+		.spare = 6
+		.HoistRecursive(asmstate.sh, exp, 0)
+		.PostRun(asmstate.sh)
+
+
 	helper HoistLoop (|asmstate| sh, |message| exp)
 		opt norefcounts
 		.Spare = 3
 		.HoistRecursive(sh, exp.last! , sc_hoister.AsLoop)
 		.Spare = 2
 		.HoistRecursive(sh, exp.first!, sc_hoister.AsLoop)
+		.PostRun(asmstate.sh)
 		
 
-	helper HoistGlobal (|asmstate| sh, |message| prop, |SCDecl| decl)
-		opt NoRefCounts
-		require !sh.TryGetGlob(decl)
-		|| dest = sh.DeclareMe(prop, decl)
-		|| Addr = sh.GlobAddrSub(decl, prop, dest)
-		.HoistComplete(dest, Decl, addr, sh)
+	helper MarkExp (|message| exp, |int| Score)
+		|| i = .count++
+		target debug: if i >= 6 // what?
+		.collection[i] = exp
+		.scores[i] = score
+			
+	
+	helper PostRun  (|asmstate| sh)
+		// do the highest one first.
+		// gtabs should come first.
+		for i in .count
+			|| prop = .collection[i]!
+			.PostRunOne(sh, prop, prop.asmdecl, (.scores[i] >> 31)|bool|)
 
-
-	helper HoistConst (|asmstate| sh, |message| prop, |scdecl| decl)
-		opt NoRefCounts
-		require !.CanReuseConst(decl)
+	
+	helper PostRunOne  (|asmstate| sh, |message| prop, |scdecl| decl, |bool| IsGlobal)
 		|| dest = sh.DeclareMe(prop, decl)
-		(dest is canhoist)
-		|| K = sh.NumToReg(prop, decl.ExportPosition, dest, dest.µtype)
+		|asmreg| K
+		if IsGlobal
+			K = sh.GlobAddrSub(decl, prop, dest)
+		  else
+			(dest is canhoist)
+			K = sh.NumToReg(prop, decl.ExportPosition, dest, dest.µtype)
 		.HoistComplete(dest, Decl, k, sh)
-
+			
 
 	helper CanReuseConst (|SCDecl| decl, |bool|)
 		opt NoRefCounts
@@ -105,18 +125,14 @@ struct SC_Hoister
 					return old.info
 					
 
-	function HoistNormal (|message| exp)
-		.spare = 6
-		.HoistRecursive(asmstate.sh, exp, 0)
-
-
 	function TryHoistOne (|asmstate| sh, |message| exp, |scdecl| prop, |int| Score)
 		if prop is const
-			if score >= AsLoop
-				.HoistConst(sh, exp, prop)
+			if (score >= AsLoop) and .CanReuseConst(prop)
+				.MarkExp(exp, score)
 					
 		  elseif prop is Global
-			.HoistGlobal(sh, exp, prop)
+			if sh.TryGetGlob(prop)
+				.MarkExp(exp, score ||| asglobal)
 	
 	
 	function message.Declable (|message!|)
@@ -137,7 +153,7 @@ struct SC_Hoister
 		return .spare > 0
 	
 	
-	function HoistRecursive (|asmstate| sh, |message| exp, |int| Score, |bool|)
+	function HoistRecursive (|ASMState| sh, |message| exp, |int| Score, |bool|)
 		opt norefcounts
 		require .CanHoist
 		exp = exp.Declable
@@ -145,7 +161,7 @@ struct SC_Hoister
 		if fn == @arg and Score < AsLoop
 			return true
 		
-		if  (fn == @dot or @thg or @num)
+		if  fn == @dot or @thg or @num
 			|| prop = exp.ASMDecl
 			if prop is const or global
 				if score >= 0

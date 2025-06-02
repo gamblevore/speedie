@@ -4,19 +4,27 @@ extend asmstate
 	function InlineOffsetOpt (|asmreg| base, |int| pow2, |&int| index, |uint| maximum, |scdecl?| Glob, |asmreg|)
 		|| bs = base.fat
 		if bs isa asm.GTAB
-			expect (glob)			// oof if not glob
-			|| lost = glob.exportposition - bs.const
-			expect lost >= 0		// oof if negative!!
-			|| i = index[] + lost
-			if i > maximum|int|		// sigh. we need to addk.
+			if (index[])
+
+			expect (glob)
+			|| lost = glob.ExportPosition - bs.const
+			expect lost >= 0
+			check !(index[] & (pow2)~bits)  (bs.msg, "Unaligned offset.")
+
+			|| i = (index[] + lost) << pow2
+			i >>= pow2
+
+			if i > maximum|int|								// overlarge. Lets increase.
 				|| temp = .TempOnly(bs.msg, base)
 				temp = bs.msg.ADDK(temp, base, i) * temp
 				i = 0
 				base = temp
+			
 			index[] = i
+			return base
 				
 				
-		  elseif  base is temp  and  bs isa asm.ADDK
+		if  base is temp  and  bs isa asm.ADDK
 			|uint| CC = bs.prms[2]
 			|uint| CC2 = CC >> pow2
 			if (CC2 <= maximum) and (CC2<<pow2 == CC)
@@ -38,15 +46,16 @@ extend asmstate
 			return exp.RFWR(A, nil, 1, offset)						// reg to mem
 
 		if fn == Compiler.RefSetRef
-			|| Out = .µGetASM(prms.first!, ASMReg.AddrRequest)
-			|| From = .µ(prms.second!, ASMReg.AddrRequest)
+			|| DestMsg = prms.first!
+			|| Out = .µGetASM(DestMsg, ASMReg.AddrRequest)
+			|| From = .µ(DestMsg.next!, ASMReg.AddrRequest)
 			if out.reg == from.reg
 				return exp.noop // wat?
 			
 			|| offset = 0
 			if Out isnt ContainsAddr
 				if From is ContainsAddr
-					from = .InlineOffsetOpt(from, 3, &offset, 13~bits, nil)
+					from = .InlineOffsetOpt(from, 3, &offset, 13~bits, destmsg.next!.asmdecl)
 					return exp.RFRD(Out, From, 1, offset)			// mem to reg
 				return exp.RFST(Out, From)							// reg to reg
 			
@@ -56,7 +65,7 @@ extend asmstate
 				where.µtype = datatypecode._voidptr
 				From = .Read(where, P, From, nil) * where			// (mem to reg)?
 
-			out = .InlineOffsetOpt(Out, 3, offset, 13~bits, nil)
+			out = .InlineOffsetOpt(Out, 3, offset, 13~bits, DestMsg.asmdecl)
 			return exp.RFWR(Out, From, 1, offset)					// reg to mem
 
 

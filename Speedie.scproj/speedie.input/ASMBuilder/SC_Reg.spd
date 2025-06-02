@@ -161,9 +161,6 @@ datatype ASMReg (uint64)
 		opt inline
 		return self|datatypecode|.isint
 
-	function IntDivType (|int|)
-		return (!.signed)|int|
-	
 	function Signed (|bool|)
 		return self|DataTypeCode|.issigned
 		

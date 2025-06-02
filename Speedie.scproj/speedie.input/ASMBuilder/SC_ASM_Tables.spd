@@ -2,21 +2,22 @@
 
 
 dispatch fn_asm_table (fn_asm)
-	@arg:  ASMType.Arg
-	@decl: ASMType.decl
-	@num:  ASMType.num
-	@char: ASMType.char
-	@rel:  ASMType.DoMath
-	@thg:  ASMType.Thg
-	@bra:  ASMType.First
-	@sheb: ASMType.Sheb
-	@sstr: ASMState.Str
-	@list: ASMState.VectorLoad
-	@func: ASMType.ASMFunction
-	@dot:  ASMType.Dot
-	@acc:  ASMType.Access
-	@brel: ASMType.Brel		// ++, --, -, &
-	@arel: ASMType.arel     // ++, --, 
+	@arg:	ASMType.Arg
+	@tril:	ASMstate.BigWhile
+	@decl:	ASMType.decl
+	@num:	ASMType.num
+	@char:	ASMType.char
+	@rel:	ASMType.DoMath
+	@thg:	ASMType.Thg
+	@bra:	ASMType.First
+	@sheb:	ASMType.Sheb
+	@sstr:	ASMState.Str
+	@list:	ASMState.VectorLoad
+	@func:	ASMType.ASMFunction
+	@dot:	ASMType.Dot
+	@acc:	ASMType.Access
+	@brel:	ASMType.Brel		// ++, --, -, &
+	@arel:	ASMType.arel     // ++, --, 
 	@type:					ASMType.TypeCast
 	@tmp:					ASMType.unexpected
 
@@ -335,11 +336,9 @@ function Decl (fn_asm)
 		.MarkDeclAsConst(ty, k, nil)
 	return k
 
-	
+
 function ArgSub (|&ASMState| self, |message| exp, |&sc_hoister| H, |AsmReg|)
 	opt NoRefCounts
-	|| OV = .OpenVars
-	
 	for ch.fast in exp
 		if h
 			h.HoistNormal(ch)
@@ -348,13 +347,13 @@ function ArgSub (|&ASMState| self, |message| exp, |&sc_hoister| H, |AsmReg|)
 		  else
 			|| What = .µ(ch, AsmReg.RealDiscard)
 			if what & asmreg.exit							// .exit has two bits but "is" requires both
-				return .Closevars(ov, nil, what)
-
-	return .CloseVars(OV, exp)
+				return what
 
 
 function Arg (fn_asm) // argument 
-	return ArgSub(self, exp, nil)
+	|| OV = .OpenVars
+	|| what = ArgSub(self, exp, nil)
+	return .CloseVars(OV, exp, what)
 
 
 function Access (fn_asm)									// a[b], struct.mem[b]

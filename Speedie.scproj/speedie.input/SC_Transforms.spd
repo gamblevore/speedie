@@ -264,6 +264,8 @@ function Tran_WhileSub (TranFunc)
 
 	node.name = "while"
 	node.ASMType = ASMType.kWhile
+	|| parent = node.parent
+		parent.ASMType = @Tril|asmtype|
 	|| Cond	= node.needfirst					#require
 	|| arg	= cond.next
 

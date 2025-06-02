@@ -367,6 +367,8 @@ static bool DoubleIsNormal (double D){
 }
 
 
+// ActualExp is passed as a boolean. However, we re-use this var for an integer value!
+// 1 Reg saved!
 void JB_FS_AppendDoubleAsText (FastString* self, double D, int dp, int ActualExp) {
 	if (!D or !DoubleIsNormal(D))
 		return JB_FS_AppendCString(self, "0.0");
@@ -376,22 +378,24 @@ void JB_FS_AppendDoubleAsText (FastString* self, double D, int dp, int ActualExp
     
     if (D < 0)
 		JB_FS_AppendByte(self, '-');
-	D = fabs(D);
+
+    D = fabs(D) + JB_Pow10(0.5001, -dp); // round off last digit!
+	// Why 0.5001? Well... we need at least 1dp. (Add at least 0.05)
+	// However, 0.05 is NOT STORABLE as a float. Either more, or less.
+	// I guess I could add more 0s, but sometimes floating point errors
+	// often end up with numbers like 0.499994, when really you wanted
+	// 0.5. After multiplying by 0.00000000000000001, this could happen.
+	// Someone better at float-math could help me :)
 
     if (ActualExp) {
 		auto e = log10(D);
 		if (fabs(e) > 7) {
 			ActualExp = (int)floor(e);
-			if (ActualExp <= -200)
-				debugger;
 			D = JB_Pow10(D, -ActualExp);
 		} else {
 			ActualExp = 0;
 		}
 	}
-    
-    auto DP2 = JB_Pow10(0.5001, -dp);
-    D = fabs(D) + DP2;
     
 	auto F = floor(D);
 	JB_FS_AppendIntegerAsText(self, F, 1);
@@ -421,8 +425,8 @@ void JB_FS_AppendDoubleAsText (FastString* self, double D, int dp, int ActualExp
 			*++Write = '-';
 		}
 		bool Active = false;
-		for (int i = 100; i >= 1; i/=10) {
-			Active |= (ActualExp >= i  or  i == 1);
+		for (int i = 100; i >= 1; i /= 10) {
+			Active |= (ActualExp >= i  ||  i == 1);
 			if (Active) {
 				*++Write = '0' + (ActualExp / i);
 				ActualExp = ActualExp % i;

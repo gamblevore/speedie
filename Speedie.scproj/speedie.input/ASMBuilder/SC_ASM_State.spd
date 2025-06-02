@@ -44,6 +44,7 @@ struct ASMState
 	
 
 	module
+		|SC_Hoister|				WhileHoister
 		|ASMState|					Sh
 		|?memory of fatasm|			JSM
 
@@ -319,7 +320,8 @@ struct ASMState
 			dest.TmpCheck
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
-			debugat 0 // keep this
+			|| trap = ++ASMTrapper
+			if trap == 431
 				
 		  else
 			opt inline
@@ -817,6 +819,8 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	return fat*dest
 		
 
+target debug
+	|| ASMTrapper = 0
 // Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:4, 8:0
 // There are only 4 above 6!, only 14 above 5, 75 above 4
 // almost all lib functions have 4 or less. 5 is for proj funcs.

@@ -35,7 +35,11 @@ datatype ASMType (uint16)
 		kSetRel
 		kIgnore
 		kDebugger
-		kRefCount // 62
+		kRefCount
 		kFail = 63
+	
+	function Tester
+		disabled 
+		|| x = kRefCount // last value
 	
 	

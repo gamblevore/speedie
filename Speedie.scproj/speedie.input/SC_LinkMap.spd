@@ -38,16 +38,14 @@ module LinkMap
 
 
 	function Collect (|scfunction| self)
-		opt norefcounts
+		opt NoRefCounts
 		scfunction.currfunc = self
 		CurrID++
 	
 		for d in .args
 			.CollectLinks( d )
-	
-		|| r = .returntype
+		|| r = .ReturnType
 			.CollectLinks( r )
-	
 		CollectFromSource(self, .sourcearg, false)
 	
 	
@@ -57,7 +55,7 @@ module LinkMap
 			|| o = msg.obj
 				.CollectLinks( o )
 			if msg.HasAny
-				if !inbranch
+				if !InBranch
 					|| T = msg.ASMType
 					InBranch = (t == ASMType.kIf or ASMType.kwhile or ASMType.ktern)
 				CollectFromSource(Self, msg, inbranch)

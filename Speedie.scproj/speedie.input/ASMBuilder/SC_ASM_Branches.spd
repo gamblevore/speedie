@@ -65,7 +65,6 @@ function IfSub (fn_asm)
 	rz = .Else(other) & Arg1Return						// if x {return} else {return}
 	AfterFirst.jumpto(.curr, asmstate.sh)
 	.BasicBlock++
-	
 
 
 function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
@@ -82,25 +81,19 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 
 
 
-function While (fn_asm)
-	opt norefcounts
-	|SC_Hoister| H
-	
+function BigWhile (fn_asm)
 	|| OV = .OpenVars
-	h.HoistLoop(self, exp)
+	WhileHoister = nil
+	WhileHoister.HoistLoop(self, exp)
+	|| what = asmtype.ArgSub(self, exp, nil)
+	return .CloseVars(OV, exp, what)
 	
-	|| v = .WhileWrap(exp)
-	
-	// seems the gtab closer has to go into closevars.
-	// or else... the arg wrapper will close this.
-	return .CloseVars(OV, v)
 
-
-function WhileWrap (|message| exp, |asmreg|)
+function While (fn_asm)
 	.state.BranchDepth++
 	rz = .WhileSub(exp)
-	.state.BranchDepth--
-	
+	.state.BranchDepth--	
+
 
 function WhileSub (|message| exp,  |asmreg|)
 	opt norefcounts
@@ -116,7 +109,7 @@ function WhileSub (|message| exp,  |asmreg|)
 	
 	if loop_test.always
 		.Nop(InitialJump)
-		if  loop_test.after != loop_Test.start  //  EH?
+		if  loop_test.After != loop_Test.Start  //  EH?
 			debugger
 			.NopRange(loop_Test.start, loop_Test.after)
 		
@@ -130,6 +123,7 @@ function WhileSub (|message| exp,  |asmreg|)
 	.loopfill(InitialJump+1 /*loop_start*/,  loop_test.start /*continue*/,  loop_test.After /*exit*/)
 	
 	return returns * loop_test.Always
+
 
 
 function Exit			(fn_asm)

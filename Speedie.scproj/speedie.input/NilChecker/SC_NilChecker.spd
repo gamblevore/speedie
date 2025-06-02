@@ -29,6 +29,7 @@ extend_module ArchonPurger {
 		@list:	List
 		@decl:	Declaration
 		@arg:	Argument
+		@tril:	Argument
 		@sheb:  Ignore
 		@sstr:	String
 		@str:	String

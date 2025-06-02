@@ -203,6 +203,7 @@ struct RetroFloat
 	
 	syntax Append (|float| n)
 		.Amount += n
+	
 	syntax Access (|int|)
 		|| A = .Amount // 1.1... every 10th frame returns 2
 		|| rem = A.fract + .remain
@@ -714,7 +715,7 @@ datatype int64
 		cpp_wrapper
 	
 	render Hex
-		fs.appendhex(self)
+		fs.AppendHex(self)
 
 	helper RenderSizePart (|faststring| fs, |int| Size, |string| Suff)
 		|| f = (self div size)|float|.DecimalPlaces(1)

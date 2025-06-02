@@ -523,13 +523,13 @@ extend ASMState
 		if 0
 			exp.DIVS(ASMReg(), ASMReg(), ASMReg(), ASMReg(), 0)
 			exp.QDIV(ASMReg(), ASMReg(), ASMReg(), ASMReg(), 0)
-		return exp.DIV(dest, ASMReg(), l, r, dest.IntDivType).Vectorisesmall(dest, asm.qdiv, asm.divs)
+		return exp.DIV(dest, ASMReg(), l, r, dest.signed|int|).Vectorisesmall(dest, asm.qdiv, asm.divs)
 
 
 	function ModInt    (fn_opasm)
 		if dest is ConstOutput
 			return .MakeConstFromTwo(dest, L, R, exp, ConstifyIntMod)
-		return exp.DIV(asmreg(), dest, L, R, dest.IntDivType) * Dest
+		return exp.DIV(asmreg(), dest, L, R, dest.signed|int|) * Dest
 
 
 	function ModFloat    (fn_opasm)
