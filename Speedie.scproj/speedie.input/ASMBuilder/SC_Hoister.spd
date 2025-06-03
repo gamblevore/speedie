@@ -1,9 +1,42 @@
 
 
-// if the globs fill up, we won't get any consts!
-// i do want both, though? Which are more important?
-// Depends, on the code, right? Sigh... I guess
-// lets leave this for now.
+/*
+
+If the globs fill up, we won't get any consts! I do want both,
+though? Which are more important? Depends, on the code, right?
+Sigh... I guess lets leave this for now.
+
+This is really annoying. is there a better way? Perhaps
+"pre-doing" loops? What about ordinary lines?
+
+That... or we gotta post-optimise. Lets list approaches:
+
+* Go over the tree... and try to pre-hoist. 
+	* Perhaps by doing the globals first, and consts second.
+		* How to make sure we don't have too many gtabs?
+		  And leave soem space for consts? (just count them) 
+
+* Hoist during post-optimisation
+	* Requires variable reordering. And branch-length adjustments.
+		* Reordering also means functions need to be reordered.
+	
+* Pre-allocate space for instructions.
+	* Requires variable reordering.
+	
+* Pre-compile... analyse, then rewind.
+	* Works... a little slow?
+		* Can be sped up by making it more complex to avoid stuff.
+	* Maybe simpler overall?
+		* Still needs a total re-write of my hoister.
+	* avoids dead-code. Better for inlines?
+
+*/
+
+
+
+
+
+
 
 struct SC_Hoister
 	linkage
@@ -12,8 +45,8 @@ struct SC_Hoister
 	|byte|				Count
 	|byte|				Spare
 	|message--[6]|		Consts
-	
-	
+
+
 	constants
 		MinHoistScore = 3
 		AsLoop = 1<<20
@@ -23,8 +56,8 @@ struct SC_Hoister
 		|| Glob = .TryGetGlob(D)
 			return Glob
 		return .GlobAddrsub(d, exp, dest)
-	
-	
+
+
 	function ASMState.GlobAddrSub (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 		opt norefcounts
 
@@ -38,8 +71,8 @@ struct SC_Hoister
 		Dest = fat * dest
 		dest.µtype = DataTypeCode._voidptr
 		return dest.HaveAddr
-	
-	
+
+
 	function ASMState.Hoist (|?&fatasm| fat, |int| n)
 		if fat == sh.KnownValues[n]
 			return // already done. Probably a number.
@@ -54,7 +87,7 @@ struct SC_Hoister
 		
 		sh.KnownValues[n] = fat
 		sh.HoistMap |= 1<<n
-		
+
 
 	function HoistNormal (|message| exp)
 		.spare = 4
@@ -66,7 +99,7 @@ struct SC_Hoister
 		.Spare = 5
 		.HoistRecursive(sh, exp, asloop)
 		.FillConsts
-		
+
 
 	helper FillConsts
 		opt norefcounts
@@ -74,7 +107,7 @@ struct SC_Hoister
 			|| prop = .consts[i]!
 			.PostRunConst(asmstate.sh, prop, prop.asmdecl)
 
-	
+
 	helper Added (|asmstate| sh, |asmreg| Dest, |scdecl| decl, |asmreg| K)
 		decl.FatConstIndex = k.fatindex
 
@@ -90,7 +123,7 @@ struct SC_Hoister
 			|| K = sh.GlobAddrSub(decl, prop, dest)
 			.Added(sh, dest, decl, K)
 
-	
+
 	function ASMState.TryGetGlob (|SCDecl| D, |asmreg|)
 		|uint64| find = d.ExportPosition
 		|uint64| range = 128 * d.globInfo.ByteCount
@@ -99,7 +132,7 @@ struct SC_Hoister
 				|uint64| Addr = old.const
 				if Addr <= find and addr + range > find
 					return old.info
-					
+
 
 	function TryHoistOne (|asmstate| sh, |message| exp, |scdecl| decl, |int| Score)
 		if decl is Global // hoist straight off
@@ -136,8 +169,7 @@ struct SC_Hoister
 				decl.FatConstIndex = old.Index
 				return true
 
-	
-	
+
 	function CanHoist (|bool|)
 		return .spare > 0
 	
@@ -167,9 +199,9 @@ struct SC_Hoister
 				
 			require .HoistRecursive(sh, ch, add + score)
 		return true
-		
 
-	
+
+
 function message.Declable (|message!|)
 	opt norefcounts
 	|| fn = .func
