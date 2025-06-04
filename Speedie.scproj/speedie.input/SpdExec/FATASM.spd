@@ -8,20 +8,26 @@ struct FatASM
 	// phi-nodes can actually be done simply by linking one fat to the prev
 	|byte|				InputFats
 	|byte|				InputRegs
+	|byte| 				Outputs
 	|byte|				_Op
 	|byte|				JumpReg
-	|byte| 				Outputs
 	|byte| 				BranchDepth
 	|byte| 				LoopDepth
 	|ASMReg| 			Info
 	|message--| 		Msg
 	|uint64| 			_Const
 	|uint[6]|			Prms
-	|uint16|			ASMIndex
 	|uint16| 			BasicBlock
-	|int16|				µRefCount
+	|int16|				µRefCount		// could make this a byte and stick at 255.
 	
 
+	function ASMIndex (|uint16|)
+		return .basicblock
+
+	setter ASMIndex (|uint16|)
+		.basicblock = value
+		
+	
 	function Op (|byte|)
 		return ._op
 	
@@ -37,7 +43,6 @@ struct FatASM
 		// leave info, msg, and _const. Other things may need them still.
 		for i in –count .prms
 			.prms[i] = 0
-		.asmindex = 0
 		.BasicBlock = 0
 		.µrefcount = 0
 	
