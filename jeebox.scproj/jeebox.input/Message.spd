@@ -44,6 +44,7 @@ The tree-data-structure represents your data. The Message class is similar to XM
 
 	constructor
 		cpp_part ConstructorEmpty
+		
 		parser.CountStats++
 		.func = @arg
 		.Position	= parser.Using.position
@@ -54,6 +55,7 @@ The tree-data-structure represents your data. The Message class is similar to XM
 			
 	constructor (|Syntax| Func=1|Syntax|, |string| Name="")
 		cpp_part ConstructorNormal
+		
 		parser.CountStats++
 		.name		= name
 		.func		= func
@@ -65,8 +67,8 @@ The tree-data-structure represents your data. The Message class is similar to XM
 	
 	constructor (|Message| Parent, |Syntax| Func, |int| BytePos, |string| name, |int| RangeLength=0)
 		cpp_part ConstructorRange
+
 		super.constructor(Parent)
-		
 		parser.CountStats++
 		.name		= name
 		.Position	= BytePos
@@ -1063,7 +1065,8 @@ The tree-data-structure represents your data. The Message class is similar to XM
 	
 	Syntax Append (|int64| Num)
 		cpp_part AppendNum
-		self <~ (@num, num.render)
+		opt norefcounts
+		.syntaxappend(@num, num.render)
 
 	Syntax Using (|MessagePosition|)
 		Opt NoRefCounts

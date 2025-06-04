@@ -126,7 +126,7 @@ class Memory
 	function NeedSpare (|int| ReqItems, |int| Extra = 0,  |&...|)
 		|| Q = .length + reqitems
 		if .size < Q
-/			require .SetSize(Q+Extra)
+			require .SetSize(Q+Extra)
 		return (.ptr + .size*.itemsize)|&...|
 
 	function HasSpare (|bool|)
