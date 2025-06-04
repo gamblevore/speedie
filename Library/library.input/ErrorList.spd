@@ -243,7 +243,11 @@ extend Object
 		cpp_part Fail
 		printline errorreceiver.NonFatal
 		app.CrashPrint
-		"${app.ObjMemory.strsize} memory used"
+		target debug
+			|| fs = faststring()
+			app.ObjMemory.strsize(Fs)
+			fs <~ " memory used"
+			printline fs
 		errorreceiver.NewError(nil, errorreceiver.NonFatal)
 
 
