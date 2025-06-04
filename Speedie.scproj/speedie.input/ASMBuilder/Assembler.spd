@@ -23,6 +23,7 @@ struct Assembler
 	|bool|						IsTextual
 	|int|						CurrFuncGrab
 	|bool|						Inited
+	|bool|						NeedsRework
 	|bool|						TailInlineable
 
 	|scfunction--|				Out
@@ -522,6 +523,7 @@ struct Assembler
 		.VDecls = 0
 		.IsTextual = false
 		.VTemps = 32
+		.NeedsRework = false
 		.zero = nil
 		.zero.info = AsmReg()
 //		.vars = nil // C++ doesn't get right code... should be memory.fill
@@ -823,21 +825,6 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 		
 
 
-
-function Assembler.GenerateASM (|scfunction| fn,  |bool|) // asmgenerate
-	opt norefcounts
-	
-	require .InitAndStartFunc(fn)
-	fn.GenASM
-	// OrigPass here
-	.FinishASM
-
-	if StdErr.ok
-		target debug
-			fn.µprint(i)
-		return true
-
-
 target debug
 	|| ASMTrapper = 0
 // Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:4, 8:0
@@ -846,3 +833,21 @@ target debug
 	
 
 	
+
+
+
+function Assembler.GenerateASM (|scfunction| fn,  |bool|) // asmgenerate
+	opt norefcounts
+	
+	require .InitAndStartFunc(fn)
+	fn.GenASM
+	if .NeedsRework
+		.CopyOver
+		fn.genasm
+	.FinishASM
+
+	if StdErr.ok
+		target debug
+			fn.µprint(i)
+		return true
+
