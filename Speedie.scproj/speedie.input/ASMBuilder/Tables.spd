@@ -525,15 +525,15 @@ function BoolNot (fn_asm)							// !a
 
 ///   ///
 
-function IncrSlowOnAddr (|&Assembler| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |ASMReg|)	
-	opt	NoRefCounts									// *a, x = *(a.b)
+function IncrSlowOnAddr (|&Assembler| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |scdecl| glob,  |ASMReg|)	
+	opt	NoRefCounts										// *a, x = *(a.b)
 	|| TmpCloser = .OpenVars
-	.Read(Dest, F, dest, addr)						// READ
+	.Read(Dest, F, dest, addr, glob)					// READ
 
 	|| NewValue = (.Temptyped(f), dest)(mode & IncrAfter)
-	.IncrPre(f, NewValue, dest, amount)				// ADD
+	.IncrPre(f, NewValue, dest, amount)					// ADD
 
-	|| fat = .write(dest, f, newvalue, addr)		// WRITE BACK
+	|| fat = .write(dest, f, newvalue, addr, glob)		// WRITE BACK
 
 	// the new value should exist! now lets close
 	.CloseVars(TmpCloser)
@@ -542,7 +542,7 @@ function IncrSlowOnAddr (|&Assembler| self, |message| f, |ASMReg| Dest, |int| Mo
 
 function IncrOnAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |scdecl| Glob, |asmreg|)
 	ifn  dest.isint  and  amount.fits(6)
-		return IncrSlowOnAddr(self, exp, dest, mode, Addr, Amount)
+		return IncrSlowOnAddr(self, exp, dest, mode, Addr, Amount, glob)
 	|| bc = dest.µtype.ByteCount.log2
 	|| offset = 0
 	addr = .InlineOffsetOpt(addr, bc, &offset, 6~bits, glob)

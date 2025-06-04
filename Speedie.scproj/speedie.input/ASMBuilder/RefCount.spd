@@ -59,13 +59,14 @@ extend Assembler
 					return exp.RFRD(Out, From, 1, offset)			// mem to reg
 				return exp.RFST(Out, From)							// reg to reg
 			
+			|| glob = DestMsg.asmdecl
 			if  From is ContainsAddr
 				|| P = prms.second!
 				|| where = .Temponly(P)
 				where.µtype = datatypecode._voidptr
-				From = .Read(where, P, From, nil) * where			// (mem to reg)?
+				From = .Read(where, P, From, nil, glob) * where			// (mem to reg)?
 
-			out = .InlineOffsetOpt(Out, 3, offset, 13~bits, DestMsg.asmdecl)
+			out = .InlineOffsetOpt(Out, 3, offset, 13~bits, glob)
 			return exp.RFWR(Out, From, 1, offset)					// reg to mem
 
 

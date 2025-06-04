@@ -733,12 +733,12 @@ function LowlevelArrayTransform (|Message| exp, |SCClass| Cls, |SCDecl|)
 	ty.name  = "memory"
 
 	prms.Func = @prm
-	prms <~ cls.calculatesize
+	using exp
+		prms <~ cls.CalculateSize
 	
-	|| MemWrapper = TypeOfExpr(exp, compiler.program)	#require
-	MemWrapper = MemWrapper.copydecl // cos we gonna alter it.
-//	(memwrapper is newlycreated)
-	memwrapper.contains = cls.TypeOptional
+	|| MemWrapper = TypeOfExpr(exp, compiler.program)
+		MemWrapper = MemWrapper.CopyDecl						// cos we gonna alter it.
+		memwrapper.contains = cls.TypeOptional
 	
 	return MemWrapper
 

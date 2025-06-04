@@ -325,7 +325,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			if trap == 431
+			//if trap == 431
 				
 		  else
 			opt inline
@@ -344,13 +344,7 @@ struct Assembler
 					(fn)(self, exp, dest)
 		return ss
 	
-
-	function ReadOrWrite (|ASMReg| dest, |message| m, |asmreg| base, |asmreg| VarAdd, |scdecl| Ty,  |int| index=0, |asmreg|)
-		if dest is FromZeroMemory or set
-			(dest is realconst) // make compiler happy
-		return .ReadOrWriteSub(dest, m, base, VarAdd, ty, index) * dest
-
-
+	
 	function ZeroMemory (|int| Index, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl| D, |&fatasm|)
 		check (d and !index and !varadd.reg) (exp)
 		if d
@@ -359,8 +353,7 @@ struct Assembler
 		return exp.MEMZ(base, index)
 	
 	
-	function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl| D, |int| Index, |&fatasm|)
-		#! We need to handle:   x = &glob, gtab doesn't give byte-aligned stuff!
+	function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl!| D, |int| Index, |&fatasm|)
 		if dest is containsaddr
 			#!wait?? this is meant to be an addrrequest? not a response.
 			debugger
@@ -408,16 +401,23 @@ struct Assembler
 			rz._op = ASMType.ReadASM[b]
 
 
-	function Read (|asmreg| dest, |message| exp,  |asmreg| ptr,  |asmreg| varadd,  |int| index=0,  |&fatasm|)
+	function Read (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scdecl| DestMsg, |int| index=0,  |&fatasm|)
 		opt inline
 		(dest isnt set)
-		return .ReadOrWriteSub(dest, exp, ptr, varadd, nil, index)
-		
+		return .ReadOrWriteSub(dest, exp, ptr, VarAdd, DestMsg, index)
 
-	function Write (|asmreg| dest, |message| exp,  |asmreg| ptr,  |asmreg| varadd,  |int| index=0,  |&fatasm|)
+
+	function Write (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scdecl| ReadMsg, |int| index=0, |&fatasm|)
 		opt inline
 		(dest is set)
-		return .ReadOrWriteSub(dest, exp, ptr, varadd, nil, index)
+		return .ReadOrWriteSub(dest, exp, ptr, VarAdd, ReadMsg, index)
+
+
+	function ReadOrWrite (|ASMReg| dest, |message| m, |asmreg| base, |asmreg| VarAdd, |scdecl| Ty,  |int| index=0, |asmreg|)
+		opt inline
+		if dest is FromZeroMemory or set
+			(dest is RealConst)				// make compiler happy
+		return .ReadOrWriteSub(dest, m, base, VarAdd, ty, index) * dest
 
 
 	function PrmCollectSpd (|message| prms,  |SCFunction| fn,  |uint64|) // paramcollect, paramscollect
