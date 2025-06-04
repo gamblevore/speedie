@@ -5,10 +5,11 @@ struct InlineBlock
 	|asmreg|		Return
 	|byte|			ParentVDecls
 	|byte|			BranchDepth
+	|byte|			LoopDepth
 	|byte|			InlineDepth
 
 
-struct ASMState
+struct Assembler
 	linkage: cpp_part Pac
 	|DataTypeCode|				ReturnASM
 	|uint16| 					BasicBlock
@@ -28,6 +29,7 @@ struct ASMState
 
 	|?&FatASM|					InlineEnd
 	|uint|						HoistMap
+	|&FatASM|					OrigPass
 	|&FatASM|					FuncStart
 	|&FatASM|					LastDebug
 	|&FatASM|					Start		// a "slice" feature would be nice    
@@ -44,9 +46,10 @@ struct ASMState
 	
 
 	module
-		|SC_Hoister|				WhileHoister
-		|ASMState|					Sh
+		//|SC_Hoister|				WhileHoister
+		|Assembler|					Sh
 		|?memory of fatasm|			JSM
+		|?memory of fatasm|			HoistSpace
 
 
 	function fn (|scfunction!--|)
@@ -753,7 +756,7 @@ function SCFunction.HasCVersion (|bool|)
 
 
 
-function asmstate.RegClear (|message| exp, |&fatasm| C, |int| i)
+function Assembler.RegClear (|message| exp, |&fatasm| C, |int| i)
 	c.prms[5] = 0
 	|| L = c.Const
 	|| signed = L < 0
@@ -761,7 +764,7 @@ function asmstate.RegClear (|message| exp, |&fatasm| C, |int| i)
 	exp.BFLG(i.asm, i.asm, L, L, signed|int|)
 
 
-function asmstate.RegsBitClear (|message| exp, |&fatasm| Start)
+function Assembler.RegsBitClear (|message| exp, |&fatasm| Start)
 	opt norefcounts
 	|| c = .Last-1
 	while C >= Start
@@ -818,6 +821,22 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	.CurrFuncGrab--
 	return fat*dest
 		
+
+
+
+function Assembler.GenerateASM (|scfunction| fn,  |bool|) // asmgenerate
+	opt norefcounts
+	
+	require .InitAndStartFunc(fn)
+	fn.GenASM
+	// OrigPass here
+	.FinishASM
+
+	if StdErr.ok
+		target debug
+			fn.µprint(i)
+		return true
+
 
 target debug
 	|| ASMTrapper = 0

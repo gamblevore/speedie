@@ -38,8 +38,8 @@ function fatasm.KNST_Encoder (Asm_encoder)
 
 
 
-extend ASMState
-	function MakeConstFromTwo (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |fn_ASMConstifier| fn,  |asmreg|)
+extend Assembler
+	function MakeConstFromTwo (|&Assembler| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |fn_ASMConstifier| fn,  |asmreg|)
 		// how to vectorise this? sigh...
 		|| K = (fn)(l, r)
 		.Nop2Consts(r, l)
@@ -157,7 +157,7 @@ function int64.CanStoreAsIntImmediate (|bool|)
 	return ((self << 50)>>50) == self
 
 
-function ASMState.CanAddK (|asmreg| R, |int64| T, |bool|) // used to be used from .plus()... works now from render
+function Assembler.CanAddK (|asmreg| R, |int64| T, |bool|) // used to be used from .plus()... works now from render
 	require (r is constoutput) and R.isint
 	require t.CanStoreAsIntImmediate
  

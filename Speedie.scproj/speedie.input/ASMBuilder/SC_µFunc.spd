@@ -1,7 +1,7 @@
 
 extend SCFunction
 	function StartASM
-		.µstart = ASMState.sh.Index
+		.µstart = Assembler.sh.Index
 
 	function µTest (|memory of asm|)
 		description "Generate some code (only for testing)."
@@ -14,7 +14,7 @@ extend SCFunction
 	// cosmic lore unfold... into tales untold
 
 	function IR (|&fatasm|)
-		return ASMState.sh.start + .µstart
+		return Assembler.sh.start + .µstart
 	
 	function MuRender (|!&ASM| Where, |!&asm| After, |!&asm|)
 		|uint64| HasLabel

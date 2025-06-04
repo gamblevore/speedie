@@ -12,12 +12,12 @@ function SCFunction.GenASM
 	opt norefcounts
 	|SC_Hoister| H 
 	|| a = .sourcearg!
-	asmtype.ArgSub(ASMState.Sh, A, H)
+	asmtype.ArgSub(Assembler.Sh, A, H)
 
 
 function message.OperatorMul (|asm| op, |&fatasm|)
 	cpp_part RequestOp
-	|| a = ASMState.sh
+	|| a = Assembler.sh
 	|| p = a.Curr
 	if p < a.End
 		if  .Position < 0
@@ -27,6 +27,7 @@ function message.OperatorMul (|asm| op, |&fatasm|)
 		P._op = op
 		p.debug = self
 		p.BranchDepth = a.State.BranchDepth
+		p.LoopDepth = a.State.LoopDepth
 		p.BasicBlock = a.BasicBlock
 		return p
 
@@ -48,7 +49,7 @@ target debug
 
 
 
-function asmstate.CloseOneVar (|message?| exp, |int| OriginalDecls, |&bool| DoMore,   |message?|)
+function Assembler.CloseOneVar (|message?| exp, |int| OriginalDecls, |&bool| DoMore,   |message?|)
 	opt norefcounts
 	
 										  /// READ TABLE ///

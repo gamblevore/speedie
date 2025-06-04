@@ -3,7 +3,7 @@
 #!"if (x) return, a(), b()   -->   if !x {a(), b()}, return"
 
 
-extend ASMState {
+extend Assembler {
 
 function Else (|message?| other, |asmreg|)
 	rz = .ElseSub(other)
@@ -63,7 +63,7 @@ function IfSub (fn_asm)
 	|| AfterFirst = other.jump
 	.AllJumpTo(b)
 	rz = .Else(other) & Arg1Return						// if x {return} else {return}
-	AfterFirst.jumpto(.curr, asmstate.sh)
+	AfterFirst.jumpto(.curr, Assembler.sh)
 	.BasicBlock++
 
 
@@ -83,15 +83,17 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 
 function BigWhile (fn_asm)
 	|| OV = .OpenVars
-	WhileHoister = nil
-	WhileHoister.HoistLoop(self, exp)
+	//WhileHoister = nil
+	//WhileHoister.HoistLoop(self, exp)
 	|| what = asmtype.ArgSub(self, exp, nil)
 	return .CloseVars(OV, exp, what)
 	
 
 function While (fn_asm)
-	.state.BranchDepth++
+	.state.BranchDepth++ // loops are still branches
+	.state.LoopDepth++
 	rz = .WhileSub(exp)
+	.state.LoopDepth--
 	.state.BranchDepth--	
 
 
@@ -435,7 +437,7 @@ Struct FatRange
 			yield curr
 
 
-extend ASMState
+extend Assembler
 	function InlineFinishWithConsts (|fatrange| R, |ASMReg|)
 		for s in R
 			if s isa asm.ret
@@ -450,7 +452,7 @@ extend ASMState
 				s.JumpReg = 1
 				.JumpFix(s)
 			  elseif s isa asm.KNST
-				ASMState.sh.AskNop(s)
+				Assembler.sh.AskNop(s)
 		
 		rz &= ~ASMReg.Exit
 		(rz as= .state.return&asmreg.exit)
@@ -470,13 +472,13 @@ extend ASMState
 	
 	
 
-function @asmstate.PrintProgress (|message| exp=nil)
+function @Assembler.PrintProgress (|message| exp=nil)
 	cpp_name adb 
 	visible
 	opt norefcounts
 	"---"
 	printline scfunction.currfunc!
-	|| s = asmstate.sh
+	|| s = Assembler.sh
 	if exp
 		printline exp
 	  else

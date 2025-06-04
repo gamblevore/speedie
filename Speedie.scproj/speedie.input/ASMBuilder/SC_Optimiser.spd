@@ -1,7 +1,7 @@
 
 
 
-function asmstate.Optimise 
+function Assembler.Optimise 
 	|| A = .Curr
 	|| S = .FuncStart
 	// jumps of 0 can be rendered as a nop
@@ -22,7 +22,7 @@ function uint.OperatorSameReg (|uint| R, |bool|)
 	return self&31 == R&31
 
 
-function fatasm.OptBor (|asmstate| A)
+function fatasm.OptBor (|Assembler| A)
 	require !.r2 and !.r3
 	|| dest = .r0
 	|| input = .r1
@@ -49,7 +49,7 @@ function FatASM.ReplaceReg (|uint| Dest, |uint| New, |bool|)
 			.InputFats &=~ (1<<i) // not sure what the fat of New is? Its not an ASMReg is it?
 
 
-function fatasm.MiniOpt (|asmstate| A)
+function fatasm.MiniOpt (|Assembler| A)
 // we aren't doing a full optimiser. A few mini-opts could be nice
 	if self isa asm.borr
 		.OptBor(A)

@@ -12,6 +12,7 @@ struct FatASM
 	|byte|				JumpReg
 	|byte| 				Outputs
 	|byte| 				BranchDepth
+	|byte| 				LoopDepth
 	|ASMReg| 			Info
 	|message--| 		Msg
 	|uint64| 			_Const
@@ -32,6 +33,7 @@ struct FatASM
 		.jumpreg = 0
 		.outputs = 0
 		.BranchDepth = 0
+		.LoopDepth = 0
 		// leave info, msg, and _const. Other things may need them still.
 		for i in –count .prms
 			.prms[i] = 0
@@ -137,7 +139,7 @@ struct FatASM
 		// we will be the last instruction
 		// so how can we reset this? I thinkonly by comparing the
 		// state's vdecls. Temps will disappear.
-		|| v = ASMState.sh.VDecls
+		|| v = Assembler.sh.VDecls
 		if v == reg and v == (.r0 - 1)
 			.Outputs = v|int|.log2
 			.r0 = v
@@ -170,11 +172,11 @@ struct FatASM
 		(aware), return .id == ID
 	
 	function ID (|uint|)
-		return self - asmstate.sh.start
+		return self - Assembler.sh.start
 
 	function Index (|uint|)
 		opt inline
-		return 1 + self - asmstate.sh.funcstart
+		return 1 + self - Assembler.sh.funcstart
 
 	function SCdecl.Fat (|&fatasm|)
 		|| K = .FatConstIndex|uint|
@@ -183,7 +185,7 @@ struct FatASM
 	function uint.FAT (|&FATASM|)
 		opt inline
 		if self
-			return asmstate.sh.funcstart + (self - 1)
+			return Assembler.sh.funcstart + (self - 1)
 	
 	function FileNum (|int|)
 		return .msg.filenum & 0x4095
@@ -250,11 +252,11 @@ struct FatASM
 			return s
 	
 	syntax Using (|&fatasm|)
-		rz = ASMState.sh.curr
-		ASMState.sh._curr = self
+		rz = Assembler.sh.curr
+		Assembler.sh._curr = self
 		
 	syntax UsingComplete (|&nil| idk)
-		ASMState.sh._curr = self, (idk)
+		Assembler.sh._curr = self, (idk)
 	
 	
 	Syntax Expect (|string| Error)
@@ -271,7 +273,7 @@ struct FatASM
 		.prms[a] = v
 		.JumpReg = a + 1
 		.µRefCount = 1 max .µRefCount // control flow is always used?
-		ASMState.sh.BasicBlock++
+		Assembler.sh.BasicBlock++
 	
 	
 	function Jump (|int|)
@@ -284,7 +286,7 @@ struct FatASM
 			return self + 1 + .prms[j-1]|int|
 	
 	
-	function JumpTo (|&fatasm| value, |&asmstate| A)
+	function JumpTo (|&fatasm| value, |&Assembler| A)
 		cpp_Part JumpToSet
 		|| j = .jumpreg
 			|| D = (value - self) - 1
@@ -515,7 +517,7 @@ struct FatASM
 			return true
 		
 		if D != D0 // faster jump
-			.JumpTo(D, ASMState.sh)
+			.JumpTo(D, Assembler.sh)
 			return true
 		
 		

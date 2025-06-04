@@ -1,7 +1,7 @@
 
 
 
-extend ASMState
+extend Assembler
 	function VecSwizzle (fn_asm)
 		opt norefcounts
 		dest = .temptyped(exp, dest)

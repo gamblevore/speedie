@@ -130,9 +130,9 @@ module {
 	|scoperator|						And
 	|scoperator|						Or
 	|scoperator|						Assigns
-	|scoperator| 						Negative= SCOperator.new(&asmstate.minus, opmode.Subtraction)	// -b... not a-b!
+	|scoperator| 						Negative= SCOperator.new(&Assembler.minus, opmode.Subtraction)	// -b... not a-b!
 	|scoperator| 						Subtract														// a-b!!
-	|scoperator| 						Bnot	= SCOperator.new(&asmstate.BitNot, opmode.Bit)
+	|scoperator| 						Bnot	= SCOperator.new(&Assembler.BitNot, opmode.Bit)
 	|scoperator|						LeftShift
 	
 	function Lookup ( |Message| opch, |SCOperator| )
@@ -160,29 +160,29 @@ module {
 		Negative.name = "-"
 		Bnot.name = "~"
 
-		.AddComp("==",					&asmstate.Equals,	OpMode.ExactEquals)
-		.AddComp( "<",					&asmstate.Less,		opmode.Comparison + opmode.less)
-		.AddComp( ">",					&asmstate.More,		opmode.Comparison + opmode.more)
-		.AddComp( "<=",					&asmstate.LessEq,	opmode.Comparison)
-		.AddComp( ">=",					&asmstate.MoreEq,	opmode.Comparison)
-		.AddComp( "!=",					&asmstate.NotEq,	OpMode.ExactNotEquals)
+		.AddComp("==",					&Assembler.Equals,	OpMode.ExactEquals)
+		.AddComp( "<",					&Assembler.Less,		opmode.Comparison + opmode.less)
+		.AddComp( ">",					&Assembler.More,		opmode.Comparison + opmode.more)
+		.AddComp( "<=",					&Assembler.LessEq,	opmode.Comparison)
+		.AddComp( ">=",					&Assembler.MoreEq,	opmode.Comparison)
+		.AddComp( "!=",					&Assembler.NotEq,	OpMode.ExactNotEquals)
 		.OppositeComp("==", "!=")
 		.OppositeComp("<", ">=")
 		.OppositeComp(">", "<=")
 
 		.AddBasic
 		
-		.AddMath( "mod",	"mod",		&asmstate.Mod,		/*.Mod*/	opmode.NeedsCppFuncOnFloats)
-		.AddMath( "+",		"Plus",		&asmstate.Plus,		/*.Add*/	opmode.Addition)
-		.AddMath( "-",		"Minus",	&asmstate.Subtract,	/*.sub*/	opmode.subtraction)
-		.AddMath( "*",		"Mul",		&asmstate.Multiply,	/*.mul*/	opmode.Multiply)
-		.AddMath( "/",		"Divide",	&asmstate.Divide,	/*.div*/)
+		.AddMath( "mod",	"mod",		&Assembler.Mod,		/*.Mod*/	opmode.NeedsCppFuncOnFloats)
+		.AddMath( "+",		"Plus",		&Assembler.Plus,		/*.Add*/	opmode.Addition)
+		.AddMath( "-",		"Minus",	&Assembler.Subtract,	/*.sub*/	opmode.subtraction)
+		.AddMath( "*",		"Mul",		&Assembler.Multiply,	/*.mul*/	opmode.Multiply)
+		.AddMath( "/",		"Divide",	&Assembler.Divide,	/*.div*/)
 
-		.AddBit( ">>",	"ShiftRight",	&asmstate.SHR,		/*.shru*/	opmode.shift)
-		LeftShift = .addbit( "<<",	"ShiftLeft",	&asmstate.SHL,		/*.shl*/	opmode.shiftonly) // can add bits
-		.AddBit( "(|)",	"BitOr",		&asmstate.BitOr,	/*.bor*/)
-		.AddBit( "&",	"BitAnd",		&asmstate.BitAnd,	/*.ban*/	opmode.SameOrLessBits)
-		.AddBit( "^",	"Xor",			&asmstate.bitxor,	/*.xor*/	opmode.noextrabits)
+		.AddBit( ">>",	"ShiftRight",	&Assembler.SHR,		/*.shru*/	opmode.shift)
+		LeftShift = .addbit( "<<",	"ShiftLeft",	&Assembler.SHL,		/*.shl*/	opmode.shiftonly) // can add bits
+		.AddBit( "(|)",	"BitOr",		&Assembler.BitOr,	/*.bor*/)
+		.AddBit( "&",	"BitAnd",		&Assembler.BitAnd,	/*.ban*/	opmode.SameOrLessBits)
+		.AddBit( "^",	"Xor",			&Assembler.bitxor,	/*.xor*/	opmode.noextrabits)
 
 		Subtract = dict["-"]
 

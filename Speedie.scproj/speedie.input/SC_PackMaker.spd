@@ -113,10 +113,10 @@ module PackMaker
 	
 	function CompileSomeFunctions (|bool| MiniTest, |bool|)
 		opt norefcounts
-		for (fn in .Packfuncs) (i)
+		for fn in .Packfuncs
 			if fn.AMiniTest == MiniTest
-				require SpdAssembler.GenerateASM(fn, i)
-		asmstate.sh.Guard
+				require Assembler.sh.GenerateASM(fn)
+		Assembler.sh.Guard
 		
 		if minitest
 			.RunAFewTests
@@ -126,7 +126,7 @@ module PackMaker
 	function ActualASMCompile (|bool|)
 		opt norefcounts
 		.Packfuncs.sort(&CodeSorter.LeafFunctionsSorter)
-		|| j = asmstate.jsm
+		|| j = Assembler.jsm
 			j.length = 0
 		
 		if !compiler.InPerry
@@ -199,7 +199,7 @@ module PackMaker
 	
 	function MakePack 
 		if (–sizeof FatASM) != 64
-		ASMState.Sh.PackMakerInit			// fn_asm_table[@arg]
+		Assembler.Sh.PackMakerInit			// fn_asm_table[@arg]
 		PackMaker.AddAll
 		|| pg = .SortFuncsAndBuildGlobs
 		target debug {

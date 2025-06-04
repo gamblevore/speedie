@@ -1,7 +1,7 @@
 
 
-prototype fn_asm    (|&ASMState| self=asmstate.sh, |message| exp, |AsmReg| Dest=asmreg(), |int| Mode=0, |AsmReg|)
-prototype fn_fatasm (|&ASMState| self=asmstate.sh, |message| exp, |AsmReg| Dest, |&FatASM|)
+prototype fn_asm    (|&Assembler| self=Assembler.sh, |message| exp, |AsmReg| Dest=asmreg(), |int| Mode=0, |AsmReg|)
+prototype fn_fatasm (|&Assembler| self=Assembler.sh, |message| exp, |AsmReg| Dest, |&FatASM|)
 
 
 datatype ASMReg (uint64)
@@ -126,7 +126,7 @@ datatype ASMReg (uint64)
 		|| f = .fatindex.fat
 			return f
 		error "anorexic register"
-		return asmstate.sh.zero
+		return Assembler.sh.zero
 
 	operator isa (|datatypecode| M, |bool|)
 		return .µtype == M

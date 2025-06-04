@@ -1,6 +1,6 @@
 
 
-prototype fn_OpASM          (|&ASMState| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asmreg|)
+prototype fn_OpASM          (|&Assembler| self, |asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asmreg|)
 prototype fn_ASMConstifier  (|asmreg| L, |asmreg| R, |int64|)
 
 
@@ -16,7 +16,7 @@ extend asmreg
 		return self 
 
 
-extend ASMState
+extend Assembler
 	function EqualsInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asmreg|)
 		|| negate = dest is negate
 		|| Res = dest.BoolAnswer						// Hmmm... so what should it be?
@@ -239,7 +239,7 @@ extend ASMState
 
 
 	// from 1 to -1
-	function Quick1Or1Sub (|&ASMState| self, |asmreg| dest, |asmreg| L, |int| ptoi, |message| exp, |asmreg|)
+	function Quick1Or1Sub (|&Assembler| self, |asmreg| dest, |asmreg| L, |int| ptoi, |message| exp, |asmreg|)
 		if ptoi == -1										//   x * -1  -->  0-x 
 			return .Subtract(dest, ASMReg(), l, exp)
 		if ptoi == 1										//   x * 1   -->  x 

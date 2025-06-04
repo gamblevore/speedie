@@ -1,6 +1,6 @@
 
 
-extend ASMState
+extend Assembler
 	function LoadTitle (|message| m, |message|)
 		// asm oof (9)
 		opt NoRefCounts

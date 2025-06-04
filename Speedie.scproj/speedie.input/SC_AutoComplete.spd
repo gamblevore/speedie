@@ -192,6 +192,7 @@ function UnusedFuncs (|message| cmd, |message|)
 function SCFunction.CheckUnused (|message| feedback)
 	opt norefcounts
 	require self isnt Disabled
+	require self isnt InitFunc
 	if .isunused
 		|| src = .source
 			|| str = "() is unused"
@@ -1033,7 +1034,7 @@ function Nothing (|message| rz,  |SCFunction| fn)
 
 
 function ASM (|message| rz,  |SCFunction| fn)
-	asmstate.sh.PackMakerInit
+	Assembler.sh.PackMakerInit
 	|| fs = FastString()
 	if !.asmsub(rz, fn, fs)
 		|| err = stderr.LastError
@@ -1052,11 +1053,11 @@ function message.AsmIndent (|message| top, |int|)
 
 function ASMSub (|message| rz,  |SCFunction| fn, |faststring| fs, |bool|)
 	opt norefcounts
-	|| j = ASMState.JSM
+	|| j = Assembler.JSM
 		j.zero
 		j.Length = 0
 
-	require SpdAssembler.GenerateASM(fn)
+	require Assembler.sh.GenerateASM(fn)
 
 	|| bb = 0
 	|message| path 

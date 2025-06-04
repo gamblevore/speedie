@@ -1,34 +1,17 @@
 
 
-/*
-
-If the globs fill up, we won't get any consts! I do want both,
-though? Which are more important? Depends, on the code, right?
-Sigh... I guess lets leave this for now.
-
-This is really annoying. is there a better way? Perhaps
-"pre-doing" loops? What about ordinary lines?
-
-That... or we gotta post-optimise. Lets list approaches:
-
-* Go over the tree... and try to pre-hoist. 
-	* Perhaps by doing the globals first, and consts second.
-		* How to make sure we don't have too many gtabs?
-		  And leave soem space for consts? (just count them) 
-
-* Hoist during post-optimisation
-	* Requires variable reordering. And branch-length adjustments.
-		* Reordering also means functions need to be reordered.
-	
-* Pre-allocate space for instructions.
-	* Requires variable reordering.
-	
+/*	
 * Pre-compile... analyse, then rewind.
 	* Works... a little slow?
 		* Can be sped up by making it more complex to avoid stuff.
 	* Maybe simpler overall?
 		* Still needs a total re-write of my hoister.
 	* avoids dead-code. Better for inlines?
+	
+
+So where to write this?
+// we can write it normally.. then just copy over to a new buffer?
+// seems to make sense.
 
 */
 
@@ -52,50 +35,15 @@ struct SC_Hoister
 		AsLoop = 1<<20
 
 
-	function ASMState.GlobAddr (|scdecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
-		|| Glob = .TryGetGlob(D)
-			return Glob
-		return .GlobAddrsub(d, exp, dest)
-
-
-	function ASMState.GlobAddrSub (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
-		opt norefcounts
-
-		|int64| iTable = d.ExportPosition
-		expect (iTable > 0)          (exp, "No global address".internal)
-		expect (iTable <= 24~bits)   (exp, "Used over 16MB of global data")
-		
-		|| fat = exp.GTAB(dest,  (d.IsLib)|int|,  iTable>>6)
-		fat.Const = iTable &~ 63
-		(dest is CanHoist)
-		Dest = fat * dest
-		dest.µtype = DataTypeCode._voidptr
-		return dest.HaveAddr
-
-
-	function ASMState.Hoist (|?&fatasm| fat, |int| n)
-		if fat == sh.KnownValues[n]
-			return // already done. Probably a number.
-		
-		target debug
-			if sh.HoistMap & (1<<n)		// what?
-			if sh.knownvalues[n]		// what?
-			if fat isnt CanHoist		// what?
-
-		if fat
-			fat.µRefCount++
-		
-		sh.KnownValues[n] = fat
-		sh.HoistMap |= 1<<n
-
-
 	function HoistNormal (|message| exp)
+		disabled
 		.spare = 4
-		.HoistRecursive(asmstate.sh, exp, 0)
+		.HoistRecursive(Assembler.sh, exp, 0)
 		.FillConsts
 
 
-	function HoistLoop (|asmstate| sh, |message| exp)
+	function HoistLoop (|Assembler| sh, |message| exp)
+		disabled
 		.Spare = 5
 		.HoistRecursive(sh, exp, asloop)
 		.FillConsts
@@ -105,10 +53,10 @@ struct SC_Hoister
 		opt norefcounts
 		for i in .count
 			|| prop = .consts[i]!
-			.PostRunConst(asmstate.sh, prop, prop.asmdecl)
+			.PostRunConst(Assembler.sh, prop, prop.asmdecl)
 
 
-	helper Added (|asmstate| sh, |asmreg| Dest, |scdecl| decl, |asmreg| K)
+	helper Added (|Assembler| sh, |asmreg| Dest, |scdecl| decl, |asmreg| K)
 		decl.FatConstIndex = k.fatindex
 
 		|| n = dest.reg
@@ -117,24 +65,30 @@ struct SC_Hoister
 		.Bits |= 1<<n
 
 	
-	helper HoistGlobal (|asmstate| sh, |message| prop, |scdecl| decl)
+	helper HoistGlobal (|Assembler| sh, |message| prop, |scdecl| decl)
 		if !sh.TryGetGlob(decl)
 			|| dest = sh.DeclareMe(prop, decl)
 			|| K = sh.GlobAddrSub(decl, prop, dest)
 			.Added(sh, dest, decl, K)
 
 
-	function ASMState.TryGetGlob (|SCDecl| D, |asmreg|)
-		|uint64| find = d.ExportPosition
-		|uint64| range = 128 * d.globInfo.ByteCount
-		for old in ASMState.sh
-			if old isa asm.gtab
-				|uint64| Addr = old.const
-				if Addr <= find and addr + range > find
-					return old.info
+	function Assembler.Hoist (|?&fatasm| fat, |int| n)
+		if fat == .KnownValues[n]
+			return			// already done. Probably a number.
+		
+		target debug		// These should never happen!
+			if .HoistMap & (1<<n)
+			if .knownvalues[n]
+			if fat isnt CanHoist
+
+		if fat
+			fat.µRefCount++
+		
+		.KnownValues[n] = fat
+		.HoistMap |= 1<<n
 
 
-	function TryHoistOne (|asmstate| sh, |message| exp, |scdecl| decl, |int| Score)
+	function TryHoistOne (|Assembler| sh, |message| exp, |scdecl| decl, |int| Score)
 		if decl is Global // hoist straight off
 			return .HoistGlobal(sh, exp, decl)
 		
@@ -148,7 +102,7 @@ struct SC_Hoister
 			decl.FatConstIndex = -1 // mark as done.
 
 
-	helper PostRunConst  (|asmstate| sh, |message| prop, |scdecl| decl)
+	helper PostRunConst  (|Assembler| sh, |message| prop, |scdecl| decl)
 		|| dest = sh.DeclareMe(prop, decl)
 		(dest is canhoist)
 		|| K = sh.NumToReg(prop, decl.ExportPosition, dest, dest.µtype)
@@ -163,7 +117,7 @@ struct SC_Hoister
 /		|| k = decl.ExportPosition
 		if !k
 			return true
-		for old in ASMState.sh
+		for old in Assembler.sh
 			if old._Const == K
 				old.µRefCount++
 				decl.FatConstIndex = old.Index
@@ -174,7 +128,8 @@ struct SC_Hoister
 		return .spare > 0
 	
 	
-	function HoistRecursive (|ASMState| sh, |message| exp, |int| Score, |bool|)
+	function HoistRecursive (|Assembler| sh, |message| exp, |int| Score, |bool|)
+		disabled
 		opt norefcounts
 		require .CanHoist
 		exp = exp.Declable
@@ -189,14 +144,14 @@ struct SC_Hoister
 					.TryHoistOne(sh, exp, prop, score)
 					return .CanHoist
 				return true
-	
+		
 		for ch.fast in exp
 			|| add = 0
 			if ch.func == @tmp
 				|| ty = ch.ASMType
 				add += (ty is kWhile) * MinHoistScore
 				add -= (ty is kIf)
-				
+			
 			require .HoistRecursive(sh, ch, add + score)
 		return true
 
@@ -214,4 +169,42 @@ function message.Declable (|message!|)
 	if fn == @func
 		return .second!
 	return self
+
+
+
+extend Assembler {
+
+function TryGetGlob (|SCDecl| D, |asmreg|)
+	|uint64| find = d.ExportPosition
+	|uint64| range = 128 * d.globInfo.ByteCount
+	for old in Assembler.sh
+		if old isa asm.gtab
+			|uint64| Addr = old.const
+			if Addr <= find and addr + range > find
+				return old.info
+
+
+function GlobAddr (|scdecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
+	|| Glob = .TryGetGlob(D)
+		return Glob
+	return .GlobAddrsub(d, exp, dest)
+
+
+function GlobAddrSub (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
+	opt norefcounts
+
+	|int64| iTable = d.ExportPosition
+	expect (iTable > 0)          (exp, "No global address".internal)
+	expect (iTable <= 24~bits)   (exp, "Used over 16MB of global data")
+	
+	|| fat = exp.GTAB(dest,  (d.IsLib)|int|,  iTable>>6)
+	fat.Const = iTable &~ 63
+	(dest is CanHoist)
+	Dest = fat * dest
+	dest.µtype = DataTypeCode._voidptr
+	return dest.HaveAddr
+
+}
+
+
 

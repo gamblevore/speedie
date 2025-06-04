@@ -7,11 +7,11 @@ module TextAssembler
 	function TextFunc (|message| msg, |bool|) // assemble a function from text
 		|| fn = SCFunction.new
 		fn.source = msg
-		require ASmState.Sh.InitAndStartfunc(fn)
-		ASMState.Sh.TextFuncSub(msg)
+		require Assembler.Sh.InitAndStartfunc(fn)
+		Assembler.Sh.TextFuncSub(msg)
 		compiler.exportnames[fn.exportname] = fn
-		ASmState.Sh.FinishASM
-		ASMState.Sh.LoadLabelJumps
+		Assembler.Sh.FinishASM
+		Assembler.Sh.LoadLabelJumps
 		.Labels.dispose
 
 
@@ -26,27 +26,4 @@ module TextAssembler
 				.textfunc(ch)
 			  elseif ch istmp "data"
 				.textdata(ch)
-
-
-
-module SpdAssembler
-	|[scfunction]|				PackFuncs
-
-	syntax access (|message| m, |scfunction|)
-		cpp_part AccessStr
-		opt norefcounts
-		return compiler.XFunc(m.name, m)	#expect (m, "This function has no ASM")
-						
-
-	function GenerateASM (|scfunction| fn, |int| i=0,  |bool|) // asmgenerate
-		opt norefcounts
-		
-		require ASMState.Sh.InitAndStartFunc(fn)
-		fn.GenASM
-		ASMState.Sh.FinishASM
-
-		if StdErr.ok
-			target debug
-				fn.µprint(i)
-			return true
 

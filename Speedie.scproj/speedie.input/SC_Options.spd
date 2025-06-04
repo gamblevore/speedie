@@ -113,7 +113,7 @@ module Feedback
 		target debug
 			if ""
 				"".debugprint // stop from being stripped
-				asmstate.PrintProgress
+				Assembler.PrintProgress
 				nil|message|.jdb2
 				nil|asmreg|.DebugPrint
 				nil|message|.PrintLocate

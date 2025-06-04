@@ -511,7 +511,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 					Missing = o
 				o = nil
 			  else
-				if o is disabled
+				if  o is disabled  and  scfunction.currfunc isnt disabled
 					error (exp,     o.description)
 					error (o.source, "Disabled here.")
 

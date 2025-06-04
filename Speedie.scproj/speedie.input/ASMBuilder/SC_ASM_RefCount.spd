@@ -1,6 +1,6 @@
 
 
-extend asmstate
+extend Assembler
 	function InlineOffsetOpt (|asmreg| base, |int| pow2, |&int| index, |uint| maximum, |scdecl?| Glob, |asmreg|)
 		|| bs = base.fat
 		if bs isa asm.GTAB
@@ -128,7 +128,7 @@ extend asmstate
 		return a
 
 
-function ASMState.Decr (|asmreg|)
+function Assembler.Decr (|asmreg|)
 	|| fat = .last(asm.rfst)
 		|| upon = fat.prms[0]
 			if !fat.prms[1] and !fat.prms[2]
@@ -136,7 +136,7 @@ function ASMState.Decr (|asmreg|)
 				rz.reg = upon
 
 
-function ASMState.SafeDecr (|asmreg|)
+function Assembler.SafeDecr (|asmreg|)
 	|| fat = .last(asm.rfap)
 		|| upon = fat.prms[1]
 		if upon and !fat.prms[0] and !fat.prms[2]

@@ -3,16 +3,22 @@
 extend_module ASM
 	helper TestASMSub (|message| tests)
 		opt norefcounts
-		asmstate.sh.PackMakerInit
+		Assembler.sh.PackMakerInit
 		|| list = tests.last(@arg)
 		|| TestName = tests[@thg]
 		require list and testname
 
 		textassembler.assemble(list)
-		|| fn = SpdAssembler[testname]
+		|| fn = .GetASMFunc(testname)
 			|| ff = fn.µTest
 			jb_vm.vm.Registers(true)
 			|| result = jb_vm.Run(ff.ptr, ff.length)
+
+
+	helper GetASMFunc (|message| m, |scfunction|)
+		cpp_part AccessStr
+		opt norefcounts
+		return compiler.XFunc(m.name, m)	#expect (m, "This function has no ASM")
 
 
 	function TestASM 

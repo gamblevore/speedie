@@ -1357,7 +1357,7 @@ function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side,  |SC
 		exp_copy = exp.copy				// needed before get type :(
 										// or else we can't do array.size++
 
-//	ASMState.kcontinue = 1
+//	Assembler.kcontinue = 1
 	|| Type = TypeOfExpr( exp, name_space )					#require
 	check (type isnt const) (msg, "Not assignable.")
 	if type.PointerCount > 0
