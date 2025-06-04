@@ -48,7 +48,7 @@ static allocate_result AllocateSub (int N, const void* Arr, uint* Where) {
 		Diff = -JB_msize(Arr);
 		Result = (uint8*)realloc((void*)Arr, N);
 	} else {
-		Diff+=16;
+		Diff = 16;
 		Result = (uint8*)calloc(1, N); // zeroed
 	}
 	if (Result) {
@@ -70,15 +70,15 @@ allocate_result JB_AllocateString (int N, const void* Arr) {
 }
 
 uint8* JB_zalloc(int N) {
-	return JB_allocate(N).Result;
+	return JB_allocate(N, 0).Result;
 }
 
 uint8* JB_malloc(int N) {
-	return JB_allocate(N).Result;
+	return JB_allocate(N, 0).Result;
 }
 
 
-// Setting the size to zero actually DOES make sense, in terms of code... and reallocing zero
+// C++ does not define realloc(x,0):  Maybe `free`, or maybe same as `malloc(0)`.
 uint8* JB_realloc (const void* Arr, int N) {
 	auto R = JB_allocate(N, Arr);
 	require (R.OK);
@@ -101,7 +101,6 @@ u64 JB_MemUsedString() {
 u64 JB_MemUsedOther() {
 	return TotalOtherBytes;
 }
-
 
 void JB_free(const void* Arr) {
 	if (Arr) {
@@ -133,7 +132,6 @@ bool JB_IsLibrary() {
 int JB_Platform__CPU() {
 	return __CPU_TYPE__;
 }
-
 bool JB_Platform__OSX() {
 	return __PLATFORM_CURR__ == __PLATFORM_OSX__;
 }

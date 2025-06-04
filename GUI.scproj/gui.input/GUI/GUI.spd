@@ -364,7 +364,7 @@ module GUI
 		|| v1 = .Sizeraw.vec2
 		|| v2 = v1 / scale
 		|| bigPx = v2.ivec2
-		.Screen.sizeinfo = bigPx
+		.Screen.AreaInfo = bigPx
 		|| r = .Renderer
 			.Raw = SDL_CreateTexture(r, ChosenPixelFormat, SDL_TEXTUREACCESS_STREAMING, bigPx.x, bigPx.y)
 			.scale = Scale

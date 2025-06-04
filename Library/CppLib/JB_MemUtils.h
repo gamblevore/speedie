@@ -30,10 +30,10 @@ struct allocate_result {
 	bool OK;
 };
 
-allocate_result JB_AllocateString (int N, const void* Arr = 0);
+allocate_result JB_AllocateString (int N, const void* Arr);
 void JB_FreeString(const void* Arr);
 
-allocate_result JB_allocate (int N, const void* Arr = 0);
+allocate_result JB_allocate (int N, const void* Arr);
 void JB_free(const void* Arr);
 uint8* JB_realloc(const void* Arr, int N);
 u64 JB_msize(const void* Arr);

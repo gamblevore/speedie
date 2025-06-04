@@ -7,10 +7,10 @@ module TextAssembler
 	function TextFunc (|message| msg, |bool|) // assemble a function from text
 		|| fn = SCFunction.new
 		fn.source = msg
-		require Assembler.Sh.InitAndStartfunc(fn)
+		Assembler.Sh.InitAndStartfunc(fn)
 		Assembler.Sh.TextFuncSub(msg)
 		compiler.exportnames[fn.exportname] = fn
-		Assembler.Sh.FinishASM
+		Assembler.Sh.CapASM
 		Assembler.Sh.LoadLabelJumps
 		.Labels.dispose
 

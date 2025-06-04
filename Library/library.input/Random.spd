@@ -143,7 +143,7 @@ struct Random
 		|| P = mem.ptr
 		if p?
 			.temporal(P, P + mem.ByteCapacity)
-			mem.Length = mem.ItemCount
+			mem.Length = mem.size
 
 	
 	function Init

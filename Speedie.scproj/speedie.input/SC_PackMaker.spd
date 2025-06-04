@@ -126,8 +126,7 @@ module PackMaker
 	function ActualASMCompile (|bool|)
 		opt norefcounts
 		.Packfuncs.sort(&CodeSorter.LeafFunctionsSorter)
-		|| j = Assembler.jsm
-			j.length = 0
+		Assembler.jsm.length = 0
 		
 		if !compiler.InPerry
 			require .CompileSomeFunctions(true)
@@ -198,7 +197,6 @@ module PackMaker
 		}
 	
 	function MakePack 
-		if (–sizeof FatASM) != 64
 		Assembler.Sh.PackMakerInit			// fn_asm_table[@arg]
 		PackMaker.AddAll
 		|| pg = .SortFuncsAndBuildGlobs
@@ -402,7 +400,7 @@ function scdecl.CheckLibGlob
 
 
 /*
-	Uses by speedie: (They all seem legit and not removeable.)
+	Globals used by speedie: (legit, not removeable)
 	|Array of Message!| TmpPrms_(1) --> VM_Builder__FinishAcc
 	|Random| Shared(2)				--> SCGame3D__Love
 	|ErrorReceiver!| StdErr(3)		--> nil__LaunchMothership

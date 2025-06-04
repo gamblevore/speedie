@@ -1053,9 +1053,8 @@ function message.AsmIndent (|message| top, |int|)
 
 function ASMSub (|message| rz,  |SCFunction| fn, |faststring| fs, |bool|)
 	opt norefcounts
-	|| j = Assembler.JSM
-		j.zero
-		j.Length = 0
+	Assembler.JSM.zero
+	Assembler.JSM.Length = 0
 
 	require Assembler.sh.GenerateASM(fn)
 

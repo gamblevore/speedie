@@ -207,4 +207,11 @@ function GlobAddrSub (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 }
 
 
+	
+
+
+function Assembler.Length (|int|)
+	return .curr - .funcstart
+
+
 

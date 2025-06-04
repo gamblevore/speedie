@@ -7,9 +7,9 @@ extend SCFunction
 		description "Generate some code (only for testing)."
 		rz = asm[.µlength*3]!
 		|| p = rz.ptr
-		|| after = .MuRender(P, P+rz.itemCount)
-		rz.itemcount = after-p
-		rz.length = rz.itemcount
+		|| after = .MuRender(P, P+rz.Size)
+		rz.Size = after-p
+		rz.length = rz.Size
 		
 	// cosmic lore unfold... into tales untold
 
@@ -97,3 +97,5 @@ function JBin.Add (|SCFunction| fn)
 	.AddMemory(@bin, fn.µlength*4)
 	for i.fat in fn
 		.AppendInt(i.Encode)
+
+

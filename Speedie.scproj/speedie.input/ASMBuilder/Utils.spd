@@ -8,13 +8,6 @@ function message.ASMDecl (|SCDecl!|)
 	target debug: rz.ASMSanity
 
 
-function SCFunction.GenASM
-	opt norefcounts
-	|SC_Hoister| H 
-	|| a = .sourcearg!
-	asmtype.ArgSub(Assembler.Sh, A, H)
-
-
 function message.OperatorMul (|asm| op, |&fatasm|)
 	cpp_part RequestOp
 	|| a = Assembler.sh

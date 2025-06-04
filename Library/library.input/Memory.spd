@@ -4,15 +4,25 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
+
+
+// We use FastString naming convention:
+	// Size means:      The buffer capacity, both used and unused.
+		// (Capacity is in terms of items, not bytes!)
+	// Length means:    Length of data that is written to, so far.
+	// FreeSize means:  Size - Length
+// Additionally, we have a ItemSize.
+
+
 class Memory
 	linkage
 		cpp_part Mrap
 		cpp_class MWrap
 		pragma noearlyfree
 	
-	|int|				ItemCount
-	|int|				Length
+	|int|				Size
 	|&byte|				_Ptr
+	|int|				Length
 	|uint|				ItemSize
 	|byte|				DeathAction
 	contains byte
@@ -21,7 +31,7 @@ class Memory
 	constructor (|int| ItemCount, |int| ItemSize, |&byte| ptr, |byte| DeathAction=DataObject.kfree)
 		cpp_part ConstructorPtr
 		.ItemSize = ItemSize
-		.ItemCount = itemcount
+		.size = itemcount
 		.deathaction = deathaction
 		.length = 0
 		._ptr = ptr
@@ -29,7 +39,7 @@ class Memory
 	
 	function UseExternalPointer (|&nil| P, |int| ItemCount, |int| ItemSize)
 		.ItemSize = ItemSize
-		.ItemCount = itemcount
+		.size = itemcount
 		if .deathaction == dataobject.kfree
 			Memory.free(._ptr)
 		.deathaction = 0
@@ -40,21 +50,27 @@ class Memory
 		return ._ptr|&...|
 		
 	function Next (|&...|)
-		return (._ptr + .BytesUsed)|&...|
+		return (._ptr + .Bytelength)|&...|
 		
 	setter Length (|int|)
-		if Value > .itemCount
-			value = .ItemCount
+		if Value > .size
+			value = .size
 		  elseif Value < 0
 			value = 0
 		.length = Value
 	
-	operator plus (|int|n, |&...|)
+	operator plus (|int| n, |&...|)
 		return (._ptr + .itemsize*n)|&...|
 	
-	function Copy (|string| Src, |int|)
+	function CopyFrom (|string| Src, |int|)
+		cpp_Part CopyFromString
 		|| cap = .ByteCapacity min src.Length
 			memory.Copy(.ptr, src.Addr, cap)
+			return cap		
+	
+	function CopyFrom (|&nil| Src, |int| Length, |int|)
+		|| cap = .ByteCapacity min Length
+			memory.Copy(.ptr, Src, cap)
 			return cap		
 	
 	function CopyTo (|memory| other, |bool|)
@@ -67,7 +83,7 @@ class Memory
 		
 	function AppendPlace (|&...|)
 		|| L = .length
-		if (L >= .itemCount)
+		if (L >= .size)
 			// try grow
 			|| NewSize = .itemsize*L*2
 			|| P2 = Memory.realloc(._ptr, NewSize)
@@ -85,21 +101,21 @@ class Memory
 		random.shared.temporal(self)
 	
 	function Count (|int|)
-		disabled "Use .ItemCount"
+		disabled "Use .size"
+		
+	setter Size (|int|)
+		.SetSize(value)
 	
-	setter ItemCount (|int|)
-		.SetCount(value)
-	
-	helper SetCount (|int| ItemCount, |bool|)
-		if ItemCount == .ItemCount
+	helper SetSize (|int| ItemCount, |bool|)
+		if ItemCount == .size
 			return true
-		require .deathaction == DataObject.kfree
+		require .DeathAction == DataObject.kfree
 		|| S = .itemsize|int|
-		|| old = S * .itemCount
+		|| old = S * .size
 		|| New = S * ItemCount
 		|| Mem = Memory.realloc(._ptr, New)
 			._ptr = mem
-			.itemCount = ItemCount
+			.size = ItemCount
 			if ItemCount < .length
 				.length = ItemCount
 			if New > Old
@@ -109,18 +125,17 @@ class Memory
 
 	function NeedSpare (|int| ReqItems, |int| Extra = 0,  |&...|)
 		|| Q = .length + reqitems
-		if .ItemCount < Q
-/			require .SetCount(Q+Extra)
-		return (.ptr + .ItemCount*.itemsize)|&...|
-
+		if .size < Q
+/			require .SetSize(Q+Extra)
+		return (.ptr + .size*.itemsize)|&...|
 
 	function HasSpare (|bool|)
-		return .Length < .itemCount
+		return .Length < .size
 	
 	function ByteCapacity (|int|)
-		return .ItemSize|int|*.ItemCount|int|
+		return .ItemSize|int|*.size|int|
 	
-	function BytesUsed (|int|)
+	function ByteLength (|int|)
 		return .ItemSize|int|*.Length|int|
 	
 	

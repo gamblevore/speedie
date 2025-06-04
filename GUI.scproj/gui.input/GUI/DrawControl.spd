@@ -61,7 +61,7 @@ class GraphicsEditor (GuiControl)
 		|| d = l[2].name.decompress
 		require (w > 0) and (h > 0) and d
 		|| img = image((w,h), l.name)
-			img.Copy(d)
+			img.CopyFrom(d)
 			return img
 	
 	function Save

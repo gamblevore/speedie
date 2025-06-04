@@ -57,6 +57,8 @@ function compiler.ClearEnvs
 
 function compiler.SetupEnv
 	opt norefcounts
+	if (–sizeof FatASM) != 64
+
 	app.parent // sigh. do this before clearenvs
 	.ClearEnvs
 	options.dev = app.prefs["dev"].int

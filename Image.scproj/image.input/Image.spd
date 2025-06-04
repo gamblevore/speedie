@@ -5,7 +5,7 @@ class Image (memory)
 	linkage
 		cpp_part Img
 		opt min 3
-	|ivec2|			Size
+	|ivec2|			Area
 	|ivec2|			WindowBase
 	|ivec4|			_ControlClip
 	|string|		Name
@@ -16,8 +16,8 @@ class Image (memory)
 		cpp_Part ConstructorPointer
 		super.constructor(s.area, 4, P)
 		.name = name
-		.length = .itemcount 
-		.SizeInfo = s
+		.length = self|memory|.size 
+		.AreaInfo = s
 	
 
 	destructor
@@ -27,6 +27,11 @@ class Image (memory)
 	render	
 		fs <~ "image${.size}:${.name}"
 	
+	setter Size (|ivec2|)
+		.ResizeTo(value)
+	
+	function Size (|ivec2|)
+		return .area
 	
 	function NeedTemp (|image|)
 		return .Temp init image(.size)
@@ -84,8 +89,8 @@ class Image (memory)
 		return .size.y
 	
 	
-	helper SizeInfo (assigns:|ivec2| wh)
-		.size = wh
+	helper AreaInfo (assigns:|ivec2| wh)
+		.area = wh
 		.ResetBoundsToSize
 
 
@@ -121,25 +126,16 @@ class Image (memory)
 
 	syntax cast (|ivec4|)
 		return ._controlclip
-
-		
-	setter Size (|ivec2|)
-		.resizeto(value)
-	
 	
 	function ResizeTo (|ivec2| value, |bool|)
 		|| N = value.area
-		if .itemcount == n // same already
-			.length = n
-			.sizeinfo = value
-			return true
-		
+		require !.deathaction  or .SetSize(N)
 		// !.deathaction means our memory is externally managed, so we assume its already been resized.
-		if !.deathaction  or .setcount(N)
-			.itemcount = n // setcap might not be called if !.deathaction
-			.length = n
-			.SizeInfo = value
-			return true
+
+//		.size = n
+		.length = n
+		.AreaInfo = value
+		return true
 			
 	
 	function DrawGradientV (|ivec4| r, |vec4| B, |vec4| T)
@@ -376,7 +372,7 @@ class Image (memory)
 				return s.loadqoi(self) #expect (.path, "Failed to read image.")
 
 		function image.WriteQOI (|string|)
-			|| l = .BytesUsed
+			|| l = .ByteLength
 			|| qoi = imagehelper.WriteQOI(.ptr, .Width, .Height, l)
 				return string.FromPtr(qoi, l)
 
@@ -385,8 +381,8 @@ class Image (memory)
 	
 	function LoadEmpty (|int| W, |int| H, |bool|)
 		if (.size.x != W or .size.y != h)
-			.itemcount = w * h
-			.SizeInfo = (w,h)
+			.setsize(w * h)
+			.AreaInfo = (w,h)
 		return .Pixels
 	
 	

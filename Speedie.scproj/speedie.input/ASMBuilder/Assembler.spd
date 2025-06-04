@@ -30,7 +30,7 @@ struct Assembler
 
 	|?&FatASM|					InlineEnd
 	|uint|						HoistMap
-	|&FatASM|					OrigPass
+	|?&FatASM|					Orig
 	|&FatASM|					FuncStart
 	|&FatASM|					LastDebug
 	|&FatASM|					Start		// a "slice" feature would be nice    
@@ -49,8 +49,8 @@ struct Assembler
 	module
 		//|SC_Hoister|				WhileHoister
 		|Assembler|					Sh
-		|?memory of fatasm|			JSM
-		|?memory of fatasm|			HoistSpace
+		|memory of fatasm|			JSM = FatASM[0]!
+		|memory of fatasm|			HoistSpace = FatASM[0]!
 
 
 	function fn (|scfunction!--|)
@@ -153,7 +153,7 @@ struct Assembler
 	syntax expect (|message?| where=nil, |string| msg)
 		cpp_part Fail
 		|| f = SCFunction.currfunc!
-		f.µlength = .curr - .funcstart
+		f.µlength = .length
 		printline f.µrender
 		debugger
 		error (where, msg)
@@ -496,19 +496,20 @@ struct Assembler
 		TextAssembler.RequestTable	?= array()
 	
 	
-	function InitAndStartFunc (|scfunction| fn, |bool|) // init 
+	function InitAndStartFunc (|scfunction| fn) // init 
 		// can't we just zero the entire thing?
 		opt norefcounts
 		
 		target debug
 			asm.noisyasm = 3
 
-		|| j = jsm init FatASM[256K]
-		require j
-		.end = j.NeedSpare(64K, j.itemcount)
+		|| j = jsm
+		.end = j.NeedSpare(256K, j.Size)
 		.start = j.ptr
 		._curr = .start + j.Length
+		
 		// after zeroing, we could just set everything normally? It seems ._curr is set from the jsm.
+		HoistSpace.Length = 0
 		
 		.out = fn
 		.state.fn = fn
@@ -535,11 +536,15 @@ struct Assembler
 		.InlineEnd = nil
 		.hoistmap = nil
 		.FuncStart = .curr
-		.returnasm = fn.ASMReturn.regtype
+		.ReturnASM = fn.ASMReturn.regtype
 		.AddFuncParams(fn)
-		return true
 
 
+	function CapASM
+		.out.µlength = .length
+		jsm!.length = .curr - .start 
+
+		
 	function FinishASM 
 		opt norefcounts
 		if .zero.Const // what?
@@ -550,9 +555,6 @@ struct Assembler
 			if !ASMType.ReturnOpt(self, 0, 0)
 				.fn.Source!.DeepLast.RET()
 		.Optimise
-
-		.out.µlength = .curr - .FuncStart
-		jsm!.length = .curr - .start 
 
 
 	function Guard
@@ -645,7 +647,7 @@ struct Assembler
 		LL.Start = .curr
 		.InlineParameters(prms)
 		|| RealStart = .curr		// Params need to be done anyhow... so don't count them.
-		fn.GenASM
+		.GenASMSub(fn)
 		.RestoreParameters
 		ll.after = .curr
 		|| Result = .InlineFinishWithConsts(ll)
@@ -834,20 +836,38 @@ target debug
 
 	
 
+function Assembler.GenASMSub (|scfunction| fn)
+	opt norefcounts
+	|SC_Hoister| H 
+	|| a = fn.SourceArg!
+	asmtype.ArgSub(Assembler.Sh, A, H)
 
 
-function Assembler.GenerateASM (|scfunction| fn,  |bool|) // asmgenerate
+function Assembler.Rework (|SCFunction| fn,  |bool|)
+	HoistSpace.NeedSpare(.Length)
+	HoistSpace.CopyFrom(.FuncStart, .Length)
+	.Orig = .FuncStart
+	.InitAndStartFunc(fn)
+	.GenASMSub(fn)
+	.FinishASM
+	.Orig = nil
+
+
+function Assembler.GenerateASM (|scfunction| fn,  |bool|) // AsmGenerate
 	opt norefcounts
 	
-	require .InitAndStartFunc(fn)
-	fn.GenASM
-	if .NeedsRework
-		.CopyOver
-		fn.genasm
+	.InitAndStartFunc(fn)
+	.GenASMSub(fn)
 	.FinishASM
+	if .NeedsRework
+		.Rework(fn)
+	.CapASM
 
 	if StdErr.ok
 		target debug
-			fn.µprint(i)
+			fn.µprint(++CountASMFuncPrint)
 		return true
+
+
+|| CountASMFuncPrint = 0
 
