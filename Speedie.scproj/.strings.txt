@@ -1867,7 +1867,7 @@
 " spaces)"
 "Indent too low."
 " but found "
-" memory used"
+"Unaligned offset."
 "Error decoding file: "
 "Error decoding data."
 "Close-tag malformed"
@@ -2209,4 +2209,3 @@
 "compare4"
 "funcaddr"
 "__IMPORT_"
-"Unaligned offset."
