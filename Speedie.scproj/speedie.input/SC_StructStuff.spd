@@ -72,7 +72,7 @@ function scfunction.StructReturned (|scdecl|)
 
 
 function scparamarray.StructExtract (|scdecl| type)
-	// remove this?
+	// Remove this?
 	debugat
 	|| s = .exp
 		|| where = s.UseNonRefChangers(True)!
@@ -81,35 +81,24 @@ function scparamarray.StructExtract (|scdecl| type)
 			scfunction.TempMoveOut(s, type)
 
 
-function scparamarray.StructReturner (|SCDecl| type, |scfunction| fn)
-	|message--| s = .exp$
-	|message--| Rel = s.UseNonRefChangers(True)
+function scparamarray.StructReturner (|SCDecl| type, |SCFunction| fn)
+	opt norefcounts
+	|| s = .exp								#require
+	|| Rel = s.UseNonRefChangers(True)
 	|| f = Rel.func
 		
 	if (f == @prm) or ((f == @rel) and !rel.secondis(@opp, "="))
-// how can I do this more easily. Just syntactically. Then call collectfrombody
-//		|| tmped = SCFunction.TempMoveOut(s, type.internal)
-//		|| dcl2 = tmped.obj|scdecl|
-//		|| name_space = tmped.parent!.obj as scnode
-//			name_space.tryadd(rel, dcl2, dcl2.name)
-//		Rel = tmped.second!
-//		f = Rel.func			/*   .TestAccept(YY.new)   -->   || tmp = YY.new, .TestAccept(tmp)   */		
-
 		error (rel, "Can't pass structs this way")
 		return
-		// what about struct allocation? collectFromBody handles the struct allocation... but we'll miss it.
-		/*   .TestAccept(YY.new)   -->   || tmp = YY.new, .TestAccept(tmp)   */
 		
-	if  (Rel.ASMType is kreturn)
-        /* return YY.new  --> yy.new(rz), return */
+	if  Rel.ASMType is kreturn
+        /* return YY.new  -->  yy.new(rz), return */
 		|| prm = s.last
 			prm.func = @prm
 			|| subrz = prm.msg(@thg, "rz")			// we need to add rz.
 			subrz.obj = SCFunction.currfunc!.StructReturned // right?
 			rel.prev = rel.first
 			f = @nil
-		  else
-			debugger 
 	
 	if  f == @rel
 		|| name = Rel.first!
@@ -152,6 +141,7 @@ function scparamarray.StructReturner (|SCDecl| type, |scfunction| fn)
 	// in this case... we could expect the C++ renderer to do it, but thats quite lame.
 	// i think we could just post-process it? makes sense, right?! Do it after transform...
 	// probably do this before the nil-checker?
+
 
 
 module StructStuff

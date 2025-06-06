@@ -439,7 +439,7 @@ function Thg (fn_asm)
 	|| reg = thg.reg
 	if (reg-1)|uint| < 31							// what?
 		return thg
-	if reg == 0  and  thg is RealConst
+	if  reg == 0  and  thg is RealConst
 		return thg									// Its still ok.   nil/false
 	error (exp, "Register out of bounds")
 

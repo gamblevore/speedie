@@ -325,7 +325,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			//if trap == 431
+			if trap == 54788
 				
 		  else
 			opt inline
@@ -382,7 +382,7 @@ struct Assembler
 	// these need to be opted. Not always happening? InlineOffsetOpt seems to only do ADDK, not ADPK
 	ADPK: t30, r2, 4                               /* R++ */
 	WR4U: t31, t30, r0, 0, 0                       /* R++[0] */	
-	|| Move = .TryAddPKMemory(base) // how is this different to inlineoffsetopt?
+	|| Move = .TryAddPKMemory(base) // how is this different to InlineOffsetOpt?
 */
 
 		if index >= 128												// read/write only allows up to 127
@@ -401,16 +401,16 @@ struct Assembler
 			rz._op = ASMType.ReadASM[b]
 
 
-	function Read (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scdecl| DestMsg, |int| index=0,  |&fatasm|)
+	function Read (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scdecl| DestDecl, |int| index=0,  |&fatasm|)
 		opt inline
 		(dest isnt set)
-		return .ReadOrWriteSub(dest, exp, ptr, VarAdd, DestMsg, index)
+		return .ReadOrWriteSub(dest, exp, ptr, VarAdd, DestDecl, index)
 
 
-	function Write (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scdecl| ReadMsg, |int| index=0, |&fatasm|)
+	function Write (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scdecl| ReadDecl, |int| index=0, |&fatasm|)
 		opt inline
 		(dest is set)
-		return .ReadOrWriteSub(dest, exp, ptr, VarAdd, ReadMsg, index)
+		return .ReadOrWriteSub(dest, exp, ptr, VarAdd, ReadDecl, index)
 
 
 	function ReadOrWrite (|ASMReg| dest, |message| m, |asmreg| base, |asmreg| VarAdd, |scdecl| Ty,  |int| index=0, |asmreg|)

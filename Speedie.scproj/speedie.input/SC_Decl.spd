@@ -79,7 +79,7 @@ datatype SCDeclInfo (int)
 		VarThatGotReturned
 		IntendedAsReturn
 		Body
-		Swappable	 = Param ||| Body ||| Global ||| Property
+		VarType	 = Param ||| Body ||| Global ||| Property
 		Local		 = Body ||| Param
 		SelfImplicit = Self ||| local // local is set by CollectOneParam, anyhow?
 		DclCopied    = altered ||| stayborrowed ||| api ||| UpgradeableContained ||| CompilerCreated ||| body ||| return // need more too? do later
@@ -107,6 +107,7 @@ class SCDecl (SCNamed) {
 	|string|			StringData		// 2 special objects. Aren't they exclusive? Write some code to see if they are.
 	|SCDecl?|			Internal
 	
+	|scdecl--?|			OriginalDecl
 	//|SCDecl|			NextContains // for multiple contains
 	|SCDecl?|			Contains
 	|Message?|			Default
@@ -119,7 +120,7 @@ class SCDecl (SCNamed) {
 	|uint16| 			ModuleNum
 	|byte| 				NilAllocDepth
 	|byte|				DepthOfBranch
-	|int|				FatConstIndex
+	|int|				FatConstIndex // make a uint16? later.
 
 	
 	constructor (|scclass| type)
@@ -947,9 +948,20 @@ class SCDecl (SCNamed) {
 			return Default
 		
 		rz = .copydecl
+		rz.info |= .info & scdeclinfo.VarType
+		while (|| s = .OriginalDecl)
+			self = s
+		rz.OriginalDecl = self
 		rz.NilDeclared = type
 
 
+	function Orig (|scdecl|)
+		opt norefcounts
+		while (|| s = .OriginalDecl)
+			self = s
+		return self
+		
+	
 	function CanNilCheck (|bool|)
 		opt norefcounts
 		require self
