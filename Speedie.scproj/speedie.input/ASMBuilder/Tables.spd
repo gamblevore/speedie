@@ -340,6 +340,8 @@ function Decl (fn_asm)
 function ArgSub (|&Assembler| self, |message| exp, |?&sc_hoister| H, |AsmReg|)
 	opt NoRefCounts
 	for ch.fast in exp
+		target debug
+			|| trap = ++ASMTrapper	
 		//if h
 			//h.HoistNormal(ch)
 		if ch.func == @decl

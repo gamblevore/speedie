@@ -10,7 +10,7 @@ class DataObject
 		kFree    = 1
 		kDelete  = 2
 	
-	|DataTypeCode|		DataType
+	|DataTypeCode|		Kind
 	|byte|				DeathAction
 	|int64|				PrivValue
 	
@@ -21,19 +21,19 @@ class DataObject
 	
 	constructor (|int64| v)
 		cpp_part ConstructorInt
-		.datatype = datatypecode.s64
+		.Kind = datatypecode.s64
 		.PrivValue = v
 
 	
 	constructor (|bool| b)  // could be an issue as most things convert to a bool...
 		cpp_part ConstructorBool
-		.datatype = datatypecode.bool
+		.Kind = datatypecode.bool
 		.PrivValue = b|int|
 
 	
 	constructor (|?&nil| p)
 		cpp_part ConstructorVoidPtr
-		.datatype = datatypecode.unusedtype
+		.Kind = datatypecode.unusedtype
 		.PrivValue = p|int64|
 
 
@@ -55,11 +55,11 @@ class DataObject
 
 	render
 		visible // hmmm
-		if .datatype.isfloat
+		if .Kind.isfloat
 			fs <~ .FloatValue
-		  elseif .datatype == datatypecode.bool	
+		  elseif .Kind == datatypecode.bool	
 			.privvalue|bool|.render(fs)
-		  elseif !.datatype.isnumeric // oop
+		  elseif !.Kind.isnumeric // oop
 			fs <~ "0x"
 			fs.appendhex(.privvalue)
 		  else
@@ -68,7 +68,7 @@ class DataObject
 	module
 		function NewFloat (|Float64| v, |Dataobject|)
 			rz = DataObject(true) 
-			rz.datatype = datatypecode.f64
+			rz.Kind = datatypecode.f64
 			rz.PrivValue = v.AsInt
 
 

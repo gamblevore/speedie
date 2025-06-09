@@ -164,12 +164,13 @@ struct Assembler
 		|| ret = .state.return
 		if ret.reg and (type is VarThatGotReturned) and (.state.fn.ReturnedVars == 1)
 			ret.µtype = T|DataTypeCode|
-			Type.wholetype = ret|DataTypeCode|
+			Type.wholetype = ret
+			
 			return ret
 		
 		|| d = .VDecls|int| + 1
 		t.reg = d
-		Type.WholeType = t|DataTypeCode|
+		Type.WholeType = t
 		if (d < .VTemps)
 			.Vars[d] = Type
 			.Vdecls = d
@@ -294,6 +295,7 @@ struct Assembler
 
 
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
+		target debug: if !dest.reg
 		|| r = .µ(Exp, dest)
 		if r.reg == dest.reg
 			return r
@@ -325,10 +327,11 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			if trap == 54788
+			//if trap == 56578
 				
 		  else
 			opt inline
+		
 		|| ss = (fn)(self, exp, dest)
 
 		target debug
@@ -645,6 +648,8 @@ struct Assembler
 		opt norefcounts
 		|fatrange| LL
 		LL.Start = .curr
+		target debug
+			|| trap = ++ASMTrapper
 		.InlineParameters(prms)
 		|| RealStart = .curr		// Params need to be done anyhow... so don't count them.
 		.GenASMSub(fn)
@@ -668,8 +673,9 @@ struct Assembler
 			if !vr
 				0
 			  elseif .CanReuseParam(prms, a, vr)
-				|| T = a.WholeType.reg(vr)
-				a.DataType = t|datatypecode|
+				|| T = v.µtype(a.WholeType.µtype)
+				t.tmpcheck
+				a.wholetype = t
 				(a is param) = (v is param)
 				(a is body) = (v isnt param)
 			  else

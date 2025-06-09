@@ -4,7 +4,7 @@ function message.ASMDecl (|SCDecl!|)
 	opt norefcounts
 	rz = .fastdecl
 	if rz.typeonly == datatypecode.unusedtype
-		rz.wholetype = rz.CalculateASMType|datatypecode|
+		rz.wholetype = rz.CalculateASMType
 	target debug: rz.ASMSanity
 
 

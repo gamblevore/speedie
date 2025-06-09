@@ -58,8 +58,8 @@ datatype DataTypeCode (uint16)
 		_void = 0
 		_voidptr = 48
 		cstring = 48
-		Failed = 1<<10   // 1KB
-		PossibleBits = 2047
+		Failed = 512
+		PossibleBits = 1023
 		Numeric = 8
 		
 		UnusedType = int64 &~ 8

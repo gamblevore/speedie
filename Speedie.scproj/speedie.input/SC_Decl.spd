@@ -142,8 +142,9 @@ class SCDecl (SCNamed) {
 	function TypeOnly (|datatypecode|)
 		return .DataType & datatypecode.possiblebits
 	
-	setter WholeType (|datatypecode|)
-		.DataType = value 
+	setter WholeType (|asmreg|)
+		value.tmpcheck
+		.DataType = value|datatypecode|
 	
 	function WholeType (|asmreg|)
 		return .DataType|asmreg|
