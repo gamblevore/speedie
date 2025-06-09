@@ -280,6 +280,7 @@ JB_MemoryLayer* JB_Class_DefaultLayer( JB_Class* Cls );
 JB_MemoryLayer* JB_Class_Layer( JB_Class* Cls );
 JB_MemoryLayer* JB_Class_CurrLayer( JB_Class* Cls );
 JB_Object* JB_Class_AllocZeroed( JB_Class* Cls );
+int64 JB_Class_MemoryUsed( JB_Class* Cls );
 void JB_Class_Add( JB_Class* Cls, const char* s );
 JB_Class* JB_Class__First();
 JB_MemoryLayer* JB_Mem_CreateLayer(JB_Class* Cls, JB_Object* Obj);

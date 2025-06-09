@@ -21,6 +21,7 @@ module Options
 
 	||		Compile					= true
 	||		TargetDebug				= false
+	||		PrintMemoryUsage		= false
 	||		PrintLibraries			= false
 	||		GenFlowControlCode		= false
 	||		KeepAllErrors			= false
@@ -429,6 +430,10 @@ module Feedback
 		+"dosign"
 			Explain( Purpose, "Code signs an app." )
 			return true
+		
+		+"mem"
+			explain(Purpose, "Prints the memory usage.")
+			options.PrintMemoryUsage = value.yes
 		
 		+"clean"
 			Explain(Purpose, "Remove temp files.")$

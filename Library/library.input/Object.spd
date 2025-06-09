@@ -136,7 +136,10 @@ struct ClassData
 	
 	function AllocZeroed (|Object|)
 		cpp_Wrapper JB_Class_AllocZeroed
-
+		
+	function MemoryUsed (|int64|)
+		cpp_Wrapper JB_Class_MemoryUsed
+	
 	function CreateLayer (|Object| obj, |MemoryLayer!|)
 		cpp_Wrapper JB_Mem_CreateLayer
 

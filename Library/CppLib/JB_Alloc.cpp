@@ -1155,6 +1155,27 @@ void JB_FindLeakedObject (JB_Object* Obj, Array* R) {
 }
 
 
+int64 JB_Class_MemoryUsed (JB_Class* Cls) {
+	JB_MemoryWorld* World = &MemoryManager;
+	uint C = 0;
+
+    SuperBlock* First = World->CurrSuper;
+    SuperBlock* Super = First;
+    do {
+		AllocationBlock* Start = StartBlock_(Super);
+		AllocationBlock* Finish = EndBlock_(Super);
+
+		do {
+			auto Owner = Start->Owner;
+			C += (Owner and Owner->Class == Cls);
+			Start = JBShift(Start, 1 << World->BlockSize);
+		} while (Start < Finish);
+		Super = Super->Next;
+    } while (Super != First);
+    return ((int64)C) << kBlockSize;
+}
+
+
 void JB_Mem_ClassLeakCounter () {
 	JB_MemoryWorld* World = &MemoryManager;
 	static int Mode;

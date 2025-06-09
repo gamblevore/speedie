@@ -20,6 +20,10 @@ function compiler.PrintCompileTime (|date| durr)
 	fs.normal  "Input Src",		Compiler.stTotalSourceSize.strsize(fs)
 	if options.color
 		fs <~ errorcolors.normal
+	
+	if Options.PrintMemoryUsage
+		fs <~ "\n"
+		app.MemoryUsage(fs)
 	printline fs
 
 

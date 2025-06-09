@@ -241,6 +241,35 @@ function CWD (assigns:|string|, |ErrorInt|)
 helper _chdir (|string| path, |ErrorInt|)
 	cpp_wrapper JB_File__chdir
 
+helper MemoryUsageSorter (SorterComparer of message)
+	return .position < b.position
+
+render MemoryUsage
+	|[message]| items
+	 
+	for cls in classdata.First
+		items <~ message(nil, @str, cls.memoryused, cls.name.str)
+	
+	items.sort(MemoryUsageSorter)
+	for I in items
+		fs.memoryreport(i.name, i.position)
+	
+	fs.memoryreport("obj", .ObjMemory)
+	fs.memoryreport("str", .StringMemory)
+	fs.memoryreport("other", .OtherMemory)	
+	
+	
+helper FastString.MemoryReport (|string| name, |int64| Amount)
+	if amount
+		self <~ name
+		self <~ ":"
+		self <~ " "
+		amount.strsize(self)
+		self <~ "\n"
+	
+	
+	
+
 
 helper LeakMarkMemory
 	cpp_wrapper JB_Mem_Mark
