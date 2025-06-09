@@ -482,7 +482,10 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 			return T.haveaddr
 		return GrabAddr(self, exp, dest, d, T)
 	
+	// it seems we can get things that are both consts and globals??
+	// specifically... function pointers to inbuilt funcs?
 	if d is const
+		if d is global // what? is it a function pointer
 		return ConstFromThgName(self, exp, dest, d)
 
 	if dest isnt ConstRequest

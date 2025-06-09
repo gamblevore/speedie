@@ -327,7 +327,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			//if trap == 56578
+			if trap == 121188
 				
 		  else
 			opt inline
@@ -673,7 +673,8 @@ struct Assembler
 			if !vr
 				0
 			  elseif .CanReuseParam(prms, a, vr)
-				|| T = v.µtype(a.WholeType.µtype)
+				
+				|| T = v.µtype(a.WholeType.µtype)       //.reg(vr)
 				t.tmpcheck
 				a.wholetype = t
 				(a is param) = (v is param)
