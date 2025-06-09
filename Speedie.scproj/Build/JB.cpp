@@ -3519,7 +3519,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[215]);
-	JB_FS_AppendInt32(_fsf0, (2025060616));
+	JB_FS_AppendInt32(_fsf0, (2025060919));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8614,7 +8614,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1723]);
-	JB_FS_AppendInt32(_fsf0, (2025060616));
+	JB_FS_AppendInt32(_fsf0, (2025060919));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -17793,16 +17793,21 @@ int SC_Reg_Reg(ASMReg Self) {
 }
 
 ASMReg SC_Reg_RegSet(ASMReg Self, int Value) {
+	int N = Value & 31;
 	Self = SC_Reg_OperatorBitand(Self, (~((ASMReg)(31 << 11))));
-	(Self = SC_Reg_OperatorAs(Self, ((ASMReg)((Value & 31) << 11))));
+	(Self = SC_Reg_OperatorAs(Self, ((ASMReg)(N << 11))));
 	Self = (SC_Reg_SyntaxIsSet(Self, kSC__Reg_Temp, ((bool)(Value >> 31))));
 	return Self;
 }
 
 ASMReg SC_Reg_ReUseRegInPlace(ASMReg Self, ASMReg Dest) {
+	Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_CanHoist, (!true));
+	return SC_Reg_SetReg(Self, Dest);
+}
+
+ASMReg SC_Reg_SetReg(ASMReg Self, ASMReg Dest) {
 	Self = SC_Reg_RegSet(Self, SC_Reg_Reg(Dest));
 	Self = (SC_Reg_SyntaxIsSet(Self, kSC__Reg_Temp, (SC_Reg_SyntaxIs(Dest, kSC__Reg_Temp))));
-	Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_CanHoist, (!true));
 	return Self;
 }
 
@@ -17829,6 +17834,40 @@ ASMReg SC_Reg_SyntaxIsSet(ASMReg Self, ASMReg R, bool Value) {
 	 else {
 		return SC_Reg_OperatorAsnt(Self, R);
 	}
+}
+
+bool SC_Reg_TmpCheck(ASMReg Self) {
+	int R = SC_Reg_Reg(Self);
+	bool IsTmp = SC_Reg_SyntaxIs(Self, kSC__Reg_Temp);
+	bool Big = R >= 26;
+	if (Big == IsTmp) {
+		return true;
+	}
+	if (Big) {
+		FastString* _fsf0 = JB_FS_Constructor(nil);
+		JB_Incr(_fsf0);
+		JB_FS_AppendString(_fsf0, JB_LUB[269]);
+		JB_FS_AppendInt32(_fsf0, R);
+		JB_FS_AppendString(_fsf0, JB_LUB[270]);
+		JB_String* _tmPf2 = JB_FS_GetResult(_fsf0);
+		JB_Incr(_tmPf2);
+		JB_Decr(_fsf0);
+		JB_PrintLine(_tmPf2);
+		JB_Decr(_tmPf2);
+	}
+	 else {
+		FastString* _fsf1 = JB_FS_Constructor(nil);
+		JB_Incr(_fsf1);
+		JB_FS_AppendString(_fsf1, JB_LUB[271]);
+		JB_FS_AppendInt32(_fsf1, R);
+		JB_FS_AppendString(_fsf1, JB_LUB[272]);
+		JB_String* _tmPf3 = JB_FS_GetResult(_fsf1);
+		JB_Incr(_tmPf3);
+		JB_Decr(_fsf1);
+		JB_PrintLine(_tmPf3);
+		JB_Decr(_tmPf3);
+	}
+	return false;
 }
 
 uint SC_Reg_treg(ASMReg Self) {
@@ -23439,12 +23478,12 @@ ASMReg SC_Pac_DeclareMe(Assembler* Self, Message* Where, SCDecl* Type) {
 	ASMReg Ret = Self->State.Return;
 	if (SC_Reg_Reg(Ret) and ((SC_Decl_SyntaxIs(Type, kSC__SCDeclInfo_VarThatGotReturned)) and (Self->State.Fn->ReturnedVars == 1))) {
 		Ret = SC_Reg_xC2xB5TypeSet(Ret, ((DataTypeCode)T));
-		(SC_Decl_WholeTypeSet(Type, ((DataTypeCode)Ret)));
+		(SC_Decl_WholeTypeSet(Type, Ret));
 		return Ret;
 	}
 	int D = ((int)Self->VDecls) + 1;
 	T = SC_Reg_RegSet(T, D);
-	(SC_Decl_WholeTypeSet(Type, ((DataTypeCode)T)));
+	(SC_Decl_WholeTypeSet(Type, T));
 	if (D < Self->VTemps) {
 		Self->Vars[D] = Type;
 		Self->VDecls = D;
@@ -24045,8 +24084,9 @@ void SC_Pac_InlineParameters(Assembler* Self, Message* Prms) {
 				0;
 			}
 			 else if (SC_Pac_CanReuseParam(Self, Prms, A, Vr)) {
-				ASMReg T = SC_Reg_RegSet(SC_Decl_WholeType(A), Vr);
-				A->DataType = ((DataTypeCode)T);
+				ASMReg T = SC_Reg_xC2xB5TypeSet(V, SC_Reg_xC2xB5Type(SC_Decl_WholeType(A)));
+				SC_Reg_TmpCheck(T);
+				(SC_Decl_WholeTypeSet(A, T));
 				((SC_Decl_SyntaxIsSet(A, kSC__SCDeclInfo_Param, (SC_Reg_SyntaxIs(V, kSC__Reg_Param)))));
 				((SC_Decl_SyntaxIsSet(A, kSC__SCDeclInfo_Body, ((!SC_Reg_SyntaxIs(V, kSC__Reg_Param))))));
 			}
@@ -28208,7 +28248,7 @@ DTWrap* JB_Wrap_ConstructorInt(DTWrap* Self, int64 V) {
 		Self = ((DTWrap*)JB_NewClass(&DTWrapData));
 	}
 	Self->DeathAction = 0;
-	Self->DataType = kJB__TC_s64;
+	Self->Kind = kJB__TC_s64;
 	Self->PrivValue = V;
 	return Self;
 }
@@ -28218,7 +28258,7 @@ DTWrap* JB_Wrap_ConstructorVoidPtr(DTWrap* Self, void* P) {
 		Self = ((DTWrap*)JB_NewClass(&DTWrapData));
 	}
 	Self->DeathAction = 0;
-	Self->DataType = kJB__TC_UnusedType;
+	Self->Kind = kJB__TC_UnusedType;
 	Self->PrivValue = ((int64)P);
 	return Self;
 }
@@ -28240,13 +28280,13 @@ JB_String* JB_Wrap_Render(DTWrap* Self, FastString* Fs_in) {
 	FastString* Fs = JB_FS__FastNew(Fs_in);
 	JB_Incr(Fs);
 	//visible;
-	if (JB_TC_IsFloat(Self->DataType)) {
+	if (JB_TC_IsFloat(Self->Kind)) {
 		JB_FS_AppendDoubleAsText0(Fs, JB_Wrap_FloatValue(Self));
 	}
-	 else if (Self->DataType == kJB__TC_bool) {
+	 else if (Self->Kind == kJB__TC_bool) {
 		JB_bool_Append(((bool)Self->PrivValue), Fs);
 	}
-	 else if (!JB_TC_IsNumeric(Self->DataType)) {
+	 else if (!JB_TC_IsNumeric(Self->Kind)) {
 		JB_FS_AppendString(Fs, JB_LUB[429]);
 		JB_FS_AppendHex(Fs, Self->PrivValue, 2);
 	}
@@ -35637,7 +35677,7 @@ SCDecl* SC_Msg_ASMDecl(Message* Self) {
 	SCDecl* Rz = nil;
 	Rz = SC_Msg_FastDecl(Self);
 	if (SC_Decl_TypeOnly(Rz) == kJB__TC_UnusedType) {
-		(SC_Decl_WholeTypeSet(Rz, ((DataTypeCode)SC_Decl_CalculateASMType(Rz))));
+		(SC_Decl_WholeTypeSet(Rz, SC_Decl_CalculateASMType(Rz)));
 	}
 	return Rz;
 }
@@ -46815,8 +46855,9 @@ bool SC_Decl_TypeSuffers(SCDecl* Self) {
 	return (D == kSC__SCNodeType_FuncProto) or (D == kSC__SCNodeType_Object);
 }
 
-void SC_Decl_WholeTypeSet(SCDecl* Self, uint /*DataTypeCode*/ Value) {
-	Self->DataType = Value;
+void SC_Decl_WholeTypeSet(SCDecl* Self, ASMReg Value) {
+	SC_Reg_TmpCheck(Value);
+	Self->DataType = ((DataTypeCode)Value);
 }
 
 ASMReg SC_Decl_WholeType(SCDecl* Self) {
@@ -60448,4 +60489,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// -2733168117064484676 7268931481306347634
+// -2460684581721072586 7268931481306347634

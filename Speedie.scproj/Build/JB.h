@@ -886,7 +886,7 @@ struct DataObject_Behaviour: Object_Behaviour {
 };
 
 JBClass ( DTWrap , JB_Object , 
-	DataTypeCode DataType;
+	DataTypeCode Kind;
 	byte DeathAction;
 	int64 PrivValue;
 );
@@ -2404,73 +2404,73 @@ extern byte SC__ASM_NoisyASM;
 
 #define kSC__ASM_WR8U ((ASM_Write)103)
 
-#define kSC__Reg_AddrForceRequest ((ASMReg)1099511627776)
+#define kSC__Reg_AddrForceRequest ((ASMReg)549755813888)
 
-#define kSC__Reg_AddrNeed ((ASMReg)1649267441664)
+#define kSC__Reg_AddrNeed ((ASMReg)824633720832)
 
-#define kSC__Reg_AddrRequest ((ASMReg)549755813888)
+#define kSC__Reg_AddrRequest ((ASMReg)274877906944)
 
 #define kSC__Reg_AlreadyNegated ((ASMReg)1048576)
 
 #define kSC__Reg_Alternate ((ASMReg)2097152)
 
-#define kSC__Reg_AlwaysSet ((ASMReg)536870912)
+#define kSC__Reg_AlwaysSet ((ASMReg)268435456)
 
-#define kSC__Reg_CanHoist ((ASMReg)67108864)
+#define kSC__Reg_CanHoist ((ASMReg)33554432)
 
-#define kSC__Reg_CondAnswer ((ASMReg)4294967296)
+#define kSC__Reg_CondAnswer ((ASMReg)2147483648)
 
-#define kSC__Reg_CondRequest ((ASMReg)2147483648)
+#define kSC__Reg_CondRequest ((ASMReg)1073741824)
 
-#define kSC__Reg_ConstInput ((ASMReg)137438953472)
+#define kSC__Reg_ConstInput ((ASMReg)68719476736)
 
-#define kSC__Reg_ConstOutput ((ASMReg)274877906944)
+#define kSC__Reg_ConstOutput ((ASMReg)137438953472)
 
-#define kSC__Reg_ConstRequest ((ASMReg)1073741824)
+#define kSC__Reg_ConstRequest ((ASMReg)536870912)
 
-#define kSC__Reg_ContainsAddr ((ASMReg)268435456)
+#define kSC__Reg_ContainsAddr ((ASMReg)134217728)
 
 #define kSC__Reg_Declaration ((ASMReg)16777216)
 
-#define kSC__Reg_DeclareInlineParam ((ASMReg)8589934592)
+#define kSC__Reg_DeclareInlineParam ((ASMReg)4294967296)
 
 #define kSC__Reg_Discard ((ASMReg)4194304)
 
-#define kSC__Reg_Exit ((ASMReg)103079215104)
+#define kSC__Reg_Exit ((ASMReg)51539607552)
 
-#define kSC__Reg_ExitAtAll ((ASMReg)68719476736)
+#define kSC__Reg_ExitAtAll ((ASMReg)34359738368)
 
-#define kSC__Reg_ExitFunction ((ASMReg)34359738368)
+#define kSC__Reg_ExitFunction ((ASMReg)17179869184)
 
 #define kSC__Reg_FromExistingVar ((ASMReg)262144)
 
 #define kSC__Reg_FromZeroMemory ((ASMReg)524288)
 
-#define kSC__Reg_InlinedAccess ((ASMReg)17179869184)
+#define kSC__Reg_InlinedAccess ((ASMReg)8589934592)
 
 #define kSC__Reg_Negate ((ASMReg)65536)
 
-#define kSC__Reg_NoScale ((ASMReg)134217728)
+#define kSC__Reg_NoScale ((ASMReg)67108864)
 
-#define kSC__Reg_NotUnConst ((ASMReg)137439215616)
+#define kSC__Reg_NotUnConst ((ASMReg)68719738880)
 
 #define kSC__Reg_Param ((ASMReg)131072)
 
-#define kSC__Reg_RealConst ((ASMReg)412316860416)
+#define kSC__Reg_RealConst ((ASMReg)206158430208)
 
-#define kSC__Reg_RealDiscard ((ASMReg)412321054720)
+#define kSC__Reg_RealDiscard ((ASMReg)206162624512)
 
-#define kSC__Reg_RemoveableOutput ((ASMReg)274911461376)
+#define kSC__Reg_RemoveableOutput ((ASMReg)137438954496)
 
 #define kSC__Reg_Set ((ASMReg)8388608)
 
-#define kSC__Reg_Temp ((ASMReg)33554432)
+#define kSC__Reg_Temp ((ASMReg)1024)
 
-#define kSC__Reg_Textual ((ASMReg)536870912)
+#define kSC__Reg_Textual ((ASMReg)268435456)
 
-#define kSC__Reg_Zero ((ASMReg)412316991544)
+#define kSC__Reg_Zero ((ASMReg)206158561336)
 
-#define kSC__Reg_ZeroParam ((ASMReg)274878038016)
+#define kSC__Reg_ZeroParam ((ASMReg)137439084544)
 
 #define kSC__ASMType_IncrAfter ((int)2)
 
@@ -2622,7 +2622,7 @@ extern ASM_Write SC__ASMType_WriteASM[5];
 
 #define kJB__TC_f64 ((DataTypeCode)248)
 
-#define kJB__TC_Failed ((DataTypeCode)1024)
+#define kJB__TC_Failed ((DataTypeCode)512)
 
 #define kJB__TC_Float ((DataTypeCode)232)
 
@@ -2646,7 +2646,7 @@ extern ASM_Write SC__ASMType_WriteASM[5];
 
 #define kJB__TC_Numeric ((DataTypeCode)8)
 
-#define kJB__TC_PossibleBits ((DataTypeCode)2047)
+#define kJB__TC_PossibleBits ((DataTypeCode)1023)
 
 #define kJB__TC_s16 ((DataTypeCode)88)
 
@@ -5535,6 +5535,8 @@ ASMReg SC_Reg_RegSet(ASMReg Self, int Value);
 
 ASMReg SC_Reg_ReUseRegInPlace(ASMReg Self, ASMReg Dest);
 
+ASMReg SC_Reg_SetReg(ASMReg Self, ASMReg Dest);
+
 bool SC_Reg_Signed(ASMReg Self);
 
 ASMReg SC_Reg_Simplify(ASMReg Self);
@@ -5544,6 +5546,8 @@ bool SC_Reg_SomePointer(ASMReg Self);
 bool SC_Reg_SyntaxIs(ASMReg Self, ASMReg R);
 
 ASMReg SC_Reg_SyntaxIsSet(ASMReg Self, ASMReg R, bool Value);
+
+bool SC_Reg_TmpCheck(ASMReg Self);
 
 uint SC_Reg_treg(ASMReg Self);
 
@@ -10461,7 +10465,7 @@ void SC_Decl_TypeReach(SCDecl* Self, SCNode* From, Message* Src);
 
 bool SC_Decl_TypeSuffers(SCDecl* Self);
 
-void SC_Decl_WholeTypeSet(SCDecl* Self, uint /*DataTypeCode*/ Value);
+void SC_Decl_WholeTypeSet(SCDecl* Self, ASMReg Value);
 
 ASMReg SC_Decl_WholeType(SCDecl* Self);
 
