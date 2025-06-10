@@ -461,7 +461,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 			if rc.iszero and !lnt.IsSigned
 				always = (comp is MoreOrEqual) - (comp is less)
 			if always
-				error (MsgRel, "Unsigned comparison vs zero gives same result.")
+				error (MsgRel, "Unchanging unsigned comparison vs zero.")
 				
 
 			
