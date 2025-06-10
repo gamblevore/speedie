@@ -1,6 +1,6 @@
 
 /*
-	Jeebox internals. By Theodore H. Smith...
+	Speedie Internals. By Theodore H. Smith...
 */
 
 // we have opposites... perhaps the negate operator could use it.
@@ -19,6 +19,8 @@ datatype OpMode (int)
 		Comparison  	// >  >=  <  <=
 		More  			// >				// if unsigned > 0
 		Less  			// <				// if 0 < unsigned
+		MoreOrEqual		// >=
+		LessOrEqual		// <=
 		NilTest			// not the same as EqualOrNot... because those include customops
 		Multiply
 		Subtraction = (makessigned + Addition)
@@ -160,29 +162,29 @@ module {
 		Negative.name = "-"
 		Bnot.name = "~"
 
-		.AddComp("==",					&Assembler.Equals,	OpMode.ExactEquals)
+		.AddComp("==",					&Assembler.Equals,		OpMode.ExactEquals)
 		.AddComp( "<",					&Assembler.Less,		opmode.Comparison + opmode.less)
 		.AddComp( ">",					&Assembler.More,		opmode.Comparison + opmode.more)
-		.AddComp( "<=",					&Assembler.LessEq,	opmode.Comparison)
-		.AddComp( ">=",					&Assembler.MoreEq,	opmode.Comparison)
-		.AddComp( "!=",					&Assembler.NotEq,	OpMode.ExactNotEquals)
+		.AddComp( "<=",					&Assembler.LessEq,		opmode.Comparison + opmode.LessOrEqual)
+		.AddComp( ">=",					&Assembler.MoreEq,		opmode.Comparison + opmode.MoreOrEqual)
+		.AddComp( "!=",					&Assembler.NotEq,		OpMode.ExactNotEquals)
 		.OppositeComp("==", "!=")
 		.OppositeComp("<", ">=")
 		.OppositeComp(">", "<=")
 
 		.AddBasic
 		
-		.AddMath( "mod",	"mod",		&Assembler.Mod,		/*.Mod*/	opmode.NeedsCppFuncOnFloats)
+		.AddMath( "mod",	"mod",		&Assembler.Mod,			/*.Mod*/	opmode.NeedsCppFuncOnFloats)
 		.AddMath( "+",		"Plus",		&Assembler.Plus,		/*.Add*/	opmode.Addition)
 		.AddMath( "-",		"Minus",	&Assembler.Subtract,	/*.sub*/	opmode.subtraction)
 		.AddMath( "*",		"Mul",		&Assembler.Multiply,	/*.mul*/	opmode.Multiply)
-		.AddMath( "/",		"Divide",	&Assembler.Divide,	/*.div*/)
+		.AddMath( "/",		"Divide",	&Assembler.Divide,		/*.div*/)
 
-		.AddBit( ">>",	"ShiftRight",	&Assembler.SHR,		/*.shru*/	opmode.shift)
+		.AddBit( ">>",	"ShiftRight",	&Assembler.SHR,			/*.shru*/	opmode.shift)
 		LeftShift = .addbit( "<<",	"ShiftLeft",	&Assembler.SHL,		/*.shl*/	opmode.shiftonly) // can add bits
-		.AddBit( "(|)",	"BitOr",		&Assembler.BitOr,	/*.bor*/)
-		.AddBit( "&",	"BitAnd",		&Assembler.BitAnd,	/*.ban*/	opmode.SameOrLessBits)
-		.AddBit( "^",	"Xor",			&Assembler.bitxor,	/*.xor*/	opmode.noextrabits)
+		.AddBit( "(|)",	"BitOr",		&Assembler.BitOr,		/*.bor*/)
+		.AddBit( "&",	"BitAnd",		&Assembler.BitAnd,		/*.ban*/	opmode.SameOrLessBits)
+		.AddBit( "^",	"Xor",			&Assembler.bitxor,		/*.xor*/	opmode.noextrabits)
 
 		Subtract = dict["-"]
 
@@ -431,6 +433,10 @@ function scdecl.CompareUnclear (|scdecl| d, |bool| MakesSenseVsZero, |bool|)
 		return true
 
 
+function scdecl.IsZero (|bool|)
+	return (self is directnumber) and !.exportposition
+
+
 function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |message| MsgRel, |int|)
 	opt norefcounts
 	if (comp is Custom or CaseAware)
@@ -447,6 +453,18 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 			// What are we comparing?   byte vs int is ok.   uint vs int NOT OK
 			if lc.CompareUnclear(rc, (comp is less)|bool|) or rc.CompareUnclear(lc, (comp is more)|bool|)
 				error (MsgRel, "Unclear signed vs unsigned comparison.")
+
+		if comp is Comparison
+			|| always = 0
+			if lc.iszero and !rnt.IsSigned
+				always = (comp is LessOrEqual) - (comp is more)
+			if rc.iszero and !lnt.IsSigned
+				always = (comp is MoreOrEqual) - (comp is less)
+			if always
+				error (MsgRel, "Unsigned comparison vs zero gives same result.")
+				
+
+			
 
 	ifn LN and LN == RN	   		// not both same numbers
 		if ln and rn and (ln == 1 or rn == 1)

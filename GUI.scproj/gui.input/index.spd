@@ -15,7 +15,7 @@ import "Image"
 
 compile_linking
 	flags
-		osx "-framework OpenGL  -framework AVFoundation  -lSDL2"
+		osx "-framework AVFoundation  -lSDL2"
 		lin " -lSDL2"
 
 	frameworks // frameworks is osx only

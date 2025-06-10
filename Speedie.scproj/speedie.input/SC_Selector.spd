@@ -113,12 +113,3 @@ class $name (selector)
 				rz = true
 
 
-selector MaterialsLol
-	|string| oof 
-	items (
-		Pellets
-		Wood
-		Iron
-		WierdBlock
-	)
-

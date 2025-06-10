@@ -40,7 +40,7 @@ module Options
 	||		Warnings				= false
 	||		ExternalCompile			= false
 	||		ASMRenderBlocks			= false
-	|byte|	Optimise				= 1
+	|int|	Optimise				= 1
 	|bool|	SelfReplacement			= 0
 	|byte|	OperationCount			= 0
 	|byte|	PerryOutput				= 0

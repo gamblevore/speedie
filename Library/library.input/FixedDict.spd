@@ -95,48 +95,51 @@ class FixedDict
 		return fixeddict(self, part, r, rt)
 	
 
-	function ValueObj (|int| t, ||)
+	helper InlineValue (|int| t, ||)
+		nil self
 		if T == typeobj: return self|...|
-		if T and .valuetype
+		if T and self and .valuetype
 			return .value|...|
 
 
 	syntax access (|string| s, assigns:|| o)
-		cpp_part SetObj
+		cpp_part SetValue
 		|| n = s.length
-			addType(self, s.addr, n-1, o, typeobj)
+			.addType(s.addr, n, o, typeobj)
+		// could allow "" as a name, using .value?
 
 
 	syntax access (|string| s, ||)
-		cpp_part GetObj
+		cpp_part GetValue
 		|| n = s.length
-			return getobj(self, s.addr, n - 1)
+			return .gettype(s.addr, n)|...|
 
 	
+	helper AddType (|&byte| Addr, |int| n, || val, |int| Type)
+		opt norefcounts
+		|| i = 0
+		while 
+			|| b = addr[i++]
+			self = .DownPart(b&15)
+			if i >= n
+				return .SetPart(B>>4, Val, Type)
+			self = .DownPart(B>>4)
+
+
+	helper GetType (|&byte| Addr, |int| n, ||)
+		opt norefcounts
+		|| i = 0
+		while
+			|| B	= addr[i++]
+			self	= self[B&15]				#require
+			|| T	= .typeof(B>>4)
+			self	= self[B>>4]
+			if i >= n
+				return .InlineValue(t)
+			require T == typedict
+
+
 	module
-		function AddType (|fixedDict| curr, |&byte| Addr, |int| n, || val, |int| Type)
-			opt norefcounts
-			for i in int.max
-				|| b = addr[i]
-				curr = curr.DownPart(b&15)
-				if i >= n
-					return curr.SetPart(B>>4, Val, Type)
-				curr = curr.DownPart(B>>4)
-
-
-		function GetObj (|fixeddict| curr, |&byte| Addr, |int| n, ||)
-			opt norefcounts
-			for i in int.max
-				|| B	= addr[i]
-				curr	= curr[B&15]				#require
-				|| T	= curr.typeof(B>>4)
-				curr	= curr[B>>4]
-				if i >= n
-					DEBUG_REQUIRE curr
-					return curr.valueobj(t) // can curr be nil or not? perhaps just require is needed
-				require T == typedict
-
-
 		function TimeTest (|array of string| items)
 			|fixeddict of string|  fd = fixeddict()
 			|dictionary of string| ed = dictionary()
@@ -212,23 +215,86 @@ class FixedDict
 
 
 
-// main
-//		fixeddict.test
-//
-
-// a fixed-place dictionary!
-// just an experiment! It works!
-// its just done for fun.
-
 /*
 	Could replace:
 		* Array			(arrays suck in every language. we only wanna go forward/backward!)
 		* Dictionary	(kinda bloated, and slower!! and takes more memory!)
-		* Hashes		(Assuming we got good removal)
 */
 
-// wouldnt this be better, if instead of setting/getting a value
-// it returns the PLACE of the value? This way... we can subclass
-// for specific types? And it can set objs/ints as it chooses?
-// or else we get a mess with types
-// although... we still have to deal with nodes?
+// Possible idea: Optimise speedie's lookuptables for properties/globals
+	// * nil means empty dictionary
+	// * Store <= 8 values, as inline-array in FixedDict (name+value stored in .items)
+	// * FixedDict can be upgraded to a proper dictionary
+
+
+role NameTableConcept (object)
+	function Add (|!&NameTableConcept| self, |message| y)
+		opt norefcounts
+		|| v = self[]
+		if !v
+			self[] = y
+			return 
+		
+		if v isa FixedDict
+			v.NameTableAdd(y)
+			return 
+
+		|| d = FixedDict()
+		self[] = d
+		d.NameTableAdd(v|&nil||message|)
+		d.NameTableAdd(y)
+
+
+	helper fixedDict.NameTableAdd (|message| value)
+		opt norefcounts
+		|| l = .Letter
+		.Letter = l+1
+		.SetPart(l++, value, fixeddict.TypeObj)
+		if l <= 7
+			return
+		
+		|message--[8]| Tmp
+		|| n = Platform.PointerBytes * 8
+		Memory.Copy((&tmp[0])|&nil|, (&.items[0])|&nil|, n)
+		Memory.zero((&.items[0])|&nil|, n) // remove all objects
+		.ItemTypes = 0
+		
+		// ReAdd objects
+		for i in 8
+			|| msg = tmp[i]!
+			|| name = msg.name
+			.addtype(name.addr, name.length, msg, fixeddict.typeobj)
+			jb_decr(msg) // oof
+	
+	
+	function Get (|string| name, |message|)
+		nil checker
+		if self isa FixedDict
+			|int| l = .letter
+				while --l >= 0
+					|| s = .items[l]|&nil||message|
+					if s.name == name
+						return s
+				return nil
+			return self[name]|&nil||message|
+		if self isa message
+			if .name == name
+				return self
+			
+				
+//class Example
+//	|?NameTableConcept| Table
+//	
+//	constructor
+//	function Test
+//		|| list = "'a', 'b', 'c'" ~ parse
+//		for s in list
+//			.Table.add(s)
+//			for s2 in list
+//				|| x = .table.get(s2.name)
+//				"$s2 --> $x"
+//
+//main
+//	|| x = Example()
+//	x.Test
+//

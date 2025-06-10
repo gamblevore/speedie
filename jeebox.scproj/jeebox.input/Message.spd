@@ -26,7 +26,8 @@ The tree-data-structure represents your data. The Message class is similar to XM
 	|MsgParseFlags|			Flags				// Flags: Output only. Change freely or reuse.
 	|uint16|				Tag					// Tag:   Jeebox does not use this.
 ////////////////////////////////		
-			
+	
+	
 	constructor (|Message!| other)
 		cpp_part ConstructorCopy
 		super.constructor

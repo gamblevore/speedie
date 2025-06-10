@@ -23,7 +23,7 @@ function compiler.PrintCompileTime (|date| durr)
 	
 	if Options.PrintMemoryUsage
 		fs <~ "\n"
-		app.MemoryUsage(fs)
+		app.MemoryUsage(8KB, fs)
 	printline fs
 
 
@@ -104,4 +104,5 @@ function compiler.CompileTime
 		TransCompiler.ExportAndInstall(elapsed)
 		if !options.scripting and stderr.ok
 			stringcorrector.CorrectStrings
+
 

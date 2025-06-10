@@ -235,25 +235,30 @@ function StdOut (|File!|)
 function CWD (|string|)
 	cpp_wrapper JB_File__CWD
 
+
 function CWD (assigns:|string|, |ErrorInt|)
 	return ._chdir(Value.resolve)
+
 
 helper _chdir (|string| path, |ErrorInt|)
 	cpp_wrapper JB_File__chdir
 
+
 helper MemoryUsageSorter (SorterComparer of message)
 	return .position < b.position
 
-render MemoryUsage
+
+render MemoryUsage (|int| Over=0)
 	|[message]| items
 	 
 	for cls in classdata.First
-		items <~ message(nil, @str, cls.memoryused, cls.name.str)
+		|| Mem = cls.memoryused
+		if mem > over
+			items <~ message(nil, @str, mem, cls.name.str)
 	
 	items.sort(MemoryUsageSorter)
 	for I in items
 		fs.memoryreport(i.name, i.position)
-	
 	fs.memoryreport("obj", .ObjMemory)
 	fs.memoryreport("str", .StringMemory)
 	fs.memoryreport("other", .OtherMemory)	
@@ -262,8 +267,7 @@ render MemoryUsage
 helper FastString.MemoryReport (|string| name, |int64| Amount)
 	if amount
 		self <~ name
-		self <~ ":"
-		self <~ " "
+		self <~ ": "
 		amount.strsize(self)
 		self <~ "\n"
 	

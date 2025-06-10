@@ -1,11 +1,10 @@
 
 
-/*
-	Jeebox internals. By Theodore H. Smith...
-*/
 
+// DEPRECATED
 
 || C_Letters		= "AZaz__09".charset
+
 module SCGame3D
 	|| Types = [
 		"point"				: "P"
