@@ -399,8 +399,6 @@ struct FastStringCpp_Behaviour;
 
 struct File_Behaviour;
 
-struct MaterialsLol_Behaviour;
-
 struct Process_Behaviour;
 
 struct SCNamed_Behaviour;
@@ -469,6 +467,8 @@ struct Macro;
 
 struct MWrap;
 
+struct JB_Object;
+
 struct RefTest;
 
 struct SCImport;
@@ -500,8 +500,6 @@ struct xC2xB5Form;
 struct FastStringCpp;
 
 struct FastString;
-
-struct MaterialsLol;
 
 struct FastString;
 
@@ -1159,13 +1157,6 @@ JBClass ( FastStringCpp , FastString ,
 struct File_Behaviour: String_Behaviour {
 };
 
-struct MaterialsLol_Behaviour: Selector_Behaviour {
-};
-
-JBClass ( MaterialsLol , Selector , 
-	JB_String* oof;
-);
-
 struct Process_Behaviour: ProcessOwner_Behaviour {
 };
 
@@ -1687,7 +1678,7 @@ extern bool SC__Options_ModePack;
 extern byte SC__Options_NilStrength;
 extern bool SC__Options_NilTestAllocNeverFails;
 extern byte SC__Options_OperationCount;
-extern byte SC__Options_Optimise;
+extern int SC__Options_Optimise;
 extern JB_String* SC__Options_output_path;
 #define kSC__Options_pack ((int)2)
 
@@ -1695,6 +1686,7 @@ extern byte SC__Options_PerryOutput;
 extern bool SC__Options_PrintCompileString;
 extern bool SC__Options_PrintFiles;
 extern bool SC__Options_PrintLibraries;
+extern bool SC__Options_PrintMemoryUsage;
 extern bool SC__Options_PrintStages;
 extern bool SC__Options_ProjectIsLibrary;
 extern bool SC__Options_ProjectIsMiniLib;
@@ -2977,15 +2969,15 @@ extern Array* SC__NilReason_values;
 
 #define kSC__OpMode_Addition ((OpMode)16)
 
-#define kSC__OpMode_AND ((OpMode)131072)
+#define kSC__OpMode_AND ((OpMode)524288)
 
-#define kSC__OpMode_AndOr ((OpMode)196608)
+#define kSC__OpMode_AndOr ((OpMode)786432)
 
 #define kSC__OpMode_Assigns ((OpMode)2)
 
 #define kSC__OpMode_Bit ((OpMode)4)
 
-#define kSC__OpMode_CaseAware ((OpMode)524288)
+#define kSC__OpMode_CaseAware ((OpMode)2097152)
 
 #define kSC__OpMode_Compare ((OpMode)1)
 
@@ -2993,19 +2985,21 @@ extern Array* SC__NilReason_values;
 
 #define kSC__OpMode_CompOrSet ((OpMode)3)
 
-#define kSC__OpMode_Custom ((OpMode)262144)
+#define kSC__OpMode_Custom ((OpMode)1048576)
 
 #define kSC__OpMode_EqualOrNot ((OpMode)256)
 
-#define kSC__OpMode_ExactEquals ((OpMode)4481)
+#define kSC__OpMode_ExactEquals ((OpMode)16769)
 
 #define kSC__OpMode_ExactlyEquals ((OpMode)128)
 
-#define kSC__OpMode_ExactNotEquals ((OpMode)4353)
+#define kSC__OpMode_ExactNotEquals ((OpMode)16641)
 
 #define kSC__OpMode_Less ((OpMode)2048)
 
-#define kSC__OpMode_LoseBits ((OpMode)32768)
+#define kSC__OpMode_LessOrEqual ((OpMode)8192)
+
+#define kSC__OpMode_LoseBits ((OpMode)131072)
 
 #define kSC__OpMode_MakesSigned ((OpMode)64)
 
@@ -3015,19 +3009,21 @@ extern Array* SC__NilReason_values;
 
 #define kSC__OpMode_More ((OpMode)1024)
 
-#define kSC__OpMode_Multiply ((OpMode)8192)
+#define kSC__OpMode_MoreOrEqual ((OpMode)4096)
 
-#define kSC__OpMode_NeedsCppFuncOnFloats ((OpMode)1048576)
+#define kSC__OpMode_Multiply ((OpMode)32768)
 
-#define kSC__OpMode_NilTest ((OpMode)4096)
+#define kSC__OpMode_NeedsCppFuncOnFloats ((OpMode)4194304)
 
-#define kSC__OpMode_NoExtraBits ((OpMode)16384)
+#define kSC__OpMode_NilTest ((OpMode)16384)
 
-#define kSC__OpMode_OR ((OpMode)65536)
+#define kSC__OpMode_NoExtraBits ((OpMode)65536)
 
-#define kSC__OpMode_SameOrLessBits ((OpMode)49152)
+#define kSC__OpMode_OR ((OpMode)262144)
 
-#define kSC__OpMode_Shift ((OpMode)16416)
+#define kSC__OpMode_SameOrLessBits ((OpMode)196608)
+
+#define kSC__OpMode_Shift ((OpMode)65568)
 
 #define kSC__OpMode_ShiftOnly ((OpMode)32)
 
@@ -3323,11 +3319,6 @@ extern Dictionary* SC__xC2xB5Form_Forms;
 
 #define kJB__File_O_WRONLY ((int)1)
 
-extern MaterialsLol* SC__MaterialsLol___First;
-extern MaterialsLol* SC__MaterialsLol_Iron;
-extern MaterialsLol* SC__MaterialsLol_Pellets;
-extern MaterialsLol* SC__MaterialsLol_WierdBlock;
-extern MaterialsLol* SC__MaterialsLol_Wood;
 extern SCIterator* SC__Iter_carray;
 extern bool SC__Base_ConstantsLoadingOverride;
 extern bool SC__Base_CurrVisibility;
@@ -3467,6 +3458,10 @@ JB_String* JB_App__FileName();
 int JB_App__Init_();
 
 bool JB_App__IsMainThread();
+
+JB_String* JB_App__MemoryUsage(int Over, FastString* Fs_in);
+
+SortComparison JB_App__MemoryUsageSorter(Message* Self, Message* B);
 
 bool JB_App__No(JB_String* Name);
 
@@ -3782,6 +3777,8 @@ bool SC_FB__AppOptions_ignorecantsave(JB_String* Name, JB_String* Value, FastStr
 bool SC_FB__AppOptions_keepallerrors(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_maxvars(JB_String* Name, JB_String* Value, FastString* Purpose);
+
+bool SC_FB__AppOptions_mem(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_nocolor(JB_String* Name, JB_String* Value, FastString* Purpose);
 
@@ -7412,9 +7409,6 @@ void adb(Message* Exp);
 // JB_File_Behaviour
 
 
-// JB_MaterialsLol_Behaviour
-
-
 // JB_Process_Behaviour
 
 
@@ -7862,6 +7856,8 @@ void SC_FS_IncludeH(FastString* Self, JB_String* Name);
 
 void JB_FS_lInt(FastString* Self, uint64 N);
 
+void JB_FS_MemoryReport(FastString* Self, JB_String* Name, int64 Amount);
+
 void JB_FS_MsgErrorName(FastString* Self, JB_String* Name);
 
 void JB_FS_Normal(FastString* Self, JB_String* S);
@@ -8019,6 +8015,9 @@ void jbl(JB_Object* Self);
 
 
 // JB_MemoryLayer
+
+
+// JB_NameTableConcept
 
 
 // JB_ProcessOwner
@@ -8252,11 +8251,7 @@ void JB_Sav_SaveWrite(Saveable* Self, ObjectSaver* Saver);
 
 
 // JB_Selector
-Selector* JB_Sel_Constructor(Selector* Self, Selector* Next, Selector** Place, JB_String* Name);
-
 void JB_Sel_Destructor(Selector* Self);
-
-void JB_Sel_GiveIDs(Selector* Self);
 
 
 
@@ -8803,19 +8798,6 @@ void JB_bin_Exit0(FastString* Self);
 int JB_bin_Exit(FastString* Self, int Amount);
 
 void JB_bin_Sheb(FastString* Self, JB_String* Name);
-
-
-
-// JB_MaterialsLol
-MaterialsLol* SC_MaterialsLol_Constructor(MaterialsLol* Self, Selector* Next, Selector** Place, JB_String* Name1);
-
-void SC_MaterialsLol_Destructor(MaterialsLol* Self);
-
-void SC_MaterialsLol____LoadSel(MaterialsLol** Place, JB_String* Name);
-
-int SC_MaterialsLol__Init_();
-
-int SC_MaterialsLol__InitCode_();
 
 
 
@@ -10313,6 +10295,8 @@ bool SC_Decl_IsUintLike(SCDecl* Self);
 
 bool SC_Decl_IsVoidPtr(SCDecl* Self);
 
+bool SC_Decl_IsZero(SCDecl* Self);
+
 bool SC_Decl_LoadContained(SCDecl* Self, Message* Contained, Message* Wrap, SCNode* Name_Space, DeclMode Purpose);
 
 bool SC_Decl_LoadContainedSub(SCDecl* Self, SCDecl* Cont, Message* Wrap, SCNode* Name_Space, DeclMode Purpose);
@@ -10868,12 +10852,12 @@ Message* JB_config__Create(JB_String* Path);
 
 
 // JB_interface
-void JB_SS_ParserCallBack_interface_SyntaxCall(JB_Task* Self, Message* Msg);
+bool JB_Task_LessThan3_interface_SyntaxCall(JB_Task* Self, int I);
 
 
 
 // JB_interface
-bool JB_Task_LessThan3_interface_SyntaxCall(JB_Task* Self, int I);
+void JB_SS_ParserCallBack_interface_SyntaxCall(JB_Task* Self, Message* Msg);
 
 
 
@@ -12148,7 +12132,7 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 
 inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
 	if ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc, false))) {
-		JB_Msg_Fail(Self, JB_LUB[907]);
+		JB_Msg_Fail(Self, JB_LUB[905]);
 	}
 }
 
