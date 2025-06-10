@@ -4,7 +4,7 @@
 */
 
 
-class SCIterator (SCNamed)
+class SCIterator (SCObject)
 	linkage
 		cpp_part			Iter
 

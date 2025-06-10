@@ -249,6 +249,8 @@ helper MemoryUsageSorter (SorterComparer of message)
 
 
 render MemoryUsage (|int| Over=0)
+	fs <~ "\n"
+
 	|[message]| items
 	 
 	for cls in classdata.First
@@ -259,9 +261,12 @@ render MemoryUsage (|int| Over=0)
 	items.sort(MemoryUsageSorter)
 	for I in items
 		fs.memoryreport(i.name, i.position)
-	fs.memoryreport("obj", .ObjMemory)
-	fs.memoryreport("str", .StringMemory)
-	fs.memoryreport("other", .OtherMemory)	
+
+	fs <~ "\n"
+
+	fs.memoryreport("obj",	.ObjMemory)
+	fs.memoryreport("str",	.StringMemory)
+	fs.memoryreport("arr",	.OtherMemory)	
 	
 	
 helper FastString.MemoryReport (|string| name, |int64| Amount)

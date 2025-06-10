@@ -624,7 +624,8 @@ function FastStringCpp.AddProperty (|scdecl| prop, |bool| intomodule)
 				self <~ "__lib__ " // not sure how this works with the new struct lib globs
 	
 			if IntoModule and prop is GameFlyingMem
-				prop.StringData.ReplaceAll("$(N)", prop.name, self)
+				// sigh
+				#!prop.StringData.ReplaceAll("$(N)", prop.name, self)
 			  else
 				Cpp_Export.WriteDecl( prop, self, nil )
 		self <~ ";"

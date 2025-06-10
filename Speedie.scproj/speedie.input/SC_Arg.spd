@@ -4,7 +4,6 @@
 */
  
 
-// 
 class SCArg (SCNode)
 	linkage
 		cpp_part		Arg
@@ -17,11 +16,13 @@ class SCArg (SCNode)
 	constructor (|Message| node)
 	// shouldn't be necessary!
 		super.Constructor(node)
+		is AllowLinkedLists
 
 	render
 		fs <~ "SCArg: (\n"
 		fs <~ .source
 		fs <~ ")\n"
+
 
 
 function Message.SCArgNested (|message| base, |SCNode| p, |SCArg?|)
@@ -31,6 +32,7 @@ function Message.SCArgNested (|message| base, |SCNode| p, |SCArg?|)
 		if cp == base
 			return .scarg(p)
 		self = cp$
+
 
 
 function Message.SCArg (|SCNode| p, |message| avoid=nil, |SCArg?|)

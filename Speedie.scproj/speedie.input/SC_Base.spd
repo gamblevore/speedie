@@ -7,11 +7,12 @@
 
 prototype CollectFunc (|Message| node, |SCNode| name_space, |Message?| ErrPlace, |SCNode?|)
 
-class SCNode (SCNamed) {
+class SCNode (SCObject) {
 linkage
 	cpp_part		Base
 
 |Dictionary? of SCObject|			Access
+|scdecl?|							LocalVarList
 |SCNode--?|							Parent
 |SCNode--?|							MyReacher
 |SCImport--?|						Project
@@ -63,19 +64,6 @@ function CollectSub (|Message| c, |SCNode|)
 		.TryAdd( c, base, base.Name )
 	
 	Return base
-
-
-
-syntax access (|message| s, |SCObject|)
-	opt norefcounts
-	rz = self[s.name]	#expect (s, "Can't find: " + s.name)
-
-
-syntax access (|string| s, |SCObject|)
-	opt norefcounts
-	|| a = .Access
-		return a.ValueLower(s)
-
 
 
 function FindModuleMsg (|Message| where, |SCNodeFindMode| Mode=0, |SCModule?|)
@@ -158,8 +146,43 @@ function FindModule (|String| name, |Message| where=nil, |SCNodeFindMode| Mode=0
 			error (where, "Can’t find module: " + name)
 
 
+syntax access (|message| s, |SCObject|)
+	opt norefcounts
+	rz = self[s.name]	#expect (s, "Can't find: " + s.name)
+
+
+syntax access (|string| s, |SCObject|)
+	opt norefcounts
+	if self is AllowLinkedLists
+		|| v = .LocalVarList
+		while v
+			if v.Name ~= s
+				return v
+			v = v.LocalVarList
+		
+	|| a = .Access
+		return a.ValueLower(s)
+
+
+function ActualAdd (|string| name, |scobject| IncObj)
+	opt norefcounts
+	// could we use scdecl linked-lists... at least for scargs?
+	// we'd have to modify upcheck, I assume? to read from linked-lists?
+	
+	if  self is AllowLinkedLists  and  incobj isa SCDecl
+		IncObj.LocalVarList = .LocalVarList
+		.LocalVarList = IncObj
+		return 
+		
+		
+	|| m = .access ?= Dictionary.new
+	m.valuelower( name ) = IncObj
+
+
 function UpCheck (|string| name, |bool| LookUp=true, |SCObject|) {
 	opt norefcounts
+	// could modify this to add ability to read scdecl linkedlists
+	// avoid needing an entire dictionary on scargs
 	if LookUp and (self isa SCClass)
 		for (c.upwards in self)
 			|| it = c[name] 
@@ -169,28 +192,12 @@ function UpCheck (|string| name, |bool| LookUp=true, |SCObject|) {
 		return self[name]
 	
 	|| curr = self					// avoid bugs like || a = 1, {|| a = 1}
-	while (curr isa SCArg)			// So... check upwards...
+	while curr isa SCArg			// So... check upwards...
 		|| found = curr[name] 
 			return found
 		require lookup
 		curr = curr.parent|scarg|
 }
-
-
-
-// OK so.. i guess functions can hide stuff below it, right?
-// so upcheck shouldn't work, if we are on a function, right?
-
-function TryAdd (|Message?| ErrPlace, |SCObject?| IncObj, |String| name)
-	real self
-	require IncObj
-	expect (name.length inrange 64) ( ErrPlace, "Name should be 1-64 bytes long." )
-	if (self isa scclass)
-		|| scls = incobj.class
-		if (scls == scclass or scmodule)
-			self = self.modul|scclass|
-	.access ?= Dictionary.new
-	.tryaddsub(errplace, incobj, name.Lowercase)
 
 	
 function @scfunction.InType (|scnodetype| ty, |bool|)
@@ -198,33 +205,39 @@ function @scfunction.InType (|scnodetype| ty, |bool|)
 	|| fn = scfunction.currfunc
 		|| cls = fn.cls
 			return cls.basetype.syntaxis(ty)
-			
 
-function TryAddSub (|Message| ErrPlace, |SCObject| IncObj, |String| name)
+
+function TryAdd (|Message?| ErrPlace, |SCObject| IncObj, |String| name)
 	opt norefcounts
+	real self
+	expect (name.length inrange 64) ( ErrPlace, "Name should be 1-64 bytes long." )
+	
+	if self isa scclass
+		|| scls = incobj.class
+		if scls == scclass or scmodule
+			self = self.modul|scclass|
 	|| Old = .Upcheck( name, !(IncObj isa SCFunction) )
+	
 	if (!Old)
-		.access![ name ] = IncObj
-		return
+		return .ActualAdd(name, IncObj)
 	
 	require (Old != IncObj) // possible?
 	
-	if (Old isa SCFunction)
-		if (IncObj isa SCFunction)		// link
+	if Old isa SCFunction
+		if IncObj isa SCFunction		// link
 			if (old.cls == IncObj.cls) or incobj.IsConstructorOnModule(old)
 				old.Last.NextFunc = IncObj
 				Return
-		  elseif incobj isa scdecl
+		  elseif IncObj isa scdecl
 			if old is HidesProperties
 				expect (!IncObj.hiderfunc) (errplace, "Multiple property-hiders found.")
 				incobj.hiderfunc = old
-				.access![ name ] = IncObj
-				return
+				return .ActualAdd(name, IncObj)
 	
-	if (name == "self") and scfunction.intype(scnodetype.object)
+	if  (name == "self")  and  scfunction.intype(scnodetype.object)
 		error ( ErrPlace, "Can't use 'self' here." )
 	  else
-		incobj.nameconflict(old, name)
+		incobj.NameConflict(old, name)
 
 
 function SCFunction.IsConstructorOnModule (|scfunction| old, |bool|)
@@ -1046,6 +1059,7 @@ datatype SCNodeInfo (int)
 	constants
 		ExplicitExport = 1
 		Visible = 2
+		AllowLinkedLists = 4
 		
 
 

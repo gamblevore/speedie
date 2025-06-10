@@ -158,7 +158,10 @@ function Tran_Array (|Message| S, |SCNode| name_space) {
 		
 	if (!thg)
 		thg = scfunction.TempMoveOut(s, s.parentpoint!)
-		name_Space.tryadd(thg, thg.asdecl, thg.name)
+		|| dcl = thg.asdecl
+			name_Space.tryadd(thg, dcl, thg.name)
+		  else
+			error (thg)
 	
 	|| P = S.NiceParent!
 	|| Place = P.ParentPoint!

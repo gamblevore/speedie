@@ -95,21 +95,22 @@ datatype SCDeclInfo (int)
 		
 	
 
-class SCDecl (SCNamed) {
+class SCDecl (SCObject) {
 	linkage
 		cpp_part			Decl
 
 	|int|				C_Array
 	
 	|uint64|			ExportPosition	// also can store numeric constants float/int up to 64-bits
-	|SCFunction--?|		HiderFunc		// todo: replace the .StringData/hider thing with this.
+	|SCFunction--?|		HiderFunc
 	|Object?|			IsLookupOnly
-	|string|			StringData		// 2 special objects. Aren't they exclusive? Write some code to see if they are.
-	|SCDecl?|			Internal
-	
-	|scdecl--?|			OriginalDecl
+
+	|SCDecl?|			Internal		// pointers
+	|scdecl--?|			OriginalDecl    // for grab global export position in ASM.
+	|scdecl?|			LocalVarList
 	//|SCDecl|			NextContains // for multiple contains
 	|SCDecl?|			Contains
+
 	|Message?|			Default
 	|SCClass|			Type
 	|SCDeclInfo|		Info
@@ -950,17 +951,14 @@ class SCDecl (SCNamed) {
 		
 		rz = .copydecl
 		rz.info |= .info & scdeclinfo.VarType
-		while (|| s = .OriginalDecl)
-			self = s
-		rz.OriginalDecl = self
+		|| s = .OriginalDecl
+		rz.OriginalDecl = s ?? self
 		rz.NilDeclared = type
 
 
 	function Orig (|scdecl|)
 		opt norefcounts
-		while (|| s = .OriginalDecl)
-			self = s
-		return self
+		return .OriginalDecl ?? self
 		
 	
 	function CanNilCheck (|bool|)

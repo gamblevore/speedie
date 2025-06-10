@@ -854,7 +854,7 @@ function MakeMainFunc (|message|)
 
 function AddMain (|int| mark, |bool|)
 	|| m = .MakeMainFunc()
-	|| b = (Truebool, falsebool)(Options.ProjectisLibrary) 
+	|| b = (Truebool!, falsebool!)(Options.ProjectisLibrary) 
 	
 	if m and .ConfMsg
 		m.first = "app.configure = __AppConfString"~parse

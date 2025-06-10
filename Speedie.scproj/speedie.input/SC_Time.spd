@@ -23,7 +23,7 @@ function compiler.PrintCompileTime (|date| durr)
 	
 	if Options.PrintMemoryUsage
 		fs <~ "\n"
-		app.MemoryUsage(8KB, fs)
+		app.MemoryUsage(32KB, fs)
 	printline fs
 
 
