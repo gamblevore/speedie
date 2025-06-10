@@ -192,7 +192,7 @@ extend SCDecl
 		fs <~ "0 };\n"
 		fs <~ "GameFlyingMem $(N) = {.InitData=(u8*)$(N)_Init, .InitDataLength=sizeof($(N)_Init)}"
 		(self is gameflyingmem)
-		.StringData = fs
+//		.StringData = fs
 
 
 function SCClass.GetFlyingMemory (|Message| exp, |SCDecl|)
