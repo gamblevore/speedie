@@ -172,13 +172,11 @@ class SCDecl (SCObject) {
 	syntax is (|SCDeclInfo| d, assigns:|bool|)
 		.sanity
 		.info = .info.set(d, Value)	
-		if self is const
-			if .objectid == 58733806
-			
 		.sanity
 
 	function sanity
-	
+		if self is const and Global	// oof
+			debugat 0
 
 	function IsNil (|bool|)
 		return self == typenil

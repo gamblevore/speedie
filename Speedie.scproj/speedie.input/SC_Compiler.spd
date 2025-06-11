@@ -718,7 +718,7 @@ function SCFunction.IsAllocOrNew (|bool|)
 
 function NewConst (|scdecl| d)
 	d.nildeclared = nilstate.real
-	d <~ scdeclinfo.Const ||| scdeclinfo.Global
+	d <~ scdeclinfo.Const // ||| scdeclinfo.Global
 	.DeclConstants <~ d
 	
 

@@ -174,7 +174,7 @@ extend Assembler
 
 	function CompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
 		mode |= r.IsBig<<2
-		if dest is negate
+		// if dest is negate
 		mode ^= dest is Negate
 		dest = dest.BoolAnswer
 		if (l is constoutput and r is constoutput) // needs to handle this!

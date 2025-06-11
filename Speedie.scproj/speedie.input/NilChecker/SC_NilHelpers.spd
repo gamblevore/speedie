@@ -49,6 +49,7 @@ function FastDeclSafe (|SCDecl|)
 
 function FastDecl (|SCDecl!|)
 	opt norefcounts
+	if .objectid == 1150328
 	|| obj = .obj
 	if obj isa scdecl // seems easier to just test
 		|| l = obj.IsLookupOnly

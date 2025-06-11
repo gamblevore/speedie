@@ -38,7 +38,6 @@ void JB_TooLargeAlloc(int64 N, const char* S) {
 }
 
 
-// solves the issue that realloc is badly defined on failiure
 static uint8* AllocateSub (int N, const void* Arr, uint* Where) {
 	uint8* Result = 0;
 	int64 Diff = 0;

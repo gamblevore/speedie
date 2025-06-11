@@ -128,7 +128,7 @@ function UseChildAsReal (|message| msg, |nilcheckmode| test, |nilreason| reason,
 	opt norefcounts
 
 	|| dcl = msg.FastDecl
-	if dcl is Global
+	if dcl is Global or const
 		return dcl.NilDeclared
 	|| ch = msg.First
 		return .UseAsRealSub(ch, test, reason, dcl)

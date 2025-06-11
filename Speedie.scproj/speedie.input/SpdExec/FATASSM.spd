@@ -542,6 +542,10 @@ struct FatASM
 
 	function DebugPrint 
 		visible
+		nil self
+		if !self
+			"(nil)"
+			return
 		if asm.NoisyASM >= 3
 			|| fs = faststring()
 			.Renda(fs)

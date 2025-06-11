@@ -389,7 +389,9 @@ function Destructable (|Message| Blocker, |Message?| arg, |Message| name)
 	|| type = TypeOfExpr(name, nil, nil)
 	require (type isa SCDecl)
 	
+	#!A
 	|| src = blocker ?? arg!.DeepLast
+	#!B
 	using src
 	|| fn		= type.type.destructorfunc!
 	|| FnMsg	= RefMsg0(fn.exportname, fn)

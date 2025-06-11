@@ -174,14 +174,14 @@ function Ternary		(fn_asm)
 	  else
 		.basicblock++
 		|| µA = .µInto(A, dest)
-		.AllJumpTo(TernTest)
 		|| Exit = exp.jump
+		.AllJumpTo(TernTest)
 		.basicblock++
 		rz = .µInto(B, dest)
 		.basicblock++
 		
 		|| fa = µa.fat
-		|| fB = rz.fat		
+		|| fb = rz.fat		
 			fb.RegInput(5, µa)	// B now refers to A. Not sure if we need this though???
 		  elseif fa
 /			fa.µRefCount++		// just in case

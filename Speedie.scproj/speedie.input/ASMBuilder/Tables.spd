@@ -482,15 +482,13 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 			return T.haveaddr
 		return GrabAddr(self, exp, dest, d, T)
 	
-	// it seems we can get things that are both consts and globals??
-	// specifically... function pointers to inbuilt funcs?
-	if d is const
-		if d is global // what? is it a function pointer
-		return ConstFromThgName(self, exp, dest, d)
-
-	if dest isnt ConstRequest
-		check (d is global) (Exp)
+	if d is global
+		if (dest is ConstRequest)
+			return nil
 		return DoGlobal(self, exp, dest, d)
+		
+	return ConstFromThgName(self, exp, dest, d)
+
 	
 
 function DoGlobal (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| D, |ASMReg|)
@@ -515,6 +513,7 @@ function DoGlobal (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| D, 
 function AddressOf (fn_asm)
 	rz = .µGetASM(exp, dest as asmreg.addrneed)
 	if (rz is ContainsAddr)
+		rz &=~ asmreg.ContainsAddr
 		return rz
 	error (exp, "ASM fail")
 	.µGetASM(exp, dest as asmreg.addrneed)
