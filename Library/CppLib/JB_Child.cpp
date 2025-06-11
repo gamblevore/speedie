@@ -82,20 +82,27 @@ void JB_RemoveHandlers() {
 }
 
 extern const char** JB_Main__Args;
+static bool AlreadyCrashed = false;
 void JB_CrashHandler(int Sig) {
-	if (Sig <= 0)
-		return; // some unixes/shells can do this?
+					// stop crash-loops.
+	if (AlreadyCrashed)
+		return;
+	AlreadyCrashed = true;
 
-				// deregister
+					// some unixes/shells can do this?
+	if (Sig <= 0)
+		return;
+	
+					// deregister
 	JB_RemoveHandlers();
 
-				// report to stdout
+					// report to stdout
 	char ErrorBuff[128];
 	auto T = time(0);
 	snprintf(ErrorBuff, sizeof(ErrorBuff), "%s\nDate: %sSignal: %s\n", App_CallPath, ctime(&T), strsignal(Sig));
 	fputs(ErrorBuff, stderr);
 	
-				// log to file
+					// log to file
 	JB_Rec__CrashLog("\n\n****** CRASHED ******");
 	JB_Rec__CrashLog("Args: [");
 	const char** c = JB_Main__Args;
@@ -106,7 +113,7 @@ void JB_CrashHandler(int Sig) {
 	JB_CrashTracer();
 	JB_Rec__CrashLog("-----------------------\n");
 
-				// print normal-errors
+					// print normal-errors
 	JB_Rec_ShellPrintErrors(nil);
 	JB_KillChildrenOnExit();
 	exit(128|Sig);
