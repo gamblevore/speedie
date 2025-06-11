@@ -175,9 +175,9 @@ class PerryIDE (Window)
 
 	function LocateProjRoot (|string| path, |filerow|)
 		opt norefcounts
-		|| R = .FindPath(path)
-		|| P = .MainProjFol
-		if R and P and r.location[0, p.location]
+		|| R = .FindPath(path)$
+		|| P = .MainProjFol$
+		if r.location[0, p.location]
 			return r
 			
 
@@ -190,7 +190,7 @@ class PerryIDE (Window)
 		opt norefcounts
 		|| it = .FileList
 		|| r = it[0]
-		return it.findapath("./input/", r)  ??  it.findapath("./*.input/", r) 
+		return it.FindAPath("./input/", r)  ??  it.findapath("./*.input/", r) 
 
 
 	behaviour AppForeGroundChange
@@ -431,7 +431,7 @@ class PerryIDE (Window)
 
 		|| fs = faststring()
 		fs <~ "Crashed: ${exit.name}  {${p.render}}\n"
-		fs <~ p.erroroutput.getresult.FindStacktrace
+		fs <~ p.ErrorOutput.getresult.FindStacktrace
 		pp[] = nil
 		.Notify(fs, @emb + what)
 		.CancelCompile

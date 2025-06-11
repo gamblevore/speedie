@@ -75,7 +75,8 @@ function perryide.CurrSelFunc (|message|)
 	opt norefcounts
 	|| msg = .EditMe.MessageAtSel
 		return msg.OwningFunc
-	
+
+
 function PerrySuperAutoComplete (guilistevent)
 	opt norefcounts
 	|| i = .ide

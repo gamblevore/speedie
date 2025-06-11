@@ -1,4 +1,5 @@
 
+
 helper textview.RangeCheck (|int| r, |message| func_name, |message| prms, |bool|)
 	|| l = func_name.position
 	|| a = func_name.after 
@@ -18,7 +19,8 @@ helper Message.IsTextFuncLike (|bool|)
 	require b == @bra or @list
 	|| c = b.next
 	return !c or c == @arg
-	
+
+
 function TextView.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| InRange, |&int| state, |message|)
 	visible
 	opt norefcounts
@@ -100,7 +102,6 @@ function TextView.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| InRange
 		ifn prms == @list or @bra // great
 			state[] = 2
 			return func_name					// 2: function a.b*
-		
 	
 	|| arg = prms.next
 	require (arg==nil or @arg)
