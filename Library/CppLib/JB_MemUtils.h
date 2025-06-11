@@ -23,29 +23,15 @@ void JB_TooLargeAlloc(int64 N, const char* S);
 void JB_OutOfMainMemory(int64 N);
 void JB_OutOfUserMemory(int64 N);
 void JB_ReportMemoryError(const char* A, int64 N, const char* B);
-uint8* JB_malloc(int N);
-uint8* JB_zalloc(int N);
-struct allocate_result {
-	uint8* Result;
-	bool OK;
-};
-
-allocate_result JB_AllocateString (int N, const void* Arr);
+uint8* JB_AllocateString (const void* Arr, int N);
 void JB_FreeString(const void* Arr);
 
-allocate_result JB_allocate (int N, const void* Arr);
-void JB_free(const void* Arr);
-uint8* JB_realloc(const void* Arr, int N);
+uint8* JB_Realloc (const void* Arr, int N);
+void JB_Free(const void* Arr);
 u64 JB_msize(const void* Arr);
 void JB_mtest(const void* M);
 u64 JB_MemUsedString();
 u64 JB_MemUsedOther();
-inline void JB_unalloc(void** Arr) {
-	if (*Arr) {
-		JB_free(*Arr);
-		*Arr = 0;
-	}
-}
 
 #define MemZero(Where) (memzero(Where, sizeof(Where)))
 inline void memzero(void* Where, int N) {

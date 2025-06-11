@@ -196,8 +196,8 @@ static CompState& alloc_compress(JB_String* self, FastString* fs) {
 	
 	if (CB > C.B) {
 		C.B = CB;
-		C.Suffixes              	= (int*)JB_realloc(C.Suffixes,       2*ChunkLength*sizeof(int)+16);
-		C.SortPositionAtByte		= (int*)JB_realloc(C.SortPositionAtByte,             ChunkLength*sizeof(int));
+		C.Suffixes              	= (int*)JB_Realloc(C.Suffixes,       2*ChunkLength*sizeof(int)+16);
+		C.SortPositionAtByte		= (int*)JB_Realloc(C.SortPositionAtByte,             ChunkLength*sizeof(int));
 	}
 	
 	C.Expected                      = Total;
@@ -207,6 +207,12 @@ static CompState& alloc_compress(JB_String* self, FastString* fs) {
 	return C;
 }
 
+inline void JB_unalloc(void** Arr) {
+	if (*Arr) {
+		JB_Free(*Arr);
+		*Arr = 0;
+	}
+}
 
 static void ClearCaches() {
 	if (sigh.B) {
@@ -447,7 +453,7 @@ static u8*				CompSpace;
 
 extern "C" int JB_CompFreer() {
 	if (CompAllocator.start_clear(10*64*1024)) {	// 10s ago!
-		free(CompSpace);
+		JB_Free(CompSpace);
 		CompSpace = 0;
 		CompAllocator.cleared();
 	}
@@ -488,7 +494,7 @@ struct Compression {
 	
 	bool StartCompress (FastString* fs, JB_String* In) {
 		int N = (HASH1_SIZE + HASH2_SIZE + W_SIZE +256*256*0) * sizeof(int); //256*256 is for TwoByte
-		if (!CompSpace and !(CompSpace = (u8*)calloc(N,1)))
+		if (!CompSpace and !(CompSpace = JB_Realloc(NULL, N)))
 			return false;
 		
 		Size = JB_Str_Length(In);

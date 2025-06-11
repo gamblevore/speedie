@@ -36,11 +36,9 @@ void OutOfMem_(Array*self, int Count=0) {
 
 
 static bool ReAlloc_(Array* self, int C) {
-	auto X = (JB_Object**)JB_realloc(self->_Ptr, C*sizeof(void*));
-	if (!X) {
-        JB_OutOfUserMemory(C*sizeof(void*));
+	auto X = (JB_Object**)JB_Realloc(self->_Ptr, C*sizeof(void*));
+	if (!X)
 		return false;
-	}
 	self->_Ptr = X;
 	self->Capacity = (int)(JB_msize(X)/sizeof(void*));
 	return true;
@@ -70,7 +68,7 @@ static void Clear_(Array* self) {
 	auto P = self->_Ptr;
 	self->Capacity = 0;
 	self->_Ptr = 0;
-	JB_free(P);
+	JB_Free(P);
 }
 
 
@@ -82,7 +80,7 @@ static void ShrinkCapacity_(Array* self, uint Smaller) {
 			return;
 		C = std::max((int)Smaller, 8);
 		self->Capacity = C;
-		self->_Ptr = (JB_Object**)JB_realloc(self->_Ptr, C*sizeof(void*));
+		self->_Ptr = (JB_Object**)JB_Realloc(self->_Ptr, C*sizeof(void*));
 		return;
 	}
 	Clear_(self);

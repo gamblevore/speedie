@@ -74,10 +74,10 @@ bool JB_BA_Realloc_( JB_String* self, int Length ) { // is a c-string
         return 0;
     }
     
-    auto Result = JB_AllocateString( Length+1, self->Addr );
-    require (Result.OK);
-    Result.Result[Length] = 0;
-    self->Addr = Result.Result;
+    auto Result = JB_AllocateString( self->Addr, Length+1 );
+    require (Result);
+    Result[Length] = 0;
+    self->Addr = Result;
 	self->Length = Length;
 	return true;
 }

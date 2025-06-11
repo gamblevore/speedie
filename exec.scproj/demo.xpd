@@ -29,7 +29,7 @@ pack "xpd"
 				+"mycuteclass2"  24  (des2, ren2)
 		
 		link 
-			JB_zalloc
+			JB_Zalloc
 			JB_ASCII
 			strlen
 

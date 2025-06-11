@@ -116,7 +116,7 @@ JB_String* JB_App__StackTrace(int Skip, FastString* Fs_in) {
 		};
 	}
 	;
-	JB_free(Strs);
+	JB_Free(Strs);
 	JB_String* _tmPf3 = JB_FS_SmartResult(Fs, Fs_in);
 	JB_Incr(_tmPf3);
 	JB_Decr(Fs);
@@ -3405,7 +3405,7 @@ int JB_FastBuff_CopyTo(FastBuff* Self, byte* Dest, int Length) {
 
 void JB_FastBuff_Destructor(FastBuff* Self) {
 	if (Self->Owns) {
-		JB_free(Self->Start);
+		JB_Free(Self->Start);
 	}
 	JB_Clear(Self->ReadFrom);
 }
@@ -3813,7 +3813,7 @@ DTWrap* JB_Wrap_ConstructorInt(DTWrap* Self, int64 V) {
 
 void JB_Wrap_Destructor(DTWrap* Self) {
 	if (Self->DeathAction == kJB__Wrap_kFree) {
-		JB_free(((void*)Self->PrivValue));
+		JB_Free(((void*)Self->PrivValue));
 	}
 }
 
@@ -4488,7 +4488,7 @@ MWrap* JB_Mrap_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Pt
 
 void JB_Mrap_Destructor(MWrap* Self) {
 	if (Self->DeathAction == kJB__Wrap_kFree) {
-		JB_free(Self->_Ptr);
+		JB_Free(Self->_Ptr);
 	}
 }
 
@@ -4509,7 +4509,7 @@ int JB_Mrap__Init_() {
 
 MWrap* JB_Mrap__Object(int Count, int ItemSize) {
 	//visible;
-	byte* P = JB_zalloc(Count * ItemSize);
+	byte* P = JB_Zalloc(Count * ItemSize);
 	if (P) {
 		return JB_Mrap_ConstructorPtr(nil, Count, ItemSize, P, kJB__Wrap_kFree);
 	}

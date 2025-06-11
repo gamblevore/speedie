@@ -38,10 +38,8 @@ void JB_TooLargeAlloc(int64 N, const char* S) {
 }
 
 
-// So the problem with realloc, is that... what if it fails?
-// we wanna return the original pointer.
-// does this not free? what if we realloc to 0?
-static allocate_result AllocateSub (int N, const void* Arr, uint* Where) {
+// solves the issue that realloc is badly defined on failiure
+static uint8* AllocateSub (int N, const void* Arr, uint* Where) {
 	uint8* Result = 0;
 	int64 Diff = 0;
 	if (Arr) {
@@ -54,35 +52,19 @@ static allocate_result AllocateSub (int N, const void* Arr, uint* Where) {
 	if (Result) {
 		Diff += JB_msize(Result);
 		*Where += Diff;
-		return {Result, true};
+		return Result;
 	}
 	
 	JB_OutOfUserMemory(N);					// Nothing has changed...
-    return {(uint8*)Arr, false};
+    return 0;
 }
 
-allocate_result JB_allocate (int N, const void* Arr) {
+uint8* JB_Realloc (const void* Arr, int N) {
 	return AllocateSub(N, Arr, &TotalOtherBytes);
 }
 
-allocate_result JB_AllocateString (int N, const void* Arr) {
+uint8* JB_AllocateString (const void* Arr, int N) {
 	return AllocateSub(N, Arr, &TotalStringBytes);
-}
-
-uint8* JB_zalloc(int N) {
-	return JB_allocate(N, 0).Result;
-}
-
-uint8* JB_malloc(int N) {
-	return JB_allocate(N, 0).Result;
-}
-
-
-// C++ does not define realloc(x,0):  Maybe `free`, or maybe same as `malloc(0)`.
-uint8* JB_realloc (const void* Arr, int N) {
-	auto R = JB_allocate(N, Arr);
-	require (R.OK);
-	return R.Result;
 }
 
 
@@ -102,7 +84,7 @@ u64 JB_MemUsedOther() {
 	return TotalOtherBytes;
 }
 
-void JB_free(const void* Arr) {
+void JB_Free(const void* Arr) {
 	if (Arr) {
 		TotalOtherBytes -= (JB_msize(Arr)+16);
 		free((void*)Arr);

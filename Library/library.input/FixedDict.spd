@@ -140,7 +140,7 @@ class FixedDict
 
 
 	module
-		function TimeTest (|array of string| items)
+		function TimeTest (|[string]| items)
 			|fixeddict of string|  fd = fixeddict()
 			|dictionary of string| ed = dictionary()
 			|| n = 4
@@ -179,9 +179,8 @@ class FixedDict
 		
 		
 		function Test
-			|array of string| items		= []
-			|| fs						= faststring.new
-			|| N						= 0
+			|[string]| items	= []
+			|| fs				= faststring.new
 
 			for i in 100
 				fs <~ ('A' + i)|Byte|
@@ -228,6 +227,7 @@ class FixedDict
 
 
 role NameTableConcept (object)
+	description "Just an idea of what we could do. Not an actual useful code."
 	function Add (|!&NameTableConcept| self, |message| y)
 		opt norefcounts
 		|| v = self[]

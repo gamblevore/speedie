@@ -6,17 +6,6 @@
 
 
 
-
-datatype int8 // aka char
-	default 0
-	
-	constants
-		|int8|
-		max = 127
-		min = -128
-	
-
-
 datatype byte
 	default 0
 
@@ -83,11 +72,16 @@ datatype byte
 			yield i
 			++i
 	
-	module
-		function ZAlloc (|int| n, |?&byte|)
-			description "Returns allocated memory, and zeros it. Creates an error() if fails."
-			cpp_wrapper JB_zalloc
 
+
+datatype int8 // aka char
+	default 0
+	
+	constants
+		|int8|
+		max = 127
+		min = -128
+	
 
 
 datatype cstring
