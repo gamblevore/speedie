@@ -8002,6 +8002,8 @@ MWrap* JB_Mrap__Object(int Count, int ItemSize);
 
 void jbl(JB_Object* Self);
 
+byte* JB_Mrap__Zalloc(int N);
+
 
 
 // JB_MemoryLayer
