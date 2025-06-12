@@ -164,22 +164,6 @@ function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg
 	(fat is CondAnswer)
 	return fat*Dest
 
-	
-/*
-Can this occur? From what C code? Can I block it?
-
-	ALLOC(1)
-	FUNC // just de-alloc before the optimise thingy.
-	ALLOC(-1)
-	RET
-
-function abc
-	|struct| WorkSpace
-	.func(WorkSpace)
-	return
-*/
-
-
 
 function NilStrooct (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg|)
 	opt norefcounts
@@ -303,8 +287,7 @@ function SetRel (fn_asm)						// function relset (
 
 
 
-function AllocBearStruct (|&Assembler| self, |message| exp, |int| v, |scdecl| ty, |int| dir, |asmreg|)
-	(self)
+function AllocBearStruct (|int| dir, |message| exp, |int| v, |scdecl| ty, |asmreg|)
 	|| size = ty.SizeOfQuery
 	size = (size+15)>>4
 	|| dest = v.asm
@@ -321,7 +304,7 @@ function Decl (fn_asm)
 
 	if !exp.obj or dest is CanHoist					// Huh?
 	if ty.IsBareStruct
-		return AllocBearStruct(self, exp, dest, ty, 1)
+		return AllocBearStruct(1, exp, dest, ty)
 	
 	|| item = rel.Last!
 
@@ -512,7 +495,7 @@ function DoGlobal (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| D, 
 
 function AddressOf (fn_asm)
 	rz = .µGetASM(exp, dest as asmreg.addrneed)
-	if (rz is ContainsAddr)
+	if (rz is ContainsAddr or InlinedAccess)
 		rz &=~ asmreg.ContainsAddr
 		return rz
 	error (exp, "ASM fail")
@@ -738,7 +721,7 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	op ?= exp
 	rz = (fn)(self, dest, ml, mr, op)
 
-	if rz.IsVec != ml.IsVec			// argh?
+	target debug: if rz.IsVec != ml.IsVec			// argh?
 	
 	rz = rz.ConstInputFromMath(ml, mr)
 	rz.µtype = dest.µtype
@@ -819,14 +802,14 @@ function MarkDeclAsConst (|scdecl| Decl, |asmreg| Initial, |asmreg| NewValue)
 
 function DeallocStack
 	opt norefcounts
-	require !.istextual
+	require !.IsTextual
 	|int| top = .VDecls
 	|| exp = .Last.msg
-	while top > 0
+	while top > .state.ParentVDecls
 		|| d = .vars[top]!
 		if d.IsBareStruct
 			exp = exp.DeepLast
-			ASMType.AllocBearStruct(self, exp, top, d, -1)
+			ASMType.AllocBearStruct(-1, exp, top, d)
 		top--
 	
 }

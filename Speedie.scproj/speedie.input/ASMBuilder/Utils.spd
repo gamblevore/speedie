@@ -79,7 +79,7 @@ function Assembler.CloseOneVar (|message?| exp, |int| OriginalDecls, |&bool| DoM
 	if  d  and  exp
 		if (d isnt return and global)  and  d.IsBareStruct
 			exp = exp.DeepLast
-			ASMType.AllocBearStruct(self, exp, v, d, -1)
+			ASMType.AllocBearStruct(-1, exp, v, d)
 
 
 											/// CLEANUP ///
