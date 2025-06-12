@@ -1,11 +1,14 @@
 
 
 dispatch PerryCommands (|perryide| self, |string| s)
-	+"beep"
-		for 2s: beep
+//	+"beep"
+//		for 2s: beep
 
 	+"cr_fix"
 		.editme.beep = s.ReplaceAll("\r\n", "\r").ReplaceAll("\r", "\n")
+	
+	+"crash"
+		app.crash
 	
 	+"cr_use"
 		.editme.beep = s.ReplaceAll("\n", "\r\n")
@@ -25,8 +28,8 @@ dispatch PerryCommands (|perryide| self, |string| s)
 			s2 = s2.first
 		.editme.beep = s2.name
 
-	+"note"
-		notifications <~ "Notification Test"
+//	+"note"
+//		notifications <~ "Notification Test"
 
 	+"render" // "parse"
 		.editme.beep = s.parse.Render

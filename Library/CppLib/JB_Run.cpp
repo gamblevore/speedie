@@ -67,6 +67,8 @@ JBClassPlace( JB_List,			JB_Ring_Destructor,		JB_AsClass(Saveable),		JB_List_Ren
 JBClassPlace( TokHan,			0,						JB_AsClass(JB_Object),		0 );
 
 extern JB_Class JB_TaskData;
+extern bool JB_NoExitOnCrash;
+
 
 
 CharSet*            WhiteSpace_;
@@ -173,21 +175,25 @@ void JB_FinalEvents() {
 
 
 int JB_CompFreer();
-int JB_CareTaker() {
+int JB_GUICareTaker() {
 	JB_CompFreer();
 	return -(getppid() <= 1);
 }
 
 
 
-Array*	JB_App__Args()						{ return App_Args; }
+Array*		JB_App__Args()					{ return App_Args; }
 JB_StringC*	JB_App__CallPath()				{ return JB_StrC(App_CallPath); }
-void	JB_LibShutdown()					{ JB_MemFree(JB_MemStandardWorld()); }
-bool	JB_LibIsShutdown()					{ return JB_MemStandardWorld()->Shutdown; }
-bool	JB_LibIsThreaded()					{ return JB_Active & 4; }
-void	JB_App__CrashInstall();
-int		JB_SP_AppInit();
-bool	JB_App__SuicideIfParentDies(bool Die)	{ PicoGlobalConf()->Observer = Die?JB_CareTaker:JB_CompFreer; return 0; }
+void		JB_LibShutdown()				{ JB_MemFree(JB_MemStandardWorld()); }
+bool		JB_LibIsShutdown()				{ return JB_MemStandardWorld()->Shutdown; }
+bool		JB_LibIsThreaded()				{ return JB_Active & 4; }
+void		JB_App__CrashInstall();
+int			JB_SP_AppInit();
+void		JB_App__GUIMode(bool GUI) {
+// GUICareTaker seems to cause problems and I'm fed up with it.
+//	PicoGlobalConf()->Observer = GUI ? JB_GUICareTaker : JB_CompFreer;
+	JB_NoExitOnCrash = GUI;
+}
 
 
 
@@ -210,18 +216,18 @@ int JB_SP_Init (_cstring* R, bool IsThread) {
 			err = dup2( STDOUT_FILENO, STDPICO_FILENO );	// reserve StdPico
 			if (!IsThread) {
 				JB_App__CrashInstall();
-				if (getppid() > 1)
-					PicoGlobalConf()->Observer = JB_CareTaker;
+//				if (getppid() > 1)
+				PicoGlobalConf()->Observer = JB_CompFreer;
 			}
 			atexit(JB_KillChildrenOnExit);
 		#endif
 	}
 	
-	App_Args = JB_Incr(JB_Str_ArgV(R));	// allow caller to remove their c-string data.
+	App_Args = JB_Incr(JB_Str_ArgV(R));			// Allow caller to remove their c-string data.
     
     ErrorString_ = emptystr();
     WhiteSpace_ = JB_CS_Constructor( nil, JB_StrC("\x9\xA\xD\x20"), false );
-    JB_FS__FastNew( 0 );		// stop leak tests catching this.
+    JB_FS__FastNew( 0 );						// Stop leak tests catching this.
     JB_Dict__Init();
     JB_Str__LoadGlobals();
     JB_PID_Start();

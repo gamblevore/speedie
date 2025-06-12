@@ -34,6 +34,25 @@ struct DateLocker {
 };
 
 
+static DateLocker		Allocator;
+static u8*				Space;
+
+// how to make this so that it frees on command... even while locked by a thread
+// that is already checking if it should be freed.
+extern "C" int CompressionFree(int X) {
+	if (Allocator.start_clear(X)) {
+		JB_Free(Space);
+		Space = 0;
+		Allocator.cleared();
+	}
+	return 0;
+}
+
+extern "C" int JB_CompFreer() {
+	return CompressionFree(10*64*1024);	// 10s ago!
+}
+
+
 
 #if 0
 
@@ -446,21 +465,6 @@ extern "C" inline int MyScore (uint len, uint offset) {
 
 
 
-
-static DateLocker		CompAllocator;
-static u8*				CompSpace;
-
-
-extern "C" int JB_CompFreer() {
-	if (CompAllocator.start_clear(10*64*1024)) {	// 10s ago!
-		JB_Free(CompSpace);
-		CompSpace = 0;
-		CompAllocator.cleared();
-	}
-	return 0;
-}
-
-
 struct Decomp {
 	u32* Curr;
 	u32* After;
@@ -494,7 +498,7 @@ struct Compression {
 	
 	bool StartCompress (FastString* fs, JB_String* In) {
 		int N = (HASH1_SIZE + HASH2_SIZE + W_SIZE +256*256*0) * sizeof(int); //256*256 is for TwoByte
-		if (!CompSpace and !(CompSpace = JB_Realloc(NULL, N)))
+		if (!Space and !(Space = JB_Realloc(NULL, N)))
 			return false;
 		
 		Size = JB_Str_Length(In);
@@ -504,7 +508,7 @@ struct Compression {
 			return false;
 		CmpOutStart = CmpOut;
 
-		Head = (int*)CompSpace;
+		Head = (int*)Space;
 		Prev = Head + HASH1_SIZE + HASH2_SIZE;
 //		TwoByte = Prev+W_SIZE;
 		Read = JB_Str_Address(In);
@@ -782,9 +786,9 @@ int CompressStrong (FastString* fs, JB_String* self, int Level) {
 
 
 extern "C" int JB_Str_CompressChunk (FastString* fs, JB_String* self, int Level) {
-	CompAllocator.lock();
+	Allocator.lock();
 	int rz = CompressStrong(fs, self, Level);
-	CompAllocator.unlock();
+	Allocator.unlock();
 	return rz;
 }
 

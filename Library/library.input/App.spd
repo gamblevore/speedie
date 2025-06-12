@@ -23,7 +23,7 @@ function TrySleep (|date| Duration=1s, |bool|)
 	cpp_wrapper JB_Date__TrySleep
 	
 function TrySleep (|float| Duration, |bool|)
-	return .trysleep(duration.date)
+	return .TrySleep(duration.date)
 	
 syntax access (|int| i, |string|)
 	disabled "use app.args[i]"
@@ -79,7 +79,7 @@ syntax expect (|string| s=nil)
 
 
 function Options (|[string]|)
-	disabled "Use switches"
+	disabled "Use .Switches()"
 
 
 function Switches (|[string]|)
@@ -91,7 +91,7 @@ function Switches (|[string]|)
 
 helper args_ (|[string]|)
 	for R in .rawargs
-		if R.argname ~= ""
+		if R.ArgName ~= ""
 			rz <~ r
 
 
@@ -171,8 +171,8 @@ function StringMemory (|int64|)
 function OtherMemory (|int64|)
 	cpp_wrapper JB_MemUsedOther
 
-function SuicideIfParentDies (assigns:|bool|, |bool|)
-	cpp_wrapper JB_App__SuicideIfParentDies
+function GUIMode (assigns:|bool|)
+	cpp_wrapper JB_App__GUIMode
 	
 function Env (|dictionary of string|)
 	cpp_wrapper JB_App__Env
@@ -329,7 +329,7 @@ function Sudo (|string| p, |ExitCode|)
 
 function Icon (assigns:|string| path)
 	|| ico = path.Resolve
-		.seticon(ico.cstr)
+		.SetIcon(ico.cstr)
 
 function SetIcon (|cstring| path)
 	cpp_wrapper JB_App__SetIcon

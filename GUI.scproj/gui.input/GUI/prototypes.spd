@@ -3,7 +3,6 @@
 // prototypes
 	
 prototype GUIDrawBackground		(|object|      self,  |image| where)
-prototype GUIApplicationInit	(|Object?| Anything = nil, |errorint|)
 prototype GUIParticleEffect		(|image|       self,  |ivec4| Rect, |vec2| V)
 
 prototype GUIListDragEvent		(|ListView|    self,  |ListViewrow?| Before, |ListViewrow?| Into, |bool|)
