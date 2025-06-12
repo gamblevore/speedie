@@ -222,7 +222,6 @@ struct FatASM
 			if i 
 				i.µRefCount++
 	
-		
 	function RegInput (|int| a, assigns:|asmreg| Input)
 		cpp_part Prm
 		opt inline
