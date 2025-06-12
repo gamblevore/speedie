@@ -50,7 +50,7 @@ constants
 	
 |asm_Read[10]|	ReadASM
 |asm_Write[5]|	WriteASM
-|message--|		LastDebugMark
+//|message--|		LastDebugMark
 
 function InitAccess
 	|| R = &ASMType.ReadASM[0]
@@ -899,13 +899,8 @@ function Message.TypeCastDoesNothing (|bool|)
 	|| Input = .first!.ASMDecl.typeonly
 	require  Output.VecCount == Input.VecCount			// Vectors
 	require  Output.IsFloat  == Input.isfloat			// Floatness
-	|| BoolOut = Output is bool
-	require (BoolOut) == (Input is bool)				// Boolness
-
-	|| BytesLost = Input.ByteCount - Output.ByteCount
-	if output.isfloat
-		return BytesLost == 0
-	require BytesLost <= 0
+	if (Output is bool) == (Input is bool)				// Boolness
+		return Input.ByteCount == Output.ByteCount
 
 	
 //function string.Trip (|bool|)

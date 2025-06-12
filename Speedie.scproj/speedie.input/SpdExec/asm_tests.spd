@@ -297,9 +297,18 @@ function AndOrRest (|int| a, |int| b, |bool| x3, |bool| x4, |int|) // stragglers
 	#!FFFF
 	return x9 + x10
 
-	
+
+function TernTest (|int| a, |int| b, |int|)
+	rz = (a, b+1)(a)
+	rz <<= 1
+
+
+function TernTest (|int| a, |int| b, |int| c, |int|)
+	return (a, b)(c)
+
+
 function AndOrRest2 (|int| a, |int| b) // more stragglers
-	if 1 or b: a = 2
+	if 1 or  b: a = 2
 	if 0 and b: b = 4	
 	if 1 and b: b = 5
 

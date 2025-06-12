@@ -161,40 +161,69 @@ function Ternary		(fn_asm)
 	|| DestType = exp.ASMDecl.typeonly
 	|| mA = .ExistingVar(a, varusemode.Sometimes)
 	|| mB = .ExistingVar(b, varusemode.Sometimes)
-	if (ma isa DestType) and (mb isa DestType) and !DestType.isfloat
-		return .SimpleTernary(dest, ma, mb, cond)
-
+	
+	if ma isa DestType
+		if (mb isa DestType) and !DestType.isfloat
+			return .InbuiltTernary(dest, ma, mb, cond)
+	
 	dest = .TempTyped(exp, dest)
-	|fatrange| TernTest
-	|| TT = .Branch(cond, terntest)
-	|| KK = TernTest.Constness
+	if  ma isa DestType  and  ma isnt ConstOutput						// goes thru kk.isknown!
+		|| mC = .ExistingVar(cond, varusemode.Sometimes)
+		if (ma == mc)
+			return .MiniTernary(dest, ma, b, cond)
+	
+	|FatRange| br
+	.Branch(cond, Br)
+	|| KK = br.Constness
 	if KK.IsKnown
 		|| which = (A, B)(KK.Default)
-		rz = .µInto(which, dest)
-	  else
-		.basicblock++
-		|| µA = .µInto(A, dest)
-		|| Exit = exp.jump
-		.AllJumpTo(TernTest)
-		.basicblock++
-		rz = .µInto(B, dest)
-		.basicblock++
-		
-		|| fa = µa.fat
-		|| fb = rz.fat		
-			fb.RegInput(5, µa)	// B now refers to A. Not sure if we need this though???
-		  elseif fa
-/			fa.µRefCount++		// just in case
-							
-		Exit.jumpto(.curr, self)
+		return .µInto(which, dest)
+
+	return .RealTernary(exp, dest, a, b, br)
 
 
-function SimpleTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond, |asmreg|)
+function RealTernary (|message| exp, |asmreg| dest, |message| A, |message| B, |fatrange| Branch, |asmreg|)
+	.basicblock++
+	|| µA = .µInto(A, dest)
+	|| Exit = exp.jump
+	.AllJumpTo(Branch)
+	.basicblock++
+	rz = .µInto(B, dest)
+	.basicblock++
+	
+	rz = .TernRefCount(µa, rz)						
+	Exit.jumpto(.curr, self)
+
+
+function TernRefCount (|asmreg| A, |asmreg| B, |asmreg|)
+	// We want things that are refered to... to not disappear.
+	rz = B
+	|| fa = A.fat
+	|| fb = B.fat		
+		fb.RegInput(5, A)			// refcount A, save from disposal
+	  elseif fa
+		rz = A
+
+
+function InbuiltTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond, |asmreg|)
 	opt norefcounts
 	|| dr = dest.reg
 	|| mc = (ASMReg(), dest)(dr == ma.reg or mb.reg)
 	|| µ = .µ(cond, mc)
 	return cond.TERN(dest, µ, ma, mb, µ.small) * dest
+
+
+function MiniTernary (|asmreg| dest, |asmreg| ma, |message| B, |message| cond, |asmreg|)
+	// x = (a, b+1)(a)
+	opt norefcounts
+	.Assign(dest, ma, b.prev!)
+	|fatrange| Branch
+	.Branch(cond, Branch, true)
+	.basicblock++
+	rz = .µinto(b, dest)
+	.basicblock++
+	rz = .TernRefCount(ma, rz)
+	.AllJumpTo(Branch)
 
 
 function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmreg|)

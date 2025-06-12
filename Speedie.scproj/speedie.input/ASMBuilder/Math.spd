@@ -710,7 +710,6 @@ extend Assembler
 		if dest.IsVec
 			return exp.vmov(dest, src, asmreg(), asmreg()) * dest		
 
-
 		// perhaps all assigns should use 16-byte vector assign.
 		
 		if !sr										// must be assigning zero

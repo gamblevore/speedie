@@ -901,6 +901,7 @@ function Tran_MsgList (|message| Exp)
 
 
 function SameTypeSub (|message| first,  |message| second,  |SCNode| name_space,  |scdecl|)
+	opt norefcounts
 	|| T1 = TypeOfExpr( first, name_space )
 	|| T2 = TypeOfExpr( second, name_space )
 	require t1 and t2
@@ -927,10 +928,10 @@ function SameTypeSub (|message| first,  |message| second,  |SCNode| name_space, 
 		if !rz
 			return t1
 // make C++ happy
-	if rz != t2
-		rz.CreateSimpleTypeCast(second)  // can delete these two lines
-	if rz != t1
-		rz.CreateSimpleTypeCast(first)	 // if we ever dump c
+	if !rz.MiniMatch(t2)
+		rz.CreateSimpleTypeCast(second)  // can delete these two things
+	if !rz.MiniMatch(t1)
+		rz.CreateSimpleTypeCast(first)	 // if we ever dump C++
 	
 
 
