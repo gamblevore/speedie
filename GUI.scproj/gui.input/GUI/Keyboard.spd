@@ -1,5 +1,6 @@
 
 
+
 dataType SDL_Scancode (int)
 	linkage
 		wrapper
