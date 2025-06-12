@@ -2932,14 +2932,13 @@ void SC_Comp__VariousSelfTests() {
 	JB_Incr(T);
 	JB_Decr(T);
 	if ((SC__Options_PerryOutput < 2) and ((!SC__Options_Scripting) and (!JB_FreeIfDead(JB_App__Parent(nil, false))))) {
-		if (({
-			JB_String* _tmPf1 = (JB_Str_OperatorMul(SC__Cpp_FindGlobalsCpp, 12));
-			JB_Incr(_tmPf1);
-			bool _tmPf0 = JB_Str_CompressTest(_tmPf1, false, 3);
-			JB_Decr(_tmPf1);
-			 _tmPf0;
-		}) and SC__Options_PrintLibraries) {
-			JB_PrintLine(JB_LUB[1892]);
+		if (SC__Options_PrintLibraries) {
+			JB_String* _tmPf0 = JB_Str_OperatorMul(SC__Cpp_FindGlobalsCpp, 12);
+			JB_Incr(_tmPf0);
+			if (JB_Str_CompressTest((_tmPf0), false, 3)) {
+				JB_PrintLine(JB_LUB[1892]);
+			}
+			JB_Decr(_tmPf0);
 		}
 	}
 }
@@ -3585,7 +3584,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[215]);
-	JB_FS_AppendInt32(_fsf0, (2025061119));
+	JB_FS_AppendInt32(_fsf0, (2025061210));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -6327,9 +6326,7 @@ void SC_Refs__Destructable(Message* Blocker, Message* Arg, Message* Name) {
 	if (!JB_Object_Isa(Type, &SCDeclData)) {
 		return;
 	}
-	//A;
 	Message* Src = ((Message*)JB_Ternary(Blocker, Blocker, SC_Msg_DeepLast(Arg)));
-	//B;
 	//using;
 	MessagePosition _usingf0 = ((MessagePosition){});
 	JB_Msg_SyntaxUsing(Src, (&_usingf0));
@@ -8686,7 +8683,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1721]);
-	JB_FS_AppendInt32(_fsf0, (2025061119));
+	JB_FS_AppendInt32(_fsf0, (2025061210));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -43057,8 +43054,6 @@ Message* SC_Msg_FalsifyNil(Message* Self) {
 }
 
 SCDecl* SC_Msg_FastDecl(Message* Self) {
-	if (JB_ObjectID(Self) == 1150328) {
-	}
 	JB_Object* Obj = Self->Obj;
 	if (JB_Object_FastIsa(Obj, &SCDeclData)) {
 		JB_Object* L = ((SCDecl*)Obj)->IsLookupOnly;
