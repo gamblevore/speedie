@@ -2207,3 +2207,4 @@
 "cmpi"
 "AFNC"
 "compare4"
+"Attempt to modify register, goes out of bounds"
