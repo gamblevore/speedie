@@ -83,7 +83,10 @@ struct Assembler
 	function AddFuncParams (|SCFunction| fn)
 		opt NoRefCounts
 		for a in fn.Args
-			(a is param)			// reset
+			(a is param)
+			(a isnt InlinedASMVar)
+			// reset.
+			// what about (a isnt body?)
 			.DeclareMe(a.source, a)
 	
 	
@@ -327,6 +330,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
+			if trap == 2444
 				
 		  else
 			opt inline
@@ -476,7 +480,10 @@ struct Assembler
 		
 		check (v < 32) (exp, "Too many registers in use. No space for result.")
 		if (dest is ExitAtAll) and .state.return
-			v = .state.parentvdecls
+			v = .state.parentvdecls // oh no. What if if .state.parentvdecls == 0
+									// that makes no sense? ooof? we'll ahve to see how many
+									// actual vdecls really exist. Perhaps it should be 1
+									// at least? I'm seeing r1 though?
 		dest.reg = v
 		dest.µtype = fn.ASMRegType
 		return dest.ReallySimplify
@@ -633,8 +640,8 @@ struct Assembler
 		.state.ParentVDecls = .VDecls
 		.state.BranchDepth = 0
 		
-		rz = .TryInlineSub(prms, fn, AllowedGain)
-	
+		|fatrange| LL
+		rz = .TryInlineSub(prms, fn, AllowedGain, LL)
 		.state = old
 		if .state.InlineDepth == 0
 			.InlineEnd = nil
@@ -643,12 +650,9 @@ struct Assembler
 		.CloseVars(OV)
 
 	
-	function TryInlineSub (|message| prms, |scfunction| fn, |int| AllowedGain,  |asmreg|)
+	function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatrange| LL, |asmreg|)
 		opt norefcounts
-		|fatrange| LL
 		LL.Start = .curr
-		target debug
-			|| trap = ++ASMTrapper
 		.InlineParameters(prms)
 		|| RealStart = .curr		// Params need to be done anyhow... so don't count them.
 		.GenASMSub(fn)
@@ -664,16 +668,17 @@ struct Assembler
 	
 	function InlineParameters (|message| prms)
 		opt norefcounts
-		|| p = prms.first
+		|| p = prms.first!
 		
 		for a in .fn.Args
-			|| v = .ExistingVar(p!)
+			(A isnt InlinedASMVar)
+			|| v = .ExistingVar(p)
 			|| vr = v.reg
 			if !vr
 				0
 			  elseif .CanReuseParam(prms, a, vr)
-				
-				|| T = v.µtype(a.WholeType.µtype)       //.reg(vr)
+				// we don't wanan do inlineaccess in here. for many reasons.
+				|| T = v.µtype(a.WholeType.µtype)
 				t.tmpcheck
 				a.wholetype = t
 				(a is param) = (v is param)
@@ -682,10 +687,13 @@ struct Assembler
 				v = nil
 			
 			if !v
-				v = .DeclareMe(a.source, a)
-				v = .µInto(p!, v as asmreg.DeclareInlineParam)
+				v = .DeclareMe(a.source, a) as asmreg.declareinlineparam
+				v = (.µgetasm(p, v), .µinto(p,v))(a isnt altered)
+				if v is inlinedaccess
+					a.wholetype = v
+					(a is InlinedASMVar)
 			.MarkDeclAsConst(a, V, nil)
-			p++
+			p = p.next!
 	
 
 	function RestoreParameters

@@ -323,8 +323,6 @@ function Decl (fn_asm)
 function ArgSub (|&Assembler| self, |message| exp, |?&sc_hoister| H, |AsmReg|)
 	opt NoRefCounts
 	for ch.fast in exp
-		target debug
-			|| trap = ++ASMTrapper	
 		//if h
 			//h.HoistNormal(ch)
 		if ch.func == @decl
@@ -352,8 +350,12 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 	|| base = .µGetASM(f)									// x = a.b[0]
 	|| sc = exp.Second.first!
 	if base is InlinedAccess
-/		return base
+		check (sc.iszero) (exp, "Attempt to modify register, goes out of bounds")
+		// in fact, this is invalid in C++ too, but we might not catch it.
+		// would be nice if marked the SCDecl itself as being used weirdly.
+		return base
 
+	
 	|| vara = .µGetASM(sc)
 
 	if d.TypeInfo.VecCount > 1
@@ -457,6 +459,8 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	if d is local
 		|| T = .ThgASM(d)
 		if dest isnt AddrNeed
+			if d is InlinedASMVar
+				(t is InlinedAccess)
 			return T
 		if dest is DeclareInlineParam		// &A
 			(t is InlinedAccess)
@@ -496,8 +500,7 @@ function DoGlobal (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| D, 
 function AddressOf (fn_asm)
 	rz = .µGetASM(exp, dest as asmreg.addrneed)
 	if (rz is ContainsAddr or InlinedAccess)
-		rz &=~ asmreg.ContainsAddr
-		return rz
+		return rz &~ asmreg.ContainsAddr
 	error (exp, "ASM fail")
 	.µGetASM(exp, dest as asmreg.addrneed)
 
@@ -739,9 +742,9 @@ function ASMReg.ConstEnough (|bool|)
 
 function ThgASM (|scdecl| d, |asmreg|)
 	|| T = d.WholeType as ASMReg.FromExistingVar
-	
+
 	(t is param) = (d is param) // unused?
-	if  d isnt alteredinbranch
+	if  d isnt AlteredInBranch
 		(t is CanHoist)
 		|| fi = d.FatConstIndex
 			|| f = fi|uint|.fat

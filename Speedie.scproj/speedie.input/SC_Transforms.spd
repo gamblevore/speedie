@@ -936,7 +936,9 @@ function compiler.CollectIsaTests (|Message| s, |bool|)
  
 function message.ObjCls (|scclass|)
 	opt norefcounts
-	|| o = .obj as scdecl // blindcast instead? its never NOT this.
+	|| o = .obj as scdecl
+		// if (o is classobj) != (o.type == TypeJBClass)
+		// I guess keep this for now. sigh. they aren't always the same
 		if o is ClassObj
 			return o.contains!.type
 

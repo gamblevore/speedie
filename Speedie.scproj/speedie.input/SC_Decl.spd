@@ -44,7 +44,7 @@ constants
 
 
 
-datatype SCDeclInfo (int)
+datatype SCDeclInfo (uint)
 	flags
 		|SCDeclInfo|
 		Borrowed
@@ -61,12 +61,12 @@ datatype SCDeclInfo (int)
 		CompilerCreated
 		PropertyWasConstructed
 		Param
+		Body
 		Property
 		Global
 		Return
 		Altered
 		AlteredInBranch
-		GameFlyingMem
 		Task
 		Self
 		ReadFrom
@@ -78,11 +78,11 @@ datatype SCDeclInfo (int)
 		ReturnedStruct
 		VarThatGotReturned
 		IntendedAsReturn
-		Body
-		VarType	 = Param ||| Body ||| Global ||| Property
-		Local		 = Body ||| Param
-		SelfImplicit = Self ||| local // local is set by CollectOneParam, anyhow?
-		DclCopied    = altered ||| stayborrowed ||| api ||| UpgradeableContained ||| CompilerCreated ||| body ||| return // need more too? do later
+		InlinedASMVar
+		VarType			= Param ||| Body ||| Global ||| Property
+		Local			= Body ||| Param
+		SelfImplicit	= Self ||| local // local is set by CollectOneParam, anyhow?
+		DclCopied		= altered ||| stayborrowed ||| api ||| UpgradeableContained ||| CompilerCreated ||| body ||| return // need more too? do later
 
 	function abc
 		|| x = Body

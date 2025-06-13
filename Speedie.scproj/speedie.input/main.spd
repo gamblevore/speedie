@@ -20,10 +20,9 @@ function Compiler.Main
 
 
 function Compiler.EnterCompile (|bool|)
-	if !.TryVariousStartModes
-		if FeedBack.ParseArgs
-			if !interact.EnterAutoComplete
-				return true
+	require !.TryVariousStartModes
+	require FeedBack.ParseArgs
+	return !interact.EnterAutoComplete
 
 
 function Compiler.PrintResults

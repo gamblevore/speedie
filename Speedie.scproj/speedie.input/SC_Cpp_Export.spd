@@ -623,7 +623,7 @@ function FastStringCpp.AddProperty (|scdecl| prop, |bool| intomodule)
 			  elseif prop is api
 				self <~ "__lib__ " // not sure how this works with the new struct lib globs
 	
-			if IntoModule and prop is GameFlyingMem
+			if 0 // IntoModule and prop is GameFlyingMem
 				// sigh
 				#!prop.StringData.ReplaceAll("$(N)", prop.name, self)
 			  else
