@@ -266,12 +266,44 @@ class StretchDivider (GuiControl)
 			.touch
 
 
+//	function Image.DrawOutlinedCircle (|vec4| R, |vec4| Inner, |vec4| Edge, |float| EdgeWidth)
+//		|| Back		= .Clip(R)$
+//
+//		|| mid		= r.Center
+//		|| maxdist	= ((0.5 * r.width) + 0.5) * 0.15
+//		|| scale	= (1.0, r.aspect)
+//		|| Dim		= r.area.RangeConvertClamped(2000.0, 0.15, 8000.0, 0.26)
+//		|| c1		= inner * inner.a
+//		|| MD		= (maxdist / dim).pow2
+//
+//		for Pix.rect in Back.ivec4
+//			|| V = (mid - pix.vec2)*scale
+//			|| vv = v • v
+//			if MD > vv
+//				|| D = maxdist / vv.sqrt
+//				self[Pix].add((D-dim)*c1)
+	
+	
+	module
+		function DrawDash (GUIDrawShader)
+			|| C = vec4(0)
+			if P.y != rect.y
+				C = colors.white(0.1)
+			  else
+				c.a = 0.05
+			if (p.x == rect.x) or (p.x == rect.x2-1)
+				c.a *= 0.5
+			c.a *= Color.a
+			pix[].overlay(C.premul)
+
+	
 	behaviour Draw
 		opt norefcounts
-		require .MouseNotDownOverOther and .entered
+		|| DrawColored = .MouseNotDownOverOther and .entered
 		|| rect = .LastRect
 		|| xy   = rect.xy
-		require where contains xy
+		ifn where contains xy
+			Drawcolored = false
 
 		|| a = .FadeAlpha
 		|| scale = rect.size.Vec2
@@ -295,14 +327,32 @@ class StretchDivider (GuiControl)
 			scale.y *= 1.2th
 			scale.x *= 1th
 		
-		for j in h
-			|| p = where[xy]
-			for i in w
-				|| diff2 = ((i,j)-center) * scale
-				col.a = (1.0 - diff2.abs.sum)*a
-				p.overlay(col.PreMul)
-				p += stride
-			xy += add
+		if !.d
+			|| TickCount = 5
+			|| txy = (xy + add * (h*0.5)|int|) - (12*add*TickCount)
+			txy.x--
+			
+			if !DrawColored
+				a = 0
+			
+			for ticks in TickCount
+				|| box = (txy, txy+(6,2))
+				|| B = vec4(1.0)
+				if ticks == 0 or ticks == tickcount-1
+					b.a = 0.5
+				b.a = b.a-a max 0.05
+				where.DrawShader(drawdash, box, b)
+				txy += 12*add
+
+		if drawcolored
+			for j in h
+				|| p = where[xy]
+				for i in w
+					|| diff2 = ((i,j)-center) * scale
+					col.a = (1.0 - diff2.abs.sum)*a
+					p.overlay(col.PreMul)
+					p += stride
+				xy += add
 
 
 

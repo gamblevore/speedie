@@ -30,7 +30,6 @@ class TextView (GUIControl)
 	|IntRange|					_TypingPlace
 	|IntRange|					_UncorrectedSel
 	
-	|GUIParticleEffect?|		LineEffect
 	|GUIKeyEvent?|				OnKeyDown
 	|GUITextEvent?|				OnTextChanged
 	|GUITextEvent?|				OnSelChanged

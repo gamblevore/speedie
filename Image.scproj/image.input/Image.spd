@@ -263,6 +263,7 @@ class Image (memory)
 		for r.width
 			(sigh++).a = Mark
 
+
 	function MarkLineV (|ivec2| P, |int| Height, |int| Mark)
 		|| iw = .width
 		|| R = .clip(P.xyxy + (0,0,0,height))
@@ -273,7 +274,8 @@ class Image (memory)
 			sigh -= iw
 			require sigh >= px
 		
-	function DrawLineH  (|ivec2| P, |int| Width,  |imagepixel| Col, |int| alpha=-1)
+
+	function DrawLineH (|ivec2| P, |int| Width, |imagepixel| Col, |int| alpha=-1)
 		require col.a
 
 		|| R = .clip(P.xyxy + (0,0,width,0))
@@ -289,6 +291,13 @@ class Image (memory)
 			if alpha >= 0
 				sigh.a = alpha
 			sigh++
+	
+	
+	function DrawShader (|GUIDrawShader| Shader, |ivec4| Rect, |vec4| Col=vec4(1))
+		|| R = .clip(rect)
+		|| range = self[r]
+		for (px in range) (pos)
+			(Shader)(self, r, pos, px, col)
 				
 	
 	function DrawLineV (|ivec2| P, |int| Height, |imagepixel| Col, |int| alpha=-1)
@@ -579,6 +588,10 @@ class Image (memory)
 				|| D = maxdist / vv.sqrt
 				self[Pix].add((D-dim)*c1)
 
+
+	// not sure how to call this. figure it out later.
+//	task DrawShader2 (|image| Upon)
+//		run (|&imagepixel| px, |vec4| Color)
 
 	
 

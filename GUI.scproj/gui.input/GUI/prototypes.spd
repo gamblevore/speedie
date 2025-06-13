@@ -3,8 +3,7 @@
 // prototypes
 	
 prototype GUIDrawBackground		(|object|      self,  |image| where)
-prototype GUIParticleEffect		(|image|       self,  |ivec4| Rect, |vec2| V)
-
+prototype GUIDrawShader			(|image|       self,  |ivec4| Rect,  |ivec2| P,  |&imagepixel| Pix, |vec4| color)
 prototype GUIListDragEvent		(|ListView|    self,  |ListViewrow?| Before, |ListViewrow?| Into, |bool|)
 prototype GUIListEvent			(|ListView|    self,  |ListViewrow?| Row, |listviewselectmode| Mode = ListViewSelectMode.normal, |bool|)
 prototype GUIListEditEvent		(|ListView|    self,  |ListViewcell?| Cell, |string| Value, |bool|)
