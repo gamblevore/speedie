@@ -308,9 +308,9 @@ extend PerryIDE
 		with .debugger 
 			is enabled
 			.div.DefaultFraction = 0.25
-			.tooltip		= "Debugger area"
+			.tooltip		= "Debugger Area"
 			.takesfocus 	= takesfocusflag.CanFocus
-			.ID				= "Debugger area"
+			.ID				= "DebuggerArea"
 			.size 			= the~width by the~bottom to 15~down
 			.gnormal		= self.errorlist.gnormal
 			.AddLow(self.Stack)

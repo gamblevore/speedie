@@ -439,15 +439,18 @@ class list (Saveable)
 		parent.first = self // smallest
 
 
-	function Loop (|bool| fwd=true, |list| Owner=nil, |...!|)
-		description "Owner must be nil... or contain us. Otherwise this function will break."
+	function FlatLoop (|bool| fwd=true, |list!| Owner, |...!|)
+		description "Owner must contain us. Otherwise this function will break."
 		opt norefcounts
 		real self
-		if Owner
-			if fwd
-				return .FlatNext ?? Owner.first!
-			return .flatPrev ?? Owner.FlatLast!
+		if fwd
+			return .FlatNext ?? Owner.First!
+		return .flatPrev ?? Owner.FlatLast!
 		
+
+	function Loop (|bool| fwd=true, |...!|)
+		opt norefcounts
+		real self
 		|| p = .parent
 		if !p
 			return self
