@@ -330,7 +330,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			if trap == 2444
+			// if trap == 2444
 				
 		  else
 			opt inline
@@ -480,10 +480,7 @@ struct Assembler
 		
 		check (v < 32) (exp, "Too many registers in use. No space for result.")
 		if (dest is ExitAtAll) and .state.return
-			v = .state.parentvdecls // oh no. What if if .state.parentvdecls == 0
-									// that makes no sense? ooof? we'll ahve to see how many
-									// actual vdecls really exist. Perhaps it should be 1
-									// at least? I'm seeing r1 though?
+			v = 1 max .state.parentvdecls // a simple max will fix this?
 		dest.reg = v
 		dest.µtype = fn.ASMRegType
 		return dest.ReallySimplify
@@ -674,10 +671,7 @@ struct Assembler
 			(A isnt InlinedASMVar)
 			|| v = .ExistingVar(p)
 			|| vr = v.reg
-			if !vr
-				0
-			  elseif .CanReuseParam(prms, a, vr)
-				// we don't wanan do inlineaccess in here. for many reasons.
+			if vr and .CanReuseParam(prms, a, vr)
 				|| T = v.µtype(a.WholeType.µtype)
 				t.tmpcheck
 				a.wholetype = t
@@ -685,6 +679,12 @@ struct Assembler
 				(a is body) = (v isnt param)
 			  else
 				v = nil
+				if a is altered
+					debugat
+				else
+					debugat
+				// we need to set it still.
+				// either to reg0 or to a new decl.
 			
 			if !v
 				v = .DeclareMe(a.source, a) as asmreg.declareinlineparam
@@ -814,6 +814,7 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	|| Start = .curr
 	++.CurrFuncGrab
 	|| Closer = .OpenVars
+	if "InitTypes2".trap
 	|| P = .PrmCollect(prms, fn)
 	.CloseVars(Closer)
 	

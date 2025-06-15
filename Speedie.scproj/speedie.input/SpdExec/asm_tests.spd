@@ -298,6 +298,18 @@ function AndOrRest (|int| a, |int| b, |bool| x3, |bool| x4, |int|) // stragglers
 	return x9 + x10
 
 
+syntax access (|string| name, |SCNodeFindMode| Mode=0, |SCClass|)
+	cpp_part FindClassName
+	return compiler.program.FindClass(name, mode)
+
+
+function InitTypes2
+	#!AAAAAAA
+	TypeInt = compiler.program.FindClass("int", 0)
+	#!BBBBBBB
+	TypeInt = self["int"]
+
+
 function InlineParam2 (|&int| v)
 	(v[])++
 

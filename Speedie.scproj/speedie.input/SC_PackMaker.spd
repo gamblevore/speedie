@@ -12,9 +12,9 @@ module PackMaker
 	helper AddFunc (|scfunction| f)
 		opt norefcounts
 		if f.IsLibrary
-			if f.needsexport or options.MakeInterpreter
+			if f.isreached or options.MakeInterpreter
 				.LibFuncs <~ f
-		  elseif f.NeedsExport or (f in "ASMExamples")
+		  elseif f.isreached or (f in "ASMExamples")
 			.PackFuncs <~ f
 
 		

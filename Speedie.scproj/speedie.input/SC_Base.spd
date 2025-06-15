@@ -761,10 +761,6 @@ function SetExportName (|String| s, |bool| Explicit)
 	.ExportName = s
 
 
-function NeedsExport (|bool|)
-	Return  (.MyReacher)
-
-
 function message.IsFuncDot (|bool|)
 	opt norefcounts
 	|| l = .last
