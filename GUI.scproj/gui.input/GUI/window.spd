@@ -361,7 +361,7 @@ class Window (GUIControl)
 
 
 	helper guicontrol.DrawInner (|image| where, |bool|)
-		if .IsViewable
+		if .IsViewableMenu
 			where.ControlClip = self
 			.__Draw__(Where)
 			.DrawChildren(where, .lastrect)

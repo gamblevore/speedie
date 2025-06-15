@@ -2,7 +2,13 @@
 
 module Notifications
 	linkage: cpp_part Note 
-	|list of window|	Alerts = list()
+	|Guicontrol of window| Alerts = guicontrol(nil)
+	init()
+	
+	function Init
+		(.alerts is visible)
+		.alerts.lastrect = (0,0,64K,64K)
+
 	
 	constants
 		height = 70
@@ -98,7 +104,7 @@ module Notifications
 		|| sz = (width)~left  by  (0~up back height)
 		rz = Window(sz, false)
 		.Alerts <~ rz
-		(rz isnt visible)
+		(rz is visible)
 		rz.id = "note"
 		rz.text = s
 		|| txt = TextView(rz)

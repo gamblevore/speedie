@@ -242,25 +242,27 @@ class ListView (GUIControl) {
 	
 	
 	helper CheckRemoved (|ListViewrow| r)
-		.scrollstart	= .replaced(r, ._Scrollstart)
+		.ScrollStart	= .replaced(r, ._Scrollstart)
 		.DraggingRowTo	= .replaced(r, .DraggingRowTo)
 		.DraggingRowFrom= .replaced(r, .DraggingRowFrom)
 	
 
-	helper ChangeSel (|listviewrow| row, |bool| Newstate, |int|)
+	helper ChangeSel (|listviewrow| Row, |bool| NewState, |int|)
 		if NewState == (row is selected)
 			return 0
 		if NewState and (row is disabled)
 			return 0
-		if .RowIsViewable(row)
+		if !gui.TouchCount and .RowIsViewable(row)
 			gui.touch
 		(row is selected) = newstate
 		return 1
 
 
-	helper RowIsViewable (|listviewrow| row, |bool|)
-		opt norefcounts
-		require .isviewable
+	helper RowIsViewable (|listviewrow| Row, |bool|)
+		opt NoRefCounts
+		// .isviewable checks the entire draw tree.
+		// can we avoid this? sigh...
+		require .IsViewable
 		for s.Visible in self
 			if s == row
 				return true
@@ -998,7 +1000,7 @@ class ListView (GUIControl) {
 		if .OneAlwaysSelected
 			return .Select(m)
 		
-		if .multiselection and multi
+		if .MultiSelection and multi
 			if .ChangeSel(m, state)
 				.SelectedEvent(m)
 		  else

@@ -1011,7 +1011,7 @@ class TextView (GUIControl)
 	function ShowNextParseError
 		opt norefcounts
 		|| start = .selectedline
-		|| d = start.Loop()
+		|| d = start.Loop
 		while d != start
 			|| err = d.LineError
 				.ErrorAt(err)

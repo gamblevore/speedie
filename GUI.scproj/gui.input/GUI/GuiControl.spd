@@ -152,21 +152,21 @@ class GUIControl (list)
 		opt NoRefCounts
 		real self
 		|| c = self
-		|| w = .window
+		|| w = .window$
 		
 		while
-			c = c.loop(dir, w) // flatloop!
+			c = c.flatloop(dir, w)
 			if c == self
 				exit
 			if .IsBetterFocus(c, rz, force)
 				rz = c
 
 
-	helper tabbability (|guicontrol| c, |int|)
+	helper Tabbability (|guicontrol| c, |int|)
 		return  c.tabindex|int|  -  .tabindex|int|
 		
 	
-	helper isbetterfocus (|guicontrol| c, |guicontrol| b, |bool| force, |bool|)
+	helper IsBetterFocus (|guicontrol| c, |guicontrol| b, |bool| force, |bool|)
 		require c.isviewable and c is enabled
 		require (c isa ListView or textview)
 		require c.takesfocus.tab(force) or (c is opensmenu)
@@ -281,8 +281,28 @@ class GUIControl (list)
 
 	
 	function IsViewable (|bool|)
-		if self
-			return (self is visible) and .lastrect.ispositive
+		opt norefcounts
+		nil checker
+		require self
+		//if self ~= "note"
+		|| r = (0, 0, 64K, 64K)
+		while self
+			require self is visible
+			|| r2 = .lastrect
+			if self isa window
+				r2 = r2.soothe
+			r = r.clip(r2)
+			require R.ispositive
+			self = .parent
+		return true
+
+
+	function IsViewableMenu (|bool|)
+		opt norefcounts
+		nil checker
+		|| w = .window
+		if w and self!.lastrect.ispositive
+			return w.isviewable
 
 		
 	function ContainsMouse (|bool|)
