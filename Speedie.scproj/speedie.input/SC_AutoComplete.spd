@@ -64,14 +64,16 @@ function EnterAutoComplete (|bool|)
 	require perry.isopen
 	app.AllowInteruptCrash = false			// to debug perry, which runs debug speedie
 	"RespondingToCommands"					// Don't delete this... too annoying to miss.
-	if !app.ismainthread
+
+	|| Realm = pico.GlobalConfig
+	Realm.TimeOut = 30s
+	if !app.IsMainThread
 		"(AsLib)"
+		realm.timeout = 0 // no need timeout
 	if options.PrintLibraries
 		"(Noisy)"
 		perry.pico.config.noise = -1
 
-	|| Realm = pico.GlobalConfig
-	Realm.TimeOut = 30s
 	compiler.InPerry = true
 	.PerryTalk(perry)
 	"ExitingCommands"						// this also
