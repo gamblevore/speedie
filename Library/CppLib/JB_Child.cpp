@@ -84,27 +84,28 @@ void JB_RemoveHandlers() {
 }
 
 
-void JB_CrashHandler(int Sig) {
-					// stop crash-loops.
+void JB_CrashHandler (int Sig) {
+						// stop crash-loops.
 	static bool AlreadyCrashed;
 	if (AlreadyCrashed)
 		return;
 	AlreadyCrashed = true;
+//	printf("Signal %i %s\n", Sig, strsignal(Sig));
 
-					// some unixes/shells can do this?
+						// Some unixes/shells can do this?
 	if (Sig <= 0)
 		return;
 	
-					// deregister
+						// deregister
 	JB_RemoveHandlers();
 
-					// report to stdout
+						// report to stdout
 	char ErrorBuff[128];
 	auto T = time(0);
 	snprintf(ErrorBuff, sizeof(ErrorBuff), "%s\nDate: %sSignal: %s\n", App_CallPath, ctime(&T), strsignal(Sig));
 	fputs(ErrorBuff, stderr);
 	
-					// log to file
+						// log to file
 	if (Sig != SIGHUP and Sig != SIGQUIT and Sig != SIGKILL) {
 		JB_Rec__CrashLog("\n\n****** CRASHED ******");
 		JB_Rec__CrashLog("Args: [");
@@ -117,11 +118,15 @@ void JB_CrashHandler(int Sig) {
 		JB_Rec__CrashLog("-----------------------\n");
 	}
 
-					// print normal-errors
+						// print normal-errors
 	JB_Rec_ShellPrintErrors(nil);
 	JB_KillChildrenOnExit();
-	if (!JB_NoExitOnCrash or Sig == SIGHUP or Sig == SIGQUIT or Sig == SIGKILL)
+	bool AskExit = (Sig == SIGHUP) or (Sig == SIGQUIT) or (Sig == SIGKILL);
+	if (!JB_NoExitOnCrash or AskExit) {
+		if (AskExit)
+			puts("ForcedToQuit");
 		exit(128|Sig);
+	}
 }
 
 
