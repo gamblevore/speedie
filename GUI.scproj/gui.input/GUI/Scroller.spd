@@ -43,24 +43,31 @@ helper MyScroller (|taskgui|)
 
 helper DrawScrollStrength (|float|)
 	opt norefcounts
-	|| Scroll = .myscroller
-		rz = 1.0-scroll.taskprogress
-		//if rz > 0
-		//	beep
+	|| Scroll = .MyScroller
+		rz = 1.0 - scroll.TaskProgress
 
 
+helper CanDrawScroll (|window| w, |bool|)
+	require w and .MouseDownOnSelfOrNil
+	require !._CanSeeAllLines
+	return (self contains .mousexy) or (w.CurrMouseDown==self)
+	
+	
 helper DrawScroll (|vec3| slh, |image| where)
 	opt NoRefCounts
-	if !.MouseNotDownOverOther
-		.noscroll
+	if !.MouseDownOnSelfOrNil
+		.NoScroll
 		return
 	
-	.MouseMoveInScrollArea(.mousexy)
-	|| s = .DrawscrollStrength
-		|| scr = ¥.scroll
-		using scr 
-		scr.Strengthen(s)
-		where.DrawRectStyled(.ScrollRect(slh), scr)
+	.MouseMoveInScrollArea(.MouseXY)
+
+	require .CanDrawScroll(.window)
+	|| s = .DrawScrollStrength #require
+
+	|| scr = ¥.scroll
+	using scr 
+	scr.Strengthen(s)
+	where.DrawRectStyled(.ScrollRect(slh), scr)
 
 
 function InScrollArea (|ivec2| p, |bool|)
@@ -72,8 +79,7 @@ function InScrollArea (|ivec2| p, |bool|)
 helper MouseMoveInScrollArea (|ivec2| p, |bool|)
 	if .HasFocus or !GUI.MouseButtons
 		if .InScrollArea(p)
-			.bumpscroll
-			return true
+			return .bumpscroll
 
 
 helper ScrollBarMove (|vec3| slh, |int| shift)
@@ -95,15 +101,14 @@ helper ClickedScrollbar (|ivec2| P,  |int| Clicks,  |vec3| slh,  |bool|)
 		require (ScrollInfo.InDrag_ >= 0) 
 		.ScrollbarMove(slh, y - ScrollInfo.InDrag_)
 	  else
-		//require .MouseMoveInScrollArea(P)
 		if r contains p
 			ScrollInfo.JustClicked_ = true
 			ScrollInfo.InDrag_ = y
 		  else
 			ScrollInfo.indrag_ = -1
 			return false
-	.bumpscroll
-	return true
+	
+	return .BumpScroll
 
 
 helper ScrollRect (|vec3| slh, |int| shift=0, |ivec4|)

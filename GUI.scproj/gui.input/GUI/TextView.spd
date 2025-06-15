@@ -7,7 +7,6 @@ class TextView (GUIControl)
 	|byte|						SingleLine
 
 	|bool| 						ShowLineNumbers
-	|bool|						CanSeeAllLines
 	|bool|						GroupSaveAll
 	|bool|						PreferStayAtEnd
 	|byte|						LineHeight
@@ -1734,7 +1733,7 @@ class TextView (GUIControl)
 			.DrawSel(where, c)
 		where.ControlClip = c			/// restore!
 
-		require  !.CanSeeAllLines and .DrawScrollStrength
+		require  !._CanSeeAllLines and .DrawScrollStrength
 		if .MyError or (._Lines is breakpoint)
 			.DrawScrollMarks(where)
 		if sel
@@ -1772,7 +1771,7 @@ class TextView (GUIControl)
 			.DrawOneLine(where, D, y, usecol, lc)
 			d++
 
-		.CanSeeAllLines = (.StartLine.position == 0) and (d==nil) // oop
+		._CanSeeAllLines = (.StartLine.position == 0) and (d==nil) // oop
 
 
 	function MaxWidthInChars (|int|)

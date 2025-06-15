@@ -27,6 +27,7 @@ class GUIControl (list)
 	|byte|						ExpandOnMouseOver
 	|bool|						PostLoaded
 	|bool|						ClickOutsideCloses
+	|bool|						_CanSeeAllLines
 	|CopyPasteFlags|			CopyPaste
 
 
@@ -241,7 +242,7 @@ class GUIControl (list)
 			scr.Remove
 
 
-	helper BumpScroll
+	helper BumpScroll (|bool|)
 		opt norefcounts
 		|| scr = .myscroller
 			scr.duration = 0.75s
@@ -252,6 +253,7 @@ class GUIControl (list)
 			scr = ScrollEvent(self, 0.75s)
 			w._Scroller = scr
 		scr.starttime += 0.25s // start on full
+		return true
 //// SCROLL END ////
 
 
@@ -283,11 +285,11 @@ class GUIControl (list)
 			return (self is visible) and .lastrect.ispositive
 
 		
-	function MouseIsInside (|bool|)
+	function ContainsMouse (|bool|)
 		opt norefcounts
 		|| w = .window
-		if w.IsFront
-			return self contains w!.MouseIsOver
+		if w and w.IsFront
+			return self contains w.CurrMouseOver
 	
 	
 	helper DrawChildren (|image| where,  |ivec4| Lim,  |guicontrol| avoid=nil) // drawcontrols
@@ -436,7 +438,7 @@ class GUIControl (list)
 
 	helper DrawFocus (|image| where, |float| strength=1.0)
 		if self
-			.drawfocusrect(Where, .lastrect, .FaintingEdge*strength)
+			.DrawFocusRect(Where, .lastrect, .FaintingEdge*strength)
 
 
 	helper FocusBorderStyle (|drawstyle|)

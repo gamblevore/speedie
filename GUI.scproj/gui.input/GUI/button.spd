@@ -253,7 +253,7 @@ class ButtonView (GUIControl)
 			|| darker = (!i and clicked)
 			if (i is Selected) or darker
 				if darker != .PressMakesLighter
-					G.overlay(0.3~black, 0.25)
+					G.Overlay(0.3~black, 0.25)
 				  else
 					|| amount = (0.66, 0.3)(i is active)
 					G.overlay((1.0, 1.0, 0.5, amount), 0.25)
@@ -305,14 +305,13 @@ class ButtonView (GUIControl)
 	
 	behaviour Draw
 		opt norefcounts
-		|| r = .lastrect
-		|| g = .MouseisInside|int| * .ExpandOnMouseOver
+		|| r = .LastRect
+		|| g = .ContainsMouse|int| * .ExpandOnMouseOver
 		|| grow = (-g,-g, g, g)
-		where.ControlClip() += grow
+		where.ControlClip += grow
 		|| w = .ItemWidth
 		if !w
-			.DrawOneButton(where, r, grow, nil)
-			return 
+			return .DrawOneButton(where, r, grow, nil)
 		
 		|| rx1 = r.x
 		R.x2 = rx1 + W

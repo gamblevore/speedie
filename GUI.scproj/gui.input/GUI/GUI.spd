@@ -997,7 +997,7 @@ module GUI
 			if (key is semicolon)
 				return w.DoListViewNext(false)
 			if (key is d) and  keys.ctrl
-				|| ov = w.MouseIsOver
+				|| ov = w.CurrMouseOver
 					Notifications <~ ov.ContainedName
 				  else
 					beep
@@ -1218,15 +1218,15 @@ module GUI
 			w.DoMouseDrag(xy, .CanDrag >= MouseDragging.Beyond)
 			return SDLActivity.activity
 		
-		|guicontrol--| PrevOver = w.MouseIsOver
+		|guicontrol--| PrevOver = w.CurrMouseOver
 		|guicontrol--| Over  = w.ControlOrMenuAt(Xy, false)
 
-		w.MouseIsOver = Over
+		w.CurrMouseOver = Over
 		|| Down = w.CurrMouseDown
 		if !Down and over
 			.SetToolTips(Over)
 		
-		if w.createddate.guiago > 0.01s
+		if w.CreatedDate.guiago > 0.01s
 			if (PrevOver != nil and Over) and (Down == nil or PrevOver)
 				PrevOver.__MouseMove__(xy, move, SDL_WindowEventID.leave)
 							

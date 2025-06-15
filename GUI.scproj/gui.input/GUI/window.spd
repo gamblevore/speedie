@@ -12,7 +12,7 @@ class Window (GUIControl)
 	|GUIControl?|						CurrMouseDown
 	|guicontrol?|						ToolTipControl
 	|guicontrol?|						DroppingInto
-	|guicontrol?|						MouseIsOver
+	|guicontrol?|						CurrMouseOver
 	|InlineEditor|						InlineEditorPlace
 	|GUIMouseMoveEvent?|				OnMouseMove
 	|list of TaskGUI|					Tasks
@@ -425,13 +425,13 @@ class Window (GUIControl)
 		GUI.candrag = R.__mousedown__(p, -1)
 
 	
-	syntax access (|ivec2| P, |bool|fordrag=false, |guicontrol|)
+	syntax access (|ivec2| P, |bool| ForDrag=false, |guicontrol|)
 		opt NoRefCounts
 		cpp_part ControlAtXY
 		|| r = p.point
-		rz = .controlat(r,  0)
+		rz = .ControlAt(r,  0)
 		if ForDrag
-			rz ?= .controlat(r, 10)
+			rz ?= .ControlAt(r, 10)
 
 
 // passthru always true?
@@ -605,13 +605,13 @@ struct SDL_Texture
 
 
 function window.MouseXY (|ivec2|)
-	return GUI.MouseXY - .lastrect.xy
+	return GUI.MouseXY - .LastRect.xy
 
 
 function guicontrol.MouseXY (|ivec2|)
 	opt norefcounts
 	|| w = .window
-		return GUI.mousexy - w.lastrect.xy
+		return w.MouseXY
 
 
 

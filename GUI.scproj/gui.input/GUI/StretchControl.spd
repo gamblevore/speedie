@@ -68,7 +68,7 @@ class StretchControl (GuiControl)
 			(sg is PassThru)
 			sG.AddPane(("bottom", "left" )(d))
 			sG.AddPane(("top",    "right")(d))
-			|| SD   = stretchdivider(sG, d) 
+			|| SD   = StretchDivider(sG, d) 
 			SD.start= start
 			SD.min  = min
 			SD.max  = max
@@ -106,19 +106,19 @@ class StretchDivider (GuiControl)
 		|| A = .low!
 		|| C = .high!
 		|| s = .start
-		if A == "left" // noice
+		if A == "left"								// noice
 			|| H = the~height
 			A.size = the~left to s		by  H
 			C.size = the~rest			by  H
 		  else
-			|| W = the~width
-					 // down/up controls split by horz-line
+			|| W = the~width						// down/up controls split by horz-line
 			A.size = W  by  the~bottom	to  s
 			C.size = W  by  the~rest
 		.InitDivider
 
 
 	function InitDivider
+		// W basically overlaps the panes... unless collapsed.
 		|| W = 3~before for 6
 		if .collapsed
 			W = 0~before for 4
@@ -253,7 +253,7 @@ class StretchDivider (GuiControl)
 
 	behaviour MouseMove
 		opt norefcounts
-		if .MouseNotDownOverOther
+		if .MouseDownOnSelfOrNil
 			return .intest(P, true)
 
 
@@ -285,6 +285,9 @@ class StretchDivider (GuiControl)
 	
 	
 	module
+		constants
+			kGrabDist = 9
+		
 		function DrawDash (GUIDrawShader)
 			|| C = vec4(0)
 			if P.y != rect.y
@@ -295,16 +298,21 @@ class StretchDivider (GuiControl)
 				c.a *= 0.5
 			c.a *= Color.a
 			pix[].overlay(C.premul)
-
+	
 	
 	behaviour Draw
 		opt norefcounts
-		|| DrawColored = .MouseNotDownOverOther and .entered
+		|| DrawColored = .MouseDownOnSelfOrNil and .entered
 		|| rect = .LastRect
 		|| xy   = rect.xy
 		ifn where contains xy
 			Drawcolored = false
-
+		
+		|| win = .Window
+			|| u = win.currscroll
+			if u and u.CanDrawScroll(win) and u.InScrollArea(win.mousexy)
+				drawcolored = false
+		
 		|| a = .FadeAlpha
 		|| scale = rect.size.Vec2
 		|| h = scale[1-.d]
@@ -326,25 +334,26 @@ class StretchDivider (GuiControl)
 			xy.y+=(!.collapsed)*3
 			scale.y *= 1.2th
 			scale.x *= 1th
+
 		
 		if !.d
 			|| TickCount = 5
-			|| txy = (xy + add * (h*0.5)|int|) - (12*add*TickCount)
-			txy.x--
+			|| txy = (xy + add * (h*0.5)|int|) - (kGrabDist*add*TickCount)
 			
 			if !DrawColored
 				a = 0
 			
 			for ticks in TickCount
-				|| box = (txy, txy+(6,2))
+				|| box = (txy, txy+(4,2))
 				|| B = vec4(1.0)
 				if ticks == 0 or ticks == tickcount-1
 					b.a = 0.5
 				b.a = b.a-a max 0.05
-				where.DrawShader(drawdash, box, b)
-				txy += 12*add
-
-		if drawcolored
+				where.DrawShader(DrawDash, box, b)
+				txy += kGrabDist*add
+		
+		
+		if DrawColored
 			for j in h
 				|| p = where[xy]
 				for i in w
@@ -356,8 +365,15 @@ class StretchDivider (GuiControl)
 
 
 
-function GuiControl.MouseNotDownOverOther (|bool|)
+function GuiControl.MouseDownOnSelfOrNil (|bool|)
 	opt norefcounts
 	|| w = .window
 		|| c = w.CurrMouseDown
 		return (c == self or nil)
+
+
+function window.CurrScroll (|GUIControl|)
+	opt norefcounts
+	|| x = ._Scroller
+		return x.Upon
+
