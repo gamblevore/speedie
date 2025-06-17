@@ -562,7 +562,7 @@ class GUIControl (list)
 		constructor
 			is animation  // doing this seems to break the system? no idea why.
 		run 
-			printline progress
+//			printline progress
 			|| hide = (progress >= 1.0 and .dir is close)
 			(.upon is visible) = !hide
 			if .dir is close
