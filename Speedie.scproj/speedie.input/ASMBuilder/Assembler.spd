@@ -206,6 +206,7 @@ struct Assembler
 		.VTemps = r
 		(t isnt realconst) // why would it be?
 		(t is temp)
+		.declprint
 		return t
 	
 	
@@ -388,7 +389,7 @@ struct Assembler
 	// these need to be opted. Not always happening? InlineOffsetOpt seems to only do ADDK, not ADPK
 	ADPK: t30, r2, 4                               /* R++ */
 	WR4U: t31, t30, r0, 0, 0                       /* R++[0] */	
-	|| Move = .TryAddPKMemory(base) // how is this different to InlineOffsetOpt?
+	|| Move = .TryAddPKMemory(base) // how is this different to InlineOff~t?
 */
 
 		if index >= 128												// read/write only allows up to 127
@@ -436,7 +437,12 @@ struct Assembler
 		
 		rz |= fn.args.Length
 
-		
+	
+	function DeclPrint
+		if 0 and "InitTypes2".trap
+			"d: ${.vdecls|int|} t: ${.vtemps|int|}"
+			debugger
+	
 	function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 		// We want a simple param order for speedie. Only sensible way to do things.
 		// So we can't share the prmcollector.
@@ -466,6 +472,7 @@ struct Assembler
 			rz |= (8-ic) << 0
 		  else
 			rz |= (17-ic) << 6
+		.declprint
 			
 
 	function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
@@ -663,35 +670,53 @@ struct Assembler
 			return Result
 	
 	
+	function UpdateInlineReg (|message| prms, |asmreg| V, |scdecl| a, |asmreg|)
+		|| T = a.wholetype
+		t.reg = v.reg
+		if v.isbig != t.isbig
+			|| D = .temptyped(prms, t.µtype|asmreg|)
+			v = ASMType.TypeCastSub(self, prms, D, v)			// convert.
+		else
+			v = v.µtype(T.µtype) // erase minor differences				
+		
+		(a is param) = (v is param)
+		(a is body) = (v isnt param)
+
+		v.tmpcheck
+		a.wholetype = v // update reg!
+		
+		if v is inlinedaccess
+			(a is InlinedASMVar)
+		return v
+	
+	
 	function InlineParameters (|message| prms)
 		opt norefcounts
 		|| p = prms.first!
 		
+		if "HighestMatch".trap
+			// what about passing a byte to a param taking an int?
+			// depends? like if it comes from a read, its already correct.
+			// our system assumes 32/64 bit correctness.
+			// So... passing 32 to a 64 isnt correct, but otherwise it should be?
+			
 		for a in .fn.Args
 			(A isnt InlinedASMVar)
 			|| v = .ExistingVar(p)
 			|| vr = v.reg
 			if vr and .CanReuseParam(prms, a, vr)
-				|| T = v.µtype(a.WholeType.µtype)
-				t.tmpcheck
-				a.wholetype = t
-				(a is param) = (v is param)
-				(a is body) = (v isnt param)
+				// 
+			  elseif v and (!vr) and (a isnt altered)
+				// 
 			  else
-				v = nil
 				if a is altered
-					debugat
-				else
-					debugat
-				// we need to set it still.
-				// either to reg0 or to a new decl.
+					v = .DeclareMe(a.source, a) as asmreg.declareinlineparam
+					v = .µinto(p, v)
+				  else
+					v = .µgetasm(p, v)
 			
-			if !v
-				v = .DeclareMe(a.source, a) as asmreg.declareinlineparam
-				v = (.µgetasm(p, v), .µinto(p,v))(a isnt altered)
-				if v is inlinedaccess
-					a.wholetype = v
-					(a is InlinedASMVar)
+			
+			v = .UpdateInlineReg(prms, V, a)
 			.MarkDeclAsConst(a, V, nil)
 			p = p.next!
 	
@@ -814,8 +839,9 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	|| Start = .curr
 	++.CurrFuncGrab
 	|| Closer = .OpenVars
-	if "InitTypes2".trap
+	.declprint
 	|| P = .PrmCollect(prms, fn)
+	.declprint
 	.CloseVars(Closer)
 	
 	if !TableID

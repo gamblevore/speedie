@@ -424,10 +424,14 @@ function Num (fn_asm)
 function Thg (fn_asm)
 	|| thg = asmtype.ThgSub(self, exp, dest)
 	|| reg = thg.reg
-	if (reg-1)|uint| < 31							// what?
+	if (reg-1)|uint| < 31								// what?
 		return thg
-	if  reg == 0  and  thg is RealConst
-		return thg									// Its still ok.   nil/false
+	if  reg == 0
+		if thg is RealConst
+			return thg									// Its still ok.   nil/false
+		if (thg is param) and (.state.inlinedepth)		// inline returned
+			(thg is constoutput)
+			return thg
 	error (exp, "Register out of bounds")
 
 
@@ -462,6 +466,8 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 			if d is InlinedASMVar
 				(t is InlinedAccess)
 			return T
+			// inlined params can set a param to reg0. so... we should mark this as a const, right?
+			
 		if dest is DeclareInlineParam		// &A
 			(t is InlinedAccess)
 			return T

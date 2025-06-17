@@ -40,7 +40,8 @@ struct FatASM
 		.outputs = 0
 		.BranchDepth = 0
 		.LoopDepth = 0
-		// leave info, msg, and _const. Other things may need them still.
+		.info = nil // ??? nothing needs this?
+		// leave msg, and _const. Other things may need them still.
 		for i in –count .prms
 			.prms[i] = 0
 		.BasicBlock = 0
