@@ -24,9 +24,6 @@ main
 	"Barris?        ${shop[`barris`]}"
 	
 /*
-   #require means: **If the result of this expression doesn't exist, exit the function**
-This is a simple way to make code-flow explicit, but 'get it out of the way'.
-
    The original C++ uses 'toml::parse' that raises an exception... causing issues.
 Speedie has no exceptions, but a far better error-handling system.
 
