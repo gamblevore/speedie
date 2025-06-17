@@ -234,7 +234,7 @@ class ErrorReceiver
 			curr_err = N
 			
 	constants
-		NonFatal = "Non-Fatal Internal Error"
+		NonFatal = "Internal Error"
 
 
 
