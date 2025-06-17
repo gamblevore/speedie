@@ -383,7 +383,7 @@ function Consts (|float64|)
 
 
 function Incr (|int| x, |int| y, |int|)
-	return .math(x++, --y)
+	return .math2(x++, --y)
 
 
 function ForeignFuncs (|string?| x, |string?| y, |string|)
@@ -468,8 +468,10 @@ function Mul (|int| a, |int| b, |int| c, |int| d, |int|)
 	|| x = 12 * 10
 	return ((a + b) * c) / d
 
-function Math (|int| a, |int| b, |int|)
+
+function Math2 (|int| a, |int| b, |int|)
 	return ((a + b) / 2) - ((a / b) * 2)
+
 
 function AndOr (|int| a, |int| b, |bool| c, |int|)
 	visible

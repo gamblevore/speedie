@@ -208,9 +208,9 @@ function TernRefCount (|asmreg| A, |asmreg| B, |asmreg|)
 function InbuiltTernary (|asmreg| dest, |asmreg| ma, |asmreg| mb, |message| cond, |asmreg|)
 	opt norefcounts
 	|| dr = dest.reg
-	|| mc = (ASMReg(), dest)(dr == ma.reg or mb.reg)
-	|| µ = .µ(cond, mc)
-	return cond.TERN(dest, µ, ma, mb, µ.small) * dest
+	|| vc = (ASMReg(), dest)(dr == ma.reg or mb.reg)
+	|| mc = .µ(cond, vc)
+	return cond.TERN(dest, mc, ma, mb, mc.small) * dest
 
 
 function MiniTernary (|asmreg| dest, |asmreg| ma, |message| B, |message| cond, |asmreg|)

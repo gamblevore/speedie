@@ -461,6 +461,7 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
 	|| d = exp.ASMDecl
 	if d is local
+		if "InlineParam".trap
 		|| T = .ThgASM(d)
 		if dest isnt AddrNeed
 			if d is InlinedASMVar
@@ -580,7 +581,10 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 	|| D = exp.ASMDecl
 	|| Amount = IncrAmount(src, mode, D)
 	if !dest.reg and dest isnt Discard
-		dest = .TempTyped(exp, dest)
+		if mode & IncrAfter
+			dest = .TempTyped(exp, dest)
+		  else
+			dest = src
 	
 	|| p = exp.parent! // better positions
 	if src is ContainsAddr

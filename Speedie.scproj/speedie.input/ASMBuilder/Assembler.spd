@@ -607,10 +607,15 @@ struct Assembler
 			return ASMType.ThgSub(self, exp, ASMReg.ConstRequest)
 	
 	
-	function CanReuseParam (|message| Prms, |scdecl| A, |int| vr, |bool|)
+	function CanReuseParam (|message| Prms, |scdecl| A, |asmreg| v, |bool|)
 		opt norefcounts
+		|| vr = v.reg
+		if !vr
+			return (a isnt altered) // passing 0 via a const?
+
 		if a isnt altered
 			return true
+		
 		require (.state.return.reg == vr)
 		for p.fast in prms
 			// check for the address of the same var?
@@ -671,22 +676,28 @@ struct Assembler
 	
 	
 	function UpdateInlineReg (|message| prms, |asmreg| V, |scdecl| a, |asmreg|)
+		if "InlineParam".trap
 		|| T = a.wholetype
-		t.reg = v.reg
-		if v.isbig != t.isbig
-			|| D = .temptyped(prms, t.µtype|asmreg|)
-			v = ASMType.TypeCastSub(self, prms, D, v)			// convert.
-		else
-			v = v.µtype(T.µtype) // erase minor differences				
-		
+		if v is inlinedaccess
+			(a is InlinedASMVar)
+
+// should be local either way...
+// perhaps this isnt needed? shouldn't be... right?
+// try delete these 2 lines!		
+
 		(a is param) = (v is param)
 		(a is body) = (v isnt param)
+
+		if v.isbig != t.isbig
+		// what about &locals being inlined?
+/			|| D = .temptyped(prms, t.µtype|asmreg|)
+			v = ASMType.TypeCastSub(self, prms, D, v)			// convert.
+		  else
+			v = v.µtype(T.µtype)								// erase minor differences				
 
 		v.tmpcheck
 		a.wholetype = v // update reg!
 		
-		if v is inlinedaccess
-			(a is InlinedASMVar)
 		return v
 	
 	
@@ -694,7 +705,7 @@ struct Assembler
 		opt norefcounts
 		|| p = prms.first!
 		
-		if "HighestMatch".trap
+		if "HighestMatch".trap or "incr".trap
 			// what about passing a byte to a param taking an int?
 			// depends? like if it comes from a read, its already correct.
 			// our system assumes 32/64 bit correctness.
@@ -703,17 +714,23 @@ struct Assembler
 		for a in .fn.Args
 			(A isnt InlinedASMVar)
 			|| v = .ExistingVar(p)
-			|| vr = v.reg
-			if vr and .CanReuseParam(prms, a, vr)
-				// 
-			  elseif v and (!vr) and (a isnt altered)
-				// 
+			if v and .CanReuseParam(prms, a, v)
+				0 //
+			  elseif a is altered
+				v = .DeclareMe(a.source, a)
+				v = v as asmreg.declareinlineparam
+				v = .µinto(p, v)
 			  else
-				if a is altered
-					v = .DeclareMe(a.source, a) as asmreg.declareinlineparam
-					v = .µinto(p, v)
-				  else
-					v = .µgetasm(p, v)
+				// this has an issue.
+				// if this expr returns a temp... (like x++)...
+				// and the inlined func calls another func...
+				// that temp will be lost. but we might still expect it to exist
+				// Solutions?
+					// * use .µinto (as above)
+					// * check if any subfuncs are called (.reached)
+				
+				v = v as asmreg.declareinlineparam
+				v = .µgetasm(p, v)
 			
 			
 			v = .UpdateInlineReg(prms, V, a)
