@@ -56,6 +56,9 @@ class TextView (GUIControl)
 		.oncopy = textCopy|GUICopyEvent|
 		.init
 
+	destructor
+		.document = nil		
+	
 	function Document (|document|)
 		return ._Viewing
 	
@@ -76,13 +79,26 @@ class TextView (GUIControl)
 			return v
 		._Viewing = v
 		v = document("")
-		v.addviewer(self)
+		v.AddViewer(self)
 		return v
+	
+	
+	behaviour MouseMove
+		|| InScroll = .MouseMoveInScrollArea(P)
+		
+		if state is enter or moved
+			if InScroll
+				SystemCursor.hand.use
+			  else
+				|| InLines = ._LineNumWidth and (State isnt leave) and (p.x < .LineNumRight)
+					SystemCursor.hand.use
+				  else
+					super.MouseMove(p, move, state)
 
-	destructor
-		.document = nil		
+		.ShowExtraInfo(P, true)
+		return InScroll
 	
-	
+
 	behaviour MouseDown
 		if (clicks == 1) and (keys.cmd or keys.ctrl)
 			.SendSpecialClick(p, !keys.PlatCmd)
@@ -94,16 +110,17 @@ class TextView (GUIControl)
 			return MouseDragging.Handled
 		
 		if self is editable or AlwaysScrollable
-			if clicks >= 1 // remove this test?
+			if clicks >= 1							// remove this test?
 				._ClicksDown = clicks
 			|| x = .EditClickText(p, clicks, false)
 				return x
 
-		|| onc = .onclicked
-		if (onc) and clicks >= 0				// -1 = drag
+		|| onc = .OnClicked
+		if (onc) and clicks >= 0					// -1 = drag
 			(onc)(self, clicks)
 		if self is editable or AlwaysScrollable
-			return MouseDragging.Within // used to be 4, now 2?
+			return MouseDragging.Within				// used to be 4, now 2?
+		
 		return MouseDragging.handled
 
 	
@@ -673,6 +690,8 @@ class TextView (GUIControl)
 	
 	behaviour KeyDown
 		opt norefcounts
+//		if key is cmd // should change cursor.
+			
 		if self is editable
 			if (.OnKeyDown)(self, key)?
 				return true
@@ -1784,14 +1803,10 @@ class TextView (GUIControl)
 		h += .LineHeight-3
 		return .height / .lineheight|int|
 	
+	
 	function MaxVisibleLines (|int|)
 		|| h = .height
 		return .height / .lineheight|int|
-	
-	
-	behaviour MouseMove
-		.ShowExtraInfo(P, true)
-		return .MouseMoveInScrollArea(P)
 	
 	
 	helper ShowNoExtra
@@ -2234,8 +2249,7 @@ class TextView (GUIControl)
 			rz.BlockSize(x,w,y,h)
 			if w < 0
 				rz.Alignment = MoveCode.Right
-			
-
+		
 		task DelayedShowError (TaskGUI, |error| err, |ivec2| Point)
 			constructor
 				is WaitStillStart
@@ -2247,6 +2261,7 @@ class TextView (GUIControl)
 					(fp)(.upon, .Point, nil, .err, "error", true)
 
 
+
 helper string.InsertTrim (|ivec2|)
 	|| i = .find('<')
 		|| i2 = .find('>', i)
@@ -2255,12 +2270,14 @@ helper string.InsertTrim (|ivec2|)
 	return (i, i)
 
 
+
 helper string.DeleteTwoBytes (|ivec2|r, |string|)
 	|| fs = faststring()
 	fs <~ self[0,       r.x]
 	fs <~ self[r.x+1,   r.x2+1]
 	fs <~ self[r.x2+2,  int.max]
 	return fs
+
 
 
 function TextView.MakeInline (|string| txt="", |bool| Editable=false, |textview|)
@@ -2272,6 +2289,7 @@ function TextView.MakeInline (|string| txt="", |bool| Editable=false, |textview|
 	.Size = (3~right for 89)  by  14~down
 		
 
+
 datatype TextViewJumpMode (int)
 	linkage: numeric false
 	flags
@@ -2282,4 +2300,12 @@ datatype TextViewJumpMode (int)
 	syntax is (|TextViewJumpMode| m, |bool|)
 		return self|int| & m|int|
 
+
+	
+//		Arrow		// arrow
+//		IBeam		// i-beam
+//		SizeWE		// double arrow west and east
+//		SizeNS		// double arrow north and south
+//		No			// slashed circle or crossbones
+//		Hand		// hand
 

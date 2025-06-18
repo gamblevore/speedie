@@ -86,28 +86,21 @@ class FileRow (ListViewRow)
 		if l.file.MoveToTrash
 			.remove(fv)
 		fv.checksize
-
-
-	function MoveToSub (|string|v, |file|)
-		|| l = .location.file
-		rz = l.sibling(v)
-		if rz.Exists
-			beep v + " already exists!"
-			rz = nil
-		  elseif !l.moveto(rz)
-			rz = nil
 	
 	
 	function MoveTo (|string| v, |bool|) // rename
-//		.sanity
-		|| f = .movetosub(v) #expect beep
-		.location = f.path
-		.name = f.name
-		.parent.filesort
-		|| d = ._Document
-			d.MoveTo(.readfrom)
-//		.sanity
-		return true
+		|| l = .location.file
+		|| f = l.sibling(v)
+		if .location != f
+			if f.Exists
+				beep v + " already exists!"
+			  elseif l.moveto(f)
+				.location = f.path
+				.name = f.name
+				.parent.filesort
+				|| d = ._Document
+					d.MoveTo(.readfrom)
+				rz = true
 
 
 	function IsDir (|bool|)

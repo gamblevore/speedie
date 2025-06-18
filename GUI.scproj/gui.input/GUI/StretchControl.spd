@@ -11,17 +11,17 @@ class StretchControl (GuiControl)
 		
 	helper AddPane (|string| name)
 		opt norefcounts
-		|| rz = guicontrol(self)
+		|| rz = GUIControl(self)
 		rz.ID = name
 		(rz is PassThru)
 	
 	setter IsCollapsed (|bool|)
 		opt norefcounts
-		.div.setcollapsed(false, value)
+		.Divider.setcollapsed(false, value)
 	
 	function IsCollapsed (|bool|)
 		opt norefcounts
-		return !.div.ActiveEnd.length
+		return !.Divider.ActiveEnd.length
 		
 	function IsOpen (|bool|)
 		opt norefcounts
@@ -29,15 +29,15 @@ class StretchControl (GuiControl)
 		
 	function Reset
 		opt norefcounts
-		.div.ActiveEnd = .div.start
+		.Divider.ActiveEnd = .Divider.start
 
 	function Collapse (|bool| soft = false)
 		opt norefcounts
-		.div.Collapse(soft)
+		.Divider.Collapse(soft)
 	
 	function AddHigh (|guicontrol| G)
 		opt norefcounts
-		.div.high <~ g
+		.Divider.high <~ g
 		
     function AddLeft (|guicontrol| G)
         .AddLow(g)
@@ -47,14 +47,14 @@ class StretchControl (GuiControl)
         
 	function AddLow (|guicontrol| G)
 		opt norefcounts
-		.div.low <~ g
+		.Divider.low <~ g
 
-	helper div (|stretchdivider!|)
+	function Divider (|stretchdivider!|)
 		return .last|stretchdivider|!
 	
 	function Show 
 		opt norefcounts
-		.div.show
+		.Divider.show
 		
 	module
 		function Horz (|guicontrol| p, |controlpoint| start, |int| min=0, |int| max=0, |stretchcontrol|)
@@ -114,10 +114,11 @@ class StretchDivider (GuiControl)
 			|| W = the~width						// down/up controls split by horz-line
 			A.size = W  by  the~bottom	to  s
 			C.size = W  by  the~rest
-		.InitDivider
+		(.OnStretch)(self)?
+		.ResizeDivider
 
 
-	function InitDivider
+	function ResizeDivider
 		// W basically overlaps the panes... unless collapsed.
 		|| W = 3~before for 6
 		if .collapsed
@@ -128,7 +129,6 @@ class StretchDivider (GuiControl)
 		  else
 			H = the~height
 		.size = W by H
-		(.OnStretch)(self)?
 
 
 	behaviour Resized
@@ -216,7 +216,7 @@ class StretchDivider (GuiControl)
 		opt NoRefCounts
 		|| l = .low
 			l.sizer.g(2+.d, self) = value
-			.InitDivider
+			.ResizeDivider
 	
 	behaviour MouseDown
 		require .InTest(P, false)
@@ -253,8 +253,11 @@ class StretchDivider (GuiControl)
 
 	behaviour MouseMove
 		opt norefcounts
+		if state is enter
+			(SystemCursor.SizeWE+.d).Use
+		
 		if .MouseDownOnSelfOrNil
-			return .intest(P, true)
+			return .InTest(P, true)
 
 
 	helper FadeAlpha (|float|)

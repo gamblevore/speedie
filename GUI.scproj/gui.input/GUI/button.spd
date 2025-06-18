@@ -97,12 +97,27 @@ class ButtonView (GUIControl)
 			if i is Selected
 				return i
 
+//		|| InScroll = .MouseMoveInScrollArea(P)
+//		if state is enter or moved
+//			if InScroll
+//				SystemCursor.hand.use
+//			  else
+//				|| InLines = ._LineNumWidth and (State isnt leave) and (p.x < .LineNumRight)
+//					SystemCursor.hand.use
+//				  else
+//					super.MouseMove(p, move, state)
 
 	behaviour MouseMove
-		opt norefcounts
+		opt NoRefCounts
+		if state isnt LEAVE
+			if self is Enabled
+				SystemCursor.hand.use
+			  else
+				SystemCursor.No.use
+			
 		if (state is enter or leave)
 			.touch
-		|| item = .itemat(P.x)
+		|| item = .ItemAt(P.x)
 		if .CurrOverItem != item
 			.CurrOverItem = item
 			.touch
@@ -339,10 +354,12 @@ class ButtonView (GUIControl)
 		opt norefcounts
 		return  .SubControl isa menu  and  .subcontrol is visible
 
+
 	function ListSource (|ListViewRow|)
 		opt norefcounts
 		|| m = .SubMenu
 			return m.ListSource
+
 
 	function OpenMenu (|listviewrow| row=nil, |menu|)
 		|| m = .SubMenu						#require

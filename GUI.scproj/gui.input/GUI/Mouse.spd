@@ -8,11 +8,56 @@ datatype MouseDragging (int)
 		Beyond = 3<<4
 		EvenIfNoMovement = 4<<4
 
+
+datatype SystemCursor (int)
+	linkage
+		wrapper
+		cpp_class SystemCursor
+	constants
+		|SystemCursor|
+		Arrow		// arrow
+		IBeam		// i-beam
+		Wait		// wait
+		CrossHair	// crosshair
+		WaitArrow	// small wait cursor (or wait if not available)
+		SizeNWSE	// double arrow northwest and southeast
+		SizeNESW	// double arrow northeast and southwest
+		SizeWE		// double arrow west and east
+		SizeNS		// double arrow north and south
+		SizeAll		// four pointed arrow pointing north, south, east, and west
+		No			// slashed circle or crossbones
+		Hand		// hand
+
+	function Get (|!&SDL_Cursor|)
+		self = self min Hand
+		return _Cursors[self] init .create
+	
+	function Use
+		.get.use
+
+	helper Create (|!&SDL_Cursor|)
+		cpp_wrapper JB_CreateSystemCursor
+
+	module
+		|(&SDL_Cursor)[12]| _Cursors
+				
+
+
+
 struct SDL_Cursor
-	linkage:wrapper
+	linkage
+		wrapper
+	function Use
+		cpp_wrapper SDL_SetCursor
+	
+	module
+		|&SDL_Cursor| _Empty
+		|byte[1]| nothing
+		function Show (|int| show=-1, |int|)
+			cpp_wrapper SDL_ShowCursor
+			
+		function Create (|&byte| data, |&byte| mask, |int| w, |int| h, |int| hot_x, |int| hot_y, |&SDL_Cursor|)
+			cpp_wrapper SDL_CreateCursor
 
-/*
-	return (x,y).sdlxy
-	#define SDL_BUTTON(X)       (1 << ((X)-1))
-*/
-
+		function Empty (|!&SDL_Cursor|)
+			return ._empty  init  Create(&nothing, &nothing, 1, 1, 0, 0)

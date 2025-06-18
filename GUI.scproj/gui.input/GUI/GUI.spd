@@ -63,10 +63,6 @@ module GUI
 	cpp_Wrapper SDL_GetMouseState		(|?&int| x, |?&int| y, |mousebutton|) 
 	cpp_wrapper SDL_SetRelativeMouseMode (|bool| Relative)
 	cpp_wrapper SDL_WarpMouseInWindow   (|&sdl_window| window, |int| x, |int| y)
-	cpp_wrapper SDL_ShowCursor			(|int| show=-1, |int|)
-	cpp_wrapper SDL_CreateCursor		(|&byte| data, |&byte| mask, |int| w, |int| h, |int| hot_x, |int| hot_y, |&SDL_Cursor|)
-	cpp_wrapper SDL_SetCursor			(|&SDL_Cursor| Cursor)
-///	
 
 	cpp_Wrapper SDL_CreateRenderer		(|&SDL_Window| window, |int| index, |Uint| flags, |?&SDL_renderer|)
 
@@ -173,19 +169,16 @@ module GUI
 		
 	helper NukeCursor
 		|| w = .ScreenWindow$
-		|byte[1]| nothing
-		|| g_cursor = SDL_CreateCursor(&nothing[0], &nothing[0], 1, 1, 0, 0)
-		.CenterCursor
-		SDL_SetCursor(g_cursor)
+		SDL_Cursor.Empty.Use
 		.ShowCursor(false)
 						
 
 	function ShowCursor (|bool| v = true)
-		SDL_ShowCursor(v|int|)
+		sdl_cursor.Show(v|int|)
 
 
 	function CursorVisible (|bool|)
-		return SDL_ShowCursor()
+		return sdl_cursor.Show()
 
 
 	helper Screenraw (assigns:|ivec4| result, |bool|)
@@ -628,6 +621,11 @@ module GUI
 			|| b = .prev
 				rect = b.lastrect
 		.CalculateSize(BigRect, rect, BigRect)
+		
+		|| Sexy = .MouSexy
+		|| Curr = .ControlOrMenuAt(Sexy)
+			curr.__MouseMove__(Sexy, Sexy - gui.CurrMouseXY, SDL_WindowEventID.moved)
+		/////
 
 	
 	helper CheckTaskAnimations

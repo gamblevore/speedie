@@ -173,6 +173,7 @@ class MenuItem (ListViewrow)
 		.name = name
 		.MenuEvent = ev
 		.obj = obj
+		isnt editable // why?
 		(self is disabled) = (name == "")
 		
 	render

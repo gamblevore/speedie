@@ -64,11 +64,11 @@ class GUIControl (list)
 	virtual Search		(|string| s, |bool|JustUpdate, |bool|)
 	virtual MouseMove	(|ivec2| P,  |ivec2| Move,   |SDL_WindowEventID| State, |bool|)
 	virtual Gesture	    (|ivec2| Wheel, |float| Rotate, |float| Pinch,  |bool|)
-	virtual MouseDown	(|ivec2| P,  |int| Clicks, |int|)
-		return 1
 	virtual RightClick	(|ivec2| P)
 	virtual KeyDown		(|keys| Key, |bool|)
 	virtual MouseUp		(|ivec2| P)
+	virtual MouseDown	(|ivec2| P,  |int| Clicks, |int|)
+		return 1
 	virtual Draw		(|image| Where)
 		opt norefcounts
 		|| G = .GNormal
@@ -87,9 +87,16 @@ class GUIControl (list)
 	virtual Resized (|bool| Initial)
 		0
 	
-
-	behaviour Search
 	behaviour MouseMove
+		if state isnt leave
+			if self is editable
+				SystemCursor.IBeam.use
+			  elseif .OnClicked
+				SystemCursor.Hand.use
+			  else
+				SystemCursor.Arrow.use
+	
+	behaviour Search
 	behaviour Gesture
 	behaviour KeyDown
 	behaviour RightClick

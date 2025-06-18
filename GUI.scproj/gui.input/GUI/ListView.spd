@@ -511,10 +511,22 @@ class ListView (GUIControl) {
 
 
 	function EnableDrag
-		.ondragrow = (nil, &BasicRowDrag)(.istree)
+		.OnDragRow = (nil, &BasicRowDrag)(.istree)
 	
 
 	behaviour MouseMove
+		|| cc = SystemCursor.Arrow
+		|| c = .FindClickedCell(P)
+			|| r = c.row
+			if (r is disabled)
+				cc = SystemCursor.no
+			  elseif (r is editable)
+				if r is Selected
+/					cc = SystemCursor.IBeam
+				  else
+					cc = SystemCursor.hand
+		cc.use
+			
 		if ._CanSeeAllLines
 			.NoScroll
 			return .HasFocus

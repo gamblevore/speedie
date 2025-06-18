@@ -71,9 +71,10 @@ helper DrawScroll (|vec3| slh, |image| where)
 
 
 function InScrollArea (|ivec2| p, |bool|)
-	|| x  = .lastrect.x2
-	|| xr = (x-10, x)
-	return (xr contains p.x) and (self contains p)
+	if self isa textview or listview
+		|| x  = .lastrect.x2
+		|| xr = (x-10, x)
+		return (xr contains p.x) and (self contains p)
 
 
 helper MouseMoveInScrollArea (|ivec2| p, |bool|)
