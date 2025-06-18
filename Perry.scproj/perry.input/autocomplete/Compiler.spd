@@ -101,9 +101,9 @@ extend PerryIDE
 				h.name = ""
 
 	function ExpandCompileSep (|bool|)
-		|| coll = .ProductSep.div.Collapsed
+		|| coll = .ProductSep.divider.Collapsed
 			.ShowCompileTab(.SpeedieText)
-			return !.ProductSep.div.Collapsed
+			return !.ProductSep.divider.Collapsed
 
 
 	function Compile (|string| operation)

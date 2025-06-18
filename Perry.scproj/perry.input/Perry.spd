@@ -322,7 +322,7 @@ function ViewAsVis (|bool| AsProject)
 	(.goPrev is visible)	= AsProject
 	(.rborder is visible)	= AsProject
 	(.ViewButtons is visible) = AsProject
-	(.filesep.div is visible) = AsProject
+	(.filesep.divider is visible) = AsProject
 		
 	(.UnNeededLabel is visible)  = .UnNeededLabel.text and AsProject and (.FileList isnt visible)
 	(.searcharea is visible)	= AsProject and (.searcharea is visible) 

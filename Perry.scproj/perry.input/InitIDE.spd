@@ -192,7 +192,11 @@ extend PerryIDE
 			.ID				= "ASMView"
 			.size 			= the~area
 			is NoSearch
-			.GNormal.solid =  LeftBG
+			.AttachedFrom = ~MoveCode.Left
+			.GNormal.inside =  LeftBG
+			.GNormal.Edge = self.asmstretch.Divider.GNormal.Edge
+			.GNormal.Edge.a = (0.05*255.0)|int|
+			
 			.OnKeyDown = ASMViewKeys
 		.ASMVis = false
 
@@ -307,7 +311,7 @@ extend PerryIDE
 		
 		with .debugger 
 			is enabled
-			.div.DefaultFraction = 0.25
+			.divider.DefaultFraction = 0.25
 			.tooltip		= "Debugger Area"
 			.takesfocus 	= takesfocusflag.CanFocus
 			.ID				= "DebuggerArea"
@@ -440,7 +444,7 @@ extend PerryIDE
 			.addleft  self.FileList
 			.addleft  self.UnNeededLabel
 		
-		with .filesep.div
+		with .filesep.divider
 			.onhide = FileSepClicker
 			.onshow = FileSepClicker
 			.onstretch = HideSomeStuffOnResize
@@ -448,7 +452,7 @@ extend PerryIDE
 		with .ProductSep
 			is enabled
 			.size = the~area
-			.div.defaultFraction = 0.125
+			.divider.defaultFraction = 0.125
 			.ID	= "edit+stdout"
 			.AddLow  self.CompileArea
 			.addhigh self.rborder
@@ -459,7 +463,7 @@ extend PerryIDE
 		with .ASMStretch
 			.id = "ASMStretch"
 			.size = the~width by the~bottom to 15~down
-			.div.defaultFraction = 0.7
+			.divider.defaultFraction = 0.7
 			.AddRight(self.asmview)
 	
 		.JeeboxText.SetupOut("Jeebox")

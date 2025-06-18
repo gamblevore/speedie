@@ -440,10 +440,13 @@ function PerryIDE.FuncText (|message| spd_func, |message|)
 	Last.msg(@sstr, .editme[oop])
 
 
-function PerryIDE.BuildCmd (|string| cmd,  |message| where,  |string| name,  |string| reason, |message|)
-	rz = .BuildCmdSub(cmd,  where,  name,  reason)
-	if !rz.CommandIsOK
-		rz = nil
+function message.IsDeclName (|bool|)
+	opt norefcounts
+	|| p = .parent!
+	if (p == @decl)
+		return p.second == self
+	if (p == @rel) and (p in @decl)
+		return .isfirst
 
 
 function message.CommandIsOK (|bool|)
@@ -453,8 +456,24 @@ function message.CommandIsOK (|bool|)
 		return false
 	return true
 	
+
+function PerryIDE.BuildCmd (|string| cmd,  |message| where,  |string| name,  |string| reason, |message|)
+	if (where == @thg) and Where.IsDeclName
+		if !where.OwningFunc
+			return .BuildDeclCommand(cmd,  where,  name,  reason)
 	
-function PerryIDE.BuildCmdSub (|string| cmd,  |message| where,  |string| name,  |string| reason,  |message|)
+	rz = .BuildNormalCommand(cmd,  where,  name,  reason)
+	if !rz.CommandIsOK
+		rz = nil
+
+
+function PerryIDE.BuildDeclCommand (|string| cmd,  |message| where,  |string| name,  |string| reason,  |message|)
+	ignore
+		global "/usr/local/speedie/Perry.scproj/perry.input/IDE.spd" 15814 17
+	debugger  // do some shit
+
+
+function PerryIDE.BuildNormalCommand (|string| cmd,  |message| where,  |string| name,  |string| reason,  |message|)
 	|| spd_func = where.OwningFunc
 	if spd_func == where
 		|| thg = where.first

@@ -6,20 +6,28 @@ function PerryIDE.MaybeSendMessage (|string| cmd,  |message| where,  |string| na
 	.SectionKeyTime = nil
 	if (fn == @name) and cmd[0, "autocomplete"]
 		return nil
-	if (fn == @thg) and (where in @decl) and !where.isfirst
-		return nil
-	.SetAutoPoint(where.Position)
 	|| isString = fn.IsString
 		if where.ShouldDisplayString
 			ifn cmd starts "autocomplete_sel"
+				.SetAutoPoint(where.Position)
 				return .DisplayStr(where)
 
-	if fn == @char or @num
+	if (fn == @char or @num) or fn.isstring
 		.PopupHide
 		return nil
 
-	if !fn.isstring		
-		return .SendFeedbackRequest(cmd, where, name, reason)
+	.SetAutoPoint(where.Position)
+	return .SendFeedbackRequest(cmd, where, name, reason)
+
+
+function PerryIDE.SendFeedbackRequest (|string| cmd,  |message| where,  |string| name,  |string| reason, |date|)
+	|| msg = .BuildCmd(cmd, where, name, reason)		#require
+
+	|| CmdStr = msg.RenderJbin
+	if .CanSend(Cmdstr)
+		rz = .SendFeedbackMsg(msg)
+	.LastCmdStr = CmdStr
+	.LastSendTime = rz
 
 
 function message.ShouldDisplayString (|bool|)
@@ -35,16 +43,6 @@ function PerryIDE.CanSend (|string| cmd, |bool|)
 		return true
 	if !.LastSendTime or .LastSendTime.ago > 0.66s
 		return true
-
-
-function PerryIDE.SendFeedbackRequest (|string| cmd,  |message| where,  |string| name,  |string| reason, |date|)
-	|| msg = .BuildCmd(cmd, where, name, reason)		#require
-
-	|| CmdStr = msg.RenderJbin
-	if .CanSend(Cmdstr)
-		rz = .SendFeedbackMsg(msg)
-	.LastCmdStr = CmdStr
-	.LastSendTime = rz
 
 
 function PerryIDE.SendFeedbackStr (|string| op)
