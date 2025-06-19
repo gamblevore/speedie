@@ -455,7 +455,7 @@ function message.CommandIsOK (|bool|)
 	if (self == "display") and (self == 1) and (.first == "")
 		return false
 	return true
-	
+
 
 function PerryIDE.BuildCmd (|string| cmd,  |message| where,  |string| name,  |string| reason, |message|)
 	if (where == @thg) and Where.IsDeclName
