@@ -30,8 +30,8 @@ datatype ASMReg (uint64)
 		ConstRequest
 		CondRequest
 		CondAnswer
-		DeclareInlineParam
-		InlinedAccess
+//		PassInnerParam
+		InnerParam
 		AlwaysSet = Textual  // reuse const
 		Exit = [ExitFunction, ExitAtAll]
 		RealConst  = [ConstInput, ConstOutput]
@@ -207,29 +207,6 @@ datatype ASMReg (uint64)
 		return (self|uint64| >> 11)&31
 	
 	function Reg (assigns:|int|, |AsmReg|)
-		// whats going on with the numbers?
-		// lets see how it works.
-		// OK... so basically... a datatype code can be up to 1023.
-		// so that leaves 1024 free.
-		// 1 << 10 is 1024. so thats OK. We can use it, rigght?
-		// so where am i going wrong here?
-		// its something really basic.
-
-		// follow it through. if you can. you know you can tho.
-		// im sooo tired. more than I believe.
-		
-		// strange. how did it ever work?
-		// oh nevermind. I removed one and added one. so it should stay the same.
-		// i really am too tired!
-		
-		// ;_;
-		
-		// perhaps i'm doing the graphics switch over too soon.
-		// like i haven't even begun. And im already feeling like
-		// I don't wanna step through this stuff.
-		
-		// once graphics is there, we can just play. not step through lines of logic.
-		
 		|| n = value&31
 		self &= ~(31 << 11)|asmreg|
 		(self as= (N << 11)|asmreg|)
@@ -239,7 +216,7 @@ datatype ASMReg (uint64)
 	
 	operator mul (|bool| b, |asmreg|)
 		return (self, nil)(b)
-	
+			
 	syntax cast (|int|)
 		cpp_part ToInt
 		return .reg

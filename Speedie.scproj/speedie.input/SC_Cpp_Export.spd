@@ -114,12 +114,11 @@ function FuncStart (|FastStringCpp| fs, |scfunction| f, |string| funcheader)
 
 
 function CanExportFunc (|SCFunction| F, |bool|)
-	// (.MyReacher) or .isapi
 	require (f.MyReacher or f is api)
 	require (f isnt disabled)
 	if f Isnt ExternalLib
 		require (f Isnt Wrapper) and !f.isMacro
-	return f isnt NewStruct  and  f isnt alreadyexported
+	return f isnt NewStruct  and  f isnt AlreadyExported
 
 
 function FuncHeader (|SCFunction| F, |string|)

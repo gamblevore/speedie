@@ -76,16 +76,15 @@ linkage
 |nilstate|				NilSelf
 |byte|					ReturnedVars
 |Byte|					MinOpt
-//|byte|					BareStructs
 |Byte|					IsAssigns
 |byte|					IsCppInBuilt
 |byte|					CantBeInlined
-|errorseverity|			BlindCasts
+|ErrorSeverity|			BlindCasts
 |byte|					IsNilChecker
 |byte| 					Badness
 |byte|					StructReturnPos
 |byte| 					OptCounts
-|byte|					IntPrmCount
+//|byte|					IntPrmCount
 |uint16|				µStart
 |uint16|				µLength
 
@@ -93,7 +92,6 @@ linkage
 
 constructor (|Message?| msg = nil)
 	Super.Constructor( msg )
-	//.tableid = 0xffff
 	.linkto = nil
 	if (msg)
 		Compiler.stFuncs++
@@ -751,7 +749,7 @@ function CollectReturnAsReal (|bool|)
 
 function AddTypeInfo (|scdecl| dcl)
 	if dcl.IntRegs
-		.IntPrmCount += dcl isnt return
+		0//.IntPrmCount += dcl isnt return
 	  elseif dcl is Return
 		is ReturnASMFloats
 

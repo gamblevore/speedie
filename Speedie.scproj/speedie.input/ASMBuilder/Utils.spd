@@ -126,10 +126,16 @@ function SCFunction.RealReturnType (|scdecl|)
 
 datatype VarUseMode (int)
 	Flags
-		Return
-		Set						// unused so far
+		AllowInline
+//		AllowPreAlter
+		ReturnAble
+		SetAble
+		InlineRequest = AllowInline
+		Return = ReturnAble
+		Set = SetAble
 		ExistingVar
-		Sometimes
-	syntax is (|varusemode| v, |bool|)
+		Sometimes			// unused so far.
+	
+	syntax is (|VarUseMode| v, |bool|)
 		return self&v
 

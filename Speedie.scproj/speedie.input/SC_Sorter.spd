@@ -47,8 +47,8 @@ function SCFunction.FindDepths (|int|)
 	// Orders the functions in terms of which ones need others.
 	// So we can process leaf functions first. Maybe easier to optimise
 
-	if .LinkDepth
-		return .LinkDepth
+	|| L = .LinkDepth
+		return L
 	
 	rz = 1
 	for f in .LinkTo

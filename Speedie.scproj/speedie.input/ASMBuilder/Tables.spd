@@ -349,7 +349,7 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 
 	|| base = .µGetASM(f)									// x = a.b[0]
 	|| sc = exp.Second.first!
-	if base is InlinedAccess
+	if base is InnerParam
 		check (sc.iszero) (exp, "Attempt to modify register, goes out of bounds")
 		// in fact, this is invalid in C++ too, but we might not catch it.
 		// would be nice if marked the SCDecl itself as being used weirdly.
@@ -464,14 +464,11 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 		if "InlineParam".trap
 		|| T = .ThgASM(d)
 		if dest isnt AddrNeed
-			if d is InlinedASMVar
-				(t is InlinedAccess)
+			if d is ASMInnerParam
+				(t is InnerParam)
 			return T
 			// inlined params can set a param to reg0. so... we should mark this as a const, right?
 			
-		if dest is DeclareInlineParam		// &A
-			(t is InlinedAccess)
-			return T
 		if d.IsBareStruct					// it already has the address
 			return T.haveaddr
 		return GrabAddr(self, exp, dest, d, T)
@@ -506,7 +503,7 @@ function DoGlobal (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| D, 
 
 function AddressOf (fn_asm)
 	rz = .µGetASM(exp, dest as asmreg.addrneed)
-	if (rz is ContainsAddr or InlinedAccess)
+	if (rz is ContainsAddr or InnerParam)
 		return rz &~ asmreg.ContainsAddr
 	error (exp, "ASM fail")
 	.µGetASM(exp, dest as asmreg.addrneed)
@@ -669,23 +666,47 @@ function message.ASMUnbra (|message|)
 	return self
 
 
+function ExistingThg (|message| m, |VarUseMode| Mode, |scdecl| d, |asmreg|)
+	require d is local
+	if mode is Return
+		.fn.TrackReturns(d)
+	return .ThgASM(d)
+
+
+function ExistingBrel (|message| m, |VarUseMode| Mode, |asmreg|)
+	opt norefcounts
+	require mode is AllowInline
+	require m.name[] == '&'						// &(y)
+
+	|| ch = m.first!.unbra						// y
+	require ch == @thg
+
+	|| d = ch.ASMDecl
+	|| pp = .ExistingThg(ch, mode, d)
+		(d is ASMInnerParam)
+		(pp is innerparam)
+		return pp
+
+
 function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
 	opt	norefcounts
-	real self
+
 	m = m.ASMUnbra
-	|| fn = m.func 
+	|| fn = m.Func
+
+	if (fn == @brel)
+		return .ExistingBrel(m, mode)
+	
 	require fn == @thg or @num
 	
 	|| d = m.ASMDecl
 	if fn == @thg
-		require d is local
-		if mode is Return
-			.fn.TrackReturns(d)
-		return .ThgASM(d)
-	
+		return .ExistingThg(m, mode, D)
+
 	|| H = .MegaNumFinder(d.ExportPosition, d.datatype)
 		return H
-	if (d is const) and !d.exportposition
+
+	if (d is const) and !d.ExportPosition
 		return .NumToReg(m, 0, asmreg(), d.DataType)
 
 
@@ -751,9 +772,13 @@ function ASMReg.ConstEnough (|bool|)
 
 
 function ThgASM (|scdecl| d, |asmreg|)
+	|| DP = d is param
+	|| IA = d is ASMInnerParam
+		d = d.internal!
 	|| T = d.WholeType as ASMReg.FromExistingVar
+	(t is param) = DP
+	(t is InnerParam) = IA
 
-	(t is param) = (d is param) // unused?
 	if  d isnt AlteredInBranch
 		(t is CanHoist)
 		|| fi = d.FatConstIndex

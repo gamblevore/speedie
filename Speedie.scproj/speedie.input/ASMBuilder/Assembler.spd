@@ -83,10 +83,9 @@ struct Assembler
 	function AddFuncParams (|SCFunction| fn)
 		opt NoRefCounts
 		for a in fn.Args
-			(a is param)
-			(a isnt InlinedASMVar)
 			// reset.
-			// what about (a isnt body?)
+			(a is param)
+			(a isnt body)
 			.DeclareMe(a.source, a)
 	
 	
@@ -662,10 +661,10 @@ struct Assembler
 	function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatrange| LL, |asmreg|)
 		opt norefcounts
 		LL.Start = .curr
-		.InlineParameters(prms)
+		|| POld = .InlineParameters(prms, fn.LinkDepth==1)
 		|| RealStart = .curr		// Params need to be done anyhow... so don't count them.
 		.GenASMSub(fn)
-		.RestoreParameters
+		.RestoreParameters(POld)
 		ll.after = .curr
 		|| Result = .InlineFinishWithConsts(ll)
 		|| Grown = .CurrGain(RealStart)
@@ -675,33 +674,30 @@ struct Assembler
 			return Result
 	
 	
-	function UpdateInlineReg (|message| prms, |asmreg| V, |scdecl| a, |asmreg|)
+	function UpdateInlineReg (|message| prms, |asmreg| V, |scdecl| D, |asmreg|)
 		if "InlineParam".trap
-		|| T = a.wholetype
-		if v is inlinedaccess
-			(a is InlinedASMVar)
+		(D is param) = (v is param)
+		(D is body) = (v isnt param)
 
-// should be local either way...
-// perhaps this isnt needed? shouldn't be... right?
-// try delete these 2 lines!		
-
-		(a is param) = (v is param)
-		(a is body) = (v isnt param)
+		|| T = D.WholeType
+		if v is InnerParam
+			(D is ASMInnerParam)
+			T = D.Internal!.WholeType
 
 		if v.isbig != t.isbig
 		// what about &locals being inlined?
-/			|| D = .temptyped(prms, t.µtype|asmreg|)
-			v = ASMType.TypeCastSub(self, prms, D, v)			// convert.
+/			|| tmp = .temptyped(prms, t.µtype|asmreg|)
+			v = ASMType.TypeCastSub(self, prms, tmp, v)			// convert.
 		  else
 			v = v.µtype(T.µtype)								// erase minor differences				
 
 		v.tmpcheck
-		a.wholetype = v // update reg!
+		D.wholetype = v // update reg!
 		
 		return v
+
 	
-	
-	function InlineParameters (|message| prms)
+	function InlineParameters (|message| prms, |bool| IsLeaf, |uint64|)
 		opt norefcounts
 		|| p = prms.first!
 		
@@ -710,41 +706,49 @@ struct Assembler
 			// depends? like if it comes from a read, its already correct.
 			// our system assumes 32/64 bit correctness.
 			// So... passing 32 to a 64 isnt correct, but otherwise it should be?
-			
-		for a in .fn.Args
-			(A isnt InlinedASMVar)
-			|| v = .ExistingVar(p)
+		
+		
+		for (a in .fn.Args) (i)
+			rz |= a.CollectForRestoreASM << (i<<3)
+			|| v = .ExistingVar(p, VarUseMode.InlineRequest)
 			if v and .CanReuseParam(prms, a, v)
 				0 //
-			  elseif a is altered
-				v = .DeclareMe(a.source, a)
-				v = v as asmreg.declareinlineparam
-				v = .µinto(p, v)
+			  elseif IsLeaf and (a isnt altered)
+				v = .µgetasm(p, v)		// then we don't care if its a temp
 			  else
-				// this has an issue.
-				// if this expr returns a temp... (like x++)...
-				// and the inlined func calls another func...
-				// that temp will be lost. but we might still expect it to exist
-				// Solutions?
-					// * use .µinto (as above)
-					// * check if any subfuncs are called (.reached)
-				
-				v = v as asmreg.declareinlineparam
-				v = .µgetasm(p, v)
-			
+				v = .DeclareMe(a.source, a)
+				v = .µinto(p, v)
 			
 			v = .UpdateInlineReg(prms, V, a)
 			.MarkDeclAsConst(a, V, nil)
 			p = p.next!
 	
 
-	function RestoreParameters
+	function RestoreParameters (|uint64| Old)
 		opt norefcounts
 		for a.backwards in .fn.Args
+			a.RestoreASM(old)
+			old >>= 8
 			.MarkDeclAsConst(a, nil, nil) // parameters can never be const anyhow
 			a.fatconstindex = 0
-			a.paramfix
+			
+	
+	function scdecl.CollectForRestoreASM (|uint64|)
+		rz |= self is ASMInnerParam
+		rz |= (self is param) << 1
+		is param
+		isnt body
+		isnt asminnerparam
+	
 
+	function scdecl.RestoreASM (|uint64| PP)
+		(self is ASMInnerParam) = PP & 1
+		(self is param) = PP&2
+		(self isnt body) = PP&2
+
+
+	function scdecl.ASMReg (assigns:|uint|)
+		.WholeType = .WholeType.Reg(value)
 	
 	function CurrGain (|&fatasm| Start, |int|)
 		|| C = .curr

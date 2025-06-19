@@ -56,6 +56,7 @@ datatype SCDeclInfo (uint)
 		UpgradeableContained
 		TypeImprove
 		UsedByCode
+		AddressOfTaken
 		API
 		ClassObj
 		CompilerCreated
@@ -78,7 +79,7 @@ datatype SCDeclInfo (uint)
 		ReturnedStruct
 		VarThatGotReturned
 		IntendedAsReturn
-		InlinedASMVar
+		ASMInnerParam
 		VarType			= Param ||| Body ||| Global ||| Property
 		Local			= Body ||| Param
 		SelfImplicit	= Self ||| local // local is set by CollectOneParam, anyhow?

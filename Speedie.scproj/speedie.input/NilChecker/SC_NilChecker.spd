@@ -614,6 +614,8 @@ function Brel (Niltrackerfn)
 	if b == '!'
 		return .Not(ch, test)
 	
+	if b == '&'
+		(ch.FastDecl is AddressOfTaken)
 	.Jump(ch, test)
 	return nilstate.real						// & ~ both return real
 
