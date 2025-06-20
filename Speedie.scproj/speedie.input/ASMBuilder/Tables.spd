@@ -465,7 +465,7 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 		|| T = .ThgASM(d)
 		if dest isnt AddrNeed
 			if d is ASMInnerParam
-				(t is InnerParam)
+/				(t is InnerParam)
 			return T
 			// inlined params can set a param to reg0. so... we should mark this as a const, right?
 			
@@ -684,7 +684,7 @@ function ExistingBrel (|message| m, |VarUseMode| Mode, |asmreg|)
 	|| d = ch.ASMDecl
 	|| pp = .ExistingThg(ch, mode, d)
 		(d is ASMInnerParam)
-		(pp is innerparam)
+/		(pp is innerparam)
 		return pp
 
 
@@ -772,9 +772,10 @@ function ASMReg.ConstEnough (|bool|)
 
 
 function ThgASM (|scdecl| d, |asmreg|)
+	opt norefcounts
 	|| DP = d is param
 	|| IA = d is ASMInnerParam
-		d = d.internal!
+/		d = d.internal!
 	|| T = d.WholeType as ASMReg.FromExistingVar
 	(t is param) = DP
 	(t is InnerParam) = IA
@@ -789,7 +790,7 @@ function ThgASM (|scdecl| d, |asmreg|)
 	
 	|| rr = T.reg
 		|| Ret = .State.Return
-		if rr and rr == ret.reg
+		if rr == ret.reg
 			(T is temp = ret is temp)
 	
 	return T

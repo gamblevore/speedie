@@ -330,7 +330,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			// if trap == 2444
+			if trap == 575
 				
 		  else
 			opt inline
@@ -676,24 +676,22 @@ struct Assembler
 	
 	function UpdateInlineReg (|message| prms, |asmreg| V, |scdecl| D, |asmreg|)
 		if "InlineParam".trap
-		(D is param) = (v is param)
-		(D is body) = (v isnt param)
+		|| VP = (v is param)
+		(D is param) = VP
+		(D is body) = !VP
+		// we only ever restore D. So the reg should be on D?	// AAARGH.
 
 		|| T = D.WholeType
 		if v is InnerParam
-			(D is ASMInnerParam)
+/			(D is ASMInnerParam)
 			T = D.Internal!.WholeType
 
-		if v.isbig != t.isbig
-		// what about &locals being inlined?
-/			|| tmp = .temptyped(prms, t.µtype|asmreg|)
-			v = ASMType.TypeCastSub(self, prms, tmp, v)			// convert.
-		  else
-			v = v.µtype(T.µtype)								// erase minor differences				
-
-		v.tmpcheck
-		D.wholetype = v // update reg!
+		if v.isbig != t.isbig									// What about &locals being inlined?
+/			|| tmp = .TempTyped(prms, t.µType|asmreg|)
+			v = ASMType.TypeCastSub(self, prms, tmp, v)			// Convert.
 		
+		v.tmpcheck
+		D.AsmReg = v										// update reg!
 		return v
 
 	
@@ -736,6 +734,7 @@ struct Assembler
 	function scdecl.CollectForRestoreASM (|uint64|)
 		rz |= self is ASMInnerParam
 		rz |= (self is param) << 1
+		rz |= .wholetype.reg << 2
 		is param
 		isnt body
 		isnt asminnerparam
@@ -745,10 +744,8 @@ struct Assembler
 		(self is ASMInnerParam) = PP & 1
 		(self is param) = PP&2
 		(self isnt body) = PP&2
-
-
-	function scdecl.ASMReg (assigns:|uint|)
-		.WholeType = .WholeType.Reg(value)
+		.wholetype = .wholetype.reg((PP>>2)&31)
+	
 	
 	function CurrGain (|&fatasm| Start, |int|)
 		|| C = .curr

@@ -14,8 +14,8 @@ datatype ASMReg (uint64)
 		|asmreg|
 		Temp = 1024 // sigh.
 		(1<<16)		// starting point
-		Negate      // dont put anything before we test for (x << 16)
-		Param
+		Negate
+		Param				// Remove? Surely params simply are regs <= the orig?
 		FromExistingVar
 		FromZeroMemory
 		AlreadyNegated
@@ -30,7 +30,6 @@ datatype ASMReg (uint64)
 		ConstRequest
 		CondRequest
 		CondAnswer
-//		PassInnerParam
 		InnerParam
 		AlwaysSet = Textual  // reuse const
 		Exit = [ExitFunction, ExitAtAll]
@@ -213,6 +212,11 @@ datatype ASMReg (uint64)
 		(self is temp) = (value >> 31)
 		target debug: if .reg != N // what?
 		return self
+
+	function SCDecl.ASMReg (assigns:|asmreg|)
+		value.µType = .DataType
+		.datatype = value|datatypecode|
+		.WholeType.tmpcheck
 	
 	operator mul (|bool| b, |asmreg|)
 		return (self, nil)(b)
