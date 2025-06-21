@@ -90,8 +90,6 @@ void JB_CrashHandler (int Sig) {
 	if (AlreadyCrashed)
 		return;
 	AlreadyCrashed = true;
-//	printf("Signal %i %s\n", Sig, strsignal(Sig));
-
 						// Some unixes/shells can do this?
 	if (Sig <= 0)
 		return;

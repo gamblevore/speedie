@@ -484,9 +484,7 @@ static int InterPipe(FastString* self, int Desired, int fd, int Mode) {
 }
 
 
-bool JB_Rec__CrashLogSub(const char* c) {
-	if (!c) return false;
-
+static bool CrashLogSub(const char* c) {
 	if (!CrashLogFile) {
 		mkdir("/tmp/logs", kDefaultMode);
 		int flags = O_RDWR | O_CREAT | O_TRUNC;
@@ -503,8 +501,9 @@ bool JB_Rec__CrashLogSub(const char* c) {
     return true;
 }
 
+
 void JB_Rec__CrashLog(const char* c) {
-	if (JB_Rec__CrashLogSub(c))
+	if (c and CrashLogSub(c))
 		JB_Write( CrashLogFile, (u8*)"\n", 1 );
 	fputc('\n', stderr);
 }
@@ -608,13 +607,6 @@ static int CaseCompare_(JB_String* self, const char* Resolved, bool Owned) {
 #endif
 }
 
-
-static void LogPut (const char* a) {
-	static int Log = open("/tmp/logs/spd.txt", O_RDWR | O_CREAT | O_TRUNC, 0775);
-	if (Log > 0)
-		write(Log, a, strlen(a));
-		write(Log, "\n", 1);
-}
 
 
 static void CaseTest_(JB_String* self) {

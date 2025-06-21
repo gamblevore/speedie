@@ -133,13 +133,13 @@ module Math
 		elseif (self < -d)
 			return self + d
 		
-	function int.Reduce2 (|int| d, |&int| Zeros, |int|)
-		opt inline
-		if ( self > d )
-			return self - d
-		  elseif (self < -d)
-			return self + d
-		Zeros[0] = Zeros[0] + 1
+//	function int.Reduce2 (|int| d, |&int| Zeros, |int|)
+//		opt inline
+//		if ( self > d )
+//			return self - d
+//		  elseif (self < -d)
+//			return self + d
+//		Zeros[0] = Zeros[0] + 1
 	
 	function uint64.LowestBit (|uint64|)
 		return self & -self 
