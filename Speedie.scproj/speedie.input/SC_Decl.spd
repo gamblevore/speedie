@@ -46,28 +46,35 @@ constants
 
 datatype SCDeclInfo (uint)
 	flags
+		// could look for other exclusive flags
+		// consts can't be borrowed.
+		
 		|SCDeclInfo|
 		Borrowed
 		StayBorrowed
-		DirectNumber						// 7
+		DirectNumber						// Eg: 7, 1, 100
 		Const
 		UnknownConst
 		NumberConst = DirectNumber + Const	// const: x = 7
 		UpgradeableContained
 		TypeImprove
 		UsedByCode
-		AddressOfTaken
 		API
 		ClassObj
 		CompilerCreated
 		PropertyWasConstructed
-		Param
+		
+		///
+		Param // exclusive. Could be... combined
 		Body
 		Property
 		Global
+		///
+		
 		Return
 		Altered
 		AlteredInBranch
+		Reference
 		Task
 		Self
 		ReadFrom
@@ -76,17 +83,18 @@ datatype SCDeclInfo (uint)
 		Grabbed
 		NoRegAddrs
 		PostIncremented
-		ReturnedStruct
 		VarThatGotReturned
+		ReturnedStruct
 		IntendedAsReturn
 		ASMInnerParam
+		
 		VarType			= Param ||| Body ||| Global ||| Property
-		Local			= Body ||| Param
-		SelfImplicit	= Self ||| local // local is set by CollectOneParam, anyhow?
+		Local			= Body  ||| Param
+		SelfImplicit	= Self  ||| local // local is set by CollectOneParam, anyhow?
 		DclCopied		= altered ||| stayborrowed ||| api ||| UpgradeableContained ||| CompilerCreated ||| body ||| return // need more too? do later
 
 	function abc
-		|| x = Body
+		|| x = ASMInnerParam
 	
 	
 	function Set (|SCDeclInfo| d, |bool| b, |SCDeclInfo|)
@@ -899,6 +907,14 @@ class SCDecl (SCObject) {
 		(rz Is Borrowed)
 		if stayborrowed
 			(rz is StayBorrowed)
+
+
+	function MakeReference (|SCDecl|)
+		opt norefcounts
+		//if .refcount > 1
+		self = .copydecl
+		is reference
+		return self
 
 
 	function MakeNewOptional (|SCDecl|)

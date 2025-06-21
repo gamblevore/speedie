@@ -512,7 +512,7 @@ function ImportAll
 	for f in .FuncList
 		f.FuncParamsLoad
 		f.LoadExportName
-		f.CheckOofifier
+		f.StatelessAccumulate
 		require !stderr.TooMany
 	scfunction.currfunc = nil
 
@@ -557,6 +557,7 @@ function ImportAll
 	.Stage( "Creating Exportnames For Function Prototypes" )
 	for f in .FuncList
 		f.BeforeTransform
+//		f.CheckStuff
 	
 	.Stage( "Checking Iterators" )
 	for c in .ClassList
@@ -573,6 +574,18 @@ function ImportAll
 	
 		
 
+//|| Worthless = 0
+
+//function scfunction.CheckStuff
+//	return
+//	require self isnt cpp
+//	// OK now what?
+//	for s in .args
+//		if (s.pointercount > 0) and (!s.type.isstruct) and (s is AlteredInsides)
+//			compiler.worthless++
+//			printline self
+//			exit
+	
 
 function LoadSuperClasses
 	opt norefcounts

@@ -1,0 +1,24 @@
+
+
+// We need to make references work. Lets put up some examples... and see how they should work
+
+function ReferenceReal (|int$| B)
+	B++
+	B = 5
+
+
+function ReferenceBad (|&int| Bad)
+
+
+function ReferenceTests (|int$| D, |&int| C)
+	visible
+	|| x = 0
+	ReferenceReal(C)	
+	ReferenceReal(1)
+	ReferenceReal(D)
+	ReferenceReal(x)
+	ReferenceBad(D) // should be banned
+	
+	// We also need to block passing references to pointers. Anything else?
+	// We pass pointers too? Now what?
+

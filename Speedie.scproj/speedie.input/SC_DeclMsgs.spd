@@ -86,14 +86,15 @@ function SCFunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 	for item in prms
 		item.CollectOneParam(self, AddToSpace, cls)
 
-	|| ns = .nilself
+	|| ns = .NilSelf
 		.WantAs(ns)
 
-	|| r = .returntype
-		if r.isbarestruct
+	|| r = .ReturnType
+		if r.IsBareStruct
 			(r is ReturnedStruct)
 		if self is HidesProperties
-			.ReturnType = r.makereal			
+			.ReturnType = r.makereal
+		check (r isnt Reference) (r.source, "No references as return values")
 
 
 function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cls, |bool|)

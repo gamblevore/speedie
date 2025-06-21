@@ -330,7 +330,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			if trap == 575
+			// if trap == 575
 				
 		  else
 			opt inline
@@ -737,7 +737,7 @@ struct Assembler
 		rz |= .wholetype.reg << 2
 		is param
 		isnt body
-		isnt asminnerparam
+		isnt ASMInnerParam
 	
 
 	function scdecl.RestoreASM (|uint64| PP)

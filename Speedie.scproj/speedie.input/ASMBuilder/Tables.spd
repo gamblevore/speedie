@@ -683,7 +683,6 @@ function ExistingBrel (|message| m, |VarUseMode| Mode, |asmreg|)
 
 	|| d = ch.ASMDecl
 	|| pp = .ExistingThg(ch, mode, d)
-		(d is ASMInnerParam)
 /		(pp is innerparam)
 		return pp
 
@@ -773,14 +772,23 @@ function ASMReg.ConstEnough (|bool|)
 
 function ThgASM (|scdecl| d, |asmreg|)
 	opt norefcounts
-	|| DP = d is param
-	|| IA = d is ASMInnerParam
-/		d = d.internal!
 	|| T = d.WholeType as ASMReg.FromExistingVar
+	|| DP = d is param
 	(t is param) = DP
-	(t is InnerParam) = IA
+	
+	|| IA = d is ASMInnerParam
+		(t is InnerParam)
+/		d = d.internal!
+		t.µtype = d.datatype
 
 	if  d isnt AlteredInBranch
+	/*
+		func(3)
+		function func (|int| x)
+			.glob = x+1
+	
+	*/
+	
 		(t is CanHoist)
 		|| fi = d.FatConstIndex
 			|| f = fi|uint|.fat

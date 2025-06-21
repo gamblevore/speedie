@@ -21,7 +21,7 @@ datatype ClassInfo (int)
 		HasNilChecker
 		DefaultsToReal
 		IsRole
-		ClassObj
+//		ClassObj
 		IsTask
 		Stateless
 		Stateful

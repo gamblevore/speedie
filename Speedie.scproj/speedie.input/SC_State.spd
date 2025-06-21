@@ -1,6 +1,6 @@
 
 
-function SCFunction.CheckOofifier
+function SCFunction.StatelessAccumulate
 	opt norefcounts
 	require self is cpp
 	|| c = .cls

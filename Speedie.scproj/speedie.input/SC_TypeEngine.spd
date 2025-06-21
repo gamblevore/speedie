@@ -217,7 +217,7 @@ function TypeOfBRel (ExprResolver)
 	if n == '-' and name == 1 // minus
 		expect (SubType.IsNearlyNormalNumber or SubType.isbool) (exp, "Expected a number.") 
 		Return SubType
-		
+	
 	if n == '&'
 		if Subtype.type.funcproto
 			return TypeOfFuncPointer(F, name_space, side)
@@ -509,6 +509,7 @@ function scdecl.ExtractAmountSub (|Message| Prms, |scdecl|)
 
 function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |int| Depth=0, |SCDecl?|)
 	// a bit recursive!
+	if "AlteredInsides".trap
 	|| f = c.func
 	if (f == @Thg)		// usual case
 		if c == "nil" // nice
@@ -536,7 +537,7 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 		|| p = c.UpToType    // abc|()--|
 			return typeofexpr(p.first, name_space)				
 			
-	if (c == @Acc)		// |Byte[10]| TenBytes
+	if (c == @acc)		// |Byte[10]| TenBytes
 		|| Prms = c.second
 		if prms.HasAny
 			|| R = ExtractDecl( c.first!, name_space, purpose, depth )			#require
@@ -554,16 +555,18 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 		|| R = ExtractDecl( c.first!, name_space, purpose, depth )				#require
 		return R.RefineDecl(c.last)
 	
-	if (f == @Arel or @brel)
+	if (f == @arel or @brel)
 		|| R = ExtractDecl( c.first!, name_space, purpose, depth )				#require
 		if C == "~"
 			return R.MakeDataObject(name_space, purpose)
-		if (C == "&")											// pointer
+		if (C == "&" and f == @brel)							// pointer
 			return r.GetAddress(purpose)
+		if (C == "$" and f == @arel)
+			return r.MakeReference
 		if (C == "?")
 			return R.MakeNewOptional
 		if (C == "!")
-			if R.StatedReal and c isnt inserted
+			if R.StatedReal and (c isnt inserted)
 				problem (c, "Already assumed real. Only '?' needs to be specified.")
 			return R.MakeNewReal
 		if (C == "--")
@@ -583,9 +586,9 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 		
 
 	rz = SCDecl(TypeVoid_!)
-	|| ErrCount = stderr.errorCount
+	|| ErrCount = stderr.ErrorCount
 
-	if (f == @Arr)
+	if (f == @arr)
 		|| ch = c.first
 		if !ch													// |[]|
 			Return TypeArray!.TypeNormal
@@ -607,7 +610,6 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 		
 	  elseif (ErrCount == StdErr.errorCount)
 		error ( c ) // no spam
-	
 
 	rz.MakeContainedObject(c)	
 	if (ErrCount != StdErr.errorCount)
