@@ -172,10 +172,11 @@ class Document (list)
 	function FindKeepDate (|string| t,  |file| f,  |bool|)
 		require .CompareTreesOnSave
 		|| old = f.ReadAll
-			|error| err
-			|| jold = old.ParseWithError(&err)
+			|| jold = old.Parse
 				|| tp = t.parse
-					rz = jold.deepequals(tp)  
+					rz = jold.deepequals(tp)
+			  else
+				stderr.pop
 
 	
 	helper SimpleUpdateFromDisk (|bool|)

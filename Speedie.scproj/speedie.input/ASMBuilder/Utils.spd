@@ -41,7 +41,7 @@ target debug
 
 
 
-function Assembler.CloseOneVar (|message?| exp, |int| OriginalDecls, |&bool| DoMore,   |message?|)
+function Assembler.CloseOneVar (|message?| exp, |int| OriginalDecls, |$bool| DoMore,   |message?|)
 	opt norefcounts
 	
 										  /// READ TABLE ///
@@ -60,7 +60,7 @@ function Assembler.CloseOneVar (|message?| exp, |int| OriginalDecls, |&bool| DoM
 			.Nop(k) 
 		  else
 			if (k isa asm.gtab) and (v == OriginalDecls + 1) // this happens to be the first gtab and it is used.
-				DoMore[] = false
+				DoMore = false
 				return nil // keep it
 			k.µRefCount-- // restore :)
 		.KnownValues[v] = nil

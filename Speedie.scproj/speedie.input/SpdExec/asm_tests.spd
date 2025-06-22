@@ -19,9 +19,9 @@ function Swap
 
 function Grab
 	|| b = '1'
-	.grab2(&b)
+	.grab2(b)
 	
-function grab2 (|?&byte| b, |int|)
+function grab2 (|$byte| b, |int|)
 	|| fs = FastString()
 	fs <~ ":"
 	|| x = asm_test_obj()

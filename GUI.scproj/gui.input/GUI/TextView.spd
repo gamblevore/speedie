@@ -1420,13 +1420,12 @@ class TextView (GUIControl)
 
 
 	helper ValidateNewText (|message|)
-		|error| ParseErr 
-		|| msg = .text.ParseWithError(ParseErr)
+		|| msg = .text.Parse
 			msg.obj = .path
 			if .MyError is parse
 				.MyError = nil
 		  elseif .expectsparse >= currentlyjeebox
-			.myerror = ParseErr
+			.myerror = StdErr.pop
 
 		|| v = ._Viewing
 			v.ShouldntSave = false

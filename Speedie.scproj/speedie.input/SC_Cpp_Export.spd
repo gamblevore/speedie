@@ -1090,7 +1090,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		|| fn = ch1.obj|scfunction|
 		|| PostBracket = false
 		
-		if (fn isa SCFunction) and !fn.prototype   // easy
+		if (fn isa SCFunction) and !fn.prototype							// easy
 			if Fn.ReturnType and (.Parent != @arg)
 				PostBracket = C_OneParamType(fs, self, .BraDeclFind)
 
@@ -1480,16 +1480,24 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function C_ParamsRender (|message| self,  |FastStringCpp| fs)
 		opt norefcounts
-		// assume we are an LST
 		fs <~ '('
-		for (item in self)
+		|| fn = .obj as SCFunction
+		|| args = fn.args?
+		if fn isnt cpp
+			args = nil
+		|| i = 0
+		for (item.fast in self)
 			fs <~ ", "
 			start
+			|| dest = args[i]
+			if dest is reference
+				fs <~ "&"
 			|| ty2 = item.obj|scdecl|
 			|| CloseStr = cpp_export.CDotType( self, ty2, fs, false ) // what about setting this like a = b. should be done at the dot/thg level?
 				
 			item.Export( fs )
 			fs <~ CloseStr
+			i++
 		fs <~ ')'
 	
 

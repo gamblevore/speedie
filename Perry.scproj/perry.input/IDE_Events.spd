@@ -305,12 +305,11 @@ function PerryIDE.UpdateJeeboxField (|bool|)
 	if !sr.width
 		txt = e.FindDrawInfo(sr.x).text
 	
-	|error| Err
 	|| str = ""
-	|| msg = txt.ParseWithError(Err)
+	|| msg = txt.Parse
 		str = msg.RenderAST(0)
 	  else
-		str = Err!.render
+		str = stderr.pop!.render
 	.ShowText(.JeeboxText, str, true)	// OK... so... what about resel from drag?
 	
 	return true

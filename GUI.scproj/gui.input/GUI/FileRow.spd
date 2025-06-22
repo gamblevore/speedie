@@ -130,8 +130,8 @@ class FileRow (ListViewRow)
 		.addfilesub(f,  o.excludes,  o.folfile,  Count)
 
 
-	helper AddFileSub (|file| f, |dictionary?| excl, |string| folfile, |&int| Count, |bool|)
-		|| C = (Count[])--
+	helper AddFileSub (|file| f, |dictionary?| excl, |string| folfile, |$int| Count, |bool|)
+		|| C = Count--
 		require C > 0
 		|| r = filerow(f.path, f.name)
 		self <~ r
@@ -176,7 +176,7 @@ class FileRow (ListViewRow)
 		.filesort
 
 
-	function FillFilesSub (|file| fol, |dictionary?| excl, |string| folfile, |&int| Count)
+	function FillFilesSub (|file| fol, |dictionary?| excl, |string| folfile, |int| Count)
 		.ReloadedAt = fol.modified
 		for f.files in fol // merge these two
 			|| name = f.path.name

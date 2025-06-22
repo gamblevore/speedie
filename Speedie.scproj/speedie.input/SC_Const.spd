@@ -276,35 +276,34 @@ function SCNode.Tran_Const (|SCDecl| D, |SCNode| base)
 
 
 
-function message.ConstIntValueSub (|&int64| v, |bool|)
+function message.ConstIntValueSub (|$int64| v, |bool|)
 	opt norefcounts
 	|| s = self
 	while s == @bra
 		s = s.first!
 	if s == @num
-		v[] = s.int
+		v = s.int
 		return true
 	if (s == @thg) and s.name[0,"syx"]
 		|| find = jeebox._syxdict.valuelower(s.name[3...])
-			v[] = find.id|int64|
-			s.become(@num, v[].render)
+			v = find.id|int64|
+			s.become(@num, v.render)
 			return true
 
 
-function message.ConstIntValue (|SCNode| name_space, |&int64| v, |bool|)
+function message.ConstIntValue (|SCNode| name_space, |$int64| v, |bool|)
 	opt norefcounts
 	if .ConstIntValueSub(v)
 		return true
 
 	|| t = TypeOfExpr(self, name_space)
-		|| d = t.default
-			// error (d is const) (itm, "We need a constant for the index") // not neeeded
-			return d.constintvaluesub(v)
+		|| d = t.Default
+			return d.ConstIntValueSub(v)
 
 
 struct ArgArrayCounter
 	|int|  i
-	|int|  max
+	|int|  Max
 	|bool| IsItem
 	|bool| IsNotItem
 	

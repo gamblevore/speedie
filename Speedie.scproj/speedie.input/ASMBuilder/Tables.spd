@@ -539,7 +539,7 @@ function IncrOnAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 		return IncrSlowOnAddr(self, exp, dest, mode, Addr, Amount, glob)
 	|| bc = dest.µtype.ByteCount.log2
 	|| offset = 0
-	addr = .InlineOffsetOpt(addr, bc, &offset, 6~bits, glob)
+	addr = .InlineOffsetOpt(addr, bc, offset, 6~bits, glob)
 	|| fat = exp.CNTC(Addr, dest, offset >> bc, amount, bc)
 
 	fat.RegInput(0) = addr // the output is also an input!

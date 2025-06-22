@@ -46,13 +46,6 @@ function String.ParseJSON (|Messageroot|)
 	rz.ConvertJSONToJB?
 	
 
-function String.ParseWithError (|!&Error| rec, |MessageRoot|)
-	rz = .parse
-	if !rz
-		|| r = stderr.pop
-		rec[] = r 
-
-
 helper String.IsJbin (|ind|)
 	if  self[] == '#'  and  self[1] == '!' // shebang
 		|| nl = .find('\n')

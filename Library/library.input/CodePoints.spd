@@ -42,7 +42,7 @@ datatype Codepoint (int)
 		  else
 			return self
 	module
-		function UTF8Read ( |&&byte| source, |Codepoint|)
+		function UTF8Read ( |$&byte| source, |Codepoint|)
 			cpp_wrapper JB_u8p_Read
 		
 		function UTF8ByteCount (|&Byte| S, |int| Len, |int| CharCount, |int|)

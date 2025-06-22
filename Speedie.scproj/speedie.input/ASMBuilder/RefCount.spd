@@ -1,19 +1,19 @@
 
 
 extend Assembler
-	function InlineOffsetOpt (|asmreg| base, |int| pow2, |&int| index, |uint| maximum, |scdecl?| Glob, |asmreg|)
+	function InlineOffsetOpt (|asmreg| base, |int| pow2, |$int| index, |uint| maximum, |scdecl?| Glob, |asmreg|)
 		opt norefcounts
 		|| bs = base.fat
 		if bs isa asm.GTAB
-			if (index[])
+			if (index)
 
 			expect (glob)
 			glob = glob.Orig
 			|| lost = glob.ExportPosition - bs.const
 			expect lost >= 0
-			check !(index[] & (pow2)~bits)  (bs.msg, "Unaligned offset.")
+			check !(index & (pow2)~bits)  (bs.msg, "Unaligned offset.")
 
-			|| i = (index[] + lost) << pow2
+			|| i = (index + lost) << pow2
 			i >>= pow2
 
 			if i > maximum|int|								// overlarge. Lets increase.
@@ -22,7 +22,7 @@ extend Assembler
 				i = 0
 				base = temp
 			
-			index[] = i
+			index = i
 			return base
 				
 				
@@ -30,7 +30,7 @@ extend Assembler
 			|uint| CC = bs.prms[2]
 			|uint| CC2 = CC >> pow2
 			if (CC2 <= maximum) and (CC2<<pow2 == CC)
-				index[] += CC2
+				index += CC2
 				|| R = bs.prms[1]
 				base.reg = R
 				(base is temp) = (R >> 31)
@@ -44,7 +44,7 @@ extend Assembler
 		if fn == compiler.RefClear
 			|| offset = 0
 			|| A = .µ(prms.first!, ASMReg.AddrRequest)
-			A = .InlineOffsetOpt(A, 3, &offset, 13~bits, nil)
+			A = .InlineOffsetOpt(A, 3, offset, 13~bits, nil)
 			return exp.RFWR(A, nil, 1, offset)						// reg to mem
 
 		if fn == Compiler.RefSetRef
@@ -58,7 +58,7 @@ extend Assembler
 			|| offset = 0
 			if Out isnt ContainsAddr
 				if From is ContainsAddr
-					from = .InlineOffsetOpt(from, 3, &offset, 13~bits, P.asmdecl)
+					from = .InlineOffsetOpt(from, 3, offset, 13~bits, P.asmdecl)
 					return exp.RFRD(Out, From, 1, offset)			// mem to reg
 				return exp.RFST(Out, From)							// reg to reg
 			

@@ -569,7 +569,7 @@ class String
 		if Codepoints >= 0
 			|| s2 = s0 + n
 			while (--CodePoints >= 0) and (s < s2)
-				codepoint.utf8read(&s)
+				codepoint.utf8read(s)
 		  else
 			while (s > s0)
 				|| c = (--s)[0]
@@ -695,7 +695,7 @@ class String
 		|| Start	= .Addr
 		|| End		= Start + .Length
 		while (Start < End)
-			|| c = codepoint.UTF8Read(&start)
+			|| c = codepoint.UTF8Read(start)
 			yield (c) (start)
 
 

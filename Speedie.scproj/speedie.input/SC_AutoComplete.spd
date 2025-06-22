@@ -448,11 +448,11 @@ helper Message.ACInIsa (|bool|)
 			return true
 
 
-function GetScope (|message| orig, |&int| types, |SCNode|)
+function GetScope (|message| orig, |$int| types, |SCNode|)
 	if !orig
 		return compiler.program
 	if orig == @ask
-		types[] = 8
+		types = 8
 		return compiler.program
 	|| f	= orig.CutifyCopy
 	|| arg	= orig.MsgArg
@@ -468,12 +468,12 @@ function GetScope (|message| orig, |&int| types, |SCNode|)
 			return decl.type
 	
 	if orig.acInIsa
-		types[] = 1
+		types = 1
 		return compiler.program
 	if arg
 		return arg
 	if orig.IsTypeOfDecl
-		types[] = 1
+		types = 1
 		return compiler.program // right????
 	
 	return orig.msgarg #expect "noscope"

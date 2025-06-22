@@ -381,8 +381,8 @@ struct Assembler
 				index += cc.const
 				varadd = asmreg()
 		//  ADDK: bs, r1, 4
-		//  RD1U: r2, bs, value, 4, 0
-		base = .InlineOffsetOpt(Base, bytes, &index, 127, d)
+		//  RD1U: r2, bs, value, 4, 0 
+		base = .InlineOffsetOpt(Base, bytes, index, 127, d)
 
 /*
 	// these need to be opted. Not always happening? InlineOffsetOpt seems to only do ADDK, not ADPK
