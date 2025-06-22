@@ -66,8 +66,9 @@ function scdecl.FastMatch (|SCDecl| O, |bool|)
 
 
 function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil,  |int|)
-// Make TypeCast = true able to deal with... pointers to structs!
 	real self
+	if "ReferenceTests".trap
+
 	if (o == nil)
 		require .default
 		Return kUseDefaultParams
@@ -83,7 +84,10 @@ function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil,  |
 			exp.replacewith(nilstruct)
 			return kCastedMatch
 		Return kSimpleMatch // will this work?
-
+	
+	if (o is const) and (self is reference) and (TypeCast&kTypeCastForParams)
+		return 0
+	
 	// Don't .Match on the contains? It would run into "array covariance" errors?
 	if O.PointeryMatch(self)
 		|| ooop = .PointeryMatchSub(o, typecast)
@@ -131,6 +135,11 @@ function scdecl.TryTypeCastCarray (|SCDecl| O, |Message| exp, |int|)
 
 function scdecl.TryTypeCastPointer (|SCDecl| O, |Message| exp, |int| TypeCast, |bool| CArray, |int|)
 	opt norefcounts
+	if o is reference
+		if exp
+			error (exp, "Can't get the address of references")
+		return 0 // pretty sure we can't do this under any circumstance
+	
 	if .Internal.MiniMatch(O)	
 		|| OAddr = O.GetAddress
 		if CArray
@@ -180,7 +189,7 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| OExp, |int| TypeCast,  |int|)
 	if TypeCast & (kTypeCastMost|||kTypeCastNumbers)
 		|| CounterPart = t.Signed				// int vs uint
 			if (CounterPart.type == ot) and (CounterPart.TypeMatch(o, typecast, oexp).isnormalmatch)
-				return ksimplematch
+				return kSimpleMatch
 
 
 	|| NoBools = (TypeCast&kTypeCastBothWays) or (typecast & knobooltypecast) 

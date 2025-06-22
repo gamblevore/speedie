@@ -456,12 +456,10 @@ function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode
 	|| Pos = 0
 	|| Result = kSimpleMatch // TypeMatch??
 	
-	// we are returning a speedtester... so we want to now make it a param. 
-	
-	|| SelfCast = Incoming.ignoreSelfContain
-	TypeCast |= kNoBoolTypeCast ||| kTypeCastWantSuperDistance
+	|| SelfCast = Incoming.IgnoreSelfContain
+	TypeCast |= kNoBoolTypeCast ||| kTypeCastWantSuperDistance ||| kTypeCastForParams
 	if self is NumberCreator
-		typecast |= ktypecastfromsmallint
+		TypeCast |= kTypeCastFromSmallInt
 	
 	|| fin = .args.length
 	|| fi = ((self is constructor)  and  !Incoming.AllowSelfToConstructor)|int|
@@ -546,6 +544,7 @@ function DescribeParamFail (|SCParamArray| params, |int| bad)
 	|| Num = bad - UsesSelf
 	|| fs = FastString()
 	|| badarg = .args[bad-1]
+	|| RefToFail = 0
 	|| P = params[bad-1]
 		if UsesSelf and bad==1
 			fs <~ "Wrong self: "
@@ -558,11 +557,20 @@ function DescribeParamFail (|SCParamArray| params, |int| bad)
 				fs <~ type.Name
 		  else
 			fs <~ "(Unknown Type)"
+		if badarg
+			RefToFail = (badarg.pointercount and (type is Reference))|int|
+			if (badarg is reference) and (type is const)
+				RefToFail = 2
 	  else
 		p = params.exp
 		fs <~ "Missing param $num (${badarg.name})"
-	fs <~ ". Expected: "
-	badarg.rendertypename(fs)
+	if !RefToFail
+		fs <~ ". Expected: "
+		badarg.rendertypename(fs)
+	  elseif RefToFail == 1
+		fs <~ " (Pointer params can't accept references)"
+	  elseif reftofail == 2
+		fs <~ " (Can't pass consts to references)"
 	error ( P, fs )
 	fs <~ "to "
 	.RenderTitle(fs)
@@ -796,14 +804,15 @@ function DeclsProtoCleanUpContainedness (|message| P, |message| ch0, |scclass!| 
 	ch0.Remove
 
 
+
 function DeclsProtoCleanup (|SCClass| fpType, |Message| ch0, |bool| AssumeSelf, |bool| late, |message| Route=nil)
 	|| Proto = fpType.FuncProto									#expect (ch0, "This isn't a prototype!")
-	|| fProtoParams = Proto.Source[ @prm, 1 ]					#require
+	|| fParams = Proto.Source[ @prm, 1 ]					#require
 	|| p = ch0.Parent!
 	p.Func = @prm
 
 	using (ch0)
-		fProtoParams.CopyAllInto( p )
+		fParams.CopyAllInto( p )
 	
 	if Route
 		|| nxt = ch0.next
@@ -1219,11 +1228,10 @@ function AlteredInsides (|int| D)
 
 function SCDecl.MarkAsAltered 
 	opt norefcounts
-//	if "AlteredInsides".trap
 	if self is local
 		(self is altered)
 		if SCFunction.InBranch > .DepthOfBranch
-			is alteredinbranch
+			is AlteredInBranch
 //		if SCFunction.InBranch < .DepthOfBranch // how??
 		if self is TypeImprove
 			|| orig = .IsLookupOnly
@@ -1707,6 +1715,7 @@ function Tran_Return (TranFunc)  // exitter
 		node.StructReturnCleanup(fn, name_space)
 
 	fn.CheckReturnValue( node, name_space )
+
  // this is where an "if" can become an exitter
 	node.LastInBlock(SCBlockage.Return)
 	node.CheckNotInStateExpr(fn.SourceArg)
@@ -1749,10 +1758,23 @@ function NewHelper (CollectFunc)
 		(rz isnt visible)
 
 
+function message.InDecl (|bool|)
+	opt norefcounts
+	while
+		self = .parent$
+		|| fn = .func
+		if fn == @decl
+			return true
+		if fn != @bra
+			return false
+
+
 function message.NeedsPreprocess (|bool|)
 	opt norefcounts
-	if self == @TRel or self IsARel "$"
+	if self == @TRel
 		return true
+	if self IsARel "$"
+		return !.InDecl
 	if self == @tmp
 		return .name == "using" or "expect" or "require" or "debug_require" or "warn" or "error" or "check" or "loop"
 
@@ -1770,7 +1792,7 @@ function SCFunction.PreProcessExpects
 		if ch.NeedsPreprocess
 			list ?= array.new
 			list <~ ch
-	require list!=nil
+	require list != nil
 	
 	for ch in list
 		if ch == @Trel or @Arel

@@ -35,11 +35,12 @@ constants
 	kTypeCastWantSuperDistance	= 128
 	kTypeCastDescribeErrors		= 256
 	kTypeCastForSetRel			= 512
-	kTypeCastSetToMemory		= 1024
-	kTypeCastFromZero			= 2048
-	kTypeCastFromSmallInt		= 4096
-	kTypeCastForRelSet			= 8192
-	kActualTypecasts			= ~(kTypeCastWantSuperDistance ||| kNoBoolTypeCast)  
+	kTypeCastSetToMemory		= 1K
+	kTypeCastFromZero			= 2K
+	kTypeCastFromSmallInt		= 4K
+	kTypeCastForRelSet			= 8K
+	kTypeCastForParams			= 16K
+	kActualTypecasts			= ~(kTypeCastWantSuperDistance ||| kNoBoolTypeCast ||| kTypeCastForParams)  
 	kTypeCastFalse				= 0
 
 
@@ -616,6 +617,10 @@ class SCDecl (SCObject) {
 		return slf.expectmatch(cls.TypeNormal, 0, self, self) 
 	
 
+	syntax expect (|string?| Reason=nil)
+		disabled ".Source can be nil sometimes"
+	
+
 	function SCDecl.ExpectFail  (|scdecl| o, |message?| errnode, |message?| backup=nil)
 		|| fs = faststring()
 		fs <~ "Type mismatch, expected '"
@@ -1093,6 +1098,13 @@ class SCDecl (SCObject) {
 		if !self
 			fs <~ "(nil!)"
 		  else 
+			if self is reference
+				fs <~ "$"
+			|| c = .Contains
+				if c.minimatch(.type.contained, 0)
+					c = nil
+				  else
+					fs <~ "("
 			if (.IsNil) 
 				fs <~ "nil"
 			  elseif .IsCArray
@@ -1112,10 +1124,10 @@ class SCDecl (SCObject) {
 				  else
 					fs <~ .Type.Name
 			
-			|| c = .Contains
-			if c and !c.minimatch(.type.contained, 0) 
+			if c 
 				fs <~ " of "
 				fs <~ c.type.name
+				fs <~ ")"
 			if self is borrowed
 				fs <~ "--"
 			if .TypeSuffers and .nilstated

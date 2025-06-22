@@ -94,7 +94,7 @@ function SCFunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 			(r is ReturnedStruct)
 		if self is HidesProperties
 			.ReturnType = r.makereal
-		check (r isnt Reference) (r.source, "No references as return values")
+		check (r isnt Reference) (r.source, "Only parameters can be references")
 
 
 function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cls, |bool|)
@@ -247,8 +247,9 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 	expect (FuncPrmz or Name)  (self, "No name found.")
 	|| Default = DeclsDefault( name )
 	|| Sdcl = ExtractDecl( Type, P, mode )
-	if !sdcl  and  !default  and  (P isa SCArg)
-		sdcl = P.ParentFunc!.ReturnType
+		check ((sdcl isnt reference) or (mode is FuncParam)) (Type, "Only parameters can be references")
+	  elseif !default  and  (P isa SCArg)
+		Sdcl = P.ParentFunc!.ReturnType
 
 	|message--| NameItm = name.CollectDclName
 	|SCDecl--| DefaultDcl
@@ -272,7 +273,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 		if (cls) and (cls.Contained)
 			sdcl = cls.Contained! // (|| x = Y), (|object| x = Y)
 		  else
-			expect (!FuncPrmz and defaultdcl) ( self, ("Missing type", "Missing type, or default value.")(!FuncPrmz) )
+			expect (!FuncPrmz and defaultdcl) (self, ("Missing type", "Missing type, or default value.")(!FuncPrmz))
 			sdcl = DefaultDcl
 	
 	if sdcl.NeedsContainedfix
@@ -282,7 +283,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 	dcl.source = self
 	if !NameItm
 		check (.islast) ( self, "Parameter is missing a name." )
-		if !funcprmz
+		if !FuncPrmz
 			return nil
 		if FuncPrmz.CollectReturnAsReal // allocs dont fail (assumed so)
 			dcl.nildeclared = nilstate.real
@@ -304,7 +305,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 
 
 	if !Default
-		name.expectlast
+		name.ExpectLast
 	
 	if mode isnt Properties // the old .obj is needed
 		nameitm.obj = dcl
@@ -390,4 +391,6 @@ datatype DeclMode (int)
 
 	syntax is (|DeclMode|o, |bool|)
 		return self == o
+
+
 

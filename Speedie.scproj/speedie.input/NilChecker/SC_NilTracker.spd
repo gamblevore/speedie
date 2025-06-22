@@ -156,7 +156,7 @@ struct ArchonPurger
 	function DeclareSub (|scdecl| D, |nilstate| nd, |nilstate|)
 		nd &= nilstate.either
 		|| N = .value.DepthOfVars + 1
-		expect (N < 31)								(D, "Too many declarations")
+		expect (N < 31)							(D.source, "Too many declarations")
 		.decls[n] = d
 		d.NilReg = N * d.TypeSuffers			
 		d.NilAllocDepth = .NestDepth

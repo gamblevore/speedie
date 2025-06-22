@@ -2,23 +2,32 @@
 
 // We need to make references work. Lets put up some examples... and see how they should work
 
-function ReferenceReal (|int$| B)
+function ReferenceReal (|$int| B)
 	B++
-	B = 5
+	B *= 5
+	
 
 
-function ReferenceBad (|&int| Bad)
+
+// So now what? we validated this?
+// Its nicely validated. Validated nicely... so...? now? What do we do?
+// Lets see? Im just not sure?
+// basically... they should act like normal ints.
+// except that they are pinters.
+// so... lets alter the C++ gen?
 
 
-function ReferenceTests (|int$| D, |&int| C)
+
+function ReferenceTests (|$int| D, |&int| C)
 	visible
 	|| x = 0
-	ReferenceReal(C)	
-	ReferenceReal(1)
-	ReferenceReal(D)
-	ReferenceReal(x)
-	ReferenceBad(D) // should be banned
-	
-	// We also need to block passing references to pointers. Anything else?
-	// We pass pointers too? Now what?
+	D = 2
+//	ReferenceReal(C)
+//	ReferenceReal(D)
+//	ReferenceReal(x)
+
+
+function AddrTest
+	|| abc = 0
+//	|| def = &abc
 

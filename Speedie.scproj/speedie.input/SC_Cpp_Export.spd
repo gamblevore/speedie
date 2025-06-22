@@ -1412,6 +1412,8 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		  else
 			T <~ C.CStructName
 		T <~ ( '*', ptrs )
+		if d is Reference
+			T <~ '&'
 
 
 	function SCClass.SimplerDataTypes (|faststring| fs, |scdecl| d)

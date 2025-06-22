@@ -135,9 +135,12 @@ function Message.CanGetAddress (|SCNode| name_space, |bool|)
 	expect (curr == @thg or @dot)		(curr, "Can't get the address of this.")
 	expect (T2 isnt NumberConst)        (curr, "Can't get the address of a const.")
 	
-	if (curr == @thg) and t2.isregister
+	if (curr == @thg) and t2.IsRegister
 		|| f = .ParentForAddress
-		expect (f == @prm or @dot)		(curr, "Can't store the address of register based variables.")
+		if (f == @prm)
+			problem (curr, "Can't store the address of register based variables.")
+		  else
+			error (curr, "Can't store the address of register based variables.")
 			
 	return true
 
@@ -509,10 +512,9 @@ function scdecl.ExtractAmountSub (|Message| Prms, |scdecl|)
 
 function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |int| Depth=0, |SCDecl?|)
 	// a bit recursive!
-	if "AlteredInsides".trap
 	|| f = c.func
 	if (f == @Thg)		// usual case
-		if c == "nil" // nice
+		if c == "nil"	// nice
 			return typevoid
 		return Compiler.FindClassType( c )
 	
@@ -561,7 +563,7 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 			return R.MakeDataObject(name_space, purpose)
 		if (C == "&" and f == @brel)							// pointer
 			return r.GetAddress(purpose)
-		if (C == "$" and f == @arel)
+		if (C == "$")
 			return r.MakeReference
 		if (C == "?")
 			return R.MakeNewOptional
