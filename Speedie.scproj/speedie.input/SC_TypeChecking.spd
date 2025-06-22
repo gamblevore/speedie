@@ -67,7 +67,6 @@ function scdecl.FastMatch (|SCDecl| O, |bool|)
 
 function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil,  |int|)
 	real self
-	if "ReferenceTests".trap
 
 	if (o == nil)
 		require .default
@@ -275,3 +274,30 @@ function scdecl.FloatCast (|scdecl| orig, |message| exp, |int|)
 	.ExpectFail(orig, exp, nil)
 
 
+
+function Compiler.GetTypeVoid (|scdecl!|)
+	opt norefcounts
+	rz = typevoid
+	if rz
+		return rz
+	
+	|| msg = `datatype _void {
+	linkage
+		cpp_class void
+		noauto				// dont want them to see this.
+	size 0
+	syntax cast (|bool|)
+		disabled "Can't cast void to a bool."
+}` ~ Parse
+
+	compiler.program.CollectOne(msg)
+	|| vc = Compiler["_void"]
+	TypeVoid_ = vc
+	
+	if !vc
+		app.Quit("_void failiure", -1)
+	
+	rz = vc.TypeNormal
+	typevoid = rz
+	vc.LinkedFrom = int.max
+	TypeVoidPtr = rz.GetAddress

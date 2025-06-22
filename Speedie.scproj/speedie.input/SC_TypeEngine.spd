@@ -128,20 +128,18 @@ function Message.CanGetAddress (|SCNode| name_space, |bool|)
 	|| curr = .unbra
 	if (curr == @acc)
 		|| f = curr.first
-		|| T = TypeOfExpr(f, name_space)				#require
-		return (T.isnumeric <= 1) #expect (curr, "Can't get address of vector element (c++ limitation).")
-
-	|| T2 = TypeOfExpr(curr, name_space)				#require // might transform it
+		|| T = TypeOfExpr(f, name_space)		#require
+		return (T.isnumeric <= 1)				#expect (curr, "Can't get address within vector (c++ limitation).")
+	
+	|| T2 = TypeOfExpr(curr, name_space)		#require // might transform it
 	expect (curr == @thg or @dot)		(curr, "Can't get the address of this.")
 	expect (T2 isnt NumberConst)        (curr, "Can't get the address of a const.")
 	
 	if (curr == @thg) and t2.IsRegister
 		|| f = .ParentForAddress
-		if (f == @prm)
-			problem (curr, "Can't store the address of register based variables.")
-		  else
-			error (curr, "Can't store the address of register based variables.")
-			
+		expect (f == @prm or @dot) (curr, "Can't store the address of register based variables.")
+		compiler.LaterAddressChecks <~ curr
+	
 	return true
 
 

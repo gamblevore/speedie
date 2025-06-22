@@ -46,12 +46,11 @@ function String.ParseJSON (|Messageroot|)
 	rz.ConvertJSONToJB?
 	
 
-function String.ParseWithError (|&Error| rec, |MessageRoot|)
+function String.ParseWithError (|!&Error| rec, |MessageRoot|)
 	rz = .parse
 	if !rz
 		|| r = stderr.pop
-		if rec
-			rec[] = r 
+		rec[] = r 
 
 
 helper String.IsJbin (|ind|)

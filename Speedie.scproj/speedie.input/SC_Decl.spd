@@ -914,14 +914,6 @@ class SCDecl (SCObject) {
 			(rz is StayBorrowed)
 
 
-	function MakeReference (|SCDecl|)
-		opt norefcounts
-		//if .refcount > 1
-		self = .copydecl
-		is reference
-		return self
-
-
 	function MakeNewOptional (|SCDecl|)
 		// this becomes declared optional...
 		// the default state is "either" (undeclared)
@@ -957,19 +949,30 @@ class SCDecl (SCObject) {
 			.NilDeclared = NilState.Real
 
 
-	function DefaultToReal (|scdecl|)
-		return .MakeExistance(nilstate.real)
+	function MakeReference (|SCDecl|)
+		opt norefcounts
+		if .NilDeclared isnt Stated
+			debugat
+		|| ref = .copydecl
+		ref.BecomeReal
+		(ref is reference)
+		return ref
 
 
 	function MakeExistance (|nilstate| type, |scdecl| Default=nil, |scdecl|)
 		opt norefcounts
-		if .nildeclared == type
+		if .NilDeclared == type
 			Return self
 		
 		if (Default and self == .type.typenormal)
 			return Default
 		
-		rz = .copydecl
+		// I think we just need to copy for globals? or at least...
+		// .originaldecl is only needed to get the exportposition for ASM globals.
+		// i still don't know why we can't just use the original... or change it.
+		// 
+		
+		rz = .CopyDecl
 		rz.info |= .info & scdeclinfo.VarType
 		|| s = .OriginalDecl
 		rz.OriginalDecl = s ?? self
@@ -978,6 +981,9 @@ class SCDecl (SCObject) {
 
 	function Orig (|scdecl|)
 		opt norefcounts
+		if .OriginalDecl != self
+			// why tho? something to do with !?
+			// I just can't remember why.
 		return .OriginalDecl ?? self
 		
 	

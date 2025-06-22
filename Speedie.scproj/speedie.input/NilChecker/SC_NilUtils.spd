@@ -1,0 +1,72 @@
+
+struct LoopInfo 
+	|NilRecord| 		ContRecord
+	|NilRecord| 		ExitRecord
+	|byte| 				VarCount
+	|byte| 				NestDepth
+	|bool| 				HasEscape
+	
+	function BeginLoop (|bool| HasExitCond, |Loopinfo|)
+		rz = self[0]
+		|| v = ArchonPurger.value
+		
+		.ExitRecord = HasExitCond|nilrecord| * V	// .Finish will check for non-zero
+		.HasEscape = HasExitCond
+		.ContRecord = V								// in case loop fails the first condition
+		.VarCount = V.DepthOfVars
+		.NestDepth = ArchonPurger.t.nestdepth
+	
+	
+	function FinishLoop (|message| msg)
+		/*
+			|| xx = 1
+			while xx
+				0
+			// we should also check for these kind of loops.
+			// not really a nil-operation though is it?
+			// maybe its ok :) quite rare!
+		*/
+		
+		|| Ex = .ExitRecord
+		ArchonPurger.t.value = Ex
+		if !ex
+			ErrorReceiver.NewCriticalError(msg, "Loop never exits.")
+
+		if !.HasEscape and !msg.islast
+			msg.KinderRemoveAfter
+	
+	
+	function NextLoop 
+		.ContRecord |= ArchonPurger.value
+		ArchonPurger.t.value = .contrecord
+
+
+	
+module PostIncrementNil
+	|message--[32]| 		Msgs
+	|int|					Size
+	|bool|					Sync
+
+	function Check (|message| ch)
+		opt norefcounts
+		|| d = ch.FastDecl
+		check (d isnt PostIncremented) (ch, "Can't post-increment twice within a statement")
+		(d is PostIncremented)
+		self <~ ch
+
+	syntax append (|message| ch)
+		|| s = .Size
+		expect (s < 32) (ch, "Too many post-increments in one statement!")
+		.msgs[s] = ch
+		.Size = s + 1
+	
+	function Clear
+		for i in .size
+			|| d = .msgs[i]!.FastDecl
+			(d isnt postincremented)
+
+		.msgs[0] = nil
+		.Size = 0
+		.Sync = false
+
+

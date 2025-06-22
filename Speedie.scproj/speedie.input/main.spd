@@ -6,6 +6,7 @@
 
 
 main // speedie main {
+	References.test
 	Compiler.SetupEnv
 	Compiler.MiniTests
 	Compiler.Main

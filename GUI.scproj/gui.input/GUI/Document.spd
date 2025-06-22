@@ -173,7 +173,7 @@ class Document (list)
 		require .CompareTreesOnSave
 		|| old = f.ReadAll
 			|error| err
-			|| jold = old.ParseWithError(err)
+			|| jold = old.ParseWithError(&err)
 				|| tp = t.parse
 					rz = jold.deepequals(tp)  
 

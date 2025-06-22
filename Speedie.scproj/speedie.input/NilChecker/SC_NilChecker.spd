@@ -262,7 +262,7 @@ function NilFunction (NilTrackerFn)
 		Test = 0
 	
 	|| P = prms.first
-	|| HasAddrs = false
+	|| HasAddrs = 0
 	for recv in fn.args
 		recv.Paramfix
 		p.VariableParamSafety
@@ -275,11 +275,12 @@ function NilFunction (NilTrackerFn)
 		if rz and !(v is FnBecomesNilCh) and p!.isfirst
 			rz = 0 // can't work
 		|| sent = p!.FastDecl
-		|| infernal = sent.internal
-			HasAddrs ?= sent.CanUpgradeInternalPointer
-			if (infernal.isproperlylocal) and (recv is NoRegAddrs)
-				problem (p, "Can't pass register, to parameter that is used unsafely.")
-		if (v is nilish) // and recv.NilReg	
+		
+		HasAddrs |= sent.CanUpgradeRegister
+
+//  // remove AllowRegisterAddr and NoRegAddrs
+		
+		if (v is nilish)
 			.NilParamPass(recv, sent, p!, fn, v)
 
 		Test = 0
@@ -288,9 +289,20 @@ function NilFunction (NilTrackerFn)
 	if HasAddrs
 		p = prms.first
 		for recv in fn.args
-			|| infernal = p!.FastDecl.CanUpgradeInternalPointer
+			|| Sent = p!.FastDecl
+			|| In = sent.CanUpgradeRegister
+			if In == 1
+				|| SentIn = sent.Internal!
 				|| ri = recv.internal!
-				.VariableSet(infernal, recv.source!, ri, p!, ri.nilcurr)
+				// are we passing this backwards? Or was there some reason for it?
+				// we'd have to swap and test to see if it makes more sense or less.
+				
+				.VariableSet(SentIn, recv.source!, ri, p!, ri.nilcurr)				
+//				.VariableSet(SentIn, p!, ri, recv.source!, ri.nilcurr) // surely its this?
+
+			  elseif In == 2
+				.VariableSet(Sent, recv.source!, recv, p!, recv.nilcurr)
+
 			p++
 
 	if fn Is Killer
@@ -303,6 +315,32 @@ function NilFunction (NilTrackerFn)
 	|| ret = fn.ReturnType
 		rz |= ret.NilDeclared
 		check ((rz is stated) or !ret.TypeSuffers) (msg, "Nil-decoration needed on return type of function: " + fn.RenderName)
+
+
+
+// if its a reference... the object should be assumed real
+//    $string? should be how we say its not
+
+function NilRefTest1 (|$object| X)
+	X = nil
+
+
+function NilRefTest2 (|$string| X)
+	X = ""
+
+
+function NilRefTest3 (|$string| X)
+	if (0.5[])
+		X = ""
+	  else
+		x = nil
+
+
+function NilRefTest4 (|$string?| X)
+	if (0.5[])
+		X = ""
+	  else
+		x = nil
 
 
 
@@ -719,7 +757,7 @@ function VariableSet (|scdecl| Recv, |message| RecvMsg, |scdecl| Sent, |message|
 	expect (!recv.IsUnknownParam) (recvmsg, Recv.PrmStateMsg("Need to set it into another var."))
 
 	if recv.StatedReal and recv isnt local
-		if sentstate isnt nilish
+		if SentState isnt nilish
 			return sentstate
 		if (SentState is realish) 
 			return .BecomeReal(sent, SentMsg, NilReason.using)

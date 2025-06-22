@@ -5,17 +5,6 @@
 function ReferenceReal (|$int| B)
 	B++
 	B *= 5
-	
-
-
-
-// So now what? we validated this?
-// Its nicely validated. Validated nicely... so...? now? What do we do?
-// Lets see? Im just not sure?
-// basically... they should act like normal ints.
-// except that they are pinters.
-// so... lets alter the C++ gen?
-
 
 
 function ReferenceTests (|$int| D, |&int| C)
@@ -31,3 +20,9 @@ function AddrTest
 	|| abc = 0
 //	|| def = &abc
 
+
+module References
+	function Test
+	
+	
+	

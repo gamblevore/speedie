@@ -24,15 +24,16 @@ role config (message)
 		cpp_part AsFloat
 		return .float
 	
-	syntax cast (|messagetable|)
+	syntax cast (|MessageTable|)
 		cpp_part AsTable
 		return .Dict(true)
 	
 	function Save (|bool|)
 		|| f = .path
-			|| p = .render
-			if p.ParseWithError(nil)
-				return f.smartdata(p)
+			|| r = .render
+			|| p = r.parse
+				return f.smartdata(r)
+			StdErr.pop
 	
 	function Path (|file|)
 		return .obj as file

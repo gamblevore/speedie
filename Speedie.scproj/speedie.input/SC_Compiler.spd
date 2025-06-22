@@ -116,6 +116,7 @@ linkage
 |[scdecl]|					DeclConstants
 |[scclass]|					TasksList
 |[Message]|					TasksTodo
+|[message]|					LaterAddressChecks
 |[Message]|					ExtendModuleList
 |[Message]|					API_List
 |[SCFunction]|				API_Funcs
@@ -573,20 +574,6 @@ function ImportAll
 	scfunction.currfunc = nil
 	
 		
-
-//|| Worthless = 0
-
-//function scfunction.CheckStuff
-//	return
-//	require self isnt cpp
-//	// OK now what?
-//	for s in .args
-//		if (s.pointercount > 0) and (!s.type.isstruct) and (s is AlteredInsides)
-//			compiler.worthless++
-//			printline self
-//			exit
-	
-
 function LoadSuperClasses
 	opt norefcounts
 	for c in .ClassList

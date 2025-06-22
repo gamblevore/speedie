@@ -61,34 +61,6 @@ function FastDecl (|SCDecl!|)
 	return Compiler.GetTypeVoid
 
 
-function Compiler.GetTypeVoid (|scdecl!|)
-	opt norefcounts
-	rz = typevoid
-	if rz
-		return rz
-	
-	|| msg = `datatype _void {
-	linkage
-		cpp_class void
-		noauto				// dont want them to see this.
-	size 0
-	syntax cast (|bool|)
-		disabled "Can't cast void to a bool."
-}` ~ Parse
-
-	compiler.program.CollectOne(msg)
-	|| vc = Compiler["_void"]
-	TypeVoid_ = vc
-	
-	if !vc
-		app.Quit("_void failiure", -1)
-	
-	rz = vc.TypeNormal
-	typevoid = rz
-	vc.LinkedFrom = int.max
-	TypeVoidPtr = rz.GetAddress
-
-
 function SCBlockage.BlockCombine (|SCBlockage| B, |int|)
 	if B == self
 		return self
@@ -98,15 +70,6 @@ function SCBlockage.BlockCombine (|SCBlockage| B, |int|)
 		return self
 	debugger,	#!would this even happen ever???
 	return SCBlockage.Continue 	// continue is weaker than exit, so return continue?
-
-
-function LastTest
-	visible
-	if 0.5[]
-		return
-	else
-		return
-	"hello"
 
 
 function LastInBlock (|SCBlockage| Reason)
@@ -160,15 +123,19 @@ function message.KinderRemoveAfter
 		x.remove
 	
 
-
-function scdecl.CanUpgradeInternalPointer (|scdecl|)
+function scdecl.CanUpgradeRegister (|int|)
 	opt norefcounts
-	|| infernal = .internal
-	if (infernal Is Local) and infernal.NilReg
-		return infernal
+	|| i = .Internal // erase this eventually
+		if (i Is Local) and i.NilReg
+			return 1
+	
+	if (self is Reference)
+		if (self is local) and .nilreg
+			return 2
+		
 
 
-function scdecl.PrmStateMsg (|string| Needed, |scfunction| f=nil, |string|)
+function scdecl.PrmStateMsg (|string| Needed, |string|)
 	|| fs = faststring()
 	fs <~ "Please state "
 	if self is self
@@ -182,7 +149,7 @@ function scdecl.PrmStateMsg (|string| Needed, |scfunction| f=nil, |string|)
 
 
 function scdecl.NilPrmFail (|scfunction| f)
-	error (f.Source, .PrmStateMsg("", f))
+	error (f.Source, .PrmStateMsg(""))
 
 
 function message.IsNowNil (|int|)

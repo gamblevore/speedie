@@ -311,7 +311,19 @@ function @scfunction.TransformAll
 
 //function scfunction.PrintBareStructs
 //	"$.ExportName has ${.barestructs|int|} barestructs"
-	
+
+
+function CheckRegAddress 
+	opt norefcounts
+	for s in compiler.LaterAddressChecks
+		|| prms = s.ancestor(@prm)
+			|| fn = prms.obj as scfunction
+				if (fn isnt cpp)
+					problem (s, "Can't store the address of register based variables.")
+		
+	compiler.LaterAddressChecks.clear
+
+
 function Transform ()
 	opt norefcounts
 
@@ -330,6 +342,7 @@ function Transform ()
 	  else
 		|| r_z = Tran_Result( self )
 		Tran_All( self, n, space )
+		.CheckRegAddress
 		if r_z
 			Tran_ResultFinish( self, r_z, space )
 		parser.Using.Flags = 0
@@ -744,10 +757,10 @@ function MakeParamsReal // for cpp funcs...
 	opt norefcounts
 	for (a in .args) (i)
 		if a.CouldUpgradeToReal
-			.args[i] = a.DefaultToReal
+			.args[i] = a.MakeExistance(nilstate.real)
 	|| r = .ReturnType
 		if r.CouldUpgradeToReal
-			.returntype = r.DefaultToReal
+			.returntype = r.MakeExistance(nilstate.real)
 
 
 function CollectReturnAsReal (|bool|)
