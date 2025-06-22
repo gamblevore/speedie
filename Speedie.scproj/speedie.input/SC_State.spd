@@ -8,3 +8,4 @@ function SCFunction.StatelessAccumulate
 	for p in .args
 		require p.Type is Stateless
 	is Stateless
+

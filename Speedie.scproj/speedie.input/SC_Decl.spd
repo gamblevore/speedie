@@ -951,8 +951,7 @@ class SCDecl (SCObject) {
 
 	function MakeReference (|SCDecl|)
 		opt norefcounts
-		if .NilDeclared isnt Stated
-			debugat
+		// if .refcount > 1 // could just alter the original, if it were unshared?
 		|| ref = .copydecl
 		ref.BecomeReal
 		(ref is reference)
