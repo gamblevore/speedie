@@ -696,7 +696,7 @@ struct ArchonPurger {
 
 struct ArgArrayCounter {
 	int i;
-	int max;
+	int Max;
 	bool IsItem;
 	bool IsNotItem;
 };
@@ -3937,7 +3937,7 @@ SCFunction* SC_AC__GetFunc(Message* Cmd, SCFile* Myfile, int Ff, int N);
 
 SCFunction* SC_AC__GetFunc2(SCFile* Myfile, int F, int N);
 
-SCNode* SC_AC__GetScope(Message* Orig, int* Types);
+SCNode* SC_AC__GetScope(Message* Orig, int& Types);
 
 void SC_AC__IdentifyBetter(Message* Node, JB_String* Name);
 
@@ -7025,7 +7025,7 @@ bool SC_Pac_CanReuseParam(Assembler* Self, Message* Prms, SCDecl* A, ASMReg V);
 
 void SC_Pac_CapASM(Assembler* Self);
 
-Message* SC_Pac_CloseOneVar(Assembler* Self, Message* Exp, int OriginalDecls, bool* DoMore);
+Message* SC_Pac_CloseOneVar(Assembler* Self, Message* Exp, int OriginalDecls, bool& DoMore);
 
 ASMReg SC_Pac_CloseVars(Assembler* Self, uint /*u16*/ Orig, Message* Exp, ASMReg Return);
 
@@ -7123,7 +7123,7 @@ bool SC_Pac_InlineAddK(Assembler* Self, ASMReg L, int64 R, ASMReg Dest);
 
 ASMReg SC_Pac_InlineFinishWithConsts(Assembler* Self, FatRange* R);
 
-ASMReg SC_Pac_InlineOffsetOpt(Assembler* Self, ASMReg Base, int Pow2, int* Index, uint Maximum, SCDecl* Glob);
+ASMReg SC_Pac_InlineOffsetOpt(Assembler* Self, ASMReg Base, int Pow2, int& Index, uint Maximum, SCDecl* Glob);
 
 uint64 SC_Pac_InlineParameters(Assembler* Self, Message* Prms, bool IsLeaf);
 
@@ -8455,8 +8455,6 @@ Message* JB_Str_ParseJbin(JB_String* Self, int64 Max);
 
 Message* JB_Str_ParseSub(JB_String* Self, Syntax Owner);
 
-Message* JB_Str_ParseWithError(JB_String* Self, JB_Error** Rec);
-
 JB_String* JB_Str_PathDir(JB_String* Self);
 
 JB_String* JB_Str_Pluralize(JB_String* Self, int Amount, JB_String* Nothing);
@@ -9710,9 +9708,9 @@ void SC_Msg_ConfTake(Message* Self, Message* Dest, JB_String* Name);
 
 Message* SC_Msg_ConstantExpandSub(Message* Self);
 
-bool SC_Msg_ConstIntValue(Message* Self, SCNode* Name_space, int64* V);
+bool SC_Msg_ConstIntValue(Message* Self, SCNode* Name_space, int64& V);
 
-bool SC_Msg_ConstIntValueSub(Message* Self, int64* V);
+bool SC_Msg_ConstIntValueSub(Message* Self, int64& V);
 
 Message* JB_Msg_ConstructorCopy(Message* Self, Message* Other);
 
@@ -12165,7 +12163,7 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 
 inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
 	if ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc, false))) {
-		JB_Msg_Fail(Self, JB_LUB[909]);
+		JB_Msg_Fail(Self, JB_LUB[905]);
 	}
 }
 

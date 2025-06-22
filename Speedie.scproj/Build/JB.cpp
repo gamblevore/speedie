@@ -74,16 +74,16 @@ JB_String* JB_App__BuildConfig(JB_String* Name) {
 }
 
 void JB_App__ConfigureSet(JB_String* Value) {
-	JB_Error* Err = nil;
-	JB_Incr(Err);
-	JB_SetRef(JB__App__Conf, JB_Str_ParseWithError(Value, (&Err)));
-	if (Err) {
-		JB_String* _tmPf0 = JB_Err_Render(Err, nil);
+	JB_SetRef(JB__App__Conf, JB_Str_Parse(Value, kJB_SyxArg, true));
+	if (!JB__App__Conf) {
+		JB_Error* _tmPf1 = JB_Rec_Pop(JB_StdErr);
+		JB_Incr(_tmPf1);
+		JB_String* _tmPf0 = JB_Err_Render(_tmPf1, nil);
 		JB_Incr(_tmPf0);
+		JB_Decr(_tmPf1);
 		JB_PrintLine(_tmPf0);
 		JB_Decr(_tmPf0);
 	}
-	JB_Decr(Err);
 	if (!JB__App__Conf) {
 		JB_SetRef(JB__App__Conf, JB_Msg_ConstructorEmpty(nil));
 	}
@@ -210,7 +210,7 @@ SpdProcess* JB_App__Parent(PicoComms* Comms, bool Expect) {
 	}
 	if (Expect) {
 		if (true) {
-			JB_Str_Fail(JB_LUB[968]);
+			JB_Str_Fail(JB_LUB[964]);
 		}
 	}
 	return nil;
@@ -255,7 +255,7 @@ Message* JB_App__Prefs() {
 }
 
 JB_String* JB_App__PrefsPath() {
-	return JB_config__ConfigPath(JB_App__BuildConfig(JB_LUB[1073]));
+	return JB_config__ConfigPath(JB_App__BuildConfig(JB_LUB[1069]));
 }
 
 void JB_App__PrefsSave() {
@@ -463,7 +463,7 @@ Dictionary* SC_Comp__Adj(Message* F) {
 	if (JB_Msg_EqualsSyx(F, kJB_SyxThg, false)) {
 		return ((Dictionary*)JB_Dict_Expect(D, F));
 	}
-	return ((Dictionary*)JB_Dict_Value0(D, JB_LUB[1003]));
+	return ((Dictionary*)JB_Dict_Value0(D, JB_LUB[999]));
 }
 
 void SC_Comp__AppBuildLibs(JB_File* Inner) {
@@ -599,7 +599,7 @@ JB_File* SC_Comp__CanTryModes() {
 	if (JB_App__Parent(nil, false)) {
 		return nil;
 	}
-	if (!((!JB_Str_Exists(JB_App__SyntaxAccess(JB_LUB[1093]))) and (!JB_Str_Exists(JB_App__SyntaxAccess(JB_LUB[1094]))))) {
+	if (!((!JB_Str_Exists(JB_App__SyntaxAccess(JB_LUB[1089]))) and (!JB_Str_Exists(JB_App__SyntaxAccess(JB_LUB[1090]))))) {
 		return nil;
 	}
 	JB_String* P = ((JB_String*)JB_Array_Value(JB_App__Args(), 0));
@@ -612,7 +612,7 @@ JB_File* SC_Comp__CanTryModes() {
 void SC_Comp__CheckIsGoodLibrary() {
 	if (SC__Options_ProjectIsLibrary) {
 		if (!SC__Comp_API_Place) {
-			JB_Str_Fail(JB_LUB[849]);
+			JB_Str_Fail(JB_LUB[845]);
 			return;
 		}
 	}
@@ -1125,7 +1125,7 @@ JB_File* SC_Comp__FindProjectSub(JB_String* Base, JB_String* Path) {
 	JB_Incr(Rz);
 	if (JB_Str_First(Path) == '/') {
 		JB_Decr(Rz);
-		return JB_Str_FileThatExists(Path, JB_LUB[1074]);
+		return JB_Str_FileThatExists(Path, JB_LUB[1070]);
 	}
 	JB_String* First = Path;
 	JB_Incr(First);
@@ -1167,7 +1167,7 @@ JB_File* SC_Comp__GeneratedCppsFolder() {
 	if (SC__Options_SelfReplacement) {
 		return SC_Comp__BuildFolder();
 	}
-	return JB_File_SyntaxAccess(SC__Comp_BaseProjectPath, JB_LUB[1095]);
+	return JB_File_SyntaxAccess(SC__Comp_BaseProjectPath, JB_LUB[1091]);
 }
 
 SCDecl* SC_Comp__GetTypeVoid() {
@@ -1829,7 +1829,7 @@ void SC_Comp__ImportProj() {
 		JB_Incr(Conf);
 		JB_String* _tmPf0 = JB_Str_OperatorPlus(SC__Comp_ProjectName, JB_LUB[551]);
 		JB_Incr(_tmPf0);
-		(JB_Msg_SetStr(Conf, JB_LUB[1073], _tmPf0));
+		(JB_Msg_SetStr(Conf, JB_LUB[1069], _tmPf0));
 		JB_Decr(_tmPf0);
 		SC_Comp__SetConf(Conf);
 		JB_Decr(Conf);
@@ -1891,7 +1891,7 @@ bool SC_Comp__InitBasicFuncs() {
 	JB_SetRef(SC__Comp_RefDecrMulti, SC_Comp__LoadRefFunc(JB_LUB[2058]));
 	JB_SetRef(SC__Comp_RefFreeIfDead, SC_Comp__LoadRefFunc(JB_LUB[1353]));
 	JB_SetRef(SC__Comp_RefSafeDecr, SC_Comp__LoadRefFunc(JB_LUB[730]));
-	JB_SetRef(SC__Comp_SwapFunc, SC_Comp__FindFunction(JB_LUB[765]));
+	JB_SetRef(SC__Comp_SwapFunc, SC_Comp__FindFunction(JB_LUB[1168]));
 	JB_SetRef(SC__Comp_NewFunc, SC_Comp__FindFunction(JB_LUB[2059]));
 	JB_SetRef(SC__Comp_TernaryFunc, SC_Comp__FindFunction(JB_LUB[1371]));
 	JB_SetRef(SC__Comp_fnAs, SC_Comp__LoadTypeTest(JB_LUB[2060]));
@@ -1970,7 +1970,7 @@ void SC_Comp__InitCompiler() {
 	 else {
 		JB_String* _tmPf6 = SC_Comp__VariantSuffix();
 		JB_Incr(_tmPf6);
-		JB_String* _tmPf5 = JB_Str_OperatorPlus(JB_LUB[1104], _tmPf6);
+		JB_String* _tmPf5 = JB_Str_OperatorPlus(JB_LUB[1100], _tmPf6);
 		JB_Incr(_tmPf5);
 		JB_Decr(_tmPf6);
 		JB_SetRef(SC__Comp__BuildFolder, JB_File_SyntaxAccess(SC__Comp_BaseProjectPath, _tmPf5));
@@ -2019,7 +2019,7 @@ bool SC_Comp__InitTypes() {
 	JB_SetRef(SC_TypeDate, SC_Comp__FindClassName(JB_LUB[1603], 0));
 	JB_SetRef(SC_TypeDuration, SC_Comp__FindClassName(JB_LUB[1604], 0));
 	JB_SetRef(SC_TypeJBClass, SC_Comp__FindClassName(JB_LUB[1605], 0));
-	JB_SetRef(SC_TypeTask, SC_Comp__FindClassName(JB_LUB[1060], 0));
+	JB_SetRef(SC_TypeTask, SC_Comp__FindClassName(JB_LUB[1056], 0));
 	JB_SetRef(SC_TypeObject, SC_Comp__FindClassName(JB_LUB[440], 0));
 	JB_SetRef(SC_TypeSyntax, SC_Comp__FindClassName(JB_LUB[534], 0));
 	JB_SetRef(SC_TypeWrapper, SC_Comp__FindClassName(JB_LUB[1305], 0));
@@ -2054,8 +2054,8 @@ bool SC_Comp__InitTypes() {
 }
 
 JB_File* SC_Comp__InputFile(JB_String* S, Message* Where) {
-	if ((JB_Str_ContainsString(S, JB_LUB[1166]))) {
-		JB_Msg_Fail(Where, JB_LUB[1167]);
+	if ((JB_Str_ContainsString(S, JB_LUB[1162]))) {
+		JB_Msg_Fail(Where, JB_LUB[1163]);
 		return nil;
 	}
 	return SC_Comp__InputFileAlways(S);
@@ -2465,7 +2465,7 @@ JB_String* SC_Comp__ProductPath() {
 	if (SC__Options_SelfReplacement) {
 		JB_String* _tmPf0 = SC_Comp__Projects();
 		JB_Incr(_tmPf0);
-		JB_String* _tmPf1 = JB_Str_OperatorPlus(JB_LUB[1004], Prod);
+		JB_String* _tmPf1 = JB_Str_OperatorPlus(JB_LUB[1000], Prod);
 		JB_Incr(_tmPf1);
 		JB_String* _tmPf4 = JB_Str_Child(_tmPf0, _tmPf1);
 		JB_Incr(_tmPf4);
@@ -2618,7 +2618,7 @@ void SC_Comp__SetConf(Message* Conf) {
 		Message* _tmPf0 = JB_Syx_OperatorPlus(kJB_SyxStr, Str);
 		JB_Incr(_tmPf0);
 		JB_Decr(Str);
-		Message* X = SC_MakeDecl(JB_LUB[0], JB_LUB[1168], _tmPf0, 0);
+		Message* X = SC_MakeDecl(JB_LUB[0], JB_LUB[1164], _tmPf0, 0);
 		JB_Incr(X);
 		JB_Decr(_tmPf0);
 		JB_Msg_BecomeMsg(Conf, X);
@@ -2826,7 +2826,7 @@ bool SC_Comp__TimeTest(Date Elapsed) {
 		int ReliableTime = ((int)(64.0f * (1024.0f * 2.5f)));
 		CanInstall = (Elapsed < ReliableTime);
 		if ((!CanInstall)) {
-			JB_Str_Fail(JB_LUB[850]);
+			JB_Str_Fail(JB_LUB[846]);
 		}
 	}
 	JB_Flow__DisabledIncr(-1);
@@ -2945,11 +2945,11 @@ void SC_Comp__VariousSelfTests() {
 
 SCNode* SC_Comp__WrongConf(Message* Node, SCNode* Name_space, Message* ErrPlace) {
 	if ((SC__Comp_ConfMsg)) {
-		JB_Msg_Fail(Node, JB_LUB[851]);
+		JB_Msg_Fail(Node, JB_LUB[847]);
 		return nil;
 	}
 	if (true) {
-		JB_Msg_Fail(Node, JB_LUB[852]);
+		JB_Msg_Fail(Node, JB_LUB[848]);
 	}
 	return nil;
 }
@@ -2962,12 +2962,12 @@ SCFunction* SC_Comp__XFunc(JB_String* Name, Message* M) {
 	if (M) {
 		if (Fn) {
 			if (true) {
-				JB_Msg_Fail(M, JB_LUB[853]);
+				JB_Msg_Fail(M, JB_LUB[849]);
 			}
 		}
 		 else {
 			if (true) {
-				JB_Msg_Fail(M, JB_LUB[854]);
+				JB_Msg_Fail(M, JB_LUB[850]);
 			}
 		}
 	}
@@ -3035,7 +3035,7 @@ void SC_FastStringOpts__String(Message* Str) {
 	SCFunction* B = ({
 		SCFunction* _X = SC__FastStringOpts__ByteFunc;
 		if (!_X) {
-			_X = SC_Comp__XFunc(JB_LUB[1023], nil);
+			_X = SC_Comp__XFunc(JB_LUB[1019], nil);
 			JB_SetRef(SC__FastStringOpts__ByteFunc, _X);
 		}
 		 _X;
@@ -3193,12 +3193,12 @@ bool SC_FB__AppOptions_dosign(JB_String* Name, JB_String* Value, FastString* Pur
 }
 
 bool SC_FB__AppOptions_elf(JB_String* Name, JB_String* Value, FastString* Purpose) {
-	if (!SC_FB__Explain(Purpose, JB_LUB[875])) {
+	if (!SC_FB__Explain(Purpose, JB_LUB[871])) {
 		return nil;
 	}
-	JB_App__Say(JB_LUB[876], true);
+	JB_App__Say(JB_LUB[872], true);
 	if (true) {
-		JB_Str_Fail(JB_LUB[877]);
+		JB_Str_Fail(JB_LUB[873]);
 	}
 	return true;
 }
@@ -3278,7 +3278,7 @@ bool SC_FB__AppOptions_gcc(JB_String* Name, JB_String* Value, FastString* Purpos
 }
 
 bool SC_FB__AppOptions_help(JB_String* Name, JB_String* Value, FastString* Purpose) {
-	if (!SC_FB__Explain(Purpose, JB_LUB[766])) {
+	if (!SC_FB__Explain(Purpose, JB_LUB[762])) {
 		return nil;
 	}
 	SC_FB__Help();
@@ -3310,7 +3310,7 @@ bool SC_FB__AppOptions_maxvars(JB_String* Name, JB_String* Value, FastString* Pu
 }
 
 bool SC_FB__AppOptions_mem(JB_String* Name, JB_String* Value, FastString* Purpose) {
-	SC_FB__Explain(Purpose, JB_LUB[1021]);
+	SC_FB__Explain(Purpose, JB_LUB[1017]);
 	SC__Options_PrintMemoryUsage = JB_Str_Yes(Value, nil);
 	return false;
 }
@@ -3352,7 +3352,7 @@ bool SC_FB__AppOptions_optimise(JB_String* Name, JB_String* Value, FastString* P
 }
 
 bool SC_FB__AppOptions_output_path(JB_String* Name, JB_String* Value, FastString* Purpose) {
-	if (!SC_FB__Explain(Purpose, JB_LUB[1022])) {
+	if (!SC_FB__Explain(Purpose, JB_LUB[1018])) {
 		return nil;
 	}
 	JB_SetRef(SC__Options_output_path, JB_File_PathFix_(Value));
@@ -3424,7 +3424,7 @@ bool SC_FB__AppOptions_self(JB_String* Name, JB_String* Value, FastString* Purpo
 	if (!SC_FB__Explain(Purpose, JB_LUB[1954])) {
 		return nil;
 	}
-	if (JB_App__No(JB_LUB[1094])) {
+	if (JB_App__No(JB_LUB[1090])) {
 		SC__Options_PerryOutput = 1;
 	}
 	JB_String* _tmPf0 = SC_Comp__SpeedieProj();
@@ -3460,12 +3460,12 @@ bool SC_FB__AppOptions_stages(JB_String* Name, JB_String* Value, FastString* Pur
 }
 
 bool SC_FB__AppOptions_target(JB_String* Name, JB_String* Value, FastString* Purpose) {
-	if (!SC_FB__Explain(Purpose, JB_LUB[878])) {
+	if (!SC_FB__Explain(Purpose, JB_LUB[874])) {
 		return nil;
 	}
 	if (JB_Str_Equals(Value, JB_LUB[357], true)) {
 		if (true) {
-			JB_Str_Fail(JB_LUB[879]);
+			JB_Str_Fail(JB_LUB[875]);
 		}
 	}
 	(SC_SC_Targets__SyntaxAccessSet(Value, true));
@@ -3584,7 +3584,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[217]);
-	JB_FS_AppendInt32(_fsf0, (2025062218));
+	JB_FS_AppendInt32(_fsf0, (2025062219));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -3682,7 +3682,7 @@ int SC_FB__Init_() {
 		JB_SetRef(SC__FB_AppOptions, (JB_Dict_Constructor(nil)));
 		DTWrap* _tmPf0 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_nocompile)));
 		JB_Incr(_tmPf0);
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1094], _tmPf0));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1090], _tmPf0));
 		JB_Decr(_tmPf0);
 		DTWrap* _tmPf1 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_breakonerr)));
 		JB_Incr(_tmPf1);
@@ -3718,7 +3718,7 @@ int SC_FB__Init_() {
 		JB_Decr(_tmPf8);
 		DTWrap* _tmPf9 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_perry)));
 		JB_Incr(_tmPf9);
-		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1093], _tmPf9));
+		(JB_Dict_ValueSet(SC__FB_AppOptions, JB_LUB[1089], _tmPf9));
 		JB_Decr(_tmPf9);
 		DTWrap* _tmPf10 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_usescriptloc)));
 		JB_Incr(_tmPf10);
@@ -4099,7 +4099,7 @@ JB_String* JB_ImageHelper__ConvertPNGToVOI(JB_String* P) {
 
 SCNode* SC_InbuiltShellArgs__Collect(Message* Node, SCNode* Name_space, Message* ErrPlace) {
 	if (Name_space != SC__Comp_program) {
-		JB_Msg_Fail(Node, JB_LUB[1122]);
+		JB_Msg_Fail(Node, JB_LUB[1118]);
 		return nil;
 	}
 	Message* _tmPf0 = JB_Msg_NeedSyx(Node, kJB_SyxList);
@@ -4121,7 +4121,7 @@ void SC_AC__ActualDefine(Message* Rz, Message* S) {
 	JB_String* F = JB_Msg_FilePath(S);
 	JB_Incr(F);
 	if (!JB_Str_Exists(F)) {
-		JB_Str_Fail(JB_LUB[820]);
+		JB_Str_Fail(JB_LUB[816]);
 		JB_Decr(F);
 		return;
 	}
@@ -4236,7 +4236,7 @@ Message* SC_AC__AutoComplete(Message* Ff, JB_String* Name, JB_String* Purpose) {
 	}
 	SC__AC_total = 0;
 	int Types = -1;
-	SCNode* Scope = SC_AC__GetScope(Ff, (&Types));
+	SCNode* Scope = SC_AC__GetScope(Ff, Types);
 	JB_Incr(Scope);
 	if (!Scope) {
 		JB_Decr(Scope);
@@ -4669,7 +4669,7 @@ Message* SC_AC__Diissplay(Message* Msg, Message* S, JB_String* Purpose) {
 	SCFunction* Fn = SC_Msg_IdentifyFunc(S);
 	JB_Incr(Fn);
 	if (JB_Msg_EqualsSyx(Msg, kJB_SyxName, false)) {
-		if ((JB_Str_Equals(Purpose, JB_LUB[1821], false)) and SC_Msg_OperatorIsTmp(S, JB_LUB[1042])) {
+		if ((JB_Str_Equals(Purpose, JB_LUB[1821], false)) and SC_Msg_OperatorIsTmp(S, JB_LUB[1038])) {
 			JB_Decr(Fn);
 			JB_Decr(Rz);
 			return S;
@@ -4970,12 +4970,12 @@ SCFunction* SC_AC__GetFunc2(SCFile* Myfile, int F, int N) {
 	return nil;
 }
 
-SCNode* SC_AC__GetScope(Message* Orig, int* Types) {
+SCNode* SC_AC__GetScope(Message* Orig, int& Types) {
 	if (!Orig) {
 		return SC__Comp_program;
 	}
 	if (JB_Msg_EqualsSyx(Orig, kJB_SyxAsk, false)) {
-		Types[0] = 8;
+		Types = 8;
 		return SC__Comp_program;
 	}
 	Message* F = SC_Msg_CutifyCopy(Orig);
@@ -5017,7 +5017,7 @@ SCNode* SC_AC__GetScope(Message* Orig, int* Types) {
 	}
 	JB_Decr(F);
 	if (SC_Msg_ACInIsa(Orig)) {
-		Types[0] = 1;
+		Types = 1;
 		JB_Decr(Arg);
 		return SC__Comp_program;
 	}
@@ -5027,7 +5027,7 @@ SCNode* SC_AC__GetScope(Message* Orig, int* Types) {
 	}
 	JB_Decr(Arg);
 	if (JB_Msg_IsTypeOfDecl(Orig)) {
-		Types[0] = 1;
+		Types = 1;
 		return SC__Comp_program;
 	}
 	SCArg* _tmPf0 = SC_Msg_MsgArg(Orig);
@@ -5067,7 +5067,7 @@ bool SC_AC__InitedOK() {
 	}
 	if (JB_Rec_OK(SC__AC_Errors)) {
 		if (true) {
-			JB_Str_Fail(JB_LUB[821]);
+			JB_Str_Fail(JB_LUB[817]);
 		}
 	}
 	return false;
@@ -5406,7 +5406,7 @@ Message* SC_AC__UnusedFuncs(Message* Cmd) {
 	}
 	SCFile* Scf = ((SCFile*)JB_Dict_ValueLower(SC__Comp_Files, Path->Name));
 	if (!Scf) {
-		JB_Str_Fail(JB_Str_OperatorPlus(JB_LUB[1078], Path->Name));
+		JB_Str_Fail(JB_Str_OperatorPlus(JB_LUB[1074], Path->Name));
 		return nil;
 	}
 	Message* Unused_libs = ((Message*)JB_Ring_NextSib(Path));
@@ -5786,18 +5786,18 @@ int SC_Linkage__Init_() {
 }
 
 bool SC_Linkage__Interpreter() {
-	return SC_Linkage__SyntaxAccess(JB_LUB[1121]);
+	return SC_Linkage__SyntaxAccess(JB_LUB[1117]);
 }
 
 SCNode* SC_Linkage__LinkCollect(Message* Node, SCNode* Name_space, Message* ErrPlace) {
 	if (Name_space != SC__Comp_program) {
-		JB_Msg_Fail(Node, JB_LUB[1122]);
+		JB_Msg_Fail(Node, JB_LUB[1118]);
 		return nil;
 	}
 	Message* Arg = JB_Msg_NeedSyx(Node, kJB_SyxArg);
 	if (Arg) {
-		SC_Msg_ConfTake(Arg, SC__Linkage_Flagz, JB_LUB[1083]);
-		SC_Msg_ConfTake(Arg, SC__Linkage_OSXFrameworks, JB_LUB[1123]);
+		SC_Msg_ConfTake(Arg, SC__Linkage_Flagz, JB_LUB[1079]);
+		SC_Msg_ConfTake(Arg, SC__Linkage_OSXFrameworks, JB_LUB[1119]);
 		{
 			Message* Ch = ((Message*)JB_Ring_First(Arg));
 			while (Ch) {
@@ -5813,7 +5813,7 @@ SCNode* SC_Linkage__LinkCollect(Message* Node, SCNode* Name_space, Message* ErrP
 		return SC__Comp_program;
 	}
 	if (true) {
-		JB_Msg_Fail(ErrPlace, JB_LUB[1124]);
+		JB_Msg_Fail(ErrPlace, JB_LUB[1120]);
 	}
 	return nil;
 }
@@ -5827,7 +5827,7 @@ bool SC_Linkage__SyntaxAccess(JB_String* Name) {
 }
 
 bool SC_Linkage__VM() {
-	return SC_Linkage__SyntaxAccess(JB_LUB[1125]);
+	return SC_Linkage__SyntaxAccess(JB_LUB[1121]);
 }
 
 
@@ -6117,7 +6117,7 @@ JB_File* JB_Platform__OpenLog() {
 	JB_Incr(_tmPf0);
 	JB_String* _tmPf2 = JB_App__AppName();
 	JB_Incr(_tmPf2);
-	JB_String* _tmPf1 = JB_Str_OperatorPlus(_tmPf2, JB_LUB[1075]);
+	JB_String* _tmPf1 = JB_Str_OperatorPlus(_tmPf2, JB_LUB[1071]);
 	JB_Incr(_tmPf1);
 	JB_Decr(_tmPf2);
 	JB_SetRef(Rz, JB_File_SyntaxAccess(_tmPf0, _tmPf1));
@@ -6175,7 +6175,7 @@ int SC_PostIncrementNil__Init_() {
 void SC_PostIncrementNil__SyntaxAppend(Message* Ch) {
 	int S = SC__PostIncrementNil_Size;
 	if (S >= 32) {
-		JB_Msg_Fail(Ch, JB_LUB[939]);
+		JB_Msg_Fail(Ch, JB_LUB[935]);
 		return;
 	}
 	SC__PostIncrementNil_Msgs[S] = Ch;
@@ -6218,7 +6218,7 @@ SCNode* SC_SCGame3D__Love(Message* Node, SCNode* Name_space, Message* ErrPlace) 
 }
 
 bool SC_SCGame3D__NeedShader(JB_String* Name) {
-	if ((JB_Str_Equals(Name, JB_LUB[945], true)) or (JB_Str_Equals(Name, JB_LUB[946], true))) {
+	if ((JB_Str_Equals(Name, JB_LUB[941], true)) or (JB_Str_Equals(Name, JB_LUB[942], true))) {
 		return true;
 	}
 	JB_Object* F = JB_Dict_Value0(SC__Imp_Shaders, Name);
@@ -6226,7 +6226,7 @@ bool SC_SCGame3D__NeedShader(JB_String* Name) {
 	if (!JB_Object_Isa(F, &JB_StringData)) {
 		FastString* _fsf0 = JB_FS_Constructor(nil);
 		JB_Incr(_fsf0);
-		JB_FS_AppendString(_fsf0, JB_LUB[947]);
+		JB_FS_AppendString(_fsf0, JB_LUB[943]);
 		JB_FS_AppendString(_fsf0, Name);
 		JB_FS_AppendByte(_fsf0, '\n');
 		JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
@@ -6422,7 +6422,7 @@ void SC_Refs__RC_CheckFuncAllocOK(SCFunction* Self, Message* Dot) {
 		if (Fn) {
 			if ((SC_Func_SyntaxIs(Fn, kSC__FunctionType_Destructor)) and (!SC_Func_SyntaxIs(Self, kSC__FunctionType_Destructor))) {
 				if (true) {
-					JB_Msg_Fail(Dot, JB_LUB[940]);
+					JB_Msg_Fail(Dot, JB_LUB[936]);
 				}
 			}
 		}
@@ -6442,7 +6442,7 @@ void SC_Refs__RC_CheckNoObjPms(Message* Msg) {
 				}
 				if (I->PointerCount) {
 					if ((SC_Class_IsObject(I->Type))) {
-						JB_Msg_Fail(Msg, JB_LUB[941]);
+						JB_Msg_Fail(Msg, JB_LUB[937]);
 						return;
 					}
 				}
@@ -7024,7 +7024,7 @@ void SC_SCSelector__DeclareOneSel(JB_String* Sel_name, JB_String* Type, Message*
 }
 
 Message* SC_SCSelector__FindItems(Message* Arg) {
-	return JB_Msg_FindSyxName(Arg, kJB_SyxTmp, JB_LUB[949], true);
+	return JB_Msg_FindSyxName(Arg, kJB_SyxTmp, JB_LUB[945], true);
 }
 
 bool SC_SCSelector__HasClassStuff(Message* Self) {
@@ -7035,9 +7035,9 @@ bool SC_SCSelector__HasClassStuff(Message* Self) {
 		while (S) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(S));
 			JB_Incr(_Nf1);
-			if (!((SC_Msg_OperatorIsTmp(S, JB_LUB[168])) or (SC_Msg_OperatorIsTmp(S, JB_LUB[949])))) {
-				if ((SC_Msg_OperatorIsTmp(S, JB_LUB[950]))) {
-					JB_Msg_Fail(S, JB_LUB[951]);
+			if (!((SC_Msg_OperatorIsTmp(S, JB_LUB[168])) or (SC_Msg_OperatorIsTmp(S, JB_LUB[945])))) {
+				if ((SC_Msg_OperatorIsTmp(S, JB_LUB[946]))) {
+					JB_Msg_Fail(S, JB_LUB[947]);
 					JB_Decr(_Nf1);
 					JB_Decr(S);
 					return nil;
@@ -7246,7 +7246,7 @@ void SC_SCTasks__NewTaskActual(Message* Node, SCNode* Name_space) {
 		Level = 3;
 	}
 	 else {
-		JB_Msg_AppendSyx(Fields, kJB_SyxSDot, JB_LUB[1165]);
+		JB_Msg_AppendSyx(Fields, kJB_SyxSDot, JB_LUB[1161]);
 	}
 	SC_Msg_BuildTask(Arg, Fields, Level);
 	JB_Tree_TakeAllFrom(Arg, SC__SCTasks_tmp);
@@ -7274,13 +7274,13 @@ void SC_SCTasks__NewTaskActual(Message* Node, SCNode* Name_space) {
 SCNode* SC_SCThe__NewInsertion(Message* Node, SCNode* Name_space, Message* ErrPlace) {
 	Message* Name = ((Message*)JB_Tree_Get(Node, 0));
 	if (JB_Msg_EqualsSyx(Name, kJB_SyxArg, false)) {
-		Name = JB_Syx_OperatorPlus(kJB_SyxThg, JB_LUB[1003]);
+		Name = JB_Syx_OperatorPlus(kJB_SyxThg, JB_LUB[999]);
 		(JB_Ring_FirstSet(Node, Name));
 	}
 	if (!JB_Msg_Expect(Name, kJB_SyxThg, nil)) {
 		return nil;
 	}
-	if (!((JB_Msg_SyntaxEquals(Name, JB_LUB[1147], false)) or (JB_Msg_SyntaxEquals(Name, JB_LUB[1003], false)))) {
+	if (!((JB_Msg_SyntaxEquals(Name, JB_LUB[1143], false)) or (JB_Msg_SyntaxEquals(Name, JB_LUB[999], false)))) {
 		JB_Msg_Fail(Name, nil);
 		return nil;
 	}
@@ -7303,7 +7303,7 @@ SCNode* SC_SCThe__NewInsertion(Message* Node, SCNode* Name_space, Message* ErrPl
 			Macro* Old = ((Macro*)JB_Dict_Value0(D, Line->Name));
 			if (Old) {
 				if (true) {
-					JB_Msg_Fail(Line, JB_LUB[1148]);
+					JB_Msg_Fail(Line, JB_LUB[1144]);
 				}
 			}
 			 else {
@@ -7320,7 +7320,7 @@ SCNode* SC_SCThe__NewInsertion(Message* Node, SCNode* Name_space, Message* ErrPl
 
 
 void SC_SC_API__DelayedClassAPI(Message* Node, JB_String* Proj) {
-	if ((JB_Msg_SyntaxEquals(Node, JB_LUB[1018], false))) {
+	if ((JB_Msg_SyntaxEquals(Node, JB_LUB[1014], false))) {
 		SC_SC_API__NewAPI(Node, JB_LUB[0], SC__Comp_program, Proj);
 		return;
 	}
@@ -7366,7 +7366,7 @@ void SC_SC_API__DelayedClassAPI(Message* Node, JB_String* Proj) {
 		while (Ch) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(Ch));
 			JB_Incr(_Nf1);
-			if (!JB_Msg_Expect(Ch, kJB_SyxTmp, JB_LUB[1018])) {
+			if (!JB_Msg_Expect(Ch, kJB_SyxTmp, JB_LUB[1014])) {
 				JB_Decr(_Nf1);
 				JB_Decr(Ch);
 				JB_Decr(Cls);
@@ -7472,7 +7472,7 @@ void SC_SC_API__NewExportAPISub(Message* Node, SCObject* Parent) {
 		JB_Decr(Arg);
 		return;
 	}
-	Message* Lib_tmp = JB_Msg_FindSyxName(Arg, kJB_SyxTmp, JB_LUB[1063], true);
+	Message* Lib_tmp = JB_Msg_FindSyxName(Arg, kJB_SyxTmp, JB_LUB[1059], true);
 	JB_Incr(Lib_tmp);
 	if (!Lib_tmp) {
 		JB_Decr(Lib_tmp);
@@ -7498,11 +7498,11 @@ void SC_SC_API__NewExportAPISub(Message* Node, SCObject* Parent) {
 		while (C) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(C));
 			JB_Incr(_Nf1);
-			if ((JB_Msg_SyntaxEquals(C, JB_LUB[1018], false)) or (JB_Msg_SyntaxEquals(C, JB_LUB[1064], false))) {
+			if ((JB_Msg_SyntaxEquals(C, JB_LUB[1014], false)) or (JB_Msg_SyntaxEquals(C, JB_LUB[1060], false))) {
 				JB_SetRef(C->Obj, Parent);
 				JB_Array_SyntaxAppend(SC__Comp_API_List, C);
 			}
-			 else if ((JB_Msg_SyntaxEquals(C, JB_LUB[1065], false)) or (JB_Msg_SyntaxEquals(C, JB_LUB[1063], false))) {
+			 else if ((JB_Msg_SyntaxEquals(C, JB_LUB[1061], false)) or (JB_Msg_SyntaxEquals(C, JB_LUB[1059], false))) {
 				if (!JB_FreeIfDead(JB_Msg_NeedSyx(C, kJB_SyxStr))) {
 					JB_Decr(_Nf1);
 					JB_Decr(C);
@@ -7875,7 +7875,7 @@ bool SC_Crkt__UseID(MessageID* S, Message* Old) {
 		return nil;
 	}
 	if ((!JB_Msg_Length(Old)) != (!OldID)) {
-		JB_Msg_Fail(Old, JB_LUB[859]);
+		JB_Msg_Fail(Old, JB_LUB[855]);
 		return nil;
 	}
 	S->ID = OldID;
@@ -8114,7 +8114,7 @@ void JB_Terminal__SyntaxAppend(JB_String* Text, ivec2 V, TerminalColor Colors) {
 		byte* _Startf0 = Text->Addr;
 		byte* _Endf1 = _Startf0 + JB_Str_Length(Text);
 		while (_Startf0 < _Endf1) {
-			Codepoint _cf2 = JB_u8p_Read((&_Startf0));
+			Codepoint _cf2 = JB_u8p_Read(&_Startf0);
 			Codepoint C = (_cf2);
 			if ((C == 10) or (C == 13)) {
 				(++V[1]);
@@ -8574,7 +8574,7 @@ bool SC_Ext__ExecuteGCC(Array* Commands) {
 	}
 	JB_String* _tmPf0 = JB_Str_OperatorPlus(SC__Ext_CppCompilerPath, JB_LUB[30]);
 	JB_Incr(_tmPf0);
-	JB_String* Start = JB_Str_OperatorPlus(JB_LUB[874], _tmPf0);
+	JB_String* Start = JB_Str_OperatorPlus(JB_LUB[870], _tmPf0);
 	JB_Incr(Start);
 	JB_Decr(_tmPf0);
 	if (true) {
@@ -8689,7 +8689,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1727]);
-	JB_FS_AppendInt32(_fsf0, (2025062218));
+	JB_FS_AppendInt32(_fsf0, (2025062219));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8735,7 +8735,7 @@ void SC_Ext__InstallOne(JB_File* Test) {
 	JB_Decr(_tmPf0);
 	JB_String* _tmPf2 = JB_File_Path(Test);
 	JB_Incr(_tmPf2);
-	JB_String* _tmPf1 = JB_Str_ReplacePathComponent(_tmPf2, -2, JB_LUB[1104]);
+	JB_String* _tmPf1 = JB_Str_ReplacePathComponent(_tmPf2, -2, JB_LUB[1100]);
 	JB_Incr(_tmPf1);
 	JB_Decr(_tmPf2);
 	JB_File* F0 = JB_Str_AsFile(_tmPf1);
@@ -9361,7 +9361,7 @@ bool SC_VM_Builder__BuildInstructions(SCFunction* Fn, Message* Node, SCNode* Nam
 			int Pos = _if0;
 			JB_String* Form = JB_Msg_Name(((Message*)JB_Tree_Get(((Message*)JB_Tree_Get(Tmp, 0)), 0)));
 			if (JB_Str_Exists(Form)) {
-				Message* Fnc = JB_Syx_OperatorPlus(kJB_SyxSDot, JB_LUB[961]);
+				Message* Fnc = JB_Syx_OperatorPlus(kJB_SyxSDot, JB_LUB[957]);
 				Message* List = JB_Msg_Msg(Fnc, kJB_SyxList, JB_LUB[0]);
 				JB_Msg_AppendSyx(List, kJB_SyxStr, JB_Str_LowerCase(Form));
 				JB_Msg_AppendSyx(List, kJB_SyxStr, Tmp->Name);
@@ -9620,7 +9620,7 @@ int SC_VM_Builder__FreeID(Message* M, int Ask) {
 		}
 		SC__VM_Builder_NormalPos = (N + 1);
 		if (N >= 256) {
-			JB_Msg_Fail(M, JB_LUB[962]);
+			JB_Msg_Fail(M, JB_LUB[958]);
 			return 0;
 		}
 		return N;
@@ -9639,7 +9639,7 @@ int SC_VM_Builder__FreeID(Message* M, int Ask) {
 	}
 	;
 	if (true) {
-		JB_Msg_Fail(M, JB_LUB[963]);
+		JB_Msg_Fail(M, JB_LUB[959]);
 	}
 	return 0;
 }
@@ -9828,7 +9828,7 @@ void SC_VM_Builder__MakeVM(Message* Tmp, FastString* Vm) {
 	(JB_Msg_SyntaxIsSet(Tmp, kJB__MsgParseFlags_Special, true));
 	Message* Arg = ((Message*)JB_Ring_Last(Tmp));
 	//;
-	JB_FS_AppendString(Vm, JB_LUB[1072]);
+	JB_FS_AppendString(Vm, JB_LUB[1068]);
 	JB_FS_AppendString(Vm, Tmp->Name);
 	JB_FS_AppendString(Vm, JB_LUB[102]);
 	//;
@@ -9849,7 +9849,7 @@ void SC_VM_Builder__MakeVM(Message* Tmp, FastString* Vm) {
 
 bool SC_VM_Builder__OKBoomer(Message* Tmp, int X, ASM_Encoder Formenc, Array* R) {
 	if ((SC__ASM_Encoders[X])) {
-		JB_Msg_Fail(Tmp, JB_LUB[964]);
+		JB_Msg_Fail(Tmp, JB_LUB[960]);
 	}
 	SC__ASM_Encoders[X] = Formenc;
 	if (R != nil) {
@@ -10020,7 +10020,7 @@ void SC_VM_Builder__VMCpp(FastString* Vm, FastString* Jump) {
 		};
 	}
 	;
-	JB_FS_AppendString(Vm, JB_LUB[1150]);
+	JB_FS_AppendString(Vm, JB_LUB[1146]);
 }
 
 void SC_VM_Builder__VMLine(Message* Line, FastString* Vm) {
@@ -10047,7 +10047,7 @@ void SC_AddToStaticSection(Message* Arg, Message* ToAdd) {
 	if (Static) {
 		Arg = ((Message*)JB_Ring_Last(Static));
 		if ((!JB_Msg_EqualsSyx(Arg, kJB_SyxArg, false))) {
-			JB_Msg_Fail(Static, JB_LUB[990]);
+			JB_Msg_Fail(Static, JB_LUB[986]);
 			return;
 		}
 	}
@@ -10084,7 +10084,7 @@ bool SC_ClassLinkageTable_cpp_wrapper(SCFunction* Fn, Message* Node, SCNode* Nam
 bool SC_ClassLinkageTable_datatype(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 	if (JB_Object_FastIsa(Name_space, &SCClassData)) {
 		if (!SC_Class_IsStruct(((SCClass*)Name_space))) {
-			JB_Msg_Fail(Node, JB_LUB[999]);
+			JB_Msg_Fail(Node, JB_LUB[995]);
 			return nil;
 		}
 		Message* Value = JB_Msg_NeedSyx(Node, kJB_SyxThg);
@@ -10108,7 +10108,7 @@ bool SC_ClassLinkageTable_noearlyfree(SCFunction* Fn, Message* Node, SCNode* Nam
 bool SC_ClassLinkageTable_numeric(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 	if (JB_Object_MustBe(Name_space, &SCClassData, Node)) {
 		if (!SC_Class_IsDataTypeOnly(((SCClass*)Name_space))) {
-			JB_Msg_Fail(Node, JB_LUB[1080]);
+			JB_Msg_Fail(Node, JB_LUB[1076]);
 			return nil;
 		}
 		Message* Type = JB_Msg_NeedSyx(Node, kJB_SyxThg);
@@ -10118,13 +10118,13 @@ bool SC_ClassLinkageTable_numeric(SCFunction* Fn, Message* Node, SCNode* Name_sp
 			return nil;
 		}
 		((SCClass*)Name_space)->TypeInfo = kJB__TC_UnusedType;
-		if ((JB_Msg_SyntaxEquals(Type, JB_LUB[35], false)) or (JB_Msg_SyntaxEquals(Type, JB_LUB[1081], false))) {
+		if ((JB_Msg_SyntaxEquals(Type, JB_LUB[35], false)) or (JB_Msg_SyntaxEquals(Type, JB_LUB[1077], false))) {
 			(SC_Class_SyntaxIsSet(((SCClass*)Name_space), kSC__ClassInfo_Symbol, true));
 		}
-		 else if (JB_Msg_SyntaxEquals(Type, JB_LUB[1082], false)) {
+		 else if (JB_Msg_SyntaxEquals(Type, JB_LUB[1078], false)) {
 			(SC_Class_SyntaxIsSet(((SCClass*)Name_space), kSC__ClassInfo_Fixed, true));
 		}
-		 else if (JB_Msg_SyntaxEquals(Type, JB_LUB[1083], false)) {
+		 else if (JB_Msg_SyntaxEquals(Type, JB_LUB[1079], false)) {
 			(SC_Class_SyntaxIsSet(((SCClass*)Name_space), kSC__ClassInfo_Flags, true));
 		}
 		 else {
@@ -10166,11 +10166,11 @@ bool SC_ClassLinkageTable_stateless(SCFunction* Fn, Message* Node, SCNode* Name_
 bool SC_ClassLinkageTable_tighten(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 	if (JB_Object_FastIsa(Name_space, &SCClassData)) {
 		if (!(SC_Class_IsObject(((SCClass*)Name_space)) or SC_Class_IsStruct(((SCClass*)Name_space)))) {
-			SC_SCObject_Fail(((SCClass*)Name_space), JB_LUB[1084]);
+			SC_SCObject_Fail(((SCClass*)Name_space), JB_LUB[1080]);
 			return nil;
 		}
 		if ((((SCClass*)Name_space)->IsWrapper)) {
-			SC_SCObject_Fail(((SCClass*)Name_space), JB_LUB[1085]);
+			SC_SCObject_Fail(((SCClass*)Name_space), JB_LUB[1081]);
 			return nil;
 		}
 		Message* _tmPf0 = ((Message*)JB_Ring_First(Node));
@@ -10194,7 +10194,7 @@ bool SC_ClassLinkageTable_wrapper(SCFunction* Fn, Message* Node, SCNode* Name_sp
 		if (F) {
 			JB_Msg_Expect(F, kJB_SyxThg, nil);
 			JB_Msg_ExpectLast(F, JB_LUB[0]);
-			if (JB_Msg_SyntaxEquals(F, JB_LUB[1000], false)) {
+			if (JB_Msg_SyntaxEquals(F, JB_LUB[996], false)) {
 				((SCClass*)Name_space)->IsWrapper = 2;
 			}
 			 else {
@@ -10292,7 +10292,7 @@ bool JB_CompareError(Message* Expected, Message* Found) {
 	JB_FS_AppendByte(Fs, '\n');
 	//;
 	//;
-	JB_FS_AppendString(Fs, JB_LUB[769]);
+	JB_FS_AppendString(Fs, JB_LUB[765]);
 	JB_String* _tmPf5 = JB_Msg_plocate(Expected);
 	JB_Incr(_tmPf5);
 	JB_FS_AppendString(Fs, _tmPf5);
@@ -10301,7 +10301,7 @@ bool JB_CompareError(Message* Expected, Message* Found) {
 	//;
 	if (Found) {
 		//;
-		JB_FS_AppendString(Fs, JB_LUB[770]);
+		JB_FS_AppendString(Fs, JB_LUB[766]);
 		JB_String* _tmPf6 = JB_Msg_plocate(Found);
 		JB_Incr(_tmPf6);
 		JB_FS_AppendString(Fs, _tmPf6);
@@ -10811,7 +10811,7 @@ SCDecl* SC_ExtractDecl(Message* C, SCNode* Name_space, DeclMode Purpose, int Dep
 		JB_Incr(Fi);
 		JB_Tree_Clear(C);
 		JB_Msg_AppendSyx(C, kJB_SyxThg, JB_LUB[1291]);
-		JB_Msg_AppendSyx(C, kJB_SyxOpp, JB_LUB[1130]);
+		JB_Msg_AppendSyx(C, kJB_SyxOpp, JB_LUB[1126]);
 		JB_Tree_SyntaxAppend(C, Fi);
 		JB_Decr(Fi);
 	}
@@ -10973,7 +10973,7 @@ SCDecl* SC_ExtractDecl(Message* C, SCNode* Name_space, DeclMode Purpose, int Dep
 			JB_Decr(Rz);
 			return nil;
 		}
-		JB_Msg_Expect(Op, kJB_SyxOpp, JB_LUB[1130]);
+		JB_Msg_Expect(Op, kJB_SyxOpp, JB_LUB[1126]);
 		JB_Decr(Op);
 		Message* Contained = JB_Msg_NeedSyxInt(C, kJB_SyxNil, 2);
 		JB_Incr(Contained);
@@ -11080,7 +11080,7 @@ bool SC_FuncLinkageTable_visible(SCFunction* Fn, Message* Node, SCNode* Name_spa
 
 bool SC_FuncPreReader_description(SCFunction* Self, Message* Msg) {
 	if (SC_Func_SyntaxIs(Self, kSC__FunctionType_Disabled)) {
-		JB_Msg_Fail(Msg, JB_LUB[1105]);
+		JB_Msg_Fail(Msg, JB_LUB[1101]);
 		return nil;
 	}
 	SC_SCBetterNode_ReadDescription(Self, Msg);
@@ -11089,7 +11089,7 @@ bool SC_FuncPreReader_description(SCFunction* Self, Message* Msg) {
 
 bool SC_FuncPreReader_disabled(SCFunction* Self, Message* Msg) {
 	(SC_Func_SyntaxIsSet(Self, kSC__FunctionType_Disabled, true));
-	JB_SetRef(Self->Description, JB_LUB[1032]);
+	JB_SetRef(Self->Description, JB_LUB[1028]);
 	Message* S = ((Message*)JB_Ring_First(Msg));
 	if (S) {
 		JB_Msg_ExpectString(S);
@@ -11106,10 +11106,10 @@ bool SC_FuncPreReader_nil(SCFunction* Self, Message* Msg) {
 	if (JB_Msg_SyntaxEquals(F, JB_LUB[182], true)) {
 		SC_Func_NilSelff(Self, Msg, kSC__NilState_Optional);
 	}
-	 else if (JB_Msg_SyntaxEquals(F, JB_LUB[1106], true)) {
+	 else if (JB_Msg_SyntaxEquals(F, JB_LUB[1102], true)) {
 		SC_Func_MakeNilChecker(Self, Msg);
 	}
-	 else if (JB_Msg_SyntaxEquals(F, JB_LUB[1107], true)) {
+	 else if (JB_Msg_SyntaxEquals(F, JB_LUB[1103], true)) {
 		SC_Func_MakeNilChecker(Self, Msg);
 		(SC_Func_SyntaxIsSet(Self, kSC__FunctionType_HidesProperties, true));
 		(SC_Func_SyntaxIsSet(Self, kSC__FunctionType_Inline, true));
@@ -11137,7 +11137,7 @@ bool SC_FuncPreReader_numeric(SCFunction* Self, Message* Msg) {
 bool SC_FuncPreReader_opt(SCFunction* Self, Message* Msg) {
 	Message* F = JB_Msg_NeedSyx(Msg, kJB_SyxThg);
 	if (F) {
-		if (JB_Msg_SyntaxEquals(F, JB_LUB[1033], true)) {
+		if (JB_Msg_SyntaxEquals(F, JB_LUB[1029], true)) {
 			Message* Min = JB_Msg_NextOf(F, kJB_SyxNum);
 			if (Min) {
 				Self->MinOpt = JB_Msg_Int(Min, 0);
@@ -11145,10 +11145,10 @@ bool SC_FuncPreReader_opt(SCFunction* Self, Message* Msg) {
 		}
 		 else {
 			JB_Msg_ExpectLast(F, JB_LUB[0]);
-			if (JB_Msg_SyntaxEquals(F, JB_LUB[1034], true)) {
+			if (JB_Msg_SyntaxEquals(F, JB_LUB[1030], true)) {
 				(SC_Func_SyntaxIsSet(Self, kSC__FunctionType_NotRefCounted, true));
 			}
-			 else if (JB_Msg_SyntaxEquals(F, JB_LUB[1035], true)) {
+			 else if (JB_Msg_SyntaxEquals(F, JB_LUB[1031], true)) {
 				(SC_Func_SyntaxIsSet(Self, kSC__FunctionType_Inline, true));
 			}
 			 else {
@@ -11255,7 +11255,7 @@ int JB_Init_() {
 		JB_Decr(_tmPf2);
 		DTWrap* _tmPf3 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewFunc)));
 		JB_Incr(_tmPf3);
-		(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1018], _tmPf3));
+		(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1014], _tmPf3));
 		JB_Decr(_tmPf3);
 		DTWrap* _tmPf4 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewCppWrapper)));
 		JB_Incr(_tmPf4);
@@ -11263,7 +11263,7 @@ int JB_Init_() {
 		JB_Decr(_tmPf4);
 		DTWrap* _tmPf5 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewCppWrapper)));
 		JB_Incr(_tmPf5);
-		(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1160], _tmPf5));
+		(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1156], _tmPf5));
 		JB_Decr(_tmPf5);
 		DTWrap* _tmPf6 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewCppWrapper)));
 		JB_Incr(_tmPf6);
@@ -11275,7 +11275,7 @@ int JB_Init_() {
 		JB_Decr(_tmPf7);
 		DTWrap* _tmPf8 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewHelper)));
 		JB_Incr(_tmPf8);
-		(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1036], _tmPf8));
+		(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1032], _tmPf8));
 		JB_Decr(_tmPf8);
 		DTWrap* _tmPf9 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewMacro)));
 		JB_Incr(_tmPf9);
@@ -11311,7 +11311,7 @@ int JB_Init_() {
 		JB_Decr(_tmPf16);
 		DTWrap* _tmPf17 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_SCTasks__NewTask)));
 		JB_Incr(_tmPf17);
-		(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1060], _tmPf17));
+		(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1056], _tmPf17));
 		JB_Decr(_tmPf17);
 		DTWrap* _tmPf18 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Class__NeuRole)));
 		JB_Incr(_tmPf18);
@@ -11327,11 +11327,11 @@ int JB_Init_() {
 		JB_Decr(_tmPf20);
 		DTWrap* _tmPf21 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewProtoType)));
 		JB_Incr(_tmPf21);
-		(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1042], _tmPf21));
+		(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1038], _tmPf21));
 		JB_Decr(_tmPf21);
 		DTWrap* _tmPf22 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewRender)));
 		JB_Incr(_tmPf22);
-		(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1111], _tmPf22));
+		(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1107], _tmPf22));
 		JB_Decr(_tmPf22);
 		DTWrap* _tmPf23 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Imp__DoImport))));
 		JB_Incr(_tmPf23);
@@ -11375,7 +11375,7 @@ int JB_Init_() {
 		JB_Decr(_tmPf32);
 		DTWrap* _tmPf33 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NeuLibrary)));
 		JB_Incr(_tmPf33);
-		(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1113], _tmPf33));
+		(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1109], _tmPf33));
 		JB_Decr(_tmPf33);
 		DTWrap* _tmPf34 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_DontRemove))));
 		JB_Incr(_tmPf34);
@@ -11383,7 +11383,7 @@ int JB_Init_() {
 		JB_Decr(_tmPf34);
 		DTWrap* _tmPf35 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Base__LoadCppPart))));
 		JB_Incr(_tmPf35);
-		(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1116], _tmPf35));
+		(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1112], _tmPf35));
 		JB_Decr(_tmPf35);
 		DTWrap* _tmPf36 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Mod__ConstantCollector))));
 		JB_Incr(_tmPf36);
@@ -11391,12 +11391,12 @@ int JB_Init_() {
 		JB_Decr(_tmPf36);
 		DTWrap* _tmPf37 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Mod__ConstantCollector))));
 		JB_Incr(_tmPf37);
-		(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1083], _tmPf37));
+		(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1079], _tmPf37));
 		JB_Decr(_tmPf37);
 		JB_SetRef(SC_ClsCollectTable, (JB_Dict_Constructor(nil)));
 		DTWrap* _tmPf38 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewConstructor)));
 		JB_Incr(_tmPf38);
-		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[950], _tmPf38));
+		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[946], _tmPf38));
 		JB_Decr(_tmPf38);
 		DTWrap* _tmPf39 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewDestructor)));
 		JB_Incr(_tmPf39);
@@ -11404,7 +11404,7 @@ int JB_Init_() {
 		JB_Decr(_tmPf39);
 		DTWrap* _tmPf40 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewRender)));
 		JB_Incr(_tmPf40);
-		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1111], _tmPf40));
+		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1107], _tmPf40));
 		JB_Decr(_tmPf40);
 		DTWrap* _tmPf41 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewFunc)));
 		JB_Incr(_tmPf41);
@@ -11416,11 +11416,11 @@ int JB_Init_() {
 		JB_Decr(_tmPf42);
 		DTWrap* _tmPf43 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewHider)));
 		JB_Incr(_tmPf43);
-		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1037], _tmPf43));
+		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1033], _tmPf43));
 		JB_Decr(_tmPf43);
 		DTWrap* _tmPf44 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewFunc)));
 		JB_Incr(_tmPf44);
-		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1018], _tmPf44));
+		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1014], _tmPf44));
 		JB_Decr(_tmPf44);
 		DTWrap* _tmPf45 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewMacro)));
 		JB_Incr(_tmPf45);
@@ -11428,7 +11428,7 @@ int JB_Init_() {
 		JB_Decr(_tmPf45);
 		DTWrap* _tmPf46 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewHelper)));
 		JB_Incr(_tmPf46);
-		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1036], _tmPf46));
+		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1032], _tmPf46));
 		JB_Decr(_tmPf46);
 		DTWrap* _tmPf47 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Beh__NewActual)));
 		JB_Incr(_tmPf47);
@@ -11448,11 +11448,11 @@ int JB_Init_() {
 		JB_Decr(_tmPf50);
 		DTWrap* _tmPf51 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NeuSyx)));
 		JB_Incr(_tmPf51);
-		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1051], _tmPf51));
+		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1047], _tmPf51));
 		JB_Decr(_tmPf51);
 		DTWrap* _tmPf52 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewCppWrapper)));
 		JB_Incr(_tmPf52);
-		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1160], _tmPf52));
+		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1156], _tmPf52));
 		JB_Decr(_tmPf52);
 		DTWrap* _tmPf53 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewCppWrapper)));
 		JB_Incr(_tmPf53);
@@ -11460,7 +11460,7 @@ int JB_Init_() {
 		JB_Decr(_tmPf53);
 		DTWrap* _tmPf54 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewProtoType)));
 		JB_Incr(_tmPf54);
-		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1042], _tmPf54));
+		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1038], _tmPf54));
 		JB_Decr(_tmPf54);
 		DTWrap* _tmPf55 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Class__LoadSyntax)));
 		JB_Incr(_tmPf55);
@@ -11496,7 +11496,7 @@ int JB_Init_() {
 		JB_Decr(_tmPf62);
 		DTWrap* _tmPf63 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_SCTasks__NewTask)));
 		JB_Incr(_tmPf63);
-		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1060], _tmPf63));
+		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1056], _tmPf63));
 		JB_Decr(_tmPf63);
 		DTWrap* _tmPf64 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Mod__DoInitAfter))));
 		JB_Incr(_tmPf64);
@@ -11512,7 +11512,7 @@ int JB_Init_() {
 		JB_Decr(_tmPf66);
 		DTWrap* _tmPf67 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_DontRemove))));
 		JB_Incr(_tmPf67);
-		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1116], _tmPf67));
+		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1112], _tmPf67));
 		JB_Decr(_tmPf67);
 		DTWrap* _tmPf68 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_DontRemove))));
 		JB_Incr(_tmPf68);
@@ -11524,7 +11524,7 @@ int JB_Init_() {
 		JB_Decr(_tmPf69);
 		DTWrap* _tmPf70 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_DontRemove))));
 		JB_Incr(_tmPf70);
-		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1161], _tmPf70));
+		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1157], _tmPf70));
 		JB_Decr(_tmPf70);
 		DTWrap* _tmPf71 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Class__GetDefault))));
 		JB_Incr(_tmPf71);
@@ -11536,7 +11536,7 @@ int JB_Init_() {
 		JB_Decr(_tmPf72);
 		DTWrap* _tmPf73 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Class__SetSize))));
 		JB_Incr(_tmPf73);
-		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[969], _tmPf73));
+		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[965], _tmPf73));
 		JB_Decr(_tmPf73);
 		DTWrap* _tmPf74 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_DontRemove))));
 		JB_Incr(_tmPf74);
@@ -11548,16 +11548,16 @@ int JB_Init_() {
 		JB_Decr(_tmPf75);
 		DTWrap* _tmPf76 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Mod__ConstantCollector))));
 		JB_Incr(_tmPf76);
-		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1083], _tmPf76));
+		(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1079], _tmPf76));
 		JB_Decr(_tmPf76);
 		JB_SetRef(SC_CppRefTable, (JB_Dict_Constructor(nil)));
 		DTWrap* _tmPf77 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_CppRefTable_disowns)));
 		JB_Incr(_tmPf77);
-		(JB_Dict_ValueSet(SC_CppRefTable, JB_LUB[1097], _tmPf77));
+		(JB_Dict_ValueSet(SC_CppRefTable, JB_LUB[1093], _tmPf77));
 		JB_Decr(_tmPf77);
 		DTWrap* _tmPf78 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_CppRefTable_disturbs)));
 		JB_Incr(_tmPf78);
-		(JB_Dict_ValueSet(SC_CppRefTable, JB_LUB[1096], _tmPf78));
+		(JB_Dict_ValueSet(SC_CppRefTable, JB_LUB[1092], _tmPf78));
 		JB_Decr(_tmPf78);
 		DTWrap* _tmPf79 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__Tran_CppRefs)));
 		JB_Incr(_tmPf79);
@@ -11566,11 +11566,11 @@ int JB_Init_() {
 		JB_SetRef(SC_FuncLinkageTable, (JB_Dict_Constructor(nil)));
 		DTWrap* _tmPf80 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FuncLinkageTable_cpp_wrapper)));
 		JB_Incr(_tmPf80);
-		(JB_Dict_ValueSet(SC_FuncLinkageTable, JB_LUB[1160], _tmPf80));
+		(JB_Dict_ValueSet(SC_FuncLinkageTable, JB_LUB[1156], _tmPf80));
 		JB_Decr(_tmPf80);
 		DTWrap* _tmPf81 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FuncLinkageTable_cpp_part)));
 		JB_Incr(_tmPf81);
-		(JB_Dict_ValueSet(SC_FuncLinkageTable, JB_LUB[1116], _tmPf81));
+		(JB_Dict_ValueSet(SC_FuncLinkageTable, JB_LUB[1112], _tmPf81));
 		JB_Decr(_tmPf81);
 		DTWrap* _tmPf82 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__Tran_CppRefs)));
 		JB_Incr(_tmPf82);
@@ -11586,16 +11586,16 @@ int JB_Init_() {
 		JB_Decr(_tmPf84);
 		DTWrap* _tmPf85 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FuncLinkageTable_inline)));
 		JB_Incr(_tmPf85);
-		(JB_Dict_ValueSet(SC_FuncLinkageTable, JB_LUB[1035], _tmPf85));
+		(JB_Dict_ValueSet(SC_FuncLinkageTable, JB_LUB[1031], _tmPf85));
 		JB_Decr(_tmPf85);
 		JB_SetRef(SC_ClassLinkageTable, (JB_Dict_Constructor(nil)));
 		DTWrap* _tmPf86 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_ClassLinkageTable_cpp_wrapper)));
 		JB_Incr(_tmPf86);
-		(JB_Dict_ValueSet(SC_ClassLinkageTable, JB_LUB[1160], _tmPf86));
+		(JB_Dict_ValueSet(SC_ClassLinkageTable, JB_LUB[1156], _tmPf86));
 		JB_Decr(_tmPf86);
 		DTWrap* _tmPf87 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_ClassLinkageTable_cpp_part)));
 		JB_Incr(_tmPf87);
-		(JB_Dict_ValueSet(SC_ClassLinkageTable, JB_LUB[1116], _tmPf87));
+		(JB_Dict_ValueSet(SC_ClassLinkageTable, JB_LUB[1112], _tmPf87));
 		JB_Decr(_tmPf87);
 		DTWrap* _tmPf88 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__Tran_CppRefs)));
 		JB_Incr(_tmPf88);
@@ -11661,7 +11661,7 @@ int JB_Init_() {
 		JB_Decr(_tmPf102);
 		DTWrap* _tmPf103 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FuncPreReader_opt)));
 		JB_Incr(_tmPf103);
-		(JB_Dict_ValueSet(SC_FuncPreReader, JB_LUB[1092], _tmPf103));
+		(JB_Dict_ValueSet(SC_FuncPreReader, JB_LUB[1088], _tmPf103));
 		JB_Decr(_tmPf103);
 		DTWrap* _tmPf104 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FuncPreReader_nil)));
 		JB_Incr(_tmPf104);
@@ -12265,14 +12265,14 @@ SCNode* SC_RootCollectTable_crash(Message* Node, SCNode* Name_space, Message* Er
 
 SCNode* SC_RootCollectTable_extends(Message* Node, SCNode* Name_space, Message* ErrPlace) {
 	if (true) {
-		JB_Msg_Fail(Node, JB_LUB[943]);
+		JB_Msg_Fail(Node, JB_LUB[939]);
 	}
 	return SC__Comp_program;
 }
 
 SCNode* SC_RootCollectTable_static(Message* Node, SCNode* Name_space, Message* ErrPlace) {
 	if (true) {
-		JB_Msg_Fail(Node, JB_LUB[944]);
+		JB_Msg_Fail(Node, JB_LUB[940]);
 	}
 	return nil;
 }
@@ -12449,14 +12449,14 @@ Message* SC_SpellOutMsg(Message* Type, Message* Exp, Message* Namemsg) {
 
 bool SC_TemporalStatements_alert(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 	if (true) {
-		JB_Msg_Fail(Node, JB_LUB[954]);
+		JB_Msg_Fail(Node, JB_LUB[950]);
 	}
 	return false;
 }
 
 bool SC_TemporalStatements_break(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 	if (true) {
-		JB_Msg_Fail(Node, JB_LUB[955]);
+		JB_Msg_Fail(Node, JB_LUB[951]);
 	}
 	return false;
 }
@@ -12471,7 +12471,7 @@ bool SC_TemporalStatements_crash(SCFunction* Fn, Message* Node, SCNode* Name_spa
 
 bool SC_TemporalStatements_do(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 	if (true) {
-		JB_Msg_Fail(Node, JB_LUB[956]);
+		JB_Msg_Fail(Node, JB_LUB[952]);
 	}
 	return false;
 }
@@ -12541,7 +12541,7 @@ void SC_Tran_ArgArray(Message* Exp, SCNode* Name_space, SCDecl* Decl) {
 	JB_Decr(Place);
 	SC_ArgArrayCounter_Check((&Counter), Exp);
 	if (Counter.IsItem) {
-		int C = Counter.max + 1;
+		int C = Counter.Max + 1;
 		if (C >= 16384) {
 			JB_Msg_Fail(Exp, JB_LUB[1387]);
 		}
@@ -12553,7 +12553,7 @@ void SC_Tran_ArgArray(Message* Exp, SCNode* Name_space, SCDecl* Decl) {
 
 bool SC_Tran_Flow(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 	if ((!Fn)) {
-		JB_Msg_Fail(Node, JB_LUB[901]);
+		JB_Msg_Fail(Node, JB_LUB[897]);
 		return nil;
 	}
 	Message* Msg = JB_Msg_NeedSyx(Node, kJB_SyxThg);
@@ -12564,8 +12564,8 @@ bool SC_Tran_Flow(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 	}
 	JB_Msg_ExpectLast(Msg, JB_LUB[0]);
 	SC_Msg_SafeRemove(Node, kJB_SyxSheb);
-	if ((!JB_Msg_SyntaxEquals(Msg, JB_LUB[804], false))) {
-		JB_Msg_Fail(Msg, JB_LUB[1066]);
+	if ((!JB_Msg_SyntaxEquals(Msg, JB_LUB[800], false))) {
+		JB_Msg_Fail(Msg, JB_LUB[1062]);
 	}
 	JB_Decr(Msg);
 	(SC_Func_SyntaxIsSet(Fn, kSC__FunctionType_FlowDisabled, true));
@@ -12644,7 +12644,7 @@ void SC_Tran_Msg(SCFunction* Fn, Message* Exp, SCNode* Name_space) {
 
 void SC_Tran_MsgList(Message* Exp) {
 	if (true) {
-		JB_Msg_Fail(Exp, JB_LUB[957]);
+		JB_Msg_Fail(Exp, JB_LUB[953]);
 	}
 	(++SC__Func_DisabledPoints);
 }
@@ -12657,7 +12657,7 @@ bool SC_Tran_Rejoin(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 		SCArg* Arg = SC_Msg_AsArg(P);
 		JB_Incr(Arg);
 		if (!(Arg and Arg->IsStatementExpr)) {
-			JB_Msg_Fail(Node, JB_LUB[958]);
+			JB_Msg_Fail(Node, JB_LUB[954]);
 			JB_Decr(Arg);
 			JB_Decr(P);
 			return nil;
@@ -12666,7 +12666,7 @@ bool SC_Tran_Rejoin(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 		Message* N = ((Message*)JB_Ring_NextSib(P));
 		JB_Incr(N);
 		if (N) {
-			JB_Msg_Fail(Node, JB_LUB[959]);
+			JB_Msg_Fail(Node, JB_LUB[955]);
 			JB_Decr(N);
 			JB_Decr(P);
 			return nil;
@@ -12819,7 +12819,7 @@ SCObject* SC_TypeOfArgArr(Message* Exp, SCNode* Name_space, Message* Side) {
 }
 
 SCObject* SC_TypeOfArr(Message* Exp, SCNode* Name_space, Message* Side) {
-	int IsDispatch = ((int)((JB_Msg_SyntaxEquals(Exp, JB_LUB[1043], true))));
+	int IsDispatch = ((int)((JB_Msg_SyntaxEquals(Exp, JB_LUB[1039], true))));
 	int InOrder = 0;
 	SCDecl* Result = SC_Decl_Constructor(nil, SC_TypeVoid_);
 	JB_Incr(Result);
@@ -13050,7 +13050,7 @@ SCObject* SC_TypeOfBRel(Message* Exp, SCNode* Name_space, Message* Side) {
 	}
 	if (N == '~') {
 		if (!SC_Decl_IsInteger(SubType)) {
-			JB_Msg_Fail(Exp, JB_LUB[916]);
+			JB_Msg_Fail(Exp, JB_LUB[912]);
 		}
 		return SubType;
 	}
@@ -13067,7 +13067,7 @@ SCObject* SC_TypeOfChar(Message* Exp, SCNode* Name_space, Message* Side) {
 	 else {
 		Cp = ((Ind)JB_Str_UTF8Value(Exp->Name, true));
 		if (!JB_Ind_SyntaxCast(Cp)) {
-			JB_Msg_Fail(Exp, JB_LUB[960]);
+			JB_Msg_Fail(Exp, JB_LUB[956]);
 			return nil;
 		}
 	}
@@ -13355,7 +13355,7 @@ SCObject* SC_TypeOfExprSub(Message* Exp, SCNode* Name_space, Message* Side) {
 	}
 	if (!JB_App__Parent(nil, false)) {
 		if (true) {
-			JB_Msg_Fail(Exp, JB_LUB[1149]);
+			JB_Msg_Fail(Exp, JB_LUB[1145]);
 		}
 	}
 	return nil;
@@ -13949,7 +13949,7 @@ SCDecl* SC_TypeOfSwizSub(Message* Exp, SCDecl* Type, SCNode* Name_space, Message
 	if (Count == 1) {
 		Swiz = (Swiz & 7);
 		if (Swiz >= W) {
-			JB_Msg_Fail(Prms, JB_LUB[1067]);
+			JB_Msg_Fail(Prms, JB_LUB[1063]);
 			JB_Decr(Prms);
 			return nil;
 		}
@@ -14004,7 +14004,7 @@ SCDecl* SC_TypeOfSwizSub(Message* Exp, SCDecl* Type, SCNode* Name_space, Message
 				}
 				 else {
 					if (Field >= W) {
-						JB_Msg_Fail(Exp, JB_LUB[1067]);
+						JB_Msg_Fail(Exp, JB_LUB[1063]);
 						JB_Decr(Tmp);
 						JB_Decr(Prms);
 						return nil;
@@ -14052,7 +14052,7 @@ SCDecl* SC_TypeOfSyntaxCall(Message* Exp, SCNode* Name_space, Message* Side) {
 
 SCObject* SC_TypeOfSyx(Message* Exp, SCNode* Name_space, Message* Side) {
 	Exp->Func = kJB_SyxThg;
-	JB_SetRef(Exp->Name, JB_Str_OperatorPlus(JB_LUB[1051], Exp->Name));
+	JB_SetRef(Exp->Name, JB_Str_OperatorPlus(JB_LUB[1047], Exp->Name));
 	return SC_TypeOfThg(Exp, Name_space, Side);
 }
 
@@ -14222,13 +14222,13 @@ SCObject* SC_TypeOfUnit(Message* Exp, SCNode* Name_space, Message* Side) {
 	Float64 Mul = 0.0f;
 	SCClass* Type = SC_TypeInt;
 	JB_String* Unit = Exp->Name;
-	if ((JB_Str_Equals(Unit, JB_LUB[435], false)) or (JB_Str_Equals(Unit, JB_LUB[791], false))) {
+	if ((JB_Str_Equals(Unit, JB_LUB[435], false)) or (JB_Str_Equals(Unit, JB_LUB[787], false))) {
 		Mul = ((Float64)(1 << 10));
 	}
-	 else if ((JB_Str_Equals(Unit, JB_LUB[436], false)) or (JB_Str_Equals(Unit, JB_LUB[792], false))) {
+	 else if ((JB_Str_Equals(Unit, JB_LUB[436], false)) or (JB_Str_Equals(Unit, JB_LUB[788], false))) {
 		Mul = ((Float64)(1 << 20));
 	}
-	 else if ((JB_Str_Equals(Unit, JB_LUB[437], false)) or (JB_Str_Equals(Unit, JB_LUB[793], false))) {
+	 else if ((JB_Str_Equals(Unit, JB_LUB[437], false)) or (JB_Str_Equals(Unit, JB_LUB[789], false))) {
 		Mul = ((Float64)(1 << 30));
 	}
 	 else if ((JB_Str_Equals(Unit, JB_LUB[438], false)) or (JB_Str_Equals(Unit, JB_LUB[87], false))) {
@@ -14263,7 +14263,7 @@ SCObject* SC_TypeOfUnit(Message* Exp, SCNode* Name_space, Message* Side) {
 		 else if (SC_Msg_UnitMatch(Exp, JB_LUB[1232], JB_LUB[1233])) {
 			Mul = (((Float64)31536000.0f) * S4);
 		}
-		 else if (SC_Msg_UnitMatch(Exp, JB_LUB[1234], JB_LUB[1033])) {
+		 else if (SC_Msg_UnitMatch(Exp, JB_LUB[1234], JB_LUB[1029])) {
 			Mul = (((Float64)60.0f) * S4);
 		}
 		 else if (SC_Msg_UnitMatch(Exp, JB_LUB[1235], JB_LUB[1236])) {
@@ -14331,7 +14331,7 @@ SCObject* SC_TypeOfUnit(Message* Exp, SCNode* Name_space, Message* Side) {
 SCDecl* SC_TypeOfVecAccess(Message* Index, SCDecl* Ty0, int W) {
 	if (JB_Msg_EqualsSyx(Index, kJB_SyxNum, false)) {
 		if (!JB_int64_OperatorInRange(JB_Msg_Int(Index, 0), W)) {
-			JB_Msg_Fail(Index, JB_LUB[1067]);
+			JB_Msg_Fail(Index, JB_LUB[1063]);
 			return nil;
 		}
 	}
@@ -14370,7 +14370,7 @@ int SC_UseCustomOperators(SCDecl* LC, SCDecl* RC, SCOperator* Comp, Message* Msg
 		if ((SC_Opp_SyntaxIs(Comp, kSC__OpMode_Comparison)) and (JB_TC_IsSigned(LNT) != JB_TC_IsSigned(RNT))) {
 			if (SC_Decl_CompareUnclear(LC, RC, ((bool)(SC_Opp_SyntaxIs(Comp, kSC__OpMode_Less)))) or SC_Decl_CompareUnclear(RC, LC, ((bool)(SC_Opp_SyntaxIs(Comp, kSC__OpMode_More))))) {
 				if (true) {
-					JB_Msg_Fail(MsgRel, JB_LUB[1068]);
+					JB_Msg_Fail(MsgRel, JB_LUB[1064]);
 				}
 			}
 		}
@@ -14384,7 +14384,7 @@ int SC_UseCustomOperators(SCDecl* LC, SCDecl* RC, SCOperator* Comp, Message* Msg
 			}
 			if (Always) {
 				if (true) {
-					JB_Msg_Fail(MsgRel, JB_LUB[1069]);
+					JB_Msg_Fail(MsgRel, JB_LUB[1065]);
 				}
 			}
 		}
@@ -14404,7 +14404,7 @@ int SC_UseCustomOperators(SCDecl* LC, SCDecl* RC, SCOperator* Comp, Message* Msg
 				}
 			}
 			if (!JB_TC_SameBasicType(LNT, RNT)) {
-				JB_Msg_Fail(MsgRel, JB_LUB[1070]);
+				JB_Msg_Fail(MsgRel, JB_LUB[1066]);
 				return 0;
 			}
 			if (LN > RN) {
@@ -14421,7 +14421,7 @@ int SC_UseCustomOperators(SCDecl* LC, SCDecl* RC, SCOperator* Comp, Message* Msg
 		bool GotABool = ((kJB__TC_bool == LNT) or (kJB__TC_bool == RNT));
 		if (LNT != RNT) {
 			if ((GotABool and SC_Opp_SyntaxIs(Comp, kSC__OpMode_Compare))) {
-				JB_Msg_Fail(MsgRel, JB_LUB[1071]);
+				JB_Msg_Fail(MsgRel, JB_LUB[1067]);
 				return 0;
 			}
 			if (SC_Opp_SyntaxIs(Comp, kSC__OpMode_MathLike)) {
@@ -14675,7 +14675,7 @@ Message* JB_Tk__DecorateThing(Message* R, int Ops) {
 		Message* Opp = JB_Tk__Process(kJB__Tk_kOppTemporal, false, nil);
 		JB_Incr(Opp);
 		if (Opp) {
-			if (JB_Msg_SyntaxEquals(Opp, JB_LUB[809], false)) {
+			if (JB_Msg_SyntaxEquals(Opp, JB_LUB[805], false)) {
 				Message* A = JB_Tk__PostInnerAdj(R, Opp);
 				JB_Incr(A);
 				if (!A) {
@@ -14744,7 +14744,7 @@ Message* JB_Tk__ElseIfAdder(Message* Prev, Message* Curr) {
 		return JB_Tk__UnexpectedSyntax(Curr);
 	}
 	if (Curr->Indent & 1) {
-		return JB_Tk__ErrorAdd(JB_LUB[810], Curr->Position);
+		return JB_Tk__ErrorAdd(JB_LUB[806], Curr->Position);
 	}
 	JB_FreeIfDead(JB_Tk__NewParentName(Prev, kJB_SyxArg, Curr->Position, JB_LUB[0]));
 	JB_Tree_SyntaxAppend(Prev, Curr);
@@ -15127,7 +15127,7 @@ Message* JB_Tk__fBinary(int Start, Message* Parent) {
 Message* JB_Tk__fBracket(int Start, Message* Parent) {
 	Message* Rz = nil;
 	Rz = JB_Tk__NewParentName(nil, kJB_SyxList, Start, JB_LUB[0]);
-	bool Lines = JB_Tk__ParseLoopFlags(Rz, JB_LUB[812], kJB__Tk_kTemporalSyxNoBar);
+	bool Lines = JB_Tk__ParseLoopFlags(Rz, JB_LUB[808], kJB__Tk_kTemporalSyxNoBar);
 	if ((!Lines) and JB_Ring_HasChildCount(Rz, 1)) {
 		JB_Msg_BecomeStr(Rz, kJB_SyxBra, JB_LUB[0]);
 	}
@@ -15263,7 +15263,7 @@ Message* JB_Tk__FillXML(Message* XML, Ind I) {
 		I = JB_Str_FindByte(S, '<', Prev, JB_int__Max());
 		if (!JB_Ind_SyntaxCast(I)) {
 			JB_Decr(S);
-			return JB_Tk__ErrorAdd(JB_LUB[811], XML->Position);
+			return JB_Tk__ErrorAdd(JB_LUB[807], XML->Position);
 		}
 		JB_Tk__AddXMLText(XML, S, Prev, I);
 		(JB_Tk__NextStartSet(I));
@@ -15418,7 +15418,7 @@ Message* JB_Tk__fMsgList(int Start, Message* Parent) {
 			break;
 		}
 		if (JB_Str_OperatorEndsWith(Item->Name, JB_LUB[364])) {
-			Message* _tmPf0 = JB_Tk__ErrorAdd(JB_LUB[1159], Item->Position);
+			Message* _tmPf0 = JB_Tk__ErrorAdd(JB_LUB[1155], Item->Position);
 			JB_Incr(_tmPf0);
 			JB_Decr(Item);
 			JB_Decr(Result);
@@ -15477,7 +15477,7 @@ Message* JB_Tk__fOppBracket(int Start, Message* Parent) {
 	}
 	JB_Decr(Opp1);
 	JB_Decr(Opp2);
-	JB_Tk__ExpectEndChar(Start, JB_LUB[812], true);
+	JB_Tk__ExpectEndChar(Start, JB_LUB[808], true);
 	Message* _tmPf1 = JB_Tk__OppChain(Result);
 	JB_Incr(_tmPf1);
 	JB_Decr(Result);
@@ -16416,7 +16416,7 @@ Message* JB_Tk__OppChain(Message* Opp) {
 void JB_Tk__Params(Message* Parent, int N) {
 	Message* Result = JB_Tk__NewParentName(Parent, kJB_SyxPrm, N, JB_LUB[0]);
 	JB_Incr(Result);
-	JB_Tk__ParseLoopFlags(Result, JB_LUB[812], kJB__Tk_kTemporalSyxNoBar);
+	JB_Tk__ParseLoopFlags(Result, JB_LUB[808], kJB__Tk_kTemporalSyxNoBar);
 	JB_Decr(Result);
 }
 
@@ -16602,7 +16602,7 @@ Message* JB_Tk__ReRoute(Message* Output, Message* Cnj, Message* F) {
 	JB_Incr(Rz);
 	if ((!F)) {
 		JB_Decr(Rz);
-		return JB_Tk__ErrorAdd(JB_LUB[1158], JB_Tk__NextStart());
+		return JB_Tk__ErrorAdd(JB_LUB[1154], JB_Tk__NextStart());
 	}
 	JB_SetRef(Rz, JB_Tk__ChainTemporalRels(F, Cnj));
 	if (JB_Ring_HasChildCount(Rz, 2) and JB_Tk__Allow(kJB__Tk_kEndOfLine)) {
@@ -16723,7 +16723,7 @@ int JB_Tk__XMLAttribs(Message* XML, int Start) {
 		I = JB_Tk__CleanSpaces();
 		C = JB_Str_ByteValue(S, I);
 		if (!((C == '\'') or (C == '"'))) {
-			JB_FreeIfDead(JB_Tk__ErrorAdd(JB_LUB[1076], I));
+			JB_FreeIfDead(JB_Tk__ErrorAdd(JB_LUB[1072], I));
 			JB_Decr(Attr);
 			JB_Decr(S);
 			JB_Decr(AllAtts);
@@ -16742,7 +16742,7 @@ int JB_Tk__XMLAttribs(Message* XML, int Start) {
 	};
 	JB_Decr(AllAtts);
 	JB_Decr(S);
-	JB_FreeIfDead(JB_Tk__ErrorAdd(JB_LUB[1077], JB_Tk__NextStart()));
+	JB_FreeIfDead(JB_Tk__ErrorAdd(JB_LUB[1073], JB_Tk__NextStart()));
 	return 0;
 }
 
@@ -17613,7 +17613,7 @@ ASM SC_ASM_Write_OffsetSet(ASM Self, uint Value) {
 SCFunction* SC_ASM__AccessStr(Message* M) {
 	SCFunction* _tmPf0 = SC_Comp__XFunc(M->Name, M);
 	if (!_tmPf0) {
-		JB_Msg_Fail(M, JB_LUB[989]);
+		JB_Msg_Fail(M, JB_LUB[985]);
 		return nil;
 	}
 	return _tmPf0;
@@ -17801,7 +17801,7 @@ FatASM* SC_Reg_NeedFAT(ASMReg Self) {
 		return F;
 	}
 	if (true) {
-		JB_Str_Fail(JB_LUB[942]);
+		JB_Str_Fail(JB_LUB[938]);
 	}
 	return (&SC__Pac_Sh.Zero);
 }
@@ -18014,7 +18014,7 @@ ASMReg SC_ASMType__AddressOf(Assembler* Self, Message* Exp, ASMReg Dest, int Mod
 		return SC_Reg_OperatorBitand(Rz, (~kSC__Reg_ContainsAddr));
 	}
 	if (true) {
-		JB_Msg_Fail(Exp, JB_LUB[822]);
+		JB_Msg_Fail(Exp, JB_LUB[818]);
 	}
 	SC_Pac_GetASM(Self, Exp, SC_Reg_OperatorAs(Dest, kSC__Reg_AddrNeed));
 	return Rz;
@@ -18357,7 +18357,7 @@ ASMReg SC_ASMType__IncrOnAddr(Assembler* Self, Message* Exp, ASMReg Dest, int Mo
 	}
 	int Bc = JB_Int_Log2(JB_TC_ByteCount(SC_Reg_xC2xB5Type(Dest)));
 	int Offset = 0;
-	Addr = SC_Pac_InlineOffsetOpt(Self, Addr, Bc, (&Offset), ((1 << 6) - 1), Glob);
+	Addr = SC_Pac_InlineOffsetOpt(Self, Addr, Bc, Offset, ((1 << 6) - 1), Glob);
 	FatASM* Fat = SC_Msg_CNTC(Exp, Addr, Dest, Offset >> Bc, Amount, Bc);
 	(SC_FAT_Prm(Fat, 0, Addr));
 	if (Mode & kSC__ASMType_IncrAfter) {
@@ -18447,7 +18447,7 @@ void SC_ASMType__NotTemp(Assembler* Self, ASMReg Src, Message* P) {
 		return;
 	}
 	if (SC_Reg_SyntaxIs(Src, kSC__Reg_Temp)) {
-		JB_Msg_Fail(P, JB_LUB[823]);
+		JB_Msg_Fail(P, JB_LUB[819]);
 	}
 }
 
@@ -18698,7 +18698,7 @@ ASMReg SC_ASMType__Unexpected(Assembler* Self, Message* Exp, ASMReg Dest, int Mo
 		}
 	}
 	if (true) {
-		JB_Msg_Fail(Exp, JB_LUB[824]);
+		JB_Msg_Fail(Exp, JB_LUB[820]);
 	}
 	return ((ASMReg)0);
 }
@@ -18777,7 +18777,7 @@ int SC_TC_FloatIntMerge(uint /*DataTypeCode*/ Self, int Old, Message* S) {
 		Old = (Old | 1);
 	}
 	if (Old == 3) {
-		JB_Msg_Fail(S, JB_LUB[953]);
+		JB_Msg_Fail(S, JB_LUB[949]);
 		return 0;
 	}
 	return Old;
@@ -19389,7 +19389,7 @@ Syntax JB_Syx__Func(JB_String* Name, Message* Where) {
 		SyntaxObj* Obj = ((SyntaxObj*)JB_Dict_ValueLower(JB__Constants__SyxDict, Name));
 		JB_Incr(Obj);
 		if (!Obj) {
-			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[808], Name);
+			JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[804], Name);
 			JB_Incr(_tmPf0);
 			JB_Msg_Fail(Where, _tmPf0);
 			JB_Decr(_tmPf0);
@@ -20280,7 +20280,7 @@ NilRecord SC_nil_BranchEnter(ArchonPurger* Self, Message* Where) {
 		return N;
 	}
 	if (true) {
-		JB_Msg_Fail(Where, JB_LUB[965]);
+		JB_Msg_Fail(Where, JB_LUB[961]);
 	}
 	return 0;
 }
@@ -20340,7 +20340,7 @@ NilState SC_nil_DeclareSub(ArchonPurger* Self, SCDecl* D, uint /*NilState*/ Nd) 
 	Nd = (Nd & kSC__NilState_Either);
 	int N = SC_NRD_DepthOfVars(SC_nil_Value(Self)) + 1;
 	if (N >= 31) {
-		JB_Msg_Fail(D->Source, JB_LUB[966]);
+		JB_Msg_Fail(D->Source, JB_LUB[962]);
 		return 0;
 	}
 	Self->Decls[N] = D;
@@ -20540,7 +20540,7 @@ NilState SC_nil__Brel(Message* Msg, NilCheckMode Test) {
 	uint B = JB_Str_First(Msg->Name);
 	if (B == '*') {
 		if (true) {
-			JB_Msg_Fail(Msg, JB_LUB[824]);
+			JB_Msg_Fail(Msg, JB_LUB[820]);
 		}
 	}
 	Message* Ch = ((Message*)JB_Ring_First(Msg));
@@ -21353,7 +21353,7 @@ NilState SC_nil__While(Message* Msg, NilCheckMode Test) {
 void SC_ArgArrayCounter_Check(ArgArrayCounter* Self, Message* Exp) {
 	if (Self->IsItem and Self->IsNotItem) {
 		if (true) {
-			JB_Msg_Fail(Exp, JB_LUB[825]);
+			JB_Msg_Fail(Exp, JB_LUB[821]);
 		}
 	}
 }
@@ -21368,12 +21368,12 @@ Message* SC_ArgArrayCounter_Do(ArgArrayCounter* Self, JB_String* Name, Message* 
 		Message* Key = JB_Msg_NeedSyx(Item, kJB_SyxNil);
 		if (Key) {
 			int64 V = 0;
-			bool _tmPf0 = SC_Msg_ConstIntValue(Key, Name_space, (&V));
+			bool _tmPf0 = SC_Msg_ConstIntValue(Key, Name_space, V);
 			if (!_tmPf0) {
 				JB_Msg_Fail(Item, JB_LUB[1325]);
 			}
 			if (_tmPf0) {
-				(Self->max = JB_int_OperatorMax(Self->max, V));
+				(Self->Max = JB_int_OperatorMax(Self->Max, V));
 			}
 			JB_Tree_SyntaxAppend(Arr, Key);
 			Value = ((Message*)JB_Ring_First(Item));
@@ -21382,7 +21382,7 @@ Message* SC_ArgArrayCounter_Do(ArgArrayCounter* Self, JB_String* Name, Message* 
 	 else {
 		Self->IsNotItem = true;
 		JB_Msg_AppendNum(Arr, (Self->i)++);
-		Self->max = Self->i;
+		Self->Max = Self->i;
 	}
 	return SC_NewEqRelWithMsgMsg(Acc, Value);
 }
@@ -21524,7 +21524,7 @@ void JB_FastBuff_PositionSet(FastBuff* Self, int Value) {
 	byte* C = Self->Start + Value;
 	if ((C < Self->Start) or (C > Self->End)) {
 		if (true) {
-			JB_FastBuff_SyntaxExpect(Self, JB_LUB[973]);
+			JB_FastBuff_SyntaxExpect(Self, JB_LUB[969]);
 		}
 		C = Self->End;
 	}
@@ -22390,7 +22390,7 @@ void SC_LoopInfo_FinishLoop(LoopInfo* Self, Message* Msg) {
 	NilRecord Ex = Self->ExitRecord;
 	(SC_nil_ValueSet((&SC__nil_T), Ex));
 	if (!Ex) {
-		JB_Rec__NewCriticalError(Msg, JB_LUB[1048], nil);
+		JB_Rec__NewCriticalError(Msg, JB_LUB[1044], nil);
 	}
 	if ((!Self->HasEscape) and (!JB_Tree_IsLast(Msg))) {
 		SC_Msg_KinderRemoveAfter(Msg);
@@ -22448,13 +22448,13 @@ void JB_LD_Destructor(ObjectLoader* Self) {
 void JB_LD_Finish(ObjectLoader* Self) {
 	JB_SetRef(Self->Result, nil);
 	if (Self->NoClass) {
-		JB_Msg_Fail(Self->DataError, JB_LUB[782]);
+		JB_Msg_Fail(Self->DataError, JB_LUB[778]);
 	}
 	if (Self->DataError) {
-		JB_Msg_Fail(Self->DataError, JB_LUB[783]);
+		JB_Msg_Fail(Self->DataError, JB_LUB[779]);
 	}
 	if (Self->CouldntLoad) {
-		JB_Object_FailStr(Self->CouldntLoad, JB_LUB[784]);
+		JB_Object_FailStr(Self->CouldntLoad, JB_LUB[780]);
 	}
 }
 
@@ -22684,7 +22684,7 @@ void JB_Saver_Constructor(ObjectSaver* Self) {
 
 void JB_Saver_Destructor(ObjectSaver* Self) {
 	if (Self->CantSaveThis) {
-		JB_Object_FailStr(Self->CantSaveThis, JB_LUB[803]);
+		JB_Object_FailStr(Self->CantSaveThis, JB_LUB[799]);
 	}
 	JB_Clear(Self->Dest);
 }
@@ -22758,7 +22758,7 @@ PicoComms* JB_Pico__New(JB_StringC* Name, int Noise) {
 	if (true) {
 		JB_String* _tmPf1 = JB_int_RenderFS(St.OpenPicos, nil);
 		JB_Incr(_tmPf1);
-		JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[799], _tmPf1);
+		JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[795], _tmPf1);
 		JB_Incr(_tmPf0);
 		JB_Decr(_tmPf1);
 		JB_Str_Fail(_tmPf0);
@@ -23345,7 +23345,7 @@ ASMReg SC_Pac_CallFunc(Assembler* Self, Message* Exp, ASMReg Dest, SCFunction* F
 	}
 	Self->VDecls = V;
 	if (V >= 32) {
-		JB_Msg_Fail(Exp, JB_LUB[934]);
+		JB_Msg_Fail(Exp, JB_LUB[930]);
 	}
 	if ((SC_Reg_SyntaxIs(Dest, kSC__Reg_ExitAtAll)) and Self->State.Return) {
 		V = JB_int_OperatorMax(1, Self->State.ParentVDecls);
@@ -23402,7 +23402,7 @@ void SC_Pac_CapASM(Assembler* Self) {
 	(JB_Mrap_LengthSet(SC__Pac_JSM, SC_Pac_Curr(Self) - Self->Start));
 }
 
-Message* SC_Pac_CloseOneVar(Assembler* Self, Message* Exp, int OriginalDecls, bool* DoMore) {
+Message* SC_Pac_CloseOneVar(Assembler* Self, Message* Exp, int OriginalDecls, bool& DoMore) {
 	uint V = ((byte)JB_Ternary(OriginalDecls >= 0, Self->VDecls, Self->VTemps));
 	SCDecl* D = Self->Vars[V];
 	if ((!D) and (OriginalDecls >= 0)) {
@@ -23415,7 +23415,7 @@ Message* SC_Pac_CloseOneVar(Assembler* Self, Message* Exp, int OriginalDecls, bo
 		}
 		 else {
 			if ((SC_FAT_OperatorIsa(K, kSC__ASM_GTAB)) and (V == (OriginalDecls + 1))) {
-				DoMore[0] = false;
+				DoMore = false;
 				return nil;
 			}
 			(--K->xC2xB5RefCount);
@@ -23453,10 +23453,10 @@ ASMReg SC_Pac_CloseVars(Assembler* Self, uint /*u16*/ Orig, Message* Exp, ASMReg
 	uint OrigTemps = Orig & 255;
 	bool DoMore = true;
 	while (Self->VTemps < OrigTemps) {
-		Exp = SC_Pac_CloseOneVar(Self, Exp, -1, (&DoMore));
+		Exp = SC_Pac_CloseOneVar(Self, Exp, -1, DoMore);
 	};
 	while (DoMore and (Self->VDecls > OrigDecls)) {
-		Exp = SC_Pac_CloseOneVar(Self, Exp, OrigDecls, (&DoMore));
+		Exp = SC_Pac_CloseOneVar(Self, Exp, OrigDecls, DoMore);
 		if (!DoMore) {
 			break;
 		}
@@ -23581,7 +23581,7 @@ ASMReg SC_Pac_DeclareMe(Assembler* Self, Message* Where, SCDecl* Type) {
 		return T;
 	}
 	if (true) {
-		SC_Pac_Fail(Self, Where, JB_LUB[935]);
+		SC_Pac_Fail(Self, Where, JB_LUB[931]);
 	}
 	return ((ASMReg)0);
 }
@@ -24165,10 +24165,10 @@ ASMReg SC_Pac_InlineFinishWithConsts(Assembler* Self, FatRange* R) {
 	return Rz;
 }
 
-ASMReg SC_Pac_InlineOffsetOpt(Assembler* Self, ASMReg Base, int Pow2, int* Index, uint Maximum, SCDecl* Glob) {
+ASMReg SC_Pac_InlineOffsetOpt(Assembler* Self, ASMReg Base, int Pow2, int& Index, uint Maximum, SCDecl* Glob) {
 	FatASM* Bs = SC_Reg_FAT(Base);
 	if (SC_FAT_OperatorIsa(Bs, kSC__ASM_GTAB)) {
-		if (Index[0]) {
+		if (Index) {
 		}
 		if ((!Glob)) {
 			JB_Object_Fail(nil);
@@ -24180,10 +24180,10 @@ ASMReg SC_Pac_InlineOffsetOpt(Assembler* Self, ASMReg Base, int Pow2, int* Index
 			JB_Object_Fail(nil);
 			return nil;
 		}
-		if ((Index[0] & ((1 << (Pow2)) - 1))) {
-			JB_Msg_Fail(Bs->Msg, JB_LUB[1145]);
+		if ((Index & ((1 << (Pow2)) - 1))) {
+			JB_Msg_Fail(Bs->Msg, JB_LUB[1141]);
 		}
-		int64 I = (Index[0] + Lost) << Pow2;
+		int64 I = (Index + Lost) << Pow2;
 		I = (I >> Pow2);
 		if (I > ((int)Maximum)) {
 			ASMReg Temp = SC_Pac_TempOnly(Self, Bs->Msg, Base);
@@ -24191,14 +24191,14 @@ ASMReg SC_Pac_InlineOffsetOpt(Assembler* Self, ASMReg Base, int Pow2, int* Index
 			I = 0;
 			Base = Temp;
 		}
-		Index[0] = I;
+		Index = I;
 		return Base;
 	}
 	if (SC_Reg_SyntaxIs(Base, kSC__Reg_Temp) and SC_FAT_OperatorIsa(Bs, kSC__ASM_ADDK)) {
 		uint CC = Bs->Prms[2];
 		uint CC2 = CC >> Pow2;
 		if ((CC2 <= Maximum) and ((CC2 << Pow2) == CC)) {
-			Index[0] = (Index[0] + CC2);
+			Index = (Index + CC2);
 			uint R = Bs->Prms[1];
 			Base = SC_Reg_RegSet(Base, R);
 			Base = (SC_Reg_SyntaxIsSet(Base, kSC__Reg_Temp, ((bool)(R >> 31))));
@@ -24459,7 +24459,7 @@ Message* SC_Pac_LoadTitle(Assembler* Self, Message* M) {
 	}
 	int64 N = JB_Msg_Int(JB_Msg_NeedSyx(Bra, kJB_SyxNum), 0);
 	if (!((N >= 0) and (N <= 10))) {
-		JB_Msg_Fail(M, JB_LUB[1061]);
+		JB_Msg_Fail(M, JB_LUB[1057]);
 		return nil;
 	}
 	{
@@ -24994,7 +24994,7 @@ FatASM* SC_Pac_ReadOrWriteSub(Assembler* Self, ASMReg Dest, Message* Exp, ASMReg
 			VarAdd = SC_Reg__New();
 		}
 	}
-	Base = SC_Pac_InlineOffsetOpt(Self, Base, Bytes, (&Index), 127, D);
+	Base = SC_Pac_InlineOffsetOpt(Self, Base, Bytes, Index, 127, D);
 	if (Index >= 128) {
 		Index = (Index << Bytes);
 		Base = SC_Pac_AddToReg(Self, Exp, SC_Reg__New(), SC_Reg_OperatorAs(Base, kSC__Reg_NoScale), Index);
@@ -25064,7 +25064,7 @@ FatASM* SC_Pac_RefCountSub(Assembler* Self, Message* Exp, Message* Prms, SCFunct
 	if (Fn == SC__Comp_RefClear) {
 		int Offset = 0;
 		ASMReg A = SC_Pac_xC2xB5(Self, ((Message*)JB_Ring_First(Prms)), kSC__Reg_AddrRequest);
-		A = SC_Pac_InlineOffsetOpt(Self, A, 3, (&Offset), ((1 << 13) - 1), nil);
+		A = SC_Pac_InlineOffsetOpt(Self, A, 3, Offset, ((1 << 13) - 1), nil);
 		return SC_Msg_RFWR(Exp, A, nil, 1, Offset);
 	}
 	if (Fn == SC__Comp_RefSetRef) {
@@ -25078,7 +25078,7 @@ FatASM* SC_Pac_RefCountSub(Assembler* Self, Message* Exp, Message* Prms, SCFunct
 		int Offset = 0;
 		if (!SC_Reg_SyntaxIs(Out, kSC__Reg_ContainsAddr)) {
 			if (SC_Reg_SyntaxIs(From, kSC__Reg_ContainsAddr)) {
-				From = SC_Pac_InlineOffsetOpt(Self, From, 3, (&Offset), ((1 << 13) - 1), SC_Msg_ASMDecl(P));
+				From = SC_Pac_InlineOffsetOpt(Self, From, 3, Offset, ((1 << 13) - 1), SC_Msg_ASMDecl(P));
 				return SC_Msg_RFRD(Exp, Out, From, 1, Offset);
 			}
 			return SC_Msg_RFST(Exp, Out, From);
@@ -25089,13 +25089,13 @@ FatASM* SC_Pac_RefCountSub(Assembler* Self, Message* Exp, Message* Prms, SCFunct
 			Where = SC_Reg_xC2xB5TypeSet(Where, kJB__TC__voidptr);
 			From = SC_FAT_AsReg(SC_Pac_Read(Self, Where, P, From, nil, SC_Msg_ASMDecl(P), 0), Where);
 		}
-		Out = SC_Pac_InlineOffsetOpt(Self, Out, 3, (&Offset), ((1 << 13) - 1), Glob);
+		Out = SC_Pac_InlineOffsetOpt(Self, Out, 3, Offset, ((1 << 13) - 1), Glob);
 		return SC_Msg_RFWR(Exp, Out, From, 1, Offset);
 	}
 	if (Fn == SC__Comp_RefIncr2) {
 		ASMReg A = SC_Pac_xC2xB5(Self, ((Message*)JB_Ring_First(Prms)), kSC__Reg_AddrRequest);
 		int Offset = 0;
-		A = SC_Pac_InlineOffsetOpt(Self, A, 3, (&Offset), ((1 << 13) - 1), nil);
+		A = SC_Pac_InlineOffsetOpt(Self, A, 3, Offset, ((1 << 13) - 1), nil);
 		ASMReg B = SC_Pac_xC2xB5(Self, ((Message*)JB_Tree_Second(Prms)), SC_Reg__New());
 		return SC_Msg_RFWR(Exp, A, B, 0, Offset);
 	}
@@ -25366,7 +25366,7 @@ ASMReg SC_Pac_TempOnly(Assembler* Self, Message* Where, ASMReg T) {
 	}
 	int R = Self->VTemps - 1;
 	if (R <= Self->VDecls) {
-		JB_Msg_Fail(Where, JB_LUB[935]);
+		JB_Msg_Fail(Where, JB_LUB[931]);
 	}
 	T = SC_Reg_RegSet(T, R);
 	Self->VTemps = R;
@@ -25773,7 +25773,7 @@ FatASM* SC_Pac_ZeroMemory(Assembler* Self, int Index, Message* Exp, ASMReg Base,
 	if (D) {
 		Index = SC_Decl_SizeOfQuery(D);
 		if (!((Index < 524288) and (Index > 0))) {
-			JB_Msg_Fail(Exp, JB_LUB[1146]);
+			JB_Msg_Fail(Exp, JB_LUB[1142]);
 		}
 	}
 	return SC_Msg_MEMZ(Exp, Base, Index);
@@ -26052,7 +26052,7 @@ JB_Object* JB_Object_TypeFailed(JB_Object* Self, JB_Class* Cls, Message* Where) 
 	JB_String* Name = JB_cstring_Str(JB_ObjClass(Self)->Name);
 	JB_Incr(Name);
 	if (true) {
-		JB_String* _tmPf1 = JB_Str_OperatorPlusWithCstring(JB_LUB[798], Cls->Name);
+		JB_String* _tmPf1 = JB_Str_OperatorPlusWithCstring(JB_LUB[794], Cls->Name);
 		JB_Incr(_tmPf1);
 		JB_String* _tmPf0 = JB_Str_OperatorPlus(Name, _tmPf1);
 		JB_Incr(_tmPf0);
@@ -26174,8 +26174,8 @@ void SC_CppRefs_Read(CppRefs* Self, Message* Node) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(C));
 			JB_Incr(_Nf1);
 			JB_Msg_Expect(C, kJB_SyxTmp, nil);
-			if (!((JB_Msg_SyntaxEquals(C, JB_LUB[1096], false)) or (JB_Msg_SyntaxEquals(C, JB_LUB[1097], false)))) {
-				JB_Msg_Fail(C, JB_LUB[1098]);
+			if (!((JB_Msg_SyntaxEquals(C, JB_LUB[1092], false)) or (JB_Msg_SyntaxEquals(C, JB_LUB[1093], false)))) {
+				JB_Msg_Fail(C, JB_LUB[1094]);
 				JB_Decr(_Nf1);
 				JB_Decr(C);
 				JB_Decr(Arg);
@@ -26207,7 +26207,7 @@ void SC_CppRefs_Read(CppRefs* Self, Message* Node) {
 		JB_Decr(Arg);
 		return;
 	}
-	Message* _tmPf4 = JB_Msg_FindSyxName(Arg, kJB_SyxTmp, JB_LUB[1099], false);
+	Message* _tmPf4 = JB_Msg_FindSyxName(Arg, kJB_SyxTmp, JB_LUB[1095], false);
 	JB_Incr(_tmPf4);
 	Message* Disown = ((Message*)JB_Tree_Get(_tmPf4, 0));
 	JB_Incr(Disown);
@@ -26216,7 +26216,7 @@ void SC_CppRefs_Read(CppRefs* Self, Message* Node) {
 		Self->Owned = (!SC_Msg_TrueOrFalse(Disown));
 	}
 	JB_Decr(Disown);
-	Message* _tmPf5 = JB_Msg_FindSyxName(Arg, kJB_SyxTmp, JB_LUB[1096], false);
+	Message* _tmPf5 = JB_Msg_FindSyxName(Arg, kJB_SyxTmp, JB_LUB[1092], false);
 	JB_Incr(_tmPf5);
 	JB_Decr(Arg);
 	Message* Stuff = ((Message*)JB_Tree_Get(_tmPf5, 0));
@@ -26743,9 +26743,9 @@ void SC_Cpp_ExportStruct(Cpp_Export* Self, SCClass* Cls, bool IsBehaviour) {
 	if (IsBehaviour) {
 		if ((!Cls->Super)) {
 			SC_Cpp_AppendCppField(Self, JB_LUB[1396], Fs);
-			SC_Cpp_ExportOneProperty(Self, Cls, Fs, JB_LUB[1111]);
+			SC_Cpp_ExportOneProperty(Self, Cls, Fs, JB_LUB[1107]);
 		}
-		SC_Cpp_ExportProperties(Self, Cls, Fs, JB_LUB[1111]);
+		SC_Cpp_ExportProperties(Self, Cls, Fs, JB_LUB[1107]);
 	}
 	 else {
 		SC_Cpp_ExportProperties(Self, Cls, Fs, nil);
@@ -27230,7 +27230,7 @@ void SC_Cpp_WriteAPIHeader(Cpp_Export* Self, JB_File* Destfile) {
 				JB_Decr(M);
 				break;
 			}
-			if ((JB_Msg_SyntaxEquals(M, JB_LUB[1064], false))) {
+			if ((JB_Msg_SyntaxEquals(M, JB_LUB[1060], false))) {
 				Message* F = ((Message*)JB_Ring_First(M));
 				JB_Incr(F);
 				SCClass* Cls = SC_Comp__SyntaxAccess(F);
@@ -27442,13 +27442,13 @@ JB_File* SC_Cpp__APIHeader() {
 	JB_Incr(Rz);
 	Message* Arg = JB_Msg_Last(SC__Comp_API_Place, kJB_SyxArg);
 	JB_Incr(Arg);
-	Message* _tmPf1 = JB_Msg_FindSyxName(Arg, kJB_SyxTmp, JB_LUB[1063], false);
+	Message* _tmPf1 = JB_Msg_FindSyxName(Arg, kJB_SyxTmp, JB_LUB[1059], false);
 	JB_Incr(_tmPf1);
 	Message* ForLib = JB_Msg_NeedSyx(_tmPf1, kJB_SyxStr);
 	JB_Incr(ForLib);
 	JB_Decr(_tmPf1);
 	if (ForLib) {
-		Message* _tmPf2 = JB_Msg_FindSyxName(Arg, kJB_SyxTmp, JB_LUB[1065], false);
+		Message* _tmPf2 = JB_Msg_FindSyxName(Arg, kJB_SyxTmp, JB_LUB[1061], false);
 		JB_Incr(_tmPf2);
 		Message* FolName = JB_Msg_NeedSyx(_tmPf2, kJB_SyxStr);
 		JB_Incr(FolName);
@@ -27458,7 +27458,7 @@ JB_File* SC_Cpp__APIHeader() {
 			JB_Incr(Fol);
 			FastString* _fsf0 = JB_FS_Constructor(nil);
 			JB_Incr(_fsf0);
-			JB_FS_AppendString(_fsf0, JB_LUB[1100]);
+			JB_FS_AppendString(_fsf0, JB_LUB[1096]);
 			SCFile* _tmPf3 = SC_Msg_File(Arg);
 			JB_Incr(_tmPf3);
 			JB_FS_AppendString(_fsf0, _tmPf3);
@@ -27467,7 +27467,7 @@ JB_File* SC_Cpp__APIHeader() {
 			JB_Incr(_tmPf4);
 			JB_Decr(_fsf0);
 			if (JB_File_MustExist(Fol, _tmPf4)) {
-				JB_String* _tmPf5 = JB_Str_OperatorPlus(SC__Comp_ProjectName, JB_LUB[1101]);
+				JB_String* _tmPf5 = JB_Str_OperatorPlus(SC__Comp_ProjectName, JB_LUB[1097]);
 				JB_Incr(_tmPf5);
 				JB_SetRef(Rz, JB_File_SyntaxAccess(Fol, _tmPf5));
 				JB_Decr(_tmPf5);
@@ -27507,20 +27507,30 @@ bool SC_Cpp__C_OneParamType(FastStringCpp* Fs, Message* Curr, SCDecl* D) {
 
 void SC_Cpp__C_ParamsRender(Message* Self, FastStringCpp* Fs) {
 	JB_FS_AppendByte(Fs, '(');
+	SCFunction* Fn = ((SCFunction*)JB_Object_FastAs(Self->Obj, &SCFunctionData));
+	Array* Args = ((Array*)JB_Ternary(Fn, Fn->Args, nil));
+	if (!SC_Func_SyntaxIs(Fn, kSC__FunctionType_Cpp)) {
+		Args = nil;
+	}
+	int I = 0;
 	{
 		Message* Item = ((Message*)JB_Ring_First(Self));
-		Message* _firstf2 = Item;
+		Message* _firstf1 = Item;
 		while (Item) {
-			Message* _Nf1 = ((Message*)JB_Ring_NextSib(Item));
-			if (_firstf2 != Item) {
+			if (_firstf1 != Item) {
 				JB_FS_AppendString(Fs, JB_LUB[12]);
 			}
 			//start;
+			SCDecl* Dest = ((SCDecl*)JB_Array_Value(Args, I));
+			if (SC_Decl_SyntaxIs(Dest, kSC__SCDeclInfo_Reference)) {
+				JB_FS_AppendByte(Fs, '&');
+			}
 			SCDecl* Ty2 = ((SCDecl*)Item->Obj);
 			JB_String* CloseStr = SC_Cpp__CDotType(Self, Ty2, Fs, false);
 			JB_Msg_Export(Item, Fs);
 			JB_FS_AppendString(Fs, CloseStr);
-			Item = _Nf1;
+			(++I);
+			Item = ((Message*)JB_Ring_NextSib(Item));
 		};
 		;
 	}
@@ -27749,23 +27759,23 @@ void SC_Cpp__C_RenderShe(Message* Self, FastStringCpp* Fs) {
 void SC_Cpp__C_RenderSStr(Message* Self, FastStringCpp* Fs) {
 	JB_String* N = Self->Name;
 	if (!JB_Str_Exists(N)) {
-		JB_FS_AppendString(Fs, JB_LUB[855]);
+		JB_FS_AppendString(Fs, JB_LUB[851]);
 	}
 	 else {
-		JB_FS_AppendString(Fs, JB_LUB[856]);
+		JB_FS_AppendString(Fs, JB_LUB[852]);
 		uint ID = 0;
 		if (JB_Object_FastIsa(N, &MessageIDData)) {
 			ID = (((MessageID*)((MessageID*)N))->ID + 1);
 			if (ID > ((uint)SC_Crkt__Count())) {
 				ID = 0;
 				if (true) {
-					JB_Msg_Fail(Self, SC_Str_internal(JB_LUB[857]));
+					JB_Msg_Fail(Self, SC_Str_internal(JB_LUB[853]));
 				}
 			}
 		}
 		 else {
 			if (true) {
-				JB_Msg_Fail(Self, SC_Str_internal(JB_LUB[858]));
+				JB_Msg_Fail(Self, SC_Str_internal(JB_LUB[854]));
 			}
 		}
 		JB_FS_AppendUint(Fs, ID);
@@ -27783,7 +27793,7 @@ void SC_Cpp__C_RenderThg(Message* Self, FastStringCpp* Fs) {
 		SC_Cpp__WriteThgMaybeTypeToo(Self, ((SCDecl*)O), Fs);
 		return;
 	}
-	JB_PrintLine(JB_Str_OperatorPlus(JB_LUB[1005], JB_int_RenderFS(JB_ObjectID(Self), nil)));
+	JB_PrintLine(JB_Str_OperatorPlus(JB_LUB[1001], JB_int_RenderFS(JB_ObjectID(Self), nil)));
 	SC_Msg_Safe(Self, Fs);
 }
 
@@ -27791,7 +27801,7 @@ void SC_Cpp__C_RenderTmp(Message* Self, FastStringCpp* Fs) {
 	JB_String* Name = Self->Name;
 	bool Needbra = false;
 	if ((JB_Str_Equals(Name, JB_LUB[468], false))) {
-		JB_FS_AppendString(Fs, JB_LUB[762]);
+		JB_FS_AppendString(Fs, JB_LUB[1165]);
 	}
 	 else if ((JB_Str_Equals(Name, JB_LUB[177], false))) {
 		JB_FS_AppendString(Fs, SC__Cpp_IfName);
@@ -27807,7 +27817,7 @@ void SC_Cpp__C_RenderTmp(Message* Self, FastStringCpp* Fs) {
 		Needbra = true;
 	}
 	 else if ((JB_Str_Equals(Name, JB_LUB[450], false))) {
-		JB_FS_AppendString(Fs, JB_LUB[763]);
+		JB_FS_AppendString(Fs, JB_LUB[1166]);
 		JB_FS_AppendString(Fs, SC__Cpp_IfName);
 		Needbra = true;
 	}
@@ -27817,8 +27827,8 @@ void SC_Cpp__C_RenderTmp(Message* Self, FastStringCpp* Fs) {
 	 else if ((JB_Str_Equals(Name, JB_LUB[243], false))) {
 		0;
 	}
-	 else if ((JB_Str_Equals(Name, JB_LUB[764], false))) {
-		JB_FS_AppendString(Fs, JB_LUB[765]);
+	 else if ((JB_Str_Equals(Name, JB_LUB[1167], false))) {
+		JB_FS_AppendString(Fs, JB_LUB[1168]);
 		JB_DoAt(1);
 		SC_Cpp__C_ParamsRender(Self, Fs);
 		return;
@@ -28249,7 +28259,7 @@ void SC_Cpp__WriteDecl(SCDecl* D, FastStringCpp* T, Message* Equality) {
 		}
 	}
 	if (Equality) {
-		JB_FS_AppendString(T, JB_LUB[882]);
+		JB_FS_AppendString(T, JB_LUB[878]);
 		JB_Msg_Export(Equality, T);
 	}
 }
@@ -29251,7 +29261,7 @@ FastString* JB_FS__UseAsOutput(JB_Object* Other) {
 	}
 	if (Other) {
 		if (true) {
-			JB_Object_FailStr(Other, JB_LUB[774]);
+			JB_Object_FailStr(Other, JB_LUB[770]);
 		}
 	}
 	return nil;
@@ -29527,7 +29537,7 @@ void SC_Instruction__InstructionInit() {
 	SC_Instruction__Add(JB_LUB[1436], JB_LUB[1437], 35);
 	SC_Instruction__Add(JB_LUB[1438], JB_LUB[1439], 36);
 	SC_Instruction__Add(JB_LUB[1440], JB_LUB[1441], 37);
-	SC_Instruction__Add(JB_LUB[764], JB_LUB[1442], 38);
+	SC_Instruction__Add(JB_LUB[1167], JB_LUB[1442], 38);
 	SC_Instruction__Add(JB_LUB[1434], JB_LUB[1443], 39);
 	SC_Instruction__Add(JB_LUB[1444], JB_LUB[1445], 40);
 	SC_Instruction__Add(JB_LUB[1446], JB_LUB[1447], 41);
@@ -29659,7 +29669,7 @@ void SC_Instruction__InstructionInit() {
 Instruction* SC_Instruction__SyntaxAccessWithMsg(Message* M) {
 	Instruction* _tmPf0 = ((Instruction*)JB_Dict_ValueLower(SC__Instruction_OpDict, M->Name));
 	if (!_tmPf0) {
-		JB_Msg_Fail(M, JB_LUB[905]);
+		JB_Msg_Fail(M, JB_LUB[901]);
 		return nil;
 	}
 	return _tmPf0;
@@ -29876,7 +29886,7 @@ bool JB_Mrap_SetSize(MWrap* Self, int ItemCount) {
 	if (true) {
 		JB_String* _tmPf1 = JB_int_RenderFS(New, nil);
 		JB_Incr(_tmPf1);
-		JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[785], _tmPf1);
+		JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[781], _tmPf1);
 		JB_Incr(_tmPf0);
 		JB_Decr(_tmPf1);
 		JB_Object_FailStr(Self, _tmPf0);
@@ -30092,10 +30102,10 @@ void SC_Imp_ImportMsgSub(SCImport* Self, Message* J) {
 	JB_File* P = SC_Comp__FindProject(Name);
 	if (!P) {
 		if (JB_Str_ByteValue(Name, 0) != '/') {
-			P = JB_Str_FileThatExists(JB_Str_SyntaxAccess(SC_Comp__Projects(), Name), JB_LUB[1074]);
+			P = JB_Str_FileThatExists(JB_Str_SyntaxAccess(SC_Comp__Projects(), Name), JB_LUB[1070]);
 		}
 		 else {
-			P = JB_Str_FileThatExists(Name, JB_LUB[1074]);
+			P = JB_Str_FileThatExists(Name, JB_LUB[1070]);
 		}
 	}
 	if (!P) {
@@ -30115,14 +30125,14 @@ SCFile* SC_Imp_ImportSpd(SCImport* Self, JB_File* C) {
 	SCFile* Rz = nil;
 	JB_Incr(Rz);
 	if (JB_Array_SyntaxCompare(SC__Imp_AllFiles, 65536, false) >= 0) {
-		JB_File_Fail(C, JB_LUB[903]);
+		JB_File_Fail(C, JB_LUB[899]);
 		JB_Decr(Rz);
 		return nil;
 	}
 	JB_String* Path = JB_Str_LowerCase(C);
 	JB_Incr(Path);
 	if (JB_FreeIfDead(((SCFile*)JB_Dict_Value0(SC__Comp_Files, Path)))) {
-		JB_File_Fail(C, JB_LUB[904]);
+		JB_File_Fail(C, JB_LUB[900]);
 	}
 	JB_SetRef(Rz, SC_File_Constructor(nil, C, Self));
 	(JB_Dict_ValueSet(SC__Comp_Files, Path, Rz));
@@ -30158,11 +30168,11 @@ void SC_Imp_IncludeCHeaders(SCImport* Self, JB_File* F, Array* Output) {
 void SC_Imp_IndexLinkage(SCImport* Self, Message* Link, SCFile* Scf) {
 	Message* _tmPf0 = JB_Msg_GetConf(Link, JB_LUB[620], false);
 	JB_Incr(_tmPf0);
-	if (JB_Msg_SyntaxEquals(_tmPf0, JB_LUB[1113], true)) {
+	if (JB_Msg_SyntaxEquals(_tmPf0, JB_LUB[1109], true)) {
 		Self->IsSTDLib = true;
 		Self->WarnUnusedFuncs = false;
 	}
-	Message* _tmPf1 = JB_Msg_GetConf(Link, JB_LUB[1114], false);
+	Message* _tmPf1 = JB_Msg_GetConf(Link, JB_LUB[1110], false);
 	JB_Incr(_tmPf1);
 	if (JB_Msg_Yes(_tmPf1, false)) {
 		JB_String* _tmPf2 = JB_File__Applications();
@@ -30177,20 +30187,20 @@ void SC_Imp_IndexLinkage(SCImport* Self, Message* Link, SCFile* Scf) {
 		JB_Decr(_tmPf3);
 	}
 	if (SC_Imp_CanBan(Self, Scf)) {
-		Message* _tmPf5 = JB_Msg_GetConf(Link, JB_LUB[1115], false);
+		Message* _tmPf5 = JB_Msg_GetConf(Link, JB_LUB[1111], false);
 		JB_Incr(_tmPf5);
 		SC_Imp_LoadBanned(Self, _tmPf5);
 		JB_Decr(_tmPf5);
 	}
 	Message* Arg = JB_Msg_NeedSyx(Link, kJB_SyxArg);
 	JB_Incr(Arg);
-	Message* Name = JB_Msg_GetConf(Arg, JB_LUB[1116], false);
+	Message* Name = JB_Msg_GetConf(Arg, JB_LUB[1112], false);
 	JB_Incr(Name);
 	if (Name) {
 		JB_SetRef(Scf->ExportName, Name->Name);
 		JB_SetRef(Self->Mod->ExportName, Name->Name);
 	}
-	Message* Blind = JB_Msg_GetConf(Arg, JB_LUB[1117], false);
+	Message* Blind = JB_Msg_GetConf(Arg, JB_LUB[1113], false);
 	JB_Incr(Blind);
 	JB_Decr(Arg);
 	if (Blind) {
@@ -30354,11 +30364,11 @@ void SC_Imp__ExportShaders() {
 	if (!SC__Imp_Shaders) {
 		return;
 	}
-	SC_Comp__Stage(JB_LUB[1118]);
-	SC_Comp__Timer(JB_LUB[1118]);
+	SC_Comp__Stage(JB_LUB[1114]);
+	SC_Comp__Timer(JB_LUB[1114]);
 	JB_File* _tmPf2 = SC_Comp__BuildFolder();
 	JB_Incr(_tmPf2);
-	JB_File* P = JB_File_SyntaxAccess(_tmPf2, JB_LUB[1119]);
+	JB_File* P = JB_File_SyntaxAccess(_tmPf2, JB_LUB[1115]);
 	JB_Incr(P);
 	JB_Decr(_tmPf2);
 	JB_FreeIfDead(SC_Str_MakeAndGoInto(P));
@@ -30382,7 +30392,7 @@ void SC_Imp__ExportShaders() {
 				JB_Decr(Name);
 				JB_String* _tmPf4 = JB_File_ReadAll(((JB_File*)F), 134217728, true);
 				JB_Incr(_tmPf4);
-				JB_String* _tmPf3 = JB_Str_OperatorPlus(JB_LUB[1120], _tmPf4);
+				JB_String* _tmPf3 = JB_Str_OperatorPlus(JB_LUB[1116], _tmPf4);
 				JB_Incr(_tmPf3);
 				JB_Decr(_tmPf4);
 				(JB_File_DataSet(Dest, _tmPf3));
@@ -30660,7 +30670,7 @@ void SC_NR_Destructor(SCNodeRenamer* Self) {
 
 void SC_NR_Rename(SCNodeRenamer* Self, Message* Name) {
 	if ((JB_Ring_HasChildren(Name))) {
-		JB_Msg_Fail(Name, JB_LUB[927]);
+		JB_Msg_Fail(Name, JB_LUB[923]);
 		return;
 	}
 	{
@@ -30890,7 +30900,7 @@ void SC_SCObject_IsVisibleSet(SCObject* Self, bool Value) {
 }
 
 void SC_SCObject_NameConflict(SCObject* Self, SCObject* Old, JB_String* Name) {
-	JB_String* Msg = JB_Str_OperatorPlus(JB_LUB[948], Name);
+	JB_String* Msg = JB_Str_OperatorPlus(JB_LUB[944], Name);
 	JB_Incr(Msg);
 	if (true) {
 		JB_Msg_Fail(Self->Source, Msg);
@@ -31311,7 +31321,7 @@ SCNode* SC_PA_DetectDotSuper(SCParamArray* Self, SCNode* Curr, SCNode* Arg_space
 					Self->Cls = Ty->Type;
 				}
 				SC_PA_AddSub(Self, Exp0);
-				if (SC_Msg_OperatorIsThing(Exp0, JB_LUB[911])) {
+				if (SC_Msg_OperatorIsThing(Exp0, JB_LUB[907])) {
 					Self->IsSuper = true;
 					JB_SetRef(Exp0->Name, JB_LUB[182]);
 					return Curr->Parent;
@@ -31404,16 +31414,16 @@ JB_String* SC_PA_ModuleName(SCParamArray* Self) {
 SCFunction* SC_PA_MultipleMatchingFunctions(SCParamArray* Self, int TypeCast, SCFunction* F, SCFunction* R) {
 	if (!SC_PA_MadeError(Self)) {
 		if (true) {
-			JB_String* _tmPf0 = SC_Str_ArgsMatchError(JB_LUB[928], TypeCast != 0);
+			JB_String* _tmPf0 = SC_Str_ArgsMatchError(JB_LUB[924], TypeCast != 0);
 			JB_Incr(_tmPf0);
 			JB_Msg_Fail(Self->Exp, _tmPf0);
 			JB_Decr(_tmPf0);
 		}
 		if (true) {
-			JB_Msg_Fail(F->Source, JB_LUB[929]);
+			JB_Msg_Fail(F->Source, JB_LUB[925]);
 		}
 		if (true) {
-			JB_Msg_Fail(R->Source, JB_LUB[930]);
+			JB_Msg_Fail(R->Source, JB_LUB[926]);
 		}
 	}
 	return nil;
@@ -31516,7 +31526,7 @@ void SC_PA_StructReturner(SCParamArray* Self, SCDecl* Type, SCFunction* Fn) {
 	Syntax F = Rel->Func;
 	if ((F == kJB_SyxPrm) or ((F == kJB_SyxRel) and (!SC_Msg_SecondIs(Rel, kJB_SyxOpp, JB_LUB[244])))) {
 		if (true) {
-			JB_Msg_Fail(Rel, JB_LUB[931]);
+			JB_Msg_Fail(Rel, JB_LUB[927]);
 		}
 		return;
 	}
@@ -31524,7 +31534,7 @@ void SC_PA_StructReturner(SCParamArray* Self, SCDecl* Type, SCFunction* Fn) {
 		Message* Prm = ((Message*)JB_Ring_Last(S));
 		if (Prm) {
 			Prm->Func = kJB_SyxPrm;
-			Message* Subrz = JB_Msg_Msg(Prm, kJB_SyxThg, JB_LUB[932]);
+			Message* Subrz = JB_Msg_Msg(Prm, kJB_SyxThg, JB_LUB[928]);
 			JB_SetRef(Subrz->Obj, SC_Func_StructReturned(SC_Func__CurrFunc()));
 			(JB_Ring_PrevSibSet(Rel, ((Message*)JB_Ring_First(Rel))));
 			F = kJB_SyxNil;
@@ -31570,7 +31580,7 @@ void SC_PA_StructReturner(SCParamArray* Self, SCDecl* Type, SCFunction* Fn) {
 	}
 	 else if (F) {
 		if (true) {
-			JB_Msg_Fail(S, JB_LUB[933]);
+			JB_Msg_Fail(S, JB_LUB[929]);
 		}
 	}
 }
@@ -32205,7 +32215,7 @@ bool SC_Str_IsOKForImport(JB_String* Self) {
 	}
 	 else {
 		if (true) {
-			JB_Object_FailStr(X, JB_LUB[952]);
+			JB_Object_FailStr(X, JB_LUB[948]);
 		}
 	}
 	JB_Decr(X);
@@ -32633,20 +32643,6 @@ Message* JB_Str_ParseSub(JB_String* Self, Syntax Owner) {
 	}
 	JB_SafeDecr(Into);
 	return ((Message*)Into);
-}
-
-Message* JB_Str_ParseWithError(JB_String* Self, JB_Error** Rec) {
-	Message* Rz = ((Message*)nil);
-	JB_Incr(Rz);
-	JB_SetRef(Rz, JB_Str_Parse(Self, kJB_SyxArg, true));
-	if (!Rz) {
-		JB_Error* R = JB_Rec_Pop(JB_StdErr);
-		JB_Incr(R);
-		JB_SetRef(Rec[0], R);
-		JB_Decr(R);
-	}
-	JB_SafeDecr(Rz);
-	return Rz;
 }
 
 JB_String* JB_Str_PathDir(JB_String* Self) {
@@ -33204,16 +33200,16 @@ bool JB_Str_Yes(JB_String* Self, Message* Where) {
 	if (!JB_Str_Exists(Self)) {
 		return false;
 	}
-	if ((JB_Str_Equals(Self, JB_LUB[148], true)) or ((JB_Str_Equals(Self, JB_LUB[35], true)) or ((JB_Str_Equals(Self, JB_LUB[804], true)) or ((JB_Str_Equals(Self, JB_LUB[269], true)) or (JB_Str_Equals(Self, JB_LUB[0], true)))))) {
+	if ((JB_Str_Equals(Self, JB_LUB[148], true)) or ((JB_Str_Equals(Self, JB_LUB[35], true)) or ((JB_Str_Equals(Self, JB_LUB[800], true)) or ((JB_Str_Equals(Self, JB_LUB[269], true)) or (JB_Str_Equals(Self, JB_LUB[0], true)))))) {
 		return false;
 	}
-	if ((JB_Str_Equals(Self, JB_LUB[106], true)) or ((JB_Str_Equals(Self, JB_LUB[34], true)) or ((JB_Str_Equals(Self, JB_LUB[805], true)) or (JB_Str_Equals(Self, JB_LUB[267], true))))) {
+	if ((JB_Str_Equals(Self, JB_LUB[106], true)) or ((JB_Str_Equals(Self, JB_LUB[34], true)) or ((JB_Str_Equals(Self, JB_LUB[801], true)) or (JB_Str_Equals(Self, JB_LUB[267], true))))) {
 		return true;
 	}
 	if (true) {
 		JB_String* _tmPf1 = JB_Str_OperatorPlus(Self, JB_LUB[323]);
 		JB_Incr(_tmPf1);
-		JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[806], _tmPf1);
+		JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[802], _tmPf1);
 		JB_Incr(_tmPf0);
 		JB_Decr(_tmPf1);
 		JB_Msg_Fail(Where, _tmPf0);
@@ -33342,13 +33338,13 @@ bool JB_SS_DecompressIntoSub(StringReader* Self, FastString* Fs, int OutLim, Com
 	while (OutRemain > 0) {
 		int64 InSize = JB_SS_UInt(Self, 4) - 4;
 		if (InSize >= 16777216) {
-			JB_SS_Fail(Self, JB_LUB[1153]);
+			JB_SS_Fail(Self, JB_LUB[1149]);
 			return nil;
 		}
 		JB_String* ChunkData = JB_SS_Str(Self, InSize, 0);
 		JB_Incr(ChunkData);
 		if ((!JB_Str_EqualsInt(ChunkData, InSize, false))) {
-			JB_SS_Fail(Self, JB_LUB[1154]);
+			JB_SS_Fail(Self, JB_LUB[1150]);
 			JB_Decr(ChunkData);
 			return nil;
 		}
@@ -33364,7 +33360,7 @@ bool JB_SS_DecompressIntoSub(StringReader* Self, FastString* Fs, int OutLim, Com
 	JB_MzSt_End(St);
 	bool _tmPf0 = (!OutRemain);
 	if (!_tmPf0) {
-		JB_SS_Fail(Self, JB_LUB[1155]);
+		JB_SS_Fail(Self, JB_LUB[1151]);
 		return nil;
 	}
 	return _tmPf0;
@@ -33410,7 +33406,7 @@ int64 JB_SS_hInt(StringReader* Self) {
 		}
 		Sh = (Sh + 7);
 		if (Sh > 57) {
-			JB_SS_Fail(Self, JB_LUB[802]);
+			JB_SS_Fail(Self, JB_LUB[798]);
 			return 0;
 		}
 	};
@@ -33470,11 +33466,11 @@ uint64 JB_SS_NextMsgInfo(StringReader* Self) {
 	Self->_Object = nil;
 	if (Info >= 0) {
 		if (T <= kJB_SyxNil) {
-			JB_SS_Fail(Self, JB_LUB[1156]);
+			JB_SS_Fail(Self, JB_LUB[1152]);
 			return 0;
 		}
 		if (true) {
-			JB_SS_Fail(Self, JB_LUB[1157]);
+			JB_SS_Fail(Self, JB_LUB[1153]);
 		}
 	}
 	return 0;
@@ -33742,7 +33738,7 @@ void SC_xC2xB5Form_AddP(xC2xB5Form* Self, int Size, uint /*ASMParam*/ P) {
 	int I = Self->Count++;
 	Self->TotalBits = (Self->TotalBits + Size);
 	if (I >= (6)) {
-		JB_Str_Fail(JB_LUB[967]);
+		JB_Str_Fail(JB_LUB[963]);
 		return;
 	}
 	P = (P | (Size - 1));
@@ -33801,7 +33797,7 @@ void SC_xC2xB5Form_LoadParam(xC2xB5Form* Self, JB_String* Pl, Message* Place, bo
 	if (JB_Str_IsInt(Pl)) {
 		int64 I = JB_Str_Int(Pl);
 		if (!((I > 0) and (I <= 24))) {
-			JB_Msg_Fail(Place, JB_LUB[1151]);
+			JB_Msg_Fail(Place, JB_LUB[1147]);
 		}
 		SC_xC2xB5Form_AddP(Self, I, kSC__xC2xB5Param_Number);
 		return;
@@ -34246,14 +34242,14 @@ void SC_FastStringCpp_AddProperty(FastStringCpp* Self, SCDecl* Prop, bool Intomo
 }
 
 void SC_FastStringCpp_AppendBehaviour(FastStringCpp* Self, JB_String* Name, SCFunction* Fn, SCClass* Type) {
-	JB_FS_AppendString(Self, JB_LUB[880]);
+	JB_FS_AppendString(Self, JB_LUB[876]);
 	if (JB_Str_Exists(Name)) {
 		JB_FS_AppendString(Self, Name);
 	}
 	 else {
-		JB_FS_AppendString(Self, JB_LUB[881]);
+		JB_FS_AppendString(Self, JB_LUB[877]);
 	}
-	JB_FS_AppendString(Self, JB_LUB[882]);
+	JB_FS_AppendString(Self, JB_LUB[878]);
 	if (!Fn) {
 		JB_FS_AppendString(Self, JB_LUB[39]);
 	}
@@ -34268,7 +34264,7 @@ void SC_FastStringCpp_AppendBehaviour(FastStringCpp* Self, JB_String* Name, SCFu
 			JB_FS_AppendString(Self, (_tmPf0));
 		}
 		 else {
-			JB_FS_AppendString(Self, JB_LUB[883]);
+			JB_FS_AppendString(Self, JB_LUB[879]);
 		}
 		JB_FS_AppendByte(Self, ')');
 		JB_FS_AppendString(Self, Fn->ExportName);
@@ -34299,7 +34295,7 @@ void SC_FastStringCpp_Destructor(FastStringCpp* Self) {
 
 JB_File* JB_File_Child(JB_File* Self, JB_String* Name) {
 	if ((!JB_Str_Exists(Name))) {
-		JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[776], Self);
+		JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[772], Self);
 		JB_Incr(_tmPf0);
 		JB_File_Fail(Self, _tmPf0);
 		JB_Decr(_tmPf0);
@@ -34323,12 +34319,12 @@ ExitCode SC_File_CodeSign(JB_File* Self, JB_String* Sign) {
 	uint _usingf0 = JB_ErrorSeverity_SyntaxUsing(__varf1);
 	Array* Args = (JB_Array_Constructor0(nil));
 	JB_Incr(Args);
-	JB_Array_SyntaxAppend(Args, JB_LUB[884]);
-	JB_Array_SyntaxAppend(Args, JB_LUB[885]);
+	JB_Array_SyntaxAppend(Args, JB_LUB[880]);
+	JB_Array_SyntaxAppend(Args, JB_LUB[881]);
 	if (SC__Options_PrintCompileString) {
-		JB_Array_SyntaxAppend(Args, JB_LUB[886]);
+		JB_Array_SyntaxAppend(Args, JB_LUB[882]);
 	}
-	JB_Array_SyntaxAppend(Args, JB_LUB[887]);
+	JB_Array_SyntaxAppend(Args, JB_LUB[883]);
 	JB_StringC* _tmPf2 = JB_Str_MakeC(Sign);
 	JB_Incr(_tmPf2);
 	JB_Array_SyntaxAppend(Args, _tmPf2);
@@ -34339,21 +34335,21 @@ ExitCode SC_File_CodeSign(JB_File* Self, JB_String* Sign) {
 	JB_Decr(_tmPf3);
 	FastString* Errs = JB_FS_Constructor(nil);
 	JB_Incr(Errs);
-	JB_File* F = JB_Str_AsFile(JB_LUB[888]);
+	JB_File* F = JB_Str_AsFile(JB_LUB[884]);
 	JB_Incr(F);
 	Rz = JB_Str_Execute(F, Args, nil, Errs, kJB__PIDM_StdOutPassThru, 0);
 	JB_SetRef(Args, (JB_Array_Constructor0(nil)));
-	JB_Array_SyntaxAppend(Args, JB_LUB[889]);
+	JB_Array_SyntaxAppend(Args, JB_LUB[885]);
 	if (SC__Options_PrintCompileString) {
-		JB_Array_SyntaxAppend(Args, JB_LUB[886]);
+		JB_Array_SyntaxAppend(Args, JB_LUB[882]);
 	}
 	JB_Array_SyntaxAppend(Args, Self);
 	if (JB_ExitCode_Successful(Rz)) {
-		Rz = JB_Str_Execute(JB_LUB[888], Args, nil, Errs, kJB__PIDM_StdOutPassThru, 0);
+		Rz = JB_Str_Execute(JB_LUB[884], Args, nil, Errs, kJB__PIDM_StdOutPassThru, 0);
 	}
 	if (JB_ExitCode_Successful(Rz)) {
-		(JB_Array_ValueSet(Args, 0, JB_LUB[890]));
-		Rz = JB_Str_Execute(JB_LUB[891], Args, nil, Errs, kJB__PIDM_StdOutPassThru, 0);
+		(JB_Array_ValueSet(Args, 0, JB_LUB[886]));
+		Rz = JB_Str_Execute(JB_LUB[887], Args, nil, Errs, kJB__PIDM_StdOutPassThru, 0);
 	}
 	 else {
 		if (true) {
@@ -34407,10 +34403,10 @@ bool JB_File_CompareMsg(JB_File* Self, ErrorInt Code, JB_String* Error) {
 	JB_String* Msg = Self;
 	JB_Incr(Msg);
 	if (Code == 1) {
-		JB_SetRef(Msg, JB_Str_OperatorPlus(Msg, JB_LUB[777]));
+		JB_SetRef(Msg, JB_Str_OperatorPlus(Msg, JB_LUB[773]));
 	}
 	 else {
-		JB_SetRef(Msg, JB_Str_OperatorPlus(Msg, JB_LUB[778]));
+		JB_SetRef(Msg, JB_Str_OperatorPlus(Msg, JB_LUB[774]));
 	}
 	JB_SetRef(Msg, JB_Str_OperatorPlus(Msg, Error));
 	if (true) {
@@ -34597,16 +34593,16 @@ bool JB_File_MustExist(JB_File* Self, JB_String* Operation) {
 	}
 	FastString* Fs = JB_FS_Constructor(nil);
 	JB_Incr(Fs);
-	JB_FS_AppendString(Fs, JB_LUB[779]);
+	JB_FS_AppendString(Fs, JB_LUB[775]);
 	if (JB_Str_First(Self) != '/') {
-		JB_FS_AppendString(Fs, JB_LUB[780]);
+		JB_FS_AppendString(Fs, JB_LUB[776]);
 		JB_String* _tmPf0 = JB_File__CWD();
 		JB_Incr(_tmPf0);
 		JB_FS_AppendString(Fs, _tmPf0);
 		JB_Decr(_tmPf0);
 	}
 	if (JB_Str_Exists(Operation)) {
-		JB_FS_AppendString(Fs, JB_LUB[781]);
+		JB_FS_AppendString(Fs, JB_LUB[777]);
 		JB_FS_AppendString(Fs, Operation);
 	}
 	JB_FS_AppendByte(Fs, ' ');
@@ -34799,7 +34795,7 @@ bool SC_File_TestSpeedie(JB_File* Self, JB_String* V) {
 	if ((JB_Str_ContainsString(_tmPf0, JB_LUB[30]))) {
 		JB_String* _tmPf2 = JB_File_Path(Self);
 		JB_Incr(_tmPf2);
-		JB_String* _tmPf1 = JB_Str_OperatorPlus(JB_LUB[1024], _tmPf2);
+		JB_String* _tmPf1 = JB_Str_OperatorPlus(JB_LUB[1020], _tmPf2);
 		JB_Incr(_tmPf1);
 		JB_Decr(_tmPf2);
 		JB_Str_Fail(_tmPf1);
@@ -34808,22 +34804,22 @@ bool SC_File_TestSpeedie(JB_File* Self, JB_String* V) {
 		return nil;
 	}
 	JB_Decr(_tmPf0);
-	JB_String* Variant = JB_Str_OperatorPlus(JB_LUB[1025], V);
+	JB_String* Variant = JB_Str_OperatorPlus(JB_LUB[1021], V);
 	JB_Incr(Variant);
 	Array* Cmd_args = (JB_Array_Constructor0(nil));
 	JB_Incr(Cmd_args);
-	JB_Array_SyntaxAppend(Cmd_args, JB_LUB[1026]);
-	JB_Array_SyntaxAppend(Cmd_args, JB_LUB[1027]);
+	JB_Array_SyntaxAppend(Cmd_args, JB_LUB[1022]);
+	JB_Array_SyntaxAppend(Cmd_args, JB_LUB[1023]);
 	JB_Array_SyntaxAppend(Cmd_args, Variant);
 	JB_Decr(Variant);
 	if (JB_Str_Exists(SC__Options_Arch)) {
-		JB_String* _tmPf3 = JB_Str_OperatorPlus(JB_LUB[1028], SC__Options_Arch);
+		JB_String* _tmPf3 = JB_Str_OperatorPlus(JB_LUB[1024], SC__Options_Arch);
 		JB_Incr(_tmPf3);
 		JB_Array_SyntaxAppend(Cmd_args, _tmPf3);
 		JB_Decr(_tmPf3);
 	}
 	if (SC__Options_PrintCompileString) {
-		JB_Array_SyntaxAppend(Cmd_args, JB_LUB[1029]);
+		JB_Array_SyntaxAppend(Cmd_args, JB_LUB[1025]);
 		JB_String* _tmPf4 = JB_File_Path(Self);
 		JB_Incr(_tmPf4);
 		JB_PrintLine(_tmPf4);
@@ -34838,12 +34834,12 @@ bool SC_File_TestSpeedie(JB_File* Self, JB_String* V) {
 	JB_Str_Execute(_tmPf6, Cmd_args, nil, nil, kJB__PIDM_StdOutPassThru, 0);
 	JB_Decr(Cmd_args);
 	JB_Decr(_tmPf6);
-	JB_String* _tmPf7 = JB_Str_OperatorPlus(JB_LUB[1030], V);
+	JB_String* _tmPf7 = JB_Str_OperatorPlus(JB_LUB[1026], V);
 	JB_Incr(_tmPf7);
 	JB_File* TestProd = SC_Comp__SpeedieDir(_tmPf7);
 	JB_Incr(TestProd);
 	JB_Decr(_tmPf7);
-	JB_File_MustExist(TestProd, JB_LUB[1031]);
+	JB_File_MustExist(TestProd, JB_LUB[1027]);
 	JB_Decr(TestProd);
 	JB_String* _tmPf9 = SC_Ext__TmpOut(V);
 	JB_Incr(_tmPf9);
@@ -35020,12 +35016,12 @@ SCDecl* SC_Decl_AccessToMemCpy(SCDecl* Self, Message* Exp, Message* Side, SCDecl
 	SCDecl* Internal = Type->Internal;
 	Message* Rel = JB_Msg_Ancestor(Exp, kJB_SyxRel);
 	if (!(Rel and Internal)) {
-		JB_Msg_Fail(Rel, JB_LUB[1006]);
+		JB_Msg_Fail(Rel, JB_LUB[1002]);
 		return nil;
 	}
 	Message* F = ((Message*)JB_Ring_First(Rel));
 	Rel->Func = kJB_SyxFunc;
-	Message* Name = JB_Syx_OperatorPlus(kJB_SyxThg, JB_LUB[1007]);
+	Message* Name = JB_Syx_OperatorPlus(kJB_SyxThg, JB_LUB[1003]);
 	(JB_Ring_FirstSet(Rel, Name));
 	JB_SetRef(Rel->Obj, SC_TypeVoid);
 	(SC_Msg_ASMTypeSet(Rel, 0));
@@ -35034,7 +35030,7 @@ SCDecl* SC_Decl_AccessToMemCpy(SCDecl* Self, Message* Exp, Message* Side, SCDecl
 	JB_Tree_SyntaxAppend(Prms, F);
 	Message* Nxt = ((Message*)JB_Ring_NextSib(Prms));
 	if (Side->Obj == SC_TypeNil) {
-		JB_SetRef(Name->Name, JB_LUB[1008]);
+		JB_SetRef(Name->Name, JB_LUB[1004]);
 		JB_Tree_Remove(Nxt);
 	}
 	 else {
@@ -35080,7 +35076,7 @@ SCDecl* SC_Decl_ActualReplace(SCDecl* Self, SCDecl* New) {
 	}
 	if (New->PointerCount) {
 		if (true) {
-			JB_Msg_Fail(Self->Source, JB_Str_OperatorPlus(kJB__Rec_NonFatal, JB_LUB[860]));
+			JB_Msg_Fail(Self->Source, JB_Str_OperatorPlus(kJB__Rec_NonFatal, JB_LUB[856]));
 		}
 	}
 	 else {
@@ -35133,7 +35129,7 @@ void SC_Decl_AsBody(SCDecl* Self) {
 
 uint64 SC_Decl_AsConst(SCDecl* Self, Message* Value, DataTypeCode* Ty) {
 	if (!SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Const)) {
-		JB_Msg_Fail(Value, JB_LUB[1009]);
+		JB_Msg_Fail(Value, JB_LUB[1005]);
 		return 0;
 	}
 	if (SC_Decl_IsFloat(Self)) {
@@ -35144,7 +35140,7 @@ uint64 SC_Decl_AsConst(SCDecl* Self, Message* Value, DataTypeCode* Ty) {
 	}
 	 else {
 		if (true) {
-			JB_Msg_Fail(Value, JB_LUB[1010]);
+			JB_Msg_Fail(Value, JB_LUB[1006]);
 		}
 	}
 	return Self->ExportPosition;
@@ -35176,7 +35172,7 @@ bool SC_Decl_AssignabilityCheck(SCDecl* Self, Message* Ln, Message* RN, SCDecl* 
 	}
 	if (Ln) {
 		if (!((SC_Msg_IsAssignable(Ln)) and ((!SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Const))))) {
-			JB_Msg_Fail(Ln, JB_LUB[1102]);
+			JB_Msg_Fail(Ln, JB_LUB[1098]);
 			return nil;
 		}
 	}
@@ -35185,14 +35181,14 @@ bool SC_Decl_AssignabilityCheck(SCDecl* Self, Message* Ln, Message* RN, SCDecl* 
 	}
 	if (SC_Decl_IsCArray(Self) or SC_Decl_IsCArray(Rc)) {
 		if (Self->C_Array != Rc->C_Array) {
-			JB_Msg_Fail(RN, JB_LUB[1103]);
+			JB_Msg_Fail(RN, JB_LUB[1099]);
 			return nil;
 		}
 		if (JB_Msg_OperatorIn(RN, kJB_SyxSheb)) {
 			return true;
 		}
 		if (true) {
-			JB_Msg_Fail(RN, JB_LUB[1102]);
+			JB_Msg_Fail(RN, JB_LUB[1098]);
 		}
 	}
 	if (SC_Decl_SyntaxIs(Rc, kSC__SCDeclInfo_Const)) {
@@ -35483,7 +35479,7 @@ void SC_Decl_CheckLibGlob(SCDecl* Self) {
 SCDecl* SC_Decl_CheckMath(SCDecl* Self, Message* Exp) {
 	if (Self->PointerCount == 1) {
 		if (Self->Type == SC_TypeVoid_) {
-			JB_Msg_Fail(Exp, JB_LUB[861]);
+			JB_Msg_Fail(Exp, JB_LUB[857]);
 		}
 	}
 	return Self;
@@ -35542,9 +35538,9 @@ void SC_Decl_ConstInRange(SCDecl* Self, Message* RN, SCDecl* Rt, bool WasHex) {
 		if (Bad) {
 			if (true) {
 				FastString* _fsf0 = JB_FS_Constructor(nil);
-				JB_FS_AppendString(_fsf0, JB_LUB[1011]);
+				JB_FS_AppendString(_fsf0, JB_LUB[1007]);
 				JB_FS_AppendInt64(_fsf0, N);
-				JB_FS_AppendString(_fsf0, JB_LUB[1012]);
+				JB_FS_AppendString(_fsf0, JB_LUB[1008]);
 				JB_FS_AppendInt64(_fsf0, Bad);
 				JB_Msg_Fail(RN, JB_FS_GetResult(_fsf0));
 			}
@@ -35666,7 +35662,7 @@ SCDecl* SC_Decl_CopyDecl(SCDecl* Self, bool ForNewVariable) {
 SCDecl* SC_Decl_CopyDeclsStructFixer(SCDecl* Self, Message* Src, DeclMode Mode, Message* Type) {
 	if (SC_DeclMode_SyntaxIs(Mode, kSC__DeclMode_FuncParam)) {
 		if ((SC_Decl_IsCArray(Self))) {
-			JB_Msg_Fail(Src, JB_LUB[1013]);
+			JB_Msg_Fail(Src, JB_LUB[1009]);
 		}
 		if (SC_Decl_IsBareStruct(Self)) {
 			return SC_Decl_GetAddress(Self, kSC__DeclMode_Always);
@@ -35830,11 +35826,11 @@ void SC_Decl_ExpectFail(SCDecl* Self, SCDecl* O, Message* Errnode, Message* Back
 	JB_Incr(Errnode);
 	FastString* Fs = JB_FS_Constructor(nil);
 	JB_Incr(Fs);
-	JB_FS_AppendString(Fs, JB_LUB[862]);
+	JB_FS_AppendString(Fs, JB_LUB[858]);
 	JB_FreeIfDead(SC_Decl_RenderTypeName(Self, Fs));
-	JB_FS_AppendString(Fs, JB_LUB[863]);
+	JB_FS_AppendString(Fs, JB_LUB[859]);
 	JB_FreeIfDead(SC_Decl_RenderTypeNameNicer(O, Fs));
-	JB_FS_AppendString(Fs, JB_LUB[864]);
+	JB_FS_AppendString(Fs, JB_LUB[860]);
 	if (!Errnode) {
 		JB_SetRef(Errnode, Backup);
 	}
@@ -35987,7 +35983,7 @@ bool SC_Decl_Found(SCDecl* Self) {
 
 DataTypeCode SC_Decl_GameType(SCDecl* Self) {
 	if ((Self->PointerCount)) {
-		JB_Msg_Fail(Self->Source, JB_LUB[865]);
+		JB_Msg_Fail(Self->Source, JB_LUB[861]);
 		return 0;
 	}
 	SCClass* T = Self->Type;
@@ -35996,9 +35992,9 @@ DataTypeCode SC_Decl_GameType(SCDecl* Self) {
 	if (!JB_TC_IsNumeric(Ti)) {
 		FastString* _fsf0 = JB_FS_Constructor(nil);
 		JB_Incr(_fsf0);
-		JB_FS_AppendString(_fsf0, JB_LUB[866]);
+		JB_FS_AppendString(_fsf0, JB_LUB[862]);
 		JB_FS_AppendString(_fsf0, T->Name);
-		JB_FS_AppendString(_fsf0, JB_LUB[864]);
+		JB_FS_AppendString(_fsf0, JB_LUB[860]);
 		JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 		JB_Incr(_tmPf1);
 		JB_Decr(_fsf0);
@@ -36026,7 +36022,7 @@ SCDecl* SC_Decl_GetAddress(SCDecl* Self, DeclMode Purpose) {
 	}
 	Rz->NilDeclared = Ns;
 	if (Rz->PointerCount > 4) {
-		JB_Msg_Fail(Self->Source, JB_LUB[867]);
+		JB_Msg_Fail(Self->Source, JB_LUB[863]);
 	}
 	JB_SafeDecr(Rz);
 	return Rz;
@@ -36123,11 +36119,11 @@ bool SC_Decl_IntsOnly(SCDecl* Self, Message* Exp) {
 		return true;
 	}
 	if (!(JB_TC_IsNumeric(T) or JB_TC_SyntaxIs(T, kJB__TC_bool))) {
-		JB_Msg_Fail(Exp, JB_LUB[868]);
+		JB_Msg_Fail(Exp, JB_LUB[864]);
 		return nil;
 	}
 	if ((JB_TC_IsFloat(T))) {
-		JB_Msg_Fail(Exp, JB_LUB[869]);
+		JB_Msg_Fail(Exp, JB_LUB[865]);
 		return nil;
 	}
 	return true;
@@ -36371,7 +36367,7 @@ SCDecl* SC_Decl_MakeAsObject(SCDecl* Self, SCDecl* Container, Message* ErrPlace)
 	}
 	if (SC_Decl_IsNormalObject(Self)) {
 		if (!SC_Decl_IsNormalObject(NormalContained)) {
-			JB_Msg_Fail(ErrPlace, JB_LUB[870]);
+			JB_Msg_Fail(ErrPlace, JB_LUB[866]);
 		}
 		JB_Decr(NormalContained);
 		return Self;
@@ -36382,7 +36378,7 @@ SCDecl* SC_Decl_MakeAsObject(SCDecl* Self, SCDecl* Container, Message* ErrPlace)
 	}
 	JB_Decr(NormalContained);
 	if (!SC_Decl_CanWrap(Self)) {
-		JB_Msg_Fail(ErrPlace, JB_LUB[871]);
+		JB_Msg_Fail(ErrPlace, JB_LUB[867]);
 	}
 	return SC_Decl_NewWrapper(Self, Self);
 }
@@ -36448,7 +36444,7 @@ SCDecl* SC_Decl_MakeExistance(SCDecl* Self, uint /*NilState*/ Type, SCDecl* Defa
 void SC_Decl_MakeGameFlying(SCDecl* Self, SCClass* Oof, Message* M) {
 	FastString* Fs = JB_FS_Constructor(nil);
 	JB_Incr(Fs);
-	JB_FS_AppendString(Fs, JB_LUB[1014]);
+	JB_FS_AppendString(Fs, JB_LUB[1010]);
 	SC_FS_CArrayAdd(Fs, Oof->Name);
 	Message* _tmPf3 = SC_Msg_ModelType(M);
 	JB_Incr(_tmPf3);
@@ -36478,8 +36474,8 @@ void SC_Decl_MakeGameFlying(SCDecl* Self, SCClass* Oof, Message* M) {
 		JB_Decr(_LoopSrcf2);
 	}
 	;
-	JB_FS_AppendString(Fs, JB_LUB[1015]);
-	JB_FS_AppendString(Fs, JB_LUB[1016]);
+	JB_FS_AppendString(Fs, JB_LUB[1011]);
+	JB_FS_AppendString(Fs, JB_LUB[1012]);
 	JB_Decr(Fs);
 }
 
@@ -36944,15 +36940,15 @@ SCDecl* SC_Decl_RefineDecl(SCDecl* Self, Message* List) {
 			Message* _Nf1 = ((Message*)JB_Ring_NextSib(P));
 			if (JB_Msg_Expect(P, kJB_SyxThg, nil)) {
 				JB_String* N = P->Name;
-				if ((JB_Str_Equals(N, JB_LUB[1017], true))) {
+				if ((JB_Str_Equals(N, JB_LUB[1013], true))) {
 					((SC_Decl_SyntaxIsSet(Rz, kSC__SCDeclInfo_Borrowed, SC__Options_ProjectIsLibrary)));
 				}
-				 else if ((JB_Str_Equals(N, JB_LUB[1018], true))) {
+				 else if ((JB_Str_Equals(N, JB_LUB[1014], true))) {
 					(SC_Decl_SyntaxIsSet(Rz, kSC__SCDeclInfo_API, true));
 				}
-				 else if ((JB_Str_Equals(N, JB_LUB[1019], true))) {
+				 else if ((JB_Str_Equals(N, JB_LUB[1015], true))) {
 					(SC_Decl_SyntaxIsSet(Rz, kSC__SCDeclInfo_Const, true));
-					JB_PrintLine(JB_LUB[1020]);
+					JB_PrintLine(JB_LUB[1016]);
 				}
 				 else {
 					if (true) {
@@ -37375,12 +37371,12 @@ int SC_Decl_TryTypeCastPointer(SCDecl* Self, SCDecl* O, Message* Exp, int TypeCa
 JB_String* SC_Decl_TryUseSaveable(SCDecl* Self, bool IsSave, SCClass* Cls) {
 	JB_String* Type = SC_Decl_IsSaveable(Self);
 	JB_Incr(Type);
-	if ((!JB_Str_Exists(Type)) or (JB_Str_Equals(Type, JB_LUB[872], false))) {
+	if ((!JB_Str_Exists(Type)) or (JB_Str_Equals(Type, JB_LUB[868], false))) {
 		if (!SC__Options_IgnoreCantSaveErrors) {
 			if (!IsSave) {
 				FastString* _fsf0 = JB_FS_Constructor(nil);
 				JB_Incr(_fsf0);
-				JB_FS_AppendString(_fsf0, JB_LUB[873]);
+				JB_FS_AppendString(_fsf0, JB_LUB[869]);
 				JB_FS_AppendString(_fsf0, Self->Name);
 				JB_FS_AppendString(_fsf0, JB_LUB[166]);
 				JB_FS_AppendString(_fsf0, Self->Type->Name);
@@ -37584,7 +37580,7 @@ Message* SC_Decl_WriteDeclSub(SCDecl* Self, JB_String* Name, int Minimal) {
 				JB_Incr(_tmPf4);
 				JB_Tree_SyntaxAppend(__imPf1, (_tmPf4));
 				JB_Decr(_tmPf4);
-				Message* _tmPf5 = JB_Syx_Msg(kJB_SyxOpp, JB_LUB[1130]);
+				Message* _tmPf5 = JB_Syx_Msg(kJB_SyxOpp, JB_LUB[1126]);
 				JB_Incr(_tmPf5);
 				JB_Tree_SyntaxAppend(__imPf1, (_tmPf5));
 				JB_Decr(_tmPf5);
@@ -37684,7 +37680,7 @@ Message* SC_Decl_WriteType(SCDecl* Self, int Minimal, bool Optionals) {
 	}
 	Rz = JB_Syx_Msg(kJB_SyxRel, JB_LUB[0]);
 	JB_Tree_SyntaxAppend(Rz, Simple);
-	JB_Msg_AppendSyx(Rz, kJB_SyxOpp, JB_LUB[1130]);
+	JB_Msg_AppendSyx(Rz, kJB_SyxOpp, JB_LUB[1126]);
 	JB_Tree_SyntaxAppend(Rz, SC_Decl_WriteType(C, Minimal, Optionals));
 	return Rz;
 }
@@ -37774,7 +37770,7 @@ SCIterator* SC_Iter_Constructor(SCIterator* Self, SCClass* Parent, Message* Msg)
 	JB_Incr(X);
 	JB_Decr(Thg);
 	if (!JB_Str_Exists(X)) {
-		JB_SetRef(X, JB_LUB[1002]);
+		JB_SetRef(X, JB_LUB[998]);
 	}
 	JB_Incr2(Self->Name, X);
 	JB_Decr(X);
@@ -38061,7 +38057,7 @@ uint64 SC_Base_CalculateConstRel(SCNode* Self, Message* Value, DataTypeCode* Ty)
 	Message* C = ((Message*)JB_Ring_NextSib(B));
 	if (JB_Msg_EqualsSyx(Value, kJB_SyxBRel, false)) {
 		if (!JB_TC_SyntaxIs(Ty[0], kJB__TC_Int)) {
-			JB_Msg_Fail(Value, JB_LUB[826]);
+			JB_Msg_Fail(Value, JB_LUB[822]);
 			return 0;
 		}
 		return (~L);
@@ -38116,7 +38112,7 @@ uint64 SC_Base_CalculateConstRel(SCNode* Self, Message* Value, DataTypeCode* Ty)
 		}
 	}
 	if ((!Ints)) {
-		JB_Msg_Fail(Value, JB_LUB[826]);
+		JB_Msg_Fail(Value, JB_LUB[822]);
 		return 0;
 	}
 	if (N == '&') {
@@ -38129,7 +38125,7 @@ uint64 SC_Base_CalculateConstRel(SCNode* Self, Message* Value, DataTypeCode* Ty)
 		if (N == '<') {
 			uint64 T = L << R;
 			if ((T >> R) != L) {
-				JB_Msg_Fail(Value, JB_LUB[827]);
+				JB_Msg_Fail(Value, JB_LUB[823]);
 				return 0;
 			}
 			return T;
@@ -38137,7 +38133,7 @@ uint64 SC_Base_CalculateConstRel(SCNode* Self, Message* Value, DataTypeCode* Ty)
 		if (N == '>') {
 			uint64 T = L >> R;
 			if ((T << R) != L) {
-				JB_Msg_Fail(Value, JB_LUB[827]);
+				JB_Msg_Fail(Value, JB_LUB[823]);
 				return 0;
 			}
 			return T;
@@ -38220,7 +38216,7 @@ void SC_Base_CollectConstantsSub(SCNode* Self, Message* Ch) {
 		return;
 	}
 	JB_Decr(Vs);
-	uint64 NextNum = 0 + ((JB_Msg_SyntaxEquals(Ch, JB_LUB[1083], false)));
+	uint64 NextNum = 0 + ((JB_Msg_SyntaxEquals(Ch, JB_LUB[1079], false)));
 	uint64 StartNum = NextNum;
 	uint64 LastFlag = 0;
 	Array* FixLater = JB_Array_Constructor0(nil);
@@ -38310,7 +38306,7 @@ void SC_Base_CollectConstantsSub(SCNode* Self, Message* Ch) {
 				Message* NewNum = SC_NewDeclNum(NewItem, NextNum, Line->Name, true);
 				JB_Incr(NewNum);
 				JB_SetRef(NewItem->Source, Line);
-				if ((JB_Msg_SyntaxEquals(Ch, JB_LUB[1083], false))) {
+				if ((JB_Msg_SyntaxEquals(Ch, JB_LUB[1079], false))) {
 					(++LastFlag);
 					NextNum = (NextNum << 1);
 				}
@@ -38566,7 +38562,7 @@ void SC_Base_ConstantExpand(SCNode* Self, Message* Ch) {
 	Message* R = ((Message*)JB_Ring_NextSib(Op));
 	JB_Incr(R);
 	if (!(((JB_Msg_SyntaxEquals(Op, JB_LUB[244], false))) and ((JB_Msg_EqualsSyx(L, kJB_SyxThg, false))))) {
-		JB_Msg_Fail(Op, JB_LUB[828]);
+		JB_Msg_Fail(Op, JB_LUB[824]);
 		JB_Decr(R);
 		JB_Decr(Op);
 		JB_Decr(L);
@@ -38783,7 +38779,7 @@ Message* SC_Base_DiissplayObj(SCNode* Self, Message* Rz) {
 
 bool SC_Base_ExpectModule(SCNode* Self, Message* Errplace) {
 	if (!JB_Object_Isa(Self, &SCModuleData)) {
-		JB_Msg_Fail(Errplace, JB_LUB[829]);
+		JB_Msg_Fail(Errplace, JB_LUB[825]);
 		return nil;
 	}
 	return true;
@@ -38797,14 +38793,14 @@ SCClass* SC_Base_FindClass(SCNode* Self, JB_String* Name, Message* Where, SCNode
 		}
 		if (!SC_SCNodeFindMode_SyntaxIs(Mode, kSC__SCNodeFindMode_NoErrors)) {
 			if (true) {
-				JB_Msg_Fail(Where, JB_LUB[991]);
+				JB_Msg_Fail(Where, JB_LUB[987]);
 			}
 		}
 		return nil;
 	}
 	if (!SC_SCNodeFindMode_SyntaxIs(Mode, kSC__SCNodeFindMode_NoErrors)) {
 		if (true) {
-			JB_Msg_Fail(Where, JB_Str_OperatorPlus(JB_LUB[992], Name));
+			JB_Msg_Fail(Where, JB_Str_OperatorPlus(JB_LUB[988], Name));
 		}
 	}
 	return nil;
@@ -38819,7 +38815,7 @@ SCClass* SC_Base_FindClassMsg(SCNode* Self, Message* Where, SCNodeFindMode Mode)
 		}
 		if (!SC_SCNodeFindMode_SyntaxIs(Mode, kSC__SCNodeFindMode_NoErrors)) {
 			if (true) {
-				JB_Msg_Fail(Where, JB_LUB[991]);
+				JB_Msg_Fail(Where, JB_LUB[987]);
 			}
 		}
 	}
@@ -38839,7 +38835,7 @@ Message* SC_Base_FindCppWrapper(SCNode* Self, Message* Place, bool Isclass) {
 		}
 		JB_Decr(Pl);
 	}
-	return SC_Msg_FindAndRemoveSub(Place, JB_LUB[1160], true, Isclass);
+	return SC_Msg_FindAndRemoveSub(Place, JB_LUB[1156], true, Isclass);
 }
 
 SCFunction* SC_Base_FindFunction(SCNode* Self, JB_String* Name) {
@@ -38874,12 +38870,12 @@ SCModule* SC_Base_FindModule(SCNode* Self, JB_String* Name, Message* Where, SCNo
 	if (Where and ((!SC_SCNodeFindMode_SyntaxIs(Mode, kSC__SCNodeFindMode_NoErrors)))) {
 		if (SC_SCNodeFindMode_SyntaxIs(Mode, kSC__SCNodeFindMode_ForClass)) {
 			if (true) {
-				JB_Msg_Fail(Where, JB_Str_OperatorPlus(JB_LUB[830], Name));
+				JB_Msg_Fail(Where, JB_Str_OperatorPlus(JB_LUB[826], Name));
 			}
 		}
 		 else {
 			if (true) {
-				JB_Msg_Fail(Where, JB_Str_OperatorPlus(JB_LUB[831], Name));
+				JB_Msg_Fail(Where, JB_Str_OperatorPlus(JB_LUB[827], Name));
 			}
 		}
 	}
@@ -39069,7 +39065,7 @@ void SC_Base_LoadExportName(SCNode* Self) {
 	JB_Incr(CW);
 	JB_String* CppName = SC_Msg_FindAndRemove(Place, JB_LUB[1242], false, IsClass);
 	JB_Incr(CppName);
-	JB_String* CppPart = SC_Msg_FindAndRemove(Place, JB_LUB[1116], false, IsClass);
+	JB_String* CppPart = SC_Msg_FindAndRemove(Place, JB_LUB[1112], false, IsClass);
 	JB_Incr(CppPart);
 	if (JB_Object_FastIsa(Self, &SCFunctionData)) {
 		if (!((SCFunction*)Self)->IsCppInBuilt) {
@@ -39316,7 +39312,7 @@ SCObject* SC_Base_LookUpSub(SCNode* Self, JB_String* OrigName, Message* Exp, SCN
 						JB_String* Err = JB_LUB[1944];
 						JB_Incr(Err);
 						if (Side and (!SC_PA_MacroSize(ParamsArray))) {
-							JB_SetRef(Err, JB_LUB[1102]);
+							JB_SetRef(Err, JB_LUB[1098]);
 						}
 						if (!((SCFunction*)O)->HasProto) {
 							JB_Msg_Fail(Exp, Err);
@@ -39446,7 +39442,7 @@ SCObject* SC_Base_LookUpSub(SCNode* Self, JB_String* OrigName, Message* Exp, SCN
 
 SCObject* SC_Base_LookUpVar(SCNode* Self, JB_String* Name, Message* Exp, Message* Side) {
 	SCObject* Rz = nil;
-	if (JB_Str_Equals(Name, JB_LUB[911], true)) {
+	if (JB_Str_Equals(Name, JB_LUB[907], true)) {
 		Name = JB_LUB[182];
 	}
 	Rz = SC_Base_LookUpSub(Self, Name, Exp, Self, nil, Side, kSC__Base_kPurposeVar);
@@ -39530,7 +39526,7 @@ JB_String* SC_Base_ReachedName(SCNode* Self) {
 
 bool SC_Base_RehomeExport(SCNode* Self) {
 	if ((SC_Base_IsLibrary(Self))) {
-		SC_SCObject_Fail(Self, JB_LUB[832]);
+		SC_SCObject_Fail(Self, JB_LUB[828]);
 	}
 	JB_String* Newhome = SC_Base_UniquifyExport(Self, Self->ExportName);
 	JB_Incr(Newhome);
@@ -39572,7 +39568,7 @@ SCDecl* SC_Base_RequireContained(SCNode* Self, Message* Errplace) {
 		}
 	}
 	if (!(Cls and Cls->Contained)) {
-		JB_Msg_Fail(Errplace, JB_LUB[1079]);
+		JB_Msg_Fail(Errplace, JB_LUB[1075]);
 		return nil;
 	}
 	return Cls->Contained;
@@ -39620,7 +39616,7 @@ SCClass* SC_Base_ShouldBeClass(SCNode* Self, Message* Errplace) {
 	SCClass* _tmPf0 = SC_Base_IsNormalObject(Self);
 	JB_Incr(_tmPf0);
 	if (!_tmPf0) {
-		JB_Msg_Fail(Errplace, JB_LUB[833]);
+		JB_Msg_Fail(Errplace, JB_LUB[829]);
 		JB_Decr(_tmPf0);
 		return nil;
 	}
@@ -39647,7 +39643,7 @@ SCModule* SC_Base_SpaceModule(SCNode* Self, Message* Errplace) {
 		return ((SCClass*)Self)->Modul;
 	}
 	if (true) {
-		JB_Msg_Fail(Errplace, JB_LUB[834]);
+		JB_Msg_Fail(Errplace, JB_LUB[830]);
 	}
 	return nil;
 }
@@ -39660,7 +39656,7 @@ SCObject* SC_Base_SyntaxAccessWithMsg(SCNode* Self, Message* S) {
 	SCObject* Rz = nil;
 	Rz = SC_Base_SyntaxAccessWithStr(Self, S->Name);
 	if (!Rz) {
-		JB_Msg_Fail(S, JB_Str_OperatorPlus(JB_LUB[835], S->Name));
+		JB_Msg_Fail(S, JB_Str_OperatorPlus(JB_LUB[831], S->Name));
 		return nil;
 	}
 	return Rz;
@@ -39709,7 +39705,7 @@ JB_String* SC_Base_TestExportName(SCNode* Self, JB_String* S, bool Explicit) {
 			return S;
 		}
 	}
-	JB_String* Err = JB_Str_OperatorPlus(JB_LUB[993], S);
+	JB_String* Err = JB_Str_OperatorPlus(JB_LUB[989], S);
 	JB_Incr(Err);
 	if (true) {
 		JB_Msg_Fail(O->Source, Err);
@@ -39800,7 +39796,7 @@ void SC_Base_Tran_Const(SCNode* Self, SCDecl* D, SCNode* Base) {
 
 void SC_Base_TryAdd(SCNode* Self, Message* ErrPlace, SCObject* IncObj, JB_String* Name) {
 	if (!JB_int_OperatorInRange(JB_Str_Length(Name), 64)) {
-		JB_Msg_Fail(ErrPlace, JB_LUB[994]);
+		JB_Msg_Fail(ErrPlace, JB_LUB[990]);
 		return;
 	}
 	if (JB_Object_FastIsa(Self, &SCClassData)) {
@@ -39826,7 +39822,7 @@ void SC_Base_TryAdd(SCNode* Self, Message* ErrPlace, SCObject* IncObj, JB_String
 		 else if (JB_Object_FastIsa(IncObj, &SCDeclData)) {
 			if (SC_Func_SyntaxIs(((SCFunction*)Old), kSC__FunctionType_HidesProperties)) {
 				if ((((SCDecl*)IncObj)->HiderFunc)) {
-					JB_Msg_Fail(ErrPlace, JB_LUB[995]);
+					JB_Msg_Fail(ErrPlace, JB_LUB[991]);
 					return;
 				}
 				((SCDecl*)IncObj)->HiderFunc = ((SCFunction*)Old);
@@ -39836,7 +39832,7 @@ void SC_Base_TryAdd(SCNode* Self, Message* ErrPlace, SCObject* IncObj, JB_String
 	}
 	if (((JB_Str_Equals(Name, JB_LUB[182], false))) and SC_Func__InType(kSC__SCNodeType_Object)) {
 		if (true) {
-			JB_Msg_Fail(ErrPlace, JB_LUB[996]);
+			JB_Msg_Fail(ErrPlace, JB_LUB[992]);
 		}
 	}
 	 else {
@@ -40721,7 +40717,7 @@ void JB_Msg_Ask__(Message* Self, FastString* Fs) {
 
 uint64 SC_Msg_ASMConst(Message* Self) {
 	if ((JB_Msg_EqualsSyx(Self, kJB_SyxUnit, false))) {
-		if (!JB_Msg_Expect(Self, kJB_SyxNil, JB_LUB[1049])) {
+		if (!JB_Msg_Expect(Self, kJB_SyxNil, JB_LUB[1045])) {
 			return 0;
 		}
 		return JB_dbl_AsInt(JB_Msg_Float(((Message*)JB_Ring_First(Self))));
@@ -41212,13 +41208,13 @@ bool SC_Msg_BuildRunTask(Message* Self, Message* Fields, int Level) {
 	Message* P1 = ((Message*)JB_Ring_First(Prms));
 	Message* Ff = ((Message*)JB_Ring_First(Fields));
 	if (((JB_Msg_EqualsSyx(P1, kJB_SyxThg, false)) or (JB_Msg_EqualsSyx(P1, kJB_SyxDot, false))) and (JB_Msg_EqualsSyx(Ff, kJB_SyxSDot, false))) {
-		JB_SetRef(Ff->Name, JB_LUB[1060]);
+		JB_SetRef(Ff->Name, JB_LUB[1056]);
 		Ff->Func = kJB_SyxThg;
 	}
 	Syntax F = JB_Msg_Func(P1);
 	if (!((F == kJB_SyxThg) or (F == kJB_SyxDot))) {
 		Message* Brah = JB_Syx_Msg(kJB_SyxBra, JB_LUB[0]);
-		JB_Msg_AppendSyx(Brah, kJB_SyxThg, JB_LUB[1165]);
+		JB_Msg_AppendSyx(Brah, kJB_SyxThg, JB_LUB[1161]);
 		(JB_Ring_FirstSet(Self, Brah));
 		Message* Pr = ((Message*)JB_Ring_Parent(Self));
 		Array* _tmPf0 = (JB_Array_Constructor0(nil));
@@ -41259,7 +41255,7 @@ void SC_Msg_BuildTask(Message* Self, Message* Fields, int Level) {
 		return;
 	}
 	if (SC_Msg_BuildRunTask(Run, Fields, Level) and (!({
-		Array* _tmPf1 = JB_Msg_FindAll(Self, kJB_SyxTmp, JB_LUB[950]);
+		Array* _tmPf1 = JB_Msg_FindAll(Self, kJB_SyxTmp, JB_LUB[946]);
 		JB_Incr(_tmPf1);
 		bool _tmPf0 = JB_Array_SyntaxCast(_tmPf1);
 		JB_Decr(_tmPf1);
@@ -41300,7 +41296,7 @@ void SC_Msg_BunchFixSub(Message* Self, Message* Subject, Message* Stuff) {
 		Message* R = ((Message*)JB_Tree_Get(Stuff, 2));
 		JB_Incr(R);
 		if (!R) {
-			JB_Msg_Fail(Stuff, JB_LUB[906]);
+			JB_Msg_Fail(Stuff, JB_LUB[902]);
 			JB_Decr(Subject);
 			JB_Decr(Stuff);
 			JB_Decr(R);
@@ -41401,7 +41397,7 @@ bool SC_Msg_CanGetAddress(Message* Self, SCNode* Name_space) {
 	if (((JB_Msg_EqualsSyx(Curr, kJB_SyxThg, false))) and SC_Decl_IsRegister(T2)) {
 		Syntax F = SC_Msg_ParentForAddress(Self);
 		if (!((F == kJB_SyxPrm) or (F == kJB_SyxDot))) {
-			JB_Msg_Fail(Curr, JB_LUB[1108]);
+			JB_Msg_Fail(Curr, JB_LUB[1104]);
 			return nil;
 		}
 		JB_Array_SyntaxAppend(SC__Comp_LaterAddressChecks, Curr);
@@ -41512,7 +41508,7 @@ void JB_Msg_Char__(Message* Self, FastString* Fs) {
 void SC_Msg_CheckConstShift(Message* Self, SCDecl* LC, SCDecl* RC, bool Bigger) {
 	int64 Rk = RC->ExportPosition;
 	if (Rk < 0) {
-		JB_Msg_Fail(Self, JB_LUB[907]);
+		JB_Msg_Fail(Self, JB_LUB[903]);
 		return;
 	}
 	uint T = SC_Decl_TypeInfo(LC);
@@ -41526,7 +41522,7 @@ void SC_Msg_CheckConstShift(Message* Self, SCDecl* LC, SCDecl* RC, bool Bigger) 
 		}
 	}
 	if (Rk >= BC) {
-		JB_Msg_Fail(Self, JB_LUB[908]);
+		JB_Msg_Fail(Self, JB_LUB[904]);
 		return;
 	}
 }
@@ -41559,7 +41555,7 @@ void SC_Msg_CheckNotInStateExpr(Message* Self, Message* Top) {
 	Message* Node = Self;
 	while (Node and (Node != Top)) {
 		if ((SC_Msg_IsStatementExpr(Node))) {
-			JB_Msg_Fail(Self, JB_Str_OperatorPlus(JB_LUB[910], Self->Name));
+			JB_Msg_Fail(Self, JB_Str_OperatorPlus(JB_LUB[906], Self->Name));
 		}
 		Node = ((Message*)JB_Ring_Parent(Node));
 	};
@@ -41569,14 +41565,14 @@ void SC_Msg_CheckSuperDotSave(Message* Self, JB_String* Name, bool ShouldBe) {
 	bool Match = ((SC_Msg_OperatorIsDot(Self, Name)) and (({
 		Message* _tmPf2 = ((Message*)JB_Ring_First(Self));
 		JB_Incr(_tmPf2);
-		bool _tmPf1 = SC_Msg_OperatorIsThing(_tmPf2, JB_LUB[911]);
+		bool _tmPf1 = SC_Msg_OperatorIsThing(_tmPf2, JB_LUB[907]);
 		JB_Decr(_tmPf2);
 		 _tmPf1;
 	})));
 	if (Match != ShouldBe) {
 		FastString* _fsf0 = JB_FS_Constructor(nil);
 		JB_Incr(_fsf0);
-		JB_FS_AppendString(_fsf0, JB_LUB[912]);
+		JB_FS_AppendString(_fsf0, JB_LUB[908]);
 		JB_FS_AppendString(_fsf0, Name);
 		JB_String* _tmPf3 = JB_FS_GetResult(_fsf0);
 		JB_Incr(_tmPf3);
@@ -41741,7 +41737,7 @@ void SC_Msg_Clean(Message* Self, bool Erl) {
 					 else if (SC__SC_UniqueNum and SC_AutoComplete__IsAFunc(S)) {
 						SC__SC_UniqueNum = 0;
 					}
-					 else if ((JB_Str_Equals(S, JB_LUB[1043], false)) or ((JB_Str_Equals(S, JB_LUB[1128], false)) or ((JB_Str_Equals(S, JB_LUB[1083], false)) or (JB_Str_Equals(S, JB_LUB[1973], false))))) {
+					 else if ((JB_Str_Equals(S, JB_LUB[1039], false)) or ((JB_Str_Equals(S, JB_LUB[1124], false)) or ((JB_Str_Equals(S, JB_LUB[1079], false)) or (JB_Str_Equals(S, JB_LUB[1973], false))))) {
 						JB_SetRef(IgnoreArg, ((Message*)JB_Ring_Last(Curr)));
 					}
 					 else if (JB_Str_Equals(S, JB_LUB[1304], false)) {
@@ -41803,7 +41799,7 @@ FatASM* SC_Msg_CMPF(Message* Self, ASMReg R1, ASMReg R2, int Cmp, int Jmp) {
 	(SC_FAT_JumpInputSet(Rz, 3, Jmp));
 	if (((Jmp << 21) >> 21) != Jmp) {
 		if (true) {
-			JB_Msg_Fail(Self, JB_LUB[1050]);
+			JB_Msg_Fail(Self, JB_LUB[1046]);
 		}
 	}
 	return Rz;
@@ -41994,7 +41990,7 @@ SCDecl* SC_Msg_CollectDecl(Message* Self, SCNode* P, SCNode* Recv, DeclMode Mode
 		}
 		(SC_Decl_SyntaxIsSet(Dcl, kSC__SCDeclInfo_ReturnedStruct, true));
 		JB_SetRef(Dcl, SC_Decl_GetAddress(Dcl, kSC__DeclMode_Always));
-		NameItm = JB_Msg_Msg(Self, kJB_SyxThg, JB_LUB[932]);
+		NameItm = JB_Msg_Msg(Self, kJB_SyxThg, JB_LUB[928]);
 		(SC_Decl_SyntaxIsSet(Dcl, kSC__SCDeclInfo_IntendedAsReturn, true));
 		FuncPrmz->StructReturnPos = (JB_Array_Size(FuncPrmz->Args) + 1);
 	}
@@ -42139,7 +42135,7 @@ bool SC_Msg_CollectOneParam(Message* Self, SCFunction* Func, SCNode* Recv, SCCla
 JB_String* SC_Msg_CollectUsage(Message* Self) {
 	FastString* Fs = JB_FS_Constructor(nil);
 	JB_Incr(Fs);
-	JB_FS_AppendString(Fs, JB_LUB[1126]);
+	JB_FS_AppendString(Fs, JB_LUB[1122]);
 	{
 		Message* Ch = ((Message*)JB_Ring_First(Self));
 		JB_Incr(Ch);
@@ -42171,7 +42167,7 @@ JB_String* SC_Msg_CollectUsage(Message* Self) {
 				JB_Incr(Type);
 				JB_Decr(Ty);
 				if (JB_Str_ContainsString(Type, JB_LUB[478])) {
-					JB_SetRef(Type, JB_LUB[980]);
+					JB_SetRef(Type, JB_LUB[976]);
 				}
 				 else if (!JB_Str_Equals(Type, JB_LUB[105], true)) {
 					//;
@@ -42185,7 +42181,7 @@ JB_String* SC_Msg_CollectUsage(Message* Self) {
 					JB_FS_AppendByte(Fs, ']');
 				}
 				if (Tyfn == kJB_SyxArr) {
-					JB_FS_AppendString(Fs, JB_LUB[1127]);
+					JB_FS_AppendString(Fs, JB_LUB[1123]);
 				}
 			}
 			JB_SetRef(Ch, _Nf2);
@@ -42255,7 +42251,7 @@ Message* SC_Msg_ConstantExpandSub(Message* Self) {
 	return Rz;
 }
 
-bool SC_Msg_ConstIntValue(Message* Self, SCNode* Name_space, int64* V) {
+bool SC_Msg_ConstIntValue(Message* Self, SCNode* Name_space, int64& V) {
 	if (SC_Msg_ConstIntValueSub(Self, V)) {
 		return true;
 	}
@@ -42269,20 +42265,20 @@ bool SC_Msg_ConstIntValue(Message* Self, SCNode* Name_space, int64* V) {
 	return false;
 }
 
-bool SC_Msg_ConstIntValueSub(Message* Self, int64* V) {
+bool SC_Msg_ConstIntValueSub(Message* Self, int64& V) {
 	Message* S = Self;
 	while (JB_Msg_EqualsSyx(S, kJB_SyxBra, false)) {
 		S = ((Message*)JB_Ring_First(S));
 	};
 	if (JB_Msg_EqualsSyx(S, kJB_SyxNum, false)) {
-		V[0] = JB_Msg_Int(S, 0);
+		V = JB_Msg_Int(S, 0);
 		return true;
 	}
-	if (((JB_Msg_EqualsSyx(S, kJB_SyxThg, false))) and JB_Str_MidEquals(S->Name, 0, JB_LUB[1051], false)) {
+	if (((JB_Msg_EqualsSyx(S, kJB_SyxThg, false))) and JB_Str_MidEquals(S->Name, 0, JB_LUB[1047], false)) {
 		SyntaxObj* Find = ((SyntaxObj*)JB_Dict_ValueLower(JB__Constants__SyxDict, JB_Str_Range(S->Name, (3), JB_int__Max())));
 		if (Find) {
-			V[0] = ((int64)Find->ID);
-			JB_Msg_BecomeStr(S, kJB_SyxNum, JB_int64_Render(V[0], nil));
+			V = ((int64)Find->ID);
+			JB_Msg_BecomeStr(S, kJB_SyxNum, JB_int64_Render(V, nil));
 			return true;
 		}
 	}
@@ -42741,7 +42737,7 @@ void SC_Msg_DenyPreviousUse(Message* Self, Message* Msg) {
 			}
 			if (Ch->Obj == Decl) {
 				if (true) {
-					JB_Msg_Fail(Ch, JB_LUB[913]);
+					JB_Msg_Fail(Ch, JB_LUB[909]);
 				}
 			}
 			Ch = _N_f2;
@@ -42834,7 +42830,7 @@ FatASM* SC_Msg_DIV2(Message* Self, ASMReg R1, ASMReg R2, int Sh, int Clear) {
 }
 
 void SC_Msg_DivByZero(Message* Self) {
-	(JB_Msg_SyntaxProblem(Self, JB_LUB[914]));
+	(JB_Msg_SyntaxProblem(Self, JB_LUB[910]));
 }
 
 FatASM* SC_Msg_DIVS(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int Kind) {
@@ -43037,7 +43033,7 @@ bool JB_Msg_Expect(Message* Self, Syntax Type, JB_String* Name) {
 		JB_Decr(_tmPf0);
 	}
 	JB_FS_MsgErrorName(Fs, Name);
-	JB_FS_AppendString(Fs, JB_LUB[786]);
+	JB_FS_AppendString(Fs, JB_LUB[782]);
 	JB_String* _tmPf1 = JB_Syx_LongName(Self->Func);
 	JB_Incr(_tmPf1);
 	JB_FS_AppendString(Fs, _tmPf1);
@@ -43069,11 +43065,11 @@ void SC_Msg_ExpectEmpty(Message* Self) {
 bool SC_Msg_ExpectInt(Message* Self, SCDecl* Type) {
 	uint Ty = Type->Type->TypeInfo;
 	if (JB_TC_ByteCount(Ty) > 4) {
-		JB_Msg_Fail(Self, JB_LUB[915]);
+		JB_Msg_Fail(Self, JB_LUB[911]);
 		return nil;
 	}
 	if (!(JB_TC_IsInt(Ty) and ((!JB_TC_SyntaxIs(Ty, kJB__TC_bool))))) {
-		JB_Msg_Fail(Self, JB_LUB[916]);
+		JB_Msg_Fail(Self, JB_LUB[912]);
 		return nil;
 	}
 	return true;
@@ -43152,7 +43148,7 @@ bool JB_Msg_ExpectString(Message* Self) {
 		return true;
 	}
 	if (true) {
-		JB_Msg_Fail(Self, JB_LUB[787]);
+		JB_Msg_Fail(Self, JB_LUB[783]);
 	}
 	return false;
 }
@@ -43209,7 +43205,7 @@ Message* SC_Msg_FailOrCopy(Message* Self, Message* P) {
 		}
 	}
 	if (true) {
-		JB_Msg_Fail(P, JB_LUB[917]);
+		JB_Msg_Fail(P, JB_LUB[913]);
 	}
 	return nil;
 }
@@ -43447,7 +43443,7 @@ Message* SC_Msg_FindAndRemove2(Message* Self, Message* Place, bool NothingOK, bo
 			Message* _tmPf0 = ((Message*)JB_Ring_Parent(Self));
 			JB_Incr(_tmPf0);
 			if (!SC_Msg_OperatorIsTmp(_tmPf0, JB_LUB[240])) {
-				JB_Msg_Fail(Ch, JB_LUB[1052]);
+				JB_Msg_Fail(Ch, JB_LUB[1048]);
 				JB_Decr(_tmPf0);
 				JB_Decr(Ch);
 				return nil;
@@ -43614,13 +43610,13 @@ Message* SC_Msg_FindShader(Message* Self, JB_String* TypeName) {
 	JB_Incr(F);
 	JB_Decr(N);
 	if ((!JB_Str_Exists(F))) {
-		JB_Msg_Fail(U, JB_LUB[1053]);
+		JB_Msg_Fail(U, JB_LUB[1049]);
 		JB_Decr(F);
 		JB_Decr(C);
 		JB_Decr(U);
 		return nil;
 	}
-	JB_String* _tmPf1 = JB_Str_OperatorPlus(TypeName, JB_LUB[1054]);
+	JB_String* _tmPf1 = JB_Str_OperatorPlus(TypeName, JB_LUB[1050]);
 	JB_Incr(_tmPf1);
 	if (!SC_SCGame3D__NeedShader(_tmPf1)) {
 		JB_Decr(_tmPf1);
@@ -43634,7 +43630,7 @@ Message* SC_Msg_FindShader(Message* Self, JB_String* TypeName) {
 		JB_SetRef(F, JB_Str_Range(F, 0, 1));
 	}
 	 else {
-		JB_String* _tmPf2 = JB_Str_OperatorPlus(TypeName, JB_LUB[1055]);
+		JB_String* _tmPf2 = JB_Str_OperatorPlus(TypeName, JB_LUB[1051]);
 		JB_Incr(_tmPf2);
 		if (!SC_SCGame3D__NeedShader(_tmPf2)) {
 			JB_Decr(_tmPf2);
@@ -43822,7 +43818,7 @@ Float64 JB_Msg_Float(Message* Self) {
 float JB_Msg_Float32(Message* Self) {
 	float D = ((float)JB_Msg_Float(Self));
 	if (fabsf(D) > JB_f__max()) {
-		JB_Str_Fail(JB_LUB[788]);
+		JB_Str_Fail(JB_LUB[784]);
 		return 0;
 	}
 	return D;
@@ -44067,7 +44063,7 @@ Message* SC_Msg_GetDclName(Message* Self, bool IsConstructor) {
 	Message* Rz = nil;
 	if (IsConstructor) {
 		if ((!JB_Tree_SyntaxEquals(Self, 2, false))) {
-			JB_Msg_Fail(Self, JB_LUB[1056]);
+			JB_Msg_Fail(Self, JB_LUB[1052]);
 			return nil;
 		}
 	}
@@ -44077,7 +44073,7 @@ Message* SC_Msg_GetDclName(Message* Self, bool IsConstructor) {
 	}
 	if (!Rz) {
 		if (true) {
-			JB_Msg_Fail(Self, JB_LUB[1057]);
+			JB_Msg_Fail(Self, JB_LUB[1053]);
 		}
 	}
 	return Rz;
@@ -44134,7 +44130,7 @@ Message* JB_Msg_GoIntoInvisArg(Message* Self, Message* Tmp, int Pos) {
 	int I = JB_int_OperatorAlign(((int)Self->Indent), 4);
 	Syntax F = Tmp->Func;
 	if (!((F == kJB_SyxTmp) or ((F == kJB_SyxItem) or (F == kJB_SyxDecl)))) {
-		return JB_Tk__ErrorAdd(JB_LUB[981], Tmp->Position);
+		return JB_Tk__ErrorAdd(JB_LUB[977], Tmp->Position);
 	}
 	Message* It = JB_Tk__MakeInvisArg(Tmp, I);
 	if (It) {
@@ -44234,7 +44230,7 @@ void SC_Msg_HateUnusedFuncs(Message* Self) {
 		Imp->WarnUnusedFuncs = true;
 	}
 	 else {
-		JB_Msg_Expect(Self, Self->Func, JB_LUB[1058]);
+		JB_Msg_Expect(Self, Self->Func, JB_LUB[1054]);
 	}
 }
 
@@ -44254,7 +44250,7 @@ SCFunction* SC_Msg_IdentifyFunc(Message* Self) {
 Message* SC_Msg_InBuiltContained(Message* Self, SCDecl* Dcl) {
 	SCDecl* Cnt = Dcl->Contains;
 	if (!Cnt) {
-		JB_Msg_Fail(Self, JB_LUB[918]);
+		JB_Msg_Fail(Self, JB_LUB[914]);
 		return nil;
 	}
 	return JB_Syx_OperatorPlus(kJB_SyxThg, Cnt->Type->Name);
@@ -44448,7 +44444,7 @@ int64 JB_Msg_IntRange(Message* Self, int StrStart, int64 Low, int64 High) {
 		return I;
 	}
 	if (true) {
-		JB_Msg_Fail(Self, JB_LUB[983]);
+		JB_Msg_Fail(Self, JB_LUB[979]);
 	}
 	return 0;
 }
@@ -44463,18 +44459,18 @@ int64 JB_Msg_Int(Message* Self, int StrStart) {
 			return JB_Str_HexIntegerSection(F->Name, StrStart, F);
 		}
 		Float64 Mul = JB_Str_TextDouble(F->Name, nil);
-		if (JB_Msg_SyntaxEquals(Self, JB_LUB[791], false)) {
+		if (JB_Msg_SyntaxEquals(Self, JB_LUB[787], false)) {
 			Mul = (Mul * ((Float64)1024));
 		}
-		 else if (JB_Msg_SyntaxEquals(Self, JB_LUB[792], false)) {
+		 else if (JB_Msg_SyntaxEquals(Self, JB_LUB[788], false)) {
 			Mul = (Mul * ((Float64)1048576));
 		}
-		 else if (JB_Msg_SyntaxEquals(Self, JB_LUB[793], false)) {
+		 else if (JB_Msg_SyntaxEquals(Self, JB_LUB[789], false)) {
 			Mul = (Mul * ((Float64)1073741824));
 		}
 		 else {
 			if (true) {
-				JB_Msg_Fail(Self, JB_LUB[794]);
+				JB_Msg_Fail(Self, JB_LUB[790]);
 			}
 			Mul = 0.0f;
 		}
@@ -44806,7 +44802,7 @@ FatASM* SC_Msg_JBAN(Message* Self, ASMReg R1, int Small, int Jmp) {
 	(SC_FAT_JumpInputSet(Rz, 2, Jmp));
 	if (((Jmp << 14) >> 14) != Jmp) {
 		if (true) {
-			JB_Msg_Fail(Self, JB_LUB[1050]);
+			JB_Msg_Fail(Self, JB_LUB[1046]);
 		}
 	}
 	return Rz;
@@ -44832,7 +44828,7 @@ FatASM* SC_Msg_JBOR(Message* Self, ASMReg R1, int Small, int Jmp) {
 	(SC_FAT_JumpInputSet(Rz, 2, Jmp));
 	if (((Jmp << 14) >> 14) != Jmp) {
 		if (true) {
-			JB_Msg_Fail(Self, JB_LUB[1050]);
+			JB_Msg_Fail(Self, JB_LUB[1046]);
 		}
 	}
 	return Rz;
@@ -44960,7 +44956,7 @@ FatASM* SC_Msg_JMPE(Message* Self, ASMReg R1, ASMReg R2, int LSmall, int RSmall,
 	(SC_FAT_JumpInputSet(Rz, 4, Jmp));
 	if (((Jmp << 20) >> 20) != Jmp) {
 		if (true) {
-			JB_Msg_Fail(Self, JB_LUB[1050]);
+			JB_Msg_Fail(Self, JB_LUB[1046]);
 		}
 	}
 	return Rz;
@@ -44976,7 +44972,7 @@ FatASM* SC_Msg_JMPF(Message* Self, ASMReg R1, ASMReg R2, int Cmp, int Jmp) {
 	(SC_FAT_JumpInputSet(Rz, 3, Jmp));
 	if (((Jmp << 21) >> 21) != Jmp) {
 		if (true) {
-			JB_Msg_Fail(Self, JB_LUB[1050]);
+			JB_Msg_Fail(Self, JB_LUB[1046]);
 		}
 	}
 	return Rz;
@@ -44992,7 +44988,7 @@ FatASM* SC_Msg_JMPI(Message* Self, ASMReg R1, ASMReg R2, int Cmp, int Jmp) {
 	(SC_FAT_JumpInputSet(Rz, 3, Jmp));
 	if (((Jmp << 22) >> 22) != Jmp) {
 		if (true) {
-			JB_Msg_Fail(Self, JB_LUB[1050]);
+			JB_Msg_Fail(Self, JB_LUB[1046]);
 		}
 	}
 	return Rz;
@@ -45007,7 +45003,7 @@ FatASM* SC_Msg_JMPK(Message* Self, ASMReg R1, int K, int Jmp) {
 	(SC_FAT_JumpInputSet(Rz, 2, Jmp));
 	if (((Jmp << 22) >> 22) != Jmp) {
 		if (true) {
-			JB_Msg_Fail(Self, JB_LUB[1050]);
+			JB_Msg_Fail(Self, JB_LUB[1046]);
 		}
 	}
 	return Rz;
@@ -45022,7 +45018,7 @@ FatASM* SC_Msg_JMPKN(Message* Self, ASMReg R1, int K, int Jmp) {
 	(SC_FAT_JumpInputSet(Rz, 2, Jmp));
 	if (((Jmp << 22) >> 22) != Jmp) {
 		if (true) {
-			JB_Msg_Fail(Self, JB_LUB[1050]);
+			JB_Msg_Fail(Self, JB_LUB[1046]);
 		}
 	}
 	return Rz;
@@ -45039,7 +45035,7 @@ FatASM* SC_Msg_JMPN(Message* Self, ASMReg R1, ASMReg R2, int LSmall, int RSmall,
 	(SC_FAT_JumpInputSet(Rz, 4, Jmp));
 	if (((Jmp << 20) >> 20) != Jmp) {
 		if (true) {
-			JB_Msg_Fail(Self, JB_LUB[1050]);
+			JB_Msg_Fail(Self, JB_LUB[1046]);
 		}
 	}
 	return Rz;
@@ -45056,7 +45052,7 @@ FatASM* SC_Msg_JUMP(Message* Self, int JUMP) {
 	(SC_FAT_JumpInputSet(Rz, 0, JUMP));
 	if (((JUMP << 8) >> 8) != JUMP) {
 		if (true) {
-			JB_Msg_Fail(Self, JB_LUB[1050]);
+			JB_Msg_Fail(Self, JB_LUB[1046]);
 		}
 	}
 	return Rz;
@@ -45069,7 +45065,7 @@ void SC_Msg_KinderRemoveAfter(Message* Self) {
 			break;
 		}
 		if (!JB_Msg_SyntaxIs(X, kJB__MsgParseFlags_Inserted)) {
-			JB_Msg_Fail(X, JB_LUB[919]);
+			JB_Msg_Fail(X, JB_LUB[915]);
 		}
 		JB_Tree_Remove(X);
 	};
@@ -45294,7 +45290,7 @@ FatASM* SC_Msg_LUPD(Message* Self, ASMReg R1, ASMReg R2, int Small, int Jmp) {
 	(SC_FAT_JumpInputSet(Rz, 3, Jmp));
 	if (((Jmp << 19) >> 19) != Jmp) {
 		if (true) {
-			JB_Msg_Fail(Self, JB_LUB[1050]);
+			JB_Msg_Fail(Self, JB_LUB[1046]);
 		}
 	}
 	return Rz;
@@ -45310,7 +45306,7 @@ FatASM* SC_Msg_LUPU(Message* Self, ASMReg R1, ASMReg R2, int Small, int Jmp) {
 	(SC_FAT_JumpInputSet(Rz, 3, Jmp));
 	if (((Jmp << 19) >> 19) != Jmp) {
 		if (true) {
-			JB_Msg_Fail(Self, JB_LUB[1050]);
+			JB_Msg_Fail(Self, JB_LUB[1046]);
 		}
 	}
 	return Rz;
@@ -45382,7 +45378,7 @@ Message* JB_Msg_MacroPrm(Message* Self, Message* Root, Array* Prms, Message* Des
 	if (((C == '_') and (JB_Str_CompareInt(N, 1, false) >= 1)) and JB_Str_IsIntFrom(N, 1)) {
 		Message* Oop = ((Message*)JB_Array_Value(Prms, ((int)JB_Str_Int(N))));
 		if (!Oop) {
-			JB_Msg_Fail(Root, JB_LUB[795]);
+			JB_Msg_Fail(Root, JB_LUB[791]);
 			return nil;
 		}
 		Syntax F = Self->Func;
@@ -45676,10 +45672,10 @@ int SC_Msg_ModelMode(Message* Self) {
 		while ((C) and (C != _afterf1)) {
 			Message* _N_f2 = ((Message*)JB_Ring_FlatNext0(C));
 			JB_Incr(_N_f2);
-			if (SC_Msg_OperatorIsThing(C, JB_LUB[920])) {
+			if (SC_Msg_OperatorIsThing(C, JB_LUB[916])) {
 				Rz = (Rz | 1);
 			}
-			 else if (SC_Msg_OperatorIsThing(C, JB_LUB[921])) {
+			 else if (SC_Msg_OperatorIsThing(C, JB_LUB[917])) {
 				Rz = (Rz | 2);
 			}
 			 else {
@@ -46347,7 +46343,7 @@ FatASM* SC_Msg_RequestOp(Message* Self, ASM Op) {
 		return P;
 	}
 	if (true) {
-		JB_Msg_Fail(Self, JB_LUB[922]);
+		JB_Msg_Fail(Self, JB_LUB[918]);
 	}
 	return A->Start;
 }
@@ -46531,7 +46527,7 @@ void SC_Msg_PrepareAST(Message* Self) {
 	Message* After = ((Message*)JB_Ring_FlatAfter(Self));
 	Message* Msg = Self;
 	while (Msg != After) {
-		if (((JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false))) and ((JB_Msg_SyntaxEquals(Msg, JB_LUB[1128], false)) or (JB_Msg_SyntaxEquals(Msg, JB_LUB[1043], false)))) {
+		if (((JB_Msg_EqualsSyx(Msg, kJB_SyxTmp, false))) and ((JB_Msg_SyntaxEquals(Msg, JB_LUB[1124], false)) or (JB_Msg_SyntaxEquals(Msg, JB_LUB[1039], false)))) {
 			SC_Func__Tran_FuncTable(Msg);
 		}
 		Msg = ((Message*)JB_Ring_FlatNext0(Msg));
@@ -47079,7 +47075,7 @@ int SC_Msg_Reg(Message* Self) {
 		return ((int)Reg);
 	}
 	if (true) {
-		JB_Msg_Fail(Self, JB_LUB[1059]);
+		JB_Msg_Fail(Self, JB_LUB[1055]);
 	}
 	return 0;
 }
@@ -47152,7 +47148,7 @@ void JB_Msg_render_jbin_sub(Message* Self, FastString* Js) {
 	while (Ch and (Ch != After)) {
 		int Depth = 0;
 		Message* Curr = Ch;
-		Ch = ((Message*)JB_Ring_FlatNextDepth(Curr, (&Depth), true));
+		Ch = ((Message*)JB_Ring_FlatNextDepth(Curr, &Depth, true));
 		JB_bin_Add(Js, Curr->Func, Curr->Name, Depth > 0);
 		JB_bin_Exit(Js, (-Depth));
 	};
@@ -47603,7 +47599,7 @@ void SC_Msg_SortImprove(Message* Self, SCNode* Name_space) {
 		}
 		Message* Prm = JB_Syx_Msg(kJB_SyxPrm, JB_LUB[0]);
 		(JB_Ring_PrevSibSet(L, Prm));
-		JB_Tree_SyntaxAppend(Prm, SC_NewRel(JB_Syx_OperatorPlus(kJB_SyxThg, JB_LUB[1129]), JB_Syx_OperatorPlus(kJB_SyxThg, ((SCClass*)Name_space)->Name), JB_LUB[1130]));
+		JB_Tree_SyntaxAppend(Prm, SC_NewRel(JB_Syx_OperatorPlus(kJB_SyxThg, JB_LUB[1125]), JB_Syx_OperatorPlus(kJB_SyxThg, ((SCClass*)Name_space)->Name), JB_LUB[1126]));
 	}
 }
 
@@ -47830,7 +47826,7 @@ Message* JB_Msg_GetConf(Message* Self, JB_String* Key, bool Err) {
 	;
 	if (Err) {
 		if (true) {
-			JB_Msg_Fail(Self, JB_Str_OperatorPlus(Key, JB_LUB[789]));
+			JB_Msg_Fail(Self, JB_Str_OperatorPlus(Key, JB_LUB[785]));
 		}
 	}
 	return nil;
@@ -47907,35 +47903,35 @@ FatASM* SC_Msg_TAIL(Message* Self, int JUMP, int Prm1) {
 
 bool SC_Msg_TargetTest(Message* Self) {
 	JB_Msg_Expect(Self, kJB_SyxThg, nil);
-	if (!((!JB_Msg_SyntaxEquals(Self, JB_LUB[1131], true)) or (!JB_Msg_SyntaxEquals(Self, JB_LUB[1132], true)))) {
+	if (!((!JB_Msg_SyntaxEquals(Self, JB_LUB[1127], true)) or (!JB_Msg_SyntaxEquals(Self, JB_LUB[1128], true)))) {
+		JB_Msg_Fail(Self, JB_LUB[1129]);
+		return nil;
+	}
+	if (!(!JB_Msg_SyntaxEquals(Self, JB_LUB[1130], true))) {
+		JB_Msg_Fail(Self, JB_LUB[1131]);
+		return nil;
+	}
+	if (!(!JB_Msg_SyntaxEquals(Self, JB_LUB[1132], true))) {
 		JB_Msg_Fail(Self, JB_LUB[1133]);
 		return nil;
 	}
-	if (!(!JB_Msg_SyntaxEquals(Self, JB_LUB[1134], true))) {
-		JB_Msg_Fail(Self, JB_LUB[1135]);
-		return nil;
-	}
-	if (!(!JB_Msg_SyntaxEquals(Self, JB_LUB[1136], true))) {
-		JB_Msg_Fail(Self, JB_LUB[1137]);
-		return nil;
-	}
 	if (!(!JB_Msg_SyntaxEquals(Self, JB_LUB[555], true))) {
-		JB_Msg_Fail(Self, JB_LUB[1138]);
+		JB_Msg_Fail(Self, JB_LUB[1134]);
 		return nil;
 	}
 	if (JB_Msg_SyntaxEquals(Self, JB_LUB[357], true)) {
 		return SC__Options_TargetDebug;
 	}
-	if (JB_Msg_SyntaxEquals(Self, JB_LUB[1139], true)) {
+	if (JB_Msg_SyntaxEquals(Self, JB_LUB[1135], true)) {
 		return (!SC__Options_TargetDebug);
 	}
-	if (JB_Msg_SyntaxEquals(Self, JB_LUB[1093], true)) {
+	if (JB_Msg_SyntaxEquals(Self, JB_LUB[1089], true)) {
 		return ((bool)SC__Options_PerryOutput);
 	}
-	if (JB_Msg_SyntaxEquals(Self, JB_LUB[1140], true)) {
+	if (JB_Msg_SyntaxEquals(Self, JB_LUB[1136], true)) {
 		return SC__Options_ProjectIsMiniLib;
 	}
-	if (JB_Msg_SyntaxEquals(Self, JB_LUB[1141], true)) {
+	if (JB_Msg_SyntaxEquals(Self, JB_LUB[1137], true)) {
 		return ((bool)SC__Imp_CurrIsManuallyImported);
 	}
 	if (JB_Msg_SyntaxEquals(Self, JB_LUB[34], true)) {
@@ -47944,13 +47940,13 @@ bool SC_Msg_TargetTest(Message* Self) {
 	if (JB_Msg_SyntaxEquals(Self, JB_LUB[35], true)) {
 		return false;
 	}
-	if (JB_Msg_SyntaxEquals(Self, JB_LUB[1142], true)) {
+	if (JB_Msg_SyntaxEquals(Self, JB_LUB[1138], true)) {
 		return JB_Platform__OSX();
 	}
-	if (JB_Msg_SyntaxEquals(Self, JB_LUB[1143], true)) {
+	if (JB_Msg_SyntaxEquals(Self, JB_LUB[1139], true)) {
 		return JB_Platform__Win();
 	}
-	if (JB_Msg_SyntaxEquals(Self, JB_LUB[1144], true)) {
+	if (JB_Msg_SyntaxEquals(Self, JB_LUB[1140], true)) {
 		return JB_Platform__Lin();
 	}
 	if (JB_Msg_SyntaxEquals(Self, JB_LUB[603], true)) {
@@ -47960,7 +47956,7 @@ bool SC_Msg_TargetTest(Message* Self) {
 }
 
 Message* SC_Msg_TaskConBefore(Message* Self) {
-	Message* Marker = JB_Msg_FindSyxName(Self, kJB_SyxDot, JB_LUB[950], false);
+	Message* Marker = JB_Msg_FindSyxName(Self, kJB_SyxDot, JB_LUB[946], false);
 	if (Marker) {
 		Marker = ((Message*)JB_Ring_NextSib(Marker));
 	}
@@ -47970,7 +47966,7 @@ Message* SC_Msg_TaskConBefore(Message* Self) {
 	if (Marker) {
 		return Marker;
 	}
-	return JB_Msg_Msg(Self, kJB_SyxSheb, JB_LUB[1060]);
+	return JB_Msg_Msg(Self, kJB_SyxSheb, JB_LUB[1056]);
 }
 
 Message* SC_Msg_TempIntoBlock(Message* Self, Message* ParentPlace) {
@@ -48116,11 +48112,11 @@ void JB_Msg_test_style(Message* Self) {
 bool SC_Msg_TestFuncName(Message* Self) {
 	Syntax Fn = Self->Func;
 	if (!((Fn != kJB_SyxFunc) and ((Fn != kJB_SyxPrm) and (Fn != kJB_SyxList)))) {
-		JB_Msg_Fail(Self, JB_LUB[846]);
+		JB_Msg_Fail(Self, JB_LUB[842]);
 		return nil;
 	}
 	if (Fn != kJB_SyxThg) {
-		JB_Msg_Fail(Self, JB_LUB[923]);
+		JB_Msg_Fail(Self, JB_LUB[919]);
 		return nil;
 	}
 	return true;
@@ -48620,7 +48616,7 @@ bool SC_Msg_TrueOrFalse(Message* Self) {
 		return false;
 	}
 	if (true) {
-		JB_Msg_Fail(Self, JB_LUB[924]);
+		JB_Msg_Fail(Self, JB_LUB[920]);
 	}
 	return false;
 }
@@ -48705,7 +48701,7 @@ void SC_Msg_TypeExpect(Message* Self, DataTypeCode* Ty, uint /*DataTypeCode*/ In
 		if ((V != In) and JB_TC_OK(V)) {
 			Ty[0] = kJB__TC_Failed;
 			if (true) {
-				JB_Msg_Fail(Self, JB_LUB[925]);
+				JB_Msg_Fail(Self, JB_LUB[921]);
 			}
 		}
 	}
@@ -48766,7 +48762,7 @@ bool SC_Msg_UnitMatch(Message* Self, JB_String* A, JB_String* B) {
 	}
 	if (JB_Str_Equals(Unit, B, false)) {
 		if (true) {
-			JB_Msg_Fail(Self, JB_Str_OperatorPlus(JB_LUB[926], A));
+			JB_Msg_Fail(Self, JB_Str_OperatorPlus(JB_LUB[922], A));
 		}
 	}
 	return false;
@@ -49760,7 +49756,7 @@ bool SC_Beh__Tran_Behaviour(Message* Node, SCClass* Cls) {
 		return nil;
 	}
 	if (Cls->IsRole) {
-		JB_Msg_Fail(Node, JB_LUB[997]);
+		JB_Msg_Fail(Node, JB_LUB[993]);
 		return nil;
 	}
 	Message* Name = JB_Msg_NeedSyx(Node, kJB_SyxThg);
@@ -49773,7 +49769,7 @@ bool SC_Beh__Tran_Behaviour(Message* Node, SCClass* Cls) {
 	JB_Incr(Lst);
 	if (Lst) {
 		if (!((!JB_Msg_EqualsSyx(Lst, kJB_SyxBra, false)) and ((!JB_Msg_EqualsSyx(Lst, kJB_SyxPrm, false)) and (!JB_Msg_EqualsSyx(Lst, kJB_SyxList, false))))) {
-			JB_Msg_Fail(Lst, JB_LUB[998]);
+			JB_Msg_Fail(Lst, JB_LUB[994]);
 			JB_Decr(Lst);
 			JB_Decr(Name);
 			return nil;
@@ -49847,7 +49843,7 @@ void SC_SCBetterNode_ReadDescription(SCBetterNode* Self, Message* Msg) {
 	JB_Incr(Str);
 	if (Str) {
 		if (((JB_String*)JB_Str_Exists(Self->Description))) {
-			JB_Msg_Fail(Msg, JB_LUB[1062]);
+			JB_Msg_Fail(Msg, JB_LUB[1058]);
 		}
 		JB_SetRef(Self->Description, Str->Name);
 	}
@@ -49952,11 +49948,11 @@ void SC_File_DetectInsecureWords(SCFile* Self) {
 		return;
 	}
 	ivec2 Where = ivec2{0, 0};
-	JB_Object* Found = JB_Dict_FindStr(Words, Self->FData, (&Where));
+	JB_Object* Found = JB_Dict_FindStr(Words, Self->FData, &Where);
 	if (Found) {
 		Message* Place = JB_Syx_OperatorPlus(kJB_SyxThg, JB_LUB[0]);
 		(JB_Msg_RangeSet(Place, ((IntRange)Where)));
-		JB_Rec__Latchkum(Place, JB_LUB[767], JB_File_Path(Self));
+		JB_Rec__Latchkum(Place, JB_LUB[763], JB_File_Path(Self));
 	}
 }
 
@@ -50949,7 +50945,7 @@ void SC_Class_BannedCheck(SCClass* Self, Message* Src) {
 		return;
 	}
 	if (true) {
-		SC_SCObject_Fail(Self, JB_Str_OperatorPlus(JB_LUB[836], Self->Name));
+		SC_SCObject_Fail(Self, JB_Str_OperatorPlus(JB_LUB[832], Self->Name));
 	}
 	SCNode* Curr = Self->MyReacher;
 	{
@@ -51015,7 +51011,7 @@ int SC_Class_CalculateSizeRaw(SCClass* Self, int Depth) {
 	if (Depth >= 16) {
 		Message* _tmPf3 = SC_Base_SourceArg(Self);
 		JB_Incr(_tmPf3);
-		JB_Msg_Fail(_tmPf3, JB_LUB[837]);
+		JB_Msg_Fail(_tmPf3, JB_LUB[833]);
 		JB_Decr(_tmPf3);
 		return 0;
 	}
@@ -51075,7 +51071,7 @@ int SC_Class_CalculateSizeRaw(SCClass* Self, int Depth) {
 	if (SC_Class_IsTask(Self)) {
 		Self->TaskObjectCount = (Self->Super->TaskObjectCount | Bits);
 		if (Self->Size > 128) {
-			JB_Msg_Fail(Self->Source, JB_LUB[838]);
+			JB_Msg_Fail(Self->Source, JB_LUB[834]);
 		}
 	}
 	return Rz;
@@ -51133,7 +51129,7 @@ void SC_Class_CheckAllocVsWrapper(SCClass* Self, SCFunction* F, bool IsConstruct
 	}
 	if ((!SC_Func_SyntaxIs(F, kSC__FunctionType_Wrapper))) {
 		if (true) {
-			JB_Msg_Fail(Self->Source, JB_LUB[839]);
+			JB_Msg_Fail(Self->Source, JB_LUB[835]);
 		}
 	}
 }
@@ -51156,7 +51152,7 @@ void SC_Class_CheckIterator(SCClass* Self) {
 
 void SC_Class_CheckStateful(SCClass* Self, Message* Node) {
 	if (!((!SC_Class_SyntaxIs(Self, kSC__ClassInfo_Stateful)) or (!SC_Class_SyntaxIs(Self, kSC__ClassInfo_Stateless)))) {
-		JB_Msg_Fail(Node, JB_LUB[840]);
+		JB_Msg_Fail(Node, JB_LUB[836]);
 		return;
 	}
 }
@@ -51631,10 +51627,10 @@ void SC_Class_DeclModel(SCClass* Self) {
 		return;
 	}
 	if (!JB_Array_SyntaxCast(Self->Properties)) {
-		JB_Msg_Fail(Self->Source, JB_LUB[1086]);
+		JB_Msg_Fail(Self->Source, JB_LUB[1082]);
 		return;
 	}
-	SCObject* Dcl = SC_Base_SyntaxAccessWithStr(Self->Modul, JB_LUB[1001]);
+	SCObject* Dcl = SC_Base_SyntaxAccessWithStr(Self->Modul, JB_LUB[997]);
 	if (JB_Object_FastIsa(Dcl, &SCDeclData)) {
 		SC_Decl_MakeGameFlying(((SCDecl*)Dcl), Self, M);
 	}
@@ -51931,7 +51927,7 @@ SCFunction* SC_Class_FindAllocFunc(SCClass* Self, JB_String* Fname, bool DontCre
 }
 
 SCClass* SC_Class_FindContainedClass(SCClass* Self) {
-	Message* C = JB_Msg_NeedSyx(JB_Msg_FindSyxName(SC_Base_SourceArg(Self), kJB_SyxTmp, JB_LUB[1161], false), kJB_SyxNil);
+	Message* C = JB_Msg_NeedSyx(JB_Msg_FindSyxName(SC_Base_SourceArg(Self), kJB_SyxTmp, JB_LUB[1157], false), kJB_SyxNil);
 	if (!C) {
 		if (SC_Class_SyntaxIs(Self, kSC__ClassInfo_ContainsParentClass)) {
 			SCNode* P = Self->Modul->Parent;
@@ -51943,13 +51939,13 @@ SCClass* SC_Class_FindContainedClass(SCClass* Self) {
 	}
 	SCModule* M = Self->Modul;
 	if (JB_Msg_EqualsSyx(C, kJB_SyxQues, false)) {
-		if ((!JB_Msg_SyntaxEquals(C, JB_LUB[1162], false))) {
+		if ((!JB_Msg_SyntaxEquals(C, JB_LUB[1158], false))) {
 			JB_Msg_Fail(C, nil);
 			return nil;
 		}
 		SCModule* P = ((SCModule*)M->Parent);
 		if (!(P and P->Cls)) {
-			JB_Msg_Fail(C, JB_LUB[1163]);
+			JB_Msg_Fail(C, JB_LUB[1159]);
 			return nil;
 		}
 		(SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_ContainsParentClass, true));
@@ -52096,7 +52092,7 @@ int SC_Class_GetDepth(SCClass* Self) {
 	uint D = Self->Depth;
 	if (D) {
 		if (D == 255) {
-			SC_SCObject_Fail(Self, JB_LUB[841]);
+			SC_SCObject_Fail(Self, JB_LUB[837]);
 			return 0;
 		}
 		return D;
@@ -52124,7 +52120,7 @@ int SC_Class_GetDepth(SCClass* Self) {
 	}
 	;
 	if (Rz >= 64) {
-		SC_SCObject_Fail(Self, JB_LUB[837]);
+		SC_SCObject_Fail(Self, JB_LUB[833]);
 	}
 	Self->Depth = Rz;
 	Message* Msg = Self->Defawlt;
@@ -52138,11 +52134,11 @@ int SC_Class_GetDepth(SCClass* Self) {
 }
 
 SCClass* SC_Class_GetFlyingMemClass(SCClass* Self) {
-	return SC_Comp__FindClassName(JB_LUB[1164], 0);
+	return SC_Comp__FindClassName(JB_LUB[1160], 0);
 }
 
 SCDecl* SC_Class_GetFlyingMemory(SCClass* Self, Message* Exp) {
-	SCObject* Decl = SC_Base_SyntaxAccessWithStr(Self->Modul, JB_LUB[1001]);
+	SCObject* Decl = SC_Base_SyntaxAccessWithStr(Self->Modul, JB_LUB[997]);
 	JB_Incr(Decl);
 	if (JB_Object_FastIsa(Decl, &SCDeclData)) {
 		if ((!JB_Msg_EqualsSyx(Exp, kJB_SyxThg, false))) {
@@ -52173,7 +52169,7 @@ SCFunction* SC_Class_GetFunc(SCClass* Self, JB_String* Keyword, bool DoError) {
 			return ((SCFunction*)O);
 		}
 		if (!((!SC_Class_IsObject(Self)) or (!DoError))) {
-			JB_Msg_Fail(Self->Source, JB_Str_OperatorPlus(Keyword, JB_LUB[842]));
+			JB_Msg_Fail(Self->Source, JB_Str_OperatorPlus(Keyword, JB_LUB[838]));
 		}
 	}
 	return nil;
@@ -52181,7 +52177,7 @@ SCFunction* SC_Class_GetFunc(SCClass* Self, JB_String* Keyword, bool DoError) {
 
 SCIterator* SC_Class_GetIteratorAny(SCClass* Self, JB_String* Name, Message* Node) {
 	if (!JB_Str_Exists(Name)) {
-		Name = JB_LUB[1002];
+		Name = JB_LUB[998];
 	}
 	{
 		SCClass* C = Self;
@@ -52317,7 +52313,7 @@ SCClass* SC_Class_InterfaceFor(SCClass* Self, JB_String* Name, Message* Errplace
 	}
 	;
 	if (!Result) {
-		JB_Msg_Fail(Errplace, JB_LUB[1087]);
+		JB_Msg_Fail(Errplace, JB_LUB[1083]);
 		return nil;
 	}
 	return Result->Cls;
@@ -52426,9 +52422,9 @@ void SC_Class_Iterfailed(SCClass* Self, JB_String* Name, Message* Node) {
 	if (true) {
 		FastString* _fsf0 = JB_FS_Constructor(nil);
 		JB_Incr(_fsf0);
-		JB_FS_AppendString(_fsf0, JB_LUB[843]);
+		JB_FS_AppendString(_fsf0, JB_LUB[839]);
 		JB_FS_AppendString(_fsf0, Name);
-		JB_FS_AppendString(_fsf0, JB_LUB[844]);
+		JB_FS_AppendString(_fsf0, JB_LUB[840]);
 		JB_FS_AppendString(_fsf0, Self->Name);
 		JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 		JB_Incr(_tmPf1);
@@ -52463,10 +52459,10 @@ void SC_Class_LoadLinkage(SCClass* Self) {
 	if (!Arg) {
 		return;
 	}
-	Self->NoAutoComplete = SC_Msg_DeprecatedClassOption(Arg, JB_LUB[1088], JB_LUB[176]);
-	((SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_NoEarlyFree, ((bool)SC_Msg_DeprecatedClassOption(Arg, JB_LUB[1089], JB_LUB[1090])))));
-	((SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_TreatAsBaseType, ((bool)SC_Msg_DeprecatedClassOption(Arg, JB_LUB[1089], JB_LUB[1091])))));
-	Self->MinOpt = SC_Msg_DeprecatedClassOption(Arg, JB_LUB[1092], JB_LUB[1033]);
+	Self->NoAutoComplete = SC_Msg_DeprecatedClassOption(Arg, JB_LUB[1084], JB_LUB[176]);
+	((SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_NoEarlyFree, ((bool)SC_Msg_DeprecatedClassOption(Arg, JB_LUB[1085], JB_LUB[1086])))));
+	((SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_TreatAsBaseType, ((bool)SC_Msg_DeprecatedClassOption(Arg, JB_LUB[1085], JB_LUB[1087])))));
+	Self->MinOpt = SC_Msg_DeprecatedClassOption(Arg, JB_LUB[1088], JB_LUB[1029]);
 }
 
 void SC_Class_LoadModuleForCls(SCClass* Self, Message* Node, SCNode* P) {
@@ -52507,7 +52503,7 @@ void SC_Class_LoadSaver(SCClass* Self) {
 		JB_String* S = JB_Str_LowerCase(_tmPf0->Name);
 		JB_Incr(S);
 		JB_Decr(_tmPf0);
-		if ((JB_Str_Equals(S, JB_LUB[39], false)) or ((JB_Str_Equals(S, JB_LUB[872], false)) or (JB_Str_Equals(S, JB_LUB[40], false)))) {
+		if ((JB_Str_Equals(S, JB_LUB[39], false)) or ((JB_Str_Equals(S, JB_LUB[868], false)) or (JB_Str_Equals(S, JB_LUB[40], false)))) {
 			JB_SetRef(Self->SaveAs, S);
 		}
 		 else if ((JB_Str_Equals(S, JB_LUB[1248], false))) {
@@ -52684,7 +52680,7 @@ void SC_Class_ModelDecls(SCClass* Self) {
 	SCClass* M = SC_Class_GetFlyingMemClass(Self);
 	JB_Incr(M);
 	if (M) {
-		SC_Class_NewDeclInClassModule(Self, JB_LUB[1001], M);
+		SC_Class_NewDeclInClassModule(Self, JB_LUB[997], M);
 	}
 	JB_Decr(M);
 }
@@ -52696,7 +52692,7 @@ void SC_Class_NeedsDefaultValue(SCClass* Self, Message* Def, Message** Place, JB
 	if (SC_Class_IsObject(Self) and (!Self->IsRole)) {
 		if (Def and (!(SC_Msg_OperatorIsThing(Def, JB_LUB[39])))) {
 			if (true) {
-				JB_String* _tmPf2 = JB_Str_OperatorPlus(JB_LUB[845], Self->Name);
+				JB_String* _tmPf2 = JB_Str_OperatorPlus(JB_LUB[841], Self->Name);
 				JB_Incr(_tmPf2);
 				JB_String* _tmPf1 = JB_Str_OperatorPlus(Name, _tmPf2);
 				JB_Incr(_tmPf1);
@@ -53313,7 +53309,7 @@ void SC_Class_TryAddToProject(SCClass* Self) {
 		}
 	}
 	 else {
-		if ((JB_Str_Equals(Self->Name, JB_LUB[1165], false)) and JB_Object_FastIsa(Self, &SCClassData)) {
+		if ((JB_Str_Equals(Self->Name, JB_LUB[1161], false)) and JB_Object_FastIsa(Self, &SCClassData)) {
 			if (((SCClass*)Self)->IsRole == 1) {
 				return;
 			}
@@ -53372,7 +53368,7 @@ SCNode* SC_Class__ExtendOneFunc(Message* Node, SCNode* Name_space, Message* ErrP
 	JB_Decr(Name);
 	if (Emb) {
 		if ((JB_Msg_EqualsSyx(Emb, kJB_SyxPrm, false))) {
-			JB_Msg_Fail(Emb, JB_LUB[846]);
+			JB_Msg_Fail(Emb, JB_LUB[842]);
 		}
 		JB_Tree_Remove(Emb);
 	}
@@ -53404,12 +53400,12 @@ JB_String* SC_Class__LoadClassName(Message* Node) {
 	}
 	if (JB_Msg_EqualsSyx(S, kJB_SyxRel, false)) {
 		if (true) {
-			JB_Msg_Fail(Node, JB_LUB[847]);
+			JB_Msg_Fail(Node, JB_LUB[843]);
 		}
 	}
 	 else {
 		if (true) {
-			JB_Msg_Fail(Node, JB_LUB[848]);
+			JB_Msg_Fail(Node, JB_LUB[844]);
 		}
 	}
 	return JB_LUB[0];
@@ -53793,7 +53789,7 @@ void SC_Func_AddSelfPrm(SCFunction* Self, SCClass* Cls) {
 	Message* Name = ((Message*)JB_Ring_First(Self->Source));
 	JB_Incr(Name);
 	if (!Name) {
-		JB_Msg_Fail(Self->Source, JB_LUB[982]);
+		JB_Msg_Fail(Self->Source, JB_LUB[978]);
 		JB_Decr(Name);
 		JB_Decr(Prms);
 		return;
@@ -54306,7 +54302,7 @@ void SC_Func_CallSuperMem(SCFunction* Self, SCFunction* Fn) {
 	}
 	Array* Fnargs = Fn->Args;
 	if (!(((JB_Array_SyntaxEquals(Fnargs, 1, false))) or SC_Class_IsTask(Self->Cls))) {
-		JB_Msg_Fail(Root, JB_LUB[892]);
+		JB_Msg_Fail(Root, JB_LUB[888]);
 		return;
 	}
 	//using;
@@ -54459,7 +54455,7 @@ void SC_Func_CheckNotBadName(SCFunction* Self) {
 		int W = SC_Class_NumericCount(Self->Cls);
 		if ((W > 1) and SC_Str_IsSwizzle(Self->Name, W)) {
 			if (true) {
-				JB_Msg_Fail(Self->Source, JB_LUB[893]);
+				JB_Msg_Fail(Self->Source, JB_LUB[889]);
 			}
 		}
 	}
@@ -54479,7 +54475,7 @@ void SC_Func_CheckRegAddress(SCFunction* Self) {
 				SCFunction* Fn = ((SCFunction*)JB_Object_FastAs(Prms->Obj, &SCFunctionData));
 				if (Fn) {
 					if ((!SC_Func_SyntaxIs(Fn, kSC__FunctionType_Cpp))) {
-						(JB_Msg_SyntaxProblem(S, JB_LUB[1108]));
+						(JB_Msg_SyntaxProblem(S, JB_LUB[1104]));
 					}
 				}
 			}
@@ -54633,14 +54629,14 @@ void SC_Func_Cleanupfunc(SCFunction* Self, Message* S) {
 	JB_Msg_SyntaxUsing(S, (&_usingf0));
 	SCClass* Cls = SC_Base_IsNormalObject(Self->Cls);
 	JB_Incr(Cls);
-	if ((JB_Msg_SyntaxEquals(S, JB_LUB[950], true)) or (JB_Msg_SyntaxEquals(S, JB_LUB[144], true))) {
+	if ((JB_Msg_SyntaxEquals(S, JB_LUB[946], true)) or (JB_Msg_SyntaxEquals(S, JB_LUB[144], true))) {
 		JB_SetRef(S->Name, JB_LUB[531]);
 		Message* _tmPf1 = JB_Syx_OperatorPlus(kJB_SyxThg, N);
 		JB_Incr(_tmPf1);
 		(JB_Ring_FirstSet(S, _tmPf1));
 		JB_Decr(_tmPf1);
 	}
-	 else if (JB_Msg_SyntaxEquals(S, JB_LUB[1111], true)) {
+	 else if (JB_Msg_SyntaxEquals(S, JB_LUB[1107], true)) {
 		if (SC_Func__Tran_Render(S, Cls)) {
 			JB_SetRef(S->Name, JB_LUB[78]);
 		}
@@ -54816,7 +54812,7 @@ void SC_Func_CopyParams(SCFunction* Self, Message* List) {
 	Message* A = JB_Msg_GiveArg(Self->Source);
 	Message* Dot = JB_Syx_Msg(kJB_SyxDot, JB_LUB[611]);
 	(JB_Ring_FirstSet(A, Dot));
-	Message* Name = JB_Msg_Msg(Dot, kJB_SyxThg, JB_LUB[911]);
+	Message* Name = JB_Msg_Msg(Dot, kJB_SyxThg, JB_LUB[907]);
 	Message* SubPrms = JB_Msg_Msg(Dot, kJB_SyxPrm, JB_LUB[0]);
 	{
 		Message* S = ((Message*)JB_Ring_First(List));
@@ -54851,7 +54847,7 @@ Message* SC_Func_CountCallsToParentAlloc(SCFunction* Self, Message* Root) {
 			if (F) {
 				SCClass* Fcls = F->Cls;
 				if (!SC_Func_IsOKConstructorCall(F, C)) {
-					JB_Msg_Fail(Curr, JB_LUB[894]);
+					JB_Msg_Fail(Curr, JB_LUB[890]);
 					return nil;
 				}
 				if (!Rz) {
@@ -54859,7 +54855,7 @@ Message* SC_Func_CountCallsToParentAlloc(SCFunction* Self, Message* Root) {
 				}
 				(++FoundCount);
 				if (FoundCount >= 2) {
-					JB_Msg_Fail(Curr, JB_LUB[895]);
+					JB_Msg_Fail(Curr, JB_LUB[891]);
 					return nil;
 				}
 			}
@@ -55069,12 +55065,12 @@ void SC_Func_DeclsPrototypeClass(SCFunction* Self, Message* Ch0) {
 	}
 	Message* Route = nil;
 	if (!fpType->FuncProto) {
-		SCClass* Task = SC_Base_FindClass(fpType->Modul, JB_LUB[1165], nil, kSC__Base_DontGoUp);
+		SCClass* Task = SC_Base_FindClass(fpType->Modul, JB_LUB[1161], nil, kSC__Base_DontGoUp);
 		if (Task) {
 			fpType = Task;
-			Route = SC_Base_Route(fpType->Modul->Parent, JB_LUB[1165]);
+			Route = SC_Base_Route(fpType->Modul->Parent, JB_LUB[1161]);
 		}
-		SCClass* Task_proto = SC_Base_FindClass(fpType->Modul, JB_LUB[1042], nil, kSC__Base_DontGoUp);
+		SCClass* Task_proto = SC_Base_FindClass(fpType->Modul, JB_LUB[1038], nil, kSC__Base_DontGoUp);
 		if (Task_proto) {
 			fpType = Task_proto;
 		}
@@ -55572,7 +55568,7 @@ void SC_Func_FillInSaver(SCFunction* Self, JB_String* Name) {
 					JB_FS_AppendString(Fs, JB_LUB[1789]);
 				}
 				 else {
-					JB_FS_AppendString(Fs, JB_LUB[882]);
+					JB_FS_AppendString(Fs, JB_LUB[878]);
 					JB_FS_AppendString(Fs, JB_LUB[1790]);
 					JB_FS_AppendString(Fs, Type);
 					SCClass* It = Item->Type;
@@ -56178,10 +56174,10 @@ void SC_Func_MakeMacro(SCFunction* Self, Message* Arg) {
 	Message* C = ((Message*)JB_Ring_First(Arg));
 	Message* Prm = ((Message*)JB_Ring_PrevSib(Arg));
 	if (!(C and (!((Message*)JB_Ring_NextSib(C))))) {
-		SC_SCObject_Fail(Self, JB_LUB[896]);
+		SC_SCObject_Fail(Self, JB_LUB[892]);
 	}
 	if ((JB_Ring_HasChildren(Prm))) {
-		JB_Str_Fail(JB_LUB[897]);
+		JB_Str_Fail(JB_LUB[893]);
 	}
 	JB_SetRef(Self->IsMacro, JB_Macro_ConstructorMsg(nil, C));
 }
@@ -56308,7 +56304,7 @@ Message* SC_Func_NewDefaultRel(SCFunction* Self, Message* Place, SCDecl* D) {
 
 void SC_Func_NilSelff(SCFunction* Self, Message* Where, uint /*NilState*/ V) {
 	if ((Self->NilSelf)) {
-		JB_Msg_Fail(Where, JB_LUB[898]);
+		JB_Msg_Fail(Where, JB_LUB[894]);
 		return;
 	}
 	Self->NilSelf = V;
@@ -56395,23 +56391,23 @@ bool SC_Func_ParseName(SCFunction* Self, Message* Node) {
 	}
 	Cname->Func = kJB_SyxThg;
 	JB_SetRef(Self->Name, Cname->Name);
-	if (JB_Str_Equals(fType, JB_LUB[1036], false)) {
+	if (JB_Str_Equals(fType, JB_LUB[1032], false)) {
 		Self->NoAutoComplete = 2;
 	}
-	 else if (JB_Str_Equals(fType, JB_LUB[1018], false)) {
+	 else if (JB_Str_Equals(fType, JB_LUB[1014], false)) {
 		(SC_Func_SyntaxIsSet(Self, kSC__FunctionType_API, true));
 	}
-	 else if (JB_Str_Equals(fType, JB_LUB[1037], false)) {
+	 else if (JB_Str_Equals(fType, JB_LUB[1033], false)) {
 		Self->IsAssigns = 2;
 		(SC_Func_SyntaxIsSet(Self, kSC__FunctionType_HidesProperties, true));
 	}
-	 else if (JB_Str_Equals(fType, JB_LUB[1038], false)) {
+	 else if (JB_Str_Equals(fType, JB_LUB[1034], false)) {
 		(SC_Func_SyntaxIsSet(Self, kSC__FunctionType_HidesProperties, true));
 	}
 	if (!Self->Cls) {
 		0;
 	}
-	 else if (JB_Msg_SyntaxEquals(Cname, JB_LUB[950], true)) {
+	 else if (JB_Msg_SyntaxEquals(Cname, JB_LUB[946], true)) {
 		(SC_Func_SyntaxIsSet(Self, kSC__FunctionType_Constructor, true));
 	}
 	 else if (JB_Msg_SyntaxEquals(Cname, JB_LUB[144], true)) {
@@ -56543,7 +56539,7 @@ void SC_Func_ReachFunc(SCFunction* Self, SCNode* From) {
 	//;
 	if (SC_Func_Borked(Self)) {
 		if (true) {
-			JB_Msg_Fail(Self->Source, JB_LUB[1109]);
+			JB_Msg_Fail(Self->Source, JB_LUB[1105]);
 		}
 		if (true) {
 			JB_Msg_Fail(From->Source, SC_Base_ReachedName(From));
@@ -57054,7 +57050,7 @@ void SC_Func_ValidateSaverSub(SCFunction* Self, JB_String* Name) {
 	}
 	Message* First = ((Message*)JB_Ring_First(SC_Func_SourceArg(Self)));
 	if (!First) {
-		JB_Msg_SyntaxWarn(Self->Source, JB_LUB[1039]);
+		JB_Msg_SyntaxWarn(Self->Source, JB_LUB[1035]);
 	}
 	{
 		Message* _LoopSrcf2 = SC_Func_SourceArg(Self);
@@ -57097,7 +57093,7 @@ int SC_Func_VisibleArgs(SCFunction* Self) {
 void SC_Func_WantAs(SCFunction* Self, uint /*NilState*/ NS) {
 	SCDecl* Dcl = ((SCDecl*)JB_Array_First(Self->Args));
 	if (!(Dcl and (SC_Decl_TypeSuffers(Dcl) and Self->Cls))) {
-		JB_Msg_Fail(Self->Source, JB_LUB[899]);
+		JB_Msg_Fail(Self->Source, JB_LUB[895]);
 		return;
 	}
 	Dcl->NilDeclared = NS;
@@ -57296,7 +57292,7 @@ Message* SC_Func__GetFileString(Message* Msg, JB_String* Name) {
 	JB_Decr(Data);
 	JB_Decr(F);
 	if (true) {
-		JB_Msg_Fail(Msg, JB_LUB[779]);
+		JB_Msg_Fail(Msg, JB_LUB[775]);
 	}
 	return nil;
 }
@@ -57331,7 +57327,7 @@ int SC_Func__Init_() {
 		JB_Decr(_tmPf1);
 		DTWrap* _tmPf2 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Func__Tran_Swap))));
 		JB_Incr(_tmPf2);
-		(JB_Dict_ValueSet(SC__Func_TemporalStatements, JB_LUB[764], _tmPf2));
+		(JB_Dict_ValueSet(SC__Func_TemporalStatements, JB_LUB[1167], _tmPf2));
 		JB_Decr(_tmPf2);
 		DTWrap* _tmPf3 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Func__Tran_While))));
 		JB_Incr(_tmPf3);
@@ -57431,7 +57427,7 @@ int SC_Func__Init_() {
 		JB_Decr(_tmPf26);
 		DTWrap* _tmPf27 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_TemporalStatements_break)));
 		JB_Incr(_tmPf27);
-		(JB_Dict_ValueSet(SC__Func_TemporalStatements, JB_LUB[762], _tmPf27));
+		(JB_Dict_ValueSet(SC__Func_TemporalStatements, JB_LUB[1165], _tmPf27));
 		JB_Decr(_tmPf27);
 		DTWrap* _tmPf28 = JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_TemporalStatements_do)));
 		JB_Incr(_tmPf28);
@@ -57626,7 +57622,7 @@ SCNode* SC_Func__NewCppWrapper(Message* Node, SCNode* Name_space, Message* ErrPl
 	JB_SetRef(Node->Name, JB_LUB[531]);
 	Message* _tmPf2 = JB_Msg_Msg(Node, kJB_SyxArg, JB_LUB[0]);
 	JB_Incr(_tmPf2);
-	Message* _tmPf1 = JB_Msg_Msg(_tmPf2, kJB_SyxTmp, JB_LUB[1160]);
+	Message* _tmPf1 = JB_Msg_Msg(_tmPf2, kJB_SyxTmp, JB_LUB[1156]);
 	JB_Incr(_tmPf1);
 	JB_Decr(_tmPf2);
 	JB_Tree_SyntaxAppend(_tmPf1, Thg);
@@ -57853,7 +57849,7 @@ void SC_Func__String_Expand(Message* Msg, SCFunction* Fn) {
 	//using;
 	MessagePosition _usingf0 = ((MessagePosition){});
 	JB_Msg_SyntaxUsing(Msg, (&_usingf0));
-	JB_String* FSName = SC_UniqueTmpVar(Fn, JB_LUB[1112]);
+	JB_String* FSName = SC_UniqueTmpVar(Fn, JB_LUB[1108]);
 	JB_Incr(FSName);
 	JB_String* StrName = JB_Str_OperatorPlus(FSName, JB_LUB[1833]);
 	JB_Incr(StrName);
@@ -58104,11 +58100,11 @@ SCDecl* SC_Func__Tran_AfterRel(Message* Msg, SCNode* Name_space, Message* Side) 
 		return nil;
 	}
 	if (SC_Decl_SyntaxIs(Type, kSC__SCDeclInfo_Const)) {
-		JB_Msg_Fail(Msg, JB_LUB[1102]);
+		JB_Msg_Fail(Msg, JB_LUB[1098]);
 	}
 	if (Type->PointerCount > 0) {
 		if ((Side)) {
-			JB_Msg_Fail(Msg, JB_LUB[1102]);
+			JB_Msg_Fail(Msg, JB_LUB[1098]);
 		}
 		SC_Decl_MarkAsAltered(Type);
 		SCDecl* _tmPf3 = SC_Decl_CheckMath(Type, Msg);
@@ -58127,7 +58123,7 @@ SCDecl* SC_Func__Tran_AfterRel(Message* Msg, SCNode* Name_space, Message* Side) 
 	if ((!SC_Class_IsObject(Type->Type)) and ((!Type->HiderFunc) and (Numc <= 1))) {
 		SC_Decl_MarkAsAltered(Type);
 		if ((Side)) {
-			JB_Msg_Fail(Msg, JB_LUB[1102]);
+			JB_Msg_Fail(Msg, JB_LUB[1098]);
 		}
 		JB_Decr(Exp_copy);
 		JB_SafeDecr(Type);
@@ -58407,7 +58403,7 @@ bool SC_Func__Tran_Beep(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 
 bool SC_Func__Tran_BlindCasts(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 	if ((!Fn)) {
-		JB_Msg_Fail(Node, JB_LUB[901]);
+		JB_Msg_Fail(Node, JB_LUB[897]);
 		return nil;
 	}
 	Message* Thg = JB_Msg_NeedSyx(Node, kJB_SyxThg);
@@ -58434,7 +58430,7 @@ void SC_Func__Tran_BreakPoint(SCFunction* Fn, SCNode* P, Message* Ch) {
 
 bool SC_Func__Tran_CppRefs(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 	if ((!Fn)) {
-		JB_Msg_Fail(Node, JB_LUB[901]);
+		JB_Msg_Fail(Node, JB_LUB[897]);
 		return nil;
 	}
 	JB_SetRef(Fn->Refs, SC_CppRefs_Constructor(nil, Node));
@@ -58511,7 +58507,7 @@ bool SC_Func__Tran_Deprecate(SCFunction* Fn, Message* Node, SCNode* Name_space) 
 
 bool SC_Func__Tran_Description(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 	if ((!Fn)) {
-		JB_Msg_Fail(Node, JB_LUB[901]);
+		JB_Msg_Fail(Node, JB_LUB[897]);
 		return nil;
 	}
 	Message* Str = JB_Msg_NeedSyx(Node, kJB_SyxStr);
@@ -58519,7 +58515,7 @@ bool SC_Func__Tran_Description(SCFunction* Fn, Message* Node, SCNode* Name_space
 	if (Str) {
 		if (!SC_Func_SyntaxIs(Fn, kSC__FunctionType_Disabled)) {
 			if (((JB_String*)JB_Str_Exists(Fn->Description))) {
-				JB_Msg_Fail(Node, JB_LUB[1040]);
+				JB_Msg_Fail(Node, JB_LUB[1036]);
 			}
 			JB_SetRef(Fn->Description, Str->Name);
 		}
@@ -58532,7 +58528,7 @@ bool SC_Func__Tran_Description(SCFunction* Fn, Message* Node, SCNode* Name_space
 bool SC_Func__Tran_Else(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 	Message* P = ((Message*)JB_Ring_Parent(Node));
 	if (!((JB_Msg_EqualsSyx(P, kJB_SyxTmp, false)) and ((JB_Msg_SyntaxEquals(P, JB_LUB[177], false)) or (JB_Msg_SyntaxEquals(P, JB_LUB[450], false))))) {
-		JB_Msg_Fail(Node, JB_LUB[900]);
+		JB_Msg_Fail(Node, JB_LUB[896]);
 		return nil;
 	}
 	return false;
@@ -58600,13 +58596,13 @@ bool SC_Func__Tran_Expect(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 
 bool SC_Func__Tran_Fails(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 	if ((!Fn)) {
-		JB_Msg_Fail(Node, JB_LUB[901]);
+		JB_Msg_Fail(Node, JB_LUB[897]);
 		return nil;
 	}
 	(SC_Msg_ASMTypeSet(Node, kSC__ASMType_kFail));
 	Fn->Badness = (Fn->Badness | 128);
 	if ((JB_Tree_IsLast(Node))) {
-		JB_Msg_Fail(Node, JB_LUB[902]);
+		JB_Msg_Fail(Node, JB_LUB[898]);
 		return nil;
 	}
 	return false;
@@ -59052,9 +59048,9 @@ bool SC_Func__Tran_FuncTable(Message* Msg) {
 			JB_Incr(_tmPf6);
 			JB_FreeIfDead(SC_Msg_ReplaceWith(protoMsg, (_tmPf6)));
 			JB_Decr(_tmPf6);
-			JB_SetRef(protoName, JB_Str_OperatorPlus(JB_LUB[1041], Name));
+			JB_SetRef(protoName, JB_Str_OperatorPlus(JB_LUB[1037], Name));
 			protoMsg->Func = kJB_SyxPrm;
-			Message* protoMsg2 = (JB_Syx_Msg(kJB_SyxTmp, JB_LUB[1042]));
+			Message* protoMsg2 = (JB_Syx_Msg(kJB_SyxTmp, JB_LUB[1038]));
 			JB_Incr(protoMsg2);
 			Message* _tmPf7 = JB_Syx_Msg(kJB_SyxThg, protoName);
 			JB_Incr(_tmPf7);
@@ -59064,7 +59060,7 @@ bool SC_Func__Tran_FuncTable(Message* Msg) {
 			(JB_Ring_NextSibSet(Msg, protoMsg2));
 			JB_Decr(protoMsg2);
 		}
-		JB_SetRef(Items->Name, JB_LUB[1043]);
+		JB_SetRef(Items->Name, JB_LUB[1039]);
 		Items->Func = kJB_SyxArr;
 		JB_Tree_Clear(Msg);
 		Msg->Func = kJB_SyxDecl;
@@ -59108,7 +59104,7 @@ bool SC_Func__Tran_FuncTable(Message* Msg) {
 			if ((JB_Msg_EqualsSyx(I, kJB_SyxTmp, false))) {
 				if (JB_Msg_EqualsSyx(Table_name, kJB_SyxPrm, false)) {
 					if ((!ListOK)) {
-						JB_Msg_Fail(I, JB_LUB[1044]);
+						JB_Msg_Fail(I, JB_LUB[1040]);
 					}
 					JB_SetRef(Table_name, ((Message*)JB_Ring_First(Table_name)));
 					JB_Tree_Remove(Sigh);
@@ -59118,7 +59114,7 @@ bool SC_Func__Tran_FuncTable(Message* Msg) {
 				}
 				JB_SetRef(Item_name, I);
 				if ((!Item_value)) {
-					JB_Msg_Fail(I, JB_LUB[1045]);
+					JB_Msg_Fail(I, JB_LUB[1041]);
 				}
 			}
 			 else {
@@ -59153,7 +59149,7 @@ bool SC_Func__Tran_FuncTable(Message* Msg) {
 				}
 				 else {
 					if ((JB_Msg_EqualsSyx(Item_value, kJB_SyxEmb, false))) {
-						JB_Msg_Fail(Item_value, JB_LUB[1046]);
+						JB_Msg_Fail(Item_value, JB_LUB[1042]);
 					}
 					if ((!JB_Msg_EqualsSyx(Item_value, kJB_SyxArg, false))) {
 						Message* _tmPf13 = JB_Syx_Msg(kJB_SyxArg, JB_LUB[0]);
@@ -59162,7 +59158,7 @@ bool SC_Func__Tran_FuncTable(Message* Msg) {
 						JB_Decr(_tmPf13);
 					}
 					if (!Item_name) {
-						JB_Msg_Fail(I, JB_LUB[1047]);
+						JB_Msg_Fail(I, JB_LUB[1043]);
 					}
 					if (Item_name) {
 						if (!JB_Str_Exists(NewName)) {
@@ -59584,7 +59580,7 @@ bool SC_Func__Tran_RenderSub(Message* Msg, SCClass* Cls) {
 	bool IsPureRender = (!JB_Msg_EqualsSyx(_tmPf0, kJB_SyxThg, false));
 	JB_Decr(_tmPf0);
 	if (IsPureRender) {
-		Message* _tmPf1 = JB_Syx_OperatorPlus(kJB_SyxThg, JB_LUB[1110]);
+		Message* _tmPf1 = JB_Syx_OperatorPlus(kJB_SyxThg, JB_LUB[1106]);
 		JB_Incr(_tmPf1);
 		(JB_Ring_FirstSet(Msg, _tmPf1));
 		JB_Decr(_tmPf1);
@@ -59600,13 +59596,13 @@ bool SC_Func__Tran_RenderSub(Message* Msg, SCClass* Cls) {
 	JB_Incr(Params);
 	JB_Decr(Name);
 	if (SC_Msg_IsBehaviour(Msg)) {
-		JB_Msg_AppendSyx(Params, kJB_SyxThg, JB_LUB[1111]);
+		JB_Msg_AppendSyx(Params, kJB_SyxThg, JB_LUB[1107]);
 	}
 	 else {
 		JB_Msg_CopyAllInto(SC__SCStrings_RenderNewParams, Params);
 	}
 	JB_Decr(Params);
-	if (JB_FreeIfDead(JB_Msg_FindNested(Msg, kJB_SyxThg, JB_LUB[1112], false))) {
+	if (JB_FreeIfDead(JB_Msg_FindNested(Msg, kJB_SyxThg, JB_LUB[1108], false))) {
 		SC_Msg_CopyAllBeforeInto(SC__SCStrings_RenderFinish, Arg, Arg);
 		SC_Msg_CopyAllAfterInto(SC__SCStrings_RenderFinish, Arg, Arg);
 	}
@@ -59635,7 +59631,7 @@ Message* SC_Func__Tran_Result(SCFunction* F) {
 	MessagePosition _usingf0 = ((MessagePosition){});
 	JB_Msg_SyntaxUsing(P, (&_usingf0));
 	JB__Tk_Using.Position = (JB_Msg_After(P) + 1);
-	Message* Ret = SC_Decl_WriteDeclFull(Type, JB_LUB[932], 0);
+	Message* Ret = SC_Decl_WriteDeclFull(Type, JB_LUB[928], 0);
 	(JB_Ring_FirstSet(Src, Ret));
 	JB_MsgPos_SyntaxUsingComplete((&_usingf0), P);
 	JB_MsgPos_Destructor((&_usingf0));
@@ -59670,7 +59666,7 @@ void SC_Func__Tran_ResultFinish(SCFunction* F, Message* R_z, SCNode* Space) {
 		Message* Ret = JB_Msg_Msg(Src, kJB_SyxTmp, JB_LUB[242]);
 		(SC_Msg_ASMTypeSet(Ret, kSC__ASMType_kReturn));
 		if (Used) {
-			JB_SetRef(JB_Msg_Msg(Ret, kJB_SyxThg, JB_LUB[932])->Obj, D);
+			JB_SetRef(JB_Msg_Msg(Ret, kJB_SyxThg, JB_LUB[928])->Obj, D);
 		}
 		 else {
 			JB_Tree_SyntaxAppend(Ret, SC_Decl_CreateDefault(F->ReturnType, Src, true));
@@ -59686,7 +59682,7 @@ bool SC_Func__Tran_Return(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 	}
 	(SC_Msg_ASMTypeSet(Node, kSC__ASMType_kReturn));
 	if ((!Fn)) {
-		JB_Msg_Fail(Node, JB_LUB[901]);
+		JB_Msg_Fail(Node, JB_LUB[897]);
 		return nil;
 	}
 	JB_SetRef(Node->Obj, Fn->ReturnType);
@@ -59746,7 +59742,7 @@ bool SC_Func__Tran_Swap(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 		JB_Msg_Fail(Node, JB_LUB[1734]);
 		return nil;
 	}
-	JB_SetRef(Node->Name, JB_LUB[765]);
+	JB_SetRef(Node->Name, JB_LUB[1168]);
 	Message* Ln = ((Message*)JB_Ring_First(Node));
 	Message* Rn = ((Message*)JB_Tree_Second(Node));
 	SCDecl* Lc = SC_TypeOfExpr(Ln, Name_space, nil);
@@ -59767,7 +59763,7 @@ bool SC_Func__Tran_Swap(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 }
 
 Message* SC_Func__Tran_Syx(Message* Msg) {
-	JB_SetRef(Msg->Name, JB_LUB[1036]);
+	JB_SetRef(Msg->Name, JB_LUB[1032]);
 	Message* Name = JB_Msg_NeedSyx(Msg, kJB_SyxThg);
 	JB_Incr(Name);
 	if (!Name) {
@@ -59971,7 +59967,7 @@ bool SC_Func__Tran_Using(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 
 bool SC_Func__Tran_Visible(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 	if ((!Fn)) {
-		JB_Msg_Fail(Node, JB_LUB[901]);
+		JB_Msg_Fail(Node, JB_LUB[897]);
 		return nil;
 	}
 	SC_Base_LoadVisibility(Fn, Node);
@@ -60733,4 +60729,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 1322232449558205386 3263278983824332870
+// 5456895915161748007 -1264558672795310633
