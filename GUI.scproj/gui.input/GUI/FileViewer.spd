@@ -140,7 +140,7 @@ class FileViewer (ListView)
 		self <~ rz
 
 
-	helper AddRootSub (|file| fol, |bool| IsMainProj, |&int| C, |filerow|)
+	helper AddRootSub (|file| fol, |bool| IsMainProj, |$int| C, |filerow|)
 		|| p = fol.path
 		if !fol.isdir
 			return FileRow(p, p.name)

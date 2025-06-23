@@ -37,7 +37,7 @@ class GraphicsEditor (GuiControl)
 	
 	behaviour Draw
 		where.DrawRect(self, .gnormal.bg)
-		.merged.Drawcentered(where, .gnormal)
+		.merged.DrawCenteredForViewer(where, .gnormal)
 
 
 	helper LoadNative (|string| f, |bool|)
@@ -93,13 +93,47 @@ class GraphicsEditor (GuiControl)
 		.addint(img.height)
 		.add(@bin, img.rawdata.compress)
 		.exit
+		
+		
+	helper image.DrawCenteredForViewer (|image| Where, |drawstyle| g = nil)
+		|| Diff = (where.CurrSize - .CurrSize)/2
+		.DrawForViewer(where, diff, g)
+
+
+	helper imagepixel.Underlay (|vec4| b, |$imagepixel| Dest)
+		|| Old = .color
+		|| C = mix(b, Old, Old.a)
+		C.a = old.a
+		Dest = C.px
+	
+
+	helper image.DrawForViewer (|image| Where, |ivec2| D=(0,0), |drawstyle| g=nil)
+		D += where.controlclip.xy
+		|| OurShit = ._Controlclip		// take our shit
+		|| Up = OurShit + D				// move it up
+		|| ClippedShit = where.clip(up) // clip the shit
+		|| BackDown = ClippedShit - D	// move the shit back down
+		
+		|| range = self[BackDown]
+		if !g
+			for (P in range) (V)
+				where[v+d] <~ p
+		  else
+			|| b1 = g.seps
+			|| b2 = g.edge
+			for (P in range) (V)
+				|| dest = where[v+d]
+				if (v.x>>4) + (v.y>>4) isa 2
+					p.underlay(b1, dest)
+				  else
+					p.underlay(b2, dest)
 	
 	
 	function DoMerge (|bool| bg=true)
 		if bg
 			.DoBG
 		for p in .layers
-			p.DrawTo(.Merged) // cell-system would be better than doing all this work
+			p.DrawForViewer(.Merged) // cell-system would be better than doing all this work
 							  // everytime a single pixel is altered! Of course... we'd need cells...
 							  // just get it working for now!
 
@@ -128,7 +162,7 @@ class GraphicsEditor (GuiControl)
 		|| w = colors.white
 		for (p in .Merged) (v)
 			|| col = (v<<size).sum isa 2
-			p[0] = (g,w)(col)
+			p[0] = (g,w)(col).px
 	
 	
 	function Export (|file| dest)

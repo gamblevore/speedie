@@ -431,7 +431,7 @@ class Tetris (GridSection)
 			br += gui.Cycle(5s, (x+y)*1s).pow8*0.08
 			r+=(0,0,1,1)
 		C = colors.wheel(Hu, SA, br, 1.0)
-		where.DrawOutlineOnly(R, C)
+		where.DrawOutlineOnly(R, C.px)
 	
 	
 	function DrawRow (|image| where, |int| y, |float| h)

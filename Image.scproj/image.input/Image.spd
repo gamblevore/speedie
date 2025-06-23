@@ -395,38 +395,10 @@ class Image (memory)
 		return .Pixels
 	
 	
-	function DrawCentered (|image| Where, |drawstyle| g = nil)
-		|| Diff = (where.CurrSize - .CurrSize)/2
-		.drawto(where, diff, g)
-	
-	
 	function CurrSize (|ivec2|)
 		return ._controlclip.size
 	
-			
-	function DrawTo (|image| Where, |ivec2| D=(0,0), |drawstyle| g=nil)
-		D += where.controlclip.xy
-		|| OurShit = ._Controlclip		// take our shit
-		|| Up = OurShit + D				// move it up
-		|| ClippedShit = where.clip(up) // clip the shit
-		|| BackDown = ClippedShit - D	// move the shit back down
-		
-		|| range = self[BackDown]
-		if !g
-			for (P in range) (V)
-				where[v+d] <~ p
-		  else
-			|| b1 = g.seps
-			|| b2 = g.edge
-			for (P in range) (V)
-				|| pp = p[0]
-				if (v.x>>4) + (v.y>>4) isa 2
-					pp.underlay(b1)
-				  else
-					pp.underlay(b2)
-				where[v+d] <~ pp
-	
-	
+				
 	function EdgeAlpha (|ivec4| R, |DrawStyle| G, |float| alpha, |MoveCode| AllowEdge=movecode.all)
 		using g
 			g.edge.alpha = alpha

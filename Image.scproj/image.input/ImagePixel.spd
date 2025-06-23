@@ -22,15 +22,18 @@ struct ImagePixelStruct
 		.r = iv.r._CB2
 		.g = iv.g._CB2
 		.b = iv.b._CB2
+	
+	function Px (|ImagePixel|)
+		return self|&ImagePixel|[]
 				
-	helper ivec4._CB (|ivec4|)
-		// test if this is faster.
-		description "A secret ClampByte"
-		|| L = ivec4((.x<0)|int|,   (.y<0)|int|,   (.z<0)|int|,   (.w<0)|int|)
-		|| H = ivec4((.x>255)|int|, (.y>255)|int|, (.z>255)|int|, (.w>255)|int|)
-	    self &= L-1			// clamp < 0
-	    self |= -H			// clamp > 255
-	    return self
+//	helper ivec4._CB (|ivec4|)
+//		// test if this is faster.
+//		description "A secret ClampByte"
+//		|| L = ivec4((.x<0)|int|,   (.y<0)|int|,   (.z<0)|int|,   (.w<0)|int|)
+//		|| H = ivec4((.x>255)|int|, (.y>255)|int|, (.z>255)|int|, (.w>255)|int|)
+//	    self &= L-1			// clamp < 0
+//	    self |= -H			// clamp > 255
+//	    return self
 	
 	helper int._CB2 (|byte|)
 		description "A secret ClampByte"
@@ -126,7 +129,7 @@ datatype ImagePixel (uint)
 		return (self != 0)
 		
 	operator in (|&imagepixel| self, |image| src, |bool|)
-		return src contains self
+		disabled "Use: image contains pixel"
 
 	syntax cast (|vec4|)
 		cpp_part CastVec4
@@ -187,13 +190,11 @@ datatype ImagePixel (uint)
 		D.a = r.a
 		.raw = D
 
-	function Underlay (|&imagepixel| self, |vec4| b) 
-		|| Old = .color
-		|| C = mix(b, Old, Old.a)
-		C.a = old.a
-		self <~ C 
-	
+	function Color (|vec4|)
+		return vec4(.r, .g, .b, .a) * (1.0/254.99)
+
 	function Color (|&imagepixel| self, |vec4|)
+		cpp_part ColorLoad
 		rz = vec4.load(self|&byte|)
 		rz *= (1.0/254.99)
 		
@@ -215,7 +216,7 @@ datatype ImagePixel (uint)
 		|ImagePixel| White
 		|ImagePixel| Clear
 
-		function CheckPixel (|string| extra=nil)
+//		function CheckPixel (|string| extra=nil)
 /*			|| W = .white
 			if  .White != -1  or  .Clear != 0
 /				.white = -1
@@ -238,24 +239,30 @@ datatype ImagePixel (uint)
 			return .clear
 
 
-function vec4.syntaxcast (|imagepixel|)
-	cpp_part AsPixel
-	return .px
-
-function vec4.Px (|imagepixel|)
-	rz <~ self
 
 function vec3.syntaxcast (|imagepixel|)
-	cpp_part AsPixel
-	return .px
+	disabled "use .px"
 		
-function vec3.Px (|imagepixel|)
-	rz <~ ((self,1.0))
+function vec4.syntaxcast (|imagepixel|)
+	disabled "Use .px"
 
 function ivec4.syntaxcast (|imagepixel|)
-	cpp_part AsPixel
-	return .px
+	disabled "Use .px"
+
+
+function vec4.Px (|imagepixel|)
+	|imagepixelstruct| Tmp
+	Tmp.AppendVec4(self)
+	return tmp.px
+
+function vec3.Px (|imagepixel|)
+	|imagepixelstruct| Tmp
+	tmp.appendvec3(self)
+	tmp.a = 255
+	return tmp.px
 
 function ivec4.Px (|imagepixel|)
-	rz <~ (.r, .g, .b, .a)
+	|imagepixelstruct| tmp
+	tmp.r = .r, tmp.g = .g, tmp.b = .b, tmp.a = .a
+	return tmp.px
 

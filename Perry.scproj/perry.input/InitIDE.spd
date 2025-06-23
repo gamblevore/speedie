@@ -114,8 +114,8 @@ extend PerryIDE
 			.size =  the~left+4 for 360  by  15~down back 150
 			.id = "debugargs"
 			.OnFocus = DebugArgsGotFocus
-			.gnormal.solid  = (0.05, 0.05, 0.05, 0.95)
-			.gnormal.edge = (0.0, 0.0, 0.0, 0.125)
+			.gnormal.solid = (0.05, 0.05, 0.05, 0.95)
+			.gnormal.edge = (0.0, 0.0, 0.0, 0.125).px
 			.OnKeyDown = DebugArgsKeyDown
 			.expectsparse = textview.AlwaysJeebox
 			.attachedfrom = movecode.top
@@ -181,9 +181,9 @@ extend PerryIDE
 			isnt drawsfocus
 			.ID				= "DrawMe"
 			.size = the~width by the~bottom to 0~before 
-			.gnormal.bg		= vec4(0.0, 0.81)
-			.gnormal.edge   = vec4(0.2, 1.0)
-			.gnormal.seps	= vec4(0.4, 1.0)
+			.gnormal.bg		= vec4(0.0, 0.81).px
+			.gnormal.edge   = vec4(0.2, 1.0).px
+			.gnormal.seps	= vec4(0.4, 1.0).px
 
 
 		with .ASMView
@@ -207,8 +207,8 @@ extend PerryIDE
 			.ID				= "AutoComplete"
 			.takesfocus 	= takesfocusflag.CanFocus
 			|| dark			= self.filelist.GNormal.bg.color
-			.GNormal.bg = mix(  dark, vec4(0.5, 1.0, 0.0, 1.0), 0.05)  // mostly dark
-			.GNormal.edge = mix(dark, colors.green, 0.1 )  // less dark
+			.GNormal.bg = mix(  dark, vec4(0.5, 1.0, 0.0, 1.0), 0.05).px  // mostly dark
+			.GNormal.edge = mix(dark, colors.green, 0.1 ).px  // less dark
 			// now what?
 			is TypeThrough
 			isnt visible
@@ -381,7 +381,7 @@ extend PerryIDE
 			
 		with .progress
 			isnt visible
-			.gnormal.edge = vec4(0.5)
+			.gnormal.edge = vec4(0.5).px
 
 
 		with .PopupDisplay

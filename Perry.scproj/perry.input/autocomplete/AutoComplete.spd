@@ -221,9 +221,9 @@ function PerryIDE.DisplayInPopup (|string| s,  |bool| instant,  |vec4| Color=vec
 		color = mix(def, color, 0.3)
 	  else
 		color = def
-	pg.bg = color
+	pg.bg = color.px
 	color = mix(colors.white(0.5), color, 0.8)
-	pg.edge	= color
+	pg.edge	= color.px
 	.StartPopupVis(instant)
 
 

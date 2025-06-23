@@ -248,15 +248,15 @@ class TextView (GUIControl)
 		return t
 		
 		
-	helper ByteAtXY (|ivec2| p, |!&ivec2| v, |textviewline|)
+	helper ByteAtXY (|ivec2| p, |$ivec2| v, |textviewline|)
 		opt norefcounts
 		|| D = .LineAtY(p.y)
 			|| x = p.x - .LineNumRight
-			v[] = .LastLineFix(d, x)
+			v = .LastLineFix(d, x)
 			return d
 		
 		if p.y < .lasttop
-			v[] = (.text.length, 0)
+			v = (.text.length, 0)
 
 	
 	helper LastLineFix (|textviewline| d, |int| x, |ivec2|)
@@ -582,7 +582,7 @@ class TextView (GUIControl)
 	helper ViewPos (|int| x, |int| before, |TextViewJumpMode| Mode=0, |TextViewLine|)
 		opt NoRefCounts
 		|| i	= 0
-		|| d	= .FindDrawInfo(x, i)
+		|| d	= .FindDrawInfoSub(x, i)
 		before = before.abs
 
 		|| lim = .MaxVisibleLines
@@ -1307,8 +1307,8 @@ class TextView (GUIControl)
 			
 
 	helper init
-		.gnormal.edge  = (0.5, 0.5, 0.5, 1.0)
-		.gnormal.Bg    = (0, 0, 0, 0.5)
+		.gnormal.edge  = (0.5, 0.5, 0.5, 1.0).px
+		.gnormal.Bg    = (0, 0, 0, 0.5).px
 		.clear("")
 	
 	
@@ -1653,16 +1653,16 @@ class TextView (GUIControl)
 			return true
 
 	
-	helper FindDrawInfo (|int| Char, |?&int| VLine=nil, |TextViewLine!|)
-		return .FindDrawInfoSub(char, vline)
-		 
+	helper FindDrawInfo (|int| Char, |TextViewLine!|)
+		|| vline = 0
+		return .finddrawinfosub(char, vline)
 		
-	helper FindDrawInfoSub (|int| Char, |?&int| VLine, |TextViewLine!|)
+	helper FindDrawInfoSub (|int| Char, |$int| VLine, |TextViewLine!|)
 		.PrepareLinesOfText
 		return .FindDrawInfoSub2(char, vline)
 
 		
-	helper FindDrawInfoSub2 (|int| Char,  |?&int| VLine,  |TextViewLine!|)
+	helper FindDrawInfoSub2 (|int| Char,  |$int| VLine,  |TextViewLine!|)
 		opt norefcounts
 		char = .clamp(char)
 		|| c = -int.max
@@ -1674,8 +1674,8 @@ class TextView (GUIControl)
 			if d == s
 				c = 0
 			if !n or .FoundInfo(d.Range, char)
-				if vline
-					vline[] = c
+//				if vline
+				vline = c
 //				_LastVLine = c
 				return d
 			d = n
@@ -1688,7 +1688,7 @@ class TextView (GUIControl)
 	helper XYOfChar (|ind| pos, |ivec2|)
 		opt norefcounts
 		|| VLine = 0
-		|| d = .FindDrawInfo(pos, VLine)
+		|| d = .FindDrawInfoSub(pos, VLine)
 		if  vline >= 0  and  vline <= .maxvisiblelines
 			return .XYOfCharSub(d, vline, pos)
 
@@ -1732,7 +1732,7 @@ class TextView (GUIControl)
 		  else
 			x = d.xofchar(t.lower)
 		|| movedCount = 0
-		d = d.movecapped(i, movedCount) 
+		d = d.MoveCapped(i, movedCount) 
 		if MovedCount
 			return .lastlinefix(d, x)
 		if i > 0
@@ -1892,7 +1892,9 @@ class TextView (GUIControl)
 		if mode is slowscroll
 			d = d.SlowMove(._Start, 2)
 
-		|| last = ._lines.last!.movecapped(3 - .MaxVisibleLines)!
+		|| n = 3 - .MaxVisibleLines
+		|| L = ._lines.last!
+		|| last = L.movecapped(n)!
 		
 		if d.position > last.position
 			d = last
@@ -2099,7 +2101,9 @@ class TextView (GUIControl)
 		d.RemoveAfter
 		._PreferPrevLine = false
 		if StayAtEnd
-			.StartWithoutScrollDraw( d.movecapped(1 - .MaxVisibleLines, nil))
+			|| n = 1 - .MaxVisibleLines
+			|| D2 = d.movecapped(n)
+			.StartWithoutScrollDraw(D2)
 		  else
 			.StartWithoutScrollDraw(._Lines.first!)
 		.ClearReclaim	

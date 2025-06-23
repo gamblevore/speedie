@@ -186,11 +186,6 @@ class list (Saveable)
 			return .next ?? self
 		return .prev ?? self
 		
-	
-	function Move (|int| n, ||)
-		cpp_part MoveN
-		return .movesub(n, nil)
-
 	function Step (|bool| fwd, ||)
 		cpp_Part stepbool
 		if fwd
@@ -204,7 +199,16 @@ class list (Saveable)
 		return self
 
 	
-	function MoveCapped (|int| n, |?&int| r=nil, |...!|)
+	function MoveCapped (|int| n, |...!|)
+		|| r = 0
+		return .MoveCapped(n, r)
+	
+	
+	// it would be nice to be able to pass "nil" to $int params
+	// and have the compiler insert some global to get the address of
+	// Objects would suffer refcount issues, so I guess not allowed.
+	// or clear after, and before.
+	function MoveCapped (|int| n, |$int| r, |...!|)
 		cpp_part StepN
 		opt NoRefCounts
 		real self
@@ -214,7 +218,14 @@ class list (Saveable)
 			return (p.first!, p.last!)(n < 0)
 		return self
 
-	helper MoveSub (|int| n, |&int| r, ||)
+	
+	function Move (|int| n, ||)
+		cpp_part MoveN
+		|| r = 0
+		return .movesub(n, r)
+
+
+	helper MoveSub (|int| n, |$int| r, |...?|)
 		opt NoRefCounts
 		real self
 		if !n
@@ -224,11 +235,11 @@ class list (Saveable)
 		|| lim = n.abs
 		while m < lim
 			c = c.step(n > 0)
-			if !c: Exit
+			if !c
+				exit
 			++m
 
-		if r
-			r[] = m
+		r = m
 		return c
 
 

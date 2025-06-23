@@ -346,7 +346,7 @@ class ListView (GUIControl) {
 		rz = TextView(Self)
 		.Typingfilter = rz
 		rz.id = "filter"
-		rz.gnormal.bg = vec4(0.1, 1.0)
+		rz.gnormal.bg = vec4(0.1, 1.0).px
 		rz.gnormal.edge = .gnormal.edge
 		(rz is editable)
 		rz.OnKeyDown = RefilterKeyDown|guikeyevent|
@@ -1316,7 +1316,7 @@ class ListView (GUIControl) {
 		unfoc.a		= focuscol.a
 		unfoc		= mix(focuscol, unfoc, 0.667)
 		unfoc.a += 0.2
-		where.fillmarks(.lastrect ± 1, bgcol, .gnormal.seps, focuscol, unfoc)
+		where.fillmarks(.lastrect ± 1, bgcol.px, .gnormal.seps, focuscol.px, unfoc.px)
 
 			
 	behaviour Gesture

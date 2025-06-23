@@ -176,7 +176,7 @@ class FileRow (ListViewRow)
 		.filesort
 
 
-	function FillFilesSub (|file| fol, |dictionary?| excl, |string| folfile, |int| Count)
+	helper FillFilesSub (|file| fol, |dictionary?| excl, |string| folfile, |$int| Count)
 		.ReloadedAt = fol.modified
 		for f.files in fol // merge these two
 			|| name = f.path.name
@@ -188,7 +188,6 @@ class FileRow (ListViewRow)
 
 
 	function ReadName (|string|)
-//		.Sanity
 		|| n = .location.name
 		if .dirfile
 			return n.pathdir + .dirfile
@@ -228,13 +227,13 @@ class FileRow (ListViewRow)
 		found <~ rz
 
 
-	function FindInFile (|string| text,  |error| found,  |&int| Remain,  |bool| DoRepl)
+	function FindInFile (|string| text,  |error| found,  |$int| Remain,  |bool| DoRepl)
 		require text
 		|| t		= .visibletext
 		require t and !t.IsBinary
 		
 		|error| parent // this is never returned? why is it made?
-		|| Lim		= Remain[]
+		|| Lim		= Remain
 		|| i		= 0
 		|| LastBefore = -1
 		
@@ -262,7 +261,7 @@ class FileRow (ListViewRow)
 				result.obj = self
 				result.path = .location
 				result.name = s
-		Remain[] = lim
+		Remain = lim
 
 
 	syntax append (|filerow| r)

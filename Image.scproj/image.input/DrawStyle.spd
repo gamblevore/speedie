@@ -68,12 +68,12 @@ class DrawStyle
 	function SafeEdge (|imagepixel|)
 		if self
 			return .edge
-		return (0.5, 0.5, 0.5, 1.0)
+		return (0.5, 0.5, 0.5, 1.0).px
 	
 	function SafeBG (|imagepixel|)
 		if self
 			return .Bg
-		return (0.0, 0.0, 0.0, 1.0)
+		return (0.0, 0.0, 0.0, 1.0).px
 		
 	function Width (|string| s, |int|)
 		return s.length * font.width
