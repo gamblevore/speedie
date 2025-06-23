@@ -130,6 +130,9 @@ function message.WithinType (|int| Allowed=3, |bool|)
 		p = p.parent	
 
 
+function Message.At (|int| pos, |message|)
+	return .FindTightest(pos, false, false)
+	
 helper message.FindTightest (|int| pos, |bool| named=false, |bool| SamePosition=false,  |message|) // findpos, findat
 	opt norefcounts
 	nil checker

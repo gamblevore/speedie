@@ -192,8 +192,11 @@ function textview.LineNumColor (|imagepixel|)
 
 
 function textview.CanDrawLight (|TextViewLine| D, |bool|)
-	if (self is editable) and !.SingleLine
-		|| sr	= .selrange
-		ifn .seltext contains jeebox.csline
-			return  (d contains sr.x and sr.x2)
+	require (self is editable) and !.SingleLine
+	// should involve ._PreferPrevLine or something calling it.
+	// or else we can select "off the end" of a line, by clicking after it
+	// yet we draw the next line "light"
+	|| sr = .selrange
+	if !sr.width and (d contains sr.x)
+		return true
 

@@ -1648,7 +1648,7 @@ class TextView (GUIControl)
 			return w.inline.editingfor == self
 
 
-	helper FoundInfo (|ivec2|m, |int| Pos, |bool|)
+	helper FoundInfo (|ivec2| m, |int| Pos, |bool|)
 		if M contains Pos
 			if (m.x2 == Pos) and !._PreferPrevLine
 				return false
@@ -1657,8 +1657,9 @@ class TextView (GUIControl)
 	
 	helper FindDrawInfo (|int| Char, |TextViewLine!|)
 		|| vline = 0
-		return .finddrawinfosub(char, vline)
-		
+		return .FindDrawInfoSub(char, vline)
+	
+	
 	helper FindDrawInfoSub (|int| Char, |$int| VLine, |TextViewLine!|)
 		.PrepareLinesOfText
 		return .FindDrawInfoSub2(char, vline)
@@ -1676,9 +1677,7 @@ class TextView (GUIControl)
 			if d == s
 				c = 0
 			if !n or .FoundInfo(d.Range, char)
-//				if vline
 				vline = c
-//				_LastVLine = c
 				return d
 			d = n
 			c++
@@ -1687,6 +1686,7 @@ class TextView (GUIControl)
 	helper Y (|textviewline| D,  |int|)
 		rz = .lasttop - (D.vline - (._Start.vline-1)) * .lineheight|int|
 
+	
 	helper XYOfChar (|ind| pos, |ivec2|)
 		opt norefcounts
 		|| VLine = 0
@@ -2043,6 +2043,10 @@ class TextView (GUIControl)
 	helper EndGap (|bool|)
 		opt norefcounts
 		require .PreferStayAtEnd
+		// surely this should start from the ._Start?
+		// it woudl be faster?
+		// we go from the end down to the start, right?
+		// but the end may be far away.
 		|| curr = ._lines.last
 		|| lim = .MaxVisibleLines
 		|| rz = 0
@@ -2098,7 +2102,7 @@ class TextView (GUIControl)
 
 
 	function EndPrepare (|TextViewLine| d, |bool| StayAtEnd, |int| pos)
-		opt norefcounts
+/		opt norefcounts
 		(pos)
 		d.RemoveAfter
 		._PreferPrevLine = false

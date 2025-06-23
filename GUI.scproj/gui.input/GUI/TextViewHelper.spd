@@ -59,7 +59,7 @@ class TextViewLine (list)
 
 	operator contains (|ind| b, |bool|)
 		|| d = .range
-		if self isnt last
+		if self is last
 			d.x2 -= 1 
 		return d contains b
 
@@ -378,7 +378,7 @@ helper TextView.DrawLineNumber (|image| Where,  |TextViewLine| D,  |int| y,  |im
 
 helper TextView.UseColorAnyway (|int|)
 	ifn .isinline
-		if .ParsedMessage// or .myerror
+		if .ParsedMessage // or .myerror
 			return 2
 		return 3
 
@@ -388,7 +388,7 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 	opt min 3
 	|| GoUp = (7 - .lineheight)/2
 	if d.LineError
-		if .myerror 
+		if .MyError
 			.DrawErrorBackground(where, y+GoUp, d)
 		  else
 			d.LineError = nil // sigh. crappy bug fix
@@ -423,7 +423,7 @@ helper TextView.DrawOneLine (|image| Where, |TextViewLine| D, |int| y, |int| use
 	
 	if .AutoLim(d)
 		if (._CanAutoComplete != 2) or (!.text)
-			if d.islast				// last line draw too early with autocomplete
+			if d.IsLast				// last line draw too early with autocomplete
 				x += font.width		// but we shouldn't need this!
 			.DrawAuto(Where, x, y)
 

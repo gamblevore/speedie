@@ -106,6 +106,10 @@ function TextView.CodeInsertion (|textviewline| D, |$int| s_end, |$bool| InRange
 	|| arg = prms.next
 	require (arg==nil or @arg)
 	|| decl = prms.first
+	if !decl
+		state = 7
+		return prms								// 2: function a.b ()
+		
 	s_end = prms.after
 	
 	|message| Name
@@ -251,6 +255,11 @@ function textview.InPrmsAndBetweenDecls (|message| msg, |int| x, |int|)
 
 
 	
+function PerryInsert7 (|textview| self, |int| A, |bool|)
+	.undochecker = -1
+	.insertsub("||", (A,A))
+	.selrange = A+1
+	return true								// fn X () --> fn X (|*|) 
 function PerryInsert6 (|textview| self, |intrange| a, |bool|)
 	.undochecker = -1
 	|| toInsert = "|| name"
@@ -323,6 +332,8 @@ function textview.PerryDeclKey (|bool|)
 	  else
 		require .parsedmessage
 	
+	// ASSUME by here, that this line parses properly.
+	
 	|| clearback = .IsClearBackLine(s.x-1)
 	|| endofline = .FindEndOfLineIgnoringWhite(s.x)
 	|| inclass = .IsInClass(d) 
@@ -331,12 +342,17 @@ function textview.PerryDeclKey (|bool|)
 	
 	if endofline or inclass
 		|| Before = .BackHasIgnoringSpaces("||", s.x) 
-		if before
 			if before == '\n' or '\r' 
 				.insert(" ")
 			else
 				.insert("|")
 			return true
+		if m
+/			|| decl = m.at(s.x)
+			if decl == @decl and decl == 1
+				.insert(" ")
+				return true
+
 		.insert("||")
 		.selrange = .sel0-1 // :)
 		return true
@@ -415,6 +431,9 @@ function textview.PerryInsertSyntax (|keys| Key, |int|)
 			return PerryInsert1(self, A)|int|
 		if state == 2
 			return PerryInsert2(self, A)|int|
+		if state == 7
+			if where
+				return PerryInsert7(self, where.position+1)|int|
 		if inrange
 			if state == 4
 				return PerryInsert34(self, A)|int|

@@ -258,6 +258,7 @@ class String
 		nil self
 		cpp_wrapper JB_Str_Trim
 	
+	
 	function TrimStart (|string| s, |bool| All=false,  |string|)
 		|| i = 0
 		while self[i, s]
@@ -642,6 +643,7 @@ class String
 				i += extra
 				from += found-(extra+1)
 		return i+from
+
 
 	function StretchyFind (|string| find, |int| from=0, |int| to=int.max, |intrange|) // findnospaces
 		|| n = self - find
