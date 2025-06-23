@@ -191,6 +191,13 @@ function UnusedFuncs (|message| cmd, |message|)
 	return cmd
 
 
+function SCDecl.IsUsed (|bool|)
+	if self is ReadFrom
+		return true
+	if self is Reference and Setto
+		return true
+
+
 function SCFunction.CheckUnused (|message| feedback)
 	opt norefcounts
 	require self isnt Disabled
@@ -208,7 +215,7 @@ function SCFunction.CheckUnused (|message| feedback)
 	require !.HasProto
 	|message| ErrName
 	for arg in .args
-		if arg isnt readfrom
+		if !arg.IsUsed
 			|| Src = arg.source
 			if src and src isnt Inserted
 				if ErrName

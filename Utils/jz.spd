@@ -400,15 +400,15 @@ module Conv
 		return str.file
 	
 	
-	function FormatInfo (|&int| Size = 0, |string|)
+	function FormatInfo (|$int| Size = 0, |string|)
 		|| str = .in!.Section(0, 64)
 			if str == string.error
 				return str
 		
 		if str.IsCompressed
 			|| addr = str.addr|&uint|
-			size[] = addr[1]
-			check (size[] < 16MB) (.in, "Corrupt mz. Too much data.")
+			size = addr[1]
+			check (size < 16MB) (.in, "Corrupt mz. Too much data.")
 			.Detected |= type.compressed
 			return "µz"
 

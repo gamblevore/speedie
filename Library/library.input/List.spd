@@ -74,9 +74,11 @@ class list (Saveable)
 
 	
 	syntax Compare (|int| n, |bool| Aware, |int|)
+		(Aware)
 		return .SlowCount - n
 	
 	syntax Equals (|int| n, |bool| Aware, |bool|)
+		(aware)
 		return .HasChildCount( n )
 	
 	syntax Equals (|byte| b, |bool|Aware, |bool|)

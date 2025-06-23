@@ -66,9 +66,10 @@ function Compiler.PrintErrors (|errorseverity| MinSev)
 	stderr.BlockErrors = true
 	|| s = .RenderErrors(stderr, minsev)
 	stderr.BlockErrors = false
-	if options.perryoutput == 2
-		s = s.digest
+	
 	if stderr.errorcount
+		if options.perryoutput == 2
+			s = s.digest
 		printerror s
 	  else
 		print s

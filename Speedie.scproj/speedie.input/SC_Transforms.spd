@@ -23,7 +23,7 @@ dispatch TemporalStatements (TranFunc)
 	ifn						(Tran_Ifn)
 	debugger				(Tran_Debugger)
 	crash					{app.crash(node.firstname)}
-	deprecate				(Tran_Deprecate)
+	bad						(Tran_TestProblem)
 	problem					(Tran_Problem)
 	borks					(Tran_Fails)
 	

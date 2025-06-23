@@ -9,15 +9,10 @@ main // speedie main {
 	References.test
 	Compiler.SetupEnv
 	Compiler.MiniTests
-	Compiler.Main
-	Compiler.PrintResults
-
-
-
-function Compiler.Main
-	if .EnterCompile
+	if compiler.EnterCompile
 		using FlowControl.attempt("Speedie"+options.variant)
-			.CompileTime
+			compiler.CompileTime
+	Compiler.PrintResults
 
 
 function Compiler.EnterCompile (|bool|)

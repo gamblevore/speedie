@@ -980,10 +980,13 @@ class SCDecl (SCObject) {
 
 	function Orig (|scdecl|)
 		opt norefcounts
-		if .OriginalDecl != self
-			// why tho? something to do with !?
-			// I just can't remember why.
-		return .OriginalDecl ?? self
+		|| d = .OriginalDecl
+			if d != self
+				debugat 
+				// why tho? something to do with !?
+				// I just can't remember why.
+			return d
+		return self
 		
 	
 	function CanNilCheck (|bool|)

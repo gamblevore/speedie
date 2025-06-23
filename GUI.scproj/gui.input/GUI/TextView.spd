@@ -1424,8 +1424,10 @@ class TextView (GUIControl)
 			msg.obj = .path
 			if .MyError is parse
 				.MyError = nil
-		  elseif .expectsparse >= currentlyjeebox
-			.myerror = StdErr.pop
+		  else
+			|| e = StdErr.pop
+			if .expectsparse >= currentlyjeebox
+				.myerror = e
 
 		|| v = ._Viewing
 			v.ShouldntSave = false

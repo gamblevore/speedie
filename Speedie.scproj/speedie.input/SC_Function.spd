@@ -313,13 +313,12 @@ function @scfunction.TransformAll
 //	"$.ExportName has ${.barestructs|int|} barestructs"
 
 
-function CheckRegAddress 
+function CheckRegAddress
 	opt norefcounts
 	for s in compiler.LaterAddressChecks
 		|| prms = s.ancestor(@prm)
 			|| fn = prms.obj as scfunction
-				if (fn isnt cpp)
-					problem (s, "Can't store the address of register based variables.")
+				check (fn is cpp) (s, "Register passed to pointer parameter.")
 		
 	compiler.LaterAddressChecks.clear
 
@@ -1676,9 +1675,14 @@ function Tran_Else (TranFunc)
 	expect (p == @tmp and "if" or "elseif") (node, "This must be in an 'if' block.")
 
 
-function Tran_Deprecate (TranFunc)
-	problem (node, "deprecate is deprecated. Use 'problem' instead.")
-	return Tran_Problem(fn, node, name_space)
+function Tran_TestProblem (TranFunc)
+	|| str = "This code is bad somehow"
+	|| msg = node[@str, @nil]
+		msg.ExpectLast
+		str = msg.name
+	problem (node, str)
+	node.MakeComment
+	return true
 
 
 function Tran_Problem (TranFunc)
