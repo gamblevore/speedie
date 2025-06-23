@@ -794,10 +794,10 @@ extend PerryIDE
 		error.SourceRemove
 
 
-	function DesiredStart (|filerow| projfol, |&int| pos,  |filerow|)
+	function DesiredStart (|filerow| projfol, |$int| pos,  |filerow|)
 		opt norefcounts
 		|| edit = .SharedProjectTabSource["edit"]
-			pos[] = .SharedProjectTabSource["pos"].int
+			pos = .SharedProjectTabSource["pos"].int
 			|| n = edit.name
 				return self.filelist[n]
 		|| tod = .nottodo

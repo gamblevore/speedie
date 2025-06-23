@@ -21,17 +21,17 @@ helper Message.IsTextFuncLike (|bool|)
 	return !c or c == @arg
 
 
-function TextView.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| InRange, |&int| state, |message|)
+function TextView.CodeInsertion (|textviewline| D, |$int| s_end, |$bool| InRange, |$int| state, |message|)
 	visible
 	opt norefcounts
 	
-	|| i2 = s_end[]
+	|| i2 = s_end
 	|| prevchar = self[i2-1]
 	while prevchar == ' '
 		prevchar = self[--i2]
-	s_end[] = i2
+	s_end = i2
 
-	|| msg	= d.message.FindTightest(s_End[])
+	|| msg	= d.message.FindTightest(s_End)
 	|| msg0 = msg
 	|| CanUsePrms = false
 	
@@ -50,15 +50,15 @@ function TextView.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| InRange
 				if msg0 == @decl
 					if msg0 in @arg
 						return nil // right?
-					inrange[] = true
-					state[] = 4
+					inrange = true
+					state = 4
 					return msg0					// 4: function a.b (|*|)
 		if  msg0 == @thg  and  msg0 in @decl  and  msg0.prev == @emb
-			State[] = -2
+			State = -2
 			return nil
 			
 		if CanUsePrms  // myfunc(a,b,c ^)
-			state[] = 3
+			state = 3
 			return msg0
 			
 		return nil
@@ -67,13 +67,13 @@ function TextView.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| InRange
 
 	if !autocomplete.IsAFunc(msg)
 		if CanUsePrms  // myfunc(a,b,c ^)
-			state[] = 3
+			state = 3
 			return msg0
 		
 		if msg.IsTextFuncLike
-			state[] = 3
+			state = 3
 		  else
-			state[] = 10
+			state = 10
 		return msg
 	
 	|| ConstructorLike = msg ~= "constructor" or "render"
@@ -82,49 +82,49 @@ function TextView.CodeInsertion (|textviewline| D, |&int| s_end, |&bool| InRange
 	if ConstructorLike and (func_name == @bra or @list)
 		prms = func_name
 		func_name = nil							// 0: constructor (|int| x)
-		inrange[] = .RangeCheck(s_end[], msg, prms)
+		inrange = .RangeCheck(s_end, msg, prms)
 	  else
 		if !func_name or func_name == @arg
 			if msg == "main"
-				state[] = 0 // all is good
+				state = 0 // all is good
 			  else
-				state[] = 1 + ConstructorLike
+				state = 1 + ConstructorLike
 			return msg // i guess?
 		prms = func_name.next
-		inrange[] = .RangeCheck(s_end[], func_name, prms)
+		inrange = .RangeCheck(s_end, func_name, prms)
 		if prms == nil							// 2: constructor *
-			state[] = 2
+			state = 2
 			return func_name					// 2: function a.b*
 		if (func_name == @arg)
-			state[] = 1 + ConstructorLike		// 1: function *{}
+			state = 1 + ConstructorLike		// 1: function *{}
 												// 2: constructor *{}
 			return msg
 		ifn prms == @list or @bra // great
-			state[] = 2
+			state = 2
 			return func_name					// 2: function a.b*
 	
 	|| arg = prms.next
 	require (arg==nil or @arg)
 	|| decl = prms.first
-	s_end[] = prms.after
+	s_end = prms.after
 	
 	|message| Name
 	while decl == @decl
 		|| Type = decl.first$
 		Name = Type.next
 		if name == "..."
-			state[] = -1
+			state = -1
 			return nil
 		if !name
-			state[] = 4
+			state = 4
 			return decl							// 4: function a.b (|*|)
 		decl = decl.next
 	
 	if Name
-		state[] = 5
+		state = 5
 		return name								// 5:function a.b (|type| name*)
 	
-	state[] = 3
+	state = 3
 	return prms
 
 

@@ -147,19 +147,19 @@ extend PerryIDE
 		.showstats
 
 	
-	function Readlog (|bool| Killed=false)
+	function ReadLog (|bool| Killed=false)
 		|| c = .Compilr $
 		|| StdOut = c.ReadStdOut
 		.SpeedieText.log(StdOut)
 		|| IsRunning = c.status.IsRunning
 		require !IsRunning or Killed
 
-		|| OK = !killed and .CheckNotCrashed(c,  "compiler")
+		|| Bad = .CheckCrashed(c,  "compiler")
 		|| Errors = c.ErrorOutput.GetResult
 			|| p = errors.parse
 				.ShowCompileErrors(p, true)
 			// Notifications will pick up the err otherwise!
-		  elseif OK
+		  elseif !bad
 			|| msg = @tmp + "compile"
 			msg <~ (@thg, "ok")
 			.ShowCompileErrors(msg, false)

@@ -705,7 +705,7 @@ class String
 		|| End		= first + .Length
 		while (Curr < End)
 			|| pos = (Curr - first)|int|
-			|| c = codepoint.UTF8Read(&curr)
+			|| c = codepoint.UTF8Read(curr)
 			yield (c) (pos)
 
 

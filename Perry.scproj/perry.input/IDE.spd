@@ -437,6 +437,18 @@ class PerryIDE (Window)
 		.CancelCompile
 
 
+	function CheckCrashed (|Process| p, |string| what, |bool|)
+		require p
+		|| Exit = p.Status
+		if exit.Crashed
+			|| fs = faststring()
+			fs <~ "Crashed: ${exit.name}  {${p.render}}\n"
+			fs <~ p.ErrorOutput.getresult.FindStacktrace
+			.Notify(fs, @emb + what)
+			.CancelCompile
+			return true
+
+
 	function string.FindStacktrace (|string|)
 		|| f = "\n****** CRASH"
 		|| where = .find(f) #require
@@ -467,10 +479,12 @@ class PerryIDE (Window)
 				.setfocus(.editme) // shouldn't need this... why doesn't .focus setter get called?
 		.UpdateDebuggedApp(false)
 
-		.CheckNotCrashed((&.feedback)|&process|, "feedback")
-		.CheckNotCrashed(.compilr,  "compiler")
+		if .CheckCrashed(.feedback, "feedback")
+			.Feedback = nil
+		if .CheckCrashed(.compilr,  "compiler")
+			.Compilr = nil
 
-		|| f = .feedback
+		|| f = .Feedback
 			.SpeedieMsgReceive(f)
 		.UpdateSearchText
 		.UpdateStatusErrors
