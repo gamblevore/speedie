@@ -681,7 +681,7 @@ function AutoSub3 (|SCObject| value, |string| key, |[autoitem]| found, |string| 
 			
 function AutoSub (|SCNode| scope, |string| name, |[autoitem]| found, |int| Types, |message| NeedTypeLimit) // autocompletesub
 	|| nav = scope.Access.Navigate
-	return .autosub2(scope, name, found, types, needtypelimit, nav)
+	.autosub2(scope, name, found, types, needtypelimit, nav)
 
 function AutoSub2 (|SCNode| scope, |string| name, |[autoitem]| found, |int| Types, |message| NeedTypeLimit, |DictionaryReader of scobject| within)
 	opt norefcounts
