@@ -8856,7 +8856,7 @@ bool SC_Decl_AlreadyContains(SCDecl* Self);
 
 void SC_Decl_AsBody(SCDecl* Self);
 
-uint64 SC_Decl_AsConst(SCDecl* Self, Message* Value, DataTypeCode* Ty);
+uint64 SC_Decl_AsConst(SCDecl* Self, Message* Value, uint /*DataTypeCode*/& Ty);
 
 SCDecl* SC_Decl_AsLocal(SCDecl* Self);
 
@@ -9264,9 +9264,9 @@ JB_String* SC_Base_AutoCompleteKind(SCNode* Self);
 
 uint64 SC_Base_CalculateConst(SCNode* Self, Message* Value);
 
-uint64 SC_Base_CalculateConstRel(SCNode* Self, Message* Value, DataTypeCode* Ty);
+uint64 SC_Base_CalculateConstRel(SCNode* Self, Message* Value, uint /*DataTypeCode*/& Ty);
 
-uint64 SC_Base_CalculateConstSub(SCNode* Self, Message* Value, DataTypeCode* Ty);
+uint64 SC_Base_CalculateConstSub(SCNode* Self, Message* Value, uint /*DataTypeCode*/& Ty);
 
 void SC_Base_CollectConstantsSub(SCNode* Self, Message* Ch);
 
@@ -10546,7 +10546,7 @@ void JB_Msg_Type__(Message* Self, FastString* Fs);
 
 bool SC_Msg_TypeCastDoesNothing(Message* Self);
 
-void SC_Msg_TypeExpect(Message* Self, DataTypeCode* Ty, uint /*DataTypeCode*/ In);
+void SC_Msg_TypeExpect(Message* Self, uint /*DataTypeCode*/& Ty, uint /*DataTypeCode*/ In);
 
 Message* SC_Msg_TypeOfArrItem(Message* Self);
 

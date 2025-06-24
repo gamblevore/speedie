@@ -3567,7 +3567,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[217]);
-	JB_FS_AppendInt32(_fsf0, (2025062416));
+	JB_FS_AppendInt32(_fsf0, (2025062420));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -8674,7 +8674,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[1728]);
-	JB_FS_AppendInt32(_fsf0, (2025062416));
+	JB_FS_AppendInt32(_fsf0, (2025062420));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -35108,7 +35108,7 @@ void SC_Decl_AsBody(SCDecl* Self) {
 	Self->DepthOfBranch = SC__Func_InBranch;
 }
 
-uint64 SC_Decl_AsConst(SCDecl* Self, Message* Value, DataTypeCode* Ty) {
+uint64 SC_Decl_AsConst(SCDecl* Self, Message* Value, uint /*DataTypeCode*/& Ty) {
 	if (!SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Const)) {
 		JB_Msg_Fail(Value, JB_LUB[1005]);
 		return 0;
@@ -38034,21 +38034,20 @@ JB_String* SC_Base_AutoCompleteKind(SCNode* Self) {
 }
 
 uint64 SC_Base_CalculateConst(SCNode* Self, Message* Value) {
-	DataTypeCode Ty[1] = {
-	};
-	return SC_Base_CalculateConstSub(Self, Value, (&Ty[0]));
+	uint Ty = 0;
+	return SC_Base_CalculateConstSub(Self, Value, Ty);
 }
 
-uint64 SC_Base_CalculateConstRel(SCNode* Self, Message* Value, DataTypeCode* Ty) {
+uint64 SC_Base_CalculateConstRel(SCNode* Self, Message* Value, uint /*DataTypeCode*/& Ty) {
 	Message* A = ((Message*)JB_Ring_First(Value));
 	uint64 L = SC_Base_CalculateConstSub(Self, A, Ty);
-	if (!JB_TC_OK(Ty[0])) {
+	if (!JB_TC_OK(Ty)) {
 		return 0;
 	}
 	Message* B = ((Message*)JB_Ring_NextSib(A));
 	Message* C = ((Message*)JB_Ring_NextSib(B));
 	if (JB_Msg_EqualsSyx(Value, kJB_SyxBRel, false)) {
-		if (!JB_TC_SyntaxIs(Ty[0], kJB__TC_Int)) {
+		if (!JB_TC_SyntaxIs(Ty, kJB__TC_Int)) {
 			JB_Msg_Fail(Value, JB_LUB[822]);
 			return 0;
 		}
@@ -38062,7 +38061,7 @@ uint64 SC_Base_CalculateConstRel(SCNode* Self, Message* Value, DataTypeCode* Ty)
 	}
 	uint N = JB_Str_First(B->Name);
 	int Lg = JB_Str_Length(B->Name);
-	bool Ints = JB_TC_IsInt((Ty[0]));
+	bool Ints = JB_TC_IsInt((Ty));
 	if (N == '+') {
 		if (Ints) {
 			return L + R;
@@ -38137,7 +38136,7 @@ uint64 SC_Base_CalculateConstRel(SCNode* Self, Message* Value, DataTypeCode* Ty)
 	return 0;
 }
 
-uint64 SC_Base_CalculateConstSub(SCNode* Self, Message* Value, DataTypeCode* Ty) {
+uint64 SC_Base_CalculateConstSub(SCNode* Self, Message* Value, uint /*DataTypeCode*/& Ty) {
 	Syntax F = Value->Func;
 	if (F == kJB_SyxNum) {
 		if (JB_Str_ContainsByte(Value->Name, '.')) {
@@ -38174,10 +38173,7 @@ uint64 SC_Base_CalculateConstSub(SCNode* Self, Message* Value, DataTypeCode* Ty)
 	if (F == kJB_SyxChar) {
 		JB_String* N = Value->Name;
 		if ((JB_Str_EqualsInt(N, 1, false))) {
-			uint V = JB_Str_First(N);
-			if (V >= 128) {
-				return V;
-			}
+			return JB_Str_First(N);
 		}
 		return JB_Str_UTF8Value(N, true);
 	}
@@ -48695,18 +48691,18 @@ bool SC_Msg_TypeCastDoesNothing(Message* Self) {
 	return false;
 }
 
-void SC_Msg_TypeExpect(Message* Self, DataTypeCode* Ty, uint /*DataTypeCode*/ In) {
-	uint V = Ty[0];
+void SC_Msg_TypeExpect(Message* Self, uint /*DataTypeCode*/& Ty, uint /*DataTypeCode*/ In) {
+	uint V = Ty;
 	if (V) {
 		if ((V != In) and JB_TC_OK(V)) {
-			Ty[0] = kJB__TC_Failed;
+			Ty = kJB__TC_Failed;
 			if (true) {
 				JB_Msg_Fail(Self, JB_LUB[921]);
 			}
 		}
 	}
 	 else {
-		Ty[0] = In;
+		Ty = In;
 	}
 }
 
@@ -60735,4 +60731,4 @@ void JB_InitClassList(SaverLoadClass fn) {
 }
 }
 
-// 5508802735313117020 -1527105296935564130
+// 3930120290075506419 -1527105296935564130
