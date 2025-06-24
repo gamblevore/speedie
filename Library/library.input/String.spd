@@ -325,9 +325,9 @@ class String
 			rz <~ string.byte(self[n])
 
 	function LineCount (|int|)
-		if !self
-			return 1
-		return .Count('\n')+1
+		rz = 1
+		for c in self
+			rz += (c=='\n' or '\r')
 	
 	function LineAtByte (|int| b, |intrange|)
 		for (L.lines in self) (after)
@@ -336,10 +336,6 @@ class String
 	
 	function DiffAt (|string| A, |ind|)
 		cpp_wrapper
-
-	function Count (|Byte| b, |int|)
-		for c in self
-			rz += (c==b)
 	
 	operator Contains (|string| s, |bool|)
 		cpp_part ContainsString
@@ -381,7 +377,7 @@ class String
 	    return self[n, int.max] + self[0, n]
 		
 		
-	function IsBadUTF8 (|int|from=0, |ind|)
+	function IsBad (|int|from=0, |ind|)
 		cpp_Wrapper JB_Str_BadUTF8
 
 	function IsBinary (|float|f=24.0, |bool|)
@@ -393,7 +389,7 @@ class String
 	helper Badness (|int|)
 		|| pos = 0
 		while
-			|| p = .IsBadUTF8(pos)
+			|| p = .IsBad(pos)
 			if p < pos	
 				exit
 			pos = p+1
@@ -553,6 +549,7 @@ class String
 
 	syntax Compare (|int| Other, |bool|Aware, |int|)
 		cpp_part CompareInt
+		(aware)
 		return .length - other
 	
 	syntax Equals (|string?| Other, |bool| Aware, |bool|)
@@ -561,6 +558,7 @@ class String
 	
 	syntax Equals (|int| Other, |bool|Aware, |bool|)
 		cpp_part EqualsInt
+		(aware)
 		return .length == other
 	
 	helper MoveCodePoint (|ind| Pos, |int| CodePoints, |ind|)

@@ -213,7 +213,7 @@ class TextViewLine (list)
 		
 		
 	function EndsWithLine (|bool|)
-		return .text.EndsWithLine
+		return .text.last.IsTextLine
 
 
 	function DrawSelSub (|image| where,  |ivec2| R,  |textview| parent,  |int| vline,  |drawstyle| g)

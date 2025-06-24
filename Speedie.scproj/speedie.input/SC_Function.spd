@@ -1231,12 +1231,6 @@ function ASMRegType (|datatypecode|)
 		return .ASMReturn.regtype
 
 
-function AlteredInsides (|int| D)
-	visible
-//	a&
-	d++
-//	d[]++
-
 
 function SCDecl.MarkAsAltered 
 	opt norefcounts
@@ -1244,7 +1238,6 @@ function SCDecl.MarkAsAltered
 		(self is altered)
 		if SCFunction.InBranch > .DepthOfBranch
 			is AlteredInBranch
-//		if SCFunction.InBranch < .DepthOfBranch // how??
 		if self is TypeImprove
 			|| orig = .IsLookupOnly
 			if orig isa SCDecl

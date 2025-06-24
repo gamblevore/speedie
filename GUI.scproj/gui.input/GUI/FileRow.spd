@@ -89,6 +89,12 @@ class FileRow (ListViewRow)
 	
 	
 	function MoveTo (|string| v, |bool|) // rename
+		if (v contains '/') or (v.isbad) or (v.linecount > 1)
+			beep v + " is not a valid filename!"
+			return false
+		
+		if .location.name == v
+			return false
 		|| l = .location.file
 		|| f = l.sibling(v)
 		if .location != f

@@ -522,7 +522,7 @@ class ListView (GUIControl) {
 				cc = SystemCursor.no
 			  elseif (r is editable)
 				if r is Selected
-/					cc = SystemCursor.IBeam
+					cc = SystemCursor.IBeam
 				  else
 					cc = SystemCursor.hand
 		cc.use

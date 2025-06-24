@@ -58,7 +58,7 @@ class PerryIDE (Window)
 	|buttonview?--|				PrevView
 	|ButtonView|				CurrFileName
 	|Buttonview|                ASMButton
-	|ButtonView|				FunctionMenu
+	|ButtonView|				FunctionMenu // .funclist
 	|ButtonView|				CommandsMenu
 	|buttonview|				Toolbar
 	|Buttonview|				ProjectTabs
@@ -230,7 +230,7 @@ class PerryIDE (Window)
 			fs <~ (' ', 3)
 			if t.IsASCII
 				fs <~ "ASCII"
-			  elseif t.IsBadUTF8
+			  elseif t.IsBad
 				fs <~ "binary"
 			  else
 				fs <~ "UTF-8"

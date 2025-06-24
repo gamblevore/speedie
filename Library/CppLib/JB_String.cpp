@@ -393,88 +393,64 @@ JB_String* JB_Str_UTF16To8(JB_String* Str, FastString* fs_in, int SrcIsBig) {
 }
 
 
-
-
-// 3 functions for interconverting character and bytes! It's a lot of processing
-// so actually, the user is best off not passing chars, but bytes instead. These
-// are really just utility functions, IE functions for processes that don't need
-// performance! These functions shouldn't break the String splitting theorem, of
-// alowing exces ranges in params,but only keeping what of the range does exist.
-
-
 // kUTF8FirstMin is a special trick to test for a UTF8 starter, in 1 test, instead of 2
 
 
-bool ValidUTF8_ (uint8* src, int len, int* cursor) {
-	const uint8* cur = src;
-	const uint8* end = cur + len;
-	unsigned char buf[4];
-	
-	while (cur < end) {
-		const uint8* p = cur;
-		if (cur >= end - 3) {
-			memset(buf, 0, 4);
-			memcpy(buf, cur, end - cur);
-			p = (const unsigned char *)buf;
-		}
-		
-		uint32_t v = p[0];			/* 0xxxxxxx */
-		if ((v & 0x80) == 0) {
-			if (v == 0)
-				break;
-			cur += 1;
+static int ValidateUTF8 (uint8* p, int Len) {
+	int i = 0;
+	while (i < Len) {		
+		u32 v = p[i++];									/* 0xxxxxxx */
+		if (v < 0x80) {
+			if (v < 32 and (v != 9 and v != 10 and v != 13))
+				return i-1;
 			continue;
 		}
 		
-		v = (v << 8) | p[1];		/* 110xxxxx 10xxxxxx */
+		if (i >= Len)
+			return i-1;
+		v = (v << 8) | p[i++];							/* 110xxxxx 10xxxxxx */
 		if ((v & 0xE0C0) == 0xC080) {
-			/* Ensure that the top 4 bits is not zero */
 			v = v & 0x1E00;
 			if (v == 0)
-				break;
-			cur += 2;
+				return i-2;
 			continue;
 		}
 		
-		v = (v << 8) | p[2];		/* 1110xxxx 10xxxxxx 10xxxxxx */
+		if (i >= Len)
+			return i-2;
+		v = (v << 8) | p[i++];							/* 1110xxxx 10xxxxxx 10xxxxxx */
 		if ((v & 0xF0C0C0) == 0xE08080) {
-			/* Ensure that the top 5 bits is not zero and not a surrogate */
 			v = v & 0x0F2000;
 			if (v == 0 or v == 0x0D2000)
-				break;
-			cur += 3;
+				return i-3;
 			continue;
 		}
 		
-		v = (v << 8) | p[3];		/* 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx */
+		if (i >= Len)
+			return i-3;
+		v = (v << 8) | p[i++];							/* 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx */
 		if ((v & 0xF8C0C0C0) == 0xF0808080) {
-			/* Ensure that the top 5 bits is not zero and not out of range */
 			v = v & 0x07300000;
 			if (v == 0 or v > 0x04000000)
-				break;
-			cur += 4;
-			continue;
+				return i-4;
 		}
-		break;
 	}
 	
-	if (cursor)
-		*cursor += (int)(cur - src);
-	
-	return cur == end;
+	return -1;
 }
 
 
 int JB_Str_BadUTF8 (JB_String* s, int Err) {
 	int n = JB_Str_Length(s);
-	if (!n or ValidUTF8_(JB_Str_Address(s)+Err, n-Err, &Err)) {
+	if (n <= 0)
 		return -1;
-	}
-	return Err;
+
+	u8* Where = JB_Str_Address(s) + Err;
+	return ValidateUTF8(Where, n - Err);
 }
 
 
-// param and return is 1 based!
+// Param and return is 1 based!
 int JB_u8p_ByteCount(uint8* a, int Len, int CharCount) {
 	if (CharCount <= 0)
 		return 0;

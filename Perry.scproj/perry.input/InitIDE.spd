@@ -548,7 +548,7 @@ extend PerryIDE
 			.tooltip = "List Functions In File"
 			.size = 4~after for 40 by the~same
 		
-		with .FunctionMenu.submenu
+		with .FunctionMenu.SubMenu
 			isnt drawsfocus
 			.ID = "AllFuncsMenu"
 			.OnSelected = PerryFuncMenuSelected

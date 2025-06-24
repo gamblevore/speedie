@@ -32,6 +32,7 @@ class StringReader
 		return .str(.length - .startfrom)
 
 	function Parse (|syntax| owner = @arg, |bool| AllowDecomp=true, |message|)
+		
 		return .ReadAll.parse(owner, allowdecomp)
 
 	

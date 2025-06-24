@@ -1,9 +1,9 @@
 
 
-
+	
 function PerryFuncListFilter (GUIListEditEvent)
 	opt norefcounts
-	.ide.listallfuncs(false, value)
+	.ide.ListAllFuncs(false, value)
 
 
 function MenuAllFuncs (GUIaction)
@@ -13,11 +13,11 @@ function MenuAllFuncs (GUIaction)
 		.OpenMenu
 
 
-function PerryIDE.ListAllFuncs (|bool| sel=false, |string| filter="")
+function PerryIDE.ListAllFuncs (|bool| Sel = false, |string| Filter = "")
 	|| submenu = .FunctionMenu.submenu!
-	|| result = submenu.listsource
+	|| result = SubMenu.listsource
 	result.clear
-	.ListAllFuncsMsg(.editme.Parse, result, filter)
+	.ListAllFuncsMsg(.EditMe.Parse, result, filter)
 	if sel
 		.FindSelectedMenuItem(result)
 	result.obj = (.editme._Start, nil)(sel)
@@ -39,7 +39,7 @@ function PerryIDE.FindSelectedMenuItem (|message| result)
 	opt norefcounts
 	require result.hasany
 	|| fn = result.FuncAtPos(.editme.sel0 )
-	.FunctionMenu.submenu!.select(result)
+	.FunctionMenu.SubMenu!.select(result)
 
 
 function string.FuncListSep (|string|)

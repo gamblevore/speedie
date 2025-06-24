@@ -11,7 +11,7 @@ cpp_part AC
 |bool|				CompiledOK
 |bool|				Cleaned
 |bool|				WillExit 
-||					func_tmp_src   = <(`return, require, "log <string>", while, linkage, for, if, else, elseif, expect, warn, error, disabled, cpp_refs, debugger, debugat, deprecate, `description "<describe this function>"`, print, printline, zalgoline, printerror, beep, continue, cpp_part, cpp_name, cpp_wrapper, `self.`, `super.`, "visible", "exit", "opt norefcounts", "opt inline"
+||					func_tmp_src   = <(`return, require, "log <string>", while, for, if, else, elseif, expect, warn, error, cpp_refs, debugger, debugat, `description "<describe this function>"`, print, printline, zalgoline, printerror, beep, continue, cpp_part, cpp_name, cpp_wrapper, `self.`, `super.`, "exit", "opt norefcounts", "opt inline"
  `)>.macro
  
 ||					all_tmp_src	= <(`
@@ -657,8 +657,11 @@ function Object.BaseAsDecl (|scdecl|)
 		return .returntype
 
 
-function AutoSub2 (|SCObject| value, |string| key,  |string| src_name, |[autoitem]| found, |bool| exact, |int| Types, |scdecl| TypeLimiter)
-	
+function AutoSub3 (|SCObject| value, |string| key, |[autoitem]| found, |string| SearchedName, |int| Types, |scdecl| TypeLimiter)
+	|| orig = value.canauto(SearchedName)
+	require orig and (!SearchedName or orig starts SearchedName)
+
+	|| Exact = SearchedName ~= orig
 	while value and .active
 		ifn (key ~= "self") and (value isa scmodule)
 			if types & value.AutoCompleteType
@@ -671,21 +674,30 @@ function AutoSub2 (|SCObject| value, |string| key,  |string| src_name, |[autoite
 					|| sub_name = value.display(exact)
 						.total++
 						sub_name = value.baseicon + " " + sub_name
-						found <~ autoitem(key, src_name, value, sub_name, exact, value.auto_type)
+						found <~ autoitem(key, orig, value, sub_name, exact, value.auto_type)
 			 
 		value = value.nextdisplay(exact)
 
 			
 function AutoSub (|SCNode| scope, |string| name, |[autoitem]| found, |int| Types, |message| NeedTypeLimit) // autocompletesub
+	|| nav = scope.Access.Navigate
+	return .autosub2(scope, name, found, types, needtypelimit, nav)
+
+function AutoSub2 (|SCNode| scope, |string| name, |[autoitem]| found, |int| Types, |message| NeedTypeLimit, |DictionaryReader of scobject| within)
+	opt norefcounts
 	|scdecl| TypeLimiter = nil
 	if NeedTypeLimit
 		TypeLimiter = TypeOfExpr(needtypelimit, scope) // >:P
-	
-	for (value in scope.access) (key)
-		|| orig = value.canauto(name)
-		if orig and (!name or orig starts name)
-			.autosub2(value, key, orig, found, orig ~= name, Types, typelimiter)
+
+	while (|| value = within.NextValue)
+		|| key = within.Name
+		.autosub3(value, key, found, name, Types, typelimiter)
 			
+	if scope is AllowLinkedLists
+		|| value = scope.LocalVarList
+		while value
+			.autosub3(value, value.name, found, name, Types, typelimiter)
+			value = value.LocalVarList
 
 
 function AutoCompleteSorter (sortercomparer of autoitem)
@@ -738,25 +750,20 @@ function AllTmps (|message|)
 			ch.tag = state
 
 
-function TmpAutoComplete (|message| f, |string| name, |string| type, |message|)
+function TmpAutoComplete (|message!| f, |string| name, |string| type, |message|)
 	|| finished = false
 	rz = @tmp + type
+	|| arg = rz.msg(@arg, name)
 	if name ~!= "r" // too annoying.
-		for ch in .functmps
+		for ch.fast in .functmps
 			if ch starts name
 				if ch.name > 2  and  ch.name ~= name
 					finished = true
 				  else
 					|| cf = ch.first
-						|| arg = rz.msg(@arg, name)
 						arg.msg(@tmp, cf.name) <~ (@str, cf.name)
-				
-	if rz.hasany
-		0 //
-	  elseif f
-		rz = .AutoComplete(f, name, type)
-	  else
-		rz = nil
+	
+	.AutoCompleteSub(f, name, type, arg)
 	  
 
 
@@ -806,28 +813,33 @@ helper message.GetTypeLimiter (|message|)
 function AutoComplete (|message| ff, |string| name, |string| Purpose, |message|)
 	require ff
 	|| f = ff.func
-	require f != @bra and @prm and @list and @arg and @arr and @acc and @decl and @rel
 	// maybe better to restrict it to an allowed-list... than a banned-list
+	if f != @bra and @prm and @list and @arg and @arr and @acc and @decl and @rel
+		|| tmp = @tmp.msg(Purpose)
+		|| arg = tmp.msg(@arg, name)
+		.AutoCompleteSub(ff, name, purpose, arg)
+		return tmp
+
+
+function AutoCompleteSub (|message| ff, |string| name, |string| Purpose, |message| into)
 	.Total = 0
 	|| Types = -1
-	|| scope = .GetScope(ff, types)		#require
-	|| NeedTypeLimit = ff.GetTypeLimiter
-	|[autoitem]| arr
-	while scope and .active
-		.AutoSub(scope, name, arr, Types, NeedTypeLimit)
-		if !name and scope isa scarg
-			exit
-		scope = scope.upclass(ff)
-		
-	arr.sort(AutoCompleteSorter)
-	rz = @tmp.msg(Purpose)
-	|| arg = rz.msg(@arg, name)
-	|autoitem| Prev
-	for i in arr
-		if i.OKby(prev)
-			|| tmp = arg.msg(@tmp, i.insert)
-			tmp <~ (@str, i.display)
-			prev = i
+	|| scope = .GetScope(ff, types)
+		|| NeedTypeLimit = ff.GetTypeLimiter
+		|[autoitem]| arr
+		while scope and .active
+			.AutoSub(scope, name, arr, Types, NeedTypeLimit)
+			if !name and scope isa scarg
+				exit
+			scope = scope.upclass(ff)
+			
+		arr.sort(AutoCompleteSorter)
+		|autoitem| Prev
+		for i in arr
+			if i.OKby(prev)
+				|| tmp = into.msg(@tmp, i.insert)
+				tmp <~ (@str, i.display)
+				prev = i
 
 
 function ActualDefine (|message| rz, |message| s)

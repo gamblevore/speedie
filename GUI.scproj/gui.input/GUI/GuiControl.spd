@@ -291,13 +291,16 @@ class GUIControl (list)
 		opt norefcounts
 		nil checker
 		require self
-		//if self ~= "note"
+
 		|| r = (0, 0, 64K, 64K)
 		while self
 			require self is visible
 			|| r2 = .lastrect
 			if self isa window
 				r2 = r2.soothe
+			if (self isa menu)
+				self = .window|&nil||menu|
+				continue
 			r = r.clip(r2)
 			require R.ispositive
 			self = .parent

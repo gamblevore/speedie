@@ -238,12 +238,6 @@ extend String
 		|| Last = .TrimLastSub(b)
 		|| Start = .find( b, Last, 0 )
 		return self[ 0, Start + fudge ]
-
-	function BeforeByte (|Byte| b, |int| NotFound=-1, |string|)
-		|| i = .find( b )
-		if (i < 0)
-			i = NotFound
-		return self[ 0, i ]
 		
 	function AddExt (|string| ext, |string|)
 		if !ext

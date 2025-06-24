@@ -132,8 +132,13 @@ function SCNode.CalculateConstSub (|message!| value, |&datatypecode| Ty, |uint64
 	if f == @rel
 		return .CalculateConstRel(value, ty)
 		
-	if f == @char
-		return value.name.codepoint
+	if f == @char // what about non-ascii bytes?
+		|| n = value.Name
+		if (n == 1)
+			|| v = n[]
+			if v >= 0x80
+				return v
+		return n.codepoint
 	
 	if value isbrel "~"
 		return .CalculateConstRel(value, ty)

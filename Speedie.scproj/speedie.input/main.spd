@@ -72,7 +72,7 @@ function compiler.SetupEnv
 
 
 
-target perrydbg
+target PerryDBG
 	api Speedie_Main (|&pico| comms, |int64| Mode, |&cstring| args, |ErrorInt|)
 		// could this be a lib-func thats included with all compiles?
 		// so any app can be run as a lib? Maybe later!
