@@ -13,16 +13,16 @@ function SCNode.CollectOneConstants (|Message| ch)
 
 	
 
-function SCNode.CalculateConstRel (|message!| value, |&datatypecode| Ty, |uint64|)
+function SCNode.CalculateConstRel (|message!| value, |$datatypecode| Ty, |uint64|)
 	opt norefcounts
 	|| A = value.first!
 	|| L = .CalculateConstSub(A, Ty)
-	require ty[].ok
+	require ty.ok
 	
 	|| B = A.next!
 	|| C = b.next!
 	if value == @brel
-		expect (ty[] is int) (value, "Not an integer")
+		expect (ty is int) (value, "Not an integer")
 		return ~L
 		
 	|| op = scoperator.lookup(B)
@@ -30,7 +30,7 @@ function SCNode.CalculateConstRel (|message!| value, |&datatypecode| Ty, |uint64
 	expect (op is MathLike) (B)
 	|| N = B.name[]
 	|| Lg = b.name.length
-	|| Ints = (ty[]).isint
+	|| Ints = (ty).isint
 	if n == '+'
 		if Ints
 			return L + R
@@ -77,20 +77,20 @@ function SCNode.CalculateConstRel (|message!| value, |&datatypecode| Ty, |uint64
 	
 
 function SCNode.CalculateConst (|message!| value, |uint64|)
-	|datatypecode[1]| Ty
-	return .CalculateConstSub(value, &ty[0])
+	|uint| Ty
+	return .CalculateConstSub(value, ty)
 
 
-function message.TypeExpect (|&datatypecode| Ty, |datatypecode| In)
-	|| v = ty[]
+function message.TypeExpect (|$datatypecode| Ty, |datatypecode| In)
+	|| v = ty
 		if  (v != in)  and  v.ok
-			ty[] = datatypecode.failed
+			ty = datatypecode.failed
 			error (self, "Can't mix floats/ints here.")
 	  else
-		ty[] = In
+		ty = In
 
 
-function scdecl.AsConst (|message| value, |&datatypecode| Ty, |uint64| )
+function scdecl.AsConst (|message| value, |$datatypecode| Ty, |uint64| )
 	expect (self is const) (value, "Not a constant")
 	if .isfloat
 		value.typeexpect(ty, datatypecode.float)
@@ -102,7 +102,7 @@ function scdecl.AsConst (|message| value, |&datatypecode| Ty, |uint64| )
 	return .exportposition
 
 
-function SCNode.CalculateConstSub (|message!| value, |&datatypecode| Ty, |uint64|)
+function SCNode.CalculateConstSub (|message!| value, |$datatypecode| Ty, |uint64|)
 	opt norefcounts
 	|| f = value.func
 	if f == @num
@@ -117,10 +117,10 @@ function SCNode.CalculateConstSub (|message!| value, |&datatypecode| Ty, |uint64
 	
 	if f == @thg
 		if value ~= "true"
-			value.TypeExpect(ty, datatypecode.bool)
+			value.TypeExpect(ty, DataTypeCode.bool)
 			return 1
 		if value ~= "false"
-			value.TypeExpect(ty, datatypecode.bool)
+			value.TypeExpect(ty, DataTypeCode.bool)
 			return 0
 		
 		|| d = self[value]
@@ -133,11 +133,10 @@ function SCNode.CalculateConstSub (|message!| value, |&datatypecode| Ty, |uint64
 		return .CalculateConstRel(value, ty)
 		
 	if f == @char // what about non-ascii bytes?
+//		if value.prev.prev == "ESCAPE"
 		|| n = value.Name
 		if (n == 1)
-			|| v = n[]
-			if v >= 0x80
-				return v
+			return n[]
 		return n.codepoint
 	
 	if value isbrel "~"
@@ -246,7 +245,7 @@ function SCNode.CollectConstantsSub (|Message| ch)
 			newitem.source = thg
 
 		if newitem
-			compiler.newconst(newitem)
+			compiler.newconst(NewItem)
 			NameList <~ NewItem.source!
 			.TryAdd( line, NewItem, NewItem.Name )
 	
