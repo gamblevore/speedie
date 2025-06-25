@@ -234,7 +234,7 @@ datatype ImagePixel (uint)
 			white <~ vec4(1.0)
 		
 		function Char (|codepoint| c, |&imagepixel|)
-			if c&1
+			if (c&1)!=0
 				return .white
 			return .clear
 
