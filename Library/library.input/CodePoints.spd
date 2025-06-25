@@ -35,7 +35,11 @@ datatype Codepoint (int)
 	function Str (|string|)
 		return string.char(self)
 	syntax cast (|string|)
+		cpp_part AsString
 		return string.char(self)
+	syntax cast (|bool|)
+		cpp_part Bool
+		return self > 0
 	render
 		if fs_in
 			fs_in.AppendUTF8(self)

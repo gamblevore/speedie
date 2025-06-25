@@ -439,10 +439,6 @@ datatype float
 		.__sincospi(a, b)
 		return (a, b)
 		
-//	syntax cast (|bool|)
-//		cpp_part AsBool
-//		return self|bool|
-	
 	function Exponent (|ivec2|)
 		cpp_wrapper JB_f_Exponent
 			
