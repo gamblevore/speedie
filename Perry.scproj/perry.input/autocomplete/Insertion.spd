@@ -322,7 +322,7 @@ function textview.IsInClass (|textviewline| d, |bool|)
 
 function textview.PerryDeclKey (|bool|)
 	opt norefcounts
-	|| s = .selrange
+	|| s = .SelRange
 	require !s.width
 
 	|| d = .FindDrawInfo(s.x)
@@ -341,10 +341,10 @@ function textview.PerryDeclKey (|bool|)
 		return .insert("|| ")
 	
 	if endofline or inclass
-		|| Before = .BackHasIgnoringSpaces("||", s.x) 
+		|| Before = .BackHasIgnoringSpaces("||", s.x)
 			if before == '\n' or '\r' 
 				.insert(" ")
-			else
+			  else
 				.insert("|")
 			return true
 		if m
