@@ -310,8 +310,8 @@ function InitTypes2
 	TypeInt = self["int"]
 
 
-function InlineParam2 (|&int| v)
-	(v[])++
+function InlineParam2 (|$int| v)
+	v++
 
 
 function InlineParam ()

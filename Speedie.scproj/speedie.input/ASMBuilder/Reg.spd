@@ -30,8 +30,8 @@ datatype ASMReg (uint64)
 		ConstRequest
 		CondRequest
 		CondAnswer
-		InnerParam
-		AlwaysSet = Textual  // reuse const
+//		InnerParam
+		SetAlways = Textual ||| Set  // reuse const
 		Exit = [ExitFunction, ExitAtAll]
 		RealConst  = [ConstInput, ConstOutput]
 		AddrNeed   = [AddrRequest, AddrForceRequest]
@@ -56,10 +56,6 @@ datatype ASMReg (uint64)
 		fs <~ "("
 		.µtype.render(Fs)
 		fs <~ ")"
-	
-	
-//	function Normalness (|bool|)
-//		return .µType.ASMUseIntRegs
 	
 	
 	function F32 (|float|)

@@ -126,11 +126,9 @@ function SCFunction.RealReturnType (|scdecl|)
 
 datatype VarUseMode (int)
 	Flags
-		AllowInline
-//		AllowPreAlter
+		Linkable
 		ReturnAble
 		SetAble
-		InlineRequest = AllowInline
 		Return = ReturnAble
 		Set = SetAble
 		ExistingVar

@@ -303,7 +303,7 @@ function FoundReg (|message| All, |int| R, |bool|)
 	if all == @thg or @num // nums can be hoisted
 		|| d = all.FastDeclSafe
 		if d is local
-			|| v = .ThgASM(d)
+			|| v = d.WholeType
 			if v.reg == r
 				return true
 		
@@ -321,7 +321,7 @@ function UniqueLocation (|message| A, |asmreg| dest, |message| B, |asmreg|)
 	if dest.reg
 		if (dest is Declaration) or .Unchanged(A, dest, B)
 			return dest
-	rz = .temponly(A)
+	rz = .TempOnly(A)
 	(rz is negate) = (Dest is negate)
 	rz.µtype = dest.µtype	
 

@@ -85,6 +85,7 @@ struct Assembler
 		for a in fn.Args
 			// reset.
 			(a is param)
+			(a isnt const)
 			(a isnt body)
 			.DeclareMe(a.source, a)
 	
@@ -359,13 +360,13 @@ struct Assembler
 		return exp.MEMZ(base, index)
 	
 	
-	function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl!| D, |int| Index, |&fatasm|)
+	function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl?| Decl, |int| Index, |&fatasm|)
 		if dest is containsaddr
 			#!wait?? this is meant to be an addrrequest? not a response.
 			debugger
 		
 		if dest is FromZeroMemory
-			return .ZeroMemory(index, exp, base, varadd, D)
+			return .ZeroMemory(index, exp, base, varadd, Decl)
 		
 		(dest asnt= asmreg.AddrRequest)
 		|| T = dest.µtype
@@ -382,7 +383,7 @@ struct Assembler
 				varadd = asmreg()
 		//  ADDK: bs, r1, 4
 		//  RD1U: r2, bs, value, 4, 0 
-		base = .InlineOffsetOpt(Base, bytes, index, 127, d)
+		base = .InlineOffsetOpt(Base, bytes, index, 127, Decl)
 
 /*
 	// these need to be opted. Not always happening? InlineOffsetOpt seems to only do ADDK, not ADPK
@@ -608,14 +609,25 @@ struct Assembler
 	
 	function CanReuseParam (|message| Prms, |scdecl| A, |asmreg| v, |bool|)
 		opt norefcounts
-		|| vr = v.reg
-		if !vr
-			return (a isnt altered) // passing 0 via a const?
-
-		if a isnt altered
-			return true
 		
+		// we could also allow it... if we are the last expr in the function
+		// what about returns?
+		// || x = func(a,b,c)
+		// return x
+		// ok... as long as the next one DOESN'T return V. So returning 0, or anything else, is OK.
+
+		// OPT THIS LATER! OPTS ARE FUN! DONT DEPREIVE UR FUTURE SELF OF FUN!
+		
+		// WHY STRESS NOW JUST TO HAVE LESS FUN LATER!
+		
+
+		if  a is reference  or  a isnt altered
+			return true
+
+		|| vr = v.reg
+		require vr
 		require (.state.return.reg == vr)
+
 		for p.fast in prms
 			// check for the address of the same var?
 			if .ExistingVar(p).reg == vr
@@ -676,46 +688,60 @@ struct Assembler
 	
 	function UpdateInlineReg (|message| prms, |asmreg| V, |scdecl| D, |asmreg|)
 		if "InlineParam".trap
-		|| VP = (v is param)
-		(D is param) = VP
-		(D is body) = !VP
-		// we only ever restore D. So the reg should be on D?	// AAARGH.
+
+		if v is constoutput and d isnt Altered
+			(d is const)
 
 		|| T = D.WholeType
-		if v is InnerParam
-/			(D is ASMInnerParam)
-			T = D.Internal!.WholeType
 
-		if v.isbig != t.isbig									// What about &locals being inlined?
+		if v.isbig != t.isbig
 /			|| tmp = .TempTyped(prms, t.µType|asmreg|)
 			v = ASMType.TypeCastSub(self, prms, tmp, v)			// Convert.
 		
-		v.tmpcheck
-		D.AsmReg = v										// update reg!
+		v.TmpCheck
+		D.AsmReg = v											// update reg!
 		return v
 
+
+	function InlineVar (|message| prms, |message| m, |scdecl| a, |asmreg|)
+		opt	norefcounts
+	
+		if "InlineParam".trap
+		m = m.ASMUnbra
+		|| fn = m.Func
+		require fn == @thg
+		|| d = m.ASMDecl
+
+		require d is local
+		|| v = .LocalThg(d)
+		if v and .CanReuseParam(prms, a, v)
+			// what about if a gets altered... and then used?
+			// like in some nested opt inline thing?
+			(a is reference) = (d is reference)
+			(a is const) = (d is const)
+			return v	
+	
 	
 	function InlineParameters (|message| prms, |bool| IsLeaf, |uint64|)
 		opt norefcounts
 		|| p = prms.first!
 		
-		if "HighestMatch".trap or "incr".trap
+		if "HighestMatch".trap
 			// what about passing a byte to a param taking an int?
 			// depends? like if it comes from a read, its already correct.
 			// our system assumes 32/64 bit correctness.
 			// So... passing 32 to a 64 isnt correct, but otherwise it should be?
 		
-		
 		for (a in .fn.Args) (i)
-			rz |= a.CollectForRestoreASM << (i<<3)
-			|| v = .ExistingVar(p, VarUseMode.InlineRequest)
-			if v and .CanReuseParam(prms, a, v)
-				0 //
+			rz |= a.CollectASMReg << (i<<3)
+			|| v = .InlineVar(prms, p, a)
+			if v
+				0
 			  elseif IsLeaf and (a isnt altered)
-				v = .µgetasm(p, v)		// then we don't care if its a temp
+				v = .µGetASM(p, v)		// then we don't care if its a temp
 			  else
 				v = .DeclareMe(a.source, a)
-				v = .µinto(p, v)
+				v = .µInto(p, v)
 			
 			v = .UpdateInlineReg(prms, V, a)
 			.MarkDeclAsConst(a, V, nil)
@@ -731,20 +757,18 @@ struct Assembler
 			a.fatconstindex = 0
 			
 	
-	function scdecl.CollectForRestoreASM (|uint64|)
-		rz |= self is ASMInnerParam
-		rz |= (self is param) << 1
-		rz |= .wholetype.reg << 2
-		is param
-		isnt body
-		isnt ASMInnerParam
+	function SCDecl.CollectASMReg (|uint64|)
+		if self isnt param // hmm?
+		rz = .wholetype.reg
+		rz |= (self is const) << 5
+		rz |= (self is reference) << 6
 	
 
 	function scdecl.RestoreASM (|uint64| PP)
-		(self is ASMInnerParam) = PP & 1
-		(self is param) = PP&2
-		(self isnt body) = PP&2
-		.wholetype = .wholetype.reg((PP>>2)&31)
+		.WholeType = .WholeType.reg(PP&31)
+		(self is const) = (PP>>5)&1
+		(self is reference) = (PP>>6)&1
+
 	
 	
 	function CurrGain (|&fatasm| Start, |int|)
@@ -759,11 +783,13 @@ struct Assembler
 		require .state.InlineDepth < .InlineDepthLimit
 		|| N = fn.µlength
 		require N and !fn.HasCVersion
-		|| AllowedGain = 5 + (fn is inline) * 23		// assume that functions have 5 instruction overhead.
-		|| Grace = 9
 
 		|| MaxEnd = .inlineend
-			require .curr + (N / 3) < maxend
+			|| SubInline = .curr + (N / 3)
+			require SubInline < maxend
+
+		|| AllowedGain = 5 + (fn is inline) * 23		// assume that functions have 5 instruction overhead.
+		|| Grace = 9
 		AllowedGain -= .State.inlinedepth
 		
 		for p.fast in prms

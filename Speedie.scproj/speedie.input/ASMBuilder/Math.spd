@@ -720,7 +720,8 @@ extend Assembler
 				return dest
 		
 		dest = dest.CopyConst(Src)
-		return .BitOr(dest as asmreg.textual, src, ASMReg(), exp)
+		return exp.BORR(dest, src) * Dest
+		// return .BitOr(dest as asmreg.textual, src, ASMReg(), exp)
 
 
 	function NopMinusOne (|asmreg| r, |bool|)

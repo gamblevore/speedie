@@ -133,21 +133,15 @@ function SCNode.CalculateConstSub (|message!| value, |$datatypecode| Ty, |uint64
 		return .CalculateConstRel(value, ty)
 		
 	if f == @char // what about non-ascii bytes?
-//		if value.prev.prev == "ESCAPE"
 		|| n = value.Name
 		if (n == 1)
 			return n[]
-		return n.codepoint
+		return n.codepoint							#expect (value, "Not a valid UTF-8 codepoint.")
 	
 	if value isbrel "~"
 		return .CalculateConstRel(value, ty)
-	/*if (value == @dot) // remove
-		|| d = value.obj
-		if d isa scdecl
-			return d.asconst(value, ty)*/
 	
 	error value
-	return 0
 	
 	
 		

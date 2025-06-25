@@ -282,8 +282,34 @@ function SetRel (fn_asm)						// function relset (
 
 	// probably x.y = z, or x[y] = z 
 	dest = .µGetASM(B, asmreg()) 
-	dest = (dest asnt ASMReg.RealConst) as AsmReg.set
-	return .µ(A, dest as asmreg.AlwaysSet)
+	(dest isnt RealConst)
+	(dest is SetAlways)
+	return .µ(A, dest)
+
+
+function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
+	|| Reff = d.WholeType
+	|| dr = dest.reg
+	if dest is AddrRequest // (|$int|) v {v++}
+		return reff.haveaddr	
+	
+	if dr == d.WholeType.reg
+		if !dr // how?
+/		return dest
+
+	if !dr
+		if dest is set // what?
+		dest.µType = Reff.µType
+		dest = .TempOnly(exp, dest)
+	
+	if dest isnt set
+/		if dest is ContainsAddr // how?
+		// dest = reff --> dest = *reff
+		return .Read(dest, exp, Reff, nil, nil) * dest
+
+	// reff = dest --> *reff = dest
+/	return .write(Reff, exp, dest, nil, nil) * dest
+
 
 
 
@@ -349,13 +375,6 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 
 	|| base = .µGetASM(f)									// x = a.b[0]
 	|| sc = exp.Second.first!
-	if base is InnerParam
-		check (sc.iszero) (exp, "Attempt to modify register, goes out of bounds")
-		// in fact, this is invalid in C++ too, but we might not catch it.
-		// would be nice if marked the SCDecl itself as being used weirdly.
-		return base
-
-	
 	|| vara = .µGetASM(sc)
 
 	if d.TypeInfo.VecCount > 1
@@ -426,12 +445,8 @@ function Thg (fn_asm)
 	|| reg = thg.reg
 	if (reg-1)|uint| < 31								// what?
 		return thg
-	if  reg == 0
-		if thg is RealConst
-			return thg									// Its still ok.   nil/false
-		if (thg is param) and (.state.inlinedepth)		// inline returned
-			(thg is constoutput)
-			return thg
+	if  !reg  and thg is ConstOutput
+		return thg										// Its still ok.   nil/false
 	error (exp, "Register out of bounds")
 
 
@@ -453,7 +468,6 @@ function GrabAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, 
 			|| bastard = .CurrFuncGrab.SetSign(t.Signed)|int64|
 			fat.Prms[5] = bastard
 			fat.const = L
-
 	return fat * dest.HaveAddr
 
 
@@ -461,13 +475,15 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
 	|| d = exp.ASMDecl
 	if d is local
-		if "InlineParam".trap
-		|| T = .ThgASM(d)
+		if dest is ConstRequest
+			return nil
+		
+		if d is reference
+			return ThgReference(self, exp, dest, d)
+			
+		|| T = .LocalThg(d)
 		if dest isnt AddrNeed
-			if d is ASMInnerParam
-/				(t is InnerParam)
 			return T
-			// inlined params can set a param to reg0. so... we should mark this as a const, right?
 			
 		if d.IsBareStruct					// it already has the address
 			return T.haveaddr
@@ -480,7 +496,7 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 		
 	return ConstFromThgName(self, exp, dest, d)
 
-	
+
 
 function DoGlobal (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| D, |ASMReg|)
 	opt	NoRefCounts
@@ -503,7 +519,7 @@ function DoGlobal (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| D, 
 
 function AddressOf (fn_asm)
 	rz = .µGetASM(exp, dest as asmreg.addrneed)
-	if (rz is ContainsAddr or InnerParam)
+	if (rz is ContainsAddr)
 		return rz &~ asmreg.ContainsAddr
 	error (exp, "ASM fail")
 	.µGetASM(exp, dest as asmreg.addrneed)
@@ -577,7 +593,10 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 	|| Src = .µGetASM(exp, dest as ASMReg.AddrRequest)
 	|| D = exp.ASMDecl
 	|| Amount = IncrAmount(src, mode, D)
-	if !dest.reg and dest isnt Discard
+
+	if dest is discard
+		mode = IncrBefore
+	  elseif !dest.reg
 		if mode & IncrAfter
 			dest = .TempTyped(exp, dest)
 		  else
@@ -670,21 +689,7 @@ function ExistingThg (|message| m, |VarUseMode| Mode, |scdecl| d, |asmreg|)
 	require d is local
 	if mode is Return
 		.fn.TrackReturns(d)
-	return .ThgASM(d)
-
-
-function ExistingBrel (|message| m, |VarUseMode| Mode, |asmreg|)
-	opt norefcounts
-	require mode is AllowInline
-	require m.name[] == '&'						// &(y)
-
-	|| ch = m.first!.unbra						// y
-	require ch == @thg
-
-	|| d = ch.ASMDecl
-	|| pp = .ExistingThg(ch, mode, d)
-/		(pp is innerparam)
-		return pp
+	return .LocalThg(d)
 
 
 function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
@@ -692,9 +697,6 @@ function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
 
 	m = m.ASMUnbra
 	|| fn = m.Func
-
-	if (fn == @brel)
-		return .ExistingBrel(m, mode)
 	
 	require fn == @thg or @num
 	
@@ -705,7 +707,8 @@ function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
 	|| H = .MegaNumFinder(d.ExportPosition, d.datatype)
 		return H
 
-	if (d is const) and !d.ExportPosition
+	// reg0. shouldn't this be part of the meganumfinder?
+	if (d is const) and !d.ExportPosition // reg0
 		return .NumToReg(m, 0, asmreg(), d.DataType)
 
 
@@ -770,26 +773,16 @@ function ASMReg.ConstEnough (|bool|)
 	return self|uint64| & asmreg.NotUnConst|uint64|
 
 
-function ThgASM (|scdecl| d, |asmreg|)
+function LocalThg (|scdecl| d, |asmreg|)
 	opt norefcounts
 	|| T = d.WholeType as ASMReg.FromExistingVar
 	|| DP = d is param
 	(t is param) = DP
 	
-	|| IA = d is ASMInnerParam
-		(t is InnerParam)
-/		d = d.internal!
-		t.µtype = d.datatype
-
 	if  d isnt AlteredInBranch
-	/*
-		func(3)
-		function func (|int| x)
-			.glob = x+1
-	
-	*/
-	
 		(t is CanHoist)
+		if d is Const
+			(t is constoutput)
 		|| fi = d.FatConstIndex
 			|| f = fi|uint|.fat
 			if f is ConstOutput

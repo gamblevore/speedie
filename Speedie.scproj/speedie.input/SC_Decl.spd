@@ -87,7 +87,7 @@ datatype SCDeclInfo (uint)
 		VarThatGotReturned
 		ReturnedStruct
 		IntendedAsReturn
-		ASMInnerParam
+//		ASMInnerParam
 		
 		VarType			= Param ||| Body ||| Global ||| Property
 		Local			= Body  ||| Param
@@ -95,7 +95,7 @@ datatype SCDeclInfo (uint)
 		DclCopied		= altered ||| stayborrowed ||| api ||| UpgradeableContained ||| CompilerCreated ||| body ||| return // need more too? do later
 
 	function abc
-		|| x = ASMInnerParam
+		|| x = IntendedAsReturn
 	
 	
 	function Set (|SCDeclInfo| d, |bool| b, |SCDeclInfo|)
@@ -185,8 +185,6 @@ class SCDecl (SCObject) {
 		.sanity
 
 	function sanity
-		if self is const and Global	// oof
-			debugat 0
 
 	function IsNil (|bool|)
 		return self == typenil

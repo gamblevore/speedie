@@ -16,9 +16,9 @@ main // speedie main {
 
 
 function Compiler.EnterCompile (|bool|)
-	require !.TryVariousStartModes
-	require FeedBack.ParseArgs
-	return !interact.EnterAutoComplete
+	if !.TryVariousStartModes
+		if FeedBack.ParseArgs
+			return !interact.EnterAutoComplete
 
 
 function Compiler.PrintResults
