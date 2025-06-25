@@ -287,7 +287,7 @@ U+100000..U+10FFFF	F4			80..8F		80..BF		80..BF
 */
 
 
-uint8* u8Read( uint8* source, u32* pch ) {
+static uint8* u8Read( uint8* source, u32* pch ) {
 	u32 ch = *source++;
     
 	if (ch >= 0x80) {
@@ -322,7 +322,6 @@ uint8* u8Write_( uint8* target, u32 ch ) {
 		*target++ = (uint8)ch;
 
 	} else {
-        
 		if (ch < 0x800) {
             *target++ = (uint8)( (ch >> 6) | 0xC0 );
 
@@ -334,9 +333,9 @@ uint8* u8Write_( uint8* target, u32 ch ) {
                 *target++ = (uint8)( (ch >> 18) | 0xF0 );
                 *target++ = (uint8)( ((ch >> 12) | byteMark) & byteMask );
             }
-            *target++ = (uint8)( (ch >> 6  | byteMark) & byteMask );
+            *target++ = (uint8)( (ch >> 6 | byteMark) & byteMask );
         }
-        *target++ = (uint8)( (ch >> 0  | byteMark) & byteMask );
+        *target++ = (uint8)( (ch >> 0 | byteMark) & byteMask );
 	}
 
 	return target;
@@ -511,7 +510,11 @@ u32 JB_Str_UTF8Size( u32 c ) {
 
 int JB_Str_UTF8Value(JB_String* self, bool Strict) {
 	int Len = JB_Str_Length(self);
-	if (Len and (!Strict or JB_Str_BadUTF8(self, 0) < 0)) {
+	if (Len <= 0)
+		return UNI_BADOFFSET;
+
+	uint8* Source = self->Addr;
+	if (!Strict or ValidateUTF8(Source, Len) < 0) {
 		uint8* Source = self->Addr;
 		int N = JB_u8_Size(*Source);
 		if ((N <= Len) and (!Strict or N == Len)) {
