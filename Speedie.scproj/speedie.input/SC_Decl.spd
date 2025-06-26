@@ -76,6 +76,7 @@ datatype SCDeclInfo (uint)
 		Altered
 		AlteredInBranch
 		Reference
+		ExistanceAltered
 		Task
 		Self
 		ReadFrom
@@ -116,7 +117,7 @@ class SCDecl (SCObject) {
 	|Object?|			IsLookupOnly
 
 	|SCDecl?|			Internal		// pointers
-	|scdecl--?|			OriginalDecl    // for grab global export position in ASM.
+//	|scdecl?|			OriginalDecl    // for grab global export position in ASM.
 	|scdecl?|			LocalVarList
 	//|SCDecl|			NextContains // for multiple contains
 	|SCDecl?|			Contains
@@ -964,27 +965,13 @@ class SCDecl (SCObject) {
 		if (Default and self == .type.typenormal)
 			return Default
 		
-		// I think we just need to copy for globals? or at least...
-		// .originaldecl is only needed to get the exportposition for ASM globals.
-		// i still don't know why we can't just use the original... or change it.
-		// 
+		// About the exportposition for ASM globals:
+		is ExistanceAltered // just for debugging the compiler.
 		
 		rz = .CopyDecl
 		rz.info |= .info & scdeclinfo.VarType
-		|| s = .OriginalDecl
-		rz.OriginalDecl = s ?? self
 		rz.NilDeclared = type
 
-
-	function Orig (|scdecl|)
-		opt norefcounts
-		|| d = .OriginalDecl
-			if d != self
-				debugat 
-				// why tho? something to do with !?
-				// I just can't remember why.
-			return d
-		return self
 		
 	
 	function CanNilCheck (|bool|)

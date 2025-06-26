@@ -202,8 +202,15 @@ function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
 	
 	|| B = '_' == dcl.name[]
 	|| C = '_' == dcl.name.Last
-	if B|||C
+	if B ||| C
 		(dcl is hidden)
+	
+	// So we put these into the global tables here.
+	// so thats the deal with the .makeexistance thing then?
+	// maybe something like: || x = GlobUint|int| ?
+	// surely... the read should be done before the cast?
+	
+	
 	if dcl.islib
 		PackMaker.LibGlobs <~ dcl
 	  else
