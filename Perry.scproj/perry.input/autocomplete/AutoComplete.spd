@@ -157,7 +157,7 @@ function AutoCompleteInsertText (GuiListEvent)
 	|| e = i.editme
 	if row >= 3
 		|| file = row.firstname
-		|| num = row.last.int
+		|| num = row[2].int
 		i.DefineSub(file, num|int|)
 	  else
 		e.autocompletestring = row.Name
