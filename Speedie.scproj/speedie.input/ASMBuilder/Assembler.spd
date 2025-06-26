@@ -100,10 +100,11 @@ struct Assembler
 
 	function Last (|asm| type, |&FatASM|)
 		|| L = ._curr - 1
-		if l isa type
-			if l.BasicBlock == .basicblock
-				return L
+		if (l isa type) and .IsCurr(L)
+			return L
 	
+	function IsCurr (|&fatasm| f, |bool|)
+		return .basicblock == f.basicblock
 	
 	function IntPowerOfTwo (|asmreg| r, |int| Sub=0, |FailableInt|)
 		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
@@ -240,7 +241,7 @@ struct Assembler
 		
 		if (r is RemoveableOutput) or (r is RealConst)
 			|| f = r.fat
-				if !ask or f.BasicBlock == .BasicBlock
+				if !ask or .IsCurr(f)
 					.Nop(f)
 					return true
 	
@@ -600,7 +601,7 @@ struct Assembler
 		|| Start = .FuncStart
 		|| reg = thg.reg
 		while  where >= start
-			require where.BasicBlock == .BasicBlock
+			require .IsCurr(where)
 			|| X = where.SmartFatness(reg)
 			require !X.KnownFalse
 			if X.knowntrue
@@ -698,20 +699,26 @@ struct Assembler
 			return Result
 	
 	
-	function UpdateInlineReg (|message| prms, |asmreg| V, |scdecl| D, |asmreg|)
+	function UpdateInlineReg (|message| P, |asmreg| V, |scdecl| D, |asmreg|)
 		if v is constoutput and d isnt Altered
 			(d is const)
 
 		|| T = D.WholeType
 
-		// this could be optimised by checking if the thing just got read.
-		// in that case... its probably... "Bitcorrect".
 		if v.isbig != t.isbig
-/			|| tmp = .TempTyped(prms, t.µType|asmreg|)
-			v = ASMType.TypeCastSub(self, prms, tmp, v)			// Convert.
+			|| f = v.fat
+			if f and .iscurr(F)	and f.IsRead
+				// so its a read, from the curr block... lets assume its ok.
+				v.µtype = t|datatypecode|
+			  else
+				// casting not quite right here.
+				// also... we just did a BOR! shouldn't that BOR do the bit reduction?
+				// seems so.
+/				|| tmp = .TempOnly(P, t.µType|asmreg|)
+				v = ASMType.TypeCastSub(self, P, tmp, v)			// Convert.
 		
 		v.TmpCheck
-		D.AsmReg = v											// update reg!
+		D.AsmReg = v												// update reg!
 		return v
 
 
@@ -738,6 +745,7 @@ struct Assembler
 		|| p = prms.first!
 		
 		for (a in .fn.Args) (i)
+			debugat 321
 			rz |= a.CollectASMReg << (i<<3)
 			|| v = .InlineVar(prms, p, a)
 			if v
@@ -748,7 +756,7 @@ struct Assembler
 				v = .DeclareMe(a.source, a)
 				v = .µInto(p, v)
 			
-			v = .UpdateInlineReg(prms, V, a)
+			v = .UpdateInlineReg(P, V, a)
 			.MarkDeclAsConst(a, V, nil)
 			p = p.next!
 	

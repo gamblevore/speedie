@@ -56,7 +56,11 @@ struct FatASM
 	function Input (|int| i, |&fatasm|)
 		|| r = (.prms[i] << 1) >> 16
 			return r.fat
-		
+	
+	function IsRead (|bool|)
+		|| op = .op
+		return op >= asm.RD1U and op <= asm.RD16 
+	
 	function IsFunc (|bool|)
 		|| b = .baseop
 		return b == asm.fncx or asm.fnc
@@ -279,8 +283,7 @@ struct FatASM
 		.JumpReg = a + 1
 		.µRefCount = 1 max .µRefCount // control flow is always used?
 		Assembler.sh.BasicBlock++
-	
-	
+		
 	function Jump (|int|)
 		|| j = .JumpReg
 			return .prms[j-1]
