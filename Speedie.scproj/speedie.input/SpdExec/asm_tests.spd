@@ -38,12 +38,6 @@ class LargeClass2 {
 	|uint16[100]| b
 }
 
-
-function IfEmpty (|int| x)
-	if x
-		0
-	  else
-		.grab2(nil)
 	
 function AddStuff (|int64| A, |int| B, |int64|)
 	|| X = A-B // shouldn't rely on B being bit-correct.

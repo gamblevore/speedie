@@ -65,9 +65,9 @@ function scdecl.FastMatch (|SCDecl| O, |bool|)
 	return o.c_array == .c_array
 
 
-function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil,  |int|)
+function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil, |int|)
 	real self
-
+	
 	if (o == nil)
 		require .default
 		Return kUseDefaultParams
@@ -75,6 +75,11 @@ function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil,  |
 	if (o == self)
 		Return kSimpleMatch		
 
+	if (o is const) and (self is reference) and (TypeCast&kTypeCastForParams)
+		return 0 // would be nice to allow nil to refs... but do it later.
+				 // we would need to allocate a temp var, clear it... 
+				 // and if its an object, then decr it after. sigh. not worth it rn!
+	
 	if (o.IsNil and (TypeCast & kTypeCastTrue))		// nil cast
 		if .CantBeNilInCpp							// |mystruct| x = nil
 			if !exp
@@ -83,9 +88,6 @@ function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil,  |
 			exp.replacewith(nilstruct)
 			return kCastedMatch
 		Return kSimpleMatch // will this work?
-	
-	if (o is const) and (self is reference) and (TypeCast&kTypeCastForParams)
-		return 0
 	
 	// Don't .Match on the contains? It would run into "array covariance" errors?
 	if O.PointeryMatch(self)

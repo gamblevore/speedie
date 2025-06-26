@@ -116,7 +116,7 @@ linkage
 |[scdecl]|					DeclConstants
 |[scclass]|					TasksList
 |[Message]|					TasksTodo
-|[message]|					LaterAddressChecks
+|[message]|					LaterAddressChecks // remove this later. Use $ for cpp too!
 |[Message]|					ExtendModuleList
 |[Message]|					API_List
 |[SCFunction]|				API_Funcs

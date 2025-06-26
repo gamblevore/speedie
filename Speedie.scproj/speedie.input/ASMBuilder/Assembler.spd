@@ -206,7 +206,7 @@ struct Assembler
 		.VTemps = r
 		(t isnt realconst) // why would it be?
 		(t is temp)
-		.declprint
+//		.declprint
 		return t
 	
 	
@@ -315,8 +315,13 @@ struct Assembler
 		return .CloseVars(Closer, nil, v)
 
 
-	function µReffed (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
-		rz = .µGetASM(exp, dest)
+	function µReffed (|message| exp, |scdecl!| A, |asmreg|)
+		rz = asmreg()
+		(rz is AddrNeed) = (a is Reference)
+		rz = .µGetASM(exp, rz)
+		if (a is reference  and  rz isnt containsaddr)
+			error (exp, "Failed to get address of expression. (Compiler *should* have caught this in transform phase)")
+		
 		|| f = rz.fat
 			f.µRefCount++
 
@@ -430,18 +435,21 @@ struct Assembler
 	function PrmCollectSpd (|message| prms,  |SCFunction| fn,  |uint64|) // paramcollect, paramscollect
 		opt norefcounts
 		|int64| sh
+		|| args = fn.args
+		|| i = 0
 		for p.fast in prms
-			|int64| v = .µReffed(p!).reg
+			|int64| v = .µReffed(p!, args[i]!).reg
 			sh += 5
 			rz |= v << sh
+			i++
 		
-		rz |= fn.args.Length
+		rz |= i
 
 	
-	function DeclPrint
-		if 0 and "InitTypes2".trap
-			"d: ${.vdecls|int|} t: ${.vtemps|int|}"
-			debugger
+//	function DeclPrint
+//		if 0 and "InitTypes2".trap
+//			"d: ${.vdecls|int|} t: ${.vtemps|int|}"
+//			debugger
 	
 	function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 		// We want a simple param order for speedie. Only sensible way to do things.
@@ -450,19 +458,23 @@ struct Assembler
 		
 		if !fn.HasCVersion
 			return .PrmCollectSpd(prms, fn)
+		
 		|int64| sh = 64
 		|| fc = 0
 		|| ic = 0
-		|| n = fn.args.Length
+		|| args = fn.args
+		|| n = args.Length
 		for Ints in 2
+			|| i = 0
 			for p.fast in prms
 				|| ty = p.ASMDecl
 				if ty.SpecialRegs|int| != Ints		// should get .SpecialRegs from message somehow?
-					|int64| v = .µReffed(p!).reg
+					|int64| v = .µReffed(p!, args[i]!).reg
 					sh -= 5
 					rz  |=  v << sh
 					ic += ints
 					fc += !ints
+				i++
 		
 		rz >>= 64-((n*5)+12)
 		if fc>8 or ic>8			// hmmm
@@ -472,7 +484,7 @@ struct Assembler
 			rz |= (8-ic) << 0
 		  else
 			rz |= (17-ic) << 6
-		.declprint
+//		.DeclPrint
 			
 
 	function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
@@ -687,8 +699,6 @@ struct Assembler
 	
 	
 	function UpdateInlineReg (|message| prms, |asmreg| V, |scdecl| D, |asmreg|)
-		if "InlineParam".trap
-
 		if v is constoutput and d isnt Altered
 			(d is const)
 
@@ -706,7 +716,6 @@ struct Assembler
 	function InlineVar (|message| prms, |message| m, |scdecl| a, |asmreg|)
 		opt	norefcounts
 	
-		if "InlineParam".trap
 		m = m.ASMUnbra
 		|| fn = m.Func
 		require fn == @thg
@@ -883,9 +892,9 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	|| Start = .curr
 	++.CurrFuncGrab
 	|| Closer = .OpenVars
-	.declprint
+//	.declprint
 	|| P = .PrmCollect(prms, fn)
-	.declprint
+//	.declprint
 	.CloseVars(Closer)
 	
 	if !TableID

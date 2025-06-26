@@ -125,6 +125,7 @@ function TypeOfFunc (ExprResolver)
 
 function Message.CanGetAddress (|SCNode| name_space, |bool|)
 	opt norefcounts
+	if "IfEmpty".trap
 	|| curr = .unbra
 	if (curr == @acc)
 		|| f = curr.first
@@ -132,8 +133,8 @@ function Message.CanGetAddress (|SCNode| name_space, |bool|)
 		return (T.isnumeric <= 1)				#expect (curr, "Can't get address within vector (c++ limitation).")
 	
 	|| T2 = TypeOfExpr(curr, name_space)		#require // might transform it
-	expect (curr == @thg or @dot)		(curr, "Can't get the address of this.")
-	expect (T2 isnt NumberConst)        (curr, "Can't get the address of a const.")
+	expect (curr == @thg or @dot)				(curr, "Can't get the address of this.")
+	expect (T2 isnt NumberConst)        		(curr, "Can't get the address of a const.")
 	
 	if (curr == @thg) and t2.IsRegister
 		|| f = .ParentForAddress

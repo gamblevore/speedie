@@ -87,7 +87,7 @@ function Assembler.CloseOneVar (|message?| exp, |int| OriginalDecls, |$bool| DoM
 		.VDecls = v - 1
 	  else
 		.VTemps = v + 1
-	.declprint
+//	.declprint
 			
 	return exp
 

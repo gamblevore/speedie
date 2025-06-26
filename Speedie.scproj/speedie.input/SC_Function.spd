@@ -313,9 +313,9 @@ function @scfunction.TransformAll
 //	"$.ExportName has ${.barestructs|int|} barestructs"
 
 
-function CheckRegAddress
+function CheckRegAddress // entire func should go once $ is used for cpp
 	opt norefcounts
-	for s in compiler.LaterAddressChecks
+	for s in compiler.LaterAddressChecks // want to remove this.
 		|| prms = s.ancestor(@prm)
 			|| fn = prms.obj as scfunction
 				check (fn is cpp) (s, "Register passed to pointer parameter.")

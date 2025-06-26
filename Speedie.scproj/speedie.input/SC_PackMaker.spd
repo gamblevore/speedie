@@ -166,7 +166,7 @@ module PackMaker
 			|| str = fn.TestObesity|&string|[]
 			printline str
 			
-		fn = .testfn("Math")
+		fn = .testfn("Math2")
 		if fn
 			for i in 5
 				self[0] = 12+i, self[1] = 6+i
