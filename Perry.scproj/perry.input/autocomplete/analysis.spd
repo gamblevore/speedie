@@ -100,8 +100,8 @@ function PerryAutoCompleteSelected (GUIListEvent)
 	if p and i.EditPath2(p)
 		|| rl = row[2]
 			e.ShowAndSel(rl.int, true)
-
 	i.DuringTempView--
+
 	
 
 function PerryFuncMenuSelected (GUIListEvent)
