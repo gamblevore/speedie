@@ -426,6 +426,7 @@ struct Assembler
 
 
 	function Read (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scdecl| DestDecl, |int| index=0,  |&fatasm|)
+		// DestDecl: I think this should be called readdecl?
 		opt inline
 		(dest isnt set)
 		return .ReadOrWriteSub(dest, exp, ptr, VarAdd, DestDecl, index)
@@ -433,6 +434,7 @@ struct Assembler
 
 	function Write (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scdecl| ReadDecl, |int| index=0, |&fatasm|)
 		opt inline
+		// ReadDecl: I think this should be called DestDecl?
 		(dest is set)
 		return .ReadOrWriteSub(dest, exp, ptr, VarAdd, ReadDecl, index)
 
