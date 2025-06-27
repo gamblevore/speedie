@@ -59,7 +59,7 @@ class Class
 		fs <~ "Class: $.name ($.size, $sup)"
 
 
-	function ClassData.AllocateBehaviour (|int| n, |&&&nil| Cpp, |&&&nil| Spd) 
+	function ClassData.AllocateBehaviour (|int| n, |$?&&nil| Cpp, |$?&&nil| Spd) 
 		cpp_Wrapper JBClassAllocBehaviour
 
 
@@ -73,8 +73,8 @@ class Class
 		
 		for ch in list
 			|| fn = function[ch]
-				cpp[i] = fn.CFunc
-				spd[i] = fn.SpeedieFunc   #check   (fn.src, "Missing behaviour")
+				cpp![i] = fn.CFunc
+				spd![i] = fn.SpeedieFunc   #check   (fn.src, "Missing behaviour")
 				// the spd version should call the c++ version...
 			i++
 		

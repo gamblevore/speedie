@@ -85,6 +85,7 @@ datatype int8 // aka char
 
 
 datatype cstring
+	size 8
 	linkage: cpp_class _cstring
 	function Length (|int|)
 		cpp_wrapper strlen

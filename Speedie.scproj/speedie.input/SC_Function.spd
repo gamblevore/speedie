@@ -315,12 +315,14 @@ function @scfunction.TransformAll
 
 function CheckRegAddress // entire func should go once $ is used for cpp
 	opt norefcounts
-	for s in compiler.LaterAddressChecks // want to remove this.
-		|| prms = s.ancestor(@prm)
-			|| fn = prms.obj as scfunction
-				check (fn is cpp) (s, "Register passed to pointer parameter.")
-		
-	compiler.LaterAddressChecks.clear
+//	for s in compiler.LaterAddressChecks // want to remove this.
+//		|| prms = s.ancestor(@prm)
+//			|| fn = prms.obj as scfunction
+//				check (fn is cpp) (s, "Register passed to pointer parameter.")
+//				if fn is cpp
+//					problem (s, "Upgrade to $$$$")
+//		
+//	compiler.LaterAddressChecks.clear
 
 
 function Transform ()

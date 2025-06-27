@@ -1,13 +1,13 @@
 
 
 module ImageHelper
-	function LoadQOI (|&byte| data, |int| len, |&int| Size, |?&byte|)
+	function LoadQOI (|&byte| data, |int| len, |$int| Size, |?&byte|)
 		cpp_wrapper JB_Img__LoadQOI
 
-	function WriteQOI (|&byte| data, |int| w, |int| h, |&int| len, |?&byte|)
+	function WriteQOI (|&byte| data, |int| w, |int| h, |$int| len, |?&byte|)
 		cpp_wrapper JB_Img__WriteQOI
 	
-	function LoadPNG (|&byte| data, |int| len, |&int| x, |&int| y, |&int| comp, |?&byte|)
+	function LoadPNG (|&byte| data, |int| len, |$int| x, |$int| y, |$int| comp, |?&byte|)
 		cpp_wrapper JB_Img__LoadPNG	
 
 	function ConvertPNGToVOI (|string| p, |string|)
@@ -15,7 +15,7 @@ module ImageHelper
 		|| x	= 0
 		|| y	= 0
 		|| comp	= 0
-		|| img = .LoadPNG( p.addr, p.length, &x, &y, &comp )
+		|| img = .LoadPNG( p.addr, p.length, x, y, comp )
 			|| n = 0
 			|| qoi = .WriteQOI(img, x, y, n)
 				rz = string.Own(qoi, n).compress(mzlab.strong)

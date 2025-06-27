@@ -123,8 +123,8 @@ module Lib
 
 	function LoadLib (|bool|)
 		|&&nil| Funcs 
-		|| spd = package.LibFuncLayout(&funcs).parse
-		|| globs = .LoadLibFuncs(spd, funcs)
+		|| spd = package.LibFuncLayout(funcs).parse
+		|| globs = .LoadLibFuncs(spd, funcs!)
 			.LoadLibGlobs(spd, globs)
 		if stderr.ok
 			return class.LoadInbuiltClasses

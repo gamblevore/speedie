@@ -425,7 +425,7 @@ datatype float
 	function tan (|float|)
 		return math.tan(self) //sigh
 
-	helper __sincospi (|&float| A, |&float| B)
+	helper __sincospi (|$float| A, |$float| B)
 		cpp_wrapper (__sincospif)
 	
 	function Rotation (|mat2|)

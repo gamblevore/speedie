@@ -252,7 +252,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			cpp_wrapper
 
 
-		function BackTrace (|&nil| space, |&int| size, |&cstring|) 
+		function BackTrace (|&nil| space, |$int| size, |&cstring|) 
 			cpp_wrapper JB_App__BackTrace
 
 

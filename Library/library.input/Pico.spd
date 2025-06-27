@@ -112,7 +112,7 @@ struct Pico
 		function Start
 			cpp_wrapper PicoStart
 
-		function Destroy (|&(?&pico)| Where, |Cstring| Why)
+		function Destroy (|?&pico| Where, |Cstring| Why, |?&pico|)
 			cpp_wrapper PicoDestroy
 			
 		function Replace (|&&pico| Where, |bool|)

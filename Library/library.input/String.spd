@@ -463,7 +463,7 @@ class String
 			cpp_Wrapper JB_Str_New
 		function Own (|&byte| addr,  |int| n, |string|)
 			cpp_wrapper JB_Str__Freeable
-		function Copy (|&byte| addr,  |int| n, |string|)
+		function Copy (|&nil| addr,  |int| n, |string|)
 			cpp_wrapper JB_Str_CopyFromPtr
 
 		function Wrap (|cstring| Addr, |stringzeroterminated|)

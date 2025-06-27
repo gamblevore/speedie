@@ -137,26 +137,25 @@ function Message.CanGetAddress (|SCNode| name_space, |bool|)
 	expect (T2 isnt NumberConst)        		(curr, "Can't get the address of a const.")
 	
 	if (curr == @thg) and t2.IsRegister
-		|| f = .ParentForAddress
-		expect (f == @prm or @dot) (curr, "Can't store the address of register based variables.")
-		compiler.LaterAddressChecks <~ curr
+		error (curr, "Can't get the address of local vars.")
+//		compiler.LaterAddressChecks <~ curr
 	
 	return true
 
 
-function Message.ParentForAddress (|syntax|)
-	opt norefcounts
-	|| gotaddr = 0
-	|| p = .parent
-	while p
-		|| f = p.func
-		if (f != @Bra and @Type)
-			if p.IsAddr
-				gotaddr++
-				require gotaddr <= 1
-			  else
-				return p.func
-		p = p.parent
+//function Message.ParentForAddress (|syntax|)
+//	opt norefcounts
+//	|| gotaddr = 0
+//	|| p = .parent
+//	while p
+//		|| f = p.func
+//		if (f != @Bra and @Type)
+//			if p.IsAddr
+//				gotaddr++
+//				require gotaddr <= 1
+//			  else
+//				return p.func
+//		p = p.parent
 
 
 function DollaDolla (|message| exp, |SCNode| name_space, |SCObject|)

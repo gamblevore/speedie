@@ -16,7 +16,6 @@ class Window (GUIControl)
 	|InlineEditor|						InlineEditorPlace
 	|GUIMouseMoveEvent?|				OnMouseMove
 	|list of TaskGUI|					Tasks
-//	|list of TaskGUI|					Animations // add this later!
 	|object?|							ReturnValue
 	|date|								CreatedDate
 	|uint64|							FrameCount
@@ -508,6 +507,8 @@ class Window (GUIControl)
 
 	helper RunWindowTasks (|bool| WantAnims)
 		opt norefcounts
+		// wait, WantAnims (animated) isnt used? 
+		// does that mean this is being called more than it should?
 		for p in .Tasks
 			|| IsAnim = p is animation 
 			if IsAnim == WantAnims
@@ -545,9 +546,6 @@ class Window (GUIControl)
 		|object|					LeakedTestObj
 		|GUIControl|				ActiveControl
 		|guicontrol of Window|		All = guicontrol(nil)
-	
-//		function Count (|int|)
-//			return .all.SlowCount
 		
 		function Front (|Window|)
 			return  .all.last
@@ -574,19 +572,22 @@ struct SDL_SysWMinfo
 	|byte[56]|	Buffer
 
 
+
 struct SDL_DisplayMode
 	linkage: wrapper
-	|uint| format
-	|int| w 
-	|int| h
-	|int| refresh_rate
-	|&nil| driverdata
+	|uint|	format
+	|int|	w 
+	|int|	h
+	|int|	refresh_rate
+	|&nil|	driverdata
+
 
 
 struct SDL_Renderer
 	linkage: wrapper
 	destructor
 		cpp_wrapper SDL_DestroyRenderer
+
 
 
 struct SDL_Texture
@@ -597,11 +598,12 @@ struct SDL_Texture
 	function UnlockThatCopiesEvenThoughItShouldnt
 		cpp_wrapper SDL_UnlockTexture
 	
-	function LockThatZerosEvenThoughItShouldnt (|?&ivec4| b, |&&nil| p, |&int| n)
+	function LockThatZerosEvenThoughItShouldnt (|?&nil| rect, |$(?&nil)| p, |$int| n)
 		cpp_wrapper SDL_LockTexture
 		
 	destructor
 		.dispose
+
 
 
 function window.MouseXY (|ivec2|)

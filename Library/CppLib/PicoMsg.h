@@ -855,13 +855,11 @@ extern "C" PicoComms* PicoCreate (const char* Name)  _pico_code_ (
 	return new PicoComms(PicoNoiseEvents, true, PicoDefaultInitSize, Name);
 )
 
-extern "C" void PicoDestroy (PicoComms** Ref, const char* Why=0) _pico_code_ (
+extern "C" PicoComms* PicoDestroy (PicoComms* M, const char* Why=0) _pico_code_ (
 /// Destroys the PicoComms object, and reclaims memory. Also closes the other side.
-/// Sets Ref to nullptr, to indicate that you really should not use that object!
-/// Accepts *Ref == nullptr
-	PicoComms* M = *Ref;
+/// Returns null always.
 	if (M) M->Destroy(Why);
-	*Ref = nullptr;
+	return nullptr;
 )
 
 extern "C" PicoComms* PicoStartChild (PicoComms* M) _pico_code_ (

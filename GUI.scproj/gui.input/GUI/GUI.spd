@@ -60,7 +60,7 @@ module GUI
 ///
 
 	cpp_wrapper SDL_CaptureMouse		(|bool| state, |int|) 
-	cpp_Wrapper SDL_GetMouseState		(|?&int| x, |?&int| y, |mousebutton|) 
+	cpp_Wrapper SDL_GetMouseState		(|$int| x, |$int| y, |mousebutton|) 
 	cpp_wrapper SDL_SetRelativeMouseMode (|bool| Relative)
 	cpp_wrapper SDL_WarpMouseInWindow   (|&sdl_window| window, |int| x, |int| y)
 
@@ -253,12 +253,13 @@ module GUI
 
 	function MouseXY (|ivec2|)
 		|| x = -1,  || y = -1
-		|| err = SDL_GetMouseState(&x, &y)
+		|| err = SDL_GetMouseState(x, y)
 		return (x,  y).sdlxy
 		
 		
 	function MouseButtons (|Mousebutton|)
-		return SDL_GetMouseState(nil, nil)
+		|| x = 0
+		return SDL_GetMouseState(x, x)
 
 	
 	constants
@@ -879,11 +880,12 @@ module GUI
 		opt norefcounts
 		|| stride = 0
 		|&nil| SDLBuff
-		t.lockThatZerosEventhoughItShouldnt(nil, &sdlbuff, &stride)
+		t.lockThatZerosEventhoughItShouldnt(nil, sdlbuff, stride)
 		// could use SDL_UpdateTexture instead? use my own buffer! then
 		// we don't need to lock/unlock, which uses 2x memory and DOESN'T
 		// let me get access to the old buffer! might be faster too.
-		.screen.UseExternalPointer(SDLBuff, .Screen.size.area, 4)
+		if SDLBuff?
+			.screen.UseExternalPointer(SDLBuff, .Screen.size.area, 4)
 		
 	
 	function EndFrame (|&SDL_Texture| T)
