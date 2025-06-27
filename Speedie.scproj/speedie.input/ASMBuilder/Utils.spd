@@ -1,5 +1,14 @@
 
 
+function message.MemDecl (|SCDecl!|)
+	opt norefcounts
+	while .func == @arel
+		|| n = .name[]
+		loop n == '?' or '!'
+		self = .parent!
+	return .ASMDecl
+
+
 function message.ASMDecl (|SCDecl!|)
 	opt norefcounts
 	rz = .fastdecl
@@ -29,6 +38,7 @@ function message.OperatorMul (|asm| op, |&fatasm|)
 
 target debug
 	function scdecl.ASMSanity 
+		if (self is Global) and !.ExportPosition // sigh
 		ifn .IsCarray or .PointerCount or .IsObject or .IsBareStruct
 			|| size = .type.Size
 			|| T = .TypeOnly
