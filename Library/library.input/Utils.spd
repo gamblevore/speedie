@@ -91,12 +91,14 @@ function @file.Dictionary (|file|)
 	
 function @file.Words (|file|)
 	return "/usr/share/dict/words".file
+
 		
 function string.Dict (|byte| sep='\n', |!dictionary|)
 	rz = Dictionary()
 	if self
 		for l in StringFields( self, sep )
 			rz[l] = "x"
+
 
 function string.Sort (|byte| sep = '\n', |string|)
 	|| x = .split(sep)
@@ -112,7 +114,7 @@ function Message.FindNotInserted (|message|)
 			return c
 	return self
 
-// move these to utils?
+
 function message.IsTypeOfDecl (|bool|)
 	return .WithinType(1)
 
@@ -132,7 +134,8 @@ function message.WithinType (|int| Allowed=3, |bool|)
 
 function Message.At (|int| pos, |message|)
 	return .FindTightest(pos, false, false)
-	
+
+
 helper message.FindTightest (|int| pos, |bool| named=false, |bool| SamePosition=false,  |message|) // findpos, findat
 	opt norefcounts
 	nil checker
@@ -195,6 +198,7 @@ function bool.Msg (|message|)
 datatype HumanDate (date)
 	render
 		fs.AppendLocalTime(self)
+
 
 function Faststring.syntaxappend (|humandate| d)
 	.appendlocaltime(d)

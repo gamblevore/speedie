@@ -10,6 +10,14 @@ class Cpp_Export {
 linkage
 	cpp_part		Cpp
 
+// void func(int* x);
+// function func (|&int| x)
+// function caller
+//     || y = 0
+//     func(y)
+//     func(&y)
+
+
 
 |[FastStringCpp]|					Outputs_cpp
 |[FastStringCpp]|					Outputs_h

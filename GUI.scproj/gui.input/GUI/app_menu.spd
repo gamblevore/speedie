@@ -86,11 +86,17 @@ function AppMenuQuit (GuiMenuEvent)
 
 
 function AppMenuAbout (GuiMenuEvent)
-	|| fs = faststring()
-	|| v = app.BuildConfig("version") ?? `$version`
-	|| c = app.BuildConfig("creator") ?? `$creator`
-	fs <~ "${app.filename} (${app.TimeID|int64|}) v$v, by $c."
-	beep fs
+	|| aboutstr = app.BuildConfig("about")
+	if !aboutstr
+		aboutstr = `$appname v$version $apptime.
+
+By '$creator'.`
+	aboutstr = aboutstr.ReplaceAll(`$appname`, app.filename)
+	aboutstr = aboutstr.ReplaceAll(`$apptime`, app.TimeID|int64|.render)
+	aboutstr = aboutstr.ReplaceAll(`$appdate`, app.Created.localtime)
+	aboutstr = aboutstr.ReplaceAll(`$version`, app.BuildConfig("version"))
+	aboutstr = aboutstr.ReplaceAll(`$creator`, app.BuildConfig("creator"))
+	app.alert aboutstr
 
 
 function AppMenuReturnkey (GuiListEvent)

@@ -187,7 +187,7 @@ class String
 			fs <~ '\n'
 
 	
-	function ReplaceAll (|string| from, |string| to, |bool|Lexer=false, |Faststring|fs_in=nil, |string|)
+	function ReplaceAll (|string| from, |string| to, |bool| CaseAware=false, |Faststring|fs_in=nil, |string|)
 		cpp_wrapper JB_Str_ReplaceAll
 
 	function Hex (|int|Spaces=0, |faststring| fs=nil, |string|)

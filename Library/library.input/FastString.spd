@@ -267,7 +267,6 @@ class FastString {
 	function AppendMemory (|&byte| Str, |int| N)
 		cpp_wrapper JB_FS_AppendMem_
 	
-
 	function AppendDurr (|Date| D)
 		cpp_wrapper JB_FS_AppendDurr
 
