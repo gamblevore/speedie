@@ -50,7 +50,7 @@ extend SCFunction
 		printline self
 		|| fs = faststring()
 		if i 
-			|| n = PackMaker.packfuncs.length>>1
+			|| n = PackMaker.packfuncs.length
 			fs <~ "($i / $n) "
 		.µRender(fs)
 		printline fs

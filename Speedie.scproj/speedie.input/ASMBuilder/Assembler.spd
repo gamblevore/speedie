@@ -301,11 +301,22 @@ struct Assembler
 
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
 		target debug: if !dest.reg
-		|| r = .µ(Exp, dest)
+		// OK... so... we should really do a type-cast, also.
+		
+		debugat 0
+		|| r = .µ(Exp, dest)		
+			
+		
 		if r.reg == dest.reg
-			return r
+			if dest.bitcount == r.bitcount
+				return r
+			|| f = r.fat
+			if f and .iscurr(F)	and f.IsRead
+				return dest
+		
 		|| dest2 = r.reg(dest)
 		(dest2 is temp) = (dest is temp)
+		dest2.µtype = dest.µtype 	 		// sigh. I guess we copy some wierd flags, from r into dest2
 		return .Assign(Dest2, r, exp)
 
 		
@@ -704,19 +715,6 @@ struct Assembler
 			(d is const)
 
 		|| T = D.WholeType
-
-		if v.isbig != t.isbig
-			|| f = v.fat
-			if f and .iscurr(F)	and f.IsRead
-				// so its a read, from the curr block... lets assume its ok.
-				v.µtype = t|datatypecode|
-			  else
-				// casting not quite right here.
-				// also... we just did a BOR! shouldn't that BOR do the bit reduction?
-				// seems so.
-/				|| tmp = .TempOnly(P, t.µType|asmreg|)
-				v = ASMType.TypeCastSub(self, P, tmp, v)			// Convert.
-		
 		v.TmpCheck
 		D.AsmReg = v												// update reg!
 		return v
@@ -745,7 +743,6 @@ struct Assembler
 		|| p = prms.first!
 		
 		for (a in .fn.Args) (i)
-			debugat 321
 			rz |= a.CollectASMReg << (i<<3)
 			|| v = .InlineVar(prms, p, a)
 			if v

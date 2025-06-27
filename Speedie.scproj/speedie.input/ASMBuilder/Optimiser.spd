@@ -18,11 +18,19 @@ function uint.IsTemp (|bool|)
 	return self & 1<<31
 
 
+
 function uint.OperatorSameReg (|uint| R, |bool|)
 	return self&31 == R&31
 
 
-function fatasm.OptBor (|Assembler| A)
+
+function fatasm.OptBFLG (|Assembler| A)
+	// dest, src, up, down, sign
+	return // do this later.
+
+/*
+	// this is my BOR code.
+	
 	require !.r2 and !.r3
 	|| dest = .r0
 	|| input = .r1
@@ -38,8 +46,10 @@ function fatasm.OptBor (|Assembler| A)
 	a.softernop(Self)
 	print "OptBor "
 	.DebugPrint
-	
-	
+*/
+
+
+
 function FatASM.ReplaceReg (|uint| Dest, |uint| New, |bool|)
 	dest &= 31
 	for i.reginputs in self
@@ -49,9 +59,10 @@ function FatASM.ReplaceReg (|uint| Dest, |uint| New, |bool|)
 			.InputFats &=~ (1<<i) // not sure what the fat of New is? Its not an ASMReg is it?
 
 
+
 function fatasm.MiniOpt (|Assembler| A)
 // we aren't doing a full optimiser. A few mini-opts could be nice
-	if self isa asm.borr
-		.OptBor(A)
+	if self isa asm.bflg
+		.OptBFLG(A)
 
 

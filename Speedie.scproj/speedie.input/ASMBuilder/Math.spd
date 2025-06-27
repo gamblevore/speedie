@@ -687,41 +687,49 @@ extend Assembler
 		(rz is constinput) = (dest is ConstInput)
 		rz.µtype = dest.µtype
 	
-	
-	function CanImproveAssign (|asmreg| dest, |asmreg| src, |&fatasm|)
+
+	function CanImproveAssign (|asmreg| dest, |asmreg| src, |fatasm| f, |asmreg|)
 		opt inline
-		require dest isnt temp
-		if  src is temp
-			return src.fat
-		if  src.reg > .vdecls
-			|| f = src.fat
-			if f == .last
-				return f
+		if .IsCurr(f)
+			if (src is temp) and (f isa asm.bflg)
+/				f.prms[0] = dest.reg
+				return dest
 	
 	
 	function Assign (|asmreg| dest, |asmreg| src, |message| exp, |asmreg|)  // assigns (		
 		|| sr = src.reg
 		|| dr = dest.reg
-		if !dr // ?:O
 		if sr == dr
-			return dest								// hmmm... we are already there
+// if we wanted to... we could make this stricter, just like the test below... that does bflg.
+// for now leave as is.
+// we could "unstricten" it by using f.isread
+			return dest
 
 		if (dest.IsVec != src.IsVec) and src.reg
 		if dest.IsVec
-			return exp.vmov(dest, src, asmreg(), asmreg()) * dest		
-
-		// perhaps all assigns should use 16-byte vector assign.
+			return exp.VMOV(dest, src, asmreg(), asmreg()) * dest
 		
 		if !sr										// must be assigning zero
 			return .LoadNumber(exp, 0, dest)		// More readable ASM.
 
-		|| improve = .CanImproveAssign(dest, src)
-			if improve.ResetOutput(dr)
-				return dest
+		|| f = src.fat
+			|| improve = .CanImproveAssign(dest, src, f)
+				return improve
+
+		
+		// BFLG is VERY optimisable :]
+		// prefered op for most things. Chainability of optimisations is very good.
 		
 		dest = dest.CopyConst(Src)
-		return exp.BORR(dest, src) * Dest
-		// return .BitOr(dest as asmreg.textual, src, ASMReg(), exp)
+		|| sh = src.BitCount - dest.BitCount
+		if sh >= 0
+			// leave as is
+		  elseif src.signed
+/			sh = 64 - src.bitcount
+		  else
+			sh = 0 // no point otherwise. just make the asm simpler.
+		
+		return exp.BFLG(dest, src, sh, sh, src.signed|int|) * Dest
 
 
 	function NopMinusOne (|asmreg| r, |bool|)

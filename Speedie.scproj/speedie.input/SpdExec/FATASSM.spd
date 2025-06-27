@@ -155,19 +155,6 @@ struct FatASM
 			.r0 = v
 			return true
 
-		
-	function ResetOutput (|int| reg, |bool|)
-		if .IsFunc
-			return .ResetFunctionCall(reg)
-		
-		|| o = .Outputs
-		if (o&1) and .prms[0]
-			.r0 = reg
-			return true
-		if (o&2) and .prms[1]
-			.r1 = reg
-			return true
-
 
 	function SmartFatness (|int| reg, |maybebool|)
 		opt norefcounts

@@ -111,18 +111,27 @@ function ReturnOpt (|&Assembler| self, |int| Ret, |int| bb, |bool|)
 	|| l = .last
 	
 	// seems the wrong order... it is:   bor, bor, bor, func.   Not:   func, bor, bor, bor
-	while l isa asm.BORR
-		Ret = PreOptBOR(self, l, Ret) #require
+	while l isa asm.BFLG
+		Ret = PreOptBFLG(self, l, Ret) #require
 		l--
 		
 	if l isa asm.fnc or asm.fnc3
 		return PreOptFnc(self, l, bb)
 
 
-function PreOptBOR (|&Assembler| self, |FATASM| l, |int| Ret, |int|)
+function PreOptBFLG (|&Assembler| self, |FATASM| l, |int| Ret, |int|)
 	(self)
-	require !l.prms[2]						// x = b ||| 0  -->  x = b
+	// out, in,   up, down, sign
 	require Ret == l.Reg(0)	// return x
+	|| up = l.reg(3)
+	|| down = l.reg(4)
+	
+	require up == down // needs to be the same.
+	require !up // for now, just go with 0 shift.
+	// what about the shifting? doesnt it depend on how many bits the input has?
+	// this is for a return, right? so... we can compare the bits to the number
+	// of bits used by the function's return type.
+	
 
 	rz = l.r1
 	using L // SyntaxUsingComplete needs upgrade to deref?
@@ -221,7 +230,7 @@ function TypeCastSub (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg| 
 	opt norefcounts
 	|| NewDecl = exp.ASMDecl
 	if newdecl.isbarestruct
-		return nilstrooct(self, exp, dest)
+		return NilStrooct(self, exp, dest)
 		
 	|| NewType = NewDecl.regtype
 	if !from.Reg												// x = 0|float|
@@ -244,7 +253,8 @@ function TypeCastSub (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg| 
 		return ConstConvert(self, exp, dest, from, oldtype, newtype)
 		
 	if oldtype.isfloat or newtype.isfloat
-		return exp.CONV(dest, from, oldtype.ASMConv(newtype))*dest
+		return exp.CONV(dest, from, oldtype.ASMConv(newtype)) * dest
+	
 	|| sh2 = 64 - OldType.BitCount
 	return exp.BFLG(dest, from, sh2, sh2, from.signed|int|) * dest
 
@@ -256,7 +266,7 @@ function ConstConvert  (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg
 	|| srf = from.NeedFAT
 	|| NC = New.BitCount
 	|int64| K
-	if old.isint!=new.isint
+	if old.isint != new.isint
 		K = srf.FloatIntConvConst(old, new)
 	  elseif new.isfloat
 		K = srf.FloatConvConst(NC)
