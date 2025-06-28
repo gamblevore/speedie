@@ -57,15 +57,15 @@ extend Assembler
 			|| offset = 0
 			if Out isnt ContainsAddr
 				if From is ContainsAddr
-					from = .InlineOffsetOpt(from, 3, offset, 13~bits, P.MemDecl)
+					from = .InlineOffsetOpt(from, 3, offset, 13~bits, P.ASMDecl)
 					return exp.RFRD(Out, From, 1, offset)			// mem to reg
 				return exp.RFST(Out, From)							// reg to reg
 			
-			|| glob = DestMsg.MemDecl
+			|| glob = DestMsg.ASMDecl
 			if  From is ContainsAddr
 				|| where = .Temponly(P)
 				where.µtype = datatypecode._voidptr
-				From = .Read(where, P, From, nil, p.MemDecl) * where// (mem to reg)?
+				From = .Read(where, P, From, nil, p.ASMDecl) * where// (mem to reg)?
 
 			out = .InlineOffsetOpt(Out, 3, offset, 13~bits, glob)
 			return exp.RFWR(Out, From, 1, offset)					// reg to mem

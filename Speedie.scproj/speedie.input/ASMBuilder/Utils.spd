@@ -1,17 +1,15 @@
 
 
-function message.MemDecl (|SCDecl!|)
-	opt norefcounts
-	while .func == @arel
-		|| n = .name[]
-		loop n == '?' or '!'
-		self = .parent!
-	return .ASMDecl
-
 
 function message.ASMDecl (|SCDecl!|)
 	opt norefcounts
 	rz = .fastdecl
+	if (rz is Global) and !rz.ExportPosition // oof
+		|| P = .first
+			rz.ExportPosition = p.ASMDecl.ExportPosition
+			target debug:  if !rz.ExportPosition // oof
+				
+		
 	if rz.typeonly == datatypecode.unusedtype
 		rz.wholetype = rz.CalculateASMType
 	target debug: rz.ASMSanity
@@ -38,8 +36,7 @@ function message.OperatorMul (|asm| op, |&fatasm|)
 
 target debug
 	function scdecl.ASMSanity 
-		if (self is Global) and !.ExportPosition // sigh
-		ifn .IsCarray or .PointerCount or .IsObject or .IsBareStruct
+		ifn  .IsCarray  or  .PointerCount  or  .IsObject  or  .IsBareStruct
 			|| size = .type.Size
 			|| T = .TypeOnly
 			if T is Vec3 or ivec3
@@ -129,6 +126,7 @@ function SCFunction.ASMReturn (|scdecl|)
 function SCFunction.RealReturnType (|scdecl|)
 	opt norefcounts
 	|| T = .returntype
+	// if t is returnedstruct: return typevoid // better?
 	if t and t isnt ReturnedStruct
 		return T
 	return TypeVoid

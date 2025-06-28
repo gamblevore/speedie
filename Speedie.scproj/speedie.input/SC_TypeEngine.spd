@@ -902,18 +902,30 @@ function Tran_MsgList (|message| Exp)
 	scfunction.disabledpoints++
 
 
+function SCDecl.AvoidGlobals (|scdecl|)
+	if self isnt global
+		return self
+
+	return .CopyDecl // this seems to clear globalness
+	// OK... so we shouldn't return a global var for something that isn't actually a global.
+	// (a,b)(c) // the overall type shouldn't actually be a global even if a and b are globals.
+	
+	
 function SameTypeSub (|message| first,  |message| second,  |SCNode| name_space,  |scdecl|)
 	opt norefcounts
+//	if "TryImproveShiftConstants".trap
 	|| T1 = TypeOfExpr( first, name_space )
 	|| T2 = TypeOfExpr( second, name_space )
 	require t1 and t2
 	
 	if t1.isnil
 		t2.TypeMatch(t1, ktypecasttrue, first)
-		return t2
+		return t2.AvoidGlobals
+	
 	if t2.isnil
 		t1.TypeMatch(t2, ktypecasttrue, second)
-		return t1
+		return t1.AvoidGlobals
+	
 	|| Obj1 = t1.isnormalobject
 	|| Obj2 = t2.isnormalobject 
 	if Obj1 and Obj2
@@ -928,7 +940,8 @@ function SameTypeSub (|message| first,  |message| second,  |SCNode| name_space, 
 	if !rz
 		rz = t1.HighestMatch( t2 )
 		if !rz
-			return t1
+			return t1.AvoidGlobals
+	
 // make C++ happy
 	if !rz.MiniMatch(t2)
 		rz.CreateSimpleTypeCast(second)  // can delete these two things
@@ -938,9 +951,10 @@ function SameTypeSub (|message| first,  |message| second,  |SCNode| name_space, 
 
 
 function TypeOfTernary (ExprResolver)
+	opt norefcounts
 	|| list		= exp.first
 	|| params	= list.next
-	expect  list.hasany and params.haschildcount(1)  (exp, "expected: (a,b)(cond)")
+	expect  list.hasany and params.HasChildCount(1)  (exp, "expected: (a,b)(cond)")
 	
 	
 	|| first	= list.first!

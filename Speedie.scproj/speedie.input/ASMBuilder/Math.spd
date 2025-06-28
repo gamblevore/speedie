@@ -725,7 +725,7 @@ extend Assembler
 		if sh >= 0
 			// leave as is
 		  elseif src.signed
-/			sh = 64 - src.bitcount
+			sh = 64 - src.bitcount
 		  else
 			sh = 0 // no point otherwise. just make the asm simpler.
 		

@@ -303,9 +303,7 @@ struct Assembler
 		target debug: if !dest.reg
 		// OK... so... we should really do a type-cast, also.
 		
-		debugat 0
 		|| r = .µ(Exp, dest)		
-			
 		
 		if r.reg == dest.reg
 			if dest.bitcount == r.bitcount
@@ -348,7 +346,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			// if trap == 575
+			// if trap == 48492
 				
 		  else
 			opt inline
@@ -696,13 +694,40 @@ struct Assembler
 		.CloseVars(OV)
 
 	
+	function PrmPrint (|string| s)
+		opt norefcounts
+		
+		print s
+		print " "
+		printline .fn.exportname
+		
+		for (a in .fn.Args) (i)
+			print a.name
+			print ": "
+			print (a is const).render
+			print ", "
+			print (a is reference).render
+			print ", "
+			printline (a.wholetype.reg).render
+		printline s
+		printline
+		printline
+
+	
 	function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatrange| LL, |asmreg|)
 		opt norefcounts
 		LL.Start = .curr
-		|| POld = .InlineParameters(prms, fn.LinkDepth==1)
+		//if (fn ~= "SC_Reg_RegSet") and "operatorwith".trap
+		//.prmprint("---->")
+
+		|| POld = .collectasmparams
+		.InlineParameters(prms, fn.LinkDepth==1)
 		|| RealStart = .curr		// Params need to be done anyhow... so don't count them.
 		.GenASMSub(fn)
 		.RestoreParameters(POld)
+		if .collectasmparams!=pold // sigh...
+		
+		//.prmprint("<----")
 		ll.after = .curr
 		|| Result = .InlineFinishWithConsts(ll)
 		|| Grown = .CurrGain(RealStart)
@@ -740,14 +765,19 @@ struct Assembler
 			return v	
 	
 	
-	function InlineParameters (|message| prms, |bool| IsLeaf, |uint64|)
+	function CollectASMParams (|uint64|)
+		opt norefcounts
+
+		for (a in .fn.Args) (i)
+			rz |= a.CollectASMReg << (i<<3)
+
+
+	function InlineParameters (|message| prms, |bool| IsLeaf)
 		opt norefcounts
 		|| p = prms.first!
 		
-		for (a in .fn.Args) (i)
-			rz |= a.CollectASMReg << (i<<3)
+		for a in .fn.Args
 			|| v = .InlineVar(prms, p, a)
-			if v
 				0
 			  elseif IsLeaf and (a isnt altered)
 				v = .µGetASM(p, v)		// then we don't care if its a temp
@@ -762,11 +792,11 @@ struct Assembler
 
 	function RestoreParameters (|uint64| Old)
 		opt norefcounts
-		for a.backwards in .fn.Args
+		for a in .fn.Args
 			a.RestoreASM(old)
 			old >>= 8
-			.MarkDeclAsConst(a, nil, nil) // parameters can never be const anyhow
-			a.fatconstindex = 0
+			a.fatconstindex = 0		// these also should be saved!
+			a.exportposition = 0	// what about simd consts? So we need like 20-bytes per decl?
 			
 	
 	function SCDecl.CollectASMReg (|uint64|)
@@ -781,7 +811,6 @@ struct Assembler
 		(self is const) = (PP>>5)&1
 		(self is reference) = (PP>>6)&1
 
-	
 	
 	function CurrGain (|&fatasm| Start, |int|)
 		|| C = .curr
@@ -920,7 +949,7 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 		dest = asmreg.exit
 	
 	.CurrFuncGrab--
-	return fat*dest
+	return fat * dest
 		
 
 

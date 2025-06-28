@@ -202,11 +202,11 @@ datatype ASMReg (uint64)
 		return (self|uint64| >> 11)&31
 	
 	function Reg (assigns:|int|, |AsmReg|)
-		|| n = value&31
+		|| Bugged = value&31
 		self &= ~(31 << 11)|asmreg|
-		(self as= (N << 11)|asmreg|)
+		(self as= (Bugged << 11)|asmreg|)
 		(self is temp) = (value >> 31)
-		target debug: if .reg != N // what?
+		target debug: if .reg != Bugged // what?
 		return self
 
 	function SCDecl.ASMReg (assigns:|asmreg|)

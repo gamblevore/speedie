@@ -313,7 +313,7 @@ function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl|
 		dest = .TempOnly(exp, dest)
 	
 	if dest isnt set
-/		if dest is ContainsAddr // how?
+		if dest is ContainsAddr // how?
 		// dest = reff --> dest = *reff
 		return .Read(dest, exp, Reff, nil, nil) * dest
 
@@ -335,6 +335,8 @@ function Decl (fn_asm)
 	
 	|| rel = exp.last!
 	|| ty = exp.fastdecl
+	(ty isnt const), (ty isnt reference)			// sigh.
+	
 	ty.DepthOfBranch = .state.BranchDepth			// Number scheme is different. ASM doesn't use .DepthOfBranch though?
 	dest = .DeclareMe(rel, ty)
 
@@ -483,6 +485,7 @@ function GrabAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, 
 
 function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
+	// IF (EXP ~= "Bugged") and "CallFunc".trap
 	|| d = exp.ASMDecl
 	if d is local
 		if dest is ConstRequest

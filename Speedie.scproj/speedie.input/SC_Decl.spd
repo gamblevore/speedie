@@ -182,10 +182,12 @@ class SCDecl (SCObject) {
 
 	syntax is (|SCDeclInfo| d, assigns:|bool|)
 		.sanity
+		//if (d == scdeclinfo.const) and (.syntaxis(d)!=value)
+		//	if .name == "Bugged"
 		.info = .info.set(d, Value)	
 		.sanity
 
-	function sanity
+	function Sanity
 
 	function IsNil (|bool|)
 		return self == typenil
