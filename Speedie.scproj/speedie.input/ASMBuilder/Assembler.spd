@@ -275,8 +275,8 @@ struct Assembler
 				.Nop(f, depth)
 	
 	
-	function SofterNop (|FATASM| Fat)
-		fat.SetOp = asm.noop
+//	function SofterNop (|FATASM| Fat)
+//		fat.SetOp = asm.noop
 
 	
 	function AskNop (|fatasm| f)
@@ -737,7 +737,7 @@ struct Assembler
 			return Result
 	
 	
-	function UpdateInlineReg (|message| P, |asmreg| V, |scdecl| D, |asmreg|)
+	function UpdateInlineReg (|asmreg| V, |scdecl| D, |asmreg|)
 		if v is constoutput and d isnt Altered
 			(d is const)
 
@@ -785,7 +785,7 @@ struct Assembler
 				v = .DeclareMe(a.source, a)
 				v = .µInto(p, v)
 			
-			v = .UpdateInlineReg(P, V, a)
+			v = .UpdateInlineReg(V, a)
 			.MarkDeclAsConst(a, V, nil)
 			p = p.next!
 	
