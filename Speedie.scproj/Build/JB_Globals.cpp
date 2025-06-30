@@ -1039,6 +1039,8 @@ FP_NilTrackerFn SC__nil_NilTable[64];
 byte SC__nil_OldPrint;
 ArchonPurger SC__nil_T;
 ;
+byte SC__DeclAlterable_Count;
+DeclAlterable SC__DeclAlterable_Items[32];
 
 
 

@@ -273,6 +273,8 @@ struct CompressionStats;
 
 struct DDA_Caster;
 
+struct DeclAlterable;
+
 struct FakeJBString;
 
 struct FastBuff;
@@ -706,6 +708,13 @@ struct CompressionStats {
 	int In;
 	int Out;
 	bool Live;
+};
+
+struct DeclAlterable {
+	uint64 ExportPosition;
+	SCDeclInfo Info;
+	u16 FatConstIndex;
+	DataTypeCode DataType;
 };
 
 struct FakeJBString {
@@ -1166,24 +1175,21 @@ struct SCDecl_Behaviour: SCObject_Behaviour {
 };
 
 JBClass ( SCDecl , SCObject , 
+	int C_Array;
+	u16 ModuleNum;
 	NilState NilDeclared;
 	byte PointerCount;
-	byte NilReg;
-	byte NilAllocDepth;
-	byte DepthOfBranch;
-	DataTypeCode DataType;
-	u16 ModuleNum;
-	int C_Array;
-	SCDeclInfo Info;
-	int FatConstIndex;
-	SCFunction* HiderFunc;
-	JB_Object* IsLookupOnly;
-	SCDecl* Internal;
-	SCDecl* LocalVarList;
-	SCDecl* Contains;
-	Message* Default;
 	SCClass* Type;
-	uint64 ExportPosition;
+	DeclAlterable xC3xA5;
+	SCDecl* LocalVarList;
+	SCDecl* Internal;
+	SCDecl* Contains;
+	JB_Object* IsLookupOnly;
+	SCFunction* HiderFunc;
+	Message* Default;
+	byte DepthOfBranch;
+	byte NilAllocDepth;
+	byte NilReg;
 );
 
 struct SCIterator_Behaviour: SCObject_Behaviour {
@@ -3203,6 +3209,8 @@ extern FP_NilTrackerFn SC__nil_NilTable[64];
 extern byte SC__nil_OldPrint;
 extern ArchonPurger SC__nil_T;
 #define JB__MzSt_All JB__.MzSt_All
+extern byte SC__DeclAlterable_Count;
+extern DeclAlterable SC__DeclAlterable_Items[32];
 #define kSC__GUIKeyRecord_Empty ((int)0)
 
 #define kSC__GUIKeyRecord_NewlyAdded ((int)3)
@@ -6583,6 +6591,15 @@ int JB_MzSt__Init_();
 // JB_DDA_Caster
 
 
+// JB_DeclAlterable
+int SC_DeclAlterable__Init_();
+
+void SC_DeclAlterable__Restore(SCDecl* D);
+
+void SC_DeclAlterable__Save(SCDecl* D);
+
+
+
 // JB_FakeJBString
 
 
@@ -7017,6 +7034,8 @@ Message* SC_Pac_CloseOneVar(Assembler* Self, Message* Exp, int OriginalDecls, bo
 
 ASMReg SC_Pac_CloseVars(Assembler* Self, uint /*u16*/ Orig, Message* Exp, ASMReg Return);
 
+void SC_Pac_CollectASMParams(Assembler* Self);
+
 ASMReg SC_Pac_Compare(Assembler* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp, int Mode);
 
 ASMReg SC_Pac_CompareFloat(Assembler* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp, int Mode);
@@ -7038,6 +7057,8 @@ int SC_Pac_CurrGain(Assembler* Self, FatASM* Start);
 void SC_Pac_DeallocStack(Assembler* Self);
 
 ASMReg SC_Pac_DeclareMe(Assembler* Self, Message* Where, SCDecl* Type);
+
+void SC_Pac_DeclReset(Assembler* Self, SCDecl* D);
 
 void SC_Pac_DecrWithFatInt(Assembler* Self, FatASM* F, int Depth);
 
@@ -7109,7 +7130,7 @@ ASMReg SC_Pac_InlineFinishWithConsts(Assembler* Self, FatRange* R);
 
 ASMReg SC_Pac_InlineOffsetOpt(Assembler* Self, ASMReg Base, int Pow2, int& Index, uint Maximum, SCDecl* Glob);
 
-uint64 SC_Pac_InlineParameters(Assembler* Self, Message* Prms, bool IsLeaf);
+void SC_Pac_InlineParameters(Assembler* Self, Message* Prms, bool IsLeaf);
 
 ASMReg SC_Pac_InlineVar(Assembler* Self, Message* Prms, Message* M, SCDecl* A);
 
@@ -7225,7 +7246,7 @@ void SC_Pac_RegClear(Assembler* Self, Message* Exp, FatASM* C, int I);
 
 void SC_Pac_RegsBitClear(Assembler* Self, Message* Exp, FatASM* Start);
 
-void SC_Pac_RestoreParameters(Assembler* Self, uint64 Old);
+void SC_Pac_RestoreParameters(Assembler* Self);
 
 bool SC_Pac_Rework(Assembler* Self, SCFunction* Fn);
 
@@ -7281,7 +7302,7 @@ bool SC_Pac_Unchanged(Assembler* Self, Message* A, ASMReg Dest, Message* B);
 
 ASMReg SC_Pac_UniqueLocation(Assembler* Self, Message* A, ASMReg Dest, Message* B);
 
-ASMReg SC_Pac_UpdateInlineReg(Assembler* Self, Message* P, ASMReg V, SCDecl* D);
+ASMReg SC_Pac_UpdateInlineReg(Assembler* Self, ASMReg V, SCDecl* D);
 
 ASMReg SC_Pac_VecAccess(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Base, ASMReg Vara);
 
@@ -8850,6 +8871,8 @@ bool SC_Decl_AssignabilityCheck(SCDecl* Self, Message* Ln, Message* RN, SCDecl* 
 
 JB_String* SC_Decl_AutoCompleteName(SCDecl* Self);
 
+SCDecl* SC_Decl_AvoidGlobals(SCDecl* Self);
+
 void SC_Decl_BecomeReal(SCDecl* Self);
 
 int SC_Decl_BestFloat(SCDecl* Self, SCDecl* OT);
@@ -8885,8 +8908,6 @@ int SC_Decl_CArrayTotal(SCDecl* Self);
 void SC_Decl_CheckLibGlob(SCDecl* Self);
 
 SCDecl* SC_Decl_CheckMath(SCDecl* Self, Message* Exp);
-
-uint64 SC_Decl_CollectASMReg(SCDecl* Self);
 
 bool SC_Decl_CompareUnclear(SCDecl* Self, SCDecl* D, bool MakesSenseVsZero);
 
@@ -9142,13 +9163,11 @@ JB_String* SC_Decl_RenderTypeName(SCDecl* Self, FastString* Fs_in);
 
 JB_String* SC_Decl_RenderTypeNameNicer(SCDecl* Self, FastString* Fs_in);
 
-void SC_Decl_RestoreASM(SCDecl* Self, uint64 PP);
-
 bool SC_Decl_SafelyWrappable(SCDecl* Self);
 
 bool SC_Decl_SameForReplace(SCDecl* Self, SCDecl* C);
 
-void SC_Decl_sanity(SCDecl* Self);
+void SC_Decl_Sanity(SCDecl* Self);
 
 int SC_Decl_SizeOfQuery(SCDecl* Self);
 
@@ -10129,8 +10148,6 @@ void SC_Msg_MakeComment(Message* Self);
 void SC_Msg_MakeTaskVar(Message* Self, Message* Con, Message* Before, bool First);
 
 void JB_Msg_max__(Message* Self, FastString* Fs);
-
-SCDecl* SC_Msg_MemDecl(Message* Self);
 
 FatASM* SC_Msg_MEMZ(Message* Self, ASMReg R1, int Value);
 
