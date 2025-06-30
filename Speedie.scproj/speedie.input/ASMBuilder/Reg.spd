@@ -210,8 +210,8 @@ datatype ASMReg (uint64)
 		return self
 
 	function SCDecl.ASMReg (assigns:|asmreg|)
-		value.µType = .DataType
-		.datatype = value|datatypecode|
+		value.µType = .å.DataType
+		.å.DataType = value|datatypecode|
 		.WholeType.tmpcheck
 	
 	operator mul (|bool| b, |asmreg|)

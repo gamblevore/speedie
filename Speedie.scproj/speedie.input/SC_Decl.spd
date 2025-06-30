@@ -110,36 +110,33 @@ class SCDecl (SCObject) {
 	linkage
 		cpp_part			Decl
 
+	//|SCDecl|			NextContains // for multiple contains
+
 	|int|				C_Array
 	
-	|uint64|			ExportPosition	// also can store numeric constants float/int up to 64-bits
 	|SCFunction--?|		HiderFunc
 	|Object?|			IsLookupOnly
 
 	|SCDecl?|			Internal		// pointers
-//	|scdecl?|			OriginalDecl    // for grab global export position in ASM.
 	|scdecl?|			LocalVarList
-	//|SCDecl|			NextContains // for multiple contains
 	|SCDecl?|			Contains
 
 	|Message?|			Default
 	|SCClass|			Type
-	|SCDeclInfo|		Info
-	|Datatypecode|		DataType
 	|NilState|			NilDeclared
 	|Byte|				PointerCount
 	|byte|				NilReg
 	|uint16| 			ModuleNum
 	|byte| 				NilAllocDepth
 	|byte|				DepthOfBranch
-	|int|				FatConstIndex // make a uint16? later.
+	|DeclAlterable|		å // The ASM can alter these, and needs to restore them too.
 
 	
 	constructor (|scclass| type)
 		opt norefcounts
 		.type = type
 		.NilDeclared = NilState.Either
-		.info = scdeclinfo.altered // why? surely it should only be if its ACTUALLY altered??? sigh.
+		.å.info = scdeclinfo.altered // why? surely it should only be if its ACTUALLY altered??? sigh.
 		|| m = SCModule.curr
 			.ModuleNum = m.ModuleNum
 
@@ -152,23 +149,23 @@ class SCDecl (SCObject) {
 		return (.MemoryLayer.obj as SCImport)!
 	
 	function TypeOnly (|datatypecode|)
-		return .DataType & datatypecode.possiblebits
+		return .å.DataType & datatypecode.possiblebits
 	
 	setter WholeType (|asmreg|)
 		value.tmpcheck
-		.DataType = value|datatypecode|
+		.å.DataType = value|datatypecode|
 	
 	function WholeType (|asmreg|)
-		return .DataType|asmreg|
+		return .å.DataType|asmreg|
 	
 	syntax append (|SCDeclInfo| d)
 		.sanity
-		.info |= d
+		.å.info |= d
 		.sanity
 
 	function IsTypeImprove (assigns:|bool|)
 		.sanity
-		.info = .info.set(SCDeclInfo.TypeImprove, Value)		
+		.å.info = .å.info.set(SCDeclInfo.TypeImprove, Value)		
 		.sanity
 	
 	
@@ -178,13 +175,13 @@ class SCDecl (SCObject) {
 		
 	syntax is (|SCDeclInfo| d, |bool|)
 		if self
-			return .info & d
+			return .å.info & d
 
 	syntax is (|SCDeclInfo| d, assigns:|bool|)
 		.sanity
 		//if (d == scdeclinfo.const) and (.syntaxis(d)!=value)
 		//	if .name == "Bugged"
-		.info = .info.set(d, Value)	
+		.å.info = .å.info.set(d, Value)	
 		.sanity
 
 	function Sanity
@@ -214,7 +211,7 @@ class SCDecl (SCObject) {
 		return (self is local) and !(.IsBareStruct or .IsCArray)
 	
 	function SpecialRegs (|bool|)
-		return self and !.datatype.IsIntReg
+		return self and !.å.DataType.IsIntReg
 	
 	function IntRegs (|bool|)
 		return !.SpecialRegs 
@@ -393,8 +390,8 @@ class SCDecl (SCObject) {
 		dcl.Contains	= .Contains
 		dcl.internal	= .Internal
 		|| cpyflags		= scdeclinfo.DclCopied
-		dcl.info &= ~cpyflags
-		dcl.Info |= .info & cpyflags
+		dcl.å.info &= ~cpyflags
+		dcl.å.info |= .å.info & cpyflags
 		dcl.sanity
 		dcl.C_array		= .C_array
 		dcl.NilDeclared = .NilDeclared
@@ -971,7 +968,7 @@ class SCDecl (SCObject) {
 		is ExistanceAltered // just for debugging the compiler.
 		
 		rz = .CopyDecl
-		rz.info |= .info & scdeclinfo.VarType
+		rz.å.info |= .å.info & scdeclinfo.VarType
 		rz.NilDeclared = type
 
 		

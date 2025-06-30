@@ -333,7 +333,7 @@ function TypeOfChar (ExprResolver)
 		char_decl = type.typenormal.CopyDecl
 		place[] = char_decl
 		(char_decl is const)			//	compiler.NewConst(char_decl) // no!
-		char_decl.ExportPosition = cp	// nice!
+		char_decl.å.ExportPosition = cp	// nice!
 	if !IsByte
 		exp.Func = @num
 		exp.name = str	
@@ -444,7 +444,7 @@ function TypeOfUnit (ExprResolver)
 
 
 function scdecl.NumberConst (assigns:|uint64| v)
-	.ExportPosition = v
+	.å.ExportPosition = v
 	is NumberConst
 
 
@@ -1443,7 +1443,7 @@ function scdecl.ConstInRange (|message| RN, |scdecl| rt, |bool| WasHex)
 			n = rn.int
 	
 	  elseif (rn == @thg) and (rt is NumberConst) and rt.isnormalnumber and rt.isinteger
-		n = rt.ExportPosition
+		n = rt.å.ExportPosition
 		
 	if n
 		|| Bad = .ConstInRangeSub(n, washex)

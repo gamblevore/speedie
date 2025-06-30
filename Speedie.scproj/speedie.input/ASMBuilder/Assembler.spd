@@ -83,9 +83,8 @@ struct Assembler
 	function AddFuncParams (|SCFunction| fn)
 		opt NoRefCounts
 		for a in fn.Args
-			// reset.
+			.DeclReset(a)
 			(a is param)
-			(a isnt const)
 			(a isnt body)
 			.DeclareMe(a.source, a)
 	
@@ -184,7 +183,7 @@ struct Assembler
 
 
 	function TempTyped (|Message| where, |asmreg| T, |scdecl| Type,  |asmreg|)
-		t.µtype = type.datatype
+		t.µtype = type.å.DataType
 		return .TempOnly(where, t)
 	
 	
@@ -193,7 +192,7 @@ struct Assembler
 		if t isnt textual
 			// what if there is a type and its different?
 			// and if its NEVER different... why add it?
-			t.µtype = where.asmdecl.datatype
+			t.µtype = where.asmdecl.å.DataType
 		return .TempOnly(where, t)
 
 
@@ -639,11 +638,8 @@ struct Assembler
 		// || x = func(a,b,c)
 		// return x
 		// ok... as long as the next one DOESN'T return V. So returning 0, or anything else, is OK.
-
 		// OPT THIS LATER! OPTS ARE FUN! DONT DEPREIVE UR FUTURE SELF OF FUN!
-		
 		// WHY STRESS NOW JUST TO HAVE LESS FUN LATER!
-		
 
 		if  a is reference  or  a isnt altered
 			return true
@@ -720,12 +716,11 @@ struct Assembler
 		//if (fn ~= "SC_Reg_RegSet") and "operatorwith".trap
 		//.prmprint("---->")
 
-		|| POld = .collectasmparams
+		.CollectASMParams
 		.InlineParameters(prms, fn.LinkDepth==1)
 		|| RealStart = .curr		// Params need to be done anyhow... so don't count them.
 		.GenASMSub(fn)
-		.RestoreParameters(POld)
-		if .collectasmparams!=pold // sigh...
+		.RestoreParameters
 		
 		//.prmprint("<----")
 		ll.after = .curr
@@ -765,11 +760,11 @@ struct Assembler
 			return v	
 	
 	
-	function CollectASMParams (|uint64|)
+	function CollectASMParams
 		opt norefcounts
 
-		for (a in .fn.Args) (i)
-			rz |= a.CollectASMReg << (i<<3)
+		for a in .fn.Args
+			DeclAlterable.save(A)
 
 
 	function InlineParameters (|message| prms, |bool| IsLeaf)
@@ -790,13 +785,10 @@ struct Assembler
 			p = p.next!
 	
 
-	function RestoreParameters (|uint64| Old)
+	function RestoreParameters
 		opt norefcounts
-		for a in .fn.Args
-			a.RestoreASM(old)
-			old >>= 8
-			a.fatconstindex = 0		// these also should be saved!
-			a.exportposition = 0	// what about simd consts? So we need like 20-bytes per decl?
+		for a.backwards in .fn.Args
+			DeclAlterable.Restore(a)
 			
 	
 	function SCDecl.CollectASMReg (|uint64|)

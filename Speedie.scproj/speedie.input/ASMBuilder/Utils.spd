@@ -4,10 +4,10 @@
 function message.ASMDecl (|SCDecl!|)
 	opt norefcounts
 	rz = .fastdecl
-	if (rz is Global) and !rz.ExportPosition // oof
+	if (rz is Global) and !rz.å.ExportPosition // oof
 		|| P = .first
-			rz.ExportPosition = p.ASMDecl.ExportPosition
-			target debug:  if !rz.ExportPosition // oof
+			rz.å.ExportPosition = p.ASMDecl.å.ExportPosition
+			target debug:  if !rz.å.ExportPosition // oof
 				
 		
 	if rz.typeonly == datatypecode.unusedtype
@@ -108,7 +108,7 @@ function scdecl.CalculateASMType (|asmreg|)
 
 	|| t = .type
 	|| b = t.BaseType
-	if b > scnodetype.datatype
+	if b > scnodetype.DataType
 		return datatypecode._voidptr|ASMReg|
 	
 	|| I = t.typeinfo

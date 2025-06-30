@@ -99,7 +99,7 @@ function scdecl.AsConst (|message| value, |$datatypecode| Ty, |uint64| )
 	  else
 		error (value, "Not a number")
 		
-	return .exportposition
+	return .å.ExportPosition
 
 
 function SCNode.CalculateConstSub (|message!| value, |$datatypecode| Ty, |uint64|)
@@ -360,7 +360,7 @@ function scdecl.NumericCountWithBools (|int|)
 		return 1
 	if .iscarray
 		return .internal!.NumericCountWithBools
-	if .DataType & datatypecode.bool
+	if .å.DataType & datatypecode.bool
 		return 1
 	return .Type.TypeInfo.VecCount
 		

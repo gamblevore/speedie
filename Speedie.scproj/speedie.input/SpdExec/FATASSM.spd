@@ -176,7 +176,7 @@ struct FatASM
 		return 1 + self - Assembler.sh.funcstart
 
 	function SCdecl.Fat (|&fatasm|)
-		|| K = .FatConstIndex|uint|
+		|| K = .å.FatConstIndex|uint|
 		return K.fat
 
 	function uint.FAT (|&FATASM|)

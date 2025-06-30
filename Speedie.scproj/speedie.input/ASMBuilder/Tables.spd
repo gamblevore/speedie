@@ -219,7 +219,7 @@ function Return (fn_asm)
 function TypeCast (fn_asm)
 	opt norefcounts
 	|| f = exp.first!
-	dest.µtype = exp.asmdecl.datatype
+	dest.µtype = exp.asmdecl.å.DataType
 	|| fReg = .µGetASM(F, dest)
 	if fReg.µtype == dest.µtype
 		return fReg // already done!
@@ -335,9 +335,7 @@ function Decl (fn_asm)
 	
 	|| rel = exp.last!
 	|| ty = exp.fastdecl
-	(ty isnt const), (ty isnt reference)			// sigh.
-	
-	ty.DepthOfBranch = .state.BranchDepth			// Number scheme is different. ASM doesn't use .DepthOfBranch though?
+	.DeclReset(ty)
 	dest = .DeclareMe(rel, ty)
 
 	if !exp.obj or dest is CanHoist					// Huh?
@@ -396,7 +394,7 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 		if !d.PointerCount and !d.IsCarray
 	
 	if dest isnt AddrRequest
-		dest.µType = exp.ASMDecl.DataType
+		dest.µType = exp.ASMDecl.å.DataType
 		return .ReadOrWrite(Dest, exp, base, vara, d)
 		
 	dest = dest.HaveAddr
@@ -426,7 +424,7 @@ function Dot (fn_asm)										// a.b
 	|| T = prop.typeinfo
 	dest.µtype = T
 	
-	|int64| Pos = prop.ExportPosition
+	|int64| Pos = prop.å.ExportPosition
 	if (pos < 0 or pos > 1K) // what?
 	
 	if (dest is AddrRequest) or prop.IsCarray
@@ -449,7 +447,7 @@ function Num (fn_asm)
 	|| T = d.typeonly
 	dest.µtype = T
 	(dest is RealConst)
-	return .NumToReg(exp, d.ExportPosition, dest, T)
+	return .NumToReg(exp, d.å.ExportPosition, dest, T)
 
 
 function Thg (fn_asm)
@@ -465,8 +463,8 @@ function Thg (fn_asm)
 function ConstFromThgName (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
 	(dest is RealConst)
 	if dest isnt ConstRequest
-		dest.µtype = d.datatype
-		return .NumToReg(exp, d.exportposition, dest, dest.µtype)
+		dest.µtype = d.å.DataType
+		return .NumToReg(exp, d.å.ExportPosition, dest, dest.µtype)
 	return dest
 
 
@@ -521,10 +519,10 @@ function DoGlobal (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| D, 
 	
 	|| addr = .GlobAddr(d, exp, dest)
 		if dest is AddrRequest
-			addr.µtype = d.DataType
+			addr.µtype = d.å.DataType
 			return addr.HaveAddr
 		
-		dest.µtype = d.DataType
+		dest.µtype = d.å.DataType
 		dest = dest asnt ASMReg.ContainsAddr
 		return .ReadOrWrite(dest, Exp, addr, ASMReg(), d, 0)
 	
@@ -717,12 +715,12 @@ function ExistingVar (|message| m, |VarUseMode| Mode = 0, |asmreg|)
 	if fn == @thg
 		return .ExistingThg(m, mode, D)
 
-	|| H = .MegaNumFinder(d.ExportPosition, d.datatype)
+	|| H = .MegaNumFinder(d.å.ExportPosition, d.å.DataType)
 		return H
 
 	// reg0. shouldn't this be part of the meganumfinder?
-	if (d is const) and !d.ExportPosition // reg0
-		return .NumToReg(m, 0, asmreg(), d.DataType)
+	if (d is const) and !d.å.ExportPosition // reg0
+		return .NumToReg(m, 0, asmreg(), d.å.DataType)
 
 
 function Str (fn_asm)
@@ -796,7 +794,7 @@ function LocalThg (|scdecl| d, |asmreg|)
 		(t is CanHoist)
 		if d is Const
 			(t is constoutput)
-		|| fi = d.FatConstIndex
+		|| fi = d.å.FatConstIndex
 			|| f = fi|uint|.fat
 			if f is ConstOutput
 				(T is ConstOutput)
@@ -816,14 +814,14 @@ function SetDeclToConst (|scdecl| decl, |asmreg| Initial, |&fatasm| f, |bool|)
 	(decl is const)
 	if f
 		// || k = 1, k = 2, k = k + 3
-		decl.ExportPosition = f._const
+		decl.å.ExportPosition = f._const
 		if !Initial.FatIndex
-		decl.FatConstIndex = Initial.fatindex
+		decl.å.FatConstIndex = Initial.fatindex
 		return true
 
 	if !initial.reg
-		decl.exportposition = 0
-		decl.FatConstIndex = 0
+		decl.å.ExportPosition = 0
+		decl.å.FatConstIndex = 0
 		return true
 		
 	debugger // ooof? 
@@ -843,10 +841,10 @@ function MarkDeclAsConst (|scdecl| Decl, |asmreg| Initial, |asmreg| NewValue)
 		(decl isnt const)
 		if f
 			.AskNop(f)
-		decl.ExportPosition = 0
+		decl.å.ExportPosition = 0
 		|| fat = decl.fat
 		if fat and newfat != fat
-			decl.FatConstIndex = 0
+			decl.å.FatConstIndex = 0
 			.AskNop(fat)
 	
 	if NewValue

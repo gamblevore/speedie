@@ -8,7 +8,7 @@ extend Assembler
 			if (index)
 
 			expect (glob)
-			|| lost = glob.ExportPosition - bs.const
+			|| lost = glob.å.ExportPosition - bs.const
 			expect lost >= 0
 			check !(index & (pow2)~bits)  (bs.msg, "Unaligned offset.")
 
