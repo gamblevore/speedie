@@ -427,14 +427,14 @@ function scdecl.CompareUnclear (|scdecl| d, |bool| MakesSenseVsZero, |bool|)
 	
 	if (l.IsSigned and bitdiff <= 0)
 		if (self is directnumber)
-			|| x = .å.ExportPosition
+			|| x = .au.ExportPosition
 				return x|int64| < 0
 			return !MakesSenseVsZero
 		return true
 
 
 function scdecl.IsZero (|bool|)
-	return (self is directnumber) and !.å.ExportPosition
+	return (self is directnumber) and !.au.ExportPosition
 
 
 function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |message| MsgRel, |int|)
@@ -529,7 +529,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 
 
 function message.CheckConstShift (|scdecl| LC, |scdecl| RC, |bool| Bigger)
-	|int64| rk = rc.å.ExportPosition
+	|int64| rk = rc.au.ExportPosition
 	expect (rk >= 0) (self, "Invalid bit shift")
 	|| T = lc.typeinfo
 	|| BC = T.BitCount
@@ -546,9 +546,9 @@ function message.CheckConstShift (|scdecl| LC, |scdecl| RC, |bool| Bigger)
 	
 function message.TryImproveShiftConstants (|scdecl| LC, |scdecl| RC, |int|)
 	opt norefcounts
-	|| lk = lc.å.ExportPosition
+	|| lk = lc.au.ExportPosition
 	|| uk = lc is unknownconst
-	|| rk = rc.å.ExportPosition
+	|| rk = rc.au.ExportPosition
 	require (lk ||| rk) or uk
 	|| nk = lk << rk
 	|| size = nk.log2|int|
@@ -563,7 +563,7 @@ function message.TryImproveShiftConstants (|scdecl| LC, |scdecl| RC, |int|)
 	if uk
 		(ty2 is unknownconst)
 	  else
-		ty2.å.ExportPosition = nk
+		ty2.au.ExportPosition = nk
 		.become(@num, nk|int64|.render)
 		.clear
 	return customops.RecheckType

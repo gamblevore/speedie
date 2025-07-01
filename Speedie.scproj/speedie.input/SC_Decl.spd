@@ -129,14 +129,15 @@ class SCDecl (SCObject) {
 	|uint16| 			ModuleNum
 	|byte| 				NilAllocDepth
 	|byte|				DepthOfBranch
-	|DeclAlterable|		å // The ASM can alter these, and needs to restore them too.
+	|DeclAlterable|		au // The ASM can alter these, and needs to restore them too.
 
 	
 	constructor (|scclass| type)
 		opt norefcounts
 		.type = type
 		.NilDeclared = NilState.Either
-		.å.info = scdeclinfo.altered // why? surely it should only be if its ACTUALLY altered??? sigh.
+		.au.info = scdeclinfo.altered // why? surely it should only be if its ACTUALLY altered??? sigh.
+		.au.datatype = datatypecode.UnusedType
 		|| m = SCModule.curr
 			.ModuleNum = m.ModuleNum
 
@@ -149,23 +150,23 @@ class SCDecl (SCObject) {
 		return (.MemoryLayer.obj as SCImport)!
 	
 	function TypeOnly (|datatypecode|)
-		return .å.DataType & datatypecode.possiblebits
+		return .au.DataType & datatypecode.possiblebits
 	
 	setter WholeType (|asmreg|)
 		value.tmpcheck
-		.å.DataType = value|datatypecode|
+		.au.DataType = value|datatypecode|
 	
 	function WholeType (|asmreg|)
-		return .å.DataType|asmreg|
+		return .au.DataType|asmreg|
 	
 	syntax append (|SCDeclInfo| d)
 		.sanity
-		.å.info |= d
+		.au.info |= d
 		.sanity
 
 	function IsTypeImprove (assigns:|bool|)
 		.sanity
-		.å.info = .å.info.set(SCDeclInfo.TypeImprove, Value)		
+		.au.info = .au.info.set(SCDeclInfo.TypeImprove, Value)		
 		.sanity
 	
 	
@@ -175,13 +176,13 @@ class SCDecl (SCObject) {
 		
 	syntax is (|SCDeclInfo| d, |bool|)
 		if self
-			return .å.info & d
+			return .au.info & d
 
 	syntax is (|SCDeclInfo| d, assigns:|bool|)
 		.sanity
 		//if (d == scdeclinfo.const) and (.syntaxis(d)!=value)
 		//	if .name == "Bugged"
-		.å.info = .å.info.set(d, Value)	
+		.au.info = .au.info.set(d, Value)	
 		.sanity
 
 	function Sanity
@@ -211,7 +212,7 @@ class SCDecl (SCObject) {
 		return (self is local) and !(.IsBareStruct or .IsCArray)
 	
 	function SpecialRegs (|bool|)
-		return self and !.å.DataType.IsIntReg
+		return self and !.au.DataType.IsIntReg
 	
 	function IntRegs (|bool|)
 		return !.SpecialRegs 
@@ -390,8 +391,8 @@ class SCDecl (SCObject) {
 		dcl.Contains	= .Contains
 		dcl.internal	= .Internal
 		|| cpyflags		= scdeclinfo.DclCopied
-		dcl.å.info &= ~cpyflags
-		dcl.å.info |= .å.info & cpyflags
+		dcl.au.info &= ~cpyflags
+		dcl.au.info |= .au.info & cpyflags
 		dcl.sanity
 		dcl.C_array		= .C_array
 		dcl.NilDeclared = .NilDeclared
@@ -968,7 +969,7 @@ class SCDecl (SCObject) {
 		is ExistanceAltered // just for debugging the compiler.
 		
 		rz = .CopyDecl
-		rz.å.info |= .å.info & scdeclinfo.VarType
+		rz.au.info |= .au.info & scdeclinfo.VarType
 		rz.NilDeclared = type
 
 		

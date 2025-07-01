@@ -4,12 +4,12 @@
 function message.ASMDecl (|SCDecl!|)
 	opt norefcounts
 	rz = .fastdecl
-	if (rz is Global) and !rz.å.ExportPosition // oof
+	if (rz is Global) and !rz.au.ExportPosition // oof
 		|| P = .first
-			rz.å.ExportPosition = p.ASMDecl.å.ExportPosition
-			target debug:  if !rz.å.ExportPosition // oof
+			rz.au.ExportPosition = p.ASMDecl.au.ExportPosition
+			target debug:  if !rz.au.ExportPosition // oof
 				
-		
+	
 	if rz.typeonly == datatypecode.unusedtype
 		rz.wholetype = rz.CalculateASMType
 	target debug: rz.ASMSanity

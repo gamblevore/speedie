@@ -2,7 +2,7 @@
 
 struct DeclAlterable
 	|uint64|			ExportPosition
-	|scdeclinfo|		Info
+	|SCDeclInfo|		Info
 	|uint16|			FatConstIndex
 	|DataTypeCode|		DataType
 
@@ -11,24 +11,25 @@ struct DeclAlterable
 		|DeclAlterable[32]| Items
 
 
+
 function @DeclAlterable.Save (|SCDecl| d)
 	|| i = Count
 	expect (i < 32) 
 	Count = i + 1
 	|| dest = items[i]
-	dest = d.å
+	dest = d.au
 
 
 function @DeclAlterable.Restore (|SCDecl| d)
 	|| i = Count #expect
 	Count = --i
 	|| dest = items[i]
-	d.å = dest
+	d.au = dest
 
 
 function assembler.DeclReset (|scdecl| d)
-	d.å.FatConstIndex = 0
-	d.å.exportposition = 0
+	d.au.FatConstIndex = 0
+	d.au.exportposition = 0
 	(d isnt reference)
 	(d isnt const)
 	d.DepthOfBranch = .state.BranchDepth			// Number scheme is different. ASM doesn't use .DepthOfBranch though?

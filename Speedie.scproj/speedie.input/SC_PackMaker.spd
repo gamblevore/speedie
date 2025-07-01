@@ -44,12 +44,12 @@ module PackMaker
 	function OrderGlobals (|[scdecl]| List, |int|) // sortglobals, globalssort
 		opt norefcounts
 		list.sort(GlobalsSorter)
-		rz = 1				// rz = 1, so if .å.ExportPosition == 0 then something is wrong.
+		rz = 1				// rz = 1, so if .au.ExportPosition == 0 then something is wrong.
 		for (d in list)
 			|| s = d.CarraySize
 			|| s16 = s min 16
 			rz = rz align s16
-			d.å.ExportPosition = rz
+			d.au.ExportPosition = rz
 			rz += s
 	
 
@@ -78,7 +78,7 @@ module PackMaker
 		.LibGlobs.sort(GlobalsSorter)
 
 		for (g in .libglobs) (i)		// lib globs are asked for, so we'll ask for them by name.
-			g.å.ExportPosition = i + 1
+			g.au.ExportPosition = i + 1
 	
 	
 	helper SortASMFuncs (|[scfunction]| list, |?&&nil| Table)
@@ -89,7 +89,7 @@ module PackMaker
 		while (|| f = list[id])
 			f.TableID = ++id
 			|| proto = f.hasproto
-				proto.å.ExportPosition = id
+				proto.au.ExportPosition = id
 			target debug
 				if Table
 					Table[id+31] = jb_vm.Load(f.exportname)

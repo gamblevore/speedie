@@ -57,7 +57,7 @@ struct SC_Hoister
 
 
 	helper Added (|Assembler| sh, |asmreg| Dest, |scdecl| decl, |asmreg| K)
-		decl.å.FatConstIndex = k.fatindex
+		decl.au.FatConstIndex = k.fatindex
 
 		|| n = dest.reg
 		sh.hoist(k.fat, n)
@@ -99,13 +99,13 @@ struct SC_Hoister
 			.spare--
 			target debug: if i >= 6 // what?
 			.Consts[i] = exp
-			decl.å.FatConstIndex = -1 // mark as done.
+			decl.au.FatConstIndex = -1 // mark as done.
 
 
 	helper PostRunConst  (|Assembler| sh, |message| prop, |scdecl| decl)
 		|| dest = sh.DeclareMe(prop, decl)
 		(dest is canhoist)
-		|| K = sh.NumToReg(prop, decl.å.ExportPosition, dest, dest.µtype)
+		|| K = sh.NumToReg(prop, decl.au.ExportPosition, dest, dest.µtype)
 		.Added(sh, dest, decl, K)
 			
 
@@ -114,13 +114,13 @@ struct SC_Hoister
 	// And what if its pre-hoisted?
 	helper DidReuseConst (|SCDecl| decl, |bool|)
 		opt NoRefCounts
-/		|| k = decl.å.ExportPosition
+/		|| k = decl.au.ExportPosition
 		if !k
 			return true
 		for old in Assembler.sh
 			if old._Const == K
 				old.µRefCount++
-				decl.å.FatConstIndex = old.Index
+				decl.au.FatConstIndex = old.Index
 				return true
 
 
@@ -175,7 +175,7 @@ function message.Declable (|message!|)
 extend Assembler {
 
 function TryGetGlob (|SCDecl| D, |asmreg|)
-	|uint64| find = d.å.ExportPosition
+	|uint64| find = d.au.ExportPosition
 	|uint64| range = 128 * d.globInfo.ByteCount
 	for old in Assembler.sh
 		if old isa asm.gtab
@@ -193,7 +193,7 @@ function GlobAddr (|scdecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 function GlobAddrSub (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
 
-	|int64| iTable = d.å.ExportPosition
+	|int64| iTable = d.au.ExportPosition
 	expect (iTable > 0)          (exp, "No global address".internal)
 	expect (iTable <= 24~bits)   (exp, "Used over 16MB of global data")
 	

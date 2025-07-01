@@ -167,7 +167,7 @@ struct Assembler
 		|| ret = .state.return
 		if ret.reg and (type is VarThatGotReturned) and (.state.fn.ReturnedVars == 1)
 			ret.µtype = T|DataTypeCode|
-			Type.wholetype = ret
+/			Type.wholetype = ret
 			
 			return ret
 		
@@ -183,7 +183,7 @@ struct Assembler
 
 
 	function TempTyped (|Message| where, |asmreg| T, |scdecl| Type,  |asmreg|)
-		t.µtype = type.å.DataType
+		t.µtype = type.au.DataType
 		return .TempOnly(where, t)
 	
 	
@@ -192,7 +192,7 @@ struct Assembler
 		if t isnt textual
 			// what if there is a type and its different?
 			// and if its NEVER different... why add it?
-			t.µtype = where.asmdecl.å.DataType
+			t.µtype = where.asmdecl.au.DataType
 		return .TempOnly(where, t)
 
 
@@ -713,8 +713,6 @@ struct Assembler
 	function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatrange| LL, |asmreg|)
 		opt norefcounts
 		LL.Start = .curr
-		//if (fn ~= "SC_Reg_RegSet") and "operatorwith".trap
-		//.prmprint("---->")
 
 		.CollectASMParams
 		.InlineParameters(prms, fn.LinkDepth==1)
@@ -722,7 +720,6 @@ struct Assembler
 		.GenASMSub(fn)
 		.RestoreParameters
 		
-		//.prmprint("<----")
 		ll.after = .curr
 		|| Result = .InlineFinishWithConsts(ll)
 		|| Grown = .CurrGain(RealStart)
@@ -799,7 +796,7 @@ struct Assembler
 	
 
 	function scdecl.RestoreASM (|uint64| PP)
-		.WholeType = .WholeType.reg(PP&31)
+/		.WholeType = .WholeType.reg(PP&31)
 		(self is const) = (PP>>5)&1
 		(self is reference) = (PP>>6)&1
 

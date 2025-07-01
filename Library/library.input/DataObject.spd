@@ -33,7 +33,7 @@ class DataObject
 	
 	constructor (|?&nil| p)
 		cpp_part ConstructorVoidPtr
-		.Kind = datatypecode.unusedtype
+		.Kind = datatypecode._voidptr
 		.PrivValue = p|int64|
 
 
