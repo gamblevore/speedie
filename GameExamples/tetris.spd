@@ -2,6 +2,7 @@
 import "GUI"
 
 // todo:
+// seems to rotate 2x per keypress when things get fast. No good!
 // pink cloudy blocks with cute faces? and hearts/rainbows/stars as they disappear
 	// Clouds via overlapping volumetric spheres and edge detection post-processing
 	// the ghost block kinda spoils the fun a bit... you end up staring at the bottom all the time.
