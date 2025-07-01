@@ -10,7 +10,7 @@ function message.ASMDecl (|SCDecl!|)
 			target debug:  if !rz.au.ExportPosition // oof
 				
 	
-	if rz.typeonly == datatypecode.unusedtype
+	if rz.typeonly == 0//datatypecode.unusedtype
 		rz.wholetype = rz.CalculateASMType
 	target debug: rz.ASMSanity
 
@@ -112,7 +112,7 @@ function scdecl.CalculateASMType (|asmreg|)
 		return datatypecode._voidptr|ASMReg|
 	
 	|| I = t.typeinfo
-	if I == datatypecode.unusedtype // what?
+	if I == 0//datatypecode.unusedtype // what?
 	return I|asmreg|
 
 

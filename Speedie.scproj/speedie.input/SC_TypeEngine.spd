@@ -913,7 +913,6 @@ function SCDecl.AvoidGlobals (|scdecl|)
 	
 function SameTypeSub (|message| first,  |message| second,  |SCNode| name_space,  |scdecl|)
 	opt norefcounts
-//	if "TryImproveShiftConstants".trap
 	|| T1 = TypeOfExpr( first, name_space )
 	|| T2 = TypeOfExpr( second, name_space )
 	require t1 and t2

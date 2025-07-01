@@ -87,7 +87,7 @@ constructor (|Message| node, |bool| HasPtrs, |scmodule| m)
 	.Modul = m
 	.IsVisible = SCNode.CurrVisibility
 	.saveas = ""
-	.TypeInfo = DataTypeCode.UnusedType
+	.TypeInfo = 0//DataTypeCode.UnusedType
 	(self is Banned) = .TestBanned
 	
 	|| T = SCDecl(self)
@@ -1043,7 +1043,7 @@ module
 	function SCClass.DataTypePostLoad
 		require .IsDataTypeOnly
 		if self ~= "_void"
-			.typeinfo = datatypecode._void
+			.typeinfo = 0//datatypecode._void
 			return
 
 		|| node = .Source!

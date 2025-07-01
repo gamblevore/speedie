@@ -196,7 +196,9 @@ module PackMaker
 			printline atomic
 		}
 	
+	
 	function MakePack 
+		compiler.During = compiler.Packing
 		Assembler.Sh.PackMakerInit			// fn_asm_table[@arg]
 		PackMaker.AddAll
 		|| pg = .SortFuncsAndBuildGlobs
@@ -204,6 +206,7 @@ module PackMaker
 		if .ActualASMCompile and Options.pack
 			.WritePackToDisk(pg)
 		}
+		compiler.During = 0
 	
 	
 	function WritePackToDisk (|int| pg)
@@ -415,4 +418,5 @@ function scdecl.CheckLibGlob
 	|bool| DebugExecute(12)			--> FB__AppOptions_noisy
 	|Charset!| CSWordStart(13)		--> Str_IsOKForImport
 */
+
 

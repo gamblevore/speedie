@@ -4,39 +4,39 @@ datatype DataTypeCode (uint16)
 	linkage
 		cpp_part TC
 
-	default UnusedType	
+	default 0	
 	constants Types
 		|DataTypeCode|
 	// 8 = "is a number" bit...
-		sign	= 64
-		byte    =               0   + 8
-		char	= 0 + 0  + 64 + 0   + 8
-		Byte2   = 1 + 0  + 0  + 0   + 8
-		Byte3   = 2 + 0  + 0  + 0   + 8
-		Byte4   = 3 + 0  + 0  + 0   + 8
-		SByte   = 0 + 0  + 64 + 0   + 8
-		SByte2  = 1 + 0  + 64 + 0   + 8
-		SByte3  = 2 + 0  + 64 + 0   + 8
-		SByte4  = 3 + 0  + 64 + 0   + 8
-		uint16  = 0 + 16 + 0  + 0   + 8
-		int16   = 0 + 16 + 64 + 0   + 8
-		s16x2   = 1 + 16 + 64 + 0   + 8
-		s16x3   = 2 + 16 + 64 + 0   + 8
-		s16x4   = 3 + 16 + 64 + 0   + 8
-		int64   = 0 + 48 + 64 + 0   + 8
-		uint64  = 0 + 48 + 0  + 0   + 8
-		iVec2   = 1 + 32 + 64 + 0   + 8
-		iVec3   = 2 + 32 + 64 + 0   + 8
-		iVec4   = 3 + 32 + 64 + 0   + 8
-		Float16  = 0 + 16 + 64 + 128 + 8
-		Float   = 0 + 32 + 64 + 128 + 8
-		Double  = 0 + 48 + 64 + 128 + 8
-		Vec2	= 1 + 32 + 64 + 128 + 8
-		Vec3    = 2 + 32 + 64 + 128 + 8 // vec3 sucks kinda
-		Vec4	= 3 + 32 + 64 + 128 + 8
-		// Mat4	// make it a struct? mat3 also?
-		Int		= 0 + 32 + 64 + 0   + 8
-		UInt	= 0 + 32 + 0  + 0   + 8
+		unsigned = 64
+		byte    = 0 + 0  + 64 + 0   + 8
+		char	= 0 + 0  + 0  + 0   + 8
+		Byte2   = 1 + 0  + 64 + 0   + 8
+		Byte3   = 2 + 0  + 64 + 0   + 8
+		Byte4   = 3 + 0  + 64 + 0   + 8
+		SByte   = 0 + 0  + 0  + 0   + 8
+		SByte2  = 1 + 0  + 0  + 0   + 8
+		SByte3  = 2 + 0  + 0  + 0   + 8
+		SByte4  = 3 + 0  + 0  + 0   + 8
+		uint16  = 0 + 16 + 64 + 0   + 8
+		int16   = 0 + 16 + 0  + 0   + 8
+		s16x2   = 1 + 16 + 0  + 0   + 8
+		s16x3   = 2 + 16 + 0  + 0   + 8
+		s16x4   = 3 + 16 + 0  + 0   + 8
+		int64   = 0 + 48 + 0  + 0   + 8
+		uint64  = 0 + 48 + 64 + 0   + 8
+		iVec2   = 1 + 32 + 0  + 0   + 8
+		iVec3   = 2 + 32 + 0  + 0   + 8
+		iVec4   = 3 + 32 + 0  + 0   + 8
+		Float16 = 0 + 16 + 0  + 128 + 8
+		Float   = 0 + 32 + 0  + 128 + 8
+		Double  = 0 + 48 + 0  + 128 + 8
+		Vec2	= 1 + 32 + 0  + 128 + 8
+		Vec3    = 2 + 32 + 0  + 128 + 8		// vec3 sucks kinda
+		Vec4	= 3 + 32 + 0  + 128 + 8
+											// Mat4	// make it a struct? mat3 also?
+		Int		= 0 + 32 + 0  + 0   + 8
+		UInt	= 0 + 32 + 64 + 0   + 8
 		bool	= 256
 		u32	 = uint
 
@@ -49,20 +49,12 @@ datatype DataTypeCode (uint16)
 		uint8 = byte
 		u16	 = uint16
 		s16	 = int16
-//		atomic_int64	= 0 + 48 + 64 + 0   + 8 + 4
-//		atomic_uint64	= 0 + 48 + 0  + 0   + 8 + 4
-//		atomic_int		= 0 + 32 + 64 + 0   + 8 + 4
-//		atomic_uint		= 0 + 32 + 0  + 0   + 8 + 4
-//		atomic_byte		=               0   + 8 + 4
 		
-		_void = 0
-		_voidptr = 48
-		cstring = 48
+		_voidptr = 112 // unsigned 64-bit non-numeric value.
+		cstring = 112 // same
 		Failed = 512
 		PossibleBits = 1023
 		Numeric = 8
-		
-		UnusedType = int64 &~ 8
 	
 	
 	function DebugPrint
@@ -134,20 +126,19 @@ datatype DataTypeCode (uint16)
 		return !.IsFloat
 	
 	function IsSigned (|bool|)
-		return (self >> 6) & 1
+		return !(self & unsigned)
+	
+	function SetSigned (|bool| HasSign, |DataTypeCode|)
+		if hasSign
+			return self  &~ unsigned
+		return self ||| unsigned
 	
 	function IsNumeric (|bool|)
-		return (self & numeric)
+		return self & numeric
 	
 	function NumericCount (|int|)
 		if (self & numeric)
 			return .VecCount
-	
-	function SetSigned (|bool| b, |DataTypeCode|)
-		if b
-			return (self) ||| (1 << 6)
-		  else
-			return (self)  &~ (1 << 6)
 	
 	function ItemBitCount (|int|)
 		return 8 << ._shift

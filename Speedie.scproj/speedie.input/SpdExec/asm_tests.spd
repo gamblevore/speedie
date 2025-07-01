@@ -102,9 +102,9 @@ function gggTest1 (|int| A, |int| B, |int|)
 	return B-1
 
 
-function gggAlter (|int| A, |int| B, |int|)
-	A++
-	if A > 0
+function gggAlter (|int| QA, |int| B, |int|)
+	QA ++
+	if QA > 0
 		return B+1
 	return B-1
 
@@ -139,6 +139,7 @@ function Inline_More
 
 	#!Set consts
 	y = gggAlter(1, 2)
+	#!ConstsTheSecond
 	y = gggAlter(-1, 2)
 	
 	#! Just alter Y

@@ -17,14 +17,18 @@ function @DeclAlterable.Save (|SCDecl| d)
 	expect (i < 32) 
 	Count = i + 1
 	|| dest = items[i]
-	dest = d.au
+	|| src = d.au
+	dest[0] = src
+
+// 	items[i] = d.au // compiler buggers this up.
+// d.au fails to get the address of item
 
 
 function @DeclAlterable.Restore (|SCDecl| d)
 	|| i = Count #expect
 	Count = --i
 	|| dest = items[i]
-	d.au = dest
+	d.au = dest[0]
 
 
 function assembler.DeclReset (|scdecl| d)

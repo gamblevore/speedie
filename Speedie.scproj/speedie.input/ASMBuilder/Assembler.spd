@@ -84,8 +84,6 @@ struct Assembler
 		opt NoRefCounts
 		for a in fn.Args
 			.DeclReset(a)
-			(a is param)
-			(a isnt body)
 			.DeclareMe(a.source, a)
 	
 	
@@ -165,16 +163,15 @@ struct Assembler
 	function DeclareMe (|Message| where,  |scdecl| Type,  |asmreg|)
 		|| t = Type.CalculateASMType
 		|| ret = .state.return
-		if ret.reg and (type is VarThatGotReturned) and (.state.fn.ReturnedVars == 1)
+		if  ret.reg  and  (type is VarThatGotReturned)  and  (.state.fn.ReturnedVars == 1)
 			ret.µtype = T|DataTypeCode|
-/			Type.wholetype = ret
-			
+			Type.wholetype = ret
 			return ret
 		
 		|| d = .VDecls|int| + 1
 		t.reg = d
 		Type.WholeType = t
-		if (d < .VTemps)
+		if  d < .VTemps
 			.Vars[d] = Type
 			.Vdecls = d
 			target debug: Type.ASMSanity
@@ -338,14 +335,14 @@ struct Assembler
 	function µGetASM (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		opt norefcounts
 		cpp_part GetASM 
-
+		
 		|| fn = fn_asm_table[exp.ASMType]!
 		target debug
 			dest.TmpCheck
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			// if trap == 48492
+//			if trap == 1069
 				
 		  else
 			opt inline
@@ -456,11 +453,6 @@ struct Assembler
 		
 		rz |= i
 
-	
-//	function DeclPrint
-//		if 0 and "InitTypes2".trap
-//			"d: ${.vdecls|int|} t: ${.vtemps|int|}"
-//			debugger
 	
 	function PrmCollect (|message| prms,  |SCFunction| fn,  |uint64|)
 		// We want a simple param order for speedie. Only sensible way to do things.
@@ -767,15 +759,31 @@ struct Assembler
 	function InlineParameters (|message| prms, |bool| IsLeaf)
 		opt norefcounts
 		|| p = prms.first!
+
+		if "Inline_More".trap
+			"-------"
 		
 		for a in .fn.Args
+//			if "Inline_More".trap
+//				debugat 3
+			
+			
 			|| v = .InlineVar(prms, p, a)
-				0
-			  elseif IsLeaf and (a isnt altered)
-				v = .µGetASM(p, v)		// then we don't care if its a temp
-			  else
+			if !v
+				|| o = .openvars
 				v = .DeclareMe(a.source, a)
-				v = .µInto(p, v)
+				if IsLeaf and a isnt altered
+					|| v2 = .µGetASM(p, v)
+					if v2.reg != v.reg
+						.closevars(o) // close the var if v2 is unused.
+					v = v2
+				  else
+					v = .µInto(p, v)
+			
+			if "Inline_More".trap
+				print a
+				print ": "
+				v.debugprint
 			
 			v = .UpdateInlineReg(V, a)
 			.MarkDeclAsConst(a, V, nil)
@@ -787,20 +795,7 @@ struct Assembler
 		for a.backwards in .fn.Args
 			DeclAlterable.Restore(a)
 			
-	
-	function SCDecl.CollectASMReg (|uint64|)
-		if self isnt param // hmm?
-		rz = .wholetype.reg
-		rz |= (self is const) << 5
-		rz |= (self is reference) << 6
-	
-
-	function scdecl.RestoreASM (|uint64| PP)
-/		.WholeType = .WholeType.reg(PP&31)
-		(self is const) = (PP>>5)&1
-		(self is reference) = (PP>>6)&1
-
-	
+		
 	function CurrGain (|&fatasm| Start, |int|)
 		|| C = .curr
 		while Start < C

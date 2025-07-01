@@ -137,7 +137,7 @@ class SCDecl (SCObject) {
 		.type = type
 		.NilDeclared = NilState.Either
 		.au.info = scdeclinfo.altered // why? surely it should only be if its ACTUALLY altered??? sigh.
-		.au.datatype = datatypecode.UnusedType
+		.au.datatype = 0//datatypecode.UnusedType
 		|| m = SCModule.curr
 			.ModuleNum = m.ModuleNum
 
@@ -180,8 +180,10 @@ class SCDecl (SCObject) {
 
 	syntax is (|SCDeclInfo| d, assigns:|bool|)
 		.sanity
-		//if (d == scdeclinfo.const) and (.syntaxis(d)!=value)
-		//	if .name == "Bugged"
+//		if (d & scdeclinfo.local) and (.syntaxis(d) != value)
+//			if (.name ~= "QA")
+//				argh = self
+//			if (.objectid == 33654202) or (compiler.During == compiler.Packing) 
 		.au.info = .au.info.set(d, Value)	
 		.sanity
 
@@ -262,7 +264,7 @@ class SCDecl (SCObject) {
 						return self
 					return o // seems simple?
 				
-			if (s &~ datatypecode.sign) == (t &~ datatypecode.sign)
+			if (s &~ datatypecode.unsigned) == (t &~ datatypecode.unsigned)
 				return self
 		|| cls = .better_numeric_sub(o, Mode, left, right)!
 		if cls.typeinfo == s
@@ -544,7 +546,7 @@ class SCDecl (SCObject) {
 			return true
 
 		require !.IsBareStruct and !.IsCArray
-		require .type.TypeInfo!=DataTypeCode.UnusedType
+		require .type.TypeInfo!=0//DataTypeCode.UnusedType
 		return true
 
 
@@ -1203,7 +1205,7 @@ class SCDecl (SCObject) {
 	function RegType (|datatypecode|)
 		opt norefcounts
 		if !self
-			return datatypecode._void
+			return 0//datatypecode._void
 		
 		|| Ty = .type
 		if ty.IsObject
@@ -1305,3 +1307,5 @@ function array.CArraySize (|[scdecl]| self, |int| size, |int|)
 		size = size align p.alignment
 		size += p.carraysize
 	return size
+
+|scdecl| argh

@@ -483,7 +483,6 @@ function GrabAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, 
 
 function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
-	// IF (EXP ~= "Bugged") and "CallFunc".trap
 	|| d = exp.ASMDecl
 	if d is local
 		if dest is ConstRequest

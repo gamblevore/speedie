@@ -127,6 +127,7 @@ linkage
 |bool|						InPerry 
 |bool| 						HasFunny
 |bool|						HasMainFunc
+|byte|						During
 |bool| 						InitedOK = true
 |int|						stClasses
 |int|						stFuncs
@@ -144,6 +145,13 @@ linkage
 
 constants
 	kTimeWidth = 19
+	Initialising
+	Import
+	Transform
+	NilChecking
+	RefCounts
+	Packing
+	CppExport
 
 
 function BuildFolder (|file|)
@@ -187,6 +195,7 @@ function CompileAll (|int|)
 	
 	if !compiler.inperry
 		if Options.ModeCpp
+			compiler.during = compiler.CppExport
 			.Timer( "Export Cpp" )
 			Cpp_Export.ExportAllSource
 
@@ -196,6 +205,7 @@ function CompileAll (|int|)
 			.TimerSub("Parse", .stParseTimeTotal)
 			.Timer( "" )
 	rz += stderr.ok
+
 
 function Projects (|String|)
 	return ._projects init file.Speediedir
@@ -382,6 +392,7 @@ function PrepareAST
 
 
 function ImportAll 
+	compiler.during = compiler.Import
 	.Timer( "Read" )
 	require .Stage( "Finding Files" )
 	
@@ -594,6 +605,7 @@ function PostInitCodeCall
 
 
 function InitCompiler
+	compiler.During = Compiler.Initialising
 	require (.Projects.fileCH("Library").mustexist) and stderr.ok
 	scoperator.Init
 	Cpp_Export.Init
@@ -723,6 +735,7 @@ function NewConst (|scdecl| d)
 
 function DoRefAnalysis
 	opt norefcounts
+	compiler.during = compiler.RefCounts
 	|[message]| list // avoid reading same thing that we alter.
 	for f in .FuncList
 		if f.IsARealSpdFunc
