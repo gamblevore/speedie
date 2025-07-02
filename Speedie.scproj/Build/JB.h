@@ -171,8 +171,6 @@ typedef ASM ASM_CmpI;
 
 typedef ASM ASM_Compare4;
 
-typedef ASM ASM_ConstGlobal;
-
 typedef ASM ASM_ConstStretchy;
 
 typedef ASM ASM_Convert;
@@ -206,6 +204,8 @@ typedef ASM ASM_Jump;
 typedef ASM ASM_Loop;
 
 typedef ASM ASM_MemUtil;
+
+typedef ASM ASM_MemoryZero;
 
 typedef ASM ASM_REQ;
 
@@ -1180,7 +1180,7 @@ JBClass ( SCDecl , SCObject ,
 	NilState NilDeclared;
 	byte PointerCount;
 	SCClass* Type;
-	DeclAlterable xC3xA5;
+	DeclAlterable au;
 	SCDecl* LocalVarList;
 	SCDecl* Internal;
 	SCDecl* Contains;
@@ -1492,10 +1492,13 @@ extern Array* SC__Comp_ClassList;
 extern SCFunction* SC__Comp_ClassListInitFunc;
 extern Message* SC__Comp_ConfMsg;
 extern Message* SC__Comp_ConstantsList;
+#define kSC__Comp_CppExport ((int)26)
+
 extern int SC__Comp_CurrStage;
 extern Array* SC__Comp_DeclConstants;
 extern SCModule* SC__Comp_DisamClasses;
 extern SCModule* SC__Comp_DisamModules;
+extern byte SC__Comp_During;
 extern Dictionary* SC__Comp_ExportNames;
 extern Message* SC__Comp_ExtendList;
 extern Array* SC__Comp_ExtendModuleList;
@@ -1509,9 +1512,13 @@ extern SCFunction* SC__Comp_fnOpMustBe;
 extern Array* SC__Comp_FuncList;
 extern bool SC__Comp_HasFunny;
 extern bool SC__Comp_HasMainFunc;
+#define kSC__Comp_Import ((int)21)
+
 extern Array* SC__Comp_ImportedList;
 extern Dictionary* SC__Comp_ImportedNames;
 extern bool SC__Comp_InitedOK;
+#define kSC__Comp_Initialising ((int)20)
+
 extern bool SC__Comp_InPerry;
 extern Dictionary* SC__Comp_InsecureWords;
 extern SCFile* SC__Comp_InternalFile;
@@ -1523,14 +1530,20 @@ extern JB_String* SC__Comp_LastTimeName;
 extern SCFunction* SC__Comp_MainFunc;
 extern Array* SC__Comp_ModuleList;
 extern SCFunction* SC__Comp_NewFunc;
+#define kSC__Comp_NilChecking ((int)23)
+
 extern Dictionary* SC__Comp_Numbers;
 extern JB_String* SC__Comp_OriginalInputPath;
+#define kSC__Comp_Packing ((int)25)
+
 extern SCFunction* SC__Comp_PrivateProperty;
 extern SCModule* SC__Comp_program;
 extern SCImport* SC__Comp_Project;
 extern JB_String* SC__Comp_ProjectName;
 extern Array* SC__Comp_ProtoTypes;
 extern SCFunction* SC__Comp_RefClear;
+#define kSC__Comp_RefCounts ((int)24)
+
 extern SCFunction* SC__Comp_RefDecr;
 extern SCFunction* SC__Comp_RefDecrMulti;
 extern SCFunction* SC__Comp_RefFreeIfDead;
@@ -1557,6 +1570,8 @@ extern JB_File* SC__Comp_TempFolder;
 extern SCFunction* SC__Comp_TernaryFunc;
 extern FastString* SC__Comp_TimerOutput;
 extern Array* SC__Comp_TodoList;
+#define kSC__Comp_Transform ((int)22)
+
 extern SCNode* SC__Comp_VisibleFuncs;
 #define kSC__CustomOps_Needed ((int)256)
 
@@ -1808,6 +1823,7 @@ extern byte SC__VM_Builder_XType;
 extern JB_String* SC___AppConfString;
 #define JB__JbinHeader JB__.JbinHeader
 #define JB__jBinNotJbin JB__.jBinNotJbin
+extern SCDecl* SC_argh;
 extern CharSet* SC_C_Letters;
 extern Dictionary* SC_ClassLinkageTable;
 extern Dictionary* SC_ClsCollectTable;
@@ -2280,7 +2296,7 @@ extern ASM_Encoder SC__ASM_Forms[128];
 
 #define kSC__ASM_LUPU ((ASM_Loop)82)
 
-#define kSC__ASM_MEMZ ((ASM_ConstGlobal)107)
+#define kSC__ASM_MEMZ ((ASM_MemoryZero)107)
 
 #define kSC__ASM_MUL ((ASM_U4)48)
 
@@ -2586,98 +2602,94 @@ extern ASM_Write SC__ASMType_WriteASM[5];
 
 #define kJB__CL1_Low ((ControlPoint)0)
 
-#define kJB__TC__void ((DataTypeCode)0)
-
-#define kJB__TC__voidptr ((DataTypeCode)48)
+#define kJB__TC__voidptr ((DataTypeCode)112)
 
 #define kJB__TC_bool ((DataTypeCode)256)
 
-#define kJB__TC_byte ((DataTypeCode)8)
+#define kJB__TC_byte ((DataTypeCode)72)
 
-#define kJB__TC_Byte2 ((DataTypeCode)9)
+#define kJB__TC_Byte2 ((DataTypeCode)73)
 
-#define kJB__TC_Byte3 ((DataTypeCode)10)
+#define kJB__TC_Byte3 ((DataTypeCode)74)
 
-#define kJB__TC_Byte4 ((DataTypeCode)11)
+#define kJB__TC_Byte4 ((DataTypeCode)75)
 
-#define kJB__TC_char ((DataTypeCode)72)
+#define kJB__TC_char ((DataTypeCode)8)
 
-#define kJB__TC_cstring ((DataTypeCode)48)
+#define kJB__TC_cstring ((DataTypeCode)112)
 
-#define kJB__TC_Double ((DataTypeCode)248)
+#define kJB__TC_Double ((DataTypeCode)184)
 
-#define kJB__TC_f16 ((DataTypeCode)216)
+#define kJB__TC_f16 ((DataTypeCode)152)
 
-#define kJB__TC_f64 ((DataTypeCode)248)
+#define kJB__TC_f64 ((DataTypeCode)184)
 
 #define kJB__TC_Failed ((DataTypeCode)512)
 
-#define kJB__TC_Float ((DataTypeCode)232)
+#define kJB__TC_Float ((DataTypeCode)168)
 
-#define kJB__TC_Float16 ((DataTypeCode)216)
+#define kJB__TC_Float16 ((DataTypeCode)152)
 
-#define kJB__TC_HFloat ((DataTypeCode)216)
+#define kJB__TC_HFloat ((DataTypeCode)152)
 
-#define kJB__TC_Int ((DataTypeCode)104)
+#define kJB__TC_Int ((DataTypeCode)40)
 
-#define kJB__TC_int16 ((DataTypeCode)88)
+#define kJB__TC_int16 ((DataTypeCode)24)
 
-#define kJB__TC_int64 ((DataTypeCode)120)
+#define kJB__TC_int64 ((DataTypeCode)56)
 
-#define kJB__TC_int8 ((DataTypeCode)72)
+#define kJB__TC_int8 ((DataTypeCode)8)
 
-#define kJB__TC_iVec2 ((DataTypeCode)105)
+#define kJB__TC_iVec2 ((DataTypeCode)41)
 
-#define kJB__TC_iVec3 ((DataTypeCode)106)
+#define kJB__TC_iVec3 ((DataTypeCode)42)
 
-#define kJB__TC_iVec4 ((DataTypeCode)107)
+#define kJB__TC_iVec4 ((DataTypeCode)43)
 
 #define kJB__TC_Numeric ((DataTypeCode)8)
 
 #define kJB__TC_PossibleBits ((DataTypeCode)1023)
 
-#define kJB__TC_s16 ((DataTypeCode)88)
+#define kJB__TC_s16 ((DataTypeCode)24)
 
-#define kJB__TC_s16x2 ((DataTypeCode)89)
+#define kJB__TC_s16x2 ((DataTypeCode)25)
 
-#define kJB__TC_s16x3 ((DataTypeCode)90)
+#define kJB__TC_s16x3 ((DataTypeCode)26)
 
-#define kJB__TC_s16x4 ((DataTypeCode)91)
+#define kJB__TC_s16x4 ((DataTypeCode)27)
 
-#define kJB__TC_s64 ((DataTypeCode)120)
+#define kJB__TC_s64 ((DataTypeCode)56)
 
-#define kJB__TC_SByte ((DataTypeCode)72)
+#define kJB__TC_SByte ((DataTypeCode)8)
 
-#define kJB__TC_SByte2 ((DataTypeCode)73)
+#define kJB__TC_SByte2 ((DataTypeCode)9)
 
-#define kJB__TC_SByte3 ((DataTypeCode)74)
+#define kJB__TC_SByte3 ((DataTypeCode)10)
 
-#define kJB__TC_SByte4 ((DataTypeCode)75)
-
-#define kJB__TC_sign ((DataTypeCode)64)
+#define kJB__TC_SByte4 ((DataTypeCode)11)
 
 extern Dictionary* JB__TC_Types_Dict;
-#define kJB__TC_u16 ((DataTypeCode)24)
+#define kJB__TC_u16 ((DataTypeCode)88)
 
-#define kJB__TC_u32 ((DataTypeCode)40)
+#define kJB__TC_u32 ((DataTypeCode)104)
 
-#define kJB__TC_u64 ((DataTypeCode)56)
+#define kJB__TC_u64 ((DataTypeCode)120)
 
-#define kJB__TC_UInt ((DataTypeCode)40)
+#define kJB__TC_UInt ((DataTypeCode)104)
 
-#define kJB__TC_uint16 ((DataTypeCode)24)
+#define kJB__TC_uint16 ((DataTypeCode)88)
 
-#define kJB__TC_uint64 ((DataTypeCode)56)
+#define kJB__TC_uint64 ((DataTypeCode)120)
 
-#define kJB__TC_uint8 ((DataTypeCode)8)
+#define kJB__TC_uint8 ((DataTypeCode)72)
 
-#define kJB__TC_UnusedType ((DataTypeCode)112)
+#define kJB__TC_unsigned ((DataTypeCode)64)
 
-#define kJB__TC_Vec2 ((DataTypeCode)233)
+#define kJB__TC_Vec2 ((DataTypeCode)169)
 
-#define kJB__TC_Vec3 ((DataTypeCode)234)
+#define kJB__TC_Vec3 ((DataTypeCode)170)
 
-#define kJB__TC_Vec4 ((DataTypeCode)235)
+#define kJB__TC_Vec4 ((DataTypeCode)171)
 
 #define kJB__Date_Highest ((int64)9223372036854775807)
 
@@ -5161,6 +5173,8 @@ int JB_int_AlignUp(int Self, int To);
 
 ASMReg SC_int_ToASM(int Self);
 
+int JB_int_ClampRange(int Self, int Low, int High);
+
 bool SC_int_IsNormalMatch(int Self);
 
 bool SC_int_IsSimpleOrPointerCast(int Self);
@@ -5310,10 +5324,6 @@ ASM SC_ASM_Compare4_LSet(ASM Self, uint Value);
 
 ASM SC_ASM_Compare4_SmallSet(ASM Self, uint Value);
 
-ASM SC_ASM_ConstGlobal_LSet(ASM Self, uint Value);
-
-ASM SC_ASM_ConstGlobal_ValueSet(ASM Self, uint Value);
-
 ASM SC_ASM_ConstStretchy_CondSet(ASM Self, uint Value);
 
 ASM SC_ASM_ConstStretchy_InvSet(ASM Self, uint Value);
@@ -5373,6 +5383,12 @@ ASM SC_ASM_Jump_JUMPSet(ASM Self, uint Value);
 ASM SC_ASM_Loop_JmpSet(ASM Self, uint Value);
 
 ASM SC_ASM_Loop_SmallSet(ASM Self, uint Value);
+
+ASM SC_ASM_MemoryZero_IndexSet(ASM Self, uint Value);
+
+ASM SC_ASM_MemoryZero_LSet(ASM Self, uint Value);
+
+ASM SC_ASM_MemoryZero_LengthSet(ASM Self, uint Value);
 
 ASM SC_ASM_MemUtil_NSet(ASM Self, uint Value);
 
@@ -5502,6 +5518,8 @@ bool SC_Reg_ConstEnough(ASMReg Self);
 ASMReg SC_Reg_ConstInputFromMath(ASMReg Self, ASMReg L, ASMReg R);
 
 ASMReg SC_Reg_CopyConst(ASMReg Self, ASMReg Src);
+
+void SC_Reg_DebugPrint(ASMReg Self);
 
 float SC_Reg_F32(ASMReg Self);
 
@@ -5742,7 +5760,7 @@ bool JB_TC_OK(uint /*DataTypeCode*/ Self);
 
 bool JB_TC_SameBasicType(uint /*DataTypeCode*/ Self, uint /*DataTypeCode*/ B);
 
-DataTypeCode JB_TC_SetSigned(uint /*DataTypeCode*/ Self, bool B);
+DataTypeCode JB_TC_SetSigned(uint /*DataTypeCode*/ Self, bool HasSign);
 
 SCClass* SC_TC_SignedStuffClass(uint /*DataTypeCode*/ Self);
 
@@ -6080,11 +6098,6 @@ ASM* JB_ASM_Compare4__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInf
 
 
 
-// ASM_ConstGlobal
-ASM* JB_ASM_ConstGlobal__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
-
-
-
 // ASM_ConstStretchy
 ASM* JB_ASM_ConstStretchy__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
@@ -6167,6 +6180,11 @@ ASM* JB_ASM_Loop__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 // ASM_MemUtil
 ASM* JB_ASM_MemUtil__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
+
+
+
+// ASM_MemoryZero
+ASM* JB_ASM_MemoryZero__Encode(FatASM* Self, ASM* Curr, ASM* After, int64 ExtraInfo);
 
 
 
@@ -6970,6 +6988,8 @@ void JB_StructSaveTest_SaveWrite(StructSaveTest* Self, ObjectSaver* Saver);
 
 
 // JB_Assembler
+ASMReg SC_Pac_AddConst(Assembler* Self, int Add, Message* Exp, ASMReg Base);
+
 void SC_Pac_AddFuncParams(Assembler* Self, SCFunction* Fn);
 
 void SC_Pac_AddLabel(Assembler* Self, Message* Ch);
@@ -9501,6 +9521,8 @@ void JB_Msg_Adj__(Message* Self, FastString* Fs);
 
 FatASM* SC_Msg_ADPK(Message* Self, ASMReg R1, ASMReg R2, int K);
 
+FatASM* SC_Msg_AFNC(Message* Self, ASMReg R1, int Library, int Index);
+
 int JB_Msg_After(Message* Self);
 
 void JB_Msg_AfterSet(Message* Self, int Value);
@@ -9669,9 +9691,9 @@ void SC_Msg_CheckNotInStateExpr(Message* Self, Message* Top);
 
 void SC_Msg_CheckSuperDotSave(Message* Self, JB_String* Name, bool ShouldBe);
 
-FatASM* SC_Msg_CLAMI(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4);
+FatASM* SC_Msg_CLAMI(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int Small);
 
-FatASM* SC_Msg_CLAMU(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4);
+FatASM* SC_Msg_CLAMU(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, int Small);
 
 void SC_Msg_Clean(Message* Self, bool Erl);
 
@@ -10149,7 +10171,7 @@ void SC_Msg_MakeTaskVar(Message* Self, Message* Con, Message* Before, bool First
 
 void JB_Msg_max__(Message* Self, FastString* Fs);
 
-FatASM* SC_Msg_MEMZ(Message* Self, ASMReg R1, int Value);
+FatASM* SC_Msg_MEMZ(Message* Self, ASMReg R1, int Index, int Length);
 
 void SC_Msg_MiniArgCpp(Message* Self, FastString* Fs);
 
@@ -12142,7 +12164,7 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 			Message* __varf1 = F->Source;
 			MessagePosition _usingf0 = ((MessagePosition){});
 			JB_Msg_SyntaxUsing(__varf1, (&_usingf0));
-			JB_Tree_SyntaxAppend(Self, (JB_Syx_Msg(kJB_SyxThg, JB_LUB[465])));
+			JB_Tree_SyntaxAppend(Self, (JB_Syx_Msg(kJB_SyxThg, JB_LUB[463])));
 			JB_MsgPos_SyntaxUsingComplete((&_usingf0), __varf1);
 			JB_MsgPos_Destructor((&_usingf0));
 		}
@@ -12151,7 +12173,7 @@ inline void SC_Msg_AddValue(Message* Self, SCFunction* F) {
 
 inline void SC_Msg_CheckFreeIfDeadValid(Message* Self) {
 	if ((!JB_Msg_EqualsSyx(Self, kJB_SyxFunc, false))) {
-		JB_Msg_Fail(Self, JB_LUB[902]);
+		JB_Msg_Fail(Self, JB_LUB[900]);
 	}
 }
 
@@ -12210,7 +12232,7 @@ inline FatASM* SC_Pac_Read(Assembler* Self, ASMReg Dest, Message* Exp, ASMReg Pt
 }
 
 inline ASMReg SC_Pac_ReadOrWrite(Assembler* Self, ASMReg Dest, Message* M, ASMReg Base, ASMReg VarAdd, SCDecl* Ty, int Index) {
-	if (SC_Reg_SyntaxIs(Dest, kSC__Reg_FromZeroMemory) or SC_Reg_SyntaxIs(Dest, kSC__Reg_Set)) {
+	if (SC_Reg_SyntaxIs(Dest, kSC__Reg_Set) or SC_Reg_SyntaxIs(Dest, kSC__Reg_FromZeroMemory)) {
 		Dest = SC_Reg_SyntaxIsSet(Dest, kSC__Reg_RealConst, true);
 	}
 	return SC_FAT_AsReg(SC_Pac_ReadOrWriteSub(Self, Dest, M, Base, VarAdd, Ty, Index), Dest);
