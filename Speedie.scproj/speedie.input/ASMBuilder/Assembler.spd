@@ -338,7 +338,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			if trap == 11883
+//			if trap == 11883
 				
 		  else
 			opt inline
@@ -371,9 +371,10 @@ struct Assembler
 	function ZeroMemory (|int| Index, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl| D, |&fatasm|)
 		expect (D) (exp)
 		check (!varadd.reg) (exp)
-		|| Amount = D.SizeOfQuery
+		|| Amount = D.SizeOfQuery #require
 
-/		if index
+		debugat 3
+		if index
 			if d isnt property							// Sigh. now what? the size isnt right?
 			|| PropSize = d.CalculateSize min 16
 			Index *= PropSize
@@ -381,8 +382,9 @@ struct Assembler
 				base = .AddConst(index, exp, base)
 				index = 0
 		
+		debugger // sigh... I want this to be simpler!
 		while
-			|| Sub = Amount min 8~bits
+			|| Sub = Amount min 256
 			Amount -= Sub
 			rz = exp.MEMZ(base, index, Sub)
 			loop Amount > 0
