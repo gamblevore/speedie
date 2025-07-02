@@ -450,17 +450,23 @@
 #define   ConstStretchy_Valueu_(x)   (((uint)((x)<<15))>>15)
 
 
-#define   ConstGlobal_Valuei       ((( int)((Op)<<13))>>15)
-#define   ConstGlobal_Valuei_(x)   ((( int)((x)<<13))>>15)
+#define   MemoryZero_Indexi       ((( int)((Op)<<13))>>24)
+#define   MemoryZero_Indexi_(x)   ((( int)((x)<<13))>>24)
 
-#define   ConstGlobal_Valueu       (((uint)((Op)<<13))>>15)
-#define   ConstGlobal_Valueu_(x)   (((uint)((x)<<13))>>15)
+#define   MemoryZero_Indexu       (((uint)((Op)<<13))>>24)
+#define   MemoryZero_Indexu_(x)   (((uint)((x)<<13))>>24)
 
-#define   ConstGlobal_Li       ((( int)((Op)<<30))>>30)
-#define   ConstGlobal_Li_(x)   ((( int)((x)<<30))>>30)
+#define   MemoryZero_Lengthi       ((( int)((Op)<<21))>>23)
+#define   MemoryZero_Lengthi_(x)   ((( int)((x)<<21))>>23)
 
-#define   ConstGlobal_Lu       (((uint)((Op)<<30))>>30)
-#define   ConstGlobal_Lu_(x)   (((uint)((x)<<30))>>30)
+#define   MemoryZero_Lengthu       (((uint)((Op)<<21))>>23)
+#define   MemoryZero_Lengthu_(x)   (((uint)((x)<<21))>>23)
+
+#define   MemoryZero_Li       ((( int)((Op)<<30))>>30)
+#define   MemoryZero_Li_(x)   ((( int)((x)<<30))>>30)
+
+#define   MemoryZero_Lu       (((uint)((Op)<<30))>>30)
+#define   MemoryZero_Lu_(x)   (((uint)((x)<<30))>>30)
 
 
 #define   AddK_Ki       ((( int)((Op)<<18))>>18)

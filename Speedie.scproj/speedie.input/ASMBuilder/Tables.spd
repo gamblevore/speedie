@@ -180,7 +180,7 @@ function NilStrooct (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg|)
 	expect ((inner == @arg) and !inner.hasany) (exp) // nil
 	|| zzeerrooo = asmreg() as asmreg.FromZeroMemory
 	zzeerrooo.reg = dest.reg
-	return .temponly(exp, zzeerrooo)
+	return zzeerrooo
 
 
 function Return (fn_asm)
@@ -513,9 +513,11 @@ function DoGlobal (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| D, 
 	target debug
 		|| d2 = exp.asmdecl
 		if !d.minimatch(d2) // Remove d2. it the same as D.
-	if dest isnt set
-		dest = .TempTyped(exp, dest)
-	
+
+	if !dest.reg or dest isnt set		// surely this is just !dest.reg?
+		dest = .TempTyped(exp, dest)	// so why test? and also, temptyped tests this already
+										// is it just for GTAB reuse? sigh.
+										
 	|| addr = .GlobAddr(d, exp, dest)
 		if dest is AddrRequest
 			addr.µtype = d.au.DataType

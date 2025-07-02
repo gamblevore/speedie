@@ -4,6 +4,7 @@ prototype fn_OpASM          (|&Assembler| self, |asmreg| dest, |asmreg| L, |asmr
 prototype fn_ASMConstifier  (|asmreg| L, |asmreg| R, |int64|)
 
 
+
 extend asmreg
 	function BoolAnswer (|asmreg|)
 		.µtype = DataTypeCode.bool
@@ -14,6 +15,7 @@ extend asmreg
 			isnt condrequest
 			is CondAnswer
 		return self 
+
 
 
 extend Assembler

@@ -129,7 +129,7 @@ struct Assembler
 	function AddToReg (|message| exp, |asmreg| Dest, |asmreg| Orig, |int64| Amount, |asmreg|)
 		if !dest or dest == asmreg()
 			dest.µtype = orig.µtype
-		dest = .temponly(exp, dest)
+		dest = .TempOnly(exp, dest)
 		|| Where = orig • dest
 		(where is realconst)
 		|| K = .NumToReg(exp, amount, where, orig.µtype)
@@ -269,12 +269,8 @@ struct Assembler
 			f.µrefcount = C
 			if C <= 0
 				.Nop(f, depth)
-	
-	
-//	function SofterNop (|FATASM| Fat)
-//		fat.SetOp = asm.noop
 
-	
+
 	function AskNop (|fatasm| f)
 		if f.µRefCount <= 0
 			.nop(f)	
@@ -342,7 +338,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-//			if trap == 1069
+			if trap == 11883
 				
 		  else
 			opt inline
@@ -350,7 +346,7 @@ struct Assembler
 		|| ss = (fn)(self, exp, dest)
 
 		target debug
-			.stacksize--
+			.StackSize--
 			if !ss.tmpcheck
 				(fn)(self, exp, dest)
 			if !ss or dest is set or ss is set
@@ -363,22 +359,47 @@ struct Assembler
 		return ss
 	
 	
+	function AddConst (|int| Add, |message| exp, |ASMReg| Base, |ASMReg|)
+		(base is NoScale)
+/		if base is temp
+			return .AddToReg(exp, base, base, Add)
+
+		|| dest = base.reg(0)
+		return .AddToReg(exp, Dest, Base, Add)
+
+	
 	function ZeroMemory (|int| Index, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl| D, |&fatasm|)
-		check (d and !index and !varadd.reg) (exp)
-		if d
-			index = d.SizeOfQuery
-			check (index < 512K and index > 0) (exp, "Can't zero that much memory")
-		return exp.MEMZ(base, index)
+		expect (D) (exp)
+		check (!varadd.reg) (exp)
+		|| Amount = D.SizeOfQuery
+
+/		if index
+			if d isnt property							// Sigh. now what? the size isnt right?
+			|| PropSize = d.CalculateSize min 16
+			Index *= PropSize
+			if index > 9~bits
+				base = .AddConst(index, exp, base)
+				index = 0
+		
+		while
+			|| Sub = Amount min 8~bits
+			Amount -= Sub
+			rz = exp.MEMZ(base, index, Sub)
+			loop Amount > 0
+			base = .AddConst(Sub, exp, base)
+
 	
 	
 	function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl?| Decl, |int| Index, |&fatasm|)
-		if dest is containsaddr
+		if dest is ContainsAddr
 			#!wait?? this is meant to be an addrrequest? not a response.
 			debugger
 		
 		if dest is FromZeroMemory
-			return .ZeroMemory(index, exp, base, varadd, Decl)
-		
+			|| fat = .ZeroMemory(index, exp, base, varadd, Decl)
+				return fat
+			dest = asmreg()
+
 		(dest asnt= asmreg.AddrRequest)
 		|| T = dest.µtype
 		|| bytes = t.ByteCount.log2
@@ -392,6 +413,7 @@ struct Assembler
 					.nop(cc)
 				index += cc.const
 				varadd = asmreg()
+		
 		//  ADDK: bs, r1, 4
 		//  RD1U: r2, bs, value, 4, 0 
 		base = .InlineOffsetOpt(Base, bytes, index, 127, Decl)
@@ -435,7 +457,7 @@ struct Assembler
 
 	function ReadOrWrite (|ASMReg| dest, |message| m, |asmreg| base, |asmreg| VarAdd, |scdecl| Ty,  |int| index=0, |asmreg|)
 		opt inline
-		if dest is FromZeroMemory or set
+		if dest is set or FromZeroMemory
 			(dest is RealConst)				// make compiler happy
 		return .ReadOrWriteSub(dest, m, base, VarAdd, ty, index) * dest
 
@@ -624,14 +646,6 @@ struct Assembler
 	
 	function CanReuseParam (|message| Prms, |scdecl| A, |asmreg| v, |bool|)
 		opt norefcounts
-		
-		// we could also allow it... if we are the last expr in the function
-		// what about returns?
-		// || x = func(a,b,c)
-		// return x
-		// ok... as long as the next one DOESN'T return V. So returning 0, or anything else, is OK.
-		// OPT THIS LATER! OPTS ARE FUN! DONT DEPREIVE UR FUTURE SELF OF FUN!
-		// WHY STRESS NOW JUST TO HAVE LESS FUN LATER!
 
 		if  a is reference  or  a isnt altered
 			return true
@@ -767,7 +781,6 @@ struct Assembler
 //			if "Inline_More".trap
 //				debugat 3
 			
-			
 			|| v = .InlineVar(prms, p, a)
 			if !v
 				|| o = .openvars
@@ -843,10 +856,9 @@ struct Assembler
 			|| h2 = h.LowestBit
 			yield .KnownValues[h2|int|.log2]!
 			h &= ~h2
-	
-	
-	
-	
+
+
+
 function SCFunction.HasCVersion (|bool|)
 	if .IsLibrary
 		return true
@@ -908,9 +920,7 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	|| Start = .curr
 	++.CurrFuncGrab
 	|| Closer = .OpenVars
-//	.declprint
 	|| P = .PrmCollect(prms, fn)
-//	.declprint
 	.CloseVars(Closer)
 	
 	if !TableID
@@ -942,8 +952,6 @@ target debug
 // Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:4, 8:0
 // There are only 4 above 6!, only 14 above 5, 75 above 4
 // almost all lib functions have 4 or less. 5 is for proj funcs.
-	
-
 	
 
 function Assembler.GenASMSub (|scfunction| fn)

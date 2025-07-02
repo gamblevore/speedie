@@ -112,6 +112,15 @@ function message.RET (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |
 }
 
 
+function message.AFNC (|asmreg| r1 = nil, |int| Library = nil, |int| Index = nil, |&fatasm|) {
+	visible
+	rz = self * asm.AFNC
+	rz.dest(0, r1)
+	rz.numinput(1) = Library
+	rz.numinput(2) = Index
+}
+
+
 function message.ALLO (|asmreg| r1 = nil, |int| Amount = nil, |&fatasm|) {
 	visible
 	rz = self * asm.ALLO
@@ -245,23 +254,25 @@ function message.DIV2 (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Sh = nil, |in
 }
 
 
-function message.CLAMI (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
+function message.CLAMI (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Small = nil, |&fatasm|) {
 	visible
 	rz = self * asm.CLAMI
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.reginput(3) = r4
+	rz.numinput(4) = Small
 }
 
 
-function message.CLAMU (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |&fatasm|) {
+function message.CLAMU (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |int| Small = nil, |&fatasm|) {
 	visible
 	rz = self * asm.CLAMU
 	rz.dest(0, r1)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.reginput(3) = r4
+	rz.numinput(4) = Small
 }
 
 
@@ -843,11 +854,12 @@ function message.CNTD (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| offset = nil,
 }
 
 
-function message.MEMZ (|asmreg| r1 = nil, |int| Value = nil, |&fatasm|) {
+function message.MEMZ (|asmreg| r1 = nil, |int| Index = nil, |int| Length = nil, |&fatasm|) {
 	visible
 	rz = self * asm.MEMZ
-	rz.dest(0, r1)
-	rz.numinput(1) = Value
+	rz.reginput(0) = r1
+	rz.numinput(1) = Index
+	rz.numinput(2) = Length
 }
 
 

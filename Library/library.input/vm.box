@@ -205,9 +205,10 @@ forms
 		Inv		1
 		Value	17
 		
-	ConstGlobal
-		r1		R
-		Value	17
+	MemoryZero
+		r1		r
+		Index	8
+		Length	9
 		
 	AddK
 		r1		R
@@ -395,10 +396,6 @@ POS 5
 									// perhaps to set simd values!
 		LoadConst(r, Op, *((uint64*)(Code)))
 		Code+=2
-
-//POS 6
-//	GMEM (ConstGlobal) // for global memory adresses
-//		LoadGConst(r, Op, *Code++)
 
 
 
@@ -615,8 +612,8 @@ POS 5
 /**/ CNTD  (CNTC)
 		IncrementAddr(r, Op, 0)
 
-/**/ MEMZ  (ConstGlobal)	// zero
-		memzero((void*)u1, L1)
+/**/ MEMZ  (MemoryZero)	// zero
+		memzero((void*)(u1+n2), L3)
 
 
 
