@@ -295,7 +295,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 
 
 prototype Thread (|pico| Comms, |int64| Data, |&nil| Argument, |bool|)
-	function Spawn (|pico| Comms, |int64| Data, |&nil| Argument,  |int| BuffBits=0, |pico|)
+	function Spawn (|pico| Comms, |int64| Data, |&nil| Argument,  |int| BuffBits=0, |&pico|)
 		description "Just a wrapper around pico.thread" 
 		|| name = (&comms.config.name[0])|cstring|
 		|| pico_out = pico.new(name.str, -1)
