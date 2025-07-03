@@ -316,22 +316,20 @@ extend Assembler
 		debugger // hmmmm. its not a pointer after all?
 
 
-	function InlineAddK (|asmreg| L, |int64| R, |asmreg| Dest, |bool|)
-		// this may be over-optimisation:   (dest.reg == l.reg) + .SmartSecretFat
-		// this allows for optimising x++, x++ --> x+=2
-		// but thats all, and it does a lot of effort to achieve this.
-		// we can't make the same effort all over for every opt we wanna make
-		// Allow as a once-off, to prove a point. Its possible but not the right way.
-		if dest.IsVec // now what?
-		
-		if (l is temp) or (dest.reg == l.reg)
-			|| fat = .SmartSecretFat(l)
-			if fat isa asm.addk
-				|| CC = fat.r2 + R
-				if CC.CanStoreAsIntImmediate
-					fat.r2 = CC
-					fat.r0 = dest
-					return true
+	function InlineAddK (|asmreg| XIn, |int64| Add, |asmreg| XOut, |bool|)
+//		x = y + 1
+//		x = x + 1
+//			-->
+//		x = y + 2
+
+		|| XY1 = .Last(asm.addk)			#require
+		if XOut.IsVec // now what?
+		|| xinreg = XIn.reg
+		require xinreg == XY1.outreg and xout.reg
+		|| add2 = XY1.reg(2) + add		
+		if add2.CanStoreAsAddK
+			xy1.r2 = add2
+			return true
 
 
 	function IntPlus     (fn_opasm)
@@ -474,7 +472,7 @@ extend Assembler
 	
 
 	function Divide (fn_opasm)
-		if r.reg == l.reg											// return 1
+		if r iz l												// return 1
 			return .SelfDivide(dest, exp)
 		if dest.isint
 			return .DivInt(dest, l, r, exp)
@@ -523,15 +521,19 @@ extend Assembler
 			r = .SmallToBig(r, l, exp)
 		
 		if 0
-			exp.DIVS(ASMReg(), ASMReg(), ASMReg(), ASMReg(), 0)
-			exp.QDIV(ASMReg(), ASMReg(), ASMReg(), ASMReg(), 0)
-		return exp.DIV(dest, ASMReg(), l, r, dest.signed|int|).Vectorisesmall(dest, asm.qdiv, asm.divs)
+			exp.DIVS
+			exp.QDIV
+		|| fat = exp.DIV(dest, ASMReg(), l, r, dest.signed|int|)
+		fat.outputs &= ~2 // clear this output
+		return fat.Vectorisesmall(dest, asm.qdiv, asm.divs)
 
 
 	function ModInt    (fn_opasm)
 		if dest is ConstOutput
 			return .MakeConstFromTwo(dest, L, R, exp, ConstifyIntMod)
-		return exp.DIV(asmreg(), dest, L, R, dest.signed|int|) * Dest
+		|| fat = exp.DIV(asmreg(), dest, L, R, dest.signed|int|)
+		fat.outputs &= ~1 // clear unused output 
+		return fat.Vectorisesmall(dest, asm.qdiv, asm.divs)
 
 
 	function ModFloat    (fn_opasm)
@@ -561,7 +563,7 @@ extend Assembler
 	function BitXor (fn_opasm)
 		if dest is ConstOutput
 			return .MakeConstFromTwo(dest, l, r, exp, ConstifyBitXor)
-		if (l.reg == r.reg)
+		if (l iz r)
 			return .Zeros(dest)
 		if !l.reg
 			return r
@@ -644,10 +646,42 @@ extend Assembler
 		return fat * Dest
 
 
+	function BFLG_RightConst  (|message| exp, |asmreg| dest, |asmreg| Src, |uint| down, |asmreg|)
+		// x = y << 1				// doesn't care about sign
+		// x = x >> 1				// does
+		// -->
+		// bflg: x, y, 1, 1
+/*
+	x = (x << 9)			>> 5
+	x = (x << 9) >> 7       >> 4
+	x = (x >> 7)            >> 3
+*/
+
+		|| xy1 = .last(asm.bflg)$ // what about qflg. allow both?
+		require xy1.outreg == src.reg
+		require (src is temp) or (dest iz src)
+
+		// src is temp:     dest = (will_be_temp<<3) >> kDown
+		// dest iz src:     dest = y << 3,  dest = dest >> 3
+		
+		|| sign = xy1.Prms[4] > 0 // dest0, src1, up2, down3, sign4
+		require (sign == src.signed) or !xy1.prms[3]
+		
+		if src is temp
+			xy1.Dest(0, dest)
+		xy1.prms[3] += down
+		return dest
+		
+		
+		
 	function SHR  (fn_opasm)
 		if dest is ConstOutput
 			return .MakeConstFromTwo(dest, l, r, exp, (ConstifyBitSHS, ConstifyBitSHR)(l.signed))
 		|| K = .const(R, 6, false)
+			if k == 0
+				return L
+			|| Opt = .BFLG_RightConst(exp, dest, l, k)
+				return Opt
 			return .BFLG_Const(exp, dest, l, 0, k)
 		
 		|| fat = exp.BRSH(dest, L, R, l.bitloss)
@@ -672,6 +706,7 @@ extend Assembler
 		|uint| SrcBits = src.BitCount
 		if up > srcbits or down > SrcBits			// wierd?
 			problem (exp, "Shift too far")
+		
 		if !up and !down
 			return .assign(dest, src, exp)
 		
@@ -681,7 +716,8 @@ extend Assembler
 		if  !src.reg  or  (up >= 64)  or  (!src.signed and down >= 64)
 			return .zeros(dest)
 	
-		return exp.BFLG(dest,  src,  up,  down,  src.signed|int|) * dest
+		|| fat = exp.BFLG(dest,  src,  up,  down,  src.signed|int|) 
+		return fat.vectorise(dest, asm.QFLG)
 
 
 	function Zeros (|asmreg| dest, |asmreg|)
@@ -694,7 +730,7 @@ extend Assembler
 		opt inline
 		if .IsCurr(f)
 			if (src is temp) and (f isa asm.bflg)
-/				f.prms[0] = dest.reg
+				f.prms[0] = dest.reg
 				return dest
 	
 	

@@ -208,7 +208,7 @@ function AskConst (|int| x)
 	|| z = x << y
 
 
-function AddK
+function AddK 
 	|| y = 1
 	|| x = (1+y)+1
 

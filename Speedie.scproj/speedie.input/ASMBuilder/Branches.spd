@@ -278,7 +278,7 @@ helper ASMBoolBadnessMadness (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |AS
 	|| ml = .ExistingVar(A, varusemode.Sometimes)
 	|| mr = .ExistingVar(B, varusemode.Sometimes)
 	
-	if ml and (ml.reg == mr.reg)
+	if ml and (ml iz mr)
 		return .ASMBoolShrink(exp, dest, ml)
 
 	if (dest isnt condrequest) and (ml.isboolV and mr.isboolV) 

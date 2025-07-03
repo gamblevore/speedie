@@ -143,7 +143,7 @@ forms
 
 	CNTC
 		r1		R
-		r2		R
+		r2		r
 		offset	6
 		cnst	6
 		size	2 // 1, 2, 4, 8
@@ -207,8 +207,8 @@ forms
 		
 	MemoryZero
 		r1		r
-		Index	8
-		Length	9
+		Index	9
+		Length	10
 		
 	AddK
 		r1		R
@@ -606,14 +606,14 @@ POS 5
 		mem1(ivec4) = (ivec4)(((ivec4*)r)[n1])
 		mem2(ivec4)
 
-/**/ CNTC  (CNTC) // negation bound CNTC and CNTD. CNTD must always be following.
+/**/ CNTC  (CNTC)
 		IncrementAddr(r, Op, 1) // same with a few others actually
 
 /**/ CNTD  (CNTC)
 		IncrementAddr(r, Op, 0)
 
 /**/ MEMZ  (MemoryZero)	// zero
-		memzero((void*)(u1+n2), L3)
+		memzero((void*)(u1+memz2(u2)), L3)
 
 
 

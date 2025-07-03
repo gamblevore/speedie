@@ -51,7 +51,7 @@ extend Assembler
 			|| Out = .µGetASM(DestMsg, ASMReg.AddrRequest)
 			|| P = prms.second!
 			|| From = .µ(P, ASMReg.AddrRequest)
-			if out.reg == from.reg
+			if out iz from
 				return exp.noop // wat?
 			
 			|| offset = 0

@@ -47,7 +47,6 @@ struct Assembler
 	
 
 	module
-		//|SC_Hoister|				WhileHoister
 		|Assembler|					Sh
 		|memory of fatasm|			JSM = FatASM[0]!
 		|memory of fatasm|			HoistSpace = FatASM[0]!
@@ -120,7 +119,7 @@ struct Assembler
 
 
 	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| ToGrow,  |int64| Value,  |asmreg|)
-		if togrow.isint and value.CanStoreAsIntImmediate and !dest.IsVec
+		if togrow.isint and value.CanStoreAsAddK and !dest.IsVec
 			return exp.ADPK(dest, ToGrow, Value) * Dest
 		.Assign(dest, ToGrow, exp)
 		rz = .IncrPre(exp, togrow, ToGrow, value)
@@ -297,7 +296,7 @@ struct Assembler
 		
 		|| r = .µ(Exp, dest)		
 		
-		if r.reg == dest.reg
+		if r iz dest
 			if dest.bitcount == r.bitcount
 				return r
 			|| f = r.fat
@@ -360,33 +359,33 @@ struct Assembler
 	
 	
 	function AddConst (|int| Add, |message| exp, |ASMReg| Base, |ASMReg|)
+		|| dest = base
+		if base isnt temp
+			dest.reg = 0
+		
 		(base is NoScale)
-/		if base is temp
-			return .AddToReg(exp, base, base, Add)
-
-		|| dest = base.reg(0)
-		return .AddToReg(exp, Dest, Base, Add)
+		return .AddToReg(exp, dest, base, Add)
 
 	
 	function ZeroMemory (|int| Index, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl| D, |&fatasm|)
 		expect (D) (exp)
 		check (!varadd.reg) (exp)
-		|| Amount = D.SizeOfQuery #require
+		|| Amount = D.SizeOfQuery						#require
+		expect (Amount < 4096) (exp, "Object too large to clear via ASM.") // can re-write this to generate a loop.
 
-		debugat 3
 		if index
 			if d isnt property							// Sigh. now what? the size isnt right?
 			|| PropSize = d.CalculateSize min 16
 			Index *= PropSize
-			if index > 9~bits
+			if index|uint| > (9~bits)|uint|
 				base = .AddConst(index, exp, base)
 				index = 0
 		
-		debugger // sigh... I want this to be simpler!
 		while
-			|| Sub = Amount min 256
+			|| Sub = Amount min (1<<10)
 			Amount -= Sub
-			rz = exp.MEMZ(base, index, Sub)
+			
+			rz = exp.MEMZ(base, index, Sub & 10~bits)		// VM treats 0 as the biggest num
 			loop Amount > 0
 			base = .AddConst(Sub, exp, base)
 
@@ -618,7 +617,8 @@ struct Assembler
 				arg.position = 0 // skip error detection
 		Arg.EROR(A,A,A,A,0)
 
-	
+
+/*	
 	function SmartSecretFat (|asmreg| Thg, |&fatasm|)
 		|| F = thg.fat
 			return F
@@ -634,6 +634,7 @@ struct Assembler
 				return where
 			// now what?
 			Where--
+*/
 
 
 /* The .asint/.asfloat functions should be recognised as working on constants? Or is that just a general case of inline functions? Technically, its an inline func that does nothing, just returns the original... with a different type. */
@@ -653,12 +654,11 @@ struct Assembler
 			return true
 
 		|| vr = v.reg
-		require vr
-		require (.state.return.reg == vr)
+		require vr and (.state.return iz vr)
 
 		for p.fast in prms
 			// check for the address of the same var?
-			if .ExistingVar(p).reg == vr
+			if .ExistingVar(p) iz vr
 				require !rz
 				rz = true
 	

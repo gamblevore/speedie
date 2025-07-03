@@ -402,12 +402,10 @@ datatype float
 	render PC // operator percent, operator pc 
 		if !self
 			fs <~ "0"
+		  elseif self < 0.001
+			fs <~ "<0.1"
 		  else
-			self = (self * 1000.0).floor*0.1
-			if !self
-				fs <~ "<0.1"
-			  else
-				fs <~ self
+			fs.appendfloat(self*100.0, 1)
 		fs <~ "%"
 
 	function cos (|float|)

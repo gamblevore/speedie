@@ -450,8 +450,8 @@ AlwaysInline void IncrementAddr (VMRegister* r, ASM Op, bool UseOld) {
 	int Size = CNTC_sizeu;
 	int Off  = (int)(CNTC_offsetu);
 	int Add  = CNTC_cnsti;
-	auto PP = (uint*)(p1(u8) + (Off << Size));
-	auto ni = n2;
+	auto PP = (uint*)(p2(u8) + (Off << Size));
+	auto ni = n1;
 	auto Result = &(r[ni].Uint);
 	uint64 Old;
 	uint64 New;

@@ -34,7 +34,10 @@ u64 JB_MemUsedString();
 u64 JB_MemUsedOther();
 
 #define MemZero(Where) (memzero(Where, sizeof(Where)))
-inline void memzero(void* Where, int N) {
+inline int memz2 (int x) {
+	return (x) | ((!x)<<9);
+}
+inline void memzero (void* Where, int N) {
     memset(Where, 0, N);
 }
 

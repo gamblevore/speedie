@@ -46,12 +46,6 @@ struct FatASM
 			.prms[i] = 0
 		.BasicBlock = 0
 		.µrefcount = 0
-	
-	function Out (|uint|)
-		|| a = .Outputs|int|.LowestBit
-			a = a.log2
-			if a != 0 // asm.div?
-			return .prms[a]		
 		
 	function Input (|int| i, |&fatasm|)
 		|| r = (.prms[i] << 1) >> 16
@@ -145,17 +139,18 @@ struct FatASM
 	setter Debug (|message|)
 		.msg = Value
 	
-	function ResetFunctionCall (|int| reg, |bool|)
-		// we will be the last instruction
-		// so how can we reset this? I thinkonly by comparing the
-		// state's vdecls. Temps will disappear.
-		|| v = Assembler.sh.VDecls
-		if v == reg and v == (.r0 - 1)
-			.Outputs = v|int|.log2
-			.r0 = v
-			return true
+//	function ResetFunctionCall (|int| reg, |bool|)
+//		// we will be the last instruction
+//		// so how can we reset this? I thinkonly by comparing the
+//		// state's vdecls. Temps will disappear.
+//		|| v = Assembler.sh.VDecls
+//		if v == reg and v == (.r0 - 1)
+//			.Outputs = v|int|.log2
+//			.r0 = v
+//			return true
 
 
+/*
 	function SmartFatness (|int| reg, |maybebool|)
 		opt norefcounts
 		|| f = .form
@@ -164,6 +159,7 @@ struct FatASM
 				|| p = f.Params[i]
 				if p.IsReg
 					return (p is Output)|maybebool|
+*/
 
 	syntax equals (|int| ID, |bool| aware, |bool|)
 		(aware), return .id == ID
@@ -329,18 +325,20 @@ struct FatASM
 		opt inline
 		return .step(1)
 
+	function OutReg (|uint|)
+		return .prms[0] & 31
+
 	function Reg (|int| i, |int|)
 		return .prms[i] & 31 // remove tmpbit + fatindex
 		
 	function CheckHasOutput 
-		opt inline, opt norefcounts
-		target debug
-			// why not use .outputs?
-			if !.Reg(0)
-				|| P = .form.params[0]
-				if  p is output//  and  p isnt optional 
-					error (self, "Missing ASM output")
-	
+		opt inline
+		target debug {
+		opt norefcounts
+		for (b.bits in .outputs|int|) (i)
+			if !.reg(i)
+				error (self, "Missing ASM output")
+		}
 		
 	function µRenderInto (|!&asm| Where, |!&asm| After, |!&asm|)
 		opt inline

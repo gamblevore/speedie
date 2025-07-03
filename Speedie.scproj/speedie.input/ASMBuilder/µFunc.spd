@@ -51,7 +51,9 @@ extend SCFunction
 		|| fs = faststring()
 		if i 
 			|| n = PackMaker.packfuncs.length
-			fs <~ "($i / $n) "
+			fs <~ "("
+			(i|float| / n|float|).pc(fs)
+			fs <~ ") "
 		.µRender(fs)
 		printline fs
 

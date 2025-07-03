@@ -153,13 +153,13 @@ function uint64.LongestBitStretch (|ivec2|)
 
 // needs refcount upgrade.
 
-function int64.CanStoreAsIntImmediate (|bool|)
+function int64.CanStoreAsAddK (|bool|)
 	return ((self << 50)>>50) == self
 
 
 function Assembler.CanAddK (|asmreg| R, |int64| T, |bool|) // used to be used from .plus()... works now from render
 	require (r is constoutput) and R.isint
-	require t.CanStoreAsIntImmediate
+	require t.CanStoreAsAddK
  
 	if r is realconst
 		.nopconst(r)

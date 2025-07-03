@@ -836,7 +836,7 @@ function message.CNTC (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| offset = nil,
 	visible
 	rz = self * asm.CNTC
 	rz.dest(0, r1)
-	rz.dest(1, r2)
+	rz.reginput(1) = r2
 	rz.numinput(2) = offset
 	rz.numinput(3) = cnst
 	rz.numinput(4) = size
@@ -847,7 +847,7 @@ function message.CNTD (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| offset = nil,
 	visible
 	rz = self * asm.CNTD
 	rz.dest(0, r1)
-	rz.dest(1, r2)
+	rz.reginput(1) = r2
 	rz.numinput(2) = offset
 	rz.numinput(3) = cnst
 	rz.numinput(4) = size
