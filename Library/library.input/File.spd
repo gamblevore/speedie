@@ -283,7 +283,7 @@ class File (String)
 	helper MoveNext (|bool|)
 		cpp_wrapper JB_File_MoveNext
 
-	helper CurrChild (|String|)
+	helper CurrChild (|int| MakeDirsObvious=0, |String|)
 		cpp_wrapper
 	
 	function Open (|int| Flags = File.O_RDWR ||| File.O_CREAT, |bool|AllowMissing=false, |filedes|)

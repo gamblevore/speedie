@@ -68,6 +68,6 @@ inline bool CloseDir_( DirReader* D ) {
     return true;
 }
 
-    dirent* ReadDir_( DirReader* D );
+dirent* ReadDir_( DirReader* D );
     
 }

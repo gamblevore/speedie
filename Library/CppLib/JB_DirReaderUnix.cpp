@@ -11,16 +11,16 @@ extern "C" {
 
 	
 inline bool IgnoreDotDot( uint8* c ) {
-	if ( c[0] != '.' ) {
+	if ( c[0] != '.' ) {				// 'abcd' is OK
 		return false;
 	}
 
-	char c1 = c[ 1 ];
+	char c1 = c[ 1 ];					// "." is bad
 	if ( c1 == 0 ) {
 		return true;
 	}
 
-	return (c1 == '.' and c[2] == 0);
+	return (c1 == '.' and c[2] == 0);	// ".." is also bad.
 }
 
 dirent* ReadDir_( DirReader* D ) {

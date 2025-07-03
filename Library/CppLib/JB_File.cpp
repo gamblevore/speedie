@@ -172,7 +172,7 @@ bool HasFD (JB_File*f) {
     return (f and f->Descriptor >= 0);
 }
 
-inline uint8* JB_FastFileThing( JB_File* S) {
+inline uint8* JB_FastFileThing(JB_File* S) {
 	return S->Addr;
 }
 
@@ -317,24 +317,24 @@ int StrOpen_(JB_File* Path, int Flags, bool AllowMissing) {
     return -1;
 }
 
-
-bool Stat_( JB_String* self, struct _stat* st, bool normal=true ) {
-    if (!self) return false;
-    int err = 0;
-    uint8 Tmp[PATH_MAX];
-	auto tmp = (const char*)JB_FastFileString(self, Tmp);
-	if (normal)
-		err = stat( tmp, st );
-	  else
-		err = lstat( tmp, st );
+static bool Stat2_( JB_String* ErrName, struct _stat* st, bool normal, const char* tmp ) {
+    int err = normal ? stat( tmp, st ) : lstat( tmp, st );
     if (!err) return true;
 	if (errno != ENOENT  and access(tmp, 0)) {
 		errno = ENOENT; // sometimes other errors are really ENOENT
 	}					// So we need to refill this.
 
 	if (errno != ENOENT)
-		ErrorHandle_(err, self, nil, "getting info on");
+		ErrorHandle_(err, ErrName, nil, "getting info on");
 	return false;
+}
+
+
+bool Stat_( JB_String* self, struct _stat* st, bool normal=true ) {
+    if (!self) return false;
+    uint8 Tmp[PATH_MAX];
+	auto tmp = (const char*)JB_FastFileString(self, Tmp);
+	return Stat2_(self, st, normal, tmp);
 }
 
 
@@ -866,16 +866,14 @@ bool JB_File_ListActive (JB_File* self) {
 }
 
 bool JB_File_ListStart (JB_File* self) {
-    int** I = (&self->Dir);
-    DirReader* D = (DirReader*)I;
+    DirReader* D = (DirReader*) (&self->Dir);
     self->DirEnt = 0; // in case already set?
     return InitOpenDir_( D, (const char*)JB_FastFileThing(self) );
 }
 
 void JB_File_ListEnd( JB_File* self ) {
     if (self->Dir) {
-        int** I = (&self->Dir);
-        DirReader* D = (DirReader*)I;
+        DirReader* D = (DirReader*) (&self->Dir);
         CloseDir_(D);
         self->Dir = 0;
     }
@@ -1242,28 +1240,60 @@ int JB_File__chdir( JB_String* Path ) {
 }
 
 
+
 bool JB_File_MoveNext(JB_File* self) {
-    int** I = (&self->Dir);
-    DirReader* D = (DirReader*)I;
+    DirReader* D = (DirReader*) (&self->Dir);
     self->DirEnt = (int*)ReadDir_(D);
     return self->DirEnt;
 }
 
- 
-JB_String* JB_File_CurrChild (JB_File* self) {
+
+static bool ChildIsDir (JB_File* self, int MakeDirsObvious, dirent* Child, int ChLength) {
+	if (Child->d_type == DT_DIR)
+		return true;
+	
+	if (Child->d_type != DT_UNKNOWN)
+		return false; // about about links? Maybe if MakeDirsObvious == 2// we'd have to do lstat on it.
+	
+	// Handle Unknown
+    int N = self->Length;
+    if (N + ChLength >= PATH_MAX-2)
+		return false; // sigh
+	
+    uint8 Tmp[PATH_MAX];
+    struct stat st = {};
+    CopyBytes( self->Addr, Tmp, N );
+    if (N > 0 and Tmp[N-1] != '/')
+		Tmp[N++] = '/';
+    CopyBytes( Child->d_name, Tmp+N, ChLength );
+    Tmp[N+ChLength] = 0;
+	
+	if (!Stat2_(self, &st, true, (const char*)(Tmp)))
+		return false;
+	return S_ISDIR(st.st_mode);
+}
+
+
+JB_String* JB_File_CurrChild (JB_File* self, int MakeDirsObvious) {
     dirent* Child = (dirent*)self->DirEnt;
     if (!Child)
         return JB_Str__Empty();
     
-    const char* ChildName = Child->d_name;
-#ifdef TARGET_API_MAC_OS
-    u32 NameLength = Child->d_namlen;
-    if ( ! NameLength ) NameLength = strlen( ChildName );
-#else
-    u32 NameLength = (u32)strlen( ChildName );
+    u32 NameLength = 0;
+#if __PLATFORM_CURR__ == __PLATFORM_OSX__
+    NameLength = Child->d_namlen;
 #endif
+    if ( ! NameLength ) NameLength = strlen( Child->d_name );
 
-    return JB_Str_CopyFromPtr( (uint8*)ChildName, (int)NameLength );
+	int IsDir = (MakeDirsObvious!=0) and ChildIsDir(self, MakeDirsObvious, Child, NameLength);
+	// what about if its not? we need the full-file-path, then. So we need to concat two strings.
+    JB_String* e = JB_Str_New( (int)NameLength + IsDir );
+    if (e) {
+        CopyBytes((uint8*)(Child->d_name), e->Addr, (int)NameLength);
+        if (IsDir)
+			e->Addr[NameLength] = '/';
+    }
+    return e;
 }
 
 

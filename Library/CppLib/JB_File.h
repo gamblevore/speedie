@@ -9,8 +9,8 @@ extern "C" {
 
 
 JBClass( JB_File, JB_StringShared,
-    int*            Dir;
-    int*            DirEnt;
+    void*           Dir;
+    void*           DirEnt;
 	int				OpenMode;
 	int				MyFlags;
 	int				Descriptor;
@@ -23,7 +23,7 @@ int JB_File_WritePng(void* file, int w, int h, const void *data);
 unsigned char* JB_Img__LoadPNG(unsigned char* data, int len, int* x, int* y, int* comp);
 uint8* JB_Img__LoadQOI(uint8* data, int len, int* Size);
 uint8* JB_Img__WriteQOI(uint8* data, int w, int h, int* len);
-JB_String* JB_File_CurrChild (JB_File* self);
+JB_String* JB_File_CurrChild (JB_File* self, int SlashOnDir);
 long JB_File_Test( );
 JB_String* JB_File_Render(JB_File* self, FastString* fs);
 bool JB_File_MoveNext(JB_File* self);
