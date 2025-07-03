@@ -94,11 +94,7 @@ class File (String)
 	
 	Syntax Append (|string| data)
 		.write(Data)
-	
-//	Syntax Append (|message| msg)	// this interface makes no sense
-//		cpp_Part WriteMsg			// you can't just append messages blindly
-//		msg.render(.out(false))		// how do they get separated? lines, spaces, commas? nothing?
-	
+		
 	function string.Visible (|bool|)
 		return .name[] != '.'
 		
