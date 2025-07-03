@@ -1254,6 +1254,8 @@ static bool ChildIsDir (JB_File* self, int MakeDirsObvious, dirent* Child, int C
 	
 	if (Child->d_type != DT_UNKNOWN)
 		return false; // about about links? Maybe if MakeDirsObvious == 2// we'd have to do lstat on it.
+	// the base of unix directories is littered with fake directories. Is it wise to not let people
+	// go into them?
 	
 	// Handle Unknown
     int N = self->Length;
@@ -1314,7 +1316,30 @@ void JB_munmap (void* mem, int64 n) {
 		ErrorHandle_(munmap(mem, n), nil, nil, "un-memmap");
 }
 
+/*
+just some wierd thing I found out about unix... the dir_type and stat modes don't match up.
 
+Sigh.
+
+		#define DT_UNKNOWN       0
+		#define DT_FIFO          1
+		#define DT_CHR           2
+		#define DT_DIR           4
+		#define DT_BLK           6
+		#define DT_REG           8
+		#define DT_LNK          10
+		#define DT_SOCK         12
+		#define DT_WHT          14
+		//  why can't unix just use the same dam numbers.
+		#define S_IFMT          0170000         // [XSI] type of file mask
+		#define S_IFIFO         0010000         // [XSI] named pipe (fifo)
+		#define S_IFCHR         0020000         // [XSI] character special
+		#define S_IFDIR         0040000         // [XSI] directory
+		#define S_IFBLK         0060000         // [XSI] block special
+		#define S_IFREG         0100000         // [XSI] regular
+		#define S_IFLNK         0120000         // [XSI] symbolic link
+		#define S_IFSOCK        0140000         // [XSI] socket
+*/
 
 }
 
