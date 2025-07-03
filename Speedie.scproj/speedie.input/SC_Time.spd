@@ -6,7 +6,7 @@ function compiler.PrintCompileTime (|date| durr)
 	fs.normal  "Stages",		fs <~ Compiler.CurrStage
 	fs.normal  "Classes",		fs <~ compiler.ReachedClassCount
 	fs.normal  "Funcs",			fs <~ "${compiler.streachedfunc} / ${compiler.funclist.length}  // (${compiler.stLibFuncs} lib)"
-	fs.Normal  "Nodes",         fs <~ "${parser.CountStats}"
+//	fs.Normal  "Nodes",         fs <~ "${parser.CountStats}"
 	fs.normal  "Strings"
 	|| avg = stringcorrector.TotalSize div stringcorrector.list.length
 	fs <~ "${stringcorrector.list.length} / "	

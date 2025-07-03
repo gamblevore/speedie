@@ -8,6 +8,16 @@ function dictionary.Sort (|SorterComparer| fn, |int| count, |[...]|)
 	rz.Length = count
 
 
+function string.Sort (|byte| sep = '\n', |string|)
+	|| x = .split(sep)
+	x.Sort(&String.Sorter)
+	return x.Join(string.byte(sep))
+
+
+helper MessagePositionSorter (SorterComparer of message)
+	return .position < b.position
+
+
 role MessageTable (Dictionary)
 	contains Message
 	syntax Access (|string| Key, assigns:||)
@@ -93,17 +103,12 @@ function @file.Words (|file|)
 	return "/usr/share/dict/words".file
 
 		
-function string.Dict (|byte| sep='\n', |!dictionary|)
-	rz = Dictionary()
+function string.Dict (|byte| sep='\n', |dictionary of string|)
 	if self
-		for l in StringFields( self, sep )
-			rz[l] = "x"
-
-
-function string.Sort (|byte| sep = '\n', |string|)
-	|| x = .split(sep)
-	x.Sort(&String.Sorter)
-	return x.Join(string.byte(sep))
+		rz = Dictionary()
+		if self
+			for l in StringFields( self, sep )
+				rz[l] = "true"
 
 
 function Message.FindNotInserted (|message|)

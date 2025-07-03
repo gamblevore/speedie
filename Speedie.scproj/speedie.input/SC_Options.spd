@@ -270,8 +270,8 @@ module Feedback
 			Explain(Purpose, "")$
 			options.perryoutput = 1
 			|| RealPerry = value~="bin"
-			options.perryoutput += RealPerry // argvalue not needed? jsut value, right?
-			compiler.insecurewords = file.Prefs("klinkerhoppen.banned")!.readall.dict
+			options.perryoutput += RealPerry // argvalue not needed? just value, right?
+			compiler.insecurewords = file.Prefs("klinkerhoppen.banned").readall.dict
 
 		+"usescriptloc"
 			Explain(Purpose, "")$

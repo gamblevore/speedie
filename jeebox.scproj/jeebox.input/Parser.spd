@@ -1280,7 +1280,7 @@ module parser
 	function Data (|string--|)
 		cpp_wrapper JB_Tk__GetData
 
-	|uint|					CountStats
+//	|uint|					CountStats  // better to put in the memory manager itself... right?
 	|message|				_EndOfLineMarker
 	|dictionary of string|  _ErrorNames = nil
 	|fnIDGenerator|			Splitter = &parser.range

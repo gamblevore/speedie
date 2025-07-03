@@ -244,9 +244,6 @@ helper _chdir (|string| path, |ErrorInt|)
 	cpp_wrapper JB_File__chdir
 
 
-helper MemoryUsageSorter (SorterComparer of message)
-	return .position < b.position
-
 
 render MemoryUsage (|int| Over=0)
 	fs <~ "\n"
@@ -256,9 +253,9 @@ render MemoryUsage (|int| Over=0)
 	for cls in classdata.First
 		|| Mem = cls.memoryused
 		if mem > over
-			items <~ message(nil, @str, mem, cls.name.str)
+			items <~ message(cls.name.str, mem)
 	
-	items.sort(MemoryUsageSorter)
+	items.sort(MessagePositionSorter)
 	for I in items
 		fs.memoryreport(i.name, i.position)
 

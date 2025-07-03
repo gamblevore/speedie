@@ -1,0 +1,33 @@
+#!/usr/local/bin/spd
+
+app.usage = "Usage: size path [...]
+--types=cpp/c/h               Only report these types
+--v=true/false                Count invisible files
+"
+
+|bool|		ShowInvis = app.yes("v")
+||			Types = app["types"].trim.dict('/')
+|[message]| Found
+
+
+main (|[existingfile]| FileList)
+	if !FileList
+		Quit app.Usage
+	
+	for F in FileList
+		F.CountAll(f.pathdir.length)
+	
+	found.sort(MessagePositionSorter)
+	for m in found
+		"${m.name}: ${m.position.strsize}"
+
+
+function file.CountAll (|int| base, |int64|)
+	if .isdir
+		for c.files in self
+			if !c.IsLink and (ShowInvis or c.Visible)
+				rz += c.CountAll(base)
+	  else
+		require !types or types[.ext]
+		rz = .size
+	Found <~ message(self[base...], rz)

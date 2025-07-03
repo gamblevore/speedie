@@ -32,7 +32,7 @@ The tree-data-structure represents your data. The Message class is similar to XM
 		cpp_part ConstructorCopy
 		super.constructor
 		
-		parser.CountStats++
+//		parser.CountStats++ // better to put in the memory manager itself... right?
 		.Position	= other.Position
 		.Name		= other.Name
 		.func		= other.func
@@ -46,7 +46,7 @@ The tree-data-structure represents your data. The Message class is similar to XM
 	constructor
 		cpp_part ConstructorEmpty
 		
-		parser.CountStats++
+//		parser.CountStats++
 		.func = @arg
 		.Position	= parser.Using.position
 		.flags		= parser.using.Flags
@@ -57,7 +57,7 @@ The tree-data-structure represents your data. The Message class is similar to XM
 	constructor (|Syntax| Func=1|Syntax|, |string| Name="")
 		cpp_part ConstructorNormal
 		
-		parser.CountStats++
+//		parser.CountStats++
 		.name		= name
 		.func		= func
 		.Position	= parser.Using.Position
@@ -70,11 +70,22 @@ The tree-data-structure represents your data. The Message class is similar to XM
 		cpp_part ConstructorRange
 
 		super.constructor(Parent)
-		parser.CountStats++
+//		parser.CountStats++
 		.name		= name
 		.Position	= BytePos
 		.func		= func
 		.RangeLength= RangeLength
+		.flags		= parser.using.Flags
+		.tag		= parser.Using.Tag
+
+	
+	constructor (|string| name, |int| BytePos)
+		cpp_part ConstructorItems
+
+//		parser.CountStats++
+		.name		= name
+		.Position	= BytePos
+		.func		= @str
 		.flags		= parser.using.Flags
 		.tag		= parser.Using.Tag
 

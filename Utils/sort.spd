@@ -59,7 +59,6 @@ function app.Collect (|file| f)
 		found <~ f
 
 	
-function MySorter (SorterComparer)
-	if a isa file and b isa file
-		return a.size - b.size
+function MySorter (SorterComparer of file)
+	return .size - b.size
 	
