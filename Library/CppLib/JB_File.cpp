@@ -861,9 +861,9 @@ JB_String* JB_File_Render(JB_File* self, FastString* fs_in) {
 	return self;
 }
 
-bool JB_File_ListActive (JB_File* self) {
-	return self->Dir;
-}
+//bool JB_File_ListActive (JB_File* self) {
+//	return self->Dir;
+//}
 
 bool JB_File_ListStart (JB_File* self) {
     DirReader* D = (DirReader*) (&self->Dir);

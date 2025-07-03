@@ -274,8 +274,8 @@ class File (String)
 	function ListStart (|bool|)
 		cpp_wrapper
 
-	function ListActive (|bool|)
-		cpp_wrapper
+//	function ListActive (|bool|)
+//		cpp_wrapper
 
 	function ListEnd
 		cpp_wrapper

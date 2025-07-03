@@ -29,7 +29,7 @@ JB_String* JB_File_Render(JB_File* self, FastString* fs);
 bool JB_File_MoveNext(JB_File* self);
 bool JB_File_ListStart( JB_File* self );
 void JB_File_ListEnd( JB_File* self );
-bool JB_File_ListActive( JB_File* self );
+//bool JB_File_ListActive( JB_File* self );
 
 JB_Object JB_File__File( JB_File* self );
 int JB_FS_AppendPipe(FastString* self, int fd, int Mode);
