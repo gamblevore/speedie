@@ -630,7 +630,7 @@ function FileViewerCountCode (GuiMenuEvent)
 					CLOC += p.loc
 	
 	|| fstr = "file".pluralize(FileCount)
-	|| r = (size|float| / cloc[]|float|).DecimalPlaces(1)
+	|| r = (size|float| / cloc[]|float|).Render
 	app.alert "${Cloc[]} lines of code and ${Cloc[1]} nodes in ${size.strsize} text ($r bytes per line)\n\n$fstr at: ${row.location}"
 
 

@@ -458,10 +458,10 @@ datatype float
 	function Date (|date|)
 		return (self * 64.0K)|date|
 
-	function DecimalPlaces (|int| to=2, |float|)
-		cpp_Part RoundTo
-		|| v = (10 pow to)|float|
-		return (self * v).Round / v
+//	function DecimalPlaces (|int| to=2, |float|)
+//		cpp_Part RoundTo
+//		|| v = (10 pow to)|float|
+//		return (self * v).Round / v
 
 	function Sign (|float| sigma=0.0, |float|)
 		if self > sigma
@@ -711,26 +711,25 @@ datatype int64
 	render Hex
 		fs.AppendHex(self)
 
-	helper RenderSizePart (|faststring| fs, |int| Size, |string| Suff)
-		|| f = (self div size)|float|.DecimalPlaces(1)
-		fs <~ f|int|
-		if f < 120.0
-			|| frac = ((f.fract*10.0)+0.5)|int|
-			fs <~ "."
-			fs <~ frac
-		fs <~ suff
 		
 	render StrSize
 		if self <= 512
 			fs <~ self
-		  elseif self <= 900KB
-			.RenderSizePart(fs, 1KB, "KB")
-		  elseif self < 900MB
-			.RenderSizePart(fs, 1MB, "MB")
-		  elseif self < 900GB
-			.RenderSizePart(fs, 1GB, "GB")
 		  else
-			.RenderSizePart(fs, 1TB, "TB")
+			|| part = 'T'
+			|| size = 1TB
+			if self <= 900KB
+				size = 1KB
+				part = 'K'
+			  elseif self < 900MB
+				size = 1MB
+				part = 'M'
+			  elseif self < 900GB
+				size = 1GB
+				part = 'G'
+			fs.AppendDouble(self div size, 1)
+			fs <~ part
+			fs <~ 'B'
 	
 	
 	function IsPow2 (|bool|)
