@@ -67,7 +67,7 @@ datatype Type (int)
 		if self is Compressed
 			fs <~ "compressed "
 		if self is jbin
-			fs <~ "jbn"
+			fs <~ "jbin"
 		  elseif self is box
 			fs <~ "jeebox"
 		  elseif self is json
