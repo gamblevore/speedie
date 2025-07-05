@@ -193,7 +193,7 @@ extend PerryIDE
 			.size 			= the~area
 			is NoSearch
 			.AttachedFrom = ~MoveCode.Left
-			.GNormal.inside =  LeftBG
+			.GNormal.inside = LeftBG + vec4(0.004, 0.002, -0.002, 0) // warmer
 			.GNormal.Edge = self.asmstretch.Divider.GNormal.Edge
 			.GNormal.Edge.a = (0.05*255.0)|int|
 			
