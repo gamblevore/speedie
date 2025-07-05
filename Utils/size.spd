@@ -15,9 +15,9 @@ main (|[existingfile]| FileList)
 		Quit app.Usage
 	
 	for F in FileList
-		F.CountAll(f.pathdir.length)
+		F.CountAll(f.path.length)
 	
-	found.sort(MessagePositionSorter)
+	found.sort(MessagePositionSorter)		
 	for m in found
 		"${m.name}: ${m.position.strsize}"
 
