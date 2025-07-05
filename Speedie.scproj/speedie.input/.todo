@@ -5,7 +5,6 @@ Bugs:
 	* function (|object!| x = nil) // which is it? should complain. Currently it becomes optional.
 	* &uint... allow &int in c++ gen
 	* vector constants
-
 	* passing .hfloatvar to  func(float) causes reporting error
 	* render float.fn {code} // won't compile
 	* refcounter passing properties as function param, SHOULD NOT assume it won't be cleared... not without disturbance checker
@@ -16,8 +15,19 @@ Bugs:
 
 
 
+class-changes:
+	* FixedDict! Replace dictionary
+	* Saving... should work as ONE stream. Maybe 1 or 2 phases. (Collects objects + write objects, but don't separate into classes.). Allows tighter compression, simpler-saving-code, etc. Makes it easier to work into an archiving system even!!! Faster saving too, just copy entire object. Needs a "SaveProperty true/false" temporal... Just use save-marking to stop saving objects twice. Need one array to clear the save-marks. dicts can use a special value to mark "end"
+		* Actually... speed isn't the issue. SIMPLICITY is. more than fast enough.
+			* Allow a tree, like JSON? Repeated objs become a ref second time around.
+				* Debuggable...
+	* Make all objects saveable? Why would some not be? Simpler than marking them as saveable.
+		* If a class has specific stuff that can't be saved... we can silently mark it as non-saveable... unless already marked as saveable... or we try to save it, then we create an error.
+
+
+
 Additions:
-	* rename "flags" to something else. I wanna use "flags" for somekinda default Info and Syntax is
+	* Rename "flags" to something else. I wanna use "flags" for somekinda default Info and Syntax is
 	* autocomplete use class description 
 	* add \123 numeric type (mostly for jbin). use a float/int format, that is signed. 2 exponent bits per byte.
 		* first byte (if float) can also store the sign of the exponent.
@@ -46,17 +56,4 @@ Additions:
 		};
 		return retVals {10, 20, "Hi"}; // Return the local structure
 	}
-	
-
-class-changes
-	* replace dictionary with fixeddict
-		* doesnt need datatype wrapper! We could use a dict of ints / pointers...
-*	|FastString| StdOutFS // create .disposeall_ func. just search for ".initvarsarg"
-* Saving... should work as ONE stream. Maybe 1 or 2 phases. (Collects objects + write objects, but don't separate into classes.). Allows tighter compression, simpler-saving-code, etc. Makes it easier to work into an archiving system even!!! Faster saving too, just copy entire object. Needs a "SaveProperty true/false" temporal... Just use save-marking to stop saving objects twice. Need one array to clear the save-marks. dicts can use a special value to mark "end"
-    * Actually... speed isn't the issue. SIMPLICITY is. more than fast enough.
-        * Allow a tree, like JSON? Repeated objs become a ref second time around.
-            * Debuggable...
-* Make all objects saveable? Why would some not be? Simpler than marking them as saveable.
-	* If a class has specific stuff that can't be saved... we can silently mark it as non-saveable... unless already marked as saveable... or we try to save it, then we create an error.
-* burst-mode allocation, for parsing basically, seeing as we spend 80% of our time during parse in allocators!
 
