@@ -317,7 +317,7 @@ int StrOpen_(JB_File* Path, int Flags, bool AllowMissing) {
     return -1;
 }
 
-static bool Stat2_( JB_String* ErrName, struct _stat* st, bool normal, const char* tmp ) {
+static bool Stat2_( JB_String* ErrName,  struct _stat* st,  bool normal,  const char* tmp ) {
     int err = normal ? stat( tmp, st ) : lstat( tmp, st );
     if (!err) return true;
 	if (errno != ENOENT  and access(tmp, 0)) {
@@ -1249,13 +1249,12 @@ bool JB_File_MoveNext(JB_File* self) {
 
 
 static bool ChildIsDir (JB_File* self, int MakeDirsObvious, dirent* Child, int ChLength) {
-	if (Child->d_type == DT_DIR)
+	int T = Child->d_type;
+	if (T == DT_DIR)
 		return true;
 	
-	if (Child->d_type != DT_UNKNOWN)
-		return false; // about about links? Maybe if MakeDirsObvious == 2// we'd have to do lstat on it.
-	// the base of unix directories is littered with fake directories. Is it wise to not let people
-	// go into them?
+	if (T != DT_LNK  and  T != DT_UNKNOWN)
+		return false;
 	
 	// Handle Unknown
     int N = self->Length;
@@ -1270,9 +1269,9 @@ static bool ChildIsDir (JB_File* self, int MakeDirsObvious, dirent* Child, int C
     CopyBytes( Child->d_name, Tmp+N, ChLength );
     Tmp[N+ChLength] = 0;
 	
-	if (!Stat2_(self, &st, true, (const char*)(Tmp)))
-		return false;
-	return S_ISDIR(st.st_mode);
+	if (Stat2_(self, &st, MakeDirsObvious==1, (const char*)(Tmp)))
+		return S_ISDIR(st.st_mode);
+	return false;
 }
 
 
