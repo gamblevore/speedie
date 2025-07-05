@@ -48,7 +48,30 @@ target debug
 
 
 
-function Assembler.CloseOneVar (|message?| exp, |int| OriginalDecls, |$bool| DoMore,   |message?|)
+
+function Assembler.OpenVars (|uint64|)
+	// return (.VDecls|uint| << 8) ||| (.VTemps << 0)
+	return .VariableAllocation
+
+
+function Assembler.CloseVars (|uint64| Orig, |message| exp = nil, |asmreg| Return=nil, |asmreg|)
+	opt NoRefCounts
+	
+	|| OrigDecls = Orig >> 8
+	|| OrigTemps = orig & 255
+
+	|| DoMore = true
+	while .VTemps < OrigTemps
+		exp = .CloseOneVar(exp, -1, DoMore)
+
+	while DoMore and .VDecls > OrigDecls
+		exp = .CloseOneVar(exp, OrigDecls, DoMore)
+		loop DoMore
+
+	return Return
+
+
+function Assembler.CloseOneVar (|message?| exp,  |int| OriginalDecls,  |$bool| DoMore,  |message?|)
 	opt norefcounts
 	
 										  /// READ TABLE ///
@@ -94,7 +117,6 @@ function Assembler.CloseOneVar (|message?| exp, |int| OriginalDecls, |$bool| DoM
 		.VDecls = v - 1
 	  else
 		.VTemps = v + 1
-//	.declprint
 			
 	return exp
 

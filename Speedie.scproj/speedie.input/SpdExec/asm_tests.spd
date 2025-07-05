@@ -1,17 +1,19 @@
 
 
 
-class asm_test_obj
-	|int| i
-	constructor
-		visible
-		.i = 0
+//class asm_test_obj
+//	|int| i
+//	constructor
+//		visible
+//		.i = 0
 
 
 
 module ASMExamples {
 |int| Glob
 |int| Bolg
+
+target pack { 
 
 function Swap
 	|| x = 1
@@ -31,8 +33,6 @@ function grab2 (|$byte| b, |int|)
 	x.i++
 	return (x.i + 10)*10
 
-
-target pack { 
 
 class LargeClass2 {
 	|byte[100]|   a
