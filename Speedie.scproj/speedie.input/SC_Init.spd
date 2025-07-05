@@ -132,6 +132,7 @@ function message.AlmostAppend (|message| v)
 
 
 function SCModule.DelayedInitFuncTransform
+	opt norefcounts
 	|| v = .InitVarsArg
 	|| DestVars = (Compiler.program.InitVarsArg, compiler.appinitglobals)(.IsLibrary)
 	|| DestCode = (Compiler.program.InitCodeArg, compiler.appinitcode)(.IsLibrary)
@@ -157,32 +158,33 @@ function SCModule.HasActualCode (|message|arg, |bool|)
 			return true // found something!
 
 
-function Message.InitRootDecl (|Message| before, |SCNode| name_space, |bool|) {
+function Message.InitRootDecl (|Message| DeclMsg, |SCNode| name_space, |bool|) {
 	// this code just seems wrong... it finds an SCDecl and puts it into "Decl" :)
 	// have an SCDecl... that should always already have a default! So why we are creating a default?
-
+	
 	require .expect(@thg)
 	
-	|| P = .Parent
-	|| NewDefault = (P.last, nil)(P == @Rel)
-	
-	|| O = name_space.LookUpVarRootDecl( .name, self )
-	require (O isa SCDecl)
-	using (self)
-	
-	|| Decl = O|SCDecl|
-	if !NewDefault
-		if !Decl.IsNormal
+	|| decl = name_space.LookUpVarRootDecl( .name, self )
+	if decl isa SCDecl
+		if decl.isbarestruct
 			return true
-		NewDefault = Decl.CreateDefault(self)
-		if (NewDefault and decl.contains)
-			NewDefault = decl.WriteTypeCast(NewDefault)
-			NewDefault.Obj = nil // just keep doing what it used to do
-	
-	if newdefault
-		if !newdefault.IsNilOrZero // and !(options.modepack and decl.islib)
-			before.Prev = NewRel( «thg .name », NewDefault, "=" )
-	Return true
+		using (self)
+
+		|| P = .parent
+		|| NewDefault = (P.last, nil)(P == @Rel)
+			
+		if !NewDefault
+			if !Decl.IsNormal
+				return true
+			NewDefault = Decl.CreateDefault(self)
+			if (NewDefault and decl.contains)
+				NewDefault = decl.WriteTypeCast(NewDefault)
+				NewDefault.Obj = nil // just keep doing what it used to do
+		
+		if newdefault
+			if !newdefault.IsNilOrZero // and !(options.modepack and decl.islib)
+				DeclMsg.Prev = NewRel( «thg .name », NewDefault, "=" )
+		Return true
 }
 
 

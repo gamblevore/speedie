@@ -8,6 +8,7 @@ class asm_test_obj
 		.i = 0
 
 
+
 module ASMExamples {
 |int| Glob
 |int| Bolg

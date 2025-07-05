@@ -304,7 +304,6 @@ struct Assembler
 				return dest
 		
 		|| dest2 = r.reg(dest)
-		(dest2 is temp) = (dest is temp)
 		dest2.µtype = dest.µtype 	 		// sigh. I guess we copy some wierd flags, from r into dest2
 		return .Assign(Dest2, r, exp)
 
@@ -337,7 +336,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-//			if trap == 11883
+			// if trap == 103591
 				
 		  else
 			opt inline
@@ -392,6 +391,7 @@ struct Assembler
 	
 	
 	function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl?| Decl, |int| Index, |&fatasm|)
+		target debug: if (dest isnt set) and !dest.reg // oh man
 		if dest is ContainsAddr
 			#!wait?? this is meant to be an addrrequest? not a response.
 			debugger
@@ -442,18 +442,16 @@ struct Assembler
 			rz._op = ASMType.ReadASM[b]
 
 
-	function Read (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scdecl| DestDecl, |int| index=0,  |&fatasm|)
-		// DestDecl: I think this should be called readdecl?
+	function Read (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scdecl| ReadDecl, |int| index=0,  |&fatasm|)
 		opt inline
 		(dest isnt set)
-		return .ReadOrWriteSub(dest, exp, ptr, VarAdd, DestDecl, index)
-
-
-	function Write (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scdecl| ReadDecl, |int| index=0, |&fatasm|)
-		opt inline
-		// ReadDecl: I think this should be called DestDecl?
-		(dest is set)
 		return .ReadOrWriteSub(dest, exp, ptr, VarAdd, ReadDecl, index)
+
+
+	function Write (|asmreg| dest, |message| exp, |asmreg| Ptr, |asmreg| VarAdd, |scdecl| DestDecl, |int| index=0, |&fatasm|)
+		opt inline
+		(dest is set)
+		return .ReadOrWriteSub(dest, exp, ptr, VarAdd, DestDecl, index)
 
 
 	function ReadOrWrite (|ASMReg| dest, |message| m, |asmreg| base, |asmreg| VarAdd, |scdecl| Ty,  |int| index=0, |asmreg|)
@@ -776,13 +774,10 @@ struct Assembler
 		opt norefcounts
 		|| p = prms.first!
 
-		if "Inline_More".trap
-			"-------"
+//		if "Inline_More".trap
+//			"-------"
 		
-		for a in .fn.Args
-//			if "Inline_More".trap
-//				debugat 3
-			
+		for a in .fn.Args			
 			|| v = .InlineVar(prms, p, a)
 			if !v
 				|| o = .openvars
@@ -795,10 +790,10 @@ struct Assembler
 				  else
 					v = .µInto(p, v)
 			
-			if "Inline_More".trap
-				print a
-				print ": "
-				v.debugprint
+//			if "Inline_More".trap
+//				print a
+//				print ": "
+//				v.debugprint
 			
 			v = .UpdateInlineReg(V, a)
 			.MarkDeclAsConst(a, V, nil)

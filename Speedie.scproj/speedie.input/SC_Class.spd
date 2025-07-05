@@ -958,12 +958,11 @@ function TryAddToProject
 module
 	function SCClass.LoadLinkage
 		opt NoRefCounts
-		|| Arg = .LinkagePlace 					#require
-
-		.NoAutoComplete = arg.DeprecatedClassOption("noauto")
-		(self is NoEarlyFree) = arg.DeprecatedClassOption("pragma", "NoEarlyFree")
-		(self is TreatAsBaseType) = arg.DeprecatedClassOption("pragma", "TreatAsBaseType")
-		.minopt = arg.DeprecatedClassOption("opt", "min")
+		|| Arg = .LinkagePlace
+			.NoAutoComplete = arg.DeprecatedClassOption("noauto")
+			(self is NoEarlyFree) = arg.DeprecatedClassOption("pragma", "NoEarlyFree")
+			(self is TreatAsBaseType) = arg.DeprecatedClassOption("pragma", "TreatAsBaseType")
+			.minopt = arg.DeprecatedClassOption("opt", "min")
 
 
 	function scnode.ExpectModule (|message| errplace, |bool|)

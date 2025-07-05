@@ -174,13 +174,12 @@ function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg
 	return fat*Dest
 
 
-function NilStrooct (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg|)
+function NilStructBuild (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg|)
 	opt norefcounts
 	|| inner = exp.first
 	expect ((inner == @arg) and !inner.hasany) (exp) // nil
 	|| zzeerrooo = asmreg() as asmreg.FromZeroMemory
-	zzeerrooo.reg = dest.reg
-	return zzeerrooo
+	return zzeerrooo.reg(dest)
 
 
 function Return (fn_asm)
@@ -230,7 +229,7 @@ function TypeCastSub (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg| 
 	opt norefcounts
 	|| NewDecl = exp.ASMDecl
 	if newdecl.isbarestruct
-		return NilStrooct(self, exp, dest)
+		return NilStructBuild(self, exp, dest)
 		
 	|| NewType = NewDecl.regtype
 	if !from.Reg												// x = 0|float|
@@ -537,6 +536,7 @@ function AddressOf (fn_asm)
 	.µGetASM(exp, dest as asmreg.addrneed)
 
 
+
 function BoolNot (fn_asm)							// !a
 	dest = dest.negate
 	|| src = .µGetASM(exp, dest)
@@ -545,29 +545,33 @@ function BoolNot (fn_asm)							// !a
 	return .Exists(dest, src, exp)
 	
 
-///   ///
 
 function IncrSlowOnAddr (|&Assembler| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |scdecl| glob,  |ASMReg|)	
-	opt	NoRefCounts										// *a, x = *(a.b)
+	opt	NoRefCounts											// *a, x = *(a.b)
 	|| TmpCloser = .OpenVars
-	.Read(Dest, F, dest, addr, glob)					// READ
+	dest = .temponly(f, Dest)
+	.Read(Dest, F, dest, addr, glob)						// READ
 
 	|| NewValue = (.Temptyped(f), dest)(mode & IncrAfter)
-	.IncrPre(f, NewValue, dest, amount)					// ADD
+	.IncrPre(f, NewValue, dest, amount)						// ADD
 
-	|| fat = .write(dest, f, newvalue, addr, glob)		// WRITE BACK
+	|| fat = .write(dest, f, NewValue, addr, glob)			// WRITE BACK
 
 	// the new value should exist! now lets close
 	.CloseVars(TmpCloser)
 	return fat * Dest
 
 
+
 function IncrOnAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |scdecl| Glob, |asmreg|)
+
 	ifn  dest.isint  and  amount.fits(6)
 		return IncrSlowOnAddr(self, exp, dest, mode, Addr, Amount, glob)
+
 	|| bc = dest.µtype.ByteCount.log2
 	|| offset = 0
 	addr = .InlineOffsetOpt(addr, bc, offset, 6~bits, glob)
+	
 	|| fat = exp.CNTC(dest, Addr, offset >> bc, amount, bc)
 	if !dest.reg
 		fat.outputs &= ~1 // clear output
@@ -576,6 +580,7 @@ function IncrOnAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 		if 0: exp.CNTD
 		fat._op = asm.cntd
 	return fat * dest
+
 
 
 function IncrAmount (|asmreg| upon, |int| IsPlus, |scdecl| D,  |int64|)
@@ -602,6 +607,7 @@ function NotTemp (|&Assembler| self, |asmreg| Src, |message| p)
 function Incrementatulatorifier		(fn_asm)				// --a++
 	visible
 	opt	NoRefCounts
+	
 	|| Src = .µGetASM(exp, dest as ASMReg.AddrRequest)
 	|| D = exp.ASMDecl
 	|| Amount = IncrAmount(src, mode, D)
@@ -609,10 +615,10 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 	if dest is discard
 		mode = IncrBefore
 	  elseif !dest.reg
-		if mode & IncrAfter
+		if (mode & IncrAfter) or (src isnt temp)
 			dest = .TempTyped(exp, dest)
 		  else
-			dest = src
+			dest.reg = src
 	
 	|| p = exp.parent! // better positions
 	if src is ContainsAddr

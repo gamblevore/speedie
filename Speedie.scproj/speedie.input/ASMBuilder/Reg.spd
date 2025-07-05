@@ -215,6 +215,11 @@ datatype ASMReg (uint64)
 		target debug: if .reg != Bugged // what?
 		return self
 
+	function Reg (assigns:|asmreg|, |asmreg|)
+		.reg = value.reg
+		(self is temp) = (value is temp)
+		return self
+
 	function SCDecl.ASMReg (assigns:|asmreg|)
 		value.µType = .au.DataType
 		.au.DataType = value|datatypecode|
@@ -241,14 +246,9 @@ datatype ASMReg (uint64)
 			return dest.µtype.zero
 		return dest
 
-	function SetReg (|asmreg| dest, |asmreg|)
-		.reg = dest.reg
-		(self is temp) = (Dest is temp)
-		return self
-	
 	function ReUseRegInPlace (|asmreg| dest, |asmreg|)
 		isnt CanHoist
-		return .setreg(dest)
+		return .reg(dest)
 	
 	function with (|asmreg| dest, |asmreg| InUse, |asmreg|)
 		if InUse.reg == dest.reg				// dest is in use!

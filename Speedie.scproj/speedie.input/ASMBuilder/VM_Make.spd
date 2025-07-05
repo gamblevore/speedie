@@ -12,6 +12,8 @@ module VM_Builder {
 |byte|			NormalPos = 0
 |uint|			FreeMultiASM = ~1
 |faststring|	FatFile
+|[message]|		rdz
+
 
 
 function DefineGetSub (|string| fname,  |int| up,  |int| down,  |byte| c,  |byte| c2)
@@ -84,6 +86,7 @@ function DataTypeModule
 	|| module = "extend_module ASM:constants:" ~ parse
 	compiler <~ module
 	.modulearg = module.last.last.last
+
 
 
 function AddForm (|message| form, |µform|)
@@ -167,7 +170,7 @@ function BuildFiles (|bool|)
 	
 	|| Forms = VMDef.find("forms")
 	forms.remove
-
+	
 	|| Code = FastString()
 	|| Jump = FastString()
 
@@ -187,10 +190,9 @@ function BuildFiles (|bool|)
 
 
 function SafeWrite (|String| name, |FastString| data)
-	if data.length < 1K // oof?
-		debugger
-	  else
-		.CppLibFile(name)!.SmartData = data
+	target debug
+		debug_require data.length >= 1K // oof?
+	.CppLibFile(name)!.SmartData = data
 
 
 function UseASM
@@ -229,7 +231,7 @@ function MakeJump   (|message| msg, |FastString| jump)
 	jump <~ "&&${msg.name},\n"
 
  
-function Clean   (|message| msg)
+function Clean (|message| msg)
 	opt norefcounts
 	for ch.flat in msg
 		if ch in @arg
@@ -381,12 +383,20 @@ function MakeFatCreator (|string| name, |µform| form)
 
 
 function FatCreatorSub (|string| name, |µform| form, |message|)
+	opt norefcounts
 	|| fn = IceCream.run(@thg+name)
 	|| arg = fn.Last!
 	|| prm = arg.prev!
 	|| FatDecl = prm.last!
-	|| r = [arg, arg]
 	|| f = form.src.first.first
+	if rdz == 0
+		rdz <~ (arg, 2)
+	
+	// theres 12 temps here.
+	// a lot. Can we reduce this? At least in the ASM?
+	// if we decr something, we can mark it as "removed"
+	// and if its the last... we can go all the way down.
+	// of course... this is "per-branch". So it would need a stack of these... 
 	
 	for (p in form) (i)
 		|| ty = ("asmreg", "int")(p.isreg)
@@ -394,14 +404,14 @@ function FatCreatorSub (|string| name, |µform| form, |message|)
 		|| rel = NewRel(@thg + pname, @thg + "nil", "=")
 		|| dcl = NewDecl(ty, rel)
 		fatdecl.prev = dcl
-		r[0] = i.msg
-		r[1] = @thg + pname
-		arg <~ p.which.run(r)
+		rdz[0] = i.msg
+		rdz[1] = @thg + pname
+		arg <~ p.which.run(rdz)
 		if p is jump
-			r[0] = @thg+pname
+			rdz[0] = @thg+pname
 			|| size = 32 - p.bitsize
-			r[1] = @num+size
-			arg <~ ohio.run(r)
+			rdz[1] = @num+size
+			arg <~ ohio.run(rdz)
 		f++
 	return fn
 		

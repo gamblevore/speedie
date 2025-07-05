@@ -125,7 +125,6 @@ function TypeOfFunc (ExprResolver)
 
 function Message.CanGetAddress (|SCNode| name_space, |bool|)
 	opt norefcounts
-	if "IfEmpty".trap
 	|| curr = .unbra
 	if (curr == @acc)
 		|| f = curr.first
