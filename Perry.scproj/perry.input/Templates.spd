@@ -26,13 +26,8 @@ main
 "
 
 	|| DebugArgs = `args {
-
+	// "arg1", "arg2" // uncomment to activate
 }
-
-/* // The format looks like this: //
-args
-	"arg1"
-	"arg2"
 pwd '.'
 env
 	setting="value"
