@@ -32,12 +32,20 @@ extend String
 	
 	
 	operator globs (|[string]| txt, |bool|)
-		cpp_part GlobMany
+		cpp_part GlobManyItems
 		opt norefcounts
 		for s in txt
 			if self globs s
 				return true
 	
+		
+	operator globbed_by (|[string]| globs, |bool|)
+		cpp_part ManyGlobsOnItem
+		opt norefcounts
+		for g in globs
+			if g globs self
+				return true
+
 	
 	operator globs (|string| txt, |bool|)
 		real self
