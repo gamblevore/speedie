@@ -303,7 +303,7 @@ class FastString {
 		_1.render(_0)
 		
 
-	syntax Compare (|int| n, |bool|Aware, |int|)
+	syntax Compare (|int| n, |bool| Aware, |int|)
 		return .streamlength - n
 }
 
