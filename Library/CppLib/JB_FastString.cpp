@@ -556,7 +556,7 @@ JB_File* JB_FS_File(FastString* fs) {
 
 void JB_FS_FileSet(FastString* fs, JB_File* F) {
     JB_SetRef( fs->File, F );
-    if (!F->Descriptor) {
+    if (F->Descriptor < 0) {
         JB_File_OpenBlank(F);
     }
 }
