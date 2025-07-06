@@ -18,9 +18,8 @@ struct Assembler
 	|byte|						DeepestInline
 	|byte|						InlineDepthLimit
 	|byte|						StackSize
-	|uint64|					VariableAllocation
-	|byte|						VDecls
-	|byte|						VTemps
+	|uint|						VDecls
+	|uint|						VTemps
 	|bool|						IsTextual
 	|int|						CurrFuncGrab
 	|bool|						Inited
@@ -149,15 +148,20 @@ struct Assembler
 			Type.wholetype = ret
 			return ret
 		
-		|| d = .VDecls|int| + 1
-		t.reg = d
+		|| d = .VDecls
+		if !d
+/			d = 1 // shouldn't happen
+			
+		|| FreeBit = (~d).LowestBit		// Find lowest free bit.
+		d |= FreeBit
+		t.reg = freeBit|int|.log2
+
 		Type.WholeType = t
-		if  d < .VTemps
-			.Vars[d] = Type
-			.Vdecls = d
-			target debug: Type.ASMSanity
-			return t
-		error (self, where, "No free local variables.")
+		.Vars[t.reg] = Type
+		.Vdecls = d
+		check (!(.vdecls & .VTemps)) (where, "No free local variables.")	// entirely full
+		target debug: Type.ASMSanity
+		return t
 
 
 	function TempTyped (|Message| where, |asmreg| T, |scdecl| Type,  |asmreg|)
@@ -178,13 +182,19 @@ struct Assembler
 		opt norefcounts
 		if t.reg
 			return t
-		|| r = .VTemps - 1
-		check (r > .vdecls) (where, "No free local variables.")
-		t.reg = r
+
+		|| r = .VTemps
+		if r&1 // how?
+/			r&=~1
+		
+		
+		|| FreeBit = (~r)|int|.Log2		// Find lowest free bit.
+		r |= FreeBit
+		t.reg = freeBit|int|.log2
 		.VTemps = r
 		(t isnt realconst) // why would it be?
 		(t is temp)
-//		.declprint
+		check (!(.vdecls & .VTemps)) (where, "No free local variables.")	// entirely full
 		return t
 	
 	
@@ -552,9 +562,9 @@ struct Assembler
 		.TailInlineable = true
 		.InlineDepthLimit = 3
 		.BasicBlock = 0
-		.VDecls = 0
+		.VDecls = 1
 		.IsTextual = false
-		.VTemps = 32
+		.VTemps = 0
 		.NeedsRework = false
 		.zero = nil
 		.zero.info = AsmReg()

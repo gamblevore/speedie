@@ -50,15 +50,14 @@ target debug
 
 
 function Assembler.OpenVars (|uint64|)
-	// return (.VDecls|uint| << 8) ||| (.VTemps << 0)
-	return .VariableAllocation
+	return (.VDecls|uint64| << 32) ||| (.VTemps << 0)
 
 
 function Assembler.CloseVars (|uint64| Orig, |message| exp = nil, |asmreg| Return=nil, |asmreg|)
 	opt NoRefCounts
 	
-	|| OrigDecls = Orig >> 8
-	|| OrigTemps = orig & 255
+	|| OrigDecls = Orig >> 32
+	|| OrigTemps = (orig << 32) >> 32
 
 	|| DoMore = true
 	while .VTemps < OrigTemps
@@ -89,6 +88,9 @@ function Assembler.CloseOneVar (|message?| exp,  |int| OriginalDecls,  |$bool| D
 		if !DebugView  and  k.µRefCount <= 1 // HoistComplete did +1 on it's refcount earlier. So it is unused.
 			.Nop(k) 
 		  else
+			// this is some kind of mini-hoister?
+			// we can remove this too, once we have the proper (redo) hoister.
+			// or just remove now?
 			if (k isa asm.gtab) and (v == OriginalDecls + 1) // this happens to be the first gtab and it is used.
 				DoMore = false
 				return nil // keep it

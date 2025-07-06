@@ -1,11 +1,11 @@
 
 
 
-//class asm_test_obj
-//	|int| i
-//	constructor
-//		visible
-//		.i = 0
+class asm_test_obj
+	|int| i
+	constructor
+		visible
+		.i = 0
 
 
 
