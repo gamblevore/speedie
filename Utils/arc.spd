@@ -1,0 +1,38 @@
+#!/usr/local/bin/spd
+
+
+// Just an example project!
+|| Excludes = "*.git*,*/cpp,*.strings.txt,*/build*,*.xcodeproj,*.ds_store,*Terminal"  /  ','
+
+main (|existingfile| input)
+	"Excluding: $Excludes\n"
+	
+	|| out = (app.Archive(input), app.Unarchive(input))(input.IsDir)
+		"${out.name}: ${out.size.strsize}"
+
+
+function app.Archive (|file| input, |file|)
+	|| out = jbin(@tmp, "archive")
+	rz = input.SetExt("arc").file
+	out.file = rz
+	out.AddStr(input.name)
+	out.Enter
+	out.ArchiveSub(input)
+	out.Exit(2)
+	
+
+function jbin.ArchiveSub (|file| Item)
+	for ch.files in item
+		if !ch.islink
+			if ch.lowercase globbed_by Excludes
+				"!! $ch"
+			  elseif ch.isdir
+				.ArchiveSub(ch)
+			  else
+				.enter(@tmp, ch)
+				.AddStr(ch.readall)
+				.exit
+	
+
+function app.UnArchive (|file| input, |file|)
+	// not implemented
