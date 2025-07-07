@@ -2,11 +2,18 @@
 
 
 main
+	|| Count = 0
 	for r in app.args
 		for s.lines in r
 			s = s.trim
 			if s
 				|| f = s.file
 				if f.Exists
+					"deleting: $f"
+					Count++
 					f.DeleteAll
-
+	
+	if Count
+		"Deleted $Count files"
+	  else
+		"No files deleted"
