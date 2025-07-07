@@ -164,7 +164,7 @@ function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg
 		  else
 			dest = .µ(f, asmreg.discard)
 	
-	.DeallocStack
+	.closevars(.state.ParentVars, exp)
 	if .TailInlineable and ReturnOpt(self, dest, bb)
 		return dest
 	
@@ -195,7 +195,7 @@ function Return (fn_asm)
 	  else
 		dest = asmreg()
 	
-	.DeallocStack
+	.closevars(1, exp)
 	if ReturnOpt(self, dest, bb)
 		return asmreg.exit
 	
@@ -286,7 +286,7 @@ function SetRel (fn_asm)						// function relset (
 		|| D = a.ASMDecl
 		dest = .µInto(B, X)
 		if x is CanHoist
-			.MarkDeclAsConst(d, nil, dest)
+			.MarkDeclAsConst(D, nil, dest)
 		return dest
 
 	// probably x.y = z, or x[y] = z 
@@ -345,10 +345,8 @@ function Decl (fn_asm)
 
 	if ty isnt local								// A carray or somthing?? idk
 	if (ty is AlteredInBranch) or (ty isnt local)
-//		(dest isnt canhoist)
 		return .µInto(item, dest)
 
-//	(dest is canhoist)								// We want to actually see the value, though?
 	|| K = .µInto(item, dest)
 	if k is ConstOutput
 		.MarkDeclAsConst(ty, k, nil)
@@ -609,7 +607,7 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 	opt	NoRefCounts
 	
 	|| Src = .µGetASM(exp, dest as ASMReg.AddrRequest)
-	|| D = exp.ASMDecl
+	|| D = exp.ASMDecl	
 	|| Amount = IncrAmount(src, mode, D)
 
 	if dest is discard
@@ -619,7 +617,6 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 			dest = .TempTyped(exp, dest)
 		  else
 			dest.reg = src
-	
 	|| p = exp.parent! // better positions
 	if src is ContainsAddr
 		dest.µType = src.µType
@@ -857,19 +854,6 @@ function MarkDeclAsConst (|scdecl| Decl, |asmreg| Initial, |asmreg| NewValue)
 	if NewValue
 		.SetDeclToConst(decl, newvalue, Newfat)
 
-
-function DeallocStack
-	opt norefcounts
-	require !.IsTextual
-	|int| top = .VDecls
-	|| exp = .Last.msg
-	while top > .state.ParentVDecls
-		|| d = .vars[top]!
-		if d.IsBareStruct
-			exp = exp.DeepLast
-			ASMType.AllocBearStruct(-1, exp, top, d)
-		top--
-	
 }
 
 

@@ -32,7 +32,7 @@ class Task (list)
 		while o
 			|| i = o.lowestbit
 			o &= ~i
-			i = i|int|.log2
+			i = i.log2
 			jb_decr( curr[i] )          // noice
 			
 	syntax is (|taskstate| s, |bool|) 

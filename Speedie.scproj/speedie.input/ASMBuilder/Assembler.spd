@@ -3,7 +3,7 @@
 struct InlineBlock
 	|scfunction!--|	Fn    
 	|asmreg|		Return
-	|byte|			ParentVDecls
+	|uint64|		ParentVars
 	|byte|			BranchDepth
 	|byte|			LoopDepth
 	|byte|			InlineDepth
@@ -149,12 +149,12 @@ struct Assembler
 			return ret
 		
 		|| d = .VDecls
-		if !d
-/			d = 1 // shouldn't happen
+		check (d != -1) (where, "No free local variables.")
+			
 			
 		|| FreeBit = (~d).LowestBit		// Find lowest free bit.
 		d |= FreeBit
-		t.reg = freeBit|int|.log2
+		t.reg = freeBit.log2
 
 		Type.WholeType = t
 		.Vars[t.reg] = Type
@@ -188,9 +188,9 @@ struct Assembler
 /			r&=~1
 		
 		
-		|| FreeBit = (~r)|int|.Log2		// Find lowest free bit.
-		r |= FreeBit
-		t.reg = freeBit|int|.log2
+		|| Free = (~r).Log2		// Find lowest free bit.
+		r |= 1<<Free
+		t.reg = Free
 		.VTemps = r
 		(t isnt realconst) // why would it be?
 		(t is temp)
@@ -504,18 +504,20 @@ struct Assembler
 			
 
 	function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
-		|| v = .VDecls					// Exit(Dest)
-		v += (!v or dest.reg != v)
-		|| diff = v - .VDecls
-		if diff == 1
+		|| vd = .VDecls
+		|| v = vd.log2
+		|| diff = (!v or dest.reg != v)
+		v += diff
+		if diff
 			.vars[v] = fn.RealReturnType
-			if .vars[v] isnt Return and .vars[v] != typevoid
+			if  .vars[v] isnt Return  and  .vars[v] != typevoid
 		
-		.Vdecls = v
+		vd |= 1<<v
+		.Vdecls = vd
 		
-		check (v < 32) (exp, "Too many registers in use. No space for result.")
+		check ((v < 32) and !(vd & .vtemps)) (exp, "Too many registers in use. No space for result.")
 		if (dest is ExitAtAll) and .state.return
-			v = 1 max .state.parentvdecls // a simple max will fix this?
+			v = 1 max (.state.parentvars >> 32) // a simple max will fix this?
 		dest.reg = v
 		dest.µtype = fn.ASMRegType
 		return dest.ReallySimplify
@@ -592,9 +594,10 @@ struct Assembler
 		|| l = .last
 		if !l.IsFinisher
 			debugger !.fn.ASMReturn
-			.DeallocStack
+			|| dl = .fn.Source!.DeepLast
+			.closevars(1, dl)
 			if !ASMType.ReturnOpt(self, 0, 0)
-				.fn.Source!.DeepLast.RET()
+				dl.RET()
 		.Optimise
 
 
@@ -675,7 +678,7 @@ struct Assembler
 		dest.µtype = fn.ASMRegType
 		.state.fn = fn
 		.state.Return = dest
-		.state.ParentVDecls = .VDecls
+		.state.ParentVars = .openvars
 		.state.BranchDepth = 0
 		
 		|fatrange| LL
@@ -843,7 +846,7 @@ struct Assembler
 		|| h = .hoistmap
 		while h
 			|| h2 = h.LowestBit
-			yield .KnownValues[h2|int|.log2]!
+			yield .KnownValues[h2.log2]!
 			h &= ~h2
 
 

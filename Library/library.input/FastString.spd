@@ -97,14 +97,10 @@ class FastString {
 	function EncodeLength (|uint64| N)  // maybe hInt is better? like how many speedie-strings are over 128 anyhow?
 		|| L2 = N|byte|					// remove these two funcs? (one below)
 		if N >= 248
-			l2 = 248 + n.lelength
+			l2 = 248 + (n|uint|.log2 max 0) >> 3
 		self <~ L2|byte|
 		if N >= 248
 			.lint(N)
-
-	function uint64.LELength (|int|)    // could remove this also
-		opt inline
-		return (self|int|.log2 max 0) >> 3
 		
 	render
 		fs <~ self

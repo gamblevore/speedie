@@ -50,77 +50,63 @@ target debug
 
 
 function Assembler.OpenVars (|uint64|)
-	return (.VDecls|uint64| << 32) ||| (.VTemps << 0)
+	return (.VDecls|uint64| << 0) ||| (.VTemps|uint64| << 32)
 
 
-function Assembler.CloseVars (|uint64| Orig, |message| exp = nil, |asmreg| Return=nil, |asmreg|)
+function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Return=nil, |asmreg|)
 	opt NoRefCounts
 	
-	|| OrigDecls = Orig >> 32
-	|| OrigTemps = (orig << 32) >> 32
+	|| OrigTemps = Orig >> 32
+	|| OrigDecls = (orig << 32) >> 32
 
-	|| DoMore = true
-	while .VTemps < OrigTemps
-		exp = .CloseOneVar(exp, -1, DoMore)
-
-	while DoMore and .VDecls > OrigDecls
-		exp = .CloseOneVar(exp, OrigDecls, DoMore)
-		loop DoMore
+	while .CloseOneVar(exp, origtemps, .vtemps)
+		0
+	
+	while .CloseOneVar(exp, OrigDecls, .vdecls)
+		0
 
 	return Return
 
 
-function Assembler.CloseOneVar (|message?| exp,  |int| OriginalDecls,  |$bool| DoMore,  |message?|)
-	opt norefcounts
+function Assembler.CloseOneVar (|message?| exp,  |uint| Orig,  |$uint| Curr,  |bool|)
+	opt norefcounts						  /// READ TABLE ///
+	|| Extra = Curr &~ Orig
+	if Extra == -1 // huh?
+	require Extra
 	
-										  /// READ TABLE ///
-	|| v =  (.VDecls, .vtemps)(OriginalDecls >= 0)
+	|| v = extra.log2
+	Curr = Curr &~ (1 << v)
 	|| d = .vars[v]
-	if !d and OriginalDecls>=0 // oof?
+	if !d and Orig&1 // oof?
 	
 	
-										   /// UNHOIST ///
-	|| k = .KnownValues[v]
+	|| k = .KnownValues[v]				   /// UNHOIST ///
 		target debug
 			if d and d.fat and d.fat != k // are these always the same? then remove one?
 		
-		|| DebugView = !.state.inlinedepth  and  originaldecls >= 0  and  options.optimise < 4
+		|| DebugView = (Orig&1)  and  !.state.inlinedepth  and  options.optimise < 4
 		if !DebugView  and  k.µRefCount <= 1 // HoistComplete did +1 on it's refcount earlier. So it is unused.
 			.Nop(k) 
 		  else
-			// this is some kind of mini-hoister?
-			// we can remove this too, once we have the proper (redo) hoister.
-			// or just remove now?
-			if (k isa asm.gtab) and (v == OriginalDecls + 1) // this happens to be the first gtab and it is used.
-				DoMore = false
-				return nil // keep it
-			k.µRefCount-- // restore :)
+			k.µRefCount--	// restore :)
 		.KnownValues[v] = nil
 	.HoistMap &=~ (1<<v)
 			
-
-										/// NOP UNUSED VARS ///
-	if d is CompilerCreated
+						
+	if d is CompilerCreated				/// NOP UNUSED VARS ///
 		|| f = d.fat
-			if  f.µrefcount == 1  and  f isa asm.allo // oof
+			if  (f.µrefcount == 1)  and  (f isa asm.allo) // oof
 			.AskNop(f)
 
 
-									  /// DEALLOCATE STRUCTS ///
-	if  d  and  exp
+	if  d  and  exp					  /// DEALLOCATE STRUCTS ///
 		if (d isnt return and global)  and  d.IsBareStruct
-			exp = exp.DeepLast
-			ASMType.AllocBearStruct(-1, exp, v, d)
+			ASMType.AllocBearStruct(-1, exp.DeepLast, v, d)
 
 
 											/// CLEANUP ///
 	.vars[v] = nil
-	if OriginalDecls >= 0
-		.VDecls = v - 1
-	  else
-		.VTemps = v + 1
-			
-	return exp
+	return true
 
 
 

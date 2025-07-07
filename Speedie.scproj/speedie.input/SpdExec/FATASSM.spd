@@ -139,27 +139,6 @@ struct FatASM
 	setter Debug (|message|)
 		.msg = Value
 	
-//	function ResetFunctionCall (|int| reg, |bool|)
-//		// we will be the last instruction
-//		// so how can we reset this? I thinkonly by comparing the
-//		// state's vdecls. Temps will disappear.
-//		|| v = Assembler.sh.VDecls
-//		if v == reg and v == (.r0 - 1)
-//			.Outputs = v|int|.log2
-//			.r0 = v
-//			return true
-
-
-/*
-	function SmartFatness (|int| reg, |maybebool|)
-		opt norefcounts
-		|| f = .form
-		for i in f.Count
-			if .Reg(i) == reg
-				|| p = f.Params[i]
-				if p.IsReg
-					return (p is Output)|maybebool|
-*/
 
 	syntax equals (|int| ID, |bool| aware, |bool|)
 		(aware), return .id == ID

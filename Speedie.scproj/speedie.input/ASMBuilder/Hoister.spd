@@ -83,7 +83,12 @@ struct SC_Hoister
 
 		if fat
 			fat.µRefCount++
-		
+			|| v = .vars[n]
+				v.au.fatconstindex = fat.index
+				v.au.ExportPosition = fat._const
+	
+		// what about updating the fatconstindex on .vars?
+		// its meant to be the same, right? same reg?
 		.KnownValues[n] = fat
 		.HoistMap |= 1<<n
 

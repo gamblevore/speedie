@@ -307,6 +307,9 @@ datatype uint
 	operator ror (|uint| bits, |uint|)
 		bits &= 31
 		return ((self >> bits) ||| (self << (32 - bits)))
+	
+	function Log2 (|int|)
+		return self|int|.log2
 		
 		
 	iterator
@@ -319,7 +322,7 @@ datatype uint
 		|| curr = self|uint|
 		while curr
 			|| lowest = curr.lowestbit
-			yield Lowest (Lowest|int|.log2)
+			yield Lowest (Lowest.log2)
 			curr = curr &~ Lowest
 	
 	
