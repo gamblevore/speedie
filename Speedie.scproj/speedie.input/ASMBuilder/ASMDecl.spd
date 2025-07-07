@@ -28,7 +28,7 @@ function @DeclAlterable.Restore (|SCDecl| d)
 function assembler.DeclReset (|scdecl| d)
 	d.au.FatConstIndex = 0
 	d.au.exportposition = 0
-	(d isnt reference)
+	// (d isnt reference)
 	(d isnt const)
 	d.DepthOfBranch = .state.BranchDepth			// Number scheme is different. ASM doesn't use .DepthOfBranch though?
 

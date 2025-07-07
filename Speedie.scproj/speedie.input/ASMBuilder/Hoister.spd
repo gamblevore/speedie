@@ -57,6 +57,9 @@ struct SC_Hoister
 
 
 	helper Added (|Assembler| sh, |asmreg| Dest, |scdecl| decl, |asmreg| K)
+		if "inline_more".trap
+			sh.fuckoff
+			
 		decl.au.FatConstIndex = k.fatindex
 
 		|| n = dest.reg
@@ -72,7 +75,9 @@ struct SC_Hoister
 			.Added(sh, dest, decl, K)
 
 
-	function Assembler.Hoist (|?&fatasm| fat, |int| n)
+	function Assembler.Hoist (|?&fatasm| fat, |int| n) 
+		opt norefcounts
+		
 		if fat == .KnownValues[n]
 			return			// already done. Probably a number.
 		
@@ -83,9 +88,10 @@ struct SC_Hoister
 
 		if fat
 			fat.µRefCount++
-			|| v = .vars[n]
-				v.au.fatconstindex = fat.index
-				v.au.ExportPosition = fat._const
+		|| v = .vars[n]
+			v.au.fatconstindex = (fat.index,0)(fat)
+			v.au.ExportPosition = (fat._const,0)(fat)
+				
 	
 		// what about updating the fatconstindex on .vars?
 		// its meant to be the same, right? same reg?
@@ -114,9 +120,10 @@ struct SC_Hoister
 		.Added(sh, dest, decl, K)
 			
 
-	// maybe just store the numbers in a list?
-	// so check against OUR number? IDK?
+	// Maybe just store the numbers in a list?
+	// So check against OUR number? IDK?
 	// And what if its pre-hoisted?
+	
 	helper DidReuseConst (|SCDecl| decl, |bool|)
 		opt NoRefCounts
 /		|| k = decl.au.ExportPosition
@@ -124,6 +131,9 @@ struct SC_Hoister
 			return true
 		for old in Assembler.sh
 			if old._Const == K
+				if "inline_more".trap
+					assembler.sh.fuckoff
+					
 				old.µRefCount++
 				decl.au.FatConstIndex = old.Index
 				return true

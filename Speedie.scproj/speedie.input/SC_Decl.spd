@@ -95,8 +95,13 @@ datatype SCDeclInfo (uint)
 		SelfImplicit	= Self  ||| local // local is set by CollectOneParam, anyhow?
 		DclCopied		= altered ||| stayborrowed ||| api ||| UpgradeableContained ||| CompilerCreated ||| body ||| return // need more too? do later
 
-	function abc
+
+	function CheckHighestValue
 		|| x = IntendedAsReturn
+	
+	
+	syntax is (|scdeclinfo| d, |bool|)
+		return self & d // for debug
 	
 	
 	function Set (|SCDeclInfo| d, |bool| b, |SCDeclInfo|)
@@ -179,11 +184,9 @@ class SCDecl (SCObject) {
 			return .au.info & d
 
 	syntax is (|SCDeclInfo| d, assigns:|bool|)
+		if .name ~= "vq"
+			if d is reference
 		.sanity
-//		if (d & scdeclinfo.local) and (.syntaxis(d) != value)
-//			if (.name ~= "QA")
-//				argh = self
-//			if (.objectid == 33654202) or (compiler.During == compiler.Packing) 
 		.au.info = .au.info.set(d, Value)	
 		.sanity
 

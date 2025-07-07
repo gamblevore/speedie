@@ -715,6 +715,7 @@ struct Assembler
 		opt norefcounts
 		LL.Start = .curr
 
+		// if "InlineParam".trap
 		.CollectASMParams
 		.InlineParameters(prms, fn.LinkDepth==1)
 		|| RealStart = .curr		// Params need to be done anyhow... so don't count them.
@@ -766,12 +767,10 @@ struct Assembler
 
 
 	function InlineParameters (|message| prms, |bool| IsLeaf)
+		if "InlineParam".trap
 		opt norefcounts
 		|| p = prms.first!
 
-//		if "Inline_More".trap
-//			"-------"
-		
 		for a in .fn.Args			
 			|| v = .InlineVar(prms, p, a)
 			if !v
@@ -784,11 +783,6 @@ struct Assembler
 					v = v2
 				  else
 					v = .µInto(p, v)
-			
-//			if "Inline_More".trap
-//				print a
-//				print ": "
-//				v.debugprint
 			
 			v = .UpdateInlineReg(V, a)
 			.MarkDeclAsConst(a, V, nil)

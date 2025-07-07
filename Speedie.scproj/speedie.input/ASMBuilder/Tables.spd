@@ -813,14 +813,20 @@ function LocalThg (|scdecl| d, |asmreg|)
 
 
 function SetDeclToConst (|scdecl| decl, |asmreg| Initial, |&fatasm| f, |bool|)
+	// isn't this the same as hoisting?
+	// can't I just merge this with our current knownvalue updater thingy?
 	require  (Initial is ConstOutput) and (decl isnt AlteredInBranch)
-
+	
 	(decl is const)
+	.knownvalues[initial.reg] = f
 	if f
 		// || k = 1, k = 2, k = k + 3
 		decl.au.ExportPosition = f._const
 		if !Initial.FatIndex
-		decl.au.FatConstIndex = Initial.fatindex
+		if "inline_more".trap
+			.fuckoff
+			
+		decl.au.FatConstIndex = f.index
 		return true
 
 	if !initial.reg
@@ -931,3 +937,8 @@ function Message.TypeCastDoesNothing (|bool|)
 //function string.Trip (|bool|)
 //	return asmtype.LastDebugMark ~= self 
 
+
+|| fuckcount = 0
+function assembler.fuckoff
+	fuckcount++
+	//debugger
