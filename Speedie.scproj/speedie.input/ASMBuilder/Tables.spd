@@ -343,14 +343,11 @@ function Decl (fn_asm)
 	
 	|| item = rel.Last!
 
-	debugat 16
 	if ty isnt local								// A carray or somthing?? idk
 	if ty is AlteredInBranch
 		return .µInto(item, dest)
 	
-	(dest is notalteredinbranch)
 	|| K = .µInto(item, dest)
-	(k is notalteredinbranch)
 	if k is ConstOutput
 		.MarkDeclAsConst(ty, k, nil)
 	return k
@@ -774,7 +771,7 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	|| op = exp.second
 	op ?= exp
 	rz = (fn)(self, dest, ml, mr, op)
-	(rz is notalteredinbranch) = (dest is notalteredinbranch) // 
+//	(rz is notalteredinbranch) = (dest is notalteredinbranch) // 
 	
 	target debug: if rz.IsVec != ml.IsVec			// argh?
 	
@@ -821,11 +818,12 @@ function SetDeclToConst (|scdecl| decl, |asmreg| Initial, |&fatasm| f, |bool|)
 	// can't I just merge this with our current knownvalue updater thingy?
 	require  (Initial is ConstOutput) and (decl isnt AlteredInBranch)
 	
+	(initial is notalteredinbranch)
 	(decl is const)
-	.SetConst(f, initial.reg)
-	//.knownvalues[initial.reg] = f
 	if f
-		//decl.au.ExportPosition = f._const
+		(f is notalteredinbranch)
+	.SetConst(f, initial.reg)
+	if f
 		return true
 
 	if !initial.reg
