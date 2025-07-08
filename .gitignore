@@ -1,3 +1,4 @@
+#Base
 **/Build*/
 /Speedie.scproj/Terminal/
 cpp.hidden
@@ -18,6 +19,7 @@ Utils/jz
 /FirstProj*
 /examples/**/books.box
 **/speedie2.xcodeproj
+
 #Terminal
 /Terminal/Backup/
 /Terminal/Debug/
@@ -36,4 +38,9 @@ examples/prototest
 *.strings.txt
 examples/encoding_test(ignore).spd
 Library/CppLib/spdsort/spdsort.xcodeproj/*
+
+#Cpps
 Library/CppLib/spdsort/spdsort.cpp
+jeebox.scproj/Cpp/JB.cpp
+jeebox.scproj/Cpp/JB.h
+jeebox.scproj/Cpp/JB_Globals.cpp
