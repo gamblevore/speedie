@@ -23,7 +23,7 @@ datatype ASMReg (uint64)
 		Discard
 		Set
 		Declaration
-		CanHoist
+		NotAlteredInbranch
 		NoScale
 		ContainsAddr
 		Textual
@@ -97,6 +97,9 @@ datatype ASMReg (uint64)
 
 	function IsConst (|int64| val, |bool|)
 		return  (self is ConstOutput) and (.const == val)
+
+	function CanBeKnownValue (|bool|)
+		 return self is NotAlteredInbranch and constoutput
 	
 	function Negate (|bool| Neg=true, |asmreg|)
 		return (self|uint64| xor (neg << 16)|uint64|)|asmreg|
@@ -247,7 +250,7 @@ datatype ASMReg (uint64)
 		return dest
 
 	function ReUseRegInPlace (|asmreg| dest, |asmreg|)
-		isnt CanHoist
+		isnt notalteredinbranch
 		return .reg(dest)
 	
 	function with (|asmreg| dest, |asmreg| InUse, |asmreg|)

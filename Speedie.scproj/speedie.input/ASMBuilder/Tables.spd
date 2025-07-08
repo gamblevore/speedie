@@ -278,6 +278,7 @@ function ConstConvert  (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg
 	return .NumToReg(exp, K, dest, new)
 
 
+
 function SetRel (fn_asm)						// function relset (
 	opt	norefcounts								//     x[func()] = y++
 	|| A = exp.first!.asmunbra
@@ -285,7 +286,7 @@ function SetRel (fn_asm)						// function relset (
 	|| X = .ExistingVar(A, VarUseMode.set)
 		|| D = a.ASMDecl
 		dest = .µInto(B, X)
-		if x is CanHoist
+		if x.CanBeKnownValue
 			.MarkDeclAsConst(D, nil, dest)
 		return dest
 
@@ -337,17 +338,19 @@ function Decl (fn_asm)
 	.DeclReset(ty)
 	dest = .DeclareMe(rel, ty)
 
-	if !exp.obj or dest is CanHoist					// Huh?
 	if ty.IsBareStruct
 		return AllocBearStruct(1, exp, dest, ty)
 	
 	|| item = rel.Last!
 
+	debugat 16
 	if ty isnt local								// A carray or somthing?? idk
-	if (ty is AlteredInBranch) or (ty isnt local)
+	if ty is AlteredInBranch
 		return .µInto(item, dest)
-
+	
+	(dest is notalteredinbranch)
 	|| K = .µInto(item, dest)
+	(k is notalteredinbranch)
 	if k is ConstOutput
 		.MarkDeclAsConst(ty, k, nil)
 	return k
@@ -771,7 +774,8 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	|| op = exp.second
 	op ?= exp
 	rz = (fn)(self, dest, ml, mr, op)
-
+	(rz is notalteredinbranch) = (dest is notalteredinbranch) // 
+	
 	target debug: if rz.IsVec != ml.IsVec			// argh?
 	
 	rz = rz.ConstInputFromMath(ml, mr)
@@ -795,7 +799,7 @@ function LocalThg (|scdecl| d, |asmreg|)
 	(t is param) = DP
 	
 	if  d isnt AlteredInBranch
-		(t is CanHoist)
+		(t is NotAlteredInbranch)
 		if d is Const
 			(t is constoutput)
 		|| fi = d.au.FatConstIndex
@@ -818,15 +822,10 @@ function SetDeclToConst (|scdecl| decl, |asmreg| Initial, |&fatasm| f, |bool|)
 	require  (Initial is ConstOutput) and (decl isnt AlteredInBranch)
 	
 	(decl is const)
-	.knownvalues[initial.reg] = f
+	.SetConst(f, initial.reg)
+	//.knownvalues[initial.reg] = f
 	if f
-		// || k = 1, k = 2, k = k + 3
-		decl.au.ExportPosition = f._const
-		if !Initial.FatIndex
-		if "inline_more".trap
-			.fuckoff
-			
-		decl.au.FatConstIndex = f.index
+		//decl.au.ExportPosition = f._const
 		return true
 
 	if !initial.reg

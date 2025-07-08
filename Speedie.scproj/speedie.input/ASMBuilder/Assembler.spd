@@ -29,7 +29,7 @@ struct Assembler
 	|scfunction--|				Out
 
 	|?&FatASM|					InlineEnd
-	|uint|						HoistMap
+	|uint|						KnownValuesMap
 	|?&FatASM|					Orig
 	|&FatASM|					FuncStart
 	|&FatASM|					LastDebug
@@ -241,7 +241,7 @@ struct Assembler
 		for v.regoutputs in fat
 			v&=31
 			.KnownValues[v] = nil
-			.HoistMap &=~ (1<<v)
+			.KnownValuesMap &=~ (1<<v)
 
 		depth++
 		if depth > 7
@@ -577,7 +577,7 @@ struct Assembler
 		fn.StartASM
 		.LastDebug = .curr
 		.InlineEnd = nil
-		.hoistmap = nil
+		.KnownValuesMap = nil
 		.FuncStart = .curr
 		.ReturnASM = fn.ASMReturn.regtype
 		.AddFuncParams(fn)
@@ -767,7 +767,7 @@ struct Assembler
 
 
 	function InlineParameters (|message| prms, |bool| IsLeaf)
-		if "InlineParam".trap
+		// if "InlineParam".trap
 		opt norefcounts
 		|| p = prms.first!
 
@@ -837,7 +837,7 @@ struct Assembler
 
 
 	iterator
-		|| h = .hoistmap
+		|| h = .KnownValuesMap
 		while h
 			|| h2 = h.LowestBit
 			yield .KnownValues[h2.log2]!

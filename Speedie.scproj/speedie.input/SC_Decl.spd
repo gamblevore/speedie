@@ -184,8 +184,8 @@ class SCDecl (SCObject) {
 			return .au.info & d
 
 	syntax is (|SCDeclInfo| d, assigns:|bool|)
-		if .name ~= "vq"
-			if d is reference
+//		if .name ~= "vq"
+//			if d is reference
 		.sanity
 		.au.info = .au.info.set(d, Value)	
 		.sanity

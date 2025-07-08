@@ -35,56 +35,24 @@ struct SC_Hoister
 		AsLoop = 1<<20
 
 
-	function HoistNormal (|message| exp)
-		disabled
-		.spare = 4
-		.HoistRecursive(Assembler.sh, exp, 0)
-		.FillConsts
-
-
-	function HoistLoop (|Assembler| sh, |message| exp)
-		disabled
-		.Spare = 5
-		.HoistRecursive(sh, exp, asloop)
-		.FillConsts
-
-
-	helper FillConsts
-		opt norefcounts
-		for i in .count
-			|| prop = .consts[i]!
-			.PostRunConst(Assembler.sh, prop, prop.asmdecl)
-
 
 	helper Added (|Assembler| sh, |asmreg| Dest, |scdecl| decl, |asmreg| K)
-		if "inline_more".trap
-			sh.fuckoff
-			
 		decl.au.FatConstIndex = k.fatindex
-
 		|| n = dest.reg
-		sh.hoist(k.fat, n)
+		sh.setconst(k.fat, n)
 		if .bits & (1<<n)  				// what?
 		.Bits |= 1<<n
 
-	
-	helper HoistGlobal (|Assembler| sh, |message| prop, |scdecl| decl)
-		if !sh.TryGetGlob(decl)
-			|| dest = sh.DeclareMe(prop, decl)
-			|| K = sh.GlobAddrSub(decl, prop, dest)
-			.Added(sh, dest, decl, K)
 
-
-	function Assembler.Hoist (|?&fatasm| fat, |int| n) 
+	function Assembler.SetConst (|?&fatasm| fat, |int| n)
+		description "Only if not altered in branch"
 		opt norefcounts
 		
 		if fat == .KnownValues[n]
 			return			// already done. Probably a number.
 		
 		target debug		// These should never happen!
-			if .HoistMap & (1<<n)
-			if .knownvalues[n]
-			if fat isnt CanHoist
+			if fat isnt notalteredinbranch
 
 		if fat
 			fat.µRefCount++
@@ -96,29 +64,7 @@ struct SC_Hoister
 		// what about updating the fatconstindex on .vars?
 		// its meant to be the same, right? same reg?
 		.KnownValues[n] = fat
-		.HoistMap |= 1<<n
-
-
-	function TryHoistOne (|Assembler| sh, |message| exp, |scdecl| decl, |int| Score)
-		if decl is Global // hoist straight off
-			return .HoistGlobal(sh, exp, decl)
-		
-		// do consts later
-		require (score >= AsLoop)  and  (decl is const)
-		if !.DidReuseConst(decl)
-			|| i = .count++
-			.spare--
-			target debug: if i >= 6 // what?
-			.Consts[i] = exp
-			decl.au.FatConstIndex = -1 // mark as done.
-
-
-	helper PostRunConst  (|Assembler| sh, |message| prop, |scdecl| decl)
-		|| dest = sh.DeclareMe(prop, decl)
-		(dest is canhoist)
-		|| K = sh.NumToReg(prop, decl.au.ExportPosition, dest, dest.µtype)
-		.Added(sh, dest, decl, K)
-			
+		.KnownValuesMap |= 1<<n
 
 	// Maybe just store the numbers in a list?
 	// So check against OUR number? IDK?
@@ -143,34 +89,6 @@ struct SC_Hoister
 		return .spare > 0
 	
 	
-	function HoistRecursive (|Assembler| sh, |message| exp, |int| Score, |bool|)
-		disabled
-		opt norefcounts
-		require .CanHoist
-		exp = exp.Declable
-		|| fn = exp.func
-		if fn == @arg and Score < AsLoop
-			return true
-		
-		if  fn == @dot or @thg or @num
-			|| prop = exp.ASMDecl
-			if prop is const or global
-				if score >= 0
-					.TryHoistOne(sh, exp, prop, score)
-					return .CanHoist
-				return true
-		
-		for ch.fast in exp
-			|| add = 0
-			if ch.func == @tmp
-				|| ty = ch.ASMType
-				add += (ty is kWhile) * MinHoistScore
-				add -= (ty is kIf)
-			
-			require .HoistRecursive(sh, ch, add + score)
-		return true
-
-
 
 function message.Declable (|message!|)
 	opt norefcounts
@@ -214,7 +132,6 @@ function GlobAddrSub (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	
 	|| fat = exp.GTAB(dest,  (d.IsLib)|int|,  iTable>>6)
 	fat.Const = iTable &~ 63
-	(dest is CanHoist)
 	Dest = fat * dest
 	dest.µtype = DataTypeCode._voidptr
 	return dest.HaveAddr

@@ -90,7 +90,7 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Orig,  |$uint| Curr,  |b
 		  else
 			k.µRefCount--	// restore :)
 		.KnownValues[v] = nil
-	.HoistMap &=~ (1<<v)
+	.KnownValuesMap &=~ (1<<v)
 			
 						
 	if d is CompilerCreated				/// NOP UNUSED VARS ///
