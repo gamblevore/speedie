@@ -38,7 +38,7 @@ The tree-data-structure represents your data. The Message class is similar to XM
 		.func		= other.func
 		.Obj		= other.obj
 		.indent		= other.indent
-		.flags		= other.flags ||| parser.using.flags // insertedness
+		.flags		= other.flags ||| parser.using.flags // copies global insertedness flags over
 		.RangeLength= other.RangeLength
 		.Tag		= other.Tag
 
