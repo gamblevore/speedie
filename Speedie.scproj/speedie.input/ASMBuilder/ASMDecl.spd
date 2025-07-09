@@ -3,7 +3,7 @@
 struct DeclAlterable
 	|uint64|			ExportPosition
 	|SCDeclInfo|		Info
-	|uint16|			FatConstIndex
+//	|uint16|			FatConstIndex
 	|DataTypeCode|		DataType
 
 	module
@@ -26,7 +26,7 @@ function @DeclAlterable.Restore (|SCDecl| d)
 
 
 function assembler.DeclReset (|scdecl| d)
-	d.au.FatConstIndex = 0
+//	d.au.FatConstIndex = 0
 	d.au.exportposition = 0
 	// (d isnt reference)
 	(d isnt const)

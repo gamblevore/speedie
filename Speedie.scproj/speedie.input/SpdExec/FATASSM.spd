@@ -13,7 +13,6 @@ struct FatASM
 	|byte|				JumpReg
 	|byte| 				BranchDepth
 	|byte| 				LoopDepth
-//	|byte|				DeclFlags
 	|ASMReg| 			Info
 	|message--| 		Msg
 	|uint64| 			_Const
@@ -40,7 +39,6 @@ struct FatASM
 		.outputs = 0
 		.BranchDepth = 0
 		.LoopDepth = 0
-//		.DeclFlags = 0
 		.info = nil // ??? nothing needs this?
 		// leave msg, and _const. Other things may need them still.
 		for i in –count .prms
@@ -97,14 +95,6 @@ struct FatASM
 			._op = sopp
 		return dest
 	
-	
-//	function Small (|asmreg| Dest, |asm| SOpp, |asmreg|)
-//		dest.FatIndex = .index
-//		.info = dest
-//		if dest.small
-///			._op = sopp
-//		return dest
-	
 
 	operator mul (|asmreg| info, |asmreg|)
 		cpp_part AsReg
@@ -120,14 +110,6 @@ struct FatASM
 	function Const (assigns:|int64|)
 		opt norefcounts
 		._const = value
-
-//	function F32 (assigns:|float|)
-//		if !value: value = 0			// rationalise
-//		.const = value.AsInt
-//
-//	function F64 (assigns:|Float64|)
-//		if !value: value = 0			// rationalise
-//		.const = value.AsInt
 		
 	function F32 (|float|)
 		|&uint64| A = &._Const 
@@ -152,9 +134,9 @@ struct FatASM
 		opt inline
 		return 1 + self - Assembler.sh.funcstart
 
-	function SCdecl.Fat (|&fatasm|)
-		|| K = .au.FatConstIndex|uint|
-		return K.fat
+//	function SCdecl.Fat (|&fatasm|)
+//		|| K = .au.FatConstIndex|uint|
+//		return K.fat
 
 	function uint.FAT (|&FATASM|)
 		opt inline
@@ -172,7 +154,11 @@ struct FatASM
 		if self
 			return m == .op
 	
+	operator reallyis (|asmreg| flags, |bool|)
+		return (.info & flags) == flags
+		
 	syntax is (|asmreg| flags, |bool|)
+		nil checker
 		if self
 			return (.info & flags)|uint64| != 0
 
@@ -185,11 +171,13 @@ struct FatASM
 	function asmreg.treg (|uint|)
 		return .reg ||| ((self is Temp)<<31)
 
+
 	function CopyFrom (|fatasm| D)
 		(self)[0] = (d)[0]
 		for i.FatInputs in self
 			if i 
 				i.µRefCount++
+	
 	
 	function RegInput (|int| a, assigns:|asmreg| Input)
 		cpp_part Prm
@@ -206,22 +194,39 @@ struct FatASM
 					src.µRefCount++
 			  else
 				debugger // what?
-	
-	
-	function Dest (|uint| a, |asmreg| info)
-		opt inline
-		.prms[a] = info.treg
-		.Outputs |= 1<<a
 
-	
-//	function Altered (|uint|) 
-//		for prm.regoutputs in self
-//			rz |= 1<<(prm&31)
-	
+
+
+	function assembler.ReDest (|uint| a, |asmreg| info, |fatasm| f)
+		// lets see.
+		|| old = f.prms[a] & 31 					// Need to remove the old output.
+			if .Registers[old] == f
+				.KnownValuesMap &= ~(1 << old)
+				.Registers[old] = nil
+		
+		f.Dest(a, info, self)						// Then we set it to the new value
+
+
+
+	function Dest (|uint| a, |asmreg| info, |&assembler| sh)
+		opt inline
+		|| changed = info.treg
+		.prms[a] = changed
+		.Outputs |= 1 << a
+		changed &= 31
+		if changed
+			sh.Registers[changed] = self
+			|| map = 1 << changed
+			if self reallyis asmreg.KnownConst		// Lets see
+				sh.KnownValuesMap |= map
+			  else
+				sh.KnownValuesMap &= ~map
+			
+
 	
 	function File (|string|)
 		opt norefcounts
-		|| s = scimport.allfiles[.filenum]
+		|| s = SCImport.AllFiles[.filenum]
 			return s
 	
 	syntax Using (|&fatasm|)

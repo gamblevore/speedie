@@ -15,23 +15,27 @@ function message.ASMDecl (|SCDecl!|)
 	target debug: rz.ASMSanity
 
 
-function message.OperatorMul (|asm| op, |&fatasm|)
-	cpp_part RequestOp
-	|| a = Assembler.sh
-	|| p = a.Curr
-	if p < a.End
-		if  .Position < 0
+function assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
+	|| p = .Curr
+	if p < .End
+		if  exp.Position < 0
 		p[0] = nil
-		a._curr = p + 1
+		._curr = p + 1
 		P._op = op
-		p.debug = self
-		p.BranchDepth = a.State.BranchDepth
-		p.LoopDepth = a.State.LoopDepth
-		p.BasicBlock = a.BasicBlock
+		p.debug = exp
+		p.BranchDepth = .State.BranchDepth
+		p.LoopDepth = .State.LoopDepth
+		p.BasicBlock = .BasicBlock
 		return p
 
-	error (self, "Function too large (over 64K)")
-	return a.start
+	error (exp, "Function too large (over 64K)")
+	return .start
+	
+	
+function message.OperatorMul (|asm| op, |&fatasm|)
+	|| a = Assembler.sh
+	return a.RequestOp(op, self)
+	
 
 
 target debug
@@ -69,43 +73,35 @@ function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Ret
 
 
 function Assembler.CloseOneVar (|message?| exp,  |uint| Orig,  |$uint| Curr,  |bool|)
-	opt norefcounts						  /// READ TABLE ///
+	opt norefcounts										/// READ TABLE ///
+	target debug
+		|| C0 = Curr
 	|| Extra = Curr &~ Orig
 	if Extra == -1 // huh?
 	require Extra
 	
 	|| v = extra.log2
-	Curr = Curr &~ (1 << v)
-	|| d = .vars[v]
-	if !d and Orig&1 // oof?
-	
-	
-	|| k = .KnownValues[v]				   /// UNHOIST ///
-		target debug
-			if d and d.fat and d.fat != k // are these always the same? then remove one?
-		
+	Curr &=~ (1<<v)
+	.KnownValuesMap &=~ (1<<v)
+
+	|| fat = .Registers[v]		#require
+	.registers[v] = nil
+	|| k = (Fat, nil)(fat is NotAlteredInbranch)		/// UNHOIST ///		
 		|| DebugView = (Orig&1)  and  !.state.inlinedepth  and  options.optimise < 4
 		if !DebugView  and  k.µRefCount <= 1 // HoistComplete did +1 on it's refcount earlier. So it is unused.
 			.Nop(k) 
 		  else
-			k.µRefCount--	// restore :)
-		.KnownValues[v] = nil
-	.KnownValuesMap &=~ (1<<v)
+			k.µRefCount--								/// restore :) ///
 			
 						
-	if d is CompilerCreated				/// NOP UNUSED VARS ///
-		|| f = d.fat
-			if  (f.µrefcount == 1)  and  (f isa asm.allo) // oof
-			.AskNop(f)
+	if fat is CompilerCreated							/// NOP UNUSED VARS ///
+		if  (fat.µrefcount == 1)  and  (fat isa asm.allo) // oof
+		.AskNop(fat)
 
 
-	if  d  and  exp					  /// DEALLOCATE STRUCTS ///
-		if (d isnt return and global)  and  d.IsBareStruct
-			ASMType.AllocBearStruct(-1, exp.DeepLast, v, d)
+	if  exp  and  fat isa asm.allo						/// DEALLOCATE STRUCTS ///
+		ASMType.AllocBearStruct(-1, exp.DeepLast, v, fat.Reg(1)<<4)
 
-
-											/// CLEANUP ///
-	.vars[v] = nil
 	return true
 
 

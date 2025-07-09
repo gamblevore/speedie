@@ -104,8 +104,6 @@ extend Assembler
 		fat.Const = v
 		(dest is realconst)
 		rz = fat*dest
-		if  (dest isnt Temp and textual)  and  (dest is NotAlteredInbranch)
-			.SetConst(fat, dest.reg)
 		
 
 	function NumToReg (|message| exp, |int64| V, |asmreg| Reg, |datatypecode| SrcType, |asmreg|)

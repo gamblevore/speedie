@@ -37,8 +37,7 @@ struct Assembler
 	|&FatASM|					_Curr    
 	|&FatASM|					End    
 
-	|scdecl--[32]|				Vars
-	|(?&FATASM)[32]|			KnownValues
+	|(?&FATASM)[32]|			Registers
 	|FatASM| 					Zero
 
 	constants
@@ -128,11 +127,6 @@ struct Assembler
 		return .Assign(dest, src, exp)
 
 
-	syntax append (|asm| code, |message| dbg, |&FatASM|)
-		cpp_part RequestOp
-		return dbg.operatormul(code)
-
-
 	syntax expect (|message?| where=nil, |string| msg)
 		cpp_part Fail
 		|| f = SCFunction.currfunc!
@@ -159,7 +153,7 @@ struct Assembler
 		t.reg = freeBit.log2
 
 		Type.WholeType = t
-		.Vars[t.reg] = Type
+//		.Registers[t.reg] = Type
 		.Vdecls = d
 		check (!(.vdecls & .VTemps)) (where, "No free local variables.")	// entirely full
 		target debug: Type.ASMSanity
@@ -239,11 +233,11 @@ struct Assembler
 		|| C = .curr - 1
 		if fat == C
 			._curr = C // nice
-
 		for v.regoutputs in fat
 			v&=31
-			.KnownValues[v] = nil
-			.KnownValuesMap &=~ (1<<v)
+			if .Registers[v] == fat
+				.Registers[v] = nil
+				.KnownValuesMap &=~ (1<<v)
 
 		depth++
 		if depth > 7
@@ -330,7 +324,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			if trap == 20236
+			if trap == 621
 				
 		  else
 			opt inline
@@ -510,9 +504,6 @@ struct Assembler
 		|| v = vd.log2
 		|| diff = (!v or dest.reg != v)
 		v += diff
-		if diff
-			.vars[v] = fn.RealReturnType
-			if  .vars[v] isnt Return  and  .vars[v] != typevoid
 		
 		vd |= 1<<v
 		.Vdecls = vd
@@ -522,7 +513,9 @@ struct Assembler
 			v = 1 max (.state.parentvars >> 32) // a simple max will fix this?
 		dest.reg = v
 		dest.µtype = fn.ASMRegType
-		return dest.ReallySimplify
+		dest = dest.ReallySimplify
+		(dest is alternate) = diff
+		return dest
 
 
 	function PackMakerInit
@@ -572,14 +565,14 @@ struct Assembler
 		.NeedsRework = false
 		.zero = nil
 		.zero.info = AsmReg()
-//		.vars = nil // C++ doesn't get right code... should be memory.fill
-		memory.Fill((&.vars[0])|&byte|, 64*8, 0)
+		.KnownValuesMap = nil
+		for i in 32
+			.registers[i] = nil
 
 		.Guard
 		fn.StartASM
 		.LastDebug = .curr
 		.InlineEnd = nil
-		.KnownValuesMap = nil
 		.FuncStart = .curr
 		.ReturnASM = fn.ASMReturn.regtype
 		.AddFuncParams(fn)
@@ -842,7 +835,7 @@ struct Assembler
 		|| h = .KnownValuesMap
 		while h
 			|| h2 = h.LowestBit
-			yield .KnownValues[h2.log2]!
+			yield .Registers[h2.log2]!
 			h &= ~h2
 
 
@@ -891,6 +884,7 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	opt norefcounts
 	|| prms = exp.last!
 	|| TableID = 0
+	if "Inline_Consts".trap
 	|| fn = prms.AsFunc
 		|| MiniDest = .AskForInline(prms, dest, fn)
 			return MiniDest
@@ -919,7 +913,13 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	if fn.HasCVersion
 		fat._op = asm.FNCX
 	fat._op += PExt > 0
+	if dest is Alternate
+		|| v = dest.reg
+		.registers[v] = fat
+
 	.RegsBitClear(exp, Start)
+		
+		
 	
 	if 0: prms.FNC3, prms.FNCX, prms.FNCX3 // MARK USED
 
@@ -944,9 +944,8 @@ target debug
 
 function Assembler.GenASMSub (|scfunction| fn)
 	opt norefcounts
-	|SC_Hoister| H 
 	|| a = fn.SourceArg!
-	asmtype.ArgSub(Assembler.Sh, A, H)
+	asmtype.ArgSub(Assembler.Sh, A)
 
 
 function Assembler.Rework (|SCFunction| fn,  |bool|)

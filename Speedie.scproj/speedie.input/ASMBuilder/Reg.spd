@@ -42,6 +42,7 @@ datatype ASMReg (uint64)
 		ZeroParam   = ConstOutput ||| param
 		RealDiscard = RealConst   ||| discard
 		NotUnConst  = fromexistingvar ||| ConstInput
+		KnownConst  = NotAlteredInbranch ||| ConstOutput
 	
 
 	function testbit

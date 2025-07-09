@@ -17,78 +17,28 @@ So where to write this?
 
 
 
-
-
-
-
-struct SC_Hoister
-	linkage
-		cpp_part Hoi
-	|uint|				Bits
-	|byte|				Count
-	|byte|				Spare
-	|message--[6]|		Consts
-
-
-	constants
-		MinHoistScore = 3
-		AsLoop = 1<<20
-
-
-
-//	helper Added (|Assembler| sh, |asmreg| Dest, |scdecl| decl, |asmreg| K)
-//		decl.au.FatConstIndex = k.fatindex
-//		|| n = dest.reg
-//		sh.setconst(k.fat, n)
-//		if .bits & (1<<n)  				// what?
-//		.Bits |= 1<<n
-
-
-	function Assembler.SetConst (|?&fatasm| fat, |int| n)
-		description "Only if not altered in branch"
-		opt norefcounts
-		
-		if fat == .KnownValues[n]
-			return			// already done. Probably a number.
-		
-		target debug		// These should never happen!
-			if fat isnt notalteredinbranch
-
-		if fat
-			fat.µRefCount++
-		|| v = .vars[n]
-			v.au.fatconstindex = (fat.index,0)(fat)
-			v.au.ExportPosition = (fat._const,0)(fat)
-				
-	
-		// what about updating the fatconstindex on .vars?
-		// its meant to be the same, right? same reg?
-		.KnownValues[n] = fat
-		.KnownValuesMap |= 1<<n
-
-	// Maybe just store the numbers in a list?
-	// So check against OUR number? IDK?
-	// And what if its pre-hoisted?
-	
-//	helper DidReuseConst (|SCDecl| decl, |bool|)
-//		opt NoRefCounts
-///		|| k = decl.au.ExportPosition
-//		if !k
-//			return true
-//		for old in Assembler.sh
-//			if old._Const == K
-//				if "inline_more".trap
-//					assembler.sh.fuckoff
-//					
-//				old.µRefCount++
-//				decl.au.FatConstIndex = old.Index
-//				return true
+function fatasm.Oppress
+	opt norefcounts
+//	
+//	if fat == .registers[n]
+//		return			// already done. Probably a number.
+//	
+//	target debug		// These should never happen!
+//		if fat isnt notalteredinbranch
 //
+//	if fat
+//		fat.µRefCount++
+//	|| v = .vars[n]
+//		v.au.fatconstindex = (fat.index,0)(fat)
+//		v.au.ExportPosition = (fat._const,0)(fat)
+//			
 //
-//	function CanHoist (|bool|)
-//		return .spare > 0
-	
-	
+//	// what about updating the fatconstindex on .vars?
+//	// its meant to be the same, right? same reg?
+//	.KnownValues[n] = fat
+//	.KnownValuesMap |= 1<<n
+
+
 
 function message.Declable (|message!|)
 	opt norefcounts

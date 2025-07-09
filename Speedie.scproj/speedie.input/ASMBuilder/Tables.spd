@@ -171,7 +171,7 @@ function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg
 	|| fat = exp.RET(Dest)
 	fat.µRefCount = 1
 	(fat is CondAnswer)
-	return fat*Dest
+	return fat * Dest
 
 
 function NilStructBuild (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg|)
@@ -323,8 +323,7 @@ function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl|
 
 
 
-function AllocBearStruct (|int| dir, |message| exp, |int| v, |scdecl| ty, |asmreg|)
-	|| size = ty.SizeOfQuery
+function AllocBearStruct (|int| dir, |message| exp, |int| v, |int| size, |asmreg|)
 	size = (size+15)>>4
 	|| dest = v.asm
 	return exp.ALLO(dest, size*dir) * dest
@@ -339,7 +338,7 @@ function Decl (fn_asm)
 	dest = .DeclareMe(rel, ty)
 
 	if ty.IsBareStruct
-		return AllocBearStruct(1, exp, dest, ty)
+		return AllocBearStruct(1, exp, dest, ty.SizeOfQuery)
 	
 	|| item = rel.Last!
 
@@ -353,7 +352,7 @@ function Decl (fn_asm)
 	return k
 
 
-function ArgSub (|&Assembler| self, |message| exp, |?&sc_hoister| H, |AsmReg|)
+function ArgSub (|&Assembler| self, |message| exp, |AsmReg|)
 	opt NoRefCounts
 	for ch.fast in exp
 		//if h
@@ -368,7 +367,7 @@ function ArgSub (|&Assembler| self, |message| exp, |?&sc_hoister| H, |AsmReg|)
 
 function Arg (fn_asm) // argument 
 	|| OV = .OpenVars
-	|| what = ArgSub(self, exp, nil)
+	|| what = ArgSub(self, exp)
 	return .CloseVars(OV, exp, what)
 
 
@@ -797,13 +796,10 @@ function LocalThg (|scdecl| d, |asmreg|)
 	
 	if  d isnt AlteredInBranch
 		(t is NotAlteredInbranch)
-		if d is Const
-			(t is constoutput)
-		|| fi = d.au.FatConstIndex
-			|| f = fi|uint|.fat
+		|| f = .registers[t.reg]
+			t.FatIndex = f.index
 			if f is ConstOutput
 				(T is ConstOutput)
-				t.FatIndex = fi
 	
 	|| rr = T.reg
 		|| Ret = .State.Return
@@ -813,49 +809,49 @@ function LocalThg (|scdecl| d, |asmreg|)
 	return T
 
 
-function SetDeclToConst (|scdecl| decl, |asmreg| Initial, |&fatasm| f, |bool|)
-	// isn't this the same as hoisting?
-	// can't I just merge this with our current knownvalue updater thingy?
-	require  (Initial is ConstOutput) and (decl isnt AlteredInBranch)
-	
-	(initial is notalteredinbranch)
-	(decl is const)
-	if f
-		(f is notalteredinbranch)
-	.SetConst(f, initial.reg)
-	if f
-		return true
-
-	if !initial.reg
-		decl.au.ExportPosition = 0
-		decl.au.FatConstIndex = 0
-		return true
-		
-	debugger // ooof? 
+//function SetDeclToConst (|scdecl| decl, |asmreg| Initial, |&fatasm| f, |bool|)
+//	// isn't this the same as hoisting?
+//	// can't I just merge this with our current knownvalue updater thingy?
+//	require  (Initial is ConstOutput) and (decl isnt AlteredInBranch)
+//	
+//	(initial is notalteredinbranch)
+//	(decl is const)
+//	if f
+//		(f is notalteredinbranch)
+//	.SetConst(f, initial.reg)
+//	if f
+//		return true
+//
+//	if !initial.reg
+//		decl.au.ExportPosition = 0
+//		decl.au.FatConstIndex = 0
+//		return true
+//		
+//	debugger // ooof? 
 
 
 function MarkDeclAsConst (|scdecl| Decl, |asmreg| Initial, |asmreg| NewValue)
 	description "Marks Decl as a const, if it definitely is a const. Otherwise marks as NOT CONST. Also nops unused consts. Also updates new const value."
 	opt NoRefCounts
-	|| f = Initial.fat
-	if initial
-		require !.SetDeclToConst(Decl, initial, f)
-
-// || k = 1, k = X	 // clear k=1
-
-	|| NewFat = NewValue.fat
-	if decl is Const // Clear old const avalue.
-		(decl isnt const)
-		if f
-			.AskNop(f)
-		decl.au.ExportPosition = 0
-		|| fat = decl.fat
-		if fat and newfat != fat
-			decl.au.FatConstIndex = 0
-			.AskNop(fat)
-	
-	if NewValue
-		.SetDeclToConst(decl, newvalue, Newfat)
+//	|| f = Initial.fat
+//	if initial
+//		require !.SetDeclToConst(Decl, initial, f)
+//
+//// || k = 1, k = X	 // clear k=1
+//
+//	|| NewFat = NewValue.fat
+//	if decl is Const // Clear old const avalue.
+//		(decl isnt const)
+//		if f
+//			.AskNop(f)
+//		decl.au.ExportPosition = 0
+//		|| fat = decl.fat
+//		if fat and newfat != fat
+////			decl.au.FatConstIndex = 0
+//			.AskNop(fat)
+//	
+//	if NewValue
+//		.SetDeclToConst(decl, newvalue, Newfat)
 
 }
 

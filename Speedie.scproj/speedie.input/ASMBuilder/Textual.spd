@@ -24,6 +24,10 @@ extend Assembler
 			.TextOpSub(m)
 
 
+//	syntax append (|asm| code, |message| dbg, |&FatASM|)
+//		cpp_part RequestOp
+//		return dbg.operatormul(code)
+
 	function TextOpSub (|message| m, |bool|)
 		opt norefcounts		
 		if m == @rel
@@ -39,7 +43,7 @@ extend Assembler
 		if op.IsSetConst
 			return .SetConst(list, m)
 		
-		|| A = self <~ (op.opcode, m)
+		|| A = .Requestop(op.opcode, m)
 		m.RangeLength = a.Index // each message now knows its fat thingy.
 		|| pos = 0
 		for p in list

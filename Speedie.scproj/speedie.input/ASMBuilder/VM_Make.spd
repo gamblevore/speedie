@@ -424,52 +424,7 @@ function µparam.Which (|macro!--|)
 	if self is output
 		return vm_builder.skibidy
 	return vm_builder.arms
-	
 
-|| icecream = `function message._0 (,|&fatasm|) {
-	visible
-	rz = self * asm._0
-}`.macro
-
-
-|| rizzler = "
-if curr < after		// remove the test for curr!=nil...
-	curr++[] = rz 
-return curr
-".macro
-
-|| double_rizzler = "
-if curr < after+2
-	curr++[] = rz 
-	curr++[] = .prms[_0]
-	|| p2 = .prms[_0+1]
-	if p2
-		curr++[] = p2
-	
-return curr
-".macro
-
-|macro|     Ooof  = `rz._0 = .prms[_1]`.macro
-
-|macro|		Ugh = `function asm._0 (assigns:|uint|, |asm|): return self ||| ((value << _1) >> _2)`.macro
-
-|| ohio    = "if (((_0<<_1)>>_1) != _0): error (self, `Jumped too far`)".macro
-|| gyatt   = "rz.jumpinput(_0) = _1".macro
-|| legs    = "rz.numinput(_0) = _1".macro
-|| arms    = "rz.reginput(_0) = _1".macro
-|| skibidy = "rz.dest(_0, _1)".macro
-
-
-|| ASM_Datatype = "datatype _0 (ASM) 
-	module
-		function Encode (ASM_Encoder,)
-			visible true
-			|asm| rz = .op|asm| << 24
-		
-ASM.Forms[_1] = &_0.Encode // for now
-".macro
-
-	
 
 function AddµOp (|string| name, |int| id) 
 	opt norefcounts
@@ -510,6 +465,53 @@ function VMLine (|message| line, |faststring| vm)
 		line.Render(vm)
 		vm <~ ";"
 	vm <~ "\n"
+
+
+
+|| icecream = `function message._0 (,|&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm._0, self)
+}`.macro
+
+
+|| rizzler = "
+if curr < after		// remove the test for curr!=nil...
+	curr++[] = rz 
+return curr
+".macro
+
+
+|| double_rizzler = "
+if curr < after+2
+	curr++[] = rz 
+	curr++[] = .prms[_0]
+	|| p2 = .prms[_0+1]
+	if p2
+		curr++[] = p2
+	
+return curr
+".macro
+
+
+|| ASM_Datatype = "datatype _0 (ASM) 
+	module
+		function Encode (ASM_Encoder,)
+			visible true
+			|asm| rz = .op|asm| << 24
+		
+ASM.Forms[_1] = &_0.Encode // for now
+".macro
+
+
+|| Ooof  = `rz._0 = .prms[_1]`.macro
+|| Ugh = `function asm._0 (assigns:|uint|, |asm|): return self ||| ((value << _1) >> _2)`.macro
+|| ohio    = "if (((_0<<_1)>>_1) != _0): error (self, `Jumped too far`)".macro
+|| gyatt   = "rz.jumpinput(_0) = _1".macro
+|| legs    = "rz.numinput(_0) = _1".macro
+|| arms    = "rz.reginput(_0) = _1".macro
+|| skibidy = "rz.dest(_0, _1, a)".macro
+
 }
 
 

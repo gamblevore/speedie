@@ -45,8 +45,8 @@ extend Assembler
 		dest = .TempOnly(exp, dest)
 		
 		if 0: exp.VBLD
-		|| fat = exp * asm.VBLD
-		fat.dest(0, dest)
+		|| fat = .RequestOp(asm.VBLD, exp)
+		fat.dest(0, dest, self)
 		fat.RegInput(1) = vv[0]
 		fat.RegInput(2) = vv[1]
 		fat.RegInput(3) = vv[2]
@@ -54,5 +54,5 @@ extend Assembler
 		if v3.reg >= 16 // move missing thing in
 			exp.VSET(dest, v3, asmreg(), 3)
 
-		return fat*dest
+		return fat * dest
 

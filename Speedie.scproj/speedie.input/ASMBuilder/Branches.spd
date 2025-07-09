@@ -85,7 +85,7 @@ function BigWhile (fn_asm)
 	|| OV = .OpenVars
 	//WhileHoister = nil
 	//WhileHoister.HoistLoop(self, exp)
-	|| what = asmtype.ArgSub(self, exp, nil)
+	|| what = asmtype.ArgSub(self, exp)
 	return .CloseVars(OV, exp, what)
 	
 
@@ -100,7 +100,7 @@ function While (fn_asm)
 function WhileSub (|message| exp,  |asmreg|)
 	opt norefcounts
 	|| InitialJump = exp.JUMP												// test goes after loop
-	|| Returns = ASMType.ArgSub(self, exp.second!, nil)						// arg
+	|| Returns = ASMType.ArgSub(self, exp.second!)							// arg
 
 	|FatRange| loop_test
 	// how to step into this? Into the while-true
