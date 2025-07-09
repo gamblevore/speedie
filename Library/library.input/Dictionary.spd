@@ -55,7 +55,10 @@ class Dictionary (saveable)
 	function ValueLower (|string| s, ||)
 		if s.islower
 			return self[s]
-		return self[s.lowercase]
+		|| l = s.lowercase
+		|| v = self[l]|...--|
+		return v
+
 
 	function ValueLower (|string| s, assigns:||)
 		if s.IsLower
@@ -64,7 +67,8 @@ class Dictionary (saveable)
 			self[s.lowercase] = value
 
 
-	function Dispose									{ cpp_wrapper }
+	function Dispose
+		cpp_wrapper
 
 
 	// "..." means "Whatever it is that we contain"
