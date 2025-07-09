@@ -13,6 +13,7 @@ struct FatASM
 	|byte|				JumpReg
 	|byte| 				BranchDepth
 	|byte| 				LoopDepth
+//	|byte|				DeclFlags
 	|ASMReg| 			Info
 	|message--| 		Msg
 	|uint64| 			_Const
@@ -35,17 +36,18 @@ struct FatASM
 		opt norefcounts
 		.InputFats = 0
 		.InputRegs = 0
-		._op = value
 		.jumpreg = 0
 		.outputs = 0
 		.BranchDepth = 0
 		.LoopDepth = 0
+//		.DeclFlags = 0
 		.info = nil // ??? nothing needs this?
 		// leave msg, and _const. Other things may need them still.
 		for i in –count .prms
 			.prms[i] = 0
 		.BasicBlock = 0
 		.µrefcount = 0
+		._op = value
 		
 	function Input (|int| i, |&fatasm|)
 		|| r = (.prms[i] << 1) >> 16

@@ -59,7 +59,9 @@ struct Assembler
     function Curr (|&fatasm|)
         return ._curr
 
-
+	function Length (|int|)
+		return .curr - .funcstart
+	
 	function AddFuncParams (|SCFunction| fn)
 		opt NoRefCounts
 		for a in fn.Args
@@ -328,7 +330,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			// if trap == 103591
+			if trap == 20236
 				
 		  else
 			opt inline

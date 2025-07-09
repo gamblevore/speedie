@@ -36,12 +36,12 @@ struct SC_Hoister
 
 
 
-	helper Added (|Assembler| sh, |asmreg| Dest, |scdecl| decl, |asmreg| K)
-		decl.au.FatConstIndex = k.fatindex
-		|| n = dest.reg
-		sh.setconst(k.fat, n)
-		if .bits & (1<<n)  				// what?
-		.Bits |= 1<<n
+//	helper Added (|Assembler| sh, |asmreg| Dest, |scdecl| decl, |asmreg| K)
+//		decl.au.FatConstIndex = k.fatindex
+//		|| n = dest.reg
+//		sh.setconst(k.fat, n)
+//		if .bits & (1<<n)  				// what?
+//		.Bits |= 1<<n
 
 
 	function Assembler.SetConst (|?&fatasm| fat, |int| n)
@@ -70,23 +70,23 @@ struct SC_Hoister
 	// So check against OUR number? IDK?
 	// And what if its pre-hoisted?
 	
-	helper DidReuseConst (|SCDecl| decl, |bool|)
-		opt NoRefCounts
-/		|| k = decl.au.ExportPosition
-		if !k
-			return true
-		for old in Assembler.sh
-			if old._Const == K
-				if "inline_more".trap
-					assembler.sh.fuckoff
-					
-				old.µRefCount++
-				decl.au.FatConstIndex = old.Index
-				return true
-
-
-	function CanHoist (|bool|)
-		return .spare > 0
+//	helper DidReuseConst (|SCDecl| decl, |bool|)
+//		opt NoRefCounts
+///		|| k = decl.au.ExportPosition
+//		if !k
+//			return true
+//		for old in Assembler.sh
+//			if old._Const == K
+//				if "inline_more".trap
+//					assembler.sh.fuckoff
+//					
+//				old.µRefCount++
+//				decl.au.FatConstIndex = old.Index
+//				return true
+//
+//
+//	function CanHoist (|bool|)
+//		return .spare > 0
 	
 	
 
@@ -137,13 +137,6 @@ function GlobAddrSub (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	return dest.HaveAddr
 
 }
-
-
-	
-
-
-function Assembler.Length (|int|)
-	return .curr - .funcstart
 
 
 

@@ -30,17 +30,18 @@ datatype ASMReg (uint64)
 		ConstRequest
 		CondRequest
 		CondAnswer
+		CompilerCreated
 //		InnerParam
-		SetAlways = Textual ||| Set  // reuse const
-		Exit = [ExitFunction, ExitAtAll]
-		RealConst  = [ConstInput, ConstOutput]
-		AddrNeed   = [AddrRequest, AddrForceRequest]
+		SetAlways   = Textual ||| Set  // reuse const
+		Exit        = [ExitFunction, ExitAtAll]
+		RealConst   = [ConstInput, ConstOutput]
+		AddrNeed    = [AddrRequest, AddrForceRequest]
 		// don't go above 47
 		RemoveableOutput = ConstOutput|||Temp
-		Zero	   = RealConst ||| 56 ||| param		// 56 == datatypecode.uint64
-		ZeroParam  = ConstOutput ||| param
-		RealDiscard = RealConst ||| discard
-		NotUnConst = fromexistingvar ||| ConstInput
+		Zero	    = RealConst   ||| 56 ||| param		// 56 == datatypecode.uint64
+		ZeroParam   = ConstOutput ||| param
+		RealDiscard = RealConst   ||| discard
+		NotUnConst  = fromexistingvar ||| ConstInput
 	
 
 	function testbit
