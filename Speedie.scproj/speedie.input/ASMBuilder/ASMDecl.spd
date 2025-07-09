@@ -1,34 +1,33 @@
 
 
-struct DeclAlterable
+// use the decl's reg for the index?
+
+struct SavedRegisters 
+	|byte|					Count
+	|DeclAlterable[32]|		Items
+
+	function Save (|SCDecl| d)
+		|| i = .Count
+		expect (i < 32) 
+		.Count = i + 1
+		.items[i] = d.au // compiler buggers this up.
+
+	function Restore (|SCDecl| d)
+		|| i = .Count #expect
+		.Count = --i
+		d.au = .items[i]
+
+	
+
+struct DeclAlterable 
 	|uint64|			ExportPosition
 	|SCDeclInfo|		Info
-//	|uint16|			FatConstIndex
 	|DataTypeCode|		DataType
 
-	module
-		|byte|					Count = 0
-		|DeclAlterable[32]|		Items
-
-
-
-function @DeclAlterable.Save (|SCDecl| d)
-	|| i = Count
-	expect (i < 32) 
-	Count = i + 1
-	items[i] = d.au // compiler buggers this up.
-
-
-function @DeclAlterable.Restore (|SCDecl| d)
-	|| i = Count #expect
-	Count = --i
-	d.au = items[i]
 
 
 function assembler.DeclReset (|scdecl| d)
-//	d.au.FatConstIndex = 0
 	d.au.exportposition = 0
-	// (d isnt reference)
 	(d isnt const)
 	d.DepthOfBranch = .state.BranchDepth			// Number scheme is different. ASM doesn't use .DepthOfBranch though?
 

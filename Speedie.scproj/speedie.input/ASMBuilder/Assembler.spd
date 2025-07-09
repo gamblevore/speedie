@@ -711,11 +711,12 @@ struct Assembler
 		LL.Start = .curr
 
 		// if "InlineParam".trap
-		.CollectASMParams
+		|SavedRegisters| regs 
+		.CollectASMParams(regs)
 		.InlineParameters(prms, fn.LinkDepth==1)
 		|| RealStart = .curr		// Params need to be done anyhow... so don't count them.
 		.GenASMSub(fn)
-		.RestoreParameters
+		.RestoreParameters(regs)
 		
 		ll.after = .curr
 		|| Result = .InlineFinishWithConsts(ll)
@@ -754,11 +755,11 @@ struct Assembler
 			return v	
 	
 	
-	function CollectASMParams
+	function CollectASMParams (|savedregisters| regs)
 		opt norefcounts
 
 		for a in .fn.Args
-			DeclAlterable.save(A)
+			regs.save(A)
 
 
 	function InlineParameters (|message| prms, |bool| IsLeaf)
@@ -784,10 +785,10 @@ struct Assembler
 			p = p.next!
 	
 
-	function RestoreParameters
+	function RestoreParameters (|SavedRegisters| regs)
 		opt norefcounts
 		for a.backwards in .fn.Args
-			DeclAlterable.Restore(a)
+			regs.Restore(a)
 			
 		
 	function CurrGain (|&fatasm| Start, |int|)
@@ -918,12 +919,9 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 		.registers[v] = fat
 
 	.RegsBitClear(exp, Start)
-		
-		
 	
 	if 0: prms.FNC3, prms.FNCX, prms.FNCX3 // MARK USED
 
-	
 	fat.µRefCount += fn isnt stateless
 	if fn is Killer // return just to be safe
 		fat = exp.RET()
