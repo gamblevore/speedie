@@ -885,7 +885,7 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	opt norefcounts
 	|| prms = exp.last!
 	|| TableID = 0
-	if "Inline_Consts".trap
+	// if "Inline_Consts".trap
 	|| fn = prms.AsFunc
 		|| MiniDest = .AskForInline(prms, dest, fn)
 			return MiniDest
