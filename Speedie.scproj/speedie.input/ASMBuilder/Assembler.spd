@@ -107,7 +107,7 @@ struct Assembler
 		rz = .IncrPre(exp, togrow, ToGrow, value)
 
 
-	function AddToReg (|message| exp, |asmreg| Dest, |asmreg| Orig, |int64| Amount, |asmreg|)
+	function AddToReg (|message| exp, |asmreg| Dest, |asmreg| Orig, |int64| Amount, |asmreg|) // addnum
 		if !dest or dest == asmreg()
 			dest.µtype = orig.µtype
 		dest = .TempOnly(exp, dest)
@@ -153,7 +153,7 @@ struct Assembler
 		t.reg = freeBit.log2
 
 		Type.WholeType = t
-//		.Registers[t.reg] = Type
+		(t is notalteredinbranch) = (type isnt alteredinbranch)
 		.Vdecls = d
 		check (!(.vdecls & .VTemps)) (where, "No free local variables.")	// entirely full
 		target debug: Type.ASMSanity
@@ -242,7 +242,7 @@ struct Assembler
 		depth++
 		if depth > 7
 		for f.fatinputs in fat
-			.decr(f, depth)
+			.Decr(f, depth)
 
 		// why is this coming after? maybe better before? try?
 		|| Type = asm.noop * (fat < ._curr)
@@ -291,6 +291,10 @@ struct Assembler
 			if f and .iscurr(F)	and f.IsRead
 				return dest
 		
+		if r is temp
+			|| f = r.fat
+				return .ReDest(dest, f)
+		
 		|| dest2 = r.reg(dest)
 		dest2.µtype = dest.µtype 	 		// sigh. I guess we copy some wierd flags, from r into dest2
 		return .Assign(Dest2, r, exp)
@@ -324,7 +328,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			if trap == 621
+			// if trap == 1324
 				
 		  else
 			opt inline
@@ -377,6 +381,25 @@ struct Assembler
 			base = .AddConst(Sub, exp, base)
 
 	
+	function GTabCorrect (|asmreg| src, |scdecl| D, |message| where, |int| Acceptable, |asmreg|)
+		|| g = src.fat
+		ifn g isa asm.gtab
+			return src
+		
+		|| expected = D.au.exportposition
+		|| found = g.prms[2] << 6
+		|| Loss = expected - found
+		expect (loss >= 0) (d.source)
+		if Loss <= Acceptable
+			return src
+		
+		|| dest = src
+		if Dest isnt temp
+			dest.reg = 0
+		
+		(src is NoScale)
+		return .AddToReg(where, dest, src, loss)
+
 	
 	function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl?| Decl, |int| Index, |&fatasm|)
 		target debug: if (dest isnt set) and !dest.reg // oh man
@@ -391,7 +414,14 @@ struct Assembler
 
 		(dest asnt= asmreg.AddrRequest)
 		|| T = dest.µtype
-		|| bytes = t.ByteCount.log2
+		|| bytes = t.ByteCount
+		if decl
+			|| curr = Decl.CalculateSize(0)
+			if curr != bytes // just check.
+			bytes = curr.clamp(1,16)
+		bytes = bytes.log2
+		
+		
 		if  (bytes|uint| > 4)
 			error (exp, "Object to large to access")				// can we do struct-mem-copy?
 			bytes = 0
@@ -656,7 +686,7 @@ struct Assembler
 		|| Start = .curr
 		|| OV = .OpenVars
 		
-		|inlineblock| Old = .State			// can't use implicit types for barestructs
+		|inlineblock| Old = .State				// can't use implicit types for barestructs
 		if !dest.reg and fn.ASMReturn
 			if dest isnt discard
 				Dest = .TempOnly(prms, dest)
@@ -678,12 +708,13 @@ struct Assembler
 		
 		|fatrange| LL
 		rz = .TryInlineSub(prms, fn, AllowedGain, LL)
+		if !rz
+			.NopRange(start, .curr)				// rewind
+		
 		.state = old
 		if .state.InlineDepth == 0
 			.InlineEnd = nil
-		if !rz
-			.NopRange(start, .curr) // rewind
-		.CloseVars(OV)
+		.CloseVars(OV) // should closevars come before restore? sigh. idk.
 
 	
 	function PrmPrint (|string| s)
@@ -712,19 +743,22 @@ struct Assembler
 
 		// if "InlineParam".trap
 		|SavedRegisters| regs 
-		.CollectASMParams(regs)
+		regs.Collect(fn.args, self)
+		
 		.InlineParameters(prms, fn.LinkDepth==1)
-		|| RealStart = .curr		// Params need to be done anyhow... so don't count them.
-		.GenASMSub(fn)
-		.RestoreParameters(regs)
+		|| RealStart = .curr					// Params need to be done anyhow... so don't count them.
+		asmtype.ArgumentSub(self, fn.SourceArg!)
+		regs.Restore(fn.args)
 		
 		ll.after = .curr
 		|| Result = .InlineFinishWithConsts(ll)
 		|| Grown = .CurrGain(RealStart)
 		if Grown <= AllowedGain
 			if !result
-				(result is ConstOutput) // no longer zero
+				(result is ConstOutput)			// no longer zero
 			return Result
+		
+		regs.Rewind(self)
 	
 	
 	function UpdateInlineReg (|asmreg| V, |scdecl| D, |asmreg|)
@@ -754,13 +788,6 @@ struct Assembler
 			(a is const) = (d is const)
 			return v	
 	
-	
-	function CollectASMParams (|savedregisters| regs)
-		opt norefcounts
-
-		for a in .fn.Args
-			regs.save(A)
-
 
 	function InlineParameters (|message| prms, |bool| IsLeaf)
 		// if "InlineParam".trap
@@ -785,11 +812,6 @@ struct Assembler
 			p = p.next!
 	
 
-	function RestoreParameters (|SavedRegisters| regs)
-		opt norefcounts
-		for a.backwards in .fn.Args
-			regs.Restore(a)
-			
 		
 	function CurrGain (|&fatasm| Start, |int|)
 		|| C = .curr
@@ -804,7 +826,7 @@ struct Assembler
 		|| N = fn.µlength
 		require N and !fn.HasCVersion
 
-		|| MaxEnd = .inlineend
+		|| MaxEnd = .InlineEnd
 			|| SubInline = .curr + (N / 3)
 			require SubInline < maxend
 
@@ -861,7 +883,6 @@ function SCFunction.HasCVersion (|bool|)
 	return true
 
 
-
 function Assembler.RegClear (|message| exp, |&fatasm| C, |int| i)
 	c.prms[5] = 0
 	|| L = c.Const
@@ -907,7 +928,7 @@ function @ASMType.ASMFunction (fn_asm) // dofunction function
 	.CloseVars(Closer)
 	
 	if !TableID
-		tableid = fn.tableid ?? 0xFFFF // 0xffff means unknown?
+		TableID = fn.tableid ?? 0xFFFF // 0xffff means unknown?
 		TableID += 31
 	|| PExt = P >> 32
 	|| fat = prms.FNC(dest, TableID, P,  PExt) // prms.fncx
@@ -940,18 +961,13 @@ target debug
 // almost all lib functions have 4 or less. 5 is for proj funcs.
 	
 
-function Assembler.GenASMSub (|scfunction| fn)
-	opt norefcounts
-	|| a = fn.SourceArg!
-	asmtype.ArgSub(Assembler.Sh, A)
-
 
 function Assembler.Rework (|SCFunction| fn,  |bool|)
 	HoistSpace.NeedSpare(.Length)
 	HoistSpace.CopyFrom(.FuncStart, .Length)
 	.Orig = .FuncStart
 	.InitAndStartFunc(fn)
-	.GenASMSub(fn)
+	asmtype.ArgumentSub(self, fn.SourceArg!)
 	.FinishASM
 	.Orig = nil
 
@@ -960,7 +976,7 @@ function Assembler.GenerateASM (|scfunction| fn,  |bool|) // AsmGenerate
 	opt norefcounts
 	
 	.InitAndStartFunc(fn)
-	.GenASMSub(fn)
+	asmtype.ArgumentSub(self, fn.SourceArg!)
 	.FinishASM
 	if .NeedsRework
 		.Rework(fn)

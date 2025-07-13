@@ -352,7 +352,7 @@ function Decl (fn_asm)
 	return k
 
 
-function ArgSub (|&Assembler| self, |message| exp, |AsmReg|)
+function ArgumentSub (|&Assembler| self, |message| exp, |AsmReg|)
 	opt NoRefCounts
 	for ch.fast in exp
 		//if h
@@ -367,7 +367,7 @@ function ArgSub (|&Assembler| self, |message| exp, |AsmReg|)
 
 function Arg (fn_asm) // argument 
 	|| OV = .OpenVars
-	|| what = ArgSub(self, exp)
+	|| what = ArgumentSub(self, exp)
 	return .CloseVars(OV, exp, what)
 
 
@@ -378,8 +378,9 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 	
 	|| f = exp.first!
 	|| d = f.asmdecl
-
-	|| base = .µGetASM(f)									// x = a.b[0]
+		
+	|| base = .µGetASM(f, ASMReg.AddrRequest)				// x = a.b[0]
+	#! what if this is a gtab and its not 100% correct?
 	|| sc = exp.Second.first!
 	|| vara = .µGetASM(sc)
 
@@ -392,15 +393,21 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 	if dest isnt AddrRequest
 		dest.µType = exp.ASMDecl.au.DataType
 		return .ReadOrWrite(Dest, exp, base, vara, d)
-		
+	
 	dest = dest.HaveAddr
-	base = base.HaveAddr
 	dest.µType = DataTypeCode._voidptr
+	base = base.HaveAddr
+	base = .GTabCorrect(Base, d, f, 0)
 	return .Plus(dest, base, vara, exp)
 	
 
 
 function Dot (fn_asm)										// a.b
+	// Something simple like:   local = globalstruct.Prop
+	// this seems to fail. Even if we first do: var = globalstruct
+	// why?
+	// well... globalstruct is done via a GTAB. So... IDK?
+	
 	opt	NoRefCounts
 	|asmreg| SubDest // fool around with optimising this
 	if dest isnt set // **once** everything is working
@@ -514,14 +521,15 @@ function DoGlobal (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| D, 
 		dest = .TempTyped(exp, dest)	// so why test? and also, temptyped tests this already
 										// is it just for GTAB reuse? sigh.
 										
-	|| addr = .GlobAddr(d, exp, dest)
-		if dest is AddrRequest
-			addr.µtype = d.au.DataType
-			return addr.HaveAddr
-		
-		dest.µtype = d.au.DataType
-		dest = dest asnt ASMReg.ContainsAddr
-		return .ReadOrWrite(dest, Exp, addr, ASMReg(), d, 0)
+	|| addr = .GlobAddr(d, exp, dest)$
+
+	if dest is AddrRequest
+		addr.µtype = d.au.DataType
+		return addr.HaveAddr
+	
+	dest.µtype = d.au.DataType
+	dest = dest asnt ASMReg.ContainsAddr
+	return .ReadOrWrite(dest, Exp, addr, ASMReg(), d, 0)
 	
 
 
@@ -600,13 +608,14 @@ function NotTemp (|&Assembler| self, |asmreg| Src, |message| p)
 	check (src isnt temp) (p, "Can't increment temporary value.")
 
 
-
 function Incrementatulatorifier		(fn_asm)				// --a++
 	visible
 	opt	NoRefCounts
 	
 	|| Src = .µGetASM(exp, dest as ASMReg.AddrRequest)
 	|| D = exp.ASMDecl	
+	src = .GTabCorrect(src, d, exp, 63)
+	
 	|| Amount = IncrAmount(src, mode, D)
 
 	if dest is discard
@@ -616,6 +625,7 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 			dest = .TempTyped(exp, dest)
 		  else
 			dest.reg = src
+	
 	|| p = exp.parent! // better positions
 	if src is ContainsAddr
 		dest.µType = src.µType
@@ -770,7 +780,6 @@ helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 	|| op = exp.second
 	op ?= exp
 	rz = (fn)(self, dest, ml, mr, op)
-//	(rz is notalteredinbranch) = (dest is notalteredinbranch) // 
 	
 	target debug: if rz.IsVec != ml.IsVec			// argh?
 	
@@ -800,6 +809,9 @@ function LocalThg (|scdecl| d, |asmreg|)
 			t.FatIndex = f.index
 			if f is ConstOutput
 				(T is ConstOutput)
+
+	if d is const
+		(t is constoutput)
 	
 	|| rr = T.reg
 		|| Ret = .State.Return
@@ -808,26 +820,6 @@ function LocalThg (|scdecl| d, |asmreg|)
 	
 	return T
 
-
-//function SetDeclToConst (|scdecl| decl, |asmreg| Initial, |&fatasm| f, |bool|)
-//	// isn't this the same as hoisting?
-//	// can't I just merge this with our current knownvalue updater thingy?
-//	require  (Initial is ConstOutput) and (decl isnt AlteredInBranch)
-//	
-//	(initial is notalteredinbranch)
-//	(decl is const)
-//	if f
-//		(f is notalteredinbranch)
-//	.SetConst(f, initial.reg)
-//	if f
-//		return true
-//
-//	if !initial.reg
-//		decl.au.ExportPosition = 0
-//		decl.au.FatConstIndex = 0
-//		return true
-//		
-//	debugger // ooof? 
 
 
 function MarkDeclAsConst (|scdecl| Decl, |asmreg| Initial, |asmreg| NewValue)

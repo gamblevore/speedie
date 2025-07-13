@@ -62,7 +62,7 @@ function TryGetGlob (|SCDecl| D, |asmreg|)
 	|uint64| range = 128 * d.globInfo.ByteCount
 	for old in Assembler.sh
 		if old isa asm.gtab
-			|uint64| Addr = old.const
+			|uint64| Addr = old.const &~ 63
 			if Addr <= find and addr + range > find
 				return old.info
 
@@ -81,7 +81,7 @@ function GlobAddrSub (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	expect (iTable <= 24~bits)   (exp, "Used over 16MB of global data")
 	
 	|| fat = exp.GTAB(dest,  (d.IsLib)|int|,  iTable>>6)
-	fat.Const = iTable &~ 63
+	fat.Const = iTable         // &~ 63 // whoever reads this should do the thing instead.
 	Dest = fat * dest
 	dest.µtype = DataTypeCode._voidptr
 	return dest.HaveAddr

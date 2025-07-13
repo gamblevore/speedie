@@ -197,18 +197,24 @@ struct FatASM
 
 
 
-	function assembler.ReDest (|uint| a, |asmreg| info, |fatasm| f)
+	function assembler.ReDest (|asmreg| info, |fatasm| f, |asmreg|)
+		|int| o = f.Outputs
+		target debug: if !o.IsPow2
+		return .ReDest(info, f, o.log2)
+		
+		
+	function assembler.ReDest (|asmreg| info, |fatasm| f, |uint| a, |asmreg|)
 		// lets see.
 		|| old = f.prms[a] & 31 					// Need to remove the old output.
 			if .Registers[old] == f
 				.KnownValuesMap &= ~(1 << old)
 				.Registers[old] = nil
 		
-		f.Dest(a, info, self)						// Then we set it to the new value
+		return f.Dest(a, info, self)						// Then we set it to the new value
 
 
 
-	function Dest (|uint| a, |asmreg| info, |&assembler| sh)
+	function Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
 		opt inline
 		|| changed = info.treg
 		.prms[a] = changed
@@ -217,10 +223,15 @@ struct FatASM
 		if changed
 			sh.Registers[changed] = self
 			|| map = 1 << changed
-			if self reallyis asmreg.KnownConst		// Lets see
+			if info is KnownConst		// Lets see
 				sh.KnownValuesMap |= map
 			  else
 				sh.KnownValuesMap &= ~map
+
+		|| U = .info
+		U.Reg = info
+		return self * U
+		
 			
 
 	
@@ -230,8 +241,9 @@ struct FatASM
 			return s
 	
 	syntax Using (|&fatasm|)
-		rz = Assembler.sh.curr
-		Assembler.sh._curr = self
+		|| A = Assembler.sh
+		rz = A.curr
+		A._curr = self
 		
 	syntax UsingComplete (|&nil| idk)
 		Assembler.sh._curr = self, (idk)
@@ -311,11 +323,11 @@ struct FatASM
 		opt inline
 		return .step(1)
 
-	function OutReg (|uint|)
+	function Reg0 (|uint|)
 		return .prms[0] & 31
 
 	function Reg (|int| i, |int|)
-		return .prms[i] & 31 // remove tmpbit + fatindex
+		return .prms[i] & 31 // remove tmpbit + fatindex		
 		
 	function CheckHasOutput 
 		opt inline

@@ -118,7 +118,6 @@ function scdecl.CalculateASMType (|asmreg|)
 		return datatypecode._voidptr|ASMReg|
 	
 	|| I = t.typeinfo
-	if I == 0//datatypecode.unusedtype // what?
 	return I|asmreg|
 
 

@@ -24,10 +24,6 @@ extend Assembler
 			.TextOpSub(m)
 
 
-//	syntax append (|asm| code, |message| dbg, |&FatASM|)
-//		cpp_part RequestOp
-//		return dbg.operatormul(code)
-
 	function TextOpSub (|message| m, |bool|)
 		opt norefcounts		
 		if m == @rel

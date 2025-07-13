@@ -325,7 +325,7 @@ extend Assembler
 		|| XY1 = .Last(asm.addk)			#require
 		if XOut.IsVec // now what?
 		|| xinreg = XIn.reg
-		require xinreg == XY1.outreg and xout.reg
+		require xinreg == XY1.reg0 and xout.reg
 		|| add2 = XY1.reg(2) + add		
 		if add2.CanStoreAsAddK
 			xy1.r2 = add2
@@ -658,7 +658,7 @@ extend Assembler
 */
 
 		|| xy1 = .last(asm.bflg)$ // what about qflg. allow both?
-		require xy1.outreg == src.reg
+		require xy1.reg0 == src.reg
 		require (src is temp) or (dest iz src)
 
 		// src is temp:     dest = (will_be_temp<<3) >> kDown
@@ -669,7 +669,7 @@ extend Assembler
 		
 		xy1.prms[3] += down
 		if src is temp
-			.ReDest(0, dest, xy1)
+			.ReDest(dest, xy1, 0)
 		return dest
 		
 		
