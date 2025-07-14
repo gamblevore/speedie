@@ -463,6 +463,13 @@
 #define   MemoryZero_Lengthu_(x)   (((uint)((x)<<22))>>22)
 
 
+#define   AddB_Ki       ((( int)((Op)<<13))>>13)
+#define   AddB_Ki_(x)   ((( int)((x)<<13))>>13)
+
+#define   AddB_Ku       (((uint)((Op)<<13))>>13)
+#define   AddB_Ku_(x)   (((uint)((x)<<13))>>13)
+
+
 #define   AddK_Ki       ((( int)((Op)<<18))>>18)
 #define   AddK_Ki_(x)   ((( int)((x)<<18))>>18)
 

@@ -1,42 +1,10 @@
 
 
 /*	
-* Pre-compile... analyse, then rewind.
-	* Works... a little slow?
-		* Can be sped up by making it more complex to avoid stuff.
-	* Maybe simpler overall?
-		* Still needs a total re-write of my hoister.
-	* avoids dead-code. Better for inlines?
-	
-
-So where to write this?
-// we can write it normally.. then just copy over to a new buffer?
-// seems to make sense.
-
+Here is the approach we will use:
+	"Pre-compile... analyse, then rewind""
+	* Can be sped up by making it more complex to avoid stuff.
 */
-
-
-
-function fatasm.Oppress
-	opt norefcounts
-//	
-//	if fat == .registers[n]
-//		return			// already done. Probably a number.
-//	
-//	target debug		// These should never happen!
-//		if fat isnt notalteredinbranch
-//
-//	if fat
-//		fat.µRefCount++
-//	|| v = .vars[n]
-//		v.au.fatconstindex = (fat.index,0)(fat)
-//		v.au.ExportPosition = (fat._const,0)(fat)
-//			
-//
-//	// what about updating the fatconstindex on .vars?
-//	// its meant to be the same, right? same reg?
-//	.KnownValues[n] = fat
-//	.KnownValuesMap |= 1<<n
 
 
 
@@ -57,34 +25,57 @@ function message.Declable (|message!|)
 
 extend Assembler {
 
+function FatASM.CanGlobGrab (|uint64| find, |uint64| range, |uint64| BS, |asmreg|)
+	opt inline
+	|uint64| Addr = .prms[2]
+	require Addr <= find
+	require addr + range > find
+	require !(addr & ((1<<BS)-1))
+	return .info
+
+
 function TryGetGlob (|SCDecl| D, |asmreg|)
+	|| G = d.GlobInfo
+	|| B = G.ByteCount
+	|uint64| range = 64 * B  // the idea is to be within N items, and before the item, and be aligned.
+							 // So what should N be?  Read/Write takes 7 bits, but CNTC uses 6 bits!
 	|uint64| find = d.au.ExportPosition
-	|uint64| range = 128 * d.globInfo.ByteCount
+
+	B--	// now, lets align this shit.
+	
 	for old in Assembler.sh
 		if old isa asm.gtab
-			|uint64| Addr = old.const &~ 63
-			if Addr <= find and addr + range > find
-				return old.info
+			|| OK = old.CanGlobGrab(find, range, B)
+				return OK
 
 
 function GlobAddr (|scdecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
+	opt norefcounts
 	|| Glob = .TryGetGlob(D)
 		return Glob
-	return .GlobAddrsub(d, exp, dest)
 
-
-function GlobAddrSub (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
-	opt norefcounts
-
-	|int64| iTable = d.au.ExportPosition
-	expect (iTable > 0)          (exp, "No global address".internal)
-	expect (iTable <= 24~bits)   (exp, "Used over 16MB of global data")
+//////
 	
-	|| fat = exp.GTAB(dest,  (d.IsLib)|int|,  iTable>>6)
-	fat.Const = iTable         // &~ 63 // whoever reads this should do the thing instead.
-	Dest = fat * dest
+	|int64| Original = d.au.ExportPosition
+	check (Original <= 32~bits)				(exp, "Too much global data used: " + original.strsize)
+	if !Original							// What?
+	if dest isnt AddrForceRequest
+		Original &= ~63
+	
+	|| Direct = Original & 18~bits
+	(Dest is GlobalMemory)
+	dest = dest.haveaddr	
 	dest.µtype = DataTypeCode._voidptr
-	return dest.HaveAddr
+	
+	|| fat = exp.GTAB(dest,  (d.IsLib)|int|,  Direct)
+	fat.Const = Direct
+	rz = fat * dest
+	
+	|| Missing = Original - Direct
+	if missing >= 4096
+		fat = exp.ADDB(dest, missing >> 12)
+		fat.const = Direct + ((missing >> 12) << 12)
+/		rz = fat * dest
 
 }
 

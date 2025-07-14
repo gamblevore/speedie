@@ -328,7 +328,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			// if trap == 1324
+			// if trap == 1332
 				
 		  else
 			opt inline
@@ -381,25 +381,6 @@ struct Assembler
 			base = .AddConst(Sub, exp, base)
 
 	
-	function GTabCorrect (|asmreg| src, |scdecl| D, |message| where, |int| Acceptable, |asmreg|)
-		|| g = src.fat
-		ifn g isa asm.gtab
-			return src
-		
-		|| expected = D.au.exportposition
-		|| found = g.prms[2] << 6
-		|| Loss = expected - found
-		expect (loss >= 0) (d.source)
-		if Loss <= Acceptable
-			return src
-		
-		|| dest = src
-		if Dest isnt temp
-			dest.reg = 0
-		
-		(src is NoScale)
-		return .AddToReg(where, dest, src, loss)
-
 	
 	function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl?| Decl, |int| Index, |&fatasm|)
 		target debug: if (dest isnt set) and !dest.reg // oh man
@@ -435,24 +416,12 @@ struct Assembler
 		
 		//  ADDK: bs, r1, 4
 		//  RD1U: r2, bs, value, 4, 0 
-		base = .InlineOffsetOpt(Base, bytes, index, 127, Decl)
-
-/*
-	// these need to be opted. Not always happening? InlineOffsetOpt seems to only do ADDK, not ADPK
-	ADPK: t30, r2, 4                               /* R++ */
-	WR4U: t31, t30, r0, 0, 0                       /* R++[0] */	
-	|| Move = .TryAddPKMemory(base) // how is this different to InlineOff~t?
-*/
-
-		if index >= 128												// read/write only allows up to 127
-			index <<= bytes
-			base = .AddToReg(exp, asmreg(), base as asmreg.noscale, index)
-			index = 0
+		base = .InlineOffsetOpt(Base, bytes, index, 7, Decl)
 
 		if 0: exp.RD1U, exp.RD1S, exp.RD2U, exp.RD2S, exp.RD4S, exp.RD8U, exp.RD16
 		if 0: exp.WR1U, exp.WR2U, exp.WR4U, exp.WR8U, exp.WR16
  
-		rz = exp.RD4U(dest, base, varadd, index>>bytes, 0)
+		rz = exp.RD4U(dest, base, varadd, index, 0)
 		if dest is set
 			rz._op = ASMType.WriteASM[bytes]
 		  else

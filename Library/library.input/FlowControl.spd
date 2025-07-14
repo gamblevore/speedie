@@ -169,7 +169,7 @@ class FlowControl
 					f.Fail(str, data, name)
 				
 			for c in data
-				f.addbyte(c)
+				f.AddByte(c)
 			.disabled = 0
 		
 		function Stop

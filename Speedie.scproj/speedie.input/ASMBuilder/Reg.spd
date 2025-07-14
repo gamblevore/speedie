@@ -31,7 +31,7 @@ datatype ASMReg (uint64)
 		CondRequest
 		CondAnswer
 		CompilerCreated
-//		InnerParam
+		GlobalMemory
 		SetAlways   = Textual ||| Set  // reuse const
 		Exit        = [ExitFunction, ExitAtAll]
 		RealConst   = [ConstInput, ConstOutput]

@@ -195,6 +195,15 @@ function message.KNST (|asmreg| r1 = nil, |int| Cond = nil, |int| Inv = nil, |in
 }
 
 
+function message.ADDB (|asmreg| r1 = nil, |int| K = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.ADDB, self)
+	rz.dest(0, r1, a)
+	rz.numinput(1) = K
+}
+
+
 function message.ADDK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh

@@ -44,6 +44,8 @@
 	RotateConst(r, Op);
 ı KNST: _
 	LoadConst(r, Op, 0);
+ı ADDB: _
+	i1 = i1 + (U1_Li << 12);
 ı ADDK: _
 	i1 = i2 + U2_Li;
 ı ADPK: _

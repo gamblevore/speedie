@@ -1,144 +1,158 @@
 
 
-extend Assembler
-	function InlineOffsetOpt (|asmreg| base, |int| pow2, |$int| index, |uint| maximum, |scdecl?| Glob, |asmreg|)
-		opt norefcounts
-		|| bs = base.fat
+
+function Assembler.InlineOffsetOpt (|asmreg| base, |int| pow2, |$int| index, |uint| MaxBits, |scdecl?| Glob, |asmreg|)
+	opt norefcounts
+	|| bs = base.fat
+	if !bs
+		return base
+	|uint| maximum = (1 << maxbits) - 1
+
+	|int64| LostBytes = 0
+	if base is GlobalMemory
+		expect (glob)
+		LostBytes = glob.au.ExportPosition
 		
-		if bs isa asm.GTAB
-			expect (glob)
-			|| lost = glob.au.ExportPosition|int64|
-			if (glob isnt global) and (glob is property)
-				debugger
-				lost += bs.const
-				lost -= bs.prms[2] << 6
-
-//				|| curr = P.CalculateSize(depth)
-//				|| SmallCurr = curr.clamp(1,16)
-				
-			  else
-				if (index)										// Hmmm.  Now what?
-				lost -= bs.const
-				expect lost >= 0
+		|| K = bs.const
+		if (glob isnt global) and (glob is property)		// a property on a global struct
+			debugger // really not sure what to do.
+			LostBytes += K
+	//		|| curr = P.CalculateSize(depth), || SmallCurr = curr.clamp(1,16)
 			
-			check !(index & (pow2)~bits)  (bs.msg, "Unaligned offset.")
+		  else
+			if (index) // not sure what to do.
+			LostBytes -= K
+			expect LostBytes >= 0
+		
+		// Our ASM store N~bits, in terms of units. (uint32, uint64, etc)
+		// But exportposition in terms of. bytes!
+		if LostBytes & (pow2)~bits
+			#!not good. We'd need to use an addk. but should never happen
+			debugger
 
-			|| i = (index + lost) << pow2
-			i >>= pow2
-
-			if i > maximum|int|									// Overlarge. Lets increase.
-				|| temp = .TempOnly(bs.msg, base)
-				temp = bs.msg.ADDK(temp, base, i) * temp
-				i = 0
-				base = temp
-			
-			index = i
-			return base
-				
-				
-		if  base is temp  and  bs isa asm.ADDK
-			|uint| CC = bs.prms[2]
-			|uint| CC2 = CC >> pow2
-			if (CC2 <= maximum) and (CC2<<pow2 == CC)
-				index += CC2
-				|| R = bs.prms[1]
-				base.reg = R
-				(base is temp) = (R >> 31)
-				base.fatindex = 0
-				.nop(bs)
+	|| i = index + (LostBytes >> pow2) 
+	if i <= maximum|int|
+		index = i
 		return base
 
+													// Unstorable. increase externally				
+	i = (index << pow2) + lostbytes
+	index = 0
+	return .addtoreg(bs.msg, base, base as asmreg.noscale, i)
 
-	function RefCountSub (|message| exp, |message| prms, |scfunction| fn, |&FatASM|)	// JB_SetRef(a, b)
-		opt	NoRefCounts
-		if fn == compiler.RefClear
-			|| offset = 0
-			|| A = .µ(prms.first!, ASMReg.AddrRequest)
-			A = .InlineOffsetOpt(A, 3, offset, 13~bits, nil)
-			return exp.RFWR(A, nil, 1, offset)						// reg to mem
+/*
+	// not sure how this works anymore
+	if  base is temp  and  bs isa asm.ADDK
+		|uint| CC = bs.prms[2]
+		|uint| CC2 = CC >> pow2
+		if (CC2 <= maximum) and (CC2<<pow2 == CC)
+			index += CC2
+			|| R = bs.prms[1]
+			base.reg = R
+			(base is temp) = (R >> 31)
+			base.fatindex = 0
+			.nop(bs)
+	return base
 
-		if fn == Compiler.RefSetRef
-			|| DestMsg = prms.first!
-			|| Out = .µGetASM(DestMsg, ASMReg.AddrRequest)
-			|| P = prms.second!
-			|| From = .µ(P, ASMReg.AddrRequest)
-			if out iz from
-				return exp.noop // wat?
-			
-			|| offset = 0
-			if Out isnt ContainsAddr
-				if From is ContainsAddr
-					from = .InlineOffsetOpt(from, 3, offset, 13~bits, P.ASMDecl)
-					return exp.RFRD(Out, From, 1, offset)			// mem to reg
-				return exp.RFST(Out, From)							// reg to reg
-			
-			|| glob = DestMsg.ASMDecl
-			if  From is ContainsAddr
-				|| where = .Temponly(P)
-				where.µtype = datatypecode._voidptr
-				From = .Read(where, P, From, nil, p.ASMDecl) * where// (mem to reg)?
-
-			out = .InlineOffsetOpt(Out, 3, offset, 13~bits, glob)
-			return exp.RFWR(Out, From, 1, offset)					// reg to mem
+/*
+	// these need to be opted. Not always happening? InlineOffsetOpt seems to only do ADDK, not ADPK
+	ADPK: t30, r2, 4                               /* R++ */
+	WR4U: t31, t30, r0, 0, 0                       /* R++[0] */	
+	|| Move = .TryAddPKMemory(base) // how is this different to InlineOff~t?
+*/
+*/
 
 
-		if fn == Compiler.RefIncr2
-			|| A = .µ(prms.first!, asmreg.AddrRequest)
-			target debug: if a isnt ContainsAddr					// always memory
-			|| offset = 0
-			A = .InlineOffsetOpt(A, 3, offset, 13~bits, nil)
-			|| B = .µ(prms.second!)
-			target debug: if b is ContainsAddr						// always reg
-			return exp.RFWR(a, b, 0, offset)
-		  else
-			|| A = .µ(prms.first!)
-			target debug: if A is ContainsAddr						// always a reg!
+function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, |&FatASM|)	// JB_SetRef(a, b)
+	opt	NoRefCounts
+	if fn == compiler.RefClear
+		|| offset = 0
+		|| A = .µ(prms.first!, ASMReg.AddrRequest)
+		A = .InlineOffsetOpt(A, 3, offset, 13, nil)
+		return exp.RFWR(A, nil, 1, offset)						// reg to mem
 
-			if fn == Compiler.RefIncr
-				|| P = .last(asm.gstr)
-					if (p.r0 samereg a.reg) and p.r1 == 0
-						p.r1 = 1
-						return p
-				return exp.rfst(asmreg(), a)
-
-			if fn == Compiler.RefDecr
-				|| P = .last
-				#! what
-				if (p isa asm.rfst)
-					if (p.r1 samereg a.reg) and (p.r0 == 0)
-						p._op = asm.RFAP
-						p.r0 = p.prms[1]
-						p.r1 = 0
-						return p
-				  elseif (p isa asm.gstr)
-					if p.r0 samereg a.reg and p.r1 == 1
-						return nil
-				return exp.RFST(a, asmreg())
-	
-			if fn == Compiler.RefSafeDecr
-				return exp.RFAP(asmreg(), a, asmreg())
-	
-		debugger 
-		return exp.EROR(asmreg(), asmreg(), asmreg(), asmreg(), 0)
-
-
-	function RefCount (fn_asm)	// JB_SetRef(a, b)
-		opt norefcounts
-		|| prms = exp.last!
-		|| fn = prms.obj|SCFunction|!
-		if fn != Compiler.RefFreeIfDead
-			|| fat = .RefCountSub(exp, prms, fn)
-				fat.µrefcount++
-				return fat * asmreg()
-			return nil
-		|| A = .µ(prms.first!)
-
-		#! Disallow: if obj.X(),   when obj.X() is a disowner
-		#! Then we will never freeifdead within if-branch or other tests.
-		#! needs understanding of disowners!
+	if fn == Compiler.RefSetRef
+		|| DestMsg = prms.first!
+		|| Out = .µGetASM(DestMsg, ASMReg.AddrRequest)
+		|| P = prms.second!
+		|| From = .µ(P, ASMReg.AddrRequest)
+		if out iz from
+			return exp.noop // wat?
 		
-		exp.RFAP(A, asmreg(), asmreg())
-		return a
+		|| offset = 0
+		if Out isnt ContainsAddr
+			if From is ContainsAddr
+				from = .InlineOffsetOpt(from, 3, offset, 13, P.ASMDecl)
+				return exp.RFRD(Out, From, 1, offset)			// mem to reg
+			return exp.RFST(Out, From)							// reg to reg
+		
+		|| glob = DestMsg.ASMDecl
+		if  From is ContainsAddr
+			|| where = .Temponly(P)
+			where.µtype = datatypecode._voidptr
+			From = .Read(where, P, From, nil, p.ASMDecl) * where// (mem to reg)?
+
+		out = .InlineOffsetOpt(Out, 3, offset, 13, glob)
+		return exp.RFWR(Out, From, 1, offset)					// reg to mem
+
+
+	if fn == Compiler.RefIncr2
+		|| A = .µ(prms.first!, asmreg.AddrRequest)
+		target debug: if a isnt ContainsAddr					// always memory
+		|| offset = 0
+		A = .InlineOffsetOpt(A, 3, offset, 13, nil)
+		|| B = .µ(prms.second!)
+		target debug: if b is ContainsAddr						// always reg
+		return exp.RFWR(a, b, 0, offset)
+	  else
+		|| A = .µ(prms.first!)
+		target debug: if A is ContainsAddr						// always a reg!
+
+		if fn == Compiler.RefIncr
+			|| P = .last(asm.gstr)
+				if (p.r0 samereg a.reg) and p.r1 == 0
+					p.r1 = 1
+					return p
+			return exp.rfst(asmreg(), a)
+
+		if fn == Compiler.RefDecr
+			|| P = .last
+			#! what
+			if (p isa asm.rfst)
+				if (p.r1 samereg a.reg) and (p.r0 == 0)
+					p._op = asm.RFAP
+					p.r0 = p.prms[1]
+					p.r1 = 0
+					return p
+			  elseif (p isa asm.gstr)
+				if p.r0 samereg a.reg and p.r1 == 1
+					return nil
+			return exp.RFST(a, asmreg())
+
+		if fn == Compiler.RefSafeDecr
+			return exp.RFAP(asmreg(), a, asmreg())
+
+	debugger 
+	return exp.EROR(asmreg(), asmreg(), asmreg(), asmreg(), 0)
+
+
+function Assembler.RefCount (fn_asm)	// JB_SetRef(a, b)
+	opt norefcounts
+	|| prms = exp.last!
+	|| fn = prms.obj|SCFunction|!
+	if fn != Compiler.RefFreeIfDead
+		|| fat = .RefCountSub(exp, prms, fn)
+			fat.µrefcount++
+			return fat * asmreg()
+		return nil
+	|| A = .µ(prms.first!)
+
+	#! Disallow: if obj.X(),   when obj.X() is a disowner
+	#! Then we will never freeifdead within if-branch or other tests.
+	#! needs understanding of disowners!
+	
+	exp.RFAP(A, asmreg(), asmreg())
+	return a
 
 
 function Assembler.Decr (|asmreg|)

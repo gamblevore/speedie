@@ -210,6 +210,10 @@ forms
 		Index	9
 		Length	10
 		
+	AddB
+		r1		R
+		K		l
+	
 	AddK
 		r1		R
 		r2		r
@@ -401,6 +405,8 @@ POS 5
 
 #!						 (((((Math)))))
 
+/**/ ADDB (AddB)
+		i1 = i1 + (U1_Li<<12)
 /**/ ADDK (AddK)
 		i1 = i2 + U2_Li
 /**/ ADPK (AddK) // post-increment

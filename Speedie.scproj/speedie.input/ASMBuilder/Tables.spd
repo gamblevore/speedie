@@ -380,7 +380,6 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 	|| d = f.asmdecl
 		
 	|| base = .µGetASM(f, ASMReg.AddrRequest)				// x = a.b[0]
-	#! what if this is a gtab and its not 100% correct?
 	|| sc = exp.Second.first!
 	|| vara = .µGetASM(sc)
 
@@ -392,22 +391,19 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 	
 	if dest isnt AddrRequest
 		dest.µType = exp.ASMDecl.au.DataType
-		return .ReadOrWrite(Dest, exp, base, vara, d)
+		|| index = .Const(vara, 7, false)
+		if index < 0
+			index = 0
+		return .ReadOrWrite(Dest, exp, base, vara, d, index)
 	
 	dest = dest.HaveAddr
 	dest.µType = DataTypeCode._voidptr
 	base = base.HaveAddr
-	base = .GTabCorrect(Base, d, f, 0)
 	return .Plus(dest, base, vara, exp)
 	
 
 
 function Dot (fn_asm)										// a.b
-	// Something simple like:   local = globalstruct.Prop
-	// this seems to fail. Even if we first do: var = globalstruct
-	// why?
-	// well... globalstruct is done via a GTAB. So... IDK?
-	
 	opt	NoRefCounts
 	|asmreg| SubDest // fool around with optimising this
 	if dest isnt set // **once** everything is working
@@ -437,7 +433,9 @@ function Dot (fn_asm)										// a.b
 		dest = dest.haveaddr
 		return .AddToReg(exp, dest, obj as ASMReg.NoScale, pos)
 	
-	return .ReadOrWrite(Dest, exp, obj, ASMReg(), prop, pos)
+	if prop.TypeSuffers and t.ByteCount != 8 // what?
+	|| Index = pos >> T.ByteCount // idfk! what about pointers? structs? carrays?
+	return .ReadOrWrite(Dest, exp, obj, ASMReg(), prop, Index)
 
 
 function Char (fn_asm)
@@ -529,7 +527,7 @@ function DoGlobal (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| D, 
 	
 	dest.µtype = d.au.DataType
 	dest = dest asnt ASMReg.ContainsAddr
-	return .ReadOrWrite(dest, Exp, addr, ASMReg(), d, 0)
+	return .ReadOrWrite(dest, Exp, addr, ASMReg(), d)
 	
 
 
@@ -575,9 +573,9 @@ function IncrOnAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 
 	|| bc = dest.µtype.ByteCount.log2
 	|| offset = 0
-	addr = .InlineOffsetOpt(addr, bc, offset, 6~bits, glob)
+	addr = .InlineOffsetOpt(addr, bc, offset, 6, glob)
 	
-	|| fat = exp.CNTC(dest, Addr, offset >> bc, amount, bc)
+	|| fat = exp.CNTC(dest, Addr, offset, amount, bc)
 	if !dest.reg
 		fat.outputs &= ~1 // clear output
 	
@@ -613,9 +611,7 @@ function Incrementatulatorifier		(fn_asm)				// --a++
 	opt	NoRefCounts
 	
 	|| Src = .µGetASM(exp, dest as ASMReg.AddrRequest)
-	|| D = exp.ASMDecl	
-	src = .GTabCorrect(src, d, exp, 63)
-	
+	|| D = exp.ASMDecl
 	|| Amount = IncrAmount(src, mode, D)
 
 	if dest is discard
