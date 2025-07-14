@@ -196,26 +196,19 @@ function Message.CollectAGlobalDecl (|SCNode| scarg, |bool|)
 	if def and !dcl.nilstated
 		|| d = def.MsgDecl
 		if d and d.StatedReal
-			dcl.nildeclared = nilstate.real			// in case of something like |object| x = real()
-	(dcl is property)
+			dcl.NilDeclared = nilstate.real			// in case of something like |object| x = real()
+	(dcl is Property)
 	(dcl is Global)
 	
 	|| B = '_' == dcl.name[]
 	|| C = '_' == dcl.name.Last
 	if B ||| C
 		(dcl is hidden)
-	
-	// So we put these into the global tables here.
-	// so thats the deal with the .makeexistance thing then?
-	// maybe something like: || x = GlobUint|int| ?
-	// surely... the read should be done before the cast?
-	
-	
+		
 	if dcl.islib
 		PackMaker.LibGlobs <~ dcl
 	  else
-		if options.ModePack or compiler.inperry
-			packmaker.PackGlobs <~ dcl
+		packmaker.PackGlobs <~ dcl
 
 	return true
 

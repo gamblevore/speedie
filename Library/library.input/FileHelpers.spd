@@ -30,7 +30,20 @@ extend String
 			if p globs ch
 				.child(ch).fileglobsub2(parts, result, i)
 	
-	
+	helper FileGlobSub2 (|[string]| parts, |[file]| result, |int| i=0)
+		if parts > i
+			.FileGlobSub(parts, result, i)
+		  else
+			|| f = .file
+			if f.Exists
+				result <~ f
+		//   /abc/def/ghi
+		//   /*/def/ghi
+		//   /abc/def/*
+		//   /abc/d*f/ghi
+		//   /*/d*f/*		
+
+
 	operator globs (|[string]| txt, |bool|)
 		cpp_part GlobManyItems
 		opt norefcounts
@@ -73,20 +86,7 @@ extend String
 			wild++  // ignore trailing stars
 		return wild == wildEnd
 	
-	
-	helper FileGlobSub2 (|[string]| parts, |[file]| result, |int| i=0)
-		if parts > i
-			.FileGlobSub(parts, result, i)
-		  else
-			|| f = .file
-			if f.Exists
-				result <~ f
-		//   /abc/def/ghi
-		//   /*/def/ghi
-		//   /abc/def/*
-		//   /abc/d*f/ghi
-		//   /*/d*f/*		
-	
+		
 	function FileExists (|bool|)
 		|| f = .file
 		return f.exists

@@ -109,7 +109,7 @@ struct CompressionStats
 	function Clear
 	function Print (|bool| Compress=true)
 	module
-		|CompressionStats| all
+		|CompressionStats| All
 		function New (|compressionstats|)
 
 } else {

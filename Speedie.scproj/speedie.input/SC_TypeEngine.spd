@@ -462,14 +462,12 @@ function TypeOfNum (ExprResolver)
 function TypeOfNumSub (ExprResolver)
 	|| n = exp.name
 	if (n contains ".")
-		|| d = Typefloat!.typenormal.copydecl
+		|| d = Typefloat!.TypeNormal.copydecl
 		|| f8 = exp.float
-		|uint64| V
 		if (d.CarraySize == 4) and !side
-			V = f8|float|.asint
+			d.NumberConst = f8|float|.asint
 		  else
-			V = f8.asint
-		d.numberconst = V
+			d.NumberConst = f8.asint
 		Return D
 
 	|| Val = exp.int

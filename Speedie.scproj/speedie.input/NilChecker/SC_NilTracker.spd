@@ -167,18 +167,6 @@ struct ArchonPurger
 		return (.value)[1]
 
 
-//	target debugnil {
-//		function SetAllNil (|NilRecord| Dest)
-//			dest &= .Realnesses
-//
-//			|| diff = dest xor value()
-//			*.neel = dest
-//			
-//			for i in 32
-//				|| d = .decls[i]
-//				if d and diff[i]
-//					d.nilprint("change")
-
 	setter Value (|NilRecord| Dest)
 		opt inline
 		.neel[] = dest & .Realnesses

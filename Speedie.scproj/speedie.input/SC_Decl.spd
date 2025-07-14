@@ -177,6 +177,9 @@ class SCDecl (SCObject) {
 	
 	syntax Compare (|string| s, |bool| aware, |int|)
 		return .name.syntaxcompare(s, aware)
+
+	syntax equals (|string| s, |bool| aware, |bool|)
+		return .name.syntaxequals(s, aware)
 		
 		
 	syntax is (|SCDeclInfo| d, |bool|)

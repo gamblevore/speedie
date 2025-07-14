@@ -3,12 +3,22 @@
 // some kinda function table... saved to a file
 
 module PackMaker
-	|[scfunction]|			LibFuncs
+	|[SCFunction]|			LibFuncs
 	|[SCDecl]|				LibGlobs
-	|[scfunction]|			PackFuncs
+	|[SCFunction]|			PackFuncs
 	|[SCDecl]|				PackGlobs
 	|int| 					ExportPos
+	
+	|int|					_PackGlobSize
+	|int|					_LibGlobSize
 
+
+	function PackGlobSize (|int|)
+		return ._PackGlobSize init .GlobalsSize(.PackGlobs, true)
+	
+	function LibGlobSize (|int|)
+		return ._LibGlobSize init .GlobalsSize(.libGlobs, false)
+		
 	helper AddFunc (|scfunction| f)
 		opt norefcounts
 		if f.IsLibrary
@@ -40,49 +50,51 @@ module PackMaker
 			lib.Add(@thg, f.ExportName)
 		lib.exit
 
-
-	function OrderGlobals (|[scdecl]| List, |int|) // sortglobals, globalssort
+	
+	function GlobalsSize (|[scdecl]| List, |bool| Alter, |int|)     // SortGlobals, GlobalsSort
 		opt norefcounts
-		list.sort(GlobalsSorter)
 		rz = 1				// rz = 1, so if .au.ExportPosition == 0 then something is wrong.
 		for (d in list)
 			|| s = d.CarraySize
 			|| s16 = s min 16
+//			printline "//:: ${d.Name} $s $s16"
 			rz = rz align s16
-			d.au.ExportPosition = rz
+			if alter
+				d.au.ExportPosition = rz
 			rz += s
 	
 
-	function SortFuncsAndBuildGlobs (|int|)
+	function SortFuncsAndBuildGlobs
 		opt norefcounts
 		|| FnInit = compiler.xfunc("JB_Init_") // we need app and pack inits separately
 		|| FnMain = compiler.xfunc("JB_Main")
 		require fninit and fnmain
 		
-		fninit.tableid = 1 // put init and main first!
-		fnmain.tableid = 2
+		fninit.TableId = 1 // put init and main first!
+		fnmain.TableId = 2
 
 		.SortASMFuncs(.PackFuncs, nil)
 		TypeObject!.PackClassChildren(nil)
 		
-		rz = .OrderGlobals(.PackGlobs)
-		.SortLibStuff(rz)
+		.PackGlobs.sort(GlobalsSorter)
+		.SortLibStuff()
 	
 	
-	function SortLibStuff (|int| pg)
+	function SortLibStuff
 		opt norefcounts
 		|&&nil| Table
-		if platform.isdebug and pg
-			Table = jb_vm.vm.InitTable(.libfuncs.length+31, pg)
-		.SortASMFuncs(.libfuncs, Table)
+		if platform.isdebug
+			Table = jb_vm.vm.InitTable(.libfuncs.length+31, .PackGlobSize)
+		.SortASMFuncs(.LibFuncs, Table)
 		.LibGlobs.sort(GlobalsSorter)
 
-		for (g in .libglobs) (i)		// lib globs are asked for, so we'll ask for them by name.
+		for (g in .LibGlobs) (i)		// lib globs are asked for, so we'll ask for them by name.
 			g.au.ExportPosition = i + 1
 	
 	
 	helper SortASMFuncs (|[scfunction]| list, |?&&nil| Table)
 		opt norefcounts
+		(table)
 		list.sort(SCFuncSorter)
 
 		|| ID = 0
@@ -90,6 +102,7 @@ module PackMaker
 			f.TableID = ++id
 			|| proto = f.hasproto
 				proto.au.ExportPosition = id
+			
 			target debug
 				if Table
 					Table[id+31] = jb_vm.Load(f.exportname)
@@ -201,19 +214,19 @@ module PackMaker
 		compiler.During = compiler.Packing
 		Assembler.Sh.PackMakerInit			// fn_asm_table[@arg]
 		PackMaker.AddAll
-		|| pg = .SortFuncsAndBuildGlobs
+		.SortFuncsAndBuildGlobs
 		target debug {
 		if .ActualASMCompile and Options.pack
-			.WritePackToDisk(pg)
+			.WritePackToDisk
 		}
 		compiler.During = 0
 	
 	
-	function WritePackToDisk (|int| pg)
+	function WritePackToDisk
 		|| j = jbin(@tmp, "xpd")
 		j.enter
 		j.enter(@tmp, "app")
-		j.addint(pg + 16)
+		j.addint(.PackGlobSize + 16)
 		j.enter
 		.ListPackFuncs(j)
 		.DumpStrings(j)
