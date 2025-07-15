@@ -210,6 +210,9 @@ struct Assembler
 	
 	
 	function Const (|asmreg| R, |int| bits, |bool| signed, |ind|)
+		if r.reg == 0
+			return 0 // sigh. I DIE.
+		
 		if R is ConstOutput
 			|| k = R.const
 			if k.fits(bits, signed)
@@ -407,16 +410,14 @@ struct Assembler
 			error (exp, "Object to large to access")				// can we do struct-mem-copy?
 			bytes = 0
 		
-		if varadd is ConstOutput
-			|| CC = varadd.fat
-				if varadd is RealConst
-					.nop(cc)
-				index += cc.const
-				varadd = asmreg()
+		|| VInd = .Const(varadd, 7, false)
+			index += VInd
+			VarAdd = ASMReg()
 		
 		//  ADDK: bs, r1, 4
 		//  RD1U: r2, bs, value, 4, 0 
-		base = .InlineOffsetOpt(Base, bytes, index, 7, Decl)
+		if decl isnt ClassObj
+			base = .InlineOffsetOpt(Base, bytes, index, 7, Decl)
 
 		if 0: exp.RD1U, exp.RD1S, exp.RD2U, exp.RD2S, exp.RD4S, exp.RD8U, exp.RD16
 		if 0: exp.WR1U, exp.WR2U, exp.WR4U, exp.WR8U, exp.WR16

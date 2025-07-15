@@ -277,8 +277,6 @@ function NilFunction (NilTrackerFn)
 		|| sent = p!.FastDecl
 		
 		HasAddrs |= sent.CanUpgradeRegister
-
-//  // remove AllowRegisterAddr and NoRegAddrs
 		
 		if (v is nilish)
 			.NilParamPass(recv, sent, p!, fn, v)
@@ -573,8 +571,8 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 		return dcl.nildeclared
 	
 	|| Unknown = dcl.IsUnknownParam 
-	if (dcl is param) and (test isnt AllowRegisterAddr) and dcl.PointerCount
-		(dcl is NoRegAddrs)
+//	if (dcl is param) and (test isnt AllowRegisterAddr) and dcl.PointerCount
+//		(dcl is NoRegAddrs)
 		
 	if Unknown and (test isnt soft and disappears)
 		if test isnt Active							// set var A to unknown prm B, so default to real

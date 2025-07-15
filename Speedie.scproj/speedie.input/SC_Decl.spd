@@ -83,7 +83,6 @@ datatype SCDeclInfo (uint)
 		SetTo					// a var sets it... like: rz = obj
 		Hidden					// internal global... should not be exposed to non-lib stuff
 		Grabbed
-		NoRegAddrs
 		PostIncremented
 		VarThatGotReturned
 		ReturnedStruct
@@ -165,14 +164,10 @@ class SCDecl (SCObject) {
 		return .au.DataType|asmreg|
 	
 	syntax append (|SCDeclInfo| d)
-		.sanity
 		.au.info |= d
-		.sanity
 
 	function IsTypeImprove (assigns:|bool|)
-		.sanity
-		.au.info = .au.info.set(SCDeclInfo.TypeImprove, Value)		
-		.sanity
+		.au.info = .au.info.set(SCDeclInfo.TypeImprove, Value)
 	
 	
 	syntax Compare (|string| s, |bool| aware, |int|)
@@ -187,13 +182,10 @@ class SCDecl (SCObject) {
 			return .au.info & d
 
 	syntax is (|SCDeclInfo| d, assigns:|bool|)
-//		if .name ~= "vq"
-//			if d is reference
-		.sanity
 		.au.info = .au.info.set(d, Value)	
-		.sanity
 
-	function Sanity
+	function Sanity 
+		// if .name ~= "&JB_ListData"
 
 	function IsNil (|bool|)
 		return self == typenil
@@ -401,7 +393,6 @@ class SCDecl (SCObject) {
 		|| cpyflags		= scdeclinfo.DclCopied
 		dcl.au.info &= ~cpyflags
 		dcl.au.info |= .au.info & cpyflags
-		dcl.sanity
 		dcl.C_array		= .C_array
 		dcl.NilDeclared = .NilDeclared
 		

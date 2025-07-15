@@ -39,10 +39,9 @@ struct Function {
 struct vm_globs {
     byte*			LibGlobs;
     byte*			PackGlobs;
-    JB_String**		PackStrs;
     Fn0*			Cpp;
-    Function*		PackCallbacks;
-    Function*		LibCallbacks;
+    Function*		PackCallbacks;	// should remove these two.        1)
+    Function*		LibCallbacks; 	// just use the main global table  2)
     byte*			AllocBase;
     int				AllocCurr;
     ASM* 			CodeBase;

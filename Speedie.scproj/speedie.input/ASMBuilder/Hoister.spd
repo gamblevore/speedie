@@ -34,7 +34,8 @@ function FatASM.CanGlobGrab (|uint64| find, |uint64| range, |uint64| BS, |asmreg
 	return .info
 
 
-function TryGetGlob (|SCDecl| D, |asmreg|)
+function TryGetGlob (|SCDecl| D, |asmreg| Mode, |asmreg|)
+	// mode can be used to require an exact match
 	|| G = d.GlobInfo
 	|| B = G.ByteCount
 	|uint64| range = 64 * B  // the idea is to be within N items, and before the item, and be aligned.
@@ -42,6 +43,8 @@ function TryGetGlob (|SCDecl| D, |asmreg|)
 	|uint64| find = d.au.ExportPosition
 
 	B--	// now, lets align this shit.
+	if mode is AddrForceRequest // need exact match.
+		range = 1
 	
 	for old in Assembler.sh
 		if old isa asm.gtab
@@ -51,7 +54,7 @@ function TryGetGlob (|SCDecl| D, |asmreg|)
 
 function GlobAddr (|scdecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
-	|| Glob = .TryGetGlob(D)
+	|| Glob = .TryGetGlob(D, dest)
 		return Glob
 
 //////
@@ -59,23 +62,24 @@ function GlobAddr (|scdecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	|int64| Original = d.au.ExportPosition
 	check (Original <= 32~bits)				(exp, "Too much global data used: " + original.strsize)
 	if !Original							// What?
-	if dest isnt AddrForceRequest
+	if  dest isnt AddrForceRequest  and  d isnt ClassObj
 		Original &= ~63
 	
 	|| Direct = Original & 18~bits
 	(Dest is GlobalMemory)
 	dest = dest.haveaddr	
 	dest.µtype = DataTypeCode._voidptr
-	
+
 	|| fat = exp.GTAB(dest,  (d.IsLib)|int|,  Direct)
 	fat.Const = Direct
 	rz = fat * dest
 	
 	|| Missing = Original - Direct
-	if missing >= 4096
-		fat = exp.ADDB(dest, missing >> 12)
-		fat.const = Direct + ((missing >> 12) << 12)
-/		rz = fat * dest
+		check !(d.islib) (exp, "Lib too big!") // should never happen!
+		if missing >= 4096
+			fat = exp.ADDB(dest, missing >> 12)
+			fat.const = Direct + ((missing >> 12) << 12)
+	/		rz = fat * dest
 
 }
 

@@ -391,10 +391,8 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 	
 	if dest isnt AddrRequest
 		dest.µType = exp.ASMDecl.au.DataType
-		|| index = .Const(vara, 7, false)
-		if index < 0
-			index = 0
-		return .ReadOrWrite(Dest, exp, base, vara, d, index)
+		// readorwrite already can convert vara to a const index, if needed.
+		return .ReadOrWrite(Dest, exp, base, vara, d, 0)
 	
 	dest = dest.HaveAddr
 	dest.µType = DataTypeCode._voidptr
@@ -501,6 +499,9 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 		return GrabAddr(self, exp, dest, d, T)
 	
 	if d is global
+		if d is classobj
+			(dest is AddrForceRequest)
+			
 		if (dest is ConstRequest)
 			return nil
 		return DoGlobal(self, exp, dest, d)
@@ -519,15 +520,14 @@ function DoGlobal (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| D, 
 		dest = .TempTyped(exp, dest)	// so why test? and also, temptyped tests this already
 										// is it just for GTAB reuse? sigh.
 										
-	|| addr = .GlobAddr(d, exp, dest)$
-
-	if dest is AddrRequest
-		addr.µtype = d.au.DataType
-		return addr.HaveAddr
-	
-	dest.µtype = d.au.DataType
-	dest = dest asnt ASMReg.ContainsAddr
-	return .ReadOrWrite(dest, Exp, addr, ASMReg(), d)
+	|| addr = .GlobAddr(d, exp, dest)
+		if dest is AddrRequest
+			addr.µtype = d.au.DataType
+			return addr.HaveAddr
+		
+		dest.µtype = d.au.DataType
+		dest = dest asnt ASMReg.ContainsAddr
+		return .ReadOrWrite(dest, Exp, addr, ASMReg(), d)
 	
 
 

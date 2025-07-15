@@ -265,7 +265,7 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 		|| SmallCurr = curr.clamp(1,16)
 		align = align max SmallCurr
 		rz = rz Align SmallCurr
-		p.au.ExportPosition = rz / SmallCurr		
+		p.au.ExportPosition = rz / SmallCurr
 		|| Mul = P.c_Array ?? 1
 		rz += Curr * Mul 
 
@@ -711,6 +711,7 @@ function AfterFuncsDecled
 	
 	|| cls = .ClassType
 		cls.Name = "&" + .CStructName + "Data" // sigh. Not pleasant.
+		
 
 
 

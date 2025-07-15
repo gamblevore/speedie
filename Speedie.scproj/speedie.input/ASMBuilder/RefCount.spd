@@ -4,6 +4,7 @@
 function Assembler.InlineOffsetOpt (|asmreg| base, |int| pow2, |$int| index, |uint| MaxBits, |scdecl?| Glob, |asmreg|)
 	opt norefcounts
 	|| bs = base.fat
+	target debug: if glob is classobj // what?
 	if !bs
 		return base
 	|uint| maximum = (1 << maxbits) - 1

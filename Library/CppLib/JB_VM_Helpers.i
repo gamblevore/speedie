@@ -251,9 +251,8 @@ u64 table (jb_vm& vm, ASM Op) {
 
 
 JB_Object* strs (jb_vm& vm, ASM Op) {
-	auto Str = vm.Env.PackStrs[Table_Addu];
-	if (Table_Modeu)
-		JB_Incr(Str);
+	auto Str = (JB_Object*)(table(vm, Op));
+	JB_Incr(Str);
 	return Str;
 }
 
