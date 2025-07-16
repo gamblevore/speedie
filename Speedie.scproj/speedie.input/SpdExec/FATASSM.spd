@@ -197,13 +197,13 @@ struct FatASM
 
 
 
-	function assembler.ReDest (|asmreg| info, |fatasm| f, |asmreg|)
+	function assembler.ReDest (|fatasm| f, |asmreg| info, |asmreg|)
 		|int| o = f.Outputs
 		target debug: if !o.IsPow2
-		return .ReDest(info, f, o.log2)
+		return .ReDest(f, info, o.log2)
 		
 		
-	function assembler.ReDest (|asmreg| info, |fatasm| f, |uint| a, |asmreg|)
+	function assembler.ReDest (|fatasm| f, |asmreg| info, |uint| a, |asmreg|)
 		// lets see.
 		|| old = f.prms[a] & 31 					// Need to remove the old output.
 			if .Registers[old] == f

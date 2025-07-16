@@ -324,13 +324,23 @@ extend Assembler
 //			-->
 //		x = y + 2
 
+
+//		t = y + 1 // t is a temp. Otherwise this would leave a bad value.
+//		z = t + 1
+//			-->
+//		z = y + 2
+
 		|| XY1 = .Last(asm.addk)			#require
 		if XOut.IsVec // now what?
 		|| xinreg = XIn.reg
-		require xinreg == XY1.reg0 and xout.reg
+		require xinreg == XY1.reg0
+		|| Changed = xinreg != xout.reg
+			require (xin is temp)
 		|| add2 = XY1.prms[2] + add		
 		if add2.CanStoreAsAddK
 			xy1.r2 = add2
+			if Changed
+				.redest(xy1, xout)
 			return true
 
 
@@ -671,7 +681,7 @@ extend Assembler
 		
 		xy1.prms[3] += down
 		if src is temp
-			.ReDest(dest, xy1, 0)
+			.ReDest(xy1, dest, 0)
 		return dest
 		
 		

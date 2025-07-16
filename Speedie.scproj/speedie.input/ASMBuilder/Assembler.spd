@@ -296,7 +296,7 @@ struct Assembler
 		
 		if r is temp
 			|| f = r.fat
-				return .ReDest(dest, f)
+				return .ReDest(f, dest)
 		
 		|| dest2 = r.reg(dest)
 		dest2.µtype = dest.µtype 	 		// sigh. I guess we copy some wierd flags, from r into dest2

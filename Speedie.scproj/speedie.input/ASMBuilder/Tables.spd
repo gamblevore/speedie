@@ -409,14 +409,9 @@ function DotConst (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| Pro
 
 function Dot (fn_asm)										// a.b
 	opt	NoRefCounts
-	|asmreg| SubDest // fool around with optimising this
-	if dest isnt set // **once** everything is working
-		dest = .TempTyped(exp, dest)
-		subdest = subdest.ReUseRegInPlace(dest)
-	
 	|| prop = exp.ASMDecl
 	if prop is const
-/		return DotConst(self, dest, exp, prop)
+		return DotConst(self, dest, exp, prop)
 	
 	
 	if prop is global
@@ -426,16 +421,14 @@ function Dot (fn_asm)										// a.b
 		|| ByteOffset = 0
 		return DoGlobal(self, dest, exp, prop, ByteOffset)
 		
-	if "StructInner".trap
-	
-	|| Obj = .µGetASM(exp.first!, SubDest)
+	|| Obj = .µGetASM(exp.first!)
 	dest.µtype = prop.typeinfo
 	
 	
-	|int64| Index = prop.au.ExportPosition 
-	if ((Index-1)|uint64| >= 1MB) or (prop.TypeSuffers and dest.ByteCount != 8) // what?
+	|| Index = prop.au.ExportPosition 
+	if (Index >= 1MB) or (prop.TypeSuffers and dest.ByteCount != 8) // what?
 	
-/	#! We should use a temp for the addr... it helps with figuring out what we are doing.
+	#! We should use a temp for the addr... it helps with figuring out what we are doing.
 	// optimisation of course.
 	#! Of course, if it doesn't change, we can just return the original.
 	#! Also... ReadOrWrite needs to understand addk.
@@ -711,7 +704,8 @@ function DotAddr (|message| exp, |AsmReg| Dest, |int| Pos, |scdecl| prop, |asmre
 	if prop.iscarray
 		dest.µtype = DataTypeCode._voidptr
 	dest = dest.haveaddr
-//	pos *= dest.ByteCount // addtoreg does the scaling, right?
+	obj = obj as asmreg.NoScale
+	pos *= prop.CArraySize
 	return .AddToReg(exp, dest, obj, pos)
 
 
