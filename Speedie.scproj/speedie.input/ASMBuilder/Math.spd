@@ -293,27 +293,29 @@ extend Assembler
 		return (.somepointer<<1) + (self isnt RealConst)
 	
 	
-	function asmreg.PointerMul (|message| exp, |int| swapped, |int|)
+	function asmreg.PointerMul (|message| exp, |bool| swapped, |int|)
+		opt norefcounts
+		|| d = .PointerMulSub(exp, swapped)
+			return d.CArraySize
+		debugger // hmmmm. its not a pointer after all?
+
+
+	function asmreg.PointerMulSub (|message| exp, |bool| swapped, |scdecl|)
 		opt norefcounts
 		|| fn = exp.Func
 		if fn == @opp
-			if swapped
-				exp = exp.next!
-			  else
-				exp = exp.prev!
+			exp = exp.step(swapped)!
 			
 		  elseif fn == @arel or @brel or @acc
 			exp = exp.first!
 			
-		  elseif fn == @dot // obj.Prop // requires pointermul on .prop cos of prev props
-			// leave it?
-			debugat
 		  else
+			if fn == @dot // obj.Prop // requires pointermul on .prop cos of prev props
+				return exp.asmdecl
 			error "aaargh"
-			debugger 
-		|| d = exp.ASMDecl.Internal
-			return d.CArraySize
-		debugger // hmmmm. its not a pointer after all?
+			debugger
+		
+		return exp.ASMDecl.Internal
 
 
 	function InlineAddK (|asmreg| XIn, |int64| Add, |asmreg| XOut, |bool|)
@@ -326,7 +328,7 @@ extend Assembler
 		if XOut.IsVec // now what?
 		|| xinreg = XIn.reg
 		require xinreg == XY1.reg0 and xout.reg
-		|| add2 = XY1.reg(2) + add		
+		|| add2 = XY1.prms[2] + add		
 		if add2.CanStoreAsAddK
 			xy1.r2 = add2
 			return true
@@ -338,13 +340,13 @@ extend Assembler
 		if dest is ConstOutput // perhaps we can do this in domathsub?
 			return .MakeConstFromTwo(dest, l, r, exp, ConstifyIntPlus)
 
-		|| swapped = 0
+		|| swapped = false
 		if  l.LeftScore < r.LeftScore // put consts into R
 			if l is alternate
 				target debug
 					if r.µtype.IsPointer						// 1 - ptr??? we blocked this already.
 			  else
-				swapped = 1
+				swapped = true
 				swap (l) (r) // a+b == b+a
 	
 		if !r.reg // add or subtract zero

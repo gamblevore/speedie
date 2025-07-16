@@ -87,7 +87,6 @@ datatype SCDeclInfo (uint)
 		VarThatGotReturned
 		ReturnedStruct
 		IntendedAsReturn
-//		ASMInnerParam
 		
 		VarType			= Param ||| Body ||| Global ||| Property
 		Local			= Body  ||| Param
@@ -1210,8 +1209,6 @@ class SCDecl (SCObject) {
 		rz = ty.typeinfo
 		if .pointercount
 			rz = datatypecode._voidptr // what about carrays?
-		  else
-			DEBUG_REQUIRE !(.c_array ||| ty.IsStruct)
 		
 		
 	function PointerIncrement (|int|)

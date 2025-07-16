@@ -50,7 +50,6 @@ constants
 	
 |asm_Read[10]|	ReadASM
 |asm_Write[5]|	WriteASM
-//|message--|		LastDebugMark
 
 function InitAccess
 	|| R = &ASMType.ReadASM[0]
@@ -103,7 +102,6 @@ function First (fn_asm)
 
 function Sheb (fn_asm)
 	opt NoRefCounts
-	// LastDebugMark = exp
 	return exp.noop * asmreg()
 	
 	
@@ -392,13 +390,21 @@ function Access (fn_asm)									// a[b], struct.mem[b]
 	if dest isnt AddrRequest
 		dest.µType = exp.ASMDecl.au.DataType
 		// readorwrite already can convert vara to a const index, if needed.
-		return .ReadOrWrite(Dest, exp, base, vara, d, 0)
+		return .ReadOrWrite(Dest, exp, base, vara, d.internal, 0)
 	
 	dest = dest.HaveAddr
 	dest.µType = DataTypeCode._voidptr
 	base = base.HaveAddr
 	return .Plus(dest, base, vara, exp)
 	
+
+
+function DotConst (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| Prop, |AsmReg|)
+	opt norefcounts // wait? don't these all get pre-transformed? SHOULD they be?
+	|| fn = prop.islookuponly
+	if fn isa scfunction
+		return DoGlobal(self, dest, exp, prop, 0)
+	return ConstFromThgName(self, exp, dest, prop)
 
 
 function Dot (fn_asm)										// a.b
@@ -409,35 +415,40 @@ function Dot (fn_asm)										// a.b
 		subdest = subdest.ReUseRegInPlace(dest)
 	
 	|| prop = exp.ASMDecl
-	if prop is const // wait? don't these all get pre-transformed? SHOULD they be?
-		|| fn = prop.islookuponly
-		if fn isa scfunction
-			return DoGlobal(self, exp, dest, prop)
-		return ConstFromThgName(self, exp, dest, prop)
+	if prop is const
+/		return DotConst(self, dest, exp, prop)
+	
+	
 	if prop is global
-		return DoGlobal(self, exp, dest, prop)
-	|| F = exp.first!		 
-	|| Obj = .µGetASM(F, subdest)
-	|| T = prop.typeinfo
-	dest.µtype = T
+		if prop.IsBareStruct // now what?
+			debugger
+		
+		|| ByteOffset = 0
+		return DoGlobal(self, dest, exp, prop, ByteOffset)
+		
+	if "StructInner".trap
 	
-	|int64| Pos = prop.au.ExportPosition
-	if (pos < 0 or pos > 1K) // what?
+	|| Obj = .µGetASM(exp.first!, SubDest)
+	dest.µtype = prop.typeinfo
 	
-	if (dest is AddrRequest) or prop.IsCarray
-		pos *= t.ByteCount
-		if prop.iscarray
-			dest.µtype = DataTypeCode._voidptr
-		dest = dest.haveaddr
-		return .AddToReg(exp, dest, obj as ASMReg.NoScale, pos)
 	
-	if prop.TypeSuffers and t.ByteCount != 8 // what?
-	|| Index = pos >> T.ByteCount // idfk! what about pointers? structs? carrays?
+	|int64| Index = prop.au.ExportPosition 
+	if ((Index-1)|uint64| >= 1MB) or (prop.TypeSuffers and dest.ByteCount != 8) // what?
+	
+/	#! We should use a temp for the addr... it helps with figuring out what we are doing.
+	// optimisation of course.
+	#! Of course, if it doesn't change, we can just return the original.
+	#! Also... ReadOrWrite needs to understand addk.
+	
+	if (dest is AddrRequest) or prop.IsCarray or prop.IsBareStruct
+		return .DotAddr(exp, dest, Index, prop, obj)
+	
 	return .ReadOrWrite(Dest, exp, obj, ASMReg(), prop, Index)
 
 
+
 function Char (fn_asm)
-	return num(self, exp, dest, mode) // its just a num, right?
+	return num(self, exp, dest) // its just a num, right?
 
 
 function Num (fn_asm)
@@ -504,13 +515,13 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 			
 		if (dest is ConstRequest)
 			return nil
-		return DoGlobal(self, exp, dest, d)
+		return DoGlobal(self, dest, exp, d, 0)
 		
 	return ConstFromThgName(self, exp, dest, d)
 
 
 
-function DoGlobal (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| D, |ASMReg|)
+function DoGlobal (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| D, |int| index, |ASMReg|)
 	opt	NoRefCounts
 	target debug
 		|| d2 = exp.asmdecl
@@ -606,7 +617,7 @@ function NotTemp (|&Assembler| self, |asmreg| Src, |message| p)
 	check (src isnt temp) (p, "Can't increment temporary value.")
 
 
-function Incrementatulatorifier		(fn_asm)				// --a++
+function Incrementatulatorifier (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg|)				// --a++
 	visible
 	opt	NoRefCounts
 	
@@ -695,6 +706,15 @@ function Unexpected		(fn_asm)
 
 
 extend Assembler {
+
+function DotAddr (|message| exp, |AsmReg| Dest, |int| Pos, |scdecl| prop, |asmreg| obj, |AsmReg|)
+	if prop.iscarray
+		dest.µtype = DataTypeCode._voidptr
+	dest = dest.haveaddr
+//	pos *= dest.ByteCount // addtoreg does the scaling, right?
+	return .AddToReg(exp, dest, obj, pos)
+
+
 function message.ASMUnbra (|message|)
 	opt	norefcounts
 	real self
@@ -914,12 +934,3 @@ function Message.TypeCastDoesNothing (|bool|)
 	if (Output is bool) == (Input is bool)				// Boolness
 		return Input.ByteCount == Output.ByteCount
 
-	
-//function string.Trip (|bool|)
-//	return asmtype.LastDebugMark ~= self 
-
-
-|| fuckcount = 0
-function assembler.fuckoff
-	fuckcount++
-	//debugger

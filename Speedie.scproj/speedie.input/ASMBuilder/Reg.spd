@@ -1,6 +1,6 @@
 
 
-prototype fn_asm    (|&Assembler| self=Assembler.sh, |message| exp, |AsmReg| Dest=asmreg(), |int| Mode=0, |AsmReg|)
+prototype fn_asm    (|&Assembler| self=Assembler.sh, |message| exp, |AsmReg| Dest=asmreg(), |AsmReg|)
 prototype fn_fatasm (|&Assembler| self=Assembler.sh, |message| exp, |AsmReg| Dest, |&FatASM|)
 
 
@@ -44,9 +44,10 @@ datatype ASMReg (uint64)
 		NotUnConst  = fromexistingvar ||| ConstInput
 		KnownConst  = NotAlteredInbranch ||| ConstOutput
 		Simple		= Temp ||| NotAlteredInbranch
+
 	
 
-	function testbit
+	function TestBit
 		|| x = AddrForceRequest
 
 		
@@ -94,8 +95,8 @@ datatype ASMReg (uint64)
 		if self isnt param
 			.NeedFAT
 		
-	function Const (assigns:|int64|)
-		.needfat.const = value
+//	function Const (assigns:|int64|)
+//		.needfat.const = value
 
 	function IsConst (|int64| val, |bool|)
 		return  (self is ConstOutput) and (.const == val)
@@ -109,8 +110,11 @@ datatype ASMReg (uint64)
 	function BitCount (|int|)
 		return .µtype.bitcount
 		
-	function Bytes (|int|)
-		return .µType._shift
+	function ByteShift (|int|)
+		return .ByteCount.log2
+	
+	function ByteCount (|int|)
+		return .µType.ByteCount
 	
 	function FatIndex (|uint|)
 		return self|uint64| >> 48
