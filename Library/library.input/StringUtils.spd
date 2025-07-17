@@ -102,7 +102,7 @@ function String.UTF16To8 (|faststring|fs=nil, |int|BigEndian=1, |string|)
 
 
 function String.UTF8 (|string|)
-	if !.isbad(0)
+	if !.FindBadUTF8(0)
 		return self
 	return .UTF16To8
 
@@ -312,7 +312,7 @@ function faststring.RenderSpeed (|string| Name, |int64| BytesIn, |duration| Dura
 
 	
 function string.UnPrintable (|int|)
-	if .IsBad
+	if .FindBadUTF8
 		return -1
 	
 	for c in self

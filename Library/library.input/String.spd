@@ -377,23 +377,27 @@ class String
 	    return self[n, int.max] + self[0, n]
 		
 		
-	function IsBad (|int|from=0, |ind|)
+	function FindBadUTF8 (|int|from=0, |ind|)
 		cpp_Wrapper JB_Str_BadUTF8
 
-	function IsBinary (|float|f=24.0, |bool|)
-		return  .badness|float|*f  >=  .length|float|
+	function IsBinary (|float| f = 512.0, |bool|)
+		|| badness = .badness
+		return  (badness.y)|float|*f  >=  .length|float|
 	
-	function IsText (|float|f=24.0, |bool|)
+	function IsText (|float| f = 512.0, |bool|)
 		return !.IsBinary(f)
 	
-	helper Badness (|int|)
+	helper Badness (|ivec2|)
+		description "Returns the validness of UTF-8 text, as: (FirstBadPosition, NumberOfBadBytesFound) as an ivec2" 
 		|| pos = 0
 		while
-			|| p = .IsBad(pos)
+			|| p = .FindBadUTF8(pos)
 			if p < pos	
 				exit
+			if rz.x < 0
+				rz.x = p
 			pos = p+1
-			++rz
+			rz.y++
 			
 	operator Plus (|string?| other, |string|)
 		nil safe

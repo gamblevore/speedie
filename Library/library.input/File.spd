@@ -245,7 +245,10 @@ class File (String)
 		return .CompareMsg(code, error)
 
 	
-	function ReadAll (|int| lim = 128MB, |bool| AllowMissing = true, |stringthatwasreadsafely|)
+	function ReadAll (|int| Lim = 128MB, |bool| AllowMissing = true, |stringthatwasreadsafely|)
+		description "Attempts to read the entire file. If .offset > 0, it will try to read from the start.
+
+Creates an error, if the file is bigger than the 'Lim' parameter." 
 		cpp_wrapper JB_File_ReadAll
 	
 	
