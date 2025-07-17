@@ -621,11 +621,12 @@ function Incrementatulatorifier (|&Assembler| self, |message| exp, |AsmReg| Dest
 	if dest is discard
 		mode = IncrBefore
 	  elseif !dest.reg
-		if (mode & IncrAfter) or (src isnt temp)
+		if (mode & IncrAfter) // or (src isnt temp) // why? Why was this added? it messes things up?
 			dest = .TempTyped(exp, dest)
 		  else
 			dest.reg = src
-	
+
+	src = src as asmreg.noscale
 	|| p = exp.parent! // better positions
 	if src is ContainsAddr
 		dest.µType = src.µType

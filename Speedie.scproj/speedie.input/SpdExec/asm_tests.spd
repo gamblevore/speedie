@@ -40,6 +40,13 @@ class LargeClass2 {
 }
 
 
+function FastMemory (|&int| x, |int| a, |int| b, |int| c)
+	(x++)[] = a
+	(++x)[] = b
+	(x--)[] = c
+	(--x)[] = 0
+
+
 function StructInner (|scdecl| d)
 	|| z = 3 // just to make it easier to see
 	|| y = &d.au.info
