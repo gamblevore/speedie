@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		AC1050132D6205ED00BB929B /* libSDL2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC1050122D6205EC00BB929B /* libSDL2.dylib */; };
 		AC1050142D6205ED00BB929B /* libSDL2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AC1050122D6205EC00BB929B /* libSDL2.dylib */; };
-		AC15C8EF29A7852100468248 /* JB_DivSufSort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC15C8ED29A7852100468248 /* JB_DivSufSort.cpp */; };
-		AC15C8F029A7852100468248 /* JB_DivSufSort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC15C8ED29A7852100468248 /* JB_DivSufSort.cpp */; };
 		AC33F7BE2B4FA499009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */; };
 		AC33F7C02B4FA499009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */; };
 		AC33F7C12B4FA499009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */; };
@@ -99,7 +97,6 @@
 		ACB2D25F29BCCAB70070E60F /* JB_Child.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528ECD2961F9B3005EFB9D /* JB_Child.cpp */; };
 		ACB2D26029BCCAB70070E60F /* JB_Alloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528EBD2961F9B2005EFB9D /* JB_Alloc.cpp */; };
 		ACB2D26129BCCAB70070E60F /* JB_PNG.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528ED22961F9B3005EFB9D /* JB_PNG.cpp */; };
-		ACB2D26229BCCAB70070E60F /* JB_DivSufSort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC15C8ED29A7852100468248 /* JB_DivSufSort.cpp */; };
 		ACB2D26329BCCAB70070E60F /* JB_LibraryFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528EC52961F9B2005EFB9D /* JB_LibraryFile.cpp */; };
 		ACB2D26529BCCAB70070E60F /* JB_Compress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528ED72961F9B4005EFB9D /* JB_Compress.cpp */; };
 		ACB2D26629BCCAB70070E60F /* JB_List.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528EC02961F9B2005EFB9D /* JB_List.cpp */; };
@@ -182,7 +179,6 @@
 /* Begin PBXFileReference section */
 		AC0F6154233BA87000382DA7 /* Jeebox.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Jeebox.input; path = ../jeebox.scproj/Jeebox.input; sourceTree = "<group>"; };
 		AC1050122D6205EC00BB929B /* libSDL2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSDL2.dylib; path = ../Library/libSDL2.dylib; sourceTree = "<group>"; };
-		AC15C8ED29A7852100468248 /* JB_DivSufSort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_DivSufSort.cpp; path = ../Library/CppLib/JB_DivSufSort.cpp; sourceTree = "<group>"; };
 		AC259FBF2660EF610026C303 /* image.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = image.input; path = ../Image.scproj/image.input; sourceTree = "<group>"; };
 		AC28D04B2638AAE700635A66 /* perry.input */ = {isa = PBXFileReference; lastKnownFileType = folder; path = perry.input; sourceTree = SOURCE_ROOT; };
 		AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Pico.cpp; path = ../Library/CppLib/JB_Pico.cpp; sourceTree = "<group>"; };
@@ -345,7 +341,6 @@
 				AC528A5A2961F536005EFB9D /* JB_Globals.cpp */,
 				AC528A5B2961F536005EFB9D /* JB.cpp */,
 				AC528E962961F99F005EFB9D /* JB_Alloc.cpp */,
-				AC15C8ED29A7852100468248 /* JB_DivSufSort.cpp */,
 				AC528E822961F99D005EFB9D /* JB_BasicIO.cpp */,
 				AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */,
 				AC528E892961F99E005EFB9D /* JB_ByteMap.cpp */,
@@ -604,7 +599,6 @@
 				AC528EB32961F99F005EFB9D /* JB_Alloc.cpp in Sources */,
 				AC528EB82961F9A0005EFB9D /* JB_MSR.cpp in Sources */,
 				AC528EB12961F99F005EFB9D /* JB_VM.cpp in Sources */,
-				AC15C8F029A7852100468248 /* JB_DivSufSort.cpp in Sources */,
 				AC528EA52961F99F005EFB9D /* JB_Vectors.cpp in Sources */,
 				AC528EA42961F99F005EFB9D /* JB_String.cpp in Sources */,
 				AC528EA72961F99F005EFB9D /* JB_Date.cpp in Sources */,
@@ -660,7 +654,6 @@
 				ACB2D25F29BCCAB70070E60F /* JB_Child.cpp in Sources */,
 				ACB2D26029BCCAB70070E60F /* JB_Alloc.cpp in Sources */,
 				ACB2D26129BCCAB70070E60F /* JB_PNG.cpp in Sources */,
-				ACB2D26229BCCAB70070E60F /* JB_DivSufSort.cpp in Sources */,
 				ACB2D26329BCCAB70070E60F /* JB_LibraryFile.cpp in Sources */,
 				ACB2D26529BCCAB70070E60F /* JB_Compress.cpp in Sources */,
 				ACB2D26629BCCAB70070E60F /* JB_List.cpp in Sources */,
@@ -702,7 +695,6 @@
 				AC528EFC2961F9B4005EFB9D /* JB_Child.cpp in Sources */,
 				AC528EDC2961F9B4005EFB9D /* JB_Alloc.cpp in Sources */,
 				AC528F062961F9B4005EFB9D /* JB_PNG.cpp in Sources */,
-				AC15C8EF29A7852100468248 /* JB_DivSufSort.cpp in Sources */,
 				AC528EEC2961F9B4005EFB9D /* JB_LibraryFile.cpp in Sources */,
 				AC528F102961F9B4005EFB9D /* JB_Compress.cpp in Sources */,
 				AC528EE22961F9B4005EFB9D /* JB_List.cpp in Sources */,
