@@ -89,7 +89,7 @@ class FileRow (ListViewRow)
 	
 	
 	function MoveTo (|string| v, |bool|) // rename
-		if (v contains '/') or (v.isbad) or (v.linecount > 1)
+		if (v contains '/') or (v.FindBadUTF8) or (v.linecount > 1)
 			beep v + " is not a valid filename!"
 			return false
 		
@@ -213,13 +213,22 @@ class FileRow (ListViewRow)
 		return s
 
 
-	function VisibleText (|bool|ignore=true, |string|)
+	function SearchableText (|string|)
 		|| d = ._Document
 			if d.current and d.SimpleUpdateFromDisk
 				return d.text
 		|| f = .readfrom.file
 		require !f.isdir
-		return f.readfile(ignore).utf8
+
+		// how do we know a file is binary? just... by checking it... really.
+		|| x = f.open
+			|| preview = f.Read(4K)
+			|| fsize = f.size
+			|| badness = preview.Badness
+				require  badness.x >= 4093  and  fsize > 4096 // heuristic, in case we cut a char in half.
+			if fsize <= 4096
+				return preview
+			return f.ReadAll
 
 
 	function FindAllParent (|message| found, |error|)
@@ -235,8 +244,7 @@ class FileRow (ListViewRow)
 
 	function FindInFile (|string| text,  |error| found,  |$int| Remain,  |bool| DoRepl)
 		require text
-		|| t		= .visibletext
-		require t and !t.IsBinary
+		|| t		= .SearchableText$
 		
 		|error| parent // this is never returned? why is it made?
 		|| Lim		= Remain

@@ -17,7 +17,7 @@ class TextView (GUIControl)
 	|byte|						_CanAutoComplete
 	|int|						_AutoCompleteBack
 	|string|					_AutoCompleteString
-	
+
 	|byte|						_LineNumWidth
 	|byte|						_CodeInsertionState
 	|uint16|					_LastDrawWidth
@@ -975,14 +975,17 @@ class TextView (GUIControl)
 
 
 	helper TypeTab (|bool|)
-		|| sr = .SelRange
-		if !sr.width and .IsJeeboxMode
-			if .TabIndent(1, "\t", true)
-				return true
+// not sure why I did this?
+//		|| sr = .SelRange
+//		if !sr.width and .IsJeeboxMode
+//			if .TabIndent(1, "\t", true)
+//				return true
 		return .typed("\t")
+
 
 	helper CanTypeTab (|bool|)
 		return !(.SingleLine & 1)
+	
 	
 	helper TryTab (|bool|)
 		require .CanTypeTab
