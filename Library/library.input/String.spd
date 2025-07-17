@@ -381,13 +381,13 @@ class String
 		cpp_Wrapper JB_Str_BadUTF8
 
 	function IsBinary (|float| f = 512.0, |bool|)
-		|| badness = .badness
+		|| badness = .UTF8Badness
 		return  (badness.y)|float|*f  >=  .length|float|
 	
 	function IsText (|float| f = 512.0, |bool|)
 		return !.IsBinary(f)
 	
-	helper Badness (|ivec2|)
+	helper UTF8Badness (|ivec2|)
 		description "Returns the validness of UTF-8 text, as: (FirstBadPosition, NumberOfBadBytesFound) as an ivec2" 
 		|| pos = 0
 		while
