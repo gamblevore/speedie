@@ -358,7 +358,8 @@ uint8* JB_FastFileString( JB_String* Path, uint8* Tmp ) { // just use posix func
 int JB_File_OpenStart( JB_File* f, bool AllowMissing ) {
 	int FD = f->Descriptor;
 	if (FD >= 0) {
-		JB_File_OffsetSet(f, 0); // in case it was already open... sigh.
+		int err = JB_File_OffsetSet(f, 0);
+		if (err) return err;
 		return FD;
 	}
 	return JB_File_Open( f, O_RDONLY, AllowMissing );
