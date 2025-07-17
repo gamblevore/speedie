@@ -43,7 +43,7 @@
 &&KNST,
 &&ADDB,
 &&ADDK,
-&&ADPK,
+&&ADAK,
 &&MULK,
 &&ADD,
 &&SUB,

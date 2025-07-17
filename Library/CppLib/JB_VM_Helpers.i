@@ -234,7 +234,7 @@ AlwaysInline void SetRefApart(VMRegister* r, ASM Op) {
 
 #define mem0(t)				({ (u2) ? ((t*)u2)[u3+Read_Offsetu-1] : 0; }) // safely read.
 #define mem1(t)				((t*)u2)[u3+Read_Offsetu-1]
-#define mem2(t)				(u2 = (u64)((t*)u2 - Read_movei))
+#define mem2(t)				(u2 = (u64)((t*)u2 + Read_movei))
 
 
 AlwaysInline JB_Object* alloc(void* o) {

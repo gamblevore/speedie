@@ -48,7 +48,7 @@
 	i1 = i1 + (U1_Li << 12);
 ı ADDK: _
 	i1 = i2 + U2_Li;
-ı ADPK: _
+ı ADAK: _
 	i1 = i2;
 	i2 = i2 + U2_Li;
 ı MULK: _

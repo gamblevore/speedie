@@ -91,6 +91,12 @@ forms
 		r3		r
 		Cmp		4
 
+	CmpF
+		r1		R
+		r2		r
+		r3		r
+		Cmp		4
+
 	Compare4
 		r1		R
 		r2		r
@@ -217,6 +223,11 @@ forms
 	AddK
 		r1		R
 		r2		r
+		K		l
+	
+	AddAK
+		r1		R
+		r2		R
 		K		l
 	
 	Div2
@@ -409,7 +420,7 @@ POS 5
 		i1 = i1 + (U1_Li<<12)
 /**/ ADDK (AddK)
 		i1 = i2 + U2_Li
-/**/ ADPK (AddK) // post-increment
+/**/ ADAK (AddAK) // after-increment (post-increment)
 		i1 = i2
 		i2 = i2 + U2_Li
 /**/ MULK  (AddK)
@@ -423,6 +434,8 @@ POS 5
 /**/ DIV (Div)
 		DivMath(r, Op)
 /**/ DIV2 (Div2)
+	// we could remove clearu?
+	// numbers are now... bituncorrect?
 		if (i2 < 0)	// quick divide by power of 2 on a signed int
 			i1 = (((i2+((1<<Div2_Shu)-1)) >> Div2_Shu) << Div2_Clearu) >> Div2_Clearu
 		else
@@ -499,7 +512,7 @@ POS 5
 /**/ CMPI  (CmpI)
 		CompI(r, Op)
 
-/**/ CMPF  (JCmpF)
+/**/ CMPF  (CmpF)
 		CompF(r, Op)
 
 

@@ -192,6 +192,19 @@
 #define   CmpI_Lu_(x)   (((uint)((x)<<27))>>27)
 
 
+#define   CmpF_Cmpi       ((( int)((Op)<<23))>>28)
+#define   CmpF_Cmpi_(x)   ((( int)((x)<<23))>>28)
+
+#define   CmpF_Cmpu       (((uint)((Op)<<23))>>28)
+#define   CmpF_Cmpu_(x)   (((uint)((x)<<23))>>28)
+
+#define   CmpF_Li       ((( int)((Op)<<27))>>27)
+#define   CmpF_Li_(x)   ((( int)((x)<<27))>>27)
+
+#define   CmpF_Lu       (((uint)((Op)<<27))>>27)
+#define   CmpF_Lu_(x)   (((uint)((x)<<27))>>27)
+
+
 #define   Compare4_Smalli       ((( int)((Op)<<28))>>31)
 #define   Compare4_Smalli_(x)   ((( int)((x)<<28))>>31)
 
@@ -475,6 +488,13 @@
 
 #define   AddK_Ku       (((uint)((Op)<<18))>>18)
 #define   AddK_Ku_(x)   (((uint)((x)<<18))>>18)
+
+
+#define   AddAK_Ki       ((( int)((Op)<<18))>>18)
+#define   AddAK_Ki_(x)   ((( int)((x)<<18))>>18)
+
+#define   AddAK_Ku       (((uint)((Op)<<18))>>18)
+#define   AddAK_Ku_(x)   (((uint)((x)<<18))>>18)
 
 
 #define   Div2_Shi       ((( int)((Op)<<18))>>26)
