@@ -100,7 +100,7 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Orig,  |$uint| Curr,  |b
 
 
 	if  exp  and  fat isa asm.allo						/// DEALLOCATE STRUCTS ///
-		ASMType.AllocBearStruct(-1, exp.DeepLast, v, fat.Reg(1)<<4)
+		ASMType.AllocBearStruct(-1, exp.DeepLast, v.asm, fat.Reg(1)<<4)
 
 	return true
 

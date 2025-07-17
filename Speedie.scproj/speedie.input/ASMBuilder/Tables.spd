@@ -163,7 +163,7 @@ function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg
 			dest = .µ(f, asmreg.discard)
 	
 	.closevars(.state.ParentVars, exp)
-	if .TailInlineable and ReturnOpt(self, dest, bb)
+	if .TailInlineable and ReturnOpt(self, dest.reg, bb)
 		return dest
 	
 	|| fat = exp.RET(Dest)
@@ -194,7 +194,7 @@ function Return (fn_asm)
 		dest = asmreg()
 	
 	.closevars(1, exp)
-	if ReturnOpt(self, dest, bb)
+	if ReturnOpt(self, dest.reg, bb)
 		return asmreg.exit
 	
 	|| D0 = .SafeDecr
@@ -321,9 +321,8 @@ function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl|
 
 
 
-function AllocBearStruct (|int| dir, |message| exp, |int| v, |int| size, |asmreg|)
+function AllocBearStruct (|int| dir, |message| exp, |asmreg| dest, |int| size, |asmreg|)
 	size = (size+15)>>4
-	|| dest = v.asm
 	return exp.ALLO(dest, size*dir) * dest
 
 

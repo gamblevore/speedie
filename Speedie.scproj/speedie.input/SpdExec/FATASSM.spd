@@ -47,7 +47,7 @@ struct FatASM
 		.µrefcount = 0
 		._op = value
 		
-	function Input (|int| i, |&fatasm|)
+	function InputFat (|int| i, |&fatasm|)
 		|| r = (.prms[i] << 1) >> 16
 			return r.fat
 	
@@ -179,7 +179,17 @@ struct FatASM
 				i.µRefCount++
 	
 	
-	function RegInput (|int| a, assigns:|asmreg| Input)
+	function RegInput (|int| a, assigns:|asmreg|)
+		.input(a, value)
+	
+	
+	function RegInput (|int| a, |asmreg|)
+		|uint64| v = .prms[a]
+		(rz is temp) = (v>>31)
+		rz.reg = v&31
+		rz = rz as ((v >> 15) << 48)|asmreg| // fat index		
+		
+	function Input (|int| a, assigns:|asmreg| Input)
 		cpp_part Prm
 		opt inline
 		
@@ -211,7 +221,6 @@ struct FatASM
 				.Registers[old] = nil
 		
 		return f.Dest(a, info, self)						// Then we set it to the new value
-
 
 
 	function Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
@@ -554,7 +563,7 @@ struct FatASM
 		while (i < –count .prms)
 			ifn ir & (1 << i)
 				continue
-			yield (.input(i))
+			yield (.inputfat(i))
 			i++
 			
 	iterator RegOutputs

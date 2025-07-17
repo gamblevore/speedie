@@ -189,7 +189,11 @@ function CompileAll (|int|)
 	StringCorrector.CorrectConsts
 	
 	rz += stderr.ok
-	if compiler.InPerry or Options.ModePack
+	|| ReallyNoDebug = false
+	target debug
+		ReallyNoDebug = Compiler.InPerry
+	
+	if !ReallyNoDebug and (compiler.InPerry or Options.ModePack)
 		.Timer( "Export Pack" )
 		PackMaker.MakePack	
 	

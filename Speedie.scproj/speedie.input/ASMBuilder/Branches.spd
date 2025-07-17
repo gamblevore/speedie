@@ -200,7 +200,7 @@ function TernRefCount (|asmreg| A, |asmreg| B, |asmreg|)
 	rz = B
 	|| fa = A.fat
 	|| fb = B.fat		
-		fb.RegInput(5, A)			// refcount A, save from disposal
+		fb.Input(5, A)			// refcount A, save from disposal
 	  elseif fa
 		rz = A
 
@@ -473,7 +473,7 @@ extend Assembler
 				if rz
 					rz = rz.simplify
 				  else
-					|| dest = s.input(0)
+					|| dest = s.inputfat(0)
 						rz = dest.info 
 					  else
 						rz = s.prms[0]|int|.asm

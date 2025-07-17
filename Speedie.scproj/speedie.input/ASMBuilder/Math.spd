@@ -383,7 +383,7 @@ extend Assembler
 		// L is now a POINTER.
 		|| v = .NumToReg(exp,  LMul,  ASMReg(),  DataTypeCode.uint)
 		if l is Alternate										// x = (lptr - rptr)/12
-			exp.ADD_(dest, L, R, ASMReg())!
+			exp.ADD_(dest, L, R, 0)!
 			debugger
 			return .DivInt(dest, dest, v, exp)
 
