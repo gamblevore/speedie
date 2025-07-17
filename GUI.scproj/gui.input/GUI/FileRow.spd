@@ -221,7 +221,7 @@ class FileRow (ListViewRow)
 		require !f.isdir
 
 		// how do we know a file is binary? just... by checking it... really.
-		|| x = f.open
+		|| x = f.open(file.readmode)
 			|| preview = f.Read(4K)
 			|| fsize = f.size
 			|| badness = preview.Badness

@@ -14,13 +14,13 @@ class File (String)
 
 	constants
 		IgnoreErrors = true
-		O_CREAT	 = 0x200			/* create if nonexistant */
-		O_TRUNC	 = 0x400			/* truncate to zero length */
-		O_EXCL   = 0x800			/* error if already exists */
-		O_APPEND = 0x008			/* set append mode */
-		O_RDONLY = 0x000			/* open for reading only */
-		O_WRONLY = 0x001			/* open for writing only */
-		O_RDWR   = 0x002			/* open for reading and writing */
+		CreateMode	 = 0x200			/* create if nonexistant */
+		TruncateMode = 0x400			/* truncate to zero length */
+		ExclusiveMode = 0x800			/* error if already exists */
+		AppendMode = 0x008				/* set append mode */
+		ReadMode = 0x000				/* open for reading only */
+		WriteMode = 0x001				/* open for writing only */
+		ReadWriteMode = 0x002			/* open for reading and writing */
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -157,7 +157,7 @@ class File (String)
 	function Section (|int| a, |int| b, |string|)
 		cpp_part AccessPeek
 		|| WasClosed = .descriptor < 0
-		if .open(File.O_RDONLY)
+		if .open(File.readmode)
 			.offset = a
 			rz = .read(b-a)
 			if WasClosed
@@ -223,8 +223,8 @@ class File (String)
 			return 1
 		A.close
 		.close
-		.Open(O_RDONLY)
-		A.Open(O_RDONLY)
+		.Open(readmode)
+		A.Open(readmode)
 		
 		while {
 			|| S_ = .Read(64K)
@@ -291,7 +291,7 @@ Creates an error, if the file is bigger than the 'Lim' parameter."
 	helper CurrChild (|int| MakeDirsObvious=0, |String|)
 		cpp_wrapper
 	
-	function Open (|int| Flags = File.O_RDWR ||| File.O_CREAT, |bool|AllowMissing=false, |filedes|)
+	function Open (|int| Flags = File.ReadWriteMode ||| File.CreateMode, |bool|AllowMissing=false, |filedes|)
 		cpp_wrapper
 
 	function OpenForRead (|bool| AllowMissing = false, |filedes|)
