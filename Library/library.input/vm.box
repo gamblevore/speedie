@@ -248,13 +248,8 @@ forms
 		r3		R
 		r4		R
 
-	RefSetCode
-		r1		R
-		r2		r
-		Code	4
-
 	RefSet1
-		r1		r		// Small R
+		r1		R
 		r2		r
 
 	RefSetApart

@@ -530,19 +530,6 @@
 #define   Swap_Lu_(x)   (((uint)((x)<<28))>>28)
 
 
-#define   RefSetCode_Codei       ((( int)((Op)<<18))>>28)
-#define   RefSetCode_Codei_(x)   ((( int)((x)<<18))>>28)
-
-#define   RefSetCode_Codeu       (((uint)((Op)<<18))>>28)
-#define   RefSetCode_Codeu_(x)   (((uint)((x)<<18))>>28)
-
-#define   RefSetCode_Li       ((( int)((Op)<<22))>>22)
-#define   RefSetCode_Li_(x)   ((( int)((x)<<22))>>22)
-
-#define   RefSetCode_Lu       (((uint)((Op)<<22))>>22)
-#define   RefSetCode_Lu_(x)   (((uint)((x)<<22))>>22)
-
-
 #define   RefSet1_Li       ((( int)((Op)<<18))>>18)
 #define   RefSet1_Li_(x)   ((( int)((x)<<18))>>18)
 
