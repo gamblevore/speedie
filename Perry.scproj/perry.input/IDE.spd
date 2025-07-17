@@ -230,7 +230,7 @@ class PerryIDE (Window)
 			fs <~ (' ', 3)
 			if t.IsASCII
 				fs <~ "ASCII"
-			  elseif t.IsBad
+			  elseif t.FindBadUTF8
 				fs <~ "binary"
 			  else
 				fs <~ "UTF-8"
