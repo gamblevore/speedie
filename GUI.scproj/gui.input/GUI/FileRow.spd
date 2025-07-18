@@ -1,5 +1,4 @@
 
-//
 class FileRow (ListViewRow)
 	linkage
 		cpp_part FR
@@ -18,16 +17,6 @@ class FileRow (ListViewRow)
 	|bool|							SameNameAsPrev
 	contains FileRow
 	
-	 
-	function Sanity 
-		disabled 
-		return
-		|| d = ._document
-			|| dp = d.location.resolve(true)
-			|| l = .location.resolve(true)
-			if l and dp
-				if l != dp
-			
 	 
 	constructor (|FileRow| R)
 		cpp_Part ConstructorCopy
@@ -51,7 +40,6 @@ class FileRow (ListViewRow)
 		.dirfile	= DirFile
 
 		.asdir		= dirfile
-//		if name contains ".scproj"
 		.name		= name
 		.lastsize	= (path.File.Size, 0)(!.asdir)
 		.lastfilecount = (!.asdir)|int|
@@ -67,12 +55,10 @@ class FileRow (ListViewRow)
 	
 	
 	behaviour Text
-//		.Sanity
 		if i == 0
 			return .name
 
 	operator isa (|string| s, |bool|)
-//		.Sanity
 		return .location isa s
 	
 
