@@ -266,14 +266,11 @@ function CalculateSizeRaw (|int| Depth=0, |int|)
 		|| pal = p.alignment
 		align = align max pal
 		rz = rz Align pal
-		if self ~= "assembler"
-			"${p.name} $rz $align"
 		p.au.ExportPosition = rz
 		p.sanity
 		|| Mul = P.c_Array ?? 1
 		rz += Curr * Mul 
 
-	if self ~= "assembler"
 	.alignment = align
 	.SizeRaw = rz
 	.Size = rz align align
