@@ -36,7 +36,7 @@ function ZeroMemory (|int| Index, |message| Exp, |asmreg| Base, |asmreg| VarAdd,
 
 
 function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl?| Decl, |int| Index, |&fatasm|)
-	target debug: if (dest isnt set) and !dest.reg // oh man
+
 	if dest is ContainsAddr
 		#!wait?? this is meant to be an addrrequest? not a response.
 		debugger
@@ -66,7 +66,7 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 		VarAdd = ASMReg()
 	
 	if decl isnt ClassObj
-		base = .InlineOffsetOpt(Base, bytes, index, 7, Decl)
+		base = .MemOffsetFix(Base, bytes, index, 7, Decl)
 	
 	|| pinc = .MemOpt(base, index, bytes)
 	
@@ -93,6 +93,10 @@ function MemOpt (|$asmreg| base, |$int| index, |int| bytes, |int|)
 		i += rz
 		require i|uint| <= 127 // could go out of range!
 	
+	// this logic is so strange. I wonder if any (real) cases exist where this can fail.
+	// (not cases that don't get generated). I can't think of how to fix this, though.
+	// this is a case of something I can't solve without examples.
+	
 	if before and (bs is temp)
 		rz = 0 // rz... does it still matter?
 	  else
@@ -101,12 +105,15 @@ function MemOpt (|$asmreg| base, |$int| index, |int| bytes, |int|)
 	index = i
 	base = bs.RegInput(1)
 	.nop(bs)
-	
 
 
-function Assembler.InlineOffsetOpt (|asmreg| base, |int| pow2, |$int| index, |uint| MaxBits, |scdecl?| Glob, |asmreg|)
+function Assembler.InlineOffsetOpt (|asmreg| base, |int| bytes, |$int| index, |uint| MaxBits, |scdecl?| Decl, |asmreg|)
+	rz = .MemOffsetFix(Base, bytes, index, maxbits, Decl)
+	.MemOpt(rz, index, bytes)
+
+
+function Assembler.MemOffsetFix (|asmreg| base, |int| pow2, |$int| index, |uint| MaxBits, |scdecl?| Glob, |asmreg|)
 	opt norefcounts
-	target debug: if glob is classobj // what?
 	|| bs = base.fat
 	if !bs
 		return base
@@ -119,10 +126,7 @@ function Assembler.InlineOffsetOpt (|asmreg| base, |int| pow2, |$int| index, |ui
 		
 		|| K = bs.const
 		if (glob isnt global) and (glob is property)		// a property on a global struct
-			debugger // really not sure what to do.
-			LostBytes += K
-	//		|| curr = P.CalculateSize(depth), || SmallCurr = curr.clamp(1,16)
-			
+			/LostBytes = 0 // assume index is already set! 
 		  else
 			LostBytes -= K
 			expect LostBytes >= 0
@@ -163,6 +167,8 @@ function ReadOrWrite (|ASMReg| dest, |message| exp, |asmreg| base, |asmreg| VarA
 	opt inline
 	if dest is set or FromZeroMemory
 		(dest is RealConst)				// make compiler happy
+	if dest isnt set
+		dest = .TempTyped(exp, dest)
 	return .ReadOrWriteSub(dest, exp, base, VarAdd, ty, index) * dest
 
 

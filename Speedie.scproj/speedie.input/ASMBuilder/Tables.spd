@@ -282,11 +282,7 @@ function SetRel (fn_asm)						// function relset (
 	|| A = exp.first!.asmunbra
 	|| B = exp.last!
 	|| X = .ExistingVar(A, VarUseMode.set)
-		|| D = a.ASMDecl
-		dest = .µInto(B, X)
-		if x.CanBeKnownValue
-			.MarkDeclAsConst(D, nil, dest)
-		return dest
+		return .µInto(B, X)
 
 	// probably x.y = z, or x[y] = z 
 	dest = .µGetASM(B, asmreg()) 
@@ -323,7 +319,9 @@ function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl|
 
 function AllocBearStruct (|int| dir, |message| exp, |asmreg| dest, |int| size, |asmreg|)
 	size = (size+15)>>4
-	return exp.ALLO(dest, size*dir) * dest
+	|| fat = exp.ALLO(dest, size*dir)
+	fat.µRefCount++ // makes sense it is always reffed
+	return fat * dest
 
 
 function Decl (fn_asm)
@@ -337,16 +335,8 @@ function Decl (fn_asm)
 	if ty.IsBareStruct
 		return AllocBearStruct(1, exp, dest, ty.SizeOfQuery)
 	
-	|| item = rel.Last!
-
 	if ty isnt local								// A carray or somthing?? idk
-	if ty is AlteredInBranch
-		return .µInto(item, dest)
-	
-	|| K = .µInto(item, dest)
-	if k is ConstOutput
-		.MarkDeclAsConst(ty, k, nil)
-	return k
+	return .µInto(rel.Last!, dest)
 
 
 function ArgumentSub (|&Assembler| self, |message| exp, |AsmReg|)
@@ -402,7 +392,7 @@ function DotConst (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| Pro
 	opt norefcounts // wait? don't these all get pre-transformed? SHOULD they be?
 	|| fn = prop.islookuponly
 	if fn isa scfunction
-		return DoGlobal(self, dest, exp, prop, 0)
+		return DoGlobal(self, dest, exp, prop)
 	return ConstFromThgName(self, exp, dest, prop)
 
 
@@ -414,11 +404,7 @@ function Dot (fn_asm)										// a.b
 	
 	
 	if prop is global
-		if prop.IsBareStruct // now what?
-			debugger
-		
-		|| ByteOffset = 0
-		return DoGlobal(self, dest, exp, prop, ByteOffset)
+		return DoGlobal(self, dest, exp, prop)
 		
 	|| Obj = .µGetASM(exp.first!)
 	dest.µtype = prop.typeinfo
@@ -434,7 +420,7 @@ function Dot (fn_asm)										// a.b
 	
 	if (dest is AddrRequest) or prop.IsCarray or prop.IsBareStruct
 		return .DotAddr(exp, dest, Index, prop, obj)
-	
+
 	return .ReadOrWrite(Dest, exp, obj, ASMReg(), prop, Index)
 
 
@@ -507,24 +493,23 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 			
 		if (dest is ConstRequest)
 			return nil
-		return DoGlobal(self, dest, exp, d, 0)
+		return DoGlobal(self, dest, exp, d)
 		
 	return ConstFromThgName(self, exp, dest, d)
 
 
 
-function DoGlobal (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| D, |int| index, |ASMReg|)
+function DoGlobal (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| D, |ASMReg|)
 	opt	NoRefCounts
 	target debug
 		|| d2 = exp.asmdecl
 		if !d.minimatch(d2) // Remove d2. it the same as D.
 
-	if !dest.reg or dest isnt set		// surely this is just !dest.reg?
-		dest = .TempTyped(exp, dest)	// so why test? and also, temptyped tests this already
-										// is it just for GTAB reuse? sigh.
+	if dest isnt set
+		dest = .TempTyped(exp, dest)
 										
 	|| addr = .GlobAddr(d, exp, dest)
-		if dest is AddrRequest
+		if (dest is AddrRequest) or d.isbarestruct or d.iscarray
 			addr.µtype = d.au.DataType
 			return addr.HaveAddr
 		
@@ -705,7 +690,6 @@ function DotAddr (|message| exp, |AsmReg| Dest, |int| Pos, |scdecl| prop, |asmre
 		dest.µtype = DataTypeCode._voidptr
 	dest = dest.haveaddr
 	obj = obj as asmreg.NoScale
-	pos *= prop.CArraySize
 	return .AddToReg(exp, dest, obj, pos)
 
 
@@ -829,32 +813,6 @@ function LocalThg (|scdecl| d, |asmreg|)
 			(T is temp = ret is temp)
 	
 	return T
-
-
-
-function MarkDeclAsConst (|scdecl| Decl, |asmreg| Initial, |asmreg| NewValue)
-	description "Marks Decl as a const, if it definitely is a const. Otherwise marks as NOT CONST. Also nops unused consts. Also updates new const value."
-	opt NoRefCounts
-//	|| f = Initial.fat
-//	if initial
-//		require !.SetDeclToConst(Decl, initial, f)
-//
-//// || k = 1, k = X	 // clear k=1
-//
-//	|| NewFat = NewValue.fat
-//	if decl is Const // Clear old const avalue.
-//		(decl isnt const)
-//		if f
-//			.AskNop(f)
-//		decl.au.ExportPosition = 0
-//		|| fat = decl.fat
-//		if fat and newfat != fat
-////			decl.au.FatConstIndex = 0
-//			.AskNop(fat)
-//	
-//	if NewValue
-//		.SetDeclToConst(decl, newvalue, Newfat)
-
 }
 
 

@@ -7,6 +7,7 @@ function message.ASMDecl (|SCDecl!|)
 	if (rz is Global) and !rz.au.ExportPosition // oof
 		|| P = .first
 			rz.au.ExportPosition = p.ASMDecl.au.ExportPosition
+			rz.sanity
 			target debug:  if !rz.au.ExportPosition // oof
 				
 	
@@ -84,18 +85,15 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Orig,  |$uint| Curr,  |b
 	Curr &=~ (1<<v)
 	.KnownValuesMap &=~ (1<<v)
 
-	|| fat = .Registers[v]		#require
+	|| fat = .Registers[v]
+	if !fat: return true
 	.registers[v] = nil
-	|| k = (Fat, nil)(fat is NotAlteredInbranch)		/// UNHOIST ///		
-		|| DebugView = (Orig&1)  and  !.state.inlinedepth  and  options.optimise < 4
-		if !DebugView  and  k.µRefCount <= 1 // HoistComplete did +1 on it's refcount earlier. So it is unused.
-			.Nop(k) 
-		  else
-			k.µRefCount--								/// restore :) ///
+	if fat.µrefcount <= 0 and fat is NotAlteredInbranch		
+		ifn (Orig&1)  and  !.state.inlinedepth  and  options.optimise < 4
+			.Nop(fat) 
 			
 						
 	if fat is CompilerCreated							/// NOP UNUSED VARS ///
-		if  (fat.µrefcount == 1)  and  (fat isa asm.allo) // oof
 		.AskNop(fat)
 
 

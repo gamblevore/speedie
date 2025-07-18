@@ -331,7 +331,7 @@ struct Assembler
 			|| StartStackSize = ++.stacksize
 			if StartStackSize > 20 // ugh
 			|| trap = ++ASMTrapper
-			// if trap == 1332
+			if trap == 3117
 				
 		  else
 			opt inline

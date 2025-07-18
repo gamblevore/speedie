@@ -250,7 +250,7 @@ function NilFunction (NilTrackerFn)
 		require .UseAsReal(fp, 0, nilreason.accessing)					// (abc)()
 
 	ifn ((fn != scfunction.currfunc) or t.anyreturns or t.nestdepth > 0)
-		ErrorReceiver.NewCriticalError(msg, "Recursion fail: This would freeze on call.")
+		ErrorReceiver.NewCriticalError(msg, "Recursion fail: This would freeze.")
 			
 	
 	if (Test is Active) and fn.IsNilChecker
