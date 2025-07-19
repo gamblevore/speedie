@@ -247,13 +247,13 @@ function BadEncoder (ASM_Encoder)
 	debugger
 
 
-function VM_NewInstructions (|message| list, |bool| Amount, |[message]| rz)
+function VM_NewInstructions (|message| list, |bool| Amount, |[message]| out)
 	opt norefcounts
 	for ch in list
-		require .VM_NewIns(ch, amount, rz)
+		require .VM_NewIns(ch, amount, out)
 
 
-function VM_FillPos (|message| list, |[message]| rz)
+function VM_FillPos (|message| list, |[message]| out)
 	opt norefcounts
 	for ch in list
 		if ch ~= "POS"
@@ -263,7 +263,7 @@ function VM_FillPos (|message| list, |[message]| rz)
 				|| i = f.int
 				|| arg = ch.last(@arg) // now what?
 				|| item = arg.first
-					.VM_MakeInstructionSub(item, false, rz, i)				
+					.VM_MakeInstructionSub(item, false, out, i)				
 
 
 function FillEncoders (|message| list, |bool| ActuallyMakeTheVM = true)

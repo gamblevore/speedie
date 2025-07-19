@@ -115,13 +115,13 @@ function SCNode.ListFunctions (|[SCFunction]|)
 		ListFunctionsSub(o, rz)
 
 
-function ListFunctionsSub (|object!| o, |[SCFunction]| rz)
+function ListFunctionsSub (|object!| o, |[SCFunction]| out)
 	opt norefcounts
 	if o isa SCDecl
 		o = o.hiderfunc|scdecl|
 	if o isa SCFunction
 		for f in o
-			rz <~ f
+			out <~ f
 		
 
 

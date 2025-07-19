@@ -96,7 +96,7 @@ function SCFunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
 		check (r isnt Reference) (r.source, "Only parameters can be references")
 
 
-function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cls, |bool|)
+function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cls,  |bool|)
 	opt norefcounts
 	real self
 	if (func.isassigns == 2) and .islast
@@ -125,8 +125,9 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 		func.altersparams |= 1<<n
 
 	func.args <~ dcl
-	check (func.args <= 8) (self, "Too many parameters defined. (8 max)")
-		
+	check (func.args <= 8)    (self, "Too many parameters defined. (8 max)")
+	if !dcl.type.isstruct
+		check (dcl.name ~!= "rz") (self, "Using reserved name.")
 	if dcl.name
 		(dcl is Param)
 	  else

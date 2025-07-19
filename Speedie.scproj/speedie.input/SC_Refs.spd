@@ -212,10 +212,10 @@ function RefMsg (|Message| msg, |String| name, |SCFunction| func, |Message|)
 function SCFunction.RefFunc (|message| prm, |message!| after)
 	opt norefcounts
 	parser.using.position = after.position
-	|| rz = SCRefs.RefMsg0(.ExportName, Compiler.RefIncr!)
-	after.next = rz
-	rz.last <~ prm
-	rz.obj = prm.obj
+	|| ref = SCRefs.RefMsg0(.ExportName, Compiler.RefIncr!)
+	after.next = ref
+	ref.last <~ prm
+	ref.obj = prm.obj
 	parser.using.position = -1
 
 

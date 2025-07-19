@@ -348,8 +348,7 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 	|| JUMP = .BoolTestAndJump(a, first, opp)						// AND/OR
 	|| Second = .µBoolInto(B, dest)
 	if Second is ConstOutput
-		.NOP(jump) // opp, first, Second, B
-		return .BoolConst2(first, second, opp).boolanswer
+		return .BoolConst2(first, second, opp, jump).boolanswer
 
 	JUMP.JumpTo(.curr, self)
 	
@@ -381,13 +380,19 @@ function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asm
 	return .Exists(dest, mr, B)
 
 
-function BoolConst2 (|asmreg| ml, |asmreg| kr, |opmode| Opp, |asmreg|)
-	if "bug".trap
+function BoolConst2 (|asmreg| ml, |asmreg| kr, |opmode| Opp, |FATASM| Jump, |asmreg|)
 	|| V = kr.const!=0
 	if v == (opp is AND)
-		.NopReg(kr)
+		|| f = ml.fat
+			f.µRefCount++
+		.nop jump
+		.NopReg(kr) // this could destroy the first input... but we still need it
+		if f
+			f.µRefCount--
+		
 		return ml
-	// .nopreg(ml) // the jump nopper already does this. in the subnop
+		
+	.nop jump	// .nopreg(ml) // the jump nopper already does this.
 	return kr
 
 

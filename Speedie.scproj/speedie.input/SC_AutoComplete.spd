@@ -80,17 +80,11 @@ function EnterAutoComplete (|bool|)
 	return true
 
 
-
 function InitedOK (|bool|)
 	if compiler.InitedOK
 		return true
 	if .Errors.OK
 		error "Compiler did not initialise"
-	
-
-//function CrashTester
-//	|| __CrashSpd__ = 0
-
 
 
 function PerryTalk (|SpdProcess| perry) // ReturnsWhenPerryClosesUs
@@ -704,6 +698,7 @@ function AutoSub (|SCNode| scope, |string| name, |[autoitem]| found, |int| Types
 	|| nav = scope.Access.Navigate
 	.autosub2(scope, name, found, types, needtypelimit, nav)
 
+
 function AutoSub2 (|SCNode| scope, |string| name, |[autoitem]| found, |int| Types, |message| NeedTypeLimit, |DictionaryReader of scobject| within)
 	opt norefcounts
 	|scdecl| TypeLimiter = nil
@@ -860,15 +855,15 @@ function AutoCompleteSub (|message| ff, |string| name, |message| into)
 				prev = i
 
 
-function ActualDefine (|message| rz, |message| s)
+function ActualDefine (|message| m, |message| s)
 	|| f = s.filepath			#expect "nopath"
-	rz <~ (@sstr, f)
-	rz <~ s.position
+	m <~ (@sstr, f)
+	m <~ s.position
 
 
-function SCNode.DiissplayObj (|message| rz, |message|)
-	rz <~ (@emb, .AutoCompleteKind + " " + .name)
-	return rz
+function SCNode.DiissplayObj (|message| m, |message|)
+	m <~ (@emb, .AutoCompleteKind + " " + .name)
+	return m
 
 
 function message.AutoCompleteDecl (|string|)
@@ -1004,23 +999,42 @@ function Define (|message--!| msg,  |string| purpose,  |object| found=nil,  |mes
 	error "nosource"
 
 
+
+function ASMFail (|scfunction| fn, |message?| ret,  |message|)
+	opt norefcounts
+	|| err = fn.SavedError
+		StdErr <~ err
+	  else
+		err = stderr.LastError
+
+	|| errtmp = @tmp + "check"
+	errtmp <~ Interact.MiniErrors(stderr)
+	app.parent! <~ errtmp
+	
+	return ret
+
+
+
 function CppASM (|message| msg,  |scfunction| fn,  |message|)
 	opt norefcounts
-	require stderr.ok
-		
-	// What should we do if its a wrapper or a macro?
+	require stderr.ok and !fn.SavedError
 	
 	|| src = fn.source				#expect (fn)
 	|| path = src.File				#expect (src)
+	
 	rz = @tmp.msg(msg.name)
 	rz.msg(@thg, fn.name)
 	|| rzarg = rz.msg(@arg)
 	if !fn.HasProperSpeedieCode
 		.Nothing(rzarg, fn)
+		if fn.SavedError
+			return .ASMFail(fn, rz)
 	  elseif msg ~= "cpp"
 		.Cpp(rzarg, fn)
 	  else
-		.ASM(rzarg, fn)
+		if !.ASM(rzarg, fn)
+			rz = nil
+			.ASMFail(fn, rz)
 
 
 
@@ -1053,34 +1067,33 @@ function message.FileMark (|message|)
 		rz <~ path
 
 
-function Cpp (|message| rz,  |SCFunction| found)
+function Cpp (|message| out,  |SCFunction| found)
 	|| msg = found.Source!.Copy
-	rz <~ msg
+	out <~ msg
 	msg.AddLinePositions
 	
 	
-function Nothing (|message| rz,  |SCFunction| fn)
+function Nothing (|message| out,  |SCFunction| fn)
 	if fn.IsMacro
-		rz <~ "This is a macro, and has no real code"
+		out <~ "This is a macro, and has no real code"
 	  elseif fn Is Wrapper
-		rz <~ "This is a cpp_wrapper function"
+		out <~ "This is a cpp_wrapper function"
 	  elseif fn is disabled
-		rz <~ "This function is disabled"
+		out <~ "This function is disabled"
 //	  elseif fn.TargettedOut
-//		rz <~ "Function was targgeted out"
+//		out <~ "Function was targgeted out"
 	  else
-		rz <~ "Could not compile this function."
+		out <~ "Could not compile this function."
 
 
-function ASM (|message| rz,  |SCFunction| fn)
+function ASM (|message| msg,  |SCFunction| fn, |bool|)
 	Assembler.sh.PackMakerInit
-	|| fs = FastString()
-	if !.asmsub(rz, fn, fs)
-		|| err = stderr.LastError
-			rz <~ err.name
-			|| errtmp = @tmp + "check"
-			errtmp <~ Interact.MiniErrors(stderr)
-			app.parent! <~ errtmp
+	Assembler.JSM.zero
+	Assembler.JSM.Length = 0
+
+	if Assembler.sh.GenerateASM(fn)
+		|| fs = FastString()
+		rz = .ASMSub(msg, fn, fs)
 
 
 function message.AsmIndent (|message| top, |int|)
@@ -1090,12 +1103,10 @@ function message.AsmIndent (|message| top, |int|)
 		self = .parent
 
 
-function ASMSub (|message| rz,  |SCFunction| fn, |faststring| fs, |bool|)
+function ASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |bool|)
 	opt norefcounts
-	Assembler.JSM.zero
-	Assembler.JSM.Length = 0
-
-	require Assembler.sh.GenerateASM(fn)
+//	out.msg(@tmp, "")			// separator. perry gets messed up
+								// need to do this more cleanly
 
 	|| bb = 0
 	|message| path 
@@ -1103,6 +1114,7 @@ function ASMSub (|message| rz,  |SCFunction| fn, |faststring| fs, |bool|)
 	|| top = fn.SourceArg
 	|| Count = 0
 	|| Size = 0
+
 	
 	for fat.fat in fn
 		|| hisss = fat.GuessSize
@@ -1111,10 +1123,10 @@ function ASMSub (|message| rz,  |SCFunction| fn, |faststring| fs, |bool|)
 		
 		if options.ASMRenderBlocks and (fat.BasicBlock != bb)
 			bb = fat.BasicBlock
-			rz <~ bb
+			out <~ bb
 		fs <~ (' ', fat.msg.asmindent(top)*2)
 		fat.RenderFat(fs, true)
-		|| tmp = rz.msg(@tmp, fs)
+		|| tmp = out.msg(@tmp, fs)
 		|| p = fat.msg.Position
 		if p <= 0
 			p = lp
@@ -1122,14 +1134,22 @@ function ASMSub (|message| rz,  |SCFunction| fn, |faststring| fs, |bool|)
 		lp = p
 		path = fat.msg.NextPath(tmp, path)
 	
-	// now... lets write the values in.
-	|| title = rz.first
+	|| title = out.first // going into the wrong place :D
 	title <~ count
 	title <~ size * 4
-	rz.msg(@tmp, "")  		// separator
-	rz.msg(@tmp, fn.render) // C-view
-	return true
 	
+	.CppView(out, fn)
+	return true
+
+
+function CppView (|message| out, |scfunction| fn)
+	out.msg(@tmp, "")			// separator
+	|| view = fn.render
+	for s.lines in view
+		if !s
+			s = " "
+		out.msg(@tmp, s)		// C-view
+
 
 function SCFunction.CheckUnusedCode (|message| feedback)
 	opt norefcounts
@@ -1376,14 +1396,3 @@ extend message
 		printline .jdb4_
 
 
-
-//|| PerryLogFile = file.Logs["SpeedieDebug.txt"]
-
-//function Compiler.PerryLog (|string| s) // try to find where this damn error came from.
-//	require compiler.InPerry
-//	if !PerryLogFile.Opened
-//		PerryLogFile.OpenEmpty
-//	PerryLogFile <~ s
-//	PerryLogFile <~ "\n"
-//
-//

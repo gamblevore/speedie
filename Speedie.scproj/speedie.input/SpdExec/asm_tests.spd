@@ -264,6 +264,7 @@ function Bug (|int| f1, |int|)
 	|| x2 = f1  or  1
 	return x2|int|
 
+
 target nothing
 	function DidntReportError (|int| f1, |int|) // this should report an error in perry!
 		visible									// but its not.
@@ -290,7 +291,7 @@ function SemiConst2 (|int| f1, |int|)
 	y9 = 0 and f1
 	#!y6
 	
-	y6 = y6 or y7*2
+	y6 = y7*2
 	#!y8
 	y8 = !y8 and x2*3
 	#!ret

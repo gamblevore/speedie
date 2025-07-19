@@ -526,10 +526,10 @@ function PerryIDE.BuildNormalCommand (|string| cmd,  |message| where,  |string| 
 		rz = nil
 
 
-function PerryIDE.DescribeWhere (|message| rz, |message| where)
-	rz <~ (@str, .editme.path) 
-	rz <~ where.position
-	rz <~ where.rangelength
+function PerryIDE.DescribeWhere (|message| out, |message| where)
+	out <~ (@str, .editme.path) 
+	out <~ where.position
+	out <~ where.rangelength
 
 
 function message.IsUsefulTypeOfDecl (|bool|)

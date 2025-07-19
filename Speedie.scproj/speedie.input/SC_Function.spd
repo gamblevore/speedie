@@ -59,6 +59,7 @@ linkage
 |[SCDecl]|				Args
 |SCClass?|				Cls
 |CppRefs?|				Refs
+|error?|				SavedError
 |object?|				CounterPart
 |SCFunction?|			NextFunc
 |SCDecl?|				HasProto
@@ -306,6 +307,7 @@ function @scfunction.TransformAll
 		require !stderr.TooMany
 		f.Transform
 
+
 function Transform ()
 	opt norefcounts
 
@@ -314,6 +316,7 @@ function Transform ()
 	scfunction.CurrFunc = self
 	scmodule.curr = .parent as scmodule
 	.Badness = 0
+	.SavedError = nil
 	|| StillOK = StdErr.Mark
 
 	|| n = .SourceArg						#require
@@ -329,6 +332,7 @@ function Transform ()
 		parser.Using.Flags = 0
 
 	if !StillOK
+		.SavedError = StdErr.LastError
 		.Badness |= 1
 	  else
 		.CallParents // hehe 🥰

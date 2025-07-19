@@ -36,10 +36,10 @@ helper __junktest_2__
 
 helper message.__junktest_18__ (|bool| named=false) // findpos, findat
 	opt norefcounts
-	|message| rz 
+	|message| m
 	for ch in self
-		if ((rz!=nil) and !rz.position) // smallest
-			rz = ch
+		if ((m!=nil) and !m.position) // smallest
+			m = ch
 
 
 
