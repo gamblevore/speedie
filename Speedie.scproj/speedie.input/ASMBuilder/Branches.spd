@@ -383,16 +383,11 @@ function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asm
 function BoolConst2 (|asmreg| ml, |asmreg| kr, |opmode| Opp, |FATASM| Jump, |asmreg|)
 	|| V = kr.const!=0
 	if v == (opp is AND)
-		|| f = ml.fat
-			f.µRefCount++
-		.nop jump
-		.NopReg(kr) // this could destroy the first input... but we still need it
-		if f
-			f.µRefCount--
-		
+		.simplenop jump
+		.NopReg(kr)
 		return ml
 		
-	.nop jump	// .nopreg(ml) // the jump nopper already does this.
+	.nop jump // this also nops ml!
 	return kr
 
 

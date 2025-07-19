@@ -233,11 +233,6 @@ struct Assembler
 	
 	
 	function SimpleNop (|FATASM| Fat)
-		|| Type = asm.noop * (fat < ._curr)
-		fat.setop = Type
-
-
-	function Nop (|FATASM| Fat, |int| Depth=0)
 		|| C = .curr - 1
 		if fat == C
 			._curr = C // nice
@@ -246,13 +241,18 @@ struct Assembler
 			if .Registers[v] == fat
 				.Registers[v] = nil
 				.KnownValuesMap &=~ (1<<v)
+		|| Type = asm.noop * (fat < ._curr)
+		fat.setop = Type
+
+
+	function Nop (|FATASM| Fat, |int| Depth=0)
+		.SimpleNop(fat)
 
 		depth++
 		if depth > 7
 		for f.fatinputs in fat
 			.Decr(f, depth)
 
-		.simplenop(fat)
 	
 	
 	function Decr (|?&fatasm| f, |int| Depth=0)
