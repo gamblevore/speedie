@@ -246,12 +246,12 @@ struct Assembler
 
 
 	function Nop (|FATASM| Fat, |int| Depth=0)
-		.SimpleNop(fat)
-
 		depth++
 		if depth > 7
 		for f.fatinputs in fat
 			.Decr(f, depth)
+
+		.SimpleNop(fat)
 
 	
 	
