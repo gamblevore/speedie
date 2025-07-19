@@ -345,11 +345,11 @@ function BoolValue (|message| A, |ASMReg| Dest, |opmode| Opp, |message| B, |ASMR
 	if first is ConstOutput
 		return .BoolConst1(b, dest, opp, first).boolanswer			// x = 5 or Y() --> x = Y()
 	
-	|| JUMP = .BoolTestAndJump(a.next!, dest, opp)					// AND/OR
+	|| JUMP = .BoolTestAndJump(a, first, opp)						// AND/OR
 	|| Second = .µBoolInto(B, dest)
 	if Second is ConstOutput
-		.NOP(jump) //opp, first, Second, B
-		return .BoolConst2(second, dest, opp, b, first).boolanswer
+		.NOP(jump) // opp, first, Second, B
+		return .BoolConst2(first, second, opp).boolanswer
 
 	JUMP.JumpTo(.curr, self)
 	
@@ -368,7 +368,7 @@ function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asm
 									// x = 5 or  2	 --> x = true
 									// x = 0 and 2	 --> x = false
 	
-	.nopreg(ml)						// x = 0 or y()  --> x = y()
+	.NopReg(ml)						// x = 0 or y()  --> x = y()
 									// x = 7 and y() --> x = y()
 	|| mr = .µ(B, dest)
 	if mr is ConstOutput
@@ -381,17 +381,14 @@ function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asm
 	return .Exists(dest, mr, B)
 
 
-function BoolConst2 (|asmreg| mr, |asmreg| Dest,  |opmode| Opp, |message| exp, |asmreg| ml, |asmreg|)
-	|| V = mr.const!=0
+function BoolConst2 (|asmreg| ml, |asmreg| kr, |opmode| Opp, |asmreg|)
+	if "bug".trap
+	|| V = kr.const!=0
 	if v == (opp is AND)
-		.nopreg(mr)
-		ml.µtype = datatypecode.bool
+		.NopReg(kr)
 		return ml
-	
-	if ml is FromExistingVar // why not?
-		.Nopreg(ml)
-	mr.µtype = DataTypeCode.bool
-	return .SetConst(exp, v|int|, mr, dest)
+	// .nopreg(ml) // the jump nopper already does this. in the subnop
+	return kr
 
 
 function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)

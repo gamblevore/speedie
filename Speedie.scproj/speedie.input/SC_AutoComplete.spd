@@ -192,19 +192,25 @@ function UnusedFuncs (|message| cmd, |message|)
 
 
 function SCDecl.IsUsed (|bool|)
+	if self is CompilerCreated
+		return true // whatever
 	if self is ReadFrom
 		return true
 	if self is Reference and Setto
 		return true
 
 
+function string.ItsUnused (|string|)
+	return self + " is unused"
+
+	
 function SCFunction.CheckUnused (|message| feedback)
 	opt norefcounts
 	require self isnt Disabled
 	require self isnt InitFunc
 	if .isunused
 		|| src = .source
-			|| str = "() is unused"
+			|| str = "()".ItsUnused
 			if .linkfrom != nil
 				str = "()'s callers are unused"
 			feedback.msg(@tmp, .name + str) <~ src.position
@@ -219,11 +225,25 @@ function SCFunction.CheckUnused (|message| feedback)
 			|| Src = arg.source
 			if src and src isnt Inserted
 				if ErrName
-					ErrName.name = arg.name + ", " + ErrName.name
+					ErrName.name = ", " + ErrName.name
+					ErrName.name = arg.name + ErrName.name
 				  else
-					ErrName = feedback.msg(@tmp, arg.name + " is unused")
-					ErrName <~ Src.position
+					feedback.msg(@tmp, arg.name.ItsUnused) <~ src.position
+	
+	for s.flat in .Source
+		if s == @decl
+			|| o = s.obj
+			if o isa SCDecl
+				if !o.IsUsed
+					feedback.msg(@tmp, o.UnusedStr) <~ s.position
 
+
+
+function scdecl.UnusedStr (|string|)
+	if self is SetTo
+		return .name + " is set to, but never read from."
+	return .name.ItsUnused
+	
 
 function Check (|message| cmd=nil, |message|)
 	if cmd
@@ -318,6 +338,7 @@ function GetFunc2 (|scfile| myfile, |int| f, |int| n,  |scfunction|)
 	
 function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction|)
 	opt norefcounts
+	if cmd contains "DidntReportError"
 	|| src = cmd.last
 	if src != @dot
 		return .getfunc2(myfile, ff, n)
@@ -751,19 +772,16 @@ function AllTmps (|message|)
 
 
 function TmpAutoComplete (|message!| f, |string| name, |string| type, |message|)
-	|| finished = false
 	rz = @tmp + type
 	|| arg = rz.msg(@arg, name)
 	if name ~!= "r" // too annoying.
 		for ch.fast in .functmps
 			if ch starts name
-				if ch.name > 2  and  ch.name ~= name
-					finished = true
-				  else
+				ifn ch.name > 2  and  ch.name ~= name
 					|| cf = ch.first
 						arg.msg(@tmp, cf.name) <~ (@str, cf.name)
 	
-	.AutoCompleteSub(f, name, type, arg)
+	.AutoCompleteSub(f, name, arg)
 	  
 
 
@@ -817,11 +835,11 @@ function AutoComplete (|message| ff, |string| name, |string| Purpose, |message|)
 	if f != @bra and @prm and @list and @arg and @arr and @acc and @decl and @rel
 		|| tmp = @tmp.msg(Purpose)
 		|| arg = tmp.msg(@arg, name)
-		.AutoCompleteSub(ff, name, purpose, arg)
+		.AutoCompleteSub(ff, name, arg)
 		return tmp
 
 
-function AutoCompleteSub (|message| ff, |string| name, |string| Purpose, |message| into)
+function AutoCompleteSub (|message| ff, |string| name, |message| into)
 	.Total = 0
 	|| Types = -1
 	|| scope = .GetScope(ff, types)
@@ -868,7 +886,6 @@ function CanUseName (|SCNode| l, |bool|)
 
 function Diissplay (|message| msg, |message| s, |string| purpose, |message|)
 	rz = @arg.msg
-	|| x = taskstate.Finished
 	|| fn = s.Identifyfunc
 	if msg == @name
 		if purpose == "display"  and  s istmp "prototype"
@@ -1049,6 +1066,10 @@ function Nothing (|message| rz,  |SCFunction| fn)
 		rz <~ "This is a cpp_wrapper function"
 	  elseif fn is disabled
 		rz <~ "This function is disabled"
+//	  elseif fn.TargettedOut
+//		rz <~ "Function was targgeted out"
+	  else
+		rz <~ "Could not compile this function."
 
 
 function ASM (|message| rz,  |SCFunction| fn)
@@ -1080,21 +1101,32 @@ function ASMSub (|message| rz,  |SCFunction| fn, |faststring| fs, |bool|)
 	|message| path 
 	|| lp = 0
 	|| top = fn.SourceArg
+	|| Count = 0
+	|| Size = 0
+	
 	for fat.fat in fn
-		if options.ASMRenderBlocks and fat.BasicBlock != bb
+		|| hisss = fat.GuessSize
+		count += hisss > 0
+		size += hisss
+		
+		if options.ASMRenderBlocks and (fat.BasicBlock != bb)
 			bb = fat.BasicBlock
 			rz <~ bb
 		fs <~ (' ', fat.msg.asmindent(top)*2)
-		fat.Renda(fs, true)
-		|| tmp = rz.msg(@tmp, fs.GetResult)
+		fat.RenderFat(fs, true)
+		|| tmp = rz.msg(@tmp, fs)
 		|| p = fat.msg.Position
 		if p <= 0
 			p = lp
 		tmp <~ p
 		lp = p
 		path = fat.msg.NextPath(tmp, path)
-
-	rz.msg(@tmp, "")
+	
+	// now... lets write the values in.
+	|| title = rz.first
+	title <~ count
+	title <~ size * 4
+	rz.msg(@tmp, "")  		// separator
 	rz.msg(@tmp, fn.render) // C-view
 	return true
 	
@@ -1102,7 +1134,7 @@ function ASMSub (|message| rz,  |SCFunction| fn, |faststring| fs, |bool|)
 function SCFunction.CheckUnusedCode (|message| feedback)
 	opt norefcounts
 	for f.fat in self
-		if f.IsUnused and f!=asm.NOOP
+		if f.IsUnused
 			|| m = f.msg
 				feedback.msg(@tmp, "Unused code") <~ m.position
 

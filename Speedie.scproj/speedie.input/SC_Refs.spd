@@ -385,23 +385,22 @@ function ExprNeedsTemping (|Message| child, |Message| name, |bool|)
 
 
 function Destructable (|Message| Blocker, |Message?| arg, |Message| name)
-	opt norefcounts
+	opt norefcounts	
 	|| type = TypeOfExpr(name, nil, nil)
-	require (type isa SCDecl)
-	
-	|| src = blocker ?? arg!.DeepLast
-	using src
-	|| fn		= type.type.destructorfunc!
-	|| FnMsg	= RefMsg0(fn.exportname, fn)
-	|| brel = fnmsg.last.msg(@brel, "&")
-	|| NewThg = brel.msg(@thg, name.name)
+		(type is Readfrom)
+		|| src = blocker ?? arg!.DeepLast
+		using src
+		|| fn		= type.type.destructorfunc!
+		|| FnMsg	= RefMsg0(fn.exportname, fn)
+		|| brel = fnmsg.last.msg(@brel, "&")
+		|| NewThg = brel.msg(@thg, name.name)
 
-	brel.obj = type.getaddress
-	newthg.obj = name.obj // needed
-	if (Blocker)
-		Blocker.Prev = Fnmsg
-	  else
-		arg <~ Fnmsg
+		brel.obj = type.getaddress
+		newthg.obj = name.obj // needed
+		if (Blocker)
+			Blocker.Prev = Fnmsg
+		  else
+			arg <~ Fnmsg
 
 
 function ReturnTempMoveOut (|Message| Child, |Message| blocker)

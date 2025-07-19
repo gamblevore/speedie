@@ -406,7 +406,7 @@ function SCFunction.operatorin (|string| s, |bool|)
 
 
 //|| LIBGC = 0 // not used much... but definitly is needed
-function scdecl.CheckLibGlob 
+//function scdecl.CheckLibGlob 
 //	if (self isnt marked) and self.IsLib and (self is Global) and (self isnt const)
 //		|| c = SCFunction.CurrFunc
 //			if !c.IsSTDLib

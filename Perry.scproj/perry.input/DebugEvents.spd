@@ -375,7 +375,15 @@ function perryide.GotASMSub (|message| asm)
 			src <~ cpy
 			cpy.obj = file.name
 
-	name.name = "function ${name.name} ($n/${n*4})"
+	|| fs = FastString()
+//	fs <~ "function "
+	fs <~ name.name
+	file = arg.first
+	fs <~ ": "
+	fs <~ file[1].int
+	fs <~ " / "
+	file[2].int.strsize(Fs)
+	name.name = fs//.GetResult
 	
 
 

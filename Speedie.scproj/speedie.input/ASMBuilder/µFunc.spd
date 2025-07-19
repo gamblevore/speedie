@@ -41,7 +41,7 @@ extend SCFunction
 				bb = µ.BasicBlock
 				fs <~ "//$bb\n"
 			fs <~ '\t'
-			µ.Renda(fs)
+			µ.RenderFat(fs)
 			fs <~ '\n'
 
 

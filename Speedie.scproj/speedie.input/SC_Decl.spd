@@ -88,6 +88,7 @@ datatype SCDeclInfo (uint)
 		ReturnedStruct
 		IntendedAsReturn
 		
+		Temp			= body ||| CompilerCreated
 		VarType			= Param ||| Body ||| Global ||| Property
 		Local			= Body  ||| Param
 		SelfImplicit	= Self  ||| local // local is set by CollectOneParam, anyhow?

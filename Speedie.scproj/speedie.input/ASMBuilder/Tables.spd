@@ -336,7 +336,9 @@ function Decl (fn_asm)
 		return AllocBearStruct(1, exp, dest, ty.SizeOfQuery)
 	
 	if ty isnt local								// A carray or somthing?? idk
-	return .µInto(rel.Last!, dest)
+	rz = .µInto(rel.Last!, dest)
+	|| f = rz.fat
+		f.µRefCount++ 
 
 
 function ArgumentSub (|&Assembler| self, |message| exp, |AsmReg|)

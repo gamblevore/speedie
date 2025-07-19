@@ -63,7 +63,7 @@ function Message.TempIntoBlock (|message| ParentPlace, |Message|)
 	  else
 		arg = FuncMsg.createownblock #require
 		|| TmpFuncVar = UniqueTmpVar()
-		TmpFuncDecl = MakeDecl( "", TmpFuncVar, FuncMsg, scdeclinfo.body )
+		TmpFuncDecl = MakeDecl( "", TmpFuncVar, FuncMsg, scdeclinfo.temp )
 		TmpFuncThg = «Thg TmpFuncVar »
 		TmpFuncThg.obj = TmpFuncDecl.obj
 		arg <~ TmpFuncDecl
@@ -74,7 +74,7 @@ function Message.TempIntoBlock (|message| ParentPlace, |Message|)
 	|| TmpParamName = UniqueTmpVar()
 	rz = @thg + TmpParamName 
 	.ReplaceWith( rz )
-	|| TmpParamDecl = MakeDecl( "", TmpParamName, self, scdeclinfo.body )
+	|| TmpParamDecl = MakeDecl( "", TmpParamName, self, scdeclinfo.temp )
 	rz.obj = TmpParamDecl.obj 
 	TmpFuncDecl.prev = TmpParamDecl
 
@@ -181,7 +181,7 @@ extend_module scfunction
 	function TempMoveOut (|Message| msg, |string| name="", |scdecl| type=nil, |Message!|)
 		cpp_part TypedTempMoveOut 
 		// a.b.c -> || tmp1 = a.b.c
-	
+		
 		|| Using = msg.SyntaxUsing
 		name ?= UniqueTmpVar(msg.MsgOwningFunc)
 		|| repl = «thg name »
@@ -192,7 +192,7 @@ extend_module scfunction
 		if (msg == @rel)
 			insert = «bra, (msg)»
 	
-		|| dcl = MakeDecl( "", name, insert )
+		|| dcl = MakeDecl( "", name, insert, scdeclinfo.temp )
 		p.Prev = dcl
 		if (repl in @arg)
 			repl.Remove
@@ -204,6 +204,7 @@ extend_module scfunction
 			|| Dcl2 = OldDcl.copydecl	// no difference, its a temp
 			if OldDcl.IsBareStruct		// oof? what about scfunction.StackAllocGuess
 			dcl2.AsBody					// can we just use collectfrombody?
+			(dcl2 is compilercreated)
 			
 			Dcl2.Name = name
 			|| relname = dcl.last.first 
@@ -229,7 +230,7 @@ extend_module scfunction
 		msg.ReplaceWith( NameThing )
 		
 		// here
-		|| declmsg = MakeDecl( "", name, msg, scdeclinfo.body )
+		|| declmsg = MakeDecl( "", name, msg, scdeclinfo.temp )
 		place.prev = declmsg
 		
 		|| d = declmsg.Obj!|scdecl|

@@ -34,20 +34,17 @@ extend Assembler
 			mode |= R.Small << 3
 			return exp.EQUL(dest, L, R, mode) * dest
 		
-		
 		|| RS = r.small
 		|&fatasm| fat
 		if l.reg
 			|| LS = L.Small
-			if negate
-				fat = exp.JMPN(l, r, LS, RS, 0)
-			  else
-				fat = exp.JMPE(l, r, LS, RS, 0)
+			fat = exp.JMPN(l, r, LS, RS, 0)
+			if !negate
+				fat._op = asm.jmpe
 		  else
-			if negate
-				fat = exp.JBAN(r, RS, 0)
-			  else
-				fat = exp.JBOR(r, RS, 0)
+			fat = exp.JBAN(r, RS, 0)
+			if !negate
+				fat._op = asm.jbor
 		return fat * res
 
 	

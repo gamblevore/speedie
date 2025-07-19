@@ -60,7 +60,7 @@ struct FatASM
 		return b == asm.fncx or asm.fnc
 	
 	function IsUnused (|bool|)
-		return .µRefCount <= 0
+		return .µRefCount <= 0 and self!=asm.NOOP
 	
 	function BaseOp (|int|)
 		rz = .op
@@ -385,7 +385,7 @@ struct FatASM
 		fs <~ ")"
 	
 	
-	function Renda (|FastString| fs, |bool| Simpler=false)
+	function RenderFat (|FastString| fs, |bool| Simpler=false)
 		opt norefcounts
 		|| obj = .msg.obj
 		
@@ -395,10 +395,7 @@ struct FatASM
 		
 		|| M = fs.mark
 		|| op = instruction.typelist[.baseop]!
-		|| NL = op.name.length
-		if .baseop == asm.noop
-			NL = -1
-		  else
+		if .baseop != asm.noop
 			fs <~ op.name
 			fs <~ ':'
 		fs <~ (' ', 5-op.name.length)
@@ -427,7 +424,7 @@ struct FatASM
 			if .op == asm.knst
 				exit
 		
-		if (self isa asm.knst or asm.knsr or asm.gtab)
+		if (self  isa  asm.knst or asm.knsr or asm.gtab)
 			.RendaKnst(fs, fs.mark-m)
 			fs <~ ' '
 		
@@ -440,6 +437,15 @@ struct FatASM
 			.RendaMsg(fs, n)
 	
 
+	function GuessSize (|int|)
+		// don't really know the size, as consts are awkward to guess
+		// and long-jumps might require more awkward encoding.
+		if .Exists
+			if ._op < 32
+				return 2 + ._op&1
+			return 1
+	
+	
 	function Exists (|bool|)
 		return .op != asm.noop
 
@@ -543,7 +549,7 @@ struct FatASM
 			return
 		if asm.NoisyASM >= 3
 			|| fs = faststring()
-			.Renda(fs)
+			.RenderFat(fs)
 			printline fs
 
 

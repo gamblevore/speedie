@@ -57,7 +57,7 @@ function message.Tran_QMark
 		rel.next = self
 		.become(@arg)
 		inside.replaceWith(@thg.msg("_t"))
-		|| decl = MakeDecl("",  "_t", inside) 
+		|| decl = MakeDecl("",  "_t", inside, scdeclinfo.temp) 
 		self <~ decl
 		decl.msg(@arg) <~ rel
 		return
@@ -92,7 +92,7 @@ function message.Tran_QMark
 	if (inside != @thg)
 		cond.name = "_t"
 		inside.replaceWith(@thg.msg("_t"))
-		tern.prev = MakeDecl("",  "_t", inside)
+		tern.prev = MakeDecl("",  "_t", inside, scdeclinfo.temp)
 
 
 

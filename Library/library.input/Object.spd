@@ -62,13 +62,16 @@ class Object
 		cpp_part FastIsa
 		return (self) and (.Class == x)
 
+	// perhaps... as and fast_as should just return nil and no errors
+	// and mustbe could do the typecast?
+	
 	operator as (|ClassData| x, |object|)
 		cpp_name JB_Object_As
 		if self isa x
 			return self
 		if self
 			return .TypeFailed(x, nil)
-		
+	
 	operator fast_as (|ClassData| x, |object|)
 		cpp_part FastAs
 		if self

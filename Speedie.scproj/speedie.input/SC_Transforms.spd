@@ -123,7 +123,7 @@ function Tran_Using (TranFunc)
 	ifn ((WithFirst == @thg or @num) or withfirst.isstring)
 		|| declname = UniqueTmpVar("_var") // maybe this should be the actual "make temp" function...
 										   // just these few lines of code.
-		|| ThgDecl = MakeDecl( "", declname, withfirst, scdeclinfo.Body )
+		|| ThgDecl = MakeDecl( "", declname, withfirst, scdeclinfo.temp )
 		|| WithFirst2 = @thg + declname
 		withfirst2.obj = withfirst!.obj
 		withfirst = withfirst2
@@ -661,7 +661,7 @@ function Tran_ForStart (|Message| arg, |Message| index, |SCNode| p)
 	
 	using (arg)
 	|| CondName = UniqueTmpVar(p, "first")			// copy the index
-	Arg.parent!.Prev = MakeDecl( "", CondName, index.copy(arg) )
+	Arg.parent!.Prev = MakeDecl( "", CondName, index.copy(arg), scdeclinfo.temp )
 
 	|| IfTest = «tmp "if"
 		«bra

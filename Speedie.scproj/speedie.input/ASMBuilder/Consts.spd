@@ -97,7 +97,7 @@ extend Assembler
 		dest = .TempOnly(exp, dest)		
 		if dest isnt Textual
 			|| K = .Last(asm.knst)
-				if k.r0 == dest.reg
+				if (k.r0 == dest.reg) and (k is temp)
 					.nop(k)
 		
 		(dest is realconst)

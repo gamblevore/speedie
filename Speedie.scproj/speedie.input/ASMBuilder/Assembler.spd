@@ -198,7 +198,7 @@ struct Assembler
 		|| f = r.fat
 			return .Nop(f)
 		if r.reg and r isnt param
-			debugat // bad!
+			debugat // we don't know what made it, but we should!!
 	
 	
 	function Nop2Consts (|asmreg| A, |asmreg| B)
@@ -232,6 +232,11 @@ struct Assembler
 					return true
 	
 	
+	function SimpleNop (|FATASM| Fat)
+		|| Type = asm.noop * (fat < ._curr)
+		fat.setop = Type
+
+
 	function Nop (|FATASM| Fat, |int| Depth=0)
 		|| C = .curr - 1
 		if fat == C
@@ -247,9 +252,7 @@ struct Assembler
 		for f.fatinputs in fat
 			.Decr(f, depth)
 
-		// why is this coming after? maybe better before? try?
-		|| Type = asm.noop * (fat < ._curr)
-		fat.setop = Type
+		.simplenop(fat)
 	
 	
 	function Decr (|?&fatasm| f, |int| Depth=0)
@@ -274,11 +277,12 @@ struct Assembler
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	function µBoolInto (|message| exp, |AsmReg| Dest, |asmreg|)
-		|| X = .ExistingVar(Exp)
-		X ?= .µInto(exp, dest)
+		|| X = .ExistingVar(Exp) // superfluous?
+		if !x
+			x = .µInto(exp, dest)
 		if  (X.µtype isnt bool)  or  (dest is negate  and  X isnt AlreadyNegated)
 			return .exists(dest as (X bitand ASMReg.FromExistingVar), X, exp)
-		return .Assign(dest, X, exp)
+		return .Assign(x.reg(dest), X, exp)
 
 
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
