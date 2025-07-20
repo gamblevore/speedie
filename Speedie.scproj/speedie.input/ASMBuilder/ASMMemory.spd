@@ -116,6 +116,8 @@ function Assembler.MemOffsetFix (|asmreg| base, |int| pow2, |$int| index, |uint|
 	opt norefcounts
 	|uint| maximum = (1 << maxbits) - 1
 	|int64| LostBytes = 0
+	
+	// So... lib globals? that have indexes set at load time? what do we do with that?
 	if base is GlobalMemory
 		expect (glob)
 		

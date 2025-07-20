@@ -2,22 +2,22 @@
 
 
 dispatch fn_asm_table (fn_asm)
-	@arg:	ASMType.Arg
-	@tril:	Assembler.BigWhile
-	@decl:	ASMType.decl
-	@num:	ASMType.num
-	@char:	ASMType.char
-	@rel:	ASMType.DoMath
-	@thg:	ASMType.Thg
-	@bra:	ASMType.First
-	@sheb:	ASMType.Sheb
-	@sstr:	Assembler.Str
-	@list:	Assembler.VectorLoad
-	@func:	ASMType.ASMFunction
-	@dot:	ASMType.Dot
-	@acc:	ASMType.Access
-	@brel:	ASMType.Brel		// ++, --, -, &
-	@arel:	ASMType.arel     // ++, --, 
+	@arg:					ASMType.Arg
+	@tril:					Assembler.BigWhile
+	@decl:					ASMType.decl
+	@num:					ASMType.num
+	@char:					ASMType.char
+	@rel:					ASMType.DoMath
+	@thg:					ASMType.Thg
+	@bra:					ASMType.First
+	@sheb:					ASMType.Sheb
+	@sstr:					Assembler.Str
+	@list:					Assembler.VectorLoad
+	@func:					ASMType.ASMFunction
+	@dot:					ASMType.Dot
+	@acc:					ASMType.Access
+	@brel:					ASMType.Brel		// ++, --, -, &
+	@arel:					ASMType.arel		// ++, --, 
 	@type:					ASMType.TypeCast
 	@tmp:					ASMType.unexpected
 
@@ -598,7 +598,7 @@ function NotTemp (|&Assembler| self, |asmreg| Src, |message| p)
 	check (src isnt temp) (p, "Can't increment temporary value.")
 
 
-function Incrementatulatorifier (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg|)				// --a++
+function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg|)				// --a++
 	visible
 	opt	NoRefCounts
 	
@@ -627,7 +627,6 @@ function Incrementatulatorifier (|&Assembler| self, |message| exp, |AsmReg| Dest
 
 
 
-
 function ARel (fn_asm)
 	opt	NoRefCounts
 	|| F = exp.name[]
@@ -636,7 +635,7 @@ function ARel (fn_asm)
 	|| M = (F == '+')|int|
 	if dest isnt discard
 		M += IncrAfter
-	return Incrementatulatorifier(self, exp.first!, dest, M)
+	return Incrementa(self, exp.first!, dest, M)
 
 
 
@@ -656,7 +655,7 @@ function BRel (fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
 		return AddressOf(self, f, dest)
 	
 	|| IsPlusPlus = n == '+'						// ++a, --a
-	return Incrementatulatorifier(self, F, dest, IsPlusPlus|int|)
+	return Incrementa(self, F, dest, IsPlusPlus|int|)
 
 
 

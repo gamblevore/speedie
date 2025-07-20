@@ -57,7 +57,6 @@ module PackMaker
 		for (d in list)
 			|| s = d.CarraySize
 			|| s16 = s min 16
-//			printline "//:: ${d.Name} $s $s16"
 			rz = rz align s16
 			if alter
 				d.au.ExportPosition = rz
