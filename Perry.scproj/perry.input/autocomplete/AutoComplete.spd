@@ -72,7 +72,7 @@ function string.LowerDiffAt (|string| A, |ind|)
 function PerryIDE.AutoCompleteFB (|message| list, |AutoCompleteMode| Mode, |string| reason, |bool|)
 	opt NoRefCounts
 	require .EditMe.CanAutoComplete == 1
-	|| w		= 5
+//	|| w		= 5
 	|| Common	= int.max
 	|| shortest = Common
 	|| longest  = 0

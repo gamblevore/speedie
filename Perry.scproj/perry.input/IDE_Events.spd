@@ -519,7 +519,7 @@ function PerryIDE.ClickedFind (|error| row)
 		return
 
 	|| curr = .MoveError(f1, row.path, -1)$
-	|| last = .MoveError(f1, row.path,  1)
+//	|| last = .MoveError(f1, row.path,  1)
 
 	.editme.show(curr.position)
 //	while curr

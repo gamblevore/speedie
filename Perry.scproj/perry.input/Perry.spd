@@ -20,7 +20,6 @@ module Perry
 	
 	function LoadWindowsFromArgs (|bool|)
 		require app.args > 0
-		|| OldProj = .projects
 		.Projects = Message()
 		for arg in app.args // load specified documents
 			|| ide = .LoadAppArg(arg)

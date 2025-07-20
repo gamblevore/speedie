@@ -80,7 +80,6 @@ function PerryFileListFilter (GUIListEditEvent)
 
 function PerryIDE.GoToMarker (|message| m, |int| dir)
 	require m 
-	|| l = m.first
 	.duringNextPrev = dir
 	using self
 		.EditPath(m.firstname)

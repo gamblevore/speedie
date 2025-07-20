@@ -126,8 +126,7 @@ class PerryIDE (Window)
 
 
 	function ExpandStr (|string| path, |string|)
-		|| d = perry.pathdict init [ "spd"  :  file.speediedir ]
-
+//		|| d = perry.pathdict init [ "spd"  :  file.speediedir ]
 		rz = path.Path_Expand(perry.PathDict) #expect ("Unrecognised @ in: " + path)
 		rz = rz.resolve(FileResolveMode.AllowMissing)
 	
@@ -422,19 +421,19 @@ class PerryIDE (Window)
 					fl.SmartName = "file".pluralize(fl.LastFileCount)
 
 
-	function CheckNotCrashed (|&Process| pp, |string| what, |bool|)
-		|| p = (pp[])|process--|
-		require p
-		|| Exit = p.Status
-		if !exit.Crashed
-			return true
-
-		|| fs = faststring()
-		fs <~ "Crashed: ${exit.name}  {${p.render}}\n"
-		fs <~ p.ErrorOutput.getresult.FindStacktrace
-		pp[] = nil
-		.Notify(fs, @emb + what)
-		.CancelCompile
+//	function CheckNotCrashed (|&Process| pp, |string| what, |bool|)
+//		|| p = (pp[])|process--|
+//		require p
+//		|| Exit = p.Status
+//		if !exit.Crashed
+//			return true
+//
+//		|| fs = faststring()
+//		fs <~ "Crashed: ${exit.name}  {${p.render}}\n"
+//		fs <~ p.ErrorOutput.getresult.FindStacktrace
+//		pp[] = nil
+//		.Notify(fs, @emb + what)
+//		.CancelCompile
 
 
 	function CheckCrashed (|Process| p, |string| what, |bool|)
@@ -754,7 +753,7 @@ class PerryIDE (Window)
 	function OpenDoc (|string| Path, |object|)
 		require self
 		|| p   = path
-		|| ext = p.ext
+//		|| ext = p.ext
 		|| f   = p.file
 		if f.isdir
 			p = p.pathdir

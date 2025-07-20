@@ -84,7 +84,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 
 	|| f = .SharedProjectTabSource[@nil]$
 	|| p = [.project, "--perry=bin", "--nocolor"]
-	|| name = .name
+//	|| name = .name
 	|| Noisy = SpdLibAlreadyInUse
 		"--sending noise--"
 		p <~ "--noisy"
